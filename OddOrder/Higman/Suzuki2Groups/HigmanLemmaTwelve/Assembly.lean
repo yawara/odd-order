@@ -607,6 +607,315 @@ theorem isTypeD_of_mixedTerm_monomial
     rw [h3, h1]
     simp
 
+/-! ## The classification endpoint -/
+
+/-- **Higman, Lemma 12 (pp. 90--92): a Suzuki 2-group of ξ-length 3 is
+isomorphic to some `B(n, θ, ε)`, `C(n, ε)`, or `D(n, θ, ε)`.**
+
+The complementary invariant factors `X ≅ A(n, θ)`, `Y ≅ A(n, φ)` are
+normalized by the `A(n, θ) ≅ A(n, θ⁻¹)` flip so that each factor
+automorphism is `1` or `Frob^r` with `0 < r ≤ n/2`, and the four cases of
+Higman's dispatch on `(θ, φ)` are closed by the per-case engines. -/
+theorem higmanLemmaTwelve
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P, x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard) :
+    IsTypeB.{uP, 0} P ∨ IsTypeC.{uP, 0} P ∨ IsTypeD.{uP, 0} P := by
+  classical
+  have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+    frattini_isElementaryAbelian_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  letI : IsMulCommutative ↑(frattini P) := IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  obtain ⟨factors, c, ePhi, nu, dataL0, dataR0, hn2, -, hnuPrim, hconj,
+      hnuL0, hnuR0⟩ :=
+    exists_complementaryFactorCoordinates_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  revert hnuL0 hnuR0 hconj hnuPrim hn2 dataR0 dataL0 nu ePhi
+  generalize Module.finrank (ZMod 2) (Additive ↑(frattini P)) = n
+  intro ePhi nu dataL0 dataR0 hn2 hnuPrim hconj hnuL0 hnuR0
+  have hK0 :=
+    lowerCentralLayerKernel_zero_eq_frattini_subgroupOf_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  have hK1 := lowerCentralLayerKernel_one_eq_bot_of_xiLengthThree
+    hP hncomm hmulti hxi hlen hprime
+  have hterm := lowerCentralTerm_one_eq_frattini_of_xiLengthThree
+    hP hncomm hmulti hxi hlen hprime
+  have hSq := lowerCentralSquaresLieInSecond_of_xiLengthThree
+    hP hncomm hmulti hxi hlen hprime
+  have hAgemo := agemo_one_eq_frattini_of_xiLengthThree
+    hP hncomm hmulti hxi hlen hprime
+  obtain ⟨-, hcentral⟩ :=
+    commutator_eq_frattini_and_frattini_le_center_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  have hPhiNeBot : frattini P ≠ (⊥ : Subgroup P) := by
+    intro hPhiBot
+    have hcommBot : _root_.commutator P = ⊥ :=
+      le_bot_iff.mp
+        ((OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP).trans
+          (le_of_eq hPhiBot))
+    exact hncomm ((commutator_eq_bot_iff P).mp hcommBot)
+  have hinvPhi : involutions P ⊆ frattini P :=
+    involutions_subset_of_nontrivial_invariant hP Y hxi.transitive
+      (IsAInvariant.of_characteristic Y.subtype) hPhiNeBot
+  have hinv : ∀ x : P, x ^ 2 = 1 → x ∈ lowerCentralTerm P 1 := by
+    intro x hx
+    rw [hterm]
+    by_cases hx1 : x = 1
+    · rw [hx1]
+      exact Subgroup.one_mem _
+    · exact hinvPhi ⟨hx, hx1⟩
+  have hn0 : n ≠ 0 := by omega
+  have n_pos : 0 < n := by omega
+  have hcard : Nat.card (GaloisField 2 n) = 2 ^ n := by
+    simpa [Nat.card_eq_fintype_card] using GaloisField.card 2 n hn0
+  have hordnu : orderOf nu = 2 ^ n - 1 := hnuPrim.eq_orderOf.symm
+  have hNpos : 0 < 2 ^ n - 1 := by
+    have : 2 ^ 1 ≤ 2 ^ n := Nat.pow_le_pow_right (by norm_num) n_pos
+    omega
+  have hνne : nu ≠ 0 := by
+    intro h0
+    have hone : nu ^ (2 ^ n - 1) = 1 := by
+      rw [← hordnu]
+      exact pow_orderOf_eq_one nu
+    rw [h0, zero_pow (by omega)] at hone
+    exact zero_ne_one hone
+  have hpowcard : ∀ x : GaloisField 2 n, x ≠ 0 → x ^ (2 ^ n - 1) = 1 := by
+    intro x hxne
+    have hfin : Finite (GaloisField 2 n) :=
+      Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
+    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    have h := FiniteField.pow_card_sub_one_eq_one x hxne
+    rwa [← Nat.card_eq_fintype_card, hcard] at h
+  have horderF : orderOf (frobeniusEquiv (GaloisField 2 n) 2) = n :=
+    orderOf_frobeniusEquiv_eq_of_card_eq_two_pow n
+      (by simpa [Nat.card_eq_fintype_card] using hcard)
+  have hfrobcong : ∀ a b : ℕ, (a : ZMod n) = (b : ZMod n) →
+      (frobeniusEquiv (GaloisField 2 n) 2) ^ a =
+        (frobeniusEquiv (GaloisField 2 n) 2) ^ b := by
+    intro a b hab
+    rw [pow_eq_pow_iff_modEq, horderF]
+    exact (ZMod.natCast_eq_natCast_iff _ _ _).mp hab
+  -- normalize each factor by the `A(n, θ) ≅ A(n, θ⁻¹)` flip
+  have normalize : ∀ {S : Subgroup P} {hSinv : IsAInvariant Y.subtype S}
+      {hPhiS : frattini P ≤ S}
+      (data : FactorCoordinateData hSinv hPhiS c ePhi nu),
+      nu = data.lambda * data.theta data.lambda →
+      ∃ data' : FactorCoordinateData hSinv hPhiS c ePhi nu,
+        nu = data'.lambda * data'.theta data'.lambda ∧
+        (data'.theta = 1 ∨
+          ∃ r : ℕ, 0 < r ∧ 2 * r ≤ n ∧
+            data'.theta = frobeniusEquiv (GaloisField 2 n) 2 ^ r ∧
+            Odd (orderOf data'.theta)) := by
+    intro S hSinv hPhiS data hnu
+    cases data with
+    | commutative d => exact ⟨.commutative d, hnu, Or.inl rfl⟩
+    | noncommutative hnc d =>
+        obtain ⟨d', r, hr0, hrhalf, hθ'⟩ := d.exists_flip_frobenius_le_half hn0
+        exact ⟨.noncommutative hnc d', d'.kernel_eigenvalue_eq,
+          Or.inr ⟨r, hr0, hrhalf, hθ', d'.theta_order_odd⟩⟩
+  obtain ⟨dL, hnuL, hLcase⟩ := normalize dataL0 hnuL0
+  obtain ⟨dR, hnuR, hRcase⟩ := normalize dataR0 hnuR0
+  -- packaged inclusions and their shared inputs
+  set L := dL.toInclusionData hEA ePhi hK1 hterm hSq hAgemo hK0 with hLdef
+  set R := dR.toInclusionData hEA ePhi hK1 hterm hSq hAgemo hK0 with hRdef
+  have hθLpkg : L.theta = dL.theta :=
+    FactorCoordinateData.toInclusionData_theta hEA ePhi dL hK1 hterm hSq
+      hAgemo hK0
+  have hθRpkg : R.theta = dR.theta :=
+    FactorCoordinateData.toInclusionData_theta hEA ePhi dR hK1 hterm hSq
+      hAgemo hK0
+  have hequivLR : ∀ α β : GaloisField 2 n,
+      mixedTermBilinear L R (dL.lambda * α) (dR.lambda * β) =
+        nu * mixedTermBilinear L R α β := fun α β =>
+    mixedTermBilinear_lambda_equivariance hEA ePhi dL dR hK1 hterm hSq
+      hAgemo hK0 hconj α β
+  have hequivRL : ∀ α β : GaloisField 2 n,
+      mixedTermBilinear R L (dR.lambda * α) (dL.lambda * β) =
+        nu * mixedTermBilinear R L α β := fun α β =>
+    mixedTermBilinear_lambda_equivariance hEA ePhi dR dL hK1 hterm hSq
+      hAgemo hK0 hconj α β
+  have hM0LR : ∃ α β : GaloisField 2 n, mixedTermBilinear L R α β ≠ 0 :=
+    exists_mixedTermBilinear_ne_zero factors L R hxi hinvPhi
+  have hM0RL : ∃ α β : GaloisField 2 n, mixedTermBilinear R L α β ≠ 0 := by
+    obtain ⟨α, β, hne⟩ := hM0LR
+    refine ⟨β, α, ?_⟩
+    rw [mixedTermBilinear_swap L R α β]
+    exact hne
+  have hinfRL : factors.right ⊓ factors.left = frattini P := by
+    rw [inf_comm]
+    exact factors.inf_eq_frattini
+  have hsupRL : factors.right ⊔ factors.left = ⊤ := by
+    rw [sup_comm]
+    exact factors.sup_eq_top
+  -- the dispatch on `(θ, φ)`
+  rcases hLcase with hθL1 | ⟨rL, hrL0, hrLhalf, hθLfrob, hθLodd⟩
+  · rcases hRcase with hθR1 | ⟨rR, hrR0, hrRhalf, hθRfrob, hθRodd⟩
+    · -- `θ = φ = 1`
+      left
+      have hlam2 : dL.lambda ^ 2 = nu := by
+        have h : dL.theta dL.lambda = dL.lambda := by
+          rw [hθL1, RingAut.one_apply]
+        calc dL.lambda ^ 2 = dL.lambda * dL.lambda := pow_two _
+          _ = dL.lambda * dL.theta dL.lambda := by rw [h]
+          _ = nu := hnuL.symm
+      have hmu2 : dR.lambda ^ 2 = nu := by
+        have h : dR.theta dR.lambda = dR.lambda := by
+          rw [hθR1, RingAut.one_apply]
+        calc dR.lambda ^ 2 = dR.lambda * dR.lambda := pow_two _
+          _ = dR.lambda * dR.theta dR.lambda := by rw [h]
+          _ = nu := hnuR.symm
+      have heq : dR.lambda = dL.lambda :=
+        CharTwo.sq_injective (hmu2.trans hlam2.symm)
+      have hequiv' : ∀ α β : GaloisField 2 n,
+          mixedTermBilinear L R (dL.lambda * α) (dL.lambda * β) =
+            nu * mixedTermBilinear L R α β := by
+        intro α β
+        have h := hequivLR α β
+        rwa [heq] at h
+      exact isTypeB_of_mixedTerm_theta_one hEA hK1 hterm hSq hAgemo hK0 ePhi
+        L R factors.right_normal factors.inf_eq_frattini factors.sup_eq_top
+        factors.frattini_lt_right.le dL.lambda nu hordnu hlam2
+        (hθLpkg.trans hθL1) (hθRpkg.trans hθR1) hequiv' hM0LR hinv hcentral
+        n_pos hcard
+    · -- `θ = 1`, `φ ≠ 1`: type C with the factors swapped
+      right; left
+      have hmu2 : dL.lambda ^ 2 = nu := by
+        have h : dL.theta dL.lambda = dL.lambda := by
+          rw [hθL1, RingAut.one_apply]
+        calc dL.lambda ^ 2 = dL.lambda * dL.lambda := pow_two _
+          _ = dL.lambda * dL.theta dL.lambda := by rw [h]
+          _ = nu := hnuL.symm
+      have hlamnuR : dR.lambda ^ (1 + 2 ^ rR) = nu := by
+        have h : dR.theta dR.lambda = dR.lambda ^ 2 ^ rR := by
+          rw [hθRfrob, frobeniusEquiv_pow_apply]
+        calc dR.lambda ^ (1 + 2 ^ rR)
+            = dR.lambda * dR.lambda ^ 2 ^ rR := by rw [pow_add, pow_one]
+          _ = dR.lambda * dR.theta dR.lambda := by rw [h]
+          _ = nu := hnuR.symm
+      exact isTypeC_of_mixedTerm_right_theta_one hEA hK1 hterm hSq hAgemo
+        hK0 ePhi R L factors.left_normal hinfRL hsupRL
+        factors.frattini_lt_left.le dR.theta hθRfrob hrR0 hrRhalf hθRpkg
+        (hθLpkg.trans hθL1) dR.lambda dL.lambda nu hordnu hlamnuR hmu2
+        hequivRL hM0RL hinv hcentral n_pos hcard
+  · rcases hRcase with hθR1 | ⟨rR, hrR0, hrRhalf, hθRfrob, hθRodd⟩
+    · -- `θ ≠ 1`, `φ = 1`: type C directly
+      right; left
+      have hmu2 : dR.lambda ^ 2 = nu := by
+        have h : dR.theta dR.lambda = dR.lambda := by
+          rw [hθR1, RingAut.one_apply]
+        calc dR.lambda ^ 2 = dR.lambda * dR.lambda := pow_two _
+          _ = dR.lambda * dR.theta dR.lambda := by rw [h]
+          _ = nu := hnuR.symm
+      have hlamnuL : dL.lambda ^ (1 + 2 ^ rL) = nu := by
+        have h : dL.theta dL.lambda = dL.lambda ^ 2 ^ rL := by
+          rw [hθLfrob, frobeniusEquiv_pow_apply]
+        calc dL.lambda ^ (1 + 2 ^ rL)
+            = dL.lambda * dL.lambda ^ 2 ^ rL := by rw [pow_add, pow_one]
+          _ = dL.lambda * dL.theta dL.lambda := by rw [h]
+          _ = nu := hnuL.symm
+      exact isTypeC_of_mixedTerm_right_theta_one hEA hK1 hterm hSq hAgemo
+        hK0 ePhi L R factors.right_normal factors.inf_eq_frattini
+        factors.sup_eq_top factors.frattini_lt_right.le dL.theta hθLfrob
+        hrL0 hrLhalf hθLpkg (hθRpkg.trans hθR1) dL.lambda dR.lambda nu
+        hordnu hlamnuL hmu2 hequivLR hM0LR hinv hcentral n_pos hcard
+    · -- both `≠ 1`
+      have hlamnuL : dL.lambda ^ (1 + 2 ^ rL) = nu := by
+        have h : dL.theta dL.lambda = dL.lambda ^ 2 ^ rL := by
+          rw [hθLfrob, frobeniusEquiv_pow_apply]
+        calc dL.lambda ^ (1 + 2 ^ rL)
+            = dL.lambda * dL.lambda ^ 2 ^ rL := by rw [pow_add, pow_one]
+          _ = dL.lambda * dL.theta dL.lambda := by rw [h]
+          _ = nu := hnuL.symm
+      have hlamnuR : dR.lambda ^ (1 + 2 ^ rR) = nu := by
+        have h : dR.theta dR.lambda = dR.lambda ^ 2 ^ rR := by
+          rw [hθRfrob, frobeniusEquiv_pow_apply]
+        calc dR.lambda ^ (1 + 2 ^ rR)
+            = dR.lambda * dR.lambda ^ 2 ^ rR := by rw [pow_add, pow_one]
+          _ = dR.lambda * dR.theta dR.lambda := by rw [h]
+          _ = nu := hnuR.symm
+      have hrLn : rL < n := by omega
+      have hrRn : rR < n := by omega
+      by_cases hrEq : rL = rR
+      · -- `θ = φ ≠ 1`
+        left
+        subst hrEq
+        have hlamLne : dL.lambda ≠ 0 := by
+          intro h0
+          rw [h0, zero_pow (by simp)] at hlamnuL
+          exact hνne hlamnuL.symm
+        have hlamRne : dR.lambda ≠ 0 := by
+          intro h0
+          rw [h0, zero_pow (by simp)] at hlamnuR
+          exact hνne hlamnuR.symm
+        have hmuEq : dR.lambda = dL.lambda :=
+          eq_of_pow_eq_pow_orderOf hNpos (by simp) hordnu hlamnuL hlamnuR
+            (hpowcard _ hlamLne) (hpowcard _ hlamRne)
+        have hequiv' : ∀ α β : GaloisField 2 n,
+            mixedTermBilinear L R (dL.lambda * α) (dL.lambda * β) =
+              nu * mixedTermBilinear L R α β := by
+          intro α β
+          have h := hequivLR α β
+          rwa [hmuEq] at h
+        have hθeq : dR.theta = dL.theta := by
+          rw [hθRfrob, hθLfrob]
+        exact isTypeB_of_mixedTerm_theta_eq hEA hK1 hterm hSq hAgemo hK0
+          ePhi L R factors.right_normal factors.inf_eq_frattini
+          factors.sup_eq_top factors.frattini_lt_right.le dL.theta hθLfrob
+          (by omega) hrLn hθLodd hθLpkg (hθRpkg.trans hθeq) dL.lambda nu
+          hordnu hlamnuL hequiv' hM0LR hinv hcentral n_pos hcard
+      · -- the independent case: type D
+        right; right
+        have hrLz : (rL : ZMod n) ≠ 0 := by
+          rw [Ne, natCast_zmod_eq_zero_iff_mod_eq_zero,
+            Nat.mod_eq_of_lt hrLn]
+          omega
+        have hrRz : (rR : ZMod n) ≠ 0 := by
+          rw [Ne, natCast_zmod_eq_zero_iff_mod_eq_zero,
+            Nat.mod_eq_of_lt hrRn]
+          omega
+        have hrszNe : (rL : ZMod n) ≠ (rR : ZMod n) := by
+          intro h
+          apply hrEq
+          have hmod := (ZMod.natCast_eq_natCast_iff _ _ _).mp h
+          rwa [Nat.ModEq, Nat.mod_eq_of_lt hrLn, Nat.mod_eq_of_lt hrRn]
+            at hmod
+        have hsum : rL + rR < n := by omega
+        have hrsz : (rL : ZMod n) + (rR : ZMod n) ≠ 0 := by
+          rw [← Nat.cast_add, Ne, natCast_zmod_eq_zero_iff_mod_eq_zero,
+            Nat.mod_eq_of_lt hsum]
+          omega
+        rcases mixedTerm_monomial_typeD n_pos hrLz hrRz hrsz hrszNe
+            (mixedTermBilinear L R) dL.lambda dR.lambda nu hordnu hlamnuL
+            hlamnuR hequivLR hM0LR with
+          ⟨hs2r, h5r, c0, hc0ne, hc0⟩ | ⟨hr2s, h5s, c0, hc0ne, hc0⟩
+        · -- survivor branch
+          have hθR2 : R.theta = dL.theta ^ 2 := by
+            rw [hθRpkg, hθRfrob, hθLfrob, ← pow_mul]
+            exact hfrobcong rR (rL * 2) (by push_cast; linear_combination hs2r)
+          exact isTypeD_of_mixedTerm_monomial hEA hK1 hterm hSq hAgemo hK0
+            ePhi L R factors.right_normal factors.inf_eq_frattini
+            factors.sup_eq_top factors.frattini_lt_right.le dL.theta hθLfrob
+            hrLn hrLz h5r hθLpkg hθR2 c0 hc0ne hc0 hinv hcentral n_pos hcard
+        · -- mirror branch, entered through the factor swap
+          have hθL2 : L.theta = dR.theta ^ 2 := by
+            rw [hθLpkg, hθLfrob, hθRfrob, ← pow_mul]
+            exact hfrobcong rL (rR * 2) (by push_cast; linear_combination hr2s)
+          have hc0' : ∀ α β : GaloisField 2 n,
+              mixedTermBilinear R L α β =
+                c0 * (α ^ 2 ^ (3 * rR % n) * β ^ 2 ^ (rR % n)) := by
+            intro α β
+            rw [mixedTermBilinear_swap L R β α, hc0 β α]
+            ring
+          exact isTypeD_of_mixedTerm_monomial hEA hK1 hterm hSq hAgemo hK0
+            ePhi R L factors.left_normal hinfRL hsupRL
+            factors.frattini_lt_left.le dR.theta hθRfrob hrRn hrRz h5s
+            hθRpkg hθL2 c0 hc0ne hc0' hinv hcentral n_pos hcard
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
