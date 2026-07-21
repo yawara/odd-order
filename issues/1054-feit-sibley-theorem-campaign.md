@@ -136,10 +136,28 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   (5.2.d/e) difference image 群・`leKer_induce_Qder_of_forall`。
 - [x] **2-kernel counting** (1dfea8ba3): `sum_degreeSq_ker_subset_not_subset` —
   Σ_{N⊆ker, M⊄ker} χ(1)² = |K⧸N| − |K⧸N⊔M| (汎用)。
-- [ ] 次: 𝒮(R) 和への橋 (LeKer ↔ characterKernel-subset、K=↥H, N=R-in-H, M=Q₁-in-H
-  で |H/R| − |H/RQ₁| 形へ) → reduction (1) 本体 (chief-factor 帰納 + Lemma 1(a) +
-  [Is] 2.30 + f.p.f. 下界 |Z/Q₂| ≥ d+1)。f.p.f. 下界は要偵察
-  (FreeActionOrbitCount / WielandtFixedPoint / CoprimeFrobeniusKernel)。
+- [x] 𝒮(R) 和ブリッジ (556867bcc): `leKer_iff_subset_characterKernel` +
+  `sum_degreeSq_SsetOf` (filter-Finset 形 = Lemma 1(a) の enumeration に直結)。
+- [x] f.p.f. 下界 (0ed24f513): `d_dvd_card_sub_one_of_le_Q1` / `d_add_one_le_card_of_le_Q1` /
+  `two_mul_d_add_one_le_card_of_le_Q1` (conj MulAction inline 構成 +
+  FreeActionOrbitCount.dvd_card_sub_one_of_free_off_unique_fixed)。
+- [x] `exists_apply_one_eq_d_mul`: ∀ χ ∈ 𝒮, χ(1) = d·m (m ≥ 1) — 1(a) anchor 可除性。
+- [ ] **次 = reduction (1) 本体**。2026-07-21 偵察で判明した組み立てルート:
+  - **連鎖 adjoin エンジンは既存**: `coherentPairChain` (S07_Coherence/CoherenceUnion.lean:1602,
+    base + per-pair step ⟹ pairUnion 全体 coherent) + `pairUnion_eq_of_cover` (分解証明) +
+    `exists_monotoneDegreeEnum` (:1436, 度数昇順 enumeration) +
+    `two_mul_lt_sq_of_primePow_gap` (NormInequalities.lean:796, 度数 gap 算術)。
+  - **1 ステップ補題の形**: 𝒮(S'Q₂) coherent ⟹ 𝒮(S'Q₃) coherent は、
+    𝒮(S'Q₃) = 𝒮(S'Q₂) ∪ (新規共役対) に分解し coherentPairChain。各 step は
+    Lemma 1(a) (coherent_adjoin_of_degree_bound) — anchor = 度数 d の member
+    (𝒮(Q') ⊆ 𝒮(S'Q₂): S'Q₂ ⊆ [Q,Q] = Q' より) + d ∣ 全度数 (exists_apply_one_eq_d_mul)。
+  - **反例抽出 (原文の ψ)**: ¬coherent ⟹ 連鎖の最初の失敗 step で 1(a) の
+    非度数仮定は全部立つので度数 bound が破れる: 2dψ(1) ≥ Σ_{base} χ(1)²
+    (= |H/S'Q₂|−|H/S'Q₁| via sum_degreeSq_SsetOf)。以降 (1.1)(1.2) の算術は
+    exists_degree_sq_le_index + two_mul_d_add_one 系で閉じる。
+  - 残る未整備: chief factor (Q₂/Q₃, Z/Q₃ = Z(Q₁/Q₃)) の商レベル中心性の取り回しと、
+    ψ(1) = dφ(1) の φ ∈ Irr(Q/S'Q₃) 具体化 ([Is] 2.30 の section 版 =
+    InflationCharacter の degree_sq_le_index_of_central_quotient :361 が使えるはず)。
 
 ## 完了条件
 

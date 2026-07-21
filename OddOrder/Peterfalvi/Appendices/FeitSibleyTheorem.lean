@@ -1063,6 +1063,25 @@ theorem sum_degreeSq_SsetOf [Finite G] (R : Subgroup G)
     · exact fun h => by simpa using (hcongr χb).mpr (by simpa using h))]
   exact sum_degreeSq_ker_subset_not_subset (R.subgroupOf hyp.H) (hyp.Q1.subgroupOf hyp.H)
 
+omit [Fintype G] in
+/-- **Every member of `𝒮` has degree `d·m` with `m ≥ 1`** (Lemma 2(a) + the induced
+degree formula): `χ = Ind_Q^H φ` gives `χ(1) = [H:Q]·φ(1) = d·φ(1)`, and `φ(1)` is
+a positive natural.  This is the `d ∣ χ(1)` divisibility feeding the anchor
+hypothesis of Lemma 1(a) throughout the reduction steps. -/
+theorem exists_apply_one_eq_d_mul [Finite G]
+    [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    ∃ m : ℕ, 0 < m ∧ χ (1 : ↥hyp.H) = (hyp.d : ℂ) * (m : ℂ) := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  have hχ' := hχ
+  rw [Sset_eq_induced_of_Q hyp] at hχ'
+  obtain ⟨φ, ⟨hφirr, -⟩, rfl⟩ := hχ'
+  obtain ⟨m, hmpos, hm, -⟩ := hφirr.exists_natDegree_charValue_one_dvd_card
+  refine ⟨m, hmpos, ?_⟩
+  rw [ClassFunction.induce_apply_one, hyp.index_Q_subgroupOf_eq_d, hm]
+
 end SsetOfCounting
 
 end Hypothesis
