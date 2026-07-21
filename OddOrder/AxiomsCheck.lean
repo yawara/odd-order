@@ -159,6 +159,7 @@ import OddOrder.BG.AppE_ExponentP
 import OddOrder.BG.AppE_SemidirectFrattini
 import OddOrder.BG.AppE_AbelianCentralizer
 import OddOrder.BG.AppE_FiliformCounterexample
+import OddOrder.BG.AppE_FiliformRefutation
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremC5
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremIIPackaging
@@ -11902,3 +11903,10 @@ API into them.
 #assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.T_not_abelian
 #assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.e23_fails_at_two
 #assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.bg_propE4_lie_counterexample
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.centralizer_zpowers_vg
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.mem_centralizer_upperCentralSeries_two_iff
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.centralizer_upperCentralSeries_two_not_abelian
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.act_regular
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.q6Setup
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.q6_centralizer_not_mulCommutative
+#assert_only_allowed_axioms OddOrder.BG.AppE.Filiform.printed_propE4_false
