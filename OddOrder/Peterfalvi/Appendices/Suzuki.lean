@@ -45,6 +45,8 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.TypeBFromW
 import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.Basic
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.FieldAction
 
 /-!
 # Peterfalvi Part II: A Theorem of Suzuki (hub)

@@ -898,6 +898,17 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 21:20 (tick #15、Fable hub cron `490dde28`) — ✅ a + b + c 3 レーン合流、census 6 不変、push 済**:
+  **a** = FeitSibley reduction (2) 部品 — centralLift 機構の W-parametric `centralLiftIn` 一般化
+  (refactor) + index bridges + closing arithmetic + centre lift Z(Q₁) 2d+1 bound + S-side
+  one-step lemma (新 leaf `FeitSibleyReductionTwo.lean`、自配線済、issue 1054)。
+  **b** = Pf Suzuki **Ch.II Theorem B campaign 起票** (issue 2053、pp.108-114 構造マップ) +
+  (B1) carrier + step (1) |Q₀| = 2^p (Artin 経由) (新 leaf `FirstCase/{Basic,FieldAction}.lean`)。
+  **c** = ⭐⭐ **Gorenstein Thm 2.5 (Thompson Replacement) + Thm 2.6 完全証明 + Lem 2.8 (i)-(iii)
+  完結** + Thm 2.7 (Glauberman Replacement) 入口 (新 leaf `GlaubermanReplacement.lean` 共通部品
+  2 本、自配線済、issue 9403)。gate = build **4609 jobs green (22.8s、+4 = 新 leaf 4 本実
+  elaborate 確認)**、AxiomsCheck OK、orphan 0 (893/893)、census 6 不変、新 axiom なし、逸脱なし、
+  採番 open 重複なし。レーン生存 3 点 OK (3 レーンとも 21:13–21:16 に commit)。push 済。
 - **2026-07-21 20:50 (tick #14、Fable hub cron `490dde28`) — ✅ a + b + c 3 レーン合流、census 6 不変、push 済**:
   **a** = ⭐ FeitSibley **reduction (1) COMPLETE** — chief-factor 帰納 assembly
   (`ssetOf_sder_coherent_of_two_primes`、新 leaf `FeitSibleyInduction.lean`、a 自身が
