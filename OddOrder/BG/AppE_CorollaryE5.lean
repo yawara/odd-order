@@ -92,6 +92,104 @@ theorem mem_opiCoreInG_singleton_of_nilpotent [Finite G] {p : ℕ} (hp : p.Prime
   refine le_opiCoreInG_of_normal_of_isPiSubgroup hQambM hQnorm' hQpi ?_
   exact ⟨W'.subtype ξ, ⟨ξ, hξP (Subgroup.mem_zpowers ξ), rfl⟩, rfl⟩
 
+/-- A `τ₂(N)`-prime avoids both `κ(N)` and `σ(N)` — the prime of BG's `x` is a
+`(κ(N) ∪ σ(N))'`-prime (the `p`-rank separates `τ₂` from `τ₁ ∪ τ₃ ⊇ κ`). -/
+theorem mem_kappa_sigma_compl_of_mem_tau2 [Finite G] {N : Subgroup G} {p : ℕ}
+    (h2 : p ∈ tau2 N) :
+    p ∈ (OddOrder.BG.Ch4.S14.kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ := by
+  rw [Set.mem_compl_iff, Set.mem_union, not_or]
+  refine ⟨fun hκ => ?_, h2.1⟩
+  rcases OddOrder.BG.Ch4.S14.kappa_subset_tau1_union_tau3 hκ with h | h
+  · exact absurd ((tau2_pRank_eq_two h2).symm.trans (tau1_pRank_eq_one h)) (by norm_num)
+  · exact absurd ((tau2_pRank_eq_two h2).symm.trans (tau3_pRank_eq_one h)) (by norm_num)
+
+/-- **A `p`-subgroup lands in a normal subgroup of `p'`-index**: if `H ≤ K`, `L ≤ K` with
+`L ⊴ K` (as `subgroupOf`), `H` a `p`-group, and `p ∤ [K : L]`, then `H ≤ L` — the image of
+any `h ∈ H` in `K/L` has order dividing both a `p`-power and the `p'`-number `[K : L]`. -/
+theorem le_of_isPGroup_of_not_dvd_relIndex [Finite G] {p : ℕ} (hp : p.Prime)
+    {H K L : Subgroup G} (hHK : H ≤ K) (_hLK : L ≤ K)
+    (hnorm : (L.subgroupOf K).Normal) (hpH : IsPGroup p ↥H)
+    (hnd : ¬ p ∣ L.relIndex K) : H ≤ L := by
+  intro g hg
+  haveI := hnorm
+  set gbar : ↥K ⧸ L.subgroupOf K := QuotientGroup.mk' _ ⟨g, hHK hg⟩ with hgbardef
+  obtain ⟨k, hk⟩ := hpH ⟨g, hg⟩
+  have hcoe : ((⟨g, hHK hg⟩ : ↥K) ^ p ^ k) = 1 := by
+    have h1 := congrArg (fun z : ↥H => (z : G)) hk
+    exact Subtype.ext (by simpa using h1)
+  have hord1 : gbar ^ p ^ k = 1 := by rw [hgbardef, ← map_pow, hcoe, map_one]
+  have hdvd1 : orderOf gbar ∣ p ^ k := orderOf_dvd_of_pow_eq_one hord1
+  have hdvd2 : orderOf gbar ∣ L.relIndex K := by
+    have h := orderOf_dvd_natCard gbar
+    rwa [← Subgroup.index_eq_card] at h
+  obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow hp).mp hdvd1
+  rcases Nat.eq_zero_or_pos j with rfl | hjpos
+  · have h1 : gbar = 1 := orderOf_eq_one_iff.mp (by rw [hj, pow_zero])
+    have hmem : (⟨g, hHK hg⟩ : ↥K) ∈ L.subgroupOf K := (QuotientGroup.eq_one_iff _).mp h1
+    exact Subgroup.mem_subgroupOf.mp hmem
+  · exact absurd ((dvd_pow_self p hjpos.ne').trans (hj ▸ hdvd2)) hnd
+
+/-- **BG `(E.30)`** (p. 165): `x ∈ O_p(M)`, the `p`-part `O_p(M) ∩ N` of `M ∩ N` is
+absorbed by the abelian `U₁`, and
+
+> `O_p(M) ∩ N = C_{O_p(M)}(x)`.
+
+`⊇` is `C_G(x) ≤ N`; `⊆` is the abelianity of `U₁`, which contains both `x` and
+`O_p(M) ∩ N` (the `(E.29)` clause *"`R` is contained in … `U₁`"*, delivered here by the
+`p'`-index absorption `le_of_isPGroup_of_not_dvd_relIndex`, since `U₁` is Hall
+`(κ(N) ∪ σ(N))'` in `N` and `p ∈ (κ(N) ∪ σ(N))ᶜ`).  The nilpotency of `M_σ` (Frobenius
+kernel of `M`, from Corollary 15.9) feeds `x ∈ O_p(M)`. -/
+theorem e5_R_eq_centralizer [Finite G]
+    {M N : Subgroup G} {x : G} {p : ℕ} (hp : p.Prime)
+    (hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hord : orderOf x = p) (hxN : x ∈ N)
+    (hCN : Subgroup.centralizer ({x} : Set G) ≤ N)
+    (hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M))
+    {K₁ U₁ : Subgroup G} (hU₁MN : U₁ ≤ M ⊓ N)
+    (hU₁hall : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ) (U₁.subgroupOf N))
+    (hU₁ab : IsMulCommutative ↥U₁)
+    (hK₁norm : K₁ ≤ Subgroup.normalizer ((U₁ : Subgroup G) : Set G))
+    (hsupMN : M ⊓ N = K₁ ⊔ U₁)
+    (hpκσ : p ∈ (OddOrder.BG.Ch4.S14.kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ) :
+    x ∈ opiCoreInG {p} M ∧
+      opiCoreInG {p} M ⊓ N ≤ U₁ ∧
+      opiCoreInG {p} M ⊓ N = opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  -- `x ∈ O_p(M)`, through the nilpotent `M_σ ⊴ M`.
+  have hMσnorm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]
+    infer_instance
+  have hxOp : x ∈ opiCoreInG {p} M :=
+    mem_opiCoreInG_singleton_of_nilpotent hp (OddOrder.BG.Ch3.S10.Msigma_le M) hMσnorm
+      hMσnil hxMσ hord
+  -- `U₁ ⊴ M ∩ N`, since `M ∩ N = K₁ ⊔ U₁` normalizes `U₁`.
+  have hMNle : M ⊓ N ≤ Subgroup.normalizer ((U₁ : Subgroup G) : Set G) := by
+    rw [hsupMN]
+    exact sup_le hK₁norm Subgroup.le_normalizer
+  have hU₁norm : (U₁.subgroupOf (M ⊓ N)).Normal := by
+    refine ⟨fun n hn k => ?_⟩
+    rw [Subgroup.mem_subgroupOf] at hn ⊢
+    have hk := Subgroup.mem_normalizer_iff.mp (hMNle k.2) (n : G)
+    simpa using hk.mp hn
+  -- Absorption: `O_p(M) ∩ N` is a `p`-subgroup of `M ∩ N`, and `p ∤ [M ∩ N : U₁]`.
+  have hOpN_MN : opiCoreInG {p} M ⊓ N ≤ M ⊓ N :=
+    le_inf (inf_le_left.trans (opiCoreInG_le _ _)) inf_le_right
+  have hPpg : IsPGroup p ↥(opiCoreInG {p} M ⊓ N) :=
+    (isPGroup_opiCoreInG_singleton M).to_le inf_le_left
+  have hnd : ¬ p ∣ U₁.relIndex (M ⊓ N) := by
+    intro hdvd
+    have h1 : U₁.relIndex (M ⊓ N) ∣ U₁.relIndex N :=
+      ⟨(M ⊓ N).relIndex N, (Subgroup.relIndex_mul_relIndex U₁ (M ⊓ N) N hU₁MN inf_le_right).symm⟩
+    exact (hU₁hall.2 p (Nat.mem_primeFactors.mpr
+      ⟨hp, hdvd.trans h1, Subgroup.index_ne_zero_of_finite⟩)) hpκσ
+  have habs : opiCoreInG {p} M ⊓ N ≤ U₁ :=
+    le_of_isPGroup_of_not_dvd_relIndex hp hOpN_MN hU₁MN hU₁norm hPpg hnd
+  have hxU₁ : x ∈ U₁ := habs ⟨hxOp, hxN⟩
+  refine ⟨hxOp, habs, le_antisymm (fun u hu => ⟨hu.1, ?_⟩) (inf_le_inf_left _ hCN)⟩
+  refine Subgroup.mem_centralizer_iff.mpr fun y hy => ?_
+  rw [Set.mem_singleton_iff.mp hy]
+  exact congrArg Subtype.val (hU₁ab.is_comm.comm (⟨x, hxU₁⟩ : ↥U₁) ⟨u, habs hu⟩)
+
 /-- **BG `(E.29)`** (p. 165): under Corollary E.5's hypothesis block, the unique maximal
 subgroup `N ⊇ C_G(x)` is of type P₂ with `C_{N_σ}(x) ≠ 1` and `M ∩ N` a complement to
 `N_σ` in `N`; and `M ∩ N` carries a Hall `κ(N)`-subgroup `K₁` of prime order together
