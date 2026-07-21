@@ -7,6 +7,7 @@ import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.GroupTheory.Commutator.Basic
 import OddOrder.GroupTheory.ThompsonSubgroup
 import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
 # Abelian Thompson Subgroup `J_a(P)` (Gorenstein 版)
@@ -838,5 +839,62 @@ instance thompsonJAbelian_subgroupOf_characteristic (P : Subgroup G) :
     ((thompsonJAbelian P).subgroupOf P).Characteristic := by
   rw [thompsonJAbelian_subgroupOf_self]
   infer_instance
+
+/-! ### Gorenstein Lemma 2.8 へ向けた `[B,A;i]` 部品
+
+Gorenstein の `[B,A;i]` (帰納定義 `[B,A;0] = B`, `[B,A;i] = [[B,A;i-1],A]`) は
+repo 既存の `OddOrder.Isaacs.Ch04.iterCommutator B A i` そのもの. ここでは
+Lem 2.8(ii) (降下) と正規化の基本性質を与える. -/
+
+open OddOrder.Isaacs.Ch04 in
+/-- `A` は `⁅X, A⁆` を正規化する (`⁅X,A⁆ = ⁅A,X⁆` + 左因子は正規化する). -/
+theorem le_normalizer_commutator_right (X A : Subgroup G) :
+    A ≤ normalizer ((⁅X, A⁆ : Subgroup G) : Set G) := by
+  rw [commutator_comm X A]
+  exact normalizer_commutator_ge_left A X
+
+open OddOrder.Isaacs.Ch04 in
+/-- `A` は各 `[B,A;i]` を正規化する (Gorenstein Lem 2.8 の途中主張;
+`i = 0` は `B ⊴ G`, `i ≥ 1` は右因子正規化で無条件). -/
+theorem le_normalizer_iterCommutator {B : Subgroup G} (A : Subgroup G) [B.Normal]
+    (i : ℕ) : A ≤ normalizer ((iterCommutator B A i : Subgroup G) : Set G) := by
+  cases i with
+  | zero =>
+    rw [iterCommutator_zero]
+    intro a _
+    rw [mem_normalizer_iff]
+    intro h
+    constructor
+    · exact fun hh => ‹B.Normal›.conj_mem h hh a
+    · intro hh
+      have hconj := ‹B.Normal›.conj_mem _ hh a⁻¹
+      rwa [show a⁻¹ * (a * h * a⁻¹) * a⁻¹⁻¹ = h by group] at hconj
+  | succ i =>
+    rw [iterCommutator_succ]
+    exact le_normalizer_commutator_right _ A
+
+open OddOrder.Isaacs.Ch04 in
+/-- **Gorenstein Lemma 2.8(ii)**: `[B,A;i+1] ≤ [B,A;i]`. -/
+theorem iterCommutator_succ_le {B : Subgroup G} (A : Subgroup G) [B.Normal]
+    (i : ℕ) : iterCommutator B A (i + 1) ≤ iterCommutator B A i := by
+  rw [iterCommutator_succ]
+  exact le_normalizer_iff_commutator_le_left.mp (le_normalizer_iterCommutator A i)
+
+open OddOrder.Isaacs.Ch04 in
+/-- `[B,A;i]` の単調降下 (一般 `i ≤ j` 形). -/
+theorem iterCommutator_le_of_le {B : Subgroup G} (A : Subgroup G) [B.Normal]
+    {i j : ℕ} (h : i ≤ j) : iterCommutator B A j ≤ iterCommutator B A i := by
+  induction j with
+  | zero => rw [Nat.le_zero.mp h]
+  | succ j ih =>
+    rcases Nat.lt_or_ge i (j + 1) with hij | hij
+    · exact (iterCommutator_succ_le A j).trans (ih (Nat.lt_succ_iff.mp hij))
+    · rw [Nat.le_antisymm h hij]
+
+open OddOrder.Isaacs.Ch04 in
+/-- `[B,A;i] ≤ B`. -/
+theorem iterCommutator_le_base {B : Subgroup G} (A : Subgroup G) [B.Normal]
+    (i : ℕ) : iterCommutator B A i ≤ B :=
+  iterCommutator_le_of_le A (Nat.zero_le i)
 
 end Subgroup
