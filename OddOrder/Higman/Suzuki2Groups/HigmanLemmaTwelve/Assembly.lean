@@ -195,6 +195,126 @@ theorem isTypeB_of_mixedTerm_theta_one
     rw [mixedTermBilinear_apply] at h
     simpa [RingAut.one_apply] using h
 
+/-! ## Case `θ = φ ≠ 1` (Higman p. 91) -/
+
+/-- **Higman p. 91, case `θ = φ ≠ 1`: `G ≅ B(n, θ, ε)`.**  The mixed term
+has the two monomials `c₁αθ(β) + c₂θ(α)β`; the shear-and-rescale coordinate
+change removes the second and normalizes the third summand, and the engine
+runs on the sheared coordinate. -/
+theorem isTypeB_of_mixedTerm_theta_eq
+    {Sl Sr : Subgroup P} {n r : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (hRnormal : Sr.Normal) (hinf : Sl ⊓ Sr = frattini P)
+    (hsup : Sl ⊔ Sr = ⊤) (hΦR : frattini P ≤ Sr)
+    (theta : RingAut (GaloisField 2 n))
+    (htheta : theta = frobeniusEquiv (GaloisField 2 n) 2 ^ r)
+    (hr0 : r ≠ 0) (hrn : r < n)
+    (hthetaodd : Odd (orderOf theta))
+    (hθL : left.theta = theta) (hθR : right.theta = theta)
+    (lam nu : GaloisField 2 n)
+    (hordnu : orderOf nu = 2 ^ n - 1)
+    (hlamnu : lam ^ (1 + 2 ^ r) = nu)
+    (hequiv :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ∀ α β : GaloisField 2 n,
+        mixedTermBilinear left right (lam * α) (lam * β) =
+          nu * mixedTermBilinear left right α β)
+    (hM0 :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ∃ α β : GaloisField 2 n, mixedTermBilinear left right α β ≠ 0)
+    (hinv : ∀ x : P, x ^ 2 = 1 → x ∈ lowerCentralTerm P 1)
+    (hcentral : frattini P ≤ Subgroup.center P)
+    (n_pos : 0 < n)
+    (hcard : Nat.card (GaloisField 2 n) = 2 ^ n) :
+    IsTypeB.{uP, 0} P := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  have hNpos : 0 < 2 ^ n - 1 := by
+    have : 2 ^ 1 ≤ 2 ^ n := Nat.pow_le_pow_right (by norm_num) n_pos
+    omega
+  have hνne : nu ≠ 0 := by
+    intro h0
+    have hone : nu ^ (2 ^ n - 1) = 1 := by
+      rw [← hordnu]
+      exact pow_orderOf_eq_one nu
+    rw [h0, zero_pow (by omega)] at hone
+    exact zero_ne_one hone
+  have hlamne : lam ≠ 0 := by
+    intro h0
+    rw [h0, zero_pow (by simp)] at hlamnu
+    exact hνne hlamnu.symm
+  have hlampow : lam ^ (2 ^ n - 1) = 1 := by
+    have hfin : Finite (GaloisField 2 n) :=
+      Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
+    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    have h := FiniteField.pow_card_sub_one_eq_one lam hlamne
+    rwa [← Nat.card_eq_fintype_card, hcard] at h
+  obtain ⟨hordlam, -⟩ :=
+    orderOf_eq_and_coprime_of_pow_eq_orderOf hNpos
+      (by simp : 1 + 2 ^ r ≠ 0) hordnu hlamnu hlampow
+  obtain ⟨c1, c2, hc12, hc⟩ :=
+    mixedTerm_two_monomials_of_theta_eq hr0 hrn
+      (mixedTermBilinear left right) lam nu hordlam hlamnu hequiv hM0
+  have hθapp : ∀ x : GaloisField 2 n, theta x = x ^ 2 ^ r := by
+    intro x
+    rw [htheta, frobeniusEquiv_pow_apply]
+  have haniso : ∀ α β : GaloisField 2 n, ¬(α = 0 ∧ β = 0) →
+      α * theta α + β * theta β + mixedTermBilinear left right α β ≠ 0 := by
+    intro a b hab
+    by_cases ha : a = 0
+    · have hb : b ≠ 0 := fun hb => hab ⟨ha, hb⟩
+      have hθb : theta b ≠ 0 := fun h =>
+        hb (theta.injective (h.trans (map_zero theta).symm))
+      subst ha
+      simpa using mul_ne_zero hb hθb
+    · by_cases hb : b = 0
+      · have hθa : theta a ≠ 0 := fun h =>
+          ha (theta.injective (h.trans (map_zero theta).symm))
+        subst hb
+        simpa using mul_ne_zero ha hθa
+      · have h := ambientProductSquare_decomposed_ne_zero left right
+          hRnormal hinf hsup hΦR hinv ha hb
+        rw [hθL, hθR, ← mixedTermBilinear_apply] at h
+        exact h
+  obtain ⟨ρ, t, ε, ht0, hε0, hEps, hfinal⟩ :=
+    exists_typeB_shear_normalization theta hthetaodd c1 c2
+      (fun a b => a * theta a + b * theta b + mixedTermBilinear left right a b)
+      (fun α β => by
+        simp only [hc]
+        rw [hθapp α, hθapp β])
+      haniso
+  refine isTypeB_of_squareCoordinate hEA hK1amb htermamb hSqamb hAgemoamb hK0
+    ePhi
+    ((shearRescaleLinearEquiv ρ t ht0).trans
+      (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR))
+    theta hthetaodd (Units.mk0 ε hε0) hEps n_pos hcard ?_ ?_
+  · rw [ambientProductExtension_inl_range]
+    exact hcentral
+  · rintro ⟨a, b⟩
+    rw [LinearEquiv.trans_apply, shearRescaleLinearEquiv_apply,
+      ambientProductSquare_eq left right hRnormal hinf hsup hΦR,
+      hθL, hθR, typeBQuadraticMap_apply, ← mixedTermBilinear_apply]
+    have h := hfinal a b
+    simpa using h
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
