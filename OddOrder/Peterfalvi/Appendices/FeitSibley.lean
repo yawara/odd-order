@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.S08_GeneralAdjoin
+import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
 
 /-!
 # Peterfalvi Appendix E: The Feit-Sibley Theorem
@@ -56,9 +57,9 @@ Per-result status:
 | `SsetOf_subset`, `d_pos`, `zSpan_Sset_le_ZIrr` | **proved, sorry-free** |
 | Lemma 2(b) integrality + degree (`tau_mem_ZIrr`, `tau_apply_one`) | **proved, sorry-free** |
 | Lemma 1(b) (equal degree ⇒ coherent) | **already in the repo**, see below |
-| Lemma 1(a) (`coherent_adjoin_of_degree_bound`) | honest statement, `sorry` |
-| Lemma 2(a) (`Sset_eq_induced_of_Q`) | honest statement, `sorry` |
-| Lemma 2(b) (`induction_isometry_on_degree_zero`) | honest statement; isometry clause `sorry` |
+| Lemma 1(a) (`coherent_adjoin_of_degree_bound`) | **proved, sorry-free** (issue 1049) |
+| Lemma 2(a) (`Sset_eq_induced_of_Q`) | **proved, sorry-free** (issue 1051) |
+| Lemma 2(b) (`induction_isometry_on_degree_zero`) | **proved, sorry-free** (issue 1052) |
 | Lemma 2(c) (`hasNoRealCharacters_Sset`) | honest statement, `sorry` |
 | Theorem (`feit_sibley_coherence`) | honest statement, `sorry` |
 -/
@@ -105,6 +106,121 @@ theorem exists_ne_trivial_liesOver_of_not_forall_eq_one
     rw [← hvalx, hval1]
   · intro θ _ hθ; rw [hzero θ hθ, zero_smul]
   · intro h; exact absurd (Finset.mem_univ _) h
+
+/-- Pulling a class function back along `e.symm` and then along `e` is the identity: for
+`e : A ≃* B` and `φ` a class function on `A`, `(φ ∘ e.symm) ∘ e = φ`. -/
+theorem compHom_toMonoidHom_compHom_symm {A B : Type*} [Group A] [Group B]
+    {k : Type*} [CommRing k] (e : A ≃* B) (φ : ClassFunction A k) :
+    ClassFunction.compHom e.toMonoidHom (ClassFunction.compHom e.symm.toMonoidHom φ) = φ := by
+  ext x
+  simp
+
+/-- Pulling a class function back along `e` and then along `e.symm` is the identity: for
+`e : A ≃* B` and `φ` a class function on `B`, `(φ ∘ e) ∘ e.symm = φ`. -/
+theorem compHom_symm_toMonoidHom_compHom {A B : Type*} [Group A] [Group B]
+    {k : Type*} [CommRing k] (e : A ≃* B) (φ : ClassFunction B k) :
+    ClassFunction.compHom e.symm.toMonoidHom (ClassFunction.compHom e.toMonoidHom φ) = φ := by
+  ext x
+  simp
+
+/-- Pullback along a group homomorphism preserves the trivial class function. -/
+theorem compHom_trivialClassFunction {A B : Type*} [Group A] [Group B] (f : A →* B) :
+    ClassFunction.compHom f (trivialClassFunction B) = trivialClassFunction A := by
+  ext x
+  simp
+
+/-- Pullback along a `MulEquiv` preserves nontriviality of class functions. -/
+theorem compHom_mulEquiv_ne_trivial {A B : Type*} [Group A] [Group B] (e : A ≃* B)
+    {θ : ClassFunction B ℂ} (hθ : θ ≠ trivialClassFunction B) :
+    ClassFunction.compHom e.toMonoidHom θ ≠ trivialClassFunction A := by
+  intro h
+  apply hθ
+  calc θ = ClassFunction.compHom e.symm.toMonoidHom
+        (ClassFunction.compHom e.toMonoidHom θ) := (compHom_symm_toMonoidHom_compHom e θ).symm
+    _ = ClassFunction.compHom e.symm.toMonoidHom (trivialClassFunction A) := by rw [h]
+    _ = trivialClassFunction B := compHom_trivialClassFunction _
+
+/-- **A character constant on a subgroup lies only over the trivial constituent** (the converse
+of `exists_ne_trivial_liesOver_of_not_forall_eq_one`): if the class function `χ` on `K` takes
+the constant value `χ(1)` on all of `N ≤ K`, then every nontrivial `θ ∈ Irr(N)` has
+multiplicity `0` in `Res_N χ`, since `Res_N χ = χ(1)·1_N` and `⟨1_N, θ⟩ = 0` by
+orthogonality. -/
+theorem restrictionMultiplicity_eq_zero_of_forall_eq_one
+    {K : Type*} [Group K] {N : Subgroup K} [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    (χ : ClassFunction K ℂ) (hconst : ∀ x : ↥N, χ (x : K) = χ 1)
+    {θ : IrreducibleCharacter ↥N} (hθ : θ ≠ trivialIrreducibleCharacter ↥N) :
+    ClassFunction.restrictionMultiplicity N χ (θ : ClassFunction ↥N ℂ) = 0 := by
+  have hres : ClassFunction.restrict N χ = χ 1 • trivialClassFunction ↥N := by
+    ext x
+    rw [ClassFunction.restrict_apply, ClassFunction.smul_apply, trivialClassFunction_apply,
+      mul_one]
+    exact hconst x
+  rw [ClassFunction.restrictionMultiplicity_def, hres, ClassFunction.inner_smul_left,
+    ← IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+    irreducibleCharacter_inner_eq_ite, if_neg (fun h => hθ h.symm), mul_zero]
+
+/-- **An irreducible constituent passes through an intermediate subgroup**: if `θ` occurs in
+`Res_N χ` and `N ≤ T`, then some `ψ ∈ Irr(T)` occurs in `Res_T χ` such that `θ` (transported
+along `↥(N.subgroupOf T) ≃* ↥N`) occurs in `Res ψ`.  Restriction in stages
+(`ClassFunction.restrict_subgroupOf_restrict`) and the Fourier expansion of `Res_T χ` give
+`⟨Res_N χ, θ⟩ = ∑_{ψ ∈ Irr(T)} ⟨Res_T χ, ψ⟩·⟨Res ψ, θ'⟩`, so a nonzero left-hand side forces
+a summand with both factors nonzero. -/
+theorem exists_restrictionMultiplicity_ne_zero_intermediate
+    {K : Type*} [Group K] {N T : Subgroup K} (hNT : N ≤ T)
+    [Fintype ↥T] [Invertible (Nat.card ↥T : ℂ)]
+    [Fintype ↥(N.subgroupOf T)] [Invertible (Nat.card ↥(N.subgroupOf T) : ℂ)]
+    [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    {χ : ClassFunction K ℂ} {θ : ClassFunction ↥N ℂ}
+    (hne : ClassFunction.restrictionMultiplicity N χ θ ≠ 0) :
+    ∃ ψ : IrreducibleCharacter ↥T,
+      ClassFunction.restrictionMultiplicity T χ (ψ : ClassFunction ↥T ℂ) ≠ 0 ∧
+        ClassFunction.restrictionMultiplicity (N.subgroupOf T) (ψ : ClassFunction ↥T ℂ)
+          (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom θ) ≠ 0 := by
+  classical
+  haveI : Finite (IrreducibleCharacter ↥T) := finite_irreducibleCharacter (G := ↥T)
+  letI : Fintype (IrreducibleCharacter ↥T) := Fintype.ofFinite _
+  by_contra hcon
+  push_neg at hcon
+  apply hne
+  -- restriction in stages: `⟨Res_N χ, θ⟩ = ⟨Res (Res_T χ), θ'⟩`
+  have h1 : ClassFunction.restrictionMultiplicity N χ θ
+      = ClassFunction.inner (ClassFunction.restrict (N.subgroupOf T)
+          (ClassFunction.restrict T χ))
+          (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom θ) := by
+    rw [ClassFunction.restrict_subgroupOf_restrict hNT]
+    exact (inner_compHom_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hNT)
+      (ClassFunction.restrict N χ) θ).symm
+  have hres_sum : ∀ (s : Finset (IrreducibleCharacter ↥T))
+      (F : IrreducibleCharacter ↥T → ClassFunction ↥T ℂ),
+      ClassFunction.restrict (N.subgroupOf T) (∑ ρ ∈ s, F ρ)
+        = ∑ ρ ∈ s, ClassFunction.restrict (N.subgroupOf T) (F ρ) := by
+    intro s F
+    induction s using Finset.induction_on with
+    | empty => ext y; simp
+    | insert a s ha ih =>
+        rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.restrict_add, ih]
+  -- Fourier expansion of `Res_T χ`, pushed through the second restriction
+  have h2 : ClassFunction.inner (ClassFunction.restrict (N.subgroupOf T)
+        (ClassFunction.restrict T χ))
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom θ)
+      = ∑ ρ : IrreducibleCharacter ↥T,
+          ClassFunction.inner (ClassFunction.restrict T χ) (ρ : ClassFunction ↥T ℂ)
+            * ClassFunction.inner (ClassFunction.restrict (N.subgroupOf T)
+                (ρ : ClassFunction ↥T ℂ))
+                (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom θ) := by
+    conv_lhs => rw [← sum_inner_irreducibleCharacter_smul (G := ↥T)
+      (ClassFunction.restrict T χ)]
+    rw [hres_sum, inner_sum_left]
+    refine Finset.sum_congr rfl fun ρ _ => ?_
+    rw [ClassFunction.restrict_smul, ClassFunction.inner_smul_left]
+  rw [h1, h2]
+  refine Finset.sum_eq_zero fun ρ _ => ?_
+  by_cases hA : ClassFunction.restrictionMultiplicity T χ (ρ : ClassFunction ↥T ℂ) = 0
+  · rw [ClassFunction.restrictionMultiplicity_def] at hA
+    rw [hA, zero_mul]
+  · have hB := hcon ρ hA
+    rw [ClassFunction.restrictionMultiplicity_def] at hB
+    rw [hB, mul_zero]
 
 /-! ## Hypotheses and notation (p. 145) -/
 
@@ -383,6 +499,40 @@ theorem H_le_normalizer_Q1 [Finite G] : hyp.H ≤ Subgroup.normalizer hyp.Q1 := 
 from `H ≤ N_G(Q₁)`. -/
 theorem Q1_subgroupOf_H_normal [Finite G] : (hyp.Q1.subgroupOf hyp.H).Normal :=
   Subgroup.normal_subgroupOf_of_le_normalizer hyp.H_le_normalizer_Q1
+
+/-- `H ≤ N_G(Q)`: every element of `H` normalises `Q` (both containments of
+`Subgroup.mem_normalizer_iff` from the `Q_normal_in_H` field, the backward one via
+`h⁻¹ ∈ H`). -/
+theorem H_le_normalizer_Q : hyp.H ≤ Subgroup.normalizer hyp.Q := by
+  intro h hh
+  rw [Subgroup.mem_normalizer_iff]
+  intro n
+  refine ⟨fun hn => hyp.Q_normal_in_H h hh n hn, fun hn => ?_⟩
+  have hkey := hyp.Q_normal_in_H h⁻¹ (hyp.H.inv_mem hh) _ hn
+  have hrw : h⁻¹ * (h * n * h⁻¹) * (h⁻¹)⁻¹ = n := by group
+  rwa [hrw] at hkey
+
+/-- **`Q ⊴ H`, as a `Subgroup.Normal` instance for the subtype form** `Q.subgroupOf H ⊴ ↥H`,
+from `H ≤ N_G(Q)`. -/
+theorem Q_subgroupOf_H_normal : (hyp.Q.subgroupOf hyp.H).Normal :=
+  Subgroup.normal_subgroupOf_of_le_normalizer hyp.H_le_normalizer_Q
+
+/-- **`Q^# = Q \ {1}` is a TI-subset of `G` with normalizer-bound `H`** (from the
+`Q_trivial_intersection` field): for `g ∉ H`, an overlap element `g·a·g⁻¹` with
+`a ∈ Q^#` and `g·a·g⁻¹ ∈ Q^#` would be a nontrivial element of
+`Q ⊓ Q^g = 1`.  This is the TI input to the induction isometry of Lemma 2(b)
+(Isaacs Lemma 7.7, `ClassFunction.inner_induce_eq_of_isTISubset`). -/
+theorem isTISubset_Q_sdiff_one :
+    OddOrder.GroupTheory.IsTISubset ((hyp.Q : Set G) \ {1}) hyp.H := by
+  refine OddOrder.GroupTheory.IsTISubset.of_disjoint_conj fun g hg a ha hga => ?_
+  obtain ⟨haQ, ha1⟩ := ha
+  obtain ⟨hgaQ, -⟩ := hga
+  have hmem : g * a * g⁻¹ ∈ hyp.Q ⊓ hyp.Q.map (MulAut.conj g).toMonoidHom :=
+    ⟨hgaQ, Subgroup.mem_map.mpr ⟨a, haQ, by simp [MulAut.conj_apply]⟩⟩
+  rw [hyp.Q_trivial_intersection g hg, Subgroup.mem_bot] at hmem
+  refine ha1 (Set.mem_singleton_iff.mpr ?_)
+  have hrw : a = g⁻¹ * (g * a * g⁻¹) * g := by group
+  rw [hrw, hmem, mul_one, inv_mul_cancel]
 
 /-- **`δ` fixes no nonidentity conjugacy class of `Q₁`** (viewed inside `↥H`): for `1 ≠ δ ∈ D`,
 a `δ`-fixed class of `Q₁.subgroupOf H` is the identity class.  A fixed class `⟦h⟧` gives
@@ -686,44 +836,228 @@ variable (hyp : Hypothesis G) [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H 
 variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
 
 omit [Fintype G] in
+open scoped ComplexOrder in
 /-- **Peterfalvi Appendix IV, Lemma 2(a)** (p. 145).  `𝒮` is exactly the set of
 characters `Ind_Q^H φ` induced from those `φ ∈ Irr(Q)` with `Q₁ ⊄ Ker φ`.
 
-**Status: honestly stated, not proved.**  Peterfalvi's proof: write
-`φ = λ θ` with `λ ∈ Irr(S)`, `θ ∈ Irr(Q₁) - {1}`; the inertia group of `φ` in
-`H` is `Q` because `Q₁ D` is a Frobenius group (Isaacs Thm. 6.34), so
-`Ind_Q^H φ` is irreducible (Isaacs Thm. 6.11), and its restriction to `Q₁ D` is
-`Ind_{Q₁}^{Q₁ D} θ`, whence `Q₁ ⊄ Ker Ind_Q^H φ`.  Conversely a `χ ∈ 𝒮`
-restricted to `Q` has a constituent `φ` with `Q₁ ⊄ Ker φ`, so `χ = Ind_Q^H φ`.
-The missing prerequisites are the Frobenius-inertia step (Isaacs 6.34 applied to
-`Q₁ D`, which needs `D_fixedPointFree_on_Q1` transported to an abstract operator
-action) and the induced-irreducibility criterion (Isaacs 6.11) for this
-configuration. -/
-theorem Sset_eq_induced_of_Q :
+Peterfalvi writes `φ = λθ` with `λ ∈ Irr(S)`, `θ ∈ Irr(Q₁) - {1}` and cites the Frobenius
+structure of `Q₁D` (Isaacs 6.34); here the inertia computation is done directly, avoiding
+the product-character decomposition (issue 1051).  **Forward**: for `φ ∈ Irr(Q)` with
+`Q₁ ⊄ Ker φ`, extract a nontrivial constituent `θ ∈ Irr(Q₁)` of `Res φ`
+(`exists_ne_trivial_liesOver_of_not_forall_eq_one`); its inertia group in `H` is exactly `Q`
+(`Hypothesis.inertia_theta_eq_Q`, from the fixed-point-free action of `D` on `Q₁`), so
+`Ind_Q^H φ` is irreducible by the Clifford correspondence
+(`isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq`, Isaacs 6.11); and `Ind_Q^H φ` is
+not constant on `Q₁`, since the θ-part bound
+(`restrictionMultiplicity_mul_le_restrictionMultiplicity`, with `⟨Res_Q Ind φ, φ⟩ = 1` by
+Frobenius reciprocity) gives it a nontrivial `Q₁`-constituent, which a character constant on
+`Q₁` cannot have (`restrictionMultiplicity_eq_zero_of_forall_eq_one`).  **Converse**: `χ ∈ 𝒮`
+lies over some nontrivial `θ ∈ Irr(Q₁)`; the constituent passes through the intermediate
+subgroup `Q` (`exists_restrictionMultiplicity_ne_zero_intermediate`), giving `ψ ∈ Irr(Q)`
+over `θ` with `⟨Res_Q χ, ψ⟩ ≠ 0`; then `Ind_Q^H ψ` is irreducible as above and
+`⟨Ind_Q^H ψ, χ⟩ ≠ 0` (Frobenius reciprocity), so `χ = Ind_Q^H ψ` by orthogonality of
+distinct irreducible characters, and `Q₁ ⊄ Ker ψ` since `ψ` lies over the nontrivial `θ`. -/
+theorem Sset_eq_induced_of_Q [Finite G] :
     hyp.Sset =
       (fun φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ =>
           ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) ''
         {φ | IsIrreducibleCharacter φ ∧
           ¬ ∀ x : ↥(hyp.Q.subgroupOf hyp.H), ((x : ↥hyp.H) : G) ∈ hyp.Q1 → φ x = φ 1} := by
-  sorry
+  classical
+  haveI hQ1n : (hyp.Q1.subgroupOf hyp.H).Normal := hyp.Q1_subgroupOf_H_normal
+  have hHT : hyp.Q1.subgroupOf hyp.H ≤ hyp.Q.subgroupOf hyp.H := fun x hx =>
+    Subgroup.mem_subgroupOf.mpr (hyp.Q1_le_Q (Subgroup.mem_subgroupOf.mp hx))
+  -- finiteness / invertibility bookkeeping
+  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.Q1.subgroupOf hyp.H) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(hyp.Q1.subgroupOf hyp.H) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Fintype ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :=
+    Fintype.ofFinite _
+  letI : Invertible
+      ((Nat.card ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Finite (IrreducibleCharacter
+      ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) :=
+    finite_irreducibleCharacter
+  letI : Fintype (IrreducibleCharacter
+      ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) := Fintype.ofFinite _
+  haveI : Finite (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) :=
+    finite_irreducibleCharacter
+  letI : Fintype (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) := Fintype.ofFinite _
+  ext χ
+  constructor
+  · -- `𝒮 ⊆` the induced set
+    intro hχmem
+    obtain ⟨hχirr, hχker⟩ := hχmem
+    -- a nontrivial constituent `θ ∈ Irr(Q₁)` of `Res χ`
+    have hker' : ¬ ∀ y : ↥(hyp.Q1.subgroupOf hyp.H), χ (y : ↥hyp.H) = χ 1 := fun hall =>
+      hχker fun x hx => hall ⟨x, Subgroup.mem_subgroupOf.mpr hx⟩
+    obtain ⟨θ, hθne, hθover⟩ := exists_ne_trivial_liesOver_of_not_forall_eq_one
+      (⟨χ, hχirr⟩ : IrreducibleCharacter ↥hyp.H) hker'
+    have hinertia := hyp.inertia_theta_eq_Q hθne
+    -- the constituent passes through `Q`: some `ψ ∈ Irr(Q)` over `θ` with `⟨Res_Q χ, ψ⟩ ≠ 0`
+    obtain ⟨ψ, hψχ, hψover⟩ := exists_restrictionMultiplicity_ne_zero_intermediate hHT
+      (χ := χ) (θ := (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ)) hθover
+    -- `Ind_Q^H ψ` is irreducible (Clifford correspondence)
+    have hindirr : IsIrreducibleCharacter (ClassFunction.induce (hyp.Q.subgroupOf hyp.H)
+        (ψ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ)) :=
+      isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq hHT θ.isIrreducible hinertia ψ
+        hψover
+    -- `Ind_Q^H ψ = χ` by orthogonality of distinct irreducible characters
+    have hfrob := inner_induce_coe_eq_restrictionMultiplicity (G := ↥hyp.H) ψ
+      (⟨χ, hχirr⟩ : IrreducibleCharacter ↥hyp.H)
+    simp only [IrreducibleCharacter.coe_mk] at hfrob
+    have hinner : ClassFunction.inner (ClassFunction.induce (hyp.Q.subgroupOf hyp.H)
+        (ψ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ)) χ ≠ 0 :=
+      fun h0 => hψχ (hfrob.symm.trans h0)
+    have heq : (⟨_, hindirr⟩ : IrreducibleCharacter ↥hyp.H)
+        = (⟨χ, hχirr⟩ : IrreducibleCharacter ↥hyp.H) := by
+      by_contra hneq
+      have hite := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
+        (⟨_, hindirr⟩ : IrreducibleCharacter ↥hyp.H)
+        (⟨χ, hχirr⟩ : IrreducibleCharacter ↥hyp.H)
+      rw [if_neg hneq] at hite
+      simp only [IrreducibleCharacter.coe_mk] at hite
+      exact hinner hite
+    refine ⟨(ψ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ), ⟨ψ.isIrreducible, ?_⟩, ?_⟩
+    · -- `Q₁ ⊄ Ker ψ`: `ψ` constant on `Q₁` would contradict `ψ` lying over the nontrivial `θ`
+      intro hall
+      have hθ'irr : IsIrreducibleCharacter (ClassFunction.compHom
+          (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom
+          (θ : ClassFunction ↥(hyp.Q1.subgroupOf hyp.H) ℂ)) :=
+        IsIrreducibleCharacter.compHom_of_surjective
+          (Subgroup.subgroupOfEquivOfLe hHT).surjective θ.isIrreducible
+      have hθ'ne : (⟨_, hθ'irr⟩ : IrreducibleCharacter
+          ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)))
+          ≠ trivialIrreducibleCharacter _ := fun h =>
+        compHom_mulEquiv_ne_trivial (Subgroup.subgroupOfEquivOfLe hHT)
+          (fun hc => hθne (Subtype.ext hc)) (congrArg Subtype.val h)
+      have hzero := restrictionMultiplicity_eq_zero_of_forall_eq_one
+        (N := (hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))
+        (ψ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ)
+        (fun y => hall (y : ↥(hyp.Q.subgroupOf hyp.H))
+          (Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp y.2)))
+        hθ'ne
+      simp only [IrreducibleCharacter.coe_mk] at hzero
+      exact hψover hzero
+    · exact congrArg Subtype.val heq
+  · -- the induced set `⊆ 𝒮`
+    rintro ⟨φ, ⟨hφirr, hφker⟩, rfl⟩
+    -- a nontrivial constituent `θ'' ∈ Irr(Q₁-in-Q)` of `Res φ`
+    have hker' : ¬ ∀ y : ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)),
+        φ (y : ↥(hyp.Q.subgroupOf hyp.H)) = φ 1 := fun hall =>
+      hφker fun x hx =>
+        hall ⟨x, Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr hx)⟩
+    obtain ⟨θ'', hθ''ne, hθ''over⟩ := exists_ne_trivial_liesOver_of_not_forall_eq_one
+      (⟨φ, hφirr⟩ : IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H)) hker'
+    -- transport `θ''` to `Irr(Q₁)` along `↥(Q₁-in-Q) ≃* ↥Q₁`
+    have hθirr : IsIrreducibleCharacter (ClassFunction.compHom
+        (Subgroup.subgroupOfEquivOfLe hHT).symm.toMonoidHom
+        (θ'' : ClassFunction
+          ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) ℂ)) :=
+      IsIrreducibleCharacter.compHom_of_surjective
+        (Subgroup.subgroupOfEquivOfLe hHT).symm.surjective θ''.isIrreducible
+    have hθne : (⟨_, hθirr⟩ : IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H))
+        ≠ trivialIrreducibleCharacter _ := fun h =>
+      compHom_mulEquiv_ne_trivial (Subgroup.subgroupOfEquivOfLe hHT).symm
+        (fun hc => hθ''ne (Subtype.ext hc)) (congrArg Subtype.val h)
+    have hinertia := hyp.inertia_theta_eq_Q hθne
+    simp only [IrreducibleCharacter.coe_mk] at hinertia
+    -- transporting back along the equivalence recovers `θ''`
+    have hround : ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).symm.toMonoidHom
+          (θ'' : ClassFunction
+            ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) ℂ))
+        = (θ'' : ClassFunction
+            ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) ℂ) :=
+      compHom_toMonoidHom_compHom_symm (Subgroup.subgroupOfEquivOfLe hHT) _
+    -- Clifford: `Ind_Q^H φ` is irreducible
+    have hover : ClassFunction.restrictionMultiplicity
+        ((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) φ
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom
+          (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).symm.toMonoidHom
+            (θ'' : ClassFunction
+              ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) ℂ))) ≠ 0 := by
+      rw [hround]
+      exact hθ''over
+    have hindirr : IsIrreducibleCharacter
+        (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) :=
+      isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq hHT hθirr hinertia
+        (⟨φ, hφirr⟩ : IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H)) hover
+    refine ⟨hindirr, ?_⟩
+    intro hLe
+    -- `Ind φ` constant on `Q₁` kills the `θ`-multiplicity …
+    have hzero := restrictionMultiplicity_eq_zero_of_forall_eq_one
+      (N := hyp.Q1.subgroupOf hyp.H) (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ)
+      (fun x => hLe (x : ↥hyp.H) (Subgroup.mem_subgroupOf.mp x.2)) hθne
+    simp only [IrreducibleCharacter.coe_mk] at hzero
+    -- … but the θ-part bound forces it nonzero: `⟨Res_Q (Ind φ), φ⟩ = 1` and `φ` lies over `θ`
+    have hfrob := inner_induce_coe_eq_restrictionMultiplicity (G := ↥hyp.H)
+      (⟨φ, hφirr⟩ : IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H))
+      (⟨ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ, hindirr⟩ :
+        IrreducibleCharacter ↥hyp.H)
+    have hself := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
+      (⟨ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ, hindirr⟩ :
+        IrreducibleCharacter ↥hyp.H)
+      (⟨ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ, hindirr⟩ :
+        IrreducibleCharacter ↥hyp.H)
+    rw [if_pos rfl] at hself
+    simp only [IrreducibleCharacter.coe_mk] at hfrob hself
+    have hfirst := hfrob.symm.trans hself
+    have hbound := restrictionMultiplicity_mul_le_restrictionMultiplicity (G := ↥hyp.H) hHT
+      (⟨ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ, hindirr⟩ :
+        IrreducibleCharacter ↥hyp.H)
+      (⟨φ, hφirr⟩ : IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H)) hθirr
+    simp only [IrreducibleCharacter.coe_mk] at hbound
+    rw [hfirst, one_mul, hround, hzero] at hbound
+    have hnonneg := ClassFunction.restrictionMultiplicity_nonneg
+      ((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) hφirr
+      θ''.isIrreducible
+    exact hθ''over (le_antisymm hbound hnonneg)
+
+omit [Fintype G] in
+/-- **Corollary of Lemma 2(a)**: every member of `𝒮` vanishes on `H − Q`.  The members of
+`𝒮` are induced from `Q ⊴ H` (`Sset_eq_induced_of_Q`), and class functions induced from a
+normal subgroup vanish off it (`ClassFunction.induce_apply_eq_zero_of_not_mem_normal`).
+This is the support input to the induction isometry of Lemma 2(b) (Isaacs Lemma 7.7) and to
+the `A`-support hypotheses of Lemma 1(a) at the Theorem's call sites. -/
+theorem apply_eq_zero_of_mem_Sset_of_not_mem_Q [Finite G]
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset)
+    {h : ↥hyp.H} (hh : (h : G) ∉ hyp.Q) : χ h = 0 := by
+  haveI : (hyp.Q.subgroupOf hyp.H).Normal := hyp.Q_subgroupOf_H_normal
+  have hmem := hχ
+  rw [Sset_eq_induced_of_Q hyp] at hmem
+  obtain ⟨φ, _, rfl⟩ := hmem
+  exact ClassFunction.induce_apply_eq_zero_of_not_mem_normal (hyp.Q.subgroupOf hyp.H) φ
+    (fun hmem' => hh (Subgroup.mem_subgroupOf.mp hmem'))
+
+omit [Fintype G] in
+/-- **Members of `ℤ[𝒮]` vanish on `H − Q`** (span form of
+`apply_eq_zero_of_mem_Sset_of_not_mem_Q`, by induction over the `ℤ`-span). -/
+theorem zSpan_Sset_apply_eq_zero_of_not_mem_Q [Finite G]
+    {φ : ClassFunction ↥hyp.H ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) hyp.Sset)
+    {x : ↥hyp.H} (hx : (x : G) ∉ hyp.Q) : φ x = 0 := by
+  induction hφ using Submodule.span_induction with
+  | mem χ hχ => exact apply_eq_zero_of_mem_Sset_of_not_mem_Q hyp hχ hx
+  | zero => simp
+  | add χ ρ _ _ hχ hρ => rw [ClassFunction.add_apply, hχ, hρ, add_zero]
+  | smul n χ _ hχ =>
+      rw [← Int.cast_smul_eq_zsmul ℂ n χ, ClassFunction.smul_apply, hχ, mul_zero]
 
 /-- **Peterfalvi Appendix IV, Lemma 2(b)** (p. 145).  `ψ ↦ Ind_H^G ψ` is an
 isometry from `ℤ[𝒮]°` (the degree-zero part of the lattice spanned by `𝒮`) to
 `ℤ[Irr G]°`: it preserves inner products, lands in `ℤ[Irr G]`, and preserves the
 degree-zero condition.
 
-**Status: partially proved.**  The **integrality** clause (`τ φ ∈ ℤ[Irr G]`) and the
-**degree-zero** clause are proved sorry-free just above (`Hypothesis.tau_mem_ZIrr`,
-`Hypothesis.tau_apply_one`) and are discharged in the proof below; only the
-**isometry** clause is `sorry`.
-
-For the isometry the book cites Isaacs Lemma 7.7, using that the elements of
-`𝒮` vanish on `H - Q` (Lemma 2(a)) and that `Q` has trivial intersections in `G`
-(`Q_trivial_intersection`).  The missing prerequisite is therefore Lemma 2(a)
-together with the TI-vanishing form of the induction isometry for the subgroup
-`Q` — the repository's TI-isometry material (`OddOrder.GroupTheory.TISubset`,
-Peterfalvi §2--§4) is stated for `A`-supported class functions on a TI subset,
-and has not been specialized to this `Q`-vanishing configuration. -/
+The **integrality** clause is `Hypothesis.tau_mem_ZIrr` and the **degree-zero** clause is
+`Hypothesis.tau_apply_one`.  For the **isometry**, the book cites Isaacs Lemma 7.7: a
+degree-zero member of `ℤ[𝒮]` vanishes off `Q^# = Q \ {1}` (Lemma 2(a) via
+`zSpan_Sset_apply_eq_zero_of_not_mem_Q`, plus the degree-zero condition at `1`), `Q^#` is a
+TI-subset of `G` with normalizer-bound `H` (`Hypothesis.isTISubset_Q_sdiff_one`, from
+`Q_trivial_intersection`), and induction from a TI-subset-supported class function is an
+isometry (`ClassFunction.inner_induce_eq_of_isTISubset`). -/
 theorem induction_isometry_on_degree_zero
     (φ ψ : ClassFunction ↥hyp.H ℂ)
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) hyp.Sset)
@@ -732,7 +1066,22 @@ theorem induction_isometry_on_degree_zero
     ClassFunction.inner (hyp.tau φ) (hyp.tau ψ) = ClassFunction.inner φ ψ ∧
       hyp.tau φ ∈ ZIrr G ∧ (hyp.tau φ) (1 : G) = 0 := by
   refine ⟨?_, hyp.tau_mem_ZIrr hφ, hyp.tau_apply_one hφ1⟩
-  sorry
+  haveI : Finite G := Finite.of_fintype G
+  -- degree-zero members of `ℤ[𝒮]` vanish off the TI-subset `A = Q \ {1}`
+  have hoff : ∀ ρ : ClassFunction ↥hyp.H ℂ,
+      ρ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) hyp.Sset → ρ (1 : ↥hyp.H) = 0 →
+      ∀ x : ↥hyp.H, (x : G) ∉ ((hyp.Q : Set G) \ {1}) → ρ x = 0 := by
+    intro ρ hρ hρ1 x hx
+    by_cases hxQ : (x : G) ∈ hyp.Q
+    · have hx1 : (x : G) = 1 := by
+        by_contra h1
+        exact hx ⟨hxQ, h1⟩
+      have hxone : x = (1 : ↥hyp.H) := Subtype.ext hx1
+      rw [hxone]
+      exact hρ1
+    · exact zSpan_Sset_apply_eq_zero_of_not_mem_Q hyp hρ hxQ
+  exact ClassFunction.inner_induce_eq_of_isTISubset hyp.H hyp.isTISubset_Q_sdiff_one
+    (hoff φ hφ hφ1) (hoff ψ hψ hψ1)
 
 omit [Fintype G] [Fintype ↥hyp.H] in
 /-- **Peterfalvi Appendix IV, Lemma 2(c)** (p. 145).  If `d = |D|` is odd then no
@@ -742,8 +1091,12 @@ omit [Fintype G] [Fintype ↥hyp.H] in
 to the odd-order group `Q₁ D` is irreducible and non-principal, so `χ̄ ≠ χ` by
 Huppert, *Endliche Gruppen* I, Kapitel V, Satz 13.8 (a group of odd order has no
 nonprincipal real irreducible character — a consequence of Burnside's
-`|{real classes}| = |{real characters}|`).  The missing prerequisites are Lemma
-2(a) and that odd-order statement, neither of which is in the repository. -/
+`|{real classes}| = |{real characters}|`).  Lemma 2(a) is now proved
+(`Sset_eq_induced_of_Q`, issue 1051) and the odd-order statement is in the
+repository (`realIrreducibleCharacter_eq_trivial_of_odd_card`,
+`BrauerPermutation.lean`); the missing pieces are the restriction step (that
+`Res_{Q₁D} Ind_Q^H φ = Ind_{Q₁}^{Q₁D} θ` is irreducible, a Mackey-type
+computation) and the source of the oddness of `|Q₁ D|` (original text, p. 145). -/
 theorem hasNoRealCharacters_Sset (hd : Odd hyp.d) :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.Sset := by
   sorry
@@ -767,9 +1120,12 @@ and (2) (`𝒮(S')` coherent when `|Q₁|` has two prime divisors; `𝒮` cohere
 `𝒳 = 𝒮 - 𝒮(Z)` coherent for `1 ≠ Z ⊴ H` with `Z ≤ Z(Q₁)`; steps (4)--(6) set up
 `𝒴 = 𝒮(Q')` and reduce coherence of `𝒮` to `a ∣ λ`; step (7) is the class-algebra
 congruence `ψ(z) ≡ ψ(1) (mod |Q|)` for `ψ ∈ Irr(G)` constant on `Z^#`; step (8)
-combines them.  Every step consumes Lemma 1(a) (`coherent_adjoin_of_degree_bound`
-above, unproved) and Lemma 2 (unproved), and step (7) needs the class-sum
-congruence machinery for a Hall TI subgroup, which is not in the repository. -/
+combines them.  Lemma 1(a) (`coherent_adjoin_of_degree_bound`, issue 1049),
+Lemma 2(a) (`Sset_eq_induced_of_Q`, issue 1051) and Lemma 2(b)
+(`induction_isometry_on_degree_zero`, issue 1052) are now proved; the remaining
+prerequisites are Lemma 2(c) (`hasNoRealCharacters_Sset` above) and step (7)'s
+class-sum congruence machinery for a Hall TI subgroup, which is not in the
+repository. -/
 theorem feit_sibley_coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis G) [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
     (hd : Odd hyp.d) :
