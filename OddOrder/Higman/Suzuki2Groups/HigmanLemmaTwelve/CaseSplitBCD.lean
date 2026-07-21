@@ -1217,6 +1217,164 @@ theorem ambientProductSquare_decomposed_ne_zero
   rw [ambientProductSquare_eq left right hRnormal hinf hsup hΦR a b]
   exact hzero
 
+/-! ## The bundled mixed term -/
+
+/-- The actual ambient mixed term `M(α, β)` of two factor inclusions, bundled
+as a `ZMod 2`-bilinear map on the Singer coordinate field: include the two
+coordinates, take the actual lower-central commutator pairing, and read the
+result through the ambient centre coordinate.  This is the bilinear map that
+the Frobenius support extraction (`exists_equivariant_frobenius_repr`)
+consumes. -/
+noncomputable def mixedTermBilinear
+    {P : Type uP} [Group P] [Finite P]
+    {Sl Sr : Subgroup P} {n : ℕ}
+    {hEA : IsElementaryAbelian 2 ↑(frattini P)}
+    {ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {hK1amb : lowerCentralLayerKernel P 1 = ⊥}
+    {htermamb : lowerCentralTerm P 1 = frattini P}
+    {hSqamb : LowerCentralSquaresLieInSecond P}
+    {hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)}
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0) :
+    GaloisField 2 n →ₗ[ZMod 2]
+      (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) :=
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  ((lowerCentralCommutatorBilinear P).compl₁₂ left.incl right.incl).compr₂
+    (ambientCenterCoordinate hEA hK1amb htermamb ePhi).toLinearMap
+
+@[simp]
+theorem mixedTermBilinear_apply
+    {P : Type uP} [Group P] [Finite P]
+    {Sl Sr : Subgroup P} {n : ℕ}
+    {hEA : IsElementaryAbelian 2 ↑(frattini P)}
+    {ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {hK1amb : lowerCentralLayerKernel P 1 = ⊥}
+    {htermamb : lowerCentralTerm P 1 = frattini P}
+    {hSqamb : LowerCentralSquaresLieInSecond P}
+    {hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)}
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (α β : GaloisField 2 n) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    mixedTermBilinear left right α β =
+      ambientCenterCoordinate hEA hK1amb htermamb ePhi
+        (lowerCentralCommutatorBilinear P (left.incl α) (right.incl β)) :=
+  rfl
+
+/-- **The actual mixed term satisfies the eigenvalue functional equation
+`M(λα, μβ) = ν · M(α, β)`** for the packaged inclusions of two factor
+coordinate data over a common ambient Singer datum. -/
+theorem mixedTermBilinear_lambda_equivariance
+    {P : Type uP} [Group P] [Finite P] {Y : Subgroup (MulAut P)}
+    {Sl Sr : Subgroup P}
+    {hSlinv : IsAInvariant Y.subtype Sl} {hPhiSl : frattini P ≤ Sl}
+    {hSrinv : IsAInvariant Y.subtype Sr} {hPhiSr : frattini P ≤ Sr}
+    {c : Y} {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    {nu : GaloisField 2 n}
+    (dataL :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      FactorCoordinateData hSlinv hPhiSl c ePhi nu)
+    (dataR :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      FactorCoordinateData hSrinv hPhiSr c ePhi nu)
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (hconj :
+      let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+        IsAInvariant.of_characteristic Y.subtype
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ePhi.conj (elabRepresentation 2 hPhiInv.restrict c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu)
+    (α β : GaloisField 2 n) :
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+    mixedTermBilinear
+        (dataL.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb hK0)
+        (dataR.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb hK0)
+        (dataL.lambda * α) (dataR.lambda * β) =
+      nu * mixedTermBilinear
+        (dataL.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb hK0)
+        (dataR.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb hK0)
+        α β := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  have key := mixedTerm_lambda_equivariance (Y := Y) hEA hK1amb htermamb ePhi
+    c nu hconj
+    (dataL.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb hK0).incl
+    (dataR.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb hK0).incl
+    dataL.lambda dataR.lambda
+    (fun γ => FactorCoordinateData.toInclusionData_incl_representation
+      hEA ePhi dataL hK1amb htermamb hSqamb hAgemoamb hK0 γ)
+    (fun γ => FactorCoordinateData.toInclusionData_incl_representation
+      hEA ePhi dataR hK1amb htermamb hSqamb hAgemoamb hK0 γ)
+    α β
+  simpa [mixedTermBilinear_apply, smul_eq_mul] using key
+
+/-- Every ambient layer class of an element of `S` lies in the image of the
+packaged inclusion: the noncommuting mixed-factor witness therefore has
+coordinates. -/
+theorem FactorInclusionData.exists_incl_eq
+    {P : Type uP} [Group P] [Finite P] {S : Subgroup P} {n : ℕ}
+    {hEA : IsElementaryAbelian 2 ↑(frattini P)}
+    {ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {hK1amb : lowerCentralLayerKernel P 1 = ⊥}
+    {htermamb : lowerCentralTerm P 1 = frattini P}
+    {hSqamb : LowerCentralSquaresLieInSecond P}
+    {hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0)}
+    (d : FactorInclusionData S hEA ePhi hK1amb htermamb hSqamb hK0)
+    (x : lowerCentralTerm P 0) (hx : (x : P) ∈ S) :
+    ∃ α : GaloisField 2 n, d.incl α = layerZeroClass x := by
+  letI := d.group
+  letI := d.normal
+  letI := d.quotComm
+  letI := d.quotModule
+  have hx' : (x : P) ∈ d.f.range := by rw [d.range_eq]; exact hx
+  obtain ⟨g, hg⟩ := hx'
+  refine ⟨d.eQuot (Additive.ofMul (QuotientGroup.mk' d.N g)), ?_⟩
+  calc d.incl (d.eQuot (Additive.ofMul (QuotientGroup.mk' d.N g)))
+      = layerZeroClass (ambientTermZeroHom d.f g) :=
+        factorInclusion_eQuot_mk d.f hK0 d.hf d.eQuot g
+    _ = layerZeroClass x := by
+        congr 1
+        exact Subtype.ext hg
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
