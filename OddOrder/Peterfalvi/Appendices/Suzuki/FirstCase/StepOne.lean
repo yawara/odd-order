@@ -21,6 +21,7 @@ set_option autoImplicit false
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 open OddOrder.Isaacs.Ch01 (fitting)
+open scoped Pointwise
 
 namespace FirstCaseHypothesis
 
@@ -169,15 +170,13 @@ theorem K_inf_centralizer_eq_bot :
     rw [fc.toHypothesis.V_inf_K_eq_bot] at hVK
     exact Subgroup.mem_bot.mp hVK
 
-/-- **Peterfalvi Part II, Ch. II, step (1), the splitting** (p. 108):
-`V = W ⋊ P`, stated as `W ⊔ P = V` (the intersection is trivial by
-`P_inf_W_eq_bot`).  The quotient `V̄ = V/W` embeds into
-`Aut F ≅ Gal(F/F₂)`, which has order `p`; since `P̄ ≤ V̄` already has
-order `p`, the two coincide. -/
-theorem W_join_P_eq_V : fc.toHypothesis.W ⊔ fc.P = fc.toHypothesis.V := by
+/-- **Peterfalvi Part II, Ch. II, step (1), the decomposition** (p. 108):
+every element of `V` is a product `g * w` with `g ∈ P` and `w ∈ W`.  The
+quotient `V̄ = V/W` embeds into `Aut F ≅ Gal(F/F₂)`, which has order `p`;
+since `P̄ ≤ V̄` already has order `p`, the two coincide. -/
+theorem exists_decomp_of_mem_V {v : G} (hv : v ∈ fc.toHypothesis.V) :
+    ∃ g ∈ fc.P, (g : G)⁻¹ * v ∈ fc.toHypothesis.W := by
   classical
-  apply le_antisymm
-  · exact sup_le fc.toHypothesis.W_le_V fc.P_le_V
   -- the semilinear model bounds `|V̄|` by `|Aut F| = p`
   obtain ⟨F, hField, hFinite, A, hcardF, hVcyc, eQ, μ, νe,
       hT, hE, hκ, eL, hL1, hL2, hL3⟩ := fc.toHypothesis.exists_semilinear_equiv
@@ -237,7 +236,6 @@ theorem W_join_P_eq_V : fc.toHypothesis.W ⊔ fc.P = fc.toHypothesis.V := by
     apply Subgroup.eq_top_of_card_eq
     rw [hcardrange, hcardVbar]
   -- read off the decomposition
-  intro v hv
   have hvD : v ∈ fc.toHypothesis.D := fc.toHypothesis.V_le_D hv
   have hzmem : (⟨QuotientGroup.mk ⟨v, hvD⟩, ⟨⟨v, hvD⟩, hv, rfl⟩⟩ :
       ↥fc.toHypothesis.Vbar) ∈ fc.toVbar.range := by
@@ -249,11 +247,121 @@ theorem W_join_P_eq_V : fc.toHypothesis.W ⊔ fc.P = fc.toHypothesis.V := by
   simp only [toVbar_coe] at hval
   rw [QuotientGroup.eq] at hval
   have hmemW : (g : G)⁻¹ * v ∈ fc.toHypothesis.W := hval
-  have hdecomp : v = (g : G) * ((g : G)⁻¹ * v) := by group
-  rw [hdecomp]
-  exact Subgroup.mul_mem _
-    (Subgroup.mem_sup_right g.2)
-    (Subgroup.mem_sup_left hmemW)
+  exact ⟨(g : G), g.2, hmemW⟩
+
+/-- **Peterfalvi Part II, Ch. II, step (1), the splitting** (p. 108):
+`V = W ⋊ P`, stated as `W ⊔ P = V` (the intersection is trivial by
+`P_inf_W_eq_bot`). -/
+theorem W_join_P_eq_V : fc.toHypothesis.W ⊔ fc.P = fc.toHypothesis.V := by
+  apply le_antisymm
+  · exact sup_le fc.toHypothesis.W_le_V fc.P_le_V
+  · intro v hv
+    obtain ⟨g, hg, hw⟩ := fc.exists_decomp_of_mem_V hv
+    have hdecomp : v = g * (g⁻¹ * v) := by group
+    rw [hdecomp]
+    exact Subgroup.mul_mem _
+      (Subgroup.mem_sup_right hg)
+      (Subgroup.mem_sup_left hw)
+
+/-- Conjugation by `D` preserves `W`: `W` is the kernel of the conjugation
+action of `D` on `Q₀`. -/
+theorem conj_mem_W_of_mem_D {d w : G} (hd : d ∈ fc.toHypothesis.D)
+    (hw : w ∈ fc.toHypothesis.W) :
+    d * w * d⁻¹ ∈ fc.toHypothesis.W := by
+  have hwD : w ∈ fc.toHypothesis.D :=
+    fc.toHypothesis.V_le_D (fc.toHypothesis.W_le_V hw)
+  have h1 : (⟨w, hwD⟩ : ↥fc.toHypothesis.D) ∈ fc.toHypothesis.conjQ0.ker := by
+    rw [fc.toHypothesis.ker_conjQ0]
+    exact hw
+  have h2 : (⟨d, hd⟩ : ↥fc.toHypothesis.D) * ⟨w, hwD⟩ * (⟨d, hd⟩)⁻¹ ∈
+      fc.toHypothesis.conjQ0.ker :=
+    (MonoidHom.normal_ker fc.toHypothesis.conjQ0).conj_mem _ h1 _
+  rw [fc.toHypothesis.ker_conjQ0] at h2
+  exact h2
+
+/-- `P` has prime order, hence is abelian and centralizes itself. -/
+theorem P_le_centralizer : fc.P ≤ Subgroup.centralizer (fc.P : Set G) := by
+  intro g hg
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hx
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  haveI : IsCyclic ↥fc.P := isCyclic_of_prime_card fc.card_P
+  letI : CommGroup ↥fc.P := IsCyclic.commGroup
+  have hcomm : (⟨x, hx⟩ : ↥fc.P) * ⟨g, hg⟩ = ⟨g, hg⟩ * ⟨x, hx⟩ :=
+    mul_comm _ _
+  exact congrArg Subtype.val hcomm
+
+/-- An element of `W` normalizing `P` centralizes it: the commutator lands
+in `P ∩ W = 1`. -/
+theorem centralizer_of_mem_W_of_mem_normalizer
+    {w : G} (hwW : w ∈ fc.toHypothesis.W)
+    (hwN : w ∈ Subgroup.normalizer ((fc.P : Set G))) :
+    w ∈ Subgroup.centralizer (fc.P : Set G) := by
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hx
+  have hxD : x ∈ fc.toHypothesis.D :=
+    fc.toHypothesis.V_le_D (fc.P_le_V hx)
+  have hy : w * x * w⁻¹ ∈ fc.P :=
+    (Subgroup.mem_normalizer_iff.mp hwN x).mp hx
+  have hyx_W : (w * x * w⁻¹) * x⁻¹ ∈ fc.toHypothesis.W := by
+    have hconj : x * w⁻¹ * x⁻¹ ∈ fc.toHypothesis.W :=
+      fc.conj_mem_W_of_mem_D hxD (fc.toHypothesis.W.inv_mem hwW)
+    have heq : (w * x * w⁻¹) * x⁻¹ = w * (x * w⁻¹ * x⁻¹) := by group
+    rw [heq]
+    exact fc.toHypothesis.W.mul_mem hwW hconj
+  have hbot : (w * x * w⁻¹) * x⁻¹ ∈ fc.P ⊓ fc.toHypothesis.W :=
+    ⟨fc.P.mul_mem hy (fc.P.inv_mem hx), hyx_W⟩
+  rw [fc.P_inf_W_eq_bot, Subgroup.mem_bot, mul_inv_eq_one] at hbot
+  calc x * w = (w * x * w⁻¹) * w := by rw [hbot]
+    _ = w * x := by group
+
+/-- **Peterfalvi Part II, Ch. II, step (1), self-normalizing centralizer**
+(p. 108): `N_G(P) = C_G(P)`.  By §3 Proposition 1(b),
+`N_G(P) = C_G(P) N_V(P)`, and `N_V(P) = C_W(P) P ≤ C_G(P)`. -/
+theorem normalizer_P_eq_centralizer :
+    Subgroup.normalizer ((fc.P : Set G)) =
+      Subgroup.centralizer (fc.P : Set G) := by
+  apply le_antisymm
+  · intro n hn
+    have hn' : n ∈ (Subgroup.centralizer (fc.P : Set G) : Set G) *
+        ((fc.toHypothesis.V ⊓ Subgroup.normalizer ((fc.P : Set G)) :
+          Subgroup G) : Set G) := by
+      rw [← fc.toHypothesis.normalizer_eq_centralizer_mul_normalizer_inf_V
+        fc.P_le_V]
+      exact hn
+    rw [Set.mem_mul] at hn'
+    obtain ⟨c, hc, v, hv, rfl⟩ := hn'
+    apply Subgroup.mul_mem _ hc
+    obtain ⟨hvV, hvN⟩ := hv
+    obtain ⟨g, hg, hw⟩ := fc.exists_decomp_of_mem_V hvV
+    have hgN : g ∈ Subgroup.normalizer ((fc.P : Set G)) :=
+      Subgroup.le_normalizer hg
+    have hwN : g⁻¹ * v ∈ Subgroup.normalizer ((fc.P : Set G)) :=
+      Subgroup.mul_mem _ (Subgroup.inv_mem _ hgN) hvN
+    have hwC := fc.centralizer_of_mem_W_of_mem_normalizer hw hwN
+    have hdecomp : v = g * (g⁻¹ * v) := by group
+    rw [hdecomp]
+    exact Subgroup.mul_mem _ (fc.P_le_centralizer hg) hwC
+  · intro c hc
+    rw [Subgroup.mem_normalizer_iff]
+    intro x
+    constructor
+    · intro hxP
+      have hcomm := Subgroup.mem_centralizer_iff.mp hc x hxP
+      have heq : c * x * c⁻¹ = x := by
+        calc c * x * c⁻¹ = (x * c) * c⁻¹ := by rw [← hcomm]
+          _ = x := by group
+      rw [heq]
+      exact hxP
+    · intro hcx
+      have hcomm := Subgroup.mem_centralizer_iff.mp hc _ hcx
+      have heq : x = c * x * c⁻¹ := by
+        have h2 : c * x = c * (c * x * c⁻¹) := by
+          calc c * x = (c * x * c⁻¹) * c := by group
+            _ = c * (c * x * c⁻¹) := hcomm
+        exact mul_left_cancel h2
+      rw [heq]
+      exact hcx
 
 end FirstCaseHypothesis
 
