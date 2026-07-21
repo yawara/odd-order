@@ -801,6 +801,65 @@ noncomputable def e5Setup [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (e5Setup hG hp hk hkp hord hxOp hEnorm hcardE hK₁E hcardK₁ hEfrob hK₁norm
         hR₁Op hR₁cyc hR₁ne hdisj hcent).act = conjActionHom hEnorm := rfl
 
+/-- **The Proposition E.4 half of BG's `(ii) ⟹ (i)`** (p. 165): if the Frobenius
+complement `E` does *not* fix `⟨x⟩`, the corrected Proposition E.4
+(`AppE_PropE4.lean`), applied to the setup `(O_p(M), K₁, E)`, produces a normal abelian
+subgroup of index `p` in `S = Ω₁(O_p(M))` — exactly what (ii) forbids.  (The subgroup is
+`C_S(Z₂(S))`, characteristic in `S`, hence normal.) -/
+theorem e5_normal_abelian_of_not_fixes [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E K₁ : Subgroup G} {x : G} {p k : ℕ}
+    (hp : p.Prime) (hk : k.Prime) (hkp : k ≠ p) (hord : orderOf x = p)
+    (hxOp : x ∈ opiCoreInG {p} M)
+    (hEnorm : E ≤ Subgroup.normalizer ((opiCoreInG {p} M : Subgroup G) : Set G))
+    (hcardE : ¬ p ∣ Nat.card ↥E)
+    (hK₁E : K₁ ≤ E) (hcardK₁ : Nat.card ↥K₁ = k)
+    (hEfrob : ∀ e ∈ E, e ≠ 1 → ∀ r ∈ opiCoreInG {p} M, r ≠ 1 → e * r * e⁻¹ ≠ r)
+    (hK₁norm : ∀ g ∈ K₁, MulAut.conj g • (Subgroup.zpowers x) = Subgroup.zpowers x)
+    {R₁amb : Subgroup G} (hR₁Op : R₁amb ≤ opiCoreInG {p} M)
+    (hR₁cyc : IsCyclic ↥R₁amb) (hR₁ne : R₁amb ≠ ⊥)
+    (hdisj : Subgroup.zpowers x ⊓ R₁amb = ⊥)
+    (hcent : opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G) =
+      Subgroup.zpowers x ⊔ R₁amb)
+    (hcard4 : p ^ 4 ≤ Nat.card ↥(Omega ↥(opiCoreInG {p} M) p 1))
+    (hdc : ∀ n : ℕ,
+      ⁅OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer
+            ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+                Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+              Set ↥(Omega ↥(opiCoreInG {p} M) p 1)))
+          (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) n,
+        Subgroup.centralizer
+          ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+              Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+            Set ↥(Omega ↥(opiCoreInG {p} M) p 1))⁆ ≤
+        OddOrder.Isaacs.Ch04.iterCommutator
+          (Subgroup.centralizer
+            ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
+                Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
+              Set ↥(Omega ↥(opiCoreInG {p} M) p 1)))
+          (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) (n + 2))
+    (hnotfix : ¬ ∀ b : ↥E,
+      (conjActionHom hEnorm b) •
+          Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) =
+        Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M))) :
+    ∃ A : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1),
+      A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p := by
+  set hyp := e5Setup hG hp hk hkp hord hxOp hEnorm hcardE hK₁E hcardK₁ hEfrob hK₁norm
+    hR₁Op hR₁cyc hR₁ne hdisj hcent with hhypdef
+  have hB_regular : ∀ b : ↥E, b ≠ 1 →
+      ∀ r : ↥(opiCoreInG {p} M), hyp.act b r = r → r = 1 := by
+    intro b hb r hr
+    by_contra hrne
+    have hbne' : (b : G) ≠ 1 := fun h => hb (Subtype.ext h)
+    have hrne' : (r : G) ≠ 1 := fun h => hrne (Subtype.ext h)
+    have hval : (b : G) * (r : G) * (b : G)⁻¹ = (r : G) := congrArg Subtype.val hr
+    exact hEfrob _ b.2 hbne' _ r.2 hrne' hval
+  have hB_not_fixes : ¬ ∀ b : ↥E, (hyp.act b) • hyp.R₀ = hyp.R₀ := fun hall =>
+    hnotfix hall
+  have hres := hyp.centralizer_upperCentralSeries_abelian_index_p hcard4 hB_regular
+    hB_not_fixes hdc
+  exact ⟨_, Subgroup.normal_of_characteristic _, hres.1, hres.2⟩
+
 /-- **Small `p`-groups always violate E.5's (ii)**: a group of order `p^n` with
 `1 ≤ n ≤ 3` has a normal abelian subgroup of index `p` (any subgroup of order `p^(n-1)`:
 normal because its index is the least prime factor of `|S|`, abelian because its order is
