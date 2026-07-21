@@ -60,6 +60,8 @@ Lem 2.8-2.10、Thm 2.11 (**Glauberman `Z(J)`-定理**) は後続。
 
 namespace Subgroup
 
+open scoped commutatorElement
+
 variable {G : Type*} [Group G]
 
 /-- The trivial subgroup `⊥` is abelian. -/
@@ -166,6 +168,92 @@ theorem le_normalizer_iff_commutator_commutator_eq_bot_of_mem_maxAbelianIn
     have h3 : ⁅B, A⁆ ≤ A :=
       (eq_inf_centralizer_of_mem_maxAbelianIn hA).ge.trans' (le_inf h2 h1)
     exact le_normalizer_iff_commutator_le_right.mpr h3
+
+/-! ### Gorenstein Thm 2.4 (Thompson) へ向けた部品
+
+`M := ⟨⁅x,a⁆ : a ∈ A⟩` を mathlib 慣習で取る (Gorenstein の `[x,A]` は
+`[a,b] = a⁻¹b⁻¹ab` 慣習; `x` は全称なので statement は等価で, 計算は `x → x⁻¹`
+の鏡映で移る). -/
+
+/-- **Gorenstein Lemma 2.5(i)** (element 形, mathlib 慣習に鏡映): `y, z` が可換で
+`⁅x,y⁆` と `⁅x,z⁆` が可換なら, 二重交換子は `y, z` について対称:
+`⁅⁅x,y⁆⁻¹, z⁆ = ⁅⁅x,z⁆⁻¹, y⁆`.
+
+Gorenstein p.20 の証明の鏡映: `⁅⁅x,y⁆⁻¹,z⁆` を
+`x · ((x⁻¹yxy⁻¹)(x⁻¹zxz⁻¹)) · (zyx⁻¹y⁻¹z⁻¹)` に展開 (自由恒等式) し, 中央 2 因子
+(どちらも `⁅x,·⁆⁻¹` の `x⁻¹`-共役ゆえ可換) を入れ替え, `yz = zy` で尾部を
+整理すると `y ↔ z` を入れ替えた同じ展開に一致する.
+
+⚠ G 原文の仮定「`[x,G]` abelian」より弱い仮定 (使う 2 元の可換性のみ) で成立 —
+原文証明の `[x⁻¹,y] = [x^m,y] ∈ [x,G]` 帰納は `x⁻¹`-共役の観察で不要になる. -/
+theorem commutatorElement_inv_rotate {x y z : G} (h1 : Commute y z)
+    (h2 : Commute ⁅x, y⁆ ⁅x, z⁆) :
+    ⁅⁅x, y⁆⁻¹, z⁆ = ⁅⁅x, z⁆⁻¹, y⁆ := by
+  have key : ∀ b c : G,
+      ⁅⁅x, b⁆⁻¹, c⁆
+        = x * ((x⁻¹ * b * x * b⁻¹) * (x⁻¹ * c * x * c⁻¹))
+            * (c * b * x⁻¹ * b⁻¹ * c⁻¹) := by
+    intro b c
+    group
+  have hu : Commute (x⁻¹ * y * x * y⁻¹) (x⁻¹ * z * x * z⁻¹) := by
+    have e : ∀ b : G, x⁻¹ * b * x * b⁻¹ = x⁻¹ * ⁅x, b⁆⁻¹ * x := by intro b; group
+    rw [e y, e z]
+    have hab : Commute ⁅x, y⁆⁻¹ ⁅x, z⁆⁻¹ := h2.inv_left.inv_right
+    have hswap : (x⁻¹ * ⁅x, y⁆⁻¹ * x) * (x⁻¹ * ⁅x, z⁆⁻¹ * x)
+        = (x⁻¹ * ⁅x, z⁆⁻¹ * x) * (x⁻¹ * ⁅x, y⁆⁻¹ * x) :=
+      calc (x⁻¹ * ⁅x, y⁆⁻¹ * x) * (x⁻¹ * ⁅x, z⁆⁻¹ * x)
+          = x⁻¹ * (⁅x, y⁆⁻¹ * ⁅x, z⁆⁻¹) * x := by group
+        _ = x⁻¹ * (⁅x, z⁆⁻¹ * ⁅x, y⁆⁻¹) * x := by rw [hab.eq]
+        _ = (x⁻¹ * ⁅x, z⁆⁻¹ * x) * (x⁻¹ * ⁅x, y⁆⁻¹ * x) := by group
+    exact hswap
+  have T : z * y * x⁻¹ * y⁻¹ * z⁻¹ = y * z * x⁻¹ * z⁻¹ * y⁻¹ := by
+    have e1 : z * y * x⁻¹ * y⁻¹ * z⁻¹ = (z * y) * x⁻¹ * (z * y)⁻¹ := by group
+    have e2 : y * z * x⁻¹ * z⁻¹ * y⁻¹ = (y * z) * x⁻¹ * (y * z)⁻¹ := by group
+    rw [e1, e2, h1.symm.eq]
+  calc ⁅⁅x, y⁆⁻¹, z⁆
+      = x * ((x⁻¹ * y * x * y⁻¹) * (x⁻¹ * z * x * z⁻¹))
+          * (z * y * x⁻¹ * y⁻¹ * z⁻¹) := key y z
+    _ = x * ((x⁻¹ * z * x * z⁻¹) * (x⁻¹ * y * x * y⁻¹))
+          * (y * z * x⁻¹ * z⁻¹ * y⁻¹) := by rw [hu.eq, T]
+    _ = ⁅⁅x, z⁆⁻¹, y⁆ := (key z y).symm
+
+/-- **Thm 2.4 の coset 単射の核** (Gorenstein p.271 中段の計算):
+`d := ⁅x,u⁆⁻¹ · ⁅x,v⁆` が `A` を中心化すれば, `w := u⁻¹v` は全ての `⁅x,a⁆`
+(`a ∈ A`) を中心化する.
+
+計算: `d` は `u ∈ A` と可換なので `d = u⁻¹ d u = ⁅x, u⁻¹v⁆`. すると
+`⁅⁅x,w⁆⁻¹, a⁆ = 1` (∀ a ∈ A) で, **Lemma 2.5(i)** の対称性から
+`⁅⁅x,a⁆⁻¹, w⁆ = 1`, すなわち `w` が `⁅x,a⁆` を中心化する. -/
+theorem commute_commutatorElement_of_inv_mul_mem_centralizer
+    {A : Subgroup G} (hA : IsMulCommutative A) {x u v : G}
+    (hu : u ∈ A) (hv : v ∈ A)
+    (hM : ∀ a ∈ A, ∀ b ∈ A, Commute ⁅x, a⁆ ⁅x, b⁆)
+    (hd : ⁅x, u⁆⁻¹ * ⁅x, v⁆ ∈ centralizer (A : Set G)) :
+    ∀ a ∈ A, Commute (u⁻¹ * v) ⁅x, a⁆ := by
+  haveI := hA
+  have hw : u⁻¹ * v ∈ A := A.mul_mem (A.inv_mem hu) hv
+  have hd' : ∀ a ∈ A, a * (⁅x, u⁆⁻¹ * ⁅x, v⁆) = (⁅x, u⁆⁻¹ * ⁅x, v⁆) * a :=
+    mem_centralizer_iff.mp hd
+  -- `d` は `u` と可換 ⟹ `d = u⁻¹ d u = ⁅x, u⁻¹v⁆`.
+  have hd_eq : ⁅x, u⁆⁻¹ * ⁅x, v⁆ = ⁅x, u⁻¹ * v⁆ := by
+    have h1 : u⁻¹ * (⁅x, u⁆⁻¹ * ⁅x, v⁆) * u = ⁅x, u⁻¹ * v⁆ := by group
+    have h2 : u⁻¹ * (⁅x, u⁆⁻¹ * ⁅x, v⁆) * u = ⁅x, u⁆⁻¹ * ⁅x, v⁆ := by
+      rw [mul_assoc, ← hd' u hu, ← mul_assoc, inv_mul_cancel, one_mul]
+    rw [← h2, h1]
+  intro a ha
+  -- `⁅⁅x,w⁆⁻¹, a⁆ = 1` (`⁅x,w⁆ = d` が `A` を中心化).
+  have hwa : Commute ⁅x, u⁻¹ * v⁆ a := by
+    rw [← hd_eq]
+    exact ((hd' a ha).symm : _ * _ = _ * _)
+  have hzero : ⁅⁅x, u⁻¹ * v⁆⁻¹, a⁆ = 1 :=
+    commutatorElement_eq_one_iff_commute.mpr hwa.inv_left
+  -- Lemma 2.5(i) の対称性で回転.
+  have hrot := commutatorElement_inv_rotate
+    (x := x) (setLike_mul_comm hw ha) (hM _ hw _ ha)
+  rw [hzero] at hrot
+  have hfin : Commute ⁅x, a⁆⁻¹ (u⁻¹ * v) :=
+    commutatorElement_eq_one_iff_commute.mp hrot.symm
+  exact (Commute.inv_left_iff.mp hfin).symm
 
 /-! ### Gorenstein Lemma 2.2: 遺伝性・共変性・characteristic 性 -/
 
