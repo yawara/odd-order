@@ -474,6 +474,11 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
                     of_xiLengthThree + inl_range。anisotropy 入力は
                     ambientProductSquare_decomposed_ne_zero (hinv は
                     involutions_subset_of_nontrivial_invariant 経由)
+  - [x] Higman payload 一括供給 `center_payload_of_card_eq_cube`
+        (`f2165d373`): IsSuzuki2Group + cyclic regular actor + |P| = q³ →
+        Z(P) = Φ(P) ∧ 中心 exponent 2 ∧ OrderQModuleSplit。
+        Lemma 5 側は actualKActor (ActualKActor.lean:117, cyclic instance +
+        actsRegularly 済) + card_K_eq_card_Q0_sub_one で instantiate 可能
   - [ ] summands が同型 iff type B を証明し、type-B 有限体座標を
         actual `Q/Q₀`, `K` action に接続する
 - [x] invariant `Q₀`-coset の coprime fixed-point lifting から
