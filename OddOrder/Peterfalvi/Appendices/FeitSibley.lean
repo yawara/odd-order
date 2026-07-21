@@ -208,6 +208,25 @@ theorem disjoint_Q_D : Disjoint hyp.Q hyp.D := disjoint_iff.mpr hyp.Q_inf_D_eq_b
 /-- `S ∩ Q₁ = 1`, in `Disjoint` form. -/
 theorem disjoint_S_Q1 : Disjoint hyp.S hyp.Q1 := disjoint_iff.mpr hyp.S_inf_Q1_eq_bot
 
+/-- **`Q₁ ⊴ Q`** (direct-product factor, elementwise form): for `q ∈ Q` and `x ∈ Q₁`,
+`q x q⁻¹ ∈ Q₁`.  Writing `q = s·y` (`s ∈ S`, `y ∈ Q₁`) via `S Q₁ = Q`, one has
+`q x q⁻¹ = s (y x y⁻¹) s⁻¹ = y x y⁻¹ ∈ Q₁` since `S` centralises `Q₁`. -/
+theorem Q1_conj_mem_of_mem_Q {q : G} (hq : q ∈ hyp.Q) {x : G} (hx : x ∈ hyp.Q1) :
+    q * x * q⁻¹ ∈ hyp.Q1 := by
+  rw [← SetLike.mem_coe, ← hyp.S_mul_Q1_eq_Q] at hq
+  obtain ⟨s, hs, y, hy, hsy⟩ := Set.mem_mul.mp hq
+  rw [SetLike.mem_coe] at hs hy
+  subst hsy
+  have hz : y * x * y⁻¹ ∈ hyp.Q1 :=
+    hyp.Q1.mul_mem (hyp.Q1.mul_mem hy hx) (hyp.Q1.inv_mem hy)
+  have hcomm : s * (y * x * y⁻¹) = (y * x * y⁻¹) * s := hyp.S_commutes_Q1 s hs _ hz
+  have hrw : s * y * x * (s * y)⁻¹ = y * x * y⁻¹ := by
+    calc s * y * x * (s * y)⁻¹
+        = s * (y * x * y⁻¹) * s⁻¹ := by group
+      _ = (y * x * y⁻¹) * s * s⁻¹ := by rw [hcomm]
+      _ = y * x * y⁻¹ := by group
+  rw [hrw]; exact hz
+
 /-- `d = |D| > 0`. -/
 theorem d_pos [Finite G] : 0 < hyp.d := Nat.card_pos
 
