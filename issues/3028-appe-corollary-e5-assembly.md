@@ -64,3 +64,106 @@ corrected E.4 landing (issues 3021/9402, commits 3b89360e3/2e6b7829c) により 
 新 leaf `OddOrder/BG/AppE_CorollaryE5.lean` (import: AppE_PropE4 + S14/S16 hub)。
 E.4 と同じパターン: 完成時に AppE_FurtherResults の sorried statement を削除し
 「下流で証明」コメントに置換。新 leaf は同 commit で OddOrder.lean に配線。
+
+## 2026-07-21 WP1 ✅ + WP2 設計確定 (lane c)
+
+**WP1 landed**: `e5_neighbour_data` (`AppE_CorollaryE5.lean`, commit 3f3d70d88, sorry-free)。
+(E.29) bundle = TypeP2 N / C_{N_σ}(x)≠⊥ / complement / K₁ (素数位数 Hall κ(N)) /
+U₁ = E₂⊔E₃ (abelian Hall (κ∪σ)ᶜ、K₁ 正規化、≠⊥)。
+
+**原文確定 (PDF p.165 = PDF page 178、画像読了)**:
+- (E.30) `R = O_p(M) ∩ (M∩N) = O_p(M) ∩ N = C_{O_p(M)}(x)`
+- (E.31) `R₀ = O_p(F(N)) ⊴ N, |R₀| = p, C_{O_p(M)}(x) = R = R₀ × (R∩E₀)` (E₀ = R₀ の
+  complement in M∩N)、R∩E₀ regular on N_σ → Prop 3.9 で cyclic
+- (E.32) `⟨x⟩ = C_R(N_σ) = R₀ ⊴ N`、K₁ が R₀ 正規化
+- (ii)⟹(i): "p ∈ τ₂(M)" と印刷されているが **τ₂(N) と読む** (x ∈ M_σ ⟹ p ∈ σ(M)、
+  τ₂(M)∩σ(M)=∅ で矛盾; signalizer の hxtau2' が p ∈ τ₂(N) を供給、r(R)=2 はここから)
+- (E.33) `|𝒞_G(L̃)| = (|L_σ|−1)|G:L| = |G|(1/|L:L_σ| − 1/|L|)`、nonconjugate L で disjoint
+- (E.34) `|𝒞_G(Ẑ)| = (1 − 1/k − 1/k* + 1/(kk*))|G|` (Ẑ = K₁K* − K₁∪K*, K* = C_{N_σ}(K₁),
+  k=|K₁|, k*=|K*|)、𝒞_G(L̃) と disjoint
+
+**(E.30) の "Hence" の実内容 (形式化ルート確定)**:
+1. `M∩N = K₁ ⊔ U₁`: `subgroupE_basic hG hsetup` の `E = E₁ ⊔ E₂ ⊔ E₃` (TheoremsAE.lean:1034
+   の内部 have と同じ projection `.2.2.2.2.1.1`) + sup_assoc。
+2. `U₁ ⊴ M∩N`: K₁ ≤ N(U₁) (hK₀NU₀) + U₁ ≤ N(U₁) → sup ≤ normalizer。
+3. **absorption** `P ≤ U₁` (P = O_p(M)∩N, p ∈ (κ∪σ)ᶜ(N)): 商論法 — M∩N/U₁ は K₁ の像で
+   生成 = κ-群; P の像は (κ∪σ)ᶜ-群かつ κ-群 → trivial → P ≤ U₁ (~15 行、generic 化候補)。
+   p ∈ (κ∪σ)ᶜ(N) は 15.9 の hrκσ'N ブロック (r := p, τ₂→∉σ, τ₂≠τ₁,τ₃→∉κ) を replay。
+4. `x ∈ O_p(M)`: 15.9 の Frobenius 構造 (M = M_σ ⋊ E) + `frobeniusKernelIsNilpotent`
+   (BG Thm 3.7) → M_σ nilpotent → x (p-元) ∈ O_p(M_σ) ≤ O_p(M)。
+   ⚠ `Msigma_isNilpotent` (S11:708) は Hypothesis111 が要るので使わない。
+   O_p(M_σ) ≤ opiCoreInG {p} M の橋: O_p(M_σ) char M_σ ⊴ M → normal p-subgroup ≤ O_p(M)。
+5. (E.30) ⊆ 側: u ∈ O_p(M)∩N → u ∈ U₁ (3.) かつ x ∈ O_p(M)∩N ≤ U₁ (4. + x∈C(x)≤N) →
+   U₁ abelian → u ∈ C(x)。⊇ 側: C(x) ≤ N (signalizer) で自明。
+6. Sylow-ness `O_p(M)∩N = Hall {p} (M∩N)` は必要になった時点で
+   (`piSubgroup_le_opiCoreInG_of_isHall` 系 + O_p(M) が M の Sylow p — M_σ nilpotent +
+   p ∈ σ(M) + E が σ'-群)。
+
+**次段 (WP2 実装)**: 上記 1-5 を `AppE_CorollaryE5.lean` に実装 ((E.30) lemma)。その後
+(E.31) = Thm 12.7 (S12_Theorem127.lean) の該当 clause 適用、(E.32)、WP3 の setup 構成。
+
+## 2026-07-21 WP2 ✅ + ⚠ 新規上流 prerequisite 発見: **Cor 15.9(c) が未形式化** (WP2.5)
+
+**WP2 landed** (commits 712b60cbe / b8c6cd0ce、全 sorry-free):
+- `mem_opiCoreInG_singleton_of_nilpotent` (p-元の O_p 吸収、W = M_σ 用)
+- `e5_neighbour_data` に `M ⊓ N = K₁ ⊔ U₁` conjunct 追加
+- `mem_kappa_sigma_compl_of_mem_tau2` / `le_of_isPGroup_of_not_dvd_relIndex` (generic)
+- `e5_R_eq_centralizer` = **BG (E.30)** ✅
+
+**⚠ WP3 の前に必要な新規上流 (WP2.5)**: E.5 冒頭の (E.28) recap
+`|E∩N| = |N/N'|, N_E(⟨x⟩) ⊆ E∩N, N ∈ ℳ_𝒫₂, p ∈ τ₂(N)` (PDF p.164 = page 177 画像確認) は
+**BG Cor 15.9(c)** (printed: "for a suitable choice of a complement E to M_σ in M ...
+(c) r ∈ τ₂(N), N_E(⟨x_r⟩) ⊆ E∩N, and |E∩N| = |N/N'|")。repo の
+`centralizer_escape_final_local` は **(a)(b) のみ** (TaxonomyOutput.lean:666- の докstring
+明記; Coq `nonFtype_signalizer_base` BGsection15.v:1399 も (a)(b))。
+⚠ 2026-07-07 に「N_G(⟨x⟩) ≤ E⊓N」版 conjunct が unsound として削除された経緯あり (issue
+9017 #19) — sound な (c) は **N_E** (E 内正規化群) かつ **suitable E** (E の再選択が入る)。
+
+- (c) の用途: WP3 の A := K₁ ≤ E 整列と WP4 終端の「E = K₁」比較。構造的に必須。
+- BG の (c) 証明 = 15.9 証明後半 (15.4)-(15.5)... (§16 側、pdftotext L6391-)。R = Sylow r
+  of M∩N (= N の Sylow r でもある) を経由して E を再選択。
+- Coq 側の対応物確認が次の一手: BGsection15/16 で Feit–Thompson (1991) clause (c) 相当
+  (`FT_signalizer` 系 / `nonFtype_signalizer` 続き) を grep。
+- 置き場所: S16 (TaxonomyOutput の続き or 新 sibling leaf)。lane c は §16 割当済なので
+  territory 問題なし。9500 claim 不要 (App.E assembly の一部、issue 3028 で追跡)。
+
+**改訂 WP 順**: WP2.5 (15.9(c)) → WP3 (setup 構成) → WP4 ((ii)∧hdc⟹(i)) → WP5 (counting)。
+
+## 2026-07-21 WP2.5 設計確定 (15.9(c) 証明の完全読解、pdftotext L6415-6435 + PDF p.123)
+
+**⭐ Coq 裁定**: BGsection15.v:1396-1398 のコメントで **Coq は (c) を意図的に drop**
+("not used later" — Coq は App.E を形式化しないため)。(c) の形式化は本 repo が初。
+
+**BG の (c) 証明の骨格** (そのまま形式化ルート):
+1. (15.2) `K₁R` 非冪零 → `K₁ ⊄ M_σ` (M_σ 冪零ゆえ) → `K₁ ∩ M_σ = 1` → `|K₁| ∉ σ(M)`
+   → K₁ は σ(M)'-群。(15.2) 自体 = C_R(K₁) ≤ C_{U₁}(K₁) = 1 + R ≠ 1 (rank 2) から
+   「冪零群の正規部分群は中心と交わる」で矛盾させる。
+2. **E の再選択**: 既存 15.9(b) の complement E₀ に Hall 共役 (`hall_D`、M solvable) を
+   当て、K₁ ≤ E := E₀^m。cyclic/complement/Frobenius は共役で保存。
+3. `N_G(⟨x⟩) ≤ N`: C_G(x) ≤ N_G(⟨x⟩) < G (G simple、⟨x⟩ ≠ 1)、ℳ(C_G(x)) = {N}
+   (signalizer 一意性) → N_G(⟨x⟩) の入る maximal = N。
+4. **`E ⊓ N = K₁`**: K₁ ≤ E∩N ≤ M∩N = K₁ ⊔ U₁; E cyclic → E∩N abelian → E∩N ≤
+   C_{M∩N}(K₁) = K₁ (∵ (15.4) C_{U₁}(K₁) = 1 の分解論法)。⊇ は選択。
+5. `N_E(⟨x⟩) ⊆ E∩N` は 3. から自明 (N_E ≤ E ∧ ≤ N_G(⟨x⟩) ≤ N)。
+6. `|E∩N| = |N/N'|` は **E.5 では省略可** (WP4 は E∩N = K₁ だけ消費; counting は k = |K₁|
+   を直接使う)。Lean statement には入れない (必要になれば別途)。
+
+**⭐ WP4 への波及**: E.4 対偶で E が R₀ = ⟨x⟩ を固定 → E ≤ N_G(⟨x⟩) ≤ N →
+E = E∩N = K₁ → |M/M'| = |E| = |K₁| prime が即納 ((i) 完成)。
+
+**要部品 (現状)**:
+- (15.4) `C_{U₁}(K₁) = ⊥`: BG Prop 14.2(g) 由来。repo 形式化の所在は次 iteration で
+  実測 (候補: S14 Basics/ElemAbelianNeighbor の 14.2(g) 群、または typeP2 系から再導出)。
+- `hall_D` (Isaacs Ch3 Basic.lean:1682) = K₁ を含む Hall σ' の存在 ✓
+- Frobenius 構造の共役輸送 (IsFrobeniusGroup + IsComplement' の MulAut.conj 版) — 既存
+  API を確認、無ければ小補題。
+- 置き場所: `AppE_CorollaryE5.lean` 内 (`e5_exists_suitable_complement`)。S16 の
+  centralizer_escape_final_local は変更しない (出力を消費するだけ)。
+
+**statement 案**:
+```
+theorem e5_exists_suitable_complement ... (K₁ 側仮説 + 15.9 出力仮説) :
+  ∃ E : Subgroup G, E ≤ M ∧ IsComplement' ((Msigma M).subgroupOf M) (E.subgroupOf M) ∧
+    IsCyclic ↥E ∧ IsFrobeniusGroup ↥M ((Msigma M).subgroupOf M) (E.subgroupOf M) ∧
+    K₁ ≤ E ∧ E ⊓ N = K₁
+```
