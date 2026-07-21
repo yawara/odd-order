@@ -2700,3 +2700,11 @@ hub は landing 時に (a) `hdc` が honest な仮説か (E.23 と同値で fabr
   に改訂済。FiliformRefutation の stale 参照も更新。
 - **BG Prop E.4 は両面決着**: printed 版の否定 (`printed_propE4_false`) + corrected 版の
   証明、双方 Lean 機械検証済。App.E 主結果の残 = E.5 のみ (§14 counting gate)。
+
+## 2026-07-21 ⭐⭐⭐ 完了条件達成 — close
+
+E.5 (`maximalSubgroups_isTypeI_or_isTypeII`, AppE_E5Counting.lean) が最後の sorry を
+解消 (issue 3028 で WP1-5 完遂)。**AppE_*.lean 全 14 leaf の実 sorry = 0** (grep 言及は
+全部 docstring)。E.1-E.5 全て axiom-clean。完了条件「AppE の sorry が 0 に」達成。
+⚠ E.4 は printed 版が偽 (`printed_propE4_false`) のため `hdc` 補正付き、E.5 の (ii)
+branch も同補正を継承 (halt = (i) ∨ ((ii) ∧ hdc))。

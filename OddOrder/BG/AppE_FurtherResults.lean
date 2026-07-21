@@ -34,9 +34,9 @@ name here never changed, so consumers were unaffected.
 
 Every statement below is a genuine group-theoretic assertion: there are no
 opaque `Prop` fields and no self-carried `_holds` proofs anywhere in this file.
-Some of the deep results are still `sorry`-ed, but the sorries sit under
-**book-strength statements**, so closing them is real mathematics rather than
-packaging.  Per-result status:
+This file is now **sorry-free**; the deep results whose proofs need machinery
+staged in later leaves (E.3(b)–(d), E.4, E.5) are proved downstream, with
+pointer comments here at their book positions.  Per-result status:
 
 | Result | Status |
 |---|---|
@@ -57,7 +57,9 @@ packaging.  Per-result status:
 | E.3(b) second + third clause | **proved** from Step 2 + first clause |
 | E.3(c) (`card_omega_le`) | **proved** — in `AppE_RegularOperator.lean` (Step 2's count) |
 | E.3(d) (`B_fixes_R₀_of_fixes_frattini`) | **proved** — in `AppE_SemidirectFrattini.lean` (Step 4) |
-| E.3(b) first clause, E.4, E.5 | honest statements, `sorry` |
+| E.3(b) first clause | **proved** — in `AppE_ExponentP.lean` (Step 3) |
+| E.4 (corrected, `+hdc`) | **proved** — in `AppE_PropE4.lean` (printed form is false) |
+| E.5 (`maximalSubgroups_isTypeI_or_isTypeII`) | **proved** — in `AppE_E5Counting.lean` |
 -/
 
 namespace OddOrder.BG.AppE
@@ -1657,61 +1659,13 @@ open OddOrder.BG.Ch3.S12 OddOrder.BG.Ch4.S14
 
 variable {G : Type*} [Group G]
 
-/-- **BG Corollary E.5** (with the E.4 correction propagated).  Let `G` be a minimal
-simple group of odd order, `M` a maximal subgroup of `G`, `x ∈ M_σ` of prime order `p`
-with `C_G(x) ⊄ M`, and `N ∈ ℳ(C_G(x))` with `N ∉ ℳ_𝓕`.  Assume in addition that
-
-* (i) `|M / M'|` is prime, or
-* (ii) `Ω₁(O_p(M))` has no normal abelian subgroup of index `p`, **and** the 2-step
-  centralizer relations `hdc` hold for the chain out of `C_S(Z₂(S))` in
-  `S = Ω₁(O_p(M))`.
-
-Then every maximal subgroup of `G` is of Type I or Type II.
-
-**Status: honestly stated, not proved.**  The hypothesis block is exactly the one
-consumed by the formalized BG Corollary 15.9
-(`OddOrder.BG.Ch4.S16.centralizer_escape_final_local`), with `orderOf x = p`
-added; note `x ∈ M_σ` together with `orderOf x = p` gives `x ∈ M_σ^#` for free.
-The proof needs (ii) ⇒ (i) via Theorem E.3 and the corrected Proposition E.4
-(`AppE_PropE4.lean`) applied to `O_p(M), K₁, E`, and then the §14 counting argument
-(`|𝒞_G(L̃)|`-disjointness, Lemma 14.5, Theorem 14.7) to rule out a maximal
-subgroup that is neither Type I nor Type II.  So it is gated on E.3/E.4 above.
-
-⚠ BG's printed (ii) branch is **irreparable as printed**: printed Proposition E.4 is
-false (`printed_propE4_false`), and the exceptional filiform `Q₆` satisfies printed (ii),
-so (ii) ⇒ (i) cannot hold without the extra `hdc` conjunct added here (issue 3021 (54);
-master note `notes/bg/appE_e4_counterexample_2026_07_21.md`).  The (i) branch is
-untouched. -/
-theorem maximalSubgroups_isTypeI_or_isTypeII [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M N : Subgroup G} {x : G} {p : ℕ}
-    (hM : M ∈ maximalSubgroups G) (hp : p.Prime)
-    (hxM : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hord : orderOf x = p)
-    (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M)
-    (hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)))
-    (hNnotF : N ∉ maximalTypeFFamily G)
-    (halt : ((derivedInG M).subgroupOf M).index.Prime ∨
-      ((¬ ∃ A : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1),
-          A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p) ∧
-        ∀ n : ℕ,
-          ⁅OddOrder.Isaacs.Ch04.iterCommutator
-              (Subgroup.centralizer
-                ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
-                    Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
-                  Set ↥(Omega ↥(opiCoreInG {p} M) p 1)))
-              (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) n,
-            Subgroup.centralizer
-              ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
-                  Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
-                Set ↥(Omega ↥(opiCoreInG {p} M) p 1))⁆ ≤
-            OddOrder.Isaacs.Ch04.iterCommutator
-              (Subgroup.centralizer
-                ((Subgroup.upperCentralSeries ↥(Omega ↥(opiCoreInG {p} M) p 1) 2 :
-                    Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) :
-                  Set ↥(Omega ↥(opiCoreInG {p} M) p 1)))
-              (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) (n + 2))) :
-    ∀ L : Subgroup G, L ∈ maximalSubgroups G →
-      OddOrder.GroupTheory.IsTypeI L ∨ OddOrder.GroupTheory.IsTypeII L := by
-  sorry
+/- **BG Corollary E.5** (`maximalSubgroups_isTypeI_or_isTypeII`) is **proved** one leaf
+downstream, in `OddOrder/BG/AppE_E5Counting.lean` — with the corrected E.4's `hdc`
+hypothesis added to the (ii) branch of its alternative (as printed that branch is
+irreparable: `printed_propE4_false`).  It has to live there: the `(ii) ∧ hdc ⟹ (i)`
+half consumes the staged `(E.29)`–`(E.32)` material of `AppE_CorollaryE5.lean` plus
+Theorem E.3 / the corrected Proposition E.4, and the closing `(E.33)`/`(E.34)` counting
+consumes the §14 machinery (Lemma 14.5(c), Theorem 14.7 duality, the `Ẑ` TI-count). -/
 
 end MaximalApplication
 
