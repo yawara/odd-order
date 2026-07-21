@@ -168,3 +168,34 @@ GPT-5.6 Sol Pro + 親計算検証で **dc≥1 は E.4 の印刷仮説から従�
    2-step 形で直接 state 済) — genuine infra だが優先度は下がった。
 2. **E.5 側 hdc 供給の調査**: FT の実適用 (S = Ω₁(O_p(M)), K₁, E) が hdc を満たすか
    (Q₆ 型 exceptional が実際に現れうるか)。E.5 本体の §14 counting gate と合わせて次段。
+
+## ✅ 2026-07-22 (lane c): 残余スコープ (2) の調査完了 — E.5 の hdc は局所 discharge 不能 (負の結論)
+
+**問い**: E.5 (ii) 分岐の追加データ (FT 文脈) が hdc を強制するか (= corrected E.5 から
+hdc を落として印刷版に戻せるか)。**答え: 局所データでは不能** — Q₆ 反例は E.5 適用時の
+追加制約もすべて満たす:
+
+- **rank-2 制約の射程**: BG p.165 の "Since p ∈ τ₂(N), r(R)=2" (印刷 τ₂(M) は typo、repo
+  `e5_R_noncyclic` docstring 参照) は **R = O_p(M) ⊓ N = C_{O_p(M)}(x)** についてであり、
+  (E.31) より R = R₀ × (R∩E₀) (p × cyclic) で**構造的に rank ≤ 2 が自動**。
+  S = Ω₁(O_p(M)) 全体には rank 制約が無い (p ∈ σ(M) 側は rank 無制約)。
+- **(ii) ⟹ |S| ≥ p⁵**: exponent-p 群は位数 ≤ p⁴ なら必ず正規 abelian index-p 部分群を持つ
+  (p³: abelian or Heisenberg の maximal は abelian; p⁴: class ≤ 3 の各 case で
+  C_S(γ₂) or C_S(x) が abelian 正規 index p)。書籍の "Hence, by (ii), |S| > p⁴" の実体。
+  Q₆ は |S| = p⁶ で通過。
+- **その他の局所データも Q₆ が満たす**: C_S(x) = R₀×R₁ = p² (narrow centralizer ✓)、
+  maximal class ✓、B = C₄₉ cyclic (E cyclic ✓)、A = ⟨β⁷⟩ order 7 prime (= |K₁| ✓)、
+  |S| = p⁶ ≤ p⁷ = p^q ✓、全部 odd ✓。
+- **書籍 E.5 の (ii) 分岐の論理構造の注記**: E.4 の結論 T = C_S(Z₂(S)) abelian index p は
+  T char S ⟹ 正規なので **(ii) と直接矛盾**する (書籍の "E = K₁ ⟹ (i)" 経路と別に、
+  (ii)∧E.4 ⟹ False ⟹ (i) の短絡もある)。いずれにせよ corrected E.4 経由で hdc が要る。
+
+⟹ **corrected E.5 (halt = (i) ∨ ((ii) ∧ hdc)) が honest な最終形として確定**。印刷版へ
+戻すには「regular B 作用 (+FT 大域文脈) が exceptional (dc=0) を排除する」深い問い
+(前記 authoritative input 待ち) の解決が必要で、局所論法では閉じない。App.E は
+"Further Results" で repo 内 consumer 無し — これ以上の強化は低優先繰延。
+
+### 残余スコープ (1) = clean Lemma が本 issue の唯一の残作業
+
+`MaximalClassPGroup.lean` (hub 承認済 leaf): 「2-step centralizer 全一致 ⟺ dc≥1」の
+群レベル同値 (iterCommutator + Hall–Witt/three-subgroups)。次 iteration で着手。
