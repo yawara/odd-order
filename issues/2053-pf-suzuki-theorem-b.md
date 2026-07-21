@@ -78,8 +78,11 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
   - [x] |Q₀| = 2^p (FirstCase/FieldAction.lean `card_Q0_eq_two_pow`,
         `a39140c69`): P ↪ V̄ (toVbar) → semilinear model 消費 →
         固定体 = F₂ (B1) → Artin で [F : F₂] = p
-  - [ ] C_K(P) = 1 (μ : fitting D̄ ≃* Fˣ + hκ equivariance +
-        Kbar_eq_fitting + V ⊓ K = ⊥ 経由)
+  - [x] C_K(P) = 1 (StepOne `K_inf_centralizer_eq_bot`, `42ed5777d`);
+        |C_{Q₀}(P)| = 2 (StepOne `card_Q0_inf_centralizer_eq_two`,
+        軌道計数+Fermat, `c89a19234`); FieldAction は
+        `exists_adapted_field_model` bundle (eQ/μ/σhom + 固定元 0∨1) に
+        リファクタ済
   - [ ] V = W ⋊ P (V/W ↪ Aut(F_{2^p}) cyclic p)
   - [ ] N_G(P) = C_G(P) (§3 Prop 1(b) =
         normalizer_eq_centralizer_mul_normalizer_inf_V) と

@@ -252,11 +252,7 @@ nilpotency (`Group.IsNilpotent.center_ne_bot`). -/
 theorem centerLiftQ1_ne_bot [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q1) :
     hyp.centerLiftQ1 ≠ ⊥ := by
   haveI := hnil
-  haveI : Nontrivial ↥hyp.Q1 := by
-    by_contra hcon
-    apply hyp.Q1_not_two_group
-    haveI : Subsingleton ↥hyp.Q1 := not_nontrivial_iff_subsingleton.mp hcon
-    exact fun g => ⟨0, by rw [pow_zero, pow_one]; exact Subsingleton.elim g 1⟩
+  haveI : Nontrivial ↥hyp.Q1 := hyp.nontrivial_Q1
   have hcne := Group.IsNilpotent.center_ne_bot (G := ↥hyp.Q1)
   obtain ⟨x, hxC, hxb⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hcne)
   intro hbot
@@ -513,6 +509,166 @@ theorem ssetOf_S_coherent_step
   -- close the contradiction
   exact false_of_reduction_two_bounds hyp.d_pos Nat.card_pos h21 h22 h23
     (hyp.two_mul_d_add_one_le_card_centerLiftQ1 hd hQ1odd hnil) h25
+
+/-! ## The reduction (2) induction and final form (pp. 146–147) -/
+
+/-- **The reduction (2) chief-factor induction**: given `𝒮(S')` coherent, the
+family `𝒮(S₃)` is coherent for every `H`-invariant `S₃ ≤ S'` — descending from
+the base `S₃ = S'` along minimal `H`-invariant steps through
+`ssetOf_S_coherent_step`, with `Z = centralLiftIn S S₃` and `S₁ ≤ Z` from
+`minimal_le_centralLiftIn` at `W = S` (`S` is nilpotent by hypothesis). -/
+theorem ssetOf_coherent_of_le_sder
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    (hlt : hyp.S ⊔ hyp.Qder < hyp.Q)
+    (hcohSder : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.SsetOf hyp.Sder) hyp.A))
+    (S₃ : Subgroup G) (hS₃le : S₃ ≤ hyp.Sder)
+    (hS₃H : ∀ h ∈ hyp.H, ∀ x ∈ S₃, h * x * h⁻¹ ∈ S₃) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.SsetOf S₃) hyp.A) := by
+  classical
+  have hmain : ∀ n (S₃' : Subgroup G), S₃' ≤ hyp.Sder →
+      (∀ h ∈ hyp.H, ∀ x ∈ S₃', h * x * h⁻¹ ∈ S₃') →
+      Nat.card ↥hyp.Sder - Nat.card ↥S₃' ≤ n →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+        (hyp.SsetOf S₃') hyp.A) := by
+    intro n
+    induction n with
+    | zero =>
+      intro S₃' hle hinvH hcard
+      have hcard_le : Nat.card ↥hyp.Sder ≤ Nat.card ↥S₃' := by
+        have hpos : 0 < Nat.card ↥S₃' := Nat.card_pos
+        omega
+      rw [OddOrder.Isaacs.Ch09.eq_of_le_of_card_le hle hcard_le]
+      exact hcohSder
+    | succ n ih =>
+      intro S₃' hle hinvH hcard
+      by_cases heq : S₃' = hyp.Sder
+      · rw [heq]
+        exact hcohSder
+      have hS₃lt : S₃' < hyp.Sder := lt_of_le_of_ne hle heq
+      obtain ⟨S₁, hS₃S₁, hS₁le, hS₁H, hmin⟩ :=
+        hyp.exists_minimal_conjInvariant_between hS₃lt
+          (fun h hh x hx => hyp.Sder_conj_mem_of_mem_H hh hx)
+      have hinvS : ∀ s ∈ hyp.S, ∀ x ∈ S₃', s * x * s⁻¹ ∈ S₃' :=
+        fun s hs x hx => hinvH s (hyp.S_le_H hs) x hx
+      -- the induction hypothesis applies at the strictly larger `S₁`
+      have hcard₁ : Nat.card ↥hyp.Sder - Nat.card ↥S₁ ≤ n := by
+        have h1 : Nat.card ↥S₃' < Nat.card ↥S₁ := by
+          rcases lt_or_ge (Nat.card ↥S₃') (Nat.card ↥S₁) with h | h
+          · exact h
+          · exact absurd (OddOrder.Isaacs.Ch09.eq_of_le_of_card_le hS₃S₁.le h)
+              hS₃S₁.ne
+        have h2 : Nat.card ↥S₁ ≤ Nat.card ↥hyp.Sder := Subgroup.card_le_of_le hS₁le
+        omega
+      have hcoh₁ := ih S₁ hS₁le hS₁H hcard₁
+      -- the chief factor sits in `Z = centralLiftIn S S₃'`
+      have hS₁Z : S₁ ≤ hyp.centralLiftIn hyp.S S₃' hinvS :=
+        hyp.minimal_le_centralLiftIn hyp.S hyp.S_nilpotent hyp.S_le_H
+          (fun h' hh' x hx => hyp.S_normal_in_H hh' hx) hS₃S₁
+          (hS₁le.trans hyp.Sder_le_S) hinvS hS₁H hinvH hmin
+      -- `S₁` is proper in `S` (else `S = [S,S]` for the nilpotent `S`)
+      have hSnotle : ¬ hyp.S ≤ S₁ := by
+        intro hSle
+        have hSder_eq : hyp.Sder = hyp.S :=
+          le_antisymm hyp.Sder_le_S (hSle.trans hS₁le)
+        have hS₁ne : S₁ ≠ ⊥ := by
+          intro hbot
+          rw [hbot] at hS₃S₁
+          exact not_lt_bot hS₃S₁
+        haveI : Nontrivial ↥hyp.S := (Subgroup.nontrivial_iff_ne_bot hyp.S).mpr
+          (fun hbot => hS₁ne (eq_bot_iff.mpr
+            ((hS₁le.trans hyp.Sder_le_S).trans (le_of_eq hbot))))
+        haveI := hyp.S_nilpotent
+        apply (IsSolvable.commutator_lt_top_of_nontrivial ↥hyp.S).ne
+        rw [eq_top_iff]
+        intro x _
+        have hx : (x : G) ∈ Subgroup.map hyp.S.subtype (commutator ↥hyp.S) := by
+          rw [map_subtype_commutator hyp.S]
+          change (x : G) ∈ hyp.Sder
+          rw [hSder_eq]
+          exact x.2
+        obtain ⟨y, hy, hyx⟩ := hx
+        rwa [show y = x from Subtype.ext hyx] at hy
+      -- the relativised `Normal` instances
+      haveI : (S₁.subgroupOf hyp.H).Normal :=
+        hyp.subgroupOf_H_normal_of_conj_mem hS₁H
+      haveI : (hyp.Q1.subgroupOf hyp.H).Normal :=
+        hyp.subgroupOf_H_normal_of_conj_mem fun h' hh' x hx =>
+          hyp.Q1_normal_in_H hh' hx
+      haveI : ((S₃'.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
+        hyp.subgroupOf_Q_normal_of_conj_mem fun q hq x hx =>
+          hinvH q (hyp.Q_le_H hq) x hx
+      have hZH : ∀ h' ∈ hyp.H, ∀ x ∈ hyp.centralLiftIn hyp.S S₃' hinvS,
+          h' * x * h'⁻¹ ∈ hyp.centralLiftIn hyp.S S₃' hinvS := fun h' hh' x hx =>
+        hyp.centralLiftIn_conj_mem_of_mem_H hyp.S hinvS hinvH
+          (fun h'' hh'' y hy => hyp.S_normal_in_H hh'' hy) hh' hx
+      haveI : ((hyp.centralLiftIn hyp.S S₃' hinvS).subgroupOf hyp.H).Normal :=
+        hyp.subgroupOf_H_normal_of_conj_mem hZH
+      haveI : (((hyp.centralLiftIn hyp.S S₃' hinvS) ⊔ hyp.centerLiftQ1).subgroupOf
+          hyp.H).Normal :=
+        hyp.subgroupOf_H_normal_of_conj_mem fun h' hh' x hx =>
+          conj_mem_sup (fun y hy => hZH h' hh' y hy)
+            (fun y hy => hyp.centerLiftQ1_conj_mem_of_mem_H hh' hy) hx
+      -- the one-step lemma closes the induction step
+      exact hyp.ssetOf_S_coherent_step hd hQ1odd hnil hlt hS₁le hS₃S₁.le hSnotle
+        (hyp.centralLiftIn_le hyp.S hinvS) hS₁Z
+        (fun z hz s hs => hz.2 s hs) hcoh₁
+  exact hmain _ S₃ hS₃le hS₃H le_rfl
+
+/-- **Reduction (2)** (pp. 146–147): if `𝒮(S')` is coherent then `𝒮` is
+coherent — the induction at `S₃ = ⊥`, with `𝒮(⊥) = 𝒮`. -/
+theorem sset_coherent_of_ssetOf_sder_coherent
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    (hlt : hyp.S ⊔ hyp.Qder < hyp.Q)
+    (hcohSder : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.SsetOf hyp.Sder) hyp.A)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
+  have h := hyp.ssetOf_coherent_of_le_sder hd hQ1odd hnil hlt hcohSder ⊥ bot_le
+    (fun h' _ x hx => by
+      rw [Subgroup.mem_bot] at hx ⊢
+      rw [hx]
+      group)
+  have hbot : hyp.SsetOf ⊥ = hyp.Sset := by
+    ext χ
+    constructor
+    · exact fun hχ => hχ.1
+    · intro hχ
+      refine ⟨hχ, fun x hx => ?_⟩
+      rw [show x = 1 from Subtype.ext (Subgroup.mem_bot.mp hx)]
+  rwa [hbot] at h
+
+/-! ## The reduction-declaration branches (p. 147, "we may assume that `Q₁`
+is a non-abelian `p`-group") -/
+
+/-- **Reductions (1)+(2) combined**: if `|Q₁|` is divisible by two distinct
+primes, `𝒮` is coherent. -/
+theorem sset_coherent_of_two_primes
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    {p r : ℕ} (hp : p.Prime) (hr : r.Prime) (hpr : p ≠ r)
+    (hpd : p ∣ Nat.card ↥hyp.Q1) (hrd : r ∣ Nat.card ↥hyp.Q1) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) :=
+  hyp.sset_coherent_of_ssetOf_sder_coherent hd hQ1odd hnil
+    (hyp.sup_S_Qder_lt_Q hnil)
+    (hyp.ssetOf_sder_coherent_of_two_primes hd hQ1odd hnil hp hr hpr hpd hrd)
+
+/-- **The abelian-`Q₁` branch** of the reduction declaration: if
+`[Q₁,Q₁] = 1`, then `Q' = S'` and the Remark gives `𝒮(S')` coherent
+directly, so `𝒮` is coherent by reduction (2). -/
+theorem sset_coherent_of_commutator_Q1_eq_bot
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    (hab : ⁅hyp.Q1, hyp.Q1⁆ = ⊥) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
+  have hlt := hyp.sup_S_Qder_lt_Q hnil
+  refine hyp.sset_coherent_of_ssetOf_sder_coherent hd hQ1odd hnil hlt ?_
+  have hQder : hyp.Qder = hyp.Sder := by
+    rw [hyp.Qder_eq_sup_Sder_commutator, hab, sup_bot_eq]
+  rw [← hQder]
+  exact hyp.ssetOf_Qder_coherent hd hQ1odd (hyp.ssetOf_Qder_nonempty hlt)
 
 end StepLemma
 

@@ -264,7 +264,86 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
 - [x] **centralLift 機構の W-一般化** (43db54a05): `centralLiftIn`/`primaryLiftIn`/
   `minimal_le_centralLiftIn` — reduction (2) の S 側 (Z/S₂ = Z(S/S₂)) で再利用可能に。
   薄いラッパー無し、Q₁ 消費側は直接更新。
-- [ ] **次: reduction (2)** (𝒮(S′) coherent ⟹ 𝒮 coherent、p. 146–147)。
+- [x] **reduction (2) 完結** `sset_coherent_of_ssetOf_sder_coherent` (debb1b3e7,
+  新 leaf FeitSibleyReductionTwo.lean 651 行, 配線済, sorry-free):
+  𝒮(S′) coherent + d odd + |Q₁| odd + Q₁ nilpotent + hlt ⟹ 𝒮 coherent。
+  部品 (全 first-shot green): S側 index ブリッジ `card_quot_sup_Q1_eq_d_mul`
+  (|H⧸A′Q₁| = d·|S⧸A′|) / counting 抽出 (|S⧸S₁| 因子保持) / 直積 index
+  `index_subgroupOf_sup_prod_eq` / `centerLiftQ1` (= centralLiftIn Q₁ ⊥) +
+  `two_mul_d_add_one_le_card_centerLiftQ1` (|Z(Q₁)| ≥ 2d+1) / 中心対 split
+  `commutator_mem_of_central_pair` / 算術 `false_of_reduction_two_bounds`
+  (m·zc(q₁−2) < 4d² vs ≥ 8d²−2) / step `ssetOf_S_coherent_step` / 帰納
+  `ssetOf_coherent_of_le_sder` (minimal_le_centralLiftIn W:=S, S_nilpotent 使用)。
+  (1)+(2) 合成で「2素数 ∣ |Q₁| ⟹ 𝒮 coherent」が閉じた。
+- [x] **還元宣言の分岐 composer** (a08484247): `sset_coherent_of_two_primes`
+  ((1)+(2) 合成) + `sset_coherent_of_commutator_Q1_eq_bot` (abelian 分岐:
+  Q′ = S′ → Remark → (2))。`nontrivial_Q1` / `sup_S_Qder_lt_Q` を抽出
+  (hlt は nilpotency のみから導出可能に)。**d=1 特例は (1)(2) では不要と確定**
+  (false_of_reduction_one/two_bounds が d ≥ 1 で閉じる鋭形)。
+  残る分岐 = Q₁ non-abelian p-群 → (3)–(8)。最終 assembly はさらに
+  hnil (Thompson, Isaacs Ch06 KernelNilpotent — d > 1 時; d = 1 時の nilpotency は
+  別途 — 要検討) と hQ1odd の供給、および素因数 1 個/2 個の場合分け
+  (Nat.card の primeFactors) を要する。⚠ hQ1odd は Hypothesis fields から導出
+  不能の疑い — feit_sibley_coherence の statement (hd のみ) と原文 p.145 仮定
+  ブロックの照合が必要 (PDF 実読、統計 fidelity)。
+- [x] **原文照合完了 (2026-07-21, PDF pp.144–147 実読)**:
+  - **p.144 仮定ブロックは repo Hypothesis と完全一致** (|Q₁| odd は書籍にも無い)。
+  - **hQ1odd 張力の確定**: 2(c) 証明の「odd order group Q₁D」は書籍側の飛躍
+    (issue 1053 裁定済: 2(c) は explicit hQ1odd、Theorem は d odd のみ据え置き・
+    還元後導出)。⚠ ただし現形式化の (1)(2) は counterexample 抽出の共役対機構経由で
+    hQ1odd を要求 — 書籍の (1)(2) は 1(a) を対無しで 1 枚ずつ adjoin するので
+    hQ1odd 不要 (Remark も O_{2'}(Q₁)⋊D で careful)。**最終 assembly の
+    ≥2素数/abelian 分岐で |Q₁| even のケースが現機構では閉じない**。解決候補:
+    (i) 1(a) の pair-free 化 + no-real 依存の除去 (書籍忠実、機構再作業大)、
+    (ii) 最終 statement に hQ1odd 追加 (1053 裁定の変更 — hub/ユーザー相談要)、
+    (iii) even ケースの vacuity 証明 (ambient TI から — 未検証、1053 も未検証と記載)。
+    **(3)–(8) は p-群文脈で hQ1odd = (p 奇素数の冪) が正当に立つため非ブロック**。
+    最終 assembly 時に再訪。
+- [ ] **次: (3)** (p. 146–147、原文実読済)。実装設計:
+  1. **𝒳-族**: 𝒳 ∩ 𝒮(R) = {χ ∈ Irr H | R ⊆ ker, Z ⊄ ker} (Z ≤ Z(Q₁) ⟹ 自動的に ∈ 𝒮)。
+     counting は既存 `sum_degreeSq_ker_subset_not_subset` (N=R-in, M=Z-in) が直用可:
+     Σ = |H⧸R| − |H⧸R⊔Z|。
+  2. **p-冪度数**: χ ∈ 𝒮(S′) ⟹ χ(1) = d·p^k。Q/S′ で S/S′ が中心 ⟹
+     deg φ ∣ |Q₁| = p^n (中心指数可除性 — repo の所在確認: SchurCenterBound 周辺、
+     無ければ [Is] 中心可除性を新設)。
+  3. **(3.1) 可除性**: χᵢ(1)² ∣ Σ_{j<i} χⱼ(1)² — d² ∣ LHS (全項 d²·p-冪²)、
+     φᵢ(1)² ∣ RHS (|H⧸S′|−|H⧸S′Z| = d|S/S′||Q₁/Z|(|Z|−1) で φᵢ(1)² ≤ |Q₁/Z|
+     両方 p-冪 ⟹ ∣; j ≥ i 項は sorted で φᵢ² ∣ φⱼ²)、gcd(d,p)=1 で合成。
+  4. **Part A (𝒳₁ coherent)**: base = 等度数セグメント {χ₁..χ_k} (2c で k ≥ 2、
+     `coherentEqualDegree`)。i > k: 2χ₁(1)χᵢ(1) < pχ₁(1)χᵢ(1) ≤ χᵢ(1)² ≤ Σ_{j<i}
+     ((3.1)+正値、p ≥ 3)。⚠ 反例抽出は **accumulated 和** (base 制限しない) が要る —
+     `sq_ratio_sum_le_of_adjoin_incoherent` を直接使い (exists_counterexample の
+     B-制限を経ない)、pair 分解の**度数単調性**が必要 (`exists_conjPair_pairUnion_eq`
+     が単調 enumeration を返すか要確認; 返さなければ度数昇順版に強化)。
+  5. **Part B (S′ ≠ 1, 𝒳 へ拡張)**: (2) 鏡映帰納の 𝒳-相対版。counting =
+     d|S/S₁||Q₁/Z|(|Z|−1) (二重 kernel 和)。anchor = Ind(1·θ) ∈ 𝒳₁ (χ(1) ∣ ψ(1) は
+     等値)。χ₁(1)² ≤ d²|Q₁/Z| + ψ(1)² ≤ d²|S/S₁||Q₁/Z| (S₁/S₂ ⊆ Z(S/S₂)) ⟹
+     |S/S₁|(|Z|−1)² ≤ 4d²、|Z| ≥ 2d+1 (two_mul_d_add_one_le_card_of_le_Q1、
+     Z ⊴ H D-inv ✓)、|S/S₁| ≥ 2 ⟹ 矛盾。算術は false_of_reduction_two_bounds 型の
+     新変種。
+  6. 新 leaf `FeitSibleyReductionThree.lean` (配線同 commit)。
+  7. **偵察結果 (2026-07-21)**: (a) 中心指数可除性 deg φ ∣ [G:Z] ([Is] CT Thm 3.12
+     相当) は repo 未発見 — `exists_natDegree_charValue_one_dvd_card` (deg ∣ |G|) のみ。
+     p-冪度数には「S/S′ 中心 ⟹ deg ∣ |Q₁|」級が必要 → 新設候補
+     (direct-product Irr 分解 or Ito 型; まず mathlib
+     `Character.degree_dvd_index_center`? を leansearch で確認)。
+     (b) ✅ **完了 (221a24dad)**: `exists_conjPair_pairUnion_eq` を min-degree 版に
+     in-place 強化 (第 3 句: 各 step の pair.1 は未収載 Y-元中で度数実部最小;
+     Set.exists_min_image 選択)。
+     (c) **② 中心指数可除性の確定ルート (2026-07-21 設計)**: 一般 CT 3.12 は不要。
+     φ ∈ Irr(Q-in) が S-部分を mod-kernel 中心に持つとき
+     (`exists_central_linear_restriction` SchurCenterBound:242 が入口)、
+     s ∈ S はスカラー作用 ⟹ |φ(s·y)| = |φ(y)| ⟹
+     1 = (1/|Q|)Σ_{q}|φ|² = (1/|Q₁|)Σ_{y∈Q₁}|φ(y)|² = ⟨Res_{Q₁}φ, Res_{Q₁}φ⟩
+     (q = s·y の一意分解で和を折り畳む) ⟹ **Res_{Q₁-in} φ 既約** ⟹
+     deg φ = deg(Res φ) ∣ |Q₁| = p^n (exists_natDegree_charValue_one_dvd_card)。
+     新補題は「S′ ⊆ ker φ ⟹ Res_{Q₁} φ 既約 + deg φ ∣ |Q₁|」の形で
+     FeitSibleyReductionThree.lean に。(1)(2) より以後 Q₁ = non-abelian p-群
+  (p 奇素数) と仮定してよい: assembly 分岐は (i) |Q₁| 2素数 → (1)+(2) 済,
+  (ii) Q₁ abelian → Q′ = S′ ⟹ Remark 𝒮(Q′) = 𝒮(S′) coherent → (2) 済,
+  (iii) Q₁ non-abelian p-群 → (3)–(8) 本線。d=1 分岐 (τ=id 自明) と
+  hnil/hQ1odd の上流供給 (Thompson/KernelNilpotent + odd) も assembly 側。
+  (3) = 1 ≠ Z ⊴ H, Z ⊆ Z(Q₁) ⟹ 𝒳 = 𝒮 − 𝒮(Z) coherent (issue 冒頭 digest 参照)。
   **実装部品リスト (2026-07-21 精査)**:
   1. S 側 index ブリッジ: |H⧸(A′⊔Q₁)-in| = d·|S⧸A′| (A′ ≤ S; [H:A′] の
      2 通りの塔で cancellation) — counting 抽出「m(q₁−1) ≤ 2da、m = |S⧸S₁| を保持」用。
