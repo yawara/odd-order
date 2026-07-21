@@ -386,6 +386,47 @@ theorem e5_exists_sylow_eq_opiCore [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   refine ⟨S, (Subgroup.eq_of_le_of_card_ge hle ?_).symm⟩
   rw [e5_opiCore_sylow_card hG hM hp hpσ hMσnil, S.card_eq_multiplicity]
 
+/-- **BG `(E.32)`, the canonical-line identification** (p. 165): the line `⟨x⟩` **is**
+Theorem 12.7's canonical line `A₀` of `N`, so `N` normalizes `⟨x⟩` and `N_σ`
+centralizes it.
+
+`⟨x⟩` is a line of the complement `M ∩ N`; by the 12.7(c) dichotomy any *other* line has
+`C_{N_σ}(X) = 1`, while `C_{N_σ}(x) ≠ 1` (the signalizer conjunct) — so `⟨x⟩ = A₀`, and
+12.7(b) hands over `N ≤ N_G(A₀)`, `N_σ ≤ C_G(A₀)`.  This packages BG's
+`⟨x⟩ = C_R(N_σ) = R₀ ⊴ N` and *"`K₁` normalizes `R₀`"* (both follow: `K₁ ≤ N`). -/
+theorem e5_zpowers_eq_canonical_line [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {N Emn E₁ E₂ E₃ : Subgroup G}
+    (hsetup : SubgroupESetup N Emn E₁ E₂ E₃)
+    {p : ℕ} (hp : p.Prime) (hp2 : p ∈ tau2 N)
+    (hnonab : ∃ S : Sylow p G, ¬ IsMulCommutative (S : Subgroup G))
+    {x : G} (hx : x ∈ Emn) (hord : orderOf x = p)
+    (hCNσx : OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥) :
+    N ≤ Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G) ∧
+      OddOrder.BG.Ch3.S10.Msigma N ≤
+        Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hsetup hp2
+  obtain ⟨A₀, hA₀eq, hA₀card, hA₀A, hMσC, hdich, habs⟩ :=
+    exists_canonical_line_of_nonabelianSylow hG hsetup hp2 hA hAE hnonab
+  -- `⟨x⟩` is a line of `M ∩ N`.
+  have hzcard : Nat.card ↥(Subgroup.zpowers x) = p := by rw [Nat.card_zpowers, hord]
+  have hzmem : Subgroup.zpowers x ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hzcard, by rw [hzcard, pow_one]⟩
+  have hzle : Subgroup.zpowers x ≤ Emn := Subgroup.zpowers_le.mpr hx
+  -- The 12.7(c) dichotomy forces `⟨x⟩ = A₀`.
+  have hzeq : Subgroup.zpowers x = A₀ := by
+    by_contra hne
+    have hd := (hdich _ hzmem hzle hne).1
+    rw [OddOrder.BG.Ch4.S14.centralizer_zpowers_eq_singleton'] at hd
+    exact hCNσx hd
+  -- 12.7(a): `p` is the only `τ₂(N)`-prime; 12.7(b): `N ≤ N_G(A₀)`.
+  have hprime_eq : ∀ q : ℕ, q.Prime → q ∈ tau2 N → q = p := fun q hq hq2 =>
+    tau2_prime_eq_of_nonabelianSylow hG hsetup hp2 hA hAE hnonab hq hq2
+  obtain ⟨hnorm, -, -⟩ := fitting_eq_sup_of_canonical_line hG hsetup hp2 hA hAE hprime_eq
+    hA₀eq hA₀card hMσC habs
+  rw [← hzeq] at hnorm hMσC
+  exact ⟨hnorm, hMσC⟩
+
 /-- **BG Corollary 15.9(c), the collapse `E ∩ N = K₁`** (BG p. 123): once the cyclic
 Frobenius complement `E` has been chosen to contain `K₁`, its intersection with `N`
 collapses onto `K₁`.
