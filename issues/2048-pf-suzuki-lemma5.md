@@ -200,7 +200,10 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
       - [x] 3-chain 存在の field 側 core (`3f7d0caaa`):
             `le_of_adjoin_frobeniusFixed_eq_top` — Singer 生成元が
             Frob^n 固定なら次数 m ≤ n (X^{2^n}−X の根の個数制限)
-      - [ ] 3-chain 存在 (残り工程、経路確定済):
+      - [x] 既約 middle quotient の排除 (`d1d113b24`):
+            `exists_proper_invariant_subgroup_of_card_sq` — EA 位数 (2^n)² +
+            cyclic 位数 2^n−1 fpf → proper 非自明不変部分群存在 (sorry 0)
+      - [ ] 3-chain 存在の最終 assembly (次工程):
             (i) 非自明不変正規部分群は involutionSubgroup を含む
             (2 群の正規部分群は中心と交わる + 位数 2 元 + K 推移性)、
             |involutionSubgroup| = q; (ii) P/Ω₁ (位数 q²) の
