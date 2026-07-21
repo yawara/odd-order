@@ -162,7 +162,7 @@
 > **再開時** (off-path scaffold 整理 or 3 冊網羅の別フェーズ) は `git worktree add` でレーン復活 +
 > 監視 cron 再作成。以下の a/b/c 3 レーン手順は**履歴** (再開時に参照)。
 
-> 横断運用ドキュメント。**監視ペース: 現行 = 15 分間隔 `7,22,37,52 * * * *` (2026-07-21 Opus hub で再作成、CronCreate job `5b140003`)**。明示指定がない場合はモデル依存 (ユーザー 2026-07-09 明文化): Fable = 30 分 `13,43` / Opus = 15 分 `7,22,37,52` (:00/:30 回避・均等割り)。⚠ 2026-07-19 の 20 分 `7,27,47` は **Fable hub 固有**の指定ゆえ、Opus 復帰に伴い model-default の 15 分へ戻した (この session でユーザーは interval 未指定)。履歴: 2026-07-21 Opus hub で 15 分再作成、2026-07-19 Fable hub で 15 分→20 分 (ユーザー指示)、2026-07-17 監視再開時は 15 分 (07-15 指定を継承)、2026-07-15 Codex hub で 20 分→15 分 (ユーザー再指示)、同日 Fable で 20 分 (ユーザー指示、endgame 監視)、2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行の明示ユーザー指定 (なければモデル対応ペース) で**作る。main worktree = `/home/ywr/odd-order`。
+> 横断運用ドキュメント。**監視ペース: 現行 = 30 分間隔 `13,43 * * * *` (2026-07-21 12:00 Fable hub で再作成、CronCreate job `2d2c6f61`; 本 session はユーザー interval 未指定 → Fable model default)**。明示指定がない場合はモデル依存 (ユーザー 2026-07-09 明文化): Fable = 30 分 `13,43` / Opus = 15 分 `7,22,37,52` (:00/:30 回避・均等割り)。⚠ 2026-07-19 の 20 分 `7,27,47` は **Fable hub 固有**の指定ゆえ、Opus 復帰に伴い model-default の 15 分へ戻した (この session でユーザーは interval 未指定)。履歴: 2026-07-21 12:00 Fable hub で 30 分 (interval 未指定 → model default)、2026-07-21 朝 Opus hub で 15 分再作成、2026-07-19 Fable hub で 15 分→20 分 (ユーザー指示)、2026-07-17 監視再開時は 15 分 (07-15 指定を継承)、2026-07-15 Codex hub で 20 分→15 分 (ユーザー再指示)、同日 Fable で 20 分 (ユーザー指示、endgame 監視)、2026-07-12 Fable で 30 分 (ユーザー再確認・規約化再指示)、2026-07-05 Fable で 30 分 `13,43` → Opus 切替で 15 分復帰、2026-07-09 Fable で 30 分 (ユーザー指示)、2026-07-02〜07-05 は 15 分、2026-06-29〜07-02 は 30 分、それ以前は 15 分。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は現行の明示ユーザー指定 (なければモデル対応ペース) で**作る。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
 > `git push origin main`（変化なし/全 abort なら push しない）。
@@ -898,6 +898,21 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 12:20 (tick #2、Fable hub cron `2d2c6f61`) — ✅ c + b 合流 (2 pass)、census 11 不変、push 済 (`66914abc8..b4c23c7e6`)**:
+  **c** = App.E E.4 Tier 2 WP3 — Q₆ Lazard 群の部分群層 (AppE_FiliformGroup 195→480 行、issue 3027)、
+  merge `e5b0c2e48`、build 4581 jobs green。**b** = tick 中の live commit (12:15) を 2nd pass で回収:
+  Higman Lemma 12 dispatch 第1層 mixed-support pinning (新 leaf SupportPinning 343 行、親 hub 配線済、
+  issue 2048)、merge `b4c23c7e6`、build **4582 jobs green (+1 = 新 module elaborate 確認)**、orphan 866/866。
+  **a** = 変化なし。両 pass とも AxiomsCheck OK / sorry 11 不変 / 新 axiom なし / 逸脱なし。レーン生存 3 点 OK。
+- **2026-07-21 12:05 (監視再開 tick #1、Fable hub — ユーザー「各レーンを監視します」) — ✅ c 合流 1 件、census 11 不変。cron 再作成 (`2d2c6f61`, 30 分 `13,43`、interval 未指定 → Fable model default)**:
+  **a/b** = 未マージ 0・変化なし。**c** = 2 commits を merge `7ed1004c0`: ⭐ BG App.E E.4 Tier 2 WP1-2 —
+  Q₆ Lazard 群を Lean で実構築 (新 leaf `AppE_FiliformGroup.lean` 195 行、c 自身が OddOrder.lean 配線済 =
+  0135 教訓の遵守継続) + Tier 2 導出スクリプト・commutator 公式の notes 永続化
+  (`notes/bg/appE_e4_tier2_group_law.md`、issue 3027、次入口 = WP3)。
+  gate: build **4581 jobs green** (exit 0 直接確認) / AxiomsCheck OK / sorry 11 不変 / 新 axiom なし /
+  範囲逸脱なし (c_re 照合、全て BG/ + 共有 OddOrder.lean) / orphan 監査 **865/865 (孤立 0)** /
+  shared-infra 衝突・採番重複なし。push 済 (merge + 本 docs)。
+  レーン生存 3 点 OK: a/b/c とも transcript mtime ≤1 分・worktree cwd プロセス生存 (11:57 時点)。
 - **2026-07-21 (手動合流 tick、Fable hub — ユーザー「各レーンをマージします」→「きりのいいところで区切って」で終了) — ✅ a/b/c 全合流 + push、census 11 不変、区切り時点で全レーン残 0・clean**:
   visit-time trial merge を 2 pass (a/b が tick 中に live commit を積んだため) + docs 1 件 = merge 6 commit
   (`2f51b87cb..c3b1311a2` push 済)。**a** = FeitSibley Lemma 2(a) 核心 4 piece (構造補題 / Frobenius Q₁D
