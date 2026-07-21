@@ -252,3 +252,22 @@ leaf は 1290 行 — **WP5 は新 sibling leaf** (`AppE_E5Counting.lean` 予定
    最終不等式は p.166 パラグラフを PDF で精読してから。
 3. E.5 statement (AppE_FurtherResults:1685 sorried) を新 leaf の証明で置換 (E.4 パターン:
    FurtherResults 側は削除+コメント、または sorried のまま新 leaf で本体)。
+
+## 2026-07-21 WP5 glue 調査 (iteration 22): hMσnil の供給経路
+
+⚠ `frobeniusKernelIsNilpotent` (BG Thm 3.7) は**素数位数 complement 限定** — E は cyclic だが
+素数位数とは限らないため直接不適。`Msigma_nilpotent_of_tau2` は p ∈ τ₂(M) 前提で不適
+(E.5 の M は p ∈ σ(M))。候補経路:
+1. **Prop 16.1 の TypeIData 経由**: 15.9 → IsTypeF M → (Prop 16.1 taxonomy) TypeIData M。
+   `TypeIData.typeF : TypeFData M` の H (= M_F) の nilpotency フィールド + H = M_σ 同定
+   (TypeF は M_F = M_σ; 対応 lemma を TaxonomyOutput/TypeBridges で探す)。
+2. 15.9 内部の "M_σ nilpotent" 導出 (Cor 14.12 = typeP2_neighbor_is_typeF 系) の再利用 —
+   nilpotency を conclusion に持つ public lemma があるか TheoremsAE を精査。
+3. hNxN 用部品は確定済: centralizer_zpowers_eq_singleton'.symm + mathlib
+   `Subgroup.centralizer_le_normalizer` + G simple (zpowers ≠ ⊤: cyclic→solvable→notSolvable
+   矛盾) + ℳ(C_G(x)) = {N}。
+4. hRnoncyc: R = O_p⊓N は N の Sylow p (p-part: |N| = |N_σ|·|M∩N|、p ∤ |N_σ|) +
+   pRank N p = 2 (τ₂) + pRank 転送 (pRank_eq_of_le_of_not_dvd_index) → rank 2 → noncyclic
+   (rank ≥ 2 → ¬cyclic: 対応 lemma 要確認、tau1_pRank_eq_one の逆向き系)。
+
+WP5 glue は新 leaf `AppE_E5Counting.lean` 予定 (未作成 — 実体ができる iteration で作成+配線)。
