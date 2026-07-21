@@ -234,6 +234,61 @@ theorem exists_minimal_aInvariant_le {A : Type*} [Group A]
 
 end CliffordCounting
 
+/-! ## The Frobenius exponent: `Aut(𝔽_{2^p}) = ⟨x ↦ x²⟩`
+
+The `𝔽_{2^p}`-side input to step (3)'s second branch: every ring automorphism
+of a field of order `2^p` is a power of the Frobenius. -/
+
+section FiniteFieldFrobenius
+
+/-- Every ring automorphism of a finite field of order `2^p` is a power of the
+Frobenius `x ↦ x²`, i.e. `σ x = x^(2^i)` for some `i`.
+
+`σ` fixes the prime field `𝔽₂`, so it is a `ZMod 2`-algebra automorphism — an
+element of `Gal(F/𝔽₂)`.  That group is cyclic of order `[F : 𝔽₂] = p` generated
+by the Frobenius (`FiniteField.frobeniusAlgEquivOfAlgebraic`, whose order equals
+`finrank`), so `σ = Frobenius^i` and hence `σ x = x^(2^i)`. -/
+theorem ringAut_card_two_pow_eq_pow {F : Type*} [Field F] [Finite F]
+    {p : ℕ} (hcard : Nat.card F = 2 ^ p) (σ : RingAut F) :
+    ∃ i : ℕ, ∀ x : F, σ x = x ^ (2 ^ i) := by
+  classical
+  haveI : Fintype F := Fintype.ofFinite F
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hFcard : Fintype.card F = 2 ^ p := by
+    rw [← Nat.card_eq_fintype_card]; exact hcard
+  haveI hchar : CharP F 2 := charP_of_card_eq_prime_pow (p := 2) (f := p) hFcard
+  letI algF : Algebra (ZMod 2) F := ZMod.algebra F 2
+  haveI : Algebra.IsAlgebraic (ZMod 2) F := Algebra.IsAlgebraic.of_finite (ZMod 2) F
+  haveI : IsGalois (ZMod 2) F := inferInstance
+  -- `σ` as a `ZMod 2`-algebra automorphism (it fixes the prime field `𝔽₂`).
+  let σ' : F ≃ₐ[ZMod 2] F := AlgEquiv.ofRingEquiv (f := σ) (fun z => by
+    have h := RingHom.ext_zmod (σ.toRingHom.comp (algebraMap (ZMod 2) F))
+      (algebraMap (ZMod 2) F)
+    exact DFunLike.congr_fun h z)
+  set frob := FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) F with hfrob
+  have hord : orderOf frob = Module.finrank (ZMod 2) F :=
+    FiniteField.orderOf_frobeniusAlgEquivOfAlgebraic (ZMod 2) F
+  have hcardaut : Nat.card (F ≃ₐ[ZMod 2] F) = Module.finrank (ZMod 2) F :=
+    IsGalois.card_aut_eq_finrank (ZMod 2) F
+  -- the Frobenius generates `Gal(F/𝔽₂)` (its order equals the group's cardinality)
+  have htop : Subgroup.zpowers frob = ⊤ := by
+    apply Subgroup.eq_top_of_card_eq
+    rw [Nat.card_zpowers, hord, hcardaut]
+  have hmem : σ' ∈ Submonoid.powers frob := by
+    rw [mem_powers_iff_mem_zpowers, htop]; exact Subgroup.mem_top _
+  obtain ⟨n, hn⟩ := hmem
+  refine ⟨n, fun x => ?_⟩
+  have hcoe : (σ : F → F) x = σ' x := rfl
+  rw [hcoe, ← hn]
+  have hiter : (⇑frob)^[n] = (· ^ (Fintype.card (ZMod 2) ^ n)) :=
+    FiniteField.coe_frobeniusAlgEquivOfAlgebraic_iterate (ZMod 2) F n
+  have hpow : ⇑(frob ^ n) = (⇑frob)^[n] := AlgEquiv.coe_pow frob n
+  have hval : (frob ^ n) x = x ^ (Fintype.card (ZMod 2) ^ n) := by
+    rw [show ((frob ^ n) x) = (⇑(frob ^ n)) x from rfl, hpow, hiter]
+  rw [hval, ZMod.card 2]
+
+end FiniteFieldFrobenius
+
 namespace FirstCaseHypothesis
 
 universe uG uΩ
