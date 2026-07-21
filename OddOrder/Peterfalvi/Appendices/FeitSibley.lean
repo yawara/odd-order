@@ -1091,8 +1091,12 @@ omit [Fintype G] [Fintype ↥hyp.H] in
 to the odd-order group `Q₁ D` is irreducible and non-principal, so `χ̄ ≠ χ` by
 Huppert, *Endliche Gruppen* I, Kapitel V, Satz 13.8 (a group of odd order has no
 nonprincipal real irreducible character — a consequence of Burnside's
-`|{real classes}| = |{real characters}|`).  The missing prerequisites are Lemma
-2(a) and that odd-order statement, neither of which is in the repository. -/
+`|{real classes}| = |{real characters}|`).  Lemma 2(a) is now proved
+(`Sset_eq_induced_of_Q`, issue 1051) and the odd-order statement is in the
+repository (`realIrreducibleCharacter_eq_trivial_of_odd_card`,
+`BrauerPermutation.lean`); the missing pieces are the restriction step (that
+`Res_{Q₁D} Ind_Q^H φ = Ind_{Q₁}^{Q₁D} θ` is irreducible, a Mackey-type
+computation) and the source of the oddness of `|Q₁ D|` (original text, p. 145). -/
 theorem hasNoRealCharacters_Sset (hd : Odd hyp.d) :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.Sset := by
   sorry
@@ -1116,9 +1120,12 @@ and (2) (`𝒮(S')` coherent when `|Q₁|` has two prime divisors; `𝒮` cohere
 `𝒳 = 𝒮 - 𝒮(Z)` coherent for `1 ≠ Z ⊴ H` with `Z ≤ Z(Q₁)`; steps (4)--(6) set up
 `𝒴 = 𝒮(Q')` and reduce coherence of `𝒮` to `a ∣ λ`; step (7) is the class-algebra
 congruence `ψ(z) ≡ ψ(1) (mod |Q|)` for `ψ ∈ Irr(G)` constant on `Z^#`; step (8)
-combines them.  Every step consumes Lemma 1(a) (`coherent_adjoin_of_degree_bound`
-above, unproved) and Lemma 2 (unproved), and step (7) needs the class-sum
-congruence machinery for a Hall TI subgroup, which is not in the repository. -/
+combines them.  Lemma 1(a) (`coherent_adjoin_of_degree_bound`, issue 1049),
+Lemma 2(a) (`Sset_eq_induced_of_Q`, issue 1051) and Lemma 2(b)
+(`induction_isometry_on_degree_zero`, issue 1052) are now proved; the remaining
+prerequisites are Lemma 2(c) (`hasNoRealCharacters_Sset` above) and step (7)'s
+class-sum congruence machinery for a Hall TI subgroup, which is not in the
+repository. -/
 theorem feit_sibley_coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis G) [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
     (hd : Odd hyp.d) :
