@@ -252,11 +252,7 @@ nilpotency (`Group.IsNilpotent.center_ne_bot`). -/
 theorem centerLiftQ1_ne_bot [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q1) :
     hyp.centerLiftQ1 ≠ ⊥ := by
   haveI := hnil
-  haveI : Nontrivial ↥hyp.Q1 := by
-    by_contra hcon
-    apply hyp.Q1_not_two_group
-    haveI : Subsingleton ↥hyp.Q1 := not_nontrivial_iff_subsingleton.mp hcon
-    exact fun g => ⟨0, by rw [pow_zero, pow_one]; exact Subsingleton.elim g 1⟩
+  haveI : Nontrivial ↥hyp.Q1 := hyp.nontrivial_Q1
   have hcne := Group.IsNilpotent.center_ne_bot (G := ↥hyp.Q1)
   obtain ⟨x, hxC, hxb⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hcne)
   intro hbot
@@ -643,6 +639,36 @@ theorem sset_coherent_of_ssetOf_sder_coherent
       refine ⟨hχ, fun x hx => ?_⟩
       rw [show x = 1 from Subtype.ext (Subgroup.mem_bot.mp hx)]
   rwa [hbot] at h
+
+/-! ## The reduction-declaration branches (p. 147, "we may assume that `Q₁`
+is a non-abelian `p`-group") -/
+
+/-- **Reductions (1)+(2) combined**: if `|Q₁|` is divisible by two distinct
+primes, `𝒮` is coherent. -/
+theorem sset_coherent_of_two_primes
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    {p r : ℕ} (hp : p.Prime) (hr : r.Prime) (hpr : p ≠ r)
+    (hpd : p ∣ Nat.card ↥hyp.Q1) (hrd : r ∣ Nat.card ↥hyp.Q1) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) :=
+  hyp.sset_coherent_of_ssetOf_sder_coherent hd hQ1odd hnil
+    (hyp.sup_S_Qder_lt_Q hnil)
+    (hyp.ssetOf_sder_coherent_of_two_primes hd hQ1odd hnil hp hr hpr hpd hrd)
+
+/-- **The abelian-`Q₁` branch** of the reduction declaration: if
+`[Q₁,Q₁] = 1`, then `Q' = S'` and the Remark gives `𝒮(S')` coherent
+directly, so `𝒮` is coherent by reduction (2). -/
+theorem sset_coherent_of_commutator_Q1_eq_bot
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    (hab : ⁅hyp.Q1, hyp.Q1⁆ = ⊥) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
+  have hlt := hyp.sup_S_Qder_lt_Q hnil
+  refine hyp.sset_coherent_of_ssetOf_sder_coherent hd hQ1odd hnil hlt ?_
+  have hQder : hyp.Qder = hyp.Sder := by
+    rw [hyp.Qder_eq_sup_Sder_commutator, hab, sup_bot_eq]
+  rw [← hQder]
+  exact hyp.ssetOf_Qder_coherent hd hQ1odd (hyp.ssetOf_Qder_nonempty hlt)
 
 end StepLemma
 
