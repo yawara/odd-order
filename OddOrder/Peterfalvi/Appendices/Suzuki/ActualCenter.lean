@@ -139,6 +139,17 @@ theorem center_Q_eq_Q0_iff_agemo_one_eq_bot :
       rw [involutionSubgroup, mem_omega1OfAbelian] at hx
       exact hx.1
 
+/-- If the center of `Q` has exponent `2`, it coincides with `Q₀`. -/
+theorem center_Q_eq_Q0_subgroupOf_of_sq_eq_one
+    (hZsq : ∀ z ∈ Subgroup.center hyp.Q, z ^ 2 = 1) :
+    Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q := by
+  rw [hyp.center_Q_eq_Q0_iff_agemo_one_eq_bot, eq_bot_iff]
+  intro x hx
+  obtain ⟨y, rfl⟩ := (mem_agemo_iff_of_comm).mp hx
+  have hy2 : y ^ 2 = (1 : ↥(Subgroup.center hyp.Q)) :=
+    Subtype.ext (hZsq (y : ↥hyp.Q) y.2)
+  simpa using hy2
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
