@@ -71,9 +71,19 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
 
 ## やること (文書順 + 上流優先)
 
-- [ ] Ch.II hypothesis carrier ((B1)+(B2)) と leaf 構成の設計
-      (`OddOrder/Peterfalvi/Appendices/Suzuki/FirstCase/` dir 化)
+- [x] Ch.II hypothesis carrier — `FirstCaseHypothesis` (FirstCase/Basic.lean,
+      `4a2fede50`): (B1) は「C_G(P) 内 EA-2 部分群 ≤ 2」形。
+      p_odd / P ∩ W = ⊥ / C_{Q₀}(P) ≤ 2 も同 leaf
 - [ ] (1) V = W ⋊ P ほか
+  - [x] |Q₀| = 2^p (FirstCase/FieldAction.lean `card_Q0_eq_two_pow`,
+        `a39140c69`): P ↪ V̄ (toVbar) → semilinear model 消費 →
+        固定体 = F₂ (B1) → Artin で [F : F₂] = p
+  - [ ] C_K(P) = 1 (μ : fitting D̄ ≃* Fˣ + hκ equivariance +
+        Kbar_eq_fitting + V ⊓ K = ⊥ 経由)
+  - [ ] V = W ⋊ P (V/W ↪ Aut(F_{2^p}) cyclic p)
+  - [ ] N_G(P) = C_G(P) (§3 Prop 1(b) =
+        normalizer_eq_centralizer_mul_normalizer_inf_V) と
+        C_D(P) = C_W(P) × P
 - [ ] (2) C_G(P) の near-field 構造 (Appendix II 接続)
 - [ ] (3) 素因数の合同条件
 - [ ] (4) Wielandt fixed point (被覆調査 → 不足なら port)
