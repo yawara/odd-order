@@ -934,7 +934,114 @@ theorem derivedDerived_le_fittingInAmbient [Finite G]
       S15.mf_ne_msigma_typeP1_structure hG hM hne hKM hK hKstar
     exact hA7
 
-/-- **BG Theorem A — the faithful monolith** (mmd L4346-4355), all 11 conjuncts `sorry`-free.
+/-- **BG Theorem A(6), proper containment `M' ⊊ M`** (mmd L4363, the `M' ⊂ M` end of the chain
+`1 ⊂ M_F ⊆ M_σ ⊆ M' ⊂ M`): the derived subgroup of a maximal subgroup `M` of a minimal simple
+group is proper.  `M` is nontrivial (`M_σ ≠ ⊥`, `M_σ ≤ M`) and solvable, so `M' = [M, M] ⊊ M`
+(`IsSolvable.commutator_lt_top_of_nontrivial`, transported into `G` along the injective
+`M.subtype`). -/
+theorem derivedInG_lt_of_maximal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) : derivedInG M < M := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMne : M ≠ ⊥ := fun h =>
+    OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+      (le_bot_iff.mp (h ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
+  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  rw [derivedInG]
+  conv_rhs => rw [← Subgroup.range_subtype M, MonoidHom.range_eq_map]
+  rw [Subgroup.map_lt_map_iff_of_injective M.subtype_injective]
+  exact IsSolvable.commutator_lt_top_of_nontrivial (G := ↥M)
+
+/-- **BG Theorem A(6), nontriviality `1 ⊂ M_F`** (mmd L4363, the `1 ⊂ M_F` end of the chain): the
+Fitting kernel `M_F` of a maximal subgroup `M` is nontrivial.  Book Theorem 15.2 proof by cases on
+whether `M_σ` is nilpotent:
+
+* `M_F = M_σ` (`M_σ` nilpotent): then `M_F = M_σ ≠ ⊥` (`Msigma_ne_bot`);
+* `M_F ≠ M_σ` (type `P₁`): Theorem 15.2 (`mf_ne_msigma_typeP1_structure`) supplies `K* ≤ M_F`, and
+  `K* ≠ ⊥` (of prime order `q`), so `M_F ≠ ⊥`.
+
+The hypothesis `hKstar_ne : K* ≠ ⊥` is BG Theorem A(5) (`theoremA_ungated_conjuncts`), always
+available in the Theorem A setup. -/
+theorem maxNilpotentNormalHall_ne_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKstar_ne : Kstar ≠ ⊥)
+    (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    S15.MF M ≠ ⊥ := by
+  by_cases hne : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M
+  · rw [hne]; exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+  · -- type `P₁`: `K* ≤ M_F` (conjunct 7 of Theorem 15.2), and `K* ≠ ⊥`.
+    obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, hKstarMF, _⟩ :=
+      S15.mf_ne_msigma_typeP1_structure hG hM hne hKM hK hKstar
+    intro hbot
+    exact hKstar_ne (le_bot_iff.mp (hbot ▸ hKstarMF))
+
+open scoped IsMulCommutative in
+/-- **BG Corollary 15.5(c) / Theorem A(6), `M'/M_F` nilpotent** (mmd L4363, `M'/M_F is nilpotent`):
+for every maximal subgroup `M` of a minimal simple group, the quotient of the derived subgroup `M'`
+by the Fitting kernel `M_F` is nilpotent.  Book Corollary 15.5(c) proof by cases:
+
+* `M_F = M_σ` (`M_σ` nilpotent, i.e. `M` type I / `M ∈ ℳ_𝓕`): `M'' ⊆ M_σ = M_F`
+  (`derivedDerived_le_Msigma` = Corollary 12.10(b) / Lemma 15.1(a)), so `M'/M_F` is **abelian**,
+  a fortiori nilpotent;
+* `M_F ≠ M_σ` (type `P₁`): Theorem 15.2 (`mf_ne_msigma_typeP1_structure`) gives `M_σ = M'`, a
+  normal `q`-subgroup `Q ≤ M_F` with `M_σ = Q ⋊ D` and `D` nilpotent.  Then `M_σ/Q ≅ D` is
+  nilpotent (complement iso), and since `Q ≤ M_F ≤ M_σ`, `M'/M_F = M_σ/M_F` is a quotient of the
+  nilpotent `M_σ/Q` (Noether's third isomorphism), hence nilpotent.
+
+This is the general (all-`M`) quotient form of the type-`F`/type-`P₁` complement-nilpotency lemmas
+(`isNilpotent_complement_of_isTypeF`, `isNilpotent_complement_of_isTypeP1_mf_ne_msigma`), stated
+directly on `M'/M_F` as printed in the book.  The `[Normal]` instance is BG background
+(`M' ≤ M ≤ N(M_F)`); it is supplied at the call site. -/
+theorem derivedInG_quotient_maxNilpotentNormalHall_isNilpotent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    [((S15.MF M).subgroupOf (derivedInG M)).Normal] :
+    Group.IsNilpotent (↥(derivedInG M) ⧸ (S15.MF M).subgroupOf (derivedInG M)) := by
+  by_cases hne : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M
+  · -- `M_F = M_σ`: `M'' ⊆ M_σ = M_F`, so `M'/M_F` is abelian.
+    have hcomm : commutator ↥(derivedInG M) ≤ (S15.MF M).subgroupOf (derivedInG M) := by
+      have h2 : derivedInG (derivedInG M) ≤ S15.MF M := by
+        rw [hne]; exact S15.derivedDerived_le_Msigma hG hM
+      intro x hx
+      rw [Subgroup.mem_subgroupOf]
+      exact h2 (Subgroup.mem_map_of_mem _ hx)
+    haveI : IsMulCommutative (↥(derivedInG M) ⧸ (S15.MF M).subgroupOf (derivedInG M)) :=
+      Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hcomm
+    exact CommGroup.isNilpotent
+  · -- type `P₁`: `M_σ = M'`, `Q ≤ M_F`, `M_σ = Q ⋊ D`, `D` nilpotent.  Work directly in `M'`.
+    obtain ⟨_, Q, _, D, _, _, _, _, _, _, _, _, _, hQMF, hMnormQ, hcomplQD, hDnil, _, _, _,
+      hMσderived, _, _, _, _⟩ := S15.mf_ne_msigma_typeP1_structure hG hM hne hKM hK hKstar
+    -- push the `M_σ = M'` identification into the complement and containment facts.
+    rw [hMσderived] at hcomplQD
+    have hMFM' : S15.MF M ≤ derivedInG M :=
+      hMσderived ▸ S15.maxNilpotentNormalHall_le_Msigma hG hM
+    have hM'M : derivedInG M ≤ M := hMσderived ▸ OddOrder.BG.Ch3.S10.Msigma_le M
+    have hQM' : Q ≤ derivedInG M := hQMF.trans hMFM'
+    haveI hQnM' : (Q.subgroupOf (derivedInG M)).Normal :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer hQM').mpr (hM'M.trans hMnormQ)
+    -- `↥(D.subgroupOf M')` is nilpotent (embeds in the nilpotent `↥D` via `D ⊓ M'`).
+    haveI hDnil' : Group.IsNilpotent ↥D := hDnil
+    haveI hInfNil : Group.IsNilpotent ↥(D ⊓ derivedInG M) :=
+      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (inf_le_left : D ⊓ derivedInG M ≤ D))
+    haveI hDsubNil : Group.IsNilpotent ↥(D.subgroupOf (derivedInG M)) := by
+      have econgr : ↥(D.subgroupOf (derivedInG M)) ≃*
+          ↥((D ⊓ derivedInG M).subgroupOf (derivedInG M)) :=
+        MulEquiv.subgroupCongr (Subgroup.inf_subgroupOf_right D (derivedInG M)).symm
+      exact Group.nilpotent_of_mulEquiv (econgr.trans
+        (Subgroup.subgroupOfEquivOfLe (inf_le_right : D ⊓ derivedInG M ≤ derivedInG M))).symm
+    -- `M'/Q ≅ ↥(D.subgroupOf M')` is nilpotent (complement iso, `Q` normal).
+    haveI hNilM'Q : Group.IsNilpotent (↥(derivedInG M) ⧸ Q.subgroupOf (derivedInG M)) :=
+      Group.nilpotent_of_mulEquiv (hcomplQD.symm.QuotientMulEquiv).symm
+    -- `M'/M_F` is a quotient of the nilpotent `M'/Q` (Noether III, `Q ≤ M_F`), hence nilpotent.
+    have hsub : Q.subgroupOf (derivedInG M) ≤ (S15.MF M).subgroupOf (derivedInG M) :=
+      Subgroup.comap_mono hQMF
+    exact Group.nilpotent_of_mulEquiv
+      (QuotientGroup.quotientQuotientEquivQuotient (Q.subgroupOf (derivedInG M))
+        ((S15.MF M).subgroupOf (derivedInG M)) hsub)
+
+/-- **BG Theorem A — the faithful monolith** (mmd L4346-4355), all 14 conjuncts `sorry`-free.
 
 This is the canonical faithful form of BG Theorem A.  It includes the explicit `hKM : K ≤ M` and
 `hUM : U ≤ M` that the BG setup `M = K U M_σ` carries but the bare Hall
@@ -945,6 +1052,13 @@ standalone lemma — none gated:
 * A(1) `M_σ` is `σ(M)`-Hall, A(2) `K` cyclic, A(3)-normal `M ≤ N(U M_σ)`, A(4) `C_U(k) = 1`,
   A(5) `K* ≠ 1` and `C_M(k) = K K*`, A(6) `M_F ≤ M_σ ≤ M'` — all from `theoremA_ungated_conjuncts`;
 * A(3)-decomposition `M = K U M_σ` — `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`;
+* A(6) the full book chain `1 ⊂ M_F ⊆ M_σ ⊆ M' ⊂ M` and `M'/M_F` nilpotent — the three clauses
+  beyond `M_F ≤ M_σ ≤ M'` are `M_F ≠ ⊥` (`maxNilpotentNormalHall_ne_bot`), `M' ⊊ M`
+  (`derivedInG_lt_of_maximal`), and the quotient nilpotency
+  (`derivedInG_quotient_maxNilpotentNormalHall_isNilpotent`, Corollary 15.5(c)).  The last is stated
+  as `∀ [((M_F).subgroupOf M').Normal], IsNilpotent (M' ⧸ M_F)`: the `[Normal]` is BG background
+  (`M' ≤ M ≤ N(M_F)`) which a consumer discharges once and applies — this keeps the monolith's own
+  signature instance-free so consumers of the *other* conjuncts are unaffected;
 * A(7) `M'' ⊆ F(M)` — `derivedDerived_le_fittingInAmbient` (now ungated, issue 8012);
 * A(8) `M_F ≠ M_σ ⟹ U = 1 ∧ F(M)` TI `∧ |K|` prime — `theoremA8_structure` (`U.subgroupOf M = ⊥`
   upgraded to `U = ⊥` via `hUM`).
@@ -967,6 +1081,10 @@ theorem theoremA_maximal_structure_faithful [Finite G]
       (K ≠ ⊥ → ∀ k ∈ K, k ≠ 1 → M ⊓ Subgroup.centralizer ({k} : Set G) = K ⊔ Kstar) ∧
       S15.MF M ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
       OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M ∧
+      S15.MF M ≠ ⊥ ∧
+      derivedInG M < M ∧
+      (∀ [((S15.MF M).subgroupOf (derivedInG M)).Normal],
+        Group.IsNilpotent (↥(derivedInG M) ⧸ (S15.MF M).subgroupOf (derivedInG M))) ∧
       derivedInG (derivedInG M) ≤ S15.fittingInAmbient M ∧
       (S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M →
         U = ⊥ ∧ S15.FittingIsTI M ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p) := by
@@ -974,7 +1092,12 @@ theorem theoremA_maximal_structure_faithful [Finite G]
     theoremA_ungated_conjuncts hG hM hKM hUM hK hKstar hU
   refine ⟨hA1, hA2, typeP_maximal_eq_kappaHall_sup_U_sup_Msigma hG hM hKM hUM hK hU,
     hA3n, hA4, hA5a, hA5b, hA6a, hA6b,
+    maxNilpotentNormalHall_ne_bot hG hM hA5a hKM hK hKstar,
+    derivedInG_lt_of_maximal hG hM, ?_,
     derivedDerived_le_fittingInAmbient hG hM hKM hK hKstar, ?_⟩
+  · -- A(6) `M'/M_F` nilpotent (instance-parametrized: the `[Normal]` is BG background).
+    intro _inst
+    exact derivedInG_quotient_maxNilpotentNormalHall_isNilpotent hG hM hKM hK hKstar
   -- A(8): `theoremA8_structure` gives `U.subgroupOf M = ⊥`; lift to `U = ⊥` via `hUM`.
   intro hne
   obtain ⟨hUsub, hTI, hp⟩ := theoremA8_structure hG hM hKM hK hKstar hU hne
