@@ -289,6 +289,103 @@ theorem e5_kappaHall_pi_sigma_compl [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   rw [hbot, Subgroup.card_bot] at hcardK₁
   exact hk.one_lt.ne hcardK₁
 
+/-- **BG's *"Hence `O_p(M)` is a Sylow `p`-subgroup of `M_σ` and of `G`"*** (p. 165), in
+cardinality form: for `p ∈ σ(M)` with `M_σ` nilpotent, `|O_p(M)|` is the full `p`-part of
+`|G|`.  The Sylow `p`-subgroup of the nilpotent `M_σ` is characteristic in it, hence a
+normal `p`-subgroup of `M`, hence inside `O_p(M)`; conversely `O_p(M) ≤ M_σ` (absorption
+into the `σ`-Hall), and `M_σ` carries the full `p`-part of `|G|` (it is `σ(M)`-Hall
+in `G`). -/
+theorem e5_opiCore_sylow_card [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} (hp : p.Prime)
+    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M)
+    (hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M)) :
+    Nat.card ↥(opiCoreInG {p} M) = p ^ (Nat.card G).factorization p := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hMσhallG : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
+      (OddOrder.BG.Ch3.S10.Msigma M) := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
+  -- `O_p(M) ≤ M_σ`.
+  have hOple : opiCoreInG {p} M ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+    refine OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall hMσhallG
+      (opiCoreInG_le _ _) ?_
+    intro r hr
+    have hr' := isPiSubgroup_opiCoreInG {p} M r hr
+    rw [Set.mem_singleton_iff] at hr'
+    exact hr' ▸ hpσ
+  -- The Sylow `p` of `M_σ` (as `subgroupOf M`) lands inside `O_p(M)`.
+  set W' : Subgroup ↥M := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M with hW'def
+  haveI : W'.Normal := by
+    rw [hW'def, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]
+    infer_instance
+  haveI : Group.IsNilpotent ↥W' :=
+    (Group.isNilpotent_congr (Subgroup.subgroupOfEquivOfLe hMσM)).mpr hMσnil
+  obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p ↥W'))
+  have hPchar : (P : Subgroup ↥W').Characteristic :=
+    Sylow.characteristic_of_normal P inferInstance
+  have hQnorm : (((P : Subgroup ↥W').map W'.subtype)).Normal :=
+    OddOrder.GroupTheory.normal_map_subtype_of_characteristic hPchar
+  set Qamb : Subgroup G := ((P : Subgroup ↥W').map W'.subtype).map M.subtype with hQdef
+  have hQambM : Qamb ≤ M := Subgroup.map_subtype_le _
+  have hQsub : Qamb.subgroupOf M = (P : Subgroup ↥W').map W'.subtype :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective _
+  have hQnorm' : (Qamb.subgroupOf M).Normal := hQsub ▸ hQnorm
+  have hQcard : Nat.card ↥Qamb =
+      p ^ (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)).factorization p := by
+    rw [hQdef, Subgroup.card_map_of_injective M.subtype_injective,
+      Subgroup.card_map_of_injective W'.subtype_injective, P.card_eq_multiplicity,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv]
+  have hQpi : Subgroup.IsPiSubgroup {p} Qamb := by
+    intro r hr
+    rw [hQcard] at hr
+    have hrp : r.Prime := Nat.prime_of_mem_primeFactors hr
+    have hrdvd : r ∣ p ^ (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)).factorization p :=
+      Nat.dvd_of_mem_primeFactors hr
+    exact (Nat.prime_dvd_prime_iff_eq hrp hp).mp (hrp.dvd_of_dvd_pow hrdvd)
+  have hQle : Qamb ≤ opiCoreInG {p} M :=
+    le_opiCoreInG_of_normal_of_isPiSubgroup hQambM hQnorm' hQpi
+  -- Squeeze `|O_p(M)|` between `|Q|` and the `p`-part of `|M_σ|`.
+  obtain ⟨a, ha⟩ := (isPGroup_opiCoreInG_singleton (q := p) M).exists_card_eq
+  have hdvd1 : Nat.card ↥Qamb ∣ Nat.card ↥(opiCoreInG {p} M) :=
+    Subgroup.card_dvd_of_le hQle
+  have hdvd2 : Nat.card ↥(opiCoreInG {p} M) ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+    Subgroup.card_dvd_of_le hOple
+  have hale : a ≤ (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)).factorization p := by
+    rw [ha] at hdvd2
+    exact (Nat.Prime.pow_dvd_iff_le_factorization hp Nat.card_pos.ne').mp hdvd2
+  have hgea : (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)).factorization p ≤ a := by
+    rw [ha, hQcard] at hdvd1
+    exact (Nat.pow_dvd_pow_iff_le_right hp.one_lt).mp hdvd1
+  -- The `p`-part of `|M_σ|` is the `p`-part of `|G|` (`M_σ` is `σ`-Hall in `G`).
+  have hpart : (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)).factorization p =
+      (Nat.card G).factorization p := by
+    have hmul := (OddOrder.BG.Ch3.S10.Msigma M).card_mul_index
+    have hidx0 : ((OddOrder.BG.Ch3.S10.Msigma M).index).factorization p = 0 := by
+      by_contra h0
+      have hpdvd : p ∣ (OddOrder.BG.Ch3.S10.Msigma M).index :=
+        Nat.dvd_of_factorization_pos h0
+      exact (hMσhallG.2 p (Nat.mem_primeFactors.mpr
+        ⟨hp, hpdvd, Subgroup.index_ne_zero_of_finite⟩)) hpσ
+    have hfmul := Nat.factorization_mul
+      (a := Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M))
+      (b := (OddOrder.BG.Ch3.S10.Msigma M).index)
+      Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite
+    have happ := congrArg (fun f => f p) hfmul
+    simp only [Finsupp.coe_add, Pi.add_apply] at happ
+    rw [hmul, hidx0, add_zero] at happ
+    exact happ.symm
+  rw [ha, le_antisymm hale hgea, hpart]
+
+/-- `O_p(M)` **is** a Sylow `p`-subgroup of `G` (p. 165), as an equation of subgroups. -/
+theorem e5_exists_sylow_eq_opiCore [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} (hp : p.Prime)
+    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M)
+    (hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M)) :
+    ∃ S : Sylow p G, (S : Subgroup G) = opiCoreInG {p} M := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨S, hle⟩ := (isPGroup_opiCoreInG_singleton (q := p) M).exists_le_sylow
+  refine ⟨S, (Subgroup.eq_of_le_of_card_ge hle ?_).symm⟩
+  rw [e5_opiCore_sylow_card hG hM hp hpσ hMσnil, S.card_eq_multiplicity]
+
 /-- **BG Corollary 15.9(c), the collapse `E ∩ N = K₁`** (BG p. 123): once the cyclic
 Frobenius complement `E` has been chosen to contain `K₁`, its intersection with `N`
 collapses onto `K₁`.
