@@ -948,14 +948,17 @@ pair enumeration; here we *construct* one: a finite, conjugation-closed, real-fr
 family `Y` containing a conjugation-closed base `B` decomposes as
 `pairUnion B pair N = Y` with each adjoined pair a fresh conjugate pair `{χ, χ̄}`.
 This is the decomposition input for the reduction steps (1)–(2) of the Feit–Sibley
-Theorem (no degree ordering is needed there: the contradiction only requires *some*
-failing pair). -/
+Theorem; the enumeration also records a min-degree clause (each step's first member
+has minimal degree real part among the not-yet-accumulated members of `Y`). -/
 
 /-- **Conjugate-pair decomposition**: a finite, conjugation-closed family `Y` with no
 real members is reached from any conjugation-closed base `B ⊆ Y` by adjoining
 conjugate pairs, each fresh at its step (`(pair j).1, (pair j).2 ∉ pairUnion B pair j`).
-Constructed by strong induction on `(Y ∖ B).ncard`: pick `χ ∈ Y ∖ B`, adjoin
-`{χ, χ̄}` (fresh, `χ̄ ≠ χ` by non-reality), recurse with base `B ∪ {χ, χ̄}`. -/
+Each step's first member additionally has minimal degree real part among the
+not-yet-accumulated members of `Y` (min-degree clause).  Constructed by strong
+induction on `(Y ∖ B).ncard`: pick `χ ∈ Y ∖ B` minimizing `(χ 1).re`
+(`Set.exists_min_image`), adjoin `{χ, χ̄}` (fresh, `χ̄ ≠ χ` by non-reality),
+recurse with base `B ∪ {χ, χ̄}`. -/
 theorem exists_conjPair_pairUnion_eq {L : Type*} [Group L]
     {Y B : Set (ClassFunction L ℂ)} (hBY : B ⊆ Y) (hYfin : Y.Finite)
     (hYconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate Y)
@@ -963,17 +966,21 @@ theorem exists_conjPair_pairUnion_eq {L : Type*} [Group L]
     (hnoreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters Y) :
     ∃ (N : ℕ) (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ),
       OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair N = Y ∧
-      ∀ j, j < N → (pair j).2 = (pair j).1.conj ∧ (pair j).1 ∈ Y ∧
+      (∀ j, j < N → (pair j).2 = (pair j).1.conj ∧ (pair j).1 ∈ Y ∧
         (pair j).1 ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j ∧
-        (pair j).2 ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j := by
+        (pair j).2 ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j) ∧
+      ∀ j, j < N → ∀ χ ∈ Y, χ ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j →
+        (((pair j).1) (1 : L)).re ≤ (χ (1 : L)).re := by
   classical
   suffices h : ∀ (n : ℕ) (B : Set (ClassFunction L ℂ)), B ⊆ Y →
       OddOrder.Peterfalvi.S03.ClosedUnderConjugate B → (Y \ B).ncard = n →
       ∃ (N : ℕ) (pair : ℕ → ClassFunction L ℂ × ClassFunction L ℂ),
         OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair N = Y ∧
-        ∀ j, j < N → (pair j).2 = (pair j).1.conj ∧ (pair j).1 ∈ Y ∧
+        (∀ j, j < N → (pair j).2 = (pair j).1.conj ∧ (pair j).1 ∈ Y ∧
           (pair j).1 ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j ∧
-          (pair j).2 ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j by
+          (pair j).2 ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j) ∧
+        ∀ j, j < N → ∀ χ ∈ Y, χ ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B pair j →
+          (((pair j).1) (1 : L)).re ≤ (χ (1 : L)).re by
     exact h _ B hBY hBconj rfl
   intro n
   induction n using Nat.strong_induction_on with
@@ -981,8 +988,14 @@ theorem exists_conjPair_pairUnion_eq {L : Type*} [Group L]
     intro B hBY hBconj hn
     by_cases hYB : Y ⊆ B
     · have hBeq : B = Y := Set.Subset.antisymm hBY hYB
-      exact ⟨0, fun _ => (0, 0), by simpa using hBeq, fun j hj => absurd hj (by omega)⟩
-    · obtain ⟨χ, hχY, hχB⟩ := Set.not_subset.mp hYB
+      exact ⟨0, fun _ => (0, 0), by simpa using hBeq, fun j hj => absurd hj (by omega),
+        fun j hj => absurd hj (by omega)⟩
+    · -- min-degree choice: `χ ∈ Y ∖ B` minimizing `(χ 1).re`
+      have hYBne : (Y \ B).Nonempty := by
+        obtain ⟨ψ₀, hψ₀Y, hψ₀B⟩ := Set.not_subset.mp hYB
+        exact ⟨ψ₀, hψ₀Y, hψ₀B⟩
+      obtain ⟨χ, ⟨hχY, hχB⟩, hχmin⟩ := Set.exists_min_image (Y \ B)
+        (fun ψ => (ψ (1 : L)).re) hYfin.sdiff hYBne
       have hχconjY : χ.conj ∈ Y := hYconj hχY
       have hχconjB : χ.conj ∉ B := fun h => hχB (by simpa using hBconj h)
       have hne : χ.conj ≠ χ := fun h => hnoreal hχY h
@@ -1006,7 +1019,7 @@ theorem exists_conjPair_pairUnion_eq {L : Type*} [Group L]
         exact Set.ncard_lt_ncard
           ((Set.ssubset_iff_of_subset hsub).mpr ⟨χ, ⟨hχY, hχB⟩, hχnot⟩)
           (hYfin.sdiff)
-      obtain ⟨N', pair', hUnion', hstep'⟩ := ih _ hlt B' hB'Y hB'conj rfl
+      obtain ⟨N', pair', hUnion', hstep', hmin'⟩ := ih _ hlt B' hB'Y hB'conj rfl
       set pr : ℕ → ClassFunction L ℂ × ClassFunction L ℂ :=
         fun j => if j = 0 then (χ, χ.conj) else pair' (j - 1) with hpr
       have hshift : ∀ k, OddOrder.Peterfalvi.S07.pairUnion (L := L) B pr (k + 1)
@@ -1023,21 +1036,35 @@ theorem exists_conjPair_pairUnion_eq {L : Type*} [Group L]
             simp [OddOrder.Peterfalvi.S07.pairSet, hpr]
           rw [OddOrder.Peterfalvi.S07.pairUnion_succ, ihk, hps,
             ← OddOrder.Peterfalvi.S07.pairUnion_succ]
-      refine ⟨N' + 1, pr, by rw [hshift N']; exact hUnion', ?_⟩
-      intro j hj
-      rcases Nat.eq_zero_or_pos j with rfl | hjpos
-      · refine ⟨by simp [hpr], by simpa [hpr] using hχY, ?_, ?_⟩
-        · simpa [hpr] using hχB
-        · simpa [hpr] using hχconjB
-      · obtain ⟨j', rfl⟩ : ∃ j'', j = j'' + 1 := ⟨j - 1, by omega⟩
-        have hj' : j' < N' := by omega
-        obtain ⟨hc, hY', hn1, hn2⟩ := hstep' j' hj'
-        have hpr_eval : pr (j' + 1) = pair' j' := by simp [hpr]
-        refine ⟨by rw [hpr_eval]; exact hc, by rw [hpr_eval]; exact hY', ?_, ?_⟩
-        · rw [hpr_eval, hshift j']
-          exact hn1
-        · rw [hpr_eval, hshift j']
-          exact hn2
+      refine ⟨N' + 1, pr, by rw [hshift N']; exact hUnion', ?_, ?_⟩
+      · intro j hj
+        rcases Nat.eq_zero_or_pos j with rfl | hjpos
+        · refine ⟨by simp [hpr], by simpa [hpr] using hχY, ?_, ?_⟩
+          · simpa [hpr] using hχB
+          · simpa [hpr] using hχconjB
+        · obtain ⟨j', rfl⟩ : ∃ j'', j = j'' + 1 := ⟨j - 1, by omega⟩
+          have hj' : j' < N' := by omega
+          obtain ⟨hc, hY', hn1, hn2⟩ := hstep' j' hj'
+          have hpr_eval : pr (j' + 1) = pair' j' := by simp [hpr]
+          refine ⟨by rw [hpr_eval]; exact hc, by rw [hpr_eval]; exact hY', ?_, ?_⟩
+          · rw [hpr_eval, hshift j']
+            exact hn1
+          · rw [hpr_eval, hshift j']
+            exact hn2
+      · intro j hj ψ hψY hψnot
+        rcases Nat.eq_zero_or_pos j with rfl | hjpos
+        · -- `pairUnion B pr 0 = B`: minimality of the chosen `χ` over `Y ∖ B`
+          have hψB : ψ ∉ B := by simpa using hψnot
+          simpa [hpr] using hχmin ψ ⟨hψY, hψB⟩
+        · -- shift into the recursive min clause over the base `B' = B ∪ {χ, χ̄}`
+          obtain ⟨j', rfl⟩ : ∃ j'', j = j'' + 1 := ⟨j - 1, by omega⟩
+          have hj' : j' < N' := by omega
+          have hψnot' : ψ ∉ OddOrder.Peterfalvi.S07.pairUnion (L := L) B' pair' j' := by
+            rw [← hshift j']
+            exact hψnot
+          have hpr_eval : pr (j' + 1) = pair' j' := by simp [hpr]
+          rw [hpr_eval]
+          exact hmin' j' hj' ψ hψY hψnot'
 
 /-- **First incoherent step extraction**: if the base of a pair chain is coherent
 but the full accumulation is not, some step turns a coherent accumulation
@@ -1712,7 +1739,7 @@ theorem exists_counterexample_of_not_coherent [Finite G] (hd : Odd hyp.d)
   classical
   have hnoreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters Y :=
     (hasNoRealCharacters_Sset hyp hd hQ1odd).mono hYS
-  obtain ⟨N, pair, hUnion, hstep⟩ :=
+  obtain ⟨N, pair, hUnion, hstep, -⟩ :=
     exists_conjPair_pairUnion_eq hBY hYfin hYconj hBconj hnoreal
   obtain ⟨i, hiN, hcoh_i, hfail_i⟩ :=
     exists_first_incoherent_step (τ := hyp.tau) (A := hyp.A) hcohB (hUnion ▸ hfail)

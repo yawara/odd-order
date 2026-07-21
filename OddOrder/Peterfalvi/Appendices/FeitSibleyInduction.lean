@@ -403,11 +403,11 @@ theorem exists_center_pow_prime_eq_one_of_dvd {K : Type*} [Group K] [Finite K]
 
 /-! ## The `p`-primary lift and the properness `Z ⊄ Q₂` (p. 146) -/
 
-/-- **The commutator subgroup of `↥Q₁` maps onto `⁅Q₁, Q₁⁆`** under the
-inclusion. -/
-theorem map_subtype_commutator :
-    Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) = ⁅hyp.Q1, hyp.Q1⁆ := by
-  change Subgroup.map hyp.Q1.subtype ⁅(⊤ : Subgroup ↥hyp.Q1), ⊤⁆ = ⁅hyp.Q1, hyp.Q1⁆
+/-- **The commutator subgroup of `↥W` maps onto `⁅W, W⁆`** under the
+inclusion, for any subgroup `W`. -/
+theorem map_subtype_commutator (W : Subgroup G) :
+    Subgroup.map W.subtype (commutator ↥W) = ⁅W, W⁆ := by
+  change Subgroup.map W.subtype ⁅(⊤ : Subgroup ↥W), ⊤⁆ = ⁅W, W⁆
   rw [Subgroup.map_commutator, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
 
 /-- A subgroup below `⁅Q₁, Q₁⁆` relativises below `commutator ↥Q₁`. -/
@@ -415,7 +415,7 @@ theorem subgroupOf_le_commutator {R : Subgroup G} (hR : R ≤ ⁅hyp.Q1, hyp.Q1�
     R.subgroupOf hyp.Q1 ≤ commutator ↥hyp.Q1 := by
   intro x hx
   have hmem : (x : G) ∈ Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) := by
-    rw [hyp.map_subtype_commutator]
+    rw [map_subtype_commutator hyp.Q1]
     exact hR (Subgroup.mem_subgroupOf.mp hx)
   obtain ⟨y, hy, hyx⟩ := hmem
   rwa [show y = x from Subtype.ext hyx] at hy
@@ -567,6 +567,41 @@ theorem not_centralLift_le_minimal [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q
   have hone : orderOf xr = 1 := Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd h1 h2)
   exact hxr1 (orderOf_eq_one_iff.mp hone)
 
+/-! ## The anchor properness `S·Q' < Q` -/
+
+/-- **`Q₁` is nontrivial**: the trivial group is a `2`-group, against
+`Q1_not_two_group`. -/
+theorem nontrivial_Q1 : Nontrivial ↥hyp.Q1 := by
+  by_contra hcon
+  apply hyp.Q1_not_two_group
+  haveI : Subsingleton ↥hyp.Q1 := not_nontrivial_iff_subsingleton.mp hcon
+  exact fun g => ⟨0, by rw [pow_zero, pow_one]; exact Subsingleton.elim g 1⟩
+
+/-- **The anchor properness `S·Q' < Q`** for nilpotent `Q₁`: nontrivial
+nilpotent groups are not perfect, so `[Q₁,Q₁] ≠ Q₁`, and
+`Q₁ ⊓ S·[Q₁,Q₁] = [Q₁,Q₁]` forces the join to miss `Q₁`. -/
+theorem sup_S_Qder_lt_Q [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q1) :
+    hyp.S ⊔ hyp.Qder < hyp.Q := by
+  haveI := hnil
+  haveI : Nontrivial ↥hyp.Q1 := hyp.nontrivial_Q1
+  have hder_ne : ⁅hyp.Q1, hyp.Q1⁆ ≠ hyp.Q1 := by
+    intro heq
+    apply (IsSolvable.commutator_lt_top_of_nontrivial ↥hyp.Q1).ne
+    rw [eq_top_iff]
+    intro x _
+    have hx : (x : G) ∈ Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) := by
+      rw [map_subtype_commutator hyp.Q1, heq]
+      exact x.2
+    obtain ⟨y, hy, hyx⟩ := hx
+    rwa [show y = x from Subtype.ext hyx] at hy
+  rw [hyp.Qder_eq_sup_Sder_commutator, ← sup_assoc, sup_eq_left.mpr hyp.Sder_le_S,
+    lt_iff_le_and_ne]
+  refine ⟨sup_le hyp.S_le_Q (hyp.Q1der_le_Q1.trans hyp.Q1_le_Q), fun heq => ?_⟩
+  have h1 : hyp.Q1 ⊓ (hyp.S ⊔ ⁅hyp.Q1, hyp.Q1⁆) = ⁅hyp.Q1, hyp.Q1⁆ :=
+    hyp.Q1_inf_sup_eq le_rfl hyp.Q1der_le_Q1
+  rw [heq, inf_eq_left.mpr hyp.Q1_le_Q] at h1
+  exact hder_ne h1.symm
+
 /-! ## The reduction (1) induction (p. 146) -/
 
 section InductionAssembly
@@ -594,28 +629,7 @@ theorem ssetOf_sup_sder_coherent_of_conjInvariant
       (hyp.SsetOf (hyp.Sder ⊔ Q₃)) hyp.A) := by
   classical
   haveI := hnil
-  -- `[Q₁,Q₁] < Q₁` (nontrivial nilpotent), hence `S·Q' < Q` for the anchor
-  haveI : Nontrivial ↥hyp.Q1 := by
-    apply Finite.one_lt_card_iff_nontrivial.mp
-    exact lt_of_lt_of_le hp.one_lt (Nat.le_of_dvd Nat.card_pos hpd)
-  have hder_ne : ⁅hyp.Q1, hyp.Q1⁆ ≠ hyp.Q1 := by
-    intro heq
-    apply (IsSolvable.commutator_lt_top_of_nontrivial ↥hyp.Q1).ne
-    rw [eq_top_iff]
-    intro x _
-    have hx : (x : G) ∈ Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) := by
-      rw [hyp.map_subtype_commutator, heq]
-      exact x.2
-    obtain ⟨y, hy, hyx⟩ := hx
-    rwa [show y = x from Subtype.ext hyx] at hy
-  have hlt : hyp.S ⊔ hyp.Qder < hyp.Q := by
-    rw [hyp.Qder_eq_sup_Sder_commutator, ← sup_assoc, sup_eq_left.mpr hyp.Sder_le_S,
-      lt_iff_le_and_ne]
-    refine ⟨sup_le hyp.S_le_Q (hyp.Q1der_le_Q1.trans hyp.Q1_le_Q), fun heq => ?_⟩
-    have h1 : hyp.Q1 ⊓ (hyp.S ⊔ ⁅hyp.Q1, hyp.Q1⁆) = ⁅hyp.Q1, hyp.Q1⁆ :=
-      hyp.Q1_inf_sup_eq le_rfl hyp.Q1der_le_Q1
-    rw [heq, inf_eq_left.mpr hyp.Q1_le_Q] at h1
-    exact hder_ne h1.symm
+  have hlt : hyp.S ⊔ hyp.Qder < hyp.Q := hyp.sup_S_Qder_lt_Q hnil
   -- the base of the induction: the Remark at `Q' = S'·[Q₁,Q₁]`
   have hbase : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
       (hyp.SsetOf (hyp.Sder ⊔ ⁅hyp.Q1, hyp.Q1⁆)) hyp.A) := by
