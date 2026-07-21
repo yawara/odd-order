@@ -262,7 +262,65 @@ theorem frattini_normalizer_thompsonJAbelian [Finite G] {p : ℕ} [Fact p.Prime]
   rw [← hfr]
   exact sup_le (hchar.trans le_sup_right) le_sup_left
 
+open OddOrder.Isaacs.Ch01 in
+/-- **Thm 2.10 step (c) 前半**: `P ≤ N(W)` なら `O_p(G ⧸ L) = ⊥`
+(`L := sSupNormalNormalizing W`). Gorenstein の `K = L(P ∩ K)` 論法を index 算術
+(`[K:M]` が `p` と互いに素かつ `p`-冪 ⟹ `= 1`) で実装. -/
+theorem opCore_quotient_sSupNormalNormalizing_eq_bot [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) {W : Subgroup G}
+    (hPW : (P : Subgroup G) ≤ normalizer (W : Set G)) :
+    haveI := sSupNormalNormalizing_normal W
+    opCore p (G ⧸ sSupNormalNormalizing W) = ⊥ := by
+  haveI := sSupNormalNormalizing_normal W
+  set L := sSupNormalNormalizing W with hLdef
+  set K := (opCore p (G ⧸ L)).comap (QuotientGroup.mk' L) with hKdef
+  haveI hKnorm : K.Normal := Subgroup.normal_comap _
+  have hLK : L ≤ K := by
+    intro l hl
+    rw [hKdef, mem_comap]
+    have h1 : QuotientGroup.mk' L l = 1 := (QuotientGroup.eq_one_iff l).mpr hl
+    rw [h1]
+    exact (opCore p (G ⧸ L)).one_mem
+  have hmapK : K.map (QuotientGroup.mk' L) = opCore p (G ⧸ L) := by
+    rw [hKdef]
+    exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective L) _
+  have hKLpow : ∃ n, L.relIndex K = p ^ n := by
+    rw [show L = (QuotientGroup.mk' L).ker from (QuotientGroup.ker_mk' L).symm,
+      Subgroup.relIndex_ker, hmapK]
+    exact (opCore_isPGroup p (G ⧸ L)).exists_card_eq
+  have hSyl : ¬ p ∣ ((P : Subgroup G) ⊓ K).relIndex K :=
+    OddOrder.Isaacs.Ch09.not_dvd_relIndex_inf_of_isSubnormal
+      (Subgroup.Normal.isSubnormal hKnorm) P
+  have hMK : L ⊔ ((P : Subgroup G) ⊓ K) = K := by
+    have hMle : L ⊔ ((P : Subgroup G) ⊓ K) ≤ K := sup_le hLK inf_le_right
+    have h1 : (L ⊔ ((P : Subgroup G) ⊓ K)).relIndex K
+        ∣ ((P : Subgroup G) ⊓ K).relIndex K :=
+      Subgroup.relIndex_dvd_of_le_left K le_sup_right
+    have h2 : (L ⊔ ((P : Subgroup G) ⊓ K)).relIndex K ∣ L.relIndex K :=
+      Subgroup.relIndex_dvd_of_le_left K le_sup_left
+    obtain ⟨n, hn⟩ := hKLpow
+    rw [hn] at h2
+    have hne : ¬ p ∣ (L ⊔ ((P : Subgroup G) ⊓ K)).relIndex K :=
+      fun hd => hSyl (dvd_trans hd h1)
+    have hone : (L ⊔ ((P : Subgroup G) ⊓ K)).relIndex K = 1 := by
+      rcases (Nat.dvd_prime_pow Fact.out).mp h2 with ⟨m, hm, hem⟩
+      rcases Nat.eq_zero_or_pos m with h0 | hpos
+      · rw [hem, h0, pow_zero]
+      · exact absurd (hem ▸ dvd_pow_self p hpos.ne') hne
+    exact le_antisymm hMle (Subgroup.relIndex_eq_one.mp hone)
+  have hKNW : K ≤ normalizer (W : Set G) := by
+    rw [← hMK]
+    exact sup_le (sSupNormalNormalizing_le_normalizer W) (inf_le_left.trans hPW)
+  have hKL : K ≤ L := le_sSupNormalNormalizing hKnorm hKNW
+  rw [← hmapK]
+  refine le_bot_iff.mp ?_
+  intro x hx
+  obtain ⟨k, hk, rfl⟩ := mem_map.mp hx
+  rw [Subgroup.mem_bot]
+  exact (QuotientGroup.eq_one_iff _).mpr (hKL hk)
+
 end Subgroup
+
 
 
 
