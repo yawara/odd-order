@@ -59,7 +59,22 @@ BG Thm 6.2 の J は Gorenstein 版。⟹ J_a 完成後、`hZJ`・結論とも J
   `thompsonJAbelian_map_of_injective` / conj 版 / characteristic 2 instance。
   sibling (elementary 版) の骨格ミラー + mathlib `map_isMulCommutative` 系で転送。
 
-## Thm 2.4 (Thompson) の実装計画 (2026-07-21 原文精読済، mmd L5487-5505)
+## ✅ Thm 2.4 (Thompson) 完全証明 (2026-07-21, commits fa5e84f27 / 44b313b65 / fa9cc3b05)
+
+`thompson_mem_maxAbelianIn` sorry-free。計画どおり 6 部品 + G Lem 2.5(i) 対称性
+(`commutatorElement_inv_rotate` — G 原文の `[x,G]` abelian 仮定を「使う 2 元の可換性」
+まで弱めて `x⁻¹`-共役の観察で `[x^m,y]` 帰納を回避)。積公式は
+`QuotientGroup.quotientInfEquivProdNormalizerQuotient` (ambient 正規性不要) で、
+coset 単射は `Quotient.out` 経由 (well-definedness 不要)。
+
+### 次 = Thm 2.5 (Thompson Replacement) の入口
+
+必要な唯一の外部部品 = **G Thm 2.6.4** (冪零群の非自明正規部分群は中心と非自明に交わる;
+`B/N ∩ Z(AB/N) ≠ 1` に適用)。repo/mathlib の対応物 (`IsPGroup.center_nontrivial` 系 /
+BG Ch1 の正規×中心交わり) を着手時に実測すること。骨格: `N = N_B(A) ⊴ AB`、
+`N ⊊ B`、`Z(AB/N) ∩ B/N ≠ 1` から `x ∈ B − N` を取り `M = [x,A] ⊆ N` abelian → 2.4。
+
+## (参考) Thm 2.4 の当初実装計画 (2026-07-21 原文精読済، mmd L5487-5505)
 
 **statement**: `A ∈ A(P)`, `x ∈ P`, `M := ⟨⁅x,a⁆ : a ∈ A⟩` abelian ⟹
 `M·C_A(M) ∈ A(P)`。Lean 形:

@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.GroupTheory.Commutator.Basic
 import OddOrder.GroupTheory.ThompsonSubgroup
+import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Abelian Thompson Subgroup `J_a(P)` (Gorenstein 版)
@@ -59,6 +60,8 @@ Lem 2.8-2.10、Thm 2.11 (**Glauberman `Z(J)`-定理**) は後続。
 -/
 
 namespace Subgroup
+
+open scoped commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -166,6 +169,429 @@ theorem le_normalizer_iff_commutator_commutator_eq_bot_of_mem_maxAbelianIn
     have h3 : ⁅B, A⁆ ≤ A :=
       (eq_inf_centralizer_of_mem_maxAbelianIn hA).ge.trans' (le_inf h2 h1)
     exact le_normalizer_iff_commutator_le_right.mpr h3
+
+/-! ### Gorenstein Thm 2.4 (Thompson) へ向けた部品
+
+`M := ⟨⁅x,a⁆ : a ∈ A⟩` を mathlib 慣習で取る (Gorenstein の `[x,A]` は
+`[a,b] = a⁻¹b⁻¹ab` 慣習; `x` は全称なので statement は等価で, 計算は `x → x⁻¹`
+の鏡映で移る). -/
+
+/-- **Gorenstein Lemma 2.5(i)** (element 形, mathlib 慣習に鏡映): `y, z` が可換で
+`⁅x,y⁆` と `⁅x,z⁆` が可換なら, 二重交換子は `y, z` について対称:
+`⁅⁅x,y⁆⁻¹, z⁆ = ⁅⁅x,z⁆⁻¹, y⁆`.
+
+Gorenstein p.20 の証明の鏡映: `⁅⁅x,y⁆⁻¹,z⁆` を
+`x · ((x⁻¹yxy⁻¹)(x⁻¹zxz⁻¹)) · (zyx⁻¹y⁻¹z⁻¹)` に展開 (自由恒等式) し, 中央 2 因子
+(どちらも `⁅x,·⁆⁻¹` の `x⁻¹`-共役ゆえ可換) を入れ替え, `yz = zy` で尾部を
+整理すると `y ↔ z` を入れ替えた同じ展開に一致する.
+
+⚠ G 原文の仮定「`[x,G]` abelian」より弱い仮定 (使う 2 元の可換性のみ) で成立 —
+原文証明の `[x⁻¹,y] = [x^m,y] ∈ [x,G]` 帰納は `x⁻¹`-共役の観察で不要になる. -/
+theorem commutatorElement_inv_rotate {x y z : G} (h1 : Commute y z)
+    (h2 : Commute ⁅x, y⁆ ⁅x, z⁆) :
+    ⁅⁅x, y⁆⁻¹, z⁆ = ⁅⁅x, z⁆⁻¹, y⁆ := by
+  have key : ∀ b c : G,
+      ⁅⁅x, b⁆⁻¹, c⁆
+        = x * ((x⁻¹ * b * x * b⁻¹) * (x⁻¹ * c * x * c⁻¹))
+            * (c * b * x⁻¹ * b⁻¹ * c⁻¹) := by
+    intro b c
+    group
+  have hu : Commute (x⁻¹ * y * x * y⁻¹) (x⁻¹ * z * x * z⁻¹) := by
+    have e : ∀ b : G, x⁻¹ * b * x * b⁻¹ = x⁻¹ * ⁅x, b⁆⁻¹ * x := by intro b; group
+    rw [e y, e z]
+    have hab : Commute ⁅x, y⁆⁻¹ ⁅x, z⁆⁻¹ := h2.inv_left.inv_right
+    have hswap : (x⁻¹ * ⁅x, y⁆⁻¹ * x) * (x⁻¹ * ⁅x, z⁆⁻¹ * x)
+        = (x⁻¹ * ⁅x, z⁆⁻¹ * x) * (x⁻¹ * ⁅x, y⁆⁻¹ * x) :=
+      calc (x⁻¹ * ⁅x, y⁆⁻¹ * x) * (x⁻¹ * ⁅x, z⁆⁻¹ * x)
+          = x⁻¹ * (⁅x, y⁆⁻¹ * ⁅x, z⁆⁻¹) * x := by group
+        _ = x⁻¹ * (⁅x, z⁆⁻¹ * ⁅x, y⁆⁻¹) * x := by rw [hab.eq]
+        _ = (x⁻¹ * ⁅x, z⁆⁻¹ * x) * (x⁻¹ * ⁅x, y⁆⁻¹ * x) := by group
+    exact hswap
+  have T : z * y * x⁻¹ * y⁻¹ * z⁻¹ = y * z * x⁻¹ * z⁻¹ * y⁻¹ := by
+    have e1 : z * y * x⁻¹ * y⁻¹ * z⁻¹ = (z * y) * x⁻¹ * (z * y)⁻¹ := by group
+    have e2 : y * z * x⁻¹ * z⁻¹ * y⁻¹ = (y * z) * x⁻¹ * (y * z)⁻¹ := by group
+    rw [e1, e2, h1.symm.eq]
+  calc ⁅⁅x, y⁆⁻¹, z⁆
+      = x * ((x⁻¹ * y * x * y⁻¹) * (x⁻¹ * z * x * z⁻¹))
+          * (z * y * x⁻¹ * y⁻¹ * z⁻¹) := key y z
+    _ = x * ((x⁻¹ * z * x * z⁻¹) * (x⁻¹ * y * x * y⁻¹))
+          * (y * z * x⁻¹ * z⁻¹ * y⁻¹) := by rw [hu.eq, T]
+    _ = ⁅⁅x, z⁆⁻¹, y⁆ := (key z y).symm
+
+/-- **Thm 2.4 の coset 単射の核** (Gorenstein p.271 中段の計算):
+`d := ⁅x,u⁆⁻¹ · ⁅x,v⁆` が `A` を中心化すれば, `w := u⁻¹v` は全ての `⁅x,a⁆`
+(`a ∈ A`) を中心化する.
+
+計算: `d` は `u ∈ A` と可換なので `d = u⁻¹ d u = ⁅x, u⁻¹v⁆`. すると
+`⁅⁅x,w⁆⁻¹, a⁆ = 1` (∀ a ∈ A) で, **Lemma 2.5(i)** の対称性から
+`⁅⁅x,a⁆⁻¹, w⁆ = 1`, すなわち `w` が `⁅x,a⁆` を中心化する. -/
+theorem commute_commutatorElement_of_inv_mul_mem_centralizer
+    {A : Subgroup G} (hA : IsMulCommutative A) {x u v : G}
+    (hu : u ∈ A) (hv : v ∈ A)
+    (hM : ∀ a ∈ A, ∀ b ∈ A, Commute ⁅x, a⁆ ⁅x, b⁆)
+    (hd : ⁅x, u⁆⁻¹ * ⁅x, v⁆ ∈ centralizer (A : Set G)) :
+    ∀ a ∈ A, Commute (u⁻¹ * v) ⁅x, a⁆ := by
+  haveI := hA
+  have hw : u⁻¹ * v ∈ A := A.mul_mem (A.inv_mem hu) hv
+  have hd' : ∀ a ∈ A, a * (⁅x, u⁆⁻¹ * ⁅x, v⁆) = (⁅x, u⁆⁻¹ * ⁅x, v⁆) * a :=
+    mem_centralizer_iff.mp hd
+  -- `d` は `u` と可換 ⟹ `d = u⁻¹ d u = ⁅x, u⁻¹v⁆`.
+  have hd_eq : ⁅x, u⁆⁻¹ * ⁅x, v⁆ = ⁅x, u⁻¹ * v⁆ := by
+    have h1 : u⁻¹ * (⁅x, u⁆⁻¹ * ⁅x, v⁆) * u = ⁅x, u⁻¹ * v⁆ := by group
+    have h2 : u⁻¹ * (⁅x, u⁆⁻¹ * ⁅x, v⁆) * u = ⁅x, u⁆⁻¹ * ⁅x, v⁆ := by
+      rw [mul_assoc, ← hd' u hu, ← mul_assoc, inv_mul_cancel, one_mul]
+    rw [← h2, h1]
+  intro a ha
+  -- `⁅⁅x,w⁆⁻¹, a⁆ = 1` (`⁅x,w⁆ = d` が `A` を中心化).
+  have hwa : Commute ⁅x, u⁻¹ * v⁆ a := by
+    rw [← hd_eq]
+    exact ((hd' a ha).symm : _ * _ = _ * _)
+  have hzero : ⁅⁅x, u⁻¹ * v⁆⁻¹, a⁆ = 1 :=
+    commutatorElement_eq_one_iff_commute.mpr hwa.inv_left
+  -- Lemma 2.5(i) の対称性で回転.
+  have hrot := commutatorElement_inv_rotate
+    (x := x) (setLike_mul_comm hw ha) (hM _ hw _ ha)
+  rw [hzero] at hrot
+  have hfin : Commute ⁅x, a⁆⁻¹ (u⁻¹ * v) :=
+    commutatorElement_eq_one_iff_commute.mp hrot.symm
+  exact (Commute.inv_left_iff.mp hfin).symm
+
+/-- 可換部分群同士の join は, 片方が他方を中心化すればまた可換 (一般形).
+
+⚠ 同内容の `OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer` が下流
+(BG Ch.4) に存在する — GroupTheory からは import 不可のため一般形を本 leaf に置く.
+下流側の dedup は issue 9403 に記録. -/
+theorem isMulCommutative_sup_of_le_centralizer {H K : Subgroup G}
+    (hH : IsMulCommutative H) (hK : IsMulCommutative K)
+    (hHK : H ≤ centralizer (K : Set G)) :
+    IsMulCommutative (H ⊔ K : Subgroup G) := by
+  rw [← le_centralizer_iff_isMulCommutative]
+  refine sup_le ?_ ?_
+  · rw [le_centralizer_iff]
+    exact sup_le (le_centralizer_iff_isMulCommutative.mpr hH) (le_centralizer_iff.mp hHK)
+  · rw [le_centralizer_iff]
+    exact sup_le hHK (le_centralizer_iff_isMulCommutative.mpr hK)
+
+/-- 可換性は部分群に遺伝する. -/
+theorem isMulCommutative_of_le {H K : Subgroup G} (hK : IsMulCommutative K)
+    (hHK : H ≤ K) : IsMulCommutative H := by
+  haveI := hK
+  exact .of_setLike_mul_comm fun a ha b hb => setLike_mul_comm (hHK ha) (hHK hb)
+
+/-- **Gorenstein の `[x, A]`**: 元 `x` と部分群 `A` の交換子部分群
+`⟨⁅x,a⁆ : a ∈ A⟩` (mathlib 慣習 `⁅x,a⁆ = xax⁻¹a⁻¹`).
+
+⚠ `⁅zpowers x, A⁆` とは別物 (そちらは `⁅xⁿ, a⁆` を全て含む). Gorenstein Ch.8 §2
+(Thompson / Glauberman replacement) の `[x, A]` はこの形. -/
+def elementCommutator (x : G) (A : Subgroup G) : Subgroup G :=
+  closure {m : G | ∃ a ∈ A, m = ⁅x, a⁆}
+
+theorem commutatorElement_mem_elementCommutator {x a : G} {A : Subgroup G}
+    (ha : a ∈ A) : ⁅x, a⁆ ∈ elementCommutator x A :=
+  subset_closure ⟨a, ha, rfl⟩
+
+/-- `x ∈ P`, `A ≤ P` なら `[x,A] ≤ P`. -/
+theorem elementCommutator_le {x : G} {A P : Subgroup G} (hx : x ∈ P) (hA : A ≤ P) :
+    elementCommutator x A ≤ P := by
+  refine (closure_le _).mpr ?_
+  rintro m ⟨a, ha, rfl⟩
+  rw [SetLike.mem_coe, commutatorElement_def]
+  exact mul_mem (mul_mem (mul_mem hx (hA ha)) (inv_mem hx)) (inv_mem (hA ha))
+
+/-- 生成元 `⁅x,a⁆` すべてと可換な元は `[x,A]` を中心化する. -/
+theorem mem_centralizer_elementCommutator_of_forall_commute {x w : G} {A : Subgroup G}
+    (h : ∀ a ∈ A, Commute w ⁅x, a⁆) :
+    w ∈ centralizer (elementCommutator x A : Set G) := by
+  have hle : elementCommutator x A ≤ centralizer ({w} : Set G) := by
+    refine (closure_le _).mpr ?_
+    rintro m ⟨a, ha, rfl⟩
+    rw [SetLike.mem_coe, mem_centralizer_iff]
+    intro g hg
+    rw [Set.mem_singleton_iff.mp hg]
+    exact (h a ha).eq
+  rw [mem_centralizer_iff]
+  intro m hm
+  have hmw := mem_centralizer_iff.mp (hle hm) w rfl
+  exact hmw.symm
+
+/-- **Thm 2.4 部品 (Gorenstein の `C ∩ M = A ∩ M = C_M(A)`)**:
+`M ≤ P` abelian について `C_M(A) = M ⊓ C_A(M)`. `≤` 側で **Lemma 2.1**
+(`C_P(A) = A`) を使う. -/
+theorem inf_centralizer_eq_of_mem_maxAbelianIn [Finite G] {P A M : Subgroup G}
+    (hA : A ∈ maxAbelianIn P) (hMP : M ≤ P) (hM : IsMulCommutative M) :
+    M ⊓ centralizer (A : Set G) = M ⊓ (A ⊓ centralizer (M : Set G)) := by
+  apply le_antisymm
+  · intro m hm
+    have hmA : m ∈ A := by
+      have hmem : m ∈ P ⊓ centralizer (A : Set G) := ⟨hMP hm.1, hm.2⟩
+      rw [← eq_inf_centralizer_of_mem_maxAbelianIn hA] at hmem
+      exact hmem
+    exact ⟨hm.1, hmA, le_centralizer_iff_isMulCommutative.mpr hM hm.1⟩
+  · intro m hm
+    exact ⟨hm.1, le_centralizer_iff_isMulCommutative.mpr hA.2.1 hm.2.1⟩
+
+/-- **積公式** (中心化版): `H ≤ C_G(K)` なら `|H ⊔ K| = [H : H ⊓ K] · |K|`
+(`[H : H⊓K]` は `(K.subgroupOf H).index` で符号化). 第二同型定理 (normalizer 版
+`QuotientGroup.quotientInfEquivProdNormalizerQuotient`) と Lagrange で数える. -/
+theorem card_sup_of_le_centralizer [Finite G] {H K : Subgroup G}
+    (hHK : H ≤ centralizer (K : Set G)) :
+    Nat.card ↥(H ⊔ K) = (K.subgroupOf H).index * Nat.card K := by
+  have hnorm : H ≤ normalizer (K : Set G) := hHK.trans (centralizer_le_normalizer _)
+  haveI := Subgroup.normal_subgroupOf_of_le_normalizer hnorm
+  haveI := Subgroup.normal_subgroupOf_sup_of_le_normalizer hnorm
+  rw [Subgroup.card_eq_card_quotient_mul_card_subgroup (K.subgroupOf (H ⊔ K))]
+  congr 1
+  · rw [Subgroup.index_eq_card]
+    exact (Nat.card_congr
+      (QuotientGroup.quotientInfEquivProdNormalizerQuotient H K hnorm).toEquiv).symm
+  · exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+
+/-- **Thm 2.4 の coset 単射** (Gorenstein 「distinct cosets → distinct cosets」):
+`[A : C_A(M)] ≤ [M : C_M(A)]` (`M := [x,A]` abelian).
+
+商の代表元 (`Quotient.out`) 経由の単射 `⟦u⟧ ↦ ⟦⁅x,u⁆⟧` で証明する — 誘導写像の
+well-definedness は不要 (Gorenstein の主張も単射性のみ). 単射性の核 =
+`commute_commutatorElement_of_inv_mul_mem_centralizer` (Lemma 2.5(i) 対称性). -/
+theorem index_centralizer_subgroupOf_le_of_elementCommutator [Finite G]
+    {A : Subgroup G} {x : G} (hA : IsMulCommutative A)
+    (hM : IsMulCommutative (elementCommutator x A)) :
+    (((A ⊓ centralizer (elementCommutator x A : Set G))).subgroupOf A).index
+      ≤ ((centralizer (A : Set G)).subgroupOf (elementCommutator x A)).index := by
+  classical
+  set M := elementCommutator x A with hMdef
+  set C := A ⊓ centralizer (M : Set G) with hCdef
+  rw [Subgroup.index_eq_card, Subgroup.index_eq_card]
+  have hMcomm : ∀ a ∈ A, ∀ b ∈ A, Commute ⁅x, a⁆ ⁅x, b⁆ := by
+    intro a ha b hb
+    haveI := hM
+    exact setLike_mul_comm (commutatorElement_mem_elementCommutator ha)
+      (commutatorElement_mem_elementCommutator hb)
+  refine Nat.card_le_card_of_injective
+    (fun q => QuotientGroup.mk (⟨⁅x, ((Quotient.out q : ↥A) : G)⁆,
+      commutatorElement_mem_elementCommutator (Quotient.out q : ↥A).2⟩ : ↥M)) ?_
+  intro q q' hqq'
+  set u : ↥A := Quotient.out q with hu_def
+  set v : ↥A := Quotient.out q' with hv_def
+  have hd : ⁅x, (u : G)⁆⁻¹ * ⁅x, (v : G)⁆ ∈ centralizer (A : Set G) := by
+    have hmem := QuotientGroup.eq.mp hqq'
+    rw [Subgroup.mem_subgroupOf] at hmem
+    simpa using hmem
+  have hw : (u : G)⁻¹ * (v : G) ∈ C := by
+    refine ⟨A.mul_mem (A.inv_mem u.2) v.2, ?_⟩
+    exact mem_centralizer_elementCommutator_of_forall_commute
+      (commute_commutatorElement_of_inv_mul_mem_centralizer hA u.2 v.2 hMcomm hd)
+  have hcoset : (QuotientGroup.mk u : ↥A ⧸ C.subgroupOf A) = QuotientGroup.mk v := by
+    refine QuotientGroup.eq.mpr ?_
+    rw [Subgroup.mem_subgroupOf]
+    simpa using hw
+  rw [← QuotientGroup.out_eq' q, ← QuotientGroup.out_eq' q']
+  exact hcoset
+
+/-- **Gorenstein Theorem 2.4** (Thompson): `A ∈ A(P)`, `x ∈ P` で
+`M := [x,A] = ⟨⁅x,a⁆ : a ∈ A⟩` が abelian なら `M·C_A(M) ∈ A(P)`
+(積は `M ⊔ (A ⊓ C(M))` で符号化).
+
+Gorenstein pp. 271-272: `M·C_A(M)` は abelian (`C_A(M)` が `M` を中心化) で,
+`|M·C| = |M||C|/|C∩M| ≥ |A|` が coset 単射
+(`index_centralizer_subgroupOf_le_of_elementCommutator`) と `C∩M = C_M(A)`
+(`inf_centralizer_eq_of_mem_maxAbelianIn`) から従うので, `A(P)` の最大位数性で
+membership が出る. -/
+theorem thompson_mem_maxAbelianIn [Finite G] {P A : Subgroup G} {x : G}
+    (hA : A ∈ maxAbelianIn P) (hx : x ∈ P)
+    (hM : IsMulCommutative (elementCommutator x A)) :
+    elementCommutator x A ⊔ (A ⊓ centralizer (elementCommutator x A : Set G))
+      ∈ maxAbelianIn P := by
+  set M := elementCommutator x A with hMdef
+  set C := A ⊓ centralizer (M : Set G) with hCdef
+  have hMP : M ≤ P := elementCommutator_le hx hA.1
+  have hCA : C ≤ A := inf_le_left
+  have hCcomm : IsMulCommutative C := isMulCommutative_of_le hA.2.1 hCA
+  have hMcent : M ≤ centralizer (C : Set G) := le_centralizer_iff.mp inf_le_right
+  have hMCcomm : IsMulCommutative (M ⊔ C : Subgroup G) :=
+    isMulCommutative_sup_of_le_centralizer hM hCcomm hMcent
+  -- `|A| ≤ |M ⊔ C|`
+  have hcard : Nat.card A ≤ Nat.card ↥(M ⊔ C) := by
+    have h1 : Nat.card A = (C.subgroupOf A).index * Nat.card C := by
+      rw [Subgroup.card_eq_card_quotient_mul_card_subgroup (C.subgroupOf A),
+        ← Subgroup.index_eq_card,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCA).toEquiv]
+    have h2 := index_centralizer_subgroupOf_le_of_elementCommutator
+      (x := x) hA.2.1 hM
+    have h3 : ((centralizer (A : Set G)).subgroupOf M).index
+        = (C.subgroupOf M).index := by
+      congr 1
+      rw [← Subgroup.inf_subgroupOf_left (centralizer (A : Set G)) M,
+        inf_centralizer_eq_of_mem_maxAbelianIn hA hMP hM,
+        Subgroup.inf_subgroupOf_left C M]
+    calc Nat.card A
+        = (C.subgroupOf A).index * Nat.card C := h1
+      _ ≤ (C.subgroupOf M).index * Nat.card C :=
+          Nat.mul_le_mul_right _ (h3 ▸ h2)
+      _ = Nat.card ↥(M ⊔ C) := (card_sup_of_le_centralizer hMcent).symm
+  refine ⟨sup_le hMP (hCA.trans hA.1), hMCcomm, fun B hBP hBcomm => ?_⟩
+  exact (hA.2.2 B hBP hBcomm).trans hcard
+
+/-! ### Gorenstein Thm 2.5 (Thompson Replacement) へ向けた normalizer 部品 -/
+
+/-- 有限群で, `x` との交換子が全て `A` に入るなら `x` は `A` を正規化する
+(`x a x⁻¹ = ⁅x,a⁆ · a`; conj 像が `A` に含まれ位数一致で一致). -/
+theorem mem_normalizer_of_forall_commutatorElement_mem [Finite G]
+    {A : Subgroup G} {x : G} (h : ∀ a ∈ A, ⁅x, a⁆ ∈ A) :
+    x ∈ normalizer (A : Set G) := by
+  have hconj : ∀ a ∈ A, x * a * x⁻¹ ∈ A := by
+    intro a ha
+    have he : x * a * x⁻¹ = ⁅x, a⁆ * a := by group
+    rw [he]
+    exact A.mul_mem (h a ha) ha
+  have hle : A.map (MulAut.conj x).toMonoidHom ≤ A := by
+    rintro - ⟨a, ha, rfl⟩
+    simpa [MulAut.conj_apply] using hconj a ha
+  have heq : A.map (MulAut.conj x).toMonoidHom = A :=
+    eq_of_le_of_card_ge hle
+      (le_of_eq (card_map_of_injective (MulAut.conj x).injective).symm)
+  rw [mem_normalizer_iff]
+  intro h'
+  constructor
+  · intro hh
+    have : (MulAut.conj x) h' ∈ A.map (MulAut.conj x).toMonoidHom :=
+      Subgroup.mem_map_of_mem _ hh
+    rw [heq] at this
+    simpa [MulAut.conj_apply] using this
+  · intro hh
+    have hmem : x * h' * x⁻¹ ∈ A.map (MulAut.conj x).toMonoidHom := heq.symm ▸ hh
+    obtain ⟨a, ha, hae⟩ := Subgroup.mem_map.mp hmem
+    have : a = h' := by
+      have := hae
+      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at this
+      exact mul_left_cancel (mul_right_cancel this)
+    exact this ▸ ha
+
+/-- 2 つの部分群を正規化する元は交わりを正規化する. -/
+theorem mem_normalizer_inf {S T : Subgroup G} {x : G}
+    (hS : x ∈ normalizer (S : Set G)) (hT : x ∈ normalizer (T : Set G)) :
+    x ∈ normalizer ((S ⊓ T : Subgroup G) : Set G) := by
+  rw [mem_normalizer_iff] at hS hT ⊢
+  intro h
+  constructor
+  · rintro ⟨h1, h2⟩
+    exact ⟨(hS h).mp h1, (hT h).mp h2⟩
+  · rintro ⟨h1, h2⟩
+    exact ⟨(hS h).mpr h1, (hT h).mpr h2⟩
+
+/-- `A` の正規化元同士: `x, g ∈ N(A)` なら共役 `x g x⁻¹ ∈ N(A)`. -/
+theorem conj_mem_normalizer {A : Subgroup G} {x g : G}
+    (hx : x ∈ normalizer (A : Set G)) (hg : g ∈ normalizer (A : Set G)) :
+    x * g * x⁻¹ ∈ normalizer (A : Set G) := by
+  rw [mem_normalizer_iff] at hx hg ⊢
+  have hx' : ∀ a, a ∈ A ↔ x⁻¹ * a * x ∈ A := by
+    intro a
+    have h := hx (x⁻¹ * a * x)
+    rw [show x * (x⁻¹ * a * x) * x⁻¹ = a by group] at h
+    exact h.symm
+  intro a
+  rw [show x * g * x⁻¹ * a * (x * g * x⁻¹)⁻¹
+      = x * (g * (x⁻¹ * a * x) * g⁻¹) * x⁻¹ by group]
+  calc a ∈ A
+      ↔ x⁻¹ * a * x ∈ A := hx' a
+    _ ↔ g * (x⁻¹ * a * x) * g⁻¹ ∈ A := hg _
+    _ ↔ x * (g * (x⁻¹ * a * x) * g⁻¹) * x⁻¹ ∈ A := hx _
+
+/-- `A` を正規化する元は `N(A)` も正規化する. -/
+theorem mem_normalizer_normalizer {A : Subgroup G} {x : G}
+    (hx : x ∈ normalizer (A : Set G)) :
+    x ∈ normalizer ((normalizer (A : Set G) : Subgroup G) : Set G) := by
+  rw [mem_normalizer_iff]
+  intro g
+  constructor
+  · intro hg
+    exact conj_mem_normalizer hx hg
+  · intro hg
+    have hxinv : x⁻¹ ∈ normalizer (A : Set G) :=
+      (normalizer (A : Set G)).inv_mem hx
+    have hconj := conj_mem_normalizer hxinv hg
+    rwa [show x⁻¹ * (x * g * x⁻¹) * x⁻¹⁻¹ = g by group] at hconj
+
+/-- **Thm 2.5 の中心元選択** (Gorenstein pp. 272: `N = N_B(A) ⊴ AB` で
+`B/N ∩ Z(AB/N) ≠ 1`): 有限 p-群 `P` 内で `A` が abelian `B` を正規化し `B` が
+`A` を正規化しないとき, `x ∈ B − N_B(A)` で全交換子 `⁅x,a⁆` (`a ∈ A`) が
+`N_B(A) = B ⊓ N(A)` に入るものが存在する.
+
+商 `AB/N` の中心と `B/N` の交わりの非自明元 (`IsPGroup.normal_inf_center_nontrivial`)
+を持ち上げる. -/
+theorem exists_commutatorElement_mem_inf_normalizer [Finite G] {p : ℕ} [Fact p.Prime]
+    {P A B : Subgroup G} (hP : IsPGroup p ↥P)
+    (hAP : A ≤ P) (hBP : B ≤ P) (hBcomm : IsMulCommutative B)
+    (hAnB : A ≤ normalizer (B : Set G)) (hBnA : ¬ B ≤ normalizer (A : Set G)) :
+    ∃ x ∈ B, x ∉ normalizer (A : Set G) ∧
+      ∀ a ∈ A, ⁅x, a⁆ ∈ B ⊓ normalizer (A : Set G) := by
+  classical
+  set N : Subgroup G := B ⊓ normalizer (A : Set G) with hNdef
+  set H : Subgroup G := A ⊔ B with hHdef
+  -- `H = AB` は `N` と `B` を正規化する
+  have hB_norm_N : B ≤ normalizer (N : Set G) :=
+    (le_centralizer_iff.mpr (inf_le_left.trans
+      (le_centralizer_iff_isMulCommutative.mpr hBcomm))).trans (centralizer_le_normalizer _)
+  have hA_norm_N : A ≤ normalizer (N : Set G) := fun a ha =>
+    mem_normalizer_inf (hAnB ha) (mem_normalizer_normalizer (le_normalizer ha))
+  have hH_norm_N : H ≤ normalizer (N : Set G) := sup_le hA_norm_N hB_norm_N
+  have hH_norm_B : H ≤ normalizer (B : Set G) := sup_le hAnB le_normalizer
+  haveI hNn : (N.subgroupOf H).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer hH_norm_N
+  haveI hBn : (B.subgroupOf H).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer hH_norm_B
+  have hHP : H ≤ P := sup_le hAP hBP
+  have hpH : IsPGroup p ↥H :=
+    (hP.to_subgroup (H.subgroupOf P)).of_equiv (Subgroup.subgroupOfEquivOfLe hHP)
+  have hpQ : IsPGroup p (↥H ⧸ N.subgroupOf H) := hpH.to_quotient _
+  set π := QuotientGroup.mk' (N.subgroupOf H) with hπdef
+  set Bbar : Subgroup (↥H ⧸ N.subgroupOf H) := (B.subgroupOf H).map π with hBbardef
+  haveI : Bbar.Normal := hBn.map _ (QuotientGroup.mk'_surjective _)
+  -- `B̄` 非自明 (さもなくば `B ≤ N ≤ N(A)`)
+  have hBbar_ne : Nontrivial ↥Bbar := by
+    by_contra htriv
+    refine hBnA fun b hb => ?_
+    have hbH : b ∈ H := le_sup_right (α := Subgroup G) (a := A) hb
+    have hbin : (⟨b, hbH⟩ : ↥H) ∈ B.subgroupOf H := by
+      rwa [Subgroup.mem_subgroupOf]
+    have hπb : π ⟨b, hbH⟩ ∈ Bbar := Subgroup.mem_map_of_mem _ hbin
+    have hone : π ⟨b, hbH⟩ = 1 := by
+      by_contra hne
+      exact htriv ⟨⟨π ⟨b, hbH⟩, hπb⟩, 1, by simpa using hne⟩
+    have hker : (⟨b, hbH⟩ : ↥H) ∈ N.subgroupOf H := by
+      have := (QuotientGroup.eq_one_iff (⟨b, hbH⟩ : ↥H)).mp hone
+      exact this
+    rw [Subgroup.mem_subgroupOf] at hker
+    exact hker.2
+  -- 中心との交わりから非自明元を取る
+  have hcent := OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial
+    hpQ (N := Bbar) hBbar_ne
+  obtain ⟨⟨z, hz⟩, hzone⟩ := exists_ne (1 : ↥(Bbar ⊓ center (↥H ⧸ N.subgroupOf H)))
+  have hzne : z ≠ 1 := by
+    intro h
+    exact hzone (Subtype.ext h)
+  obtain ⟨bin, hbin, hbz⟩ := Subgroup.mem_map.mp hz.1
+  refine ⟨(bin : G), Subgroup.mem_subgroupOf.mp hbin, ?_, ?_⟩
+  · -- `x ∉ N(A)` (さもなくば `z = 1`)
+    intro hmem
+    have hbinN : bin ∈ N.subgroupOf H := by
+      rw [Subgroup.mem_subgroupOf]
+      exact ⟨Subgroup.mem_subgroupOf.mp hbin, hmem⟩
+    have : π bin = 1 := (QuotientGroup.eq_one_iff bin).mpr hbinN
+    rw [hbz] at this
+    exact hzne this
+  · -- `⁅x, a⁆ ∈ N` (`z` が商の中心に居るので交換子が `ker π` に落ちる)
+    intro a ha
+    have haH : a ∈ H := le_sup_left (α := Subgroup G) (b := B) ha
+    have hcomm : π ⁅bin, (⟨a, haH⟩ : ↥H)⁆ = 1 := by
+      rw [map_commutatorElement, hbz]
+      exact commutatorElement_eq_one_iff_commute.mpr
+        ((Subgroup.mem_center_iff.mp hz.2 (π ⟨a, haH⟩)).symm)
+    have hmem : ⁅bin, (⟨a, haH⟩ : ↥H)⁆ ∈ N.subgroupOf H :=
+      (QuotientGroup.eq_one_iff _).mp hcomm
+    rw [Subgroup.mem_subgroupOf] at hmem
+    have hcoe : ((⁅bin, (⟨a, haH⟩ : ↥H)⁆ : ↥H) : G) = ⁅(bin : G), a⁆ := by
+      simp [commutatorElement_def]
+    rwa [hcoe] at hmem
 
 /-! ### Gorenstein Lemma 2.2: 遺伝性・共変性・characteristic 性 -/
 
