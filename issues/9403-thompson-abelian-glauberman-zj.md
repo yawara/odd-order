@@ -99,6 +99,48 @@ class ≤ 2 の `B` が対象で p odd が効く。Lem 2.8 は独立の帰納補
   で n = 2、Hall–Witt (G Thm 2.2.3(i)) + `B' ≤ Z(P)` で `[x,A]` が全 x ∈ B で
   abelian に落ちる — **p odd はこの Case 2 の (2.13)-(2.15) で使用**、原文精読要)。
 
+#### Thm 2.7 の完全分解 (2026-07-21 原文精読済 mmd L5560-5596)
+
+**core 定理** (P = AB 簡約後、型レベル): 仮定 `⊤ = B ⊔ A`, `B ⊴ G`,
+`hB' : ⁅B,B⁆ ≤ center G`, `hA : A ∈ maxAbelianIn ⊤`, `hBnA : ¬ B ≤ N(A)`,
+`[Finite G]`, `[Group.IsNilpotent G]`, `hodd : Odd (Nat.card G)` (p odd の代替、
+x² = 1 ⟹ x = 1 に使用)。結論 `∃ A* ∈ maxAbelianIn ⊤, A ⊓ B < A* ⊓ B ∧ A* ≤ N(A)`。
+
+- **n**: 最小の正整数で `[B,A;n]` abelian (well-def = iterCommutator_eq_bot_of_
+  isNilpotent_ambient で eventually ⊥ + Nat.find)。
+- **Case 1** (`[B,A;n+1] ≠ ⊥`): r := 最小 `[B,A;r] = ⊥` (r ≥ n+2 ≥ 3)。
+  「∃ x ∈ [B,A;r-3], ¬ A centralizes [x,A]」: さもなくば A が [B,A;r-2] の全生成元
+  ⁅x,a⁆ を中心化 ⟹ [B,A;r-1] = ⊥ ✗ r 最小性 (⁅X,A⁆ = closure of ⁅x,a⁆ 生成元)。
+  M := elementCommutator x A ≤ [B,A;r-2] ≤ [B,A;n] abelian → **Thm 2.4** で
+  A* = M ⊔ C_A(M) ∈ A(⊤)。
+- **Case 2** (`[B,A;n+1] = ⊥`): Lem 2.8(iii) で n ≤ 2; [B,A;2] ≠ ⊥ (**Lem 2.3** の
+  対偶、B not ≤ N(A)) ⟹ n = 2 ⟹ `[B,A;3] = ⊥`。
+  **核心: ∀ x ∈ B, [x,A] abelian** — Hall–Witt (G Thm 2.2.3(i)) を (x, u⁻¹, w = [x,v])
+  で: 各因子が B' ≤ Z 込みで central 化し (2.12) `[x,u,w][u⁻¹,w⁻¹,x] = 1`;
+  (2.13)-(2.16) で mod B' 変形 (G Lem 2.2.5(ii) = 「[x,y] が x,y と可換 ⟹
+  [x,y]⁻¹ = [x⁻¹,y] = [x,y⁻¹]」の鏡映版が新規に必要; 2.5(i) は形式化済
+  commutatorElement_inv_rotate) ⟹ (2.17)(2.18) 対称形 ⟹ `[[x,u],[x,v]]² = 1`
+  ⟹ **hodd で = 1**。x の選択は Case 1 同型 ([B,A] が A を中心化しない)。
+- **共通 wrap-up** (両 case): (α) A∩B ≤ C_A(M): three-subgroup
+  (mathlib `commutator_commutator_eq_bot_of_rotate`): `⁅⁅B,A∩B⁆,A⁆ ≤ ⁅⁅B,B⁆,A⁆ =
+  ⊥` (B' central) + `⁅⁅A∩B,A⁆,A⁆ ≤ ⁅⁅A,A⁆,A⁆ = ⊥` (A abelian) ⟹
+  `⁅⁅A,B⁆,A∩B⁆ = ⊥` ⟹ A∩B centralizes ⁅B,A⁆ ⊇ M。
+  (β) 真性 witness: M ⊄ A (A abelian が M を中心化することになり x-選択に矛盾)。
+  (γ) **A* ≤ N(A)**: `⁅A*,A⁆ ≤ [B,A;r-1]` (Case 2 は [B,A;2]) — 分解 g = c·m
+  (`coe_mul_of_left_le_normalizer_right`、C は M を中心化) で ⁅cm,a⁆ = c⁅m,a⁆c⁻¹
+  (⁅c,a⁆=1、C ≤ A abelian)、⁅m,a⁆ ∈ ⁅[B,A;r-2],A⁆ = [B,A;r-1] は **A-正規**
+  (le_normalizer_iterCommutator) ゆえ c-共役で閉じる ⟹
+  `⁅⁅A*,A⁆,A⁆ ≤ [B,A;r] = ⊥` ⟹ **Lem 2.3** で A* ≤ N(A)。
+  ⟹ helper `commutator_sup_le_of_centralizer` として一般化して実装する。
+- **wrapper** (subgroup-level P): Q := A ⊔ B ≤ P で core を ↥Q に instantiate。
+  A(Q) ⊆ A(P) (maxAbelianIn_subset_of_le、A₀ := A)。B' ≤ Z(J_a(P)) 仮定からの
+  `B' ≤ Z(Q)` 導出: Z(J_a(P)) ≤ A (Lem 2.1: Z(J) centralizes A ≤ J_a ⟹
+  ∈ ⊤ ⊓ centralizer A = A) ⟹ B' ≤ A ⟹ A centralizes B' (A abelian)、
+  B centralizes B' (class ≤ 2 = hB'B : ⁅B,B⁆ ≤ centralizer B) ⟹ Q = A ⊔ B ≤
+  centralizer B' ⟹ B' ≤ Z(Q)。type-level への transport (subgroupOf 往復) が
+  plumbing の主コスト — maxAbelianIn の subtype-transport は
+  thompsonJAbelian_map_of_injective の key_comap/key_map パターンを流用。
+
 #### ✅ (旧記録) Lem 2.8(ii) + [B,A;i] 部品 (2026-07-21): `[B,A;i]` = 既存
 `Isaacs.Ch04.iterCommutator B A i` を再利用。`le_normalizer_commutator_right` /
 `le_normalizer_iterCommutator` / `iterCommutator_succ_le` (= (ii)) /
