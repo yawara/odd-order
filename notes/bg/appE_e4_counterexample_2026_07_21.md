@@ -158,11 +158,9 @@ GPT の clean Lemma は「dc≥1 ⟺ 2-step centralizer 一致」の同値の gr
    - ✅ **Tier 1 (Lie 環レベル) = 完了** (`OddOrder/BG/AppE_FiliformCounterexample.lean`、
      下記セクション参照)。反例の数学的核心 (Jacobi・fpf・中心化群構造・(E.23) の破れ) を
      機械検証済。残る散文ギャップは Lazard 対応 (class 5 < p、古典定理) のみ。
-   - ⬜ **Tier 2 (群レベル) = 低優先繰延** (恒久対象外にはしない): `S = Exp(L)` を
-     iterated `SemidirectProduct` (mathlib) で構築し `RegularOperatorSetup` を実 instantiate、
-     repo の E.4 statement そのものの否定を証明する。結合法則は semidirect 構成で無料になる
-     設計 (BCH 直書きの associativity 山を回避)。coordinates of the second kind の
-     多項式群法則を sympy で導出 → 各検証は少変数多項式恒等式。推定 3-6 sessions。
+   - ✅ **Tier 2 (群レベル) = 完了 (2026-07-21、issue 3027)**: 当初の semidirect 案でなく
+     **直接多項式法則** (rescale `diag(1,1,2,12,24,720)` で整数係数化した truncated BCH、
+     全恒等式が素の `ring` で閉じる) を採用。下記セクション参照。
    - **corrected E.4 の健全性は反例の正否に依存しない** (仮説追加は定理を弱めるだけ) という
      非対称性は不変 — Tier 2 は erratum 公表時の確度向上が主目的。
 5. **エラータ報告はユーザー判断事項** (外向き action)。Glauberman (Chicago) 存命。
@@ -221,3 +219,32 @@ mathlib import のみの自己完結 leaf。`V = Fin 6 → ZMod 197` 上の明�
 = **Lean 検証済**、(ii) 印刷文の転記 = PDF ページ画像で照合済、(iii) Lie→群の Lazard 転送
 = 未形式化の古典定理 (class < p)、の 3 点に分解され、実質的な誤りリスクは (iii) の適用ミス
 のみに局所化された。(iii) も潰すのが Tier 2 (上記)。
+
+## ✅ 2026-07-21: Tier 2 完了 — printed E.4 の否定を Lean で証明 (issue 3027)
+
+Lazard 転送の散文ギャップも消え、**「BG 印刷版 E.4 は偽」が repo の E.4 statement
+そのものの否定として機械検証された**。leaf 2 枚 (いずれも green・axiom-clean・
+AxiomsCheck 登録済・OddOrder.lean 配線済):
+
+1. **`OddOrder/BG/AppE_FiliformGroup.lean`** (WP2-4): `V = Fin 6 → ZMod 197` 上の
+   rescaled truncated BCH 法則 `gmul` で群 `Q6` を実構築 (`Group.ofLeftAxioms`、
+   assoc は整数係数多項式恒等式 = `ring`)。`|S|=197⁶`、exponent 197 (`co_pow`)、
+   Z(S) = e₅-line、**C_S(⟨v⟩) = ⟨v⟩ ⊔ ⟨e₅⟩** (E.3 の narrow 仮説)、Z₂(S) = e₄–e₅ 平面、
+   **T = C_S(Z₂(S)) = {x₀=0} 非可換** (bg·e2g ≠ e2g·bg)。β の MulAut 化 + 
+   `act : Multiplicative (ZMod 49) →* MulAut Q6` + fpf (`act_regular`) +
+   A = ⟨ofAdd 7⟩ が R₀ 固定 / B は非固定。
+   - 証明技法メモ: Z₂ 下界は **`plane_mul_comm`** (平面元 x に対し
+     `x * y = ⟨(-30·x₄·y₀)•e₅⟩ * (y * x)`、中心補正を**左に**置く) で
+     ⁅x,y⁆ = 補正 が `mul_inv_cancel_right` 一発になり、4 重 BCH 展開を完全回避。
+     上界は ⁅x, a⁆/⁅x, b⁆ ∈ e₅-line の座標 2..4 から linear_combination で三角 solve。
+2. **`OddOrder/BG/AppE_FiliformRefutation.lean`** (WP5): 
+   **`q6Setup : RegularOperatorSetup Q6 (Multiplicative (ZMod 49)) 197 7`** (全 field
+   実データ、opaque/sorry 無し)、`Ω₁(S) = ⊤`、`197⁴ ≤ |Ω₁(S)|`、comap 転送
+   (`Subgroup.comap_upperCentralSeries` + `MulEquiv.subgroupCongr`+`topEquiv`)、
+   `q6_centralizer_not_mulCommutative`、**headline `printed_propE4_false`**:
+   sorried `RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p` と
+   同形の全称文 (universe 0) の否定。
+
+**確度の 3 分解は 2 点に縮んだ**: (i) 反例の実在+全仮説成立 = Lean 検証済 (群レベル)、
+(ii) 印刷文転記 = PDF 画像照合済。(iii) Lazard 転送は**不要になった** (群を直接構築)。
+残作業: corrected E.4 (hdc 追加版) の証明 = issue 9402 (別トラック)。

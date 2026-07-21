@@ -125,3 +125,25 @@ GPT-5.6 Sol Pro + 親計算検証で **dc≥1 は E.4 の印刷仮説から従�
   dc 同値)。clean Lemma = この同値の形式化 (群レベル、iterCommutator + Hall–Witt; Lie ring 不要)。
 - E.4 側の hdc は **2-step centralizer 形** (`∀ a, ⁅H_a,T⁆ ≤ H_{a+2}`) で statement に足す
   (consumer 直結)。詳細正本 = `notes/bg/appE_e4_counterexample_2026_07_21.md` §形式化方針。
+
+## 2026-07-21 (lane c): Tier 2 完了 → 本 issue が次 frontier。E.4-hdc 組立の入口
+
+**Tier 2 (issue 3027) landing 済** — `printed_propE4_false` (AppE_FiliformRefutation.lean) で
+「印刷版 E.4 は偽」が repo statement の否定として機械検証された。⟹ 残りは本 issue の
+**corrected E.4** (優先) + clean Lemma。
+
+### E.4-hdc 組立の実測入口 (2026-07-21 調査済)
+
+- **abelian-clause engine は証明済・sorry-free**:
+  `RegularOperatorSetup.commutator_centralizer_eq_bot_of_beta_supply`
+  (`AppE_EigenvalueCombinatorics.lean:860`)。⚠ 同 file の `grep sorry` 1 件は docstring 汚染
+  (L618「all sorry-free」) で実 sorry は 0。
+- engine の入力: α 側 chain data (`hr`/`hr₀`/`hr0r`/`hrq`/`hr1`)、`σβ` + **`hβsupply`** (= E.23 形)、
+  `t,t₀` unit + `t₀ ≠ t`。供給側 (E.19)/(E.20)/(E.21) 両半は `AppE_AbelianCentralizer.lean`
+  に sorry-free で存在 (L114/L522/L652)。
+- **残作業** = (1) E.4 statement (`AppE_FurtherResults.lean:1645`) に `hdc` (2-step centralizer 形
+  `∀ a, ⁅H_a, T⁆ ≤ H_{a+2}`) を追加、(2) `hdc` → `hβsupply` を `caseA_eigenvalue_step`
+  (`AppE_EigenvalueCombinatorics.lean:787`) + `caseB_excluded` (L766) の帰納で構成、
+  (3) α/β 固有値データを (E.19)-(E.22) pieces から実引数化、(4) engine に投入。
+  index-p clause は無条件のまま (証明済 scaffold)。
+- 組立レシピの正本 = issue 3021 (43)/(51)/(52) 節。

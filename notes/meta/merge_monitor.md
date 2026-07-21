@@ -898,6 +898,26 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 13:15 (tick #4、Fable hub cron `067d5c59`) — ✅ b + c 合流、census 9 不変、push 済**:
+  **b** = Higman Lemma 12 B case shear 正規化 + packaged inclusion の actor-eigenvalue 法則
+  (CaseSplitBCD +218 行、merge `2840d769e`、issue 2048)。**c** = BG App.E corrected (E.23) β-supply —
+  hdc から全 level の eigenvalue scaling を帰納構成 (新 leaf `AppE_BetaSupply.lean` 138 行、
+  c 自身が OddOrder.lean 配線済、merge `a4f9d6d90`、issue 9402)。**a** = 未マージ 0 (transcript は
+  13:10 更新 = 生存、次項目作業中)。gate = build **4585 jobs green (22s, +1 = 新 module)**、
+  新 leaf 実 elaborate 確認、AxiomsCheck OK、orphan 0 (869/869)、census 9 不変、新 axiom なし、逸脱なし。
+  レーン生存 3 点 OK。
+- **2026-07-21 13:05 (tick #3、Fable hub 新セッション — ユーザー「各レーンを監視します」) — ✅ 中断 tick 復旧 + a/b/c 3 レーン合流、sorry 11→9、push 済**:
+  前 hub セッション (cron `2d2c6f61`) は tick #3 の途中で死亡していた — **a の FeitSibley merge
+  `5567b0e63` (未 push 8 commits) を作った後、b の merge 途中 (MERGE_HEAD=`f49de9f3c`、staged index
+  が b 内容と完全一致) で切断**。`git merge --abort` で復旧し b の現 tip から合流し直した (成果損失ゼロ)。
+  **a** = FeitSibley Lemma 2(a)+2(b) 完全証明 (issue 1051/1052 close、sorry 11→9; FeitSibley 所有 =
+  裁定 9204 の a carve-out で非逸脱)。**b** = Higman Lemma 12 dispatch 第2+3層 + anisotropy bridge
+  (新 leaf CaseDispatch 544 行、merge `1e94d631c`)。**c** = ⭐ BG App.E E.4 Tier 2 完了 —
+  **printed Prop E.4 の否定を Lean で証明** (新 leaf AppE_FiliformRefutation 165 行、issue 3027 close、
+  merge `2b390fc4a`)。gate = build **4584 jobs green (21s)**、新 leaf 4 本の実 elaborate を log で確認、
+  AxiomsCheck OK (再ビルド 4.1s green)、orphan 0 (868/868)、census 9 (= FurtherResults 2 +
+  FeitSibley 2 + NearFields 1 + Suzuki2Groups 4)、新 axiom なし。レーン生存 3 点 OK (a/b/c 全稼働)。
+  cron は session-only ゆえ消滅済 → 本セッションで再作成 (30 分 `13,43`、Fable model default 踏襲)。
 - **2026-07-21 12:20 (tick #2、Fable hub cron `2d2c6f61`) — ✅ c + b 合流 (2 pass)、census 11 不変、push 済 (`66914abc8..b4c23c7e6`)**:
   **c** = App.E E.4 Tier 2 WP3 — Q₆ Lazard 群の部分群層 (AppE_FiliformGroup 195→480 行、issue 3027)、
   merge `e5b0c2e48`、build 4581 jobs green。**b** = tick 中の live commit (12:15) を 2nd pass で回収:

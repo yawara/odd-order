@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.BG.AppE_FiliformCounterexample
 import Mathlib.Algebra.Group.MinimalAxioms
 import Mathlib.Algebra.Group.Subgroup.ZPowers.Basic
+import Mathlib.Data.ZMod.QuotientGroup
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.PGroup
 import Mathlib.Tactic.LinearCombination
@@ -50,7 +51,7 @@ against `gmul`.
 
 namespace OddOrder.BG.AppE.Filiform
 
-open scoped commutatorElement
+open scoped commutatorElement Pointwise
 
 /-! ### The (rescaled) truncated BCH group law -/
 
@@ -476,5 +477,148 @@ theorem centralizer_upperCentralSeries_two_not_abelian :
     mem_centralizer_upperCentralSeries_two_iff.mpr (by decide)
   have := habel.is_comm.comm ⟨bg, hb⟩ ⟨e2g, he⟩
   exact bg_e2g_not_commute (by simpa [Subtype.ext_iff] using this)
+
+/-! ### The `C₄₉`-operator action: `βAut` and `act` -/
+
+/-- `β` respects the BCH law: the weight grading of every monomial of `gmul` is exact
+(`1+8 = 9`, `8+9 = 17`, `8+17 = 25`, `1+25 = 26`, `9+17 = 26`), so conjugating each
+coordinate by its `ζ`-weight passes through the multiplication. -/
+theorem gmul_beta (x y : V) : gmul (β x) (β y) = β (gmul x y) := by
+  funext k
+  fin_cases k <;> simp [gmul, β, w] <;> ring
+
+/-- `β` as a group automorphism of the Lazard group `S`, with inverse `β⁴⁸`. -/
+def βAut : MulAut Q6 where
+  toFun x := ⟨β x.co⟩
+  invFun x := ⟨β^[48] x.co⟩
+  left_inv x := Q6.ext (by
+    calc β^[48] (β x.co) = β^[49] x.co := (Function.iterate_succ_apply β 48 x.co).symm
+    _ = x.co := by rw [beta_iterate_card]; rfl)
+  right_inv x := Q6.ext (by
+    calc β (β^[48] x.co) = β^[49] x.co := (Function.iterate_succ_apply' β 48 x.co).symm
+    _ = x.co := by rw [beta_iterate_card]; rfl)
+  map_mul' x y := Q6.ext (gmul_beta x.co y.co).symm
+
+@[simp] theorem βAut_apply (x : Q6) : βAut x = ⟨β x.co⟩ := rfl
+
+theorem βAut_pow_apply (n : ℕ) (x : Q6) : (βAut ^ n) x = ⟨β^[n] x.co⟩ := by
+  induction n generalizing x with
+  | zero => rfl
+  | succ n ih =>
+    rw [pow_succ, MulAut.mul_apply, βAut_apply, ih, ← Function.iterate_succ_apply]
+
+/-- `βAut` has order dividing `49` (together with `act_regular` below, exactly `49`). -/
+theorem βAut_pow_49 : βAut ^ 49 = 1 := by
+  ext x
+  rw [βAut_pow_apply, beta_iterate_card]
+  rfl
+
+/-- The operator action of `B ≅ C₄₉` (spelled `Multiplicative (ZMod 49)`) on `S`:
+`n ↦ βⁿ`.  This is the field `RegularOperatorSetup.act` of the E.3/E.4 setup. -/
+def act : Multiplicative (ZMod 49) →* MulAut Q6 where
+  toFun n := βAut ^ n.toAdd.val
+  map_one' := by
+    show βAut ^ (0 : ZMod 49).val = 1
+    rw [ZMod.val_zero, pow_zero]
+  map_mul' a b := by
+    show βAut ^ (a.toAdd + b.toAdd).val = βAut ^ a.toAdd.val * βAut ^ b.toAdd.val
+    rw [ZMod.val_add, ← pow_eq_pow_mod _ βAut_pow_49, pow_add]
+
+@[simp] theorem act_apply (n : Multiplicative (ZMod 49)) :
+    act n = βAut ^ n.toAdd.val := rfl
+
+/-- **`B` acts regularly on `S`**: every nontrivial element of `C₄₉` acts without
+nonidentity fixed points (all six `β`-weights are units mod `49`).  This covers both
+the `A_regular` field of the setup and Proposition E.4's `hB_regular`. -/
+theorem act_regular (b : Multiplicative (ZMod 49)) (hb : b ≠ 1) (x : Q6)
+    (hfix : act b x = x) : x = 1 := by
+  have hval1 : 1 ≤ b.toAdd.val := by
+    rcases Nat.eq_zero_or_pos b.toAdd.val with h0 | h1
+    · exact absurd (toAdd_eq_zero.mp ((ZMod.val_eq_zero _).mp h0)) hb
+    · exact h1
+  have hval48 : b.toAdd.val ≤ 48 := by
+    have := ZMod.val_lt b.toAdd
+    omega
+  have hco : β^[b.toAdd.val] x.co = x.co := by
+    have h' := congrArg Q6.co hfix
+    rwa [act_apply, βAut_pow_apply] at h'
+  exact Q6.ext (by rw [beta_iterate_fixed_eq_zero hval1 hval48 hco]; rfl)
+
+/-- `β^[m]` commutes with scalars (it is diagonal). -/
+theorem beta_iterate_smul (m : ℕ) (c : K) (x : V) : β^[m] (c • x) = c • β^[m] x := by
+  funext i
+  simp only [beta_iterate_apply, Pi.smul_apply, smul_eq_mul]
+  ring
+
+/-- `α = β⁷` fixes `R₀ = ⟨vg⟩` setwise (it is the scalar `ζ⁷` on the line `K·v`). -/
+theorem βAut_pow_seven_smul_zpowers_vg :
+    (βAut ^ 7) • Subgroup.zpowers vg = Subgroup.zpowers vg := by
+  have h49 : zeta ^ 42 * zeta ^ 7 = 1 := by decide
+  ext x
+  rw [Subgroup.mem_smul_pointwise_iff_exists]
+  constructor
+  · rintro ⟨s, hs, rfl⟩
+    obtain ⟨c, hc⟩ := mem_zpowers_vg_iff.mp hs
+    refine mem_zpowers_vg_iff.mpr ⟨c * zeta ^ 7, ?_⟩
+    rw [MulAut.smul_def, βAut_pow_apply]
+    show β^[7] s.co = (c * zeta ^ 7) • v
+    rw [hc, beta_iterate_smul, alpha_smul_v, smul_smul]
+  · intro hx
+    obtain ⟨c, hc⟩ := mem_zpowers_vg_iff.mp hx
+    refine ⟨⟨(zeta ^ 42 * c) • v⟩, mem_zpowers_vg_iff.mpr ⟨zeta ^ 42 * c, rfl⟩, ?_⟩
+    rw [MulAut.smul_def, βAut_pow_apply]
+    refine Q6.ext ?_
+    show β^[7] ((zeta ^ 42 * c) • v) = x.co
+    rw [beta_iterate_smul, alpha_smul_v, smul_smul, hc]
+    congr 1
+    linear_combination c * h49
+
+/-- **`A = ⟨(ofAdd 7)⟩` fixes `R₀` setwise** — the field
+`RegularOperatorSetup.A_fixes_R₀`. -/
+theorem act_A_fixes_zpowers_vg :
+    ∀ a ∈ Subgroup.zpowers (Multiplicative.ofAdd (7 : ZMod 49)),
+      (act a) • Subgroup.zpowers vg = Subgroup.zpowers vg := by
+  intro a ha
+  obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp ha
+  rw [map_zpow]
+  have h7 : act (Multiplicative.ofAdd (7 : ZMod 49)) = βAut ^ 7 := by
+    show βAut ^ (7 : ZMod 49).val = βAut ^ 7
+    norm_num [show (7 : ZMod 49).val = 7 by decide]
+  rw [h7]
+  exact MulAction.mem_stabilizer_iff.mp
+    (Subgroup.zpow_mem _ (MulAction.mem_stabilizer_iff.mpr βAut_pow_seven_smul_zpowers_vg) k)
+
+/-- **`B` does not fix `R₀`** — Proposition E.4's hypothesis `hB_not_fixes`:
+already `β` itself moves the line `K·v` (`β v = (ζ, ζ⁸, 0, …)` is not proportional
+to `v` since `ζ⁷ ≠ 1`). -/
+theorem act_not_fixes_zpowers_vg :
+    ¬ ∀ b : Multiplicative (ZMod 49),
+        (act b) • Subgroup.zpowers vg = Subgroup.zpowers vg := by
+  intro h
+  have h1 : act (Multiplicative.ofAdd (1 : ZMod 49)) = βAut := by
+    show βAut ^ (1 : ZMod 49).val = βAut
+    rw [show (1 : ZMod 49).val = 1 by decide, pow_one]
+  have hmem : βAut • vg ∈ βAut • Subgroup.zpowers vg :=
+    Subgroup.smul_mem_pointwise_smul vg _ _ (Subgroup.mem_zpowers vg)
+  rw [← h1, h (Multiplicative.ofAdd (1 : ZMod 49)), h1] at hmem
+  obtain ⟨s, hs⟩ := mem_zpowers_vg_iff.mp hmem
+  exact beta_not_fixes_v ⟨s, by simpa [MulAut.smul_def] using hs⟩
+
+/-! ### Cardinalities of the distinguished subgroups -/
+
+/-- `|R₀| = 197 = p`. -/
+theorem card_zpowers_vg : Nat.card ↥(Subgroup.zpowers vg) = 197 := by
+  rw [Nat.card_zpowers, orderOf_vg]
+
+/-- `|R₁| = 197` (in particular `R₁ ≠ 1`; it is cyclic by construction). -/
+theorem card_zpowers_e5g : Nat.card ↥(Subgroup.zpowers e5g) = 197 := by
+  rw [Nat.card_zpowers, orderOf_e5g]
+
+/-- `|A| = 7 = q` for `A = ⟨(ofAdd 7)⟩ ≤ C₄₉`. -/
+theorem card_zpowers_ofAdd_seven :
+    Nat.card ↥(Subgroup.zpowers (Multiplicative.ofAdd (7 : ZMod 49))) = 7 := by
+  haveI : Fact (Nat.Prime 7) := ⟨by norm_num⟩
+  rw [Nat.card_zpowers]
+  exact orderOf_eq_prime (by decide) (by decide)
 
 end OddOrder.BG.AppE.Filiform
