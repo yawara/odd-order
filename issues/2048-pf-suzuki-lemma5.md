@@ -180,6 +180,14 @@ Appendix III Theorem (d),(e) の `K`-module 分解・type-B 同値・有限体�
   - [ ] Higman Lemmas 10--12 (pp. 87--92) の分類終端から
         `Agemo Z(Q) 2 1 = ⊥`、従って `Z(Q) = Q₀` を証明し、同時に
         actual two-summand split を構成する
+    - [x] B/C/D model の中心 exponent 2 (`ModelCenters.lean`, `37b78e57b`):
+          twisted product の mem_center_iff + polarization radical 自明性
+          (B/C は初等、D は Dedekind 自己同型独立 3 項) + equivModel transport
+    - [x] `center_sq_eq_one_of_xiLengthThree` (`08fb9d018`):
+          分類と接続し ξ-length 3 で ∀ z ∈ Z(P), z² = 1
+    - [ ] 残り: CenterHomocyclic の同値 (`Agemo Z(Q) 2 1 = ⊥` 形) へ接続して
+          Z(Q) = Q₀ を Lemma 5 の設定で結論し、xiLengthThreeTypeAFactorData
+          から OrderQModuleSplit (HigmanDE.lean) を実構成する
     - [x] Higman Lemma 10: characteristic `2` の proper odd-degree
           finite field extensionで、任意の `r : ℤ`, `ε` に対する非零 `α` と
           `Tr(α · Frob^r(α) · ε) = 0` を構成する
