@@ -14,6 +14,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.SquareCosetFiber
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.KSubgroupOrbit
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ActualQuotientAction
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
 
 /-!
 # Peterfalvi Appendix III: On Suzuki 2-Groups
