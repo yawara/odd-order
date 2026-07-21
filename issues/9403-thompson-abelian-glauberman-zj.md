@@ -112,8 +112,40 @@ class ≤ 2 の `B` が対象で p odd が効く。Lem 2.8 は独立の帰納補
   (2.19) = z² = 1 + hodd (`∀ g, g² = 1 → g = 1` 形で受理)。
 - core は n := Nat.find (最小 abelian 正添字) で case 分岐。
 
-**残り (ZJ まで) — 2026-07-21 原文精読完了 (pdftotext L15282-15355; mmd は
-p.298 が MISSING でそちらを使う)**:
+#### ✅ Thm 2.10 (Glauberman) 完全証明 (2026-07-21, commits 7301fdd22 / 74547340e / ed87b2fbe)
+
+`inf_zCenter_thompsonJAbelian_normal` sorry-free / **axiom-clean 確認済**
+(propext, Classical.choice, Quot.sound)。GlaubermanZJ.lean ≈ 620 行。
+
+- step (c) 後半 `le_sSupNormalNormalizing_of_isPStableOp`: C=C_G(B) ≤ L (最大性) +
+  IsPStableOp + `map_opCore_le_opCore_of_surjective` (O_p の全射転送、新規) で
+  AL/L ≤ O_p(G/L) = ⊥ ⟹ A ≤ L。
+- step (d) `normalClosure_le_zCenter_thompsonJAbelian_inf`: A が A(P⊓L) の witness →
+  J_a(P⊓L) ≤ J_a(P)、W ≤ X、Frattini + `normalClosure_le_of_sup_normalizer_eq_top`
+  (g = n·l 分解の一般補題、新規) で B ≤ X。副産物: ThompsonSubgroupAbelian に
+  `zCenter_thompsonJAbelian_le_of_mem_maxAbelianIn` (Lem 2.1 系 2、
+  glauberman_replacement の local have を public 抽出) +
+  `isMulCommutative_centralizer_inf`。
+- 組立 `inf_zCenter_thompsonJAbelian_normal_of_card_le`: |B| ≤ n 帰納。
+  B₁ := normalClosure(Z⊓B) < B なら IH 転送 / B₁ = B なら B' < B に IH
+  (`commutator_lt_of_isPGroup_ne_bot`、新規: 冪零→可解→commutator_lt_of_ne_bot の
+  subtype 転送) → step (a) → J_a(P) ≤ P⊓L なら step (b) で結論 / さもなくば
+  (c)(d)(e) で矛盾 (A₁ ⊄ L を |A₁⊓B| 最大選択、Thompson replacement、X ≤ A*)。
+
+#### 次 = Thm 2.11 (ZJ 定理) — 原文 pdftotext L15347-15363 精読済
+
+1. **O_p'(G) = 1 ケース** (BG 側 consumer が使う形): `Z(J_a(P)) ⊴ G`。
+   部品 = **G Thm 8.1.3**「p-constrained + O_p'(G)=1 ⟹ P の正規 abelian 部分群
+   A ≤ O_p(G)」(repo 対応 = Isaacs Ch07
+   `centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot` 系を実測して接続;
+   p-constraint の repo 形も同時に確定)。Z(J_a(P)) ⊴ P abelian
+   (`le_normalizer_zCenter_thompsonJAbelian` + `isMulCommutative_centralizer_inf`)
+   ⟹ Z ≤ O_p(G) =: B ⟹ Thm 2.10 で Z = Z ⊓ B ⊴ G。
+2. **一般形** `G = O_p'(G)·N_G(Z(J_a(P)))`: G/O_p' への簡約 (G Thm 1.1(ii)+1.3.7)。
+   quotient を跨ぐ J_a 転送 (`thompsonJAbelian_map_of_injective` は単射版のみ —
+   O_p' が p'-群なので P ≅ P·O_p'/O_p' の同型経由で転送) が plumbing の主コスト。
+
+**残り (旧計画メモ; 原文 pdftotext L15282-15355; mmd は p.298 が MISSING)**:
 
 1. **subgroup-level Thm 2.7 wrapper**: 仮定 = P ≤ N(B) (B ⊴ P), hclass2 :
    ⁅B,B⁆ ≤ centralizer B (class ≤ 2), hBZJ : ⁅B,B⁆ ≤ Z(J_a(P))-encoding,

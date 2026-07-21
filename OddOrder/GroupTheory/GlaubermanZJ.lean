@@ -83,21 +83,6 @@ theorem commutator_normalClosure_le {B W T : Subgroup G}
   rw [mem_comap, mem_centralizer_iff] at hmem
   exact (hmem (QuotientGroup.mk' T b) (mem_map_of_mem _ hb)).symm
 
-/-- **Gorenstein Theorem 2.10** (Glauberman): `G` 有限, `p` 奇素数,
-`G` が群論的に `p`-stable (`IsPStableOp`), `B ⊴ G` が `p`-部分群,
-`P ∈ Syl_p(G)` とすると, `B ⊓ Z(J_a(P)) ⊴ G`
-(`Z(J_a(P))` は `C_G(J_a(P)) ⊓ J_a(P)` で符号化).
-
-証明 (pdftotext L15282-15340, 最小反例帰納) は issue 9403 の分解 (a)-(e).
-現状は honest statement + sorry (組立は次段; sorried-cite で下流 Thm 2.11 と
-BG Thm 6.2 hZJ の組立を先行させる). -/
-theorem inf_zCenter_thompsonJAbelian_normal [Finite G] {p : ℕ} [Fact p.Prime]
-    (hp2 : p ≠ 2) (hstable : IsPStableOp p G)
-    (P : Sylow p G) {B : Subgroup G} [B.Normal] (hB : IsPGroup p ↥B) :
-    (B ⊓ (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
-      ⊓ thompsonJAbelian (P : Subgroup G))).Normal := by
-  sorry
-
 /-- conj で固定される部分群への normalizer membership. -/
 theorem mem_normalizer_of_map_conj_eq {H : Subgroup G} {g : G}
     (h : H.map (MulAut.conj g).toMonoidHom = H) : g ∈ normalizer (H : Set G) := by
@@ -318,6 +303,501 @@ theorem opCore_quotient_sSupNormalNormalizing_eq_bot [Finite G] {p : ℕ} [Fact 
   obtain ⟨k, hk, rfl⟩ := mem_map.mp hx
   rw [Subgroup.mem_bot]
   exact (QuotientGroup.eq_one_iff _).mpr (hKL hk)
+
+open OddOrder.Isaacs.Ch01 in
+/-- **`O_p` の全射転送**: `f : G →* H` 全射なら `(O_p(G)).map f ≤ O_p(H)`
+(像は正規 `p`-部分群ゆえ Isaacs Problem 1B.2 の最大性で吸収される). -/
+theorem map_opCore_le_opCore_of_surjective {H : Type*} [Group H] [Finite H]
+    {p : ℕ} [Fact p.Prime] {f : G →* H} (hf : Function.Surjective f) :
+    (opCore p G).map f ≤ opCore p H := by
+  haveI : ((opCore p G).map f).Normal := Subgroup.Normal.map (opCore.normal p G) f hf
+  exact normal_pgroup_le_opCore ((opCore_isPGroup p G).map f)
+
+open OddOrder.Isaacs.Ch01 in
+/-- **Thm 2.10 step (c) 後半** (Gorenstein p. 278-279): `G` が `p`-stable,
+`B ⊴ G` `p`-部分群, `W ≤ B`, `P ≤ N(W)`, `A ∈ A(P)` で `⁅⁅B,A⁆,A⁆ = ⊥` なら
+`A ≤ L := sSupNormalNormalizing W`.
+
+論法: `C := C_G(B)` は `W ≤ B` を中心化するので `C ≤ N(W)`, `C ⊴ G`
+(mathlib `normal_centralizer`) ⟹ `L` の最大性で `C ≤ L`. p-stability で
+`AC/C ≤ O_p(G/C)`; 全射 `G/C → G/L` で `AL/L ≤ O_p(G/L) = ⊥` (step (c) 前半)
+⟹ `A ≤ L`. -/
+theorem le_sSupNormalNormalizing_of_isPStableOp [Finite G] {p : ℕ} [Fact p.Prime]
+    (hstable : IsPStableOp p G) (P : Sylow p G)
+    {B W A : Subgroup G} [B.Normal] (hB : IsPGroup p ↥B)
+    (hWB : W ≤ B) (hPW : (P : Subgroup G) ≤ normalizer (W : Set G))
+    (hA : A ∈ maxAbelianIn (P : Subgroup G))
+    (hBAA : ⁅⁅B, A⁆, A⁆ = ⊥) :
+    A ≤ sSupNormalNormalizing W := by
+  haveI := sSupNormalNormalizing_normal W
+  -- `C := C_G(B) ≤ L` (正規 + `W` を中心化 ⟹ 正規化).
+  have hCL : centralizer (B : Set G) ≤ sSupNormalNormalizing W :=
+    le_sSupNormalNormalizing inferInstance
+      ((centralizer_le (SetLike.coe_subset_coe.mpr hWB)).trans
+        (centralizer_le_normalizer _))
+  -- p-stability の適用: `A` の `G/C` での像は `O_p(G/C)`.
+  have hApgroup : IsPGroup p ↥A :=
+    P.isPGroup'.of_injective (Subgroup.inclusion hA.1) (Subgroup.inclusion_injective _)
+  have hstab := hstable B A ‹B.Normal› hB hApgroup hBAA
+  -- 全射 `φ : G/C → G/L` で転送.
+  set φ : G ⧸ centralizer (B : Set G) →* G ⧸ sSupNormalNormalizing W :=
+    QuotientGroup.map _ _ (MonoidHom.id G) (fun x hx => hCL hx) with hφdef
+  have hcomp : φ.comp (QuotientGroup.mk' (centralizer (B : Set G)))
+      = QuotientGroup.mk' (sSupNormalNormalizing W) := by
+    ext x
+    simp [hφdef]
+  have hφsurj : Function.Surjective φ := by
+    intro y
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective (sSupNormalNormalizing W) y
+    exact ⟨QuotientGroup.mk' _ x, by rw [← MonoidHom.comp_apply, hcomp]⟩
+  have hmapL : A.map (QuotientGroup.mk' (sSupNormalNormalizing W))
+      ≤ opCore p (G ⧸ sSupNormalNormalizing W) := by
+    calc A.map (QuotientGroup.mk' (sSupNormalNormalizing W))
+        = (A.map (QuotientGroup.mk' (centralizer (B : Set G)))).map φ := by
+          rw [Subgroup.map_map, hcomp]
+      _ ≤ (opCore p (G ⧸ centralizer (B : Set G))).map φ := Subgroup.map_mono hstab
+      _ ≤ opCore p (G ⧸ sSupNormalNormalizing W) :=
+          map_opCore_le_opCore_of_surjective hφsurj
+  have hbot : A.map (QuotientGroup.mk' (sSupNormalNormalizing W)) = ⊥ :=
+    le_bot_iff.mp (hmapL.trans_eq
+      (opCore_quotient_sSupNormalNormalizing_eq_bot P hPW))
+  intro a ha
+  have h1 : QuotientGroup.mk' (sSupNormalNormalizing W) a ∈
+      A.map (QuotientGroup.mk' (sSupNormalNormalizing W)) := mem_map_of_mem _ ha
+  rw [hbot, Subgroup.mem_bot] at h1
+  exact (QuotientGroup.eq_one_iff a).mp h1
+
+/-! ### Thm 2.10 step (d): `B = normalClosure (Z ⊓ B) ≤ Z(J_a(P ⊓ L))` -/
+
+/-- **Frattini 分解による normal closure の吸収**: `L ⊔ N(X) = ⊤`, `L ⊴ G`,
+`L ≤ N(W)`, `W ≤ X` なら `normalClosure W ≤ X`
+(`g = n·l` 分解で `W^g = (W^l)^n = W^n ≤ X^n = X`). -/
+theorem normalClosure_le_of_sup_normalizer_eq_top {L W X : Subgroup G} [L.Normal]
+    (hsup : L ⊔ normalizer (X : Set G) = ⊤)
+    (hLW : L ≤ normalizer (W : Set G)) (hWX : W ≤ X) :
+    normalClosure (W : Set G) ≤ X := by
+  refine (closure_le X).mpr ?_
+  intro a ha
+  rw [Group.mem_conjugatesOfSet_iff] at ha
+  obtain ⟨b, hb, hconj⟩ := ha
+  obtain ⟨c, rfl⟩ := isConj_iff.mp hconj
+  have hctop : c ∈ ((normalizer (X : Set G) : Subgroup G) : Set G) * (L : Set G) := by
+    rw [← Subgroup.mul_normal]
+    show c ∈ ((normalizer (X : Set G) ⊔ L : Subgroup G) : Set G)
+    rw [sup_comm, hsup]
+    exact Subgroup.mem_top c
+  rw [Set.mem_mul] at hctop
+  obtain ⟨n, hn, l, hl, rfl⟩ := hctop
+  have hbW : l * b * l⁻¹ ∈ W := (mem_normalizer_iff.mp (hLW hl) b).mp hb
+  have hbX : n * (l * b * l⁻¹) * n⁻¹ ∈ X :=
+    (mem_normalizer_iff.mp hn _).mp (hWX hbW)
+  have heq : n * l * b * (n * l)⁻¹ = n * (l * b * l⁻¹) * n⁻¹ := by group
+  rw [SetLike.mem_coe, heq]
+  exact hbX
+
+/-- **Thm 2.10 step (d)** (Gorenstein p. 279): `W ≤ Z(J_a(P))`, `A ∈ A(P)`,
+`A ≤ L := sSupNormalNormalizing W` なら `normalClosure W ≤ X := Z(J_a(P ⊓ L))`
+(Thm 2.10 では `W = Z ⊓ B`, `B = normalClosure W` に適用して **`B` abelian** を得る).
+
+`A ≤ P ⊓ L` が `A(P⊓L)` の witness になり `J_a(P⊓L) ≤ J_a(P)` (Lem 2.2(a));
+`W ≤ Z(J_a(P)) ≤ A ≤ J_a(P⊓L)` (Lem 2.1 系 2) と `W ≤ C(J_a(P)) ≤ C(J_a(P⊓L))` で
+`W ≤ X`; Frattini `G = L·N(J_a(P⊓L))` (Thm 1.3.7/1.3.8) + `N(J_a) ≤ N(X)` +
+`L ≤ N(W)` で normal closure が `X` に吸収される. -/
+theorem normalClosure_le_zCenter_thompsonJAbelian_inf [Finite G] {p : ℕ}
+    [Fact p.Prime] (P : Sylow p G) {W A : Subgroup G}
+    (hWZ : W ≤ centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+      ⊓ thompsonJAbelian (P : Subgroup G))
+    (hA : A ∈ maxAbelianIn (P : Subgroup G))
+    (hAL : A ≤ sSupNormalNormalizing W) :
+    normalClosure (W : Set G)
+      ≤ centralizer
+          ((thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W)) : Set G)
+        ⊓ thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W) := by
+  haveI := sSupNormalNormalizing_normal W
+  have hAPL : A ≤ (P : Subgroup G) ⊓ sSupNormalNormalizing W := le_inf hA.1 hAL
+  have hAin : A ∈ maxAbelianIn ((P : Subgroup G) ⊓ sSupNormalNormalizing W) :=
+    ⟨hAPL, hA.2.1, fun B' hB' hB'comm => hA.2.2 B' (hB'.trans inf_le_left) hB'comm⟩
+  have hJle : thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W)
+      ≤ thompsonJAbelian (P : Subgroup G) :=
+    thompsonJAbelian_le_of_le inf_le_left hA hAPL
+  have hWX : W ≤ centralizer
+      ((thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W)) : Set G)
+      ⊓ thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W) :=
+    le_inf
+      ((hWZ.trans inf_le_left).trans
+        (centralizer_le (SetLike.coe_subset_coe.mpr hJle)))
+      ((hWZ.trans (zCenter_thompsonJAbelian_le_of_mem_maxAbelianIn hA)).trans
+        (le_thompsonJAbelian_of_mem_maxAbelianIn hAin))
+  obtain ⟨Q, hQ⟩ := exists_sylow_inf_of_normal P (sSupNormalNormalizing W)
+  have hfr := frattini_normalizer_thompsonJAbelian Q
+  have hmap : ((Q : Subgroup ↥(sSupNormalNormalizing W)).map
+      (sSupNormalNormalizing W).subtype)
+      = (P : Subgroup G) ⊓ sSupNormalNormalizing W := by
+    rw [hQ, subgroupOf_map_subtype]
+    exact inf_eq_left.mpr inf_le_right
+  rw [hmap] at hfr
+  have hsup : sSupNormalNormalizing W
+      ⊔ normalizer ((centralizer
+          ((thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W)) : Set G)
+        ⊓ thompsonJAbelian ((P : Subgroup G) ⊓ sSupNormalNormalizing W)
+          : Subgroup G) : Set G) = ⊤ := by
+    rw [eq_top_iff, ← hfr]
+    refine sup_le_sup_left (fun g hg => ?_) _
+    exact mem_normalizer_inf (mem_normalizer_centralizer hg) hg
+  exact normalClosure_le_of_sup_normalizer_eq_top hsup
+    (sSupNormalNormalizing_le_normalizer W) hWX
+
+/-! ### Thm 2.10 の組立: 最小反例帰納 + step (e) の最終矛盾 -/
+
+/-- 有限 `p`-群の非自明部分群は完全でない: `B ≠ ⊥` なら `⁅B,B⁆ < B`
+(`↥B` は冪零 ⟹ 可解で, 可解群の交換子部分群は真に下がる). -/
+theorem commutator_lt_of_isPGroup_ne_bot [Finite G] {p : ℕ} [Fact p.Prime]
+    {B : Subgroup G} (hB : IsPGroup p ↥B) (hne : B ≠ ⊥) : ⁅B, B⁆ < B := by
+  haveI : Group.IsNilpotent ↥B := hB.isNilpotent
+  haveI : Nontrivial ↥B := (nontrivial_iff_ne_bot B).mpr hne
+  have hlt : ⁅(⊤ : Subgroup ↥B), (⊤ : Subgroup ↥B)⁆ < ⊤ :=
+    IsSolvable.commutator_lt_of_ne_bot top_ne_bot
+  have hmaplt : Subgroup.map B.subtype ⁅(⊤ : Subgroup ↥B), (⊤ : Subgroup ↥B)⁆
+      < Subgroup.map B.subtype (⊤ : Subgroup ↥B) :=
+    lt_of_le_of_ne (Subgroup.map_mono hlt.le)
+      (fun h => hlt.ne (Subgroup.map_injective B.subtype_injective h))
+  have hmap : Subgroup.map B.subtype ⁅(⊤ : Subgroup ↥B), (⊤ : Subgroup ↥B)⁆
+      = ⁅B, B⁆ := by
+    rw [Subgroup.map_commutator, ← MonoidHom.range_eq_map, B.range_subtype]
+  have htop : Subgroup.map B.subtype (⊤ : Subgroup ↥B) = B := by
+    rw [← MonoidHom.range_eq_map, B.range_subtype]
+  rwa [hmap, htop] at hmaplt
+
+open OddOrder.Isaacs.Ch01 in
+/-- **Gorenstein Theorem 2.10 の帰納 engine** (card 有界版): `|B| ≤ n` 上の帰納で
+Thm 2.10 を証明する. 本体は `inf_zCenter_thompsonJAbelian_normal` を使うこと.
+
+構成 (Gorenstein pp. 277-279):
+* `B = ⊥` は自明. `B₁ := normalClosure (Z ⊓ B) < B` なら帰納法 (`Z ⊓ B₁ = Z ⊓ B`).
+* `B₁ = B` のとき: `B' := ⁅B,B⁆ < B` に帰納法で `(Z ⊓ B') ⊴ G` → **step (a)** で
+  `B' ≤ Z(J_a(P))` + `cl(B) ≤ 2`.
+* `J_a(P) ≤ P ⊓ L` (`L := sSupNormalNormalizing (Z ⊓ B)`) なら **step (b)**:
+  Lem 2.2 で `J_a(P⊓L) = J_a(P)`, Frattini `G = L·N(J_a(P))` と
+  `N(J_a(P)) ≤ N(Z ⊓ B)`, `L ≤ N(Z ⊓ B)` で `Z ⊓ B ⊴ G` — 結論成立.
+* さもなくば **steps (c)(d)(e)** で矛盾: Thm 2.9 の `A` は step (c) で `A ≤ L`,
+  step (d) で `B ≤ X := Z(J_a(P⊓L))` (特に `B` abelian); `J_a(P) ⊄ P⊓L` から
+  `A₁ ∈ A(P)`, `A₁ ⊄ L` を `|A₁ ⊓ B|` 最大で選ぶと `⁅⁅B,A₁⁆,A₁⁆ ≠ ⊥`
+  (さもなくば (c) で `A₁ ≤ L`), Lem 2.3 で `¬ B ≤ N(A₁)`, **Thompson replacement**
+  (Thm 2.5, `B` abelian) の `A*` は最大性で `A* ≤ L` ⟹ `X ≤ A*` (Lem 2.1 系 2) ⟹
+  `⁅⁅B,A₁⁆,A₁⁆ ≤ ⁅⁅A*,A₁⁆,A₁⁆ ≤ ⁅A₁,A₁⁆ = ⊥` 矛盾. -/
+theorem inf_zCenter_thompsonJAbelian_normal_of_card_le [Finite G] {p : ℕ}
+    [Fact p.Prime] (hp2 : p ≠ 2) (hstable : IsPStableOp p G) (P : Sylow p G) :
+    ∀ n : ℕ, ∀ B : Subgroup G, Nat.card ↥B ≤ n → B.Normal → IsPGroup p ↥B →
+      (B ⊓ (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+        ⊓ thompsonJAbelian (P : Subgroup G))).Normal := by
+  intro n
+  induction n with
+  | zero =>
+    intro B hcard _ _
+    exact absurd (Nat.le_zero.mp hcard) Nat.card_pos.ne'
+  | succ n IH =>
+    intro B hcard hBnorm hB
+    haveI := hBnorm
+    rcases eq_or_ne B ⊥ with rfl | hBne
+    · rw [bot_inf_eq]
+      infer_instance
+    -- `B₁ := normalClosure (Z ⊓ B)`
+    rcases (eq_or_ne (normalClosure (((centralizer
+        ((thompsonJAbelian (P : Subgroup G)) : Set G)
+        ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B : Subgroup G) : Set G)) B).symm with
+      hB₁ne | hBcl
+    · -- `B₁ < B`: 帰納法で `(B₁ ⊓ Z) ⊴ G`, `Z ⊓ B₁ = Z ⊓ B` で転送.
+      have hB₁B : normalClosure (((centralizer
+          ((thompsonJAbelian (P : Subgroup G)) : Set G)
+          ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B : Subgroup G) : Set G) ≤ B :=
+        normalClosure_le_normal (SetLike.coe_subset_coe.mpr inf_le_right)
+      have hcardlt : Nat.card ↥(normalClosure (((centralizer
+          ((thompsonJAbelian (P : Subgroup G)) : Set G)
+          ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B : Subgroup G) : Set G))
+          < Nat.card ↥B :=
+        lt_of_le_of_ne (Subgroup.card_le_of_le hB₁B)
+          (fun h => hB₁ne (eq_of_le_of_card_ge hB₁B h.ge))
+      have hres := IH _ (by omega) Subgroup.normalClosure_normal (hB.to_le hB₁B)
+      have hZeq : (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+            ⊓ thompsonJAbelian (P : Subgroup G))
+          ⊓ normalClosure (((centralizer
+            ((thompsonJAbelian (P : Subgroup G)) : Set G)
+            ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B : Subgroup G) : Set G)
+          = (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+            ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B := by
+        refine le_antisymm (inf_le_inf_left _ hB₁B) (le_inf inf_le_left le_normalClosure)
+      have hgoal : B ⊓ (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+            ⊓ thompsonJAbelian (P : Subgroup G))
+          = normalClosure (((centralizer
+            ((thompsonJAbelian (P : Subgroup G)) : Set G)
+            ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B : Subgroup G) : Set G)
+          ⊓ (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+            ⊓ thompsonJAbelian (P : Subgroup G)) :=
+        calc B ⊓ (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+              ⊓ thompsonJAbelian (P : Subgroup G))
+            = (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+              ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B := inf_comm _ _
+          _ = (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+                ⊓ thompsonJAbelian (P : Subgroup G))
+              ⊓ normalClosure (((centralizer
+                ((thompsonJAbelian (P : Subgroup G)) : Set G)
+                ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B : Subgroup G) : Set G) :=
+            hZeq.symm
+          _ = normalClosure (((centralizer
+                ((thompsonJAbelian (P : Subgroup G)) : Set G)
+                ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B : Subgroup G) : Set G)
+              ⊓ (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+                ⊓ thompsonJAbelian (P : Subgroup G)) := inf_comm _ _
+      rw [hgoal]
+      exact hres
+    · -- `B = normalClosure (Z ⊓ B)` (Gorenstein の最小反例状況).
+      replace hBcl := hBcl.symm
+      have hBP : B ≤ (P : Subgroup G) :=
+        (normal_pgroup_le_opCore hB).trans (opCore_le P)
+      -- step (a) の instance 前提: `(Z ⊓ B') ⊴ G` (帰納法, `B' < B`).
+      have hB'lt : ⁅B, B⁆ < B := commutator_lt_of_isPGroup_ne_bot hB hBne
+      have hcardlt : Nat.card ↥(⁅B, B⁆ : Subgroup G) < Nat.card ↥B :=
+        lt_of_le_of_ne (Subgroup.card_le_of_le hB'lt.le)
+          (fun h => hB'lt.ne (eq_of_le_of_card_ge hB'lt.le h.ge))
+      have hresB' := IH ⁅B, B⁆ (by omega) inferInstance (hB.to_le hB'lt.le)
+      haveI hZB'norm : ((centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+          ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ ⁅B, B⁆).Normal := by
+        rwa [inf_comm] at hresB'
+      -- step (a): `B' ≤ Z(J_a(P))`, `B' ≤ C(B)`.
+      obtain ⟨hB'Z, hB'CB⟩ :=
+        commutator_le_zCenter_and_centralizer_of_normalClosure_eq hBP hBcl
+      -- `L := sSupNormalNormalizing (Z ⊓ B)` の準備.
+      haveI := sSupNormalNormalizing_normal ((centralizer
+        ((thompsonJAbelian (P : Subgroup G)) : Set G)
+        ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B)
+      have hPW : (P : Subgroup G) ≤ normalizer (((centralizer
+          ((thompsonJAbelian (P : Subgroup G)) : Set G)
+          ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B : Subgroup G) : Set G) := by
+        intro g hg
+        refine mem_normalizer_inf (le_normalizer_zCenter_thompsonJAbelian _ hg) ?_
+        rw [normalizer_eq_top]
+        exact mem_top g
+      by_cases hJPL : thompsonJAbelian (P : Subgroup G)
+          ≤ (P : Subgroup G) ⊓ sSupNormalNormalizing ((centralizer
+            ((thompsonJAbelian (P : Subgroup G)) : Set G)
+            ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B)
+      · -- step (b): `J_a(P) ≤ P ⊓ L` なら結論成立.
+        obtain ⟨Q, hQ⟩ := exists_sylow_inf_of_normal P (sSupNormalNormalizing
+          ((centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+            ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B))
+        have hfr := frattini_normalizer_thompsonJAbelian Q
+        have hmapQ : ((Q : Subgroup ↥(sSupNormalNormalizing ((centralizer
+            ((thompsonJAbelian (P : Subgroup G)) : Set G)
+            ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B))).map
+              (sSupNormalNormalizing ((centralizer
+                ((thompsonJAbelian (P : Subgroup G)) : Set G)
+                ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B)).subtype)
+            = (P : Subgroup G) ⊓ sSupNormalNormalizing ((centralizer
+              ((thompsonJAbelian (P : Subgroup G)) : Set G)
+              ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B) := by
+          rw [hQ, subgroupOf_map_subtype]
+          exact inf_eq_left.mpr inf_le_right
+        rw [hmapQ, thompsonJAbelian_eq_of_le_of_le hJPL inf_le_left] at hfr
+        have hNJW : normalizer ((thompsonJAbelian (P : Subgroup G) : Subgroup G) : Set G)
+            ≤ normalizer (((centralizer
+              ((thompsonJAbelian (P : Subgroup G)) : Set G)
+              ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B : Subgroup G) : Set G) := by
+          intro g hg
+          refine mem_normalizer_inf
+            (mem_normalizer_inf (mem_normalizer_centralizer hg) hg) ?_
+          rw [normalizer_eq_top]
+          exact mem_top g
+        have htop : normalizer (((centralizer
+            ((thompsonJAbelian (P : Subgroup G)) : Set G)
+            ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B : Subgroup G) : Set G) = ⊤ := by
+          rw [eq_top_iff, ← hfr]
+          exact sup_le (sSupNormalNormalizing_le_normalizer _) hNJW
+        have hWnorm := normalizer_eq_top_iff.mp htop
+        rw [inf_comm B]
+        exact hWnorm
+      · -- steps (c)(d)(e): `J_a(P) ⊄ P ⊓ L` から矛盾.
+        exfalso
+        have hPnB : (P : Subgroup G) ≤ normalizer (B : Set G) := by
+          intro g _
+          rw [normalizer_eq_top]
+          exact mem_top g
+        -- Thm 2.9 の `A` と step (c).
+        obtain ⟨A, hA, hBNA⟩ := exists_mem_maxAbelianIn_normalizer_of_class_two
+          hp2 P.isPGroup' hBP hPnB hB'CB hB'Z
+        have hBAA : ⁅⁅B, A⁆, A⁆ = ⊥ :=
+          (le_normalizer_iff_commutator_commutator_eq_bot_of_mem_maxAbelianIn
+            hA hBP).mp hBNA
+        have hAL := le_sSupNormalNormalizing_of_isPStableOp hstable P hB
+          inf_le_right hPW hA hBAA
+        -- step (d): `B ≤ X := Z(J_a(P⊓L))`.
+        have hBX : B ≤ centralizer ((thompsonJAbelian ((P : Subgroup G)
+              ⊓ sSupNormalNormalizing ((centralizer
+                ((thompsonJAbelian (P : Subgroup G)) : Set G)
+                ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B))) : Set G)
+            ⊓ thompsonJAbelian ((P : Subgroup G)
+              ⊓ sSupNormalNormalizing ((centralizer
+                ((thompsonJAbelian (P : Subgroup G)) : Set G)
+                ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B)) := by
+          have h1 := normalClosure_le_zCenter_thompsonJAbelian_inf P
+            inf_le_left hA hAL
+          rwa [← hBcl] at h1
+        have hBcomm : IsMulCommutative B :=
+          isMulCommutative_of_le (isMulCommutative_centralizer_inf _) hBX
+        -- どの `A₁ ⊄ L` も `⁅⁅B,A₁⁆,A₁⁆ ≠ ⊥` (さもなくば step (c) で `A₁ ≤ L`).
+        have hkey : ∀ A₁ ∈ maxAbelianIn (P : Subgroup G),
+            ¬ A₁ ≤ sSupNormalNormalizing ((centralizer
+              ((thompsonJAbelian (P : Subgroup G)) : Set G)
+              ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B) →
+            ⁅⁅B, A₁⁆, A₁⁆ ≠ ⊥ :=
+          fun A₁ hA₁ hnle hbot => hnle
+            (le_sSupNormalNormalizing_of_isPStableOp hstable P hB
+              inf_le_right hPW hA₁ hbot)
+        -- `A₁ ⊄ L` の存在 (`J_a(P) ⊄ P⊓L` から).
+        have hA₁ex : ∃ A₁, A₁ ∈ maxAbelianIn (P : Subgroup G) ∧
+            ¬ A₁ ≤ sSupNormalNormalizing ((centralizer
+              ((thompsonJAbelian (P : Subgroup G)) : Set G)
+              ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B) := by
+          by_contra hall
+          push Not at hall
+          exact hJPL (iSup_le fun A' => iSup_le fun hA' =>
+            le_inf hA'.1 (hall A' hA'))
+        -- `|A₁ ⊓ B|` 最大の `A₁` を選ぶ.
+        obtain ⟨A₁, hA₁S, hA₁max⟩ := Set.exists_max_image
+          {A' : Subgroup G | A' ∈ maxAbelianIn (P : Subgroup G) ∧
+            ¬ A' ≤ sSupNormalNormalizing ((centralizer
+              ((thompsonJAbelian (P : Subgroup G)) : Set G)
+              ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B)}
+          (fun A' => Nat.card ↥(A' ⊓ B))
+          (Set.finite_univ.subset fun _ _ => Set.mem_univ _) hA₁ex
+        obtain ⟨hA₁, hA₁nL⟩ := hA₁S
+        have hBnA₁ : ¬ B ≤ normalizer (A₁ : Set G) := fun hle =>
+          hkey A₁ hA₁ hA₁nL
+            ((le_normalizer_iff_commutator_commutator_eq_bot_of_mem_maxAbelianIn
+              hA₁ hBP).mp hle)
+        -- Thompson replacement (Thm 2.5, `B` abelian).
+        obtain ⟨Astar, hAstar, hltAB, hAstarNA₁⟩ := thompson_replacement
+          P.isPGroup' hA₁ hBP hBcomm (hA₁.1.trans hPnB) hBnA₁
+        -- 最大性から `A* ≤ L`.
+        have hAstarL : Astar ≤ sSupNormalNormalizing ((centralizer
+            ((thompsonJAbelian (P : Subgroup G)) : Set G)
+            ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B) := by
+          by_contra hnle
+          exact hltAB.ne (eq_of_le_of_card_ge hltAB.le
+            (hA₁max Astar ⟨hAstar, hnle⟩))
+        -- `X ≤ A*` (Lem 2.1 系 2 in `P ⊓ L`).
+        have hAstarPL : Astar ≤ (P : Subgroup G)
+            ⊓ sSupNormalNormalizing ((centralizer
+              ((thompsonJAbelian (P : Subgroup G)) : Set G)
+              ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B) :=
+          le_inf hAstar.1 hAstarL
+        have hAstarIn : Astar ∈ maxAbelianIn ((P : Subgroup G)
+            ⊓ sSupNormalNormalizing ((centralizer
+              ((thompsonJAbelian (P : Subgroup G)) : Set G)
+              ⊓ thompsonJAbelian (P : Subgroup G)) ⊓ B)) :=
+          ⟨hAstarPL, hAstar.2.1,
+            fun B' hB' hB'c => hAstar.2.2 B' (hB'.trans inf_le_left) hB'c⟩
+        have hBAstar : B ≤ Astar :=
+          hBX.trans (zCenter_thompsonJAbelian_le_of_mem_maxAbelianIn hAstarIn)
+        -- step (e) の最終矛盾.
+        have hfin : ⁅⁅B, A₁⁆, A₁⁆ ≤ ⊥ :=
+          calc ⁅⁅B, A₁⁆, A₁⁆
+              ≤ ⁅⁅Astar, A₁⁆, A₁⁆ :=
+                commutator_mono (commutator_mono hBAstar le_rfl) le_rfl
+            _ ≤ ⁅A₁, A₁⁆ :=
+                commutator_mono ((commutator_comm Astar A₁).trans_le
+                  (le_normalizer_iff_commutator_le_left.mp hAstarNA₁)) le_rfl
+            _ = ⊥ := commutator_eq_bot_iff_le_centralizer.mpr
+                (le_centralizer_iff_isMulCommutative.mpr hA₁.2.1)
+        exact hkey A₁ hA₁ hA₁nL (le_bot_iff.mp hfin)
+
+/-- **Gorenstein Theorem 2.10** (Glauberman): `G` 有限, `p` 奇素数,
+`G` が群論的に `p`-stable (`IsPStableOp`), `B ⊴ G` が `p`-部分群,
+`P ∈ Syl_p(G)` とすると, `B ⊓ Z(J_a(P)) ⊴ G`
+(`Z(J_a(P))` は `C_G(J_a(P)) ⊓ J_a(P)` で符号化). Issue 9403. -/
+theorem inf_zCenter_thompsonJAbelian_normal [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp2 : p ≠ 2) (hstable : IsPStableOp p G)
+    (P : Sylow p G) {B : Subgroup G} [B.Normal] (hB : IsPGroup p ↥B) :
+    (B ⊓ (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+      ⊓ thompsonJAbelian (P : Subgroup G))).Normal :=
+  inf_zCenter_thompsonJAbelian_normal_of_card_le hp2 hstable P
+    (Nat.card ↥B) B le_rfl ‹B.Normal› hB
+
+/-! ### Thm 2.11 (Glauberman の `Z(J)`-定理), `O_{p'}(G) = 1` 形 -/
+
+open OddOrder.Isaacs.Ch01 in
+/-- **Gorenstein Theorem 1.3 (Ch.8 §1) の `O_{p'}(G) = 1` 形**: `G` が p-stable
+(`IsPStableOp`) かつ p-constrained (`O_{p'} = 1` の下では `C_G(O_p(G)) ≤ O_p(G)`
+に落ちる), `P ∈ Syl_p(G)`, `A ⊴ P` abelian なら `A ≤ O_p(G)`.
+
+証明 (p. 270 の簡約): `Q := O_p(G) ≤ P ≤ N(A)` と `A` abelian で
+`⁅⁅Q,A⁆,A⁆ = ⊥` ⟹ p-stability で `AC/C ≤ O_p(G/C)` (`C := C_G(Q)`);
+p-constraint で `C ≤ Q` は `p`-群 ⟹ `O_p(G/C)` の逆像 `K₀` は正規 `p`-部分群
+(`IsPGroup.comap_of_ker_isPGroup`) ⟹ `A ≤ K₀ ≤ O_p(G)`. -/
+theorem le_opCore_of_normal_abelian_of_isPStableOp [Finite G] {p : ℕ}
+    [Fact p.Prime] (hstable : IsPStableOp p G)
+    (hconstr : centralizer ((opCore p G : Subgroup G) : Set G) ≤ opCore p G)
+    (P : Sylow p G) {A : Subgroup G} (hAP : A ≤ (P : Subgroup G))
+    (hPnA : (P : Subgroup G) ≤ normalizer (A : Set G))
+    (hAcomm : IsMulCommutative A) :
+    A ≤ opCore p G := by
+  have hQA : ⁅⁅opCore p G, A⁆, A⁆ = ⊥ := by
+    have h1 : ⁅opCore p G, A⁆ ≤ A := by
+      rw [commutator_comm]
+      exact le_normalizer_iff_commutator_le_left.mp ((opCore_le P).trans hPnA)
+    have h2 : ⁅A, A⁆ = ⊥ := commutator_eq_bot_iff_le_centralizer.mpr
+      (le_centralizer_iff_isMulCommutative.mpr hAcomm)
+    exact le_bot_iff.mp (h2 ▸ commutator_mono h1 le_rfl)
+  have hAp : IsPGroup p ↥A := P.isPGroup'.to_le hAP
+  have hstab := hstable (opCore p G) A (opCore.normal p G)
+    (opCore_isPGroup p G) hAp hQA
+  have hCp : IsPGroup p ↥(centralizer ((opCore p G : Subgroup G) : Set G)) :=
+    (opCore_isPGroup p G).to_le hconstr
+  have hker : IsPGroup p
+      (QuotientGroup.mk' (centralizer ((opCore p G : Subgroup G) : Set G))).ker := by
+    rw [QuotientGroup.ker_mk']
+    exact hCp
+  have hK₀ : IsPGroup p
+      ↥((opCore p (G ⧸ centralizer ((opCore p G : Subgroup G) : Set G))).comap
+        (QuotientGroup.mk' (centralizer ((opCore p G : Subgroup G) : Set G)))) :=
+    IsPGroup.comap_of_ker_isPGroup (opCore_isPGroup p _) _ hker
+  haveI : ((opCore p (G ⧸ centralizer ((opCore p G : Subgroup G) : Set G))).comap
+      (QuotientGroup.mk' (centralizer ((opCore p G : Subgroup G) : Set G)))).Normal :=
+    Subgroup.normal_comap _
+  have hK₀le := normal_pgroup_le_opCore hK₀
+  intro a ha
+  refine hK₀le ?_
+  rw [mem_comap]
+  exact hstab (mem_map_of_mem _ ha)
+
+open OddOrder.Isaacs.Ch01 in
+/-- **Gorenstein Theorem 2.11 (Glauberman の `Z(J)`-定理) — `O_{p'}(G) = 1` 形**:
+`G` 有限, `p` 奇素数, `G` が p-stable (`IsPStableOp`) かつ p-constrained
+(`O_{p'}(G) = 1` の下での形 `C_G(O_p(G)) ≤ O_p(G)`), `P ∈ Syl_p(G)` なら
+`Z(J_a(P)) ⊴ G`.
+
+証明 (p. 279): `Z(J_a(P))` は `P` の正規 abelian 部分群なので Thm 1.3 で
+`Z ≤ O_p(G) =: B`; Thm 2.10 で `Z = B ⊓ Z ⊴ G`. 一般形
+`G = O_{p'}(G)·N_G(Z(J(P)))` は `G/O_{p'}` への簡約で本定理に帰着する (別途). -/
+theorem zCenter_thompsonJAbelian_normal [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp2 : p ≠ 2) (hstable : IsPStableOp p G)
+    (hconstr : centralizer ((opCore p G : Subgroup G) : Set G) ≤ opCore p G)
+    (P : Sylow p G) :
+    (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+      ⊓ thompsonJAbelian (P : Subgroup G)).Normal := by
+  have hZB : centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+      ⊓ thompsonJAbelian (P : Subgroup G) ≤ opCore p G :=
+    le_opCore_of_normal_abelian_of_isPStableOp hstable hconstr P
+      (inf_le_right.trans (thompsonJAbelian_le _))
+      (le_normalizer_zCenter_thompsonJAbelian _)
+      (isMulCommutative_centralizer_inf _)
+  have h210 := inf_zCenter_thompsonJAbelian_normal hp2 hstable P
+    (B := opCore p G) (opCore_isPGroup p G)
+  have heq : opCore p G
+      ⊓ (centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+        ⊓ thompsonJAbelian (P : Subgroup G))
+      = centralizer ((thompsonJAbelian (P : Subgroup G)) : Set G)
+        ⊓ thompsonJAbelian (P : Subgroup G) := inf_eq_right.mpr hZB
+  rwa [heq] at h210
 
 end Subgroup
 
