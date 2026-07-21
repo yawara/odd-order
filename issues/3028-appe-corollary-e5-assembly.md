@@ -217,3 +217,19 @@ R∩E₀ cyclic (Prop 3.9、regular on N_σ)。これが setup の R₁/centrali
 
 setup フィールド対応: centralizer_eq = 2 (subgroupOf ↥O_p 化)、R₁_cyclic = 4、
 R₀_disjoint_R₁ = 2、R₁_ne_bot = 5。
+
+## 2026-07-21 WP3 ✅ + WP4 前半 ✅ (commits f3047221c / a5f5b90bf / 3e4ac514e / 7a2496198 / 3e9d5856b)
+
+- `e5_centralizer_decomposition` = **(E.31)** ✅ (12.7(d) E₀ + mul_normal 分解 + 12.7(c)
+  regular + Prop 3.9 cyclic)
+- `e5Setup` = **RegularOperatorSetup (O_p(M), K₁, E) 構成** ✅ (term-mode structure literal、
+  ⚠ tactic-def だと data 射影が簡約せず E.4 適用不能 — refactor 済、rfl 射影補題付き)
+- `exists_normal_abelian_index_prime_of_card_le_cube` = WP4(a) (|S| ≤ p³ は (ii) 違反)
+- `e5_normal_abelian_of_not_fixes` = **WP4(b1)**: corrected E.4 が e5Setup に発火、
+  ¬fixes → (ii) 否定の witness (T = C_S(Z₂S) char→normal)
+
+**残 WP4(b2)**: (ii)∧hdc ⟹ (i) 最終束ね — hcard4 (WP4(a) 対偶) → by_contra で b1 →
+∀b fixes → E ≤ N_G(⟨x⟩) ≤ N (hNxN は仮説、最終組立で ℳ(C_G(x))={N} + G simple から) →
+E = E⊓N = K₁ → derivedInG M = M_σ (Msigma_le_derived + M⧸Mσ' card k prime cyclic abelian
+→ commutator ≤ Mσ') → index = k prime。
+**残 WP5**: counting (E.33)/(E.34) — 新 sibling leaf に置く (本 leaf 1137 行)。

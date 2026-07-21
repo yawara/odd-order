@@ -898,6 +898,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 ## 現状メモ
 
+- **2026-07-21 15:15 (tick #8、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、census 7 不変、push 済**:
+  **a** = FeitSibley Theorem 反例抽出 3 部作の合成 `exists_counterexample_of_not_coherent` +
+  反例中核補題 (失敗 adjoin ⟹ Σm² ≤ 2a) + 共役対分解 (pairUnion 構成) + scaled-diff A-support
+  (FeitSibleyTheorem +355 行、merge 1本目、issue 1054)。**b** = ⭐ ξ-length-3 橋渡し完成 —
+  `hasXiLengthThree_of_card_eq_cube` (新 leaf `XiLengthFromCard.lean` 719 行、親 leaf 配線済) +
+  既約 middle quotient 排除 + Frobenius 固定 Singer 生成元の次数制限 (issue 2048)。**c** =
+  ⭐ E.5 **(E.31) 証明** — C_{O_p(M)}(x) = ⟨x⟩ × R₁ (R₁ cyclic) + **WP3 完了**
+  (RegularOperatorSetup 構成) + WP4(a) 小 p-群の (ii) 破り (AppE_CorollaryE5 +406 行、issue 3028)。
+  gate = build **4592 jobs green (18s, +1 = 新 leaf 実 elaborate 確認)**、AxiomsCheck OK、
+  orphan 0 (876/876)、census 7 不変、新 axiom なし、逸脱なし。レーン生存 3 点 OK。
 - **2026-07-21 14:45 (tick #7、Fable hub cron `067d5c59`) — ✅ a + b + c 3 レーン合流、census 7 不変、push 済**:
   **a** = FeitSibley Theorem reduction (1) 部品 — 2-kernel 度数二乗和 counting / f.p.f. 下界
   (d∣|Z|−1, |Z|≥2d+1) / d∣χ(1) 度数補題 / SsetOf 反変単調性 (FeitSibleyTheorem +284 行、
