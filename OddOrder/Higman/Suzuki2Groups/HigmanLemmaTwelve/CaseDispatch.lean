@@ -648,6 +648,18 @@ theorem shearRescaleLinearEquiv_apply {n : ℕ} (ρ t : GaloisField 2 n)
 
 /-! ### Higman pp. 91--92: the type-C and type-D `ε` conditions -/
 
+/-- **Higman p. 90, the type-B `ε` (single-monomial case).**  Anisotropy of
+the decomposed square form with the diagonal mixed monomial `c₀ · α · φ(β)`
+is exactly Peterfalvi's condition on `ε = c₀` — only the order of the three
+summands differs. -/
+theorem isTypeBEpsilon_of_decomposed_aniso {n : ℕ}
+    (phi : RingAut (GaloisField 2 n)) (c0 : GaloisField 2 n)
+    (haniso : ∀ a b : GaloisField 2 n, a ≠ 0 → b ≠ 0 →
+      a * phi a + b * phi b + c0 * (a * phi b) ≠ 0) :
+    OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsTypeBEpsilon phi c0 := by
+  intro a b ha hb h0
+  exact haniso a b ha hb (by linear_combination h0)
+
 /-- **Higman p. 91, the type-C `ε`.**  Over `GaloisField 2 n` with
 `θ = Frob^r` and `2r + 1 = n`, anisotropy of the decomposed square form with
 the type-C monomial mixed term is exactly Higman's condition on `ε = c₀`:
