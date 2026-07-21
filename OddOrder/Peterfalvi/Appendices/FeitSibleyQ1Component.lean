@@ -280,6 +280,39 @@ theorem exists_restrict_eq_nsmul [Finite G] [Fintype ↥(hyp.Q.subgroupOf hyp.H)
   refine ⟨θ, m θ, hθirr, Nat.pos_of_ne_zero (Finsupp.mem_support_iff.mp hθsupp), ?_⟩
   rw [hmsum, hsupp_eq, Finset.sum_singleton]
 
+/-! ## The inflation `θ~ = θ ∘ q1Proj` -/
+
+/-- **The projection `q1Proj` is surjective**: it fixes the `Q₁`-part pointwise
+(`q1Proj_apply_coe_of_mem`), so every element of the target is its own image. -/
+theorem q1Proj_surjective : Function.Surjective hyp.q1Proj := fun t =>
+  ⟨(t : ↥(hyp.Q.subgroupOf hyp.H)),
+    Subtype.ext (hyp.q1Proj_apply_coe_of_mem t.2)⟩
+
+/-- **Restricting the inflation recovers `θ`**: `Res_{Q₁} (θ ∘ q1Proj) = θ`,
+because `q1Proj` is the identity on the `Q₁`-part.  Together with
+`IsIrreducibleCharacter.compHom_of_surjective` (via `q1Proj_surjective`) this
+realises every `θ ∈ Irr(Q₁)` as the restriction of a member of `Irr(Q)` with
+the `S`-part in its kernel. -/
+theorem restrict_compHom_q1Proj
+    (θ : ClassFunction ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf
+      (hyp.Q.subgroupOf hyp.H)) ℂ) :
+    ClassFunction.restrict ((hyp.Q1.subgroupOf hyp.H).subgroupOf
+      (hyp.Q.subgroupOf hyp.H)) (ClassFunction.compHom hyp.q1Proj θ) = θ := by
+  apply Subtype.ext
+  funext t
+  rw [ClassFunction.restrict_apply, ClassFunction.compHom_apply]
+  exact congrArg θ (Subtype.ext (hyp.q1Proj_apply_coe_of_mem t.2))
+
+/-- **The `S`-part lies in the kernel of the inflation**: for `s` in the
+(doubly relativised) `S`-part, `(θ ∘ q1Proj) s = θ 1`. -/
+theorem compHom_q1Proj_apply_of_mem_S
+    (θ : ClassFunction ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf
+      (hyp.Q.subgroupOf hyp.H)) ℂ)
+    {s : ↥(hyp.Q.subgroupOf hyp.H)}
+    (hs : s ∈ (hyp.S.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :
+    ClassFunction.compHom hyp.q1Proj θ s = θ 1 := by
+  rw [ClassFunction.compHom_apply, hyp.q1Proj_apply_of_mem_S hs]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
