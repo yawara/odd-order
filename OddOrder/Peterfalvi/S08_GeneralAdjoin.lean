@@ -110,6 +110,23 @@ theorem inner_tau_extension_of_supported
   rw [hS₁.extends_on_supported δ hδ]
   exact hisom u δ hu (zSupportedSpan_mono_left hS₁S hδ)
 
+/-- Push a per-member orthogonality `⟨ν x, W⟩ = 0` (`x ∈ S₁`) to the whole
+lattice `ℤ[S₁]`, by linearity of the coherent extension `ν` (issue 1050). -/
+theorem inner_extension_eq_zero_on_span
+    {τ : IntegralCharacterMap L G} {S₁ : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hS₁ : IsCoherent τ S₁ A) {W : ClassFunction G ℂ}
+    (hmem : ∀ x ∈ S₁, ClassFunction.inner (hS₁.extension x) W = 0) :
+    ∀ ξ ∈ Submodule.span ℤ S₁, ClassFunction.inner (hS₁.extension ξ) W = 0 := by
+  intro ξ hξ
+  induction hξ using Submodule.span_induction with
+  | mem x hx => exact hmem x hx
+  | zero => simp
+  | add y z _ _ ihy ihz => rw [map_add, ClassFunction.inner_add_left, ihy, ihz, add_zero]
+  | smul c y _ ih =>
+      rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ c (hS₁.extension y),
+        ClassFunction.inner_smul_left, ih, mul_zero]
+
 /-! ### The general extension-image bridge (helper 4) -/
 
 open scoped Classical in
@@ -151,7 +168,8 @@ noncomputable def retarget_isCoherent_of_extensionImage_general
     (hτdiffZ : τ (χ - χ.conj) ∈ ZIrr G)
     (hcrux1 : ClassFunction.inner (τ (χ - a • chi1)) (hS₁.extension chi1) = -((a : ℂ) * (m₁ : ℂ)))
     (hcrux2 : ClassFunction.inner (τ (χ - χ.conj)) (hS₁.extension chi1) = 0)
-    (hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {chi1}))
+    (hSgen : ∀ x ∈ S₁, ∃ n : ℕ, 0 < n ∧
+      (n : ℤ) • x ∈ Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {chi1}))
     (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, χ.conj}) A ⊆
       Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - χ.conj, χ - a • chi1})) :
     IsCoherent τ (S₁ ∪ {χ, χ.conj}) A := by
@@ -279,12 +297,25 @@ noncomputable def retarget_isCoherent_of_extensionImage_general
         rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ c (hS₁.extension y),
           ClassFunction.inner_smul_left, ih,
           ← Int.cast_smul_eq_zsmul ℂ c y, ClassFunction.inner_smul_left]; ring
-  have hX_ortho : ∀ ξ ∈ Submodule.span ℤ S₁, ClassFunction.inner (hS₁.extension ξ) X = 0 := by
-    intro ξ hξ
-    rw [hX, ← Nat.cast_smul_eq_nsmul ℂ a (hS₁.extension chi1), ClassFunction.inner_add_right,
-      OddOrder.RepresentationTheory.inner_smul_right, hkey ξ (hSgen hξ),
-      hS₁.extension_inner_eq ξ chi1 hξ (Submodule.subset_span hchi1)]
-    simp only [star_natCast]; ring
+  -- Per-member `⟨ν x, X⟩ = 0`: apply `hkey` to the scaled lift `n • x` (`hSgen`),
+  -- then divide by `n > 0`.  This is the rational-ratio replacement (issue 1050)
+  -- for the integer-ratio lattice generation `ℤ[S₁] ≤ ℤ[supported ∪ {χ₁}]`.
+  have hmemX : ∀ x ∈ S₁, ClassFunction.inner (hS₁.extension x) X = 0 := by
+    intro x hx
+    obtain ⟨n, hn, hnx⟩ := hSgen x hx
+    have hnxS₁ : (n : ℤ) • x ∈ Submodule.span ℤ S₁ :=
+      Submodule.smul_mem _ _ (Submodule.subset_span hx)
+    have h0 : ClassFunction.inner (hS₁.extension ((n : ℤ) • x)) X = 0 := by
+      rw [hX, ← Nat.cast_smul_eq_nsmul ℂ a (hS₁.extension chi1), ClassFunction.inner_add_right,
+        OddOrder.RepresentationTheory.inner_smul_right, hkey _ hnx,
+        hS₁.extension_inner_eq _ chi1 hnxS₁ (Submodule.subset_span hchi1)]
+      simp only [star_natCast]; ring
+    rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ (n : ℤ) (hS₁.extension x),
+      ClassFunction.inner_smul_left] at h0
+    have hne : ((n : ℤ) : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
+    exact (mul_eq_zero.mp h0).resolve_left hne
+  have hX_ortho : ∀ ξ ∈ Submodule.span ℤ S₁, ClassFunction.inner (hS₁.extension ξ) X = 0 :=
+    inner_extension_eq_zero_on_span hS₁ hmemX
   have hkeyd : ∀ ξ ∈ Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {chi1}),
       ClassFunction.inner (hS₁.extension ξ) (τ (χ - χ.conj)) = 0 := by
     intro ξ hξ
@@ -316,9 +347,19 @@ noncomputable def retarget_isCoherent_of_extensionImage_general
     | smul c y _ ih =>
         rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ c (hS₁.extension y),
           ClassFunction.inner_smul_left, ih, mul_zero]
+  -- Per-member `⟨ν x, τ(χ − χ̄)⟩ = 0`, again via the scaled lift and `n > 0`.
+  have hmemd : ∀ x ∈ S₁, ClassFunction.inner (hS₁.extension x) (τ (χ - χ.conj)) = 0 := by
+    intro x hx
+    obtain ⟨n, hn, hnx⟩ := hSgen x hx
+    have h0 := hkeyd _ hnx
+    rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ (n : ℤ) (hS₁.extension x),
+      ClassFunction.inner_smul_left] at h0
+    have hne : ((n : ℤ) : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
+    exact (mul_eq_zero.mp h0).resolve_left hne
   have hXbar_ortho : ∀ ξ ∈ Submodule.span ℤ S₁, ClassFunction.inner (hS₁.extension ξ) Xbar = 0 := by
     intro ξ hξ
-    rw [hXbar, ClassFunction.inner_sub_right, hX_ortho ξ hξ, hkeyd ξ (hSgen hξ), sub_zero]
+    rw [hXbar, ClassFunction.inner_sub_right, hX_ortho ξ hξ,
+      inner_extension_eq_zero_on_span hS₁ hmemd ξ hξ, sub_zero]
   have himg : τ (χ - a • chi1) = X - a • hS₁.extension chi1 := by rw [hX]; abel
   exact retarget_isCoherent hS₁ hχχ hχbarχbar hχχbar hχbarχ
     hXX hXbarXbar hXXbar hXbarX hXZ hXbarZ hX_ortho hXbar_ortho rfl hχ_S1 hχbar_S1 hchi1 himg hgen
@@ -590,8 +631,8 @@ noncomputable def adjoinPairCoherent_general
     (hdiffasuppχ : (χ - a • χmem i₁).support ⊆ A)
     (htau1_memaχ : τ (χ - a • χmem i₁) ∈ ZIrr G)
     (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((degMem i : ℝ) / (degMem i₁ : ℝ)) ^ 2)
-    (hSgen : Submodule.span ℤ S₁ ≤
-      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χmem i₁}))
+    (hSgen : ∀ x ∈ S₁, ∃ n : ℕ, 0 < n ∧
+      (n : ℤ) • x ∈ Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χmem i₁}))
     (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, χ.conj}) A ⊆
       Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - χ.conj, χ - a • χmem i₁})) :
     IsCoherent τ (S₁ ∪ {χ, χ.conj}) A := by

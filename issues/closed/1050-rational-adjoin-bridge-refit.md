@@ -54,3 +54,18 @@ integer 版を subsume。
   `hSgen`/`hkey`/`hkeyd`), `:561` (`adjoinPairCoherent_general`, `hSgen` param)
 - issue 1049 (integer 版完成の記録), `S07_Coherence/DifferenceImage.lean:173` (integer hSgen lemma)
 - coq `PFsection5.v:1124` (`extend_coherent`, rational `a_ξ = ξ(1)/ξ₁(1)/‖ξ‖²`)
+
+## 完了 (2026-07-22, commit c1f50cc5a)
+
+Part B ((3) 後半の 𝒳-相対帰納) が consumer になったことが原文 p.147 精読で確定した
+(anchor Ind(1·θ) の度数 d·θ(1) は base 𝒳∩𝒮(S₁) member の度数 d·λ(1)·θ_x(1) を
+割らない) ため、「優先度低・consumer 無し」から昇格して実施。
+
+実装は本 issue の予定案 (hX_ortho の per-member scaled+crux1 再導出) とは別ルート:
+- hSgen を**スケール生成** `∀x∈S₁, ∃n>0, n•x ∈ ℤ[supported∪{χ₁}]` に弱化
+  (rational 比では n = anchor 度数で成立; integer 版は n=1 で subsume)。
+  hkey/hkeyd は無傷のまま n•x に適用 → n>0 で除算。
+- hgen は新補題 `zSupportedSpan_adjoinPair_subset_span_of_diffSupports` (hSgen 不要、
+  両差の A-support のみ) で供給。旧 anchorGeneration 補題は他 8 caller 用に残置
+  (dedup は後続候補)。
+- `coherent_adjoin_of_degree_bound` から hdvd、wrapper から hmdvd を除去。
