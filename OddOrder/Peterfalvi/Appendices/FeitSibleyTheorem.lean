@@ -220,39 +220,36 @@ variable [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
 variable [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
 
 omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
-/-- **A member `φ ∈ Irr(Q)` inducing into `𝒮(Q')` is trivial on `Q'`**: if
-`Ind_Q^H φ` is irreducible and constant on `Q'` (`LeKer`), then `φ` is constant on
-`Q'.subgroupOf Q`.  Mirror of the Lemma 2(a) kernel argument with `Q₁` replaced by
-`Q'`: a nontrivial constituent `θ ∈ Irr(Q')` of `Res φ` would, through the θ-part
-bound (`restrictionMultiplicity_mul_le_restrictionMultiplicity`, with
-`⟨Res_Q Ind φ, φ⟩ = 1` by Frobenius reciprocity and irreducibility of `Ind φ`),
-give `Ind φ` a nontrivial `Q'`-constituent, which a character constant on `Q'`
-cannot have (`restrictionMultiplicity_eq_zero_of_forall_eq_one`). -/
-theorem forall_eq_one_of_leKer_Qder [Finite G]
+/-- **A member `φ ∈ Irr(Q)` inducing constantly on `R ≤ Q` is itself constant on
+`R`** (the general-`R` form of the Lemma 2(a) kernel argument; only `R ≤ Q` is
+used): a nontrivial constituent of `Res_R φ` would, through the θ-part bound,
+give `Ind φ` a nontrivial `R`-constituent, which a character constant on `R`
+cannot have. -/
+theorem forall_eq_one_of_leKer [Finite G] (R : Subgroup G) (hRQ : R ≤ hyp.Q)
     {φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ} (hφirr : IsIrreducibleCharacter φ)
     (hindirr : IsIrreducibleCharacter
       (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ))
-    (hker : hyp.LeKer (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) hyp.Qder) :
-    ∀ y : ↥((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)),
+    (hker : hyp.LeKer (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) R) :
+    ∀ y : ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)),
       φ (y : ↥(hyp.Q.subgroupOf hyp.H)) = φ 1 := by
   classical
-  have hHT : hyp.Qder.subgroupOf hyp.H ≤ hyp.Q.subgroupOf hyp.H := fun x hx =>
-    Subgroup.mem_subgroupOf.mpr (hyp.Qder_le_Q (Subgroup.mem_subgroupOf.mp hx))
+  have hHT : R.subgroupOf hyp.H ≤ hyp.Q.subgroupOf hyp.H := fun x hx =>
+    Subgroup.mem_subgroupOf.mpr (hRQ (Subgroup.mem_subgroupOf.mp hx))
   -- finiteness / invertibility bookkeeping
   letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.Qder.subgroupOf hyp.H) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(hyp.Qder.subgroupOf hyp.H) : ℂ) :=
+  letI : Fintype ↥(R.subgroupOf hyp.H) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(R.subgroupOf hyp.H) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Fintype ↥((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :=
+  letI : Fintype ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :=
     Fintype.ofFinite _
   letI : Invertible
-      ((Nat.card ↥((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) : ℂ) :=
+      ((Nat.card ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   haveI : Finite (IrreducibleCharacter
-      ↥((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) :=
+      ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) :=
     finite_irreducibleCharacter
   letI : Fintype (IrreducibleCharacter
-      ↥((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) := Fintype.ofFinite _
+      ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) := Fintype.ofFinite _
   by_contra hcon
   -- a nontrivial constituent `θ'' ∈ Irr(Q'-in-Q)` of `Res φ`
   obtain ⟨θ'', hθ''ne, hθ''over⟩ := exists_ne_trivial_liesOver_of_not_forall_eq_one
@@ -261,23 +258,23 @@ theorem forall_eq_one_of_leKer_Qder [Finite G]
   have hθirr : IsIrreducibleCharacter (ClassFunction.compHom
       (Subgroup.subgroupOfEquivOfLe hHT).symm.toMonoidHom
       (θ'' : ClassFunction
-        ↥((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) ℂ)) :=
+        ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) ℂ)) :=
     IsIrreducibleCharacter.compHom_of_surjective
       (Subgroup.subgroupOfEquivOfLe hHT).symm.surjective θ''.isIrreducible
-  have hθne : (⟨_, hθirr⟩ : IrreducibleCharacter ↥(hyp.Qder.subgroupOf hyp.H))
+  have hθne : (⟨_, hθirr⟩ : IrreducibleCharacter ↥(R.subgroupOf hyp.H))
       ≠ trivialIrreducibleCharacter _ := fun h =>
     compHom_mulEquiv_ne_trivial (Subgroup.subgroupOfEquivOfLe hHT).symm
       (fun hc => hθ''ne (Subtype.ext hc)) (congrArg Subtype.val h)
   have hround : ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom
       (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).symm.toMonoidHom
         (θ'' : ClassFunction
-          ↥((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) ℂ))
+          ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) ℂ))
       = (θ'' : ClassFunction
-          ↥((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) ℂ) :=
+          ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) ℂ) :=
     compHom_toMonoidHom_compHom_symm (Subgroup.subgroupOfEquivOfLe hHT) _
   -- `Ind φ` constant on `Q'` kills the transported θ-multiplicity …
   have hzero := restrictionMultiplicity_eq_zero_of_forall_eq_one
-    (N := hyp.Qder.subgroupOf hyp.H) (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ)
+    (N := R.subgroupOf hyp.H) (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ)
     (fun x => hker (x : ↥hyp.H) (Subgroup.mem_subgroupOf.mp x.2)) hθne
   simp only [IrreducibleCharacter.coe_mk] at hzero
   -- … but the θ-part bound forces it nonzero
@@ -300,9 +297,20 @@ theorem forall_eq_one_of_leKer_Qder [Finite G]
   simp only [IrreducibleCharacter.coe_mk] at hbound
   rw [hfirst, one_mul, hround, hzero] at hbound
   have hnonneg := ClassFunction.restrictionMultiplicity_nonneg
-    ((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) hφirr
+    ((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) hφirr
     θ''.isIrreducible
   exact hθ''over (le_antisymm hbound hnonneg)
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- `forall_eq_one_of_leKer` at `R = Q' = [Q,Q]`. -/
+theorem forall_eq_one_of_leKer_Qder [Finite G]
+    {φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ} (hφirr : IsIrreducibleCharacter φ)
+    (hindirr : IsIrreducibleCharacter
+      (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ))
+    (hker : hyp.LeKer (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) hyp.Qder) :
+    ∀ y : ↥((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)),
+      φ (y : ↥(hyp.Q.subgroupOf hyp.H)) = φ 1 :=
+  hyp.forall_eq_one_of_leKer hyp.Qder hyp.Qder_le_Q hφirr hindirr hker
 
 omit [Fintype G] [Fintype ↥hyp.H] in
 /-- **All members of `𝒮(Q')` have degree `d`** (Remark, p. 145).  By Lemma 2(a),
