@@ -247,6 +247,22 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
 (sum_degreeSq_SsetOf; base ⊆ S₁ 単調) — ℂ→ℝ 変換は度数が実 (d·m) なので
 (x(1))² の Re で。
 
+### (1.2) の適用設計 (2026-07-21 固定)
+
+`degree_sq_le_index_of_central_quotient` (InflationCharacter.lean:361) 確認済み:
+`(φ : Irr G₀) (D) (hND : N ≤ D) (hker : N ⊆ ker φ) (hcentral : D.map (mk' N) ≤ center (G₀⧸N))
+⟹ ∃ e, φ(1) = e ∧ e² ≤ D.index`。
+(1.2) への適用: ψ ∈ 𝒮(S'Q₃) を 2(a) で ψ = Ind_Q^H φ' (φ' ∈ Irr(Q-in-H), ψ(1) = d·a,
+a = φ'(1) — exists_apply_one_eq_d_mul の choose と同一視) に分解し、G₀ := ↥(Q-in-H)、
+N := (Sder⊔Q₃)-in-Q (φ' が S'Q₃ 上定数 = forall_eq_one_of_leKer_Qder の一般 R 版が要る —
+現行は Qder 固定なので R-パラメタ化した `forall_eq_one_of_leKer` に一般化するか、
+kernel 経由で直接)、D := (S ⊔ Z)-in-Q、hcentral : (SZ)/(S'Q₃) が Q/(S'Q₃) の中心 —
+これが chief-factor 側の唯一の群論的入力 (Z/Q₃ := Z(Q₁/Q₃) の引き上げ + S-部分は
+Q = S×Q₁ の直積性から S/(S∩…) が commute…)。結論 a² ≤ [Q:SZ]-in = |Q₁/Z| 型。
+⟹ 実装順: ① forall_eq_one_of_leKer_Qder の R-一般化 (R ≤ Q, R ⊴ H 要素形仮定で
+同証明)、② hcentral を仮定に持つ (1.2) 補題 (中心性は reduction assembly 側で
+Z の定義から供給)、③ (1.1)+(1.2)+f.p.f. 下界の算術合成 → d ≤ 2。
+
 ## 完了条件
 
 `feit_sibley_coherence` sorry-free + axiom-clean + build green。
