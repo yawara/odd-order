@@ -8558,6 +8558,17 @@ orders are complementary. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.OrderQModuleSplit.nonempty_summandEquiv_of_isomorphic
 
+/-! **Lemma 5, the square fiber of a summand**: on an invariant summand of
+order `|Z|` the coset square map is a bijection from the nonidentity cosets
+onto the involutions `Z \ {1}`; the fiber over a fixed involution is a single
+coset. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.bijOn_cosetSquare
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.existsUnique_cosetSquare_eq
+
 /-! In the actual Part II setting, `|K|` and `|Q₀|` are coprime and the
 induced action on `Q / Q₀` is fixed-point-free.  Hence every invariant
 order-`|Q₀|` subgroup is transitive on its nonidentity elements and simple as
