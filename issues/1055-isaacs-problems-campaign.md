@@ -232,9 +232,17 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   を先証して `.trans hCA` / `hane:a≠1`(P) ≠ `⟨a,ha⟩≠1`(↥A) → Subtype.ext_iff で導出 / MulAction proof の
   `show`→`change` / `MulAut.conjNormal_apply` + `mul_inv_eq_iff_eq_mul` で commute / card は
   `Fintype.card_subtype_compl`+`card_subtype_eq`。→ **1D.10 完了**。
-- ⬜ **残り §1D**: 1D.5 (intricate) / 1D.11 (`|G| ∣ n!`、1D.10 後半を各 Sylow に適用可能に) /
+- ✅ 実証明 **1D.11** `card_dvd_factorial_of_abelian_bound` (`n` が可換部分群位数の上界 ⟹ `|G| ∣ n!`) +
+  helper `exists_maximal_abelian_normal` (有限順序の極大元 `Finite.exists_le_maximal`、witness=`center P`)。
+  各 `P∈Syl_p(G)` の極大可換正規 `A` に 1D.10 後半 ⟹ `|P:A|∣(|A|-1)!`、`A.map subtype` の可換性
+  (`equivMapOfInjective` 経由) で `|A|≤n`、`|P|=|A|·|P:A| ∣ |A|! ∣ n!` (`mul_factorial_pred`)。
+  `|P|=p^{v_p|G|}` (`Sylow.card_eq_multiplicity`) で全素数冪 ⟹ `|G|∣n!` (`Nat.dvd_iff_prime_pow_dvd_dvd`)。
+  ⚠ `dvd_iff_prime_pow_dvd_dvd` の `intro` は `Nat.Prime` を与える (変換不要) / `card_eq_multiplicity` は
+  `↥↑P` coe ゆえ明示型 `have hmult : Nat.card ↥P = …` で橋渡し。`n` を最大値でなく上界に一般化。
+  → **1D.11 完了**。
+- ⬜ **残り §1D**: 1D.5 (intricate) /
   1D.12 (位数 p 元数 `≡-1 mod p`、McKay の p-tuple + `card_modEq_card_fixedPoints`) /
-  1D.15 の一般 `N` 版。多くは meaty。
+  1D.15 の一般 `N` 版。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 
