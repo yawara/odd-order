@@ -525,6 +525,63 @@ theorem isNilpotent_of_quotient_commutator_isNilpotent {G : Type*} [Group G] [Fi
         (by simpa using QuotientGroup.mk_surjective) hcomap)
   exact isNilpotent_of_quotient_frattini_isNilpotent
 
+/-- Frattini 論法の一般化: 有限群 `K` の正規部分群 `M` について商 `K / M` が冪零ならば、各 Sylow
+`p`-部分群 `P` について `N_K(P) ⊔ M = ⊤`。`P` の像 `θ(P)` (`θ = K ↠ K/M`) は `K/M` の Sylow ゆえ
+冪零性から正規、逆像 `P ⊔ M` が `K` で正規、Frattini 論法 `normalizer_sup_eq_top'` で `P` を吸収。
+`isNilpotent_of_quotient_frattini_isNilpotent` の核を `M` 一般に取り出したもの。 -/
+theorem sylow_normalizer_sup_eq_top_of_quotient_nilpotent {K : Type*} [Group K] [Finite K]
+    {M : Subgroup K} [M.Normal] (hquot : Group.IsNilpotent (K ⧸ M)) {p : ℕ} [Fact p.Prime]
+    (P : Sylow p K) : Subgroup.normalizer ↑P ⊔ M = ⊤ := by
+  haveI := hquot
+  obtain ⟨Q, hQ⟩ := exists_sylow_coe_eq_of_isHallSubgroup_singleton
+    (IsHallSubgroup.map_of_surjective (QuotientGroup.mk'_surjective M)
+      (sylow_isHallSubgroup_singleton P))
+  have hmapnorm : ((↑P : Subgroup K).map (QuotientGroup.mk' M)).Normal :=
+    hQ ▸ (inferInstance : (Q : Subgroup (K ⧸ M)).Normal)
+  haveI hPMnorm : ((↑P : Subgroup K) ⊔ M).Normal := by
+    have h := hmapnorm.comap (QuotientGroup.mk' M)
+    rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk'] at h
+  have hfr := Sylow.normalizer_sup_eq_top' (N := (↑P : Subgroup K) ⊔ M) P le_sup_left
+  refine le_antisymm le_top ?_
+  rw [← hfr]
+  exact sup_le le_sup_left (sup_le (Subgroup.le_normalizer.trans le_sup_left) le_sup_right)
+
+/-- **Isaacs Problem 1D.15** (一般 `N` 版). `Φ(G) ⊆ N ⊴ G` で商 `N / Φ(G)` が冪零ならば `N` は冪零。
+各 Sylow `p`-部分群 `P` について ── (内) `N/Φ(G)` の冪零性から
+`sylow_normalizer_sup_eq_top_of_quotient_nilpotent` で `N_N(P) ⊔ Φ(G)ᴺ = ⊤` (`↥N` 内)、`N.subtype`
+で押し出して `N = θ(N_N(P)) ⊔ Φ(G) ≤ N_G(P) ⊔ Φ(G)` (`le_normalizer_map`)。(外)
+`Sylow.normalizer_sup_eq_top` で `N_G(P) ⊔ N = ⊤`。合わせて `N_G(P) ⊔ Φ(G) = ⊤`、
+`frattini_nongenerating` で `N_G(P) = ⊤` ⟹ `P ⊴ G` ⟹ `P ⊴ N`。全 Sylow 正規で `N` 冪零。N=G 版
+`isNilpotent_of_quotient_frattini_isNilpotent` の二層版 (Fitting 経由は循環するので Frattini 二段)。 -/
+theorem isNilpotent_of_frattini_le_of_quotient_isNilpotent {G : Type*} [Group G] [Finite G]
+    {N : Subgroup G} [N.Normal] (hΦN : frattini G ≤ N)
+    (hquot : Group.IsNilpotent (↥N ⧸ (frattini G).subgroupOf N)) :
+    Group.IsNilpotent ↥N := by
+  refine (Group.isNilpotent_of_finite_tfae.out 3 0 rfl rfl).mp ?_
+  intro p hp P
+  haveI := hp
+  have hinner := sylow_normalizer_sup_eq_top_of_quotient_nilpotent hquot P
+  have houter := Sylow.normalizer_sup_eq_top P
+  -- `hinner` を `N.subtype` で `G` に押し出す
+  have hmapeq :
+      (Subgroup.normalizer (↑P : Subgroup ↥N)).map N.subtype ⊔ frattini G = N := by
+    have h := congrArg (Subgroup.map N.subtype) hinner
+    rwa [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hΦN,
+      ← MonoidHom.range_eq_map, Subgroup.range_subtype] at h
+  have hNle : N ≤ Subgroup.normalizer (P.map N.subtype) ⊔ frattini G :=
+    hmapeq.symm.le.trans (sup_le_sup_right (Subgroup.le_normalizer_map N.subtype) _)
+  -- 内外を合わせて `N_G(P) ⊔ Φ(G) = ⊤`
+  have hcomb : Subgroup.normalizer (P.map N.subtype) ⊔ frattini G = ⊤ := by
+    refine le_antisymm le_top ?_
+    rw [← houter]
+    exact sup_le le_sup_left hNle
+  -- 非生成性で `P ⊴ G`、対応で `P ⊴ N`
+  have hPmapnorm := Subgroup.normalizer_eq_top_iff.mp (frattini_nongenerating hcomb)
+  have hsgof : (P.map N.subtype).subgroupOf N = (↑P : Subgroup ↥N) := by
+    rw [← Subgroup.comap_subtype, Subgroup.comap_map_eq, Subgroup.ker_subtype, sup_bot_eq]
+  have hsub := hPmapnorm.subgroupOf N
+  rwa [hsgof] at hsub
+
 /-- **Isaacs Problem 1D.8** (基本アーベル部分の核). 有限 `p`-群 `P` では任意の `g` について
 `g ^ p ∈ Φ(P)`。各極大部分群 `M` は `p`-群の coatom ゆえ指数が素数 (1D.6) かつ `∣ |P| = p^n`、したがって
 指数 `= p`。`Subgroup.pow_index_mem` で `g ^ (M.index) = g ^ p ∈ M`、全極大の共通部分をとって

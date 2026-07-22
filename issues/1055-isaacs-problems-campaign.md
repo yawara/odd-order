@@ -248,17 +248,16 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   `.get ⟨0,pos⟩`+`get_replicate`+`rotate_one_eq_self_iff_eq_replicate`)、`|G|^(p-1)≡0`。減算は
   `{x//x^p=1} ≃ Option {x//orderOf=p}` (1↔none) で `Fintype.card_option`。⚠ `toAdd_one/mul/ofAdd` は bare、
   `List.Vector.head` は長さ p が succ 形でなく型不一致 → `.get ⟨0,hp.out.pos⟩`。→ **1D.12 完了**。
-- ⬜ **残り §1D (2 問)**: **1D.5** (intricate) / **1D.15 の一般 `N` 版** (Φ(G)⊆N◁G, N/Φ(G)冪零⟹N冪零)。
-  **★ 1D.15 一般版の正しい証明を発見 (2026-07-23、非循環)**: Fitting 経由は循環 (`F(G/Φ)=F(G)/Φ` の
-  `⊇` 方向が 1D.15 自身)。正しくは **二段 Frattini**: 各 `P∈Syl_p(N)` について ── (内) `PΦ(G)/Φ(G)` は
-  `N/Φ(G)` (冪零) の Sylow ゆえ正規 ⟹ `PΦ(G)◁N`、Frattini で `N=PΦ(G)·N_N(P)=Φ(G)·N_N(P)` ⟹
-  `N≤Φ(G)⊔N_G(P)`。(外) `Sylow.normalizer_sup_eq_top (P:Sylow p ↥N)`: `N_G(P)⊔N=⊤`
-  (=`normalizer(P.map N.subtype)⊔N=⊤`, cf. 1D.1)。合わせ `N_G(P)⊔Φ(G)=⊤`、`frattini_nongenerating`
-  で `N_G(P)=⊤` ⟹ `P◁G` ⟹ `P◁N`。全 Sylow 正規 (`isNilpotent_of_finite_tfae`) で `N` 冪零。⚠ `fitting`
-  不要 (循環回避のため Frattini 必須)。難所 = 二段 `↥N`/`Φ(G).subgroupOf N`/`P.map N.subtype` 配管 (~60 行、
-  N=G 版 `isNilpotent_of_quotient_frattini_isNilpotent` の二層版)。**mathlib 部分群冪零 = `Subgroup.isNilpotent`
-  [IsNilpotent G] instance / `fitting.isNilpotent` / `nilpotent_normal_le_fitting` 確認済 (今回は未使用)。**
-  両問とも substantial ゆえ、次は Ch.2 問題へ breadth 展開も選択肢。
+- ✅ 実証明 **1D.15 (一般 `N` 版)** `isNilpotent_of_frattini_le_of_quotient_isNilpotent` (`Φ(G)⊆N◁G`,
+  `N/Φ(G)` 冪零⟹`N` 冪零) + 再利用 helper `sylow_normalizer_sup_eq_top_of_quotient_nilpotent` (`K/M` 冪零
+  ⟹ 各 Sylow で `N_K(P)⊔M=⊤`、N=G 版の核を M 一般化)。**二段 Frattini** (Fitting 経由は循環): 各
+  `P∈Syl_p(↥N)` に (内) helper で `N_↥N(P)⊔Φ(G)ᴺ=⊤`、`N.subtype` で押し出し (`map_sup`+`subgroupOf_map_subtype`
+  +`le_normalizer_map`) `N≤N_G(P.map)⊔Φ(G)`、(外) `Sylow.normalizer_sup_eq_top` で `N_G(P.map)⊔N=⊤`、
+  合わせ `N_G(P.map)⊔Φ(G)=⊤`、`frattini_nongenerating`⟹`P.map◁G`、`subgroupOf`+`Normal.subgroupOf`+
+  `comap_map_eq`+`ker_subtype` で `P◁↥N`。⚠ 罠: `(↑P:Subgroup)` 明示は二重 coe→bare `↑P`+absorb は
+  `le_antisymm`+`sup_le` / `rw[←hmapeq]` は `N` が `P:Sylow p ↥N` の型に現れ motive 破綻→`.le.trans` の項 /
+  `Subgroup.map_top` は無く `←MonoidHom.range_eq_map`。→ **1D.15 完了 (N=G + 一般 N)**。
+- ⬜ **残り §1D (1 問)**: **1D.5** (intricate、Frobenius complement)。substantial ゆえ次は Ch.2 展開も選択肢。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 
