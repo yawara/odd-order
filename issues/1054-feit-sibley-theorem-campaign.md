@@ -683,11 +683,20 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
       (ξ:G→ℂ)=ρ.character; ZIrr.lean:95)。(8) goal は Prop ゆえ obtain 可。
       haveI := hirr で instance 化 → peterfalvi_67_hall_of_odd 適用。
     - **算術核** dvd_of_isIntegral_ratio (完成)、**central 合同** peterfalvi_67_hall_of_odd (完成)。
-    - **(c) 正則指標和** = `sum_degree_mul_charValue_XsetOf_bot` (2026-07-22 完成,
-      新 leaf `FeitSibleyConclusion.lean`): Σ_{χ∈𝒳}χ(1)χ(z) = −|H⧸Z| (z∈Z^#)。
-      mem_XsetOf_bot_iff + leKer_iff_subset_characterKernel で 𝒳={Z⊄characterKernel}
-      に reindex (Finset.sum_bij')、sumNonInflatedDegreeMulChar_of_mem 適用。
-      S08 sum_degree_mul_charValue_Xset_eq_of_frobenius の FeitSibley mirror。
+    - **(c) 正則指標和 (両評価完成)** — 新 leaf `FeitSibleyConclusion.lean`:
+      `sum_degree_mul_charValue_XsetOf_bot`: Σ_{χ∈𝒳}χ(1)χ(z) = −|H⧸Z| (z∈Z^#、ψ_𝒳(z)) +
+      `sum_degreeSq_XsetOf_bot` (2026-07-22 完成): Σ_{χ∈𝒳}χ(1)² = |H|−|H⧸Z| (ψ_𝒳(1))。
+      ⟹ ψ_𝒳(z)−ψ_𝒳(1) = −|H| = z 評価入力。両方 mem_XsetOf_bot_iff + leKer_iff で
+      {Z⊄characterKernel} に reindex (Finset.sum_bij')、sumNonInflated{DegreeMulChar,DegreeSq}。
+      S08 sum_degree_{mul_charValue,Sq}_Xset の FeitSibley mirror。
+    - **⭐ ルート B (代替/参照, S08 (6.8) mirror)**: `extension_constant_on_sharp_of_prime`
+      (S07_CoherenceGalois:424、汎用 S07 だが dadeIntegralCharacterMap 型 — Galois σ が
+      (·^k) で prime-order Z を回す; **要 Dade→Ind 一般化 or FeitSibley 版**) で
+      「coherentYset.extension η constant on Z^#」を直接取得 (Z prime order + Z⊆ker η、
+      η∈𝒴 は Q'⊆ker + Z⊆[Q₁,Q₁]⊆Q' から充足) + `apply_one_sub_apply_eq_card_mul_inner`
+      (S08_CaseBCoherence/CentralCongruence:172、汎用 {Γ}: f constant on Γ^# ∧ φ linear ⟹
+      f(1)−f(z)=|Γ|⟨f,φ⟩)。**ルート A (Res_H Fourier) は自己完結で value+constancy を同時に
+      出すので採用; B は constancy shortcut の参照**。
     **⭐ アーキ判明 (2026-07-22)**: `feit_sibley_coherence` の sorry は **FeitSibley.lean:1239
     (base)**。FeitSibleyTheorem (leKer_iff 等) と FeitSibleyEndgame (mem_XsetOf_bot_iff 等) は
     **並行ブランチ** (互いに import せず、両方 base 下流)。⟹ (8) assembly + closure は
