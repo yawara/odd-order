@@ -1,0 +1,244 @@
+#!/usr/bin/env python3
+"""bin/check-warnings — lint 警告の ratchet gate (sorry 警告のみ無条件許容).
+
+背景 (issue 0138 / 0123):
+  lint 警告は `lake build` を止めないため溜まり続ける。本リポでは 2026-07-17 に
+  census 4761 件から wave で削ってきたが、gate が無いためレーンの積み増し速度が
+  hub の解消速度を上回り、2026-07-21 の 172 件が 07-22 には 230 件へ増えた。
+  iut / moore57 の教訓 = 「警告はその commit で直す」を機械で強制する。
+
+  ただし odd-order には既に 200+ 件の backlog があるので、iut 式の「day-1 ゼロ gate」
+  は初手で CI を赤にする。そこで本 gate は **ratchet 方式**:
+    baseline (現存警告の (ファイル, カテゴリ) 別カウント) を記録し、
+    **baseline を超える増加 = 新規カテゴリ or カウント増**が 1 件でもあれば exit 1。
+  backlog は grandfather され、cleanup wave が baseline を下げていく。
+  baseline が空になった時点で `--strict` に切り替えれば純粋なゼロ gate になる。
+
+仕様:
+  - `lake build` を実行 (追加引数は素通し)。build 自体が失敗したらその exit code。
+  - 出力の `warning:` 行を (相対パス, linter カテゴリ) に分類。
+    `declaration uses 'sorry'` (v4.32 実文言はバッククォート) は statement-first
+    spine 戦略の正常系ゆえ**常に無視**。
+  - Lake はキャッシュ済み module の警告も replay するので増分 build でも既存を拾う。
+    ⚠ ただし replay は**取りこぼしがある** (issue 0123)。baseline は fresh full build
+    (CI と同じ) で取り直すのが authoritative。ローカルの増分は近似。
+
+Modes:
+  bin/check-warnings                  ratchet gate: baseline 超過があれば exit 1
+  bin/check-warnings --report         現況を分類表示 (gate しない)
+  bin/check-warnings --update-baseline  現況を baseline に書き出す (cleanup 後に実行)
+  bin/check-warnings --strict         ゼロ gate: 非 sorry 警告が 1 件でもあれば exit 1
+  bin/check-warnings --diff           baseline との差分 (改善/悪化) を表示して exit 0
+  追加引数は `lake build` に渡る (例: bin/check-warnings OddOrder)
+
+baseline ファイル: bin/lint-baseline.tsv  (`count<TAB>relpath<TAB>category`, `#` コメント可)
+"""
+import sys, os, re, subprocess
+from collections import Counter
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASELINE = os.path.join(ROOT, 'bin', 'lint-baseline.tsv')
+
+SORRY = re.compile(r"declaration uses .sorry.")
+WARN_START = re.compile(r"^(?:⚠\s*)?warning:\s*(.*)$")
+BLOCK_END = re.compile(r"^(?:⚠\s*)?(warning|error|info):|^(Build completed|Some builds|\[|trace:)")
+# 警告ブロック先頭の `warning: <path>:L:C: <first msg line>` から path を取る
+PATH_AT = re.compile(r"(?:\.?/)?(?P<p>[\w./-]+\.lean):\d+:\d+:")
+# note: this linter can be disabled with `set_option linter.<name> false`
+LINTER_NOTE = re.compile(r"set_option\s+linter\.([A-Za-z.]+)\s+false")
+
+
+def classify(block: str) -> str:
+    """warning ブロック全文から linter カテゴリを決定 (line 番号非依存).
+
+    最優先は末尾 note の `set_option linter.X false` から抽出する正確な linter 名。
+    無い場合 (deprecation 等は linter でない) はメッセージ本文のキーワードで分類。
+    """
+    if SORRY.search(block):
+        return 'sorry'
+    mn = LINTER_NOTE.search(block)
+    if mn:
+        return mn.group(1)                      # 例: style.longLine, flexible, style.show
+    low = block.lower()
+    if 'has been deprecated' in low or 'deprecated:' in low:
+        return 'deprecation'
+    if "does nothing" in low:
+        return 'doNothing'
+    if 'maxheartbeat' in low:
+        return 'maxHeartbeats'
+    if 'does not use the following hypothesis in its type' in low:
+        return 'unusedHypInType'
+    if 'automatically included section variable' in low:
+        return 'sectionVar'
+    if 'mathlib.tactic' in low and 'import' in low:
+        return 'import.mathlibTactic'
+    if "* '-/'" in block or 'copyright' in low:
+        return 'style.header'
+    # 未分類: path/line/digit/backtick 内容を除去して line 番号非依存の head を作る
+    body = re.sub(PATH_AT, '', block.splitlines()[0])
+    body = re.sub(r'`[^`]*`', '`…`', body)
+    body = re.sub(r'\d+', 'N', body).strip()
+    return 'other: ' + body[:40]
+
+
+def collect_current(extra_args):
+    """lake build を回して (relpath, category) -> count を返す。(counter, status, log)"""
+    proc = subprocess.run(['lake', 'build', *extra_args], cwd=ROOT,
+                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    log = proc.stdout
+    lines = log.splitlines()
+    counts = Counter()
+    i, n = 0, len(lines)
+    while i < n:
+        mw = WARN_START.match(lines[i])
+        if not mw:
+            i += 1
+            continue
+        first = lines[i]
+        # ブロック本文を次の warning/error/info 開始まで集める
+        block = [first]
+        j = i + 1
+        while j < n and not BLOCK_END.match(lines[j]):
+            block.append(lines[j])
+            j += 1
+        blocktext = '\n'.join(block)
+        cat = classify(blocktext)
+        i = j
+        if cat == 'sorry':
+            continue
+        mp = PATH_AT.search(first)
+        path = mp.group('p') if mp else '?'
+        path = re.sub(r'^\./', '', path)
+        counts[(path, cat)] += 1
+    return counts, proc.returncode, log
+
+
+def load_baseline():
+    base = Counter()
+    if not os.path.exists(BASELINE):
+        return base
+    for line in open(BASELINE, encoding='utf-8'):
+        line = line.rstrip('\n')
+        if not line or line.startswith('#'):
+            continue
+        parts = line.split('\t')
+        if len(parts) != 3:
+            continue
+        n, path, cat = parts
+        base[(path, cat)] = int(n)
+    return base
+
+
+def write_baseline(counts):
+    lines = ['# bin/lint-baseline.tsv — lint 警告 ratchet の基準 (issue 0138)',
+             '# `count<TAB>relpath<TAB>category`。cleanup wave のたびに --update-baseline で更新。',
+             '# 目標: 全行が消え baseline が空 → --strict のゼロ gate へ移行。',
+             f'# 総数: {sum(counts.values())} 件 / {len(counts)} (file,category) 組',
+             '#']
+    for (path, cat), n in sorted(counts.items(), key=lambda x: (-x[1], x[0][0], x[0][1])):
+        lines.append(f'{n}\t{path}\t{cat}')
+    with open(BASELINE, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(lines) + '\n')
+
+
+def print_census(counts):
+    bycat = Counter()
+    for (path, cat), n in counts.items():
+        bycat[cat] += n
+    print(f'=== 非 sorry lint 警告 {sum(counts.values())} 件 (カテゴリ別) ===')
+    for cat, n in bycat.most_common():
+        print(f'{n:4d}  {cat}')
+    print(f'\n=== ファイル別 top 15 ===')
+    byfile = Counter()
+    for (path, cat), n in counts.items():
+        byfile[path] += n
+    for path, n in byfile.most_common(15):
+        print(f'{n:4d}  {path}')
+
+
+def main():
+    args = sys.argv[1:]
+    mode = 'gate'
+    extra = []
+    for a in args:
+        if a == '--report':
+            mode = 'report'
+        elif a == '--update-baseline':
+            mode = 'update'
+        elif a == '--strict':
+            mode = 'strict'
+        elif a == '--diff':
+            mode = 'diff'
+        elif a in ('-h', '--help'):
+            print(__doc__)
+            return
+        else:
+            extra.append(a)
+
+    counts, status, log = collect_current(extra)
+    if status != 0:
+        print('\n'.join(log.splitlines()[-3:]))
+        for l in log.splitlines():
+            if re.search(r'(^|\s)error:', l):
+                print(l)
+        print(f'❌ build failed (exit {status})')
+        sys.exit(status)
+
+    if mode == 'report':
+        print_census(counts)
+        return
+    if mode == 'update':
+        write_baseline(counts)
+        print(f'✓ baseline 更新: {sum(counts.values())} 件 / {len(counts)} 組 → {BASELINE}')
+        return
+    if mode == 'strict':
+        if counts:
+            print_census(counts)
+            print(f'\n❌ 非 sorry 警告が {sum(counts.values())} 件あります (--strict ゼロ gate)')
+            sys.exit(1)
+        print('✓ warnings clean (--strict): 非 sorry 警告ゼロ')
+        return
+
+    base = load_baseline()
+    regressions = []
+    for key, n in counts.items():
+        b = base.get(key, 0)
+        if n > b:
+            regressions.append((key, b, n))
+    improvements = []
+    for key, b in base.items():
+        n = counts.get(key, 0)
+        if n < b:
+            improvements.append((key, b, n))
+
+    if mode == 'diff':
+        print(f'baseline 総数: {sum(base.values())} / 現況: {sum(counts.values())}')
+        if regressions:
+            print('\n悪化 (新規/増加):')
+            for (p, c), b, n in sorted(regressions):
+                print(f'  {b}→{n}  {p}  [{c}]')
+        if improvements:
+            print('\n改善 (減少/消滅):')
+            for (p, c), b, n in sorted(improvements):
+                print(f'  {b}→{n}  {p}  [{c}]')
+        if not regressions and not improvements:
+            print('baseline と一致 (差分なし)')
+        return
+
+    # gate mode
+    if regressions:
+        print('❌ baseline を超える lint 警告が増えました (その commit で直すか baseline を'
+              ' 意図的に更新してください):')
+        for (p, c), b, n in sorted(regressions):
+            print(f'  {p}  [{c}]  baseline {b} → {n}')
+        print(f'\n合計 {len(regressions)} 組で増加。'
+              f' 意図的な追加なら `bin/check-warnings --update-baseline` で承認。')
+        sys.exit(1)
+    msg = f'✓ ratchet OK: 非 sorry 警告 {sum(counts.values())} 件 (baseline {sum(base.values())} 以下)'
+    if improvements:
+        msg += f' — うち {len(improvements)} 組が改善'
+    print(msg)
+
+
+if __name__ == '__main__':
+    main()
