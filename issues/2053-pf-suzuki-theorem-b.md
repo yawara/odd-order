@@ -373,17 +373,36 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       Higman 非依存)、conclusion のみ sorryAx (pow_four 経由)。
     - AxiomsCheck: StepFive を import 追加、clean 3 本を登録 (conclusion は
       Higman+9318 継承ゆえ意図的に非登録、注記済)。
-- [ ] (9) `p = f` — **算術半分 完了 (2026-07-22, FirstCase/StepNine.lean 新設・root 配線)**:
-  `char_eq_p_of_p_dvd_card_Q_add_one` (sorryAx=9318 through model): `p∣|Q|+1 ⟹ char=p`。
-  |Q|=|C_Q(P)|^p (step4) + |C_Q(P)|=|F|−1 (units) ⟹ |Q|+1=(|F|−1)^p+1 ≡ |F| (mod p)
-  (`ZMod.pow_card` Fermat) ⟹ p∣|F|、additive Cauchy (`exists_prime_addOrderOf_dvd_card`) +
-  `char_spec` (char•x=0, char prime) ⟹ p∣char ⟹ p=char。near-field F でも成立
-  (Field 不要、additive 経路)。
-  **残 = transfer 半分**: `p∣|Q|+1` を transfer T:G→H/(QKW) で出す。前提 = §1 Prop4(a)
-  coset reps (1 と {ty:y∈Q}、`exists_canonicalForm` 経由) で [G:H]=|Q|+1、tyx=xty^x、
-  (B2) で T(x)=1、P∩QKW=1。mathlib `MonoidHom.transfer`/`transfer_eq_prod_...` を使うが
-  `transfer_eq_pow` の key 条件 (P pointwise weakly-closed) は成立せず → 明示 transversal
-  の orbit 計算 (off-diag 項が QKW に落ちる) が要る。substantial subproject。
+- [x] (9) `p = f` — **transfer 半分 + endgame 完了 (2026-07-22)、残 = 構造ゲート 1 本**:
+  - **算術半分** (既済): `char_eq_p_of_p_dvd_card_Q_add_one` (sorryAx=9318 through model):
+    `p∣|Q|+1 ⟹ char=p`。|Q|=|C_Q(P)|^p (step4) + |C_Q(P)|=|F|−1 (units) ⟹ Fermat ⟹ p∣|F|
+    ⟹ additive Cauchy + char_spec ⟹ p=char。near-field F でも成立 (additive 経路)。
+  - **transfer 半分 完了 (axiom-clean)**: 予想と違い `transfer_eq_pow` の key 条件 (universal
+    weakly-closed) は不要だった。真の機構 = **transversal `R = {1}∪{ty}` が x∈P 共役で不変**
+    (`x∈V=C_D(t)` が t 中心化 + Q normal ⟹ `x⁻¹(ty)x=t(x⁻¹yx)`)。→ 汎用補題
+    **`OddOrder.GroupTheory.transfer_eq_pow_of_conj_invariant_transversal`**
+    (`GroupTheory/TransferInvariantTransversal.lean` 新設・root 配線): 左 transversal が x 共役
+    不変なら `transfer ϕ x = ϕ(x)^[G:H]` (mathlib 左 transversal で `x•S=S·x` を示す、
+    axiom-clean・reusable)。右版 corollary + `isComplement_inv_of_isComplement` も。
+    - `CanonicalForm.lean`: `rightTransversalTQ`={1}∪{ty} + `isComplement_H_rightTransversalTQ`
+      (Prop 4(a) を IsComplement 化、`exists_canonicalForm`+`canonicalForm_unique` から)。
+    - `StepNine.lean`: `rightTransversalTQ_conj_invariant` (R が x∈P 共役不変) +
+      **`transfer_eq_pow_card_Q_add_one`** (`transfer ϕ x = ϕ(x)^{|Q|+1}`、[G:H]=|Ω|=|Q|+1)。
+  - **endgame 完了 (axiom-clean)**: **`p_dvd_card_Q_add_one`** — ϕ=Abelianization.of:H→H^ab。
+    `T=transfer ϕ` は可換群への hom ゆえ `⁅G,G⁆≤ker T`；(B2)=`p∤|G^ab|` で p-元 x∈⁅G,G⁆ ⟹
+    `T(x)=1`；`T(x)=ϕ(x)^{|Q|+1}` かつ `P∩⁅H,H⁆=1` で `ord ϕ(x)=p` ⟹ `p∣|Q|+1`。
+    **`char_eq_p`** = p_dvd + 算術半分の連結 (= step (9) `p=f`、model sorry 継承)。
+  - **構造ゲート `P∩⁅H,H⁆=⊥` 完了 (2026-07-22、axiom-clean)** = 書籍の `P∩QKW=1` (∵ `⁅H,H⁆≤QKW`):
+    `P_inf_commutator_H_eq_bot` (StepNine.lean)。機構 = 保持 hom `hToAbDbar : ↥H→*Abelianization Dbar`
+    (`Abelianization.of ∘ mk'_W ∘ hToD`) が `⁅H,H⁆` を殺すが `P^#` 上非自明。部品:
+    - `QD_isComplement_in_H` (H=Q⋊D、`isComplement'_subgroupOf_of_disjoint_mul_eq_univ`) +
+      **`hToD:↥H→*↥D`** (Q-kill 保持、`dToV` clone) + `QsubgroupOfH_normal` instance。
+    - 非自明性 `hToAbDbar_ne_one_of_mem_P`: x∈P# の Dbar 像は Vbar (既存 `toVbar`) ∈、≠1
+      (`P∩W=⊥`)、∉ Kbar=fitting Dbar⊇commutator Dbar (`Kbar⊓Vbar=⊥`、`fitting_Dbar_cyclic_fpf_abelian.2.2`)。
+    - **`p_dvd_card_Q_add_one`/`char_eq_p` は hPinj 仮説を撤去** → char_eq_p は **hB2 + model のみ**。
+  - **残 = hB2 (B2 standing 仮説) の carrier 化のみ** (ゲートでない): `p∤|G^ab|` = 「index-p 正規
+    部分群なし」。Theorem B が全体で仮定するので step (17) 組立時に carrier/statement で threading。
+    (否定側は Ch.I §3 Prop 2 = InductionNonSimple で処理済。) model sorry は 9318 継承。
 - [ ] (10) Lemma 5 消費の二分岐
 - [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
 - [ ] (13)–(16)

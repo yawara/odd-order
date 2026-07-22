@@ -7,6 +7,8 @@ import OddOrder.Peterfalvi.Appendices.Suzuki
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.GroupTheory.ElementaryAbelian
+import OddOrder.Peterfalvi.Appendices.NearFieldClass
+import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
 
 /-!
 # Peterfalvi Appendix C: On Near-Fields
@@ -81,29 +83,6 @@ theorem card_group_dvd_card_of_free {G β : Type*} [Group G] [MulAction G β]
     rw [Nat.card_congr (MulAction.orbitEquivQuotientStabilizer G ω.out), hfree ω.out,
       ← Subgroup.index_eq_card, Subgroup.index_bot]
   exact ⟨1, by rw [hc, mul_one]⟩
-
-/-- A **(right) near-field** (Peterfalvi, Appendix C, p. 137): a set `F` with `+` and `·` such that
-`(F, +)` is a commutative group, `(F, ·)` is a group with zero — i.e. `(F ∖ {0}, ·)` is a group —
-and the **right** distributive law `(a + b) c = a c + b c` holds.  (Left distributivity and
-`·`-commutativity may fail; a field is the special case where both also hold.)
-
-Modeled as `AddCommGroup F` + `GroupWithZero F` + right distributivity, so the full multiplicative
-group-with-zero API (`mul_inv_cancel₀`, `zero_mul`, `mul_zero`, `zero_ne_one`, …) is inherited. -/
-class NearField (F : Type*) extends AddCommGroup F, GroupWithZero F where
-  /-- The right distributive law `(a + b) * c = a * c + b * c`. -/
-  protected right_distrib : ∀ a b c : F, (a + b) * c = a * c + b * c
-
-/-- The right distributive law in a near-field. -/
-theorem NearField.add_mul {F : Type*} [NearField F] (a b c : F) :
-    (a + b) * c = a * c + b * c := NearField.right_distrib a b c
-
-/-- **A near-field with commutative multiplication is a field** (the meaning of the first
-alternative in Peterfalvi, Appendix C, Proposition 2).  A near-field only postulates the *right*
-distributive law; if multiplication is commutative the left law follows, so `F` is a commutative
-division ring, i.e. a field. -/
-theorem NearField.mul_add_of_mul_comm {F : Type*} [NearField F]
-    (hcomm : ∀ x y : F, x * y = y * x) (a b c : F) : a * (b + c) = a * b + a * c := by
-  rw [hcomm a (b + c), NearField.add_mul, hcomm b a, hcomm c a]
 
 section NearFieldBasics
 

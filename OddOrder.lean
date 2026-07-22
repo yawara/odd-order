@@ -453,6 +453,7 @@ import OddOrder.BG.AppE_FiliformRefutation
 import OddOrder.Peterfalvi.Appendices.Suzuki
 import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.NearFieldClass
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.ExceptionalNearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
