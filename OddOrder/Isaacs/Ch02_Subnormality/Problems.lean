@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.IsSubnormal
 import OddOrder.Isaacs.Ch01_Sylow.Main
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
+import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 /-!
 # Isaacs Chapter 2 — Problems §2A (Subnormality)
@@ -61,6 +63,57 @@ theorem le_of_isSubnormal_of_coprime_index {G : Type*} [Group G] [Finite G] {K :
             rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hKK']
       _ ≤ (H'.subgroupOf K').map K'.subtype := Subgroup.map_mono hle'
       _ = H' := by rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hle]
+
+open OddOrder.Isaacs.Ch01 OddOrder.Isaacs.Ch03 in
+/-- 部分正規部分群 `H` について `O_π(↥H)` を `G` へ押し出すと `O_π(G)` を超えない。`IsSubnormal` の
+構造帰納 (motive を `(oPiCore π ↥H).map H.subtype ≤ oPiCore π G` とすると step の IH が上の `K'` に
+ついてで整合する)。top は `oPiCore.map_le_of_surjective`、step は同型
+`(subgroupOfEquivOfLe hle).symm` で `oPiCore π ↥H'` を `oPiCore π ↥(H'.subgroupOf K')` に移送
+(`oPiCore.map_eq_of_mulEquiv`)、`characteristic_map_subtype_normal` で `↥K'` 正規、`le_oPiCore` で
+`≤ oPiCore π ↥K'`、`H.subtype = K'.subtype ∘ (subgroupOf).subtype ∘ e.symm` で合成して IH。 -/
+theorem oPiCore_map_subtype_le_of_isSubnormal {G : Type*} [Group G] [Finite G] {π : Set ℕ} :
+    ∀ {H : Subgroup G}, H.IsSubnormal → (oPiCore π ↥H).map H.subtype ≤ oPiCore π G := by
+  intro H hH
+  induction hH with
+  | top =>
+    exact oPiCore.map_le_of_surjective π (⊤ : Subgroup G).subtype
+      (fun g => ⟨⟨g, Subgroup.mem_top g⟩, rfl⟩)
+  | @step H' K' hle hsubK' hN ih =>
+    haveI := hN
+    set e := Subgroup.subgroupOfEquivOfLe hle with he
+    have htrans : (oPiCore π ↥H').map (e.symm : ↥H' →* ↥(H'.subgroupOf K'))
+        = oPiCore π ↥(H'.subgroupOf K') := oPiCore.map_eq_of_mulEquiv π e.symm
+    haveI hnorm : ((oPiCore π ↥(H'.subgroupOf K')).map (H'.subgroupOf K').subtype).Normal :=
+      characteristic_map_subtype_normal (oPiCore π ↥(H'.subgroupOf K'))
+    have hpi : Subgroup.IsPiGroup π
+        ((oPiCore π ↥(H'.subgroupOf K')).map (H'.subgroupOf K').subtype) := fun q hq =>
+      oPiCore.isPiGroup π q
+        (by rwa [Subgroup.card_map_of_injective (Subgroup.subtype_injective _)] at hq)
+    have hle_oPiK' : (oPiCore π ↥(H'.subgroupOf K')).map (H'.subgroupOf K').subtype
+        ≤ oPiCore π ↥K' := Subgroup.IsPiGroup.le_oPiCore hpi
+    have hcomp : H'.subtype
+        = (K'.subtype.comp (H'.subgroupOf K').subtype).comp
+          (e.symm : ↥H' →* ↥(H'.subgroupOf K')) := by
+      ext h; rfl
+    have hmapeq : (oPiCore π ↥H').map H'.subtype
+        = ((oPiCore π ↥(H'.subgroupOf K')).map (H'.subgroupOf K').subtype).map K'.subtype := by
+      rw [hcomp, ← Subgroup.map_map, ← Subgroup.map_map, htrans]
+    rw [hmapeq]
+    exact (Subgroup.map_mono hle_oPiK').trans ih
+
+open OddOrder.Isaacs.Ch01 OddOrder.Isaacs.Ch03 in
+/-- **Isaacs Problem 2A.1**. 有限群 `G` の部分正規 π-部分群 `K` は π-radical `O_π(G)` に含まれる。
+`↥K` は π-群なので `O_π(↥K) = ⊤`、`oPiCore_map_subtype_le_of_isSubnormal` で
+`K = (O_π ↥K).map K.subtype ≤ O_π(G)`。系として二つの部分正規 π-部分群の生成する部分群も π-群
+(ともに `O_π(G)` に含まれ `O_π(G)` は π-群)。 -/
+theorem le_oPiCore_of_isSubnormal_of_isPiGroup {G : Type*} [Group G] [Finite G] {π : Set ℕ}
+    {K : Subgroup G} (hK : K.IsSubnormal) (hπ : Subgroup.IsPiGroup π K) : K ≤ oPiCore π G := by
+  have h := oPiCore_map_subtype_le_of_isSubnormal (π := π) hK
+  have htop : oPiCore π (↥K) = ⊤ := by
+    refine top_le_iff.mp (Subgroup.IsPiGroup.le_oPiCore (H := (⊤ : Subgroup ↥K)) (fun q hq => ?_))
+    exact hπ q (by rwa [Subgroup.card_top] at hq)
+  rw [htop, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at h
+  exact h
 
 end
 
