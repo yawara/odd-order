@@ -467,5 +467,6 @@ import OddOrder.Peterfalvi.Appendices.FeitSibleyUnionCoherence
 import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
 import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 import OddOrder.Peterfalvi.Appendices.FeitSibleyConclusion
+import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
 import OddOrder.FeitThompson
 import OddOrder.AxiomsCheck
