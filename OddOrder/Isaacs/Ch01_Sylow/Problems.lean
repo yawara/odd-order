@@ -847,4 +847,54 @@ theorem oPiCore_eq_iInf_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Fin
 
 end
 
+section /- Problems 1C: Sylow C-theorem, Frattini argument (pp. 17-19) -/
+
+open Pointwise in
+/-- **Isaacs Problem 1C.1**. `P` を Sylow `p`-部分群、`N_G(P) ≤ H ≤ G` とすると `H = N_G(H)`
+(1B.3 の一般化 — `H = N_G(P)` で 1B.3)。
+
+Frattini 論法: `g ∈ N_G(H)` を取る。`P ≤ H` かつ `g·P·g⁻¹ ≤ H` (共役が `H` を保つ)。`P` と
+`g•P` はともに `H` の Sylow `p`-部分群 (`Sylow.subtype`)、`H` 内の Sylow C で `∃ k∈H`,
+`k•P = g•P` (G の Sylow として、`map_conj_smul` で ↥H から降ろす)。すると `g⁻¹·k ∈ N_G(P) ≤ H`、
+`k ∈ H` ゆえ `g ∈ H`。 -/
+theorem eq_normalizer_of_sylow_normalizer_le {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    [Finite G] (P : Sylow p G) {H : Subgroup G}
+    (hle : Subgroup.normalizer (P : Subgroup G) ≤ H) :
+    Subgroup.normalizer H = H := by
+  refine le_antisymm (fun g hg => ?_) Subgroup.le_normalizer
+  have hPH : (P : Subgroup G) ≤ H := Subgroup.le_normalizer.trans hle
+  -- 共役 g は H を保つ
+  have hgH : MulAut.conj g • H = H := by
+    ext x
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+      show ((MulAut.conj g)⁻¹ • x : G) = g⁻¹ * x * g by rw [← map_inv]; simp [MulAut.smul_def]]
+    exact (Subgroup.mem_normalizer_iff''.mp hg x).symm
+  have hgPH : (↑(g • P) : Subgroup G) ≤ H := by
+    rw [Sylow.coe_subgroup_smul, ← hgH]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hPH
+  -- ↥H での Sylow C
+  obtain ⟨k, hk⟩ := MulAction.exists_smul_eq (↥H) (P.subtype hPH) ((g • P).subtype hgPH)
+  -- ↥H の等式を Subgroup ↥H に落とし、H.subtype で G に写して ↑k • P = g • P を得る
+  have hAB : MulAut.conj k • ((P : Subgroup G).subgroupOf H)
+      = (MulAut.conj g • (P : Subgroup G)).subgroupOf H := by
+    have h := congrArg (fun S : Sylow p ↥H => (S : Subgroup ↥H)) hk
+    simpa only [Sylow.coe_subgroup_smul, Sylow.coe_subtype] using h
+  have hkey : (↑k : G) • P = g • P := by
+    apply Sylow.ext
+    rw [Sylow.coe_subgroup_smul, Sylow.coe_subgroup_smul]
+    have h := congrArg (Subgroup.map H.subtype) hAB
+    rwa [map_conj_smul, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hPH,
+      Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr
+        (by rw [Sylow.coe_subgroup_smul] at hgPH; exact hgPH),
+      show (H.subtype k : G) = ↑k from rfl] at h
+  -- 仕上げ: g⁻¹·↑k ∈ N_G(P) ≤ H, ↑k ∈ H ⟹ g ∈ H
+  have hmem : g⁻¹ * (↑k : G) ∈ Subgroup.normalizer (P : Subgroup G) :=
+    Sylow.smul_eq_iff_mem_normalizer.mp (by rw [mul_smul, hkey, inv_smul_smul])
+  have hg_inv : g⁻¹ ∈ H := by
+    have h1 := H.mul_mem (hle hmem) (H.inv_mem k.2)
+    rwa [mul_inv_cancel_right] at h1
+  simpa using H.inv_mem hg_inv
+
+end
+
 end OddOrder.Isaacs.Ch01
