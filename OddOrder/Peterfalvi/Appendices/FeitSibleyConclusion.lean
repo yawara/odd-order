@@ -373,6 +373,59 @@ theorem witness_charValue_cong [Fintype G]
   exact hcong2
 
 open scoped Classical in
+open scoped Classical in
+/-- **(4) anchor divisibility** (Peterfalvi (4), p. 147: `aᵢ = χᵢ(1)/χ₁(1) ∈ ℤ`).  There is an
+anchor `χ₁ ∈ 𝒳₁ = XsetOf Sder Z` (the `𝒮(S')`-relative part) of minimal `p`-power degree such that
+`χ₁(1) ∣ χ(1)` for every `χ ∈ 𝒳 = XsetOf ⊥ Z` (the full family).
+
+Members of `𝒳₁` have `p`-power degree `d·p^k` (`exists_apply_one_eq_d_mul_pow`); pick `χ₁` of
+minimal exponent.  For `χ ∈ 𝒳`, `exists_anchor_of_mem_XsetOf` gives an anchor `χθ ∈ 𝒳₁` with
+`χθ(1) = d·tθ ∣ χ(1)`; since `χθ ∈ 𝒳₁`, `tθ = p^{kθ}` with `kθ ≥ k₁` (minimality), so
+`χ₁(1) = d·p^{k₁} ∣ d·p^{kθ} ∣ χ(1)`.  This discharges the integer-ratio `hXdiff` hypothesis of
+`dvd_lam_of_endgame_data`/`xset_qder_union_coherent` — no product character theory needed. -/
+theorem exists_min_anchor_dvd [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+    [Invertible (Nat.card ↥hyp.H : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    {p : ℕ} (hp : p.Prime) (hQ1p : IsPGroup p ↥hyp.Q1)
+    {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) (hZne : Z ≠ ⊥)
+    (hZH : ∀ ⦃h : G⦄, h ∈ hyp.H → ∀ ⦃x : G⦄, x ∈ Z → h * x * h⁻¹ ∈ Z)
+    [(hyp.Sder.subgroupOf hyp.H).Normal]
+    [((hyp.Sder.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal] :
+    ∃ χ₁ ∈ hyp.XsetOf hyp.Sder Z, ∀ χ ∈ hyp.XsetOf ⊥ Z,
+      ∃ b : ℕ, 0 < b ∧ χ (1 : ↥hyp.H) = (b : ℂ) * χ₁ (1 : ↥hyp.H) := by
+  classical
+  have hX1fin : (hyp.XsetOf hyp.Sder Z).Finite := hyp.XsetOf_finite hyp.Sder Z
+  have hX1ne : (hyp.XsetOf hyp.Sder Z).Nonempty :=
+    hyp.XsetOf_nonempty hyp.Sder_le_S hZQ1 hZne
+  -- every `𝒳₁` member has a `p`-power degree `d·p^k`
+  have hpow : ∀ χ ∈ hyp.XsetOf hyp.Sder Z,
+      ∃ k : ℕ, χ (1 : ↥hyp.H) = (hyp.d : ℂ) * ((p ^ k : ℕ) : ℂ) :=
+    fun χ hχ => hyp.exists_apply_one_eq_d_mul_pow hp hQ1p (hyp.XsetOf_subset_SsetOf hyp.Sder Z hχ)
+  set kof : ClassFunction ↥hyp.H ℂ → ℕ :=
+    fun χ => if h : χ ∈ hyp.XsetOf hyp.Sder Z then (hpow χ h).choose else 0 with hkofdef
+  have hkof : ∀ χ (hχ : χ ∈ hyp.XsetOf hyp.Sder Z),
+      χ (1 : ↥hyp.H) = (hyp.d : ℂ) * ((p ^ kof χ : ℕ) : ℂ) := by
+    intro χ hχ
+    simp only [hkofdef, dif_pos hχ]; exact (hpow χ hχ).choose_spec
+  obtain ⟨χ₁, hχ₁X1, hχ₁min⟩ := Set.exists_min_image _ kof hX1fin hX1ne
+  refine ⟨χ₁, hχ₁X1, fun χ hχ => ?_⟩
+  obtain ⟨χθ, tθ, e, hχθX1, htθpos, hepos, hχθdeg, hχdeg⟩ :=
+    hyp.exists_anchor_of_mem_XsetOf hZQ1 hZH hχ
+  have hd0 : (hyp.d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+  -- `tθ = p^{kof χθ}` from the two degree formulas for `χθ`
+  have htθpow : tθ = p ^ kof χθ := by
+    have h := hkof χθ hχθX1
+    rw [hχθdeg] at h
+    exact_mod_cast mul_left_cancel₀ hd0 h
+  have hle : kof χ₁ ≤ kof χθ := hχ₁min χθ hχθX1
+  refine ⟨e * p ^ (kof χθ - kof χ₁), Nat.mul_pos hepos (pow_pos hp.pos _), ?_⟩
+  have hb : e * tθ = (e * p ^ (kof χθ - kof χ₁)) * p ^ kof χ₁ := by
+    rw [htθpow, mul_assoc, ← pow_add, Nat.sub_add_cancel hle]
+  rw [hχdeg, hkof χ₁ hχ₁X1]
+  rw [show ((e * tθ : ℕ) : ℂ) = (((e * p ^ (kof χθ - kof χ₁)) * p ^ kof χ₁ : ℕ) : ℂ) from by
+    exact_mod_cast hb]
+  push_cast
+  ring
+
 /-- **(8) full assembly: `a ∣ λ`** (Peterfalvi (8), p. 150).  The keystone divisibility closing
 step (6): from the endgame `(4)` data — the coherent `𝒳 = XsetOf ⊥ Z` with anchor `χ₁` of degree
 `χ₁(1) = a·d`, `p`-power degree differences `χ − b·χ₁` supported, the `𝒴`-witness `e' = ε·ξ`
