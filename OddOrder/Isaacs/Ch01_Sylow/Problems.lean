@@ -217,6 +217,72 @@ theorem card_doubleCoset_mul_card_inf_conj {G : Type*} [Group G] [Finite G]
   rw [← horb, ← hstab, ← Nat.card_prod,
     Nat.card_congr (orbitProdStabilizerEquivGroup (H × K) g), Nat.card_prod]
 
+open Pointwise in
+/-- 部分群積の位数公式 `|HK| · |H∩K| = |H| · |K|` (Isaacs 1A.2 の Note の「よく知られた公式」、
+上の `card_doubleCoset_mul_card_inf_conj` を `g = 1` に適用したもの)。 -/
+theorem card_mul_card_inf {G : Type*} [Group G] [Finite G] (H K : Subgroup G) :
+    Nat.card (↑H * ↑K : Set G) * Nat.card ↥(H ⊓ K) = Nat.card H * Nat.card K := by
+  have h2 := card_doubleCoset_mul_card_inf_conj H K 1
+  have hdc : DoubleCoset.doubleCoset (1 : G) (↑H) (↑K) = (↑H * ↑K : Set G) := by
+    ext x
+    rw [DoubleCoset.mem_doubleCoset, Set.mem_mul]
+    constructor
+    · rintro ⟨a, ha, b, hb, rfl⟩; exact ⟨a, ha, b, hb, by group⟩
+    · rintro ⟨a, ha, b, hb, rfl⟩; exact ⟨a, ha, b, hb, by group⟩
+  have hconj : MulAut.conj (1 : G)⁻¹ • H = H := by rw [inv_one, map_one, one_smul]
+  rw [hdc, hconj, inf_comm] at h2
+  exact h2
+
+open Pointwise in
+/-- **Isaacs Problem 1A.3(a)** (不等式). `|H : H∩K| ≤ |G : K|`、乗法形 `|H|·|K| ≤ |G|·|H∩K|`。
+`|H|·|K| = |HK|·|H∩K| ≤ |G|·|H∩K|` (`HK ⊆ G`)。index 形 `(H⊓K).index ≤ H.index·K.index` は
+mathlib の `Subgroup.index_inf_le`。 -/
+theorem card_mul_le_card_mul_card_inf {G : Type*} [Group G] [Finite G] (H K : Subgroup G) :
+    Nat.card H * Nat.card K ≤ Nat.card G * Nat.card ↥(H ⊓ K) := by
+  rw [← card_mul_card_inf H K]
+  gcongr
+  rw [Nat.card_coe_set_eq, ← Set.ncard_univ G]
+  exact Set.ncard_le_ncard (Set.subset_univ _)
+
+open Pointwise in
+/-- **Isaacs Problem 1A.3(a)** (等号条件). `|H|·|K| = |G|·|H∩K| ⟺ HK = G` (集合として)。 -/
+theorem card_mul_eq_iff_mul_eq_univ {G : Type*} [Group G] [Finite G] (H K : Subgroup G) :
+    Nat.card H * Nat.card K = Nat.card G * Nat.card ↥(H ⊓ K) ↔ (↑H * ↑K : Set G) = Set.univ := by
+  rw [← card_mul_card_inf H K, Set.eq_univ_iff_ncard, ← Nat.card_coe_set_eq]
+  constructor
+  · exact fun h => Nat.eq_of_mul_eq_mul_right Nat.card_pos h
+  · exact fun h => by rw [h]
+
+open Pointwise in
+/-- **Isaacs Problem 1A.3(b)**. `|G:H|` と `|G:K|` が互いに素ならば `HK = G` (集合として)。
+
+`[G:H] ∣ [G:H∩K]` かつ `[G:K] ∣ [G:H∩K]` (∵ `H∩K ≤ H,K`)、互いに素ゆえ `[G:H]·[G:K] ∣ [G:H∩K]`。
+一方 `[G:H∩K] ≤ [G:H]·[G:K]` (`Subgroup.index_inf_le`)。よって `[G:H∩K] = [G:H]·[G:K]`、
+これは (a) の等号条件 `|H|·|K| = |G|·|H∩K|` と同値ゆえ `HK = G`。 -/
+theorem mul_eq_univ_of_coprime_index {G : Type*} [Group G] [Finite G] {H K : Subgroup G}
+    (hcop : Nat.Coprime H.index K.index) : (↑H * ↑K : Set G) = Set.univ := by
+  rw [← card_mul_eq_iff_mul_eq_univ]
+  have hdvd : H.index * K.index ∣ (H ⊓ K).index :=
+    hcop.mul_dvd_of_dvd_of_dvd (Subgroup.index_dvd_of_le inf_le_left)
+      (Subgroup.index_dvd_of_le inf_le_right)
+  have hpos : 0 < (H ⊓ K).index := Nat.pos_of_ne_zero fun h => by
+    have hc := Subgroup.card_mul_index (H ⊓ K)
+    rw [h, Nat.mul_zero] at hc
+    exact (Nat.card_pos).ne' hc.symm
+  have hidx : (H ⊓ K).index = H.index * K.index :=
+    le_antisymm Subgroup.index_inf_le (Nat.le_of_dvd hpos hdvd)
+  have eH : Nat.card H * H.index = Nat.card G := Subgroup.card_mul_index H
+  have eK : Nat.card K * K.index = Nat.card G := Subgroup.card_mul_index K
+  have eI : Nat.card ↥(H ⊓ K) * (H.index * K.index) = Nat.card G := by
+    rw [← hidx]; exact Subgroup.card_mul_index (H ⊓ K)
+  have hprodpos : 0 < H.index * K.index := hidx ▸ hpos
+  apply Nat.eq_of_mul_eq_mul_right hprodpos
+  calc Nat.card H * Nat.card K * (H.index * K.index)
+      = (Nat.card H * H.index) * (Nat.card K * K.index) := by ring
+    _ = Nat.card G * Nat.card G := by rw [eH, eK]
+    _ = Nat.card G * (Nat.card ↥(H ⊓ K) * (H.index * K.index)) := by rw [eI]
+    _ = Nat.card G * Nat.card ↥(H ⊓ K) * (H.index * K.index) := by ring
+
 end
 
 /-! ## mathlib で被覆される演習 (続き)
