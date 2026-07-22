@@ -552,6 +552,46 @@ theorem pow_eq_one_frattiniQuotient_of_isPGroup {P : Type*} [Group P] [Finite P]
   rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
   exact pow_mem_frattini_of_isPGroup hP g
 
+/-- `P / Φ(P)` が巡回ならば `P` は巡回 (1D.9 の核). 生成元 `x̄ = xΦ(P)` をとると `⟨x⟩` の像が
+`P/Φ(P)` 全体ゆえ `⟨x⟩ ⊔ Φ(P) = ⊤` (`comap_map_eq` + `ker_mk'`)、Frattini 部分群の非生成性
+(`frattini_nongenerating`) で `⟨x⟩ = ⊤`、すなわち `x` が `P` を生成。 -/
+theorem isCyclic_of_frattiniQuotient_isCyclic {P : Type*} [Group P] [Finite P]
+    (h : IsCyclic (P ⧸ frattini P)) : IsCyclic P := by
+  obtain ⟨gbar, hgbar⟩ := h.exists_generator
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective gbar
+  have himg : (Subgroup.zpowers x).map (QuotientGroup.mk' (frattini P)) = ⊤ := by
+    rw [MonoidHom.map_zpowers, eq_top_iff]
+    intro y _
+    exact hgbar y
+  have hsup : Subgroup.zpowers x ⊔ frattini P = ⊤ := by
+    have hc := congrArg (Subgroup.comap (QuotientGroup.mk' (frattini P))) himg
+    rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk', Subgroup.comap_top] at hc
+  have htop : Subgroup.zpowers x = ⊤ := frattini_nongenerating hsup
+  exact ⟨⟨x, fun y => htop.ge (Subgroup.mem_top y)⟩⟩
+
+/-- **Isaacs Problem 1D.9** (前半). 非巡回有限 `p`-群 `P` では `p ^ 2 ≤ |P : Φ(P)|`。商 `P / Φ(P)`
+は `p`-群 (`IsPGroup.to_quotient`) で位数 `p ^ n`。`P` 非巡回ゆえ
+`isCyclic_of_frattiniQuotient_isCyclic` の対偶で `P / Φ(P)` も非巡回、したがって位数 `1` (自明) でも
+`p` (`isCyclic_of_prime_card` で巡回) でもない、すなわち `n ≥ 2`。 -/
+theorem sq_le_card_frattiniQuotient_of_isPGroup_of_not_isCyclic {P : Type*} [Group P] [Finite P]
+    {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P) (hnc : ¬ IsCyclic P) :
+    p ^ 2 ≤ Nat.card (P ⧸ frattini P) := by
+  have hncq : ¬ IsCyclic (P ⧸ frattini P) :=
+    fun hc => hnc (isCyclic_of_frattiniQuotient_isCyclic hc)
+  obtain ⟨n, hn⟩ := (hP.to_quotient (frattini P)).exists_card_eq
+  rw [hn]
+  refine Nat.pow_le_pow_right (Fact.out : p.Prime).pos ?_
+  by_contra hlt
+  rw [not_le] at hlt
+  interval_cases n
+  · rw [pow_zero] at hn
+    haveI : Subsingleton (P ⧸ frattini P) := (Nat.card_eq_one_iff_unique.mp hn).1
+    refine hncq ⟨⟨1, fun y => Subgroup.mem_zpowers_iff.mpr ⟨0, ?_⟩⟩⟩
+    rw [zpow_zero]
+    exact Subsingleton.elim _ _
+  · rw [pow_one] at hn
+    exact hncq (isCyclic_of_prime_card hn)
+
 end
 
 end OddOrder.Isaacs.Ch01
