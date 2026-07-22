@@ -173,14 +173,23 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     `exists_pow_two_fittingConjAction` (ec7f1be5c)、A2
     `fittingConjAction_pow_of_K_conj` (9407e5de2)、combine
     `exists_pow_two_modEq_of_K_conj` (131319f5b: hB → ∃i r≡2^i)。
-    **残 = Half B のみ** (M 側で hB = `∃ a∈P, a≠1 ∧ ∀k∈K a·k·a⁻¹=k^r` を供給)。
-    Half B 精緻化: M K-既約 → `exists_field_semilinear` (E:=M, T:=K, ψ:=K の
-    M 上共役作用, hirr:=既約) で F'=𝔽_{r^p}, M 1-dim/F', 各 g=conj-by-a に σ_a:
-    F'≃+*F' (semilinear law)。要点: (1) K↪F'ˣ (M≅F' 上 K が mult by unit),
-    (2) K on M faithful (fpf `conjQByK_fixed_eq_one` ⟹ faithful), (3) σ: P→RingAut F'
-    injective + |P|=p=|Gal(F'/𝔽_r)| ⟹ P≅Gal, (4) Frobenius x↦x^r ∈ Gal ゆえ
-    ∃a∈P σ_a=Frobenius (A1 の r 版: RingAut 𝔽_{r^p}=x↦x^{r^j}), その a で
-    a·k·a⁻¹=σ_a(k)=k^r。⚠ 全体は dichotomy 経由で 9318 継承 (AxiomsCheck 非登録)。
+  - **Half B 完了 (2026-07-22)**: `exists_K_conj_pow_of_irreducible`
+    (StepThree.lean 末尾) — M K-既約 ⟹ ∃ a∈P, ∀k∈K a·k·a⁻¹=k^r。
+    実装 = `exists_field_semilinear_with_scalar` (App I Prop 2(a)+(b) の
+    μ : K→*F'ˣ 保持版; E:=↥M, T:=↥K, ψ:=正規化共役) で F'=𝔽_{r^p} を取得、
+    μ 単射 (fpf `conjQByK_fixed_eq_one`)、生成元 a₀ の共役が σ-semilinear、
+    σ=x↦x^{r^j} (`ringAut_card_prime_pow_eq_pow` q:=r)。p∣j なら σ が Fˣ 固定
+    → a₀ が K 中心化 → `K_inf_centralizer_eq_bot`+|K|=2^p−1>1 で矛盾;
+    さもなくば m=j⁻¹ (mod p) で a:=a₀^m が Frobenius = x↦x^r → μ 単射で
+    K に転送。9318 継承 (`card_inf_centralizer_eq_prime` 経由) ゆえ
+    AxiomsCheck 非登録。
+  - **package (3) 完了 (2026-07-22) → step (3) 完結**:
+    `exists_pow_two_modEq_of_prime_dvd_card_Q1` (StepThree.lean 末尾) —
+    r ∣ |Q₁| prime ⟹ ∃i, r ≡ 2^i [MOD 2^p−1]。M の存在+極小性 =
+    `exists_minimal_invariant_elab` (Q1MinimalInvariant, X := K⊔P ≤ H) が
+    丸ごと供給、dichotomy 消費、第一分岐 = `card_K_dvd_sub_one...` の
+    (2^p−1) ∣ (r−1) を Nat.modEq_iff_dvd' で r ≡ 2^0 化、第二分岐 =
+    Half B → combine。9318 継承 (AxiomsCheck 非登録)。
 - [ ] (4) Wielandt fixed point (被覆調査 → 不足なら port)
 - [ ] (5)–(9)
 - [ ] (10) Lemma 5 消費の二分岐
