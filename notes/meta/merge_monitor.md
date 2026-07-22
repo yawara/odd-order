@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 07:0x 監視 tick — a (1D.15 general N) + b (Higman L13 type-C parameter) 合流 / 🔴 c stall 継続 (~4h)**。a=3 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.15 (general N)** — Φ(G)⊆N◁G かつ N/Φ(G) nilpotent ⟹ N nilpotent、前 tick 発見の二段 Frattini 論法を実証明 +57; docs で §1D **17/18 milestone** + 1D.5 分析 + Ch.2 スコープ整理) / b (**Higman Lemma 13** C factor の sharp parameter + middle bracket 固有 weight、新 leaf `RestrictedFactorTypeCParameter.lean` +325 / `FrattiniMiddleEigenweights.lean` +274、両 WIRED)。
+> **gate: green 4671 jobs (前 4669 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 4ca250a71→b2f96d220**。範囲逸脱なし。
+> ℹ **a の §1D がほぼ完 (17/18)** — 次は Ch.2 (Subnormality) スコープへ移行見込み。1D.5 は closing 論法判明・共役 gap 特定済。
+> 🔴 **lane c stall 継続 (~4h, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動 or 退役指示待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
 > **▶▶ 2026-07-23 06:5x 監視 tick — a (1D.15 docs) + b (Higman L13 Jacobi swap) 合流 / 🔴 c stall 継続 (~3h50m)**。a=2 / b=1 / c=0 / d=0(WIP foo)。
 > 合流: a (**docs-only** — Isaacs 1D.15 一般 N 版の正しい非循環証明を発見 (二段 Frattini)、`issues/1055` +10。Lean 未変更ゆえ build 影響なし。WIP で実証明中) / b (**Higman Lemma 13** Φ² 座標で Jacobi swap を証明、新 leaf `FrattiniTripleJacobi.lean` +313 WIRED)。
 > **gate: green 4669 jobs (前 4668 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push b4e0df7b2→457a5cef6**。範囲逸脱なし。
