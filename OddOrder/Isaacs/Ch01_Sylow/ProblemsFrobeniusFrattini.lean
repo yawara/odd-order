@@ -500,6 +500,29 @@ theorem isNilpotent_of_quotient_frattini_isNilpotent {G : Type*} [Group G] [Fini
   rw [← h1]
   exact sup_le le_rfl Subgroup.le_normalizer
 
+/-- **Isaacs Problem 1D.17**. `N ◁ G` が冪零で商 `G / N'` (`N' = ⁅N, N⁆` は `N` の導来部分群) も
+冪零ならば `G` は冪零。導来部分群 `N' = ⁅N, N⁆` は 1D.8 (`commutator_le_frattini`, `N` 冪零) で `Φ(N)`
+に含まれ、1D.16 (`frattini_map_subtype_le_frattini`) で `Φ(N)` の像 `⊆ Φ(G)`、あわせて `N' ⊆ Φ(G)`
+(`Subgroup.map_subtype_commutator` で `(commutator ↥N).map N.subtype = ⁅N, N⁆`)。ゆえに全射
+`G / N' ↠ G / Φ(G)` (`QuotientGroup.map`) があり、`G / N'` 冪零から `G / Φ(G)` 冪零
+(`nilpotent_of_surjective`)、1D.15 (`isNilpotent_of_quotient_frattini_isNilpotent`) で `G` 冪零。
+
+弱めて「`G/N` 冪零」を仮定しても `G` 冪零は従わない (Isaacs の Note)。 -/
+theorem isNilpotent_of_quotient_commutator_isNilpotent {G : Type*} [Group G] [Finite G]
+    (N : Subgroup G) [N.Normal] [Group.IsNilpotent (N : Subgroup G)]
+    [Group.IsNilpotent (G ⧸ ⁅N, N⁆)] : Group.IsNilpotent G := by
+  -- `N' = ⁅N, N⁆ ⊆ Φ(G)`
+  have hN'le : ⁅N, N⁆ ≤ frattini G := by
+    rw [← Subgroup.map_subtype_commutator]
+    exact (Subgroup.map_mono commutator_le_frattini).trans frattini_map_subtype_le_frattini
+  have hcomap : ⁅N, N⁆ ≤ (frattini G).comap (MonoidHom.id G) := by rwa [Subgroup.comap_id]
+  -- 全射 `G / N' ↠ G / Φ(G)` で `G / Φ(G)` が冪零
+  haveI : Group.IsNilpotent (G ⧸ frattini G) :=
+    Group.nilpotent_of_surjective _
+      (QuotientGroup.map_surjective_of_surjective ⁅N, N⁆ (frattini G) (MonoidHom.id G)
+        (by simpa using QuotientGroup.mk_surjective) hcomap)
+  exact isNilpotent_of_quotient_frattini_isNilpotent
+
 end
 
 end OddOrder.Isaacs.Ch01
