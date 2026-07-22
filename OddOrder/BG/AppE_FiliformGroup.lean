@@ -129,7 +129,7 @@ instance : Finite Q6 :=
 theorem card_q6 : Nat.card Q6 = 197 ^ 6 := by
   rw [Nat.card_eq_of_bijective (fun x : Q6 => x.co)
     ⟨fun _ _ h => Q6.ext h, fun f => ⟨⟨f⟩, rfl⟩⟩]
-  simp [Nat.card_pi, Nat.card_zmod]
+  simp
 
 /-! ### Powers are scalar multiples: exponent `197` -/
 

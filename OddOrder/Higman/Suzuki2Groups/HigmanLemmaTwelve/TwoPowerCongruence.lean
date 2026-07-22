@@ -194,7 +194,7 @@ theorem exists_finset_sum_two_pow_eq_of_multiset {n : ℕ} (M : Multiset ℕ)
     · -- extract a repeated exponent and merge it by the carry
       have hdup : ∃ a, 2 ≤ Multiset.count a M := by
         by_contra hno
-        push_neg at hno
+        push Not at hno
         exact hnd (Multiset.nodup_iff_count_le_one.mpr fun a => by
           have := hno a; omega)
       obtain ⟨a, ha⟩ := hdup

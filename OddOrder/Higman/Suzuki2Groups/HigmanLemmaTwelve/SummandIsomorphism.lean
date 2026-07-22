@@ -41,7 +41,7 @@ theorem exists_frobenius_conjugate_of_semiconj
       (c i * lam ^ 2 ^ (i : ℕ) - mu * c i) • frobLin n i =
       (0 : GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) := by
     ext x
-    simp only [LinearMap.coeFn_sum, Finset.sum_apply, LinearMap.smul_apply,
+    simp only [LinearMap.coe_sum, Finset.sum_apply, LinearMap.smul_apply,
       frobLin_apply, LinearMap.zero_apply, smul_eq_mul, sub_mul]
     rw [Finset.sum_sub_distrib]
     have h1 : ∑ i : Fin n,
@@ -65,7 +65,7 @@ theorem exists_frobenius_conjugate_of_semiconj
     Finset.univ _ hzero
   have hcne : ∃ i : Fin n, c i ≠ 0 := by
     by_contra hallzero
-    push_neg at hallzero
+    push Not at hallzero
     apply hf
     have hczero : c = 0 := Finsupp.ext hallzero
     have := congrArg (frobeniusBasis n hn).repr.symm

@@ -260,7 +260,7 @@ theorem frobenius_double_sum_pair {n : ℕ}
           (frobeniusEquiv (GaloisField 2 n) 2 ^ (j : ℕ)) β) :=
     (Finset.sum_subset (Finset.subset_univ _) fun i _ hi => by
       simp only [Finset.mem_insert, Finset.mem_singleton] at hi
-      push_neg at hi
+      push Not at hi
       exact hinner i hi.1 hi.2).symm
   have hrow : ∀ (i2 j2 : Fin n), (∀ i j : Fin n, c i j ≠ 0 → i ≠ i2 → False) →
       True := fun _ _ _ => trivial
@@ -326,7 +326,7 @@ theorem exists_equivariant_frobenius_repr {n : ℕ} (hn : n ≠ 0)
       exact mul_comm _ _
     exact mul_left_cancel₀ hne h'
   · by_contra hall
-    push_neg at hall
+    push Not at hall
     obtain ⟨α, β, hαβ⟩ := hM0
     apply hαβ
     rw [hc α β]
