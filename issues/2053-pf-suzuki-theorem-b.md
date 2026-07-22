@@ -213,24 +213,54 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     実証明、`card_D_le_three_of_noncomm` (非可換=F_{9,2}) は **gated sorry**
     (Aut(F_{9,2}) 奇部分=3、F*=Q₈ ゆえ; near-field Aut infra 無し、D_odd は在り
     |D|∣3 だけ欠く; shared 9300 候補)。StepSix の唯一の sorry。
-  - **(7) 着手方針 (2026-07-22 精査)** — `N = P ∧ Σ ≅ C_W(P)`。深い統合論法
-    (fresh context 推奨、intricate):
-    - N (= step 2(a) kernel = `(H.subgroupOf L).normalCore`) は `N = (N∩W)×P`
-      (step 1 = §3 Prop 1(b))。**要確認/導出**: step 1 は N_G(P)=C_G(P)N_V(P)・
-      N_V(P)=C_W(P)P までで、kernel N の (N∩W)×P 分解は未確認。
-    - 背理: N∩W ≠ 1 を仮定。R := C_Q(N∩W) に **§3 Prop 1(c)** =
-      `centralizer_trichotomy_of_induction` (CentralizerTrichotomy.lean:217、
-      `CentralizerTrichotomyData` の PSL/PSU/Suzuki) を X:=N∩W で適用 →
-      **|R| 三分岐を導出** (f=3: |R|=|Q₀| or |Q₀|³; f=5: |R|=|Q₀|²)。⚠ この
-      |R|/|Q₀|/f 帰結は trichotomy data からの導出が要 (単一 clean lemma 無し)。
-    - C_Q(P) ⊂ R (N が C_Q(P) 中心化)、Q 2群 (step 4)。**(6) と (2)(b)** で
-      3 ケース: (a)|F|=3,|C_Q(P)|=2 (b)|F|=9,|C_Q(P)|=8 (c)|F|=5,|C_Q(P)|=4。
-      **step (4)** `card_Q_eq_card_inf_centralizer_pow` で |Q|=|Q₀|/|Q₀|³/|Q₀|²。
-    - N∩W が Q に faithful 作用 ⟹ Q₀⊂R⊊Q で (a) 消去; |C_{Q₀}(P)|=2 (step 1)
-      で C_Q(P) が位数4元 → (c) 消去、(b) は |R|=|Q₀|² ⟹ f=5 矛盾。⟹ N∩W=1。
-    - Σ≅C_W(P): N=P を得た後の identification (§3 Prop 1(c) の C_W(P) 側)。
-    - 供給済 upstream: step (6) 全体形、step (4)、trichotomy machinery。
-      残 = kernel N=(N∩W)×P 確認 + |R| 三分岐導出 + 矛盾 assembly + Σ 同型。
+  - **(7) 完了 (2026-07-22, FirstCase/StepSeven.lean 新設・root+AxiomsCheck 配線)** —
+    `N = P ∧ Σ ≅ C_W(P)` (p. 110)。3 commit:
+    - **decomposition (axiom-clean)**: `kernelN` (= book の N = `(H.subgroupOf L).normalCore`
+      を L↪G で map)、`P_le_kernelN` (P ⊆ C_{D_L}(Q_L)=N)、`kernelN_le_V`
+      (N ≤ C_D(P)=C_W(P)·P ≤ V)、`kernelN_eq_kernelInf_W_join_P` (`N=(N∩W)⊔P`、
+      n∈N⊆V を exists_decomp で g·w 分解、g∈P⊆N ⟹ w=g⁻¹n∈N∩W)、
+      `kernelN_eq_P_of_kernelInf_W_eq_bot` (N∩W=1 ⟹ N=P)。
+    - **f = char (axiom-clean ∀-model)**: `orderOf_st_eq_char` — s̄,t̄ (π(s),π(t) in L/N)
+      が distinct involution (s∈Q∖D / t∉H⊇D / st⁻¹∉H) ⟹ char=|s̄t̄|
+      (`model.orderOf_mul_of_involutions`) ⟹ (st)^char∈N ⟹ odd-kernel bridge
+      `orderOf_mul_eq_prime_of_pow_mem_odd_kernel` で |st|=char。書籍の "(2), §1 Prop 4(c)
+      + App II Prop 1"。 ⚠ 当初懸念した「quotient 用 hA3 が (B1) で偽」問題は core bridge
+      が qhyp 不要ゆえ回避 (X=P で直接適用可)。
+    - **|C_Q(X)| readoff (axiom-clean)**: `Hypothesis.cQ_card_and_pGroup_of_trichotomy` —
+      `centralizer_trichotomy_of_induction` を branch cases 展開、
+      `|C_Q(X)|=|C_{Q₀}(X)|^k` (k=1,2,3) を `distinguishedProduct_order`(f=3/5/3) と対で返す。
+    - **contradiction (sorryAx: 9318+Higman)**: `kernelN_inf_W_eq_bot` — X=N∩W≠1 仮定、
+      X≤W が Q₀ 中心化 ⟹ C_G(X) に four-subgroup ⟹ trichotomy。R=C_Q(X) 2群 +
+      C_Q(P)⊆R ⟹ C_Q(P) 2群 ⟹ (step4) Q 2群 ⟹ Q₁=1 (**Q₁=1 は仮定でなく導出**、
+      当初の解釈修正)。step(5)/(6) で `|C_Q(P)|∈{2,8,4}` + `cQ_card_cases_of_Q1_eq_bot`
+      (`c=char-1 ∨ (c=8∧char=3)`、|F|=9⟹char=3 は addOrderOf で導出)。faithful
+      (`centralizer_Q_inf_D_eq_bot`) ⟹ R⊊Q; Q₀⊆R strict when c>2 (|C_{Q₀}(P)|=2)。
+      5 consistent (k,m) 組を `step_seven_numeric` (2冪 exponent 比較) で全消去。
+    - **Σ ≅ C_W(P) (sorryAx: kernelN_inf_W_eq_bot 経由)**: `sigma_mulEquiv_centralizer_W` —
+      `rankOneQuotient.D = (D_L).map(mk' N)` (rfl!)、`w↦[w]` が iso (inj = C_W(P)∩N⊆W∩N=1、
+      surj = C_D(P)=C_W(P)·P + P⊆N)。assembly = `N_eq_P_and_sigma_mulEquiv_centralizer_W`。
+    - 数学的には step (7) 完結。sorryAx は 9318 (model) + Higman (step5 F_{9,2} 枝、lane a)
+      の legitimate 上流 sorried-cite のみ。
+  - **(8) 着手 (2026-07-22, FirstCase/StepEight.lean 新設・root+AxiomsCheck 配線)** —
+    `Q₁≠1 ⟹ ℓ=|Σ| prime ∧ |F|∈{3^ℓ,5^ℓ,9^ℓ}` (p. 110)。**opening 2 lemma landed**:
+    - `comm_of_Q1_ne_bot` (∀-model, sorryAx=9318+Higman): 「By (5), F is a field」—
+      step5 の dichotomy (comm ∨ F_{9,2}∧Q₁=1) から Q₁≠1 ⟹ comm。
+    - `st_mem_and_cQ_isPGroup_of_mem_centralizer_W` (**axiom-clean**): w∈C_W(P)#
+      で trichotomy を X=⟨w⟩ に適用 ⟹ f=|st|∈{3,5} ∧ C_Q(w) 2群。readoff の直接消費。
+    - **⚠ 残 = step (8) core (C_F(w) 固定体解析、deep・fresh context 推奨)**:
+      1. w∈C_W(P) → Σ-image [w]∈rankOneQuotient.D → **σ_w := model.dAut [w]** (F≃+F 自己同型)。
+         `sigma_mulEquiv_centralizer_W` の合成。
+      2. **C_Q(w) ≅ C_{F*}(w)** (σ_w 固定単位): `model.qEquiv` (Q≅F*) +
+         `model.dAut_conj`/`qEquiv_conj` で共役 ↔ σ_w 作用を橋渡し。C_Q(w) は
+         step8 の `st_mem_...` で 2群と既知。
+      3. **|C_F(w)| = f^a** (固定部分体、Artin = mathlib `FixedPoints.finrank_eq_card`
+         on ⟨σ_w⟩; F は素体 𝔽_f 上)。C_F(w)* = C_{F*}(w) 2群 ⟹ f^a=2^b+1 ⟹
+         step6 `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` で |C_F(w)|∈{f,9}。
+      4. **f=3 の場合 mixed 排除** (w₁,w₂ で |C_F(w_i)|=3^i は w₁ 偶位数矛盾) ⟹
+         |C_F(w)| は w に依らず一定 ⟹ ℓ=|C_W(P)| prime ∧ |F|=|C_F(w)|^ℓ。
+      infra 所在: `AffineNearFieldModel` の dAut/dAut_conj/dAut_mul/qEquiv/qEquiv_conj
+      (NearFields.lean:729+)、Artin = mathlib FieldTheory/Fixed.lean。σ_w の位数=ℓ
+      (Σ 巡回性は要確認 — C_W(P) が巡回か? §3 の W 構造から)。
   - **(6) 算術補題 完了 (2026-07-22, StepSix.lean 新設)**:
     `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` (axiom-clean, AxiomsCheck
     登録) — [HB] IX 2.7: `f 奇 ∧ f^a = 2^b+1 (b≥1) ⟹ a=1 ∨ f^a=9`。純 ℕ 算術
