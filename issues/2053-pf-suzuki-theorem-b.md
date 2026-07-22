@@ -182,9 +182,14 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     → a₀ が K 中心化 → `K_inf_centralizer_eq_bot`+|K|=2^p−1>1 で矛盾;
     さもなくば m=j⁻¹ (mod p) で a:=a₀^m が Frobenius = x↦x^r → μ 単射で
     K に転送。9318 継承 (`card_inf_centralizer_eq_prime` 経由) ゆえ
-    AxiomsCheck 非登録。**残 = package (3)**: r ∣ |Q₁| prime → M 極小
-    K⊔P-不変 EA r-部分群の存在構成 + dichotomy 消費 + 第一/第二分岐合流で
-    `∃i, r ≡ 2^i [MOD 2^p−1]`。
+    AxiomsCheck 非登録。
+  - **package (3) 完了 (2026-07-22) → step (3) 完結**:
+    `exists_pow_two_modEq_of_prime_dvd_card_Q1` (StepThree.lean 末尾) —
+    r ∣ |Q₁| prime ⟹ ∃i, r ≡ 2^i [MOD 2^p−1]。M の存在+極小性 =
+    `exists_minimal_invariant_elab` (Q1MinimalInvariant, X := K⊔P ≤ H) が
+    丸ごと供給、dichotomy 消費、第一分岐 = `card_K_dvd_sub_one...` の
+    (2^p−1) ∣ (r−1) を Nat.modEq_iff_dvd' で r ≡ 2^0 化、第二分岐 =
+    Half B → combine。9318 継承 (AxiomsCheck 非登録)。
 - [ ] (4) Wielandt fixed point (被覆調査 → 不足なら port)
 - [ ] (5)–(9)
 - [ ] (10) Lemma 5 消費の二分岐

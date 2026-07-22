@@ -1309,6 +1309,42 @@ theorem exists_K_conj_pow_of_irreducible {r : ℕ} (hr : r.Prime)
     rw [SubmonoidClass.coe_pow]
     exact hres
 
+/-- **Peterfalvi Part II, Ch. II, step (3)** (p. 109), packaged: every prime
+divisor `r` of `|Q₁|` satisfies `r ≡ 2^i (mod 2^p − 1)` for some `i`.
+
+The minimal `KP`-invariant elementary abelian `r`-subgroup `M ≤ Q₁`
+(`exists_minimal_invariant_elab`) feeds the Clifford dichotomy
+(`exists_prime_order_invariant_or_irreducible`): a `1`-dimensional
+`K`-submodule gives `|K| = 2^p − 1 ∣ r − 1`, i.e. `r ≡ 1 = 2^0`
+(`card_K_dvd_sub_one_of_prime_order_invariant`); in the irreducible case
+Half B (`exists_K_conj_pow_of_irreducible`) supplies `a ∈ P` with
+`k ↦ k^r` on `K`, and the combine (`exists_pow_two_modEq_of_K_conj`)
+compares it with Half A's `k ↦ k^(2^i)`.
+
+Inherits the step (2)(b) `sorry` through `|C_M(P)| = r` (issue 9318). -/
+theorem exists_pow_two_modEq_of_prime_dvd_card_Q1 {r : ℕ} (hr : r.Prime)
+    (hdvd : r ∣ Nat.card ↥fc.toHypothesis.Q1) :
+    ∃ i : ℕ, r ≡ 2 ^ i [MOD 2 ^ fc.p - 1] := by
+  classical
+  have hXH : fc.toHypothesis.K ⊔ fc.P ≤ fc.toHypothesis.H :=
+    sup_le (fc.toHypothesis.K_le_D.trans fc.toHypothesis.D_le_H)
+      ((fc.P_le_V.trans fc.toHypothesis.V_le_D).trans
+        fc.toHypothesis.D_le_H)
+  obtain ⟨M, hMQ1, hMne, helab, hinv, hmin⟩ :=
+    fc.toHypothesis.exists_minimal_invariant_elab hXH hr hdvd
+  rcases fc.exists_prime_order_invariant_or_irreducible hr hMQ1 hMne helab
+      hinv hmin with ⟨V, hVM, hVne, hVcard, hVinv⟩ | hirr
+  · -- first branch: `|K| ∣ r − 1`, so `r ≡ 1 = 2^0`
+    have hdvd1 := fc.card_K_dvd_sub_one_of_prime_order_invariant hr
+      (hVM.trans (hMQ1.trans fc.toHypothesis.Q1_le_Q)) hVne hVcard hVinv
+    refine ⟨0, ?_⟩
+    rw [pow_zero]
+    exact ((Nat.modEq_iff_dvd' hr.one_lt.le).mpr hdvd1).symm
+  · -- second branch: Half B supplies the `r`-power law; combine with Half A
+    obtain ⟨a, ha⟩ :=
+      fc.exists_K_conj_pow_of_irreducible hr hMQ1 hMne helab hinv hirr
+    exact fc.exists_pow_two_modEq_of_K_conj a ha
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
