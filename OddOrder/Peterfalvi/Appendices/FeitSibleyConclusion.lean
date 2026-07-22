@@ -336,6 +336,97 @@ theorem witness_charValue_cong [Fintype G]
   rw [← hsmul z, ← hsmul 1] at hcong2
   exact hcong2
 
+open scoped Classical in
+/-- **(8) full assembly: `a ∣ λ`** (Peterfalvi (8), p. 150).  The keystone divisibility closing
+step (6): from the endgame `(4)` data — the coherent `𝒳 = XsetOf ⊥ Z` with anchor `χ₁` of degree
+`χ₁(1) = a·d`, `p`-power degree differences `χ − b·χ₁` supported, the `𝒴`-witness `e' = ε·ξ`
+cross-orthogonal to the `𝒳`-extensions, and the `(6)` coefficient `λ` from
+`⟨τ(χ₁ − a·η₁), e'⟩ = λ − a` — one gets `a ∣ λ`.
+
+Assembly of the five `(8)`-core pieces: `restrict_apply_sub_eq_neg_card_mul_inner` (piece 4) gives
+`χ₁(1)·(e'(w) − e'(1)) = −|H|·⟨Res_H e', χ₁⟩` for every `w ∈ Z^#`, a value independent of `w`, so
+`e'` is constant on `Z^#`; `witness_charValue_cong` (the step-(7) application) then gives
+`e'(z) ≡ e'(1) (mod |Q|)`.  `restrict_inner_keystone` (piece 3) fixes
+`⟨Res_H e', χ₁⟩ = λ + a·μ` (`μ = ⟨Res_H e', η₁⟩ − 1 ∈ ℤ`); substituting `χ₁(1) = a·d`,
+`|H| = d·|Q|` into piece 4 gives `(a·d)·(e'(z) − e'(1)) = −(d·|Q|)·(λ + a·μ)`, whence
+`dvd_lam_of_evaluation_cong` (piece 5) yields `a ∣ λ`. -/
+theorem dvd_lam_of_endgame_data [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+    [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) [(Z.subgroupOf hyp.H).Normal]
+    (hoddG : Odd (Nat.card G)) (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index)
+    {T : Finset (ClassFunction ↥hyp.H ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.XsetOf ⊥ Z)
+    (hcohX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.XsetOf ⊥ Z) hyp.A)
+    {χ₁ : ClassFunction ↥hyp.H ℂ} (hχ₁ : χ₁ ∈ hyp.XsetOf ⊥ Z)
+    {a : ℕ} (ha : 0 < a) (hχ₁deg : χ₁ 1 = (a : ℂ) * (hyp.d : ℂ))
+    (hXdiff : ∀ χ ∈ hyp.XsetOf ⊥ Z, ∃ b : ℕ,
+      χ - b • χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) (hyp.XsetOf ⊥ Z) hyp.A)
+    {e' : ClassFunction G ℂ} (he'ZIrr : e' ∈ ZIrr G)
+    {ε : ℤ} {ξ : IrreducibleCharacter G} (hεne : ε ≠ 0)
+    (he'eq : e' = ε • (ξ : ClassFunction G ℂ))
+    (hcross : ∀ φ ∈ hyp.XsetOf ⊥ Z, ClassFunction.inner (hcohX.extension φ) e' = 0)
+    {η₁ : ClassFunction ↥hyp.H ℂ} (hη₁ZIrr : η₁ ∈ ZIrr ↥hyp.H) {lam : ℤ}
+    (hlam1 : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) e' = (lam : ℂ) - a)
+    {z : ↥hyp.H} (hzZ : (z : G) ∈ Z) (hz1 : z ≠ 1)
+    (hQz : hyp.Q ≤ Subgroup.centralizer ({(z : G)} : Set G))
+    (hcard_const : ∀ w ∈ Z, w ≠ 1 →
+      Nat.card ↥(hyp.H ⊓ Subgroup.centralizer ({w} : Set G)) =
+        Nat.card ↥(hyp.H ⊓ Subgroup.centralizer ({(z : G)} : Set G))) :
+    (a : ℤ) ∣ lam := by
+  classical
+  have hZQ : Z ≤ hyp.Q := hZQ1.trans hyp.Q1_le_Q
+  -- `d ≠ 0` and `|H| = d·|Q|`
+  have hd0 : (hyp.d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+  have hHcard : (Nat.card ↥hyp.H : ℂ) = (hyp.d : ℂ) * (Nat.card ↥hyp.Q : ℂ) := by
+    have h := hyp.card_Q_mul_card_D
+    show (Nat.card ↥hyp.H : ℂ) = (Nat.card ↥hyp.D : ℂ) * (Nat.card ↥hyp.Q : ℂ)
+    rw [← h]; push_cast; ring
+  -- `χ₁(1) ≠ 0`
+  have hχ0 : χ₁ 1 ≠ 0 := by
+    rw [hχ₁deg]; exact mul_ne_zero (Nat.cast_ne_zero.mpr ha.ne') hd0
+  -- piece 4, universally in `w ∈ Z^#`: RHS is `w`-independent
+  have hpiece4 : ∀ w : ↥hyp.H, (w : G) ∈ Z → w ≠ 1 →
+      χ₁ 1 * (e' (w : G) - e' 1)
+        = -(Nat.card ↥hyp.H : ℂ) * ClassFunction.inner (ClassFunction.restrict hyp.H e') χ₁ :=
+    fun w hwZ hw1 =>
+      hyp.restrict_apply_sub_eq_neg_card_mul_inner hZQ1 hT hcohX hχ₁ he'ZIrr hcross hXdiff hwZ hw1
+  -- `e'` is constant on `Z^#`
+  have he'const : ∀ w : G, w ∈ Z → w ≠ 1 → e' w = e' (z : G) := by
+    intro w hwZ hw1
+    have hwH : w ∈ hyp.H := hyp.Q_le_H (hZQ hwZ)
+    have hwne : (⟨w, hwH⟩ : ↥hyp.H) ≠ 1 := fun h => hw1 (by simpa using congrArg (Subtype.val) h)
+    have p4w := hpiece4 ⟨w, hwH⟩ hwZ hwne
+    have p4z := hpiece4 z hzZ hz1
+    have hcancel : χ₁ 1 * (e' w - e' 1) = χ₁ 1 * (e' (z : G) - e' 1) := by
+      rw [show ((⟨w, hwH⟩ : ↥hyp.H) : G) = w from rfl] at p4w; rw [p4w, p4z]
+    have hsub := mul_left_cancel₀ hχ0 hcancel
+    linear_combination hsub
+  -- step (7): `e'(z) ≡ e'(1) (mod |Q|)`
+  have hz1G : (z : G) ≠ 1 := fun h => hz1 (Subtype.ext (by simpa using h))
+  have hHall : Nat.Coprime (Nat.card ↥hyp.Q) (Nat.card (↥hyp.H ⧸ hyp.Q.subgroupOf hyp.H)) := by
+    have hidx : Nat.card (↥hyp.H ⧸ hyp.Q.subgroupOf hyp.H) = hyp.d := hyp.index_Q_subgroupOf_eq_d
+    rw [hidx]; exact hyp.coprime_Q_D
+  have halg := hyp.witness_charValue_cong hZQ hoddG hHall hHallG hzZ hz1G hQz hεne he'eq
+    he'const hcard_const
+  -- keystone: `c₀ = λ + a·μ` with `μ = ⟨Res_H e', η₁⟩ − 1`
+  obtain ⟨mu', hmu'⟩ :=
+    ClassFunction.inner_mem_ZIrr_int (ClassFunction.restrict_mem_ZIrr hyp.H he'ZIrr) hη₁ZIrr
+  have hkey := hyp.restrict_inner_keystone hlam1
+  rw [hmu'] at hkey
+  -- combine piece 4 (at `z`) with the degree substitutions into `dvd_lam_of_evaluation_cong`
+  have heval : (a : ℂ) * (hyp.d : ℂ) * (e' (z : G) - e' 1)
+      = -((hyp.d : ℂ) * (Nat.card ↥hyp.Q : ℂ)) * ((lam : ℂ) + (a : ℂ) * ((mu' : ℂ) - 1)) := by
+    have p4z := hpiece4 z hzZ hz1
+    rw [hχ₁deg, hHcard] at p4z
+    rw [p4z]
+    -- `⟨Res_H e', χ₁⟩ = λ + a·(μ' − 1)` from the keystone
+    have hc₀ : ClassFunction.inner (ClassFunction.restrict hyp.H e') χ₁
+        = (lam : ℂ) + (a : ℂ) * ((mu' : ℂ) - 1) := by linear_combination hkey
+    rw [hc₀]
+  have hΔ : IsIntegral ℤ ((e' (z : G) - e' 1) / (Nat.card ↥hyp.Q : ℂ)) := halg
+  simpa using dvd_lam_of_evaluation_cong (a := a) (lam := lam) (mu := mu' - 1) ha hd0
+    (by exact_mod_cast (Nat.cast_ne_zero.mpr (Nat.card_pos (α := ↥hyp.Q)).ne' :
+      (Nat.card ↥hyp.Q : ℂ) ≠ 0)) (by push_cast; linear_combination heval) hΔ
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
