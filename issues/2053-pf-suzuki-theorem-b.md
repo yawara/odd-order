@@ -403,8 +403,10 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
   - **残 = hB2 (B2 standing 仮説) の carrier 化のみ** (ゲートでない): `p∤|G^ab|` = 「index-p 正規
     部分群なし」。Theorem B が全体で仮定するので step (17) 組立時に carrier/statement で threading。
     (否定側は Ch.I §3 Prop 2 = InductionNonSimple で処理済。) model sorry は 9318 継承。
-- [ ] (10) 二分岐 — **大半完了 (2026-07-23、FirstCase/StepTen.lean 新設・root 配線)**。
-      残 = (10.2) の「W cyclic of order 3 or 9」(Lemma 5 消費) + 最終 dichotomy 組立。
+- [x] (10) 二分岐 — **完了 (2026-07-23、FirstCase/StepTen.lean・StepFive.lean)**。
+      endpoint = `step_ten_dichotomy` (`|F|=p^m` の下で (10.1) `¬p∣|Σ| ∧ |G|_p=p^{m+2}` ∨
+      (10.2) `p∣|Σ| ∧ p=3 ∧ |F|=9 ∧ IsCyclic W ∧ |W|∈{3,9} ∧ 3^|G|_3=3^4·|W|`)。
+      sorryAx=9318+Higman through model (AxiomsCheck 非登録)。
   - **arithmetic core (axiom-clean)**: `padicValNat_pow_sub_one_add_one` (LTE
     `v_p((N-1)^p+1)=v_p(N)+1`)、`card_field_eq_prime_pow` (|F|=p^m, m≥1、additive
     p-group)、`padicValNat_card_Q_add_one` (opening `(|Q|+1)_p = p^{m+1}`)。
@@ -424,12 +426,22 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
   - **(10.2) numeric core 完了 (model)**: `card_field_eq_nine_of_p_dvd_card_centralizer_W`
     — p∣|Σ| ⟹ **p=3 ∧ |F|=9 ∧ |C_Q(P)|=8 ∧ |Σ|=3** (step6 で可換 F は |Σ|=1 ⟹ 矛盾 →
     非可換 → step5 で |F|=9; step7 Σ≅C_W(P) で |Σ| 変換)。
-  - **残 (10.2) 深部**: 「W cyclic of order 3 or 9」= Lemma 5
-    (`lemmaFive_of_orderThree`、要 `orderOf(distinguishedInvolution·t)=3` +
-    `IsSuzuki2Group Q` + `|Q₀|=2^m` + `|Q|=|Q₀|^3`)。case (10.2) では p=3,|F|=9 から
-    |Q₀|=2^3 (card_Q0_eq_two_pow), |Q|=8^3=|Q₀|^3 (step4)。要調査 = step5 内部から
-    `IsSuzuki2Group Q` と `orderOf(st)=3` を露出 (or 再導出)。その後 `|G|_3=3^4|W|` は
-    `factorization_card_G_eq` (m=2) + |W|∈{3,9} で 3^4·|W| 化。最終 dichotomy 組立。
+  - **(10.2) 完了 (2026-07-23)**: `w_cyclic_of_p_dvd_card_centralizer_W` — p∣|Σ| ⟹
+    p=3 ∧ |F|=9 ∧ IsCyclic W ∧ |W|∈{3,9} ∧ 3^|G|_3=3^4·|W|。3 部品:
+    - **`isSuzuki2Group_Q_of_noncomm` (StepFive 新規、model-carrying)**: F 非可換 ⟹
+      IsSuzuki2Group Q。|C_Q(P)|=8 (`card_nearField_eq_nine_and_Q1_eq_bot`) で |Q|=8^p=2^{3p}
+      は 2-群 ⟹ 任意 Sylow-2 S=⊤ (`Sylow.card_eq_multiplicity`+`eq_top_of_card_eq`)、
+      `↥S≅↥Q` (`subgroupCongr`+`topEquiv`)。非可換 units 2 個 (`exists_noncommuting_two_elements`)
+      を Q へ転送 ⟹ Q 非可換 ⟹ `sylowTwo_isMulCommutative_or_isSuzuki2Group` で S Suzuki ⟹
+      `IsSuzuki2Group.of_equiv eS` で Q Suzuki。⚠ `of_equiv` は full name
+      `...SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv` (dot notation は Suzuki2Group
+      namespace を見るので不可)。
+    - **`orderOf(st)=3`**: `orderOf_st_eq_char model` (step7) + char=3 (|F|=9 の additive
+      order 論法、StepSeven パターン流用)。
+    - **Lemma 5 消費**: m:=p, `card_Q0_eq_two_pow` (|Q₀|=2^p), |Q|=|Q₀|^3 (step4+p=3)。
+      `lemmaFive_of_orderThree` ⟹ IsCyclic W ∧ |W|∣2^p+1=9。|Σ|=3∣|W| (`card_dvd_of_le`)
+      で |W|≠1 ⟹ |W|∈{3,9} (`dvd_prime_pow`)。|G|_3 = `factorization_card_G_eq` (m=2) +
+      |W|=3^k で 3^4·|W|。
 - [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
 - [ ] (13)–(16)
 - [ ] Hall-Wielandt abelian 版 (shared infra、claim してから)

@@ -6,6 +6,16 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **✅ 2026-07-23 01:0x — d CLAUDE.md 変更をユーザー承認 → 合流 (hold 解消)**。ユーザー「d の発案は取り込んで」→ d (blueprint 逆生成推奨への CLAUDE.md 改訂 + issue 0143) を `--no-ff` 合流 (docs-only, Lean 非変更ゆえ build 不要, push 5fdec8275→4dc1323cd)。**新方針 = forward TeX driver 不可のまま、Lean からの逆生成 (依存 DAG/教科書番号対応/proved-sorry を getUsedConstants/CollectAxioms で抽出) は推奨** (issue 0143 に実装計画)。lane d の memtenance charter は問題なく機能。⚠ c は依然 9406 で hold (b consumer 待ち、下記)。
+>
+> **▶▶ 2026-07-23 00:5x 監視 tick — a/b 合流 / c・d hold**。a=6 / b=3 / c=5 / d=1。
+> 合流: a (**🎉 Isaacs §1B 完結 1B.5-1B.8** + `Ch03_SplitExtensions/PiResidual.lean` 新 leaf O^π, 配線済) / b (docs 2053 step10 記録)。
+> **gate (a+b): green 4646 jobs (+1 PiResidual) / AxiomsCheck OK (3754・新 axiom 0) / sorry 7→7 非退行 / lint 216 / push 6d1a24cd1→d4e5d1f54**。
+> **c は hold 継続** (fix(A) 含む +5 = **BLOCKER 2 (Q-regularity) 解消 + cyclic 証明 + quaternion 孤立化**の大進捗が全て b consumer 待ちで gated)。
+> ⚠⚠⚠ **lane b 最優先指示 (再掲・強調)**: **c の 9406 fix(A) 完成済 5 commit が b の consumer 更新のみを待って全 hold 中**。b は step10 docs でなく **`StepEight.lean` `model_qEquiv_conj` (104/114/133) + `StepFive.lean` (689-729) の `model.qEquiv_conj` 消費を新 RHS `qEquiv q⁻¹` に更新**せよ (q↔q⁻¹ 調整、小変更)。上げ次第 hub が c+b を同一 tick land。
+> ⚠ **lane d hold + user escalation**: d の初 commit (70bb7e9b7) が **CLAUDE.md「やらないこと」の leanblueprint 規則を softening** (forward 禁止のまま **reverse Lean→blueprint 生成を「推奨」化**) + issue 0143。内容は repo 哲学と整合的で well-argued だが **CLAUDE.md ガバナンス変更 + 「2026-07-23 ユーザー方針」の attribution を hub は検証不可**。⟹ **未検証 user-policy のガバナンス変更を silently merge しない方針で d を hold、ユーザーに確認 escalate**。d の lean-eval/docs 部分は問題なし。⚠ d の issue は base 4000 のはずが 0143 (base 0) を使用 — 軽微逸脱 (policy issue ゆえ base 0 は許容範囲、次回から 4000)。
+> **513185** idle 継続。
+>
 > **🆕 2026-07-23 00:3x — lane d 新設 (ユーザー指示「lint/ドキュメント整備/lean-eval 抽出の専用レーン = D」)**。
 > worktree `/home/ywr/odd-order-d` (branch d) 作成: `.lake/packages`・`references` を main から symlink、`.lake/build` を
 > warm-start コピー、`lake build OddOrder` = green 4645 jobs (warm no-op) 確認、git status clean。issue base = **4000**。

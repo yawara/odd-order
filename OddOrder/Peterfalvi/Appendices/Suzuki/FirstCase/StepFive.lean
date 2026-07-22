@@ -907,6 +907,83 @@ theorem card_nearField_eq_nine_and_Q1_eq_bot :
   rw [fc.card_Q_eq_card_inf_centralizer_pow, hCQP8,
     show (8 : ℕ) = 2 ^ 3 by norm_num, ← pow_mul]
 
+/-- **Peterfalvi Part II, Ch. II, step (10.2) input** (p. 111): in the
+non-commutative case `Q` is a Suzuki `2`-group.  "In this case, `|Q| = |F*|^p = 8³`
+and `C_Q(P) ≅ F*` is not abelian, whence `Q` is a Suzuki 2-group."
+
+`|C_Q(P)| = 8` (step (5)) makes `|Q| = |C_Q(P)|^p = 2^{3p}` a `2`-power, so any
+Sylow `2`-subgroup `S` of `Q` is `⊤` and `↥S ≅ ↥Q`.  Two non-commuting units of
+`F` (from `F` non-commutative) transport into `Q`, so `Q` — hence `S` — is
+non-abelian, and `sylowTwo_isMulCommutative_or_isSuzuki2Group` gives that `S`,
+and so `Q`, is a Suzuki `2`-group (`IsSuzuki2Group.of_equiv`).
+
+Inherits the step (2)(b) `sorry` (issue 9318) + Higman through the model. -/
+theorem isSuzuki2Group_Q_of_noncomm
+    {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+    (hnc : ¬ ∀ x y : F, x * y = y * x) :
+    OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥fc.toHypothesis.Q := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI : Finite F := by
+    have hinj : Function.Injective
+        (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
+      fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
+    exact Finite.of_injective _ hinj
+  -- `|C_Q(P)| = 8`
+  obtain ⟨_, hCQ8, _⟩ :=
+    (fc.card_nearField_eq_nine_and_Q1_eq_bot model).resolve_left hnc
+  -- `|Q| = |C_Q(P)|^p = 8^p = 2^{3p}` is a `2`-power
+  have hcardQ : Nat.card ↥fc.toHypothesis.Q = 2 ^ (3 * fc.p) := by
+    rw [fc.card_Q_eq_card_inf_centralizer_pow, hCQ8,
+      show (8 : ℕ) = 2 ^ 3 by norm_num, ← pow_mul]
+  have hQ2 : IsPGroup 2 ↥fc.toHypothesis.Q := IsPGroup.of_card hcardQ
+  -- `e : C_Q(P) ≃* F^*`, and `F^*` is nilpotent (subgroup of nilpotent `Q`)
+  obtain ⟨e⟩ := fc.centralizer_inf_mulEquiv_units model
+  have hnil : Group.IsNilpotent Fˣ := by
+    letI : Group.IsNilpotent ↥fc.toHypothesis.Q := fc.toHypothesis.isNilpotent_Q
+    haveI : Group.IsNilpotent
+        ↥((fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)).subgroupOf
+          fc.toHypothesis.Q) := inferInstance
+    exact Group.nilpotent_of_mulEquiv
+      ((Subgroup.subgroupOfEquivOfLe
+        (inf_le_left : fc.toHypothesis.Q ⊓
+          Subgroup.centralizer (fc.P : Set G) ≤ fc.toHypothesis.Q)).trans e)
+  -- two non-commuting units transport into `Q`, so `Q` is non-abelian
+  obtain ⟨a₀, b₀, -, -, hab₀⟩ :=
+    exists_noncommuting_two_elements_of_nearField_units hnil hnc
+  set incl : ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) →*
+      ↥fc.toHypothesis.Q := Subgroup.inclusion inf_le_left with hincldef
+  have hinclinj : Function.Injective incl := Subgroup.inclusion_injective _
+  set toQ : Fˣ →* ↥fc.toHypothesis.Q := incl.comp e.symm.toMonoidHom with htoQdef
+  have htoQinj : Function.Injective toQ := hinclinj.comp e.symm.injective
+  have hQnc : ¬ IsMulCommutative ↥fc.toHypothesis.Q := by
+    intro hcomm
+    exact hab₀ (htoQinj (by
+      rw [map_mul, map_mul]; exact hcomm.is_comm.comm (toQ a₀) (toQ b₀)))
+  -- a Sylow `2`-subgroup `S = ⊤` of the `2`-group `Q`
+  obtain ⟨S⟩ : Nonempty (Sylow 2 ↥fc.toHypothesis.Q) := inferInstance
+  have hStop : (S : Subgroup ↥fc.toHypothesis.Q) = ⊤ := by
+    apply Subgroup.eq_top_of_card_eq
+    rw [S.card_eq_multiplicity, hcardQ,
+      Nat.Prime.factorization_pow Nat.prime_two, Finsupp.single_eq_same]
+  -- `↥S ≅ ↥Q`
+  let eS : ↥(S : Subgroup ↥fc.toHypothesis.Q) ≃* ↥fc.toHypothesis.Q :=
+    (MulEquiv.subgroupCongr hStop).trans Subgroup.topEquiv
+  -- `S` is non-abelian (isomorphic to `Q`), hence a Suzuki `2`-group
+  have hSsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
+      ↥(S : Subgroup ↥fc.toHypothesis.Q) := by
+    rcases fc.toHypothesis.sylowTwo_isMulCommutative_or_isSuzuki2Group S with hc | hs
+    · refine absurd (IsMulCommutative.of_comm ?_) hQnc
+      intro x y
+      refine eS.symm.injective ?_
+      rw [map_mul, map_mul]
+      exact hc.is_comm.comm (eS.symm x) (eS.symm y)
+    · exact hs
+  exact OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv hSsuz eS
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
