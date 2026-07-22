@@ -146,6 +146,30 @@ theorem isConj_of_orderOf_eq_two {u v : G} (hu : orderOf u = 2) (hv : orderOf v 
   have he : (d⁻¹ * c) * u * (d⁻¹ * c)⁻¹ = d⁻¹ * (c * u * c⁻¹) * d := by group
   rw [he, hc, ← hd]; group
 
+/-- `z` is an involution: `orderOf z = 2`. -/
+theorem orderOf_z : orderOf Q.z = 2 := by
+  have hdvd : orderOf Q.z ∣ 2 := orderOf_dvd_of_pow_eq_one Q.z_sq
+  rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h | h
+  · exact absurd (orderOf_eq_one_iff.mp h) Q.z_ne_one
+  · exact h
+
+/-- **Characterization of the involution class**: `u` is conjugate to `z` iff `u` is an
+involution.  Since all involutions are conjugate (`isConj_of_orderOf_eq_two`) and `z` is one
+(`orderOf_z`), the involutions of `G` are exactly the conjugacy class of `z` — the class `K`
+used in the class-sum formula for Lemma 1.8. -/
+theorem isConj_z_iff_orderOf_eq_two {u : G} : IsConj u Q.z ↔ orderOf u = 2 := by
+  constructor
+  · intro h
+    obtain ⟨c, hc⟩ := isConj_iff.mp h
+    have heq : orderOf u = orderOf (c * u * c⁻¹) :=
+      SemiconjBy.orderOf_eq c (show SemiconjBy c u (c * u * c⁻¹) by
+        change c * u = c * u * c⁻¹ * c; group)
+    rw [hc, Q.orderOf_z] at heq
+    exact heq
+  · intro hu
+    obtain ⟨c, hc⟩ := Q.exists_conj_eq_z hu
+    exact isConj_iff.mpr ⟨c, hc⟩
+
 /-- **The product of two involutions has odd order** (Gorenstein Ch. 12, Lemma 1.7).  If `u v`
 had even order `2s`, the involution `z' = (uv)ˢ` (a power of `uv`) would be inverted by both
 `u` and `v` (each inverts `uv`), hence centralized by them (`z'` is an involution).  By

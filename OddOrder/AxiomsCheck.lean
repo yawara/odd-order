@@ -12328,3 +12328,5 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.GroupTheory.QuaternionSylowSetup.exists_conj_eq_z
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.isConj_of_orderOf_eq_two
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.isConj_z_iff_orderOf_eq_two
