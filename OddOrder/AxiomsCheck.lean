@@ -12282,8 +12282,12 @@ transversal `1, {t y : y ∈ Q}` and the relation `t y x = x t y^x`.
 * `rightTransversalTQ_conj_invariant` — that transversal is invariant under conjugation by `x ∈ P`
   (`P ≤ C_D(t)` centralises `t`, and `x ∈ H` normalises `Q`).
 * `transfer_eq_pow_card_Q_add_one` — **step (9) transfer identity**: `transfer ϕ x = ϕ x ^ (|Q|+1)`
-  for every `ϕ : H →* A` and `x ∈ P` (since `[G:H] = |Ω| = |Q|+1`).  The remaining `p ∣ |Q|+1`
-  needs the (B2) hypothesis and `P ∩ (QKW) = 1`, tracked separately. -/
+  for every `ϕ : H →* A` and `x ∈ P` (since `[G:H] = |Ω| = |Q|+1`).
+* `p_dvd_card_Q_add_one` — **step (9)**: `p ∣ |Q|+1`, taking `ϕ = Abelianization.of : H → H^{ab}`,
+  from `hB2 : p ∤ |G^{ab}|` (⟹ `x ∈ ⁅G,G⁆` ⟹ `T(x)=1`) and `hPinj : P ∩ ⁅H,H⁆ = 1` (⟹ `ϕ x`
+  has order `p`).  `hB2` is the book's standing (B2) (no normal subgroup of index `p`); `hPinj`
+  is the book's `P ∩ QKW = 1` (as `⁅H,H⁆ ≤ QKW`), the remaining First-Case structural input.
+  The `char = f = p` assembly (`char_eq_p`) inherits the model `sorry` (9318) so is unregistered. -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.transfer_eq_pow_of_conj_invariant_transversal
 #assert_only_allowed_axioms OddOrder.GroupTheory.isComplement_inv_of_isComplement
@@ -12295,6 +12299,8 @@ transversal `1, {t y : y ∈ Q}` and the relation `t y x = x t y^x`.
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.rightTransversalTQ_conj_invariant
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.transfer_eq_pow_card_Q_add_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.p_dvd_card_Q_add_one
 
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を

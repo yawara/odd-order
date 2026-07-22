@@ -164,7 +164,7 @@ lemma isComplement_H_rightTransversalTQ :
   · -- `g ∉ H`: the unique representative is `t y'` from the canonical form
     obtain ⟨x, hx, y', hy', hxy⟩ := hyp.exists_canonicalForm hg
     refine ⟨⟨hyp.t * y', hyp.mem_rightTransversalTQ.mpr (Or.inr ⟨y', hy', rfl⟩)⟩, ?_, ?_⟩
-    · show g * (hyp.t * y')⁻¹ ∈ hyp.H
+    · change g * (hyp.t * y')⁻¹ ∈ hyp.H
       have : g * (hyp.t * y')⁻¹ = x := by rw [hxy]; group
       rw [this]; exact hx
     · rintro ⟨r, hr⟩ hmem
