@@ -173,6 +173,7 @@ import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup
 import OddOrder.Mathlib.Sylow
 import OddOrder.Isaacs.Ch01_Sylow.Main
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch05_Transfer.Main
