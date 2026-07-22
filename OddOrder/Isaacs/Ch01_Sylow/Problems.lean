@@ -7,6 +7,7 @@ import Mathlib.GroupTheory.IndexNormal
 import Mathlib.GroupTheory.Sylow
 import Mathlib.GroupTheory.DoubleCoset
 import Mathlib.GroupTheory.GroupAction.Quotient
+import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 /-!
 # Isaacs Chapter 1 — Problems (演習問題)
@@ -596,5 +597,70 @@ end
   (`Mathlib/GroupTheory/Sylow.lean`) がまさにこれ。証明は Frattini 論法
   (`S ⊴ N` かつ 1B.1(b) で `N` 内の Sylow が一意 ⟹ `N_G(N) ⊆ N`)。
 -/
+
+section /- Problems 1B: Hall π-subgroups (1B.5-1B.8, Ch.3 の Hall/π 理論を前借り) -/
+
+open OddOrder.Isaacs.Ch03
+
+open Pointwise in
+/-- **Isaacs Problem 1B.6**. `H` を `G` の π-Hall 部分群、`K ≤ G` を部分群とする。`HK` が部分群
+(ある `L : Subgroup G` の台が `↑H·↑K`) ならば `H ∩ K` は `K` の π-Hall 部分群
+(`(H ⊓ K).subgroupOf K`)。
+
+`|H∩K|` の素因子: `H∩K ≤ H` ゆえ `|H∩K| ∣ |H|`、`H` が π-Hall で `|H|` の素因子 ⊆ π。
+`|K:H∩K|`: ダイヤモンド `|L|·|H∩K| = |H|·|K|` (1A.2/1A.3 `card_mul_card_inf`) と `H ≤ L` から
+`|K:H∩K| = |L:H|` が `|G:H|` を割り、`H` が π-Hall で `|G:H|` の素因子は π を避ける。 -/
+theorem isHallSubgroup_inf_of_mul_isSubgroup {π : Set ℕ} {G : Type*} [Group G] [Finite G]
+    {H K : Subgroup G} (hH : IsHallSubgroup π H)
+    (hHK : ∃ L : Subgroup G, (L : Set G) = (H : Set G) * (K : Set G)) :
+    IsHallSubgroup π ((H ⊓ K).subgroupOf K) := by
+  obtain ⟨L, hLeq⟩ := hHK
+  have hHL : H ≤ L := fun x hx => by
+    rw [← SetLike.mem_coe, hLeq]; exact ⟨x, hx, 1, K.one_mem, mul_one x⟩
+  -- ダイヤモンド |L|·|H∩K| = |H|·|K|
+  have ehk : Nat.card L * Nat.card ↥(H ⊓ K) = Nat.card H * Nat.card K := by
+    have h := card_mul_card_inf H K
+    rwa [← hLeq, SetLike.coe_sort_coe] at h
+  -- |H|·|L:H| = |L|,  |H∩K|·|K:H∩K| = |K|
+  have eL : Nat.card H * H.relIndex L = Nat.card ↥L := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHL).toEquiv]
+    exact Subgroup.card_mul_index (H.subgroupOf L)
+  have eK : Nat.card ↥(H ⊓ K) * H.relIndex K = Nat.card K := by
+    rw [← Subgroup.inf_relIndex_right (H := H) (K := K),
+      ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_right : H ⊓ K ≤ K)).toEquiv]
+    exact Subgroup.card_mul_index ((H ⊓ K).subgroupOf K)
+  -- |K:H∩K| = |L:H|
+  have hrel_eq : H.relIndex K = H.relIndex L := by
+    have key : Nat.card H * (Nat.card ↥(H ⊓ K) * H.relIndex L)
+        = Nat.card H * (Nat.card ↥(H ⊓ K) * H.relIndex K) := by
+      calc Nat.card H * (Nat.card ↥(H ⊓ K) * H.relIndex L)
+          = Nat.card H * H.relIndex L * Nat.card ↥(H ⊓ K) := by ring
+        _ = Nat.card ↥L * Nat.card ↥(H ⊓ K) := by rw [eL]
+        _ = Nat.card H * Nat.card K := ehk
+        _ = Nat.card H * (Nat.card ↥(H ⊓ K) * H.relIndex K) := by rw [eK]
+    exact (Nat.eq_of_mul_eq_mul_left Nat.card_pos
+      (Nat.eq_of_mul_eq_mul_left Nat.card_pos key)).symm
+  refine ⟨fun q hq => ?_, fun q hq => ?_⟩
+  · -- |M| = |H∩K| ∣ |H|
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_right : H ⊓ K ≤ K)).toEquiv] at hq
+    exact hH.1 q (Nat.primeFactors_mono (Subgroup.card_dvd_of_le inf_le_left)
+      Nat.card_pos.ne' hq)
+  · -- M.index = |K:H∩K| = |L:H| ∣ |G:H|
+    have hMidx : ((H ⊓ K).subgroupOf K).index = H.relIndex K := Subgroup.inf_relIndex_right H K
+    rw [hMidx, hrel_eq] at hq
+    exact hH.2 q (Nat.primeFactors_mono (Subgroup.relIndex_dvd_index_of_le hHL)
+      Subgroup.index_ne_zero_of_finite hq)
+
+/-! ### Problems 1B: mathlib / repo で被覆される Hall/π 演習 (docstring 記録)
+
+- **Problem 1B.7(a)** (`O_π(G)` = 最大の正規 π-部分群): 本リポジトリの
+  `OddOrder.Isaacs.Ch03.oPiCore π G` (= 正規 π-部分群の sup) が正規 (`oPiCore.normal`) かつ
+  characteristic (`oPiCore.characteristic`) な π-部分群であり、任意の正規 π-部分群 `H` を含む
+  (`Subgroup.IsPiGroup.le_oPiCore` = まさに Problem 1B.7(a)) ことが
+  `OddOrder/Isaacs/Ch03_SplitExtensions/Theorem315.lean` で示されている。この一意最大性から
+  `O_π(G)` は characteristic (Isaacs の Note)。
+-/
+
+end
 
 end OddOrder.Isaacs.Ch01
