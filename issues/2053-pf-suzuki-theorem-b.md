@@ -223,10 +223,23 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     identification)。qEquiv ∘ (mk' N の Q⊓C_G(P) への制限)。単射 = N ≤ D_L
     + Q⊓D=1 (StepThree の ι イディオム)、全射 = Q̄ := map の定義から。
     (ii) `Q1_eq_bot_of_card_two_pow` — |Q| = 2^n → Q₁ = ⊥。
-    残 = (a) C_Q(P) 非可換 → C_S(P) quaternion order 8 (Suzuki 2-group +
-    higman_classification + 2-rank 1)、(b) F* が指数 2 巡回部分群、
-    (c) App II Prop 2 消費 + |F*/Z(F*)| = 4 = r+1 → r=3 算術、
-    (d) |Q| = 8^p (step (4) + |C_Q(P)|=|F*|=8) → Q₁=⊥ assembly。
+  - **(5) 抽象核 完了 (2026-07-22, 5641a66bf)**:
+    `nearField_card_eq_nine_of_nilpotent_units` (StepFive.lean, 本体
+    sorry-free) — F near-field + Fˣ nilpotent + 2-rank 1 + 2-元指数 4 +
+    非可換 → |F| = 9 ∧ |F*| = 8。helper 3 点 (c4e069e7b):
+    `pow_four_eq_one_of_isSuzuki2Group` (**Higman sorried-cite**、lane a
+    campaign 待ち)、`card_center_eq_two_of_card_eq_eight`、
+    `isCyclic_odd_pSubgroup_of_nearField_units`。
+    残 = **fc-level assembly**: ⚠ hexp4 の供給は S Suzuki 経由なので
+    F-可換で場合分けしてから: F 非可換 → **抽出補題** (要実装:
+    `exists_noncommuting_two_elements_of_nearField_units` — abstract 証明の
+    prefix (O/T 分解 + hTnc) を再利用して Fˣ の非可換 2-元 pair を返す)
+    → e.symm で Q の非可換 2-元 → S 非可換 →
+    `sylowTwo_isMulCommutative_or_isSuzuki2Group` で S Suzuki → 全 Q の
+    2-元が指数 4 (2-元 ∈ S) → hexp4 供給 → 抽象核 → |C_Q(P)| = 8
+    (`centralizer_inf_mulEquiv_units` で転送) → step (4) で |Q| = 8^p =
+    2^{3p} → `Q1_eq_bot_of_card_two_pow` → Q₁ = ⊥。
+    最終形: `(∀ x y : F, comm) ∨ (card F = 9 ∧ card C_Q(P) = 8 ∧ Q₁ = ⊥)`。
 - [ ] (10) Lemma 5 消費の二分岐
 - [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
 - [ ] (13)–(16)
