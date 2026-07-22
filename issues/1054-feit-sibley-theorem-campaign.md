@@ -536,9 +536,31 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
       (7) class-algebra 合同は独立 — (6) 統合が済んだので (7)→(8) で a∣λ を出して
       union_coherent_of_lambda_dvd に供給、その後 step 5 の adjoin/(2)。
   - [ ] **(7)** class-algebra 合同 (独立、並行可): ψ constant on Z^# ⟹
-    ψ(z)≡ψ(1) mod|Q|。ω central character (ω(Kₛ)=ψ(Kₛ)/ψ(1)) の代数的整数性 +
-    構造定数 aᵢⱼₛ + Q f.p.f. 作用の counting。**前提の repo 内所在確認要**
-    (中心指標・class algebra・代数的整数)。無ければ RepresentationTheory 新 leaf。
+    ψ(z)≡ψ(1) mod|Q|。
+    **⭐ スコープ確定 (2026-07-22 偵察): 新規 class-algebra 構築は不要 — 既存 machinery
+    の再インスタンス化。** `peterfalvi_67` (ClassSumAlgebra.lean:127) が (7) の合同
+    そのもの (`ρ.character z ≡ ρ.character 1 [ALGMOD |P|]`) を、中心指標 constancy +
+    TI + `a₁₁≡1+a₁₂` から `peterfalvi_673` 経由で導出済。全下位部品が存在:
+    - `classSum`/`classSumCoeff`/`classSum_mul` (構造定数 = (7.1)、ClassSumCongruence.lean)
+    - `classSumCoeff_self_one_eq_zero` (hreal で a₁₁₀=0) / `classSumCoeff_self_inv_one_eq_card`
+      (a₁₂₀=|C₁|) / `peterfalvi_673_combine/cancel/final` ((7.3)(7.4) 算術)
+    - `card_dvd_classSumCoeff_of_fixedPointFree` (**完全汎用**: 任意有限部分群 P の
+      f.p.f. 共役作用で |P| ∣ classSumCoeff = (7.2) の核) / 中心指標整数性
+      `nonidentityZClassCoeffSum_isIntegral` / `character_isIntegral`。
+    **唯一の差分 = P Sylow (mod |P|) vs Q Hall (mod |Q|)**。Sylow 依存は 2 箇所のみ:
+    ① `fixedPointFree_classPair_of_isTISubset` (ClassSumCongruence.lean:491、Sylow P の
+       p-element 論法で「x∈P^# が (u,v) を固定 ⟹ u,v∈Z」を出す) →
+       **Q の TI 構造 (Q_trivial_intersection) を使う Hall 変種を新設**が要 (これが主タスク)。
+    ② `coprime_card_class_card_sylow` (|C₁| と |P| の coprime) → Q Hall では
+       |C₁|=|G:C_G(z)| と |Q| の coprime を別途 (Q Hall + z∈Z⊆Q の C_G(z)⊇Q から)。
+    ⟹ 実装 = **`peterfalvi_67` の Hall-TI 版** (`peterfalvi_67_hall` 等) を
+    ClassSumAlgebra または新 leaf に。①の f.p.f. Hall 変種 (~60-100 行) + coprime
+    補題 + peterfalvi_67 の assembly を Q で再展開 (~40 行)。**中心指標・class algebra・
+    代数的整数はすべて既存** — 「無ければ新 leaf」は不要と確定。
+    次 iteration: App.IV endgame の Q/Z/TI が peterfalvi_67 の引数 (hZP/hZnormal/hti/
+    hPz/hreal/hconst/hone) をどう供給するか (Hypothesis field からの導出) を確定してから
+    Hall 変種を書く。⚠ hconst の「N∩C_G card 定数」条件と hone の供給が endgame 側で
+    どう出るか要精査 (原文 (7) の d odd 使用箇所 = K₁∩Z^#≠∅ の存在)。
   - [ ] **(8)** Conclusion: (5)+(6)+(7) で a∣λ を証明し (6) を閉じる。
     Res_H e′₁ = (λ+aμ)Σaᵢχᵢ + χ′、Σaᵢχᵢ=(ρ_H−ρ_{H/Z})/(da)、z∈Z^# 評価 +
     (7) を ±e′₁ に適用 → λ/a+μ 代数的整数 → a∣λ。
