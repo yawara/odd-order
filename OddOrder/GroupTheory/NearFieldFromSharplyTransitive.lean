@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.NearFields
+import Mathlib.Algebra.GroupWithZero.Action.Defs
+import Mathlib.Algebra.Group.Action.Basic
+import OddOrder.Peterfalvi.Appendices.NearFieldClass
 
 /-!
 # Near-field from a sharply transitive additive action
@@ -102,7 +104,7 @@ theorem mul_eq_zero_iff {x y : A} : d.mul x y = 0 ↔ x = 0 ∨ y = 0 := by
       · exact absurd hx hy
 
 theorem mul_ne_zero {x y : A} (hx : x ≠ 0) (hy : y ≠ 0) : d.mul x y ≠ 0 := by
-  rw [Ne, mul_eq_zero_iff]; tauto
+  rw [Ne, mul_eq_zero_iff]; exact fun h => h.elim hx hy
 
 /-- The key group-theoretic identity: `coord (z • y) = coord z * coord y` for `y ≠ 0`
 (so `coord` is an anti-homomorphism; this drives associativity of `mul`). -/
