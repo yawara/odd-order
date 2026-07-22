@@ -105,24 +105,6 @@ theorem exists_mixedTermBilinear_ne_zero
 
 /-! ## Symmetry of the mixed term -/
 
-/-- The commutator pairing is symmetric in characteristic two: it is
-alternating, and `-1 = 1` on the `ZMod 2`-module target. -/
-theorem lowerCentralCommutatorBilinear_comm
-    (H : Type uP) [Group H]
-    (x y : Additive (lowerCentralLayer H 0)) :
-    lowerCentralCommutatorBilinear H y x =
-      lowerCentralCommutatorBilinear H x y := by
-  have hself := lowerCentralCommutatorBilinear_self H (x + y)
-  rw [map_add] at hself
-  simp only [LinearMap.add_apply, map_add,
-    lowerCentralCommutatorBilinear_self, zero_add, add_zero] at hself
-  have h2 : lowerCentralCommutatorBilinear H x y +
-      lowerCentralCommutatorBilinear H x y = 0 := by
-    have h := two_smul (ZMod 2) (lowerCentralCommutatorBilinear H x y)
-    rw [show (2 : ZMod 2) = 0 by decide, zero_smul] at h
-    exact h.symm
-  exact add_right_cancel (hself.trans h2.symm)
-
 /-- Swapping the two factors transposes the mixed term. -/
 theorem mixedTermBilinear_swap
     {Sl Sr : Subgroup P} {n : ℕ}

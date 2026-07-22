@@ -858,6 +858,24 @@ theorem lowerCentralCommutatorBilinear_self
     (lowerCentralCommutatorBihom H)
     (lowerCentralCommutatorBihom_self H) x
 
+/-- The commutator pairing is symmetric in characteristic two: it is
+alternating, and `-1 = 1` on the `ZMod 2`-module target. -/
+theorem lowerCentralCommutatorBilinear_comm
+    (H : Type uH) [Group H]
+    (x y : Additive (lowerCentralLayer H 0)) :
+    lowerCentralCommutatorBilinear H y x =
+      lowerCentralCommutatorBilinear H x y := by
+  have hself := lowerCentralCommutatorBilinear_self H (x + y)
+  rw [map_add] at hself
+  simp only [LinearMap.add_apply, map_add,
+    lowerCentralCommutatorBilinear_self, zero_add, add_zero] at hself
+  have h2 : lowerCentralCommutatorBilinear H x y +
+      lowerCentralCommutatorBilinear H x y = 0 := by
+    have h := two_smul (ZMod 2) (lowerCentralCommutatorBilinear H x y)
+    rw [show (2 : ZMod 2) = 0 by decide, zero_smul] at h
+    exact h.symm
+  exact add_right_cancel (hself.trans h2.symm)
+
 /-- The descended commutator pairing as a degree-two alternating map. -/
 noncomputable def lowerCentralCommutatorAlternating
     (H : Type uH) [Group H] :
