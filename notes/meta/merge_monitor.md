@@ -6,6 +6,13 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 02:5x 監視 tick — a (1C.8/1D.1) + b (Higman L13) + c (Prop1 model 完全証明・分割) 合流 / 🎉 sorry 8→7**。a=4 / b=2 / c=1 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problems 1C.8** 位数 pᵃ 部分群数の mod p 合同 + **1D.1** N_G(P)⊆H (P∈Syl_p(H), H◁G) ⟹ p∤|G:H|、`Problems.lean` +138) / b (**Higman Lemma 13** — 指数4前像の ξ 長さと長さ3化、`RestrictedLengths.lean` +326 拡張) / c (**Pf App C Prop1** `model_involution_data` **完全証明** + `RankOneAffineModel.lean` **新 leaf 分割** (863 行, NearFields 1188 に縮小))。
+> 🎉 **実 sorry 8→7 (改善)**: c が `model_involution_data` を実証明して 1 sorry 消滅、残る Q₈ Brauer–Suzuki sorry を新 leaf `RankOneAffineModel.lean` に孤立化 (NearFields 2→0, RankOneAffineModel 0→1)。**新 sorry 基準 = 7** (NearFields ではなく RankOneAffineModel に Q₈ gap が移動)。非退行かつ genuine な充足。
+> **c の分割 = mathlib 準拠 PASS**: NearFields が 2000 行制限に近づいたため rankOne model を `RankOneAffineModel.lean` (863) へ topic-split、`NearFields.lean` は re-export (import 保持) + `OddOrder.lean:457` に直接配線 → 下流 import 不変・orphan 0。file-size watch: 全 leaf <1500 (RankOneAffineModel 863 / NearFields 1188 / RestrictedLengths 599)。
+> **gate: green 4655 jobs (前 4654 +1 leaf split, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→7 (改善, 新基準 7) / lint 199 ≤ 199 baseline (a/b/c は新規警告 0) / push 76bb4a187→b3c4fb3e6**。範囲逸脱なし。
+> ℹ **d = wave 間 (0 ahead, scratch `foo` のみ)** — 前 tick の 19件 wave 後、次 wave 準備中。escalation 対象外。
+>
 > **▶▶ 2026-07-23 02:3x 監視 tick — b (Higman L13) + 🧹 d (lint wave 218→199) 合流 / a・c WIP**。a=0(WIP) / b=3 / c=0(WIP) / d=2。
 > 合流: b (**Higman Lemma 13** — 指数2前像の長さ2化・三直和の対独立性強化、新 leaf `RestrictedLengths.lean` +273 WIRED via `HigmanLemmaThirteen.lean`) / **d (🧹 初の lint 合流)** — frozen-zone 機械 wave 19件解消 (deprecation/simpArgs/does-nothing/seqFocus/maxHeartbeats、BG AppE 3 / Higman **Twelve** 3 / Pf Suzuki2Groups 2 / S11 1)、`bin/lint-baseline.tsv` **218→199**、issue 0138 ログ。
 > **d 合流検査 = PASS**: (i) **mechanical 確認** — theorem/lemma/def/structure/instance の signature 行変更 **0** (proof/signature 不改変) / (ii) **frozen file 確認** — d の触った Higman は **Twelve** (b の active frontier は **Thirteen** ゆえ非衝突)、他は BG AppE・Pf Suzuki2Groups・S11 で active lane 回避。charter 合致。
