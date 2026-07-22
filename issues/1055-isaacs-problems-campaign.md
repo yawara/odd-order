@@ -224,10 +224,17 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   repo `Ch01_Sylow/Basic.lean`) で `A<L≤C_P(A)`, `|L:A|=p`, `L◁P` を得、`L⊆C_P(A)` で `A⊆Z(L)`、
   `L/A` 位数 p 巡回で `L` 可換 (`isMulCommutative_of_isCyclic_of_ker_le_center`) — 極大性に矛盾。
   ⚠ `Subgroup.le_centralizer` は H explicit / repo 補題は `OddOrder.Isaacs.Ch01.IsPGroup.*` で dot notation
-  不発 (`_root_.IsPGroup` を見る) → 明示適用 + `import Basic`。**残: 1D.10 後半 (`|P:A| ∣ (|A|-1)!`、
-  P の A∖{1} への共役作用が忠実、kernel=C_P(A)=A で `P/A ↪ S_{|A|-1}`)**。
-- ⬜ **残り §1D**: 1D.5 (intricate) / 1D.10 後半 (`|P:A|∣(|A|-1)!`) /
-  1D.11 (`|G| ∣ n!`) / 1D.12 (位数 p 元数 `≡-1 mod p`) / 1D.15 の一般 `N` 版。多くは meaty。
+  不発 (`_root_.IsPGroup` を見る) → 明示適用 + `import Basic`。
+- ✅ 実証明 **1D.10 (後半)** `index_dvd_factorial_of_maximal_abelian_normal` (`|P:A| ∣ (|A|-1)!`)。
+  `P` の `A∖{1}={a:↥A//a≠1}` への共役 MulAction (`MulAut.conjNormal`) を letI 定義、`MulAction.toPermHom`
+  の核 = `C_P(A) = A` (前半)、`Subgroup.index_ker` + `Nat.card_perm` で `|P:A|=|range|∣|Perm(A∖{1})|
+  =(|A|-1)!`。⚠ 罠: `rw [←hCA]` は `A` を `centralizer A` 内まで書換え motive 破綻 → `f.ker=centralizer A`
+  を先証して `.trans hCA` / `hane:a≠1`(P) ≠ `⟨a,ha⟩≠1`(↥A) → Subtype.ext_iff で導出 / MulAction proof の
+  `show`→`change` / `MulAut.conjNormal_apply` + `mul_inv_eq_iff_eq_mul` で commute / card は
+  `Fintype.card_subtype_compl`+`card_subtype_eq`。→ **1D.10 完了**。
+- ⬜ **残り §1D**: 1D.5 (intricate) / 1D.11 (`|G| ∣ n!`、1D.10 後半を各 Sylow に適用可能に) /
+  1D.12 (位数 p 元数 `≡-1 mod p`、McKay の p-tuple + `card_modEq_card_fixedPoints`) /
+  1D.15 の一般 `N` 版。多くは meaty。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 
