@@ -225,6 +225,46 @@ theorem lem_1_8_relation
   rw [hfactor] at hB2
   exact (mul_eq_zero.mp hB2).resolve_left (pow_ne_zero 2 hNne)
 
+/-- **Gorenstein Ch.12 Lemma 1.9**: `G` possesses a **non-linear** irreducible character `χ`
+(degree `≥ 2`) whose kernel contains **every involution** (`χ(u) = χ(1)` for `orderOf u = 2`).
+From Lemma 1.8's relation, together with `χ(u) = 1 + χ₁(u)` (Lemma 1.6) and `χ(1) = χ₁(1) + 1`
+(Lemma 1.5), clearing denominators reduces to `(χ(u) − χ(1))² = 0`; and any involution is
+conjugate to the class representative, so `χ` is constant on all of them. -/
+theorem lem_1_9
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥Q.N : ℂ)]
+    [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    ∃ χ : IrreducibleCharacter G, (∃ d : ℕ, 2 ≤ d ∧ (χ : ClassFunction G ℂ) 1 = (d : ℂ)) ∧
+      ∀ u : G, orderOf u = 2 → (χ : ClassFunction G ℂ) u = (χ : ClassFunction G ℂ) 1 := by
+  haveI : Fintype G := Fintype.ofFinite _
+  haveI : Fintype ↥Q.N := Fintype.ofFinite _
+  obtain ⟨χ₁, χ, _, _, _, hdecomp, hdeg⟩ := Q.thetaStar_decomposition
+  have h18 := Q.lem_1_8_relation hdecomp
+  set u₀ := Q.involutionClass.out with hu₀
+  -- `u₀` is an involution, so `θ*(u₀) = 0` and `χ(u₀) = 1 + χ₁(u₀)`
+  have hu₀2 : orderOf u₀ = 2 := Q.mk_eq_involutionClass_iff.mp (conjClass_mk_out _)
+  have hval : (χ : ClassFunction G ℂ) u₀ = (χ₁ : ClassFunction G ℂ) u₀ + 1 :=
+    Q.apply_eq_of_thetaStar_apply_eq_zero hdecomp (Q.thetaStar_apply_eq_zero_of_orderOf_eq_two hu₀2)
+  -- character degrees are positive integers, hence nonzero
+  obtain ⟨d, hdpos, hd1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+  obtain ⟨d1, hd1pos, hd11⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ₁
+  have hχ1ne : (χ : ClassFunction G ℂ) 1 ≠ 0 := by rw [hd1]; exact_mod_cast hdpos.ne'
+  have hχ₁1ne : (χ₁ : ClassFunction G ℂ) 1 ≠ 0 := by rw [hd11]; exact_mod_cast hd1pos.ne'
+  -- `(χ(u₀) − χ(1))² = 0`
+  have hχ₁u : (χ₁ : ClassFunction G ℂ) u₀ = (χ : ClassFunction G ℂ) u₀ - 1 := by rw [hval]; ring
+  have hχ₁1 : (χ₁ : ClassFunction G ℂ) 1 = (χ : ClassFunction G ℂ) 1 - 1 := by rw [hdeg]; ring
+  have hq1 : (χ : ClassFunction G ℂ) 1 - 1 ≠ 0 := by rw [← hχ₁1]; exact hχ₁1ne
+  have hsq0 : ((χ : ClassFunction G ℂ) u₀ - (χ : ClassFunction G ℂ) 1) ^ 2 = 0 := by
+    rw [hχ₁u, hχ₁1] at h18
+    field_simp [hχ1ne, hq1] at h18
+    linear_combination h18
+  have hval0 : (χ : ClassFunction G ℂ) u₀ = (χ : ClassFunction G ℂ) 1 :=
+    sub_eq_zero.mp (pow_eq_zero_iff two_ne_zero |>.mp hsq0)
+  refine ⟨χ, ⟨d1 + 1, by omega, ?_⟩, ?_⟩
+  · rw [hdeg, hd11]; push_cast; ring
+  · -- any involution `u` is conjugate to `u₀`, so `χ(u) = χ(u₀) = χ(1)`
+    intro u hu
+    rw [(χ : ClassFunction G ℂ).of_isConj (Q.isConj_of_orderOf_eq_two hu hu₀2), hval0]
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory
