@@ -199,7 +199,11 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       C_Q(K)=1 = fpf、coprime = `coprime_card_Q_K` + **p ∤ |Q|**
       (`not_p_dvd_card_Q1`/`not_p_dvd_card_Q`: step (3) の合同 r≡2^i と
       p odd の矛盾 — 書籍の「r ≠ p は (3) の帰結」を形式化)。9318 継承。
-- [ ] (5)–(9)
+- [x] (5) **完了 (2026-07-22)** — `card_nearField_eq_nine_and_Q1_eq_bot`
+      (StepFive.lean, FirstCaseHypothesis): `(∀ x y : F, comm) ∨ (|F| = 9 ∧
+      |C_Q(P)| = 8 ∧ Q₁ = ⊥)`。本体 sorry-free (Higman `pow_four` + 9318 model
+      継承のみ)。詳細は末尾「step (5) 完了記録」。
+- [ ] (6)–(9)
   - **(5) 被覆調査 (2026-07-22): 3 部品すべて実装済、assembly のみ**:
     (i) Ch.I §2 Cor = `sylowTwo_isMulCommutative_or_isSuzuki2Group`
     (Suzuki/SylowTwo.lean:60、S 可換 or Suzuki 2-group)。
@@ -240,6 +244,24 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     (`centralizer_inf_mulEquiv_units` で転送) → step (4) で |Q| = 8^p =
     2^{3p} → `Q1_eq_bot_of_card_two_pow` → Q₁ = ⊥。
     最終形: `(∀ x y : F, comm) ∨ (card F = 9 ∧ card C_Q(P) = 8 ∧ Q₁ = ⊥)`。
+  - **step (5) 完了記録 (2026-07-22)**:
+    - 抽象核の O/T 分解 prefix を共有補題 **`exists_nilpotent_units_sylowTwo_decomp`**
+      (axiom-clean) に括り出し、抽象核と抽出補題が共に消費 (二重化回避、
+      抽象核は signature 不変で内部だけ差し替え・regression 無)。
+    - **`exists_noncommuting_two_elements_of_nearField_units`** (axiom-clean):
+      nilpotent 非可換 near-field の Fˣ から非可換 2-元 pair (共に 2-元)。
+    - **`card_nearField_eq_nine_and_Q1_eq_bot`** (∀-model, letI-prefix):
+      hnc で場合分け → 非可換なら抽出補題 → `toQ = incl∘e.symm` で C_Q(P)≤Q へ
+      転送 → `mem_sylowTwo_of_orderOf_two_pow` で S 到達 → S 非可換 →
+      `sylowTwo_isMulCommutative_or_isSuzuki2Group` で S Suzuki →
+      `pow_four_eq_one_of_isSuzuki2Group` で hexp4 供給 → 抽象核 → |F|=9,|Fˣ|=8
+      → `centralizer_inf_mulEquiv_units` で |C_Q(P)|=8 → step(4) で |Q|=8^p=2^{3p}
+      → `Q1_eq_bot_of_card_two_pow`。hnil = Q nilpotent の subgroup を e で転送、
+      h2rank = (B1) を e.symm で転送。
+    - #print axioms 実測: 抽象核・bundle・extraction = clean (hexp4 は仮説ゆえ
+      Higman 非依存)、conclusion のみ sorryAx (pow_four 経由)。
+    - AxiomsCheck: StepFive を import 追加、clean 3 本を登録 (conclusion は
+      Higman+9318 継承ゆえ意図的に非登録、注記済)。
 - [ ] (10) Lemma 5 消費の二分岐
 - [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
 - [ ] (13)–(16)

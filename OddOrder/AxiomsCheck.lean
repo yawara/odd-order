@@ -223,6 +223,7 @@ import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
@@ -12097,6 +12098,25 @@ and `card_inf_centralizer_eq_prime` inherit the step (2)(b) sorry — issue 9318
 deliberately NOT asserted here.) -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_K_dvd_sub_one_of_prime_order_invariant
+
+/-! **Peterfalvi Part II, Ch. II, step (5), the near-field analysis** (`FirstCase/StepFive.lean`,
+issue 2053, 2026-07-22): if `C_Q(P) ≅ F^*` is nonabelian then `|F| = 9`.  The unit group of a
+nilpotent noncommutative near-field splits as a central cyclic odd part `O` and a nonabelian
+Sylow `2`-subgroup `T` (`exists_nilpotent_units_sylowTwo_decomp`); the noncommutativity yields a
+pair of noncommuting `2`-elements (`exists_noncommuting_two_elements_of_nearField_units`); and,
+given that `2`-elements have order dividing `4`, `T` is `Q₈`, forcing `|F| = 9`, `|F^*| = 8`
+(`nearField_card_eq_nine_of_nilpotent_units`).  All three are sorry-free.
+
+(The `2`-element exponent bound is supplied downstream by the Higman theorem
+`pow_four_eq_one_of_isSuzuki2Group`, and the near-field model by Appendix C Proposition 1 —
+issue 9318.  The step (5) conclusion `card_nearField_eq_nine_and_Q1_eq_bot` therefore inherits
+both sorries and is deliberately NOT asserted here.) -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.exists_nilpotent_units_sylowTwo_decomp
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.exists_noncommuting_two_elements_of_nearField_units
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.nearField_card_eq_nine_of_nilpotent_units
 
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
