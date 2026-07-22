@@ -619,6 +619,94 @@ theorem IsHallSubgroup.map_of_surjective {G K : Type*} [Group G] [Group K] [Fini
     rw [Nat.mem_primeFactors] at hp ⊢
     exact ⟨hp.1, hp.2.1.trans (H.index_map_dvd hθ), Subgroup.index_ne_zero_of_finite⟩
 
+/-- Sylow `p`-部分群は `{p}`-Hall 部分群 (`|S| = p^n`、`|G:S|` は `p` と互いに素)。 -/
+theorem sylow_isHallSubgroup_singleton {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (S : Sylow p G) : IsHallSubgroup ({p} : Set ℕ) (S : Subgroup G) := by
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp S.isPGroup'
+  refine ⟨fun q hq => ?_, fun q hq => ?_⟩
+  · rw [Nat.mem_primeFactors] at hq
+    have hqS : q ∣ p ^ n := hn ▸ hq.2.1
+    exact (Nat.prime_dvd_prime_iff_eq hq.1 Fact.out).mp (hq.1.dvd_of_dvd_pow hqS)
+  · rw [Nat.mem_primeFactors] at hq
+    intro (hqp : q = p)
+    exact S.not_dvd_index (hqp ▸ hq.2.1)
+
+/-- `{p}`-Hall 部分群は Sylow `p`-部分群 (橋渡しの逆): `IsHallSubgroup {p} H` なる `H` は
+ある Sylow `p`-部分群と一致する。`H` は `p`-群 (`|H|` の素因子はすべて `p`)、Sylow `S ⊇ H` を
+取ると `[S:H]` を割る素数は `p` (∣`|S|`) かつ `≠ p` (∣`[G:H]`) で矛盾 → `relIndex_eq_one` で `S ≤ H`。 -/
+theorem exists_sylow_coe_eq_of_isHallSubgroup_singleton {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] {H : Subgroup G} (hH : IsHallSubgroup ({p} : Set ℕ) H) :
+    ∃ S : Sylow p G, (S : Subgroup G) = H := by
+  have hHp : IsPGroup p H := IsPGroup.of_card
+    (Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne' fun {d} hd hdvd =>
+      hH.1 d (Nat.mem_primeFactors.mpr ⟨hd, hdvd, Nat.card_pos.ne'⟩))
+  obtain ⟨S, hHS⟩ := hHp.exists_le_sylow
+  refine ⟨S, le_antisymm ?_ hHS⟩
+  rw [← Subgroup.relIndex_eq_one]
+  by_contra hne
+  obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hne
+  -- q ∣ [S:H] ∣ |S| = p^m ⟹ q = p
+  obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp S.isPGroup'
+  have hqp : q = p := (Nat.prime_dvd_prime_iff_eq hq Fact.out).mp
+    (hq.dvd_of_dvd_pow (hm ▸ hqdvd.trans (Subgroup.relIndex_dvd_card H S)))
+  -- q ∣ [S:H] ∣ [G:H] ⟹ q ≠ p (H が {p}-Hall)
+  exact hH.2 q (Nat.mem_primeFactors.mpr ⟨hq,
+    hqdvd.trans (Subgroup.relIndex_dvd_index_of_le hHS), Subgroup.index_ne_zero_of_finite⟩) hqp
+
+/-- `(MulAut.conj a)⁻¹` を元 `z` に作用させると `a⁻¹ z a` (共役)。`map_conj_smul` の補助。 -/
+private theorem inv_conj_smul_apply {L : Type*} [Group L] (a z : L) :
+    ((MulAut.conj a)⁻¹ • z : L) = a⁻¹ * z * a := by
+  rw [← map_inv]; simp [MulAut.smul_def]
+
+open Pointwise in
+/-- 準同型は共役と可換: `θ(g H g⁻¹) = θ(g) · θ(H) · θ(g)⁻¹`。共役の pointwise 作用
+`MulAut.conj g • H` と像の相互作用 (1B.5(b) で `θ(g • S₀) = θ(g) • θ(S₀)` に使用)。 -/
+theorem map_conj_smul {G K : Type*} [Group G] [Group K] (θ : G →* K) (g : G) (H : Subgroup G) :
+    (MulAut.conj g • H).map θ = MulAut.conj (θ g) • (H.map θ) := by
+  ext y
+  simp only [Subgroup.mem_map, Subgroup.mem_pointwise_smul_iff_inv_smul_mem, inv_conj_smul_apply]
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    exact ⟨g⁻¹ * x * g, hx, by rw [map_mul, map_mul, map_inv]⟩
+  · rintro ⟨x, hx, hxy⟩
+    exact ⟨g * x * g⁻¹, by rw [show g⁻¹ * (g * x * g⁻¹) * g = x by group]; exact hx,
+      by rw [map_mul, map_mul, map_inv, hxy]; group⟩
+
+open Pointwise in
+/-- **Isaacs Problem 1B.5(b)**. `θ : G ↠ K` が有限群の全射で `T` が `K` の Sylow `p`-部分群
+ならば、`T = θ(S)` となる `G` の Sylow `p`-部分群 `S` が存在する。
+
+任意の Sylow `S₀ : Sylow p G` の像 `θ(S₀)` は `{p}`-Hall (1B.5(a) + `sylow_isHallSubgroup_singleton`)
+なので Sylow `Q` を与える。`T`, `Q` は `K` で共役 `T = k • Q` (Sylow C)、`k = θ g` と書くと
+`T = θ(g) • θ(S₀) = θ(g • S₀)` (`map_conj_smul`)、`S := g • S₀` が求めるもの。 -/
+theorem exists_sylow_map_eq {G K : Type*} [Group G] [Group K] [Finite G]
+    {θ : G →* K} (hθ : Function.Surjective θ) {p : ℕ} [Fact p.Prime] (T : Sylow p K) :
+    ∃ S : Sylow p G, (S : Subgroup G).map θ = (T : Subgroup K) := by
+  haveI : Finite K := Finite.of_surjective θ hθ
+  obtain ⟨S₀⟩ := (Sylow.nonempty : Nonempty (Sylow p G))
+  obtain ⟨Q, hQ⟩ := exists_sylow_coe_eq_of_isHallSubgroup_singleton
+    (IsHallSubgroup.map_of_surjective hθ (sylow_isHallSubgroup_singleton S₀))
+  obtain ⟨k, hk⟩ := MulAction.exists_smul_eq K Q T
+  obtain ⟨g, rfl⟩ := hθ k
+  refine ⟨g • S₀, ?_⟩
+  rw [Sylow.coe_subgroup_smul, map_conj_smul, ← hQ, ← Sylow.coe_subgroup_smul, hk]
+
+/-- **Isaacs Problem 1B.5(c)**. `θ : G ↠ K` が有限群の全射ならば、各素数 `p` について
+`|Syl_p(K)| ≤ |Syl_p(G)|`。1B.5(b) より `S ↦ (θ(S) を Sylow とみたもの)` が
+`Syl_p(G) ↠ Syl_p(K)` の全射を与える。 -/
+theorem card_sylow_le_of_surjective {G K : Type*} [Group G] [Group K] [Finite G]
+    {θ : G →* K} (hθ : Function.Surjective θ) {p : ℕ} [Fact p.Prime] :
+    Nat.card (Sylow p K) ≤ Nat.card (Sylow p G) := by
+  haveI : Finite K := Finite.of_surjective θ hθ
+  refine Nat.card_le_card_of_surjective
+    (fun S : Sylow p G => (exists_sylow_coe_eq_of_isHallSubgroup_singleton
+      (IsHallSubgroup.map_of_surjective hθ (sylow_isHallSubgroup_singleton S))).choose) ?_
+  intro T
+  obtain ⟨S, hS⟩ := exists_sylow_map_eq hθ T
+  refine ⟨S, Sylow.ext ?_⟩
+  rw [(exists_sylow_coe_eq_of_isHallSubgroup_singleton
+    (IsHallSubgroup.map_of_surjective hθ (sylow_isHallSubgroup_singleton S))).choose_spec, hS]
+
 open Pointwise in
 /-- **Isaacs Problem 1B.6**. `H` を `G` の π-Hall 部分群、`K ≤ G` を部分群とする。`HK` が部分群
 (ある `L : Subgroup G` の台が `↑H·↑K`) ならば `H ∩ K` は `K` の π-Hall 部分群
