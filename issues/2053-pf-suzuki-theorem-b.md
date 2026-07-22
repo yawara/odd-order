@@ -203,7 +203,7 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       (StepFive.lean, FirstCaseHypothesis): `(∀ x y : F, comm) ∨ (|F| = 9 ∧
       |C_Q(P)| = 8 ∧ Q₁ = ⊥)`。本体 sorry-free (Higman `pow_four` + 9318 model
       継承のみ)。詳細は末尾「step (5) 完了記録」。
-- [ ] (6)–(9)
+- [ ] (6)–(9) — **(6)(7)(8) 完了, 残 = (9) `p = f`**
   - **(6) 体の場合 完了 (2026-07-22)** — `card_field_eq_and_D_eq_one_of_comm`
     (axiom-clean ∀-model): Q₁=1, F 可換 ⟹ (|F|=char ∨ |F|=9) ∧ |D|=1。
     部品完備: arithmetic + ringAut_sq + fieldOfComm + 抽象核 + `dAutHom`
@@ -241,8 +241,9 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       surj = C_D(P)=C_W(P)·P + P⊆N)。assembly = `N_eq_P_and_sigma_mulEquiv_centralizer_W`。
     - 数学的には step (7) 完結。sorryAx は 9318 (model) + Higman (step5 F_{9,2} 枝、lane a)
       の legitimate 上流 sorried-cite のみ。
-  - **(8) 着手 (2026-07-22, FirstCase/StepEight.lean 新設・root+AxiomsCheck 配線)** —
-    `Q₁≠1 ⟹ ℓ=|Σ| prime ∧ |F|∈{3^ℓ,5^ℓ,9^ℓ}` (p. 110)。**opening 2 lemma landed**:
+  - **(8) 完了 (2026-07-22, FirstCase/StepEight.lean, root+AxiomsCheck 配線)** —
+    `Q₁≠1 ∧ ℓ=|Σ|≠1 ⟹ ℓ prime ∧ |F|∈{3^ℓ,5^ℓ,9^ℓ}` (p. 110)。endpoint =
+    `card_prime_and_card_field_of_Q1_ne_bot` (sorryAx=9318+Higman)。以下 sub-lemma 群:
     - `comm_of_Q1_ne_bot` (∀-model, sorryAx=9318+Higman): 「By (5), F is a field」—
       step5 の dichotomy (comm ∨ F_{9,2}∧Q₁=1) から Q₁≠1 ⟹ comm。
     - `st_mem_and_cQ_isPGroup_of_mem_centralizer_W` (**axiom-clean**): w∈C_W(P)#
@@ -278,13 +279,20 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
         card_fixedSet_eq_card_fixedUnits_add_one で |C_F(w)|=2^b+1、b≥1 は char∈{3,5} odd から
         (fixedSet=char^a odd ⟹ 2^b+1 odd ⟹ b≥1)、heart `card_fixedSet_mem_of_units_two_pow`。
         Field 化 = `fieldOfComm hcomm` (hcomm=comm_of_Q1_ne_bot)、CharP F char は step6 導出流用。
-    - **⚠ 残 = step (8) assembly (D) のみ (mechanical, unblocked)**:
-      (D) f=3 mixed 排除 (w₁,w₂ で 3^1,3^2 は偶位数矛盾) → |C_F(w)| 一定 → ℓ=|C_W(P)| prime
-          (各 nonid σ_w の固定体=𝔽_f ⟹ [F:𝔽_f]=|⟨σ_w⟩|=ℓ ⟹ Σ 全 nonid 元位数 ℓ ⟹ cyclic
-          prime) + |F|=|C_F(w)|^ℓ。⚠ Artin [F:固定体]=|⟨σ⟩| は mathlib FixedPoints.finrank
-          (MulSemiringAction (zpowers σ) F setup 要)。Σ↪Aut(F) 単射 = dAut_injective +
-          C_W(P)≅D (sigma_mulEquiv)、Aut(finite field) cyclic は mathlib。ψ:C_W(P)→*RingAut F
-          = (dAutHom hcomm model).comp cwToDHom を組んで per-w 固定数を束ねる。
+    - **(D) 完了 (2026-07-22) → step (8) 完結**: `card_prime_and_card_field_of_Q1_ne_bot`
+      (**sorryAx=9318+Higman**、∀-model): `Q₁≠1 ∧ ℓ=|Σ|=|C_W(P)|≠1 ⟹ ℓ prime ∧
+      |F|∈{3^ℓ,5^ℓ,9^ℓ}`。汎用 axiom-clean 3 補題 (StepEight top、AxiomsCheck 登録):
+      - `card_eq_card_fixedPoints_pow_orderOf` (Artin): σ:RingAut(有限体) で
+        `|F|=|{x:σx=x}|^{orderOf σ}`。zpowers σ の MulSemiringAction + `FixedPoints.finrank_eq_card`。
+      - `isCyclic_ringAut_of_charP`: 有限体の `RingAut F` cyclic。RingAut F ↪ Gal(F/𝔽_q)
+        (`AlgEquiv.ofRingEquiv`, prime field 固定) + Gal cyclic instance + `isCyclic_of_injective`。
+      - `card_prime_of_isCyclic_forall_ne_one_orderOf`: cyclic 群で全 nonid 同位数 ⟹ card prime
+        (`IsCyclic.card_orderOf_eq_totient` + `Nat.totient_eq_iff_prime`)。
+      assembly: ψ=(dAutHom hcomm model).comp f (f:C_W(P)→*Σ、sigma_mulEquiv の f と同構成)、
+      単射 (f 単射=kernelN∩W=⊥ + dAut_injective)。IsCyclic(RingAut F)⟹IsCyclic C_W(P)。
+      constancy = 各 nonid w で |F|=char^{a_w·orderOf σ_w} (a_w∈{1,2}=step C+char_pow、
+      orderOf σ_w odd=D_odd)、N=a_w·orderOf の parity が a_w 一意決定 ⟹ |C_F(w)| 一定。
+      ⟹ orderOf σ_w 一定 ⟹ generator で ℓ prime + |F|=|C_F(g)|^ℓ、|C_F(g)|∈{3,5,9}。
   - **(6) 算術補題 完了 (2026-07-22, StepSix.lean 新設)**:
     `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` (axiom-clean, AxiomsCheck
     登録) — [HB] IX 2.7: `f 奇 ∧ f^a = 2^b+1 (b≥1) ⟹ a=1 ∨ f^a=9`。純 ℕ 算術
