@@ -23,13 +23,23 @@ formal-math ベンチ。problem ごとに `Challenge.lean` が文を固定し, �
    自作 def への依存が少ないほど提出が楽。ただし `Defs/*.lean` への小さな持ち込みは前例あり)
 3. **証明が難しく mathlib 未収録** (でないとベンチにならない)
 
-## 📋 候補一覧 (2026-07-19 全面差し替え)
+## 📋 候補一覧
 
-> **正本 = [`notes/meta/lean_eval_candidates_2026_07_19.md`](../notes/meta/lean_eval_candidates_2026_07_19.md)**
-> — 79 エージェント fan-out (発掘 4 スライス + 既存 11 件再測 + lean-eval recon → 候補 77 件を
-> 敵対的検証 → 68 件通過 / 4 件 reject) の実測結果。strong 31 件 + viable 27 件の全表、
-> トップ 5 の statement 素案、reject 理由、lean-eval 側の problem 一覧・提出フローを収録。
-> 本 issue には要約のみ置く。
+> **前向きリストの正本 = [`notes/meta/lean_eval_forward_list_2026_07_22.md`](../notes/meta/lean_eval_forward_list_2026_07_22.md)**
+> — 2026-07-22 に「3 冊が順調に完成すると自然に submit できる問題」の軸で再編 (11 エージェント
+> fan-out: ready-now 34 件再検証 + 新着 10 件発掘 + 4 active frontier 進捗測定 + 未解決 3 問の
+> solver-side 評価、frontier は敵対的検証済)。**3 層構造**: Tier A ready-now (34+🆕6) /
+> Tier B 完成待ち (9318 BrauerSuzuki=既存未解決を解答, 1054 FeitSibley, 2053 Suzuki-A) /
+> Tier C off-path (Z*/Gorenstein–Walter/brauer_splitting_field)。
+>
+> ⚠ **2026-07-22 の最大訂正 = Glauberman ZJ 定理**: 下記 2026-07-19 note §3 は ZJ を
+> 「reject — repo に存在しない」としたが、その後 `GroupTheory/GlaubermanZJ.lean` で
+> **完全形式化された** (`oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian`, 実 sorry 0)。
+> 伝説級の新規提案候補。他に B.H.Neumann 位数 3・一般 Hall–Petresco・Galois–Burnside 等が新着。
+>
+> ready-now の詳細表 (strong 31 + viable 27 の全表・statement 素案・reject 理由・提出フロー) は
+> [`notes/meta/lean_eval_candidates_2026_07_19.md`](../notes/meta/lean_eval_candidates_2026_07_19.md)
+> を引き続き正本とする (2026-07-22 note が前向き軸で上書き・補完)。本 issue には要約のみ置く。
 >
 > ⚠ **旧表 (2026-05-30) は破棄**。事実誤認 3 件: Frobenius 核存在は repo に**不在** /
 > Burnside 正規 p-補群は **mathlib 収録済** (`MonoidHom.ker_transferSylow_isComplement'`) /
@@ -59,6 +69,15 @@ formal-math ベンチ。problem ごとに `Challenge.lean` が文を固定し, �
 
 ## やること
 
+- [ ] **🆕 (提案) Glauberman ZJ 定理を出す** — 前 note が reject したが 2026-07-22 に完成
+      (`GroupTheory.oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian`)。伝説級・mathlib/eval
+      双方に無い。⚠ AxiomsCheck 未登録 → 提出前に `#print axioms` で axiom-clean 確定
+- [ ] **🆕 (提案) B.H.Neumann 位数 3 定理** (`lowerCentralSeries_two_eq_bot_of_fixedPointFree_orderOf_eq_three`、
+      AxiomsCheck:8350 登録済・bespoke ほぼ 0) と **一般 Hall–Petresco** (`HallPetresco.exists_hallPetresco`、
+      AxiomsCheck:10858) を提案。後者は旧 #16 (class≤3 版) を差し替える
+- [ ] **🎯 (解答) `brauer_suzuki` = 9318 完走で既存未解決 problem を落とす** — Tier B で唯一
+      「未解決 problem を解答」できる経路。≈38% (Gorenstein Lem 1.2–1.6 landing、最難所の例外指標
+      Lem 1.4–1.5 済)。lane c frontier。完成時に solver-side 提出
 - [ ] **(提案) Jordan の定理を problem 提案 PR で出す** — mathlib が `proof_wanted` で明示的に
       欲しがっており bespoke def ゼロ。`lake exe lean-eval validate-manifest` +
       `check-problem-build` で検証してから PR
