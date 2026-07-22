@@ -895,6 +895,54 @@ theorem eq_normalizer_of_sylow_normalizer_le {p : ℕ} [Fact p.Prime] {G : Type*
     rwa [mul_inv_cancel_right] at h1
   simpa using H.inv_mem hg_inv
 
+/-- **Isaacs Problem 1C.2(a)**. `H ≤ G`、`P` を `H` の Sylow `p`-部分群とすると、`G` のある
+Sylow `p`-部分群 `S` で `P = H ∩ S` (= `(↑S).subgroupOf H`) となる。
+
+`P` を `G` に押し出した p-部分群 `P.map H.subtype` を含む Sylow `S` を取ると
+(`IsPGroup.exists_le_sylow`)、`P ≤ (↑S).subgroupOf H`。後者は p-部分群 (`↑S ⊓ H ≤ ↑S`) ゆえ
+`H` の Sylow `P` の極大性 (`is_maximal'`) で一致。 -/
+theorem exists_sylow_subgroupOf_eq_of_sylow {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    [Finite G] {H : Subgroup G} (P : Sylow p ↥H) :
+    ∃ S : Sylow p G, (P : Subgroup ↥H) = (↑S : Subgroup G).subgroupOf H := by
+  obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp P.isPGroup'
+  have hpg : IsPGroup p ((P : Subgroup ↥H).map H.subtype) :=
+    IsPGroup.of_card (by rw [Subgroup.card_map_of_injective (Subgroup.subtype_injective _), hm])
+  obtain ⟨S, hS⟩ := hpg.exists_le_sylow
+  refine ⟨S, ?_⟩
+  -- (↑S).subgroupOf H は p-部分群
+  have hScard : Nat.card ((S : Subgroup G).subgroupOf H)
+      = Nat.card ((S : Subgroup G) ⊓ H : Subgroup G) := by
+    rw [← Subgroup.card_map_of_injective (Subgroup.subtype_injective H),
+      Subgroup.subgroupOf_map_subtype]
+  have hSpg : IsPGroup p ((S : Subgroup G).subgroupOf H) := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp S.isPGroup'
+    have hdvd : Nat.card ((S : Subgroup G) ⊓ H : Subgroup G) ∣ p ^ n :=
+      hn ▸ Subgroup.card_dvd_of_le (inf_le_left : (S : Subgroup G) ⊓ H ≤ (S : Subgroup G))
+    obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp hdvd
+    exact IsPGroup.of_card (hScard.trans hj)
+  exact (P.is_maximal' hSpg (Subgroup.map_le_iff_le_comap.mp hS)).symm
+
+/-- **Isaacs Problem 1C.3(a)**. `G` の位数が `p` の冪である元の全体 `X` は、全 Sylow `p`-部分群
+の和集合に一致する。
+
+⊇: Sylow `P` (p-群) の元 `x` は `orderOf x ∣ |P| = p^n` ゆえ位数 `p` 冪。⊆: 位数 `p^k` の `x` は
+`⟨x⟩` が p-群 (`|⟨x⟩| = orderOf x = p^k`) ゆえある Sylow に含まれる (`IsPGroup.exists_le_sylow`)。 -/
+theorem powerOrder_eq_iUnion_sylow {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] :
+    {x : G | ∃ k, orderOf x = p ^ k} = ⋃ P : Sylow p G, (P : Set G) := by
+  ext x
+  simp only [Set.mem_setOf_eq, Set.mem_iUnion, SetLike.mem_coe]
+  constructor
+  · rintro ⟨k, hk⟩
+    have hpg : IsPGroup p (Subgroup.zpowers x) :=
+      IsPGroup.of_card (show Nat.card (Subgroup.zpowers x) = p ^ k by rw [Nat.card_zpowers, hk])
+    obtain ⟨P, hP⟩ := hpg.exists_le_sylow
+    exact ⟨P, hP (Subgroup.mem_zpowers x)⟩
+  · rintro ⟨P, hxP⟩
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
+    obtain ⟨k, -, hk⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp
+      (hn ▸ Subgroup.orderOf_dvd_natCard (P : Subgroup G) hxP)
+    exact ⟨k, hk⟩
+
 end
 
 end OddOrder.Isaacs.Ch01
