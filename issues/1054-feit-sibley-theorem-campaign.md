@@ -461,7 +461,11 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
          x=1∧m=2 → **swap+negate**: w η₁ := −E′η₂, w η₂ := −E′η₁ (dite)。
          swap が (P1) を保つのは m=2 に限る (w η₂ − w η₁ = E′η₂ − E′η₁ ✓)。
          **中間の IsCoherent Y 再証明は不要** — 下流は w 関数だけ消費する。
-      2. **v 分析**: v := u + a•(w η₁)、(v,v) = 1 (norm identity, nvv=1)、
+      2. **v 分析**: 前半 [x] **v-facts パッケージ完成** `keystone_residual_props`
+         (2026-07-22, sorry-free): v := u + a•(w η₁) について (v,v) = 1 /
+         v ∈ ZIrr / v ⊥ 全 w(𝒴) / (v, Eχ') = a'·((v,Eχ₁) − 1) (χ'≠χ₁,
+         a'-supported diff)。後半 [ ] = ±Irr 抽出 + 3 分岐 + wX 割当構成
+         (下記設計、次 iteration): v := u + a•(w η₁)、(v,v) = 1 (norm identity, nvv=1)、
          v ∈ ZIrr → ±Irr (exists_zsmul_irreducibleCharacter_of_inner_self_one)。
          (v, Eχ') − a'(v, Eχ₁) = −a' (tau_keystone_inner_extensionX_diff +
          (5) で (w η₁, Eχ') = 0) → 整数値分析: (v,Eχ₁) = 1 → v = Eχ₁ /

@@ -936,6 +936,110 @@ theorem exists_normalized_witness_of_dvd [Finite G]
       push_cast
       ring
 
+/-- **Peterfalvi (6), the residual `v = u + a·w(η₁)`** (p. 148): once `λ = 0`
+(normalized witnesses), the residual `v` of the keystone image `u = Ind(χ₁ − a·η₁)`
+is a norm-one virtual character orthogonal to every `𝒴`-witness, and its pairings
+with the `𝒳`-witnesses satisfy `(v, eᵢ) = aᵢ·((v, e₁) − 1)` — the input of the
+`v = e₁ ∨ v = −e₂` case analysis. -/
+theorem keystone_residual_props [Finite G]
+    {X Y : Set (ClassFunction ↥hyp.H ℂ)}
+    (hXS : X ⊆ hyp.Sset) (hYS : Y ⊆ hyp.Sset) (hdisj : ∀ φ ∈ X, φ ∉ Y)
+    (hcohX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau X hyp.A)
+    (hcohY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau Y hyp.A)
+    {χ₁ : ClassFunction ↥hyp.H ℂ} (hχ₁X : χ₁ ∈ X)
+    (hXdiff : ∀ φ ∈ X, ∃ b : ℕ, 0 < b ∧
+      φ - b • χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) X hyp.A)
+    {χ₂ : ClassFunction ↥hyp.H ℂ} (hχ₂X : χ₂ ∈ X) (hχ₂ne : χ₂ ≠ χ₁)
+    {η₁ : ClassFunction ↥hyp.H ℂ} (hη₁Y : η₁ ∈ Y)
+    (hYdiff : ∀ ψ ∈ Y, ψ - η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+      Y hyp.A)
+    {η₂ : ClassFunction ↥hyp.H ℂ} (hη₂Y : η₂ ∈ Y) (hη₂ne : η₂ ≠ η₁)
+    {a : ℕ}
+    (hsupp : χ₁ - a • η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+      hyp.Sset hyp.A)
+    {w : ClassFunction ↥hyp.H ℂ → ClassFunction G ℂ}
+    (hwP2a : ∀ η ∈ Y, ∃ η' ∈ Y, ∃ s : ℤ, (s = 1 ∨ s = -1) ∧ w η = s • hcohY.extension η')
+    (hwnorm : ∀ η ∈ Y, ClassFunction.inner (w η) (w η) = 1)
+    (hworth : ∀ η ∈ Y, ∀ η' ∈ Y, η ≠ η' → ClassFunction.inner (w η) (w η') = 0)
+    (hwu_ne : ∀ η ∈ Y, η ≠ η₁ →
+      ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (w η) = 0)
+    (hwu_1 : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (w η₁) = -(a : ℂ)) :
+    ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • w η₁)
+        (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • w η₁) = 1 ∧
+      (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • w η₁) ∈ ZIrr G ∧
+      (∀ η ∈ Y, ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • w η₁) (w η) = 0) ∧
+      (∀ χ' ∈ X, χ' ≠ χ₁ → ∀ a' : ℕ,
+        χ' - a' • χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) X hyp.A →
+        ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • w η₁) (hcohX.extension χ') =
+          (a' : ℂ) * (ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • w η₁)
+            (hcohX.extension χ₁) - 1)) := by
+  classical
+  set u : ClassFunction G ℂ := hyp.tau (χ₁ - a • η₁) with hu
+  set v : ClassFunction G ℂ := u + (a : ℂ) • w η₁ with hv
+  have hη₁X : η₁ ∉ X := fun h => hdisj η₁ h hη₁Y
+  have hχ₁η₁ : χ₁ ≠ η₁ := fun h => hdisj χ₁ hχ₁X (h ▸ hη₁Y)
+  have huu : ClassFunction.inner u u = 1 + (a : ℂ) ^ 2 := by
+    rw [hu]
+    exact hyp.tau_scaled_diff_inner_self (hXS hχ₁X) (hYS hη₁Y) hχ₁η₁ hsupp
+  have hwu_1' : ClassFunction.inner (w η₁) u = -(a : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm]
+    rw [hu, hwu_1, star_neg, star_natCast]
+  have hwu1u : ClassFunction.inner u (w η₁) = -(a : ℂ) := by rw [hu]; exact hwu_1
+  -- `(v, v) = 1`
+  have hvv : ClassFunction.inner v v = 1 := by
+    rw [hv]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      star_natCast]
+    rw [huu, hwu_1', hwnorm η₁ hη₁Y, hwu1u]
+    ring
+  -- `v ∈ ZIrr`
+  have hwη₁Z : w η₁ ∈ ZIrr G := by
+    obtain ⟨η', hη'Y, s, -, hws⟩ := hwP2a η₁ hη₁Y
+    rw [hws]
+    exact Submodule.smul_mem _ _ (hcohY.extension_mem_ZIrr η' (Submodule.subset_span hη'Y))
+  have hvZ : v ∈ ZIrr G := by
+    rw [hv]
+    refine Submodule.add_mem _ (hu ▸ hyp.tau_mem_ZIrr hsupp.1) ?_
+    rw [show ((a : ℂ)) = (((a : ℤ)) : ℂ) by push_cast; ring, Int.cast_smul_eq_zsmul]
+    exact Submodule.smul_mem _ _ hwη₁Z
+  -- `v` is orthogonal to every `𝒴`-witness
+  have hvw : ∀ η ∈ Y, ClassFunction.inner v (w η) = 0 := by
+    intro η hη
+    rw [hv, ClassFunction.inner_add_left, ClassFunction.inner_smul_left]
+    by_cases hne : η = η₁
+    · rw [hne, hu, hwu_1, hwnorm η₁ hη₁Y]
+      ring
+    · rw [hu, hwu_ne η hη hne, hworth η₁ hη₁Y η hη (fun h => hne h.symm)]
+      ring
+  refine ⟨hvv, hvZ, hvw, ?_⟩
+  -- the `𝒳`-side pairing relation
+  intro χ' hχ'X hχ'ne a' hsuppX'
+  -- `(w η₁, E χ') = 0` and `(w η₁, E χ₁) = 0` from (5)
+  have hEw : ∀ φ ∈ X, ClassFunction.inner (w η₁) (hcohX.extension φ) = 0 := by
+    intro φ hφ
+    obtain ⟨η', hη'Y, s, -, hws⟩ := hwP2a η₁ hη₁Y
+    rw [hws, ← Int.cast_smul_eq_zsmul ℂ s, ClassFunction.inner_smul_left]
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      hyp.cross_extension_inner_eq_zero hXS hYS hdisj hcohX hcohY hχ₁X hXdiff hχ₂X hχ₂ne
+        hη₁Y hYdiff hη₂Y hη₂ne hφ hη'Y, star_zero, mul_zero]
+  -- `(v, E χ' − a'·E χ₁) = −a'`
+  have hpair : ClassFunction.inner v
+      (hcohX.extension χ' - (a' : ℂ) • hcohX.extension χ₁) = -(a' : ℂ) := by
+    rw [hv, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
+      ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+      OddOrder.RepresentationTheory.inner_smul_right, star_natCast,
+      OddOrder.RepresentationTheory.inner_smul_right, star_natCast,
+      hEw χ' hχ'X, hEw χ₁ hχ₁X]
+    have hkey := hyp.tau_keystone_inner_extensionX_diff hXS hcohX hχ₁X (hYS hη₁Y) hη₁X
+      hsupp hχ'X hχ'ne hsuppX'
+    rw [ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right,
+      star_natCast, ← hu] at hkey
+    linear_combination hkey
+  rw [ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right,
+    star_natCast] at hpair
+  linear_combination hpair
+
 end Coherence
 
 end Hypothesis
