@@ -6,6 +6,13 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 02:3x 監視 tick — b (Higman L13) + 🧹 d (lint wave 218→199) 合流 / a・c WIP**。a=0(WIP) / b=3 / c=0(WIP) / d=2。
+> 合流: b (**Higman Lemma 13** — 指数2前像の長さ2化・三直和の対独立性強化、新 leaf `RestrictedLengths.lean` +273 WIRED via `HigmanLemmaThirteen.lean`) / **d (🧹 初の lint 合流)** — frozen-zone 機械 wave 19件解消 (deprecation/simpArgs/does-nothing/seqFocus/maxHeartbeats、BG AppE 3 / Higman **Twelve** 3 / Pf Suzuki2Groups 2 / S11 1)、`bin/lint-baseline.tsv` **218→199**、issue 0138 ログ。
+> **d 合流検査 = PASS**: (i) **mechanical 確認** — theorem/lemma/def/structure/instance の signature 行変更 **0** (proof/signature 不改変) / (ii) **frozen file 確認** — d の触った Higman は **Twelve** (b の active frontier は **Thirteen** ゆえ非衝突)、他は BG AppE・Pf Suzuki2Groups・S11 で active lane 回避。charter 合致。
+> **gate: green 4654 jobs (前 4653 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→8 非退行 / lint 199 ≤ 199 baseline (d の新 baseline に対し exact — b の新 leaf は 0 新規警告で clean) / push a2fc97dda→31accf994**。
+> ℹ **a/c WIP watch**: a=`Problems.lean` 編集中 (§1C 次問継続) / c=`NearFields.lean` 編集中 (rankOne 残 field / Q₈ transport)。両 0 ahead・通常進行。**d は 0 ahead に復帰** (scratch `foo` のみ、次 wave へ)。
+> ✅ **d メンテナンス lane が機能**: hub の従来 cleanup wave を d が引き取り、baseline を初めて ratchet-down (218→199)。今後の wave も同検査 (mechanical + frozen) で受理。
+>
 > **▶▶ 2026-07-23 02:2x 監視 tick — a (1C.6a/b) + b (Higman L13 商分解) + c (App C Prop1 model 組立) 合流 / d lint 稼働**。a=3 / b=3 / c=1(+WIP) / d=0(10 WIP)。
 > 合流: a (**Isaacs §1C Problems 1C.6a/1C.6b** — G=HK の共通 Sylow と P=(P∩H)(P∩K) 集合積、`Problems.lean` +118) / b (**Higman Lemma 13** — Frattini 商の ξ 長さ・不変直和分解・持ち上げ、新 leaf `QuotientLengths.lean`+200 / `QuotientSummands.lean`+249 / `FrattiniPreimages.lean`+239、3 枚とも WIRED via `HigmanLemmaThirteen.lean`) / c (**Pf App C Prop1** `rankOne_affine_nearField` の model 組立 — **carrier 実構成 + 13/15 フィールド実証明**、`NearFields.lean` +267/−30)。
 > **gate: green 4653 jobs (前 4650 +3 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→8 非退行 (count-sorry; c の model 組立は carrier 実構成でも sorry 非増 = NearFields 2 のまま、Q₈ gap 孤立維持) / lint 218 ≤ 218 baseline (ratchet exit 0) / push f499e5c23→8d2f7140a**。範囲逸脱なし。
