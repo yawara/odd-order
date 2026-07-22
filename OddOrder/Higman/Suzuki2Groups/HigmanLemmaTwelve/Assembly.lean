@@ -610,6 +610,218 @@ theorem isTypeD_of_mixedTerm_monomial
 
 /-! ## The classification endpoint -/
 
+/-- **Higman Lemma 12 (pp. 90--91), B/C dispatch with a commutative left
+factor.**
+
+Retaining a commutative member of the complementary factor pair forces its
+factor automorphism to be `1`.  Thus only the first two cases of Higman's
+dispatch remain: a second trivial factor automorphism gives type B, while a
+nontrivial Frobenius automorphism on the right gives type C. -/
+theorem isTypeB_or_isTypeC_of_commutative_left_factor
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    (factors : XiLengthThreeTypeAFactorData P Y)
+    (hleftComm : IsMulCommutative factors.left) :
+    IsTypeB.{uP, 0} P ∨ IsTypeC.{uP, 0} P := by
+  classical
+  have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+    frattini_isElementaryAbelian_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  obtain ⟨c, ePhi, nu, dataL0, dataR0, hn2, -, hnuPrim, hconj,
+      hnuL0, hnuR0⟩ :=
+    exists_factorPairCoordinates_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+      factors.left_invariant factors.frattini_lt_left
+      factors.left_lt_top factors.right_invariant
+      factors.frattini_lt_right factors.right_lt_top
+  revert hnuL0 hnuR0 hconj hnuPrim hn2 dataR0 dataL0 nu ePhi
+  generalize Module.finrank (ZMod 2) (Additive ↑(frattini P)) = n
+  intro ePhi nu dataL0 dataR0 hn2 hnuPrim hconj hnuL0 hnuR0
+  have hK0 :=
+    lowerCentralLayerKernel_zero_eq_frattini_subgroupOf_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  have hK1 := lowerCentralLayerKernel_one_eq_bot_of_xiLengthThree
+    hP hncomm hmulti hxi hlen hprime
+  have hterm := lowerCentralTerm_one_eq_frattini_of_xiLengthThree
+    hP hncomm hmulti hxi hlen hprime
+  have hSq := lowerCentralSquaresLieInSecond_of_xiLengthThree
+    hP hncomm hmulti hxi hlen hprime
+  have hAgemo := agemo_one_eq_frattini_of_xiLengthThree
+    hP hncomm hmulti hxi hlen hprime
+  obtain ⟨-, hcentral⟩ :=
+    commutator_eq_frattini_and_frattini_le_center_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  have hPhiNeBot : frattini P ≠ (⊥ : Subgroup P) := by
+    intro hPhiBot
+    have hcommBot : _root_.commutator P = ⊥ :=
+      le_bot_iff.mp
+        ((OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP).trans
+          (le_of_eq hPhiBot))
+    exact hncomm ((commutator_eq_bot_iff P).mp hcommBot)
+  have hinvPhi : involutions P ⊆ frattini P :=
+    involutions_subset_of_nontrivial_invariant hP Y hxi.transitive
+      (IsAInvariant.of_characteristic Y.subtype) hPhiNeBot
+  have hinv : ∀ x : P, x ^ 2 = 1 → x ∈ lowerCentralTerm P 1 := by
+    intro x hx
+    rw [hterm]
+    by_cases hx1 : x = 1
+    · rw [hx1]
+      exact Subgroup.one_mem _
+    · exact hinvPhi ⟨hx, hx1⟩
+  have hn0 : n ≠ 0 := by omega
+  have n_pos : 0 < n := by omega
+  have hcard : Nat.card (GaloisField 2 n) = 2 ^ n := by
+    simpa [Nat.card_eq_fintype_card] using GaloisField.card 2 n hn0
+  have hordnu : orderOf nu = 2 ^ n - 1 := hnuPrim.eq_orderOf.symm
+  have normalizeRight : ∀
+      (data : FactorCoordinateData factors.right_invariant
+        factors.frattini_lt_right.le c ePhi nu),
+      nu = data.lambda * data.theta data.lambda →
+      ∃ data' : FactorCoordinateData factors.right_invariant
+          factors.frattini_lt_right.le c ePhi nu,
+        nu = data'.lambda * data'.theta data'.lambda ∧
+        (data'.theta = 1 ∨
+          ∃ r : ℕ, 0 < r ∧ 2 * r ≤ n ∧
+            data'.theta = frobeniusEquiv (GaloisField 2 n) 2 ^ r ∧
+            Odd (orderOf data'.theta)) := by
+    intro data hnu
+    cases data with
+    | commutative d => exact ⟨.commutative d, hnu, Or.inl rfl⟩
+    | noncommutative hnc d =>
+        obtain ⟨d', r, hr0, hrhalf, htheta⟩ :=
+          d.exists_flip_frobenius_le_half hn0
+        exact ⟨.noncommutative hnc d', d'.kernel_eigenvalue_eq,
+          Or.inr ⟨r, hr0, hrhalf, htheta, d'.theta_order_odd⟩⟩
+  have hthetaL0 : dataL0.theta = 1 := by
+    cases dataL0 with
+    | commutative d => rfl
+    | noncommutative hnc d => exact (hnc hleftComm).elim
+  obtain ⟨dR, hnuR, hRcase⟩ := normalizeRight dataR0 hnuR0
+  set L := dataL0.toInclusionData hEA ePhi hK1 hterm hSq hAgemo hK0
+  set R := dR.toInclusionData hEA ePhi hK1 hterm hSq hAgemo hK0
+  have hthetaLpkg : L.theta = dataL0.theta :=
+    FactorCoordinateData.toInclusionData_theta hEA ePhi dataL0 hK1 hterm
+      hSq hAgemo hK0
+  have hthetaRpkg : R.theta = dR.theta :=
+    FactorCoordinateData.toInclusionData_theta hEA ePhi dR hK1 hterm hSq
+      hAgemo hK0
+  have hequivLR : ∀ alpha beta : GaloisField 2 n,
+      mixedTermBilinear L R
+          (dataL0.lambda * alpha) (dR.lambda * beta) =
+        nu * mixedTermBilinear L R alpha beta := fun alpha beta =>
+    mixedTermBilinear_lambda_equivariance hEA ePhi dataL0 dR hK1 hterm
+      hSq hAgemo hK0 hconj alpha beta
+  have hequivRL : ∀ alpha beta : GaloisField 2 n,
+      mixedTermBilinear R L
+          (dR.lambda * alpha) (dataL0.lambda * beta) =
+        nu * mixedTermBilinear R L alpha beta := fun alpha beta =>
+    mixedTermBilinear_lambda_equivariance hEA ePhi dR dataL0 hK1 hterm
+      hSq hAgemo hK0 hconj alpha beta
+  have hM0LR : ∃ alpha beta : GaloisField 2 n,
+      mixedTermBilinear L R alpha beta ≠ 0 :=
+    exists_mixedTermBilinear_ne_zero factors L R hxi hinvPhi
+  have hM0RL : ∃ alpha beta : GaloisField 2 n,
+      mixedTermBilinear R L alpha beta ≠ 0 := by
+    obtain ⟨alpha, beta, hne⟩ := hM0LR
+    refine ⟨beta, alpha, ?_⟩
+    rw [mixedTermBilinear_swap L R alpha beta]
+    exact hne
+  have hinfRL : factors.right ⊓ factors.left = frattini P := by
+    rw [inf_comm]
+    exact factors.inf_eq_frattini
+  have hsupRL : factors.right ⊔ factors.left = ⊤ := by
+    rw [sup_comm]
+    exact factors.sup_eq_top
+  rcases hRcase with hthetaR1 | ⟨rR, hrR0, hrRhalf, hthetaRfrob, -⟩
+  · left
+    have hlam2 : dataL0.lambda ^ 2 = nu := by
+      have h : dataL0.theta dataL0.lambda = dataL0.lambda := by
+        rw [hthetaL0, RingAut.one_apply]
+      calc
+        dataL0.lambda ^ 2 = dataL0.lambda * dataL0.lambda := pow_two _
+        _ = dataL0.lambda * dataL0.theta dataL0.lambda := by rw [h]
+        _ = nu := hnuL0.symm
+    have hmu2 : dR.lambda ^ 2 = nu := by
+      have h : dR.theta dR.lambda = dR.lambda := by
+        rw [hthetaR1, RingAut.one_apply]
+      calc
+        dR.lambda ^ 2 = dR.lambda * dR.lambda := pow_two _
+        _ = dR.lambda * dR.theta dR.lambda := by rw [h]
+        _ = nu := hnuR.symm
+    have heq : dR.lambda = dataL0.lambda :=
+      CharTwo.sq_injective (hmu2.trans hlam2.symm)
+    have hequiv' : ∀ alpha beta : GaloisField 2 n,
+        mixedTermBilinear L R
+            (dataL0.lambda * alpha) (dataL0.lambda * beta) =
+          nu * mixedTermBilinear L R alpha beta := by
+      intro alpha beta
+      have h := hequivLR alpha beta
+      rwa [heq] at h
+    exact isTypeB_of_mixedTerm_theta_one hEA hK1 hterm hSq hAgemo hK0
+      ePhi L R factors.right_normal factors.inf_eq_frattini
+      factors.sup_eq_top factors.frattini_lt_right.le dataL0.lambda nu
+      hordnu hlam2 (hthetaLpkg.trans hthetaL0)
+      (hthetaRpkg.trans hthetaR1) hequiv' hM0LR hinv hcentral n_pos hcard
+  · right
+    have hmu2 : dataL0.lambda ^ 2 = nu := by
+      have h : dataL0.theta dataL0.lambda = dataL0.lambda := by
+        rw [hthetaL0, RingAut.one_apply]
+      calc
+        dataL0.lambda ^ 2 = dataL0.lambda * dataL0.lambda := pow_two _
+        _ = dataL0.lambda * dataL0.theta dataL0.lambda := by rw [h]
+        _ = nu := hnuL0.symm
+    have hlamnuR : dR.lambda ^ (1 + 2 ^ rR) = nu := by
+      have h : dR.theta dR.lambda = dR.lambda ^ 2 ^ rR := by
+        rw [hthetaRfrob, frobeniusEquiv_pow_apply]
+      calc
+        dR.lambda ^ (1 + 2 ^ rR) =
+            dR.lambda * dR.lambda ^ 2 ^ rR := by rw [pow_add, pow_one]
+        _ = dR.lambda * dR.theta dR.lambda := by rw [h]
+        _ = nu := hnuR.symm
+    exact isTypeC_of_mixedTerm_right_theta_one hEA hK1 hterm hSq hAgemo
+      hK0 ePhi R L factors.left_normal hinfRL hsupRL
+      factors.frattini_lt_left.le dR.theta hthetaRfrob hrR0 hrRhalf
+      hthetaRpkg (hthetaLpkg.trans hthetaL0) dR.lambda dataL0.lambda nu
+      hordnu hlamnuR hmu2 hequivRL hM0RL hinv hcentral n_pos hcard
+
+/-- **Higman Lemma 12 (pp. 90--91), B/C classification from a prescribed
+commutative invariant factor.**
+
+The prescribed factor is retained as the left member of a complementary
+type-A pair, so the preceding dispatcher never enters the type-D case. -/
+theorem isTypeB_or_isTypeC_of_commutative_invariant_factor_of_xiLengthThree
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : frattini P < S)
+    (hStop : S < (⊤ : Subgroup P))
+    (hcommS : IsMulCommutative S) :
+    IsTypeB.{uP, 0} P ∨ IsTypeC.{uP, 0} P := by
+  obtain ⟨factors, hleft⟩ :=
+    xiLengthThreeTypeAFactorData_exists_with_left
+      hP hncomm hmulti hxi hlen hprime hSinv hPhiS hStop
+  have hleftComm : IsMulCommutative factors.left := by
+    rw [hleft]
+    exact hcommS
+  exact isTypeB_or_isTypeC_of_commutative_left_factor
+    hP hncomm hmulti hxi hlen hprime factors hleftComm
+
 /-- **Higman, Lemma 12 (pp. 90--92): a Suzuki 2-group of ξ-length 3 is
 isomorphic to some `B(n, θ, ε)`, `C(n, ε)`, or `D(n, θ, ε)`.**
 
