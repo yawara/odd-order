@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 08:5x 監視 tick — b (9322 CommutatorSup 共有化 refactor) 合流 / a WIP / 🔴 c stall / d quiet**。a=0(WIP) / b=2 / c=0 / d=0(WIP foo)。
+> 合流: b (**issue 9322** — `commutator_sup_le_of_le` (commutator-sup modulo normal) を `BG/AppE_EigenvalueCombinatorics.lean` から**共有 leaf `GroupTheory/CommutatorSup.lean` +57 へ抽出** (unowned GroupTheory ゆえ in-scope)、AppE_EigenvalueCombinatorics は CommutatorSup を re-import して consumer (FurtherResults/BetaSupply/PropE4) に透過。同 tick で Higman 新 leaf `FrattiniCrossCommutatorContradiction.lean` も commit)。
+> **gate: green 4685 jobs (前 4683 +2 leaf = CommutatorSup + FrattiniCrossCommutatorContradiction, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 84cc47ea3→702f4a5d6**。範囲逸脱なし。
+> ✅ **cross-file refactor 検証成功**: 上流 GroupTheory leaf 抽出 + BG AppE consumer 3 file の再解決を hub フルビルドが確認 (theorem 移設が re-export 経由で透過、consumer 無破壊)。これが hub 単一フルビルドの存在理由 (merge 特有の下流破綻検出)。auto orphan-check が loop-race の 2 枚目 leaf を自動捕捉。
+> 🔴 **lane c stall (~5h50m) / ℹ lane d quiet (~6h15m, 非 escalation)**。a/b で監視継続。
+>
 > **▶▶ 2026-07-23 08:3x 監視 tick — a (3A.1a semidihedral) + b (Higman L13 diagonal axis) 合流 / 🔴 c stall / d quiet**。a=1 / b=2 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problem 3A.1a** — semidihedral の特徴的自己同型: 存在・一意性・位数2、`Ch03_SplitExtensions/Problems.lean` +112) / b (**Higman Lemma 13** diagonal bracket の successor 軸同定 + restricted B の Φ² bracket 非退化性、新 leaf `FrattiniMiddleDiagonalAxis.lean` +223 / `RestrictedFactorTypeBSquareNonzero.lean` +269、両 WIRED (auto-check))。
 > **gate: green 4683 jobs (前 4681 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 60aeb057a→6b7118edd**。範囲逸脱なし。
