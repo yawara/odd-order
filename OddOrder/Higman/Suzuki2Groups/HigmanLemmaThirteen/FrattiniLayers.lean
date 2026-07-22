@@ -218,22 +218,22 @@ theorem normalInvariantBot_covBy_frattiniSquare_of_exponent_four
   exact ⟨pow_two_eq_one_of_mem_frattiniSquare
     hPhiComm hfour hz, hz1⟩
 
-/-- In the exponent-four branch, `Φ(P)²` is covered by `Φ(P)`.
+/-- Every actor-invariant subgroup between `Φ(P)²` and `Φ(P)` is one of
+the two endpoints.
 
-Higman Lemma 1 classifies every subgroup of the commutative Frattini
-subgroup invariant under the restricted actor as an Agemo layer.  A layer
-containing `Φ(P)²` is therefore either `Φ(P)²` itself or all of
-`Φ(P)`. -/
-theorem frattiniSquare_covBy_frattini_of_exponent_four
+This is the interval-classification content of Higman Lemma 1.  Normality
+in the ambient group is not required. -/
+theorem eq_frattiniSquare_or_frattini_of_invariant
     [Finite P]
     {Y : Subgroup (MulAut P)}
     (hP : IsPGroup 2 P)
     (hxi : IsXiActor Y)
     (hPhiComm : IsMulCommutative (frattini P))
-    (hfour : ∀ z : frattini P, z ^ 4 = 1)
-    (hexists : ∃ z : frattini P, z ^ 2 ≠ 1) :
-    frattiniSquareNormalInvariant Y.subtype ⋖
-      frattiniNormalInvariant Y.subtype := by
+    {C : Subgroup P}
+    (hCinv : IsAInvariant Y.subtype C)
+    (hSquareC : frattiniSquare P ≤ C)
+    (hCPhi : C ≤ frattini P) :
+    C = frattiniSquare P ∨ C = frattini P := by
   let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
     IsAInvariant.of_characteristic Y.subtype
   have htransPhi : ∀ x ∈ involutions (frattini P),
@@ -250,35 +250,52 @@ theorem frattiniSquare_covBy_frattini_of_exponent_four
     exists_homocyclic_and_invariant_eq_agemo
       (hP.to_subgroup (frattini P)) hPhiInv.restrict htransPhi
   letI : Fintype ι := hι
+  let U : Subgroup (frattini P) := C.subgroupOf (frattini P)
+  have hUInv : IsAInvariant hPhiInv.restrict U := by
+    simpa [U] using hPhiInv.subgroupOf hCinv
+  obtain ⟨s, _hs, hU⟩ := classify U hUInv
+  cases s with
+  | zero =>
+      right
+      have hPhiC : frattini P ≤ C :=
+        Subgroup.subgroupOf_eq_top.mp (by
+          simpa [U, agemo_zero_eq_top] using hU)
+      exact le_antisymm hCPhi hPhiC
+  | succ s =>
+      left
+      have hUle : U ≤ Agemo (frattini P) 2 1 := by
+        rw [hU]
+        exact Agemo.anti (Nat.succ_le_succ (Nat.zero_le s))
+      have hCLeSquare : C ≤ frattiniSquare P := by
+        rw [← Subgroup.map_subgroupOf_eq_of_le hCPhi, frattiniSquare]
+        exact Subgroup.map_mono hUle
+      exact le_antisymm hCLeSquare hSquareC
+
+/-- In the exponent-four branch, `Φ(P)²` is covered by `Φ(P)`.
+
+Higman Lemma 1 classifies every subgroup of the commutative Frattini
+subgroup invariant under the restricted actor as an Agemo layer.  A layer
+containing `Φ(P)²` is therefore either `Φ(P)²` itself or all of
+`Φ(P)`. -/
+theorem frattiniSquare_covBy_frattini_of_exponent_four
+    [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hxi : IsXiActor Y)
+    (hPhiComm : IsMulCommutative (frattini P))
+    (hfour : ∀ z : frattini P, z ^ 4 = 1)
+    (hexists : ∃ z : frattini P, z ^ 2 ≠ 1) :
+    frattiniSquareNormalInvariant Y.subtype ⋖
+      frattiniNormalInvariant Y.subtype := by
   apply covBy_iff_lt_and_eq_or_eq.mpr
   refine ⟨?_, ?_⟩
   · change frattiniSquare P < frattini P
     exact frattiniSquare_lt_frattini hPhiComm hfour hexists
   intro C hSquareC hCPhi
-  have hSquareCVal : frattiniSquare P ≤ C.1 := hSquareC
-  have hCPhiVal : C.1 ≤ frattini P := hCPhi
-  let U : Subgroup (frattini P) := C.1.subgroupOf (frattini P)
-  have hUInv : IsAInvariant hPhiInv.restrict U := by
-    simpa [U] using hPhiInv.subgroupOf C.2.2
-  obtain ⟨s, _hs, hU⟩ := classify U hUInv
-  cases s with
-  | zero =>
-      right
-      apply Subtype.ext
-      have hPhiCVal : frattini P ≤ C.1 :=
-        Subgroup.subgroupOf_eq_top.mp (by
-          simpa [U, agemo_zero_eq_top] using hU)
-      exact le_antisymm hCPhiVal hPhiCVal
-  | succ s =>
-      left
-      apply Subtype.ext
-      have hUle : U ≤ Agemo (frattini P) 2 1 := by
-        rw [hU]
-        exact Agemo.anti (Nat.succ_le_succ (Nat.zero_le s))
-      have hCLeSquare : C.1 ≤ frattiniSquare P := by
-        rw [← Subgroup.map_subgroupOf_eq_of_le hCPhiVal, frattiniSquare]
-        exact Subgroup.map_mono hUle
-      exact le_antisymm hCLeSquare hSquareCVal
+  rcases eq_frattiniSquare_or_frattini_of_invariant
+      hP hxi hPhiComm C.2.2 hSquareC hCPhi with hC | hC
+  · exact Or.inl (Subtype.ext hC)
+  · exact Or.inr (Subtype.ext hC)
 
 /-- **Higman Lemma 13 (p. 92), exponent-four lower composition
 series.**  The two strict Frattini steps are both covers. -/
