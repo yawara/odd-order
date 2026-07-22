@@ -109,8 +109,9 @@ Isaacs 2.12: `H ≤ F(G) ⇔ ∀ x ∈ G, ⟨H, H^x⟩` が冪零
   `#assert_only_allowed_axioms OddOrder.Isaacs.Ch02.baerSuzuki_pCore` 追加.
   `{propext, Classical.choice, Quot.sound}` のみ依存.
 - [x] **lean-eval submit 対応メモ**:
-  [`notes/meta/lean_eval_baer_suzuki.md`](../../notes/meta/lean_eval_baer_suzuki.md)
-  に `LeanEval.Defs.pCore = opCore` の対応と submit 戦略を記録.
+  [`notes/meta/lean_eval_submission.md`](../../notes/meta/lean_eval_submission.md) §2
+  に `LeanEval.Defs.pCore = opCore` の対応と submit 戦略を記録
+  (旧 `lean_eval_baer_suzuki.md` を 2026-07-22 に統合).
 - [ ] (option) subset 版 — 未実装 (lean-eval が subset 版を追加した時点で対応).
 
 `lake build OddOrder` green, full AxiomsCheck pass.
