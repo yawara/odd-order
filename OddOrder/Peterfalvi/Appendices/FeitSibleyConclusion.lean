@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.FeitSibleyUnionCoherence
 import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 import OddOrder.GroupTheory.RepresentationTheory.HallTICongruence
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 
 /-!
 # Peterfalvi Appendix IV: the (8) conclusion (p. 150)
@@ -462,6 +463,53 @@ excluding it from `𝒳`.  (`Z = endgameZ ≤ Q'` by `endgameZ_le_Qder`.) -/
 theorem xsetOf_bot_disjoint_ssetOf_Qder {Z : Subgroup G} (hZQder : Z ≤ hyp.Qder)
     {φ : ClassFunction ↥hyp.H ℂ} (hφ : φ ∈ hyp.XsetOf ⊥ Z) : φ ∉ hyp.SsetOf hyp.Qder :=
   fun hφQ => hφ.2 (fun x hx => hφQ.2 x (hZQder hx))
+
+/-- **A degree-`d` member of `𝒮` is trivial on `Q'`** (Peterfalvi (4), `a > 1` input, p. 147).
+If `χ ∈ 𝒮` has `χ(1) = d`, then `χ ∈ 𝒮(Q')` (`LeKer χ Q'`).  Writing `χ = Ind_Q^H φ`
+(`Sset_eq_induced_of_Q`), `χ(1) = d·φ(1) = d` forces `φ(1) = 1`, so `φ` is a **linear** character,
+trivial on the derived subgroup `commutator ↥(Q ⧸ H)` (`apply_eq_one_of_mem_commutator`), whose
+image under the coercion is `⁅Q,Q⁆ = Q'`.  Hence `φ` is constant on `Q'`, and
+`leKer_induce_Qder_of_forall` gives `LeKer (Ind φ) Q'`.  Since `𝒳 = 𝒮 − 𝒮(Z)` is disjoint from
+`𝒮(Q')` (`Z ≤ Q'`), no `𝒳`-member has degree `d`, i.e. the anchor ratio `a > 1`. -/
+theorem leKer_Qder_of_apply_one_eq_d [Finite G] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥hyp.H : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) (hχ1 : χ (1 : ↥hyp.H) = (hyp.d : ℂ)) :
+    hyp.LeKer χ hyp.Qder := by
+  classical
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  have hχ' := hχ
+  rw [Sset_eq_induced_of_Q hyp] at hχ'
+  obtain ⟨φ, ⟨hφirr, -⟩, rfl⟩ := hχ'
+  -- `φ(1) = 1` from `Ind φ (1) = d·φ(1) = d`
+  have hφ1 : (φ : ↥(hyp.Q.subgroupOf hyp.H) → ℂ) 1 = 1 := by
+    have hdeg := ClassFunction.induce_apply_one (hyp.Q.subgroupOf hyp.H) φ
+    rw [hyp.index_Q_subgroupOf_eq_d] at hdeg
+    have hd0 : (hyp.d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
+    have : (hyp.d : ℂ) * (φ : ↥(hyp.Q.subgroupOf hyp.H) → ℂ) 1 = (hyp.d : ℂ) * 1 := by
+      rw [mul_one, ← hdeg]; exact hχ1
+    exact mul_left_cancel₀ hd0 this
+  -- the coercion `ι : ↥(Q ⧸ H) → G` has commutator image `Q'`
+  set ι : ↥(hyp.Q.subgroupOf hyp.H) →* G :=
+    hyp.H.subtype.comp (hyp.Q.subgroupOf hyp.H).subtype with hιdef
+  have hinj : Function.Injective ι :=
+    Subtype.val_injective.comp Subtype.val_injective
+  have hrange : (⊤ : Subgroup ↥(hyp.Q.subgroupOf hyp.H)).map ι = hyp.Q := by
+    ext g
+    rw [Subgroup.mem_map]
+    constructor
+    · rintro ⟨y, -, rfl⟩
+      exact Subgroup.mem_subgroupOf.mp y.2
+    · intro hg
+      exact ⟨⟨⟨g, hyp.Q_le_H hg⟩, Subgroup.mem_subgroupOf.mpr hg⟩, Subgroup.mem_top _, rfl⟩
+  have hmapcomm : (commutator ↥(hyp.Q.subgroupOf hyp.H)).map ι = hyp.Qder := by
+    rw [commutator_def, Subgroup.map_commutator, hrange]; rfl
+  -- `φ` is constant on `Q'`
+  apply hyp.leKer_induce_Qder_of_forall
+  intro y hy
+  have hymem : y ∈ commutator ↥(hyp.Q.subgroupOf hyp.H) := by
+    rw [← Subgroup.mem_map_iff_mem hinj, hmapcomm]; exact hy
+  rw [hφirr.apply_eq_one_of_mem_commutator_of_apply_one_eq_one hφ1 hymem, hφ1]
 
 /-- **(8) full assembly: `a ∣ λ`** (Peterfalvi (8), p. 150).  The keystone divisibility closing
 step (6): from the endgame `(4)` data — the coherent `𝒳 = XsetOf ⊥ Z` with anchor `χ₁` of degree
