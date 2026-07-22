@@ -115,3 +115,5 @@ S7B2_NormalJ_PComplement (1879)・FrobeniusActionTI (1873)・AppC_FrobeniusClass
 | `OddOrder/Isaacs/Ch01_Sylow/Problems.lean` | 1615 | a | issue 1055 Problems campaign の集約先。§1A–§1D を単一 file に蓄積してきた結果 1500 を超過。本 tick (merge `793240f05`) で +180 (1D.2 + 1D.7/1D.13/1D.14)。**flag 段階** (2000 未満ゆえ即時分割不要)。 |
 
 **owner = a への申し送り (active frontier ゆえ hub は race しない)**: Problems.lean は a が毎 tick 演習問題を追記する active file。lane trigger 「次の主結果クラスタに着手するときは新 leaf を切る」に従い、**次のセクション (§1E 以降 or 次章 Problems) は `Ch01_Sylow/Problems/SectionX.lean` の新 leaf に切って `Problems.lean` を re-export hub 化**するのが望ましい (textbook § 構造とも一致、traceability 保持)。2000 接近 or 次の § 境界のいずれか早い方で a が分割。hub は 2000 到達までは watch のみ、a が動かず 2000 接近なら backstop で凍結 § (§1A–1C) を prefix-split。
+
+**✅ 2026-07-23 03:5x 解消**: a が**次 tick で自ら分割**した (commit `690d25865` "split §1D into ProblemsFrobeniusFrattini leaf")。§1D の Frobenius/Frattini 系を新 leaf `ProblemsFrobeniusFrattini.lean` (+340) に移設、`Problems.lean` **1615→1363** (1500 未満に復帰)、`OddOrder.lean:179` に配線済 (orphan 0)。hub の flag → a の自律分割の協調ループが機能。**watch 解除**。
