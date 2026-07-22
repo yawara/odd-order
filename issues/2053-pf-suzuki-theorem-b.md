@@ -200,6 +200,24 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       (`not_p_dvd_card_Q1`/`not_p_dvd_card_Q`: step (3) の合同 r≡2^i と
       p odd の矛盾 — 書籍の「r ≠ p は (3) の帰結」を形式化)。9318 継承。
 - [ ] (5)–(9)
+  - **(5) 被覆調査 (2026-07-22): 3 部品すべて実装済、assembly のみ**:
+    (i) Ch.I §2 Cor = `sylowTwo_isMulCommutative_or_isSuzuki2Group`
+    (Suzuki/SylowTwo.lean:60、S 可換 or Suzuki 2-group)。
+    (ii) App II Prop 2 = `cyclic_index_two_nearField_classification`
+    (NearFields.lean:958、**proved axiom-clean 2026-07-21**: F*が指数2巡回
+    部分群 → F field ∨ F≅F_{r²,2} ∧ |Z(F*)|=r−1)。
+    (iii) [H] III 8.2 = `RankOneHypothesis.sylow_two_isCyclic_or_quaternion`
+    (NearFields.lean:691、2-rank 1 → cyclic ∨ quaternion)。
+    Suzuki 2-group 指数 4 = `higman_classification`
+    (Appendices/Suzuki2Groups.lean:76)。
+    証明筋 (p. 109–110): C_Q(P) 非可換 → C_S(P) 非可換 → S Suzuki 2-group
+    (可換なら C_S(P) 可換) → exp 4 + 2-rank 1 → C_S(P) quaternion order 8
+    → F* ≅ C_Q(P) が指数 2 巡回部分群を持つ → (ii) で F≅F_{r²,2},
+    |Z(F*)|=r−1 → |F*/Z(F*)|=4 (quaternion 構造) = r+1 → r=3, |C_Q(P)|=8
+    → (4) より |Q|=8^p=|F*|^p... Q₁=1 は |Q|=2^{3p} 2-群化から。
+    F の supply = StepTwo `exists_affineNearFieldModel` (9318 sorried-cite)
+    経由 — (5) も 9318 継承。statement 形は AffineNearFieldModel 消費形で
+    設計要 (次 iteration)。
 - [ ] (10) Lemma 5 消費の二分岐
 - [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
 - [ ] (13)–(16)
