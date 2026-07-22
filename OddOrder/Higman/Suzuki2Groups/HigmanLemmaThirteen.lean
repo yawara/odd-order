@@ -16,3 +16,4 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutato
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutatorEquivariance
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCommutators
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCommutatorEquivariance
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniTripleCommutators
