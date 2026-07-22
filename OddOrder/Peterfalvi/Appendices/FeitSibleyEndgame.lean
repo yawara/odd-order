@@ -27,6 +27,8 @@ class-algebra congruence → (8) conclusion) is built on top.
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 
+open OddOrder.RepresentationTheory
+
 open scoped commutatorElement
 
 /-! ## The (6) integer inequality core (p. 148) -/
@@ -195,6 +197,25 @@ theorem endgame_Xset_coherent (hd : Odd hyp.d) {p : ℕ} (hp : p.Prime)
     (hyp.endgameZ_ne_bot hp hQ1p hnonab)
     (fun z hz y hy => hyp.endgameZ_centralizes hz hy)
     (fun h hh x hx => hyp.endgameZ_conj_mem_of_mem_H hh hx)
+
+/-- **The coherence witness at an irreducible member** (Peterfalvi (4)): the
+coherent extension of an irreducible `χ ∈ S` is `±` a single irreducible
+character of `G` — `extension χ = ε • ξ` with `ε ∈ {±1}`, `ξ ∈ Irr G`.  The
+isometry (`extension_inner_eq`) sends `‖χ‖² = 1` to `‖extension χ‖² = 1`, and
+`extension χ ∈ ℤ[Irr G]` (`extension_mem_ZIrr`), so
+`exists_zsmul_irreducibleCharacter_of_inner_self_one` gives the signed
+irreducible.  This yields the witnesses `eᵢ` (from `𝒳`) and `e'ⱼ` (from `𝒴`). -/
+theorem coherent_extension_eq_zsmul_irr {S : Set (ClassFunction ↥hyp.H ℂ)} {A : Set ↥hyp.H}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S A)
+    {χ : ClassFunction ↥hyp.H ℂ} (hχS : χ ∈ S) (hχirr : IsIrreducibleCharacter χ) :
+    ∃ (ε : ℤ) (ξ : IrreducibleCharacter G),
+      (ε = 1 ∨ ε = -1) ∧ hcoh.extension χ = ε • (ξ : ClassFunction G ℂ) := by
+  have hχspan : χ ∈ OddOrder.Peterfalvi.S07.zSpan S := Submodule.subset_span hχS
+  have hmem : hcoh.extension χ ∈ ZIrr G := hcoh.extension_mem_ZIrr χ hχspan
+  have hnorm : ClassFunction.inner (hcoh.extension χ) (hcoh.extension χ) = 1 := by
+    rw [hcoh.extension_inner_eq χ χ hχspan hχspan]
+    exact hχirr.inner_self_eq_one
+  exact exists_zsmul_irreducibleCharacter_of_inner_self_one hmem hnorm
 
 end Coherence
 
