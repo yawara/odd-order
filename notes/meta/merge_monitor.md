@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 04:0x 監視 tick — a (1D.4) + b (Higman L13 + 9319 claim) 合流 / 🔴 c stall 確定**。a=2 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.4** Frobenius complement ⟺ N 上の fixed-point-free action、`ProblemsFrobeniusFrattini.lean` +64) / b (**Higman Lemma 13** Frattini 二乗層に交換子を収める、`FrattiniLayers.lean` +105 + **issue 9319** (lower-central graded Jacobi) を shared-infra claim (b band 9300 ✓))。
+> **gate: green 4657 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 3655dc2b4→820cfbd62**。範囲逸脱なし。
+> 🔴 **lane c stall 確定 (要ユーザー対応)**: c は 9407 裁定 (BG remainder) を **03:04 の merge-main (`705bb93e3`) で受領後、以降 68 分 (04:12 時点) worktree ファイル更新ゼロ + commit ゼロ + odd-order-c を触る lean/lake/ccd プロセス無**。前 d stall と同じ signature (62 分閾値超過)。**c は arbitration を pick up した直後に session 停止**した公算 — BG remainder work は未着手。hub は unsupervised c を再起動不可 → **ユーザーに c セッション再起動を依頼** (下記報告)。⚠ 前 tick「genuine 探索中」判定を撤回: worktree 更新ゼロは survey 中ですらない証左。
+> ℹ a=1D.4 で ProblemsFrobeniusFrattini 継続 / d=wave 間。両 escalation 対象外。
+>
 > **▶▶ 2026-07-23 03:5x 監視 tick — a (1D.3 + ✅Problems 分割) + b (Higman L12/13) 合流**。a=4 / b=2 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problem 1D.3** Frobenius complement は Hall subgroup + **✅ Problems.lean §1D 分割** — 新 leaf `ProblemsFrobeniusFrattini.lean` +340 WIRED via `OddOrder.lean:179`、Problems.lean 1615→1363) / b (**Higman Lemma 12/13** 指数4因子を B(n,1,ε)/C に精密化 + witness 保持、既存 leaf 拡張・新 leaf 0)。
 > **gate: green 4657 jobs (前 4656 +1 leaf = a の分割 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 4c5d0f799→ca78e7c84**。範囲逸脱なし。
