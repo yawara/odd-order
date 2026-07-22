@@ -12,6 +12,7 @@ import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
+import OddOrder.GroupTheory.BrauerSuzukiInvolutions
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Mathlib.QuotientGroup
@@ -12306,3 +12307,18 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.GroupTheory.QuaternionSylowSetup.thetaStar_apply_eq_zero_of_odd
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.apply_eq_of_thetaStar_apply_eq_zero
+
+/-! **Brauer–Suzuki, Gorenstein Ch.12 Lemma 1.7 (group-theoretic core)**
+(`GroupTheory.BrauerSuzukiInvolutions`, issue 9318, 2026-07-22).
+
+* `commute_involution_eq` — **any two commuting involutions of `G` are equal**: `⟨u,v⟩` is a
+  `2`-group inside a Sylow `2`-subgroup conjugate to the generalized quaternion `S`, whose
+  unique involution `z` both must equal.
+* `odd_orderOf_mul_of_involution` — **the product of two involutions has odd order**: if `uv`
+  had even order `2s`, `(uv)ˢ` would be an involution commuting with `u` and `v`, forcing
+  `u = v = (uv)ˢ` and `uv = 1`.  This is `β(y) = 0` for even-order `y` (no involution pair
+  multiplies to an even-order element). -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.commute_involution_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.odd_orderOf_mul_of_involution
