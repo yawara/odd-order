@@ -8,6 +8,7 @@ import Lean.Util.CollectAxioms
 import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.BrauerSuzuki
+import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Mathlib.QuotientGroup
@@ -12157,3 +12158,10 @@ deliberately NOT asserted here.) -/
 2-補群 `K` を与え、`K ≤ O_{2'}`、`u` を含む Sylow `S'` は可換で `S' ≤ C_G(u)`。
 残る quaternion case (Gorenstein Ch.12) が issue 9318 の本体。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.brauerSuzuki_of_isCyclic_sylowTwo
+
+/-! **Brauer–Suzuki, quaternion setup** (`GroupTheory.BrauerSuzukiSetup`, issue 9318,
+2026-07-22).  Gorenstein Ch.12 p.373 の setup: `QuaternionSylowSetup` =
+`S = ⟨x, y ∣ x^{2ⁿ}=1, y²=x^{2ⁿ⁻¹}, xʸ=x⁻¹⟩` (n ≥ 3) の presentation data。
+`y ∉ ⟨x⟩` は導出 (`y_notMem_zpowers_x`)、`mem_iff` = 剰余類分解 `S = X ∪ X·y`。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.mem_iff
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.y_notMem_zpowers_x
