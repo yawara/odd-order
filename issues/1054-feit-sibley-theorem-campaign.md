@@ -770,9 +770,22 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
       ⟹ |H⊓C(w)|=|Q| は Z^# 上一定 = hcard_const。
     z∈endgameZ に対し endgameZ_le_Q1 + endgameZ_centralizes 経由で自動適用可。
 
-  ### 残 master assembly = (4)(5)(6) endgame notation setup + case 構造
+  ### ⭐⭐⭐ (4)-(8) endgame 統合完成 (2026-07-22): xset_qder_union_coherent
 
-  a∣λ (dvd_lam_of_endgame_data) と union_coherent が揃ったので、残るのは:
+  **`xset_qder_union_coherent` (Conclusion.lean, sorry-free)**: endgame (4) data から
+  `Nonempty (IsCoherent hyp.tau (XsetOf⊥Z ∪ Y) hyp.A)` を産出。(8) 核 + endgame 機械の
+  全 wiring が完成:
+  - 入力 (全て既存補題が供給): coherent 𝒳=XsetOf⊥Z (anchor χ₁ 度数 a·d, p冪 supported
+    diff hXdiff, χ₂≠χ₁) + coherent 𝒴⊆𝒮 (disjoint, η₁, |𝒴|≥2, hYdiff, η₂≠η₁) +
+    keystone χ₁−a•η₁ supported + 中心 Z≤Z(Q₁) (hZcent) + z∈Z^# + Odd|G| + hHallG。
+  - wiring: cross_extension_inner_eq_zero → hcross / coherent_extension_eq_zsmul_irr →
+    e'=ε•ξ / exists_lambda_norm_identity → λ+identity / dvd_lam_of_endgame_data → a∣λ
+    (hQz/hcard_const は中心 Z discharge wrapper で自動) / union_coherent_of_lambda_dvd。
+  - ⚠ Nonempty 返し (IsCoherent はデータ; Prop-valued にして ∃ obtain 自由化)。
+
+  ### 残 master assembly = (4) setup INPUTS + adjoin + case 構造
+
+  xset_qder_union_coherent が endgame core を閉じたので、残るのは**その入力構築**:
   1. **(4) setup (非可換 p 群 case)**: Z:=endgameZ に対し 𝒳=XsetOf⊥Z coherent
      (endgame_Xset_coherent) + 𝒴=𝒮(Q') coherent (ssetOf_Qder_coherent, Remark) を取り、
      **anchor χ₁ (最小度数, χ₁(1)=a·d) 選択** + **hXdiff (∀χ∈𝒳,∃b,χ−b•χ₁ supported =
