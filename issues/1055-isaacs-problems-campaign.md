@@ -169,14 +169,11 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   を仮定、`P=Q∩H` (`Q∈Syl_p(G)`, `|P|=pPart(H)>1`)、(a) で `N_G(P)⊆H`。`P<Q` なら 1D.2 と同じ
   g-抽出 (正規化条件+`subgroupOf_normalizer_eq`) で `g∈N_G(P)∩Q⊆H∩Q=P`, `g∉P` 矛盾 (fixed-point 不要)、
   ∴ `P=Q`、`pPart(H)=pPart(G)`、しかし `p∣index` で `pPart(H)<pPart(G)` 矛盾。
-- ⚠ **分割必須 (owner=lane a、次イテレーション冒頭で実施)**: `Problems.lean` が 1615 行 (>1500 flag、
-  hub 裁定 2026-07-23 03:3x tick)。**hub は active-lane ファイルを触らない**ので owner が分割する。
-  規律上 1500 超で §1D 追記は停止 → **次イテレーションはまず分割してから 1D.4 以降**。
-  分割方針 (flat suffix-split, module 名不変で下流無影響): §1D 部分 (section 1D、
-  `normal_of_prime_index...` から末尾まで) を新 leaf `Ch01_Sylow/ProblemsFrobeniusFrattini.lean`
-  へ移設 (preamble: `import ...Problems` + Nilpotent/Cyclic/Frattini、`namespace OddOrder.Isaacs.Ch01`)、
-  Nilpotent/Cyclic/Frattini import は §1D 専用ゆえ一緒に移す。`OddOrder.lean` に新 leaf を配線
-  (同 commit、2026-07-20 規約)。§1A–§1C は `Problems.lean` に残す。
+- ✅ **分割完了 (2026-07-23)**: `Problems.lean` (1682→1363 行, §1A–§1C) と新 leaf
+  `Ch01_Sylow/ProblemsFrobeniusFrattini.lean` (341 行, §1D 全 7 定理) に flat suffix-split。
+  新 leaf は `Problems` を import (§1A–§1C helper 利用) + Nilpotent/Cyclic/Frattini (§1D 専用)。
+  `OddOrder.lean` 配線済、両 leaf build green (2209 jobs)。module 名不変で下流無影響。**以降 §1D の
+  追記は新 leaf へ**。
 - ⬜ **残り §1D (分割後)**: 1D.4/1D.5 (Frobenius complement 判定, より構造的) / 1D.8 (G/Φ(G)
   elementary abelian) / 1D.9–1D.12 / 1D.15–1D.17 (Φ・冪零系)。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
