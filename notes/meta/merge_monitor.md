@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 08:2x 監視 tick — b (Higman L13 Φ² B/B support) 合流 / a WIP / 🔴 c stall / d quiet**。a=0(WIP) / b=2 / c=0 / d=0(WIP foo)。
+> 合流: b (**Higman Lemma 13** Φ² bracket の B/B support + restricted mixed term を ambient Φ² に同定、新 leaf `FrattiniSquareSupport.lean` +249 / `RestrictedFactorMixedTermBridge.lean` +356、両 WIRED)。a は次 Problem を WIP (issue 1055 doc のみ変更、commit 前)。
+> **gate: green 4681 jobs (前 4679 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 991ddda8c→f8b5027da**。範囲逸脱なし。
+> 🔧 **orphan-check 強化**: 前 tick の loop-race 教訓を受け、merge 後に `git diff --name-status HEAD@{1} HEAD` で**実際に追加された .lean leaf を列挙し各々の import 有無を自動検査**する手順を追加 (今回 2 枚とも WIRED 確認)。jobs delta と二重で担保。
+> 🔴 **lane c stall (~5h20m) / ℹ lane d quiet (~5h40m, 非 escalation)**: 両者更新ゼロ継続。a/b の 2 レーンで監視継続。
+>
 > **▶▶ 2026-07-23 08:0x 監視 tick — a (2A.7/2A.8 + 🆕Ch.3 3A.5) + b (Higman L13 固有weight ×3 leaf) 合流 / 🔴 c stall / d quiet**。a=4 / b=2 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs 2A.7/2A.8** (S^G minimal normal + distinct simple subnormals commute) + **🆕 Ch.3 (Split Extensions) 開始 3A.5** G⋊G ≅ G×G (conjugation action)、新 leaf `Ch03_SplitExtensions/Problems.lean` +38 WIRED via `OddOrder.lean:184`) / b (**Higman Lemma 13** Φ²値交換子の固有weight + B/B bracket 対角span縮約、新 leaf `FrattiniSquareEigenweights.lean` +339 / `FrattiniMiddleDiagonalSupport.lean` +163 / `FrattiniTripleBaseChangeJacobi.lean`、3 枚とも WIRED)。
 > **gate: green 4679 jobs (前 4675 +4 leaf = a 1 + b 3, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push a8e0f8c6e→42f49b70f**。範囲逸脱なし。
