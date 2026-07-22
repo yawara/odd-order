@@ -43,13 +43,13 @@ lemma isComplement_inv_of_isComplement {T : Set G}
   intro g
   obtain ⟨t, ht, htu⟩ := isComplement_iff_existsUnique_mul_inv_mem.mp hT g⁻¹
   refine ⟨⟨(t : G)⁻¹, Set.inv_mem_inv.mpr t.2⟩, ?_, ?_⟩
-  · show ((t : G)⁻¹)⁻¹ * g ∈ H
+  · change ((t : G)⁻¹)⁻¹ * g ∈ H
     simpa using inv_mem ht
   · rintro ⟨s, hs⟩ hmem
     have hsT : s⁻¹ ∈ T := Set.mem_inv.mp hs
     have hst : (⟨s⁻¹, hsT⟩ : ↥T) = t := by
       refine htu _ ?_
-      show g⁻¹ * (s⁻¹)⁻¹ ∈ H
+      change g⁻¹ * (s⁻¹)⁻¹ ∈ H
       simpa using inv_mem hmem
     exact Subtype.ext (by simpa using congrArg (fun u : ↥T => ((u : G)⁻¹)) hst)
 
@@ -61,12 +61,12 @@ lemma leftQuotientEquiv_coe_eq_of_mem (S : H.LeftTransversal) {a : G}
   obtain ⟨s0, _, huniq⟩ := (isComplement_iff_existsUnique_inv_mul_mem.mp S.2) a
   have e1 : S.2.leftQuotientEquiv (a : G ⧸ H) = s0 := by
     refine huniq _ ?_
-    show (S.2.leftQuotientEquiv (a : G ⧸ H) : G)⁻¹ * a ∈ H
+    change (S.2.leftQuotientEquiv (a : G ⧸ H) : G)⁻¹ * a ∈ H
     rw [← QuotientGroup.eq]
     exact S.2.quotientGroupMk_leftQuotientEquiv (a : G ⧸ H)
   have e2 : (⟨a, ha⟩ : ↥(S : Set G)) = s0 := by
     refine huniq _ ?_
-    show (a : G)⁻¹ * a ∈ H
+    change (a : G)⁻¹ * a ∈ H
     simp
   exact Subtype.ext_iff.mp (e1.trans e2.symm)
 
