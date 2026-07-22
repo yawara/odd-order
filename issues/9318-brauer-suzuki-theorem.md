@@ -155,3 +155,18 @@ Gorenstein Lem 1.4: `θ = 1_C↑N − ψ̃` について (i) `(θ,θ)_N = 3` (ii
 - Tc = `1_C↑N` = N/C (index 2) の正則表現指標 = 1_N + (N/C の非自明線形指標)
 証明順: ψ 構成 (LinearChar, x↦i, RH⊆ker) → ψ̃=ψ↑N 既約 deg 2 (Clifford) →
 θ 定義・deg 0 → (θ,θ)_N=3 (Thm 4.2.4(i) = 内積計算) → N−A 上 θ=0 (Thm 4.4.3(ii))。
+
+#### ψ 構成の具体経路 (2026-07-22、RH 積構造 commit e039809db を基盤に確定)
+
+**`C/RH ≅ ℤ/4`** が ψ の土台。実測で確定した部品:
+- `mem_RH_iff` (積構造) + `mem_R_of_mem_X_of_mem_RH` より **`x² ∉ RH`** (x²∈RH⟹x²∈R=⟨x⁴⟩⟹
+  orderOf x²=2ⁿ⁻¹ ∣ 2ⁿ⁻², 矛盾) かつ **x⁴ ∈ R ⊆ RH**。⟹ `orderOf (xRH) = 4`。
+- `C = XH`、H ⊆ RH ⟹ **`C/RH = ⟨xRH⟩`** (巡回、位数 4 = ℤ/4)。∴ 未計算の |C|/|RH| 不要。
+- **ψ 構成手順**: (1) `(RH.subgroupOf C) ⊴ ↥C` (RH ⊴ N ⊇ C より)。(2) 商 `↥C ⧸ (RH.subgroupOf C)`
+  ≅ ℤ/4 (gen = xRH 像, 位数 4)。(3) ℤ/4 → ℂˣ (gen ↦ i = `Complex.I` の単元) の character。
+  (4) `InflationCharacter.inflate` or `compHom` で ↥C に inflate → χ : ↥C →* ℂˣ。
+  (5) `LinearCharacter.linearClassFunction χ` = ψ (ClassFunction ↥C ℂ)。RH ⊆ ker は構成から自明。
+- ψ̃ = `induce (C.subgroupOf N) ψ` 既約 deg 2: C は N 内 index 2、ψ ≠ ψ^{conj by N∖C} (ψ(x)=i vs
+  ψ(x⁻¹)=−i)、Clifford/Mackey 既約判定 (`Clifford.lean`/`CliffordCorrespondence.lean`)。
+- θ = `induce 1_C − ψ̃`、(θ,θ)_N=3: N/C の正則指標 Tc = 1_N+sgn、Thm 4.2.4(i) 内積。
+  N−A 上 θ=0: RH⊆ker ψ ゆえ ψ↑N は A 上のみ非零 (`induce_apply` 系)。
