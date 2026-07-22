@@ -535,8 +535,28 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
       5. その後: 1(a) adjoin で 𝒮(S′) coherent → (2) で 𝒮 → (iii) 分岐完成。
       (7) class-algebra 合同は独立 — (6) 統合が済んだので (7)→(8) で a∣λ を出して
       union_coherent_of_lambda_dvd に供給、その後 step 5 の adjoin/(2)。
-  - [ ] **(7)** class-algebra 合同 (独立、並行可): ψ constant on Z^# ⟹
-    ψ(z)≡ψ(1) mod|Q|。
+  - [~] **(7)** class-algebra 合同: ψ constant on Z^# ⟹ ψ(z)≡ψ(1) mod|Q|。
+    **⭐ Hall 合同 machinery 完成** = `peterfalvi_67_hall` (2026-07-22, sorry-free,
+    新 leaf `OddOrder/GroupTheory/RepresentationTheory/HallTICongruence.lean` 272 行,
+    OddOrder.lean 配線済, 純 read-only cite で shared-infra 無改変・9200 claim 不要)。
+    - `mem_of_orderOf_coprime_relindex`: 正規 Hall π-元包含 (H⧸Q で orderOf 二重可除)。
+    - `fixedPointFree_classPair_hall`: Hall f.p.f. (crux)。Sylow proof を mirror し
+      2 点差替 — `IsTISubset.centralizer_le` で C_G(x)⊆H、mem_Q で π-元⟹∈Q、
+      `IsTISubset.mem_of_conj_mem_conj` で 2 回目 TI。
+    - `centralCharacterOfRep_classSum_mul_cong_collapse_hall`: 汎用 mul_cong (f.p.f.
+      可除性を供給) + 汎用 collapse 恒等式の合成。
+    - `peterfalvi_67_hall`: peterfalvi_67 を P→Q, N→H で mirror。汎用部品
+      (peterfalvi_673 / centralCharacterOfRep_eq_of_tiSubset_card_eq / character_isIntegral /
+      nonidentityZClassCoeffSum_isIntegral / character_one_mul_centralCharacterOfRep_mk)
+      は全て read-only。coprime |C₁| |Q| (hcop) は仮説 (caller = (8) が Q⊆C_G(z) から供給)。
+    ⚠ 実装知見: IsIrreducible は `[ρ.IsIrreducible]` (Set.IsIrreducible と ambiguous) /
+    SemiconjBy.orderOf_eq c hsc で共役 order 保存 / Subgroup.orderOf_mk で subtype order /
+    section variable は f.p.f.(群論のみ)と assembly(V/ConjClasses)で分離 (未使用 warning 回避)。
+    **残 = (8) 側の endgame 特化 instantiation**: peterfalvi_67_hall を hyp.Q/hyp.H/
+    endgameZ/ρ(=±e'₁) に適用し、hcop (sub-lemma 3: Q⊆C_G(z)→coprime)・hreal (odd order
+    で z≁z⁻¹)・hone (Hall nonidentityZClassCoeffSum_cong、odd order)・hconst (ψ constant
+    on Z^#) を供給 → 「(ψ(z)−ψ(1))/|Q| 代数的整数」に変換。これは (8) の一部。
+    (以下は偵察時の旧記録; machinery は上記で完成済)
     **⭐ スコープ確定 (2026-07-22 偵察): 新規 class-algebra 構築は不要 — 既存 machinery
     の再インスタンス化。** `peterfalvi_67` (ClassSumAlgebra.lean:127) が (7) の合同
     そのもの (`ρ.character z ≡ ρ.character 1 [ALGMOD |P|]`) を、中心指標 constancy +

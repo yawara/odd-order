@@ -73,6 +73,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
+import OddOrder.GroupTheory.RepresentationTheory.HallTICongruence
 import OddOrder.GroupTheory.RepresentationTheory.ClassTwoSquareIndex
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
