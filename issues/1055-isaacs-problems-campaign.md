@@ -115,8 +115,13 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   Sylow 第三定理 (`card_sylow_modEq_one`) で両者 ≡1 (mod p) ⟹ `q≡1 (mod p)` ⟹ `q>p`、しかし
   `q ∣ |G|` ゆえ `q≤p`、矛盾。⚠ coercion `↑↑P` (Sylow→Subgroup→Set) vs `↑P` (Sylow→Set 直接) を
   `Sylow.coe_coe` で橋渡し。
-- ⬜ **残り §1C (一般 Sylow, 次に着手)**: **1C.6** (G=HK で ∃P∈Syl(G), P∩H∈Syl(H) ∧ P∩K∈Syl(K);
-  P=(P∩H)(P∩K)) / **1C.8** (位数 p^a 部分群数 P と G で mod p 合同、共役作用の計数)。
+- ✅ 実証明 **1C.6(a)** `exists_sylow_inf_sylow_of_mul_eq_univ` (`G=HK` ⟹ ∃P∈Syl(G),
+  `P∩H`=H の Sylow 位数 ∧ `P∩K`=K の Sylow 位数)。helper `exists_sylow_inf_card_eq` (1C.2a の帰結) +
+  Sylow 共役 `c•Q=Q'` の `c⁻¹=h·k` 分解、`P:=h⁻¹•Q`、`conj_smul_eq_self_of_mem`+`smul_inf`+`equivSMul`
+  (共役の位数保存)。mathlib 既製 `conj_smul_eq_self_of_mem`/`smul_inf`/`equivSMul` を活用。
+- ⬜ **残り §1C (一般 Sylow, 次に着手)**: **1C.6(b)** (P=(P∩H)(P∩K) 集合積、p-part 計数
+  `|G||H∩K|=|H||K|` + `card_mul_card_inf`) / **1C.8** (位数 p^a 部分群数 P と G で mod p 合同、
+  共役作用の計数)。
 - ⏸ **後回し (重い/特殊、後で戻る)**: **1C.4** (\|G\|=120 index 3 or 5)。n_2∈{1,3,5} は清潔
   (正規化群 index or 商 order 15)、但し **n_2=15 の場合が構造的に重い** (S_5 型、index-5 部分群 S_4 の
   存在は列挙でなく構造 — 計数だけでは矛盾を出せないことを確認済)。**1C.5** (A_{p+1} で

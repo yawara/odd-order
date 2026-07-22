@@ -1119,6 +1119,55 @@ theorem sylow_normal_of_maximal_subgroup_prime_index {p : ℕ} [Fact p.Prime] {G
   have hz : q - 1 = 0 := Nat.eq_zero_of_dvd_of_lt hd (by omega)
   omega
 
+/-- 補助 (1C.2(a) の帰結). 部分群 `H ≤ G` に対し、ある Sylow `p`-部分群 `Q` の交わり `Q ⊓ H` は
+`H` の位数の `p`-部分 (= `H` の Sylow 位数) をもつ。 -/
+theorem exists_sylow_inf_card_eq {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (H : Subgroup G) :
+    ∃ Q : Sylow p G,
+      Nat.card ((Q : Subgroup G) ⊓ H : Subgroup G) = p ^ (Nat.card H).factorization p := by
+  obtain ⟨R⟩ := (inferInstance : Nonempty (Sylow p ↥H))
+  obtain ⟨Q, hQ⟩ := exists_sylow_subgroupOf_eq_of_sylow R
+  refine ⟨Q, ?_⟩
+  have h1 : Nat.card ((Q : Subgroup G) ⊓ H : Subgroup G)
+      = Nat.card ((Q : Subgroup G).subgroupOf H) := by
+    rw [← Subgroup.subgroupOf_map_subtype,
+      Subgroup.card_map_of_injective (Subgroup.subtype_injective H)]
+  rw [h1, ← hQ, R.card_eq_multiplicity]
+
+open Pointwise in
+/-- **Isaacs Problem 1C.6(a)**. `G = HK` のとき、ある Sylow `p`-部分群 `P` で `P ∩ H` が `H` の
+Sylow、`P ∩ K` が `K` の Sylow (位数の `p`-部分に一致)。
+
+`H` の Sylow を含む `Q`、`K` の Sylow を含む `Q'` を取り、共役 `c • Q = Q'` の `c⁻¹ = h·k`
+(`h∈H`, `k∈K`、`G=HK`) と分解。`P := h⁻¹ • Q` とすると、`h⁻¹∈H` ゆえ `P ∩ H = conj h⁻¹ • (Q ∩ H)`
+(`conj_smul_eq_self_of_mem` + `smul_inf`) で位数保存 (`equivSMul`)、また `Q' = conj k⁻¹ • P`
+かつ `k⁻¹∈K` ゆえ `Q' ∩ K = conj k⁻¹ • (P ∩ K)`。 -/
+theorem exists_sylow_inf_sylow_of_mul_eq_univ {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    [Finite G] {H K : Subgroup G} (hHK : (H : Set G) * (K : Set G) = Set.univ) :
+    ∃ P : Sylow p G,
+      Nat.card ((P : Subgroup G) ⊓ H : Subgroup G) = p ^ (Nat.card H).factorization p ∧
+      Nat.card ((P : Subgroup G) ⊓ K : Subgroup G) = p ^ (Nat.card K).factorization p := by
+  obtain ⟨Q, hQH⟩ := exists_sylow_inf_card_eq (p := p) H
+  obtain ⟨Q', hQ'K⟩ := exists_sylow_inf_card_eq (p := p) K
+  obtain ⟨c, hc⟩ := MulAction.exists_smul_eq G Q Q'
+  have hmem : c⁻¹ ∈ (H : Set G) * (K : Set G) := by rw [hHK]; exact Set.mem_univ _
+  obtain ⟨h, hh, k, hk, hhk⟩ := Set.mem_mul.mp hmem
+  have hck : c = k⁻¹ * h⁻¹ := by rw [← mul_inv_rev, hhk, inv_inv]
+  refine ⟨(h⁻¹ : G) • Q, ?_, ?_⟩
+  · -- P ∩ H は H の Sylow
+    have hPH : (↑((h⁻¹ : G) • Q) : Subgroup G) ⊓ H
+        = MulAut.conj h⁻¹ • ((Q : Subgroup G) ⊓ H) := by
+      rw [Sylow.coe_subgroup_smul, Subgroup.smul_inf,
+        Subgroup.conj_smul_eq_self_of_mem (H.inv_mem hh)]
+    rw [hPH, ← Nat.card_congr (Subgroup.equivSMul _ _).toEquiv, hQH]
+  · -- P ∩ K は K の Sylow
+    have e1 : (Q' : Subgroup G) = MulAut.conj k⁻¹ • (↑((h⁻¹ : G) • Q) : Subgroup G) := by
+      rw [← hc, Sylow.coe_subgroup_smul, Sylow.coe_subgroup_smul, smul_smul, ← map_mul, ← hck]
+    have key : (Q' : Subgroup G) ⊓ K
+        = MulAut.conj k⁻¹ • ((↑((h⁻¹ : G) • Q) : Subgroup G) ⊓ K) := by
+      rw [e1, Subgroup.smul_inf, Subgroup.conj_smul_eq_self_of_mem (K.inv_mem hk)]
+    rw [← hQ'K, key, ← Nat.card_congr (Subgroup.equivSMul _ _).toEquiv]
+
 end
 
 end OddOrder.Isaacs.Ch01
