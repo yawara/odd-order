@@ -6,6 +6,13 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-22 22:4x 監視 tick (Opus 4.8 hub 638898, cron `7,22,37,52` id 3ee45bda) — c NearFields 着手 (裁定受領確認)**。a=6 / b=1 / c=2。
+> 🎯 **c の idle-wait 解消**: c は sync して NearFields 裁定を受領 → **transport に着手** (`GroupTheory/NearFieldFromSharplyTransitive.lean` 新 leaf, Pf App.C p.137, **sorry-free** な transport building block、OddOrder.lean 配線済)。coordination 機構 (裁定を merge_monitor→c の git merge main) が機能。
+> 合流: a (**Isaacs Ch.1 Problems 1A.3 |H:H∩K|≤|G:K| + 1A.5 積作用推移性 + 1A.7**) / b (**2053 step (9) transfer identity T(x)=ϕ(x)^{|Q|+1}**, Suzuki/CanonicalForm + StepNine + TransferInvariantTransversal) / c (NearFields transport leaf)。
+> **gate: フルビルド green 4643 jobs (前 4642 +1 新 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3750・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 / lint ratchet 218→221 (b の step9 style.show ×3 grandfather + owner=b flag) / push**。範囲逸脱なし (a=Isaacs / b=Suzuki+shared / c=GroupTheory transport)。
+> **513185** (前 hub): ALIVE・idle 継続 (inert)。
+> frontier: a = 1055 Isaacs Problems Ch.1 (§1A 完了間近) / b = 2053 step (9) transfer identity / c = **NearFields Prop1 transport (着手済)** → 完了後 Suzuki2Groups (B 分割)。
+>
 > **🔀 2026-07-22 22:3x — C の次タスク = B レーン分割 (ユーザー裁定)。ただし NearFields 完了後**。
 > ユーザー指示「C の次のタスクは B レーンを分割したい」+ 訂正「NearFields が終わった後でやることだよ」。hub 実測で feasibility 確認済 → **可能・クリーンな分割点あり**。
 > ⚠ **順序訂正**: NearFields ruling (22:1x) は **supersede しない** — **c の作業順序 = ① NearFields Prop1 transport (今の primary) → ② NearFields 完了後に Suzuki2Groups (B 分割) に着手**。
