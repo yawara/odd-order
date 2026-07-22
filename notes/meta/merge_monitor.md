@@ -6,6 +6,8 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **✅ 2026-07-23 01:0x — d CLAUDE.md 変更をユーザー承認 → 合流 (hold 解消)**。ユーザー「d の発案は取り込んで」→ d (blueprint 逆生成推奨への CLAUDE.md 改訂 + issue 0143) を `--no-ff` 合流 (docs-only, Lean 非変更ゆえ build 不要, push 5fdec8275→4dc1323cd)。**新方針 = forward TeX driver 不可のまま、Lean からの逆生成 (依存 DAG/教科書番号対応/proved-sorry を getUsedConstants/CollectAxioms で抽出) は推奨** (issue 0143 に実装計画)。lane d の memtenance charter は問題なく機能。⚠ c は依然 9406 で hold (b consumer 待ち、下記)。
+>
 > **▶▶ 2026-07-23 00:5x 監視 tick — a/b 合流 / c・d hold**。a=6 / b=3 / c=5 / d=1。
 > 合流: a (**🎉 Isaacs §1B 完結 1B.5-1B.8** + `Ch03_SplitExtensions/PiResidual.lean` 新 leaf O^π, 配線済) / b (docs 2053 step10 記録)。
 > **gate (a+b): green 4646 jobs (+1 PiResidual) / AxiomsCheck OK (3754・新 axiom 0) / sorry 7→7 非退行 / lint 216 / push 6d1a24cd1→d4e5d1f54**。
