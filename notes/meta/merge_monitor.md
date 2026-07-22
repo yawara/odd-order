@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 06:0x 監視 tick — a (1D.11) + b (Higman L13 graded 交換子) 合流 / 🔴 c stall 継続 (~3h)**。a=3 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.11** — abelian 部分群の位数を n で抑えると |G| ∣ n!、`ProblemsFrobeniusFrattini.lean` +53; 1D.12 McKay-count plan も確定) / b (**Higman Lemma 13** 交差交換子を共通 Φ/Φ² へ降ろす + middle 交換子の actor 共変性、新 leaf `FrattiniGradedCommutators.lean` +299 / `FrattiniGradedCommutatorEquivariance.lean` +184、両 WIRED)。
+> **gate: green 4665 jobs (前 4663 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push cafe5bd17→ab44d49d5**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~3h, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
 > **▶▶ 2026-07-23 05:5x 監視 tick — a (1D.10 counting) + b (Higman L13 Φ/Φ² 座標) 合流 / 🔴 c stall 継続 (~2h50m)**。a=2 / b=1 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problem 1D.10 (counting)** — A∖{1} 上の faithful action で |P:A| ∣ (|A|-1)!、`ProblemsFrobeniusFrattini.lean` +64) / b (**Higman Lemma 13** 共通 Φ/Φ² 座標を構成、新 leaf `FrattiniMiddleCoordinates.lean` +440 WIRED)。
 > **gate: green 4663 jobs (前 4662 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push b2dcd6f7c→829720fd4**。範囲逸脱なし。
