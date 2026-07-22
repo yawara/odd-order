@@ -112,6 +112,24 @@ theorem pow_two_eq_one_of_mem_frattiniSquare
     _ = (y : P) ^ 4 := by group
     _ = 1 := hyfour
 
+/-- In the exponent-four branch, the Frattini square is central.
+
+Every nonidentity element of `Φ(P)²` is an involution, and transitivity of
+the Suzuki actor forces all ambient involutions into the center. -/
+theorem frattiniSquare_le_center_of_exponent_four
+    [Finite P] [Nontrivial P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hxi : IsXiActor Y)
+    (hPhiComm : IsMulCommutative (frattini P))
+    (hfour : ∀ z : frattini P, z ^ 4 = 1) :
+    frattiniSquare P ≤ Subgroup.center P := by
+  intro x hx
+  by_cases hx1 : x = 1
+  · exact hx1 ▸ Subgroup.one_mem _
+  · exact involutions_subset_center_of_transitive hP Y hxi.transitive
+      ⟨pow_two_eq_one_of_mem_frattiniSquare hPhiComm hfour hx, hx1⟩
+
 /-- A Frattini element with nontrivial square makes `Φ(P)²` nontrivial. -/
 theorem frattiniSquare_ne_bot_of_exists_pow_two_ne_one
     (hexists : ∃ z : frattini P, z ^ 2 ≠ 1) :
@@ -218,12 +236,12 @@ theorem normalInvariantBot_covBy_frattiniSquare_of_exponent_four
   exact ⟨pow_two_eq_one_of_mem_frattiniSquare
     hPhiComm hfour hz, hz1⟩
 
-/-- Every actor-invariant subgroup between `Φ(P)²` and `Φ(P)` is one of
-the two endpoints.
+/-- Every actor-invariant subgroup contained in `Φ(P)` either lies in
+`Φ(P)²` or is all of `Φ(P)`.
 
 This is the interval-classification content of Higman Lemma 1.  Normality
 in the ambient group is not required. -/
-theorem eq_frattiniSquare_or_frattini_of_invariant
+theorem le_frattiniSquare_or_eq_frattini_of_invariant
     [Finite P]
     {Y : Subgroup (MulAut P)}
     (hP : IsPGroup 2 P)
@@ -231,9 +249,8 @@ theorem eq_frattiniSquare_or_frattini_of_invariant
     (hPhiComm : IsMulCommutative (frattini P))
     {C : Subgroup P}
     (hCinv : IsAInvariant Y.subtype C)
-    (hSquareC : frattiniSquare P ≤ C)
     (hCPhi : C ≤ frattini P) :
-    C = frattiniSquare P ∨ C = frattini P := by
+    C ≤ frattiniSquare P ∨ C = frattini P := by
   let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
     IsAInvariant.of_characteristic Y.subtype
   have htransPhi : ∀ x ∈ involutions (frattini P),
@@ -256,20 +273,38 @@ theorem eq_frattiniSquare_or_frattini_of_invariant
   obtain ⟨s, _hs, hU⟩ := classify U hUInv
   cases s with
   | zero =>
-      right
-      have hPhiC : frattini P ≤ C :=
-        Subgroup.subgroupOf_eq_top.mp (by
-          simpa [U, agemo_zero_eq_top] using hU)
-      exact le_antisymm hCPhi hPhiC
+    right
+    have hPhiC : frattini P ≤ C :=
+      Subgroup.subgroupOf_eq_top.mp (by
+        simpa [U, agemo_zero_eq_top] using hU)
+    exact le_antisymm hCPhi hPhiC
   | succ s =>
-      left
-      have hUle : U ≤ Agemo (frattini P) 2 1 := by
-        rw [hU]
-        exact Agemo.anti (Nat.succ_le_succ (Nat.zero_le s))
-      have hCLeSquare : C ≤ frattiniSquare P := by
-        rw [← Subgroup.map_subgroupOf_eq_of_le hCPhi, frattiniSquare]
-        exact Subgroup.map_mono hUle
-      exact le_antisymm hCLeSquare hSquareC
+    left
+    have hUle : U ≤ Agemo (frattini P) 2 1 := by
+      rw [hU]
+      exact Agemo.anti (Nat.succ_le_succ (Nat.zero_le s))
+    have hCLeSquare : C ≤ frattiniSquare P := by
+      rw [← Subgroup.map_subgroupOf_eq_of_le hCPhi, frattiniSquare]
+      exact Subgroup.map_mono hUle
+    exact hCLeSquare
+
+/-- Every actor-invariant subgroup between `Φ(P)²` and `Φ(P)` is one of
+the two endpoints. -/
+theorem eq_frattiniSquare_or_frattini_of_invariant
+    [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hxi : IsXiActor Y)
+    (hPhiComm : IsMulCommutative (frattini P))
+    {C : Subgroup P}
+    (hCinv : IsAInvariant Y.subtype C)
+    (hSquareC : frattiniSquare P ≤ C)
+    (hCPhi : C ≤ frattini P) :
+    C = frattiniSquare P ∨ C = frattini P := by
+  rcases le_frattiniSquare_or_eq_frattini_of_invariant
+      hP hxi hPhiComm hCinv hCPhi with hCSquare | hCPhi
+  · exact Or.inl (le_antisymm hCSquare hSquareC)
+  · exact Or.inr hCPhi
 
 /-- In the exponent-four branch, `Φ(P)²` is covered by `Φ(P)`.
 
@@ -296,6 +331,40 @@ theorem frattiniSquare_covBy_frattini_of_exponent_four
       hP hxi hPhiComm C.2.2 hSquareC hCPhi with hC | hC
   · exact Or.inl (Subtype.ext hC)
   · exact Or.inr (Subtype.ext hC)
+
+/-- In the exponent-four branch, commutators with the Frattini subgroup
+land in `Φ(P)²`.
+
+Nilpotence makes `[Φ(P), P]` a proper subgroup of `Φ(P)`.  It is invariant
+under the Suzuki actor, so the preceding interval dichotomy places it in the
+square layer rather than at the top endpoint. -/
+theorem commutator_frattini_top_le_frattiniSquare_of_exponent_four
+    [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hxi : IsXiActor Y)
+    (hPhiComm : IsMulCommutative (frattini P))
+    (hexists : ∃ z : frattini P, z ^ 2 ≠ 1) :
+    ⁅frattini P, (⊤ : Subgroup P)⁆ ≤ frattiniSquare P := by
+  have hSquareNeBot : frattiniSquare P ≠ (⊥ : Subgroup P) :=
+    frattiniSquare_ne_bot_of_exists_pow_two_ne_one hexists
+  have hPhiNeBot : frattini P ≠ (⊥ : Subgroup P) := by
+    intro hPhiBot
+    apply hSquareNeBot
+    exact le_antisymm
+      (frattiniSquare_le_frattini.trans (le_of_eq hPhiBot)) bot_le
+  letI : Group.IsNilpotent P := hP.isNilpotent
+  have hcommLt : ⁅frattini P, (⊤ : Subgroup P)⁆ < frattini P :=
+    OddOrder.Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient
+      (E := frattini P) (F := (⊤ : Subgroup P)) hPhiNeBot
+  have hcommInv : IsAInvariant Y.subtype
+      ⁅frattini P, (⊤ : Subgroup P)⁆ :=
+    (IsAInvariant.of_characteristic Y.subtype).commutator
+      (IsAInvariant.top Y.subtype)
+  rcases le_frattiniSquare_or_eq_frattini_of_invariant
+      hP hxi hPhiComm hcommInv hcommLt.le with hle | heq
+  · exact hle
+  · exact (hcommLt.ne heq).elim
 
 /-- **Higman Lemma 13 (p. 92), exponent-four lower composition
 series.**  The two strict Frattini steps are both covers. -/
