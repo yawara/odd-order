@@ -281,17 +281,19 @@ linear_combination で (χ(u₀)−χ(1))²=0 → 任意 involution は u₀ 共
 1. ✅ **M := ⟨全 involution⟩ ⊴ G** 完成 (`BrauerSuzukiEndgame.lean` 新 leaf、`involutionClosure` +
    `involutionClosure_normal`: involution 集合は共役不変ゆえ `le_normalizer_closure_iff` +
    `orderOf_eq_of_isConj` で closure 正規)。axiom-clean。
-2. **Q := S ∩ M は cyclic**。背理: Q が generalized quaternion なら yxⁱ∈Q ⟹ x²∈Q ⟹ |S:Q|≤2 ⟹
-   S/Q abelian。G₁:=SM に `lem_1_9` 適用 → G₁ の非線形 φ で M⊆ker φ (全 involution が M 生成)
-   → G₁/ker φ は G₁/M ≅ S/Q の商 = abelian → φ 線形、矛盾。∴ Q cyclic。
-   ⚠ **最難所 = `QuaternionSylowSetup ↥(SM)` 構築** (~60-80 行 fiddly):
-   - **鍵 API 発見**: `Sylow.subtype (h : P ≤ N) : Sylow p N` (mathlib Sylow.lean:151、repo
-     Ch07 に使用例) で `Q.S.subtype (hSSM : (Q.S:Subgroup G) ≤ Q.S⊔M) : Sylow 2 ↥(SM)`。
-   - `x':=⟨Q.x, hxSM⟩ : ↥SM` (Q.x∈S≤SM)、y' 同様。
-   - field transport: `hx_order` (orderOf_mk/coe injective)、`hy_sq`/`hconj` (coe 単射で G の関係を
-     転送)、`hxS'/hyS'` (comap membership)、⚠ `hclosure` (closure {x',y'} = S' の転送が最 fiddly、
-     `Subgroup.closure` ↔ `comap`/`subtype` の交換 or map/closure 補題)。
-   - 構築後 `lem_1_9 (SM setup)` で φ 取得 → M⊆ker φ + SM/M≅S/Q abelian で矛盾。
+2. ✅ **`QuaternionSylowSetup ↥(SM)` 構築完成** (`smSetup`、最難所突破、axiom-clean):
+   `Sylow.subtype` で Q.S を SM の Sylow-2 に制限、field transport (orderOf_mk / Subtype.ext+
+   push_cast / hclosure = `Subgroup.map_injective` + `MonoidHom.map_closure` + `map_comap_eq`)。
+   **Q := S∩M は cyclic** (残):背理で Q not cyclic ⟹ SM/M abelian ⟹ 矛盾。**全部品確定・feasible**:
+   - **`not_isMulCommutative_quotient` helper** (rep-theory glue、~30 行): `lem_1_9 Q.smSetup` で
+     SM の非線形 φ (φ(1)=d≥2) 取得 + `M.subgroupOf SM ⊆ characterKernel φ` (involution が M 生成、
+     `characterKernel`=S03、`characterKernelSubgroup`=S13 が subgroup) + **鍵補題
+     `apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient`**
+     (InflationCharacter:344、M⊆ker + SM/M abelian → φ(1)=1) → φ(1)=1 vs d≥2 矛盾。
+     ⟹ `¬ IsMulCommutative (↥SM ⧸ M.subgroupOf SM)`。
+   - **`Q not cyclic → SM/M abelian`** (群論、~50-70 行 fiddly): Q⊴S (M⊴G)、Q⊄X (else cyclic) ⟹
+     ∃ xᵏy∈Q ⟹ (Q⊴S で) x²∈Q ⟹ |S:Q|≤2 ⟹ S/Q abelian、SM/M≅S/Q (第二同型)。
+   - 上 2 つが矛盾 → Q cyclic。
 3. **M の正規 2-補群 L** (Burnside、Q=S∩M は M の cyclic Sylow-2)。L char M ⊴ G → **L ⊴ G**、
    L ⊆ K:=O_{2'}(G)。M=LQ ⟹ **KQ ⊴ G**。
 4. **Ḡ:=G/K で Ω₁(Q̄)=Z(Ḡ) 位数 2** (Q̄ cyclic 正規、O_{2'}(Ḡ)=1 ⟹ Z(Ḡ) は 2-群、Z(S) 位数 2)。
