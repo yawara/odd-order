@@ -192,6 +192,27 @@ theorem restrict_extension_inner_eq_nsmul [Finite G] [Fintype G]
     OddOrder.RepresentationTheory.inner_smul_right, star_natCast] at hkey
   linear_combination hkey
 
+/-- **(8) keystone relation** (Peterfalvi (8), p. 150).  The keystone pairing
+`⟨Res_H e', χ₁⟩ − a·⟨Res_H e', η₁⟩ = λ − a`, where `e'` is the `𝒴`-witness for `η₁` and
+`⟨τ(χ₁ − a·η₁), e'⟩ = λ − a` is the `(6)` norm-identity coefficient.  By Frobenius reciprocity
+`⟨Res_H e', χ₁ − a·η₁⟩ = conj⟨Ind(χ₁ − a·η₁), e'⟩ = conj⟨τ(χ₁ − a·η₁), e'⟩ = λ − a`.  Combined
+with the `𝒳`-coefficient relation this fixes `c₀ = ⟨Res_H e', χ₁⟩ = λ + a·μ` with
+`μ = ⟨Res_H e', η₁⟩ − 1`. -/
+theorem restrict_inner_keystone [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {χ₁ η₁ : ClassFunction ↥hyp.H ℂ} {e' : ClassFunction G ℂ} {a : ℕ} {lam : ℤ}
+    (hlam1 : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) e' = (lam : ℂ) - a) :
+    ClassFunction.inner (ClassFunction.restrict hyp.H e') χ₁
+      - (a : ℂ) * ClassFunction.inner (ClassFunction.restrict hyp.H e') η₁ = (lam : ℂ) - a := by
+  have hks : ClassFunction.inner (ClassFunction.restrict hyp.H e') (χ₁ - a • η₁)
+      = (lam : ℂ) - a := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      ← ClassFunction.inner_induce_eq_inner_restrict hyp.H (χ₁ - a • η₁) e',
+      ← hyp.tau_apply, hlam1, star_sub, star_intCast, star_natCast]
+  rw [ClassFunction.inner_sub_right, ← Nat.cast_smul_eq_nsmul ℂ a η₁,
+    OddOrder.RepresentationTheory.inner_smul_right, star_natCast] at hks
+  linear_combination hks
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
