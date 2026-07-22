@@ -273,6 +273,16 @@ import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ActualQuotientAction
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
+-- lean-eval 提出候補の登録 (issue 0050, 2026-07-22)
+import OddOrder.Isaacs.Ch01_Sylow.Basic
+import OddOrder.Isaacs.Ch08_PermutationGroups.PCycleJordan
+import OddOrder.Isaacs.Ch08_PermutationGroups.PSLSimple
+import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.GroupTheory.TransferTransitivity
+import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
+import OddOrder.GroupTheory.GlaubermanReplacement
+import OddOrder.GroupTheory.GlaubermanZJ
+import OddOrder.GroupTheory.SolvableTwoTransitive
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -12282,3 +12292,29 @@ Higman sorries through the model and are intentionally unregistered):
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.mem_C_of_odd_of_mem_N
 #assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.S_sup_H_eq_N
+
+/-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
+
+「AxiomsCheck 未登録だが `#print axioms` では clean」だった提出候補を機械ゲートに載せる
+(統合 note `notes/meta/lean_eval_submission.md` §3)。これで axiom-clean が毎ビルド保証され、
+提出前の手動 `#print axioms` が不要になる。-/
+
+-- Isaacs Ch.8: Jordan の定理 / PSL(n,K) 単純性
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch08.alternatingGroup_le_of_isPreprimitive_of_isCycle_mem
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch08.isSimpleGroup_projectiveSpecialLinearGroup
+-- Isaacs Ch.1: Fitting 部分群 F(G) の冪零性・最大性 (Thm 1.28)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch01.fitting.isNilpotent
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+-- 一般群論: Thompson critical subgroup / transfer 推移律
+#assert_only_allowed_axioms OddOrder.GroupTheory.isCritical_exists
+#assert_only_allowed_axioms OddOrder.GroupTheory.transfer_transfer
+-- 表現論: Burnside (既約表現の包絡環 = End V)
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.span_range_representation_eq_top
+-- Glauberman ZJ 定理 (Z(J) 正規) + Replacement 定理 (Gorenstein Ch.8 §2)
+#assert_only_allowed_axioms
+  Subgroup.oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian
+#assert_only_allowed_axioms Subgroup.glauberman_replacement
+-- Galois–Burnside (可解 2-可移群の極小正規部分群は elementary abelian regular)
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive
