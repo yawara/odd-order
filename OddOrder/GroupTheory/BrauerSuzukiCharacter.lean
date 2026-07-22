@@ -351,6 +351,121 @@ theorem theta_apply_eq_zero_of_notMem_A [Fintype ↥Q.N]
     rw [ClassFunction.induce_apply_eq_zero_of_not_mem_normal _ _ hgH,
       ClassFunction.induce_apply_eq_zero_of_not_mem_normal _ _ hgH, sub_zero]
 
+/-! ### `Ind_C^N ψ` is irreducible (inertia of `ψ` is `C`), and `(θ,θ)_N = 3` -/
+
+/-- `x` viewed as an element of `C.subgroupOf N`. -/
+def xN : ↥(Q.C.subgroupOf Q.N) :=
+  ⟨⟨Q.x, Q.S_le_N Q.hxS⟩, by rw [Subgroup.mem_subgroupOf]; exact Q.x_mem_C⟩
+
+@[simp] theorem coe_xN : ((Q.xN : ↥Q.N) : G) = Q.x := rfl
+
+/-- `ψ(w) = ψ(d)` whenever the underlying `G`-element of `w` (in `C.subgroupOf N`) equals
+that of `d` (in `C`). -/
+theorem psiN_apply_eq_psiHom {w : ↥(Q.C.subgroupOf Q.N)} {d : ↥Q.C}
+    (hwd : ((w : ↥Q.N) : G) = (d : G)) : Q.psiN w = (Q.psiHom d : ℂ) := by
+  rw [psiN, linearClassFunction_apply, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom]
+  congr 2
+  exact Subtype.ext hwd
+
+/-- `ψ(x) = i` in the `N`-view. -/
+theorem psiN_xN : Q.psiN Q.xN = Complex.I := by
+  rw [Q.psiN_apply_eq_psiHom (d := Q.xC) rfl, Q.psiHom_xC, coe_iUnit]
+
+/-- **`ψ ≠ ψʸ`** (Gorenstein p. 375): `ψʸ(x) = ψ(y·x·y⁻¹) = ψ(x⁻¹) = i⁻¹ ≠ i = ψ(x)`.
+This is exactly what forces the inertia of `ψ` in `N` to be `C` (not `N`). -/
+theorem conjBy_y_psiN_ne_psiN :
+    ClassFunction.conjBy (⟨Q.y, Q.y_mem_N⟩ : ↥Q.N) Q.psiN ≠ Q.psiN := by
+  intro h
+  have hval := congrArg (fun f : ClassFunction ↥(Q.C.subgroupOf Q.N) ℂ => f Q.xN) h
+  have hconj_coe :
+      (((⟨Q.y, Q.y_mem_N⟩ : ↥Q.N) * (Q.xN : ↥Q.N) * (⟨Q.y, Q.y_mem_N⟩ : ↥Q.N)⁻¹ :
+        ↥Q.N) : G) = ((Q.xC⁻¹ : ↥Q.C) : G) := by
+    change Q.y * Q.x * Q.y⁻¹ = Q.x⁻¹
+    exact Q.hconj
+  rw [ClassFunction.conjBy_apply, Q.psiN_apply_eq_psiHom hconj_coe,
+    Q.psiN_apply_eq_psiHom (d := Q.xC) rfl, map_inv, Q.psiHom_xC] at hval
+  -- hval : (↑iUnit⁻¹ : ℂ) = (↑iUnit : ℂ)
+  have hu : iUnit⁻¹ = iUnit := Units.val_injective hval
+  have hsq : iUnit * iUnit = 1 := mul_eq_one_iff_eq_inv.mpr hu.symm
+  have hII : Complex.I * Complex.I = 1 := by
+    have := congrArg Units.val hsq
+    rwa [Units.val_mul, coe_iUnit, Units.val_one] at this
+  rw [← sq, Complex.I_sq] at hII
+  norm_num at hII
+
+/-- **The inertia group of `ψ` in `N` is `C`** (Gorenstein p. 375): `C ⊆ I_N(ψ)` always,
+and `I_N(ψ) ⊆ C` because any `g ∉ C` is `yc` with `c ∈ C`, so `ψ^g = ψ^y ≠ ψ`. -/
+theorem inertia_psiN : ClassFunction.inertia Q.psiN = Q.C.subgroupOf Q.N := by
+  apply le_antisymm
+  · intro g hg
+    rw [ClassFunction.mem_inertia] at hg
+    rcases Q.mem_C_or_yinv_mul_mem_C g.2 with hgC | hyg
+    · rw [Subgroup.mem_subgroupOf]; exact hgC
+    · exfalso
+      set c : ↥Q.N := (⟨Q.y, Q.y_mem_N⟩ : ↥Q.N)⁻¹ * g with hc
+      have hcC : c ∈ Q.C.subgroupOf Q.N := by
+        rw [Subgroup.mem_subgroupOf]
+        change Q.y⁻¹ * (g : G) ∈ Q.C
+        exact hyg
+      have hgeq : (⟨Q.y, Q.y_mem_N⟩ : ↥Q.N) * c = g := by rw [hc]; group
+      have h1 : ClassFunction.conjBy g Q.psiN
+          = ClassFunction.conjBy (⟨Q.y, Q.y_mem_N⟩ : ↥Q.N) Q.psiN := by
+        conv_lhs => rw [← hgeq, ClassFunction.conjBy_mul,
+          ClassFunction.conjBy_eq_self_of_mem hcC]
+      rw [hg] at h1
+      exact Q.conjBy_y_psiN_ne_psiN h1.symm
+  · exact ClassFunction.subgroup_le_inertia Q.psiN
+
+/-- `ψ` (in the `N`-view) is irreducible. -/
+theorem psiN_isIrr : IsIrreducibleCharacter Q.psiN := by
+  have h := Q.psiNIrr.isIrreducible
+  rwa [coe_psiNIrr] at h
+
+/-- `ψ ≠ 1_C` as a class function. -/
+theorem psiN_ne_trivial : Q.psiN ≠ trivialClassFunction ↥(Q.C.subgroupOf Q.N) := by
+  intro h
+  apply Q.psiNIrr_ne_trivial
+  apply IrreducibleCharacter.ext
+  rw [coe_psiNIrr, h, IrreducibleCharacter.coe_trivialIrreducibleCharacter]
+
+/-- **`Ind_C^N ψ` is irreducible** (Gorenstein Lemma 1.4): `I_N(ψ) = C`, so induction
+from `C` to `N` gives an irreducible character (`isIrreducibleCharacter_induce_of_inertia_eq`). -/
+theorem psiN_induce_irreducible [Fintype ↥Q.N] [Invertible (Nat.card ↥Q.N : ℂ)]
+    [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    IsIrreducibleCharacter (ClassFunction.induce (Q.C.subgroupOf Q.N) Q.psiN) := by
+  have h := isIrreducibleCharacter_induce_of_inertia_eq Q.psiNIrr (by
+    rw [coe_psiNIrr]; exact Q.inertia_psiN)
+  rwa [coe_psiNIrr] at h
+
+/-- **`(θ, θ)_N = 3`** (Gorenstein Lemma 1.4(i)).  Writing `Tc = Ind 1_C`, `Ps = Ind ψ`,
+`(θ,θ) = (Tc,Tc) − (Tc,Ps) − (Ps,Tc) + (Ps,Ps) = 2 − 0 − 0 + 1 = 3`:
+`(Tc,Tc) = [N:C] = 2`, `(Ps,Tc) = 0` (`ψ` irreducible `≠ 1`), `(Tc,Ps) = 0` (conjugate),
+`(Ps,Ps) = 1` (`Ind ψ` irreducible). -/
+theorem theta_inner_self [Fintype ↥Q.N] [Invertible (Nat.card ↥Q.N : ℂ)]
+    [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    ClassFunction.inner Q.theta Q.theta = 3 := by
+  have hirr : IsIrreducibleCharacter (ClassFunction.induce (Q.C.subgroupOf Q.N) Q.psiN) :=
+    Q.psiN_induce_irreducible
+  rw [theta, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right]
+  have hTT : ClassFunction.inner
+      (ClassFunction.induce (Q.C.subgroupOf Q.N) (trivialClassFunction _))
+      (ClassFunction.induce (Q.C.subgroupOf Q.N) (trivialClassFunction _)) = 2 := by
+    rw [ClassFunction.induce_trivial_inner_self, Q.index_C_subgroupOf_N]; norm_num
+  have hPT : ClassFunction.inner (ClassFunction.induce (Q.C.subgroupOf Q.N) Q.psiN)
+      (ClassFunction.induce (Q.C.subgroupOf Q.N) (trivialClassFunction _)) = 0 :=
+    ClassFunction.induce_inner_induce_trivial_eq_zero_of_irreducible _ Q.psiN_isIrr
+      Q.psiN_ne_trivial
+  have hTP : ClassFunction.inner
+      (ClassFunction.induce (Q.C.subgroupOf Q.N) (trivialClassFunction _))
+      (ClassFunction.induce (Q.C.subgroupOf Q.N) Q.psiN) = 0 := by
+    rw [ClassFunction.inner_star_comm, hPT, star_zero]
+  have hPP : ClassFunction.inner (ClassFunction.induce (Q.C.subgroupOf Q.N) Q.psiN)
+      (ClassFunction.induce (Q.C.subgroupOf Q.N) Q.psiN) = 1 := by
+    rw [OddOrder.RepresentationTheory.irr_cf_inner
+      (mem_irreducibleCharacters.mpr hirr) (mem_irreducibleCharacters.mpr hirr), if_pos rfl]
+  rw [hTT, hTP, hPT, hPP]; norm_num
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory
