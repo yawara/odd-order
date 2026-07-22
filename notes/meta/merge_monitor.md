@@ -6,6 +6,18 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **🆕 2026-07-23 00:3x — lane d 新設 (ユーザー指示「lint/ドキュメント整備/lean-eval 抽出の専用レーン = D」)**。
+> worktree `/home/ywr/odd-order-d` (branch d) 作成: `.lake/packages`・`references` を main から symlink、`.lake/build` を
+> warm-start コピー、`lake build OddOrder` = green 4645 jobs (warm no-op) 確認、git status clean。issue base = **4000**。
+> **役割 = メンテナンス専用 (cross-cutting)**: ① lint backlog 掃除 (frozen file, baseline ratchet-down — 従来 hub の
+> cleanup wave を引き取る) ② docs/notes hygiene + stale docstring sweep ③ lean-eval 抽出。
+> **path 排他 territory なし** — d_re は primary zone (bin/・top-level docs・lean-eval) のみで、lint/docstring は全 Lean
+> file (frozen・mechanical) に及ぶのが sanctioned。**hub の d 合流検査 = 「mechanical か (実 proof/signature 不改変) +
+> frozen file か (a/b/c active frontier 回避)」**。実 proof/signature 改変は STOP。charter 正本 = lane_reallocation §1。
+> **監視 cron を d 込みで再作成** (旧 ee4db237 → 新 id、`{a,b,c,d}` の 4 レーン check)。⚠ d の Lean 編集は lint/docstring で
+> a/b/c の frozen file に及ぶため、合流順は **a/b/c を先に、d を最後**にして d の掃除が最新 frozen 状態に乗るようにする。
+> ⚠ 9406 coordination は継続 (c READY・b consumer 待ち、下記 00:2x 参照)。
+>
 > **▶▶ 2026-07-23 00:2x 監視 tick — 🔧 9406 c READY / c hold (b consumer 待ち)**。a=1 / b=2 / c=2。
 > 合流: a (**Isaacs §1B 1B.5a/1B.7b** π-Hall 像/O_π) / b (**2053 step (10/10.1)** Q₁=1 (p∣|Σ|) / |G|_p=p^{m+2} (p∤|Σ|)、StepTen)。**c は hold**。
 > 🔧 **9406 状態**: **c は fix(A) 適用済・READY** (commit e8bb049db、`qEquiv_conj` RHS = `emb(ofAdd(x*(qEquiv q⁻¹)))`)。
@@ -302,6 +314,7 @@
 > b_re='^OddOrder/Higman/|^OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/|^OddOrder/Peterfalvi/Appendices/Suzuki(/|\.lean)'   # 2026-07-19 夕 ユーザー裁定 (issue 0127 ③): Higman 原典 = 4 冊目として OddOrder/Higman/ を新設、b 所有。⚠ 2026-07-22 裁定 (ユーザー「C の次タスク = B 分割」): Peterfalvi Appendices/Suzuki2Groups (.lean + subdir 11 file) を c へ carve → b_re は Suzuki(/|.lean) = Theorem B (FirstCase) チェーンのみ。Higman/** (土台・完成済) は b 保持で c が cite
 > c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|ExceptionalNearField|Suzuki2Groups)'   # 2026-07-22 9205 裁定: FeitSibley 除去→a。near-field クラスタ + Huppert/SemilinearField/ExceptionalNearField は c。⚠ 2026-07-22 裁定 (ユーザー「C の次タスク = B 分割、ただし NearFields が終わった後」): **Peterfalvi Appendices/Suzuki2Groups を b→c へ carve** (Peterfalvi App III Higman 2-群分類の最終組立 = 4 sorry、B 完成済 Higman/** を cite)。**c の作業順序 = ① NearFields Prop1 transport (immediate primary) → ② NearFields 完了後に Suzuki2Groups (B 分割)**。両方 c 所有。NearFields Prop1 の Q₈ 部分は依然 research gap 繰延だが、transport は先に進める
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
+> d_re='^bin/|^README|^ROADMAP|^CLAUDE\.md|^AGENTS\.md|^notes/meta/lean_eval'  # 2026-07-23 新設 lane d (メンテナンス専用) の primary zone。⚠ d は cross-cutting ゆえ path 排他でない: lint/docstring sweep は **全 Lean file (frozen のみ・mechanical のみ)** に及ぶのが sanctioned。d の Lean 編集を range 逸脱として自動 flag せず、hub が「mechanical か (実 proof/signature 不改変) + frozen file か (active frontier 回避)」を合流時に確認する。実 proof/signature を触っていたら STOP (mechanical 逸脱)。詳細 = lane_reallocation §1「lane d charter」
 > ```
 > **▶ 2026-07-19 11:29 lane a 復帰 → 暫定裁定 9158 失効、9154 の恒久配分へ復帰**。
 > a は 05:36〜11:27 の 5h51m 停止 (60 秒後 wakeup が発火せずセッション終了) から復帰し、
