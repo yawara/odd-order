@@ -704,10 +704,26 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     import、確立済)。base の sorry は最終的に**この leaf へ relocation** して閉じる (base は
     誰にも上流 import されない endpoint ゆえ移設安全; hub 調整候補)。stale docstring
     (「(7) machinery は repo に無い」) は 2026-07-22 修正済。
-    **assembly の残実装** (次 session、FeitSibleyConclusion.lean に): (a) Res_H e′₁ inner を
-    Frobenius (inner_induce_coe_eq_restrictionMultiplicity) + (5) cross-orth + (6) coherence
-    で計算、(b) Fourier 展開、(d) z 評価 (c 完成済)、(e) ξ→Rep + (7) + 算術核 → a∣λ →
-    union_coherent_of_lambda_dvd → step 5 → feit_sibley_coherence 証明 + base relocation。
+    - **(b) Fourier 展開インフラ確認 (2026-07-22): 全 unblock**。`mem_ZIrr_repr`
+      (ZIrrFourier:105): θ∈ZIrr Γ ⟹ ∃ c:Finsupp (support⊆Irr), θ=Σ_{a∈support}(c a)•a。
+      `inner_eq_coeff_of_repr` (:117): (θ,χ)=c(χ)。Frobenius 一般形
+      `ClassFunction.inner_induce_eq_inner_restrict` ((Ind θ,φ)=(θ,Res φ))。全存在。
+    **⭐ (8) 核 = 5 ピース ~240 行 (全インフラ確認済、tightly-coupled、fresh context 推奨)**:
+    1. **Fourier-eval-split** (一般, ~50行): θ∈ZIrr↥H, z∈N ⟹ θ(z)−θ(1) =
+       Σ_{χ:N⊄characterKernel}(θ,χ)(χ(z)−χ(1))。mem_ZIrr_repr + N⊆ker 項消滅
+       (mem_characterKernel: χ(z)=χ(1))。support↔IrreducibleCharacter filter reindex。
+    2. **coefficient 関係** (FeitSibley, ~80行): resE:=Res_H e′₁∈ZIrr↥H。
+       (resE, χᵢ−aᵢχ₁)_H = (e′₁, τ(χᵢ−aᵢχ₁))_G [Frobenius] = (e′₁, eᵢ−aᵢe₁) [coherence
+       extends_on_supported、χᵢ−aᵢχ₁ supported] = 0 [(5) cross_extension_inner_eq_zero]
+       ⟹ (resE,χᵢ) = aᵢ·c₀ (c₀:=(resE,χ₁))。
+    3. **c₀=λ+aμ** (FeitSibley, ~30行): (resE, χ₁−aη₁)=(e′₁,u)=λ−a [(6) hlam_1、u=τ(χ₁−aη₁)]
+       = c₀−a·μ′ (μ′:=(resE,η₁)) ⟹ c₀=λ+a(μ′−1)=λ+aμ (μ:=μ′−1)。
+    4. **合成+eval+算術** (~40行): θ(z)−θ(1)=(c₀/χ₁(1))(ψ_𝒳(z)−ψ_𝒳(1))=(c₀/(ad))(−|H|)
+       =−c₀|Q|/a=−|Q|(λ/a+μ) [ψ_𝒳 両評価 c 完成、χ₁(1)=ad、|H|=d|Q|]。
+    5. **(7)適用+final** (~40行): e′₁=ε•ξ (ξ IrreducibleCharacter)、ξ→Rep (IsIrreducibleCharacter
+       obtain) → peterfalvi_67_hall_of_odd → e′₁(z)≡e′₁(1) [ALGMOD|Q|]、上式代入 →
+       (λ/a+μ) alg int → dvd_of_isIntegral_ratio で a∣λ → union_coherent_of_lambda_dvd →
+       step 5 → feit_sibley_coherence 証明 + base relocation。
   作業順: (7) は独立ゆえ (4)(5)(6) と並行可。それ以外は (4)→(5)→(6)→(8)。
 - [ ] 旧記録: **Part A 本体組み立て** (2026-07-21 設計固定、この順):
   1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
