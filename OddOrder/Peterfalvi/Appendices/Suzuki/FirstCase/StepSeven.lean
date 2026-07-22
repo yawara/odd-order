@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
+import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
 
 /-!
 # Peterfalvi Part II, Ch. II, step (7): `N = P`
@@ -162,6 +163,175 @@ theorem kernelN_eq_P_of_kernelInf_W_eq_bot
   rw [h, bot_sup_eq] at hd
   exact hd
 
+/-- **Peterfalvi Part II, Ch. II, `f = char F`** (p. 110): "Let `f` be the order
+of `st`.  Thus `f` is the characteristic of `F` by (2), Chapter I §1
+Proposition 4(c) and Appendix II, Proposition 1."  For any near-field model of
+the `P`-centralizer quotient, the order of the global product
+`s·t = distinguishedInvolution · t` equals the characteristic of `F`.
+
+The images `s̄ = π(s)`, `t̄ = π(t)` in `L/N = C_G(P)/N` are distinct involutions
+(`s ∈ Q ∖ D`, `t ∉ H ⊇ D`, `s·t⁻¹ ∉ H`), so `char = |s̄ · t̄|` by
+`model.orderOf_mul_of_involutions`.  Hence `(s·t)^char ∈ N`, and the odd-kernel
+bridge (`orderOf_mul_eq_prime_of_pow_mem_odd_kernel`, `s` inverts `st` and
+centralizes the odd `N`) gives `|s·t| = char`.
+
+Inherits the step (2)(b) `sorry` (issue 9318) only through a caller who supplies
+the model via `exists_affineNearFieldModel`. -/
+theorem orderOf_st_eq_char :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ∀ {F : Type uG} [NearFields.NearField F]
+      (model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
+      orderOf (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) =
+        model.char := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  intro F instF model
+  classical
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hNdef
+  have hsL : fc.toHypothesis.distinguishedInvolution ∈ L :=
+    fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V fc.P_le_V
+  have htL : fc.toHypothesis.t ∈ L := by
+    rw [hLdef, Subgroup.mem_centralizer_iff]
+    intro x hx
+    exact (fc.toHypothesis.commute_t_of_mem_V (fc.P_le_V hx)).eq
+  set sL : ↥L := ⟨fc.toHypothesis.distinguishedInvolution, hsL⟩ with hsLdef
+  set tL : ↥L := ⟨fc.toHypothesis.t, htL⟩ with htLdef
+  set pi : ↥L →* (↥L ⧸ N) := QuotientGroup.mk' N with hpidef
+  have hs2 : sL ^ 2 = 1 :=
+    Subtype.ext fc.toHypothesis.distinguishedInvolution_sq
+  have ht2 : tL ^ 2 = 1 := Subtype.ext fc.toHypothesis.t_sq
+  have hsQ : (sL : G) ∈ fc.toHypothesis.Q :=
+    fc.toHypothesis.mem_Q_of_sq_eq_one_of_mem_H
+      fc.toHypothesis.distinguishedInvolution_mem_H
+      fc.toHypothesis.distinguishedInvolution_sq
+  have hcore : N = (fc.toHypothesis.D.subgroupOf L) ⊓
+      Subgroup.centralizer ((fc.toHypothesis.Q.subgroupOf L) : Set ↥L) := by
+    rw [hNdef]; exact fc.toHypothesis.normalCore_cH_eq_centralizer_cQ fc.P_le_V
+  have hNleD : N ≤ fc.toHypothesis.D.subgroupOf L := by
+    rw [hcore]; exact inf_le_left
+  have hNodd : Odd (Nat.card ↥N) :=
+    (fc.toHypothesis.centralizerHypothesisA1 fc.P_le_V).D_odd.of_dvd_nat
+      (Subgroup.card_dvd_of_le hNleD)
+  have hsN : ∀ n ∈ N, Commute sL n := by
+    intro n hn
+    have hnC : n ∈ Subgroup.centralizer
+        ((fc.toHypothesis.Q.subgroupOf L) : Set ↥L) := by
+      rw [hcore] at hn; exact hn.2
+    have hsQL : sL ∈ fc.toHypothesis.Q.subgroupOf L :=
+      Subgroup.mem_subgroupOf.mpr hsQ
+    exact Subgroup.mem_centralizer_iff.mp hnC sL hsQL
+  -- `s ∉ N` (`s ∈ Q ∩ D = 1` would force `s = 1`) and `t ∉ N` (`t ∉ H`)
+  have hsN_not : sL ∉ N := by
+    intro h
+    have hsD : (sL : G) ∈ fc.toHypothesis.D :=
+      Subgroup.mem_subgroupOf.mp (hNleD h)
+    have hbot : (sL : G) ∈ fc.toHypothesis.Q ⊓ fc.toHypothesis.D := ⟨hsQ, hsD⟩
+    rw [fc.toHypothesis.Q_inf_D_eq_bot, Subgroup.mem_bot] at hbot
+    exact fc.toHypothesis.distinguishedInvolution_ne_one hbot
+  have htN_not : tL ∉ N := by
+    intro h
+    have htD : (tL : G) ∈ fc.toHypothesis.D :=
+      Subgroup.mem_subgroupOf.mp (hNleD h)
+    exact fc.toHypothesis.t_not_mem_H (fc.toHypothesis.D_le_H htD)
+  have hne : sL * tL ≠ 1 := by
+    intro h
+    have hst : fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t = 1 := by
+      have := congrArg (Subtype.val) h
+      rwa [Subgroup.coe_mul, Subgroup.coe_one] at this
+    have hst' : fc.toHypothesis.distinguishedInvolution = fc.toHypothesis.t⁻¹ :=
+      mul_eq_one_iff_eq_inv.mp hst
+    apply fc.toHypothesis.t_not_mem_H
+    rw [fc.toHypothesis.t_inv_eq] at hst'
+    exact hst' ▸ fc.toHypothesis.distinguishedInvolution_mem_H
+  -- the images are distinct involutions of the quotient `L/N`
+  have hu2 : (pi sL) ^ 2 = 1 := by rw [← map_pow, hs2, map_one]
+  have hv2 : (pi tL) ^ 2 = 1 := by rw [← map_pow, ht2, map_one]
+  have hu1 : pi sL ≠ 1 := by
+    rw [hpidef, QuotientGroup.mk'_apply, Ne, QuotientGroup.eq_one_iff]
+    exact hsN_not
+  have hv1 : pi tL ≠ 1 := by
+    rw [hpidef, QuotientGroup.mk'_apply, Ne, QuotientGroup.eq_one_iff]
+    exact htN_not
+  have huv : pi sL ≠ pi tL := by
+    intro h
+    have h1 : pi (sL * tL⁻¹) = 1 := by rw [map_mul, map_inv, h, mul_inv_cancel]
+    rw [hpidef, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h1
+    have hstD : ((sL * tL⁻¹ : ↥L) : G) ∈ fc.toHypothesis.D :=
+      Subgroup.mem_subgroupOf.mp (hNleD h1)
+    have hstH : ((sL * tL⁻¹ : ↥L) : G) ∈ fc.toHypothesis.H :=
+      fc.toHypothesis.D_le_H hstD
+    rw [Subgroup.coe_mul, Subgroup.coe_inv] at hstH
+    have htinvH : fc.toHypothesis.t⁻¹ ∈ fc.toHypothesis.H := by
+      have hsinvH : fc.toHypothesis.distinguishedInvolution⁻¹ ∈ fc.toHypothesis.H :=
+        fc.toHypothesis.H.inv_mem fc.toHypothesis.distinguishedInvolution_mem_H
+      have : fc.toHypothesis.distinguishedInvolution⁻¹ *
+          (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t⁻¹) ∈
+          fc.toHypothesis.H := fc.toHypothesis.H.mul_mem hsinvH hstH
+      rwa [← mul_assoc, inv_mul_cancel, one_mul] at this
+    exact fc.toHypothesis.t_not_mem_H
+      (by rw [fc.toHypothesis.t_inv_eq] at htinvH; exact htinvH)
+  -- `char = |s̄ · t̄|`
+  have hchar : orderOf (pi sL * pi tL) = model.char :=
+    model.orderOf_mul_of_involutions (pi sL) (pi tL) hu2 hu1 hv2 hv1 huv
+  have hpow1 : (pi sL * pi tL) ^ model.char = 1 := by
+    rw [← hchar]; exact pow_orderOf_eq_one _
+  have hpowN : (sL * tL) ^ model.char ∈ N := by
+    rw [← QuotientGroup.ker_mk' N, MonoidHom.mem_ker, ← hpidef, map_pow, map_mul]
+    exact hpow1
+  have hbridge : orderOf (sL * tL) = model.char :=
+    orderOf_mul_eq_prime_of_pow_mem_odd_kernel
+      model.char_prime hNodd hs2 ht2 hsN hpowN hne
+  have htransfer := orderOf_injective L.subtype L.subtype_injective (sL * tL)
+  rw [hbridge] at htransfer
+  have hcoe : L.subtype (sL * tL) =
+      fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t := by
+    rw [map_mul]; rfl
+  rwa [hcoe] at htransfer
+
 end FirstCaseHypothesis
+
+namespace Hypothesis
+
+variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G] (hyp : Hypothesis G Ω)
+
+/-- **Peterfalvi Part II, Ch. I §3 Proposition 1(c), the `|C_Q(X)|` reading**
+(used in step (7), p. 110): for a nontrivial `X ≤ V` (with the induction
+hypothesis and a four-subgroup in `C_G(X)`), the centralizer `C_Q(X)` is a
+`2`-group, and its order is tied to the global product order
+`f = |s·t| = orderOf(distinguishedInvolution · t)`:
+
+* `PSL(2,ℓ)`: `|C_Q(X)| = |C_{Q₀}(X)|` and `f = 3`;
+* `Sz(ℓ)`: `|C_Q(X)| = |C_{Q₀}(X)|²` and `f = 5`;
+* `PSU(3,ℓ)`: `|C_Q(X)| = |C_{Q₀}(X)|³` and `f = 3`.
+
+Assembled by casing the trichotomy branch. -/
+theorem cQ_card_and_pGroup_of_trichotomy {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (hX : X ≠ ⊥)
+    (hA3 : ∃ E : Subgroup (Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (ind : TheoremAInductionBelow G Ω) :
+    IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) ∧
+    ((Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) =
+        Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) ∧
+        orderOf (hyp.distinguishedInvolution * hyp.t) = 3) ∨
+     (Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) =
+        Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) ^ 2 ∧
+        orderOf (hyp.distinguishedInvolution * hyp.t) = 5) ∨
+     (Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) =
+        Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) ^ 3 ∧
+        orderOf (hyp.distinguishedInvolution * hyp.t) = 3)) := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  obtain ⟨tdata⟩ := hyp.centralizer_trichotomy_of_induction hXV hX hA3 ind
+  refine ⟨tdata.common.cQ_isPGroup, ?_⟩
+  rcases tdata.branch with ⟨data, teq, details⟩ | ⟨data, teq, details⟩ |
+    ⟨data, teq, details⟩
+  · exact Or.inl ⟨by rw [details.natCard_cQ_eq_field, details.natCard_cQ0_eq_field],
+      details.distinguishedProduct_order⟩
+  · exact Or.inr (Or.inl ⟨details.natCard_cQ_eq_cQ0_sq,
+      details.distinguishedProduct_order⟩)
+  · exact Or.inr (Or.inr ⟨details.natCard_cQ_eq_cQ0_cube,
+      details.distinguishedProduct_order⟩)
+
+end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
