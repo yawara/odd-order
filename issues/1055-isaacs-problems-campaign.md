@@ -103,8 +103,12 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - ✅ 実証明 **1C.2(a)** `exists_sylow_subgroupOf_eq_of_sylow` (H の Sylow P = H∩S、Sylow.subtype +
   極大性) + **1C.2(b)** `card_sylow_subgroup_le` (n_p(H)≤n_p(G)、1C.2a 対応が単射)。
 - ✅ 実証明 **1C.3(a)** `powerOrder_eq_iUnion_sylow` (位数 p 冪の元 = ⋃ Sylow)。
-- ⬜ **残り §1C**: **1C.3(b)** (p∣\|G\| ⟹ p∣\|X\|、Sylow P を X に共役作用 → X^P=Z(P) で
-  `IsPGroup.card_modEq_card_fixedPoints`) / **1C.4** (\|G\|=120 で index 3 or 5 の部分群、n_2 場合分け) /
+- ✅ 実証明 **1C.3(b)** `prime_dvd_card_orderOf_prime_pow` (p∣\|G\| ⟹ p∣\|X\|)。Sylow `P` を `X` に
+  共役作用させ `\|X\|≡\|X^P\| (mod p)` (`card_modEq_card_fixedPoints`)、固定点 `X^P`=`Z(P)`
+  (可換 p-元は `P` に入る = helper `mem_sylow_of_orderOf_prime_pow_of_forall_commute`
+  = `⟨x⟩≤N_G(P)` + Sylow 極大性)、`P` 非自明 p-群ゆえ `p∣\|Z(P)\|`。↥P の `X` への共役
+  `MulAction` を letI 構成 + 固定点 ≃ `Z(P)` 全単射 (`card_eq_of_bijective`)。
+- ⬜ **残り §1C**: **1C.4** (\|G\|=120 で index 3 or 5 の部分群、n_2 場合分け) /
   **1C.5** (A_{p+1} で \|N_G(P)\|=p(p-1)/2、位数 p 元の計数、特殊) / **1C.6** (G=HK で P∩H,P∩K が Sylow) /
   **1C.7** (極大部分群が全て素数指数 ⟹ 最大素数 Sylow 正規) / **1C.8** (位数 p^a 部分群数 mod p、計数)。
 
