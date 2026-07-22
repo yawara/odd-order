@@ -720,16 +720,39 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     3. [x] **keystone 関係 完成** = `restrict_inner_keystone` (2026-07-22, sorry-free):
        (Res_H e', χ₁)−a·(Res_H e', η₁)=λ−a (hlam1 仮説)。Frobenius + conj。
        ⟹ c₀=λ+aμ (μ=(Res_H e',η₁)−1)。
-    4. **合成+eval** (~70行, 残): χ₁(1)·((Res_H e')(z)−(Res_H e')(1)) = −|H|·c₀。
-       piece1 × χ₁(1) → per-χ で piece2 (b·c₀) + degree (χ(1)=b·χ₁(1), supported ⟹
-       value 0 at 1、one_notMem_A) で c₀·χ(1) → Σχ(1)(χz−χ1) = 両 eval で −|H|
-       (sum_degree_mul_charValue − sum_degreeSq)。restrict_apply で (Res_H e')(z)=e'((z:G))。
-       ⟹ e′₁(z)−e′₁(1)=−|H|·c₀/χ₁(1)=−|Q|(λ/a+μ) (χ₁(1)=ad, |H|=d|Q|, c₀=λ+aμ)。
-    5. **(7)適用+final** (~40行): e′₁=ε•ξ (ξ IrreducibleCharacter)、ξ→Rep (IsIrreducibleCharacter
-       obtain) → peterfalvi_67_hall_of_odd → e′₁(z)≡e′₁(1) [ALGMOD|Q|]、上式代入 →
-       (λ/a+μ) alg int → dvd_of_isIntegral_ratio で a∣λ → union_coherent_of_lambda_dvd →
-       step 5 → feit_sibley_coherence 証明 + base relocation。
+    4. [x] **合成+eval 完成** = `restrict_apply_sub_eq_neg_card_mul_inner` (2026-07-22,
+       Conclusion.lean, sorry-free): χ₁(1)·(e'(z)−e'(1)) = −|H|·⟨Res_H e', χ₁⟩。
+       piece1 × χ₁(1) → per-χ で piece2 (⟨θ,χ⟩=b·c₀) + degree (χ(1)=b·χ₁(1), supported ⟹
+       value 0 at 1、one_notMem_A) で χ₁(1)·⟨θ,χ⟩=c₀·χ(1) → Σχ(1)(χz−χ1) = 両 eval で −|H|
+       (sum_degree_mul_charValue − sum_degreeSq)。restrict_apply で θ→e'。
+    5. [x] **(7)適用+算術核 完成** (2026-07-22, sorry-free、2 補題に分割):
+       - **算術核** = `dvd_lam_of_evaluation_cong` (Endgame.lean): heval
+         (a·d)·Δ=−(d·|Q|)·(λ+aμ) (piece4 の χ₁(1)=ad,|H|=d|Q|,c₀=λ+aμ 代入形) +
+         hcong (IsIntegral (Δ/|Q|)) ⟹ d 約分 → λ/a+μ=−(Δ/|Q|) alg int →
+         dvd_of_isIntegral_ratio で a∣λ。hyp-agnostic ℂ 補題。
+       - **(7)適用** = `witness_charValue_cong` (Conclusion.lean): e'=ε•ξ に
+         peterfalvi_67_hall_of_odd 適用 → e'(z)≡e'(1) [ALGMOD |Q|]。S08
+         restrict_extension_Yset_charValue_cong_caseB の mirror。ξ.isIrreducible で ρ 抽出、
+         e'-const → ρ.character-const (ε cancel) で hconst 供給、ε で Cong.smul_left scale。
+         構造的仮説 (Q≤H/Q⊴H/TI) は Hypothesis から discharge; 残 (Odd|G|, Q Hall in H/G,
+         Z⊴H central, Q≤C(z), card 定数性) は master assembly が供給。
   作業順: (7) は独立ゆえ (4)(5)(6) と並行可。それ以外は (4)→(5)→(6)→(8)。
+
+  ### ⭐ (8) 核 全ピース完成 (2026-07-22)。次 = master assembly
+
+  (8) 核 5 ピースが全て sorry-free で build green。残るのは **feit_sibley_coherence
+  本体の master assembly** (FeitSibley.lean:1247 の唯一の sorry):
+  - **reductions (1)(2)(3) + endgame (4)(5)(6) + step (7) + (8) 核は全て存在・証明済**
+    (standalone lemma 群、まだ feit_sibley_coherence に配線されていない)。
+  - master assembly の構造: d=1 分岐 (自明) | d>1: Q₁ nilpotent (Thompson) →
+    (1)(2) で 𝒮 coherence を 𝒮(S') に、Q₁ が abelian/2素数なら閉じ、非可換 p-群へ還元 →
+    (3) で 𝒳=𝒮−𝒮(Z) coherent → (4)(5)(6) endgame notation setup + union_coherent_of_lambda_dvd →
+    a∣λ を (8) 核 (witness_charValue_cong → dvd_lam_of_evaluation_cong) で供給。
+  - **(8) 核の posited 群仮説を discharge する群論補題**が master assembly の主タスク:
+    Odd|G| (theorem hypothesis 追加が faithful — FT 文脈)、Z⊴H central (reduction Z 選択)、
+    card 定数性 |H⊓C(w)|=|H⊓C(z)| on Z^# (Z prime order + D 作用)、
+    e'=ε•ξ (endgame P2 witness)、e'-const on Z^# (piece4 が z-独立を与える)、
+    Q Hall in H/G (coprime_Q_D + TI)、Q≤C(z) (S_commutes_Q1 + Z≤Z(Q₁))。
 - [ ] 旧記録: **Part A 本体組み立て** (2026-07-21 設計固定、この順):
   1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
      保存。no-real: |Q₁| = p^n 奇 (p=2 なら Q1_not_two_group と矛盾で p 奇 —
