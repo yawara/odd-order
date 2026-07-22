@@ -619,6 +619,94 @@ theorem IsHallSubgroup.map_of_surjective {G K : Type*} [Group G] [Group K] [Fini
     rw [Nat.mem_primeFactors] at hp ⊢
     exact ⟨hp.1, hp.2.1.trans (H.index_map_dvd hθ), Subgroup.index_ne_zero_of_finite⟩
 
+/-- Sylow `p`-部分群は `{p}`-Hall 部分群 (`|S| = p^n`、`|G:S|` は `p` と互いに素)。 -/
+theorem sylow_isHallSubgroup_singleton {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (S : Sylow p G) : IsHallSubgroup ({p} : Set ℕ) (S : Subgroup G) := by
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp S.isPGroup'
+  refine ⟨fun q hq => ?_, fun q hq => ?_⟩
+  · rw [Nat.mem_primeFactors] at hq
+    have hqS : q ∣ p ^ n := hn ▸ hq.2.1
+    exact (Nat.prime_dvd_prime_iff_eq hq.1 Fact.out).mp (hq.1.dvd_of_dvd_pow hqS)
+  · rw [Nat.mem_primeFactors] at hq
+    intro (hqp : q = p)
+    exact S.not_dvd_index (hqp ▸ hq.2.1)
+
+/-- `{p}`-Hall 部分群は Sylow `p`-部分群 (橋渡しの逆): `IsHallSubgroup {p} H` なる `H` は
+ある Sylow `p`-部分群と一致する。`H` は `p`-群 (`|H|` の素因子はすべて `p`)、Sylow `S ⊇ H` を
+取ると `[S:H]` を割る素数は `p` (∣`|S|`) かつ `≠ p` (∣`[G:H]`) で矛盾 → `relIndex_eq_one` で `S ≤ H`。 -/
+theorem exists_sylow_coe_eq_of_isHallSubgroup_singleton {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] {H : Subgroup G} (hH : IsHallSubgroup ({p} : Set ℕ) H) :
+    ∃ S : Sylow p G, (S : Subgroup G) = H := by
+  have hHp : IsPGroup p H := IsPGroup.of_card
+    (Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne' fun {d} hd hdvd =>
+      hH.1 d (Nat.mem_primeFactors.mpr ⟨hd, hdvd, Nat.card_pos.ne'⟩))
+  obtain ⟨S, hHS⟩ := hHp.exists_le_sylow
+  refine ⟨S, le_antisymm ?_ hHS⟩
+  rw [← Subgroup.relIndex_eq_one]
+  by_contra hne
+  obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hne
+  -- q ∣ [S:H] ∣ |S| = p^m ⟹ q = p
+  obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp S.isPGroup'
+  have hqp : q = p := (Nat.prime_dvd_prime_iff_eq hq Fact.out).mp
+    (hq.dvd_of_dvd_pow (hm ▸ hqdvd.trans (Subgroup.relIndex_dvd_card H S)))
+  -- q ∣ [S:H] ∣ [G:H] ⟹ q ≠ p (H が {p}-Hall)
+  exact hH.2 q (Nat.mem_primeFactors.mpr ⟨hq,
+    hqdvd.trans (Subgroup.relIndex_dvd_index_of_le hHS), Subgroup.index_ne_zero_of_finite⟩) hqp
+
+/-- `(MulAut.conj a)⁻¹` を元 `z` に作用させると `a⁻¹ z a` (共役)。`map_conj_smul` の補助。 -/
+private theorem inv_conj_smul_apply {L : Type*} [Group L] (a z : L) :
+    ((MulAut.conj a)⁻¹ • z : L) = a⁻¹ * z * a := by
+  rw [← map_inv]; simp [MulAut.smul_def]
+
+open Pointwise in
+/-- 準同型は共役と可換: `θ(g H g⁻¹) = θ(g) · θ(H) · θ(g)⁻¹`。共役の pointwise 作用
+`MulAut.conj g • H` と像の相互作用 (1B.5(b) で `θ(g • S₀) = θ(g) • θ(S₀)` に使用)。 -/
+theorem map_conj_smul {G K : Type*} [Group G] [Group K] (θ : G →* K) (g : G) (H : Subgroup G) :
+    (MulAut.conj g • H).map θ = MulAut.conj (θ g) • (H.map θ) := by
+  ext y
+  simp only [Subgroup.mem_map, Subgroup.mem_pointwise_smul_iff_inv_smul_mem, inv_conj_smul_apply]
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    exact ⟨g⁻¹ * x * g, hx, by rw [map_mul, map_mul, map_inv]⟩
+  · rintro ⟨x, hx, hxy⟩
+    exact ⟨g * x * g⁻¹, by rw [show g⁻¹ * (g * x * g⁻¹) * g = x by group]; exact hx,
+      by rw [map_mul, map_mul, map_inv, hxy]; group⟩
+
+open Pointwise in
+/-- **Isaacs Problem 1B.5(b)**. `θ : G ↠ K` が有限群の全射で `T` が `K` の Sylow `p`-部分群
+ならば、`T = θ(S)` となる `G` の Sylow `p`-部分群 `S` が存在する。
+
+任意の Sylow `S₀ : Sylow p G` の像 `θ(S₀)` は `{p}`-Hall (1B.5(a) + `sylow_isHallSubgroup_singleton`)
+なので Sylow `Q` を与える。`T`, `Q` は `K` で共役 `T = k • Q` (Sylow C)、`k = θ g` と書くと
+`T = θ(g) • θ(S₀) = θ(g • S₀)` (`map_conj_smul`)、`S := g • S₀` が求めるもの。 -/
+theorem exists_sylow_map_eq {G K : Type*} [Group G] [Group K] [Finite G]
+    {θ : G →* K} (hθ : Function.Surjective θ) {p : ℕ} [Fact p.Prime] (T : Sylow p K) :
+    ∃ S : Sylow p G, (S : Subgroup G).map θ = (T : Subgroup K) := by
+  haveI : Finite K := Finite.of_surjective θ hθ
+  obtain ⟨S₀⟩ := (Sylow.nonempty : Nonempty (Sylow p G))
+  obtain ⟨Q, hQ⟩ := exists_sylow_coe_eq_of_isHallSubgroup_singleton
+    (IsHallSubgroup.map_of_surjective hθ (sylow_isHallSubgroup_singleton S₀))
+  obtain ⟨k, hk⟩ := MulAction.exists_smul_eq K Q T
+  obtain ⟨g, rfl⟩ := hθ k
+  refine ⟨g • S₀, ?_⟩
+  rw [Sylow.coe_subgroup_smul, map_conj_smul, ← hQ, ← Sylow.coe_subgroup_smul, hk]
+
+/-- **Isaacs Problem 1B.5(c)**. `θ : G ↠ K` が有限群の全射ならば、各素数 `p` について
+`|Syl_p(K)| ≤ |Syl_p(G)|`。1B.5(b) より `S ↦ (θ(S) を Sylow とみたもの)` が
+`Syl_p(G) ↠ Syl_p(K)` の全射を与える。 -/
+theorem card_sylow_le_of_surjective {G K : Type*} [Group G] [Group K] [Finite G]
+    {θ : G →* K} (hθ : Function.Surjective θ) {p : ℕ} [Fact p.Prime] :
+    Nat.card (Sylow p K) ≤ Nat.card (Sylow p G) := by
+  haveI : Finite K := Finite.of_surjective θ hθ
+  refine Nat.card_le_card_of_surjective
+    (fun S : Sylow p G => (exists_sylow_coe_eq_of_isHallSubgroup_singleton
+      (IsHallSubgroup.map_of_surjective hθ (sylow_isHallSubgroup_singleton S))).choose) ?_
+  intro T
+  obtain ⟨S, hS⟩ := exists_sylow_map_eq hθ T
+  refine ⟨S, Sylow.ext ?_⟩
+  rw [(exists_sylow_coe_eq_of_isHallSubgroup_singleton
+    (IsHallSubgroup.map_of_surjective hθ (sylow_isHallSubgroup_singleton S))).choose_spec, hS]
+
 open Pointwise in
 /-- **Isaacs Problem 1B.6**. `H` を `G` の π-Hall 部分群、`K ≤ G` を部分群とする。`HK` が部分群
 (ある `L : Subgroup G` の台が `↑H·↑K`) ならば `H ∩ K` は `K` の π-Hall 部分群
@@ -701,6 +789,43 @@ theorem oPiCore_le_of_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Finit
       Subgroup.index_ne_zero_of_finite⟩) hqπ
   exact le_sup_left.trans hsub
 
+open Pointwise in
+/-- **Isaacs Problem 1B.7(c)**. `G` が π-Hall 部分群を持つとき、`O_π(G)` は `G` の全 π-Hall 部分群
+の共通部分に一致する。
+
+`⊇`: `O_π ≤` 各 π-Hall (1B.7(b)) より `O_π ≤ ⨅`。`⊆`: 交叉 `N := ⨅` は (i) π-群 (`N ≤ H₀` で
+`|N| ∣ |H₀|`)、(ii) 正規 — 共役 `g` は π-Hall 族を並べ替える (`IsHallSubgroup.mulAut_smul`) ので
+`g⁻¹xg ∈ 全 π-Hall ⟺ x ∈ 全 π-Hall`。正規 π-群ゆえ `N ≤ O_π` (1B.7(a) `le_oPiCore`)。 -/
+theorem oPiCore_eq_iInf_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Finite G]
+    (hne : ∃ H : Subgroup G, IsHallSubgroup π H) :
+    oPiCore π G = ⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G) := by
+  obtain ⟨H₀, hH₀⟩ := hne
+  have hmem : ∀ x : G,
+      x ∈ (⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G))
+        ↔ ∀ H : {H : Subgroup G // IsHallSubgroup π H}, x ∈ (H : Subgroup G) :=
+    fun _ => Subgroup.mem_iInf
+  have hNle : (⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G)) ≤ H₀ :=
+    iInf_le _ (⟨H₀, hH₀⟩ : {H : Subgroup G // IsHallSubgroup π H})
+  have hNpi : Subgroup.IsPiGroup π
+      (⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G)) :=
+    fun q hq => hH₀.1 q (Nat.primeFactors_mono (Subgroup.card_dvd_of_le hNle) Nat.card_pos.ne' hq)
+  haveI hNnorm : (⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G)).Normal := by
+    apply Subgroup.Normal.of_conjugate_fixed
+    intro g
+    ext x
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hmem, hmem]
+    constructor
+    · intro h H
+      have hh := h (⟨MulAut.conj g⁻¹ • (H : Subgroup G), H.2.mulAut_smul (MulAut.conj g⁻¹)⟩ :
+        {H : Subgroup G // IsHallSubgroup π H})
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, map_inv, inv_inv, smul_inv_smul] at hh
+      exact hh
+    · intro h H
+      have hh := h (⟨MulAut.conj g • (H : Subgroup G), H.2.mulAut_smul (MulAut.conj g)⟩ :
+        {H : Subgroup G // IsHallSubgroup π H})
+      rwa [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hh
+  exact le_antisymm (le_iInf fun H => oPiCore_le_of_isHallSubgroup H.2) hNpi.le_oPiCore
+
 /-! ### Problems 1B: mathlib / repo で被覆される Hall/π 演習 (docstring 記録)
 
 - **Problem 1B.7(a)** (`O_π(G)` = 最大の正規 π-部分群): 本リポジトリの
@@ -708,7 +833,16 @@ theorem oPiCore_le_of_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Finit
   characteristic (`oPiCore.characteristic`) な π-部分群であり、任意の正規 π-部分群 `H` を含む
   (`Subgroup.IsPiGroup.le_oPiCore` = まさに Problem 1B.7(a)) ことが
   `OddOrder/Isaacs/Ch03_SplitExtensions/Theorem315.lean` で示されている。この一意最大性から
-  `O_π(G)` は characteristic (Isaacs の Note)。上の `oPiCore_le_of_isHallSubgroup` が 1B.7(b)。
+  `O_π(G)` は characteristic (Isaacs の Note)。1B.7(b) = `oPiCore_le_of_isHallSubgroup`、
+  1B.7(c) = `oPiCore_eq_iInf_isHallSubgroup` (上に実証明)。
+
+- **Problem 1B.8(a)** (`O^π(G)` = π-剰余 = `G/N` が π-群となる最小の正規部分群): 本リポジトリの
+  `OddOrder.Isaacs.Ch03.oPiResidual π G` (= `sInf {N | N◁G ∧ G/N が π-群}`、
+  `OddOrder/Isaacs/Ch03_SplitExtensions/PiResidual.lean`) が、有限群で `G/O^π(G)` が π-群
+  (`isPiGroup_quotient_oPiResidual`) かつ `G/N` を π-群にする任意の正規 `N` に含まれる
+  (`oPiResidual_le_of_isPiGroup_quotient`)、すなわち最小 (一意 = `oPiResidual_eq_...minimal`)。
+  Ch09 の `pResidual` (= `O^p`) の π 一般化。**1B.8(b)** = `oPiResidual_eq_closure_piPrimeElements`
+  (`O^π(G)` は位数がどの π-素数でも割れない元 = π'-元で生成される、同 PiResidual.lean)。
 -/
 
 end
