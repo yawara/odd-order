@@ -1168,6 +1168,75 @@ theorem exists_sylow_inf_sylow_of_mul_eq_univ {p : ℕ} [Fact p.Prime] {G : Type
       rw [e1, Subgroup.smul_inf, Subgroup.conj_smul_eq_self_of_mem (K.inv_mem hk)]
     rw [← hQ'K, key, ← Nat.card_congr (Subgroup.equivSMul _ _).toEquiv]
 
+open Pointwise in
+/-- **Isaacs Problem 1C.6(b)**. `G = HK` で `P ∩ H`, `P ∩ K` がそれぞれ `H`, `K` の Sylow
+(1C.6(a) の `P`) ならば `P = (P ∩ H)(P ∩ K)` (集合積)。
+
+`(P∩H)(P∩K) ⊆ P` は明らか。位数計数: `|(P∩H)(P∩K)|·|P∩H∩K| = |P∩H|·|P∩K|`
+(`card_mul_card_inf`)、`|G||H∩K|=|H||K|` (`G=HK`) の `p`-部分から `|P|·pPart(H∩K)=|P∩H|·|P∩K|`、
+かつ `|P∩H∩K| ≤ pPart(H∩K)` (H∩K の p-部分群) ゆえ `|(P∩H)(P∩K)| ≥ |P|`。⊆ と合わせ集合として一致。 -/
+theorem sylow_inf_mul_sylow_inf_eq {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {H K : Subgroup G} (P : Sylow p G) (hHK : (H : Set G) * (K : Set G) = Set.univ)
+    (hPH : Nat.card ((P : Subgroup G) ⊓ H : Subgroup G) = p ^ (Nat.card H).factorization p)
+    (hPK : Nat.card ((P : Subgroup G) ⊓ K : Subgroup G) = p ^ (Nat.card K).factorization p) :
+    (((P : Subgroup G) ⊓ H : Subgroup G) : Set G) * (((P : Subgroup G) ⊓ K : Subgroup G) : Set G)
+      = (P : Set G) := by
+  have hppos : 0 < p := (Fact.out : p.Prime).pos
+  have hphkpos : 0 < p ^ (Nat.card ↥(H ⊓ K)).factorization p := pow_pos hppos _
+  -- |G|·|H∩K| = |H|·|K|
+  have hprod : Nat.card G * Nat.card ↥(H ⊓ K) = Nat.card H * Nat.card K := by
+    have hc := card_mul_card_inf H K
+    rwa [hHK, Nat.card_univ] at hc
+  -- p-指数の加法性
+  have hfact : (Nat.card G).factorization p + (Nat.card ↥(H ⊓ K)).factorization p
+      = (Nat.card H).factorization p + (Nat.card K).factorization p := by
+    have h1 : (Nat.card G * Nat.card ↥(H ⊓ K)).factorization p
+        = (Nat.card H * Nat.card K).factorization p := by rw [hprod]
+    rwa [Nat.factorization_mul (Nat.card_pos).ne' (Nat.card_pos).ne',
+      Nat.factorization_mul (Nat.card_pos).ne' (Nat.card_pos).ne', Finsupp.add_apply,
+      Finsupp.add_apply] at h1
+  -- (II): |P|·pPart(H∩K) = |P∩H|·|P∩K|
+  have hII : Nat.card ↥(P : Subgroup G) * p ^ (Nat.card ↥(H ⊓ K)).factorization p
+      = p ^ (Nat.card H).factorization p * p ^ (Nat.card K).factorization p := by
+    rw [P.card_eq_multiplicity, ← pow_add, ← pow_add, hfact]
+  -- P∩H∩K = P ⊓ (H⊓K)
+  have hABinf : ((P : Subgroup G) ⊓ H) ⊓ ((P : Subgroup G) ⊓ K)
+      = (P : Subgroup G) ⊓ (H ⊓ K) := by rw [inf_inf_inf_comm, inf_idem]
+  -- |P∩H∩K| ≤ pPart(H∩K)
+  have hIle : Nat.card ↥((P : Subgroup G) ⊓ (H ⊓ K))
+      ≤ p ^ (Nat.card ↥(H ⊓ K)).factorization p := by
+    obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp (P.isPGroup'.to_le (inf_le_left))
+    have hdvd : p ^ m ∣ Nat.card ↥(H ⊓ K) :=
+      hm ▸ Subgroup.card_dvd_of_le (inf_le_right : (P : Subgroup G) ⊓ (H ⊓ K) ≤ H ⊓ K)
+    refine Nat.le_of_dvd hphkpos ?_
+    rw [hm]
+    exact pow_dvd_pow p
+      ((Nat.Prime.pow_dvd_iff_le_factorization Fact.out (Nat.card_pos).ne').mp hdvd)
+  -- |(P∩H)(P∩K)|·|P∩H∩K| = |P∩H|·|P∩K|
+  have hmulinf := card_mul_card_inf ((P : Subgroup G) ⊓ H) ((P : Subgroup G) ⊓ K)
+  rw [hABinf, hPH, hPK] at hmulinf
+  -- (P∩H)(P∩K) ⊆ P
+  have hsub : (((P : Subgroup G) ⊓ H : Subgroup G) : Set G)
+      * (((P : Subgroup G) ⊓ K : Subgroup G) : Set G) ⊆ (P : Set G) := by
+    rintro x ⟨a, ha, b, hb, rfl⟩
+    exact (P : Subgroup G).mul_mem (Subgroup.mem_inf.mp ha).1 (Subgroup.mem_inf.mp hb).1
+  -- |P| ≤ |(P∩H)(P∩K)|
+  have hge : Nat.card ↥(P : Subgroup G)
+      ≤ Nat.card ((((P : Subgroup G) ⊓ H : Subgroup G) : Set G)
+        * (((P : Subgroup G) ⊓ K : Subgroup G) : Set G)) := by
+    refine Nat.le_of_mul_le_mul_right ?_ hphkpos
+    calc Nat.card ↥(P : Subgroup G) * p ^ (Nat.card ↥(H ⊓ K)).factorization p
+        = Nat.card ((((P : Subgroup G) ⊓ H : Subgroup G) : Set G)
+            * (((P : Subgroup G) ⊓ K : Subgroup G) : Set G))
+          * Nat.card ↥((P : Subgroup G) ⊓ (H ⊓ K)) := by rw [hII, ← hmulinf]
+      _ ≤ Nat.card ((((P : Subgroup G) ⊓ H : Subgroup G) : Set G)
+            * (((P : Subgroup G) ⊓ K : Subgroup G) : Set G))
+          * p ^ (Nat.card ↥(H ⊓ K)).factorization p := by gcongr
+  -- ⊆ と |P| ≤ |積| から集合として一致
+  refine Set.eq_of_subset_of_ncard_le hsub ?_ (Set.toFinite _)
+  rw [← Nat.card_coe_set_eq, ← Nat.card_coe_set_eq]
+  exact hge
+
 end
 
 end OddOrder.Isaacs.Ch01
