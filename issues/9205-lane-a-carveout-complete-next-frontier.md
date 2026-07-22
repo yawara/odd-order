@@ -86,3 +86,26 @@ hub が lane a の次 frontier (or 退役) を裁定し、ownership 不整合を
 - `notes/meta/merge_monitor.md` 2026-07-22 18:5x tick (hub 診断: a は完了境界 + ownership 不整合)
 - issue 9318 (BS, NearFields Prop 1 の gate)、9204 (carve-out)、1054 (FeitSibley close)
 - reallocation note `notes/meta/lane_reallocation_2026_07_16.md` §1–§2
+
+---
+
+## HUB RULING (2026-07-22 20:3x, Opus hub)
+
+### ① ownership 不整合 — 裁定済 (自律)
+
+`merge_monitor.md` の regex を裁定に整合 (commit 同梱):
+- **FeitSibley → a**: a が完済 (axiom-clean, 1054 close)。`a_re` に明示 carve-out を追加。
+  完済ゆえ以後は frozen だが、a の既マージ編集を step 1.5 で誤検出しないため明示所有とする。
+- **NearFields クラスタ (NearFields / ExceptionalNearField / SemilinearField / Huppert) → c**:
+  a の推奨どおり。NearFields Prop 1 (`rankOne_affine_nearField`) の discharge は c の 9318
+  Brauer–Suzuki が最も自己完結的。`c_re` から FeitSibley を除去。
+- ⟹ 不整合解消。a は NearFields を今後触らない (c 領域)。
+
+### ② lane a 再配分 — ユーザー escalation (2026-07-22 20:3x)
+
+a の割当 territory 完済は実測で確認 (Isaacs/Pf 本文 実 sorry 0・番号被覆 0 欠落・特殊化債務
+11/11、FeitSibley axiom-clean)。remaining project frontier は b (2053) / c (9318) が活発所有。
+⟹ **lane a 全体の次の使い道は「スコープ (E: Isaacs Problems を in-scope にするか) + 資源戦略
+(A 退役 / C クロス割当)」の判断で、これは規約上ユーザー事項** (scope 決定 = user、lane 退役 =
+資源判断)。hub は AskUserQuestion で escalate した。ownature 裁定 (①) と immediate bridge が
+無いこと (NearFields→c ゆえ (B) は a の仕事でない) を踏まえ、ユーザー裁可待ち。
