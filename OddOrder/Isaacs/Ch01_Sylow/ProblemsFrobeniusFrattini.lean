@@ -335,6 +335,70 @@ theorem coprime_card_index_of_disjoint_conj {G : Type*} [Group G] [Finite G] {H 
   have := Nat.pow_right_injective hp.two_le heq
   omega
 
+open Pointwise in
+/-- **Isaacs Problem 1D.4**. `G = NH` で `1 < N ⊴ G`, `N ∩ H = 1` とする。`H` が Frobenius
+complement (`H ⊓ H^g = 1` すべての `g ∉ H`) であることと、すべての非単位 `h ∈ H` について
+`C_N(h) = 1` であることは同値。
+
+`⟹`: `n ∈ C_N(h)`, `n ≠ 1` があれば `n ∉ H` (`N∩H=1`) かつ `h = n·h·n⁻¹ ∈ H^n` (可換)、
+`h ∈ H ⊓ H^n`, `h ≠ 1` で Frobenius に反する。
+`⟸`: `g ∉ H` を `g = n·h'` 分解、`H^g = H^n` (`conj_smul_eq_self_of_mem`) で `n ∈ N`, `n ≠ 1` に帰着。
+`x ∈ H ⊓ H^n`, `x ≠ 1` とすると `n⁻¹·x·n ∈ H` かつ `x ∈ H` ゆえ `x⁻¹·n⁻¹·x·n ∈ H`、また N 正規で
+`∈ N`、`N∩H=1` から `= 1`、つまり `x` と `n` は可換で `n ∈ C_N(x) = 1`、`n ≠ 1` に矛盾。 -/
+theorem frobenius_complement_iff_centralizer_eq_bot {G : Type*} [Group G] {N H : Subgroup G}
+    [hN : N.Normal] (hNH : (N : Set G) * (H : Set G) = Set.univ) (hinf : N ⊓ H = ⊥) :
+    (∀ g : G, g ∉ H → H ⊓ MulAut.conj g • H = ⊥) ↔
+    (∀ h : G, h ∈ H → h ≠ 1 → Subgroup.centralizer {h} ⊓ N = ⊥) := by
+  constructor
+  · -- Frobenius ⟹ C_N(h) = 1
+    intro hfrob h hhH hh1
+    rw [eq_bot_iff]
+    intro n hn
+    obtain ⟨hnc, hnN⟩ := Subgroup.mem_inf.mp hn
+    rw [Subgroup.mem_bot]
+    by_contra hn1
+    have hnH : n ∉ H := fun hnH =>
+      hn1 (Subgroup.mem_bot.mp (hinf ▸ Subgroup.mem_inf.mpr ⟨hnN, hnH⟩))
+    have hcomm : n * h = h * n := (Subgroup.mem_centralizer_iff.mp hnc h rfl).symm
+    have hhconj : h ∈ MulAut.conj n • H := by
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, ← map_inv, MulAut.smul_def,
+        MulAut.conj_apply, inv_inv, mul_assoc, ← hcomm, ← mul_assoc, inv_mul_cancel, one_mul]
+      exact hhH
+    exact hh1 (Subgroup.mem_bot.mp (hfrob n hnH ▸ Subgroup.mem_inf.mpr ⟨hhH, hhconj⟩))
+  · -- C_N(h) = 1 ⟹ Frobenius
+    intro hcent g hg
+    obtain ⟨n, hnN, h', hh'H, hgeq⟩ := Set.mem_mul.mp (hNH ▸ Set.mem_univ g)
+    have hconjeq : MulAut.conj g • H = MulAut.conj n • H := by
+      rw [← hgeq, map_mul, mul_smul, Subgroup.conj_smul_eq_self_of_mem hh'H]
+    rw [hconjeq]
+    have hn1 : n ≠ 1 := by rintro rfl; rw [one_mul] at hgeq; exact hg (hgeq ▸ hh'H)
+    rw [eq_bot_iff]
+    intro x hx
+    obtain ⟨hxH, hxc⟩ := Subgroup.mem_inf.mp hx
+    rw [Subgroup.mem_bot]
+    by_contra hx1
+    have hinvH : n⁻¹ * x * n ∈ H := by
+      have h0 := Subgroup.mem_pointwise_smul_iff_inv_smul_mem.mp hxc
+      rwa [← map_inv, MulAut.smul_def, MulAut.conj_apply, inv_inv] at h0
+    have hcomm0 : x⁻¹ * n⁻¹ * x * n = 1 := by
+      have hHm : x⁻¹ * n⁻¹ * x * n ∈ H := by
+        have h5 : x⁻¹ * (n⁻¹ * x * n) ∈ H := H.mul_mem (H.inv_mem hxH) hinvH
+        rwa [← mul_assoc, ← mul_assoc] at h5
+      have hNm : x⁻¹ * n⁻¹ * x * n ∈ N :=
+        N.mul_mem (by simpa using hN.conj_mem n⁻¹ (N.inv_mem hnN) x⁻¹) hnN
+      have hmem : x⁻¹ * n⁻¹ * x * n ∈ N ⊓ H := Subgroup.mem_inf.mpr ⟨hNm, hHm⟩
+      rw [hinf] at hmem; exact Subgroup.mem_bot.mp hmem
+    have h2 : n⁻¹ * x * n = x := by
+      have h3 : x * (x⁻¹ * n⁻¹ * x * n) = x * 1 := congrArg (x * ·) hcomm0
+      rw [mul_one, show x * (x⁻¹ * n⁻¹ * x * n) = n⁻¹ * x * n by group] at h3
+      exact h3
+    have hxn : x * n = n * x := by
+      have h4 : n * (n⁻¹ * x * n) = n * x := congrArg (n * ·) h2
+      rwa [show n * (n⁻¹ * x * n) = x * n by group] at h4
+    have hcn : n ∈ Subgroup.centralizer {x} := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy; rw [Set.mem_singleton_iff] at hy; subst hy; exact hxn
+    exact hn1 (Subgroup.mem_bot.mp (hcent x hxH hx1 ▸ Subgroup.mem_inf.mpr ⟨hcn, hnN⟩))
 end
 
 end OddOrder.Isaacs.Ch01
