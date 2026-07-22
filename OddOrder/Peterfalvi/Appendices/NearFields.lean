@@ -59,7 +59,8 @@ Per-result status:
 | `NearField.mul_add_of_mul_comm` (commutative ⇒ distributive) | **proved, sorry-free** (new) |
 | `exists_field_structure_of_cyclic_index_two` (Prop 2, first half) | **proved, sorry-free** (new) |
 | App. C Prop 1, prerequisite (i) (`RankOneHypothesis.sylow_two_isCyclic_or_quaternion`) | **proved, axiom-clean** (2026-07-22) |
-| App. C Prop 1 (`rankOne_affine_nearField`) | honest statement, `sorry` — gated on Brauer–Suzuki (issue 9318) |
+| Brauer–Suzuki (ii), quaternion `|S| ≥ 16` + cyclic (`brauerSuzuki_of_quaternionSylow`) | **proved, axiom-clean** (2026-07-22, issue 9318; `Q₈` case open) |
+| App. C Prop 1 (`rankOne_affine_nearField`) | honest statement, `sorry` — remaining: near-field transport + `Q₈` BS |
 | App. C Prop 2 headline (`cyclic_index_two_nearField_classification`) | **proved, axiom-clean** (2026-07-21, commit 42892fcb5) |
 -/
 
@@ -773,8 +774,11 @@ state (updated 2026-07-21, issue 9404):
 * (i) a Sylow 2-subgroup of `G` is cyclic or generalized quaternion (Huppert, *Endliche Gruppen* I,
   Kapitel III, Satz 8.2) — **proved** as `RankOneHypothesis.sylow_two_isCyclic_or_quaternion`
   above (bridge from `two_rank_one` to Isaacs Thm 6.11).
-* (ii) the **Brauer–Suzuki theorem** `G = O_{2'}(G) C_G(u)` — not formalized; **issue 9318**
-  (lane b claim).  This is the sole remaining gate.
+* (ii) the **Brauer–Suzuki theorem** `G = O_{2'}(G) C_G(u)` (**issue 9318**) — **proved** as
+  `OddOrder.GroupTheory.brauerSuzuki_of_isCyclic_sylowTwo` (cyclic Sylow-2) and
+  `OddOrder.GroupTheory.QuaternionSylowSetup.brauerSuzuki_of_quaternionSylow` (generalized
+  quaternion, `|S| ≥ 16`, via Gorenstein Ch.12 exceptional character theory).  The residual
+  `Q₈` case (`|S| = 8`) needs modular character theory and is not yet formalized.
 * (iii) Huppert Kapitel II, Satz 3.2, giving the elementary abelian normal subgroup regular on `Ω`
   (hence `G = F ⋊ H`) for the solvable `O_{2'}(G)` (solvable by Feit–Thompson) — **formalized** as
   `OddOrder.GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive`

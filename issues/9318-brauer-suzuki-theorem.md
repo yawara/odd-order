@@ -43,16 +43,27 @@ Character Theory Ch.7 (block-free proof by Glauberman?)。repo の指標 infra
 
 ## やること
 
-- [ ] 証明戦略調査 (Gorenstein §12.1 / Glauberman の block-free 証明 /
-      Coq odd-order に相当物があるか grep)
-- [ ] cyclic Sylow-2 case (Cayley normal 2-complement で軽い) の確認
-- [ ] generalized quaternion case の形式化
+- [x] 証明戦略調査 (Gorenstein Ch.12 読了、下記)
+- [x] **cyclic Sylow-2 case** → `brauerSuzuki_of_isCyclic_sylowTwo` (`BrauerSuzuki.lean`) 完成
+- [x] **generalized quaternion case (|S| ≥ 16)** → `brauerSuzuki_of_quaternionSylow`
+      (`BrauerSuzukiEndgame.lean`) **完成 2026-07-22, axiom-clean**。Lem 1.4〜1.9 (指標理論) +
+      endgame (M 2-nilpotent / z̄ 中心 / Frattini) の全体。AxiomsCheck 登録済。
 - [x] ~~Huppert III 8.2 / II 3.2 の form 化~~ → **lane c が完了 (2026-07-22)**:
       II 3.2 = `GroupTheory/SolvableTwoTransitive.lean`
       `exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive` (issue 9404 closed)、
       III 8.2 = `NearFields.lean` `RankOneHypothesis.sylow_two_isCyclic_or_quaternion`
       (two_rank_one → Isaacs Thm 6.11 橋)。いずれも axiom-clean。
-- [ ] rankOne_affine_nearField の sorry 解消 (残 gate は BS 本体のみ)
+- [ ] **Q₈ case (|S| = 8)** — 別ルート (modular character theory)、真の research-adjacent gap。
+      Gorenstein は「all known proofs require the theory of modular characters」と明記。未着手。
+- [ ] rankOne_affine_nearField の sorry 解消 (残: near-field transport (Pf p.137) + Q₈ BS)
+
+## 状態 (2026-07-22 完了): BS 定理本体は cyclic + 一般化四元数 |S|≥16 で完成
+
+**達成**: `oPiCore {p | p ≠ 2} G ⊔ centralizer {z} = ⊤` (= `G = O_{2'}(G)·C_G(z)`)。
+cyclic case (`brauerSuzuki_of_isCyclic_sylowTwo`) と quaternion |S|≥16 case
+(`brauerSuzuki_of_quaternionSylow`) の両方 axiom-clean [propext, Classical.choice, Quot.sound]。
+**残る gap は Q₈ (|S|=8) のみ** — modular character theory を要し別 issue 相当。消費点
+`rankOne_affine_nearField` は BS 以外に near-field transport が残るため sorry のまま。
 
 ## 完了条件
 
