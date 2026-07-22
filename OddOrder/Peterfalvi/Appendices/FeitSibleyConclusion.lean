@@ -281,6 +281,7 @@ theorem restrict_apply_sub_eq_neg_card_mul_inner [Finite G] [Fintype G]
     ring
   simpa only [ClassFunction.restrict_apply, OneMemClass.coe_one] using hval
 
+set_option linter.unusedFintypeInType false in
 open scoped OddOrder.AlgInt in
 /-- **(8) step-(7) applied to a `𝒴`-witness** (Peterfalvi (8), p. 150).  For the `𝒴`-witness
 `e' = ε·ξ` (`ε ≠ 0`, `ξ ∈ Irr G`) — which is constant on `Z^#` by the `(8)` evaluation
@@ -378,7 +379,7 @@ theorem dvd_lam_of_endgame_data [Fintype G] [Invertible (Nat.card G : ℂ)] [Fin
   have hd0 : (hyp.d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.d_pos.ne'
   have hHcard : (Nat.card ↥hyp.H : ℂ) = (hyp.d : ℂ) * (Nat.card ↥hyp.Q : ℂ) := by
     have h := hyp.card_Q_mul_card_D
-    show (Nat.card ↥hyp.H : ℂ) = (Nat.card ↥hyp.D : ℂ) * (Nat.card ↥hyp.Q : ℂ)
+    change (Nat.card ↥hyp.H : ℂ) = (Nat.card ↥hyp.D : ℂ) * (Nat.card ↥hyp.Q : ℂ)
     rw [← h]; push_cast; ring
   -- `χ₁(1) ≠ 0`
   have hχ0 : χ₁ 1 ≠ 0 := by
@@ -426,6 +427,74 @@ theorem dvd_lam_of_endgame_data [Fintype G] [Invertible (Nat.card G : ℂ)] [Fin
   simpa using dvd_lam_of_evaluation_cong (a := a) (lam := lam) (mu := mu' - 1) ha hd0
     (by exact_mod_cast (Nat.cast_ne_zero.mpr (Nat.card_pos (α := ↥hyp.Q)).ne' :
       (Nat.card ↥hyp.Q : ℂ) ≠ 0)) (by push_cast; linear_combination heval) hΔ
+
+open scoped Classical in
+/-- **(4)–(8) endgame assembly: `𝒳 ∪ 𝒴` is coherent** (Peterfalvi (4)–(6)+(8), p. 148–150).
+With the endgame `(4)` data set up — the coherent `𝒳 = XsetOf ⊥ Z` (anchor `χ₁`, degree
+`χ₁(1) = a·d`, `p`-power integral differences) and a coherent `𝒴 ⊆ 𝒮` disjoint from `𝒳`
+(anchor `η₁`, `|𝒴| ≥ 2`, `A`-supported differences), the supported keystone `χ₁ − a·η₁`, and a
+central `Z ≤ Z(Q₁)` with `z ∈ Z^#` — the union `𝒳 ∪ 𝒴` is coherent.
+
+This wires the four endgame lemmas: `cross_extension_inner_eq_zero` (step (5),
+`⟨E_𝒳 φ, e'⟩ = 0`), `coherent_extension_eq_zsmul_irr` (the `𝒴`-witness `e' = ε·ξ`),
+`exists_lambda_norm_identity` (the `(6)` coefficient `λ` and norm identity), and
+`dvd_lam_of_endgame_data` (the `(8)` divisibility `a ∣ λ`, with `hQz`/`hcard_const` discharged
+via `Q_le_centralizer_of_mem_central`/`inf_centralizer_card_const_of_central`), feeding
+`union_coherent_of_lambda_dvd`. -/
+theorem xset_qder_union_coherent [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Fintype ↥hyp.H]
+    [Invertible (Nat.card ↥hyp.H : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) [(Z.subgroupOf hyp.H).Normal]
+    (hZcent : ∀ w ∈ Z, ∀ y ∈ hyp.Q1, ⁅w, y⁆ = 1)
+    (hoddG : Odd (Nat.card G)) (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index)
+    (hcohX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.XsetOf ⊥ Z) hyp.A)
+    {χ₁ : ClassFunction ↥hyp.H ℂ} (hχ₁X : χ₁ ∈ hyp.XsetOf ⊥ Z)
+    {a : ℕ} (ha : 2 ≤ a) (hχ₁deg : χ₁ 1 = (a : ℂ) * (hyp.d : ℂ))
+    (hXdiff : ∀ φ ∈ hyp.XsetOf ⊥ Z, ∃ b : ℕ, 0 < b ∧
+      φ - b • χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) (hyp.XsetOf ⊥ Z) hyp.A)
+    {χ₂ : ClassFunction ↥hyp.H ℂ} (hχ₂X : χ₂ ∈ hyp.XsetOf ⊥ Z) (hχ₂ne : χ₂ ≠ χ₁)
+    {Y : Set (ClassFunction ↥hyp.H ℂ)} (hYS : Y ⊆ hyp.Sset)
+    (hdisj : ∀ φ ∈ hyp.XsetOf ⊥ Z, φ ∉ Y)
+    (hcohY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau Y hyp.A)
+    {η₁ : ClassFunction ↥hyp.H ℂ} (hη₁Y : η₁ ∈ Y)
+    (hYdiff : ∀ ψ ∈ Y, ψ - η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) Y hyp.A)
+    {η₂ : ClassFunction ↥hyp.H ℂ} (hη₂Y : η₂ ∈ Y) (hη₂ne : η₂ ≠ η₁) (hm : 2 ≤ Y.ncard)
+    (hsupp : χ₁ - a • η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A)
+    {z : ↥hyp.H} (hzZ : (z : G) ∈ Z) (hz1 : z ≠ 1) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.XsetOf ⊥ Z ∪ Y) hyp.A) := by
+  classical
+  have hXS : hyp.XsetOf ⊥ Z ⊆ hyp.Sset := hyp.XsetOf_subset_Sset ⊥ Z
+  have hχ₁S : χ₁ ∈ hyp.Sset := hXS hχ₁X
+  have hχ₁Y : χ₁ ∉ Y := hdisj χ₁ hχ₁X
+  -- the `𝒴`-witness `e'` for `η₁`
+  set e' : ClassFunction G ℂ := hcohY.extension η₁ with he'def
+  have he'ZIrr : e' ∈ ZIrr G := hcohY.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁Y)
+  -- (5) cross-orthogonality `⟨E_𝒳 φ, e'⟩ = 0`
+  have hcross : ∀ φ ∈ hyp.XsetOf ⊥ Z, ClassFunction.inner (hcohX.extension φ) e' = 0 :=
+    fun φ hφ => hyp.cross_extension_inner_eq_zero hXS hYS hdisj hcohX hcohY hχ₁X hXdiff hχ₂X
+      hχ₂ne hη₁Y hYdiff hη₂Y hη₂ne hφ hη₁Y
+  -- the `𝒴`-witness is `±Irr`
+  obtain ⟨ε, ξ, hε, hEeq⟩ :=
+    hyp.coherent_extension_eq_zsmul_irr hcohY hη₁Y (hYS hη₁Y).1
+  have hεne : ε ≠ 0 := by rcases hε with h | h <;> omega
+  -- (6) the coefficient `λ` and norm identity
+  obtain ⟨lam, hlam_ne, hlam_1, nvv, hnvv, hident⟩ :=
+    hyp.exists_lambda_norm_identity hYS hcohY hχ₁S hχ₁Y hη₁Y hsupp hYdiff
+  -- (8) divisibility `a ∣ λ`
+  have hη₁ZIrr : η₁ ∈ ZIrr ↥hyp.H := (hYS hη₁Y).1.mem_ZIrr
+  have hz1G : (z : G) ≠ 1 := fun h => hz1 (Subtype.ext (by simpa using h))
+  have hdvd : (a : ℤ) ∣ lam :=
+    hyp.dvd_lam_of_endgame_data hZQ1 hoddG hHallG
+      (T := (hyp.XsetOf_finite ⊥ Z).toFinset) (fun φ => Set.Finite.mem_toFinset _)
+      hcohX hχ₁X (by omega) hχ₁deg
+      (fun φ hφ => (hXdiff φ hφ).imp fun b hb => hb.2)
+      he'ZIrr hεne hEeq hcross hη₁ZIrr hlam_1 hzZ hz1
+      (hyp.Q_le_centralizer_of_mem_central hZQ1 hZcent hzZ)
+      (fun w hwZ hw1 => hyp.inf_centralizer_card_const_of_central hZQ1 hZcent hwZ hw1 hzZ hz1G)
+  -- (6) assembly: `a ∣ λ ⟹ 𝒳 ∪ 𝒴` coherent
+  exact ⟨hyp.union_coherent_of_lambda_dvd hXS hYS hdisj hcohX hcohY hχ₁X
+    (fun φ hφ => (hXdiff φ hφ).imp fun b hb => hb) hχ₂X hχ₂ne hη₁Y hYdiff hη₂Y hη₂ne ha hm hsupp
+    hlam_ne hlam_1 hnvv hident hdvd⟩
 
 end Hypothesis
 
