@@ -334,8 +334,13 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
 
 - ✅ 実証明 **3A.5** `semidirectConjEquivProd` (`G ⋊ G ≅ G × G`、共役作用の半直積は直積)。同型
   `(n,g)↦(n·g,g)` (逆 `(a,g)↦⟨a·g⁻¹,g⟩`)、map_mul' は `mul_left`/`mul_right`/`conj_apply` 展開 + `group`。
-- ⬜ 残り §3A: 3A.1/3A.2 (semidihedral/generalized quaternion 構成) / 3A.3/3A.4 (order pm, q(q-1) 構成) /
-  3A.6 (p-群 faithful ⟹ orbit faithful、Thm 1.38 Brodkey) / 3A.7 (regular orbit) / 3A.8 (cyclic pqr auto)。
+- ⬜ 残り §3A (いずれも substantial ~50-60 行): **3A.6** (p-群 P が p∤|G| の G に faithful ⟹ ある
+  P-orbit で faithful) — repo に **Thm 1.38 (Generalized Brodkey)** あり (`Ch01_Sylow/Main.lean:756`、
+  Sylow 交叉極小で S∩T 内の両正規部分群 ⊆ O_p)。application は `G⋊P` 構成で P を Sylow とみて Brodkey +
+  orbit-stabilizer。**3A.3** (order pm, m|p-1, 正規 P 位数 p, G/P 巡回, Z(G)=1) — construction:
+  `(ZMod p)⋊C`, C≤Aut(ZMod p)=(ZMod p)ˣ 位数 m (巡回ゆえ存在)、加法/乗法 bridging + Z=1 検証。
+  **3A.4** (order q(q-1), 基本アーベル正規, 位数 p 元共役) — 体 F_q の F_q⋊F_qˣ。3A.1/3A.2 (SD/Q_n 構成) /
+  3A.7 (regular orbit) / 3A.8 (cyclic pqr auto)。次イテレーションで 3A.6 or 3A.3 を新鮮に構築推奨。
 
 - ⬜ **次: §3A 続き or §2A hard tail 再訪。§1D 残り = 1D.5 (Isaacs-noted-hardest)。**
 
