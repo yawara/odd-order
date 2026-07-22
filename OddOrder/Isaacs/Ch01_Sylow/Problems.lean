@@ -1496,6 +1496,120 @@ theorem mem_frattini_iff_forall_closure {G : Type*} [Group G] [Finite G] {g : G}
       exact hMco.2 _ hlt
     exact hMco.1 (Subgroup.closure_eq M ▸ h (↑M) hclosure)
 
+open MulAction in
+/-- **Isaacs Problem 1D.2**. 素数 `p` を固定し、部分群 `H ≤ G` が「位数 `p` の任意の元 `x ∈ H` に
+ついて `C_G(x) ⊆ H`」をみたすとする。このとき `p` は `|H|` と `|G : H|` を同時には割らない。
+
+背理法。`p ∣ |H|` かつ `p ∣ |G:H|` とすると、`Q ∈ Syl_p(G)` に対し `P := Q ∩ H` は `H` の Sylow で
+`|P| = pPart(H) < pPart(G) = |Q|` ゆえ `P < Q`。`Q` は p-群 (冪零) で正規化条件をみたすので
+`P.subgroupOf Q < N(P.subgroupOf Q) = (N_G(P)).subgroupOf Q` (`subgroupOf_normalizer_eq`)、よって
+`g ∈ N_G(P) ∩ Q`, `g ∉ P` が取れる。`⟨g⟩` を `P` に共役作用させると固定点 (= `C_P(g)`) は非自明
+(p-群作用、`exists_fixed_point_of_prime_dvd_card_of_fixed_point`)、その非単位固定点の適当な冪 `x` は
+位数 `p` で `g` と可換、`x ∈ P ⊆ H` ゆえ `g ∈ C_G(x) ⊆ H`、`g ∈ Q ∩ H = P` で `g ∉ P` に矛盾。 -/
+theorem not_dvd_card_and_index_of_centralizer_le {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    [Finite G] {H : Subgroup G}
+    (hC : ∀ x : G, x ∈ H → orderOf x = p → Subgroup.centralizer {x} ≤ H) :
+    ¬ (p ∣ Nat.card H ∧ p ∣ H.index) := by
+  rintro ⟨hpH, hpI⟩
+  obtain ⟨Q, hPcard⟩ := exists_sylow_inf_card_eq (p := p) H
+  set P : Subgroup G := (Q : Subgroup G) ⊓ H with hPdef
+  have hPQ : P ≤ (Q : Subgroup G) := inf_le_left
+  have hPH : P ≤ H := inf_le_right
+  -- p ∣ |P|、P 非自明
+  have hpP : p ∣ Nat.card ↥P := by
+    rw [hPcard]
+    exact dvd_pow_self p (Nat.Prime.factorization_pos_of_dvd Fact.out (Nat.card_pos).ne' hpH).ne'
+  haveI : Nontrivial ↥P :=
+    Finite.one_lt_card_iff_nontrivial.mp
+      (lt_of_lt_of_le (Fact.out : p.Prime).one_lt (Nat.le_of_dvd Nat.card_pos hpP))
+  -- |P| < |Q|
+  have hlt : Nat.card ↥P < Nat.card ↥(Q : Subgroup G) := by
+    rw [hPcard, Q.card_eq_multiplicity]
+    have hfac : (Nat.card H).factorization p + (H.index).factorization p
+        = (Nat.card G).factorization p := by
+      rw [← Finsupp.add_apply, ← Nat.factorization_mul (Nat.card_pos).ne'
+        Subgroup.index_ne_zero_of_finite, Subgroup.card_mul_index]
+    have hpos : 0 < (H.index).factorization p :=
+      Nat.Prime.factorization_pos_of_dvd Fact.out Subgroup.index_ne_zero_of_finite hpI
+    exact Nat.pow_lt_pow_right (Fact.out : p.Prime).one_lt (by omega)
+  have hPltQ : P < (Q : Subgroup G) :=
+    lt_of_le_of_ne hPQ (fun h => hlt.ne (by rw [h]))
+  -- g ∈ N_G(P) ∩ Q, g ∉ P
+  haveI : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
+  have hlt2 : P.subgroupOf (Q : Subgroup G) < ⊤ := by
+    rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
+    exact fun h => hPltQ.ne (le_antisymm hPQ h)
+  have hnorm := Group.normalizerCondition_of_isNilpotent _ hlt2
+  rw [← Subgroup.subgroupOf_normalizer_eq hPQ] at hnorm
+  obtain ⟨g0, hg0mem, hg0notin⟩ := SetLike.exists_of_lt hnorm
+  set g : G := (g0 : G) with hgdef
+  have hgN : g ∈ Subgroup.normalizer P := Subgroup.mem_subgroupOf.mp hg0mem
+  have hgQ : g ∈ (Q : Subgroup G) := g0.2
+  have hgnotP : g ∉ P := fun h => hg0notin (Subgroup.mem_subgroupOf.mpr h)
+  -- ⟨g⟩ の P への共役作用
+  have hzpN : Subgroup.zpowers g ≤ Subgroup.normalizer P := Subgroup.zpowers_le.mpr hgN
+  have hzpg : IsPGroup p ↥(Subgroup.zpowers g) := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp Q.isPGroup'
+    obtain ⟨k, -, hk⟩ := (Nat.dvd_prime_pow Fact.out).mp
+      (hn ▸ Subgroup.orderOf_dvd_natCard (Q : Subgroup G) hgQ)
+    exact IsPGroup.of_card (by rw [Nat.card_zpowers, hk])
+  letI : MulAction ↥(Subgroup.zpowers g) ↥P :=
+    { smul := fun k y => ⟨(k : G) * (y : G) * (k : G)⁻¹,
+        (Subgroup.mem_normalizer_iff.mp (hzpN k.2) (y : G)).mp y.2⟩
+      one_smul := fun y => by
+        apply Subtype.ext
+        change ((1 : ↥(Subgroup.zpowers g)) : G) * (y : G) * ((1 : ↥(Subgroup.zpowers g)) : G)⁻¹
+          = (y : G)
+        simp
+      mul_smul := fun k₁ k₂ y => by
+        apply Subtype.ext
+        change ((k₁ * k₂ : ↥(Subgroup.zpowers g)) : G) * (y : G)
+            * ((k₁ * k₂ : ↥(Subgroup.zpowers g)) : G)⁻¹
+          = (k₁ : G) * ((k₂ : G) * (y : G) * (k₂ : G)⁻¹) * (k₁ : G)⁻¹
+        simp only [Subgroup.coe_mul]; group }
+  have h1fix : (1 : ↥P) ∈ fixedPoints ↥(Subgroup.zpowers g) ↥P := by
+    rw [mem_fixedPoints]
+    intro k
+    apply Subtype.ext
+    change (k : G) * ((1 : ↥P) : G) * (k : G)⁻¹ = ((1 : ↥P) : G)
+    simp
+  obtain ⟨b, hbfix, hbne⟩ :=
+    hzpg.exists_fixed_point_of_prime_dvd_card_of_fixed_point ↥P hpP h1fix
+  -- b ≠ 1, g と可換
+  have hbcomm : g * (b : G) = (b : G) * g := by
+    have := congrArg Subtype.val (hbfix ⟨g, Subgroup.mem_zpowers g⟩)
+    -- (⟨g,_⟩ • b).1 = b.1 : g * b * g⁻¹ = b
+    have hgbg : g * (b : G) * g⁻¹ = (b : G) := this
+    rw [mul_inv_eq_iff_eq_mul] at hgbg
+    exact hgbg
+  have hbP : (b : G) ∈ (Q : Subgroup G) := hPQ b.2
+  obtain ⟨k, hk⟩ : ∃ k, orderOf (b : G) = p ^ k := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp Q.isPGroup'
+    obtain ⟨k, -, hk⟩ := (Nat.dvd_prime_pow Fact.out).mp
+      (hn ▸ Subgroup.orderOf_dvd_natCard (Q : Subgroup G) hbP)
+    exact ⟨k, hk⟩
+  have hbne1 : (b : G) ≠ 1 := fun h => hbne (Subtype.ext h.symm)
+  have hk1 : 1 ≤ k := by
+    rcases Nat.eq_zero_or_pos k with h | h
+    · exact absurd (orderOf_eq_one_iff.mp (by rw [hk, h, pow_zero])) hbne1
+    · exact h
+  -- x := b^(p^(k-1)) は位数 p
+  set x : G := (b : G) ^ (p ^ (k - 1)) with hxdef
+  have hxord : orderOf x = p := by
+    rw [hxdef, orderOf_pow, hk, Nat.gcd_eq_right (pow_dvd_pow p (Nat.sub_le k 1)),
+      Nat.pow_div (Nat.sub_le k 1) (Fact.out : p.Prime).pos,
+      show k - (k - 1) = 1 from by omega, pow_one]
+  have hxP : x ∈ P := by rw [hxdef]; exact Subgroup.pow_mem P b.2 _
+  -- g ∈ C_G(x) ⊆ H、しかし g ∈ Q ∩ H = P で g ∉ P に矛盾
+  have hgx : g ∈ Subgroup.centralizer {x} := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    rw [Set.mem_singleton_iff] at hy
+    subst hy
+    exact (((show Commute g (b : G) from hbcomm).pow_right (p ^ (k - 1))).symm).eq
+  have hgH : g ∈ H := hC x (hPH hxP) hxord hgx
+  exact hgnotP (Subgroup.mem_inf.mpr ⟨hgQ, hgH⟩)
+
 end
 
 end OddOrder.Isaacs.Ch01
