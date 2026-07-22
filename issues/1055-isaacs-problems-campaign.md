@@ -141,12 +141,20 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - ✅ 実証明 **1D.1** `not_dvd_index_of_sylow_normalizer_le` (`P∈Syl_p(H)`, `H◁G`, `N_G(P)⊆H` ⟹
   `p∤|G:H|`)。Frattini 論法 (`Sylow.normalizer_sup_eq_top`) で `N_G(P)⊔H=⊤`、`N_G(P)≤H` から
   `H=⊤`、`|G:H|=1`。
-- ⬜ **残り §1D**: 1D.2 (C_G(x)⊆H for order-p x ⟹ p∤both) / 1D.3 (Frobenius complement は Hall) /
-  1D.4/1D.5 (Frobenius complement 判定) / **1D.6** (冪零群で極大⟺素数指数) / 1D.7 (Frattini=非生成元) /
-  1D.8 (G/Φ(G) elementary abelian) / 1D.9–1D.17 (Φ・冪零系; mathlib `Group.nilpotent`・`frattini` 支援厚)。
-  多くは mathlib の nilpotent/Frattini API で直接的。文書順で進める。
+- ✅ 実証明 **1D.6** `isCoatom_iff_index_prime` (冪零群で `H` 極大 (coatom) ⟺ `|G:H|` 素数)。
+  `⟹`: 冪零⟹正規化条件 (`Group.normalizerCondition_of_isNilpotent`) で極大は正規、対応定理で `G⧸H`
+  単純 (`comap_injective` で `IsSimpleGroup` 構成)、単純+冪零⟹可換 (mathlib instance)、可換単純は素数
+  位数 (`IsSimpleGroup.prime_card`)。`⟸`: 素数指数 ⟹ `H≠⊤` かつ `H<K` で `K.index∣H.index` 素数ゆえ
+  `K=⊤`。⚠ import 追加 (Nilpotent/Cyclic)、namespace 罠: `MonoidHom.comap_bot`・
+  `Subgroup.NormalizerCondition.normal_of_coatom` (Subgroup namespace 内)。
+- ⏸ **1D.2 後回し (meaty ~80行)**: `C_G(x)⊆H` (order-p `x∈H`) ⟹ `p` は `|H|` と `|G:H|` を同時に
+  割らない。証明計画: `p∣|H|` なら `P∈Syl_p(H)` を `S∈Syl_p(G)` に拡大、`p∣|G:H|` ⟹ `P<S`、
+  `NormalizerCondition ↥S` で `g∈N_S(P)-P`、`⟨g⟩` の `P` への共役作用の固定点 `C_P(g)≠1` (p-群作用計数)、
+  order-p `x∈C_P(g)⊆P⊆H` を Cauchy で取り `g∈C_G(x)⊆H` ⟹ `g∈S∩H=P` 矛盾。
+- ⬜ **残り §1D**: 1D.2 (上記後回し) / 1D.3–1D.5 (Frobenius complement, Ch.6 前方参照концепт) /
+  1D.7 (Frattini=非生成元) / 1D.8–1D.17 (Φ・冪零系; mathlib nilpotent/Frattini API 支援厚)。
 
-- ⬜ **次: §1D 続き (1D.2–) → §1E–§1G**。1C.4/1C.5 は §1C 内後回し (上記)。
+- ⬜ **次: §1D 続き (1D.7 等 mathlib 支援厚のもの、1D.2 は後で) → §1E–§1G**。1C.4/1C.5 は §1C 内後回し。
 
 ## 完了条件
 
