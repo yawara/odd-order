@@ -7,6 +7,9 @@ created: 2026-07-22
 
 # lane c: BS |S|≥16 完成 — 次 frontier 裁定要請
 
+> **CLOSED 2026-07-23**: hub 裁定 (= NearFields Prop 1 transport) を完遂。Prop 1 は Q₈ を除き
+> 完成 (commit `44b8457e1` + `aeb6b6371`)。territory 再枯渇につき後継 = **issue 9407**。
+
 ## 報告: issue 9318 Brauer–Suzuki の主キャンペーン完了 (2026-07-22, lane c)
 
 `brauerSuzuki_of_quaternionSylow` (`GroupTheory/BrauerSuzukiEndgame.lean`) 完成:
