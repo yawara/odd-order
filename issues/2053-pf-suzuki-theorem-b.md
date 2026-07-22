@@ -216,8 +216,17 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     |Z(F*)|=r−1 → |F*/Z(F*)|=4 (quaternion 構造) = r+1 → r=3, |C_Q(P)|=8
     → (4) より |Q|=8^p=|F*|^p... Q₁=1 は |Q|=2^{3p} 2-群化から。
     F の supply = StepTwo `exists_affineNearFieldModel` (9318 sorried-cite)
-    経由 — (5) も 9318 継承。statement 形は AffineNearFieldModel 消費形で
-    設計要 (次 iteration)。
+    経由 — (5) も 9318 継承。statement 形 = AffineNearFieldModel を ∀-model
+    パラメータで消費 (letI-prefix statement)。
+  - **(5) 部品 2 点完了 (2026-07-22, FirstCase/StepFive.lean 新設・root 配線)**:
+    (i) `centralizer_inf_mulEquiv_units` — **C_Q(P) ≅ F*** (書籍の standing
+    identification)。qEquiv ∘ (mk' N の Q⊓C_G(P) への制限)。単射 = N ≤ D_L
+    + Q⊓D=1 (StepThree の ι イディオム)、全射 = Q̄ := map の定義から。
+    (ii) `Q1_eq_bot_of_card_two_pow` — |Q| = 2^n → Q₁ = ⊥。
+    残 = (a) C_Q(P) 非可換 → C_S(P) quaternion order 8 (Suzuki 2-group +
+    higman_classification + 2-rank 1)、(b) F* が指数 2 巡回部分群、
+    (c) App II Prop 2 消費 + |F*/Z(F*)| = 4 = r+1 → r=3 算術、
+    (d) |Q| = 8^p (step (4) + |C_Q(P)|=|F*|=8) → Q₁=⊥ assembly。
 - [ ] (10) Lemma 5 消費の二分岐
 - [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
 - [ ] (13)–(16)
