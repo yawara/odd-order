@@ -392,11 +392,21 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     - endgame_Xset_coherent: reduction (3) 供給 → 𝒳 = XsetOf ⊥ Z coherent。
       Normal 3 点 (Sder/Z/S H-不変を subgroupOf_H_normal_of_conj_mem + conj_mem_sup)。
     - 𝒴 = 𝒮(Q′) coherence = 既存 ssetOf_Qder_coherent 直用 (ラッパー不要)。
-  - [ ] **次 = (4) witness 抽出 + (5)**: witness eᵢ := (𝒳 coh).extension χᵢ,
-    e′ⱼ := (𝒴 coh).extension ηⱼ ∈ ZIrr G、norm-1 (isometry + χᵢ irred) ⟹ ±Irr
-    (mem_ZIrr_inner_self_eq_sum_sq ベース、norm-1⟹±single-Irr 補題を新設)。
+  - [x] **(4) witness 抽出完了** (coherent_extension_eq_zsmul_irr, sorry-free):
+    coherence hcoh + χ ∈ S 既約 ⟹ ∃ ε∈{±1} ξ∈Irr(G): hcoh.extension χ = ε•ξ。
+    ⟨eχ,eχ⟩=1 (extension_inner_eq + IsIrreducibleCharacter.inner_self_eq_one) +
+    eχ∈ZIrr (extension_mem_ZIrr) → **既存** exists_zsmul_irreducibleCharacter_of
+    _inner_self_one (InducedIrreducible.lean:751; norm-1⟹±Irr、新設不要だった)。
+    χ ∈ zSpan S = Submodule.subset_span。eᵢ/e′ⱼ 両方をこれで抽出。
+  - [ ] **次 = (5)** (eᵢ,e′ⱼ)=0。⚠ **crux (2026-07-22 判明)**: eᵢ と e′ⱼ は別
+    extension だが、両 extension は τ = Ind_H^G に **supported difference 上で一致**
+    (extends_on_supported) ゆえ eᵢ−aᵢe₁ = τ(χᵢ−aᵢχ₁), e′ⱼ−e′₁ = τ(ηⱼ−η₁)。
+    τ が ℤ[𝒮]° 上 **大域等長** (Lemma 2(b)、hyp.tau の isometry) なら
+    ⟨eᵢ−aᵢe₁, e′ⱼ−e′₁⟩ = ⟨χᵢ−aᵢχ₁, ηⱼ−η₁⟩ = 0 (𝒳∩𝒴=∅ + 相異既約直交) が (5) の起点。
+    **要調査: hyp.tau の大域等長性 (ℤ[𝒮]° 上) の repo 内所在** (extension_inner_eq は
+    lattice-relative なので、cross-family には τ 自体の等長性が要る)。無ければ
+    Lemma 2(b) 側で供給されているはず (tau_inner_eq 系を grep)。
     aᵢ := χᵢ(1)/χ₁(1) (exists_apply_one_eq_d_mul_pow の p-冪)。
-    ⚠ eᵢ と e′ⱼ は別 extension ゆえ (5)(6) で両立性を示して単一 extension に統合。
   - [ ] **(5)** (eᵢ,e′ⱼ)=0: λ:=(eᵢ−aᵢe₁,e′₁)=(eᵢ−aᵢe₁,e′₂)≠0 と仮定 → aᵢ=1,
     λ=±1, eᵢ−e₁=λ(e′₁+e′₂) → degree-0 で e′₁(1)=0 矛盾 (inner-product manip)。
   - [ ] **(6) 本体**: Ind(χ₁−aη₁)=−a·e′₁+λΣe′ᵢ+v、(v,e′ᵢ)=0 → norm 展開で
