@@ -466,6 +466,56 @@ theorem theta_inner_self [Fintype ↥Q.N] [Invertible (Nat.card ↥Q.N : ℂ)]
       (mem_irreducibleCharacters.mpr hirr) (mem_irreducibleCharacters.mpr hirr), if_pos rfl]
   rw [hTT, hTP, hPT, hPP]; norm_num
 
+/-! ### The induced character `θ* = Ind_N^G θ` (Gorenstein Lemma 1.5, analytic part) -/
+
+/-- **`θ* = Ind_N^G θ`** (Gorenstein Lemma 1.5): the `TI`-induction of `θ` to the whole
+group `G`.  Since `A = C − RH` is a TI-subset with normalizer-bound `N` and `θ` vanishes off
+`A`, this induction is an isometry on `θ`. -/
+noncomputable def thetaStar [Fintype G] [Fintype ↥Q.N]
+    [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    ClassFunction G ℂ :=
+  ClassFunction.induce Q.N Q.theta
+
+/-- `θ` vanishes off `A` (packaged for the TI isometry). -/
+theorem theta_vanishes_off_A [Fintype ↥Q.N]
+    [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    ∀ x : ↥Q.N, (x : G) ∉ Q.A → Q.theta x = 0 :=
+  fun _ hx => Q.theta_apply_eq_zero_of_notMem_A hx
+
+/-- **`(θ*, θ*)_G = 3`** (Gorenstein Lemma 1.5): the TI-induction isometry
+(`inner_induce_eq_of_isTISubset`) carries `(θ,θ)_N = 3` to `G`. -/
+theorem thetaStar_inner_self [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    ClassFunction.inner Q.thetaStar Q.thetaStar = 3 := by
+  rw [thetaStar, ClassFunction.inner_induce_eq_of_isTISubset Q.N Q.A_isTISubset
+    Q.theta_vanishes_off_A Q.theta_vanishes_off_A, Q.theta_inner_self]
+
+/-- **`θ*(1) = 0`** (Gorenstein Lemma 1.5): `θ*(1) = [G:N]·θ(1) = 0`. -/
+theorem thetaStar_apply_one [Fintype G] [Fintype ↥Q.N]
+    [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    Q.thetaStar (1 : G) = 0 := by
+  rw [thetaStar, ClassFunction.induce_apply_one, Q.theta_apply_one, mul_zero]
+
+/-- **`(θ*, 1_G)_G = 1`** (Gorenstein Lemma 1.5): Frobenius reciprocity reduces this to
+`(θ, 1_N)_N = (Ind 1_C, 1_N) − (Ind ψ, 1_N) = 1 − 0 = 1`. -/
+theorem thetaStar_inner_trivial [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    ClassFunction.inner Q.thetaStar (trivialClassFunction G) = 1 := by
+  haveI : Fintype ↥(Q.C.subgroupOf Q.N) := Fintype.ofFinite _
+  rw [thetaStar, ClassFunction.induce_inner_trivial, theta, ClassFunction.inner_sub_left]
+  -- (Ind 1_C, 1_N) = 1, (Ind ψ, 1_N) = 0
+  have hT : ClassFunction.inner
+      (ClassFunction.induce (Q.C.subgroupOf Q.N) (trivialClassFunction _))
+      (trivialClassFunction ↥Q.N) = 1 := by
+    rw [ClassFunction.induce_inner_trivial, OddOrder.RepresentationTheory.irr_cf_inner
+      trivialClassFunction_isIrreducible trivialClassFunction_isIrreducible, if_pos rfl]
+  have hP : ClassFunction.inner (ClassFunction.induce (Q.C.subgroupOf Q.N) Q.psiN)
+      (trivialClassFunction ↥Q.N) = 0 := by
+    rw [ClassFunction.induce_inner_trivial, OddOrder.RepresentationTheory.irr_cf_inner
+      (mem_irreducibleCharacters.mpr Q.psiN_isIrr) trivialClassFunction_isIrreducible,
+      if_neg Q.psiN_ne_trivial]
+  rw [hT, hP, sub_zero]
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory
