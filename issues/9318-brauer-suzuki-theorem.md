@@ -116,3 +116,14 @@ Setup: `x` = S の指数 2 巡回部分群の生成元、`X = ⟨x⟩`, `T = ⟨
    ChatGPT 再構成ルート ([[feedback-ask-chatgpt-for-elided-gaps]])。**ここだけが真の
    research-adjacent gap**。
 4. 統合 → `rankOne_affine_nearField` の sorry 解消。
+
+## 進捗 (2026-07-22, lane c)
+
+- ✅ **cyclic case** (`BrauerSuzuki.lean` `brauerSuzuki_of_isCyclic_sylowTwo`)。
+- ✅ **quaternion setup** (`BrauerSuzukiSetup.lean`): presentation → S = X ∪ X·y、
+  unique involution z、T ⊴ S、S ∩ C = X。
+- ✅ **Gorenstein Lem 1.2** (`BrauerSuzukiNormalizer.lean`): X = C の cyclic Sylow-2、
+  Burnside 2-補群 H (= C の奇数位数元全体、choice 非依存)、**C = XH**、H ⊴ N、
+  **N = SH**。全て axiom-clean + AxiomsCheck 登録。
+- 次 = **Lem 1.3** (A = C − RH の TI 性、N_G(A) = N) → Lem 1.4 の指標構成
+  (ψ: C の線形指標 RH ⊆ ker、ψ̃ = ψ↑N 既約 deg 2、θ = 1_C↑N − ψ̃ norm 3)。

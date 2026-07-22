@@ -9,6 +9,7 @@ import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.GroupTheory.BrauerSuzukiSetup
+import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Mathlib.QuotientGroup
@@ -12165,3 +12166,25 @@ deliberately NOT asserted here.) -/
 `y ∉ ⟨x⟩` は導出 (`y_notMem_zpowers_x`)、`mem_iff` = 剰余類分解 `S = X ∪ X·y`。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.mem_iff
 #assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.y_notMem_zpowers_x
+
+/-! **Brauer–Suzuki, Gorenstein Ch.12 Lemma 1.2 — COMPLETE**
+(`GroupTheory.BrauerSuzukiNormalizer`, issue 9318, 2026-07-22).  `T = ⟨x²⟩`,
+`C = C_G(T)`, `N = N_G(T)` について:
+
+* `two_not_dvd_relIndex_C` / `exists_sylow_C_eq` — `X = S ∩ C` は `C` の cyclic
+  Sylow `2` (hoist した `sylow_relIndex_normal_not_dvd` を `N` 内で適用)。
+* `exists_normal_two_complement` — Burnside (mathlib `IsCyclic.isComplement'`) の
+  正規 2-補群、membership = 「奇数位数」で choice 非依存に特徴付け。
+* `X_sup_H_eq_C` — **Lem 1.2(ii) `C = XH`**。`mem_C_of_odd_of_mem_N` — 奇数位数元は
+  `T` を中心化 (`N/C ↪ Aut(T)` が 2-群; G Lemma 5.4.1 相当)。
+* `S_sup_H_eq_N` — **Lem 1.2(i) `N = SH`**: `N/H` に奇素数位数元が無い (p-part
+  持ち上げ) → Sylow 像の index が奇数かつ 2-冪 → 1 → comap で `S ⊔ H = N`。 -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.two_not_dvd_relIndex_C
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.exists_sylow_C_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.exists_normal_two_complement
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.X_sup_H_eq_C
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.mem_C_of_odd_of_mem_N
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.S_sup_H_eq_N
