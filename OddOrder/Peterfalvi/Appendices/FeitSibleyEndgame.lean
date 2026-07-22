@@ -652,6 +652,142 @@ theorem tau_scaled_diff_inner_extension_diff [Finite G]
     ((hYS hη₁Y).1).inner_self_eq_one]
   ring
 
+/-- **Peterfalvi (6), the `λ`-form norm identity** (p. 148): for `δ = χ − a·η₁`
+(`χ ∈ 𝒮 ∖ 𝒴` of degree `a·d`), the Fourier coefficients of `u = Ind δ` along the
+witnesses `e'ⱼ` are `λ` at every `ηⱼ ≠ η₁` and `λ − a` at `η₁`, and the Bessel
+decomposition of `(u, u) = 1 + a²` gives the integer identity
+`1 + a² = (v,v) + (λ−a)² + (m−1)·λ²` with `(v,v) ≥ 0` and `m = |𝒴|`.
+Combining with `a ∣ λ` (from (7)/(8)) this feeds
+`x_eq_zero_or_x_one_of_norm_identity`. -/
+theorem exists_lambda_norm_identity [Finite G]
+    {Y : Set (ClassFunction ↥hyp.H ℂ)} (hYS : Y ⊆ hyp.Sset)
+    (hcohY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau Y hyp.A)
+    {χ : ClassFunction ↥hyp.H ℂ} (hχS : χ ∈ hyp.Sset) (hχY : χ ∉ Y)
+    {η₁ : ClassFunction ↥hyp.H ℂ} (hη₁Y : η₁ ∈ Y) {a : ℕ}
+    (hsupp : χ - a • η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+      hyp.Sset hyp.A)
+    (hYdiff : ∀ ψ ∈ Y, ψ - η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+      Y hyp.A) :
+    ∃ lam : ℤ,
+      (∀ η ∈ Y, η ≠ η₁ →
+        ClassFunction.inner (hyp.tau (χ - a • η₁)) (hcohY.extension η) = (lam : ℂ)) ∧
+      ClassFunction.inner (hyp.tau (χ - a • η₁)) (hcohY.extension η₁) = (lam : ℂ) - a ∧
+      ∃ nvv : ℤ, 0 ≤ nvv ∧
+        1 + (a : ℤ) ^ 2 = nvv + (lam - a) ^ 2 + ((Y.ncard : ℤ) - 1) * lam ^ 2 := by
+  classical
+  have hYfin : Y.Finite := hyp.Sset_finite.subset hYS
+  set s : Finset (ClassFunction ↥hyp.H ℂ) := hYfin.toFinset with hs
+  have hmem : ∀ {η : ClassFunction ↥hyp.H ℂ}, η ∈ s ↔ η ∈ Y := fun {η} =>
+    Set.Finite.mem_toFinset hYfin
+  set u : ClassFunction G ℂ := hyp.tau (χ - a • η₁) with hu
+  have huZ : u ∈ ZIrr G := hyp.tau_mem_ZIrr hsupp.1
+  -- orthonormality of the `𝒴`-witnesses
+  have horth : ∀ i ∈ s, ∀ j ∈ s, i ≠ j →
+      ClassFunction.inner (hcohY.extension i) (hcohY.extension j) = 0 := by
+    intro i hi j hj hne
+    rw [hcohY.extension_inner_eq i j (Submodule.subset_span (hmem.mp hi))
+      (Submodule.subset_span (hmem.mp hj))]
+    exact hyp.Sset_pairwiseOrthogonal (hYS (hmem.mp hi)) (hYS (hmem.mp hj)) hne
+  have hnorm : ∀ j ∈ s, ClassFunction.inner (hcohY.extension j) (hcohY.extension j) = 1 := by
+    intro j hj
+    rw [hcohY.extension_inner_eq j j (Submodule.subset_span (hmem.mp hj))
+      (Submodule.subset_span (hmem.mp hj))]
+    exact ((hYS (hmem.mp hj)).1).inner_self_eq_one
+  -- integrality of the Fourier coefficients
+  have hint : ∀ η, η ∈ Y → ∃ t : ℤ,
+      ClassFunction.inner u (hcohY.extension η) = (t : ℂ) := by
+    intro η hη
+    obtain ⟨ε, ξ, hε, hE⟩ := hyp.coherent_extension_eq_zsmul_irr hcohY hη (hYS hη).1
+    obtain ⟨t0, ht0⟩ := mem_ZIrr_inner_int ξ huZ
+    refine ⟨ε * t0, ?_⟩
+    rw [hE, ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ),
+      ClassFunction.inner_smul_right, star_intCast, ht0]
+    push_cast
+    ring
+  choose tz htz using hint
+  set c : ClassFunction ↥hyp.H ℂ → ℤ := fun η => if h : η ∈ Y then tz η h else 0 with hcdef
+  have hc : ∀ η (hη : η ∈ Y),
+      ClassFunction.inner u (hcohY.extension η) = (c η : ℂ) := by
+    intro η hη
+    rw [hcdef]
+    simp only [dif_pos hη]
+    exact htz η hη
+  -- the common `λ`
+  refine ⟨c η₁ + a, ?_, ?_, ?_⟩
+  · -- coefficient at `η ≠ η₁`
+    intro η hη hne
+    have h6a := hyp.tau_scaled_diff_inner_extension_diff hYS hcohY hχS hχY hη₁Y hsupp hη
+      hne (hYdiff η hη)
+    rw [ClassFunction.inner_sub_right, ← hu] at h6a
+    rw [sub_eq_iff_eq_add.mp h6a, hc η₁ hη₁Y]
+    push_cast
+    ring
+  · -- coefficient at `η₁`
+    rw [hc η₁ hη₁Y]
+    push_cast
+    ring
+  · -- the Bessel identity
+    have hη₁s : η₁ ∈ s := hmem.mpr hη₁Y
+    have hBessel := inner_self_eq_residual_add_sum_inner_mul_star horth hnorm u
+    -- left side: `(u,u) = 1 + a²`
+    have hχη₁ : χ ≠ η₁ := fun h => hχY (h ▸ hη₁Y)
+    have huu : ClassFunction.inner u u = 1 + (a : ℂ) ^ 2 := by
+      rw [hu]
+      exact hyp.tau_scaled_diff_inner_self hχS (hYS hη₁Y) hχη₁ hsupp
+    rw [huu] at hBessel
+    -- rewrite the residual with integer coefficients
+    have hsum_eq : ∑ η ∈ s, ClassFunction.inner u (hcohY.extension η) • hcohY.extension η
+        = ∑ η ∈ s, ((c η : ℂ)) • hcohY.extension η :=
+      Finset.sum_congr rfl fun η hη => by rw [hc η (hmem.mp hη)]
+    rw [hsum_eq] at hBessel
+    -- the residual is a virtual character, so its self-pairing is a sum of squares
+    have hvZ : u - ∑ η ∈ s, ((c η : ℂ)) • hcohY.extension η ∈ ZIrr G := by
+      refine Submodule.sub_mem _ huZ (Submodule.sum_mem _ fun η hη => ?_)
+      rw [Int.cast_smul_eq_zsmul]
+      exact Submodule.smul_mem _ _
+        (hcohY.extension_mem_ZIrr η (Submodule.subset_span (hmem.mp hη)))
+    obtain ⟨cf, -, -, hvv⟩ := mem_ZIrr_inner_self_eq_sum_sq hvZ
+    refine ⟨∑ α ∈ cf.support, (cf α) ^ 2,
+      Finset.sum_nonneg fun α _ => sq_nonneg _, ?_⟩
+    -- the coefficient sum: `η₁`-term plus `(m−1)` copies of `λ²`
+    have hsum_coeff : ∑ η ∈ s, ClassFunction.inner u (hcohY.extension η) *
+        star (ClassFunction.inner u (hcohY.extension η)) =
+        ((c η₁ : ℂ)) ^ 2 + ((s.card : ℂ) - 1) * ((c η₁ : ℂ) + a) ^ 2 := by
+      rw [← Finset.add_sum_erase s _ hη₁s, hc η₁ hη₁Y, star_intCast]
+      congr 1
+      · ring
+      · have herase : ∀ η ∈ s.erase η₁,
+            ClassFunction.inner u (hcohY.extension η) *
+              star (ClassFunction.inner u (hcohY.extension η)) =
+            ((c η₁ : ℂ) + a) ^ 2 := by
+          intro η hη
+          obtain ⟨hne, hηs⟩ := Finset.mem_erase.mp hη
+          have h6a := hyp.tau_scaled_diff_inner_extension_diff hYS hcohY hχS hχY hη₁Y
+            hsupp (hmem.mp hηs) hne (hYdiff η (hmem.mp hηs))
+          rw [ClassFunction.inner_sub_right, ← hu] at h6a
+          rw [sub_eq_iff_eq_add.mp h6a, hc η₁ hη₁Y]
+          rw [show ((a : ℂ)) + (c η₁ : ℂ) = (((c η₁ : ℤ) + (a : ℤ) : ℤ) : ℂ) by push_cast; ring,
+            star_intCast]
+          push_cast
+          ring
+        rw [Finset.sum_congr rfl herase, Finset.sum_const, Finset.card_erase_of_mem hη₁s,
+          nsmul_eq_mul]
+        rw [Nat.cast_sub (Finset.card_pos.mpr ⟨η₁, hη₁s⟩)]
+        push_cast
+        ring
+    rw [hsum_coeff, hvv] at hBessel
+    -- cast the `ℂ`-identity down to `ℤ`
+    have hcardN : Y.ncard = s.card := by
+      rw [hs]
+      exact Set.ncard_eq_toFinset_card Y hYfin
+    have hZidentity : ((1 + (a : ℤ) ^ 2 : ℤ) : ℂ) =
+        ((∑ α ∈ cf.support, (cf α) ^ 2 + ((c η₁ + a) - a) ^ 2 +
+          ((Y.ncard : ℤ) - 1) * (c η₁ + a) ^ 2 : ℤ) : ℂ) := by
+      rw [hcardN]
+      push_cast
+      linear_combination hBessel
+    exact_mod_cast hZidentity
+
 end Coherence
 
 end Hypothesis
