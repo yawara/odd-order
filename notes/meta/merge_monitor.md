@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 04:3x 監視 tick — a (1D.8 abelian) 合流 / b WIP / 🔴 c stall 継続**。a=1 / b=0(WIP) / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.8 (abelian part)** — nilpotent G で [G,G] ⊆ Φ(G)、`ProblemsFrobeniusFrattini.lean` +22)。
+> **gate: green 4657 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push f4a4090cb→b185c4ade**。範囲逸脱なし。
+> ℹ **b WIP (合流なし)**: b は新 leaf `ExponentFourJacobi.lean` を作成中 + `HigmanLemmaThirteen.lean` 編集中 (未 commit)。次 tick で commit 見込み、配線 (orphan) は merge 前に確認する。
+> 🔴 **lane c stall 継続 (未復帰)**: 04:37 時点も worktree 更新ゼロ (03:04 以降)。ユーザーの c 再起動待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
 > **▶▶ 2026-07-23 04:2x 監視 tick — a (1D.16) + b (9319 graded Jacobi 証明) 合流 / 🔴 c stall 継続**。a=2 / b=2 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problem 1D.16** — 正規部分群 N で Φ(N) ⊆ Φ(G)、`ProblemsFrobeniusFrattini.lean` +50) / b (**issue 9319 lower-central graded Jacobi を実証明 + claim close** — `HigmanLowerCentralDegreeThree.lean` +121 / `HigmanLowerCentralGraded.lean` +18 (既存 leaf 拡張・新 leaf 0) + Assembly.lean −18 refactor)。
 > **gate: green 4657 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 01bf4c429→017e2b9ee**。範囲逸脱なし。9319 は b band (9300) の shared-infra claim を実証明で満たし closed/ へ。
