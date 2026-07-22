@@ -132,8 +132,10 @@ Setup: `x` = S の指数 2 巡回部分群の生成元、`X = ⟨x⟩`, `T = ⟨
   (同位数部分群一意性)・`le_of_le_zpowers_of_card_dvd`(入れ子)・
   `zpowers_eq_of_mem_of_orderOf_eq`。axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
   → 下流 Lem 1.4 の induced-character 等長 `inner_induce_eq_of_isTISubset` が直接消費可能。
-  - **残** (Lem 1.3 の完全等式 `N = N_G(A)`、Lem 1.4 の等長には不要ゆえ低優先): `N ≤ N_G(A)`
-    (A の N-不変性、要 `R ⊴ N` = R char T ⊴ N を一意性で) + `N_G(A) ≤ N` (要 A 非空 = RH ⊊ C の
-    積位数 |RH|=|R||H| < |X||H|=|C|)。
+- ✅ **`N ≤ N_G(A)`** (`conj_mem_A_of_mem_N`): N は A = C−RH を正規化。核心 = `map_R_conj_of_mem_N`
+  (R char T ⊴ N を cyclic 一意性で `R.map (conj n) = R`) + `map_H_conj_of_mem_N` → `RH ⊴ N`。
+  axiom-clean。これで **「A は N-不変な TI-subset (normalizer-bound N)」= Lem 1.3 の使用可能内容が完成**。
+  - **残** (完全等式 `N = N_G(A)` の残る片方向 `N_G(A) ≤ N`、Lem 1.4 には不要ゆえ低優先繰延):
+    A 非空 (RH ⊊ C)。C/H 商での位数論法 (mk x の位数 = 2ⁿ、z∉H) or 積位数 |RH|=|R||H|<|C| が必要。
 - 次 = **Lem 1.4** の指標構成 (ψ: C の線形指標 RH ⊆ ker、ψ̃ = ψ↑N 既約 deg 2、
   θ = 1_C↑N − ψ̃ norm 3)。TI 集合 A + 等長 lemma は形式化済。

@@ -358,6 +358,52 @@ theorem A_isTISubset : IsTISubset Q.A Q.N := by
   rw [N, mem_normalizer_iff_map_conj_eq]
   exact hmapeq
 
+/-! ### `N` normalizes `A` (Lemma 1.3, the `N ≤ N_G(A)` direction) -/
+
+/-- Conjugation by `N` preserves `T` (`N = N_G(T)`). -/
+theorem conj_mem_T_of_mem_N {n t : G} (hn : n ∈ Q.N) (ht : t ∈ Q.T) : n * t * n⁻¹ ∈ Q.T := by
+  rw [N, Subgroup.mem_normalizer_iff] at hn
+  exact (hn t).mp ht
+
+/-- **`N` normalizes `R`** (Gorenstein p. 374): `R` is the unique subgroup of order `2ⁿ⁻²`
+of the cyclic group `T = ⟨x²⟩`, and `N` normalizes `T`, so `n·R·n⁻¹ = R`. -/
+theorem map_R_conj_of_mem_N {n : G} (hn : n ∈ Q.N) : Q.R.map (MulAut.conj n) = Q.R := by
+  refine eq_of_le_zpowers_of_card_eq (a := Q.x ^ (2 : ℕ)) ?_ Q.R_le_T ?_
+  · rintro _ ⟨r, hr, rfl⟩
+    change n * r * n⁻¹ ∈ Q.T
+    exact Q.conj_mem_T_of_mem_N hn (Q.R_le_T hr)
+  · exact Nat.card_congr
+      (Subgroup.equivMapOfInjective Q.R _ (MulAut.conj n).injective).symm.toEquiv
+
+/-- **`N` normalizes `H`** (`H ⊴ N`, group-of-conjugates form). -/
+theorem map_H_conj_of_mem_N {n : G} (hn : n ∈ Q.N) : Q.H.map (MulAut.conj n) = Q.H := by
+  apply le_antisymm
+  · rintro _ ⟨h, hh, rfl⟩
+    change n * h * n⁻¹ ∈ Q.H
+    exact Q.conj_mem_H_of_mem_N hn hh
+  · intro h hh
+    refine ⟨n⁻¹ * h * n⁻¹⁻¹, Q.conj_mem_H_of_mem_N (inv_mem hn) hh, ?_⟩
+    change n * (n⁻¹ * h * n⁻¹⁻¹) * n⁻¹ = h
+    group
+
+/-- **`N` normalizes `RH`** (Gorenstein p. 374): `RH = R ⊔ H` with `R, H` both `N`-invariant. -/
+theorem map_RH_conj_of_mem_N {n : G} (hn : n ∈ Q.N) : Q.RH.map (MulAut.conj n) = Q.RH := by
+  rw [RH, Subgroup.map_sup, Q.map_R_conj_of_mem_N hn, Q.map_H_conj_of_mem_N hn]
+
+theorem conj_mem_RH_of_mem_N {n w : G} (hn : n ∈ Q.N) (hw : w ∈ Q.RH) : n * w * n⁻¹ ∈ Q.RH := by
+  have h : n * w * n⁻¹ ∈ Q.RH.map (MulAut.conj n) := ⟨w, hw, rfl⟩
+  rwa [Q.map_RH_conj_of_mem_N hn] at h
+
+/-- **Gorenstein Lemma 1.3 (`N ≤ N_G(A)`)**: `N` normalizes `A = C − RH`, since it
+normalizes both `C` and `RH`. -/
+theorem conj_mem_A_of_mem_N {n a : G} (hn : n ∈ Q.N) (ha : a ∈ Q.A) : n * a * n⁻¹ ∈ Q.A := by
+  obtain ⟨haC, haRH⟩ := ha
+  refine ⟨Q.conj_mem_C_of_mem_N hn haC, ?_⟩
+  intro hmem
+  refine haRH ?_
+  have h := Q.conj_mem_RH_of_mem_N (inv_mem hn) hmem
+  rwa [show n⁻¹ * (n * a * n⁻¹) * (n⁻¹)⁻¹ = a from by group] at h
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory
