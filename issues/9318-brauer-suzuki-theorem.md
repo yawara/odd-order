@@ -257,15 +257,35 @@ Gorenstein Lem 1.7 の**純群論核心**を完成 (axiom-clean、AxiomsCheck �
 - setup 確認済: `QuaternionSylowSetup` は `S : Sylow 2 G` を posit ゆえ全 Sylow-2 が S 共役で
   unique involution。原文の「z 個別 Klein-four」議論より `commute_involution_eq` 汎用形が簡潔だった。
 
-### Lem 1.8/1.9 + endgame 計画 (次 frontier、Gorenstein Ch.12 p.376-377)
+### Lem 1.8 導出経路確定 (2026-07-22 lane c、⚠ class-summed 版で per-element β を回避)
 
-- **β(y) の定義**と (1.1)=(9.4.2) 構造定数公式 `β(y) = |G|/|C_G(u)|²·Σᵢ ζᵢ(u)²ζᵢ(y)/ζᵢ(1)`
-  (`ClassSumCoefficientFormula.lean` = `classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter`
-  との接続)。involution は G に唯一の共役類 K (全 Sylow-2 が unique involution + Sylow 定理)。
-- **Lem 1.8**: β(y)·θ*(y)=0 (Lem 1.6 で odd/involution 側 θ*=0、Lem 1.7 で even 側 β=0) +
-  直交性 → `1 + χ₁(u)²/χ₁(1) − χ(u)²/χ(1) = 0`。
-- **Lem 1.9**: χ₁(u)=χ(u)−1, χ₁(1)=χ(1)−1 代入 → `(χ(u)−χ(1))²=0` → 全 involution ⊆ ker χ、
-  χ 非線形 (χ(1)=1+χ₁(1)≥2)。
+**核心洞察**: Gorenstein は per-element β(y) を使うが、`classSumCoeff` (= 共役類 Cs 全体で和を
+取った版、`ClassSumCongruence.lean` 定義 = #{(u,v): u,v∈K, uv∈Cs}) で書き換えると per-element β
+の定義を回避でき、既存の `classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter`
+(`ClassSumCoefficientFormula.lean`) を直接使える。導出:
+
+1. **K := ConjClasses.mk Q.z** = involution 共役類。`mk u = K ↔ orderOf u = 2`
+   (`isConj_of_orderOf_eq_two` + `exists_conj_eq_z` + `orderOf z = 2`)。要 `orderOf_z` 補題。
+2. **`classSumCoeff K K Cs · θ*(Cs.out) = 0`** (各 Cs): Cs.out が奇数位数 → θ*(Cs.out)=0
+   (Lem 1.6 `thetaStar_apply_eq_zero_of_odd`); 偶数位数 → **classSumCoeff K K Cs = 0**
+   (`odd_orderOf_mul_of_involution`: u,v∈K involution ⟹ uv 奇数位数 ⟹ uv∉Cs、filter 空)。
+   → **要 `classSumCoeff_eq_zero_of_even_order` 補題**。
+3. **(9.4.2) 代入**: `classSumCoeff K K Cs · |C_G(Cs.out)| = Σ_χ (|K|χ(u))²/χ(1) · χ(Cs.out⁻¹)`
+   (Ci=Cj=K)。両辺に θ*(Cs.out)/|C_G(Cs.out)| を掛け Cs で和 → 左辺 0 (step 2)。
+4. **重複度 collapse**: 右辺 = Σ_χ (|K|χ(u))²/χ(1) · [Σ_Cs χ(Cs.out⁻¹)θ*(Cs.out)/|C_G(Cs.out)|]。
+   内側 = (1/|G|)Σ_{y∈G} χ(y⁻¹)θ*(y) = ⟨θ*, χ⟩ = χ の θ* 内重複度 (θ*=1_G+χ₁−χ より
+   1_G:+1, χ₁:+1, χ:−1, 他:0)。→ |K|²(1 + χ₁(u)²/χ₁(1) − χ(u)²/χ(1)) = 0。
+   **要**: ⟨θ*, χ⟩ の値 (既存 `thetaStar_decomposition` + 内積 API) と Σ_Cs → Σ_{y∈G} の
+   class-function 和の変換 (`|Cs| = |G|/|C_G|`、既存 conjugacy sum API を要調査)。
+5. **Lem 1.8**: |K|²≠0 で割り `1 + χ₁(u)²/χ₁(1) − χ(u)²/χ(1) = 0`。
+
+⚠ step 4 の Σ_Cs ↔ Σ_{y∈G} 変換 (class 和) と ⟨θ*,χ⟩ 抽出が最難所。既存の column/row 直交
+API (`ColumnOrthogonality.lean`) と inner product 定義の接続を精査してから着手。
+
+### Lem 1.9 + endgame 計画 (Gorenstein Ch.12 p.376-377)
+
+- **Lem 1.9**: χ₁(u)=χ(u)−1, χ₁(1)=χ(1)−1 (Lem 1.5/1.6) 代入 → `(χ(u)−χ(1))²=0` → χ(u)=χ(1)
+  → 全 involution ⊆ ker χ、χ 非線形 (χ(1)=1+χ₁(1)≥2)。純代数 (分母払い + omega/ring)。
 - **endgame** (純群論): M=⟨involutions⟩⊴G、Q=S∩M cyclic (さもなくば非線形指標が線形化し矛盾)
   → Burnside 2-補群 L⊴G → KQ⊴G (K=O_{2'}) → Ḡ=G/K で Ω₁(Q̄)=Z(Ḡ) 位数 2。□
 
