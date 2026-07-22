@@ -33,8 +33,6 @@ set_option autoImplicit false
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
-open Finset
-
 /-- **[HB] Kapitel IX, Lemma 2.7** (arithmetic): if `f` is odd and
 `f ^ a = 2 ^ b + 1` with `b ≥ 1`, then `a = 1` or `f ^ a = 9`.
 
@@ -138,3 +136,5 @@ theorem eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one {f a b : ℕ}
   -- `f^a = f^(2c) = (f^c)^2 = g^2 = 9`
   rw [mul_comm 2 c, pow_mul, ← hgdef, hg3]
   norm_num
+
+end OddOrder.Peterfalvi.Appendices.Suzuki

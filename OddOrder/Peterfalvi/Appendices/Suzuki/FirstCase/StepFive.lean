@@ -497,7 +497,7 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
         exact Subgroup.card_subgroup_dvd_card _
       have hk2 : k ≤ 2 := by
         by_contra hk3
-        push_neg at hk3
+        push Not at hk3
         have h8dvd : (2 : ℕ) ^ 3 ∣ 4 * Nat.card ↥O := by
           refine dvd_trans (pow_dvd_pow 2 hk3) ?_
           rw [← hk]
@@ -633,7 +633,7 @@ theorem exists_noncommuting_two_elements_of_nearField_units {F : Type*}
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨O, T, -, -, -, -, -, -, hTnc⟩ :=
     exists_nilpotent_units_sylowTwo_decomp hnil hnc
-  push_neg at hTnc
+  push Not at hTnc
   obtain ⟨a, b, hab⟩ := hTnc
   refine ⟨(a : Fˣ), (b : Fˣ), ?_, ?_, ?_⟩
   · obtain ⟨k, hk⟩ := (IsPGroup.iff_orderOf.mp T.isPGroup') a
@@ -665,7 +665,7 @@ surjective because `Q̄` is by definition the image of `Q ⊓ C_G(P)`. -/
 theorem centralizer_inf_mulEquiv_units :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ∀ {F : Type uG} [NearFields.NearField F]
-      (model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
+      (_model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
       Nonempty
         (↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) ≃* Fˣ) := by
   letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
@@ -788,7 +788,7 @@ the Higman `sorry` (`pow_four_eq_one_of_isSuzuki2Group`, tracked in 2053). -/
 theorem card_nearField_eq_nine_and_Q1_eq_bot :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ∀ {F : Type uG} [NearFields.NearField F]
-      (model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
+      (_model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
       (∀ x y : F, x * y = y * x) ∨
         (Nat.card F = 9 ∧
           Nat.card ↥(fc.toHypothesis.Q ⊓
