@@ -23,8 +23,12 @@ self-contained / 証明が難しく mathlib 未収録。詳細と全候補は正
 
 ## やること
 
-- [ ] **🆕 (提案) Glauberman ZJ 定理** — 2026-07-22 完成 (`GlaubermanZJ.lean`、伝説級・mathlib/eval
-      双方に無い)。⚠ AxiomsCheck 未登録 → 提出前に `#print axioms` で axiom-clean 確定
+- [x] **(整備 2026-07-22) AxiomsCheck 未登録の strong 候補 10 件を登録** — ZJ / Replacement /
+      Galois–Burnside / Ch08 Jordan / PSL 単純性 / `isCritical_exists` / `transfer_transfer` /
+      Ch01 Fitting 冪零性・最大性 / `span_range_representation_eq_top`。`lake build
+      OddOrder.AxiomsCheck` green (全件 allowlist の 3 公理のみ)。提出前の手動 `#print axioms` が不要に
+- [ ] **🆕 (提案) Glauberman ZJ 定理** — 2026-07-22 完成・AxiomsCheck 登録済
+      (`Subgroup.oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian`、伝説級・mathlib/eval 双方に無い)
 - [ ] **🆕 (提案) B.H.Neumann 位数 3** (`lowerCentralSeries_two_eq_bot_of_fixedPointFree_orderOf_eq_three`、
       登録済・bespoke≈0) + **一般 Hall–Petresco** (`HallPetresco.exists_hallPetresco`、登録済、旧 class≤3 を差替)
 - [ ] **🎯 (解答) `brauer_suzuki` = issue 9318 完走** — Tier B 唯一の「既存未解決を解答」経路 (≈38%、lane c)
@@ -32,9 +36,6 @@ self-contained / 証明が難しく mathlib 未収録。詳細と全候補は正
       `lake exe lean-eval validate-manifest` + `check-problem-build` で検証してから PR
 - [ ] **(提案) Chermak–Delgado / Furtwängler / Thompson FPF-nilpotency** を続けて提案 PR。
       提案先 merge、solver は他者開放 (`feit_thompson` 前例)
-- [ ] **(整備) AxiomsCheck 未登録の strong 候補を登録** — ZJ / Replacement / Galois–Burnside /
-      Ch08 Jordan / PSL 単純性 / `isCritical_exists` / `transfer_transfer` / Ch01 Fitting /
-      `span_range_representation_eq_top` (いずれも `#print axioms` で clean 実測済)
 - [ ] **(整備) stale docstring 掃除** — `burnside_p_pow_q_pow`「local axiom 封じ込め」/
       `Ch07.normal_J`「Remaining local axioms」/ `AppC_NormSet`「to be formalized」/
       `brauer_permutation_lemma'`「Isaacs Thm 6.32」誤引用ほか (正本 note §8)
