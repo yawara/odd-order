@@ -163,7 +163,7 @@ theorem exists_counterexample_anchored_of_not_coherent [Finite G] (hd : Odd hyp.
       ψ (1 : ↥hyp.H) = (hyp.d : ℂ) * (a : ℂ) ∧ tθ ∣ a)
     (hfail : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau Y hyp.A)) :
     ∃ (ψ χθ : ClassFunction ↥hyp.H ℂ) (tθ a : ℕ) (m : ClassFunction ↥hyp.H ℂ → ℕ),
-      ψ ∈ Y ∧ χθ ∈ B₀ ∧ 0 < tθ ∧ 0 < a ∧
+      ψ ∈ Y ∧ ψ ∉ B ∧ χθ ∈ B₀ ∧ 0 < tθ ∧ 0 < a ∧
       χθ (1 : ↥hyp.H) = (hyp.d : ℂ) * (tθ : ℂ) ∧
       ψ (1 : ↥hyp.H) = (hyp.d : ℂ) * (a : ℂ) ∧
       (∀ x ∈ B, x (1 : ↥hyp.H) = (hyp.d : ℂ) * (m x : ℂ)) ∧
@@ -236,7 +236,9 @@ theorem exists_counterexample_anchored_of_not_coherent [Finite G] (hd : Odd hyp.
   obtain ⟨m, hmdeg, hmsum⟩ := hyp.sq_ratio_sum_le_of_adjoin_incoherent_anchored hd hQ1odd
     hS₁S (hYfin.subset (hsub i (by omega))) (hconj_closed i (by omega)) hcoh_i
     hχθS₁ htθpos hχθdeg (hYS hψY) hfresh1 hfresh2' hψdeg hdvd hfail'
-  refine ⟨(pair i).1, χθ, tθ, a, m, hψY, hχθB₀, htθpos, hapos, hχθdeg, hψdeg,
+  have hψnotB : (pair i).1 ∉ B := fun h =>
+    hfresh1 (OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl h))
+  refine ⟨(pair i).1, χθ, tθ, a, m, hψY, hψnotB, hχθB₀, htθpos, hapos, hχθdeg, hψdeg,
     fun x hx => hmdeg x (OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hx)), ?_⟩
   refine le_trans (Finset.sum_le_sum_of_subset_of_nonneg ?_ ?_) hmsum
   · intro x hx
@@ -370,7 +372,7 @@ theorem xsetOf_S_coherent_step [Finite G]
     exact ⟨χθ, tθ, e * tθ, hχθX, htθpos, Nat.mul_pos hepos htθpos, hχθdeg,
       hψdeg, dvd_mul_left tθ e⟩
   -- the counterexample
-  obtain ⟨ψ, χθ, tθ, a, m, hψY, hχθX, htθpos, hapos, hχθdeg, hψdeg, hmdeg, hmsum⟩ :=
+  obtain ⟨ψ, χθ, tθ, a, m, hψY, -, hχθX, htθpos, hapos, hχθdeg, hψdeg, hmdeg, hmsum⟩ :=
     hyp.exists_counterexample_anchored_of_not_coherent hd hQ1odd hB₀B hBY hYS hYfin
       hYconj hBconj hcoh₁ hanchor hfail
   -- `h1`: counting `|S⧸S₁|·|Q₁⧸Z|·(|Z|−1) ≤ d·2·tθ·a`
