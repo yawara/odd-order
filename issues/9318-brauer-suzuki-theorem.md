@@ -125,5 +125,145 @@ Setup: `x` = S の指数 2 巡回部分群の生成元、`X = ⟨x⟩`, `T = ⟨
 - ✅ **Gorenstein Lem 1.2** (`BrauerSuzukiNormalizer.lean`): X = C の cyclic Sylow-2、
   Burnside 2-補群 H (= C の奇数位数元全体、choice 非依存)、**C = XH**、H ⊴ N、
   **N = SH**。全て axiom-clean + AxiomsCheck 登録。
-- 次 = **Lem 1.3** (A = C − RH の TI 性、N_G(A) = N) → Lem 1.4 の指標構成
-  (ψ: C の線形指標 RH ⊆ ker、ψ̃ = ψ↑N 既約 deg 2、θ = 1_C↑N − ψ̃ norm 3)。
+- ✅ **Gorenstein Lem 1.3 (TI 性)** (`BrauerSuzukiTISubset.lean`): **`A_isTISubset :
+  IsTISubset Q.A Q.N`**(`A = C − RH`)。核心 = `T_le_zpowers_of_mem_A`「`a∈A ⟹ T ≤ ⟨a⟩`」
+  (a の 2-part `a₂` が `X` の C 内共役 `cxc⁻¹` に入る → `T` は `⟨a⟩` 唯一の位数 2ⁿ⁻¹
+  部分群 → `T = g⁻¹Tg`)。汎用 cyclic 補題も追加: `eq_of_le_zpowers_of_card_eq`
+  (同位数部分群一意性)・`le_of_le_zpowers_of_card_dvd`(入れ子)・
+  `zpowers_eq_of_mem_of_orderOf_eq`。axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
+  → 下流 Lem 1.4 の induced-character 等長 `inner_induce_eq_of_isTISubset` が直接消費可能。
+- ✅ **`N ≤ N_G(A)`** (`conj_mem_A_of_mem_N`): N は A = C−RH を正規化。核心 = `map_R_conj_of_mem_N`
+  (R char T ⊴ N を cyclic 一意性で `R.map (conj n) = R`) + `map_H_conj_of_mem_N` → `RH ⊴ N`。
+- ✅ **完全等式 `N = N_G(A)`** (`mem_N_iff_forall_conj_mem_A`): 逆向き `N_G(A) ≤ N` も完成。
+  基盤 = **`mem_RH_iff`** (RH = R·H 積構造、R 中心的ゆえ H と可換) + `X_inf_H_eq_bot` +
+  `x_notMem_RH` (x∈RH⟹x∈R⟹位数|2ⁿ⁻²、矛盾) → **`A_nonempty`** (x∈A)。
+  → **Gorenstein Lemma 1.3 完全形式化 (axiom-clean [propext, Classical.choice, Quot.sound])**。
+- ✅ **Gorenstein Lem 1.4 完全形式化** (`BrauerSuzukiCharacter.lean`、2026-07-22、axiom-clean
+  `[propext, Classical.choice, Quot.sound]`、sorry 0):
+  - **構造前提**: `x² ∉ RH`、`y ∈ N ∖ C`、coset 分解 **`N = C ∪ yC`**
+    (`mem_C_or_yinv_mul_mem_C`、自己完結部分群 K = C ∪ yC) → **`[N:C] = 2`**
+    (`index_C_subgroupOf_N`、`index_eq_two_iff'`)。
+  - **線形指標 ψ** (`psiHom : ↥C →* ℂˣ`): `C/RH ≅ ℤ/4` の忠実指標 x̄↦i を引き戻し。
+    `orderOf x̄ = 4` (x²∉RH, x⁴∈RH)、`C/RH = ⟨x̄⟩` (`subgroupOf_sup` で X⊔RH=C)、
+    `monoidHomOfForallMemZpowers` x̄↦iUnit → `mk'` 合成。`ψ(x)=i`、`RH⊆ker ψ`、`ψ≠1`。
+  - **θ = Ind_C^N 1_C − Ind_C^N ψ** (`theta`): **`θ(1)=0`** (`theta_apply_one`)、
+    **`θ≡0 on N−A`** (`theta_apply_eq_zero_of_notMem_A`、C外=normal support / RH上=同一定数)。
+  - **`ψ≠ψʸ`** (`conjBy_y_psiN_ne_psiN`: x で ψʸ(x)=ψ(x⁻¹)=i⁻¹≠i) → **`I_N(ψ)=C`**
+    (`inertia_psiN`) → **`Ind_C^N ψ` 既約** (`psiN_induce_irreducible`、
+    `isIrreducibleCharacter_induce_of_inertia_eq`、bundled IrreducibleCharacter)。
+  - **`(θ,θ)_N = 3`** (`theta_inner_self`): (Tc,Tc)=[N:C]=2 − (Tc,Ps)=0 − (Ps,Tc)=0
+    + (Ps,Ps)=1。使用: `induce_trivial_inner_self` / `induce_inner_induce_trivial_eq_zero_of_irreducible`
+    / `inner_star_comm` / `irr_cf_inner`。
+  - ⚠ 計画で想定した「Clifford で ψ↑N 既約」は **`InducedIrreducible.lean`
+    `isIrreducibleCharacter_induce_of_inertia_eq` (inertia=H → 誘導既約) がより直接**だった
+    (一般 Clifford correspondence の subtype juggling 不要)。deg 2 は使わず (deg θ=0 は
+    [N:C] 相殺で deg
+    値不要)。
+
+### Lem 1.5 計画 (2026-07-22 lane c、次 frontier)
+
+Gorenstein Lem 1.5: `θ* = Ind_N^G θ` (TI 誘導、`A_isTISubset` が feed)。
+- **`(θ*,θ*)_G = 3`**: TI 等長 `inner_induce_eq_of_isTISubset` (θ が A 外で消滅 =
+  `theta_apply_eq_zero_of_notMem_A` を feed) → `(θ*,θ*)_G = (θ,θ)_N = 3`。
+- **`(θ*,1_G)_G = 1`**: Frobenius `inner_induce_eq_inner_restrict` → `(θ, 1_N)_N`
+  = (Ind 1_C, 1_N) − (Ind ψ, 1_N) = 1 − 0 = 1。
+- **`θ*(1) = 0`**: `induce_apply_one` で [G:N]·θ(1) = 0。
+- ✅ **解析部完成** (`thetaStar` 系、2026-07-22 commit): `(θ*,θ*)_G=3` / `θ*(1)=0` /
+  `(θ*,1_G)=1`。axiom-clean。
+
+#### Lem 1.5 分解の実装計画 (2026-07-22、API 精査済 — 次 iteration frontier)
+
+**⚠ 経路確定 (誤経路を排除)**: ρ = θ*−1_G は norm 2 だが **`ρ(1) = θ*(1)−1 = −1 ≠ 0`**
+なので `exists_irr_sub_irr_of_inner_self_two` (ZIrrFourier:574、**`φ(1)=0` を要求**) は
+**適用不可**。**norm-3 を θ* に直接適用**する (θ*(1)=0 は満たす)。
+
+必要な部品:
+1. **`θ* ∈ ZIrr G`** — `induce_mem_ZIrr Q.N (hθ : θ ∈ ZIrr N)` (InducedCharacter:1062)。
+   θ ∈ ZIrr N は θ = Ind 1_C − Ind ψ (両者 character ∈ ZIrr) の差。要 `induce_mem_ZIrr` を
+   C.subgroupOf N に 2 回 + `sub_mem`。
+2. **`exists_triple_of_sum_sq_eq_three`** (新 infra、`exists_pair_of_sum_sq_eq_two`
+   ZIrrFourier:262 の 3 版): `∑_{a∈s} cₐ² = 3 ∧ cₐ≠0 → s = {α,β,γ} 相異 ∧ 各 cₐ=±1`。
+   証明: 各 cₐ²≥1、和=3 → card≤3; card=1(c²=3 不可)・card=2(c₁²+c₂²=3 整数解無)を omega 排除
+   → card=3、各 cₐ²=1。
+3. **1_G の係数 = 1**: `inner_eq_coeff_of_repr` (ZIrrFourier:117) で c(1_G) = (θ*,1_G) = 1
+   (`thetaStar_inner_trivial`)。
+4. **次数論法**: θ*(1) = ∑ cᵢ dᵢ = 0、1_G の項 = 1·1、残り 2 項 c₁d₁+c₂d₂ = −1、
+   cᵢ=±1・dᵢ≥1 → 一方 +1 他方 −1 かつ |d₁−d₂|=1 → **θ* = 1_G + χ₁ − χ、χ(1)=χ₁(1)+1**。
+   `exists_irr_sub_irr_of_inner_self_two` の (±1,±1) case 分析 (597-613) が雛形。
+
+出力定理 (提案): `∃ χ₁ χ : IrreducibleCharacter G, χ₁ ≠ χ ∧ χ₁ ≠ 1 ∧ χ ≠ 1 ∧
+  θ* = 1_G + χ₁ − χ ∧ χ(1) = χ₁(1) + 1`。→ 下流 Lem 1.6 (involution/奇数位数元上 θ*=0) へ。
+
+#### ✅ 基礎完了 (2026-07-22 commit 3c3e07c38) + 分解本体の確定手順
+
+**完了**: `exists_triple_of_sum_sq_eq_three` (汎用) + `theta_mem_ZIrr` /
+`thetaStar_mem_ZIrr` (∈ZIrr)。`thetaStar_inner_self=3` / `_apply_one=0` /
+`_inner_trivial=1` も既済。
+
+**⚠ 最終判断: 分解本体は ρ = θ*−1_G (norm 2) 経由が最良** (triple 版より nontrivial 判定が楽):
+`exists_irr_sub_irr_of_inner_self_two` (ZIrrFourier:574) は φ(1)=0 要求で ρ(1)=−1 に
+不適 → **その proof (578-613) を ρ 用に複製**する。手順:
+1. `ρ := θ* − 1_G`、`hρZ : ρ ∈ ZIrr` (`sub_mem thetaStar_mem_ZIrr trivial.mem_ZIrr`)。
+2. `(ρ,ρ)=2`: `inner_sub_left/right` 展開 = (θ*,θ*)−(θ*,1)−(1,θ*)+(1,1) = 3−1−1+1
+   ((1,θ*)=conj(θ*,1)=1 via `inner_star_comm`、(1,1)=1 via `irr_cf_inner`)。
+3. `ρ(1)=−1`: `sub_apply` + `thetaStar_apply_one` + `trivialClassFunction_apply`。
+4. Fourier `mem_ZIrr_inner_self_eq_sum_sq hρZ` → c, `Σc²=2` → `exists_pair_of_sum_sq_eq_two`
+   → α₀,β₀ 相異・c=±1、`hrepr : ρ = cα•α₀ + cβ•β₀`。
+5. 次数: `irreducibleCharacter_apply_one_eq_pos_natCast` → dα,dβ≥1、
+   `hone' : cα·dα+cβ·dβ = −1` (hρ1 に hrepr 代入)。
+6. **4-case (cα,cβ)=(±1,±1)**: (+,+)→dα+dβ=−1 不可、(−,−)→dα+dβ=1 だが dα,dβ≥1 で不可、
+   (+,−)→dβ=dα+1 [χ₁=α₀,χ=β₀]、(−,+)→dα=dβ+1 [χ₁=β₀,χ=α₀]。
+7. **nontrivial**: `(ρ,trivial)=0` (=(θ*,1)−(1,1)=1−1)、かつ `(ρ,α₀)=cα₀` (hrepr+orthonormality)。
+   α₀=trivial なら (ρ,α₀)=(ρ,trivial)=0 だが cα₀=±1≠0 で矛盾 → α₀≠trivial (β₀ も同様)。
+8. `θ* = 1_G + ρ = 1_G + χ₁ − χ` (`hρ` を戻す + abel)。
+triple 版 (θ* 直接、`exists_triple_of_sum_sq_eq_three`) は trivial が {α,β,γ} の
+どれかの 3-way 識別が必要で冗長 — triple 補題は汎用 infra として保持 (別 norm-3 用)。
+
+### ✅ Lem 1.5 完成 (2026-07-22 commit 3e56a40ca)
+
+`thetaStar_decomposition`: **θ* = 1_G + χ₁ − χ** (χ₁≠χ 非主既約、χ(1)=χ₁(1)+1)。
+上記 ρ+pair 手順どおり、次数 4-case は ℤ で `exact_mod_cast` → omega。axiom-clean。
+→ **Lemma 1.4 + 1.5 完全形式化完了** (`BrauerSuzukiCharacter.lean`、~660 行、sorry 0)。
+
+### Lem 1.6 計画 (次 frontier、⚠ 原文再読が必要)
+
+Gorenstein Lem 1.6: **involution・奇数位数元上で θ* = 0** → そこで `χ = 1 + χ₁`
+(値の等式)。要調査:
+- 機構: θ* = Ind_N^G θ は θ が A=C−RH 外で消滅 → g が A に共役で入らなければ θ*(g)=0。
+  中心 involution z = x^{2ⁿ⁻¹} は **z ∈ R ⊆ RH ⊄ A** (z は R=⟨x⁴⟩ の唯一の involution、
+  n≥3 で 2ⁿ⁻²≥2)。奇数位数元は 2-group S の外。→ TI 誘導値 = 0 の具体条件を原文で確認。
+- 使う repo infra: `induce_apply_eq_zero_of_not_conjugatesIntoSet` 系 (θ* が A 共役外で 0)、
+  `theta_apply_eq_zero_of_notMem_A`。involution が A に非共役 = z ∉ A + 共役類の議論。
+- 出力: χ, χ₁ の値の関係 (involution u で χ(u) = 1 + χ₁(u) 等) → Lem 1.7-1.9 (β(y) 数え上げ)
+  → endgame。⚠ Lem 1.6-1.9 は Gorenstein Ch.12 pp.375-377 の再読が必要 (β(y) 構造定数公式
+  (9.4.2) = `ClassSumCoefficientFormula.lean` との接続)。
+
+### Lem 1.4 計画 (2026-07-22 lane c、⚠ 下記 infra は grep 発見のみ・API 未精査)
+
+Gorenstein Lem 1.4: `θ = 1_C↑N − ψ̃` について (i) `(θ,θ)_N = 3` (ii) `deg θ = 0`、
+`N − A` 上で `θ = 0`。使えそうな既存 repo infra (要 API 精査):
+- **`RepresentationTheory/LinearCharacter.lean`** — 線形指標 (ψ: C→ℂ の構成、値 i on x)
+- **`RepresentationTheory/InflationCharacter.lean`** — RH ⊆ ker の inflation 構成
+- **`RepresentationTheory/Clifford.lean` / `CliffordCorrespondence.lean`** — ψ↑N の既約性
+  (C は N 内 index 2、ψ が N-不変でない ⟹ 誘導既約; Clifford/Mackey)
+- **`RepresentationTheory/InducedCharacter.lean`** — `induce`/`induce_add`/`induce_smul`/
+  `induce_apply_one`、内積、**`inner_induce_eq_of_isTISubset` (TI 等長 ← `A_isTISubset` が feed)**
+- **`Peterfalvi/S05_NormThree.lean`** — norm-3 パターン ((θ,θ)=3、Lem 1.5 の θ* 分解へ)
+- Tc = `1_C↑N` = N/C (index 2) の正則表現指標 = 1_N + (N/C の非自明線形指標)
+証明順: ψ 構成 (LinearChar, x↦i, RH⊆ker) → ψ̃=ψ↑N 既約 deg 2 (Clifford) →
+θ 定義・deg 0 → (θ,θ)_N=3 (Thm 4.2.4(i) = 内積計算) → N−A 上 θ=0 (Thm 4.4.3(ii))。
+
+#### ψ 構成の具体経路 (2026-07-22、RH 積構造 commit e039809db を基盤に確定)
+
+**`C/RH ≅ ℤ/4`** が ψ の土台。実測で確定した部品:
+- `mem_RH_iff` (積構造) + `mem_R_of_mem_X_of_mem_RH` より **`x² ∉ RH`** (x²∈RH⟹x²∈R=⟨x⁴⟩⟹
+  orderOf x²=2ⁿ⁻¹ ∣ 2ⁿ⁻², 矛盾) かつ **x⁴ ∈ R ⊆ RH**。⟹ `orderOf (xRH) = 4`。
+- `C = XH`、H ⊆ RH ⟹ **`C/RH = ⟨xRH⟩`** (巡回、位数 4 = ℤ/4)。∴ 未計算の |C|/|RH| 不要。
+- **ψ 構成手順**: (1) `(RH.subgroupOf C) ⊴ ↥C` (RH ⊴ N ⊇ C より)。(2) 商 `↥C ⧸ (RH.subgroupOf C)`
+  ≅ ℤ/4 (gen = xRH 像, 位数 4)。(3) ℤ/4 → ℂˣ (gen ↦ i = `Complex.I` の単元) の character。
+  (4) `InflationCharacter.inflate` or `compHom` で ↥C に inflate → χ : ↥C →* ℂˣ。
+  (5) `LinearCharacter.linearClassFunction χ` = ψ (ClassFunction ↥C ℂ)。RH ⊆ ker は構成から自明。
+- ψ̃ = `induce (C.subgroupOf N) ψ` 既約 deg 2: C は N 内 index 2、ψ ≠ ψ^{conj by N∖C} (ψ(x)=i vs
+  ψ(x⁻¹)=−i)、Clifford/Mackey 既約判定 (`Clifford.lean`/`CliffordCorrespondence.lean`)。
+- θ = `induce 1_C − ψ̃`、(θ,θ)_N=3: N/C の正則指標 Tc = 1_N+sgn、Thm 4.2.4(i) 内積。
+  N−A 上 θ=0: RH⊆ker ψ ゆえ ψ↑N は A 上のみ非零 (`induce_apply` 系)。

@@ -8,6 +8,8 @@ import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
+import OddOrder.GroupTheory.BrauerSuzukiTISubset
+import OddOrder.GroupTheory.BrauerSuzukiCharacter
 import OddOrder.GroupTheory.CentralElementaryExtension
 import OddOrder.GroupTheory.CentralProduct
 import OddOrder.GroupTheory.ChermakDelgado
@@ -451,6 +453,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFour
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
