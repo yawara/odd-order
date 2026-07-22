@@ -61,3 +61,58 @@ Character Theory Ch.7 (block-free proof by Glauberman?)。repo の指標 infra
 ## 参照
 
 <!-- 関連 issue / PR / ファイル / コミット. -->
+
+---
+
+## 証明戦略調査 (2026-07-22, lane c) — Gorenstein Ch.12 読了
+
+### 原典の所在 (実測)
+
+- **Gorenstein Ch.12 "Groups with Generalized Quaternion Sylow 2-Subgroups"**
+  (`finite-groups.pdftotext.txt` L20072〜、書籍 pp. 373-377) = **Thm 1.1 (Brauer-Suzuki)**、
+  `|S| ≥ 16` を例外指標理論で証明する短章。**`|S| = 8` (Q8) は「all known proofs require
+  the theory of modular characters」と明記** (1968 時点) — Q8 は別ルート要調査。
+- 支持機構: **Thm 4.6 (Brauer-Suzuki)** = TI 集合上の誘導等長 (L8117)、
+  **Thm 5.4 (Brauer-Suzuki)** = 例外指標系の存在 (L8533)。
+- **Coq odd-order に BS 無し** (grep 実測 0 件 — 奇数位数群に involution が無いので当然)。
+
+### Gorenstein Ch.12 の証明骨格 (|S| = 2^n ≥ 16)
+
+Setup: `x` = S の指数 2 巡回部分群の生成元、`X = ⟨x⟩`, `T = ⟨x²⟩`, `R = ⟨x⁴⟩`,
+`C = C_G(T)`, `N = N_G(T)`。
+1. **Lem 1.2**: `N = SH` (`H ⊴ N` 奇数位数)、`C = XH`。X が C の cyclic Sylow-2 →
+   Burnside normal 2-complement (G Thm 7.6.1 = mathlib Burnside)。
+2. **Lem 1.3**: `A = C − RH` は **TI subset**、`N_G(A) = N`。
+3. **Lem 1.4**: ψ = C の線形指標 (RH ⊆ ker、x ↦ i) の誘導 ψ̃ (N 上既約 deg 2)、
+   `θ = 1_C↑N − ψ̃`: `(θ,θ)_N = 3`、`deg θ = 0`、`θ ≡ 0 on N − A`。
+4. **TI 等長** (G Thm 4.4.6): `(θ*,θ*)_G = 3`、Frobenius 相互律で 1_G の重複度 1 →
+   **Lem 1.5**: `θ* = 1_G + χ₁ − χ` (χ₁ ≠ χ 非主既約)。
+5. **Lem 1.6**: involution・奇数位数元上で `θ* = 0` → `χ = 1 + χ₁` そこで。
+6. **Lem 1.7**: β(y) = #{(u,v) : involutions, uv = y} は偶数位数 y で 0
+   (一意 involution ⟹ Klein four が存在しない)。
+7. **(9.4.2)**: β(y) = |G|/|C_G(u)|² Σᵢ ζᵢ(u)²ζᵢ(y)/ζᵢ(1) (class 積の構造定数公式)。
+8. Σ β·θ* = 0 + 直交性 → **Lem 1.8**: `1 + χ₁(u)²/χ₁(1) − χ(u)²/χ(1) = 0` →
+   **Lem 1.9**: `(χ(u) − χ(1))² = 0` → **全 involution ⊆ ker χ**、χ 非線形。
+9. **endgame (純群論)**: `M = ⟨involutions⟩ ⊴ G`、`Q = S∩M` は cyclic (さもなくば
+   SM の非線形指標が線形化して矛盾) → Burnside → `L ⊴ G` 奇 → `KQ ⊴ G`
+   (`K = O_{2'}(G)`) → `Ḡ = G/K` で `Ω₁(Q̄) = Z(Ḡ)`、位数 2。□
+
+### repo 資産との対応 (grep 実測)
+
+| Gorenstein | repo |
+|---|---|
+| Thm 4.4.6 (TI 誘導等長) | `inner_induce_eq_of_isTISubset` / `induce_apply_coe_of_isTISubset` (InducedCharacter.lean、generic・sorry-free) |
+| (9.4.2) 構造定数公式 | `ClassSumCoefficientFormula.lean` `classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter` |
+| Thm 7.6.1 (Burnside) | mathlib (`Sylow.ker_transferSylow_isComplement'` 系; Ch05 で被覆済記録) |
+| quaternion 分類 | mathlib `QuaternionGroup` + `Isaacs.Ch06.isCyclic_or_two_quaternion_of_subgroups_card_prime_unique` |
+| norm-3/deg-0 分解 (Lem 1.5) | Pf S03/S05 の IsometryDifferencePair 系パターン (要 adapt) |
+
+### 形式化順序 (提案)
+
+1. **cyclic Sylow-2 case** (軽い): Burnside → `G = O_{2'}(G) ⋊ S` → `G = O_{2'}(G)·C_G(u)`。
+2. **|S| ≥ 16 case**: 上記骨格を新 leaf 群 (`OddOrder/GroupTheory/BrauerSuzuki*.lean`) で。
+   最難所は Lem 1.4-1.5 (指標の具体構成 + norm 計算) と (9.4.2) の接続。
+3. **Q8 case**: 別調査 — block-free 証明の文献特定 (Glauberman?) or 教科書省略として
+   ChatGPT 再構成ルート ([[feedback-ask-chatgpt-for-elided-gaps]])。**ここだけが真の
+   research-adjacent gap**。
+4. 統合 → `rankOne_affine_nearField` の sorry 解消。
