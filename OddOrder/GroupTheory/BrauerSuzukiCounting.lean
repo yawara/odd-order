@@ -167,6 +167,64 @@ theorem sum_degWeight_inner_eq_zero
   rw [← Finset.mul_sum, ← h942]
   field_simp
 
+/-- **Gorenstein Ch.12 Lemma 1.8**: for the decomposition `θ* = 1_G + χ₁ − χ` (Lemma 1.5),
+`1 + χ₁(u)²/χ₁(1) − χ(u)²/χ(1) = 0`, where `u` is an involution (the class-`K` representative).
+Collapsing `sum_degWeight_inner_eq_zero` by `⟨θ*, ψ⟩ = δ_{1,ψ} + δ_{χ₁,ψ} − δ_{χ,ψ}`
+(orthonormality) leaves the three terms `|K|²·(1 + χ₁(u)²/χ₁(1) − χ(u)²/χ(1)) = 0`; dividing by
+`|K|² ≠ 0` gives the relation. -/
+theorem lem_1_8_relation
+    [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥Q.N : ℂ)]
+    [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] {χ₁ χd : IrreducibleCharacter G}
+    (hdecomp : Q.thetaStar = trivialClassFunction G + (χ₁ : ClassFunction G ℂ)
+      - (χd : ClassFunction G ℂ)) :
+    1 + (χ₁ : ClassFunction G ℂ) Q.involutionClass.out ^ 2 / (χ₁ : ClassFunction G ℂ) 1
+      - (χd : ClassFunction G ℂ) Q.involutionClass.out ^ 2 / (χd : ClassFunction G ℂ) 1 = 0 := by
+  classical
+  have hB2 := Q.sum_degWeight_inner_eq_zero
+  set N := (Nat.card { x : G // ConjClasses.mk x = Q.involutionClass } : ℂ) with hN
+  set u₀ := Q.involutionClass.out with hu₀
+  -- `∑_χ g(χ)·⟨a, χ⟩ = g(a)` by orthonormality (only the `χ = a` term survives); stated for
+  -- a class function `a` so it applies uniformly to `1_G`, `χ₁`, `χ`
+  have hcollapse : ∀ a : ClassFunction G ℂ, a ∈ irreducibleCharacters G →
+      ∑ χ : IrreducibleCharacter G,
+          (N * (χ : ClassFunction G ℂ) u₀ * (N * (χ : ClassFunction G ℂ) u₀)
+            / (χ : ClassFunction G ℂ) 1) * ClassFunction.inner a (χ : ClassFunction G ℂ)
+        = N * a u₀ * (N * a u₀) / a 1 := by
+    intro a ha
+    rw [Finset.sum_eq_single (⟨a, mem_irreducibleCharacters.mp ha⟩ : IrreducibleCharacter G)]
+    · simp only [IrreducibleCharacter.coe_mk]
+      rw [irr_cf_inner ha ha, if_pos rfl, mul_one]
+    · intro b _ hb
+      rw [irr_cf_inner ha (mem_irreducibleCharacters.mpr b.2),
+        if_neg (fun h => hb (Subtype.ext h).symm), mul_zero]
+    · intro h; exact absurd (Finset.mem_univ _) h
+  -- expand `⟨θ*, χ⟩ = ⟨1_G, χ⟩ + ⟨χ₁, χ⟩ − ⟨χ, χ⟩` (ground rewrite of `θ*`) and collapse each sum
+  simp only [hdecomp, ClassFunction.inner_sub_left, ClassFunction.inner_add_left,
+    mul_add, mul_sub] at hB2
+  rw [Finset.sum_sub_distrib, Finset.sum_add_distrib,
+    hcollapse _ (mem_irreducibleCharacters.mpr trivialClassFunction_isIrreducible),
+    hcollapse _ (mem_irreducibleCharacters.mpr χ₁.2),
+    hcollapse _ (mem_irreducibleCharacters.mpr χd.2)] at hB2
+  -- `g(1_G) = N²` since the trivial character is `1` everywhere
+  simp only [trivialClassFunction_apply] at hB2
+  -- `N ≠ 0` (the class `K` is nonempty: `z ∈ K`)
+  have hNpos : 0 < Nat.card { x : G // ConjClasses.mk x = Q.involutionClass } := by
+    have : Nonempty { x : G // ConjClasses.mk x = Q.involutionClass } :=
+      ⟨Q.z, by rw [involutionClass]⟩
+    exact Nat.card_pos
+  have hNne : N ≠ 0 := by rw [hN]; exact_mod_cast hNpos.ne'
+  -- factor `N²` and divide
+  have hfactor : N * 1 * (N * 1) / 1
+      + N * (χ₁ : ClassFunction G ℂ) u₀ * (N * (χ₁ : ClassFunction G ℂ) u₀)
+        / (χ₁ : ClassFunction G ℂ) 1
+      - N * (χd : ClassFunction G ℂ) u₀ * (N * (χd : ClassFunction G ℂ) u₀)
+        / (χd : ClassFunction G ℂ) 1
+      = N ^ 2 * (1 + (χ₁ : ClassFunction G ℂ) u₀ ^ 2 / (χ₁ : ClassFunction G ℂ) 1
+          - (χd : ClassFunction G ℂ) u₀ ^ 2 / (χd : ClassFunction G ℂ) 1) := by
+    ring
+  rw [hfactor] at hB2
+  exact (mul_eq_zero.mp hB2).resolve_left (pow_ne_zero 2 hNne)
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory
