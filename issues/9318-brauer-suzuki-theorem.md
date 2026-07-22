@@ -7,13 +7,31 @@ created: 2026-07-21
 
 # Brauer-Suzuki 定理: 一般化四元数 Sylow 2 → G = O_{2'}(G)C_G(u)
 
+## 🎯 HUB RULING (2026-07-22, ユーザー裁可): claim owner **b → c 移管**
+
+本 issue の owner を **lane c** に移管する。c の primary frontier = 本 issue。根拠:
+
+1. **b は未着手** (2026-07-22 実測: main..b に BS 関連 commit 0、調査 checkbox 未チェック)
+   かつ issue 2053 Theorem B の 17-step campaign 進行中 — b は 2053 に専念する。
+2. **c は既に前提 2 件を完了済** (下記 checkbox、issue 9404 closed) で文脈を持っている。
+3. **消費点 `rankOne_affine_nearField` (NearFields.lean) は c 所有ファイル** — 自所有の
+   gate を自分で外す形になり、gated-frontier 問題も同時に解消。
+4. c の BG scope は closed (Thm A(6)/(7) landing、実 sorry 0) で live frontier が空だった。
+
+b 側は Theorem B step (2) で App C Prop 1 を **sorried-cite** してよい (signature は
+`rankOne_affine_nearField` で確定済、[[feedback-cite-sorried-lemmas-if-signature-correct]])。
+BS 本体の置き場所は一般有限群論ゆえ `OddOrder/GroupTheory/**` (shared) を第一候補とし、
+新 leaf は claim-before-build どおり本 issue が claim を兼ねる (c は 9400 番台で追加
+claim を切ってもよい)。step 1.5 の所有 regex 変更は不要 (shared_re / c_re で被覆)。
+
 ## 背景
 
 Peterfalvi Appendix C Prop 1 (`rankOne_affine_nearField`, NearFields.lean:741)
 は honestly-stated sorry で、その未形式化前提の最大物が **Brauer–Suzuki 定理**
 (Sylow 2-subgroup が一般化四元数なら G = O_{2'}(G)·C_G(u)、u は中心的 involution;
 系として G は単純でない)。Ch.II Theorem B (issue 2053 step (2)) が App C Prop 1
-を消費するため、lane b が claim する。
+を消費するため、lane b が claim する。~~(claim 経緯)~~ → **2026-07-22 に c へ移管
+(冒頭 HUB RULING 参照)**。
 
 他の前提 2 つは軽い: Huppert III 8.2 (2-rank 1 → Sylow-2 cyclic or
 generalized quaternion) と Huppert II 3.2 (normal complement)。

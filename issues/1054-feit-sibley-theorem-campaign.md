@@ -380,19 +380,61 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     1 + a² = (v,v) + a²(x−1)² + (m−1)x²a²、(v,v) ≥ 0、a ≥ 2、m ≥ 2 ⟹
     x = 0 ∨ (x=1 ∧ m=2)。整数性 (a² ≥ 4 で bracket ≤ 1) + interval_cases。
     (v,v)=1 の抽出や x=1,m=2 の符号差し替え還元は assembly 側 ((6) 本体)。
-  - [ ] **(4) Notation setup**: Z := ⁅Q₁,Q₁⁆ ⊓ centralizer(Q₁:Set G) (≤ Q₁,
-    ⁅Z,Q₁⁆=1)。非自明 = ⁅Q₁,Q₁⁆ ≠ ⊥ (Q₁ non-abelian) + IsPGroup.normal_inf
-    _center_nontrivial (Isaacs Ch01 Basic:407) で ⁅Q₁,Q₁⁆⊓Z(Q₁) ≠ 1。H-不変 =
-    ⁅Q₁,Q₁⁆ char in Q₁ ⊴ H + centralizer H-不変。→ reduction (3)
-    xset_coherent_of_le_center_Q1 で 𝒳 = XsetOf ⊥ Z coherent、Remark
-    ssetOf_Qder_coherent で 𝒴 = 𝒮(Q′) coherent。witness eᵢ := (𝒳 coh).extension χᵢ,
-    e′ⱼ := (𝒴 coh).extension ηⱼ ∈ ZIrr G、norm-1 (isometry + χᵢ irred) ⟹ ±Irr。
-    ⚠ eᵢ と e′ⱼ は別 extension ゆえ (5)(6) で両立性を示して単一 extension に統合。
-  - [ ] **(5)** (eᵢ,e′ⱼ)=0: λ:=(eᵢ−aᵢe₁,e′₁)=(eᵢ−aᵢe₁,e′₂)≠0 と仮定 → aᵢ=1,
-    λ=±1, eᵢ−e₁=λ(e′₁+e′₂) → degree-0 で e′₁(1)=0 矛盾 (inner-product manip)。
+  - [x] **(4) Notation setup — Z 構成 + 𝒳/𝒴 coherence 完了** (7be8d3d7e + 759d2788a,
+    sorry-free): endgameZ := ⁅Q₁,Q₁⁆ ⊓ C_G(Q₁)。4 性質 (le_Q1 / centralizes
+    ⁅z,y⁆=1 / ne_bot / conj_mem H-不変)。
+    - ne_bot: normal_inf_center_nontrivial (Isaacs Ch01) で ↥Q₁ レベル
+      [Q₁,Q₁]⊓Z(Q₁) ≠ 1 → map_eq_bot_iff + ker_subtype で G レベルへ (単射)。
+      ⚠ 名前空間は OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial (full path)。
+    - conj_mem: ⁅Q₁,Q₁⁆ は Q1_map_conj_eq(既存 FeitSibleyInduction) + map_commutator、
+      C_G(Q₁) は Commute.map (conj h)。⚠ rw[mem_centralizer_iff] は coe 不一致で
+      失敗 → mem_centralizer_iff_commutator_eq_one の .mp/.mpr 項適用が robust。
+    - endgame_Xset_coherent: reduction (3) 供給 → 𝒳 = XsetOf ⊥ Z coherent。
+      Normal 3 点 (Sder/Z/S H-不変を subgroupOf_H_normal_of_conj_mem + conj_mem_sup)。
+    - 𝒴 = 𝒮(Q′) coherence = 既存 ssetOf_Qder_coherent 直用 (ラッパー不要)。
+  - [x] **(4) witness 抽出完了** (coherent_extension_eq_zsmul_irr, sorry-free):
+    coherence hcoh + χ ∈ S 既約 ⟹ ∃ ε∈{±1} ξ∈Irr(G): hcoh.extension χ = ε•ξ。
+    ⟨eχ,eχ⟩=1 (extension_inner_eq + IsIrreducibleCharacter.inner_self_eq_one) +
+    eχ∈ZIrr (extension_mem_ZIrr) → **既存** exists_zsmul_irreducibleCharacter_of
+    _inner_self_one (InducedIrreducible.lean:751; norm-1⟹±Irr、新設不要だった)。
+    χ ∈ zSpan S = Submodule.subset_span。eᵢ/e′ⱼ 両方をこれで抽出。
+  - [x] **⭐ (5) 完結** `cross_extension_inner_eq_zero` (FeitSibleyEndgame.lean,
+    sorry-free, 2026-07-22): disjoint coherent 族 X,Y ⊆ 𝒮 の一般形 —
+    (E χ, E′ η) = 0 ∀χ∈X ∀η∈Y。仮定: X anchor χ₁ + scaled diff A-supported
+    (∀φ∈X ∃a>0, φ−a•χ₁ ∈ ℤ[X,A])、X 第 2 元 χ₂≠χ₁、Y 等度数 diff
+    (∀ψ∈Y, ψ−η₁ ∈ ℤ[Y,A])、Y 第 2 元 η₂≠η₁。部品 4 補題:
+    - `cross_inner_extension_diff_eq_zero`: 両 extension が τ に supported diff 上
+      一致 (extends_on_supported + map_sub/map_nsmul) → **大域等長は既存
+      `tau_inner_eq_of_supported_Sset`** (FeitSibleyTheorem:1464、zSupportedSpan
+      mono で X,Y → 𝒮 に持ち上げ) → H 側で 4 cross 項が Sset_pairwiseOrthogonal
+      で消滅。
+    - `cross_inner_extension_diff_right_eq_zero` (λ=0 核): by_contra λ≠0 →
+      witnesses (coherent_extension_eq_zsmul_irr ×4) → λ≠0 が ξ′₁,ξ′₂ ∈ {ξχ,ξ₁}
+      を強制 (ξ′₁≠ξ′₂, ξχ≠ξ₁ は lattice 等長) → 2 case とも
+      `eq_zero_of_signed_degree_relations` (純 ℂ 算術核、f₁/f₂ swap で共用) で
+      ξχ(1) = 0 → 度数正値と矛盾。**書籍の aᵢ=1 抽出・e′₁(1)=0 経路は不要**
+      (3 関係式から直接 D₂=0 が出る鋭形; linear_combination 2 発)。
+    - `cross_inner_extension_diff_any_eq_zero`: η₁ 値 0 + cross 等長で全 j へ転送。
+    - anchor 消滅 (χ₂ 使用): t=(Eχ₁,E′η)≠0 → ξ′=ξ₁ → (Eχ₂,E′η)=0=a₂t → 矛盾。
+    汎用部品: `inner_zsmul_irreducible_eq` (⟨ε•ξ,ε′•ξ′⟩=εε′δ、ZIrrFourier
+    upstream 候補)。⚠ Lean 実装知見: 識別子に `λ` 不可 (予約トークン) /
+    ite を含む have statement には proof 冒頭 `classical` 必須 (無いと Decidable
+    が sorry に落ちて "ring failed ... = sorry" の不可解エラー) / `omit ... in` は
+    docstring の**前**。
+    (4)(5) の endgame 組み立てでは X = 𝒳 (aᵢ = p-冪比, exists_apply_one_eq_d_mul_pow)、
+    Y = 𝒴 = 𝒮(Q′) (全員 degree d)、hdisj = XsetOf の ¬LeKer Z vs Q′⊇Z... の
+    supported-diff 仮定充足は (6) assembly 側で供給。
   - [ ] **(6) 本体**: Ind(χ₁−aη₁)=−a·e′₁+λΣe′ᵢ+v、(v,e′ᵢ)=0 → norm 展開で
     x_eq_zero_or_x_one_of_norm_identity 適用 → a∣λ ⟹ 𝒮∪𝒴 coherent (τ が
     χᵢ↦eᵢ,ηⱼ↦e′ⱼ で一貫) → Lemma 1(a) で 𝒮(S′) → (2) で 𝒮。
+    - [x] **pairing 恒等式 2 本** (2026-07-22, sorry-free): `tau_scaled_diff_inner_self`
+      ((τδ,τδ) = 1+a²、δ = χ−a•η₁ A-supported、coherence 不要) +
+      `tau_scaled_diff_inner_extension_diff` ((τδ, e′ⱼ−e′₁) = a、j>1)。
+      どちらも tau_inner_eq_of_supported_Sset 直用 + Sset_pairwiseOrthogonal。
+    - [ ] 次 = 直交分解 τδ = Σⱼ tⱼe′ⱼ + v ((v,e′ⱼ)=0)。𝒴 の Finset 化 +
+      e′ⱼ 正規直交 (extension_inner_eq) + tⱼ ∈ ℤ (mem_ZIrr_inner_int) +
+      (v,v) ≥ 0 (mem_ZIrr_inner_self_eq_sum_sq)。NormInequalities の
+      CharacterPsiDecomposition (D.X/D.Y/tau1_image, :400-470) が流用候補 — 要偵察。
   - [ ] **(7)** class-algebra 合同 (独立、並行可): ψ constant on Z^# ⟹
     ψ(z)≡ψ(1) mod|Q|。ω central character (ω(Kₛ)=ψ(Kₛ)/ψ(1)) の代数的整数性 +
     構造定数 aᵢⱼₛ + Q f.p.f. 作用の counting。**前提の repo 内所在確認要**
