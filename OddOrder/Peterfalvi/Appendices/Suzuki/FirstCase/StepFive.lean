@@ -163,27 +163,27 @@ theorem isCyclic_odd_pSubgroup_of_nearField_units {F : Type*}
   exact Huppert.isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian
     hf hR hqodd hEA φ hfpf
 
-/-- **The abstract core of step (5)** (p. 109–110): a finite near-field `F`
-whose unit group is nilpotent, of `2`-rank one, with `2`-elements of order
-dividing `4`, and noncommutative, has `|F| = 9` (and `|F^*| = 8`).
+/-- **The shared Sylow-`2` decomposition prefix of step (5)** (p. 109–110):
+the unit group of a finite near-field that is nilpotent and noncommutative
+splits as a central cyclic odd part `O` (a normal `2`-complement) and a
+nonabelian Sylow `2`-subgroup `T`.
 
-The unit group decomposes as `F^* = T × O` (normal `2`-complement of the
-nilpotent group); the odd part `O` is cyclic (odd `p`-subgroups of `F^*`
-act fixed-point-freely on `(F, +)`, `isCyclic_odd_pSubgroup_of_nearField_units`);
-noncommutativity pushes into `T`, which is generalized quaternion
-([Is] Thm 6.11, 2-rank one) of exponent `4`, hence `Q₈` of order `8`.
-Then `Z(F^*) = Z(T) × O` has order `2|O|`, and `T` contains a cyclic
-subgroup of order `4`, so `C₄ × O` is cyclic of index `2` in `F^*`;
-Appendix C, Proposition 2 (`cyclic_index_two_nearField_classification`)
-gives `|F| = r²` with `|Z(F^*)| = r − 1`, and the arithmetic
-`8|O| = r² − 1`, `2|O| = r − 1` forces `|O| = 1`, `r = 3`. -/
-theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
+This is the common opening of both the extraction lemma
+`exists_noncommuting_two_elements_of_nearField_units` and the abstract core
+`nearField_card_eq_nine_of_nilpotent_units`: odd `p`-subgroups of `F^*` act
+fixed-point-freely on `(F, +)` hence are cyclic
+(`isCyclic_odd_pSubgroup_of_nearField_units`), so the odd part `O` is cyclic
+and central; the noncommutativity of `F` is therefore forced into `T`. -/
+theorem exists_nilpotent_units_sylowTwo_decomp {F : Type*}
     [NearFields.NearField F] [Finite F]
     (hnil : Group.IsNilpotent Fˣ)
-    (h2rank : ∀ E : Subgroup Fˣ, (∀ x ∈ E, x ^ 2 = 1) → Nat.card ↥E ≤ 2)
-    (hexp4 : ∀ u : Fˣ, (∃ k : ℕ, orderOf u = 2 ^ k) → u ^ 4 = 1)
     (hnc : ¬ ∀ x y : F, x * y = y * x) :
-    Nat.card F = 9 ∧ Nat.card Fˣ = 8 := by
+    ∃ (O : Subgroup Fˣ) (T : Sylow 2 Fˣ), O.Normal ∧
+      Subgroup.IsComplement' O (T : Subgroup Fˣ) ∧
+      ¬ 2 ∣ Nat.card ↥O ∧ IsCyclic ↥O ∧
+      (∀ o t : Fˣ, o ∈ O → t ∈ (T : Subgroup Fˣ) → Commute o t) ∧
+      O ≤ Subgroup.center Fˣ ∧
+      ¬ ∀ a b : ↥(T : Subgroup Fˣ), a * b = b * a := by
   classical
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   haveI := hnil
@@ -195,7 +195,6 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
   haveI hTnorm : (T : Subgroup Fˣ).Normal := inferInstance
   have hOodd : ¬ 2 ∣ Nat.card ↥O :=
     OddOrder.Isaacs.Ch05.not_dvd_card_of_isComplement'_sylow T hcompl
-  have hOpos : 0 < Nat.card ↥O := Nat.card_pos
   -- `O` is cyclic: odd Sylows of `F^*` are cyclic
   haveI hOzg : IsZGroup ↥O := by
     rw [isZGroup_iff]
@@ -260,6 +259,57 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
     calc u * v = ((ou : Fˣ) * tu) * ((ov : Fˣ) * tv) := by rw [hu, hv]
       _ = ((ov : Fˣ) * tv) * ((ou : Fˣ) * tu) := hkey.eq
       _ = v * u := by rw [hu, hv]
+  -- `O ≤ Z(F^*)`
+  have hOle : O ≤ Subgroup.center Fˣ := by
+    intro o ho
+    rw [Subgroup.mem_center_iff]
+    intro g
+    obtain ⟨⟨og, tg⟩, hg, -⟩ := hcompl.existsUnique g
+    have h1 : Commute (og : Fˣ) o := by
+      have h := mul_comm (⟨(og : Fˣ), og.2⟩ : ↥O) ⟨o, ho⟩
+      exact congrArg Subtype.val h
+    have h2 : Commute o (tg : Fˣ) := hOTcomm _ _ ho tg.2
+    calc g * o = ((og : Fˣ) * (tg : Fˣ)) * o := by rw [← hg]
+      _ = (og : Fˣ) * ((tg : Fˣ) * o) := mul_assoc _ _ _
+      _ = (og : Fˣ) * (o * (tg : Fˣ)) := by rw [← h2.eq]
+      _ = ((og : Fˣ) * o) * (tg : Fˣ) := (mul_assoc _ _ _).symm
+      _ = (o * (og : Fˣ)) * (tg : Fˣ) := by rw [h1.eq]
+      _ = o * ((og : Fˣ) * (tg : Fˣ)) := mul_assoc _ _ _
+      _ = o * g := by rw [hg]
+  exact ⟨O, T, hOnorm, hcompl, hOodd, hOcyc, hOTcomm, hOle, hTnc⟩
+
+/-- **The abstract core of step (5)** (p. 109–110): a finite near-field `F`
+whose unit group is nilpotent, of `2`-rank one, with `2`-elements of order
+dividing `4`, and noncommutative, has `|F| = 9` (and `|F^*| = 8`).
+
+The unit group decomposes as `F^* = T × O` (normal `2`-complement of the
+nilpotent group); the odd part `O` is cyclic (odd `p`-subgroups of `F^*`
+act fixed-point-freely on `(F, +)`, `isCyclic_odd_pSubgroup_of_nearField_units`);
+noncommutativity pushes into `T`, which is generalized quaternion
+([Is] Thm 6.11, 2-rank one) of exponent `4`, hence `Q₈` of order `8`.
+Then `Z(F^*) = Z(T) × O` has order `2|O|`, and `T` contains a cyclic
+subgroup of order `4`, so `C₄ × O` is cyclic of index `2` in `F^*`;
+Appendix C, Proposition 2 (`cyclic_index_two_nearField_classification`)
+gives `|F| = r²` with `|Z(F^*)| = r − 1`, and the arithmetic
+`8|O| = r² − 1`, `2|O| = r − 1` forces `|O| = 1`, `r = 3`. -/
+theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
+    [NearFields.NearField F] [Finite F]
+    (hnil : Group.IsNilpotent Fˣ)
+    (h2rank : ∀ E : Subgroup Fˣ, (∀ x ∈ E, x ^ 2 = 1) → Nat.card ↥E ≤ 2)
+    (hexp4 : ∀ u : Fˣ, (∃ k : ℕ, orderOf u = 2 ^ k) → u ^ 4 = 1)
+    (hnc : ¬ ∀ x y : F, x * y = y * x) :
+    Nat.card F = 9 ∧ Nat.card Fˣ = 8 := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI := hnil
+  -- normal `2`-complement `O` (cyclic, central) and nonabelian Sylow `2`
+  -- subgroup `T`, from the shared decomposition prefix
+  obtain ⟨O, T, hOnorm, hcompl, hOodd, hOcyc, hOTcomm, hOle, hTnc⟩ :=
+    exists_nilpotent_units_sylowTwo_decomp hnil hnc
+  haveI := hOnorm
+  haveI hTnorm : (T : Subgroup Fˣ).Normal := inferInstance
+  have hOpos : 0 < Nat.card ↥O := Nat.card_pos
+  letI : CommGroup ↥O := hOcyc.commGroup
   -- `T` is generalized quaternion (2-rank one, [Is] Thm 6.11)
   have hUnique : ∀ K L : Subgroup ↥(T : Subgroup Fˣ),
       Nat.card K = 2 → Nat.card L = 2 → K = L := by
@@ -357,23 +407,6 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
         exact hx
       obtain ⟨a, ha, b, hb, rfl⟩ := hx'
       exact ⟨(⟨⟨a, ha⟩, ⟨b, hb⟩⟩ : ↥A × ↥B), rfl⟩
-  -- `O ≤ Z(F^*)`
-  have hOle : O ≤ Subgroup.center Fˣ := by
-    intro o ho
-    rw [Subgroup.mem_center_iff]
-    intro g
-    obtain ⟨⟨og, tg⟩, hg, -⟩ := hcompl.existsUnique g
-    have h1 : Commute (og : Fˣ) o := by
-      have h := mul_comm (⟨(og : Fˣ), og.2⟩ : ↥O) ⟨o, ho⟩
-      exact congrArg Subtype.val h
-    have h2 : Commute o (tg : Fˣ) := hOTcomm _ _ ho tg.2
-    calc g * o = ((og : Fˣ) * (tg : Fˣ)) * o := by rw [← hg]
-      _ = (og : Fˣ) * ((tg : Fˣ) * o) := mul_assoc _ _ _
-      _ = (og : Fˣ) * (o * (tg : Fˣ)) := by rw [← h2.eq]
-      _ = ((og : Fˣ) * o) * (tg : Fˣ) := (mul_assoc _ _ _).symm
-      _ = (o * (og : Fˣ)) * (tg : Fˣ) := by rw [h1.eq]
-      _ = o * ((og : Fˣ) * (tg : Fˣ)) := mul_assoc _ _ _
-      _ = o * g := by rw [hg]
   -- `Z(F^*) = (Z(F^*) ⊓ T) ⊔ O`
   have hZeq : Subgroup.center Fˣ =
       (Subgroup.center Fˣ ⊓ (T : Subgroup Fˣ)) ⊔ O := by
@@ -464,7 +497,7 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
         exact Subgroup.card_subgroup_dvd_card _
       have hk2 : k ≤ 2 := by
         by_contra hk3
-        push_neg at hk3
+        push Not at hk3
         have h8dvd : (2 : ℕ) ^ 3 ∣ 4 * Nat.card ↥O := by
           refine dvd_trans (pow_dvd_pow 2 hk3) ?_
           rw [← hk]
@@ -583,6 +616,35 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
     norm_num
   · rw [hcardU8, hm1]
 
+/-- **Extraction of a noncommuting `2`-element pair** (p. 109–110, opening of
+step (5)): a nilpotent noncommutative finite near-field has two noncommuting
+`2`-elements in its unit group.
+
+Routed through `exists_nilpotent_units_sylowTwo_decomp`: the noncommutativity
+lands in the Sylow `2`-subgroup `T`, whose elements are `2`-elements.  Step (5)
+transports the pair to `C_Q(P) ≤ Q`, so the Sylow `2`-subgroup `S` of `Q` is
+nonabelian, hence a Suzuki `2`-group. -/
+theorem exists_noncommuting_two_elements_of_nearField_units {F : Type*}
+    [NearFields.NearField F] [Finite F]
+    (hnil : Group.IsNilpotent Fˣ)
+    (hnc : ¬ ∀ x y : F, x * y = y * x) :
+    ∃ a b : Fˣ, (∃ k : ℕ, orderOf a = 2 ^ k) ∧ (∃ k : ℕ, orderOf b = 2 ^ k) ∧
+      a * b ≠ b * a := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨O, T, -, -, -, -, -, -, hTnc⟩ :=
+    exists_nilpotent_units_sylowTwo_decomp hnil hnc
+  push Not at hTnc
+  obtain ⟨a, b, hab⟩ := hTnc
+  refine ⟨(a : Fˣ), (b : Fˣ), ?_, ?_, ?_⟩
+  · obtain ⟨k, hk⟩ := (IsPGroup.iff_orderOf.mp T.isPGroup') a
+    exact ⟨k, (orderOf_injective (T : Subgroup Fˣ).subtype
+      (Subgroup.subtype_injective _) a).trans hk⟩
+  · obtain ⟨k, hk⟩ := (IsPGroup.iff_orderOf.mp T.isPGroup') b
+    exact ⟨k, (orderOf_injective (T : Subgroup Fˣ).subtype
+      (Subgroup.subtype_injective _) b).trans hk⟩
+  · intro h
+    exact hab (Subtype.ext h)
+
 end StepFiveHelpers
 
 namespace FirstCaseHypothesis
@@ -603,7 +665,7 @@ surjective because `Q̄` is by definition the image of `Q ⊓ C_G(P)`. -/
 theorem centralizer_inf_mulEquiv_units :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ∀ {F : Type uG} [NearFields.NearField F]
-      (model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
+      (_model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
       Nonempty
         (↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) ≃* Fˣ) := by
   letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
@@ -691,6 +753,159 @@ theorem Q1_eq_bot_of_card_two_pow {n : ℕ}
   have hbot : fc.toHypothesis.Q1Subgroup = ⊥ :=
     Subgroup.eq_bot_of_card_eq _ hone
   rw [Hypothesis.Q1, hbot, Subgroup.map_bot]
+
+/-- In the nilpotent group `Q`, every `2`-element lies in the (unique) Sylow
+`2`-subgroup `S`. -/
+private theorem mem_sylowTwo_of_orderOf_two_pow
+    (S : Sylow 2 ↥fc.toHypothesis.Q) {w : ↥fc.toHypothesis.Q} {k : ℕ}
+    (hw : orderOf w = 2 ^ k) : w ∈ (S : Subgroup ↥fc.toHypothesis.Q) := by
+  letI : Group.IsNilpotent ↥fc.toHypothesis.Q := fc.toHypothesis.isNilpotent_Q
+  letI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  letI hSnorm : (S : Subgroup ↥fc.toHypothesis.Q).Normal := inferInstance
+  have hzp : IsPGroup 2 ↥(Subgroup.zpowers w) :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, hw])
+  obtain ⟨T, hle⟩ := hzp.exists_le_sylow
+  haveI : Unique (Sylow 2 ↥fc.toHypothesis.Q) := Sylow.unique_of_normal S hSnorm
+  have hTS : T = S := Subsingleton.elim _ _
+  rw [← hTS]
+  exact hle (Subgroup.mem_zpowers w)
+
+/-- **Peterfalvi Part II, Ch. II, step (5)** (p. 109–110): either `F` is a
+field (`C_Q(P)` abelian), or `F ≅ F_{9,2}` — `|F| = 9`, `|C_Q(P)| = |F^*| = 8`
+— and `Q₁ = 1`.
+
+If `C_Q(P) ≅ F^*` is nonabelian, its noncommutativity extracts a pair of
+noncommuting `2`-elements (`exists_noncommuting_two_elements_of_nearField_units`),
+which land in the Sylow `2`-subgroup `S` of `Q`; so `S` is nonabelian, hence a
+Suzuki `2`-group of exponent `4` (`sylowTwo_isMulCommutative_or_isSuzuki2Group`
++ Higman).  That exponent bound feeds the abstract core
+`nearField_card_eq_nine_of_nilpotent_units`, giving `|F| = 9`, `|F^*| = 8`;
+step (4) then makes `|Q| = 8^p = 2^{3p}` a `2`-power, so `Q₁ = 1`
+(`Q1_eq_bot_of_card_two_pow`).
+
+Inherits the step (2)(b) `sorry` (issue 9318) through the near-field model and
+the Higman `sorry` (`pow_four_eq_one_of_isSuzuki2Group`, tracked in 2053). -/
+theorem card_nearField_eq_nine_and_Q1_eq_bot :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ∀ {F : Type uG} [NearFields.NearField F]
+      (_model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
+      (∀ x y : F, x * y = y * x) ∨
+        (Nat.card F = 9 ∧
+          Nat.card ↥(fc.toHypothesis.Q ⊓
+            Subgroup.centralizer (fc.P : Set G)) = 8 ∧
+          fc.toHypothesis.Q1 = ⊥) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  intro F instF model
+  classical
+  haveI : Finite F := by
+    have hinj : Function.Injective
+        (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
+      fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
+    exact Finite.of_injective _ hinj
+  by_cases hnc : ∀ x y : F, x * y = y * x
+  · exact Or.inl hnc
+  refine Or.inr ?_
+  -- the standing identification `C_Q(P) ≅ F^*`
+  obtain ⟨e⟩ := fc.centralizer_inf_mulEquiv_units model
+  -- `F^*` is nilpotent: a subgroup of the nilpotent `Q`, transported along `e`
+  have hnil : Group.IsNilpotent Fˣ := by
+    letI : Group.IsNilpotent ↥fc.toHypothesis.Q := fc.toHypothesis.isNilpotent_Q
+    haveI : Group.IsNilpotent
+        ↥((fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)).subgroupOf
+          fc.toHypothesis.Q) := inferInstance
+    exact Group.nilpotent_of_mulEquiv
+      ((Subgroup.subgroupOfEquivOfLe
+        (inf_le_left : fc.toHypothesis.Q ⊓
+          Subgroup.centralizer (fc.P : Set G) ≤ fc.toHypothesis.Q)).trans e)
+  -- `F^*` has `2`-rank one: transport of (B1) along `e`
+  have h2rank : ∀ E : Subgroup Fˣ, (∀ x ∈ E, x ^ 2 = 1) →
+      Nat.card ↥E ≤ 2 := by
+    intro E hEsq
+    set E'' : Subgroup ↥(fc.toHypothesis.Q ⊓
+        Subgroup.centralizer (fc.P : Set G)) := E.map e.symm.toMonoidHom
+      with hE''def
+    have hcardE'' : Nat.card ↥E'' = Nat.card ↥E := by
+      rw [hE''def]
+      exact (Nat.card_congr (Subgroup.equivMapOfInjective E e.symm.toMonoidHom
+        e.symm.injective).toEquiv).symm
+    have hle : E''.map (fc.toHypothesis.Q ⊓
+          Subgroup.centralizer (fc.P : Set G)).subtype ≤
+        Subgroup.centralizer (fc.P : Set G) := by
+      rintro x ⟨y, -, rfl⟩
+      exact y.2.2
+    have hsq : ∀ x ∈ E''.map (fc.toHypothesis.Q ⊓
+        Subgroup.centralizer (fc.P : Set G)).subtype, x ^ 2 = 1 := by
+      rintro x ⟨y, hy, rfl⟩
+      obtain ⟨z, hz, rfl⟩ := hy
+      have hz2 : z ^ 2 = 1 := hEsq z hz
+      have hzz : (e.symm.toMonoidHom z) ^ 2 = 1 := by
+        rw [← map_pow, hz2, map_one]
+      rw [← map_pow, hzz, map_one]
+    have hcard' : Nat.card ↥(E''.map (fc.toHypothesis.Q ⊓
+        Subgroup.centralizer (fc.P : Set G)).subtype) = Nat.card ↥E := by
+      rw [Nat.card_congr (Subgroup.equivMapOfInjective E'' _
+        (Subgroup.subtype_injective _)).toEquiv.symm, hcardE'']
+    have hle2 := fc.twoRank_centralizer_le_one _ hle hsq
+    rwa [hcard'] at hle2
+  -- extraction: two noncommuting `2`-elements of `F^*`
+  obtain ⟨a₀, b₀, ⟨ka, hka⟩, ⟨kb, hkb⟩, hab₀⟩ :=
+    exists_noncommuting_two_elements_of_nearField_units hnil hnc
+  -- transport a unit with `2`-power order into `Q`
+  set incl : ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) →*
+      ↥fc.toHypothesis.Q := Subgroup.inclusion inf_le_left with hincldef
+  have hinclinj : Function.Injective incl := Subgroup.inclusion_injective _
+  set toQ : Fˣ →* ↥fc.toHypothesis.Q := incl.comp e.symm.toMonoidHom
+    with htoQdef
+  have htoQinj : Function.Injective toQ := hinclinj.comp e.symm.injective
+  have hord : ∀ u : Fˣ, orderOf (toQ u) = orderOf u := fun u =>
+    (orderOf_injective incl hinclinj (e.symm u)).trans
+      (orderOf_injective e.symm.toMonoidHom e.symm.injective u)
+  -- `S`, a Sylow `2`-subgroup of `Q`; the pair lands in it
+  obtain ⟨S⟩ : Nonempty (Sylow 2 ↥fc.toHypothesis.Q) := inferInstance
+  have haS : toQ a₀ ∈ (S : Subgroup ↥fc.toHypothesis.Q) :=
+    fc.mem_sylowTwo_of_orderOf_two_pow S (by rw [hord]; exact hka)
+  have hbS : toQ b₀ ∈ (S : Subgroup ↥fc.toHypothesis.Q) :=
+    fc.mem_sylowTwo_of_orderOf_two_pow S (by rw [hord]; exact hkb)
+  -- `S` is nonabelian
+  have hSnc : ¬ IsMulCommutative ↥(S : Subgroup ↥fc.toHypothesis.Q) := by
+    intro hcomm
+    apply hab₀
+    apply htoQinj
+    rw [map_mul, map_mul]
+    have hcs := hcomm.is_comm.comm
+      (⟨toQ a₀, haS⟩ : ↥(S : Subgroup ↥fc.toHypothesis.Q)) ⟨toQ b₀, hbS⟩
+    have hval := congrArg Subtype.val hcs
+    simpa using hval
+  -- hence `S` is a Suzuki `2`-group, of exponent `4`
+  have hSsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
+      ↥(S : Subgroup ↥fc.toHypothesis.Q) := by
+    rcases fc.toHypothesis.sylowTwo_isMulCommutative_or_isSuzuki2Group S with
+      hc | hs
+    · exact absurd hc hSnc
+    · exact hs
+  -- supply `hexp4` for `F^*`
+  have hexp4 : ∀ u : Fˣ, (∃ k : ℕ, orderOf u = 2 ^ k) → u ^ 4 = 1 := by
+    intro u hu
+    obtain ⟨k, hk⟩ := hu
+    have huS : toQ u ∈ (S : Subgroup ↥fc.toHypothesis.Q) :=
+      fc.mem_sylowTwo_of_orderOf_two_pow S (by rw [hord]; exact hk)
+    have h4 : (⟨toQ u, huS⟩ : ↥(S : Subgroup ↥fc.toHypothesis.Q)) ^ 4 = 1 :=
+      pow_four_eq_one_of_isSuzuki2Group hSsuz _
+    apply htoQinj
+    rw [map_pow, map_one]
+    have hval := congrArg Subtype.val h4
+    simpa using hval
+  -- the abstract core
+  obtain ⟨hF9, hU8⟩ :=
+    nearField_card_eq_nine_of_nilpotent_units hnil h2rank hexp4 hnc
+  have hCQP8 : Nat.card ↥(fc.toHypothesis.Q ⊓
+      Subgroup.centralizer (fc.P : Set G)) = 8 := by
+    rw [Nat.card_congr e.toEquiv, hU8]
+  refine ⟨hF9, hCQP8, ?_⟩
+  -- `|Q| = |C_Q(P)|^p = 8^p = 2^{3p}`, so `Q₁ = 1`
+  apply fc.Q1_eq_bot_of_card_two_pow (n := 3 * fc.p)
+  rw [fc.card_Q_eq_card_inf_centralizer_pow, hCQP8,
+    show (8 : ℕ) = 2 ^ 3 by norm_num, ← pow_mul]
 
 end FirstCaseHypothesis
 

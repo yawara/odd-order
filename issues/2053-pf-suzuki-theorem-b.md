@@ -199,7 +199,42 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       C_Q(K)=1 = fpf、coprime = `coprime_card_Q_K` + **p ∤ |Q|**
       (`not_p_dvd_card_Q1`/`not_p_dvd_card_Q`: step (3) の合同 r≡2^i と
       p odd の矛盾 — 書籍の「r ≠ p は (3) の帰結」を形式化)。9318 継承。
-- [ ] (5)–(9)
+- [x] (5) **完了 (2026-07-22)** — `card_nearField_eq_nine_and_Q1_eq_bot`
+      (StepFive.lean, FirstCaseHypothesis): `(∀ x y : F, comm) ∨ (|F| = 9 ∧
+      |C_Q(P)| = 8 ∧ Q₁ = ⊥)`。本体 sorry-free (Higman `pow_four` + 9318 model
+      継承のみ)。詳細は末尾「step (5) 完了記録」。
+- [ ] (6)–(9)
+  - **(6) 体の場合 完了 (2026-07-22)** — `card_field_eq_and_D_eq_one_of_comm`
+    (axiom-clean ∀-model): Q₁=1, F 可換 ⟹ (|F|=char ∨ |F|=9) ∧ |D|=1。
+    部品完備: arithmetic + ringAut_sq + fieldOfComm + 抽象核 + `dAutHom`
+    (dAut→RingAut 群 hom, crux) + `card_Q_eq_two_pow_of_Q1_eq_bot`。全 StepSix.lean。
+  - **(6) 全体形 landing (2026-07-22)** — `card_field_and_D_of_Q1_eq_bot`:
+    Q₁=1 ⟹ (可換 → (|F|=char∨9)∧|D|=1) ∧ (非可換 → |D|∈{1,3})。field case は
+    実証明、`card_D_le_three_of_noncomm` (非可換=F_{9,2}) は **gated sorry**
+    (Aut(F_{9,2}) 奇部分=3、F*=Q₈ ゆえ; near-field Aut infra 無し、D_odd は在り
+    |D|∣3 だけ欠く; shared 9300 候補)。StepSix の唯一の sorry。
+  - **(6) 算術補題 完了 (2026-07-22, StepSix.lean 新設)**:
+    `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` (axiom-clean, AxiomsCheck
+    登録) — [HB] IX 2.7: `f 奇 ∧ f^a = 2^b+1 (b≥1) ⟹ a=1 ∨ f^a=9`。純 ℕ 算術
+    (幾何和の偶奇で a 偶 → (f^c-1)(f^c+1)=2^b で 2 冪 → f^c=3)。steps (6)/(8) が消費。
+  - **(6) 体の場合 crux 完了 (2026-07-22)**: `ringAut_sq_eq_one_of_card_prime_or_prime_sq`
+    (StepSix.lean, axiom-clean, AxiomsCheck 登録) — 有限体 F (位数 q or q²) の
+    RingAut は exponent ≤ 2 (∀σ, σ²=1)。`ringAut_card_prime_pow_eq_pow` (σx=x^{q^i})
+    + `FiniteField.pow_card_pow` (x^{|F|^i}=x)。⟹ Σ 奇位数 ↪ exponent-2 群 → Σ=1。
+  - **(6) 本体 assembly プラン (2026-07-22 精査済)**: model 上で 2 分岐 (letI-prefix,
+    step 5 と同型)。**核心の ungated/gated 判定完了**:
+    - **体の場合 (F 可換) = ungated だが plumbing 多層**:
+      (i) NearField 可換 → Field インスタンス橋 = **未整備** (`nearField_field_structure_of_index_two`
+      は別型 K を返すのみ; `NearField.mul_add_of_mul_comm` で distributivity はある →
+      Field 構造を F 上に直接構成する def が要る)。
+      (ii) dAut g (F≃+F 乗法的) → RingAut F (体なら ring equiv)、D →* RingAut F 単射。
+      (iii) |F*| = |C_Q(P)| が 2 冪 (Q₁=1 ⟹ Q=Sylow-2 2群) → |F|=|F*|+1=2^b+1 →
+      **arithmetic lemma** で |F|∈{f,9} → **ringAut_sq_eq_one** → Σ 奇 → Σ=1。
+    - **F_{9,2} の場合 = gated (深い near-field Aut)**: `Twisted`/`TwistData` に
+      automorphism infra 無し。「Aut(F_{9,2}) 奇部分 = 3 (F*=Q₈ ゆえ)」は sorried-cite
+      (shared 9300 claim 候補) or 独立 campaign。arithmetic lemma・ringAut_sq は供給済。
+    - 供給済 upstream: arithmetic lemma, ringAut_sq_eq_one。残 = (i) Field 橋 +
+      (ii) dAut→RingAut + (iii) |F*|=2冪 plumbing + F_{9,2} sorried-cite。
   - **(5) 被覆調査 (2026-07-22): 3 部品すべて実装済、assembly のみ**:
     (i) Ch.I §2 Cor = `sylowTwo_isMulCommutative_or_isSuzuki2Group`
     (Suzuki/SylowTwo.lean:60、S 可換 or Suzuki 2-group)。
@@ -240,6 +275,24 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     (`centralizer_inf_mulEquiv_units` で転送) → step (4) で |Q| = 8^p =
     2^{3p} → `Q1_eq_bot_of_card_two_pow` → Q₁ = ⊥。
     最終形: `(∀ x y : F, comm) ∨ (card F = 9 ∧ card C_Q(P) = 8 ∧ Q₁ = ⊥)`。
+  - **step (5) 完了記録 (2026-07-22)**:
+    - 抽象核の O/T 分解 prefix を共有補題 **`exists_nilpotent_units_sylowTwo_decomp`**
+      (axiom-clean) に括り出し、抽象核と抽出補題が共に消費 (二重化回避、
+      抽象核は signature 不変で内部だけ差し替え・regression 無)。
+    - **`exists_noncommuting_two_elements_of_nearField_units`** (axiom-clean):
+      nilpotent 非可換 near-field の Fˣ から非可換 2-元 pair (共に 2-元)。
+    - **`card_nearField_eq_nine_and_Q1_eq_bot`** (∀-model, letI-prefix):
+      hnc で場合分け → 非可換なら抽出補題 → `toQ = incl∘e.symm` で C_Q(P)≤Q へ
+      転送 → `mem_sylowTwo_of_orderOf_two_pow` で S 到達 → S 非可換 →
+      `sylowTwo_isMulCommutative_or_isSuzuki2Group` で S Suzuki →
+      `pow_four_eq_one_of_isSuzuki2Group` で hexp4 供給 → 抽象核 → |F|=9,|Fˣ|=8
+      → `centralizer_inf_mulEquiv_units` で |C_Q(P)|=8 → step(4) で |Q|=8^p=2^{3p}
+      → `Q1_eq_bot_of_card_two_pow`。hnil = Q nilpotent の subgroup を e で転送、
+      h2rank = (B1) を e.symm で転送。
+    - #print axioms 実測: 抽象核・bundle・extraction = clean (hexp4 は仮説ゆえ
+      Higman 非依存)、conclusion のみ sorryAx (pow_four 経由)。
+    - AxiomsCheck: StepFive を import 追加、clean 3 本を登録 (conclusion は
+      Higman+9318 継承ゆえ意図的に非登録、注記済)。
 - [ ] (10) Lemma 5 消費の二分岐
 - [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
 - [ ] (13)–(16)
