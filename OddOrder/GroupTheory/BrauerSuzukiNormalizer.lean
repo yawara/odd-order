@@ -225,6 +225,143 @@ theorem X_sup_H_eq_C : Q.X ⊔ Q.H = Q.C := by
   rw [sup_comm]
   exact h
 
-end QuaternionSylowSetup
+/-! ### Lemma 1.2 (i): `N = SH` -/
 
-end OddOrder.GroupTheory
+theorem isCyclic_T : IsCyclic ↥Q.T := by
+  rw [show Q.T = Subgroup.zpowers (Q.x ^ (2 : ℕ)) from rfl]
+  exact ⟨⟨⟨Q.x ^ (2 : ℕ), mem_zpowers _⟩, by
+    rintro ⟨g, k, rfl⟩
+    exact ⟨k, by ext; simp⟩⟩⟩
+
+theorem card_T : Nat.card ↥Q.T = 2 ^ (Q.n - 1) := by
+  rw [show Q.T = Subgroup.zpowers (Q.x ^ (2 : ℕ)) from rfl, Nat.card_zpowers, orderOf_pow,
+    Q.hx_order, Nat.gcd_eq_right (dvd_pow_self 2 (by have := Q.hn; omega)),
+    show (2 : ℕ) ^ Q.n = 2 ^ (Q.n - 1) * 2 from by
+      rw [← pow_succ]
+      congr 1
+      have := Q.hn
+      omega,
+    Nat.mul_div_cancel _ (by norm_num)]
+
+/-- **Odd-order elements of `N` centralize `T`** (Gorenstein Lemma 1.2, via
+Lemma 5.4.1): `N/C` embeds in `Aut(T)`, a `2`-group since `T` is a cyclic `2`-group. -/
+theorem mem_C_of_odd_of_mem_N {g : G} (hgN : g ∈ Q.N) (hodd : Odd (orderOf g)) :
+    g ∈ Q.C := by
+  haveI := Q.isCyclic_T
+  set φ : ↥Q.N →* MulAut ↥Q.T := Subgroup.normalizerMonoidHom Q.T with hφ
+  have hker : φ ⟨g, hgN⟩ = 1 := by
+    have h1 : orderOf g = orderOf (⟨g, hgN⟩ : ↥Q.N) :=
+      orderOf_injective Q.N.subtype Q.N.subtype_injective ⟨g, hgN⟩
+    have h2 : orderOf (φ ⟨g, hgN⟩) ∣ orderOf g := by
+      rw [h1]
+      exact orderOf_map_dvd φ _
+    have h3 : orderOf (φ ⟨g, hgN⟩) ∣ 2 ^ (Q.n - 2) := by
+      have hdvd := orderOf_dvd_natCard (φ ⟨g, hgN⟩)
+      rwa [show Nat.card (MulAut ↥Q.T) = 2 ^ (Q.n - 2) from by
+        rw [IsCyclic.card_mulAut, Q.card_T,
+          Nat.totient_prime_pow Nat.prime_two (by have := Q.hn; omega),
+          show Q.n - 1 - 1 = Q.n - 2 from by have := Q.hn; omega]
+        norm_num] at hdvd
+    obtain ⟨j, _, hj⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp h3
+    have hj0 : j = 0 := by
+      by_contra h
+      have h2div : (2 : ℕ) ∣ orderOf g := (hj ▸ dvd_pow_self 2 h).trans h2
+      have := Nat.odd_iff.mp hodd
+      omega
+    exact orderOf_eq_one_iff.mp (by rw [hj, hj0, pow_zero])
+  rw [C, mem_centralizer_iff]
+  intro t ht
+  have h4 := congrArg (fun ψ : MulAut ↥Q.T => ((ψ ⟨t, ht⟩ : ↥Q.T) : G)) hker
+  simp only [MulAut.one_apply] at h4
+  have h5 : ((φ ⟨g, hgN⟩ ⟨t, ht⟩ : ↥Q.T) : G) = g * t * g⁻¹ := rfl
+  rw [h5] at h4
+  calc t * g = (g * t * g⁻¹) * g := by rw [h4]
+    _ = g * t := by group
+
+/-- Odd-order elements of `N` lie in `H` (they centralize `T` and have odd order). -/
+theorem mem_H_of_odd_of_mem_N {g : G} (hgN : g ∈ Q.N) (hodd : Odd (orderOf g)) :
+    g ∈ Q.H :=
+  Q.mem_H_iff.mpr ⟨Q.mem_C_of_odd_of_mem_N hgN hodd, hodd⟩
+
+/-- `H ≤ N`. -/
+theorem H_le_N : Q.H ≤ Q.N := Q.H_le_C.trans Q.C_le_N
+
+/-- `H ⊴ N` (bundled form). -/
+instance : (Q.H.subgroupOf Q.N).Normal := by
+  refine ⟨?_⟩
+  rintro ⟨h, hhN⟩ hh ⟨m, hmN⟩
+  rw [mem_subgroupOf] at hh ⊢
+  exact Q.conj_mem_H_of_mem_N hmN hh
+
+/-- **Gorenstein Lemma 1.2 (i): `N = SH`** (join form).  The quotient `N/H` has no
+element of odd prime order (its `p`-part would be an odd-order element of `N` outside
+`H`), so the image of the Sylow `2`-subgroup `S` has index `1`. -/
+theorem S_sup_H_eq_N : (Q.S : Subgroup G) ⊔ Q.H = Q.N := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set K : Subgroup ↥Q.N := Q.H.subgroupOf Q.N with hK
+  set P' : Sylow 2 ↥Q.N := Q.S.subtype Q.S_le_N with hP'
+  set π := QuotientGroup.mk' K with hπ
+  -- no odd prime divides `|N ⧸ H|`
+  have hodd_free : ∀ p : ℕ, p.Prime → p ≠ 2 → ¬ p ∣ Nat.card (↥Q.N ⧸ K) := by
+    intro p hp hp2 hdvd
+    haveI : Fact p.Prime := ⟨hp⟩
+    haveI : Fintype (↥Q.N ⧸ K) := Fintype.ofFinite _
+    rw [Nat.card_eq_fintype_card] at hdvd
+    obtain ⟨gbar, hgbar⟩ := exists_prime_orderOf_dvd_card p hdvd
+    obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective K gbar
+    have hdpos : (0 : ℕ) < orderOf y := orderOf_pos y
+    have hpd : p ∣ orderOf y := by
+      rw [← hgbar]
+      exact orderOf_map_dvd π y
+    -- `w = y^m` is the `p`-part of `y`: odd order, hence in `K`; but `π w ≠ 1`.
+    set v := (orderOf y).factorization p with hv
+    set m := orderOf y / p ^ v with hm
+    have hmd : p ^ v * m = orderOf y := Nat.ordProj_mul_ordCompl_eq_self (orderOf y) p
+    have hmdvd : m ∣ orderOf y := Dvd.intro_left _ hmd
+    have hmpos : 0 < m := Nat.pos_of_mul_pos_left (a := p ^ v) (by rw [hmd]; exact hdpos)
+    have hw : orderOf (y ^ m) = p ^ v := by
+      rw [orderOf_pow, Nat.gcd_eq_right hmdvd, ← hmd, Nat.mul_div_cancel _ hmpos]
+    have hvpos : 0 < v := hp.factorization_pos_of_dvd hdpos.ne' hpd
+    have hwodd : Odd (orderOf (y ^ m)) := by
+      rw [hw]
+      exact (hp.odd_of_ne_two hp2).pow
+    have hwK : y ^ m ∈ K := by
+      rw [hK, mem_subgroupOf]
+      refine Q.mem_H_of_odd_of_mem_N (y ^ m).2 ?_
+      have h1 : orderOf ((y ^ m : ↥Q.N) : G) = orderOf (y ^ m) :=
+        orderOf_injective Q.N.subtype Q.N.subtype_injective (y ^ m)
+      rwa [h1]
+    have hπw1 : π (y ^ m) = 1 := (QuotientGroup.eq_one_iff _).mpr hwK
+    have hpm : ¬ p ∣ m := Nat.not_dvd_ordCompl hp hdpos.ne'
+    have hπwp : orderOf (π (y ^ m)) = p := by
+      rw [map_pow, orderOf_pow, hgbar,
+        (hp.coprime_iff_not_dvd.mpr hpm : Nat.gcd p m = 1), Nat.div_one]
+    rw [hπw1, orderOf_one] at hπwp
+    exact hp.one_lt.ne hπwp
+  -- the image of the Sylow `2`-subgroup of `N` has index `1` in the quotient
+  have hidx : ((P' : Subgroup ↥Q.N).map π).index = 1 := by
+    rw [Nat.eq_one_iff_not_exists_prime_dvd]
+    intro p hp hdvd
+    rcases eq_or_ne p 2 with rfl | hp2
+    · -- `2` cannot divide it: the index divides the odd index of the Sylow `P'`.
+      have h1 : ((P' : Subgroup ↥Q.N).map π).index = ((P' : Subgroup ↥Q.N) ⊔ K).index := by
+        rw [← Subgroup.index_comap_of_surjective _ (QuotientGroup.mk'_surjective K),
+          Subgroup.comap_map_eq, QuotientGroup.ker_mk']
+      have h2 : ((P' : Subgroup ↥Q.N) ⊔ K).index ∣ (P' : Subgroup ↥Q.N).index :=
+        Subgroup.index_dvd_of_le le_sup_left
+      rw [h1] at hdvd
+      exact P'.not_dvd_index (hdvd.trans h2)
+    · -- an odd prime cannot divide it: it would divide `|N⧸H|`.
+      exact hodd_free p hp hp2 (hdvd.trans (Subgroup.index_dvd_card _))
+  have hmap_top : (P' : Subgroup ↥Q.N).map π = ⊤ := Subgroup.index_eq_one.mp hidx
+  have hsup' : (P' : Subgroup ↥Q.N) ⊔ K = ⊤ := by
+    have h := congrArg (Subgroup.comap π) hmap_top
+    rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk', Subgroup.comap_top] at h
+  -- transport to `G` along `N.subtype`
+  have h := congrArg (Subgroup.map Q.N.subtype) hsup'
+  have htopN : Subgroup.map Q.N.subtype ⊤ = Q.N := by
+    rw [← MonoidHom.range_eq_map]
+    exact Q.N.range_subtype
+  rw [hP', Sylow.coe_subtype, hK, Subgroup.map_sup, subgroupOf_map_subtype,
+    subgroupOf_map_subtype, htopN, inf_of_le_left Q.S_le_N, inf_of_le_left Q.H_le_N] at h
+  exact h
