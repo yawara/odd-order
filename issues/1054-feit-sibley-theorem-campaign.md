@@ -552,10 +552,19 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     ⚠ 実装知見: IsIrreducible は `[ρ.IsIrreducible]` (Set.IsIrreducible と ambiguous) /
     SemiconjBy.orderOf_eq c hsc で共役 order 保存 / Subgroup.orderOf_mk で subtype order /
     section variable は f.p.f.(群論のみ)と assembly(V/ConjClasses)で分離 (未使用 warning 回避)。
-    **残 = (8) 側の endgame 特化 instantiation**: peterfalvi_67_hall を hyp.Q/hyp.H/
-    endgameZ/ρ(=±e'₁) に適用し、hcop (sub-lemma 3: Q⊆C_G(z)→coprime)・hreal (odd order
-    で z≁z⁻¹)・hone (Hall nonidentityZClassCoeffSum_cong、odd order)・hconst (ψ constant
-    on Z^#) を供給 → 「(ψ(z)−ψ(1))/|Q| 代数的整数」に変換。これは (8) の一部。
+    **⭐ endgame-facing API 完成** = `peterfalvi_67_hall_of_odd` (2026-07-22, sorry-free,
+    HallTICongruence.lean 398 行)。hreal/hone/hcop を内部 discharge した clean wrapper:
+    odd|G| + Q normal Hall (H と G 両方) TI + Z⊴H + z∈Z^# を Q が中心化 + ρ constant
+    on Z^# ⟹ ρ.character z ≡ ρ.character 1 [ALGMOD |Q|]。追加部品:
+    - `coprime_card_class_card_hall` (hcop: Q⊆C_G(z)+Q Hall in G ⟹ coprime |C₁| |Q|)
+    - `nonidentityZClassCoeffSum_cong_hall` (hone: trivial rep + Hall collapse で a₁₁≡1+a₁₂)
+    - hreal は汎用 `ConjClasses.eq_one_of_isConj_inv_of_odd_card` (odd|G|) で discharge。
+    **残 = (8) 本体のみ** (endgame 特化、下記): peterfalvi_67_hall_of_odd を
+    hyp.Q/hyp.H/endgameZ/ρ(=±e'₁ の表現) に適用 → 「(ψ(z)−ψ(1))/|Q| 代数的整数」を得て
+    (5)(6) の e'₁(z)−e'₁(1) = −|Q|(λ/a+μ) と合わせ a∣λ。⚠ 供給要: (i) ρ = e'₁(∈±Irr(G))
+    に対応する Representation (ClassFunction→Representation ブリッジ)、(ii) Q Hall in G
+    (coprime |Q| Q.index) の endgame からの導出、(iii) endgameZ⊆Z(Q) から Q⊆C_G(z)、
+    (iv) hconst (ρ constant on Z^# + N∩C_G card 定数) の endgame からの供給。
     (以下は偵察時の旧記録; machinery は上記で完成済)
     **⭐ スコープ確定 (2026-07-22 偵察): 新規 class-algebra 構築は不要 — 既存 machinery
     の再インスタンス化。** `peterfalvi_67` (ClassSumAlgebra.lean:127) が (7) の合同

@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
 import OddOrder.GroupTheory.TISubset
 
 /-!
@@ -285,6 +287,111 @@ theorem peterfalvi_67_hall [Finite G] (ρ : Representation ℂ G V) [ρ.IsIrredu
   have hone' : a₁₁ ≡ 1 + a₁₂ [ALGMOD (Nat.card ↥Q : ℤ)] := by
     simpa [a₁₁, a₁₂, C₁, C₂] using hone
   exact peterfalvi_673 hcop hψz hψ1 ha₁₁ ha₁₂ h11 h12 hsubst hone'
+
+/-- **Structure-constant congruence `a₁₁ ≡ 1 + a₁₂ (mod |Q|)`, Hall form** (Peterfalvi (6.7.3)).
+The trivial-character specialization of `centralCharacterOfRep_classSum_mul_cong_collapse_hall`:
+applying the collapse to `ρ₀ = 1_G` and combining the two (6.7.2) congruences via
+`peterfalvi_673_combine`/`peterfalvi_673_cancel` discharges the last non-hypothesis input of
+`peterfalvi_67_hall`.  Hall analogue of `nonidentityZClassCoeffSum_cong_of_isTISubset`. -/
+theorem nonidentityZClassCoeffSum_cong_hall [Finite G] {H Q Z : Subgroup G}
+    (hQH : Q ≤ H) (hZQ : Z ≤ Q)
+    (hQnormal : (Q.subgroupOf H).Normal) (hZnormal : (Z.subgroupOf H).Normal)
+    (hti : IsTISubset ((Q : Set G) \ {1}) H)
+    (hHall : Nat.Coprime (Nat.card ↥Q) (Nat.card (↥H ⧸ Q.subgroupOf H)))
+    {z : G} (hzZ : z ∈ Z) (hz1 : z ≠ 1)
+    (hQz : Q ≤ Subgroup.centralizer ({z} : Set G))
+    (hHallG : Nat.Coprime (Nat.card ↥Q) Q.index)
+    (hreal : ConjClasses.mk z⁻¹ ≠ ConjClasses.mk z)
+    (hcardconst : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 →
+      Nat.card ↥(H ⊓ Subgroup.centralizer ({w} : Set G)) =
+        Nat.card ↥(H ⊓ Subgroup.centralizer ({z} : Set G))) :
+    nonidentityZClassCoeffSum Z (ConjClasses.mk z) (ConjClasses.mk z)
+      ≡ 1 + nonidentityZClassCoeffSum Z (ConjClasses.mk z) (ConjClasses.mk z⁻¹)
+        [ALGMOD (Nat.card ↥Q : ℤ)] := by
+  classical
+  set ρ₀ : Representation ℂ G ℂ := Representation.trivial ℂ G ℂ with hρ₀
+  haveI : ρ₀.IsIrreducible := isIrreducible_complex_rep ρ₀
+  have hchar0 : ∀ g : G, ρ₀.character g = 1 := by
+    intro g; simp [hρ₀, Representation.character]
+  let C₁ : ConjClasses G := ConjClasses.mk z
+  let C₂ : ConjClasses G := ConjClasses.mk z⁻¹
+  let α : ℂ := ω ρ₀ C₁
+  let a₁₁ : ℂ := nonidentityZClassCoeffSum Z C₁ C₁
+  let a₁₂ : ℂ := nonidentityZClassCoeffSum Z C₁ C₂
+  let q : ℤ := Nat.card { x : G // ConjClasses.mk x = C₁ }
+  have hzA : z ∈ (Q : Set G) \ {1} := ⟨hZQ hzZ, by simpa using hz1⟩
+  have hωconst : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ω ρ₀ (ConjClasses.mk w) = α := by
+    intro w hwZ hw1
+    have hwA : w ∈ (Q : Set G) \ {1} := ⟨hZQ hwZ, by simpa using hw1⟩
+    exact centralCharacterOfRep_eq_of_tiSubset_card_eq_of_character_eq ρ₀ hti hwA hzA
+      (hcardconst hwZ hw1) (by rw [hchar0, hchar0])
+  have hC₁ : ∃ y : G, y ∈ Z ∧ y ≠ 1 ∧ ConjClasses.mk y = C₁ := ⟨z, hzZ, hz1, rfl⟩
+  have hC₂ : ∃ y : G, y ∈ Z ∧ y ≠ 1 ∧ ConjClasses.mk y = C₂ :=
+    ⟨z⁻¹, Z.inv_mem hzZ, inv_ne_one.mpr hz1, rfl⟩
+  have hcoeff11 : (classSum C₁ * classSum C₁) (1 : G) = 0 := by
+    rw [classSum_mul_apply_one_eq_classSumCoeff_one]
+    rw [show classSumCoeff C₁ C₁ 1 = 0 by
+      simpa [C₁] using classSumCoeff_self_one_eq_zero z hreal]
+    norm_num
+  have hcoeff12 : (classSum C₁ * classSum C₂) (1 : G) = (q : ℂ) := by
+    rw [classSum_mul_apply_one_eq_classSumCoeff_one]
+    rw [show classSumCoeff C₁ C₂ 1 = Nat.card { x : G // ConjClasses.mk x = C₁ } by
+      simpa [C₁, C₂] using classSumCoeff_self_inv_one_eq_card z]
+    simp [q]
+  have h11raw := centralCharacterOfRep_classSum_mul_cong_collapse_hall ρ₀ hQH hZQ hQnormal
+    hZnormal hti hHall hC₁ hC₁ (α := α) hωconst
+  have h12raw := centralCharacterOfRep_classSum_mul_cong_collapse_hall ρ₀ hQH hZQ hQnormal
+    hZnormal hti hHall hC₁ hC₂ (α := α) hωconst
+  have hωC₂ : ω ρ₀ C₂ = α := by
+    simpa [C₂] using hωconst (Z.inv_mem hzZ) (inv_ne_one.mpr hz1)
+  have h11 : (1 : ℂ) * α ^ 2 ≡ 1 * (a₁₁ * α) [ALGMOD (Nat.card ↥Q : ℤ)] := by
+    simpa [C₁, α, a₁₁, pow_two, hcoeff11, hchar0] using h11raw
+  have h12 : (1 : ℂ) * α ^ 2 ≡ 1 * ((q : ℂ) + a₁₂ * α) [ALGMOD (Nat.card ↥Q : ℤ)] := by
+    simpa [C₁, C₂, α, a₁₂, q, pow_two, hcoeff12, hωC₂, hchar0] using h12raw
+  have hsubst : (1 : ℂ) * α = (q : ℂ) * 1 := by
+    have h := character_one_mul_centralCharacterOfRep_mk ρ₀ z
+    simpa [C₁, α, q, hchar0] using h
+  have hcop : IsCoprime q (Nat.card ↥Q : ℤ) := by
+    simpa [C₁, q] using coprime_card_class_card_hall hQz hHallG
+  have ha₁₁ : IsIntegral ℤ a₁₁ := by
+    simpa [a₁₁, C₁] using nonidentityZClassCoeffSum_isIntegral Z C₁ C₁
+  have ha₁₂ : IsIntegral ℤ a₁₂ := by
+    simpa [a₁₂, C₁, C₂] using nonidentityZClassCoeffSum_isIntegral Z C₁ C₂
+  have hcomb := peterfalvi_673_combine h11 h12
+  have hfinal := peterfalvi_673_cancel hcop isIntegral_one isIntegral_one ha₁₁ ha₁₂ hsubst hcomb
+  simpa [a₁₁, a₁₂, C₁, C₂] using hfinal
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- **Peterfalvi (6.7), Hall odd-order form** (Appendix IV, step (7)).  For a normal Hall subgroup
+`Q ⊴ H` (Hall in both `H` and `G`) whose nonidentity elements are a TI-subset of `G` (bound `H`),
+inside a group `G` of **odd** order, with `Z ≤ Q` normal in `H` and `z ∈ Z^#` centralized by `Q`,
+and an irreducible `ρ` constant on `Z^#` (with the normalizer–centralizer card constancy):
+`ψ(z) ≡ ψ(1) (mod |Q|)`.  The two non-hypothesis inputs of `peterfalvi_67_hall` are discharged:
+`⟦z⁻¹⟧ ≠ ⟦z⟧` from oddness of `|G|` (`eq_one_of_isConj_inv_of_odd_card`), and the
+structure-constant congruence from the trivial character (`nonidentityZClassCoeffSum_cong_hall`). -/
+theorem peterfalvi_67_hall_of_odd [Finite G] (ρ : Representation ℂ G V) [ρ.IsIrreducible]
+    {H Q Z : Subgroup G} (hQH : Q ≤ H) (hZQ : Z ≤ Q)
+    (hQnormal : (Q.subgroupOf H).Normal) (hZnormal : (Z.subgroupOf H).Normal)
+    (hti : IsTISubset ((Q : Set G) \ {1}) H)
+    (hHall : Nat.Coprime (Nat.card ↥Q) (Nat.card (↥H ⧸ Q.subgroupOf H)))
+    (hoddG : Odd (Nat.card G))
+    {z : G} (hzZ : z ∈ Z) (hz1 : z ≠ 1)
+    (hQz : Q ≤ Subgroup.centralizer ({z} : Set G))
+    (hHallG : Nat.Coprime (Nat.card ↥Q) Q.index)
+    (hconst : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 →
+      ρ.character w = ρ.character z ∧
+        Nat.card ↥(H ⊓ Subgroup.centralizer ({w} : Set G)) =
+          Nat.card ↥(H ⊓ Subgroup.centralizer ({z} : Set G))) :
+    ρ.character z ≡ ρ.character 1 [ALGMOD (Nat.card ↥Q : ℤ)] := by
+  have hreal : ConjClasses.mk z⁻¹ ≠ ConjClasses.mk z := by
+    rw [Ne, ConjClasses.mk_eq_mk_iff_isConj]
+    intro h
+    exact hz1 (ConjClasses.eq_one_of_isConj_inv_of_odd_card hoddG h)
+  exact peterfalvi_67_hall ρ hQH hZQ hQnormal hZnormal hti hHall hzZ hz1
+    (coprime_card_class_card_hall hQz hHallG) hreal hconst
+    (nonidentityZClassCoeffSum_cong_hall hQH hZQ hQnormal hZnormal hti hHall hzZ hz1 hQz hHallG
+      hreal fun w hw h1 => (hconst hw h1).2)
 
 end Assembly
 
