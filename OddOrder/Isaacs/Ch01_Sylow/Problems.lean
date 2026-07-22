@@ -217,6 +217,122 @@ theorem card_doubleCoset_mul_card_inf_conj {G : Type*} [Group G] [Finite G]
   rw [← horb, ← hstab, ← Nat.card_prod,
     Nat.card_congr (orbitProdStabilizerEquivGroup (H × K) g), Nat.card_prod]
 
+open Pointwise in
+/-- 部分群積の位数公式 `|HK| · |H∩K| = |H| · |K|` (Isaacs 1A.2 の Note の「よく知られた公式」、
+上の `card_doubleCoset_mul_card_inf_conj` を `g = 1` に適用したもの)。 -/
+theorem card_mul_card_inf {G : Type*} [Group G] [Finite G] (H K : Subgroup G) :
+    Nat.card (↑H * ↑K : Set G) * Nat.card ↥(H ⊓ K) = Nat.card H * Nat.card K := by
+  have h2 := card_doubleCoset_mul_card_inf_conj H K 1
+  have hdc : DoubleCoset.doubleCoset (1 : G) (↑H) (↑K) = (↑H * ↑K : Set G) := by
+    ext x
+    rw [DoubleCoset.mem_doubleCoset, Set.mem_mul]
+    constructor
+    · rintro ⟨a, ha, b, hb, rfl⟩; exact ⟨a, ha, b, hb, by group⟩
+    · rintro ⟨a, ha, b, hb, rfl⟩; exact ⟨a, ha, b, hb, by group⟩
+  have hconj : MulAut.conj (1 : G)⁻¹ • H = H := by rw [inv_one, map_one, one_smul]
+  rw [hdc, hconj, inf_comm] at h2
+  exact h2
+
+open Pointwise in
+/-- **Isaacs Problem 1A.3(a)** (不等式). `|H : H∩K| ≤ |G : K|`、乗法形 `|H|·|K| ≤ |G|·|H∩K|`。
+`|H|·|K| = |HK|·|H∩K| ≤ |G|·|H∩K|` (`HK ⊆ G`)。index 形 `(H⊓K).index ≤ H.index·K.index` は
+mathlib の `Subgroup.index_inf_le`。 -/
+theorem card_mul_le_card_mul_card_inf {G : Type*} [Group G] [Finite G] (H K : Subgroup G) :
+    Nat.card H * Nat.card K ≤ Nat.card G * Nat.card ↥(H ⊓ K) := by
+  rw [← card_mul_card_inf H K]
+  gcongr
+  rw [Nat.card_coe_set_eq, ← Set.ncard_univ G]
+  exact Set.ncard_le_ncard (Set.subset_univ _)
+
+open Pointwise in
+/-- **Isaacs Problem 1A.3(a)** (等号条件). `|H|·|K| = |G|·|H∩K| ⟺ HK = G` (集合として)。 -/
+theorem card_mul_eq_iff_mul_eq_univ {G : Type*} [Group G] [Finite G] (H K : Subgroup G) :
+    Nat.card H * Nat.card K = Nat.card G * Nat.card ↥(H ⊓ K) ↔ (↑H * ↑K : Set G) = Set.univ := by
+  rw [← card_mul_card_inf H K, Set.eq_univ_iff_ncard, ← Nat.card_coe_set_eq]
+  constructor
+  · exact fun h => Nat.eq_of_mul_eq_mul_right Nat.card_pos h
+  · exact fun h => by rw [h]
+
+open Pointwise in
+/-- **Isaacs Problem 1A.3(b)**. `|G:H|` と `|G:K|` が互いに素ならば `HK = G` (集合として)。
+
+`[G:H] ∣ [G:H∩K]` かつ `[G:K] ∣ [G:H∩K]` (∵ `H∩K ≤ H,K`)、互いに素ゆえ `[G:H]·[G:K] ∣ [G:H∩K]`。
+一方 `[G:H∩K] ≤ [G:H]·[G:K]` (`Subgroup.index_inf_le`)。よって `[G:H∩K] = [G:H]·[G:K]`、
+これは (a) の等号条件 `|H|·|K| = |G|·|H∩K|` と同値ゆえ `HK = G`。 -/
+theorem mul_eq_univ_of_coprime_index {G : Type*} [Group G] [Finite G] {H K : Subgroup G}
+    (hcop : Nat.Coprime H.index K.index) : (↑H * ↑K : Set G) = Set.univ := by
+  rw [← card_mul_eq_iff_mul_eq_univ]
+  have hdvd : H.index * K.index ∣ (H ⊓ K).index :=
+    hcop.mul_dvd_of_dvd_of_dvd (Subgroup.index_dvd_of_le inf_le_left)
+      (Subgroup.index_dvd_of_le inf_le_right)
+  have hpos : 0 < (H ⊓ K).index := Nat.pos_of_ne_zero fun h => by
+    have hc := Subgroup.card_mul_index (H ⊓ K)
+    rw [h, Nat.mul_zero] at hc
+    exact (Nat.card_pos).ne' hc.symm
+  have hidx : (H ⊓ K).index = H.index * K.index :=
+    le_antisymm Subgroup.index_inf_le (Nat.le_of_dvd hpos hdvd)
+  have eH : Nat.card H * H.index = Nat.card G := Subgroup.card_mul_index H
+  have eK : Nat.card K * K.index = Nat.card G := Subgroup.card_mul_index K
+  have eI : Nat.card ↥(H ⊓ K) * (H.index * K.index) = Nat.card G := by
+    rw [← hidx]; exact Subgroup.card_mul_index (H ⊓ K)
+  have hprodpos : 0 < H.index * K.index := hidx ▸ hpos
+  apply Nat.eq_of_mul_eq_mul_right hprodpos
+  calc Nat.card H * Nat.card K * (H.index * K.index)
+      = (Nat.card H * H.index) * (Nat.card K * K.index) := by ring
+    _ = Nat.card G * Nat.card G := by rw [eH, eK]
+    _ = Nat.card G * (Nat.card ↥(H ⊓ K) * (H.index * K.index)) := by rw [eI]
+    _ = Nat.card G * Nat.card ↥(H ⊓ K) * (H.index * K.index) := by ring
+
+open Pointwise MulAction in
+/-- **Isaacs Problem 1A.5**. `G` が `α`, `β` に推移的に作用するとき、積 `α × β` への (対角) 作用が
+推移的 ⟺ `G_a · G_b = G` (安定化群の集合積、`a`, `b` は任意の基点)。
+
+⟹: `c ∈ G` に対し `(a,b) → (a, c·b)` を送る `g` (推移性) は `g∈G_a` かつ `g⁻¹c∈G_b`、
+`c = g·(g⁻¹c)`。⟸: `(a',b')` に対し `g₁·a=a'`, `g₂·b=b'` を取り、`g₂⁻¹g₁ ∈ G_b·G_a`
+(= `univ`) を `t·s` と分解して `g = g₂·t` とすると `g·a=a'`, `g·b=b'`。 -/
+theorem isPretransitive_prod_iff {G α β : Type*} [Group G] [MulAction G α] [MulAction G β]
+    [IsPretransitive G α] [IsPretransitive G β] (a : α) (b : β) :
+    IsPretransitive G (α × β) ↔
+      (↑(stabilizer G a) * ↑(stabilizer G b) : Set G) = Set.univ := by
+  constructor
+  · intro h
+    ext c
+    simp only [Set.mem_univ, iff_true, Set.mem_mul, SetLike.mem_coe]
+    obtain ⟨g, hg⟩ := h.exists_smul_eq (a, b) (a, c • b)
+    obtain ⟨hga, hgb⟩ := Prod.ext_iff.mp hg
+    have hga : g • a = a := hga
+    have hgb : g • b = c • b := hgb
+    refine ⟨g, ?_, g⁻¹ * c, ?_, by group⟩
+    · rw [mem_stabilizer_iff]; exact hga
+    · rw [mem_stabilizer_iff, mul_smul, ← hgb, inv_smul_smul]
+  · intro h
+    have hconnect : ∀ (a' : α) (b' : β), ∃ g : G, g • a = a' ∧ g • b = b' := by
+      intro a' b'
+      obtain ⟨g₁, hg₁⟩ := exists_smul_eq G a a'
+      obtain ⟨g₂, hg₂⟩ := exists_smul_eq G b b'
+      have hmem : g₁⁻¹ * g₂ ∈ (↑(stabilizer G a) * ↑(stabilizer G b) : Set G) :=
+        h ▸ Set.mem_univ _
+      rw [Set.mem_mul] at hmem
+      obtain ⟨s, hs, t, ht, hst⟩ := hmem
+      rw [SetLike.mem_coe, mem_stabilizer_iff] at hs ht
+      refine ⟨g₁ * s, ?_, ?_⟩
+      · rw [mul_smul, hs, hg₁]
+      · have hg : g₁ * s = g₂ * t⁻¹ := by
+          have h2 : g₁ * (s * t) = g₂ := by rw [hst]; group
+          rw [← h2]; group
+        rw [hg, mul_smul]
+        rw [show t⁻¹ • b = b by rw [inv_smul_eq_iff, ht], hg₂]
+    refine ⟨fun x y => ?_⟩
+    obtain ⟨gx, hgx1, hgx2⟩ := hconnect x.1 x.2
+    obtain ⟨gy, hgy1, hgy2⟩ := hconnect y.1 y.2
+    refine ⟨gy * gx⁻¹, ?_⟩
+    rw [Prod.ext_iff]
+    refine ⟨?_, ?_⟩
+    · change (gy * gx⁻¹) • x.1 = y.1
+      rw [← hgx1, mul_smul, inv_smul_smul]; exact hgy1
+    · change (gy * gx⁻¹) • x.2 = y.2
+      rw [← hgx2, mul_smul, inv_smul_smul]; exact hgy2
+
 end
 
 /-! ## mathlib で被覆される演習 (続き)

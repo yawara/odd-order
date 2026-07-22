@@ -59,9 +59,17 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   (`fixedPointsMulLeftCosetsEquivQuotient`)。
 - ✅ 実証明: **1A.2** (`card_doubleCoset_mul_card_inf_conj`: 二重剰余類 |HgK|·|K∩H^g|=|H||K|、
   H×K の両側作用 (h,k)•x=hxk⁻¹ の orbit-stabilizer)。
-- ⬜ 残 §1A: **1A.3** (|H:H∩K|≤|G:K| 等号⟺HK=G; coprime index⟹HK=G) — **1A.2 を g=1 に適用
-  すれば |HK|·|H∩K|=|H||K|、あとは HK⊆G で ≤ + 等号=HK=G** / **1A.5** (積作用の推移性⟺G_αG_β=G) /
-  **1A.7** (真部分群の共役の和集合の補集合 ≥|H|、1A.6 の置換指標を使う)。
+- ✅ 実証明: **1A.3** (`card_mul_card_inf` helper = |HK|·|H∩K|=|H||K| (1A.2 g=1) /
+  `card_mul_le_card_mul_card_inf` (a)≤ / `card_mul_eq_iff_mul_eq_univ` (a)等号⟺HK=G /
+  `mul_eq_univ_of_coprime_index` (b) coprime index⟹HK=G)。
+- ✅ 実証明: **1A.5** (`isPretransitive_prod_iff`: G が α,β に推移的作用のとき積作用が推移的
+  ⟺ G_a·G_b=univ、両方向とも安定化群と剰余類の交わり)。
+- ⬜ 残 §1A: **1A.7** (真部分群 H の共役の和集合に入らない元 ≥|H|)。**正しい論法 (導出済)**:
+  χ = G の G⧸H (右剰余類) 上の置換指標。(i) Burnside for G: `∑_{g∈G}χ(g)=|G|` (G は推移的ゆえ
+  軌道 1 個)。(ii) Burnside for H (制限作用): `∑_{h∈H}χ(h)=|H|·(#H-軌道)=|H|·(#二重剰余類 H\G/H)
+  ≥ 2|H|` (真部分群ゆえ二重剰余類 ≥2: H·1·H と HxH(x∉H))。(iii) `χ(g)=0 ⟺ g∉∪共役` ゆえ
+  z=|{χ=0}|。z ≥ (|G|-|H|)-∑_{g∉H}χ(g) ≥ (|G|-|H|)-(|G|-2|H|)=|H|。mathlib =
+  `sum_card_fixedBy_eq_card_orbits_mul_card_group` (Burnside)、H の制限作用の軌道=二重剰余類。
 - ⬜ §1B–§1G 未着手。
 
 ## 完了条件
