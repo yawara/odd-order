@@ -75,6 +75,39 @@ theorem sum_degree_mul_charValue_XsetOf_bot [Finite G] {Z : Subgroup G} (hZQ1 : 
       rw [hT, hchar]; exact ⟨ψ.2, hψ.2⟩
     · apply IrreducibleCharacter.ext; rfl
 
+open scoped Classical in
+/-- **Degree-square value over `𝒳`** (Peterfalvi (8), the `z = 1` companion of
+`sum_degree_mul_charValue_XsetOf_bot`).  For `𝒳 = XsetOf ⊥ Z` with `Z ≤ Q₁`,
+`∑_{χ ∈ 𝒳} χ(1)² = |H| − |H ⧸ Z|` — the identity value of `ρ_H − ρ_{H/Z}`
+(`sumNonInflatedDegreeSq`).  Together with the off-identity value `-|H ⧸ Z|` this gives the
+`(8)` difference `ρ_H − ρ_{H/Z}` evaluated at `z ∈ Z^#` minus at `1`, namely `-|H|`. -/
+theorem sum_degreeSq_XsetOf_bot [Finite G] {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    [(Z.subgroupOf hyp.H).Normal]
+    {T : Finset (ClassFunction ↥hyp.H ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.XsetOf ⊥ Z) :
+    ∑ φ ∈ T, ((φ : ClassFunction ↥hyp.H ℂ) 1) ^ 2
+      = (Nat.card ↥hyp.H : ℂ) - (Nat.card (↥hyp.H ⧸ Z.subgroupOf hyp.H) : ℂ) := by
+  classical
+  have hchar : ∀ φ : ClassFunction ↥hyp.H ℂ, φ ∈ hyp.XsetOf ⊥ Z ↔
+      IsIrreducibleCharacter φ ∧
+        ¬ ((Z.subgroupOf hyp.H : Set ↥hyp.H) ⊆ OddOrder.Peterfalvi.S03.characterKernel φ) := by
+    intro φ
+    rw [hyp.mem_XsetOf_bot_iff hZQ1, hyp.leKer_iff_subset_characterKernel]
+  rw [show ∑ φ ∈ T, ((φ : ClassFunction ↥hyp.H ℂ) 1) ^ 2
+      = ∑ ψ ∈ Finset.univ.filter (fun ψ : IrreducibleCharacter ↥hyp.H =>
+          ¬ ((Z.subgroupOf hyp.H : Set ↥hyp.H) ⊆
+            OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction ↥hyp.H ℂ))),
+          ((ψ : ClassFunction ↥hyp.H ℂ) 1) ^ 2 from ?_]
+  · exact OddOrder.RepresentationTheory.sumNonInflatedDegreeSq (N := Z.subgroupOf hyp.H)
+  · refine Finset.sum_bij'
+      (fun φ hφ => (⟨φ, ((hchar φ).mp ((hT φ).mp hφ)).1⟩ : IrreducibleCharacter ↥hyp.H))
+      (fun ψ _ => (ψ : ClassFunction ↥hyp.H ℂ))
+      (fun φ hφ => ?_) (fun ψ hψ => ?_) (fun φ hφ => rfl) (fun ψ hψ => ?_) (fun φ hφ => rfl)
+    · rw [Finset.mem_filter]
+      exact ⟨Finset.mem_univ _, ((hchar φ).mp ((hT φ).mp hφ)).2⟩
+    · rw [Finset.mem_filter] at hψ
+      rw [hT, hchar]; exact ⟨ψ.2, hψ.2⟩
+    · apply IrreducibleCharacter.ext; rfl
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
