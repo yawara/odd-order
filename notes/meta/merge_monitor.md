@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 04:5x 監視 tick — a (1D.15/1D.17) + b (Higman L13 Jacobi) 合流 / 🔴 c stall 継続 (~1h50m)**。a=3 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problems 1D.15 (N=G)** G/Φ(G) nilpotent ⟹ G nilpotent + **1D.17** N◁G nilpotent かつ G/N' nilpotent ⟹ G nilpotent、`ProblemsFrobeniusFrattini.lean` +52) / b (**Higman Lemma 13** 指数4因子の Jacobi 交換関係 + Φ² Singer 座標、新 leaf `ExponentFourJacobi.lean` +247 / `FrattiniSquareCoordinates.lean` +181、両 WIRED via `HigmanLemmaThirteen.lean`)。
+> **gate: green 4659 jobs (前 4657 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 705821625→e03d15c48**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~1h50m, 未復帰)**: 03:04 以降 worktree 更新ゼロが継続 (04:52 時点も activity 0)。ユーザーの c 再起動待ち (2 tick 前に escalate 済)。a/b/d 健全ゆえ c 以外の監視は継続。d=wave 間。
+>
 > **▶▶ 2026-07-23 04:3x 監視 tick — a (1D.8 abelian) 合流 / b WIP / 🔴 c stall 継続**。a=1 / b=0(WIP) / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problem 1D.8 (abelian part)** — nilpotent G で [G,G] ⊆ Φ(G)、`ProblemsFrobeniusFrattini.lean` +22)。
 > **gate: green 4657 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push f4a4090cb→b185c4ade**。範囲逸脱なし。
