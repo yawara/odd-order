@@ -124,6 +124,49 @@ theorem sum_thetaStar_char_div_centralizer_eq_inner
     linear_combination -hcent
   rw [invOf_eq_inv, div_eq_mul_inv, hc_inv]; ring
 
+/-- **`∑_χ (|K|·χ(u))²/χ(1) · ⟨θ*, χ⟩ = 0`** (Gorenstein Lemma 1.8, the character-sum form).
+Substituting the class-sum formula `(9.4.2)` into `sum_classSumCoeff_thetaStar_eq_zero` and
+recognizing the resulting weighted class sum as `⟨θ*, χ⟩`
+(`sum_thetaStar_char_div_centralizer_eq_inner`) turns the vanishing class sum into a vanishing
+sum over irreducible characters. -/
+theorem sum_degWeight_inner_eq_zero
+    [Fintype G] [Fintype ↥Q.N]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥Q.N : ℂ)]
+    [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    ∑ χ : IrreducibleCharacter G,
+        ((Nat.card { x : G // ConjClasses.mk x = Q.involutionClass } : ℂ)
+              * (χ : ClassFunction G ℂ) Q.involutionClass.out
+            * ((Nat.card { x : G // ConjClasses.mk x = Q.involutionClass } : ℂ)
+              * (χ : ClassFunction G ℂ) Q.involutionClass.out)
+          / (χ : ClassFunction G ℂ) 1)
+          * ClassFunction.inner Q.thetaStar (χ : ClassFunction G ℂ) = 0 := by
+  classical
+  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  rw [← Q.sum_classSumCoeff_thetaStar_eq_zero]
+  -- rewrite `⟨θ*, χ⟩` as the weighted class sum, then swap the order of summation
+  rw [Finset.sum_congr rfl fun χ _ => by
+    rw [← Q.sum_thetaStar_char_div_centralizer_eq_inner χ, Finset.mul_sum], Finset.sum_comm]
+  refine Finset.sum_congr rfl fun Cs _ => ?_
+  -- per class `Cs`: the inner `∑_χ` reassembles the `(9.4.2)` right-hand side
+  have h942 := classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter
+    (G := G) Q.involutionClass Q.involutionClass Cs
+  have hgne : (Nat.card G : ℂ) ≠ 0 := Invertible.ne_zero _
+  have hcent : (conjugacyClassSize Cs : ℂ)
+      * (Nat.card (Subgroup.centralizer ({Cs.out} : Set G)) : ℂ) = (Nat.card G : ℂ) := by
+    have h := conjugacyClassSize_mk_mul_card_centralizer_cast (G := G) Cs.out
+    rwa [conjClass_mk_out] at h
+  have hcentne : (Nat.card (Subgroup.centralizer ({Cs.out} : Set G)) : ℂ) ≠ 0 := by
+    intro h0; rw [h0, mul_zero] at hcent; exact hgne hcent.symm
+  -- factor `θ*(Cs.out)/|C_G|` out of the `∑_χ` (abstracting the `χ`-dependent factors as
+  -- `a, b` to avoid coercion friction), then use `(9.4.2)`
+  have reorder : ∀ a b : ℂ, a * (Q.thetaStar Cs.out * b
+        / (Nat.card (Subgroup.centralizer ({Cs.out} : Set G)) : ℂ))
+      = Q.thetaStar Cs.out / (Nat.card (Subgroup.centralizer ({Cs.out} : Set G)) : ℂ) * (a * b) :=
+    fun a b => by ring
+  simp_rw [reorder]
+  rw [← Finset.mul_sum, ← h942]
+  field_simp
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory
