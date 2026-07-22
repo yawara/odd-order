@@ -415,6 +415,69 @@ theorem restricted_range_hasXiLengthThree_of_frattini_cover_exponent_four
   have hErank := rank_le_two E
   omega
 
+/-- **Higman Lemma 13 (p. 93), exponent-four lifted factors.**
+
+The two complementary Frattini preimages both have restricted `ξ`-length
+three.  Their intersection is `Φ(P)` and together they generate `P`. -/
+theorem exists_two_xiLengthThree_frattini_preimages_of_exponent_four
+    [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthFour Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    (hPhiComm : IsMulCommutative (frattini P))
+    (hfour : ∀ z : frattini P, z ^ 4 = 1)
+    (hexists : ∃ z : frattini P, z ^ 2 ≠ 1) :
+    ∃ (X Z : Subgroup P)
+        (hXinv : IsAInvariant Y.subtype X)
+        (hZinv : IsAInvariant Y.subtype Z),
+      X.Normal ∧ HasXiLengthThree hXinv.restrict.range.subtype ∧
+        Z.Normal ∧ HasXiLengthThree hZinv.restrict.range.subtype ∧
+        frattini P < X ∧ X < ⊤ ∧
+        frattini P < Z ∧ Z < ⊤ ∧
+        X ⊓ Z = frattini P ∧ X ⊔ Z = ⊤ := by
+  obtain ⟨X, Z, hXnormal, hXinv, hZnormal, hZinv,
+      hPhiX, hXtop, hPhiZ, hZtop,
+      _hXbot, _hZbot, hXZinf, hXZsup⟩ :=
+    exists_two_invariant_frattini_preimages_of_xiLengthFour_exponent_four
+      hP hncomm hmulti hxi hlen hprime hPhiComm hfour hexists
+  let phiTerm := frattiniNormalInvariant Y.subtype
+  let xTerm : NormalInvariantSubgroup Y.subtype :=
+    ⟨X, ⟨hXnormal, hXinv⟩⟩
+  let zTerm : NormalInvariantSubgroup Y.subtype :=
+    ⟨Z, ⟨hZnormal, hZinv⟩⟩
+  have hLower := frattiniSquare_composition_series_of_exponent_four
+    hP hxi hPhiComm hfour hexists
+  have hXcovers := hlen.covers_of_chain
+    hLower.1.lt hLower.2.lt
+      (show phiTerm < xTerm from hPhiX)
+      (show xTerm < normalInvariantTop Y.subtype from hXtop)
+  have hZcovers := hlen.covers_of_chain
+    hLower.1.lt hLower.2.lt
+      (show phiTerm < zTerm from hPhiZ)
+      (show zTerm < normalInvariantTop Y.subtype from hZtop)
+  let hPhiXCover : NormalInvariantCover Y.subtype (frattini P) X :=
+    { left := phiTerm.2
+      right := xTerm.2
+      covBy := hXcovers.2.2.1 }
+  let hPhiZCover : NormalInvariantCover Y.subtype (frattini P) Z :=
+    { left := phiTerm.2
+      right := zTerm.2
+      covBy := hZcovers.2.2.1 }
+  have hlenX : HasXiLengthThree hXinv.restrict.range.subtype :=
+    restricted_range_hasXiLengthThree_of_frattini_cover_exponent_four
+      hP hxi hPhiComm hfour hexists hXinv hPhiXCover
+  have hlenZ : HasXiLengthThree hZinv.restrict.range.subtype :=
+    restricted_range_hasXiLengthThree_of_frattini_cover_exponent_four
+      hP hxi hPhiComm hfour hexists hZinv hPhiZCover
+  exact ⟨X, Z, hXinv, hZinv, hXnormal, hlenX, hZnormal, hlenZ,
+    hPhiX, hXtop, hPhiZ, hZtop, hXZinf, hXZsup⟩
+
 /-- **Higman Lemma 13 (p. 93), exponent-two lifted factors.**
 
 The three independent Frattini preimages all have restricted `ξ`-length
