@@ -85,6 +85,45 @@ theorem sum_classSumCoeff_thetaStar_eq_zero
   · rw [Q.classSumCoeff_involutionClass_eq_zero_of_even heven, Nat.cast_zero, zero_mul]
   · rw [Q.thetaStar_apply_eq_zero_of_odd hodd, mul_zero]
 
+/-- **The `(9.4.2)`-weighted class sum equals the inner product `⟨θ*, χ⟩`** (Gorenstein
+Lemma 1.8, the bridge from the class-sum formula to character multiplicities).  Summing
+`θ*(Cs.out)·χ(Cs.out⁻¹)` weighted by `1/|C_G(Cs.out)|` over conjugacy classes reproduces the
+normalized inner product `⟨θ*, χ⟩ = ⅟|G| · ∑_g θ*(g)·conj(χ(g))`, using the orbit-stabilizer
+identity `|Cs|·|C_G(Cs.out)| = |G|` and `χ(g⁻¹) = conj(χ(g))`. -/
+theorem sum_thetaStar_char_div_centralizer_eq_inner
+    [Fintype G] [Fintype ↥Q.N] [Fintype (ConjClasses G)]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥Q.N : ℂ)]
+    [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] (χ : IrreducibleCharacter G) :
+    ∑ Cs : ConjClasses G, Q.thetaStar Cs.out * (χ : ClassFunction G ℂ) Cs.out⁻¹
+        / (Nat.card (Subgroup.centralizer ({Cs.out} : Set G)) : ℂ)
+      = ClassFunction.inner Q.thetaStar (χ : ClassFunction G ℂ) := by
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum,
+    classFunction_innerSum_eq_sum_conjClasses, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun Cs _ => ?_
+  -- reconcile the representative `conjugacyClassRepresentative Cs` with `Cs.out`
+  have hrepconj : IsConj (conjugacyClassRepresentative Cs) Cs.out := by
+    rw [← ConjClasses.mk_eq_mk_iff_isConj, conjugacyClassRepresentative_mk_eq, conjClass_mk_out]
+  have hθ : Q.thetaStar (conjugacyClassRepresentative Cs) = Q.thetaStar Cs.out :=
+    Q.thetaStar.of_isConj hrepconj
+  have hχ : (χ : ClassFunction G ℂ) (conjugacyClassRepresentative Cs)
+      = (χ : ClassFunction G ℂ) Cs.out :=
+    (χ : ClassFunction G ℂ).of_isConj hrepconj
+  rw [hθ, hχ, irreducibleCharacter_apply_inv]
+  -- orbit-stabilizer: `|Cs|·|C_G(Cs.out)| = |G|`
+  have hcent : (conjugacyClassSize Cs : ℂ)
+      * (Nat.card (Subgroup.centralizer ({Cs.out} : Set G)) : ℂ) = (Nat.card G : ℂ) := by
+    have h := conjugacyClassSize_mk_mul_card_centralizer_cast (G := G) Cs.out
+    rwa [conjClass_mk_out] at h
+  have hgne : (Nat.card G : ℂ) ≠ 0 := Invertible.ne_zero _
+  have hcentne : (Nat.card (Subgroup.centralizer ({Cs.out} : Set G)) : ℂ) ≠ 0 := by
+    intro h0; rw [h0, mul_zero] at hcent; exact hgne hcent.symm
+  -- `1/|C_G(Cs.out)| = |Cs| · 1/|G|`
+  have hc_inv : (Nat.card (Subgroup.centralizer ({Cs.out} : Set G)) : ℂ)⁻¹
+      = (conjugacyClassSize Cs : ℂ) * (Nat.card G : ℂ)⁻¹ := by
+    field_simp
+    linear_combination -hcent
+  rw [invOf_eq_inv, div_eq_mul_inv, hc_inv]; ring
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory
