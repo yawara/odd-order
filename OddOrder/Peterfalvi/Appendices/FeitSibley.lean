@@ -60,8 +60,8 @@ Per-result status:
 | Lemma 1(a) (`coherent_adjoin_of_degree_bound`) | **proved, sorry-free** (issue 1049) |
 | Lemma 2(a) (`Sset_eq_induced_of_Q`) | **proved, sorry-free** (issue 1051) |
 | Lemma 2(b) (`induction_isometry_on_degree_zero`) | **proved, sorry-free** (issue 1052) |
-| Lemma 2(c) (`hasNoRealCharacters_Sset`) | **proved, sorry-free** (issue 1053; explicit `Odd |Q₁|` hypothesis, see its docstring) |
-| Theorem (`feit_sibley_coherence`) | honest statement, `sorry` |
+| Lemma 2(c) (`hasNoRealCharacters_Sset`) | **proved** (issue 1053, `Odd |Q₁|` hyp.) |
+| Theorem (`feit_sibley_coherence`) | **proved** (`FeitSibleyMain`, issue 1054) |
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
@@ -1212,44 +1212,11 @@ theorem hasNoRealCharacters_Sset [Finite G] (hd : Odd hyp.d)
 
 end LemmaTwo
 
-/-! ## The Feit-Sibley Theorem (pp. 146--150) -/
+/-! ## The Feit-Sibley Theorem (pp. 146--150)
 
-section MainTheorem
-
-/-- **Peterfalvi Appendix IV, Theorem** (p. 146).  If `d = |D|` is odd, then `𝒮`
-is coherent with respect to the induction isometry `τ = Ind_H^G` of Lemma 2(b).
-
-**Status: honestly stated, not proved.**  Every ingredient is now a real
-statement: `hyp` is the book's hypothesis block, `hyp.Sset` and `hyp.A` are the
-book's `𝒮` and `Q^#`, and `hyp.tau` *is* `Ind_H^G`.
-
-Peterfalvi's proof is the eight-step argument on pp. 146--150: reductions (1)
-and (2) (`𝒮(S')` coherent when `|Q₁|` has two prime divisors; `𝒮` coherent when
-`𝒮(S')` is) let one assume `Q₁` is a non-abelian `p`-group; step (3) makes
-`𝒳 = 𝒮 - 𝒮(Z)` coherent for `1 ≠ Z ⊴ H` with `Z ≤ Z(Q₁)`; steps (4)--(6) set up
-`𝒴 = 𝒮(Q')` and reduce coherence of `𝒮` to `a ∣ λ`; step (7) is the class-algebra
-congruence `ψ(z) ≡ ψ(1) (mod |Q|)` for `ψ ∈ Irr(G)` constant on `Z^#`; step (8)
-combines them.  Lemma 1(a) (`coherent_adjoin_of_degree_bound`, issue 1049),
-Lemma 2(a) (`Sset_eq_induced_of_Q`, issue 1051), Lemma 2(b)
-(`induction_isometry_on_degree_zero`, issue 1052) and Lemma 2(c)
-(`hasNoRealCharacters_Sset`, issue 1053; its `Odd |Q₁|` hypothesis is available
-here post-reduction, where `Q₁` is a `p`-group for a prime `p ≠ 2`) are now
-proved.  Steps (1)--(6) are formalized (reductions
-`ssetOf_sder_coherent_of_two_primes`/`sset_coherent_of_ssetOf_sder_coherent`,
-step (3) `xset_coherent_of_le_center_Q1`, and the (6) union coherence
-`union_coherent_of_lambda_dvd`, `a ∣ λ ⟹ 𝒳 ∪ 𝒴` coherent).  Step (7)'s class-sum
-congruence for a Hall TI subgroup is now in the repository
-(`peterfalvi_67_hall_of_odd`, `HallTICongruence.lean`), together with the (8)
-divisibility core `dvd_of_isIntegral_ratio` and the regular-character value
-`sum_degree_mul_charValue_XsetOf_bot`.  The remaining work is the (8) final
-assembly (`Res_H e'₁` analysis → `a ∣ λ`) and the step-(5) adjoin closing `𝒮`
-(campaign issue 1054). -/
-theorem feit_sibley_coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
-    (hyp : Hypothesis G) [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
-    (hd : Odd hyp.d) :
-    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
-  sorry
-
-end MainTheorem
+The main theorem `feit_sibley_coherence` is assembled at the top of the chain in
+`OddOrder.Peterfalvi.Appendices.FeitSibleyMain` (it consumes the reductions and the
+endgame downstream of this base file).  It carries the same fully-qualified name
+`OddOrder.Peterfalvi.Appendices.FeitSibley.feit_sibley_coherence`. -/
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley

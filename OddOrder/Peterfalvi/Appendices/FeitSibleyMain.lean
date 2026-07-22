@@ -201,8 +201,153 @@ theorem ssetOf_sder_coherent_of_xset_qder_union
       (fun δ hδ z hz => hZH δ (hyp.D_le_H hδ) z hz) hZne hZodd
   exact false_of_finish_bounds hyp.d_pos ha2 Nat.card_pos Nat.card_pos h1 h3 h4
 
+open scoped Classical in
+/-- **The non-abelian `p`-group branch: `𝒮(S')` coherent** (Peterfalvi (3)–(6), pp. 147–148).
+For a non-abelian `p`-group `Q₁` (`d` odd, `|G|` odd, `Q` Hall), `𝒮(S')` is coherent.  With
+`Z = ⁅Q₁,Q₁⁆ ∩ Z(Q₁) ≠ 1`, step (3) makes `𝒳 = 𝒮 − 𝒮(Z) = XsetOf ⊥ Z` coherent
+(`endgame_Xset_coherent`); the endgame steps (4)–(8) make `𝒳 ∪ 𝒴` coherent
+(`xset_qder_union_coherent`, `𝒴 = 𝒮(Q')`) with the anchor package `exists_anchor_data`, the
+Remark facts on `𝒴` (`ssetOf_Qder_coherent`, `two_le_ncard_SsetOf_Qder`), and a witness pair of
+conjugates; restricting to `𝒳₁ ∪ 𝒴` (`isCoherent_subset`, `𝒳₁ = 𝒳 ∩ 𝒮(S') = XsetOf S' Z`) and
+adjoining the rest of `𝒮(S')` (`ssetOf_sder_coherent_of_xset_qder_union`) closes it. -/
+theorem ssetOf_sder_coherent_of_nonabelian
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hoddG : Odd (Nat.card G)) (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index)
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    {p : ℕ} (hp : p.Prime) (hQ1p : IsPGroup p ↥hyp.Q1) (hnonab : ⁅hyp.Q1, hyp.Q1⁆ ≠ ⊥) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsetOf hyp.Sder) hyp.A) := by
+  classical
+  set Z : Subgroup G := hyp.endgameZ with hZdef
+  have hZQ1 : Z ≤ hyp.Q1 := hyp.endgameZ_le_Q1
+  have hZne : Z ≠ ⊥ := hyp.endgameZ_ne_bot hp hQ1p hnonab
+  have hZQder : Z ≤ hyp.Qder := hyp.endgameZ_le_Qder
+  have hZcent : ∀ w ∈ Z, ∀ y ∈ hyp.Q1, ⁅w, y⁆ = 1 :=
+    fun w hw y hy => hyp.endgameZ_centralizes hw hy
+  have hZH : ∀ h ∈ hyp.H, ∀ x ∈ Z, h * x * h⁻¹ ∈ Z :=
+    fun h hh x hx => hyp.endgameZ_conj_mem_of_mem_H hh hx
+  -- the three `H`-normal instances (as in `endgame_Xset_coherent`)
+  haveI : (hyp.Sder.subgroupOf hyp.H).Normal :=
+    hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx => hyp.Sder_conj_mem_of_mem_H hh hx
+  haveI : (Z.subgroupOf hyp.H).Normal :=
+    hyp.subgroupOf_H_normal_of_conj_mem hZH
+  -- the no-real-character fact (Lemma 2(c)) for the conjugate witnesses
+  have hnoreal := hasNoRealCharacters_Sset hyp hd hQ1odd
+  -- (3): `𝒳 = XsetOf ⊥ Z` is coherent
+  have hcohX := (hyp.endgame_Xset_coherent hd hp hQ1p hnonab).some
+  -- (4) anchor package
+  obtain ⟨χ₁, a, hχ₁X, ha, hχ₁deg, hXdiff⟩ :=
+    hyp.exists_anchor_data hp hQ1p hZQ1 hZne hZQder hZH
+  have hχ₁S : χ₁ ∈ hyp.Sset := hyp.XsetOf_subset_Sset ⊥ Z hχ₁X
+  have hχ₂X : χ₁.conj ∈ hyp.XsetOf ⊥ Z := hyp.conj_mem_XsetOf hχ₁X
+  have hχ₂ne : χ₁.conj ≠ χ₁ := fun h => hnoreal hχ₁S h
+  -- `𝒴 = 𝒮(Q')` and its Remark facts
+  have hlt : hyp.S ⊔ hyp.Qder < hyp.Q := hyp.sup_S_Qder_lt_Q hnil
+  have hYne : (hyp.SsetOf hyp.Qder).Nonempty := hyp.ssetOf_Qder_nonempty hlt
+  have hYS : hyp.SsetOf hyp.Qder ⊆ hyp.Sset := fun x hx => hx.1
+  have hcohY := (hyp.ssetOf_Qder_coherent hd hQ1odd hYne).some
+  obtain ⟨η₁, hη₁Y⟩ := hYne
+  have hη₁S : η₁ ∈ hyp.Sset := hYS hη₁Y
+  have hη₁d : η₁ (1 : ↥hyp.H) = (hyp.d : ℂ) := hyp.apply_one_eq_d_of_mem_SsetOf_Qder hη₁Y
+  have hη₂Y : η₁.conj ∈ hyp.SsetOf hyp.Qder := hyp.conj_mem_SsetOf hη₁Y
+  have hη₂ne : η₁.conj ≠ η₁ := fun h => hnoreal hη₁S h
+  have hm : 2 ≤ (hyp.SsetOf hyp.Qder).ncard :=
+    hyp.two_le_ncard_SsetOf_Qder hd hQ1odd ⟨η₁, hη₁Y⟩
+  -- the `𝒴`-difference support and the keystone support
+  have hYdiff : ∀ ψ ∈ hyp.SsetOf hyp.Qder,
+      ψ - η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) (hyp.SsetOf hyp.Qder) hyp.A :=
+    fun ψ hψ => ⟨Submodule.sub_mem _ (Submodule.subset_span hψ) (Submodule.subset_span hη₁Y),
+      hyp.diff_support_subset_A_of_mem_SsetOf_Qder hψ hη₁Y⟩
+  have hsupp : χ₁ - a • η₁ ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A :=
+    hyp.keystone_mem_zSupportedSpan hχ₁S hη₁S (by rw [hχ₁deg, hη₁d])
+  -- a nontrivial `z ∈ Z^#`
+  haveI : Nontrivial ↥Z := (Subgroup.nontrivial_iff_ne_bot _).mpr hZne
+  obtain ⟨z₀, hz₀ne⟩ := exists_ne (1 : ↥Z)
+  have hz₀H : (z₀ : G) ∈ hyp.H := hyp.Q_le_H (hyp.Q1_le_Q (hZQ1 z₀.2))
+  set z : ↥hyp.H := ⟨(z₀ : G), hz₀H⟩ with hzdef
+  have hzZ : (z : G) ∈ Z := z₀.2
+  have hz1 : z ≠ 1 := fun h => hz₀ne (Subtype.ext (by simpa [hzdef] using congrArg Subtype.val h))
+  -- (4)–(8): `𝒳 ∪ 𝒴` is coherent
+  have hcohXY := hyp.xset_qder_union_coherent hZQ1 hZcent hoddG hHallG hcohX hχ₁X ha hχ₁deg
+    hXdiff hχ₂X hχ₂ne hYS (fun φ hφ => hyp.xsetOf_bot_disjoint_ssetOf_Qder hZQder hφ)
+    hcohY hη₁Y hYdiff hη₂Y hη₂ne hm hsupp hzZ hz1
+  -- restrict to `𝒳₁ ∪ 𝒴` (`𝒳₁ = XsetOf S' Z`)
+  have hXX' : hyp.XsetOf hyp.Sder Z ∪ hyp.SsetOf hyp.Qder
+      ⊆ hyp.XsetOf ⊥ Z ∪ hyp.SsetOf hyp.Qder :=
+    Set.union_subset_union (fun x hx => ⟨hyp.ssetOf_antitone bot_le hx.1, hx.2⟩) (subset_refl _)
+  have hne : ∃ φ : ClassFunction ↥hyp.H ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+        (hyp.XsetOf hyp.Sder Z ∪ hyp.SsetOf hyp.Qder) hyp.A ∧ φ ≠ 0 :=
+    ⟨η₁.conj - η₁,
+      ⟨Submodule.sub_mem _ (Submodule.subset_span (Set.mem_union_right _ hη₂Y))
+          (Submodule.subset_span (Set.mem_union_right _ hη₁Y)),
+        hyp.diff_support_subset_A_of_mem_SsetOf_Qder hη₂Y hη₁Y⟩,
+      fun h => hη₂ne (sub_eq_zero.mp h)⟩
+  have hcohB : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.XsetOf hyp.Sder Z ∪ hyp.SsetOf hyp.Qder) hyp.A) :=
+    ⟨hyp.isCoherent_subset hcohXY.some hXX' hne⟩
+  -- (6) finish: `𝒮(S')` is coherent
+  exact hyp.ssetOf_sder_coherent_of_xset_qder_union hd hQ1odd hZQ1 hZne hZcent hZH hcohB
+    ⟨η₁, hη₁Y⟩
+
 end Finish
 
 end Hypothesis
+
+/-! ## The Feit–Sibley Theorem (pp. 146–150) -/
+
+variable {G : Type*} [Group G]
+
+/-- **Peterfalvi Appendix IV, Theorem** (pp. 146–150; Feit–Sibley).  If `d = |D|` is odd, then
+`𝒮` is coherent with respect to the induction isometry `τ = Ind_H^G` of Lemma 2(b).
+
+The reduction declaration (pp. 146–147) splits on the structure of `Q₁`:
+
+* `|Q₁|` has two distinct prime divisors — reductions (1)+(2)
+  (`sset_coherent_of_two_primes`);
+* `Q₁` abelian (`⁅Q₁,Q₁⁆ = ⊥`) — the Remark plus reduction (2)
+  (`sset_coherent_of_commutator_Q1_eq_bot`);
+* `Q₁` a non-abelian `p`-group — the endgame steps (3)–(8)
+  (`ssetOf_sder_coherent_of_nonabelian`) plus reduction (2).
+
+The `p`-power case is extracted from "not two primes" via
+`Nat.eq_prime_pow_of_unique_prime_dvd`, and `|Q₁| ≠ 1` from `Q1_not_two_group`
+(a trivial group is a `2`-group).  The three added hypotheses `Odd |G|`,
+`Group.IsNilpotent Q₁` and `Nat.Coprime |Q| [G:Q]` are the standing hypotheses of
+the Appendix IV configuration (Peterfalvi's global odd-order hypothesis (E), the
+nilpotent Frobenius-kernel factor, and `Q` a Hall subgroup). -/
+theorem feit_sibley_coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hyp : Hypothesis G) [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    (hd : Odd hyp.d) (hoddG : Odd (Nat.card G))
+    (hnil : Group.IsNilpotent ↥hyp.Q1)
+    (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
+  classical
+  letI : Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- `|Q₁|` is odd (`Q₁ ≤ G`, `|G|` odd) and `≠ 1` (`Q₁` is not a `2`-group)
+  have hQ1odd : Odd (Nat.card ↥hyp.Q1) :=
+    hoddG.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.Q1)
+  have hN1 : Nat.card ↥hyp.Q1 ≠ 1 := fun h1 =>
+    hyp.Q1_not_two_group (IsPGroup.of_card (p := 2) (n := 0) (by rw [h1, pow_zero]))
+  by_cases hab : ⁅hyp.Q1, hyp.Q1⁆ = ⊥
+  · -- abelian `Q₁`
+    exact hyp.sset_coherent_of_commutator_Q1_eq_bot hd hQ1odd hnil hab
+  · by_cases htwo : ∃ p r : ℕ, p.Prime ∧ r.Prime ∧ p ≠ r ∧
+        p ∣ Nat.card ↥hyp.Q1 ∧ r ∣ Nat.card ↥hyp.Q1
+    · -- two distinct prime divisors
+      obtain ⟨p, r, hp, hr, hpr, hpd, hrd⟩ := htwo
+      exact hyp.sset_coherent_of_two_primes hd hQ1odd hnil hp hr hpr hpd hrd
+    · -- `¬ two primes`: `Q₁` is a non-abelian `p`-group
+      push Not at htwo
+      obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd hN1
+      have hQ1p : IsPGroup p ↥hyp.Q1 :=
+        IsPGroup.of_card (Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne' (by
+          intro d hd' hdvd
+          by_contra hdp
+          exact htwo d p hd' hp hdp hdvd hpd))
+      have hlt : hyp.S ⊔ hyp.Qder < hyp.Q := hyp.sup_S_Qder_lt_Q hnil
+      exact hyp.sset_coherent_of_ssetOf_sder_coherent hd hQ1odd hnil hlt
+        (hyp.ssetOf_sder_coherent_of_nonabelian hd hQ1odd hoddG hHallG hnil hp hQ1p hab)
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
