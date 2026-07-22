@@ -187,8 +187,13 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   CommGroup 限定、`mem_sup` 積形も同様) → `Φ(N)` 正規性 + `mul_normal` で Dedekind を回避。
 - ⏸ **1D.5 後回し (intricate)**: `N_G(P)⊆H` (全 p-部分群) ⟹ Frobenius complement。`D=H∩H^g` の
   Sylow `Q` の共役論法が clean な計画立たず (Isaacs/Coq 再読が要)。
-- ⬜ **残り §1D**: 1D.5 (上記) / 1D.8 (G/Φ(G) elementary abelian, Burnside basis 要・mathlib 支援なし) /
-  1D.9–1D.12 / 1D.15 (Φ(G)⊆N, N/Φ(G) 冪零⟹N冪零) / 1D.17 (Φ・冪零系)。多くは meaty。
+- ✅ 実証明 **1D.8 (可換部分)** `commutator_le_frattini` (冪零有限群で `[G,G]⊆Φ(G)`、`G/Φ(G)` 可換)。
+  各極大 `M` は素数指数 (1D.6) ゆえ `G⧸M` は素数位数=巡回、`isMulCommutative_of_isCyclic_of_ker_le_center`
+  (⚠ `IsCyclic.commGroup` は既存 Group instance と diamond を作るので `IsMulCommutative` 経由で回避)、
+  `commutatorElement_eq_one_iff_mul_comm` で `⁅g₁,g₂⁆∈M`。elementary abelian の残り (p-群で `P^p⊆Φ`
+  ⟹ 指数 p) は未 (別途)。
+- ⬜ **残り §1D**: 1D.5 (intricate) / 1D.8 の elementary abelian part (p-群 exponent p) / 1D.9–1D.12 /
+  1D.15 (Φ(G)⊆N, N/Φ(G) 冪零⟹N冪零) / 1D.17 (N 冪零+G/N' 冪零⟹G 冪零)。多くは meaty。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 

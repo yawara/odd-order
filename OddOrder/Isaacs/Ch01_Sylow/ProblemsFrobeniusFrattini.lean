@@ -449,6 +449,28 @@ theorem frattini_map_subtype_le_frattini {G : Type*} [Group G] [Finite G] {N : S
   have hNM : N ≤ N ⊓ M := Subgroup.subgroupOf_eq_top.mp (frattini_nongenerating hsup)
   exact hnle (hΦNle.trans (le_inf_iff.mp hNM).2)
 
+/-- **Isaacs Problem 1D.8** (可換部分). 冪零有限群 `G` では `[G, G] ⊆ Φ(G)`、すなわち `G / Φ(G)` は
+可換。各極大部分群 `M` は素数指数 (1D.6) ゆえ正規で `G ⧸ M` は素数位数、したがって巡回=可換なので
+`[G, G] ⊆ M`、これが全極大部分群にわたるので `[G, G] ⊆ Φ(G)`。 -/
+theorem commutator_le_frattini {G : Type*} [Group G] [Finite G] [Group.IsNilpotent G] :
+    commutator G ≤ frattini G := by
+  rw [frattini, Order.radical]
+  refine le_iInf fun M => le_iInf fun hM => ?_
+  simp only [Set.mem_setOf_eq] at hM
+  haveI hMnorm : M.Normal :=
+    Subgroup.normalizer_eq_top_iff.mp
+      (hM.2 _ (Group.normalizerCondition_of_isNilpotent M (lt_top_iff_ne_top.mpr hM.1)))
+  haveI : Fact (M.index).Prime := ⟨(isCoatom_iff_index_prime M).mp hM⟩
+  haveI hcyc : IsCyclic (G ⧸ M) := isCyclic_of_prime_card (p := M.index)
+    (Subgroup.index_eq_card (H := M) ▸ rfl)
+  have hcomm : IsMulCommutative (G ⧸ M) :=
+    (MonoidHom.id (G ⧸ M)).isMulCommutative_of_isCyclic_of_ker_le_center (by simp)
+  rw [commutator_def, Subgroup.commutator_le]
+  intro g₁ _ g₂ _
+  rw [← QuotientGroup.ker_mk' M, MonoidHom.mem_ker, map_commutatorElement,
+    commutatorElement_eq_one_iff_mul_comm]
+  exact hcomm.is_comm.comm (QuotientGroup.mk' M g₁) (QuotientGroup.mk' M g₂)
+
 end
 
 end OddOrder.Isaacs.Ch01
