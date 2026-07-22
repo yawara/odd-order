@@ -89,13 +89,15 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - ✅ 記録 **1B.7(a)** (repo `Subgroup.IsPiGroup.le_oPiCore` = O_π 最大正規 π-部分群)。
 - ✅ 実証明 **1B.7(b)** `oPiCore_le_of_isHallSubgroup` (O_π ≤ 任意 π-Hall) + **1B.7(c)**
   `oPiCore_eq_iInf_isHallSubgroup` (O_π = 全 π-Hall の共通部分)。
-- ⬜ **1B.8** (O^π = π-剰余 = G/N が π-群となる最小正規 N、π'-元で生成): 新規インフラが必要。
-  Ch09 `pResidual` (O^p) の π 一般化 = `oPiResidual π G := sInf {N | N◁G ∧ IsPiGroup π (G/N)}`。
-  (a) 存在+G/O^π が π-群 (π-商正規の集合が ⊓ で閉じる、`inf_mem_pQuotientNormals` の π 版) +
-  普遍性。(b) π'-元による生成。置き場は新 leaf `Ch03_SplitExtensions/PiResidual.lean` が自然
-  (O_π の隣、O^p の π 版)。
+- ✅ 実証明 **1B.8** (新 leaf `Ch03_SplitExtensions/PiResidual.lean`、O^p `pResidual` の π 一般化):
+  `oPiResidual π G := sInf {N | N◁G ∧ IsPiGroup π (G/N)}`。**(a)** `isPiGroup_quotient_oPiResidual`
+  (G/O^π が π-群、π-商正規が ⊓ で閉じ最小元) + `oPiResidual_le_of_isPiGroup_quotient` (普遍性) +
+  一意性。**(b)** `oPiResidual_eq_closure_piPrimeElements` (O^π = π'-元で生成、W◁G は共役不変 +
+  Cauchy で G/W が π-群、`Nat.exists_eq_pow_mul_and_not_dvd` で q-部分冪抽出)。OddOrder.lean 配線済。
 
-- ⬜ **次: §1B は 1B.8 のみ残**。その後 §1C (Sylow C-定理・Frattini 論法) — 1C.1–1C.8。§1D–§1G も未着手。
+**🎉 §1B 完了 (全 8 問: 1B.1a/1B.4/1B.5abc/1B.6/1B.7bc/1B.8ab 実証明 + 1B.1b/1B.2/1B.3/1B.7a 記録)。**
+
+- ⬜ **次: §1C** (Sylow C-定理・Frattini 論法) — 1C.1–1C.8。§1D–§1G も未着手。
 
 ## 完了条件
 

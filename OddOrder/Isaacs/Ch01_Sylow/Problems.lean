@@ -841,8 +841,8 @@ theorem oPiCore_eq_iInf_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Fin
   `OddOrder/Isaacs/Ch03_SplitExtensions/PiResidual.lean`) が、有限群で `G/O^π(G)` が π-群
   (`isPiGroup_quotient_oPiResidual`) かつ `G/N` を π-群にする任意の正規 `N` に含まれる
   (`oPiResidual_le_of_isPiGroup_quotient`)、すなわち最小 (一意 = `oPiResidual_eq_...minimal`)。
-  Ch09 の `pResidual` (= `O^p`) の π 一般化。**1B.8(b)** (`O^π(G)` は位数が π-数でない元で生成
-  される) は未 (別途)。
+  Ch09 の `pResidual` (= `O^p`) の π 一般化。**1B.8(b)** = `oPiResidual_eq_closure_piPrimeElements`
+  (`O^π(G)` は位数がどの π-素数でも割れない元 = π'-元で生成される、同 PiResidual.lean)。
 -/
 
 end

@@ -19,8 +19,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
   が π-群であることを同時に与える (π-商正規の集合が `⊓` で閉じ有限ゆえ最小元をもつ)。
 - `isPiGroup_quotient_oPiResidual` (**核心**): `G/O^π(G)` は π-群。
 - `oPiResidual_le_of_isPiGroup_quotient`: `N ◁ G` で `G/N` が π-群 ⟹ `O^π(G) ≤ N` (普遍性)。
-
-Isaacs 1B.8(b) (`O^π(G)` は位数が π-数でない元で生成される) は別途。
+- `oPiResidual_eq_closure_piPrimeElements` (1B.8(b)): `O^π(G)` は位数がどの π-素数でも割れない
+  元 (π'-元) 全体で生成される部分群に一致する。
 
 ## 実装ノート
 
@@ -124,5 +124,78 @@ theorem oPiResidual_eq_of_isPiGroup_quotient_of_minimal [Finite G] {N : Subgroup
     oPiResidual π G = N :=
   le_antisymm (oPiResidual_le_of_isPiGroup_quotient hN)
     (hmin (oPiResidual π G) isPiGroup_quotient_oPiResidual)
+
+/-! ### 1B.8(b): `O^π(G)` は π'-元 (位数が π-数でない元) で生成される -/
+
+/-- 共役は位数を保つ。 -/
+private theorem orderOf_conj_eq (g x : G) : orderOf (g * x * g⁻¹) = orderOf x :=
+  orderOf_injective (MulAut.conj g).toMonoidHom (MulAut.conj g).injective x
+
+/-- **Isaacs Problem 1B.8(b)**. `O^π(G)` は位数がどの π-素数でも割れない元 (= π'-元) 全体で
+生成される部分群に一致する。
+
+`W := ⟨π'-元⟩`。`W ≤ O^π`: π'-元 `g` の `G/O^π` (π-群) での像の位数は `|orderOf g|` (π'-数) を割り
+かつ π-数ゆえ `1`、よって `g ∈ O^π`。`O^π ≤ W`: `W ◁ G` (π'-元集合は共役不変) で `G/W` は π-群
+(素数 `q ∉ π` が `|G/W|` を割れば Cauchy で位数 `q` の `x̄`、持ち上げ `x` の `q`-部分冪 `x^m`
+(`Nat.exists_eq_pow_mul_and_not_dvd`) は位数 `q^k` の π'-元 ∈ W ゆえ `x̄^m = 1`、だが `q ∤ m` で
+`x̄^m` は位数 `q ≠ 1` — 矛盾)、普遍性 `oPiResidual_le_of_isPiGroup_quotient` で `O^π ≤ W`。 -/
+theorem oPiResidual_eq_closure_piPrimeElements [Finite G] :
+    oPiResidual π G = Subgroup.closure {g : G | ∀ q ∈ (orderOf g).primeFactors, q ∉ π} := by
+  set S : Set G := {g : G | ∀ q ∈ (orderOf g).primeFactors, q ∉ π} with hS
+  -- W = closure S は正規 (S は共役不変)
+  haveI hWnorm : (Subgroup.closure S).Normal := by
+    refine ⟨fun a ha g => ?_⟩
+    induction ha using Subgroup.closure_induction with
+    | mem x hx =>
+      refine Subgroup.subset_closure ?_
+      rw [hS, Set.mem_setOf_eq, orderOf_conj_eq]; exact hx
+    | one => simp
+    | mul x y _ _ hgx hgy =>
+      rw [show g * (x * y) * g⁻¹ = (g * x * g⁻¹) * (g * y * g⁻¹) by group]
+      exact mul_mem hgx hgy
+    | inv x _ hgx =>
+      rw [show g * x⁻¹ * g⁻¹ = (g * x * g⁻¹)⁻¹ by group]; exact inv_mem hgx
+  refine le_antisymm ?_ ?_
+  · -- O^π ≤ W: G/W は π-群
+    refine oPiResidual_le_of_isPiGroup_quotient (fun q hq => ?_)
+    by_contra hqπ
+    haveI : Fact q.Prime := ⟨(Nat.mem_primeFactors.mp hq).1⟩
+    obtain ⟨xbar, hxbar⟩ := exists_prime_orderOf_dvd_card' q (Nat.mem_primeFactors.mp hq).2.1
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective xbar
+    have hqn : q ∣ orderOf x :=
+      hxbar ▸ orderOf_map_dvd (QuotientGroup.mk' (Subgroup.closure S)) x
+    obtain ⟨k, m, hm, hn⟩ :=
+      Nat.exists_eq_pow_mul_and_not_dvd (orderOf_pos x).ne' q (Fact.out : q.Prime).ne_one
+    have hm_pos : 0 < m := Nat.pos_of_dvd_of_pos ⟨q ^ k, by rw [hn]; ring⟩ (orderOf_pos x)
+    have hk1 : k ≠ 0 := by
+      rintro rfl
+      rw [pow_zero, one_mul] at hn
+      exact hm (hn ▸ hqn)
+    -- x^m は位数 q^k の π'-元
+    have hox : orderOf (x ^ m) = q ^ k := by
+      rw [orderOf_pow, hn, Nat.gcd_eq_right ⟨q ^ k, by ring⟩, Nat.mul_div_cancel _ hm_pos]
+    have hxmW : x ^ m ∈ Subgroup.closure S := Subgroup.subset_closure (by
+      rw [hS, Set.mem_setOf_eq]
+      intro r hr
+      rw [hox] at hr
+      have hrp := Nat.prime_of_mem_primeFactors hr
+      have : r = q := (Nat.prime_dvd_prime_iff_eq hrp (Fact.out : q.Prime)).mp
+        (hrp.dvd_of_dvd_pow (Nat.mem_primeFactors.mp hr).2.1)
+      rw [this]; exact hqπ)
+    -- x̄^m = 1 (∈ W) だが位数 q ≠ 1
+    have h1 : (QuotientGroup.mk' (Subgroup.closure S) x) ^ m = 1 := by
+      rw [← map_pow]; exact (QuotientGroup.eq_one_iff _).mpr hxmW
+    exact hm (hxbar ▸ orderOf_dvd_of_pow_eq_one h1)
+  · -- W ≤ O^π: 各 π'-元 g は O^π に属す
+    rw [Subgroup.closure_le]
+    intro g hg
+    rw [SetLike.mem_coe, ← QuotientGroup.eq_one_iff, ← orderOf_eq_one_iff]
+    by_contra hne
+    obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hne
+    have hqπ : q ∈ π := isPiGroup_quotient_oPiResidual q (Nat.mem_primeFactors.mpr
+      ⟨hq, hqdvd.trans (orderOf_dvd_natCard _), Nat.card_pos.ne'⟩)
+    exact hg q (Nat.mem_primeFactors.mpr ⟨hq,
+      hqdvd.trans (orderOf_map_dvd (QuotientGroup.mk' (oPiResidual π G)) g),
+      (orderOf_pos g).ne'⟩) hqπ
 
 end OddOrder.Isaacs.Ch03
