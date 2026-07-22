@@ -242,36 +242,39 @@ of a field of order `2^p` is a power of the Frobenius. -/
 
 section FiniteFieldFrobenius
 
-/-- Every ring automorphism of a finite field of order `2^p` is a power of the
-Frobenius `x ↦ x²`, i.e. `σ x = x^(2^i)` for some `i`.
+/-- Every ring automorphism of a finite field of order `q^p` (`q` prime) is a
+power of the Frobenius `x ↦ x^q`, i.e. `σ x = x^(q^i)` for some `i`.
 
-`σ` fixes the prime field `𝔽₂`, so it is a `ZMod 2`-algebra automorphism — an
-element of `Gal(F/𝔽₂)`.  That group is cyclic of order `[F : 𝔽₂] = p` generated
+`σ` fixes the prime field `𝔽_q`, so it is a `ZMod q`-algebra automorphism — an
+element of `Gal(F/𝔽_q)`.  That group is cyclic of order `[F : 𝔽_q] = p` generated
 by the Frobenius (`FiniteField.frobeniusAlgEquivOfAlgebraic`, whose order equals
-`finrank`), so `σ = Frobenius^i` and hence `σ x = x^(2^i)`. -/
-theorem ringAut_card_two_pow_eq_pow {F : Type*} [Field F] [Finite F]
-    {p : ℕ} (hcard : Nat.card F = 2 ^ p) (σ : RingAut F) :
-    ∃ i : ℕ, ∀ x : F, σ x = x ^ (2 ^ i) := by
+`finrank`), so `σ = Frobenius^i` and hence `σ x = x^(q^i)`.
+
+Used on both sides of step (3): `q = 2` for the `𝔽_{2^p}`-action of `K⋊P` on
+`Q₀` (Half A), and `q = r` for the `𝔽_{r^p}`-action on `M` (Half B). -/
+theorem ringAut_card_prime_pow_eq_pow {F : Type*} [Field F] [Finite F]
+    {q p : ℕ} [Fact q.Prime] (hcard : Nat.card F = q ^ p) (σ : RingAut F) :
+    ∃ i : ℕ, ∀ x : F, σ x = x ^ (q ^ i) := by
   classical
   haveI : Fintype F := Fintype.ofFinite F
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  have hFcard : Fintype.card F = 2 ^ p := by
+  haveI : NeZero q := ⟨(Fact.out : Nat.Prime q).ne_zero⟩
+  have hFcard : Fintype.card F = q ^ p := by
     rw [← Nat.card_eq_fintype_card]; exact hcard
-  haveI hchar : CharP F 2 := charP_of_card_eq_prime_pow (p := 2) (f := p) hFcard
-  letI algF : Algebra (ZMod 2) F := ZMod.algebra F 2
-  haveI : Algebra.IsAlgebraic (ZMod 2) F := Algebra.IsAlgebraic.of_finite (ZMod 2) F
-  haveI : IsGalois (ZMod 2) F := inferInstance
-  -- `σ` as a `ZMod 2`-algebra automorphism (it fixes the prime field `𝔽₂`).
-  let σ' : F ≃ₐ[ZMod 2] F := AlgEquiv.ofRingEquiv (f := σ) (fun z => by
-    have h := RingHom.ext_zmod (σ.toRingHom.comp (algebraMap (ZMod 2) F))
-      (algebraMap (ZMod 2) F)
+  haveI hchar : CharP F q := charP_of_card_eq_prime_pow (p := q) (f := p) hFcard
+  letI algF : Algebra (ZMod q) F := ZMod.algebra F q
+  haveI : Algebra.IsAlgebraic (ZMod q) F := Algebra.IsAlgebraic.of_finite (ZMod q) F
+  haveI : IsGalois (ZMod q) F := inferInstance
+  -- `σ` as a `ZMod q`-algebra automorphism (it fixes the prime field `𝔽_q`).
+  let σ' : F ≃ₐ[ZMod q] F := AlgEquiv.ofRingEquiv (f := σ) (fun z => by
+    have h := RingHom.ext_zmod (σ.toRingHom.comp (algebraMap (ZMod q) F))
+      (algebraMap (ZMod q) F)
     exact DFunLike.congr_fun h z)
-  set frob := FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod 2) F with hfrob
-  have hord : orderOf frob = Module.finrank (ZMod 2) F :=
-    FiniteField.orderOf_frobeniusAlgEquivOfAlgebraic (ZMod 2) F
-  have hcardaut : Nat.card (F ≃ₐ[ZMod 2] F) = Module.finrank (ZMod 2) F :=
-    IsGalois.card_aut_eq_finrank (ZMod 2) F
-  -- the Frobenius generates `Gal(F/𝔽₂)` (its order equals the group's cardinality)
+  set frob := FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod q) F with hfrob
+  have hord : orderOf frob = Module.finrank (ZMod q) F :=
+    FiniteField.orderOf_frobeniusAlgEquivOfAlgebraic (ZMod q) F
+  have hcardaut : Nat.card (F ≃ₐ[ZMod q] F) = Module.finrank (ZMod q) F :=
+    IsGalois.card_aut_eq_finrank (ZMod q) F
+  -- the Frobenius generates `Gal(F/𝔽_q)` (its order equals the group's cardinality)
   have htop : Subgroup.zpowers frob = ⊤ := by
     apply Subgroup.eq_top_of_card_eq
     rw [Nat.card_zpowers, hord, hcardaut]
@@ -281,12 +284,12 @@ theorem ringAut_card_two_pow_eq_pow {F : Type*} [Field F] [Finite F]
   refine ⟨n, fun x => ?_⟩
   have hcoe : (σ : F → F) x = σ' x := rfl
   rw [hcoe, ← hn]
-  have hiter : (⇑frob)^[n] = (· ^ (Fintype.card (ZMod 2) ^ n)) :=
-    FiniteField.coe_frobeniusAlgEquivOfAlgebraic_iterate (ZMod 2) F n
+  have hiter : (⇑frob)^[n] = (· ^ (Fintype.card (ZMod q) ^ n)) :=
+    FiniteField.coe_frobeniusAlgEquivOfAlgebraic_iterate (ZMod q) F n
   have hpow : ⇑(frob ^ n) = (⇑frob)^[n] := AlgEquiv.coe_pow frob n
-  have hval : (frob ^ n) x = x ^ (Fintype.card (ZMod 2) ^ n) := by
+  have hval : (frob ^ n) x = x ^ (Fintype.card (ZMod q) ^ n) := by
     rw [show ((frob ^ n) x) = (⇑(frob ^ n)) x from rfl, hpow, hiter]
-  rw [hval, ZMod.card 2]
+  rw [hval, ZMod.card q]
 
 end FiniteFieldFrobenius
 
@@ -898,7 +901,7 @@ theorem card_K_dvd_sub_one_of_prime_order_invariant {r : ℕ} (hr : r.Prime)
 `a ∈ P`, conjugation by `a` on the Fitting subgroup `F(D̄) ≅ 𝔽_{2^p}ˣ` (the image
 of `K`) is a power-of-two map `t ↦ t^(2^i)`.
 
-This is `Aut(𝔽_{2^p}) = ⟨Frobenius⟩` (`ringAut_card_two_pow_eq_pow`) read through
+This is `Aut(𝔽_{2^p}) = ⟨Frobenius⟩` (`ringAut_card_prime_pow_eq_pow`) read through
 the adapted field model (`exists_adapted_field_model`): the model intertwines
 `fittingConjAction (toVbar a)` on `F(D̄)` with the field automorphism `σhom a`
 acting on `𝔽_{2^p}ˣ` via `μ`, and `σhom a` is a power of the Frobenius. -/
@@ -910,7 +913,8 @@ theorem exists_pow_two_fittingConjAction (a : ↥fc.P) :
   letI : Field F := hFld
   letI : Finite F := hFin
   have hcard2 : Nat.card F = 2 ^ fc.p := hcardF.trans fc.card_Q0_eq_two_pow
-  obtain ⟨i, hi⟩ := ringAut_card_two_pow_eq_pow hcard2 (σhom a)
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨i, hi⟩ := ringAut_card_prime_pow_eq_pow (q := 2) hcard2 (σhom a)
   refine ⟨i, fun t => ?_⟩
   refine μ.injective ?_
   rw [hlawμ a t, map_pow]

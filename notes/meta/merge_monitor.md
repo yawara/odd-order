@@ -6,6 +6,25 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **🔁 2026-07-22 hub 裁定 (ユーザー裁可「b→c を進めて」): issue 9318 Brauer–Suzuki の claim owner を b → c に移管**。
+> 背景: 実 sorry 6 は全て Pf Appendices (FeitSibley 1 = a 進行中 / NearFields 1 = 9318 gated /
+> Suzuki2Groups 4 = b 残債)。BG closed で c の live frontier が空になっていた。b は 9318 未着手
+> (BS 関連 commit 0) かつ 2053 Theorem B campaign 中、c は前提 2 件 (Huppert III 8.2 / II 3.2) を
+> 完了済 (9404 closed)、消費点 NearFields.lean は c 所有 — ⟹ c が BS 本体を駆動する。
+> **c の primary frontier = 9318 → NearFields Prop 1 sorry 解消**。b は Theorem B step (2) で
+> `rankOne_affine_nearField` を sorried-cite。BS 新 leaf の置き場 = `GroupTheory/**` (shared) 第一候補、
+> **step 1.5 regex 変更不要** (shared_re/c_re で被覆; c が GroupTheory に BS leaf を切っても逸脱でない、
+> claim = 9318)。詳細 = issues/9318 冒頭 HUB RULING。
+>
+> **▶▶ 2026-07-22 10:1x 監視再開 (Fable hub) — 前 Opus hub は 03:23 の 3 合流後に gate/push 未完了で死亡**。
+> 引き継ぎ時 `origin/main..main` = **12 commits 未 push** (step 1 の警告どおりの残留パターン、
+> 03:23 の Merge a/b/c + lane commits が未検証で main に居座っていた)。本 tick の合流
+> (a=1054 witness 抽出 `coherent_extension_eq_zsmul_irr` / b=2053 A1 任意素数 q 一般化 /
+> c=survey note 追記) と併せて**フルビルド gate 1 回で 12+3 commits をまとめて検証**:
+> green **4620 jobs** (前 tick 4619+1) / orphan 0 (904/904) / AxiomsCheck OK / sorry 6→6 非退行 /
+> push 済 (467d67742→a23573eb8)。監視 cron 15 分 `7,22,37,52` 再作成 (id a9f29e81)。
+> レーン生存 3 点確認: a/b/c とも worktree に live pid (1112/1316/1696)、a・c は 10:12 commit。
+>
 > **▶▶ 2026-07-22 01:59 監視再開 (Opus hub) — 前 Fable hub は model 切替で死亡**。
 > 前 hub の最終合流は 00:58 (4f8df7128)、以後 01:07/22/37/52 の tick で a/b/c に未マージ work が
 > 溜まっていた (01:48 時点で 3 レーンとも commit 済) のに合流していない → Fable cron が
