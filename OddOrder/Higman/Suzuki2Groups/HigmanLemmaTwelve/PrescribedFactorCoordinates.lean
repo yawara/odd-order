@@ -349,8 +349,7 @@ theorem exists_noncommutativeFactorCoordinates_of_ambientFrattiniSinger
       IsMulCommutative.of_comm hEA.comm
     letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
       hEA.zmodModule
-    let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
-    ∀ (c : Y)
+    ∀ {n : Nat} (c : Y)
       (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
       (nu : GaloisField 2 n),
       2 ≤ n →
@@ -402,8 +401,7 @@ theorem exists_noncommutativeFactorCoordinates_of_ambientFrattiniSinger
   letI : CommGroup ↑(frattini P) := inferInstance
   letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
-  let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
-  intro c ePhi nu hnTwo hcgen hnuPrimitive hconj
+  intro n c ePhi nu hnTwo hcgen hnuPrimitive hconj
   have hSneBot : S ≠ (⊥ : Subgroup P) :=
     ne_of_gt (lt_of_le_of_lt bot_le hPhiS)
   have hinvS : involutions P ⊆ S :=
@@ -537,8 +535,7 @@ theorem exists_commutativeFactorCoordinates_of_ambientFrattiniSinger
     letI : CommGroup S :=
       { (inferInstance : Group S) with
         mul_comm := hcommS.is_comm.comm }
-    let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
-    ∀ (c : Y)
+    ∀ {n : Nat} (c : Y)
       (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
       (nu : GaloisField 2 n),
       ePhi.conj (elabRepresentation 2 hPhiInv.restrict c) =
@@ -580,8 +577,7 @@ theorem exists_commutativeFactorCoordinates_of_ambientFrattiniSinger
   letI : CommGroup S :=
     { (inferInstance : Group S) with
       mul_comm := hcommS.is_comm.comm }
-  let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
-  intro c ePhi nu hconj
+  intro n c ePhi nu hconj
   have hSneBot : S ≠ (⊥ : Subgroup P) :=
     ne_of_gt (lt_of_le_of_lt bot_le hPhiS)
   have hinvS : involutions P ⊆ S :=
@@ -888,8 +884,7 @@ theorem exists_factorCoordinates_of_ambientFrattiniSinger
       IsMulCommutative.of_comm hEA.comm
     letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
       hEA.zmodModule
-    let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
-    ∀ (c : Y)
+    ∀ {n : Nat} (c : Y)
       (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
       (nu : GaloisField 2 n),
       2 ≤ n →
@@ -910,8 +905,7 @@ theorem exists_factorCoordinates_of_ambientFrattiniSinger
   letI : CommGroup ↑(frattini P) := inferInstance
   letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
-  let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
-  intro c ePhi nu hnTwo hcgen hnuPrimitive hconj
+  intro n c ePhi nu hnTwo hcgen hnuPrimitive hconj
   by_cases hcommS : IsMulCommutative S
   · letI : CommGroup S :=
       { (inferInstance : Group S) with
