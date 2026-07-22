@@ -535,6 +535,62 @@ theorem cross_extension_inner_eq_zero [Finite G]
       sub_zero] at hlam0
     exact hlam0
 
+/-! ### Peterfalvi (6): the pairing identities of `Ind(χ₁ − a·η₁)` (p. 148)
+
+With `χ₁ ∈ 𝒳` of degree `a·d` and `η₁ ∈ 𝒴` of degree `d`, the element
+`δ = χ₁ − a·η₁` is a degree-zero `A`-supported element of `ℤ[𝒮]`, so `τδ = Ind δ`
+is controlled by the Lemma 2(b) isometry: `(τδ, τδ) = 1 + a²` and
+`(τδ, e'ⱼ − e'₁) = a` for `j > 1`.  These feed the orthogonal decomposition
+`τδ = −a·e'₁ + λ·∑ e'ᵢ + v` of (6). -/
+
+omit [Fintype ↥hyp.H] in
+/-- **Peterfalvi (6), norm identity** (p. 148): `(Ind(χ − a·η₁), Ind(χ − a·η₁)) = 1 + a²`
+for distinct members `χ, η₁` of `𝒮` with `χ − a·η₁` an `A`-supported lattice
+element.  Pure Lemma 2(b): no coherence input. -/
+theorem tau_scaled_diff_inner_self [Finite G]
+    {χ η₁ : ClassFunction ↥hyp.H ℂ} (hχS : χ ∈ hyp.Sset) (hη₁S : η₁ ∈ hyp.Sset)
+    (hne : χ ≠ η₁) {a : ℕ}
+    (hsupp : χ - a • η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+      hyp.Sset hyp.A) :
+    ClassFunction.inner (hyp.tau (χ - a • η₁)) (hyp.tau (χ - a • η₁)) =
+      1 + (a : ℂ) ^ 2 := by
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  rw [hyp.tau_inner_eq_of_supported_Sset hsupp hsupp, ← Nat.cast_smul_eq_nsmul ℂ a η₁]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left, ClassFunction.inner_smul_right, star_natCast]
+  rw [(hχS.1).inner_self_eq_one, (hη₁S.1).inner_self_eq_one,
+    hyp.Sset_pairwiseOrthogonal hχS hη₁S hne,
+    hyp.Sset_pairwiseOrthogonal hη₁S hχS (Ne.symm hne)]
+  ring
+
+/-- **Peterfalvi (6), cross pairing** (p. 148): `(Ind(χ − a·η₁), e'ⱼ − e'₁) = a` for
+`j > 1` — the isometry sends the pairing back to `H`, where only the
+`a·(η₁, η₁)`-term survives.  This determines the `e'`-coefficients of
+`Ind(χ₁ − a·η₁)` up to the common shift `λ`. -/
+theorem tau_scaled_diff_inner_extension_diff [Finite G]
+    {Y : Set (ClassFunction ↥hyp.H ℂ)} (hYS : Y ⊆ hyp.Sset)
+    (hcohY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau Y hyp.A)
+    {χ : ClassFunction ↥hyp.H ℂ} (hχS : χ ∈ hyp.Sset) (hχY : χ ∉ Y)
+    {η₁ : ClassFunction ↥hyp.H ℂ} (hη₁Y : η₁ ∈ Y) {a : ℕ}
+    (hsupp : χ - a • η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+      hyp.Sset hyp.A)
+    {η : ClassFunction ↥hyp.H ℂ} (hηY : η ∈ Y) (hne : η ≠ η₁)
+    (hsuppY : η - η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) Y hyp.A) :
+    ClassFunction.inner (hyp.tau (χ - a • η₁))
+      (hcohY.extension η - hcohY.extension η₁) = (a : ℂ) := by
+  have hEY : hcohY.extension η - hcohY.extension η₁ = hyp.tau (η - η₁) := by
+    rw [← hcohY.extends_on_supported _ hsuppY, map_sub]
+  rw [hEY, hyp.tau_inner_eq_of_supported_Sset hsupp
+    (OddOrder.Peterfalvi.S07.zSupportedSpan_mono_left hYS hsuppY),
+    ← Nat.cast_smul_eq_nsmul ℂ a η₁]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left]
+  rw [hyp.Sset_pairwiseOrthogonal hχS (hYS hηY) (fun h => hχY (h ▸ hηY)),
+    hyp.Sset_pairwiseOrthogonal hχS (hYS hη₁Y) (fun h => hχY (h ▸ hη₁Y)),
+    hyp.Sset_pairwiseOrthogonal (hYS hη₁Y) (hYS hηY) (Ne.symm hne),
+    ((hYS hη₁Y).1).inner_self_eq_one]
+  ring
+
 end Coherence
 
 end Hypothesis

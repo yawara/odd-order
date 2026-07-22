@@ -427,6 +427,14 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   - [ ] **(6) 本体**: Ind(χ₁−aη₁)=−a·e′₁+λΣe′ᵢ+v、(v,e′ᵢ)=0 → norm 展開で
     x_eq_zero_or_x_one_of_norm_identity 適用 → a∣λ ⟹ 𝒮∪𝒴 coherent (τ が
     χᵢ↦eᵢ,ηⱼ↦e′ⱼ で一貫) → Lemma 1(a) で 𝒮(S′) → (2) で 𝒮。
+    - [x] **pairing 恒等式 2 本** (2026-07-22, sorry-free): `tau_scaled_diff_inner_self`
+      ((τδ,τδ) = 1+a²、δ = χ−a•η₁ A-supported、coherence 不要) +
+      `tau_scaled_diff_inner_extension_diff` ((τδ, e′ⱼ−e′₁) = a、j>1)。
+      どちらも tau_inner_eq_of_supported_Sset 直用 + Sset_pairwiseOrthogonal。
+    - [ ] 次 = 直交分解 τδ = Σⱼ tⱼe′ⱼ + v ((v,e′ⱼ)=0)。𝒴 の Finset 化 +
+      e′ⱼ 正規直交 (extension_inner_eq) + tⱼ ∈ ℤ (mem_ZIrr_inner_int) +
+      (v,v) ≥ 0 (mem_ZIrr_inner_self_eq_sum_sq)。NormInequalities の
+      CharacterPsiDecomposition (D.X/D.Y/tau1_image, :400-470) が流用候補 — 要偵察。
   - [ ] **(7)** class-algebra 合同 (独立、並行可): ψ constant on Z^# ⟹
     ψ(z)≡ψ(1) mod|Q|。ω central character (ω(Kₛ)=ψ(Kₛ)/ψ(1)) の代数的整数性 +
     構造定数 aᵢⱼₛ + Q f.p.f. 作用の counting。**前提の repo 内所在確認要**
