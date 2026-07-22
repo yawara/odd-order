@@ -607,6 +607,26 @@ theorem inf_centralizer_eq_Q_of_mem_Q1 {w : G} (hwQ1 : w ∈ hyp.Q1) (hw1 : w �
     rw [hd1, mul_one]; exact hq
   · exact fun q hq => ⟨hyp.Q_le_H hq, hQcent hq⟩
 
+/-- **`Q ≤ C_G(z)` for `z` in a central `Z ≤ Z(Q₁)`** (Peterfalvi (7)/(8) `hQz` input).  Thin
+specialisation of `Q_le_centralizer_of_centralizes_Q1` to a subgroup `Z ≤ Q₁` centralising `Q₁`. -/
+theorem Q_le_centralizer_of_mem_central {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    (hZcent : ∀ w ∈ Z, ∀ y ∈ hyp.Q1, ⁅w, y⁆ = 1) {z : G} (hzZ : z ∈ Z) :
+    hyp.Q ≤ Subgroup.centralizer ({z} : Set G) :=
+  hyp.Q_le_centralizer_of_centralizes_Q1 (hZQ1 hzZ) (hZcent z hzZ)
+
+/-- **Normalizer–centralizer cardinality constancy on `Z^#`** (Peterfalvi (7)/(8) `hcard_const`
+input).  For a central `Z ≤ Z(Q₁)`, `|H ⊓ C_G(w)| = |Q|` for every `w ∈ Z^#`
+(`inf_centralizer_eq_Q_of_mem_Q1`), so the cardinality is constant on `Z^#`. -/
+theorem inf_centralizer_card_const_of_central {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    (hZcent : ∀ w ∈ Z, ∀ y ∈ hyp.Q1, ⁅w, y⁆ = 1)
+    {w z : G} (hwZ : w ∈ Z) (hw1 : w ≠ 1) (hzZ : z ∈ Z) (hz1 : z ≠ 1) :
+    Nat.card ↥(hyp.H ⊓ Subgroup.centralizer ({w} : Set G))
+      = Nat.card ↥(hyp.H ⊓ Subgroup.centralizer ({z} : Set G)) := by
+  rw [hyp.inf_centralizer_eq_Q_of_mem_Q1 (hZQ1 hwZ) hw1
+        (hyp.Q_le_centralizer_of_mem_central hZQ1 hZcent hwZ),
+      hyp.inf_centralizer_eq_Q_of_mem_Q1 (hZQ1 hzZ) hz1
+        (hyp.Q_le_centralizer_of_mem_central hZQ1 hZcent hzZ)]
+
 /-- The `↥Q₁`-level commutator maps onto `⁅Q₁, Q₁⁆`. -/
 theorem map_commutator_Q1 :
     (commutator ↥hyp.Q1).map hyp.Q1.subtype = ⁅hyp.Q1, hyp.Q1⁆ := by
