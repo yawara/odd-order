@@ -3,3 +3,4 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniLayers
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.CompositionSeries
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.QuotientLengths
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.QuotientSummands
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniPreimages
