@@ -58,6 +58,35 @@ theorem padicValNat_pow_sub_one_add_one {p N : ℕ} [Fact p.Prime] (hp : Odd p)
   rw [one_pow, Nat.sub_add_cancel hN, padicValNat_self] at key
   exact key
 
+/-! ## Structural `|G|_p` decomposition
+
+`|G| = |Q| · |D| · (|Q|+1)` (`card_G_eq`), and `|D| = |D̄| · |W|`,
+`|D̄| = |K̄| · |V̄|` (`D̄ = K̄ ⋊ V̄`).  The `p`-parts are `|Q|_p = 1`
+(`not_p_dvd_card_Q`), `|K̄|_p = 1` (`|K̄| = 2^p − 1`), `|V̄| = p`, giving
+`|D|_p = p · |W|_p` and `|G|_p = p^{m+2} · |W|_p`. -/
+
+namespace Hypothesis
+
+variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G] (hyp : Hypothesis G Ω)
+
+/-- `|D| = |D̄| · |W|` where `D̄ = D/W`. -/
+theorem card_D_eq_card_Dbar_mul_card_W :
+    Nat.card ↥hyp.D = Nat.card hyp.Dbar * Nat.card ↥hyp.W := by
+  have hW : Nat.card ↥(hyp.W.subgroupOf hyp.D) = Nat.card ↥hyp.W :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hyp.W_le_V.trans hyp.V_le_D)).toEquiv
+  calc Nat.card ↥hyp.D
+      = Nat.card (↥hyp.D ⧸ hyp.W.subgroupOf hyp.D) *
+          Nat.card ↥(hyp.W.subgroupOf hyp.D) :=
+        Subgroup.card_eq_card_quotient_mul_card_subgroup _
+    _ = Nat.card hyp.Dbar * Nat.card ↥hyp.W := by rw [hW]
+
+/-- `|K̄| · |V̄| = |D̄|` (`D̄ = K̄ ⋊ V̄`, from `Kbar_isComplement_Vbar`). -/
+theorem card_Kbar_mul_card_Vbar :
+    Nat.card ↥hyp.Kbar * Nat.card ↥hyp.Vbar = Nat.card hyp.Dbar := by
+  simpa using Subgroup.IsComplement.card_mul_card hyp.Kbar_isComplement_Vbar
+
+end Hypothesis
+
 namespace FirstCaseHypothesis
 
 universe uG uΩ
@@ -153,6 +182,113 @@ theorem padicValNat_card_Q_add_one {F : Type uG} [NearFields.NearField F]
   have hFpos : 1 ≤ Nat.card F := Nat.card_pos
   rw [hQ, padicValNat_pow_sub_one_add_one fc.p_odd hpF hFpos, hm,
     padicValNat.prime_pow]
+
+/-- **Step (10)** structural: `|K̄| = 2^p − 1` (First Case).  `K̄ = F(D̄)`, and
+Proposition 2 gives `|F(D̄)| = |KSet| = |K| = |Q₀| − 1 = 2^p − 1`. -/
+theorem card_Kbar_eq_two_pow_sub_one :
+    Nat.card ↥fc.toHypothesis.Kbar = 2 ^ fc.p - 1 := by
+  have hK : Nat.card ↥fc.toHypothesis.K = fc.toHypothesis.KSet.ncard :=
+    (Nat.card_coe_set_eq _).trans (by rw [fc.toHypothesis.coe_K])
+  have hKbar := congrArg (fun s : Subgroup fc.toHypothesis.Dbar => Nat.card ↥s)
+    fc.toHypothesis.Kbar_eq_fitting
+  rw [hKbar, fc.toHypothesis.card_fitting_Dbar_eq_ncard_KSet, ← hK,
+    fc.toHypothesis.card_K_eq_card_Q0_sub_one, fc.card_Q0_eq_two_pow]
+
+/-- **Step (10)** structural: `p ∤ |K̄|` (First Case).  `|K̄| = 2^p − 1 ≡ 1 (mod p)`
+by Fermat (`2^p ≡ 2`), so `p ∤ |K̄|`. -/
+theorem not_p_dvd_card_Kbar :
+    ¬ fc.p ∣ Nat.card ↥fc.toHypothesis.Kbar := by
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  rw [fc.card_Kbar_eq_two_pow_sub_one]
+  intro hdvd
+  have h1le : 1 ≤ 2 ^ fc.p := Nat.one_le_two_pow
+  have h1 : ((2 ^ fc.p - 1 : ℕ) : ZMod fc.p) = 0 :=
+    (ZMod.natCast_eq_zero_iff _ _).mpr hdvd
+  have hval : ((2 ^ fc.p - 1 : ℕ) : ZMod fc.p) = 1 := by
+    rw [Nat.cast_sub h1le, Nat.cast_pow, Nat.cast_one, Nat.cast_ofNat, ZMod.pow_card]
+    ring
+  rw [hval] at h1
+  exact one_ne_zero h1
+
+/-- **Step (10)** structural: `|V̄| = p` (First Case).  `V = W ⋊ P`, so
+`V̄ = V/W = (W̄ ⊔ P̄)` collapses to the image of `P`; `P ∩ W = 1` makes the
+quotient map injective on `P`, so `|V̄| = |P| = p`. -/
+theorem card_Vbar_eq_p :
+    Nat.card ↥fc.toHypothesis.Vbar = fc.p := by
+  have hWD : fc.toHypothesis.W ≤ fc.toHypothesis.D :=
+    fc.toHypothesis.W_le_V.trans fc.toHypothesis.V_le_D
+  have hPD : fc.P ≤ fc.toHypothesis.D := fc.P_le_V.trans fc.toHypothesis.V_le_D
+  set ψ : ↥fc.P →* fc.toHypothesis.Dbar :=
+    (QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D)).comp
+      (Subgroup.inclusion hPD) with hψ
+  -- `ψ` is injective: its kernel is `P ∩ W = 1`
+  have hψinj : Function.Injective ψ := by
+    rw [injective_iff_map_eq_one]
+    intro x hx
+    rw [hψ, MonoidHom.comp_apply, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+      Subgroup.mem_subgroupOf] at hx
+    have hmem : (x : G) ∈ fc.P ⊓ fc.toHypothesis.W := ⟨x.2, hx⟩
+    rw [fc.P_inf_W_eq_bot, Subgroup.mem_bot] at hmem
+    exact Subtype.ext hmem
+  have hbot : (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D).map
+      (QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D)) = ⊥ := by
+    rw [Subgroup.map_eq_bot_iff]
+    exact le_of_eq (QuotientGroup.ker_mk' _).symm
+  -- `ψ.range = V̄`: both equal `(P.subgroupOf D).map (mk' W)`
+  have hψrange : ψ.range = (fc.P.subgroupOf fc.toHypothesis.D).map
+      (QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D)) := by
+    rw [hψ, MonoidHom.range_eq_map, ← Subgroup.map_map, ← MonoidHom.range_eq_map,
+      Subgroup.inclusion_range]
+  have hVbarP : fc.toHypothesis.Vbar = (fc.P.subgroupOf fc.toHypothesis.D).map
+      (QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D)) := by
+    rw [show fc.toHypothesis.Vbar = (fc.toHypothesis.V.subgroupOf fc.toHypothesis.D).map
+        (QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D)) from rfl,
+      ← fc.W_join_P_eq_V, Subgroup.subgroupOf_sup hWD hPD, Subgroup.map_sup, hbot, bot_sup_eq]
+  have hrange : ψ.range = fc.toHypothesis.Vbar := hψrange.trans hVbarP.symm
+  rw [← hrange, ← fc.card_P]
+  exact (Nat.card_congr (MonoidHom.ofInjective hψinj).toEquiv).symm
+
+/-- **Step (10)** structural: `|D̄|_p = p`.  `|D̄| = |K̄| · |V̄|`, `p ∤ |K̄|`,
+`|V̄| = p`. -/
+theorem factorization_card_Dbar_eq_one :
+    (Nat.card fc.toHypothesis.Dbar).factorization fc.p = 1 := by
+  rw [← fc.toHypothesis.card_Kbar_mul_card_Vbar,
+    Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.add_apply,
+    Nat.factorization_eq_zero_of_not_dvd fc.not_p_dvd_card_Kbar, fc.card_Vbar_eq_p,
+    Nat.Prime.factorization_self fc.p_prime, zero_add]
+
+/-- **Step (10)** structural: `|D|_p = p · |W|_p`, i.e.
+`v_p(|D|) = 1 + v_p(|W|)`. -/
+theorem factorization_card_D_eq :
+    (Nat.card ↥fc.toHypothesis.D).factorization fc.p =
+      1 + (Nat.card ↥fc.toHypothesis.W).factorization fc.p := by
+  rw [fc.toHypothesis.card_D_eq_card_Dbar_mul_card_W,
+    Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.add_apply,
+    fc.factorization_card_Dbar_eq_one]
+
+/-- **Peterfalvi Part II, Ch. II, step (10)** (p. 111): `|G|_p = p^{m+2} · |W|_p`,
+i.e. `v_p(|G|) = (m+2) + v_p(|W|)` where `|F| = p^m`.
+
+`|G| = |Q| · |D| · (|Q|+1)`; `|Q|_p = 1` (`not_p_dvd_card_Q`), `|D|_p = p · |W|_p`
+(`factorization_card_D_eq`), and `(|Q|+1)_p = p^{m+1}`
+(`padicValNat_card_Q_add_one`).  Inherits the step (2)(b) `sorry` (issue 9318)
+through the model. -/
+theorem factorization_card_G_eq {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) :
+    (Nat.card G).factorization fc.p =
+      (m + 2) + (Nat.card ↥fc.toHypothesis.W).factorization fc.p := by
+  have hQ1 : (Nat.card ↥fc.toHypothesis.Q + 1).factorization fc.p = m + 1 := by
+    rw [Nat.factorization_def _ fc.p_prime, fc.padicValNat_card_Q_add_one model hB2 hm]
+  have hQ0 : (Nat.card ↥fc.toHypothesis.Q).factorization fc.p = 0 :=
+    Nat.factorization_eq_zero_of_not_dvd fc.not_p_dvd_card_Q
+  rw [fc.toHypothesis.card_G_eq,
+    Nat.factorization_mul (mul_ne_zero Nat.card_pos.ne' Nat.card_pos.ne') (by omega),
+    Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.add_apply,
+    Finsupp.add_apply, hQ0, hQ1, fc.factorization_card_D_eq]
+  ring
 
 end FirstCaseHypothesis
 
