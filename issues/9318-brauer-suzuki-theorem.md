@@ -241,17 +241,30 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)、AxiomsCheck 登録済 
 - `thetaStar_apply_eq_zero_of_orderOf_eq_two` / `_of_odd` — involution / 奇数位数元で θ*=0。
 - `apply_eq_of_thetaStar_apply_eq_zero` — θ*=1_G+χ₁−χ に θ*(y)=0 を代入 ⟹ χ(y)=1+χ₁(y)。
 
-### Lem 1.7 計画 (次 frontier、Gorenstein Ch.12 p.375-376)
+### ✅ Lem 1.7 核心完成 (2026-07-22 lane c、`BrauerSuzukiInvolutions.lean` 新 leaf)
 
-Gorenstein Lem 1.7: **β(y) = #{(u,v): involutions, uv=y} = 0 for y of even order** (純群論)。
-証明: uv=y, u,v involution, |y|=2s ⟹ u,v は y を反転 (Thm 9.1.1) し z=yˢ (involution) を
-中心化。u≠z なら ⟨u,z⟩ = Klein four ⟹ Sylow-2 に含まれるが generalized quaternion は
-unique involution ゆえ矛盾 → u=z=v ⟹ uv=1、y≠1 と矛盾。∴ β(y)=0。
-- ⚠ **要確認**: setup が「G の Sylow-2 が (S に共役ゆえ) generalized quaternion で unique
-  involution」を持つか。`QuaternionSylowSetup` の posit 内容を精査 (S が Sylow か、
-  unique-involution を全 Sylow-2 に伝播できるか)。Klein-four ⟹ contained in Sylow-2 は
-  `IsPGroup` + Sylow。unique involution は quaternion 分類 (`isCyclic_or_two_quaternion...`)。
-- 続く (1.1)=(9.4.2) 構造定数公式 (`ClassSumCoefficientFormula.lean`) → Lem 1.8/1.9 → endgame。
+Gorenstein Lem 1.7 の**純群論核心**を完成 (axiom-clean、AxiomsCheck 登録済):
+- **`commute_involution_eq`**: 可換な involution 対 u,v は相等。⟨u,v⟩ (可換ゆえ elementary
+  abelian 2-group、`closure_induction₂` で abelian・全元 sq=1 → `IsPGroup 2`) は Sylow-2 P に
+  含まれ (`IsPGroup.exists_le_sylow`)、P は S に共役 (`MulAction.exists_smul_eq`)。共役で u,v を
+  S に落とすと `eq_one_or_eq_z_of_sq_eq_one` (S の unique involution z) より両者 = z → u=v。
+- **`odd_orderOf_mul_of_involution`**: involution 積 u·v は奇数位数。もし偶数 2s なら z'=(uv)ˢ が
+  involution で u,v が反転・中心化 (`SemiconjBy.pow_right`) → `commute_involution_eq` で u=v=z'
+  → uv=z'²=1、偶数位数 ≥2 と矛盾。**= β(y)=0 for even order y** (involution 対は偶数位数元を作らない)。
+- setup 確認済: `QuaternionSylowSetup` は `S : Sylow 2 G` を posit ゆえ全 Sylow-2 が S 共役で
+  unique involution。原文の「z 個別 Klein-four」議論より `commute_involution_eq` 汎用形が簡潔だった。
+
+### Lem 1.8/1.9 + endgame 計画 (次 frontier、Gorenstein Ch.12 p.376-377)
+
+- **β(y) の定義**と (1.1)=(9.4.2) 構造定数公式 `β(y) = |G|/|C_G(u)|²·Σᵢ ζᵢ(u)²ζᵢ(y)/ζᵢ(1)`
+  (`ClassSumCoefficientFormula.lean` = `classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter`
+  との接続)。involution は G に唯一の共役類 K (全 Sylow-2 が unique involution + Sylow 定理)。
+- **Lem 1.8**: β(y)·θ*(y)=0 (Lem 1.6 で odd/involution 側 θ*=0、Lem 1.7 で even 側 β=0) +
+  直交性 → `1 + χ₁(u)²/χ₁(1) − χ(u)²/χ(1) = 0`。
+- **Lem 1.9**: χ₁(u)=χ(u)−1, χ₁(1)=χ(1)−1 代入 → `(χ(u)−χ(1))²=0` → 全 involution ⊆ ker χ、
+  χ 非線形 (χ(1)=1+χ₁(1)≥2)。
+- **endgame** (純群論): M=⟨involutions⟩⊴G、Q=S∩M cyclic (さもなくば非線形指標が線形化し矛盾)
+  → Burnside 2-補群 L⊴G → KQ⊴G (K=O_{2'}) → Ḡ=G/K で Ω₁(Q̄)=Z(Ḡ) 位数 2。□
 
 ### Lem 1.4 計画 (2026-07-22 lane c、⚠ 下記 infra は grep 発見のみ・API 未精査)
 
