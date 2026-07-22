@@ -288,6 +288,7 @@ import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 import OddOrder.GroupTheory.GlaubermanReplacement
 import OddOrder.GroupTheory.GlaubermanZJ
 import OddOrder.GroupTheory.SolvableTwoTransitive
+import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -12455,3 +12456,6 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 -- Galois–Burnside (可解 2-可移群の極小正規部分群は elementary abelian regular)
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive
+-- Peterfalvi App.IV Feit–Sibley 定理 (d odd ⟹ 𝒮 coherent; campaign issue 1054)
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.FeitSibley.feit_sibley_coherence
