@@ -257,7 +257,14 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   `comap_map_eq`+`ker_subtype` で `P◁↥N`。⚠ 罠: `(↑P:Subgroup)` 明示は二重 coe→bare `↑P`+absorb は
   `le_antisymm`+`sup_le` / `rw[←hmapeq]` は `N` が `P:Sylow p ↥N` の型に現れ motive 破綻→`.le.trans` の項 /
   `Subgroup.map_top` は無く `←MonoidHom.range_eq_map`。→ **1D.15 完了 (N=G + 一般 N)**。
-- ⬜ **残り §1D (1 問)**: **1D.5** (intricate、Frobenius complement)。substantial ゆえ次は Ch.2 展開も選択肢。
+- ⬜ **残り §1D (1 問)**: **1D.5** (Isaacs 明記の難問)。統陳: `H≤G` で「全素数 p・全 p-部分群 `P⊆H` に
+  `N_G(P)⊆H`」ならば `H` は Frobenius complement (`∀g∉H, H∩H^g=1`, cf. 1D.3)。**closing 論法は判明**:
+  `D:=H∩H^g≠1` と仮定、`Q∈Syl_q(D)` (nontrivial) をとる。`Q⊆H`、`Q⊆H^g`。もし `Q` と `Q^g` (Isaacs 慣用
+  `H^g=g⁻¹Hg` で `Q^g=gQg⁻¹⊆H`) が `H` で共役 `Q^g=Q^h` (h∈H) なら `h⁻¹g∈N_G(Q)⊆H` (条件) ゆえ `g∈H`、
+  矛盾。**難所 = 「Q と Q^g が H で共役」の justification** (Isaacs hint だが subtle、Sylow of H への埋め込み
+  だけでは同位数 q-部分群の共役は従わず、maximality/counting 論法を要すると思われる)。→ **専用 session で
+  精査**。他の §1D は全完 (**17/18**)。次は Ch.2 (Subnormality、repo に `Ch02_Subnormality/` 既存) の
+  問題へ breadth 展開推奨。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 
