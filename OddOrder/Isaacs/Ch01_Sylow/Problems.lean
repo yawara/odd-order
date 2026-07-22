@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.IndexNormal
 import Mathlib.GroupTheory.Sylow
+import Mathlib.GroupTheory.DoubleCoset
 
 /-!
 # Isaacs Chapter 1 — Problems (演習問題)
@@ -145,6 +146,76 @@ theorem prime_dvd_index_normalizer_of_prime_pow {G : Type*} [Group G] [Finite G]
   obtain ⟨s, hs⟩ := hdvd
   refine Sylow.prime_dvd_card_quotient_normalizer ⟨s, ?_⟩ hH
   rw [← Subgroup.card_mul_index H, hH, hs, pow_succ]; ring
+
+open Pointwise MulAction in
+/-- **Isaacs Problem 1A.2**. 二重剰余類の位数公式: `|HgK| · |K ∩ H^g| = |H| · |K|`
+(`H^g = g⁻¹Hg = MulAut.conj g⁻¹ • H`)。除算形は `|HgK| = |H||K| / |K ∩ H^g|`。`g = 1` で
+通常の `|HK| = |H||K|/|H∩K|` 公式。
+
+`H × K` を `(h,k)•x = h·x·k⁻¹` で `G` に作用させると、`g` の軌道が `HgK` (集合として)、
+固定化群 `{(h,k) : h·g·k⁻¹ = g}` が `k ↦ (g k g⁻¹, k)` で `K ∩ H^g` と同型。軌道-固定化群定理
+(`orbitProdStabilizerEquivGroup`) より従う。 -/
+theorem card_doubleCoset_mul_card_inf_conj {G : Type*} [Group G] [Finite G]
+    (H K : Subgroup G) (g : G) :
+    Nat.card (DoubleCoset.doubleCoset g (H : Set G) K) * Nat.card ↥(K ⊓ MulAut.conj g⁻¹ • H)
+      = Nat.card H * Nat.card K := by
+  -- `H^g` の membership 判定
+  have hmem : ∀ y : G, y ∈ MulAut.conj g⁻¹ • H ↔ g * y * g⁻¹ ∈ H := fun y => by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hy : (MulAut.conj g⁻¹)⁻¹ • y = g * y * g⁻¹ := by
+      simp only [← map_inv, inv_inv, MulAut.smul_def, MulAut.conj_apply]
+    rw [hy]
+  -- 両側作用 (h,k)•x = h x k⁻¹
+  letI act : MulAction (H × K) G :=
+    { smul := fun p x => (p.1 : G) * x * (p.2 : G)⁻¹
+      one_smul := fun x => by
+        change ((1 : H × K).1 : G) * x * ((1 : H × K).2 : G)⁻¹ = x
+        simp
+      mul_smul := fun p q x => by
+        change ((p * q).1 : G) * x * ((p * q).2 : G)⁻¹
+          = (p.1 : G) * ((q.1 : G) * x * (q.2 : G)⁻¹) * (p.2 : G)⁻¹
+        simp only [Prod.fst_mul, Prod.snd_mul, Subgroup.coe_mul, mul_inv_rev]; group }
+  -- 軌道 = HgK
+  have horb : orbit (H × K) g = DoubleCoset.doubleCoset g (H : Set G) K := by
+    ext x
+    rw [mem_orbit_iff, DoubleCoset.mem_doubleCoset]
+    constructor
+    · rintro ⟨⟨h, k⟩, rfl⟩
+      exact ⟨h, h.2, (k : G)⁻¹, K.inv_mem k.2, rfl⟩
+    · rintro ⟨h, hh, k, hk, rfl⟩
+      exact ⟨(⟨h, hh⟩, ⟨k⁻¹, K.inv_mem hk⟩), by
+        change (h : G) * g * ((k : G)⁻¹)⁻¹ = h * g * k; group⟩
+  -- 固定化群条件: (h,k)•g = g ⟹ g·k·g⁻¹ = h
+  have hstabeq : ∀ p : stabilizer (H × K) g, g * (p.1.2 : G) * g⁻¹ = (p.1.1 : G) := fun p => by
+    have hp : (p.1.1 : G) * g * (p.1.2 : G)⁻¹ = g := p.2
+    calc g * (p.1.2 : G) * g⁻¹
+        = (p.1.1 : G) * g * (p.1.2 : G)⁻¹ * (p.1.2 : G) * g⁻¹ := by rw [hp]
+      _ = (p.1.1 : G) := by group
+  -- 固定化群 ≅ K ⊓ H^g  (k ↦ (g k g⁻¹, k))
+  have hstab : Nat.card (stabilizer (H × K) g) = Nat.card ↥(K ⊓ MulAut.conj g⁻¹ • H) := by
+    apply Nat.card_congr
+    refine
+      { toFun := fun p => ⟨(p.1.2 : G), Subgroup.mem_inf.2 ⟨p.1.2.2, ?_⟩⟩
+        invFun := fun t => ⟨(⟨g * (t : G) * g⁻¹, (hmem t).1 (Subgroup.mem_inf.1 t.2).2⟩,
+          ⟨(t : G), (Subgroup.mem_inf.1 t.2).1⟩), ?_⟩
+        left_inv := ?_
+        right_inv := ?_ }
+    · -- (p.1.2 : G) ∈ H^g
+      rw [hmem, hstabeq p]; exact p.1.1.2
+    · -- (g t g⁻¹, t) ∈ stabilizer
+      change (g * (t : G) * g⁻¹) * g * ((t : G))⁻¹ = g
+      group
+    · -- left_inv
+      intro p
+      apply Subtype.ext
+      apply Prod.ext
+      · exact Subtype.ext (hstabeq p)
+      · exact Subtype.ext rfl
+    · -- right_inv
+      intro t
+      exact Subtype.ext rfl
+  rw [← horb, ← hstab, ← Nat.card_prod,
+    Nat.card_congr (orbitProdStabilizerEquivGroup (H × K) g), Nat.card_prod]
 
 end
 
