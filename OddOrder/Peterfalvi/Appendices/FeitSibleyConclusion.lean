@@ -455,6 +455,14 @@ theorem exists_anchor_hXdiff [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintyp
     (by rw [Nat.cast_one, one_mul]; exact hbdeg)
   simpa using hsupp
 
+/-- **(4) disjointness `𝒳 ∩ 𝒴 = ∅`** (Peterfalvi (4), p. 147).  For `Z ≤ Q'`, the family
+`𝒳 = 𝒮 − 𝒮(Z) = XsetOf ⊥ Z` (members with `Z ⊄ Ker`) is disjoint from `𝒴 = 𝒮(Q') = SsetOf Qder`
+(members trivial on `Q' ⊇ Z`, hence on `Z`): a `𝒴`-member is constant on `Q' ⊇ Z`, so `Z ⊆ Ker`,
+excluding it from `𝒳`.  (`Z = endgameZ ≤ Q'` by `endgameZ_le_Qder`.) -/
+theorem xsetOf_bot_disjoint_ssetOf_Qder {Z : Subgroup G} (hZQder : Z ≤ hyp.Qder)
+    {φ : ClassFunction ↥hyp.H ℂ} (hφ : φ ∈ hyp.XsetOf ⊥ Z) : φ ∉ hyp.SsetOf hyp.Qder :=
+  fun hφQ => hφ.2 (fun x hx => hφQ.2 x (hZQder hx))
+
 /-- **(8) full assembly: `a ∣ λ`** (Peterfalvi (8), p. 150).  The keystone divisibility closing
 step (6): from the endgame `(4)` data — the coherent `𝒳 = XsetOf ⊥ Z` with anchor `χ₁` of degree
 `χ₁(1) = a·d`, `p`-power degree differences `χ − b·χ₁` supported, the `𝒴`-witness `e' = ε·ξ`
