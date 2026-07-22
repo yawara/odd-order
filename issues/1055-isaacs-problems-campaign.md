@@ -232,9 +232,27 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   を先証して `.trans hCA` / `hane:a≠1`(P) ≠ `⟨a,ha⟩≠1`(↥A) → Subtype.ext_iff で導出 / MulAction proof の
   `show`→`change` / `MulAut.conjNormal_apply` + `mul_inv_eq_iff_eq_mul` で commute / card は
   `Fintype.card_subtype_compl`+`card_subtype_eq`。→ **1D.10 完了**。
-- ⬜ **残り §1D**: 1D.5 (intricate) / 1D.11 (`|G| ∣ n!`、1D.10 後半を各 Sylow に適用可能に) /
-  1D.12 (位数 p 元数 `≡-1 mod p`、McKay の p-tuple + `card_modEq_card_fixedPoints`) /
-  1D.15 の一般 `N` 版。多くは meaty。
+- ✅ 実証明 **1D.11** `card_dvd_factorial_of_abelian_bound` (`n` が可換部分群位数の上界 ⟹ `|G| ∣ n!`) +
+  helper `exists_maximal_abelian_normal` (有限順序の極大元 `Finite.exists_le_maximal`、witness=`center P`)。
+  各 `P∈Syl_p(G)` の極大可換正規 `A` に 1D.10 後半 ⟹ `|P:A|∣(|A|-1)!`、`A.map subtype` の可換性
+  (`equivMapOfInjective` 経由) で `|A|≤n`、`|P|=|A|·|P:A| ∣ |A|! ∣ n!` (`mul_factorial_pred`)。
+  `|P|=p^{v_p|G|}` (`Sylow.card_eq_multiplicity`) で全素数冪 ⟹ `|G|∣n!` (`Nat.dvd_iff_prime_pow_dvd_dvd`)。
+  ⚠ `dvd_iff_prime_pow_dvd_dvd` の `intro` は `Nat.Prime` を与える (変換不要) / `card_eq_multiplicity` は
+  `↥↑P` coe ゆえ明示型 `have hmult : Nat.card ↥P = …` で橋渡し。`n` を最大値でなく上界に一般化。
+  → **1D.11 完了**。
+- ⬜ **残り §1D** (いずれも ~60 行 substantial、quick path 無し):
+  - **1D.12** (位数 p 元数 `≡-1 mod p`) — 詳細プラン確定 (2026-07-23 調査): mathlib は Cauchy **存在**
+    (`exists_prime_orderOf_dvd_card`) のみ露出、**count は無い**ので McKay を自前構築。素材 =
+    `Equiv.Perm.VectorsProdEqOne` (`Perm/Cycle/Type.lean` 422+): `vectorsProdEqOne G p` (積=1 の p-tuple)、
+    `.card` (=`|G|^(p-1)`)、`rotate`/`rotate_zero`/`rotate_rotate`/`rotate_length`。手順: (1) `rotate` で
+    `MulAction (Multiplicative (ZMod p)) (vectorsProdEqOne G p)` を letI 定義 (mul_smul は p-周期性
+    `rotate v (k+p)=rotate v k` = rotate_rotate+rotate_length で `rotate v k = rotate v (k%p)`)、(2)
+    `IsPGroup.card_modEq_card_fixedPoints`: `|vectorsProdEqOne|≡|fixed| mod p`、`|vectorsProdEqOne|=|G|^(p-1)≡0`
+    (p∣|G|) ⟹ `#{x^p=1}=|fixed|≡0`、fixedPoints=定数ベクトル `replicate p x` (x^p=1) と同定
+    (`List.rotate_one_eq_self_iff_eq_replicate`)、(3) `sum_card_orderOf_eq_card_pow_eq_one (p≠0)`:
+    `divisors p={1,p}` で `#{ord=1}+#{ord=p}=#{x^p=1}`、`#{ord=1}=1` ⟹ `#{ord=p}=#{x^p=1}-1≡-1`。
+    別案: mathlib Cauchy 内の `σ`(rotate-by-1 perm)を再構築し `zpowers σ` を p-群として使う。
+  - **1D.5** (intricate) / **1D.15 の一般 `N` 版** (Φ(G)⊆N◁G, N/Φ(G)冪零⟹N冪零)。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 

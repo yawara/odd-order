@@ -716,6 +716,59 @@ theorem index_dvd_factorial_of_maximal_abelian_normal {P : Type*} [Group P] [Fin
     _ = (Nat.card {a : ↥A // a ≠ 1}).factorial := Nat.card_perm
     _ = (Nat.card ↥A - 1).factorial := by rw [hcardX]
 
+/-- 有限群には可換正規部分群のうち極大なもの (`⊥` を含むので存在) がある。1D.10/1D.11 で
+Lemma 1.23 を適用するための存在補題 (有限順序集合の極大元)。 -/
+theorem exists_maximal_abelian_normal (P : Type*) [Group P] [Finite P] :
+    ∃ A : Subgroup P, A.Normal ∧ IsMulCommutative ↥A ∧
+      ∀ B : Subgroup P, B.Normal → IsMulCommutative ↥B → A ≤ B → B = A := by
+  obtain ⟨A, -, hAmax⟩ := Finite.exists_le_maximal
+    (p := fun B : Subgroup P => B.Normal ∧ IsMulCommutative ↥B) (a := Subgroup.center P)
+    ⟨inferInstance, inferInstance⟩
+  exact ⟨A, hAmax.1.1, hAmax.1.2,
+    fun C hCn hCa hAC => le_antisymm (hAmax.2 ⟨hCn, hCa⟩ hAC) hAC⟩
+
+/-- **Isaacs Problem 1D.11**. `n` が有限群 `G` の可換部分群の位数の上界ならば `|G| ∣ n!`。各素数 `p`
+について `P ∈ Syl_p(G)` の極大可換正規部分群 `A` (`exists_maximal_abelian_normal`) に 1D.10 後半を適用
+すると `|P:A| ∣ (|A|-1)!`、`A` は可換ゆえ像を通して `|A| ≤ n`、したがって
+`|P| = |A|·|P:A| ∣ |A|·(|A|-1)! = |A|! ∣ n!`。`|P| = p^{v_p|G|}` は `|G|` の `p`-部分ゆえ、
+全素数冪について割り切れ `|G| ∣ n!` (`Nat.dvd_iff_prime_pow_dvd_dvd`)。`n` を最大値でなく上界に
+一般化してある (最大値はその特別な場合)。 -/
+theorem card_dvd_factorial_of_abelian_bound {G : Type*} [Group G] [Finite G] {n : ℕ}
+    (hn : ∀ B : Subgroup G, IsMulCommutative ↥B → Nat.card ↥B ≤ n) :
+    Nat.card G ∣ n.factorial := by
+  rw [Nat.dvd_iff_prime_pow_dvd_dvd]
+  intro p k hp hpk
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
+  have hPdvd : Nat.card ↥P ∣ n.factorial := by
+    obtain ⟨A, hAn, hAa, hAmax⟩ := exists_maximal_abelian_normal ↥P
+    haveI := hAn
+    haveI := hAa
+    haveI hPp : IsPGroup p ↥P := P.isPGroup'
+    have hidx : A.index ∣ (Nat.card ↥A - 1).factorial :=
+      index_dvd_factorial_of_maximal_abelian_normal hPp A hAmax
+    have hAle : Nat.card ↥A ≤ n := by
+      have hfinj := (P : Subgroup G).subtype_injective
+      haveI : IsMulCommutative ↥(A.map (P : Subgroup G).subtype) := by
+        refine ⟨⟨fun x y => ?_⟩⟩
+        obtain ⟨a, rfl⟩ :=
+          (Subgroup.equivMapOfInjective A (P : Subgroup G).subtype hfinj).surjective x
+        obtain ⟨b, rfl⟩ :=
+          (Subgroup.equivMapOfInjective A (P : Subgroup G).subtype hfinj).surjective y
+        rw [← map_mul, ← map_mul, hAa.is_comm.comm a b]
+      have hle := hn (A.map (P : Subgroup G).subtype) inferInstance
+      rwa [Subgroup.card_map_of_injective hfinj] at hle
+    have hAne : Nat.card ↥A ≠ 0 := Nat.card_pos.ne'
+    calc Nat.card ↥P = Nat.card ↥A * A.index := (Subgroup.card_mul_index A).symm
+      _ ∣ Nat.card ↥A * (Nat.card ↥A - 1).factorial := Nat.mul_dvd_mul_left _ hidx
+      _ = (Nat.card ↥A).factorial := Nat.mul_factorial_pred hAne
+      _ ∣ n.factorial := Nat.factorial_dvd_factorial hAle
+  have hk : p ^ k ∣ Nat.card ↥P := by
+    have hmult : Nat.card ↥P = p ^ Nat.factorization (Nat.card G) p := P.card_eq_multiplicity
+    rw [hmult]
+    exact pow_dvd_pow p ((hp.pow_dvd_iff_le_factorization Nat.card_pos.ne').mp hpk)
+  exact hk.trans hPdvd
+
 end
 
 end OddOrder.Isaacs.Ch01
