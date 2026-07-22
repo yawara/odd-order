@@ -151,6 +151,12 @@ theorem T_le_C : Q.T ≤ Q.C := Q.T_le_X.trans Q.X_le_C
 /-- `R ≤ C`. -/
 theorem R_le_C : Q.R ≤ Q.C := Q.R_le_T.trans Q.T_le_C
 
+/-- `R ≤ X`: `x⁴ = (x)⁴ ∈ ⟨x⟩ = X`. -/
+theorem R_le_X : Q.R ≤ Q.X := by
+  intro g hg
+  obtain ⟨m, rfl⟩ := Q.mem_R_iff.mp hg
+  exact Q.mem_X_iff.mpr ⟨4 * m, rfl⟩
+
 /-- Every element of `C` centralizes every element of `T` (`T ≤ Z(C)`). -/
 theorem C_centralizes_T {c t : G} (hc : c ∈ Q.C) (ht : t ∈ Q.T) : c * t * c⁻¹ = t := by
   rw [C, mem_centralizer_iff] at hc
@@ -403,6 +409,103 @@ theorem conj_mem_A_of_mem_N {n a : G} (hn : n ∈ Q.N) (ha : a ∈ Q.A) : n * a 
   refine haRH ?_
   have h := Q.conj_mem_RH_of_mem_N (inv_mem hn) hmem
   rwa [show n⁻¹ * (n * a * n⁻¹) * (n⁻¹)⁻¹ = a from by group] at h
+
+/-! ### The product structure of `RH`, `A ≠ ∅`, and `N_G(A) ≤ N` (completing `N = N_G(A)`) -/
+
+/-- `R` centralizes `H`: `R ≤ T ≤ Z(C)` and `H ≤ C`. -/
+theorem R_centralizes_H {r h : G} (hr : r ∈ Q.R) (hh : h ∈ Q.H) : r * h = h * r := by
+  have h1 : h * r * h⁻¹ = r := Q.C_centralizes_T (Q.H_le_C hh) (Q.R_le_T hr)
+  calc r * h = (h * r * h⁻¹) * h := by rw [h1]
+    _ = h * r := by group
+
+/-- **The product structure of `RH`** (Gorenstein p. 374): since `R` is central in `C`
+(so commutes with `H`), `RH = R ⊔ H` is the pointwise product `R · H`. -/
+theorem mem_RH_iff {g : G} : g ∈ Q.RH ↔ ∃ r ∈ Q.R, ∃ h ∈ Q.H, g = r * h := by
+  constructor
+  · intro hg
+    let S₀ : Subgroup G :=
+      { carrier := {g | ∃ r ∈ Q.R, ∃ h ∈ Q.H, g = r * h}
+        one_mem' := ⟨1, one_mem _, 1, one_mem _, (one_mul 1).symm⟩
+        mul_mem' := by
+          rintro a b ⟨r₁, hr₁, h₁, hh₁, rfl⟩ ⟨r₂, hr₂, h₂, hh₂, rfl⟩
+          refine ⟨r₁ * r₂, mul_mem hr₁ hr₂, h₁ * h₂, mul_mem hh₁ hh₂, ?_⟩
+          have hcomm : h₁ * r₂ = r₂ * h₁ := (Q.R_centralizes_H hr₂ hh₁).symm
+          calc r₁ * h₁ * (r₂ * h₂) = r₁ * (h₁ * r₂) * h₂ := by group
+            _ = r₁ * (r₂ * h₁) * h₂ := by rw [hcomm]
+            _ = r₁ * r₂ * (h₁ * h₂) := by group
+        inv_mem' := by
+          rintro a ⟨r, hr, h, hh, rfl⟩
+          refine ⟨r⁻¹, inv_mem hr, h⁻¹, inv_mem hh, ?_⟩
+          rw [mul_inv_rev, Q.R_centralizes_H (inv_mem hr) (inv_mem hh)] }
+    have hle : Q.RH ≤ S₀ := by
+      rw [RH, sup_le_iff]
+      exact ⟨fun r hr => ⟨r, hr, 1, one_mem _, (mul_one r).symm⟩,
+        fun h hh => ⟨1, one_mem _, h, hh, (one_mul h).symm⟩⟩
+    exact hle hg
+  · rintro ⟨r, hr, h, hh, rfl⟩
+    exact mul_mem (Q.R_le_RH hr) (Q.H_le_RH hh)
+
+/-- `X ⊓ H = ⊥`: `X` is a `2`-group, `H` has odd order. -/
+theorem X_inf_H_eq_bot : Q.X ⊓ Q.H = ⊥ := by
+  rw [eq_bot_iff]
+  rintro g ⟨hgX, hgH⟩
+  rw [Subgroup.mem_bot, ← orderOf_eq_one_iff]
+  have hodd : Odd (orderOf g) := (Q.mem_H_iff.mp hgH).2
+  have hdvd : orderOf g ∣ 2 ^ Q.n := Q.hx_order ▸ orderOf_dvd_of_mem_zpowers hgX
+  obtain ⟨j, _, hj⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp hdvd
+  rw [hj] at hodd ⊢
+  rcases Nat.eq_zero_or_pos j with hj0 | hpos
+  · rw [hj0, pow_zero]
+  · exfalso
+    have hdvd2 : (2 : ℕ) ∣ 2 ^ j := dvd_pow_self 2 hpos.ne'
+    rw [Nat.odd_iff] at hodd
+    omega
+
+/-- `x^k ∈ RH ⟹ x^k ∈ R` (elements of `X ∩ RH` lie in `R`, since `RH = R·H`, `X ⊓ H = ⊥`). -/
+theorem mem_R_of_mem_X_of_mem_RH {k : ℤ} (hmem : Q.x ^ k ∈ Q.RH) : Q.x ^ k ∈ Q.R := by
+  obtain ⟨r, hr, h, hh, heq⟩ := Q.mem_RH_iff.mp hmem
+  have hhX : h ∈ Q.X := by
+    have he : h = r⁻¹ * Q.x ^ k := by rw [heq]; group
+    rw [he]
+    exact mul_mem (inv_mem (Q.R_le_X hr)) (Q.mem_X_iff.mpr ⟨k, rfl⟩)
+  have hh1 : h = 1 := by
+    have hmemInf : h ∈ Q.X ⊓ Q.H := ⟨hhX, hh⟩
+    rw [Q.X_inf_H_eq_bot, Subgroup.mem_bot] at hmemInf
+    exact hmemInf
+  rw [heq, hh1, mul_one]
+  exact hr
+
+/-- **`x ∉ RH`** (`orderOf x = 2ⁿ` but `R = ⟨x⁴⟩` has order `2ⁿ⁻²`). -/
+theorem x_notMem_RH : Q.x ∉ Q.RH := by
+  intro hx
+  have hxR : Q.x ∈ Q.R := by
+    have h := Q.mem_R_of_mem_X_of_mem_RH (k := 1) (by rwa [zpow_one])
+    rwa [zpow_one] at h
+  have hdvd : orderOf Q.x ∣ Nat.card Q.R := by
+    have h1 := orderOf_dvd_natCard (⟨Q.x, hxR⟩ : Q.R)
+    rwa [← orderOf_injective Q.R.subtype Q.R.subtype_injective ⟨Q.x, hxR⟩] at h1
+  rw [Q.hx_order, Q.card_R] at hdvd
+  have hle := Nat.le_of_dvd (by positivity) hdvd
+  have h2 : (2 : ℕ) ^ (Q.n - 2) < 2 ^ Q.n :=
+    Nat.pow_lt_pow_right one_lt_two (by have := Q.hn; omega)
+  omega
+
+/-- **`A = C − RH` is nonempty** (`x ∈ A`). -/
+theorem A_nonempty : Q.A.Nonempty :=
+  ⟨Q.x, Q.x_mem_C, Q.x_notMem_RH⟩
+
+/-- **Gorenstein Lemma 1.3 (`N_G(A) ≤ N`)**: any `g` normalizing the set `A` lies in `N`.
+Since `A ≠ ∅`, the assumption produces an overlap, and `A` is a TI-subset with bound `N`. -/
+theorem mem_N_of_forall_conj_mem_A {g : G} (hg : ∀ a ∈ Q.A, g * a * g⁻¹ ∈ Q.A) : g ∈ Q.N := by
+  obtain ⟨a, ha⟩ := Q.A_nonempty
+  exact Q.A_isTISubset g ⟨a, ha, hg a ha⟩
+
+/-- **Gorenstein Lemma 1.3, full form `N = N_G(A)`**: `g` normalizes the set `A` iff `g ∈ N`. -/
+theorem mem_N_iff_forall_conj_mem_A {g : G} : g ∈ Q.N ↔ ∀ a ∈ Q.A, g * a * g⁻¹ ∈ Q.A := by
+  constructor
+  · intro hg a ha
+    exact Q.conj_mem_A_of_mem_N hg ha
+  · exact Q.mem_N_of_forall_conj_mem_A
 
 end QuaternionSylowSetup
 
