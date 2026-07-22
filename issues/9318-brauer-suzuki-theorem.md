@@ -194,6 +194,31 @@ Gorenstein Lem 1.5: `θ* = Ind_N^G θ` (TI 誘導、`A_isTISubset` が feed)。
 出力定理 (提案): `∃ χ₁ χ : IrreducibleCharacter G, χ₁ ≠ χ ∧ χ₁ ≠ 1 ∧ χ ≠ 1 ∧
   θ* = 1_G + χ₁ − χ ∧ χ(1) = χ₁(1) + 1`。→ 下流 Lem 1.6 (involution/奇数位数元上 θ*=0) へ。
 
+#### ✅ 基礎完了 (2026-07-22 commit 3c3e07c38) + 分解本体の確定手順
+
+**完了**: `exists_triple_of_sum_sq_eq_three` (汎用) + `theta_mem_ZIrr` /
+`thetaStar_mem_ZIrr` (∈ZIrr)。`thetaStar_inner_self=3` / `_apply_one=0` /
+`_inner_trivial=1` も既済。
+
+**⚠ 最終判断: 分解本体は ρ = θ*−1_G (norm 2) 経由が最良** (triple 版より nontrivial 判定が楽):
+`exists_irr_sub_irr_of_inner_self_two` (ZIrrFourier:574) は φ(1)=0 要求で ρ(1)=−1 に
+不適 → **その proof (578-613) を ρ 用に複製**する。手順:
+1. `ρ := θ* − 1_G`、`hρZ : ρ ∈ ZIrr` (`sub_mem thetaStar_mem_ZIrr trivial.mem_ZIrr`)。
+2. `(ρ,ρ)=2`: `inner_sub_left/right` 展開 = (θ*,θ*)−(θ*,1)−(1,θ*)+(1,1) = 3−1−1+1
+   ((1,θ*)=conj(θ*,1)=1 via `inner_star_comm`、(1,1)=1 via `irr_cf_inner`)。
+3. `ρ(1)=−1`: `sub_apply` + `thetaStar_apply_one` + `trivialClassFunction_apply`。
+4. Fourier `mem_ZIrr_inner_self_eq_sum_sq hρZ` → c, `Σc²=2` → `exists_pair_of_sum_sq_eq_two`
+   → α₀,β₀ 相異・c=±1、`hrepr : ρ = cα•α₀ + cβ•β₀`。
+5. 次数: `irreducibleCharacter_apply_one_eq_pos_natCast` → dα,dβ≥1、
+   `hone' : cα·dα+cβ·dβ = −1` (hρ1 に hrepr 代入)。
+6. **4-case (cα,cβ)=(±1,±1)**: (+,+)→dα+dβ=−1 不可、(−,−)→dα+dβ=1 だが dα,dβ≥1 で不可、
+   (+,−)→dβ=dα+1 [χ₁=α₀,χ=β₀]、(−,+)→dα=dβ+1 [χ₁=β₀,χ=α₀]。
+7. **nontrivial**: `(ρ,trivial)=0` (=(θ*,1)−(1,1)=1−1)、かつ `(ρ,α₀)=cα₀` (hrepr+orthonormality)。
+   α₀=trivial なら (ρ,α₀)=(ρ,trivial)=0 だが cα₀=±1≠0 で矛盾 → α₀≠trivial (β₀ も同様)。
+8. `θ* = 1_G + ρ = 1_G + χ₁ − χ` (`hρ` を戻す + abel)。
+triple 版 (θ* 直接、`exists_triple_of_sum_sq_eq_three`) は trivial が {α,β,γ} の
+どれかの 3-way 識別が必要で冗長 — triple 補題は汎用 infra として保持 (別 norm-3 用)。
+
 ### Lem 1.4 計画 (2026-07-22 lane c、⚠ 下記 infra は grep 発見のみ・API 未精査)
 
 Gorenstein Lem 1.4: `θ = 1_C↑N − ψ̃` について (i) `(θ,θ)_N = 3` (ii) `deg θ = 0`、
