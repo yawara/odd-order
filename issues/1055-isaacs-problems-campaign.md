@@ -59,9 +59,11 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   (`fixedPointsMulLeftCosetsEquivQuotient`)。
 - ✅ 実証明: **1A.2** (`card_doubleCoset_mul_card_inf_conj`: 二重剰余類 |HgK|·|K∩H^g|=|H||K|、
   H×K の両側作用 (h,k)•x=hxk⁻¹ の orbit-stabilizer)。
-- ⬜ 残 §1A: **1A.3** (|H:H∩K|≤|G:K| 等号⟺HK=G; coprime index⟹HK=G) — **1A.2 を g=1 に適用
-  すれば |HK|·|H∩K|=|H||K|、あとは HK⊆G で ≤ + 等号=HK=G** / **1A.5** (積作用の推移性⟺G_αG_β=G) /
-  **1A.7** (真部分群の共役の和集合の補集合 ≥|H|、1A.6 の置換指標を使う)。
+- ✅ 実証明: **1A.3** (`card_mul_card_inf` helper = |HK|·|H∩K|=|H||K| (1A.2 g=1) /
+  `card_mul_le_card_mul_card_inf` (a)≤ / `card_mul_eq_iff_mul_eq_univ` (a)等号⟺HK=G /
+  `mul_eq_univ_of_coprime_index` (b) coprime index⟹HK=G)。
+- ⬜ 残 §1A: **1A.5** (積作用の推移性⟺G_αG_β=G) / **1A.7** (真部分群の共役の和集合の補集合 ≥|H|、
+  1A.6 の置換指標を使う)。いずれも mathlib 直接対応なし。
 - ⬜ §1B–§1G 未着手。
 
 ## 完了条件
