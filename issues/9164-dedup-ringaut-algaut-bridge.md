@@ -54,3 +54,12 @@ Suzuki 側が共有 `ringAutMulEquivAlgAut` を呼び、inline `toAlgAut` が消
 - ⚠ **owner 注意**: Suzuki 付録は lane a の territory ではない (issue 2048 = lane b 系)。
   差し替えは所有レーンか hub が行う。lane a 側は共有版を land 済みで、
   Suzuki 側が現状のままでもビルドは壊れない (単なる重複)。
+
+---
+
+## 🧭 HUB RULING (2026-07-22): owner = lane b、実施は 2053 の区切りで
+
+Suzuki 付録は b territory ゆえ差し替え実施 owner = **b**。重複はビルドを壊さない
+(単なる dup) ので緊急性なし — **2053 Theorem B の区切り** (issue 0127 ②の
+Suzuki2Groups 統合と同じタイミング) でまとめて実施すること。hub は tick でこの間
+dup 増殖がないかだけ watch。

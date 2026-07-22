@@ -39,3 +39,16 @@ sorry 数不変で main に合流される。
 - issue 1054 (lane a の campaign、分割タイミングの依存先)
 - CLAUDE.md「ファイル粒度」/ `notes/meta/merge_monitor.md` step 4 (サイズ watch)
 - 先例: issue 0103 (機械分割の道具と手順)、issue 9160 (Higman 系粒度)
+
+---
+
+## 🧭 HUB RULING (2026-07-22): 分割は issue 1054 campaign close まで繰延
+
+- FeitSibleyTheorem.lean は現在 **1882 行**、同クラスタの FeitSibleyEndgame.lean も
+  **1444 行**に成長中 (1054 campaign step 6/8)。いずれも lane a の **active frontier** で、
+  今 prefix-split すると a の編集と衝突する (凍結境界が無い)。
+- **裁定**: 分割実施は **1054 close 直後** (クラスタ凍結時) に hub がまとめて行う。
+  対象 = FeitSibleyTheorem (>1500) + Endgame (超過見込み) の 2 本、方式 = 記述的英語名の
+  topic leaves + 必要なら pure re-export hub。
+- **例外 trigger**: どちらかが **2000 行 (hard limit) に到達したら**繰延を破棄し、
+  a と衝突しない先頭凍結クラスタのみ緊急 prefix-split。
