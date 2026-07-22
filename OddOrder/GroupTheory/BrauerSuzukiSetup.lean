@@ -311,6 +311,37 @@ theorem S_inf_C_eq_X : (Q.S : Subgroup G) ⊓ Q.C = Q.X := by
       omega
   · exact le_inf (by rw [X]; exact zpowers_le.mpr Q.hxS) Q.X_le_C
 
+/-! ### The derived subgroup of `S` (Gorenstein p. 373: `S' = ⟨x²⟩ = T`) -/
+
+/-- Conjugation by `y⁻¹` also inverts every power of `x` (`y⁻¹·xᵏ·y = x⁻ᵏ`). -/
+theorem conj_inv_x_zpow (k : ℤ) : Q.y⁻¹ * Q.x ^ k * Q.y = Q.x ^ (-k) := by
+  have h : Q.y * Q.x ^ (-k) * Q.y⁻¹ = Q.x ^ k := by rw [Q.conj_x_zpow (-k), neg_neg]
+  calc Q.y⁻¹ * Q.x ^ k * Q.y
+      = Q.y⁻¹ * (Q.y * Q.x ^ (-k) * Q.y⁻¹) * Q.y := by rw [h]
+    _ = Q.x ^ (-k) := by group
+
+/-- **The derived subgroup of `S` lies in `T = ⟨x²⟩`** (Gorenstein p. 373: `S' = ⟨x²⟩`).  Every
+commutator of two elements of `S` is a power of `x²`, computed from the presentation relations by
+the four cases of the coset decomposition `S = X ∪ X·y`.  Hence `S/T` is abelian — this drives the
+`Q`-cyclic step of the Brauer–Suzuki endgame. -/
+theorem comm_mem_T {s t : G} (hs : s ∈ (Q.S : Subgroup G)) (ht : t ∈ (Q.S : Subgroup G)) :
+    s * t * s⁻¹ * t⁻¹ ∈ Q.T := by
+  rcases Q.mem_iff.mp hs with ⟨i, rfl | rfl⟩ <;> rcases Q.mem_iff.mp ht with ⟨j, rfl | rfl⟩
+  · rw [show Q.x ^ i * Q.x ^ j * (Q.x ^ i)⁻¹ * (Q.x ^ j)⁻¹ = 1 from by group]
+    exact one_mem _
+  · refine Q.mem_T_iff.mpr ⟨i, ?_⟩
+    calc Q.x ^ i * (Q.x ^ j * Q.y) * (Q.x ^ i)⁻¹ * (Q.x ^ j * Q.y)⁻¹
+        = Q.x ^ i * Q.x ^ j * (Q.y * Q.x ^ (-i) * Q.y⁻¹) * Q.x ^ (-j) := by group
+      _ = Q.x ^ i * Q.x ^ j * Q.x ^ i * Q.x ^ (-j) := by rw [Q.conj_x_zpow (-i), neg_neg]
+      _ = Q.x ^ (2 * i) := by group
+  · refine Q.mem_T_iff.mpr ⟨-j, ?_⟩
+    rw [Q.coset_conj_x_zpow i j]; group
+  · refine Q.mem_T_iff.mpr ⟨i - j, ?_⟩
+    calc (Q.x ^ i * Q.y) * (Q.x ^ j * Q.y) * (Q.x ^ i * Q.y)⁻¹ * (Q.x ^ j * Q.y)⁻¹
+        = Q.x ^ i * (Q.y * Q.x ^ (j - i) * Q.y⁻¹) * Q.x ^ (-j) := by group
+      _ = Q.x ^ i * Q.x ^ (-(j - i)) * Q.x ^ (-j) := by rw [Q.conj_x_zpow (j - i)]
+      _ = Q.x ^ (2 * (i - j)) := by group
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory
