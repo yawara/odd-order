@@ -213,8 +213,13 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   生成元を非生成性 `frattini_nongenerating` で持ち上げ) + `sq_le_card_frattiniQuotient_of_isPGroup_of_not_isCyclic`
   (非巡回 p-群 ⟹ `p²≤|P:Φ(P)|`、商 p-群位数 `p^n` で `n≥2`: 位数 `1`(自明)/`p`(`isCyclic_of_prime_card`) 排除)。
   ⚠ `x̄` 等結合文字は識別子不可 (`gbar`)、`MonoidHom.map_zpowers` (Subgroup 側でない)、`Subgroup.eq_top_iff'`
-  は解決せず `eq_top_iff`+intro。**残: 1D.9 後半 (位数 p² ⟹ 巡回 or 基本アーベル、`Φ=⊥` 経由)**。
-- ⬜ **残り §1D**: 1D.5 (intricate) / 1D.9 後半 (位数 p² 分類) / 1D.10 (max abelian normal `A=C_P(A)`) /
+  は解決せず `eq_top_iff`+intro。
+- ✅ 実証明 **1D.9 (後半)** `isCyclic_or_elementaryAbelian_of_card_eq_prime_sq` (位数 p² ⟹ 巡回 or
+  基本アーベル)。非巡回なら前半で `p²≤|P:Φ(P)|`、Lagrange `index_mul_card` で `|Φ(P)|=1` ⟹ `Φ(P)=⊥`、
+  `pow_mem_frattini` で exponent p、`commutator_le_frattini`+`commutator_eq_bot_iff` (=`IsMulCommutative`)
+  で可換。⚠ 元の交換子 `⁅a,b⁆` の `Bracket P P` は **scoped instance** (`commutatorElement`) ゆえ自分で
+  書くと未合成 → `commutator_eq_bot_iff` 経由で回避。→ **1D.9 完了**。
+- ⬜ **残り §1D**: 1D.5 (intricate) / 1D.10 (max abelian normal `A=C_P(A)`) /
   1D.11 (`|G| ∣ n!`) / 1D.12 (位数 p 元数 `≡-1 mod p`) / 1D.15 の一般 `N` 版。多くは meaty。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
