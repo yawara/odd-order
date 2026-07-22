@@ -933,6 +933,51 @@ theorem RankOneHypothesis.q_regular_on_complement {G Ω : Type*} [Group G] [MulA
     rw [← hyp.Q_inf_D_eq_bot]; exact Subgroup.mem_inf.mpr ⟨hmemQ, hmemD⟩
   exact Subtype.ext (inv_mul_eq_one.mp (Subgroup.mem_bot.mp hbot))
 
+open MulAction in
+/-- **`Q` acts regularly on `F ∖ {1}` by conjugation** (Peterfalvi App. C, Prop 1's transport: the
+near-field `reg` datum).  Transporting `q_regular_on_complement` across the regular action `F ≅ Ω`
+(`f ↦ f • basept`): conjugation `q · e · q⁻¹` of the `F`-element `e` corresponds to the permutation
+`q • ω'` since `(q e q⁻¹) • basept = q • (e • basept) = q • ω'` (as `q ∈ Q ≤ H` fixes `basept`).
+
+Produces the multiplicative identity `e` (the `F`-element with `e • basept = t • basept = ω'`) and,
+for every `f ∈ F ∖ {1}`, the unique `q ∈ Q` with `q e q⁻¹ = f`. -/
+theorem RankOneHypothesis.exists_conj_regular {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+    (hyp : RankOneHypothesis G Ω) {Fsub : Subgroup G} [hFN : Fsub.Normal]
+    (htrans : IsPretransitive ↥Fsub Ω) (hdisj : Disjoint Fsub hyp.H) :
+    ∃ e : G, e ∈ Fsub ∧ e • hyp.basept = hyp.t • hyp.basept ∧
+      ∀ f : G, f ∈ Fsub → f ≠ 1 → ∃! q : ↥hyp.Q, (q : G) * e * (q : G)⁻¹ = f := by
+  classical
+  -- `F` acts freely at `basept` (disjoint from `H = stabilizer basept`).
+  have hfree : ∀ a b : G, a ∈ Fsub → b ∈ Fsub → a • hyp.basept = b • hyp.basept → a = b := by
+    intro a b haF hbF hab
+    have hmem : b⁻¹ * a ∈ Fsub ⊓ hyp.H :=
+      ⟨Fsub.mul_mem (Fsub.inv_mem hbF) haF, hyp.H_def ▸ mem_stabilizer_iff.mpr (by
+        rw [mul_smul, hab, ← mul_smul, inv_mul_cancel, one_smul])⟩
+    rw [hdisj.eq_bot, Subgroup.mem_bot] at hmem
+    exact (inv_mul_eq_one.mp hmem).symm
+  -- pick `e ∈ F` with `e • basept = t • basept = ω'`.
+  obtain ⟨e', he'⟩ := htrans.exists_smul_eq hyp.basept (hyp.t • hyp.basept)
+  have he'G : (e' : G) • hyp.basept = hyp.t • hyp.basept := he'
+  refine ⟨(e' : G), e'.2, he'G, fun f hfF hf1 => ?_⟩
+  -- `((q e q⁻¹) • basept) = q • ω'`.
+  have hconj : ∀ q : ↥hyp.Q, ((q : G) * (e' : G) * (q : G)⁻¹) • hyp.basept
+      = (q : G) • (hyp.t • hyp.basept) := by
+    intro q
+    have hqfix : (q : G)⁻¹ • hyp.basept = hyp.basept :=
+      mem_stabilizer_iff.mp (hyp.H_def ▸ hyp.Q_le_H (hyp.Q.inv_mem q.2))
+    rw [mul_smul, mul_smul, hqfix, he'G]
+  -- `q e q⁻¹ = f  ↔  q • ω' = f • basept`.
+  have hφ : f • hyp.basept ≠ hyp.basept := fun h => hf1 (hfree f 1 hfF Fsub.one_mem (by simpa using h))
+  obtain ⟨q0, hq0, huniq⟩ := hyp.q_regular_on_complement (f • hyp.basept) hφ
+  have hequiv : ∀ q : ↥hyp.Q,
+      ((q : G) * (e' : G) * (q : G)⁻¹ = f) ↔ ((q : G) • (hyp.t • hyp.basept) = f • hyp.basept) := by
+    intro q
+    constructor
+    · intro h; rw [← hconj q, h]
+    · intro h
+      exact hfree _ f (hFN.conj_mem _ e'.2 _) hfF (by rw [hconj q, h])
+  exact ⟨q0, (hequiv q0).mpr hq0, fun q hq => huniq q ((hequiv q).mp hq)⟩
+
 end PropositionOne
 
 section PropositionTwo
