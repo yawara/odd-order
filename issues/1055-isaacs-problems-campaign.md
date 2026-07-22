@@ -317,7 +317,12 @@ mathlib inductive (`top`/`step`)。
     ⟹ `O^π(G) ≤ K`)。`O^π=⟨π'-元⟩` (`oPiResidual_eq_closure_piPrimeElements`=1B.8) + `closure_le` で各 π'-元
     `g` に帰着、`⟨g⟩` の位数 `orderOf g` (π'-数) は `|G:K|` (π-数) と互いに素 (`disjoint_primeFactors`)、
     2A.3(a) で `⟨g⟩≤K` ⟹ `g∈K`。import 追加 = Ch03 PiResidual。一発 green (import のみ)。→ **2A.2 完了**。
-  - 2A.4 (Wielandt) / 2A.5-2A.9 (socle・単純部分正規、heavy)。
+  - ✅ 記録 **2A.7** (`S◁◁G` 非可換単純 ⟹ `S^G` minimal normal): repo `Ch09.isMinimalNormal_normalClosure_of_isSubnormal`
+    (Isaacs Lemma 9.17) がまさにこれ、docstring 記録 (ラッパー方針)。
+  - ✅ 実証明 **2A.8** `commutator_eq_bot_of_ne_of_isSubnormal_of_simple` (異なる非可換単純な部分正規 `S,T`
+    ⟹ `⁅S,T⁆=⊥`)。非可換単純部分正規は component (`isQuasisimple_of_isSimpleGroup_not_isMulCommutative`)、
+    異なる component は可換 (`IsComponent.commutator_eq_bot_of_ne`、Ch09)。import 追加 = Ch09 SubnormalSocle。
+  - ⬜ 残り §2A: 2A.4 (Wielandt) / 2A.5 (minimal normal = 単純直積) / 2A.6 / 2A.9 (O^π normalizes π-perfect)。
 
 - ⬜ **次: §1D 続き (1D.8/1D.13 系 mathlib 支援厚のもの、1D.2/1D.3-5 は後で) → §1E–§1G**。
 

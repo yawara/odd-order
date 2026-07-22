@@ -8,6 +8,7 @@ import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 
 /-!
 # Isaacs Chapter 2 — Problems §2A (Subnormality)
@@ -171,6 +172,25 @@ theorem oPiResidual_le_of_isSubnormal_of_index_isPiNumber {G : Type*} [Group G] 
     refine (Nat.disjoint_primeFactors Subgroup.index_ne_zero_of_finite (orderOf_pos g).ne').mp ?_
     exact Finset.disjoint_left.mpr fun q hqi hqo => hg q hqo (hidx q hqi)
   exact le_of_isSubnormal_of_coprime_index hK hcop (Subgroup.mem_zpowers g)
+
+/-
+**Isaacs Problem 2A.7** (`S ◁◁ G` 非可換単純 ⟹ `S^G` = normal closure が minimal normal): repo の
+`OddOrder.Isaacs.Ch09.isMinimalNormal_normalClosure_of_isSubnormal` (Isaacs Lemma 9.17) がまさにこれ
+(`S.IsSubnormal → IsSimpleGroup ↥S → ¬IsMulCommutative ↥S → IsMinimalNormal (normalClosure ↑S)`)。
+純粋対応ゆえラッパーは書かない (ラッパー方針)。
+-/
+
+open OddOrder.Isaacs.Ch09 in
+/-- **Isaacs Problem 2A.8**. 異なる非可換単純な部分正規部分群 `S`, `T` は元ごとに可換 (`⁅S, T⁆ = ⊥`)。
+非可換単純な部分正規部分群は component (`isQuasisimple_of_isSimpleGroup_not_isMulCommutative`)、
+異なる component は可換 (`IsComponent.commutator_eq_bot_of_ne`)。 -/
+theorem commutator_eq_bot_of_ne_of_isSubnormal_of_simple {G : Type*} [Group G] [Finite G]
+    {S T : Subgroup G} (hS : S.IsSubnormal) (hSsimp : IsSimpleGroup ↥S)
+    (hSnc : ¬ IsMulCommutative ↥S) (hT : T.IsSubnormal) (hTsimp : IsSimpleGroup ↥T)
+    (hTnc : ¬ IsMulCommutative ↥T) (hne : S ≠ T) : ⁅S, T⁆ = ⊥ :=
+  IsComponent.commutator_eq_bot_of_ne
+    ⟨hS, isQuasisimple_of_isSimpleGroup_not_isMulCommutative hSsimp hSnc⟩
+    ⟨hT, isQuasisimple_of_isSimpleGroup_not_isMulCommutative hTsimp hTnc⟩ hne
 
 end
 
