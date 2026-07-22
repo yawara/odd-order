@@ -9,6 +9,7 @@ import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
+import OddOrder.GroupTheory.BrauerSuzukiCharacter
 import OddOrder.GroupTheory.CentralElementaryExtension
 import OddOrder.GroupTheory.CentralProduct
 import OddOrder.GroupTheory.ChermakDelgado
