@@ -447,11 +447,41 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
       statement は tau 形のまま** — goal 側 rw [← hu] は不要 (むしろ失敗)、
       補題結果は rw [hu] で tau 形に開いてから exact。
       m≥2 不要 (m=1 でも真)。Set.ncard_eq_toFinset_card は ℕ で先に rw。
-    - [ ] 次 = (6) 残り: a∣λ 仮定下の分岐処理 → x=0 (λ=0) 抽出 → v = u + a•E′η₁
-      ((v,v)=1, v∈ZIrr) → v = e₁ or −e₂ (𝒳 側 pairing (u, eᵢ−aᵢe₁) = −aᵢ) →
-      u = e₁ − a e′₁ → 𝒳∪𝒴 coherence 構成 (extension を member 値で構築 —
-      S07 の構成手段 (retarget?) 要偵察) → 1(a) adjoin で 𝒮(S′) → (2)。
-      x=1∧m=2 分岐は e′ 符号差し替え還元。
+    - [x] **𝒳 側 keystone pairing** `tau_keystone_inner_extensionX_diff`
+      (2026-07-22, sorry-free): (u, eᵢ − aᵢe₁) = −aᵢ (6a の X 鏡映)。
+    - [ ] **(6) 組み立て設計 (2026-07-22 固定; 次 session はここから)**:
+      1. **witness 正規化補題**: exists_lambda_norm_identity データ + a∣λ + 2≤a +
+         2≤m ⟹ ∃ w : CF H → CF G (𝒴-witness 割当):
+         (P1) ∀η∈Y, w η − w η₁ = τ(η−η₁); (P2) union 直交正規·±Irr·∈ZIrr;
+         (P3) (u, w η) = 0 (η≠η₁) ∧ (u, w η₁) = −a。
+         構成: x_eq_zero_or_x_one_of_norm_identity で分岐。x=0 → w := E′ 値。
+         x=1∧m=2 → **swap+negate**: w η₁ := −E′η₂, w η₂ := −E′η₁ (dite)。
+         swap が (P1) を保つのは m=2 に限る (w η₂ − w η₁ = E′η₂ − E′η₁ ✓)。
+         **中間の IsCoherent Y 再証明は不要** — 下流は w 関数だけ消費する。
+      2. **v 分析**: v := u + a•(w η₁)、(v,v) = 1 (norm identity, nvv=1)、
+         v ∈ ZIrr → ±Irr (exists_zsmul_irreducibleCharacter_of_inner_self_one)。
+         (v, Eχ') − a'(v, Eχ₁) = −a' (tau_keystone_inner_extensionX_diff +
+         (5) で (w η₁, Eχ') = 0) → 整数値分析: (v,Eχ₁) = 1 → v = Eχ₁ /
+         (v,Eχ₁) = 0 → ∀χ'≠χ₁: a' = 1 ∧ v = −Eχ' → n = 2 (相異なる χ' が
+         全部 −v) → X 側 swap+negate (a₂ = 1 は conj 対で成立) /
+         (v,Eχ₁) = −1 → |−2a'| ≤ 1 矛盾。
+         出力: X-witness 割当 wX (P1-X: wX χ − aᵪ wX χ₁ = τ(χ−aᵪχ₁)) +
+         **keystone (P4): wX χ₁ − a•(w η₁) = u = τ(χ₁ − a•η₁)**。
+      3. **member-assignment coherence 構成補題** (standalone、S07 レベル可):
+         X, Y disjoint ⊆ Irr、割当 wX/wY が (P1-X)(P1-Y)(P4) + union 直交正規
+         ±Irr を満たす ⟹ IsCoherent τ (X∪Y) A。
+         extension := φ ↦ E₀(φ − Σ_{μ∈X∪Y}(φ,μ)μ) + Σ_{μ}(φ,μ)•w(μ)
+         (E₀ は任意の底 map — 実は残差項は zSpan(X∪Y) 上 0 なので
+         extension_inner_eq/mem_ZIrr は member 値のみで決まる;
+         innerLeftℤ smulRight の有限和で ℤ-linear、retarget の m-fold 版)。
+         extends_on_supported = **生成引数**: supported φ = Σcᵪχ + Σdⱼηⱼ,
+         degree-0 ⟹ φ = Σcᵪ(χ−aᵪχ₁) + Σdⱼ(ηⱼ−η₁) + p(χ₁−aη₁) (p = Σcᵪaᵪ,
+         q = −pa は degree 消去から)。各生成元で E″ = τ ✓。
+         ⚠ 係数抽出は直交性経由 (c_μ = (φ,μ) 実整数)。
+      4. (6) 統合: 1+2+3 合成 → a∣λ ⟹ IsCoherent τ (X∪Y) A。
+      5. その後: 1(a) adjoin で 𝒮(S′) coherent → (2) で 𝒮 → (iii) 分岐完成。
+      (7) class-algebra 合同は独立 — (6) 統合が重いので先に (7) を済ませる
+      選択肢もある (文書順は (6)→(7) だが (7) は self-contained)。
   - [ ] **(7)** class-algebra 合同 (独立、並行可): ψ constant on Z^# ⟹
     ψ(z)≡ψ(1) mod|Q|。ω central character (ω(Kₛ)=ψ(Kₛ)/ψ(1)) の代数的整数性 +
     構造定数 aᵢⱼₛ + Q f.p.f. 作用の counting。**前提の repo 内所在確認要**

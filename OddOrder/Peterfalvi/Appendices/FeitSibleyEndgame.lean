@@ -652,6 +652,36 @@ theorem tau_scaled_diff_inner_extension_diff [Finite G]
     ((hYS hη₁Y).1).inner_self_eq_one]
   ring
 
+/-- **Peterfalvi (6), `𝒳`-side keystone pairing** (p. 148): with `u = Ind(χ₁ − a·η₁)`
+(`χ₁ ∈ 𝒳` the anchor, `η₁ ∈ 𝒴`), pairing against the `𝒳`-keystone differences gives
+`(u, eᵢ − aᵢ·e₁) = (χ₁ − a·η₁, χᵢ − aᵢ·χ₁) = −aᵢ` — the input of the
+`v = e₁ ∨ v = −e₂` analysis of (6). -/
+theorem tau_keystone_inner_extensionX_diff [Finite G]
+    {X : Set (ClassFunction ↥hyp.H ℂ)} (hXS : X ⊆ hyp.Sset)
+    (hcohX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau X hyp.A)
+    {χ₁ : ClassFunction ↥hyp.H ℂ} (hχ₁X : χ₁ ∈ X)
+    {η₁ : ClassFunction ↥hyp.H ℂ} (hη₁S : η₁ ∈ hyp.Sset) (hη₁X : η₁ ∉ X) {a : ℕ}
+    (hsupp : χ₁ - a • η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H)
+      hyp.Sset hyp.A)
+    {χ' : ClassFunction ↥hyp.H ℂ} (hχ'X : χ' ∈ X) (hχ'ne : χ' ≠ χ₁) {a' : ℕ}
+    (hsuppX : χ' - a' • χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) X hyp.A) :
+    ClassFunction.inner (hyp.tau (χ₁ - a • η₁))
+      (hcohX.extension χ' - (a' : ℂ) • hcohX.extension χ₁) = -(a' : ℂ) := by
+  have hEX : hcohX.extension χ' - (a' : ℂ) • hcohX.extension χ₁ = hyp.tau (χ' - a' • χ₁) := by
+    rw [← hcohX.extends_on_supported _ hsuppX, map_sub, map_nsmul,
+      Nat.cast_smul_eq_nsmul ℂ a' (hcohX.extension χ₁)]
+  rw [hEX, hyp.tau_inner_eq_of_supported_Sset hsupp
+    (OddOrder.Peterfalvi.S07.zSupportedSpan_mono_left hXS hsuppX),
+    ← Nat.cast_smul_eq_nsmul ℂ a η₁, ← Nat.cast_smul_eq_nsmul ℂ a' χ₁]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+    star_natCast]
+  rw [hyp.Sset_pairwiseOrthogonal (hXS hχ₁X) (hXS hχ'X) (Ne.symm hχ'ne),
+    ((hXS hχ₁X).1).inner_self_eq_one,
+    hyp.Sset_pairwiseOrthogonal hη₁S (hXS hχ'X) (fun h => hη₁X (h ▸ hχ'X)),
+    hyp.Sset_pairwiseOrthogonal hη₁S (hXS hχ₁X) (fun h => hη₁X (h ▸ hχ₁X))]
+  ring
+
 /-- **Peterfalvi (6), the `λ`-form norm identity** (p. 148): for `δ = χ − a·η₁`
 (`χ ∈ 𝒮 ∖ 𝒴` of degree `a·d`), the Fourier coefficients of `u = Ind δ` along the
 witnesses `e'ⱼ` are `λ` at every `ηⱼ ≠ η₁` and `λ − a` at `η₁`, and the Bessel
