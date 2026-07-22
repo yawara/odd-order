@@ -498,25 +498,27 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
          `memberAssignmentMap_apply` + `memberAssignmentMap_apply_of_mem`
          (直交正規 collapse F μ₀ = W μ₀) + `zsmul_mem_zSupportedSpan` (閉包;
          zero/add/sub は DifferenceImage に既存)。
-         後半 [ ] = IsCoherent 組立本体 (次 iteration):
-         extension := Σ_{μ∈s} (innerLeftℤ μ).smulRight (ŵ μ) (E₀ = 0 でよい —
-         span 外の値は無関係)、E μ₀ = ŵμ₀ (member 直交正規で collapse)。
-         extension_inner_eq = inner_map_eq_on_zSpan + ŵ-gram (X/Y/cross 4 clauses)。
-         extends_on_supported = **生成引数**: φ supported → 再構成 + C·χ₁+D·η₁
-         残差の degree-at-1 で D = −Ca → φ = Σc(χ'−a'χ₁) + Σd(η−η₁) +
-         C(χ₁−aη₁)、各生成元で E = τ (P1-X/P1-Y/keystone)、equalizer submodule。
-         nonzero = 継承 (hcohX.nonzero を span mono で X∪Y へ)。
-         **member-assignment coherence 構成補題** (standalone、S07 レベル可):
-         X, Y disjoint ⊆ Irr、割当 wX/wY が (P1-X)(P1-Y)(P4) + union 直交正規
-         ±Irr を満たす ⟹ IsCoherent τ (X∪Y) A。
-         extension := φ ↦ E₀(φ − Σ_{μ∈X∪Y}(φ,μ)μ) + Σ_{μ}(φ,μ)•w(μ)
-         (E₀ は任意の底 map — 実は残差項は zSpan(X∪Y) 上 0 なので
-         extension_inner_eq/mem_ZIrr は member 値のみで決まる;
-         innerLeftℤ smulRight の有限和で ℤ-linear、retarget の m-fold 版)。
-         extends_on_supported = **生成引数**: supported φ = Σcᵪχ + Σdⱼηⱼ,
-         degree-0 ⟹ φ = Σcᵪ(χ−aᵪχ₁) + Σdⱼ(ηⱼ−η₁) + p(χ₁−aη₁) (p = Σcᵪaᵪ,
-         q = −pa は degree 消去から)。各生成元で E″ = τ ✓。
-         ⚠ 係数抽出は直交性経由 (c_μ = (φ,μ) 実整数)。
+         後半 [x] **IsCoherent 組立本体完成** = `isCoherent_of_memberAssignment`
+         (2026-07-22, sorry-free, FeitSibleyEndgame.lean SpanTransport 節, generic Γ/Δ):
+         有限直交正規 S、直交正規 ℤ[Irr]-値割当 W、共通 anchor η₁∈S、各 μ∈S に
+         `∃ b:ℕ, μ−b•η₁ supported ∧ W μ−(b:ℂ)•W η₁ = τ(μ−b•η₁)` ⟹ IsCoherent τ S A。
+         **設計改良 = 単一 anchor η₁ + 合成 b_μ**: 書籍の X/Y 二重 anchor (χ₁, η₁) を
+         「全 member を η₁ に還元した合成差分 μ−b_μ•η₁」に畳んで uniform 化 —
+         X の χ は b_χ = a_χ·a (χ−a_χχ₁ と a_χ(χ₁−aη₁) の和; assembly 側で供給)。
+         extension := **memberAssignmentMap s W** (E₀ = 0, 残差は zSpan 上 0)。
+         - extension_inner_eq/mem_ZIrr = inner_map_eq_on_zSpan / map_mem_ZIrr_on_zSpan
+           + member collapse (W-gram: hWnorm/hWorth/hWZIrr)。
+         - **extends_on_supported = 生成引数** (実装確定ルート): supported φ を
+           整係数再構成 φ=Σc_μ•μ (eq_sum_inner_smul + exists_int_inner)、degree-0
+           (φ 1=0 ∵ 1∉A, μ 1=b_μ·η₁ 1) で **anchor 係数 Σc_μ b_μ=0** (η₁ 1≠0)、
+           ⟹ φ=Σc_μ•(μ−b_μ•η₁) が生成元の整結合 → memberAssignmentMap と τ が
+           各生成元 (map_sub/map_nsmul/collapse + hbeq) で一致 → calc で φ 全体へ。
+           **equalizer submodule を明示的に作らず calc 一発で閉じた** (両写像とも
+           ℤ-linear ゆえ decomposition に map_sum/map_zsmul を流すだけ)。
+         - nonzero = 仮定 hnz (assembly 側で η₂−η₁ 等を供給)。
+         ⚠ 実装知見: IsCoherent は Type ⟹ `noncomputable def` (theorem 不可) /
+         IntegralCharacterMap は full path (OddOrder.Peterfalvi.S07) 要 /
+         nsmul↔ℂ-smul 橋 = Nat.cast_smul_eq_nsmul、nsmul↔zsmul 橋 = 同 (ℤ 版)。
       4. (6) 統合: 1+2+3 合成 → a∣λ ⟹ IsCoherent τ (X∪Y) A。
       5. その後: 1(a) adjoin で 𝒮(S′) coherent → (2) で 𝒮 → (iii) 分岐完成。
       (7) class-algebra 合同は独立 — (6) 統合が重いので先に (7) を済ませる
