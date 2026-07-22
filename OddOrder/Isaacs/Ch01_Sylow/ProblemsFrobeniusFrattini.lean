@@ -523,6 +523,35 @@ theorem isNilpotent_of_quotient_commutator_isNilpotent {G : Type*} [Group G] [Fi
         (by simpa using QuotientGroup.mk_surjective) hcomap)
   exact isNilpotent_of_quotient_frattini_isNilpotent
 
+/-- **Isaacs Problem 1D.8** (基本アーベル部分の核). 有限 `p`-群 `P` では任意の `g` について
+`g ^ p ∈ Φ(P)`。各極大部分群 `M` は `p`-群の coatom ゆえ指数が素数 (1D.6) かつ `∣ |P| = p^n`、したがって
+指数 `= p`。`Subgroup.pow_index_mem` で `g ^ (M.index) = g ^ p ∈ M`、全極大の共通部分をとって
+`g ^ p ∈ Φ(P)`。これが `P / Φ(P)` の指数 `p` 性 (基本アーベルの exponent 部分) を与える。 -/
+theorem pow_mem_frattini_of_isPGroup {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime]
+    (hP : IsPGroup p P) (g : P) : g ^ p ∈ frattini P := by
+  haveI := hP.isNilpotent
+  rw [frattini, Order.radical]
+  refine Subgroup.mem_iInf.mpr fun M => Subgroup.mem_iInf.mpr fun hM => ?_
+  simp only [Set.mem_setOf_eq] at hM
+  haveI : M.Normal := Subgroup.normalizer_eq_top_iff.mp
+    (hM.2 _ (Group.normalizerCondition_of_isNilpotent M (lt_top_iff_ne_top.mpr hM.1)))
+  have hidx : M.index = p := by
+    have hp : M.index.Prime := (isCoatom_iff_index_prime M).mp hM
+    obtain ⟨n, hn⟩ := hP.exists_card_eq
+    have hdvd : M.index ∣ p ^ n := hn ▸ M.index_dvd_card
+    exact (Nat.prime_dvd_prime_iff_eq hp Fact.out).mp (hp.dvd_of_dvd_pow hdvd)
+  rw [← hidx]
+  exact Subgroup.pow_index_mem M g
+
+/-- **Isaacs Problem 1D.8** (基本アーベル部分). 有限 `p`-群 `P` では `P / Φ(P)` の各元の `p` 乗が
+`1`、すなわち exponent が `p` を割る。`commutator_le_frattini` (可換部分、`p`-群は冪零) とあわせて
+`P / Φ(P)` は基本アーベル。`pow_mem_frattini_of_isPGroup` の商への持ち上げ。 -/
+theorem pow_eq_one_frattiniQuotient_of_isPGroup {P : Type*} [Group P] [Finite P] {p : ℕ}
+    [Fact p.Prime] (hP : IsPGroup p P) (x : P ⧸ frattini P) : x ^ p = 1 := by
+  obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective x
+  rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+  exact pow_mem_frattini_of_isPGroup hP g
+
 end
 
 end OddOrder.Isaacs.Ch01
