@@ -161,6 +161,37 @@ theorem apply_sub_apply_eq_sum_XsetOf_bot [Finite G] [Fintype ↥hyp.H]
       · exact absurd (not_not.mp h) hχT'.2
   rw [hL, hR]
 
+open scoped Classical in
+/-- **(8) coefficient relation** (Peterfalvi (8), p. 150).  For the restriction `Res_H e'`
+of a `𝒴`-witness `e'` and a member `χ` of the coherent `𝒳`-family with `χ − b·χ₁` supported,
+the Fourier coefficient scales with `b`: `⟨Res_H e', χ⟩ = b·⟨Res_H e', χ₁⟩`.
+
+By Frobenius reciprocity `⟨Res_H e', χ − b·χ₁⟩ = conj⟨Ind(χ − b·χ₁), e'⟩`, and
+`Ind(χ − b·χ₁) = τ(χ − b·χ₁) = E(χ − b·χ₁) = E χ − b·E χ₁` (coherence on the supported
+difference), which is orthogonal to `e'` by the cross-orthogonality `⟨E φ, e'⟩ = 0`
+(`cross_extension_inner_eq_zero`).  Hence `⟨Res_H e', χ − b·χ₁⟩ = 0`. -/
+theorem restrict_extension_inner_eq_nsmul [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {X : Set (ClassFunction ↥hyp.H ℂ)}
+    (hcohX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau X hyp.A)
+    {χ₁ χ : ClassFunction ↥hyp.H ℂ} {e' : ClassFunction G ℂ}
+    (hcross : ∀ φ ∈ X, ClassFunction.inner (hcohX.extension φ) e' = 0)
+    {b : ℕ} (hsupp : χ - b • χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) X hyp.A)
+    (hχX : χ ∈ X) (hχ₁X : χ₁ ∈ X) :
+    ClassFunction.inner (ClassFunction.restrict hyp.H e') χ
+      = (b : ℂ) * ClassFunction.inner (ClassFunction.restrict hyp.H e') χ₁ := by
+  have htau : ClassFunction.induce hyp.H (χ - b • χ₁) = hcohX.extension (χ - b • χ₁) := by
+    rw [← hyp.tau_apply, ← hcohX.extends_on_supported _ hsupp]
+  have hkey : ClassFunction.inner (ClassFunction.restrict hyp.H e') (χ - b • χ₁) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      ← ClassFunction.inner_induce_eq_inner_restrict hyp.H (χ - b • χ₁) e',
+      htau, map_sub, map_nsmul, ← Nat.cast_smul_eq_nsmul ℂ b (hcohX.extension χ₁),
+      ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, hcross χ hχX, hcross χ₁ hχ₁X,
+      mul_zero, sub_zero, star_zero]
+  rw [ClassFunction.inner_sub_right, ← Nat.cast_smul_eq_nsmul ℂ b χ₁,
+    OddOrder.RepresentationTheory.inner_smul_right, star_natCast] at hkey
+  linear_combination hkey
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
