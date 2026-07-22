@@ -523,6 +523,75 @@ theorem isNilpotent_of_quotient_commutator_isNilpotent {G : Type*} [Group G] [Fi
         (by simpa using QuotientGroup.mk_surjective) hcomap)
   exact isNilpotent_of_quotient_frattini_isNilpotent
 
+/-- **Isaacs Problem 1D.8** (基本アーベル部分の核). 有限 `p`-群 `P` では任意の `g` について
+`g ^ p ∈ Φ(P)`。各極大部分群 `M` は `p`-群の coatom ゆえ指数が素数 (1D.6) かつ `∣ |P| = p^n`、したがって
+指数 `= p`。`Subgroup.pow_index_mem` で `g ^ (M.index) = g ^ p ∈ M`、全極大の共通部分をとって
+`g ^ p ∈ Φ(P)`。これが `P / Φ(P)` の指数 `p` 性 (基本アーベルの exponent 部分) を与える。 -/
+theorem pow_mem_frattini_of_isPGroup {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime]
+    (hP : IsPGroup p P) (g : P) : g ^ p ∈ frattini P := by
+  haveI := hP.isNilpotent
+  rw [frattini, Order.radical]
+  refine Subgroup.mem_iInf.mpr fun M => Subgroup.mem_iInf.mpr fun hM => ?_
+  simp only [Set.mem_setOf_eq] at hM
+  haveI : M.Normal := Subgroup.normalizer_eq_top_iff.mp
+    (hM.2 _ (Group.normalizerCondition_of_isNilpotent M (lt_top_iff_ne_top.mpr hM.1)))
+  have hidx : M.index = p := by
+    have hp : M.index.Prime := (isCoatom_iff_index_prime M).mp hM
+    obtain ⟨n, hn⟩ := hP.exists_card_eq
+    have hdvd : M.index ∣ p ^ n := hn ▸ M.index_dvd_card
+    exact (Nat.prime_dvd_prime_iff_eq hp Fact.out).mp (hp.dvd_of_dvd_pow hdvd)
+  rw [← hidx]
+  exact Subgroup.pow_index_mem M g
+
+/-- **Isaacs Problem 1D.8** (基本アーベル部分). 有限 `p`-群 `P` では `P / Φ(P)` の各元の `p` 乗が
+`1`、すなわち exponent が `p` を割る。`commutator_le_frattini` (可換部分、`p`-群は冪零) とあわせて
+`P / Φ(P)` は基本アーベル。`pow_mem_frattini_of_isPGroup` の商への持ち上げ。 -/
+theorem pow_eq_one_frattiniQuotient_of_isPGroup {P : Type*} [Group P] [Finite P] {p : ℕ}
+    [Fact p.Prime] (hP : IsPGroup p P) (x : P ⧸ frattini P) : x ^ p = 1 := by
+  obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective x
+  rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+  exact pow_mem_frattini_of_isPGroup hP g
+
+/-- `P / Φ(P)` が巡回ならば `P` は巡回 (1D.9 の核). 生成元 `x̄ = xΦ(P)` をとると `⟨x⟩` の像が
+`P/Φ(P)` 全体ゆえ `⟨x⟩ ⊔ Φ(P) = ⊤` (`comap_map_eq` + `ker_mk'`)、Frattini 部分群の非生成性
+(`frattini_nongenerating`) で `⟨x⟩ = ⊤`、すなわち `x` が `P` を生成。 -/
+theorem isCyclic_of_frattiniQuotient_isCyclic {P : Type*} [Group P] [Finite P]
+    (h : IsCyclic (P ⧸ frattini P)) : IsCyclic P := by
+  obtain ⟨gbar, hgbar⟩ := h.exists_generator
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective gbar
+  have himg : (Subgroup.zpowers x).map (QuotientGroup.mk' (frattini P)) = ⊤ := by
+    rw [MonoidHom.map_zpowers, eq_top_iff]
+    intro y _
+    exact hgbar y
+  have hsup : Subgroup.zpowers x ⊔ frattini P = ⊤ := by
+    have hc := congrArg (Subgroup.comap (QuotientGroup.mk' (frattini P))) himg
+    rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk', Subgroup.comap_top] at hc
+  have htop : Subgroup.zpowers x = ⊤ := frattini_nongenerating hsup
+  exact ⟨⟨x, fun y => htop.ge (Subgroup.mem_top y)⟩⟩
+
+/-- **Isaacs Problem 1D.9** (前半). 非巡回有限 `p`-群 `P` では `p ^ 2 ≤ |P : Φ(P)|`。商 `P / Φ(P)`
+は `p`-群 (`IsPGroup.to_quotient`) で位数 `p ^ n`。`P` 非巡回ゆえ
+`isCyclic_of_frattiniQuotient_isCyclic` の対偶で `P / Φ(P)` も非巡回、したがって位数 `1` (自明) でも
+`p` (`isCyclic_of_prime_card` で巡回) でもない、すなわち `n ≥ 2`。 -/
+theorem sq_le_card_frattiniQuotient_of_isPGroup_of_not_isCyclic {P : Type*} [Group P] [Finite P]
+    {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P) (hnc : ¬ IsCyclic P) :
+    p ^ 2 ≤ Nat.card (P ⧸ frattini P) := by
+  have hncq : ¬ IsCyclic (P ⧸ frattini P) :=
+    fun hc => hnc (isCyclic_of_frattiniQuotient_isCyclic hc)
+  obtain ⟨n, hn⟩ := (hP.to_quotient (frattini P)).exists_card_eq
+  rw [hn]
+  refine Nat.pow_le_pow_right (Fact.out : p.Prime).pos ?_
+  by_contra hlt
+  rw [not_le] at hlt
+  interval_cases n
+  · rw [pow_zero] at hn
+    haveI : Subsingleton (P ⧸ frattini P) := (Nat.card_eq_one_iff_unique.mp hn).1
+    refine hncq ⟨⟨1, fun y => Subgroup.mem_zpowers_iff.mpr ⟨0, ?_⟩⟩⟩
+    rw [zpow_zero]
+    exact Subsingleton.elim _ _
+  · rw [pow_one] at hn
+    exact hncq (isCyclic_of_prime_card hn)
+
 end
 
 end OddOrder.Isaacs.Ch01

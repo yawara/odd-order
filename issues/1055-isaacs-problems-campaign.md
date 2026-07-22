@@ -190,8 +190,12 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - ✅ 実証明 **1D.8 (可換部分)** `commutator_le_frattini` (冪零有限群で `[G,G]⊆Φ(G)`、`G/Φ(G)` 可換)。
   各極大 `M` は素数指数 (1D.6) ゆえ `G⧸M` は素数位数=巡回、`isMulCommutative_of_isCyclic_of_ker_le_center`
   (⚠ `IsCyclic.commGroup` は既存 Group instance と diamond を作るので `IsMulCommutative` 経由で回避)、
-  `commutatorElement_eq_one_iff_mul_comm` で `⁅g₁,g₂⁆∈M`。elementary abelian の残り (p-群で `P^p⊆Φ`
-  ⟹ 指数 p) は未 (別途)。
+  `commutatorElement_eq_one_iff_mul_comm` で `⁅g₁,g₂⁆∈M`。
+- ✅ 実証明 **1D.8 (基本アーベル部分)** `pow_mem_frattini_of_isPGroup` (p-群で `∀g, g^p∈Φ(P)`) +
+  `pow_eq_one_frattiniQuotient_of_isPGroup` (商 `P/Φ(P)` の exponent が p を割る)。核は Burnside 基底定理
+  **不要**: 各極大 `M` は p-群 coatom ゆえ指数素数 (1D.6) かつ `∣|P|=p^n` で `=p`、`Subgroup.pow_index_mem`
+  で `g^(M.index)=g^p∈M`、全極大の共通部分で `g^p∈Φ(P)`。`commutator_le_frattini` (可換) とあわせ
+  `P/Φ(P)` 基本アーベル。→ **1D.8 完了**。
 - ✅ 実証明 **1D.15 (`N=G` 版)** `isNilpotent_of_quotient_frattini_isNilpotent` (`G/Φ(G)` 冪零⟹`G`
   冪零)。各 Sylow `P` の像 `θ(P)` は `G/Φ(G)` の Sylow (1B.5(b) `exists_sylow_coe_eq_of_isHallSubgroup_singleton`
   + `IsHallSubgroup.map_of_surjective`)、冪零性で正規、逆像 `P⊔Φ(G)=comap(map P)` (`comap_map_eq`+`ker_mk'`)
@@ -205,8 +209,13 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   + `map_surjective_of_surjective`、⚠ section 変数 `N` が explicit 先頭ゆえ計 5 引数) で `G/Φ(G)` 冪零
   (`Group.nilpotent_of_surjective`)、1D.15 で `G` 冪零。→ **§1D Frattini 冪零クラスタ 1D.13–1D.17 完結**
   (1D.15 一般 N 版のみ残)。
-- ⬜ **残り §1D**: 1D.5 (intricate) / 1D.8 の elementary abelian part (p-群 exponent p) / 1D.9–1D.12 /
-  1D.15 の一般 `N` 版。多くは meaty。
+- ✅ 実証明 **1D.9 (前半+核)** `isCyclic_of_frattiniQuotient_isCyclic` (`P/Φ(P)` 巡回⟹`P` 巡回、
+  生成元を非生成性 `frattini_nongenerating` で持ち上げ) + `sq_le_card_frattiniQuotient_of_isPGroup_of_not_isCyclic`
+  (非巡回 p-群 ⟹ `p²≤|P:Φ(P)|`、商 p-群位数 `p^n` で `n≥2`: 位数 `1`(自明)/`p`(`isCyclic_of_prime_card`) 排除)。
+  ⚠ `x̄` 等結合文字は識別子不可 (`gbar`)、`MonoidHom.map_zpowers` (Subgroup 側でない)、`Subgroup.eq_top_iff'`
+  は解決せず `eq_top_iff`+intro。**残: 1D.9 後半 (位数 p² ⟹ 巡回 or 基本アーベル、`Φ=⊥` 経由)**。
+- ⬜ **残り §1D**: 1D.5 (intricate) / 1D.9 後半 (位数 p² 分類) / 1D.10 (max abelian normal `A=C_P(A)`) /
+  1D.11 (`|G| ∣ n!`) / 1D.12 (位数 p 元数 `≡-1 mod p`) / 1D.15 の一般 `N` 版。多くは meaty。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 
