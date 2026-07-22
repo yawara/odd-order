@@ -252,13 +252,22 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
     (`List.rotate_one_eq_self_iff_eq_replicate`)、(3) `sum_card_orderOf_eq_card_pow_eq_one (p≠0)`:
     `divisors p={1,p}` で `#{ord=1}+#{ord=p}=#{x^p=1}`、`#{ord=1}=1` ⟹ `#{ord=p}=#{x^p=1}-1≡-1`。
     別案: mathlib Cauchy 内の `σ`(rotate-by-1 perm)を再構築し `zpowers σ` を p-群として使う。
-    **確認済ピース (2026-07-23 再調査)**: `ZMod.val_add [NeZero n] (a b):(a+b).val=(a.val+b.val)%n` /
-    `IsPGroup.of_card (Nat.card=p^n)` / `IsPGroup.card_modEq_card_fixedPoints (α)[Finite α]` /
-    `List.rotate_one_eq_self_iff_eq_replicate` / `sum_card_orderOf_eq_card_pow_eq_one (n≠0)` (mathlib) /
-    周期性 = `rotate_rotate`+`rotate_length` で `rotate w (p+s)=rotate w s`。**mathlib に Frobenius count
-    (`#{x^n=1}` 可除性) のショートカットは無い**ことを確定 (grep 済)。**難所 = 固定点集合
-    `fixedPoints (Mult (ZMod p)) (vectorsProdEqOne G p) ≃ {x//x^p=1}` の List.Vector equiv (~30 行、
-    replicate/head/rotate_replicate/cons_head_tail、低信頼)** → 専用 session で構築推奨。
+    **★ 核心機構はコンパイル検証済 (2026-07-23、~40 行)**。`import Mathlib.GroupTheory.Perm.Cycle.Type`
+    + `open Equiv.Perm in`。動く構成: (i) 周期性 `hp1: rotate w (p+s)=rotate w s := rw[←rotate_rotate,
+    rotate_length]`、`hper2` (t 帰納, `rotate w (p*t+r)=rotate w r`)、`hper` (`rotate w m=rotate w (m%p)`,
+    `conv_lhs => rw[←Nat.div_add_mod m p]`)。(ii) `letI act : MulAction (Multiplicative (ZMod p))
+    (vectorsProdEqOne G p)` = `{smul k v := rotate v (toAdd k).val, one_smul (change+`toAdd_one`+`ZMod.val_zero`
+    +`rotate_zero`), mul_smul (change+`rotate_rotate`+hper 両辺+`congr 1`+`toAdd_mul`+`ZMod.val_add`+`Nat.mod_mod`
+    +`Nat.add_comm`)}`。(iii) `haveI hPG : IsPGroup p (Multiplicative (ZMod p)) := IsPGroup.of_card (n:=1)
+    (rw[pow_one,Nat.card_eq_fintype_card,Fintype.card_multiplicative,ZMod.card])`。(iv) 合流:
+    `hPG.card_modEq_card_fixedPoints (vectorsProdEqOne G p)` + `VectorsProdEqOne.card` (=|G|^(p-1))
+    + `dvd_pow`。⚠ 補題名: `toAdd_one`/`toAdd_mul` は **bare** (Multiplicative. 付けると unknown)、
+    `ZMod.val_one`、`Nat.Prime.divisors (=hp.out.divisors): divisors p={1,p}`。
+    **残ブロッカー = 固定点 equiv のみ** (`Nat.card_congr` で `fixedPoints ≃ {x//x^p=1}`): ⚠ `List.Vector.head`
+    は長さ `p` が `succ _` に構文一致せず型不一致 → **`.get ⟨0, hp.out.pos⟩` を使う** (`List.Vector.get_replicate`)。
+    `rotate_one_eq_self_iff_eq_replicate` は `∃a, l=replicate l.length a` を返す。forward=`List.rotate_replicate`。
+    減算: `sum_card_orderOf_eq_card_pow_eq_one` + `hp.out.divisors` + `Finset.sum_pair` + `#{ord=1}=1`
+    (`orderOf_eq_one_iff`) + `Nat.card`↔Finset 変換。機構コードは本 session scratchpad に退避済 (揮発)。
   - **1D.5** (intricate) / **1D.15 の一般 `N` 版** (Φ(G)⊆N◁G, N/Φ(G)冪零⟹N冪零)。⚠ 1D.15 一般版は
     N=G 版 (`isNilpotent_of_quotient_frattini_isNilpotent`) から**直には従わない** (Φ(G)⊆Φ(N) は成り立たず
     ―1D.16 は逆向き Φ(N)⊆Φ(G)― Φ(G) は N で非生成とは限らない)。Isaacs 原文の別論法を要精読。
