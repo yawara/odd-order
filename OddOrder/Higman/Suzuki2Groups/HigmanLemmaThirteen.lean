@@ -19,3 +19,4 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniSquareCommutato
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniTripleCommutators
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniTripleJacobi
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCParameter
