@@ -175,4 +175,28 @@ theorem ringAut_sq_eq_one_of_card_prime_or_prime_sq {F : Type*} [Field F]
     rw [hqq, ← h2, ← hcardfin]
     exact FiniteField.pow_card_pow i x
 
+/-- **A commutative near-field is a field** (Peterfalvi, Appendix C,
+Proposition 2, first alternative): a `NearField` with commutative
+multiplication is a `Field`.
+
+A near-field already carries `AddCommGroup` and `GroupWithZero`; only the
+left distributive law (`NearField.mul_add_of_mul_comm`) and `mul_comm` are
+missing.  Reusing the existing operations avoids `npow`/`nsmul` diamonds, so
+the resulting field's `+`, `*`, `⁻¹` agree with the near-field's — hence a
+near-field automorphism (`F ≃+ F` that is multiplicative) is a ring
+automorphism of this field.
+
+See note [reducible non-instances]: this is a `def`, invoked with `letI`
+where a field structure on the commutative near-field is needed. -/
+@[reducible] def NearFields.fieldOfComm {F : Type*} [inst : NearFields.NearField F]
+    (hcomm : ∀ x y : F, x * y = y * x) : Field F :=
+  { inst with
+    mul_comm := hcomm
+    left_distrib := fun a b c => NearFields.NearField.mul_add_of_mul_comm hcomm a b c
+    right_distrib := NearFields.NearField.right_distrib
+    nnqsmul := _
+    nnqsmul_def := fun _ _ => rfl
+    qsmul := _
+    qsmul_def := fun _ _ => rfl }
+
 end OddOrder.Peterfalvi.Appendices.Suzuki

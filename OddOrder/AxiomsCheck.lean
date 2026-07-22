@@ -12136,6 +12136,15 @@ exponent `≤ 2` (`σ² = 1`).  Via `ringAut_card_prime_pow_eq_pow` (`σ x = x^{
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.ringAut_sq_eq_one_of_card_prime_or_prime_sq
 
+/-! **A commutative near-field is a field** (`FirstCase/StepSix.lean`, App. C Prop 2 first
+alternative, 2026-07-22): `NearFields.fieldOfComm` builds a `Field` structure on a commutative
+`NearField` by adding `mul_comm` and the left distributive law
+(`NearField.mul_add_of_mul_comm`) to the existing `AddCommGroup`/`GroupWithZero`.  Reusing the
+near-field operations keeps `+`, `*`, `⁻¹` unchanged, so a near-field automorphism is a ring
+automorphism of this field — the bridge into `RingAut` for step (6)/(8)'s field case. Sorry-free. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.NearFields.fieldOfComm
+
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
 欠いていた).  Zassenhaus/Dickson 分類の App.C 特殊形: 有限 near-field `F` の乗法群が
