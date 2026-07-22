@@ -27,13 +27,29 @@ factor-cover endpoint でも同じ事実が必要だが、Higman から BG を i
 
 ## やること
 
-- [ ] generic theorem を `OddOrder.GroupTheory` へ移設
-- [ ] BG の既存 consumer を shared theorem へ付け替え
-- [ ] 新 leaf を `OddOrder.lean` に配線
-- [ ] targeted build と warning ratchet
-- [ ] issue を closed に移す
+- [x] generic theorem を `OddOrder.GroupTheory` へ移設
+- [x] BG の既存 consumer を shared theorem へ付け替え
+- [x] 新 leaf を `OddOrder.lean` に配線
+- [x] targeted build と warning ratchet
+- [x] issue を closed に移す
 
 ## 完了条件
 
 新規 sorry/axiom なし。shared leaf、BG consumer、Higman consumer の targeted build が
 green で、warning ratchet が baseline 内。
+
+## 2026-07-23 完了
+
+commit `bfe41dfe2` で既存 theorem を
+`OddOrder.GroupTheory.commutator_sup_le_of_le` として shared leaf へ移設し、
+BG Appendix E consumer も shared theorem へ付け替えた。薄い互換 wrapper は残していない。
+
+検証:
+
+- `lake build OddOrder.GroupTheory.CommutatorSup` — 888 jobs green
+- `lake build OddOrder.BG.AppE_EigenvalueCombinatorics` — 3318 jobs green
+- `lake build OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniCrossCommutatorContradiction`
+  — 2625 jobs green (`5d45ac6d9`)
+- `lake build OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen` — 2649 jobs green
+- warning ratchet — shared 0 件、BG 18 件、いずれも baseline 内
+- 独立 review — clean
