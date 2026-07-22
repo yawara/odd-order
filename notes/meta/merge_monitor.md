@@ -6,6 +6,13 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 02:0x 監視 tick — a (1C.7) + b (Higman L13 Frattini 整列) 合流 / c WIP watch / d lint 継続**。a=1 / b=2 / c=0(WIP) / d=0。
+> 合流: a (**Isaacs §1C Problem 1C.7** — 極大部分群が素数指数のとき最大素数 Sylow が正規、`Problems.lean` +49) / b (**Higman Lemma 13** — Frattini 系列の整列、新 leaf `HigmanLemmaThirteen/CompositionSeries.lean` +204 / `HigmanLemmaThirteen/FrattiniLayers.lean` +344、両 WIRED via `HigmanLemmaThirteen.lean`、**0 sorry**)。
+> **gate: green 4650 jobs (前 4648 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→8 非退行 (count-sorry) / lint 218 ≤ 218 baseline (ratchet exit 0) / push b4e98c575→b23fb1429**。範囲逸脱なし (a=Isaacs / b=Higman、両所有内)。
+> 👀 **c WIP watch**: c は 0 ahead だが worktree で `NearFields.lean` を編集中 (+207/−29 uncommitted) — 9406 land 後の次 frontier (rankOne / Q₈ transport) を構成中。未 commit ゆえ hold ではなく通常進行、次 tick で commit を待つ。
+> ℹ **lane d = lint-fix 継続 (ユーザー通知受領)**: ユーザーより「d が hub の代わりに lint fix でできるところを進めている」と明示 → 前 tick の「d stall 確定」は**解消**、d の quiet は escalation 対象外。d の lint 掃除は全 frozen file に及ぶ sanctioned territory ゆえ合流順は従来どおり a/b/c 先・d 最後。d は 0 ahead・worktree に scratch `foo` のみ (無害・未追跡)。
+> **監視再開 (このセッション = hub)**: 前 cron は消滅 (CronList 空) → 15 分 cron (`7,22,37,52`, Opus) 再作成。
+>
 > **▶▶ 2026-07-23 01:5x 監視 tick — b (Higman L13) 合流 / 🔴 d stall 確定**。a=0 / b=1 / c=0 / d=0。
 > 合流: b (**Higman Lemma 13** — ξ-length 4 と Frattini 分岐、新 leaf `HigmanLemmaThirteen.lean` + `HigmanLemmaThirteen/LengthFourReduction.lean`, 両 WIRED)。
 > **gate: green 4648 jobs (前 4646 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・新 axiom 0) / 実 sorry 8→8 非退行 / lint 218 ≤ 218 (push を lint exit で gate) / push 41dd75444→714569ab0**。範囲逸脱なし (b=Higman)。
