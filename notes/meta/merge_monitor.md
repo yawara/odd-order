@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 08:3x 監視 tick — a (3A.1a semidihedral) + b (Higman L13 diagonal axis) 合流 / 🔴 c stall / d quiet**。a=1 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 3A.1a** — semidihedral の特徴的自己同型: 存在・一意性・位数2、`Ch03_SplitExtensions/Problems.lean` +112) / b (**Higman Lemma 13** diagonal bracket の successor 軸同定 + restricted B の Φ² bracket 非退化性、新 leaf `FrattiniMiddleDiagonalAxis.lean` +223 / `RestrictedFactorTypeBSquareNonzero.lean` +269、両 WIRED (auto-check))。
+> **gate: green 4683 jobs (前 4681 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 60aeb057a→6b7118edd**。範囲逸脱なし。
+> 🔴 **lane c stall (~5h35m) / ℹ lane d quiet (~6h, 非 escalation)**: 両者更新ゼロ継続。a/b の 2 レーンで監視継続。
+>
 > **▶▶ 2026-07-23 08:2x 監視 tick — b (Higman L13 Φ² B/B support) 合流 / a WIP / 🔴 c stall / d quiet**。a=0(WIP) / b=2 / c=0 / d=0(WIP foo)。
 > 合流: b (**Higman Lemma 13** Φ² bracket の B/B support + restricted mixed term を ambient Φ² に同定、新 leaf `FrattiniSquareSupport.lean` +249 / `RestrictedFactorMixedTermBridge.lean` +356、両 WIRED)。a は次 Problem を WIP (issue 1055 doc のみ変更、commit 前)。
 > **gate: green 4681 jobs (前 4679 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 991ddda8c→f8b5027da**。範囲逸脱なし。
