@@ -329,6 +329,21 @@ theorem T_le_zpowers_of_mem_A {a : G} (ha : a ∈ Q.A) : Q.T ≤ Subgroup.zpower
   rw [zpowers_le]
   exact ha2 ▸ pow_mem (mem_zpowers a) mm
 
+/-- **Every element of `A = C − RH` has order divisible by `4`.**  From `a ∈ A` we get
+`T ≤ ⟨a⟩` (`T_le_zpowers_of_mem_A`), hence `|T| = 2ⁿ⁻¹ ∣ orderOf a`, and `4 = 2² ∣ 2ⁿ⁻¹`
+because `n ≥ 3`.  In particular no element of `A` is an involution or has odd order — the
+key group-theoretic input to Gorenstein Lemma 1.6 (`θ*` vanishes on involutions and
+odd-order elements, since these cannot be conjugate into `A`). -/
+theorem four_dvd_orderOf_of_mem_A {a : G} (ha : a ∈ Q.A) : 4 ∣ orderOf a := by
+  have hTa : Q.T ≤ Subgroup.zpowers a := Q.T_le_zpowers_of_mem_A ha
+  have hdvd : Nat.card ↥Q.T ∣ orderOf a := by
+    rw [← Nat.card_zpowers (a := a)]
+    exact Subgroup.card_dvd_of_le hTa
+  rw [Q.card_T] at hdvd
+  refine dvd_trans ?_ hdvd
+  rw [show (4 : ℕ) = 2 ^ 2 from rfl]
+  exact pow_dvd_pow 2 (by have := Q.hn; omega)
+
 /-! ### Lemma 1.3: `A` is a TI-subset with normalizer-bound `N` -/
 
 /-- **Gorenstein Lemma 1.3 (TI part)**: `A = C − RH` is a TI-subset with

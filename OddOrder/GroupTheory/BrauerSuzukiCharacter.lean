@@ -692,6 +692,73 @@ theorem thetaStar_decomposition [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.ca
   · -- (−1, −1): `dα + dβ = 1` impossible (both ≥ 1)
     exfalso; rw [hcα1, hcβ1] at hone'Z; omega
 
+/-! ### Gorenstein Lemma 1.6: `θ*` vanishes on involutions and odd-order elements
+
+`θ* = Ind_N^G θ` is supported on the elements of `G` conjugate into `A` (as `θ` is supported
+on `A`), and every element of `A` has order divisible by `4` (`four_dvd_orderOf_of_mem_A`).
+Since order is a conjugacy invariant, an element whose order is not a multiple of `4` — in
+particular any involution or odd-order element — is not conjugate into `A`, so `θ*` vanishes
+there.  Feeding `θ*(y) = 0` into the decomposition `θ* = 1_G + χ₁ − χ` (Lemma 1.5) yields
+`χ(y) = 1 + χ₁(y)`. -/
+
+/-- **Core vanishing (Gorenstein Lemma 1.6)**: if `orderOf y` is not divisible by `4`, then
+`θ*(y) = 0`.  `θ* = Ind_N^G θ` is supported on the elements conjugate into `A`
+(`induce_eq_zero_of_not_conjugatesIntoSet`, since `θ` is supported on `A`), and every element
+of `A` has order divisible by `4` (`four_dvd_orderOf_of_mem_A`); conjugation preserves order,
+so a `y` with `¬ 4 ∣ orderOf y` is not conjugate into `A`. -/
+theorem thetaStar_apply_eq_zero_of_not_four_dvd [Fintype G] [Fintype ↥Q.N]
+    [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)]
+    {y : G} (hy : ¬ (4 ∣ orderOf y)) : Q.thetaStar y = 0 := by
+  -- `θ` is supported on the preimage in `↥N` of `A`
+  have hsupp : Q.theta.support ⊆ {a : ↥Q.N | (a : G) ∈ Q.A} := by
+    intro a ha
+    rw [ClassFunction.mem_support] at ha
+    by_contra hnot
+    exact ha (Q.theta_apply_eq_zero_of_notMem_A hnot)
+  -- `y` is not conjugate into `A`: otherwise its order would be divisible by `4`
+  have hy' : y ∉ ClassFunction.conjugatesIntoSet Q.N {a : ↥Q.N | (a : G) ∈ Q.A} := by
+    rw [ClassFunction.mem_conjugatesIntoSet]
+    rintro ⟨x, hx, hmem⟩
+    have hyA : x⁻¹ * y * x ∈ Q.A := hmem
+    have h4 : 4 ∣ orderOf (x⁻¹ * y * x) := Q.four_dvd_orderOf_of_mem_A hyA
+    rw [SemiconjBy.orderOf_eq x (show SemiconjBy x (x⁻¹ * y * x) y by
+      change x * (x⁻¹ * y * x) = y * x; group)] at h4
+    exact hy h4
+  rw [thetaStar]
+  exact ClassFunction.induce_eq_zero_of_not_conjugatesIntoSet hsupp hy'
+
+/-- **Gorenstein Lemma 1.6 (involution case)**: `θ*(u) = 0` for any involution `u`
+(`orderOf u = 2`), since `¬ 4 ∣ 2`. -/
+theorem thetaStar_apply_eq_zero_of_orderOf_eq_two [Fintype G] [Fintype ↥Q.N]
+    [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)]
+    {u : G} (hu : orderOf u = 2) : Q.thetaStar u = 0 :=
+  Q.thetaStar_apply_eq_zero_of_not_four_dvd (by rw [hu]; omega)
+
+/-- **Gorenstein Lemma 1.6 (odd-order case)**: `θ*(y) = 0` for any `y` of odd order, since
+`4 ∣ orderOf y` would force `orderOf y` even. -/
+theorem thetaStar_apply_eq_zero_of_odd [Fintype G] [Fintype ↥Q.N]
+    [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)]
+    {y : G} (hy : Odd (orderOf y)) : Q.thetaStar y = 0 := by
+  refine Q.thetaStar_apply_eq_zero_of_not_four_dvd ?_
+  rw [Nat.odd_iff] at hy
+  omega
+
+/-- **Gorenstein Lemma 1.6 (character values)**: given the decomposition `θ* = 1_G + χ₁ − χ`
+(Lemma 1.5) and any `y` with `θ*(y) = 0`, we have `χ(y) = 1 + χ₁(y)`.  Combined with the
+vanishing lemmas above this gives `χ(y) = 1 + χ₁(y)` on every involution and odd-order
+element — the input to Gorenstein Lemma 1.8/1.9. -/
+theorem apply_eq_of_thetaStar_apply_eq_zero [Fintype G] [Fintype ↥Q.N]
+    [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)]
+    {χ₁ χ : IrreducibleCharacter G}
+    (hdecomp : Q.thetaStar = trivialClassFunction G + (χ₁ : ClassFunction G ℂ)
+      - (χ : ClassFunction G ℂ))
+    {y : G} (hy : Q.thetaStar y = 0) :
+    (χ : ClassFunction G ℂ) y = (χ₁ : ClassFunction G ℂ) y + 1 := by
+  have h := congrArg (fun f : ClassFunction G ℂ => f y) hdecomp
+  simp only [ClassFunction.add_apply, ClassFunction.sub_apply, trivialClassFunction_apply] at h
+  rw [hy] at h
+  linear_combination h
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory

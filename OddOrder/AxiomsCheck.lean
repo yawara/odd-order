@@ -10,6 +10,10 @@ import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
+import OddOrder.GroupTheory.BrauerSuzukiTISubset
+import OddOrder.GroupTheory.BrauerSuzukiCharacter
+import OddOrder.GroupTheory.BrauerSuzukiInvolutions
+import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Mathlib.QuotientGroup
@@ -12293,6 +12297,94 @@ Higman sorries through the model and are intentionally unregistered):
   OddOrder.GroupTheory.QuaternionSylowSetup.mem_C_of_odd_of_mem_N
 #assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.S_sup_H_eq_N
 
+/-! **Brauer–Suzuki, Gorenstein Ch.12 Lemma 1.3 — COMPLETE**
+(`GroupTheory.BrauerSuzukiTISubset`, issue 9318, 2026-07-22).  `A = C − RH`:
+
+* `A_isTISubset` — **Lem 1.3 (TI part) `A` is a TI-subset with normalizer-bound `N`**:
+  `a ∈ A ⟹ T ≤ ⟨a⟩`, so overlapping conjugates force `g⁻¹Tg = T`, i.e. `g ∈ N`.
+* `mem_N_iff_forall_conj_mem_A` — **`N = N_G(A)`** (both inclusions), via `RH = R·H`
+  product structure and `A_nonempty` (`x ∈ A`).
+* `four_dvd_orderOf_of_mem_A` — every element of `A` has order divisible by `4`
+  (`|T| = 2ⁿ⁻¹ ∣ orderOf a`, `n ≥ 3`); the group-theoretic input to Lemma 1.6. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.A_isTISubset
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.mem_N_iff_forall_conj_mem_A
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.four_dvd_orderOf_of_mem_A
+
+/-! **Brauer–Suzuki, Gorenstein Ch.12 Lemma 1.4 & 1.5 — COMPLETE**
+(`GroupTheory.BrauerSuzukiCharacter`, issue 9318, 2026-07-22).  `ψ` = linear character of
+`C` (`C/RH ≅ ℤ/4`, `x ↦ i`), `ψ̃ = Ind_C^N ψ` irreducible, `θ = Ind_C^N 1_C − ψ̃`:
+
+* Lem 1.4: `theta_apply_one` (`θ(1) = 0`), `theta_apply_eq_zero_of_notMem_A`
+  (`θ ≡ 0` on `N − A`), `theta_inner_self` (`(θ,θ)_N = 3`).
+* Lem 1.5: `thetaStar_inner_self` (`(θ*,θ*)_G = 3` via the TI isometry) and
+  `thetaStar_decomposition` — **`θ* = 1_G + χ₁ − χ`** for distinct non-principal
+  irreducibles with `χ(1) = χ₁(1) + 1`. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.theta_apply_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.theta_apply_eq_zero_of_notMem_A
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.theta_inner_self
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.thetaStar_inner_self
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.thetaStar_decomposition
+
+/-! **Brauer–Suzuki, Gorenstein Ch.12 Lemma 1.6 — COMPLETE**
+(`GroupTheory.BrauerSuzukiCharacter`, issue 9318, 2026-07-22).  `θ* = Ind_N^G θ` is
+supported on elements conjugate into `A`, whose orders are divisible by `4`; hence:
+
+* `thetaStar_apply_eq_zero_of_not_four_dvd` — `θ*(y) = 0` when `¬ 4 ∣ orderOf y`.
+* `thetaStar_apply_eq_zero_of_orderOf_eq_two` / `_of_odd` — **`θ*(u) = 0` on involutions
+  and odd-order elements**.
+* `apply_eq_of_thetaStar_apply_eq_zero` — feeding `θ*(y) = 0` into `θ* = 1_G + χ₁ − χ`
+  gives **`χ(y) = 1 + χ₁(y)`** there. -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.thetaStar_apply_eq_zero_of_not_four_dvd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.thetaStar_apply_eq_zero_of_orderOf_eq_two
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.thetaStar_apply_eq_zero_of_odd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.apply_eq_of_thetaStar_apply_eq_zero
+
+/-! **Brauer–Suzuki, Gorenstein Ch.12 Lemma 1.7 (group-theoretic core)**
+(`GroupTheory.BrauerSuzukiInvolutions`, issue 9318, 2026-07-22).
+
+* `commute_involution_eq` — **any two commuting involutions of `G` are equal**: `⟨u,v⟩` is a
+  `2`-group inside a Sylow `2`-subgroup conjugate to the generalized quaternion `S`, whose
+  unique involution `z` both must equal.
+* `odd_orderOf_mul_of_involution` — **the product of two involutions has odd order**: if `uv`
+  had even order `2s`, `(uv)ˢ` would be an involution commuting with `u` and `v`, forcing
+  `u = v = (uv)ˢ` and `uv = 1`.  This is `β(y) = 0` for even-order `y` (no involution pair
+  multiplies to an even-order element).
+* `exists_conj_eq_z` / `isConj_of_orderOf_eq_two` — **every involution is conjugate to `z`**,
+  so `G` has a **single class of involutions** (the class-sum input `(9.4.2)` for Lemma 1.8). -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.commute_involution_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.odd_orderOf_mul_of_involution
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.exists_conj_eq_z
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.isConj_of_orderOf_eq_two
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.isConj_z_iff_orderOf_eq_two
+
+/-! **Brauer–Suzuki, Gorenstein Ch.12 Lemma 1.8 (counting side, in progress)**
+(`GroupTheory.BrauerSuzukiCounting`, issue 9318, 2026-07-22).
+
+* `mk_eq_involutionClass_iff` — `mk u = K ↔ orderOf u = 2` (the involutions are the single
+  class `K = mk z`).
+* `classSumCoeff_involutionClass_eq_zero_of_even` — **`classSumCoeff K K Cs = 0` for even-order
+  `Cs`**: no involution pair multiplies to an even-order element
+  (`odd_orderOf_mul_of_involution`).  This is the `β(y) = 0` half feeding `(9.4.2)` in
+  Lemma 1.8. -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.mk_eq_involutionClass_iff
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.classSumCoeff_involutionClass_eq_zero_of_even
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.sum_classSumCoeff_thetaStar_eq_zero
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 
 「AxiomsCheck 未登録だが `#print axioms` では clean」だった提出候補を機械ゲートに載せる

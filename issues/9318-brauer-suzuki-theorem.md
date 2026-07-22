@@ -225,18 +225,69 @@ triple 版 (θ* 直接、`exists_triple_of_sum_sq_eq_three`) は trivial が {α
 上記 ρ+pair 手順どおり、次数 4-case は ℤ で `exact_mod_cast` → omega。axiom-clean。
 → **Lemma 1.4 + 1.5 完全形式化完了** (`BrauerSuzukiCharacter.lean`、~660 行、sorry 0)。
 
-### Lem 1.6 計画 (次 frontier、⚠ 原文再読が必要)
+### ✅ Lem 1.6 完成 (2026-07-22 lane c、`BrauerSuzukiCharacter.lean` + `BrauerSuzukiTISubset.lean`)
 
-Gorenstein Lem 1.6: **involution・奇数位数元上で θ* = 0** → そこで `χ = 1 + χ₁`
-(値の等式)。要調査:
-- 機構: θ* = Ind_N^G θ は θ が A=C−RH 外で消滅 → g が A に共役で入らなければ θ*(g)=0。
-  中心 involution z = x^{2ⁿ⁻¹} は **z ∈ R ⊆ RH ⊄ A** (z は R=⟨x⁴⟩ の唯一の involution、
-  n≥3 で 2ⁿ⁻²≥2)。奇数位数元は 2-group S の外。→ TI 誘導値 = 0 の具体条件を原文で確認。
-- 使う repo infra: `induce_apply_eq_zero_of_not_conjugatesIntoSet` 系 (θ* が A 共役外で 0)、
-  `theta_apply_eq_zero_of_notMem_A`。involution が A に非共役 = z ∉ A + 共役類の議論。
-- 出力: χ, χ₁ の値の関係 (involution u で χ(u) = 1 + χ₁(u) 等) → Lem 1.7-1.9 (β(y) 数え上げ)
-  → endgame。⚠ Lem 1.6-1.9 は Gorenstein Ch.12 pp.375-377 の再読が必要 (β(y) 構造定数公式
-  (9.4.2) = `ClassSumCoefficientFormula.lean` との接続)。
+Gorenstein Lem 1.6: **involution・奇数位数元上で θ* = 0** かつ **χ(y) = 1 + χ₁(y)**。全て
+axiom-clean (`[propext, Classical.choice, Quot.sound]`)、AxiomsCheck 登録済 (Lem 1.3/1.4/1.5
+も同時に import+登録 — 従来 AxiomsCheck は Normalizer までしか import していなかった)。
+
+**⚠ 原文より簡潔な機構を採用** (z 個別の議論不要): 「θ* = Ind_N^G θ は A の共役の外で消滅」
+(`induce_eq_zero_of_not_conjugatesIntoSet`、θ が A に台) × 「**A の元は位数が 4 で割れる**」
+(新 `four_dvd_orderOf_of_mem_A`: a∈A ⟹ T ≤ ⟨a⟩ ⟹ |T|=2ⁿ⁻¹ ∣ orderOf a、n≥3 で 4 ∣ 2ⁿ⁻¹)。
+位数は共役不変 (`SemiconjBy.orderOf_eq`) ゆえ involution (order 2)・奇数位数元は A に共役外
+→ θ*(y)=0。実装補題:
+- `four_dvd_orderOf_of_mem_A` (TISubset) — A の元の位数は 4 で割れる。
+- `thetaStar_apply_eq_zero_of_not_four_dvd` (Character) — ¬4∣orderOf y ⟹ θ*(y)=0 (核心)。
+- `thetaStar_apply_eq_zero_of_orderOf_eq_two` / `_of_odd` — involution / 奇数位数元で θ*=0。
+- `apply_eq_of_thetaStar_apply_eq_zero` — θ*=1_G+χ₁−χ に θ*(y)=0 を代入 ⟹ χ(y)=1+χ₁(y)。
+
+### ✅ Lem 1.7 核心完成 (2026-07-22 lane c、`BrauerSuzukiInvolutions.lean` 新 leaf)
+
+Gorenstein Lem 1.7 の**純群論核心**を完成 (axiom-clean、AxiomsCheck 登録済):
+- **`commute_involution_eq`**: 可換な involution 対 u,v は相等。⟨u,v⟩ (可換ゆえ elementary
+  abelian 2-group、`closure_induction₂` で abelian・全元 sq=1 → `IsPGroup 2`) は Sylow-2 P に
+  含まれ (`IsPGroup.exists_le_sylow`)、P は S に共役 (`MulAction.exists_smul_eq`)。共役で u,v を
+  S に落とすと `eq_one_or_eq_z_of_sq_eq_one` (S の unique involution z) より両者 = z → u=v。
+- **`odd_orderOf_mul_of_involution`**: involution 積 u·v は奇数位数。もし偶数 2s なら z'=(uv)ˢ が
+  involution で u,v が反転・中心化 (`SemiconjBy.pow_right`) → `commute_involution_eq` で u=v=z'
+  → uv=z'²=1、偶数位数 ≥2 と矛盾。**= β(y)=0 for even order y** (involution 対は偶数位数元を作らない)。
+- **`exists_conj_eq_z`** (任意 involution は z に共役) + **`isConj_of_orderOf_eq_two`** (全
+  involution は互いに共役 = **G は単一 involution 共役類 K**)。Sylow 部分は helper
+  `exists_conj_subgroupLe_S` に factor して 3 補題で共有。→ Lem 1.8 の (9.4.2) で Ci=Cj=K の入力。
+- setup 確認済: `QuaternionSylowSetup` は `S : Sylow 2 G` を posit ゆえ全 Sylow-2 が S 共役で
+  unique involution。原文の「z 個別 Klein-four」議論より `commute_involution_eq` 汎用形が簡潔だった。
+
+### Lem 1.8 導出経路確定 (2026-07-22 lane c、⚠ class-summed 版で per-element β を回避)
+
+**核心洞察**: Gorenstein は per-element β(y) を使うが、`classSumCoeff` (= 共役類 Cs 全体で和を
+取った版、`ClassSumCongruence.lean` 定義 = #{(u,v): u,v∈K, uv∈Cs}) で書き換えると per-element β
+の定義を回避でき、既存の `classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter`
+(`ClassSumCoefficientFormula.lean`) を直接使える。導出:
+
+1. **K := ConjClasses.mk Q.z** = involution 共役類。`mk u = K ↔ orderOf u = 2`
+   (`isConj_of_orderOf_eq_two` + `exists_conj_eq_z` + `orderOf z = 2`)。要 `orderOf_z` 補題。
+2. **`classSumCoeff K K Cs · θ*(Cs.out) = 0`** (各 Cs): Cs.out が奇数位数 → θ*(Cs.out)=0
+   (Lem 1.6 `thetaStar_apply_eq_zero_of_odd`); 偶数位数 → **classSumCoeff K K Cs = 0**
+   (`odd_orderOf_mul_of_involution`: u,v∈K involution ⟹ uv 奇数位数 ⟹ uv∉Cs、filter 空)。
+   → **要 `classSumCoeff_eq_zero_of_even_order` 補題**。
+3. **(9.4.2) 代入**: `classSumCoeff K K Cs · |C_G(Cs.out)| = Σ_χ (|K|χ(u))²/χ(1) · χ(Cs.out⁻¹)`
+   (Ci=Cj=K)。両辺に θ*(Cs.out)/|C_G(Cs.out)| を掛け Cs で和 → 左辺 0 (step 2)。
+4. **重複度 collapse**: 右辺 = Σ_χ (|K|χ(u))²/χ(1) · [Σ_Cs χ(Cs.out⁻¹)θ*(Cs.out)/|C_G(Cs.out)|]。
+   内側 = (1/|G|)Σ_{y∈G} χ(y⁻¹)θ*(y) = ⟨θ*, χ⟩ = χ の θ* 内重複度 (θ*=1_G+χ₁−χ より
+   1_G:+1, χ₁:+1, χ:−1, 他:0)。→ |K|²(1 + χ₁(u)²/χ₁(1) − χ(u)²/χ(1)) = 0。
+   **要**: ⟨θ*, χ⟩ の値 (既存 `thetaStar_decomposition` + 内積 API) と Σ_Cs → Σ_{y∈G} の
+   class-function 和の変換 (`|Cs| = |G|/|C_G|`、既存 conjugacy sum API を要調査)。
+5. **Lem 1.8**: |K|²≠0 で割り `1 + χ₁(u)²/χ₁(1) − χ(u)²/χ(1) = 0`。
+
+⚠ step 4 の Σ_Cs ↔ Σ_{y∈G} 変換 (class 和) と ⟨θ*,χ⟩ 抽出が最難所。既存の column/row 直交
+API (`ColumnOrthogonality.lean`) と inner product 定義の接続を精査してから着手。
+
+### Lem 1.9 + endgame 計画 (Gorenstein Ch.12 p.376-377)
+
+- **Lem 1.9**: χ₁(u)=χ(u)−1, χ₁(1)=χ(1)−1 (Lem 1.5/1.6) 代入 → `(χ(u)−χ(1))²=0` → χ(u)=χ(1)
+  → 全 involution ⊆ ker χ、χ 非線形 (χ(1)=1+χ₁(1)≥2)。純代数 (分母払い + omega/ring)。
+- **endgame** (純群論): M=⟨involutions⟩⊴G、Q=S∩M cyclic (さもなくば非線形指標が線形化し矛盾)
+  → Burnside 2-補群 L⊴G → KQ⊴G (K=O_{2'}) → Ḡ=G/K で Ω₁(Q̄)=Z(Ḡ) 位数 2。□
 
 ### Lem 1.4 計画 (2026-07-22 lane c、⚠ 下記 infra は grep 発見のみ・API 未精査)
 
