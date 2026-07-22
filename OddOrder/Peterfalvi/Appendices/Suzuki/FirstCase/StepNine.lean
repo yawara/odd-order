@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
+import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+import OddOrder.GroupTheory.TransferInvariantTransversal
 
 /-!
 # Peterfalvi Part II, Ch. II, step (9): `p = f`
@@ -89,6 +91,57 @@ theorem char_eq_p_of_p_dvd_card_Q_add_one
     (Nat.card_eq_fintype_card (α := F) ▸ hpF)
   have hdvd : fc.p ∣ model.char := ha ▸ addOrderOf_dvd_of_nsmul_eq_zero (model.char_spec a)
   exact ((Nat.prime_dvd_prime_iff_eq fc.p_prime model.char_prime).mp hdvd).symm
+
+open scoped Pointwise in
+/-- **Peterfalvi Part II, Ch. II, step (9), transversal invariance**: the right
+transversal `{1} ∪ {t y : y ∈ Q}` of `H` is invariant under conjugation by `x ∈ P`.
+Since `P ≤ V = C_D(t)`, `x` centralises `t`, and `x ∈ H` normalises `Q`, so
+`x⁻¹ (t y) x = t (x⁻¹ y x)` with `x⁻¹ y x ∈ Q`. -/
+theorem rightTransversalTQ_conj_invariant {x : G} (hxP : x ∈ fc.P) :
+    ∀ r ∈ fc.toHypothesis.rightTransversalTQ,
+      x⁻¹ * r * x ∈ fc.toHypothesis.rightTransversalTQ := by
+  set hyp := fc.toHypothesis with hhyp
+  have hxH : x ∈ hyp.H := hyp.D_le_H (hyp.V_le_D (fc.P_le_V hxP))
+  have hxt : Commute x hyp.t := hyp.commute_t_of_mem_V (fc.P_le_V hxP)
+  intro r hr
+  rw [Hypothesis.mem_rightTransversalTQ] at hr ⊢
+  rcases hr with rfl | ⟨y, hyQ, rfl⟩
+  · left; group
+  · right
+    refine ⟨x⁻¹ * y * x, ?_, ?_⟩
+    · simpa using hyp.Q_normal_in_H x⁻¹ (inv_mem hxH) y hyQ
+    · calc hyp.t * (x⁻¹ * y * x)
+          = hyp.t * x⁻¹ * y * x := by group
+        _ = x⁻¹ * hyp.t * y * x := by rw [← hxt.inv_left.eq]
+        _ = x⁻¹ * (hyp.t * y) * x := by group
+
+/-- **Peterfalvi Part II, Ch. II, step (9), the transfer computation** (p. 111):
+for any homomorphism `ϕ : H →* A` to a commutative group and `x ∈ P`, the transfer
+of `x` is `T(x) = ϕ(x) ^ (|Q| + 1)`.
+
+By Prop 4 (a) the identity and the elements `t y` (`y ∈ Q`) represent the right
+cosets of `H`, so `[G : H] = |Q| + 1`; this transversal is invariant under
+conjugation by `x ∈ P` (`rightTransversalTQ_conj_invariant`), whence every transfer
+factor equals `x` (`transfer_eq_pow_of_conj_invariant_rightTransversal`). -/
+theorem transfer_eq_pow_card_Q_add_one {A : Type*} [CommGroup A]
+    (ϕ : fc.toHypothesis.H →* A) {x : G} (hxP : x ∈ fc.P) :
+    MonoidHom.transfer ϕ x
+      = ϕ ⟨x, fc.toHypothesis.D_le_H (fc.toHypothesis.V_le_D (fc.P_le_V hxP))⟩
+          ^ (Nat.card fc.toHypothesis.Q + 1) := by
+  have hxH : x ∈ fc.toHypothesis.H :=
+    fc.toHypothesis.D_le_H (fc.toHypothesis.V_le_D (fc.P_le_V hxP))
+  have hindex : fc.toHypothesis.H.index = Nat.card fc.toHypothesis.Q + 1 := by
+    haveI := fc.toHypothesis.doubly_transitive
+    haveI : MulAction.IsPretransitive G Ω :=
+      MulAction.isPretransitive_of_is_two_pretransitive
+    rw [fc.toHypothesis.H_def,
+      MulAction.index_stabilizer_of_transitive G fc.toHypothesis.basept,
+      fc.toHypothesis.card_Omega]
+  haveI : fc.toHypothesis.H.FiniteIndex := ⟨by rw [hindex]; exact Nat.succ_ne_zero _⟩
+  rw [OddOrder.GroupTheory.transfer_eq_pow_of_conj_invariant_rightTransversal ϕ
+      fc.toHypothesis.isComplement_H_rightTransversalTQ hxH
+      (fc.rightTransversalTQ_conj_invariant hxP),
+    hindex]
 
 end FirstCaseHypothesis
 

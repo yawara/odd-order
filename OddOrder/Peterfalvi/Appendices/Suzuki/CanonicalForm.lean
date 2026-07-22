@@ -128,6 +128,56 @@ theorem existsUnique_canonicalForm {g : G} (hg : g ∉ hyp.H) :
   have h2 := hyp.canonicalForm_unique hx' hy' hx hy (hxy'.symm.trans hxy)
   exact Prod.ext h2.1 h2.2
 
+/-! ## Proposition 4 (a) packaged as a transversal
+
+The identity `1` and the elements `t y` (`y ∈ Q`) form a system of representatives
+for the *right* cosets of `H` in `G` (used by the transfer computation of
+Part II, Ch. II, step (9)). -/
+
+/-- The right transversal `{1} ∪ {t y : y ∈ Q}` of `H` in `G` (Prop 4 (a)). -/
+def rightTransversalTQ : Set G :=
+  insert 1 ((fun y => hyp.t * y) '' (hyp.Q : Set G))
+
+@[simp] lemma mem_rightTransversalTQ {g : G} :
+    g ∈ hyp.rightTransversalTQ ↔ g = 1 ∨ ∃ y ∈ hyp.Q, hyp.t * y = g := by
+  simp only [rightTransversalTQ, Set.mem_insert_iff, Set.mem_image, SetLike.mem_coe]
+
+/-- **Peterfalvi Part II, Ch. I Prop 4 (a)** as a complement: `1` and `{t y : y ∈ Q}`
+represent the right cosets of `H`, i.e. `H` and `{1} ∪ {t y}` complement in `G`. -/
+lemma isComplement_H_rightTransversalTQ :
+    Subgroup.IsComplement (hyp.H : Set G) hyp.rightTransversalTQ := by
+  rw [Subgroup.isComplement_iff_existsUnique_mul_inv_mem]
+  intro g
+  by_cases hg : g ∈ hyp.H
+  · -- `g ∈ H`: the unique representative is `1`
+    refine ⟨⟨1, hyp.mem_rightTransversalTQ.mpr (Or.inl rfl)⟩, by simpa using hg, ?_⟩
+    rintro ⟨r, hr⟩ hmem
+    rcases hyp.mem_rightTransversalTQ.mp hr with rfl | ⟨y, hyQ, rfl⟩
+    · rfl
+    · exfalso
+      apply hyp.t_not_mem_H
+      have htinv : hyp.t⁻¹ ∈ hyp.H := by
+        have hcalc : hyp.t⁻¹ = (g * y⁻¹)⁻¹ * (g * (hyp.t * y)⁻¹) := by group
+        rw [hcalc]
+        exact mul_mem (inv_mem (mul_mem hg (inv_mem (hyp.Q_le_H hyQ)))) hmem
+      simpa using inv_mem htinv
+  · -- `g ∉ H`: the unique representative is `t y'` from the canonical form
+    obtain ⟨x, hx, y', hy', hxy⟩ := hyp.exists_canonicalForm hg
+    refine ⟨⟨hyp.t * y', hyp.mem_rightTransversalTQ.mpr (Or.inr ⟨y', hy', rfl⟩)⟩, ?_, ?_⟩
+    · show g * (hyp.t * y')⁻¹ ∈ hyp.H
+      have : g * (hyp.t * y')⁻¹ = x := by rw [hxy]; group
+      rw [this]; exact hx
+    · rintro ⟨r, hr⟩ hmem
+      rcases hyp.mem_rightTransversalTQ.mp hr with rfl | ⟨y, hyQ, rfl⟩
+      · exact absurd (by simpa using hmem) hg
+      · -- `r = t y`, and `g = (g (t y)⁻¹) t y` is a canonical form, so `y = y'`
+        refine Subtype.ext ?_
+        have hmem' : g * (hyp.t * y)⁻¹ ∈ hyp.H := hmem
+        have hgeq : g * (hyp.t * y)⁻¹ * hyp.t * y = g := by group
+        obtain ⟨-, hyeq⟩ :=
+          hyp.canonicalForm_unique hmem' hyQ hx hy' (hgeq.trans hxy)
+        exact congrArg (hyp.t * ·) hyeq
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
