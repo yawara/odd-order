@@ -436,6 +436,151 @@ theorem cardFixedConj_eq_cardFixedM0 {F : Type uG} [NearFields.NearField F]
         _ = (qb : ↥L ⧸ N) := by rw [hem]
   exact Nat.card_congr (Equiv.subtypeEquiv e.symm.toEquiv hiff)
 
+/-- **`[w] ∈ Σ = D`** for `w ∈ C_W(P)` (step (8)): the image of `w` under the
+quotient map `C_G(P) → C_G(P)/N` lands in the automorphism group
+`Σ = D = fc.rankOneQuotient.D`, because `w ∈ W ≤ V ≤ D`. -/
+noncomputable def sigmaElt {w : G} (hwW : w ∈ fc.toHypothesis.W)
+    (hwP : w ∈ Subgroup.centralizer (fc.P : Set G)) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ↥fc.rankOneQuotient.D :=
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  ⟨QuotientGroup.mk' _ ⟨w, hwP⟩,
+    Subgroup.mem_map_of_mem _ (Subgroup.mem_subgroupOf.mpr
+      (fc.toHypothesis.V_le_D (fc.toHypothesis.W_le_V hwW)))⟩
+
+/-- **The `w`-fixed part of `C_Q(P)` is a `2`-group** (step (8), p. 110): for a
+nonidentity `w ∈ C_W(P)`, an element of `M₀ = C_Q(P)` fixed by `w`-conjugation
+centralizes `w`, hence lies in `C_Q(w)`, which is a `2`-group
+(`st_mem_and_cQ_isPGroup_of_mem_centralizer_W`).  So the number of `w`-fixed
+elements of `M₀` is a power of `2`. -/
+theorem exists_card_fixedM0_eq_two_pow
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    {w : G} (hwW : w ∈ fc.toHypothesis.W)
+    (hwP : w ∈ Subgroup.centralizer (fc.P : Set G)) (hw1 : w ≠ 1) :
+    ∃ b : ℕ, Nat.card {m : ↥(fc.toHypothesis.Q ⊓
+      Subgroup.centralizer (fc.P : Set G)) // w * (m : G) * w⁻¹ = (m : G)} = 2 ^ b := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set K : Subgroup G :=
+    Subgroup.centralizer ((Subgroup.zpowers w : Subgroup G) : Set G) with hK
+  set M₀ : Subgroup G := fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G) with hM₀
+  -- `C_Q(w)` (as a subgroup of `C_G(⟨w⟩)`) is a `2`-group
+  have hpg : IsPGroup 2 ↥(fc.toHypothesis.Q.subgroupOf K) :=
+    (fc.st_mem_and_cQ_isPGroup_of_mem_centralizer_W ind hwW hwP hw1).2
+  -- `w`-conjugation-fixed ⟺ centralizes `⟨w⟩`
+  have hfix_iff : ∀ x : G, (w * x * w⁻¹ = x) ↔ x ∈ K := by
+    intro x
+    rw [hK, Subgroup.mem_centralizer_iff]
+    constructor
+    · intro hx z hz
+      obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+      have hcomm : Commute w x := mul_inv_eq_iff_eq_mul.mp hx
+      exact (hcomm.zpow_left n).eq
+    · intro hx
+      have hcomm : w * x = x * w := hx w (Subgroup.mem_zpowers w)
+      rw [hcomm]; group
+  -- identify the fixed set with `M₀.subgroupOf K`, a subgroup of the 2-group
+  let e : {m : ↥M₀ // w * (m : G) * w⁻¹ = (m : G)} ≃ ↥(M₀.subgroupOf K) :=
+    { toFun := fun m => ⟨⟨(m.1 : G), (hfix_iff (m.1 : G)).mp m.2⟩,
+        Subgroup.mem_subgroupOf.mpr m.1.2⟩
+      invFun := fun x => ⟨⟨(x.1 : G), Subgroup.mem_subgroupOf.mp x.2⟩,
+        (hfix_iff (x.1 : G)).mpr x.1.2⟩
+      left_inv := fun m => rfl
+      right_inv := fun x => rfl }
+  have hle : M₀.subgroupOf K ≤ fc.toHypothesis.Q.subgroupOf K :=
+    Subgroup.comap_mono (inf_le_left)
+  have hp2 : IsPGroup 2 ↥(M₀.subgroupOf K) := hpg.to_le hle
+  obtain ⟨b, hb⟩ := hp2.exists_card_eq
+  exact ⟨b, (Nat.card_congr e).trans hb⟩
+
+/-- **Peterfalvi Part II, Ch. II, step (8), the per-`w` fixed-field order**
+(p. 110): assume `Q₁ ≠ 1`.  For a nonidentity `w ∈ C_W(P)`, the fixed field
+`C_F(w)` of the automorphism `σ_w = dAut [w]` has order `f` (the characteristic)
+or `9`.
+
+By step (5) the near-field `F` is a field (`comm_of_Q1_ne_bot`).  The units of
+`C_F(w)` are `C_{F^*}(w)`, which corresponds (through `qEquiv` and the
+projection `C_Q(P) ≅ Q̄`) to the `w`-fixed part of `C_Q(P) ⊆ C_Q(w)`, a
+`2`-group; so `|C_{F^*}(w)| = 2^b` and `|C_F(w)| = 2^b + 1`.  The arithmetic
+heart `card_fixedSet_mem_of_units_two_pow` then gives `|C_F(w)| ∈ {f, 9}`.
+
+Inherits the step (2)(b) `sorry` (issue 9318) through a model-supplying caller,
+and the Higman `sorry` (step (5)) through `comm_of_Q1_ne_bot`. -/
+theorem cardFixedField_char_or_nine
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+    (hQ1 : fc.toHypothesis.Q1 ≠ ⊥)
+    {w : G} (hwW : w ∈ fc.toHypothesis.W)
+    (hwP : w ∈ Subgroup.centralizer (fc.P : Set G)) (hw1 : w ≠ 1) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    Nat.card {x : F // model.dAut (fc.sigmaElt hwW hwP) x = x} = model.char ∨
+    Nat.card {x : F // model.dAut (fc.sigmaElt hwW hwP) x = x} = 9 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- `F` is a field (`Q₁ ≠ 1` ⟹ commutative)
+  have hcomm := fc.comm_of_Q1_ne_bot model hQ1
+  letI : Field F := NearFields.fieldOfComm hcomm
+  haveI : Finite F := by
+    have hinj : Function.Injective (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
+      fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
+    exact Finite.of_injective _ hinj
+  set g := fc.sigmaElt hwW hwP with hg
+  set σ : F ≃+* F := fc.dAutHom hcomm model g with hσ
+  -- `char = |st| ∈ {3, 5}` (odd)
+  have hchar := fc.orderOf_st_eq_char model
+  have hst := (fc.st_mem_and_cQ_isPGroup_of_mem_centralizer_W ind hwW hwP hw1).1
+  have hcharval : model.char = 3 ∨ model.char = 5 := by
+    rcases hst with h | h
+    · exact Or.inl (hchar.symm.trans h)
+    · exact Or.inr (hchar.symm.trans h)
+  -- `CharP F (model.char)` (from `char_spec` + `char_prime`)
+  haveI : CharP F model.char := by
+    have hchar0 : (model.char : F) = 0 := by
+      have h := model.char_spec 1
+      rwa [nsmul_eq_mul, mul_one] at h
+    have hrc : ringChar F = model.char := by
+      have hdvd : ringChar F ∣ model.char := ringChar.dvd hchar0
+      rcases Nat.Prime.eq_one_or_self_of_dvd model.char_prime _ hdvd with h1 | h
+      · exfalso
+        haveI : CharP F 1 := h1 ▸ ringChar.charP F
+        have h10 : (1 : F) = 0 := by
+          have hc := (CharP.cast_eq_zero_iff F 1 1).mpr (dvd_refl 1)
+          rwa [Nat.cast_one] at hc
+        exact one_ne_zero h10
+      · exact h
+    rw [← hrc]; exact ringChar.charP F
+  -- fixed units count `= 2^b`
+  obtain ⟨b, hb⟩ := fc.exists_card_fixedM0_eq_two_pow ind hwW hwP hw1
+  have hwH : w ∈ fc.toHypothesis.H :=
+    fc.toHypothesis.D_le_H (fc.toHypothesis.V_le_D (fc.toHypothesis.W_le_V hwW))
+  have hgH : (↑g : fc.centralizerActionQuotient fc.P) ∈ fc.rankOneQuotient.H :=
+    (fc.rankOneQuotient.D_def.le.trans inf_le_left) g.2
+  have hunits : Nat.card {u : Fˣ // σ (u : F) = (u : F)} = 2 ^ b := by
+    have e1 := card_fixedUnits_eq_card_fixedConj model g hgH
+    have e2 := fc.cardFixedConj_eq_cardFixedM0 model hwP hwH
+    exact e1.trans (e2.trans hb)
+  -- fixed set count `= 2^b + 1`
+  have hset : Nat.card {x : F // σ x = x} = 2 ^ b + 1 := by
+    rw [card_fixedSet_eq_card_fixedUnits_add_one σ, hunits]
+  -- `b ≥ 1` (the fixed field has odd order `char^a`, so `2^b + 1` is odd)
+  have hb1 : 1 ≤ b := by
+    rcases Nat.eq_zero_or_pos b with hb0 | hbpos
+    · exfalso
+      obtain ⟨a, ha⟩ := exists_card_fixedSet_eq_char_pow model.char_prime σ
+      have hcard2 : Nat.card {x : F // σ x = x} = 2 := by rw [hset, hb0]; norm_num
+      rw [ha] at hcard2
+      have h3 : 3 ≤ model.char := by rcases hcharval with h | h <;> omega
+      rcases Nat.eq_zero_or_pos a with ha0 | hapos
+      · rw [ha0, pow_zero] at hcard2; omega
+      · have hle : model.char ≤ model.char ^ a := Nat.le_self_pow hapos.ne' _
+        omega
+    · exact hbpos
+  -- arithmetic heart: `|C_F(w)| ∈ {f, 9}`
+  exact card_fixedSet_mem_of_units_two_pow model.char_prime σ hb1 hset
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
