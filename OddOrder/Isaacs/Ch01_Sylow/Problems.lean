@@ -132,7 +132,29 @@ theorem eq_top_of_mul_conj_covers {G : Type*} [Group G] {H : Subgroup G} {x : G}
   rw [this]
   exact mul_mem hh hxk
 
+/-- **Isaacs Problem 1A.10(b)**. `|H|` が素数 `p` の冪で `p ∣ |G:H|` ならば `p ∣ |N_G(H):H|`。
+
+mathlib の `Sylow.prime_dvd_card_quotient_normalizer` (前提が `p^(n+1) ∣ |G|`) への仮定変換:
+`|H| = p^n` かつ `p ∣ [G:H]` から `|G| = |H|·[G:H] = p^n·(p·s) = p^(n+1)·s` を得る。結論の
+`N_G(H) ⧸ H.comap (N_G(H)).subtype` は `N_G(H)/H`、その位数が指数 `[N_G(H):H]`。 -/
+theorem prime_dvd_index_normalizer_of_prime_pow {G : Type*} [Group G] [Finite G] {p n : ℕ}
+    (hp : p.Prime) {H : Subgroup G} (hH : Nat.card H = p ^ n) (hdvd : p ∣ H.index) :
+    p ∣ Nat.card (Subgroup.normalizer (H : Set G) ⧸
+      H.comap (Subgroup.normalizer (H : Set G)).subtype) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨s, hs⟩ := hdvd
+  refine Sylow.prime_dvd_card_quotient_normalizer ⟨s, ?_⟩ hH
+  rw [← Subgroup.card_mul_index H, hH, hs, pow_succ]; ring
+
 end
+
+/-! ## mathlib で被覆される演習 (続き)
+
+- **Problem 1A.10(a)** (`|N_G(H):H|` = `H` の右移動で不変な右剰余類の個数): `H` が右剰余類
+  `G⧸H` に左移動で作用するときの不動点が `N_G(H)/H` と一致することを述べており、mathlib の
+  `Sylow.fixedPointsMulLeftCosetsEquivQuotient H : fixedPoints H (G ⧸ H) ≃ N_G(H) ⧸ (H の像)`
+  が与える (これは 1A.10(b) = `prime_dvd_card_quotient_normalizer` の証明の中核でもある)。
+-/
 
 /-! ## mathlib で被覆される演習 (docstring 記録、純粋ラッパーは書かない)
 
