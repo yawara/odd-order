@@ -204,6 +204,13 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       |C_Q(P)| = 8 ∧ Q₁ = ⊥)`。本体 sorry-free (Higman `pow_four` + 9318 model
       継承のみ)。詳細は末尾「step (5) 完了記録」。
 - [ ] (6)–(9)
+  - **(6) 算術補題 完了 (2026-07-22, StepSix.lean 新設)**:
+    `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` (axiom-clean, AxiomsCheck
+    登録) — [HB] IX 2.7: `f 奇 ∧ f^a = 2^b+1 (b≥1) ⟹ a=1 ∨ f^a=9`。純 ℕ 算術
+    (幾何和の偶奇で a 偶 → (f^c-1)(f^c+1)=2^b で 2 冪 → f^c=3)。steps (6)/(8) が消費。
+  - **(6) 本体 残**: model の Σ (=D) 構造 + Aut(F_{9,2}) の奇部分=位数3 +
+    Aut(field)=Galois cyclic of order a が必要。near-field automorphism infra 依存
+    (gated 気味)。arithmetic lemma は供給済。
   - **(5) 被覆調査 (2026-07-22): 3 部品すべて実装済、assembly のみ**:
     (i) Ch.I §2 Cor = `sylowTwo_isMulCommutative_or_isSuzuki2Group`
     (Suzuki/SylowTwo.lean:60、S 可換 or Suzuki 2-group)。

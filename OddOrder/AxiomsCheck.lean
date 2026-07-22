@@ -225,6 +225,7 @@ import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
@@ -12118,6 +12119,14 @@ both sorries and is deliberately NOT asserted here.) -/
   OddOrder.Peterfalvi.Appendices.Suzuki.exists_noncommuting_two_elements_of_nearField_units
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.nearField_card_eq_nine_of_nilpotent_units
+
+/-! **Peterfalvi Part II, Ch. II, step (6), the arithmetic lemma** (`FirstCase/StepSix.lean`,
+issue 2053, 2026-07-22): [HB] Kapitel IX, Lemma 2.7 — an odd prime power `f^a = 2^b + 1`
+(`b ≥ 1`) forces `a = 1` or `f^a = 9`.  Elementary: the geometric-sum parity makes `a` even,
+and `(f^c - 1)(f^c + 1) = 2^b` (two powers of `2` differing by `2`) forces `f^c = 3`.
+Pure `ℕ` arithmetic, sorry-free; consumed by steps (6) and (8). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one
 
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
