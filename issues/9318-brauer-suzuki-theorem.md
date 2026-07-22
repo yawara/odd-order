@@ -138,8 +138,40 @@ Setup: `x` = S の指数 2 巡回部分群の生成元、`X = ⟨x⟩`, `T = ⟨
   基盤 = **`mem_RH_iff`** (RH = R·H 積構造、R 中心的ゆえ H と可換) + `X_inf_H_eq_bot` +
   `x_notMem_RH` (x∈RH⟹x∈R⟹位数|2ⁿ⁻²、矛盾) → **`A_nonempty`** (x∈A)。
   → **Gorenstein Lemma 1.3 完全形式化 (axiom-clean [propext, Classical.choice, Quot.sound])**。
-- 次 = **Lem 1.4** の指標構成 (ψ: C の線形指標 RH ⊆ ker、ψ̃ = ψ↑N 既約 deg 2、
-  θ = 1_C↑N − ψ̃ norm 3)。TI 集合 A + 等長 lemma は形式化済。
+- ✅ **Gorenstein Lem 1.4 完全形式化** (`BrauerSuzukiCharacter.lean`、2026-07-22、axiom-clean
+  `[propext, Classical.choice, Quot.sound]`、sorry 0):
+  - **構造前提**: `x² ∉ RH`、`y ∈ N ∖ C`、coset 分解 **`N = C ∪ yC`**
+    (`mem_C_or_yinv_mul_mem_C`、自己完結部分群 K = C ∪ yC) → **`[N:C] = 2`**
+    (`index_C_subgroupOf_N`、`index_eq_two_iff'`)。
+  - **線形指標 ψ** (`psiHom : ↥C →* ℂˣ`): `C/RH ≅ ℤ/4` の忠実指標 x̄↦i を引き戻し。
+    `orderOf x̄ = 4` (x²∉RH, x⁴∈RH)、`C/RH = ⟨x̄⟩` (`subgroupOf_sup` で X⊔RH=C)、
+    `monoidHomOfForallMemZpowers` x̄↦iUnit → `mk'` 合成。`ψ(x)=i`、`RH⊆ker ψ`、`ψ≠1`。
+  - **θ = Ind_C^N 1_C − Ind_C^N ψ** (`theta`): **`θ(1)=0`** (`theta_apply_one`)、
+    **`θ≡0 on N−A`** (`theta_apply_eq_zero_of_notMem_A`、C外=normal support / RH上=同一定数)。
+  - **`ψ≠ψʸ`** (`conjBy_y_psiN_ne_psiN`: x で ψʸ(x)=ψ(x⁻¹)=i⁻¹≠i) → **`I_N(ψ)=C`**
+    (`inertia_psiN`) → **`Ind_C^N ψ` 既約** (`psiN_induce_irreducible`、
+    `isIrreducibleCharacter_induce_of_inertia_eq`、bundled IrreducibleCharacter)。
+  - **`(θ,θ)_N = 3`** (`theta_inner_self`): (Tc,Tc)=[N:C]=2 − (Tc,Ps)=0 − (Ps,Tc)=0
+    + (Ps,Ps)=1。使用: `induce_trivial_inner_self` / `induce_inner_induce_trivial_eq_zero_of_irreducible`
+    / `inner_star_comm` / `irr_cf_inner`。
+  - ⚠ 計画で想定した「Clifford で ψ↑N 既約」は **`InducedIrreducible.lean`
+    `isIrreducibleCharacter_induce_of_inertia_eq` (inertia=H → 誘導既約) がより直接**だった
+    (一般 Clifford correspondence の subtype juggling 不要)。deg 2 は使わず (deg θ=0 は
+    [N:C] 相殺で deg
+    値不要)。
+
+### Lem 1.5 計画 (2026-07-22 lane c、次 frontier)
+
+Gorenstein Lem 1.5: `θ* = Ind_N^G θ` (TI 誘導、`A_isTISubset` が feed)。
+- **`(θ*,θ*)_G = 3`**: TI 等長 `inner_induce_eq_of_isTISubset` (θ が A 外で消滅 =
+  `theta_apply_eq_zero_of_notMem_A` を feed) → `(θ*,θ*)_G = (θ,θ)_N = 3`。
+- **`(θ*,1_G)_G = 1`**: Frobenius `inner_induce_eq_inner_restrict` → `(θ, 1_N)_N`
+  = (Ind 1_C, 1_N) − (Ind ψ, 1_N) = 1 − 0 = 1。
+- **`θ*(1) = 0`**: `induce_apply_one` で [G:N]·θ(1) = 0。
+- **分解 `θ* = 1_G + χ₁ − χ`** (χ₁≠χ 非主既約): θ* は norm-3 virtual char で 1_G を重複度 1
+  含む → ρ = θ*−1_G は norm-2・1_G 直交・ρ(1)=−1 → ρ = χ₁−χ (χ(1)=χ₁(1)+1)。
+  repo infra = `InducedIrreducible.lean` の `exists_single_of_sum_sq_eq_one` /
+  norm-2 分解、`IsometryDifferencePair`、`Peterfalvi/S05_NormThree.lean` を要 API 精査。
 
 ### Lem 1.4 計画 (2026-07-22 lane c、⚠ 下記 infra は grep 発見のみ・API 未精査)
 
