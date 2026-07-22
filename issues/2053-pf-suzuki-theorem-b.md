@@ -208,9 +208,24 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` (axiom-clean, AxiomsCheck
     登録) — [HB] IX 2.7: `f 奇 ∧ f^a = 2^b+1 (b≥1) ⟹ a=1 ∨ f^a=9`。純 ℕ 算術
     (幾何和の偶奇で a 偶 → (f^c-1)(f^c+1)=2^b で 2 冪 → f^c=3)。steps (6)/(8) が消費。
-  - **(6) 本体 残**: model の Σ (=D) 構造 + Aut(F_{9,2}) の奇部分=位数3 +
-    Aut(field)=Galois cyclic of order a が必要。near-field automorphism infra 依存
-    (gated 気味)。arithmetic lemma は供給済。
+  - **(6) 体の場合 crux 完了 (2026-07-22)**: `ringAut_sq_eq_one_of_card_prime_or_prime_sq`
+    (StepSix.lean, axiom-clean, AxiomsCheck 登録) — 有限体 F (位数 q or q²) の
+    RingAut は exponent ≤ 2 (∀σ, σ²=1)。`ringAut_card_prime_pow_eq_pow` (σx=x^{q^i})
+    + `FiniteField.pow_card_pow` (x^{|F|^i}=x)。⟹ Σ 奇位数 ↪ exponent-2 群 → Σ=1。
+  - **(6) 本体 assembly プラン (2026-07-22 精査済)**: model 上で 2 分岐 (letI-prefix,
+    step 5 と同型)。**核心の ungated/gated 判定完了**:
+    - **体の場合 (F 可換) = ungated だが plumbing 多層**:
+      (i) NearField 可換 → Field インスタンス橋 = **未整備** (`nearField_field_structure_of_index_two`
+      は別型 K を返すのみ; `NearField.mul_add_of_mul_comm` で distributivity はある →
+      Field 構造を F 上に直接構成する def が要る)。
+      (ii) dAut g (F≃+F 乗法的) → RingAut F (体なら ring equiv)、D →* RingAut F 単射。
+      (iii) |F*| = |C_Q(P)| が 2 冪 (Q₁=1 ⟹ Q=Sylow-2 2群) → |F|=|F*|+1=2^b+1 →
+      **arithmetic lemma** で |F|∈{f,9} → **ringAut_sq_eq_one** → Σ 奇 → Σ=1。
+    - **F_{9,2} の場合 = gated (深い near-field Aut)**: `Twisted`/`TwistData` に
+      automorphism infra 無し。「Aut(F_{9,2}) 奇部分 = 3 (F*=Q₈ ゆえ)」は sorried-cite
+      (shared 9300 claim 候補) or 独立 campaign。arithmetic lemma・ringAut_sq は供給済。
+    - 供給済 upstream: arithmetic lemma, ringAut_sq_eq_one。残 = (i) Field 橋 +
+      (ii) dAut→RingAut + (iii) |F*|=2冪 plumbing + F_{9,2} sorried-cite。
   - **(5) 被覆調査 (2026-07-22): 3 部品すべて実装済、assembly のみ**:
     (i) Ch.I §2 Cor = `sylowTwo_isMulCommutative_or_isSuzuki2Group`
     (Suzuki/SylowTwo.lean:60、S 可換 or Suzuki 2-group)。

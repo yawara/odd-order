@@ -137,4 +137,42 @@ theorem eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one {f a b : ℕ}
   rw [mul_comm 2 c, pow_mul, ← hgdef, hg3]
   norm_num
 
+/-- **Finite-field automorphisms for step (6)** (p. 110): the ring
+automorphism group of a finite field of prime or prime-square order has
+exponent at most `2` — every `σ` satisfies `σ² = 1`.
+
+By `ringAut_card_prime_pow_eq_pow`, `σ x = x ^ (q^i)`; when `|F| = q` the
+identity `x ^ q = x` makes `σ = 1`, and when `|F| = q²` we get
+`σ² x = x ^ (q^{2i}) = x ^ (|F|^i) = x`.
+
+Consumed by step (6) (field case) and step (8): `Σ` acts on the field `F`
+by automorphisms, so `Σ` of odd order embeds into a group of exponent `2`
+and is therefore trivial (when `|F| ∈ {f, 9}`). -/
+theorem ringAut_sq_eq_one_of_card_prime_or_prime_sq {F : Type*} [Field F]
+    [Finite F] {q : ℕ} (hq : q.Prime)
+    (hcard : Nat.card F = q ∨ Nat.card F = q ^ 2) (σ : RingAut F) :
+    σ ^ 2 = 1 := by
+  haveI : Fact q.Prime := ⟨hq⟩
+  haveI : Fintype F := Fintype.ofFinite F
+  have hcardfin : Fintype.card F = Nat.card F := (Nat.card_eq_fintype_card).symm
+  have happ2 : ∀ x : F, (σ ^ 2) x = σ (σ x) := fun x => by rw [sq]; rfl
+  ext x
+  rw [happ2]
+  change σ (σ x) = x
+  rcases hcard with h1 | h2
+  · -- `|F| = q`: `σ` is the identity
+    obtain ⟨i, hi⟩ :=
+      ringAut_card_prime_pow_eq_pow (q := q) (p := 1) (by rwa [pow_one]) σ
+    have hfix : ∀ y : F, σ y = y := by
+      intro y
+      rw [hi y, ← h1, ← hcardfin]
+      exact FiniteField.pow_card_pow i y
+    rw [hfix, hfix]
+  · -- `|F| = q²`: `σ² = 1`
+    obtain ⟨i, hi⟩ := ringAut_card_prime_pow_eq_pow (q := q) (p := 2) h2 σ
+    rw [hi (σ x), hi x, ← pow_mul]
+    have hqq : q ^ i * q ^ i = (q ^ 2) ^ i := by rw [← pow_add, ← pow_mul]; congr 1; omega
+    rw [hqq, ← h2, ← hcardfin]
+    exact FiniteField.pow_card_pow i x
+
 end OddOrder.Peterfalvi.Appendices.Suzuki

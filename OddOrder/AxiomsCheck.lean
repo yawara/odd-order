@@ -12128,6 +12128,14 @@ Pure `ℕ` arithmetic, sorry-free; consumed by steps (6) and (8). -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one
 
+/-! **Step (6), the finite-field automorphism bound** (`FirstCase/StepSix.lean`, issue 2053,
+2026-07-22): the ring automorphism group of a finite field of prime or prime-square order has
+exponent `≤ 2` (`σ² = 1`).  Via `ringAut_card_prime_pow_eq_pow` (`σ x = x^{q^i}`) and
+`x^{|F|^i} = x`.  Sorry-free; lets step (6)/(8) conclude that the odd-order automorphism group
+`Σ` of a field `F` with `|F| ∈ {f, 9}` is trivial. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.ringAut_sq_eq_one_of_card_prime_or_prime_sq
+
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
 欠いていた).  Zassenhaus/Dickson 分類の App.C 特殊形: 有限 near-field `F` の乗法群が
