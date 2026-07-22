@@ -7,6 +7,7 @@ import Mathlib.GroupTheory.IndexNormal
 import Mathlib.GroupTheory.Sylow
 import Mathlib.GroupTheory.DoubleCoset
 import Mathlib.GroupTheory.GroupAction.Quotient
+import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 /-!
 # Isaacs Chapter 1 — Problems (演習問題)
@@ -459,5 +460,257 @@ end
   巡回シフトで作用し、不動点 = 対角 `(x,…,x)` with `xᵖ=1`) が、まさに mathlib の証明戦略。
   位数 `p` の元の個数 `≡ -1 (mod p)` の精緻化は本ファイルの 1A.9 で使う。
 -/
+
+section /- Problems 1B: Sylow subgroups and normalizers (pp. 12-14) -/
+
+open Pointwise in
+/-- **Isaacs Problem 1B.1(a)**. `S` を Sylow `p`-部分群、`P` を `p`-部分群とすると、集合積
+`P·S` が部分群 (= ある部分群 `K` の台と一致) であるための必要十分条件は `P ≤ S`。
+
+⟸: `P ≤ S` なら `↑P·↑S = ↑S` (部分群の台)。⟹: `↑P·↑S` が部分群 `K` の台なら `S ≤ K` かつ
+`P ≤ K`、`|K|·|P∩S| = |P|·|S|` (`card_mul_card_inf` = 1A.2/1A.3) より `|K| ∣ p^(a+b)` すなわち
+`|K|` は `p` の冪。ゆえに `K` は `S` を含む `p`-部分群、Sylow の極大性 (`is_maximal'`) で `K = S`、
+よって `P ≤ K = S`。 -/
+theorem mul_isSubgroup_iff_le_sylow {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {P : Subgroup G} (hP : IsPGroup p P) (S : Sylow p G) :
+    (∃ K : Subgroup G, (K : Set G) = (P : Set G) * ((S : Subgroup G) : Set G))
+      ↔ P ≤ (S : Subgroup G) := by
+  constructor
+  · rintro ⟨K, hK⟩
+    -- S ≤ K かつ P ≤ K (1 ∈ P, 1 ∈ S ゆえ)
+    have hSK : (S : Subgroup G) ≤ K := fun s hs => by
+      rw [← SetLike.mem_coe, hK]; exact ⟨1, P.one_mem, s, hs, one_mul s⟩
+    have hPK : P ≤ K := fun x hx => by
+      rw [← SetLike.mem_coe, hK]; exact ⟨x, hx, 1, (S : Subgroup G).one_mem, mul_one x⟩
+    -- |K|·|P∩S| = |P|·|S| = p^(a+b) ⟹ |K| ∣ p^(a+b) ⟹ K は p-群
+    obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp hP
+    obtain ⟨b, hb⟩ := IsPGroup.iff_card.mp S.isPGroup'
+    have hmul := card_mul_card_inf P (S : Subgroup G)
+    rw [← hK, SetLike.coe_sort_coe, ha, hb, ← pow_add] at hmul
+    have hdvd : Nat.card K ∣ p ^ (a + b) := ⟨_, hmul.symm⟩
+    obtain ⟨c, -, hc⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp hdvd
+    -- Sylow の極大性で K = S、ゆえ P ≤ K = S
+    have hKS : K = (S : Subgroup G) := S.is_maximal' (IsPGroup.of_card hc) hSK
+    exact hKS ▸ hPK
+  · intro hPS
+    refine ⟨(S : Subgroup G), ?_⟩
+    ext x
+    simp only [SetLike.mem_coe, Set.mem_mul]
+    constructor
+    · intro hx; exact ⟨1, P.one_mem, x, hx, one_mul x⟩
+    · rintro ⟨h, hh, k, hk, rfl⟩; exact (S : Subgroup G).mul_mem (hPS hh) hk
+
+/-- 一般補題 (1B.4 の核): 有限群からの全射 `f : A ↠ B` と素数 `p ∣ |B|` に対し、`f` の核を含み
+位数 `p·|ker f|` の部分群 `R` が存在する。`B` で Cauchy (`exists_prime_orderOf_dvd_card'`) を使い
+位数 `p` の巡回部分群 `C` を取り、その逆像 `C.comap f` を `R` とする。指数計算
+(`index_comap_of_surjective` + `card_mul_index`) で `|R| = p·|ker f|`。 -/
+theorem exists_subgroup_card_eq_prime_mul_ker {A B : Type*} [Group A] [Group B] [Finite A]
+    (f : A →* B) (hf : Function.Surjective f) {p : ℕ} [Fact p.Prime] (hp : p ∣ Nat.card B) :
+    ∃ R : Subgroup A, f.ker ≤ R ∧ Nat.card R = p * Nat.card f.ker := by
+  haveI : Finite B := Finite.of_surjective f hf
+  obtain ⟨b, hb⟩ := exists_prime_orderOf_dvd_card' p hp
+  set C : Subgroup B := Subgroup.zpowers b with hCdef
+  have hCcard : Nat.card C = p := by rw [hCdef, Nat.card_zpowers, hb]
+  refine ⟨C.comap f, ?_, ?_⟩
+  · intro x hx
+    rw [Subgroup.mem_comap, MonoidHom.mem_ker.mp hx]; exact one_mem _
+  · have hCidx_pos : 0 < C.index := Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+    have e1 : Nat.card (C.comap f) * C.index = Nat.card A := by
+      rw [← Subgroup.index_comap_of_surjective (H := C) hf]; exact Subgroup.card_mul_index _
+    have e2 : Nat.card C * C.index = Nat.card B := Subgroup.card_mul_index C
+    have hkerB : f.ker.index = Nat.card B := by
+      change Nat.card (A ⧸ f.ker) = Nat.card B
+      exact Nat.card_congr (QuotientGroup.quotientKerEquivOfSurjective f hf).toEquiv
+    have e3 : Nat.card f.ker * Nat.card B = Nat.card A := by
+      rw [← hkerB]; exact Subgroup.card_mul_index f.ker
+    apply Nat.eq_of_mul_eq_mul_right hCidx_pos
+    rw [e1, ← e3, ← e2, hCcard]; ring
+
+/-- **Isaacs Problem 1B.4**. `p`-部分群 `P` の指数 `|G:P|` が `p` で割れるならば、`P` を含み
+`|Q:P| = p` (すなわち `|Q| = p·|P|`) となる部分群 `Q` が存在する。Sylow の定理を使わず Cauchy
+の定理 (1A.8) から示す (Isaacs のヒント: `N_G(P)/P` を考える)。
+
+`p ∣ |N_G(P):P|` (Problem 1A.10(b) = `prime_dvd_index_normalizer_of_prime_pow`) と `N_G(P)/P`
+での Cauchy から `exists_subgroup_card_eq_prime_mul_ker` を適用し、逆像 `R ≤ N_G(P)` を `G` に
+落として `Q` を得る。系 (下記 `isSylow_of_maximal_pGroup`): 極大 `p`-部分群は Sylow `p`-部分群。 -/
+theorem exists_le_card_eq_prime_mul_of_prime_dvd_index {p : ℕ} [Fact p.Prime] {G : Type*}
+    [Group G] [Finite G] {P : Subgroup G} (hP : IsPGroup p P) (hdvd : p ∣ P.index) :
+    ∃ Q : Subgroup G, P ≤ Q ∧ Nat.card Q = p * Nat.card P := by
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hP
+  have hPN : P ≤ Subgroup.normalizer (P : Set G) := Subgroup.le_normalizer
+  -- p ∣ |N_G(P)/P|  (1A.10(b))
+  have hpdvd := prime_dvd_index_normalizer_of_prime_pow (Fact.out : p.Prime) hn hdvd
+  -- 逆像 R ≤ N_G(P) を helper で取る
+  obtain ⟨R, hkerR, hRcard⟩ := exists_subgroup_card_eq_prime_mul_ker
+    (QuotientGroup.mk' (P.subgroupOf (Subgroup.normalizer (P : Set G))))
+    (QuotientGroup.mk'_surjective _) hpdvd
+  rw [QuotientGroup.ker_mk'] at hkerR hRcard
+  refine ⟨R.map (Subgroup.normalizer (P : Set G)).subtype, ?_, ?_⟩
+  · -- P ≤ Q: P = (P.subgroupOf N).map N.subtype ≤ R.map N.subtype
+    have hPeq : (P.subgroupOf (Subgroup.normalizer (P : Set G))).map
+        (Subgroup.normalizer (P : Set G)).subtype = P := by
+      rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hPN]
+    have hmono := Subgroup.map_mono (f := (Subgroup.normalizer (P : Set G)).subtype) hkerR
+    rwa [hPeq] at hmono
+  · -- |Q| = |R| = p·|P.subgroupOf N| = p·|P|
+    rw [Subgroup.card_map_of_injective (Subgroup.subtype_injective _), hRcard,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPN).toEquiv]
+
+/-- **Isaacs Problem 1B.4** (系). `G` の極大 `p`-部分群 `P` (真に大きい `p`-部分群を持たない) の
+指数 `|G:P|` は `p` で割れない。これが Sylow E-定理の Cauchy による別証明: mathlib では Sylow の
+定義そのものが「極大 `p`-部分群」なので `P` は自動的に Sylow `p`-部分群 (`⟨P, hP, hmax⟩ : Sylow p G`)
+であり、本補題はその指数が `p` と互いに素であること (= 位数計算による Sylow 性の特徴付け) を、
+Sylow の定理を使わず 1B.4 の拡大補題から導く: `p ∣ |G:P|` ならば真に大きい `p`-部分群に拡大でき、
+極大性に矛盾する。 -/
+theorem not_dvd_index_of_maximal_pGroup {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {P : Subgroup G} (hP : IsPGroup p P)
+    (hmax : ∀ Q : Subgroup G, IsPGroup p Q → P ≤ Q → Q = P) :
+    ¬ p ∣ P.index := by
+  intro hdvd
+  obtain ⟨Q, hPQ, hQcard⟩ := exists_le_card_eq_prime_mul_of_prime_dvd_index hP hdvd
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hP
+  have hQpg : IsPGroup p Q :=
+    IsPGroup.of_card (show Nat.card Q = p ^ (n + 1) by rw [hQcard, hn, pow_succ'])
+  rw [hmax Q hQpg hPQ, hn] at hQcard
+  exact absurd (Nat.eq_of_mul_eq_mul_right (pow_pos (Fact.out : p.Prime).pos n)
+    (by rw [one_mul]; exact hQcard)) (Fact.out : p.Prime).one_lt.ne
+
+end
+
+/-! ## Problems 1B: mathlib / repo で被覆される演習 (docstring 記録)
+
+- **Problem 1B.1(b)** (正規 Sylow は一意かつ characteristic): `S ⊴ G` が Sylow `p`-部分群なら
+  `Sylp(G) = {S}`、さらに `S` は `G` で characteristic。前半は mathlib の
+  `Sylow.unique_of_normal : P.Normal → Unique (Sylow p G)`、後半は
+  `Sylow.characteristic_of_normal : P.Normal → P.Characteristic`
+  (`Mathlib/GroupTheory/Sylow.lean`)。Isaacs は Sylow C-定理を使わない証明を要求するが
+  (章の教育的制約)、形式化する対象は結果そのもの。
+
+- **Problem 1B.2** (`O_p(G)` = 最大の正規 `p`-部分群): 本リポジトリの
+  `OddOrder.Isaacs.Ch01.opCore p G` (= 全 Sylow `p`-部分群の共通部分) が `p`-部分群
+  (`opCore_isPGroup`) かつ正規 (`opCore.normal`) かつ characteristic (`opCore.characteristic`)
+  であり、任意の正規 `p`-部分群 `N` を含む (`normal_pgroup_le_opCore` = まさに Problem 1B.2)
+  ことが `OddOrder/Isaacs/Ch01_Sylow/Basic.lean` で示されている。
+
+- **Problem 1B.3** (Sylow 正規化群は自己正規化: `N = N_G(N)` where `N = N_G(S)`): mathlib の
+  `Sylow.normalizer_normalizer : normalizer (normalizer (P : Set G)) = normalizer (P : Set G)`
+  (`Mathlib/GroupTheory/Sylow.lean`) がまさにこれ。証明は Frattini 論法
+  (`S ⊴ N` かつ 1B.1(b) で `N` 内の Sylow が一意 ⟹ `N_G(N) ⊆ N`)。
+-/
+
+section /- Problems 1B: Hall π-subgroups (1B.5-1B.8, Ch.3 の Hall/π 理論を前借り) -/
+
+open OddOrder.Isaacs.Ch03
+
+/-- **Isaacs Problem 1B.5(a)**. `θ : G ↠ K` が有限群の全射準同型で `H` が `G` の π-Hall 部分群
+ならば、像 `θ(H)` (= `H.map θ`) は `K` の π-Hall 部分群。
+
+`|θ(H)| ∣ |H|` (任意の準同型で `card_map_dvd`) より `|θ(H)|` の素因子 ⊆ `|H|` の素因子 ⊆ π。
+`|K:θ(H)| ∣ |G:H|` (全射で `index_map_dvd`) より素因子は π を避ける。
+(`IsHallSubgroup.map_quotient` = `θ = mk' N` の特殊化を全射一般に拡張。) -/
+theorem IsHallSubgroup.map_of_surjective {G K : Type*} [Group G] [Group K] [Finite G]
+    {π : Set ℕ} {θ : G →* K} (hθ : Function.Surjective θ) {H : Subgroup G}
+    (hH : IsHallSubgroup π H) : IsHallSubgroup π (H.map θ) := by
+  refine ⟨fun p hp => ?_, fun p hp => ?_⟩
+  · apply hH.1
+    rw [Nat.mem_primeFactors] at hp ⊢
+    exact ⟨hp.1, hp.2.1.trans (Subgroup.card_map_dvd _ _), Nat.card_pos.ne'⟩
+  · apply hH.2
+    rw [Nat.mem_primeFactors] at hp ⊢
+    exact ⟨hp.1, hp.2.1.trans (H.index_map_dvd hθ), Subgroup.index_ne_zero_of_finite⟩
+
+open Pointwise in
+/-- **Isaacs Problem 1B.6**. `H` を `G` の π-Hall 部分群、`K ≤ G` を部分群とする。`HK` が部分群
+(ある `L : Subgroup G` の台が `↑H·↑K`) ならば `H ∩ K` は `K` の π-Hall 部分群
+(`(H ⊓ K).subgroupOf K`)。
+
+`|H∩K|` の素因子: `H∩K ≤ H` ゆえ `|H∩K| ∣ |H|`、`H` が π-Hall で `|H|` の素因子 ⊆ π。
+`|K:H∩K|`: ダイヤモンド `|L|·|H∩K| = |H|·|K|` (1A.2/1A.3 `card_mul_card_inf`) と `H ≤ L` から
+`|K:H∩K| = |L:H|` が `|G:H|` を割り、`H` が π-Hall で `|G:H|` の素因子は π を避ける。 -/
+theorem isHallSubgroup_inf_of_mul_isSubgroup {π : Set ℕ} {G : Type*} [Group G] [Finite G]
+    {H K : Subgroup G} (hH : IsHallSubgroup π H)
+    (hHK : ∃ L : Subgroup G, (L : Set G) = (H : Set G) * (K : Set G)) :
+    IsHallSubgroup π ((H ⊓ K).subgroupOf K) := by
+  obtain ⟨L, hLeq⟩ := hHK
+  have hHL : H ≤ L := fun x hx => by
+    rw [← SetLike.mem_coe, hLeq]; exact ⟨x, hx, 1, K.one_mem, mul_one x⟩
+  -- ダイヤモンド |L|·|H∩K| = |H|·|K|
+  have ehk : Nat.card L * Nat.card ↥(H ⊓ K) = Nat.card H * Nat.card K := by
+    have h := card_mul_card_inf H K
+    rwa [← hLeq, SetLike.coe_sort_coe] at h
+  -- |H|·|L:H| = |L|,  |H∩K|·|K:H∩K| = |K|
+  have eL : Nat.card H * H.relIndex L = Nat.card ↥L := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHL).toEquiv]
+    exact Subgroup.card_mul_index (H.subgroupOf L)
+  have eK : Nat.card ↥(H ⊓ K) * H.relIndex K = Nat.card K := by
+    rw [← Subgroup.inf_relIndex_right (H := H) (K := K),
+      ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_right : H ⊓ K ≤ K)).toEquiv]
+    exact Subgroup.card_mul_index ((H ⊓ K).subgroupOf K)
+  -- |K:H∩K| = |L:H|
+  have hrel_eq : H.relIndex K = H.relIndex L := by
+    have key : Nat.card H * (Nat.card ↥(H ⊓ K) * H.relIndex L)
+        = Nat.card H * (Nat.card ↥(H ⊓ K) * H.relIndex K) := by
+      calc Nat.card H * (Nat.card ↥(H ⊓ K) * H.relIndex L)
+          = Nat.card H * H.relIndex L * Nat.card ↥(H ⊓ K) := by ring
+        _ = Nat.card ↥L * Nat.card ↥(H ⊓ K) := by rw [eL]
+        _ = Nat.card H * Nat.card K := ehk
+        _ = Nat.card H * (Nat.card ↥(H ⊓ K) * H.relIndex K) := by rw [eK]
+    exact (Nat.eq_of_mul_eq_mul_left Nat.card_pos
+      (Nat.eq_of_mul_eq_mul_left Nat.card_pos key)).symm
+  refine ⟨fun q hq => ?_, fun q hq => ?_⟩
+  · -- |M| = |H∩K| ∣ |H|
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_right : H ⊓ K ≤ K)).toEquiv] at hq
+    exact hH.1 q (Nat.primeFactors_mono (Subgroup.card_dvd_of_le inf_le_left)
+      Nat.card_pos.ne' hq)
+  · -- M.index = |K:H∩K| = |L:H| ∣ |G:H|
+    have hMidx : ((H ⊓ K).subgroupOf K).index = H.relIndex K := Subgroup.inf_relIndex_right H K
+    rw [hMidx, hrel_eq] at hq
+    exact hH.2 q (Nat.primeFactors_mono (Subgroup.relIndex_dvd_index_of_le hHL)
+      Subgroup.index_ne_zero_of_finite hq)
+
+/-- **Isaacs Problem 1B.7(b)**. `O_π(G)` (= `oPiCore π G`) は `G` の任意の π-Hall 部分群 `H` に
+含まれる。
+
+`N := O_π(G)` は正規 π-群。`N ⊔ H` の指数 `[N⊔H : H] = H.relIndex (N⊔H)` を割る素数 `q` は、
+`[N⊔H:H] ∣ |N⊔H| ∣ |N|·|H|` (`normal_mul` + `card_mul_card_inf`) より π に属し (`N`,`H` とも
+π-群)、同時に `[N⊔H:H] ∣ |G:H|` (`H ≤ N⊔H`) より π を避ける (`H` が π-Hall) — 矛盾。よって
+`[N⊔H:H] = 1`、`relIndex_eq_one` から `N⊔H ≤ H`、ゆえ `N ≤ N⊔H ≤ H`。 -/
+theorem oPiCore_le_of_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Finite G]
+    {H : Subgroup G} (hH : IsHallSubgroup π H) : oPiCore π G ≤ H := by
+  set N := oPiCore π G with hN
+  haveI : N.Normal := by rw [hN]; infer_instance
+  have hNpi : Subgroup.IsPiGroup π N := by rw [hN]; exact oPiCore.isPiGroup π
+  have hsub : N ⊔ H ≤ H := by
+    rw [← Subgroup.relIndex_eq_one]
+    by_contra hne
+    obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hne
+    -- q ∈ π : [N⊔H:H] ∣ |N⊔H| ∣ |N|·|H|、素因子は π
+    have hcard_dvd : Nat.card ↥(N ⊔ H) ∣ Nat.card N * Nat.card H := by
+      have hmul := card_mul_card_inf N H
+      rw [← Subgroup.normal_mul N H, SetLike.coe_sort_coe] at hmul
+      exact ⟨_, hmul.symm⟩
+    have hqπ : q ∈ π := by
+      have hq2 : q ∣ Nat.card N * Nat.card H :=
+        (hqdvd.trans (Subgroup.relIndex_dvd_card H (N ⊔ H))).trans hcard_dvd
+      rcases (Nat.Prime.dvd_mul hq).mp hq2 with h | h
+      · exact hNpi q (Nat.mem_primeFactors.mpr ⟨hq, h, Nat.card_pos.ne'⟩)
+      · exact hH.1 q (Nat.mem_primeFactors.mpr ⟨hq, h, Nat.card_pos.ne'⟩)
+    -- q ∉ π : [N⊔H:H] ∣ |G:H|、素因子は π を避ける
+    exact hH.2 q (Nat.mem_primeFactors.mpr ⟨hq,
+      hqdvd.trans (Subgroup.relIndex_dvd_index_of_le le_sup_right),
+      Subgroup.index_ne_zero_of_finite⟩) hqπ
+  exact le_sup_left.trans hsub
+
+/-! ### Problems 1B: mathlib / repo で被覆される Hall/π 演習 (docstring 記録)
+
+- **Problem 1B.7(a)** (`O_π(G)` = 最大の正規 π-部分群): 本リポジトリの
+  `OddOrder.Isaacs.Ch03.oPiCore π G` (= 正規 π-部分群の sup) が正規 (`oPiCore.normal`) かつ
+  characteristic (`oPiCore.characteristic`) な π-部分群であり、任意の正規 π-部分群 `H` を含む
+  (`Subgroup.IsPiGroup.le_oPiCore` = まさに Problem 1B.7(a)) ことが
+  `OddOrder/Isaacs/Ch03_SplitExtensions/Theorem315.lean` で示されている。この一意最大性から
+  `O_π(G)` は characteristic (Isaacs の Note)。上の `oPiCore_le_of_isHallSubgroup` が 1B.7(b)。
+-/
+
+end
 
 end OddOrder.Isaacs.Ch01
