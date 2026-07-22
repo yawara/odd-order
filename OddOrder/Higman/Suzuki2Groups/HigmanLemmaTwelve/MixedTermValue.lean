@@ -243,7 +243,7 @@ theorem exists_frobenius_pow_eq_of_ringAut (n : ℕ) (hn : n ≠ 0)
     (sigma : RingAut (GaloisField 2 n)) :
     ∃ r : Fin n, sigma = (frobeniusEquiv (GaloisField 2 n) 2) ^ (r : ℕ) := by
   by_contra hno
-  push_neg at hno
+  push Not at hno
   haveI : Finite (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) :=
     Finite.of_injective
       (fun f => (f : GaloisField 2 n → GaloisField 2 n)) DFunLike.coe_injective
