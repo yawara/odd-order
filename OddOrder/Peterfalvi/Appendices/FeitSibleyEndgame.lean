@@ -93,6 +93,33 @@ theorem dvd_of_isIntegral_ratio {a : ℕ} (ha : 0 < a) {lam mu : ℤ}
     rw [div_eq_iff ha0] at hn; rw [hn]; ring
   exact_mod_cast hlc
 
+/-- **(8) divisibility from the evaluation identity** (Peterfalvi Appendix IV, p. 150).  The `(8)`
+evaluation `χ₁(1)·(e'(z) − e'(1)) = −|H|·c₀` (`restrict_apply_sub_eq_neg_card_mul_inner`), rewritten
+with `χ₁(1) = a·d`, `|H| = d·|Q|` and the keystone `c₀ = λ + a·μ`, reads
+`(a·d)·Δ = −(d·|Q|)·(λ + a·μ)` with `Δ = e'(z) − e'(1)`.  Cancelling the nonzero `d` gives
+`a·Δ = −|Q|·(λ + a·μ)`, so `λ/a + μ = −(Δ/|Q|)`.  The central-character congruence (7)
+`e'(z) ≡ e'(1) (mod |Q|)` (`peterfalvi_67_hall_of_odd`) says `Δ/|Q|` is an algebraic integer, hence
+so is `λ/a + μ`, forcing `a ∣ λ` (`dvd_of_isIntegral_ratio`) — the last step of (6). -/
+theorem dvd_lam_of_evaluation_cong {a : ℕ} (ha : 0 < a) {lam mu : ℤ}
+    {dc Qc Δ : ℂ} (hd0 : dc ≠ 0) (hQ0 : Qc ≠ 0)
+    (heval : (a : ℂ) * dc * Δ = -(dc * Qc) * ((lam : ℂ) + (a : ℂ) * (mu : ℂ)))
+    (hcong : IsIntegral ℤ (Δ / Qc)) :
+    (a : ℤ) ∣ lam := by
+  have ha0 : (a : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr ha.ne'
+  -- cancel `d`: `a·Δ = -Qc·(λ + aμ)`
+  have hcancel : (a : ℂ) * Δ = -Qc * ((lam : ℂ) + (a : ℂ) * (mu : ℂ)) :=
+    mul_left_cancel₀ hd0 (by linear_combination heval)
+  -- the ratio `λ/a + μ = -(Δ/Qc)`
+  have hratio : (lam : ℂ) / (a : ℂ) + (mu : ℂ) = -(Δ / Qc) := by
+    apply mul_left_cancel₀ (mul_ne_zero ha0 hQ0)
+    have hL : (a : ℂ) * Qc * ((lam : ℂ) / (a : ℂ) + (mu : ℂ))
+        = Qc * ((lam : ℂ) + (a : ℂ) * (mu : ℂ)) := by field_simp
+    have hR : (a : ℂ) * Qc * -(Δ / Qc) = -((a : ℂ) * Δ) := by field_simp
+    rw [hL, hR, hcancel]; ring
+  refine dvd_of_isIntegral_ratio (lam := lam) (mu := mu) ha ?_
+  rw [hratio]
+  exact hcong.neg
+
 /-- **Sign–degree bookkeeping core for Peterfalvi (5)** (p. 148): if the signed
 irreducible constituents satisfy the `λ`-equality `e·f₁ = −(A·(e₁·f₂))` (the two
 evaluations of `λ = (eᵢ − aᵢe₁, e'ⱼ)`), the `X`-side degree identity
