@@ -1610,6 +1610,73 @@ theorem not_dvd_card_and_index_of_centralizer_le {p : ℕ} [Fact p.Prime] {G : T
   have hgH : g ∈ H := hC x (hPH hxP) hxord hgx
   exact hgnotP (Subgroup.mem_inf.mpr ⟨hgQ, hgH⟩)
 
+open Pointwise in
+/-- **Isaacs Problem 1D.3(a)**. `H ≤ G` が `H ⊓ H^g = 1` (すべての `g ∉ H`) をみたす (Frobenius
+complement) とき、`1 < K ≤ H` なる任意の部分群 `K` について `N_G(K) ⊆ H`。
+
+`n ∈ N_G(K)`, `n ∉ H` とすると `K = n·K·n⁻¹ ≤ n·H·n⁻¹ = H^{n}` かつ `K ≤ H` ゆえ
+`K ≤ H ⊓ H^n = 1`、`K > 1` に矛盾。 -/
+theorem normalizer_le_of_disjoint_conj {G : Type*} [Group G] {H : Subgroup G}
+    (hH : ∀ g : G, g ∉ H → H ⊓ MulAut.conj g • H = ⊥)
+    {K : Subgroup G} (hK1 : K ≠ ⊥) (hKH : K ≤ H) : Subgroup.normalizer K ≤ H := by
+  intro n hn
+  by_contra hnH
+  refine hK1 (le_bot_iff.mp ?_)
+  rw [← hH n hnH]
+  refine le_inf hKH ?_
+  have hnorm : MulAut.conj n • K = K := Subgroup.mem_normalizer_iff_map_conj_eq.mp hn
+  calc K = MulAut.conj n • K := hnorm.symm
+    _ ≤ MulAut.conj n • H := Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hKH
+
+open Pointwise in
+/-- **Isaacs Problem 1D.3(b)**. `H ≤ G` が `H ⊓ H^g = 1` (すべての `g ∉ H`) をみたす (Frobenius
+complement) とき、`H` は Hall 部分群 (`|H|` と `|G : H|` は互いに素)。
+
+素数 `p ∣ gcd(|H|, |G:H|)` があると仮定。`Q ∈ Syl_p(G)`, `P := Q ∩ H` は `|P| = pPart(H) > 1`
+(∴ `P ≠ ⊥`)、(a) より `N_G(P) ⊆ H`。もし `P < Q` なら正規化条件で `g ∈ N_G(P) ∩ Q`, `g ∉ P` が
+取れるが `g ∈ N_G(P) ⊆ H` かつ `g ∈ Q` ゆえ `g ∈ Q ∩ H = P` で矛盾。ゆえ `P = Q`、
+`pPart(H) = |P| = |Q| = pPart(G)`。しかし `p ∣ |G:H|` からは `pPart(H) < pPart(G)`、矛盾。 -/
+theorem coprime_card_index_of_disjoint_conj {G : Type*} [Group G] [Finite G] {H : Subgroup G}
+    (hH : ∀ g : G, g ∉ H → H ⊓ MulAut.conj g • H = ⊥) :
+    Nat.Coprime (Nat.card H) H.index := by
+  by_contra hnc
+  obtain ⟨p, hp, hpg⟩ := Nat.exists_prime_and_dvd hnc
+  have hpH : p ∣ Nat.card H := hpg.trans (Nat.gcd_dvd_left _ _)
+  have hpI : p ∣ H.index := hpg.trans (Nat.gcd_dvd_right _ _)
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨Q, hPcard⟩ := exists_sylow_inf_card_eq (p := p) H
+  set P : Subgroup G := (Q : Subgroup G) ⊓ H with hPdef
+  have hpP : p ∣ Nat.card ↥P := by
+    rw [hPcard]
+    exact dvd_pow_self p (Nat.Prime.factorization_pos_of_dvd hp (Nat.card_pos).ne' hpH).ne'
+  have hP1 : P ≠ ⊥ := by
+    intro h; rw [h, Subgroup.card_bot] at hpP; exact hp.one_lt.ne' (Nat.dvd_one.mp hpP)
+  have hNle : Subgroup.normalizer P ≤ H := normalizer_le_of_disjoint_conj hH hP1 inf_le_right
+  -- P = ↑Q
+  have hPQeq : P = (Q : Subgroup G) := by
+    by_contra hne
+    have hPltQ : P < (Q : Subgroup G) := lt_of_le_of_ne inf_le_left hne
+    haveI : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
+    have hlt2 : P.subgroupOf (Q : Subgroup G) < ⊤ := by
+      rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
+      exact fun h => hPltQ.ne (le_antisymm inf_le_left h)
+    have hnorm := Group.normalizerCondition_of_isNilpotent _ hlt2
+    rw [← Subgroup.subgroupOf_normalizer_eq inf_le_left] at hnorm
+    obtain ⟨g0, hg0m, hg0n⟩ := SetLike.exists_of_lt hnorm
+    exact hg0n (Subgroup.mem_subgroupOf.mpr
+      (Subgroup.mem_inf.mpr ⟨g0.2, hNle (Subgroup.mem_subgroupOf.mp hg0m)⟩))
+  -- pPart(H) = |P| = |Q| = pPart(G), しかし p ∣ index で pPart(H) < pPart(G)
+  have heq : p ^ (Nat.card H).factorization p = p ^ (Nat.card G).factorization p := by
+    rw [← hPcard, hPQeq, Q.card_eq_multiplicity]
+  have hfac : (Nat.card H).factorization p + (H.index).factorization p
+      = (Nat.card G).factorization p := by
+    rw [← Finsupp.add_apply, ← Nat.factorization_mul (Nat.card_pos).ne'
+      Subgroup.index_ne_zero_of_finite, Subgroup.card_mul_index]
+  have hpos : 0 < (H.index).factorization p :=
+    Nat.Prime.factorization_pos_of_dvd hp Subgroup.index_ne_zero_of_finite hpI
+  have := Nat.pow_right_injective hp.two_le heq
+  omega
+
 end
 
 end OddOrder.Isaacs.Ch01
