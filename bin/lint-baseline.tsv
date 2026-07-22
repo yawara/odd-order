@@ -1,7 +1,7 @@
 # bin/lint-baseline.tsv — lint 警告 ratchet の基準 (issue 0138)
 # `count<TAB>relpath<TAB>category`。cleanup wave のたびに --update-baseline で更新。
 # 目標: 全行が消え baseline が空 → --strict のゼロ gate へ移行。
-# 総数: 230 件 / 84 (file,category) 組
+# 総数: 218 件 / 77 (file,category) 組
 #
 67	OddOrder/BG/AppE_FiliformGroup.lean	flexible
 10	OddOrder/Peterfalvi/Appendices/NearFields.lean	style.show
@@ -23,15 +23,10 @@
 3	OddOrder/Peterfalvi/Appendices/FeitSibley.lean	unusedVariables
 3	OddOrder/Peterfalvi/Appendices/Suzuki/FirstCase/FieldAction.lean	style.show
 3	OddOrder/Peterfalvi/Appendices/Suzuki2Groups/ModelCenters.lean	deprecation
-2	OddOrder/BG/AppE_AbelianCentralizer.lean	deprecation
 2	OddOrder/BG/AppE_EigenvalueCombinatorics.lean	style.longLine
-2	OddOrder/BG/AppE_FiliformGroup.lean	unusedSimpArgs
 2	OddOrder/BG/AppE_FurtherResults.lean	style.show
-2	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/CaseDispatch.lean	deprecation
 2	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/CaseDispatch.lean	unusedTactic
 2	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/MixedEigenweights.lean	style.show
-2	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/SummandIsomorphism.lean	deprecation
-2	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/XiLengthFromCard.lean	deprecation
 2	OddOrder/Peterfalvi/Appendices/NearFields.lean	deprecation
 1	OddOrder/BG/AppD_CNGroups/MaximalSylowIntersection.lean	unusedSectionVars
 1	OddOrder/BG/AppE_AbelianCentralizer.lean	style.longLine
@@ -55,8 +50,6 @@
 1	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/CaseSplitBCD.lean	unusedVariables
 1	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/MixedEigenweights.lean	style.maxHeartbeats
 1	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/MixedEigenweights.lean	unusedSimpArgs
-1	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/MixedTermValue.lean	deprecation
-1	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/TwoPowerCongruence.lean	deprecation
 1	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/XiLengthFromCard.lean	style.longLine
 1	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/XiLengthFromCard.lean	unusedSectionVars
 1	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/XiLengthFromCard.lean	unusedSimpArgs

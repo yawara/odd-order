@@ -329,7 +329,7 @@ theorem exists_proper_invariant_subgroup_of_card_sq
     ∃ V : Subgroup Q, V ≠ ⊥ ∧ V ≠ ⊤ ∧ IsAInvariant rho V := by
   classical
   by_contra hnone
-  push_neg at hnone
+  push Not at hnone
   letI : CommGroup Q :=
     { (inferInstance : Group Q) with mul_comm := hcomm }
   letI : Module (ZMod 2) (Additive Q) := AddCommGroup.zmodModule (by
@@ -537,7 +537,7 @@ theorem hasXiLengthThree_of_card_eq_cube
       (involutionSubgroup P).one_mem
     have hstep : (((involutionSubgroup P : Set P)) \ {1}).ncard + 1 =
         (involutionSubgroup P : Set P).ncard :=
-      Set.ncard_diff_singleton_add_one h1 (Set.toFinite _)
+      Set.ncard_sdiff_singleton_add_one h1 (Set.toFinite _)
     rw [← involutions_eq_involutionSubgroup_diff_identity hP, hinvcard] at hstep
     have h2 : (involutionSubgroup P : Set P).ncard =
         Nat.card ↥(involutionSubgroup P) :=
