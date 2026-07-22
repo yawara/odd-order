@@ -80,7 +80,9 @@ theorem exists_three_complementary_invariant_summands_of_xiLengthThree
       IsAInvariant act U ∧ IsAInvariant act V ∧
         IsAInvariant act W ∧
         U ≠ ⊥ ∧ U ≠ ⊤ ∧ V ≠ ⊥ ∧ V ≠ ⊤ ∧
-        W ≠ ⊥ ∧ W ≠ ⊤ ∧ U ⊓ V = ⊥ ∧
+        W ≠ ⊥ ∧ W ≠ ⊤ ∧
+        U ⊓ V = ⊥ ∧ U ⊓ W = ⊥ ∧ V ⊓ W = ⊥ ∧
+        U ⊔ V ≠ ⊤ ∧ U ⊔ W ≠ ⊤ ∧ V ⊔ W ≠ ⊤ ∧
           (U ⊔ V) ⊓ W = ⊥ ∧ U ⊔ V ⊔ W = ⊤ := by
   letI : CommGroup E :=
     { (inferInstance : Group E) with mul_comm := hEA.comm }
@@ -105,6 +107,7 @@ theorem exists_three_complementary_invariant_summands_of_xiLengthThree
     change U.1 ⊔ (B.1 ⊓ C) = B.1
     rw [inf_comm B.1 C, ← sup_inf_assoc_of_le C hUB'.le,
       hUCtop, top_inf_eq]
+  have hVleB : V ≤ B.1 := inf_le_left
   have hVbot : V ≠ (⊥ : Subgroup E) := by
     intro hV
     apply hUB'.ne
@@ -112,7 +115,7 @@ theorem exists_three_complementary_invariant_summands_of_xiLengthThree
   have hVtop : V ≠ (⊤ : Subgroup E) := by
     intro hV
     apply hBtop'.ne
-    exact top_unique (hV ▸ (show V ≤ B.1 from inf_le_left))
+    exact top_unique (hV ▸ hVleB)
   have hWbot : W ≠ (⊥ : Subgroup E) := by
     intro hW
     apply hBtop'.ne
@@ -121,9 +124,43 @@ theorem exists_three_complementary_invariant_summands_of_xiLengthThree
     intro hW
     apply hBbot'.ne'
     simpa [hW] using hBWbot
+  have hVB : V < B.1 := by
+    apply lt_of_le_of_ne hVleB
+    intro hVB
+    apply hUbot'.ne'
+    calc
+      U.1 = U.1 ⊓ V := (inf_eq_left.mpr (hVB ▸ hUB'.le)).symm
+      _ = ⊥ := hUVbot
+  have hUWbot : U.1 ⊓ W = (⊥ : Subgroup E) := by
+    apply le_bot_iff.mp
+    exact (inf_le_inf_right W hUB'.le).trans (le_of_eq hBWbot)
+  have hVWbot : V ⊓ W = (⊥ : Subgroup E) := by
+    apply le_bot_iff.mp
+    exact (inf_le_inf_right W hVleB).trans (le_of_eq hBWbot)
+  have hUVtop : U.1 ⊔ V ≠ (⊤ : Subgroup E) := by
+    intro htop
+    exact hBtop'.ne (hUVB.symm.trans htop)
+  have hUWtop : U.1 ⊔ W ≠ (⊤ : Subgroup E) := by
+    intro htop
+    have hWUtop : W ⊔ U.1 = (⊤ : Subgroup E) := by
+      simpa [sup_comm] using htop
+    have hBU : B.1 = U.1 := by
+      have hmod : B.1 ⊓ (W ⊔ U.1) = U.1 := by
+        rw [← inf_sup_assoc_of_le W hUB'.le, hBWbot, bot_sup_eq]
+      rwa [hWUtop, inf_top_eq] at hmod
+    exact hUB'.ne hBU.symm
+  have hVWtop : V ⊔ W ≠ (⊤ : Subgroup E) := by
+    intro htop
+    have hWVtop : W ⊔ V = (⊤ : Subgroup E) := by
+      simpa [sup_comm] using htop
+    have hBV : B.1 = V := by
+      have hmod : B.1 ⊓ (W ⊔ V) = V := by
+        rw [← inf_sup_assoc_of_le W hVleB, hBWbot, bot_sup_eq]
+      rwa [hWVtop, inf_top_eq] at hmod
+    exact hVB.ne hBV.symm
   refine ⟨U.1, V, W, U.2.2, hVinv, hWinv,
     hUbot'.ne', ?_, hVbot, hVtop, hWbot, hWtop,
-    hUVbot, ?_, ?_⟩
+    hUVbot, hUWbot, hVWbot, hUVtop, hUWtop, hVWtop, ?_, ?_⟩
   · exact hUtop'.ne
   · simpa [hUVB] using hBWbot
   · simpa [hUVB] using hBWtop
@@ -213,7 +250,9 @@ theorem exists_three_invariant_quotient_summands_of_xiLengthFour_exponent_two
           (IsAInvariant.of_characteristic Y.subtype :
             IsAInvariant Y.subtype (frattini P)).quotientMulAutHom W ∧
         U ≠ ⊥ ∧ U ≠ ⊤ ∧ V ≠ ⊥ ∧ V ≠ ⊤ ∧
-        W ≠ ⊥ ∧ W ≠ ⊤ ∧ U ⊓ V = ⊥ ∧
+        W ≠ ⊥ ∧ W ≠ ⊤ ∧
+        U ⊓ V = ⊥ ∧ U ⊓ W = ⊥ ∧ V ⊓ W = ⊥ ∧
+        U ⊔ V ≠ ⊤ ∧ U ⊔ W ≠ ⊤ ∧ V ⊔ W ≠ ⊤ ∧
           (U ⊔ V) ⊓ W = ⊥ ∧ U ⊔ V ⊔ W = ⊤ := by
   letI : Nontrivial P := by
     obtain ⟨x, y, _, _, hxy⟩ := hmulti

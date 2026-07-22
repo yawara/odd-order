@@ -49,6 +49,11 @@ theorem frattiniPreimages_of_three_complementary_quotient_summands
     (hVbot : V ≠ ⊥) (hVtop : V ≠ ⊤)
     (hWbot : W ≠ ⊥) (hWtop : W ≠ ⊤)
     (hUVbot : U ⊓ V = ⊥)
+    (hUWbot : U ⊓ W = ⊥)
+    (hVWbot : V ⊓ W = ⊥)
+    (hUVtop : U ⊔ V ≠ ⊤)
+    (hUWtop : U ⊔ W ≠ ⊤)
+    (hVWtop : V ⊔ W ≠ ⊤)
     (hUVWbot : (U ⊔ V) ⊓ W = ⊥)
     (hUVWtop : U ⊔ V ⊔ W = ⊤) :
     ∃ X Z T : Subgroup P,
@@ -60,6 +65,9 @@ theorem frattiniPreimages_of_three_complementary_quotient_summands
         frattini P < T ∧ T < ⊤ ∧
         X ≠ ⊥ ∧ Z ≠ ⊥ ∧ T ≠ ⊥ ∧
         X ⊓ Z = frattini P ∧
+        X ⊓ T = frattini P ∧
+        Z ⊓ T = frattini P ∧
+        X ⊔ Z < ⊤ ∧ X ⊔ T < ⊤ ∧ Z ⊔ T < ⊤ ∧
           (X ⊔ Z) ⊓ T = frattini P ∧
             X ⊔ Z ⊔ T = ⊤ := by
   let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
@@ -111,9 +119,47 @@ theorem frattiniPreimages_of_three_complementary_quotient_summands
       _ = (⊥ : Subgroup (P ⧸ frattini P)).comap q := by
         rw [hUVbot]
       _ = frattini P := by simp [q, QuotientGroup.ker_mk']
+  have hXTinf : X ⊓ T = frattini P := by
+    calc
+      X ⊓ T = (U ⊓ W).comap q := by
+        exact (Subgroup.comap_inf U W q).symm
+      _ = (⊥ : Subgroup (P ⧸ frattini P)).comap q := by
+        rw [hUWbot]
+      _ = frattini P := by simp [q, QuotientGroup.ker_mk']
+  have hZTinf : Z ⊓ T = frattini P := by
+    calc
+      Z ⊓ T = (V ⊓ W).comap q := by
+        exact (Subgroup.comap_inf V W q).symm
+      _ = (⊥ : Subgroup (P ⧸ frattini P)).comap q := by
+        rw [hVWbot]
+      _ = frattini P := by simp [q, QuotientGroup.ker_mk']
   have hXZsup : X ⊔ Z = (U ⊔ V).comap q :=
     Subgroup.comap_sup_eq (f := q) U V
       (QuotientGroup.mk'_surjective (frattini P))
+  have hXTsup : X ⊔ T = (U ⊔ W).comap q :=
+    Subgroup.comap_sup_eq (f := q) U W
+      (QuotientGroup.mk'_surjective (frattini P))
+  have hZTsup : Z ⊔ T = (V ⊔ W).comap q :=
+    Subgroup.comap_sup_eq (f := q) V W
+      (QuotientGroup.mk'_surjective (frattini P))
+  have hXZtop : X ⊔ Z < (⊤ : Subgroup P) := by
+    rw [hXZsup]
+    have h := (Subgroup.comap_lt_comap_of_surjective
+      (QuotientGroup.mk'_surjective (frattini P))).2
+        (lt_top_iff_ne_top.mpr hUVtop)
+    simpa [q] using h
+  have hXTtop : X ⊔ T < (⊤ : Subgroup P) := by
+    rw [hXTsup]
+    have h := (Subgroup.comap_lt_comap_of_surjective
+      (QuotientGroup.mk'_surjective (frattini P))).2
+        (lt_top_iff_ne_top.mpr hUWtop)
+    simpa [q] using h
+  have hZTtop : Z ⊔ T < (⊤ : Subgroup P) := by
+    rw [hZTsup]
+    have h := (Subgroup.comap_lt_comap_of_surjective
+      (QuotientGroup.mk'_surjective (frattini P))).2
+        (lt_top_iff_ne_top.mpr hVWtop)
+    simpa [q] using h
   have hXZ_Tinf : (X ⊔ Z) ⊓ T = frattini P := by
     calc
       (X ⊔ Z) ⊓ T = ((U ⊔ V) ⊓ W).comap q := by
@@ -136,7 +182,8 @@ theorem frattiniPreimages_of_three_complementary_quotient_summands
     ne_of_gt (lt_of_le_of_lt bot_le hPhiX),
     ne_of_gt (lt_of_le_of_lt bot_le hPhiZ),
     ne_of_gt (lt_of_le_of_lt bot_le hPhiT),
-    hXZinf, hXZ_Tinf, hXZ_Tsup⟩
+    hXZinf, hXTinf, hZTinf, hXZtop, hXTtop, hZTtop,
+    hXZ_Tinf, hXZ_Tsup⟩
 
 /-- **Higman Lemma 13 (p. 92), exponent-four Frattini preimages.**
 
@@ -207,19 +254,25 @@ theorem exists_three_invariant_frattini_preimages_of_xiLengthFour_exponent_two
         frattini P < T ∧ T < ⊤ ∧
         X ≠ ⊥ ∧ Z ≠ ⊥ ∧ T ≠ ⊥ ∧
         X ⊓ Z = frattini P ∧
+        X ⊓ T = frattini P ∧
+        Z ⊓ T = frattini P ∧
+        X ⊔ Z < ⊤ ∧ X ⊔ T < ⊤ ∧ Z ⊔ T < ⊤ ∧
           (X ⊔ Z) ⊓ T = frattini P ∧
             X ⊔ Z ⊔ T = ⊤ := by
   obtain ⟨U, V, W, hUinv, hVinv, hWinv,
       hUbot, hUtop, hVbot, hVtop, hWbot, hWtop,
-      hUVbot, hUVWbot, hUVWtop⟩ :=
+      hUVbot, hUWbot, hVWbot, hUVtop, hUWtop, hVWtop,
+      hUVWbot, hUVWtop⟩ :=
     exists_three_invariant_quotient_summands_of_xiLengthFour_exponent_two
       hP hncomm hmulti hxi hlen hprime htwo
   obtain ⟨X, Z, T, hXinv, hZinv, hTinv,
       hPhiX, hXtop, hPhiZ, hZtop, hPhiT, hTtop,
-      hXbot, hZbot, hTbot, hXZinf, hXZ_Tinf, hXZ_Tsup⟩ :=
+      hXbot, hZbot, hTbot, hXZinf, hXTinf, hZTinf,
+      hXZtop, hXTtop, hZTtop, hXZ_Tinf, hXZ_Tsup⟩ :=
     frattiniPreimages_of_three_complementary_quotient_summands
       hUinv hVinv hWinv hUbot hUtop hVbot hVtop hWbot hWtop
-      hUVbot hUVWbot hUVWtop
+      hUVbot hUWbot hVWbot hUVtop hUWtop hVWtop
+      hUVWbot hUVWtop
   have hXnormal : X.Normal :=
     Subgroup.Normal.of_commutator_le P
       ((OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP).trans
@@ -234,6 +287,7 @@ theorem exists_three_invariant_frattini_preimages_of_xiLengthFour_exponent_two
         hPhiT.le)
   exact ⟨X, Z, T, hXnormal, hXinv, hZnormal, hZinv,
     hTnormal, hTinv, hPhiX, hXtop, hPhiZ, hZtop, hPhiT, hTtop,
-    hXbot, hZbot, hTbot, hXZinf, hXZ_Tinf, hXZ_Tsup⟩
+    hXbot, hZbot, hTbot, hXZinf, hXTinf, hZTinf,
+    hXZtop, hXTtop, hZTtop, hXZ_Tinf, hXZ_Tsup⟩
 
 end OddOrder.Higman.Suzuki2Groups
