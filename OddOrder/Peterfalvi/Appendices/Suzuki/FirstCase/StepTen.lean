@@ -491,6 +491,52 @@ theorem factorization_card_G_eq_of_not_p_dvd_card_centralizer_W
     Nat.factorization_eq_zero_of_not_dvd
       (fc.not_p_dvd_card_W_of_not_p_dvd_card_centralizer_W hpSig), add_zero]
 
+/-- **Peterfalvi Part II, Ch. II, step (10.2) numeric core** (p. 111): if `p ∣ |Σ|`
+then `p = 3`, `|Σ| = 3`, `F ≅ F_{9,2}` (`|F| = 9`, non-commutative) and `|C_Q(P)| = 8`.
+
+By (6) (`Q₁ = 1` from `Q1_eq_bot_of_p_dvd_card_centralizer_W`) a commutative `F` forces
+`|Σ| = 1`, contradicting `p ∣ |Σ|`; so `F` is non-commutative and `|Σ| ∈ {1, 3}`, whence
+`|Σ| = 3` and `p = 3`.  By (5), non-commutative `F` has `|F| = 9`, `|C_Q(P)| = 8`.
+Inherits the step (2)(b) `sorry` (issue 9318) + Higman through the model. -/
+theorem card_field_eq_nine_of_p_dvd_card_centralizer_W
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hpSig : fc.p ∣
+      Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :
+    fc.p = 3 ∧ Nat.card F = 9 ∧
+      Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) = 8 ∧
+      Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) = 3 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  have hQ1 : fc.toHypothesis.Q1 = ⊥ :=
+    fc.Q1_eq_bot_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  obtain ⟨e⟩ := fc.sigma_mulEquiv_centralizer_W ind
+  have hSigCard : Nat.card ↥fc.rankOneQuotient.D =
+      Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) :=
+    Nat.card_congr e.toEquiv
+  obtain ⟨hcomm_case, hncomm_case⟩ := fc.card_field_and_D_of_Q1_eq_bot model hQ1
+  -- `F` is non-commutative: a commutative `F` gives `|Σ| = 1`, contradicting `p ∣ |Σ|`
+  have hncomm : ¬ ∀ x y : F, x * y = y * x := by
+    intro hcomm
+    have hSig1 : Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) = 1 := by
+      rw [← hSigCard]; exact (hcomm_case hcomm).2
+    rw [hSig1] at hpSig
+    exact fc.p_prime.one_lt.ne' (Nat.dvd_one.mp hpSig)
+  -- `|Σ| = 3`
+  have hSig3 : Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) = 3 := by
+    rcases hncomm_case hncomm with h1 | h3
+    · rw [hSigCard] at h1; rw [h1] at hpSig
+      exact absurd (Nat.dvd_one.mp hpSig) fc.p_prime.one_lt.ne'
+    · rw [← hSigCard]; exact h3
+  have hp3 : fc.p = 3 :=
+    (Nat.prime_dvd_prime_iff_eq fc.p_prime (by norm_num)).mp (hSig3 ▸ hpSig)
+  -- `|F| = 9`, `|C_Q(P)| = 8` (step (5), non-commutative case)
+  rcases fc.card_nearField_eq_nine_and_Q1_eq_bot model with hcomm | ⟨hF9, hCQ8, _⟩
+  · exact absurd hcomm hncomm
+  · exact ⟨hp3, hF9, hCQ8, hSig3⟩
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
