@@ -122,9 +122,26 @@ hub が修正案を裁定 → 構造 (lane c) + consumer (lane b) を coherent �
 **cross-lane coordination (同一 hub tick で land 必須)**:
 - **lane c** (NearFields.lean owner): `AffineNearFieldModel.qEquiv_conj` の RHS を `qEquiv q → qEquiv q⁻¹`
   に変更 + `mulEquivUnits` で qEquiv 系フィールドを埋め `rankOne_affine_nearField` の当該部を前進。
-- **lane b** (Suzuki/FirstCase owner): `StepEight.lean` `model_qEquiv_conj` (行 104/114/133) + `StepFive.lean`
-  (689-729) の `model.qEquiv_conj`/`model.qEquiv` 消費を新 RHS (`qEquiv q⁻¹`) に合わせ `q↔q⁻¹` 調整。
-- ⚠ 片方だけ合流すると StepEight/StepFive build 破綻ゆえ、**hub は c と b の patch を同一 tick で `--no-ff`
-  合流 + 合成フルビルド検証**してから push。b/c は各自 patch 完了を issue 9406 か notes で hub に知らせる。
+- **lane b** (Suzuki/FirstCase owner): `StepEight.lean` `model_qEquiv_conj` の
+  `model.qEquiv_conj` 消費を新 RHS (`qEquiv q⁻¹`) に合わせ `q↔q⁻¹` 調整。
+  `StepFive.lean:689-729` は実装監査で signature 非依存と確定したため code patch 不要。
+- ⚠ c だけ合流すると StepEight build 破綻ゆえ、**hub は c と b の patch を同一 tick で `--no-ff` 合流し、
+  合成フルビルド検証**してから push。b/c は各自 patch 完了を issue 9406 か notes で hub に知らせる。
 
 status: open (両 patch 合流で close)。
+
+## ✅ lane b consumer READY (2026-07-23, commit `5be71e802`)
+
+`StepEight.model_qEquiv_conj` の theorem statement を保ったまま、新しい
+`qEquiv_conj` RHS (`qEquiv q⁻¹`) に consumer を追随させた。証明は共役鎖を `q⁻¹` と
+`(g q g⁻¹)⁻¹` に対して実行し、RHS の二重逆元を消して従来の equivariance を回収する。
+
+検証: lane c の新 signature を一時 overlay した上で
+`lake build OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight` 成功 (4483 jobs)、
+`bin/check-warnings OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight` ratchet OK。
+
+**StepFive 影響の訂正**: `StepFive.lean:689-729` は `qEquiv : Q ≃* Fˣ` の準同型性・
+単射性・全射性のみを使い、`qEquiv_conj` は参照しない。fix (A) で `qEquiv` の型は不変なので
+StepFive の code patch は不要。実コードの直接 consumer は StepEight の 2 呼び出しだけだった。
+
+lane b patch は READY。hub は lane c の `e8bb049db` 系 patch と同一 tick で合流可能。
