@@ -43,3 +43,11 @@ docstring のコマンドが実文言にマッチし、実測の照合結果が 
 - iut 側の記録: `/home/ywr/iut/notes/meta/lean_formalization_tips.md` §3、
   `/home/ywr/iut/bin/check-warnings` (引用符非依存パターンの実装例)
 - 関連: issue 0138 (ゼロ警告 gate — 同じ warning フィルタを使う)
+
+---
+
+## ✅ Close (2026-07-22 hub)
+
+- docstring の照合コマンドを引用符非依存 `grep -c "declaration uses .sorry."` に修正 (bin/count-sorry:14)。
+- 実測照合: 本日 11:5x full build gate (4627 jobs, gate_final.log) で
+  `uses .sorry.` 警告 = **7** / `bin/count-sorry` = **7** — 完全一致 (乖離なし)。

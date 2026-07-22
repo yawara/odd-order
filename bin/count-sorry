@@ -11,7 +11,7 @@ identifiers). Docstrings may freely say whatever they want — the count is not
 fooled, so there is no need to police the word "sorry" in comments.
 
 Ground truth for the absolute number is the Lean elaborator warning
-    lake build OddOrder 2>&1 | grep -c "declaration uses 'sorry'"
+    lake build OddOrder 2>&1 | grep -c "declaration uses .sorry."   # 引用符非依存 (v4.32 実文言はバッククォート; issue 0137)
 (per DECLARATION; needs a full non-incremental build). This script is the fast
 proxy (per TOKEN; a decl with N sorries counts N).
 

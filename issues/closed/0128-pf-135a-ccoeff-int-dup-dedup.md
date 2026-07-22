@@ -77,3 +77,11 @@ lane a が main を取り込み、(13.8) 後続作業が重複なしで進行し
 - 関連: issues/0127 (① 重複 2 件、同型パターン)、issues/closed/9161
 - 修復 commit: 本 issue と同時にマージされる hub commit を参照
 - gate ログ: dup 衝突 → 逆方向 dedup の type mismatch → 正方向で green の 3 回の build 実測
+
+---
+
+## ✅ Close (2026-07-22 hub)
+
+hub dedup + 機械修復は 2026-07-19 に完了済み。残条件だった「lane a の main sync」は
+以後の多数の `Merge branch 'main' into a` (最新 2026-07-22 cc9a50d2f) で満たされ、
+再発なし。再発防止メモは本文に保存済み — 完了。

@@ -91,3 +91,17 @@ S7B2_NormalJ_PComplement (1879)・FrobeniusActionTI (1873)・AppC_FrobeniusClass
 
 - CLAUDE.md「開発規約 > ファイル粒度」/ `notes/meta/merge_monitor.md` (hub gate)
 - issue 0103 (機械分割の道具立て: preamble 再現・private public 化・sorry/宣言/namespace 文脈保存検証)
+
+---
+
+## 📏 2026-07-22 hub 実測更新 (>1500 行の現況と実施計画)
+
+| file | 行数 | 状態 |
+|---|---|---|
+| FeitSibleyTheorem.lean | 1882 | issue 0141 — **1054 close 後に分割** (a active、裁定済) |
+| S01_Solvable.lean (BG Ch1) | 1619 | BG 凍結領域 — quiet window で hub prefix-split 可 |
+| CNGroupStructure.lean | 1585 | issue 0129 — CN クラスタ凍結済 (9133 close)、quiet window で分割可 |
+| StepThree.lean (Suzuki FirstCase) | 1350 | watch (b active、1500 未満) |
+| FeitSibleyEndgame.lean | 1444 | watch (a active、0141 裁定に含む) |
+
+実施順 (quiet window): 0129 CNGroupStructure → S01_Solvable → (1054 close 後) 0141 一式。

@@ -74,3 +74,9 @@ singleton 特殊化 (`isPiSubgroup_of_isPGroup_of_mem hH rfl` で得られる)�
 着手前の grep が singleton 形を拾えていなかった (検索語が `_of_mem` 寄りだった)。
 
 - [ ] (2) を (1) の系に置換するか、単に (1) へ寄せて削除する。
+
+---
+
+## 🧭 HUB RULING (2026-07-22): 9159 と統合実施 (owner = hub)
+
+9159 の HUB RULING を参照 — 両 dedup は hub が quiet window で 1 コミット同時実施。

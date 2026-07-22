@@ -204,3 +204,13 @@ ScheduleWakeup を呼ばず turn 終了」。CLAUDE.md の「/loop self-pacing 6
 効いていない。恒久対策候補 (次に手が空いた hub or user が判断): 各レーンの /loop 復帰を
 より確実にする仕組み (再開プロンプトの定型化 / wakeup 忘れ検出時の自動 nudge)。
 現状 hub は独立セッションへ介入できないので report のみ。
+
+---
+
+## 🧭 HUB RULING (2026-07-22): pending へ移動 — hub 側の対策は実装済み、恒久対策はユーザー判断待ち
+
+- hub でできる検出はすべて運用に定着済み: 毎 tick の 3 点生存確認 (transcript mtime /
+  直近 commit / worktree cwd プロセス、merge_monitor.md 手順 (7))。停止検出時は報告
+  (unsupervised レーンへの介入は不可能)。
+- 残る恒久対策 (再開プロンプト定型化 / wakeup 忘れの自動 nudge = harness/運用側の変更) は
+  **ユーザー判断待ち** → pending へ。stall 再発時は本 issue に事例を追記する。
