@@ -113,6 +113,67 @@ theorem inner_zsmul_irreducible_eq (ε ε' : ℤ) (ξ ξ' : IrreducibleCharacter
     irreducibleCharacter_inner_eq_ite]
   ring
 
+/-- **Residual orthogonality** (Peterfalvi (6), p. 148): subtracting the Fourier
+components of `u` along a finite orthonormal family `w` leaves a residual
+orthogonal to every member: `(u − ∑ⱼ (u,wⱼ)·wⱼ, wₖ) = 0`.  Upstream candidate
+for `ZIrrFourier.lean`. -/
+theorem inner_sub_sum_inner_smul_eq_zero {ι : Type*} {s : Finset ι}
+    {w : ι → ClassFunction Γ ℂ}
+    (horth : ∀ i ∈ s, ∀ j ∈ s, i ≠ j → ClassFunction.inner (w i) (w j) = 0)
+    (hnorm : ∀ j ∈ s, ClassFunction.inner (w j) (w j) = 1)
+    (u : ClassFunction Γ ℂ) {k : ι} (hk : k ∈ s) :
+    ClassFunction.inner (u - ∑ j ∈ s, ClassFunction.inner u (w j) • w j) (w k) = 0 := by
+  rw [ClassFunction.inner_sub_left, inner_sum_left s _ _,
+    Finset.sum_eq_single k
+      (fun j hj hne => by
+        rw [ClassFunction.inner_smul_left, horth j hj k hk hne, mul_zero])
+      (fun h => absurd hk h),
+    ClassFunction.inner_smul_left, hnorm k hk, mul_one, sub_self]
+
+/-- **Bessel decomposition of the norm** (Peterfalvi (6), p. 148): for a finite
+orthonormal family `w` and any `u`,
+`(u, u) = (v, v) + ∑ⱼ (u,wⱼ)·star (u,wⱼ)` where `v = u − ∑ⱼ (u,wⱼ)·wⱼ` is the
+residual.  Upstream candidate for `ZIrrFourier.lean`. -/
+theorem inner_self_eq_residual_add_sum_inner_mul_star {ι : Type*} {s : Finset ι}
+    {w : ι → ClassFunction Γ ℂ}
+    (horth : ∀ i ∈ s, ∀ j ∈ s, i ≠ j → ClassFunction.inner (w i) (w j) = 0)
+    (hnorm : ∀ j ∈ s, ClassFunction.inner (w j) (w j) = 1)
+    (u : ClassFunction Γ ℂ) :
+    ClassFunction.inner u u =
+      ClassFunction.inner (u - ∑ j ∈ s, ClassFunction.inner u (w j) • w j)
+        (u - ∑ j ∈ s, ClassFunction.inner u (w j) • w j)
+      + ∑ j ∈ s, ClassFunction.inner u (w j) * star (ClassFunction.inner u (w j)) := by
+  set S : ClassFunction Γ ℂ := ∑ j ∈ s, ClassFunction.inner u (w j) • w j with hS
+  set v : ClassFunction Γ ℂ := u - S with hv
+  -- the residual is orthogonal to the projection, on both sides
+  have hvw : ∀ k ∈ s, ClassFunction.inner v (w k) = 0 := fun k hk =>
+    inner_sub_sum_inner_smul_eq_zero horth hnorm u hk
+  have hvS : ClassFunction.inner v S = 0 := by
+    rw [hS, inner_sum_right]
+    refine Finset.sum_eq_zero fun j hj => ?_
+    rw [ClassFunction.inner_smul_right, hvw j hj, mul_zero]
+  have hSv : ClassFunction.inner S v = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hvS, star_zero]
+  -- the projection's self-pairing is the diagonal sum
+  have hSS : ClassFunction.inner S S = ∑ j ∈ s, ClassFunction.inner u (w j) *
+      star (ClassFunction.inner u (w j)) := by
+    rw [hS, inner_sum_left]
+    refine Finset.sum_congr rfl fun j hj => ?_
+    rw [ClassFunction.inner_smul_left, inner_sum_right,
+      Finset.sum_eq_single j
+        (fun k hk hne => by
+          rw [ClassFunction.inner_smul_right, horth j hj k hk (Ne.symm hne), mul_zero])
+        (fun h => absurd hj h),
+      ClassFunction.inner_smul_right, hnorm j hj]
+    ring
+  have hu : u = v + S := by rw [hv]; abel
+  calc ClassFunction.inner u u = ClassFunction.inner (v + S) (v + S) := by rw [← hu]
+    _ = ClassFunction.inner v v + ClassFunction.inner v S +
+        (ClassFunction.inner S v + ClassFunction.inner S S) := by
+        rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+          ClassFunction.inner_add_right]
+    _ = _ := by rw [hvS, hSv, hSS, add_zero, zero_add]
+
 end SignedIrr
 
 /-! ## The endgame central subgroup `Z = ⁅Q₁, Q₁⁆ ⊓ Z(Q₁)` (Peterfalvi (4), p. 147)

@@ -431,10 +431,18 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
       ((τδ,τδ) = 1+a²、δ = χ−a•η₁ A-supported、coherence 不要) +
       `tau_scaled_diff_inner_extension_diff` ((τδ, e′ⱼ−e′₁) = a、j>1)。
       どちらも tau_inner_eq_of_supported_Sset 直用 + Sset_pairwiseOrthogonal。
-    - [ ] 次 = 直交分解 τδ = Σⱼ tⱼe′ⱼ + v ((v,e′ⱼ)=0)。𝒴 の Finset 化 +
-      e′ⱼ 正規直交 (extension_inner_eq) + tⱼ ∈ ℤ (mem_ZIrr_inner_int) +
-      (v,v) ≥ 0 (mem_ZIrr_inner_self_eq_sum_sq)。NormInequalities の
-      CharacterPsiDecomposition (D.X/D.Y/tau1_image, :400-470) が流用候補 — 要偵察。
+    - [x] **Bessel 分解 2 本** (2026-07-22, sorry-free, generic Γ):
+      `inner_sub_sum_inner_smul_eq_zero` (残差 ⊥ wₖ) +
+      `inner_self_eq_residual_add_sum_inner_mul_star` ((u,u) = (v,v) + Σtⱼ·star tⱼ、
+      有限正規直交族)。ZIrrFourier upstream 候補。⚠ inner_sum_left/right・
+      inner_conj_symm は OddOrder.RepresentationTheory 直下 (ClassFunction. でない、
+      mathlib _root_.inner_conj_symm と ambiguity → full path)。
+      CharacterPsiDecomposition は (5.4) 特化形で流用不可と確認。
+    - [ ] 次 = (6) norm identity λ 形: u := τδ, s := 𝒴.toFinset, w := E′ に適用 →
+      tⱼ 共通値 λ (6a 転送) + t₁ = λ−a + tⱼ ∈ ℤ (mem_ZIrr_inner_int + witness) +
+      (v,v) = nvv ∈ ℤ≥0 (v ∈ ZIrr via tau_mem_ZIrr + Int.cast_smul_eq_zsmul、
+      mem_ZIrr_inner_self_eq_sum_sq) → 1+a² = nvv + (λ−a)² + (m−1)λ²
+      (m = Y.ncard、Sset_finite ⟹ Y 有限)。
   - [ ] **(7)** class-algebra 合同 (独立、並行可): ψ constant on Z^# ⟹
     ψ(z)≡ψ(1) mod|Q|。ω central character (ω(Kₛ)=ψ(Kₛ)/ψ(1)) の代数的整数性 +
     構造定数 aᵢⱼₛ + Q f.p.f. 作用の counting。**前提の repo 内所在確認要**
