@@ -251,6 +251,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
+import OddOrder.Peterfalvi.Appendices.ExceptionalNearField
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
@@ -12112,3 +12113,21 @@ deliberately NOT asserted here.) -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.NearFields.twMul_central_iff
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.NearFields.cyclic_index_two_nearField_classification
+
+/-! **Peterfalvi Appendix C, the exceptional near-field `F_{r²,2}` — concrete instantiation**
+(`Peterfalvi.Appendices.ExceptionalNearField`, 2026-07-22).  `TwistData` の抽象構成
+(`NearFields.lean`) を book の実データで実体化: `K` を位数 `p^{2n}` の有限体として
+
+* `squareSignChar` — 平方指標の `Kˣ →* Multiplicative (ZMod 2)` 形 (乗法性 =
+  `quadraticChar` の乗法性; char `2` でも退化的に成立するので仮定なし)。
+* `exceptionalTwistData` — `σ = halfFrobenius (x ↦ x^{pⁿ})`, `χ = squareSignChar` の
+  `TwistData K`。near-field `F_{r²,2}` は `Twisted (exceptionalTwistData …)` (generic
+  instance)。
+* `exceptionalTwistData_twMul_of_isSquare` / `…_of_not_isSquare` — book p. 138 の乗法
+  `x ∘ y = x·y` (`y` 平方) / `x^{pⁿ}·y` (非平方) との一致。 -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.NearFields.squareSignChar
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.NearFields.exceptionalTwistData
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exceptionalTwistData_twMul_of_isSquare
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exceptionalTwistData_twMul_of_not_isSquare
