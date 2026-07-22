@@ -588,6 +588,110 @@ theorem thetaStar_mem_ZIrr [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.card G 
   rw [thetaStar]
   exact ClassFunction.induce_mem_ZIrr _ Q.theta_mem_ZIrr
 
+/-- **Gorenstein Lemma 1.5 (decomposition)**: `θ* = 1_G + χ₁ − χ` for two distinct
+non-principal irreducible characters `χ₁, χ` with `χ(1) = χ₁(1) + 1`.
+
+`ρ = θ* − 1_G` is a virtual character of squared norm `2` orthogonal to `1_G` with
+`ρ(1) = −1`; by the Fourier structure `ρ = ±χ₁ ± χ` for distinct irreducibles, both
+non-principal (`⟨ρ, 1_G⟩ = 0`), and the degree constraint `ρ(1) = −1` forces the signs to
+be `(+, −)` with `χ(1) = χ₁(1) + 1`. -/
+theorem thetaStar_decomposition [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    ∃ χ₁ χ : IrreducibleCharacter G, χ₁ ≠ χ ∧ χ₁ ≠ trivialIrreducibleCharacter G ∧
+      χ ≠ trivialIrreducibleCharacter G ∧
+      Q.thetaStar = trivialClassFunction G + (χ₁ : ClassFunction G ℂ)
+        - (χ : ClassFunction G ℂ) ∧
+      (χ : ClassFunction G ℂ) (1 : G) = (χ₁ : ClassFunction G ℂ) (1 : G) + 1 := by
+  classical
+  set ρ : ClassFunction G ℂ := Q.thetaStar - trivialClassFunction G with hρdef
+  have hρZ : ρ ∈ ZIrr G :=
+    sub_mem Q.thetaStar_mem_ZIrr trivialClassFunction_isIrreducible.mem_ZIrr
+  -- (ρ, ρ) = 2
+  have hρnorm : ClassFunction.inner ρ ρ = 2 := by
+    have h1G : ClassFunction.inner (trivialClassFunction G) (trivialClassFunction G) = 1 := by
+      rw [OddOrder.RepresentationTheory.irr_cf_inner trivialClassFunction_isIrreducible
+        trivialClassFunction_isIrreducible, if_pos rfl]
+    have hcross : ClassFunction.inner (trivialClassFunction G) Q.thetaStar = 1 := by
+      rw [ClassFunction.inner_star_comm, Q.thetaStar_inner_trivial, star_one]
+    rw [hρdef, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, Q.thetaStar_inner_self, Q.thetaStar_inner_trivial,
+      hcross, h1G]
+    ring
+  -- ρ(1) = -1
+  have hρ1 : ρ (1 : G) = -1 := by
+    rw [hρdef, ClassFunction.sub_apply, Q.thetaStar_apply_one, trivialClassFunction_apply]
+    ring
+  -- (ρ, 1_G) = 0
+  have hρtriv : ClassFunction.inner ρ (trivialClassFunction G) = 0 := by
+    rw [hρdef, ClassFunction.inner_sub_left, Q.thetaStar_inner_trivial,
+      OddOrder.RepresentationTheory.irr_cf_inner trivialClassFunction_isIrreducible
+        trivialClassFunction_isIrreducible, if_pos rfl, sub_self]
+  -- Fourier structure: ρ = c(α₀)·α₀ + c(β₀)·β₀
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hρZ
+  have hsumZ : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hρnorm
+  have hne : ∀ a ∈ c.support, c a ≠ 0 := fun a ha => Finsupp.mem_support_iff.mp ha
+  obtain ⟨α₀, β₀, hαβ, hs, hcα, hcβ⟩ := exists_pair_of_sum_sq_eq_two hne hsumZ
+  have hα₀ : α₀ ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  have hβ₀ : β₀ ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  rw [hs, Finset.sum_pair hαβ] at hrepr
+  obtain ⟨dα, hdα, hα1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ⟨α₀, hα₀⟩
+  obtain ⟨dβ, hdβ, hβ1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ⟨β₀, hβ₀⟩
+  simp only [IrreducibleCharacter.coe_mk] at hα1 hβ1
+  -- degree equation (in ℤ)
+  have hone'Z : c α₀ * (dα : ℤ) + c β₀ * (dβ : ℤ) = -1 := by
+    have h := hρ1
+    rw [hrepr] at h
+    simp only [ClassFunction.add_apply, ClassFunction.smul_apply, hα1, hβ1] at h
+    exact_mod_cast h
+  have hdα1 : 1 ≤ (dα : ℤ) := by exact_mod_cast hdα
+  have hdβ1 : 1 ≤ (dβ : ℤ) := by exact_mod_cast hdβ
+  -- non-principality of α₀, β₀ via `⟨ρ, ·⟩ = coeff`
+  have hinnα : ClassFunction.inner ρ α₀ = (c α₀ : ℂ) := by
+    rw [hrepr, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.irr_cf_inner hα₀ hα₀,
+      if_pos rfl, OddOrder.RepresentationTheory.irr_cf_inner hβ₀ hα₀,
+      if_neg (Ne.symm hαβ), mul_one, mul_zero, add_zero]
+  have hinnβ : ClassFunction.inner ρ β₀ = (c β₀ : ℂ) := by
+    rw [hrepr, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.irr_cf_inner hα₀ hβ₀,
+      if_neg hαβ, OddOrder.RepresentationTheory.irr_cf_inner hβ₀ hβ₀, if_pos rfl,
+      mul_zero, mul_one, zero_add]
+  have hαnt : α₀ ≠ trivialClassFunction G := by
+    intro h
+    have hc0 : (c α₀ : ℂ) = 0 := by rw [← hinnα, h]; exact hρtriv
+    rcases hcα with hh | hh <;> rw [hh] at hc0 <;> norm_num at hc0
+  have hβnt : β₀ ≠ trivialClassFunction G := by
+    intro h
+    have hc0 : (c β₀ : ℂ) = 0 := by rw [← hinnβ, h]; exact hρtriv
+    rcases hcβ with hh | hh <;> rw [hh] at hc0 <;> norm_num at hc0
+  -- `θ* = 1_G + ρ`
+  have hθρ : Q.thetaStar = trivialClassFunction G + ρ := by rw [hρdef]; abel
+  rcases hcα with hcα1 | hcα1 <;> rcases hcβ with hcβ1 | hcβ1
+  · -- (+1, +1): `dα + dβ = -1` impossible
+    exfalso; rw [hcα1, hcβ1] at hone'Z; omega
+  · -- (+1, −1): `θ* = 1 + α₀ − β₀`, `dβ = dα + 1`
+    refine ⟨⟨α₀, hα₀⟩, ⟨β₀, hβ₀⟩, fun h => hαβ (congrArg Subtype.val h),
+      fun h => hαnt (congrArg Subtype.val h), fun h => hβnt (congrArg Subtype.val h), ?_, ?_⟩
+    · rw [hθρ, hrepr, hcα1, hcβ1]
+      simp only [IrreducibleCharacter.coe_mk, Int.cast_one, Int.cast_neg, one_smul, neg_one_smul]
+      abel
+    · rw [IrreducibleCharacter.coe_mk, IrreducibleCharacter.coe_mk, hα1, hβ1]
+      rw [hcα1, hcβ1] at hone'Z
+      have : (dβ : ℤ) = dα + 1 := by omega
+      exact_mod_cast this
+  · -- (−1, +1): `θ* = 1 + β₀ − α₀`, `dα = dβ + 1`
+    refine ⟨⟨β₀, hβ₀⟩, ⟨α₀, hα₀⟩, fun h => hαβ (congrArg Subtype.val h).symm,
+      fun h => hβnt (congrArg Subtype.val h), fun h => hαnt (congrArg Subtype.val h), ?_, ?_⟩
+    · rw [hθρ, hrepr, hcα1, hcβ1]
+      simp only [IrreducibleCharacter.coe_mk, Int.cast_one, Int.cast_neg, one_smul, neg_one_smul]
+      abel
+    · rw [IrreducibleCharacter.coe_mk, IrreducibleCharacter.coe_mk, hα1, hβ1]
+      rw [hcα1, hcβ1] at hone'Z
+      have : (dα : ℤ) = dβ + 1 := by omega
+      exact_mod_cast this
+  · -- (−1, −1): `dα + dβ = 1` impossible (both ≥ 1)
+    exfalso; rw [hcα1, hcβ1] at hone'Z; omega
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory
