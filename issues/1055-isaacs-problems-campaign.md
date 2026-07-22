@@ -137,7 +137,16 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   \|N_G(P)\|=p(p-1)/2)。p-cycle の計数 (C(p+1,p)·(p-1)! 個、全て偶置換) が要で、mathlib の対称群
   cycle-type API 依存の特殊問題。
 
-- ⬜ **次: §1C の 1C.6/1C.8 → §1D–§1G**。1C.4/1C.5 は §1C 内後回し (上記)。
+**§1D** (`Ch01_Sylow/Problems.lean` section 1D、2026-07-23 着手):
+- ✅ 実証明 **1D.1** `not_dvd_index_of_sylow_normalizer_le` (`P∈Syl_p(H)`, `H◁G`, `N_G(P)⊆H` ⟹
+  `p∤|G:H|`)。Frattini 論法 (`Sylow.normalizer_sup_eq_top`) で `N_G(P)⊔H=⊤`、`N_G(P)≤H` から
+  `H=⊤`、`|G:H|=1`。
+- ⬜ **残り §1D**: 1D.2 (C_G(x)⊆H for order-p x ⟹ p∤both) / 1D.3 (Frobenius complement は Hall) /
+  1D.4/1D.5 (Frobenius complement 判定) / **1D.6** (冪零群で極大⟺素数指数) / 1D.7 (Frattini=非生成元) /
+  1D.8 (G/Φ(G) elementary abelian) / 1D.9–1D.17 (Φ・冪零系; mathlib `Group.nilpotent`・`frattini` 支援厚)。
+  多くは mathlib の nilpotent/Frattini API で直接的。文書順で進める。
+
+- ⬜ **次: §1D 続き (1D.2–) → §1E–§1G**。1C.4/1C.5 は §1C 内後回し (上記)。
 
 ## 完了条件
 

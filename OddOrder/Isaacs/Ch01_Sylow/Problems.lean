@@ -1360,4 +1360,21 @@ theorem card_subgroup_card_eq_modEq {p : ℕ} [Fact p.Prime] {G : Type*} [Group 
 
 end
 
+section /- Problems 1D: Frobenius complements, Frattini, nilpotency (pp. 19-28) -/
+
+/-- **Isaacs Problem 1D.1**. `P` を `H ⊴ G` の Sylow `p`-部分群とし、`N_G(P) ⊆ H` とする。
+このとき `p ∤ |G : H|`。
+
+Frattini 論法 (`Sylow.normalizer_sup_eq_top`) で `N_G(P) ⊔ H = ⊤`。仮定 `N_G(P) ≤ H` から
+`N_G(P) ⊔ H = H`、ゆえ `H = ⊤`、`|G : H| = 1` で `p ∤ 1`。 -/
+theorem not_dvd_index_of_sylow_normalizer_le {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    [Finite G] {H : Subgroup G} [H.Normal] (P : Sylow p ↥H)
+    (hle : Subgroup.normalizer (P.map H.subtype) ≤ H) : ¬ p ∣ H.index := by
+  have hfrat : Subgroup.normalizer (P.map H.subtype) ⊔ H = ⊤ := Sylow.normalizer_sup_eq_top P
+  have hHtop : H = ⊤ := top_le_iff.mp (hfrat ▸ sup_le hle le_rfl)
+  rw [hHtop, Subgroup.index_top]
+  exact fun h => absurd (Nat.dvd_one.mp h) (Fact.out : p.Prime).ne_one
+
+end
+
 end OddOrder.Isaacs.Ch01
