@@ -6,6 +6,23 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-22 17:07 監視 tick (Opus 4.8 hub, cron `7,22,37,52`)**。a=0 (37 分無 commit —
+> 1054 step (4) master assembly 進行中とみて継続監視、stall 未確定) / b=2 / c=3。合流: b (2053 step (8)
+> σ_w RingEquiv packaging + model equivariance qEquiv intertwines D-conj & dAut / StepEight・AxiomsCheck) /
+> c (9318 BS **Lem 1.9 完成** 非線形 χ で全 involution ⊆ ker χ / BrauerSuzukiCounting・AxiomsCheck)。
+> 新 leaf 0・範囲逸脱なし。**gate: green 4637 jobs (不変) / AxiomsCheck OK (12443<12600) / sorry 8→8 /
+> 新 axiom なし / lint 220=220 差分なし / push 3f9721492→30b84f73f**。reconcile 0。frontier: a = 1054
+> step (4) master assembly / b = 2053 step (8) model 橋 / c = 9318 BS endgame (Lem 1.6-1.9 完・矛盾組立へ)。
+>
+> **▶▶ 2026-07-22 16:52 監視 tick (Opus 4.8 hub, cron `7,22,37,52`)**。a=0 (変化なし) / b=2 / c=3。
+> 合流: b (2053 step (8) fixed-field arithmetic heart |C_F(w)|∈{f,9} / StepEight・AxiomsCheck 追記) /
+> c (9318 BS Lem 1.8 完成 1+χ₁(u)²/χ₁(1)−χ(u)²/χ(1)=0 / BrauerSuzukiCounting・AxiomsCheck 追記)。
+> 新 leaf 0。step 1.5 clean (b は 3-dot で確認 — b が main 未取込ゆえ 2-dot は a/c 差分を誤検出、
+> 3-dot main...b = AxiomsCheck+StepEight のみで範囲内)。**gate: green 4637 jobs (新 leaf 0 で不変) /
+> AxiomsCheck OK (12428<12600) / sorry 8→8 非退行 / 新 axiom なし / lint 220=220 差分なし /
+> push 済 422480f3a→ad34b8379**。reconcile 0。レーン frontier: a = 1054 step (4) master assembly /
+> b = 2053 step (8) model 橋 / c = 9318 BS Lem 1.9 + endgame。
+>
 > **▶▶ 2026-07-22 16:4x 監視 tick (Opus 4.8 hub) — ユーザー「各レーンを監視します」で起動 (前 15:0x hub から継続)**。
 > 引き継ぎ時 main に未 push 3 (lean-eval 提出候補 issue 0050、main 直接作業)、3 レーンとも未マージ
 > work あり (a=12 / b=9 / c=16 commits、いずれも main 遅れ 0、直近 4–12 分で active commit)。合流:

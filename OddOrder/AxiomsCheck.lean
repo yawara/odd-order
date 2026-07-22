@@ -12414,6 +12414,8 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.GroupTheory.QuaternionSylowSetup.sum_degWeight_inner_eq_zero
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.lem_1_8_relation
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.lem_1_9
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 
 「AxiomsCheck 未登録だが `#print axioms` では clean」だった提出候補を機械ゲートに載せる
