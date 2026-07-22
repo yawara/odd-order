@@ -227,6 +227,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
@@ -12183,6 +12184,14 @@ Higman sorries through the model and are intentionally unregistered):
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.orderOf_st_eq_char
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.cQ_card_and_pGroup_of_trichotomy
+
+/-! **Peterfalvi Part II, Ch. II, step (8), per-`w` induction facts**
+(`FirstCase/StepEight.lean`, issue 2053, 2026-07-22): for a nonidentity
+`w ∈ C_W(P)`, applying §3 Prop 1(c) to `⟨w⟩` gives `f = |s·t| ∈ {3, 5}` and
+`C_Q(w)` a `2`-group.  Axiom-clean application of the trichotomy reading
+(`w` centralizes `Q₀`, so the four-subgroup of `Q₀` lies in `C_G(w)`). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.st_mem_and_cQ_isPGroup_of_mem_centralizer_W
 
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
