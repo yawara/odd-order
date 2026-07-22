@@ -6,6 +6,22 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-22 15:0x 監視再開 (Opus 4.8 hub) — ユーザー「各レーンを監視します」で起動**。
+> 引き継ぎ時 3 レーンとも未マージ work あり (a=29 / b=13 / c=15 commits、いずれも main に遅れ 0)。
+> 3 点生存確認で a/b/c とも live (transcript 15:0x / live pid 244410/307590/242396)。合流:
+> a (1054 Pf App.IV endgame step (8) — a∣λ 全組立 + 群仮説 discharge / 新 leaf FeitSibleyConclusion・
+> FeitSibleyUnionCoherence・HallTICongruence) / b (2053 Pf II Ch.II step (6) 体の場合 実証明 + F_{9,2}
+> gated / 新 leaf Suzuki/FirstCase/StepSix) / c (9318 Brauer–Suzuki Gorenstein Ch.12 Lem 1.3–1.5 完成 /
+> 新 leaf BrauerSuzukiCharacter・BrauerSuzukiTISubset)。全新 leaf は各 OddOrder.lean に配線済を確認。
+> **gate: フルビルド green 4633 jobs (前 4627+6) / orphan 0 (917/917) / AxiomsCheck OK /
+> sorry 7→8 (非退行 — +1 は新 gated leaf StepSix の F_{9,2}、証明済→sorry ではない) /
+> lint ratchet green (216 ≤ 218、b の lint cleanup で 2 組改善) / push 済 f25946458→97be9d073**。
+> hub reconcile 1 件: b の BS 追記で AxiomsCheck 12257 行 → longFile 12200→12400 に bump (commit 97be9d073)。
+> 監視 cron 再作成 = **Opus 15 分 `7,22,37,52` (id 0ea969d7)**。file-size watch: FeitSibleyTheorem 1882 /
+> S04g_Thm418 1963 が 2000 hard limit 接近 (0141 で FeitSibley 追跡済、1054 close まで繰延)。
+> レーン frontier: a = 1054 step (4) master assembly 残 / b = 2053 step (6) F_{9,2} gated 残 /
+> c = 9318 BS Lem 1.6 (involution 上 θ*=0)。
+>
 > **🏁 2026-07-22 11:5x Fable hub — rate limit 前の clean handoff 状態**。ユーザー指示で全レーン
 > 合流 + 裁定一括処理を実施済み。**状態: 全レーン未マージ 0 / 未 push 0 / gate green 4627 jobs /
 > AxiomsCheck OK / sorry 7 (scaffold 1 込み、regression なし) / orphan 0** (tip = 49892d075)。
