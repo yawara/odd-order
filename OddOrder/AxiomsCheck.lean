@@ -12238,6 +12238,35 @@ step (6) arithmetic lemma).  Model-independent, axiom-clean. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.cardFixedConj_eq_cardFixedM0
 
+/-! **Step (8), the per-`w` fixed-field order** (`FirstCase/StepEight.lean`, issue 2053,
+2026-07-22): for a nonidentity `w ∈ C_W(P)`, the `w`-fixed part of `M₀ = C_Q(P)` lies in the
+`2`-group `C_Q(w)`, so its cardinality is a power of `2`
+(`exists_card_fixedM0_eq_two_pow`, axiom-clean).  Chaining this through the equivariance transfer
+and the fixed-field arithmetic gives `|C_F(w)| ∈ {f, 9}` (`cardFixedField_char_or_nine`), which
+inherits the step (2)(b) `sorry` (issue 9318) and the Higman `sorry` (step (5)) through
+`comm_of_Q1_ne_bot`, so is intentionally not registered here. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.exists_card_fixedM0_eq_two_pow
+
+/-! **Step (8), finite-field automorphism infrastructure** (`FirstCase/StepEight.lean`,
+issue 2053, 2026-07-22): three general axiom-clean facts about a finite field `F`.
+Artin's degree theorem for a single automorphism `σ` — `|F| = |C_F(σ)|^{orderOf σ}`
+(`card_eq_card_fixedPoints_pow_orderOf`, via `FixedPoints.finrank_eq_card` for `⟨σ⟩`); the ring
+automorphism group `RingAut F` is cyclic (`isCyclic_ringAut_of_charP`, `RingAut F ↪ Gal(F/𝔽_q)`);
+and a cyclic group whose nonidentity elements all have the same order is of prime order
+(`card_prime_of_isCyclic_forall_ne_one_orderOf`, via `IsCyclic.card_orderOf_eq_totient`).
+
+Assembled into **step (8)** (`card_prime_and_card_field_of_Q1_ne_bot`): `Q₁ ≠ 1` and
+`ℓ = |Σ| ≠ 1` ⟹ `ℓ` prime and `|F| ∈ {3^ℓ, 5^ℓ, 9^ℓ}`.  That conclusion inherits the step (2)(b)
+`sorry` (issue 9318) and the Higman `sorry` (step (5)) through step (C), so is intentionally not
+registered here. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.card_eq_card_fixedPoints_pow_orderOf
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.isCyclic_ringAut_of_charP
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.card_prime_of_isCyclic_forall_ne_one_orderOf
+
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
 欠いていた).  Zassenhaus/Dickson 分類の App.C 特殊形: 有限 near-field `F` の乗法群が
