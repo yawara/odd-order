@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 07:5x 監視 tick — a (2A.2/2A.3b) + b (Higman L13 ambient 固有空間) 合流 / 🔴 c stall 継続 / ℹ d も 5h quiet (非 escalation)**。a=3 / b=1 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problems 2A.2** subnormal K + π-number index ⟹ O^π(G) ⊆ K + **2A.3b** subnormal K + coprime index ⟹ K ⊆ H (2A.1 経由)、`Ch02_Subnormality/Problems.lean` +57) / b (**Higman Lemma 13** restricted factor を ambient 固有空間化、新 leaf `RestrictedFactorAmbientEigenvectors.lean` +233 WIRED)。
+> **gate: green 4675 jobs (前 4674 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 045530eb0→570b3eb5b**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~4h50m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動 or 退役指示待ち。
+> ℹ **lane d も quiet (~5h, 但し escalation しない)**: d の最終 commit は 02:38 の lint wave (218→199)、以降 worktree 更新ゼロ (foo のみ)。ユーザー方針「d は lint-fix 専任・quiet でも escalation しない」ゆえ**報告のみ**。lint backlog は 199 で据え置き (次 wave 待ち)。⚠ もし c/d 両停止が長引くなら hub が lint cleanup wave を代行する選択肢あり (CLAUDE.md「hub の役割 = frozen×機械の cleanup wave」) — 現状は a/b が活発ゆえ保留。
+>
 > **▶▶ 2026-07-23 07:3x 監視 tick — a (2A.1 subnormal π⊆O_π) + b (Higman L13 B/B support) 合流 / 🔴 c stall 継続 (~4h30m)**。a=4 / b=1 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problem 2A.1** — subnormal π-subgroup ⊆ O_π(G) を char-motive 帰納で実証明、`Ch02_Subnormality/Problems.lean` +53; 2A.3(b) は 2A.1 経由で unblock) / b (**Higman Lemma 13** B/B middle support、新 leaf `FrattiniMiddleSupport.lean` +218 WIRED)。
 > **gate: green 4674 jobs (前 4673 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push fbe2307e5→b472fdfd6**。範囲逸脱なし。
