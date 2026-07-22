@@ -6,6 +6,17 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **🏁 2026-07-22 11:5x Fable hub — rate limit 前の clean handoff 状態**。ユーザー指示で全レーン
+> 合流 + 裁定一括処理を実施済み。**状態: 全レーン未マージ 0 / 未 push 0 / gate green 4627 jobs /
+> AxiomsCheck OK / sorry 7 (scaffold 1 込み、regression なし) / orphan 0** (tip = 49892d075)。
+> 裁定一括 (同 commit): close 0137/0135/0128、pending 0131/0140、ruling 0141 (FeitSibley 分割は
+> 1054 close まで繰延・2000 行緊急 trigger)・9164 (owner=b)・9130+9159 (hub quiet-window 統合実施)、
+> 0124 に >1500 現況表。**次期 hub への注意**: 本セッションの cron (30 分 `13,43`, id 9115c9eb) は
+> セッション死で消滅する — 再開時は CronCreate 再作成 (Fable=30 分 `13,43` / Opus=15 分 `7,22,37,52`)。
+> quiet-window 宿題 = 0129 CNGroupStructure 分割 → S01_Solvable 分割 → 0127① dedup → 9130+9159。
+> レーン frontier: a = 1054 step (6) 進行中 / b = 2053 step (5) 抽象核完了・fc assembly 設計済 /
+> c = 9318 BS Lem 1.2 完遂・次は Lem 1.3 (TI subset)。
+>
 > **🔁 2026-07-22 hub 裁定 (ユーザー裁可「b→c を進めて」): issue 9318 Brauer–Suzuki の claim owner を b → c に移管**。
 > 背景: 実 sorry 6 は全て Pf Appendices (FeitSibley 1 = a 進行中 / NearFields 1 = 9318 gated /
 > Suzuki2Groups 4 = b 残債)。BG closed で c の live frontier が空になっていた。b は 9318 未着手

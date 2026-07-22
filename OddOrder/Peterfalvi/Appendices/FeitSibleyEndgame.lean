@@ -174,6 +174,276 @@ theorem inner_self_eq_residual_add_sum_inner_mul_star {ι : Type*} {s : Finset �
           ClassFunction.inner_add_right]
     _ = _ := by rw [hvS, hSv, hSS, add_zero, zero_add]
 
+/-! ### Span-transport helpers for the (6) coherence assembly
+
+A `ℤ`-linear map that preserves the gram matrix (resp. `ℤ[Irr]`-valuedness) on the
+members of a set `T` does so on all of `ℤ[T]`; an orthonormal finite `T` gives
+integer Fourier coefficients and the reconstruction `φ = ∑_μ (φ,μ)·μ` on `ℤ[T]`.
+These extend the member-level facts of the witness assignments to the lattice. -/
+
+section SpanTransport
+
+variable {Δ : Type*} [Group Δ] [Fintype Δ] [Invertible (Nat.card Δ : ℂ)]
+
+/-- A `ℤ`-linear map preserving inner products on the members of `T` preserves
+them on all of `ℤ[T]`. -/
+theorem inner_map_eq_on_zSpan (F : ClassFunction Γ ℂ →ₗ[ℤ] ClassFunction Δ ℂ)
+    {T : Set (ClassFunction Γ ℂ)}
+    (h : ∀ μ ∈ T, ∀ ν ∈ T, ClassFunction.inner (F μ) (F ν) = ClassFunction.inner μ ν) :
+    ∀ φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T,
+      ∀ ψ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T,
+      ClassFunction.inner (F φ) (F ψ) = ClassFunction.inner φ ψ := by
+  have hright : ∀ μ ∈ T, ∀ ψ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T,
+      ClassFunction.inner (F μ) (F ψ) = ClassFunction.inner μ ψ := by
+    intro μ hμ ψ hψ
+    induction hψ using Submodule.span_induction with
+    | mem ν hν => exact h μ hμ ν hν
+    | zero => rw [map_zero, ClassFunction.inner_zero_right, ClassFunction.inner_zero_right]
+    | add ψ₁ ψ₂ _ _ ih₁ ih₂ =>
+        rw [map_add, ClassFunction.inner_add_right, ClassFunction.inner_add_right, ih₁, ih₂]
+    | smul c ψ₀ _ ih =>
+        rw [map_smul, ← Int.cast_smul_eq_zsmul ℂ c (F ψ₀), ← Int.cast_smul_eq_zsmul ℂ c ψ₀,
+          OddOrder.RepresentationTheory.inner_smul_right,
+          OddOrder.RepresentationTheory.inner_smul_right, ih]
+  intro φ hφ ψ hψ
+  induction hφ using Submodule.span_induction with
+  | mem μ hμ => exact hright μ hμ ψ hψ
+  | zero => rw [map_zero, ClassFunction.inner_zero_left, ClassFunction.inner_zero_left]
+  | add φ₁ φ₂ _ _ ih₁ ih₂ =>
+      rw [map_add, ClassFunction.inner_add_left, ClassFunction.inner_add_left, ih₁, ih₂]
+  | smul c φ₀ _ ih =>
+      rw [map_smul, ← Int.cast_smul_eq_zsmul ℂ c (F φ₀), ← Int.cast_smul_eq_zsmul ℂ c φ₀,
+        ClassFunction.inner_smul_left, ClassFunction.inner_smul_left, ih]
+
+omit [Fintype Γ] [Invertible (Nat.card Γ : ℂ)] [Fintype Δ] [Invertible (Nat.card Δ : ℂ)] in
+/-- A `ℤ`-linear map with `ℤ[Irr]`-values on the members of `T` has `ℤ[Irr]`-values
+on all of `ℤ[T]`. -/
+theorem map_mem_ZIrr_on_zSpan (F : ClassFunction Γ ℂ →ₗ[ℤ] ClassFunction Δ ℂ)
+    {T : Set (ClassFunction Γ ℂ)} (h : ∀ μ ∈ T, F μ ∈ ZIrr Δ) :
+    ∀ φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T, F φ ∈ ZIrr Δ := by
+  intro φ hφ
+  induction hφ using Submodule.span_induction with
+  | mem μ hμ => exact h μ hμ
+  | zero => rw [map_zero]; exact Submodule.zero_mem _
+  | add φ₁ φ₂ _ _ ih₁ ih₂ => rw [map_add]; exact Submodule.add_mem _ ih₁ ih₂
+  | smul c φ₀ _ ih => rw [map_smul]; exact Submodule.smul_mem _ _ ih
+
+/-- On `ℤ[T]` with integer member gram matrix, all Fourier coefficients against
+members are integers. -/
+theorem exists_int_inner_of_mem_zSpan {T : Set (ClassFunction Γ ℂ)}
+    (hgram : ∀ ν ∈ T, ∀ μ ∈ T, ∃ c : ℤ, ClassFunction.inner ν μ = (c : ℂ)) :
+    ∀ φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T, ∀ μ ∈ T,
+      ∃ c : ℤ, ClassFunction.inner φ μ = (c : ℂ) := by
+  intro φ hφ
+  induction hφ using Submodule.span_induction with
+  | mem ν hν => exact fun μ hμ => hgram ν hν μ hμ
+  | zero => exact fun μ hμ => ⟨0, by rw [ClassFunction.inner_zero_left, Int.cast_zero]⟩
+  | add φ₁ φ₂ _ _ ih₁ ih₂ =>
+      intro μ hμ
+      obtain ⟨c₁, hc₁⟩ := ih₁ μ hμ
+      obtain ⟨c₂, hc₂⟩ := ih₂ μ hμ
+      exact ⟨c₁ + c₂, by rw [ClassFunction.inner_add_left, hc₁, hc₂, Int.cast_add]⟩
+  | smul c φ₀ _ ih =>
+      intro μ hμ
+      obtain ⟨c₀, hc₀⟩ := ih μ hμ
+      refine ⟨c * c₀, ?_⟩
+      rw [← Int.cast_smul_eq_zsmul ℂ c φ₀, ClassFunction.inner_smul_left, hc₀, Int.cast_mul]
+
+/-- **Reconstruction on `ℤ[T]`** for a finite orthonormal `T`: every lattice
+element is the sum of its Fourier components, `φ = ∑_{μ ∈ T} (φ, μ)·μ`. -/
+theorem eq_sum_inner_smul_of_mem_zSpan {T : Set (ClassFunction Γ ℂ)}
+    {s : Finset (ClassFunction Γ ℂ)}
+    (hsT : ∀ {μ : ClassFunction Γ ℂ}, μ ∈ s ↔ μ ∈ T)
+    (hnorm : ∀ μ ∈ T, ClassFunction.inner μ μ = 1)
+    (horth : ∀ μ ∈ T, ∀ ν ∈ T, μ ≠ ν → ClassFunction.inner μ ν = 0) :
+    ∀ φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T,
+      φ = ∑ μ ∈ s, ClassFunction.inner φ μ • μ := by
+  intro φ hφ
+  induction hφ using Submodule.span_induction with
+  | mem ν hν =>
+      rw [Finset.sum_eq_single ν
+        (fun μ hμ hne => by rw [horth ν hν μ (hsT.mp hμ) (Ne.symm hne), zero_smul])
+        (fun h => absurd (hsT.mpr hν) h), hnorm ν hν, one_smul]
+  | zero =>
+      simp only [ClassFunction.inner_zero_left, zero_smul, Finset.sum_const_zero]
+  | add φ₁ φ₂ _ _ ih₁ ih₂ =>
+      conv_lhs => rw [ih₁, ih₂]
+      rw [← Finset.sum_add_distrib]
+      refine Finset.sum_congr rfl fun μ hμ => ?_
+      rw [ClassFunction.inner_add_left, add_smul]
+  | smul c φ₀ _ ih =>
+      conv_lhs => rw [ih]
+      rw [Finset.smul_sum]
+      refine Finset.sum_congr rfl fun μ hμ => ?_
+      rw [← Int.cast_smul_eq_zsmul ℂ c (ClassFunction.inner φ₀ μ • μ),
+        ← Int.cast_smul_eq_zsmul ℂ c φ₀, ClassFunction.inner_smul_left, smul_smul]
+
+omit [Fintype Γ] [Invertible (Nat.card Γ : ℂ)] in
+/-- `ℤ`-multiples stay in the supported lattice. -/
+theorem zsmul_mem_zSupportedSpan {T : Set (ClassFunction Γ ℂ)} {A : Set Γ}
+    {φ : ClassFunction Γ ℂ} (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := Γ) T A)
+    (n : ℤ) : n • φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := Γ) T A := by
+  refine ⟨Submodule.smul_mem _ _ hφ.1, fun x hx => hφ.2 ?_⟩
+  rw [ClassFunction.mem_support] at hx ⊢
+  intro h0
+  apply hx
+  rw [← Int.cast_smul_eq_zsmul ℂ n φ, ClassFunction.smul_apply, h0, mul_zero]
+
+/-- **The member-assignment extension map**: `φ ↦ ∑_{μ ∈ s} (φ, μ)·W(μ)` — the
+`m`-fold analogue of the rank-2 `retarget`, sending each member `μ` of an
+orthonormal family to its prescribed witness `W μ`.  This is the coherent
+extension of the Peterfalvi (6) union `𝒳 ∪ 𝒴`. -/
+noncomputable def memberAssignmentMap (s : Finset (ClassFunction Γ ℂ))
+    (W : ClassFunction Γ ℂ → ClassFunction Δ ℂ) :
+    ClassFunction Γ ℂ →ₗ[ℤ] ClassFunction Δ ℂ :=
+  ∑ μ ∈ s, (OddOrder.Peterfalvi.S07.IntegralCharacterMap.innerLeftℤ (L := Γ) μ).smulRight (W μ)
+
+omit [Fintype Δ] [Invertible (Nat.card Δ : ℂ)] in
+theorem memberAssignmentMap_apply (s : Finset (ClassFunction Γ ℂ))
+    (W : ClassFunction Γ ℂ → ClassFunction Δ ℂ) (φ : ClassFunction Γ ℂ) :
+    memberAssignmentMap s W φ = ∑ μ ∈ s, ClassFunction.inner φ μ • W μ := by
+  simp [memberAssignmentMap, LinearMap.sum_apply, LinearMap.smulRight_apply]
+
+omit [Fintype Δ] [Invertible (Nat.card Δ : ℂ)] in
+/-- On a member of the orthonormal family, the assignment map collapses to the
+prescribed witness: `F μ₀ = W μ₀`. -/
+theorem memberAssignmentMap_apply_of_mem {T : Set (ClassFunction Γ ℂ)}
+    {s : Finset (ClassFunction Γ ℂ)}
+    (hsT : ∀ {μ : ClassFunction Γ ℂ}, μ ∈ s ↔ μ ∈ T)
+    (hnorm : ∀ μ ∈ T, ClassFunction.inner μ μ = 1)
+    (horth : ∀ μ ∈ T, ∀ ν ∈ T, μ ≠ ν → ClassFunction.inner μ ν = 0)
+    (W : ClassFunction Γ ℂ → ClassFunction Δ ℂ)
+    {μ₀ : ClassFunction Γ ℂ} (hμ₀ : μ₀ ∈ T) :
+    memberAssignmentMap s W μ₀ = W μ₀ := by
+  rw [memberAssignmentMap_apply, Finset.sum_eq_single μ₀
+    (fun μ hμ hne => by rw [horth μ₀ hμ₀ μ (hsT.mp hμ) (Ne.symm hne), zero_smul])
+    (fun h => absurd (hsT.mpr hμ₀) h), hnorm μ₀ hμ₀, one_smul]
+
+/-- **Member-assignment coherence** (Peterfalvi (6) assembly core, p. 148).
+A finite orthonormal set `S ⊆ CF(Γ)` is coherent for `(τ, A)` as soon as its
+members carry an orthonormal `ℤ[Irr Δ]`-valued assignment `W` that agrees with
+`τ` on every supported difference `μ − b_μ·η₁` to a fixed anchor `η₁ ∈ S`.
+
+The coherent extension is `memberAssignmentMap s W` (the `m`-fold `retarget`).
+Isometry and the `ZIrr` codomain come from the orthonormal `W` on members
+(`inner_map_eq_on_zSpan`, `map_mem_ZIrr_on_zSpan`).  For `extends_on_supported`
+the supported lattice `Z[S, A]` is generated by the differences
+`{μ − b_μ·η₁ : μ ∈ S}`: a supported `φ = ∑ c_μ μ` has anchor coefficient
+`∑ c_μ b_μ = 0` (degree `0` at `1`, since `1 ∉ A` and `η₁ 1 ≠ 0`), so
+`φ = ∑ c_μ (μ − b_μ·η₁)` is an integral combination of generators, and both
+maps agree on each generator.  This is the standalone core the Peterfalvi (6)
+union `𝒳 ∪ 𝒴` coherence is assembled from. -/
+noncomputable def isCoherent_of_memberAssignment
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap Γ Δ}
+    {S : Set (ClassFunction Γ ℂ)} {A : Set Γ}
+    {W : ClassFunction Γ ℂ → ClassFunction Δ ℂ}
+    {s : Finset (ClassFunction Γ ℂ)}
+    (hsS : ∀ {μ : ClassFunction Γ ℂ}, μ ∈ s ↔ μ ∈ S)
+    (hnorm : ∀ μ ∈ S, ClassFunction.inner μ μ = 1)
+    (horth : ∀ μ ∈ S, ∀ ν ∈ S, μ ≠ ν → ClassFunction.inner μ ν = 0)
+    (hWnorm : ∀ μ ∈ S, ClassFunction.inner (W μ) (W μ) = 1)
+    (hWorth : ∀ μ ∈ S, ∀ ν ∈ S, μ ≠ ν → ClassFunction.inner (W μ) (W ν) = 0)
+    (hWZIrr : ∀ μ ∈ S, W μ ∈ ZIrr Δ)
+    {η₁ : ClassFunction Γ ℂ} (hη₁S : η₁ ∈ S) (hη₁one : η₁ (1 : Γ) ≠ 0)
+    (hAone : (1 : Γ) ∉ A)
+    (hdiff : ∀ μ ∈ S, ∃ b : ℕ,
+      μ - b • η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := Γ) S A ∧
+      W μ - (b : ℂ) • W η₁ = τ (μ - b • η₁))
+    (hnz : ∃ φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := Γ) S A, φ ≠ 0) :
+    OddOrder.Peterfalvi.S07.IsCoherent τ S A := by
+  classical
+  -- the assignment map is orthonormal on members, hence isometric on `Z[S]`
+  have hmember_inner : ∀ μ ∈ S, ∀ ν ∈ S,
+      ClassFunction.inner (memberAssignmentMap s W μ) (memberAssignmentMap s W ν) =
+        ClassFunction.inner μ ν := by
+    intro μ hμ ν hν
+    rw [memberAssignmentMap_apply_of_mem hsS hnorm horth W hμ,
+      memberAssignmentMap_apply_of_mem hsS hnorm horth W hν]
+    by_cases h : μ = ν
+    · subst h; rw [hWnorm μ hμ, hnorm μ hμ]
+    · rw [hWorth μ hμ ν hν h, horth μ hμ ν hν h]
+  refine
+    { nonzero := hnz
+      extension := memberAssignmentMap s W
+      extension_inner_eq := fun φ ψ hφ hψ =>
+        inner_map_eq_on_zSpan (memberAssignmentMap s W) hmember_inner φ hφ ψ hψ
+      extends_on_supported := ?_
+      extension_mem_ZIrr := fun φ hφ =>
+        map_mem_ZIrr_on_zSpan (memberAssignmentMap s W)
+          (fun μ hμ => by
+            rw [memberAssignmentMap_apply_of_mem hsS hnorm horth W hμ]; exact hWZIrr μ hμ)
+          φ hφ }
+  -- **the generation argument** for `extends_on_supported`
+  intro φ hφ
+  have hdiff' : ∀ μ ∈ s, ∃ b : ℕ,
+      μ - b • η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := Γ) S A ∧
+      W μ - (b : ℂ) • W η₁ = τ (μ - b • η₁) := fun μ hμ => hdiff μ (hsS.mp hμ)
+  choose! b hbsupp hbeq using hdiff'
+  -- integer member gram, hence integer Fourier coefficients `c μ = (φ, μ)`
+  have hgram : ∀ ν ∈ S, ∀ μ ∈ S, ∃ cc : ℤ, ClassFunction.inner ν μ = (cc : ℂ) := by
+    intro ν hν μ hμ
+    by_cases h : ν = μ
+    · exact ⟨1, by rw [h, hnorm μ hμ, Int.cast_one]⟩
+    · exact ⟨0, by rw [horth ν hν μ hμ h, Int.cast_zero]⟩
+  have hcoeff : ∀ μ ∈ s, ∃ cc : ℤ, ClassFunction.inner φ μ = (cc : ℂ) :=
+    fun μ hμ => exists_int_inner_of_mem_zSpan hgram φ hφ.1 μ (hsS.mp hμ)
+  choose! c hc using hcoeff
+  -- reconstruction in integer form: `φ = ∑ c μ • μ`
+  have hrecon : φ = ∑ μ ∈ s, (c μ) • μ := by
+    conv_lhs => rw [eq_sum_inner_smul_of_mem_zSpan hsS hnorm horth φ hφ.1]
+    refine Finset.sum_congr rfl fun μ hμ => ?_
+    rw [hc μ hμ, Int.cast_smul_eq_zsmul]
+  -- degree `0`: `φ 1 = 0`, and each `μ 1 = b_μ · η₁ 1`
+  have hφ1 : φ (1 : Γ) = 0 := by
+    by_contra h
+    exact hAone (hφ.2 (ClassFunction.mem_support.mpr h))
+  have hμ1 : ∀ μ ∈ s, μ (1 : Γ) = (b μ : ℂ) * η₁ (1 : Γ) := by
+    intro μ hμ
+    have h0 : (μ - b μ • η₁) (1 : Γ) = 0 := by
+      by_contra h
+      exact hAone ((hbsupp μ hμ).2 (ClassFunction.mem_support.mpr h))
+    rw [ClassFunction.sub_apply, ← Nat.cast_smul_eq_nsmul ℂ (b μ) η₁,
+      ClassFunction.smul_apply] at h0
+    exact sub_eq_zero.mp h0
+  -- the anchor coefficient vanishes: `∑ c μ · b μ = 0`
+  have hP : (∑ μ ∈ s, c μ * (b μ : ℤ)) = 0 := by
+    have hval : ((∑ μ ∈ s, c μ * (b μ : ℤ) : ℤ) : ℂ) * η₁ (1 : Γ) = 0 := by
+      rw [Int.cast_sum, Finset.sum_mul, ← hφ1]
+      conv_rhs => rw [hrecon, ClassFunction.sum_apply]
+      refine Finset.sum_congr rfl fun μ hμ => ?_
+      rw [← Int.cast_smul_eq_zsmul ℂ (c μ) μ, ClassFunction.smul_apply, hμ1 μ hμ]
+      push_cast; ring
+    rcases mul_eq_zero.mp hval with h | h
+    · exact_mod_cast h
+    · exact absurd h hη₁one
+  -- decompose `φ` over the supported generators `μ − b_μ·η₁`
+  have hdecomp : ∑ μ ∈ s, (c μ) • (μ - b μ • η₁) = φ := by
+    have hterm : ∀ μ ∈ s, (c μ) • (μ - b μ • η₁)
+        = (c μ) • μ - (c μ * (b μ : ℤ)) • η₁ := by
+      intro μ _
+      rw [smul_sub, ← Nat.cast_smul_eq_nsmul ℤ (b μ) η₁, smul_smul]
+    rw [Finset.sum_congr rfl hterm, Finset.sum_sub_distrib, ← Finset.sum_smul, hP,
+      zero_smul, sub_zero]
+    exact hrecon.symm
+  -- both maps agree on each generator, hence on `φ`
+  calc memberAssignmentMap s W φ
+      = memberAssignmentMap s W (∑ μ ∈ s, (c μ) • (μ - b μ • η₁)) := by rw [hdecomp]
+    _ = ∑ μ ∈ s, (c μ) • memberAssignmentMap s W (μ - b μ • η₁) := by
+        rw [map_sum]; exact Finset.sum_congr rfl fun μ _ => by rw [map_zsmul]
+    _ = ∑ μ ∈ s, (c μ) • τ (μ - b μ • η₁) := by
+        refine Finset.sum_congr rfl fun μ hμ => ?_
+        congr 1
+        rw [map_sub, map_nsmul,
+          memberAssignmentMap_apply_of_mem hsS hnorm horth W (hsS.mp hμ),
+          memberAssignmentMap_apply_of_mem hsS hnorm horth W hη₁S,
+          ← Nat.cast_smul_eq_nsmul ℂ (b μ) (W η₁)]
+        exact hbeq μ hμ
+    _ = τ (∑ μ ∈ s, (c μ) • (μ - b μ • η₁)) := by
+        rw [map_sum]; exact (Finset.sum_congr rfl fun μ _ => by rw [map_zsmul]).symm
+    _ = τ φ := by rw [hdecomp]
+
+end SpanTransport
+
 end SignedIrr
 
 /-! ## The endgame central subgroup `Z = ⁅Q₁, Q₁⁆ ⊓ Z(Q₁)` (Peterfalvi (4), p. 147)

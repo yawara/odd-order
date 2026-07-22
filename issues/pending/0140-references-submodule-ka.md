@@ -41,3 +41,12 @@ submodule 経由で再現すること。
 - iut 実装: `.gitmodules` + `bin/setup-worktree.sh` + `references/README.md`
   (`/home/ywr/iut/`)
 - moore57 側の同型 issue: moore57 issue 0057
+
+---
+
+## 🧭 HUB 推奨 (2026-07-22): 採用推奨、実施はユーザー承認 + 大区切り後 — pending へ
+
+- 推奨 = **submodule 化を採用** (iut で利点実証済み、版が記録されない現状の欠点は本物)。
+- ただし全レーン稼働中の references 構成変更は各 worktree の symlink 運用に触るため、
+  実施タイミングは **FeitSibley (1054) / Theorem B (2053) いずれかの close 後の quiet
+  window** を推奨。repo 構成の不可逆変更ゆえ最終 go はユーザー承認事項 → pending。

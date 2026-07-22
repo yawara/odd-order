@@ -57,3 +57,12 @@ created: 2026-07-19
 
 - `OddOrder/BG/Ch1_Preliminary/S06_Thm64.lean:524` (defeq 依存の実例)。
 - issue 3026 (BG Thm 6.4)。
+
+---
+
+## 🧭 HUB RULING (2026-07-22): owner = hub、quiet window で 9130 と同時実施
+
+9130 (個別補題の集約) と本 issue (述語レベルの defeq 重複) は同根 — **hub が
+両方まとめて 1 コミットで実施**する。タイミング = レーン frontier 非接触の quiet
+window (BG は凍結済み・S06_Thm64:524 の defeq 依存箇所も凍結領域なので、いつでも
+安全に触れる。優先度は 0127 ① の後)。lane 側は着手不要。
