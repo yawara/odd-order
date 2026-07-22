@@ -190,7 +190,15 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     丸ごと供給、dichotomy 消費、第一分岐 = `card_K_dvd_sub_one...` の
     (2^p−1) ∣ (r−1) を Nat.modEq_iff_dvd' で r ≡ 2^0 化、第二分岐 =
     Half B → combine。9318 継承 (AxiomsCheck 非登録)。
-- [ ] (4) Wielandt fixed point (被覆調査 → 不足なら port)
+- [x] (4) **完了 (2026-07-22)** — `card_Q_eq_card_inf_centralizer_pow`
+      (FirstCase/StepFour.lean 新設、root 配線済): |Q| = |C_Q(P)|^p。
+      Wielandt = **Pf (9.1) 実装済** (`wielandt_fixedPoint_trivial_U_fixed`,
+      sorry-free) を消費 — port 不要だった。carrier `CoprimeFrobeniusAction`
+      (L = K⊔P, U = K, E = P) を組立: Frobenius 構造 =
+      `isFrobeniusGroup_of_prime_complement_fixedFree` (C_K(P)=1)、
+      C_Q(K)=1 = fpf、coprime = `coprime_card_Q_K` + **p ∤ |Q|**
+      (`not_p_dvd_card_Q1`/`not_p_dvd_card_Q`: step (3) の合同 r≡2^i と
+      p odd の矛盾 — 書籍の「r ≠ p は (3) の帰結」を形式化)。9318 継承。
 - [ ] (5)–(9)
 - [ ] (10) Lemma 5 消費の二分岐
 - [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
