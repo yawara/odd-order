@@ -152,6 +152,25 @@ theorem fixedPointFree_classPair_hall [Finite G] {H Q Z : Subgroup G}
   have hvZ : v ∈ Z := hmem_Z hxv hzjZ hzjne hvconj
   exact hCs (u * v) hqs (Z.mul_mem huZ hvZ)
 
+/-- **Coprimality atom `(|C₁|, |Q|) = 1`, Hall form** (Peterfalvi (6.7.3)).  If `z` is centralized
+by all of `Q` (`Q ⊆ C_G(z)`, e.g. `z ∈ Z(Q)`) and `Q` is a Hall subgroup of `G`
+(`(|Q|, [G:Q]) = 1`), then the size `|C₁| = |⟦z⟧|` of the conjugacy class of `z` is coprime to
+`|Q|`: `|⟦z⟧| = [G : C_G(z)] ∣ [G : Q]` (`Q ⊆ C_G(z)`), which is coprime to `|Q|`.
+
+Hall analogue of `coprime_card_class_card_sylow`; the Sylow `p ∤ [G:P]` is replaced by the Hall
+coprimality `(|Q|, [G:Q]) = 1`. -/
+theorem coprime_card_class_card_hall [Finite G] {Q : Subgroup G} {z : G}
+    (hQz : Q ≤ Subgroup.centralizer ({z} : Set G))
+    (hHall : Nat.Coprime (Nat.card ↥Q) Q.index) :
+    IsCoprime (Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z } : ℤ)
+      (Nat.card ↥Q : ℤ) := by
+  have hdvd : Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z } ∣ Q.index := by
+    rw [card_class_eq_index_centralizer]
+    exact Subgroup.index_dvd_of_le hQz
+  have hcopN : Nat.Coprime (Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z })
+      (Nat.card ↥Q) := Nat.Coprime.coprime_dvd_left hdvd hHall.symm
+  exact_mod_cast hcopN.isCoprime
+
 section Assembly
 open OddOrder.AlgInt
 
