@@ -450,8 +450,11 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     - [x] **𝒳 側 keystone pairing** `tau_keystone_inner_extensionX_diff`
       (2026-07-22, sorry-free): (u, eᵢ − aᵢe₁) = −aᵢ (6a の X 鏡映)。
     - [ ] **(6) 組み立て設計 (2026-07-22 固定; 次 session はここから)**:
-      1. **witness 正規化補題**: exists_lambda_norm_identity データ + a∣λ + 2≤a +
-         2≤m ⟹ ∃ w : CF H → CF G (𝒴-witness 割当):
+      1. [x] **witness 正規化補題完成** `exists_normalized_witness_of_dvd`
+         (2026-07-22, sorry-free)。⚠ Lean 知見: `rcases hmem with rfl | rfl` は
+         h : η = η₂ で **η₂ 側を subst 消去**する (RHS 優先) — 後続タクストで
+         η₂ を参照するなら h 保持 + rw [h]。x_eq_zero 適用は (a := (a:ℤ))
+         (m := ...) 明示 (mod_cast が metavar で詰まる)。仕様:
          (P1) ∀η∈Y, w η − w η₁ = τ(η−η₁); (P2) union 直交正規·±Irr·∈ZIrr;
          (P3) (u, w η) = 0 (η≠η₁) ∧ (u, w η₁) = −a。
          構成: x_eq_zero_or_x_one_of_norm_identity で分岐。x=0 → w := E′ 値。
