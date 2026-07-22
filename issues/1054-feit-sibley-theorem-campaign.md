@@ -561,6 +561,60 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     hPz/hreal/hconst/hone) をどう供給するか (Hypothesis field からの導出) を確定してから
     Hall 変種を書く。⚠ hconst の「N∩C_G card 定数」条件と hone の供給が endgame 側で
     どう出るか要精査 (原文 (7) の d odd 使用箇所 = K₁∩Z^#≠∅ の存在)。
+    **Hall f.p.f. 変種の設計確定 (2026-07-22 偵察)** — Sylow proof
+    (ClassSumCongruence.lean:491-588) の 2 Sylow-step を差し替えるだけ:
+    - `Q_trivial_intersection : ∀ x∉H, Q ⊓ Q.map(conj x) = ⊥` (FeitSibley.lean:267) が
+      TI の正本。x∈Q^# を y が中心化 ⟹ x∈Q ⊓ Q^{y⁻¹} nontrivial ⟹ y∈H
+      (**C_G(x)⊆H**; 既に近い補題が FeitSibley.lean:521-532 = TI overlap 消化)。
+      これが Sylow の `hcent_le` (→N_G(P)) を H に置換する部分。
+    - Sylow の `mem_sylow_of_mem_normalizer_of_isPGroup` (y∈N かつ p-元 ⟹ y∈P) の Hall 版 =
+      「y∈H かつ y が π(Q)-元 ⟹ y∈Q」(正規 Hall は全 π-元を含む)。Hall infra は
+      `Isaacs/Ch03_SplitExtensions/Theorem315.lean` (IsHallSubgroup/IsPiGroup/
+      card_dvd_of_isPiGroup)。⚠ 正規 Hall ⟹ 全 π-元包含 が repo に無ければ小補題新設
+      (Q ⊴ H + coprime index、共役類の π-元 order は |Q| を割る)。
+    - coprime |C₁| |Q|: z∈Z⊆Z(Q₁) は Q=S×Q₁ を中心化 (S_commutes_Q1 + Z⊆Z(Q₁)) ⟹
+      **Q⊆C_G(z)** ⟹ |C₁|=|G:C_G(z)| ∣ |G:Q|、Q Hall ⟹ coprime(|G:Q|,|Q|)。
+    残りの TI/Z⊴H/共役鎖 (hZconj/hmem_Z の骨格) は Sylow 版と同一 (汎用)。
+    ⟹ **`peterfalvi_67_hall` を lane-a leaf に新設** (既存 shared lemma は read only、
+    peterfalvi_673 + card_dvd_classSumCoeff_of_fixedPointFree を cite)。~100-150 行見込。
+    **⭐ TI input 準備済**: `isTISubset_Q_sdiff_one` (FeitSibley.lean:525) =
+    `IsTISubset (Q\{1}) H` が既存 (peterfalvi_67 の hti に対応、normalizer→H)。
+    **実行可能設計 = 4 sub-lemma (次 turn はこれを順に書くだけ)**:
+    1. `mem_Q_of_mem_H_of_orderOf_coprime` (~15 行): y∈H かつ coprime(orderOf y, |H:Q|)
+       ⟹ y∈Q。証明: H⧸Q で orderOf(mk y) ∣ orderOf y かつ ∣ |H:Q| (Lagrange)、
+       coprime ⟹ orderOf(mk y)=1 ⟹ mk y=1 ⟹ y∈Q (QuotientGroup.eq_one_iff)。
+       (Q ⊴ H = Q_subgroupOf_H_normal は既存)。
+    2. `fixedPointFree_classPair_hall` (~70 行): ClassSumCongruence.lean:491 の Sylow proof
+       を写経し 2 点差替 — `hcent_le` の N_G(P)→H (isTISubset_Q_sdiff_one 直用)、
+       `mem_sylow_of_mem_normalizer_of_isPGroup`→上記 1 (y は zi∈Z⊆Q に共役 ⟹
+       orderOf y=orderOf zi ∣ |Q| coprime |H:Q|)。hZconj は Z⊴H (subgroupOf) から。
+    3. `coprime_classCard_Q` (~15 行): z∈Z⊆Z(Q₁) が Q=S×Q₁ 中心化 (S_commutes_Q1) ⟹
+       Q ⊆ C_G(z) ⟹ |C₁|=|G:C_G(z)| ∣ |G:Q| coprime |Q| (Q Hall = coprime_Q_D + |H:Q|)。
+    4. `peterfalvi_67_hall` (~40 行): ClassSumAlgebra.lean:127 peterfalvi_67 を写経、
+       P→Q、上記 2/3 を Sylow 版の差替に。中心指標 collapse
+       (centralCharacterOfRep_classSum_mul_cong_collapse_of_isTISubset) が Sylow P を
+       取るか要確認 — 取るなら汎用 TI 版も要 (ClassSumCongruence 側、shared claim)。
+    ⚠ 4 の collapse 補題が Sylow 依存なら shared-infra 追加 (9200 claim)。まず署名確認。
+    **⭐ 署名確認済 (2026-07-22): collapse は Sylow 依存** —
+    `centralCharacterOfRep_classSum_mul_cong_collapse_of_isTISubset`
+    (ClassSumCongruence.lean:1577) は `(P : Sylow p G)` を取り modulus = `Nat.card P`。
+    内部で `centralCharacterOfRep_classSum_mul_cong_of_isTISubset` →
+    `fixedPointFree_classPair_of_isTISubset` (Sylow) を使う。⟹ **(7) Hall 版は純 lane-a
+    leaf で完結しない — shared class-algebra infra の Hall 変種を要す**。
+    **確定した architecture (次 turn の実行計画)**:
+    - **9200 claim** を立てる (shared-infra、レーン別サブバンド a=9200)。着手前に
+      `ls issues/9*.md` で重複 scan (現状 9130/9159/9164/9318 = 別件)。
+    - **方式 = 汎用化 (既存 Sylow 版を壊さない追加)**: collapse/mul_cong/f.p.f. の
+      「一般部分群 P + f.p.f. を仮説に取る」版を ClassSumCongruence/ClassSumAlgebra に
+      **新規追加** (既存 Sylow 版は f.p.f. を fixedPointFree_classPair_of_isTISubset で
+      供給する薄い wrapper に後退させられるが、無理に触らず追加のみでよい)。
+      核 `card_dvd_classSumCoeff_of_fixedPointFree` は既に f.p.f. を仮説に取る汎用形
+      ゆえ、その上の mul_cong/collapse も f.p.f. 仮説版に一般化するのは機械的。
+    - その上で lane-a leaf に Hall f.p.f. (sub-lemma 2) + peterfalvi_67_hall (sub-lemma 4)
+      を組む。sub-lemma 1 (mem_Q_of_orderOf_coprime) と 3 (coprime_classCard_Q) は
+      lane-a leaf で自足。
+    ⟹ 見込 = shared 側 汎用化 ~80 行 (9200) + lane-a 側 Hall 組立 ~100 行。
+    hub 調整: 9200 claim は additive (既存 Sylow 版不変) ゆえ低リスク。
   - [ ] **(8)** Conclusion: (5)+(6)+(7) で a∣λ を証明し (6) を閉じる。
     Res_H e′₁ = (λ+aμ)Σaᵢχᵢ + χ′、Σaᵢχᵢ=(ρ_H−ρ_{H/Z})/(da)、z∈Z^# 評価 +
     (7) を ±e′₁ に適用 → λ/a+μ 代数的整数 → a∣λ。
