@@ -12131,3 +12131,20 @@ deliberately NOT asserted here.) -/
   OddOrder.Peterfalvi.Appendices.NearFields.exceptionalTwistData_twMul_of_isSquare
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.NearFields.exceptionalTwistData_twMul_of_not_isSquare
+
+/-! **`F_{r²,2}` is not a field** (`Peterfalvi.Appendices.ExceptionalNearField`,
+2026-07-22).  `p` 奇素数・`n ≥ 1` で twist は真に非可換 — Prop 2 の例外分岐が体分岐と
+交わらないことの witness。
+
+* `exists_isSquare_halfFrobenius_ne` — half-Frobenius が動かす**平方元**の存在。
+  カウント不要の初等論法: すべての平方が固定なら `σ z = ±z` で `(K,+)` が 2 つの真部分群
+  の和になり矛盾 (乗法生成元の位数 `p^{2n}−1 ∤ pⁿ−1` で `{σ=id}` が真、`σ(1)=1≠−1` で
+  `{σ=−id}` が真)。
+* `exceptionalTwistData_not_comm` — `z² ∘ y = (z²)ʳ·y ≠ y·z² = y ∘ z²` (`y` 非平方)。
+* `exceptionalNearField_not_commutative` — `Twisted` レベルの headline。 -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exists_isSquare_halfFrobenius_ne
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exceptionalTwistData_not_comm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exceptionalNearField_not_commutative

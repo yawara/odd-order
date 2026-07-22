@@ -191,4 +191,98 @@ theorem exceptionalTwistData_twMul_of_not_isSquare (hcard : Fintype.card K = p ^
 
 end ExceptionalNearField
 
+/-! ### `F_{r²,2}` is not a field -/
+
+section NotCommutative
+
+variable (K : Type*) [Field K] [Fintype K] (p n : ℕ) [Fact p.Prime] [CharP K p]
+
+/-- For `n ≥ 1` and `p` odd the half-Frobenius moves some **square**.  Otherwise
+`σ(z)² = z²` for every `z`, so `σ z = ±z`, making `(K, +)` the union of the two additive
+subgroups `{σ = id}` and `{σ = -id}`; the first is proper (a multiplicative generator
+has order `p^{2n} - 1 > pⁿ - 1`), the second is proper (`σ(1) = 1 ≠ -1` as `p ≠ 2`),
+and a group is never the union of two proper subgroups (the element `a + 1` with
+`σ a = -a`, `a ≠ 0` lands in neither). -/
+theorem exists_isSquare_halfFrobenius_ne (hp2 : p ≠ 2) (hn : n ≠ 0)
+    (hcard : Fintype.card K = p ^ (2 * n)) :
+    ∃ z : K, halfFrobenius K p n (z ^ 2) ≠ z ^ 2 := by
+  have hp : p.Prime := Fact.out
+  have h2K : (2 : K) ≠ 0 := fun h =>
+    hp2 ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).mp
+      ((CharP.cast_eq_zero_iff K p 2).mp h))
+  by_contra hcon
+  push Not at hcon
+  have hpm : ∀ z : K, halfFrobenius K p n z = z ∨ halfFrobenius K p n z = -z := fun z =>
+    (Commute.all _ z).sq_eq_sq_iff_eq_or_eq_neg.mp (by rw [← map_pow]; exact hcon z)
+  -- `σ ≠ id`: a multiplicative generator has order `p^{2n} - 1`, not dividing `pⁿ - 1`.
+  have hσne : ¬∀ z : K, halfFrobenius K p n z = z := by
+    intro hfix
+    obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := Kˣ)
+    have hord : orderOf g = p ^ (2 * n) - 1 := by
+      rw [orderOf_eq_card_of_forall_mem_zpowers hg, Nat.card_units,
+        Nat.card_eq_fintype_card, hcard]
+    have hgval : ((g : Kˣ) : K) ^ p ^ n = ((g : Kˣ) : K) := by
+      rw [← halfFrobenius_apply]; exact hfix _
+    have hgpow : g ^ p ^ n = g ^ 1 := Units.ext (by
+      rw [Units.val_pow_eq_pow_val, pow_one]; exact hgval)
+    have hple : 1 ≤ p ^ n := Nat.one_le_pow n p hp.pos
+    have hdvd : orderOf g ∣ p ^ n - 1 :=
+      (Nat.modEq_iff_dvd' hple).mp (pow_eq_pow_iff_modEq.mp hgpow).symm
+    have ht2 : 2 ≤ p ^ n := le_trans hp.two_le (Nat.le_self_pow hn p)
+    have htpos : 0 < p ^ n - 1 := by omega
+    have hle := Nat.le_of_dvd htpos hdvd
+    rw [hord] at hle
+    have hsq : p ^ (2 * n) = p ^ n * p ^ n := by rw [two_mul, pow_add]
+    have hmul : 2 * p ^ n ≤ p ^ n * p ^ n := Nat.mul_le_mul_right _ ht2
+    omega
+  -- an element negated by `σ`, necessarily nonzero
+  obtain ⟨a, ha⟩ := not_forall.mp hσne
+  have haneg : halfFrobenius K p n a = -a := (hpm a).resolve_left ha
+  have ha0 : a ≠ 0 := fun h => ha (by rw [h, map_zero])
+  -- `a + 1` is neither fixed nor negated
+  have hsum := hpm (a + 1)
+  rw [map_add, haneg, map_one] at hsum
+  rcases hsum with h | h
+  · have h' : -a = a := add_right_cancel h
+    have h2a : (2 : K) * a = 0 := by
+      rw [two_mul, neg_eq_iff_add_eq_zero.mp h']
+    rcases mul_eq_zero.mp h2a with h2 | h2
+    · exact h2K h2
+    · exact ha0 h2
+  · rw [neg_add] at h
+    have h1 : (1 : K) = -1 := add_left_cancel h
+    exact h2K (by rw [← one_add_one_eq_two, eq_neg_iff_add_eq_zero.mp h1])
+
+/-- **The twisted multiplication of `F_{r²,2}` is not commutative** (Peterfalvi
+Appendix C, p. 138): for `r = pⁿ` a power of an odd prime (`n ≥ 1`), the twist is
+genuine — a square `z²` moved by the half-Frobenius and a non-square `y` do not
+commute, since `z² ∘ y = (z²)ʳ·y` while `y ∘ z² = y·z²`.  Hence the exceptional branch
+of Proposition 2 (`cyclic_index_two_nearField_classification`) is disjoint from the
+field branch. -/
+theorem exceptionalTwistData_not_comm (hp2 : p ≠ 2) (hn : n ≠ 0)
+    (hcard : Fintype.card K = p ^ (2 * n)) :
+    ∃ x y : K, (exceptionalTwistData K p n hcard).twMul x y ≠
+      (exceptionalTwistData K p n hcard).twMul y x := by
+  obtain ⟨z, hz⟩ := exists_isSquare_halfFrobenius_ne K p n hp2 hn hcard
+  have hchar2 : ringChar K ≠ 2 := by rw [ringChar.eq K p]; exact hp2
+  obtain ⟨y, hy⟩ := FiniteField.exists_nonsquare (F := K) hchar2
+  have hy0 : y ≠ 0 := fun h => hy (h ▸ ⟨0, (zero_mul (0 : K)).symm⟩)
+  refine ⟨z ^ 2, y, ?_⟩
+  rw [exceptionalTwistData_twMul_of_not_isSquare K p n hcard hy,
+    exceptionalTwistData_twMul_of_isSquare K p n hcard (IsSquare.sq z)]
+  intro h
+  apply hz
+  rw [halfFrobenius_apply]
+  exact mul_right_cancel₀ hy0 (h.trans (mul_comm y (z ^ 2)))
+
+/-- **The exceptional near-field `F_{r²,2}` is not a field**: the near-field
+`Twisted (exceptionalTwistData …)` has non-commutative multiplication. -/
+theorem exceptionalNearField_not_commutative (hp2 : p ≠ 2) (hn : n ≠ 0)
+    (hcard : Fintype.card K = p ^ (2 * n)) :
+    ∃ x y : Twisted (exceptionalTwistData K p n hcard), x * y ≠ y * x := by
+  obtain ⟨x, y, hxy⟩ := exceptionalTwistData_not_comm K p n hp2 hn hcard
+  exact ⟨x, y, hxy⟩
+
+end NotCommutative
+
 end OddOrder.Peterfalvi.Appendices.NearFields
