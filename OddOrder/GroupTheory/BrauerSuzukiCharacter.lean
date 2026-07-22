@@ -30,6 +30,62 @@ This file develops the pieces in the book's order:
 
 namespace OddOrder.GroupTheory
 
+/-- **Integer triples of squared norm `3`**: if `∑_{a∈s} cₐ² = 3` with all `cₐ ≠ 0`, then `s`
+has exactly three elements and each coefficient is `±1`.  (The norm-`3` analogue of
+`exists_pair_of_sum_sq_eq_two`; could move to `ZIrrFourier` upstream.) -/
+theorem exists_triple_of_sum_sq_eq_three {ι : Type*} [DecidableEq ι] {s : Finset ι} {c : ι → ℤ}
+    (hne : ∀ a ∈ s, c a ≠ 0) (hsum : ∑ a ∈ s, c a ^ 2 = 3) :
+    ∃ α β γ : ι, α ≠ β ∧ α ≠ γ ∧ β ≠ γ ∧ s = {α, β, γ} ∧
+      (c α = 1 ∨ c α = -1) ∧ (c β = 1 ∨ c β = -1) ∧ (c γ = 1 ∨ c γ = -1) := by
+  classical
+  have hsq2 : ∀ n : ℤ, n ^ 2 ≠ 2 := by
+    intro n hn
+    have h1 : (n - 1) * (n + 1) = 1 := by linear_combination hn
+    rcases Int.eq_one_or_neg_one_of_mul_eq_one' h1 with ⟨ha, hb⟩ | ⟨ha, hb⟩ <;> omega
+  have hsq3 : ∀ n : ℤ, n ^ 2 ≠ 3 := by
+    intro n hn
+    have hb1 : n < 2 := by nlinarith [sq_nonneg (n - 2)]
+    have hb2 : -2 < n := by nlinarith [sq_nonneg (n + 2)]
+    interval_cases n <;> norm_num at hn
+  have hge : ∀ a ∈ s, 1 ≤ c a ^ 2 := fun a ha => by
+    have h := Int.one_le_abs (hne a ha)
+    calc (1 : ℤ) = 1 ^ 2 := by ring
+      _ ≤ |c a| ^ 2 := by gcongr
+      _ = c a ^ 2 := sq_abs (c a)
+  have hcard3 : s.card ≤ 3 := by
+    have hle : (s.card : ℤ) ≤ ∑ a ∈ s, c a ^ 2 := by
+      calc (s.card : ℤ) = ∑ _a ∈ s, (1 : ℤ) := by
+            rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+        _ ≤ ∑ a ∈ s, c a ^ 2 := Finset.sum_le_sum hge
+    rw [hsum] at hle; omega
+  have hcard : s.card = 3 := by
+    by_contra hne3
+    have hcases : s.card = 0 ∨ s.card = 1 ∨ s.card = 2 := by omega
+    rcases hcases with hc | hc | hc
+    · rw [Finset.card_eq_zero] at hc; subst hc; simp at hsum
+    · obtain ⟨a, rfl⟩ := Finset.card_eq_one.mp hc
+      rw [Finset.sum_singleton] at hsum; exact hsq3 (c a) hsum
+    · obtain ⟨α, β, hαβ, rfl⟩ := Finset.card_eq_two.mp hc
+      rw [Finset.sum_pair hαβ] at hsum
+      have h1 := hge α (by simp); have h2 := hge β (by simp)
+      rcases (by omega : c α ^ 2 = 1 ∨ c α ^ 2 = 2) with h | h
+      · exact hsq2 (c β) (by omega)
+      · exact hsq2 (c α) h
+  obtain ⟨α, β, γ, hαβ, hαγ, hβγ, rfl⟩ := Finset.card_eq_three.mp hcard
+  have hαmem : α ∉ ({β, γ} : Finset ι) := by
+    simp only [Finset.mem_insert, Finset.mem_singleton, not_or]; exact ⟨hαβ, hαγ⟩
+  have hβmem : β ∉ ({γ} : Finset ι) := by
+    simp only [Finset.mem_singleton]; exact hβγ
+  rw [Finset.sum_insert hαmem, Finset.sum_insert hβmem, Finset.sum_singleton] at hsum
+  have h1 := hge α (by simp); have h2 := hge β (by simp); have h3 := hge γ (by simp)
+  have hcα : c α ^ 2 = 1 := by omega
+  have hcβ : c β ^ 2 = 1 := by omega
+  have hcγ : c γ ^ 2 = 1 := by omega
+  refine ⟨α, β, γ, hαβ, hαγ, hβγ, rfl, ?_, ?_, ?_⟩
+  · rw [pow_two] at hcα; exact mul_self_eq_one_iff.mp hcα
+  · rw [pow_two] at hcβ; exact mul_self_eq_one_iff.mp hcβ
+  · rw [pow_two] at hcγ; exact mul_self_eq_one_iff.mp hcγ
+
 namespace QuaternionSylowSetup
 
 open Subgroup
@@ -515,6 +571,22 @@ theorem thetaStar_inner_trivial [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.ca
       (mem_irreducibleCharacters.mpr Q.psiN_isIrr) trivialClassFunction_isIrreducible,
       if_neg Q.psiN_ne_trivial]
   rw [hT, hP, sub_zero]
+
+/-- `θ ∈ ℤ[Irr N]` (virtual character): `θ = Ind 1_C − Ind ψ`, both induced characters. -/
+theorem theta_mem_ZIrr [Fintype ↥Q.N] [Invertible (Nat.card ↥Q.N : ℂ)]
+    [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    Q.theta ∈ ZIrr ↥Q.N := by
+  haveI : Fintype ↥(Q.C.subgroupOf Q.N) := Fintype.ofFinite _
+  rw [theta]
+  exact sub_mem (ClassFunction.induce_mem_ZIrr _ trivialClassFunction_isIrreducible.mem_ZIrr)
+    (ClassFunction.induce_mem_ZIrr _ Q.psiN_isIrr.mem_ZIrr)
+
+/-- `θ* ∈ ℤ[Irr G]` (virtual character): TI-induction of the virtual character `θ`. -/
+theorem thetaStar_mem_ZIrr [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    Q.thetaStar ∈ ZIrr G := by
+  rw [thetaStar]
+  exact ClassFunction.induce_mem_ZIrr _ Q.theta_mem_ZIrr
 
 end QuaternionSylowSetup
 
