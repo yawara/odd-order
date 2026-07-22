@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 03:2x 監視 tick — a (1D.6) + b (Higman L12/L13) 合流**。a=3 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.6** — nilpotent group で maximal ⟺ prime index、`Problems.lean` +55) / b (**Higman Lemma 12 前像補完 + Lemma 13 指数4因子の Frattini 同定**、`ExponentFourFactors.lean` +85 / `HigmanLemmaTwelve/QuotientTwoStep.lean` +114、既存 leaf 拡張ゆえ新 leaf 0)。
+> **gate: green 4656 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 6b539c31e→0a71c2c98**。範囲逸脱なし。
+> ℹ **c = 前 tick 9407 裁定 (C) を受領、BG remainder へ着手中 (0 ahead・0 WIP、commit 前)**。a=Problems WIP (§1D 継続) / d=wave 間 (foo)。全 escalation 対象外。
+>
 > **▶▶ 2026-07-23 03:0x 監視 tick — b (Higman L13) 合流 + 🧭 c frontier 裁定 (9407 close)**。a=0(WIP) / b=3 / c=2(docs) / d=0(WIP foo)。
 > 合流: b (**Higman Lemma 13** — 指数4二因子の BCD 分類と非可換性、新 leaf `ExponentFourFactors.lean` +251 WIRED via `HigmanLemmaThirteen.lean`) / c (**docs-only** — 9407 App C Prop 1 完成報告 + 9405 を closed/ へ)。
 > **gate: green 4656 jobs (前 4655 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 8237512be→ceed3b2d3**。
