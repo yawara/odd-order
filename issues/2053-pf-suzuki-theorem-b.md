@@ -213,6 +213,24 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     実証明、`card_D_le_three_of_noncomm` (非可換=F_{9,2}) は **gated sorry**
     (Aut(F_{9,2}) 奇部分=3、F*=Q₈ ゆえ; near-field Aut infra 無し、D_odd は在り
     |D|∣3 だけ欠く; shared 9300 候補)。StepSix の唯一の sorry。
+  - **(7) 着手方針 (2026-07-22 精査)** — `N = P ∧ Σ ≅ C_W(P)`。深い統合論法
+    (fresh context 推奨、intricate):
+    - N (= step 2(a) kernel = `(H.subgroupOf L).normalCore`) は `N = (N∩W)×P`
+      (step 1 = §3 Prop 1(b))。**要確認/導出**: step 1 は N_G(P)=C_G(P)N_V(P)・
+      N_V(P)=C_W(P)P までで、kernel N の (N∩W)×P 分解は未確認。
+    - 背理: N∩W ≠ 1 を仮定。R := C_Q(N∩W) に **§3 Prop 1(c)** =
+      `centralizer_trichotomy_of_induction` (CentralizerTrichotomy.lean:217、
+      `CentralizerTrichotomyData` の PSL/PSU/Suzuki) を X:=N∩W で適用 →
+      **|R| 三分岐を導出** (f=3: |R|=|Q₀| or |Q₀|³; f=5: |R|=|Q₀|²)。⚠ この
+      |R|/|Q₀|/f 帰結は trichotomy data からの導出が要 (単一 clean lemma 無し)。
+    - C_Q(P) ⊂ R (N が C_Q(P) 中心化)、Q 2群 (step 4)。**(6) と (2)(b)** で
+      3 ケース: (a)|F|=3,|C_Q(P)|=2 (b)|F|=9,|C_Q(P)|=8 (c)|F|=5,|C_Q(P)|=4。
+      **step (4)** `card_Q_eq_card_inf_centralizer_pow` で |Q|=|Q₀|/|Q₀|³/|Q₀|²。
+    - N∩W が Q に faithful 作用 ⟹ Q₀⊂R⊊Q で (a) 消去; |C_{Q₀}(P)|=2 (step 1)
+      で C_Q(P) が位数4元 → (c) 消去、(b) は |R|=|Q₀|² ⟹ f=5 矛盾。⟹ N∩W=1。
+    - Σ≅C_W(P): N=P を得た後の identification (§3 Prop 1(c) の C_W(P) 側)。
+    - 供給済 upstream: step (6) 全体形、step (4)、trichotomy machinery。
+      残 = kernel N=(N∩W)×P 確認 + |R| 三分岐導出 + 矛盾 assembly + Σ 同型。
   - **(6) 算術補題 完了 (2026-07-22, StepSix.lean 新設)**:
     `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` (axiom-clean, AxiomsCheck
     登録) — [HB] IX 2.7: `f 奇 ∧ f^a = 2^b+1 (b≥1) ⟹ a=1 ∨ f^a=9`。純 ℕ 算術
