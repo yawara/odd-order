@@ -6,6 +6,10 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 01:4x 監視 tick**。a=1 / b=0 / c=0 / d=0。合流: a (Isaacs §1C Problems 1C.3b)。
+> **gate: green 4646 jobs / AxiomsCheck OK (3754・新 axiom 0) / 実 sorry 8→8 非退行 (9406 後の新基準 8) / lint 218 ≤ 218 (push を lint exit で gate — 前 tick の slip 反省) / push a0c6949d2→61566491f**。
+> ⚠ **lane d watch (要注意)**: d は 47 分 commit 無 (初 CLAUDE.md commit 以降)、lsof で worktree を開く ccd-cli プロセス無 hit、worktree に未追跡 scratch `foo` 1 件。メンテナンス lane ゆえ lint census / lean-eval 抽出の分析中の可能性もあるが、**stall or session 停止の疑い**。次 tick でも quiet なら user へ d セッション確認を依頼。⚠ scratch `foo` は d の作業残渣 (無害・未追跡)。**513185** idle 継続。
+>
 > **🎉 2026-07-23 01:2x 監視 tick — 9406 coordinated land 成功 (c+b 同一 tick 合流)**。a=4 / b=2 / c=7 / d=0。
 > ユーザー「b をマージして」= b nudge → **b が 9406 consumer 更新完了** (`5be71e802`: StepEight `model_qEquiv_conj` を `model.qEquiv_conj q→q⁻¹` に追随)。⟹ c(fix A)+b(consumer) 両揃い → **a+b+c を同一 tick で `--no-ff` 合流**。
 > issue 9406 doc に b/c 双方の READY note が付き conflict → 両保持で解消。**Lean code は無衝突 = fix A × consumer は整合**。
