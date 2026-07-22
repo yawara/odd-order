@@ -6,6 +6,35 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 00:0x 監視 tick**。a=0 / b=0 / c=1。合流: c (**O_{2'}(G) ≠ 1 の初等核** — App C Prop1 prerequisite given BS, NearFields.lean +36)。
+> ⚠ **9406 fix(A) はまだ未適用**: c の +1 は qEquiv_conj を触らない独立な transport prerequisite (単独 merge 安全と確認)。c は先に他部品を進行中。9406 coordination (c 構造 + b consumer) は両者 ready 後に同一 tick で land 予定。
+> **gate: フルビルド green 4645 jobs (不変) / AxiomsCheck OK (3754・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 / lint 216 ≤ 216 / push 3414a7fd7→e084548b7**。範囲逸脱なし。
+> a/b は 0 ahead (a=§1B 演習, b=step10 後 + 9406 consumer 更新待ち — 未 sync)。**513185** idle 継続。
+>
+> **▶▶ 2026-07-22 23:3x 監視 tick + 🔧 9406 hub 裁定 (AffineNearFieldModel signature)**。a=3 / b=1 / c=2。
+> 合流: a (**🎉 Isaacs §1A 完了 全8問**, 1A.7 Burnside — Fintype の壁突破) / b (**2053 step (10) arithmetic core (|Q|+1)_p=p^{m+1}**, StepTen 新 leaf・配線済) / c (near-field transport glue: Q conj on Additive F + issue 9406)。
+> **gate: フルビルド green 4645 jobs (前 4644 +1 StepTen, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 / lint 216 ≤ 216 / push 001eb7997→149a5173d**。範囲逸脱なし。
+> **🔧 issue 9406 hub 裁定 (受理 + fix (A) 認可)**: c が transport 構成中に `AffineNearFieldModel.qEquiv_conj`
+> (NearFields.lean, App C Prop1 結論構造) の **over-specification** を発見・escalate。hub 検証で **c の分析は正しい**:
+> `qEquiv_conj` は `qEquiv(q)=q•e` を強制するが `q↦q•e` は**反準同型** (`(m₁•e)*(m₂•e)=(m₂*m₁)•e`, Lean 確認済)
+> ゆえ `MulEquiv` (準同型) には Q 可換が要る → **非可換 Q (例外 near-field の F\*≅Q₈/SL(2,3), 2-rank-1 で実在) で充足不能**。
+> right near-field の `L_a:x↦x·a` が反準同型ゆえ数学的にも自然な取りこぼし。**認可する fix = (A)**: `qEquiv_conj` の
+> RHS を `qEquiv q → qEquiv q⁻¹` (⁻¹ 1 個挿入)。`q↦q⁻¹•e` = inversion∘反準同型 = **genuine 準同型** Q→Fˣ で充足
+> (`x*qEquiv(q⁻¹)=x*(q•e)=q•x`=共役 LHS)。型不変 (`↥Q ≃* Fˣ`)・共役形不変。
+> ⚠ **cross-lane coordination (同一 tick で land 必須)**: **c** = NearFields.lean に fix(A) 適用 (owner) /
+> **b** = StepEight.lean の `model_qEquiv_conj` (行 104/114/133、`model.qEquiv_conj` 直接消費) を新 RHS に合わせ更新。
+> 片方だけ land すると StepEight build 破綻ゆえ hub は両者を同 tick で合流 + 合成フルビルド検証。**signature 無断改変 STOP でない** (c が正しく escalate、認可済 signature 進化)。詳細 = issue 9406。
+> **513185** (前 hub): ALIVE・idle 継続 (inert)。
+> frontier: a = 1055 §1B へ / b = 2053 step (10) + 9406 consumer 更新 / c = 9406 fix(A) 適用 → NearFields transport 継続。
+>
+> **▶▶ 2026-07-22 23:2x 監視再開 (ユーザー指示「監視に戻ってください」) — cron 再作成 (id ee4db237)**。a=0 / b=3 / c=1。
+> Q₈/BS 文献調査の pivot 完了 (note `notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`: Q₈ は character-free bypass 無し=modular 必須確定、App.C は FT 非依存)。
+> 合流: b (**2053 step (9) gate — P ∩ ⁅H,H⁆ = 1 完了**, Suzuki/StepNine + AxiomsCheck) / c (**near-field transport API — units iso + conjugation action bridge**, Pf App.C p.137, NearFieldFromSharplyTransitive)。新 leaf 0・範囲逸脱なし。
+> **gate: フルビルド green 4644 jobs (不変) / AxiomsCheck OK (3754・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 / lint ratchet 216 ≤ 216 / push**。
+> ⚠ **lane a watch**: a は 28 分 commit 無 — Isaacs 演習 **1A.7 が Fintype 合成の壁で保留**（a 自身が記録済）。stall でなく特定演習の詰まりゆえ次 tick で監視（続くなら a は §1B へ移るのが自律行動）。
+> **513185** (前 hub): ALIVE・idle 継続 (inert)。
+> frontier: a = 1055 Isaacs Problems (1A.7 保留・§1B 検討) / b = 2053 step (9) 完了 → 次 step / c = NearFields transport (API 整備中、Prop1 を Q₈ 以外で閉じる方向)。
+>
 > **⏸ 2026-07-22 23:1x 監視 tick + cron 停止 (ユーザー指示「いったん cron とめて。さっきの調査を深めて」)**。a=2 / b=1 / c=2。
 > 合流: a (docs 1A.7 保留) / b (docs 2053 step9 完了記録) / c (**NearFieldClass.lean 抽出 = 循環 import 解消** + transport 継続、OddOrder.lean 配線済)。
 > c の `lint-baseline.tsv` 編集が hub の ratchet-down (216) と衝突 → **ours (216) で解消** (lint ratchet で 216≤216 検証済ゆえ c の +3 grandfather は不要だった)。

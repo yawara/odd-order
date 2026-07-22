@@ -4,7 +4,12 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.GroupWithZero.Action.Defs
+import Mathlib.Algebra.GroupWithZero.Units.Basic
 import Mathlib.Algebra.Group.Action.Basic
+import Mathlib.Algebra.Group.Action.End
+import Mathlib.Algebra.GroupWithZero.Action.End
+import Mathlib.Algebra.Group.TypeTags.Basic
+import Mathlib.GroupTheory.GroupAction.ConjAct
 import OddOrder.Peterfalvi.Appendices.NearFieldClass
 
 /-!
@@ -34,6 +39,51 @@ affine near-field model (`AffineNearFieldModel`) of Appendix C, Proposition 1.
 open OddOrder.Peterfalvi.Appendices.NearFields (NearField)
 
 namespace OddOrder.GroupTheory
+
+/-- A `MulDistribMulAction M α` on a commutative group `α` (a monoid `M` acting by group
+automorphisms) transports to a `DistribMulAction` of `M` on the additive type tag `Additive α`:
+the action fixes `0 = Additive.ofMul 1` and is additive because it is multiplicative on `α`.
+
+This is the bridge that turns a conjugation action of a group `Q` on a normal *abelian* subgroup
+`F` into the `[DistribMulAction Q (Additive F)]` that `SharplyTransitiveData` consumes. -/
+@[reducible] def MulDistribMulAction.toDistribMulActionAdditive {M α : Type*} [Monoid M]
+    [CommGroup α] [MulDistribMulAction M α] : DistribMulAction M (Additive α) where
+  smul m a := Additive.ofMul (m • a.toMul)
+  one_smul a := by
+    change Additive.ofMul ((1 : M) • a.toMul) = a
+    rw [one_smul]; rfl
+  mul_smul m n a := by
+    change Additive.ofMul ((m * n) • a.toMul)
+      = Additive.ofMul (m • (Additive.ofMul (n • a.toMul)).toMul)
+    rw [mul_smul]; rfl
+  smul_zero m := by
+    change Additive.ofMul (m • (1 : α)) = (0 : Additive α)
+    rw [smul_one]; rfl
+  smul_add m a b := by
+    change Additive.ofMul (m • (a.toMul * b.toMul))
+      = Additive.ofMul (m • a.toMul) + Additive.ofMul (m • b.toMul)
+    rw [smul_mul']; rfl
+
+open scoped IsMulCommutative in
+/-- The **conjugation action** of a subgroup `Q ≤ G` on the additive group `Additive ↥F` of a
+normal *abelian* subgroup `F ⊴ G`: `q • Additive.ofMul f = Additive.ofMul (q f q⁻¹)`.
+
+This is the `DistribMulAction` that feeds `SharplyTransitiveData` in the affine near-field transport
+(Peterfalvi App. C, Prop 1): `F ⋊ Q` with `Q` sharply transitive on `F ∖ {1}` becomes the affine
+near-field group `𝓛(F) = F ⋊ F^*`. -/
+@[reducible] noncomputable def conjAdditiveAction {G : Type*} [Group G] (F Q : Subgroup G)
+    [F.Normal] [IsMulCommutative ↥F] : DistribMulAction ↥Q (Additive ↥F) :=
+  letI : DistribMulAction (ConjAct G) (Additive ↥F) :=
+    MulDistribMulAction.toDistribMulActionAdditive
+  DistribMulAction.compHom (Additive ↥F)
+    ((ConjAct.toConjAct : G ≃* ConjAct G).toMonoidHom.comp Q.subtype)
+
+open scoped IsMulCommutative in
+/-- Unfolding the conjugation action: `(q • a)` is conjugation of `a` by `q` inside `G`. -/
+theorem conjAdditiveAction_val_toMul {G : Type*} [Group G] {F Q : Subgroup G} [F.Normal]
+    [IsMulCommutative ↥F] (q : ↥Q) (a : Additive ↥F) :
+    letI := conjAdditiveAction F Q
+    (((q • a).toMul : ↥F) : G) = (q : G) * ((a.toMul : ↥F) : G) * (q : G)⁻¹ := rfl
 
 variable {M A : Type*} [Group M] [AddCommGroup A] [DistribMulAction M A]
 
@@ -129,6 +179,18 @@ theorem mul_assoc' (x y z : A) : d.mul (d.mul x y) z = d.mul x (d.mul y z) := by
   · simp [hx]
   · exact d.e_mul x hx
 
+/-- **Right multiplication is the action**: `x * (m • e) = m • x`.  This is the bridge between the
+near-field multiplication and the group action — the identity that turns the conjugation action of
+the acting group into right multiplication by `F^*` (Peterfalvi's `𝓛(F) = F ⋊ F^*`). -/
+theorem mul_smul_e (m : M) (x : A) : d.mul x (m • d.e) = m • x := by
+  rw [d.mul_def (d.smul_e_ne_zero m), ← d.coord_unique (d.smul_e_ne_zero m) rfl]
+
+/-- The product of two "coordinate" elements is *anti*-multiplicative in `M`:
+`(m₁ • e) * (m₂ • e) = (m₂ * m₁) • e`.  Hence `m ↦ m • e` is an anti-homomorphism `M → Aˣ`, and a
+genuine isomorphism `M ≃* Aˣ` must pre-compose with inversion (see `mulEquivUnits`). -/
+theorem smul_e_mul (m₁ m₂ : M) : d.mul (m₁ • d.e) (m₂ • d.e) = (m₂ * m₁) • d.e := by
+  rw [d.mul_smul_e, mul_smul]
+
 /-- **Right distributivity** `(a + b) * c = a * c + b * c` — exactly additivity of `· • x`. -/
 theorem right_distrib' (a b c : A) : d.mul (a + b) c = d.mul a c + d.mul b c := by
   by_cases hc : c = 0
@@ -171,6 +233,33 @@ multiplicative identity is `e`. -/
   mul_inv_cancel := fun _ ha => d.mul_inv_cancel' ha
   exists_pair_ne := ⟨0, d.e, fun h => d.e_ne_zero h.symm⟩
   right_distrib := d.right_distrib'
+
+/-- **The multiplicative group of the near-field is the acting group** `M`: the map
+`m ↦ m⁻¹ • e` is a group isomorphism `M ≃* Aˣ` (onto the units `A ∖ {0}` of the near-field).
+
+The inverse `m ↦ m⁻¹` (rather than `m ↦ m • e`) is what makes this a *homomorphism*: right
+multiplication is `x * y = (coord y) • x`, so `(m₁⁻¹ • e) * (m₂⁻¹ • e) = (m₁ m₂)⁻¹ • e` — i.e.
+`m ↦ m • e` is an *anti*-homomorphism, and pre-composing with inversion fixes the direction.  This
+realizes the identification `Q ≃* F^*` of Peterfalvi Appendix C, Proposition 1. -/
+noncomputable def mulEquivUnits :
+    letI := d.nearField
+    M ≃* Aˣ :=
+  letI := d.nearField
+  { toFun := fun m => Units.mk0 (m⁻¹ • d.e) (d.smul_e_ne_zero _)
+    invFun := fun u => (d.coord (u : A))⁻¹
+    left_inv := fun m => by
+      simp only [Units.val_mk0]
+      rw [← d.coord_unique (d.smul_e_ne_zero m⁻¹) rfl, inv_inv]
+    right_inv := fun u => by
+      have hu : (u : A) ≠ 0 := u.ne_zero
+      apply Units.ext
+      simp only [Units.val_mk0, inv_inv]
+      exact d.coord_smul_e hu
+    map_mul' := fun m₁ m₂ => by
+      apply Units.ext
+      simp only [Units.val_mk0, Units.val_mul]
+      change (m₁ * m₂)⁻¹ • d.e = d.mul (m₁⁻¹ • d.e) (m₂⁻¹ • d.e)
+      rw [d.mul_smul_e, smul_smul, mul_inv_rev] }
 
 end SharplyTransitiveData
 

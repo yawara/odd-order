@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.IndexNormal
 import Mathlib.GroupTheory.Sylow
 import Mathlib.GroupTheory.DoubleCoset
+import Mathlib.GroupTheory.GroupAction.Quotient
 
 /-!
 # Isaacs Chapter 1 — Problems (演習問題)
@@ -332,6 +333,108 @@ theorem isPretransitive_prod_iff {G α β : Type*} [Group G] [MulAction G α] [M
       rw [← hgx1, mul_smul, inv_smul_smul]; exact hgy1
     · change (gy * gx⁻¹) • x.2 = y.2
       rw [← hgx2, mul_smul, inv_smul_smul]; exact hgy2
+
+open MulAction in
+/-- Burnside の補題 (Nat.card 版): 有限群 `M` が有限集合 `β` に作用するとき
+`∑_{m∈M}|Fix(m)| = (#軌道)·|M|`。mathlib の Fintype 版
+`sum_card_fixedBy_eq_card_orbits_mul_card_group` の Nat.card 化 (Isaacs 1A.6 の置換指標による
+軌道計数、1A.7 で使用)。`∑ m : M` の総和記法のため `[Fintype M]` が必要。 -/
+theorem sum_card_fixedBy_nat {M β : Type*} [Group M] [Fintype M] [MulAction M β] [Finite β] :
+    ∑ m : M, Nat.card (fixedBy β m) = Nat.card (orbitRel.Quotient M β) * Nat.card M := by
+  classical
+  obtain ⟨_⟩ := nonempty_fintype β
+  haveI : Fintype (orbitRel.Quotient M β) := Fintype.ofFinite _
+  simp only [Nat.card_eq_fintype_card]
+  exact sum_card_fixedBy_eq_card_orbits_mul_card_group M β
+
+open MulAction in
+/-- **Isaacs Problem 1A.7**. 有限群 `G` の真部分群 `H` の共役のいずれにも属さない元
+(`∀ x, x⁻¹gx ∉ H`) は `|H|` 個以上ある。
+
+`χ(g) = |Fix_{G⧸H}(g)|` について Burnside を `G`, `H` に適用: `∑_{g∈G}χ(g) = |G|` (推移的)、
+`∑_{h∈H}χ(h) = |H|·(#H-軌道) ≥ 2|H|` (真部分群ゆえ H-軌道 = 二重剰余類が 2 個以上)。
+`χ(g)=0 ⟺ g⁻¹ が共役に入らない`、counting `z ≥ (|G|-|H|)-∑_{g∉H}χ ≥ |H|`、`g↦g⁻¹` 双射。 -/
+theorem card_not_mem_conj_ge {G : Type*} [Group G] [Finite G] {H : Subgroup G} (hH : H ≠ ⊤) :
+    Nat.card H ≤ Nat.card {g : G // ∀ x : G, x⁻¹ * g * x ∉ H} := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  -- (a) g fixes QuotientGroup.mk x ⟺ x⁻¹g⁻¹x ∈ H
+  have hfix : ∀ g x : G,
+      g • (QuotientGroup.mk x : G ⧸ H) = QuotientGroup.mk x ↔ x⁻¹ * g⁻¹ * x ∈ H := fun g x => by
+    rw [MulAction.Quotient.smul_mk, smul_eq_mul, QuotientGroup.eq, mul_inv_rev]
+  -- (b) χ g = 0 ⟺ ∀ x, x⁻¹g⁻¹x ∉ H
+  have hχzero : ∀ g : G, Nat.card (fixedBy (G ⧸ H) g) = 0 ↔ ∀ x : G, x⁻¹ * g⁻¹ * x ∉ H := by
+    intro g
+    rw [Nat.card_eq_zero, or_iff_left (not_infinite_iff_finite.mpr inferInstance),
+      Set.isEmpty_coe_sort, Set.eq_empty_iff_forall_notMem]
+    refine ⟨fun h x hx => h (QuotientGroup.mk x : G ⧸ H) (mem_fixedBy.mpr ((hfix g x).mpr hx)),
+      fun h c => ?_⟩
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective c
+    exact fun hc => h x ((hfix g x).mp (mem_fixedBy.mp hc))
+  -- (G-side) ∑ χ = |G|
+  have hsumG : ∑ g : G, Nat.card (fixedBy (G ⧸ H) g) = Nat.card G := by
+    rw [sum_card_fixedBy_nat]
+    haveI : Subsingleton (orbitRel.Quotient G (G ⧸ H)) :=
+      (pretransitive_iff_subsingleton_quotient G (G ⧸ H)).mp inferInstance
+    rw [show Nat.card (orbitRel.Quotient G (G ⧸ H)) = 1 from Nat.card_unique, one_mul]
+  -- (H-side) 2|H| ≤ ∑_{h∈H} χ(↑h)
+  have hsumH : 2 * Nat.card H ≤ ∑ h : H, Nat.card (fixedBy (G ⧸ H) (h : G)) := by
+    have heq : ∑ h : H, Nat.card (fixedBy (G ⧸ H) (h : G))
+        = Nat.card (orbitRel.Quotient H (G ⧸ H)) * Nat.card H := sum_card_fixedBy_nat
+    rw [heq]
+    gcongr
+    -- 2 ≤ #H-軌道: [1] と [x] (x∉H) が別軌道
+    obtain ⟨x, -, hx⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hH)
+    have hnt : Nontrivial (orbitRel.Quotient H (G ⧸ H)) := by
+      refine ⟨Quotient.mk'' (QuotientGroup.mk (1 : G) : G ⧸ H),
+        Quotient.mk'' (QuotientGroup.mk x : G ⧸ H), ?_⟩
+      rw [ne_eq, Quotient.eq'', MulAction.orbitRel_apply, MulAction.mem_orbit_iff]
+      rintro ⟨h, hh⟩
+      rw [show (h • (QuotientGroup.mk x : G ⧸ H)) = QuotientGroup.mk ((h : G) * x) from rfl,
+        QuotientGroup.eq, mul_one, mul_inv_rev] at hh
+      exact hx (H.inv_mem_iff.mp (by simpa using H.mul_mem hh h.2))
+    exact Finite.one_lt_card_iff_nontrivial.mpr hnt
+  -- target ≃ {χ = 0} (g ↦ g⁻¹, hχzero)
+  rw [show Nat.card {g : G // ∀ x : G, x⁻¹ * g * x ∉ H}
+      = Nat.card {g : G // Nat.card (fixedBy (G ⧸ H) g) = 0} from
+    Nat.card_congr ((Equiv.inv G).subtypeEquiv fun g => by
+      rw [Equiv.inv_apply, hχzero]; simp only [inv_inv])]
+  -- Finset counting
+  haveI : Fintype {g : G // Nat.card (fixedBy (G ⧸ H) g) = 0} := Fintype.ofFinite _
+  set f : G → ℕ := fun g => Nat.card (fixedBy (G ⧸ H) g) with hf
+  set SH := Finset.univ.filter (fun g => g ∈ H) with hSHd
+  set SHc := Finset.univ.filter (fun g => g ∉ H) with hSHcd
+  set Z := Finset.univ.filter (fun g => f g = 0) with hZd
+  have hcardH : SH.card = Nat.card H := by
+    rw [hSHd, Nat.card_eq_fintype_card, Fintype.card_subtype]
+  have hcardZ : Z.card = Nat.card {g : G // f g = 0} := by
+    rw [hZd, Nat.card_eq_fintype_card, Fintype.card_subtype]
+  rw [← hcardH, ← hcardZ]
+  -- 和の分割 A + B = |G|
+  have hsum : (∑ g ∈ SH, f g) + (∑ g ∈ SHc, f g) = Nat.card G :=
+    (Finset.sum_filter_add_sum_filter_not Finset.univ (· ∈ H) f).trans hsumG
+  -- H 側 ≥ 2·|SH|
+  have hSHge : 2 * SH.card ≤ ∑ g ∈ SH, f g := by
+    rw [hcardH]
+    calc 2 * Nat.card H ≤ ∑ h : H, f (h : G) := hsumH
+      _ = ∑ g ∈ SH, f g := (Finset.sum_subtype _ (fun g => by rw [hSHd]; simp) f).symm
+  -- Hᶜ 側: |SHc| ≤ B + |Z|
+  have hB : SHc.card ≤ (∑ g ∈ SHc, f g) + Z.card := by
+    have hle : SHc.card ≤ ∑ g ∈ SHc, (f g + if f g = 0 then 1 else 0) := by
+      rw [Finset.card_eq_sum_ones]
+      exact Finset.sum_le_sum fun g _ => by
+        by_cases h : f g = 0
+        · rw [if_pos h]; omega
+        · rw [if_neg h]; omega
+    refine hle.trans ?_
+    rw [Finset.sum_add_distrib, Finset.sum_boole]
+    gcongr
+    exact Finset.card_le_card (Finset.filter_subset_filter _ (Finset.subset_univ _))
+  -- |SH| + |SHc| = |G|
+  have hcompl : SH.card + SHc.card = Nat.card G := by
+    rw [hSHd, hSHcd, Finset.card_filter_add_card_filter_not, Finset.card_univ,
+      Nat.card_eq_fintype_card]
+  omega
 
 end
 
