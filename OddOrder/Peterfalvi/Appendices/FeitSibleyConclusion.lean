@@ -108,6 +108,59 @@ theorem sum_degreeSq_XsetOf_bot [Finite G] {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1
       rw [hT, hchar]; exact ⟨ψ.2, hψ.2⟩
     · apply IrreducibleCharacter.ext; rfl
 
+open scoped Classical in
+/-- **(8) Fourier evaluation split** (Peterfalvi (8), p. 150).  A virtual character
+`θ ∈ ℤ[Irr H]` evaluated on `z ∈ Z` minus at `1` picks up only its `𝒳 = XsetOf ⊥ Z`
+components: `θ(z) − θ(1) = ∑_{χ ∈ 𝒳} ⟨θ, χ⟩·(χ(z) − χ(1))`.  Writing `θ = ∑_a c_a·a`
+(`mem_ZIrr_repr`) and evaluating, the `Z ⊆ Ker a` (i.e. `LeKer a Z`) components are constant
+on `Z` (`a(z) = a(1)`) and drop out; the surviving irreducibles are exactly `𝒳`, on which the
+coefficient is the Fourier inner product `⟨θ, a⟩ = c_a` (`inner_eq_coeff_of_repr`). -/
+theorem apply_sub_apply_eq_sum_XsetOf_bot [Finite G] [Fintype ↥hyp.H]
+    [Invertible (Nat.card ↥hyp.H : ℂ)] {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    {T : Finset (ClassFunction ↥hyp.H ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.XsetOf ⊥ Z)
+    {θ : ClassFunction ↥hyp.H ℂ} (hθ : θ ∈ ZIrr ↥hyp.H)
+    {z : ↥hyp.H} (hz : (z : G) ∈ Z) :
+    θ z - θ 1 = ∑ χ ∈ T, ClassFunction.inner θ (χ : ClassFunction ↥hyp.H ℂ) * (χ z - χ 1) := by
+  classical
+  obtain ⟨c, hsupp, hrepr⟩ := mem_ZIrr_repr hθ
+  have hinner : ∀ χ ∈ T, ClassFunction.inner θ χ = (c χ : ℂ) := by
+    intro χ hχ
+    have hirr : IsIrreducibleCharacter χ := ((hyp.mem_XsetOf_bot_iff hZQ1).mp ((hT χ).mp hχ)).1
+    have h := inner_eq_coeff_of_repr (⟨χ, hirr⟩ : IrreducibleCharacter ↥hyp.H) hsupp
+    rw [show ((⟨χ, hirr⟩ : IrreducibleCharacter ↥hyp.H) : ClassFunction ↥hyp.H ℂ) = χ from rfl,
+      ← hrepr] at h
+    exact h
+  rw [Finset.sum_congr rfl (fun χ hχ => by rw [hinner χ hχ])]
+  have hval : θ z - θ 1 = ∑ a ∈ c.support, (c a : ℂ) * (a z - a 1) := by
+    rw [hrepr, ClassFunction.sum_apply, ClassFunction.sum_apply, ← Finset.sum_sub_distrib]
+    refine Finset.sum_congr rfl fun a _ => ?_
+    rw [ClassFunction.smul_apply, ClassFunction.smul_apply]; ring
+  rw [hval]
+  have hLeKer_vanish : ∀ a : ClassFunction ↥hyp.H ℂ, hyp.LeKer a Z → (a z - a 1) = 0 := by
+    intro a ha; rw [ha z hz, sub_self]
+  have hL : ∑ a ∈ c.support, (c a : ℂ) * (a z - a 1)
+      = ∑ a ∈ c.support.filter (fun a => ¬ hyp.LeKer a Z), (c a : ℂ) * (a z - a 1) := by
+    refine (Finset.sum_subset (Finset.filter_subset _ _) ?_).symm
+    intro a ha hnot
+    rw [Finset.mem_filter, not_and_or, not_not] at hnot
+    rcases hnot with h | h
+    · exact absurd ha h
+    · rw [hLeKer_vanish a h, mul_zero]
+  have hR : ∑ a ∈ c.support.filter (fun a => ¬ hyp.LeKer a Z), (c a : ℂ) * (a z - a 1)
+      = ∑ χ ∈ T, (c χ : ℂ) * (χ z - χ 1) := by
+    refine Finset.sum_subset ?_ ?_
+    · intro a ha
+      rw [Finset.mem_filter] at ha
+      rw [hT, hyp.mem_XsetOf_bot_iff hZQ1]
+      exact ⟨mem_irreducibleCharacters.mp (hsupp (Finset.mem_coe.mpr ha.1)), ha.2⟩
+    · intro χ hχT hχnot
+      have hχT' := (hyp.mem_XsetOf_bot_iff hZQ1).mp ((hT χ).mp hχT)
+      rw [Finset.mem_filter, not_and_or] at hχnot
+      rcases hχnot with h | h
+      · rw [Finsupp.notMem_support_iff.mp h, Int.cast_zero, zero_mul]
+      · exact absurd (not_not.mp h) hχT'.2
+  rw [hL, hR]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
