@@ -153,3 +153,34 @@ CLAUDE.md 明記、0123 close。
 - lane b: Higman/Suzuki2Groups・Pf Appendices Suzuki の show/simpArgs/sectionVar/残 deprecation
 - lane a: S11_* maxHeartbeats / FeitSibley 系 simpArgs・show
 - 別トラック: openClassical (0133) / Mathlib.Tactic import (0136) / 長宣言名 (0132)
+
+---
+
+## ✅ 2026-07-23 実施 (d = hub 代行) — frozen 機械 wave 19件 (218→199)
+
+commit `975a387e1` (10 files, +15/-29)。real hub 稼働中 (a/b/c を合流・tick で「d lint」明記) ゆえ
+**main へ直接 push せず d に commit → hub が forward merge** する分担。full build (5m54s) + `--diff`
+で regression ゼロ、AxiomsCheck OK (`OddOrder.lean:484` が import)、sorry 8 非退行を確認。
+
+**解消 19件 (frozen × 純機械のみ; active-lane は全除外)**:
+- deprecation 3: ModelCenters `push_neg at hall` → `push Not at hall`
+- unusedSimpArgs 9: ModelCenters 6 (zero_add/zero_mul) / MixedEigenweights `Fin.val_mk` /
+  XiLengthFromCard・QuotientPlaneModel `AddSubgroup.mem_toZModSubmodule`
+- unusedTactic 3: CaseDispatch no-op `push_cast` ×2 (a:=r/s 単項時のみ) / AppE_AbelianCentralizer no-op `change`
+- unnecessarySeqFocus 2: AppE_FiliformCounterexample・AppE_FiliformGroup 2 段目 `<;>` → `;`
+- style.maxHeartbeats 2: MixedEigenweights・S11_NineElevenCaseAResidual に理由コメント
+
+**このwaveで踏んだ罠 (次 wave 用)**:
+- ⚠ **`style.maxHeartbeats` のコメントは `set_option … in` の *直後* (次 cmd の前) に置く**。
+  linter (`DeprecatedSyntaxLinter.getSetOptionMaxHeartbeatsComment`) は `in` と cmd の間の trivia
+  を見る。前に置くと不成立で 1 往復した。例: `set_option maxHeartbeats n in` → `-- 理由` → `theorem …`。
+- ⚠ **同一 simp 行トラップ**: ModelCenters 189-190(eq1) と 196-197(eq2) は byte 一致だが 190 のみ
+  unused。`replace_all` 厳禁、`have h := hadd (γ,0)` 等 context で個別特定 (Python の count==1 assert で担保)。
+- ⚠ **baseline に stale あり**: S05_GridTrichotomy は baseline で `style.header` だが実体は
+  `import.mathlibTactic` (0136 track)。着手判断は census 実測で。
+
+### 残 199 の大どころ (hub は active-lane を触らない; owner が frontier 通過時に解消)
+- **flexible 74** (AppE_FiliformGroup 67 / Counterexample 6) — 要 `simp?` + full build + 敵対検証。lane c or hub 専用 wave。
+- **style.show 59** — goal 変更 show の個別確認要。owner lane 通過時。
+- longLine 17 / unusedVariables・unusedSectionVars 17 / openClassical 11 (0133) ほか。
+- FieldAction `simpa`→`simp` 1 は owner 判断で defer。
