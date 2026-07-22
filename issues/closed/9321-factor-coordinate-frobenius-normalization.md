@@ -27,12 +27,30 @@ Lemma 13 でも共通 `ePhi` と `nu` を動かさず同じ操作が必要なの
 
 ## やること
 
-- [ ] inclusive `FactorCoordinateData` の normalization theorem を追加
-- [ ] prescribed kernel coordinate と `nu` の index を保持
-- [ ] CaseDispatch と Assembly の targeted build
-- [ ] warning ratchet
-- [ ] issue を closed に移す
+- [x] inclusive `FactorCoordinateData` の normalization theorem を追加
+- [x] prescribed kernel coordinate と `nu` の index を保持
+- [x] CaseDispatch と Assembly の targeted build
+- [x] warning ratchet
+- [x] issue を closed に移す
 
 ## 完了条件
 
 新規 sorry/axiom なし。CaseDispatch と Assembly の targeted build green。
+
+## 2026-07-23 完了
+
+commit `e4f91c289` で
+`FactorCoordinateData.exists_normalized_frobenius_le_half` を追加した。
+commutative branch は同じ coordinate data と `theta = 1` を返し、
+noncommutative branch は既存の coordinate flip により `0 < r`、
+`2*r ≤ n` を満たす Frobenius power を返す。型 index の `c`、`ePhi`、`nu`
+は両 branch で不変。
+
+検証:
+
+- `lake build OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch`
+- `lake build OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly`
+- `bin/check-warnings OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch`
+  — 非 sorry 警告 21、全件 baseline 内
+- `bin/check-warnings OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly`
+  — 非 sorry 警告 31、全件 baseline 内
