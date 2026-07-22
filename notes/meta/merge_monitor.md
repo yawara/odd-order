@@ -6,6 +6,15 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **🔀 2026-07-22 22:3x — C の次タスク = B レーン分割 (ユーザー裁定) → c primary = Peterfalvi Suzuki2Groups**。
+> ユーザー指示「C の次のタスクは B レーンを分割したい」。hub 実測で feasibility 確認済 → **可能・クリーンな分割点あり**。前 tick の「c → NearFields transport」を supersede。
+> **分割内容**: **Peterfalvi `Appendices/Suzuki2Groups.lean` + `Suzuki2Groups/` subdir (11 file) を b → c へ carve**。
+> = Peterfalvi App III Higman 2-群分類の**最終組立 4 sorry** (`square_map_quadratic` / `higman_classification` / `typeB_field_model` / `typeB_automorphism_structure`)。土台の **`Higman/Suzuki2Groups/**` (60+ file・全 sorry-free) は B が完成済**ゆえ c は cite するだけ。
+> **クリーンな理由 (実測)**: ① file 分離 (`Suzuki/`=Theorem B は b、`Suzuki2Groups`=c) ② 循環依存なし (b の TypeBFromW/WCyclicDivides は Suzuki2Groups を **cite のみ**、edit しない — cite≠所有) ③ B は今 Suzuki2Groups を触っていない (dirty 0) ④ c が 4 sorry を閉じれば B の cite が強化される。
+> ⚠ **B の active FirstCase step チェーン (Step1→9→組立) は線形依存ゆえ co-work 不可** — だから独立クラスタの Suzuki2Groups を切り出すのが正しい並列化。B は Theorem B (2053) を継続。
+> **regex 更新済**: b_re = `Appendices/Suzuki(/|.lean)` (Theorem B のみ) / c_re += `Suzuki2Groups`。**NearFields Prop1 (Q₈ gated) は c 所有のまま低優先繰延に降格**。
+> ⚠ c は未 sync ゆえ本裁定も未受領 — 次 sync で NearFields でなく Suzuki2Groups に向かう (未同期継続なら user nudge)。
+>
 > **▶▶ 2026-07-22 22:2x 監視 tick (Opus 4.8 hub 638898, cron `7,22,37,52` id 3ee45bda)**。a=3 / b=1 / c=0。
 > 合流: a (**Isaacs Ch.1 Problems 1A.2 二重剰余類位数公式 |HgK|·|K∩Hᵍ|=|H||K| + 1A.3 hint**, Problems.lean +71) /
 > b (**GroupTheory/TransferInvariantTransversal.lean 新 leaf** — conjugation-invariant transversal 上の transfer, +92, OddOrder.lean 配線済)。
@@ -227,8 +236,8 @@
 > FT endgame の履歴であり、新フェーズの range-check には使わない):
 > ```
 > a_re='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S|^OddOrder/Peterfalvi/Appendices/FeitSibley'   # 2026-07-19 9154 + 2026-07-22 9205 裁定: FeitSibley (a 完済 axiom-clean) を a 明示 carve-out
-> b_re='^OddOrder/Higman/|^OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/|^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'   # 2026-07-19 夕 ユーザー裁定 (issue 0127 ③): Higman 原典 = 4 冊目として OddOrder/Higman/ を新設、b 所有
-> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|ExceptionalNearField)'   # 2026-07-22 9205 裁定: FeitSibley 除去 (a 完済→a carve-out へ)。near-field クラスタ (NearFields Prop 1) + ExceptionalNearField/SemilinearField/Huppert は c。⚠ 2026-07-22 9405 revise: BS |S|≥16 後の c 次 frontier = **NearFields Prop1 transport (Pf p.137)** に確定 (ユーザー指示) → 前案の「Isaacs Ch.6–10 cross-assign」は撤回 (c_re の Isaacs carve も削除、Isaacs Problems 1055 は全て a 所有に戻す)
+> b_re='^OddOrder/Higman/|^OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/|^OddOrder/Peterfalvi/Appendices/Suzuki(/|\.lean)'   # 2026-07-19 夕 ユーザー裁定 (issue 0127 ③): Higman 原典 = 4 冊目として OddOrder/Higman/ を新設、b 所有。⚠ 2026-07-22 裁定 (ユーザー「C の次タスク = B 分割」): Peterfalvi Appendices/Suzuki2Groups (.lean + subdir 11 file) を c へ carve → b_re は Suzuki(/|.lean) = Theorem B (FirstCase) チェーンのみ。Higman/** (土台・完成済) は b 保持で c が cite
+> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|ExceptionalNearField|Suzuki2Groups)'   # 2026-07-22 9205 裁定: FeitSibley 除去→a。near-field クラスタ + Huppert/SemilinearField/ExceptionalNearField は c。⚠ 2026-07-22 裁定 (ユーザー「C の次タスク = B 分割」): **Peterfalvi Appendices/Suzuki2Groups を b→c へ carve** (Peterfalvi App III Higman 2-群分類の最終組立 = 4 sorry、B 完成済 Higman/** を cite)。c primary = Suzuki2Groups。NearFields Prop1 (Q₈ gated) は c 所有のまま低優先繰延に降格
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
 > ```
 > **▶ 2026-07-19 11:29 lane a 復帰 → 暫定裁定 9158 失効、9154 の恒久配分へ復帰**。
