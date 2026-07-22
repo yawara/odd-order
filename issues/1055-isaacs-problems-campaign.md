@@ -322,9 +322,22 @@ mathlib inductive (`top`/`step`)。
   - ✅ 実証明 **2A.8** `commutator_eq_bot_of_ne_of_isSubnormal_of_simple` (異なる非可換単純な部分正規 `S,T`
     ⟹ `⁅S,T⁆=⊥`)。非可換単純部分正規は component (`isQuasisimple_of_isSimpleGroup_not_isMulCommutative`)、
     異なる component は可換 (`IsComponent.commutator_eq_bot_of_ne`、Ch09)。import 追加 = Ch09 SubnormalSocle。
-  - ⬜ 残り §2A: 2A.4 (Wielandt) / 2A.5 (minimal normal = 単純直積) / 2A.6 / 2A.9 (O^π normalizes π-perfect)。
+  - ⏸ **残り §2A (deferred-hard、repo 直接対応薄い)**: 2A.4 (Wielandt: S 単純が全 subnormal と permute
+    ⟹ 全 subnormal を正規化) / 2A.5 (minimal normal = 単純直積、socle 分解が必要) / 2A.6 / 2A.9
+    (H◁◁G π-perfect ⟹ O^π(G) が H を正規化)。**2A.9 メモ**: `H≤O^π(G)` は導ける (H/(H∩O^π(G)) は
+    π-群商ゆえ π-perfect の H で自明) が、正規化は subtle。いずれも ~40-60 行 machinery ゆえ専用 session。
 
-- ⬜ **次: §1D 続き (1D.8/1D.13 系 mathlib 支援厚のもの、1D.2/1D.3-5 は後で) → §1E–§1G**。
+## Ch.3 (Split Extensions) §3A — 着手 (2026-07-23、§2A hard tail deferred 中の breadth 展開)
+
+新 leaf `OddOrder/Isaacs/Ch03_SplitExtensions/Problems.lean` (namespace `OddOrder.Isaacs.Ch03`、
+import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 配線済)。
+
+- ✅ 実証明 **3A.5** `semidirectConjEquivProd` (`G ⋊ G ≅ G × G`、共役作用の半直積は直積)。同型
+  `(n,g)↦(n·g,g)` (逆 `(a,g)↦⟨a·g⁻¹,g⟩`)、map_mul' は `mul_left`/`mul_right`/`conj_apply` 展開 + `group`。
+- ⬜ 残り §3A: 3A.1/3A.2 (semidihedral/generalized quaternion 構成) / 3A.3/3A.4 (order pm, q(q-1) 構成) /
+  3A.6 (p-群 faithful ⟹ orbit faithful、Thm 1.38 Brodkey) / 3A.7 (regular orbit) / 3A.8 (cyclic pqr auto)。
+
+- ⬜ **次: §3A 続き or §2A hard tail 再訪。§1D 残り = 1D.5 (Isaacs-noted-hardest)。**
 
 ## 完了条件
 
