@@ -174,6 +174,112 @@ theorem inner_self_eq_residual_add_sum_inner_mul_star {ι : Type*} {s : Finset �
           ClassFunction.inner_add_right]
     _ = _ := by rw [hvS, hSv, hSS, add_zero, zero_add]
 
+/-! ### Span-transport helpers for the (6) coherence assembly
+
+A `ℤ`-linear map that preserves the gram matrix (resp. `ℤ[Irr]`-valuedness) on the
+members of a set `T` does so on all of `ℤ[T]`; an orthonormal finite `T` gives
+integer Fourier coefficients and the reconstruction `φ = ∑_μ (φ,μ)·μ` on `ℤ[T]`.
+These extend the member-level facts of the witness assignments to the lattice. -/
+
+section SpanTransport
+
+variable {Δ : Type*} [Group Δ] [Fintype Δ] [Invertible (Nat.card Δ : ℂ)]
+
+/-- A `ℤ`-linear map preserving inner products on the members of `T` preserves
+them on all of `ℤ[T]`. -/
+theorem inner_map_eq_on_zSpan (F : ClassFunction Γ ℂ →ₗ[ℤ] ClassFunction Δ ℂ)
+    {T : Set (ClassFunction Γ ℂ)}
+    (h : ∀ μ ∈ T, ∀ ν ∈ T, ClassFunction.inner (F μ) (F ν) = ClassFunction.inner μ ν) :
+    ∀ φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T,
+      ∀ ψ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T,
+      ClassFunction.inner (F φ) (F ψ) = ClassFunction.inner φ ψ := by
+  have hright : ∀ μ ∈ T, ∀ ψ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T,
+      ClassFunction.inner (F μ) (F ψ) = ClassFunction.inner μ ψ := by
+    intro μ hμ ψ hψ
+    induction hψ using Submodule.span_induction with
+    | mem ν hν => exact h μ hμ ν hν
+    | zero => rw [map_zero, ClassFunction.inner_zero_right, ClassFunction.inner_zero_right]
+    | add ψ₁ ψ₂ _ _ ih₁ ih₂ =>
+        rw [map_add, ClassFunction.inner_add_right, ClassFunction.inner_add_right, ih₁, ih₂]
+    | smul c ψ₀ _ ih =>
+        rw [map_smul, ← Int.cast_smul_eq_zsmul ℂ c (F ψ₀), ← Int.cast_smul_eq_zsmul ℂ c ψ₀,
+          OddOrder.RepresentationTheory.inner_smul_right,
+          OddOrder.RepresentationTheory.inner_smul_right, ih]
+  intro φ hφ ψ hψ
+  induction hφ using Submodule.span_induction with
+  | mem μ hμ => exact hright μ hμ ψ hψ
+  | zero => rw [map_zero, ClassFunction.inner_zero_left, ClassFunction.inner_zero_left]
+  | add φ₁ φ₂ _ _ ih₁ ih₂ =>
+      rw [map_add, ClassFunction.inner_add_left, ClassFunction.inner_add_left, ih₁, ih₂]
+  | smul c φ₀ _ ih =>
+      rw [map_smul, ← Int.cast_smul_eq_zsmul ℂ c (F φ₀), ← Int.cast_smul_eq_zsmul ℂ c φ₀,
+        ClassFunction.inner_smul_left, ClassFunction.inner_smul_left, ih]
+
+omit [Fintype Γ] [Invertible (Nat.card Γ : ℂ)] [Fintype Δ] [Invertible (Nat.card Δ : ℂ)] in
+/-- A `ℤ`-linear map with `ℤ[Irr]`-values on the members of `T` has `ℤ[Irr]`-values
+on all of `ℤ[T]`. -/
+theorem map_mem_ZIrr_on_zSpan (F : ClassFunction Γ ℂ →ₗ[ℤ] ClassFunction Δ ℂ)
+    {T : Set (ClassFunction Γ ℂ)} (h : ∀ μ ∈ T, F μ ∈ ZIrr Δ) :
+    ∀ φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T, F φ ∈ ZIrr Δ := by
+  intro φ hφ
+  induction hφ using Submodule.span_induction with
+  | mem μ hμ => exact h μ hμ
+  | zero => rw [map_zero]; exact Submodule.zero_mem _
+  | add φ₁ φ₂ _ _ ih₁ ih₂ => rw [map_add]; exact Submodule.add_mem _ ih₁ ih₂
+  | smul c φ₀ _ ih => rw [map_smul]; exact Submodule.smul_mem _ _ ih
+
+/-- On `ℤ[T]` with integer member gram matrix, all Fourier coefficients against
+members are integers. -/
+theorem exists_int_inner_of_mem_zSpan {T : Set (ClassFunction Γ ℂ)}
+    (hgram : ∀ ν ∈ T, ∀ μ ∈ T, ∃ c : ℤ, ClassFunction.inner ν μ = (c : ℂ)) :
+    ∀ φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T, ∀ μ ∈ T,
+      ∃ c : ℤ, ClassFunction.inner φ μ = (c : ℂ) := by
+  intro φ hφ
+  induction hφ using Submodule.span_induction with
+  | mem ν hν => exact fun μ hμ => hgram ν hν μ hμ
+  | zero => exact fun μ hμ => ⟨0, by rw [ClassFunction.inner_zero_left, Int.cast_zero]⟩
+  | add φ₁ φ₂ _ _ ih₁ ih₂ =>
+      intro μ hμ
+      obtain ⟨c₁, hc₁⟩ := ih₁ μ hμ
+      obtain ⟨c₂, hc₂⟩ := ih₂ μ hμ
+      exact ⟨c₁ + c₂, by rw [ClassFunction.inner_add_left, hc₁, hc₂, Int.cast_add]⟩
+  | smul c φ₀ _ ih =>
+      intro μ hμ
+      obtain ⟨c₀, hc₀⟩ := ih μ hμ
+      refine ⟨c * c₀, ?_⟩
+      rw [← Int.cast_smul_eq_zsmul ℂ c φ₀, ClassFunction.inner_smul_left, hc₀, Int.cast_mul]
+
+/-- **Reconstruction on `ℤ[T]`** for a finite orthonormal `T`: every lattice
+element is the sum of its Fourier components, `φ = ∑_{μ ∈ T} (φ, μ)·μ`. -/
+theorem eq_sum_inner_smul_of_mem_zSpan {T : Set (ClassFunction Γ ℂ)}
+    {s : Finset (ClassFunction Γ ℂ)}
+    (hsT : ∀ {μ : ClassFunction Γ ℂ}, μ ∈ s ↔ μ ∈ T)
+    (hnorm : ∀ μ ∈ T, ClassFunction.inner μ μ = 1)
+    (horth : ∀ μ ∈ T, ∀ ν ∈ T, μ ≠ ν → ClassFunction.inner μ ν = 0) :
+    ∀ φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := Γ) T,
+      φ = ∑ μ ∈ s, ClassFunction.inner φ μ • μ := by
+  intro φ hφ
+  induction hφ using Submodule.span_induction with
+  | mem ν hν =>
+      rw [Finset.sum_eq_single ν
+        (fun μ hμ hne => by rw [horth ν hν μ (hsT.mp hμ) (Ne.symm hne), zero_smul])
+        (fun h => absurd (hsT.mpr hν) h), hnorm ν hν, one_smul]
+  | zero =>
+      simp only [ClassFunction.inner_zero_left, zero_smul, Finset.sum_const_zero]
+  | add φ₁ φ₂ _ _ ih₁ ih₂ =>
+      conv_lhs => rw [ih₁, ih₂]
+      rw [← Finset.sum_add_distrib]
+      refine Finset.sum_congr rfl fun μ hμ => ?_
+      rw [ClassFunction.inner_add_left, add_smul]
+  | smul c φ₀ _ ih =>
+      conv_lhs => rw [ih]
+      rw [Finset.smul_sum]
+      refine Finset.sum_congr rfl fun μ hμ => ?_
+      rw [← Int.cast_smul_eq_zsmul ℂ c (ClassFunction.inner φ₀ μ • μ),
+        ← Int.cast_smul_eq_zsmul ℂ c φ₀, ClassFunction.inner_smul_left, smul_smul]
+
+end SpanTransport
+
 end SignedIrr
 
 /-! ## The endgame central subgroup `Z = ⁅Q₁, Q₁⁆ ⊓ Z(Q₁)` (Peterfalvi (4), p. 147)

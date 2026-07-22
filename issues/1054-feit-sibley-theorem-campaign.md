@@ -486,7 +486,21 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
          (v,Eχ₁) = −1 → |−2a'| ≤ 1 矛盾。
          出力: X-witness 割当 wX (P1-X: wX χ − aᵪ wX χ₁ = τ(χ−aᵪχ₁)) +
          **keystone (P4): wX χ₁ − a•(w η₁) = u = τ(χ₁ − a•η₁)**。
-      3. **member-assignment coherence 構成補題** (standalone、S07 レベル可):
+      3. 前半 [x] **span 転送ヘルパー 4 本完成** (2026-07-22, sorry-free,
+         generic Γ→Δ、SpanTransport section): `inner_map_eq_on_zSpan`
+         (member gram 保存 ⟹ ℤ[T] 全体で等長) / `map_mem_ZIrr_on_zSpan` /
+         `exists_int_inner_of_mem_zSpan` (整係数) / `eq_sum_inner_smul_of_mem_zSpan`
+         (再構成 φ = Σ(φ,μ)•μ、有限直交正規 T)。すべて Submodule.span_induction
+         (cases mem/zero/add/smul; smul は ← Int.cast_smul_eq_zsmul 経由)。
+         後半 [ ] = IsCoherent 組立本体 (次 iteration):
+         extension := Σ_{μ∈s} (innerLeftℤ μ).smulRight (ŵ μ) (E₀ = 0 でよい —
+         span 外の値は無関係)、E μ₀ = ŵμ₀ (member 直交正規で collapse)。
+         extension_inner_eq = inner_map_eq_on_zSpan + ŵ-gram (X/Y/cross 4 clauses)。
+         extends_on_supported = **生成引数**: φ supported → 再構成 + C·χ₁+D·η₁
+         残差の degree-at-1 で D = −Ca → φ = Σc(χ'−a'χ₁) + Σd(η−η₁) +
+         C(χ₁−aη₁)、各生成元で E = τ (P1-X/P1-Y/keystone)、equalizer submodule。
+         nonzero = 継承 (hcohX.nonzero を span mono で X∪Y へ)。
+         **member-assignment coherence 構成補題** (standalone、S07 レベル可):
          X, Y disjoint ⊆ Irr、割当 wX/wY が (P1-X)(P1-Y)(P4) + union 直交正規
          ±Irr を満たす ⟹ IsCoherent τ (X∪Y) A。
          extension := φ ↦ E₀(φ − Σ_{μ∈X∪Y}(φ,μ)μ) + Σ_{μ}(φ,μ)•w(μ)
