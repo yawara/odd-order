@@ -6,6 +6,22 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-22 23:3x 監視 tick + 🔧 9406 hub 裁定 (AffineNearFieldModel signature)**。a=3 / b=1 / c=2。
+> 合流: a (**🎉 Isaacs §1A 完了 全8問**, 1A.7 Burnside — Fintype の壁突破) / b (**2053 step (10) arithmetic core (|Q|+1)_p=p^{m+1}**, StepTen 新 leaf・配線済) / c (near-field transport glue: Q conj on Additive F + issue 9406)。
+> **gate: フルビルド green 4645 jobs (前 4644 +1 StepTen, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 / lint 216 ≤ 216 / push 001eb7997→149a5173d**。範囲逸脱なし。
+> **🔧 issue 9406 hub 裁定 (受理 + fix (A) 認可)**: c が transport 構成中に `AffineNearFieldModel.qEquiv_conj`
+> (NearFields.lean, App C Prop1 結論構造) の **over-specification** を発見・escalate。hub 検証で **c の分析は正しい**:
+> `qEquiv_conj` は `qEquiv(q)=q•e` を強制するが `q↦q•e` は**反準同型** (`(m₁•e)*(m₂•e)=(m₂*m₁)•e`, Lean 確認済)
+> ゆえ `MulEquiv` (準同型) には Q 可換が要る → **非可換 Q (例外 near-field の F\*≅Q₈/SL(2,3), 2-rank-1 で実在) で充足不能**。
+> right near-field の `L_a:x↦x·a` が反準同型ゆえ数学的にも自然な取りこぼし。**認可する fix = (A)**: `qEquiv_conj` の
+> RHS を `qEquiv q → qEquiv q⁻¹` (⁻¹ 1 個挿入)。`q↦q⁻¹•e` = inversion∘反準同型 = **genuine 準同型** Q→Fˣ で充足
+> (`x*qEquiv(q⁻¹)=x*(q•e)=q•x`=共役 LHS)。型不変 (`↥Q ≃* Fˣ`)・共役形不変。
+> ⚠ **cross-lane coordination (同一 tick で land 必須)**: **c** = NearFields.lean に fix(A) 適用 (owner) /
+> **b** = StepEight.lean の `model_qEquiv_conj` (行 104/114/133、`model.qEquiv_conj` 直接消費) を新 RHS に合わせ更新。
+> 片方だけ land すると StepEight build 破綻ゆえ hub は両者を同 tick で合流 + 合成フルビルド検証。**signature 無断改変 STOP でない** (c が正しく escalate、認可済 signature 進化)。詳細 = issue 9406。
+> **513185** (前 hub): ALIVE・idle 継続 (inert)。
+> frontier: a = 1055 §1B へ / b = 2053 step (10) + 9406 consumer 更新 / c = 9406 fix(A) 適用 → NearFields transport 継続。
+>
 > **▶▶ 2026-07-22 23:2x 監視再開 (ユーザー指示「監視に戻ってください」) — cron 再作成 (id ee4db237)**。a=0 / b=3 / c=1。
 > Q₈/BS 文献調査の pivot 完了 (note `notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`: Q₈ は character-free bypass 無し=modular 必須確定、App.C は FT 非依存)。
 > 合流: b (**2053 step (9) gate — P ∩ ⁅H,H⁆ = 1 完了**, Suzuki/StepNine + AxiomsCheck) / c (**near-field transport API — units iso + conjugation action bridge**, Pf App.C p.137, NearFieldFromSharplyTransitive)。新 leaf 0・範囲逸脱なし。
