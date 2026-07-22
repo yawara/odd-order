@@ -125,5 +125,15 @@ Setup: `x` = S の指数 2 巡回部分群の生成元、`X = ⟨x⟩`, `T = ⟨
 - ✅ **Gorenstein Lem 1.2** (`BrauerSuzukiNormalizer.lean`): X = C の cyclic Sylow-2、
   Burnside 2-補群 H (= C の奇数位数元全体、choice 非依存)、**C = XH**、H ⊴ N、
   **N = SH**。全て axiom-clean + AxiomsCheck 登録。
-- 次 = **Lem 1.3** (A = C − RH の TI 性、N_G(A) = N) → Lem 1.4 の指標構成
-  (ψ: C の線形指標 RH ⊆ ker、ψ̃ = ψ↑N 既約 deg 2、θ = 1_C↑N − ψ̃ norm 3)。
+- ✅ **Gorenstein Lem 1.3 (TI 性)** (`BrauerSuzukiTISubset.lean`): **`A_isTISubset :
+  IsTISubset Q.A Q.N`**(`A = C − RH`)。核心 = `T_le_zpowers_of_mem_A`「`a∈A ⟹ T ≤ ⟨a⟩`」
+  (a の 2-part `a₂` が `X` の C 内共役 `cxc⁻¹` に入る → `T` は `⟨a⟩` 唯一の位数 2ⁿ⁻¹
+  部分群 → `T = g⁻¹Tg`)。汎用 cyclic 補題も追加: `eq_of_le_zpowers_of_card_eq`
+  (同位数部分群一意性)・`le_of_le_zpowers_of_card_dvd`(入れ子)・
+  `zpowers_eq_of_mem_of_orderOf_eq`。axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
+  → 下流 Lem 1.4 の induced-character 等長 `inner_induce_eq_of_isTISubset` が直接消費可能。
+  - **残** (Lem 1.3 の完全等式 `N = N_G(A)`、Lem 1.4 の等長には不要ゆえ低優先): `N ≤ N_G(A)`
+    (A の N-不変性、要 `R ⊴ N` = R char T ⊴ N を一意性で) + `N_G(A) ≤ N` (要 A 非空 = RH ⊊ C の
+    積位数 |RH|=|R||H| < |X||H|=|C|)。
+- 次 = **Lem 1.4** の指標構成 (ψ: C の線形指標 RH ⊆ ker、ψ̃ = ψ↑N 既約 deg 2、
+  θ = 1_C↑N − ψ̃ norm 3)。TI 集合 A + 等長 lemma は形式化済。
