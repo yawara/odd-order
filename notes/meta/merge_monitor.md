@@ -6,6 +6,18 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **🏁 2026-07-22 17:37 監視 tick (Opus 4.8 hub, cron `7,22,37,52`) — 🎉 Feit-Sibley 定理完成 (issue 1054 CLOSE)**。
+> a=2 / b=2 / c=2。合流: **a (1054 CLOSE): `feit_sibley_coherence` を AxiomsCheck gate に登録 —
+> axioms check OK, 3 axioms all in allowlist で真に axiom-clean。Pf App.IV Feit-Sibley 定理 campaign 完了**
+> (FeitSibley.lean (6) capstone sorry 解消 → 全体 sorry 8→7)。b (2053 step (8) equivariance transfer
+> Q̄ [w]-fixed↔C_Q(P) w-fixed) / c (9318 BS endgame SM/M 非可換 Q cyclic rep-glue)。新 leaf 0・範囲逸脱なし。
+> **gate: green 4639 jobs / AxiomsCheck OK (feit_sibley_coherence 含む・12467<12600) / sorry 8→7 (改善) /
+> 新 axiom なし / lint 216→215 (FeitSibley longLine 解消) / push 2c7f3ba6b→e11ef74ab**。
+> ⚠ **1054 close で issue 0141 (FeitSibley 分割) が解禁** — ただし FeitSibley 最大 file は
+> FeitSibleyTheorem 1882 < 2000 hard limit ゆえ緊急分割不要、quiet-window hub タスクとして繰延可。
+> frontier: a = **1054 完了・次 frontier 未定** (次 tick で確認) / b = 2053 step (8) (C)(D) assembly /
+> c = 9318 BS 矛盾組立 (SM/M 非可換 → endgame)。
+>
 > **▶▶ 2026-07-22 17:22 監視 tick (Opus 4.8 hub, cron `7,22,37,52`)**。a=2 (再開・stall 解消) / b=4 / c=6。
 > 合流: a (1054 (6) ssetOf_sder_coherent_of_xset_qder_union / 新 leaf FeitSibleyMain) / b (2053 step (8)
 > (B) 完了 + (C)(D) assembly frontier) / c (9318 SM-setup 完成 + Q cyclic 論法部品 / 新 leaf
