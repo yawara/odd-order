@@ -9,6 +9,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.Peterfalvi.Appendices.NearFieldClass
 import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
+import OddOrder.GroupTheory.SolvableTwoTransitive
+import OddOrder.GroupTheory.BrauerSuzuki
 
 /-!
 # Peterfalvi Appendix C: On Near-Fields
@@ -770,6 +772,40 @@ theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAct
     (hyp : RankOneHypothesis G Ω) :
     ∃ (F : Type u) (_ : NearField F), Nonempty (AffineNearFieldModel hyp F) := by
   sorry
+
+/-- **The odd core `O_{2'}(G)` is nontrivial** (first step of Peterfalvi App. C, Prop 1's proof,
+given Brauer–Suzuki (ii)).  If `O_{2'}(G) = 1` then Brauer–Suzuki `O_{2'}(G) ⊔ C_G(t) = ⊤` collapses
+to `C_G(t) = ⊤`, i.e. the involution `t` is central.  But then conjugation by `t` is the identity,
+so `H^t = H` and `D = H ⊓ H^t = H`; hence `|H|` is odd (`D_odd`).  This contradicts `Q ≤ H` with
+`|Q|` even (`Q_even`), which forces `|H|` even.
+
+The Brauer–Suzuki conclusion is taken as a hypothesis `hbs`; it is discharged from
+`RankOneHypothesis.sylow_two_isCyclic_or_quaternion` together with
+`brauerSuzuki_of_isCyclic_sylowTwo` / `brauerSuzuki_of_quaternionSylow` (the residual `Q₈` case of
+the latter being the sole research-adjacent gap). -/
+theorem RankOneHypothesis.oddCore_ne_bot {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+    (hyp : RankOneHypothesis G Ω)
+    (hbs : OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {hyp.t} = ⊤) :
+    OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ≠ ⊥ := by
+  intro hbot
+  -- Trivial odd core collapses Brauer–Suzuki to `C_G(t) = ⊤`: `t` is central.
+  rw [hbot, bot_sup_eq] at hbs
+  have htc : ∀ g : G, hyp.t * g = g * hyp.t := by
+    intro g
+    have hmem : g ∈ Subgroup.centralizer {hyp.t} := by rw [hbs]; exact Subgroup.mem_top g
+    exact Subgroup.mem_centralizer_iff.mp hmem hyp.t rfl
+  -- Central `t` ⟹ conjugation by `t` is the identity ⟹ `H^t = H` ⟹ `D = H`.
+  have hconj_id : (MulAut.conj hyp.t).toMonoidHom = MonoidHom.id G := by
+    ext g
+    change hyp.t * g * hyp.t⁻¹ = g
+    rw [htc g, mul_assoc, mul_inv_cancel, mul_one]
+  have hDH : hyp.D = hyp.H := by
+    rw [hyp.D_def, hconj_id, Subgroup.map_id, inf_idem]
+  -- `Q ≤ H` and `|Q|` even force `|H|` even, contradicting `|D| = |H|` odd.
+  have hHeven : Even (Nat.card hyp.H) :=
+    even_iff_two_dvd.mpr
+      (dvd_trans hyp.Q_even.two_dvd (Subgroup.card_dvd_of_le hyp.Q_le_H))
+  exact (Nat.not_even_iff_odd.mpr (hDH ▸ hyp.D_odd)) hHeven
 
 end PropositionOne
 
