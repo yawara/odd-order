@@ -6,6 +6,18 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-22 21:2x 監視 tick (Opus 4.8 hub 638898, cron `7,22,37,52` id 3ee45bda) — 二重 hub 裁定後の初合流**。
+> ⚠ **二重 hub 検出 + ユーザー裁定**: 前 hub セッション 513185 (16:37 起動・4h) が本セッション (638898, 20:19 起動) と並行稼働していた。
+> 513185 は 20:38 に a の 9205 を merge (`d29497ff2`)、20:51 に ownership 裁定 (`19bf817c0`: FeitSibley→a / NearFields→c, regex 整合) を push。
+> **ユーザー裁定 = 本セッション (638898) を hub として残す**。ただし 513185 は terminate 依頼後も ALIVE のまま**20:51 以降 idle** (b/c の新規 work を merge せず = cron 死 listed-but-dead 疑い [[cron-dies-on-model-switch]])。
+> ⟹ 未マージ work が待機し 513185 が非機能ゆえ、本セッションが単独 hub として合流を実施 (513185 idle で race リスク低・push race 検出付き)。
+> **513185 の産出を検証・継承**: `d29497ff2`/`19bf817c0` とも docs-only で健全、ownership 不整合 (私が 20:2x で flag) は 513185 の regex 整合で解決済。
+> 合流: **b (2053 Pf II Ch.II step (8) 完了 — (C) per-w fixed field ∈{f,9} + (D) ℓ=|Σ| prime ∧ |F|∈{3^ℓ,5^ℓ,9^ℓ}, StepEight +438 sorry-free)** /
+> **c (9318 BS endgame — Q=S∩M cyclic (S/Q abelian via S'=T) + M 2-nilpotent, G/O_{2'} image cyclic 2-group, GroupTheory/BrauerSuzuki{Endgame,Setup})**。新 leaf 0・範囲逸脱なし (b=Suzuki+AxiomsCheck / c=GroupTheory 9318 claim)。
+> **gate: フルビルド green 4639 jobs (前 tick と一致 = orphan 0, `error:` 0) / AxiomsCheck OK (3739 checks・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (StepFive54/StepSix421/Suzuki2Groups 53/76/82/88=b:6, NearFields786=c:1) / lint ratchet 215 ≤ 215 / push 19bf817c0→b88b259fd**。
+> **lane a 再配分 (pending user decision)**: a の 9205 (territory 100% 完済・非 gated frontier 無) の再配分 (退役 A / NearFields skeleton B / cross-assign C / 新 E-scope) は 513185 が user escalation と裁定済。次 tick 以降、本 hub からもユーザーへ選択肢を提示予定 (lane d 退役の前例に整合)。
+> frontier: a = 9205 再配分待ち (territory 完済・idle 想定) / b = 2053 step (8) 完了 → 次 step (Theorem B 組立) / c = 9318 BS 矛盾組立 (endgame 継続)。
+>
 > **✅ 2026-07-22 20:2x tick (Opus 4.8 hub, cron 再作成 `7,22,37,52` id 3ee45bda) — ユーザー「各レーンを監視します」で監視再開・stall 解消確認**。
 > 前 tick の 3 レーン stall (17:37〜) は **復帰済み**: 全 worktree 追跡ファイル mtime が 20:18–20:19 に更新
 > (各レーン起動時 `git merge main` + frontier 再開)、lsof で 3 レーンとも live session (a=513628 3h43m / b=344015 5h / c=335685 5h)。
