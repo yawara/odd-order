@@ -252,7 +252,18 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
     (`List.rotate_one_eq_self_iff_eq_replicate`)、(3) `sum_card_orderOf_eq_card_pow_eq_one (p≠0)`:
     `divisors p={1,p}` で `#{ord=1}+#{ord=p}=#{x^p=1}`、`#{ord=1}=1` ⟹ `#{ord=p}=#{x^p=1}-1≡-1`。
     別案: mathlib Cauchy 内の `σ`(rotate-by-1 perm)を再構築し `zpowers σ` を p-群として使う。
-  - **1D.5** (intricate) / **1D.15 の一般 `N` 版** (Φ(G)⊆N◁G, N/Φ(G)冪零⟹N冪零)。
+    **確認済ピース (2026-07-23 再調査)**: `ZMod.val_add [NeZero n] (a b):(a+b).val=(a.val+b.val)%n` /
+    `IsPGroup.of_card (Nat.card=p^n)` / `IsPGroup.card_modEq_card_fixedPoints (α)[Finite α]` /
+    `List.rotate_one_eq_self_iff_eq_replicate` / `sum_card_orderOf_eq_card_pow_eq_one (n≠0)` (mathlib) /
+    周期性 = `rotate_rotate`+`rotate_length` で `rotate w (p+s)=rotate w s`。**mathlib に Frobenius count
+    (`#{x^n=1}` 可除性) のショートカットは無い**ことを確定 (grep 済)。**難所 = 固定点集合
+    `fixedPoints (Mult (ZMod p)) (vectorsProdEqOne G p) ≃ {x//x^p=1}` の List.Vector equiv (~30 行、
+    replicate/head/rotate_replicate/cons_head_tail、低信頼)** → 専用 session で構築推奨。
+  - **1D.5** (intricate) / **1D.15 の一般 `N` 版** (Φ(G)⊆N◁G, N/Φ(G)冪零⟹N冪零)。⚠ 1D.15 一般版は
+    N=G 版 (`isNilpotent_of_quotient_frattini_isNilpotent`) から**直には従わない** (Φ(G)⊆Φ(N) は成り立たず
+    ―1D.16 は逆向き Φ(N)⊆Φ(G)― Φ(G) は N で非生成とは限らない)。Isaacs 原文の別論法を要精読。
+  - **⚠ §1D 残り 3 問はいずれも hard cluster (各 ~60-70 行、quick path 無し)。次イテレーションは
+    新鮮 context で (a) 1D.12 McKay 構築 or (b) Ch.2 問題へ breadth 展開 を判断。**
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 
