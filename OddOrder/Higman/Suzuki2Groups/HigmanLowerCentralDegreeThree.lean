@@ -829,6 +829,127 @@ theorem lowerCentralTripleCommutatorTrilinear_mk
         (QuotientGroup.mk' (lowerCentralLayerKernel H 0) z)) = _
   rw [lowerCentralDegreeThreeCommutatorBilinear_mk]
 
+/-- The associated-graded triple commutator satisfies the Jacobi identity.
+This is Hall--Witt after conjugation disappears in the first lower-central
+layer. -/
+theorem lowerCentralTripleCommutatorTrilinear_jacobi
+    (H : Type uH) [Group H]
+    (x y z : Additive (lowerCentralLayer H 0)) :
+    lowerCentralTripleCommutatorTrilinear H x y z +
+        lowerCentralTripleCommutatorTrilinear H y z x +
+        lowerCentralTripleCommutatorTrilinear H z x y = 0 := by
+  obtain ⟨x₀, hx₀⟩ :=
+    QuotientGroup.mk'_surjective
+      (lowerCentralLayerKernel H 0) (Additive.toMul x)
+  obtain ⟨y₀, hy₀⟩ :=
+    QuotientGroup.mk'_surjective
+      (lowerCentralLayerKernel H 0) (Additive.toMul y)
+  obtain ⟨z₀, hz₀⟩ :=
+    QuotientGroup.mk'_surjective
+      (lowerCentralLayerKernel H 0) (Additive.toMul z)
+  have hx :
+      Additive.ofMul
+          (QuotientGroup.mk' (lowerCentralLayerKernel H 0) x₀) = x := by
+    simpa only [ofMul_toMul] using congrArg Additive.ofMul hx₀
+  have hy :
+      Additive.ofMul
+          (QuotientGroup.mk' (lowerCentralLayerKernel H 0) y₀) = y := by
+    simpa only [ofMul_toMul] using congrArg Additive.ofMul hy₀
+  have hz :
+      Additive.ofMul
+          (QuotientGroup.mk' (lowerCentralLayerKernel H 0) z₀) = z := by
+    simpa only [ofMul_toMul] using congrArg Additive.ofMul hz₀
+  have hconjClass (b c : ↥(lowerCentralTerm H 0)) :
+      QuotientGroup.mk' (lowerCentralLayerKernel H 0)
+          (b * c * b⁻¹) =
+        QuotientGroup.mk' (lowerCentralLayerKernel H 0) c := by
+    simp only [map_mul, map_inv, mul_assoc, mul_inv_cancel_comm_assoc]
+  have hvalueConj (a b c : ↥(lowerCentralTerm H 0)) :
+      lowerCentralDegreeThreeCommutatorValue H
+          (lowerCentralCommutator H a b) (b * c * b⁻¹) =
+        lowerCentralDegreeThreeCommutatorValue H
+          (lowerCentralCommutator H a b) c := by
+    calc
+      _ = lowerCentralDegreeThreeCommutatorBihom H
+            (QuotientGroup.mk' (lowerCentralLayerKernel H 1)
+              (lowerCentralCommutator H a b))
+            (QuotientGroup.mk' (lowerCentralLayerKernel H 0)
+              (b * c * b⁻¹)) :=
+          (lowerCentralDegreeThreeCommutatorBihom_mk H
+            (lowerCentralCommutator H a b) (b * c * b⁻¹)).symm
+      _ = lowerCentralDegreeThreeCommutatorBihom H
+            (QuotientGroup.mk' (lowerCentralLayerKernel H 1)
+              (lowerCentralCommutator H a b))
+            (QuotientGroup.mk' (lowerCentralLayerKernel H 0) c) := by
+          rw [hconjClass b c]
+      _ = _ :=
+          lowerCentralDegreeThreeCommutatorBihom_mk H
+            (lowerCentralCommutator H a b) c
+  have hHall :
+      lowerCentralDegreeThreeCommutator H
+            (lowerCentralCommutator H x₀ y₀) (y₀ * z₀ * y₀⁻¹) *
+        lowerCentralDegreeThreeCommutator H
+            (lowerCentralCommutator H y₀ z₀) (z₀ * x₀ * z₀⁻¹) *
+        lowerCentralDegreeThreeCommutator H
+            (lowerCentralCommutator H z₀ x₀) (x₀ * y₀ * x₀⁻¹) = 1 := by
+    apply Subtype.ext
+    change
+      ⁅⁅(x₀ : H), (y₀ : H)⁆,
+          (y₀ : H) * (z₀ : H) * (y₀ : H)⁻¹⁆ *
+        ⁅⁅(y₀ : H), (z₀ : H)⁆,
+          (z₀ : H) * (x₀ : H) * (z₀ : H)⁻¹⁆ *
+        ⁅⁅(z₀ : H), (x₀ : H)⁆,
+          (x₀ : H) * (y₀ : H) * (x₀ : H)⁻¹⁆ = (1 : H)
+    exact commutatorElement_commutatorElement_conj_mul
+      (x₀ : H) (y₀ : H) (z₀ : H)
+  have hprod :
+      lowerCentralDegreeThreeCommutatorValue H
+            (lowerCentralCommutator H x₀ y₀) z₀ *
+        lowerCentralDegreeThreeCommutatorValue H
+            (lowerCentralCommutator H y₀ z₀) x₀ *
+        lowerCentralDegreeThreeCommutatorValue H
+            (lowerCentralCommutator H z₀ x₀) y₀ = 1 := by
+    have hq :
+        lowerCentralDegreeThreeCommutatorValue H
+              (lowerCentralCommutator H x₀ y₀) (y₀ * z₀ * y₀⁻¹) *
+          lowerCentralDegreeThreeCommutatorValue H
+              (lowerCentralCommutator H y₀ z₀) (z₀ * x₀ * z₀⁻¹) *
+          lowerCentralDegreeThreeCommutatorValue H
+              (lowerCentralCommutator H z₀ x₀) (x₀ * y₀ * x₀⁻¹) = 1 := by
+      simpa only [lowerCentralDegreeThreeCommutatorValue, map_mul, map_one] using
+        congrArg
+          (QuotientGroup.mk' (lowerCentralLayerKernel H 2)) hHall
+    rw [hvalueConj x₀ y₀ z₀, hvalueConj y₀ z₀ x₀,
+      hvalueConj z₀ x₀ y₀] at hq
+    exact hq
+  rw [← hx, ← hy, ← hz]
+  simpa only [lowerCentralTripleCommutatorTrilinear_mk,
+    ofMul_mul, ofMul_one] using congrArg Additive.ofMul hprod
+
+/-- If the degree-two bracket of `x` and `y` vanishes, then the two triple
+commutators with fixed first entry `z` agree. -/
+theorem lowerCentralTripleCommutatorTrilinear_swap_last_of_commutator_eq_zero
+    (H : Type uH) [Group H]
+    (x y z : Additive (lowerCentralLayer H 0))
+    (hxy : lowerCentralCommutatorBilinear H x y = 0) :
+    lowerCentralTripleCommutatorTrilinear H z x y =
+      lowerCentralTripleCommutatorTrilinear H z y x := by
+  have hzero :
+      lowerCentralTripleCommutatorTrilinear H x y z = 0 := by
+    rw [lowerCentralTripleCommutatorTrilinear_apply, hxy,
+      map_zero, LinearMap.zero_apply]
+  have hsym :
+      lowerCentralTripleCommutatorTrilinear H y z x =
+        lowerCentralTripleCommutatorTrilinear H z y x := by
+    rw [lowerCentralTripleCommutatorTrilinear_apply,
+      lowerCentralTripleCommutatorTrilinear_apply,
+      lowerCentralCommutatorBilinear_comm H y z]
+  have hJ :=
+    lowerCentralTripleCommutatorTrilinear_jacobi H z x y
+  rw [hzero, add_zero, hsym] at hJ
+  exact (eq_neg_of_add_eq_zero_left hJ).trans
+    (ZModModule.neg_eq_self _)
+
 /-- Actual triple commutators span `L₃`.  This combines the full range of
 `L₁ × L₁ → L₂` with the full range of `L₂ × L₁ → L₃`; no surjectivity is
 postulated for either bracket. -/
