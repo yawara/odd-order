@@ -852,6 +852,27 @@ theorem RankOneHypothesis.exists_regular_normal {G Ω : Type*} [Group G] [MulAct
   · obtain ⟨f, hf⟩ := htrans.exists_smul_eq (g • hyp.basept) hyp.basept
     exact ⟨f, hf⟩
 
+/-- **Brauer–Suzuki for the rank-one group** (Peterfalvi App. C, Prop 1, prerequisite (ii)):
+`O_{2'}(G) ⊔ C_G(t) = ⊤` for the distinguished involution `t`.  A Sylow `2`-subgroup is cyclic or
+generalized quaternion (`sylow_two_isCyclic_or_quaternion`); Brauer–Suzuki applies in each case.
+
+The **cyclic** branch is closed directly (`brauerSuzuki_of_isCyclic_sylowTwo`, which accepts any
+involution).  The **generalized quaternion** branch splits further: `|S| ≥ 16` is closed by
+`QuaternionSylowSetup.brauerSuzuki_of_quaternionSylow` (Gorenstein Ch. 12, ordinary exceptional
+characters), while `|S| = 8` (`Q₈`) genuinely requires modular character theory (Gorenstein: "all
+known proofs require the theory of modular characters") and is the sole residual research gap of
+Appendix C — off the Feit–Thompson critical path, deferred (see
+`notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`).  The quaternion branch also needs
+`t = z` (the central involution), from uniqueness of involutions in a quaternion Sylow group. -/
+theorem RankOneHypothesis.brauerSuzuki {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+    (hyp : RankOneHypothesis G Ω) (S : Sylow 2 G) :
+    OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {hyp.t} = ⊤ := by
+  rcases hyp.sylow_two_isCyclic_or_quaternion S with hcyc | ⟨_n, _hq⟩
+  · exact OddOrder.GroupTheory.brauerSuzuki_of_isCyclic_sylowTwo S hcyc hyp.t hyp.t_sq hyp.t_ne_one
+  · -- generalized quaternion: `QuaternionSylowSetup` construction (`|S| ≥ 16`) + `t = z`, with the
+    -- residual `Q₈` (`|S| = 8`) case needing modular character theory (deferred research gap).
+    sorry
+
 end PropositionOne
 
 section PropositionTwo
