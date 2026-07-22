@@ -64,8 +64,16 @@ Per-result status:
 | `exists_field_structure_of_cyclic_index_two` (Prop 2, first half) | **proved, sorry-free** (new) |
 | App. C Prop 1, prerequisite (i) (`RankOneHypothesis.sylow_two_isCyclic_or_quaternion`) | **proved, axiom-clean** (2026-07-22) |
 | Brauer–Suzuki (ii), quaternion `|S| ≥ 16` + cyclic (`brauerSuzuki_of_quaternionSylow`) | **proved, axiom-clean** (2026-07-22, issue 9318; `Q₈` case open) |
-| App. C Prop 1 (`rankOne_affine_nearField`) | honest statement, `sorry` — remaining: near-field transport + `Q₈` BS |
+| App. C Prop 1 (`rankOne_affine_nearField`) | **model assembled**; 2 `sorry`s remain (below) |
+| Prop 1 involution clauses (`model_involution_data`) | honest `sorry` (involution structure) |
 | App. C Prop 2 headline (`cyclic_index_two_nearField_classification`) | **proved, axiom-clean** (2026-07-21, commit 42892fcb5) |
+
+`rankOne_affine_nearField` builds the near-field carrier `F = Additive ↥Fsub` from the regular
+normal subgroup and proves 13 of the 15 `AffineNearFieldModel` fields: the embedding `(F,+) ↪ G`,
+normality, the complement `G = F ⋊ H`, the identification `Q ≃* Fˣ` with its conjugation
+compatibility, the faithful action of `D` by near-field automorphisms, and the characteristic.  The
+two remaining `sorry`s are isolated: the involution clauses (`model_involution_data` — unique
+involution in `H`, order-`p` products of distinct involutions) and the `Q₈` case of Brauer–Suzuki.
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
@@ -751,35 +759,8 @@ structure AffineNearFieldModel {G Ω : Type*} [Group G] [MulAction G Ω] [Finite
   orderOf_mul_of_involutions : ∀ u v : G, u ^ 2 = 1 → u ≠ 1 → v ^ 2 = 1 → v ≠ 1 → u ≠ v →
     orderOf (u * v) = char
 
-/-- **Peterfalvi Appendix C, Proposition 1** (p. 137).  If `G` satisfies (A1) and (A2) and has
-2-rank `1`, then `G` is the affine group of a finite near-field: there is a near-field `F` and a
-group `Σ` of automorphisms of `F` with `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ Σ`, identifying `Q` with `F^*`
-and `D` with `Σ`.  Moreover `H` has a unique involution and, for distinct involutions `u, v ∈ G`,
-`|uv|` equals the characteristic of `F`.
-
-**Status: honestly stated, not proved.**  Peterfalvi's proof consumes three results; their repo
-state (updated 2026-07-21, issue 9404):
-
-* (i) a Sylow 2-subgroup of `G` is cyclic or generalized quaternion (Huppert, *Endliche Gruppen* I,
-  Kapitel III, Satz 8.2) — **proved** as `RankOneHypothesis.sylow_two_isCyclic_or_quaternion`
-  above (bridge from `two_rank_one` to Isaacs Thm 6.11).
-* (ii) the **Brauer–Suzuki theorem** `G = O_{2'}(G) C_G(u)` (**issue 9318**) — **proved** as
-  `OddOrder.GroupTheory.brauerSuzuki_of_isCyclic_sylowTwo` (cyclic Sylow-2) and
-  `OddOrder.GroupTheory.QuaternionSylowSetup.brauerSuzuki_of_quaternionSylow` (generalized
-  quaternion, `|S| ≥ 16`, via Gorenstein Ch.12 exceptional character theory).  The residual
-  `Q₈` case (`|S| = 8`) needs modular character theory and is not yet formalized.
-* (iii) Huppert Kapitel II, Satz 3.2, giving the elementary abelian normal subgroup regular on `Ω`
-  (hence `G = F ⋊ H`) for the solvable `O_{2'}(G)` (solvable by Feit–Thompson) — **formalized** as
-  `OddOrder.GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive`
-  (`GroupTheory/SolvableTwoTransitive.lean`).
-
-With (ii) in hand, the near-field structure on `F` comes from the regular action of `Q` on `F^#`
-by the standard transport recorded on p. 137 (choose the `D`-fixed point of `F^#` as the
-multiplicative identity), which *is* elementary. -/
-theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-    (hyp : RankOneHypothesis G Ω) :
-    ∃ (F : Type u) (_ : NearField F), Nonempty (AffineNearFieldModel hyp F) := by
-  sorry
+-- (`rankOne_affine_nearField` is stated and proved below, after its prerequisites
+-- `oddCore_ne_bot` / `exists_regular_normal` / `brauerSuzuki` / `exists_conj_regular`.)
 
 /-- **The odd core `O_{2'}(G)` is nontrivial** (first step of Peterfalvi App. C, Prop 1's proof,
 given Brauer–Suzuki (ii)).  If `O_{2'}(G) = 1` then Brauer–Suzuki `O_{2'}(G) ⊔ C_G(t) = ⊤` collapses
@@ -977,6 +958,262 @@ theorem RankOneHypothesis.exists_conj_regular {G Ω : Type*} [Group G] [MulActio
     · intro h
       exact hfree _ f (hFN.conj_mem _ e'.2 _) hfF (by rw [hconj q, h])
   exact ⟨q0, (hequiv q0).mpr hq0, fun q hq => huniq q ((hequiv q).mp hq)⟩
+
+open OddOrder.GroupTheory
+open scoped IsMulCommutative
+
+/-- **The involution data of the affine near-field model** (Peterfalvi App. C, Prop 1, last three
+clauses): `H` has a unique involution and, for distinct involutions `u ≠ v` of `G`, the order of
+`u v` equals the exponent `p` of the regular normal subgroup `F` (the characteristic of the
+near-field).
+
+Isolated from the model assembly because it requires the fixed-point analysis of involutions in the
+doubly transitive action (each involution fixes a unique point; the product of two distinct
+involutions is a nontrivial element of the odd-order regular kernel `F`, hence of order `p`).  Stated
+over the same regular-normal data `(p, Fsub)` that the model is built from. -/
+theorem RankOneHypothesis.model_involution_data {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+    (hyp : RankOneHypothesis G Ω) {p : ℕ} {Fsub : Subgroup G} [Fsub.Normal]
+    (hp : p.Prime) (htrans : MulAction.IsPretransitive ↥Fsub Ω)
+    (hcompl : Subgroup.IsComplement' Fsub hyp.H) (hexp : ∀ x ∈ Fsub, x ^ p = 1) :
+    (∃! u : ↥hyp.H, (u : G) ^ 2 = 1 ∧ (u : G) ≠ 1) ∧
+      (∀ u v : G, u ^ 2 = 1 → u ≠ 1 → v ^ 2 = 1 → v ≠ 1 → u ≠ v → orderOf (u * v) = p) := by
+  sorry
+
+/-- **Peterfalvi Appendix C, Proposition 1** (p. 137).  If `G` satisfies (A1) and (A2) and has
+2-rank `1`, then `G` is the affine group of a finite near-field: there is a near-field `F` and a
+group `Σ` of automorphisms of `F` with `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ Σ`, identifying `Q` with `F^*`
+and `D` with `Σ`.  Moreover `H` has a unique involution and, for distinct involutions `u, v ∈ G`,
+`|uv|` equals the characteristic of `F`.
+
+The near-field carrier is `F = Additive ↥Fsub`, where `Fsub` is the elementary abelian regular
+normal subgroup of `G` (`exists_regular_normal`, via Brauer–Suzuki (ii)); its near-field structure
+is transported from the sharply transitive conjugation action of `Q` on `F ∖ {1}`
+(`exists_conj_regular` + `SharplyTransitiveData.nearField`).  The identifications are the actual
+data: `emb` embeds `(F, +) = Fsub` into `G`; `qEquiv = mulEquivUnits` realizes `Q ≃* Fˣ`; the
+conjugation-to-right-multiplication compatibility is `mul_mulEquivUnits_inv`; `D` acts by near-field
+automorphisms via conjugation (using that `D` normalizes `Q` (`Q_normal_in_H`) and fixes `e`).
+
+The three involution clauses are `model_involution_data`; the sole remaining gap is the residual
+`Q₈` case of Brauer–Suzuki (inside `brauerSuzuki`), off the Feit–Thompson critical path. -/
+theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+    (hyp : RankOneHypothesis G Ω) :
+    ∃ (F : Type u) (_ : NearField F), Nonempty (AffineNearFieldModel hyp F) := by
+  classical
+  haveI := hyp.faithful
+  -- Brauer–Suzuki (ii) discharges the odd-core hypothesis (`Q₈` case sorried inside).
+  obtain ⟨S⟩ : Nonempty (Sylow 2 G) := inferInstance
+  have hbs := hyp.brauerSuzuki S
+  -- Regular normal elementary abelian `F ⊴ G` with `G = F ⋊ H`.
+  obtain ⟨p, Fsub, hp, hFnormal, hcomm, hexp, htrans, hcompl⟩ := hyp.exists_regular_normal hbs
+  haveI : Fsub.Normal := hFnormal
+  haveI : IsMulCommutative ↥Fsub := hcomm
+  have hdisj : Disjoint Fsub hyp.H := hcompl.disjoint
+  -- Conjugation-regular datum: identity `e` and the regular `Q`-action on `F ∖ {1}`.
+  obtain ⟨e, heF, he_smul, hreg⟩ := hyp.exists_conj_regular htrans hdisj
+  -- Conjugation actions of `Q` and `D` on the additive group `A = Additive ↥Fsub`.
+  letI actQ : DistribMulAction ↥hyp.Q (Additive ↥Fsub) := conjAdditiveAction Fsub hyp.Q
+  letI actD : DistribMulAction ↥hyp.D (Additive ↥Fsub) := conjAdditiveAction Fsub hyp.D
+  set eA : Additive ↥Fsub := Additive.ofMul ⟨e, heF⟩ with heA_def
+  -- `.toMul`-then-embed is injective on `A`.
+  have htoMul_inj : ∀ a b : Additive ↥Fsub,
+      ((Additive.toMul a : ↥Fsub) : G) = ((Additive.toMul b : ↥Fsub) : G) → a = b := by
+    intro a b h
+    have h2 : (Additive.toMul a : ↥Fsub) = Additive.toMul b := Subtype.ext h
+    rw [← ofMul_toMul a, ← ofMul_toMul b, h2]
+  -- `eA ≠ 0`, because `e • basept = t • basept ≠ basept`.
+  have heA_ne : eA ≠ 0 := by
+    intro h
+    apply hyp.t_not_mem_H
+    rw [hyp.H_def, MulAction.mem_stabilizer_iff, ← he_smul]
+    have he1 : (⟨e, heF⟩ : ↥Fsub) = 1 := by
+      have h' := congrArg Additive.toMul h
+      simpa [heA_def] using h'
+    rw [show e = ((⟨e, heF⟩ : ↥Fsub) : G) from rfl, he1, Subgroup.coe_one, one_smul]
+  -- bridge: `q • eA = y  ↔  (q) e (q)⁻¹ = (toMul y)` (conjugation is the smul, definitionally).
+  have hEq : ∀ (q : ↥hyp.Q) (y : Additive ↥Fsub),
+      (q • eA = y) ↔ ((q : G) * e * (q : G)⁻¹ = ((Additive.toMul y : ↥Fsub) : G)) := by
+    intro q y
+    constructor
+    · intro h
+      have hc := conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.Q) q eA
+      rw [h] at hc; exact hc.symm
+    · intro h
+      apply htoMul_inj
+      rw [conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.Q) q eA]; exact h
+  -- The sharply transitive datum: `Q` acts regularly on `A ∖ {0}` (via `hreg`).
+  let data : SharplyTransitiveData ↥hyp.Q (Additive ↥Fsub) :=
+    { e := eA
+      e_ne_zero := heA_ne
+      reg := by
+        intro y hy
+        have hf1 : ((Additive.toMul y : ↥Fsub) : G) ≠ 1 := by
+          intro h
+          apply hy
+          have h2 : (Additive.toMul y : ↥Fsub) = 1 := Subtype.ext h
+          rw [← ofMul_toMul y, h2]; rfl
+        obtain ⟨q, hq, huniq⟩ := hreg _ (Additive.toMul y).2 hf1
+        exact ⟨q, (hEq q y).mpr hq, fun q' hq' => huniq q' ((hEq q' y).mp hq')⟩ }
+  letI hNF : NearField (Additive ↥Fsub) := data.nearField
+  -- The embedding `Multiplicative (Additive ↥Fsub) →* G` (= `Fsub ↪ G` under type tags).
+  let emb : Multiplicative (Additive ↥Fsub) →* G :=
+    { toFun := fun x => ((Additive.toMul (Multiplicative.toAdd x) : ↥Fsub) : G)
+      map_one' := rfl
+      map_mul' := fun _ _ => rfl }
+  have hemb_apply : ∀ z : Additive ↥Fsub,
+      emb (Multiplicative.ofAdd z) = ((Additive.toMul z : ↥Fsub) : G) := fun _ => rfl
+  have hrange : MonoidHom.range emb = Fsub := by
+    ext g
+    constructor
+    · rintro ⟨z, rfl⟩; exact SetLike.coe_mem _
+    · intro hg; exact ⟨Multiplicative.ofAdd (Additive.ofMul ⟨g, hg⟩), rfl⟩
+  -- `D ≤ H`, and `D` fixes both `basept` and `ω' = t • basept` (two-point stabilizer).
+  have hD_le_H : hyp.D ≤ hyp.H := by rw [hyp.D_def]; exact inf_le_left
+  have hD_eq : hyp.D = MulAction.stabilizer G hyp.basept ⊓
+      MulAction.stabilizer G (hyp.t • hyp.basept) := by
+    rw [hyp.D_def, hyp.H_def, ← MulAction.stabilizer_smul_eq_stabilizer_map_conj]
+  have hDfix_base : ∀ g : ↥hyp.D, (g : G) • hyp.basept = hyp.basept := by
+    intro g
+    have hg : (g : G) ∈ hyp.H := hD_le_H g.2
+    rw [hyp.H_def] at hg
+    exact MulAction.mem_stabilizer_iff.mp hg
+  have hDfix_ω' : ∀ g : ↥hyp.D, (g : G) • (hyp.t • hyp.basept) = hyp.t • hyp.basept := by
+    intro g
+    have hmem : (↑g : G) ∈ MulAction.stabilizer G hyp.basept ⊓
+        MulAction.stabilizer G (hyp.t • hyp.basept) := by rw [← hD_eq]; exact g.2
+    exact MulAction.mem_stabilizer_iff.mp (Subgroup.mem_inf.mp hmem).2
+  -- `Fsub` acts freely at `basept` (disjoint from `H = stabilizer basept`).
+  have hfreeF : ∀ a b : G, a ∈ Fsub → b ∈ Fsub → a • hyp.basept = b • hyp.basept → a = b := by
+    intro a b haF hbF hab
+    have hmem : b⁻¹ * a ∈ Fsub ⊓ hyp.H :=
+      ⟨Fsub.mul_mem (Fsub.inv_mem hbF) haF, hyp.H_def ▸ MulAction.mem_stabilizer_iff.mpr (by
+        rw [mul_smul, hab, ← mul_smul, inv_mul_cancel, one_smul])⟩
+    rw [hdisj.eq_bot, Subgroup.mem_bot] at hmem
+    exact (inv_mul_eq_one.mp hmem).symm
+  -- `e` is `D`-fixed: `(g) e (g)⁻¹ = e` for `g ∈ D` (the multiplicative identity is the `D`-fixed
+  -- point of `F ∖ {1}`).
+  have heDfix : ∀ g : ↥hyp.D, (g : G) * e * (g : G)⁻¹ = e := by
+    intro g
+    refine hfreeF _ _ (hFnormal.conj_mem e heF (g : G)) heF ?_
+    have hginv : (g : G)⁻¹ • hyp.basept = hyp.basept := by
+      rw [inv_smul_eq_iff]; exact (hDfix_base g).symm
+    calc ((g : G) * e * (g : G)⁻¹) • hyp.basept
+        = (g : G) • (e • ((g : G)⁻¹ • hyp.basept)) := by rw [mul_smul, mul_smul]
+      _ = (g : G) • (e • hyp.basept) := by rw [hginv]
+      _ = (g : G) • (hyp.t • hyp.basept) := by rw [he_smul]
+      _ = hyp.t • hyp.basept := hDfix_ω' g
+      _ = e • hyp.basept := he_smul.symm
+  refine ⟨Additive ↥Fsub, hNF, ⟨?_⟩⟩
+  refine
+    { emb := emb
+      emb_injective := by
+        intro a b h
+        have h1 : (Additive.toMul (Multiplicative.toAdd a) : ↥Fsub)
+            = Additive.toMul (Multiplicative.toAdd b) := Subtype.ext h
+        have := congrArg (fun f : ↥Fsub => Multiplicative.ofAdd (Additive.ofMul f)) h1
+        simpa using this
+      range_normal := by rw [hrange]; exact hFnormal
+      isComplement := by rw [hrange]; exact hcompl
+      qEquiv := data.mulEquivUnits
+      qEquiv_conj := ?_
+      dAut := fun g => DistribMulAction.toAddEquiv (Additive ↥Fsub) g
+      dAut_mul := ?_
+      dAut_injective := ?_
+      dAut_conj := ?_
+      unique_involution_in_H := (hyp.model_involution_data hp htrans hcompl hexp).1
+      char := p
+      char_prime := hp
+      char_spec := ?_
+      orderOf_mul_of_involutions := (hyp.model_involution_data hp htrans hcompl hexp).2 }
+  · -- qEquiv_conj: conjugation by `q` = right mult by `qEquiv q⁻¹` (`mul_mulEquivUnits_inv`).
+    intro q x
+    simp only [hemb_apply]
+    change (q : G) * ((Additive.toMul x : ↥Fsub) : G) * (q : G)⁻¹
+      = ((Additive.toMul (data.mul x
+          ((data.mulEquivUnits q⁻¹ : (Additive ↥Fsub)ˣ) : Additive ↥Fsub)) : ↥Fsub) : G)
+    rw [data.mul_mulEquivUnits_inv q x, conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.Q) q x]
+  · -- dAut_mul: `D` acts by near-field automorphisms.  Uses `Q_normal_in_H` (so `data.coord`
+    -- transports by conjugation) and that `e` is `D`-fixed (`heDfix`).
+    intro g x y
+    change (g : ↥hyp.D) • data.mul x y
+      = data.mul ((g : ↥hyp.D) • x) ((g : ↥hyp.D) • y)
+    by_cases hy : y = 0
+    · subst hy; rw [data.mul_zero, smul_zero, data.mul_zero]
+    · have hgy : (g : ↥hyp.D) • y ≠ 0 := fun h => hy (by rw [← inv_smul_smul g y, h, smul_zero])
+      have hmemQ : (g : G) * (data.coord y : G) * (g : G)⁻¹ ∈ hyp.Q :=
+        hyp.Q_normal_in_H (g : G) (hD_le_H g.2) (data.coord y : G) (data.coord y).2
+      have hgeInv : (g : G)⁻¹ * e * (g : G) = e := by
+        have h := heDfix g
+        have h2 : (g : G)⁻¹ * ((g : G) * e * (g : G)⁻¹) * (g : G) = (g : G)⁻¹ * e * (g : G) := by
+          rw [h]
+        rw [← h2]; group
+      have hy2 : ((Additive.toMul y : ↥Fsub) : G)
+          = (data.coord y : G) * e * (data.coord y : G)⁻¹ := by
+        have h := congrArg (fun z : Additive ↥Fsub => ((Additive.toMul z : ↥Fsub) : G))
+          (data.coord_smul_e hy)
+        rw [conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.Q)] at h
+        exact h.symm
+      have hcoordD : data.coord ((g : ↥hyp.D) • y)
+          = ⟨(g : G) * (data.coord y : G) * (g : G)⁻¹, hmemQ⟩ := by
+        refine (data.coord_unique hgy ?_).symm
+        apply htoMul_inj
+        rw [conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.Q)
+              ⟨(g : G) * (data.coord y : G) * (g : G)⁻¹, hmemQ⟩ eA,
+            conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.D) g y, hy2]
+        change ((g : G) * (data.coord y : G) * (g : G)⁻¹) * e
+            * ((g : G) * (data.coord y : G) * (g : G)⁻¹)⁻¹
+          = (g : G) * ((data.coord y : G) * e * (data.coord y : G)⁻¹) * (g : G)⁻¹
+        calc ((g : G) * (data.coord y : G) * (g : G)⁻¹) * e
+              * ((g : G) * (data.coord y : G) * (g : G)⁻¹)⁻¹
+            = (g : G) * (data.coord y : G) * ((g : G)⁻¹ * e * (g : G))
+                * ((data.coord y : G)⁻¹ * (g : G)⁻¹) := by group
+          _ = (g : G) * (data.coord y : G) * e * ((data.coord y : G)⁻¹ * (g : G)⁻¹) := by
+                rw [hgeInv]
+          _ = (g : G) * ((data.coord y : G) * e * (data.coord y : G)⁻¹) * (g : G)⁻¹ := by group
+      rw [data.mul_def hy, data.mul_def hgy, hcoordD]
+      apply htoMul_inj
+      rw [conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.D) g (data.coord y • x),
+        conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.Q)
+          ⟨(g : G) * (data.coord y : G) * (g : G)⁻¹, hmemQ⟩ ((g : ↥hyp.D) • x),
+        conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.Q) (data.coord y) x,
+        conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.D) g x]
+      change (g : G) * ((data.coord y : G) * ((Additive.toMul x : ↥Fsub) : G)
+            * (data.coord y : G)⁻¹) * (g : G)⁻¹
+        = ((g : G) * (data.coord y : G) * (g : G)⁻¹)
+            * ((g : G) * ((Additive.toMul x : ↥Fsub) : G) * (g : G)⁻¹)
+            * ((g : G) * (data.coord y : G) * (g : G)⁻¹)⁻¹
+      group
+  · -- dAut_injective: `dAut g = dAut g'` ⟹ `g, g'` conjugate `Fsub` identically ⟹ agree on `Ω`.
+    intro g g' h
+    apply Subtype.ext
+    refine eq_of_smul_eq_smul (α := Ω) fun ω => ?_
+    obtain ⟨f, hf⟩ := htrans.exists_smul_eq hyp.basept ω
+    have hconj : (g : G) * (f : G) * (g : G)⁻¹ = (g' : G) * (f : G) * (g' : G)⁻¹ := by
+      have hfun : (g : ↥hyp.D) • Additive.ofMul f = (g' : ↥hyp.D) • Additive.ofMul f :=
+        DFunLike.congr_fun h (Additive.ofMul f)
+      have h2 := congrArg (fun z : Additive ↥Fsub => ((Additive.toMul z : ↥Fsub) : G)) hfun
+      rw [conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.D) g (Additive.ofMul f),
+        conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.D) g' (Additive.ofMul f),
+        toMul_ofMul] at h2
+      exact h2
+    have hfG : (f : G) • hyp.basept = ω := hf
+    have key : ∀ d : ↥hyp.D, (d : G) • ω = ((d : G) * (f : G) * (d : G)⁻¹) • hyp.basept := by
+      intro d
+      rw [← hfG, ← mul_smul]
+      conv_rhs => rw [← hDfix_base d, ← mul_smul]
+      congr 1
+      group
+    rw [key g, key g', hconj]
+  · -- dAut_conj: the `D`-action on `F` is conjugation inside `G` (definitionally).
+    intro g x
+    simp only [hemb_apply]
+    change (g : G) * ((Additive.toMul x : ↥Fsub) : G) * (g : G)⁻¹
+      = ((Additive.toMul ((g : ↥hyp.D) • x) : ↥Fsub) : G)
+    rw [conjAdditiveAction_val_toMul (F := Fsub) (Q := hyp.D) g x]
+  · -- char_spec: `p • x = 0`, i.e. `(toMul x) ^ p = 1` (exponent of the elementary abelian `Fsub`).
+    intro x
+    apply htoMul_inj
+    rw [toMul_nsmul, Subgroup.coe_pow]
+    exact hexp _ (Additive.toMul x).2
 
 end PropositionOne
 
