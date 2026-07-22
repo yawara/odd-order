@@ -847,4 +847,102 @@ theorem oPiCore_eq_iInf_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Fin
 
 end
 
+section /- Problems 1C: Sylow C-theorem, Frattini argument (pp. 17-19) -/
+
+open Pointwise in
+/-- **Isaacs Problem 1C.1**. `P` を Sylow `p`-部分群、`N_G(P) ≤ H ≤ G` とすると `H = N_G(H)`
+(1B.3 の一般化 — `H = N_G(P)` で 1B.3)。
+
+Frattini 論法: `g ∈ N_G(H)` を取る。`P ≤ H` かつ `g·P·g⁻¹ ≤ H` (共役が `H` を保つ)。`P` と
+`g•P` はともに `H` の Sylow `p`-部分群 (`Sylow.subtype`)、`H` 内の Sylow C で `∃ k∈H`,
+`k•P = g•P` (G の Sylow として、`map_conj_smul` で ↥H から降ろす)。すると `g⁻¹·k ∈ N_G(P) ≤ H`、
+`k ∈ H` ゆえ `g ∈ H`。 -/
+theorem eq_normalizer_of_sylow_normalizer_le {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    [Finite G] (P : Sylow p G) {H : Subgroup G}
+    (hle : Subgroup.normalizer (P : Subgroup G) ≤ H) :
+    Subgroup.normalizer H = H := by
+  refine le_antisymm (fun g hg => ?_) Subgroup.le_normalizer
+  have hPH : (P : Subgroup G) ≤ H := Subgroup.le_normalizer.trans hle
+  -- 共役 g は H を保つ
+  have hgH : MulAut.conj g • H = H := by
+    ext x
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+      show ((MulAut.conj g)⁻¹ • x : G) = g⁻¹ * x * g by rw [← map_inv]; simp [MulAut.smul_def]]
+    exact (Subgroup.mem_normalizer_iff''.mp hg x).symm
+  have hgPH : (↑(g • P) : Subgroup G) ≤ H := by
+    rw [Sylow.coe_subgroup_smul, ← hgH]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hPH
+  -- ↥H での Sylow C
+  obtain ⟨k, hk⟩ := MulAction.exists_smul_eq (↥H) (P.subtype hPH) ((g • P).subtype hgPH)
+  -- ↥H の等式を Subgroup ↥H に落とし、H.subtype で G に写して ↑k • P = g • P を得る
+  have hAB : MulAut.conj k • ((P : Subgroup G).subgroupOf H)
+      = (MulAut.conj g • (P : Subgroup G)).subgroupOf H := by
+    have h := congrArg (fun S : Sylow p ↥H => (S : Subgroup ↥H)) hk
+    simpa only [Sylow.coe_subgroup_smul, Sylow.coe_subtype] using h
+  have hkey : (↑k : G) • P = g • P := by
+    apply Sylow.ext
+    rw [Sylow.coe_subgroup_smul, Sylow.coe_subgroup_smul]
+    have h := congrArg (Subgroup.map H.subtype) hAB
+    rwa [map_conj_smul, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hPH,
+      Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr
+        (by rw [Sylow.coe_subgroup_smul] at hgPH; exact hgPH),
+      show (H.subtype k : G) = ↑k from rfl] at h
+  -- 仕上げ: g⁻¹·↑k ∈ N_G(P) ≤ H, ↑k ∈ H ⟹ g ∈ H
+  have hmem : g⁻¹ * (↑k : G) ∈ Subgroup.normalizer (P : Subgroup G) :=
+    Sylow.smul_eq_iff_mem_normalizer.mp (by rw [mul_smul, hkey, inv_smul_smul])
+  have hg_inv : g⁻¹ ∈ H := by
+    have h1 := H.mul_mem (hle hmem) (H.inv_mem k.2)
+    rwa [mul_inv_cancel_right] at h1
+  simpa using H.inv_mem hg_inv
+
+/-- **Isaacs Problem 1C.2(a)**. `H ≤ G`、`P` を `H` の Sylow `p`-部分群とすると、`G` のある
+Sylow `p`-部分群 `S` で `P = H ∩ S` (= `(↑S).subgroupOf H`) となる。
+
+`P` を `G` に押し出した p-部分群 `P.map H.subtype` を含む Sylow `S` を取ると
+(`IsPGroup.exists_le_sylow`)、`P ≤ (↑S).subgroupOf H`。後者は p-部分群 (`↑S ⊓ H ≤ ↑S`) ゆえ
+`H` の Sylow `P` の極大性 (`is_maximal'`) で一致。 -/
+theorem exists_sylow_subgroupOf_eq_of_sylow {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    [Finite G] {H : Subgroup G} (P : Sylow p ↥H) :
+    ∃ S : Sylow p G, (P : Subgroup ↥H) = (↑S : Subgroup G).subgroupOf H := by
+  obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp P.isPGroup'
+  have hpg : IsPGroup p ((P : Subgroup ↥H).map H.subtype) :=
+    IsPGroup.of_card (by rw [Subgroup.card_map_of_injective (Subgroup.subtype_injective _), hm])
+  obtain ⟨S, hS⟩ := hpg.exists_le_sylow
+  refine ⟨S, ?_⟩
+  -- (↑S).subgroupOf H は p-部分群
+  have hScard : Nat.card ((S : Subgroup G).subgroupOf H)
+      = Nat.card ((S : Subgroup G) ⊓ H : Subgroup G) := by
+    rw [← Subgroup.card_map_of_injective (Subgroup.subtype_injective H),
+      Subgroup.subgroupOf_map_subtype]
+  have hSpg : IsPGroup p ((S : Subgroup G).subgroupOf H) := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp S.isPGroup'
+    have hdvd : Nat.card ((S : Subgroup G) ⊓ H : Subgroup G) ∣ p ^ n :=
+      hn ▸ Subgroup.card_dvd_of_le (inf_le_left : (S : Subgroup G) ⊓ H ≤ (S : Subgroup G))
+    obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp hdvd
+    exact IsPGroup.of_card (hScard.trans hj)
+  exact (P.is_maximal' hSpg (Subgroup.map_le_iff_le_comap.mp hS)).symm
+
+/-- **Isaacs Problem 1C.3(a)**. `G` の位数が `p` の冪である元の全体 `X` は、全 Sylow `p`-部分群
+の和集合に一致する。
+
+⊇: Sylow `P` (p-群) の元 `x` は `orderOf x ∣ |P| = p^n` ゆえ位数 `p` 冪。⊆: 位数 `p^k` の `x` は
+`⟨x⟩` が p-群 (`|⟨x⟩| = orderOf x = p^k`) ゆえある Sylow に含まれる (`IsPGroup.exists_le_sylow`)。 -/
+theorem powerOrder_eq_iUnion_sylow {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] :
+    {x : G | ∃ k, orderOf x = p ^ k} = ⋃ P : Sylow p G, (P : Set G) := by
+  ext x
+  simp only [Set.mem_setOf_eq, Set.mem_iUnion, SetLike.mem_coe]
+  constructor
+  · rintro ⟨k, hk⟩
+    have hpg : IsPGroup p (Subgroup.zpowers x) :=
+      IsPGroup.of_card (show Nat.card (Subgroup.zpowers x) = p ^ k by rw [Nat.card_zpowers, hk])
+    obtain ⟨P, hP⟩ := hpg.exists_le_sylow
+    exact ⟨P, hP (Subgroup.mem_zpowers x)⟩
+  · rintro ⟨P, hxP⟩
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
+    obtain ⟨k, -, hk⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp
+      (hn ▸ Subgroup.orderOf_dvd_natCard (P : Subgroup G) hxP)
+    exact ⟨k, hk⟩
+
+end
+
 end OddOrder.Isaacs.Ch01
