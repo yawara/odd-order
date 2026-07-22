@@ -1334,4 +1334,81 @@ theorem xiLengthThreeTypeAFactorData_exists
       parameter_eq := hparam
       parameter_two_le := htwo }⟩
 
+/-- **Higman Lemma 12 (p. 90), factor data with a prescribed left
+factor.**
+
+Any proper invariant subgroup above `Φ(P)` can be retained as the left
+type-A factor.  The quotient-Maschke construction supplies its invariant
+complement, and the two inclusive type-A models have the same parameter
+because both contain exactly the ambient involutions. -/
+theorem xiLengthThreeTypeAFactorData_exists_with_left
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : frattini P < S)
+    (hStop : S < (⊤ : Subgroup P)) :
+    ∃ data : XiLengthThreeTypeAFactorData P Y, data.left = S := by
+  obtain ⟨T, hTnormal, hTinv, hPhiT, hTtop, hSTinf, hSTsup⟩ :=
+    exists_complementary_invariant_frattini_preimage_of_xiLengthThree
+      hP hmulti hprime hSinv hPhiS hStop
+  have hSnormal : S.Normal :=
+    Subgroup.Normal.of_commutator_le P
+      ((OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP).trans
+        hPhiS.le)
+  obtain ⟨dataS⟩ :=
+    isXiLengthTwoTypeA_invariant_subgroup_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime hSinv hPhiS hStop
+  obtain ⟨dataT⟩ :=
+    isXiLengthTwoTypeA_invariant_subgroup_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime hTinv hPhiT hTtop
+  have hSbot : S ≠ (⊥ : Subgroup P) :=
+    ne_of_gt (lt_of_le_of_lt bot_le hPhiS)
+  have hTbot : T ≠ (⊥ : Subgroup P) :=
+    ne_of_gt (lt_of_le_of_lt bot_le hPhiT)
+  have hinvS : involutions P ⊆ S :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive hSinv hSbot
+  have hinvT : involutions P ⊆ T :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive hTinv hTbot
+  have hcardST : (involutions S).ncard = (involutions T).ncard :=
+    (involutions_ncard_subgroup_eq_of_subset S hinvS).trans
+      (involutions_ncard_subgroup_eq_of_subset T hinvT).symm
+  have hparam : dataS.parameter = dataT.parameter :=
+    XiLengthTwoTypeAData.parameter_eq_of_involutions_ncard_eq
+      dataS dataT hcardST
+  have hmultiS : ∃ x y : S,
+      x ∈ involutions S ∧ y ∈ involutions S ∧ x ≠ y :=
+    exists_distinct_involutions_subgroup_of_subset hinvS hmulti
+  have htwo : 2 ≤ dataS.parameter :=
+    XiLengthTwoTypeAData.parameter_two_le_of_exists_distinct_involutions
+      dataS hmultiS
+  let data : XiLengthThreeTypeAFactorData P Y :=
+    { left := S
+      right := T
+      left_normal := hSnormal
+      left_invariant := hSinv
+      right_normal := hTnormal
+      right_invariant := hTinv
+      frattini_lt_left := hPhiS
+      left_lt_top := hStop
+      frattini_lt_right := hPhiT
+      right_lt_top := hTtop
+      inf_eq_frattini := hSTinf
+      sup_eq_top := hSTsup
+      left_model := dataS
+      right_model := dataT
+      parameter_eq := hparam
+      parameter_two_le := htwo }
+  exact ⟨data, rfl⟩
+
 end OddOrder.Higman.Suzuki2Groups
