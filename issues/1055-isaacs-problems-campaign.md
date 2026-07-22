@@ -97,7 +97,18 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 
 **🎉 §1B 完了 (全 8 問: 1B.1a/1B.4/1B.5abc/1B.6/1B.7bc/1B.8ab 実証明 + 1B.1b/1B.2/1B.3/1B.7a 記録)。**
 
-- ⬜ **次: §1C** (Sylow C-定理・Frattini 論法) — 1C.1–1C.8。§1D–§1G も未着手。
+**§1C** (`Ch01_Sylow/Problems.lean` section 1C、2026-07-23):
+- ✅ 実証明 **1C.1** `eq_normalizer_of_sylow_normalizer_le` (N_G(P)≤H ⟹ H=N_G(H)、Frattini、1B.3 一般化。
+  ↥H の Sylow C + `map_conj_smul` で G に降ろす + `Sylow.smul_eq_iff_mem_normalizer`)。
+- ✅ 実証明 **1C.2(a)** `exists_sylow_subgroupOf_eq_of_sylow` (H の Sylow P = H∩S、Sylow.subtype +
+  極大性) + **1C.2(b)** `card_sylow_subgroup_le` (n_p(H)≤n_p(G)、1C.2a 対応が単射)。
+- ✅ 実証明 **1C.3(a)** `powerOrder_eq_iUnion_sylow` (位数 p 冪の元 = ⋃ Sylow)。
+- ⬜ **残り §1C**: **1C.3(b)** (p∣\|G\| ⟹ p∣\|X\|、Sylow P を X に共役作用 → X^P=Z(P) で
+  `IsPGroup.card_modEq_card_fixedPoints`) / **1C.4** (\|G\|=120 で index 3 or 5 の部分群、n_2 場合分け) /
+  **1C.5** (A_{p+1} で \|N_G(P)\|=p(p-1)/2、位数 p 元の計数、特殊) / **1C.6** (G=HK で P∩H,P∩K が Sylow) /
+  **1C.7** (極大部分群が全て素数指数 ⟹ 最大素数 Sylow 正規) / **1C.8** (位数 p^a 部分群数 mod p、計数)。
+
+- ⬜ **次: 残り §1C (1C.3b から) → §1D–§1G**。§1C の残りは計数・場合分け・特殊群で meaty。
 
 ## 完了条件
 
