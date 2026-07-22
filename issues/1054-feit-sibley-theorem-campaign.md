@@ -431,10 +431,27 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
       ((τδ,τδ) = 1+a²、δ = χ−a•η₁ A-supported、coherence 不要) +
       `tau_scaled_diff_inner_extension_diff` ((τδ, e′ⱼ−e′₁) = a、j>1)。
       どちらも tau_inner_eq_of_supported_Sset 直用 + Sset_pairwiseOrthogonal。
-    - [ ] 次 = 直交分解 τδ = Σⱼ tⱼe′ⱼ + v ((v,e′ⱼ)=0)。𝒴 の Finset 化 +
-      e′ⱼ 正規直交 (extension_inner_eq) + tⱼ ∈ ℤ (mem_ZIrr_inner_int) +
-      (v,v) ≥ 0 (mem_ZIrr_inner_self_eq_sum_sq)。NormInequalities の
-      CharacterPsiDecomposition (D.X/D.Y/tau1_image, :400-470) が流用候補 — 要偵察。
+    - [x] **Bessel 分解 2 本** (2026-07-22, sorry-free, generic Γ):
+      `inner_sub_sum_inner_smul_eq_zero` (残差 ⊥ wₖ) +
+      `inner_self_eq_residual_add_sum_inner_mul_star` ((u,u) = (v,v) + Σtⱼ·star tⱼ、
+      有限正規直交族)。ZIrrFourier upstream 候補。⚠ inner_sum_left/right・
+      inner_conj_symm は OddOrder.RepresentationTheory 直下 (ClassFunction. でない、
+      mathlib _root_.inner_conj_symm と ambiguity → full path)。
+      CharacterPsiDecomposition は (5.4) 特化形で流用不可と確認。
+    - [x] **norm identity λ 形完成** `exists_lambda_norm_identity` (2026-07-22,
+      sorry-free): ∃ lam ∈ ℤ: (u,E′η) = lam (∀η≠η₁)、(u,E′η₁) = lam−a、
+      ∃ nvv ≥ 0: 1+a² = nvv + (lam−a)² + (Y.ncard−1)·lam²。
+      構成: lam := c(η₁)+a (c = choose 整数係数を dite 全域化)、Bessel 適用、
+      erase η₁ で和分割、mem_ZIrr_inner_self_eq_sum_sq で nvv。
+      ⚠ set u の罠: set は現 goal を u に畳むが、**後から作る have/補題適用の
+      statement は tau 形のまま** — goal 側 rw [← hu] は不要 (むしろ失敗)、
+      補題結果は rw [hu] で tau 形に開いてから exact。
+      m≥2 不要 (m=1 でも真)。Set.ncard_eq_toFinset_card は ℕ で先に rw。
+    - [ ] 次 = (6) 残り: a∣λ 仮定下の分岐処理 → x=0 (λ=0) 抽出 → v = u + a•E′η₁
+      ((v,v)=1, v∈ZIrr) → v = e₁ or −e₂ (𝒳 側 pairing (u, eᵢ−aᵢe₁) = −aᵢ) →
+      u = e₁ − a e′₁ → 𝒳∪𝒴 coherence 構成 (extension を member 値で構築 —
+      S07 の構成手段 (retarget?) 要偵察) → 1(a) adjoin で 𝒮(S′) → (2)。
+      x=1∧m=2 分岐は e′ 符号差し替え還元。
   - [ ] **(7)** class-algebra 合同 (独立、並行可): ψ constant on Z^# ⟹
     ψ(z)≡ψ(1) mod|Q|。ω central character (ω(Kₛ)=ψ(Kₛ)/ψ(1)) の代数的整数性 +
     構造定数 aᵢⱼₛ + Q f.p.f. 作用の counting。**前提の repo 内所在確認要**
