@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 01:1x 監視 tick — a/b 合流 / c hold 深刻化 (+7)**。a=1 / b=1 / c=7 / d=0。
+> 合流: a (Isaacs §1C 1C.1 N_G(P)⊆H⟹H=N_G(H)) / b (2053 step (10) 二分岐完結 (10.1)∨(10.2) — StepFive+StepTen)。
+> **gate: green 4646 jobs (不変) / AxiomsCheck OK (3754・新 axiom 0) / sorry 7→7 / lint 216 / push 0283c93f4→fef4e8774**。
+> ⚠ b の step10 は **StepFive を触ったが qEquiv consumer 更新ではない** (step10 論法の追記、qEquiv 非使用ゆえ fix(A) と独立・安全)。
+> 🔴 **9406 bottleneck 深刻化 — c +7 全 hold・b 2 tick 連続で consumer 未着手**: c の fix(A) 完成済 7 commit (BLOCKER2 + cyclic + quaternion 孤立化 + 続く transport) が **b の StepEight/StepFive consumer 更新 (q↔q⁻¹ 小変更) だけ**を待って全 gated。b は step10 に集中し 9406 未着手。**ユーザーへ再 escalate**: b nudge or hub 代行 (下記報告)。fix(A) は unsatisfiable な旧 field 除去ゆえ非破壊 deprecation 不可 = b consumer 更新は必須。**513185** idle 継続。
+>
 > **✅ 2026-07-23 01:0x — d CLAUDE.md 変更をユーザー承認 → 合流 (hold 解消)**。ユーザー「d の発案は取り込んで」→ d (blueprint 逆生成推奨への CLAUDE.md 改訂 + issue 0143) を `--no-ff` 合流 (docs-only, Lean 非変更ゆえ build 不要, push 5fdec8275→4dc1323cd)。**新方針 = forward TeX driver 不可のまま、Lean からの逆生成 (依存 DAG/教科書番号対応/proved-sorry を getUsedConstants/CollectAxioms で抽出) は推奨** (issue 0143 に実装計画)。lane d の memtenance charter は問題なく機能。⚠ c は依然 9406 で hold (b consumer 待ち、下記)。
 >
 > **▶▶ 2026-07-23 00:5x 監視 tick — a/b 合流 / c・d hold**。a=6 / b=3 / c=5 / d=1。
