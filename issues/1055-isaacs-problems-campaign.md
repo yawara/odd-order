@@ -192,8 +192,15 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   (⚠ `IsCyclic.commGroup` は既存 Group instance と diamond を作るので `IsMulCommutative` 経由で回避)、
   `commutatorElement_eq_one_iff_mul_comm` で `⁅g₁,g₂⁆∈M`。elementary abelian の残り (p-群で `P^p⊆Φ`
   ⟹ 指数 p) は未 (別途)。
+- ✅ 実証明 **1D.15 (`N=G` 版)** `isNilpotent_of_quotient_frattini_isNilpotent` (`G/Φ(G)` 冪零⟹`G`
+  冪零)。各 Sylow `P` の像 `θ(P)` は `G/Φ(G)` の Sylow (1B.5(b) `exists_sylow_coe_eq_of_isHallSubgroup_singleton`
+  + `IsHallSubgroup.map_of_surjective`)、冪零性で正規、逆像 `P⊔Φ(G)=comap(map P)` (`comap_map_eq`+`ker_mk'`)
+  が正規、Frattini 論法 `normalizer_sup_eq_top'` + 非生成性 `frattini_nongenerating` で `N_G(P)=⊤` ⟹ `P◁G`、
+  全 Sylow 正規で `G` 冪零 (`isNilpotent_of_finite_tfae.out 3 0`)。mathlib `frattini_nilpotent` と平行構造。
+  ⚠ coe 罠: `(P:Subgroup G)` は `↑↑P` (二重) を作り補題の `↑P` (単一) と非一致 → hfr 再文言せず `top_le_iff`+`sup_le`
+  で項構成 (`sup_eq_left` の rw パターンは coe で不発)。**一般 `N` 版 (Φ(G)⊆N◁G, N/Φ(G)冪零⟹N冪零) は残**。
 - ⬜ **残り §1D**: 1D.5 (intricate) / 1D.8 の elementary abelian part (p-群 exponent p) / 1D.9–1D.12 /
-  1D.15 (Φ(G)⊆N, N/Φ(G) 冪零⟹N冪零) / 1D.17 (N 冪零+G/N' 冪零⟹G 冪零)。多くは meaty。
+  1D.15 の一般 `N` 版 / 1D.17 (N 冪零+G/N' 冪零⟹G 冪零、1D.15+1D.8+1D.16 で閉じる)。多くは meaty。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 

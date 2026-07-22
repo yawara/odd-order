@@ -471,6 +471,35 @@ theorem commutator_le_frattini {G : Type*} [Group G] [Finite G] [Group.IsNilpote
     commutatorElement_eq_one_iff_mul_comm]
   exact hcomm.is_comm.comm (QuotientGroup.mk' M g₁) (QuotientGroup.mk' M g₂)
 
+/-- **Isaacs Problem 1D.15** (`N = G` の場合). 有限群 `G` で商 `G / Φ(G)` が冪零ならば `G` 自身が
+冪零。各 Sylow `p`-部分群 `P` について、その像 `θ(P)` (`θ = G ↠ G/Φ(G)`) は `G/Φ(G)` の Sylow
+(1B.5(b) の像構成) ゆえ冪零性から正規、逆像 `P ⊔ Φ(G) = θ⁻¹(θ(P))` (`comap_map_eq` + `ker θ = Φ(G)`)
+が `G` で正規。Frattini 論法 `N_G(P) ⊔ (P ⊔ Φ(G)) = ⊤` から `P` を吸収して `N_G(P) ⊔ Φ(G) = ⊤`、
+Frattini 部分群の非生成性 (`frattini_nongenerating`) で `N_G(P) = ⊤`、すなわち `P ◁ G`。全 Sylow が
+正規なので `G` は冪零 (`isNilpotent_of_finite_tfae`)。1D.14 (`Φ(G) ⊆ Z(G) ⟹ 冪零`) を一般化する。 -/
+theorem isNilpotent_of_quotient_frattini_isNilpotent {G : Type*} [Group G] [Finite G]
+    [Group.IsNilpotent (G ⧸ frattini G)] : Group.IsNilpotent G := by
+  refine (Group.isNilpotent_of_finite_tfae.out 3 0 rfl rfl).mp ?_
+  intro p hp P
+  haveI := hp
+  -- `θ(P)` は `G/Φ(G)` の Sylow `p`-部分群 `Q`
+  obtain ⟨Q, hQ⟩ := exists_sylow_coe_eq_of_isHallSubgroup_singleton
+    (IsHallSubgroup.map_of_surjective (QuotientGroup.mk'_surjective (frattini G))
+      (sylow_isHallSubgroup_singleton P))
+  -- `G/Φ(G)` 冪零ゆえ `θ(P) = ↑Q` は正規、逆像 `P ⊔ Φ(G)` も正規
+  have hmapnorm : ((P : Subgroup G).map (QuotientGroup.mk' (frattini G))).Normal :=
+    hQ ▸ (inferInstance : (Q : Subgroup (G ⧸ frattini G)).Normal)
+  haveI hPΦnorm : ((P : Subgroup G) ⊔ frattini G).Normal := by
+    have h := hmapnorm.comap (QuotientGroup.mk' (frattini G))
+    rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk'] at h
+  -- Frattini 論法 + 非生成性で `N_G(P) = ⊤`、すなわち `P ◁ G`
+  have hfr := Sylow.normalizer_sup_eq_top' (N := (P : Subgroup G) ⊔ frattini G) P le_sup_left
+  rw [← sup_assoc] at hfr
+  have h1 := frattini_nongenerating hfr
+  refine Subgroup.normalizer_eq_top_iff.mp (top_le_iff.mp ?_)
+  rw [← h1]
+  exact sup_le le_rfl Subgroup.le_normalizer
+
 end
 
 end OddOrder.Isaacs.Ch01
