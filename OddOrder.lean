@@ -464,6 +464,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
