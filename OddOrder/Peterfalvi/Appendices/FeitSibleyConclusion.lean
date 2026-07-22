@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.FeitSibleyUnionCoherence
 import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
+import OddOrder.GroupTheory.RepresentationTheory.HallTICongruence
 
 /-!
 # Peterfalvi Appendix IV: the (8) conclusion (p. 150)
@@ -279,6 +280,61 @@ theorem restrict_apply_sub_eq_neg_card_mul_inner [Finite G] [Fintype G]
     rw [hkey, Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum, hsum1, hsum2]
     ring
   simpa only [ClassFunction.restrict_apply, OneMemClass.coe_one] using hval
+
+open scoped OddOrder.AlgInt in
+/-- **(8) step-(7) applied to a `𝒴`-witness** (Peterfalvi (8), p. 150).  For the `𝒴`-witness
+`e' = ε·ξ` (`ε ≠ 0`, `ξ ∈ Irr G`) — which is constant on `Z^#` by the `(8)` evaluation
+(`restrict_apply_sub_eq_neg_card_mul_inner`) — the central-character congruence (7)
+`peterfalvi_67_hall_of_odd` gives `e'(z) ≡ e'(1) (mod |Q|)`.
+
+The structural inputs of `peterfalvi_67_hall_of_odd` are discharged from the `Hypothesis` block
+(`Q ≤ H`, `Q ⊴ H`, `Q^#` is a `TI`-subset of `G`); the remaining inputs — `G` of odd order, `Q`
+a Hall subgroup of `H` and of `G`, `Z ⊴ H` central with `Q ≤ C_G(z)`, and the constancy of `ρ`
+and of the normalizer–centralizer cardinality on `Z^#` — are supplied by the reduction context.
+Writing `ξ = ρ.character` (`ξ.isIrreducible`), the `e'`-constancy transfers to `ρ.character`
+(cancel `ε`), feeding (7); scaling the resulting `ξ`-congruence by the integer `ε`
+(`Cong.smul_left`) returns the congruence for `e'`. -/
+theorem witness_charValue_cong [Fintype G]
+    {Z : Subgroup G} (hZQ : Z ≤ hyp.Q) [(Z.subgroupOf hyp.H).Normal]
+    (hoddG : Odd (Nat.card G))
+    (hHall : Nat.Coprime (Nat.card ↥hyp.Q) (Nat.card (↥hyp.H ⧸ hyp.Q.subgroupOf hyp.H)))
+    (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index)
+    {z : G} (hzZ : z ∈ Z) (hz1 : z ≠ 1)
+    (hQz : hyp.Q ≤ Subgroup.centralizer ({z} : Set G))
+    {e' : ClassFunction G ℂ} {ε : ℤ} {ξ : IrreducibleCharacter G} (hεne : ε ≠ 0)
+    (he' : e' = ε • (ξ : ClassFunction G ℂ))
+    (he'const : ∀ w ∈ Z, w ≠ 1 → e' w = e' z)
+    (hcard_const : ∀ w ∈ Z, w ≠ 1 →
+      Nat.card ↥(hyp.H ⊓ Subgroup.centralizer ({w} : Set G)) =
+        Nat.card ↥(hyp.H ⊓ Subgroup.centralizer ({z} : Set G))) :
+    e' z ≡ e' 1 [ALGMOD (Nat.card ↥hyp.Q : ℤ)] := by
+  classical
+  obtain ⟨V, _, _, _, ρ, hρ, hξρ⟩ := ξ.isIrreducible
+  haveI : ρ.IsIrreducible := hρ
+  have hεceo : (ε : ℂ) ≠ 0 := Int.cast_ne_zero.mpr hεne
+  have hεint : IsIntegral ℤ (ε : ℂ) := by
+    simpa using (isIntegral_algebraMap (R := ℤ) (A := ℂ) (x := ε))
+  have hsmul : ∀ g : G, e' g = (ε : ℂ) * ((ξ : ClassFunction G ℂ) g) := by
+    intro g
+    rw [he', ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ), ClassFunction.smul_apply]
+  -- `hconst` for (7): character constancy (cancel `ε` from `e'`-constancy) + card constancy
+  have hconst : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 →
+      ρ.character w = ρ.character z ∧
+        Nat.card ↥(hyp.H ⊓ Subgroup.centralizer ({w} : Set G)) =
+          Nat.card ↥(hyp.H ⊓ Subgroup.centralizer ({z} : Set G)) := by
+    intro w hwZ hw1
+    refine ⟨?_, hcard_const w hwZ hw1⟩
+    rw [← congrFun hξρ w, ← congrFun hξρ z]
+    apply mul_left_cancel₀ hεceo
+    rw [← hsmul w, ← hsmul z]
+    exact he'const w hwZ hw1
+  have hcong := OddOrder.RepresentationTheory.peterfalvi_67_hall_of_odd ρ hyp.Q_le_H hZQ
+    hyp.Q_subgroupOf_H_normal inferInstance hyp.isTISubset_Q_sdiff_one hHall hoddG hzZ hz1 hQz
+    hHallG hconst
+  rw [← congrFun hξρ z, ← congrFun hξρ 1] at hcong
+  have hcong2 := hcong.smul_left hεint
+  rw [← hsmul z, ← hsmul 1] at hcong2
+  exact hcong2
 
 end Hypothesis
 
