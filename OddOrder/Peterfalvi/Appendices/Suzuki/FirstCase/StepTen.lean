@@ -58,6 +58,30 @@ theorem padicValNat_pow_sub_one_add_one {p N : ℕ} [Fact p.Prime] (hp : Odd p)
   rw [one_pow, Nat.sub_add_cancel hN, padicValNat_self] at key
   exact key
 
+/-! ## Powers of two modulo `2^p − 1`
+
+Step (10) rules out `Q₁ ≠ 1` (when `p ∣ |Σ|`) using step (3): a prime `r ∣ |Q₁|`
+satisfies `r ≡ 2^i (mod 2^p − 1)`.  In the offending cases `p ∈ {3, 5}` this is
+impossible because the residues `2^i mod (2^p − 1)` avoid `13 mod 7 = 6` and
+`11 mod 31 = 11`. -/
+
+/-- The residues of powers of two modulo `7` are exactly `{1, 2, 4}` (period 3). -/
+theorem pow_two_mod_seven (i : ℕ) : 2 ^ i % 7 = 1 ∨ 2 ^ i % 7 = 2 ∨ 2 ^ i % 7 = 4 := by
+  induction i with
+  | zero => left; rfl
+  | succ n ih =>
+    rw [pow_succ, Nat.mul_mod]
+    rcases ih with h | h | h <;> rw [h] <;> decide
+
+/-- The residues of powers of two modulo `31` are exactly `{1, 2, 4, 8, 16}` (period 5). -/
+theorem pow_two_mod_31 (i : ℕ) :
+    2 ^ i % 31 = 1 ∨ 2 ^ i % 31 = 2 ∨ 2 ^ i % 31 = 4 ∨ 2 ^ i % 31 = 8 ∨ 2 ^ i % 31 = 16 := by
+  induction i with
+  | zero => left; rfl
+  | succ n ih =>
+    rw [pow_succ, Nat.mul_mod]
+    rcases ih with h | h | h | h | h <;> rw [h] <;> decide
+
 /-! ## Structural `|G|_p` decomposition
 
 `|G| = |Q| · |D| · (|Q|+1)` (`card_G_eq`), and `|D| = |D̄| · |W|`,
@@ -84,6 +108,27 @@ theorem card_D_eq_card_Dbar_mul_card_W :
 theorem card_Kbar_mul_card_Vbar :
     Nat.card ↥hyp.Kbar * Nat.card ↥hyp.Vbar = Nat.card hyp.Dbar := by
   simpa using Subgroup.IsComplement.card_mul_card hyp.Kbar_isComplement_Vbar
+
+/-- An odd prime dividing `|Q|` divides `|Q₁|` (`Q = S × Q₁` with `S` a `2`-group). -/
+theorem dvd_card_Q1_of_odd_prime_dvd_card_Q {r : ℕ} (hr : r.Prime) (hodd : Odd r)
+    (hdvd : r ∣ Nat.card ↥hyp.Q) : r ∣ Nat.card ↥hyp.Q1 := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let S : Sylow 2 ↥hyp.Q := default
+  have hQ : Nat.card ↥hyp.Q =
+      Nat.card ↥(S : Subgroup ↥hyp.Q) * Nat.card ↥hyp.Q1Subgroup := by
+    rw [← Nat.card_congr (hyp.sylowTwoProdQ1MulEquiv S).toEquiv, Nat.card_prod]
+  rw [hQ] at hdvd
+  rw [hyp.card_Q1]
+  rcases (Nat.Prime.dvd_mul hr).mp hdvd with hS | hQ1
+  · exfalso
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp S.isPGroup'
+    rw [hk] at hS
+    have hr2 : r = 2 :=
+      (Nat.prime_dvd_prime_iff_eq hr Nat.prime_two).mp (hr.dvd_of_dvd_pow hS)
+    rw [hr2] at hodd
+    exact (Nat.not_odd_iff_even.mpr even_two) hodd
+  · exact hQ1
 
 end Hypothesis
 
@@ -289,6 +334,84 @@ theorem factorization_card_G_eq {F : Type uG} [NearFields.NearField F]
     Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.add_apply,
     Finsupp.add_apply, hQ0, hQ1, fc.factorization_card_D_eq]
   ring
+
+/-- **Peterfalvi Part II, Ch. II, step (10)** (p. 111): if `p ∣ |Σ|` then `Q₁ = 1`.
+
+Suppose `Q₁ ≠ 1`.  As `p ∣ |Σ|` and `p` is prime, `|Σ| ≠ 1`, so step (8) gives `|Σ|`
+prime and `F` a field of order `3^{|Σ|}`, `5^{|Σ|}` or `9^{|Σ|}`; with `p = |Σ|` this
+forces `p ∈ {3, 5}` (as `p ∣ |F|`) and `|C_Q(P)| = |F| − 1 ∈ {26, 3124, 728}`.  An odd
+prime `r ∈ {13, 11, 13}` divides `|C_Q(P)|` hence `|Q₁|`, so step (3) gives
+`r ≡ 2^i (mod 2^p − 1)` — impossible since `13 ≢ 2^i (mod 7)` and `11 ≢ 2^i (mod 31)`.
+Inherits the step (2)(b) `sorry` (issue 9318) through the model. -/
+theorem Q1_eq_bot_of_p_dvd_card_centralizer_W
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hpSig : fc.p ∣ Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :
+    fc.toHypothesis.Q1 = ⊥ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  by_contra hQ1
+  -- `|Σ| ≠ 1` since `p ∣ |Σ|` and `p > 1`
+  have hSigNe1 :
+      Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ≠ 1 :=
+    fun h => fc.p_prime.one_lt.ne' (Nat.dvd_one.mp (h ▸ hpSig))
+  obtain ⟨hSigPrime, hFcases⟩ :=
+    fc.card_prime_and_card_field_of_Q1_ne_bot ind model hQ1 hSigNe1
+  have hpeq : fc.p = Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) :=
+    (Nat.prime_dvd_prime_iff_eq fc.p_prime hSigPrime).mp hpSig
+  -- `|C_Q(P)| = |F| − 1`
+  obtain ⟨e⟩ := fc.centralizer_inf_mulEquiv_units model
+  have hCQ : Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) =
+      Nat.card F - 1 := by rw [Nat.card_congr e.toEquiv, Nat.card_units]
+  have hCQdvdQ : Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) ∣
+      Nat.card ↥fc.toHypothesis.Q := Subgroup.card_dvd_of_le inf_le_left
+  obtain ⟨m, hm1, hm⟩ := fc.card_field_eq_prime_pow model hB2
+  have hpF : fc.p ∣ Nat.card F := by rw [hm]; exact dvd_pow_self fc.p (by omega)
+  rw [← hpeq] at hFcases
+  -- an odd prime `r ∣ |C_Q(P)|` forces `∃ i, r ≡ 2^i (mod 2^p − 1)`
+  have hcontra : ∀ r : ℕ, r.Prime → Odd r →
+      r ∣ Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) →
+      ∃ i, r ≡ 2 ^ i [MOD 2 ^ fc.p - 1] := fun r hr hodd hrdvd =>
+    fc.exists_pow_two_modEq_of_prime_dvd_card_Q1 hr
+      (fc.toHypothesis.dvd_card_Q1_of_odd_prime_dvd_card_Q hr hodd (hrdvd.trans hCQdvdQ))
+  rcases hFcases with h3 | h5 | h9
+  · -- `|F| = 3^p` ⟹ `p = 3`, `|C_Q(P)| = 26`, use `r = 13`
+    have hp3 : fc.p = 3 := (Nat.prime_dvd_prime_iff_eq fc.p_prime (by norm_num)).mp
+      (fc.p_prime.dvd_of_dvd_pow (h3 ▸ hpF))
+    have h13 : (13 : ℕ) ∣
+        Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) := by
+      rw [hCQ, h3, hp3]; norm_num
+    obtain ⟨i, hi⟩ := hcontra 13 (by norm_num) (by decide) h13
+    rw [hp3] at hi
+    have hi' : (13 : ℕ) % 7 = 2 ^ i % 7 := hi
+    rcases pow_two_mod_seven i with h | h | h <;> omega
+  · -- `|F| = 5^p` ⟹ `p = 5`, `|C_Q(P)| = 3124`, use `r = 11`
+    have hp5 : fc.p = 5 := (Nat.prime_dvd_prime_iff_eq fc.p_prime (by norm_num)).mp
+      (fc.p_prime.dvd_of_dvd_pow (h5 ▸ hpF))
+    have h11 : (11 : ℕ) ∣
+        Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) := by
+      rw [hCQ, h5, hp5]; norm_num
+    obtain ⟨i, hi⟩ := hcontra 11 (by norm_num) (by decide) h11
+    rw [hp5] at hi
+    have hi' : (11 : ℕ) % 31 = 2 ^ i % 31 := hi
+    rcases pow_two_mod_31 i with h | h | h | h | h <;> omega
+  · -- `|F| = 9^p` ⟹ `p = 3`, `|C_Q(P)| = 728`, use `r = 13`
+    have hp3 : fc.p = 3 := by
+      have hd : fc.p ∣ 3 ^ (2 * fc.p) := by
+        have : fc.p ∣ (9 : ℕ) ^ fc.p := h9 ▸ hpF
+        rwa [show (9 : ℕ) = 3 ^ 2 from rfl, ← pow_mul] at this
+      exact (Nat.prime_dvd_prime_iff_eq fc.p_prime (by norm_num)).mp
+        (fc.p_prime.dvd_of_dvd_pow hd)
+    have h13 : (13 : ℕ) ∣
+        Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) := by
+      rw [hCQ, h9, hp3]; norm_num
+    obtain ⟨i, hi⟩ := hcontra 13 (by norm_num) (by decide) h13
+    rw [hp3] at hi
+    have hi' : (13 : ℕ) % 7 = 2 ^ i % 7 := hi
+    rcases pow_two_mod_seven i with h | h | h <;> omega
 
 end FirstCaseHypothesis
 
