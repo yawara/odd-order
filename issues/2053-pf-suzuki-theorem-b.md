@@ -373,6 +373,17 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       Higman 非依存)、conclusion のみ sorryAx (pow_four 経由)。
     - AxiomsCheck: StepFive を import 追加、clean 3 本を登録 (conclusion は
       Higman+9318 継承ゆえ意図的に非登録、注記済)。
+- [ ] (9) `p = f` — **算術半分 完了 (2026-07-22, FirstCase/StepNine.lean 新設・root 配線)**:
+  `char_eq_p_of_p_dvd_card_Q_add_one` (sorryAx=9318 through model): `p∣|Q|+1 ⟹ char=p`。
+  |Q|=|C_Q(P)|^p (step4) + |C_Q(P)|=|F|−1 (units) ⟹ |Q|+1=(|F|−1)^p+1 ≡ |F| (mod p)
+  (`ZMod.pow_card` Fermat) ⟹ p∣|F|、additive Cauchy (`exists_prime_addOrderOf_dvd_card`) +
+  `char_spec` (char•x=0, char prime) ⟹ p∣char ⟹ p=char。near-field F でも成立
+  (Field 不要、additive 経路)。
+  **残 = transfer 半分**: `p∣|Q|+1` を transfer T:G→H/(QKW) で出す。前提 = §1 Prop4(a)
+  coset reps (1 と {ty:y∈Q}、`exists_canonicalForm` 経由) で [G:H]=|Q|+1、tyx=xty^x、
+  (B2) で T(x)=1、P∩QKW=1。mathlib `MonoidHom.transfer`/`transfer_eq_prod_...` を使うが
+  `transfer_eq_pow` の key 条件 (P pointwise weakly-closed) は成立せず → 明示 transversal
+  の orbit 計算 (off-diag 項が QKW に落ちる) が要る。substantial subproject。
 - [ ] (10) Lemma 5 消費の二分岐
 - [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
 - [ ] (13)–(16)
