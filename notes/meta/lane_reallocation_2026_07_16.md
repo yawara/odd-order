@@ -30,8 +30,30 @@
 | **b** | `/home/ywr/odd-order-b` | Suzuki チェーン (Ch.8 は 2026-07-19 に a へ返還) | `OddOrder/Peterfalvi/Appendices/{Suzuki,Suzuki2Groups}*.lean` | 2000 |
 | **c** | `/home/ywr/odd-order-c` | BG 残 + Pf Appendices の非 Suzuki 系のうち **Huppert/SemilinearField** | `OddOrder/BG/**` + `Appendices/{Huppert,SemilinearField}.lean`。⚠ **NearFields/FeitSibley は 2026-07-21 裁定 9204 で a へ carve-out** (c は App.E 3021 に専念・2 日 dormant だった)。**Pf 本文 `OddOrder/Peterfalvi/S*.lean` は 2026-07-19 裁定 9154 で a へ移管** (9158 で一時 c へ暫定移管したが a 復帰により失効) | 3000 |
 
+| **d** | `/home/ywr/odd-order-d` | **メンテナンス専用レーン** (2026-07-23 新設、ユーザー指示): lint backlog 掃除 + docs/notes hygiene + stale docstring sweep + **lean-eval 抽出** | **path-prefix 排他所有なし (cross-cutting)**。運用 = 下記「lane d charter」。primary zone = `notes/meta/lean_eval_submission.md` + lean-eval 抽出物 / `bin/lint-baseline.tsv` の ratchet-down / top-level docs (README/ROADMAP)。lint・docstring は **frozen file のみ**に mechanical 編集、active frontier 不可触、collision 時は active レーンに譲る | 4000 |
+
 - shared infra (`OddOrder/GroupTheory/**`, `OddOrder/Algebra/**`, `OddOrder/Mathlib/**`, root `OddOrder/*.lean`) =
   所有なし、**claim-before-build (9000 番台 issue)** 継続。hub/main = base 0。
+
+### lane d charter (2026-07-23 新設、メンテナンス専用)
+
+lane d は a/b/c と異なり **path-prefix の排他 territory を持たない cross-cutting 保守レーン**
+(lint/docs/docstring/lean-eval は本質的に全域に跨り、`notes/` も各レーンが自分の分を書くため排他不可)。
+運用規律:
+
+- **担当**: ① **lint backlog 掃除** — `bin/lint-baseline.tsv` の grandfather 済警告を frozen file 上で解消し
+  baseline を ratchet-down (従来 hub がやっていた「frozen×機械カテゴリ cleanup wave」を d が引き取る)。
+  ② **docs/notes hygiene** — stale docstring 修正 ([[feedback-fix-stale-docstrings-on-sight]])・notes 整理・
+  README/ROADMAP 更新。③ **lean-eval 抽出** — `notes/meta/lean_eval_submission.md` 系の抽出物の生成/更新。
+- **collision 回避 (最重要)**: d の Lean file 編集は **(i) mechanical のみ** (lint/docstring/formatting、実 proof
+  改変や signature 変更は禁止 = それは owner レーンの仕事) **(ii) frozen file のみ** (a/b/c の active frontier ‐
+  未マージ work のある file ‐ は触らない) **(iii) collision 時は active レーンに譲る** (owner の substantive
+  work が勝ち、d は後で再適用)。着手前に `git -C odd-order-{a,b,c} status`/最新 commit で active file を避ける。
+- **lint 分担**: active レーンは自分の新規警告を grandfather (従来どおり)。hub は合流 tick で reconcile
+  (grandfather + 改善の ratchet-down)。**d は proactive な backlog 掃除**を担い baseline を純ゼロへ寄せる
+  (完了像 = issue 0138: backlog が sorry のみ → gate を `--strict` 化)。
+- **STOP 条件は a/b/c と同じ** + d 固有: **実 proof/signature を触ったら STOP** (mechanical 逸脱)。
+- issue base = **4000** (旧 lane d の band を継続、closed 群は履歴)。shared-infra claim は原則不要 (要れば 9600)。
 - Pf 本文 `S*.lean` は c 所有だが、b の Suzuki 作業が §10 等の既存 statement を cite するのは通常どおり自由
   (cite は所有と無関係)。
 

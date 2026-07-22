@@ -6,6 +6,34 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 00:5x 監視 tick — a/b 合流 / c・d hold**。a=6 / b=3 / c=5 / d=1。
+> 合流: a (**🎉 Isaacs §1B 完結 1B.5-1B.8** + `Ch03_SplitExtensions/PiResidual.lean` 新 leaf O^π, 配線済) / b (docs 2053 step10 記録)。
+> **gate (a+b): green 4646 jobs (+1 PiResidual) / AxiomsCheck OK (3754・新 axiom 0) / sorry 7→7 非退行 / lint 216 / push 6d1a24cd1→d4e5d1f54**。
+> **c は hold 継続** (fix(A) 含む +5 = **BLOCKER 2 (Q-regularity) 解消 + cyclic 証明 + quaternion 孤立化**の大進捗が全て b consumer 待ちで gated)。
+> ⚠⚠⚠ **lane b 最優先指示 (再掲・強調)**: **c の 9406 fix(A) 完成済 5 commit が b の consumer 更新のみを待って全 hold 中**。b は step10 docs でなく **`StepEight.lean` `model_qEquiv_conj` (104/114/133) + `StepFive.lean` (689-729) の `model.qEquiv_conj` 消費を新 RHS `qEquiv q⁻¹` に更新**せよ (q↔q⁻¹ 調整、小変更)。上げ次第 hub が c+b を同一 tick land。
+> ⚠ **lane d hold + user escalation**: d の初 commit (70bb7e9b7) が **CLAUDE.md「やらないこと」の leanblueprint 規則を softening** (forward 禁止のまま **reverse Lean→blueprint 生成を「推奨」化**) + issue 0143。内容は repo 哲学と整合的で well-argued だが **CLAUDE.md ガバナンス変更 + 「2026-07-23 ユーザー方針」の attribution を hub は検証不可**。⟹ **未検証 user-policy のガバナンス変更を silently merge しない方針で d を hold、ユーザーに確認 escalate**。d の lean-eval/docs 部分は問題なし。⚠ d の issue は base 4000 のはずが 0143 (base 0) を使用 — 軽微逸脱 (policy issue ゆえ base 0 は許容範囲、次回から 4000)。
+> **513185** idle 継続。
+>
+> **🆕 2026-07-23 00:3x — lane d 新設 (ユーザー指示「lint/ドキュメント整備/lean-eval 抽出の専用レーン = D」)**。
+> worktree `/home/ywr/odd-order-d` (branch d) 作成: `.lake/packages`・`references` を main から symlink、`.lake/build` を
+> warm-start コピー、`lake build OddOrder` = green 4645 jobs (warm no-op) 確認、git status clean。issue base = **4000**。
+> **役割 = メンテナンス専用 (cross-cutting)**: ① lint backlog 掃除 (frozen file, baseline ratchet-down — 従来 hub の
+> cleanup wave を引き取る) ② docs/notes hygiene + stale docstring sweep ③ lean-eval 抽出。
+> **path 排他 territory なし** — d_re は primary zone (bin/・top-level docs・lean-eval) のみで、lint/docstring は全 Lean
+> file (frozen・mechanical) に及ぶのが sanctioned。**hub の d 合流検査 = 「mechanical か (実 proof/signature 不改変) +
+> frozen file か (a/b/c active frontier 回避)」**。実 proof/signature 改変は STOP。charter 正本 = lane_reallocation §1。
+> **監視 cron を d 込みで再作成** (旧 ee4db237 → 新 id、`{a,b,c,d}` の 4 レーン check)。⚠ d の Lean 編集は lint/docstring で
+> a/b/c の frozen file に及ぶため、合流順は **a/b/c を先に、d を最後**にして d の掃除が最新 frozen 状態に乗るようにする。
+> ⚠ 9406 coordination は継続 (c READY・b consumer 待ち、下記 00:2x 参照)。
+>
+> **▶▶ 2026-07-23 00:2x 監視 tick — 🔧 9406 c READY / c hold (b consumer 待ち)**。a=1 / b=2 / c=2。
+> 合流: a (**Isaacs §1B 1B.5a/1B.7b** π-Hall 像/O_π) / b (**2053 step (10/10.1)** Q₁=1 (p∣|Σ|) / |G|_p=p^{m+2} (p∤|Σ|)、StepTen)。**c は hold**。
+> 🔧 **9406 状態**: **c は fix(A) 適用済・READY** (commit e8bb049db、`qEquiv_conj` RHS = `emb(ofAdd(x*(qEquiv q⁻¹)))`)。
+> c 自身が「フルビルドは StepEight/StepFive で破綻 (b の consumer が旧 RHS 前提) — hub は c+b を同一 tick 合流」と警告 = **c を単独 merge すると build 破壊**ゆえ **c を hold**。
+> ⚠⚠ **lane b への指示 (c を unblock するため優先)**: `StepEight.lean` `model_qEquiv_conj` (行 104/114/133) + `StepFive.lean` (689-729) の `model.qEquiv_conj`/`model.qEquiv` 消費を **新 RHS `qEquiv q⁻¹`** に合わせ更新せよ (q↔q⁻¹ 調整)。**c の fix(A) は完成済で b の consumer 更新のみが blocker**。b が patch を上げ次第、hub が **c+b を同一 tick で --no-ff 合流 + 合成フルビルド検証** して land。
+> ℹ **c の補足**: fix(A) は qEquiv 構造 (BLOCKER 1) を解消するが、`rankOne_affine_nearField` は依然 sorry (Q₈ BS に gated、`notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md` §1) — 構造修正 land 後も theorem は Q₈ 1 点で残る (想定内)。
+> **gate (a+b): フルビルド green 4645 jobs (不変, qEquiv_conj 旧 RHS 維持で整合) / AxiomsCheck OK (3754・新 axiom 0) / 実 sorry 7→7 非退行 / lint 216 / push b2b481a6a→342cd20d1**。**513185** idle 継続。
+>
 > **▶▶ 2026-07-23 00:1x 監視 tick**。a=2 / b=2 / c=1。合流: a (**Isaacs §1B Problems 1B.1a/1B.4/1B.6**) / b (**2053 step (10) structural |G|_p = p^{m+2}·|W|_p**) / c (**affine regular normal subgroup F 抽出** = App C Prop1 prereq iii, Huppert II 3.2 相当)。
 > 9406 fix(A) は依然どのレーンも未着手 (全 commit qEquiv_conj 非接触・独立ゆえ安全合流)。b は main sync 済 = 9406 裁定受領、step10 完了後に consumer 更新の見込み。
 > **gate: フルビルド green 4645 jobs (不変) / AxiomsCheck OK (3754・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 / lint 216 ≤ 216 / push 642260356→c3f12cae2**。新 leaf 0・範囲逸脱なし。**513185** idle 継続。
@@ -294,6 +322,7 @@
 > b_re='^OddOrder/Higman/|^OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/|^OddOrder/Peterfalvi/Appendices/Suzuki(/|\.lean)'   # 2026-07-19 夕 ユーザー裁定 (issue 0127 ③): Higman 原典 = 4 冊目として OddOrder/Higman/ を新設、b 所有。⚠ 2026-07-22 裁定 (ユーザー「C の次タスク = B 分割」): Peterfalvi Appendices/Suzuki2Groups (.lean + subdir 11 file) を c へ carve → b_re は Suzuki(/|.lean) = Theorem B (FirstCase) チェーンのみ。Higman/** (土台・完成済) は b 保持で c が cite
 > c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|ExceptionalNearField|Suzuki2Groups)'   # 2026-07-22 9205 裁定: FeitSibley 除去→a。near-field クラスタ + Huppert/SemilinearField/ExceptionalNearField は c。⚠ 2026-07-22 裁定 (ユーザー「C の次タスク = B 分割、ただし NearFields が終わった後」): **Peterfalvi Appendices/Suzuki2Groups を b→c へ carve** (Peterfalvi App III Higman 2-群分類の最終組立 = 4 sorry、B 完成済 Higman/** を cite)。**c の作業順序 = ① NearFields Prop1 transport (immediate primary) → ② NearFields 完了後に Suzuki2Groups (B 分割)**。両方 c 所有。NearFields Prop1 の Q₈ 部分は依然 research gap 繰延だが、transport は先に進める
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
+> d_re='^bin/|^README|^ROADMAP|^CLAUDE\.md|^AGENTS\.md|^notes/meta/lean_eval'  # 2026-07-23 新設 lane d (メンテナンス専用) の primary zone。⚠ d は cross-cutting ゆえ path 排他でない: lint/docstring sweep は **全 Lean file (frozen のみ・mechanical のみ)** に及ぶのが sanctioned。d の Lean 編集を range 逸脱として自動 flag せず、hub が「mechanical か (実 proof/signature 不改変) + frozen file か (active frontier 回避)」を合流時に確認する。実 proof/signature を触っていたら STOP (mechanical 逸脱)。詳細 = lane_reallocation §1「lane d charter」
 > ```
 > **▶ 2026-07-19 11:29 lane a 復帰 → 暫定裁定 9158 失効、9154 の恒久配分へ復帰**。
 > a は 05:36〜11:27 の 5h51m 停止 (60 秒後 wakeup が発火せずセッション終了) から復帰し、
