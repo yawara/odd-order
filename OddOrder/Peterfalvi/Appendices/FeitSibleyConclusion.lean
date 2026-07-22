@@ -557,6 +557,21 @@ theorem exists_anchor_data [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype 
       (by rw [Nat.cast_one, one_mul]; exact hbdeg)
     simpa using hsupp
 
+/-- **(4) keystone difference is `A`-supported** (Peterfalvi (4), p. 148): for `χ₁, η₁ ∈ 𝒮` with
+`χ₁(1) = a·η₁(1)`, the keystone `χ₁ − a·η₁` lies in `ℤ[𝒮]°` and is `A`-supported.  (In the endgame
+`η₁ ∈ 𝒴 = 𝒮(Q')` has degree `d` and `χ₁(1) = a·d`, so `a = χ₁(1)/d`.) -/
+theorem keystone_mem_zSupportedSpan [Finite G] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥hyp.H : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    {χ₁ η₁ : ClassFunction ↥hyp.H ℂ}
+    (hχ₁ : χ₁ ∈ hyp.Sset) (hη₁ : η₁ ∈ hyp.Sset) {a : ℕ}
+    (hdeg : χ₁ (1 : ↥hyp.H) = (a : ℂ) * η₁ (1 : ↥hyp.H)) :
+    χ₁ - a • η₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A := by
+  refine ⟨Submodule.sub_mem _ (Submodule.subset_span hχ₁) (nsmul_mem (Submodule.subset_span hη₁) a),
+    ?_⟩
+  have hsupp := hyp.scaled_diff_support_subset_A_of_mem_Sset hχ₁ hη₁ (n := 1) (m := a)
+    (by rw [Nat.cast_one, one_mul]; exact hdeg)
+  simpa using hsupp
+
 /-- **(8) full assembly: `a ∣ λ`** (Peterfalvi (8), p. 150).  The keystone divisibility closing
 step (6): from the endgame `(4)` data — the coherent `𝒳 = XsetOf ⊥ Z` with anchor `χ₁` of degree
 `χ₁(1) = a·d`, `p`-power degree differences `χ − b·χ₁` supported, the `𝒴`-witness `e' = ε·ξ`
