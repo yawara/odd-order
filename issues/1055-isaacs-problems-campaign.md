@@ -280,8 +280,15 @@ mathlib inductive (`top`/`step`)。
   `index_eq_card`) 双方を割り、後者は `|G:H'|` を割り (`relIndex_dvd_index_of_le`) `|K|` と互いに素
   (`eq_one_of_dvd_coprimes`) ⟹ 像 `⊥` ⟹ `K.subgroupOf K'≤H'.subgroupOf K'` ⟹ `K≤H'`
   (`subgroupOf_map_subtype`+`inf_eq_left`)。
-- ⬜ **残り §2A** (2A.3(a) 以外は substantial、要 machinery):
-  - **2A.1** (subnormal π-subgroup `K ⊆ O_π(G)`) — **正しい帰納 motive を発見 (2026-07-23)**: 素朴な
+- ✅ 実証明 **2A.1** `le_oPiCore_of_isSubnormal_of_isPiGroup` (subnormal π-subgroup `K ⊆ O_π(G)`) +
+  helper `oPiCore_map_subtype_le_of_isSubnormal` (`(oPiCore π ↥H).map H.subtype ≤ oPiCore π G` for H 部分正規)。
+  char-motive の IsSubnormal 構造帰納が動いた: top=`oPiCore.map_le_of_surjective`、step=`subgroupOfEquivOfLe`
+  の iso で `oPiCore.map_eq_of_mulEquiv` 移送 + `characteristic_map_subtype_normal` (Ch01 1D.16) で ↥K' 正規
+  + `IsPiGroup.le_oPiCore` + `H.subtype=K'.subtype∘subtype∘e.symm` 合成 (`map_map`) + IH。2A.1 本体は
+  `↥K` π-群で `oPiCore π ↥K=⊤` (`card_top`), `(⊤).map K.subtype=range=K`。import 追加 = Ch03 Theorem315 +
+  Ch01 ProblemsFrobeniusFrattini (cycle 無し)。→ **2A.1 完了、2A.3(b) unblock**。
+- ⬜ **残り §2A** (要 machinery):
+  - **旧 2A.1 メモ** (参考): **正しい帰納 motive の発見過程**: 素朴な
     `P K := IsPiGroup π K → K≤oPiCore` は IsSubnormal 構造帰納に **不適** (step の IH は大きい `K'` について
     で、π-group 性は小さい `K` について ⟹ 使えない)。正解は **`P H := (oPiCore π ↥H).map H.subtype ≤
     oPiCore π G`** (H を IsSubnormal で帰納): top は `↥⊤≅G` の iso、step (`H◁K'`, IH: `(oPiCore π ↥K').map
@@ -291,8 +298,21 @@ mathlib inductive (`top`/`step`)。
     素材確認済: `IsPiGroup.le_oPiCore`[Normal] / `oPiCore.characteristic`/`isPiGroup` / `IsPiGroup.map_equiv`
     / `normal_of_characteristic` / 1D.16 の `characteristic_map_subtype_normal` パターン。~60 行 fiddly
     (subgroup-as-group + inclusion + char + π-group 配管)。
-  - **2A.3(b)** (`K` 部分正規版) — **2A.1 経由**: π=π(K)、K « G π-group ⟹ 2A.1 で `K⊆O_π(G)`、`O_π(G)◁G`
-    π-group で `|O_π(G):O_π(G)∩H| ∣ gcd(|O_π(G)|,|G:H|)=1` (互いに素) ⟹ `O_π(G)⊆H` ⟹ `K⊆H`。
+    **★ 全ツールチェーン確認済 (2026-07-23)、step の具体手順**: iso `e := (Subgroup.subgroupOfEquivOfLe hle).symm
+    : ↥H ≃* ↥(H.subgroupOf K')` で `(oPiCore π ↥H).map e = oPiCore π ↥(H.subgroupOf K')`
+    (**`oPiCore.map_eq_of_mulEquiv` は public**、Ch03 Theorem315.lean — private の `map_le_of_mulEquiv` を
+    懸念したが equality 版が公開されている)。`inclusion hle = (H.subgroupOf K').subtype ∘ e` ゆえ
+    `(oPiCore π ↥H).map (inclusion hle) = (oPiCore π ↥(H.subgroupOf K')).map (H.subgroupOf K').subtype`、
+    これは `characteristic_map_subtype_normal` (oPiCore char + `H.subgroupOf K'◁↥K'`=hN) で ↥K' 正規 +
+    π-group (`oPiCore.isPiGroup`) ⟹ `≤ oPiCore π ↥K'` (`IsPiGroup.le_oPiCore`)、`.map K'.subtype` して IH。
+    top は `oPiCore.map_le_of_surjective π (⊤).subtype`。**import 追加要**: `Ch03_SplitExtensions.Theorem315`
+    (oPiCore) + `Ch01_Sylow.ProblemsFrobeniusFrattini` (characteristic_map_subtype_normal)。cycle 無し。
+  - **2A.3(b)** (`K` 部分正規版) — **2A.1 経由** (2A.1 完了で unblock 済、次に構築): π=π(K)=`(Nat.card K).primeFactors`、
+    `IsPiGroup π K` は自明、`le_oPiCore_of_isSubnormal_of_isPiGroup` で `K⊆O_π(G)`。核 helper
+    `coprime_normal_le` (`N◁G`, `coprime(|N|,|G:H|)` ⟹ `N⊆H`): `|N:N∩H|=|N⊔H:H|` (`card_mul_card_inf`
+    = Ch01 Problems の N 正規積公式) が `|N|` と `|G:H|` 双方を割り互いに素で `=1` ⟹ `N⊓H=N`⟹`N≤H`。
+    coprimality `coprime(|O_π(G)|,|G:H|)`: `primes(|O_π(G)|)⊆π(K)=primes(|K|)` (`oPiCore.isPiGroup`) かつ
+    `coprime(|G:H|,|K|)` ⟹ 素因数非共有 (`Nat.Coprime.primeFactors` 系)。~40 行。
   - 2A.2 (O^π) / 2A.4 (Wielandt) / 2A.5-2A.9 (socle・単純部分正規、heavy)。
 
 - ⬜ **次: §1D 続き (1D.8/1D.13 系 mathlib 支援厚のもの、1D.2/1D.3-5 は後で) → §1E–§1G**。
