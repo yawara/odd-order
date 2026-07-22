@@ -1012,3 +1012,14 @@ Z の定義から供給)、③ (1.1)+(1.2)+f.p.f. 下界の算術合成 → d �
   (**pdftotext は文字散乱で使用不可 — PDF ページ画像を読むこと**)
 - issue 1049 (L1a) / 1051 (L2a) / 1052 (L2b) / 1053 (L2c)
 - Coq 対応なし (odd-order は Peterfalvi Part I のみ; App.IV は Part II 用)
+
+## hub lint flag (2026-07-22 16:4x tick)
+
+`FeitSibleyConclusion.lean` 合流で非 sorry lint 警告 +4 (baseline 218→220 に grandfather 済、
+CI 赤化回避):
+- +1 `style.longLine`
+- +3 `unusedFintypeInType` (instance-in-type — leaf build 検出不能な cascade 系。full build +
+  敵対的検証必須ゆえ hub は触らず owner に委譲)
+
+⟹ **owner (lane a) が本 leaf の frontier 通過時に解消**。解消後は `bin/check-warnings
+--update-baseline` で baseline を下げること。
