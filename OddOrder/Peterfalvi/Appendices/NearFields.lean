@@ -807,6 +807,43 @@ theorem RankOneHypothesis.oddCore_ne_bot {G Ω : Type*} [Group G] [MulAction G �
       (dvd_trans hyp.Q_even.two_dvd (Subgroup.card_dvd_of_le hyp.Q_le_H))
   exact (Nat.not_even_iff_odd.mpr (hDH ▸ hyp.D_odd)) hHeven
 
+/-- **The affine regular normal subgroup `F`** (Peterfalvi App. C, Prop 1, prerequisite (iii),
+given Brauer–Suzuki (ii)).  From `O_{2'}(G) ≠ 1` (`oddCore_ne_bot`) and its solvability (odd order,
+Feit–Thompson), Huppert II Satz 3.2
+(`exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive`) yields an elementary abelian
+`p`-subgroup `F ⊴ G` regular on `Ω`; regularity gives the complement `G = F ⋊ H`
+(`isComplement'_stabilizer`).  This is the additive group underlying the near-field of Prop 1.
+
+Takes the Brauer–Suzuki conclusion `hbs` as a hypothesis (discharged via the cyclic / generalized
+quaternion split; the residual `Q₈` case of the latter is the sole research-adjacent gap). -/
+theorem RankOneHypothesis.exists_regular_normal {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+    (hyp : RankOneHypothesis G Ω)
+    (hbs : OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {hyp.t} = ⊤) :
+    ∃ (p : ℕ) (F : Subgroup G), p.Prime ∧ F.Normal ∧ IsMulCommutative ↥F ∧
+      (∀ x ∈ F, x ^ p = 1) ∧ MulAction.IsPretransitive ↥F Ω ∧
+      Subgroup.IsComplement' F hyp.H := by
+  haveI := hyp.faithful
+  -- `O_{2'}(G)` is a nontrivial solvable normal subgroup (odd order → Feit–Thompson).
+  have hNne : OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ≠ ⊥ := hyp.oddCore_ne_bot hbs
+  have hNodd : Odd (Nat.card ↥(OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G)) :=
+    Nat.not_even_iff_odd.mp (mt Even.two_dvd (fun h2 =>
+      (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup {p | p ≠ 2}) 2
+        (Nat.mem_primeFactors.mpr ⟨Nat.prime_two, h2, Nat.card_pos.ne'⟩) rfl))
+  haveI hNsolv : IsSolvable ↥(OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G) := feitThompson hNodd
+  obtain ⟨p, F, _hp, hFnormal, _hFle, _hFne, hcomm, hexp, _hpgroup, htrans, hfree⟩ :=
+    OddOrder.GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive
+      hyp.doubly_transitive hNne hNsolv
+  refine ⟨p, F, _hp, hFnormal, hcomm, hexp, htrans, ?_⟩
+  -- `G = F ⋊ H`: `F` regular on `Ω`, `H = stabilizer basept`.
+  rw [hyp.H_def]
+  refine Subgroup.isComplement'_stabilizer hyp.basept (fun h hh => ?_) (fun g => ?_)
+  · have hmem : (h : G) ∈ MulAction.stabilizer G hyp.basept ⊓ F :=
+      ⟨MulAction.mem_stabilizer_iff.mpr hh, h.2⟩
+    rw [hfree hyp.basept, Subgroup.mem_bot] at hmem
+    exact Subtype.ext hmem
+  · obtain ⟨f, hf⟩ := htrans.exists_smul_eq (g • hyp.basept) hyp.basept
+    exact ⟨f, hf⟩
+
 end PropositionOne
 
 section PropositionTwo
