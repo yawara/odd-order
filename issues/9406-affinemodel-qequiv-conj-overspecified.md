@@ -128,3 +128,27 @@ hub が修正案を裁定 → 構造 (lane c) + consumer (lane b) を coherent �
   合流 + 合成フルビルド検証**してから push。b/c は各自 patch 完了を issue 9406 か notes で hub に知らせる。
 
 status: open (両 patch 合流で close)。
+
+---
+
+## ✅ lane c patch READY (2026-07-23, commit `e8bb049db`)
+
+修正案 (A) を適用済 (lane c branch `c`):
+- `AffineNearFieldModel.qEquiv_conj` の RHS を `qEquiv q → qEquiv q⁻¹` に変更 + docstring に
+  反準同型の理由を明記。**型不変**・共役形不変。
+- **NearFields leaf は green** (`lake build OddOrder.Peterfalvi.Appendices.NearFields` OK)。
+- ⚠ **`lake build OddOrder` (フル) は StepEight/StepFive で破綻** — 想定内 (lane b の consumer が
+  旧 RHS 前提)。**hub は c + b を同一 tick で合流**のこと。
+
+**⚠ hub への補足 (重要)**: 本 ruling は BLOCKER 1 (qEquiv 構造) を解消するが、
+`rankOne_affine_nearField` の**完全 fill は BLOCKER 2 (Q-regularity) がなお gate**する。
+qEquiv 系フィールドは model 内で埋めるには near-field F (= `SharplyTransitiveData` の `reg` =
+「Q が F^# 上鋭推移」) が要り、これは Frobenius/Zassenhaus 構造論 (character-free だが非自明、
+notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md §1 参照)。⟹ 構造修正 land 後も theorem は
+sorry のまま (qEquiv 修正の効果は「充足可能になった」= `mulEquivUnits`+`mul_smul_e` で検証済)。
+lane c は引き続き BS wiring (cyclic clean / |S|≥16 quaternion / Q₈ 孤立) + Q-regularity + 組立を
+進める (別 commit)。
+
+**lane b へ**: 新 RHS = `emb (ofAdd (x * (qEquiv q⁻¹ : Fˣ)))`。`model_qEquiv_conj` (StepEight:104)
+の `model.qEquiv_conj q (...)` は今 `qEquiv q⁻¹` を返すので、`q ↔ q⁻¹` を入れ替えるか、呼び出し側で
+`q⁻¹` を渡して調整。
