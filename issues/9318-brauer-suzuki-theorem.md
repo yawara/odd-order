@@ -168,10 +168,31 @@ Gorenstein Lem 1.5: `θ* = Ind_N^G θ` (TI 誘導、`A_isTISubset` が feed)。
 - **`(θ*,1_G)_G = 1`**: Frobenius `inner_induce_eq_inner_restrict` → `(θ, 1_N)_N`
   = (Ind 1_C, 1_N) − (Ind ψ, 1_N) = 1 − 0 = 1。
 - **`θ*(1) = 0`**: `induce_apply_one` で [G:N]·θ(1) = 0。
-- **分解 `θ* = 1_G + χ₁ − χ`** (χ₁≠χ 非主既約): θ* は norm-3 virtual char で 1_G を重複度 1
-  含む → ρ = θ*−1_G は norm-2・1_G 直交・ρ(1)=−1 → ρ = χ₁−χ (χ(1)=χ₁(1)+1)。
-  repo infra = `InducedIrreducible.lean` の `exists_single_of_sum_sq_eq_one` /
-  norm-2 分解、`IsometryDifferencePair`、`Peterfalvi/S05_NormThree.lean` を要 API 精査。
+- ✅ **解析部完成** (`thetaStar` 系、2026-07-22 commit): `(θ*,θ*)_G=3` / `θ*(1)=0` /
+  `(θ*,1_G)=1`。axiom-clean。
+
+#### Lem 1.5 分解の実装計画 (2026-07-22、API 精査済 — 次 iteration frontier)
+
+**⚠ 経路確定 (誤経路を排除)**: ρ = θ*−1_G は norm 2 だが **`ρ(1) = θ*(1)−1 = −1 ≠ 0`**
+なので `exists_irr_sub_irr_of_inner_self_two` (ZIrrFourier:574、**`φ(1)=0` を要求**) は
+**適用不可**。**norm-3 を θ* に直接適用**する (θ*(1)=0 は満たす)。
+
+必要な部品:
+1. **`θ* ∈ ZIrr G`** — `induce_mem_ZIrr Q.N (hθ : θ ∈ ZIrr N)` (InducedCharacter:1062)。
+   θ ∈ ZIrr N は θ = Ind 1_C − Ind ψ (両者 character ∈ ZIrr) の差。要 `induce_mem_ZIrr` を
+   C.subgroupOf N に 2 回 + `sub_mem`。
+2. **`exists_triple_of_sum_sq_eq_three`** (新 infra、`exists_pair_of_sum_sq_eq_two`
+   ZIrrFourier:262 の 3 版): `∑_{a∈s} cₐ² = 3 ∧ cₐ≠0 → s = {α,β,γ} 相異 ∧ 各 cₐ=±1`。
+   証明: 各 cₐ²≥1、和=3 → card≤3; card=1(c²=3 不可)・card=2(c₁²+c₂²=3 整数解無)を omega 排除
+   → card=3、各 cₐ²=1。
+3. **1_G の係数 = 1**: `inner_eq_coeff_of_repr` (ZIrrFourier:117) で c(1_G) = (θ*,1_G) = 1
+   (`thetaStar_inner_trivial`)。
+4. **次数論法**: θ*(1) = ∑ cᵢ dᵢ = 0、1_G の項 = 1·1、残り 2 項 c₁d₁+c₂d₂ = −1、
+   cᵢ=±1・dᵢ≥1 → 一方 +1 他方 −1 かつ |d₁−d₂|=1 → **θ* = 1_G + χ₁ − χ、χ(1)=χ₁(1)+1**。
+   `exists_irr_sub_irr_of_inner_self_two` の (±1,±1) case 分析 (597-613) が雛形。
+
+出力定理 (提案): `∃ χ₁ χ : IrreducibleCharacter G, χ₁ ≠ χ ∧ χ₁ ≠ 1 ∧ χ ≠ 1 ∧
+  θ* = 1_G + χ₁ − χ ∧ χ(1) = χ₁(1) + 1`。→ 下流 Lem 1.6 (involution/奇数位数元上 θ*=0) へ。
 
 ### Lem 1.4 計画 (2026-07-22 lane c、⚠ 下記 infra は grep 発見のみ・API 未精査)
 
