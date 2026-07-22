@@ -241,6 +241,26 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       surj = C_D(P)=C_W(P)·P + P⊆N)。assembly = `N_eq_P_and_sigma_mulEquiv_centralizer_W`。
     - 数学的には step (7) 完結。sorryAx は 9318 (model) + Higman (step5 F_{9,2} 枝、lane a)
       の legitimate 上流 sorried-cite のみ。
+  - **(8) 着手 (2026-07-22, FirstCase/StepEight.lean 新設・root+AxiomsCheck 配線)** —
+    `Q₁≠1 ⟹ ℓ=|Σ| prime ∧ |F|∈{3^ℓ,5^ℓ,9^ℓ}` (p. 110)。**opening 2 lemma landed**:
+    - `comm_of_Q1_ne_bot` (∀-model, sorryAx=9318+Higman): 「By (5), F is a field」—
+      step5 の dichotomy (comm ∨ F_{9,2}∧Q₁=1) から Q₁≠1 ⟹ comm。
+    - `st_mem_and_cQ_isPGroup_of_mem_centralizer_W` (**axiom-clean**): w∈C_W(P)#
+      で trichotomy を X=⟨w⟩ に適用 ⟹ f=|st|∈{3,5} ∧ C_Q(w) 2群。readoff の直接消費。
+    - **⚠ 残 = step (8) core (C_F(w) 固定体解析、deep・fresh context 推奨)**:
+      1. w∈C_W(P) → Σ-image [w]∈rankOneQuotient.D → **σ_w := model.dAut [w]** (F≃+F 自己同型)。
+         `sigma_mulEquiv_centralizer_W` の合成。
+      2. **C_Q(w) ≅ C_{F*}(w)** (σ_w 固定単位): `model.qEquiv` (Q≅F*) +
+         `model.dAut_conj`/`qEquiv_conj` で共役 ↔ σ_w 作用を橋渡し。C_Q(w) は
+         step8 の `st_mem_...` で 2群と既知。
+      3. **|C_F(w)| = f^a** (固定部分体、Artin = mathlib `FixedPoints.finrank_eq_card`
+         on ⟨σ_w⟩; F は素体 𝔽_f 上)。C_F(w)* = C_{F*}(w) 2群 ⟹ f^a=2^b+1 ⟹
+         step6 `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` で |C_F(w)|∈{f,9}。
+      4. **f=3 の場合 mixed 排除** (w₁,w₂ で |C_F(w_i)|=3^i は w₁ 偶位数矛盾) ⟹
+         |C_F(w)| は w に依らず一定 ⟹ ℓ=|C_W(P)| prime ∧ |F|=|C_F(w)|^ℓ。
+      infra 所在: `AffineNearFieldModel` の dAut/dAut_conj/dAut_mul/qEquiv/qEquiv_conj
+      (NearFields.lean:729+)、Artin = mathlib FieldTheory/Fixed.lean。σ_w の位数=ℓ
+      (Σ 巡回性は要確認 — C_W(P) が巡回か? §3 の W 構造から)。
   - **(6) 算術補題 完了 (2026-07-22, StepSix.lean 新設)**:
     `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` (axiom-clean, AxiomsCheck
     登録) — [HB] IX 2.7: `f 奇 ∧ f^a = 2^b+1 (b≥1) ⟹ a=1 ∨ f^a=9`。純 ℕ 算術
