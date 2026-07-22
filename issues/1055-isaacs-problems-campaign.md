@@ -64,7 +64,13 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   `mul_eq_univ_of_coprime_index` (b) coprime index⟹HK=G)。
 - ✅ 実証明: **1A.5** (`isPretransitive_prod_iff`: G が α,β に推移的作用のとき積作用が推移的
   ⟺ G_a·G_b=univ、両方向とも安定化群と剰余類の交わり)。
-- ⬜ 残 §1A: **1A.7** (真部分群 H の共役の和集合に入らない元 ≥|H|)。**正しい論法 (導出済)**:
+- ⬜ 残 §1A: **1A.7** (真部分群 H の共役の和集合に入らない元 ≥|H|)。⚠ **2026-07-22 着手したが
+  Fintype 合成の壁で保留** — `Nat.card` 版 Burnside helper (`∑_m Nat.card(fixedBy β m) =
+  Nat.card(orbitRel.Quotient M β)·Nat.card M`) が `orbitRel.Quotient` の Fintype 合成で
+  "failed to synthesize Fintype M" を返す (letI/haveI/cases/simpa/explicit-rw 全滅)。
+  **次手**: (a) 全体を `Fintype.card` native で書き Nat.card 変換を最後のみに / (b) `Fintype G` を
+  仮定に追加 / (c) `MulAction.card_...` 系の Nat.card 直接補題を再探索 / (d) ChatGPT 相談
+  ([[feedback-ask-chatgpt-for-elided-gaps]])。数学論法は下記どおり健全。**正しい論法 (導出済)**:
   χ = G の G⧸H (右剰余類) 上の置換指標。(i) Burnside for G: `∑_{g∈G}χ(g)=|G|` (G は推移的ゆえ
   軌道 1 個)。(ii) Burnside for H (制限作用): `∑_{h∈H}χ(h)=|H|·(#H-軌道)=|H|·(#二重剰余類 H\G/H)
   ≥ 2|H|` (真部分群ゆえ二重剰余類 ≥2: H·1·H と HxH(x∉H))。(iii) `χ(g)=0 ⟺ g∉∪共役` ゆえ
