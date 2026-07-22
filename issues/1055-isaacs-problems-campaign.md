@@ -108,11 +108,22 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   (可換 p-元は `P` に入る = helper `mem_sylow_of_orderOf_prime_pow_of_forall_commute`
   = `⟨x⟩≤N_G(P)` + Sylow 極大性)、`P` 非自明 p-群ゆえ `p∣\|Z(P)\|`。↥P の `X` への共役
   `MulAction` を letI 構成 + 固定点 ≃ `Z(P)` 全単射 (`card_eq_of_bijective`)。
-- ⬜ **残り §1C**: **1C.4** (\|G\|=120 で index 3 or 5 の部分群、n_2 場合分け) /
-  **1C.5** (A_{p+1} で \|N_G(P)\|=p(p-1)/2、位数 p 元の計数、特殊) / **1C.6** (G=HK で P∩H,P∩K が Sylow) /
-  **1C.7** (極大部分群が全て素数指数 ⟹ 最大素数 Sylow 正規) / **1C.8** (位数 p^a 部分群数 mod p、計数)。
+- ✅ 実証明 **1C.7** `sylow_normal_of_maximal_subgroup_prime_index` (極大部分群 (coatom) が全て
+  素数指数 + `p` = 最大素因数 ⟹ Sylow `p`-部分群正規)。背理法: `N_G(P)≠⊤` ⟹ `N_G(P)` を含む極大
+  `M` (`eq_top_or_exists_le_coatom`、有限束 coatomic)、`q:=|G:M|` 素数。`P` は `M` の Sylow でもあり
+  `N_M(P)=N_G(P)` (`subgroupOf_normalizer_eq`) ゆえ `n_p(G)=q·n_p(M)` (`relIndex_mul_index`)、
+  Sylow 第三定理 (`card_sylow_modEq_one`) で両者 ≡1 (mod p) ⟹ `q≡1 (mod p)` ⟹ `q>p`、しかし
+  `q ∣ |G|` ゆえ `q≤p`、矛盾。⚠ coercion `↑↑P` (Sylow→Subgroup→Set) vs `↑P` (Sylow→Set 直接) を
+  `Sylow.coe_coe` で橋渡し。
+- ⬜ **残り §1C (一般 Sylow, 次に着手)**: **1C.6** (G=HK で ∃P∈Syl(G), P∩H∈Syl(H) ∧ P∩K∈Syl(K);
+  P=(P∩H)(P∩K)) / **1C.8** (位数 p^a 部分群数 P と G で mod p 合同、共役作用の計数)。
+- ⏸ **後回し (重い/特殊、後で戻る)**: **1C.4** (\|G\|=120 index 3 or 5)。n_2∈{1,3,5} は清潔
+  (正規化群 index or 商 order 15)、但し **n_2=15 の場合が構造的に重い** (S_5 型、index-5 部分群 S_4 の
+  存在は列挙でなく構造 — 計数だけでは矛盾を出せないことを確認済)。**1C.5** (A_{p+1} で
+  \|N_G(P)\|=p(p-1)/2)。p-cycle の計数 (C(p+1,p)·(p-1)! 個、全て偶置換) が要で、mathlib の対称群
+  cycle-type API 依存の特殊問題。
 
-- ⬜ **次: 残り §1C (1C.3b から) → §1D–§1G**。§1C の残りは計数・場合分け・特殊群で meaty。
+- ⬜ **次: §1C の 1C.6/1C.8 → §1D–§1G**。1C.4/1C.5 は §1C 内後回し (上記)。
 
 ## 完了条件
 
