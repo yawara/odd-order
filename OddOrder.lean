@@ -167,6 +167,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.TISubset
 import OddOrder.GroupTheory.TISubsetCounting
+import OddOrder.GroupTheory.TransferInvariantTransversal
 import OddOrder.GroupTheory.ZGroup
 import OddOrder.Mathlib.QuotientGroup
 import OddOrder.Mathlib.SchurZassenhausConj
