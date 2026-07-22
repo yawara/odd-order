@@ -492,6 +492,12 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
          `exists_int_inner_of_mem_zSpan` (整係数) / `eq_sum_inner_smul_of_mem_zSpan`
          (再構成 φ = Σ(φ,μ)•μ、有限直交正規 T)。すべて Submodule.span_induction
          (cases mem/zero/add/smul; smul は ← Int.cast_smul_eq_zsmul 経由)。
+         中盤 [x] **extension 写像完成** (2026-07-22, sorry-free):
+         `memberAssignmentMap s W := Σ_{μ∈s} (innerLeftℤ μ).smulRight (W μ)`
+         (⚠ innerLeftℤ の namespace は S07.IntegralCharacterMap) +
+         `memberAssignmentMap_apply` + `memberAssignmentMap_apply_of_mem`
+         (直交正規 collapse F μ₀ = W μ₀) + `zsmul_mem_zSupportedSpan` (閉包;
+         zero/add/sub は DifferenceImage に既存)。
          後半 [ ] = IsCoherent 組立本体 (次 iteration):
          extension := Σ_{μ∈s} (innerLeftℤ μ).smulRight (ŵ μ) (E₀ = 0 でよい —
          span 外の値は無関係)、E μ₀ = ŵμ₀ (member 直交正規で collapse)。

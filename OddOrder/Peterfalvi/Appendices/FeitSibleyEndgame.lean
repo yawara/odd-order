@@ -278,6 +278,47 @@ theorem eq_sum_inner_smul_of_mem_zSpan {T : Set (ClassFunction Γ ℂ)}
       rw [← Int.cast_smul_eq_zsmul ℂ c (ClassFunction.inner φ₀ μ • μ),
         ← Int.cast_smul_eq_zsmul ℂ c φ₀, ClassFunction.inner_smul_left, smul_smul]
 
+omit [Fintype Γ] [Invertible (Nat.card Γ : ℂ)] in
+/-- `ℤ`-multiples stay in the supported lattice. -/
+theorem zsmul_mem_zSupportedSpan {T : Set (ClassFunction Γ ℂ)} {A : Set Γ}
+    {φ : ClassFunction Γ ℂ} (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := Γ) T A)
+    (n : ℤ) : n • φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := Γ) T A := by
+  refine ⟨Submodule.smul_mem _ _ hφ.1, fun x hx => hφ.2 ?_⟩
+  rw [ClassFunction.mem_support] at hx ⊢
+  intro h0
+  apply hx
+  rw [← Int.cast_smul_eq_zsmul ℂ n φ, ClassFunction.smul_apply, h0, mul_zero]
+
+/-- **The member-assignment extension map**: `φ ↦ ∑_{μ ∈ s} (φ, μ)·W(μ)` — the
+`m`-fold analogue of the rank-2 `retarget`, sending each member `μ` of an
+orthonormal family to its prescribed witness `W μ`.  This is the coherent
+extension of the Peterfalvi (6) union `𝒳 ∪ 𝒴`. -/
+noncomputable def memberAssignmentMap (s : Finset (ClassFunction Γ ℂ))
+    (W : ClassFunction Γ ℂ → ClassFunction Δ ℂ) :
+    ClassFunction Γ ℂ →ₗ[ℤ] ClassFunction Δ ℂ :=
+  ∑ μ ∈ s, (OddOrder.Peterfalvi.S07.IntegralCharacterMap.innerLeftℤ (L := Γ) μ).smulRight (W μ)
+
+omit [Fintype Δ] [Invertible (Nat.card Δ : ℂ)] in
+theorem memberAssignmentMap_apply (s : Finset (ClassFunction Γ ℂ))
+    (W : ClassFunction Γ ℂ → ClassFunction Δ ℂ) (φ : ClassFunction Γ ℂ) :
+    memberAssignmentMap s W φ = ∑ μ ∈ s, ClassFunction.inner φ μ • W μ := by
+  simp [memberAssignmentMap, LinearMap.sum_apply, LinearMap.smulRight_apply]
+
+omit [Fintype Δ] [Invertible (Nat.card Δ : ℂ)] in
+/-- On a member of the orthonormal family, the assignment map collapses to the
+prescribed witness: `F μ₀ = W μ₀`. -/
+theorem memberAssignmentMap_apply_of_mem {T : Set (ClassFunction Γ ℂ)}
+    {s : Finset (ClassFunction Γ ℂ)}
+    (hsT : ∀ {μ : ClassFunction Γ ℂ}, μ ∈ s ↔ μ ∈ T)
+    (hnorm : ∀ μ ∈ T, ClassFunction.inner μ μ = 1)
+    (horth : ∀ μ ∈ T, ∀ ν ∈ T, μ ≠ ν → ClassFunction.inner μ ν = 0)
+    (W : ClassFunction Γ ℂ → ClassFunction Δ ℂ)
+    {μ₀ : ClassFunction Γ ℂ} (hμ₀ : μ₀ ∈ T) :
+    memberAssignmentMap s W μ₀ = W μ₀ := by
+  rw [memberAssignmentMap_apply, Finset.sum_eq_single μ₀
+    (fun μ hμ hne => by rw [horth μ₀ hμ₀ μ (hsT.mp hμ) (Ne.symm hne), zero_smul])
+    (fun h => absurd (hsT.mpr hμ₀) h), hnorm μ₀ hμ₀, one_smul]
+
 end SpanTransport
 
 end SignedIrr
