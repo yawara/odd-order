@@ -57,9 +57,11 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   **1A.9** (|G|=pm,p>m→位数p部分群一意) / **1A.10(b)** (p群H, p∣[G:H]→p∣[N_G(H):H])。
 - ✅ mathlib 対応 docstring 記録: **1A.6** (Burnside 軌道計数) / **1A.8** (Cauchy) / **1A.10(a)**
   (`fixedPointsMulLeftCosetsEquivQuotient`)。
-- ⬜ 残 §1A: **1A.2** (二重剰余類 |HgK|=|H||K|/|K∩H^g|) / **1A.3** (|H:H∩K|≤|G:K| 等号⟺HK=G;
-  coprime index⟹HK=G) / **1A.5** (積作用の推移性⟺G_αG_β=G) / **1A.7** (真部分群の共役の
-  和集合の補集合 ≥|H|)。いずれも mathlib 直接対応なし = genuine 証明。
+- ✅ 実証明: **1A.2** (`card_doubleCoset_mul_card_inf_conj`: 二重剰余類 |HgK|·|K∩H^g|=|H||K|、
+  H×K の両側作用 (h,k)•x=hxk⁻¹ の orbit-stabilizer)。
+- ⬜ 残 §1A: **1A.3** (|H:H∩K|≤|G:K| 等号⟺HK=G; coprime index⟹HK=G) — **1A.2 を g=1 に適用
+  すれば |HK|·|H∩K|=|H||K|、あとは HK⊆G で ≤ + 等号=HK=G** / **1A.5** (積作用の推移性⟺G_αG_β=G) /
+  **1A.7** (真部分群の共役の和集合の補集合 ≥|H|、1A.6 の置換指標を使う)。
 - ⬜ §1B–§1G 未着手。
 
 ## 完了条件
