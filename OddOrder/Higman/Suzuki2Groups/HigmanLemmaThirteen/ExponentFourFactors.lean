@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLengths
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthTwoModels
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
 
 /-!
 # Higman's Lemma 13: the exponent-four factors
@@ -27,6 +28,7 @@ namespace OddOrder.Higman.Suzuki2Groups
 open OddOrder.GroupTheory
 open OddOrder.GroupTheory.Suzuki2Group
 open OddOrder.Isaacs.Ch03
+open OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 
 universe uA uP
 
@@ -148,5 +150,102 @@ theorem restricted_lengthThree_not_isMulCommutative_of_covBy_top
     restricted_range_isXiActor hxi hSinv
   exact (not_hasXiLengthThree_of_isMulCommutative_of_pow_four
     (hP.to_subgroup S) hxiS.transitive hcommS hSfour) hlenS
+
+/-- **Higman Lemma 13 (p. 92), initial classification of the two
+exponent-four factors.**
+
+The two complementary Frattini preimages are noncommutative Suzuki
+`2`-groups of restricted `ξ`-length three, so Higman's Lemma 12 classifies
+each as type B, C, or D.  The ambient meet and join data are retained for the
+subsequent refinement to the source's type-B/type-C cases and its mixed
+commutator contradiction. -/
+theorem exists_two_classified_xiLengthThree_frattini_preimages_of_exponent_four
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthFour Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    (hPhiComm : IsMulCommutative (frattini P))
+    (hfour : ∀ z : frattini P, z ^ 4 = 1)
+    (hexists : ∃ z : frattini P, z ^ 2 ≠ 1) :
+    ∃ (X Z : Subgroup P)
+        (hXinv : IsAInvariant Y.subtype X)
+        (hZinv : IsAInvariant Y.subtype Z),
+      X.Normal ∧ HasXiLengthThree hXinv.restrict.range.subtype ∧
+        ¬ IsMulCommutative X ∧
+        (IsTypeB.{uP, 0} X ∨ IsTypeC.{uP, 0} X ∨ IsTypeD.{uP, 0} X) ∧
+        Z.Normal ∧ HasXiLengthThree hZinv.restrict.range.subtype ∧
+        ¬ IsMulCommutative Z ∧
+        (IsTypeB.{uP, 0} Z ∨ IsTypeC.{uP, 0} Z ∨ IsTypeD.{uP, 0} Z) ∧
+        frattini P < X ∧ X < ⊤ ∧
+        frattini P < Z ∧ Z < ⊤ ∧
+        X ⊓ Z = frattini P ∧ X ⊔ Z = ⊤ := by
+  obtain ⟨X, Z, hXinv, hZinv, hXnormal, hlenX,
+      hZnormal, hlenZ, hPhiX, hXtop, hPhiZ, hZtop,
+      hXZinf, hXZsup⟩ :=
+    exists_two_xiLengthThree_frattini_preimages_of_exponent_four
+      hP hncomm hmulti hxi hlen hprime hPhiComm hfour hexists
+  let phiTerm := frattiniNormalInvariant Y.subtype
+  let xTerm : NormalInvariantSubgroup Y.subtype :=
+    ⟨X, ⟨hXnormal, hXinv⟩⟩
+  let zTerm : NormalInvariantSubgroup Y.subtype :=
+    ⟨Z, ⟨hZnormal, hZinv⟩⟩
+  have hLower := frattiniSquare_composition_series_of_exponent_four
+    hP hxi hPhiComm hfour hexists
+  have hXcovers := hlen.covers_of_chain
+    hLower.1.lt hLower.2.lt
+      (show phiTerm < xTerm from hPhiX)
+      (show xTerm < normalInvariantTop Y.subtype from hXtop)
+  have hZcovers := hlen.covers_of_chain
+    hLower.1.lt hLower.2.lt
+      (show phiTerm < zTerm from hPhiZ)
+      (show zTerm < normalInvariantTop Y.subtype from hZtop)
+  let hXTopCover : NormalInvariantCover Y.subtype X ⊤ :=
+    { left := xTerm.2
+      right := (normalInvariantTop Y.subtype).2
+      covBy := hXcovers.2.2.2 }
+  let hZTopCover : NormalInvariantCover Y.subtype Z ⊤ :=
+    { left := zTerm.2
+      right := (normalInvariantTop Y.subtype).2
+      covBy := hZcovers.2.2.2 }
+  have hXncomm : ¬ IsMulCommutative X :=
+    restricted_lengthThree_not_isMulCommutative_of_covBy_top
+      hP hncomm hmulti hxi hprime hXinv hXTopCover hlenX
+  have hZncomm : ¬ IsMulCommutative Z :=
+    restricted_lengthThree_not_isMulCommutative_of_covBy_top
+      hP hncomm hmulti hxi hprime hZinv hZTopCover hlenZ
+  have classify :
+      ∀ (S : Subgroup P) (hSinv : IsAInvariant Y.subtype S),
+        frattini P < S →
+        HasXiLengthThree hSinv.restrict.range.subtype →
+        ¬ IsMulCommutative S →
+        IsTypeB.{uP, 0} S ∨ IsTypeC.{uP, 0} S ∨ IsTypeD.{uP, 0} S := by
+    intro S hSinv hPhiS hlenS hncommS
+    have hSneBot : S ≠ (⊥ : Subgroup P) :=
+      ne_of_gt (lt_of_le_of_lt bot_le hPhiS)
+    have hinvS : involutions P ⊆ S :=
+      involutions_subset_of_nontrivial_invariant
+        hP Y hxi.transitive hSinv hSneBot
+    have hxiS : IsXiActor hSinv.restrict.range :=
+      restricted_range_isXiActor hxi hSinv
+    have hmultiS : ∃ x y : S,
+        x ∈ involutions S ∧ y ∈ involutions S ∧ x ≠ y :=
+      exists_distinct_involutions_subgroup_of_subset hinvS hmulti
+    have hprimeS : ∀ p : ℕ, p.Prime →
+        p ∣ Nat.card hSinv.restrict.range →
+          p ∣ (involutions S).ncard :=
+      restricted_range_primeSupport hSinv hinvS hprime
+    exact higmanLemmaTwelve (hP.to_subgroup S) hncommS hmultiS
+      hxiS hlenS hprimeS
+  have hXclass := classify X hXinv hPhiX hlenX hXncomm
+  have hZclass := classify Z hZinv hPhiZ hlenZ hZncomm
+  exact ⟨X, Z, hXinv, hZinv, hXnormal, hlenX, hXncomm, hXclass,
+    hZnormal, hlenZ, hZncomm, hZclass, hPhiX, hXtop, hPhiZ, hZtop,
+    hXZinf, hXZsup⟩
 
 end OddOrder.Higman.Suzuki2Groups
