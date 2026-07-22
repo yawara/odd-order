@@ -7,6 +7,28 @@ created: 2026-07-21
 
 # FeitSibley Theorem (feit_sibley_coherence): 8 ステップ campaign 計画
 
+## ✅ 完了 (2026-07-22)
+
+`feit_sibley_coherence` を **axiom-clean で完全証明** (`#print axioms` =
+`[propext, Classical.choice, Quot.sound]`、AxiomsCheck.lean に登録済)。FeitSibley
+chain 全 leaf が sorry-free。最終 assembly は新 top leaf
+`OddOrder/Peterfalvi/Appendices/FeitSibleyMain.lean`:
+
+- **(6) 仕上げ** `ssetOf_sder_coherent_of_xset_qder_union` + 算術核
+  `false_of_finish_bounds`: 𝒳₁∪𝒴 coherent + 𝒴 非空 ⟹ 𝒮(S') coherent
+  (反例 ψ の a≥2 = ψ∉𝒮(Q') と counting + [Is]2.30 の矛盾)。支持:
+  `exists_counterexample_anchored_of_not_coherent` の結論に `ψ∉B` を追加。
+- **非可換 p 群分岐** `ssetOf_sder_coherent_of_nonabelian`: Z=endgameZ で
+  endgame_Xset_coherent → xset_qder_union_coherent → isCoherent_subset → 仕上げ。
+- **master** `feit_sibley_coherence`: 還元宣言 case dispatch (可換 / 2 素因数 /
+  非可換 p 群)。base FeitSibley.lean から top leaf へ移設 (同名維持)。
+- **追加仮説**: `Odd |G|` (E) + `IsNilpotent Q₁` + `Q Hall` (App.IV standing
+  hypotheses、Hypothesis 構造の最小フィールドから導出不可の genuine な前提)。
+
+以下は campaign 中の計画・調査ログ (歴史的記録として保持)。
+
+---
+
 FeitSibley.lean 最後の sorry。Peterfalvi App.IV Theorem (pp. 146–150):
 **d odd ⟹ 𝒮 は Lemma 2(b) の isometry τ = Ind_H^G に関して coherent**
 (`Nonempty (IsCoherent hyp.tau hyp.Sset hyp.A)`)。原文全 8 ステップを 2026-07-21 に
