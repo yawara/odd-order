@@ -461,7 +461,19 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
          x=1∧m=2 → **swap+negate**: w η₁ := −E′η₂, w η₂ := −E′η₁ (dite)。
          swap が (P1) を保つのは m=2 に限る (w η₂ − w η₁ = E′η₂ − E′η₁ ✓)。
          **中間の IsCoherent Y 再証明は不要** — 下流は w 関数だけ消費する。
-      2. **v 分析**: 前半 [x] **v-facts パッケージ完成** `keystone_residual_props`
+      2. [x] **v 分析完成** (2026-07-22, sorry-free): `keystone_residual_props` +
+         **`exists_X_witness_assignment`** — (v,Eχ₁) の 3 分岐 (v = Eχ₁ →
+         E-値そのまま / (v,Eχ₁) = −1 → χ₂ 経由で 4a₂² = 1 矛盾 / (v,Eχ₁) = 0 →
+         全 χ'≠χ₁ で a' = 1 ∧ Eχ' = −v、swap 割当 wXχ₁ = v, wXχ'≠χ₁ = −Eχ₁)。
+         出力 6 clauses: ZIrr / 単位ノルム / X-直交 / 𝒴-witness cross-直交 /
+         X-差関係 (∀ 有効 a') / keystone wXχ₁ − a•(w η₁) = τ(χ₁ − a•η₁)。
+         ⚠ Lean 知見: ℂ に nlinarith/linarith 不可 → ε²=1 系は
+         linear_combination (係数 = 相手の ε² 等) / `first | norm_num | ...` は
+         norm_num が goal を False に「進捗」させ成功扱いになる罠 → 符号抽出は
+         linear_combination (εv·h'' − ε'·hεv2 型) が robust / 混合 smul の
+         加群等式は `module` タクティク / a' 一意性は degree at 1 (happly1 +
+         hval_eq、hone : χ₁−1•χ₁ ∈ supported)。
+         旧設計メモ: 前半 = `keystone_residual_props`
          (2026-07-22, sorry-free): v := u + a•(w η₁) について (v,v) = 1 /
          v ∈ ZIrr / v ⊥ 全 w(𝒴) / (v, Eχ') = a'·((v,Eχ₁) − 1) (χ'≠χ₁,
          a'-supported diff)。後半 [ ] = ±Irr 抽出 + 3 分岐 + wX 割当構成
