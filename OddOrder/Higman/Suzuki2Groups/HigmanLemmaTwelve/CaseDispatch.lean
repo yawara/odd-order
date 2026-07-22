@@ -188,6 +188,33 @@ theorem NoncommutativeFactorCoordinateData.exists_flip_frobenius_le_half
       omega
     · rw [data.flip_theta, hinv]
 
+/-- Inclusive form of the Frobenius half-range normalization.  A
+commutative factor already has `theta = 1`; a noncommutative factor is
+replaced, when necessary, by its coordinate flip.  In either branch the
+prescribed kernel coordinate, the actor generator, and `nu` remain the same. -/
+theorem FactorCoordinateData.exists_normalized_frobenius_le_half
+    [Finite P]
+    (hn : n ≠ 0)
+    (data : FactorCoordinateData hSinv hPhiS c ePhi nu) :
+    ∃ data' : FactorCoordinateData hSinv hPhiS c ePhi nu,
+      nu = data'.lambda * data'.theta data'.lambda ∧
+      (data'.theta = 1 ∨
+        ∃ r : ℕ, 0 < r ∧ 2 * r ≤ n ∧
+          data'.theta = frobeniusEquiv (GaloisField 2 n) 2 ^ r ∧
+          Odd (orderOf data'.theta)) := by
+  cases data with
+  | commutative d =>
+      let data' : FactorCoordinateData hSinv hPhiS c ePhi nu :=
+        .commutative d
+      exact ⟨data', data'.kernel_eigenvalue_eq, Or.inl rfl⟩
+  | noncommutative hnc d =>
+      obtain ⟨d', r, hr0, hrhalf, htheta⟩ :=
+        d.exists_flip_frobenius_le_half hn
+      let data' : FactorCoordinateData hSinv hPhiS c ePhi nu :=
+        .noncommutative hnc d'
+      exact ⟨data', data'.kernel_eigenvalue_eq,
+        Or.inr ⟨r, hr0, hrhalf, htheta, d'.theta_order_odd⟩⟩
+
 /-! ### Monomialization of the mixed term
 
 From `M(λα, μβ) = ν M(α, β)` and `M ≠ 0`, the Frobenius coefficients of `M`
