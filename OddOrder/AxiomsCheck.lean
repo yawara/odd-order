@@ -12283,11 +12283,16 @@ transversal `1, {t y : y ∈ Q}` and the relation `t y x = x t y^x`.
   (`P ≤ C_D(t)` centralises `t`, and `x ∈ H` normalises `Q`).
 * `transfer_eq_pow_card_Q_add_one` — **step (9) transfer identity**: `transfer ϕ x = ϕ x ^ (|Q|+1)`
   for every `ϕ : H →* A` and `x ∈ P` (since `[G:H] = |Ω| = |Q|+1`).
+* `QD_isComplement_in_H` / `hToD` — `H = Q ⋊ D` complement and the retraction `H →* D`
+  (clone of `dToV`), used to build `hToAbDbar : H →* Abelianization Dbar` (kills `Q`, `W`, `⁅·,·⁆`).
+* `P_inf_commutator_H_eq_bot` — **step (9) structural input, now PROVED**: `P ∩ ⁅H,H⁆ = 1`
+  (`P` injects into `H^{ab}`; the book's `P ∩ QKW = 1`, since `⁅H,H⁆ ≤ QKW`).  `hToAbDbar` kills
+  `⁅H,H⁆` but is nontrivial on `P^#` (image lands in `Vbar`, `≠1` by `P ∩ W = 1`, `∉ Kbar ⊇
+  commutator Dbar` by `Kbar ⊓ Vbar = 1`).
 * `p_dvd_card_Q_add_one` — **step (9)**: `p ∣ |Q|+1`, taking `ϕ = Abelianization.of : H → H^{ab}`,
-  from `hB2 : p ∤ |G^{ab}|` (⟹ `x ∈ ⁅G,G⁆` ⟹ `T(x)=1`) and `hPinj : P ∩ ⁅H,H⁆ = 1` (⟹ `ϕ x`
-  has order `p`).  `hB2` is the book's standing (B2) (no normal subgroup of index `p`); `hPinj`
-  is the book's `P ∩ QKW = 1` (as `⁅H,H⁆ ≤ QKW`), the remaining First-Case structural input.
-  The `char = f = p` assembly (`char_eq_p`) inherits the model `sorry` (9318) so is unregistered. -/
+  from `hB2 : p ∤ |G^{ab}|` (⟹ `x ∈ ⁅G,G⁆` ⟹ `T(x)=1`) and `P_inf_commutator_H_eq_bot` (⟹ `ϕ x`
+  has order `p`).  Only remaining hypothesis is the book's standing (B2) `hB2`.  The `char = f = p`
+  assembly (`char_eq_p`) inherits only `hB2` + the model `sorry` (9318), so is unregistered. -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.transfer_eq_pow_of_conj_invariant_transversal
 #assert_only_allowed_axioms OddOrder.GroupTheory.isComplement_inv_of_isComplement
@@ -12299,6 +12304,11 @@ transversal `1, {t y : y ∈ Q}` and the relation `t y x = x t y^x`.
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.rightTransversalTQ_conj_invariant
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.transfer_eq_pow_card_Q_add_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.QD_isComplement_in_H
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.hToD
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.P_inf_commutator_H_eq_bot
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.p_dvd_card_Q_add_one
 

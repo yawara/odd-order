@@ -392,11 +392,17 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     `T=transfer ϕ` は可換群への hom ゆえ `⁅G,G⁆≤ker T`；(B2)=`p∤|G^ab|` で p-元 x∈⁅G,G⁆ ⟹
     `T(x)=1`；`T(x)=ϕ(x)^{|Q|+1}` かつ `P∩⁅H,H⁆=1` で `ord ϕ(x)=p` ⟹ `p∣|Q|+1`。
     **`char_eq_p`** = p_dvd + 算術半分の連結 (= step (9) `p=f`、model sorry 継承)。
-  - **⚠ 残 = 構造ゲート `hPinj : P ∩ ⁅H,H⁆ = ⊥`** (= 書籍の `P∩QKW=1`, ∵ `⁅H,H⁆≤QKW`)。
-    `hB2` (index-p 正規部分群なし = `p∤|G^ab|`) は Theorem B の standing 仮説ゆえゲートでなく
-    上位 carrier/statement で threading する。**hPinj の還元 (未着手)**: H=Q⋊D ⟹ `⁅H,H⁆∩D=⁅D,D⁆`
-    ⟹ `P∩⁅H,H⁆ = P∩⁅D,D⁆` (P≤D); さらに `P∩W=⊥` (P_inf_W_eq_bot 既済) + D̄=Fitting⋊V̄ 分解で
-    `P̄∩⁅D̄,D̄⁆` に落とす見込み。V̄ 可換性 or P̄ の position が鍵。First-Case D 構造の実作業。
+  - **構造ゲート `P∩⁅H,H⁆=⊥` 完了 (2026-07-22、axiom-clean)** = 書籍の `P∩QKW=1` (∵ `⁅H,H⁆≤QKW`):
+    `P_inf_commutator_H_eq_bot` (StepNine.lean)。機構 = 保持 hom `hToAbDbar : ↥H→*Abelianization Dbar`
+    (`Abelianization.of ∘ mk'_W ∘ hToD`) が `⁅H,H⁆` を殺すが `P^#` 上非自明。部品:
+    - `QD_isComplement_in_H` (H=Q⋊D、`isComplement'_subgroupOf_of_disjoint_mul_eq_univ`) +
+      **`hToD:↥H→*↥D`** (Q-kill 保持、`dToV` clone) + `QsubgroupOfH_normal` instance。
+    - 非自明性 `hToAbDbar_ne_one_of_mem_P`: x∈P# の Dbar 像は Vbar (既存 `toVbar`) ∈、≠1
+      (`P∩W=⊥`)、∉ Kbar=fitting Dbar⊇commutator Dbar (`Kbar⊓Vbar=⊥`、`fitting_Dbar_cyclic_fpf_abelian.2.2`)。
+    - **`p_dvd_card_Q_add_one`/`char_eq_p` は hPinj 仮説を撤去** → char_eq_p は **hB2 + model のみ**。
+  - **残 = hB2 (B2 standing 仮説) の carrier 化のみ** (ゲートでない): `p∤|G^ab|` = 「index-p 正規
+    部分群なし」。Theorem B が全体で仮定するので step (17) 組立時に carrier/statement で threading。
+    (否定側は Ch.I §3 Prop 2 = InductionNonSimple で処理済。) model sorry は 9318 継承。
 - [ ] (10) Lemma 5 消費の二分岐
 - [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
 - [ ] (13)–(16)

@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
 import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
 import OddOrder.GroupTheory.TransferInvariantTransversal
+import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # Peterfalvi Part II, Ch. II, step (9): `p = f`
@@ -34,6 +35,59 @@ This file formalizes the **arithmetic finish** as `char_eq_p_of_p_dvd_card_Q_add
 set_option autoImplicit false
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
+
+open scoped Pointwise
+
+/-! ## The retraction `H = Q ⋊ D → D` and the map `H → Abelianization Dbar`
+
+Used by step (9) to show `P` injects into `H^{ab}` (`P ∩ ⁅H,H⁆ = 1`). -/
+
+namespace Hypothesis
+
+variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G] (hyp : Hypothesis G Ω)
+
+/-- `Q` and `D` complement in `H` (`H = Q ⋊ D`). -/
+theorem QD_isComplement_in_H :
+    (hyp.Q.subgroupOf hyp.H).IsComplement' (hyp.D.subgroupOf hyp.H) := by
+  refine Subgroup.isComplement'_subgroupOf_of_disjoint_mul_eq_univ
+    hyp.D_le_H hyp.Q_le_H (by rw [inf_comm]; exact hyp.Q_inf_D_eq_bot) ?_
+  intro x hxH
+  have hx : x ∈ (hyp.Q : Set G) * (hyp.D : Set G) := by rw [hyp.Q_mul_D_eq_H]; exact hxH
+  obtain ⟨q, hq, d, hd, hqd⟩ := hx
+  exact ⟨q, hq, d, hd, hqd⟩
+
+instance QsubgroupOfH_normal : (hyp.Q.subgroupOf hyp.H).Normal := by
+  constructor
+  intro n hn g
+  rw [Subgroup.mem_subgroupOf] at hn ⊢
+  have := hyp.Q_normal_in_H (g : G) g.2 (n : G) hn
+  simpa [mul_assoc] using this
+
+/-- The canonical retraction `H = Q ⋊ D → D`. -/
+noncomputable def hToD : ↥hyp.H →* ↥hyp.D :=
+  (Subgroup.subgroupOfEquivOfLe hyp.D_le_H).toMonoidHom.comp
+    (SemidirectProduct.rightHom.comp
+      (SemidirectProduct.mulEquivSubgroup hyp.QD_isComplement_in_H).symm.toMonoidHom)
+
+@[simp] theorem hToD_of_mem_D {d : G} (hd : d ∈ hyp.D) :
+    hyp.hToD ⟨d, hyp.D_le_H hd⟩ = ⟨d, hd⟩ := by
+  let dh : ↥hyp.H := ⟨d, hyp.D_le_H hd⟩
+  let dd : ↥(hyp.D.subgroupOf hyp.H) := ⟨dh, hd⟩
+  let e := SemidirectProduct.mulEquivSubgroup hyp.QD_isComplement_in_H
+  have he : e.symm dh = SemidirectProduct.inr dd := by
+    rw [e.symm_apply_eq]
+    simp [e, dh, dd]
+  change (Subgroup.subgroupOfEquivOfLe hyp.D_le_H)
+    (SemidirectProduct.right (e.symm dh)) = ⟨d, hd⟩
+  rw [he]
+  rfl
+
+/-- `H → D → Dbar → Abelianization Dbar` (kills `Q`, `W`, and the commutator). -/
+noncomputable def hToAbDbar : ↥hyp.H →* Abelianization hyp.Dbar :=
+  (Abelianization.of).comp
+    ((QuotientGroup.mk' (hyp.W.subgroupOf hyp.D)).comp hyp.hToD)
+
+end Hypothesis
 
 namespace FirstCaseHypothesis
 
@@ -143,19 +197,69 @@ theorem transfer_eq_pow_card_Q_add_one {A : Type*} [CommGroup A]
       (fc.rightTransversalTQ_conj_invariant hxP),
     hindex]
 
+/-- The composite `H → Abelianization Dbar` is nontrivial on `P^#`: for `x ∈ P`,
+`x ≠ 1`, the image of `x` in `Dbar` lies in `Vbar` and is `≠ 1` (`P ∩ W = 1`), hence
+`∉ Kbar = fitting Dbar ⊇ ⁅Dbar, Dbar⁆` (`Kbar ⊓ Vbar = 1`), so its class in
+`Abelianization Dbar` is nontrivial. -/
+theorem hToAbDbar_ne_one_of_mem_P {x : G} (hxP : x ∈ fc.P) (hx1 : x ≠ 1) :
+    fc.toHypothesis.hToAbDbar
+      ⟨x, fc.toHypothesis.D_le_H (fc.toHypothesis.V_le_D (fc.P_le_V hxP))⟩ ≠ 1 := by
+  have hxD : x ∈ fc.toHypothesis.D := fc.toHypothesis.V_le_D (fc.P_le_V hxP)
+  set xbar : fc.toHypothesis.Dbar :=
+    QuotientGroup.mk' (fc.toHypothesis.W.subgroupOf fc.toHypothesis.D) ⟨x, hxD⟩ with hxbar
+  have hval : fc.toHypothesis.hToAbDbar
+      ⟨x, fc.toHypothesis.D_le_H hxD⟩ = Abelianization.of xbar := by
+    rw [Hypothesis.hToAbDbar, MonoidHom.comp_apply, MonoidHom.comp_apply,
+      fc.toHypothesis.hToD_of_mem_D hxD]
+  rw [hval]
+  have hxbarV : xbar ∈ fc.toHypothesis.Vbar := by
+    rw [hxbar, Hypothesis.Vbar]
+    exact ⟨⟨x, hxD⟩, Subgroup.mem_subgroupOf.mpr (fc.P_le_V hxP), rfl⟩
+  have hxbar1 : xbar ≠ 1 := by
+    rw [hxbar]
+    intro hcon
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf] at hcon
+    exact hx1 (Subgroup.mem_bot.mp (fc.P_inf_W_eq_bot.le ⟨hxP, hcon⟩))
+  intro hcon
+  have hxbarComm : xbar ∈ commutator fc.toHypothesis.Dbar :=
+    (QuotientGroup.eq_one_iff _).mp hcon
+  have hxbarK : xbar ∈ fc.toHypothesis.Kbar := by
+    rw [fc.toHypothesis.Kbar_eq_fitting]
+    exact fc.toHypothesis.fitting_Dbar_cyclic_fpf_abelian.2.2 hxbarComm
+  have hmem : xbar ∈ fc.toHypothesis.Kbar ⊓ fc.toHypothesis.Vbar := ⟨hxbarK, hxbarV⟩
+  rw [fc.toHypothesis.Kbar_isComplement_Vbar.disjoint.eq_bot, Subgroup.mem_bot] at hmem
+  exact hxbar1 hmem
+
+/-- **Peterfalvi Part II, Ch. II, step (9), structural input** (p. 111): `P ∩ ⁅H,H⁆ = 1`
+(`P` injects into `H^{ab}`; the book's `P ∩ QKW = 1`, since `⁅H,H⁆ ≤ QKW`).
+
+The composite `χ : H → Abelianization Dbar` (`hToAbDbar`) kills `⁅H,H⁆` (its target is
+abelian) but is nontrivial on `P^#` (`hToAbDbar_ne_one_of_mem_P`), so no nonidentity
+element of `P` lies in `⁅H,H⁆`. -/
+theorem P_inf_commutator_H_eq_bot :
+    fc.P ⊓ (commutator ↥fc.toHypothesis.H).map fc.toHypothesis.H.subtype = ⊥ := by
+  rw [eq_bot_iff]
+  rintro y ⟨hyP, z, hzC, hzy⟩
+  rw [Subgroup.mem_bot]
+  by_contra hy1
+  have hyH : y ∈ fc.toHypothesis.H := hzy ▸ z.2
+  have hzeq : (⟨y, hyH⟩ : ↥fc.toHypothesis.H) = z := Subtype.ext hzy.symm
+  have h1 : fc.toHypothesis.hToAbDbar ⟨y, hyH⟩ = 1 := by
+    rw [hzeq]
+    exact MonoidHom.mem_ker.mp (Abelianization.commutator_subset_ker _ hzC)
+  exact fc.hToAbDbar_ne_one_of_mem_P hyP hy1 h1
+
 /-- **Peterfalvi Part II, Ch. II, step (9)** (p. 111): `p ∣ |Q| + 1`.
 
 Take `ϕ = Abelianization.of : H → H^{ab}` and `x ∈ P` of order `p`.  The transfer
 `T = transfer ϕ : G → H^{ab}` maps into an abelian group, so `⁅G,G⁆ ≤ ker T`; by
 `hB2` (no normal subgroup of index `p`, equivalently `p ∤ |G^{ab}|`) the `p`-element
 `x` lies in `⁅G,G⁆`, so `T(x) = 1`.  But `T(x) = ϕ(x)^{|Q|+1}`
-(`transfer_eq_pow_card_Q_add_one`), and `hPinj` (`P ∩ ⁅H,H⁆ = 1`, i.e. `P` injects
-into `H^{ab}`; the book's `P ∩ QKW = 1`, as `⁅H,H⁆ ≤ QKW`) makes `ϕ(x)` of order `p`.
-Hence `ϕ(x)^{|Q|+1} = 1` forces `p ∣ |Q| + 1`. -/
+(`transfer_eq_pow_card_Q_add_one`), and `P ∩ ⁅H,H⁆ = 1`
+(`P_inf_commutator_H_eq_bot`) makes `ϕ(x)` of order `p`.  Hence `ϕ(x)^{|Q|+1} = 1`
+forces `p ∣ |Q| + 1`. -/
 theorem p_dvd_card_Q_add_one
-    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
-    (hPinj : Disjoint fc.P
-      ((commutator ↥fc.toHypothesis.H).map fc.toHypothesis.H.subtype)) :
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     fc.p ∣ Nat.card fc.toHypothesis.Q + 1 := by
   haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
   -- pick a nonidentity `x ∈ P`; it has order `p`
@@ -198,7 +302,7 @@ theorem p_dvd_card_Q_add_one
       (QuotientGroup.eq_one_iff _).mp hcon
     have hxM : x ∈ (commutator ↥fc.toHypothesis.H).map fc.toHypothesis.H.subtype :=
       ⟨⟨x, hxH⟩, hmem, rfl⟩
-    exact hx1 (Subgroup.mem_bot.mp (hPinj.le_bot ⟨hxP, hxM⟩))
+    exact hx1 (Subgroup.mem_bot.mp (fc.P_inf_commutator_H_eq_bot.le ⟨hxP, hxM⟩))
   have hordϕ : orderOf (ϕ ⟨x, hxH⟩) = fc.p := by
     have h1 : orderOf (ϕ ⟨x, hxH⟩) ∣ fc.p :=
       orderOf_dvd_of_pow_eq_one (by rw [← map_pow, hxHpow, map_one])
@@ -214,17 +318,16 @@ theorem p_dvd_card_Q_add_one
 (the book's `P ∩ QKW = 1`), the characteristic `f` of the near-field equals `p`.
 
 Combines the transfer half (`p_dvd_card_Q_add_one`) with the arithmetic finish
-(`char_eq_p_of_p_dvd_card_Q_add_one`).  Inherits the step (2)(b) `sorry` (issue 9318)
-through the supplied model. -/
+(`char_eq_p_of_p_dvd_card_Q_add_one`).  The only remaining hypothesis is the book's
+standing (B2) (no normal subgroup of index `p`, as `p ∤ |G^{ab}|`).  Inherits the
+step (2)(b) `sorry` (issue 9318) through the supplied model. -/
 theorem char_eq_p {F : Type uG} [NearFields.NearField F]
     (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
       NearFields.AffineNearFieldModel fc.rankOneQuotient F)
-    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
-    (hPinj : Disjoint fc.P
-      ((commutator ↥fc.toHypothesis.H).map fc.toHypothesis.H.subtype)) :
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     model.char = fc.p :=
-  fc.char_eq_p_of_p_dvd_card_Q_add_one model (fc.p_dvd_card_Q_add_one hB2 hPinj)
+  fc.char_eq_p_of_p_dvd_card_Q_add_one model (fc.p_dvd_card_Q_add_one hB2)
 
 end FirstCaseHypothesis
 
