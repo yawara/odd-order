@@ -6,6 +6,19 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **✅ 2026-07-22 20:2x tick (Opus 4.8 hub, cron 再作成 `7,22,37,52` id 3ee45bda) — ユーザー「各レーンを監視します」で監視再開・stall 解消確認**。
+> 前 tick の 3 レーン stall (17:37〜) は **復帰済み**: 全 worktree 追跡ファイル mtime が 20:18–20:19 に更新
+> (各レーン起動時 `git merge main` + frontier 再開)、lsof で 3 レーンとも live session (a=513628 3h43m / b=344015 5h / c=335685 5h)。
+> **前 hub の監視 cron はセッション死で消滅していた → Opus 15 分 `7,22,37,52` を再作成 (id 3ee45bda)**。
+> **状態: 全レーン 0 unmerged / 0 behind / 未 push 0 / main = d11e3e321 は前 tick gate 済 green (Lean 変更なしゆえフルビルド不要)**。合流対象なし。
+> **lane a 完了境界の hub 応答 (a の空 skeleton 9205「次 frontier 確認」に対して)**: a territory 実測 = Isaacs 実 sorry 0 /
+> Pf 本文 S* 0 / `formalized_specialized` code marker 0。唯一残 NearFields:786 は **BS-gated (c 9318 依存) で a 自力不可**
+> ⟹ a は NearFields で idle しないこと。**次 frontier = scope survey (three_books_full_survey) の残 Isaacs/Pf 未形式化結果を
+> 上流優先+文書順で自律選択** (Ch.9 F\*(G) 系・付録対応表・残 specialized 一般化)。真に非 gated 枠が尽きているなら 9200 帯 HUB
+> issue で reallocation を hub にエスカレーション (a が自測して articulate → 次 tick で hub 深掘り裁定; 復帰 2 分での「枯渇」断定は時期尚早ゆえ本 tick は留保)。
+> b = Suzuki2Groups 4 + StepFive/StepSix (実 sorry 6) / c = 9318 BS endgame (NearFields:786 gated 保持) — 両者 active frontier 継続。
+> ⚠ **未解決 hub タスク (継続保留)**: NearFields ownership 不整合 (header/regex を 9204 の a carve-out に整合) — 0 unmerged で merge-blocking でないため保留。
+>
 > **🛑 2026-07-22 18:5x tick — 3 レーン stall 継続 (~82 分、未復帰)**。全レーン 0 unmerged、
 > 全 worktree の追跡ファイル mtime が 17:36-17:38 のまま不変 (a=17:38 の 9205 空 skeleton / b=17:36
 > AxiomsCheck / c=17:37 merge sync)。17:37 tick 直後に一斉沈黙 = /loop wakeup 全レーン発火停止の疑い
