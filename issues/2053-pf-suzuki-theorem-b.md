@@ -403,7 +403,33 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
   - **残 = hB2 (B2 standing 仮説) の carrier 化のみ** (ゲートでない): `p∤|G^ab|` = 「index-p 正規
     部分群なし」。Theorem B が全体で仮定するので step (17) 組立時に carrier/statement で threading。
     (否定側は Ch.I §3 Prop 2 = InductionNonSimple で処理済。) model sorry は 9318 継承。
-- [ ] (10) Lemma 5 消費の二分岐
+- [ ] (10) 二分岐 — **大半完了 (2026-07-23、FirstCase/StepTen.lean 新設・root 配線)**。
+      残 = (10.2) の「W cyclic of order 3 or 9」(Lemma 5 消費) + 最終 dichotomy 組立。
+  - **arithmetic core (axiom-clean)**: `padicValNat_pow_sub_one_add_one` (LTE
+    `v_p((N-1)^p+1)=v_p(N)+1`)、`card_field_eq_prime_pow` (|F|=p^m, m≥1、additive
+    p-group)、`padicValNat_card_Q_add_one` (opening `(|Q|+1)_p = p^{m+1}`)。
+  - **structural |G|_p (axiom-clean 群論部)**: `card_D_eq_card_Dbar_mul_card_W`
+    (|D|=|D̄||W|)、`card_Kbar_mul_card_Vbar` (|D̄|=|K̄||V̄|)、`card_Kbar_eq_two_pow_sub_one`
+    (|K̄|=2^p−1=|K|、Prop 2 経由)、`not_p_dvd_card_Kbar` (Fermat)、`card_Vbar_eq_p`
+    (|V̄|=p、V=W⋊P の image)、`factorization_card_Dbar_eq_one`/`factorization_card_D_eq`
+    → `factorization_card_G_eq` (model): **|G|_p = p^{m+2}·|W|_p**。
+  - **(10.1) 完了 (model)**: `P_le_normalizer_W` + `not_p_dvd_card_W_of_not_p_dvd_card_centralizer_W`
+    (P p群が W に共役作用、mod-p 固定点合同 `|W|≡|C_W(P)|`、fixedPoints≃W⊓C_G(P)、
+    両 axiom-clean) → `factorization_card_G_eq_of_not_p_dvd_card_centralizer_W`:
+    **p∤|Σ| ⟹ |G|_p = p^{m+2}**。
+  - **(10) Q₁=1 (model)**: `Q1_eq_bot_of_p_dvd_card_centralizer_W` — p∣|Σ|∧Q₁≠1 で
+    step8 の |F|∈{3^ℓ,5^ℓ,9^ℓ} → p∈{3,5}, |C_Q(P)|∈{26,3124,728} の奇素因数
+    r∈{13,11,13} が step3 の r≡2^i mod(2^p−1) と矛盾 (`pow_two_mod_seven`/`pow_two_mod_31`
+    + `dvd_card_Q1_of_odd_prime_dvd_card_Q` 全 axiom-clean helper)。
+  - **(10.2) numeric core 完了 (model)**: `card_field_eq_nine_of_p_dvd_card_centralizer_W`
+    — p∣|Σ| ⟹ **p=3 ∧ |F|=9 ∧ |C_Q(P)|=8 ∧ |Σ|=3** (step6 で可換 F は |Σ|=1 ⟹ 矛盾 →
+    非可換 → step5 で |F|=9; step7 Σ≅C_W(P) で |Σ| 変換)。
+  - **残 (10.2) 深部**: 「W cyclic of order 3 or 9」= Lemma 5
+    (`lemmaFive_of_orderThree`、要 `orderOf(distinguishedInvolution·t)=3` +
+    `IsSuzuki2Group Q` + `|Q₀|=2^m` + `|Q|=|Q₀|^3`)。case (10.2) では p=3,|F|=9 から
+    |Q₀|=2^3 (card_Q0_eq_two_pow), |Q|=8^3=|Q₀|^3 (step4)。要調査 = step5 内部から
+    `IsSuzuki2Group Q` と `orderOf(st)=3` を露出 (or 再導出)。その後 `|G|_3=3^4|W|` は
+    `factorization_card_G_eq` (m=2) + |W|∈{3,9} で 3^4·|W| 化。最終 dichotomy 組立。
 - [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
 - [ ] (13)–(16)
 - [ ] Hall-Wielandt abelian 版 (shared infra、claim してから)
