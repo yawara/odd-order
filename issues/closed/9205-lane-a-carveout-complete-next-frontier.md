@@ -109,3 +109,15 @@ a の割当 territory 完済は実測で確認 (Isaacs/Pf 本文 実 sorry 0・�
 (A 退役 / C クロス割当)」の判断で、これは規約上ユーザー事項** (scope 決定 = user、lane 退役 =
 資源判断)。hub は AskUserQuestion で escalate した。ownature 裁定 (①) と immediate bridge が
 無いこと (NearFields→c ゆえ (B) は a の仕事でない) を踏まえ、ユーザー裁可待ち。
+
+### ③ USER RULING (2026-07-22): (E) Isaacs Problems 着手
+
+ユーザー裁可 = **(E) Isaacs の演習問題 (Problems) を in-scope 化し lane a が形式化**。
+⟹ **scope 拡大**: これまでの Isaacs 被覆測定は「番号付き結果のみ」で演習を対象外にしていたが、
+以後 Isaacs 演習問題も形式化対象 (lane a territory)。lane a は退役せず Isaacs Problems campaign に着手。
+
+- 着手順 = **上流優先 + 文書順** (Ch.1 §A の 1A.1 から)。
+- 置き場 = `OddOrder/Isaacs/ChNN_.../Problems*.lean` (章ディレクトリ内、新 leaf、OddOrder.lean 配線)。
+- campaign tracking = 新 issue (base 1000)。本 9205 は照会完了ゆえ close。
+
+⟹ **本 issue close** (ownership 裁定 ① + 再配分裁定 ②③ 完了)。campaign は後継 issue で追跡。

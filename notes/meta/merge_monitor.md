@@ -6,6 +6,15 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **📌 2026-07-22 21:4x 監視 tick (Opus 4.8 hub 638898, cron `7,22,37,52` id 3ee45bda) — scope 拡大 (Isaacs 演習問題 in-scope 化) + step (9)**。
+> **① scope 拡大 (ユーザー裁定 9205 ③)**: lane a の territory 完済 → hub が再配分を escalation → **ユーザーが (E) Isaacs 演習問題 (Problems) の in-scope 化を裁定** (本 hub session 外の別チャネル経由)。
+> lane a の新 frontier = **campaign 1055 (Isaacs Problems, 全 10 章・数百問、番号付き結果と同強度で形式化)**。従来の被覆測定 (`frontier_measured_2026_07_19.md`) は「番号付き結果のみ」で演習対象外だった ⟹ 演習も対象に追加。issue 9205 は closed 化。
+> **② 合流**: a (**Ch01_Sylow/Problems.lean 起票** — Ch.1 演習 2 宣言 sorry-free + campaign 1055) / b (**2053 Pf II Ch.II step (9)** arithmetic finish p=f from p ∣ |Q|+1, **StepNine 新 leaf** +95)。
+> 新 leaf 2 本 (Problems / StepNine) とも **OddOrder.lean 配線済** (root closure OK・build で両者 elaborate 確認 = orphan 0)。範囲逸脱なし (a=Isaacs / b=Suzuki)。c は 0 ahead。
+> **gate: フルビルド green 4641 jobs (前 4639 +2 新 leaf) / AxiomsCheck OK (3739・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 / lint ratchet 215 ≤ 215 / push d2c85f13a→2bda7611f**。
+> **③ 二重 hub**: 前 hub 513185 は依然 ALIVE だが 20:51 以降 idle 継続 (inert・非干渉)。ユーザー裁定=本セッション hub のまま。terminate 未反映だが合流を妨げず。
+> frontier: a = **1055 Isaacs Problems (Ch.1 着手)** / b = 2053 step (9) 完了 → step (10)/Theorem B 組立 / c = 9318 BS 矛盾組立 (endgame)。
+>
 > **▶▶ 2026-07-22 21:2x 監視 tick (Opus 4.8 hub 638898, cron `7,22,37,52` id 3ee45bda) — 二重 hub 裁定後の初合流**。
 > ⚠ **二重 hub 検出 + ユーザー裁定**: 前 hub セッション 513185 (16:37 起動・4h) が本セッション (638898, 20:19 起動) と並行稼働していた。
 > 513185 は 20:38 に a の 9205 を merge (`d29497ff2`)、20:51 に ownership 裁定 (`19bf817c0`: FeitSibley→a / NearFields→c, regex 整合) を push。
