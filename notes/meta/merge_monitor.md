@@ -6,6 +6,15 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-22 22:2x 監視 tick (Opus 4.8 hub 638898, cron `7,22,37,52` id 3ee45bda)**。a=3 / b=1 / c=0。
+> 合流: a (**Isaacs Ch.1 Problems 1A.2 二重剰余類位数公式 |HgK|·|K∩Hᵍ|=|H||K| + 1A.3 hint**, Problems.lean +71) /
+> b (**GroupTheory/TransferInvariantTransversal.lean 新 leaf** — conjugation-invariant transversal 上の transfer, +92, OddOrder.lean 配線済)。
+> **gate: フルビルド green 4642 jobs (前 4641 +1 新 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3744・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 / lint ratchet 216→218 (b の TransferInvariantTransversal [style.show] 2 件 grandfather + owner=b flag) / push**。
+> ⚠ **b の claim-before-build 漏れ (owner flag)**: b は shared `GroupTheory/**` leaf を **9300 帯 claim 無し**で新設 (open 9xxx = 9318 のみ)。work は genuine (transfer 補題、Suzuki 前提とみられる) ゆえ合流したが、次回 shared leaf は claim 必須 (dup 検出のため)。
+> ⚠ **c 未受領 (監視継続)**: c は 9405 で NearFields 裁定を hub に照会後 **36 分 idle** (dirty 0・NearFields 未着手・+0)。c の最終 sync (21:50) は hub 裁定 push (21:5x/22:1x) より前ゆえ **transport 裁定を未受領**。hub は unsupervised lane に直接送信不可 ([[cross-lane-sync-via-notes]]) — c の `git merge main` 再 sync 待ち。次 tick で c が sync→NearFields 着手したか確認 (未同期継続なら user へ nudge 依頼)。
+> **513185** (前 hub): ALIVE・idle 継続 (inert)。
+> frontier: a = 1055 Isaacs Problems Ch.1 (1A 進行) / b = transfer 系 → 2053 Theorem B / c = NearFields Prop1 transport (裁定受領待ち)。
+>
 > **🔁 2026-07-22 22:1x — c 9405 裁定 REVISE (ユーザー指示): c 次 frontier = NearFields Prop1 transport (Isaacs Ch.6–10 案は撤回)**。
 > 前 tick で「BS 後の c → Isaacs Problems 1055 Ch.6–10 cross-assign」と裁定したが、ユーザー指示 + hub 実測で **revise**:
 > **① ownership 明確化**: NearFields は既に **c 所有** (513185 の `19bf817c0` で 9204 の a carve-out → c へ移管済、現行 c_re に含まれる)。c の 9405 の「ownership=a」は stale。
