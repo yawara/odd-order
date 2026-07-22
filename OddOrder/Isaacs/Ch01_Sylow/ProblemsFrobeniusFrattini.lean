@@ -652,6 +652,70 @@ theorem centralizer_eq_self_of_maximal_abelian_normal {P : Type*} [Group P] [Fin
       (by rw [QuotientGroup.ker_mk']; exact hAcenterL)
   exact absurd (hmax L hLnorm hLab hAL.le) hAL.ne'
 
+/-- **Isaacs Problem 1D.10** (後半). 極大可換正規部分群 `A` について `|P : A|` は `(|A| - 1)!` を割る。
+`A = C_P(A)` (前半) なので `P` の共役作用 `P → Sym(A ∖ {1})` の核は `C_P(A) = A`、ゆえに
+`P/A ↪ Sym(A ∖ {1})`、`|P : A| = |P/A| ∣ |Sym(A∖{1})| = (|A| - 1)!`。 -/
+theorem index_dvd_factorial_of_maximal_abelian_normal {P : Type*} [Group P] [Finite P]
+    {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P) (A : Subgroup P) [A.Normal]
+    [IsMulCommutative ↥A]
+    (hmax : ∀ B : Subgroup P, B.Normal → IsMulCommutative ↥B → A ≤ B → B = A) :
+    A.index ∣ (Nat.card ↥A - 1).factorial := by
+  have hCA : Subgroup.centralizer (A : Set P) = A :=
+    centralizer_eq_self_of_maximal_abelian_normal hP A hmax
+  -- `P` は共役で `A ∖ {1}` に作用する
+  letI act : MulAction P {a : ↥A // a ≠ 1} :=
+    { smul := fun g x => ⟨MulAut.conjNormal g x.1,
+        fun hc => x.2 ((MulAut.conjNormal g).injective (hc.trans (map_one _).symm))⟩
+      one_smul := fun x => Subtype.ext (by
+        change MulAut.conjNormal 1 x.1 = x.1
+        rw [map_one]; rfl)
+      mul_smul := fun g h x => Subtype.ext (by
+        change MulAut.conjNormal (g * h) x.1 = MulAut.conjNormal g (MulAut.conjNormal h x.1)
+        rw [map_mul]; rfl) }
+  have hsmul : ∀ (g : P) (x : {a : ↥A // a ≠ 1}), ((g • x).1 : ↥A) = MulAut.conjNormal g x.1 :=
+    fun _ _ => rfl
+  set f := MulAction.toPermHom P {a : ↥A // a ≠ 1} with hf
+  have hfapp : ∀ (g : P) (x : {a : ↥A // a ≠ 1}), f g x = g • x := fun _ _ => rfl
+  -- 核は `C_P(A) = A`
+  have hker : f.ker = A := by
+    have hkerC : f.ker = Subgroup.centralizer (A : Set P) := by
+      ext g
+      rw [MonoidHom.mem_ker, Subgroup.mem_centralizer_iff]
+      constructor
+      · intro hg a ha
+        rcases eq_or_ne a 1 with rfl | hane
+        · simp
+        · have hane' : (⟨a, ha⟩ : ↥A) ≠ 1 := fun h => hane (Subtype.ext_iff.mp h)
+          have hgx : g • (⟨⟨a, ha⟩, hane'⟩ : {a : ↥A // a ≠ 1}) = ⟨⟨a, ha⟩, hane'⟩ :=
+            Equiv.Perm.ext_iff.mp hg ⟨⟨a, ha⟩, hane'⟩
+          have h1 : (MulAut.conjNormal g ⟨a, ha⟩ : ↥A) = ⟨a, ha⟩ := by
+            have hv := Subtype.ext_iff.mp hgx
+            rwa [hsmul] at hv
+          have h2 := Subtype.ext_iff.mp h1
+          rw [MulAut.conjNormal_apply] at h2
+          exact (mul_inv_eq_iff_eq_mul.mp h2).symm
+      · intro hg
+        rw [Equiv.Perm.ext_iff]
+        intro x
+        change g • x = x
+        apply Subtype.ext
+        rw [hsmul]
+        apply Subtype.ext
+        rw [MulAut.conjNormal_apply]
+        have hcx := hg (x.1 : P) x.1.2
+        rw [← hcx]; group
+    exact hkerC.trans hCA
+  have hcardX : Nat.card {a : ↥A // a ≠ 1} = Nat.card ↥A - 1 := by
+    classical
+    have hfin : Fintype ↥A := Fintype.ofFinite _
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card,
+      Fintype.card_subtype_compl (fun x : ↥A => x = 1), Fintype.card_subtype_eq]
+  calc A.index = f.ker.index := by rw [hker]
+    _ = Nat.card f.range := Subgroup.index_ker f
+    _ ∣ Nat.card (Equiv.Perm {a : ↥A // a ≠ 1}) := Subgroup.card_subgroup_dvd_card _
+    _ = (Nat.card {a : ↥A // a ≠ 1}).factorial := Nat.card_perm
+    _ = (Nat.card ↥A - 1).factorial := by rw [hcardX]
+
 end
 
 end OddOrder.Isaacs.Ch01
