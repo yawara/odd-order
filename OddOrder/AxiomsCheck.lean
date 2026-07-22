@@ -226,6 +226,8 @@ import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
@@ -12100,6 +12102,70 @@ and `card_inf_centralizer_eq_prime` inherit the step (2)(b) sorry — issue 9318
 deliberately NOT asserted here.) -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_K_dvd_sub_one_of_prime_order_invariant
+
+/-! **Peterfalvi Part II, Ch. II, step (5), the near-field analysis** (`FirstCase/StepFive.lean`,
+issue 2053, 2026-07-22): if `C_Q(P) ≅ F^*` is nonabelian then `|F| = 9`.  The unit group of a
+nilpotent noncommutative near-field splits as a central cyclic odd part `O` and a nonabelian
+Sylow `2`-subgroup `T` (`exists_nilpotent_units_sylowTwo_decomp`); the noncommutativity yields a
+pair of noncommuting `2`-elements (`exists_noncommuting_two_elements_of_nearField_units`); and,
+given that `2`-elements have order dividing `4`, `T` is `Q₈`, forcing `|F| = 9`, `|F^*| = 8`
+(`nearField_card_eq_nine_of_nilpotent_units`).  All three are sorry-free.
+
+(The `2`-element exponent bound is supplied downstream by the Higman theorem
+`pow_four_eq_one_of_isSuzuki2Group`, and the near-field model by Appendix C Proposition 1 —
+issue 9318.  The step (5) conclusion `card_nearField_eq_nine_and_Q1_eq_bot` therefore inherits
+both sorries and is deliberately NOT asserted here.) -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.exists_nilpotent_units_sylowTwo_decomp
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.exists_noncommuting_two_elements_of_nearField_units
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.nearField_card_eq_nine_of_nilpotent_units
+
+/-! **Peterfalvi Part II, Ch. II, step (6), the arithmetic lemma** (`FirstCase/StepSix.lean`,
+issue 2053, 2026-07-22): [HB] Kapitel IX, Lemma 2.7 — an odd prime power `f^a = 2^b + 1`
+(`b ≥ 1`) forces `a = 1` or `f^a = 9`.  Elementary: the geometric-sum parity makes `a` even,
+and `(f^c - 1)(f^c + 1) = 2^b` (two powers of `2` differing by `2`) forces `f^c = 3`.
+Pure `ℕ` arithmetic, sorry-free; consumed by steps (6) and (8). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one
+
+/-! **Step (6), the finite-field automorphism bound** (`FirstCase/StepSix.lean`, issue 2053,
+2026-07-22): the ring automorphism group of a finite field of prime or prime-square order has
+exponent `≤ 2` (`σ² = 1`).  Via `ringAut_card_prime_pow_eq_pow` (`σ x = x^{q^i}`) and
+`x^{|F|^i} = x`.  Sorry-free; lets step (6)/(8) conclude that the odd-order automorphism group
+`Σ` of a field `F` with `|F| ∈ {f, 9}` is trivial. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.ringAut_sq_eq_one_of_card_prime_or_prime_sq
+
+/-! **A commutative near-field is a field** (`FirstCase/StepSix.lean`, App. C Prop 2 first
+alternative, 2026-07-22): `NearFields.fieldOfComm` builds a `Field` structure on a commutative
+`NearField` by adding `mul_comm` and the left distributive law
+(`NearField.mul_add_of_mul_comm`) to the existing `AddCommGroup`/`GroupWithZero`.  Reusing the
+near-field operations keeps `+`, `*`, `⁻¹` unchanged, so a near-field automorphism is a ring
+automorphism of this field — the bridge into `RingAut` for step (6)/(8)'s field case. Sorry-free. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.NearFields.fieldOfComm
+
+/-! **Step (6), field-case abstract core** (`FirstCase/StepSix.lean`, issue 2053, 2026-07-22):
+if a finite field `F` of characteristic `f` has `|F| = 2^b + 1`, then `|F| ∈ {f, 9}`, and any
+odd-order group acting faithfully by ring automorphisms is trivial.  Combines
+`FiniteField.card` (`|F| = f^a`), the arithmetic lemma, and the exponent-`2` bound
+`ringAut_sq_eq_one_of_card_prime_or_prime_sq`.  Sorry-free; the model assembly of step (6)'s
+field case supplies `|F^*| = 2^b` (from `Q₁ = 1`) and `Σ ↪ RingAut F` (from `dAut`). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.card_eq_and_aut_trivial_of_field_units_two_pow
+
+/-! **Step (6), field case — COMPLETE** (`FirstCase/StepSix.lean`, issue 2053, 2026-07-22):
+assuming `Q₁ = 1`, if the model's near-field `F` is commutative (a field) then `|F| ∈ {f, 9}`
+and `Σ = D = 1`.  `dAutHom` realizes `D` as ring automorphisms (via `NearFields.fieldOfComm`),
+`Q₁ = 1` makes `|F^*| = |C_Q(P)|` a power of `2` with `|F| = 2^b + 1`, and the abstract core
+finishes.  Sorry-free as a `∀`-model statement (a caller supplying the model inherits the
+issue 9318 sorry). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.dAutHom
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_field_eq_and_D_eq_one_of_comm
 
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
