@@ -251,6 +251,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.NearFields
+import OddOrder.Peterfalvi.Appendices.ExceptionalNearField
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
@@ -12094,3 +12095,56 @@ and `card_inf_centralizer_eq_prime` inherit the step (2)(b) sorry — issue 9318
 deliberately NOT asserted here.) -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_K_dvd_sub_one_of_prime_order_invariant
+
+/-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
+2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
+欠いていた).  Zassenhaus/Dickson 分類の App.C 特殊形: 有限 near-field `F` の乗法群が
+**cyclic** な指数 `2` 部分群 `A` を持てば、`F` は可換 (体) か、さもなくば奇素数冪 `r` が
+あって `F ≅ F_{r²,2}` (`TwistData` の twisted near-field) かつ `|Z(Fˣ)| = r - 1`。
+
+* `card_eq_sq_of_orderTwo_ringAut` — 位数 `2` の体自己同型は `|K| = r²` を強制 (Artin)。
+* `exists_field_structure_of_cyclic_index_two` — 第一半 (体構造)、cyclic 仮定の book 形。
+* `twMul_central_iff` — 中心性 `⟺` `σ`-固定 (center 節 `|Z(Fˣ)| = r - 1` のエンジン)。
+* `cyclic_index_two_nearField_classification` — **Prop 2 全文**。 -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.card_eq_sq_of_orderTwo_ringAut
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exists_field_structure_of_cyclic_index_two
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.NearFields.twMul_central_iff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.cyclic_index_two_nearField_classification
+
+/-! **Peterfalvi Appendix C, the exceptional near-field `F_{r²,2}` — concrete instantiation**
+(`Peterfalvi.Appendices.ExceptionalNearField`, 2026-07-22).  `TwistData` の抽象構成
+(`NearFields.lean`) を book の実データで実体化: `K` を位数 `p^{2n}` の有限体として
+
+* `squareSignChar` — 平方指標の `Kˣ →* Multiplicative (ZMod 2)` 形 (乗法性 =
+  `quadraticChar` の乗法性; char `2` でも退化的に成立するので仮定なし)。
+* `exceptionalTwistData` — `σ = halfFrobenius (x ↦ x^{pⁿ})`, `χ = squareSignChar` の
+  `TwistData K`。near-field `F_{r²,2}` は `Twisted (exceptionalTwistData …)` (generic
+  instance)。
+* `exceptionalTwistData_twMul_of_isSquare` / `…_of_not_isSquare` — book p. 138 の乗法
+  `x ∘ y = x·y` (`y` 平方) / `x^{pⁿ}·y` (非平方) との一致。 -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.NearFields.squareSignChar
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.NearFields.exceptionalTwistData
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exceptionalTwistData_twMul_of_isSquare
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exceptionalTwistData_twMul_of_not_isSquare
+
+/-! **`F_{r²,2}` is not a field** (`Peterfalvi.Appendices.ExceptionalNearField`,
+2026-07-22).  `p` 奇素数・`n ≥ 1` で twist は真に非可換 — Prop 2 の例外分岐が体分岐と
+交わらないことの witness。
+
+* `exists_isSquare_halfFrobenius_ne` — half-Frobenius が動かす**平方元**の存在。
+  カウント不要の初等論法: すべての平方が固定なら `σ z = ±z` で `(K,+)` が 2 つの真部分群
+  の和になり矛盾 (乗法生成元の位数 `p^{2n}−1 ∤ pⁿ−1` で `{σ=id}` が真、`σ(1)=1≠−1` で
+  `{σ=−id}` が真)。
+* `exceptionalTwistData_not_comm` — `z² ∘ y = (z²)ʳ·y ≠ y·z² = y ∘ z²` (`y` 非平方)。
+* `exceptionalNearField_not_commutative` — `Twisted` レベルの headline。 -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exists_isSquare_halfFrobenius_ne
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exceptionalTwistData_not_comm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exceptionalNearField_not_commutative
