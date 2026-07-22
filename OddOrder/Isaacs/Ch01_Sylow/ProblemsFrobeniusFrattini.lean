@@ -8,6 +8,7 @@ import OddOrder.Isaacs.Ch01_Sylow.Basic
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.GroupTheory.Frattini
+import Mathlib.GroupTheory.Perm.Cycle.Type
 
 /-!
 # Isaacs Chapter 1 — Problems §1D (Frobenius complements, Frattini, nilpotency)
@@ -768,6 +769,136 @@ theorem card_dvd_factorial_of_abelian_bound {G : Type*} [Group G] [Finite G] {n 
     rw [hmult]
     exact pow_dvd_pow p ((hp.pow_dvd_iff_le_factorization Nat.card_pos.ne').mp hpk)
   exact hk.trans hPdvd
+
+open Equiv.Perm in
+/-- McKay の数え上げ: 素数 `p ∣ |G|` のとき、`x ^ p = 1` をみたす `x` の個数は `p` の倍数。
+`vectorsProdEqOne G p` (積が `1` の `p`-組、個数 `|G|^{p-1}`) に `Multiplicative (ZMod p)` を巡回
+シフトで作用させ `IsPGroup.card_modEq_card_fixedPoints` を用いる。固定点は定数ベクトル `(x, …, x)`
+(`x ^ p = 1`) と一対一。`|G|^{p-1} ≡ 0` (`p ∣ |G|`) ゆえ固定点数 `≡ 0`。 -/
+theorem card_pow_eq_one_modEq_zero {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [hp : Fact p.Prime] (hdvd : p ∣ Nat.card G) :
+    Nat.card {x : G // x ^ p = 1} ≡ 0 [MOD p] := by
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : NeZero p := ⟨hp.out.ne_zero⟩
+  have hpos : 0 < p := hp.out.pos
+  -- `rotate` の `p`-周期性
+  have hp1 : ∀ (w : vectorsProdEqOne G p) (s : ℕ),
+      VectorsProdEqOne.rotate w (p + s) = VectorsProdEqOne.rotate w s := fun w s => by
+    rw [← VectorsProdEqOne.rotate_rotate, VectorsProdEqOne.rotate_length]
+  have hper2 : ∀ (w : vectorsProdEqOne G p) (t r : ℕ),
+      VectorsProdEqOne.rotate w (p * t + r) = VectorsProdEqOne.rotate w r := by
+    intro w t
+    induction t with
+    | zero => intro r; simp
+    | succ k ih => intro r; rw [Nat.mul_succ, show p * k + p + r = p + (p * k + r) by ring, hp1, ih]
+  have hper : ∀ (w : vectorsProdEqOne G p) (m : ℕ),
+      VectorsProdEqOne.rotate w m = VectorsProdEqOne.rotate w (m % p) := fun w m => by
+    conv_lhs => rw [← Nat.div_add_mod m p]
+    exact hper2 w (m / p) (m % p)
+  -- `Multiplicative (ZMod p)` の巡回シフト作用
+  letI act : MulAction (Multiplicative (ZMod p)) (vectorsProdEqOne G p) :=
+    { smul := fun k v => VectorsProdEqOne.rotate v (Multiplicative.toAdd k).val
+      one_smul := fun v => by
+        change VectorsProdEqOne.rotate v
+          (Multiplicative.toAdd (1 : Multiplicative (ZMod p))).val = v
+        rw [toAdd_one, ZMod.val_zero, VectorsProdEqOne.rotate_zero]
+      mul_smul := fun a b v => by
+        change VectorsProdEqOne.rotate v (Multiplicative.toAdd (a * b)).val
+          = VectorsProdEqOne.rotate (VectorsProdEqOne.rotate v (Multiplicative.toAdd b).val)
+              (Multiplicative.toAdd a).val
+        rw [VectorsProdEqOne.rotate_rotate, hper v (Multiplicative.toAdd (a * b)).val,
+          hper v ((Multiplicative.toAdd b).val + (Multiplicative.toAdd a).val)]
+        congr 1
+        rw [toAdd_mul, ZMod.val_add, Nat.mod_mod, Nat.add_comm (Multiplicative.toAdd b).val] }
+  haveI hPG : IsPGroup p (Multiplicative (ZMod p)) :=
+    IsPGroup.of_card (n := 1) (by
+      rw [pow_one, Nat.card_eq_fintype_card, Fintype.card_multiplicative, ZMod.card])
+  -- 固定点 (= 定数ベクトル) は `{x // x ^ p = 1}` と一対一
+  have hshift : ∀ (v : vectorsProdEqOne G p),
+      (Multiplicative.ofAdd (1 : ZMod p)) • v = VectorsProdEqOne.rotate v 1 := fun v => by
+    change VectorsProdEqOne.rotate v
+      (Multiplicative.toAdd (Multiplicative.ofAdd (1 : ZMod p))).val = _
+    rw [toAdd_ofAdd, ZMod.val_one]
+  have hrepl : ∀ (v : vectorsProdEqOne G p),
+      (Multiplicative.ofAdd (1 : ZMod p)) • v = v →
+      v.1 = List.Vector.replicate p (v.1.get ⟨0, hpos⟩) := by
+    intro v hv
+    have hrot1 : v.1.toList.rotate 1 = v.1.toList := by
+      have h2 := hv
+      rw [hshift] at h2
+      exact Subtype.ext_iff.mp (Subtype.ext_iff.mp h2)
+    obtain ⟨a, ha⟩ := List.rotate_one_eq_self_iff_eq_replicate.mp hrot1
+    have hlist : v.1.toList = List.replicate p a := by rw [ha]; congr 1; exact v.1.2
+    have hv1 : v.1 = List.Vector.replicate p a := Subtype.ext hlist
+    have hget : v.1.get ⟨0, hpos⟩ = a := by rw [hv1, List.Vector.get_replicate]
+    rw [hget]; exact hv1
+  have hfixcard :
+      Nat.card (MulAction.fixedPoints (Multiplicative (ZMod p)) (vectorsProdEqOne G p))
+        = Nat.card {x : G // x ^ p = 1} := by
+    apply Nat.card_congr
+    refine
+      { toFun := fun v => ⟨v.1.1.get ⟨0, hpos⟩, ?_⟩
+        invFun := fun x => ⟨⟨List.Vector.replicate p x.1, ?_⟩,
+          (MulAction.mem_fixedPoints).2 fun k => Subtype.ext (Subtype.ext ?_)⟩
+        left_inv := ?_
+        right_inv := ?_ }
+    · -- 固定点 head の `p` 乗は `1`
+      have hv := hrepl v.1 ((MulAction.mem_fixedPoints).1 v.2 (Multiplicative.ofAdd (1 : ZMod p)))
+      have hpr : v.1.1.toList.prod = 1 := v.1.2
+      rw [hv] at hpr
+      rwa [show (List.Vector.replicate p (v.1.1.get ⟨0, hpos⟩)).toList
+        = List.replicate p (v.1.1.get ⟨0, hpos⟩) from rfl, List.prod_replicate] at hpr
+    · -- replicate の積は `1`
+      change (List.replicate p x.1).prod = 1
+      rw [List.prod_replicate, x.2]
+    · -- replicate は各 `k` で不変
+      exact List.rotate_replicate x.1 p _
+    · -- left_inv
+      intro v
+      apply Subtype.ext; apply Subtype.ext
+      exact (hrepl v.1 ((MulAction.mem_fixedPoints).1 v.2 (Multiplicative.ofAdd (1 : ZMod p)))).symm
+    · -- right_inv
+      intro x
+      apply Subtype.ext
+      exact List.Vector.get_replicate x.1 ⟨0, hpos⟩
+  -- 合流: `|vectorsProdEqOne| = |G|^{p-1} ≡ 0`
+  have hmod := hPG.card_modEq_card_fixedPoints (vectorsProdEqOne G p)
+  rw [hfixcard] at hmod
+  have hVcard : Nat.card (vectorsProdEqOne G p) = Fintype.card G ^ (p - 1) := by
+    rw [Nat.card_eq_fintype_card, VectorsProdEqOne.card]
+  have hV0 : Nat.card (vectorsProdEqOne G p) ≡ 0 [MOD p] := by
+    rw [hVcard, Nat.modEq_zero_iff_dvd]
+    exact dvd_pow (by rwa [Nat.card_eq_fintype_card] at hdvd) (by have := hp.out.two_le; omega)
+  exact hmod.symm.trans hV0
+
+/-- **Isaacs Problem 1D.12**. 素数 `p ∣ |G|` のとき、位数 `p` の元の個数は `p` を法として `-1`
+(個数 `+ 1` が `p` の倍数)。`x ^ p = 1 ⟺ orderOf x ∈ {1, p}` なので位数 `p` の元数は `#{x^p=1} - 1`、
+McKay (`card_pow_eq_one_modEq_zero`) で `#{x^p=1} ≡ 0`、単位元 1 個を引いて `≡ -1`。 -/
+theorem card_orderOf_eq_prime_add_one_modEq_zero {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [hp : Fact p.Prime] (hdvd : p ∣ Nat.card G) :
+    Nat.card {x : G // orderOf x = p} + 1 ≡ 0 [MOD p] := by
+  classical
+  have hmck := card_pow_eq_one_modEq_zero (G := G) hdvd
+  -- `{x // x^p=1} ≃ Option {x // orderOf x = p}` (単位元 1 ↔ none)
+  have hpart : Nat.card {x : G // x ^ p = 1} = Nat.card {x : G // orderOf x = p} + 1 := by
+    haveI : Fintype G := Fintype.ofFinite G
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, ← Fintype.card_option]
+    refine Fintype.card_congr
+      { toFun := fun x => if h : x.1 = 1 then none else some ⟨x.1, orderOf_eq_prime x.2 h⟩
+        invFun := fun o => o.elim ⟨1, one_pow p⟩
+          (fun y => ⟨y.1, orderOf_dvd_iff_pow_eq_one.mp y.2.dvd⟩)
+        left_inv := fun x => ?_
+        right_inv := fun o => ?_ }
+    · by_cases h : x.1 = 1
+      · simp only [dif_pos h, Option.elim]; exact Subtype.ext h.symm
+      · simp only [dif_neg h, Option.elim]
+    · rcases o with _ | y
+      · simp only [Option.elim, dif_pos]
+      · have hy1 : y.1 ≠ 1 :=
+          fun h => hp.out.one_lt.ne' (y.2.symm.trans (orderOf_eq_one_iff.mpr h))
+        simp only [Option.elim, dif_neg hy1]
+  rw [hpart] at hmck
+  exact hmck
 
 end
 

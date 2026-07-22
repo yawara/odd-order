@@ -240,39 +240,18 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   ⚠ `dvd_iff_prime_pow_dvd_dvd` の `intro` は `Nat.Prime` を与える (変換不要) / `card_eq_multiplicity` は
   `↥↑P` coe ゆえ明示型 `have hmult : Nat.card ↥P = …` で橋渡し。`n` を最大値でなく上界に一般化。
   → **1D.11 完了**。
-- ⬜ **残り §1D** (いずれも ~60 行 substantial、quick path 無し):
-  - **1D.12** (位数 p 元数 `≡-1 mod p`) — 詳細プラン確定 (2026-07-23 調査): mathlib は Cauchy **存在**
-    (`exists_prime_orderOf_dvd_card`) のみ露出、**count は無い**ので McKay を自前構築。素材 =
-    `Equiv.Perm.VectorsProdEqOne` (`Perm/Cycle/Type.lean` 422+): `vectorsProdEqOne G p` (積=1 の p-tuple)、
-    `.card` (=`|G|^(p-1)`)、`rotate`/`rotate_zero`/`rotate_rotate`/`rotate_length`。手順: (1) `rotate` で
-    `MulAction (Multiplicative (ZMod p)) (vectorsProdEqOne G p)` を letI 定義 (mul_smul は p-周期性
-    `rotate v (k+p)=rotate v k` = rotate_rotate+rotate_length で `rotate v k = rotate v (k%p)`)、(2)
-    `IsPGroup.card_modEq_card_fixedPoints`: `|vectorsProdEqOne|≡|fixed| mod p`、`|vectorsProdEqOne|=|G|^(p-1)≡0`
-    (p∣|G|) ⟹ `#{x^p=1}=|fixed|≡0`、fixedPoints=定数ベクトル `replicate p x` (x^p=1) と同定
-    (`List.rotate_one_eq_self_iff_eq_replicate`)、(3) `sum_card_orderOf_eq_card_pow_eq_one (p≠0)`:
-    `divisors p={1,p}` で `#{ord=1}+#{ord=p}=#{x^p=1}`、`#{ord=1}=1` ⟹ `#{ord=p}=#{x^p=1}-1≡-1`。
-    別案: mathlib Cauchy 内の `σ`(rotate-by-1 perm)を再構築し `zpowers σ` を p-群として使う。
-    **★ 核心機構はコンパイル検証済 (2026-07-23、~40 行)**。`import Mathlib.GroupTheory.Perm.Cycle.Type`
-    + `open Equiv.Perm in`。動く構成: (i) 周期性 `hp1: rotate w (p+s)=rotate w s := rw[←rotate_rotate,
-    rotate_length]`、`hper2` (t 帰納, `rotate w (p*t+r)=rotate w r`)、`hper` (`rotate w m=rotate w (m%p)`,
-    `conv_lhs => rw[←Nat.div_add_mod m p]`)。(ii) `letI act : MulAction (Multiplicative (ZMod p))
-    (vectorsProdEqOne G p)` = `{smul k v := rotate v (toAdd k).val, one_smul (change+`toAdd_one`+`ZMod.val_zero`
-    +`rotate_zero`), mul_smul (change+`rotate_rotate`+hper 両辺+`congr 1`+`toAdd_mul`+`ZMod.val_add`+`Nat.mod_mod`
-    +`Nat.add_comm`)}`。(iii) `haveI hPG : IsPGroup p (Multiplicative (ZMod p)) := IsPGroup.of_card (n:=1)
-    (rw[pow_one,Nat.card_eq_fintype_card,Fintype.card_multiplicative,ZMod.card])`。(iv) 合流:
-    `hPG.card_modEq_card_fixedPoints (vectorsProdEqOne G p)` + `VectorsProdEqOne.card` (=|G|^(p-1))
-    + `dvd_pow`。⚠ 補題名: `toAdd_one`/`toAdd_mul` は **bare** (Multiplicative. 付けると unknown)、
-    `ZMod.val_one`、`Nat.Prime.divisors (=hp.out.divisors): divisors p={1,p}`。
-    **残ブロッカー = 固定点 equiv のみ** (`Nat.card_congr` で `fixedPoints ≃ {x//x^p=1}`): ⚠ `List.Vector.head`
-    は長さ `p` が `succ _` に構文一致せず型不一致 → **`.get ⟨0, hp.out.pos⟩` を使う** (`List.Vector.get_replicate`)。
-    `rotate_one_eq_self_iff_eq_replicate` は `∃a, l=replicate l.length a` を返す。forward=`List.rotate_replicate`。
-    減算: `sum_card_orderOf_eq_card_pow_eq_one` + `hp.out.divisors` + `Finset.sum_pair` + `#{ord=1}=1`
-    (`orderOf_eq_one_iff`) + `Nat.card`↔Finset 変換。機構コードは本 session scratchpad に退避済 (揮発)。
-  - **1D.5** (intricate) / **1D.15 の一般 `N` 版** (Φ(G)⊆N◁G, N/Φ(G)冪零⟹N冪零)。⚠ 1D.15 一般版は
-    N=G 版 (`isNilpotent_of_quotient_frattini_isNilpotent`) から**直には従わない** (Φ(G)⊆Φ(N) は成り立たず
-    ―1D.16 は逆向き Φ(N)⊆Φ(G)― Φ(G) は N で非生成とは限らない)。Isaacs 原文の別論法を要精読。
-  - **⚠ §1D 残り 3 問はいずれも hard cluster (各 ~60-70 行、quick path 無し)。次イテレーションは
-    新鮮 context で (a) 1D.12 McKay 構築 or (b) Ch.2 問題へ breadth 展開 を判断。**
+- ✅ 実証明 **1D.12** `card_orderOf_eq_prime_add_one_modEq_zero` (`p∣|G|` ⟹ 位数 p 元数 `+1 ≡ 0 mod p`)
+  + McKay helper `card_pow_eq_one_modEq_zero` (`#{x^p=1} ≡ 0`)。mathlib は Cauchy **存在**のみ露出・count
+  無しゆえ McKay を自前構築: `vectorsProdEqOne G p` (`Perm/Cycle/Type.lean`) に `Multiplicative (ZMod p)` を
+  巡回シフト作用 (`rotate`、mul_smul は p-周期性 `hper: rotate w m=rotate w (m%p)`)、
+  `IsPGroup.card_modEq_card_fixedPoints` で `|G|^(p-1)≡|fixed|`、固定点 ≃ `{x//x^p=1}` (定数ベクトル、
+  `.get ⟨0,pos⟩`+`get_replicate`+`rotate_one_eq_self_iff_eq_replicate`)、`|G|^(p-1)≡0`。減算は
+  `{x//x^p=1} ≃ Option {x//orderOf=p}` (1↔none) で `Fintype.card_option`。⚠ `toAdd_one/mul/ofAdd` は bare、
+  `List.Vector.head` は長さ p が succ 形でなく型不一致 → `.get ⟨0,hp.out.pos⟩`。→ **1D.12 完了**。
+- ⬜ **残り §1D (2 問)**: **1D.5** (intricate) / **1D.15 の一般 `N` 版** (Φ(G)⊆N◁G, N/Φ(G)冪零⟹N冪零)。
+  ⚠ 1D.15 一般版は N=G 版 (`isNilpotent_of_quotient_frattini_isNilpotent`) から**直には従わない**
+  (Φ(G)⊆Φ(N) は成り立たず ―1D.16 は逆向き Φ(N)⊆Φ(G)― Φ(G) は N で非生成とは限らない)。Isaacs 原文の
+  別論法を要精読。両問とも substantial ゆえ、次は Ch.2 問題へ breadth 展開も選択肢。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 
