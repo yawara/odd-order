@@ -6,6 +6,13 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 03:0x 監視 tick — b (Higman L13) 合流 + 🧭 c frontier 裁定 (9407 close)**。a=0(WIP) / b=3 / c=2(docs) / d=0(WIP foo)。
+> 合流: b (**Higman Lemma 13** — 指数4二因子の BCD 分類と非可換性、新 leaf `ExponentFourFactors.lean` +251 WIRED via `HigmanLemmaThirteen.lean`) / c (**docs-only** — 9407 App C Prop 1 完成報告 + 9405 を closed/ へ)。
+> **gate: green 4656 jobs (前 4655 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 8237512be→ceed3b2d3**。
+> 🧭 **hub 裁定 (9407, c 次 frontier)**: c が App C Prop 1 完遂 (Q₈ 除 sorry-clean) → 次 frontier 裁定要請。**hub 自律裁定 = (C) c 所有 territory (BG remainder + Pf remainder) の未形式化番号付き結果を doc-order 自律形式化** (AskUserQuestion 不可・hub が grep/survey 実測で決定)。ガードレール: ① **Isaacs Ch.10 は c territory 外** (2026-07-19 に a 移管 + 全 28 完成、実測訂正) ② **doc-order で BG を Pf より先に** (冊間順、BG section 若い順、stale survey 不可・実測 grep 必須) ③ **Q₈ BS (A) = tracked deferred 継続** (write-off でなく doc-order/upstream 優先ゆえ; cost が理由ではない) ④ **dedup 9130/9159/9164 (B) は c primary にせず d 候補** (mechanical・d charter 適合) ⑤ **standing authority**: c は in-territory frontier を自律選択し完遂ごとに再 escalate 不要。**9407 → closed/、9405 → closed/**。
+> 🔧 **d 向け flag (次 wave 候補)**: dedup 9130 (IsPiSubgroup of IsPGroup) / 9159 (IsPiGroup/IsPiSubgroup predicates) / 9164 (RingAut-AlgAut bridge) は mechanical dedup ゆえ d の lint/cleanup charter に適合。d が lint wave の合間に検討可 (claim-before-build: 着手時に 9xxx で claim)。
+> ℹ **a=Problems.lean WIP (§1D 継続) / d=wave 間 (foo のみ)**。両 escalation 対象外。
+>
 > **▶▶ 2026-07-23 02:5x 監視 tick — a (1C.8/1D.1) + b (Higman L13) + c (Prop1 model 完全証明・分割) 合流 / 🎉 sorry 8→7**。a=4 / b=2 / c=1 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problems 1C.8** 位数 pᵃ 部分群数の mod p 合同 + **1D.1** N_G(P)⊆H (P∈Syl_p(H), H◁G) ⟹ p∤|G:H|、`Problems.lean` +138) / b (**Higman Lemma 13** — 指数4前像の ξ 長さと長さ3化、`RestrictedLengths.lean` +326 拡張) / c (**Pf App C Prop1** `model_involution_data` **完全証明** + `RankOneAffineModel.lean` **新 leaf 分割** (863 行, NearFields 1188 に縮小))。
 > 🎉 **実 sorry 8→7 (改善)**: c が `model_involution_data` を実証明して 1 sorry 消滅、残る Q₈ Brauer–Suzuki sorry を新 leaf `RankOneAffineModel.lean` に孤立化 (NearFields 2→0, RankOneAffineModel 0→1)。**新 sorry 基準 = 7** (NearFields ではなく RankOneAffineModel に Q₈ gap が移動)。非退行かつ genuine な充足。
