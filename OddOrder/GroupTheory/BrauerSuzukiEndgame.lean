@@ -121,6 +121,60 @@ theorem not_isMulCommutative_SM_quotient_M :
   have : d = 1 := by exact_mod_cast h1
   omega
 
+/-- **`Q = S ∩ M` is cyclic** (Gorenstein Ch.12, p. 376).  Were `Q` non-cyclic, it would not lie
+in the cyclic maximal subgroup `X = ⟨x⟩`, so it contains an element `xᵏ·y` of the coset `X·y`.
+Conjugating by `x` (which normalizes `Q = S ∩ M`, as `M ⊴ G`) and dividing gives `x⁻² ∈ Q`, hence
+`T = ⟨x²⟩ ≤ Q ≤ M`.  Since `S' = ⟨x²⟩ = T` (`comm_mem_T`), the quotient `S/Q` is abelian; by
+Noether's second isomorphism theorem so is `SM/M`, contradicting
+`not_isMulCommutative_SM_quotient_M`. -/
+theorem SinfM_isCyclic :
+    IsCyclic ↥((Q.S : Subgroup G) ⊓ involutionClosure G) := by
+  by_contra hnc
+  -- `Q ⊄ X`, so `Q` contains an element `xᵏ·y` of the coset `X·y`.
+  have hnotle : ¬ ((Q.S : Subgroup G) ⊓ involutionClosure G ≤ Q.X) := by
+    intro hle
+    haveI : IsCyclic ↥Q.X := Subgroup.isCyclic_zpowers Q.x
+    exact hnc (Subgroup.isCyclic_of_le hle)
+  obtain ⟨q, hqQ, hqX⟩ := SetLike.not_le_iff_exists.mp hnotle
+  obtain ⟨hqS, hqM⟩ := Subgroup.mem_inf.mp hqQ
+  obtain ⟨k, rfl | rfl⟩ := Q.mem_iff.mp hqS
+  · exact hqX (Q.mem_X_iff.mpr ⟨k, rfl⟩)
+  -- `x·q·x⁻¹ ∈ Q` (`Q = S ∩ M` normal in `S`); dividing by `q` yields `x⁻² ∈ Q`.
+  · have hxq : Q.x * (Q.x ^ k * Q.y) * Q.x⁻¹ ∈ (Q.S : Subgroup G) ⊓ involutionClosure G :=
+      Subgroup.mem_inf.mpr ⟨mul_mem (mul_mem Q.hxS hqS) (inv_mem Q.hxS),
+        involutionClosure_normal.conj_mem _ hqM Q.x⟩
+    have hxinv2 : Q.x ^ (-2 : ℤ) ∈ (Q.S : Subgroup G) ⊓ involutionClosure G := by
+      have hmul := mul_mem (inv_mem hqQ) hxq
+      rwa [show (Q.x ^ k * Q.y)⁻¹ * (Q.x * (Q.x ^ k * Q.y) * Q.x⁻¹) = Q.x ^ (-2 : ℤ) from by
+        calc (Q.x ^ k * Q.y)⁻¹ * (Q.x * (Q.x ^ k * Q.y) * Q.x⁻¹)
+            = Q.y⁻¹ * Q.x ^ (1 : ℤ) * Q.y * Q.x⁻¹ := by group
+          _ = Q.x ^ (-1 : ℤ) * Q.x⁻¹ := by rw [Q.conj_inv_x_zpow 1]
+          _ = Q.x ^ (-2 : ℤ) := by group] at hmul
+    -- so `x² ∈ Q`, hence `T = ⟨x²⟩ ≤ Q ≤ M`.
+    have hx2 : Q.x ^ (2 : ℕ) ∈ (Q.S : Subgroup G) ⊓ involutionClosure G := by
+      have h := inv_mem hxinv2
+      rwa [zpow_neg, inv_inv, zpow_two, ← pow_two] at h
+    have hTM : Q.T ≤ involutionClosure G :=
+      (le_trans (by rw [QuaternionSylowSetup.T, Subgroup.zpowers_le]; exact hx2) inf_le_right)
+    -- `commutator ↥S ≤ M.subgroupOf S` since `S' = T ≤ M`, so `S/Q` is abelian.
+    haveI hab : IsMulCommutative
+        (↥(Q.S : Subgroup G) ⧸ (involutionClosure G).subgroupOf (Q.S : Subgroup G)) := by
+      rw [Subgroup.Normal.quotient_commutative_iff_commutator_le, commutator_eq_closure,
+        Subgroup.closure_le]
+      rintro _ ⟨a, b, rfl⟩
+      rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, commutatorElement_def]
+      push_cast
+      exact hTM (Q.comm_mem_T a.2 b.2)
+    -- Transfer along Noether II: `SM/M ≅ S/Q` is abelian, contradiction.
+    refine absurd ?_ Q.not_isMulCommutative_SM_quotient_M
+    change IsMulCommutative (↥((Q.S : Subgroup G) ⊔ involutionClosure G) ⧸
+      (involutionClosure G).subgroupOf ((Q.S : Subgroup G) ⊔ involutionClosure G))
+    rw [isMulCommutative_iff]
+    intro a b
+    apply (QuotientGroup.quotientInfEquivProdNormalQuotient
+      (Q.S : Subgroup G) (involutionClosure G)).symm.injective
+    rw [map_mul, map_mul, mul_comm']
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory
