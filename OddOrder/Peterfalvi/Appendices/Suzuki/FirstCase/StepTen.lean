@@ -413,6 +413,84 @@ theorem Q1_eq_bot_of_p_dvd_card_centralizer_W
     have hi' : (13 : ℕ) % 7 = 2 ^ i % 7 := hi
     rcases pow_two_mod_seven i with h | h | h <;> omega
 
+/-- `P ≤ N_G(W)`: every element of `P ⊆ D` normalizes `W` (`conj_mem_W_of_mem_D`). -/
+theorem P_le_normalizer_W :
+    fc.P ≤ Subgroup.normalizer fc.toHypothesis.W := by
+  intro x hxP
+  have hxD : x ∈ fc.toHypothesis.D := fc.toHypothesis.V_le_D (fc.P_le_V hxP)
+  rw [Subgroup.mem_normalizer_iff]
+  intro w
+  refine ⟨fun hw => fc.conj_mem_W_of_mem_D hxD hw, fun hw => ?_⟩
+  have hconj := fc.conj_mem_W_of_mem_D (fc.toHypothesis.D.inv_mem hxD) hw
+  rw [inv_inv] at hconj
+  have heq : x⁻¹ * (x * w * x⁻¹) * x = w := by group
+  rwa [heq] at hconj
+
+/-- **Peterfalvi Part II, Ch. II, step (10)** (p. 111): if `p ∤ |Σ| = |C_W(P)|` then
+`p ∤ |W|`.
+
+`P` (a `p`-group) acts on `W` by conjugation (`P ≤ N_G(W)`), so by the fixed-point
+congruence `|W| ≡ |C_W(P)| (mod p)`; the fixed points are exactly `W ⊓ C_G(P) = C_W(P)`.
+Hence `p ∣ |W| ⟹ p ∣ |C_W(P)|`. -/
+theorem not_p_dvd_card_W_of_not_p_dvd_card_centralizer_W
+    (hcw : ¬ fc.p ∣
+      Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :
+    ¬ fc.p ∣ Nat.card ↥fc.toHypothesis.W := by
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  -- `P` acts on `W` by conjugation, via `P ≤ N_G(W)`
+  letI : MulAction ↥fc.P ↥fc.toHypothesis.W :=
+    MulAction.compHom _ (Subgroup.inclusion fc.P_le_normalizer_W)
+  have hval : ∀ (p : ↥fc.P) (w : ↥fc.toHypothesis.W),
+      ((p • w : ↥fc.toHypothesis.W) : G) = (p : G) * (w : G) * (p : G)⁻¹ := fun _ _ => rfl
+  have hPpg : IsPGroup fc.p ↥fc.P := by
+    rw [IsPGroup.iff_card]; exact ⟨1, by rw [fc.card_P, pow_one]⟩
+  have hmod := hPpg.card_modEq_card_fixedPoints ↥fc.toHypothesis.W
+  -- `fixedPoints P W ≃ W ⊓ C_G(P)`
+  have hfix : Nat.card (MulAction.fixedPoints ↥fc.P ↥fc.toHypothesis.W) =
+      Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
+    apply Nat.card_congr
+    refine ⟨fun x => ⟨(x.1 : G), Subgroup.mem_inf.mpr ⟨x.1.2, ?_⟩⟩,
+      fun y => ⟨⟨(y : G), (Subgroup.mem_inf.mp y.2).1⟩, ?_⟩, fun _ => rfl, fun _ => rfl⟩
+    · refine Subgroup.mem_centralizer_iff.mpr (fun g hg => ?_)
+      have hfx : ((⟨g, hg⟩ : ↥fc.P) • x.1 : ↥fc.toHypothesis.W) = x.1 :=
+        (MulAction.mem_fixedPoints.mp x.2) ⟨g, hg⟩
+      have hg' : g * (x.1 : G) * g⁻¹ = (x.1 : G) := by
+        rw [← hval ⟨g, hg⟩ x.1, hfx]
+      calc g * (x.1 : G) = (g * (x.1 : G) * g⁻¹) * g := by group
+        _ = (x.1 : G) * g := by rw [hg']
+    · rw [MulAction.mem_fixedPoints]
+      intro p
+      apply Subtype.ext
+      rw [hval p ⟨(y : G), (Subgroup.mem_inf.mp y.2).1⟩]
+      have hc : (p : G) * (y : G) = (y : G) * (p : G) :=
+        Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp y.2).2 (p : G) p.2
+      rw [hc]; group
+  rw [hfix] at hmod
+  -- `p ∣ |W| ⟹ p ∣ |C_W(P)|` (contrapositive)
+  intro hpW
+  exact hcw (Nat.modEq_zero_iff_dvd.mp
+    (((Nat.modEq_zero_iff_dvd.mpr hpW).symm.trans hmod).symm))
+
+/-- **Peterfalvi Part II, Ch. II, step (10.1)** (p. 111): if `p ∤ |Σ| = |C_W(P)|` then
+`|G|_p = p^{m+2}`.
+
+`p ∤ |Σ| ⟹ p ∤ |W|` (`not_p_dvd_card_W_of_not_p_dvd_card_centralizer_W`), so `|W|_p = 0`
+and `|G|_p = p^{m+2} · |W|_p = p^{m+2}` (`factorization_card_G_eq`).  Inherits the step
+(2)(b) `sorry` (issue 9318) through the model. -/
+theorem factorization_card_G_eq_of_not_p_dvd_card_centralizer_W
+    {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m)
+    (hpSig : ¬ fc.p ∣
+      Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :
+    (Nat.card G).factorization fc.p = m + 2 := by
+  rw [fc.factorization_card_G_eq model hB2 hm,
+    Nat.factorization_eq_zero_of_not_dvd
+      (fc.not_p_dvd_card_W_of_not_p_dvd_card_centralizer_W hpSig), add_zero]
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
