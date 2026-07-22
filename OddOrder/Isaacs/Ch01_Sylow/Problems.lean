@@ -789,6 +789,43 @@ theorem oPiCore_le_of_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Finit
       Subgroup.index_ne_zero_of_finite⟩) hqπ
   exact le_sup_left.trans hsub
 
+open Pointwise in
+/-- **Isaacs Problem 1B.7(c)**. `G` が π-Hall 部分群を持つとき、`O_π(G)` は `G` の全 π-Hall 部分群
+の共通部分に一致する。
+
+`⊇`: `O_π ≤` 各 π-Hall (1B.7(b)) より `O_π ≤ ⨅`。`⊆`: 交叉 `N := ⨅` は (i) π-群 (`N ≤ H₀` で
+`|N| ∣ |H₀|`)、(ii) 正規 — 共役 `g` は π-Hall 族を並べ替える (`IsHallSubgroup.mulAut_smul`) ので
+`g⁻¹xg ∈ 全 π-Hall ⟺ x ∈ 全 π-Hall`。正規 π-群ゆえ `N ≤ O_π` (1B.7(a) `le_oPiCore`)。 -/
+theorem oPiCore_eq_iInf_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Finite G]
+    (hne : ∃ H : Subgroup G, IsHallSubgroup π H) :
+    oPiCore π G = ⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G) := by
+  obtain ⟨H₀, hH₀⟩ := hne
+  have hmem : ∀ x : G,
+      x ∈ (⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G))
+        ↔ ∀ H : {H : Subgroup G // IsHallSubgroup π H}, x ∈ (H : Subgroup G) :=
+    fun _ => Subgroup.mem_iInf
+  have hNle : (⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G)) ≤ H₀ :=
+    iInf_le _ (⟨H₀, hH₀⟩ : {H : Subgroup G // IsHallSubgroup π H})
+  have hNpi : Subgroup.IsPiGroup π
+      (⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G)) :=
+    fun q hq => hH₀.1 q (Nat.primeFactors_mono (Subgroup.card_dvd_of_le hNle) Nat.card_pos.ne' hq)
+  haveI hNnorm : (⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G)).Normal := by
+    apply Subgroup.Normal.of_conjugate_fixed
+    intro g
+    ext x
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, hmem, hmem]
+    constructor
+    · intro h H
+      have hh := h (⟨MulAut.conj g⁻¹ • (H : Subgroup G), H.2.mulAut_smul (MulAut.conj g⁻¹)⟩ :
+        {H : Subgroup G // IsHallSubgroup π H})
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, map_inv, inv_inv, smul_inv_smul] at hh
+      exact hh
+    · intro h H
+      have hh := h (⟨MulAut.conj g • (H : Subgroup G), H.2.mulAut_smul (MulAut.conj g)⟩ :
+        {H : Subgroup G // IsHallSubgroup π H})
+      rwa [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hh
+  exact le_antisymm (le_iInf fun H => oPiCore_le_of_isHallSubgroup H.2) hNpi.le_oPiCore
+
 /-! ### Problems 1B: mathlib / repo で被覆される Hall/π 演習 (docstring 記録)
 
 - **Problem 1B.7(a)** (`O_π(G)` = 最大の正規 π-部分群): 本リポジトリの
@@ -796,7 +833,8 @@ theorem oPiCore_le_of_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Finit
   characteristic (`oPiCore.characteristic`) な π-部分群であり、任意の正規 π-部分群 `H` を含む
   (`Subgroup.IsPiGroup.le_oPiCore` = まさに Problem 1B.7(a)) ことが
   `OddOrder/Isaacs/Ch03_SplitExtensions/Theorem315.lean` で示されている。この一意最大性から
-  `O_π(G)` は characteristic (Isaacs の Note)。上の `oPiCore_le_of_isHallSubgroup` が 1B.7(b)。
+  `O_π(G)` は characteristic (Isaacs の Note)。1B.7(b) = `oPiCore_le_of_isHallSubgroup`、
+  1B.7(c) = `oPiCore_eq_iInf_isHallSubgroup` (上に実証明)。
 -/
 
 end
