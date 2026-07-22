@@ -247,20 +247,27 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       step5 の dichotomy (comm ∨ F_{9,2}∧Q₁=1) から Q₁≠1 ⟹ comm。
     - `st_mem_and_cQ_isPGroup_of_mem_centralizer_W` (**axiom-clean**): w∈C_W(P)#
       で trichotomy を X=⟨w⟩ に適用 ⟹ f=|st|∈{3,5} ∧ C_Q(w) 2群。readoff の直接消費。
-    - **⚠ 残 = step (8) core (C_F(w) 固定体解析、deep・fresh context 推奨)**:
-      1. w∈C_W(P) → Σ-image [w]∈rankOneQuotient.D → **σ_w := model.dAut [w]** (F≃+F 自己同型)。
-         `sigma_mulEquiv_centralizer_W` の合成。
-      2. **C_Q(w) ≅ C_{F*}(w)** (σ_w 固定単位): `model.qEquiv` (Q≅F*) +
-         `model.dAut_conj`/`qEquiv_conj` で共役 ↔ σ_w 作用を橋渡し。C_Q(w) は
-         step8 の `st_mem_...` で 2群と既知。
-      3. **|C_F(w)| = f^a** (固定部分体、Artin = mathlib `FixedPoints.finrank_eq_card`
-         on ⟨σ_w⟩; F は素体 𝔽_f 上)。C_F(w)* = C_{F*}(w) 2群 ⟹ f^a=2^b+1 ⟹
-         step6 `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` で |C_F(w)|∈{f,9}。
-      4. **f=3 の場合 mixed 排除** (w₁,w₂ で |C_F(w_i)|=3^i は w₁ 偶位数矛盾) ⟹
-         |C_F(w)| は w に依らず一定 ⟹ ℓ=|C_W(P)| prime ∧ |F|=|C_F(w)|^ℓ。
-      infra 所在: `AffineNearFieldModel` の dAut/dAut_conj/dAut_mul/qEquiv/qEquiv_conj
-      (NearFields.lean:729+)、Artin = mathlib FieldTheory/Fixed.lean。σ_w の位数=ℓ
-      (Σ 巡回性は要確認 — C_W(P) が巡回か? §3 の W 構造から)。
+    - **fixed-field arithmetic heart 完了 (2026-07-22, axiom-clean, model-free)**:
+      `exists_card_fixedSet_eq_char_pow` (σ:F≃+*F 固定集合を AddSubgroup で構成 →
+      additive Lagrange で |{x:σx=x}|=f^a) + `card_fixedSet_mem_of_units_two_pow`
+      (固定単位 2^b群 ⟹ f^a=2^b+1 ⟹ |固定体|∈{f,9}、step6 算術補題)。書籍の
+      「|C_F(w)|=f^a=2^b+1 ⟹ ∈{f,9}」を model 非依存に切り出し済。
+    - **⚠ 残 = step (8) model 橋 + ℓ-prime assembly (deep・fresh context 推奨)**:
+      1. w∈C_W(P) → Σ-image [w]∈rankOneQuotient.D (`sigma_mulEquiv_centralizer_W`
+         の e.symm) → **σ_w := model.dAut [w]** (F≃+F を RingEquiv 化: dAut_mul で乗法的)。
+      2. **C_{C_Q(P)}(w) ≅ C_{F*}(σ_w) = {x:σx=x}∖0** (equivariance、要設計の核心):
+         - global C_Q(P) ≅ F* (step5 `centralizer_inf_mulEquiv_units`) は w-共役 ↔ σ_w
+           に intertwine (mk' N が w∈C_G(P) の共役を quotient に降ろす + qEquiv の
+           [w]-equivariance: **導出済** — [w]q̄[w]⁻¹ ↔ σ_w(qEquiv q̄)、dAut_conj+qEquiv_conj+
+           emb で emb(x·σu) 計算)。
+         - C_{C_Q(P)}(w) ⊆ C_Q(w) (∵ C_Q(P)⊆Q)、C_Q(w) 2群 (step8 `st_mem_...`) ⟹
+           C_{F*}(σ_w) 2群 ⟹ |{x:σx=x}|=|C_{F*}(σ_w)|+1=2^b+1 ⟹ heart で ∈{f,9}。
+      3. **f=3 mixed 排除 + ℓ prime**: |C_F(w)| 一定 (w₁,w₂ で 3^1,3^2 は偶位数矛盾)。
+         各 nonid σ_w の固定体=𝔽_f (|C_F(w)|=f 時) ⟹ [F:𝔽_f]=|⟨σ_w⟩|=ℓ ∀w ⟹ Σ の全
+         nonid 元が位数 ℓ=|Σ| ⟹ Σ cyclic prime。|F|=|C_F(w)|^ℓ。
+      infra: AffineNearFieldModel dAut/dAut_conj/dAut_mul/qEquiv/qEquiv_conj/emb
+      (NearFields.lean:729+)。⚠ 位数=ℓ の Artin ([F:固定体]=|⟨σ⟩|) は
+      mathlib FixedPoints.finrank (要 MulSemiringAction (zpowers σ) F setup)。
   - **(6) 算術補題 完了 (2026-07-22, StepSix.lean 新設)**:
     `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` (axiom-clean, AxiomsCheck
     登録) — [HB] IX 2.7: `f 奇 ∧ f^a = 2^b+1 (b≥1) ⟹ a=1 ∨ f^a=9`。純 ℕ 算術
