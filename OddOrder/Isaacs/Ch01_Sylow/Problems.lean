@@ -283,6 +283,56 @@ theorem mul_eq_univ_of_coprime_index {G : Type*} [Group G] [Finite G] {H K : Sub
     _ = Nat.card G * (Nat.card ↥(H ⊓ K) * (H.index * K.index)) := by rw [eI]
     _ = Nat.card G * Nat.card ↥(H ⊓ K) * (H.index * K.index) := by ring
 
+open Pointwise MulAction in
+/-- **Isaacs Problem 1A.5**. `G` が `α`, `β` に推移的に作用するとき、積 `α × β` への (対角) 作用が
+推移的 ⟺ `G_a · G_b = G` (安定化群の集合積、`a`, `b` は任意の基点)。
+
+⟹: `c ∈ G` に対し `(a,b) → (a, c·b)` を送る `g` (推移性) は `g∈G_a` かつ `g⁻¹c∈G_b`、
+`c = g·(g⁻¹c)`。⟸: `(a',b')` に対し `g₁·a=a'`, `g₂·b=b'` を取り、`g₂⁻¹g₁ ∈ G_b·G_a`
+(= `univ`) を `t·s` と分解して `g = g₂·t` とすると `g·a=a'`, `g·b=b'`。 -/
+theorem isPretransitive_prod_iff {G α β : Type*} [Group G] [MulAction G α] [MulAction G β]
+    [IsPretransitive G α] [IsPretransitive G β] (a : α) (b : β) :
+    IsPretransitive G (α × β) ↔
+      (↑(stabilizer G a) * ↑(stabilizer G b) : Set G) = Set.univ := by
+  constructor
+  · intro h
+    ext c
+    simp only [Set.mem_univ, iff_true, Set.mem_mul, SetLike.mem_coe]
+    obtain ⟨g, hg⟩ := h.exists_smul_eq (a, b) (a, c • b)
+    obtain ⟨hga, hgb⟩ := Prod.ext_iff.mp hg
+    have hga : g • a = a := hga
+    have hgb : g • b = c • b := hgb
+    refine ⟨g, ?_, g⁻¹ * c, ?_, by group⟩
+    · rw [mem_stabilizer_iff]; exact hga
+    · rw [mem_stabilizer_iff, mul_smul, ← hgb, inv_smul_smul]
+  · intro h
+    have hconnect : ∀ (a' : α) (b' : β), ∃ g : G, g • a = a' ∧ g • b = b' := by
+      intro a' b'
+      obtain ⟨g₁, hg₁⟩ := exists_smul_eq G a a'
+      obtain ⟨g₂, hg₂⟩ := exists_smul_eq G b b'
+      have hmem : g₁⁻¹ * g₂ ∈ (↑(stabilizer G a) * ↑(stabilizer G b) : Set G) :=
+        h ▸ Set.mem_univ _
+      rw [Set.mem_mul] at hmem
+      obtain ⟨s, hs, t, ht, hst⟩ := hmem
+      rw [SetLike.mem_coe, mem_stabilizer_iff] at hs ht
+      refine ⟨g₁ * s, ?_, ?_⟩
+      · rw [mul_smul, hs, hg₁]
+      · have hg : g₁ * s = g₂ * t⁻¹ := by
+          have h2 : g₁ * (s * t) = g₂ := by rw [hst]; group
+          rw [← h2]; group
+        rw [hg, mul_smul]
+        rw [show t⁻¹ • b = b by rw [inv_smul_eq_iff, ht], hg₂]
+    refine ⟨fun x y => ?_⟩
+    obtain ⟨gx, hgx1, hgx2⟩ := hconnect x.1 x.2
+    obtain ⟨gy, hgy1, hgy2⟩ := hconnect y.1 y.2
+    refine ⟨gy * gx⁻¹, ?_⟩
+    rw [Prod.ext_iff]
+    refine ⟨?_, ?_⟩
+    · change (gy * gx⁻¹) • x.1 = y.1
+      rw [← hgx1, mul_smul, inv_smul_smul]; exact hgy1
+    · change (gy * gx⁻¹) • x.2 = y.2
+      rw [← hgx2, mul_smul, inv_smul_smul]; exact hgy2
+
 end
 
 /-! ## mathlib で被覆される演習 (続き)
