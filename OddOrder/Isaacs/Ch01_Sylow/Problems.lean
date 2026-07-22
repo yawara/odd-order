@@ -1237,6 +1237,127 @@ theorem sylow_inf_mul_sylow_inf_eq {p : ℕ} [Fact p.Prime] {G : Type*} [Group G
   rw [← Nat.card_coe_set_eq, ← Nat.card_coe_set_eq]
   exact hge
 
+/-- p-部分群 `D` が Sylow `p`-部分群 `P` に正規化される (`P ≤ N_G(D)`) ならば `D ≤ P`。
+`D ⊔ P` は p-群 (`IsPGroup.to_sup_of_normal_left'`)、Sylow 極大性で `D ⊔ P = P`。1C.8 の固定点計算で使う。 -/
+theorem le_sylow_of_isPGroup_of_le_normalizer {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+    [Finite G] (P : Sylow p G) {D : Subgroup G} (hD : IsPGroup p D)
+    (hDP : (P : Subgroup G) ≤ Subgroup.normalizer D) : D ≤ (P : Subgroup G) := by
+  have hsup : IsPGroup p (D ⊔ (P : Subgroup G) : Subgroup G) :=
+    hD.to_sup_of_normal_left' P.isPGroup' hDP
+  have heq : D ⊔ (P : Subgroup G) = (P : Subgroup G) := P.is_maximal' hsup le_sup_right
+  exact le_sup_left.trans (le_of_eq heq)
+
+open MulAction Pointwise in
+/-- **Isaacs Problem 1C.8**. Sylow `p`-部分群 `P` に対し、任意の `a` について位数 `p^a` の部分群の
+個数は `P` の中と `G` の中で `p` を法として合同。
+
+`↥P` を位数 `p^a` の部分群の集合 `S_a(G)`・`S_a(P)` に共役作用させる。`|S_a(G)| ≡ |Fix_G|`,
+`|S_a(P)| ≡ |Fix_P| (mod p)` (`card_modEq_card_fixedPoints`)。固定点 `Fix_G` は `P` に正規化される
+位数 `p^a` 部分群で、それらは `P` に含まれ (`le_sylow_of_isPGroup_of_le_normalizer`)、`D ↦ D.subgroupOf P`
+が `Fix_G ≃ Fix_P` (`conj_smul_subgroupOf` で正規性を移送、`map_subgroupOf_eq_of_le` で往復)。 -/
+theorem card_subgroup_card_eq_modEq {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (P : Sylow p G) (a : ℕ) :
+    Nat.card {D : Subgroup G // Nat.card D = p ^ a}
+      ≡ Nat.card {D' : Subgroup ↥(P : Subgroup G) // Nat.card D' = p ^ a} [MOD p] := by
+  classical
+  -- ↥P の S_a(G) への共役作用
+  letI actG : MulAction ↥(P : Subgroup G) {D : Subgroup G // Nat.card D = p ^ a} :=
+    { smul := fun h D => ⟨MulAut.conj (h : G) • D.1,
+        (Nat.card_congr (Subgroup.equivSMul (MulAut.conj (h : G)) D.1).symm.toEquiv).trans D.2⟩
+      one_smul := fun D => by
+        refine Subtype.ext ?_
+        change MulAut.conj ((1 : ↥(P : Subgroup G)) : G) • D.1 = D.1
+        rw [OneMemClass.coe_one, map_one, one_smul]
+      mul_smul := fun h₁ h₂ D => by
+        refine Subtype.ext ?_
+        change MulAut.conj ((h₁ * h₂ : ↥(P : Subgroup G)) : G) • D.1
+          = MulAut.conj (h₁ : G) • MulAut.conj (h₂ : G) • D.1
+        rw [Subgroup.coe_mul, map_mul, mul_smul] }
+  -- ↥P の S_a(P) への共役作用
+  letI actP : MulAction ↥(P : Subgroup G)
+      {D' : Subgroup ↥(P : Subgroup G) // Nat.card D' = p ^ a} :=
+    { smul := fun h D => ⟨MulAut.conj h • D.1,
+        (Nat.card_congr (Subgroup.equivSMul (MulAut.conj h) D.1).symm.toEquiv).trans D.2⟩
+      one_smul := fun D => by
+        refine Subtype.ext ?_
+        change MulAut.conj (1 : ↥(P : Subgroup G)) • D.1 = D.1
+        rw [map_one, one_smul]
+      mul_smul := fun h₁ h₂ D => by
+        refine Subtype.ext ?_
+        change MulAut.conj (h₁ * h₂ : ↥(P : Subgroup G)) • D.1
+          = MulAut.conj h₁ • MulAut.conj h₂ • D.1
+        rw [map_mul, mul_smul] }
+  -- 固定点の特徴づけ
+  have hbridge : ∀ (g : G) (D : Subgroup G),
+      MulAut.conj g • D = D → g ∈ Subgroup.normalizer D :=
+    fun g D h => Subgroup.mem_normalizer_iff_map_conj_eq.mpr h
+  have hfixG : ∀ D : {D : Subgroup G // Nat.card D = p ^ a},
+      D ∈ fixedPoints ↥(P : Subgroup G) {D : Subgroup G // Nat.card D = p ^ a} ↔
+      ∀ h : ↥(P : Subgroup G), MulAut.conj (h : G) • D.1 = D.1 := fun D => by
+    rw [mem_fixedPoints]
+    exact ⟨fun hh h => congrArg Subtype.val (hh h), fun hh h => Subtype.ext (hh h)⟩
+  have hfixP : ∀ D : {D' : Subgroup ↥(P : Subgroup G) // Nat.card D' = p ^ a},
+      D ∈ fixedPoints ↥(P : Subgroup G) {D' : Subgroup ↥(P : Subgroup G) // Nat.card D' = p ^ a} ↔
+      ∀ h : ↥(P : Subgroup G), MulAut.conj h • D.1 = D.1 := fun D => by
+    rw [mem_fixedPoints]
+    exact ⟨fun hh h => congrArg Subtype.val (hh h), fun hh h => Subtype.ext (hh h)⟩
+  -- 固定点は P に含まれる
+  have hle : ∀ y : fixedPoints ↥(P : Subgroup G) {D : Subgroup G // Nat.card D = p ^ a},
+      y.1.1 ≤ (P : Subgroup G) := fun y =>
+    le_sylow_of_isPGroup_of_le_normalizer P (IsPGroup.of_card y.1.2) (fun g hg =>
+      hbridge g y.1.1 ((hfixG y.1).mp y.2 ⟨g, hg⟩))
+  -- 往復: (D'.map subtype).subgroupOf P = D'
+  have hround : ∀ D' : Subgroup ↥(P : Subgroup G),
+      (D'.map (P : Subgroup G).subtype).subgroupOf (P : Subgroup G) = D' :=
+    fun D' => Subgroup.comap_map_eq_self_of_injective (Subgroup.subtype_injective _) D'
+  -- Fix_G ≃ Fix_P (D ↦ D.subgroupOf P)
+  have hcard : Nat.card (fixedPoints ↥(P : Subgroup G) {D : Subgroup G // Nat.card D = p ^ a})
+      = Nat.card (fixedPoints ↥(P : Subgroup G)
+        {D' : Subgroup ↥(P : Subgroup G) // Nat.card D' = p ^ a}) := by
+    refine Nat.card_eq_of_bijective
+      (fun y => ⟨⟨y.1.1.subgroupOf (P : Subgroup G),
+        (Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hle y)).toEquiv).trans y.1.2⟩,
+        (hfixP _).mpr (fun h => by
+          rw [Subgroup.conj_smul_subgroupOf (hle y), (hfixG y.1).mp y.2 h])⟩) ?_
+    constructor
+    · -- 単射
+      intro y y' hyy
+      apply Subtype.ext; apply Subtype.ext
+      have h1 : y.1.1.subgroupOf (P : Subgroup G)
+          = y'.1.1.subgroupOf (P : Subgroup G) := congrArg (fun w => w.1.1) hyy
+      have := congrArg (Subgroup.map (P : Subgroup G).subtype) h1
+      rwa [Subgroup.map_subgroupOf_eq_of_le (hle y),
+        Subgroup.map_subgroupOf_eq_of_le (hle y')] at this
+    · -- 全射
+      rintro z
+      refine ⟨⟨⟨z.1.1.map (P : Subgroup G).subtype, ?_⟩, ?_⟩, ?_⟩
+      · rw [Subgroup.card_map_of_injective (Subgroup.subtype_injective _)]; exact z.1.2
+      · refine (hfixG _).mpr (fun h => ?_)
+        have hDle : z.1.1.map (P : Subgroup G).subtype ≤ (P : Subgroup G) :=
+          Subgroup.map_subtype_le _
+        have hconjle : MulAut.conj (h : G) • z.1.1.map (P : Subgroup G).subtype
+            ≤ (P : Subgroup G) := by
+          calc MulAut.conj (h : G) • z.1.1.map (P : Subgroup G).subtype
+              ≤ MulAut.conj (h : G) • (P : Subgroup G) := by gcongr
+            _ = (P : Subgroup G) := Subgroup.conj_smul_eq_self_of_mem h.2
+        have hkey : (MulAut.conj (h : G) • z.1.1.map (P : Subgroup G).subtype).subgroupOf
+              (P : Subgroup G)
+            = (z.1.1.map (P : Subgroup G).subtype).subgroupOf (P : Subgroup G) := by
+          rw [← Subgroup.conj_smul_subgroupOf hDle, hround, (hfixP z.1).mp z.2 h]
+        have h1 := congrArg (Subgroup.map (P : Subgroup G).subtype) hkey
+        rwa [Subgroup.map_subgroupOf_eq_of_le hconjle,
+          Subgroup.map_subgroupOf_eq_of_le hDle] at h1
+      · apply Subtype.ext; apply Subtype.ext
+        exact hround z.1.1
+  -- 仕上げ
+  calc Nat.card {D : Subgroup G // Nat.card D = p ^ a}
+      ≡ Nat.card (fixedPoints ↥(P : Subgroup G) {D : Subgroup G // Nat.card D = p ^ a}) [MOD p] :=
+        P.isPGroup'.card_modEq_card_fixedPoints _
+    _ = Nat.card (fixedPoints ↥(P : Subgroup G)
+        {D' : Subgroup ↥(P : Subgroup G) // Nat.card D' = p ^ a}) := hcard
+    _ ≡ Nat.card {D' : Subgroup ↥(P : Subgroup G) // Nat.card D' = p ^ a} [MOD p] :=
+        (P.isPGroup'.card_modEq_card_fixedPoints _).symm
+
 end
 
 end OddOrder.Isaacs.Ch01
