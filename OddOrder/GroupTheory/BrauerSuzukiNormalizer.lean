@@ -1,3 +1,4 @@
+import Mathlib.GroupTheory.Transfer
 import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.SylowNormalRelIndex
 
@@ -82,6 +83,82 @@ theorem exists_sylow_C_eq :
     exact hodd (hjeq ▸ dvd_pow_self 2 h)
   rw [hj0, pow_zero] at hjeq
   exact relIndex_eq_one.mp hjeq
+
+/-! ### The normal `2`-complement `H` of `C` (Burnside) -/
+
+/-- `2` is the smallest prime factor of `|C|` (as `x ∈ C` has order `2ⁿ`). -/
+theorem minFac_card_C : (Nat.card ↥Q.C).minFac = 2 := by
+  have h2dvd : 2 ∣ Nat.card ↥Q.C := by
+    have hx : Q.x ∈ Q.C := Q.x_mem_C
+    have hoc : orderOf (⟨Q.x, hx⟩ : ↥Q.C) = 2 ^ Q.n := by
+      have h := orderOf_injective Q.C.subtype Q.C.subtype_injective (⟨Q.x, hx⟩ : ↥Q.C)
+      rw [← h]
+      exact Q.hx_order
+    have hdvd := orderOf_dvd_natCard (⟨Q.x, hx⟩ : ↥Q.C)
+    rw [hoc] at hdvd
+    exact dvd_trans (dvd_pow_self 2 (by have := Q.hn; omega)) hdvd
+  have hne1 : Nat.card ↥Q.C ≠ 1 := by
+    intro h
+    rw [h] at h2dvd
+    norm_num at h2dvd
+  exact le_antisymm (Nat.minFac_le_of_dvd le_rfl h2dvd) (Nat.minFac_prime hne1).two_le
+
+/-- **Burnside inside `C`** (Gorenstein p. 374, via Theorem 7.6.1): `C` has a normal
+`2`-complement — a normal subgroup `K₀ ≤ C` of odd cardinality complementing the
+cyclic Sylow `2`-subgroup `X`.  Packaged as: a normal subgroup whose membership is
+*exactly* "odd order", which is what makes `H ⊴ N` automatic later. -/
+theorem exists_normal_two_complement :
+    ∃ K₀ : Subgroup ↥Q.C, K₀.Normal ∧ ¬ 2 ∣ Nat.card K₀ ∧
+      (∀ c : ↥Q.C, c ∈ K₀ ↔ Odd (orderOf c)) ∧
+      K₀ ⊔ Q.X.subgroupOf Q.C = ⊤ := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨P, hPX⟩ := Q.exists_sylow_C_eq
+  haveI hXcyc : IsCyclic ↥Q.X := by
+    rw [show Q.X = Subgroup.zpowers Q.x from rfl]
+    exact ⟨⟨⟨Q.x, mem_zpowers Q.x⟩, by
+      rintro ⟨g, k, rfl⟩
+      exact ⟨k, by ext; simp⟩⟩⟩
+  haveI hcyc : IsCyclic (P : Subgroup ↥Q.C) := by
+    rw [hPX]
+    exact isCyclic_of_surjective (subgroupOfEquivOfLe Q.X_le_C).symm.toMonoidHom
+      (subgroupOfEquivOfLe Q.X_le_C).symm.surjective
+  have hcompl := IsCyclic.isComplement' Q.minFac_card_C hcyc
+  set K₀ := (MonoidHom.transferSylow P (hcyc.normalizer_le_centralizer Q.minFac_card_C)).ker
+    with hK₀
+  have hK₀card : Nat.card K₀ = (P : Subgroup ↥Q.C).index := hcompl.index_eq_card.symm
+  have hK₀odd : ¬ 2 ∣ Nat.card K₀ := by rw [hK₀card]; exact P.not_dvd_index
+  have hK₀idx : K₀.index = Nat.card (P : Subgroup ↥Q.C) := hcompl.symm.index_eq_card
+  have hmem : ∀ c : ↥Q.C, c ∈ K₀ ↔ Odd (orderOf c) := by
+    intro c
+    constructor
+    · -- elements of the odd-order group `K₀` have odd order
+      intro hc
+      have h1 : orderOf c = orderOf (⟨c, hc⟩ : K₀) :=
+        orderOf_injective K₀.subtype K₀.subtype_injective ⟨c, hc⟩
+      have hdvd : orderOf c ∣ Nat.card K₀ := by
+        rw [h1]; exact orderOf_dvd_natCard _
+      rw [Nat.odd_iff]
+      rcases Nat.even_or_odd (orderOf c) with he | ho
+      · exact absurd (he.two_dvd.trans hdvd) hK₀odd
+      · exact Nat.odd_iff.mp ho
+    · -- an odd-order element maps to `1` in the `2`-group `C⧸K₀`
+      intro hodd
+      obtain ⟨m, hm⟩ := P.isPGroup'.exists_card_eq
+      have h2 : orderOf ((QuotientGroup.mk' K₀) c) ∣ orderOf c := orderOf_map_dvd _ c
+      have h3 : orderOf ((QuotientGroup.mk' K₀) c) ∣ 2 ^ m := by
+        have hdvd := orderOf_dvd_natCard ((QuotientGroup.mk' K₀) c)
+        rwa [show Nat.card (↥Q.C ⧸ K₀) = 2 ^ m from by rw [← hm, ← hK₀idx]; rfl] at hdvd
+      obtain ⟨j, _, hj⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp h3
+      have hj0 : j = 0 := by
+        by_contra h
+        have h2div : (2 : ℕ) ∣ orderOf c := (hj ▸ dvd_pow_self 2 h).trans h2
+        have hmod := Nat.odd_iff.mp hodd
+        omega
+      have hone : orderOf ((QuotientGroup.mk' K₀) c) = 1 := by rw [hj, hj0, pow_zero]
+      exact (QuotientGroup.eq_one_iff c).mp (orderOf_eq_one_iff.mp hone)
+  exact ⟨K₀, inferInstance, hK₀odd, hmem, by
+    have := hcompl.sup_eq_top
+    rwa [hPX] at this⟩
 
 end QuaternionSylowSetup
 
