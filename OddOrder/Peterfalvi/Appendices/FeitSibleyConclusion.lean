@@ -557,6 +557,27 @@ theorem exists_anchor_data [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype 
       (by rw [Nat.cast_one, one_mul]; exact hbdeg)
     simpa using hsupp
 
+/-- **Coherence restricts to subfamilies** (Peterfalvi (6), p. 148, the "`𝒮(S')`-finish" step).
+A coherent family `X` restricts to any subfamily `X' ⊆ X` (carrying a nonzero `A`-supported
+element): the same extension `E` is an isometry and matches `τ` on the smaller supported
+sublattice `ℤ[X']° ⊆ ℤ[X]°`.  This turns the `(6)` output `𝒳 ∪ 𝒴` coherent into `𝒳₁ ∪ 𝒴`
+coherent (with `𝒳₁ = 𝒳 ∩ 𝒮(S')`), the starting point of the Lemma 1(a) adjunction to `𝒮(S')`. -/
+noncomputable def isCoherent_subset [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+    [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {X X' : Set (ClassFunction ↥hyp.H ℂ)}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau X hyp.A) (hXX' : X' ⊆ X)
+    (hne : ∃ φ : ClassFunction ↥hyp.H ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) X' hyp.A ∧ φ ≠ 0) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau X' hyp.A where
+  nonzero := hne
+  extension := hcoh.extension
+  extension_inner_eq := fun φ ψ hφ hψ =>
+    hcoh.extension_inner_eq φ ψ (Submodule.span_mono hXX' hφ) (Submodule.span_mono hXX' hψ)
+  extends_on_supported := fun φ hφ =>
+    hcoh.extends_on_supported φ (OddOrder.Peterfalvi.S07.zSupportedSpan_mono_left hXX' hφ)
+  extension_mem_ZIrr := fun φ hφ =>
+    hcoh.extension_mem_ZIrr φ (Submodule.span_mono hXX' hφ)
+
 /-- **(4) keystone difference is `A`-supported** (Peterfalvi (4), p. 148): for `χ₁, η₁ ∈ 𝒮` with
 `χ₁(1) = a·η₁(1)`, the keystone `χ₁ − a·η₁` lies in `ℤ[𝒮]°` and is `A`-supported.  (In the endgame
 `η₁ ∈ 𝒴 = 𝒮(Q')` has degree `d` and `χ₁(1) = a·d`, so `a = χ₁(1)/d`.) -/
