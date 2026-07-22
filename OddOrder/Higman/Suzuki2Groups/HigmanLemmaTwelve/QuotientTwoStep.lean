@@ -235,6 +235,120 @@ theorem exists_complementary_invariant_quotient_summands_of_xiLengthThree
   exact ⟨U.1, W, U.2.2, hWinv, hUbot'.ne', hUtop'.ne,
     hWbot, hWtop, hUWbot, hUWtop⟩
 
+/-- **Higman Lemma 12 (p. 90), invariant complement to a prescribed
+Frattini preimage.**
+
+Every proper actor-invariant subgroup strictly above `Φ(P)` has a second
+proper actor-invariant Frattini preimage which complements it.  Map the
+prescribed subgroup to `P / Φ(P)`, apply operator Maschke there, and pull the
+complement back.  The returned complement is normal because it contains the
+commutator subgroup through `Φ(P)`. -/
+theorem exists_complementary_invariant_frattini_preimage_of_xiLengthThree
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : frattini P < S)
+    (hStop : S < (⊤ : Subgroup P)) :
+    ∃ T : Subgroup P,
+      T.Normal ∧ IsAInvariant Y.subtype T ∧
+        frattini P < T ∧ T < ⊤ ∧
+        S ⊓ T = frattini P ∧ S ⊔ T = ⊤ := by
+  let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+    IsAInvariant.of_characteristic Y.subtype
+  let q := QuotientGroup.mk' (frattini P)
+  let U := S.map q
+  have hUinv : IsAInvariant hPhiInv.quotientMulAutHom U := by
+    simpa [U, q] using hPhiInv.map_quotient hSinv
+  have hUbot : (⊥ : Subgroup (P ⧸ frattini P)) < U := by
+    rw [← Subgroup.comap_lt_comap_of_surjective
+      (QuotientGroup.mk'_surjective (frattini P))]
+    simpa [U, q, QuotientGroup.comap_map_mk',
+      sup_eq_right.mpr hPhiS.le] using hPhiS
+  have hUtop : U < (⊤ : Subgroup (P ⧸ frattini P)) := by
+    rw [← Subgroup.comap_lt_comap_of_surjective
+      (QuotientGroup.mk'_surjective (frattini P))]
+    simpa [U, q, QuotientGroup.comap_map_mk',
+      sup_eq_right.mpr hPhiS.le] using hStop
+  have hPhiNeTop : frattini P ≠ (⊤ : Subgroup P) :=
+    (hPhiS.trans hStop).ne
+  letI : Nontrivial (P ⧸ frattini P) :=
+    Subgroup.nontrivial_quotient_of_ne_top hPhiNeTop
+  have hinv : (involutions P).Nonempty := by
+    obtain ⟨x, _, hx, _, _⟩ := hmulti
+    exact ⟨x, hx⟩
+  have hYodd : Odd (Nat.card Y) := by
+    have hinvOdd := involutions_ncard_odd_of_isPGroup hP hinv
+    exact Nat.not_even_iff_odd.mp fun hYeven =>
+      hinvOdd.not_two_dvd_nat
+        (hprime 2 Nat.prime_two (Even.two_dvd hYeven))
+  have hQp : IsPGroup 2 (P ⧸ frattini P) :=
+    hP.to_quotient (frattini P)
+  have htwoQ : 2 ∣ Nat.card (P ⧸ frattini P) :=
+    hQp.card_eq_or_dvd.resolve_left
+      (ne_of_gt (Finite.one_lt_card_iff_nontrivial.mpr inferInstance))
+  have hcop : Nat.Coprime (Nat.card Y)
+      (Nat.card (P ⧸ frattini P)) := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hQp
+    rw [hn]
+    exact hYodd.coprime_two_right.pow_right n
+  have hQEA : IsElementaryAbelian 2 (P ⧸ frattini P) :=
+    hP.quotient_frattini_isElementaryAbelian
+  obtain ⟨W, hWinv, hUWbot, hUWtop⟩ :=
+    OddOrder.BG.Ch1_Preliminary.exists_aInvariant_complement_of_isElementaryAbelian
+      htwoQ hcop hQEA hUinv
+  have hWbot : W ≠ (⊥ : Subgroup (P ⧸ frattini P)) := by
+    intro hW
+    apply hUtop.ne
+    simpa [hW] using hUWtop
+  have hWtop : W ≠ (⊤ : Subgroup (P ⧸ frattini P)) := by
+    intro hW
+    apply hUbot.ne'
+    simpa [hW] using hUWbot
+  let T := W.comap q
+  have hTinv : IsAInvariant Y.subtype T := by
+    simpa [T, q] using hPhiInv.comap_quotient hWinv
+  have hPhiT : frattini P < T := by
+    have h := (Subgroup.comap_lt_comap_of_surjective
+      (QuotientGroup.mk'_surjective (frattini P))).2
+        (bot_lt_iff_ne_bot.mpr hWbot)
+    simpa [T, q, QuotientGroup.ker_mk'] using h
+  have hTtop : T < (⊤ : Subgroup P) := by
+    have h := (Subgroup.comap_lt_comap_of_surjective
+      (QuotientGroup.mk'_surjective (frattini P))).2
+        (lt_top_iff_ne_top.mpr hWtop)
+    simpa [T, q] using h
+  have hUcomap : U.comap q = S := by
+    simp [U, q, QuotientGroup.comap_map_mk',
+      sup_eq_right.mpr hPhiS.le]
+  have hSTinf : S ⊓ T = frattini P := by
+    calc
+      S ⊓ T = U.comap q ⊓ W.comap q := by rw [hUcomap]
+      _ = (U ⊓ W).comap q :=
+        (Subgroup.comap_inf U W q).symm
+      _ = (⊥ : Subgroup (P ⧸ frattini P)).comap q := by
+        rw [hUWbot]
+      _ = frattini P := by simp [q, QuotientGroup.ker_mk']
+  have hSTsup : S ⊔ T = (⊤ : Subgroup P) := by
+    calc
+      S ⊔ T = U.comap q ⊔ W.comap q := by rw [hUcomap]
+      _ = (U ⊔ W).comap q :=
+        Subgroup.comap_sup_eq (f := q) U W
+          (QuotientGroup.mk'_surjective (frattini P))
+      _ = (⊤ : Subgroup (P ⧸ frattini P)).comap q := by
+        rw [hUWtop]
+      _ = ⊤ := Subgroup.comap_top q
+  have hTnormal : T.Normal :=
+    Subgroup.Normal.of_commutator_le P
+      ((OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP).trans
+        hPhiT.le)
+  exact ⟨T, hTnormal, hTinv, hPhiT, hTtop, hSTinf, hSTsup⟩
+
 /-- Pull complementary nonzero proper invariant summands of the Frattini
 quotient back to complementary invariant subgroups of the original group. -/
 theorem frattiniPreimages_of_complementary_invariant_quotient_summands
