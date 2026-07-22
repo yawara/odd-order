@@ -6,3 +6,4 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.QuotientSummands
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniPreimages
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLengths
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourFactors
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourJacobi
