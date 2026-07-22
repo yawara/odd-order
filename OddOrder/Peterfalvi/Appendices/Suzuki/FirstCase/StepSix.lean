@@ -407,6 +407,47 @@ theorem card_field_eq_and_D_eq_one_of_comm :
   exact card_eq_and_aut_trivial_of_field_units_two_pow model.char_prime hm hFcard
     fc.rankOneQuotient.D_odd (fc.dAutHom hcomm model) hφinj
 
+/-- **Peterfalvi Part II, Ch. II, step (6), `F_{9,2}` case** (p. 110): if the
+model's near-field `F` is noncommutative — so `F ≅ F_{9,2}` by step (5) — then
+`|Σ| = |D| ∈ {1, 3}`.
+
+**Gated `sorry`.**  The book's argument: "an odd order group of automorphisms
+of `F_{9,2}` can only have order 1 or 3 as `F*_{9,2}` is quaternion of order 8"
+— i.e. an automorphism restricts to an automorphism of `F^* = Q₈`, and the odd
+part of `Aut(Q₈) = S₄` is `C₃`.  Formalizing this needs the automorphism theory
+of the twisted near-field `F_{9,2}` (`Twisted`/`TwistData`), which carries no
+automorphism infrastructure yet.  Tracked in issue 2053 (shared-infra
+candidate); `D_odd` is available, only the divisibility `|D| ∣ 3` is missing. -/
+theorem card_D_le_three_of_noncomm {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+    (hncomm : ¬ ∀ x y : F, x * y = y * x) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    Nat.card ↥fc.rankOneQuotient.D = 1 ∨ Nat.card ↥fc.rankOneQuotient.D = 3 := by
+  sorry
+
+/-- **Peterfalvi Part II, Ch. II, step (6)** (p. 110): assume `Q₁ = 1`.  Either
+`F` is a field, `|F| ∈ {f, 9}` and `Σ = 1`; or `F ≅ F_{9,2}` and `|Σ| ∈ {1, 3}`.
+
+The field case (`card_field_eq_and_D_eq_one_of_comm`) is sorry-free as a
+`∀`-model statement; the `F_{9,2}` case (`card_D_le_three_of_noncomm`) is
+gated on the automorphism theory of `F_{9,2}`. -/
+theorem card_field_and_D_of_Q1_eq_bot :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ∀ {F : Type uG} [NearFields.NearField F]
+      (model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
+      fc.toHypothesis.Q1 = ⊥ →
+      ((∀ x y : F, x * y = y * x) →
+        (Nat.card F = model.char ∨ Nat.card F = 9) ∧
+          Nat.card ↥fc.rankOneQuotient.D = 1) ∧
+      ((¬ ∀ x y : F, x * y = y * x) →
+        Nat.card ↥fc.rankOneQuotient.D = 1 ∨
+          Nat.card ↥fc.rankOneQuotient.D = 3) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  intro F instF model hQ1
+  exact ⟨fun hcomm => fc.card_field_eq_and_D_eq_one_of_comm model hQ1 hcomm,
+    fun hncomm => fc.card_D_le_three_of_noncomm model hncomm⟩
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

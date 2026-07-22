@@ -204,6 +204,15 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       |C_Q(P)| = 8 ∧ Q₁ = ⊥)`。本体 sorry-free (Higman `pow_four` + 9318 model
       継承のみ)。詳細は末尾「step (5) 完了記録」。
 - [ ] (6)–(9)
+  - **(6) 体の場合 完了 (2026-07-22)** — `card_field_eq_and_D_eq_one_of_comm`
+    (axiom-clean ∀-model): Q₁=1, F 可換 ⟹ (|F|=char ∨ |F|=9) ∧ |D|=1。
+    部品完備: arithmetic + ringAut_sq + fieldOfComm + 抽象核 + `dAutHom`
+    (dAut→RingAut 群 hom, crux) + `card_Q_eq_two_pow_of_Q1_eq_bot`。全 StepSix.lean。
+  - **(6) 全体形 landing (2026-07-22)** — `card_field_and_D_of_Q1_eq_bot`:
+    Q₁=1 ⟹ (可換 → (|F|=char∨9)∧|D|=1) ∧ (非可換 → |D|∈{1,3})。field case は
+    実証明、`card_D_le_three_of_noncomm` (非可換=F_{9,2}) は **gated sorry**
+    (Aut(F_{9,2}) 奇部分=3、F*=Q₈ ゆえ; near-field Aut infra 無し、D_odd は在り
+    |D|∣3 だけ欠く; shared 9300 候補)。StepSix の唯一の sorry。
   - **(6) 算術補題 完了 (2026-07-22, StepSix.lean 新設)**:
     `eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one` (axiom-clean, AxiomsCheck
     登録) — [HB] IX 2.7: `f 奇 ∧ f^a = 2^b+1 (b≥1) ⟹ a=1 ∨ f^a=9`。純 ℕ 算術
