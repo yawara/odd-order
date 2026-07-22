@@ -549,6 +549,64 @@ theorem endgameZ_centralizes {z : G} (hz : z ∈ hyp.endgameZ) {y : G} (hy : y �
   have : Commute z y := (commutatorElement_eq_one_iff_commute.mp hyz).symm
   exact commutatorElement_eq_one_iff_commute.mpr this
 
+open scoped Pointwise in
+/-- **`Q` centralises a central element of `Q₁`** (Peterfalvi (7)/(8) input).  For `w ∈ Q₁`
+that centralises all of `Q₁` (`w ∈ Z(Q₁)`), the whole direct factorisation `Q = S × Q₁`
+centralises `w`: `S` commutes with `Q₁` elementwise (`S_commutes_Q1`) and `Q₁` centralises `w`. -/
+theorem Q_le_centralizer_of_centralizes_Q1 {w : G} (hwQ1 : w ∈ hyp.Q1)
+    (hcent : ∀ y ∈ hyp.Q1, ⁅w, y⁆ = 1) :
+    hyp.Q ≤ Subgroup.centralizer ({w} : Set G) := by
+  intro q hq
+  rw [Subgroup.mem_centralizer_iff]
+  rintro x hx
+  rw [Set.mem_singleton_iff] at hx; subst x
+  have hqset : (q : G) ∈ (hyp.S : Set G) * (hyp.Q1 : Set G) := by
+    rw [hyp.S_mul_Q1_eq_Q]; exact hq
+  obtain ⟨s, hs, y, hy, rfl⟩ := Set.mem_mul.mp hqset
+  -- `w` commutes with `s ∈ S` (`S_commutes_Q1`, `w ∈ Q₁`) and with `y ∈ Q₁` (`w ∈ Z(Q₁)`)
+  have hsw : s * w = w * s := hyp.S_commutes_Q1 s hs w hwQ1
+  have hyw : w * y = y * w := commutatorElement_eq_one_iff_commute.mp (hcent y hy)
+  calc w * (s * y) = (w * s) * y := by rw [mul_assoc]
+    _ = (s * w) * y := by rw [hsw]
+    _ = s * (w * y) := by rw [mul_assoc]
+    _ = s * (y * w) := by rw [hyw]
+    _ = (s * y) * w := by rw [mul_assoc]
+
+open scoped Pointwise in
+/-- **`C_H(w) = Q` for `w ∈ Q₁^#` centralised by `Q`** (Peterfalvi (7)/(8) input).  Given
+`Q ≤ C_G(w)`, the complement `D` contributes nothing: any `h = q·d ∈ H` (`q ∈ Q`, `d ∈ D`)
+centralising `w` forces `d` to centralise `w ∈ Q₁`, so `d = 1` by the fixed-point-freeness of
+`D` on `Q₁` (as `w ≠ 1`).  Hence `H ⊓ C_G(w) = Q`; in particular `|H ⊓ C_G(w)| = |Q|` is the same
+for every `w ∈ Z^#`, the normalizer–centralizer constancy input of (7). -/
+theorem inf_centralizer_eq_Q_of_mem_Q1 {w : G} (hwQ1 : w ∈ hyp.Q1) (hw1 : w ≠ 1)
+    (hQcent : hyp.Q ≤ Subgroup.centralizer ({w} : Set G)) :
+    hyp.H ⊓ Subgroup.centralizer ({w} : Set G) = hyp.Q := by
+  apply le_antisymm
+  · rintro h ⟨hhH, hhC⟩
+    have hwq : w * h = h * w := by
+      have := (Subgroup.mem_centralizer_iff).mp hhC w (Set.mem_singleton _); exact this
+    have hhset : (h : G) ∈ (hyp.Q : Set G) * (hyp.D : Set G) := by
+      rw [hyp.Q_mul_D_eq_H]; exact hhH
+    obtain ⟨q, hq, d, hd, rfl⟩ := Set.mem_mul.mp hhset
+    -- `q` centralises `w`, so `d` does too
+    have hqw : w * q = q * w :=
+      (Subgroup.mem_centralizer_iff).mp (hQcent hq) w (Set.mem_singleton _)
+    have hdw : d * w * d⁻¹ = w := by
+      -- cancel `q` on the left: `w*q*d = q*w*d = q*d*w` gives `w*d = d*w`
+      have hstep : q * (w * d) = q * (d * w) :=
+        calc q * (w * d) = (q * w) * d := (mul_assoc q w d).symm
+          _ = (w * q) * d := by rw [← hqw]
+          _ = w * (q * d) := mul_assoc w q d
+          _ = (q * d) * w := hwq
+          _ = q * (d * w) := mul_assoc q d w
+      have hdw' : w * d = d * w := mul_left_cancel hstep
+      rw [← hdw']; group
+    have hd1 : d = 1 := by
+      by_contra hdne
+      exact hw1 (hyp.D_fixedPointFree_on_Q1 d hd hdne w hwQ1 hdw)
+    rw [hd1, mul_one]; exact hq
+  · exact fun q hq => ⟨hyp.Q_le_H hq, hQcent hq⟩
+
 /-- The `↥Q₁`-level commutator maps onto `⁅Q₁, Q₁⁆`. -/
 theorem map_commutator_Q1 :
     (commutator ↥hyp.Q1).map hyp.Q1.subtype = ⁅hyp.Q1, hyp.Q1⁆ := by
