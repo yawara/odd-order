@@ -36,6 +36,13 @@ jobs:
             exit 1
           fi
 
+      # Lint 警告 ratchet gate (issue 0138): 現存 backlog は bin/lint-baseline.tsv で
+      # grandfather し、baseline を超える新規/増加の lint 警告があれば fail する。
+      # sorry 警告 (statement-first spine の正常系) は常に許容。lean-action の fresh build
+      # 済 olean を replay して判定する。backlog が空になったら --strict へ切替。
+      - name: Lint warning ratchet (bin/check-warnings)
+        run: bin/check-warnings
+
       # GitHub Pages 未有効化のため docgen-action は Pages deploy で 404 失敗する.
       # Pages を有効化するか, deploy を切り離すまで一時無効化.
       # - uses: leanprover-community/docgen-action@v1

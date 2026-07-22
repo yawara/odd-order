@@ -131,3 +131,25 @@ maxHeartbeats 2、seqFocus 2。⚠ 着手前に各サイトの owner-active 判�
 
 `bin/check-warnings --strict` が exit 0 (非 sorry 警告ゼロ)、CI に gate step、
 CLAUDE.md 明記、0123 close。
+
+---
+
+## ✅ 2026-07-22 実施 (Opus hub) — Phase 0-1 landing + frozen wave 12 件
+
+- **Phase 0 (commit `2b9ce8bba`)**: `bin/check-warnings` + `bin/lint-baseline.tsv` (230 件)。
+- **frozen wave (commit `d7f772527`)**: provably-cold (lane c→BrauerSuzuki / lane b→Suzuki-
+  FirstCase、両者非 dirty を worktree status で確認) の非カスケード機械 12 件を解消
+  (deprecation 10 = push_neg/coeFn_sum/ncard rename + unusedSimpArgs 2)。230→**218**。
+  増分 green (下流込み)。baseline を 218 に更新。
+- **Phase 1 (本 commit)**: `lean_action_ci.yml` に ratchet step 追加 (backlog は
+  grandfather、新規のみ赤)。lane 周知 = `notes/meta/lint_gate_2026_07_22.md`。
+- **baseline の authoritativeness**: 218 は増分 replay 由来。ratchet は自己補正 (baseline が
+  低すぎれば既存警告が「regression」で出るので +bump するだけ) ゆえ CI 初回 fresh run で
+  ずれても軽微。
+
+### 残 218 の所有 (frontier 通過時に owner が解消; hub は active-lane を触らない)
+
+- lane c: `AppE_FiliformGroup` flexible 67 (⚠ simp only 化は要 full build + 敵対検証) ほか
+- lane b: Higman/Suzuki2Groups・Pf Appendices Suzuki の show/simpArgs/sectionVar/残 deprecation
+- lane a: S11_* maxHeartbeats / FeitSibley 系 simpArgs・show
+- 別トラック: openClassical (0133) / Mathlib.Tactic import (0136) / 長宣言名 (0132)
