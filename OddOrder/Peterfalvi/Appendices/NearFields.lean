@@ -720,10 +720,18 @@ structure AffineNearFieldModel {G Ω : Type*} [Group G] [MulAction G Ω] [Finite
   /-- `Q` is identified with `F^*`. -/
   qEquiv : ↥hyp.Q ≃* Fˣ
   /-- The identification `Q ≃* F^*` turns conjugation into right multiplication, i.e. it realizes
-  `F ⋊ Q ≅ F ⋊ F^* = 𝓛(F)`. -/
+  `F ⋊ Q ≅ F ⋊ F^* = 𝓛(F)`.
+
+  The `q⁻¹` on the right is forced and not cosmetic (issue 9406): in a *right* near-field the maps
+  `x ↦ x·a` (`a ∈ F^*`) compose **anti**-homomorphically (`L_a ∘ L_b = L_{b·a}`), so the natural
+  bijection `Q → F^*` sending `q` to the linear part of conjugation-by-`q` is an *anti*-isomorphism.
+  A genuine group isomorphism `qEquiv : Q ≃* F^*` must therefore realize conjugation-by-`q` as right
+  multiplication by `qEquiv q⁻¹` (equivalently `qEquiv q = q⁻¹ • e`, `mulEquivUnits`); writing
+  `qEquiv q` here would force `Q` to be abelian and make the model unsatisfiable for the exceptional
+  near-fields (`F^* ≅ SL(2, 3)`, quaternion Sylow `2`). -/
   qEquiv_conj : ∀ (q : ↥hyp.Q) (x : F),
     (q : G) * emb (Multiplicative.ofAdd x) * (q : G)⁻¹
-      = emb (Multiplicative.ofAdd (x * ((qEquiv q : Fˣ) : F)))
+      = emb (Multiplicative.ofAdd (x * ((qEquiv q⁻¹ : Fˣ) : F)))
   /-- `D` acts on `F` by additive bijections … -/
   dAut : ↥hyp.D → (F ≃+ F)
   /-- … which are multiplicative, i.e. near-field automorphisms … -/
