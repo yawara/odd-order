@@ -230,6 +230,8 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
@@ -322,7 +324,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 12400
+set_option linter.style.longFile 12600
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -12178,6 +12180,32 @@ issue 9318 sorry). -/
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.dAutHom
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_field_eq_and_D_eq_one_of_comm
+
+/-! **Peterfalvi Part II, Ch. II, step (7)** (`FirstCase/StepSeven.lean`, issue 2053,
+2026-07-22): `N = P` and `Σ ≅ C_W(P)` (p. 110).  The axiom-clean infrastructure of the
+step (the full `N = P`, `Σ ≅ C_W(P)`, and `N∩W=1` contradiction inherit the issue 9318 +
+Higman sorries through the model and are intentionally unregistered):
+
+* `kernelN_eq_kernelInf_W_join_P` — the decomposition `N = (N ∩ W) × P` (step (1)),
+  the sorry-free reduction backbone of `N = P`.
+* `orderOf_st_eq_char` — `f = |s·t| = char F` (the book's "(2), Ch. I §1 Prop 4(c) and
+  App. II Prop 1"): distinct involutions `s̄, t̄` of `C_G(P)/N` and the odd-kernel bridge.
+* `Hypothesis.cQ_card_and_pGroup_of_trichotomy` — §3 Prop 1(c) reading:
+  `C_Q(X)` a 2-group with `|C_Q(X)| = |C_{Q₀}(X)|^k` tied to `f` (PSL/Sz/PSU). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.kernelN_eq_kernelInf_W_join_P
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.orderOf_st_eq_char
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.cQ_card_and_pGroup_of_trichotomy
+
+/-! **Peterfalvi Part II, Ch. II, step (8), per-`w` induction facts**
+(`FirstCase/StepEight.lean`, issue 2053, 2026-07-22): for a nonidentity
+`w ∈ C_W(P)`, applying §3 Prop 1(c) to `⟨w⟩` gives `f = |s·t| ∈ {3, 5}` and
+`C_Q(w)` a `2`-group.  Axiom-clean application of the trichotomy reading
+(`w` centralizes `Q₀`, so the four-subgroup of `Q₀` lies in `C_G(w)`). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.st_mem_and_cQ_isPGroup_of_mem_centralizer_W
 
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
