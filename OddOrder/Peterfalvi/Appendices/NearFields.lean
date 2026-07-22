@@ -873,6 +873,66 @@ theorem RankOneHypothesis.brauerSuzuki {G Ω : Type*} [Group G] [MulAction G Ω]
     -- residual `Q₈` (`|S| = 8`) case needing modular character theory (deferred research gap).
     sorry
 
+open MulAction SubMulAction in
+/-- **`Q` acts regularly on `Ω ∖ {basept}`** (the permutation-action heart of Peterfalvi App. C,
+Prop 1's transport — *not* a research gap, elementary from the hypotheses).
+
+The key is that `D = H ⊓ H^t` is the **two-point stabilizer** `G_{ω, ω'}` where `ω' := t • basept`:
+`H^t = t·G_ω·t⁻¹ = G_{t·ω}` (`stabilizer_smul_eq_stabilizer_map_conj`), so `D = G_ω ⊓ G_{ω'}`.  Since
+`H = G_ω` is transitive on `Ω ∖ {ω}` (double transitivity) and `H = Q·D` with `D` fixing `ω'`, the
+even part `Q` is **regular**: `q ↦ q • ω'` is a bijection onto `Ω ∖ {ω}` (transitive since every
+target is `q·d • ω' = q • ω'`; free since `stab_Q(ω') = Q ⊓ D = ⊥`).
+
+Under `F ≅ Ω` (`F` regular) this transports to `Q` acting regularly on `F^#` by conjugation, the
+`reg` datum of the near-field `SharplyTransitiveData`. -/
+theorem RankOneHypothesis.q_regular_on_complement {G Ω : Type*} [Group G] [MulAction G Ω]
+    [Finite G] (hyp : RankOneHypothesis G Ω) (ω'' : Ω) (hω'' : ω'' ≠ hyp.basept) :
+    ∃! q : ↥hyp.Q, (q : G) • (hyp.t • hyp.basept) = ω'' := by
+  classical
+  haveI h2 := hyp.doubly_transitive
+  haveI hpre : IsPretransitive G Ω := isPretransitive_of_is_two_pretransitive
+  set ω' := hyp.t • hyp.basept with hω'_def
+  have hω'_ne : ω' ≠ hyp.basept := fun h =>
+    hyp.t_not_mem_H (hyp.H_def ▸ mem_stabilizer_iff.mpr h)
+  -- `D = G_basept ⊓ G_{ω'}` (two-point stabilizer).
+  have hD_eq : hyp.D = stabilizer G hyp.basept ⊓ stabilizer G ω' := by
+    rw [hyp.D_def, hyp.H_def, ← stabilizer_smul_eq_stabilizer_map_conj]
+  -- `H = G_basept` is transitive on `Ω ∖ {basept}`.
+  haveI h1 : IsPretransitive (stabilizer G hyp.basept) (ofStabilizer G hyp.basept) :=
+    is_one_pretransitive_iff.mp
+      ((SubMulAction.ofStabilizer.isMultiplyPretransitive (n := 1) (a := hyp.basept)).mp h2)
+  have hH_trans : ∀ a b : Ω, a ≠ hyp.basept → b ≠ hyp.basept →
+      ∃ h : G, h ∈ hyp.H ∧ h • a = b := by
+    intro a b ha hb
+    obtain ⟨h, hh⟩ := h1.exists_smul_eq
+      (⟨a, (mem_ofStabilizer_iff G hyp.basept).mpr ha⟩ : ofStabilizer G hyp.basept)
+      ⟨b, (mem_ofStabilizer_iff G hyp.basept).mpr hb⟩
+    refine ⟨(h : G), by rw [hyp.H_def]; exact h.2, ?_⟩
+    have hval := congrArg Subtype.val hh
+    rwa [SubMulAction.val_smul_of_tower] at hval
+  -- Existence: `h • ω' = ω''` for some `h = q·d ∈ H`, and `d • ω' = ω'`.
+  obtain ⟨h, hhH, hh⟩ := hH_trans ω' ω'' hω'_ne hω''
+  have hmem : h ∈ (hyp.Q : Set G) * (hyp.D : Set G) := by rw [hyp.Q_mul_D_eq_H]; exact hhH
+  obtain ⟨q, hqQ, d, hdD, hqd⟩ := Set.mem_mul.mp hmem
+  have hdω' : (d : G) • ω' = ω' := by
+    have hdD' : d ∈ hyp.D := SetLike.mem_coe.mp hdD
+    rw [hD_eq] at hdD'
+    exact mem_stabilizer_iff.mp hdD'.2
+  have hqω' : (q : G) • ω' = ω'' := by rw [← hh, ← hqd, mul_smul, hdω']
+  refine ⟨⟨q, SetLike.mem_coe.mp hqQ⟩, hqω', ?_⟩
+  rintro ⟨q₂, hq₂Q⟩ hq₂
+  -- `q₂⁻¹ q ∈ Q ⊓ D = ⊥`, hence `q = q₂`.
+  have hmemQ : q₂⁻¹ * q ∈ hyp.Q := hyp.Q.mul_mem (hyp.Q.inv_mem hq₂Q) (SetLike.mem_coe.mp hqQ)
+  have hmemStab_base : q₂⁻¹ * q ∈ stabilizer G hyp.basept := by
+    rw [← hyp.H_def]; exact hyp.Q_le_H hmemQ
+  have hmemStab_ω' : q₂⁻¹ * q ∈ stabilizer G ω' := by
+    rw [mem_stabilizer_iff, mul_smul, hqω', ← hq₂, ← mul_smul, inv_mul_cancel, one_smul]
+  have hmemD : q₂⁻¹ * q ∈ hyp.D := by
+    rw [hD_eq]; exact Subgroup.mem_inf.mpr ⟨hmemStab_base, hmemStab_ω'⟩
+  have hbot : q₂⁻¹ * q ∈ (⊥ : Subgroup G) := by
+    rw [← hyp.Q_inf_D_eq_bot]; exact Subgroup.mem_inf.mpr ⟨hmemQ, hmemD⟩
+  exact Subtype.ext (inv_mul_eq_one.mp (Subgroup.mem_bot.mp hbot))
+
 end PropositionOne
 
 section PropositionTwo
