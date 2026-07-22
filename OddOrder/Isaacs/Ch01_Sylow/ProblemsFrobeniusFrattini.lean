@@ -592,6 +592,33 @@ theorem sq_le_card_frattiniQuotient_of_isPGroup_of_not_isCyclic {P : Type*} [Gro
   · rw [pow_one] at hn
     exact hncq (isCyclic_of_prime_card hn)
 
+/-- **Isaacs Problem 1D.9** (後半). 位数 `p²` の群 `P` は巡回であるか、または基本アーベル (可換かつ
+全元の `p` 乗が `1`)。非巡回なら前半で `p² ≤ |P : Φ(P)|`、Lagrange (`index_mul_card`) より `|Φ(P)| = 1`
+すなわち `Φ(P) = ⊥`。よって `pow_mem_frattini_of_isPGroup` から `g ^ p ∈ ⊥` (exponent p)、
+`commutator_le_frattini` から `⁅a, b⁆ ∈ ⊥` (可換)。 -/
+theorem isCyclic_or_elementaryAbelian_of_card_eq_prime_sq {P : Type*} [Group P] [Finite P]
+    {p : ℕ} [Fact p.Prime] (hcard : Nat.card P = p ^ 2) :
+    IsCyclic P ∨ (IsMulCommutative P ∧ ∀ g : P, g ^ p = 1) := by
+  haveI hP : IsPGroup p P := IsPGroup.iff_card.mpr ⟨2, hcard⟩
+  haveI := hP.isNilpotent
+  rcases em (IsCyclic P) with hc | hnc
+  · exact Or.inl hc
+  refine Or.inr ?_
+  have hidx : p ^ 2 ≤ (frattini P).index :=
+    sq_le_card_frattiniQuotient_of_isPGroup_of_not_isCyclic hP hnc
+  have hΦbot : frattini P = ⊥ := by
+    rw [Subgroup.eq_bot_iff_card]
+    have hlag := (frattini P).index_mul_card
+    rw [hcard] at hlag
+    have hk : 0 < (frattini P).index := lt_of_lt_of_le (pow_pos (Fact.out : p.Prime).pos 2) hidx
+    have hle : (frattini P).index * Nat.card (frattini P) ≤ (frattini P).index * 1 := by
+      rw [mul_one, hlag]; exact hidx
+    exact Nat.le_antisymm (Nat.le_of_mul_le_mul_left hle hk) Nat.card_pos
+  have hcbot : commutator P = ⊥ := le_bot_iff.mp (hΦbot ▸ commutator_le_frattini)
+  refine ⟨(commutator_eq_bot_iff P).mp hcbot, fun g => ?_⟩
+  have := pow_mem_frattini_of_isPGroup hP g
+  rwa [hΦbot, Subgroup.mem_bot] at this
+
 end
 
 end OddOrder.Isaacs.Ch01
