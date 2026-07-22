@@ -280,8 +280,20 @@ mathlib inductive (`top`/`step`)。
   `index_eq_card`) 双方を割り、後者は `|G:H'|` を割り (`relIndex_dvd_index_of_le`) `|K|` と互いに素
   (`eq_one_of_dvd_coprimes`) ⟹ 像 `⊥` ⟹ `K.subgroupOf K'≤H'.subgroupOf K'` ⟹ `K≤H'`
   (`subgroupOf_map_subtype`+`inf_eq_left`)。
-- ⬜ **残り §2A**: 2A.3(b) (`K` 部分正規版) / 2A.1 (`O_π(G)` が部分正規 π-部分群を含む、`oPiCore` Ch03) /
-  2A.2 / 2A.4 (Wielandt) / 2A.5-2A.9 (socle・単純部分正規)。
+- ⬜ **残り §2A** (2A.3(a) 以外は substantial、要 machinery):
+  - **2A.1** (subnormal π-subgroup `K ⊆ O_π(G)`) — **正しい帰納 motive を発見 (2026-07-23)**: 素朴な
+    `P K := IsPiGroup π K → K≤oPiCore` は IsSubnormal 構造帰納に **不適** (step の IH は大きい `K'` について
+    で、π-group 性は小さい `K` について ⟹ 使えない)。正解は **`P H := (oPiCore π ↥H).map H.subtype ≤
+    oPiCore π G`** (H を IsSubnormal で帰納): top は `↥⊤≅G` の iso、step (`H◁K'`, IH: `(oPiCore π ↥K').map
+    K'.subtype ≤ oPiCore π G`) は `(oPiCore π ↥H).map (Subgroup.inclusion hle)` が ↥K' で正規 (oPiCore char
+    in ↥H + `H.subgroupOf K'◁↥K'` で char-in-normal) かつ π-group (`oPiCore.isPiGroup`+`IsPiGroup.map`) ⟹
+    `≤ oPiCore π ↥K'` (`IsPiGroup.le_oPiCore`)、`H.subtype=K'.subtype∘inclusion` で `.map K'.subtype` して IH。
+    素材確認済: `IsPiGroup.le_oPiCore`[Normal] / `oPiCore.characteristic`/`isPiGroup` / `IsPiGroup.map_equiv`
+    / `normal_of_characteristic` / 1D.16 の `characteristic_map_subtype_normal` パターン。~60 行 fiddly
+    (subgroup-as-group + inclusion + char + π-group 配管)。
+  - **2A.3(b)** (`K` 部分正規版) — **2A.1 経由**: π=π(K)、K « G π-group ⟹ 2A.1 で `K⊆O_π(G)`、`O_π(G)◁G`
+    π-group で `|O_π(G):O_π(G)∩H| ∣ gcd(|O_π(G)|,|G:H|)=1` (互いに素) ⟹ `O_π(G)⊆H` ⟹ `K⊆H`。
+  - 2A.2 (O^π) / 2A.4 (Wielandt) / 2A.5-2A.9 (socle・単純部分正規、heavy)。
 
 - ⬜ **次: §1D 続き (1D.8/1D.13 系 mathlib 支援厚のもの、1D.2/1D.3-5 は後で) → §1E–§1G**。
 
