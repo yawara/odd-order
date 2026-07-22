@@ -495,6 +495,25 @@ theorem commutator_Q1_le_Q1 : ⁅hyp.Q1, hyp.Q1⁆ ≤ hyp.Q1 :=
 
 theorem endgameZ_le_Q1 : hyp.endgameZ ≤ hyp.Q1 := inf_le_left.trans hyp.commutator_Q1_le_Q1
 
+/-- **`𝒳 = XsetOf ⊥ Z = {χ ∈ Irr H | Z ⊄ Ker χ}`** when `Z ≤ Q₁` (Peterfalvi (8), p. 150).
+The `Q₁ ⊄ Ker χ` defining condition of `𝒮` and the `⊥ ⊆ Ker χ` condition of `𝒮(⊥)` are both
+redundant here: `⊥ ⊆ Ker` is vacuous, and `Z ⊄ Ker χ` with `Z ≤ Q₁` forces `Q₁ ⊄ Ker χ`
+(a character constant on `Q₁` is constant on `Z ≤ Q₁`).  This identifies `𝒳` with the full family
+of irreducibles *not* trivial on `Z`, so its degree-weighted sum is the regular-character
+difference `ρ_H − ρ_{H/Z}` (`sumNonInflatedDegreeMulChar_of_mem`), the (8) constancy input. -/
+theorem mem_XsetOf_bot_iff {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    {χ : ClassFunction ↥hyp.H ℂ} :
+    χ ∈ hyp.XsetOf ⊥ Z ↔ IsIrreducibleCharacter χ ∧ ¬ hyp.LeKer χ Z := by
+  constructor
+  · rintro ⟨⟨⟨hirr, _⟩, _⟩, hZ⟩
+    exact ⟨hirr, hZ⟩
+  · rintro ⟨hirr, hZ⟩
+    refine ⟨⟨⟨hirr, ?_⟩, ?_⟩, hZ⟩
+    · exact fun hQ1 => hZ fun x hxZ => hQ1 x (hZQ1 hxZ)
+    · intro x hx
+      rw [Subgroup.mem_bot] at hx
+      rw [show x = 1 from Subtype.ext hx]
+
 /-- **`Z` centralises `Q₁`** (`Z ≤ Z(Q₁)`): `⁅z, y⁆ = 1` for `z ∈ Z`, `y ∈ Q₁`. -/
 theorem endgameZ_centralizes {z : G} (hz : z ∈ hyp.endgameZ) {y : G} (hy : y ∈ hyp.Q1) :
     ⁅z, y⁆ = 1 := by

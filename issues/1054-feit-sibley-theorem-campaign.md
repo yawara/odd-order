@@ -669,6 +669,23 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     (λ/a+μ) alg int → dvd_of_isIntegral_ratio で a∣λ → union_coherent_of_lambda_dvd。
     ⚠ 供給要: ξ→Representation ブリッジ、Q Hall in G (coprime |Q| Q.index)、
     hconst (ρ constant on Z^# + N∩C_G card 定数)、endgameZ⊆Z(Q)⟹Q⊆C_G(z)。
+    **⭐ 全 routing 確定 (2026-07-22 偵察、部品所在):**
+    - **𝒳 = {χ∈Irr H | Z⊄ker χ}** = `mem_XsetOf_bot_iff` (2026-07-22 完成、
+      FeitSibleyEndgame.lean)。Z≤Q₁ ゆえ Q₁⊄ker 条件が Z⊄ker に subsume。
+      ⟹ Σ_{χ∈𝒳}χ(1)χ(z) が sumNonInflatedDegreeMulChar_of_mem (=−|H⧸Z|) に直結。
+      ⚠ ただし Set 𝒳 (ClassFunction) ↔ Finset {ξ:IrreducibleCharacter | Z⊄characterKernel}
+      の bijection が要 (LeKer↔characterKernel = `leKer_iff_subset_characterKernel`
+      FeitSibleyTheorem:1119)。
+    - **τ = ClassFunction.induce hyp.H** (= Ind_H^G、FeitSibley.lean:315)。
+    - **Frobenius reciprocity** = `inner_induce_coe_eq_restrictionMultiplicity`
+      (FeitSibleyTheorem:281 で使用例)。(Res_H e′₁, ζ)_H = (e′₁, τζ)_G の橋。
+    - **ξ→Representation** = `IsIrreducibleCharacter` を obtain (= ∃V ρ, IsIrreducible ∧
+      (ξ:G→ℂ)=ρ.character; ZIrr.lean:95)。(8) goal は Prop ゆえ obtain 可。
+      haveI := hirr で instance 化 → peterfalvi_67_hall_of_odd 適用。
+    - **算術核** dvd_of_isIntegral_ratio (完成)、**central 合同** peterfalvi_67_hall_of_odd (完成)。
+    **assembly の残実装** (次 session、tightly-coupled): (a) Res_H e′₁ inner を Frobenius +
+    (5) cross-orth + (6) coherence で計算、(b) Fourier 展開、(c) 𝒳↔Finset bijection +
+    正則指標恒等式、(d) z 評価、(e) ξ→Rep + (7) + 算術核。~200 行、fresh context 推奨。
   作業順: (7) は独立ゆえ (4)(5)(6) と並行可。それ以外は (4)→(5)→(6)→(8)。
 - [ ] 旧記録: **Part A 本体組み立て** (2026-07-21 設計固定、この順):
   1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
