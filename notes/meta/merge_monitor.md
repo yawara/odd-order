@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 04:2x 監視 tick — a (1D.16) + b (9319 graded Jacobi 証明) 合流 / 🔴 c stall 継続**。a=2 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.16** — 正規部分群 N で Φ(N) ⊆ Φ(G)、`ProblemsFrobeniusFrattini.lean` +50) / b (**issue 9319 lower-central graded Jacobi を実証明 + claim close** — `HigmanLowerCentralDegreeThree.lean` +121 / `HigmanLowerCentralGraded.lean` +18 (既存 leaf 拡張・新 leaf 0) + Assembly.lean −18 refactor)。
+> **gate: green 4657 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 01bf4c429→017e2b9ee**。範囲逸脱なし。9319 は b band (9300) の shared-infra claim を実証明で満たし closed/ へ。
+> 🔴 **lane c stall 継続 (未復帰・ユーザー対応待ち)**: 前 tick で escalate 済。c は 03:04 以降 worktree 更新ゼロのまま (04:2x 時点も activity 0)。ユーザーの c 再起動を待機。復帰すれば 9407 裁定 (BG remainder) に向かう。**a/b/d は健全**ゆえ c 以外の監視は継続。
+> ℹ a=1D 演習継続 / d=wave 間。
+>
 > **▶▶ 2026-07-23 04:0x 監視 tick — a (1D.4) + b (Higman L13 + 9319 claim) 合流 / 🔴 c stall 確定**。a=2 / b=2 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problem 1D.4** Frobenius complement ⟺ N 上の fixed-point-free action、`ProblemsFrobeniusFrattini.lean` +64) / b (**Higman Lemma 13** Frattini 二乗層に交換子を収める、`FrattiniLayers.lean` +105 + **issue 9319** (lower-central graded Jacobi) を shared-infra claim (b band 9300 ✓))。
 > **gate: green 4657 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 3655dc2b4→820cfbd62**。範囲逸脱なし。
