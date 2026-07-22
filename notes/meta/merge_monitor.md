@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 06:3x 監視 tick — a (🎯1D.12 McKay 突破) + b (Higman L13 Φ² triple 交換子) 合流 / 🔴 c stall 継続 (~3h35m)**。a=2 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.12** — #{位数 p の元} + 1 ≡ 0 mod p を **McKay counting で実証明** (+131)。2 tick の難所調査を経て突破、mathlib ショートカット無しを自前で構成) / b (**Higman Lemma 13** Φ² 値 triple commutator + 交換子の actor 共変性、新 leaf `FrattiniTripleCommutators.lean` +296 / `FrattiniSquareCommutatorEquivariance.lean` +199、両 WIRED)。
+> **gate: green 4668 jobs (前 4666 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 8c2e0c9d4→fc5ec579f**。範囲逸脱なし。
+> 🎯 **a の 1D.12 突破 = 難所回避しない実践例**: 06:0x/06:2x の 2 tick で「mathlib に Frobenius count 近道無し」を確定し核心機構を検証 (docs) → 本 tick で McKay 論法を自前構成し実証明。CLAUDE.md「深い frontier なら deep なまま engage」どおり。
+> 🔴 **lane c stall 継続 (~3h35m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動 or 退役指示待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
 > **▶▶ 2026-07-23 06:2x 監視 tick — a (1D.12 docs) + b (Higman L13 Φ² 内部交換子) 合流 / 🔴 c stall 継続 (~3h20m)**。a=3(docs) / b=1 / c=0 / d=0(WIP foo)。
 > 合流: a (**docs-only** — Isaacs 1D.12 McKay-count 再調査: mathlib に Frobenius count ショートカット無しを確定 + 核心機構をコンパイル検証、`issues/1055` +21。Lean 未変更ゆえ build 影響なし) / b (**Higman Lemma 13** Φ/Φ² から Φ² への内部交換子を構成、新 leaf `FrattiniSquareCommutators.lean` +503 WIRED)。
 > **gate: green 4666 jobs (前 4665 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 7a94a33d3→61d9441f3**。範囲逸脱なし。
