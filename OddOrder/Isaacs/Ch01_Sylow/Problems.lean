@@ -1070,6 +1070,55 @@ theorem prime_dvd_card_orderOf_prime_pow {p : ℕ} [Fact p.Prime] {G : Type*} [G
     P.isPGroup'.card_modEq_card_fixedPoints X
   exact Nat.modEq_zero_iff_dvd.mp (hmod.trans (Nat.modEq_zero_iff_dvd.mpr hfixdvd))
 
+/-- **Isaacs Problem 1C.7**. `G` の極大部分群 (coatom) がすべて素数指数をもち、`p` が `|G|` の
+素因数の上界 (最大素因数) ならば、`G` の Sylow `p`-部分群は正規。
+
+背理法: `P` が正規でないとすると `N_G(P) ≠ ⊤` なので `N_G(P)` を含む極大部分群 `M` が存在し
+(有限束は coatomic)、その指数 `q := |G:M|` は素数 (仮定)。`P` は `M` の Sylow でもあり、`N_G(P) ≤ M`
+から `M` 内の正規化群 `N_M(P) = N_G(P)`。ゆえ `n_p(M) = |M:N_G(P)|` かつ
+`n_p(G) = |G:N_G(P)| = |G:M|·|M:N_G(P)| = q·n_p(M)`。Sylow の第三定理で `n_p(G) ≡ n_p(M) ≡ 1 (mod p)`
+なので `q ≡ 1 (mod p)`、すなわち `q > p`。しかし `q` は `|G|` の素因数ゆえ `q ≤ p`。矛盾。 -/
+theorem sylow_normal_of_maximal_subgroup_prime_index {p : ℕ} [Fact p.Prime] {G : Type*}
+    [Group G] [Finite G] (P : Sylow p G)
+    (hmax : ∀ M : Subgroup G, IsCoatom M → (M.index).Prime)
+    (hlarge : ∀ q : ℕ, q.Prime → q ∣ Nat.card G → q ≤ p) :
+    (P : Subgroup G).Normal := by
+  by_contra hnn
+  -- N_G(P) ≠ ⊤
+  have hNne : Subgroup.normalizer (P : Subgroup G) ≠ (⊤ : Subgroup G) := by
+    intro h; exact hnn (Subgroup.normalizer_eq_top_iff.mp h)
+  -- N_G(P) を含む極大部分群 M
+  obtain ⟨M, hMco, hNM⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.normalizer (P : Subgroup G) : Subgroup G)).resolve_left
+      hNne
+  have hPM : (P : Subgroup G) ≤ M := Subgroup.le_normalizer.trans hNM
+  -- n_p(M) = |M : N_G(P)| (= (N_G P).relIndex M)
+  have hrel : Nat.card (Sylow p ↥M) = (Subgroup.normalizer (P : Subgroup G)).relIndex M := by
+    rw [(P.subtype hPM).card_eq_index_normalizer, ← Sylow.coe_coe, Sylow.coe_subtype,
+      ← Subgroup.subgroupOf_normalizer_eq hPM, Subgroup.relIndex]
+  -- n_p(M) · q = n_p(G)
+  have heq : Nat.card (Sylow p ↥M) * M.index = Nat.card (Sylow p G) := by
+    rw [hrel, Subgroup.relIndex_mul_index hNM, Sylow.coe_coe, ← P.card_eq_index_normalizer]
+  -- 両者 ≡ 1 (mod p)
+  have hnpM : Nat.card (Sylow p ↥M) ≡ 1 [MOD p] := card_sylow_modEq_one p ↥M
+  have hnpG : Nat.card (Sylow p G) ≡ 1 [MOD p] := card_sylow_modEq_one p G
+  set q := M.index with hq
+  have hqprime : q.Prime := hmax M hMco
+  -- q ≡ 1 (mod p)
+  have hq1 : q ≡ 1 [MOD p] := by
+    have h1 : q ≡ Nat.card (Sylow p ↥M) * q [MOD p] := by
+      calc q = 1 * q := (one_mul q).symm
+        _ ≡ Nat.card (Sylow p ↥M) * q [MOD p] := Nat.ModEq.mul_right q hnpM.symm
+    rw [heq] at h1
+    exact h1.trans hnpG
+  -- q ≤ p だが q ≡ 1 (mod p) は q > p を強制、矛盾
+  have hqle : q ≤ p := hlarge q hqprime (hq ▸ M.index_dvd_card)
+  have hd : p ∣ q - 1 := (Nat.modEq_iff_dvd' hqprime.one_lt.le).mp hq1.symm
+  have h2q : 2 ≤ q := hqprime.two_le
+  have h2p : 2 ≤ p := (Fact.out : p.Prime).two_le
+  have hz : q - 1 = 0 := Nat.eq_zero_of_dvd_of_lt hd (by omega)
+  omega
+
 end
 
 end OddOrder.Isaacs.Ch01
