@@ -181,6 +181,7 @@ import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch02_Subnormality.Problems
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
