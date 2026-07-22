@@ -579,6 +579,103 @@ Inherits the step (2)(b) `sorry` (issue 9318) through the model. -/
 theorem kernelN_eq_P (ind : Hypothesis.TheoremAInductionBelow G Ω) : fc.kernelN = fc.P :=
   fc.kernelN_eq_P_of_kernelInf_W_eq_bot (fc.kernelN_inf_W_eq_bot ind)
 
+/-- **Peterfalvi Part II, Ch. II, step (7), `Σ ≅ C_W(P)`** (p. 110): the group of
+automorphisms `Σ = D` of the rank-one quotient `C_G(P)/N` is isomorphic to
+`C_W(P) = W ∩ C_G(P)`.
+
+`Σ = (C_D(P))/N` (the image of `D_L = C_D(P)` in `L/N`), and `w ↦ [w]` is an
+isomorphism `C_W(P) → Σ`: it is injective because `C_W(P) ∩ N ⊆ W ∩ N = 1`
+(`kernelN_inf_W_eq_bot`); and surjective because `C_D(P) = C_W(P) · P` (step (1))
+with `P ⊆ N` (`P_le_kernelN`), so every `[d] ∈ Σ` is `[c]` with `c ∈ C_W(P)`.
+
+Inherits the step (2)(b) `sorry` (issue 9318) through `kernelN_inf_W_eq_bot`. -/
+theorem sigma_mulEquiv_centralizer_W
+    (ind : Hypothesis.TheoremAInductionBelow G Ω) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    Nonempty (↥fc.rankOneQuotient.D ≃*
+      ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hNdef
+  set CW : Subgroup G := fc.toHypothesis.W ⊓ L with hCWdef
+  have hCWL : CW ≤ L := inf_le_right
+  -- `P.subgroupOf L ≤ N` and `N ∩ W = 1`
+  have hPsubN : fc.P.subgroupOf L ≤ N := by
+    intro pL hpL
+    have hpP : (pL : G) ∈ fc.P := Subgroup.mem_subgroupOf.mp hpL
+    obtain ⟨nN, hnN, hn⟩ := fc.P_le_kernelN hpP
+    have : nN = pL := Subtype.ext hn
+    exact this ▸ hnN
+  have hNW : fc.kernelN ⊓ fc.toHypothesis.W = ⊥ := fc.kernelN_inf_W_eq_bot ind
+  -- the forward map `C_W(P) → Σ`, `w ↦ [w]`
+  set Sig : Subgroup (↥L ⧸ N) :=
+    (fc.toHypothesis.D.subgroupOf L).map (QuotientGroup.mk' N) with hSigdef
+  have hmemSig : ∀ w : ↥CW,
+      ((QuotientGroup.mk' N).comp (Subgroup.inclusion hCWL)) w ∈ Sig := by
+    intro w
+    exact Subgroup.mem_map_of_mem _ (Subgroup.mem_subgroupOf.mpr
+      (fc.toHypothesis.V_le_D (fc.toHypothesis.W_le_V w.2.1)))
+  set f : ↥CW →* ↥Sig :=
+    ((QuotientGroup.mk' N).comp (Subgroup.inclusion hCWL)).codRestrict Sig hmemSig
+    with hfdef
+  have hfval : ∀ w : ↥CW, (f w : ↥L ⧸ N) =
+      QuotientGroup.mk' N ⟨(w : G), hCWL w.2⟩ := fun _ => rfl
+  have hfinj : Function.Injective f := by
+    intro a b hab
+    have h1 : QuotientGroup.mk' N (⟨(a : G), hCWL a.2⟩ : ↥L) =
+        QuotientGroup.mk' N ⟨(b : G), hCWL b.2⟩ := by
+      rw [← hfval a, ← hfval b, hab]
+    have h2 : (⟨(a : G), hCWL a.2⟩ : ↥L) * (⟨(b : G), hCWL b.2⟩ : ↥L)⁻¹ ∈ N := by
+      rw [← QuotientGroup.ker_mk' N, MonoidHom.mem_ker, map_mul, map_inv, h1,
+        mul_inv_cancel]
+    have h3 : ((a : G) * (b : G)⁻¹) ∈ fc.kernelN :=
+      ⟨(⟨(a : G), hCWL a.2⟩ : ↥L) * (⟨(b : G), hCWL b.2⟩ : ↥L)⁻¹, h2, rfl⟩
+    have h4 : ((a : G) * (b : G)⁻¹) ∈ fc.toHypothesis.W :=
+      fc.toHypothesis.W.mul_mem a.2.1 (fc.toHypothesis.W.inv_mem b.2.1)
+    have h5 : ((a : G) * (b : G)⁻¹) ∈ fc.kernelN ⊓ fc.toHypothesis.W := ⟨h3, h4⟩
+    rw [hNW, Subgroup.mem_bot] at h5
+    exact Subtype.ext (mul_inv_eq_one.mp h5)
+  have hfsurj : Function.Surjective f := by
+    rintro ⟨σ, hσ⟩
+    obtain ⟨d, hd, hdσ⟩ := hσ
+    -- `(d : G) ∈ C_D(P) ≤ V`, decompose `d = g·c`, `g ∈ P`, `c ∈ C_W(P)`
+    have hdD : (d : G) ∈ fc.toHypothesis.D := Subgroup.mem_subgroupOf.mp hd
+    have hdCP : (d : G) ∈ Subgroup.centralizer (fc.P : Set G) := d.2
+    have hdV : (d : G) ∈ fc.toHypothesis.V := by
+      have hdCD : (d : G) ∈ fc.toHypothesis.D ⊓
+          Subgroup.centralizer (fc.P : Set G) := ⟨hdD, hdCP⟩
+      rw [fc.D_inf_centralizer_eq_W_inf_centralizer_join_P] at hdCD
+      exact (sup_le (le_trans inf_le_left fc.toHypothesis.W_le_V) fc.P_le_V) hdCD
+    obtain ⟨g, hgP, hgw⟩ := fc.exists_decomp_of_mem_V hdV
+    have hgL : g ∈ L := fc.P_le_centralizer hgP
+    have hdL : (d : G) ∈ L := d.2
+    have hcL : g⁻¹ * (d : G) ∈ L := mul_mem (inv_mem hgL) hdL
+    have hcCW : g⁻¹ * (d : G) ∈ CW := ⟨hgw, hcL⟩
+    refine ⟨⟨g⁻¹ * (d : G), hcCW⟩, ?_⟩
+    apply Subtype.ext
+    rw [hfval ⟨g⁻¹ * (d : G), hcCW⟩]
+    -- `[g⁻¹ d] = [d]` because `g ∈ P ⊆ N`
+    have hgN : (⟨g, hgL⟩ : ↥L) ∈ N := hPsubN (Subgroup.mem_subgroupOf.mpr hgP)
+    have hg1 : QuotientGroup.mk' N (⟨g, hgL⟩ : ↥L) = 1 := by
+      rw [← MonoidHom.mem_ker, QuotientGroup.ker_mk']; exact hgN
+    have hkey : (⟨g⁻¹ * (d : G), hCWL hcCW⟩ : ↥L) =
+        (⟨g, hgL⟩ : ↥L)⁻¹ * ⟨(d : G), hdL⟩ := Subtype.ext rfl
+    rw [hkey, map_mul, map_inv, hg1, inv_one, one_mul]
+    have hdeq : (⟨(d : G), hdL⟩ : ↥L) = d := Subtype.ext rfl
+    rw [hdeq]; exact hdσ
+  exact ⟨(MulEquiv.ofBijective f ⟨hfinj, hfsurj⟩).symm⟩
+
+/-- **Peterfalvi Part II, Ch. II, step (7)** (p. 110): `N = P` and
+`Σ ≅ C_W(P)`.  The two conclusions of step (7), assembled. -/
+theorem N_eq_P_and_sigma_mulEquiv_centralizer_W
+    (ind : Hypothesis.TheoremAInductionBelow G Ω) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    fc.kernelN = fc.P ∧
+    Nonempty (↥fc.rankOneQuotient.D ≃*
+      ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :=
+  ⟨fc.kernelN_eq_P ind, fc.sigma_mulEquiv_centralizer_W ind⟩
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
