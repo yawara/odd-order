@@ -127,13 +127,13 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 |---|---|---|---|---|---|---|
 | 6 | Dietzmann の補題 (Isaacs 5.10) | `Isaacs.Ch05.dietzmann` | Ch05_Transfer/Dietzmann.lean:254 | :1045 | high | ★★ |
 | 7 | 既約表現次数 ∣ \|G\| (Frobenius) | `RepresentationTheory.finrank_dvd_card` | RepresentationTheory/ClassSumAlgebra.lean:298 | :2312 | high | ★★ |
-| 8 | Burnside (既約表現包絡環 = End V) | `RepresentationTheory.span_range_representation_eq_top` | RepresentationTheory/AbsolutelyIrreducible.lean:192 | 実測 (未登録) | high | ★★ |
+| 8 | Burnside (既約表現包絡環 = End V) | `RepresentationTheory.span_range_representation_eq_top` | RepresentationTheory/AbsolutelyIrreducible.lean:192 | ✅ 登録済 (2026-07-22) | high | ★★ |
 | 9 | Alperin–Kuo 系 `g^[G:G'∩Z]=1` (10.28) | `Isaacs.Ch10.pow_index_commutator_inf_center_eq_one` | Ch10/PrincipalIdeal.lean:90 | :10526 | high | ★★ (#3 と資産共有・両方は出さない) |
 | 10 | Horoševskii (自己同型位数<\|G\|) | `Isaacs.Ch03.horosevskii_aut_order_lt` | Ch03_SplitExtensions/Basic.lean:124 | :950 | high | ★★ |
 | 11 | Lucchini (巡回部分群 core 指数, 2.20) | `Isaacs.Ch04.lucchini_index_normalCore_lt_index` | Ch04_Commutators/ForwardFromCh02.lean:1084 | :941 | high | ★★ |
 | 12 | Isaacs 10.25 (transfer 指数消滅) | `Algebra.transfer_pow_relindex_eq_one` | Algebra/PrincipalIdealTheorem.lean:1320 | :10525 | high | ★★ (#3 上流・片方) |
 | 13 | 単純群の冪零極大部分群は p-群 (5.24) | `Isaacs.Ch05.exists_isPGroup_of_isCoatom_of_isNilpotent` | Ch05/NilpotentMaximal.lean:249 | :1065 | high | ★★ |
-| 14 | transfer 推移律 (Isaacs 10.8) | `GroupTheory.transfer_transfer` | GroupTheory/TransferTransitivity.lean:366 | 実測 (未登録) | high | ★★ |
+| 14 | transfer 推移律 (Isaacs 10.8) | `GroupTheory.transfer_transfer` | GroupTheory/TransferTransitivity.lean:366 | ✅ 登録済 (2026-07-22) | high | ★★ |
 | 15 | BG Prop 3.9 (奇 p-群 FPF⇒巡回) | `BG.Ch1.S03.isCyclic_of_isPGroup_of_isFrobeniusAction` | BG/…/S03g_Thm310.lean:55 | :5763 | high | ★★ |
 | 16 | Hall–Petrescu (class≤3) | `BG.AppE.hallCollection_of_class_le_three` | BG/AppE_CollectionFormula.lean:194 | :10841 | high | ★★ **← 🆕一般版 (§3.3) が上位互換** |
 | 17 | 可解群既約表現次数 ∣\|G\| (BG 2.3/Fong) | `RepresentationTheory.finrank_dvd_card_of_isAlgClosed_of_irreducible` | RepresentationTheory/FongSwan.lean:202 | :5425 | high | ★★ (#7 と重複気味・片方) |
@@ -144,7 +144,7 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 | 22 | Peterfalvi 付録 I Prop 2 (半線形性つき体構造) | `Peterfalvi.Appendices.Huppert.exists_field_semilinear` | Appendices/SemilinearField.lean:199 | :8870 | high | ★ |
 | 23 | 忠実既約表現⇒中心巡回 (Gorenstein 3.2.2) | `RepresentationTheory.isCyclic_center_of_faithful_irreducible` | RepresentationTheory/AbsolutelyIrreducible.lean:239 | :5481 | high | ★ (易しめ枠) |
 | 24 | \|SL(2,q)\| = q(q−1)(q+1) | `GroupTheory.SpecificGroups.ProjectiveSpecialLinear.natCard_specialLinearGroup_fin_two` | …/RootGroupSylow.lean:106 | :355 | high | ★ (提出時 vestigial `[CharP F 2]` を外す) |
-| 25 | Thompson critical subgroup (G 5.3.11) | `GroupTheory.isCritical_exists` | GroupTheory/CriticalSubgroup.lean:434 | 実測 (未登録) | medium | ★★ (docstring 過大表現を写さない) |
+| 25 | Thompson critical subgroup (G 5.3.11) | `GroupTheory.isCritical_exists` | GroupTheory/CriticalSubgroup.lean:434 | ✅ 登録済 (2026-07-22) | medium | ★★ (docstring 過大表現を写さない) |
 | 26 | **Hall の定理 E/C/D** (可解群) | `Isaacs.Ch03.hall_E_exists`/`hall_C`/`hall_D` | Ch03_SplitExtensions/Basic.lean:1002/1375/1675 | :954/1690/1694 | medium | ★★★ |
 | 27 | Thompson Frobenius 核冪零 (subgroup-pair 形) | `Isaacs.Ch06.IsFrobeniusGroup.isNilpotent_kernel` | Ch06/KernelNilpotent.lean:382 | :1131 | medium | ★ (#4 action 形を優先) |
 | 28 | Huppert metacyclic Sylow (Isaacs 10.12) | `Isaacs.Ch10.dvd_index_commutator_of_metacyclic_sylow` | Ch10/HuppertMetacyclic.lean:751 | :10516 | medium | ★★ |
@@ -156,12 +156,12 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 
 | 定理 | Lean 名 | file:line | AxiomsCheck | 知名度 | 備考 |
 |---|---|---|---|---|---|
-| **Glauberman ZJ 定理** (Z(J) 正規) | `GroupTheory.oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian` (core 形 `zCenter_thompsonJAbelian_normal`:781) | GroupTheory/GlaubermanZJ.lean:888 | ❌ 未登録 (要 `#print axioms`) | **伝説級** | ⚠ **前 note が「repo に存在しない」と reject した項目が完成**。Gorenstein Thm 2.10/2.11。bespoke = `thompsonJAbelian`/`IsPStableOp`/`opCore`/`oPiCore` |
-| Glauberman Replacement 定理 | `GroupTheory.glauberman_replacement` | GroupTheory/GlaubermanReplacement.lean:540 | ❌ 未登録 | 高 | ZJ の前提 (G Ch.8 §2 Thm 2.7)。Hall–Witt 恒等式 (:210) も副産物 |
+| **Glauberman ZJ 定理** (Z(J) 正規) | `Subgroup.oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian` (core 形 `Subgroup.zCenter_thompsonJAbelian_normal`:781) | GroupTheory/GlaubermanZJ.lean:888 | ✅ 登録済 (2026-07-22) | **伝説級** | ⚠ **前 note が「repo に存在しない」と reject した項目が完成**。Gorenstein Thm 2.10/2.11。bespoke = `thompsonJAbelian`/`IsPStableOp`/`opCore`/`oPiCore` |
+| Glauberman Replacement 定理 | `Subgroup.glauberman_replacement` | GroupTheory/GlaubermanReplacement.lean:540 | ✅ 登録済 (2026-07-22) | 高 | ZJ の前提 (G Ch.8 §2 Thm 2.7)。Hall–Witt 恒等式 (:210) も副産物 |
 | **B.H.Neumann 位数 3 定理** (order-3 FPF 自己同型⇒class≤2) | `GroupTheory.lowerCentralSeries_two_eq_bot_of_fixedPointFree_orderOf_eq_three` | GroupTheory/FixedPointFreeOrderThree.lean:456 | ✅ :8350 | 高 | 純 mathlib 語彙・仮説 inline ∀・**bespoke ほぼ 0** = 最も出しやすい |
 | **一般 Hall–Petresco 公式** | `GroupTheory.HallPetresco.exists_hallPetresco` (2-gen 版 `BG.AppE.hallCollection`) | GroupTheory/HallPetresco.lean:407 | ✅ :10858 | 高 | class 制約なし・任意 G (Mann 証明)。**#16 (class≤3) を完全に超える** |
 | Hall 正則 p-群 (class<p ⇒ p 乗が部分群) | `GroupTheory.pow_mul_eq_one_of_class_lt` | GroupTheory/RegularPGroup.lean:195 | ✅ :10861 | 中 | 上の群論的帰結 (BG E.2) |
-| Galois–Burnside (可解 2-可移群極小正規部分群 elementary abelian regular) | `GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive` | GroupTheory/SolvableTwoTransitive.lean:65 | ❌ 未登録 | 中 | Huppert II Satz 3.2 (issue 9404) |
+| Galois–Burnside (可解 2-可移群極小正規部分群 elementary abelian regular) | `GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive` | GroupTheory/SolvableTwoTransitive.lean:65 | ✅ 登録済 (2026-07-22) | 中 | Huppert II Satz 3.2 (issue 9404) |
 
 **新着の推し**: ZJ (伝説級・要登録) → 提案本命 / B.H.Neumann 位数 3 (登録済・bespoke≈0) → 最も出しやすい /
 一般 Hall–Petresco → #16 を差し替える。
@@ -170,7 +170,7 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 
 | 定理 | Lean 名 | file:line | AxiomsCheck | 備考 |
 |---|---|---|---|---|
-| Fitting F(G) 冪零性・最大性 (1.28) | `Isaacs.Ch01.fitting.isNilpotent`/`nilpotent_normal_le_fitting` | Ch01_Sylow/Basic.lean:1108/963 | 実測 (Ch01 未登録) | 焼き込み 2 行・実質 strong 寄り |
+| Fitting F(G) 冪零性・最大性 (1.28) | `Isaacs.Ch01.fitting.isNilpotent`/`nilpotent_normal_le_fitting` | Ch01_Sylow/Basic.lean:1108/963 | ✅ 登録済 (2026-07-22) | 焼き込み 2 行・実質 strong 寄り |
 | Wielandt 自己同型塔定理 (9.10) | `Isaacs.Ch09.exists_card_autTowerType_le` | Ch09/AutTower.lean:364 | :1191 | universe 跨ぎ・正答率≈0 想定 |
 | Thompson 正規 p-補群 (7.1) | `Isaacs.Ch07.thompson_normal_p_complement_of_local_hypotheses` | Ch07/S7C_…Final.lean:35 | :1630 | bespoke 5・実質 strong 寄り |
 | Glauberman normal-J (7.6 完全形) | `Isaacs.Ch07.normal_J` | Ch07/S7B2_NormalJ_PComplement.lean:1425 | :1569 | bespoke 9。docstring「local axiom 残」は stale |
@@ -320,12 +320,15 @@ per_page 付き 2 ページで (1 回の要約 fetch は後半を捏造する事
 
 ## §8. 次アクション (issue 0050 tracker が正)
 
-1. 🆕 ZJ 定理を AxiomsCheck 登録 → 提案 PR 最有力。
-2. Tier A 提案 PR: Jordan / Chermak–Delgado / Furtwängler / Thompson-FPF + 🆕 B.H.Neumann 位数 3
-   (登録済) + 一般 Hall–Petresco (#16 差替)。提案先 merge、solver は他者開放 (feit_thompson 前例)。
-3. 🎯 9318 完走 → `brauer_suzuki` 解答 (Tier B 唯一の未解決落とし)。lane c 継続。
-4. AxiomsCheck 未登録の ready-now を登録 (ZJ/Replacement/Galois–Burnside/Jordan/PSL 単純性/
-   `isCritical_exists`/`transfer_transfer`/Ch01 Fitting/`span_range_representation_eq_top`)。
+1. ✅ **(2026-07-22 完了) AxiomsCheck 未登録の ready-now 10 件を登録** — ZJ / Replacement /
+   Galois–Burnside / Jordan / PSL 単純性 / `isCritical_exists` / `transfer_transfer` /
+   Ch01 Fitting 冪零性・最大性 / `span_range_representation_eq_top`。全件 `lake build
+   OddOrder.AxiomsCheck` で `depends on 3 axiom(s), all in allowlist` を確認。提出前の手動
+   `#print axioms` が不要になった。
+2. 🆕 ZJ 定理を提案 PR に (登録済ゆえ最有力)。
+3. Tier A 提案 PR: Jordan / Chermak–Delgado / Furtwängler / Thompson-FPF + 🆕 B.H.Neumann 位数 3
+   + 一般 Hall–Petresco (#16 差替)。提案先 merge、solver は他者開放 (feit_thompson 前例)。
+4. 🎯 9318 完走 → `brauer_suzuki` 解答 (Tier B 唯一の未解決落とし)。lane c 継続。
 5. stale docstring 掃除 (`burnside_p_pow_q_pow` の「local axiom 封じ込め」、`Ch07.normal_J` の
    「Remaining local axioms」、`AppC_NormSet` の「to be formalized」、`brauer_permutation_lemma'`
    の「Isaacs Thm 6.32」誤引用ほか) — 提出物に写すと誤解を招く。
