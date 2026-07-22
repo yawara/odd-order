@@ -511,6 +511,52 @@ theorem leKer_Qder_of_apply_one_eq_d [Finite G] [Invertible (Nat.card G : ℂ)]
     rw [← Subgroup.mem_map_iff_mem hinj, hmapcomm]; exact hy
   rw [hφirr.apply_eq_one_of_mem_commutator_of_apply_one_eq_one hφ1 hymem, hφ1]
 
+open scoped Classical in
+/-- **(4) anchor data** (Peterfalvi (4), p. 147): the complete anchor package feeding
+`xset_qder_union_coherent`.  There is an anchor `χ₁ ∈ 𝒳 = XsetOf ⊥ Z` and an integer `a ≥ 2` with
+`χ₁(1) = a·d` and, for every `χ ∈ 𝒳`, a supported difference `χ − b·χ₁` (`b > 0`).
+
+`χ₁` is the minimal-`p`-power-degree `𝒳₁`-anchor (`exists_min_anchor_dvd`), so `χ₁(1) = d·p^{k₁}`
+(`exists_apply_one_eq_d_mul_pow`) and `χ₁(1) ∣ χ(1)`.  The ratio `a = p^{k₁} ≥ 2` because `a = 1`
+would give `χ₁(1) = d`, forcing `χ₁ ∈ 𝒮(Q')` (`leKer_Qder_of_apply_one_eq_d`) and hence
+`LeKer χ₁ Z` (`Z ≤ Q'`), contradicting `Z ⊄ Ker χ₁`.  The supported differences follow from the
+divisibility and `scaled_diff_support_subset_A_of_mem_Sset`. -/
+theorem exists_anchor_data [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+    [Invertible (Nat.card ↥hyp.H : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    {p : ℕ} (hp : p.Prime) (hQ1p : IsPGroup p ↥hyp.Q1)
+    {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) (hZne : Z ≠ ⊥) (hZQder : Z ≤ hyp.Qder)
+    (hZH : ∀ ⦃h : G⦄, h ∈ hyp.H → ∀ ⦃x : G⦄, x ∈ Z → h * x * h⁻¹ ∈ Z)
+    [(hyp.Sder.subgroupOf hyp.H).Normal]
+    [((hyp.Sder.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal] :
+    ∃ (χ₁ : ClassFunction ↥hyp.H ℂ) (a : ℕ), χ₁ ∈ hyp.XsetOf ⊥ Z ∧ 2 ≤ a ∧
+      χ₁ 1 = (a : ℂ) * (hyp.d : ℂ) ∧
+      ∀ χ ∈ hyp.XsetOf ⊥ Z, ∃ b : ℕ, 0 < b ∧
+        χ - b • χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) (hyp.XsetOf ⊥ Z) hyp.A := by
+  obtain ⟨χ₁, hχ₁X1, hdvd⟩ := hyp.exists_min_anchor_dvd hp hQ1p hZQ1 hZne hZH
+  obtain ⟨k₁, hk₁⟩ :=
+    hyp.exists_apply_one_eq_d_mul_pow hp hQ1p (hyp.XsetOf_subset_SsetOf _ _ hχ₁X1)
+  have hχ₁X : χ₁ ∈ hyp.XsetOf ⊥ Z :=
+    ⟨⟨hχ₁X1.1.1, fun x hx => by
+      rw [Subgroup.mem_bot] at hx; rw [show x = 1 from Subtype.ext hx]⟩, hχ₁X1.2⟩
+  refine ⟨χ₁, p ^ k₁, hχ₁X, ?_, ?_, ?_⟩
+  · -- `2 ≤ p^{k₁}` from non-linearity
+    have hane1 : p ^ k₁ ≠ 1 := by
+      intro hpk1
+      refine hχ₁X1.2 (fun x hx => ?_)
+      have hχ₁d : χ₁ (1 : ↥hyp.H) = (hyp.d : ℂ) := by rw [hk₁, hpk1]; push_cast; ring
+      exact hyp.leKer_Qder_of_apply_one_eq_d (SsetOf_subset hyp hyp.Sder hχ₁X1.1) hχ₁d x (hZQder hx)
+    have hapos : 1 ≤ p ^ k₁ := Nat.one_le_iff_ne_zero.mpr (pow_ne_zero _ hp.pos.ne')
+    omega
+  · rw [hk₁]; push_cast; ring
+  · intro χ hχ
+    obtain ⟨b, hbpos, hbdeg⟩ := hdvd χ hχ
+    refine ⟨b, hbpos, Submodule.sub_mem _ (Submodule.subset_span hχ)
+      (nsmul_mem (Submodule.subset_span hχ₁X) b), ?_⟩
+    have hsupp := hyp.scaled_diff_support_subset_A_of_mem_Sset
+      (hyp.XsetOf_subset_Sset ⊥ Z hχ) (hyp.XsetOf_subset_Sset ⊥ Z hχ₁X) (n := 1) (m := b)
+      (by rw [Nat.cast_one, one_mul]; exact hbdeg)
+    simpa using hsupp
+
 /-- **(8) full assembly: `a ∣ λ`** (Peterfalvi (8), p. 150).  The keystone divisibility closing
 step (6): from the endgame `(4)` data — the coherent `𝒳 = XsetOf ⊥ Z` with anchor `χ₁` of degree
 `χ₁(1) = a·d`, `p`-power degree differences `χ − b·χ₁` supported, the `𝒴`-witness `e' = ε·ξ`
