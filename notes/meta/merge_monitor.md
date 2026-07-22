@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 00:0x 監視 tick**。a=0 / b=0 / c=1。合流: c (**O_{2'}(G) ≠ 1 の初等核** — App C Prop1 prerequisite given BS, NearFields.lean +36)。
+> ⚠ **9406 fix(A) はまだ未適用**: c の +1 は qEquiv_conj を触らない独立な transport prerequisite (単独 merge 安全と確認)。c は先に他部品を進行中。9406 coordination (c 構造 + b consumer) は両者 ready 後に同一 tick で land 予定。
+> **gate: フルビルド green 4645 jobs (不変) / AxiomsCheck OK (3754・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 / lint 216 ≤ 216 / push 3414a7fd7→e084548b7**。範囲逸脱なし。
+> a/b は 0 ahead (a=§1B 演習, b=step10 後 + 9406 consumer 更新待ち — 未 sync)。**513185** idle 継続。
+>
 > **▶▶ 2026-07-22 23:3x 監視 tick + 🔧 9406 hub 裁定 (AffineNearFieldModel signature)**。a=3 / b=1 / c=2。
 > 合流: a (**🎉 Isaacs §1A 完了 全8問**, 1A.7 Burnside — Fintype の壁突破) / b (**2053 step (10) arithmetic core (|Q|+1)_p=p^{m+1}**, StepTen 新 leaf・配線済) / c (near-field transport glue: Q conj on Additive F + issue 9406)。
 > **gate: フルビルド green 4645 jobs (前 4644 +1 StepTen, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 / lint 216 ≤ 216 / push 001eb7997→149a5173d**。範囲逸脱なし。
