@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 03:3x 監視 tick — a (1D.2/1D.7/13/14) + b (Higman L12) 合流 / 📏 Problems.lean 1615 flag**。a=4 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problems 1D.2** p は centralizer 条件下で |H|・|G:H| を同時に割れない + **1D.7/1D.13/1D.14** Frattini non-generators・central nilpotency、`Problems.lean` +180) / b (**Higman Lemma 12** 可換因子の B/C 分類 + factor data 保持、`Assembly.lean`/`LengthTwoModels.lean` 拡張・新 leaf 0)。
+> **gate: green 4656 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push a3c455432→793240f05**。範囲逸脱なし。
+> 📏 **file-size flag (owner=a)**: `Problems.lean` が **1615 行** で 1500 超過 → issue 0124 watch に追加。**flag 段階のみ (2000 未満ゆえ即時分割不要)**、a の active frontier ゆえ hub は race せず。申し送り = a は次の § クラスタを `Ch01_Sylow/Problems/SectionX.lean` の新 leaf に切り `Problems.lean` を re-export hub 化 (2000 接近 or 次 § 境界で)。hub は 2000 到達まで watch、a 不動なら凍結 §1A–1C を backstop prefix-split。
+> ℹ **b worktree に未追跡 `Scratch.lean` (無害・未 stage)**。c=BG remainder 継続 (0 ahead)。d=wave 間。全 escalation 対象外。
+>
 > **▶▶ 2026-07-23 03:2x 監視 tick — a (1D.6) + b (Higman L12/L13) 合流**。a=3 / b=2 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problem 1D.6** — nilpotent group で maximal ⟺ prime index、`Problems.lean` +55) / b (**Higman Lemma 12 前像補完 + Lemma 13 指数4因子の Frattini 同定**、`ExponentFourFactors.lean` +85 / `HigmanLemmaTwelve/QuotientTwoStep.lean` +114、既存 leaf 拡張ゆえ新 leaf 0)。
 > **gate: green 4656 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 6b539c31e→0a71c2c98**。範囲逸脱なし。
