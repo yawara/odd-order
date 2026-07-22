@@ -139,3 +139,18 @@ Setup: `x` = S の指数 2 巡回部分群の生成元、`X = ⟨x⟩`, `T = ⟨
     A 非空 (RH ⊊ C)。C/H 商での位数論法 (mk x の位数 = 2ⁿ、z∉H) or 積位数 |RH|=|R||H|<|C| が必要。
 - 次 = **Lem 1.4** の指標構成 (ψ: C の線形指標 RH ⊆ ker、ψ̃ = ψ↑N 既約 deg 2、
   θ = 1_C↑N − ψ̃ norm 3)。TI 集合 A + 等長 lemma は形式化済。
+
+### Lem 1.4 計画 (2026-07-22 lane c、⚠ 下記 infra は grep 発見のみ・API 未精査)
+
+Gorenstein Lem 1.4: `θ = 1_C↑N − ψ̃` について (i) `(θ,θ)_N = 3` (ii) `deg θ = 0`、
+`N − A` 上で `θ = 0`。使えそうな既存 repo infra (要 API 精査):
+- **`RepresentationTheory/LinearCharacter.lean`** — 線形指標 (ψ: C→ℂ の構成、値 i on x)
+- **`RepresentationTheory/InflationCharacter.lean`** — RH ⊆ ker の inflation 構成
+- **`RepresentationTheory/Clifford.lean` / `CliffordCorrespondence.lean`** — ψ↑N の既約性
+  (C は N 内 index 2、ψ が N-不変でない ⟹ 誘導既約; Clifford/Mackey)
+- **`RepresentationTheory/InducedCharacter.lean`** — `induce`/`induce_add`/`induce_smul`/
+  `induce_apply_one`、内積、**`inner_induce_eq_of_isTISubset` (TI 等長 ← `A_isTISubset` が feed)**
+- **`Peterfalvi/S05_NormThree.lean`** — norm-3 パターン ((θ,θ)=3、Lem 1.5 の θ* 分解へ)
+- Tc = `1_C↑N` = N/C (index 2) の正則表現指標 = 1_N + (N/C の非自明線形指標)
+証明順: ψ 構成 (LinearChar, x↦i, RH⊆ker) → ψ̃=ψ↑N 既約 deg 2 (Clifford) →
+θ 定義・deg 0 → (θ,θ)_N=3 (Thm 4.2.4(i) = 内積計算) → N−A 上 θ=0 (Thm 4.4.3(ii))。
