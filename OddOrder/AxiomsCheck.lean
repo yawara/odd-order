@@ -13,6 +13,7 @@ import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
 import OddOrder.GroupTheory.BrauerSuzukiInvolutions
+import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Mathlib.QuotientGroup
@@ -12330,3 +12331,17 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.GroupTheory.QuaternionSylowSetup.isConj_of_orderOf_eq_two
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.isConj_z_iff_orderOf_eq_two
+
+/-! **Brauer–Suzuki, Gorenstein Ch.12 Lemma 1.8 (counting side, in progress)**
+(`GroupTheory.BrauerSuzukiCounting`, issue 9318, 2026-07-22).
+
+* `mk_eq_involutionClass_iff` — `mk u = K ↔ orderOf u = 2` (the involutions are the single
+  class `K = mk z`).
+* `classSumCoeff_involutionClass_eq_zero_of_even` — **`classSumCoeff K K Cs = 0` for even-order
+  `Cs`**: no involution pair multiplies to an even-order element
+  (`odd_orderOf_mul_of_involution`).  This is the `β(y) = 0` half feeding `(9.4.2)` in
+  Lemma 1.8. -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.mk_eq_involutionClass_iff
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.classSumCoeff_involutionClass_eq_zero_of_even
