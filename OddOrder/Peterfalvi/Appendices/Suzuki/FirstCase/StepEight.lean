@@ -309,6 +309,70 @@ theorem st_mem_and_cQ_isPGroup_of_mem_centralizer_W
   · exact Or.inr h
   · exact Or.inl h
 
+/-- **The projection `C_Q(P) ≅ Q̄`** (step (8), reconstructing step (5)'s `ι`
+without `qEquiv`): `mk' N` restricts to a group isomorphism from
+`M₀ = Q ⊓ C_G(P)` onto the model's `Q̄`, whose value on `m` is `[m]`.
+
+Injective because its kernel meets `Q ⊓ D = 1`; bijective because `|M₀| = |Q̄|`
+(both equal `|F^*|`, via step (5)'s `C_Q(P) ≅ F^*` and `qEquiv`). -/
+theorem exists_qbarEquiv {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ∃ e : ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) ≃*
+        ↥fc.rankOneQuotient.Q,
+      ∀ m : ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)),
+        ((e m : ↥fc.rankOneQuotient.Q) :
+          ↥(Subgroup.centralizer (fc.P : Set G)) ⧸
+            (fc.toHypothesis.H.subgroupOf
+              (Subgroup.centralizer (fc.P : Set G))).normalCore) =
+          QuotientGroup.mk' _ ⟨(m : G), m.2.2⟩ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hNdef
+  set M₀ : Subgroup G := fc.toHypothesis.Q ⊓ L with hM₀def
+  have hM₀L : M₀ ≤ L := inf_le_right
+  have hQbar : fc.rankOneQuotient.Q =
+      (fc.toHypothesis.Q.subgroupOf L).map (QuotientGroup.mk' N) := rfl
+  have hmemQ : ∀ m : ↥M₀,
+      ((QuotientGroup.mk' N).comp (Subgroup.inclusion hM₀L)) m ∈
+        fc.rankOneQuotient.Q := by
+    intro m
+    rw [hQbar]
+    exact Subgroup.mem_map_of_mem _ (Subgroup.mem_subgroupOf.mpr m.2.1)
+  set piQ : ↥M₀ →* ↥fc.rankOneQuotient.Q :=
+    ((QuotientGroup.mk' N).comp (Subgroup.inclusion hM₀L)).codRestrict
+      fc.rankOneQuotient.Q hmemQ with hpiQdef
+  -- injective: kernel meets `Q ⊓ D = 1`
+  have hpiQinj : Function.Injective piQ := by
+    intro a b hab
+    have h1 : ((QuotientGroup.mk' N).comp (Subgroup.inclusion hM₀L))
+        (a * b⁻¹) = 1 := by
+      have h1' : piQ (a * b⁻¹) = 1 := by rw [map_mul, map_inv, hab, mul_inv_cancel]
+      exact congrArg Subtype.val h1'
+    have h4 : Subgroup.inclusion hM₀L (a * b⁻¹) ∈ N := by
+      rw [← QuotientGroup.ker_mk' N, MonoidHom.mem_ker]; exact h1
+    have h5 : Subgroup.inclusion hM₀L (a * b⁻¹) ∈ fc.toHypothesis.D.subgroupOf L := by
+      have hND : N ≤ fc.toHypothesis.D.subgroupOf L := by
+        rw [hNdef, fc.toHypothesis.normalCore_cH_eq_centralizer_cQ fc.P_le_V]
+        exact inf_le_left
+      exact hND h4
+    have h6 : ((a * b⁻¹ : ↥M₀) : G) ∈ fc.toHypothesis.Q ⊓ fc.toHypothesis.D :=
+      ⟨(a * b⁻¹).2.1, Subgroup.mem_subgroupOf.mp h5⟩
+    rw [fc.toHypothesis.Q_inf_D_eq_bot, Subgroup.mem_bot] at h6
+    exact mul_inv_eq_one.mp (Subtype.ext h6)
+  -- `|M₀| = |Q̄|` (both `= |F^*|`)
+  have hcard : Nat.card ↥M₀ = Nat.card ↥fc.rankOneQuotient.Q := by
+    obtain ⟨e5⟩ := fc.centralizer_inf_mulEquiv_units model
+    rw [Nat.card_congr e5.toEquiv, Nat.card_congr model.qEquiv.toEquiv]
+  haveI : Finite ↥M₀ := inferInstance
+  have hpiQbij : Function.Bijective piQ :=
+    (Nat.bijective_iff_injective_and_card piQ).mpr ⟨hpiQinj, hcard⟩
+  refine ⟨MulEquiv.ofBijective piQ hpiQbij, ?_⟩
+  intro m
+  rfl
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
