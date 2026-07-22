@@ -431,7 +431,7 @@ theorem one_tmul_ne_zero_of_ne_zero
     (fun i => (e w) ^ (2 ^ i.val)) hsum
   have hpos : 0 < Module.finrank (ZMod 2) F := Module.finrank_pos
   have hi := hcoeff ⟨0, hpos⟩
-  simp only [Fin.val_mk, pow_zero, pow_one] at hi
+  simp only [pow_zero, pow_one] at hi
   exact hw (e.injective (by rw [hi, map_zero]))
 
 /-- The base-changed ambient bracket is nonzero on `1 ⊗ a`, `1 ⊗ b` whenever
@@ -623,6 +623,7 @@ theorem exists_factorFamily [Finite P]
 end EigenFamily
 
 set_option maxHeartbeats 800000 in
+-- 混合重み方程式の証明は共通 Singer datum 上の重い代数展開を要し既定 heartbeat を超えるため引き上げる
 /-- **Higman Lemma 12 (p. 90), the mixed weight equation.**
 
 Over the common ambient Singer datum on `Φ(P)`, the actual complementary

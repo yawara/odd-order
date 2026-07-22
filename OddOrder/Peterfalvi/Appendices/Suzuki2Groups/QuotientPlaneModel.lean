@@ -103,8 +103,7 @@ theorem exists_planeCoordinates_of_isomorphicSplit
   have hmemΦ : ∀ (M : Submodule (ZMod 2) (Additive ↥Xbar)) (x : ↥Xbar),
       x ∈ Φ M ↔ Additive.ofMul x ∈ M := by
     intro M x
-    simp only [Φ, OrderIso.trans_apply, AddSubgroup.mem_toSubgroup',
-      AddSubgroup.mem_toZModSubmodule]
+    simp only [Φ, OrderIso.trans_apply, AddSubgroup.mem_toSubgroup']
     rfl
   -- irreducibility of the linearized summand
   have hirr : Representation.IsIrreducible rhoX := by
