@@ -6,6 +6,14 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **🎉 2026-07-22 21:5x 監視 tick (Opus 4.8 hub 638898, cron `7,22,37,52` id 3ee45bda) — Brauer–Suzuki 定理完成 (c) + c 9405 frontier 裁定**。
+> **① 合流**: a (**Isaacs Ch.1 Problems 1A.4 (H·K=G⟹H·Kᶻ=G) + 1A.10 (p∣[G:H]⟹p∣[N_G(H):H])**、Problems.lean +70) /
+> c (**🎉 issue 9318 Brauer–Suzuki 定理完成** — `brauerSuzuki_of_quaternionSylow`: G=O_{2'}(G)·C_G(z)、cyclic + 一般化四元数 |S|≥16、axiom-clean + AxiomsCheck 登録)。新 leaf 0・範囲逸脱なし。
+> **② gate: フルビルド green 4641 jobs / AxiomsCheck OK (3744 checks・`brauerSuzuki_of_quaternionSylow` 3 axiom all-in-allowlist・新 axiom 0) / 実 sorry 7→7 非退行** (NearFields:786 は BS |S|≥16 だけでは未閉 — 残 transport + Q₈ BS、regression でない) **/ lint ratchet 215→216 (NearFields longLine を grandfather; owner=c flag: longLine + BrauerSuzuki.lean copyright ヘッダ欠落) / push a438d3065→(baseline+tick)**。
+> **③ c 9405 frontier 裁定 (hub 自律)**: BS |S|≥16 完成で **c territory 完済** (BG/** sorry-clean・Huppert/SemilinearField clean・formalized_specialized 0)。c 領域の残 = NearFields Prop1 (`rankOne_affine_nearField`) だが **Q₈ BS (|S|=8) に gated = research gap** (Gorenstein「all known proofs require modular character theory」、repo に基盤なし)。⟹ **Q₈ BS は低優先繰延** (恒久除外でなく別 gap issue で追跡)。**c の次 frontier = Isaacs Problems campaign 1055 の Ch.6–10 へ cross-assign** (1055 は大規模ゆえ a=Ch.1–5 と分担、ChNN/Problems.lean はファイル分離で非衝突; c_re に carve 追加済)。⚠ c の 9405 の「NearFields ownership=a」は stale (513185 の 19bf817c0 で c へ移管済)。9318 は |S|≥16 完成・Q₈ residual を保持 (完全 close でない)。
+> **④ 二重 hub**: 513185 は依然 ALIVE・idle 継続 (inert・非干渉)。
+> frontier: a = 1055 Isaacs Problems **Ch.1–5** / b = 2053 step (9) 完了 → step (10)/Theorem B 組立 / c = 1055 Isaacs Problems **Ch.6–10** (BS 完成後の新 assignment)。
+>
 > **📌 2026-07-22 21:4x 監視 tick (Opus 4.8 hub 638898, cron `7,22,37,52` id 3ee45bda) — scope 拡大 (Isaacs 演習問題 in-scope 化) + step (9)**。
 > **① scope 拡大 (ユーザー裁定 9205 ③)**: lane a の territory 完済 → hub が再配分を escalation → **ユーザーが (E) Isaacs 演習問題 (Problems) の in-scope 化を裁定** (本 hub session 外の別チャネル経由)。
 > lane a の新 frontier = **campaign 1055 (Isaacs Problems, 全 10 章・数百問、番号付き結果と同強度で形式化)**。従来の被覆測定 (`frontier_measured_2026_07_19.md`) は「番号付き結果のみ」で演習対象外だった ⟹ 演習も対象に追加。issue 9205 は closed 化。
@@ -202,7 +210,7 @@
 > ```
 > a_re='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S|^OddOrder/Peterfalvi/Appendices/FeitSibley'   # 2026-07-19 9154 + 2026-07-22 9205 裁定: FeitSibley (a 完済 axiom-clean) を a 明示 carve-out
 > b_re='^OddOrder/Higman/|^OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/|^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'   # 2026-07-19 夕 ユーザー裁定 (issue 0127 ③): Higman 原典 = 4 冊目として OddOrder/Higman/ を新設、b 所有
-> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|ExceptionalNearField)'   # 2026-07-22 9205 裁定: FeitSibley 除去 (a 完済→a carve-out へ)。near-field クラスタ (NearFields Prop 1 は c の 9318 BS で discharge) + ExceptionalNearField/SemilinearField/Huppert は c
+> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|ExceptionalNearField)|^OddOrder/Isaacs/Ch(0[6-9]|10)_[^/]*/Problems'   # 2026-07-22 9205 裁定: FeitSibley 除去 (a 完済→a carve-out へ)。near-field クラスタ (NearFields Prop 1 は c の 9318 BS で discharge) + ExceptionalNearField/SemilinearField/Huppert は c。⊕ 2026-07-22 9405 裁定: BS |S|≥16 完成で c territory 完済 (Q₈ BS は research gap 繰延) → Isaacs Problems campaign 1055 の Ch.6–10 を c へ cross-assign (a=Ch.1–5、ChNN/Problems.lean はファイル分離で非衝突)
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
 > ```
 > **▶ 2026-07-19 11:29 lane a 復帰 → 暫定裁定 9158 失効、9154 の恒久配分へ復帰**。
