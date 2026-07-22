@@ -213,6 +213,73 @@ theorem restrict_inner_keystone [Finite G] [Fintype G]
     OddOrder.RepresentationTheory.inner_smul_right, star_natCast] at hks
   linear_combination hks
 
+open scoped Classical in
+/-- **(8) composition + evaluation** (Peterfalvi (8), p. 150).  Combining the Fourier split
+(`apply_sub_apply_eq_sum_XsetOf_bot`), the `𝒳`-coefficient relation
+(`restrict_extension_inner_eq_nsmul`) and the two regular-character evaluations
+(`sum_degree_mul_charValue_XsetOf_bot`, `sum_degreeSq_XsetOf_bot`) gives, for the `𝒴`-witness
+`e'` (with cross-orthogonality `⟨E φ, e'⟩ = 0` on `𝒳`) and `z ∈ Z^#`,
+`χ₁(1)·(e'(z) − e'(1)) = −|H|·⟨Res_H e', χ₁⟩`.
+
+Set `θ = Res_H e' ∈ ℤ[Irr H]` (`restrict_mem_ZIrr`) and `c₀ = ⟨θ, χ₁⟩`.  The split gives
+`θ(z) − θ(1) = ∑_{χ ∈ 𝒳} ⟨θ, χ⟩·(χ(z) − χ(1))`.  Each `χ ∈ 𝒳` has a supported difference
+`χ − b·χ₁` (P1-X data), so `⟨θ, χ⟩ = b·c₀` and — since the difference vanishes at `1` (support
+`⊆ A`, `1 ∉ A`) — `χ(1) = b·χ₁(1)`; hence `χ₁(1)·⟨θ, χ⟩ = c₀·χ(1)`.  Multiplying the split by
+`χ₁(1)` and evaluating `∑ χ(1)·χ(z) = −|H ⧸ Z|` and `∑ χ(1)² = |H| − |H ⧸ Z|` collapses the sum
+to `−|H|·c₀`.  This is the `(8)` value feeding the central-character congruence: dividing by
+`χ₁(1) = a·d` and `|H| = d·|Q|` yields `e'(z) − e'(1) = −|Q|·(λ/a + μ)`. -/
+theorem restrict_apply_sub_eq_neg_card_mul_inner [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) [(Z.subgroupOf hyp.H).Normal]
+    {T : Finset (ClassFunction ↥hyp.H ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.XsetOf ⊥ Z)
+    (hcohX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.XsetOf ⊥ Z) hyp.A)
+    {χ₁ : ClassFunction ↥hyp.H ℂ} (hχ₁ : χ₁ ∈ hyp.XsetOf ⊥ Z)
+    {e' : ClassFunction G ℂ} (he' : e' ∈ ZIrr G)
+    (hcross : ∀ φ ∈ hyp.XsetOf ⊥ Z, ClassFunction.inner (hcohX.extension φ) e' = 0)
+    (hXdiff : ∀ χ ∈ hyp.XsetOf ⊥ Z, ∃ b : ℕ,
+      χ - b • χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) (hyp.XsetOf ⊥ Z) hyp.A)
+    {z : ↥hyp.H} (hz : (z : G) ∈ Z) (hz1 : z ≠ 1) :
+    χ₁ 1 * (e' (z : G) - e' 1)
+      = -(Nat.card ↥hyp.H : ℂ) * ClassFunction.inner (ClassFunction.restrict hyp.H e') χ₁ := by
+  classical
+  have hθZIrr : ClassFunction.restrict hyp.H e' ∈ ZIrr ↥hyp.H :=
+    ClassFunction.restrict_mem_ZIrr hyp.H he'
+  -- piece 1: Fourier split of `θ(z) − θ(1)` over `𝒳`
+  have hsplit := hyp.apply_sub_apply_eq_sum_XsetOf_bot hZQ1 hT hθZIrr hz
+  -- multiply the split by `χ₁(1)`, rewriting each coefficient `χ₁(1)·⟨θ, χ⟩ = c₀·χ(1)`
+  have hkey : χ₁ 1 * (ClassFunction.restrict hyp.H e' z - ClassFunction.restrict hyp.H e' 1)
+      = ∑ χ ∈ T, (ClassFunction.inner (ClassFunction.restrict hyp.H e') χ₁ * (χ 1 * χ z)
+          - ClassFunction.inner (ClassFunction.restrict hyp.H e') χ₁ * (χ 1) ^ 2) := by
+    rw [hsplit, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun χ hχ => ?_
+    obtain ⟨b, hsupp⟩ := hXdiff χ ((hT χ).mp hχ)
+    -- coefficient: `⟨θ, χ⟩ = b·c₀`
+    have hinner : ClassFunction.inner (ClassFunction.restrict hyp.H e') χ
+        = (b : ℂ) * ClassFunction.inner (ClassFunction.restrict hyp.H e') χ₁ :=
+      hyp.restrict_extension_inner_eq_nsmul hcohX hcross hsupp ((hT χ).mp hχ) hχ₁
+    -- degree: `χ(1) = b·χ₁(1)` from `(χ − b·χ₁)(1) = 0` (support `⊆ A`, `1 ∉ A`)
+    have hbdeg : χ 1 = (b : ℂ) * χ₁ 1 := by
+      have hval0 : (χ - b • χ₁) 1 = 0 := by
+        by_contra h
+        exact hyp.one_notMem_A
+          (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hsupp
+            (ClassFunction.mem_support.mpr h))
+      have happ : (χ - b • χ₁) 1 = χ 1 - (b : ℂ) * χ₁ 1 := by
+        rw [ClassFunction.sub_apply, ← Nat.cast_smul_eq_nsmul ℂ b χ₁, ClassFunction.smul_apply]
+      rw [happ] at hval0
+      exact eq_of_sub_eq_zero hval0
+    rw [hinner, hbdeg]; ring
+  -- evaluate the two regular-character sums over `𝒳`
+  have hsum1 := hyp.sum_degree_mul_charValue_XsetOf_bot hZQ1 hT
+    (Subgroup.mem_subgroupOf.mpr hz) hz1
+  have hsum2 := hyp.sum_degreeSq_XsetOf_bot hZQ1 hT
+  have hval : χ₁ 1 * (ClassFunction.restrict hyp.H e' z - ClassFunction.restrict hyp.H e' 1)
+      = -(Nat.card ↥hyp.H : ℂ)
+          * ClassFunction.inner (ClassFunction.restrict hyp.H e') χ₁ := by
+    rw [hkey, Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum, hsum1, hsum2]
+    ring
+  simpa only [ClassFunction.restrict_apply, OneMemClass.coe_one] using hval
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
