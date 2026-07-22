@@ -415,7 +415,7 @@ theorem restricted_range_hasXiLengthThree_of_frattini_cover_exponent_four
   have hErank := rank_le_two E
   omega
 
-/-- **Higman Lemma 13 (p. 93), exponent-four lifted factors.**
+/-- **Higman Lemma 13 (p. 92), exponent-four lifted factors.**
 
 The two complementary Frattini preimages both have restricted `ξ`-length
 three.  Their intersection is `Φ(P)` and together they generate `P`. -/
