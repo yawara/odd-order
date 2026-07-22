@@ -12454,17 +12454,33 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.lem_1_9
 
-/-! **Brauer–Suzuki, Gorenstein Ch.12 endgame (in progress)**
+/-! **Brauer–Suzuki, Gorenstein Ch.12 endgame — COMPLETE (|S| ≥ 16)**
 (`GroupTheory.BrauerSuzukiEndgame`, issue 9318, 2026-07-22).
 
 * `involutionClosure_normal` — **`M = ⟨involutions⟩ ⊴ G`** (the involution set is
   conjugation-invariant).
 * `smSetup` — **`G₁ = SM` again carries a `QuaternionSylowSetup`** (Sylow `2`-subgroup `S`
-  transported via `Sylow.subtype`), letting `lem_1_9` apply to `SM` in the `Q`-cyclic step. -/
+  transported via `Sylow.subtype`), letting `lem_1_9` apply to `SM` in the `Q`-cyclic step.
+* `not_isMulCommutative_SM_quotient_M` / `SinfM_isCyclic` — **`Q = S ∩ M` is cyclic**: were it
+  not, `S/Q` (hence `SM/M`) would be abelian, contradicting the non-linear `φ` on `SM`.
+* `exists_oddComplement_of_isCyclic_sylowTwo` / `image_M_isCyclic_and_isPGroup` — `M` is
+  2-nilpotent (Burnside), and its image in `Ḡ = G/O_{2'}(G)` is a **cyclic 2-group**.
+* `zbar_central` — the image `z̄` of the central involution is **central in `Ḡ`** (unique
+  involution of the normal cyclic image of `M`).
+* `brauerSuzuki_of_quaternionSylow` — **`G = O_{2'}(G)·C_G(z)`** (`oPiCore ⊔ centralizer {z} = ⊤`),
+  Gorenstein Theorem 1.1, via a Frattini argument on `N = ⟨z⟩·O_{2'}(G)`.  (The `Q₈` case
+  `|S| = 8` needs modular character theory and remains a separate gap.) -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.involutionClosure_normal
 #assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.smSetup
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.not_isMulCommutative_SM_quotient_M
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.SinfM_isCyclic
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_oddComplement_of_isCyclic_sylowTwo
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.image_M_isCyclic_and_isPGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.zbar_central
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.brauerSuzuki_of_quaternionSylow
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 
