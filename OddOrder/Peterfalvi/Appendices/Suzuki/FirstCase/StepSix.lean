@@ -283,4 +283,130 @@ theorem card_Q_eq_two_pow_of_Q1_eq_bot (h : hyp.Q1 = ⊥) :
 
 end Hypothesis
 
+namespace FirstCaseHypothesis
+
+universe uG uΩ
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (fc : FirstCaseHypothesis G Ω)
+
+/-- **The automorphism action `Σ = D → RingAut F`** (p. 110, field case): when
+the near-field `F` of the model is commutative — hence a field via
+`NearFields.fieldOfComm` — the model's `dAut` action of `D` by near-field
+automorphisms is a group homomorphism into `RingAut F`.
+
+`dAut g` is additive (`F ≃+ F`) and multiplicative (`dAut_mul`), so it is a ring
+automorphism; the homomorphism property `dAut (g h) = dAut g ∘ dAut h` comes
+from composing conjugations (`dAut_conj`) inside `G` and cancelling the
+injective embedding `emb`. -/
+noncomputable def dAutHom {F : Type uG} [NearFields.NearField F]
+    (hcomm : ∀ x y : F, x * y = y * x)
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    letI := NearFields.fieldOfComm hcomm
+    ↥fc.rankOneQuotient.D →* RingAut F :=
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  letI := NearFields.fieldOfComm hcomm
+  { toFun := fun g => { model.dAut g with map_mul' := model.dAut_mul g }
+    map_one' := by
+      ext x
+      have hconj := model.dAut_conj 1 x
+      rw [OneMemClass.coe_one, one_mul, inv_one, mul_one] at hconj
+      have : x = model.dAut 1 x :=
+        Multiplicative.ofAdd.injective (model.emb_injective hconj)
+      exact this.symm
+    map_mul' := fun g h => by
+      ext x
+      -- `dAut (g h) x = dAut g (dAut h x)` from composing conjugations
+      have hgh := model.dAut_conj (g * h) x
+      have hh := model.dAut_conj h x
+      have hg := model.dAut_conj g (model.dAut h x)
+      rw [MulMemClass.coe_mul] at hgh
+      have hkey : model.emb (Multiplicative.ofAdd (model.dAut (g * h) x)) =
+          model.emb (Multiplicative.ofAdd (model.dAut g (model.dAut h x))) := by
+        rw [← hgh, ← hg, ← hh]
+        group
+      exact Multiplicative.ofAdd.injective (model.emb_injective hkey) }
+
+/-- **Peterfalvi Part II, Ch. II, step (6), field case** (p. 110): assume
+`Q₁ = 1`.  If the near-field `F` of the model is commutative — hence a field —
+then `|F| ∈ {f, 9}` (where `f` is the characteristic) and `Σ = D = 1`.
+
+`Q₁ = 1` makes `Q` a `2`-group, so `|F^*| = |C_Q(P)|` is a power of `2` and
+`|F| = 2^b + 1`; `Q_even` (transported through `model.qEquiv`) gives `b ≥ 1`.
+The field-case abstract core
+(`card_eq_and_aut_trivial_of_field_units_two_pow`) then finishes, fed the
+automorphism homomorphism `dAutHom : D → RingAut F`.
+
+Sorry-free as a `∀`-model statement; a caller supplying the model through
+`exists_affineNearFieldModel` inherits the step (2)(b) `sorry` (issue 9318). -/
+theorem card_field_eq_and_D_eq_one_of_comm :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ∀ {F : Type uG} [NearFields.NearField F]
+      (model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
+      fc.toHypothesis.Q1 = ⊥ → (∀ x y : F, x * y = y * x) →
+      (Nat.card F = model.char ∨ Nat.card F = 9) ∧
+        Nat.card ↥fc.rankOneQuotient.D = 1 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  intro F instF model hQ1 hcomm
+  classical
+  letI : Field F := NearFields.fieldOfComm hcomm
+  haveI : Finite F := by
+    have hinj : Function.Injective
+        (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
+      fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
+    exact Finite.of_injective _ hinj
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- `|F^*| = |C_Q(P)|` is a power of `2` (from `Q₁ = 1`)
+  obtain ⟨e⟩ := fc.centralizer_inf_mulEquiv_units model
+  obtain ⟨n, hQn⟩ := fc.toHypothesis.card_Q_eq_two_pow_of_Q1_eq_bot hQ1
+  have hCQdvd : Nat.card ↥(fc.toHypothesis.Q ⊓
+      Subgroup.centralizer (fc.P : Set G)) ∣ 2 ^ n :=
+    hQn ▸ Subgroup.card_dvd_of_le inf_le_left
+  obtain ⟨m, -, hCQm⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp hCQdvd
+  have hFxcard : Nat.card Fˣ = 2 ^ m := (Nat.card_congr e.toEquiv).symm.trans hCQm
+  -- `|F| = 2^m + 1`
+  have hFcard : Nat.card F = 2 ^ m + 1 := by
+    have hu := Nat.card_units F
+    rw [hFxcard] at hu
+    have hpos : 1 ≤ Nat.card F := Nat.card_pos
+    omega
+  -- `b = m ≥ 1`: `|F^*|` is even (`Q_even` via `qEquiv`)
+  have hm : 1 ≤ m := by
+    have hFxeven : Even (Nat.card Fˣ) := by
+      rw [← Nat.card_congr model.qEquiv.toEquiv]
+      exact fc.rankOneQuotient.Q_even
+    rw [hFxcard] at hFxeven
+    rcases Nat.eq_zero_or_pos m with rfl | hpos
+    · simp at hFxeven
+    · exact hpos
+  -- `CharP F (model.char)`
+  haveI : CharP F model.char := by
+    have hchar0 : (model.char : F) = 0 := by
+      have h := model.char_spec 1
+      rwa [nsmul_eq_mul, mul_one] at h
+    have hrc : ringChar F = model.char := by
+      have hdvd : ringChar F ∣ model.char := ringChar.dvd hchar0
+      rcases (Nat.Prime.eq_one_or_self_of_dvd model.char_prime _ hdvd) with h1 | h
+      · exfalso
+        haveI : CharP F 1 := h1 ▸ ringChar.charP F
+        have h10 : (1 : F) = 0 := by
+          have hc := (CharP.cast_eq_zero_iff F 1 1).mpr (dvd_refl 1)
+          rwa [Nat.cast_one] at hc
+        exact one_ne_zero h10
+      · exact h
+    rw [← hrc]; exact ringChar.charP F
+  -- `dAutHom` is injective
+  have hφinj : Function.Injective (fc.dAutHom hcomm model) := by
+    intro g h hgh
+    apply model.dAut_injective
+    ext x
+    exact DFunLike.congr_fun hgh x
+  -- feed the abstract core
+  exact card_eq_and_aut_trivial_of_field_units_two_pow model.char_prime hm hFcard
+    fc.rankOneQuotient.D_odd (fc.dAutHom hcomm model) hφinj
+
+end FirstCaseHypothesis
+
 end OddOrder.Peterfalvi.Appendices.Suzuki

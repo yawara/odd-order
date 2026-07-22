@@ -12154,6 +12154,17 @@ field case supplies `|F^*| = 2^b` (from `Q₁ = 1`) and `Σ ↪ RingAut F` (from
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.card_eq_and_aut_trivial_of_field_units_two_pow
 
+/-! **Step (6), field case — COMPLETE** (`FirstCase/StepSix.lean`, issue 2053, 2026-07-22):
+assuming `Q₁ = 1`, if the model's near-field `F` is commutative (a field) then `|F| ∈ {f, 9}`
+and `Σ = D = 1`.  `dAutHom` realizes `D` as ring automorphisms (via `NearFields.fieldOfComm`),
+`Q₁ = 1` makes `|F^*| = |C_Q(P)|` a power of `2` with `|F| = 2^b + 1`, and the abstract core
+finishes.  Sorry-free as a `∀`-model statement (a caller supplying the model inherits the
+issue 9318 sorry). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.dAutHom
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_field_eq_and_D_eq_one_of_comm
+
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
 欠いていた).  Zassenhaus/Dickson 分類の App.C 特殊形: 有限 near-field `F` の乗法群が
