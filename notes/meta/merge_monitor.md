@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 08:0x 監視 tick — a (2A.7/2A.8 + 🆕Ch.3 3A.5) + b (Higman L13 固有weight ×3 leaf) 合流 / 🔴 c stall / d quiet**。a=4 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs 2A.7/2A.8** (S^G minimal normal + distinct simple subnormals commute) + **🆕 Ch.3 (Split Extensions) 開始 3A.5** G⋊G ≅ G×G (conjugation action)、新 leaf `Ch03_SplitExtensions/Problems.lean` +38 WIRED via `OddOrder.lean:184`) / b (**Higman Lemma 13** Φ²値交換子の固有weight + B/B bracket 対角span縮約、新 leaf `FrattiniSquareEigenweights.lean` +339 / `FrattiniMiddleDiagonalSupport.lean` +163 / `FrattiniTripleBaseChangeJacobi.lean`、3 枚とも WIRED)。
+> **gate: green 4679 jobs (前 4675 +4 leaf = a 1 + b 3, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push a8e0f8c6e→42f49b70f**。範囲逸脱なし。
+> ⚠ **orphan-check メモ**: b は 3-dot diff 時点では 2 新 leaf だったが、merge 直前に 3 枚目 `FrattiniTripleBaseChangeJacobi` を commit (loop 中)。hub は merge 後に 3 枚目の配線を追加検証 (HigmanLemmaThirteen:22) → jobs +4 で全 elaborate 確認。**lane が loop 中は merge 時点で新 leaf 数が diff 検査時と変わりうる — jobs 数 delta で最終確認する規律が機能**。
+> 🔴 **lane c stall 継続 (~5h, 未復帰)** / ℹ **lane d quiet (~5h20m, lint 専任ゆえ非 escalation)**: 両者 03:04 / 02:38 以降更新ゼロ。a/b の 2 レーンが活発ゆえ監視継続。
+>
 > **▶▶ 2026-07-23 07:5x 監視 tick — a (2A.2/2A.3b) + b (Higman L13 ambient 固有空間) 合流 / 🔴 c stall 継続 / ℹ d も 5h quiet (非 escalation)**。a=3 / b=1 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problems 2A.2** subnormal K + π-number index ⟹ O^π(G) ⊆ K + **2A.3b** subnormal K + coprime index ⟹ K ⊆ H (2A.1 経由)、`Ch02_Subnormality/Problems.lean` +57) / b (**Higman Lemma 13** restricted factor を ambient 固有空間化、新 leaf `RestrictedFactorAmbientEigenvectors.lean` +233 WIRED)。
 > **gate: green 4675 jobs (前 4674 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 045530eb0→570b3eb5b**。範囲逸脱なし。
