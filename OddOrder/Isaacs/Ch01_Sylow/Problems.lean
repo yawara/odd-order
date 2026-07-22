@@ -9,6 +9,7 @@ import Mathlib.GroupTheory.DoubleCoset
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.GroupTheory.Frattini
 import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 /-!
@@ -1429,6 +1430,71 @@ theorem isCoatom_iff_index_prime {G : Type*} [Group G] [Finite G] [Group.IsNilpo
           rw [Subgroup.card_mul_index H]
         have hcard : Nat.card K = Nat.card H := Nat.eq_of_mul_eq_mul_right hp.pos key
         exact hHK.ne (Subgroup.eq_of_le_of_card_ge hHK.le hcard.le)
+
+/-- **Isaacs Problem 1D.13**. `Z ≤ Z(G)` かつ `G ⧸ Z` が冪零ならば `G` は冪零。
+
+mathlib の `Group.isNilpotent_of_ker_le_center` (核が中心に含まれる準同型で冪零性が降りる) を
+商写像 `mk' Z` (核 `= Z ≤ Z(G)`) に適用した特殊化。 -/
+theorem isNilpotent_of_center_le {G : Type*} [Group G] {Z : Subgroup G} [Z.Normal]
+    (hZ : Z ≤ Subgroup.center G) (hq : Group.IsNilpotent (G ⧸ Z)) : Group.IsNilpotent G :=
+  haveI := hq
+  Subgroup.isNilpotent_of_ker_le_center (QuotientGroup.mk' Z)
+    (by rw [QuotientGroup.ker_mk']; exact hZ)
+
+/-
+**Problem 1D.14** (Frattini 部分群 `Φ(G)` は冪零): mathlib の `frattini_nilpotent`
+(`[Finite G]` で `Group.IsNilpotent (frattini G)`) がまさにこれ。`frattini G` は
+`Order.radical (Subgroup G)` = 全極大部分群の交わり = Isaacs の `Φ(G)`。純粋対応ゆえ
+ラッパーは書かない (ラッパー方針)。
+
+**Problem 1D.7** (`Φ(G)` = 非生成元全体): mathlib の `frattini_nongenerating` が subgroup 形
+(`K ⊔ frattini G = ⊤ → K = ⊤`)。Isaacs の元/部分集合形は下記 `mem_frattini_iff_forall_closure`。
+-/
+
+/-- **Isaacs Problem 1D.7**. `g ∈ Φ(G)` であることと、`g` が「非生成元」であること
+(任意の `X ⊆ G` について `⟨X ∪ {g}⟩ = G` ならば `⟨X⟩ = G`) は同値。
+
+`⟹`: `g ∈ Φ(G)` なら `⟨{g}⟩ ≤ Φ(G)`、`⊤ = ⟨X∪{g}⟩ = ⟨{g}⟩ ⊔ ⟨X⟩ ≤ Φ(G) ⊔ ⟨X⟩` から
+`⟨X⟩ ⊔ Φ(G) = ⊤`、`frattini_nongenerating` で `⟨X⟩ = ⊤`。
+`⟸`: 対偶。`g ∉ Φ(G) = ⨅ 極大部分群` なら `g ∉ M` なる極大 `M` があり、`X = M` で
+`⟨M ∪ {g}⟩ = ⟨{g}⟩ ⊔ M = ⊤` (M 極大, `g∉M`) だが `⟨M⟩ = M ≠ ⊤`、非生成元性に反する。 -/
+theorem mem_frattini_iff_forall_closure {G : Type*} [Group G] [Finite G] {g : G} :
+    g ∈ frattini G ↔
+    ∀ X : Set G, Subgroup.closure (insert g X) = ⊤ → Subgroup.closure X = ⊤ := by
+  constructor
+  · intro hg X hX
+    apply frattini_nongenerating
+    have h2 : Subgroup.closure {g} ≤ frattini G := by
+      intro x hx
+      rw [Subgroup.mem_closure_singleton] at hx
+      obtain ⟨n, rfl⟩ := hx
+      exact (frattini G).zpow_mem hg n
+    rw [← top_le_iff]
+    calc (⊤ : Subgroup G) = Subgroup.closure (insert g X) := hX.symm
+      _ = Subgroup.closure {g} ⊔ Subgroup.closure X := by
+          rw [Set.insert_eq, Subgroup.closure_union]
+      _ ≤ frattini G ⊔ Subgroup.closure X := sup_le_sup_right h2 _
+      _ = Subgroup.closure X ⊔ frattini G := sup_comm _ _
+  · intro h
+    by_contra hg
+    have hex : ∃ M : Subgroup G, IsCoatom M ∧ g ∉ M := by
+      by_contra hall
+      apply hg
+      rw [frattini, Order.radical]
+      simp only [Subgroup.mem_iInf, Set.mem_setOf_eq]
+      intro M hM
+      by_contra hgM
+      exact hall ⟨M, hM, hgM⟩
+    obtain ⟨M, hMco, hgM⟩ := hex
+    have hlt : M < Subgroup.closure {g} ⊔ M := by
+      refine lt_of_le_of_ne le_sup_right (fun heq => hgM ?_)
+      have hgc : g ∈ Subgroup.closure {g} ⊔ M :=
+        Subgroup.mem_sup_left (Subgroup.subset_closure (Set.mem_singleton g))
+      rwa [← heq] at hgc
+    have hclosure : Subgroup.closure (insert g (↑M : Set G)) = ⊤ := by
+      rw [Set.insert_eq, Subgroup.closure_union, Subgroup.closure_eq]
+      exact hMco.2 _ hlt
+    exact hMco.1 (Subgroup.closure_eq M ▸ h (↑M) hclosure)
 
 end
 

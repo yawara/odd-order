@@ -151,10 +151,19 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   割らない。証明計画: `p∣|H|` なら `P∈Syl_p(H)` を `S∈Syl_p(G)` に拡大、`p∣|G:H|` ⟹ `P<S`、
   `NormalizerCondition ↥S` で `g∈N_S(P)-P`、`⟨g⟩` の `P` への共役作用の固定点 `C_P(g)≠1` (p-群作用計数)、
   order-p `x∈C_P(g)⊆P⊆H` を Cauchy で取り `g∈C_G(x)⊆H` ⟹ `g∈S∩H=P` 矛盾。
-- ⬜ **残り §1D**: 1D.2 (上記後回し) / 1D.3–1D.5 (Frobenius complement, Ch.6 前方参照концепт) /
-  1D.7 (Frattini=非生成元) / 1D.8–1D.17 (Φ・冪零系; mathlib nilpotent/Frattini API 支援厚)。
+- ✅ 実証明 **1D.7** `mem_frattini_iff_forall_closure` (`g∈Φ(G)` ⟺ 非生成元: 任意の `X` で
+  `⟨X∪{g}⟩=⊤ → ⟨X⟩=⊤`)。`⟹` は `frattini_nongenerating` (mathlib) + `⟨{g}⟩≤Φ`、`⟸` は
+  `Φ=⨅極大` から `g∉M` なる極大 `M` を取り `X=M` で反例。
+- ✅ 実証明 **1D.13** `isNilpotent_of_center_le` (`Z≤Z(G)` かつ `G⧸Z` 冪零 ⟹ `G` 冪零)。mathlib
+  `Subgroup.isNilpotent_of_ker_le_center` を `mk' Z` (核=Z) に適用した特殊化。
+- ✅ 記録 **1D.14** (`Φ(G)` 冪零): mathlib `frattini_nilpotent` 直対応 (`frattini G=Order.radical
+  =⨅極大=Isaacs Φ(G)`)、ラッパー方針で記録のみ。
+- ⬜ **残り §1D**: 1D.2 (後回し, 上記) / 1D.3–1D.5 (Frobenius complement, Ch.6 前方参照) /
+  1D.8 (G/Φ(G) elementary abelian) / 1D.9–1D.12 / 1D.15–1D.17 (Φ・冪零系; mathlib 支援厚)。
+  ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
+  module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 
-- ⬜ **次: §1D 続き (1D.7 等 mathlib 支援厚のもの、1D.2 は後で) → §1E–§1G**。1C.4/1C.5 は §1C 内後回し。
+- ⬜ **次: §1D 続き (1D.8/1D.13 系 mathlib 支援厚のもの、1D.2/1D.3-5 は後で) → §1E–§1G**。
 
 ## 完了条件
 
