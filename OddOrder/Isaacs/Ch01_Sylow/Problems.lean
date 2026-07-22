@@ -602,6 +602,23 @@ section /- Problems 1B: Hall π-subgroups (1B.5-1B.8, Ch.3 の Hall/π 理論を
 
 open OddOrder.Isaacs.Ch03
 
+/-- **Isaacs Problem 1B.5(a)**. `θ : G ↠ K` が有限群の全射準同型で `H` が `G` の π-Hall 部分群
+ならば、像 `θ(H)` (= `H.map θ`) は `K` の π-Hall 部分群。
+
+`|θ(H)| ∣ |H|` (任意の準同型で `card_map_dvd`) より `|θ(H)|` の素因子 ⊆ `|H|` の素因子 ⊆ π。
+`|K:θ(H)| ∣ |G:H|` (全射で `index_map_dvd`) より素因子は π を避ける。
+(`IsHallSubgroup.map_quotient` = `θ = mk' N` の特殊化を全射一般に拡張。) -/
+theorem IsHallSubgroup.map_of_surjective {G K : Type*} [Group G] [Group K] [Finite G]
+    {π : Set ℕ} {θ : G →* K} (hθ : Function.Surjective θ) {H : Subgroup G}
+    (hH : IsHallSubgroup π H) : IsHallSubgroup π (H.map θ) := by
+  refine ⟨fun p hp => ?_, fun p hp => ?_⟩
+  · apply hH.1
+    rw [Nat.mem_primeFactors] at hp ⊢
+    exact ⟨hp.1, hp.2.1.trans (Subgroup.card_map_dvd _ _), Nat.card_pos.ne'⟩
+  · apply hH.2
+    rw [Nat.mem_primeFactors] at hp ⊢
+    exact ⟨hp.1, hp.2.1.trans (H.index_map_dvd hθ), Subgroup.index_ne_zero_of_finite⟩
+
 open Pointwise in
 /-- **Isaacs Problem 1B.6**. `H` を `G` の π-Hall 部分群、`K ≤ G` を部分群とする。`HK` が部分群
 (ある `L : Subgroup G` の台が `↑H·↑K`) ならば `H ∩ K` は `K` の π-Hall 部分群
@@ -651,6 +668,39 @@ theorem isHallSubgroup_inf_of_mul_isSubgroup {π : Set ℕ} {G : Type*} [Group G
     exact hH.2 q (Nat.primeFactors_mono (Subgroup.relIndex_dvd_index_of_le hHL)
       Subgroup.index_ne_zero_of_finite hq)
 
+/-- **Isaacs Problem 1B.7(b)**. `O_π(G)` (= `oPiCore π G`) は `G` の任意の π-Hall 部分群 `H` に
+含まれる。
+
+`N := O_π(G)` は正規 π-群。`N ⊔ H` の指数 `[N⊔H : H] = H.relIndex (N⊔H)` を割る素数 `q` は、
+`[N⊔H:H] ∣ |N⊔H| ∣ |N|·|H|` (`normal_mul` + `card_mul_card_inf`) より π に属し (`N`,`H` とも
+π-群)、同時に `[N⊔H:H] ∣ |G:H|` (`H ≤ N⊔H`) より π を避ける (`H` が π-Hall) — 矛盾。よって
+`[N⊔H:H] = 1`、`relIndex_eq_one` から `N⊔H ≤ H`、ゆえ `N ≤ N⊔H ≤ H`。 -/
+theorem oPiCore_le_of_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Finite G]
+    {H : Subgroup G} (hH : IsHallSubgroup π H) : oPiCore π G ≤ H := by
+  set N := oPiCore π G with hN
+  haveI : N.Normal := by rw [hN]; infer_instance
+  have hNpi : Subgroup.IsPiGroup π N := by rw [hN]; exact oPiCore.isPiGroup π
+  have hsub : N ⊔ H ≤ H := by
+    rw [← Subgroup.relIndex_eq_one]
+    by_contra hne
+    obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hne
+    -- q ∈ π : [N⊔H:H] ∣ |N⊔H| ∣ |N|·|H|、素因子は π
+    have hcard_dvd : Nat.card ↥(N ⊔ H) ∣ Nat.card N * Nat.card H := by
+      have hmul := card_mul_card_inf N H
+      rw [← Subgroup.normal_mul N H, SetLike.coe_sort_coe] at hmul
+      exact ⟨_, hmul.symm⟩
+    have hqπ : q ∈ π := by
+      have hq2 : q ∣ Nat.card N * Nat.card H :=
+        (hqdvd.trans (Subgroup.relIndex_dvd_card H (N ⊔ H))).trans hcard_dvd
+      rcases (Nat.Prime.dvd_mul hq).mp hq2 with h | h
+      · exact hNpi q (Nat.mem_primeFactors.mpr ⟨hq, h, Nat.card_pos.ne'⟩)
+      · exact hH.1 q (Nat.mem_primeFactors.mpr ⟨hq, h, Nat.card_pos.ne'⟩)
+    -- q ∉ π : [N⊔H:H] ∣ |G:H|、素因子は π を避ける
+    exact hH.2 q (Nat.mem_primeFactors.mpr ⟨hq,
+      hqdvd.trans (Subgroup.relIndex_dvd_index_of_le le_sup_right),
+      Subgroup.index_ne_zero_of_finite⟩) hqπ
+  exact le_sup_left.trans hsub
+
 /-! ### Problems 1B: mathlib / repo で被覆される Hall/π 演習 (docstring 記録)
 
 - **Problem 1B.7(a)** (`O_π(G)` = 最大の正規 π-部分群): 本リポジトリの
@@ -658,7 +708,7 @@ theorem isHallSubgroup_inf_of_mul_isSubgroup {π : Set ℕ} {G : Type*} [Group G
   characteristic (`oPiCore.characteristic`) な π-部分群であり、任意の正規 π-部分群 `H` を含む
   (`Subgroup.IsPiGroup.le_oPiCore` = まさに Problem 1B.7(a)) ことが
   `OddOrder/Isaacs/Ch03_SplitExtensions/Theorem315.lean` で示されている。この一意最大性から
-  `O_π(G)` は characteristic (Isaacs の Note)。
+  `O_π(G)` は characteristic (Isaacs の Note)。上の `oPiCore_le_of_isHallSubgroup` が 1B.7(b)。
 -/
 
 end
