@@ -709,9 +709,10 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
       `inner_eq_coeff_of_repr` (:117): (θ,χ)=c(χ)。Frobenius 一般形
       `ClassFunction.inner_induce_eq_inner_restrict` ((Ind θ,φ)=(θ,Res φ))。全存在。
     **⭐ (8) 核 = 5 ピース ~240 行 (全インフラ確認済、tightly-coupled、fresh context 推奨)**:
-    1. **Fourier-eval-split** (一般, ~50行): θ∈ZIrr↥H, z∈N ⟹ θ(z)−θ(1) =
-       Σ_{χ:N⊄characterKernel}(θ,χ)(χ(z)−χ(1))。mem_ZIrr_repr + N⊆ker 項消滅
-       (mem_characterKernel: χ(z)=χ(1))。support↔IrreducibleCharacter filter reindex。
+    1. [x] **Fourier-eval-split 完成** = `apply_sub_apply_eq_sum_XsetOf_bot`
+       (2026-07-22, sorry-free): θ∈ZIrr↥H, z∈Z ⟹ θ(z)−θ(1)=Σ_{χ∈𝒳}(θ,χ)(χ(z)−χ(1))。
+       mem_ZIrr_repr + LeKer 項消滅 + 両辺を support∩{¬LeKer Z} に Finset.sum_subset 還元 +
+       inner_eq_coeff_of_repr。𝒳-Finset T 版 (IrreducibleCharacter reindex 不要に簡略化)。
     2. **coefficient 関係** (FeitSibley, ~80行): resE:=Res_H e′₁∈ZIrr↥H。
        (resE, χᵢ−aᵢχ₁)_H = (e′₁, τ(χᵢ−aᵢχ₁))_G [Frobenius] = (e′₁, eᵢ−aᵢe₁) [coherence
        extends_on_supported、χᵢ−aᵢχ₁ supported] = 0 [(5) cross_extension_inner_eq_zero]
