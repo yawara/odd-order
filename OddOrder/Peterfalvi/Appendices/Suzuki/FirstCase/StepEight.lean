@@ -135,6 +135,39 @@ theorem model_qEquiv_conj (g : ↥hyp.D) (q : ↥hyp.Q)
   have hfin := Multiplicative.ofAdd.injective (model.emb_injective hr.symm)
   rwa [one_mul, one_mul] at hfin
 
+/-- **`qEquiv` matches fixed units with conjugation-fixed `Q`** (step (8)): for
+`g ∈ D` (inside `H`), `qEquiv` restricts to a bijection between the elements of
+`Q` fixed by `g`-conjugation and the units of `F` fixed by `dAut g`.  Hence the
+two counts agree. -/
+theorem card_fixedUnits_eq_card_fixedConj (g : ↥hyp.D) (hgH : (g : G') ∈ hyp.H) :
+    Nat.card {u : Fˣ // model.dAut g (u : F) = (u : F)} =
+      Nat.card {q : ↥hyp.Q // (g : G') * (q : G') * (g : G')⁻¹ = (q : G')} := by
+  classical
+  have hnorm : ∀ q : ↥hyp.Q, (g : G') * (q : G') * (g : G')⁻¹ ∈ hyp.Q :=
+    fun q => hyp.Q_normal_in_H (g : G') hgH (q : G') q.2
+  refine (Nat.card_congr ?_).symm
+  refine
+    { toFun := fun q => ⟨model.qEquiv q.1, ?_⟩
+      invFun := fun u => ⟨model.qEquiv.symm u.1, ?_⟩
+      left_inv := fun q => Subtype.ext (by simp)
+      right_inv := fun u => Subtype.ext (by simp) }
+  · -- fixed conjugation ⟹ fixed unit
+    have hc := hnorm q.1
+    have hkey := model_qEquiv_conj model g q.1 hc
+    have hq : (⟨(g : G') * (q.1 : G') * (g : G')⁻¹, hc⟩ : ↥hyp.Q) = q.1 :=
+      Subtype.ext q.2
+    rw [hq] at hkey
+    exact hkey.symm
+  · -- fixed unit ⟹ fixed conjugation
+    have hc := hnorm (model.qEquiv.symm u.1)
+    have hkey := model_qEquiv_conj model g (model.qEquiv.symm u.1) hc
+    rw [MulEquiv.apply_symm_apply] at hkey
+    rw [u.2] at hkey
+    have heq : model.qEquiv ⟨(g : G') * ((model.qEquiv.symm u.1 : ↥hyp.Q) : G') *
+        (g : G')⁻¹, hc⟩ = model.qEquiv (model.qEquiv.symm u.1) := by
+      rw [MulEquiv.apply_symm_apply]; exact Units.ext hkey
+    exact Subtype.ext_iff.mp (model.qEquiv.injective heq)
+
 end ModelDAut
 
 /-- **The fixed set of a ring automorphism of a finite field is a subfield**
