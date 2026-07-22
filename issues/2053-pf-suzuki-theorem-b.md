@@ -259,14 +259,21 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       consumables: `ringEquivOfAddEquivMul` (dAut g を RingEquiv 化) +
       `card_fixedSet_eq_card_fixedUnits_add_one` (|{x:σx=x}|=|fixed units|+1) +
       heart 2 本。**crux 全部 done — 残りは mechanical assembly**。
-    - **⚠ 残 = step (8) assembly (mechanical, unblocked)**:
-      (A) w∈C_W(P)# → [w]:=e.symm⟨w,hw⟩∈rankOneQuotient.D (e=sigma_mulEquiv_centralizer_W)、
-          σ_w := ringEquivOfAddEquivMul (dAut[w]) (dAut_mul[w])。
-      (B) C_{F*}(σ_w) ≅ C_{Q̄}([w]) via qEquiv + `model_qEquiv_conj` ([w]q̄[w]⁻¹=q̄ ⟺
-          σ_w(qEquiv q̄)=qEquiv q̄) → card 等。
-      (C) C_{Q̄}([w]) ≅ C_{C_Q(P)}(w) (global projection mk'N の w-equivariance、step5 ι) →
-          C_{C_Q(P)}(w)⊆C_Q(w) (∵C_Q(P)⊆Q)、C_Q(w) 2群 (step8 `st_mem_...`、centralizer
-          (zpowers w)=C_G(w)) ⟹ C_{F*}(σ_w) 2群 ⟹ |{x:σ_w x=x}|=2^b+1 ⟹ heart で ∈{f,9}。
+    - **(B) 完了 (2026-07-22)**: `card_fixedUnits_eq_card_fixedConj` (axiom-clean,
+      model-general) — qEquiv + model_qEquiv_conj で `{u:Fˣ//dAut g ↑u=↑u}` ≅
+      `{q:↥Q//[g]q[g]⁻¹=q}`、card 一致。equivariance の直接 payoff。
+    - **⚠ 残 = step (8) assembly (C)(D) (mechanical, unblocked)**:
+      (A) w∈C_W(P)# → [w]:=⟨mk'N⟨w,hwL⟩, _∈D⟩∈rankOneQuotient.D、
+          σ_w := ringEquivOfAddEquivMul (dAut[w]) (dAut_mul[w])。σ_w ↑u=dAut[w]↑u。
+      (C) `{q̄:[w]-fixed in Q̄}` ≅ `{q∈M₀=C_Q(P):wqw⁻¹=q}` via **piQ 再構成**
+          (piQ := ((mk'N).comp(inclusion M₀≤L)).codRestrict Q̄ _; step5 ι の projection 部分):
+          - piQ inj (ker: N≤D_L + Q⊓D=1、step5 と同)、|M₀|=|Q_L|=|Q̄| (mk'N inj on Q_L、
+            Q_L∩N=1) ⟹ **piQ bijective** (finite equal card + inj)。
+          - piQ equivariant: piQ(wqw⁻¹)=[w]piQ(q)[w]⁻¹ (mk'N hom、w,q∈L)。⟹ fixed 集合 biject。
+          - {q∈M₀:w-fixed}=M₀∩C_G(w)⊆Q∩C_G(w)=C_Q(w) 2群 (step8 st_mem_...、
+            centralizer(zpowers w)=C_G(w)) ⟹ |{q̄:[w]-fixed}| ∣ 2^k ⟹ (B) で
+            |{u:σ_w fixed}|=2^b ⟹ card_fixedSet_eq_card_fixedUnits_add_one で
+            |{x:σ_w x=x}|=2^b+1 ⟹ heart `card_fixedSet_mem_of_units_two_pow` で ∈{f,9}。
       (D) f=3 mixed 排除 (w₁,w₂ で 3^1,3^2 は偶位数矛盾) → |C_F(w)| 一定 → ℓ=|C_W(P)| prime
           (各 nonid σ_w の固定体=𝔽_f ⟹ [F:𝔽_f]=|⟨σ_w⟩|=ℓ ⟹ Σ 全 nonid 元位数 ℓ ⟹ cyclic
           prime) + |F|=|C_F(w)|^ℓ。⚠ Artin [F:固定体]=|⟨σ⟩| は mathlib FixedPoints.finrank
