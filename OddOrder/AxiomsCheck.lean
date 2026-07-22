@@ -12094,3 +12094,21 @@ and `card_inf_centralizer_eq_prime` inherit the step (2)(b) sorry — issue 9318
 deliberately NOT asserted here.) -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_K_dvd_sub_one_of_prime_order_invariant
+
+/-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
+2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
+欠いていた).  Zassenhaus/Dickson 分類の App.C 特殊形: 有限 near-field `F` の乗法群が
+**cyclic** な指数 `2` 部分群 `A` を持てば、`F` は可換 (体) か、さもなくば奇素数冪 `r` が
+あって `F ≅ F_{r²,2}` (`TwistData` の twisted near-field) かつ `|Z(Fˣ)| = r - 1`。
+
+* `card_eq_sq_of_orderTwo_ringAut` — 位数 `2` の体自己同型は `|K| = r²` を強制 (Artin)。
+* `exists_field_structure_of_cyclic_index_two` — 第一半 (体構造)、cyclic 仮定の book 形。
+* `twMul_central_iff` — 中心性 `⟺` `σ`-固定 (center 節 `|Z(Fˣ)| = r - 1` のエンジン)。
+* `cyclic_index_two_nearField_classification` — **Prop 2 全文**。 -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.card_eq_sq_of_orderTwo_ringAut
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exists_field_structure_of_cyclic_index_two
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.NearFields.twMul_central_iff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.cyclic_index_two_nearField_classification
