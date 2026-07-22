@@ -783,9 +783,28 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     (hQz/hcard_const は中心 Z discharge wrapper で自動) / union_coherent_of_lambda_dvd。
   - ⚠ Nonempty 返し (IsCoherent はデータ; Prop-valued にして ∃ obtain 自由化)。
 
+  ### ⚠ 健全性確認 (2026-07-22): full-𝒳 hXdiff は満足可能 (scaffold でない)
+
+  `dvd_lam_of_endgame_data`/`xset_qder_union_coherent` は **full 𝒳 = XsetOf⊥Z** に対し
+  hXdiff (∀χ∈𝒳, ∃b, χ−b•χ₁ supported、b=χ(1)/χ₁(1)∈ℤ) を要求する。これが満足可能か
+  ([[scaffold-sorry-free-not-done]]) を検証した結果 **満足可能**:
+  - 各 χ∈𝒮 は χ(1)=d·m (m=φ(1)=φ_S(1)·φ_{Q₁}(1)、`exists_apply_one_eq_d_mul` Theorem:1300)。
+  - **anchor χ₁ = 𝒳₁=XsetOf Sder Z の最小度数元** (φ_S linear ⟹ χ₁(1)=d·p^{k₁}、
+    `exists_apply_one_eq_d_mul_pow` ReductionThree:302; k₁ = Q₁ の最小非線形既約度数指数)。
+  - **χ₁(1)∣χ(1) for full 𝒳**: 各 χ∈𝒳 は Z⊄Ker χ, Z≤[Q₁,Q₁] ⟹ φ_{Q₁} 非線形 ⟹
+    v_p(χ(1))=k≥k₁。かつ gcd(φ_S(1),p)=1 (φ_S(1)∣|S|, coprime_S_Q1) + d coprime p
+    (coprime_Q_D) ⟹ χ₁(1)=d·p^{k₁} ∣ d·φ_S(1)·p^k=χ(1)。b=φ_S(1)·p^{k−k₁}∈ℤ。
+  - supportedness = `scaled_diff_support_subset_A_of_mem_Sset` (Theorem:1591)。
+  ⟹ **(8) core は健全**。anchor は「min-degree of 𝒳₁」で選ぶ (full 𝒳 の min-degree では
+  φ_S 非線形になりうり divisibility 破綻)。
+
   ### 残 master assembly = (4) setup INPUTS + adjoin + case 構造
 
   xset_qder_union_coherent が endgame core を閉じたので、残るのは**その入力構築**:
+  ⚠ (4) setup の核心 = **full-𝒳 の p-valuation 下界** (∀χ∈𝒳, v_p(χ(1))≥k₁) の露出。
+  Q₁ の最小非線形既約度数 p^{k₁} + φ_{Q₁} 非線形性 (Z⊄Ker から) + degree 分解
+  χ(1)=d·φ_S(1)·p^k が要る。ReductionThree の pow 系補題は 𝒮(S') (φ_S linear) 限定なので
+  full 𝒳 への拡張が新規インフラ。⟵ 最大未構築、次 iteration の主タスク。
   1. **(4) setup (非可換 p 群 case)**: Z:=endgameZ に対し 𝒳=XsetOf⊥Z coherent
      (endgame_Xset_coherent) + 𝒴=𝒮(Q') coherent (ssetOf_Qder_coherent, Remark) を取り、
      **anchor χ₁ (最小度数, χ₁(1)=a·d) 選択** + **hXdiff (∀χ∈𝒳,∃b,χ−b•χ₁ supported =
