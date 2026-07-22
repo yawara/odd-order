@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch01_Sylow.Basic
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.GroupTheory.Frattini
@@ -618,6 +619,38 @@ theorem isCyclic_or_elementaryAbelian_of_card_eq_prime_sq {P : Type*} [Group P] 
   refine ⟨(commutator_eq_bot_iff P).mp hcbot, fun g => ?_⟩
   have := pow_mem_frattini_of_isPGroup hP g
   rwa [hΦbot, Subgroup.mem_bot] at this
+
+/-- **Isaacs Problem 1D.10** (前半). 有限 `p`-群 `P` の可換正規部分群のうち極大な `A` は自己中心化的、
+すなわち `C_P(A) = A`。`A ⊆ C_P(A)` は `A` 可換ゆえ自明。逆に `A < C_P(A)` なら Lemma 1.23
+(`IsPGroup.exists_normal_index_eq_prime`) で `A < L ≤ C_P(A)`, `|L:A| = p`, `L ◁ P` を得る。
+`L ⊆ C_P(A)` から `A ⊆ Z(L)`、`L/A` は位数 `p` で巡回ゆえ `L` は可換
+(`isMulCommutative_of_isCyclic_of_ker_le_center`) — `A < L` の可換正規部分群は `A` の極大性に反する。 -/
+theorem centralizer_eq_self_of_maximal_abelian_normal {P : Type*} [Group P] [Finite P]
+    {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P) (A : Subgroup P) [A.Normal]
+    [IsMulCommutative ↥A]
+    (hmax : ∀ B : Subgroup P, B.Normal → IsMulCommutative ↥B → A ≤ B → B = A) :
+    Subgroup.centralizer (A : Set P) = A := by
+  refine le_antisymm ?_ (Subgroup.le_centralizer A)
+  by_contra hnle
+  haveI : (Subgroup.centralizer (A : Set P)).Normal := Subgroup.normal_centralizer
+  have hlt : A < Subgroup.centralizer (A : Set P) :=
+    lt_of_le_of_ne (Subgroup.le_centralizer A) (fun heq => hnle heq.ge)
+  obtain ⟨L, hLnorm, hAL, hLC, hidx⟩ := IsPGroup.exists_normal_index_eq_prime hP hlt
+  -- `L ⊆ C_P(A)` ゆえ `A ⊆ Z(L)`
+  have hAcenterL : A.subgroupOf L ≤ Subgroup.center ↥L := by
+    intro x hx
+    rw [Subgroup.mem_center_iff]
+    intro l
+    apply Subtype.ext
+    rw [Subgroup.coe_mul, Subgroup.coe_mul]
+    exact ((Subgroup.mem_centralizer_iff.mp (hLC l.2)) _ (Subgroup.mem_subgroupOf.mp hx)).symm
+  -- `L/A` 位数 `p` で巡回 ⟹ `L` 可換
+  haveI hcyc : IsCyclic (↥L ⧸ A.subgroupOf L) :=
+    isCyclic_of_prime_card (p := p) (by rw [← Subgroup.index_eq_card]; exact hidx)
+  haveI hLab : IsMulCommutative ↥L :=
+    (QuotientGroup.mk' (A.subgroupOf L)).isMulCommutative_of_isCyclic_of_ker_le_center
+      (by rw [QuotientGroup.ker_mk']; exact hAcenterL)
+  exact absurd (hmax L hLnorm hLab hAL.le) hAL.ne'
 
 end
 
