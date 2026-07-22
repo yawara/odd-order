@@ -13,3 +13,4 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorCoordin
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorNormalForms
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleCoordinates
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutators
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniGradedCommutatorEquivariance
