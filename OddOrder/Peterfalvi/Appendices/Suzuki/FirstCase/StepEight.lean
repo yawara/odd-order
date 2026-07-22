@@ -62,6 +62,81 @@ theorem card_fixedSet_eq_card_fixedUnits_add_one {F : Type*} [Field F] [Finite F
   rw [Nat.card_congr e, Nat.card_eq_fintype_card, Fintype.card_option,
     ← Nat.card_eq_fintype_card]
 
+section ModelDAut
+
+variable {G' Ω' : Type*} [Group G'] [MulAction G' Ω'] [Finite G']
+  {hyp : NearFields.RankOneHypothesis G' Ω'} {F : Type*} [NearFields.NearField F]
+  (model : NearFields.AffineNearFieldModel hyp F)
+
+/-- **`dAut 1 = id`**: the model's automorphism action sends the identity of `D`
+to the identity automorphism (the conjugation by `1` fixes `emb`). -/
+theorem model_dAut_one (x : F) : model.dAut 1 x = x := by
+  have hconj := model.dAut_conj 1 x
+  rw [OneMemClass.coe_one, one_mul, inv_one, mul_one] at hconj
+  exact (Multiplicative.ofAdd.injective (model.emb_injective hconj)).symm
+
+/-- **`dAut` is a homomorphism**: `dAut (g h) = dAut g ∘ dAut h`, obtained by
+composing the conjugations realizing `dAut`. -/
+theorem model_dAut_hom (g h : ↥hyp.D) (x : F) :
+    model.dAut (g * h) x = model.dAut g (model.dAut h x) := by
+  have hgh := model.dAut_conj (g * h) x
+  have hh := model.dAut_conj h x
+  have hg := model.dAut_conj g (model.dAut h x)
+  rw [MulMemClass.coe_mul] at hgh
+  have hkey : model.emb (Multiplicative.ofAdd (model.dAut (g * h) x)) =
+      model.emb (Multiplicative.ofAdd (model.dAut g (model.dAut h x))) := by
+    rw [← hgh, ← hg, ← hh]; group
+  exact Multiplicative.ofAdd.injective (model.emb_injective hkey)
+
+/-- **`dAut g` and `dAut g⁻¹` are mutually inverse**. -/
+theorem model_dAut_inv_cancel (g : ↥hyp.D) (x : F) :
+    model.dAut g (model.dAut g⁻¹ x) = x := by
+  rw [← model_dAut_hom model g g⁻¹ x, mul_inv_cancel, model_dAut_one]
+
+/-- **`qEquiv` intertwines `D`-conjugation on `Q` with `dAut` on `F^*`**
+(step (8), the equivariance): for `g ∈ D` and `q ∈ Q`, the `Q`-conjugate
+`g q g⁻¹` maps under `qEquiv` to `dAut g` applied to `qEquiv q`.
+
+Conjugating `emb(1)` by `g q g⁻¹` and unwinding through `dAut_conj` (for `g`,
+`g⁻¹`) and `qEquiv_conj` (for `q`) computes to `emb(1 · dAut g ↑(qEquiv q))`;
+comparing with `qEquiv_conj` for the conjugate and cancelling `emb`, `ofAdd`
+gives the identity. -/
+theorem model_qEquiv_conj (g : ↥hyp.D) (q : ↥hyp.Q)
+    (hc : (g : G') * (q : G') * (g : G')⁻¹ ∈ hyp.Q) :
+    ((model.qEquiv ⟨(g : G') * (q : G') * (g : G')⁻¹, hc⟩ : Fˣ) : F) =
+      model.dAut g ((model.qEquiv q : Fˣ) : F) := by
+  set u : F := ((model.qEquiv q : Fˣ) : F) with hu
+  set c : G' := (g : G') * (q : G') * (g : G')⁻¹ with hc_def
+  have hy : ((g : G'))⁻¹ * model.emb (Multiplicative.ofAdd (1 : F)) * (g : G') =
+      model.emb (Multiplicative.ofAdd (model.dAut g⁻¹ (1 : F))) := by
+    have h := model.dAut_conj g⁻¹ (1 : F)
+    rwa [Subgroup.coe_inv, inv_inv] at h
+  have hq := model.qEquiv_conj q (model.dAut g⁻¹ (1 : F))
+  have hgg := model.dAut_conj g (model.dAut g⁻¹ (1 : F) * u)
+  have hval : model.dAut g (model.dAut g⁻¹ (1 : F) * u) = 1 * model.dAut g u := by
+    rw [model.dAut_mul g, model_dAut_inv_cancel model g (1 : F)]
+  have hchain : c * model.emb (Multiplicative.ofAdd (1 : F)) * c⁻¹ =
+      model.emb (Multiplicative.ofAdd (1 * model.dAut g u)) := by
+    calc c * model.emb (Multiplicative.ofAdd (1 : F)) * c⁻¹
+        = (g : G') * ((q : G') * (((g : G'))⁻¹ *
+            model.emb (Multiplicative.ofAdd (1 : F)) * (g : G')) *
+            (q : G')⁻¹) * (g : G')⁻¹ := by rw [hc_def]; group
+      _ = (g : G') * ((q : G') *
+            model.emb (Multiplicative.ofAdd (model.dAut g⁻¹ (1 : F))) *
+            (q : G')⁻¹) * (g : G')⁻¹ := by rw [hy]
+      _ = (g : G') * model.emb
+            (Multiplicative.ofAdd (model.dAut g⁻¹ (1 : F) * u)) * (g : G')⁻¹ := by
+            rw [hq]
+      _ = model.emb (Multiplicative.ofAdd
+            (model.dAut g (model.dAut g⁻¹ (1 : F) * u))) := by rw [hgg]
+      _ = model.emb (Multiplicative.ofAdd (1 * model.dAut g u)) := by rw [hval]
+  have hr := model.qEquiv_conj ⟨c, hc⟩ (1 : F)
+  rw [hchain] at hr
+  have hfin := Multiplicative.ofAdd.injective (model.emb_injective hr.symm)
+  rwa [one_mul, one_mul] at hfin
+
+end ModelDAut
+
 /-- **The fixed set of a ring automorphism of a finite field is a subfield**
 (step (8), p. 110): for a finite field `F` of characteristic `f` and a ring
 automorphism `σ`, the fixed set `{x : σ x = x}` is a subfield, hence has order
