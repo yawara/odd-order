@@ -12429,6 +12429,8 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   transported via `Sylow.subtype`), letting `lem_1_9` apply to `SM` in the `Q`-cyclic step. -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.involutionClosure_normal
 #assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.smSetup
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.not_isMulCommutative_SM_quotient_M
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 
