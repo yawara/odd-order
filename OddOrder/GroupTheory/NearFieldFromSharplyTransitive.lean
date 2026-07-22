@@ -185,6 +185,12 @@ the acting group into right multiplication by `F^*` (Peterfalvi's `𝓛(F) = F �
 theorem mul_smul_e (m : M) (x : A) : d.mul x (m • d.e) = m • x := by
   rw [d.mul_def (d.smul_e_ne_zero m), ← d.coord_unique (d.smul_e_ne_zero m) rfl]
 
+/-- The product of two "coordinate" elements is *anti*-multiplicative in `M`:
+`(m₁ • e) * (m₂ • e) = (m₂ * m₁) • e`.  Hence `m ↦ m • e` is an anti-homomorphism `M → Aˣ`, and a
+genuine isomorphism `M ≃* Aˣ` must pre-compose with inversion (see `mulEquivUnits`). -/
+theorem smul_e_mul (m₁ m₂ : M) : d.mul (m₁ • d.e) (m₂ • d.e) = (m₂ * m₁) • d.e := by
+  rw [d.mul_smul_e, mul_smul]
+
 /-- **Right distributivity** `(a + b) * c = a * c + b * c` — exactly additivity of `· • x`. -/
 theorem right_distrib' (a b c : A) : d.mul (a + b) c = d.mul a c + d.mul b c := by
   by_cases hc : c = 0
