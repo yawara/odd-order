@@ -307,12 +307,12 @@ mathlib inductive (`top`/`step`)。
     π-group (`oPiCore.isPiGroup`) ⟹ `≤ oPiCore π ↥K'` (`IsPiGroup.le_oPiCore`)、`.map K'.subtype` して IH。
     top は `oPiCore.map_le_of_surjective π (⊤).subtype`。**import 追加要**: `Ch03_SplitExtensions.Theorem315`
     (oPiCore) + `Ch01_Sylow.ProblemsFrobeniusFrattini` (characteristic_map_subtype_normal)。cycle 無し。
-  - **2A.3(b)** (`K` 部分正規版) — **2A.1 経由** (2A.1 完了で unblock 済、次に構築): π=π(K)=`(Nat.card K).primeFactors`、
-    `IsPiGroup π K` は自明、`le_oPiCore_of_isSubnormal_of_isPiGroup` で `K⊆O_π(G)`。核 helper
-    `coprime_normal_le` (`N◁G`, `coprime(|N|,|G:H|)` ⟹ `N⊆H`): `|N:N∩H|=|N⊔H:H|` (`card_mul_card_inf`
-    = Ch01 Problems の N 正規積公式) が `|N|` と `|G:H|` 双方を割り互いに素で `=1` ⟹ `N⊓H=N`⟹`N≤H`。
-    coprimality `coprime(|O_π(G)|,|G:H|)`: `primes(|O_π(G)|)⊆π(K)=primes(|K|)` (`oPiCore.isPiGroup`) かつ
-    `coprime(|G:H|,|K|)` ⟹ 素因数非共有 (`Nat.Coprime.primeFactors` 系)。~40 行。
+  - ✅ 実証明 **2A.3(b)** `le_of_isSubnormal_of_coprime_index'` (`K` 部分正規, `|G:H|` と `|K|` 互いに素
+    ⟹ `K≤H`) + helper `coprime_normal_le` (`N◁G`, `coprime(|N|,|G:H|)` ⟹ `N≤H`)。π=`↑(Nat.card K).primeFactors`、
+    2A.1 で `K⊆O_π(G)`、`coprime_normal_le` を `O_π(G)` に適用。coprime_normal_le: `|H⊔N:H|=relIndex` が
+    `card_mul_card_inf`(正規積公式)で `|N|` を割り `relIndex_dvd_index_of_le` で `|G:H|` も割り互いに素で `=1`
+    ⟹ `H⊔N=H`⟹`N≤H`。coprimality は `oPiCore.isPiGroup` の primes⊆ + `Coprime.disjoint_primeFactors` +
+    `Finset.disjoint_of_subset_left`。一発 green。→ **2A.3 完全完成 (a+b)**。
   - 2A.2 (O^π) / 2A.4 (Wielandt) / 2A.5-2A.9 (socle・単純部分正規、heavy)。
 
 - ⬜ **次: §1D 続き (1D.8/1D.13 系 mathlib 支援厚のもの、1D.2/1D.3-5 は後で) → §1E–§1G**。
