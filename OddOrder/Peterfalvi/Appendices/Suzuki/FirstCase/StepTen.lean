@@ -508,7 +508,8 @@ theorem card_field_eq_nine_of_p_dvd_card_centralizer_W
       Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :
     fc.p = 3 ∧ Nat.card F = 9 ∧
       Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) = 8 ∧
-      Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) = 3 := by
+      Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) = 3 ∧
+      ¬ ∀ x y : F, x * y = y * x := by
   letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   have hQ1 : fc.toHypothesis.Q1 = ⊥ :=
     fc.Q1_eq_bot_of_p_dvd_card_centralizer_W ind model hB2 hpSig
@@ -535,7 +536,120 @@ theorem card_field_eq_nine_of_p_dvd_card_centralizer_W
   -- `|F| = 9`, `|C_Q(P)| = 8` (step (5), non-commutative case)
   rcases fc.card_nearField_eq_nine_and_Q1_eq_bot model with hcomm | ⟨hF9, hCQ8, _⟩
   · exact absurd hcomm hncomm
-  · exact ⟨hp3, hF9, hCQ8, hSig3⟩
+  · exact ⟨hp3, hF9, hCQ8, hSig3, hncomm⟩
+
+/-- **Peterfalvi Part II, Ch. II, step (10.2)** (p. 111): if `p ∣ |Σ|` then
+`p = 3`, `F ≅ F_{9,2}` (`|F| = 9`), `W` is cyclic of order `3` or `9`, and
+`|G|_3 = 3^4 · |W|`.
+
+Building on the numeric core (`card_field_eq_nine_of_p_dvd_card_centralizer_W`:
+`p = 3`, `|F| = 9`, `|C_Q(P)| = 8`, `|Σ| = 3`), `Q` is a Suzuki `2`-group
+(`isSuzuki2Group_Q_of_noncomm`), `|s·t| = char = 3` (`orderOf_st_eq_char` +
+`|F| = 9`), `|Q₀| = 2^p` and `|Q| = |Q₀|^3`; Chapter I §3 Lemma 5
+(`lemmaFive_of_orderThree`) then gives `W` cyclic with `|W| ∣ 2^p + 1 = 9`.  Since
+`W ⊇ C_W(P)` has order `|Σ| = 3 ≠ 1`, `W ≠ ⊥`, so `|W| ∈ {3, 9}`.  The `3`-part is
+`|G|_3 = 3^{m+2}·|W|_3 = 3^4·|W|` (`factorization_card_G_eq`, `m = 2`, `|W|` a
+`3`-power).  Inherits the step (2)(b) `sorry` (issue 9318) + Higman through the
+model. -/
+theorem w_cyclic_of_p_dvd_card_centralizer_W
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hpSig : fc.p ∣
+      Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :
+    fc.p = 3 ∧ Nat.card F = 9 ∧ IsCyclic ↥fc.toHypothesis.W ∧
+      (Nat.card ↥fc.toHypothesis.W = 3 ∨ Nat.card ↥fc.toHypothesis.W = 9) ∧
+      3 ^ (Nat.card G).factorization 3 = 3 ^ 4 * Nat.card ↥fc.toHypothesis.W := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  obtain ⟨hp3, hF9, hCQ8, hSig3, hncomm⟩ :=
+    fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  -- `|s·t| = char = 3` (`|F| = 9`)
+  have hchar3 : (model.char : ℕ) = 3 := by
+    have h1 : model.char • (1 : F) = 0 := model.char_spec 1
+    have hdvd : addOrderOf (1 : F) ∣ model.char :=
+      addOrderOf_dvd_iff_nsmul_eq_zero.mpr h1
+    have hne1 : addOrderOf (1 : F) ≠ 1 := by
+      rw [Ne, AddMonoid.addOrderOf_eq_one_iff]; exact one_ne_zero
+    have haoeq : addOrderOf (1 : F) = model.char :=
+      ((Nat.dvd_prime model.char_prime).mp hdvd).resolve_left hne1
+    have hchar9 : model.char ∣ 9 := by
+      rw [← haoeq, ← hF9]; exact addOrderOf_dvd_natCard 1
+    have h3 : model.char ∣ 3 := by
+      rw [show (9 : ℕ) = 3 ^ 2 by norm_num] at hchar9
+      exact model.char_prime.dvd_of_dvd_pow hchar9
+    exact (Nat.prime_dvd_prime_iff_eq model.char_prime (by norm_num)).mp h3
+  have hst : orderOf (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, hchar3]
+  -- `Q` is a Suzuki `2`-group
+  have hQsuz := fc.isSuzuki2Group_Q_of_noncomm model hncomm
+  -- `|Q₀| = 2^p`, `|Q| = |Q₀|^3`
+  have hQ0card : Nat.card ↥fc.toHypothesis.Q0 = 2 ^ fc.p := fc.card_Q0_eq_two_pow
+  have hcardQ : Nat.card ↥fc.toHypothesis.Q = Nat.card ↥fc.toHypothesis.Q0 ^ 3 := by
+    rw [fc.card_Q_eq_card_inf_centralizer_pow, hCQ8, hQ0card, hp3]; norm_num
+  -- Chapter I §3 Lemma 5: `W` cyclic, `|W| ∣ 2^p + 1 = 9`
+  obtain ⟨hcyc, hdvd, _⟩ :=
+    fc.toHypothesis.lemmaFive_of_orderThree hst hQsuz fc.p_prime.pos.ne' hQ0card hcardQ ind
+  rw [hp3] at hdvd
+  have hdvd9 : Nat.card ↥fc.toHypothesis.W ∣ 9 := by
+    rwa [show (2 : ℕ) ^ 3 + 1 = 9 by norm_num] at hdvd
+  -- `3 = |Σ| = |C_W(P)| ∣ |W|`, so `|W| ≠ 1`
+  have h3dvd : 3 ∣ Nat.card ↥fc.toHypothesis.W := by
+    have hle := Subgroup.card_dvd_of_le
+      (inf_le_left : fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G) ≤
+        fc.toHypothesis.W)
+    rwa [hSig3] at hle
+  -- `|W| = 3^k` with `1 ≤ k ≤ 2`, i.e. `|W| ∈ {3, 9}`
+  have hdvd9' : Nat.card ↥fc.toHypothesis.W ∣ 3 ^ 2 := by
+    rw [show (3 : ℕ) ^ 2 = 9 by norm_num]; exact hdvd9
+  obtain ⟨k, hk2, hkeq⟩ := (Nat.dvd_prime_pow Nat.prime_three).mp hdvd9'
+  have hk1 : 1 ≤ k := by
+    rcases Nat.eq_zero_or_pos k with hk0 | hk0
+    · rw [hk0, pow_zero] at hkeq
+      rw [hkeq] at h3dvd; omega
+    · exact hk0
+  have hWcases : Nat.card ↥fc.toHypothesis.W = 3 ∨ Nat.card ↥fc.toHypothesis.W = 9 := by
+    interval_cases k
+    · exact Or.inl (by rw [hkeq]; norm_num)
+    · exact Or.inr (by rw [hkeq]; norm_num)
+  refine ⟨hp3, hF9, hcyc, hWcases, ?_⟩
+  -- `|G|_3 = 3^{m+2}·|W|_3 = 3^4·|W|` (`m = 2`, `|W| = 3^k` a `3`-power)
+  have hm2 : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  have hGfact := fc.factorization_card_G_eq model hB2 hm2
+  rw [hp3] at hGfact
+  rw [hGfact, pow_add, hkeq, Nat.Prime.factorization_pow Nat.prime_three,
+    Finsupp.single_eq_same]
+
+/-- **Peterfalvi Part II, Ch. II, step (10)** (p. 111): let `|F| = p^m`.  Exactly
+one of the following holds.
+
+* **(10.1)** `p ∤ |Σ|` and `|G|_p = p^{m+2}`.
+* **(10.2)** `p = |Σ| = 3`, `F ≅ F_{9,2}`, `W` is cyclic of order `3` or `9`, and
+  `|G|_3 = 3^4 · |W|`.
+
+The dichotomy is on whether `p ∣ |Σ| = |C_W(P)|`: the negative branch is
+`factorization_card_G_eq_of_not_p_dvd_card_centralizer_W`, the positive branch is
+`w_cyclic_of_p_dvd_card_centralizer_W`.  Inherits the step (2)(b) `sorry`
+(issue 9318) + Higman through the model. -/
+theorem step_ten_dichotomy
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) :
+    (¬ fc.p ∣ Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ∧
+      (Nat.card G).factorization fc.p = m + 2) ∨
+    (fc.p ∣ Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ∧
+      fc.p = 3 ∧ Nat.card F = 9 ∧ IsCyclic ↥fc.toHypothesis.W ∧
+      (Nat.card ↥fc.toHypothesis.W = 3 ∨ Nat.card ↥fc.toHypothesis.W = 9) ∧
+      3 ^ (Nat.card G).factorization 3 = 3 ^ 4 * Nat.card ↥fc.toHypothesis.W) := by
+  by_cases hpSig : fc.p ∣
+      Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))
+  · exact Or.inr ⟨hpSig, fc.w_cyclic_of_p_dvd_card_centralizer_W ind model hB2 hpSig⟩
+  · exact Or.inl ⟨hpSig,
+      fc.factorization_card_G_eq_of_not_p_dvd_card_centralizer_W model hB2 hm hpSig⟩
 
 end FirstCaseHypothesis
 
