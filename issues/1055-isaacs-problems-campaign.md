@@ -263,10 +263,37 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   `H^g=g⁻¹Hg` で `Q^g=gQg⁻¹⊆H`) が `H` で共役 `Q^g=Q^h` (h∈H) なら `h⁻¹g∈N_G(Q)⊆H` (条件) ゆえ `g∈H`、
   矛盾。**難所 = 「Q と Q^g が H で共役」の justification** (Isaacs hint だが subtle、Sylow of H への埋め込み
   だけでは同位数 q-部分群の共役は従わず、maximality/counting 論法を要すると思われる)。→ **専用 session で
-  精査**。他の §1D は全完 (**17/18**)。次は Ch.2 (Subnormality、repo に `Ch02_Subnormality/` 既存) の
-  問題へ breadth 展開推奨。
+  精査**。他の §1D は全完 (**17/18**)。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
+
+## Ch.2 (Subnormality) §2A — 着手 (2026-07-23)
+
+新 leaf `OddOrder/Isaacs/Ch02_Subnormality/Problems.lean` (namespace `OddOrder.Isaacs.Ch02`、import
+`Mathlib.GroupTheory.IsSubnormal`+`Ch01_Sylow.Main`、`OddOrder.lean` 配線済)。`Subgroup.IsSubnormal` は
+mathlib inductive (`top`/`step`)。
+
+- ✅ 実証明 **2A.3(a)** `le_of_isSubnormal_of_coprime_index` (`H` 部分正規, `|G:H|` と `|K|` 互いに素
+  ⟹ `K≤H`)。`IsSubnormal` 帰納法 (`| top => le_top | @step H' K' hle _ hN ih`): step で `K'.index∣H'.index`
+  (`index_dvd_of_le`) から `ih` で `K≤K'`、核 = 商 `mk'(H'.subgroupOf K')` の像 `(K.subgroupOf K').map` の
+  card が `|K|` (`card_map_dvd`+`subgroupOfEquivOfLe`) と `(H'.subgroupOf K').index` (`card_subgroup_dvd_card`,
+  `index_eq_card`) 双方を割り、後者は `|G:H'|` を割り (`relIndex_dvd_index_of_le`) `|K|` と互いに素
+  (`eq_one_of_dvd_coprimes`) ⟹ 像 `⊥` ⟹ `K.subgroupOf K'≤H'.subgroupOf K'` ⟹ `K≤H'`
+  (`subgroupOf_map_subtype`+`inf_eq_left`)。
+- ⬜ **残り §2A** (2A.3(a) 以外は substantial、要 machinery):
+  - **2A.1** (subnormal π-subgroup `K ⊆ O_π(G)`) — **正しい帰納 motive を発見 (2026-07-23)**: 素朴な
+    `P K := IsPiGroup π K → K≤oPiCore` は IsSubnormal 構造帰納に **不適** (step の IH は大きい `K'` について
+    で、π-group 性は小さい `K` について ⟹ 使えない)。正解は **`P H := (oPiCore π ↥H).map H.subtype ≤
+    oPiCore π G`** (H を IsSubnormal で帰納): top は `↥⊤≅G` の iso、step (`H◁K'`, IH: `(oPiCore π ↥K').map
+    K'.subtype ≤ oPiCore π G`) は `(oPiCore π ↥H).map (Subgroup.inclusion hle)` が ↥K' で正規 (oPiCore char
+    in ↥H + `H.subgroupOf K'◁↥K'` で char-in-normal) かつ π-group (`oPiCore.isPiGroup`+`IsPiGroup.map`) ⟹
+    `≤ oPiCore π ↥K'` (`IsPiGroup.le_oPiCore`)、`H.subtype=K'.subtype∘inclusion` で `.map K'.subtype` して IH。
+    素材確認済: `IsPiGroup.le_oPiCore`[Normal] / `oPiCore.characteristic`/`isPiGroup` / `IsPiGroup.map_equiv`
+    / `normal_of_characteristic` / 1D.16 の `characteristic_map_subtype_normal` パターン。~60 行 fiddly
+    (subgroup-as-group + inclusion + char + π-group 配管)。
+  - **2A.3(b)** (`K` 部分正規版) — **2A.1 経由**: π=π(K)、K « G π-group ⟹ 2A.1 で `K⊆O_π(G)`、`O_π(G)◁G`
+    π-group で `|O_π(G):O_π(G)∩H| ∣ gcd(|O_π(G)|,|G:H|)=1` (互いに素) ⟹ `O_π(G)⊆H` ⟹ `K⊆H`。
+  - 2A.2 (O^π) / 2A.4 (Wielandt) / 2A.5-2A.9 (socle・単純部分正規、heavy)。
 
 - ⬜ **次: §1D 続き (1D.8/1D.13 系 mathlib 支援厚のもの、1D.2/1D.3-5 は後で) → §1E–§1G**。
 
