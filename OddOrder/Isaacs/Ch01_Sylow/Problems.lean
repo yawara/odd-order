@@ -84,6 +84,54 @@ theorem exists_unique_subgroup_card_eq_of_prime_gt {G : Type*} [Group G] [Finite
   have hQP : Sylow.ofCard Q hQfact = P := Subsingleton.elim _ _
   rw [← Sylow.coe_ofCard Q hQfact, hQP]
 
+/-- **Isaacs Problem 1A.4** (核となる被覆補題). 部分群 `H, K` が `H·K = G` (任意の `g` が
+`h·k`, `h∈H`, `k∈K` と書ける) をみたすなら、任意の `z` で `H·(z⁻¹Kz) = G`。
+
+証明: `z⁻¹ = h₀·k₀`, `g·z⁻¹ = h₁·k₁` と分解し、`g = (h₁h₀⁻¹)·(z⁻¹(k₀⁻¹k₁)z)` を確認する
+(中央の `z⁻¹` を `h₀k₀` に置換すると `h₀⁻¹h₀`, `k₀k₀⁻¹` が消えて `h₁k₁z = (gz⁻¹)z = g`)。 -/
+theorem exists_mem_mul_conj_of_covers {G : Type*} [Group G] {H K : Subgroup G}
+    (hcov : ∀ g : G, ∃ h ∈ H, ∃ k ∈ K, h * k = g) (z g : G) :
+    ∃ h ∈ H, ∃ k ∈ K, h * (z⁻¹ * k * z) = g := by
+  obtain ⟨h₀, hh₀, k₀, hk₀, e0⟩ := hcov z⁻¹
+  obtain ⟨h₁, hh₁, k₁, hk₁, e1⟩ := hcov (g * z⁻¹)
+  refine ⟨h₁ * h₀⁻¹, mul_mem hh₁ (inv_mem hh₀), k₀⁻¹ * k₁, mul_mem (inv_mem hk₀) hk₁, ?_⟩
+  have step : h₁ * h₀⁻¹ * (z⁻¹ * (k₀⁻¹ * k₁) * z) = h₁ * k₁ * z := by
+    rw [← e0]; group
+  rw [step, e1]; group
+
+open Pointwise in
+/-- **Isaacs Problem 1A.4** (帰結). `H·H^x = G` (`H^x = x⁻¹Hx`、任意の `g` が
+`h·(x⁻¹h'x)`, `h,h'∈H` と書ける) ならば `H = ⊤`。
+
+上の被覆補題を `K = x⁻¹Hx`, `z = x⁻¹` に適用すると `H·(x·(x⁻¹Hx)·x⁻¹) = H·H = G` を得るが、
+`H·H = H` (`H` は部分群) ゆえ `H = ⊤`。 -/
+theorem eq_top_of_mul_conj_covers {G : Type*} [Group G] {H : Subgroup G} {x : G}
+    (hcov : ∀ g : G, ∃ h ∈ H, ∃ h' ∈ H, h * (x⁻¹ * h' * x) = g) : H = ⊤ := by
+  set K : Subgroup G := MulAut.conj x⁻¹ • H with hK
+  -- H·K = G (K = x⁻¹Hx)
+  have hcovK : ∀ g : G, ∃ h ∈ H, ∃ k ∈ K, h * k = g := by
+    intro g
+    obtain ⟨h, hh, h', hh', hg⟩ := hcov g
+    refine ⟨h, hh, x⁻¹ * h' * x, ?_, hg⟩
+    rw [hK, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hconj : (MulAut.conj x⁻¹)⁻¹ • (x⁻¹ * h' * x) = h' := by
+      simp only [← map_inv, inv_inv, MulAut.smul_def, MulAut.conj_apply]; group
+    rw [hconj]; exact hh'
+  -- 被覆補題 (z = x⁻¹) を適用
+  rw [Subgroup.eq_top_iff']
+  intro g
+  obtain ⟨h, hh, k, hk, hg⟩ := exists_mem_mul_conj_of_covers hcovK x⁻¹ g
+  -- k ∈ K = x⁻¹Hx ⟹ x·k·x⁻¹ ∈ H
+  have hxk : x * k * x⁻¹ ∈ H := by
+    rw [hK, Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hk
+    have hconj : (MulAut.conj x⁻¹)⁻¹ • k = x * k * x⁻¹ := by
+      simp only [← map_inv, inv_inv, MulAut.smul_def, MulAut.conj_apply]
+    rwa [hconj] at hk
+  -- g = h · (x·k·x⁻¹)、両方 H の元
+  have : g = h * (x * k * x⁻¹) := by rw [← hg]; group
+  rw [this]
+  exact mul_mem hh hxk
+
 end
 
 /-! ## mathlib で被覆される演習 (docstring 記録、純粋ラッパーは書かない)
