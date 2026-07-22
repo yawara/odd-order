@@ -426,6 +426,35 @@ theorem exists_min_anchor_dvd [Fintype G] [Invertible (Nat.card G : ℂ)] [Finty
   push_cast
   ring
 
+open scoped Classical in
+/-- **(4) supported differences `hXdiff`** (Peterfalvi (4), p. 147).  There is an anchor
+`χ₁ ∈ 𝒳 = XsetOf ⊥ Z` such that for every `χ ∈ 𝒳` the difference `χ − b·χ₁` (with
+`b = χ(1)/χ₁(1) ∈ ℕ`, `b > 0`) is `A`-supported — the integer-ratio `hXdiff` input of
+`xset_qder_union_coherent`.  Combines the anchor divisibility (`exists_min_anchor_dvd`) with the
+degree-matched support lemma (`scaled_diff_support_subset_A_of_mem_Sset`, `n = 1`). -/
+theorem exists_anchor_hXdiff [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+    [Invertible (Nat.card ↥hyp.H : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    {p : ℕ} (hp : p.Prime) (hQ1p : IsPGroup p ↥hyp.Q1)
+    {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) (hZne : Z ≠ ⊥)
+    (hZH : ∀ ⦃h : G⦄, h ∈ hyp.H → ∀ ⦃x : G⦄, x ∈ Z → h * x * h⁻¹ ∈ Z)
+    [(hyp.Sder.subgroupOf hyp.H).Normal]
+    [((hyp.Sder.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal] :
+    ∃ χ₁ ∈ hyp.XsetOf ⊥ Z, ∀ χ ∈ hyp.XsetOf ⊥ Z, ∃ b : ℕ, 0 < b ∧
+      χ - b • χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) (hyp.XsetOf ⊥ Z) hyp.A := by
+  obtain ⟨χ₁, hχ₁X1, hdvd⟩ := hyp.exists_min_anchor_dvd hp hQ1p hZQ1 hZne hZH
+  have hχ₁X : χ₁ ∈ hyp.XsetOf ⊥ Z :=
+    ⟨⟨hχ₁X1.1.1, fun x hx => by
+      rw [Subgroup.mem_bot] at hx
+      rw [show x = 1 from Subtype.ext hx]⟩, hχ₁X1.2⟩
+  refine ⟨χ₁, hχ₁X, fun χ hχ => ?_⟩
+  obtain ⟨b, hbpos, hbdeg⟩ := hdvd χ hχ
+  refine ⟨b, hbpos, Submodule.sub_mem _ (Submodule.subset_span hχ)
+    (nsmul_mem (Submodule.subset_span hχ₁X) b), ?_⟩
+  have hsupp := hyp.scaled_diff_support_subset_A_of_mem_Sset
+    (hyp.XsetOf_subset_Sset ⊥ Z hχ) (hyp.XsetOf_subset_Sset ⊥ Z hχ₁X) (n := 1) (m := b)
+    (by rw [Nat.cast_one, one_mul]; exact hbdeg)
+  simpa using hsupp
+
 /-- **(8) full assembly: `a ∣ λ`** (Peterfalvi (8), p. 150).  The keystone divisibility closing
 step (6): from the endgame `(4)` data — the coherent `𝒳 = XsetOf ⊥ Z` with anchor `χ₁` of degree
 `χ₁(1) = a·d`, `p`-power degree differences `χ − b·χ₁` supported, the `𝒴`-witness `e' = ε·ξ`
