@@ -955,6 +955,121 @@ theorem powerOrder_eq_iUnion_sylow {p : ℕ} [Fact p.Prime] {G : Type*} [Group G
       (hn ▸ Subgroup.orderOf_dvd_natCard (P : Subgroup G) hxP)
     exact ⟨k, hk⟩
 
+/-- p-元 `x` が Sylow `p`-部分群 `P` の全ての元と可換ならば `x ∈ P`。
+
+`⟨x⟩` は p-群、`x` が `P` を中心化するので `⟨x⟩ ≤ N_G(P)` (`centralizer_le_normalizer`)、ゆえ
+`P ⊔ ⟨x⟩` も p-群 (`IsPGroup.to_sup_of_normal_left'`)、Sylow の極大性 (`is_maximal'`) で
+`P ⊔ ⟨x⟩ = P`、したがって `x ∈ P`。1C.3(b) の固定点計算で使う。 -/
+theorem mem_sylow_of_orderOf_prime_pow_of_forall_commute {p : ℕ} [Fact p.Prime] {G : Type*}
+    [Group G] [Finite G] (P : Sylow p G) {x : G} {k : ℕ} (hk : orderOf x = p ^ k)
+    (hcomm : ∀ h ∈ (P : Subgroup G), h * x = x * h) : x ∈ (P : Subgroup G) := by
+  have hxpg : IsPGroup p (Subgroup.zpowers x) :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, hk])
+  have hnorm : Subgroup.zpowers x ≤ Subgroup.normalizer (P : Subgroup G) :=
+    Subgroup.zpowers_le.mpr
+      (Subgroup.centralizer_le_normalizer _ (Subgroup.mem_centralizer_iff.mpr hcomm))
+  have hsup : IsPGroup p ((P : Subgroup G) ⊔ Subgroup.zpowers x : Subgroup G) :=
+    P.isPGroup'.to_sup_of_normal_left' hxpg hnorm
+  have heq : (P : Subgroup G) ⊔ Subgroup.zpowers x = (P : Subgroup G) :=
+    P.is_maximal' hsup le_sup_left
+  exact (heq ▸ (le_sup_right : Subgroup.zpowers x ≤ _)) (Subgroup.mem_zpowers x)
+
+open MulAction in
+/-- **Isaacs Problem 1C.3(b)**. `p ∣ |G|` ならば、位数が `p` の冪である元全体 `X` の個数は
+`p` で割り切れる。
+
+Sylow `p`-部分群 `P` を `X` に共役で作用させると `|X| ≡ |X^P| (mod p)`
+(`IsPGroup.card_modEq_card_fixedPoints`)。固定点 `X^P` は「`P` の全元と可換な `p`-元」であり、
+そのような元は `P` に属する (`mem_sylow_of_orderOf_prime_pow_of_forall_commute`) ので `X^P` は
+`Z(P)` (= `P` の中心) と全単射。`P` は非自明 p-群ゆえ `Z(P)` も非自明 p-群で `p ∣ |Z(P)| = |X^P|`、
+したがって `p ∣ |X|`。 -/
+theorem prime_dvd_card_orderOf_prime_pow {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (hp : p ∣ Nat.card G) :
+    p ∣ Nat.card {x : G // ∃ k, orderOf x = p ^ k} := by
+  obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
+  set X := {x : G // ∃ k, orderOf x = p ^ k} with hXdef
+  haveI hXfin : Finite X := Subtype.finite
+  -- ↥P の X への共役作用
+  letI act : MulAction (↥(P : Subgroup G)) X :=
+    { smul := fun h x => ⟨(h : G) * (x : G) * (h : G)⁻¹, by
+        obtain ⟨k, hk⟩ := x.2
+        refine ⟨k, ?_⟩
+        have sc : SemiconjBy (h : G) (x : G) ((h : G) * (x : G) * (h : G)⁻¹) := by
+          change (h : G) * (x : G) = (h : G) * (x : G) * (h : G)⁻¹ * (h : G)
+          group
+        rw [← hk]; exact (SemiconjBy.orderOf_eq (h : G) sc).symm⟩
+      one_smul := fun x => by
+        apply Subtype.ext
+        change ((1 : ↥(P : Subgroup G)) : G) * (x : G) * ((1 : ↥(P : Subgroup G)) : G)⁻¹ = (x : G)
+        simp
+      mul_smul := fun h₁ h₂ x => by
+        apply Subtype.ext
+        change ((h₁ * h₂ : ↥(P : Subgroup G)) : G) * (x : G) * ((h₁ * h₂ : ↥(P : Subgroup G)) : G)⁻¹
+            = (h₁ : G) * ((h₂ : G) * (x : G) * (h₂ : G)⁻¹) * (h₁ : G)⁻¹
+        simp only [Subgroup.coe_mul]; group }
+  -- 固定点の特徴づけ: w ∈ X^P ↔ w が P の全元と可換
+  have hchar : ∀ w : X, w ∈ fixedPoints (↥(P : Subgroup G)) X ↔
+      ∀ h ∈ (P : Subgroup G), h * (w : G) = (w : G) * h := by
+    intro w
+    rw [mem_fixedPoints]
+    constructor
+    · intro hw h hh
+      have hval : h * (w : G) * h⁻¹ = (w : G) := congrArg Subtype.val (hw ⟨h, hh⟩)
+      rwa [mul_inv_eq_iff_eq_mul] at hval
+    · intro hw
+      rintro ⟨h, hh⟩
+      apply Subtype.ext
+      change h * (w : G) * h⁻¹ = (w : G)
+      rw [hw h hh, mul_assoc, mul_inv_cancel, mul_one]
+  -- P の元は p-元
+  have hPpow : ∀ w : (↥(P : Subgroup G)), ∃ k, orderOf ((w : G)) = p ^ k := by
+    intro w
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
+    obtain ⟨k, -, hk⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp
+      (hn ▸ Subgroup.orderOf_dvd_natCard (P : Subgroup G) w.2)
+    exact ⟨k, hk⟩
+  -- X^P → Z(P) の下降写像 toC, 全単射
+  let toC : (fixedPoints (↥(P : Subgroup G)) X) → ↥(Subgroup.center (↥(P : Subgroup G))) :=
+    fun y => ⟨⟨((y : X) : G), by
+        obtain ⟨k, hk⟩ := (y : X).2
+        exact mem_sylow_of_orderOf_prime_pow_of_forall_commute P hk ((hchar (y : X)).mp y.2)⟩,
+      Subgroup.mem_center_iff.mpr fun v => Subtype.ext ((hchar (y : X)).mp y.2 v.1 v.2)⟩
+  have hinj : Function.Injective toC := by
+    intro y y' h
+    apply Subtype.ext
+    apply Subtype.ext
+    exact congrArg
+      (fun z : ↥(Subgroup.center (↥(P : Subgroup G))) => ((z : ↥(P : Subgroup G)) : G)) h
+  have hsurj : Function.Surjective toC := by
+    rintro ⟨⟨g, hgP⟩, hzc⟩
+    refine ⟨⟨⟨g, hPpow ⟨g, hgP⟩⟩, ?_⟩, ?_⟩
+    · refine (hchar _).mpr ?_
+      intro h hh
+      exact congrArg Subtype.val (Subgroup.mem_center_iff.mp hzc ⟨h, hh⟩)
+    · exact Subtype.ext (Subtype.ext rfl)
+  have hcardfix : Nat.card (fixedPoints (↥(P : Subgroup G)) X)
+      = Nat.card (Subgroup.center (↥(P : Subgroup G))) :=
+    Nat.card_eq_of_bijective toC ⟨hinj, hsurj⟩
+  -- P は非自明, ゆえ Z(P) は非自明 p-群で p ∣ |Z(P)|
+  have hPdvd : p ∣ Nat.card (↥(P : Subgroup G)) := by
+    rw [P.card_eq_multiplicity]
+    exact dvd_pow_self p ((Fact.out : p.Prime).factorization_pos_of_dvd
+      (Nat.card_pos).ne' hp).ne'
+  haveI : Nontrivial (↥(P : Subgroup G)) :=
+    Finite.one_lt_card_iff_nontrivial.mp
+      (lt_of_lt_of_le (Fact.out : p.Prime).one_lt (Nat.le_of_dvd Nat.card_pos hPdvd))
+  have hZdvd : p ∣ Nat.card (Subgroup.center (↥(P : Subgroup G))) := by
+    obtain ⟨n, hn, hcard⟩ :=
+      (P.isPGroup'.to_subgroup (Subgroup.center (↥(P : Subgroup G)))).nontrivial_iff_card.mp
+        P.isPGroup'.center_nontrivial
+    rw [hcard]; exact dvd_pow_self p hn.ne'
+  -- 仕上げ
+  have hfixdvd : p ∣ Nat.card (fixedPoints (↥(P : Subgroup G)) X) := by
+    rw [hcardfix]; exact hZdvd
+  have hmod : Nat.card X ≡ Nat.card (fixedPoints (↥(P : Subgroup G)) X) [MOD p] :=
+    P.isPGroup'.card_modEq_card_fixedPoints X
+  exact Nat.modEq_zero_iff_dvd.mp (hmod.trans (Nat.modEq_zero_iff_dvd.mpr hfixdvd))
+
 end
 
 end OddOrder.Isaacs.Ch01
