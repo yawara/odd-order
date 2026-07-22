@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 03:5x 監視 tick — a (1D.3 + ✅Problems 分割) + b (Higman L12/13) 合流**。a=4 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.3** Frobenius complement は Hall subgroup + **✅ Problems.lean §1D 分割** — 新 leaf `ProblemsFrobeniusFrattini.lean` +340 WIRED via `OddOrder.lean:179`、Problems.lean 1615→1363) / b (**Higman Lemma 12/13** 指数4因子を B(n,1,ε)/C に精密化 + witness 保持、既存 leaf 拡張・新 leaf 0)。
+> **gate: green 4657 jobs (前 4656 +1 leaf = a の分割 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 4c5d0f799→ca78e7c84**。範囲逸脱なし。
+> ✅ **file-size flag 解消 (協調ループ成功)**: 前 tick に hub が flag した `Problems.lean` 1615 を、**a が次 tick で自律分割** (§1D→`ProblemsFrobeniusFrattini.lean`、配線込み)。1363 に復帰、issue 0124 watch 解除。hub flag → owner 自律分割の設計どおり。
+> 👀 **c watch (3 tick quiet)**: c は 9407 裁定後 BG remainder に着手中だが 03:2x 以降 0 ahead が 3 tick 継続 (~30分 commit 無)。BG 未形式化結果の survey+初回構成は時間を要するため**現時点で stall 判定はしない** (genuine 探索中の公算)。次 tick も 0 なら worktree 更新時刻を確認。a=次 §1E WIP / d=wave 間。
+>
 > **▶▶ 2026-07-23 03:3x 監視 tick — a (1D.2/1D.7/13/14) + b (Higman L12) 合流 / 📏 Problems.lean 1615 flag**。a=4 / b=2 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problems 1D.2** p は centralizer 条件下で |H|・|G:H| を同時に割れない + **1D.7/1D.13/1D.14** Frattini non-generators・central nilpotency、`Problems.lean` +180) / b (**Higman Lemma 12** 可換因子の B/C 分類 + factor data 保持、`Assembly.lean`/`LengthTwoModels.lean` 拡張・新 leaf 0)。
 > **gate: green 4656 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push a3c455432→793240f05**。範囲逸脱なし。

@@ -236,14 +236,86 @@ theorem frattini_map_eq_frattiniSquare_of_restricted_lengthThree_exponent_four
     rw [← hsz]
     exact hsSqP
 
-/-- **Higman Lemma 13 (p. 92), initial classification of the two
+/-- **Higman Lemma 13 (p. 92), classification of an exponent-four
+restricted factor.**
+
+Inside a restricted length-three factor `S`, the preimage of the ambient
+`Φ(P)` is a proper commutative invariant subgroup strictly above `Φ(S)`.
+The prescribed-factor form of Lemma 12 therefore retains the equation
+`phi = 1` in the type-B branch; the only other branch is type C. -/
+theorem restricted_lengthThree_typeB_phi_one_or_typeC_of_exponent_four
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    (hPhiComm : IsMulCommutative (frattini P))
+    (hfour : ∀ z : frattini P, z ^ 4 = 1)
+    (hexists : ∃ z : frattini P, z ^ 2 ≠ 1)
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : NormalInvariantCover Y.subtype (frattini P) S)
+    (hlenS : HasXiLengthThree hSinv.restrict.range.subtype)
+    (hncommS : ¬ IsMulCommutative S) :
+    (∃ data : TypeBData.{uP, 0} S, data.phi = 1) ∨
+      IsTypeC.{uP, 0} S := by
+  have hSneBot : S ≠ (⊥ : Subgroup P) :=
+    ne_of_gt (lt_of_le_of_lt bot_le hPhiS.lt)
+  have hinvS : involutions P ⊆ S :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive hSinv hSneBot
+  have hxiS : IsXiActor hSinv.restrict.range :=
+    restricted_range_isXiActor hxi hSinv
+  have hmultiS : ∃ x y : S,
+      x ∈ involutions S ∧ y ∈ involutions S ∧ x ≠ y :=
+    exists_distinct_involutions_subgroup_of_subset hinvS hmulti
+  have hprimeS : ∀ p : ℕ, p.Prime →
+      p ∣ Nat.card hSinv.restrict.range →
+        p ∣ (involutions S).ncard :=
+    restricted_range_primeSupport hSinv hinvS hprime
+  let A : Subgroup S := (frattini P).subgroupOf S
+  have hAmap : A.map S.subtype = frattini P :=
+    Subgroup.map_subgroupOf_eq_of_le hPhiS.le
+  have hFrattiniMap : (frattini S).map S.subtype = frattiniSquare P :=
+    frattini_map_eq_frattiniSquare_of_restricted_lengthThree_exponent_four
+      hP hmulti hxi hprime hPhiComm hexists hSinv hPhiS hlenS hncommS
+  have hPhiA : frattini S < A := by
+    rw [← Subgroup.map_lt_map_iff_of_injective S.subtype_injective,
+      hFrattiniMap, hAmap]
+    exact frattiniSquare_lt_frattini hPhiComm hfour hexists
+  have hAtop : A < (⊤ : Subgroup S) := by
+    rw [← Subgroup.map_lt_map_iff_of_injective S.subtype_injective,
+      hAmap]
+    simpa [← MonoidHom.range_eq_map] using hPhiS.lt
+  have hAY : IsAInvariant hSinv.restrict A :=
+    hSinv.subgroupOf (IsAInvariant.of_characteristic Y.subtype)
+  have hArange : IsAInvariant hSinv.restrict.range.subtype A :=
+    (isAInvariant_range_subtype_iff hSinv.restrict A).2 hAY
+  have hAcomm : IsMulCommutative A := by
+    refine IsMulCommutative.of_comm fun a b => ?_
+    let aPhi : frattini P := ⟨((a : S) : P), a.property⟩
+    let bPhi : frattini P := ⟨((b : S) : P), b.property⟩
+    apply Subtype.ext
+    apply Subtype.ext
+    change ((aPhi * bPhi : frattini P) : P) =
+      ((bPhi * aPhi : frattini P) : P)
+    exact congrArg Subtype.val (hPhiComm.is_comm.comm aPhi bPhi)
+  exact
+    exists_typeBData_phi_eq_one_or_isTypeC_of_commutative_invariant_factor_of_xiLengthThree
+      (hP.to_subgroup S) hncommS hmultiS hxiS hlenS hprimeS
+      hArange hPhiA hAtop hAcomm
+
+/-- **Higman Lemma 13 (p. 92), classification of the two
 exponent-four factors.**
 
 The two complementary Frattini preimages are noncommutative Suzuki
-`2`-groups of restricted `ξ`-length three, so Higman's Lemma 12 classifies
-each as type B, C, or D.  The ambient meet and join data are retained for the
-subsequent refinement to the source's type-B/type-C cases and its mixed
-commutator contradiction. -/
+`2`-groups of restricted `ξ`-length three.  Retaining the ambient Frattini
+subgroup as a prescribed commutative factor strengthens Higman's Lemma 12
+to the source's exact alternatives `B(n, 1, ε)` and `C(n, ε)`.  The ambient
+meet and join data are retained for the mixed-commutator contradiction. -/
 theorem exists_two_classified_xiLengthThree_frattini_preimages_of_exponent_four
     {P : Type uP} [Group P] [Finite P]
     {Y : Subgroup (MulAut P)}
@@ -263,10 +335,12 @@ theorem exists_two_classified_xiLengthThree_frattini_preimages_of_exponent_four
         (hZinv : IsAInvariant Y.subtype Z),
       X.Normal ∧ HasXiLengthThree hXinv.restrict.range.subtype ∧
         ¬ IsMulCommutative X ∧
-        (IsTypeB.{uP, 0} X ∨ IsTypeC.{uP, 0} X ∨ IsTypeD.{uP, 0} X) ∧
+        ((∃ data : TypeBData.{uP, 0} X, data.phi = 1) ∨
+          IsTypeC.{uP, 0} X) ∧
         Z.Normal ∧ HasXiLengthThree hZinv.restrict.range.subtype ∧
         ¬ IsMulCommutative Z ∧
-        (IsTypeB.{uP, 0} Z ∨ IsTypeC.{uP, 0} Z ∨ IsTypeD.{uP, 0} Z) ∧
+        ((∃ data : TypeBData.{uP, 0} Z, data.phi = 1) ∨
+          IsTypeC.{uP, 0} Z) ∧
         frattini P < X ∧ X < ⊤ ∧
         frattini P < Z ∧ Z < ⊤ ∧
         X ⊓ Z = frattini P ∧ X ⊔ Z = ⊤ := by
@@ -290,6 +364,14 @@ theorem exists_two_classified_xiLengthThree_frattini_preimages_of_exponent_four
     hLower.1.lt hLower.2.lt
       (show phiTerm < zTerm from hPhiZ)
       (show zTerm < normalInvariantTop Y.subtype from hZtop)
+  let hPhiXCover : NormalInvariantCover Y.subtype (frattini P) X :=
+    { left := phiTerm.2
+      right := xTerm.2
+      covBy := hXcovers.2.2.1 }
+  let hPhiZCover : NormalInvariantCover Y.subtype (frattini P) Z :=
+    { left := phiTerm.2
+      right := zTerm.2
+      covBy := hZcovers.2.2.1 }
   let hXTopCover : NormalInvariantCover Y.subtype X ⊤ :=
     { left := xTerm.2
       right := (normalInvariantTop Y.subtype).2
@@ -304,31 +386,14 @@ theorem exists_two_classified_xiLengthThree_frattini_preimages_of_exponent_four
   have hZncomm : ¬ IsMulCommutative Z :=
     restricted_lengthThree_not_isMulCommutative_of_covBy_top
       hP hncomm hmulti hxi hprime hZinv hZTopCover hlenZ
-  have classify :
-      ∀ (S : Subgroup P) (hSinv : IsAInvariant Y.subtype S),
-        frattini P < S →
-        HasXiLengthThree hSinv.restrict.range.subtype →
-        ¬ IsMulCommutative S →
-        IsTypeB.{uP, 0} S ∨ IsTypeC.{uP, 0} S ∨ IsTypeD.{uP, 0} S := by
-    intro S hSinv hPhiS hlenS hncommS
-    have hSneBot : S ≠ (⊥ : Subgroup P) :=
-      ne_of_gt (lt_of_le_of_lt bot_le hPhiS)
-    have hinvS : involutions P ⊆ S :=
-      involutions_subset_of_nontrivial_invariant
-        hP Y hxi.transitive hSinv hSneBot
-    have hxiS : IsXiActor hSinv.restrict.range :=
-      restricted_range_isXiActor hxi hSinv
-    have hmultiS : ∃ x y : S,
-        x ∈ involutions S ∧ y ∈ involutions S ∧ x ≠ y :=
-      exists_distinct_involutions_subgroup_of_subset hinvS hmulti
-    have hprimeS : ∀ p : ℕ, p.Prime →
-        p ∣ Nat.card hSinv.restrict.range →
-          p ∣ (involutions S).ncard :=
-      restricted_range_primeSupport hSinv hinvS hprime
-    exact higmanLemmaTwelve (hP.to_subgroup S) hncommS hmultiS
-      hxiS hlenS hprimeS
-  have hXclass := classify X hXinv hPhiX hlenX hXncomm
-  have hZclass := classify Z hZinv hPhiZ hlenZ hZncomm
+  have hXclass :=
+    restricted_lengthThree_typeB_phi_one_or_typeC_of_exponent_four
+      hP hmulti hxi hprime hPhiComm hfour hexists hXinv hPhiXCover
+      hlenX hXncomm
+  have hZclass :=
+    restricted_lengthThree_typeB_phi_one_or_typeC_of_exponent_four
+      hP hmulti hxi hprime hPhiComm hfour hexists hZinv hPhiZCover
+      hlenZ hZncomm
   exact ⟨X, Z, hXinv, hZinv, hXnormal, hlenX, hXncomm, hXclass,
     hZnormal, hlenZ, hZncomm, hZclass, hPhiX, hXtop, hPhiZ, hZtop,
     hXZinf, hXZsup⟩
