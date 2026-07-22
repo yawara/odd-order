@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 05:3x 監視 tick — a (1D.10) + b (Higman L13 正規化) 合流 / 🔴 c stall 継続 (~2h35m)**。a=2 / b=1 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.10 (self-centralizing)** — P の maximal abelian normal A は A = C_P(A)、`ProblemsFrobeniusFrattini.lean` +33) / b (**Higman Lemma 13** restricted factor を Frobenius 正規化、新 leaf `RestrictedFactorNormalForms.lean` +164 WIRED)。
+> **gate: green 4662 jobs (前 4661 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 57efc426e→d0bc6f40d**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~2h35m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
 > **▶▶ 2026-07-23 05:2x 監視 tick — a (1D.9 p²分類) + b (Higman L13 + 9321 座標正規化) 合流 / 🔴 c stall 継続 (~2h20m)**。a=2 / b=4 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problem 1D.9 (order-p² 分類)** — 位数 p² 群は cyclic か elementary abelian、`ProblemsFrobeniusFrattini.lean` +27) / b (**Higman Lemma 13** restricted factor を共通 Φ² 座標化、新 leaf `RestrictedFactorCoordinates.lean` +327 WIRED + **issue 9321 (factor coordinate Frobenius 正規化) を実証明・close** (b band 9300、3 連続 shared-infra: 9319/9320/9321))。
 > **gate: green 4661 jobs (前 4660 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 156c71c2b→b6fa959a3**。範囲逸脱なし。
