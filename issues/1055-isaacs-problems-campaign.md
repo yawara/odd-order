@@ -50,6 +50,18 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - **難易度・quick-win は着手基準でない** — 文書順で正面から。ただし 1 問で堂々巡りせず、
   genuine に blocked なら記録して先へ進み後で戻る。
 
+## 進捗
+
+**Ch.1 §1A** (`Ch01_Sylow/Problems.lean`、2026-07-22 着手):
+- ✅ 実証明: **1A.1** (素数指数+最小性→正規) / **1A.4** (H·K=G⟹H·K^z=G + 帰結 H·H^x=G⟹H=⊤) /
+  **1A.9** (|G|=pm,p>m→位数p部分群一意) / **1A.10(b)** (p群H, p∣[G:H]→p∣[N_G(H):H])。
+- ✅ mathlib 対応 docstring 記録: **1A.6** (Burnside 軌道計数) / **1A.8** (Cauchy) / **1A.10(a)**
+  (`fixedPointsMulLeftCosetsEquivQuotient`)。
+- ⬜ 残 §1A: **1A.2** (二重剰余類 |HgK|=|H||K|/|K∩H^g|) / **1A.3** (|H:H∩K|≤|G:K| 等号⟺HK=G;
+  coprime index⟹HK=G) / **1A.5** (積作用の推移性⟺G_αG_β=G) / **1A.7** (真部分群の共役の
+  和集合の補集合 ≥|H|)。いずれも mathlib 直接対応なし = genuine 証明。
+- ⬜ §1B–§1G 未着手。
+
 ## 完了条件
 
 Isaacs Ch.1–10 の全演習問題が形式化 (実証明 or mathlib/repo 対応の docstring 記録)、
