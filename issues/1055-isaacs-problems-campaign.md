@@ -174,8 +174,13 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   新 leaf は `Problems` を import (§1A–§1C helper 利用) + Nilpotent/Cyclic/Frattini (§1D 専用)。
   `OddOrder.lean` 配線済、両 leaf build green (2209 jobs)。module 名不変で下流無影響。**以降 §1D の
   追記は新 leaf へ**。
-- ⬜ **残り §1D (分割後)**: 1D.4/1D.5 (Frobenius complement 判定, より構造的) / 1D.8 (G/Φ(G)
-  elementary abelian) / 1D.9–1D.12 / 1D.15–1D.17 (Φ・冪零系)。
+- ✅ 実証明 **1D.4** `frobenius_complement_iff_centralizer_eq_bot` (`G=NH`, `1<N◁G`, `N∩H=1` で
+  `H` Frobenius complement ⟺ 全非単位 `h∈H` で `C_N(h)=1`)。`⟹`: `n∈C_N(h), n≠1` なら `n∉H` かつ
+  `h=n·h·n⁻¹∈H^n` で `h∈H⊓H^n` (Frobenius に反する)。`⟸`: `g=n·h'` 分解で `H^g=H^n`
+  (`conj_smul_eq_self_of_mem`) から `n∈N,n≠1` に帰着、`x∈H⊓H^n, x≠1` で `x⁻¹n⁻¹xn∈N∩H=1` (N 正規)、
+  `x,n` 可換 (`group` tactic) ゆえ `n∈C_N(x)=1` 矛盾。(新 leaf ProblemsFrobeniusFrattini.lean)
+- ⬜ **残り §1D**: 1D.5 (Frobenius complement 判定, N_G(P)⊆H 版) / 1D.8 (G/Φ(G) elementary abelian) /
+  1D.9–1D.12 / 1D.15–1D.17 (Φ・冪零系)。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 
