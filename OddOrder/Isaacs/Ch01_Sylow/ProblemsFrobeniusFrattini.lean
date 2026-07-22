@@ -399,6 +399,56 @@ theorem frobenius_complement_iff_centralizer_eq_bot {G : Type*} [Group G] {N H :
       rw [Subgroup.mem_centralizer_iff]
       intro y hy; rw [Set.mem_singleton_iff] at hy; subst hy; exact hxn
     exact hn1 (Subgroup.mem_bot.mp (hcent x hxH hx1 ▸ Subgroup.mem_inf.mpr ⟨hcn, hnN⟩))
+
+/-- 特性部分群を正規部分群 `N` に沿って `G` へ押し出したものは `G` で正規。共役 `MulAut.conj g` を
+`N` に制限した `MulAut.conjNormal g` の下で特性部分群は不変。 -/
+theorem characteristic_map_subtype_normal {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    (H : Subgroup ↥N) [H.Characteristic] : (H.map N.subtype).Normal := by
+  constructor
+  intro n hn g
+  obtain ⟨h, hhH, rfl⟩ := Subgroup.mem_map.mp hn
+  refine Subgroup.mem_map.mpr ⟨MulAut.conjNormal g h, ?_, MulAut.conjNormal_apply g h⟩
+  rw [← Subgroup.characteristic_iff_map_eq.mp ‹H.Characteristic› (MulAut.conjNormal g)]
+  exact Subgroup.mem_map_of_mem _ hhH
+
+open Pointwise in
+/-- **Isaacs Problem 1D.16**. `N ◁ G` ならば `Φ(N) ⊆ Φ(G)` (Frattini 部分群の単調性、`N` の
+Frattini を `G` へ押し出したもの)。
+
+各極大部分群 `M` について `Φ(N) ⊆ M` を示す。`Φ(N)` は `N` の特性部分群 (`frattini` characteristic)
+かつ `N ◁ G` ゆえ `Φ(N) ◁ G`。`Φ(N) ⊄ M` なら `M` 極大で `M ⊔ Φ(N) = ⊤`、`Φ(N)` 正規ゆえ
+`M ⊔ Φ(N) = M · Φ(N)` (`mul_normal`)。任意の `x ∈ N` は `x = m·φ` (`m∈M`, `φ∈Φ(N)`) と書け
+`m = x·φ⁻¹ ∈ N` から `m ∈ N ⊓ M`、`x ∈ (N⊓M) ⊔ Φ(N)`。ゆえ `N ≤ (N⊓M) ⊔ Φ(N)`、`N` の部分群として
+`(N⊓M) ⊔ Φ(N) = ⊤`、`frattini_nongenerating` で `N ⊓ M = N`、`N ⊆ M`、`Φ(N) ⊆ N ⊆ M` で矛盾。 -/
+theorem frattini_map_subtype_le_frattini {G : Type*} [Group G] [Finite G] {N : Subgroup G}
+    [N.Normal] : (frattini ↥N).map N.subtype ≤ frattini G := by
+  set ΦN := (frattini ↥N).map N.subtype with hΦN
+  haveI hΦnorm : ΦN.Normal := characteristic_map_subtype_normal (frattini ↥N)
+  have hΦNle : ΦN ≤ N := Subgroup.map_subtype_le _
+  have hround : ΦN.subgroupOf N = frattini ↥N :=
+    Subgroup.comap_map_eq_self_of_injective (Subgroup.subtype_injective N) _
+  rw [frattini, Order.radical]
+  refine le_iInf fun M => le_iInf fun hM => ?_
+  simp only [Set.mem_setOf_eq] at hM
+  by_contra hnle
+  have htop : M ⊔ ΦN = ⊤ :=
+    hM.2 _ (lt_of_le_of_ne le_sup_left (fun h => hnle (le_sup_right.trans_eq h.symm)))
+  have hle : N ≤ (N ⊓ M) ⊔ ΦN := by
+    intro x hxN
+    have hxmul : x ∈ (M : Set G) * (ΦN : Set G) := by
+      rw [← Subgroup.mul_normal M ΦN, htop]; exact Subgroup.mem_top x
+    obtain ⟨m, hmM, φ, hφΦ, rfl⟩ := Set.mem_mul.mp hxmul
+    have hmN : m ∈ N := by
+      have he : m = m * φ * φ⁻¹ := by group
+      rw [he]; exact N.mul_mem hxN (N.inv_mem (hΦNle hφΦ))
+    exact ((N ⊓ M) ⊔ ΦN).mul_mem
+      (Subgroup.mem_sup_left (Subgroup.mem_inf.mpr ⟨hmN, hmM⟩)) (Subgroup.mem_sup_right hφΦ)
+  have hsup : (N ⊓ M).subgroupOf N ⊔ frattini ↥N = ⊤ := by
+    rw [← hround, ← Subgroup.subgroupOf_sup inf_le_left hΦNle, Subgroup.subgroupOf_eq_top]
+    exact hle
+  have hNM : N ≤ N ⊓ M := Subgroup.subgroupOf_eq_top.mp (frattini_nongenerating hsup)
+  exact hnle (hΦNle.trans (le_inf_iff.mp hNM).2)
+
 end
 
 end OddOrder.Isaacs.Ch01
