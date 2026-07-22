@@ -753,6 +753,36 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     card 定数性 |H⊓C(w)|=|H⊓C(z)| on Z^# (Z prime order + D 作用)、
     e'=ε•ξ (endgame P2 witness)、e'-const on Z^# (piece4 が z-独立を与える)、
     Q Hall in H/G (coprime_Q_D + TI)、Q≤C(z) (S_commutes_Q1 + Z≤Z(Q₁))。
+
+  ### ⭐⭐ (8) 全組立 + 群仮説 discharge 完成 (2026-07-22 後半)
+
+  (8) 核をさらに**単一の a∣λ 統合補題**に束ね、posited 群仮説の主要 2 件を discharge:
+  - **`dvd_lam_of_endgame_data` (Conclusion.lean, sorry-free)**: endgame (4) data
+    (coherent 𝒳=XsetOf⊥Z + anchor χ₁ 度数 a·d + supported diff χ−b•χ₁ + 𝒴-witness
+    e'=ε•ξ cross-orth + keystone ⟨τ(χ₁−a•η₁),e'⟩=λ−a) ⟹ **a∣λ**。piece4 を Z^# 上
+    普遍適用 → e'-const 自動導出 → witness_charValue_cong → keystone で c₀=λ+aμ →
+    dvd_lam_of_evaluation_cong。**union_coherent_of_lambda_dvd の hdvd を直接供給**。
+    残 posited = Odd|G|, Q Hall in G (hHallG), Q≤C(z) (hQz), card 定数性 (hcard_const),
+    endgame (4) data 本体。
+  - **群仮説 discharge (Endgame.lean, sorry-free)**: hQz と hcard_const を証明:
+    - `Q_le_centralizer_of_centralizes_Q1`: w∈Q₁ が Q₁ 中心化 ⟹ Q=S×Q₁ が w 中心化。
+    - `inf_centralizer_eq_Q_of_mem_Q1`: w∈Q₁^# + Q≤C(w) ⟹ H⊓C_G(w)=Q (D f.p.f.)。
+      ⟹ |H⊓C(w)|=|Q| は Z^# 上一定 = hcard_const。
+    z∈endgameZ に対し endgameZ_le_Q1 + endgameZ_centralizes 経由で自動適用可。
+
+  ### 残 master assembly = (4)(5)(6) endgame notation setup + case 構造
+
+  a∣λ (dvd_lam_of_endgame_data) と union_coherent が揃ったので、残るのは:
+  1. **(4) setup (非可換 p 群 case)**: Z:=endgameZ に対し 𝒳=XsetOf⊥Z coherent
+     (endgame_Xset_coherent) + 𝒴=𝒮(Q') coherent (ssetOf_Qder_coherent, Remark) を取り、
+     **anchor χ₁ (最小度数, χ₁(1)=a·d) 選択** + **hXdiff (∀χ∈𝒳,∃b,χ−b•χ₁ supported =
+     (3.1) p 冪度数構造)** + **keystone χ₁−a•η₁ supported** を確立。⟵ 最大の未構築ピース。
+     exists_lambda_norm_identity で λ+norm identity、dvd_lam_of_endgame_data で a∣λ、
+     union_coherent_of_lambda_dvd で 𝒳∪𝒴 coherent。
+  2. **adjoin**: 𝒮(S')−(𝒳∪𝒴) を Lemma 1(a) で 𝒳∪𝒴 に adjoin → 𝒮(S') coherent。
+  3. **case 構造**: d=1 (自明) | d>1: Q₁ nilpotent (Thompson) → |Q₁| 2素数 ((1)+(2)) |
+     Q₁ abelian p群 (ReductionTwo:658 branch + (2)) | Q₁ 非可換 p群 ((4)setup→(2))。
+  4. **Odd|G| を feit_sibley_coherence の仮説に追加** (FT 文脈で faithful; step (7) 必須)。
 - [ ] 旧記録: **Part A 本体組み立て** (2026-07-21 設計固定、この順):
   1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
      保存。no-real: |Q₁| = p^n 奇 (p=2 なら Q1_not_two_group と矛盾で p 奇 —
