@@ -374,7 +374,6 @@ theorem witness_charValue_cong [Fintype G]
   exact hcong2
 
 open scoped Classical in
-open scoped Classical in
 /-- **(4) anchor divisibility** (Peterfalvi (4), p. 147: `aᵢ = χᵢ(1)/χ₁(1) ∈ ℤ`).  There is an
 anchor `χ₁ ∈ 𝒳₁ = XsetOf Sder Z` (the `𝒮(S')`-relative part) of minimal `p`-power degree such that
 `χ₁(1) ∣ χ(1)` for every `χ ∈ 𝒳 = XsetOf ⊥ Z` (the full family).
@@ -384,7 +383,7 @@ minimal exponent.  For `χ ∈ 𝒳`, `exists_anchor_of_mem_XsetOf` gives an anc
 `χθ(1) = d·tθ ∣ χ(1)`; since `χθ ∈ 𝒳₁`, `tθ = p^{kθ}` with `kθ ≥ k₁` (minimality), so
 `χ₁(1) = d·p^{k₁} ∣ d·p^{kθ} ∣ χ(1)`.  This discharges the integer-ratio `hXdiff` hypothesis of
 `dvd_lam_of_endgame_data`/`xset_qder_union_coherent` — no product character theory needed. -/
-theorem exists_min_anchor_dvd [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+theorem exists_min_anchor_dvd [Finite G] [Invertible (Nat.card G : ℂ)]
     [Invertible (Nat.card ↥hyp.H : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
     {p : ℕ} (hp : p.Prime) (hQ1p : IsPGroup p ↥hyp.Q1)
     {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) (hZne : Z ≠ ⊥)
@@ -394,6 +393,8 @@ theorem exists_min_anchor_dvd [Fintype G] [Invertible (Nat.card G : ℂ)] [Finty
     ∃ χ₁ ∈ hyp.XsetOf hyp.Sder Z, ∀ χ ∈ hyp.XsetOf ⊥ Z,
       ∃ b : ℕ, 0 < b ∧ χ (1 : ↥hyp.H) = (b : ℂ) * χ₁ (1 : ↥hyp.H) := by
   classical
+  letI : Fintype G := Fintype.ofFinite G
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
   have hX1fin : (hyp.XsetOf hyp.Sder Z).Finite := hyp.XsetOf_finite hyp.Sder Z
   have hX1ne : (hyp.XsetOf hyp.Sder Z).Nonempty :=
     hyp.XsetOf_nonempty hyp.Sder_le_S hZQ1 hZne
@@ -433,7 +434,7 @@ open scoped Classical in
 `b = χ(1)/χ₁(1) ∈ ℕ`, `b > 0`) is `A`-supported — the integer-ratio `hXdiff` input of
 `xset_qder_union_coherent`.  Combines the anchor divisibility (`exists_min_anchor_dvd`) with the
 degree-matched support lemma (`scaled_diff_support_subset_A_of_mem_Sset`, `n = 1`). -/
-theorem exists_anchor_hXdiff [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+theorem exists_anchor_hXdiff [Finite G] [Invertible (Nat.card G : ℂ)]
     [Invertible (Nat.card ↥hyp.H : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
     {p : ℕ} (hp : p.Prime) (hQ1p : IsPGroup p ↥hyp.Q1)
     {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) (hZne : Z ≠ ⊥)
@@ -521,7 +522,7 @@ open scoped Classical in
 would give `χ₁(1) = d`, forcing `χ₁ ∈ 𝒮(Q')` (`leKer_Qder_of_apply_one_eq_d`) and hence
 `LeKer χ₁ Z` (`Z ≤ Q'`), contradicting `Z ⊄ Ker χ₁`.  The supported differences follow from the
 divisibility and `scaled_diff_support_subset_A_of_mem_Sset`. -/
-theorem exists_anchor_data [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
+theorem exists_anchor_data [Finite G] [Invertible (Nat.card G : ℂ)]
     [Invertible (Nat.card ↥hyp.H : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
     {p : ℕ} (hp : p.Prime) (hQ1p : IsPGroup p ↥hyp.Q1)
     {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) (hZne : Z ≠ ⊥) (hZQder : Z ≤ hyp.Qder)
@@ -531,7 +532,10 @@ theorem exists_anchor_data [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype 
     ∃ (χ₁ : ClassFunction ↥hyp.H ℂ) (a : ℕ), χ₁ ∈ hyp.XsetOf ⊥ Z ∧ 2 ≤ a ∧
       χ₁ 1 = (a : ℂ) * (hyp.d : ℂ) ∧
       ∀ χ ∈ hyp.XsetOf ⊥ Z, ∃ b : ℕ, 0 < b ∧
-        χ - b • χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) (hyp.XsetOf ⊥ Z) hyp.A := by
+        χ - b • χ₁ ∈
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) (hyp.XsetOf ⊥ Z) hyp.A := by
+  letI : Fintype G := Fintype.ofFinite G
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
   obtain ⟨χ₁, hχ₁X1, hdvd⟩ := hyp.exists_min_anchor_dvd hp hQ1p hZQ1 hZne hZH
   obtain ⟨k₁, hk₁⟩ :=
     hyp.exists_apply_one_eq_d_mul_pow hp hQ1p (hyp.XsetOf_subset_SsetOf _ _ hχ₁X1)
