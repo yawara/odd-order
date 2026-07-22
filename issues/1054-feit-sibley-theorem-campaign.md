@@ -683,9 +683,22 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
       (ξ:G→ℂ)=ρ.character; ZIrr.lean:95)。(8) goal は Prop ゆえ obtain 可。
       haveI := hirr で instance 化 → peterfalvi_67_hall_of_odd 適用。
     - **算術核** dvd_of_isIntegral_ratio (完成)、**central 合同** peterfalvi_67_hall_of_odd (完成)。
-    **assembly の残実装** (次 session、tightly-coupled): (a) Res_H e′₁ inner を Frobenius +
-    (5) cross-orth + (6) coherence で計算、(b) Fourier 展開、(c) 𝒳↔Finset bijection +
-    正則指標恒等式、(d) z 評価、(e) ξ→Rep + (7) + 算術核。~200 行、fresh context 推奨。
+    - **(c) 正則指標和** = `sum_degree_mul_charValue_XsetOf_bot` (2026-07-22 完成,
+      新 leaf `FeitSibleyConclusion.lean`): Σ_{χ∈𝒳}χ(1)χ(z) = −|H⧸Z| (z∈Z^#)。
+      mem_XsetOf_bot_iff + leKer_iff_subset_characterKernel で 𝒳={Z⊄characterKernel}
+      に reindex (Finset.sum_bij')、sumNonInflatedDegreeMulChar_of_mem 適用。
+      S08 sum_degree_mul_charValue_Xset_eq_of_frobenius の FeitSibley mirror。
+    **⭐ アーキ判明 (2026-07-22)**: `feit_sibley_coherence` の sorry は **FeitSibley.lean:1239
+    (base)**。FeitSibleyTheorem (leKer_iff 等) と FeitSibleyEndgame (mem_XsetOf_bot_iff 等) は
+    **並行ブランチ** (互いに import せず、両方 base 下流)。⟹ (8) assembly + closure は
+    **両ブランチ下流の新 leaf `FeitSibleyConclusion.lean`** に置く (UnionCoherence+Theorem を
+    import、確立済)。base の sorry は最終的に**この leaf へ relocation** して閉じる (base は
+    誰にも上流 import されない endpoint ゆえ移設安全; hub 調整候補)。stale docstring
+    (「(7) machinery は repo に無い」) は 2026-07-22 修正済。
+    **assembly の残実装** (次 session、FeitSibleyConclusion.lean に): (a) Res_H e′₁ inner を
+    Frobenius (inner_induce_coe_eq_restrictionMultiplicity) + (5) cross-orth + (6) coherence
+    で計算、(b) Fourier 展開、(d) z 評価 (c 完成済)、(e) ξ→Rep + (7) + 算術核 → a∣λ →
+    union_coherent_of_lambda_dvd → step 5 → feit_sibley_coherence 証明 + base relocation。
   作業順: (7) は独立ゆえ (4)(5)(6) と並行可。それ以外は (4)→(5)→(6)→(8)。
 - [ ] 旧記録: **Part A 本体組み立て** (2026-07-21 設計固定、この順):
   1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
