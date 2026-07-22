@@ -219,6 +219,25 @@ Gorenstein Lem 1.5: `θ* = Ind_N^G θ` (TI 誘導、`A_isTISubset` が feed)。
 triple 版 (θ* 直接、`exists_triple_of_sum_sq_eq_three`) は trivial が {α,β,γ} の
 どれかの 3-way 識別が必要で冗長 — triple 補題は汎用 infra として保持 (別 norm-3 用)。
 
+### ✅ Lem 1.5 完成 (2026-07-22 commit 3e56a40ca)
+
+`thetaStar_decomposition`: **θ* = 1_G + χ₁ − χ** (χ₁≠χ 非主既約、χ(1)=χ₁(1)+1)。
+上記 ρ+pair 手順どおり、次数 4-case は ℤ で `exact_mod_cast` → omega。axiom-clean。
+→ **Lemma 1.4 + 1.5 完全形式化完了** (`BrauerSuzukiCharacter.lean`、~660 行、sorry 0)。
+
+### Lem 1.6 計画 (次 frontier、⚠ 原文再読が必要)
+
+Gorenstein Lem 1.6: **involution・奇数位数元上で θ* = 0** → そこで `χ = 1 + χ₁`
+(値の等式)。要調査:
+- 機構: θ* = Ind_N^G θ は θ が A=C−RH 外で消滅 → g が A に共役で入らなければ θ*(g)=0。
+  中心 involution z = x^{2ⁿ⁻¹} は **z ∈ R ⊆ RH ⊄ A** (z は R=⟨x⁴⟩ の唯一の involution、
+  n≥3 で 2ⁿ⁻²≥2)。奇数位数元は 2-group S の外。→ TI 誘導値 = 0 の具体条件を原文で確認。
+- 使う repo infra: `induce_apply_eq_zero_of_not_conjugatesIntoSet` 系 (θ* が A 共役外で 0)、
+  `theta_apply_eq_zero_of_notMem_A`。involution が A に非共役 = z ∉ A + 共役類の議論。
+- 出力: χ, χ₁ の値の関係 (involution u で χ(u) = 1 + χ₁(u) 等) → Lem 1.7-1.9 (β(y) 数え上げ)
+  → endgame。⚠ Lem 1.6-1.9 は Gorenstein Ch.12 pp.375-377 の再読が必要 (β(y) 構造定数公式
+  (9.4.2) = `ClassSumCoefficientFormula.lean` との接続)。
+
 ### Lem 1.4 計画 (2026-07-22 lane c、⚠ 下記 infra は grep 発見のみ・API 未精査)
 
 Gorenstein Lem 1.4: `θ = 1_C↑N − ψ̃` について (i) `(θ,θ)_N = 3` (ii) `deg θ = 0`、
