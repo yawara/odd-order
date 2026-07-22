@@ -14,6 +14,7 @@ import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
 import OddOrder.GroupTheory.BrauerSuzukiInvolutions
 import OddOrder.GroupTheory.BrauerSuzukiCounting
+import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Mathlib.QuotientGroup
@@ -12416,6 +12417,17 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.GroupTheory.QuaternionSylowSetup.lem_1_8_relation
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.lem_1_9
+
+/-! **Brauer–Suzuki, Gorenstein Ch.12 endgame (in progress)**
+(`GroupTheory.BrauerSuzukiEndgame`, issue 9318, 2026-07-22).
+
+* `involutionClosure_normal` — **`M = ⟨involutions⟩ ⊴ G`** (the involution set is
+  conjugation-invariant).
+* `smSetup` — **`G₁ = SM` again carries a `QuaternionSylowSetup`** (Sylow `2`-subgroup `S`
+  transported via `Sylow.subtype`), letting `lem_1_9` apply to `SM` in the `Q`-cyclic step. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.involutionClosure_normal
+#assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.smSetup
+
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 
 「AxiomsCheck 未登録だが `#print axioms` では clean」だった提出候補を機械ゲートに載せる
