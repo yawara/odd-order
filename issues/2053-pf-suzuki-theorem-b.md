@@ -108,6 +108,10 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
     (ii) **Brauer–Suzuki** (G = O_{2'}(G)·C_G(u))、(iii) Huppert II 3.2
     (normal complement)。方針 = sorried-cite で Theorem B の下流を実証明しつつ、
     Brauer–Suzuki 形式化を独立 campaign として起票 (shared infra、9300 claim)
+    - **📌 2026-07-22 hub 裁定更新**: (i)(iii) は c が完了済 (9404 closed)、
+      (ii) = **issue 9318 は b → c に移管** (ユーザー裁可、issues/9318 冒頭
+      HUB RULING)。b は本 campaign で `rankOne_affine_nearField` を
+      sorried-cite し続けるだけでよい (producer = c、b 側の追加作業なし)
 - [ ] (3) 素因数の合同条件
   - **被覆調査 (2026-07-21)**: (i) Q₁ = `hyp.Q1` (SylowDecomposition.lean:89、
     Q1Subgroup + sylowTwoProdQ1MulEquiv で S × Q₁ 分解済) ✓。

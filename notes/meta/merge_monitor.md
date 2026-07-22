@@ -6,6 +6,16 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **🔁 2026-07-22 hub 裁定 (ユーザー裁可「b→c を進めて」): issue 9318 Brauer–Suzuki の claim owner を b → c に移管**。
+> 背景: 実 sorry 6 は全て Pf Appendices (FeitSibley 1 = a 進行中 / NearFields 1 = 9318 gated /
+> Suzuki2Groups 4 = b 残債)。BG closed で c の live frontier が空になっていた。b は 9318 未着手
+> (BS 関連 commit 0) かつ 2053 Theorem B campaign 中、c は前提 2 件 (Huppert III 8.2 / II 3.2) を
+> 完了済 (9404 closed)、消費点 NearFields.lean は c 所有 — ⟹ c が BS 本体を駆動する。
+> **c の primary frontier = 9318 → NearFields Prop 1 sorry 解消**。b は Theorem B step (2) で
+> `rankOne_affine_nearField` を sorried-cite。BS 新 leaf の置き場 = `GroupTheory/**` (shared) 第一候補、
+> **step 1.5 regex 変更不要** (shared_re/c_re で被覆; c が GroupTheory に BS leaf を切っても逸脱でない、
+> claim = 9318)。詳細 = issues/9318 冒頭 HUB RULING。
+>
 > **▶▶ 2026-07-22 10:1x 監視再開 (Fable hub) — 前 Opus hub は 03:23 の 3 合流後に gate/push 未完了で死亡**。
 > 引き継ぎ時 `origin/main..main` = **12 commits 未 push** (step 1 の警告どおりの残留パターン、
 > 03:23 の Merge a/b/c + lane commits が未検証で main に居座っていた)。本 tick の合流
