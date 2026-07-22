@@ -713,14 +713,18 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
        (2026-07-22, sorry-free): θ∈ZIrr↥H, z∈Z ⟹ θ(z)−θ(1)=Σ_{χ∈𝒳}(θ,χ)(χ(z)−χ(1))。
        mem_ZIrr_repr + LeKer 項消滅 + 両辺を support∩{¬LeKer Z} に Finset.sum_subset 還元 +
        inner_eq_coeff_of_repr。𝒳-Finset T 版 (IrreducibleCharacter reindex 不要に簡略化)。
-    2. **coefficient 関係** (FeitSibley, ~80行): resE:=Res_H e′₁∈ZIrr↥H。
-       (resE, χᵢ−aᵢχ₁)_H = (e′₁, τ(χᵢ−aᵢχ₁))_G [Frobenius] = (e′₁, eᵢ−aᵢe₁) [coherence
-       extends_on_supported、χᵢ−aᵢχ₁ supported] = 0 [(5) cross_extension_inner_eq_zero]
-       ⟹ (resE,χᵢ) = aᵢ·c₀ (c₀:=(resE,χ₁))。
-    3. **c₀=λ+aμ** (FeitSibley, ~30行): (resE, χ₁−aη₁)=(e′₁,u)=λ−a [(6) hlam_1、u=τ(χ₁−aη₁)]
-       = c₀−a·μ′ (μ′:=(resE,η₁)) ⟹ c₀=λ+a(μ′−1)=λ+aμ (μ:=μ′−1)。
-    4. **合成+eval+算術** (~40行): θ(z)−θ(1)=(c₀/χ₁(1))(ψ_𝒳(z)−ψ_𝒳(1))=(c₀/(ad))(−|H|)
-       =−c₀|Q|/a=−|Q|(λ/a+μ) [ψ_𝒳 両評価 c 完成、χ₁(1)=ad、|H|=d|Q|]。
+    2. [x] **coefficient 関係 完成** = `restrict_extension_inner_eq_nsmul` (2026-07-22,
+       sorry-free): (Res_H e', χ)=b·(Res_H e', χ₁) (χ−b•χ₁ supported)。Frobenius
+       (inner_induce_eq_inner_restrict) + conj + coherence extends_on_supported + cross-orth
+       (hcross 仮説、assembly が cross_extension_inner_eq_zero で供給)。
+    3. [x] **keystone 関係 完成** = `restrict_inner_keystone` (2026-07-22, sorry-free):
+       (Res_H e', χ₁)−a·(Res_H e', η₁)=λ−a (hlam1 仮説)。Frobenius + conj。
+       ⟹ c₀=λ+aμ (μ=(Res_H e',η₁)−1)。
+    4. **合成+eval** (~70行, 残): χ₁(1)·((Res_H e')(z)−(Res_H e')(1)) = −|H|·c₀。
+       piece1 × χ₁(1) → per-χ で piece2 (b·c₀) + degree (χ(1)=b·χ₁(1), supported ⟹
+       value 0 at 1、one_notMem_A) で c₀·χ(1) → Σχ(1)(χz−χ1) = 両 eval で −|H|
+       (sum_degree_mul_charValue − sum_degreeSq)。restrict_apply で (Res_H e')(z)=e'((z:G))。
+       ⟹ e′₁(z)−e′₁(1)=−|H|·c₀/χ₁(1)=−|Q|(λ/a+μ) (χ₁(1)=ad, |H|=d|Q|, c₀=λ+aμ)。
     5. **(7)適用+final** (~40行): e′₁=ε•ξ (ξ IrreducibleCharacter)、ξ→Rep (IsIrreducibleCharacter
        obtain) → peterfalvi_67_hall_of_odd → e′₁(z)≡e′₁(1) [ALGMOD|Q|]、上式代入 →
        (λ/a+μ) alg int → dvd_of_isIntegral_ratio で a∣λ → union_coherent_of_lambda_dvd →
