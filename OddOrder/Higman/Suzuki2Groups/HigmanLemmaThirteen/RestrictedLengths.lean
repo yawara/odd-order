@@ -152,6 +152,332 @@ theorem restricted_range_hasXiLengthTwo_of_frattini_cover_exponent_two
       rwa [hCS] at h
     exact (not_lt_of_ge hD'S) hSD
 
+/-- In the exponent-four branch, a normal invariant Frattini cover has
+restricted `ξ`-length three.
+
+For every nontrivial restricted normal invariant subgroup `K`, the low
+coordinate `K ⊓ Φ(P)` is either `Φ(P)²` or `Φ(P)`, while the high coordinate
+`K ⊔ Φ(P)` is either `Φ(P)` or the whole cover.  Dedekind's modular identity
+shows that these two coordinates determine `K`; their binary rank therefore
+has only the values zero, one, and two. -/
+theorem restricted_range_hasXiLengthThree_of_frattini_cover_exponent_four
+    [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hxi : IsXiActor Y)
+    (hPhiComm : IsMulCommutative (frattini P))
+    (hfour : ∀ z : frattini P, z ^ 4 = 1)
+    (hexists : ∃ z : frattini P, z ^ 2 ≠ 1)
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : NormalInvariantCover Y.subtype (frattini P) S) :
+    HasXiLengthThree hSinv.restrict.range.subtype := by
+  classical
+  let ract := hSinv.restrict.range.subtype
+  let squareS : Subgroup S := (frattiniSquare P).subgroupOf S
+  let phiS : Subgroup S := (frattini P).subgroupOf S
+  have hSquarePhi : frattiniSquare P ≤ frattini P :=
+    frattiniSquare_le_frattini
+  have hSquareS : frattiniSquare P ≤ S := hSquarePhi.trans hPhiS.le
+  have hSquareMap : squareS.map S.subtype = frattiniSquare P := by
+    exact Subgroup.map_subgroupOf_eq_of_le hSquareS
+  have hPhiMap : phiS.map S.subtype = frattini P := by
+    exact Subgroup.map_subgroupOf_eq_of_le hPhiS.le
+  have hSquareNormal : squareS.Normal :=
+    (frattiniSquareNormalInvariant Y.subtype).2.1.subgroupOf S
+  have hPhiNormal : phiS.Normal :=
+    (inferInstance : (frattini P).Normal).subgroupOf S
+  have hSquareY : IsAInvariant hSinv.restrict squareS :=
+    hSinv.subgroupOf (frattiniSquareNormalInvariant Y.subtype).2.2
+  have hPhiY : IsAInvariant hSinv.restrict phiS :=
+    hSinv.subgroupOf (IsAInvariant.of_characteristic Y.subtype)
+  have hSquareRange : IsAInvariant ract squareS :=
+    (isAInvariant_range_subtype_iff hSinv.restrict squareS).2 hSquareY
+  have hPhiRange : IsAInvariant ract phiS :=
+    (isAInvariant_range_subtype_iff hSinv.restrict phiS).2 hPhiY
+  let squareTerm : NormalInvariantSubgroup ract :=
+    ⟨squareS, ⟨hSquareNormal, hSquareRange⟩⟩
+  let phiTerm : NormalInvariantSubgroup ract :=
+    ⟨phiS, ⟨hPhiNormal, hPhiRange⟩⟩
+  have hAmbientSeries :=
+    frattiniSquare_composition_series_of_exponent_four
+      hP hxi hPhiComm hfour hexists
+  have hbotSquare : normalInvariantBot ract < squareTerm := by
+    have hbotSquareP : (⊥ : Subgroup P) < frattiniSquare P := by
+      have h := hAmbientSeries.1.lt
+      change (⊥ : Subgroup P) < frattiniSquare P at h
+      exact h
+    change (⊥ : Subgroup S) < squareS
+    rw [← Subgroup.map_lt_map_iff_of_injective S.subtype_injective]
+    simpa [hSquareMap] using hbotSquareP
+  have hSquarePhiTerm : squareTerm < phiTerm := by
+    have hSquarePhiP : frattiniSquare P < frattini P := by
+      have h := hAmbientSeries.2.lt
+      change frattiniSquare P < frattini P at h
+      exact h
+    change squareS < phiS
+    rw [← Subgroup.map_lt_map_iff_of_injective S.subtype_injective]
+    simpa [hSquareMap, hPhiMap] using hSquarePhiP
+  have hPhiTop : phiTerm < normalInvariantTop ract := by
+    change phiS < (⊤ : Subgroup S)
+    rw [← Subgroup.map_lt_map_iff_of_injective S.subtype_injective]
+    rw [hPhiMap]
+    simpa [← MonoidHom.range_eq_map] using hPhiS.lt
+  refine ⟨squareTerm, phiTerm, hbotSquare, hSquarePhiTerm, hPhiTop, ?_⟩
+  intro A B C D E hAB hBC hCD hDE
+  let low (K : NormalInvariantSubgroup ract) : Subgroup S := K.1 ⊓ phiS
+  let high (K : NormalInvariantSubgroup ract) : Subgroup S := K.1 ⊔ phiS
+  let rank (K : NormalInvariantSubgroup ract) : ℕ :=
+    (if low K = phiS then 1 else 0) +
+      (if high K = (⊤ : Subgroup S) then 1 else 0)
+  have hbotAle : normalInvariantBot ract ≤ A := by
+    change (⊥ : Subgroup S) ≤ A.1
+    exact bot_le
+  have hbotB : normalInvariantBot ract < B :=
+    lt_of_le_of_lt hbotAle hAB
+  have hbotC : normalInvariantBot ract < C := hbotB.trans hBC
+  have hbotD : normalInvariantBot ract < D := hbotC.trans hCD
+  have hbotE : normalInvariantBot ract < E := hbotD.trans hDE
+  have coordinate_data :
+      ∀ K : NormalInvariantSubgroup ract,
+        K ≠ normalInvariantBot ract →
+          (low K = squareS ∨ low K = phiS) ∧
+            (high K = phiS ∨ high K = ⊤) := by
+    intro K hKne
+    have hKvalNeBot : K.1 ≠ (⊥ : Subgroup S) := by
+      intro hKbot
+      apply hKne
+      apply Subtype.ext
+      exact hKbot
+    have hKmapNeBot : K.1.map S.subtype ≠ (⊥ : Subgroup P) := by
+      intro hKmap
+      apply hKvalNeBot
+      exact (Subgroup.map_eq_bot_iff_of_injective
+        K.1 S.subtype_injective).mp hKmap
+    have hKY : IsAInvariant hSinv.restrict K.1 :=
+      (isAInvariant_range_subtype_iff hSinv.restrict K.1).1 K.2.2
+    have hKmapInv : IsAInvariant Y.subtype (K.1.map S.subtype) :=
+      aInvariant_map_subtype_of_restrict hSinv hKY
+    have hinvK : involutions P ⊆ K.1.map S.subtype :=
+      involutions_subset_of_nontrivial_invariant
+        hP Y hxi.transitive hKmapInv hKmapNeBot
+    have hSquareKmap : frattiniSquare P ≤ K.1.map S.subtype := by
+      intro z hz
+      by_cases hz1 : z = 1
+      · exact hz1 ▸ (K.1.map S.subtype).one_mem
+      · apply hinvK
+        exact ⟨pow_two_eq_one_of_mem_frattiniSquare
+          hPhiComm hfour hz, hz1⟩
+    have hLowMap : (low K).map S.subtype =
+        K.1.map S.subtype ⊓ frattini P := by
+      change (K.1 ⊓ phiS).map S.subtype = _
+      rw [Subgroup.map_inf _ _ _ S.subtype_injective, hPhiMap]
+    have hLowInv : IsAInvariant Y.subtype
+        (K.1.map S.subtype ⊓ frattini P) :=
+      hKmapInv.inf (IsAInvariant.of_characteristic Y.subtype)
+    have hSquareLow : frattiniSquare P ≤
+        K.1.map S.subtype ⊓ frattini P :=
+      le_inf hSquareKmap hSquarePhi
+    have hLowPhi : K.1.map S.subtype ⊓ frattini P ≤ frattini P :=
+      inf_le_right
+    have hLowClass := eq_frattiniSquare_or_frattini_of_invariant
+      hP hxi hPhiComm hLowInv hSquareLow hLowPhi
+    have hLowClassS : low K = squareS ∨ low K = phiS := by
+      rcases hLowClass with hLow | hLow
+      · left
+        apply Subgroup.map_injective S.subtype_injective
+        rw [hLowMap, hSquareMap]
+        exact hLow
+      · right
+        apply Subgroup.map_injective S.subtype_injective
+        rw [hLowMap, hPhiMap]
+        exact hLow
+    have hHighMap : (high K).map S.subtype =
+        K.1.map S.subtype ⊔ frattini P := by
+      change (K.1 ⊔ phiS).map S.subtype = _
+      rw [Subgroup.map_sup, hPhiMap]
+    have hHighInv : IsAInvariant Y.subtype
+        (K.1.map S.subtype ⊔ frattini P) :=
+      hKmapInv.sup (IsAInvariant.of_characteristic Y.subtype)
+    have hHighNormal : (K.1.map S.subtype ⊔ frattini P).Normal :=
+      Subgroup.Normal.of_commutator_le P
+        ((OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP).trans
+          le_sup_right)
+    have hHighS : K.1.map S.subtype ⊔ frattini P ≤ S :=
+      sup_le (Subgroup.map_subtype_le K.1) hPhiS.le
+    have hHighClass := hPhiS.eq_left_or_eq_right
+      ⟨hHighNormal, hHighInv⟩ le_sup_right hHighS
+    have hTopMap : (⊤ : Subgroup S).map S.subtype = S := by
+      simp [← MonoidHom.range_eq_map]
+    have hHighClassS : high K = phiS ∨ high K = ⊤ := by
+      rcases hHighClass with hHigh | hHigh
+      · left
+        apply Subgroup.map_injective S.subtype_injective
+        rw [hHighMap, hPhiMap]
+        exact hHigh
+      · right
+        apply Subgroup.map_injective S.subtype_injective
+        rw [hHighMap, hTopMap]
+        exact hHigh
+    exact ⟨hLowClassS, hHighClassS⟩
+  have coordinate_injective :
+      ∀ {K L : NormalInvariantSubgroup ract}, K ≤ L →
+        low K = low L → high K = high L → K = L := by
+    intro K L hKL hLowEq hHighEq
+    letI : K.1.Normal := K.2.1
+    have hLle : L.1 ≤ K.1 ⊔ phiS := by
+      change K.1 ⊔ phiS = L.1 ⊔ phiS at hHighEq
+      rw [hHighEq]
+      exact le_sup_left
+    have hdecomp : L.1 = K.1 ⊔ (L.1 ⊓ phiS) :=
+      Subgroup.eq_sup_inf_of_le_sup_of_normal_of_le hKL hLle
+    have hLK : L.1 = K.1 := by
+      calc
+        L.1 = K.1 ⊔ (L.1 ⊓ phiS) := hdecomp
+        _ = K.1 ⊔ (K.1 ⊓ phiS) := by
+          change K.1 ⊔ low L = K.1 ⊔ low K
+          rw [hLowEq]
+        _ = K.1 := sup_eq_left.mpr inf_le_left
+    exact Subtype.ext hLK.symm
+  have rank_strict :
+      ∀ {K L : NormalInvariantSubgroup ract},
+        K ≠ normalInvariantBot ract →
+        L ≠ normalInvariantBot ract → K < L → rank K < rank L := by
+    intro K L hKne hLne hKL
+    obtain ⟨hKlow, hKhigh⟩ := coordinate_data K hKne
+    obtain ⟨hLlow, hLhigh⟩ := coordinate_data L hLne
+    have hLowLe : low K ≤ low L := inf_le_inf_right phiS hKL.le
+    have hHighLe : high K ≤ high L := sup_le_sup_right hKL.le phiS
+    have hLowBitLe :
+        (if low K = phiS then 1 else 0) ≤
+          (if low L = phiS then 1 else 0) := by
+      by_cases hKphi : low K = phiS
+      · have hLphi : low L = phiS :=
+          le_antisymm inf_le_right (hKphi ▸ hLowLe)
+        simp [hKphi, hLphi]
+      · simp [hKphi]
+    have hHighBitLe :
+        (if high K = (⊤ : Subgroup S) then 1 else 0) ≤
+          (if high L = (⊤ : Subgroup S) then 1 else 0) := by
+      by_cases hKtop : high K = (⊤ : Subgroup S)
+      · have hLtop : high L = (⊤ : Subgroup S) :=
+          top_unique (hKtop ▸ hHighLe)
+        simp [hKtop, hLtop]
+      · simp [hKtop]
+    have hRankLe : rank K ≤ rank L := by
+      dsimp [rank]
+      omega
+    apply lt_of_le_of_ne hRankLe
+    intro hRankEq
+    have hLowBitEq :
+        (if low K = phiS then 1 else 0) =
+          (if low L = phiS then 1 else 0) := by
+      dsimp [rank] at hRankEq
+      omega
+    have hHighBitEq :
+        (if high K = (⊤ : Subgroup S) then 1 else 0) =
+          (if high L = (⊤ : Subgroup S) then 1 else 0) := by
+      dsimp [rank] at hRankEq
+      omega
+    have hLowEq : low K = low L := by
+      by_cases hKphi : low K = phiS
+      · have hLphi : low L = phiS := by
+          by_contra h
+          simp [hKphi, h] at hLowBitEq
+        exact hKphi.trans hLphi.symm
+      · have hKsq : low K = squareS := hKlow.resolve_right hKphi
+        have hLnotPhi : low L ≠ phiS := by
+          intro h
+          simp [hKphi, h] at hLowBitEq
+        have hLsq : low L = squareS := hLlow.resolve_right hLnotPhi
+        exact hKsq.trans hLsq.symm
+    have hHighEq : high K = high L := by
+      by_cases hKtop : high K = (⊤ : Subgroup S)
+      · have hLtop : high L = (⊤ : Subgroup S) := by
+          by_contra h
+          simp [hKtop, h] at hHighBitEq
+        exact hKtop.trans hLtop.symm
+      · have hKphi : high K = phiS := hKhigh.resolve_right hKtop
+        have hLnotTop : high L ≠ (⊤ : Subgroup S) := by
+          intro h
+          simp [hKtop, h] at hHighBitEq
+        have hLphi : high L = phiS := hLhigh.resolve_right hLnotTop
+        exact hKphi.trans hLphi.symm
+    exact hKL.ne (coordinate_injective hKL.le hLowEq hHighEq)
+  have rank_le_two :
+      ∀ K : NormalInvariantSubgroup ract, rank K ≤ 2 := by
+    intro K
+    dsimp [rank]
+    split_ifs <;> omega
+  have hBCrank := rank_strict hbotB.ne' hbotC.ne' hBC
+  have hCDrank := rank_strict hbotC.ne' hbotD.ne' hCD
+  have hDErank := rank_strict hbotD.ne' hbotE.ne' hDE
+  have hErank := rank_le_two E
+  omega
+
+/-- **Higman Lemma 13 (p. 93), exponent-four lifted factors.**
+
+The two complementary Frattini preimages both have restricted `ξ`-length
+three.  Their intersection is `Φ(P)` and together they generate `P`. -/
+theorem exists_two_xiLengthThree_frattini_preimages_of_exponent_four
+    [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthFour Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    (hPhiComm : IsMulCommutative (frattini P))
+    (hfour : ∀ z : frattini P, z ^ 4 = 1)
+    (hexists : ∃ z : frattini P, z ^ 2 ≠ 1) :
+    ∃ (X Z : Subgroup P)
+        (hXinv : IsAInvariant Y.subtype X)
+        (hZinv : IsAInvariant Y.subtype Z),
+      X.Normal ∧ HasXiLengthThree hXinv.restrict.range.subtype ∧
+        Z.Normal ∧ HasXiLengthThree hZinv.restrict.range.subtype ∧
+        frattini P < X ∧ X < ⊤ ∧
+        frattini P < Z ∧ Z < ⊤ ∧
+        X ⊓ Z = frattini P ∧ X ⊔ Z = ⊤ := by
+  obtain ⟨X, Z, hXnormal, hXinv, hZnormal, hZinv,
+      hPhiX, hXtop, hPhiZ, hZtop,
+      _hXbot, _hZbot, hXZinf, hXZsup⟩ :=
+    exists_two_invariant_frattini_preimages_of_xiLengthFour_exponent_four
+      hP hncomm hmulti hxi hlen hprime hPhiComm hfour hexists
+  let phiTerm := frattiniNormalInvariant Y.subtype
+  let xTerm : NormalInvariantSubgroup Y.subtype :=
+    ⟨X, ⟨hXnormal, hXinv⟩⟩
+  let zTerm : NormalInvariantSubgroup Y.subtype :=
+    ⟨Z, ⟨hZnormal, hZinv⟩⟩
+  have hLower := frattiniSquare_composition_series_of_exponent_four
+    hP hxi hPhiComm hfour hexists
+  have hXcovers := hlen.covers_of_chain
+    hLower.1.lt hLower.2.lt
+      (show phiTerm < xTerm from hPhiX)
+      (show xTerm < normalInvariantTop Y.subtype from hXtop)
+  have hZcovers := hlen.covers_of_chain
+    hLower.1.lt hLower.2.lt
+      (show phiTerm < zTerm from hPhiZ)
+      (show zTerm < normalInvariantTop Y.subtype from hZtop)
+  let hPhiXCover : NormalInvariantCover Y.subtype (frattini P) X :=
+    { left := phiTerm.2
+      right := xTerm.2
+      covBy := hXcovers.2.2.1 }
+  let hPhiZCover : NormalInvariantCover Y.subtype (frattini P) Z :=
+    { left := phiTerm.2
+      right := zTerm.2
+      covBy := hZcovers.2.2.1 }
+  have hlenX : HasXiLengthThree hXinv.restrict.range.subtype :=
+    restricted_range_hasXiLengthThree_of_frattini_cover_exponent_four
+      hP hxi hPhiComm hfour hexists hXinv hPhiXCover
+  have hlenZ : HasXiLengthThree hZinv.restrict.range.subtype :=
+    restricted_range_hasXiLengthThree_of_frattini_cover_exponent_four
+      hP hxi hPhiComm hfour hexists hZinv hPhiZCover
+  exact ⟨X, Z, hXinv, hZinv, hXnormal, hlenX, hZnormal, hlenZ,
+    hPhiX, hXtop, hPhiZ, hZtop, hXZinf, hXZsup⟩
+
 /-- **Higman Lemma 13 (p. 93), exponent-two lifted factors.**
 
 The three independent Frattini preimages all have restricted `ξ`-length
