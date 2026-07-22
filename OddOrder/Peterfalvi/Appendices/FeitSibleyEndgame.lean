@@ -68,6 +68,31 @@ theorem x_eq_zero_or_x_one_of_norm_identity {a m x nvv : ℤ}
     exfalso
     nlinarith [hk, hm]
 
+/-- **(8) divisibility core** (Peterfalvi Appendix IV, p. 150): if `λ/a + μ` is an algebraic
+integer with `μ : ℤ` and `a > 0`, then `a ∣ λ`.  Indeed `λ/a = (λ/a + μ) − μ` is a *rational*
+algebraic integer, hence an integer (`isIntegral_rat_imp_int`), so its denominator `a` divides
+`λ`.  This is the last step of (8): the central-character congruence
+`(e'₁(z) − e'₁(1))/|Q| = −(λ/a + μ)` (from (7) applied to `±e'₁`) is an algebraic integer,
+forcing `a ∣ λ` and closing (6). -/
+theorem dvd_of_isIntegral_ratio {a : ℕ} (ha : 0 < a) {lam mu : ℤ}
+    (hint : IsIntegral ℤ ((lam : ℂ) / (a : ℂ) + (mu : ℂ))) :
+    (a : ℤ) ∣ lam := by
+  have ha0 : (a : ℂ) ≠ 0 := by exact_mod_cast ha.ne'
+  have hmu : IsIntegral ℤ (mu : ℂ) := by
+    simpa using isIntegral_algebraMap (R := ℤ) (A := ℂ) (x := mu)
+  have hla : IsIntegral ℤ ((lam : ℂ) / (a : ℂ)) := by
+    have h := hint.sub hmu
+    have he : (lam : ℂ) / (a : ℂ) + (mu : ℂ) - (mu : ℂ) = (lam : ℂ) / (a : ℂ) := by ring
+    rwa [he] at h
+  set q : ℚ := (lam : ℚ) / (a : ℚ) with hq
+  have hqc : (q : ℂ) = (lam : ℂ) / (a : ℂ) := by rw [hq]; push_cast; ring
+  obtain ⟨n, hn⟩ := isIntegral_rat_imp_int (q := q) (by rw [hqc]; exact hla)
+  rw [hqc] at hn
+  refine ⟨n, ?_⟩
+  have hlc : (lam : ℂ) = (a : ℂ) * (n : ℂ) := by
+    rw [div_eq_iff ha0] at hn; rw [hn]; ring
+  exact_mod_cast hlc
+
 /-- **Sign–degree bookkeeping core for Peterfalvi (5)** (p. 148): if the signed
 irreducible constituents satisfy the `λ`-equality `e·f₁ = −(A·(e₁·f₂))` (the two
 evaluations of `λ = (eᵢ − aᵢe₁, e'ⱼ)`), the `X`-side degree identity

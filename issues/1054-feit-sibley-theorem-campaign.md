@@ -644,9 +644,31 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
       lane-a leaf で自足。
     ⟹ 見込 = shared 側 汎用化 ~80 行 (9200) + lane-a 側 Hall 組立 ~100 行。
     hub 調整: 9200 claim は additive (既存 Sylow 版不変) ゆえ低リスク。
-  - [ ] **(8)** Conclusion: (5)+(6)+(7) で a∣λ を証明し (6) を閉じる。
+  - [~] **(8)** Conclusion: (5)+(6)+(7) で a∣λ を証明し (6) を閉じる。
     Res_H e′₁ = (λ+aμ)Σaᵢχᵢ + χ′、Σaᵢχᵢ=(ρ_H−ρ_{H/Z})/(da)、z∈Z^# 評価 +
     (7) を ±e′₁ に適用 → λ/a+μ 代数的整数 → a∣λ。
+    **⭐ 偵察 (2026-07-22): (8) の再利用可能な核 2 つが既存/完成済**:
+    - **正則指標差恒等式** = `sumNonInflatedDegreeMulChar_of_mem`
+      (InflationCharacter.lean:540)。docstring 明示「**mmd 04.8 L168** = Peterfalvi (6.8.1)、
+      η₁^{τ₁} が Z^# 上定数を示すステップ」。z∈N^# で Σ_{χ:N⊄ker}χ(1)χ(z) = −|G⧸N|
+      (= (ρ_G−ρ_{G/N})(z))。これが (8) の Σaᵢχᵢ 評価そのもの (G=H, N=Z)。
+      主文 §6.8 (S08_DegreeSums:917, S08_YsetInner/CharacterBreaks:102) で消費済 = 汎用。
+    - **central 合同** = `peterfalvi_67_hall_of_odd` (私が完成、HallTICongruence)。
+    - **最終算術** = `dvd_of_isIntegral_ratio` (2026-07-22 完成、FeitSibleyEndgame.lean):
+      λ/a+μ が alg int (μ∈ℤ, a>0) ⟹ a∣λ (isIntegral_rat_imp_int 経由、rational
+      alg int は整数)。x_eq_zero_or_x_one_of_norm_identity と並ぶ算術核。
+    **参照**: 主文 §6.8 = `SibleyDadeHypothesis` framework
+    (S08_CaseBCoherence/CentralCongruence.lean、inner_tau_alpha_dvd_index 等) が (8) の
+    assembly パターンを demonstrate (別 hypothesis 構造なので直接再利用でなく参照)。
+    **残 = FeitSibley 特化 assembly (次 turn)**: (a) e′₁ (G側±Irr witness) の
+    Res_H 分析 → (Res_H e′₁, χᵢ−aᵢχ₁)=0 (i≥2), (Res_H e′₁, χ₁−aη₁)=λ−a (from (5)(6))、
+    (b) Fourier 展開 Res_H e′₁ = (λ+aμ)Σaᵢχᵢ + χ′ (χ′⊥χᵢ, Z⊆ker χ′)、
+    (c) Σaᵢχᵢ = (ρ_H−ρ_{H/Z})/(da) を sumNonInflatedDegreeMulChar_of_mem で、
+    (d) z∈Z^# 評価 e′₁(z)−e′₁(1) = −|Q|(λ/a+μ) (|H|=d|Q| = [H:Q]=d 使用)、
+    (e) e′₁=±ξ を ξ=ρ.character に橋渡し → peterfalvi_67_hall_of_odd 適用 →
+    (λ/a+μ) alg int → dvd_of_isIntegral_ratio で a∣λ → union_coherent_of_lambda_dvd。
+    ⚠ 供給要: ξ→Representation ブリッジ、Q Hall in G (coprime |Q| Q.index)、
+    hconst (ρ constant on Z^# + N∩C_G card 定数)、endgameZ⊆Z(Q)⟹Q⊆C_G(z)。
   作業順: (7) は独立ゆえ (4)(5)(6) と並行可。それ以外は (4)→(5)→(6)→(8)。
 - [ ] 旧記録: **Part A 本体組み立て** (2026-07-21 設計固定、この順):
   1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
