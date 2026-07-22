@@ -833,6 +833,16 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
      `Merge '<branch>' (<topic>): <要約>` + 本文に各単位 + 末尾に
      現行モデルの trailer (harness 既定; 2026-07-02 現在 Claude Fable 5)
    - 不合格 → `git merge --abort` で**報告**（何が落ちたか・どのファイルか）
+   - **lint ratchet (issue 0138, 2026-07-22 正式化)**: build 合格後に `bin/check-warnings --diff`。
+     ⚠ **hard-STOP ではない**（genuine math の合流を lint で止めない）:
+     - 悪化ゼロ → そのまま。改善あり（hub の frozen wave landing）→ `bin/check-warnings
+       --update-baseline` で baseline を下げ同 commit に含める。
+     - レーンが新規警告を導入（悪化あり）→ main CI（`lean_action_ci.yml` の check-warnings step）を
+       赤にしないため hub が reconcile: frozen×機械で安全に直せるなら in-tick 修正、active-lane 領域
+       or owner 判断なら `--update-baseline` で grandfather しつつ owner を issue/note で flag（債務は
+       追跡、破棄しない）。
+     - tick 報告に「非 sorry 警告 N→M」を記載（従来の非公式メトリックを本 step に正式化）。
+     - backlog が sorry のみになったら CI/gate を `--strict`（純ゼロ）へ切替、issue 0123 を 0138 に統合。
 3. **新規 forward axiom を含む commit** (`axiom ` 宣言の追加を `git diff --cached` で確認) は
    自動合流せず abort → 報告（上記ポリシー）。
 3b. **root closure 検査 (2026-06-11 追加, E の発見)**: 新規追加 `.lean` ファイル
