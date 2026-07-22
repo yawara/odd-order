@@ -12216,6 +12216,8 @@ step (6) arithmetic lemma).  Model-independent, axiom-clean. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.exists_card_fixedSet_eq_char_pow
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.card_fixedSet_mem_of_units_two_pow
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.card_fixedSet_eq_card_fixedUnits_add_one
 
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を

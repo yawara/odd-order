@@ -23,6 +23,45 @@ set_option autoImplicit false
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
+/-- Package an additive automorphism of a field that is also multiplicative as a
+ring automorphism (`σ_w` for step (8): the model's `dAut g` is `F ≃+ F` and
+multiplicative by `dAut_mul`). -/
+def ringEquivOfAddEquivMul {F : Type*} [Field F] (a : F ≃+ F)
+    (hmul : ∀ x y : F, a (x * y) = a x * a y) : F ≃+* F :=
+  { a with map_mul' := hmul }
+
+theorem ringEquivOfAddEquivMul_apply {F : Type*} [Field F] (a : F ≃+ F)
+    (hmul : ∀ x y : F, a (x * y) = a x * a y) (x : F) :
+    ringEquivOfAddEquivMul a hmul x = a x := rfl
+
+/-- **Fixed field = fixed units + `0`** (step (8), p. 110): the fixed set of a
+ring automorphism `σ` of a finite field has one more element than the fixed
+units — the extra element is `0`. -/
+theorem card_fixedSet_eq_card_fixedUnits_add_one {F : Type*} [Field F] [Finite F]
+    (σ : F ≃+* F) :
+    Nat.card {x : F // σ x = x} =
+      Nat.card {u : Fˣ // σ (u : F) = (u : F)} + 1 := by
+  classical
+  haveI : Fintype F := Fintype.ofFinite F
+  let e : {x : F // σ x = x} ≃ Option {u : Fˣ // σ (u : F) = (u : F)} :=
+    { toFun := fun x => if hx : (x : F) = 0 then none
+        else some ⟨Units.mk0 (x : F) hx, x.2⟩
+      invFun := fun o => o.elim ⟨0, map_zero σ⟩ (fun u => ⟨(u : Fˣ), u.2⟩)
+      left_inv := fun x => by
+        by_cases hx : (x : F) = 0
+        · simp only [dif_pos hx, Option.elim]; exact Subtype.ext hx.symm
+        · simp only [dif_neg hx, Option.elim, Units.val_mk0]
+      right_inv := fun o => by
+        cases o with
+        | none => simp only [Option.elim, dif_pos]
+        | some u =>
+          have hu : ((u : Fˣ) : F) ≠ 0 := (u : Fˣ).ne_zero
+          simp only [Option.elim, dif_neg hu]
+          exact congrArg some (Subtype.ext (Units.ext (by simp))) }
+  haveI : Fintype {u : Fˣ // σ (u : F) = (u : F)} := Fintype.ofFinite _
+  rw [Nat.card_congr e, Nat.card_eq_fintype_card, Fintype.card_option,
+    ← Nat.card_eq_fintype_card]
+
 /-- **The fixed set of a ring automorphism of a finite field is a subfield**
 (step (8), p. 110): for a finite field `F` of characteristic `f` and a ring
 automorphism `σ`, the fixed set `{x : σ x = x}` is a subfield, hence has order
