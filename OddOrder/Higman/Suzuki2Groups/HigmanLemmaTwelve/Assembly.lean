@@ -156,6 +156,105 @@ theorem mixedTermBilinear_swap
 /-- **Higman p. 90, case `θ = φ = 1`: `G ≅ B(n, 1, ε)`.**  Both factors are
 commutative; the mixed term is a single diagonal monomial `c₀αβ` by the
 support pinning, and anisotropy makes `c₀` a permitted `ε`. -/
+theorem exists_typeBData_phi_eq_one_of_mixedTerm_theta_one
+    {Sl Sr : Subgroup P} {n : ℕ}
+    (hEA : IsElementaryAbelian 2 ↑(frattini P))
+    (hK1amb : lowerCentralLayerKernel P 1 = ⊥)
+    (htermamb : lowerCentralTerm P 1 = frattini P)
+    (hSqamb : LowerCentralSquaresLieInSecond P)
+    (hAgemoamb : Agemo P 2 1 = frattini P)
+    (hK0 : lowerCentralLayerKernel P 0 =
+      (frattini P).subgroupOf (lowerCentralTerm P 0))
+    (ePhi :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+    (left : FactorInclusionData Sl hEA ePhi hK1amb htermamb hSqamb hK0)
+    (right : FactorInclusionData Sr hEA ePhi hK1amb htermamb hSqamb hK0)
+    (hRnormal : Sr.Normal) (hinf : Sl ⊓ Sr = frattini P)
+    (hsup : Sl ⊔ Sr = ⊤) (hΦR : frattini P ≤ Sr)
+    (lam nu : GaloisField 2 n)
+    (hordnu : orderOf nu = 2 ^ n - 1)
+    (hlam2 : lam ^ 2 = nu)
+    (hθL : left.theta = 1) (hθR : right.theta = 1)
+    (hequiv :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ∀ α β : GaloisField 2 n,
+        mixedTermBilinear left right (lam * α) (lam * β) =
+          nu * mixedTermBilinear left right α β)
+    (hM0 :
+      letI : IsMulCommutative ↑(frattini P) :=
+        IsMulCommutative.of_comm hEA.comm
+      letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+      ∃ α β : GaloisField 2 n, mixedTermBilinear left right α β ≠ 0)
+    (hinv : ∀ x : P, x ^ 2 = 1 → x ∈ lowerCentralTerm P 1)
+    (hcentral : frattini P ≤ Subgroup.center P)
+    (n_pos : 0 < n)
+    (hcard : Nat.card (GaloisField 2 n) = 2 ^ n) :
+    ∃ data : TypeBData.{uP, 0} P, data.phi = 1 := by
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  have hNpos : 0 < 2 ^ n - 1 := by
+    have : 2 ^ 1 ≤ 2 ^ n := Nat.pow_le_pow_right (by norm_num) n_pos
+    omega
+  have hνne : nu ≠ 0 := by
+    intro h0
+    have hone : nu ^ (2 ^ n - 1) = 1 := by
+      rw [← hordnu]
+      exact pow_orderOf_eq_one nu
+    rw [h0, zero_pow (by omega)] at hone
+    exact zero_ne_one hone
+  have hlamne : lam ≠ 0 := by
+    intro h0
+    rw [h0] at hlam2
+    exact hνne (by simpa using hlam2.symm)
+  have hlampow : lam ^ (2 ^ n - 1) = 1 := by
+    have hfin : Finite (GaloisField 2 n) :=
+      Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
+    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    have h := FiniteField.pow_card_sub_one_eq_one lam hlamne
+    rwa [← Nat.card_eq_fintype_card, hcard] at h
+  obtain ⟨hordlam, -⟩ :=
+    orderOf_eq_and_coprime_of_pow_eq_orderOf hNpos (by norm_num : (2 : ℕ) ≠ 0)
+      hordnu hlam2 hlampow
+  obtain ⟨c0, hc0ne, hc0⟩ :=
+    mixedTerm_monomial_of_theta_one n_pos (mixedTermBilinear left right)
+      lam nu hordlam (by simpa using hlam2) hequiv hM0
+  have hdecomp := fun (a b : GaloisField 2 n) (ha : a ≠ 0) (hb : b ≠ 0) =>
+    ambientProductSquare_decomposed_ne_zero left right hRnormal hinf hsup
+      hΦR hinv ha hb
+  have hEps : OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsTypeBEpsilon
+      (1 : RingAut (GaloisField 2 n)) c0 := by
+    refine isTypeBEpsilon_of_decomposed_aniso 1 c0 fun a b ha hb => ?_
+    have h := hdecomp a b ha hb
+    rw [hθL, hθR, ← mixedTermBilinear_apply, hc0] at h
+    simpa [RingAut.one_apply] using h
+  refine ⟨TypeBData.ofExtension n n_pos hcard 1
+    (by simp : Odd (orderOf (1 : RingAut (GaloisField 2 n))))
+    (Units.mk0 c0 hc0ne) hEps
+    (ambientProductExtension hK0
+      (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR)
+      ePhi) ?_ ?_, ?_⟩
+  · rw [ambientProductExtension_inl_range]
+    exact hcentral
+  · intro x
+    refine ambientProductExtension_hsq_of_coordinate hEA hK1amb htermamb
+      hSqamb hAgemoamb hK0 ePhi
+      (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR)
+      (typeBQuadraticMap 1 c0) ?_ x
+    rintro ⟨a, b⟩
+    rw [ambientProductSquare_eq left right hRnormal hinf hsup hΦR,
+      typeBQuadraticMap_apply, hθL, hθR, ← mixedTermBilinear_apply, hc0]
+    simp [RingAut.one_apply]
+    ring
+  · rfl
+
+/-- The proposition-level theta-one endpoint, retained for consumers which
+do not need the distinguished equation `phi = 1`. -/
 theorem isTypeB_of_mixedTerm_theta_one
     {Sl Sr : Subgroup P} {n : ℕ}
     (hEA : IsElementaryAbelian 2 ↑(frattini P))
@@ -195,54 +294,12 @@ theorem isTypeB_of_mixedTerm_theta_one
     (n_pos : 0 < n)
     (hcard : Nat.card (GaloisField 2 n) = 2 ^ n) :
     IsTypeB.{uP, 0} P := by
-  letI : IsMulCommutative ↑(frattini P) :=
-    IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
-  have hNpos : 0 < 2 ^ n - 1 := by
-    have : 2 ^ 1 ≤ 2 ^ n := Nat.pow_le_pow_right (by norm_num) n_pos
-    omega
-  have hνne : nu ≠ 0 := by
-    intro h0
-    have hone : nu ^ (2 ^ n - 1) = 1 := by
-      rw [← hordnu]
-      exact pow_orderOf_eq_one nu
-    rw [h0, zero_pow (by omega)] at hone
-    exact zero_ne_one hone
-  have hlamne : lam ≠ 0 := by
-    intro h0
-    rw [h0] at hlam2
-    exact hνne (by simpa using hlam2.symm)
-  have hlampow : lam ^ (2 ^ n - 1) = 1 := by
-    have hfin : Finite (GaloisField 2 n) :=
-      Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
-    have h := FiniteField.pow_card_sub_one_eq_one lam hlamne
-    rwa [← Nat.card_eq_fintype_card, hcard] at h
-  obtain ⟨hordlam, -⟩ :=
-    orderOf_eq_and_coprime_of_pow_eq_orderOf hNpos (by norm_num : (2 : ℕ) ≠ 0)
-      hordnu hlam2 hlampow
-  obtain ⟨c0, hc0ne, hc0⟩ :=
-    mixedTerm_monomial_of_theta_one n_pos (mixedTermBilinear left right)
-      lam nu hordlam (by simpa using hlam2) hequiv hM0
-  have hdecomp := fun (a b : GaloisField 2 n) (ha : a ≠ 0) (hb : b ≠ 0) =>
-    ambientProductSquare_decomposed_ne_zero left right hRnormal hinf hsup
-      hΦR hinv ha hb
-  have hEps : OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsTypeBEpsilon
-      (1 : RingAut (GaloisField 2 n)) c0 := by
-    refine isTypeBEpsilon_of_decomposed_aniso 1 c0 fun a b ha hb => ?_
-    have h := hdecomp a b ha hb
-    rw [hθL, hθR, ← mixedTermBilinear_apply, hc0] at h
-    simpa [RingAut.one_apply] using h
-  refine isTypeB_of_mixedTerm hEA hK1amb htermamb hSqamb hAgemoamb hK0 ePhi
-    left right hRnormal hinf hsup hΦR 1 hθL hθR
-    (by simp : Odd (orderOf (1 : RingAut (GaloisField 2 n))))
-    (Units.mk0 c0 hc0ne) hEps n_pos hcard ?_ ?_
-  · rw [ambientProductExtension_inl_range]
-    exact hcentral
-  · intro α β
-    have h := hc0 α β
-    rw [mixedTermBilinear_apply] at h
-    simpa [RingAut.one_apply] using h
+  obtain ⟨data, -⟩ :=
+    exists_typeBData_phi_eq_one_of_mixedTerm_theta_one
+      hEA hK1amb htermamb hSqamb hAgemoamb hK0 ePhi left right
+      hRnormal hinf hsup hΦR lam nu hordnu hlam2 hθL hθR hequiv hM0
+      hinv hcentral n_pos hcard
+  exact ⟨data⟩
 
 /-! ## Case `θ = φ ≠ 1` (Higman p. 91) -/
 
@@ -617,7 +674,7 @@ Retaining a commutative member of the complementary factor pair forces its
 factor automorphism to be `1`.  Thus only the first two cases of Higman's
 dispatch remain: a second trivial factor automorphism gives type B, while a
 nontrivial Frobenius automorphism on the right gives type C. -/
-theorem isTypeB_or_isTypeC_of_commutative_left_factor
+theorem exists_typeBData_phi_eq_one_or_isTypeC_of_commutative_left_factor
     (hP : IsPGroup 2 P)
     (hncomm : ¬ IsMulCommutative P)
     (hmulti : ∃ x y : P,
@@ -628,7 +685,8 @@ theorem isTypeB_or_isTypeC_of_commutative_left_factor
       p ∣ (involutions P).ncard)
     (factors : XiLengthThreeTypeAFactorData P Y)
     (hleftComm : IsMulCommutative factors.left) :
-    IsTypeB.{uP, 0} P ∨ IsTypeC.{uP, 0} P := by
+    (∃ data : TypeBData.{uP, 0} P, data.phi = 1) ∨
+      IsTypeC.{uP, 0} P := by
   classical
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
@@ -766,7 +824,8 @@ theorem isTypeB_or_isTypeC_of_commutative_left_factor
       intro alpha beta
       have h := hequivLR alpha beta
       rwa [heq] at h
-    exact isTypeB_of_mixedTerm_theta_one hEA hK1 hterm hSq hAgemo hK0
+    exact exists_typeBData_phi_eq_one_of_mixedTerm_theta_one
+      hEA hK1 hterm hSq hAgemo hK0
       ePhi L R factors.right_normal factors.inf_eq_frattini
       factors.sup_eq_top factors.frattini_lt_right.le dataL0.lambda nu
       hordnu hlam2 (hthetaLpkg.trans hthetaL0)
@@ -793,11 +852,59 @@ theorem isTypeB_or_isTypeC_of_commutative_left_factor
       hthetaRpkg (hthetaLpkg.trans hthetaL0) dR.lambda dataL0.lambda nu
       hordnu hlamnuR hmu2 hequivRL hM0RL hinv hcentral n_pos hcard
 
+/-- The proposition-level B/C dispatcher, retained for consumers which do not
+need the distinguished equation `phi = 1` in the type-B branch. -/
+theorem isTypeB_or_isTypeC_of_commutative_left_factor
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    (factors : XiLengthThreeTypeAFactorData P Y)
+    (hleftComm : IsMulCommutative factors.left) :
+    IsTypeB.{uP, 0} P ∨ IsTypeC.{uP, 0} P := by
+  rcases
+      exists_typeBData_phi_eq_one_or_isTypeC_of_commutative_left_factor
+        hP hncomm hmulti hxi hlen hprime factors hleftComm with
+    ⟨data, -⟩ | hC
+  · exact Or.inl ⟨data⟩
+  · exact Or.inr hC
+
 /-- **Higman Lemma 12 (pp. 90--91), B/C classification from a prescribed
 commutative invariant factor.**
 
 The prescribed factor is retained as the left member of a complementary
 type-A pair, so the preceding dispatcher never enters the type-D case. -/
+theorem exists_typeBData_phi_eq_one_or_isTypeC_of_commutative_invariant_factor_of_xiLengthThree
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : frattini P < S)
+    (hStop : S < (⊤ : Subgroup P))
+    (hcommS : IsMulCommutative S) :
+    (∃ data : TypeBData.{uP, 0} P, data.phi = 1) ∨
+      IsTypeC.{uP, 0} P := by
+  obtain ⟨factors, hleft⟩ :=
+    xiLengthThreeTypeAFactorData_exists_with_left
+      hP hncomm hmulti hxi hlen hprime hSinv hPhiS hStop
+  have hleftComm : IsMulCommutative factors.left := by
+    rw [hleft]
+    exact hcommS
+  exact exists_typeBData_phi_eq_one_or_isTypeC_of_commutative_left_factor
+    hP hncomm hmulti hxi hlen hprime factors hleftComm
+
+/-- The proposition-level prescribed-factor dispatcher, retained for consumers
+which do not need the distinguished equation `phi = 1` in the type-B branch. -/
 theorem isTypeB_or_isTypeC_of_commutative_invariant_factor_of_xiLengthThree
     (hP : IsPGroup 2 P)
     (hncomm : ¬ IsMulCommutative P)
@@ -813,14 +920,12 @@ theorem isTypeB_or_isTypeC_of_commutative_invariant_factor_of_xiLengthThree
     (hStop : S < (⊤ : Subgroup P))
     (hcommS : IsMulCommutative S) :
     IsTypeB.{uP, 0} P ∨ IsTypeC.{uP, 0} P := by
-  obtain ⟨factors, hleft⟩ :=
-    xiLengthThreeTypeAFactorData_exists_with_left
-      hP hncomm hmulti hxi hlen hprime hSinv hPhiS hStop
-  have hleftComm : IsMulCommutative factors.left := by
-    rw [hleft]
-    exact hcommS
-  exact isTypeB_or_isTypeC_of_commutative_left_factor
-    hP hncomm hmulti hxi hlen hprime factors hleftComm
+  rcases
+      exists_typeBData_phi_eq_one_or_isTypeC_of_commutative_invariant_factor_of_xiLengthThree
+        hP hncomm hmulti hxi hlen hprime hSinv hPhiS hStop hcommS with
+    ⟨data, -⟩ | hC
+  · exact Or.inl ⟨data⟩
+  · exact Or.inr hC
 
 /-- **Higman, Lemma 12 (pp. 90--92): a Suzuki 2-group of ξ-length 3 is
 isomorphic to some `B(n, θ, ε)`, `C(n, ε)`, or `D(n, θ, ε)`.**
