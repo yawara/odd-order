@@ -45,7 +45,7 @@ theorem eq_zero_of_ringAut_comb_two {F : Type uF} [Field F]
     (h : ∀ x : F, a * σ x + c * x = 0) : a = 0 ∧ c = 0 := by
   obtain ⟨x0, hx0⟩ : ∃ x, σ x ≠ x := by
     by_contra hall
-    push_neg at hall
+    push Not at hall
     exact hσ (RingEquiv.ext hall)
   have h1 := h 1
   rw [map_one, mul_one, mul_one] at h1
@@ -71,7 +71,7 @@ theorem eq_zero_of_ringAut_comb_three {F : Type uF} [Field F]
   have ha : a = 0 := by
     obtain ⟨y0, hy0⟩ : ∃ y, σ y ≠ τ y := by
       by_contra hall
-      push_neg at hall
+      push Not at hall
       exact hστ (RingEquiv.ext hall)
     obtain ⟨hA, -⟩ := eq_zero_of_ringAut_comb_two σ hσ1 _ _ (key y0)
     rcases mul_eq_zero.mp hA with h' | h'
@@ -80,7 +80,7 @@ theorem eq_zero_of_ringAut_comb_three {F : Type uF} [Field F]
   have hc : c = 0 := by
     obtain ⟨y1, hy1⟩ : ∃ y, τ y ≠ y := by
       by_contra hall
-      push_neg at hall
+      push Not at hall
       exact hτ1 (RingEquiv.ext hall)
     obtain ⟨-, hC⟩ := eq_zero_of_ringAut_comb_two σ hσ1 _ _ (key y1)
     rcases mul_eq_zero.mp hC with h' | h'
@@ -187,7 +187,7 @@ theorem typeBQuadraticMap_radical_eq_zero [CharP F 2]
     intro γ
     have h := hadd (γ, 0)
     simp only [Prod.mk_add_mk, typeBQuadraticMap_apply, map_add, map_zero,
-      add_zero, zero_add, zero_mul, mul_zero] at h
+      add_zero, mul_zero] at h
     linear_combination h
   have eq2 : ∀ δ : F,
       epsilon * (α * phi δ) + β * phi δ + δ * phi β = 0 := by
@@ -207,7 +207,7 @@ theorem typeBQuadraticMap_radical_eq_zero [CharP F 2]
     have hα : α = 0 := (mul_eq_zero.mp hεα).resolve_left hε
     have h1 := eq1 1
     rw [hθ, hα] at h1
-    simp only [RingAut.one_apply, map_one, zero_mul, one_mul, mul_one,
+    simp only [RingAut.one_apply, map_one, one_mul, mul_one,
       zero_add, add_zero] at h1
     have hβ : β = 0 := (mul_eq_zero.mp h1).resolve_left hε
     rw [hα, hβ]
@@ -268,11 +268,11 @@ theorem typeCQuadraticMap_radical_eq_zero [Finite F] [CharP F 2]
       intro γ
       have h := hadd (γ, 0)
       simp only [Prod.mk_add_mk, typeCQuadraticMap_apply, map_add, map_zero,
-        add_zero, zero_add, zero_mul, mul_zero] at h
+        add_zero, mul_zero] at h
       linear_combination h
     have h := eq1 1
     rw [hα] at h
-    simp only [map_zero, map_one, zero_mul, mul_zero, one_mul, mul_one,
+    simp only [map_zero, map_one, mul_zero, one_mul, mul_one,
       zero_add, add_zero] at h
     have hεβ : epsilon * (frobeniusEquiv F 2 * theta) β = 0 := h
     have hmulβ : (frobeniusEquiv F 2 * theta) β = 0 :=

@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 02:2x 監視 tick — a (1C.6a/b) + b (Higman L13 商分解) + c (App C Prop1 model 組立) 合流 / d lint 稼働**。a=3 / b=3 / c=1(+WIP) / d=0(10 WIP)。
+> 合流: a (**Isaacs §1C Problems 1C.6a/1C.6b** — G=HK の共通 Sylow と P=(P∩H)(P∩K) 集合積、`Problems.lean` +118) / b (**Higman Lemma 13** — Frattini 商の ξ 長さ・不変直和分解・持ち上げ、新 leaf `QuotientLengths.lean`+200 / `QuotientSummands.lean`+249 / `FrattiniPreimages.lean`+239、3 枚とも WIRED via `HigmanLemmaThirteen.lean`) / c (**Pf App C Prop1** `rankOne_affine_nearField` の model 組立 — **carrier 実構成 + 13/15 フィールド実証明**、`NearFields.lean` +267/−30)。
+> **gate: green 4653 jobs (前 4650 +3 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→8 非退行 (count-sorry; c の model 組立は carrier 実構成でも sorry 非増 = NearFields 2 のまま、Q₈ gap 孤立維持) / lint 218 ≤ 218 baseline (ratchet exit 0) / push f499e5c23→8d2f7140a**。範囲逸脱なし。
+> ✅ **c の doneness note**: rankOne model 組立は opaque carrier を**実構成**し 15 フィールド中 13 を実証明 — CLAUDE.md「doneness = carrier 構成可能性」に合致する genuine 前進 (sorry 数不変でも実質進捗)。残 Q₈/quaternion 2 sorry は既知 gap の孤立継続。c は worktree で `NearFields.lean` を更に編集中 (次 tick 継続)。
+> ℹ **lane d = lint 稼働確認**: d は 0 ahead だが worktree に **10 file の lint 修正 WIP** (BG AppE 3 / Higman LemmaTwelve 3 / Pf Suzuki2Groups 2 等) — ユーザー通知どおり lint-fix 稼働中。commit 出れば a/b/c の後に最後に合流。
+>
 > **▶▶ 2026-07-23 02:0x 監視 tick — a (1C.7) + b (Higman L13 Frattini 整列) 合流 / c WIP watch / d lint 継続**。a=1 / b=2 / c=0(WIP) / d=0。
 > 合流: a (**Isaacs §1C Problem 1C.7** — 極大部分群が素数指数のとき最大素数 Sylow が正規、`Problems.lean` +49) / b (**Higman Lemma 13** — Frattini 系列の整列、新 leaf `HigmanLemmaThirteen/CompositionSeries.lean` +204 / `HigmanLemmaThirteen/FrattiniLayers.lean` +344、両 WIRED via `HigmanLemmaThirteen.lean`、**0 sorry**)。
 > **gate: green 4650 jobs (前 4648 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→8 非退行 (count-sorry) / lint 218 ≤ 218 baseline (ratchet exit 0) / push b4e98c575→b23fb1429**。範囲逸脱なし (a=Isaacs / b=Higman、両所有内)。

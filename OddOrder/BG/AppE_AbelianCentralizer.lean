@@ -513,7 +513,6 @@ theorem map_eq_self_of_forall_zpow {E : Type*} [Group E] [Finite E] {f : MulAut 
     V.map ((f : MulAut E) : E →* E) = V := by
   refine Subgroup.eq_of_le_of_card_ge ?_ (le_of_eq ?_)
   · rintro _ ⟨x, hx, rfl⟩
-    change ((f : MulAut E) : E →* E) x ∈ V
     rw [show ((f : MulAut E) : E →* E) x = f x from rfl, hf x]
     exact V.zpow_mem hx t
   · exact Nat.card_congr
