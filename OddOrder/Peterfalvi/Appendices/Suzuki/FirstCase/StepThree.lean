@@ -995,6 +995,320 @@ theorem exists_pow_two_modEq_of_K_conj (a : ↥fc.P) {r : ℕ}
   rw [horder] at hmod
   exact hmod.symm
 
+/-- **Step (3), second branch — Half B** (the `𝔽_{r^p}`-side, p. 109): if `K`
+acts irreducibly on the elementary abelian `r`-group `M`, then some `a ∈ P`
+conjugates every `k ∈ K` to its `r`-th power.
+
+`K` is abelian and acts irreducibly on `M`, so by Appendix I, Proposition
+2(a)+(b) (`exists_field_semilinear_with_scalar`) `M` is a `1`-dimensional
+vector space over a field `F` with `|F| = |M| = r^p`, `K` acting through
+scalars `μ : K →* Fˣ`; `μ` is injective because `K` is fixed-point-free on
+`Q ⊇ M` (§2 Prop 1(a), `conjQByK_fixed_eq_one`).  Conjugation by a generator
+`a₀` of `P` normalizes both `K` and `M`, hence acts `σ`-semilinearly with
+`σ = (x ↦ x^(r^j)) ∈ Gal(F/𝔽_r)` (`ringAut_card_prime_pow_eq_pow`) and
+`μ(a₀ k a₀⁻¹) = σ(μ k)`.  If `p ∣ j` then `σ` fixes `Fˣ` pointwise, so `a₀`
+centralizes `K`; as `P = ⟨a₀⟩` this forces `K = C_K(P) = 1` (step (1)),
+contradicting `|K| = 2^p − 1 > 1`.  Otherwise choose `m` with
+`j·m ≡ 1 (mod p)`: conjugation by `a := a₀^m` acts on `μ(K) ≤ Fˣ` as
+`x ↦ x^(r^(jm)) = x^r` (the Frobenius), and injectivity of `μ` transports
+`k ↦ k^r` back to `K`.
+
+Inherits the step (2)(b) `sorry` through `|C_M(P)| = r` (issue 9318). -/
+theorem exists_K_conj_pow_of_irreducible {r : ℕ} (hr : r.Prime)
+    {M : Subgroup G} (hMQ1 : M ≤ fc.toHypothesis.Q1) (hMne : M ≠ ⊥)
+    (helab : IsElementaryAbelian r ↥M)
+    (hinv : ∀ g ∈ fc.toHypothesis.K ⊔ fc.P, ∀ m ∈ M, g * m * g⁻¹ ∈ M)
+    (hirr : ∀ B ≤ M, (∀ k ∈ fc.toHypothesis.K, ∀ m ∈ B, k * m * k⁻¹ ∈ B) →
+      B ≠ ⊥ → B = M) :
+    ∃ a : ↥fc.P, ∀ k ∈ fc.toHypothesis.K,
+      (a : G) * k * (a : G)⁻¹ = k ^ r := by
+  classical
+  haveI : Fact r.Prime := ⟨hr⟩
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have hMQ : M ≤ fc.toHypothesis.Q := hMQ1.trans fc.toHypothesis.Q1_le_Q
+  have hcardM : Nat.card ↥M = r ^ fc.p := by
+    rw [fc.card_eq_card_inf_centralizer_pow hr hMQ hMne helab hinv,
+      fc.card_inf_centralizer_eq_prime hr hMQ1 hMne helab hinv]
+  -- the conjugation action `ψ` of `K` on `M`
+  have hLnorm : fc.toHypothesis.K ⊔ fc.P ≤
+      Subgroup.normalizer (M : Set G) := by
+    intro g hg
+    rw [Subgroup.mem_normalizer_iff]
+    intro x
+    constructor
+    · exact fun hx => hinv g hg x hx
+    · intro hx
+      have h2 := hinv g⁻¹ (inv_mem hg) _ hx
+      simpa [mul_assoc] using h2
+  set L : Subgroup G := fc.toHypothesis.K ⊔ fc.P with hLdef
+  set φ : ↥L →* MulAut ↥M :=
+    M.normalizerMonoidHom.comp (Subgroup.inclusion hLnorm) with hφdef
+  have hφval : ∀ (a : ↥L) (m : ↥M),
+      ((φ a m : ↥M) : G) = (a : G) * (m : G) * (a : G)⁻¹ := fun _ _ => rfl
+  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  letI : CommGroup ↥M := helab.subgroupCommGroup
+  letI : CommGroup ↥fc.toHypothesis.K := IsCyclic.commGroup
+  set ψ : ↥fc.toHypothesis.K →* MulAut ↥M :=
+    φ.comp (Subgroup.inclusion le_sup_left) with hψdef
+  have hψval : ∀ (k : ↥fc.toHypothesis.K) (m : ↥M),
+      ((ψ k m : ↥M) : G) = (k : G) * (m : G) * (k : G)⁻¹ := fun _ _ => rfl
+  -- irreducibility, in subtype form
+  have hirrψ : ∀ U : Subgroup ↥M,
+      OddOrder.Isaacs.Ch03.IsAInvariant ψ U → U = ⊥ ∨ U = ⊤ := by
+    intro U hU
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem] at hU
+    by_cases hUbot : U.map M.subtype = ⊥
+    · left
+      exact Subgroup.map_injective M.subtype_injective
+        (hUbot.trans (Subgroup.map_bot M.subtype).symm)
+    · right
+      have hUM : U.map M.subtype = M := by
+        refine hirr _ (Subgroup.map_subtype_le U) ?_ hUbot
+        rintro k hk x ⟨m, hm, rfl⟩
+        exact ⟨_, hU ⟨k, hk⟩ m hm, hψval ⟨k, hk⟩ m⟩
+      rw [Subgroup.eq_top_iff']
+      intro x
+      have hxm : (x : G) ∈ U.map M.subtype := by
+        rw [hUM]; exact x.2
+      obtain ⟨y, hy, hyx⟩ := hxm
+      rwa [show y = x from Subtype.ext hyx] at hy
+  -- Appendix I Prop 2(a)+(b): the field `F` with the scalar realization of `K`
+  obtain ⟨F, instF, instMod, instFin, -, hcardF, ⟨μ, hμ⟩, hsemi⟩ :=
+    Huppert.exists_field_semilinear_with_scalar helab ψ hirrψ
+  letI : Field F := instF
+  letI : Module F (Additive ↥M) := instMod
+  letI : Finite F := instFin
+  haveI : Fintype F := Fintype.ofFinite F
+  have hcardF' : Nat.card F = r ^ fc.p := hcardF.trans hcardM
+  have hFcard : Fintype.card F = r ^ fc.p := by
+    rw [← Nat.card_eq_fintype_card]; exact hcardF'
+  -- `μ` is injective (`K` is fixed-point-free on `Q ⊇ M`)
+  have hμinj : Function.Injective μ := by
+    refine (injective_iff_map_eq_one μ).mpr fun k hk1 => ?_
+    by_contra hkne
+    obtain ⟨m, hm⟩ := exists_ne (1 : ↥M)
+    have hfix : ψ k m = m := by
+      have h := hμ k (Additive.ofMul m)
+      rw [hk1, Units.val_one, one_smul] at h
+      have h2 := congrArg Additive.toMul h
+      simpa using h2.symm
+    have hact : (k : G) * (m : G) * (k : G)⁻¹ = (m : G) := by
+      rw [← hψval k m, hfix]
+    have hfixQ : fc.toHypothesis.conjQByK k ⟨(m : G), hMQ m.2⟩
+        = ⟨(m : G), hMQ m.2⟩ := by
+      apply Subtype.ext
+      rw [fc.toHypothesis.conjQByK_apply_val]
+      exact hact
+    have h1 := fc.toHypothesis.conjQByK_fixed_eq_one hkne hfixQ
+    have h1G := congrArg Subtype.val h1
+    exact hm (Subtype.ext h1G)
+  -- a generator `a₀` of `P`
+  haveI : Nontrivial ↥fc.P := by
+    refine (Subgroup.nontrivial_iff_ne_bot fc.P).mpr fun hbot => ?_
+    have h1 : Nat.card ↥fc.P = 1 := by rw [hbot, Subgroup.card_bot]
+    rw [fc.card_P] at h1
+    exact fc.p_prime.one_lt.ne' h1
+  obtain ⟨a₀, ha₀⟩ := exists_ne (1 : ↥fc.P)
+  have horda : orderOf a₀ = fc.p := by
+    have hdvd : orderOf a₀ ∣ fc.p := fc.card_P ▸ orderOf_dvd_natCard a₀
+    rcases fc.p_prime.eq_one_or_self_of_dvd _ hdvd with h1 | h
+    · exact absurd (orderOf_eq_one_iff.mp h1) ha₀
+    · exact h
+  have hzp : Subgroup.zpowers a₀ = (⊤ : Subgroup ↥fc.P) := by
+    apply Subgroup.eq_top_of_card_eq
+    rw [Nat.card_zpowers, horda, fc.card_P]
+  -- `a₀` normalizes `K` (`K ◁ D`, `P ≤ D`), giving `c ∈ Aut(K)`
+  have hPnormK : ∀ gP : ↥fc.P,
+      (gP : G) ∈ Subgroup.normalizer (fc.toHypothesis.K : Set G) := by
+    intro gP
+    have hgD : (gP : G) ∈ fc.toHypothesis.D :=
+      fc.toHypothesis.V_le_D (fc.P_le_V gP.2)
+    rw [Subgroup.mem_normalizer_iff]
+    intro x
+    constructor
+    · intro hx
+      have h := (inferInstance :
+          (fc.toHypothesis.K.subgroupOf fc.toHypothesis.D).Normal).conj_mem
+        ⟨x, fc.toHypothesis.K_le_D hx⟩ (Subgroup.mem_subgroupOf.mpr hx)
+        ⟨(gP : G), hgD⟩
+      exact Subgroup.mem_subgroupOf.mp h
+    · intro hx
+      have h := (inferInstance :
+          (fc.toHypothesis.K.subgroupOf fc.toHypothesis.D).Normal).conj_mem
+        ⟨(gP : G) * x * (gP : G)⁻¹, fc.toHypothesis.K_le_D hx⟩
+        (Subgroup.mem_subgroupOf.mpr hx) ⟨(gP : G)⁻¹, inv_mem hgD⟩
+      have h2 := Subgroup.mem_subgroupOf.mp h
+      simpa [mul_assoc] using h2
+  set n₀ : ↥(Subgroup.normalizer (fc.toHypothesis.K : Set G)) :=
+    ⟨(a₀ : G), hPnormK a₀⟩ with hn₀def
+  set c : MulAut ↥fc.toHypothesis.K :=
+    fc.toHypothesis.K.normalizerMonoidHom n₀ with hcdef
+  have hcval : ∀ k : ↥fc.toHypothesis.K,
+      ((c k : ↥fc.toHypothesis.K) : G) = (a₀ : G) * (k : G) * (a₀ : G)⁻¹ :=
+    fun _ => rfl
+  set aL : ↥L := ⟨(a₀ : G), Subgroup.mem_sup_right a₀.2⟩ with haLdef
+  set g : MulAut ↥M := φ aL with hgdef
+  -- conjugation by `a₀` intertwines `ψ` with `c`
+  have hcomm : ∀ k : ↥fc.toHypothesis.K, ψ (c k) = g * ψ k * g⁻¹ := by
+    intro k
+    have hginv : g⁻¹ = φ aL⁻¹ := by
+      rw [hgdef]; exact (map_inv φ aL).symm
+    ext m
+    have hRHS : (((g * ψ k * g⁻¹) m : ↥M) : G)
+        = (aL : G) * (((k : G)) * (((aL⁻¹ : ↥L) : G) * (m : G)
+            * ((aL⁻¹ : ↥L) : G)⁻¹) * ((k : G))⁻¹) * (aL : G)⁻¹ := by
+      rw [show (g * ψ k * g⁻¹) m = g ((ψ k) (g⁻¹ m)) from rfl, hginv, hgdef]
+      rw [hφval, hψval, hφval]
+    rw [hRHS, hψval, hcval]
+    have hinvcoe : ((aL⁻¹ : ↥L) : G) = (aL : G)⁻¹ := rfl
+    have haLcoe : (aL : G) = (a₀ : G) := rfl
+    rw [hinvcoe, haLcoe]
+    group
+  obtain ⟨σ, hσ⟩ := hsemi g c hcomm
+  -- the scalar-conjugation identity `μ(a₀ k a₀⁻¹) = σ(μ k)`
+  have hkey : ∀ k : ↥fc.toHypothesis.K, (μ (c k) : F) = σ (μ k : F) := by
+    intro k
+    obtain ⟨x, hx⟩ := exists_ne (0 : Additive ↥M)
+    obtain ⟨y, hy⟩ := (MulEquiv.toAdditive g).surjective x
+    have h1 : (μ (c k) : F) • x = σ (μ k : F) • x := by
+      rw [← hy]
+      calc (μ (c k) : F) • (MulEquiv.toAdditive g) y
+          = Additive.ofMul ((ψ (c k))
+              (Additive.toMul ((MulEquiv.toAdditive g) y))) := hμ (c k) _
+        _ = Additive.ofMul ((ψ (c k)) (g (Additive.toMul y))) := rfl
+        _ = Additive.ofMul ((g * ψ k * g⁻¹) (g (Additive.toMul y))) := by
+            rw [hcomm k]
+        _ = Additive.ofMul (g ((ψ k) (Additive.toMul y))) := by
+            congr 1
+            show g ((ψ k) (g⁻¹ (g (Additive.toMul y)))) = _
+            have hz : g⁻¹ (g (Additive.toMul y)) = Additive.toMul y := by
+              change (g⁻¹ * g) (Additive.toMul y) = _
+              rw [inv_mul_cancel]
+              rfl
+            rw [hz]
+        _ = (MulEquiv.toAdditive g)
+              (Additive.ofMul ((ψ k) (Additive.toMul y))) := rfl
+        _ = (MulEquiv.toAdditive g) ((μ k : F) • y) := by rw [← hμ k y]
+        _ = σ (μ k : F) • (MulEquiv.toAdditive g) y := hσ _ _
+    by_contra hne
+    have hsub : ((μ (c k) : F) - σ (μ k : F)) • x = 0 := by
+      rw [sub_smul, h1, sub_self]
+    have hc0 : (μ (c k) : F) - σ (μ k : F) ≠ 0 := sub_ne_zero.mpr hne
+    have hx0 : x = 0 := by
+      have h2 := congrArg
+        (fun z => ((μ (c k) : F) - σ (μ k : F))⁻¹ • z) hsub
+      simpa [smul_smul, inv_mul_cancel₀ hc0] using h2
+    exact hx hx0
+  obtain ⟨j, hj⟩ := ringAut_card_prime_pow_eq_pow (q := r) hcardF' σ
+  by_cases hpj : ((j : ZMod fc.p)) = 0
+  · -- `σ` fixes `μ(K)` pointwise, so `a₀` centralizes `K = C_K(P) = 1`:
+    -- contradiction with `|K| = 2^p − 1 > 1`
+    exfalso
+    obtain ⟨s, hs⟩ := (ZMod.natCast_eq_zero_iff j fc.p).mp hpj
+    have hfixk : ∀ k : ↥fc.toHypothesis.K, c k = k := by
+      intro k
+      apply hμinj
+      apply Units.ext
+      calc (μ (c k) : F) = σ (μ k : F) := hkey k
+        _ = (μ k : F) ^ r ^ j := hj _
+        _ = (μ k : F) ^ (r ^ fc.p) ^ s := by rw [hs, pow_mul]
+        _ = (μ k : F) := by
+            rw [← hFcard]; exact FiniteField.pow_card_pow s _
+    have hcent : fc.toHypothesis.K ≤
+        Subgroup.centralizer (fc.P : Set G) := by
+      intro x hx
+      rw [Subgroup.mem_centralizer_iff]
+      intro gp hgp
+      have hmem : (⟨gp, hgp⟩ : ↥fc.P) ∈ Subgroup.zpowers a₀ := by
+        rw [hzp]; exact Subgroup.mem_top _
+      obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hmem
+      have hc₀ : Commute (a₀ : G) x := by
+        have h := hfixk ⟨x, hx⟩
+        have hcoe : (a₀ : G) * x * (a₀ : G)⁻¹ = x := by
+          have h2 := congrArg Subtype.val h
+          rwa [hcval] at h2
+        have h3 : (a₀ : G) * x = x * (a₀ : G) := by
+          conv_rhs => rw [← hcoe]
+          group
+        exact h3
+      have hgpn : gp = (a₀ : G) ^ n := by
+        have h2 := congrArg Subtype.val hn
+        rw [SubgroupClass.coe_zpow] at h2
+        exact h2.symm
+      rw [hgpn]
+      exact (hc₀.zpow_left n).eq
+    have hKbot : fc.toHypothesis.K = ⊥ := by
+      have hinf := fc.K_inf_centralizer_eq_bot
+      rwa [inf_eq_left.mpr hcent] at hinf
+    have hcardK : Nat.card ↥fc.toHypothesis.K = 2 ^ fc.p - 1 := by
+      rw [fc.toHypothesis.card_K_eq_card_Q0_sub_one, fc.card_Q0_eq_two_pow]
+    rw [hKbot, Subgroup.card_bot] at hcardK
+    have h4 : 4 ≤ 2 ^ fc.p :=
+      calc (4 : ℕ) = 2 ^ 2 := by norm_num
+        _ ≤ 2 ^ fc.p := Nat.pow_le_pow_right (by norm_num) fc.p_prime.two_le
+    omega
+  · -- pick `m` with `j·m ≡ 1 (mod p)`; then `a := a₀^m` works
+    haveI : NeZero fc.p := ⟨fc.p_prime.ne_zero⟩
+    set m : ℕ := ((j : ZMod fc.p)⁻¹).val with hmdef
+    have hjm : (j * m) % fc.p = 1 := by
+      have hcast : ((j * m : ℕ) : ZMod fc.p) = 1 := by
+        push_cast
+        rw [hmdef, ZMod.natCast_val, ZMod.cast_id]
+        exact mul_inv_cancel₀ hpj
+      have hmodeq := (ZMod.natCast_eq_natCast_iff (j * m) 1 fc.p).mp
+        (by rw [hcast]; norm_num)
+      have hmod : (j * m) % fc.p = 1 % fc.p := hmodeq
+      rwa [Nat.mod_eq_of_lt fc.p_prime.one_lt] at hmod
+    set s : ℕ := (j * m) / fc.p with hsdef
+    have hjmeq : j * m = fc.p * s + 1 := by
+      conv_lhs => rw [← Nat.div_add_mod (j * m) fc.p]
+      rw [hjm, ← hsdef]
+    have hgen : ∀ x : F, x ^ (r ^ j) ^ m = x ^ r := by
+      intro x
+      calc x ^ (r ^ j) ^ m = x ^ r ^ (j * m) := by rw [← pow_mul]
+        _ = x ^ (r ^ (fc.p * s) * r) := by rw [hjmeq, pow_succ]
+        _ = (x ^ r ^ (fc.p * s)) ^ r := by rw [pow_mul]
+        _ = (x ^ (r ^ fc.p) ^ s) ^ r := by rw [pow_mul]
+        _ = x ^ r := by rw [← hFcard, FiniteField.pow_card_pow]
+    have hiter : ∀ (n : ℕ) (k : ↥fc.toHypothesis.K),
+        (μ ((c ^ n) k) : F) = (μ k : F) ^ (r ^ j) ^ n := by
+      intro n
+      induction n with
+      | zero => intro k; simp
+      | succ n ih =>
+        intro k
+        have hstep : (c ^ (n + 1)) k = (c ^ n) (c k) := by
+          rw [pow_succ]; rfl
+        rw [hstep, ih (c k)]
+        have hck : (μ (c k) : F) = (μ k : F) ^ r ^ j := by
+          rw [hkey k]; exact hj _
+        rw [hck, ← pow_mul, ← pow_succ']
+    refine ⟨a₀ ^ m, fun k hk => ?_⟩
+    have hcm : (c ^ m) (⟨k, hk⟩ : ↥fc.toHypothesis.K)
+        = (⟨k, hk⟩ : ↥fc.toHypothesis.K) ^ r := by
+      apply hμinj
+      apply Units.ext
+      rw [hiter m ⟨k, hk⟩, map_pow, Units.val_pow_eq_pow_val, hgen]
+    have hcoe := congrArg Subtype.val hcm
+    have hcmL : ((c ^ m) (⟨k, hk⟩ : ↥fc.toHypothesis.K) : G)
+        = (a₀ : G) ^ m * k * ((a₀ : G) ^ m)⁻¹ := by
+      have hcpow : c ^ m = fc.toHypothesis.K.normalizerMonoidHom (n₀ ^ m) := by
+        rw [hcdef, map_pow]
+      rw [hcpow]
+      have happ : ((fc.toHypothesis.K.normalizerMonoidHom (n₀ ^ m))
+            (⟨k, hk⟩ : ↥fc.toHypothesis.K) : G)
+          = ((n₀ ^ m : ↥(Subgroup.normalizer
+              (fc.toHypothesis.K : Set G))) : G) * k
+            * ((n₀ ^ m : ↥(Subgroup.normalizer
+              (fc.toHypothesis.K : Set G))) : G)⁻¹ := rfl
+      rw [happ, SubmonoidClass.coe_pow]
+    have hres : (a₀ : G) ^ m * k * ((a₀ : G) ^ m)⁻¹ = k ^ r := by
+      have hcr : ((⟨k, hk⟩ ^ r : ↥fc.toHypothesis.K) : G) = k ^ r := by
+        rw [SubmonoidClass.coe_pow]
+      rw [← hcmL, hcoe, hcr]
+    rw [SubmonoidClass.coe_pow]
+    exact hres
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
