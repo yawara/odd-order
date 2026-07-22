@@ -12203,6 +12203,16 @@ Higman sorries through the model and are intentionally unregistered):
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.st_mem_and_cQ_isPGroup_of_mem_centralizer_W
 
+/-! **Step (8), the fixed-field arithmetic** (`FirstCase/StepEight.lean`, issue 2053,
+2026-07-22): for a finite field `F` (characteristic `f`) and a ring automorphism `σ`, the fixed
+set is an additive subgroup, so `|{x : σ x = x}| = f^a` (additive Lagrange); if the fixed *units*
+form a `2^b`-group (`b ≥ 1`) then `f^a = 2^b + 1`, so `|{x : σ x = x}| ∈ {f, 9}` (via the
+step (6) arithmetic lemma).  Model-independent, axiom-clean. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.exists_card_fixedSet_eq_char_pow
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.card_fixedSet_mem_of_units_two_pow
+
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
 欠いていた).  Zassenhaus/Dickson 分類の App.C 特殊形: 有限 near-field `F` の乗法群が
