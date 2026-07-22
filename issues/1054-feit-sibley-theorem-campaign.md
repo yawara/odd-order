@@ -814,11 +814,28 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   ⟹ χ₁(1)·⟨θ,χ⟩=c₀·χ(1) (piece4 の要). ⟹ **piece2/piece4/dvd_lam を pairwise 生成元に
   改訂すれば full-𝒳 可除性・積指標論が全て不要**になる。
 
-  ### 残 master assembly (改訂ルート)
-  1. piece2 pairwise 版 `restrict_extension_inner_pairwise` (n•χ−m•χ' supported ⟹
-     n⟨Res e',χ⟩=m⟨Res e',χ'⟩)。2. piece4/dvd_lam を pairwise hXdiff' (m₁•χ−mχ•χ₁ supported,
-     常に満足可能) に改訂。3. (4) setup: anchor χ₁=min-deg + hXdiff' (scaled_diff_support で
-     機械的) + keystone。4. adjoin + case + Odd|G|。
+  ### ⭐⭐ (4) setup 実現ルート確定 (2026-07-22) — 積指標論も pairwise 改訂も不要
+
+  **⚠ pairwise は union_coherent には効かない** (exists_X_witness_assignment の P1-X
+  `wX χ − a·wX χ₁ = τ(χ−a•χ₁)` は整数比 aᵢ∈ℤ を要求) ので可除性はやはり必要。
+  **しかし可除性は既存インフラで導出可能** (積指標論 不要):
+  - **`exists_anchor_of_mem_XsetOf` (Q1Component.lean:329)**: 任意 R (⊥ 含む) に対し
+    ψ∈XsetOf R Z ⟹ ∃ χθ∈XsetOf Sder Z (=𝒳₁), tθ e:ℕ, χθ(1)=d·tθ ∧ ψ(1)=d·(e·tθ)。
+    ⟹ **χθ(1)=d·tθ ∣ ψ(1)** (ψ-依存の 𝒳₁ anchor)。
+  - **min-degree 大域 anchor χ₁**: 𝒳₁ の最小度数元。χ₁(1)=d·p^{k₁}
+    (exists_apply_one_eq_d_mul_pow で p 冪)。χ₁≤χθ (min) + 両 p 冪 ⟹ **t₁∣tθ∣(χ(1)/d)**
+    ⟹ **χ₁(1)∣χ(1) for full 𝒳**。⟹ **既存 hXdiff (整数比 χ−b•χ₁) が discharge 可能**。
+  ⟹ **既存 xset_qder_union_coherent/dvd_lam は改訂不要**。pairwise 補題は無害な bonus。
+
+  ### 残 master assembly (確定ルート)
+  1. **(4) setup**: (a) 𝒳₁=XsetOf Sder Z nonempty (Z≠1 + Lem2c、two_le_ncard 型)。
+     (b) χ₁=min-deg of 𝒳₁ (Finset min)。(c) χ₁(1)=d·p^{k₁} (exists_apply_one_eq_d_mul_pow)。
+     (d) **hXdiff**: ∀χ∈full 𝒳, exists_anchor→χθ∈𝒳₁ (χθ(1)∣χ(1)) + χ₁≤χθ (p冪 t₁∣tθ)
+     ⟹ χ₁(1)∣χ(1) ⟹ b=χ(1)/χ₁(1)∈ℕ ⟹ χ−b•χ₁ supported (scaled_diff_support Theorem:1591)。
+     (e) keystone χ₁−a•η₁ supported (a=χ₁(1)/d=p^{k₁})。
+  2. xset_qder_union_coherent (既存) → 𝒳∪𝒴 coherent。
+  3. adjoin 𝒮(S')−(𝒳₁∪𝒴)→𝒮(S') (Lemma 1(a) coherent_adjoin_of_degree_bound)。
+  4. 非可換 p 群 case ((1)+(2) 型組立) + d=1 + dispatch + Odd|G| 追加。
   1. **(4) setup (非可換 p 群 case)**: Z:=endgameZ に対し 𝒳=XsetOf⊥Z coherent
      (endgame_Xset_coherent) + 𝒴=𝒮(Q') coherent (ssetOf_Qder_coherent, Remark) を取り、
      **anchor χ₁ (最小度数, χ₁(1)=a·d) 選択** + **hXdiff (∀χ∈𝒳,∃b,χ−b•χ₁ supported =
