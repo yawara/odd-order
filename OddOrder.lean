@@ -14,6 +14,7 @@ import OddOrder.GroupTheory.BrauerSuzukiInvolutions
 import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.CentralElementaryExtension
+import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
 import OddOrder.GroupTheory.CentralProduct
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.ChiefFactor
