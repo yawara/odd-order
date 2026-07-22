@@ -70,6 +70,21 @@ theorem classSumCoeff_involutionClass_eq_zero_of_even
   rw [orderOf_eq_of_isConj hconj] at hodd
   exact (Nat.not_even_iff_odd.mpr hodd) hCs
 
+/-- **`∑_Cs classSumCoeff K K Cs · θ*(Cs.out) = 0`** (Gorenstein Lemma 1.8, `β·θ* = 0` summed
+by class).  Each term vanishes: if `Cs.out` has even order then `classSumCoeff K K Cs = 0`
+(`classSumCoeff_involutionClass_eq_zero_of_even`); if it has odd order then `θ*(Cs.out) = 0`
+(`thetaStar_apply_eq_zero_of_odd`, Lemma 1.6). -/
+theorem sum_classSumCoeff_thetaStar_eq_zero
+    [Fintype G] [Fintype ↥Q.N] [Fintype (ConjClasses G)] [DecidableEq (ConjClasses G)]
+    [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
+    ∑ Cs : ConjClasses G,
+      (classSumCoeff Q.involutionClass Q.involutionClass Cs : ℂ) * Q.thetaStar Cs.out = 0 := by
+  apply Finset.sum_eq_zero
+  intro Cs _
+  rcases Nat.even_or_odd (orderOf Cs.out) with heven | hodd
+  · rw [Q.classSumCoeff_involutionClass_eq_zero_of_even heven, Nat.cast_zero, zero_mul]
+  · rw [Q.thetaStar_apply_eq_zero_of_odd hodd, mul_zero]
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory

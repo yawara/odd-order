@@ -12345,3 +12345,5 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.GroupTheory.QuaternionSylowSetup.mk_eq_involutionClass_iff
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.classSumCoeff_involutionClass_eq_zero_of_even
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.sum_classSumCoeff_thetaStar_eq_zero
