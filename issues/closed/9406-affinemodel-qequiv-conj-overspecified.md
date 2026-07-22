@@ -169,3 +169,6 @@ lane c は引き続き BS wiring (cyclic clean / |S|≥16 quaternion / Q₈ 孤�
 **lane b へ**: 新 RHS = `emb (ofAdd (x * (qEquiv q⁻¹ : Fˣ)))`。`model_qEquiv_conj` (StepEight:104)
 の `model.qEquiv_conj q (...)` は今 `qEquiv q⁻¹` を返すので、`q ↔ q⁻¹` を入れ替えるか、呼び出し側で
 `q⁻¹` を渡して調整。
+
+---
+## ✅ CLOSED (2026-07-23 01:2x): fix(A) + consumer 合流で qEquiv_conj 構造バグ解消。合成フルビルド green で c-fix-A × b-consumer 整合を検証。残る Q₈/transport は rankOne_affine_nearField sorry + notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md で追跡。

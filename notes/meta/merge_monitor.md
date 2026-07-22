@@ -6,6 +6,17 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **🎉 2026-07-23 01:2x 監視 tick — 9406 coordinated land 成功 (c+b 同一 tick 合流)**。a=4 / b=2 / c=7 / d=0。
+> ユーザー「b をマージして」= b nudge → **b が 9406 consumer 更新完了** (`5be71e802`: StepEight `model_qEquiv_conj` を `model.qEquiv_conj q→q⁻¹` に追随)。⟹ c(fix A)+b(consumer) 両揃い → **a+b+c を同一 tick で `--no-ff` 合流**。
+> issue 9406 doc に b/c 双方の READY note が付き conflict → 両保持で解消。**Lean code は無衝突 = fix A × consumer は整合**。
+> 🔑 **合成フルビルド green 4646 jobs / EXITCODE=0 / error 0 / StepEight elaborate 確認 (9406 検証成功)** = c の新 qEquiv_conj RHS × b の consumer が coherent。
+> **c の genuine 進捗**: fix A + **BLOCKER 2 (Q-regularity `Q が Ω∖{basept} 上 regular`) 解消** + **cyclic BS case 実証明** + **quaternion 孤立化** (新定理 `RankOneHypothesis.brauerSuzuki`)。
+> ⚠ **実 sorry 7→8 (regression でない・受理)**: 差分は NearFields.lean 1→2 のみ = c の新 `RankOneHypothesis.brauerSuzuki` が cyclic を実証明し **quaternion/Q₈ gap を単一明示 sorry に孤立化**したもの (既存の証明が sorry 化したものは皆無)。CLAUDE.md「sorry カウントで測らない・gap 明示化は正」に合致 ([[scaffold-sorry-free-not-done]])。
+> **AxiomsCheck OK (3754・allowlist 外 0・新 axiom 0) / lint 216→218 (c NearFields longLine grandfather, owner=c flag)**。
+> ⚠ **process slip (自戒)**: lint check(exit1) を確認する前に push → baseline 未更新のまま合流 → fix-forward で grandfather push (68b1ca219)。今後 push 前に lint exit を必ず確認。
+> **issue 9406 close** (qEquiv_conj 構造バグ解消; 残る Q₈/transport は rankOne sorry + 投資ノートで追跡)。push 55abbc850→68b1ca219。
+> frontier: a = §1C 演習 / b = 2053 step (10) 後 / c = NearFields 組立 (Q-regularity 済 → rankOne 前進、Q₈ のみ deferred) / d = メンテナンス。
+>
 > **▶▶ 2026-07-23 01:1x 監視 tick — a/b 合流 / c hold 深刻化 (+7)**。a=1 / b=1 / c=7 / d=0。
 > 合流: a (Isaacs §1C 1C.1 N_G(P)⊆H⟹H=N_G(H)) / b (2053 step (10) 二分岐完結 (10.1)∨(10.2) — StepFive+StepTen)。
 > **gate: green 4646 jobs (不変) / AxiomsCheck OK (3754・新 axiom 0) / sorry 7→7 / lint 216 / push 0283c93f4→fef4e8774**。
