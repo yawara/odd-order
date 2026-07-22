@@ -31,8 +31,27 @@ application: here only a *single* transversal need be closed under `x`-conjugati
 namespace OddOrder.GroupTheory
 
 open Subgroup Subgroup.leftTransversals MulAction
+open scoped Pointwise
 
 variable {G : Type*} [Group G] {H : Subgroup G} {A : Type*} [CommGroup A]
+
+/-- The pointwise inverse of a right transversal of `H` is a left transversal of `H`.
+(If `G = H · T`, then `G = T⁻¹ · H` by inverting `h · t = g ↦ t⁻¹ · h⁻¹ = g⁻¹`.) -/
+lemma isComplement_inv_of_isComplement {T : Set G}
+    (hT : IsComplement (H : Set G) T) : IsComplement T⁻¹ (H : Set G) := by
+  rw [isComplement_iff_existsUnique_inv_mul_mem]
+  intro g
+  obtain ⟨t, ht, htu⟩ := isComplement_iff_existsUnique_mul_inv_mem.mp hT g⁻¹
+  refine ⟨⟨(t : G)⁻¹, Set.inv_mem_inv.mpr t.2⟩, ?_, ?_⟩
+  · show ((t : G)⁻¹)⁻¹ * g ∈ H
+    simpa using inv_mem ht
+  · rintro ⟨s, hs⟩ hmem
+    have hsT : s⁻¹ ∈ T := Set.mem_inv.mp hs
+    have hst : (⟨s⁻¹, hsT⟩ : ↥T) = t := by
+      refine htu _ ?_
+      show g⁻¹ * (s⁻¹)⁻¹ ∈ H
+      simpa using inv_mem hmem
+    exact Subtype.ext (by simpa using congrArg (fun u : ↥T => ((u : G)⁻¹)) hst)
 
 /-- If `a ∈ S` (a left transversal of `H`) lies in the coset `↑a`, then `a` is the
 chosen representative of that coset. -/
@@ -88,5 +107,22 @@ theorem transfer_eq_pow_of_conj_invariant_transversal [H.FiniteIndex]
     exact Finset.prod_congr rfl (fun q _ => congrArg ϕ (Subtype.ext (hfactor q)))
   rw [hprod, Finset.prod_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
     ← Subgroup.index_eq_card]
+
+/-- **Transfer over a conjugation-invariant right transversal.** If a *right*
+transversal `T` of `H ≤ G` (`IsComplement ↑H T`) is invariant under conjugation by
+`x ∈ H`, then `transfer ϕ x = ϕ ⟨x, hx⟩ ^ H.index`.  (Its pointwise inverse `T⁻¹` is
+the conjugation-invariant left transversal fed to
+`transfer_eq_pow_of_conj_invariant_transversal`.) -/
+theorem transfer_eq_pow_of_conj_invariant_rightTransversal [H.FiniteIndex]
+    (ϕ : H →* A) {T : Set G} (hT : IsComplement (H : Set G) T) {x : G} (hx : x ∈ H)
+    (hTconj : ∀ r ∈ T, x⁻¹ * r * x ∈ T) :
+    MonoidHom.transfer ϕ x = ϕ ⟨x, hx⟩ ^ H.index := by
+  refine transfer_eq_pow_of_conj_invariant_transversal ϕ
+    ⟨T⁻¹, isComplement_inv_of_isComplement hT⟩ hx ?_
+  intro s hs
+  rw [Set.mem_inv] at hs ⊢
+  have hinv : (x⁻¹ * s * x)⁻¹ = x⁻¹ * s⁻¹ * x := by group
+  rw [hinv]
+  exact hTconj s⁻¹ hs
 
 end OddOrder.GroupTheory

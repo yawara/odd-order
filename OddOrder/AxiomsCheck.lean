@@ -233,6 +233,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
@@ -12266,6 +12267,34 @@ registered here. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.isCyclic_ringAut_of_charP
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.card_prime_of_isCyclic_forall_ne_one_orderOf
+
+/-! **Peterfalvi Part II, Ch. II, step (9), the transfer computation**
+(`GroupTheory.TransferInvariantTransversal` +
+`Peterfalvi.Appendices.Suzuki.{CanonicalForm, FirstCase.StepNine}`, 2026-07-22).  The book
+computes `T(x) = x^{|Q|+1}` for the transfer `T : G → H/(QKW)` using the canonical-form right
+transversal `1, {t y : y ∈ Q}` and the relation `t y x = x t y^x`.
+
+* `transfer_eq_pow_of_conj_invariant_transversal` — general engine: if a left transversal of
+  `H ≤ G` is invariant under conjugation by `x ∈ H`, then `transfer ϕ x = ϕ x ^ [G:H]`.
+* `isComplement_inv_of_isComplement` — the pointwise inverse of a right transversal is a left one.
+* `transfer_eq_pow_of_conj_invariant_rightTransversal` — the right‑transversal corollary.
+* `isComplement_H_rightTransversalTQ` — Prop 4(a): `1, {t y}` complement `H` (right cosets).
+* `rightTransversalTQ_conj_invariant` — that transversal is invariant under conjugation by `x ∈ P`
+  (`P ≤ C_D(t)` centralises `t`, and `x ∈ H` normalises `Q`).
+* `transfer_eq_pow_card_Q_add_one` — **step (9) transfer identity**: `transfer ϕ x = ϕ x ^ (|Q|+1)`
+  for every `ϕ : H →* A` and `x ∈ P` (since `[G:H] = |Ω| = |Q|+1`).  The remaining `p ∣ |Q|+1`
+  needs the (B2) hypothesis and `P ∩ (QKW) = 1`, tracked separately. -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.transfer_eq_pow_of_conj_invariant_transversal
+#assert_only_allowed_axioms OddOrder.GroupTheory.isComplement_inv_of_isComplement
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.transfer_eq_pow_of_conj_invariant_rightTransversal
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isComplement_H_rightTransversalTQ
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.rightTransversalTQ_conj_invariant
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.transfer_eq_pow_card_Q_add_one
 
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
