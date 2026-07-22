@@ -84,8 +84,8 @@ lakefile global に依存）。
 
 - 提出方針: `../odd-order-submission/SUBMISSION_STRATEGY.md` §5.6 (lean option parity) / §5.2 (閉包 565) /
   §5.3 (最小 re-root)
-- issue [0050](0050-lean-eval-submission-candidates.md)（lean-eval 提出候補・park）,
-  `notes/meta/lean_eval_baer_suzuki.md`（前例）
+- issue [0050](0050-lean-eval-submission-candidates.md)（lean-eval 提出 tracker）,
+  [`notes/meta/lean_eval_submission.md`](../../notes/meta/lean_eval_submission.md) §1.3（leanOptions parity は本 note に統合）
 - `notes/meta/mathlib_v432_migration.md`（option 関連の既往）
 - 対象: `lakefile.toml [leanOptions]`（現状 `relaxedAutoImplicit=false` / `maxSynthPendingDepth=3` /
   `autoImplicit` 未設定）
