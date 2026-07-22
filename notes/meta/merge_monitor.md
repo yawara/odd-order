@@ -6,6 +6,14 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-22 23:2x 監視再開 (ユーザー指示「監視に戻ってください」) — cron 再作成 (id ee4db237)**。a=0 / b=3 / c=1。
+> Q₈/BS 文献調査の pivot 完了 (note `notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`: Q₈ は character-free bypass 無し=modular 必須確定、App.C は FT 非依存)。
+> 合流: b (**2053 step (9) gate — P ∩ ⁅H,H⁆ = 1 完了**, Suzuki/StepNine + AxiomsCheck) / c (**near-field transport API — units iso + conjugation action bridge**, Pf App.C p.137, NearFieldFromSharplyTransitive)。新 leaf 0・範囲逸脱なし。
+> **gate: フルビルド green 4644 jobs (不変) / AxiomsCheck OK (3754・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 / lint ratchet 216 ≤ 216 / push**。
+> ⚠ **lane a watch**: a は 28 分 commit 無 — Isaacs 演習 **1A.7 が Fintype 合成の壁で保留**（a 自身が記録済）。stall でなく特定演習の詰まりゆえ次 tick で監視（続くなら a は §1B へ移るのが自律行動）。
+> **513185** (前 hub): ALIVE・idle 継続 (inert)。
+> frontier: a = 1055 Isaacs Problems (1A.7 保留・§1B 検討) / b = 2053 step (9) 完了 → 次 step / c = NearFields transport (API 整備中、Prop1 を Q₈ 以外で閉じる方向)。
+>
 > **⏸ 2026-07-22 23:1x 監視 tick + cron 停止 (ユーザー指示「いったん cron とめて。さっきの調査を深めて」)**。a=2 / b=1 / c=2。
 > 合流: a (docs 1A.7 保留) / b (docs 2053 step9 完了記録) / c (**NearFieldClass.lean 抽出 = 循環 import 解消** + transport 継続、OddOrder.lean 配線済)。
 > c の `lint-baseline.tsv` 編集が hub の ratchet-down (216) と衝突 → **ours (216) で解消** (lint ratchet で 216≤216 検証済ゆえ c の +3 grandfather は不要だった)。
