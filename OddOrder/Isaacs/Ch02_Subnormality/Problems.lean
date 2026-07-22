@@ -7,6 +7,7 @@ import Mathlib.GroupTheory.IsSubnormal
 import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
 
 /-!
 # Isaacs Chapter 2 — Problems §2A (Subnormality)
@@ -154,6 +155,22 @@ theorem le_of_isSubnormal_of_coprime_index' {G : Type*} [Group G] [Finite G] {H 
       Subgroup.index_ne_zero_of_finite]
     exact Finset.disjoint_of_subset_left hsub hcop.symm.disjoint_primeFactors
   exact hKoP.trans (coprime_normal_le hcopOP)
+
+open OddOrder.Isaacs.Ch03 in
+/-- **Isaacs Problem 2A.2**. `K` が部分正規で `|G : K|` が π-数ならば `O^π(G) ≤ K`。`O^π(G)` は π'-元で
+生成される (`oPiResidual_eq_closure_piPrimeElements`)。各 π'-元 `g` について `⟨g⟩` の位数
+(= `orderOf g`) は π'-数、`|G:K|` は π-数ゆえ互いに素、`K` 部分正規で 2A.3(a) より `⟨g⟩ ≤ K`、
+すなわち `g ∈ K`。したがって生成部分群 `O^π(G) ≤ K`。 -/
+theorem oPiResidual_le_of_isSubnormal_of_index_isPiNumber {G : Type*} [Group G] [Finite G]
+    {π : Set ℕ} {K : Subgroup G} (hK : K.IsSubnormal)
+    (hidx : ∀ q ∈ (K.index).primeFactors, q ∈ π) : oPiResidual π G ≤ K := by
+  rw [oPiResidual_eq_closure_piPrimeElements, Subgroup.closure_le]
+  intro g hg
+  have hcop : (K.index).Coprime (Nat.card ↥(Subgroup.zpowers g)) := by
+    rw [Nat.card_zpowers]
+    refine (Nat.disjoint_primeFactors Subgroup.index_ne_zero_of_finite (orderOf_pos g).ne').mp ?_
+    exact Finset.disjoint_left.mpr fun q hqi hqo => hg q hqo (hidx q hqi)
+  exact le_of_isSubnormal_of_coprime_index hK hcop (Subgroup.mem_zpowers g)
 
 end
 
