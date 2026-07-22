@@ -261,6 +261,19 @@ noncomputable def mulEquivUnits :
       change (m₁ * m₂)⁻¹ • d.e = d.mul (m₁⁻¹ • d.e) (m₂⁻¹ • d.e)
       rw [d.mul_smul_e, smul_smul, mul_inv_rev] }
 
+/-- The underlying element of `mulEquivUnits m` is `m⁻¹ • e`. -/
+@[simp] theorem mulEquivUnits_val (m : M) :
+    letI := d.nearField
+    ((d.mulEquivUnits m : Aˣ) : A) = m⁻¹ • d.e := rfl
+
+/-- Right multiplication by `mulEquivUnits q⁻¹` **is** the action of `q` (the near-field form of the
+conjugation-to-right-multiplication identity, `qEquiv_conj` after issue 9406 fix (A)):
+`x * (mulEquivUnits q⁻¹) = q • x`. -/
+theorem mul_mulEquivUnits_inv (q : M) (x : A) :
+    letI := d.nearField
+    d.mul x ((d.mulEquivUnits q⁻¹ : Aˣ) : A) = q • x := by
+  rw [d.mulEquivUnits_val, inv_inv, d.mul_smul_e]
+
 end SharplyTransitiveData
 
 end OddOrder.GroupTheory
