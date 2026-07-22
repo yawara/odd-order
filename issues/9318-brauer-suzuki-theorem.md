@@ -225,18 +225,33 @@ triple 版 (θ* 直接、`exists_triple_of_sum_sq_eq_three`) は trivial が {α
 上記 ρ+pair 手順どおり、次数 4-case は ℤ で `exact_mod_cast` → omega。axiom-clean。
 → **Lemma 1.4 + 1.5 完全形式化完了** (`BrauerSuzukiCharacter.lean`、~660 行、sorry 0)。
 
-### Lem 1.6 計画 (次 frontier、⚠ 原文再読が必要)
+### ✅ Lem 1.6 完成 (2026-07-22 lane c、`BrauerSuzukiCharacter.lean` + `BrauerSuzukiTISubset.lean`)
 
-Gorenstein Lem 1.6: **involution・奇数位数元上で θ* = 0** → そこで `χ = 1 + χ₁`
-(値の等式)。要調査:
-- 機構: θ* = Ind_N^G θ は θ が A=C−RH 外で消滅 → g が A に共役で入らなければ θ*(g)=0。
-  中心 involution z = x^{2ⁿ⁻¹} は **z ∈ R ⊆ RH ⊄ A** (z は R=⟨x⁴⟩ の唯一の involution、
-  n≥3 で 2ⁿ⁻²≥2)。奇数位数元は 2-group S の外。→ TI 誘導値 = 0 の具体条件を原文で確認。
-- 使う repo infra: `induce_apply_eq_zero_of_not_conjugatesIntoSet` 系 (θ* が A 共役外で 0)、
-  `theta_apply_eq_zero_of_notMem_A`。involution が A に非共役 = z ∉ A + 共役類の議論。
-- 出力: χ, χ₁ の値の関係 (involution u で χ(u) = 1 + χ₁(u) 等) → Lem 1.7-1.9 (β(y) 数え上げ)
-  → endgame。⚠ Lem 1.6-1.9 は Gorenstein Ch.12 pp.375-377 の再読が必要 (β(y) 構造定数公式
-  (9.4.2) = `ClassSumCoefficientFormula.lean` との接続)。
+Gorenstein Lem 1.6: **involution・奇数位数元上で θ* = 0** かつ **χ(y) = 1 + χ₁(y)**。全て
+axiom-clean (`[propext, Classical.choice, Quot.sound]`)、AxiomsCheck 登録済 (Lem 1.3/1.4/1.5
+も同時に import+登録 — 従来 AxiomsCheck は Normalizer までしか import していなかった)。
+
+**⚠ 原文より簡潔な機構を採用** (z 個別の議論不要): 「θ* = Ind_N^G θ は A の共役の外で消滅」
+(`induce_eq_zero_of_not_conjugatesIntoSet`、θ が A に台) × 「**A の元は位数が 4 で割れる**」
+(新 `four_dvd_orderOf_of_mem_A`: a∈A ⟹ T ≤ ⟨a⟩ ⟹ |T|=2ⁿ⁻¹ ∣ orderOf a、n≥3 で 4 ∣ 2ⁿ⁻¹)。
+位数は共役不変 (`SemiconjBy.orderOf_eq`) ゆえ involution (order 2)・奇数位数元は A に共役外
+→ θ*(y)=0。実装補題:
+- `four_dvd_orderOf_of_mem_A` (TISubset) — A の元の位数は 4 で割れる。
+- `thetaStar_apply_eq_zero_of_not_four_dvd` (Character) — ¬4∣orderOf y ⟹ θ*(y)=0 (核心)。
+- `thetaStar_apply_eq_zero_of_orderOf_eq_two` / `_of_odd` — involution / 奇数位数元で θ*=0。
+- `apply_eq_of_thetaStar_apply_eq_zero` — θ*=1_G+χ₁−χ に θ*(y)=0 を代入 ⟹ χ(y)=1+χ₁(y)。
+
+### Lem 1.7 計画 (次 frontier、Gorenstein Ch.12 p.375-376)
+
+Gorenstein Lem 1.7: **β(y) = #{(u,v): involutions, uv=y} = 0 for y of even order** (純群論)。
+証明: uv=y, u,v involution, |y|=2s ⟹ u,v は y を反転 (Thm 9.1.1) し z=yˢ (involution) を
+中心化。u≠z なら ⟨u,z⟩ = Klein four ⟹ Sylow-2 に含まれるが generalized quaternion は
+unique involution ゆえ矛盾 → u=z=v ⟹ uv=1、y≠1 と矛盾。∴ β(y)=0。
+- ⚠ **要確認**: setup が「G の Sylow-2 が (S に共役ゆえ) generalized quaternion で unique
+  involution」を持つか。`QuaternionSylowSetup` の posit 内容を精査 (S が Sylow か、
+  unique-involution を全 Sylow-2 に伝播できるか)。Klein-four ⟹ contained in Sylow-2 は
+  `IsPGroup` + Sylow。unique involution は quaternion 分類 (`isCyclic_or_two_quaternion...`)。
+- 続く (1.1)=(9.4.2) 構造定数公式 (`ClassSumCoefficientFormula.lean`) → Lem 1.8/1.9 → endgame。
 
 ### Lem 1.4 計画 (2026-07-22 lane c、⚠ 下記 infra は grep 発見のみ・API 未精査)
 
