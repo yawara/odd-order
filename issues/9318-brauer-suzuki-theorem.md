@@ -268,7 +268,35 @@ sub-step 分割で完成: `mk_eq_involutionClass_iff` / `classSumCoeff_involutio
 coercion: `simp_rw [∀χ hinner]` は binder 下で coercion mismatch → `simp only [hdecomp]`
 (ground rewrite) + `irr_cf_inner` (ClassFunction 版) で回避。
 
-### Lem 1.9 計画 (次 frontier、純代数 → endgame)
+### ✅ Lem 1.9 完成 (2026-07-22 lane c、`BrauerSuzukiCounting.lean` `lem_1_9`、axiom-clean)
+
+**`lem_1_9`: G は非線形既約指標 χ (degree ≥ 2) を持ち、全 involution が χ(u)=χ(1) (ker χ)**。
+下記手順どおり (thetaStar_decomposition + lem_1_8_relation + apply_eq + hdeg 代入 → field_simp +
+linear_combination で (χ(u₀)−χ(1))²=0 → 任意 involution は u₀ 共役)。全 AxiomsCheck 登録済。
+**これで Lem 1.4〜1.9 完成 = Brauer–Suzuki 指標理論核心 完了。**
+
+### endgame 計画 (次 frontier、Gorenstein Ch.12 p.376-377、純群論、⚠ 大 piece)
+
+`lem_1_9` の非線形 χ (全 involution ⊆ ker χ) から:
+1. **M := ⟨全 involution⟩ ⊴ G** (involution 集合は共役不変ゆえ closure 正規)。mathlib
+   `Subgroup.normalClosure` or `closure` of conjugation-invariant set。
+2. **Q := S ∩ M は cyclic**。背理: Q が generalized quaternion なら yxⁱ∈Q ⟹ x²∈Q ⟹ |S:Q|≤2 ⟹
+   S/Q abelian。G₁:=SM に `lem_1_9` 適用 (G₁ の Sylow-2 = S generalized quaternion、⚠ G₁ に
+   `QuaternionSylowSetup` を作る必要) → G₁ の非線形 φ で M⊆ker φ (全 involution が M 生成)
+   → G₁/ker φ は G₁/M ≅ S/Q の商 = abelian → φ 線形、矛盾。∴ Q cyclic。
+   ⚠ **最難所**: `lem_1_9` を部分群 G₁=SM に適用するには G₁ 用 setup 構築 (S は G₁ でも
+   generalized quaternion Sylow-2)。あるいは Lem 1.9 を「setup を持つ任意の群」用に一般化。
+3. **M の正規 2-補群 L** (Burnside、Q=S∩M は M の cyclic Sylow-2)。L char M ⊴ G → **L ⊴ G**、
+   L ⊆ K:=O_{2'}(G)。M=LQ ⟹ **KQ ⊴ G**。
+4. **Ḡ:=G/K で Ω₁(Q̄)=Z(Ḡ) 位数 2** (Q̄ cyclic 正規、O_{2'}(Ḡ)=1 ⟹ Z(Ḡ) は 2-群、Z(S) 位数 2)。
+   → **Z(G/O_{2'}(G)) 位数 2** = Gorenstein Thm 1.1。
+5. **系 `G = O_{2'}(G)·C_G(u)`** (u = 中心 involution): Z(G/K) 位数 2 から Frattini 型で導出。
+   → `rankOne_affine_nearField` (NearFields.lean) の sorry が要求する形へ橋渡し。
+
+⚠ endgame は ~150-250 行の純群論 (⟨involutions⟩ 正規 / SM への Lem 1.9 適用 / Burnside /
+G/K の中心解析)。Q8 case (|S|=8) は別途 research-adjacent gap のまま。
+
+<details><summary>Lem 1.9 手順 (完成前の計画記録)</summary>
 
 Gorenstein Lem 1.9: `(χ(u)−χ(1))²=0` → 全 involution ⊆ ker χ。手順:
 1. `obtain ⟨χ₁,χ,...,hdecomp,hdeg⟩ := thetaStar_decomposition` (hdeg: χ(1)=χ₁(1)+1)。
@@ -278,8 +306,8 @@ Gorenstein Lem 1.9: `(χ(u)−χ(1))²=0` → 全 involution ⊆ ker χ。手順
    **χ(u)=1+χ₁(u)** → χ₁(u)=χ(u)−1。hdeg: χ₁(1)=χ(1)−1。
 4. 代入 + 分母払い (χ₁(1),χ(1)≠0 = degree ≥1) → `(χ(u)−χ(1))²=0` → χ(u)=χ(1)。
    → 全 involution v: χ(v)=χ(u)=χ(1) (v~u 共役 + χ class fn) → v∈ker χ。χ 非線形 (χ(1)=χ₁(1)+1≥2)。
-- **endgame** (純群論、Gorenstein p.376-377): M=⟨involutions⟩⊴G、Q=S∩M cyclic (さもなくば非線形
-  指標が線形化し矛盾) → Burnside 2-補群 L⊴G → KQ⊴G (K=O_{2'}) → Ḡ=G/K で Ω₁(Q̄)=Z(Ḡ) 位数 2。□
+
+</details>
 
 <details><summary>Lem 1.8 導出経路 (完成前の計画記録)</summary>
 
