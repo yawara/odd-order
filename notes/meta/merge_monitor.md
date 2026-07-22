@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 01:5x 監視 tick — b (Higman L13) 合流 / 🔴 d stall 確定**。a=0 / b=1 / c=0 / d=0。
+> 合流: b (**Higman Lemma 13** — ξ-length 4 と Frattini 分岐、新 leaf `HigmanLemmaThirteen.lean` + `HigmanLemmaThirteen/LengthFourReduction.lean`, 両 WIRED)。
+> **gate: green 4648 jobs (前 4646 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・新 axiom 0) / 実 sorry 8→8 非退行 / lint 218 ≤ 218 (push を lint exit で gate) / push 41dd75444→714569ab0**。範囲逸脱なし (b=Higman)。
+> 🔴 **lane d stall 確定**: d は **62 分 commit 無** (初 CLAUDE.md commit 00:54 以降) + **01:00 以降 worktree ファイル更新ゼロ** + lsof 無 hit + scratch `foo` 放置。分析中でなく **session 停止/stall がほぼ確定**。hub は unsupervised d を再起動不可 → **ユーザーに d セッション再起動を依頼** (2 tick 連続で quiet 報告)。b が Theorem B (step 10) から Higman L13 に移ったのは b territory 内 (Higman は b 所有) で正常。**513185** idle 継続。
+>
 > **▶▶ 2026-07-23 01:4x 監視 tick**。a=1 / b=0 / c=0 / d=0。合流: a (Isaacs §1C Problems 1C.3b)。
 > **gate: green 4646 jobs / AxiomsCheck OK (3754・新 axiom 0) / 実 sorry 8→8 非退行 (9406 後の新基準 8) / lint 218 ≤ 218 (push を lint exit で gate — 前 tick の slip 反省) / push a0c6949d2→61566491f**。
 > ⚠ **lane d watch (要注意)**: d は 47 分 commit 無 (初 CLAUDE.md commit 以降)、lsof で worktree を開く ccd-cli プロセス無 hit、worktree に未追跡 scratch `foo` 1 件。メンテナンス lane ゆえ lint census / lean-eval 抽出の分析中の可能性もあるが、**stall or session 停止の疑い**。次 tick でも quiet なら user へ d セッション確認を依頼。⚠ scratch `foo` は d の作業残渣 (無害・未追跡)。**513185** idle 継続。
