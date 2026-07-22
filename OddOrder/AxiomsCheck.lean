@@ -12317,8 +12317,14 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 * `odd_orderOf_mul_of_involution` — **the product of two involutions has odd order**: if `uv`
   had even order `2s`, `(uv)ˢ` would be an involution commuting with `u` and `v`, forcing
   `u = v = (uv)ˢ` and `uv = 1`.  This is `β(y) = 0` for even-order `y` (no involution pair
-  multiplies to an even-order element). -/
+  multiplies to an even-order element).
+* `exists_conj_eq_z` / `isConj_of_orderOf_eq_two` — **every involution is conjugate to `z`**,
+  so `G` has a **single class of involutions** (the class-sum input `(9.4.2)` for Lemma 1.8). -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.commute_involution_eq
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.odd_orderOf_mul_of_involution
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.exists_conj_eq_z
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.QuaternionSylowSetup.isConj_of_orderOf_eq_two
