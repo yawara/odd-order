@@ -519,18 +519,270 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
          ⚠ 実装知見: IsCoherent は Type ⟹ `noncomputable def` (theorem 不可) /
          IntegralCharacterMap は full path (OddOrder.Peterfalvi.S07) 要 /
          nsmul↔ℂ-smul 橋 = Nat.cast_smul_eq_nsmul、nsmul↔zsmul 橋 = 同 (ℤ 版)。
-      4. (6) 統合: 1+2+3 合成 → a∣λ ⟹ IsCoherent τ (X∪Y) A。
+      4. [x] **(6) 統合完成** = `union_coherent_of_lambda_dvd` (2026-07-22, sorry-free,
+         **新 leaf FeitSibleyUnionCoherence.lean 192 行**, OddOrder.lean 配線済)。
+         a∣λ + (4) データ (X/Y disjoint coherent, χ₁∈X, η₁∈Y, a≥2, m≥2, keystone
+         χ₁−a•η₁ supported, λ norm-identity data) ⟹ IsCoherent τ (X∪Y) A。
+         組立: exists_normalized_witness_of_dvd (w) → exists_X_witness_assignment (wX)
+         → 合成 W (`if μ∈X then wX μ else w μ`) → isCoherent_of_memberAssignment。
+         合成差分 = 単一 anchor η₁: η∈Y は b=1、χ∈X は b=a_χ·a
+         (χ−a_χa•η₁ = (χ−a_χ•χ₁)+a_χ•(χ₁−a•η₁), P1-X+keystone を τ 線形で合成)。
+         ⚠ 実装知見: IsCoherent は Type ⟹ ∃ witness は Classical.choose で取り出し
+         (obtain 不可、Exists.casesOn は Prop のみ); **choose_spec を set の前に**取らないと
+         properties が hwex.choose を参照して set 済 w と syntactic mismatch /
+         inner_conj_symm は OddOrder.RepresentationTheory full path (mathlib と ambiguous) /
+         混合 nsmul/ℂ-smul の加群等式は push_cast + module。
       5. その後: 1(a) adjoin で 𝒮(S′) coherent → (2) で 𝒮 → (iii) 分岐完成。
-      (7) class-algebra 合同は独立 — (6) 統合が重いので先に (7) を済ませる
-      選択肢もある (文書順は (6)→(7) だが (7) は self-contained)。
-  - [ ] **(7)** class-algebra 合同 (独立、並行可): ψ constant on Z^# ⟹
-    ψ(z)≡ψ(1) mod|Q|。ω central character (ω(Kₛ)=ψ(Kₛ)/ψ(1)) の代数的整数性 +
-    構造定数 aᵢⱼₛ + Q f.p.f. 作用の counting。**前提の repo 内所在確認要**
-    (中心指標・class algebra・代数的整数)。無ければ RepresentationTheory 新 leaf。
-  - [ ] **(8)** Conclusion: (5)+(6)+(7) で a∣λ を証明し (6) を閉じる。
+      (7) class-algebra 合同は独立 — (6) 統合が済んだので (7)→(8) で a∣λ を出して
+      union_coherent_of_lambda_dvd に供給、その後 step 5 の adjoin/(2)。
+  - [~] **(7)** class-algebra 合同: ψ constant on Z^# ⟹ ψ(z)≡ψ(1) mod|Q|。
+    **⭐ Hall 合同 machinery 完成** = `peterfalvi_67_hall` (2026-07-22, sorry-free,
+    新 leaf `OddOrder/GroupTheory/RepresentationTheory/HallTICongruence.lean` 272 行,
+    OddOrder.lean 配線済, 純 read-only cite で shared-infra 無改変・9200 claim 不要)。
+    - `mem_of_orderOf_coprime_relindex`: 正規 Hall π-元包含 (H⧸Q で orderOf 二重可除)。
+    - `fixedPointFree_classPair_hall`: Hall f.p.f. (crux)。Sylow proof を mirror し
+      2 点差替 — `IsTISubset.centralizer_le` で C_G(x)⊆H、mem_Q で π-元⟹∈Q、
+      `IsTISubset.mem_of_conj_mem_conj` で 2 回目 TI。
+    - `centralCharacterOfRep_classSum_mul_cong_collapse_hall`: 汎用 mul_cong (f.p.f.
+      可除性を供給) + 汎用 collapse 恒等式の合成。
+    - `peterfalvi_67_hall`: peterfalvi_67 を P→Q, N→H で mirror。汎用部品
+      (peterfalvi_673 / centralCharacterOfRep_eq_of_tiSubset_card_eq / character_isIntegral /
+      nonidentityZClassCoeffSum_isIntegral / character_one_mul_centralCharacterOfRep_mk)
+      は全て read-only。coprime |C₁| |Q| (hcop) は仮説 (caller = (8) が Q⊆C_G(z) から供給)。
+    ⚠ 実装知見: IsIrreducible は `[ρ.IsIrreducible]` (Set.IsIrreducible と ambiguous) /
+    SemiconjBy.orderOf_eq c hsc で共役 order 保存 / Subgroup.orderOf_mk で subtype order /
+    section variable は f.p.f.(群論のみ)と assembly(V/ConjClasses)で分離 (未使用 warning 回避)。
+    **⭐ endgame-facing API 完成** = `peterfalvi_67_hall_of_odd` (2026-07-22, sorry-free,
+    HallTICongruence.lean 398 行)。hreal/hone/hcop を内部 discharge した clean wrapper:
+    odd|G| + Q normal Hall (H と G 両方) TI + Z⊴H + z∈Z^# を Q が中心化 + ρ constant
+    on Z^# ⟹ ρ.character z ≡ ρ.character 1 [ALGMOD |Q|]。追加部品:
+    - `coprime_card_class_card_hall` (hcop: Q⊆C_G(z)+Q Hall in G ⟹ coprime |C₁| |Q|)
+    - `nonidentityZClassCoeffSum_cong_hall` (hone: trivial rep + Hall collapse で a₁₁≡1+a₁₂)
+    - hreal は汎用 `ConjClasses.eq_one_of_isConj_inv_of_odd_card` (odd|G|) で discharge。
+    **残 = (8) 本体のみ** (endgame 特化、下記): peterfalvi_67_hall_of_odd を
+    hyp.Q/hyp.H/endgameZ/ρ(=±e'₁ の表現) に適用 → 「(ψ(z)−ψ(1))/|Q| 代数的整数」を得て
+    (5)(6) の e'₁(z)−e'₁(1) = −|Q|(λ/a+μ) と合わせ a∣λ。⚠ 供給要: (i) ρ = e'₁(∈±Irr(G))
+    に対応する Representation (ClassFunction→Representation ブリッジ)、(ii) Q Hall in G
+    (coprime |Q| Q.index) の endgame からの導出、(iii) endgameZ⊆Z(Q) から Q⊆C_G(z)、
+    (iv) hconst (ρ constant on Z^# + N∩C_G card 定数) の endgame からの供給。
+    (以下は偵察時の旧記録; machinery は上記で完成済)
+    **⭐ スコープ確定 (2026-07-22 偵察): 新規 class-algebra 構築は不要 — 既存 machinery
+    の再インスタンス化。** `peterfalvi_67` (ClassSumAlgebra.lean:127) が (7) の合同
+    そのもの (`ρ.character z ≡ ρ.character 1 [ALGMOD |P|]`) を、中心指標 constancy +
+    TI + `a₁₁≡1+a₁₂` から `peterfalvi_673` 経由で導出済。全下位部品が存在:
+    - `classSum`/`classSumCoeff`/`classSum_mul` (構造定数 = (7.1)、ClassSumCongruence.lean)
+    - `classSumCoeff_self_one_eq_zero` (hreal で a₁₁₀=0) / `classSumCoeff_self_inv_one_eq_card`
+      (a₁₂₀=|C₁|) / `peterfalvi_673_combine/cancel/final` ((7.3)(7.4) 算術)
+    - `card_dvd_classSumCoeff_of_fixedPointFree` (**完全汎用**: 任意有限部分群 P の
+      f.p.f. 共役作用で |P| ∣ classSumCoeff = (7.2) の核) / 中心指標整数性
+      `nonidentityZClassCoeffSum_isIntegral` / `character_isIntegral`。
+    **唯一の差分 = P Sylow (mod |P|) vs Q Hall (mod |Q|)**。Sylow 依存は 2 箇所のみ:
+    ① `fixedPointFree_classPair_of_isTISubset` (ClassSumCongruence.lean:491、Sylow P の
+       p-element 論法で「x∈P^# が (u,v) を固定 ⟹ u,v∈Z」を出す) →
+       **Q の TI 構造 (Q_trivial_intersection) を使う Hall 変種を新設**が要 (これが主タスク)。
+    ② `coprime_card_class_card_sylow` (|C₁| と |P| の coprime) → Q Hall では
+       |C₁|=|G:C_G(z)| と |Q| の coprime を別途 (Q Hall + z∈Z⊆Q の C_G(z)⊇Q から)。
+    ⟹ 実装 = **`peterfalvi_67` の Hall-TI 版** (`peterfalvi_67_hall` 等) を
+    ClassSumAlgebra または新 leaf に。①の f.p.f. Hall 変種 (~60-100 行) + coprime
+    補題 + peterfalvi_67 の assembly を Q で再展開 (~40 行)。**中心指標・class algebra・
+    代数的整数はすべて既存** — 「無ければ新 leaf」は不要と確定。
+    次 iteration: App.IV endgame の Q/Z/TI が peterfalvi_67 の引数 (hZP/hZnormal/hti/
+    hPz/hreal/hconst/hone) をどう供給するか (Hypothesis field からの導出) を確定してから
+    Hall 変種を書く。⚠ hconst の「N∩C_G card 定数」条件と hone の供給が endgame 側で
+    どう出るか要精査 (原文 (7) の d odd 使用箇所 = K₁∩Z^#≠∅ の存在)。
+    **Hall f.p.f. 変種の設計確定 (2026-07-22 偵察)** — Sylow proof
+    (ClassSumCongruence.lean:491-588) の 2 Sylow-step を差し替えるだけ:
+    - `Q_trivial_intersection : ∀ x∉H, Q ⊓ Q.map(conj x) = ⊥` (FeitSibley.lean:267) が
+      TI の正本。x∈Q^# を y が中心化 ⟹ x∈Q ⊓ Q^{y⁻¹} nontrivial ⟹ y∈H
+      (**C_G(x)⊆H**; 既に近い補題が FeitSibley.lean:521-532 = TI overlap 消化)。
+      これが Sylow の `hcent_le` (→N_G(P)) を H に置換する部分。
+    - Sylow の `mem_sylow_of_mem_normalizer_of_isPGroup` (y∈N かつ p-元 ⟹ y∈P) の Hall 版 =
+      「y∈H かつ y が π(Q)-元 ⟹ y∈Q」(正規 Hall は全 π-元を含む)。Hall infra は
+      `Isaacs/Ch03_SplitExtensions/Theorem315.lean` (IsHallSubgroup/IsPiGroup/
+      card_dvd_of_isPiGroup)。⚠ 正規 Hall ⟹ 全 π-元包含 が repo に無ければ小補題新設
+      (Q ⊴ H + coprime index、共役類の π-元 order は |Q| を割る)。
+    - coprime |C₁| |Q|: z∈Z⊆Z(Q₁) は Q=S×Q₁ を中心化 (S_commutes_Q1 + Z⊆Z(Q₁)) ⟹
+      **Q⊆C_G(z)** ⟹ |C₁|=|G:C_G(z)| ∣ |G:Q|、Q Hall ⟹ coprime(|G:Q|,|Q|)。
+    残りの TI/Z⊴H/共役鎖 (hZconj/hmem_Z の骨格) は Sylow 版と同一 (汎用)。
+    ⟹ **`peterfalvi_67_hall` を lane-a leaf に新設** (既存 shared lemma は read only、
+    peterfalvi_673 + card_dvd_classSumCoeff_of_fixedPointFree を cite)。~100-150 行見込。
+    **⭐ TI input 準備済**: `isTISubset_Q_sdiff_one` (FeitSibley.lean:525) =
+    `IsTISubset (Q\{1}) H` が既存 (peterfalvi_67 の hti に対応、normalizer→H)。
+    **実行可能設計 = 4 sub-lemma (次 turn はこれを順に書くだけ)**:
+    1. `mem_Q_of_mem_H_of_orderOf_coprime` (~15 行): y∈H かつ coprime(orderOf y, |H:Q|)
+       ⟹ y∈Q。証明: H⧸Q で orderOf(mk y) ∣ orderOf y かつ ∣ |H:Q| (Lagrange)、
+       coprime ⟹ orderOf(mk y)=1 ⟹ mk y=1 ⟹ y∈Q (QuotientGroup.eq_one_iff)。
+       (Q ⊴ H = Q_subgroupOf_H_normal は既存)。
+    2. `fixedPointFree_classPair_hall` (~70 行): ClassSumCongruence.lean:491 の Sylow proof
+       を写経し 2 点差替 — `hcent_le` の N_G(P)→H (isTISubset_Q_sdiff_one 直用)、
+       `mem_sylow_of_mem_normalizer_of_isPGroup`→上記 1 (y は zi∈Z⊆Q に共役 ⟹
+       orderOf y=orderOf zi ∣ |Q| coprime |H:Q|)。hZconj は Z⊴H (subgroupOf) から。
+    3. `coprime_classCard_Q` (~15 行): z∈Z⊆Z(Q₁) が Q=S×Q₁ 中心化 (S_commutes_Q1) ⟹
+       Q ⊆ C_G(z) ⟹ |C₁|=|G:C_G(z)| ∣ |G:Q| coprime |Q| (Q Hall = coprime_Q_D + |H:Q|)。
+    4. `peterfalvi_67_hall` (~40 行): ClassSumAlgebra.lean:127 peterfalvi_67 を写経、
+       P→Q、上記 2/3 を Sylow 版の差替に。中心指標 collapse
+       (centralCharacterOfRep_classSum_mul_cong_collapse_of_isTISubset) が Sylow P を
+       取るか要確認 — 取るなら汎用 TI 版も要 (ClassSumCongruence 側、shared claim)。
+    ⚠ 4 の collapse 補題が Sylow 依存なら shared-infra 追加 (9200 claim)。まず署名確認。
+    **⭐ 署名確認済 (2026-07-22): collapse は Sylow 依存** —
+    `centralCharacterOfRep_classSum_mul_cong_collapse_of_isTISubset`
+    (ClassSumCongruence.lean:1577) は `(P : Sylow p G)` を取り modulus = `Nat.card P`。
+    内部で `centralCharacterOfRep_classSum_mul_cong_of_isTISubset` →
+    `fixedPointFree_classPair_of_isTISubset` (Sylow) を使う。⟹ **(7) Hall 版は純 lane-a
+    leaf で完結しない — shared class-algebra infra の Hall 変種を要す**。
+    **確定した architecture (次 turn の実行計画)**:
+    - **9200 claim** を立てる (shared-infra、レーン別サブバンド a=9200)。着手前に
+      `ls issues/9*.md` で重複 scan (現状 9130/9159/9164/9318 = 別件)。
+    - **方式 = 汎用化 (既存 Sylow 版を壊さない追加)**: collapse/mul_cong/f.p.f. の
+      「一般部分群 P + f.p.f. を仮説に取る」版を ClassSumCongruence/ClassSumAlgebra に
+      **新規追加** (既存 Sylow 版は f.p.f. を fixedPointFree_classPair_of_isTISubset で
+      供給する薄い wrapper に後退させられるが、無理に触らず追加のみでよい)。
+      核 `card_dvd_classSumCoeff_of_fixedPointFree` は既に f.p.f. を仮説に取る汎用形
+      ゆえ、その上の mul_cong/collapse も f.p.f. 仮説版に一般化するのは機械的。
+    - その上で lane-a leaf に Hall f.p.f. (sub-lemma 2) + peterfalvi_67_hall (sub-lemma 4)
+      を組む。sub-lemma 1 (mem_Q_of_orderOf_coprime) と 3 (coprime_classCard_Q) は
+      lane-a leaf で自足。
+    ⟹ 見込 = shared 側 汎用化 ~80 行 (9200) + lane-a 側 Hall 組立 ~100 行。
+    hub 調整: 9200 claim は additive (既存 Sylow 版不変) ゆえ低リスク。
+  - [~] **(8)** Conclusion: (5)+(6)+(7) で a∣λ を証明し (6) を閉じる。
     Res_H e′₁ = (λ+aμ)Σaᵢχᵢ + χ′、Σaᵢχᵢ=(ρ_H−ρ_{H/Z})/(da)、z∈Z^# 評価 +
     (7) を ±e′₁ に適用 → λ/a+μ 代数的整数 → a∣λ。
+    **⭐ 偵察 (2026-07-22): (8) の再利用可能な核 2 つが既存/完成済**:
+    - **正則指標差恒等式** = `sumNonInflatedDegreeMulChar_of_mem`
+      (InflationCharacter.lean:540)。docstring 明示「**mmd 04.8 L168** = Peterfalvi (6.8.1)、
+      η₁^{τ₁} が Z^# 上定数を示すステップ」。z∈N^# で Σ_{χ:N⊄ker}χ(1)χ(z) = −|G⧸N|
+      (= (ρ_G−ρ_{G/N})(z))。これが (8) の Σaᵢχᵢ 評価そのもの (G=H, N=Z)。
+      主文 §6.8 (S08_DegreeSums:917, S08_YsetInner/CharacterBreaks:102) で消費済 = 汎用。
+    - **central 合同** = `peterfalvi_67_hall_of_odd` (私が完成、HallTICongruence)。
+    - **最終算術** = `dvd_of_isIntegral_ratio` (2026-07-22 完成、FeitSibleyEndgame.lean):
+      λ/a+μ が alg int (μ∈ℤ, a>0) ⟹ a∣λ (isIntegral_rat_imp_int 経由、rational
+      alg int は整数)。x_eq_zero_or_x_one_of_norm_identity と並ぶ算術核。
+    **参照**: 主文 §6.8 = `SibleyDadeHypothesis` framework
+    (S08_CaseBCoherence/CentralCongruence.lean、inner_tau_alpha_dvd_index 等) が (8) の
+    assembly パターンを demonstrate (別 hypothesis 構造なので直接再利用でなく参照)。
+    **残 = FeitSibley 特化 assembly (次 turn)**: (a) e′₁ (G側±Irr witness) の
+    Res_H 分析 → (Res_H e′₁, χᵢ−aᵢχ₁)=0 (i≥2), (Res_H e′₁, χ₁−aη₁)=λ−a (from (5)(6))、
+    (b) Fourier 展開 Res_H e′₁ = (λ+aμ)Σaᵢχᵢ + χ′ (χ′⊥χᵢ, Z⊆ker χ′)、
+    (c) Σaᵢχᵢ = (ρ_H−ρ_{H/Z})/(da) を sumNonInflatedDegreeMulChar_of_mem で、
+    (d) z∈Z^# 評価 e′₁(z)−e′₁(1) = −|Q|(λ/a+μ) (|H|=d|Q| = [H:Q]=d 使用)、
+    (e) e′₁=±ξ を ξ=ρ.character に橋渡し → peterfalvi_67_hall_of_odd 適用 →
+    (λ/a+μ) alg int → dvd_of_isIntegral_ratio で a∣λ → union_coherent_of_lambda_dvd。
+    ⚠ 供給要: ξ→Representation ブリッジ、Q Hall in G (coprime |Q| Q.index)、
+    hconst (ρ constant on Z^# + N∩C_G card 定数)、endgameZ⊆Z(Q)⟹Q⊆C_G(z)。
+    **⭐ 全 routing 確定 (2026-07-22 偵察、部品所在):**
+    - **𝒳 = {χ∈Irr H | Z⊄ker χ}** = `mem_XsetOf_bot_iff` (2026-07-22 完成、
+      FeitSibleyEndgame.lean)。Z≤Q₁ ゆえ Q₁⊄ker 条件が Z⊄ker に subsume。
+      ⟹ Σ_{χ∈𝒳}χ(1)χ(z) が sumNonInflatedDegreeMulChar_of_mem (=−|H⧸Z|) に直結。
+      ⚠ ただし Set 𝒳 (ClassFunction) ↔ Finset {ξ:IrreducibleCharacter | Z⊄characterKernel}
+      の bijection が要 (LeKer↔characterKernel = `leKer_iff_subset_characterKernel`
+      FeitSibleyTheorem:1119)。
+    - **τ = ClassFunction.induce hyp.H** (= Ind_H^G、FeitSibley.lean:315)。
+    - **Frobenius reciprocity** = `inner_induce_coe_eq_restrictionMultiplicity`
+      (FeitSibleyTheorem:281 で使用例)。(Res_H e′₁, ζ)_H = (e′₁, τζ)_G の橋。
+    - **ξ→Representation** = `IsIrreducibleCharacter` を obtain (= ∃V ρ, IsIrreducible ∧
+      (ξ:G→ℂ)=ρ.character; ZIrr.lean:95)。(8) goal は Prop ゆえ obtain 可。
+      haveI := hirr で instance 化 → peterfalvi_67_hall_of_odd 適用。
+    - **算術核** dvd_of_isIntegral_ratio (完成)、**central 合同** peterfalvi_67_hall_of_odd (完成)。
+    - **(c) 正則指標和 (両評価完成)** — 新 leaf `FeitSibleyConclusion.lean`:
+      `sum_degree_mul_charValue_XsetOf_bot`: Σ_{χ∈𝒳}χ(1)χ(z) = −|H⧸Z| (z∈Z^#、ψ_𝒳(z)) +
+      `sum_degreeSq_XsetOf_bot` (2026-07-22 完成): Σ_{χ∈𝒳}χ(1)² = |H|−|H⧸Z| (ψ_𝒳(1))。
+      ⟹ ψ_𝒳(z)−ψ_𝒳(1) = −|H| = z 評価入力。両方 mem_XsetOf_bot_iff + leKer_iff で
+      {Z⊄characterKernel} に reindex (Finset.sum_bij')、sumNonInflated{DegreeMulChar,DegreeSq}。
+      S08 sum_degree_{mul_charValue,Sq}_Xset の FeitSibley mirror。
+    - **⭐ ルート B (代替/参照, S08 (6.8) mirror)**: `extension_constant_on_sharp_of_prime`
+      (S07_CoherenceGalois:424、汎用 S07 だが dadeIntegralCharacterMap 型 — Galois σ が
+      (·^k) で prime-order Z を回す; **要 Dade→Ind 一般化 or FeitSibley 版**) で
+      「coherentYset.extension η constant on Z^#」を直接取得 (Z prime order + Z⊆ker η、
+      η∈𝒴 は Q'⊆ker + Z⊆[Q₁,Q₁]⊆Q' から充足) + `apply_one_sub_apply_eq_card_mul_inner`
+      (S08_CaseBCoherence/CentralCongruence:172、汎用 {Γ}: f constant on Γ^# ∧ φ linear ⟹
+      f(1)−f(z)=|Γ|⟨f,φ⟩)。**ルート A (Res_H Fourier) は自己完結で value+constancy を同時に
+      出すので採用; B は constancy shortcut の参照**。
+    **⭐ アーキ判明 (2026-07-22)**: `feit_sibley_coherence` の sorry は **FeitSibley.lean:1239
+    (base)**。FeitSibleyTheorem (leKer_iff 等) と FeitSibleyEndgame (mem_XsetOf_bot_iff 等) は
+    **並行ブランチ** (互いに import せず、両方 base 下流)。⟹ (8) assembly + closure は
+    **両ブランチ下流の新 leaf `FeitSibleyConclusion.lean`** に置く (UnionCoherence+Theorem を
+    import、確立済)。base の sorry は最終的に**この leaf へ relocation** して閉じる (base は
+    誰にも上流 import されない endpoint ゆえ移設安全; hub 調整候補)。stale docstring
+    (「(7) machinery は repo に無い」) は 2026-07-22 修正済。
+    - **(b) Fourier 展開インフラ確認 (2026-07-22): 全 unblock**。`mem_ZIrr_repr`
+      (ZIrrFourier:105): θ∈ZIrr Γ ⟹ ∃ c:Finsupp (support⊆Irr), θ=Σ_{a∈support}(c a)•a。
+      `inner_eq_coeff_of_repr` (:117): (θ,χ)=c(χ)。Frobenius 一般形
+      `ClassFunction.inner_induce_eq_inner_restrict` ((Ind θ,φ)=(θ,Res φ))。全存在。
+    **⭐ (8) 核 = 5 ピース ~240 行 (全インフラ確認済、tightly-coupled、fresh context 推奨)**:
+    1. [x] **Fourier-eval-split 完成** = `apply_sub_apply_eq_sum_XsetOf_bot`
+       (2026-07-22, sorry-free): θ∈ZIrr↥H, z∈Z ⟹ θ(z)−θ(1)=Σ_{χ∈𝒳}(θ,χ)(χ(z)−χ(1))。
+       mem_ZIrr_repr + LeKer 項消滅 + 両辺を support∩{¬LeKer Z} に Finset.sum_subset 還元 +
+       inner_eq_coeff_of_repr。𝒳-Finset T 版 (IrreducibleCharacter reindex 不要に簡略化)。
+    2. [x] **coefficient 関係 完成** = `restrict_extension_inner_eq_nsmul` (2026-07-22,
+       sorry-free): (Res_H e', χ)=b·(Res_H e', χ₁) (χ−b•χ₁ supported)。Frobenius
+       (inner_induce_eq_inner_restrict) + conj + coherence extends_on_supported + cross-orth
+       (hcross 仮説、assembly が cross_extension_inner_eq_zero で供給)。
+    3. [x] **keystone 関係 完成** = `restrict_inner_keystone` (2026-07-22, sorry-free):
+       (Res_H e', χ₁)−a·(Res_H e', η₁)=λ−a (hlam1 仮説)。Frobenius + conj。
+       ⟹ c₀=λ+aμ (μ=(Res_H e',η₁)−1)。
+    4. [x] **合成+eval 完成** = `restrict_apply_sub_eq_neg_card_mul_inner` (2026-07-22,
+       Conclusion.lean, sorry-free): χ₁(1)·(e'(z)−e'(1)) = −|H|·⟨Res_H e', χ₁⟩。
+       piece1 × χ₁(1) → per-χ で piece2 (⟨θ,χ⟩=b·c₀) + degree (χ(1)=b·χ₁(1), supported ⟹
+       value 0 at 1、one_notMem_A) で χ₁(1)·⟨θ,χ⟩=c₀·χ(1) → Σχ(1)(χz−χ1) = 両 eval で −|H|
+       (sum_degree_mul_charValue − sum_degreeSq)。restrict_apply で θ→e'。
+    5. [x] **(7)適用+算術核 完成** (2026-07-22, sorry-free、2 補題に分割):
+       - **算術核** = `dvd_lam_of_evaluation_cong` (Endgame.lean): heval
+         (a·d)·Δ=−(d·|Q|)·(λ+aμ) (piece4 の χ₁(1)=ad,|H|=d|Q|,c₀=λ+aμ 代入形) +
+         hcong (IsIntegral (Δ/|Q|)) ⟹ d 約分 → λ/a+μ=−(Δ/|Q|) alg int →
+         dvd_of_isIntegral_ratio で a∣λ。hyp-agnostic ℂ 補題。
+       - **(7)適用** = `witness_charValue_cong` (Conclusion.lean): e'=ε•ξ に
+         peterfalvi_67_hall_of_odd 適用 → e'(z)≡e'(1) [ALGMOD |Q|]。S08
+         restrict_extension_Yset_charValue_cong_caseB の mirror。ξ.isIrreducible で ρ 抽出、
+         e'-const → ρ.character-const (ε cancel) で hconst 供給、ε で Cong.smul_left scale。
+         構造的仮説 (Q≤H/Q⊴H/TI) は Hypothesis から discharge; 残 (Odd|G|, Q Hall in H/G,
+         Z⊴H central, Q≤C(z), card 定数性) は master assembly が供給。
   作業順: (7) は独立ゆえ (4)(5)(6) と並行可。それ以外は (4)→(5)→(6)→(8)。
+
+  ### ⭐ (8) 核 全ピース完成 (2026-07-22)。次 = master assembly
+
+  (8) 核 5 ピースが全て sorry-free で build green。残るのは **feit_sibley_coherence
+  本体の master assembly** (FeitSibley.lean:1247 の唯一の sorry):
+  - **reductions (1)(2)(3) + endgame (4)(5)(6) + step (7) + (8) 核は全て存在・証明済**
+    (standalone lemma 群、まだ feit_sibley_coherence に配線されていない)。
+  - master assembly の構造: d=1 分岐 (自明) | d>1: Q₁ nilpotent (Thompson) →
+    (1)(2) で 𝒮 coherence を 𝒮(S') に、Q₁ が abelian/2素数なら閉じ、非可換 p-群へ還元 →
+    (3) で 𝒳=𝒮−𝒮(Z) coherent → (4)(5)(6) endgame notation setup + union_coherent_of_lambda_dvd →
+    a∣λ を (8) 核 (witness_charValue_cong → dvd_lam_of_evaluation_cong) で供給。
+  - **(8) 核の posited 群仮説を discharge する群論補題**が master assembly の主タスク:
+    Odd|G| (theorem hypothesis 追加が faithful — FT 文脈)、Z⊴H central (reduction Z 選択)、
+    card 定数性 |H⊓C(w)|=|H⊓C(z)| on Z^# (Z prime order + D 作用)、
+    e'=ε•ξ (endgame P2 witness)、e'-const on Z^# (piece4 が z-独立を与える)、
+    Q Hall in H/G (coprime_Q_D + TI)、Q≤C(z) (S_commutes_Q1 + Z≤Z(Q₁))。
+
+  ### ⭐⭐ (8) 全組立 + 群仮説 discharge 完成 (2026-07-22 後半)
+
+  (8) 核をさらに**単一の a∣λ 統合補題**に束ね、posited 群仮説の主要 2 件を discharge:
+  - **`dvd_lam_of_endgame_data` (Conclusion.lean, sorry-free)**: endgame (4) data
+    (coherent 𝒳=XsetOf⊥Z + anchor χ₁ 度数 a·d + supported diff χ−b•χ₁ + 𝒴-witness
+    e'=ε•ξ cross-orth + keystone ⟨τ(χ₁−a•η₁),e'⟩=λ−a) ⟹ **a∣λ**。piece4 を Z^# 上
+    普遍適用 → e'-const 自動導出 → witness_charValue_cong → keystone で c₀=λ+aμ →
+    dvd_lam_of_evaluation_cong。**union_coherent_of_lambda_dvd の hdvd を直接供給**。
+    残 posited = Odd|G|, Q Hall in G (hHallG), Q≤C(z) (hQz), card 定数性 (hcard_const),
+    endgame (4) data 本体。
+  - **群仮説 discharge (Endgame.lean, sorry-free)**: hQz と hcard_const を証明:
+    - `Q_le_centralizer_of_centralizes_Q1`: w∈Q₁ が Q₁ 中心化 ⟹ Q=S×Q₁ が w 中心化。
+    - `inf_centralizer_eq_Q_of_mem_Q1`: w∈Q₁^# + Q≤C(w) ⟹ H⊓C_G(w)=Q (D f.p.f.)。
+      ⟹ |H⊓C(w)|=|Q| は Z^# 上一定 = hcard_const。
+    z∈endgameZ に対し endgameZ_le_Q1 + endgameZ_centralizes 経由で自動適用可。
+
+  ### 残 master assembly = (4)(5)(6) endgame notation setup + case 構造
+
+  a∣λ (dvd_lam_of_endgame_data) と union_coherent が揃ったので、残るのは:
+  1. **(4) setup (非可換 p 群 case)**: Z:=endgameZ に対し 𝒳=XsetOf⊥Z coherent
+     (endgame_Xset_coherent) + 𝒴=𝒮(Q') coherent (ssetOf_Qder_coherent, Remark) を取り、
+     **anchor χ₁ (最小度数, χ₁(1)=a·d) 選択** + **hXdiff (∀χ∈𝒳,∃b,χ−b•χ₁ supported =
+     (3.1) p 冪度数構造)** + **keystone χ₁−a•η₁ supported** を確立。⟵ 最大の未構築ピース。
+     exists_lambda_norm_identity で λ+norm identity、dvd_lam_of_endgame_data で a∣λ、
+     union_coherent_of_lambda_dvd で 𝒳∪𝒴 coherent。
+  2. **adjoin**: 𝒮(S')−(𝒳∪𝒴) を Lemma 1(a) で 𝒳∪𝒴 に adjoin → 𝒮(S') coherent。
+  3. **case 構造**: d=1 (自明) | d>1: Q₁ nilpotent (Thompson) → |Q₁| 2素数 ((1)+(2)) |
+     Q₁ abelian p群 (ReductionTwo:658 branch + (2)) | Q₁ 非可換 p群 ((4)setup→(2))。
+  4. **Odd|G| を feit_sibley_coherence の仮説に追加** (FT 文脈で faithful; step (7) 必須)。
 - [ ] 旧記録: **Part A 本体組み立て** (2026-07-21 設計固定、この順):
   1. **𝒳₁ setup**: XsetOf 定義 (SsetOf Sder ∩ {¬LeKer Z})。共役閉 ✓ conj 既存 2 条件
      保存。no-real: |Q₁| = p^n 奇 (p=2 なら Q1_not_two_group と矛盾で p 奇 —

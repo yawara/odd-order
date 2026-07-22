@@ -68,6 +68,58 @@ theorem x_eq_zero_or_x_one_of_norm_identity {a m x nvv : ℤ}
     exfalso
     nlinarith [hk, hm]
 
+/-- **(8) divisibility core** (Peterfalvi Appendix IV, p. 150): if `λ/a + μ` is an algebraic
+integer with `μ : ℤ` and `a > 0`, then `a ∣ λ`.  Indeed `λ/a = (λ/a + μ) − μ` is a *rational*
+algebraic integer, hence an integer (`isIntegral_rat_imp_int`), so its denominator `a` divides
+`λ`.  This is the last step of (8): the central-character congruence
+`(e'₁(z) − e'₁(1))/|Q| = −(λ/a + μ)` (from (7) applied to `±e'₁`) is an algebraic integer,
+forcing `a ∣ λ` and closing (6). -/
+theorem dvd_of_isIntegral_ratio {a : ℕ} (ha : 0 < a) {lam mu : ℤ}
+    (hint : IsIntegral ℤ ((lam : ℂ) / (a : ℂ) + (mu : ℂ))) :
+    (a : ℤ) ∣ lam := by
+  have ha0 : (a : ℂ) ≠ 0 := by exact_mod_cast ha.ne'
+  have hmu : IsIntegral ℤ (mu : ℂ) := by
+    simpa using isIntegral_algebraMap (R := ℤ) (A := ℂ) (x := mu)
+  have hla : IsIntegral ℤ ((lam : ℂ) / (a : ℂ)) := by
+    have h := hint.sub hmu
+    have he : (lam : ℂ) / (a : ℂ) + (mu : ℂ) - (mu : ℂ) = (lam : ℂ) / (a : ℂ) := by ring
+    rwa [he] at h
+  set q : ℚ := (lam : ℚ) / (a : ℚ) with hq
+  have hqc : (q : ℂ) = (lam : ℂ) / (a : ℂ) := by rw [hq]; push_cast; ring
+  obtain ⟨n, hn⟩ := isIntegral_rat_imp_int (q := q) (by rw [hqc]; exact hla)
+  rw [hqc] at hn
+  refine ⟨n, ?_⟩
+  have hlc : (lam : ℂ) = (a : ℂ) * (n : ℂ) := by
+    rw [div_eq_iff ha0] at hn; rw [hn]; ring
+  exact_mod_cast hlc
+
+/-- **(8) divisibility from the evaluation identity** (Peterfalvi Appendix IV, p. 150).  The `(8)`
+evaluation `χ₁(1)·(e'(z) − e'(1)) = −|H|·c₀` (`restrict_apply_sub_eq_neg_card_mul_inner`), rewritten
+with `χ₁(1) = a·d`, `|H| = d·|Q|` and the keystone `c₀ = λ + a·μ`, reads
+`(a·d)·Δ = −(d·|Q|)·(λ + a·μ)` with `Δ = e'(z) − e'(1)`.  Cancelling the nonzero `d` gives
+`a·Δ = −|Q|·(λ + a·μ)`, so `λ/a + μ = −(Δ/|Q|)`.  The central-character congruence (7)
+`e'(z) ≡ e'(1) (mod |Q|)` (`peterfalvi_67_hall_of_odd`) says `Δ/|Q|` is an algebraic integer, hence
+so is `λ/a + μ`, forcing `a ∣ λ` (`dvd_of_isIntegral_ratio`) — the last step of (6). -/
+theorem dvd_lam_of_evaluation_cong {a : ℕ} (ha : 0 < a) {lam mu : ℤ}
+    {dc Qc Δ : ℂ} (hd0 : dc ≠ 0) (hQ0 : Qc ≠ 0)
+    (heval : (a : ℂ) * dc * Δ = -(dc * Qc) * ((lam : ℂ) + (a : ℂ) * (mu : ℂ)))
+    (hcong : IsIntegral ℤ (Δ / Qc)) :
+    (a : ℤ) ∣ lam := by
+  have ha0 : (a : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr ha.ne'
+  -- cancel `d`: `a·Δ = -Qc·(λ + aμ)`
+  have hcancel : (a : ℂ) * Δ = -Qc * ((lam : ℂ) + (a : ℂ) * (mu : ℂ)) :=
+    mul_left_cancel₀ hd0 (by linear_combination heval)
+  -- the ratio `λ/a + μ = -(Δ/Qc)`
+  have hratio : (lam : ℂ) / (a : ℂ) + (mu : ℂ) = -(Δ / Qc) := by
+    apply mul_left_cancel₀ (mul_ne_zero ha0 hQ0)
+    have hL : (a : ℂ) * Qc * ((lam : ℂ) / (a : ℂ) + (mu : ℂ))
+        = Qc * ((lam : ℂ) + (a : ℂ) * (mu : ℂ)) := by field_simp
+    have hR : (a : ℂ) * Qc * -(Δ / Qc) = -((a : ℂ) * Δ) := by field_simp
+    rw [hL, hR, hcancel]; ring
+  refine dvd_of_isIntegral_ratio (lam := lam) (mu := mu) ha ?_
+  rw [hratio]
+  exact hcong.neg
+
 /-- **Sign–degree bookkeeping core for Peterfalvi (5)** (p. 148): if the signed
 irreducible constituents satisfy the `λ`-equality `e·f₁ = −(A·(e₁·f₂))` (the two
 evaluations of `λ = (eᵢ − aᵢe₁, e'ⱼ)`), the `X`-side degree identity
@@ -470,6 +522,25 @@ theorem commutator_Q1_le_Q1 : ⁅hyp.Q1, hyp.Q1⁆ ≤ hyp.Q1 :=
 
 theorem endgameZ_le_Q1 : hyp.endgameZ ≤ hyp.Q1 := inf_le_left.trans hyp.commutator_Q1_le_Q1
 
+/-- **`𝒳 = XsetOf ⊥ Z = {χ ∈ Irr H | Z ⊄ Ker χ}`** when `Z ≤ Q₁` (Peterfalvi (8), p. 150).
+The `Q₁ ⊄ Ker χ` defining condition of `𝒮` and the `⊥ ⊆ Ker χ` condition of `𝒮(⊥)` are both
+redundant here: `⊥ ⊆ Ker` is vacuous, and `Z ⊄ Ker χ` with `Z ≤ Q₁` forces `Q₁ ⊄ Ker χ`
+(a character constant on `Q₁` is constant on `Z ≤ Q₁`).  This identifies `𝒳` with the full family
+of irreducibles *not* trivial on `Z`, so its degree-weighted sum is the regular-character
+difference `ρ_H − ρ_{H/Z}` (`sumNonInflatedDegreeMulChar_of_mem`), the (8) constancy input. -/
+theorem mem_XsetOf_bot_iff {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    {χ : ClassFunction ↥hyp.H ℂ} :
+    χ ∈ hyp.XsetOf ⊥ Z ↔ IsIrreducibleCharacter χ ∧ ¬ hyp.LeKer χ Z := by
+  constructor
+  · rintro ⟨⟨⟨hirr, _⟩, _⟩, hZ⟩
+    exact ⟨hirr, hZ⟩
+  · rintro ⟨hirr, hZ⟩
+    refine ⟨⟨⟨hirr, ?_⟩, ?_⟩, hZ⟩
+    · exact fun hQ1 => hZ fun x hxZ => hQ1 x (hZQ1 hxZ)
+    · intro x hx
+      rw [Subgroup.mem_bot] at hx
+      rw [show x = 1 from Subtype.ext hx]
+
 /-- **`Z` centralises `Q₁`** (`Z ≤ Z(Q₁)`): `⁅z, y⁆ = 1` for `z ∈ Z`, `y ∈ Q₁`. -/
 theorem endgameZ_centralizes {z : G} (hz : z ∈ hyp.endgameZ) {y : G} (hy : y ∈ hyp.Q1) :
     ⁅z, y⁆ = 1 := by
@@ -477,6 +548,84 @@ theorem endgameZ_centralizes {z : G} (hz : z ∈ hyp.endgameZ) {y : G} (hy : y �
     (Subgroup.mem_centralizer_iff_commutator_eq_one.mp hz.2) y hy
   have : Commute z y := (commutatorElement_eq_one_iff_commute.mp hyz).symm
   exact commutatorElement_eq_one_iff_commute.mpr this
+
+open scoped Pointwise in
+/-- **`Q` centralises a central element of `Q₁`** (Peterfalvi (7)/(8) input).  For `w ∈ Q₁`
+that centralises all of `Q₁` (`w ∈ Z(Q₁)`), the whole direct factorisation `Q = S × Q₁`
+centralises `w`: `S` commutes with `Q₁` elementwise (`S_commutes_Q1`) and `Q₁` centralises `w`. -/
+theorem Q_le_centralizer_of_centralizes_Q1 {w : G} (hwQ1 : w ∈ hyp.Q1)
+    (hcent : ∀ y ∈ hyp.Q1, ⁅w, y⁆ = 1) :
+    hyp.Q ≤ Subgroup.centralizer ({w} : Set G) := by
+  intro q hq
+  rw [Subgroup.mem_centralizer_iff]
+  rintro x hx
+  rw [Set.mem_singleton_iff] at hx; subst x
+  have hqset : (q : G) ∈ (hyp.S : Set G) * (hyp.Q1 : Set G) := by
+    rw [hyp.S_mul_Q1_eq_Q]; exact hq
+  obtain ⟨s, hs, y, hy, rfl⟩ := Set.mem_mul.mp hqset
+  -- `w` commutes with `s ∈ S` (`S_commutes_Q1`, `w ∈ Q₁`) and with `y ∈ Q₁` (`w ∈ Z(Q₁)`)
+  have hsw : s * w = w * s := hyp.S_commutes_Q1 s hs w hwQ1
+  have hyw : w * y = y * w := commutatorElement_eq_one_iff_commute.mp (hcent y hy)
+  calc w * (s * y) = (w * s) * y := by rw [mul_assoc]
+    _ = (s * w) * y := by rw [hsw]
+    _ = s * (w * y) := by rw [mul_assoc]
+    _ = s * (y * w) := by rw [hyw]
+    _ = (s * y) * w := by rw [mul_assoc]
+
+open scoped Pointwise in
+/-- **`C_H(w) = Q` for `w ∈ Q₁^#` centralised by `Q`** (Peterfalvi (7)/(8) input).  Given
+`Q ≤ C_G(w)`, the complement `D` contributes nothing: any `h = q·d ∈ H` (`q ∈ Q`, `d ∈ D`)
+centralising `w` forces `d` to centralise `w ∈ Q₁`, so `d = 1` by the fixed-point-freeness of
+`D` on `Q₁` (as `w ≠ 1`).  Hence `H ⊓ C_G(w) = Q`; in particular `|H ⊓ C_G(w)| = |Q|` is the same
+for every `w ∈ Z^#`, the normalizer–centralizer constancy input of (7). -/
+theorem inf_centralizer_eq_Q_of_mem_Q1 {w : G} (hwQ1 : w ∈ hyp.Q1) (hw1 : w ≠ 1)
+    (hQcent : hyp.Q ≤ Subgroup.centralizer ({w} : Set G)) :
+    hyp.H ⊓ Subgroup.centralizer ({w} : Set G) = hyp.Q := by
+  apply le_antisymm
+  · rintro h ⟨hhH, hhC⟩
+    have hwq : w * h = h * w := by
+      have := (Subgroup.mem_centralizer_iff).mp hhC w (Set.mem_singleton _); exact this
+    have hhset : (h : G) ∈ (hyp.Q : Set G) * (hyp.D : Set G) := by
+      rw [hyp.Q_mul_D_eq_H]; exact hhH
+    obtain ⟨q, hq, d, hd, rfl⟩ := Set.mem_mul.mp hhset
+    -- `q` centralises `w`, so `d` does too
+    have hqw : w * q = q * w :=
+      (Subgroup.mem_centralizer_iff).mp (hQcent hq) w (Set.mem_singleton _)
+    have hdw : d * w * d⁻¹ = w := by
+      -- cancel `q` on the left: `w*q*d = q*w*d = q*d*w` gives `w*d = d*w`
+      have hstep : q * (w * d) = q * (d * w) :=
+        calc q * (w * d) = (q * w) * d := (mul_assoc q w d).symm
+          _ = (w * q) * d := by rw [← hqw]
+          _ = w * (q * d) := mul_assoc w q d
+          _ = (q * d) * w := hwq
+          _ = q * (d * w) := mul_assoc q d w
+      have hdw' : w * d = d * w := mul_left_cancel hstep
+      rw [← hdw']; group
+    have hd1 : d = 1 := by
+      by_contra hdne
+      exact hw1 (hyp.D_fixedPointFree_on_Q1 d hd hdne w hwQ1 hdw)
+    rw [hd1, mul_one]; exact hq
+  · exact fun q hq => ⟨hyp.Q_le_H hq, hQcent hq⟩
+
+/-- **`Q ≤ C_G(z)` for `z` in a central `Z ≤ Z(Q₁)`** (Peterfalvi (7)/(8) `hQz` input).  Thin
+specialisation of `Q_le_centralizer_of_centralizes_Q1` to a subgroup `Z ≤ Q₁` centralising `Q₁`. -/
+theorem Q_le_centralizer_of_mem_central {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    (hZcent : ∀ w ∈ Z, ∀ y ∈ hyp.Q1, ⁅w, y⁆ = 1) {z : G} (hzZ : z ∈ Z) :
+    hyp.Q ≤ Subgroup.centralizer ({z} : Set G) :=
+  hyp.Q_le_centralizer_of_centralizes_Q1 (hZQ1 hzZ) (hZcent z hzZ)
+
+/-- **Normalizer–centralizer cardinality constancy on `Z^#`** (Peterfalvi (7)/(8) `hcard_const`
+input).  For a central `Z ≤ Z(Q₁)`, `|H ⊓ C_G(w)| = |Q|` for every `w ∈ Z^#`
+(`inf_centralizer_eq_Q_of_mem_Q1`), so the cardinality is constant on `Z^#`. -/
+theorem inf_centralizer_card_const_of_central {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    (hZcent : ∀ w ∈ Z, ∀ y ∈ hyp.Q1, ⁅w, y⁆ = 1)
+    {w z : G} (hwZ : w ∈ Z) (hw1 : w ≠ 1) (hzZ : z ∈ Z) (hz1 : z ≠ 1) :
+    Nat.card ↥(hyp.H ⊓ Subgroup.centralizer ({w} : Set G))
+      = Nat.card ↥(hyp.H ⊓ Subgroup.centralizer ({z} : Set G)) := by
+  rw [hyp.inf_centralizer_eq_Q_of_mem_Q1 (hZQ1 hwZ) hw1
+        (hyp.Q_le_centralizer_of_mem_central hZQ1 hZcent hwZ),
+      hyp.inf_centralizer_eq_Q_of_mem_Q1 (hZQ1 hzZ) hz1
+        (hyp.Q_le_centralizer_of_mem_central hZQ1 hZcent hzZ)]
 
 /-- The `↥Q₁`-level commutator maps onto `⁅Q₁, Q₁⁆`. -/
 theorem map_commutator_Q1 :
