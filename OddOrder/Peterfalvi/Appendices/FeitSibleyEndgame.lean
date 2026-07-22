@@ -522,6 +522,11 @@ theorem commutator_Q1_le_Q1 : ⁅hyp.Q1, hyp.Q1⁆ ≤ hyp.Q1 :=
 
 theorem endgameZ_le_Q1 : hyp.endgameZ ≤ hyp.Q1 := inf_le_left.trans hyp.commutator_Q1_le_Q1
 
+/-- `Z = ⁅Q₁,Q₁⁆ ⊓ C(Q₁) ≤ ⁅Q₁,Q₁⁆ ≤ ⁅Q,Q⁆ = Q'`: the endgame centre lies in the derived
+subgroup, so `𝒴 = 𝒮(Q')` (trivial on `Q'`) is disjoint from `𝒳 = 𝒮 − 𝒮(Z)`. -/
+theorem endgameZ_le_Qder : hyp.endgameZ ≤ hyp.Qder :=
+  (inf_le_left.trans (Subgroup.commutator_mono hyp.Q1_le_Q hyp.Q1_le_Q))
+
 /-- **`𝒳 = XsetOf ⊥ Z = {χ ∈ Irr H | Z ⊄ Ker χ}`** when `Z ≤ Q₁` (Peterfalvi (8), p. 150).
 The `Q₁ ⊄ Ker χ` defining condition of `𝒮` and the `⊥ ⊆ Ker χ` condition of `𝒮(⊥)` are both
 redundant here: `⊥ ⊆ Ker` is vacuous, and `Z ⊄ Ker χ` with `Z ≤ Q₁` forces `Q₁ ⊄ Ker χ`
