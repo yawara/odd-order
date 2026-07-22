@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 07:3x 監視 tick — a (2A.1 subnormal π⊆O_π) + b (Higman L13 B/B support) 合流 / 🔴 c stall 継続 (~4h30m)**。a=4 / b=1 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 2A.1** — subnormal π-subgroup ⊆ O_π(G) を char-motive 帰納で実証明、`Ch02_Subnormality/Problems.lean` +53; 2A.3(b) は 2A.1 経由で unblock) / b (**Higman Lemma 13** B/B middle support、新 leaf `FrattiniMiddleSupport.lean` +218 WIRED)。
+> **gate: green 4674 jobs (前 4673 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push fbe2307e5→b472fdfd6**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~4h30m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動 or 退役指示待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
 > **▶▶ 2026-07-23 07:2x 監視 tick — a (🆕Ch.2 開始 2A.3a) + b (Higman L13 L₀ 移送) 合流 / 🔴 c stall 継続 (~4h15m)**。a=3 / b=1 / c=0 / d=0(WIP foo)。
 > 合流: a (**🆕 Isaacs Ch.2 (Subnormality) 開始** — Problem 2A.3a: subnormal H + coprime index ⟹ K ⊆ H、新 leaf `Ch02_Subnormality/Problems.lean` +67 WIRED via `OddOrder.lean:181`; docs で 2A.1 帰納 motive も確定。§1D 完 → Ch.2 移行) / b (**Higman Lemma 13** restricted L₀ を ambient layer へ移送、新 leaf `RestrictedLayerZeroTransport.lean` +159 WIRED)。
 > **gate: green 4673 jobs (前 4671 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 4b370d3ab→c9bd6552b**。範囲逸脱なし。a の Ch02 leaf 新設 + OddOrder.lean 配線を同 commit で実施 (orphan 防御遵守)。
