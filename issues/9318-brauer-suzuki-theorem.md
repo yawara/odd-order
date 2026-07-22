@@ -278,14 +278,20 @@ linear_combination で (χ(u₀)−χ(1))²=0 → 任意 involution は u₀ 共
 ### endgame 計画 (次 frontier、Gorenstein Ch.12 p.376-377、純群論、⚠ 大 piece)
 
 `lem_1_9` の非線形 χ (全 involution ⊆ ker χ) から:
-1. **M := ⟨全 involution⟩ ⊴ G** (involution 集合は共役不変ゆえ closure 正規)。mathlib
-   `Subgroup.normalClosure` or `closure` of conjugation-invariant set。
+1. ✅ **M := ⟨全 involution⟩ ⊴ G** 完成 (`BrauerSuzukiEndgame.lean` 新 leaf、`involutionClosure` +
+   `involutionClosure_normal`: involution 集合は共役不変ゆえ `le_normalizer_closure_iff` +
+   `orderOf_eq_of_isConj` で closure 正規)。axiom-clean。
 2. **Q := S ∩ M は cyclic**。背理: Q が generalized quaternion なら yxⁱ∈Q ⟹ x²∈Q ⟹ |S:Q|≤2 ⟹
-   S/Q abelian。G₁:=SM に `lem_1_9` 適用 (G₁ の Sylow-2 = S generalized quaternion、⚠ G₁ に
-   `QuaternionSylowSetup` を作る必要) → G₁ の非線形 φ で M⊆ker φ (全 involution が M 生成)
+   S/Q abelian。G₁:=SM に `lem_1_9` 適用 → G₁ の非線形 φ で M⊆ker φ (全 involution が M 生成)
    → G₁/ker φ は G₁/M ≅ S/Q の商 = abelian → φ 線形、矛盾。∴ Q cyclic。
-   ⚠ **最難所**: `lem_1_9` を部分群 G₁=SM に適用するには G₁ 用 setup 構築 (S は G₁ でも
-   generalized quaternion Sylow-2)。あるいは Lem 1.9 を「setup を持つ任意の群」用に一般化。
+   ⚠ **最難所 = `QuaternionSylowSetup ↥(SM)` 構築** (~60-80 行 fiddly):
+   - **鍵 API 発見**: `Sylow.subtype (h : P ≤ N) : Sylow p N` (mathlib Sylow.lean:151、repo
+     Ch07 に使用例) で `Q.S.subtype (hSSM : (Q.S:Subgroup G) ≤ Q.S⊔M) : Sylow 2 ↥(SM)`。
+   - `x':=⟨Q.x, hxSM⟩ : ↥SM` (Q.x∈S≤SM)、y' 同様。
+   - field transport: `hx_order` (orderOf_mk/coe injective)、`hy_sq`/`hconj` (coe 単射で G の関係を
+     転送)、`hxS'/hyS'` (comap membership)、⚠ `hclosure` (closure {x',y'} = S' の転送が最 fiddly、
+     `Subgroup.closure` ↔ `comap`/`subtype` の交換 or map/closure 補題)。
+   - 構築後 `lem_1_9 (SM setup)` で φ 取得 → M⊆ker φ + SM/M≅S/Q abelian で矛盾。
 3. **M の正規 2-補群 L** (Burnside、Q=S∩M は M の cyclic Sylow-2)。L char M ⊴ G → **L ⊴ G**、
    L ⊆ K:=O_{2'}(G)。M=LQ ⟹ **KQ ⊴ G**。
 4. **Ḡ:=G/K で Ω₁(Q̄)=Z(Ḡ) 位数 2** (Q̄ cyclic 正規、O_{2'}(Ḡ)=1 ⟹ Z(Ḡ) は 2-群、Z(S) 位数 2)。
