@@ -398,17 +398,32 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
     eχ∈ZIrr (extension_mem_ZIrr) → **既存** exists_zsmul_irreducibleCharacter_of
     _inner_self_one (InducedIrreducible.lean:751; norm-1⟹±Irr、新設不要だった)。
     χ ∈ zSpan S = Submodule.subset_span。eᵢ/e′ⱼ 両方をこれで抽出。
-  - [ ] **次 = (5)** (eᵢ,e′ⱼ)=0。⚠ **crux (2026-07-22 判明)**: eᵢ と e′ⱼ は別
-    extension だが、両 extension は τ = Ind_H^G に **supported difference 上で一致**
-    (extends_on_supported) ゆえ eᵢ−aᵢe₁ = τ(χᵢ−aᵢχ₁), e′ⱼ−e′₁ = τ(ηⱼ−η₁)。
-    τ が ℤ[𝒮]° 上 **大域等長** (Lemma 2(b)、hyp.tau の isometry) なら
-    ⟨eᵢ−aᵢe₁, e′ⱼ−e′₁⟩ = ⟨χᵢ−aᵢχ₁, ηⱼ−η₁⟩ = 0 (𝒳∩𝒴=∅ + 相異既約直交) が (5) の起点。
-    **要調査: hyp.tau の大域等長性 (ℤ[𝒮]° 上) の repo 内所在** (extension_inner_eq は
-    lattice-relative なので、cross-family には τ 自体の等長性が要る)。無ければ
-    Lemma 2(b) 側で供給されているはず (tau_inner_eq 系を grep)。
-    aᵢ := χᵢ(1)/χ₁(1) (exists_apply_one_eq_d_mul_pow の p-冪)。
-  - [ ] **(5)** (eᵢ,e′ⱼ)=0: λ:=(eᵢ−aᵢe₁,e′₁)=(eᵢ−aᵢe₁,e′₂)≠0 と仮定 → aᵢ=1,
-    λ=±1, eᵢ−e₁=λ(e′₁+e′₂) → degree-0 で e′₁(1)=0 矛盾 (inner-product manip)。
+  - [x] **⭐ (5) 完結** `cross_extension_inner_eq_zero` (FeitSibleyEndgame.lean,
+    sorry-free, 2026-07-22): disjoint coherent 族 X,Y ⊆ 𝒮 の一般形 —
+    (E χ, E′ η) = 0 ∀χ∈X ∀η∈Y。仮定: X anchor χ₁ + scaled diff A-supported
+    (∀φ∈X ∃a>0, φ−a•χ₁ ∈ ℤ[X,A])、X 第 2 元 χ₂≠χ₁、Y 等度数 diff
+    (∀ψ∈Y, ψ−η₁ ∈ ℤ[Y,A])、Y 第 2 元 η₂≠η₁。部品 4 補題:
+    - `cross_inner_extension_diff_eq_zero`: 両 extension が τ に supported diff 上
+      一致 (extends_on_supported + map_sub/map_nsmul) → **大域等長は既存
+      `tau_inner_eq_of_supported_Sset`** (FeitSibleyTheorem:1464、zSupportedSpan
+      mono で X,Y → 𝒮 に持ち上げ) → H 側で 4 cross 項が Sset_pairwiseOrthogonal
+      で消滅。
+    - `cross_inner_extension_diff_right_eq_zero` (λ=0 核): by_contra λ≠0 →
+      witnesses (coherent_extension_eq_zsmul_irr ×4) → λ≠0 が ξ′₁,ξ′₂ ∈ {ξχ,ξ₁}
+      を強制 (ξ′₁≠ξ′₂, ξχ≠ξ₁ は lattice 等長) → 2 case とも
+      `eq_zero_of_signed_degree_relations` (純 ℂ 算術核、f₁/f₂ swap で共用) で
+      ξχ(1) = 0 → 度数正値と矛盾。**書籍の aᵢ=1 抽出・e′₁(1)=0 経路は不要**
+      (3 関係式から直接 D₂=0 が出る鋭形; linear_combination 2 発)。
+    - `cross_inner_extension_diff_any_eq_zero`: η₁ 値 0 + cross 等長で全 j へ転送。
+    - anchor 消滅 (χ₂ 使用): t=(Eχ₁,E′η)≠0 → ξ′=ξ₁ → (Eχ₂,E′η)=0=a₂t → 矛盾。
+    汎用部品: `inner_zsmul_irreducible_eq` (⟨ε•ξ,ε′•ξ′⟩=εε′δ、ZIrrFourier
+    upstream 候補)。⚠ Lean 実装知見: 識別子に `λ` 不可 (予約トークン) /
+    ite を含む have statement には proof 冒頭 `classical` 必須 (無いと Decidable
+    が sorry に落ちて "ring failed ... = sorry" の不可解エラー) / `omit ... in` は
+    docstring の**前**。
+    (4)(5) の endgame 組み立てでは X = 𝒳 (aᵢ = p-冪比, exists_apply_one_eq_d_mul_pow)、
+    Y = 𝒴 = 𝒮(Q′) (全員 degree d)、hdisj = XsetOf の ¬LeKer Z vs Q′⊇Z... の
+    supported-diff 仮定充足は (6) assembly 側で供給。
   - [ ] **(6) 本体**: Ind(χ₁−aη₁)=−a·e′₁+λΣe′ᵢ+v、(v,e′ᵢ)=0 → norm 展開で
     x_eq_zero_or_x_one_of_norm_identity 適用 → a∣λ ⟹ 𝒮∪𝒴 coherent (τ が
     χᵢ↦eᵢ,ηⱼ↦e′ⱼ で一貫) → Lemma 1(a) で 𝒮(S′) → (2) で 𝒮。
