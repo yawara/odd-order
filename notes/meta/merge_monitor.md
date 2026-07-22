@@ -6,6 +6,15 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **🔁 2026-07-22 22:1x — c 9405 裁定 REVISE (ユーザー指示): c 次 frontier = NearFields Prop1 transport (Isaacs Ch.6–10 案は撤回)**。
+> 前 tick で「BS 後の c → Isaacs Problems 1055 Ch.6–10 cross-assign」と裁定したが、ユーザー指示 + hub 実測で **revise**:
+> **① ownership 明確化**: NearFields は既に **c 所有** (513185 の `19bf817c0` で 9204 の a carve-out → c へ移管済、現行 c_re に含まれる)。c の 9405 の「ownership=a」は stale。
+> **② transport は Q₈ gap と分離可能 (実測)**: `rankOne_affine_nearField` (`NearFields.lean:793`, App.C Prop1) の残り = **near-field transport (Pf p.137)** + **Q₈ BS (|S|=8)**。
+> docstring 771–789 より依存 (i) Sylow-2 cyclic/quaternion ✅ / (ii) BS ✅ cyclic+四元数|S|≥16 (Q₈ のみ未) / (iii) Huppert II 3.2 ✅ は揃い、**transport は (ii) を仮定すれば "elementary" (789 行)**。
+> ⟹ **c は transport を「BS 前提の補題」として形式化し、Prop1 を cyclic + 四元数 |S|≥16 の全ケースで閉じ、残 `sorry` を Q₈ (|S|=8) の 1 サブケースだけに孤立化できる** (非 gated な genuine monograph 数学、c は BS を今 session で証明済ゆえ文脈保持)。
+> **③ 確定裁定**: **c の primary frontier = NearFields Prop1 transport (Pf p.137)**。Q₈ BS (|S|=8, modular character 基盤要) = 孤立 sorry として低優先繰延。
+> **Isaacs Problems 1055 は全て a 所有に復帰** (Ch.1–10 全て a) — 前案の Ch.6–10 c carve は c_re から撤回済。c が NearFields も尽くしたら (Q₈ 以外) 再度 hub 裁定。
+>
 > **🎉 2026-07-22 21:5x 監視 tick (Opus 4.8 hub 638898, cron `7,22,37,52` id 3ee45bda) — Brauer–Suzuki 定理完成 (c) + c 9405 frontier 裁定**。
 > **① 合流**: a (**Isaacs Ch.1 Problems 1A.4 (H·K=G⟹H·Kᶻ=G) + 1A.10 (p∣[G:H]⟹p∣[N_G(H):H])**、Problems.lean +70) /
 > c (**🎉 issue 9318 Brauer–Suzuki 定理完成** — `brauerSuzuki_of_quaternionSylow`: G=O_{2'}(G)·C_G(z)、cyclic + 一般化四元数 |S|≥16、axiom-clean + AxiomsCheck 登録)。新 leaf 0・範囲逸脱なし。
@@ -210,7 +219,7 @@
 > ```
 > a_re='^OddOrder/Isaacs/|^OddOrder/Peterfalvi/S|^OddOrder/Peterfalvi/Appendices/FeitSibley'   # 2026-07-19 9154 + 2026-07-22 9205 裁定: FeitSibley (a 完済 axiom-clean) を a 明示 carve-out
 > b_re='^OddOrder/Higman/|^OddOrder/GroupTheory/SpecificGroups/Suzuki2Group/|^OddOrder/Peterfalvi/Appendices/(Suzuki|Suzuki2Groups)'   # 2026-07-19 夕 ユーザー裁定 (issue 0127 ③): Higman 原典 = 4 冊目として OddOrder/Higman/ を新設、b 所有
-> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|ExceptionalNearField)|^OddOrder/Isaacs/Ch(0[6-9]|10)_[^/]*/Problems'   # 2026-07-22 9205 裁定: FeitSibley 除去 (a 完済→a carve-out へ)。near-field クラスタ (NearFields Prop 1 は c の 9318 BS で discharge) + ExceptionalNearField/SemilinearField/Huppert は c。⊕ 2026-07-22 9405 裁定: BS |S|≥16 完成で c territory 完済 (Q₈ BS は research gap 繰延) → Isaacs Problems campaign 1055 の Ch.6–10 を c へ cross-assign (a=Ch.1–5、ChNN/Problems.lean はファイル分離で非衝突)
+> c_re='^OddOrder/BG/|^OddOrder/Peterfalvi/Appendices/(NearFields|Huppert|SemilinearField|ExceptionalNearField)'   # 2026-07-22 9205 裁定: FeitSibley 除去 (a 完済→a carve-out へ)。near-field クラスタ (NearFields Prop 1) + ExceptionalNearField/SemilinearField/Huppert は c。⚠ 2026-07-22 9405 revise: BS |S|≥16 後の c 次 frontier = **NearFields Prop1 transport (Pf p.137)** に確定 (ユーザー指示) → 前案の「Isaacs Ch.6–10 cross-assign」は撤回 (c_re の Isaacs carve も削除、Isaacs Problems 1055 は全て a 所有に戻す)
 > shared_re='^OddOrder\.lean$|^OddOrder/[^/]+\.lean$|^OddOrder/(GroupTheory|Algebra|Mathlib)/'  # + notes/issues; 新規 shared leaf は open 9000 claim 必須 (claim-before-build)
 > ```
 > **▶ 2026-07-19 11:29 lane a 復帰 → 暫定裁定 9158 失効、9154 の恒久配分へ復帰**。
