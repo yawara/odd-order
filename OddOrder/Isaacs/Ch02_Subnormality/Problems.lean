@@ -7,6 +7,7 @@ import Mathlib.GroupTheory.IsSubnormal
 import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
+import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
 
 /-!
 # Isaacs Chapter 2 — Problems §2A (Subnormality)
@@ -114,6 +115,62 @@ theorem le_oPiCore_of_isSubnormal_of_isPiGroup {G : Type*} [Group G] [Finite G] 
     exact hπ q (by rwa [Subgroup.card_top] at hq)
   rw [htop, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at h
   exact h
+
+open OddOrder.Isaacs.Ch01 in
+/-- 正規部分群 `N` の位数が `|G : H|` と互いに素ならば `N ≤ H`。`|H⊔N : H|` は `card_mul_card_inf`
+(正規積公式) より `|N|` を割り、また `|G : H|` も割る (`relIndex_dvd_index_of_le`) ので互いに素で `= 1`、
+したがって `H⊔N = H`、`N ≤ H`。 -/
+theorem coprime_normal_le {G : Type*} [Group G] [Finite G] {N H : Subgroup G} [N.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥N) H.index) : N ≤ H := by
+  have hlag : H.relIndex (H ⊔ N) * Nat.card ↥H = Nat.card ↥(H ⊔ N) := by
+    rw [Subgroup.relIndex,
+      ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left : H ≤ H ⊔ N)).toEquiv]
+    exact Subgroup.index_mul_card (H.subgroupOf (H ⊔ N))
+  have hcmi : Nat.card ↥(H ⊔ N) * Nat.card ↥(H ⊓ N) = Nat.card ↥H * Nat.card ↥N := by
+    have h := card_mul_card_inf H N
+    rwa [← Subgroup.mul_normal H N] at h
+  have hkey : H.relIndex (H ⊔ N) * Nat.card ↥(H ⊓ N) = Nat.card ↥N := by
+    refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥H)) ?_
+    rw [← mul_assoc, mul_comm (Nat.card ↥H) (H.relIndex (H ⊔ N)), hlag, hcmi]
+  have hdN : H.relIndex (H ⊔ N) ∣ Nat.card ↥N := ⟨Nat.card ↥(H ⊓ N), hkey.symm⟩
+  have hdidx : H.relIndex (H ⊔ N) ∣ H.index := Subgroup.relIndex_dvd_index_of_le le_sup_left
+  have hd1 : H.relIndex (H ⊔ N) = 1 := Nat.eq_one_of_dvd_coprimes hcop hdN hdidx
+  have hcardeq : Nat.card ↥(H ⊔ N) = Nat.card ↥H := by rw [← hlag, hd1, one_mul]
+  exact le_sup_right.trans (Subgroup.eq_of_le_of_card_ge le_sup_left hcardeq.le).ge
+
+open OddOrder.Isaacs.Ch01 OddOrder.Isaacs.Ch03 in
+/-- **Isaacs Problem 2A.3(b)**. `K` が部分正規で `|G : H|` と `|K|` が互いに素ならば `K ≤ H`。
+`π := |K| の素因数集合` とおくと `K` は π-群、2A.1 で `K ≤ O_π(G)`。`O_π(G)` は正規 π-群で、その位数の
+素因数は `π ⊆ |K| の素因数`、`|G:H|` は `|K|` と互いに素ゆえ `|O_π(G)|` とも互いに素、`coprime_normal_le`
+で `O_π(G) ≤ H`、したがって `K ≤ H`。 -/
+theorem le_of_isSubnormal_of_coprime_index' {G : Type*} [Group G] [Finite G] {H K : Subgroup G}
+    (hK : K.IsSubnormal) (hcop : (H.index).Coprime (Nat.card ↥K)) : K ≤ H := by
+  set π : Set ℕ := ↑(Nat.card ↥K).primeFactors with hπdef
+  have hπK : Subgroup.IsPiGroup π K := fun q hq => Finset.mem_coe.mpr hq
+  have hKoP : K ≤ oPiCore π G := le_oPiCore_of_isSubnormal_of_isPiGroup hK hπK
+  have hsub : (Nat.card ↥(oPiCore π G)).primeFactors ⊆ (Nat.card ↥K).primeFactors := fun q hq =>
+    Finset.mem_coe.mp (oPiCore.isPiGroup π q hq)
+  have hcopOP : Nat.Coprime (Nat.card ↥(oPiCore π G)) H.index := by
+    rw [← Nat.disjoint_primeFactors (Nat.card_pos (α := ↥(oPiCore π G))).ne'
+      Subgroup.index_ne_zero_of_finite]
+    exact Finset.disjoint_of_subset_left hsub hcop.symm.disjoint_primeFactors
+  exact hKoP.trans (coprime_normal_le hcopOP)
+
+open OddOrder.Isaacs.Ch03 in
+/-- **Isaacs Problem 2A.2**. `K` が部分正規で `|G : K|` が π-数ならば `O^π(G) ≤ K`。`O^π(G)` は π'-元で
+生成される (`oPiResidual_eq_closure_piPrimeElements`)。各 π'-元 `g` について `⟨g⟩` の位数
+(= `orderOf g`) は π'-数、`|G:K|` は π-数ゆえ互いに素、`K` 部分正規で 2A.3(a) より `⟨g⟩ ≤ K`、
+すなわち `g ∈ K`。したがって生成部分群 `O^π(G) ≤ K`。 -/
+theorem oPiResidual_le_of_isSubnormal_of_index_isPiNumber {G : Type*} [Group G] [Finite G]
+    {π : Set ℕ} {K : Subgroup G} (hK : K.IsSubnormal)
+    (hidx : ∀ q ∈ (K.index).primeFactors, q ∈ π) : oPiResidual π G ≤ K := by
+  rw [oPiResidual_eq_closure_piPrimeElements, Subgroup.closure_le]
+  intro g hg
+  have hcop : (K.index).Coprime (Nat.card ↥(Subgroup.zpowers g)) := by
+    rw [Nat.card_zpowers]
+    refine (Nat.disjoint_primeFactors Subgroup.index_ne_zero_of_finite (orderOf_pos g).ne').mp ?_
+    exact Finset.disjoint_left.mpr fun q hqi hqo => hg q hqo (hidx q hqi)
+  exact le_of_isSubnormal_of_coprime_index hK hcop (Subgroup.mem_zpowers g)
 
 end
 
