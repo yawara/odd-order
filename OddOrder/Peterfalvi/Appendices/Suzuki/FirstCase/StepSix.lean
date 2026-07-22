@@ -258,4 +258,29 @@ theorem card_eq_and_aut_trivial_of_field_units_two_pow {F : Type*} [Field F]
   haveI : Subsingleton D := ⟨fun x y => by rw [hDtriv x, hDtriv y]⟩
   exact Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨1⟩⟩
 
+namespace Hypothesis
+
+variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G] (hyp : Hypothesis G Ω)
+
+/-- **Step (6) plumbing**: if `Q₁ = 1` then `Q` is a `2`-group.  `Q₁` is the
+odd normal `2`-complement of the nilpotent `Q`, so `Q₁ = 1` leaves `Q` equal to
+its Sylow `2`-subgroup. -/
+theorem card_Q_eq_two_pow_of_Q1_eq_bot (h : hyp.Q1 = ⊥) :
+    ∃ n : ℕ, Nat.card ↥hyp.Q = 2 ^ n := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨S⟩ : Nonempty (Sylow 2 ↥hyp.Q) := inferInstance
+  have hcompl := hyp.sylowTwo_isComplement'_Q1Subgroup S
+  have hQ1bot : hyp.Q1Subgroup = ⊥ := by
+    have hc := hyp.card_Q1
+    rw [h, Subgroup.card_bot] at hc
+    exact Subgroup.eq_bot_of_card_eq _ hc.symm
+  obtain ⟨n, hn⟩ := S.isPGroup'.exists_card_eq
+  refine ⟨n, ?_⟩
+  have hmul := hcompl.card_mul
+  rw [hQ1bot, Subgroup.card_bot, mul_one] at hmul
+  rw [← hmul, hn]
+
+end Hypothesis
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
