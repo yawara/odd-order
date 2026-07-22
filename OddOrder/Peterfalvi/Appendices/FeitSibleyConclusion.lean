@@ -193,6 +193,41 @@ theorem restrict_extension_inner_eq_nsmul [Finite G] [Fintype G]
     OddOrder.RepresentationTheory.inner_smul_right, star_natCast] at hkey
   linear_combination hkey
 
+/-- **(8) coefficient relation, pairwise form** (Peterfalvi (8), p. 150).  The degree-`0`
+generator `n·χ − m·χ'` of `ℤ[𝒳]°` (for `χ, χ' ∈ 𝒳` with `n·χ(1) = m·χ'(1)`, e.g.
+`n = χ'(1)/d`, `m = χ(1)/d`) is `A`-supported, so — via Frobenius, coherence and the
+cross-orthogonality `⟨E φ, e'⟩ = 0` — the Fourier coefficients of `Res_H e'` along `χ, χ'`
+satisfy `n·⟨Res_H e', χ⟩ = m·⟨Res_H e', χ'⟩`.  Unlike `restrict_extension_inner_eq_nsmul`
+this needs **no divisibility** `χ'(1) ∣ χ(1)`: it uses the symmetric generator with integer
+degree coefficients `n, m`, which always exist (`exists_apply_one_eq_d_mul`). -/
+theorem restrict_extension_inner_pairwise [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+    {X : Set (ClassFunction ↥hyp.H ℂ)}
+    (hcohX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau X hyp.A)
+    {χ χ' : ClassFunction ↥hyp.H ℂ} {e' : ClassFunction G ℂ}
+    (hcross : ∀ φ ∈ X, ClassFunction.inner (hcohX.extension φ) e' = 0)
+    {n m : ℕ}
+    (hsupp : n • χ - m • χ' ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) X hyp.A)
+    (hχX : χ ∈ X) (hχ'X : χ' ∈ X) :
+    (n : ℂ) * ClassFunction.inner (ClassFunction.restrict hyp.H e') χ
+      = (m : ℂ) * ClassFunction.inner (ClassFunction.restrict hyp.H e') χ' := by
+  have htau : ClassFunction.induce hyp.H (n • χ - m • χ')
+      = hcohX.extension (n • χ - m • χ') := by
+    rw [← hyp.tau_apply, ← hcohX.extends_on_supported _ hsupp]
+  have hkey : ClassFunction.inner (ClassFunction.restrict hyp.H e') (n • χ - m • χ') = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      ← ClassFunction.inner_induce_eq_inner_restrict hyp.H (n • χ - m • χ') e',
+      htau, map_sub, map_nsmul, map_nsmul,
+      ← Nat.cast_smul_eq_nsmul ℂ n (hcohX.extension χ),
+      ← Nat.cast_smul_eq_nsmul ℂ m (hcohX.extension χ'),
+      ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+      ClassFunction.inner_smul_left, hcross χ hχX, hcross χ' hχ'X,
+      mul_zero, mul_zero, sub_zero, star_zero]
+  rw [ClassFunction.inner_sub_right, ← Nat.cast_smul_eq_nsmul ℂ n χ,
+    ← Nat.cast_smul_eq_nsmul ℂ m χ', OddOrder.RepresentationTheory.inner_smul_right,
+    OddOrder.RepresentationTheory.inner_smul_right, star_natCast, star_natCast] at hkey
+  linear_combination hkey
+
 /-- **(8) keystone relation** (Peterfalvi (8), p. 150).  The keystone pairing
 `⟨Res_H e', χ₁⟩ − a·⟨Res_H e', η₁⟩ = λ − a`, where `e'` is the `𝒴`-witness for `η₁` and
 `⟨τ(χ₁ − a·η₁), e'⟩ = λ − a` is the `(6)` norm-identity coefficient.  By Frobenius reciprocity

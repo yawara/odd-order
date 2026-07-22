@@ -798,13 +798,27 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
   ⟹ **(8) core は健全**。anchor は「min-degree of 𝒳₁」で選ぶ (full 𝒳 の min-degree では
   φ_S 非線形になりうり divisibility 破綻)。
 
-  ### 残 master assembly = (4) setup INPUTS + adjoin + case 構造
+  ### ⭐ PDF 精読で構成の正しさ確認 + 除算回避ルート発見 (2026-07-22)
 
-  xset_qder_union_coherent が endgame core を閉じたので、残るのは**その入力構築**:
-  ⚠ (4) setup の核心 = **full-𝒳 の p-valuation 下界** (∀χ∈𝒳, v_p(χ(1))≥k₁) の露出。
-  Q₁ の最小非線形既約度数 p^{k₁} + φ_{Q₁} 非線形性 (Z⊄Ker から) + degree 分解
-  χ(1)=d·φ_S(1)·p^k が要る。ReductionThree の pow 系補題は 𝒮(S') (φ_S linear) 限定なので
-  full 𝒳 への拡張が新規インフラ。⟵ 最大未構築、次 iteration の主タスク。
+  **PDF pp.146-148 精読で確認**: (4) 𝒳=𝒮−𝒮(Z)=**full 𝒳=XsetOf⊥Z**、χ₁=最小度数、
+  aᵢ=χᵢ(1)/χ₁(1)∈ℤ。(6) は **a∣λ ⟹ 𝒳∪𝒴 coherent** (= xset_qder_union_coherent +
+  dvd_lam_of_endgame_data そのもの)。仕上げ: adjoin 𝒮(S')−(𝒳₁∪𝒴)→𝒮(S')→(2)→𝒮。
+  ⟹ **既存構成は完全に正しい**。(3) の 𝒳₁=𝒳∩𝒮(S') は χᵢ(1)=d·p^{kᵢ} (pure p冪)。
+
+  **⚠ 除算回避 (重要)**: dvd_lam_of_endgame_data の hXdiff (∀χ, ∃b∈ℕ, χ−b•χ₁ supported、
+  b=χ(1)/χ₁(1)=aᵢ∈ℤ) を満たすには full-𝒳 の可除性 (aᵢ∈ℤ) が要り、それには S×Q₁ 積指標論
+  (Irr(S×Q₁)=Irr(S)⊗Irr(Q₁), 度数=積) の新規構築が必要 (大)。**しかし回避可能**:
+  degree-0 生成元 **m₁•χ − mχ•χ₁** (mχ=χ(1)/d∈ℕ は exists_apply_one_eq_d_mul で常に取れる)
+  は度数一致 (m₁·χ(1)=mχ·χ₁(1)) かつ supported (scaled_diff_support) で**可除性不要**。
+  Frobenius+coherence+cross-orth で ⟨Res e',m₁•χ−mχ•χ₁⟩=0 ⟹ m₁⟨Res e',χ⟩=mχ⟨Res e',χ₁⟩
+  ⟹ χ₁(1)·⟨θ,χ⟩=c₀·χ(1) (piece4 の要). ⟹ **piece2/piece4/dvd_lam を pairwise 生成元に
+  改訂すれば full-𝒳 可除性・積指標論が全て不要**になる。
+
+  ### 残 master assembly (改訂ルート)
+  1. piece2 pairwise 版 `restrict_extension_inner_pairwise` (n•χ−m•χ' supported ⟹
+     n⟨Res e',χ⟩=m⟨Res e',χ'⟩)。2. piece4/dvd_lam を pairwise hXdiff' (m₁•χ−mχ•χ₁ supported,
+     常に満足可能) に改訂。3. (4) setup: anchor χ₁=min-deg + hXdiff' (scaled_diff_support で
+     機械的) + keystone。4. adjoin + case + Odd|G|。
   1. **(4) setup (非可換 p 群 case)**: Z:=endgameZ に対し 𝒳=XsetOf⊥Z coherent
      (endgame_Xset_coherent) + 𝒴=𝒮(Q') coherent (ssetOf_Qder_coherent, Remark) を取り、
      **anchor χ₁ (最小度数, χ₁(1)=a·d) 選択** + **hXdiff (∀χ∈𝒳,∃b,χ−b•χ₁ supported =
