@@ -50,9 +50,25 @@ lane c の次 frontier を裁定願う。候補 (hub が自ら調査して決定
 裁定まで lane c は (C) 方向で survey を実測し ungated な genuine 未形式化結果を自律的に拾って進める
 (territorial ルール = 所有ファイルのみ; 未所有 leaf 新設は consumer が他レーンでも in-scope)。
 
-## 完了条件
+## hub 裁定 (2026-07-23 03:0x, 監視セッション)
 
-hub が lane c の次 frontier (上記 A–D いずれか、or 新規) を裁定し issue/notes に記録。
+lane c の App C Prop 1 完遂を確認 (`RankOneAffineModel.lean` フルビルド green・15 フィールド + `model_involution_data` axiom-clean・残 sorry は Q₈ BS 1 点のみ)。次 frontier を **(C) 主・自律継続** と裁定する。hub 自身の調査 (grep/survey 実測) に基づく:
+
+**裁定 = (C) — c 所有 territory の未形式化 番号付き結果を doc-order で自律形式化。以下のガードレール:**
+
+1. **territory の確定 (実測訂正あり)**: c 所有 = **BG remainder + Peterfalvi remainder のみ**。
+   - **Isaacs Ch.10 は c territory から除外** — 2026-07-19 裁定で **a 所有**に移管済、かつ 2026-07-17 に全 28 結果完成 (survey line 52/307/368、`Ch10_MoreTransfer/Main.lean` の完成表)。9407 の候補列挙が Ch.10 を含意していたら不要。
+   - c 所有内の非 Q₈ sorry は **0** (Suzuki2Groups.lean 4 / Suzuki/FirstCase の StepFive・StepSix 各 1 は **b の Suzuki 系** territory であって c ではない — 実測確認済)。
+2. **doc-order 優先 = BG を Pf より先に**: 冊間 doc order (Isaacs→BG→Peterfalvi) ゆえ、c は **BG remainder の未形式化番号付き結果**を Pf remainder より優先する。BG 内は section 番号の若い順。実測 grep (descriptive 名 + 番号) で「本当に未形式化 (Lean file 不在)」を確認してから着手 — **stale survey を一次情報にしない** ([[verify-port-state-by-number-not-coq-name]])。
+3. **(A) Q₈ BS = tracked deferred 継続 (write-off ではない)**: `RankOneHypothesis.brauerSuzuki` の Q₈ (|S|=8) sorry は追跡継続 (`notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`)。deferral の根拠は **cost/規模ではなく doc-order/upstream 優先** — 単一の孤立 downstream endpoint (modular char theory infra 要) より、nearer で ungated な多数の未形式化結果が doc-order で先。nearer frontier が枯渇 or modular-char infra が別途入った時点で再評価。**「cost が理由」ではない点を明記** ([[feedback-cost-scope-not-a-criterion]])。
+4. **(B) dedup 9130/9159/9164 = c の primary にしない**: shared-infra dedup は新規形式化より価値が低く、かつ **mechanical** ゆえ **d (メンテナンス lane) の charter に適合**。d が wave 間に拾える候補として flag (下記 merge_monitor tick にも記載)。c が真に block されたときの side-task としては可。
+5. **standing authority (重要)**: c は (C) 内の**具体 leaf を自律選択**し、**完遂ごとに hub へ再 escalate しない** (lane policy = frontier は上流優先+doc-order で lane が自律決定; [[feedback-no-avoiding-hard-parts]])。escalation は STOP 条件 (新 axiom / unsound / build 破壊 / sorry 退行) と真の設計分岐のみ。今回の 9407 は「territory 完済境界」の初回ゆえ裁定したが、以後の in-territory frontier 選択は聞きに来なくてよい。
+
+**⟹ close**: (C) 自律継続で確定。c は BG remainder の doc-order-earliest 未形式化結果を実測 grep で拾って進める。
+
+## 完了条件 (満了)
+
+~~hub が lane c の次 frontier を裁定し issue/notes に記録~~ → **上記 hub 裁定で満了** (2026-07-23 03:0x)。
 
 ## 参照
 
