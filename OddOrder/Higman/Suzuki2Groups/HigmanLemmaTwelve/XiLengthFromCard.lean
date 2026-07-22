@@ -353,8 +353,7 @@ theorem exists_proper_invariant_subgroup_of_card_sq
   have hmemΦ : ∀ (M : Submodule (ZMod 2) (Additive Q)) (x : Q),
       x ∈ Φ M ↔ Additive.ofMul x ∈ M := by
     intro M x
-    simp only [Φ, OrderIso.trans_apply, AddSubgroup.mem_toSubgroup',
-      AddSubgroup.mem_toZModSubmodule]
+    simp only [Φ, OrderIso.trans_apply, AddSubgroup.mem_toSubgroup']
     rfl
   -- irreducibility of the linearized action
   have hirr : Representation.IsIrreducible rho' := by

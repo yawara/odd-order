@@ -220,7 +220,7 @@ theorem gmul_smul_e5 (x : V) (t : K) : gmul x (t • e5) = x + t • e5 := by
 /-- Multiplying by an `e₅`-line element on the left is coordinate addition. -/
 theorem smul_e5_gmul (x : V) (t : K) : gmul (t • e5) x = x + t • e5 := by
   funext k
-  fin_cases k <;> simp [gmul, e5] <;> ring
+  fin_cases k <;> simp [gmul, e5]; ring
 
 /-- **`Z(S)` is exactly the `e₅`-line**: an element is central iff its coordinates
 `0`–`4` vanish.  (Upper bound: commuting with `a` forces `x₁ = x₄ = 0` and commuting

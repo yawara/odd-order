@@ -6,6 +6,42 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 02:5x 監視 tick — a (1C.8/1D.1) + b (Higman L13) + c (Prop1 model 完全証明・分割) 合流 / 🎉 sorry 8→7**。a=4 / b=2 / c=1 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problems 1C.8** 位数 pᵃ 部分群数の mod p 合同 + **1D.1** N_G(P)⊆H (P∈Syl_p(H), H◁G) ⟹ p∤|G:H|、`Problems.lean` +138) / b (**Higman Lemma 13** — 指数4前像の ξ 長さと長さ3化、`RestrictedLengths.lean` +326 拡張) / c (**Pf App C Prop1** `model_involution_data` **完全証明** + `RankOneAffineModel.lean` **新 leaf 分割** (863 行, NearFields 1188 に縮小))。
+> 🎉 **実 sorry 8→7 (改善)**: c が `model_involution_data` を実証明して 1 sorry 消滅、残る Q₈ Brauer–Suzuki sorry を新 leaf `RankOneAffineModel.lean` に孤立化 (NearFields 2→0, RankOneAffineModel 0→1)。**新 sorry 基準 = 7** (NearFields ではなく RankOneAffineModel に Q₈ gap が移動)。非退行かつ genuine な充足。
+> **c の分割 = mathlib 準拠 PASS**: NearFields が 2000 行制限に近づいたため rankOne model を `RankOneAffineModel.lean` (863) へ topic-split、`NearFields.lean` は re-export (import 保持) + `OddOrder.lean:457` に直接配線 → 下流 import 不変・orphan 0。file-size watch: 全 leaf <1500 (RankOneAffineModel 863 / NearFields 1188 / RestrictedLengths 599)。
+> **gate: green 4655 jobs (前 4654 +1 leaf split, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→7 (改善, 新基準 7) / lint 199 ≤ 199 baseline (a/b/c は新規警告 0) / push 76bb4a187→b3c4fb3e6**。範囲逸脱なし。
+> ℹ **d = wave 間 (0 ahead, scratch `foo` のみ)** — 前 tick の 19件 wave 後、次 wave 準備中。escalation 対象外。
+>
+> **▶▶ 2026-07-23 02:3x 監視 tick — b (Higman L13) + 🧹 d (lint wave 218→199) 合流 / a・c WIP**。a=0(WIP) / b=3 / c=0(WIP) / d=2。
+> 合流: b (**Higman Lemma 13** — 指数2前像の長さ2化・三直和の対独立性強化、新 leaf `RestrictedLengths.lean` +273 WIRED via `HigmanLemmaThirteen.lean`) / **d (🧹 初の lint 合流)** — frozen-zone 機械 wave 19件解消 (deprecation/simpArgs/does-nothing/seqFocus/maxHeartbeats、BG AppE 3 / Higman **Twelve** 3 / Pf Suzuki2Groups 2 / S11 1)、`bin/lint-baseline.tsv` **218→199**、issue 0138 ログ。
+> **d 合流検査 = PASS**: (i) **mechanical 確認** — theorem/lemma/def/structure/instance の signature 行変更 **0** (proof/signature 不改変) / (ii) **frozen file 確認** — d の触った Higman は **Twelve** (b の active frontier は **Thirteen** ゆえ非衝突)、他は BG AppE・Pf Suzuki2Groups・S11 で active lane 回避。charter 合致。
+> **gate: green 4654 jobs (前 4653 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→8 非退行 / lint 199 ≤ 199 baseline (d の新 baseline に対し exact — b の新 leaf は 0 新規警告で clean) / push a2fc97dda→31accf994**。
+> ℹ **a/c WIP watch**: a=`Problems.lean` 編集中 (§1C 次問継続) / c=`NearFields.lean` 編集中 (rankOne 残 field / Q₈ transport)。両 0 ahead・通常進行。**d は 0 ahead に復帰** (scratch `foo` のみ、次 wave へ)。
+> ✅ **d メンテナンス lane が機能**: hub の従来 cleanup wave を d が引き取り、baseline を初めて ratchet-down (218→199)。今後の wave も同検査 (mechanical + frozen) で受理。
+>
+> **▶▶ 2026-07-23 02:2x 監視 tick — a (1C.6a/b) + b (Higman L13 商分解) + c (App C Prop1 model 組立) 合流 / d lint 稼働**。a=3 / b=3 / c=1(+WIP) / d=0(10 WIP)。
+> 合流: a (**Isaacs §1C Problems 1C.6a/1C.6b** — G=HK の共通 Sylow と P=(P∩H)(P∩K) 集合積、`Problems.lean` +118) / b (**Higman Lemma 13** — Frattini 商の ξ 長さ・不変直和分解・持ち上げ、新 leaf `QuotientLengths.lean`+200 / `QuotientSummands.lean`+249 / `FrattiniPreimages.lean`+239、3 枚とも WIRED via `HigmanLemmaThirteen.lean`) / c (**Pf App C Prop1** `rankOne_affine_nearField` の model 組立 — **carrier 実構成 + 13/15 フィールド実証明**、`NearFields.lean` +267/−30)。
+> **gate: green 4653 jobs (前 4650 +3 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→8 非退行 (count-sorry; c の model 組立は carrier 実構成でも sorry 非増 = NearFields 2 のまま、Q₈ gap 孤立維持) / lint 218 ≤ 218 baseline (ratchet exit 0) / push f499e5c23→8d2f7140a**。範囲逸脱なし。
+> ✅ **c の doneness note**: rankOne model 組立は opaque carrier を**実構成**し 15 フィールド中 13 を実証明 — CLAUDE.md「doneness = carrier 構成可能性」に合致する genuine 前進 (sorry 数不変でも実質進捗)。残 Q₈/quaternion 2 sorry は既知 gap の孤立継続。c は worktree で `NearFields.lean` を更に編集中 (次 tick 継続)。
+> ℹ **lane d = lint 稼働確認**: d は 0 ahead だが worktree に **10 file の lint 修正 WIP** (BG AppE 3 / Higman LemmaTwelve 3 / Pf Suzuki2Groups 2 等) — ユーザー通知どおり lint-fix 稼働中。commit 出れば a/b/c の後に最後に合流。
+>
+> **▶▶ 2026-07-23 02:0x 監視 tick — a (1C.7) + b (Higman L13 Frattini 整列) 合流 / c WIP watch / d lint 継続**。a=1 / b=2 / c=0(WIP) / d=0。
+> 合流: a (**Isaacs §1C Problem 1C.7** — 極大部分群が素数指数のとき最大素数 Sylow が正規、`Problems.lean` +49) / b (**Higman Lemma 13** — Frattini 系列の整列、新 leaf `HigmanLemmaThirteen/CompositionSeries.lean` +204 / `HigmanLemmaThirteen/FrattiniLayers.lean` +344、両 WIRED via `HigmanLemmaThirteen.lean`、**0 sorry**)。
+> **gate: green 4650 jobs (前 4648 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→8 非退行 (count-sorry) / lint 218 ≤ 218 baseline (ratchet exit 0) / push b4e98c575→b23fb1429**。範囲逸脱なし (a=Isaacs / b=Higman、両所有内)。
+> 👀 **c WIP watch**: c は 0 ahead だが worktree で `NearFields.lean` を編集中 (+207/−29 uncommitted) — 9406 land 後の次 frontier (rankOne / Q₈ transport) を構成中。未 commit ゆえ hold ではなく通常進行、次 tick で commit を待つ。
+> ℹ **lane d = lint-fix 継続 (ユーザー通知受領)**: ユーザーより「d が hub の代わりに lint fix でできるところを進めている」と明示 → 前 tick の「d stall 確定」は**解消**、d の quiet は escalation 対象外。d の lint 掃除は全 frozen file に及ぶ sanctioned territory ゆえ合流順は従来どおり a/b/c 先・d 最後。d は 0 ahead・worktree に scratch `foo` のみ (無害・未追跡)。
+> **監視再開 (このセッション = hub)**: 前 cron は消滅 (CronList 空) → 15 分 cron (`7,22,37,52`, Opus) 再作成。
+>
+> **▶▶ 2026-07-23 01:5x 監視 tick — b (Higman L13) 合流 / 🔴 d stall 確定**。a=0 / b=1 / c=0 / d=0。
+> 合流: b (**Higman Lemma 13** — ξ-length 4 と Frattini 分岐、新 leaf `HigmanLemmaThirteen.lean` + `HigmanLemmaThirteen/LengthFourReduction.lean`, 両 WIRED)。
+> **gate: green 4648 jobs (前 4646 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・新 axiom 0) / 実 sorry 8→8 非退行 / lint 218 ≤ 218 (push を lint exit で gate) / push 41dd75444→714569ab0**。範囲逸脱なし (b=Higman)。
+> 🔴 **lane d stall 確定**: d は **62 分 commit 無** (初 CLAUDE.md commit 00:54 以降) + **01:00 以降 worktree ファイル更新ゼロ** + lsof 無 hit + scratch `foo` 放置。分析中でなく **session 停止/stall がほぼ確定**。hub は unsupervised d を再起動不可 → **ユーザーに d セッション再起動を依頼** (2 tick 連続で quiet 報告)。b が Theorem B (step 10) から Higman L13 に移ったのは b territory 内 (Higman は b 所有) で正常。**513185** idle 継続。
+>
+> **▶▶ 2026-07-23 01:4x 監視 tick**。a=1 / b=0 / c=0 / d=0。合流: a (Isaacs §1C Problems 1C.3b)。
+> **gate: green 4646 jobs / AxiomsCheck OK (3754・新 axiom 0) / 実 sorry 8→8 非退行 (9406 後の新基準 8) / lint 218 ≤ 218 (push を lint exit で gate — 前 tick の slip 反省) / push a0c6949d2→61566491f**。
+> ⚠ **lane d watch (要注意)**: d は 47 分 commit 無 (初 CLAUDE.md commit 以降)、lsof で worktree を開く ccd-cli プロセス無 hit、worktree に未追跡 scratch `foo` 1 件。メンテナンス lane ゆえ lint census / lean-eval 抽出の分析中の可能性もあるが、**stall or session 停止の疑い**。次 tick でも quiet なら user へ d セッション確認を依頼。⚠ scratch `foo` は d の作業残渣 (無害・未追跡)。**513185** idle 継続。
+>
 > **🎉 2026-07-23 01:2x 監視 tick — 9406 coordinated land 成功 (c+b 同一 tick 合流)**。a=4 / b=2 / c=7 / d=0。
 > ユーザー「b をマージして」= b nudge → **b が 9406 consumer 更新完了** (`5be71e802`: StepEight `model_qEquiv_conj` を `model.qEquiv_conj q→q⁻¹` に追随)。⟹ c(fix A)+b(consumer) 両揃い → **a+b+c を同一 tick で `--no-ff` 合流**。
 > issue 9406 doc に b/c 双方の READY note が付き conflict → 両保持で解消。**Lean code は無衝突 = fix A × consumer は整合**。
