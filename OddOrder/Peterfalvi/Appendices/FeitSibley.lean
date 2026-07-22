@@ -1234,8 +1234,16 @@ Lemma 2(a) (`Sset_eq_induced_of_Q`, issue 1051), Lemma 2(b)
 (`induction_isometry_on_degree_zero`, issue 1052) and Lemma 2(c)
 (`hasNoRealCharacters_Sset`, issue 1053; its `Odd |Q₁|` hypothesis is available
 here post-reduction, where `Q₁` is a `p`-group for a prime `p ≠ 2`) are now
-proved; the remaining prerequisite is step (7)'s class-sum congruence machinery
-for a Hall TI subgroup, which is not in the repository. -/
+proved.  Steps (1)--(6) are formalized (reductions
+`ssetOf_sder_coherent_of_two_primes`/`sset_coherent_of_ssetOf_sder_coherent`,
+step (3) `xset_coherent_of_le_center_Q1`, and the (6) union coherence
+`union_coherent_of_lambda_dvd`, `a ∣ λ ⟹ 𝒳 ∪ 𝒴` coherent).  Step (7)'s class-sum
+congruence for a Hall TI subgroup is now in the repository
+(`peterfalvi_67_hall_of_odd`, `HallTICongruence.lean`), together with the (8)
+divisibility core `dvd_of_isIntegral_ratio` and the regular-character value
+`sum_degree_mul_charValue_XsetOf_bot`.  The remaining work is the (8) final
+assembly (`Res_H e'₁` analysis → `a ∣ λ`) and the step-(5) adjoin closing `𝒮`
+(campaign issue 1054). -/
 theorem feit_sibley_coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis G) [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
     (hd : Odd hyp.d) :
