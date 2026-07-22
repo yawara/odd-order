@@ -199,4 +199,63 @@ where a field structure on the commutative near-field is needed. -/
     qsmul := _
     qsmul_def := fun _ _ => rfl }
 
+/-- **The abstract core of step (6), field case** (p. 110): if the unit group
+of a finite field `F` of characteristic `f` has order `2^b`, so that
+`|F| = 2^b + 1`, then `|F| ∈ {f, 9}`; and any odd-order group `D` acting
+faithfully by ring automorphisms is trivial.
+
+By `FiniteField.card`, `|F| = f^a`; the arithmetic lemma
+(`eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one`) gives `a = 1` (`|F| = f`)
+or `f^a = 9`.  Then `|F|` is prime or prime-square, so `RingAut F` has
+exponent `≤ 2` (`ringAut_sq_eq_one_of_card_prime_or_prime_sq`); an odd-order
+subgroup of an exponent-`2` group is trivial. -/
+theorem card_eq_and_aut_trivial_of_field_units_two_pow {F : Type*} [Field F]
+    [Finite F] {f b : ℕ} (hf : f.Prime) [CharP F f] (hb : 1 ≤ b)
+    (hFcard : Nat.card F = 2 ^ b + 1) {D : Type*} [Group D] [Finite D]
+    (hDodd : Odd (Nat.card D)) (φ : D →* RingAut F)
+    (hφinj : Function.Injective φ) :
+    (Nat.card F = f ∨ Nat.card F = 9) ∧ Nat.card D = 1 := by
+  haveI : Fact f.Prime := ⟨hf⟩
+  haveI : Fintype F := Fintype.ofFinite F
+  obtain ⟨a, -, hcard_fa⟩ := FiniteField.card (K := F) f
+  have hNcard : Nat.card F = f ^ (a : ℕ) := by
+    rw [Nat.card_eq_fintype_card]; exact hcard_fa
+  have heq : f ^ (a : ℕ) = 2 ^ b + 1 := by rw [← hNcard]; exact hFcard
+  -- `f` is odd (else `2^a` even would equal the odd `2^b + 1`)
+  have hfodd : Odd f := by
+    rcases hf.eq_two_or_odd' with rfl | hodd
+    · exfalso
+      have hae : Even (2 ^ (a : ℕ)) :=
+        even_iff_two_dvd.mpr (dvd_pow_self 2 a.pos.ne')
+      rw [heq, Nat.even_add_one] at hae
+      exact hae (even_iff_two_dvd.mpr (dvd_pow_self 2 (by omega : b ≠ 0)))
+    · exact hodd
+  have hdich :=
+    eq_one_or_pow_eq_nine_of_pow_eq_two_pow_add_one hfodd hb heq
+  have hFcard2 : Nat.card F = f ∨ Nat.card F = 9 := by
+    rcases hdich with ha1 | hf9
+    · left; rw [hNcard, ha1, pow_one]
+    · right; rw [hNcard]; exact hf9
+  refine ⟨hFcard2, ?_⟩
+  -- every ring automorphism squares to the identity
+  have hsq : ∀ σ : RingAut F, σ ^ 2 = 1 := by
+    rcases hFcard2 with hf' | h9
+    · exact fun σ => ringAut_sq_eq_one_of_card_prime_or_prime_sq hf (Or.inl hf') σ
+    · exact fun σ => ringAut_sq_eq_one_of_card_prime_or_prime_sq (q := 3) (by norm_num)
+        (Or.inr (by rw [h9]; norm_num)) σ
+  -- an odd-order group faithfully in an exponent-`2` group is trivial
+  have hDtriv : ∀ d : D, d = 1 := by
+    intro d
+    have hd2 : d ^ 2 = 1 := by
+      apply hφinj
+      rw [map_pow, map_one, hsq]
+    have hord2 : orderOf d ∣ 2 := orderOf_dvd_of_pow_eq_one hd2
+    rcases (Nat.dvd_prime Nat.prime_two).mp hord2 with h1 | h2
+    · exact orderOf_eq_one_iff.mp h1
+    · exfalso
+      have hdvd : (2 : ℕ) ∣ Nat.card D := h2 ▸ orderOf_dvd_natCard d
+      exact (Nat.not_even_iff_odd.mpr hDodd) (even_iff_two_dvd.mpr hdvd)
+  haveI : Subsingleton D := ⟨fun x y => by rw [hDtriv x, hDtriv y]⟩
+  exact Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨1⟩⟩
+
 end OddOrder.Peterfalvi.Appendices.Suzuki

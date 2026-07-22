@@ -12145,6 +12145,15 @@ automorphism of this field — the bridge into `RingAut` for step (6)/(8)'s fiel
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.NearFields.fieldOfComm
 
+/-! **Step (6), field-case abstract core** (`FirstCase/StepSix.lean`, issue 2053, 2026-07-22):
+if a finite field `F` of characteristic `f` has `|F| = 2^b + 1`, then `|F| ∈ {f, 9}`, and any
+odd-order group acting faithfully by ring automorphisms is trivial.  Combines
+`FiniteField.card` (`|F| = f^a`), the arithmetic lemma, and the exponent-`2` bound
+`ringAut_sq_eq_one_of_card_prime_or_prime_sq`.  Sorry-free; the model assembly of step (6)'s
+field case supplies `|F^*| = 2^b` (from `Q₁ = 1`) and `Σ ↪ RingAut F` (from `dAut`). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.card_eq_and_aut_trivial_of_field_units_two_pow
+
 /-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
 欠いていた).  Zassenhaus/Dickson 分類の App.C 特殊形: 有限 near-field `F` の乗法群が
