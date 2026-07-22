@@ -151,6 +151,91 @@ theorem restricted_lengthThree_not_isMulCommutative_of_covBy_top
   exact (not_hasXiLengthThree_of_isMulCommutative_of_pow_four
     (hP.to_subgroup S) hxiS.transitive hcommS hSfour) hlenS
 
+/-- **Higman Lemma 13 (p. 92), Frattini subgroup of an exponent-four
+factor.**
+
+For a noncommutative restricted length-three factor `S` covering `Φ(P)`,
+its internal Frattini subgroup maps onto `Φ(P)²` in the ambient group.
+The cover consequences first place this image in the interval
+`[Φ(P)², Φ(P)]`.  Higman's invariant Agemo classification leaves only the
+two endpoints.  The upper endpoint is impossible: `Φ(S)` is elementary
+abelian by Lemma 12, whereas the exponent-four branch supplies an element
+of `Φ(P)` with nontrivial square. -/
+theorem frattini_map_eq_frattiniSquare_of_restricted_lengthThree_exponent_four
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    (hPhiComm : IsMulCommutative (frattini P))
+    (hexists : ∃ z : frattini P, z ^ 2 ≠ 1)
+    {S : Subgroup P}
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiS : NormalInvariantCover Y.subtype (frattini P) S)
+    (hlenS : HasXiLengthThree hSinv.restrict.range.subtype)
+    (hncommS : ¬ IsMulCommutative S) :
+    (frattini S).map S.subtype = frattiniSquare P := by
+  have hSneBot : S ≠ (⊥ : Subgroup P) :=
+    ne_of_gt (lt_of_le_of_lt bot_le hPhiS.lt)
+  have hinvS : involutions P ⊆ S :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive hSinv hSneBot
+  have hxiS : IsXiActor hSinv.restrict.range :=
+    restricted_range_isXiActor hxi hSinv
+  have hmultiS : ∃ x y : S,
+      x ∈ involutions S ∧ y ∈ involutions S ∧ x ≠ y :=
+    exists_distinct_involutions_subgroup_of_subset hinvS hmulti
+  have hprimeS : ∀ p : ℕ, p.Prime →
+      p ∣ Nat.card hSinv.restrict.range →
+        p ∣ (involutions S).ncard :=
+    restricted_range_primeSupport hSinv hinvS hprime
+  have hEAS : IsElementaryAbelian 2 (frattini S) :=
+    frattini_isElementaryAbelian_of_xiLengthThree
+      (hP.to_subgroup S) hncommS hmultiS hxiS hlenS hprimeS
+  have hAmbientInv : IsAInvariant Y.subtype
+      (NormalInvariantCover.ambientFrattini S) := by
+    simpa [NormalInvariantCover.ambientFrattini] using
+      aInvariant_map_subtype_of_restrict hSinv
+        (IsAInvariant.of_characteristic hSinv.restrict :
+          IsAInvariant hSinv.restrict (frattini S))
+  letI : CommGroup (frattini P) :=
+    { (inferInstance : Group (frattini P)) with
+      mul_comm := hPhiComm.is_comm.comm }
+  have hPhiPhi : NormalInvariantCover.ambientFrattini (frattini P) =
+      frattiniSquare P := by
+    rw [NormalInvariantCover.ambientFrattini, frattiniSquare,
+      NormalInvariantCover.frattini_eq_agemo_one
+        (hP.to_subgroup (frattini P))]
+  have hSquareLe : frattiniSquare P ≤
+      NormalInvariantCover.ambientFrattini S := by
+    rw [← hPhiPhi]
+    exact NormalInvariantCover.ambientFrattini_left_le_right_of_comm
+      hP hPhiComm hPhiS.le
+  change NormalInvariantCover.ambientFrattini S = frattiniSquare P
+  rcases eq_frattiniSquare_or_frattini_of_invariant
+      hP hxi hPhiComm hAmbientInv hSquareLe
+        hPhiS.ambientFrattini_right_le_left with hgood | hbad
+  · exact hgood
+  · exfalso
+    obtain ⟨z, hz⟩ := hexists
+    have hzMap : (z : P) ∈ (frattini S).map S.subtype := by
+      change (z : P) ∈ NormalInvariantCover.ambientFrattini S
+      rw [hbad]
+      exact z.property
+    obtain ⟨s, hs, hsz⟩ := Subgroup.mem_map.mp hzMap
+    have hsSqS : s ^ 2 = (1 : S) :=
+      congrArg Subtype.val
+        (hEAS.pow_eq_one (⟨s, hs⟩ : frattini S))
+    have hsSqP : (s : P) ^ 2 = 1 := congrArg Subtype.val hsSqS
+    apply hz
+    apply Subtype.ext
+    change (z : P) ^ 2 = 1
+    rw [← hsz]
+    exact hsSqP
+
 /-- **Higman Lemma 13 (p. 92), initial classification of the two
 exponent-four factors.**
 
