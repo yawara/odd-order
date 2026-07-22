@@ -6,6 +6,23 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **🛑 2026-07-22 18:5x tick — 3 レーン stall 継続 (~82 分、未復帰)**。全レーン 0 unmerged、
+> 全 worktree の追跡ファイル mtime が 17:36-17:38 のまま不変 (a=17:38 の 9205 空 skeleton / b=17:36
+> AxiomsCheck / c=17:37 merge sync)。17:37 tick 直後に一斉沈黙 = /loop wakeup 全レーン発火停止の疑い
+> (相関: 同時刻に hub の Edit hook が "host client unreachable" で連続タイムアウト — infra 断の可能性)。
+> **merge-safety STOP でない** (build/git 健全、hub cron はこの tick も正常発火) ゆえ cron 維持・報告のみ。
+> lanes は unsupervised session ゆえ hub から再起動不可 → **ユーザーの lane セッション再起動が必要** (2 tick 連続報告済)。
+> **hub 調査所見 (実測)**: 実 sorry 7 の territory map = **b:6** (Suzuki2Groups 4 = :53/76/82/88 +
+> StepFive:54 + StepSix:421) / **c:1** (NearFields:786、ただし 9204 で a へ carve-out 済 = 実質 a 領域・
+> **c の 9318 Brauer-Suzuki に gated**) / **a 本文 (Isaacs+Pf S*):0**。⟹ **a は真の完了境界**: 1054
+> (FeitSibley) close + 領域 sorry-clean、唯一残る NearFields:786 は BS gated で自力不可 → 非 gated な
+> 新 frontier が必要ゆえ 9205 起票中に停止。a 復帰時の次 frontier = Isaacs 未了 or Pf 本文残
+> (git log 実測要; reallocation line 40 の Ch.2/3 初期値は消化済ゆえ再測)。
+> ⚠ **ownership 不整合 (lanes 復帰後に hub 解決)**: merge_monitor `c_re` は NearFields/FeitSibley を
+> c と記すが reallocation 9204 (2026-07-21) は両者を a へ carve-out (a の 9205 も両者を carve-out と主張)。
+> header は FeitSibley→a・NearFields→c の中間状態。**regex を 9204 に整合**させる (今は 0 unmerged で
+> merge blocking でないため保留、STOP でない)。
+>
 > **🏁 2026-07-22 17:37 監視 tick (Opus 4.8 hub, cron `7,22,37,52`) — 🎉 Feit-Sibley 定理完成 (issue 1054 CLOSE)**。
 > a=2 / b=2 / c=2。合流: **a (1054 CLOSE): `feit_sibley_coherence` を AxiomsCheck gate に登録 —
 > axioms check OK, 3 axioms all in allowlist で真に axiom-clean。Pf App.IV Feit-Sibley 定理 campaign 完了**
