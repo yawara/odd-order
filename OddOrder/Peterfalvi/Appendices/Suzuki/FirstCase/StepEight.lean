@@ -98,42 +98,50 @@ theorem model_dAut_inv_cancel (g : ↥hyp.D) (x : F) :
 `g q g⁻¹` maps under `qEquiv` to `dAut g` applied to `qEquiv q`.
 
 Conjugating `emb(1)` by `g q g⁻¹` and unwinding through `dAut_conj` (for `g`,
-`g⁻¹`) and `qEquiv_conj` (for `q`) computes to `emb(1 · dAut g ↑(qEquiv q))`;
-comparing with `qEquiv_conj` for the conjugate and cancelling `emb`, `ofAdd`
-gives the identity. -/
+`g⁻¹`) and `qEquiv_conj` (for `q⁻¹`) computes to
+`emb(1 · dAut g ↑(qEquiv q))`.  The inverse in `qEquiv_conj` means that this
+is conjugation by `(g q g⁻¹)⁻¹`; comparing the two descriptions and cancelling
+`emb`, `ofAdd` gives the identity. -/
 theorem model_qEquiv_conj (g : ↥hyp.D) (q : ↥hyp.Q)
     (hc : (g : G') * (q : G') * (g : G')⁻¹ ∈ hyp.Q) :
     ((model.qEquiv ⟨(g : G') * (q : G') * (g : G')⁻¹, hc⟩ : Fˣ) : F) =
       model.dAut g ((model.qEquiv q : Fˣ) : F) := by
   set u : F := ((model.qEquiv q : Fˣ) : F) with hu
-  set c : G' := (g : G') * (q : G') * (g : G')⁻¹ with hc_def
+  let c : ↥hyp.Q := ⟨(g : G') * (q : G') * (g : G')⁻¹, hc⟩
   have hy : ((g : G'))⁻¹ * model.emb (Multiplicative.ofAdd (1 : F)) * (g : G') =
       model.emb (Multiplicative.ofAdd (model.dAut g⁻¹ (1 : F))) := by
     have h := model.dAut_conj g⁻¹ (1 : F)
     rwa [Subgroup.coe_inv, inv_inv] at h
-  have hq := model.qEquiv_conj q (model.dAut g⁻¹ (1 : F))
+  have hq := model.qEquiv_conj q⁻¹ (model.dAut g⁻¹ (1 : F))
+  simp only [inv_inv] at hq
   have hgg := model.dAut_conj g (model.dAut g⁻¹ (1 : F) * u)
   have hval : model.dAut g (model.dAut g⁻¹ (1 : F) * u) = 1 * model.dAut g u := by
     rw [model.dAut_mul g, model_dAut_inv_cancel model g (1 : F)]
-  have hchain : c * model.emb (Multiplicative.ofAdd (1 : F)) * c⁻¹ =
+  have hchain : ((c⁻¹ : ↥hyp.Q) : G') *
+        model.emb (Multiplicative.ofAdd (1 : F)) * ((c⁻¹ : ↥hyp.Q) : G')⁻¹ =
       model.emb (Multiplicative.ofAdd (1 * model.dAut g u)) := by
-    calc c * model.emb (Multiplicative.ofAdd (1 : F)) * c⁻¹
-        = (g : G') * ((q : G') * (((g : G'))⁻¹ *
-            model.emb (Multiplicative.ofAdd (1 : F)) * (g : G')) *
-            (q : G')⁻¹) * (g : G')⁻¹ := by rw [hc_def]; group
-      _ = (g : G') * ((q : G') *
+    calc
+      ((c⁻¹ : ↥hyp.Q) : G') * model.emb (Multiplicative.ofAdd (1 : F)) *
+          ((c⁻¹ : ↥hyp.Q) : G')⁻¹
+          = (g : G') * (((q⁻¹ : ↥hyp.Q) : G') * (((g : G'))⁻¹ *
+              model.emb (Multiplicative.ofAdd (1 : F)) * (g : G')) *
+              ((q⁻¹ : ↥hyp.Q) : G')⁻¹) * (g : G')⁻¹ := by
+                dsimp [c]
+                group
+      _ = (g : G') * (((q⁻¹ : ↥hyp.Q) : G') *
             model.emb (Multiplicative.ofAdd (model.dAut g⁻¹ (1 : F))) *
-            (q : G')⁻¹) * (g : G')⁻¹ := by rw [hy]
+            ((q⁻¹ : ↥hyp.Q) : G')⁻¹) * (g : G')⁻¹ := by rw [hy]
       _ = (g : G') * model.emb
             (Multiplicative.ofAdd (model.dAut g⁻¹ (1 : F) * u)) * (g : G')⁻¹ := by
             rw [hq]
       _ = model.emb (Multiplicative.ofAdd
             (model.dAut g (model.dAut g⁻¹ (1 : F) * u))) := by rw [hgg]
       _ = model.emb (Multiplicative.ofAdd (1 * model.dAut g u)) := by rw [hval]
-  have hr := model.qEquiv_conj ⟨c, hc⟩ (1 : F)
+  have hr := model.qEquiv_conj c⁻¹ (1 : F)
+  simp only [inv_inv] at hr
   rw [hchain] at hr
   have hfin := Multiplicative.ofAdd.injective (model.emb_injective hr.symm)
-  rwa [one_mul, one_mul] at hfin
+  simpa only [one_mul, c, u] using hfin
 
 /-- **`qEquiv` matches fixed units with conjugation-fixed `Q`** (step (8)): for
 `g ∈ D` (inside `H`), `qEquiv` restricts to a bijection between the elements of
