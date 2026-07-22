@@ -459,6 +459,7 @@ import OddOrder.Peterfalvi.Appendices.FeitSibleyReductionThree
 import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
 import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
 import OddOrder.Peterfalvi.Appendices.FeitSibleyEndgame
+import OddOrder.Peterfalvi.Appendices.FeitSibleyUnionCoherence
 import OddOrder.Peterfalvi.Appendices.FeitSibleyReductions
 import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 import OddOrder.FeitThompson

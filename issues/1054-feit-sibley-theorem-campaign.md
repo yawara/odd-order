@@ -519,10 +519,22 @@ e'₁(z) − e'₁(1) = (λ+aμ)(−|H|/(da)) = −|Q|(λ/a + μ)。(7) を ±e'
          ⚠ 実装知見: IsCoherent は Type ⟹ `noncomputable def` (theorem 不可) /
          IntegralCharacterMap は full path (OddOrder.Peterfalvi.S07) 要 /
          nsmul↔ℂ-smul 橋 = Nat.cast_smul_eq_nsmul、nsmul↔zsmul 橋 = 同 (ℤ 版)。
-      4. (6) 統合: 1+2+3 合成 → a∣λ ⟹ IsCoherent τ (X∪Y) A。
+      4. [x] **(6) 統合完成** = `union_coherent_of_lambda_dvd` (2026-07-22, sorry-free,
+         **新 leaf FeitSibleyUnionCoherence.lean 192 行**, OddOrder.lean 配線済)。
+         a∣λ + (4) データ (X/Y disjoint coherent, χ₁∈X, η₁∈Y, a≥2, m≥2, keystone
+         χ₁−a•η₁ supported, λ norm-identity data) ⟹ IsCoherent τ (X∪Y) A。
+         組立: exists_normalized_witness_of_dvd (w) → exists_X_witness_assignment (wX)
+         → 合成 W (`if μ∈X then wX μ else w μ`) → isCoherent_of_memberAssignment。
+         合成差分 = 単一 anchor η₁: η∈Y は b=1、χ∈X は b=a_χ·a
+         (χ−a_χa•η₁ = (χ−a_χ•χ₁)+a_χ•(χ₁−a•η₁), P1-X+keystone を τ 線形で合成)。
+         ⚠ 実装知見: IsCoherent は Type ⟹ ∃ witness は Classical.choose で取り出し
+         (obtain 不可、Exists.casesOn は Prop のみ); **choose_spec を set の前に**取らないと
+         properties が hwex.choose を参照して set 済 w と syntactic mismatch /
+         inner_conj_symm は OddOrder.RepresentationTheory full path (mathlib と ambiguous) /
+         混合 nsmul/ℂ-smul の加群等式は push_cast + module。
       5. その後: 1(a) adjoin で 𝒮(S′) coherent → (2) で 𝒮 → (iii) 分岐完成。
-      (7) class-algebra 合同は独立 — (6) 統合が重いので先に (7) を済ませる
-      選択肢もある (文書順は (6)→(7) だが (7) は self-contained)。
+      (7) class-algebra 合同は独立 — (6) 統合が済んだので (7)→(8) で a∣λ を出して
+      union_coherent_of_lambda_dvd に供給、その後 step 5 の adjoin/(2)。
   - [ ] **(7)** class-algebra 合同 (独立、並行可): ψ constant on Z^# ⟹
     ψ(z)≡ψ(1) mod|Q|。ω central character (ω(Kₛ)=ψ(Kₛ)/ψ(1)) の代数的整数性 +
     構造定数 aᵢⱼₛ + Q f.p.f. 作用の counting。**前提の repo 内所在確認要**
