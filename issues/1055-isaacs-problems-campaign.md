@@ -240,9 +240,19 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   ⚠ `dvd_iff_prime_pow_dvd_dvd` の `intro` は `Nat.Prime` を与える (変換不要) / `card_eq_multiplicity` は
   `↥↑P` coe ゆえ明示型 `have hmult : Nat.card ↥P = …` で橋渡し。`n` を最大値でなく上界に一般化。
   → **1D.11 完了**。
-- ⬜ **残り §1D**: 1D.5 (intricate) /
-  1D.12 (位数 p 元数 `≡-1 mod p`、McKay の p-tuple + `card_modEq_card_fixedPoints`) /
-  1D.15 の一般 `N` 版。
+- ⬜ **残り §1D** (いずれも ~60 行 substantial、quick path 無し):
+  - **1D.12** (位数 p 元数 `≡-1 mod p`) — 詳細プラン確定 (2026-07-23 調査): mathlib は Cauchy **存在**
+    (`exists_prime_orderOf_dvd_card`) のみ露出、**count は無い**ので McKay を自前構築。素材 =
+    `Equiv.Perm.VectorsProdEqOne` (`Perm/Cycle/Type.lean` 422+): `vectorsProdEqOne G p` (積=1 の p-tuple)、
+    `.card` (=`|G|^(p-1)`)、`rotate`/`rotate_zero`/`rotate_rotate`/`rotate_length`。手順: (1) `rotate` で
+    `MulAction (Multiplicative (ZMod p)) (vectorsProdEqOne G p)` を letI 定義 (mul_smul は p-周期性
+    `rotate v (k+p)=rotate v k` = rotate_rotate+rotate_length で `rotate v k = rotate v (k%p)`)、(2)
+    `IsPGroup.card_modEq_card_fixedPoints`: `|vectorsProdEqOne|≡|fixed| mod p`、`|vectorsProdEqOne|=|G|^(p-1)≡0`
+    (p∣|G|) ⟹ `#{x^p=1}=|fixed|≡0`、fixedPoints=定数ベクトル `replicate p x` (x^p=1) と同定
+    (`List.rotate_one_eq_self_iff_eq_replicate`)、(3) `sum_card_orderOf_eq_card_pow_eq_one (p≠0)`:
+    `divisors p={1,p}` で `#{ord=1}+#{ord=p}=#{x^p=1}`、`#{ord=1}=1` ⟹ `#{ord=p}=#{x^p=1}-1≡-1`。
+    別案: mathlib Cauchy 内の `σ`(rotate-by-1 perm)を再構築し `zpowers σ` を p-群として使う。
+  - **1D.5** (intricate) / **1D.15 の一般 `N` 版** (Φ(G)⊆N◁G, N/Φ(G)冪零⟹N冪零)。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
 
