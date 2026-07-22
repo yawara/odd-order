@@ -7,7 +7,9 @@ import Mathlib.Algebra.GroupWithZero.Action.Defs
 import Mathlib.Algebra.GroupWithZero.Units.Basic
 import Mathlib.Algebra.Group.Action.Basic
 import Mathlib.Algebra.Group.Action.End
+import Mathlib.Algebra.GroupWithZero.Action.End
 import Mathlib.Algebra.Group.TypeTags.Basic
+import Mathlib.GroupTheory.GroupAction.ConjAct
 import OddOrder.Peterfalvi.Appendices.NearFieldClass
 
 /-!
@@ -61,6 +63,27 @@ This is the bridge that turns a conjugation action of a group `Q` on a normal *a
     change Additive.ofMul (m • (a.toMul * b.toMul))
       = Additive.ofMul (m • a.toMul) + Additive.ofMul (m • b.toMul)
     rw [smul_mul']; rfl
+
+open scoped IsMulCommutative in
+/-- The **conjugation action** of a subgroup `Q ≤ G` on the additive group `Additive ↥F` of a
+normal *abelian* subgroup `F ⊴ G`: `q • Additive.ofMul f = Additive.ofMul (q f q⁻¹)`.
+
+This is the `DistribMulAction` that feeds `SharplyTransitiveData` in the affine near-field transport
+(Peterfalvi App. C, Prop 1): `F ⋊ Q` with `Q` sharply transitive on `F ∖ {1}` becomes the affine
+near-field group `𝓛(F) = F ⋊ F^*`. -/
+@[reducible] noncomputable def conjAdditiveAction {G : Type*} [Group G] (F Q : Subgroup G)
+    [F.Normal] [IsMulCommutative ↥F] : DistribMulAction ↥Q (Additive ↥F) :=
+  letI : DistribMulAction (ConjAct G) (Additive ↥F) :=
+    MulDistribMulAction.toDistribMulActionAdditive
+  DistribMulAction.compHom (Additive ↥F)
+    ((ConjAct.toConjAct : G ≃* ConjAct G).toMonoidHom.comp Q.subtype)
+
+open scoped IsMulCommutative in
+/-- Unfolding the conjugation action: `(q • a)` is conjugation of `a` by `q` inside `G`. -/
+theorem conjAdditiveAction_val_toMul {G : Type*} [Group G] {F Q : Subgroup G} [F.Normal]
+    [IsMulCommutative ↥F] (q : ↥Q) (a : Additive ↥F) :
+    letI := conjAdditiveAction F Q
+    (((q • a).toMul : ↥F) : G) = (q : G) * ((a.toMul : ↥F) : G) * (q : G)⁻¹ := rfl
 
 variable {M A : Type*} [Group M] [AddCommGroup A] [DistribMulAction M A]
 
@@ -161,6 +184,12 @@ near-field multiplication and the group action — the identity that turns the c
 the acting group into right multiplication by `F^*` (Peterfalvi's `𝓛(F) = F ⋊ F^*`). -/
 theorem mul_smul_e (m : M) (x : A) : d.mul x (m • d.e) = m • x := by
   rw [d.mul_def (d.smul_e_ne_zero m), ← d.coord_unique (d.smul_e_ne_zero m) rfl]
+
+/-- The product of two "coordinate" elements is *anti*-multiplicative in `M`:
+`(m₁ • e) * (m₂ • e) = (m₂ * m₁) • e`.  Hence `m ↦ m • e` is an anti-homomorphism `M → Aˣ`, and a
+genuine isomorphism `M ≃* Aˣ` must pre-compose with inversion (see `mulEquivUnits`). -/
+theorem smul_e_mul (m₁ m₂ : M) : d.mul (m₁ • d.e) (m₂ • d.e) = (m₂ * m₁) • d.e := by
+  rw [d.mul_smul_e, mul_smul]
 
 /-- **Right distributivity** `(a + b) * c = a * c + b * c` — exactly additivity of `· • x`. -/
 theorem right_distrib' (a b c : A) : d.mul (a + b) c = d.mul a c + d.mul b c := by
