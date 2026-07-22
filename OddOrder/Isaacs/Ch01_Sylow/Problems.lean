@@ -922,6 +922,18 @@ theorem exists_sylow_subgroupOf_eq_of_sylow {p : ℕ} [Fact p.Prime] {G : Type*}
     exact IsPGroup.of_card (hScard.trans hj)
   exact (P.is_maximal' hSpg (Subgroup.map_le_iff_le_comap.mp hS)).symm
 
+/-- **Isaacs Problem 1C.2(b)**. Sylow `p`-部分群の個数について `n_p(H) ≤ n_p(G)`
+(`H ≤ G` の部分群)。1C.2(a) より各 `P ∈ Syl_p(H)` に `P = H∩S` なる `S ∈ Syl_p(G)` を対応させる
+写像は単射 (`P = H∩S` から `S` が `P` を決める)。 -/
+theorem card_sylow_subgroup_le {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (H : Subgroup G) : Nat.card (Sylow p ↥H) ≤ Nat.card (Sylow p G) := by
+  refine Nat.card_le_card_of_injective
+    (fun P => (exists_sylow_subgroupOf_eq_of_sylow P).choose) (fun P₁ P₂ h => Sylow.ext ?_)
+  rw [(exists_sylow_subgroupOf_eq_of_sylow P₁).choose_spec,
+    (exists_sylow_subgroupOf_eq_of_sylow P₂).choose_spec,
+    show (exists_sylow_subgroupOf_eq_of_sylow P₁).choose
+      = (exists_sylow_subgroupOf_eq_of_sylow P₂).choose from h]
+
 /-- **Isaacs Problem 1C.3(a)**. `G` の位数が `p` の冪である元の全体 `X` は、全 Sylow `p`-部分群
 の和集合に一致する。
 
