@@ -257,7 +257,31 @@ Gorenstein Lem 1.7 の**純群論核心**を完成 (axiom-clean、AxiomsCheck �
 - setup 確認済: `QuaternionSylowSetup` は `S : Sylow 2 G` を posit ゆえ全 Sylow-2 が S 共役で
   unique involution。原文の「z 個別 Klein-four」議論より `commute_involution_eq` 汎用形が簡潔だった。
 
-### Lem 1.8 導出経路確定 (2026-07-22 lane c、⚠ class-summed 版で per-element β を回避)
+### ✅ Lem 1.8 完成 (2026-07-22 lane c、`BrauerSuzukiCounting.lean` 新 leaf、axiom-clean)
+
+**`lem_1_8_relation`: `1 + χ₁(u)²/χ₁(1) − χ(u)²/χ(1) = 0`** (u = involutionClass.out)。
+sub-step 分割で完成: `mk_eq_involutionClass_iff` / `classSumCoeff_involutionClass_eq_zero_of_even`
+(step 2) / `sum_classSumCoeff_thetaStar_eq_zero` (A) / `sum_thetaStar_char_div_centralizer_eq_inner`
+(B1: (9.4.2)-weighted class 和 = ⟨θ*,χ⟩、orbit-stabilizer + apply_inv) /
+`sum_degWeight_inner_eq_zero` (B2: (9.4.2) 代入) / `lem_1_8_relation` (⟨θ*,ψ⟩ 重複度 collapse +
+|K|² 除)。全 AxiomsCheck 登録済。⚠ 実装で苦労した点 = ClassFunction (submodule subtype) の
+coercion: `simp_rw [∀χ hinner]` は binder 下で coercion mismatch → `simp only [hdecomp]`
+(ground rewrite) + `irr_cf_inner` (ClassFunction 版) で回避。
+
+### Lem 1.9 計画 (次 frontier、純代数 → endgame)
+
+Gorenstein Lem 1.9: `(χ(u)−χ(1))²=0` → 全 involution ⊆ ker χ。手順:
+1. `obtain ⟨χ₁,χ,...,hdecomp,hdeg⟩ := thetaStar_decomposition` (hdeg: χ(1)=χ₁(1)+1)。
+2. `lem_1_8_relation hdecomp`: `1+χ₁(u)²/χ₁(1)−χ(u)²/χ(1)=0` (u=involutionClass.out)。
+3. u は involution (`mk_eq_involutionClass_iff`: mk(out)=K → orderOf out=2)、θ*(u)=0
+   (`thetaStar_apply_eq_zero_of_orderOf_eq_two`)、`apply_eq_of_thetaStar_apply_eq_zero hdecomp`:
+   **χ(u)=1+χ₁(u)** → χ₁(u)=χ(u)−1。hdeg: χ₁(1)=χ(1)−1。
+4. 代入 + 分母払い (χ₁(1),χ(1)≠0 = degree ≥1) → `(χ(u)−χ(1))²=0` → χ(u)=χ(1)。
+   → 全 involution v: χ(v)=χ(u)=χ(1) (v~u 共役 + χ class fn) → v∈ker χ。χ 非線形 (χ(1)=χ₁(1)+1≥2)。
+- **endgame** (純群論、Gorenstein p.376-377): M=⟨involutions⟩⊴G、Q=S∩M cyclic (さもなくば非線形
+  指標が線形化し矛盾) → Burnside 2-補群 L⊴G → KQ⊴G (K=O_{2'}) → Ḡ=G/K で Ω₁(Q̄)=Z(Ḡ) 位数 2。□
+
+<details><summary>Lem 1.8 導出経路 (完成前の計画記録)</summary>
 
 **核心洞察**: Gorenstein は per-element β(y) を使うが、`classSumCoeff` (= 共役類 Cs 全体で和を
 取った版、`ClassSumCongruence.lean` 定義 = #{(u,v): u,v∈K, uv∈Cs}) で書き換えると per-element β
@@ -282,12 +306,7 @@ Gorenstein Lem 1.7 の**純群論核心**を完成 (axiom-clean、AxiomsCheck �
 ⚠ step 4 の Σ_Cs ↔ Σ_{y∈G} 変換 (class 和) と ⟨θ*,χ⟩ 抽出が最難所。既存の column/row 直交
 API (`ColumnOrthogonality.lean`) と inner product 定義の接続を精査してから着手。
 
-### Lem 1.9 + endgame 計画 (Gorenstein Ch.12 p.376-377)
-
-- **Lem 1.9**: χ₁(u)=χ(u)−1, χ₁(1)=χ(1)−1 (Lem 1.5/1.6) 代入 → `(χ(u)−χ(1))²=0` → χ(u)=χ(1)
-  → 全 involution ⊆ ker χ、χ 非線形 (χ(1)=1+χ₁(1)≥2)。純代数 (分母払い + omega/ring)。
-- **endgame** (純群論): M=⟨involutions⟩⊴G、Q=S∩M cyclic (さもなくば非線形指標が線形化し矛盾)
-  → Burnside 2-補群 L⊴G → KQ⊴G (K=O_{2'}) → Ḡ=G/K で Ω₁(Q̄)=Z(Ḡ) 位数 2。□
+</details>
 
 ### Lem 1.4 計画 (2026-07-22 lane c、⚠ 下記 infra は grep 発見のみ・API 未精査)
 
