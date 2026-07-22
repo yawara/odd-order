@@ -6,6 +6,16 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-22 17:22 監視 tick (Opus 4.8 hub, cron `7,22,37,52`)**。a=2 (再開・stall 解消) / b=4 / c=6。
+> 合流: a (1054 (6) ssetOf_sder_coherent_of_xset_qder_union / 新 leaf FeitSibleyMain) / b (2053 step (8)
+> (B) 完了 + (C)(D) assembly frontier) / c (9318 SM-setup 完成 + Q cyclic 論法部品 / 新 leaf
+> BrauerSuzukiEndgame)。新 leaf 2本とも OddOrder.lean 配線済 (root closure OK)。**gate: green 4639 jobs
+> (4637+2=新 leaf 2) / AxiomsCheck OK (12457<12600) / sorry 8→8 / 新 axiom なし**。
+> **lint 改善 220→216**: lane a が前 tick で hub が flag した FeitSibleyConclusion 債務
+> (longLine 1 + unusedFintypeInType 3) を (6) 仕上げで自己解消 → baseline を規約どおり下げた
+> (commit 別 chore)。push 2f41a2dff→b9b3171b9。frontier: a = 1054 step (4)/(6) / b = 2053 step (8)
+> (C)(D) assembly / c = 9318 BS 矛盾組立 (Q cyclic)。
+>
 > **▶▶ 2026-07-22 17:07 監視 tick (Opus 4.8 hub, cron `7,22,37,52`)**。a=0 (37 分無 commit —
 > 1054 step (4) master assembly 進行中とみて継続監視、stall 未確定) / b=2 / c=3。合流: b (2053 step (8)
 > σ_w RingEquiv packaging + model equivariance qEquiv intertwines D-conj & dAut / StepEight・AxiomsCheck) /
