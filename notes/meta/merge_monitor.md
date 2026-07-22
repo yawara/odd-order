@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 06:2x 監視 tick — a (1D.12 docs) + b (Higman L13 Φ² 内部交換子) 合流 / 🔴 c stall 継続 (~3h20m)**。a=3(docs) / b=1 / c=0 / d=0(WIP foo)。
+> 合流: a (**docs-only** — Isaacs 1D.12 McKay-count 再調査: mathlib に Frobenius count ショートカット無しを確定 + 核心機構をコンパイル検証、`issues/1055` +21。Lean 未変更ゆえ build 影響なし) / b (**Higman Lemma 13** Φ/Φ² から Φ² への内部交換子を構成、新 leaf `FrattiniSquareCommutators.lean` +503 WIRED)。
+> **gate: green 4666 jobs (前 4665 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 7a94a33d3→61d9441f3**。範囲逸脱なし。
+> ℹ **a は 1D.12 (McKay counting) が難所** — mathlib ショートカット無しを確定し核心機構を検証中 (docs 段階)。深い frontier ゆえ数反復かかるのは正常 (CLAUDE.md「難所を回避しない」)。b は次 leaf `FrattiniSquareCommutatorEquivariance` を WIP。
+> 🔴 **lane c stall 継続 (~3h20m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動待ち (または退役指示待ち)。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
 > **▶▶ 2026-07-23 06:0x 監視 tick — a (1D.11) + b (Higman L13 graded 交換子) 合流 / 🔴 c stall 継続 (~3h)**。a=3 / b=2 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problem 1D.11** — abelian 部分群の位数を n で抑えると |G| ∣ n!、`ProblemsFrobeniusFrattini.lean` +53; 1D.12 McKay-count plan も確定) / b (**Higman Lemma 13** 交差交換子を共通 Φ/Φ² へ降ろす + middle 交換子の actor 共変性、新 leaf `FrattiniGradedCommutators.lean` +299 / `FrattiniGradedCommutatorEquivariance.lean` +184、両 WIRED)。
 > **gate: green 4665 jobs (前 4663 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push cafe5bd17→ab44d49d5**。範囲逸脱なし。
