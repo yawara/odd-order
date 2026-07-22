@@ -219,7 +219,14 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   `pow_mem_frattini` で exponent p、`commutator_le_frattini`+`commutator_eq_bot_iff` (=`IsMulCommutative`)
   で可換。⚠ 元の交換子 `⁅a,b⁆` の `Bracket P P` は **scoped instance** (`commutatorElement`) ゆえ自分で
   書くと未合成 → `commutator_eq_bot_iff` 経由で回避。→ **1D.9 完了**。
-- ⬜ **残り §1D**: 1D.5 (intricate) / 1D.10 (max abelian normal `A=C_P(A)`) /
+- ✅ 実証明 **1D.10 (前半)** `centralizer_eq_self_of_maximal_abelian_normal` (p-群の極大可換正規部分群 `A`
+  は `C_P(A)=A`)。`A≤C_P(A)` は可換ゆえ自明。`A<C_P(A)` なら **Lemma 1.23** (`IsPGroup.exists_normal_index_eq_prime`,
+  repo `Ch01_Sylow/Basic.lean`) で `A<L≤C_P(A)`, `|L:A|=p`, `L◁P` を得、`L⊆C_P(A)` で `A⊆Z(L)`、
+  `L/A` 位数 p 巡回で `L` 可換 (`isMulCommutative_of_isCyclic_of_ker_le_center`) — 極大性に矛盾。
+  ⚠ `Subgroup.le_centralizer` は H explicit / repo 補題は `OddOrder.Isaacs.Ch01.IsPGroup.*` で dot notation
+  不発 (`_root_.IsPGroup` を見る) → 明示適用 + `import Basic`。**残: 1D.10 後半 (`|P:A| ∣ (|A|-1)!`、
+  P の A∖{1} への共役作用が忠実、kernel=C_P(A)=A で `P/A ↪ S_{|A|-1}`)**。
+- ⬜ **残り §1D**: 1D.5 (intricate) / 1D.10 後半 (`|P:A|∣(|A|-1)!`) /
   1D.11 (`|G| ∣ n!`) / 1D.12 (位数 p 元数 `≡-1 mod p`) / 1D.15 の一般 `N` 版。多くは meaty。
   ⚠ namespace 罠: `Subgroup.isNilpotent_of_ker_le_center` (Subgroup 内)、`closure_le` は
   module system で露出せず → `mem_closure_singleton`+`zpow_mem` で回避。
