@@ -160,6 +160,71 @@ theorem exists_normal_two_complement :
     have := hcompl.sup_eq_top
     rwa [hPX] at this⟩
 
+/-! ### `H` as a subgroup of `G`, and Lemma 1.2 (ii): `C = XH` -/
+
+/-- **`H`** (Gorenstein Lemma 1.2): the normal `2`-complement of `C`, as a subgroup of
+`G`.  Its membership predicate is canonical — "lies in `C` and has odd order"
+(`mem_H_iff`) — so nothing depends on the choice of Burnside complement. -/
+noncomputable def H : Subgroup G :=
+  Q.exists_normal_two_complement.choose.map Q.C.subtype
+
+/-- `H = {g ∈ C ∣ orderOf g is odd}`. -/
+theorem mem_H_iff {g : G} : g ∈ Q.H ↔ g ∈ Q.C ∧ Odd (orderOf g) := by
+  obtain ⟨-, -, hmem, -⟩ := Q.exists_normal_two_complement.choose_spec
+  constructor
+  · rintro ⟨c, hc, rfl⟩
+    refine ⟨c.2, ?_⟩
+    have := (hmem c).mp hc
+    rwa [← orderOf_injective Q.C.subtype Q.C.subtype_injective c] at this
+  · rintro ⟨hgC, hgO⟩
+    refine ⟨⟨g, hgC⟩, (hmem _).mpr ?_, rfl⟩
+    have h1 : orderOf g = orderOf (⟨g, hgC⟩ : ↥Q.C) :=
+      orderOf_injective Q.C.subtype Q.C.subtype_injective ⟨g, hgC⟩
+    rwa [h1] at hgO
+
+theorem H_le_C : Q.H ≤ Q.C := fun _ hg => (Q.mem_H_iff.mp hg).1
+
+/-- `|H|` is odd. -/
+theorem two_not_dvd_card_H : ¬ 2 ∣ Nat.card Q.H := by
+  obtain ⟨-, hodd, -, -⟩ := Q.exists_normal_two_complement.choose_spec
+  rwa [show Nat.card Q.H = Nat.card Q.exists_normal_two_complement.choose from
+    Nat.card_congr (Subgroup.equivMapOfInjective _ _ Q.C.subtype_injective).symm.toEquiv]
+
+/-- Elements of `N` conjugate `C` into `C` (`C ⊴ N`, elementwise form). -/
+theorem conj_mem_C_of_mem_N {n c : G} (hn : n ∈ Q.N) (hc : c ∈ Q.C) :
+    n * c * n⁻¹ ∈ Q.C := by
+  rw [C, mem_centralizer_iff] at hc ⊢
+  intro t ht
+  rw [N] at hn
+  have ht' : n⁻¹ * t * n ∈ Q.T := by
+    refine (Subgroup.mem_normalizer_iff.mp hn (n⁻¹ * t * n)).mpr ?_
+    rwa [show n * (n⁻¹ * t * n) * n⁻¹ = t from by group]
+  have h := hc _ ht'
+  calc t * (n * c * n⁻¹) = n * (n⁻¹ * t * n * c) * n⁻¹ := by group
+    _ = n * (c * (n⁻¹ * t * n)) * n⁻¹ := by rw [h]
+    _ = n * c * n⁻¹ * t := by group
+
+/-- **`H ⊴ N`, elementwise form** (Gorenstein Lemma 1.2(i)): conjugation by `N`
+preserves membership in `C` and the order, hence preserves `H`. -/
+theorem conj_mem_H_of_mem_N {n h : G} (hn : n ∈ Q.N) (hh : h ∈ Q.H) :
+    n * h * n⁻¹ ∈ Q.H := by
+  obtain ⟨hhC, hhO⟩ := Q.mem_H_iff.mp hh
+  refine Q.mem_H_iff.mpr ⟨Q.conj_mem_C_of_mem_N hn hhC, ?_⟩
+  have h1 : orderOf ((MulAut.conj n) h) = orderOf h :=
+    orderOf_injective (MulAut.conj n).toMonoidHom (MulAut.conj n).injective h
+  rwa [show n * h * n⁻¹ = (MulAut.conj n) h from rfl, h1]
+
+/-- **Gorenstein Lemma 1.2 (ii): `C = XH`** (join form). -/
+theorem X_sup_H_eq_C : Q.X ⊔ Q.H = Q.C := by
+  obtain ⟨-, -, -, hsup⟩ := Q.exists_normal_two_complement.choose_spec
+  have h := congrArg (Subgroup.map Q.C.subtype) hsup
+  have htop : Subgroup.map Q.C.subtype ⊤ = Q.C := by
+    rw [← MonoidHom.range_eq_map]
+    exact Q.C.range_subtype
+  rw [Subgroup.map_sup, subgroupOf_map_subtype, inf_of_le_left Q.X_le_C, htop] at h
+  rw [sup_comm]
+  exact h
+
 end QuaternionSylowSetup
 
 end OddOrder.GroupTheory
