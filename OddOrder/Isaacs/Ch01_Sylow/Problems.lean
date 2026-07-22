@@ -835,6 +835,14 @@ theorem oPiCore_eq_iInf_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Fin
   `OddOrder/Isaacs/Ch03_SplitExtensions/Theorem315.lean` で示されている。この一意最大性から
   `O_π(G)` は characteristic (Isaacs の Note)。1B.7(b) = `oPiCore_le_of_isHallSubgroup`、
   1B.7(c) = `oPiCore_eq_iInf_isHallSubgroup` (上に実証明)。
+
+- **Problem 1B.8(a)** (`O^π(G)` = π-剰余 = `G/N` が π-群となる最小の正規部分群): 本リポジトリの
+  `OddOrder.Isaacs.Ch03.oPiResidual π G` (= `sInf {N | N◁G ∧ G/N が π-群}`、
+  `OddOrder/Isaacs/Ch03_SplitExtensions/PiResidual.lean`) が、有限群で `G/O^π(G)` が π-群
+  (`isPiGroup_quotient_oPiResidual`) かつ `G/N` を π-群にする任意の正規 `N` に含まれる
+  (`oPiResidual_le_of_isPiGroup_quotient`)、すなわち最小 (一意 = `oPiResidual_eq_...minimal`)。
+  Ch09 の `pResidual` (= `O^p`) の π 一般化。**1B.8(b)** (`O^π(G)` は位数が π-数でない元で生成
+  される) は未 (別途)。
 -/
 
 end
