@@ -7,6 +7,7 @@ import Lean.Elab.Command
 import Lean.Util.CollectAxioms
 import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Mathlib.QuotientGroup
@@ -12148,3 +12149,11 @@ deliberately NOT asserted here.) -/
   OddOrder.Peterfalvi.Appendices.NearFields.exceptionalTwistData_not_comm
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.NearFields.exceptionalNearField_not_commutative
+
+/-! **Brauer–Suzuki theorem, cyclic case** (`GroupTheory.BrauerSuzuki`, issue 9318,
+2026-07-22).  `brauerSuzuki_of_isCyclic_sylowTwo` — cyclic Sylow `2`-subgroup + 対合
+`u` で `O_{2'}(G) ⊔ C_G(u) = ⊤` (= `G = O_{2'}(G)·C_G(u)`)。involution の存在から
+`|G|` は偶数で `2` が最小素因子、mathlib Burnside (`IsCyclic.isComplement'`) が正規
+2-補群 `K` を与え、`K ≤ O_{2'}`、`u` を含む Sylow `S'` は可換で `S' ≤ C_G(u)`。
+残る quaternion case (Gorenstein Ch.12) が issue 9318 の本体。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.brauerSuzuki_of_isCyclic_sylowTwo
