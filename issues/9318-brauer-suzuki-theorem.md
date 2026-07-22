@@ -251,6 +251,9 @@ Gorenstein Lem 1.7 の**純群論核心**を完成 (axiom-clean、AxiomsCheck �
 - **`odd_orderOf_mul_of_involution`**: involution 積 u·v は奇数位数。もし偶数 2s なら z'=(uv)ˢ が
   involution で u,v が反転・中心化 (`SemiconjBy.pow_right`) → `commute_involution_eq` で u=v=z'
   → uv=z'²=1、偶数位数 ≥2 と矛盾。**= β(y)=0 for even order y** (involution 対は偶数位数元を作らない)。
+- **`exists_conj_eq_z`** (任意 involution は z に共役) + **`isConj_of_orderOf_eq_two`** (全
+  involution は互いに共役 = **G は単一 involution 共役類 K**)。Sylow 部分は helper
+  `exists_conj_subgroupLe_S` に factor して 3 補題で共有。→ Lem 1.8 の (9.4.2) で Ci=Cj=K の入力。
 - setup 確認済: `QuaternionSylowSetup` は `S : Sylow 2 G` を posit ゆえ全 Sylow-2 が S 共役で
   unique involution。原文の「z 個別 Klein-four」議論より `commute_involution_eq` 汎用形が簡潔だった。
 
