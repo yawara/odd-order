@@ -8501,6 +8501,19 @@ commutator whose Frobenius weight satisfies `λ^(2^i) μ^(2^j) = ν^(2^k)`.  Wit
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.higmanLemmaTwelve
 
+/-! **Higman Lemma 13 and Theorem 1**: the `ξ`-length bound excludes chains
+of length at least four; the center chain then dispatches every Suzuki
+`2`-group to one of the honest type-`A`/`B`/`C`/`D` models. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.higmanLemmaThirteen
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.higmanClassification
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.higmanClassification_of_isSuzuki2Group
+
 /-! **Peterfalvi Appendix III, Theorem (e), recognition half**: a summand
 isomorphism of any invariant two-summand split of `P ⧸ Z(P)` forces
 Frobenius-conjugate factor eigenvalues, which kills the type-C and type-D
