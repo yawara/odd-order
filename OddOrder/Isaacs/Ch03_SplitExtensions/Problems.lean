@@ -8,6 +8,7 @@ import Mathlib.Tactic.Group
 import Mathlib.Data.ZMod.Basic
 import Mathlib.Algebra.Group.End
 import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.Tactic.LinearCombination
 
 /-!
 # Isaacs Chapter 3 — Problems §3A (Split Extensions)
@@ -335,6 +336,87 @@ def semidihedralOrderFlip (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
     refine Subtype.ext ?_
     change (q.1 * Multiplicative.ofAdd (-1)) * Multiplicative.ofAdd 1 = q.1
     rw [mul_assoc, ← ofAdd_add, neg_add_cancel, ofAdd_zero, mul_one]
+
+/-! ### Problem 3A.1(c) — `S - C` の位数 2・位数 4 の元はそれぞれ単一共役類
+
+`refl x` を `inl y` (= `(y, 1)`) で共役すると `refl (y·x·σ(y⁻¹))` になり、加法的には `toAdd x` が
+`(2 - z)·toAdd y` だけシフトする (`z = n/2`)。`u = 1 + n/4` は `(2-z)·u = 2` を満たすので、シフト集合は
+`ℤ/n` の偶元全体。位数 2 (resp 4) の元 = `x` 偶 (resp 奇) ゆえ、差 (偶) は必ずシフトで実現でき、
+互いに共役 = 単一共役類。 -/
+
+/-- reflection `(x,σ)` を `inl y = (y,1)` で共役すると `(y·x·σ(y⁻¹), σ)`。 -/
+theorem semidihedralReflection_conj (n : ℕ) (hn : 8 ∣ n) (x y : Multiplicative (ZMod n)) :
+    SemidirectProduct.inl y * semidihedralReflection n hn x * (SemidirectProduct.inl y)⁻¹
+      = semidihedralReflection n hn (y * x * semidihedralMulAut n hn y⁻¹) := by
+  rw [← map_inv SemidirectProduct.inl]
+  refine SemidirectProduct.ext ?_ ?_
+  · simp only [semidihedralReflection, SemidirectProduct.mul_left, SemidirectProduct.left_inl]
+    rfl
+  · simp only [semidihedralReflection, SemidirectProduct.mul_right, SemidirectProduct.right_inl,
+      mul_one, one_mul]
+
+/-- `(2-z)·(·)` (共役シフト) は偶元全体を覆う: `z·d = 0` (d 偶) なら `∃ t, (2-z)·t = d`。
+`u = 1 + n/4` が `(2-z)·u = 2` (`(2-4k)(1+2k) = 2 - 8k² ≡ 2`) ゆえ、`d = 2s` に対し `t = u·s`。 -/
+theorem semidihedral_shift_surj (n : ℕ) [NeZero n] (hn : 8 ∣ n) {d : ZMod n}
+    (hd : ((n / 2 : ℕ) : ZMod n) * d = 0) :
+    ∃ t : ZMod n, (2 - ((n / 2 : ℕ) : ZMod n)) * t = d := by
+  obtain ⟨k, rfl⟩ := hn
+  have hk : 0 < k := by have := NeZero.ne (8 * k); omega
+  have d2 : 8 * k / 2 = 4 * k := by omega
+  rw [d2] at hd ⊢
+  have hu : ((2 : ZMod (8 * k)) - ((4 * k : ℕ) : ZMod (8 * k))) * ((1 + 2 * k : ℕ) : ZMod (8 * k))
+      = 2 := by
+    have h8k : (8 : ZMod (8 * k)) * (k : ZMod (8 * k)) = 0 := by
+      have hh : ((8 * k : ℕ) : ZMod (8 * k)) = 0 := ZMod.natCast_self _
+      push_cast at hh; linear_combination hh
+    push_cast
+    linear_combination (-(k : ZMod (8 * k))) * h8k
+  have hs : ∃ s : ZMod (8 * k), d = 2 * s := by
+    have hdv : 2 ∣ d.val := by
+      have h0 : ((4 * k * d.val : ℕ) : ZMod (8 * k)) = 0 := by
+        rw [Nat.cast_mul, ZMod.natCast_zmod_val]; exact hd
+      rw [ZMod.natCast_eq_zero_iff] at h0
+      have h1 : 4 * k * 2 ∣ 4 * k * d.val := by rw [show 4 * k * 2 = 8 * k by ring]; exact h0
+      rwa [Nat.mul_dvd_mul_iff_left (show 0 < 4 * k by omega)] at h1
+    obtain ⟨j, hj⟩ := hdv
+    exact ⟨(j : ZMod (8 * k)), by rw [← ZMod.natCast_zmod_val d, hj]; push_cast; ring⟩
+  obtain ⟨s, rfl⟩ := hs
+  exact ⟨((1 + 2 * k : ℕ) : ZMod (8 * k)) * s, by rw [← mul_assoc, hu]⟩
+
+/-- 差 `z·(toAdd x' - toAdd x) = 0` なら `refl x` と `refl x'` は共役 (共役子 `inl (ofAdd t)`)。 -/
+theorem semidihedralReflection_isConj (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    {x x' : Multiplicative (ZMod n)}
+    (hxx' : ((n / 2 : ℕ) : ZMod n) * (Multiplicative.toAdd x' - Multiplicative.toAdd x) = 0) :
+    IsConj (semidihedralReflection n hn x) (semidihedralReflection n hn x') := by
+  obtain ⟨t, ht⟩ := semidihedral_shift_surj n hn hxx'
+  rw [isConj_iff]
+  refine ⟨SemidirectProduct.inl (Multiplicative.ofAdd t), ?_⟩
+  rw [semidihedralReflection_conj]
+  congr 1
+  apply Multiplicative.toAdd.injective
+  simp only [toAdd_mul, semidihedralMulAut_apply, toAdd_ofAdd, toAdd_inv]
+  linear_combination ht
+
+/-- **Isaacs Problem 3A.1(c)** (位数 2 は単一共役類). `S - C` の位数 2 の元 (x 偶) は互いに共役。 -/
+theorem semidihedralReflection_isConj_of_two (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    {x x' : Multiplicative (ZMod n)}
+    (hx : ((n / 2 : ℕ) : ZMod n) * Multiplicative.toAdd x = 0)
+    (hx' : ((n / 2 : ℕ) : ZMod n) * Multiplicative.toAdd x' = 0) :
+    IsConj (semidihedralReflection n hn x) (semidihedralReflection n hn x') :=
+  semidihedralReflection_isConj n hn (by rw [mul_sub, hx', hx, sub_zero])
+
+/-- **Isaacs Problem 3A.1(c)** (位数 4 は単一共役類). `S - C` の位数 4 の元 (x 奇) は互いに共役。 -/
+theorem semidihedralReflection_isConj_of_four (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    {x x' : Multiplicative (ZMod n)}
+    (hx : ((n / 2 : ℕ) : ZMod n) * Multiplicative.toAdd x ≠ 0)
+    (hx' : ((n / 2 : ℕ) : ZMod n) * Multiplicative.toAdd x' ≠ 0) :
+    IsConj (semidihedralReflection n hn x) (semidihedralReflection n hn x') := by
+  apply semidihedralReflection_isConj n hn
+  have e1 := (semidihedral_invol_mul_dichotomy n (dvd_trans (by norm_num) hn)
+    (Multiplicative.toAdd x)).resolve_left hx
+  have e2 := (semidihedral_invol_mul_dichotomy n (dvd_trans (by norm_num) hn)
+    (Multiplicative.toAdd x')).resolve_left hx'
+  rw [mul_sub, e2, e1, sub_self]
 
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,

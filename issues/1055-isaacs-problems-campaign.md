@@ -344,7 +344,13 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
   `_ne_one`/`_sq_eq_one_iff`。位数特徴づけ `_orderOf_eq_two_iff` (⟺`z·x=0`=偶)・`_eq_four_iff`
   (⟺`z·x≠0`=奇、`orderOf_eq_prime_pow`)・`_two_or_four`。半々: `semidihedral_invol_mul_dichotomy`
   (`z·a∈{0,z}`、induction) + `_invol_ne_zero` + **`semidihedralOrderFlip`** (位数2集合 ≃ 位数4集合、
-  parity flip `x↦x·ofAdd 1`)。全実証明・sorry 無・axiom-clean。⚠ (c) (共役類) は未着手 (defer)。
+  parity flip `x↦x·ofAdd 1`)。全実証明・sorry 無・axiom-clean。
+- ✅ 実証明 **3A.1(c)** 位数 2・位数 4 の元はそれぞれ単一共役類 (2026-07-23)。`_conj`: `inl y` で
+  reflection を共役すると `refl(y·x·σ(y⁻¹))` (加法的に `toAdd x` が `(2-z)·toAdd y` シフト)。
+  `semidihedral_shift_surj`: `z·d=0` (d 偶) なら `∃t, (2-z)·t=d` (`u=1+n/4` が `(2-z)·u=2` ∵
+  `(2-4k)(1+2k)=2-8k²≡2`、d=2s→t=u·s)。`_isConj` (差が偶なら共役) + 系 `_isConj_of_two` (両偶)
+  ・`_isConj_of_four` (両奇、dichotomy で `z·x=z` 確定)。全実証明・sorry 無・axiom-clean。
+  **3A.1 完全完成 (a/b/c)**。
 - ✅ 実証明 **3A.5** `semidirectConjEquivProd` (`G ⋊ G ≅ G × G`、共役作用の半直積は直積)。同型
   `(n,g)↦(n·g,g)` (逆 `(a,g)↦⟨a·g⁻¹,g⟩`)、map_mul' は `mul_left`/`mul_right`/`conj_apply` 展開 + `group`。
 - ⬜ 残り §3A (いずれも substantial ~50-60 行): **3A.6** (p-群 P が p∤|G| の G に faithful ⟹ ある
