@@ -6,6 +6,10 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-24 01:1x 監視 tick (B 単独) — b (Higman aligned+all-isomorphic parameter branches close 7 leaf) 合流**。b=8。
+> 合流 b (**Higman L13 exponent-two 分岐を集中 close**): three-term graph factor lift / all-isomorphic ambient bracket 消去 / first aligned parameter branch close / graph eigen seed→contradiction / all-isomorphic graph preimage 組立 / aligned parameter branches 全 close / all-isomorphic parameter branch close。7 新 leaf (ThreeTermGraphPreimage / AllIsomorphicAmbientCancellation / FirstAlignedParameterBranch / AllIsomorphicInvariantContradiction / AllIsomorphicGraphPreimage / AlignedParameterBranches / AllIsomorphicParameterBranch) 全 WIRED。既存 PairwiseJoinInfrastructure 更新。
+> **gate: green 4639 jobs (前 4632 +7 = b の 7 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push 4e8ab2d3e→33f645926**。範囲逸脱なし。build wall 1:29。
+>
 > **▶▶ 2026-07-24 00:4x 監視 tick (B 単独) — b (Higman three-factor coordination・aligned graph contradiction 6 leaf) 合流**。b=8。
 > 合流 b (**Higman L13 exponent-two**): 3 exponent-two factor を coordinate / aligned graph contradiction を閉じる / all-isomorphic bracket support 消去 / pairwise join infrastructure package / coherent parameter case 分岐 / three-term graph geometry 証明。6 新 leaf (ThreePairCoordinates / AlignedGraphContradiction / AllIsomorphicSupportCancellation / PairwiseJoinInfrastructure / ThreeParameterBranching / GraphOverTargetAxisGeometry) 全 WIRED。
 > **gate: green 4632 jobs (前 4626 +6 = b の 6 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push 47a17b6d7→c5d929a6c**。範囲逸脱なし。build wall 1:35。
