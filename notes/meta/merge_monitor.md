@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 09:2x 監視 tick — b (Higman L13 cross commutator 包含 ×4 leaf) 合流 / a WIP / 🔴 c stall / d quiet**。a=0(WIP) / b=4 / c=0 / d=0(WIP foo)。
+> 合流: b (**Higman Lemma 13** factor span を cross commutator 包含へ降ろす + B/B 対角 bracket を Jacobi 消去 + eigenfamily span を cross inclusion へ束ね + canonical factor family 全 span 露出、新 leaf `FrattiniMiddleDiagonalZero.lean`+177 / `RestrictedFactorCanonicalAmbientFamily.lean`+181 / `RestrictedFactorCrossCommutatorInclusion.lean`+193 / `TypeBEigenfamilyCrossCommutator.lean`+159、4 枚とも WIRED (auto-check))。a は次 Problem を WIP。
+> **gate: green 4691 jobs (前 4687 +4 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 3327209b8→91368d1d3**。範囲逸脱なし。
+> 🔴 **lane c stall (~6h15m) / ℹ lane d quiet (~6h45m, 非 escalation)**。a/b で監視継続。⚠ Edit ツール hook が前 tick からタイムアウト継続 — tick note は Bash(Python) 挿入で代替中 (成果物影響なし)。
+>
 > **▶▶ 2026-07-23 09:0x 監視 tick — a (3A.1b) + b (Higman L13 span 移送 + 9322 close) 合流 / 🔴 c stall / d quiet**。a=2 / b=3 / c=0 / d=0(WIP foo)。
 > 合流: a (**Isaacs Problem 3A.1b** — semidihedral 群内の位数分布 (位数 2 か 4、半々)、`Ch03_SplitExtensions/Problems.lean` +205、file 355 行で watch 外) / b (**Higman Lemma 13** restricted subgroup 全体を factor span へ移送 + type-B 固有軸 bracket 非零化、新 leaf `RestrictedFactorAmbientSpan.lean` +151 / `RestrictedFactorTypeBSquareEigenNonzero.lean` +347、両 WIRED (auto-check) + 9322 closed/ へ)。
 > **gate: green 4687 jobs (前 4685 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push f76035c63→da6c72049**。範囲逸脱なし。
