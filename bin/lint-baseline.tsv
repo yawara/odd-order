@@ -1,33 +1,21 @@
 # bin/lint-baseline.tsv — lint 警告 ratchet の基準 (issue 0138)
 # `count<TAB>relpath<TAB>category`。cleanup wave のたびに --update-baseline で更新。
 # 目標: 全行が消え baseline が空 → --strict のゼロ gate へ移行。
-# 総数: 190 件 / 58 (file,category) 組
+# 総数: 153 件 / 45 (file,category) 組
 #
 67	OddOrder/BG/AppE_FiliformGroup.lean	flexible
-10	OddOrder/Peterfalvi/Appendices/NearFields.lean	style.show
 8	OddOrder/BG/AppE_FiliformGroup.lean	style.show
-7	OddOrder/Peterfalvi/Appendices/NearFields.lean	style.longLine
 6	OddOrder/BG/AppE_FiliformCounterexample.lean	flexible
 6	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/XiLengthFromCard.lean	style.show
 5	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/CaseSplitBCD.lean	unusedSectionVars
 5	OddOrder/Peterfalvi/Appendices/Suzuki/WCyclicDivides.lean	style.show
-4	OddOrder/BG/AppE_ExponentP.lean	style.show
-4	OddOrder/BG/Ch4_FamilyOfMaximal/S15_MF/OpicoreCentralizer.lean	style.longLine
 4	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/AmbientProductCoordinate.lean	style.show
 4	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/CaseDispatch.lean	style.show
 4	OddOrder/Peterfalvi/Appendices/FeitSibleyQ1Component.lean	style.show
 4	OddOrder/Peterfalvi/Appendices/Suzuki/FirstCase/StepOne.lean	style.show
 3	OddOrder/Peterfalvi/Appendices/FeitSibley.lean	unusedFintypeInType
 3	OddOrder/Peterfalvi/Appendices/Suzuki/FirstCase/FieldAction.lean	style.show
-2	OddOrder/BG/AppE_EigenvalueCombinatorics.lean	style.longLine
-2	OddOrder/BG/AppE_FurtherResults.lean	style.show
 2	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/MixedEigenweights.lean	style.show
-2	OddOrder/Peterfalvi/Appendices/NearFields.lean	deprecation
-1	OddOrder/BG/AppD_CNGroups/MaximalSylowIntersection.lean	unusedSectionVars
-1	OddOrder/BG/AppE_AbelianCentralizer.lean	style.longLine
-1	OddOrder/BG/AppE_AbelianCentralizer.lean	unusedVariables
-1	OddOrder/BG/AppE_FurtherResults.lean	style.longLine
-1	OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults/TypeBridges.lean	style.longLine
 1	OddOrder/FeitThompsonNuGrid.lean	flexible
 1	OddOrder/GroupTheory/BrauerSuzuki.lean	style.header
 1	OddOrder/GroupTheory/BrauerSuzukiNormalizer.lean	style.header
@@ -41,7 +29,6 @@
 1	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/CaseSplitBCD.lean	unusedVariables
 1	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/XiLengthFromCard.lean	style.longLine
 1	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/XiLengthFromCard.lean	unusedSectionVars
-1	OddOrder/Peterfalvi/Appendices/ExceptionalNearField.lean	style.header
 1	OddOrder/Peterfalvi/Appendices/SemilinearField.lean	style.openClassical
 1	OddOrder/Peterfalvi/Appendices/Suzuki/FirstCase/FieldAction.lean	unnecessarySimpa
 1	OddOrder/Peterfalvi/Appendices/Suzuki/FirstCase/StepThree.lean	style.show
