@@ -941,7 +941,7 @@ theorem sOf_degreeSubfamily_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
     (hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm)
     (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (_htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
     (data : TypesIIIIIIVSetup M) (Y : Subgroup G) (d : ℕ)
     (hKeq : h46.toCore.K = (derivedInG M).subgroupOf M)
