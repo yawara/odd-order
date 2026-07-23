@@ -259,6 +259,152 @@ theorem exists_pairwiseJoinLowerCentralData_of_exponent_two
     involutions_le_frattini := hinvPhiJ
     singer_conj := hconjJ }⟩
 
+/-- Transport the packaged invariant join to the literal subgroup join. -/
+theorem PairwiseJoinLowerCentralData.supInvariant
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)}
+    {R S : Subgroup P}
+    {hPhiEA : IsElementaryAbelian 2 (frattini P)}
+    {n : Nat} {c : Y}
+    {ePhi :
+      letI : IsMulCommutative (frattini P) :=
+        IsMulCommutative.of_comm hPhiEA.comm
+      letI : Module (ZMod 2) (Additive (frattini P)) :=
+        hPhiEA.zmodModule
+      Additive (frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : PairwiseJoinLowerCentralData R S hPhiEA c ePhi nu) :
+    IsAInvariant Y.subtype (R ⊔ S) :=
+  data.join_eq_sup ▸ data.invariant
+
+/-- The Frattini map stored by the bundle, transported to the literal join. -/
+theorem PairwiseJoinLowerCentralData.supFrattiniMap
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)}
+    {R S : Subgroup P}
+    {hPhiEA : IsElementaryAbelian 2 (frattini P)}
+    {n : Nat} {c : Y}
+    {ePhi :
+      letI : IsMulCommutative (frattini P) :=
+        IsMulCommutative.of_comm hPhiEA.comm
+      letI : Module (ZMod 2) (Additive (frattini P)) :=
+        hPhiEA.zmodModule
+      Additive (frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : PairwiseJoinLowerCentralData R S hPhiEA c ePhi nu) :
+    (frattini ↥(R ⊔ S)).map (R ⊔ S).subtype = frattini P :=
+  data.join_eq_sup ▸ data.frattini_map
+
+/-- The lower-central kernel-one fact stored by the bundle, on the literal join. -/
+theorem PairwiseJoinLowerCentralData.supKernelOneEqBot
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)}
+    {R S : Subgroup P}
+    {hPhiEA : IsElementaryAbelian 2 (frattini P)}
+    {n : Nat} {c : Y}
+    {ePhi :
+      letI : IsMulCommutative (frattini P) :=
+        IsMulCommutative.of_comm hPhiEA.comm
+      letI : Module (ZMod 2) (Additive (frattini P)) :=
+        hPhiEA.zmodModule
+      Additive (frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : PairwiseJoinLowerCentralData R S hPhiEA c ePhi nu) :
+    lowerCentralLayerKernel ↥(R ⊔ S) 1 = ⊥ :=
+  data.join_eq_sup ▸ data.kernel_one_eq_bot
+
+/-- The lower-central term-one fact stored by the bundle, on the literal join. -/
+theorem PairwiseJoinLowerCentralData.supTermOneEqFrattini
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)}
+    {R S : Subgroup P}
+    {hPhiEA : IsElementaryAbelian 2 (frattini P)}
+    {n : Nat} {c : Y}
+    {ePhi :
+      letI : IsMulCommutative (frattini P) :=
+        IsMulCommutative.of_comm hPhiEA.comm
+      letI : Module (ZMod 2) (Additive (frattini P)) :=
+        hPhiEA.zmodModule
+      Additive (frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : PairwiseJoinLowerCentralData R S hPhiEA c ePhi nu) :
+    lowerCentralTerm ↥(R ⊔ S) 1 = frattini ↥(R ⊔ S) :=
+  data.join_eq_sup ▸ data.term_one_eq_frattini
+
+/-- The square-containment fact stored by the bundle, on the literal join. -/
+theorem PairwiseJoinLowerCentralData.supSquaresLieInSecond
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)}
+    {R S : Subgroup P}
+    {hPhiEA : IsElementaryAbelian 2 (frattini P)}
+    {n : Nat} {c : Y}
+    {ePhi :
+      letI : IsMulCommutative (frattini P) :=
+        IsMulCommutative.of_comm hPhiEA.comm
+      letI : Module (ZMod 2) (Additive (frattini P)) :=
+        hPhiEA.zmodModule
+      Additive (frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : PairwiseJoinLowerCentralData R S hPhiEA c ePhi nu) :
+    LowerCentralSquaresLieInSecond ↥(R ⊔ S) :=
+  data.join_eq_sup ▸ data.squares_lie_in_second
+
+/-- The first-agemo fact stored by the bundle, on the literal join. -/
+theorem PairwiseJoinLowerCentralData.supAgemoOneEqFrattini
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)}
+    {R S : Subgroup P}
+    {hPhiEA : IsElementaryAbelian 2 (frattini P)}
+    {n : Nat} {c : Y}
+    {ePhi :
+      letI : IsMulCommutative (frattini P) :=
+        IsMulCommutative.of_comm hPhiEA.comm
+      letI : Module (ZMod 2) (Additive (frattini P)) :=
+        hPhiEA.zmodModule
+      Additive (frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : PairwiseJoinLowerCentralData R S hPhiEA c ePhi nu) :
+    Agemo ↥(R ⊔ S) 2 1 = frattini ↥(R ⊔ S) :=
+  data.join_eq_sup ▸ data.agemo_one_eq_frattini
+
+/-- The zeroth-kernel fact stored by the bundle, on the literal join. -/
+theorem PairwiseJoinLowerCentralData.supKernelZeroEqFrattiniSubgroupOf
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)}
+    {R S : Subgroup P}
+    {hPhiEA : IsElementaryAbelian 2 (frattini P)}
+    {n : Nat} {c : Y}
+    {ePhi :
+      letI : IsMulCommutative (frattini P) :=
+        IsMulCommutative.of_comm hPhiEA.comm
+      letI : Module (ZMod 2) (Additive (frattini P)) :=
+        hPhiEA.zmodModule
+      Additive (frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : PairwiseJoinLowerCentralData R S hPhiEA c ePhi nu) :
+    lowerCentralLayerKernel ↥(R ⊔ S) 0 =
+      (frattini ↥(R ⊔ S)).subgroupOf
+        (lowerCentralTerm ↥(R ⊔ S) 0) :=
+  data.join_eq_sup ▸ data.kernel_zero_eq_frattini_subgroupOf
+
+/-- The involution containment stored by the bundle, on the literal join. -/
+theorem PairwiseJoinLowerCentralData.supInvolutionsLeFrattini
+    {P : Type uP} [Group P]
+    {Y : Subgroup (MulAut P)}
+    {R S : Subgroup P}
+    {hPhiEA : IsElementaryAbelian 2 (frattini P)}
+    {n : Nat} {c : Y}
+    {ePhi :
+      letI : IsMulCommutative (frattini P) :=
+        IsMulCommutative.of_comm hPhiEA.comm
+      letI : Module (ZMod 2) (Additive (frattini P)) :=
+        hPhiEA.zmodModule
+      Additive (frattini P) ≃ₗ[ZMod 2] GaloisField 2 n}
+    {nu : GaloisField 2 n}
+    (data : PairwiseJoinLowerCentralData R S hPhiEA c ePhi nu) :
+    involutions ↥(R ⊔ S) ⊆ frattini ↥(R ⊔ S) :=
+  data.join_eq_sup ▸ data.involutions_le_frattini
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
