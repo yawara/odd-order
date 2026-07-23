@@ -272,6 +272,7 @@ theorem isCentral_iff {x : V} : IsCentral x ↔ ∃ t : K, x = t • e5 := by
     funext k
     fin_cases k <;> simp [br, e5]
 
+set_option linter.flexible false in
 theorem isUpperCentral2_iff {x : V} :
     IsUpperCentral2 x ↔ x 0 = 0 ∧ x 1 = 0 ∧ x 2 = 0 ∧ x 3 = 0 := by
   constructor
@@ -313,6 +314,7 @@ theorem T_not_abelian : MemT eB ∧ MemT e2 ∧ br eB e2 ≠ 0 :=
 
 /-! ### Theorem E.3's centralizer hypothesis: `C_L(v) = K·v ⊕ K·e₅` -/
 
+set_option linter.flexible false in
 /-- `C_L(v) = K·v ⊕ K·e₅`: the Lie analogue of Theorem E.3's hypothesis
 `C_R(R₀) = R₀ × R₁` with `R₀ = Exp(K·v)` of order `p` and `R₁ = Exp(K·e₅)` cyclic
 (here of order `p`, sitting in the centre). -/
@@ -414,6 +416,7 @@ theorem beta_iterate_fixed_eq_zero {m : ℕ} (h1 : 1 ≤ m) (h2 : m ≤ 48) {x :
   · exact absurd (sub_eq_zero.mp h) hne
   · exact h
 
+set_option linter.flexible false in
 /-- `α = β⁷` is the scalar `ζ⁷` on the line `K·v`: "A fixes `R₀`" (Theorem E.3).  On the
 whole plane `L₁` it is the scalar `r = ζ⁷` (`ζ⁵⁶ = ζ⁴⁹·ζ⁷ = ζ⁷`), matching BG's `(E.22)`
 — the α-side of BG's argument is *correct*; only the β-side `(E.23)` fails. -/
