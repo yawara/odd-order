@@ -17,10 +17,6 @@
 3	OddOrder/Peterfalvi/Appendices/Suzuki/FirstCase/FieldAction.lean	style.show
 2	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/MixedEigenweights.lean	style.show
 1	OddOrder/FeitThompsonNuGrid.lean	flexible
-1	OddOrder/GroupTheory/BrauerSuzuki.lean	style.header
-1	OddOrder/GroupTheory/BrauerSuzukiNormalizer.lean	style.header
-1	OddOrder/GroupTheory/BrauerSuzukiNormalizer.lean	style.missingEnd
-1	OddOrder/GroupTheory/BrauerSuzukiSetup.lean	style.header
 1	OddOrder/GroupTheory/RepresentationTheory/InflationInduction.lean	style.openClassical
 1	OddOrder/GroupTheory/RepresentationTheory/NonInflatedDegreeSqInterval.lean	style.openClassical
 1	OddOrder/GroupTheory/RepresentationTheory/PrimeTIResidue.lean	unusedFintypeInType
