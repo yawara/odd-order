@@ -421,7 +421,7 @@ theorem alpha_smul_v : β^[7] v = zeta ^ 7 • v := by
   funext i
   rw [beta_iterate_apply]
   change zeta ^ (7 * w i) * v i = zeta ^ 7 * v i
-  fin_cases i <;> simp [v, w] <;> decide
+  fin_cases i <;> simp [v, w]; decide
 
 /-- `β` does **not** fix the line `K·v`: Proposition E.4's hypothesis "B does not fix
 `R₀`".  (`β v = (ζ, ζ⁸, 0, …)` is not proportional to `v = (1, 1, 0, …)` since

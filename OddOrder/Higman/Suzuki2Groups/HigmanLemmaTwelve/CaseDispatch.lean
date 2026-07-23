@@ -528,7 +528,6 @@ theorem mixedTerm_monomial_typeD {n r s : ℕ} (hn : 0 < n)
           exact hi'
         · refine Fin.ext ?_
           refine fin_val_eq_of_zmod_eq (a := r) ?_
-          push_cast
           exact hj'
       · exact absurd ⟨⟨h1, h2⟩, ⟨h3, h4⟩⟩ hexcl
     refine Or.inl ⟨h1, h2, c ⟨3 * r % n, hi0lt⟩ ⟨r % n, hj0lt⟩, ?_,
@@ -552,7 +551,6 @@ theorem mixedTerm_monomial_typeD {n r s : ℕ} (hn : 0 < n)
       · constructor
         · refine Fin.ext ?_
           refine fin_val_eq_of_zmod_eq (a := s) ?_
-          push_cast
           exact hi'
         · refine Fin.ext ?_
           refine fin_val_eq_of_zmod_eq (a := 3 * s) ?_

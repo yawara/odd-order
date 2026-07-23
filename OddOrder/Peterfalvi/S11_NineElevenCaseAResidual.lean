@@ -150,6 +150,7 @@ theorem caseA_sThree_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (fun h => hnr χ₀ hχ₀ h.symm)
 
 set_option maxHeartbeats 1600000 in
+-- (9.11) のノルム評価は FiniteInduce スコープ上の重い展開で既定 heartbeat を超えるため引き上げる
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11.4)–(9.11.8): the norm bound, at §9 level** — the §9 form of
 `S13.nineElevenNormBound_of_sevenEightRefutation`, discharged up to the (9.11.7)–(9.11.8)

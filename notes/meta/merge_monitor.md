@@ -6,6 +6,205 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 09:2x 監視 tick — b (Higman L13 cross commutator 包含 ×4 leaf) 合流 / a WIP / 🔴 c stall / d quiet**。a=0(WIP) / b=4 / c=0 / d=0(WIP foo)。
+> 合流: b (**Higman Lemma 13** factor span を cross commutator 包含へ降ろす + B/B 対角 bracket を Jacobi 消去 + eigenfamily span を cross inclusion へ束ね + canonical factor family 全 span 露出、新 leaf `FrattiniMiddleDiagonalZero.lean`+177 / `RestrictedFactorCanonicalAmbientFamily.lean`+181 / `RestrictedFactorCrossCommutatorInclusion.lean`+193 / `TypeBEigenfamilyCrossCommutator.lean`+159、4 枚とも WIRED (auto-check))。a は次 Problem を WIP。
+> **gate: green 4691 jobs (前 4687 +4 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 3327209b8→91368d1d3**。範囲逸脱なし。
+> 🔴 **lane c stall (~6h15m) / ℹ lane d quiet (~6h45m, 非 escalation)**。a/b で監視継続。⚠ Edit ツール hook が前 tick からタイムアウト継続 — tick note は Bash(Python) 挿入で代替中 (成果物影響なし)。
+>
+> **▶▶ 2026-07-23 09:0x 監視 tick — a (3A.1b) + b (Higman L13 span 移送 + 9322 close) 合流 / 🔴 c stall / d quiet**。a=2 / b=3 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 3A.1b** — semidihedral 群内の位数分布 (位数 2 か 4、半々)、`Ch03_SplitExtensions/Problems.lean` +205、file 355 行で watch 外) / b (**Higman Lemma 13** restricted subgroup 全体を factor span へ移送 + type-B 固有軸 bracket 非零化、新 leaf `RestrictedFactorAmbientSpan.lean` +151 / `RestrictedFactorTypeBSquareEigenNonzero.lean` +347、両 WIRED (auto-check) + 9322 closed/ へ)。
+> **gate: green 4687 jobs (前 4685 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push f76035c63→da6c72049**。範囲逸脱なし。
+> 🔴 **lane c stall (~6h) / ℹ lane d quiet (~6h30m, 非 escalation)**。a/b で監視継続。
+>
+> **▶▶ 2026-07-23 08:5x 監視 tick — b (9322 CommutatorSup 共有化 refactor) 合流 / a WIP / 🔴 c stall / d quiet**。a=0(WIP) / b=2 / c=0 / d=0(WIP foo)。
+> 合流: b (**issue 9322** — `commutator_sup_le_of_le` (commutator-sup modulo normal) を `BG/AppE_EigenvalueCombinatorics.lean` から**共有 leaf `GroupTheory/CommutatorSup.lean` +57 へ抽出** (unowned GroupTheory ゆえ in-scope)、AppE_EigenvalueCombinatorics は CommutatorSup を re-import して consumer (FurtherResults/BetaSupply/PropE4) に透過。同 tick で Higman 新 leaf `FrattiniCrossCommutatorContradiction.lean` も commit)。
+> **gate: green 4685 jobs (前 4683 +2 leaf = CommutatorSup + FrattiniCrossCommutatorContradiction, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 84cc47ea3→702f4a5d6**。範囲逸脱なし。
+> ✅ **cross-file refactor 検証成功**: 上流 GroupTheory leaf 抽出 + BG AppE consumer 3 file の再解決を hub フルビルドが確認 (theorem 移設が re-export 経由で透過、consumer 無破壊)。これが hub 単一フルビルドの存在理由 (merge 特有の下流破綻検出)。auto orphan-check が loop-race の 2 枚目 leaf を自動捕捉。
+> 🔴 **lane c stall (~5h50m) / ℹ lane d quiet (~6h15m, 非 escalation)**。a/b で監視継続。
+>
+> **▶▶ 2026-07-23 08:3x 監視 tick — a (3A.1a semidihedral) + b (Higman L13 diagonal axis) 合流 / 🔴 c stall / d quiet**。a=1 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 3A.1a** — semidihedral の特徴的自己同型: 存在・一意性・位数2、`Ch03_SplitExtensions/Problems.lean` +112) / b (**Higman Lemma 13** diagonal bracket の successor 軸同定 + restricted B の Φ² bracket 非退化性、新 leaf `FrattiniMiddleDiagonalAxis.lean` +223 / `RestrictedFactorTypeBSquareNonzero.lean` +269、両 WIRED (auto-check))。
+> **gate: green 4683 jobs (前 4681 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 60aeb057a→6b7118edd**。範囲逸脱なし。
+> 🔴 **lane c stall (~5h35m) / ℹ lane d quiet (~6h, 非 escalation)**: 両者更新ゼロ継続。a/b の 2 レーンで監視継続。
+>
+> **▶▶ 2026-07-23 08:2x 監視 tick — b (Higman L13 Φ² B/B support) 合流 / a WIP / 🔴 c stall / d quiet**。a=0(WIP) / b=2 / c=0 / d=0(WIP foo)。
+> 合流: b (**Higman Lemma 13** Φ² bracket の B/B support + restricted mixed term を ambient Φ² に同定、新 leaf `FrattiniSquareSupport.lean` +249 / `RestrictedFactorMixedTermBridge.lean` +356、両 WIRED)。a は次 Problem を WIP (issue 1055 doc のみ変更、commit 前)。
+> **gate: green 4681 jobs (前 4679 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 991ddda8c→f8b5027da**。範囲逸脱なし。
+> 🔧 **orphan-check 強化**: 前 tick の loop-race 教訓を受け、merge 後に `git diff --name-status HEAD@{1} HEAD` で**実際に追加された .lean leaf を列挙し各々の import 有無を自動検査**する手順を追加 (今回 2 枚とも WIRED 確認)。jobs delta と二重で担保。
+> 🔴 **lane c stall (~5h20m) / ℹ lane d quiet (~5h40m, 非 escalation)**: 両者更新ゼロ継続。a/b の 2 レーンで監視継続。
+>
+> **▶▶ 2026-07-23 08:0x 監視 tick — a (2A.7/2A.8 + 🆕Ch.3 3A.5) + b (Higman L13 固有weight ×3 leaf) 合流 / 🔴 c stall / d quiet**。a=4 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs 2A.7/2A.8** (S^G minimal normal + distinct simple subnormals commute) + **🆕 Ch.3 (Split Extensions) 開始 3A.5** G⋊G ≅ G×G (conjugation action)、新 leaf `Ch03_SplitExtensions/Problems.lean` +38 WIRED via `OddOrder.lean:184`) / b (**Higman Lemma 13** Φ²値交換子の固有weight + B/B bracket 対角span縮約、新 leaf `FrattiniSquareEigenweights.lean` +339 / `FrattiniMiddleDiagonalSupport.lean` +163 / `FrattiniTripleBaseChangeJacobi.lean`、3 枚とも WIRED)。
+> **gate: green 4679 jobs (前 4675 +4 leaf = a 1 + b 3, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push a8e0f8c6e→42f49b70f**。範囲逸脱なし。
+> ⚠ **orphan-check メモ**: b は 3-dot diff 時点では 2 新 leaf だったが、merge 直前に 3 枚目 `FrattiniTripleBaseChangeJacobi` を commit (loop 中)。hub は merge 後に 3 枚目の配線を追加検証 (HigmanLemmaThirteen:22) → jobs +4 で全 elaborate 確認。**lane が loop 中は merge 時点で新 leaf 数が diff 検査時と変わりうる — jobs 数 delta で最終確認する規律が機能**。
+> 🔴 **lane c stall 継続 (~5h, 未復帰)** / ℹ **lane d quiet (~5h20m, lint 専任ゆえ非 escalation)**: 両者 03:04 / 02:38 以降更新ゼロ。a/b の 2 レーンが活発ゆえ監視継続。
+>
+> **▶▶ 2026-07-23 07:5x 監視 tick — a (2A.2/2A.3b) + b (Higman L13 ambient 固有空間) 合流 / 🔴 c stall 継続 / ℹ d も 5h quiet (非 escalation)**。a=3 / b=1 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problems 2A.2** subnormal K + π-number index ⟹ O^π(G) ⊆ K + **2A.3b** subnormal K + coprime index ⟹ K ⊆ H (2A.1 経由)、`Ch02_Subnormality/Problems.lean` +57) / b (**Higman Lemma 13** restricted factor を ambient 固有空間化、新 leaf `RestrictedFactorAmbientEigenvectors.lean` +233 WIRED)。
+> **gate: green 4675 jobs (前 4674 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 045530eb0→570b3eb5b**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~4h50m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動 or 退役指示待ち。
+> ℹ **lane d も quiet (~5h, 但し escalation しない)**: d の最終 commit は 02:38 の lint wave (218→199)、以降 worktree 更新ゼロ (foo のみ)。ユーザー方針「d は lint-fix 専任・quiet でも escalation しない」ゆえ**報告のみ**。lint backlog は 199 で据え置き (次 wave 待ち)。⚠ もし c/d 両停止が長引くなら hub が lint cleanup wave を代行する選択肢あり (CLAUDE.md「hub の役割 = frozen×機械の cleanup wave」) — 現状は a/b が活発ゆえ保留。
+>
+> **▶▶ 2026-07-23 07:3x 監視 tick — a (2A.1 subnormal π⊆O_π) + b (Higman L13 B/B support) 合流 / 🔴 c stall 継続 (~4h30m)**。a=4 / b=1 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 2A.1** — subnormal π-subgroup ⊆ O_π(G) を char-motive 帰納で実証明、`Ch02_Subnormality/Problems.lean` +53; 2A.3(b) は 2A.1 経由で unblock) / b (**Higman Lemma 13** B/B middle support、新 leaf `FrattiniMiddleSupport.lean` +218 WIRED)。
+> **gate: green 4674 jobs (前 4673 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push fbe2307e5→b472fdfd6**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~4h30m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動 or 退役指示待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 07:2x 監視 tick — a (🆕Ch.2 開始 2A.3a) + b (Higman L13 L₀ 移送) 合流 / 🔴 c stall 継続 (~4h15m)**。a=3 / b=1 / c=0 / d=0(WIP foo)。
+> 合流: a (**🆕 Isaacs Ch.2 (Subnormality) 開始** — Problem 2A.3a: subnormal H + coprime index ⟹ K ⊆ H、新 leaf `Ch02_Subnormality/Problems.lean` +67 WIRED via `OddOrder.lean:181`; docs で 2A.1 帰納 motive も確定。§1D 完 → Ch.2 移行) / b (**Higman Lemma 13** restricted L₀ を ambient layer へ移送、新 leaf `RestrictedLayerZeroTransport.lean` +159 WIRED)。
+> **gate: green 4673 jobs (前 4671 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 4b370d3ab→c9bd6552b**。範囲逸脱なし。a の Ch02 leaf 新設 + OddOrder.lean 配線を同 commit で実施 (orphan 防御遵守)。
+> 🔴 **lane c stall 継続 (~4h15m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動 or 退役指示待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 07:0x 監視 tick — a (1D.15 general N) + b (Higman L13 type-C parameter) 合流 / 🔴 c stall 継続 (~4h)**。a=3 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.15 (general N)** — Φ(G)⊆N◁G かつ N/Φ(G) nilpotent ⟹ N nilpotent、前 tick 発見の二段 Frattini 論法を実証明 +57; docs で §1D **17/18 milestone** + 1D.5 分析 + Ch.2 スコープ整理) / b (**Higman Lemma 13** C factor の sharp parameter + middle bracket 固有 weight、新 leaf `RestrictedFactorTypeCParameter.lean` +325 / `FrattiniMiddleEigenweights.lean` +274、両 WIRED)。
+> **gate: green 4671 jobs (前 4669 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 4ca250a71→b2f96d220**。範囲逸脱なし。
+> ℹ **a の §1D がほぼ完 (17/18)** — 次は Ch.2 (Subnormality) スコープへ移行見込み。1D.5 は closing 論法判明・共役 gap 特定済。
+> 🔴 **lane c stall 継続 (~4h, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動 or 退役指示待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 06:5x 監視 tick — a (1D.15 docs) + b (Higman L13 Jacobi swap) 合流 / 🔴 c stall 継続 (~3h50m)**。a=2 / b=1 / c=0 / d=0(WIP foo)。
+> 合流: a (**docs-only** — Isaacs 1D.15 一般 N 版の正しい非循環証明を発見 (二段 Frattini)、`issues/1055` +10。Lean 未変更ゆえ build 影響なし。WIP で実証明中) / b (**Higman Lemma 13** Φ² 座標で Jacobi swap を証明、新 leaf `FrattiniTripleJacobi.lean` +313 WIRED)。
+> **gate: green 4669 jobs (前 4668 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push b4e0df7b2→457a5cef6**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~3h50m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動 or 退役指示待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 06:3x 監視 tick — a (🎯1D.12 McKay 突破) + b (Higman L13 Φ² triple 交換子) 合流 / 🔴 c stall 継続 (~3h35m)**。a=2 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.12** — #{位数 p の元} + 1 ≡ 0 mod p を **McKay counting で実証明** (+131)。2 tick の難所調査を経て突破、mathlib ショートカット無しを自前で構成) / b (**Higman Lemma 13** Φ² 値 triple commutator + 交換子の actor 共変性、新 leaf `FrattiniTripleCommutators.lean` +296 / `FrattiniSquareCommutatorEquivariance.lean` +199、両 WIRED)。
+> **gate: green 4668 jobs (前 4666 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 8c2e0c9d4→fc5ec579f**。範囲逸脱なし。
+> 🎯 **a の 1D.12 突破 = 難所回避しない実践例**: 06:0x/06:2x の 2 tick で「mathlib に Frobenius count 近道無し」を確定し核心機構を検証 (docs) → 本 tick で McKay 論法を自前構成し実証明。CLAUDE.md「深い frontier なら deep なまま engage」どおり。
+> 🔴 **lane c stall 継続 (~3h35m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動 or 退役指示待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 06:2x 監視 tick — a (1D.12 docs) + b (Higman L13 Φ² 内部交換子) 合流 / 🔴 c stall 継続 (~3h20m)**。a=3(docs) / b=1 / c=0 / d=0(WIP foo)。
+> 合流: a (**docs-only** — Isaacs 1D.12 McKay-count 再調査: mathlib に Frobenius count ショートカット無しを確定 + 核心機構をコンパイル検証、`issues/1055` +21。Lean 未変更ゆえ build 影響なし) / b (**Higman Lemma 13** Φ/Φ² から Φ² への内部交換子を構成、新 leaf `FrattiniSquareCommutators.lean` +503 WIRED)。
+> **gate: green 4666 jobs (前 4665 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 7a94a33d3→61d9441f3**。範囲逸脱なし。
+> ℹ **a は 1D.12 (McKay counting) が難所** — mathlib ショートカット無しを確定し核心機構を検証中 (docs 段階)。深い frontier ゆえ数反復かかるのは正常 (CLAUDE.md「難所を回避しない」)。b は次 leaf `FrattiniSquareCommutatorEquivariance` を WIP。
+> 🔴 **lane c stall 継続 (~3h20m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動待ち (または退役指示待ち)。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 06:0x 監視 tick — a (1D.11) + b (Higman L13 graded 交換子) 合流 / 🔴 c stall 継続 (~3h)**。a=3 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.11** — abelian 部分群の位数を n で抑えると |G| ∣ n!、`ProblemsFrobeniusFrattini.lean` +53; 1D.12 McKay-count plan も確定) / b (**Higman Lemma 13** 交差交換子を共通 Φ/Φ² へ降ろす + middle 交換子の actor 共変性、新 leaf `FrattiniGradedCommutators.lean` +299 / `FrattiniGradedCommutatorEquivariance.lean` +184、両 WIRED)。
+> **gate: green 4665 jobs (前 4663 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push cafe5bd17→ab44d49d5**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~3h, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 05:5x 監視 tick — a (1D.10 counting) + b (Higman L13 Φ/Φ² 座標) 合流 / 🔴 c stall 継続 (~2h50m)**。a=2 / b=1 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.10 (counting)** — A∖{1} 上の faithful action で |P:A| ∣ (|A|-1)!、`ProblemsFrobeniusFrattini.lean` +64) / b (**Higman Lemma 13** 共通 Φ/Φ² 座標を構成、新 leaf `FrattiniMiddleCoordinates.lean` +440 WIRED)。
+> **gate: green 4663 jobs (前 4662 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push b2dcd6f7c→829720fd4**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~2h50m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 05:3x 監視 tick — a (1D.10) + b (Higman L13 正規化) 合流 / 🔴 c stall 継続 (~2h35m)**。a=2 / b=1 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.10 (self-centralizing)** — P の maximal abelian normal A は A = C_P(A)、`ProblemsFrobeniusFrattini.lean` +33) / b (**Higman Lemma 13** restricted factor を Frobenius 正規化、新 leaf `RestrictedFactorNormalForms.lean` +164 WIRED)。
+> **gate: green 4662 jobs (前 4661 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 57efc426e→d0bc6f40d**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~2h35m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 05:2x 監視 tick — a (1D.9 p²分類) + b (Higman L13 + 9321 座標正規化) 合流 / 🔴 c stall 継続 (~2h20m)**。a=2 / b=4 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.9 (order-p² 分類)** — 位数 p² 群は cyclic か elementary abelian、`ProblemsFrobeniusFrattini.lean` +27) / b (**Higman Lemma 13** restricted factor を共通 Φ² 座標化、新 leaf `RestrictedFactorCoordinates.lean` +327 WIRED + **issue 9321 (factor coordinate Frobenius 正規化) を実証明・close** (b band 9300、3 連続 shared-infra: 9319/9320/9321))。
+> **gate: green 4661 jobs (前 4660 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 156c71c2b→b6fa959a3**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~2h20m, 未復帰)**: 03:04 以降 worktree 更新ゼロ。ユーザー再起動待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 05:0x 監視 tick — a (1D.8/1D.9) + b (Higman L13 + 9320 一般化) 合流 / 🔴 c stall 継続 (~2h)**。a=2 / b=4 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problems 1D.8 (elem-abelian part)** P/Φ(P) exponent p + **1D.9** P/Φ(P) cyclic ⟹ P cyclic、`ProblemsFrobeniusFrattini.lean` +69) / b (**Higman Lemma 13** factor Frattini を共通 Φ² 座標へ移送、新 leaf `RestrictedFrattiniCoordinates.lean` +165 WIRED + **issue 9320 (prescribed factor coordinate degree) を一般化・実証明・close** (b band 9300))。
+> **gate: green 4660 jobs (前 4659 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push e264f4a44→93a085add**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~2h, 未復帰)**: 03:04 以降 worktree 更新ゼロが継続 (05:07 時点も activity 0)。ユーザーの c 再起動待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 04:5x 監視 tick — a (1D.15/1D.17) + b (Higman L13 Jacobi) 合流 / 🔴 c stall 継続 (~1h50m)**。a=3 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problems 1D.15 (N=G)** G/Φ(G) nilpotent ⟹ G nilpotent + **1D.17** N◁G nilpotent かつ G/N' nilpotent ⟹ G nilpotent、`ProblemsFrobeniusFrattini.lean` +52) / b (**Higman Lemma 13** 指数4因子の Jacobi 交換関係 + Φ² Singer 座標、新 leaf `ExponentFourJacobi.lean` +247 / `FrattiniSquareCoordinates.lean` +181、両 WIRED via `HigmanLemmaThirteen.lean`)。
+> **gate: green 4659 jobs (前 4657 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 705821625→e03d15c48**。範囲逸脱なし。
+> 🔴 **lane c stall 継続 (~1h50m, 未復帰)**: 03:04 以降 worktree 更新ゼロが継続 (04:52 時点も activity 0)。ユーザーの c 再起動待ち (2 tick 前に escalate 済)。a/b/d 健全ゆえ c 以外の監視は継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 04:3x 監視 tick — a (1D.8 abelian) 合流 / b WIP / 🔴 c stall 継続**。a=1 / b=0(WIP) / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.8 (abelian part)** — nilpotent G で [G,G] ⊆ Φ(G)、`ProblemsFrobeniusFrattini.lean` +22)。
+> **gate: green 4657 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push f4a4090cb→b185c4ade**。範囲逸脱なし。
+> ℹ **b WIP (合流なし)**: b は新 leaf `ExponentFourJacobi.lean` を作成中 + `HigmanLemmaThirteen.lean` 編集中 (未 commit)。次 tick で commit 見込み、配線 (orphan) は merge 前に確認する。
+> 🔴 **lane c stall 継続 (未復帰)**: 04:37 時点も worktree 更新ゼロ (03:04 以降)。ユーザーの c 再起動待ち。a/b/d 健全ゆえ監視継続。d=wave 間。
+>
+> **▶▶ 2026-07-23 04:2x 監視 tick — a (1D.16) + b (9319 graded Jacobi 証明) 合流 / 🔴 c stall 継続**。a=2 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.16** — 正規部分群 N で Φ(N) ⊆ Φ(G)、`ProblemsFrobeniusFrattini.lean` +50) / b (**issue 9319 lower-central graded Jacobi を実証明 + claim close** — `HigmanLowerCentralDegreeThree.lean` +121 / `HigmanLowerCentralGraded.lean` +18 (既存 leaf 拡張・新 leaf 0) + Assembly.lean −18 refactor)。
+> **gate: green 4657 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 01bf4c429→017e2b9ee**。範囲逸脱なし。9319 は b band (9300) の shared-infra claim を実証明で満たし closed/ へ。
+> 🔴 **lane c stall 継続 (未復帰・ユーザー対応待ち)**: 前 tick で escalate 済。c は 03:04 以降 worktree 更新ゼロのまま (04:2x 時点も activity 0)。ユーザーの c 再起動を待機。復帰すれば 9407 裁定 (BG remainder) に向かう。**a/b/d は健全**ゆえ c 以外の監視は継続。
+> ℹ a=1D 演習継続 / d=wave 間。
+>
+> **▶▶ 2026-07-23 04:0x 監視 tick — a (1D.4) + b (Higman L13 + 9319 claim) 合流 / 🔴 c stall 確定**。a=2 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.4** Frobenius complement ⟺ N 上の fixed-point-free action、`ProblemsFrobeniusFrattini.lean` +64) / b (**Higman Lemma 13** Frattini 二乗層に交換子を収める、`FrattiniLayers.lean` +105 + **issue 9319** (lower-central graded Jacobi) を shared-infra claim (b band 9300 ✓))。
+> **gate: green 4657 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 3655dc2b4→820cfbd62**。範囲逸脱なし。
+> 🔴 **lane c stall 確定 (要ユーザー対応)**: c は 9407 裁定 (BG remainder) を **03:04 の merge-main (`705bb93e3`) で受領後、以降 68 分 (04:12 時点) worktree ファイル更新ゼロ + commit ゼロ + odd-order-c を触る lean/lake/ccd プロセス無**。前 d stall と同じ signature (62 分閾値超過)。**c は arbitration を pick up した直後に session 停止**した公算 — BG remainder work は未着手。hub は unsupervised c を再起動不可 → **ユーザーに c セッション再起動を依頼** (下記報告)。⚠ 前 tick「genuine 探索中」判定を撤回: worktree 更新ゼロは survey 中ですらない証左。
+> ℹ a=1D.4 で ProblemsFrobeniusFrattini 継続 / d=wave 間。両 escalation 対象外。
+>
+> **▶▶ 2026-07-23 03:5x 監視 tick — a (1D.3 + ✅Problems 分割) + b (Higman L12/13) 合流**。a=4 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.3** Frobenius complement は Hall subgroup + **✅ Problems.lean §1D 分割** — 新 leaf `ProblemsFrobeniusFrattini.lean` +340 WIRED via `OddOrder.lean:179`、Problems.lean 1615→1363) / b (**Higman Lemma 12/13** 指数4因子を B(n,1,ε)/C に精密化 + witness 保持、既存 leaf 拡張・新 leaf 0)。
+> **gate: green 4657 jobs (前 4656 +1 leaf = a の分割 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 4c5d0f799→ca78e7c84**。範囲逸脱なし。
+> ✅ **file-size flag 解消 (協調ループ成功)**: 前 tick に hub が flag した `Problems.lean` 1615 を、**a が次 tick で自律分割** (§1D→`ProblemsFrobeniusFrattini.lean`、配線込み)。1363 に復帰、issue 0124 watch 解除。hub flag → owner 自律分割の設計どおり。
+> 👀 **c watch (3 tick quiet)**: c は 9407 裁定後 BG remainder に着手中だが 03:2x 以降 0 ahead が 3 tick 継続 (~30分 commit 無)。BG 未形式化結果の survey+初回構成は時間を要するため**現時点で stall 判定はしない** (genuine 探索中の公算)。次 tick も 0 なら worktree 更新時刻を確認。a=次 §1E WIP / d=wave 間。
+>
+> **▶▶ 2026-07-23 03:3x 監視 tick — a (1D.2/1D.7/13/14) + b (Higman L12) 合流 / 📏 Problems.lean 1615 flag**。a=4 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problems 1D.2** p は centralizer 条件下で |H|・|G:H| を同時に割れない + **1D.7/1D.13/1D.14** Frattini non-generators・central nilpotency、`Problems.lean` +180) / b (**Higman Lemma 12** 可換因子の B/C 分類 + factor data 保持、`Assembly.lean`/`LengthTwoModels.lean` 拡張・新 leaf 0)。
+> **gate: green 4656 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push a3c455432→793240f05**。範囲逸脱なし。
+> 📏 **file-size flag (owner=a)**: `Problems.lean` が **1615 行** で 1500 超過 → issue 0124 watch に追加。**flag 段階のみ (2000 未満ゆえ即時分割不要)**、a の active frontier ゆえ hub は race せず。申し送り = a は次の § クラスタを `Ch01_Sylow/Problems/SectionX.lean` の新 leaf に切り `Problems.lean` を re-export hub 化 (2000 接近 or 次 § 境界で)。hub は 2000 到達まで watch、a 不動なら凍結 §1A–1C を backstop prefix-split。
+> ℹ **b worktree に未追跡 `Scratch.lean` (無害・未 stage)**。c=BG remainder 継続 (0 ahead)。d=wave 間。全 escalation 対象外。
+>
+> **▶▶ 2026-07-23 03:2x 監視 tick — a (1D.6) + b (Higman L12/L13) 合流**。a=3 / b=2 / c=0 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problem 1D.6** — nilpotent group で maximal ⟺ prime index、`Problems.lean` +55) / b (**Higman Lemma 12 前像補完 + Lemma 13 指数4因子の Frattini 同定**、`ExponentFourFactors.lean` +85 / `HigmanLemmaTwelve/QuotientTwoStep.lean` +114、既存 leaf 拡張ゆえ新 leaf 0)。
+> **gate: green 4656 jobs (不変・新 leaf 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 6b539c31e→0a71c2c98**。範囲逸脱なし。
+> ℹ **c = 前 tick 9407 裁定 (C) を受領、BG remainder へ着手中 (0 ahead・0 WIP、commit 前)**。a=Problems WIP (§1D 継続) / d=wave 間 (foo)。全 escalation 対象外。
+>
+> **▶▶ 2026-07-23 03:0x 監視 tick — b (Higman L13) 合流 + 🧭 c frontier 裁定 (9407 close)**。a=0(WIP) / b=3 / c=2(docs) / d=0(WIP foo)。
+> 合流: b (**Higman Lemma 13** — 指数4二因子の BCD 分類と非可換性、新 leaf `ExponentFourFactors.lean` +251 WIRED via `HigmanLemmaThirteen.lean`) / c (**docs-only** — 9407 App C Prop 1 完成報告 + 9405 を closed/ へ)。
+> **gate: green 4656 jobs (前 4655 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 8237512be→ceed3b2d3**。
+> 🧭 **hub 裁定 (9407, c 次 frontier)**: c が App C Prop 1 完遂 (Q₈ 除 sorry-clean) → 次 frontier 裁定要請。**hub 自律裁定 = (C) c 所有 territory (BG remainder + Pf remainder) の未形式化番号付き結果を doc-order 自律形式化** (AskUserQuestion 不可・hub が grep/survey 実測で決定)。ガードレール: ① **Isaacs Ch.10 は c territory 外** (2026-07-19 に a 移管 + 全 28 完成、実測訂正) ② **doc-order で BG を Pf より先に** (冊間順、BG section 若い順、stale survey 不可・実測 grep 必須) ③ **Q₈ BS (A) = tracked deferred 継続** (write-off でなく doc-order/upstream 優先ゆえ; cost が理由ではない) ④ **dedup 9130/9159/9164 (B) は c primary にせず d 候補** (mechanical・d charter 適合) ⑤ **standing authority**: c は in-territory frontier を自律選択し完遂ごとに再 escalate 不要。**9407 → closed/、9405 → closed/**。
+> 🔧 **d 向け flag (次 wave 候補)**: dedup 9130 (IsPiSubgroup of IsPGroup) / 9159 (IsPiGroup/IsPiSubgroup predicates) / 9164 (RingAut-AlgAut bridge) は mechanical dedup ゆえ d の lint/cleanup charter に適合。d が lint wave の合間に検討可 (claim-before-build: 着手時に 9xxx で claim)。
+> ℹ **a=Problems.lean WIP (§1D 継続) / d=wave 間 (foo のみ)**。両 escalation 対象外。
+>
+> **▶▶ 2026-07-23 02:5x 監視 tick — a (1C.8/1D.1) + b (Higman L13) + c (Prop1 model 完全証明・分割) 合流 / 🎉 sorry 8→7**。a=4 / b=2 / c=1 / d=0(WIP foo)。
+> 合流: a (**Isaacs Problems 1C.8** 位数 pᵃ 部分群数の mod p 合同 + **1D.1** N_G(P)⊆H (P∈Syl_p(H), H◁G) ⟹ p∤|G:H|、`Problems.lean` +138) / b (**Higman Lemma 13** — 指数4前像の ξ 長さと長さ3化、`RestrictedLengths.lean` +326 拡張) / c (**Pf App C Prop1** `model_involution_data` **完全証明** + `RankOneAffineModel.lean` **新 leaf 分割** (863 行, NearFields 1188 に縮小))。
+> 🎉 **実 sorry 8→7 (改善)**: c が `model_involution_data` を実証明して 1 sorry 消滅、残る Q₈ Brauer–Suzuki sorry を新 leaf `RankOneAffineModel.lean` に孤立化 (NearFields 2→0, RankOneAffineModel 0→1)。**新 sorry 基準 = 7** (NearFields ではなく RankOneAffineModel に Q₈ gap が移動)。非退行かつ genuine な充足。
+> **c の分割 = mathlib 準拠 PASS**: NearFields が 2000 行制限に近づいたため rankOne model を `RankOneAffineModel.lean` (863) へ topic-split、`NearFields.lean` は re-export (import 保持) + `OddOrder.lean:457` に直接配線 → 下流 import 不変・orphan 0。file-size watch: 全 leaf <1500 (RankOneAffineModel 863 / NearFields 1188 / RestrictedLengths 599)。
+> **gate: green 4655 jobs (前 4654 +1 leaf split, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→7 (改善, 新基準 7) / lint 199 ≤ 199 baseline (a/b/c は新規警告 0) / push 76bb4a187→b3c4fb3e6**。範囲逸脱なし。
+> ℹ **d = wave 間 (0 ahead, scratch `foo` のみ)** — 前 tick の 19件 wave 後、次 wave 準備中。escalation 対象外。
+>
+> **▶▶ 2026-07-23 02:3x 監視 tick — b (Higman L13) + 🧹 d (lint wave 218→199) 合流 / a・c WIP**。a=0(WIP) / b=3 / c=0(WIP) / d=2。
+> 合流: b (**Higman Lemma 13** — 指数2前像の長さ2化・三直和の対独立性強化、新 leaf `RestrictedLengths.lean` +273 WIRED via `HigmanLemmaThirteen.lean`) / **d (🧹 初の lint 合流)** — frozen-zone 機械 wave 19件解消 (deprecation/simpArgs/does-nothing/seqFocus/maxHeartbeats、BG AppE 3 / Higman **Twelve** 3 / Pf Suzuki2Groups 2 / S11 1)、`bin/lint-baseline.tsv` **218→199**、issue 0138 ログ。
+> **d 合流検査 = PASS**: (i) **mechanical 確認** — theorem/lemma/def/structure/instance の signature 行変更 **0** (proof/signature 不改変) / (ii) **frozen file 確認** — d の触った Higman は **Twelve** (b の active frontier は **Thirteen** ゆえ非衝突)、他は BG AppE・Pf Suzuki2Groups・S11 で active lane 回避。charter 合致。
+> **gate: green 4654 jobs (前 4653 +1 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→8 非退行 / lint 199 ≤ 199 baseline (d の新 baseline に対し exact — b の新 leaf は 0 新規警告で clean) / push a2fc97dda→31accf994**。
+> ℹ **a/c WIP watch**: a=`Problems.lean` 編集中 (§1C 次問継続) / c=`NearFields.lean` 編集中 (rankOne 残 field / Q₈ transport)。両 0 ahead・通常進行。**d は 0 ahead に復帰** (scratch `foo` のみ、次 wave へ)。
+> ✅ **d メンテナンス lane が機能**: hub の従来 cleanup wave を d が引き取り、baseline を初めて ratchet-down (218→199)。今後の wave も同検査 (mechanical + frozen) で受理。
+>
+> **▶▶ 2026-07-23 02:2x 監視 tick — a (1C.6a/b) + b (Higman L13 商分解) + c (App C Prop1 model 組立) 合流 / d lint 稼働**。a=3 / b=3 / c=1(+WIP) / d=0(10 WIP)。
+> 合流: a (**Isaacs §1C Problems 1C.6a/1C.6b** — G=HK の共通 Sylow と P=(P∩H)(P∩K) 集合積、`Problems.lean` +118) / b (**Higman Lemma 13** — Frattini 商の ξ 長さ・不変直和分解・持ち上げ、新 leaf `QuotientLengths.lean`+200 / `QuotientSummands.lean`+249 / `FrattiniPreimages.lean`+239、3 枚とも WIRED via `HigmanLemmaThirteen.lean`) / c (**Pf App C Prop1** `rankOne_affine_nearField` の model 組立 — **carrier 実構成 + 13/15 フィールド実証明**、`NearFields.lean` +267/−30)。
+> **gate: green 4653 jobs (前 4650 +3 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→8 非退行 (count-sorry; c の model 組立は carrier 実構成でも sorry 非増 = NearFields 2 のまま、Q₈ gap 孤立維持) / lint 218 ≤ 218 baseline (ratchet exit 0) / push f499e5c23→8d2f7140a**。範囲逸脱なし。
+> ✅ **c の doneness note**: rankOne model 組立は opaque carrier を**実構成**し 15 フィールド中 13 を実証明 — CLAUDE.md「doneness = carrier 構成可能性」に合致する genuine 前進 (sorry 数不変でも実質進捗)。残 Q₈/quaternion 2 sorry は既知 gap の孤立継続。c は worktree で `NearFields.lean` を更に編集中 (次 tick 継続)。
+> ℹ **lane d = lint 稼働確認**: d は 0 ahead だが worktree に **10 file の lint 修正 WIP** (BG AppE 3 / Higman LemmaTwelve 3 / Pf Suzuki2Groups 2 等) — ユーザー通知どおり lint-fix 稼働中。commit 出れば a/b/c の後に最後に合流。
+>
+> **▶▶ 2026-07-23 02:0x 監視 tick — a (1C.7) + b (Higman L13 Frattini 整列) 合流 / c WIP watch / d lint 継続**。a=1 / b=2 / c=0(WIP) / d=0。
+> 合流: a (**Isaacs §1C Problem 1C.7** — 極大部分群が素数指数のとき最大素数 Sylow が正規、`Problems.lean` +49) / b (**Higman Lemma 13** — Frattini 系列の整列、新 leaf `HigmanLemmaThirteen/CompositionSeries.lean` +204 / `HigmanLemmaThirteen/FrattiniLayers.lean` +344、両 WIRED via `HigmanLemmaThirteen.lean`、**0 sorry**)。
+> **gate: green 4650 jobs (前 4648 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・FAIL 0・allowlist 外 0・新 axiom 0) / 実 sorry 8→8 非退行 (count-sorry) / lint 218 ≤ 218 baseline (ratchet exit 0) / push b4e98c575→b23fb1429**。範囲逸脱なし (a=Isaacs / b=Higman、両所有内)。
+> 👀 **c WIP watch**: c は 0 ahead だが worktree で `NearFields.lean` を編集中 (+207/−29 uncommitted) — 9406 land 後の次 frontier (rankOne / Q₈ transport) を構成中。未 commit ゆえ hold ではなく通常進行、次 tick で commit を待つ。
+> ℹ **lane d = lint-fix 継続 (ユーザー通知受領)**: ユーザーより「d が hub の代わりに lint fix でできるところを進めている」と明示 → 前 tick の「d stall 確定」は**解消**、d の quiet は escalation 対象外。d の lint 掃除は全 frozen file に及ぶ sanctioned territory ゆえ合流順は従来どおり a/b/c 先・d 最後。d は 0 ahead・worktree に scratch `foo` のみ (無害・未追跡)。
+> **監視再開 (このセッション = hub)**: 前 cron は消滅 (CronList 空) → 15 分 cron (`7,22,37,52`, Opus) 再作成。
+>
+> **▶▶ 2026-07-23 01:5x 監視 tick — b (Higman L13) 合流 / 🔴 d stall 確定**。a=0 / b=1 / c=0 / d=0。
+> 合流: b (**Higman Lemma 13** — ξ-length 4 と Frattini 分岐、新 leaf `HigmanLemmaThirteen.lean` + `HigmanLemmaThirteen/LengthFourReduction.lean`, 両 WIRED)。
+> **gate: green 4648 jobs (前 4646 +2 leaf, elaborate 確認 orphan 0) / AxiomsCheck OK (3754・新 axiom 0) / 実 sorry 8→8 非退行 / lint 218 ≤ 218 (push を lint exit で gate) / push 41dd75444→714569ab0**。範囲逸脱なし (b=Higman)。
+> 🔴 **lane d stall 確定**: d は **62 分 commit 無** (初 CLAUDE.md commit 00:54 以降) + **01:00 以降 worktree ファイル更新ゼロ** + lsof 無 hit + scratch `foo` 放置。分析中でなく **session 停止/stall がほぼ確定**。hub は unsupervised d を再起動不可 → **ユーザーに d セッション再起動を依頼** (2 tick 連続で quiet 報告)。b が Theorem B (step 10) から Higman L13 に移ったのは b territory 内 (Higman は b 所有) で正常。**513185** idle 継続。
+>
+> **▶▶ 2026-07-23 01:4x 監視 tick**。a=1 / b=0 / c=0 / d=0。合流: a (Isaacs §1C Problems 1C.3b)。
+> **gate: green 4646 jobs / AxiomsCheck OK (3754・新 axiom 0) / 実 sorry 8→8 非退行 (9406 後の新基準 8) / lint 218 ≤ 218 (push を lint exit で gate — 前 tick の slip 反省) / push a0c6949d2→61566491f**。
+> ⚠ **lane d watch (要注意)**: d は 47 分 commit 無 (初 CLAUDE.md commit 以降)、lsof で worktree を開く ccd-cli プロセス無 hit、worktree に未追跡 scratch `foo` 1 件。メンテナンス lane ゆえ lint census / lean-eval 抽出の分析中の可能性もあるが、**stall or session 停止の疑い**。次 tick でも quiet なら user へ d セッション確認を依頼。⚠ scratch `foo` は d の作業残渣 (無害・未追跡)。**513185** idle 継続。
+>
+> **🎉 2026-07-23 01:2x 監視 tick — 9406 coordinated land 成功 (c+b 同一 tick 合流)**。a=4 / b=2 / c=7 / d=0。
+> ユーザー「b をマージして」= b nudge → **b が 9406 consumer 更新完了** (`5be71e802`: StepEight `model_qEquiv_conj` を `model.qEquiv_conj q→q⁻¹` に追随)。⟹ c(fix A)+b(consumer) 両揃い → **a+b+c を同一 tick で `--no-ff` 合流**。
+> issue 9406 doc に b/c 双方の READY note が付き conflict → 両保持で解消。**Lean code は無衝突 = fix A × consumer は整合**。
+> 🔑 **合成フルビルド green 4646 jobs / EXITCODE=0 / error 0 / StepEight elaborate 確認 (9406 検証成功)** = c の新 qEquiv_conj RHS × b の consumer が coherent。
+> **c の genuine 進捗**: fix A + **BLOCKER 2 (Q-regularity `Q が Ω∖{basept} 上 regular`) 解消** + **cyclic BS case 実証明** + **quaternion 孤立化** (新定理 `RankOneHypothesis.brauerSuzuki`)。
+> ⚠ **実 sorry 7→8 (regression でない・受理)**: 差分は NearFields.lean 1→2 のみ = c の新 `RankOneHypothesis.brauerSuzuki` が cyclic を実証明し **quaternion/Q₈ gap を単一明示 sorry に孤立化**したもの (既存の証明が sorry 化したものは皆無)。CLAUDE.md「sorry カウントで測らない・gap 明示化は正」に合致 ([[scaffold-sorry-free-not-done]])。
+> **AxiomsCheck OK (3754・allowlist 外 0・新 axiom 0) / lint 216→218 (c NearFields longLine grandfather, owner=c flag)**。
+> ⚠ **process slip (自戒)**: lint check(exit1) を確認する前に push → baseline 未更新のまま合流 → fix-forward で grandfather push (68b1ca219)。今後 push 前に lint exit を必ず確認。
+> **issue 9406 close** (qEquiv_conj 構造バグ解消; 残る Q₈/transport は rankOne sorry + 投資ノートで追跡)。push 55abbc850→68b1ca219。
+> frontier: a = §1C 演習 / b = 2053 step (10) 後 / c = NearFields 組立 (Q-regularity 済 → rankOne 前進、Q₈ のみ deferred) / d = メンテナンス。
+>
+> **▶▶ 2026-07-23 01:1x 監視 tick — a/b 合流 / c hold 深刻化 (+7)**。a=1 / b=1 / c=7 / d=0。
+> 合流: a (Isaacs §1C 1C.1 N_G(P)⊆H⟹H=N_G(H)) / b (2053 step (10) 二分岐完結 (10.1)∨(10.2) — StepFive+StepTen)。
+> **gate: green 4646 jobs (不変) / AxiomsCheck OK (3754・新 axiom 0) / sorry 7→7 / lint 216 / push 0283c93f4→fef4e8774**。
+> ⚠ b の step10 は **StepFive を触ったが qEquiv consumer 更新ではない** (step10 論法の追記、qEquiv 非使用ゆえ fix(A) と独立・安全)。
+> 🔴 **9406 bottleneck 深刻化 — c +7 全 hold・b 2 tick 連続で consumer 未着手**: c の fix(A) 完成済 7 commit (BLOCKER2 + cyclic + quaternion 孤立化 + 続く transport) が **b の StepEight/StepFive consumer 更新 (q↔q⁻¹ 小変更) だけ**を待って全 gated。b は step10 に集中し 9406 未着手。**ユーザーへ再 escalate**: b nudge or hub 代行 (下記報告)。fix(A) は unsatisfiable な旧 field 除去ゆえ非破壊 deprecation 不可 = b consumer 更新は必須。**513185** idle 継続。
+>
+> **✅ 2026-07-23 01:0x — d CLAUDE.md 変更をユーザー承認 → 合流 (hold 解消)**。ユーザー「d の発案は取り込んで」→ d (blueprint 逆生成推奨への CLAUDE.md 改訂 + issue 0143) を `--no-ff` 合流 (docs-only, Lean 非変更ゆえ build 不要, push 5fdec8275→4dc1323cd)。**新方針 = forward TeX driver 不可のまま、Lean からの逆生成 (依存 DAG/教科書番号対応/proved-sorry を getUsedConstants/CollectAxioms で抽出) は推奨** (issue 0143 に実装計画)。lane d の memtenance charter は問題なく機能。⚠ c は依然 9406 で hold (b consumer 待ち、下記)。
+>
 > **▶▶ 2026-07-23 00:5x 監視 tick — a/b 合流 / c・d hold**。a=6 / b=3 / c=5 / d=1。
 > 合流: a (**🎉 Isaacs §1B 完結 1B.5-1B.8** + `Ch03_SplitExtensions/PiResidual.lean` 新 leaf O^π, 配線済) / b (docs 2053 step10 記録)。
 > **gate (a+b): green 4646 jobs (+1 PiResidual) / AxiomsCheck OK (3754・新 axiom 0) / sorry 7→7 非退行 / lint 216 / push 6d1a24cd1→d4e5d1f54**。

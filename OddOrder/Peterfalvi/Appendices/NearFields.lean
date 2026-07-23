@@ -11,6 +11,9 @@ import OddOrder.Peterfalvi.Appendices.NearFieldClass
 import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
 import OddOrder.GroupTheory.SolvableTwoTransitive
 import OddOrder.GroupTheory.BrauerSuzuki
+-- Re-export Proposition 1 (split out to `RankOneAffineModel.lean` for the file-length limit) so
+-- downstream files importing `NearFields` still see `RankOneHypothesis` / `rankOne_affine_nearField`.
+import OddOrder.Peterfalvi.Appendices.RankOneAffineModel
 
 /-!
 # Peterfalvi Appendix C: On Near-Fields
@@ -64,8 +67,21 @@ Per-result status:
 | `exists_field_structure_of_cyclic_index_two` (Prop 2, first half) | **proved, sorry-free** (new) |
 | App. C Prop 1, prerequisite (i) (`RankOneHypothesis.sylow_two_isCyclic_or_quaternion`) | **proved, axiom-clean** (2026-07-22) |
 | Brauer–Suzuki (ii), quaternion `|S| ≥ 16` + cyclic (`brauerSuzuki_of_quaternionSylow`) | **proved, axiom-clean** (2026-07-22, issue 9318; `Q₈` case open) |
-| App. C Prop 1 (`rankOne_affine_nearField`) | honest statement, `sorry` — remaining: near-field transport + `Q₈` BS |
+| App. C Prop 1 (`rankOne_affine_nearField`) | **model assembled**; sole `sorry` is the `Q₈` BS case |
+| Prop 1 involution clauses (`model_involution_data`) | **proved, axiom-clean** (fixed-point analysis) |
 | App. C Prop 2 headline (`cyclic_index_two_nearField_classification`) | **proved, axiom-clean** (2026-07-21, commit 42892fcb5) |
+
+Proposition 1 (the `RankOneHypothesis` / `AffineNearFieldModel` rows above) lives in the sibling
+file `RankOneAffineModel.lean` (split out for the 2000-line file limit); it is re-exported here, so
+downstream files importing `NearFields` are unaffected.
+
+`rankOne_affine_nearField` builds the near-field carrier `F = Additive ↥Fsub` from the regular
+normal subgroup and proves all 15 `AffineNearFieldModel` fields: the embedding `(F,+) ↪ G`,
+normality, the complement `G = F ⋊ H`, the identification `Q ≃* Fˣ` with its conjugation
+compatibility, the faithful action of `D` by near-field automorphisms, the characteristic, and the
+involution clauses (`model_involution_data`, axiom-clean).  The **sole** remaining `sorry` is the
+`Q₈` (`|S| = 8`) case of Brauer–Suzuki, which needs modular character theory (a known research gap,
+off the Feit–Thompson critical path).
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields
@@ -619,232 +635,6 @@ end Twisted
 
 end TwistedNearField
 
-section PropositionOne
-
-open scoped Pointwise
-
-/-- **Peterfalvi Appendix C, Proposition 1, hypotheses** (p. 137): the Part II hypotheses
-**(A1)** and **(A2)** (p. 97) together with "`G` has 2-rank `1`".
-
-The fields are exactly those of `Suzuki.Hypothesis` *except* (A3), which is replaced by its
-negation.  This has to be a separate structure: `Suzuki.Hypothesis` carries
-`two_rank_ge_two : ∃ E : Subgroup G, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1` as a field, so bolting a
-genuine 2-rank-one hypothesis onto it would produce contradictory (hence vacuous) hypotheses.
-
-`two_rank_one` says `G` has **no** Klein four subgroup, i.e. 2-rank `≤ 1`; equality holds because
-`Q_even` forces an involution to exist (Cauchy).  The hypotheses are satisfiable: e.g.
-`G = AGL(1, 3) ≅ S₃` acting on three points, with `Q` of order `2` and `D = 1`. -/
-structure RankOneHypothesis (G Ω : Type*) [Group G] [MulAction G Ω] [Finite G] where
-  /-- the base point of `Ω`; `H` is its stabilizer -/
-  basept : Ω
-  /-- (A1): the action is doubly transitive -/
-  doubly_transitive : MulAction.IsMultiplyPretransitive G Ω 2
-  /-- (A2): the action is faithful -/
-  faithful : FaithfulSMul G Ω
-  H : Subgroup G
-  Q : Subgroup G
-  D : Subgroup G
-  H_def : H = MulAction.stabilizer G basept
-  /-- the distinguished involution `t ∈ G - H` -/
-  t : G
-  t_sq : t ^ 2 = 1
-  t_ne_one : t ≠ 1
-  t_not_mem_H : t ∉ H
-  D_def : D = H ⊓ H.map (MulAut.conj t).toMonoidHom
-  Q_le_H : Q ≤ H
-  Q_normal_in_H : ∀ h ∈ H, ∀ x ∈ Q, h * x * h⁻¹ ∈ Q
-  Q_inf_D_eq_bot : Q ⊓ D = ⊥
-  Q_mul_D_eq_H : (Q : Set G) * (D : Set G) = (H : Set G)
-  Q_even : Even (Nat.card Q)
-  D_odd : Odd (Nat.card D)
-  /-- `G` has 2-rank one: it contains no elementary abelian subgroup of order `4`.
-  This is the negation of Part II's hypothesis (A3). -/
-  two_rank_one : ¬ ∃ E : Subgroup G, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1
-
-/-- **Proposition 1, prerequisite (i)** (Huppert, *Endliche Gruppen* I, Kapitel III, Satz 8.2):
-a group of 2-rank one has cyclic or generalized quaternion Sylow `2`-subgroups.
-
-Bridge from `two_rank_one` to **Isaacs Thm 6.11**
-(`isCyclic_or_two_quaternion_of_subgroups_card_prime_unique`): if a Sylow `2`-subgroup had two
-distinct subgroups of order `2`, it would contain an elementary abelian subgroup of order `4`
-(`IsPGroup.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne`), which
-`two_rank_one` forbids. -/
-theorem RankOneHypothesis.sylow_two_isCyclic_or_quaternion
-    {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-    (hyp : RankOneHypothesis G Ω) (S : Sylow 2 G) :
-    IsCyclic ↥(S : Subgroup G) ∨
-      ∃ n : ℕ, Nonempty (↥(S : Subgroup G) ≃* QuaternionGroup n) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  have hUnique : ∀ K L : Subgroup ↥(S : Subgroup G),
-      Nat.card K = 2 → Nat.card L = 2 → K = L := by
-    intro K L hK hL
-    by_contra hne
-    obtain ⟨E, hE_elem, hE_card⟩ :=
-      S.isPGroup'.exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
-        hK hL hne
-    refine hyp.two_rank_one ⟨E.map (S : Subgroup G).subtype, ?_, ?_⟩
-    · rw [Nat.card_congr
-        (Subgroup.equivMapOfInjective E _ (S : Subgroup G).subtype_injective).symm.toEquiv,
-        hE_card]
-      norm_num
-    · rintro x ⟨y, hy, rfl⟩
-      have hy2 : (⟨y, hy⟩ : ↥E) ^ 2 = 1 := hE_elem.pow_eq_one _
-      have hyS : y ^ 2 = 1 := by simpa using congrArg Subtype.val hy2
-      simpa using congrArg ((S : Subgroup G).subtype) hyS
-  rcases OddOrder.Isaacs.Ch06.isCyclic_or_two_quaternion_of_subgroups_card_prime_unique
-      S.isPGroup' hUnique with hcyc | ⟨_, hq⟩
-  · exact Or.inl hcyc
-  · exact Or.inr hq
-
-/-- **Peterfalvi Appendix C, Proposition 1, conclusion**: the affine near-field model of `G`.
-
-The book asserts an isomorphism `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ Σ` identifying `Q` with `F^*` and `D`
-with `Σ`.  Internally this says: `F` sits in `G` as a normal subgroup complemented by `H`
-(`G = F ⋊ H`), the conjugation action of `Q` on `F` is right multiplication by `F^*` under an
-isomorphism `Q ≃* Fˣ`, and `D` acts faithfully on `F` by near-field automorphisms.  A "near-field
-automorphism" is an additive equivalence that is also multiplicative — spelled out as `dAut` +
-`dAut_mul` rather than through a bundled automorphism group.
-
-The final two clauses of the proposition ("`H` has only one involution"; "if `u ≠ v` are
-involutions of `G` then `|uv|` is the characteristic of `F`") are the last three fields; `char` is
-the characteristic in the sense of `exists_prime_char`. -/
-structure AffineNearFieldModel {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-    (hyp : RankOneHypothesis G Ω) (F : Type*) [NearField F] where
-  /-- `(F, +)` embedded in `G`. -/
-  emb : Multiplicative F →* G
-  emb_injective : Function.Injective emb
-  /-- `F ⊴ G`. -/
-  range_normal : (MonoidHom.range emb).Normal
-  /-- `G = F ⋊ H`. -/
-  isComplement : Subgroup.IsComplement' (MonoidHom.range emb) hyp.H
-  /-- `Q` is identified with `F^*`. -/
-  qEquiv : ↥hyp.Q ≃* Fˣ
-  /-- The identification `Q ≃* F^*` turns conjugation into right multiplication, i.e. it realizes
-  `F ⋊ Q ≅ F ⋊ F^* = 𝓛(F)`. -/
-  qEquiv_conj : ∀ (q : ↥hyp.Q) (x : F),
-    (q : G) * emb (Multiplicative.ofAdd x) * (q : G)⁻¹
-      = emb (Multiplicative.ofAdd (x * ((qEquiv q : Fˣ) : F)))
-  /-- `D` acts on `F` by additive bijections … -/
-  dAut : ↥hyp.D → (F ≃+ F)
-  /-- … which are multiplicative, i.e. near-field automorphisms … -/
-  dAut_mul : ∀ (g : ↥hyp.D) (x y : F), dAut g (x * y) = dAut g x * dAut g y
-  /-- … faithfully, so that `D` *is* a group `Σ` of automorphisms of `F` … -/
-  dAut_injective : Function.Injective dAut
-  /-- … and the action is the conjugation action inside `G`. -/
-  dAut_conj : ∀ (g : ↥hyp.D) (x : F),
-    (g : G) * emb (Multiplicative.ofAdd x) * (g : G)⁻¹ = emb (Multiplicative.ofAdd (dAut g x))
-  /-- `H` has exactly one involution. -/
-  unique_involution_in_H : ∃! u : ↥hyp.H, (u : G) ^ 2 = 1 ∧ (u : G) ≠ 1
-  /-- The characteristic of the near-field `F`. -/
-  char : ℕ
-  char_prime : char.Prime
-  char_spec : ∀ x : F, char • x = 0
-  /-- If `u ≠ v` are involutions of `G` then `|uv|` is the characteristic of `F`. -/
-  orderOf_mul_of_involutions : ∀ u v : G, u ^ 2 = 1 → u ≠ 1 → v ^ 2 = 1 → v ≠ 1 → u ≠ v →
-    orderOf (u * v) = char
-
-/-- **Peterfalvi Appendix C, Proposition 1** (p. 137).  If `G` satisfies (A1) and (A2) and has
-2-rank `1`, then `G` is the affine group of a finite near-field: there is a near-field `F` and a
-group `Σ` of automorphisms of `F` with `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ Σ`, identifying `Q` with `F^*`
-and `D` with `Σ`.  Moreover `H` has a unique involution and, for distinct involutions `u, v ∈ G`,
-`|uv|` equals the characteristic of `F`.
-
-**Status: honestly stated, not proved.**  Peterfalvi's proof consumes three results; their repo
-state (updated 2026-07-21, issue 9404):
-
-* (i) a Sylow 2-subgroup of `G` is cyclic or generalized quaternion (Huppert, *Endliche Gruppen* I,
-  Kapitel III, Satz 8.2) — **proved** as `RankOneHypothesis.sylow_two_isCyclic_or_quaternion`
-  above (bridge from `two_rank_one` to Isaacs Thm 6.11).
-* (ii) the **Brauer–Suzuki theorem** `G = O_{2'}(G) C_G(u)` (**issue 9318**) — **proved** as
-  `OddOrder.GroupTheory.brauerSuzuki_of_isCyclic_sylowTwo` (cyclic Sylow-2) and
-  `OddOrder.GroupTheory.QuaternionSylowSetup.brauerSuzuki_of_quaternionSylow` (generalized
-  quaternion, `|S| ≥ 16`, via Gorenstein Ch.12 exceptional character theory).  The residual
-  `Q₈` case (`|S| = 8`) needs modular character theory and is not yet formalized.
-* (iii) Huppert Kapitel II, Satz 3.2, giving the elementary abelian normal subgroup regular on `Ω`
-  (hence `G = F ⋊ H`) for the solvable `O_{2'}(G)` (solvable by Feit–Thompson) — **formalized** as
-  `OddOrder.GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive`
-  (`GroupTheory/SolvableTwoTransitive.lean`).
-
-With (ii) in hand, the near-field structure on `F` comes from the regular action of `Q` on `F^#`
-by the standard transport recorded on p. 137 (choose the `D`-fixed point of `F^#` as the
-multiplicative identity), which *is* elementary. -/
-theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-    (hyp : RankOneHypothesis G Ω) :
-    ∃ (F : Type u) (_ : NearField F), Nonempty (AffineNearFieldModel hyp F) := by
-  sorry
-
-/-- **The odd core `O_{2'}(G)` is nontrivial** (first step of Peterfalvi App. C, Prop 1's proof,
-given Brauer–Suzuki (ii)).  If `O_{2'}(G) = 1` then Brauer–Suzuki `O_{2'}(G) ⊔ C_G(t) = ⊤` collapses
-to `C_G(t) = ⊤`, i.e. the involution `t` is central.  But then conjugation by `t` is the identity,
-so `H^t = H` and `D = H ⊓ H^t = H`; hence `|H|` is odd (`D_odd`).  This contradicts `Q ≤ H` with
-`|Q|` even (`Q_even`), which forces `|H|` even.
-
-The Brauer–Suzuki conclusion is taken as a hypothesis `hbs`; it is discharged from
-`RankOneHypothesis.sylow_two_isCyclic_or_quaternion` together with
-`brauerSuzuki_of_isCyclic_sylowTwo` / `brauerSuzuki_of_quaternionSylow` (the residual `Q₈` case of
-the latter being the sole research-adjacent gap). -/
-theorem RankOneHypothesis.oddCore_ne_bot {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-    (hyp : RankOneHypothesis G Ω)
-    (hbs : OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {hyp.t} = ⊤) :
-    OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ≠ ⊥ := by
-  intro hbot
-  -- Trivial odd core collapses Brauer–Suzuki to `C_G(t) = ⊤`: `t` is central.
-  rw [hbot, bot_sup_eq] at hbs
-  have htc : ∀ g : G, hyp.t * g = g * hyp.t := by
-    intro g
-    have hmem : g ∈ Subgroup.centralizer {hyp.t} := by rw [hbs]; exact Subgroup.mem_top g
-    exact Subgroup.mem_centralizer_iff.mp hmem hyp.t rfl
-  -- Central `t` ⟹ conjugation by `t` is the identity ⟹ `H^t = H` ⟹ `D = H`.
-  have hconj_id : (MulAut.conj hyp.t).toMonoidHom = MonoidHom.id G := by
-    ext g
-    change hyp.t * g * hyp.t⁻¹ = g
-    rw [htc g, mul_assoc, mul_inv_cancel, mul_one]
-  have hDH : hyp.D = hyp.H := by
-    rw [hyp.D_def, hconj_id, Subgroup.map_id, inf_idem]
-  -- `Q ≤ H` and `|Q|` even force `|H|` even, contradicting `|D| = |H|` odd.
-  have hHeven : Even (Nat.card hyp.H) :=
-    even_iff_two_dvd.mpr
-      (dvd_trans hyp.Q_even.two_dvd (Subgroup.card_dvd_of_le hyp.Q_le_H))
-  exact (Nat.not_even_iff_odd.mpr (hDH ▸ hyp.D_odd)) hHeven
-
-/-- **The affine regular normal subgroup `F`** (Peterfalvi App. C, Prop 1, prerequisite (iii),
-given Brauer–Suzuki (ii)).  From `O_{2'}(G) ≠ 1` (`oddCore_ne_bot`) and its solvability (odd order,
-Feit–Thompson), Huppert II Satz 3.2
-(`exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive`) yields an elementary abelian
-`p`-subgroup `F ⊴ G` regular on `Ω`; regularity gives the complement `G = F ⋊ H`
-(`isComplement'_stabilizer`).  This is the additive group underlying the near-field of Prop 1.
-
-Takes the Brauer–Suzuki conclusion `hbs` as a hypothesis (discharged via the cyclic / generalized
-quaternion split; the residual `Q₈` case of the latter is the sole research-adjacent gap). -/
-theorem RankOneHypothesis.exists_regular_normal {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-    (hyp : RankOneHypothesis G Ω)
-    (hbs : OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {hyp.t} = ⊤) :
-    ∃ (p : ℕ) (F : Subgroup G), p.Prime ∧ F.Normal ∧ IsMulCommutative ↥F ∧
-      (∀ x ∈ F, x ^ p = 1) ∧ MulAction.IsPretransitive ↥F Ω ∧
-      Subgroup.IsComplement' F hyp.H := by
-  haveI := hyp.faithful
-  -- `O_{2'}(G)` is a nontrivial solvable normal subgroup (odd order → Feit–Thompson).
-  have hNne : OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ≠ ⊥ := hyp.oddCore_ne_bot hbs
-  have hNodd : Odd (Nat.card ↥(OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G)) :=
-    Nat.not_even_iff_odd.mp (mt Even.two_dvd (fun h2 =>
-      (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup {p | p ≠ 2}) 2
-        (Nat.mem_primeFactors.mpr ⟨Nat.prime_two, h2, Nat.card_pos.ne'⟩) rfl))
-  haveI hNsolv : IsSolvable ↥(OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G) := feitThompson hNodd
-  obtain ⟨p, F, _hp, hFnormal, _hFle, _hFne, hcomm, hexp, _hpgroup, htrans, hfree⟩ :=
-    OddOrder.GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive
-      hyp.doubly_transitive hNne hNsolv
-  refine ⟨p, F, _hp, hFnormal, hcomm, hexp, htrans, ?_⟩
-  -- `G = F ⋊ H`: `F` regular on `Ω`, `H = stabilizer basept`.
-  rw [hyp.H_def]
-  refine Subgroup.isComplement'_stabilizer hyp.basept (fun h hh => ?_) (fun g => ?_)
-  · have hmem : (h : G) ∈ MulAction.stabilizer G hyp.basept ⊓ F :=
-      ⟨MulAction.mem_stabilizer_iff.mpr hh, h.2⟩
-    rw [hfree hyp.basept, Subgroup.mem_bot] at hmem
-    exact Subtype.ext hmem
-  · obtain ⟨f, hf⟩ := htrans.exists_smul_eq (g • hyp.basept) hyp.basept
-    exact ⟨f, hf⟩
-
-end PropositionOne
 
 section PropositionTwo
 
