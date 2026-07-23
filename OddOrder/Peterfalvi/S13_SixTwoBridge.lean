@@ -622,7 +622,7 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
     (hzS : params.zeta ∈ inducedFamily M)
     (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
-    {A' B : Subgroup ↥M}
+    {B : Subgroup ↥M}
     {S₁ : Set (ClassFunction ↥M ℂ)}
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
     (hS₁sub : S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥)
@@ -850,7 +850,7 @@ theorem sixTwoDecompositionData [Finite G]
     · exact S08.inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr
         hyp.dadeData.dade hyp.hconj hodd hyp.mderivSharp_subset_A0 hS₁sub hS₁conj hS₁coh
         hψB hψirr hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
-    · exact sixTwoMemberDatum_of_reducible_member (A' := A') hG hyp hmu hδpm hδj hzS hz1 hS₁conj
+    · exact sixTwoMemberDatum_of_reducible_member hG hyp hmu hδpm hδj hzS hz1 hS₁conj
         hS₁sub hS₁coh hψB hψirr
         hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
   · -- reducible (μ-column) break: the named grid obligation

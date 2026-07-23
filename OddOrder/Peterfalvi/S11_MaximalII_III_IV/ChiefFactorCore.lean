@@ -170,7 +170,8 @@ theorem sOf_subset_sSet [Finite G] (data : TypesIIIIIIVSetup M) (Y : Subgroup G)
   ⟨χ, xiOf_subset_xiSet data Y hχ, hφ⟩
 
 open OddOrder.Peterfalvi.S11 in
-/-- **`𝒮(⊥) = 𝒮`** (issue 1017; relocated from S15 to §11 for the (10.11) type-II consumer, issue 1048): the `⊥`-kernel demand of `𝒮(Y)` is vacuous — only
+/-- **`𝒮(⊥) = 𝒮`** (issue 1017; relocated from S15 to §11 for the (10.11) type-II consumer,
+issue 1048): the `⊥`-kernel demand of `𝒮(Y)` is vacuous — only
 the identity lies in `⊥`, and `1 ∈ Ker χ` always — so every `Ind_{HU}^M ξ ∈ 𝒮` already lies in
 `𝒮(⊥)`.  Generic in `data` (the collapse core extracted from the linchpin `sSet_eq_sOf_H0Cprime`);
 it identifies the degenerate `S`-instance kernel strata (`H₀ = C′ = U′ = ⊥`) with the full

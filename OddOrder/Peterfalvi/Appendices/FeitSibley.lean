@@ -78,9 +78,8 @@ nontrivial `θ ∈ Irr(N)` occurs in `Res_N χ`.  Fourier expansion
 (`sum_inner_irreducibleCharacter_smul`): if every nontrivial `θ` had multiplicity `0`, then
 `Res_N χ = ⟨Res χ, 1⟩·1`, forcing `χ` constant on `N`. -/
 theorem exists_ne_trivial_liesOver_of_not_forall_eq_one
-    {K : Type*} [Group K] [Finite K] [Fintype K] [Invertible (Nat.card K : ℂ)]
+    {K : Type*} [Group K] [Finite K] [Invertible (Nat.card K : ℂ)]
     {N : Subgroup K} [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
-    [Fintype (IrreducibleCharacter ↥N)]
     (χ : IrreducibleCharacter K)
     (hker : ¬ ∀ x : ↥N, (χ : ClassFunction K ℂ) (x : K) = (χ : ClassFunction K ℂ) 1) :
     ∃ θ : IrreducibleCharacter ↥N, θ ≠ trivialIrreducibleCharacter ↥N ∧
@@ -180,7 +179,7 @@ theorem exists_restrictionMultiplicity_ne_zero_intermediate
   haveI : Finite (IrreducibleCharacter ↥T) := finite_irreducibleCharacter (G := ↥T)
   letI : Fintype (IrreducibleCharacter ↥T) := Fintype.ofFinite _
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   apply hne
   -- restriction in stages: `⟨Res_N χ, θ⟩ = ⟨Res (Res_T χ), θ'⟩`
   have h1 : ClassFunction.restrictionMultiplicity N χ θ
@@ -449,10 +448,10 @@ theorem fixedPointFree_of_mem_Q1_mul_D [Finite G] {k : G} (hk : k ∈ hyp.Q1)
     { toFun := fun z => ⟨δ * (z : G) * δ⁻¹, hyp.D_normalizes_Q1 hδ z.2⟩
       invFun := fun z => ⟨δ⁻¹ * (z : G) * δ, by
         simpa using hyp.D_normalizes_Q1 (hyp.D.inv_mem hδ) z.2⟩
-      left_inv := fun z => Subtype.ext (by simp only [Subgroup.coe_mk]; group)
-      right_inv := fun z => Subtype.ext (by simp only [Subgroup.coe_mk]; group)
+      left_inv := fun z => Subtype.ext (by group)
+      right_inv := fun z => Subtype.ext (by group)
       map_mul' := fun z w => Subtype.ext (by
-        simp only [Subgroup.coe_mk, Subgroup.coe_mul]; group) }
+        simp only [Subgroup.coe_mul]; group) }
   have hαcoe : ∀ z : hyp.Q1, ((α z : hyp.Q1) : G) = δ * (z : G) * δ⁻¹ := fun _ => rfl
   have hα_fpf : MonoidHom.FixedPointFree α := by
     intro z hz
@@ -747,7 +746,7 @@ Feit–Sibley Theorem genuinely needs the rational case (anchor `Ind(1·θ)` of 
 against members of degree `d·λ(1)·θ_x(1)`). -/
 theorem coherent_adjoin_of_degree_bound
     (hyp : OddOrder.Peterfalvi.S07.Hypothesis (L := L) (G := G) S A)
-    (h1A : (1 : L) ∉ A)
+    (_h1A : (1 : L) ∉ A)
     {S₁ : Set (ClassFunction L ℂ)} (hS₁S : S₁ ⊆ S)
     (hcoh : Nonempty (IsCoherent hyp.tau S₁ A))
     {χ : ClassFunction L ℂ} (hχS : χ ∈ S)
@@ -763,10 +762,10 @@ theorem coherent_adjoin_of_degree_bound
       ClassFunction.inner (χmem i) (χmem j) = if i = j then (1 : ℂ) else 0)
     (hmemconjortho : ∀ i ∈ s, ClassFunction.inner (χmem i) (χmem i).conj = 0)
     (hdegpos : 0 < degMem i₁)
-    (hdegMem : ∀ i ∈ s, ((χmem i : ClassFunction L ℂ) : L → ℂ) 1 = (degMem i : ℂ))
+    (_hdegMem : ∀ i ∈ s, ((χmem i : ClassFunction L ℂ) : L → ℂ) 1 = (degMem i : ℂ))
     (hmemdiffsupp : ∀ i ∈ s, ((χmem i).conj - χmem i).support ⊆ A)
     (hdegdiffsupp : ∀ i ∈ s, (degMem i₁ • χmem i - degMem i • χmem i₁).support ⊆ A)
-    {a : ℕ} (hχdeg : ((χ : ClassFunction L ℂ) : L → ℂ) 1 = (a : ℂ) * (degMem i₁ : ℂ))
+    {a : ℕ} (_hχdeg : ((χ : ClassFunction L ℂ) : L → ℂ) 1 = (a : ℂ) * (degMem i₁ : ℂ))
     (hdiffasuppχ : (χ - a • χmem i₁).support ⊆ A)
     (htau1_memaχ : hyp.tau (χ - a • χmem i₁) ∈ ZIrr G)
     (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((degMem i : ℝ) / (degMem i₁ : ℝ)) ^ 2) :
@@ -1014,7 +1013,7 @@ theorem Sset_eq_induced_of_Q [Finite G] :
       θ''.isIrreducible
     exact hθ''over (le_antisymm hbound hnonneg)
 
-omit [Fintype G] in
+omit [Fintype G] [Fintype ↥hyp.H] in
 /-- **Corollary of Lemma 2(a)**: every member of `𝒮` vanishes on `H − Q`.  The members of
 `𝒮` are induced from `Q ⊴ H` (`Sset_eq_induced_of_Q`), and class functions induced from a
 normal subgroup vanish off it (`ClassFunction.induce_apply_eq_zero_of_not_mem_normal`).
@@ -1023,6 +1022,7 @@ the `A`-support hypotheses of Lemma 1(a) at the Theorem's call sites. -/
 theorem apply_eq_zero_of_mem_Sset_of_not_mem_Q [Finite G]
     {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset)
     {h : ↥hyp.H} (hh : (h : G) ∉ hyp.Q) : χ h = 0 := by
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
   haveI : (hyp.Q.subgroupOf hyp.H).Normal := hyp.Q_subgroupOf_H_normal
   have hmem := hχ
   rw [Sset_eq_induced_of_Q hyp] at hmem
@@ -1030,7 +1030,7 @@ theorem apply_eq_zero_of_mem_Sset_of_not_mem_Q [Finite G]
   exact ClassFunction.induce_apply_eq_zero_of_not_mem_normal (hyp.Q.subgroupOf hyp.H) φ
     (fun hmem' => hh (Subgroup.mem_subgroupOf.mp hmem'))
 
-omit [Fintype G] in
+omit [Fintype G] [Fintype ↥hyp.H] in
 /-- **Members of `ℤ[𝒮]` vanish on `H − Q`** (span form of
 `apply_eq_zero_of_mem_Sset_of_not_mem_Q`, by induction over the `ℤ`-span). -/
 theorem zSpan_Sset_apply_eq_zero_of_not_mem_Q [Finite G]

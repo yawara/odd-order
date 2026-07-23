@@ -788,7 +788,7 @@ by (5.2.e) (`sOf_memberRFamily_orthogonal`).  **No type hypothesis appears.** -/
 theorem sOf_coherent_extension_cross_orthogonal [Finite G] {M : Subgroup G} {A : Set G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
-    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [NeZero (Nat.card h46.W1)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
     (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
@@ -811,6 +811,7 @@ theorem sOf_coherent_extension_cross_orthogonal [Finite G] {M : Subgroup G} {A :
     (hne1 : ψ ≠ lam) (hne2 : ψ ≠ lam.conj) :
     ClassFunction.inner (c₁.extension ψ) (c₂.extension lam) = 0 := by
   classical
+  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   haveI := derivedInG_subgroupOf_normal M
   have h1 : ClassFunction.inner ψ lam = 0 :=
     OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
