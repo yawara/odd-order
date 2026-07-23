@@ -10,6 +10,8 @@ import Mathlib.Algebra.Group.End
 import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.Tactic.LinearCombination
 import Mathlib.Data.ZMod.QuotientGroup
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.RingTheory.ZMod.UnitsCyclic
 
 /-!
 # Isaacs Chapter 3 — Problems §3A (Split Extensions)
@@ -577,6 +579,80 @@ theorem reflection_mem_quaternion_iff (n : ℕ) [NeZero n] (hn : 8 ∣ n)
   rw [semidihedralQuaternion, MonoidHom.mem_ker, semidihedralParity_reflection,
     semidihedralLeftParity_apply, ← ofAdd_add, ofAdd_eq_one]
   exact (by decide : ∀ a : ZMod 2, (a + 1 = 0 ↔ a = 1)) _
+
+/-! ### Problem 3A.3 — 位数 pm の群 (正規 P 位数 p, G/P 巡回, Z(G)=1)
+
+`p` 素数, `m ∣ p-1`, `m > 1`。`(ZMod p)ˣ` (巡回, 位数 p-1) の位数 m 元 `u` から自己同型
+`σ = ×u` を作り、`G = Multiplicative (ZMod p) ⋊ ⟨σ⟩`。`|G| = p·m`、`P = inl 像` 正規 位数 p、
+`G/P ≅ ⟨σ⟩` 巡回、`Z(G) = 1` (作用が忠実 + 非自明: 体で `u-1` 可逆)。 -/
+
+/-- 単元 `u` による `Multiplicative (ZMod p)` の乗法的自己同型 `σ = ×u`。 -/
+noncomputable def sigmaOf {p : ℕ} (u : (ZMod p)ˣ) : MulAut (Multiplicative (ZMod p)) :=
+  (MulAutMultiplicative (ZMod p)).symm (AddAut.mulLeft u)
+
+theorem sigmaOf_orderOf {p : ℕ} (u : (ZMod p)ˣ) : orderOf (sigmaOf u) = orderOf u := by
+  have hinj : Function.Injective
+      (AddAut.mulLeft : (ZMod p)ˣ →* Multiplicative (AddAut (ZMod p))) := by
+    intro a b h
+    have h2 : (↑a : ZMod p) * 1 = (↑b : ZMod p) * 1 :=
+      DFunLike.congr_fun (congrArg Multiplicative.toAdd h) (1 : ZMod p)
+    rw [mul_one, mul_one] at h2
+    exact Units.ext h2
+  calc orderOf (sigmaOf u)
+      = orderOf (AddAut.mulLeft u) :=
+        orderOf_injective (MulAutMultiplicative (ZMod p)).symm.toMonoidHom
+          (MulAutMultiplicative (ZMod p)).symm.injective _
+    _ = orderOf u := orderOf_injective AddAut.mulLeft hinj u
+
+/-- `σ` の作用: `σ(x) = ↑u · toAdd x` (乗法的). -/
+@[simp] theorem sigmaOf_apply {p : ℕ} (u : (ZMod p)ˣ) (x : Multiplicative (ZMod p)) :
+    sigmaOf u x = Multiplicative.ofAdd ((↑u : ZMod p) * Multiplicative.toAdd x) := rfl
+
+/-- 位数 pm の群 `G = Multiplicative (ZMod p) ⋊ ⟨σ⟩`。 -/
+abbrev affineGroup {p : ℕ} (u : (ZMod p)ˣ) :=
+  SemidirectProduct (Multiplicative (ZMod p)) (Subgroup.zpowers (sigmaOf u))
+    (Subgroup.zpowers (sigmaOf u)).subtype
+
+/-- **Isaacs Problem 3A.3** (位数). `|G| = p · orderOf u`。 -/
+theorem affineGroup_card {p : ℕ} [Fact p.Prime] (u : (ZMod p)ˣ) :
+    Nat.card (affineGroup u) = p * orderOf u := by
+  rw [affineGroup, SemidirectProduct.card, Nat.card_zpowers, sigmaOf_orderOf,
+    Nat.card_congr (Multiplicative.toAdd (α := ZMod p)), Nat.card_zmod]
+
+/-- **Isaacs Problem 3A.3** (存在). 位数 `pm` の群で、位数 `p` の正規部分群 `P` をもち、
+`G/P` が巡回, `Z(G) = 1`。 -/
+theorem exists_group_card_eq_center_trivial (p m : ℕ) [Fact p.Prime] (hm : m ∣ p - 1)
+    (hm1 : 1 < m) : ∃ u : (ZMod p)ˣ, orderOf u = m := by
+  haveI := ZMod.isCyclic_units_prime (Fact.out (p := p.Prime))
+  obtain ⟨g, hg⟩ := IsCyclic.exists_ofOrder_eq_natCard (α := (ZMod p)ˣ)
+  have hp2 := (Fact.out (p := p.Prime)).two_le
+  have hcard : Nat.card (ZMod p)ˣ = p - 1 := by
+    rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime Fact.out]
+  have hng : orderOf g = p - 1 := by rw [hg, hcard]
+  have hmle : m ≤ p - 1 := Nat.le_of_dvd (by omega) hm
+  have hne : (p - 1) / m ≠ 0 := by have := Nat.div_pos hmle (by omega); omega
+  have hdvd : (p - 1) / m ∣ orderOf g := by rw [hng]; exact Nat.div_dvd_of_dvd hm
+  exact ⟨g ^ ((p - 1) / m), by
+    rw [orderOf_pow_of_dvd hne hdvd, hng, Nat.div_div_self hm (by omega)]⟩
+
+/-- **Isaacs Problem 3A.3** (P = ker rightHom の位数). `|P| = p`。P は正規 (`MonoidHom.normal_ker`)。 -/
+theorem affineGroup_card_ker {p : ℕ} [Fact p.Prime] (u : (ZMod p)ˣ) :
+    Nat.card (SemidirectProduct.rightHom :
+      affineGroup u →* Subgroup.zpowers (sigmaOf u)).ker = p := by
+  rw [← SemidirectProduct.range_inl_eq_ker_rightHom,
+    ← Nat.card_congr (MonoidHom.ofInjective
+      (SemidirectProduct.inl_injective
+        (φ := (Subgroup.zpowers (sigmaOf u)).subtype))).toEquiv,
+    Nat.card_congr (Multiplicative.toAdd (α := ZMod p)), Nat.card_zmod]
+
+/-- **Isaacs Problem 3A.3** (G/P 巡回). `G/ker rightHom ≅ ⟨σ⟩` (巡回)。 -/
+theorem affineGroup_quotient_isCyclic {p : ℕ} [Fact p.Prime] (u : (ZMod p)ˣ) :
+    IsCyclic (affineGroup u ⧸
+      (SemidirectProduct.rightHom : affineGroup u →* Subgroup.zpowers (sigmaOf u)).ker) := by
+  have e := QuotientGroup.quotientKerEquivOfSurjective
+    (SemidirectProduct.rightHom : affineGroup u →* Subgroup.zpowers (sigmaOf u))
+    SemidirectProduct.rightHom_surjective
+  exact isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
 
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,
