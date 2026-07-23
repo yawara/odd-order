@@ -332,6 +332,14 @@ mathlib inductive (`top`/`step`)。
 新 leaf `OddOrder/Isaacs/Ch03_SplitExtensions/Problems.lean` (namespace `OddOrder.Isaacs.Ch03`、
 import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 配線済)。
 
+- ✅ 実証明 **3A.3** 位数 pm 群 (正規 P 位数 p, G/P 巡回, Z(G)=1) — 2026-07-23 **完全完成**:
+  σ=×u (位数 m, `AddAut.mulLeft`+`MulAutMultiplicative`) / `affineGroup u = Mult(ZMod p) ⋊ ⟨σ⟩` /
+  `affineGroup_card` (|G|=p·orderOf u) / `affineGroup_card_ker` (P=ker rightHom 位数 p, 正規) /
+  `affineGroup_quotient_isCyclic` (G/P 巡回) / **`affineGroup_center_eq_bot`** (Z(G)=⊥、u≠1) /
+  `exists_group_card_eq_normal_cyclic_center_trivial` (存在まとめ)。center は (a,h)∈Z → φ(h)=id⟹h=1、
+  a=σ(a)⟹(u-1)·toAdd a=0⟹a=1 (体 ZMod p で u-1 可逆)。⚠ `Multiplicative (ZMod p)` の ring/group Mul
+  instance 衝突は **cancel を toAdd で ZMod p 加法に落として `add_left_cancel`** で回避 (教訓記録)。
+  全実証明・sorry 無・axiom-clean。
 - ✅ 実証明 **3A.1(a)** semidihedral の特徴的自己同型 (2026-07-23)。`ZMod n` (8∣n) 上、生成元条件
   `c^a = c⁻¹z` (加法的 `-c+z`, `z=n/2`) を満たす唯一の自己同型 `a` = 乗数 `w=z-1` (`w²=1` ∵ 4∣n)
   による乗法、位数 2。`semidihedralAut` (concrete `AddEquiv`, 自身が逆) / `_apply` / `_apply_isUnit`
@@ -351,7 +359,7 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
   `(2-4k)(1+2k)=2-8k²≡2`、d=2s→t=u·s)。`_isConj` (差が偶なら共役) + 系 `_isConj_of_two` (両偶)
   ・`_isConj_of_four` (両奇、dichotomy で `z·x=z` 確定)。全実証明・sorry 無・axiom-clean。
   **3A.1 完全完成 (a/b/c)**。
-- ⬜ **3A.2** (一般化四元数群 Q_n、3A.1 に依存) — roadmap (2026-07-23 記録、次イテレーション実行):
+- ✅ 実証明 **3A.2** 一般化四元数群 `Q_n` (位数 n) — 2026-07-23 完成 (ker(ψ) 構成):
   B = C の index-2 部分群 = `Subgroup.zpowers (Multiplicative.ofAdd (2:ZMod n))` (位数 n/2、
   偶元 = squares)。位数 4 の元 {(x,σ): x 奇} は inl(B) の coset `(ofAdd x₀, σ)·inl(B)` をなす
   (x₀ 奇; σ(ofAdd 2k)=ofAdd(-2k) ゆえ shift で {奇}=coset)。Q = coset ∪ inl(B) は位数 n の部分群
@@ -368,13 +376,39 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
   ({(x,1):x偶}∪{(x,σ):x奇}) + closure 手証明 (既証明の位数2/4 characterization を活用) にフォールバック。
 - ✅ 実証明 **3A.5** `semidirectConjEquivProd` (`G ⋊ G ≅ G × G`、共役作用の半直積は直積)。同型
   `(n,g)↦(n·g,g)` (逆 `(a,g)↦⟨a·g⁻¹,g⟩`)、map_mul' は `mul_left`/`mul_right`/`conj_apply` 展開 + `group`。
+- ⬜ **3A.3** (位数 pm 群、Z(G)=1) — 構成計画 (2026-07-23、order-m 元は scratch 検証済):
+  G = `Multiplicative (ZMod p) ⋊ Subgroup.zpowers σ` (p 素数, m∣p-1, m>1)。
+  **(1) order-m 元 u : (ZMod p)ˣ [検証済]**: `haveI := ZMod.isCyclic_units_prime Fact.out`;
+  `obtain ⟨g,hg⟩ := IsCyclic.exists_ofOrder_eq_natCard`; `Nat.card (ZMod p)ˣ = p-1`
+  (`card_units_eq_totient`+`totient_prime`); `u := g^((p-1)/m)`;
+  `orderOf u = m` via `orderOf_pow_of_dvd hne hdvd` + `Nat.div_div_self hm`
+  (hdvd: (p-1)/m ∣ p-1 = `Nat.div_dvd_of_dvd hm`, hne: (p-1)/m≠0)。
+  **(2) σ := `(MulAutMultiplicative (ZMod p)).symm (AddAut.mulLeft u)`** : MulAut(Mult(ZMod p))。
+  `orderOf σ = orderOf u = m` via `orderOf_injective (MulAutMultiplicative _).symm.toMonoidHom
+  (.symm.injective)` ∘ `orderOf_injective AddAut.mulLeft hinj`。⚠ hinj (mulLeft 単射) は
+  `AddAut.mulLeft = DistribMulAction.toAddAut` (`@[simps! +simpRhs]`) の apply で `(toAdd(mulLeft a)) 1
+  = ↑a·1 = ↑a`; `congrArg Multiplicative.toAdd h` + `DFunLike.congr_fun _ 1` + `simpa [Units.smul_def,
+  Units.ext_iff]` (前回 simp が toAdd wrapper を剥がせず未完 — apply 補題名の特定が要)。
+  **(3) |G| = p·m**: `SemidirectProduct.card` (=|N|·|H|) + `Nat.card_zpowers`+orderOf σ=m +
+  `Nat.card (Mult(ZMod p)) = p` (`Nat.card_congr Multiplicative.toAdd`+`Nat.card_zmod`)。
+  **(4) P := inl 像 = ker rightHom, 正規, |P|=p; G/P ≅ zpowers σ 巡回 (rightHom 全射)**。
+  `SemidirectProduct.rightHom`/`range_inl`/`inl_injective`。
+  **(5) Z(G)=⊥ [核心・未検証, SemidirectProduct center API 無し]**: (a,h)∈center →
+  ∀(b,k) 可換。k=1: a·φ(h)(b)=b·a ⟹ φ(h)(b)=b ∀b (N 可換) ⟹ φ(h)=id ⟹ h=1 (φ=subtype 単射)。
+  h=1,b=1,k=σ: a=σ(a)=×u(a) ⟹ (u-1)·toAdd a=0 ⟹ toAdd a=0 (u≠1 ⟹ u-1 は体 ZMod p の unit)
+  ⟹ a=1。~50 行。`Subgroup.mem_center_iff`/`SemidirectProduct.ext`/`SemidirectProduct.mul_left,right`。
 - ⬜ 残り §3A (いずれも substantial ~50-60 行): **3A.6** (p-群 P が p∤|G| の G に faithful ⟹ ある
   P-orbit で faithful) — repo に **Thm 1.38 (Generalized Brodkey)** あり (`Ch01_Sylow/Main.lean:756`、
   Sylow 交叉極小で S∩T 内の両正規部分群 ⊆ O_p)。application は `G⋊P` 構成で P を Sylow とみて Brodkey +
   orbit-stabilizer。**3A.3** (order pm, m|p-1, 正規 P 位数 p, G/P 巡回, Z(G)=1) — construction:
   `(ZMod p)⋊C`, C≤Aut(ZMod p)=(ZMod p)ˣ 位数 m (巡回ゆえ存在)、加法/乗法 bridging + Z=1 検証。
-  **3A.4** (order q(q-1), 基本アーベル正規, 位数 p 元共役) — 体 F_q の F_q⋊F_qˣ。3A.1/3A.2 (SD/Q_n 構成) /
-  3A.7 (regular orbit) / 3A.8 (cyclic pqr auto)。次イテレーションで 3A.6 or 3A.3 を新鮮に構築推奨。
+  **3A.4** (order q(q-1), 基本アーベル正規, 位数 p 元共役) — roadmap: 有限体 F (|F|=q=p^k) の
+  `G = Multiplicative F ⋊ Fˣ` (φ = `(MulAutMultiplicative F).symm ∘ AddAut.mulLeft` : Fˣ→MulAut)。
+  3A.3 の affineGroup パターン再利用 (**cancel は toAdd で加法に落として instance 衝突回避**)。
+  |G|=q(q-1) (`SemidirectProduct.card`, |Fˣ|=q-1)、N=inl 像 正規 位数 q 基本アーベル (char p ゆえ
+  ∀x xᵖ=1)、位数-p 元 = inl(F\{0}) (h≠1 なら orderOf h | q-1 coprime p ⟹ 位数 p 不可 ⟹ h=1)、
+  Fˣ が F\{0} に推移的 (h=a'/a) ⟹ 全 inl(nonzero) 共役 = 単一共役類。`GaloisField p k` or 任意
+  `[Field F][Fintype F]` で parameterize。~110 行。3A.7 (regular orbit) / 3A.8 (cyclic pqr auto)。
   **★ 3A.3 の材料確定 (2026-07-23、de-risked)**: bridge は **`IsCyclic.mulAutMulEquiv : MulAut G ≃*
   (ZMod (Nat.card G))ˣ`** (Cyclic.lean:593) がまさにこれ (先の「bridge 無し」は誤り)。手順:
   `N := Multiplicative (ZMod p)` (cyclic card p)、`(ZMod p)ˣ` の位数 m 元 `u` (m|p-1, 巡回ゆえ存在) →

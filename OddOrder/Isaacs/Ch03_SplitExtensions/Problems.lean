@@ -9,6 +9,9 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.Algebra.Group.End
 import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.Tactic.LinearCombination
+import Mathlib.Data.ZMod.QuotientGroup
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.RingTheory.ZMod.UnitsCyclic
 
 /-!
 # Isaacs Chapter 3 — Problems §3A (Split Extensions)
@@ -417,6 +420,304 @@ theorem semidihedralReflection_isConj_of_four (n : ℕ) [NeZero n] (hn : 8 ∣ n
   have e2 := (semidihedral_invol_mul_dichotomy n (dvd_trans (by norm_num) hn)
     (Multiplicative.toAdd x')).resolve_left hx'
   rw [mul_sub, e2, e1, sub_self]
+
+/-! ### Problem 3A.2 — 一般化四元数群 `Q_n = ⟨σ⟩·B ∪ B` (位数 n)
+
+`S = C_n ⋊ ⟨σ⟩` から `ℤ/2` への準同型 `ψ(x,h) = (x の parity) + (h の parity)` を作り、`Q := ker ψ`
+とする。`ψ` 全射ゆえ `|Q| = |S|/2 = n` (= 一般化四元数群 `Q_n`)。左 parity `fn`・H parity `fg` を
+`SemidirectProduct.lift` で束ねる (σ は parity を保存: `w = z-1` 奇)。 -/
+
+/-- `σ` の位数は 2。 -/
+theorem semidihedralMulAut_orderOf (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    orderOf (semidihedralMulAut n hn) = 2 := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  exact orderOf_eq_prime (by rw [pow_two]; exact semidihedralMulAut_sq n hn)
+    (semidihedralMulAut_ne_one n hn)
+
+/-- `H = ⟨σ⟩` の元は `1` か `σ` (位数 2 ゆえ). -/
+theorem semidihedral_H_cases (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    (h : Subgroup.zpowers (semidihedralMulAut n hn)) :
+    h = 1 ∨ h = ⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ := by
+  rcases eq_or_ne h 1 with rfl | hne
+  · exact Or.inl rfl
+  · refine Or.inr ?_
+    have hcard : Nat.card (Subgroup.zpowers (semidihedralMulAut n hn)) = 2 := by
+      rw [Nat.card_zpowers, semidihedralMulAut_orderOf]
+    obtain ⟨y, -, huniq⟩ :=
+      (Nat.card_eq_two_iff' (1 : Subgroup.zpowers (semidihedralMulAut n hn))).mp hcard
+    have hσ : (⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ :
+        Subgroup.zpowers (semidihedralMulAut n hn)) ≠ 1 :=
+      fun hcon => semidihedralMulAut_ne_one n hn (by simpa using Subtype.ext_iff.mp hcon)
+    rw [huniq h hne, huniq _ hσ]
+
+/-- 左成分の parity 準同型 `C_n → ℤ/2`。 -/
+def semidihedralLeftParity (n : ℕ) (hn : 8 ∣ n) :
+    Multiplicative (ZMod n) →* Multiplicative (ZMod 2) where
+  toFun x := Multiplicative.ofAdd
+    (ZMod.castHom (dvd_trans (by norm_num) hn) (ZMod 2) (Multiplicative.toAdd x))
+  map_one' := by simp
+  map_mul' x y := by simp only [toAdd_mul, map_add, ofAdd_add]
+
+@[simp] theorem semidihedralLeftParity_apply (n : ℕ) (hn : 8 ∣ n) (x : Multiplicative (ZMod n)) :
+    semidihedralLeftParity n hn x = Multiplicative.ofAdd
+      (ZMod.castHom (dvd_trans (by norm_num) hn) (ZMod 2) (Multiplicative.toAdd x)) := rfl
+
+open Classical in
+/-- H 成分の parity 準同型 `⟨σ⟩ → ℤ/2` (`σ ↦ 1`)。 -/
+noncomputable def semidihedralRightParity (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    Subgroup.zpowers (semidihedralMulAut n hn) →* Multiplicative (ZMod 2) where
+  toFun h := if h = 1 then 1 else Multiplicative.ofAdd 1
+  map_one' := by simp
+  map_mul' h h' := by
+    have hσσ : (⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ :
+        Subgroup.zpowers (semidihedralMulAut n hn)) *
+        ⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ = 1 :=
+      Subtype.ext (by change semidihedralMulAut n hn * semidihedralMulAut n hn = 1
+                      exact semidihedralMulAut_sq n hn)
+    have hσ1 : (⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ :
+        Subgroup.zpowers (semidihedralMulAut n hn)) ≠ 1 :=
+      fun hcon => semidihedralMulAut_ne_one n hn (by simpa using Subtype.ext_iff.mp hcon)
+    have hof : Multiplicative.ofAdd (1 : ZMod 2) * Multiplicative.ofAdd 1 = 1 := by decide
+    rcases semidihedral_H_cases n hn h with rfl | rfl <;>
+      rcases semidihedral_H_cases n hn h' with rfl | rfl <;>
+      simp [hσσ, hσ1, hof]
+
+/-- `σ` は左 parity を保存: `fn(σ x) = fn(x)` (`w = z-1` が奇 ⟹ `cast w = 1` in `ℤ/2`)。 -/
+theorem semidihedralLeftParity_mulAut (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    (x : Multiplicative (ZMod n)) :
+    semidihedralLeftParity n hn (semidihedralMulAut n hn x) = semidihedralLeftParity n hn x := by
+  have hn2 : ((n / 2 : ℕ) : ZMod 2) = 0 := by rw [ZMod.natCast_eq_zero_iff]; omega
+  have hw : (ZMod.castHom (dvd_trans (by norm_num) hn) (ZMod 2)) (((n / 2 : ℕ) : ZMod n) - 1)
+      = 1 := by rw [map_sub, map_natCast, map_one, hn2]; decide
+  simp only [semidihedralLeftParity_apply, semidihedralMulAut_apply, toAdd_ofAdd, map_mul, hw,
+    one_mul]
+
+/-- **Isaacs Problem 3A.2** の parity 準同型 `ψ : S →* ℤ/2`, `ψ(x,h) = fn(x)·fg(h)`。 -/
+noncomputable def semidihedralParity (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    SemidihedralGroup n hn →* Multiplicative (ZMod 2) :=
+  SemidirectProduct.lift (semidihedralLeftParity n hn) (semidihedralRightParity n hn)
+    (fun g => MonoidHom.ext fun x => by
+      have hcancel : (semidihedralRightParity n hn) g * semidihedralLeftParity n hn x *
+          ((semidihedralRightParity n hn) g)⁻¹ = semidihedralLeftParity n hn x := by
+        rw [mul_comm ((semidihedralRightParity n hn) g), mul_assoc, mul_inv_cancel, mul_one]
+      simp only [MonoidHom.coe_comp, Function.comp_apply, MulEquiv.coe_toMonoidHom,
+        MulAut.conj_apply, hcancel]
+      rcases semidihedral_H_cases n hn g with rfl | rfl
+      · rfl
+      · exact semidihedralLeftParity_mulAut n hn x)
+
+@[simp] theorem semidihedralParity_inl (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    (x : Multiplicative (ZMod n)) :
+    semidihedralParity n hn (SemidirectProduct.inl x) = semidihedralLeftParity n hn x := by
+  rw [semidihedralParity, SemidirectProduct.lift_inl]
+
+/-- **Isaacs Problem 3A.2** の一般化四元数群 `Q_n := ker ψ`。`ψ` 全射ゆえ位数 `|S|/2 = n`。 -/
+noncomputable def semidihedralQuaternion (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    Subgroup (SemidihedralGroup n hn) :=
+  (semidihedralParity n hn).ker
+
+theorem semidihedralParity_surjective (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    Function.Surjective (semidihedralParity n hn) := by
+  have hcases : ∀ z : Multiplicative (ZMod 2), z = 1 ∨ z = Multiplicative.ofAdd 1 := fun z => by
+    rcases (by decide : ∀ a : ZMod 2, a = 0 ∨ a = 1) (Multiplicative.toAdd z) with h | h
+    · exact Or.inl (Multiplicative.toAdd.injective (by rw [h]; rfl))
+    · exact Or.inr (Multiplicative.toAdd.injective (by rw [h]; rfl))
+  intro y
+  rcases hcases y with rfl | rfl
+  · exact ⟨1, map_one _⟩
+  · exact ⟨SemidirectProduct.inl (Multiplicative.ofAdd 1), by
+      rw [semidihedralParity_inl, semidihedralLeftParity_apply, toAdd_ofAdd, map_one]⟩
+
+/-- **Isaacs Problem 3A.2**. `Q_n` は位数 `n` の部分群 (= 一般化四元数群)。 -/
+theorem semidihedralQuaternion_card (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    Nat.card (semidihedralQuaternion n hn) = n := by
+  have hZn : Nat.card (Multiplicative (ZMod n)) = n := by
+    rw [Nat.card_congr (Multiplicative.toAdd (α := ZMod n)), Nat.card_zmod]
+  have hZ2 : Nat.card (Multiplicative (ZMod 2)) = 2 := by
+    rw [Nat.card_congr (Multiplicative.toAdd (α := ZMod 2)), Nat.card_zmod]
+  have hS : Nat.card (SemidihedralGroup n hn) = 2 * n := by
+    rw [SemidirectProduct.card, Nat.card_zpowers, semidihedralMulAut_orderOf, hZn]; ring
+  have hidx : (semidihedralQuaternion n hn).index = 2 := by
+    rw [semidihedralQuaternion, Subgroup.index_ker,
+      MonoidHom.range_eq_top.mpr (semidihedralParity_surjective n hn),
+      Nat.card_congr (Subgroup.topEquiv).toEquiv, hZ2]
+  have hcard := Subgroup.card_mul_index (semidihedralQuaternion n hn)
+  rw [hidx, hS] at hcard
+  omega
+
+theorem semidihedralRightParity_sigma (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    semidihedralRightParity n hn ⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩
+      = Multiplicative.ofAdd 1 := by
+  have hσ1 : (⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ :
+      Subgroup.zpowers (semidihedralMulAut n hn)) ≠ 1 :=
+    fun hcon => semidihedralMulAut_ne_one n hn (by simpa using Subtype.ext_iff.mp hcon)
+  simp only [semidihedralRightParity, MonoidHom.coe_mk, OneHom.coe_mk, if_neg hσ1]
+
+theorem semidihedralParity_reflection (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    (x : Multiplicative (ZMod n)) :
+    semidihedralParity n hn (semidihedralReflection n hn x)
+      = semidihedralLeftParity n hn x * Multiplicative.ofAdd 1 := by
+  rw [show semidihedralParity n hn (semidihedralReflection n hn x)
+      = semidihedralLeftParity n hn x *
+        semidihedralRightParity n hn ⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ from rfl,
+    semidihedralRightParity_sigma]
+
+/-- **Isaacs Problem 3A.2** (`B ⊆ Q`). `inl x` (`= C_n` の元) が `Q` に属す ⟺ `x` が偶。
+`B` = index-2 部分群 (偶元) はちょうど `Q ∩ C`。 -/
+theorem inl_mem_quaternion_iff (n : ℕ) [NeZero n] (hn : 8 ∣ n) (x : Multiplicative (ZMod n)) :
+    SemidirectProduct.inl x ∈ semidihedralQuaternion n hn
+      ↔ (ZMod.castHom (dvd_trans (by norm_num) hn) (ZMod 2)) (Multiplicative.toAdd x) = 0 := by
+  rw [semidihedralQuaternion, MonoidHom.mem_ker, semidihedralParity_inl,
+    semidihedralLeftParity_apply, ofAdd_eq_one]
+
+/-- **Isaacs Problem 3A.2** (位数 4 の coset ⊆ Q). reflection `(x,σ)` が `Q` に属す ⟺ `x` が奇。
+位数 4 の元 (`x` 奇) 全体は `Q` 内の `B`-coset をなす。 -/
+theorem reflection_mem_quaternion_iff (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    (x : Multiplicative (ZMod n)) :
+    semidihedralReflection n hn x ∈ semidihedralQuaternion n hn
+      ↔ (ZMod.castHom (dvd_trans (by norm_num) hn) (ZMod 2)) (Multiplicative.toAdd x) = 1 := by
+  rw [semidihedralQuaternion, MonoidHom.mem_ker, semidihedralParity_reflection,
+    semidihedralLeftParity_apply, ← ofAdd_add, ofAdd_eq_one]
+  exact (by decide : ∀ a : ZMod 2, (a + 1 = 0 ↔ a = 1)) _
+
+/-! ### Problem 3A.3 — 位数 pm の群 (正規 P 位数 p, G/P 巡回, Z(G)=1)
+
+`p` 素数, `m ∣ p-1`, `m > 1`。`(ZMod p)ˣ` (巡回, 位数 p-1) の位数 m 元 `u` から自己同型
+`σ = ×u` を作り、`G = Multiplicative (ZMod p) ⋊ ⟨σ⟩`。`|G| = p·m`、`P = inl 像` 正規 位数 p、
+`G/P ≅ ⟨σ⟩` 巡回、`Z(G) = 1` (作用が忠実 + 非自明: 体で `u-1` 可逆)。 -/
+
+/-- 単元 `u` による `Multiplicative (ZMod p)` の乗法的自己同型 `σ = ×u`。 -/
+noncomputable def sigmaOf {p : ℕ} (u : (ZMod p)ˣ) : MulAut (Multiplicative (ZMod p)) :=
+  (MulAutMultiplicative (ZMod p)).symm (AddAut.mulLeft u)
+
+theorem sigmaOf_orderOf {p : ℕ} (u : (ZMod p)ˣ) : orderOf (sigmaOf u) = orderOf u := by
+  have hinj : Function.Injective
+      (AddAut.mulLeft : (ZMod p)ˣ →* Multiplicative (AddAut (ZMod p))) := by
+    intro a b h
+    have h2 : (↑a : ZMod p) * 1 = (↑b : ZMod p) * 1 :=
+      DFunLike.congr_fun (congrArg Multiplicative.toAdd h) (1 : ZMod p)
+    rw [mul_one, mul_one] at h2
+    exact Units.ext h2
+  calc orderOf (sigmaOf u)
+      = orderOf (AddAut.mulLeft u) :=
+        orderOf_injective (MulAutMultiplicative (ZMod p)).symm.toMonoidHom
+          (MulAutMultiplicative (ZMod p)).symm.injective _
+    _ = orderOf u := orderOf_injective AddAut.mulLeft hinj u
+
+/-- `σ` の作用: `σ(x) = ↑u · toAdd x` (乗法的). -/
+@[simp] theorem sigmaOf_apply {p : ℕ} (u : (ZMod p)ˣ) (x : Multiplicative (ZMod p)) :
+    sigmaOf u x = Multiplicative.ofAdd ((↑u : ZMod p) * Multiplicative.toAdd x) := rfl
+
+/-- 位数 pm の群 `G = Multiplicative (ZMod p) ⋊ ⟨σ⟩`。 -/
+abbrev affineGroup {p : ℕ} (u : (ZMod p)ˣ) :=
+  SemidirectProduct (Multiplicative (ZMod p)) (Subgroup.zpowers (sigmaOf u))
+    (Subgroup.zpowers (sigmaOf u)).subtype
+
+/-- **Isaacs Problem 3A.3** (位数). `|G| = p · orderOf u`。 -/
+theorem affineGroup_card {p : ℕ} [Fact p.Prime] (u : (ZMod p)ˣ) :
+    Nat.card (affineGroup u) = p * orderOf u := by
+  rw [affineGroup, SemidirectProduct.card, Nat.card_zpowers, sigmaOf_orderOf,
+    Nat.card_congr (Multiplicative.toAdd (α := ZMod p)), Nat.card_zmod]
+
+/-- **Isaacs Problem 3A.3** (存在). 位数 `pm` の群で、位数 `p` の正規部分群 `P` をもち、
+`G/P` が巡回, `Z(G) = 1`。 -/
+theorem exists_group_card_eq_center_trivial (p m : ℕ) [Fact p.Prime] (hm : m ∣ p - 1)
+    (hm1 : 1 < m) : ∃ u : (ZMod p)ˣ, orderOf u = m := by
+  haveI := ZMod.isCyclic_units_prime (Fact.out (p := p.Prime))
+  obtain ⟨g, hg⟩ := IsCyclic.exists_ofOrder_eq_natCard (α := (ZMod p)ˣ)
+  have hp2 := (Fact.out (p := p.Prime)).two_le
+  have hcard : Nat.card (ZMod p)ˣ = p - 1 := by
+    rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime Fact.out]
+  have hng : orderOf g = p - 1 := by rw [hg, hcard]
+  have hmle : m ≤ p - 1 := Nat.le_of_dvd (by omega) hm
+  have hne : (p - 1) / m ≠ 0 := by have := Nat.div_pos hmle (by omega); omega
+  have hdvd : (p - 1) / m ∣ orderOf g := by rw [hng]; exact Nat.div_dvd_of_dvd hm
+  exact ⟨g ^ ((p - 1) / m), by
+    rw [orderOf_pow_of_dvd hne hdvd, hng, Nat.div_div_self hm (by omega)]⟩
+
+/-- **Isaacs Problem 3A.3** (P = ker rightHom の位数). `|P| = p`。P は正規 (`MonoidHom.normal_ker`)。 -/
+theorem affineGroup_card_ker {p : ℕ} [Fact p.Prime] (u : (ZMod p)ˣ) :
+    Nat.card (SemidirectProduct.rightHom :
+      affineGroup u →* Subgroup.zpowers (sigmaOf u)).ker = p := by
+  rw [← SemidirectProduct.range_inl_eq_ker_rightHom,
+    ← Nat.card_congr (MonoidHom.ofInjective
+      (SemidirectProduct.inl_injective
+        (φ := (Subgroup.zpowers (sigmaOf u)).subtype))).toEquiv,
+    Nat.card_congr (Multiplicative.toAdd (α := ZMod p)), Nat.card_zmod]
+
+/-- **Isaacs Problem 3A.3** (G/P 巡回). `G/ker rightHom ≅ ⟨σ⟩` (巡回)。 -/
+theorem affineGroup_quotient_isCyclic {p : ℕ} [Fact p.Prime] (u : (ZMod p)ˣ) :
+    IsCyclic (affineGroup u ⧸
+      (SemidirectProduct.rightHom : affineGroup u →* Subgroup.zpowers (sigmaOf u)).ker) := by
+  have e := QuotientGroup.quotientKerEquivOfSurjective
+    (SemidirectProduct.rightHom : affineGroup u →* Subgroup.zpowers (sigmaOf u))
+    SemidirectProduct.rightHom_surjective
+  exact isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
+
+/-- **Isaacs Problem 3A.3** (中心自明). `u ≠ 1` (作用が非自明) なら `Z(G) = 1`。
+中心元 `(a,h)`: `inl b` と可換 ⟹ `φ(h)=id` ⟹ `h=1`; `inr σ` と可換 ⟹ `a=σ(a)=×u(a)` ⟹
+`(u-1)·toAdd a=0` ⟹ `toAdd a=0` (体 `ZMod p` で `u-1≠0` 可逆) ⟹ `a=1`。 -/
+theorem affineGroup_center_eq_bot {p : ℕ} [Fact p.Prime] {u : (ZMod p)ˣ} (hu : u ≠ 1) :
+    Subgroup.center (affineGroup u) = ⊥ := by
+  rw [Subgroup.eq_bot_iff_forall]
+  intro g hg
+  rw [Subgroup.mem_center_iff] at hg
+  have hright : g.right = 1 := by
+    have key : (Subgroup.zpowers (sigmaOf u)).subtype g.right = 1 := by
+      ext b
+      simp only [MulAut.one_apply]
+      have hb := congrArg SemidirectProduct.left (hg (SemidirectProduct.inl b))
+      simp only [SemidirectProduct.mul_left, SemidirectProduct.left_inl,
+        SemidirectProduct.right_inl, map_one, MulAut.one_apply] at hb
+      apply Multiplicative.toAdd.injective
+      have hb2 := congrArg Multiplicative.toAdd hb
+      rw [toAdd_mul, toAdd_mul] at hb2
+      have hc : Multiplicative.toAdd g.left + Multiplicative.toAdd b
+          = Multiplicative.toAdd g.left
+            + Multiplicative.toAdd ((Subgroup.zpowers (sigmaOf u)).subtype g.right b) := by
+        rw [add_comm (Multiplicative.toAdd g.left) (Multiplicative.toAdd b)]; exact hb2
+      exact (add_left_cancel hc).symm
+    exact (Subgroup.zpowers (sigmaOf u)).subtype_injective
+      (key.trans (map_one (Subgroup.zpowers (sigmaOf u)).subtype).symm)
+  have hleft : g.left = 1 := by
+    have hb := congrArg SemidirectProduct.left (hg (SemidirectProduct.inr
+      ⟨sigmaOf u, Subgroup.mem_zpowers _⟩))
+    simp only [SemidirectProduct.mul_left, SemidirectProduct.left_inr,
+      SemidirectProduct.right_inr, map_one, mul_one, one_mul] at hb
+    rw [show ((Subgroup.zpowers (sigmaOf u)).subtype ⟨sigmaOf u, Subgroup.mem_zpowers _⟩)
+        = sigmaOf u from rfl, sigmaOf_apply] at hb
+    have ht : Multiplicative.toAdd g.left = (↑u : ZMod p) * Multiplicative.toAdd g.left := by
+      have h2 := congrArg Multiplicative.toAdd hb
+      rw [toAdd_ofAdd] at h2
+      exact h2.symm
+    have hu0 : (↑u : ZMod p) - 1 ≠ 0 := by
+      intro hcon
+      apply hu
+      rw [sub_eq_zero] at hcon
+      exact Units.ext (hcon.trans Units.val_one.symm)
+    have hzero : Multiplicative.toAdd g.left = 0 := by
+      have hmul : ((↑u : ZMod p) - 1) * Multiplicative.toAdd g.left = 0 := by
+        rw [sub_mul, one_mul, ← ht, sub_self]
+      exact (mul_eq_zero.mp hmul).resolve_left hu0
+    exact Multiplicative.toAdd.injective (by rw [hzero]; rfl)
+  exact SemidirectProduct.ext (by rw [hleft, SemidirectProduct.one_left])
+    (by rw [hright, SemidirectProduct.one_right])
+
+/-- **Isaacs Problem 3A.3** (まとめ). `p` 素数, `m ∣ p-1`, `m > 1` のとき、位数 `pm` の群 `G` で、
+位数 `p` の正規部分群 `P` をもち、`G/P` が巡回, `Z(G) = 1` となるものが存在する。 -/
+theorem exists_group_card_eq_normal_cyclic_center_trivial (p m : ℕ) [Fact p.Prime]
+    (hm : m ∣ p - 1) (hm1 : 1 < m) :
+    ∃ u : (ZMod p)ˣ, Nat.card (affineGroup u) = p * m ∧
+      Nat.card (SemidirectProduct.rightHom :
+        affineGroup u →* Subgroup.zpowers (sigmaOf u)).ker = p ∧
+      IsCyclic (affineGroup u ⧸
+        (SemidirectProduct.rightHom : affineGroup u →* Subgroup.zpowers (sigmaOf u)).ker) ∧
+      Subgroup.center (affineGroup u) = ⊥ := by
+  obtain ⟨u, hu⟩ := exists_group_card_eq_center_trivial p m hm hm1
+  have hune : u ≠ 1 := by
+    intro h; rw [h, orderOf_one] at hu; omega
+  exact ⟨u, by rw [affineGroup_card, hu], affineGroup_card_ker u,
+    affineGroup_quotient_isCyclic u, affineGroup_center_eq_bot hune⟩
 
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,
