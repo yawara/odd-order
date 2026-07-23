@@ -402,8 +402,13 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
   Sylow 交叉極小で S∩T 内の両正規部分群 ⊆ O_p)。application は `G⋊P` 構成で P を Sylow とみて Brodkey +
   orbit-stabilizer。**3A.3** (order pm, m|p-1, 正規 P 位数 p, G/P 巡回, Z(G)=1) — construction:
   `(ZMod p)⋊C`, C≤Aut(ZMod p)=(ZMod p)ˣ 位数 m (巡回ゆえ存在)、加法/乗法 bridging + Z=1 検証。
-  **3A.4** (order q(q-1), 基本アーベル正規, 位数 p 元共役) — 体 F_q の F_q⋊F_qˣ。3A.1/3A.2 (SD/Q_n 構成) /
-  3A.7 (regular orbit) / 3A.8 (cyclic pqr auto)。次イテレーションで 3A.6 or 3A.3 を新鮮に構築推奨。
+  **3A.4** (order q(q-1), 基本アーベル正規, 位数 p 元共役) — roadmap: 有限体 F (|F|=q=p^k) の
+  `G = Multiplicative F ⋊ Fˣ` (φ = `(MulAutMultiplicative F).symm ∘ AddAut.mulLeft` : Fˣ→MulAut)。
+  3A.3 の affineGroup パターン再利用 (**cancel は toAdd で加法に落として instance 衝突回避**)。
+  |G|=q(q-1) (`SemidirectProduct.card`, |Fˣ|=q-1)、N=inl 像 正規 位数 q 基本アーベル (char p ゆえ
+  ∀x xᵖ=1)、位数-p 元 = inl(F\{0}) (h≠1 なら orderOf h | q-1 coprime p ⟹ 位数 p 不可 ⟹ h=1)、
+  Fˣ が F\{0} に推移的 (h=a'/a) ⟹ 全 inl(nonzero) 共役 = 単一共役類。`GaloisField p k` or 任意
+  `[Field F][Fintype F]` で parameterize。~110 行。3A.7 (regular orbit) / 3A.8 (cyclic pqr auto)。
   **★ 3A.3 の材料確定 (2026-07-23、de-risked)**: bridge は **`IsCyclic.mulAutMulEquiv : MulAut G ≃*
   (ZMod (Nat.card G))ˣ`** (Cyclic.lean:593) がまさにこれ (先の「bridge 無し」は誤り)。手順:
   `N := Multiplicative (ZMod p)` (cyclic card p)、`(ZMod p)ˣ` の位数 m 元 `u` (m|p-1, 巡回ゆえ存在) →
