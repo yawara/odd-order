@@ -44,3 +44,4 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorsTypeBC
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedFactorTypeCParameter
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniCrossCommutatorContradiction
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeBTypeB
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentFourTypeCTypeB
