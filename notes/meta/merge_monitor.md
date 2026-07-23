@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 19:0x 監視 tick — c (Filiform lint 81件・lane-c backlog 完了) + a (openClassical 8 file) 合流 + baseline 139→50**。a=1 / b=0 / c=1 / d=0。
+> 合流 c (**lint 0146 完了**): BG AppE_Filiform{Group,Counterexample} の flexible (73) + style.show (8) = 81 件解消。**これで lane-c-owned lint backlog は完了** (c 宣言)。c は lint-baseline.tsv 非接触 (Lean 修正のみ) ゆえ merge clean。
+> 合流 a (**lint 0133**): open scoped Classical statement-dependent を Pf S04_{DadeIsometry/MobiusAssembly, InduceConjFinset} / S08_{CaseBAnchoredSeed, CaseBWeightedEndgame, CoherenceWeighted, Theorem63} / S09_{Building78C, CertificateDischarge} の 8 file で局所化。競合は lint-baseline.tsv のみ (--ours 解消)。8 Pf file は main 未変更ゆえ非競合。
+> **gate: green 4721 jobs (不変・c/a とも lint-only 新 leaf 0・orphan なし) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 50 ≤ 50 新 baseline (実 warning 50 = 139 − c81 − a の openClassical、pure removal・新 grandfather 0) / push 6a3754542→0b82b7871**。範囲逸脱なし。build wall 17:17 (a の Pf S08/S09 = 深い大 file の下流 cone)。
+> 📉 **baseline は 4 tick で 199→190→153→139→50 と急減** (d/c/a の lint wave 集中期)。lane-c backlog 完了で c は Q₈/math frontier に復帰見込み。a は openClassical (0133) 継続の可能性。⚠ a は behind=29 と大幅遅延 — merge-base 解析で吸収中だが a 側の `git merge main` 同期滞りは継続観察。
+>
 > **▶▶ 2026-07-23 18:4x 監視 tick — b (Higman exp-two pair 実分類 4 leaf) 合流**。a=0 / b=3 / c=0 / d=0。(18:2x tick は全レーン ahead=0 で省略)
 > 合流: b (**Higman L13 exponent-two 続き**): 共通座標上の actual exponent-two pair を分類 + factor-pair relation を定義/固定座標版に分離。4 新 leaf: ExponentTwoPairwiseFactorCoordinates (448行) + ExponentTwoPairwiseFactorData (206行) (HigmanLemmaThirteen/) / FactorPairRelationDefinition (55行) + FixedFactorPairRelation (323行) (HigmanLemmaTwelve/)。FactorPairRelation.lean は −264 の分割 refactor (Definition/Fixed へ抽出、削除でなく移設)。全 leaf hub 経由 WIRED。
 > **gate: green 4721 jobs (前 4717 +4 = b の 4 leaf・orphan 0) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 139 ≤ 139 baseline (b の 4 新 leaf は非 sorry 警告 0) / push 09f7e6043→59d88b8df**。範囲逸脱なし。build wall 1:12 (Higman leaf-ward ゆえ下流限定・高速)。b は lint-baseline 非接触ゆえ baseline 調整不要。
