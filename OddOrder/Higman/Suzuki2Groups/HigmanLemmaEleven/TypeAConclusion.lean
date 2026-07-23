@@ -449,7 +449,7 @@ private theorem lowerCentralTerm_one_map_zeroEquiv_symm
 
 /-- Identify the ambient quotient by the first lower-central term with the
 actual zeroth lower-central layer. -/
-private noncomputable def ambientQuotientEquivLowerCentralLayerZero
+noncomputable def ambientQuotientEquivLowerCentralLayerZero
     (P : Type uP) [Group P]
     (hK0 : lowerCentralLayerKernel P 0 =
       (lowerCentralTerm P 1).subgroupOf (lowerCentralTerm P 0)) :
@@ -460,7 +460,7 @@ private noncomputable def ambientQuotientEquivLowerCentralLayerZero
 
 /-- When the second-layer denominator is trivial, the second layer is the
 actual first lower-central term. -/
-private noncomputable def lowerCentralLayerOneEquivTerm
+noncomputable def lowerCentralLayerOneEquivTerm
     {P : Type uP} [Group P]
     (hK1 : lowerCentralLayerKernel P 1 = ⊥) :
     lowerCentralLayer P 1 ≃* lowerCentralTerm P 1 :=
@@ -468,7 +468,7 @@ private noncomputable def lowerCentralLayerOneEquivTerm
     QuotientGroup.quotientBot
 
 /-- Kernel coordinates induced by an additive second-layer coordinate. -/
-private noncomputable def lowerCentralExtensionLeft
+noncomputable def lowerCentralExtensionLeft
     {P : Type uP} [Group P]
     {F : Type uF} [AddGroup F]
     (hK1 : lowerCentralLayerKernel P 1 = ⊥)
@@ -478,7 +478,7 @@ private noncomputable def lowerCentralExtensionLeft
     (lowerCentralLayerOneEquivTerm hK1)
 
 /-- Quotient coordinates induced by an additive zeroth-layer coordinate. -/
-private noncomputable def lowerCentralExtensionRight
+noncomputable def lowerCentralExtensionRight
     {P : Type uP} [Group P]
     {F : Type uF} [AddGroup F]
     (hK0 : lowerCentralLayerKernel P 0 =
@@ -490,7 +490,7 @@ private noncomputable def lowerCentralExtensionRight
 
 /-- The kernel coordinate sends an actual second-layer square class back to
 the ambient square. -/
-private theorem lowerCentralExtensionLeft_square
+theorem lowerCentralExtensionLeft_square
     {P : Type uP} [Group P]
     {F : Type uF} [AddGroup F]
     (hSq : LowerCentralSquaresLieInSecond P)
