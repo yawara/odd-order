@@ -6,6 +6,10 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 18:4x 監視 tick — b (Higman exp-two pair 実分類 4 leaf) 合流**。a=0 / b=3 / c=0 / d=0。(18:2x tick は全レーン ahead=0 で省略)
+> 合流: b (**Higman L13 exponent-two 続き**): 共通座標上の actual exponent-two pair を分類 + factor-pair relation を定義/固定座標版に分離。4 新 leaf: ExponentTwoPairwiseFactorCoordinates (448行) + ExponentTwoPairwiseFactorData (206行) (HigmanLemmaThirteen/) / FactorPairRelationDefinition (55行) + FixedFactorPairRelation (323行) (HigmanLemmaTwelve/)。FactorPairRelation.lean は −264 の分割 refactor (Definition/Fixed へ抽出、削除でなく移設)。全 leaf hub 経由 WIRED。
+> **gate: green 4721 jobs (前 4717 +4 = b の 4 leaf・orphan 0) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 139 ≤ 139 baseline (b の 4 新 leaf は非 sorry 警告 0) / push 09f7e6043→59d88b8df**。範囲逸脱なし。build wall 1:12 (Higman leaf-ward ゆえ下流限定・高速)。b は lint-baseline 非接触ゆえ baseline 調整不要。
+>
 > **▶▶ 2026-07-23 18:1x 監視 tick — c (baseline no-op) 吸収**。a=0 / b=0 / c=1 / d=0。
 > 合流: c (**baseline-only commit**、Lean 変更ゼロ)。c は main 同期後 BrauerSuzuki 行を落として 153→149 に締めたが、hub は前 tick (18:0x) で全 merge 後に実数 **139** へ regen 済 (c の BrauerSuzuki + a の Pf を含む)。c の 149 は 139 より緩いため `ort` 3-way が main の 139 に収束 (c の削除は main の削除の部分集合 → 競合なく自動解決)。
 > **gate: merge 後 tree が pre-merge main と byte-identical (content no-op) を確認 ⟹ build/lint/sorry は前 tick 値不変 (green 4717 / lint 139 / sorry 7)、フルビルド skip。push a8304ffed→df8a284e3**。DAG 衛生目的 (c の divergence 解消 → 次 sync clean)。
