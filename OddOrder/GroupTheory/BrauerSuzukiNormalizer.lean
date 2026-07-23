@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
 import Mathlib.GroupTheory.Transfer
 import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.SylowNormalRelIndex
@@ -365,3 +370,7 @@ theorem S_sup_H_eq_N : (Q.S : Subgroup G) ⊔ Q.H = Q.N := by
   rw [hP', Sylow.coe_subtype, hK, Subgroup.map_sup, subgroupOf_map_subtype,
     subgroupOf_map_subtype, htopN, inf_of_le_left Q.S_le_N, inf_of_le_left Q.H_le_N] at h
   exact h
+
+end QuaternionSylowSetup
+
+end OddOrder.GroupTheory
