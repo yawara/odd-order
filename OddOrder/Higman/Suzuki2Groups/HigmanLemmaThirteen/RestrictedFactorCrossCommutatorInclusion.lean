@@ -1,0 +1,193 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.FrattiniMiddleEigenweights
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.RestrictedLayerZeroTransport
+
+/-!
+# Higman's Lemma 13: from factor spans to a cross-commutator inclusion
+
+G. Higman, “Suzuki 2-groups,” *Illinois Journal of Mathematics* 7 (1963),
+Lemma 13, p. 92.
+
+If scalar-extended ground classes from two restricted subgroups lie in two
+factor-family spans and the middle Frattini bracket vanishes on those spans,
+then the subgroup cross commutator lies in `Φ(P)²`.
+-/
+
+set_option autoImplicit false
+
+namespace OddOrder.Higman.Suzuki2Groups
+
+open OddOrder.GroupTheory
+open OddOrder.GroupTheory.Suzuki2Group
+open OddOrder.Isaacs.Ch03
+open scoped commutatorElement IsMulCommutative TensorProduct
+
+universe uP uF uI
+
+local instance restrictedFactorCrossInclusionLayerIsMulCommutative
+    (P : Type uP) [Group P] (i : Nat) :
+    IsMulCommutative (lowerCentralLayer P i) :=
+  lowerCentralLayerIsMulCommutative P i
+
+noncomputable local instance restrictedFactorCrossInclusionLayerZModTwoModule
+    (P : Type uP) [Group P] (i : Nat) :
+    Module (ZMod 2) (Additive (lowerCentralLayer P i)) :=
+  lowerCentralLayerZmodModule P i
+
+/-- **Higman Lemma 13 (p. 92), cross inclusion from span vanishing.**
+
+Vanishing of the scalar-extended middle bracket on two submodules which
+contain all ground classes from `X` and `Z` forces `[X,Z] ≤ Φ(P)²`. -/
+theorem commutator_le_frattiniSquare_of_map₂_eq_bot
+    {F : Type uF} [Field F] [Algebra (ZMod 2) F]
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hxi : IsXiActor Y)
+    (hPhiComm : IsMulCommutative (frattini P))
+    (hexists : ∃ z : frattini P, z ^ 2 ≠ 1)
+    (X Z : Subgroup P)
+    {I : Type uI}
+    (f g : I → F ⊗[ZMod 2] Additive (lowerCentralLayer P 0))
+    (hXspan : ∀ x : lowerCentralTerm X 0,
+      (1 : F) ⊗ₜ[ZMod 2]
+          Additive.ofMul
+            (QuotientGroup.mk' (lowerCentralLayerKernel P 0)
+              (subgroupLowerCentralTermZeroHom X x)) ∈
+        Submodule.span F (Set.range f))
+    (hZspan : ∀ z : lowerCentralTerm Z 0,
+      (1 : F) ⊗ₜ[ZMod 2]
+          Additive.ofMul
+            (QuotientGroup.mk' (lowerCentralLayerKernel P 0)
+              (subgroupLowerCentralTermZeroHom Z z)) ∈
+        Submodule.span F (Set.range g))
+    (hmap :
+      letI : CommGroup (frattini P) :=
+        { (inferInstance : Group (frattini P)) with
+          mul_comm := hPhiComm.is_comm.comm }
+      Submodule.map₂
+          (frattiniMiddleCommutatorBilinearBaseChange F
+            hP hxi hPhiComm hexists)
+          (Submodule.span F (Set.range f))
+          (Submodule.span F (Set.range g)) = ⊥) :
+    ⁅X, Z⁆ ≤ frattiniSquare P := by
+  letI : CommGroup (frattini P) :=
+    { (inferInstance : Group (frattini P)) with
+      mul_comm := hPhiComm.is_comm.comm }
+  rw [Subgroup.commutator_le]
+  intro x hx z hz
+  let xX : X := ⟨x, hx⟩
+  let zZ : Z := ⟨z, hz⟩
+  let x0 : lowerCentralTerm X 0 := ⟨xX, Subgroup.mem_top xX⟩
+  let z0 : lowerCentralTerm Z 0 := ⟨zZ, Subgroup.mem_top zZ⟩
+  let xP : lowerCentralTerm P 0 := subgroupLowerCentralTermZeroHom X x0
+  let zP : lowerCentralTerm P 0 := subgroupLowerCentralTermZeroHom Z z0
+  let ux : Additive (lowerCentralLayer P 0) :=
+    Additive.ofMul
+      (QuotientGroup.mk' (lowerCentralLayerKernel P 0) xP)
+  let uz : Additive (lowerCentralLayer P 0) :=
+    Additive.ofMul
+      (QuotientGroup.mk' (lowerCentralLayerKernel P 0) zP)
+  let beta := frattiniMiddleCommutatorBilinearBaseChange F
+    hP hxi hPhiComm hexists
+  have hux : (1 : F) ⊗ₜ[ZMod 2] ux ∈
+      Submodule.span F (Set.range f) := hXspan x0
+  have huz : (1 : F) ⊗ₜ[ZMod 2] uz ∈
+      Submodule.span F (Set.range g) := hZspan z0
+  have hbetaMem : beta ((1 : F) ⊗ₜ[ZMod 2] ux)
+        ((1 : F) ⊗ₜ[ZMod 2] uz) ∈
+      Submodule.map₂ beta
+        (Submodule.span F (Set.range f))
+        (Submodule.span F (Set.range g)) :=
+    Submodule.apply_mem_map₂ beta hux huz
+  have hbetaZero : beta ((1 : F) ⊗ₜ[ZMod 2] ux)
+      ((1 : F) ⊗ₜ[ZMod 2] uz) = 0 := by
+    rw [hmap] at hbetaMem
+    simpa using hbetaMem
+  have hground : frattiniMiddleCommutatorBilinear
+      hP hxi hPhiComm hexists ux uz = 0 := by
+    apply (Module.FaithfullyFlat.one_tmul_eq_zero_iff
+      (R := ZMod 2)
+      (M := Additive (frattiniMiddleLayer P))
+      (A := F)
+      (frattiniMiddleCommutatorBilinear
+        hP hxi hPhiComm hexists ux uz)).mp
+    simpa only [beta, ux, uz,
+      frattiniMiddleCommutatorBilinearBaseChange_tmul, one_mul] using
+        hbetaZero
+  apply (frattiniMiddleCommutatorBilinear_mk_eq_zero_iff
+    hP hxi hPhiComm hexists xP zP).1
+  exact hground
+
+/-- **Higman Lemma 13 (p. 92), cross inclusion from diagonal vanishing.**
+
+If the image of two factor-family spans is generated by diagonal
+brackets, vanishing of every diagonal bracket supplies the `map₂ = ⊥`
+hypothesis required for the group-level cross-commutator inclusion. -/
+theorem commutator_le_frattiniSquare_of_diagonal_eq_zero
+    {F : Type uF} [Field F] [Algebra (ZMod 2) F]
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hxi : IsXiActor Y)
+    (hPhiComm : IsMulCommutative (frattini P))
+    (hexists : ∃ z : frattini P, z ^ 2 ≠ 1)
+    (X Z : Subgroup P)
+    {I : Type uI}
+    (f g : I → F ⊗[ZMod 2] Additive (lowerCentralLayer P 0))
+    (hXspan : ∀ x : lowerCentralTerm X 0,
+      (1 : F) ⊗ₜ[ZMod 2]
+          Additive.ofMul
+            (QuotientGroup.mk' (lowerCentralLayerKernel P 0)
+              (subgroupLowerCentralTermZeroHom X x)) ∈
+        Submodule.span F (Set.range f))
+    (hZspan : ∀ z : lowerCentralTerm Z 0,
+      (1 : F) ⊗ₜ[ZMod 2]
+          Additive.ofMul
+            (QuotientGroup.mk' (lowerCentralLayerKernel P 0)
+              (subgroupLowerCentralTermZeroHom Z z)) ∈
+        Submodule.span F (Set.range g))
+    (hdiagonal :
+      letI : CommGroup (frattini P) :=
+        { (inferInstance : Group (frattini P)) with
+          mul_comm := hPhiComm.is_comm.comm }
+      ∀ i, frattiniMiddleCommutatorBilinearBaseChange F
+          hP hxi hPhiComm hexists (f i) (g i) = 0)
+    (hsupport :
+      letI : CommGroup (frattini P) :=
+        { (inferInstance : Group (frattini P)) with
+          mul_comm := hPhiComm.is_comm.comm }
+      Submodule.map₂
+          (frattiniMiddleCommutatorBilinearBaseChange F
+            hP hxi hPhiComm hexists)
+          (Submodule.span F (Set.range f))
+          (Submodule.span F (Set.range g)) =
+        Submodule.span F
+          (Set.range fun i ↦
+            frattiniMiddleCommutatorBilinearBaseChange F
+              hP hxi hPhiComm hexists (f i) (g i))) :
+    ⁅X, Z⁆ ≤ frattiniSquare P := by
+  letI : CommGroup (frattini P) :=
+    { (inferInstance : Group (frattini P)) with
+      mul_comm := hPhiComm.is_comm.comm }
+  have hmap : Submodule.map₂
+        (frattiniMiddleCommutatorBilinearBaseChange F
+          hP hxi hPhiComm hexists)
+        (Submodule.span F (Set.range f))
+        (Submodule.span F (Set.range g)) = ⊥ := by
+    rw [hsupport]
+    apply le_antisymm
+    · apply Submodule.span_le.2
+      rintro _ ⟨i, rfl⟩
+      change frattiniMiddleCommutatorBilinearBaseChange F
+          hP hxi hPhiComm hexists (f i) (g i) = 0
+      exact hdiagonal i
+    · exact bot_le
+  exact commutator_le_frattiniSquare_of_map₂_eq_bot
+    hP hxi hPhiComm hexists X Z f g hXspan hZspan hmap
+
+end OddOrder.Higman.Suzuki2Groups
