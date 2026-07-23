@@ -368,6 +368,27 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
   ({(x,1):x偶}∪{(x,σ):x奇}) + closure 手証明 (既証明の位数2/4 characterization を活用) にフォールバック。
 - ✅ 実証明 **3A.5** `semidirectConjEquivProd` (`G ⋊ G ≅ G × G`、共役作用の半直積は直積)。同型
   `(n,g)↦(n·g,g)` (逆 `(a,g)↦⟨a·g⁻¹,g⟩`)、map_mul' は `mul_left`/`mul_right`/`conj_apply` 展開 + `group`。
+- ⬜ **3A.3** (位数 pm 群、Z(G)=1) — 構成計画 (2026-07-23、order-m 元は scratch 検証済):
+  G = `Multiplicative (ZMod p) ⋊ Subgroup.zpowers σ` (p 素数, m∣p-1, m>1)。
+  **(1) order-m 元 u : (ZMod p)ˣ [検証済]**: `haveI := ZMod.isCyclic_units_prime Fact.out`;
+  `obtain ⟨g,hg⟩ := IsCyclic.exists_ofOrder_eq_natCard`; `Nat.card (ZMod p)ˣ = p-1`
+  (`card_units_eq_totient`+`totient_prime`); `u := g^((p-1)/m)`;
+  `orderOf u = m` via `orderOf_pow_of_dvd hne hdvd` + `Nat.div_div_self hm`
+  (hdvd: (p-1)/m ∣ p-1 = `Nat.div_dvd_of_dvd hm`, hne: (p-1)/m≠0)。
+  **(2) σ := `(MulAutMultiplicative (ZMod p)).symm (AddAut.mulLeft u)`** : MulAut(Mult(ZMod p))。
+  `orderOf σ = orderOf u = m` via `orderOf_injective (MulAutMultiplicative _).symm.toMonoidHom
+  (.symm.injective)` ∘ `orderOf_injective AddAut.mulLeft hinj`。⚠ hinj (mulLeft 単射) は
+  `AddAut.mulLeft = DistribMulAction.toAddAut` (`@[simps! +simpRhs]`) の apply で `(toAdd(mulLeft a)) 1
+  = ↑a·1 = ↑a`; `congrArg Multiplicative.toAdd h` + `DFunLike.congr_fun _ 1` + `simpa [Units.smul_def,
+  Units.ext_iff]` (前回 simp が toAdd wrapper を剥がせず未完 — apply 補題名の特定が要)。
+  **(3) |G| = p·m**: `SemidirectProduct.card` (=|N|·|H|) + `Nat.card_zpowers`+orderOf σ=m +
+  `Nat.card (Mult(ZMod p)) = p` (`Nat.card_congr Multiplicative.toAdd`+`Nat.card_zmod`)。
+  **(4) P := inl 像 = ker rightHom, 正規, |P|=p; G/P ≅ zpowers σ 巡回 (rightHom 全射)**。
+  `SemidirectProduct.rightHom`/`range_inl`/`inl_injective`。
+  **(5) Z(G)=⊥ [核心・未検証, SemidirectProduct center API 無し]**: (a,h)∈center →
+  ∀(b,k) 可換。k=1: a·φ(h)(b)=b·a ⟹ φ(h)(b)=b ∀b (N 可換) ⟹ φ(h)=id ⟹ h=1 (φ=subtype 単射)。
+  h=1,b=1,k=σ: a=σ(a)=×u(a) ⟹ (u-1)·toAdd a=0 ⟹ toAdd a=0 (u≠1 ⟹ u-1 は体 ZMod p の unit)
+  ⟹ a=1。~50 行。`Subgroup.mem_center_iff`/`SemidirectProduct.ext`/`SemidirectProduct.mul_left,right`。
 - ⬜ 残り §3A (いずれも substantial ~50-60 行): **3A.6** (p-群 P が p∤|G| の G に faithful ⟹ ある
   P-orbit で faithful) — repo に **Thm 1.38 (Generalized Brodkey)** あり (`Ch01_Sylow/Main.lean:756`、
   Sylow 交叉極小で S∩T 内の両正規部分群 ⊆ O_p)。application は `G⋊P` 構成で P を Sylow とみて Brodkey +
