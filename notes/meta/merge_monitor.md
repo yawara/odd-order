@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 17:1x 監視 tick — d (lint 第2 frozen wave, baseline 199→190) 合流**。a=0 / b=0 / c=0 / d=2。(17:07 tick は全レーン ahead=0 で合流なし・省略)
+> 合流: d (**lint 保守レーン・issue 0138**: 第2 frozen wave で FeitSibley / S03g_Thm310General / S11_NineElevenSubcoherentBridge の frozen×機械カテゴリ lint 警告 **9 件解消** → `bin/lint-baseline.tsv` baseline **199→190**。残 backlog を per-lane 指示 issue 化 = 0144 (a owned) / 0145 (b owned) / 0146 (c owned)。3 Lean file は全 frozen (owner 別作業中) の lint 専用編集)。
+> **gate: green 4709 jobs (前 4709 不変・新 leaf 0 = orphan なし、新規は issue .md 3 枚のみ) / AxiomsCheck OK (build elaborate 通過・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 190 ≤ 190 新 baseline (d の 199→190 締めが c の ℒ(F) 込みでも実数一致・check-warnings で確認) / push 62f2eee1e→57d8411bf**。範囲逸脱なし。build wall 10:46 (S03g = BG §3 base file の lint 編集 → 下流 BG/Pf cone を全再 elaborate)。
+> ⚠ **base-file lint 編集は full-build 必須の実例**: d の 3 file 編集のうち S03g_Thm310General が深い base ゆえ、trivial な lint 修正でも下流数千 job が再 elaborate (5s→10:46)。leaf build では stale-green を返しうる領域。hub 単一フルビルドが cascade を担保 (CLAUDE.md lint 節「flexible/import 絞り込み系は full build 必須」の同型)。
+> d-authored (S03g/FeitSibley/S11/lint-baseline/0138/0144-0146) と main-authored (c の ℒ(F): AxiomsCheck/NearField/9318/merge_monitor/survey) は disjoint ゆえ競合ゼロ。behind=4 の 2-dot D/M は d-behind-main artifact。
+>
 > **▶▶ 2026-07-23 16:5x 監視 tick — c (Pf App C ℒ(F) 順方向) 合流 + Q₈ frontier 再裁定**。a=0 / b=0 / c=2 / d=0。(16:37 tick は全レーン ahead=0 で合流なし・省略)
 > 合流: c (**Pf App C ℒ(F) correspondence 順方向** — near-field F → 𝓛(F)=F⋊F* が F 上 **sharply 2-transitive**。`nearFieldAffineGroup` (= 𝓛(F) を `Subgroup (Equiv.Perm F)` として具体構成、affine 置換 x↦x*u+t) + `nearField_affine_existsUnique` / `nearFieldAffineGroup_existsUnique`。全 near-field 一般・axiom-clean。既存 wired leaf `GroupTheory/NearFieldFromSharplyTransitive.lean` +146 に追加ゆえ新 leaf 0。AxiomsCheck に新定理 2 本の #assert 登録 = gate 強化。survey の App C ℒ(F) 行を 未→済 訂正)。
 > **gate: green 4709 jobs (前 4709 不変・新 leaf 0 = orphan なし) / AxiomsCheck OK (新 assert 2 本含め build elaborate 通過・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 199 ≤ 199 baseline / push 9c58067a6→252a5ea70**。範囲逸脱なし。build 52s (NearField + AxiomsCheck + 下流 再 elaborate)。c は behind=0 (strictly ahead) ゆえ競合なし。

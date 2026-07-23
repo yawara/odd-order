@@ -184,3 +184,40 @@ commit `975a387e1` (10 files, +15/-29)。real hub 稼働中 (a/b/c を合流・t
 - **style.show 59** — goal 変更 show の個別確認要。owner lane 通過時。
 - longLine 17 / unusedVariables・unusedSectionVars 17 / openClassical 11 (0133) ほか。
 - FieldAction `simpa`→`simp` 1 は owner 判断で defer。
+
+---
+
+## 🧭 2026-07-23 — per-lane 分割 issue 化 + d の第2 frozen wave
+
+ユーザー指示「各レーン向けの指示も issue に / こちらでできることはやる」に基づき、
+残 backlog を **territory 所有レーン別に issue 化** (fresh full build 実測 206 件 = 増分 baseline 199 +7、
+replay 取りこぼし分。所有は `--first-parent main` の Merge 'x' で確定):
+
+- **[0144](0144-lint-lane-a-owned.md)** — lane a (Pf FeitSibley / S11 / S13)。a は Isaacs Problems へ
+  移動済ゆえ Pf 側は**凍結** → d が機械分を先行解消 (下記)。残 = Fintype 判断 + show 4 + longLine 1。
+- **[0145](0145-lint-lane-b-owned.md)** — lane b (Higman/Suzuki2Groups / Pf Suzuki App / PrimeTIResidue)、45 件。
+  b の active zone ゆえ owner 解消 (show 31 が最多)。
+- **[0146](0146-lint-lane-c-owned.md)** — lane c (BG AppE / NearFields / BrauerSuzuki / BG Ch4)、123 件。
+  **flexible 73** が最重量 (full build + 敵対検証)。c の active zone。
+
+### d の第2 frozen wave (本 tick、9 件 / baseline 199→190、full build EXIT=0 検証)
+
+lane a の **凍結** Pf 領域 (a は Isaacs へ移動、worktree status で uncommitted 無しを確認) +
+frozen BG Ch1 の **純機械カテゴリのみ**を先行解消 (active-lane の b/c は一切触らず):
+- deprecation 1: `FeitSibley` `push_neg`→`push Not`
+- unusedSimpArgs 3: `FeitSibley` α-equiv の `Subgroup.coe_mk` (452/453 は `group` 単独化、455 は coe_mk 削除)
+- unusedVariables 5: `FeitSibley` `_h1A`/`_hdegMem`/`_hχdeg` (named-arg caller 無しを確認) /
+  `S11_NineElevenSubcoherentBridge` `_htau` (7 出現中 L944 のみ、3 行 block で特定) /
+  `S03g_Thm310General` `caseB_transfer` の dead implicit `K` 削除 (caller L427 の `(K := K)` も協調除去)
+
+**踏んだ罠**:
+- ⚠ `S13_SixTwoBridge` `A'` (`{A' B : Subgroup ↥M}` の dead implicit) は **同 file L853 が
+  `(A' := ...)` で named 呼び出し**していた (grep で取りこぼし) → `_A'` rename が caller を壊し
+  full build が S13 で error。**revert して owner (0144) へ委譲**。S03g `K` と同型だが K は caller が
+  1 箇所で協調除去できた一方、A' は 1 警告のため risk を取らず defer。
+- ⚠ full build の **incremental replay は取りこぼす**: postbuild は S13 error で中断、FeitSibley は
+  独立 DAG ゆえ未到達 = 未検証だった。revert 後の全 pending rebuild (EXIT=0) で FeitSibley が
+  `⚠ Built` (残 unusedFintypeInType 3 のみ) を確認して初めて green 確定。
+
+⚠ **`unusedFintypeInType` (FeitSibley 75/1017/1033・S11_RFamily 780) は d が触らず owner (0144) へ** —
+どの instance が flagged か / body が Fintype を要求するかは proof 文脈判断が最も安全 (誤ると body 破壊)。

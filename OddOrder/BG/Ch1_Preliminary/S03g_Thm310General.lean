@@ -160,7 +160,7 @@ order is unchanged (`card_map_mk'_eq_of_disjoint`) and so is the `finrank` of it
 carry over verbatim.  The induction (Case B) supplies the quotient conclusion `hquot` by applying
 the
 induction hypothesis to `ρ̄` (whose kernel `K/K₀` is strictly smaller). -/
-theorem caseB_transfer (ρ : Representation F G V) {K₀ K R : Subgroup G} [K₀.Normal]
+theorem caseB_transfer (ρ : Representation F G V) {K₀ R : Subgroup G} [K₀.Normal]
     (hker : ∀ x ∈ K₀, ρ x = 1) (hdisj : Disjoint R K₀)
     (hquot : ∃ p : ℕ, p.Prime ∧ Nat.card (R.map (QuotientGroup.mk' K₀)) = p ∧
       finrank F V = Nat.card (R.map (QuotientGroup.mk' K₀)) *
@@ -424,7 +424,7 @@ private theorem frobenius_general_aux [IsAlgClosed F] [FiniteDimensional F V] [N
         rw [hcardK, hrange]
         exact (lt_mul_iff_one_lt_right Nat.card_pos).mpr hkergt
       -- Apply the induction hypothesis to the lift and transfer the conclusion back.
-      exact caseB_transfer (K := K) ρ hker hdisj
+      exact caseB_transfer ρ hker hdisj
         (IH (Nat.card (K.map (QuotientGroup.mk' K₀))) hcard_lt (QuotientGroup.lift K₀ ρ hker)
           hRne' hKmapne hKcard' hcop' hCVK' hFrob' hcond3' rfl)
 

@@ -1,63 +1,90 @@
 ---
-id: 0146
+id: 146
 slug: lint-lane-c-owned
-title: "lane c 所有ファイルの lint backlog 解消 (baseline ratchet down)"
+title: "lint backlog — lane c 所有分 (BG AppE / Pf NearFields / BrauerSuzuki / BG Ch4) の解消"
 created: 2026-07-23
 ---
 
-# lane c 所有ファイルの lint backlog 解消 (baseline ratchet down)
+# lint backlog — lane c 所有分の解消
 
-## 背景
+親 issue = [0138](0138-zero-warning-gate.md)。本 issue は **lane c が territory 所有する file の残 lint 警告**を列挙。
+方針は [0144](0144-lint-lane-a-owned.md) 冒頭「方針」節と共通。lane c は残 backlog **最大 (123 件)** で、
+うち **`flexible` 73 件が最重量** (full build + 敵対検証必須、下記)。
 
-issue 0138 の zero-warning ratchet gate は baseline 199 (2026-07-23)。CLAUDE.md「lint 警告ゼロ方針」
-= **自領域の残 backlog は frontier 通過時に owner が解消する**。lane c は Q₈ (hub 裁定で低優先繰延)
-待ちの間に、**lane-c 所有ファイルの lint backlog** を掃いて baseline を ratchet down する。
+> ⚠ lane c の territory (AppE / NearFields / BrauerSuzuki) は c の active zone
+> (2026-07-23 時点で NearFieldFromSharplyTransitive を編集中)。hub/d は触らない。
 
-owner 境界 (hub 9407/9318 裁定): lane c = **BG/** + Peterfalvi/Appendices/{NearFields,
-ExceptionalNearField, SemilinearField, RankOneAffineModel, NearFieldClass, Huppert} +
-GroupTheory/NearFieldFromSharplyTransitive** 等の near-field 系。
-⚠ **除外 (他レーン所有・触らない)**: Peterfalvi/Appendices/Suzuki/** (lane b) /
-Suzuki2Groups/** (lane b Higman) / FeitSibley* (lane a)。
+## lane c 所有ファイルと残警告 (2026-07-23 fresh build 実測、計 123 件)
 
-## 対象 (baseline TSV の lane-c-owned 行)
+### BG/AppE_* (Filiform 系) — flexible の集中
 
-安全な機械カテゴリから: `style.show` (show→change) / `style.longLine` / `style.header` /
-`deprecation` / `unusedSimpArgs` / `unnecessarySimpa` / `unusedVariables` / `unusedSectionVars`。
-⚠ `flexible` (AppE_FiliformGroup 67 / AppE_FiliformCounterexample 6) は leaf build で検出不能な
-cascade を起こす (0123 で main 2 回破壊) ので **full build + 敵対的検証必須** — 慎重に別途。
-`style.openClassical` (SemilinearField) は statement-dependent (issue 0133) ゆえ owner 判断。
+| ファイル | カテゴリ×件数 |
+|---|---|
+| `AppE_FiliformGroup.lean` | **`flexible` 67** / `style.show` 8 |
+| `AppE_FiliformCounterexample.lean` | **`flexible` 6** |
+| `AppE_ExponentP.lean` | `style.show` 4 |
+| `AppE_FurtherResults.lean` | `style.show` 2 / `style.longLine` 1 |
+| `AppE_EigenvalueCombinatorics.lean` | `style.longLine` 2 |
+| `AppE_AbelianCentralizer.lean` | `style.longLine` 1 / `unusedVariables` 1 |
+
+### Peterfalvi/Appendices/ (NearFields = Prop C 系)
+
+| ファイル | カテゴリ×件数 |
+|---|---|
+| `NearFields.lean` | `style.show` 10 / `style.longLine` 7 / `deprecation` 2 |
+| `ExceptionalNearField.lean` | `style.header` 1 |
+
+### GroupTheory/ (Brauer–Suzuki)
+
+| ファイル | カテゴリ×件数 |
+|---|---|
+| `BrauerSuzuki.lean` | `style.header` 1 |
+| `BrauerSuzukiNormalizer.lean` | `style.header` 1 / `style.missingEnd` 1 |
+| `BrauerSuzukiSetup.lean` | `style.header` 1 |
+
+### BG/AppD_CNGroups/, BG/Ch4_FamilyOfMaximal/
+
+| ファイル | カテゴリ×件数 |
+|---|---|
+| `AppD_CNGroups/MaximalSylowIntersection.lean` | `unusedSectionVars` 1 |
+| `Ch4_FamilyOfMaximal/S15_MF/OpicoreCentralizer.lean` | `style.longLine` 4 (L417/650/663/665) |
+| `Ch4_FamilyOfMaximal/S16_MainResults/TypeBridges.lean` | `style.longLine` 1 (L1027) |
+
+## 手法メモ
+
+- **`flexible` 73 件 (⚠ 最重量・要 full build + 敵対検証)**: `simp ... at h1 h2 ...` 等が
+  fragile と判定されている。**`simp only` 化は過去 revert 実績** (issue 0123 で main を 2 回破壊) ゆえ
+  **`simp?` の出力を採用** (Lean が最小 simp set を提示) するか、理由付き per-decl
+  `set_option linter.flexible false in`。**leaf build では cascade を検出できない** —
+  必ず **full build + 敵対的検証** (fix 後に別 build で regression ゼロ確認)。
+  1 commit = 1 wave、`--update-baseline` で段階的に下げる。
+- **`style.header` 4 / `style.missingEnd` 1**: 標準 4 行ヘッダ追加 / `end <section>` 補完 (機械的・安全)。
+  ⚠ header は `import Mathlib.Tactic` 丸 import (0136 track) と混同しない — S05_GridTrichotomy は
+  baseline 上 header だが実体は import (着手判断は census 実測で)。
+- **`deprecation` 2 (NearFields)**: `push_neg`→`push Not` / `push_cast` 削除 / ncard rename の類。機械的。
+- **`style.show` 24 / `style.longLine` 16**: [0145](0145-lint-lane-b-owned.md) 手法メモと同じ (per-site 判断)。
+- **`unusedVariables` 1 / `unusedSectionVars` 1**: `_`-prefix / `omit ... in` (named-arg・型注意)。
+
+## 別トラック (本 issue 対象外)
+
+- `SemilinearField.lean` の `style.openClassical` 1 は **[0133](0133-open-scoped-classical-statement-dependent.md)** track。
+- `OddOrder/FeitThompsonNuGrid.lean` の `flexible` 1 は FT spine (frozen) — hub の flexible wave で処理。
 
 ## 完了条件
 
-lane-c-owned 行の warning を解消し、full check-warnings green + baseline 更新 (ratchet down)。
-build green・AxiomsCheck 非退行・sorry 非退行を維持。
+lane c 所有ファイルの非 sorry 警告ゼロ → `bin/check-warnings --update-baseline`。
 
-## 参照
+## 進捗 (2026-07-23 lane c セッション) — 安全な機械カテゴリ 37 件解消 + BrauerSuzuki header
 
-- issue 0138 (zero-warning gate) / 0123 (linter cleanup) / 0133 (openClassical)
-- `bin/lint-baseline.tsv` / `bin/check-warnings`
+full build green で以下を解消 (この issue を main の hub 版で受領し継続):
 
-## 進捗 (2026-07-23 lane c) — 安全な機械カテゴリ 37 件解消
+- **NearFields.lean** (19): `style.show` 10 (→`change`) / `style.longLine` 7 / `deprecation` 2 (`push_neg`→`push Not`)
+- **ExceptionalNearField.lean** (1): `style.header` (copyright block 追加)
+- **AppE_ExponentP** (4 `show`) / **AppE_FurtherResults** (2 `show` + 1 longLine) / **AppE_EigenvalueCombinatorics** (2 longLine) / **AppE_AbelianCentralizer** (1 longLine + `unusedVariables`→`_hcard`)
+- **AppD_CNGroups/MaximalSylowIntersection** (1): `unusedSectionVars` = `omit hne in` + caller の `hne` 実引数削除
+- **OpicoreCentralizer** (4 longLine) / **TypeBridges** (1 longLine)
+- **BrauerSuzuki{,Normalizer,Setup}.lean**: `style.header` 3 + `style.missingEnd` 1 (別 wave で処理予定/処理済)
 
-full build 検証中。解消した lane-c-owned warning (37 件):
-
-| ファイル | カテゴリ | 件数 |
-|---|---|---|
-| Peterfalvi/Appendices/NearFields.lean | style.show 10 / style.longLine 7 / deprecation(push_neg→push Not) 2 | 19 |
-| Peterfalvi/Appendices/ExceptionalNearField.lean | style.header (copyright block 追加) | 1 |
-| BG/AppE_ExponentP.lean | style.show | 4 |
-| BG/AppE_FurtherResults.lean | style.show 2 / style.longLine 1 | 3 |
-| BG/AppE_EigenvalueCombinatorics.lean | style.longLine | 2 |
-| BG/AppE_AbelianCentralizer.lean | style.longLine 1 / unusedVariables(_hcard) 1 | 2 |
-| BG/AppD_CNGroups/MaximalSylowIntersection.lean | unusedSectionVars (`omit hne in` + caller 修正) | 1 |
-| BG/Ch4_FamilyOfMaximal/S15_MF/OpicoreCentralizer.lean | style.longLine (docstring reflow) | 4 |
-| BG/Ch4_FamilyOfMaximal/S16_MainResults/TypeBridges.lean | style.longLine | 1 |
-
-**繰延 (grandfather 継続)**:
-- `S03g_Thm310General.lean` の `K` unusedVariables (1): caller (`:427`) が `(K := …)` で named 参照
-  → `_K` rename は caller 破壊。theorem body では未使用だが external 参照ゆえ触らない (revert 済)。
-- **`flexible` (AppE_FiliformGroup 67 / AppE_FiliformCounterexample 6 = 73)**: leaf build 検出不能な
-  cascade リスク (0123 で main 2 回破壊) → **full build + 敵対的検証を要する別途慎重パス**に繰延。
-- `SemilinearField.lean` の `style.openClassical` (1): statement-dependent (issue 0133)、owner 判断繰延。
-
-baseline は full build 確認後 199→~162 に ratchet down 予定。
+**繰延 (grandfather)**: `flexible` 73 (AppE_Filiform*、full build + 敵対検証の別パス) /
+`SemilinearField` openClassical (0133) / `FeitThompsonNuGrid` flexible (FT spine, hub wave)。
+S03g `K` は lane d が第2 wave で解消済 (本 issue 対象外)。
