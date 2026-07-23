@@ -6,6 +6,10 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 23:4x 監視 tick (B 単独) — b (Higman bracket faithfulness・quotient factor geometry 5 leaf) 合流**。b=6。
+> 合流 b (**Higman L13 exponent-two**): aligned ambient bracket 消去 / quotient graph subspace を invariant 化 / canonical invariant preimage 保持 / factor geometry を quotient へ transport / exponent-two bracket faithfulness 証明。5 新 leaf (AlignedAmbientBracketCancellation / GraphSubspaceInvariant / CanonicalInvariantPreimage / QuotientFactorGeometry / AmbientBracketFaithfulness) 全 WIRED。
+> **gate: green 4621 jobs (前 4616 +5 = b の 5 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push b5d12c3b4→c92ba6842**。範囲逸脱なし。build wall 1:07。
+>
 > **▶▶ 2026-07-23 23:1x 監視 tick (B 単独) — b (Higman Frattini quotient bridge・graph subspace geometry 6 leaf) 合流**。b=8。
 > 合流 b (**Higman L13 exponent-two**): common factor ambient coordinate align / input coordinate で mixed term 消去 / Frattini quotient bridge linearize / full exponent-two preimage geometry 保持 / Frattini quotient で factor range 同定 / pairwise mixed term align+消去 / graph subspace geometry 証明。6 新 leaf (ExponentTwoCommonFactorScalarBridge / QuotientLayerBridge / FullPreimageGeometry / FactorQuotientRange / AlignedMixedTermCancellation / GraphSubspaceGeometry) 全 WIRED。既存 ExponentTwoPairwiseMixedTermSupport 更新。
 > **gate: green 4616 jobs (前 4610 +6 = b の 6 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push c79629732→4a097aa29**。範囲逸脱なし。build wall 1:11。
