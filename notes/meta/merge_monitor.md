@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 19:2x 監視 tick — b (Higman normalized factor param coherence 1 leaf) 合流 + c (baseline no-op) 吸収**。a=0 / b=1 / c=2 / d=0。
+> 合流 b (**Higman L13 exponent-two**): 正規化 factor parameter の coherence を証明。新 leaf NormalizedFactorParameterCoherence (75行, HigmanLemmaThirteen/)、hub 経由 WIRED。
+> 合流 c (**baseline no-op**): c は Filiform cleanup 後 baseline を 139→58 に締めたが、前 tick (19:0x) の hub 実数 50 regen (Filiform + openClassical 込み) に包含。--ours=50 で解消、Lean 変更 0。
+> **gate: green 4722 jobs (前 4721 +1 = b の 1 leaf・orphan 0) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 50 ≤ 50 baseline (b の新 leaf 非 sorry 警告 0・c は content no-op) / push 4f29cec48→ba4bdec84**。範囲逸脱なし。build wall 1:33 (Higman leaf-ward)。
+>
 > **▶▶ 2026-07-23 19:0x 監視 tick — c (Filiform lint 81件・lane-c backlog 完了) + a (openClassical 8 file) 合流 + baseline 139→50**。a=1 / b=0 / c=1 / d=0。
 > 合流 c (**lint 0146 完了**): BG AppE_Filiform{Group,Counterexample} の flexible (73) + style.show (8) = 81 件解消。**これで lane-c-owned lint backlog は完了** (c 宣言)。c は lint-baseline.tsv 非接触 (Lean 修正のみ) ゆえ merge clean。
 > 合流 a (**lint 0133**): open scoped Classical statement-dependent を Pf S04_{DadeIsometry/MobiusAssembly, InduceConjFinset} / S08_{CaseBAnchoredSeed, CaseBWeightedEndgame, CoherenceWeighted, Theorem63} / S09_{Building78C, CertificateDischarge} の 8 file で局所化。競合は lint-baseline.tsv のみ (--ours 解消)。8 Pf file は main 未変更ゆえ非競合。
