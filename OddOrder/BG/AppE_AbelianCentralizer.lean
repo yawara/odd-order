@@ -266,11 +266,11 @@ theorem RegularOperatorSetup.isElementaryAbelian_quotient_commutator [Finite R] 
 
 /-- **BG's `B` fixes some complement `Q/S'` of `T/S'` in `S/S'`**.
 
-Operator Maschke (`OddOrder.BG.Ch1_Preliminary.exists_aInvariant_complement_of_isElementaryAbelian`) applied
+Operator Maschke (`exists_aInvariant_complement_of_isElementaryAbelian`) applied
 to the elementary abelian `S/S'` with the coprime `B`-action: `p ∤ |B|` while `|S/S'| = p²`,
 so the `B`-invariant subspace `T/S'` splits off. -/
 theorem RegularOperatorSetup.exists_aInvariant_complement_of_centralizer [Finite R] [Finite B]
-    (hyp : RegularOperatorSetup R B p q) (hcard : p ^ 4 ≤ Nat.card ↥(Omega R p 1))
+    (hyp : RegularOperatorSetup R B p q) (_hcard : p ^ 4 ≤ Nat.card ↥(Omega R p 1))
     (hSinv : IsAInvariant hyp.act (Omega R p 1))
     (hS'inv : IsAInvariant hSinv.restrict (_root_.commutator ↥(Omega R p 1))) :
     ∃ W : Subgroup (↥(Omega R p 1) ⧸ _root_.commutator ↥(Omega R p 1)),

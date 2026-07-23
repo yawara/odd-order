@@ -321,6 +321,7 @@ theorem sylow_le_and_eq_normalizer :
   rw [← hMeq, ← hPM_eq]
 
 include hyp hQP hne hmax hM_ge hM_core in
+omit hne in
 /-- **BG display (D.2)**: `P ∩ Q = O_p(M)`.
 
 `≤` comes from the 3-step Sylow-intersection identity `inf_sylow_eq_oPiCore`, applied to the
@@ -421,7 +422,7 @@ theorem isThreeStepGroup_and_inf_eq_oPiCore (hyp : MinimalSimpleCNHypothesis G) 
   obtain ⟨-, hMeq⟩ := sylow_le_and_eq_normalizer hyp hQP hne hmax hM_ge hM_core hM_max
   refine ⟨hMeq ▸ isThreeStepGroup_of_maximal hyp hQP hmax hM_ge hM_core, ?_⟩
   rw [← hMeq]
-  exact inf_eq_oPiCore_of_maximal hyp hQP hne hmax hM_ge hM_core
+  exact inf_eq_oPiCore_of_maximal hyp hQP hmax hM_ge hM_core
 
 /-- **The form Lemma D.1 uses**: *every* Sylow `p`-subgroup `R ≠ P` meets `P` inside
 `O_p(N_G(Z(L(P))))`.
