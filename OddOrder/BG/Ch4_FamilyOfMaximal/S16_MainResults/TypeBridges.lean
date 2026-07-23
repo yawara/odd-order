@@ -1024,7 +1024,8 @@ theorem derivedInG_quotient_maxNilpotentNormalHall_isNilpotent [Finite G]
     -- `↥(D.subgroupOf M')` is nilpotent (embeds in the nilpotent `↥D` via `D ⊓ M'`).
     haveI hDnil' : Group.IsNilpotent ↥D := hDnil
     haveI hInfNil : Group.IsNilpotent ↥(D ⊓ derivedInG M) :=
-      Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (inf_le_left : D ⊓ derivedInG M ≤ D))
+      Group.nilpotent_of_mulEquiv
+        (Subgroup.subgroupOfEquivOfLe (inf_le_left : D ⊓ derivedInG M ≤ D))
     haveI hDsubNil : Group.IsNilpotent ↥(D.subgroupOf (derivedInG M)) := by
       have econgr : ↥(D.subgroupOf (derivedInG M)) ≃*
           ↥((D ⊓ derivedInG M).subgroupOf (derivedInG M)) :=

@@ -56,7 +56,7 @@ pointer comments here at their book positions.  Per-result status:
 | E.3(b) Step 2, (E.4)--(E.7) | **proved, sorry-free** (chain, `\|T\| = pⁿ`, `\|S/S'\| = p²`) |
 | E.3(b) second + third clause | **proved** from Step 2 + first clause |
 | E.3(c) (`card_omega_le`) | **proved** — in `AppE_RegularOperator.lean` (Step 2's count) |
-| E.3(d) (`B_fixes_R₀_of_fixes_frattini`) | **proved** — in `AppE_SemidirectFrattini.lean` (Step 4) |
+| E.3(d) (`B_fixes_R₀_of_fixes_frattini`) | **proved** — `AppE_SemidirectFrattini.lean` (Step 4) |
 | E.3(b) first clause | **proved** — in `AppE_ExponentP.lean` (Step 3) |
 | E.4 (corrected, `+hdc`) | **proved** — in `AppE_PropE4.lean` (printed form is false) |
 | E.5 (`maximalSubgroups_isTypeI_or_isTypeII`) | **proved** — in `AppE_E5Counting.lean` |
@@ -1118,7 +1118,7 @@ theorem RegularOperatorSetup.card_quotient_commutator_of_card_le_prime_cube [Fin
     haveI := habel
     have hcomm : _root_.commutator ↥S = ⊥ := commutator_eq_bot ↥S
     rw [hcomm]
-    show (⊥ : Subgroup ↥S).index = p ^ 2
+    change (⊥ : Subgroup ↥S).index = p ^ 2
     rw [Subgroup.index_bot]
     omega
   · -- `S` nonabelian: `|S| = p³`, `|Z(S)| = p`, `S' = Z(S)`.
@@ -1195,7 +1195,7 @@ theorem RegularOperatorSetup.card_quotient_commutator_of_card_le_prime_cube [Fin
             Nat.pow_lt_pow_right hyp.p_prime.one_lt (by norm_num)
           omega
         rw [hk, hk3']
-    show (_root_.commutator ↥S).index = p ^ 2
+    change (_root_.commutator ↥S).index = p ^ 2
     have hmul : Nat.card ↥(_root_.commutator ↥S) * (_root_.commutator ↥S).index =
         Nat.card ↥S := (_root_.commutator ↥S).card_mul_index
     rw [hScomm, hScube] at hmul

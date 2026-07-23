@@ -73,3 +73,18 @@ created: 2026-07-23
 ## 完了条件
 
 lane c 所有ファイルの非 sorry 警告ゼロ → `bin/check-warnings --update-baseline`。
+
+## 進捗 (2026-07-23 lane c セッション) — 安全な機械カテゴリ 37 件解消 + BrauerSuzuki header
+
+full build green で以下を解消 (この issue を main の hub 版で受領し継続):
+
+- **NearFields.lean** (19): `style.show` 10 (→`change`) / `style.longLine` 7 / `deprecation` 2 (`push_neg`→`push Not`)
+- **ExceptionalNearField.lean** (1): `style.header` (copyright block 追加)
+- **AppE_ExponentP** (4 `show`) / **AppE_FurtherResults** (2 `show` + 1 longLine) / **AppE_EigenvalueCombinatorics** (2 longLine) / **AppE_AbelianCentralizer** (1 longLine + `unusedVariables`→`_hcard`)
+- **AppD_CNGroups/MaximalSylowIntersection** (1): `unusedSectionVars` = `omit hne in` + caller の `hne` 実引数削除
+- **OpicoreCentralizer** (4 longLine) / **TypeBridges** (1 longLine)
+- **BrauerSuzuki{,Normalizer,Setup}.lean**: `style.header` 3 + `style.missingEnd` 1 (別 wave で処理予定/処理済)
+
+**繰延 (grandfather)**: `flexible` 73 (AppE_Filiform*、full build + 敵対検証の別パス) /
+`SemilinearField` openClassical (0133) / `FeitThompsonNuGrid` flexible (FT spine, hub wave)。
+S03g `K` は lane d が第2 wave で解消済 (本 issue 対象外)。

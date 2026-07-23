@@ -216,12 +216,12 @@ theorem normalizer_le_normalizer_omegaInG {G : Type*} [Group G] (H : Subgroup G)
       g * h * g⁻¹ ∈ omegaInG H p n := by
     intro g hg h hh
     have hle : omegaInG H p n ≤ (omegaInG H p n).comap (MulAut.conj g).toMonoidHom := by
-      show Subgroup.closure {x : G | x ∈ H ∧ x ^ (p ^ n) = 1} ≤ _
+      change Subgroup.closure {x : G | x ∈ H ∧ x ^ (p ^ n) = 1} ≤ _
       refine (Subgroup.closure_le _).mpr ?_
       rintro x ⟨hxH, hxp⟩
       refine Subgroup.mem_comap.mpr (mem_omegaInG ?_ ?_)
       · exact (Subgroup.mem_normalizer_iff.mp hg x).mp hxH
-      · show (g * x * g⁻¹) ^ (p ^ n) = 1
+      · change (g * x * g⁻¹) ^ (p ^ n) = 1
         have : ((MulAut.conj g) x) ^ (p ^ n) = 1 := by rw [← map_pow, hxp, map_one]
         simpa using this
     exact hle hh
@@ -1010,12 +1010,12 @@ theorem orbit_conjAct_subset_coset {G : Type*} [Group G] (v : G) :
     MulAction.orbit (ConjAct G) v ⊆ v • ((_root_.commutator G : Subgroup G) : Set G) := by
   rintro _ ⟨t, rfl⟩
   refine ⟨v⁻¹ * (ConjAct.ofConjAct t * v * (ConjAct.ofConjAct t)⁻¹), ?_, ?_⟩
-  · show _ ∈ (_root_.commutator G : Subgroup G)
+  · change _ ∈ (_root_.commutator G : Subgroup G)
     have hrw : v⁻¹ * (ConjAct.ofConjAct t * v * (ConjAct.ofConjAct t)⁻¹)
         = ⁅v⁻¹, ConjAct.ofConjAct t⁆ := by group
     rw [hrw, commutator_def]
     exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
-  · show v * (v⁻¹ * (ConjAct.ofConjAct t * v * (ConjAct.ofConjAct t)⁻¹)) = t • v
+  · change v * (v⁻¹ * (ConjAct.ofConjAct t * v * (ConjAct.ofConjAct t)⁻¹)) = t • v
     rw [ConjAct.smul_def]
     group
 

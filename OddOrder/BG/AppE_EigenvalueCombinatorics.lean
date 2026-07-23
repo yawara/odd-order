@@ -403,8 +403,10 @@ theorem RegularOperatorSetup.dvd_sub_mul_eigenvalues_chain [Finite R] [Finite B]
   obtain ⟨sj, hsj_cong, hsj_mem⟩ := hep j hlive_j
   obtain ⟨sd, hsd_cong, hsd_mem⟩ := hep d hlive_d
   -- BG's `⁅wᵢ, wⱼ⁆ ∈ H_{k-1}`.
-  have hwiT : commutatorIterate w v i ∈ T := iterCommutator_le_base i (commutatorIterate_mem_chain hw i)
-  have hwjT : commutatorIterate w v j ∈ T := iterCommutator_le_base j (commutatorIterate_mem_chain hw j)
+  have hwiT : commutatorIterate w v i ∈ T :=
+    iterCommutator_le_base i (commutatorIterate_mem_chain hw i)
+  have hwjT : commutatorIterate w v j ∈ T :=
+    iterCommutator_le_base j (commutatorIterate_mem_chain hw j)
   have hxy : ⁅commutatorIterate w v i, commutatorIterate w v j⁆ ∈
       OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) d :=
     hTle (Subgroup.commutator_mem_commutator hwiT hwjT)
