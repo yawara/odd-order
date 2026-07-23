@@ -9188,6 +9188,20 @@ irreducibly on `(F, +)`), and the resulting unconditional field structure
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.NearFields.nearField_field_structure_of_index_two
 
+/-! **Peterfalvi, Appendix II (Near-Fields), p. 137 — the `𝓛(F)` correspondence, forward
+direction** (`NearFieldFromSharplyTransitive`).  Dual to the backward `SharplyTransitiveData`
+transport: *from* a near-field `F` one builds the affine group `𝓛(F) = F ⋊ F^*` (the subgroup
+`nearFieldAffineGroup` of `Equiv.Perm F` of affine permutations `x ↦ x * u + t`) and shows it acts
+**sharply `2`-transitively** on `F` — `nearField_affine_existsUnique` (the arithmetic `∃!` core) and
+`nearFieldAffineGroup_existsUnique` (the group-level statement).  Fully general (any near-field),
+axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.nearField_affine_existsUnique
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.nearFieldAffineGroup_existsUnique
+
 /-! **`M_F` is automorphism-equivariant** (`MaxNilpotentNormalHall`).  The maximal nilpotent
 normal Hall subgroup `M_F` of Peterfalvi/BG is natural under any automorphism `φ` of `G`:
 `φ • M_F = (φ • M)_F` (`maxNilpotentNormalHall_pointwise_smul`), with the candidate-set/subgroupOf
