@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 20:2x 監視 tick — b (Higman param arithmetic 1 leaf) 合流 + 🧭 c frontier 裁定 (issue 9501)**。a=0 / b=2 / c=0(idle 3tick) / d=0。
+> 合流 b (**Higman L13**): exponent-two parameter arithmetic を独立化 + normalized pair relation witness 保持。新 leaf ExponentTwoParameterArithmetic (HigmanLemmaThirteen/) WIRED。
+> **gate: green 4595 jobs (前 4594 +1 = b の 1 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push 23c24fbc5→679c9b94c**。範囲逸脱なし。build wall 1:09。
+> 🧭 **c frontier 裁定 (hub 自律、issue 9501 新設)**: c は Q₈ 凍結 + lint 完了で 3 tick idle。hub が c territory を実測 → **残 sorry 7 は全て gated**: RankOneAffineModel:1 = Q₈ 凍結 / StepFive・StepSix = 9318(凍結)+ Higman 2053(b active) / Suzuki2Groups.lean:4 = `higman_classification` 他(**b の active Higman L13**)。issue 3017(BG 6.2 J(S))は CLOSED(memory L87 stale 訂正済)。⟹ **c 割当 territory に非凍結・非 b-gated の ungated frontier 無**。裁定: c は新 ungated scope を取る(3 冊残作業は豊富・survey は stale ゆえ実測必須・doc-order・b の Higman file cluster は衝突回避で避ける・Q₈ 除外)。frontier 具体選択は c 自律。c は次 sync で 9501 を読む。
+>
 > **▶▶ 2026-07-23 20:1x 監視 tick — b (Higman coord coherence 2 leaf) + a (lint 0136① import 絞り込み) 合流。⚠ jobs 基準変更 4724→4594**。a=1 / b=1 / c=0(idle) / d=0。
 > 合流 b (**Higman L13**): normalized factor coordinate を join 越しに同定。2 新 leaf ExponentTwoFactorCoordinateCoherence + NormalizedFactorCoordinateCoherence (HigmanLemmaThirteen/)、hub 経由 WIRED。
 > 合流 a (**lint 0136①**): Pf S05_GridTrichotomy の broad `import Mathlib.Tactic` を実使用 module へ絞り込み (DAG 衛生)。競合は lint-baseline のみ (--ours=47)。
