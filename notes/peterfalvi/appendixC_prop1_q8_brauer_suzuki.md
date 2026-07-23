@@ -1,5 +1,9 @@
 # Peterfalvi App.C Prop 1 — Q₈ 部分ケースと Brauer–Suzuki / modular character theory 調査
 
+> **⚠ 凍結（ユーザー裁定 2026-07-23）**: Q₈ を閉じる modular char theory 整備は**書籍選定を含む
+> 長期プロジェクトとして凍結**。project spec = [`../meta/q8_modular_char_theory_frozen_project.md`](../meta/q8_modular_char_theory_frozen_project.md)、
+> 追跡 = issue 0147（pending）/ 9318（closed、|S|≥16 完了）。**本 note は当時の前提調査**として保持。
+
 > **作成 2026-07-22**（Q₈ gap の frontier 戦略調査）。対象 = `OddOrder/Peterfalvi/Appendices/NearFields.lean`
 > の `rankOne_affine_nearField`（App.C Prop 1）に残る唯一の sorry。
 > **問い**: この Q₈（`|S| = 8`）部分ケースを、**modular character theory を新設せずに**閉じる経路はあるか？

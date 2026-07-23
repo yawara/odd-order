@@ -36,8 +36,6 @@ The bridge from the textbook data `(E, φ : U →* MulAut E, T)` to this core (b
 
 namespace OddOrder.Peterfalvi.Appendices.Huppert
 
-open scoped Classical
-
 section Prop2Core
 
 variable {k : Type*} [CommRing k] {T : Type*} [CommGroup T] [Finite T]
@@ -56,6 +54,7 @@ theorem finite_end : Finite (Module.End (MonoidAlgebra k T) M) :=
 
 variable [IsSimpleModule (MonoidAlgebra k T) M]
 
+open scoped Classical in
 /-- **Schur + Wedderburn**: the endomorphism ring of a finite simple `k[T]`-module is a field.
 (Schur makes it a division ring, `Module.End` instance; finite division rings are fields,
 `littleWedderburn`.) -/
@@ -94,6 +93,7 @@ theorem isSimpleModule_end :
 
 omit [Finite T] in
 omit [Finite M] in
+open scoped Classical in
 /-- `M` is `1`-dimensional over the field `D = End_{k[T]}(M)` (`isSimpleModule_end` + the
 classification of simple modules over a division ring). -/
 theorem finrank_end_eq_one :
@@ -101,6 +101,7 @@ theorem finrank_end_eq_one :
   isSimpleModule_iff_finrank_eq_one.mp isSimpleModule_end
 
 omit [Finite T] in
+open scoped Classical in
 /-- `|End_{k[T]}(M)| = |M|`: as `M` is a `1`-dimensional `D`-space, `|M| = |D|¹`. -/
 theorem natCard_end_eq :
     Nat.card (Module.End (MonoidAlgebra k T) M) = Nat.card M := by
@@ -121,6 +122,7 @@ section Prop2Bridge
 
 open OddOrder.GroupTheory OddOrder.BG.Ch1_Preliminary OddOrder.Isaacs.Ch03
 
+open scoped Classical in
 /-- **Peterfalvi, Appendix I, Proposition 2(a)** (textbook form).  Let the commutative group `T`
 act on the elementary abelian `p`-group `E`, *irreducibly* (every `T`-invariant subgroup of `E`
 is `⊥` or `⊤`).  Then there is a finite field `F` acting on `E` (written additively) over which
@@ -189,6 +191,7 @@ theorem exists_field_of_irreducible.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [C
     endField, Module.End.applyModule, finite_end, finrank_end_eq_one, ?_⟩
   exact natCard_end_eq.trans (Nat.card_congr Additive.toMul)
 
+open scoped Classical in
 /-- **Peterfalvi, Appendix I, Proposition 2(a)+(b)** (textbook form, with semilinearity).
 In addition to the field `F` of part (a), every `g : MulAut E` that *normalizes* the `T`-action —
 i.e. `ψ (c t) = g · ψ t · g⁻¹` for some `c : T ≃* T` — acts `F`-semilinearly on `E` (written
@@ -298,6 +301,7 @@ theorem exists_field_semilinear.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [CommG
   change uLin (a x) = uLin (a (uLin.symm (uLin x)))
   rw [LinearEquiv.symm_apply_apply]
 
+open scoped Classical in
 /-- **Peterfalvi, Appendix I, Proposition 2(a)+(b)**, with the scalar
 realization of `T` retained.  The old `exists_field_semilinear` theorem remains
 unchanged; this stronger result is the interface required by Part II, Ch. I

@@ -23,7 +23,6 @@ Prefix-split from `OddOrder.Peterfalvi.S09_CertificateDischarge` (2000-line limi
 namespace OddOrder.Peterfalvi.S09.Cert
 
 open OddOrder.RepresentationTheory
-open scoped Classical
 
 variable {L : Type*} [Group L] [Fintype L]
 
@@ -180,6 +179,7 @@ theorem eq_zero_of_mem_span_orthogonal [Invertible (Nat.card L : ℂ)]
     | smul c x _ ih => rw [ClassFunction.inner_smul_left, ih, mul_zero]
   exact inner_self_eq_zero (key η hη)
 
+open scoped Classical in
 /-- **The supported projection** `η ↦ η · 𝟙_A` of a class function onto `CF(L, A)`.  When `A` is a
 conjugation-invariant set, the pointwise product with the indicator of `A` is again a class
 function (the indicator and `η` are both conjugation-invariant).  This is the projection used in
@@ -193,11 +193,13 @@ noncomputable def supportedProj (A : Set L) (hA : ∀ g h : L, h * g * h⁻¹ �
     · simp only [if_neg hg, if_neg (fun hc => hg ((hA g h).mp hc))]⟩
 
 omit [Fintype L] in
+open scoped Classical in
 @[simp] theorem supportedProj_apply (A : Set L) (hA : ∀ g h : L, h * g * h⁻¹ ∈ A ↔ g ∈ A)
     (η : ClassFunction L ℂ) (x : L) :
     supportedProj A hA η x = if x ∈ A then η x else 0 := rfl
 
 omit [Fintype L] in
+open scoped Classical in
 /-- The supported projection is supported on `A` (lies in `CF(L,A)`). -/
 theorem supportedProj_mem_supported (A : Set L) (hA : ∀ g h : L, h * g * h⁻¹ ∈ A ↔ g ∈ A)
     (η : ClassFunction L ℂ) :
@@ -209,6 +211,7 @@ theorem supportedProj_mem_supported (A : Set L) (hA : ∀ g h : L, h * g * h⁻�
   change supportedProj A hA η x = 0
   simp only [supportedProj_apply, if_neg hxA]
 
+open scoped Classical in
 /-- **The supported projection preserves inner products against `CF(L,A)`.**  For `ψ` supported on
 `A`, `⟨ψ, η · 𝟙_A⟩ = ⟨ψ, η⟩`: off `A` the factor `ψ(x)` already vanishes, so multiplying `η` by the
 indicator of `A` changes nothing. -/
@@ -227,6 +230,7 @@ theorem inner_supportedProj [Invertible (Nat.card L : ℂ)] (A : Set L)
       exact hx ((ClassFunction.mem_supportedSubmodule.mp hψ) (ClassFunction.mem_support.mpr h0))
     rw [hψx, zero_mul, zero_mul]
 
+open scoped Classical in
 /-- **Peterfalvi (7.7.a), the determination step.**  If a set `S` of class functions spans `CF(L,A)`
 (`hspan`) and consists of `A`-supported functions (`hS_supp`), then a class function `η` orthogonal
 to every member of `S` vanishes on `A`.  Apply the uniqueness principle to the supported projection

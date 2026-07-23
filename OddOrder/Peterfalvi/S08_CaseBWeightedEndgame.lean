@@ -32,12 +32,12 @@ input `hXanchored` — is **not** in this leaf; the endgame here takes that seed
 namespace OddOrder.Peterfalvi.S08
 
 open OddOrder.RepresentationTheory
-open scoped Classical
 
 variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
+open scoped Classical in
 /-- **(6.6) norm-weighted `X` degree-square identity** (case-(B) form).
 
 The norm-weighted degree-square sum over `X = S − S(Z)` is `|L:H|·(|H| − |H:Z|)`.  Unlike the
@@ -148,6 +148,7 @@ theorem sum_re_div_normSq_Xset_eq (hyp : SibleyDadeHypothesis G L H) {Z : Subgro
     push_cast; ring
   exact Complex.ofReal_inj.mp key
 
+open scoped Classical in
 /-- **(6.6)/(6.8) X-set nonemptiness, norm-weighted (case-B, no Frobenius).**  As
 `Xset_nonempty_of_subgroupOf_ne_bot`, but the strictly-positive degree sum is the **norm-weighted**
 identity `sum_re_div_normSq_Xset_eq` (`∑_{X(Z)} χ(1).re²/‖χ‖² = |L:H|(|H|−|H:Z|)`, valid for
@@ -206,6 +207,7 @@ theorem Xset_nonempty_of_subgroupOf_ne_bot_weighted (hyp : SibleyDadeHypothesis 
       ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hker', hne'⟩, heq'.symm⟩)
   exact hyp.mem_Xset.mpr ⟨hχS, hχnotSZ⟩
 
+open scoped Classical in
 /-- **(6.2) norm-weighted `X`-sum bound** (case-(B) form).
 
 The norm-weighted Peterfalvi (5.6) inequality for case (B): if `X(W₂) ∪ Y` is coherent but adding
@@ -281,6 +283,7 @@ theorem xSum_le_two_psi_caseB
         refine Finset.sum_congr rfl (fun j _ => ?_); rw [hmcnorm j, Complex.ofReal_re]
     _ ≤ 2 * (ψ 1).re * (η 1).re := hfambound
 
+open scoped Classical in
 /-- **Norm-weighted (5.6) `X`-sum bound, reducible-column break form.**  The column analogue of
 `xSum_le_two_psi_caseB`: when the (6.8.3) break is a reducible certain-type column
 `ψ = columnSum h46 χ₂b` (not excludable when `W₂ ⊄ Z`, e.g. case (A) at `Z = Z(H) ∩ H′`), the

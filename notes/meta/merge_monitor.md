@@ -6,6 +6,51 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 21:1x 監視 tick (B 単独) — b (Higman prescribed factor transport 2 leaf) 合流**。b=2。
+> 合流 b (**Higman L13**): prescribed factor を pairwise join 越しに transport + all-distinct parameter list check を閉じる。2 新 leaf ExponentTwoAllDistinctParameters (331行) + ExponentTwoPrescribedFactorTransport (153行) (HigmanLemmaThirteen/)、hub 経由 WIRED。
+> **gate: green 4597 jobs (前 4595 +2 = b の 2 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push dbb7f5927→462ac752b**。範囲逸脱なし。build wall 1:37。(20:43 tick は b ahead=0 で合流なし・省略)
+>
+> **👁 2026-07-23 20:3x モード変更 (ユーザー指示)**: **A/C/D いったん凍結 → B 単独監視モードへ移行**。cron を **30 分おき** (`13,43 * * * *`、job 0f8d27c5) に変更 (旧 15 分 `7,22,37,52` d9a20ef3 は削除)。以降 hub は **lane b のみ**合流ゲートを回す (a/c/d は合流対象外・凍結)。20:2x で発行した c frontier 裁定 (issue 9501) は c 凍結ゆえ保留 (凍結解除時に再開)。次 tick 20:43。
+>
+> **▶▶ 2026-07-23 20:2x 監視 tick — b (Higman param arithmetic 1 leaf) 合流 + 🧭 c frontier 裁定 (issue 9501)**。a=0 / b=2 / c=0(idle 3tick) / d=0。
+> 合流 b (**Higman L13**): exponent-two parameter arithmetic を独立化 + normalized pair relation witness 保持。新 leaf ExponentTwoParameterArithmetic (HigmanLemmaThirteen/) WIRED。
+> **gate: green 4595 jobs (前 4594 +1 = b の 1 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push 23c24fbc5→679c9b94c**。範囲逸脱なし。build wall 1:09。
+> 🧭 **c frontier 裁定 (hub 自律、issue 9501 新設)**: c は Q₈ 凍結 + lint 完了で 3 tick idle。hub が c territory を実測 → **残 sorry 7 は全て gated**: RankOneAffineModel:1 = Q₈ 凍結 / StepFive・StepSix = 9318(凍結)+ Higman 2053(b active) / Suzuki2Groups.lean:4 = `higman_classification` 他(**b の active Higman L13**)。issue 3017(BG 6.2 J(S))は CLOSED(memory L87 stale 訂正済)。⟹ **c 割当 territory に非凍結・非 b-gated の ungated frontier 無**。裁定: c は新 ungated scope を取る(3 冊残作業は豊富・survey は stale ゆえ実測必須・doc-order・b の Higman file cluster は衝突回避で避ける・Q₈ 除外)。frontier 具体選択は c 自律。c は次 sync で 9501 を読む。
+>
+> **▶▶ 2026-07-23 20:1x 監視 tick — b (Higman coord coherence 2 leaf) + a (lint 0136① import 絞り込み) 合流。⚠ jobs 基準変更 4724→4594**。a=1 / b=1 / c=0(idle) / d=0。
+> 合流 b (**Higman L13**): normalized factor coordinate を join 越しに同定。2 新 leaf ExponentTwoFactorCoordinateCoherence + NormalizedFactorCoordinateCoherence (HigmanLemmaThirteen/)、hub 経由 WIRED。
+> 合流 a (**lint 0136①**): Pf S05_GridTrichotomy の broad `import Mathlib.Tactic` を実使用 module へ絞り込み (DAG 衛生)。競合は lint-baseline のみ (--ours=47)。
+> **⚠ jobs 絶対値が 4724→4594 に減少 (−132)**: a の import 絞り込みで **S05 経由でのみ到達していた Mathlib.Tactic submodule 群が OddOrder closure から離脱** (b の +2 leaf を含んで net −130)。**OddOrder leaf の脱落ではない** — `✔ Built OddOrder` + b の 2 leaf elaborate 確認済、build green ゆえ cascade 破壊なし (import 絞り込みの想定内 DAG 衛生効果、CLAUDE.md 0123 の敵対的検証をフルビルドで実施)。**次 tick 以降の jobs 基準 = 4594**。
+> **gate: green 4594 jobs (新基準・import 絞り込みで Mathlib 減、OddOrder 全 elaborate) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 46 ≤ 47 baseline (a の絞り込みで 47→46、1 件 loose は許容・regen は 0136 campaign 完了時に batch) / push 3b6ec6d74→0048d0331**。範囲逸脱なし。build wall 10:34。
+> ℹ **c idle 継続 (Q₈ 凍結後)**: c は ahead=0・worktree clean、9400 frontier-request 未提出。territory 完済境界ゆえ次 tick も idle なら hub が実測ベースで next frontier を裁定する (前 tick 方針どおり)。
+>
+> **▶▶ 2026-07-23 20:0x 監視 tick — c (baseline no-op) + c (Q₈ 凍結 docs) 合流。⚠ c territory 完済境界へ**。a=0 / b=0 / c=2(+freeze) / d=0。
+> 合流 c-1 (**baseline no-op**): c の 47 ratchet は main の 47 regen と同値 (tree-identical, --ours)。
+> 合流 c-2 (**Q₈ 凍結 docs**, commit b4c8bfdba): **ユーザー裁定 (2026-07-23) で Q₈ Brauer–Suzuki (|S|=8) を凍結** — hub の 16:5x「Q₈=c active frontier」再裁定はこの凍結で**上書き**(hub 受諾)。c が docs 化: issues/9318 を closed/ へ移動 (|S|≥16 完了で BS 定理 close) / issues/pending/0147 (Q₈ modular char theory frozen project) 新設 / notes/meta/q8_modular_char_theory_frozen_project.md (書籍選定込み長期 spec) / appendixC note 更新。docs-only ゆえ build 不要 (Lean 不変)。
+> **gate: docs-only 2 merge (Lean 変更 0・tree の OddOrder/ 部分不変) ⟹ build/lint/sorry 前 tick 値不変 (4724 / 47 / 7)、フルビルド skip。push 999fe9e51→df080fd00→06ad52d84**。範囲逸脱なし。
+> 🧭 **⚠ c territory 完済境界 (hub 裁定 pending)**: c は lint (0146/0133) 完了 + Q₈ 凍結で、**割当 territory (BG/** + Pf Appendices) に非凍結・ungated の未形式化 frontier が無い**状態 (memory lane-c-frontier + 本 freeze)。次 frontier は hub 裁定 or reallocation。c はまだ 9400-band frontier-request 未提出 (freeze 直後 idle)。**方針: 次 tick で c の自己判断 (9400 request or survey 再実測での新 work 発見) を待ち、c が idle 継続 or 9400 提出したら hub が実測ベースで next frontier を裁定** (Q₈ は凍結ゆえ除外; b の Higman 応援 / a の Isaacs 応援 / 3 冊の未着手 ungated 結果 / specialization debt 一般化 が候補)。AskUserQuestion しない。
+>
+> **▶▶ 2026-07-23 19:4x 監視 tick — b (Higman transport 2 leaf) + c (openClassical 0133 完了) 合流 + baseline 50→47**。a=0 / b=2 / c=2 / d=0。
+> 合流 b (**Higman L13 exponent-two**): actual factor を pairwise join 越しに transport + lower central layer を同値越しに transport。2 新 leaf: ExponentTwoFactorCopyTransport (HigmanLemmaThirteen/) + HigmanLowerCentralTransport (**Higman/Suzuki2Groups/ top-level file** → Suzuki2Groups.lean:21 aggregator に配線)。両 WIRED。
+> 合流 c (**lint 0133 完了**): GroupTheory/RepresentationTheory/{InflationInduction, NonInflatedDegreeSqInterval} + Pf Appendices/SemilinearField の open scoped Classical を局所化 → **issue 0133 完了** (a の Pf S04/S08/S09 と file 分担で完遂)。baseline 非接触。
+> **gate: green 4724 jobs (前 4722 +2 = b の 2 leaf・orphan 0) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 47 ≤ 47 新 baseline (c の openClassical で 50→47、pure removal 3 組・新 grandfather 0) / push f2a393e97→6c335ac52**。範囲逸脱なし。build wall 9:24 (c の RepresentationTheory InflationInduction が char spine 下流)。
+> 📉 **baseline 199→190→153→139→50→47**。issue 0133 (openClassical) 完了で lint backlog はほぼ掃引済 (残 47)。lane-c lint 完了ゆえ c は Q₈/math 復帰見込み。
+>
+> **▶▶ 2026-07-23 19:2x 監視 tick — b (Higman normalized factor param coherence 1 leaf) 合流 + c (baseline no-op) 吸収**。a=0 / b=1 / c=2 / d=0。
+> 合流 b (**Higman L13 exponent-two**): 正規化 factor parameter の coherence を証明。新 leaf NormalizedFactorParameterCoherence (75行, HigmanLemmaThirteen/)、hub 経由 WIRED。
+> 合流 c (**baseline no-op**): c は Filiform cleanup 後 baseline を 139→58 に締めたが、前 tick (19:0x) の hub 実数 50 regen (Filiform + openClassical 込み) に包含。--ours=50 で解消、Lean 変更 0。
+> **gate: green 4722 jobs (前 4721 +1 = b の 1 leaf・orphan 0) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 50 ≤ 50 baseline (b の新 leaf 非 sorry 警告 0・c は content no-op) / push 4f29cec48→ba4bdec84**。範囲逸脱なし。build wall 1:33 (Higman leaf-ward)。
+>
+> **▶▶ 2026-07-23 19:0x 監視 tick — c (Filiform lint 81件・lane-c backlog 完了) + a (openClassical 8 file) 合流 + baseline 139→50**。a=1 / b=0 / c=1 / d=0。
+> 合流 c (**lint 0146 完了**): BG AppE_Filiform{Group,Counterexample} の flexible (73) + style.show (8) = 81 件解消。**これで lane-c-owned lint backlog は完了** (c 宣言)。c は lint-baseline.tsv 非接触 (Lean 修正のみ) ゆえ merge clean。
+> 合流 a (**lint 0133**): open scoped Classical statement-dependent を Pf S04_{DadeIsometry/MobiusAssembly, InduceConjFinset} / S08_{CaseBAnchoredSeed, CaseBWeightedEndgame, CoherenceWeighted, Theorem63} / S09_{Building78C, CertificateDischarge} の 8 file で局所化。競合は lint-baseline.tsv のみ (--ours 解消)。8 Pf file は main 未変更ゆえ非競合。
+> **gate: green 4721 jobs (不変・c/a とも lint-only 新 leaf 0・orphan なし) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 50 ≤ 50 新 baseline (実 warning 50 = 139 − c81 − a の openClassical、pure removal・新 grandfather 0) / push 6a3754542→0b82b7871**。範囲逸脱なし。build wall 17:17 (a の Pf S08/S09 = 深い大 file の下流 cone)。
+> 📉 **baseline は 4 tick で 199→190→153→139→50 と急減** (d/c/a の lint wave 集中期)。lane-c backlog 完了で c は Q₈/math frontier に復帰見込み。a は openClassical (0133) 継続の可能性。⚠ a は behind=29 と大幅遅延 — merge-base 解析で吸収中だが a 側の `git merge main` 同期滞りは継続観察。
+>
+> **▶▶ 2026-07-23 18:4x 監視 tick — b (Higman exp-two pair 実分類 4 leaf) 合流**。a=0 / b=3 / c=0 / d=0。(18:2x tick は全レーン ahead=0 で省略)
+> 合流: b (**Higman L13 exponent-two 続き**): 共通座標上の actual exponent-two pair を分類 + factor-pair relation を定義/固定座標版に分離。4 新 leaf: ExponentTwoPairwiseFactorCoordinates (448行) + ExponentTwoPairwiseFactorData (206行) (HigmanLemmaThirteen/) / FactorPairRelationDefinition (55行) + FixedFactorPairRelation (323行) (HigmanLemmaTwelve/)。FactorPairRelation.lean は −264 の分割 refactor (Definition/Fixed へ抽出、削除でなく移設)。全 leaf hub 経由 WIRED。
+> **gate: green 4721 jobs (前 4717 +4 = b の 4 leaf・orphan 0) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 139 ≤ 139 baseline (b の 4 新 leaf は非 sorry 警告 0) / push 09f7e6043→59d88b8df**。範囲逸脱なし。build wall 1:12 (Higman leaf-ward ゆえ下流限定・高速)。b は lint-baseline 非接触ゆえ baseline 調整不要。
+>
 > **▶▶ 2026-07-23 18:1x 監視 tick — c (baseline no-op) 吸収**。a=0 / b=0 / c=1 / d=0。
 > 合流: c (**baseline-only commit**、Lean 変更ゼロ)。c は main 同期後 BrauerSuzuki 行を落として 153→149 に締めたが、hub は前 tick (18:0x) で全 merge 後に実数 **139** へ regen 済 (c の BrauerSuzuki + a の Pf を含む)。c の 149 は 139 より緩いため `ort` 3-way が main の 139 に収束 (c の削除は main の削除の部分集合 → 競合なく自動解決)。
 > **gate: merge 後 tree が pre-merge main と byte-identical (content no-op) を確認 ⟹ build/lint/sorry は前 tick 値不変 (green 4717 / lint 139 / sorry 7)、フルビルド skip。push a8304ffed→df8a284e3**。DAG 衛生目的 (c の divergence 解消 → 次 sync clean)。

@@ -143,7 +143,7 @@ theorem co_pow (x : Q6) (n : ℕ) : (x ^ n).co = (n : K) • x.co := by
   | zero => simp
   | succ n ih =>
     rw [pow_succ]
-    show gmul (x ^ n).co x.co = _
+    change gmul (x ^ n).co x.co = _
     rw [ih, gmul_smul_self]
     congr 1
     push_cast
@@ -222,6 +222,7 @@ theorem smul_e5_gmul (x : V) (t : K) : gmul (t • e5) x = x + t • e5 := by
   funext k
   fin_cases k <;> simp [gmul, e5]; ring
 
+set_option linter.flexible false in
 /-- **`Z(S)` is exactly the `e₅`-line**: an element is central iff its coordinates
 `0`–`4` vanish.  (Upper bound: commuting with `a` forces `x₁ = x₄ = 0` and commuting
 with `b` forces `x₀ = x₂ = x₃ = 0`; lower bound: `gmul_smul_e5`/`smul_e5_gmul`.) -/
@@ -310,6 +311,7 @@ theorem disjoint_zpowers_vg_e5g :
 
 /-! ### Theorem E.3's centralizer hypothesis: `C_S(R₀) = R₀ ⊔ R₁` -/
 
+set_option linter.flexible false in
 /-- An element commutes with `vg` iff it lies on `K·v + K·e₅` in coordinates —
 the triangular solve behind Theorem E.3's hypothesis `C_R(R₀) = R₀ × R₁`.
 (Coordinate `2` forces `x₁ = x₀`, then `3` forces `x₂ = 0`, then `4` forces
@@ -359,7 +361,7 @@ theorem centralizer_zpowers_vg :
     have hxeq : x = (⟨c • v⟩ : Q6) * ⟨t • e5⟩ := by
       ext1
       rw [co_mul]
-      show x.co = gmul (c • v) (t • e5)
+      change x.co = gmul (c • v) (t • e5)
       rw [gmul_smul_e5, hco]
     rw [hxeq]
     exact Subgroup.mul_mem _
@@ -400,6 +402,7 @@ theorem plane_mem_upperCentralSeries_two {x : Q6} (h0 : x.co 0 = 0) (h1 : x.co 1
     rw [commutatorElement_def, mul_inv_rev, mul_assoc (x * y)]
   rw [hxyc, plane_mul_comm y h0 h1 h2 h3, mul_inv_cancel_right]
 
+set_option linter.flexible false in
 /-- **`Z₂(S)` upper bound**: coordinates `0`–`3` of any element of `Z₂(S)` vanish.
 (The commutator with `a` pins `x₁`, the one with `b` pins `x₀`, `x₂`, `x₃`.) -/
 theorem upperCentralSeries_two_le_plane {x : Q6}
@@ -433,6 +436,7 @@ theorem upperCentralSeries_two_le_plane {x : Q6}
     exact (mul_eq_zero.mp hh).resolve_left (by decide)
   exact ⟨hx0, hx1, hx2, hx3⟩
 
+set_option linter.flexible false in
 /-- **`T = C_S(Z₂(S))` is exactly the hyperplane `{x | x₀ = 0}`** — the group-level
 form of Tier 1's `memT_iff`.  The index-`p` clause of Proposition E.4 survives
 (this is a hyperplane); it is the abelian clause that fails. -/
@@ -518,10 +522,10 @@ theorem βAut_pow_49 : βAut ^ 49 = 1 := by
 def act : Multiplicative (ZMod 49) →* MulAut Q6 where
   toFun n := βAut ^ n.toAdd.val
   map_one' := by
-    show βAut ^ (0 : ZMod 49).val = 1
+    change βAut ^ (0 : ZMod 49).val = 1
     rw [ZMod.val_zero, pow_zero]
   map_mul' a b := by
-    show βAut ^ (a.toAdd + b.toAdd).val = βAut ^ a.toAdd.val * βAut ^ b.toAdd.val
+    change βAut ^ (a.toAdd + b.toAdd).val = βAut ^ a.toAdd.val * βAut ^ b.toAdd.val
     rw [ZMod.val_add, ← pow_eq_pow_mod _ βAut_pow_49, pow_add]
 
 @[simp] theorem act_apply (n : Multiplicative (ZMod 49)) :
@@ -561,14 +565,14 @@ theorem βAut_pow_seven_smul_zpowers_vg :
     obtain ⟨c, hc⟩ := mem_zpowers_vg_iff.mp hs
     refine mem_zpowers_vg_iff.mpr ⟨c * zeta ^ 7, ?_⟩
     rw [MulAut.smul_def, βAut_pow_apply]
-    show β^[7] s.co = (c * zeta ^ 7) • v
+    change β^[7] s.co = (c * zeta ^ 7) • v
     rw [hc, beta_iterate_smul, alpha_smul_v, smul_smul]
   · intro hx
     obtain ⟨c, hc⟩ := mem_zpowers_vg_iff.mp hx
     refine ⟨⟨(zeta ^ 42 * c) • v⟩, mem_zpowers_vg_iff.mpr ⟨zeta ^ 42 * c, rfl⟩, ?_⟩
     rw [MulAut.smul_def, βAut_pow_apply]
     refine Q6.ext ?_
-    show β^[7] ((zeta ^ 42 * c) • v) = x.co
+    change β^[7] ((zeta ^ 42 * c) • v) = x.co
     rw [beta_iterate_smul, alpha_smul_v, smul_smul, hc]
     congr 1
     linear_combination c * h49
@@ -582,7 +586,7 @@ theorem act_A_fixes_zpowers_vg :
   obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp ha
   rw [map_zpow]
   have h7 : act (Multiplicative.ofAdd (7 : ZMod 49)) = βAut ^ 7 := by
-    show βAut ^ (7 : ZMod 49).val = βAut ^ 7
+    change βAut ^ (7 : ZMod 49).val = βAut ^ 7
     norm_num [show (7 : ZMod 49).val = 7 by decide]
   rw [h7]
   exact MulAction.mem_stabilizer_iff.mp
@@ -596,7 +600,7 @@ theorem act_not_fixes_zpowers_vg :
         (act b) • Subgroup.zpowers vg = Subgroup.zpowers vg := by
   intro h
   have h1 : act (Multiplicative.ofAdd (1 : ZMod 49)) = βAut := by
-    show βAut ^ (1 : ZMod 49).val = βAut
+    change βAut ^ (1 : ZMod 49).val = βAut
     rw [show (1 : ZMod 49).val = 1 by decide, pow_one]
   have hmem : βAut • vg ∈ βAut • Subgroup.zpowers vg :=
     Subgroup.smul_mem_pointwise_smul vg _ _ (Subgroup.mem_zpowers vg)

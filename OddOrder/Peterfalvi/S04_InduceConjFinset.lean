@@ -590,8 +590,6 @@ end VirtualCharacterRHS
 
 section MobiusAssembly
 
-open scoped Classical
-
 /-- **Peterfalvi (2.1)/(2.10.3), the conjugating-set cardinality `|𝒜(g, K·a)| = |C_G(a)|`** when
 `a` *centralizes* the subgroup `K` (so `K ⊆ C_G(a)`), `C_G(a)` normalizes `K`, `⟨a⟩` and `K` have
 coprime orders, and `g` is `G`-conjugate to an element `a·x₀` (`x₀ ∈ K`).
@@ -835,6 +833,7 @@ theorem card_conjFiber_conj_eq (g c : G) (X : Set G) :
   · intro y _; group
   · intro y _; group
 
+open scoped Classical in
 /-- **Peterfalvi (2.1), the conjugacy-image fiber count.**  Let `a` normalize a finite subgroup `K`
 coprimely and `C = K ⊓ C_G(a)`.  For `w` in the coset `K·a` (`w·a⁻¹ ∈ K`), the fiber of the
 parametrization `(c, x) ↦ x⁻¹(c·a)x` of `K·a` over `w` has exactly `|C|` elements:
@@ -938,6 +937,7 @@ theorem card_cosetConjFiber_eq_card_centralizerInf {K : Subgroup G} {a : G}
       change x * (x₀ : G)⁻¹ * (x₀ : G) = x
       group
 
+open scoped Classical in
 /-- **Peterfalvi (2.1), the fiber factorization** (the long pole of (2.10) STEP 2).  Let `a`
 normalize a finite subgroup `K` coprimely and `C = K ⊓ C_G(a)`.  Then for any `g`,
 
@@ -1086,6 +1086,7 @@ theorem card_conjFiber_coset_mul_card_centralizerInf {K : Subgroup G} {a : G}
   rw [hSleft] at hSright
   exact hSright
 
+open scoped Classical in
 /-- **Peterfalvi (2.10), the Möbius cancellation identity** (the toggle-`a` pairing of (2.10)).
 For `a ∈ A` normalizing `H(B)` (i.e. `a ∈ N_L(B)`) and nonempty `B ⊆ A`,
 
@@ -1163,6 +1164,7 @@ theorem mobiusSummand_of_nonempty (a : {a : G // a ∈ A}) (g : G)
         ((conjFiber g ((↑(hIntersection hyp B hB) : Set G) * ({(a : G)} : Set G))).card : ℂ) := by
   rw [mobiusSummand, dif_pos hB]
 
+open scoped Classical in
 /-- Membership of `a` in `N_L(B)` is insensitive to inserting `a` into `B` (for `a ∉ B`): since
 conjugation by `a` fixes `a` (`a·a·a⁻¹ = a`), `a` permutes `B` iff it permutes `insert a B`. -/
 theorem mem_nLStabilizerIn_insert_iff (a : {a : G // a ∈ A})
@@ -1203,6 +1205,7 @@ theorem mem_nLStabilizerIn_insert_iff (a : {a : G // a ∈ A})
     · rw [hfix hx]; exact Finset.mem_insert_self _ _
     · exact Finset.mem_insert_of_mem (hstab c hc)
 
+open scoped Classical in
 /-- **Peterfalvi (2.10), the toggle-`a` pairwise cancellation.**  For `a ∉ B`, nonempty `B ⊆ A`
 with `a ∈ N_L(B)`, the Möbius summands for `B` and `insert a B` are negatives:
 
@@ -1275,16 +1278,19 @@ noncomputable def toggleA (a : {a : G // a ∈ A}) (B : Finset {a : G // a ∈ A
 
 omit [Group G] in
 omit [Fintype G] in
+open scoped Classical in
 theorem toggleA_of_mem {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}}
     (haB : a ∈ B) : toggleA a B = B.erase a := by
   classical rw [toggleA]; simp only [if_pos haB]
 
 omit [Group G] in
 omit [Fintype G] in
+open scoped Classical in
 theorem toggleA_of_not_mem {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}}
     (haB : a ∉ B) : toggleA a B = insert a B := by
   classical rw [toggleA]; simp only [if_neg haB]
 
+open scoped Classical in
 /-- **Peterfalvi (2.10), the toggle-`a` involution collapses `𝒫(a)` to its `B = {a}` survivor.**
 
     `∑_{B ∈ 𝒫(a)} mobiusSummand a g B = mobiusSummand a g {a}`.
