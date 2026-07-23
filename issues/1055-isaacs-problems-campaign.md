@@ -332,13 +332,14 @@ mathlib inductive (`top`/`step`)。
 新 leaf `OddOrder/Isaacs/Ch03_SplitExtensions/Problems.lean` (namespace `OddOrder.Isaacs.Ch03`、
 import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 配線済)。
 
-- 🔨 **3A.3** (位数 pm 群) 部分完成 (2026-07-23): σ (位数 m, `AddAut.mulLeft`+`MulAutMultiplicative`)
-  / `affineGroup u = Mult(ZMod p) ⋊ ⟨σ⟩` / `affineGroup_card` (|G|=p·orderOf u) / `affineGroup_card_ker`
-  (P=ker rightHom 位数 p) / `affineGroup_quotient_isCyclic` (G/P 巡回) / `exists_group_card_eq_center_trivial`
-  (位数 m 元存在) を実証明。⚠ **Z(G)=⊥ (中心自明) は未完** — center 計算で `Multiplicative (ZMod p)` の
-  ring Mul (`instDistribOfSemiring`) と group Mul (`Multiplicative.group`) の instance 衝突。
-  回避法: step1 の cancel を `mul_left_cancel` (Multiplicative) でなく **toAdd で ZMod p 加法に落として
-  `add_left_cancel`**、g.right=1 の結論も MulAut equation の simp を避ける。次イテレーションで完了。
+- ✅ 実証明 **3A.3** 位数 pm 群 (正規 P 位数 p, G/P 巡回, Z(G)=1) — 2026-07-23 **完全完成**:
+  σ=×u (位数 m, `AddAut.mulLeft`+`MulAutMultiplicative`) / `affineGroup u = Mult(ZMod p) ⋊ ⟨σ⟩` /
+  `affineGroup_card` (|G|=p·orderOf u) / `affineGroup_card_ker` (P=ker rightHom 位数 p, 正規) /
+  `affineGroup_quotient_isCyclic` (G/P 巡回) / **`affineGroup_center_eq_bot`** (Z(G)=⊥、u≠1) /
+  `exists_group_card_eq_normal_cyclic_center_trivial` (存在まとめ)。center は (a,h)∈Z → φ(h)=id⟹h=1、
+  a=σ(a)⟹(u-1)·toAdd a=0⟹a=1 (体 ZMod p で u-1 可逆)。⚠ `Multiplicative (ZMod p)` の ring/group Mul
+  instance 衝突は **cancel を toAdd で ZMod p 加法に落として `add_left_cancel`** で回避 (教訓記録)。
+  全実証明・sorry 無・axiom-clean。
 - ✅ 実証明 **3A.1(a)** semidihedral の特徴的自己同型 (2026-07-23)。`ZMod n` (8∣n) 上、生成元条件
   `c^a = c⁻¹z` (加法的 `-c+z`, `z=n/2`) を満たす唯一の自己同型 `a` = 乗数 `w=z-1` (`w²=1` ∵ 4∣n)
   による乗法、位数 2。`semidihedralAut` (concrete `AddEquiv`, 自身が逆) / `_apply` / `_apply_isUnit`

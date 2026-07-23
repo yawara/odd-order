@@ -654,6 +654,71 @@ theorem affineGroup_quotient_isCyclic {p : ℕ} [Fact p.Prime] (u : (ZMod p)ˣ) 
     SemidirectProduct.rightHom_surjective
   exact isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
 
+/-- **Isaacs Problem 3A.3** (中心自明). `u ≠ 1` (作用が非自明) なら `Z(G) = 1`。
+中心元 `(a,h)`: `inl b` と可換 ⟹ `φ(h)=id` ⟹ `h=1`; `inr σ` と可換 ⟹ `a=σ(a)=×u(a)` ⟹
+`(u-1)·toAdd a=0` ⟹ `toAdd a=0` (体 `ZMod p` で `u-1≠0` 可逆) ⟹ `a=1`。 -/
+theorem affineGroup_center_eq_bot {p : ℕ} [Fact p.Prime] {u : (ZMod p)ˣ} (hu : u ≠ 1) :
+    Subgroup.center (affineGroup u) = ⊥ := by
+  rw [Subgroup.eq_bot_iff_forall]
+  intro g hg
+  rw [Subgroup.mem_center_iff] at hg
+  have hright : g.right = 1 := by
+    have key : (Subgroup.zpowers (sigmaOf u)).subtype g.right = 1 := by
+      ext b
+      simp only [MulAut.one_apply]
+      have hb := congrArg SemidirectProduct.left (hg (SemidirectProduct.inl b))
+      simp only [SemidirectProduct.mul_left, SemidirectProduct.left_inl,
+        SemidirectProduct.right_inl, map_one, MulAut.one_apply] at hb
+      apply Multiplicative.toAdd.injective
+      have hb2 := congrArg Multiplicative.toAdd hb
+      rw [toAdd_mul, toAdd_mul] at hb2
+      have hc : Multiplicative.toAdd g.left + Multiplicative.toAdd b
+          = Multiplicative.toAdd g.left
+            + Multiplicative.toAdd ((Subgroup.zpowers (sigmaOf u)).subtype g.right b) := by
+        rw [add_comm (Multiplicative.toAdd g.left) (Multiplicative.toAdd b)]; exact hb2
+      exact (add_left_cancel hc).symm
+    exact (Subgroup.zpowers (sigmaOf u)).subtype_injective
+      (key.trans (map_one (Subgroup.zpowers (sigmaOf u)).subtype).symm)
+  have hleft : g.left = 1 := by
+    have hb := congrArg SemidirectProduct.left (hg (SemidirectProduct.inr
+      ⟨sigmaOf u, Subgroup.mem_zpowers _⟩))
+    simp only [SemidirectProduct.mul_left, SemidirectProduct.left_inr,
+      SemidirectProduct.right_inr, map_one, mul_one, one_mul] at hb
+    rw [show ((Subgroup.zpowers (sigmaOf u)).subtype ⟨sigmaOf u, Subgroup.mem_zpowers _⟩)
+        = sigmaOf u from rfl, sigmaOf_apply] at hb
+    have ht : Multiplicative.toAdd g.left = (↑u : ZMod p) * Multiplicative.toAdd g.left := by
+      have h2 := congrArg Multiplicative.toAdd hb
+      rw [toAdd_ofAdd] at h2
+      exact h2.symm
+    have hu0 : (↑u : ZMod p) - 1 ≠ 0 := by
+      intro hcon
+      apply hu
+      rw [sub_eq_zero] at hcon
+      exact Units.ext (hcon.trans Units.val_one.symm)
+    have hzero : Multiplicative.toAdd g.left = 0 := by
+      have hmul : ((↑u : ZMod p) - 1) * Multiplicative.toAdd g.left = 0 := by
+        rw [sub_mul, one_mul, ← ht, sub_self]
+      exact (mul_eq_zero.mp hmul).resolve_left hu0
+    exact Multiplicative.toAdd.injective (by rw [hzero]; rfl)
+  exact SemidirectProduct.ext (by rw [hleft, SemidirectProduct.one_left])
+    (by rw [hright, SemidirectProduct.one_right])
+
+/-- **Isaacs Problem 3A.3** (まとめ). `p` 素数, `m ∣ p-1`, `m > 1` のとき、位数 `pm` の群 `G` で、
+位数 `p` の正規部分群 `P` をもち、`G/P` が巡回, `Z(G) = 1` となるものが存在する。 -/
+theorem exists_group_card_eq_normal_cyclic_center_trivial (p m : ℕ) [Fact p.Prime]
+    (hm : m ∣ p - 1) (hm1 : 1 < m) :
+    ∃ u : (ZMod p)ˣ, Nat.card (affineGroup u) = p * m ∧
+      Nat.card (SemidirectProduct.rightHom :
+        affineGroup u →* Subgroup.zpowers (sigmaOf u)).ker = p ∧
+      IsCyclic (affineGroup u ⧸
+        (SemidirectProduct.rightHom : affineGroup u →* Subgroup.zpowers (sigmaOf u)).ker) ∧
+      Subgroup.center (affineGroup u) = ⊥ := by
+  obtain ⟨u, hu⟩ := exists_group_card_eq_center_trivial p m hm hm1
+  have hune : u ≠ 1 := by
+    intro h; rw [h, orderOf_one] at hu; omega
+  exact ⟨u, by rw [affineGroup_card, hu], affineGroup_card_ker u,
+    affineGroup_quotient_isCyclic u, affineGroup_center_eq_bot hune⟩
+
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,
 a.right·b.right)` を写すと `(a.left·a.right·b.left·b.right, a.right·b.right)` = 直積の積の像。 -/
