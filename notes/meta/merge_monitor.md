@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 20:0x 監視 tick — c (baseline no-op) + c (Q₈ 凍結 docs) 合流。⚠ c territory 完済境界へ**。a=0 / b=0 / c=2(+freeze) / d=0。
+> 合流 c-1 (**baseline no-op**): c の 47 ratchet は main の 47 regen と同値 (tree-identical, --ours)。
+> 合流 c-2 (**Q₈ 凍結 docs**, commit b4c8bfdba): **ユーザー裁定 (2026-07-23) で Q₈ Brauer–Suzuki (|S|=8) を凍結** — hub の 16:5x「Q₈=c active frontier」再裁定はこの凍結で**上書き**(hub 受諾)。c が docs 化: issues/9318 を closed/ へ移動 (|S|≥16 完了で BS 定理 close) / issues/pending/0147 (Q₈ modular char theory frozen project) 新設 / notes/meta/q8_modular_char_theory_frozen_project.md (書籍選定込み長期 spec) / appendixC note 更新。docs-only ゆえ build 不要 (Lean 不変)。
+> **gate: docs-only 2 merge (Lean 変更 0・tree の OddOrder/ 部分不変) ⟹ build/lint/sorry 前 tick 値不変 (4724 / 47 / 7)、フルビルド skip。push 999fe9e51→df080fd00→06ad52d84**。範囲逸脱なし。
+> 🧭 **⚠ c territory 完済境界 (hub 裁定 pending)**: c は lint (0146/0133) 完了 + Q₈ 凍結で、**割当 territory (BG/** + Pf Appendices) に非凍結・ungated の未形式化 frontier が無い**状態 (memory lane-c-frontier + 本 freeze)。次 frontier は hub 裁定 or reallocation。c はまだ 9400-band frontier-request 未提出 (freeze 直後 idle)。**方針: 次 tick で c の自己判断 (9400 request or survey 再実測での新 work 発見) を待ち、c が idle 継続 or 9400 提出したら hub が実測ベースで next frontier を裁定** (Q₈ は凍結ゆえ除外; b の Higman 応援 / a の Isaacs 応援 / 3 冊の未着手 ungated 結果 / specialization debt 一般化 が候補)。AskUserQuestion しない。
+>
 > **▶▶ 2026-07-23 19:4x 監視 tick — b (Higman transport 2 leaf) + c (openClassical 0133 完了) 合流 + baseline 50→47**。a=0 / b=2 / c=2 / d=0。
 > 合流 b (**Higman L13 exponent-two**): actual factor を pairwise join 越しに transport + lower central layer を同値越しに transport。2 新 leaf: ExponentTwoFactorCopyTransport (HigmanLemmaThirteen/) + HigmanLowerCentralTransport (**Higman/Suzuki2Groups/ top-level file** → Suzuki2Groups.lean:21 aggregator に配線)。両 WIRED。
 > 合流 c (**lint 0133 完了**): GroupTheory/RepresentationTheory/{InflationInduction, NonInflatedDegreeSqInterval} + Pf Appendices/SemilinearField の open scoped Classical を局所化 → **issue 0133 完了** (a の Pf S04/S08/S09 と file 分担で完遂)。baseline 非接触。
