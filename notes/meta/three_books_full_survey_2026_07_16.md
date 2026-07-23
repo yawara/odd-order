@@ -461,13 +461,13 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 | BG §11 | 8 | 8 | 0 | 0 | 0 | 0 |
 | BG §12 | 20 | 20 | 0 | 0 | 0 | 0 |
 | BG §13 | 14 | 14 | 0 | 0 | 0 | 0 |
-| BG §14 | 15 | 13 | 1 | 1 | 0 | 0 |
+| BG §14 | 15 | 13 | 1 | 1 | 0 | 0 | ⚠ 2026-07-23 hub 監査で訂正: Lem 14.13(b) は 07-18 landing 済 (partial→済)。残る唯一の "部分" = Cor 14.12 M*-pinned surfacing (残 2 clause は内部で証明済・consumer 0 の effort-S packaging 債務、genuine 新規数学でない)。issue 9318 HUB 裁定参照
 | BG §15 | 10 | 6 | 4 | 0 | 0 | 0 |
-| BG §16 | 11 | 4 | 3 | 3 | 1 | 0 |
+| BG §16 | 11 | 4 | 3 | 3 | 1 | 0 | ⚠ 2026-07-23 hub 監査で訂正: 全 11 結果 (Thm A/B/C/D/E, Prop 16.1, Thm I/II, tamely-imbedded 定義) sorry-free 完成。Thm A A(6)/(7) は 0126 close 済、Thm II は無条件形。旧「3 部分 + 1 未」は 07-18〜22 landing で全解消の stale snapshot
 | BG App.A | 6 | 6 | 0 | 0 | 0 | 0 |
 | BG App.B | 6 | 6 | 0 | 0 | 0 | 0 |
 | BG App.C | 19 | 12 | 3 | 0 | 4 | 0 |
-| BG App.D | 3 | 0 | 0 | 3 | 0 | 0 |
+| BG App.D | 3 | 0 | 0 | 3 | 0 | 0 | ⚠ 2026-07-23 hub 監査で訂正 (旧: 全 3 partial): 全 3 結果 (Lem D.1 Sylow-TI / Lem D.2 P≤N(P)′ / 3-step dichotomy) 完成・sorry-free・axiom-clean (lane c 自作 issue 3020/9133、非 contested)。partial は stale
 | BG App.E | 5 | 0 | 0 | 3 | 2 | 0 | ⚠ 2026-07-19 hub 監査で訂正 (旧: 部分0/未5)。E.1/E.2/E.3 は部分 (E.1 は class≤2, ≤3 が全 n で sorry-free)、未は E.4/E.5 のみ |
 
 ### BG §1 — BG §1 Elementary Properties of Solvable Groups

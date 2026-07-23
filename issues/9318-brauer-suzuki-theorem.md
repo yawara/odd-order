@@ -384,3 +384,33 @@ Gorenstein Lem 1.4: `θ = 1_C↑N − ψ̃` について (i) `(θ,θ)_N = 3` (ii
   ψ(x⁻¹)=−i)、Clifford/Mackey 既約判定 (`Clifford.lean`/`CliffordCorrespondence.lean`)。
 - θ = `induce 1_C − ψ̃`、(θ,θ)_N=3: N/C の正則指標 Tc = 1_N+sgn、Thm 4.2.4(i) 内積。
   N−A 上 θ=0: RH⊆ker ψ ゆえ ψ↑N は A 上のみ非零 (`induce_apply` 系)。
+
+## HUB 裁定 (2026-07-23): Q₈ = lane c の confirmed primary。BG-remainder 監査で doc-order 繰延失効
+
+**契機**: lane c が [9407](closed/9407-lane-c-prop1-done-next-frontier.md) で「territory 完済・次 frontier 裁定要請」を出し、以後 ~6h stall (自前 commit は 02:59 が最後、以降 merge のみ)。ユーザーが hub に「c 枯渇か / lane b の Higman を分解して c に回せるか」を諮問。hub が 3-agent 並列 fan-out で **BG remainder 全数実測監査**を実施。
+
+### 監査結論 (3 agent 実測、survey ラベルでなく repo grep/Read/git log)
+
+**BG remainder に「Q₈ より doc-order 早い genuinely 未形式化・ungated・c-territory の番号付き結果」は存在しない。** survey 表 (three_books_full_survey line 451-471, 2026-07-16 snapshot) は §16/§14/App.D/App.E 行が全て stale で、inline UPDATE (07-18〜22) と実測が正。
+
+- **§1–§5**: 完成 (§1 Lem 1.21(d)・特殊化債務全解消, §2 全 2.1-2.7, §3 Thm 3.10, §4 全 4.4/4.5/4.6/4.20/Cor 4.19, §5)。
+- **§6**: 残は **Thm 6.2 literal J(S) のみ = Glauberman Z(J) 定理に gated** ([3017](3017-thm62-js-general.md), major upstream 待ちの正当な繰延、**ungated frontier でない**)。Thm 6.4 は c が 07-22 close。
+- **§7–§13**: 完成 (表 gap 0)。
+- **§14**: 完成。唯一の残 = **Cor 14.12 M*-pinned surfacing** (残 2 clause は `H∩M*=D` を内部で確立済ゆえ**数学的内容は証明済**、M* を signature に露出していないだけ、consumer 0、effort-S packaging 債務 — genuine な新規数学でない)。Lem 14.13(b) は 07-18 landing 済 (survey stale)。
+- **§15**: 完成 (issue 3022 で Thm 15.7 全 5 条項 book strength)。
+- **§16**: 全 11 結果 (Thm A/B/C/D/E, Prop 16.1, Thm I/II, tamely-imbedded 定義) 完成・sorry-free。Thm A A(6)/(7) は 07-22 close ([0126](closed/0126*.md))。Thm A "unified capstone" は **book gap でなく repo packaging** かつ実質配線済。
+- **App.A/App.B**: 完成 (6/6)。
+- **App.C (BG)**: 12 done + 3 specialized 完成 (Thm C/C.1/C.2/C.3, norm-set + Frobenius class sum, axiom-clean)。残は Rem (V) 自明 wlog / Rem (II) SL(2,2^q) 例示 (群構成 infra soft-gated, illustrative) / Rem (IV)・Prob 1 (**文献 pointer / open research problem で本文に証明なし ⟹ 形式化ソース不在、CLAUDE.md 明示の低優先繰延**)。特殊化債務 1 件 (Thm C 抽象形) は一般化 payoff が Rem II 例示のみで低価値。
+- **App.D**: 全 3 結果 (D.1/D.2/3-step dichotomy) 完成 (survey「全 3 partial」は stale、c 自作 axiom-clean・非 contested)。
+- **App.E**: E.1–E.5 全完成 (Hall-Petresco/regular-p/exponent-p/E.4 は印刷版反例 filiform + 修正版/E.5)、opaque-Prop scaffold は 07-18 de-opacify 済。
+
+### ownership (lane b 分解の是非)
+
+**lane b の Higman Lemma 13 は分解しない。** (a) `HigmanLemmaThirteen.lean` は 40-leaf pure re-export hub で Higman/ 全体 sorry 0、単一の深い矛盾論法を bottom-up 収束中 — 分割は同一 dir の merge 衝突 + b 独自インフラの巨大 ramp-up + linear tail ブロックで利得 ≪ コスト。(b) 実測で **b は §14/§16/App.C/D/E と非接触** (未マージ 3 commit は全て `Higman/Suzuki2Groups/`、AppE との import 双方向ゼロ、共有は `GroupTheory/CommutatorSup` 汎用補題 1 本のみ)。c を b に相乗りさせる必要も余地もない。
+
+### 裁定
+
+1. **c の confirmed primary = 本 issue の Q₈ (|S|=8) case** (Lem 1.4–1.9 の指標理論 + endgame)。**c 自身が既に Lem 1.4 の詳細計画 (ψ 構成経路: C/RH≅ℤ/4 → 誘導既約 deg 2 → θ, norm-3、上記 2026-07-22 節) を書いており、真に「やることが無い」状態ではなかった** — 9407 の「territory 完済」は本 issue の live Q₈ frontier を見落とした framing で、実態は**セッション停止** (/loop 不再開)。BG remainder が実測で枯渇した今、9407 §3 の doc-order 繰延根拠 (「nearer BG-remainder を先に、枯渇時に再評価」) は**失効**。cost/規模/modular-char infra の重さは着手判断基準でない ([[feedback-cost-scope-not-a-criterion]])。
+2. **operational fix = lane c セッションの再起動**を本 issue (Q₈ Lem 1.4) に向けて。frontier は明確ゆえ再 escalate 不要 (9407 §5 standing authority)。
+3. **marginal packaging 債務 (Cor 14.12 M*-surfacing / App.C Thm C 抽象一般化) は Q₈ を displace しない** — 内容証明済・consumer 0 の低価値 cleanup ゆえ **lane d (メンテナンス lane) 候補 or c が Q₈ で真に block されたときの side-task**。9407 §4 の dedup 扱いと同方針。
+4. **survey 表 (line 451-471) の stale 行**は別途 [[feedback-fix-stale-docstrings-on-sight]] で訂正 (§16/§14/App.D/App.E)。
