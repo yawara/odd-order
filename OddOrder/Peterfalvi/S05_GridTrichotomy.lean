@@ -3,9 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Algebra.CharP.CharAndCard
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Set.Card
-import Mathlib.Tactic
+import Mathlib.Tactic.Abel
+import Mathlib.Tactic.Common
+import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.FinCases
+import Mathlib.Tactic.Group
+import Mathlib.Tactic.IntervalCases
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Module
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Zify
 
 /-!
 # Peterfalvi (3.8): the additive-grid trichotomy

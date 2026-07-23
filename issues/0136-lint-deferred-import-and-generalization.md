@@ -52,6 +52,27 @@ S06_CertainTypeIsometry) が green だったので FIXED と報告した。
 4. hub の合流 gate と衝突しないよう、**レーンが静かなタイミング**でやる
    (フルビルド中に他レーンをマージすると切り分けが効かない)。
 
+### ✅ 2026-07-23 実施 (lane a) — ① 解消
+
+`import Mathlib.Tactic` (line 8) を明示 tactic + 依存 module へ置換:
+`Mathlib.Algebra.CharP.CharAndCard` + 13 tactic (`Common` + `Abel`/`FieldSimp`/`FinCases`/`Group`/
+`IntervalCases`/`Linarith`/`LinearCombination`/`Module`/`NormNum.Prime`/`Positivity`/`Ring`/`Zify`;
+`omega`/`decide` は core、`norm_cast`/`push_cast` は algebra module 経由で解決、`Mathlib.Tactic.NormCast`
+は module として存在しない点に注意)。
+
+**cascade は 1 件のみ**: `Suzuki/FirstCase/StepThree:263` の `charP_of_card_eq_prime_pow`
+(= `Mathlib.Algebra.CharP.CharAndCard`。前回未検出だった `NormNum.Prime` は初手で同梱して pre-empt。
+その他 finite-field 補題 `FiniteField.card`/`ZMod.card`/`frobeniusAlgEquivOfAlgebraic` は 13 tactic の
+推移閉包で既に到達可、追加不要)。territory 尊重のため下流 (lane b の Suzuki 付録) を編集せず
+**S05 側に該当 module を持たせて解決** (S05 は元々 spine 唯一の `import Mathlib.Tactic` =
+de-facto 供給 hub ゆえ整合)。
+
+**フルビルド 3 回で検証** (0136 手順どおり leaf build を根拠にしない): ① narrow → 4585/4588 で
+StepThree のみ break → ② CharAndCard 追加 → **green 4589** → ③ main 合流後 (新 Higman leaf +
+c の openClassical) 再フルビルド → **green 4592**。`import.mathlibTactic` warning は repo 全体から
+消滅 (`grep -rn "^import Mathlib.Tactic$" OddOrder` = 0)、非 sorry regression 0。baseline の
+`S05 style.header` (= import 警告の mislabel) を除去。**① 完了** (② AppD hne は未着手・別 track)。
+
 ---
 
 ## ② `AppD/MaximalSylowIntersection` の `hne` 一般化
