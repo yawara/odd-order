@@ -6,6 +6,13 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 20:1x 監視 tick — b (Higman coord coherence 2 leaf) + a (lint 0136① import 絞り込み) 合流。⚠ jobs 基準変更 4724→4594**。a=1 / b=1 / c=0(idle) / d=0。
+> 合流 b (**Higman L13**): normalized factor coordinate を join 越しに同定。2 新 leaf ExponentTwoFactorCoordinateCoherence + NormalizedFactorCoordinateCoherence (HigmanLemmaThirteen/)、hub 経由 WIRED。
+> 合流 a (**lint 0136①**): Pf S05_GridTrichotomy の broad `import Mathlib.Tactic` を実使用 module へ絞り込み (DAG 衛生)。競合は lint-baseline のみ (--ours=47)。
+> **⚠ jobs 絶対値が 4724→4594 に減少 (−132)**: a の import 絞り込みで **S05 経由でのみ到達していた Mathlib.Tactic submodule 群が OddOrder closure から離脱** (b の +2 leaf を含んで net −130)。**OddOrder leaf の脱落ではない** — `✔ Built OddOrder` + b の 2 leaf elaborate 確認済、build green ゆえ cascade 破壊なし (import 絞り込みの想定内 DAG 衛生効果、CLAUDE.md 0123 の敵対的検証をフルビルドで実施)。**次 tick 以降の jobs 基準 = 4594**。
+> **gate: green 4594 jobs (新基準・import 絞り込みで Mathlib 減、OddOrder 全 elaborate) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 46 ≤ 47 baseline (a の絞り込みで 47→46、1 件 loose は許容・regen は 0136 campaign 完了時に batch) / push 3b6ec6d74→0048d0331**。範囲逸脱なし。build wall 10:34。
+> ℹ **c idle 継続 (Q₈ 凍結後)**: c は ahead=0・worktree clean、9400 frontier-request 未提出。territory 完済境界ゆえ次 tick も idle なら hub が実測ベースで next frontier を裁定する (前 tick 方針どおり)。
+>
 > **▶▶ 2026-07-23 20:0x 監視 tick — c (baseline no-op) + c (Q₈ 凍結 docs) 合流。⚠ c territory 完済境界へ**。a=0 / b=0 / c=2(+freeze) / d=0。
 > 合流 c-1 (**baseline no-op**): c の 47 ratchet は main の 47 regen と同値 (tree-identical, --ours)。
 > 合流 c-2 (**Q₈ 凍結 docs**, commit b4c8bfdba): **ユーザー裁定 (2026-07-23) で Q₈ Brauer–Suzuki (|S|=8) を凍結** — hub の 16:5x「Q₈=c active frontier」再裁定はこの凍結で**上書き**(hub 受諾)。c が docs 化: issues/9318 を closed/ へ移動 (|S|≥16 完了で BS 定理 close) / issues/pending/0147 (Q₈ modular char theory frozen project) 新設 / notes/meta/q8_modular_char_theory_frozen_project.md (書籍選定込み長期 spec) / appendixC note 更新。docs-only ゆえ build 不要 (Lean 不変)。
