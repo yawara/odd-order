@@ -44,7 +44,7 @@ namespace XiLengthThreeTypeAFactorData
 
 Normalize a supplied pair of factor coordinates and return the oriented
 B/C/D parameter relation without choosing a new ambient Singer datum. -/
-theorem exists_normalizedFactorPairRelation_of_fixedCoordinates
+theorem exists_normalizedFactorPairRelation_with_witnesses_of_fixedCoordinates
     {P : Type uP} [Group P] [Finite P]
     {Y : Subgroup (MulAut P)}
     (hP : IsPGroup 2 P)
@@ -80,6 +80,18 @@ theorem exists_normalizedFactorPairRelation_of_fixedCoordinates
             factors.left_invariant factors.frattini_lt_left.le c ePhi nu)
           (right' : FactorCoordinateData
             factors.right_invariant factors.frattini_lt_right.le c ePhi nu),
+          nu = left'.lambda * left'.theta left'.lambda ∧
+          nu = right'.lambda * right'.theta right'.lambda ∧
+          (left'.theta = 1 ∨
+            ∃ rL : ℕ, 0 < rL ∧ 2 * rL ≤ n ∧
+              left'.theta =
+                frobeniusEquiv (GaloisField 2 n) 2 ^ rL ∧
+              Odd (orderOf left'.theta)) ∧
+          (right'.theta = 1 ∨
+            ∃ rR : ℕ, 0 < rR ∧ 2 * rR ≤ n ∧
+              right'.theta =
+                frobeniusEquiv (GaloisField 2 n) 2 ^ rR ∧
+              Odd (orderOf right'.theta)) ∧
           NormalizedFactorPairRelation n left'.theta right'.theta := by
   classical
   dsimp only
@@ -158,6 +170,8 @@ theorem exists_normalizedFactorPairRelation_of_fixedCoordinates
     exact data.exists_normalized_frobenius_le_half hn0
   obtain ⟨dL, hnuL, hLcase⟩ := normalize dataL0
   obtain ⟨dR, hnuR, hRcase⟩ := normalize dataR0
+  have hLnormal := hLcase
+  have hRnormal := hRcase
   set L := dL.toInclusionData hEA ePhi hK1 hterm hSq hAgemo hK0
   set R := dR.toInclusionData hEA ePhi hK1 hterm hSq hAgemo hK0
   have hequivLR : ∀ α β : GaloisField 2 n,
@@ -194,7 +208,7 @@ theorem exists_normalizedFactorPairRelation_of_fixedCoordinates
       hlamnu hmunu (hpowcard mu hmune) hequiv hM0).1
   rcases hLcase with hthetaL1 | ⟨rL, hrL0, hrLhalf, hthetaLfrob, -⟩
   · rcases hRcase with hthetaR1 | ⟨rR, hrR0, hrRhalf, hthetaRfrob, -⟩
-    · exact ⟨dL, dR, .typeB (hthetaL1.trans hthetaR1.symm)⟩
+    · exact ⟨dL, dR, hnuL, hnuR, hLnormal, hRnormal, .typeB (hthetaL1.trans hthetaR1.symm)⟩
     · have hleftSq : dL.lambda ^ 2 = nu := by
         have htheta : dL.theta dL.lambda = dL.lambda := by
           rw [hthetaL1, RingAut.one_apply]
@@ -226,7 +240,7 @@ theorem exists_normalizedFactorPairRelation_of_fixedCoordinates
       have hdim := typeCDimension (mixedTermBilinear R L)
         dR.lambda dL.lambda hrR0 hrRhalf hrightNorm hleftSq
         hequivRL hM0RL
-      exact ⟨dL, dR,
+      exact ⟨dL, dR, hnuL, hnuR, hLnormal, hRnormal,
         .typeCRight rR hrR0 hthetaL1 hthetaRfrob hdim⟩
   · rcases hRcase with hthetaR1 | ⟨rR, hrR0, hrRhalf, hthetaRfrob, -⟩
     · have hrightSq : dR.lambda ^ 2 = nu := by
@@ -249,12 +263,12 @@ theorem exists_normalizedFactorPairRelation_of_fixedCoordinates
       have hdim := typeCDimension (mixedTermBilinear L R)
         dL.lambda dR.lambda hrL0 hrLhalf hleftNorm hrightSq
         hequivLR hM0LR
-      exact ⟨dL, dR,
+      exact ⟨dL, dR, hnuL, hnuR, hLnormal, hRnormal,
         .typeCLeft rL hrL0 hthetaLfrob hthetaR1 hdim⟩
     · by_cases hre : rL = rR
       · have hthetaEq : dL.theta = dR.theta := by
           rw [hthetaLfrob, hthetaRfrob, hre]
-        exact ⟨dL, dR, .typeB hthetaEq⟩
+        exact ⟨dL, dR, hnuL, hnuR, hLnormal, hRnormal, .typeB hthetaEq⟩
       · have hleftNorm : dL.lambda ^ (1 + 2 ^ rL) = nu := by
           have htheta :
               dL.theta dL.lambda = dL.lambda ^ 2 ^ rL := by
@@ -304,14 +318,77 @@ theorem exists_normalizedFactorPairRelation_of_fixedCoordinates
             rw [hthetaRfrob, hthetaLfrob, ← pow_mul]
             exact hfrobcong rR (rL * 2)
               (by push_cast; linear_combination hs2r)
-          exact ⟨dL, dR,
+          exact ⟨dL, dR, hnuL, hnuR, hLnormal, hRnormal,
             .typeDLeft rL hrL0 hrLhalf hthetaLfrob hthetaR2 h5r⟩
         · have hthetaL2 : dL.theta = dR.theta ^ 2 := by
             rw [hthetaLfrob, hthetaRfrob, ← pow_mul]
             exact hfrobcong rL (rR * 2)
               (by push_cast; linear_combination hr2s)
-          exact ⟨dL, dR,
+          exact ⟨dL, dR, hnuL, hnuR, hLnormal, hRnormal,
             .typeDRight rR hrR0 hrRhalf hthetaRfrob hthetaL2 h5s⟩
+
+end XiLengthThreeTypeAFactorData
+
+namespace XiLengthThreeTypeAFactorData
+
+/-- **Higman Lemma 12 (pp. 90–92), fixed-coordinate parameter dispatch.**
+
+Compatibility view of
+`exists_normalizedFactorPairRelation_with_witnesses_of_fixedCoordinates`
+that retains the original relation-only result. -/
+theorem exists_normalizedFactorPairRelation_of_fixedCoordinates
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthThree Y.subtype)
+    (hprime : ∀ p : ℕ, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    (factors : XiLengthThreeTypeAFactorData P Y) :
+    let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+      IsAInvariant.of_characteristic Y.subtype
+    let hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+      frattini_isElementaryAbelian_of_xiLengthThree
+        hP hncomm hmulti hxi hlen hprime
+    letI : IsMulCommutative ↑(frattini P) :=
+      IsMulCommutative.of_comm hEA.comm
+    letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+      hEA.zmodModule
+    ∀ {n : Nat} (c : Y)
+      (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] GaloisField 2 n)
+      (nu : GaloisField 2 n),
+      2 ≤ n →
+      IsPrimitiveRoot nu (2 ^ n - 1) →
+      ePhi.conj (elabRepresentation 2 hPhiInv.restrict c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu →
+      ∀ (_left : FactorCoordinateData
+          factors.left_invariant factors.frattini_lt_left.le c ePhi nu)
+        (_right : FactorCoordinateData
+          factors.right_invariant factors.frattini_lt_right.le c ePhi nu),
+        ∃ (left' : FactorCoordinateData
+            factors.left_invariant factors.frattini_lt_left.le c ePhi nu)
+          (right' : FactorCoordinateData
+            factors.right_invariant factors.frattini_lt_right.le c ePhi nu),
+          NormalizedFactorPairRelation n left'.theta right'.theta := by
+  classical
+  dsimp only
+  let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
+    IsAInvariant.of_characteristic Y.subtype
+  have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
+    frattini_isElementaryAbelian_of_xiLengthThree
+      hP hncomm hmulti hxi hlen hprime
+  letI : IsMulCommutative ↑(frattini P) :=
+    IsMulCommutative.of_comm hEA.comm
+  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  intro n c ePhi nu hnTwo hnuPrim hconj dataL0 dataR0
+  obtain ⟨dL, dR, -, -, -, -, hrelation⟩ :=
+    factors.exists_normalizedFactorPairRelation_with_witnesses_of_fixedCoordinates
+      hP hncomm hmulti hxi hlen hprime
+      c ePhi nu hnTwo hnuPrim hconj dataL0 dataR0
+  exact ⟨dL, dR, hrelation⟩
 
 end XiLengthThreeTypeAFactorData
 
