@@ -344,7 +344,28 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
   `_ne_one`/`_sq_eq_one_iff`。位数特徴づけ `_orderOf_eq_two_iff` (⟺`z·x=0`=偶)・`_eq_four_iff`
   (⟺`z·x≠0`=奇、`orderOf_eq_prime_pow`)・`_two_or_four`。半々: `semidihedral_invol_mul_dichotomy`
   (`z·a∈{0,z}`、induction) + `_invol_ne_zero` + **`semidihedralOrderFlip`** (位数2集合 ≃ 位数4集合、
-  parity flip `x↦x·ofAdd 1`)。全実証明・sorry 無・axiom-clean。⚠ (c) (共役類) は未着手 (defer)。
+  parity flip `x↦x·ofAdd 1`)。全実証明・sorry 無・axiom-clean。
+- ✅ 実証明 **3A.1(c)** 位数 2・位数 4 の元はそれぞれ単一共役類 (2026-07-23)。`_conj`: `inl y` で
+  reflection を共役すると `refl(y·x·σ(y⁻¹))` (加法的に `toAdd x` が `(2-z)·toAdd y` シフト)。
+  `semidihedral_shift_surj`: `z·d=0` (d 偶) なら `∃t, (2-z)·t=d` (`u=1+n/4` が `(2-z)·u=2` ∵
+  `(2-4k)(1+2k)=2-8k²≡2`、d=2s→t=u·s)。`_isConj` (差が偶なら共役) + 系 `_isConj_of_two` (両偶)
+  ・`_isConj_of_four` (両奇、dichotomy で `z·x=z` 確定)。全実証明・sorry 無・axiom-clean。
+  **3A.1 完全完成 (a/b/c)**。
+- ⬜ **3A.2** (一般化四元数群 Q_n、3A.1 に依存) — roadmap (2026-07-23 記録、次イテレーション実行):
+  B = C の index-2 部分群 = `Subgroup.zpowers (Multiplicative.ofAdd (2:ZMod n))` (位数 n/2、
+  偶元 = squares)。位数 4 の元 {(x,σ): x 奇} は inl(B) の coset `(ofAdd x₀, σ)·inl(B)` をなす
+  (x₀ 奇; σ(ofAdd 2k)=ofAdd(-2k) ゆえ shift で {奇}=coset)。Q = coset ∪ inl(B) は位数 n の部分群
+  (= Q_n)。**★ clean 構成発見 (2026-07-23)**: `ψ : S →* Multiplicative (ℤ/2)`,
+  `ψ(x,h) = (h の parity ∈{0,1}) + (toAdd x の parity)` は**準同型** — σ twist で左 parity が保存
+  (`w = z-1 = 4k-1` 奇ゆえ `parity(w·m) = parity(m)`)、H-part も加法的。ψ 全射 (`ψ(ofAdd 1,1)=1`)
+  ゆえ **Q := ψ.ker、`|Q| = |S|/2 = n`** が自動 (`Subgroup.card_eq_card_quotient_mul_card_subgroup`
+  や index=2)。B ≤ Q (偶元は ker)、位数 4 元 (x 奇, σ) ⊆ Q (parity 1+1=0)、Q = {(x,1):x偶}∪{(x,σ):x奇}
+  = coset ∪ B。~50 行 (ψ の map_mul' 計算が主)。閉性を手で示すより ker(ψ) が圧倒的に clean。
+  既存 semidihedral インフラ (reflection/σ/dichotomy/parity) を再利用。
+  ⚠ 次イテレーション注意: ψ の H-part parity は `SemidirectProduct.rightHom : S →* H` +
+  `H = ⟨σ⟩ ≃* Multiplicative (ℤ/2)` iso が要 (σ 位数2)。iso が clean に取れない場合は、ψ を toFun 直書き
+  (g.right の 1/σ 判定 + 左 parity) + map_mul' 手計算、または Q を carrier set 直接定義
+  ({(x,1):x偶}∪{(x,σ):x奇}) + closure 手証明 (既証明の位数2/4 characterization を活用) にフォールバック。
 - ✅ 実証明 **3A.5** `semidirectConjEquivProd` (`G ⋊ G ≅ G × G`、共役作用の半直積は直積)。同型
   `(n,g)↦(n·g,g)` (逆 `(a,g)↦⟨a·g⁻¹,g⟩`)、map_mul' は `mul_left`/`mul_right`/`conj_apply` 展開 + `group`。
 - ⬜ 残り §3A (いずれも substantial ~50-60 行): **3A.6** (p-群 P が p∤|G| の G に faithful ⟹ ある
