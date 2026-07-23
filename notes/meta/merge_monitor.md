@@ -6,6 +6,14 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 18:0x 監視 tick — b (Higman exp-two coords 2 leaf) + c (BrauerSuzuki lint 4) + a (Pf lint) 合流 + hub baseline tighten 153→139**。a=1 / b=3 / c=1 / d=0。
+> 合流 b (**Higman L13 exponent-two 続き**): 2 新 leaf ExponentTwoPairwiseCoordinates (共有 Frattini 座標, 460行) + FactorPairRelation (正規化 factor-pair 関係, 347行)、hub 経由 WIRED (jobs +2)。
+> 合流 c (**lint 0146 続き**): GroupTheory/BrauerSuzuki{,Normalizer,Setup} の style.header (Copyright too short) + missingEnd (unclosed sections) 警告 4 件解消。
+> 合流 a (**lint 0144**): Pf FeitSibley/FeitSibleyQ1Component/S11_{ChiefFactorCore,NineElevenRFamily,NineElevenSubcoherentBridge}/S13_SixTwoBridge の lane-a-owned 警告。
+> 🧭 **cross-lane 競合の裁定 (hub 自律)**: a=behind12・c=behind6 で 2-dot diff は Higman hub / BG AppE / issues の M/D を大量に出したが、**merge-base 起点の実 authored 集合**で判定すると a/c は Higman hub を authored せず (b のみ)、実競合面は **lint-baseline.tsv のみ** (a と c が別 base で締めた: a→181 stale-199base / c→149)。b→c→a の順で合流、baseline 競合は各回 `--ours` (main) で解消し、**全 merge 後に build の実 warning 数 139 へ hub が --update-baseline で regen** (差分 pure removal 9 組・新 grandfather 0)。FeitSibley は a と d(17:1x) が同一 file を lint したが編集行非重複で auto-merge 成功。
+> **gate: green 4717 jobs (前 4715 +2 = b の 2 leaf・orphan 0) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 139 ≤ 139 新 baseline (実 warning 139 = 153 − a/c 修正14、b 新 leaf 非 sorry 警告 0) / push 323c66ac4→8d4e42562**。範囲逸脱なし。build wall ~10min (b leaf + BrauerSuzuki + a の Pf + 下流)。
+> ✅ **教訓**: 複数レーンが lint-baseline.tsv を並行編集する時代 (a=0144/c=0146/d=0138) には、各レーンの主張 baseline 値は無意味 (別 base ゆえ)。**hub が全 merge 後に一度だけ実数へ regen** する規律で衝突を吸収。baseline は 3 tick で 199→190→153→139 と締まった。
+>
 > **▶▶ 2026-07-23 17:4x 監視 tick — b (Higman exponent-two infra 6 leaf) + c (lint 0146 37件) 合流 + hub baseline tighten 190→153**。a=0 / b=2 / c=2 / d=0。(17:2x tick は全レーン ahead=0 で合流なし・省略)
 > 合流 b (**Higman Lemma 13 exponent-two pairwise infrastructure**): 5 新 leaf (HigmanLemmaThirteen/): ExponentTwo{CommutingFactors,FactorModels,PairwiseClassification,PairwiseFrattini,PairwiseJoins} + **Lemma 12** XiLengthTwoTypeAClassification (HigmanLemmaTwelve/)。全 6 leaf は HigmanLemmaThirteen/Twelve hub に import 済 → `OddOrder.lean:474` (Higman/Suzuki2Groups.lean) 経由で推移 WIRED (jobs +6 で全 elaborate 確認)。
 > 合流 c (**lint 0146 lane-c-owned 37 件解消**): BG AppD_CNGroups/MaximalSylowIntersection + AppE_{AbelianCentralizer,EigenvalueCombinatorics,ExponentP,FurtherResults} + S15_MF/OpicoreCentralizer + S16/TypeBridges + Pf {ExceptionalNearField,NearFields}。⚠ c の merge が lint-baseline.tsv を d の 190 版へ解決し tsv 締めを喪失 (Lean 修正は保持) → **hub が build 後の実数 153 へ --update-baseline で tighten** (差分 = pure removal 13 組・新 grandfather 0、CLAUDE.md「hub の役割 = wave 後 baseline 更新」)。
