@@ -351,6 +351,13 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
   `(2-4k)(1+2k)=2-8k²≡2`、d=2s→t=u·s)。`_isConj` (差が偶なら共役) + 系 `_isConj_of_two` (両偶)
   ・`_isConj_of_four` (両奇、dichotomy で `z·x=z` 確定)。全実証明・sorry 無・axiom-clean。
   **3A.1 完全完成 (a/b/c)**。
+- ⬜ **3A.2** (一般化四元数群 Q_n、3A.1 に依存) — roadmap (2026-07-23 記録、次イテレーション実行):
+  B = C の index-2 部分群 = `Subgroup.zpowers (Multiplicative.ofAdd (2:ZMod n))` (位数 n/2、
+  偶元 = squares)。位数 4 の元 {(x,σ): x 奇} は inl(B) の coset `(ofAdd x₀, σ)·inl(B)` をなす
+  (x₀ 奇; σ(ofAdd 2k)=ofAdd(-2k) ゆえ shift で {奇}=coset)。Q = coset ∪ inl(B) は位数 n の部分群
+  (= Q_n)。閉性: coset·coset⊆inl(B) ((x,σ)(x',σ)=(x·σ(x'),1)、toAdd=x+z-x'=z+even=even ∵z=n/2 偶)、
+  inl(B)·coset⊆coset・coset·inl(B)⊆coset、逆元。`Subgroup` を carrier set + closure で構成 or
+  zpowers(ofAdd 2)⊔⟨reflection⟩。~80 行。既存 semidihedral インフラ (reflection/σ/dichotomy) を再利用。
 - ✅ 実証明 **3A.5** `semidirectConjEquivProd` (`G ⋊ G ≅ G × G`、共役作用の半直積は直積)。同型
   `(n,g)↦(n·g,g)` (逆 `(a,g)↦⟨a·g⁻¹,g⟩`)、map_mul' は `mul_left`/`mul_right`/`conj_apply` 展開 + `group`。
 - ⬜ 残り §3A (いずれも substantial ~50-60 行): **3A.6** (p-群 P が p∤|G| の G に faithful ⟹ ある
