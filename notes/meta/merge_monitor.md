@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 19:4x 監視 tick — b (Higman transport 2 leaf) + c (openClassical 0133 完了) 合流 + baseline 50→47**。a=0 / b=2 / c=2 / d=0。
+> 合流 b (**Higman L13 exponent-two**): actual factor を pairwise join 越しに transport + lower central layer を同値越しに transport。2 新 leaf: ExponentTwoFactorCopyTransport (HigmanLemmaThirteen/) + HigmanLowerCentralTransport (**Higman/Suzuki2Groups/ top-level file** → Suzuki2Groups.lean:21 aggregator に配線)。両 WIRED。
+> 合流 c (**lint 0133 完了**): GroupTheory/RepresentationTheory/{InflationInduction, NonInflatedDegreeSqInterval} + Pf Appendices/SemilinearField の open scoped Classical を局所化 → **issue 0133 完了** (a の Pf S04/S08/S09 と file 分担で完遂)。baseline 非接触。
+> **gate: green 4724 jobs (前 4722 +2 = b の 2 leaf・orphan 0) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 47 ≤ 47 新 baseline (c の openClassical で 50→47、pure removal 3 組・新 grandfather 0) / push f2a393e97→6c335ac52**。範囲逸脱なし。build wall 9:24 (c の RepresentationTheory InflationInduction が char spine 下流)。
+> 📉 **baseline 199→190→153→139→50→47**。issue 0133 (openClassical) 完了で lint backlog はほぼ掃引済 (残 47)。lane-c lint 完了ゆえ c は Q₈/math 復帰見込み。
+>
 > **▶▶ 2026-07-23 19:2x 監視 tick — b (Higman normalized factor param coherence 1 leaf) 合流 + c (baseline no-op) 吸収**。a=0 / b=1 / c=2 / d=0。
 > 合流 b (**Higman L13 exponent-two**): 正規化 factor parameter の coherence を証明。新 leaf NormalizedFactorParameterCoherence (75行, HigmanLemmaThirteen/)、hub 経由 WIRED。
 > 合流 c (**baseline no-op**): c は Filiform cleanup 後 baseline を 139→58 に締めたが、前 tick (19:0x) の hub 実数 50 regen (Filiform + openClassical 込み) に包含。--ours=50 で解消、Lean 変更 0。
