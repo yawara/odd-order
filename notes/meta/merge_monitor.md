@@ -6,6 +6,12 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 17:4x 監視 tick — b (Higman exponent-two infra 6 leaf) + c (lint 0146 37件) 合流 + hub baseline tighten 190→153**。a=0 / b=2 / c=2 / d=0。(17:2x tick は全レーン ahead=0 で合流なし・省略)
+> 合流 b (**Higman Lemma 13 exponent-two pairwise infrastructure**): 5 新 leaf (HigmanLemmaThirteen/): ExponentTwo{CommutingFactors,FactorModels,PairwiseClassification,PairwiseFrattini,PairwiseJoins} + **Lemma 12** XiLengthTwoTypeAClassification (HigmanLemmaTwelve/)。全 6 leaf は HigmanLemmaThirteen/Twelve hub に import 済 → `OddOrder.lean:474` (Higman/Suzuki2Groups.lean) 経由で推移 WIRED (jobs +6 で全 elaborate 確認)。
+> 合流 c (**lint 0146 lane-c-owned 37 件解消**): BG AppD_CNGroups/MaximalSylowIntersection + AppE_{AbelianCentralizer,EigenvalueCombinatorics,ExponentP,FurtherResults} + S15_MF/OpicoreCentralizer + S16/TypeBridges + Pf {ExceptionalNearField,NearFields}。⚠ c の merge が lint-baseline.tsv を d の 190 版へ解決し tsv 締めを喪失 (Lean 修正は保持) → **hub が build 後の実数 153 へ --update-baseline で tighten** (差分 = pure removal 13 組・新 grandfather 0、CLAUDE.md「hub の役割 = wave 後 baseline 更新」)。
+> **gate: green 4715 jobs (前 4709 +6 = b の 6 leaf ちょうど・orphan 0) / AxiomsCheck OK (build elaborate 通過・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 153 ≤ 153 新 baseline (実 warning 153・c の 37 解消 + b の非 sorry 新規 0) / push 02e97466b→4878c7758**。範囲逸脱なし。build wall 11:19 (BG AppE/NearFields 再 elaborate + b 6 leaf)。
+> b/c とも behind=0 (直前に main 同期) ゆえ相互競合ゼロ。b の Higman と c の BG/Pf lint は非重複。baseline は 2 tick で 199→190 (d)→153 (c) と締まった。
+>
 > **▶▶ 2026-07-23 17:1x 監視 tick — d (lint 第2 frozen wave, baseline 199→190) 合流**。a=0 / b=0 / c=0 / d=2。(17:07 tick は全レーン ahead=0 で合流なし・省略)
 > 合流: d (**lint 保守レーン・issue 0138**: 第2 frozen wave で FeitSibley / S03g_Thm310General / S11_NineElevenSubcoherentBridge の frozen×機械カテゴリ lint 警告 **9 件解消** → `bin/lint-baseline.tsv` baseline **199→190**。残 backlog を per-lane 指示 issue 化 = 0144 (a owned) / 0145 (b owned) / 0146 (c owned)。3 Lean file は全 frozen (owner 別作業中) の lint 専用編集)。
 > **gate: green 4709 jobs (前 4709 不変・新 leaf 0 = orphan なし、新規は issue .md 3 枚のみ) / AxiomsCheck OK (build elaborate 通過・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 190 ≤ 190 新 baseline (d の 199→190 締めが c の ℒ(F) 込みでも実数一致・check-warnings で確認) / push 62f2eee1e→57d8411bf**。範囲逸脱なし。build wall 10:46 (S03g = BG §3 base file の lint 編集 → 下流 BG/Pf cone を全再 elaborate)。
