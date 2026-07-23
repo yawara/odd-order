@@ -6,6 +6,10 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 21:4x 監視 tick (B 単独) — b (Higman common-factor params 1 leaf) 合流**。b=3。
+> 合流 b (**Higman L13**): common-factor parameter check を接続 + normalized factor relation を対称化。新 leaf ExponentTwoCommonFactorParameters (124行, HigmanLemmaThirteen/) WIRED。既存 FactorPairRelationDefinition も更新。
+> **gate: green 4598 jobs (前 4597 +1 = b の 1 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push 4177fa7a7→ee27eefa7**。範囲逸脱なし。build wall 1:10。
+>
 > **▶▶ 2026-07-23 21:1x 監視 tick (B 単独) — b (Higman prescribed factor transport 2 leaf) 合流**。b=2。
 > 合流 b (**Higman L13**): prescribed factor を pairwise join 越しに transport + all-distinct parameter list check を閉じる。2 新 leaf ExponentTwoAllDistinctParameters (331行) + ExponentTwoPrescribedFactorTransport (153行) (HigmanLemmaThirteen/)、hub 経由 WIRED。
 > **gate: green 4597 jobs (前 4595 +2 = b の 2 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push dbb7f5927→462ac752b**。範囲逸脱なし。build wall 1:37。(20:43 tick は b ahead=0 で合流なし・省略)
