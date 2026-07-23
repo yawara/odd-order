@@ -1,11 +1,8 @@
 # bin/lint-baseline.tsv — lint 警告 ratchet の基準 (issue 0138)
 # `count<TAB>relpath<TAB>category`。cleanup wave のたびに --update-baseline で更新。
 # 目標: 全行が消え baseline が空 → --strict のゼロ gate へ移行。
-# 総数: 139 件 / 36 (file,category) 組
+# 総数: 58 件 / 33 (file,category) 組
 #
-67	OddOrder/BG/AppE_FiliformGroup.lean	flexible
-8	OddOrder/BG/AppE_FiliformGroup.lean	style.show
-6	OddOrder/BG/AppE_FiliformCounterexample.lean	flexible
 6	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/XiLengthFromCard.lean	style.show
 5	OddOrder/Higman/Suzuki2Groups/HigmanLemmaTwelve/CaseSplitBCD.lean	unusedSectionVars
 5	OddOrder/Peterfalvi/Appendices/Suzuki/WCyclicDivides.lean	style.show
