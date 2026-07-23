@@ -293,6 +293,190 @@ theorem exists_actualPairwiseFactorCoordinates_of_exponent_two
 
 The actual two factors are retained while their fixed-coordinate data are
 normalized into Higman's oriented B/C/D parameter relation. -/
+theorem exists_normalizedFactorPairRelation_with_witnesses_on_actualPairwiseJoin_of_exponent_two
+    {P : Type uP} [Group P] [Finite P]
+    {Y : Subgroup (MulAut P)}
+    (hP : IsPGroup 2 P)
+    (hncomm : ¬ IsMulCommutative P)
+    (hmulti : ∃ x y : P,
+      x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y)
+    (hxi : IsXiActor Y)
+    (hlen : HasXiLengthFour Y.subtype)
+    (hprime : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
+      p ∣ (involutions P).ncard)
+    (htwo : ∀ z : frattini P, z ^ 2 = 1)
+    {R S : Subgroup P}
+    (hRinv : IsAInvariant Y.subtype R)
+    (hSinv : IsAInvariant Y.subtype S)
+    (hPhiR : frattini P < R)
+    (hPhiS : frattini P < S)
+    (hRSinf : R ⊓ S = frattini P)
+    (hRStop : R ⊔ S < (⊤ : Subgroup P))
+    (dataR : XiLengthTwoTypeAData.{uP, 0} R)
+    (dataS : XiLengthTwoTypeAData.{uP, 0} S) :
+    let J : Subgroup P := R ⊔ S
+    let hJinv : IsAInvariant Y.subtype J := hRinv.sup hSinv
+    let hPhiEA : IsElementaryAbelian 2 (frattini P) :=
+      frattini_isElementaryAbelian_of_exponent_two htwo
+    let hMap : (frattini J).map J.subtype = frattini P :=
+      frattini_sup_map_subtype_eq_ambientFrattini
+        hP hxi htwo hRinv hPhiR dataR
+    let hJoinEA : IsElementaryAbelian 2 (frattini J) :=
+      IsElementaryAbelian.of_mulEquiv
+        (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm hPhiEA
+    letI : IsMulCommutative (frattini P) :=
+      IsMulCommutative.of_comm hPhiEA.comm
+    letI : Module (ZMod 2) (Additive (frattini P)) :=
+      hPhiEA.zmodModule
+    letI : IsMulCommutative (frattini J) :=
+      IsMulCommutative.of_comm hJoinEA.comm
+    letI : Module (ZMod 2) (Additive (frattini J)) :=
+      hJoinEA.zmodModule
+    ∀ {n : Nat} (c : Y)
+      (ePhi : Additive (frattini P) ≃ₗ[ZMod 2]
+        GaloisField 2 n)
+      (nu : GaloisField 2 n),
+      2 ≤ n →
+      (∀ g : Y, g ∈ Subgroup.zpowers c) →
+      IsPrimitiveRoot nu (2 ^ n - 1) →
+      ePhi.conj
+          (elabRepresentation 2
+            (IsAInvariant.of_characteristic
+              Y.subtype : IsAInvariant Y.subtype (frattini P)).restrict c) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu →
+      ∃ (factors : XiLengthThreeTypeAFactorData
+            J hJinv.restrict.range)
+        (left' : FactorCoordinateData factors.left_invariant
+            factors.frattini_lt_left.le
+            (hJinv.restrict.rangeRestrict c)
+            ((pairwiseJoinFrattiniLinearEquivAmbientFrattini
+              hPhiEA hMap).trans ePhi) nu)
+        (right' : FactorCoordinateData factors.right_invariant
+            factors.frattini_lt_right.le
+            (hJinv.restrict.rangeRestrict c)
+            ((pairwiseJoinFrattiniLinearEquivAmbientFrattini
+              hPhiEA hMap).trans ePhi) nu),
+        factors.left = R.subgroupOf J ∧
+        factors.right = S.subgroupOf J ∧
+        nu = left'.lambda * left'.theta left'.lambda ∧
+        nu = right'.lambda * right'.theta right'.lambda ∧
+        (left'.theta = 1 ∨
+          ∃ rL : ℕ, 0 < rL ∧ 2 * rL ≤ n ∧
+            left'.theta =
+              frobeniusEquiv (GaloisField 2 n) 2 ^ rL ∧
+            Odd (orderOf left'.theta)) ∧
+        (right'.theta = 1 ∨
+          ∃ rR : ℕ, 0 < rR ∧ 2 * rR ≤ n ∧
+            right'.theta =
+              frobeniusEquiv (GaloisField 2 n) 2 ^ rR ∧
+            Odd (orderOf right'.theta)) ∧
+        NormalizedFactorPairRelation n left'.theta right'.theta := by
+  classical
+  dsimp only
+  let J : Subgroup P := R ⊔ S
+  let hJinv : IsAInvariant Y.subtype J := hRinv.sup hSinv
+  let hPhiEA : IsElementaryAbelian 2 (frattini P) :=
+    frattini_isElementaryAbelian_of_exponent_two htwo
+  let hMap : (frattini J).map J.subtype = frattini P :=
+    frattini_sup_map_subtype_eq_ambientFrattini
+      hP hxi htwo hRinv hPhiR dataR
+  let hJoinEA : IsElementaryAbelian 2 (frattini J) :=
+    IsElementaryAbelian.of_mulEquiv
+      (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm hPhiEA
+  letI : IsMulCommutative (frattini P) :=
+    IsMulCommutative.of_comm hPhiEA.comm
+  letI : CommGroup (frattini P) := inferInstance
+  letI : Module (ZMod 2) (Additive (frattini P)) :=
+    hPhiEA.zmodModule
+  letI : IsMulCommutative (frattini J) :=
+    IsMulCommutative.of_comm hJoinEA.comm
+  letI : CommGroup (frattini J) := inferInstance
+  letI : Module (ZMod 2) (Additive (frattini J)) :=
+    hJoinEA.zmodModule
+  intro n c ePhi nu hnTwo hcgen hnuPrimitive hconj
+  have hRJoin : R < J := by
+    apply lt_of_le_of_ne le_sup_left
+    intro hEq
+    have hSleR : S ≤ R := by
+      rw [hEq]
+      exact le_sup_right
+    have hSphi : S = frattini P := by
+      calc
+        S = R ⊓ S := (inf_eq_right.mpr hSleR).symm
+        _ = frattini P := hRSinf
+    exact hPhiS.ne hSphi.symm
+  have hbotPhi : (⊥ : Subgroup P) < frattini P :=
+    (normalInvariantBot_covBy_frattini_of_pow_two_eq_one
+      hP hncomm hxi htwo).lt
+  have hlenJ : HasXiLengthThree hJinv.restrict.range.subtype :=
+    restricted_range_hasXiLengthThree_of_two_step_exponent_two
+      hP hxi hlen htwo hRinv hJinv hbotPhi hPhiR hRJoin hRStop
+  have hinvPhi : involutions P ⊆ frattini P :=
+    involutions_subset_of_nontrivial_invariant
+      hP Y hxi.transitive
+        (IsAInvariant.of_characteristic Y.subtype) hbotPhi.ne'
+  have hncommJ : ¬ IsMulCommutative J :=
+    not_isMulCommutative_sup_of_typeA_factors
+      hxi hRinv hSinv hRSinf dataR dataS hinvPhi htwo
+  have hinvJ : involutions P ⊆ J := fun _ hx =>
+    (le_sup_left : R ≤ J) (hPhiR.le (hinvPhi hx))
+  have hmultiJ : ∃ x y : J,
+      x ∈ involutions J ∧ y ∈ involutions J ∧ x ≠ y :=
+    exists_distinct_involutions_subgroup_of_subset hinvJ hmulti
+  have hxiJ : IsXiActor hJinv.restrict.range :=
+    restricted_range_isXiActor hxi hJinv
+  have hprimeJ : ∀ p : Nat, p.Prime →
+      p ∣ Nat.card hJinv.restrict.range →
+        p ∣ (involutions J).ncard :=
+    restricted_range_primeSupport hJinv hinvJ hprime
+  let cJ : hJinv.restrict.range :=
+    hJinv.restrict.rangeRestrict c
+  let eJoin :=
+    (pairwiseJoinFrattiniLinearEquivAmbientFrattini
+      hPhiEA hMap).trans ePhi
+  have hconjJ :
+      eJoin.conj
+          (elabRepresentation 2
+            (IsAInvariant.of_characteristic
+              hJinv.restrict.range.subtype :
+                IsAInvariant hJinv.restrict.range.subtype
+                  (frattini J)).restrict cJ) =
+        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu :=
+    pairwiseJoinFrattiniSingerCoordinate_conj
+      hJinv hPhiEA hMap c ePhi nu hconj
+  obtain ⟨factors, left, right, hleft, hright, _hsourceL, _hsourceR⟩ :=
+    exists_actualPairwiseFactorCoordinates_of_exponent_two
+      hP hncomm hmulti hxi hlen hprime htwo
+      hRinv hSinv hPhiR hPhiS hRSinf hRStop dataR dataS
+      c ePhi nu hnTwo hcgen hnuPrimitive hconj
+  obtain ⟨left', right', hsourceL', hsourceR',
+      hleftCase, hrightCase, hrelation⟩ :=
+    factors.exists_normalizedFactorPairRelation_with_witnesses_of_fixedCoordinates
+      (hP.to_subgroup J) hncommJ hmultiJ hxiJ hlenJ hprimeJ
+      cJ eJoin nu hnTwo hnuPrimitive hconjJ
+      left right
+  exact ⟨factors, left', right', hleft, hright,
+    hsourceL', hsourceR', hleftCase, hrightCase, hrelation⟩
+end
+
+end OddOrder.Higman.Suzuki2Groups
+
+namespace OddOrder.Higman.Suzuki2Groups
+universe uP
+
+open OddOrder.GroupTheory
+open OddOrder.GroupTheory.Suzuki2Group
+open OddOrder.RepresentationTheory
+open OddOrder.Isaacs.Ch03
+open Module
+open scoped IsMulCommutative
+
+noncomputable section
+
+/-- **Higman Lemma 13 (p. 93), normalized relation on one actual pair.**
+
+Compatibility view of the witness-preserving theorem that retains the
+original relation-only result. -/
 theorem exists_normalizedFactorPairRelation_on_actualPairwiseJoin_of_exponent_two
     {P : Type uP} [Group P] [Finite P]
     {Y : Subgroup (MulAut P)}
@@ -382,67 +566,14 @@ theorem exists_normalizedFactorPairRelation_on_actualPairwiseJoin_of_exponent_tw
   letI : Module (ZMod 2) (Additive (frattini J)) :=
     hJoinEA.zmodModule
   intro n c ePhi nu hnTwo hcgen hnuPrimitive hconj
-  have hRJoin : R < J := by
-    apply lt_of_le_of_ne le_sup_left
-    intro hEq
-    have hSleR : S ≤ R := by
-      rw [hEq]
-      exact le_sup_right
-    have hSphi : S = frattini P := by
-      calc
-        S = R ⊓ S := (inf_eq_right.mpr hSleR).symm
-        _ = frattini P := hRSinf
-    exact hPhiS.ne hSphi.symm
-  have hbotPhi : (⊥ : Subgroup P) < frattini P :=
-    (normalInvariantBot_covBy_frattini_of_pow_two_eq_one
-      hP hncomm hxi htwo).lt
-  have hlenJ : HasXiLengthThree hJinv.restrict.range.subtype :=
-    restricted_range_hasXiLengthThree_of_two_step_exponent_two
-      hP hxi hlen htwo hRinv hJinv hbotPhi hPhiR hRJoin hRStop
-  have hinvPhi : involutions P ⊆ frattini P :=
-    involutions_subset_of_nontrivial_invariant
-      hP Y hxi.transitive
-        (IsAInvariant.of_characteristic Y.subtype) hbotPhi.ne'
-  have hncommJ : ¬ IsMulCommutative J :=
-    not_isMulCommutative_sup_of_typeA_factors
-      hxi hRinv hSinv hRSinf dataR dataS hinvPhi htwo
-  have hinvJ : involutions P ⊆ J := fun _ hx =>
-    (le_sup_left : R ≤ J) (hPhiR.le (hinvPhi hx))
-  have hmultiJ : ∃ x y : J,
-      x ∈ involutions J ∧ y ∈ involutions J ∧ x ≠ y :=
-    exists_distinct_involutions_subgroup_of_subset hinvJ hmulti
-  have hxiJ : IsXiActor hJinv.restrict.range :=
-    restricted_range_isXiActor hxi hJinv
-  have hprimeJ : ∀ p : Nat, p.Prime →
-      p ∣ Nat.card hJinv.restrict.range →
-        p ∣ (involutions J).ncard :=
-    restricted_range_primeSupport hJinv hinvJ hprime
-  let cJ : hJinv.restrict.range :=
-    hJinv.restrict.rangeRestrict c
-  let eJoin :=
-    (pairwiseJoinFrattiniLinearEquivAmbientFrattini
-      hPhiEA hMap).trans ePhi
-  have hconjJ :
-      eJoin.conj
-          (elabRepresentation 2
-            (IsAInvariant.of_characteristic
-              hJinv.restrict.range.subtype :
-                IsAInvariant hJinv.restrict.range.subtype
-                  (frattini J)).restrict cJ) =
-        Algebra.lmul (ZMod 2) (GaloisField 2 n) nu :=
-    pairwiseJoinFrattiniSingerCoordinate_conj
-      hJinv hPhiEA hMap c ePhi nu hconj
-  obtain ⟨factors, left, right, hleft, hright, _hsourceL, _hsourceR⟩ :=
-    exists_actualPairwiseFactorCoordinates_of_exponent_two
+  obtain ⟨factors, left', right', hleft, hright,
+      -, -, -, -, hrelation⟩ :=
+    exists_normalizedFactorPairRelation_with_witnesses_on_actualPairwiseJoin_of_exponent_two
       hP hncomm hmulti hxi hlen hprime htwo
       hRinv hSinv hPhiR hPhiS hRSinf hRStop dataR dataS
       c ePhi nu hnTwo hcgen hnuPrimitive hconj
-  obtain ⟨left', right', hrelation⟩ :=
-    factors.exists_normalizedFactorPairRelation_of_fixedCoordinates
-      (hP.to_subgroup J) hncommJ hmultiJ hxiJ hlenJ hprimeJ
-      cJ eJoin nu hnTwo hnuPrimitive hconjJ
-      left right
   exact ⟨factors, left', right', hleft, hright, hrelation⟩
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
