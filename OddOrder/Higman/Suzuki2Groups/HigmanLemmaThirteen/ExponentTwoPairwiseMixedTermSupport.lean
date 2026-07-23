@@ -45,10 +45,12 @@ private theorem exists_common_right_monomial_profile
       M₂ (lam * α) (mu * β) = nu * M₂ α β)
     (hM₁ : ∃ α β, M₁ α β ≠ 0)
     (hM₂ : ∃ α β, M₂ α β ≠ 0) :
-    ∃ (j : ℕ) (c₁ c₂ : GaloisField 2 n),
-      j < n ∧ c₁ ≠ 0 ∧ c₂ ≠ 0 ∧
-      (∀ β, M₁ 1 β = c₁ * β ^ 2 ^ j) ∧
-      ∀ β, M₂ 1 β = c₂ * β ^ 2 ^ j := by
+    ∃ (i j : ℕ) (c₁ c₂ : GaloisField 2 n),
+      i < n ∧ j < n ∧ c₁ ≠ 0 ∧ c₂ ≠ 0 ∧
+      (∀ α β,
+        M₁ α β = c₁ * (α ^ 2 ^ i * β ^ 2 ^ j)) ∧
+      ∀ α β,
+        M₂ α β = c₂ * (α ^ 2 ^ i * β ^ 2 ^ j) := by
   have hn0 : n ≠ 0 := by omega
   have hnpos : 0 < n := by omega
   have hcard : Nat.card (GaloisField 2 n) = 2 ^ n := by
@@ -123,11 +125,11 @@ private theorem exists_common_right_monomial_profile
       obtain ⟨c₂, hc₂, hform₂⟩ :=
         mixedTerm_monomial_of_theta_one hnpos M₂ lam nu
           hordlam hlamSource hequiv₂' hM₂
-      refine ⟨0, c₁, c₂, hnpos, hc₁, hc₂, ?_, ?_⟩
-      · intro β
-        simpa using hform₁ 1 β
-      · intro β
-        simpa using hform₂ 1 β
+      refine ⟨0, 0, c₁, c₂, hnpos, hnpos, hc₁, hc₂, ?_, ?_⟩
+      · intro α β
+        simpa using hform₁ α β
+      · intro α β
+        simpa using hform₂ α β
   | typeCLeft r hr htheta hphi hdim =>
       have h2r : 2 * r ≤ n := by omega
       have hlamNorm : lam ^ (1 + 2 ^ r) = nu := by
@@ -149,17 +151,14 @@ private theorem exists_common_right_monomial_profile
         exact hnuNe hmuSq.symm
       have hordlam : orderOf lam = 2 ^ n - 1 :=
         fullOrderOf (by simp) hlamNorm
-      obtain ⟨_, c₁, hc₁, hform₁⟩ :=
+      obtain ⟨_hdim₁, c₁, hc₁, hform₁⟩ :=
         mixedTerm_monomial_typeC hr h2r M₁ lam mu nu
           hordlam hlamNorm hmuSq (hpowcard mu hmune) hequiv₁ hM₁
-      obtain ⟨_, c₂, hc₂, hform₂⟩ :=
+      obtain ⟨_hdim₂, c₂, hc₂, hform₂⟩ :=
         mixedTerm_monomial_typeC hr h2r M₂ lam mu nu
           hordlam hlamNorm hmuSq (hpowcard mu hmune) hequiv₂ hM₂
-      refine ⟨r + 1, c₁, c₂, by omega, hc₁, hc₂, ?_, ?_⟩
-      · intro β
-        simpa using hform₁ 1 β
-      · intro β
-        simpa using hform₂ 1 β
+      exact ⟨n - 1, r + 1, c₁, c₂, by omega, by omega,
+        hc₁, hc₂, hform₁, hform₂⟩
   | typeCRight r hr htheta hphi hdim =>
       have h2r : 2 * r ≤ n := by omega
       have hlamSq : lam ^ 2 = nu := by
@@ -197,20 +196,20 @@ private theorem exists_common_right_monomial_profile
       have hM₂' : ∃ α β, (LinearMap.flip M₂) α β ≠ 0 := by
         obtain ⟨α, β, hne⟩ := hM₂
         exact ⟨β, α, hne⟩
-      obtain ⟨_, c₁, hc₁, hform₁⟩ :=
+      obtain ⟨_hdim₁, c₁, hc₁, hform₁⟩ :=
         mixedTerm_monomial_typeC hr h2r (LinearMap.flip M₁)
           mu lam nu hordmu hmuNorm hlamSq (hpowcard lam hlamne)
           hequiv₁' hM₁'
-      obtain ⟨_, c₂, hc₂, hform₂⟩ :=
+      obtain ⟨_hdim₂, c₂, hc₂, hform₂⟩ :=
         mixedTerm_monomial_typeC hr h2r (LinearMap.flip M₂)
           mu lam nu hordmu hmuNorm hlamSq (hpowcard lam hlamne)
           hequiv₂' hM₂'
-      refine ⟨n - 1, c₁, c₂, Nat.sub_lt (by omega) (by omega),
+      refine ⟨r + 1, n - 1, c₁, c₂, by omega, by omega,
         hc₁, hc₂, ?_, ?_⟩
-      · intro β
-        simpa using hform₁ β 1
-      · intro β
-        simpa using hform₂ β 1
+      · intro α β
+        simpa [mul_comm] using hform₁ β α
+      · intro α β
+        simpa [mul_comm] using hform₂ β α
   | typeDLeft r hr hrhalf htheta hphi hfive =>
       have hrn : r < n := by omega
       have hrz : (r : ZMod n) ≠ 0 := by
@@ -257,12 +256,14 @@ private theorem exists_common_right_monomial_profile
             M (lam * α) (mu * β) = nu * M α β)
           (hM : ∃ α β, M α β ≠ 0) :
           ∃ c : GaloisField 2 n, c ≠ 0 ∧
-            ∀ β, M 1 β = c * β ^ 2 ^ (r % n) := by
+            ∀ α β, M α β =
+              c * (α ^ 2 ^ (3 * r % n) *
+                β ^ 2 ^ (r % n)) := by
         rcases mixedTerm_monomial_typeD hnpos hrz hsz hrsz hrsne
             M lam mu nu hordnu hlamNorm hmuNorm hequiv hM with
           hleft | hright
         · obtain ⟨_, _, c, hc, hform⟩ := hleft
-          exact ⟨c, hc, fun β => by simpa using hform 1 β⟩
+          exact ⟨c, hc, hform⟩
         · obtain ⟨hrfour, _, _⟩ := hright
           exfalso
           apply hrz
@@ -270,7 +271,8 @@ private theorem exists_common_right_monomial_profile
           linear_combination -2 * hrfour - hfive
       obtain ⟨c₁, hc₁, hform₁⟩ := profile M₁ hequiv₁ hM₁
       obtain ⟨c₂, hc₂, hform₂⟩ := profile M₂ hequiv₂ hM₂
-      exact ⟨r % n, c₁, c₂, Nat.mod_lt _ hnpos,
+      exact ⟨3 * r % n, r % n, c₁, c₂,
+        Nat.mod_lt _ hnpos, Nat.mod_lt _ hnpos,
         hc₁, hc₂, hform₁, hform₂⟩
   | typeDRight r hr hrhalf hphi htheta hfive =>
       have hrn : r < n := by omega
@@ -318,7 +320,9 @@ private theorem exists_common_right_monomial_profile
             M (lam * α) (mu * β) = nu * M α β)
           (hM : ∃ α β, M α β ≠ 0) :
           ∃ c : GaloisField 2 n, c ≠ 0 ∧
-            ∀ β, M 1 β = c * β ^ 2 ^ (3 * r % n) := by
+            ∀ α β, M α β =
+              c * (α ^ 2 ^ (r % n) *
+                β ^ 2 ^ (3 * r % n)) := by
         have hequiv' : ∀ α β,
             (LinearMap.flip M) (mu * α) (lam * β) =
               nu * (LinearMap.flip M) α β := by
@@ -331,7 +335,8 @@ private theorem exists_common_right_monomial_profile
             (LinearMap.flip M) mu lam nu hordnu hmuNorm hlamNorm
             hequiv' hM' with hleft | hright
         · obtain ⟨_, _, c, hc, hform⟩ := hleft
-          exact ⟨c, hc, fun β => by simpa using hform β 1⟩
+          refine ⟨c, hc, fun α β => ?_⟩
+          simpa [mul_comm] using hform β α
         · obtain ⟨hrfour, _, _⟩ := hright
           exfalso
           apply hrz
@@ -339,7 +344,8 @@ private theorem exists_common_right_monomial_profile
           linear_combination -2 * hrfour - hfive
       obtain ⟨c₁, hc₁, hform₁⟩ := profile M₁ hequiv₁ hM₁
       obtain ⟨c₂, hc₂, hform₂⟩ := profile M₂ hequiv₂ hM₂
-      exact ⟨3 * r % n, c₁, c₂, Nat.mod_lt _ hnpos,
+      exact ⟨r % n, 3 * r % n, c₁, c₂,
+        Nat.mod_lt _ hnpos, Nat.mod_lt _ hnpos,
         hc₁, hc₂, hform₁, hform₂⟩
 
 /-- **Higman Lemma 13 (p. 93), cancellation on one common right support.**
@@ -369,17 +375,85 @@ theorem exists_nontrivial_pair_cancel_common_right_mixedTerms
     ∃ a b : GaloisField 2 n,
       (a ≠ 0 ∨ b ≠ 0) ∧
       ∀ β, a * M₁ 1 β + b * M₂ 1 β = 0 := by
-  obtain ⟨j, c₁, c₂, _, _, _, hform₁, hform₂⟩ :=
+  obtain ⟨_i, j, c₁, c₂, _, _, _, _, hform₁, hform₂⟩ :=
     exists_common_right_monomial_profile hn hnuPrimitive
       hsourceL hsourceR hunique hrel M₁ M₂
       hequiv₁ hequiv₂ hM₁ hM₂
   obtain ⟨a, b, hab, hcancel⟩ :=
     exists_nontrivial_pair_mul_add_mul_eq_zero c₁ c₂
+  have hform₁_one : ∀ β, M₁ 1 β = c₁ * β ^ 2 ^ j := by
+    intro β
+    simpa using hform₁ 1 β
+  have hform₂_one : ∀ β, M₂ 1 β = c₂ * β ^ 2 ^ j := by
+    intro β
+    simpa using hform₂ 1 β
   refine ⟨a, b, hab, fun β => ?_⟩
-  rw [hform₁ β, hform₂ β]
+  rw [hform₁_one β, hform₂_one β]
   calc
     a * (c₁ * β ^ 2 ^ j) + b * (c₂ * β ^ 2 ^ j) =
         (a * c₁ + b * c₂) * β ^ 2 ^ j := by ring
+    _ = 0 := by rw [hcancel, zero_mul]
+
+/-- **Higman Lemma 13 (p. 93), input-coordinate cancellation.**
+
+Under the same one-support hypothesis, choose actual left field coordinates
+whose common Frobenius powers are the two cancelling coefficients.  The
+resulting nonzero pair makes the sum of the two mixed terms vanish against
+every right coordinate.  This is the form used to construct Higman's
+`u₀ = a x₀ + b y₀`. -/
+theorem exists_nontrivial_pair_inputs_cancel_common_right_mixedTerms
+    {n : ℕ} (hn : 2 ≤ n)
+    {theta phi : RingAut (GaloisField 2 n)}
+    {lam mu nu : GaloisField 2 n}
+    (hnuPrimitive : IsPrimitiveRoot nu (2 ^ n - 1))
+    (hsourceL : nu = lam * theta lam)
+    (hsourceR : nu = mu * phi mu)
+    (hunique : theta = 1 ∨ theta ≠ phi)
+    (hrel : NormalizedFactorPairRelation n theta phi)
+    (M₁ M₂ : GaloisField 2 n →ₗ[ZMod 2]
+      (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n))
+    (hequiv₁ : ∀ α β,
+      M₁ (lam * α) (mu * β) = nu * M₁ α β)
+    (hequiv₂ : ∀ α β,
+      M₂ (lam * α) (mu * β) = nu * M₂ α β)
+    (hM₁ : ∃ α β, M₁ α β ≠ 0)
+    (hM₂ : ∃ α β, M₂ α β ≠ 0) :
+    ∃ a b : GaloisField 2 n,
+      (a ≠ 0 ∨ b ≠ 0) ∧
+      ∀ β, M₁ a β + M₂ b β = 0 := by
+  obtain ⟨i, j, c₁, c₂, _, _, _, _, hform₁, hform₂⟩ :=
+    exists_common_right_monomial_profile hn hnuPrimitive
+      hsourceL hsourceR hunique hrel M₁ M₂
+      hequiv₁ hequiv₂ hM₁ hM₂
+  obtain ⟨A, B, hAB, hcancel⟩ :=
+    exists_nontrivial_pair_mul_add_mul_eq_zero c₁ c₂
+  obtain ⟨a, ha⟩ :=
+    (frobeniusEquiv (GaloisField 2 n) 2 ^ i).surjective A
+  obtain ⟨b, hb⟩ :=
+    (frobeniusEquiv (GaloisField 2 n) 2 ^ i).surjective B
+  have haPow : a ^ 2 ^ i = A := by
+    simpa only [frobeniusEquiv_pow_apply] using ha
+  have hbPow : b ^ 2 ^ i = B := by
+    simpa only [frobeniusEquiv_pow_apply] using hb
+  have hab : a ≠ 0 ∨ b ≠ 0 := by
+    rcases hAB with hA | hB
+    · left
+      intro haZero
+      apply hA
+      calc
+        A = (frobeniusEquiv (GaloisField 2 n) 2 ^ i) a := ha.symm
+        _ = 0 := by simp [haZero]
+    · right
+      intro hbZero
+      apply hB
+      calc
+        B = (frobeniusEquiv (GaloisField 2 n) 2 ^ i) b := hb.symm
+        _ = 0 := by simp [hbZero]
+  refine ⟨a, b, hab, fun β => ?_⟩
+  rw [hform₁ a β, hform₂ b β, haPow, hbPow]
+  calc
+    c₁ * (A * β ^ 2 ^ j) + c₂ * (B * β ^ 2 ^ j) =
+        (A * c₁ + B * c₂) * β ^ 2 ^ j := by ring
     _ = 0 := by rw [hcancel, zero_mul]
 
 end
