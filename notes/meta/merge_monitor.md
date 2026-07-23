@@ -6,6 +6,11 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-24 02:1x 監視 tick (B 単独) — 🎯🎯 b (Higman Suzuki 2-group classification = Lemma 13 完成) 合流**。b=1(flagship)。
+> 合流 b (**Higman Lemma 13 + Theorem 1 = Suzuki 2-group classification 完成、sorry-free・axiom-clean**): ξ-length bound が length≥4 chain を排除 → center chain が各 Suzuki 2-group を honest type-A/B/C/D model へ dispatch。新 leaf Classification.lean (higmanClassification + higmanClassification_of_isSuzuki2Group、Suzuki2Groups.lean:37 aggregator 経由 WIRED)。exponent-two (ExponentTwoContradiction) + exponent-four (ExponentFourContradiction) の両分岐がこの上位定理で統合。
+> **gate: green 4645 jobs (前 4644 +1 = Classification.lean・orphan 0) / AxiomsCheck OK (新 assert 3 本 higmanLemmaThirteen/higmanClassification/higmanClassification_of_isSuzuki2Group 全通過 = axiom-clean 検証、assert failure 0) / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push fca642b73→1ab3fd126**。範囲逸脱なし。build wall 1:11。
+> 🎯🎯 **Higman Lemma 13 完成**。約 9 tick (~3h) で b が exponent-two/four 両分岐 (~47 leaf) を積み上げ最上位分類へ統合。これは Pf App Suzuki appendix の `higman_classification` gated sorry (Suzuki2Groups.lean:76、c territory) を解消する上流だが、c は凍結中ゆえ下流接続は保留 (凍結解除時に c が接続可能)。b の次は Higman 系の残り (Lemma 12 系・他 Suzuki 定理) or Theorem 完成の見込み。
+>
 > **▶▶ 2026-07-24 01:4x 監視 tick (B 単独) — b (Higman 🎯exponent-two contradiction 統合 + ξ-length bound 5 leaf) 合流**。b=6。
 > 合流 b (**Higman L13 主要マイルストーン**): exponent-two length-four branch close / length-four descent 準備 / exact ξ-length four 排除 / longer ξ-chain descend / **ξ-length bound 証明**。5 新 leaf: **ExponentTwoContradiction** (exponent-two 分岐を統合して閉じる、ExponentFourContradiction と対) / **LengthBound** (ξ-length bound = Higman 分類の中核) / LengthFourContradiction / LengthFourDescent / LengthFourProperDescent。全 WIRED。
 > **gate: green 4644 jobs (前 4639 +5 = b の 5 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push 7643a2723→a192c296a**。範囲逸脱なし。build wall 1:52。
