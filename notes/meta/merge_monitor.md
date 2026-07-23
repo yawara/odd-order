@@ -6,6 +6,10 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 22:3x 監視 tick (B 単独) — b (Higman exponent-two factor 同型・support 消去 8 leaf) 合流**。b=9(8 feat+merge)。
+> 合流 b (**Higman L13 exponent-two 大量進捗**): 3 distinct factor parameter 排除 (ExponentTwoParameterCoincidence) / parameter→factor 同型復元 (ExponentTwoFactorIsomorphism) / commutator support 消去 (ExponentTwoSupportCancellation) / 同型 factor pair 生成 (ExponentTwoIsomorphicFactors) / invariant quotient factor lift (ExponentTwoInvariantPreimage) / 共通 pairwise mixed-term support 消去 (ExponentTwoPairwiseMixedTermSupport) / common factor eigenvalue 同定 (ExponentTwoLambdaCoherence) / pairwise mixed term を ambient で realize (ExponentTwoPairwiseMixedTermAmbientBridge)。8 新 leaf 全 WIRED。既存 HigmanLemmaEleven/TypeAConclusion 更新。
+> **gate: green 4606 jobs (前 4598 +8 = b の 8 leaf ちょうど・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push 565a0ed8c→7319d5eed**。範囲逸脱なし。build wall 2:42。
+>
 > **▶▶ 2026-07-23 21:4x 監視 tick (B 単独) — b (Higman common-factor params 1 leaf) 合流**。b=3。
 > 合流 b (**Higman L13**): common-factor parameter check を接続 + normalized factor relation を対称化。新 leaf ExponentTwoCommonFactorParameters (124行, HigmanLemmaThirteen/) WIRED。既存 FactorPairRelationDefinition も更新。
 > **gate: green 4598 jobs (前 4597 +1 = b の 1 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push 4177fa7a7→ee27eefa7**。範囲逸脱なし。build wall 1:10。
