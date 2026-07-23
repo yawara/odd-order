@@ -24,12 +24,12 @@ sum), routing through the complex orbit count `sum_div_normSq_induce_kernelFilte
 namespace OddOrder.Peterfalvi.S08
 
 open OddOrder.RepresentationTheory
-open scoped Classical
 
 variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
+open scoped Classical in
 /-- **(6.2) degree-square sum over a filtration set `S(A)`.**
 
 The norm-weighted degree-square sum over `S(A) = {Ind_H^L θ | A ⊆ Ker θ, θ ≠ 1}` is
@@ -99,6 +99,7 @@ theorem exists_SsubFiltration_member_degree_index (hyp : SibleyDadeHypothesis G 
     hyp.mem_SsubFiltration.mpr ⟨θ, hθne, hθker, rfl⟩,
     by rw [ClassFunction.induce_apply_one, hθdeg, mul_one]⟩
 
+open scoped Classical in
 /-- **(6.2) `S(A)`-sum bound, case (c2).**  The norm-weighted Peterfalvi (5.6) inequality for a
 filtration set: if `S₁` (coherent, `S(A) ⊆ S₁ ⊆ S`) cannot be extended by the break pair
 `{ψ, ψ̄}`, then the degree-square count over `S(A)` is bounded:
@@ -159,6 +160,7 @@ theorem sSubFiltration_sum_le_two_psi_caseB
         refine Finset.sum_congr rfl (fun j _ => ?_); rw [hmcnorm j, Complex.ofReal_re]
     _ ≤ 2 * (ψ 1).re * (η 1).re := hfambound
 
+open scoped Classical in
 /-- **(6.2) `S(A)`-sum bound, case (c2), reducible COLUMN break.**  The column-break analogue of
 `sSubFiltration_sum_le_two_psi_caseB`: the break `ψ` adjoined to discharge non-coherence is a
 reducible certain-type column `μ_b = columnSum χ₂b`.  Same `(6.2)` conclusion
