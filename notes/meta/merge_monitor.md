@@ -6,6 +6,25 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 18:1x 監視 tick — c (baseline no-op) 吸収**。a=0 / b=0 / c=1 / d=0。
+> 合流: c (**baseline-only commit**、Lean 変更ゼロ)。c は main 同期後 BrauerSuzuki 行を落として 153→149 に締めたが、hub は前 tick (18:0x) で全 merge 後に実数 **139** へ regen 済 (c の BrauerSuzuki + a の Pf を含む)。c の 149 は 139 より緩いため `ort` 3-way が main の 139 に収束 (c の削除は main の削除の部分集合 → 競合なく自動解決)。
+> **gate: merge 後 tree が pre-merge main と byte-identical (content no-op) を確認 ⟹ build/lint/sorry は前 tick 値不変 (green 4717 / lint 139 / sorry 7)、フルビルド skip。push a8304ffed→df8a284e3**。DAG 衛生目的 (c の divergence 解消 → 次 sync clean)。
+> ℹ **baseline-only の superseded commit は content no-op merge で吸収**: レーンが自 base で baseline を締めた後に hub が実数 regen すると、レーンの baseline commit は緩い側になり main に包含される。tree-identical を確認できれば build 不要。
+>
+> **▶▶ 2026-07-23 18:0x 監視 tick — b (Higman exp-two coords 2 leaf) + c (BrauerSuzuki lint 4) + a (Pf lint) 合流 + hub baseline tighten 153→139**。a=1 / b=3 / c=1 / d=0。
+> 合流 b (**Higman L13 exponent-two 続き**): 2 新 leaf ExponentTwoPairwiseCoordinates (共有 Frattini 座標, 460行) + FactorPairRelation (正規化 factor-pair 関係, 347行)、hub 経由 WIRED (jobs +2)。
+> 合流 c (**lint 0146 続き**): GroupTheory/BrauerSuzuki{,Normalizer,Setup} の style.header (Copyright too short) + missingEnd (unclosed sections) 警告 4 件解消。
+> 合流 a (**lint 0144**): Pf FeitSibley/FeitSibleyQ1Component/S11_{ChiefFactorCore,NineElevenRFamily,NineElevenSubcoherentBridge}/S13_SixTwoBridge の lane-a-owned 警告。
+> 🧭 **cross-lane 競合の裁定 (hub 自律)**: a=behind12・c=behind6 で 2-dot diff は Higman hub / BG AppE / issues の M/D を大量に出したが、**merge-base 起点の実 authored 集合**で判定すると a/c は Higman hub を authored せず (b のみ)、実競合面は **lint-baseline.tsv のみ** (a と c が別 base で締めた: a→181 stale-199base / c→149)。b→c→a の順で合流、baseline 競合は各回 `--ours` (main) で解消し、**全 merge 後に build の実 warning 数 139 へ hub が --update-baseline で regen** (差分 pure removal 9 組・新 grandfather 0)。FeitSibley は a と d(17:1x) が同一 file を lint したが編集行非重複で auto-merge 成功。
+> **gate: green 4717 jobs (前 4715 +2 = b の 2 leaf・orphan 0) / AxiomsCheck OK (新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 139 ≤ 139 新 baseline (実 warning 139 = 153 − a/c 修正14、b 新 leaf 非 sorry 警告 0) / push 323c66ac4→8d4e42562**。範囲逸脱なし。build wall ~10min (b leaf + BrauerSuzuki + a の Pf + 下流)。
+> ✅ **教訓**: 複数レーンが lint-baseline.tsv を並行編集する時代 (a=0144/c=0146/d=0138) には、各レーンの主張 baseline 値は無意味 (別 base ゆえ)。**hub が全 merge 後に一度だけ実数へ regen** する規律で衝突を吸収。baseline は 3 tick で 199→190→153→139 と締まった。
+>
+> **▶▶ 2026-07-23 17:4x 監視 tick — b (Higman exponent-two infra 6 leaf) + c (lint 0146 37件) 合流 + hub baseline tighten 190→153**。a=0 / b=2 / c=2 / d=0。(17:2x tick は全レーン ahead=0 で合流なし・省略)
+> 合流 b (**Higman Lemma 13 exponent-two pairwise infrastructure**): 5 新 leaf (HigmanLemmaThirteen/): ExponentTwo{CommutingFactors,FactorModels,PairwiseClassification,PairwiseFrattini,PairwiseJoins} + **Lemma 12** XiLengthTwoTypeAClassification (HigmanLemmaTwelve/)。全 6 leaf は HigmanLemmaThirteen/Twelve hub に import 済 → `OddOrder.lean:474` (Higman/Suzuki2Groups.lean) 経由で推移 WIRED (jobs +6 で全 elaborate 確認)。
+> 合流 c (**lint 0146 lane-c-owned 37 件解消**): BG AppD_CNGroups/MaximalSylowIntersection + AppE_{AbelianCentralizer,EigenvalueCombinatorics,ExponentP,FurtherResults} + S15_MF/OpicoreCentralizer + S16/TypeBridges + Pf {ExceptionalNearField,NearFields}。⚠ c の merge が lint-baseline.tsv を d の 190 版へ解決し tsv 締めを喪失 (Lean 修正は保持) → **hub が build 後の実数 153 へ --update-baseline で tighten** (差分 = pure removal 13 組・新 grandfather 0、CLAUDE.md「hub の役割 = wave 後 baseline 更新」)。
+> **gate: green 4715 jobs (前 4709 +6 = b の 6 leaf ちょうど・orphan 0) / AxiomsCheck OK (build elaborate 通過・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 153 ≤ 153 新 baseline (実 warning 153・c の 37 解消 + b の非 sorry 新規 0) / push 02e97466b→4878c7758**。範囲逸脱なし。build wall 11:19 (BG AppE/NearFields 再 elaborate + b 6 leaf)。
+> b/c とも behind=0 (直前に main 同期) ゆえ相互競合ゼロ。b の Higman と c の BG/Pf lint は非重複。baseline は 2 tick で 199→190 (d)→153 (c) と締まった。
+>
 > **▶▶ 2026-07-23 17:1x 監視 tick — d (lint 第2 frozen wave, baseline 199→190) 合流**。a=0 / b=0 / c=0 / d=2。(17:07 tick は全レーン ahead=0 で合流なし・省略)
 > 合流: d (**lint 保守レーン・issue 0138**: 第2 frozen wave で FeitSibley / S03g_Thm310General / S11_NineElevenSubcoherentBridge の frozen×機械カテゴリ lint 警告 **9 件解消** → `bin/lint-baseline.tsv` baseline **199→190**。残 backlog を per-lane 指示 issue 化 = 0144 (a owned) / 0145 (b owned) / 0146 (c owned)。3 Lean file は全 frozen (owner 別作業中) の lint 専用編集)。
 > **gate: green 4709 jobs (前 4709 不変・新 leaf 0 = orphan なし、新規は issue .md 3 枚のみ) / AxiomsCheck OK (build elaborate 通過・新 axiom 0) / 実 sorry 7→7 非退行 (基準 7) / lint 190 ≤ 190 新 baseline (d の 199→190 締めが c の ℒ(F) 込みでも実数一致・check-warnings で確認) / push 62f2eee1e→57d8411bf**。範囲逸脱なし。build wall 10:46 (S03g = BG §3 base file の lint 編集 → 下流 BG/Pf cone を全再 elaborate)。

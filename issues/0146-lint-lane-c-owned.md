@@ -83,7 +83,11 @@ full build green で以下を解消 (この issue を main の hub 版で受領�
 - **AppE_ExponentP** (4 `show`) / **AppE_FurtherResults** (2 `show` + 1 longLine) / **AppE_EigenvalueCombinatorics** (2 longLine) / **AppE_AbelianCentralizer** (1 longLine + `unusedVariables`→`_hcard`)
 - **AppD_CNGroups/MaximalSylowIntersection** (1): `unusedSectionVars` = `omit hne in` + caller の `hne` 実引数削除
 - **OpicoreCentralizer** (4 longLine) / **TypeBridges** (1 longLine)
-- **BrauerSuzuki{,Normalizer,Setup}.lean**: `style.header` 3 + `style.missingEnd` 1 (別 wave で処理予定/処理済)
+- **BrauerSuzuki{,Normalizer,Setup}.lean**: `style.header` 3 (copyright block 追加) + `style.missingEnd` 1
+  (`BrauerSuzukiNormalizer` に `end QuaternionSylowSetup` / `end OddOrder.GroupTheory` 補完) — 解消済
+
+計 **41 件解消** (37 + BrauerSuzuki 4)。baseline は merged tree で `--update-baseline` 再生成
+(main の d 第2 wave 190 を基点に、非重複の c-fixes 41 を反映 → 149 見込み)。
 
 **繰延 (grandfather)**: `flexible` 73 (AppE_Filiform*、full build + 敵対検証の別パス) /
 `SemilinearField` openClassical (0133) / `FeitThompsonNuGrid` flexible (FT spine, hub wave)。
