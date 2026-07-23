@@ -50,6 +50,23 @@ inductive NormalizedFactorPairRelation (n : ℕ)
       (left_square : theta = phi ^ 2)
       (order_five_congruence : 5 * (r : ZMod n) = 0)
 
+/-- Reversing the two prescribed factors reverses the orientation of a
+normalized factor-pair relation. -/
+theorem NormalizedFactorPairRelation.symm
+    {n : ℕ} {theta phi : RingAut (GaloisField 2 n)}
+    (h : NormalizedFactorPairRelation n theta phi) :
+    NormalizedFactorPairRelation n phi theta := by
+  cases h with
+  | typeB same => exact .typeB same.symm
+  | typeCLeft r hr0 htheta hphi hdim =>
+      exact .typeCRight r hr0 hphi htheta hdim
+  | typeCRight r hr0 htheta hphi hdim =>
+      exact .typeCLeft r hr0 hphi htheta hdim
+  | typeDLeft r hr0 hrhalf htheta hphi hfive =>
+      exact .typeDRight r hr0 hrhalf htheta hphi hfive
+  | typeDRight r hr0 hrhalf hphi htheta hfive =>
+      exact .typeDLeft r hr0 hrhalf hphi htheta hfive
+
 end
 
 end OddOrder.Higman.Suzuki2Groups
