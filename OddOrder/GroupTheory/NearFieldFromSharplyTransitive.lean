@@ -10,6 +10,8 @@ import Mathlib.Algebra.Group.Action.End
 import Mathlib.Algebra.GroupWithZero.Action.End
 import Mathlib.Algebra.Group.TypeTags.Basic
 import Mathlib.GroupTheory.GroupAction.ConjAct
+import Mathlib.GroupTheory.Perm.Basic
+import Mathlib.Tactic.Abel
 import OddOrder.Peterfalvi.Appendices.NearFieldClass
 
 /-!
@@ -275,5 +277,149 @@ theorem mul_mulEquivUnits_inv (q : M) (x : A) :
   rw [d.mulEquivUnits_val, inv_inv, d.mul_smul_e]
 
 end SharplyTransitiveData
+
+end OddOrder.GroupTheory
+
+/-! ### The affine group of a near-field (forward direction of the correspondence)
+
+Peterfalvi, Appendix C, p. 137 records the correspondence in *both* directions.  The structure
+`SharplyTransitiveData` above does the backward half (a sharply transitive action produces a
+near-field).  Here is the
+forward half: *from* a near-field `F` one builds the **affine group** `𝓛(F) = F ⋊ F^*`, realized as
+the group of affine permutations `x ↦ x * u + t` (`u ∈ F^*`, `t ∈ F`) of `F`, and shows that it
+**acts sharply `2`-transitively** on `F` — any ordered pair of distinct points maps to any ordered
+pair of distinct points under a *unique* affine map.  This is the Zassenhaus near-field ↔
+sharply-`2`-transitive-group correspondence going the other way. -/
+
+namespace OddOrder.Peterfalvi.Appendices.NearFields
+
+variable {F : Type*} [NearField F]
+
+/-- Right multiplication distributes over negation in a near-field: `(-a) * c = -(a * c)`
+(from the right distributive law, since `(-a) * c + a * c = (-a + a) * c = 0`).  Named to avoid the
+clash with the ring lemma `_root_.neg_mul`, which does not apply to a near-field. -/
+theorem nearField_neg_mul (a c : F) : (-a) * c = -(a * c) := by
+  rw [eq_neg_iff_add_eq_zero, ← NearField.add_mul, neg_add_cancel, zero_mul]
+
+/-- Right multiplication distributes over subtraction in a near-field: `(a - b) * c = a*c - b*c`. -/
+theorem nearField_sub_mul (a b c : F) : (a - b) * c = a * c - b * c := by
+  rw [sub_eq_add_neg, NearField.add_mul, nearField_neg_mul, ← sub_eq_add_neg]
+
+end OddOrder.Peterfalvi.Appendices.NearFields
+
+namespace OddOrder.GroupTheory
+
+open OddOrder.Peterfalvi.Appendices.NearFields
+
+variable {F : Type*} [NearField F]
+
+/-- The **affine permutation** `x ↦ x * u + t` of a near-field `F` (`u ∈ F^*`, `t ∈ F`).  It is a
+bijection because `u` is invertible; the inverse is `y ↦ (y - t) * u⁻¹`.  These permutations are the
+elements of the affine group `𝓛(F) = F ⋊ F^*`. -/
+def nearFieldAffinePerm (u : Fˣ) (t : F) : Equiv.Perm F where
+  toFun x := x * (u : F) + t
+  invFun y := (y - t) * ((u⁻¹ : Fˣ) : F)
+  left_inv x := by
+    change ((x * (u : F) + t) - t) * ((u⁻¹ : Fˣ) : F) = x
+    rw [add_sub_cancel_right, mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, mul_one]
+  right_inv y := by
+    change ((y - t) * ((u⁻¹ : Fˣ) : F)) * (u : F) + t = y
+    rw [mul_assoc, ← Units.val_mul, inv_mul_cancel, Units.val_one, mul_one, sub_add_cancel]
+
+@[simp] theorem nearFieldAffinePerm_apply (u : Fˣ) (t x : F) :
+    nearFieldAffinePerm u t x = x * (u : F) + t := rfl
+
+/-- **Sharp `2`-transitivity of the affine maps of a near-field** (arithmetic core): for distinct
+`a ≠ b` and distinct `c ≠ d` there is a *unique* pair `(u, t) ∈ F^* × F` whose affine map
+`x ↦ x*u + t` sends `a ↦ c` and `b ↦ d`.  Existence solves `(b-a)*u = d-c` (possible since
+`b-a ≠ 0` and the nonzero elements form a group) then sets `t = c - a*u`; uniqueness cancels the
+nonzero factor `b - a`. -/
+theorem nearField_affine_existsUnique {a b c d : F} (hab : a ≠ b) (hcd : c ≠ d) :
+    ∃! p : Fˣ × F, a * (p.1 : F) + p.2 = c ∧ b * (p.1 : F) + p.2 = d := by
+  have hw : b - a ≠ 0 := sub_ne_zero.mpr (Ne.symm hab)
+  have hv : d - c ≠ 0 := sub_ne_zero.mpr (Ne.symm hcd)
+  -- solve `(b - a) * u = d - c` for a unit `u`; `obtain` keeps `u` opaque (so `abel` treats `↑u`
+  -- as an atom, which a `set`-let-binding would zeta-expand inconsistently)
+  obtain ⟨u, hbau⟩ : ∃ u : Fˣ, (b - a) * (u : F) = d - c := by
+    refine ⟨(Units.mk0 (b - a) hw)⁻¹ * Units.mk0 (d - c) hv, ?_⟩
+    rw [Units.val_mul, Units.val_inv_eq_inv_val, Units.val_mk0, Units.val_mk0,
+      ← mul_assoc, mul_inv_cancel₀ hw, one_mul]
+  refine ⟨(u, c - a * (u : F)), ⟨?_, ?_⟩, ?_⟩
+  · -- a * u + (c - a * u) = c  (`change` forces the `Prod.fst` projection to reduce so `abel`'s
+    -- atoms match)
+    change a * (u : F) + (c - a * (u : F)) = c
+    abel
+  · -- b * u + (c - a * u) = d
+    change b * (u : F) + (c - a * (u : F)) = d
+    have hstep : b * (u : F) - a * (u : F) = d - c := by rw [← nearField_sub_mul]; exact hbau
+    have hrw : b * (u : F) + (c - a * (u : F)) = (b * (u : F) - a * (u : F)) + c := by abel
+    rw [hrw, hstep]; abel
+  · -- uniqueness
+    rintro ⟨u', t'⟩ ⟨h1, h2⟩
+    simp only at h1 h2
+    -- from h1, h2 : (b - a) * u' = d - c
+    have hq : (b - a) * (u' : F) = d - c := by
+      rw [nearField_sub_mul]
+      have e1 : b * (u' : F) = d - t' := by rw [← h2]; abel
+      have e2 : a * (u' : F) = c - t' := by rw [← h1]; abel
+      rw [e1, e2]; abel
+    have huval : (u' : F) = (u : F) := mul_left_cancel₀ hw (by rw [hq, hbau])
+    have hut : u' = u := Units.val_injective huval
+    have ht' : t' = c - a * (u : F) := by rw [← huval, ← h1]; abel
+    exact Prod.ext hut ht'
+
+/-- The identity is the affine permutation `x ↦ x * 1 + 0`. -/
+theorem nearFieldAffinePerm_one_zero : nearFieldAffinePerm (1 : Fˣ) (0 : F) = 1 := by
+  ext x; simp [nearFieldAffinePerm_apply]
+
+/-- Composition of affine permutations: `(x ↦ x*u₂ + t₂) ∘ (x ↦ x*u₁ + t₁) = (x ↦ x*(u₁u₂) +
+(t₁*u₂ + t₂))`.  (`Equiv.Perm` multiplication is `(f * g) x = f (g x)`.) -/
+theorem nearFieldAffinePerm_mul (u₁ u₂ : Fˣ) (t₁ t₂ : F) :
+    nearFieldAffinePerm u₂ t₂ * nearFieldAffinePerm u₁ t₁
+      = nearFieldAffinePerm (u₁ * u₂) (t₁ * (u₂ : F) + t₂) := by
+  ext x
+  simp only [Equiv.Perm.mul_apply, nearFieldAffinePerm_apply, Units.val_mul]
+  rw [NearField.add_mul, mul_assoc x (u₁ : F) (u₂ : F)]
+  abel
+
+/-- The inverse of an affine permutation is affine: `(x ↦ x*u + t)⁻¹ = (x ↦ x*u⁻¹ - t*u⁻¹)`. -/
+theorem nearFieldAffinePerm_inv (u : Fˣ) (t : F) :
+    (nearFieldAffinePerm u t)⁻¹ = nearFieldAffinePerm u⁻¹ (-(t * ((u⁻¹ : Fˣ) : F))) := by
+  refine inv_eq_of_mul_eq_one_left ?_
+  rw [nearFieldAffinePerm_mul, mul_inv_cancel, add_neg_cancel, nearFieldAffinePerm_one_zero]
+
+/-- The **affine group** `𝓛(F) = F ⋊ F^*` of a near-field `F`, realized as the subgroup of
+`Equiv.Perm F` consisting of the affine permutations `x ↦ x * u + t` (`u ∈ F^*`, `t ∈ F`).  Closure
+under multiplication and inverses is the affine composition/inversion law
+(`nearFieldAffinePerm_mul`, `nearFieldAffinePerm_inv`). -/
+def nearFieldAffineGroup (F : Type*) [NearField F] : Subgroup (Equiv.Perm F) where
+  carrier := {g | ∃ u t, nearFieldAffinePerm u t = g}
+  one_mem' := ⟨1, 0, nearFieldAffinePerm_one_zero⟩
+  mul_mem' := by
+    rintro _ _ ⟨ua, ta, rfl⟩ ⟨ub, tb, rfl⟩
+    exact ⟨ub * ua, tb * (ua : F) + ta, (nearFieldAffinePerm_mul ub ua tb ta).symm⟩
+  inv_mem' := by
+    rintro _ ⟨u, t, rfl⟩
+    exact ⟨u⁻¹, -(t * ((u⁻¹ : Fˣ) : F)), (nearFieldAffinePerm_inv u t).symm⟩
+
+@[simp] theorem mem_nearFieldAffineGroup {g : Equiv.Perm F} :
+    g ∈ nearFieldAffineGroup F ↔ ∃ u t, nearFieldAffinePerm u t = g := Iff.rfl
+
+/-- **The affine group of a near-field acts sharply `2`-transitively** (Peterfalvi, Appendix C,
+p. 137, forward direction of the Zassenhaus correspondence): for distinct `a ≠ b` and distinct
+`c ≠ d` there is a *unique* element of `𝓛(F) = F ⋊ F^*` sending `a ↦ c` and `b ↦ d`.  This packages
+the arithmetic core `nearField_affine_existsUnique` at the level of the permutation group. -/
+theorem nearFieldAffineGroup_existsUnique {a b c d : F} (hab : a ≠ b) (hcd : c ≠ d) :
+    ∃! g : nearFieldAffineGroup F, (g : Equiv.Perm F) a = c ∧ (g : Equiv.Perm F) b = d := by
+  obtain ⟨⟨u, t⟩, ⟨hc, hd⟩, huniq⟩ := nearField_affine_existsUnique hab hcd
+  refine ⟨⟨nearFieldAffinePerm u t, u, t, rfl⟩, ⟨?_, ?_⟩, ?_⟩
+  · simpa using hc
+  · simpa using hd
+  · rintro ⟨g, ug, tg, rfl⟩ ⟨hgc, hgd⟩
+    apply Subtype.ext
+    simp only [nearFieldAffinePerm_apply] at hgc hgd
+    have heq : (ug, tg) = (u, t) := huniq (ug, tg) ⟨hgc, hgd⟩
+    rw [Prod.mk.injEq] at heq
+    rw [heq.1, heq.2]
 
 end OddOrder.GroupTheory
