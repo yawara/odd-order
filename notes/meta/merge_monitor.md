@@ -6,6 +6,8 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **👁 2026-07-23 20:3x モード変更 (ユーザー指示)**: **A/C/D いったん凍結 → B 単独監視モードへ移行**。cron を **30 分おき** (`13,43 * * * *`、job 0f8d27c5) に変更 (旧 15 分 `7,22,37,52` d9a20ef3 は削除)。以降 hub は **lane b のみ**合流ゲートを回す (a/c/d は合流対象外・凍結)。20:2x で発行した c frontier 裁定 (issue 9501) は c 凍結ゆえ保留 (凍結解除時に再開)。次 tick 20:43。
+>
 > **▶▶ 2026-07-23 20:2x 監視 tick — b (Higman param arithmetic 1 leaf) 合流 + 🧭 c frontier 裁定 (issue 9501)**。a=0 / b=2 / c=0(idle 3tick) / d=0。
 > 合流 b (**Higman L13**): exponent-two parameter arithmetic を独立化 + normalized pair relation witness 保持。新 leaf ExponentTwoParameterArithmetic (HigmanLemmaThirteen/) WIRED。
 > **gate: green 4595 jobs (前 4594 +1 = b の 1 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push 23c24fbc5→679c9b94c**。範囲逸脱なし。build wall 1:09。
