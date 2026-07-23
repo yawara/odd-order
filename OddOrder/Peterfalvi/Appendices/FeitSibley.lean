@@ -78,9 +78,8 @@ nontrivial `θ ∈ Irr(N)` occurs in `Res_N χ`.  Fourier expansion
 (`sum_inner_irreducibleCharacter_smul`): if every nontrivial `θ` had multiplicity `0`, then
 `Res_N χ = ⟨Res χ, 1⟩·1`, forcing `χ` constant on `N`. -/
 theorem exists_ne_trivial_liesOver_of_not_forall_eq_one
-    {K : Type*} [Group K] [Finite K] [Fintype K] [Invertible (Nat.card K : ℂ)]
+    {K : Type*} [Group K] [Finite K] [Invertible (Nat.card K : ℂ)]
     {N : Subgroup K} [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
-    [Fintype (IrreducibleCharacter ↥N)]
     (χ : IrreducibleCharacter K)
     (hker : ¬ ∀ x : ↥N, (χ : ClassFunction K ℂ) (x : K) = (χ : ClassFunction K ℂ) 1) :
     ∃ θ : IrreducibleCharacter ↥N, θ ≠ trivialIrreducibleCharacter ↥N ∧
@@ -1014,7 +1013,7 @@ theorem Sset_eq_induced_of_Q [Finite G] :
       θ''.isIrreducible
     exact hθ''over (le_antisymm hbound hnonneg)
 
-omit [Fintype G] in
+omit [Fintype G] [Fintype ↥hyp.H] in
 /-- **Corollary of Lemma 2(a)**: every member of `𝒮` vanishes on `H − Q`.  The members of
 `𝒮` are induced from `Q ⊴ H` (`Sset_eq_induced_of_Q`), and class functions induced from a
 normal subgroup vanish off it (`ClassFunction.induce_apply_eq_zero_of_not_mem_normal`).
@@ -1023,6 +1022,7 @@ the `A`-support hypotheses of Lemma 1(a) at the Theorem's call sites. -/
 theorem apply_eq_zero_of_mem_Sset_of_not_mem_Q [Finite G]
     {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset)
     {h : ↥hyp.H} (hh : (h : G) ∉ hyp.Q) : χ h = 0 := by
+  letI : Fintype ↥hyp.H := Fintype.ofFinite _
   haveI : (hyp.Q.subgroupOf hyp.H).Normal := hyp.Q_subgroupOf_H_normal
   have hmem := hχ
   rw [Sset_eq_induced_of_Q hyp] at hmem
@@ -1030,7 +1030,7 @@ theorem apply_eq_zero_of_mem_Sset_of_not_mem_Q [Finite G]
   exact ClassFunction.induce_apply_eq_zero_of_not_mem_normal (hyp.Q.subgroupOf hyp.H) φ
     (fun hmem' => hh (Subgroup.mem_subgroupOf.mp hmem'))
 
-omit [Fintype G] in
+omit [Fintype G] [Fintype ↥hyp.H] in
 /-- **Members of `ℤ[𝒮]` vanish on `H − Q`** (span form of
 `apply_eq_zero_of_mem_Sset_of_not_mem_Q`, by induction over the `ℤ`-span). -/
 theorem zSpan_Sset_apply_eq_zero_of_not_mem_Q [Finite G]

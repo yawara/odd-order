@@ -108,7 +108,7 @@ noncomputable def q1Proj :
       SetLike.mem_coe.mp (hyp.isComplement'_S_Q1_subgroupOf.equiv q).2.2⟩
   map_one' := by
     apply Subtype.ext
-    show ((hyp.isComplement'_S_Q1_subgroupOf.equiv 1).2 : ↥(hyp.Q.subgroupOf hyp.H)) = 1
+    change ((hyp.isComplement'_S_Q1_subgroupOf.equiv 1).2 : ↥(hyp.Q.subgroupOf hyp.H)) = 1
     exact equiv_snd_eq_of_mul_eq hyp.isComplement'_S_Q1_subgroupOf
       (Subgroup.one_mem _) (Subgroup.one_mem _) (mul_one 1)
   map_mul' q₁ q₂ := by
@@ -133,7 +133,7 @@ noncomputable def q1Proj :
             * (((e q₂).1 : _) * ((e q₂).2 : _)) := by group
         _ = q₁ * q₂ := by rw [h1, h2]
     apply Subtype.ext
-    show ((e (q₁ * q₂)).2 : ↥(hyp.Q.subgroupOf hyp.H))
+    change ((e (q₁ * q₂)).2 : ↥(hyp.Q.subgroupOf hyp.H))
       = ((e q₁).2 : ↥(hyp.Q.subgroupOf hyp.H)) * ((e q₂).2 : _)
     exact equiv_snd_eq_of_mul_eq hyp.isComplement'_S_Q1_subgroupOf
       (Subgroup.mul_mem _ (SetLike.mem_coe.mp (e q₁).1.2)
@@ -147,7 +147,7 @@ theorem q1Proj_apply_coe_of_mem {q : ↥(hyp.Q.subgroupOf hyp.H)}
     (hq : q ∈ (hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :
     ((hyp.q1Proj q : ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf
         (hyp.Q.subgroupOf hyp.H))) : ↥(hyp.Q.subgroupOf hyp.H)) = q := by
-  show ((hyp.isComplement'_S_Q1_subgroupOf.equiv q).2 : ↥(hyp.Q.subgroupOf hyp.H)) = q
+  change ((hyp.isComplement'_S_Q1_subgroupOf.equiv q).2 : ↥(hyp.Q.subgroupOf hyp.H)) = q
   exact equiv_snd_eq_of_mul_eq hyp.isComplement'_S_Q1_subgroupOf
     (Subgroup.one_mem _) hq (one_mul q)
 
@@ -157,7 +157,7 @@ theorem q1Proj_apply_of_mem_S {q : ↥(hyp.Q.subgroupOf hyp.H)}
     (hq : q ∈ (hyp.S.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :
     hyp.q1Proj q = 1 := by
   apply Subtype.ext
-  show ((hyp.isComplement'_S_Q1_subgroupOf.equiv q).2 : ↥(hyp.Q.subgroupOf hyp.H)) = 1
+  change ((hyp.isComplement'_S_Q1_subgroupOf.equiv q).2 : ↥(hyp.Q.subgroupOf hyp.H)) = 1
   exact equiv_snd_eq_of_mul_eq hyp.isComplement'_S_Q1_subgroupOf
     hq (Subgroup.one_mem _) (mul_one q)
 
