@@ -6,6 +6,10 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-24 00:1x 監視 tick (B 単独) — b (Higman invariant graph commutativity→contradiction 5 leaf) 合流**。b=5。
+> 合流 b (**Higman L13 exponent-two**): invariant graph subspace を pull back / ambient bracket zero を可換性へ / aligned invariant graph factor 構築 / invariant graph factor 可換化 → **invariant graph contradiction** (exponent-two 分岐の矛盾に接近)。5 新 leaf (InvariantGraphPreimage / AmbientBracketCommutativity / AlignedGraphPreimage / InvariantGraphCommutativity / InvariantGraphContradiction) 全 WIRED。
+> **gate: green 4626 jobs (前 4621 +5 = b の 5 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push 403452622→ea2c13ab3**。範囲逸脱なし。build wall 1:29。
+>
 > **▶▶ 2026-07-23 23:4x 監視 tick (B 単独) — b (Higman bracket faithfulness・quotient factor geometry 5 leaf) 合流**。b=6。
 > 合流 b (**Higman L13 exponent-two**): aligned ambient bracket 消去 / quotient graph subspace を invariant 化 / canonical invariant preimage 保持 / factor geometry を quotient へ transport / exponent-two bracket faithfulness 証明。5 新 leaf (AlignedAmbientBracketCancellation / GraphSubspaceInvariant / CanonicalInvariantPreimage / QuotientFactorGeometry / AmbientBracketFaithfulness) 全 WIRED。
 > **gate: green 4621 jobs (前 4616 +5 = b の 5 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push b5d12c3b4→c92ba6842**。範囲逸脱なし。build wall 1:07。
