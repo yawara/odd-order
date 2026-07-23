@@ -18,6 +18,7 @@ import OddOrder.Higman.Suzuki2Groups.HigmanKernel
 import OddOrder.Higman.Suzuki2Groups.HigmanImageOrder
 import OddOrder.Higman.Suzuki2Groups.HigmanFinalCase
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralGraded
+import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralTransport
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralSpectrum
 import OddOrder.Higman.Suzuki2Groups.HigmanSquareMap
 import OddOrder.Higman.Suzuki2Groups.HigmanLowerCentralDegreeThree
