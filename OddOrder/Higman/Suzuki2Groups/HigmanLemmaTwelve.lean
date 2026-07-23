@@ -16,6 +16,7 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphism
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.CaseDispatch
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Classification
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.Assembly
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.FactorPairRelation
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.SummandIsomorphismBridge
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TypeBRecognition
