@@ -12,7 +12,7 @@ import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
 import OddOrder.GroupTheory.SolvableTwoTransitive
 import OddOrder.GroupTheory.BrauerSuzuki
 -- Re-export Proposition 1 (split out to `RankOneAffineModel.lean` for the file-length limit) so
--- downstream files importing `NearFields` still see `RankOneHypothesis` / `rankOne_affine_nearField`.
+-- downstream importers of `NearFields` still see `RankOneHypothesis` / `rankOne_affine_nearField`.
 import OddOrder.Peterfalvi.Appendices.RankOneAffineModel
 
 /-!
@@ -65,11 +65,11 @@ Per-result status:
 | App. C Prop 2, field half (`nearField_field_structure_of_index_two`) | **proved** (unchanged) |
 | `NearField.mul_add_of_mul_comm` (commutative ⇒ distributive) | **proved, sorry-free** (new) |
 | `exists_field_structure_of_cyclic_index_two` (Prop 2, first half) | **proved, sorry-free** (new) |
-| App. C Prop 1, prerequisite (i) (`RankOneHypothesis.sylow_two_isCyclic_or_quaternion`) | **proved, axiom-clean** (2026-07-22) |
-| Brauer–Suzuki (ii), quaternion `|S| ≥ 16` + cyclic (`brauerSuzuki_of_quaternionSylow`) | **proved, axiom-clean** (2026-07-22, issue 9318; `Q₈` case open) |
-| App. C Prop 1 (`rankOne_affine_nearField`) | **model assembled**; sole `sorry` is the `Q₈` BS case |
-| Prop 1 involution clauses (`model_involution_data`) | **proved, axiom-clean** (fixed-point analysis) |
-| App. C Prop 2 headline (`cyclic_index_two_nearField_classification`) | **proved, axiom-clean** (2026-07-21, commit 42892fcb5) |
+| App. C Prop 1 prereq (i) (`sylow_two_isCyclic_or_quaternion`) | proved, axiom-clean |
+| BS (ii) quaternion `|S|≥16` + cyclic (`brauerSuzuki_of_quaternionSylow`) | proved, `Q₈` open |
+| App. C Prop 1 (`rankOne_affine_nearField`) | model assembled; sole `sorry` = `Q₈` BS case |
+| Prop 1 involution clauses (`model_involution_data`) | proved, axiom-clean |
+| App. C Prop 2 (`cyclic_index_two_nearField_classification`) | proved, axiom-clean |
 
 Proposition 1 (the `RankOneHypothesis` / `AffineNearFieldModel` rows above) lives in the sibling
 file `RankOneAffineModel.lean` (split out for the 2000-line file limit); it is re-exported here, so
@@ -722,10 +722,10 @@ theorem twMul_central_iff {K : Type*} [Field K] [Finite K]
     { carrier := {u | σ (u : K) = u}
       one_mem' := by simp
       mul_mem' := fun {x y} hx hy => by
-        show σ ((x * y : Kˣ) : K) = ((x * y : Kˣ) : K)
+        change σ ((x * y : Kˣ) : K) = ((x * y : Kˣ) : K)
         rw [Units.val_mul, map_mul, hx, hy]
       inv_mem' := fun {x} hx => by
-        show σ ((x⁻¹ : Kˣ) : K) = ((x⁻¹ : Kˣ) : K)
+        change σ ((x⁻¹ : Kˣ) : K) = ((x⁻¹ : Kˣ) : K)
         rw [Units.val_inv_eq_inv_val, map_inv₀, hx] }
   have hFuMem : ∀ u : Kˣ, u ∈ Fu ↔ σ (u : K) = u := fun _ => Iff.rfl
   have hFuCard : Nat.card ↥Fu = r - 1 := hFuCount
@@ -752,7 +752,7 @@ theorem twMul_central_iff {K : Type*} [Field K] [Finite K]
     obtain ⟨k, hk⟩ := h_dvd
     rw [hk, pow_mul, hFupow u hu, one_pow]
   obtain ⟨u₁, hu₁⟩ : ∃ u₁ : Kˣ, u₁ ∉ B := by
-    by_contra hcon; push_neg at hcon
+    by_contra hcon; push Not at hcon
     have hBtop : B = ⊤ := eq_top_iff.mpr fun u _ => hcon u
     rw [hBtop, Subgroup.index_top] at hBindex; exact absurd hBindex (by norm_num)
   constructor
@@ -851,9 +851,10 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
     fun _ _ => rfl
   -- `A` is normal (index 2); choose `y₀ ∉ A` and the right-multiplication automorphism `g₀`.
   haveI hAnormal : A.Normal := Subgroup.normal_of_index_eq_two hidx
-  have hAne : A ≠ ⊤ := fun h => by rw [h, Subgroup.index_top] at hidx; exact absurd hidx (by norm_num)
+  have hAne : A ≠ ⊤ := fun h => by
+    rw [h, Subgroup.index_top] at hidx; exact absurd hidx (by norm_num)
   obtain ⟨y₀, hy₀⟩ : ∃ y₀ : Fˣ, y₀ ∉ A := by
-    by_contra h; push_neg at h; exact hAne (eq_top_iff.mpr fun x _ => h x)
+    by_contra h; push Not at h; exact hAne (eq_top_iff.mpr fun x _ => h x)
   set g₀ : MulAut (Multiplicative F) :=
     (rightMul ((y₀ : Fˣ) : F) (Units.ne_zero y₀)).toMultiplicative with hg₀def
   have hg₀toAdd : ∀ x : Multiplicative F,
@@ -935,7 +936,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
       (Subgroup.mul_mem_iff_of_index_two hidx).mpr
         (iff_of_false (fun h => hy₀ (by simpa using inv_mem h)) hy)
     have hyval : ((y : Fˣ) : F) = ((y₀ : Fˣ) : F) * (((⟨y₀⁻¹ * y, ha⟩ : ↥A) : Fˣ) : F) := by
-      show ((y : Fˣ) : F) = ((y₀ : Fˣ) : F) * ((y₀⁻¹ * y : Fˣ) : F)
+      change ((y : Fˣ) : F) = ((y₀ : Fˣ) : F) * ((y₀⁻¹ * y : Fˣ) : F)
       rw [← Units.val_mul]; congr 1; group
     rw [hyval, ← mul_assoc, hσNF s x, hUmulA (σ s) (x * ((y₀ : Fˣ) : F)) ⟨y₀⁻¹ * y, ha⟩, mul_assoc]
   -- dichotomy on whether `σ` is trivial.
@@ -1037,11 +1038,11 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
       obtain ⟨a', ha'⟩ := hσμ a
       refine ⟨a', ?_⟩
       apply Units.ext
-      show (μ a' : K) = σ (y : K)
+      change (μ a' : K) = σ (y : K)
       rw [← ha', ha]
     have hσU2 : ∀ y : Kˣ, Units.map (σ : K →* K) (Units.map (σ : K →* K) y) = y := by
       intro y; apply Units.ext
-      show σ (σ (y : K)) = (y : K)
+      change σ (σ (y : K)) = (y : K)
       exact hσσ (y : K)
     have hpres : ∀ y : Kˣ, Units.map (σ : K →* K) y ∈ B ↔ y ∈ B := by
       intro y
@@ -1077,7 +1078,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
           have hlhs : Θ a * Θ c = Θ (a * c) := by
             rw [hΘ a, ← ha', hUmulA a 1 a', one_mul, ha', hΘ c, ← mul_smul, hΘ]
           have htw : d.twMul a c = a * c := by
-            show d.twAut (d.twExp c) a * c = a * c
+            change d.twAut (d.twExp c) a * c = a * c
             rw [hexp, hχ1, toAdd_one, TwistData.twAut_zero]; rfl
           rw [hlhs, htw]
         · have hΘc := hΘc_ne c hc
@@ -1092,7 +1093,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
             simp only [Units.val_mk0, one_mul] at hu
             rw [hΘ a, hu, hΘ c, ← mul_smul, hΘ]
           have htw : d.twMul a c = σ a * c := by
-            show d.twAut (d.twExp c) a * c = σ a * c
+            change d.twAut (d.twExp c) a * c = σ a * c
             rw [hexp1, TwistData.twAut_one]
           rw [hlhs, htw]
     have hiso : ∀ x y : F, Θ.symm (x * y) = d.twMul (Θ.symm x) (Θ.symm y) := by
@@ -1111,7 +1112,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
         have hg := (MulAction.mem_fixedPoints.mp h) ⟨σ, Subgroup.mem_zpowers σ⟩
         simpa [RingAut.smul_def] using hg
       · intro hσx
-        show x ∈ MulAction.fixedPoints _ K
+        change x ∈ MulAction.fixedPoints _ K
         rw [MulAction.mem_fixedPoints]
         rintro ⟨g, hg⟩
         have hst : g ∈ MulAction.stabilizer (RingAut K) x :=
@@ -1122,7 +1123,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
       intro a c hc hcB
       have hexp : d.twExp c = 0 := by
         unfold TwistData.twExp; rw [dif_neg hc, (hχone _).mpr hcB, toAdd_one]
-      show d.twAut (d.twExp c) a * c = a * c
+      change d.twAut (d.twExp c) a * c = a * c
       rw [hexp, TwistData.twAut_zero]; rfl
     have htwNB : ∀ (a c : K) (hc : c ≠ 0), Units.mk0 c hc ∉ B → d.twMul a c = σ a * c := by
       intro a c hc hcB
@@ -1130,7 +1131,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
         unfold TwistData.twExp; rw [dif_neg hc]
         exact hZ2 _ (fun h => hcB ((hχone _).mp (Multiplicative.toAdd.injective
           (h.trans toAdd_one.symm))))
-      show d.twAut (d.twExp c) a * c = σ a * c
+      change d.twAut (d.twExp c) a * c = σ a * c
       rw [hexp, TwistData.twAut_one]
     have hFixCard : Nat.card {a : Kˣ // σ (a : K) = (a : K)} = r - 1 := by
       have e1 : {a : Kˣ // σ (a : K) = (a : K)}

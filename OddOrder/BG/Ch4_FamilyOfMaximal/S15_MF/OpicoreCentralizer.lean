@@ -414,7 +414,8 @@ place.  The surviving `∃ p ∈ σ(M) ∖ β(M)` is the ambient constraint behi
 
 **Not part of this bundle (issue 3022, closed):** conjunct (d) (`E₃ = 1`, `E₂ ⊲ E`, `E/E₂ ≅ E₁`
 cyclic) and the genuine (e) trichotomy that pins `p = |X|` and splits into BG's three cases.  Both
-are formalized as separate downstream theorems — (d) as `sigmaComplement_structure_of_not_fittingIsTI`
+are formalized as separate downstream theorems — (d) as
+`sigmaComplement_structure_of_not_fittingIsTI`
 (taking a §12 `E`-setup, since BG (d) is a statement about the `E, E₁, E₂, E₃` of §12–13), the full
 (e) as `S16.fitting_not_ti_structure_e` — so this bundle carries only (a)(b)(c) and must not be read
 on its own as a complete formalization of 15.7.
@@ -647,8 +648,8 @@ theorem rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI [Finite G]
 * `H` non-abelian — the part of BG's (e2)/(e3) that is **common** to both: a prime
   `p ∈ σ(M) − β(M)` with `O_p(H)` non-abelian and `O_{p'}(H)` cyclic.
 
-⚠ **This is the S15-layer partial**, deliberately kept at this import position.  `OpicoreCentralizer`
-sits *above* `WitnessPGroup` and `S16` in the import order
+⚠ **This is the S15-layer partial**, deliberately kept at this import position.
+`OpicoreCentralizer` sits *above* `WitnessPGroup` and `S16` in the import order
 (`… → OpicoreCentralizer → TIFailure → WitnessPGroup`), so it cannot cite the two refinements that
 pin down the printed (e).  Both refinements *are* formalized downstream, sorry-free and axiom-clean
 (issue 3022, closed):
@@ -660,9 +661,10 @@ pin down the printed (e).  Both refinements *are* formalized downstream, sorry-f
    `S15.card_inf_conj_fitting_eq_of_not_isMulCommutative` (`WitnessPGroup`).  Here `p` is only *the*
    witness prime of `exists_inf_conj_fitting_orderP_witness`.
 2. **(e2) vs (e3).**  BG refines the non-abelian case by type: for `M ∈ ℳ_F` the exponent of `M/H`
-   divides `q − 1` for every `q ∈ π(H)` (`typeF_exponent_dvd_sub_one_of_invariant_card`, also used by
-   `S16`'s `isTypeI_of_isTypeF`); for `M ∈ ℳ_{P₁}` (the Singer case) one gets `|O_p(H)| = p³` and
-   `|M/H| ∣ p + 1` (`card_opiCore_eq_prime_cube_singer` + `card_dvd_succ_of_primeAction_extraspecial`).
+   divides `q − 1` for every `q ∈ π(H)` (`typeF_exponent_dvd_sub_one_of_invariant_card`,
+   also used by `S16`'s `isTypeI_of_isTypeF`); for `M ∈ ℳ_{P₁}` (the Singer case) one gets
+   `|O_p(H)| = p³` and `|M/H| ∣ p + 1`
+   (`card_opiCore_eq_prime_cube_singer` + `card_dvd_succ_of_primeAction_extraspecial`).
    These are assembled with the `p = |X|` pinning into the full trichotomy
    `S16.fitting_not_ti_structure_e` (`S16_MainResults/FittingNonTITrichotomy.lean`).
 
