@@ -6,6 +6,10 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-23 23:1x 監視 tick (B 単独) — b (Higman Frattini quotient bridge・graph subspace geometry 6 leaf) 合流**。b=8。
+> 合流 b (**Higman L13 exponent-two**): common factor ambient coordinate align / input coordinate で mixed term 消去 / Frattini quotient bridge linearize / full exponent-two preimage geometry 保持 / Frattini quotient で factor range 同定 / pairwise mixed term align+消去 / graph subspace geometry 証明。6 新 leaf (ExponentTwoCommonFactorScalarBridge / QuotientLayerBridge / FullPreimageGeometry / FactorQuotientRange / AlignedMixedTermCancellation / GraphSubspaceGeometry) 全 WIRED。既存 ExponentTwoPairwiseMixedTermSupport 更新。
+> **gate: green 4616 jobs (前 4610 +6 = b の 6 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push c79629732→4a097aa29**。範囲逸脱なし。build wall 1:11。
+>
 > **▶▶ 2026-07-23 22:5x 監視 tick (B 単独) — b (Higman common factor range・scalar reparam 4 leaf) 合流**。b=5。
 > 合流 b (**Higman L13 exponent-two**): quotient eigenvalue の primitivity 証明 (ExponentTwoLambdaPrimitivity) / common factor coordinate を scalar で align (ExponentTwoScalarReparameterization) / ambient layer で保持 (ExponentTwoCommonFactorAmbientInclusion) / common factor ambient range 同定 (ExponentTwoCommonFactorRange)。4 新 leaf 全 WIRED。
 > **gate: green 4610 jobs (前 4606 +4 = b の 4 leaf・orphan 0) / AxiomsCheck OK / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push 36da53fe1→7de05110d**。範囲逸脱なし。build wall 1:06。
