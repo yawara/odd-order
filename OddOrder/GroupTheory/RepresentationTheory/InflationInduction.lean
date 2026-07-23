@@ -34,10 +34,10 @@ These package the "(1.6.b)" identification Peterfalvi uses in (13.18.a,b): toget
 
 namespace OddOrder.RepresentationTheory
 
-open scoped Classical
 
 variable {G : Type*} [Group G]
 
+open scoped Classical in
 /-- **Fiber cardinality of the quotient map.**  The number of `g : G` mapping to a fixed coset
 `q : G ⧸ N` under `QuotientGroup.mk` equals `|N|` (every fiber is a coset of `N`,
 `QuotientGroup.card_preimage_mk` with a singleton). -/
@@ -52,6 +52,7 @@ theorem card_filter_mk_eq {N : Subgroup G} [Fintype G] (q : G ⧸ N) :
   rw [hcard, QuotientGroup.card_preimage_mk N ({q} : Set (G ⧸ N))]
   simp
 
+open scoped Classical in
 /-- **P1 — inflation isometry for the quotient map.**  Pullback along `mk' N` preserves the
 class-function inner product: `⟨compHom (mk' N) φ, compHom (mk' N) ψ⟩_G = ⟨φ, ψ⟩_{G⧸N}`.
 
@@ -84,6 +85,7 @@ theorem inner_compHom_mk'_eq {N : Subgroup G} [N.Normal] [Fintype G] [Fintype (G
   congr 1
   rw [invOf_eq_inv, invOf_eq_inv, hcardG, mul_inv, mul_assoc, inv_mul_cancel₀ hne2, mul_one]
 
+open scoped Classical in
 /-- **Permutation-character value of the induced trivial character.**  `Ind_H^G 1_H` at `g` is
 `⅟|H|` times the number of conjugators `x` sending `g` into `H` (the trivial character contributes
 `1` on each such `x`).  (Generic; the same fact as `S15_SAndT_Setup.induce_one_apply`, reproven
@@ -101,6 +103,7 @@ private theorem induceTriv_apply {H : Subgroup G} [Fintype G] [Invertible (Nat.c
         rfl),
     Finset.sum_const, nsmul_eq_mul, mul_one]
 
+open scoped Classical in
 /-- **P2 — trivial-character induction–inflation commute** (Peterfalvi "(1.6.b)").  For a normal
 subgroup `N ⊴ G` contained in `A ≤ G`, the induced trivial character of `A` is the inflation of the
 induced trivial character of the quotient subgroup `A/N = A.map (mk' N) ≤ G ⧸ N`:
@@ -181,6 +184,7 @@ theorem induce_one_eq_compHom_induce_one_of_le {N A : Subgroup G} [N.Normal] (hN
   rw [invOf_eq_inv, invOf_eq_inv, hcardA, mul_inv, mul_comm ((Nat.card ↥N : ℂ))⁻¹,
     mul_assoc, inv_mul_cancel₀ hneN, mul_one]
 
+open scoped Classical in
 /-- **P3 — inflated class functions are orthogonal to irreducibles not killing `N`.**  For `N ⊴ G`,
 any class function `φ` of `G ⧸ N` inflates to something orthogonal to every irreducible character
 `ψ` of `G` whose kernel does **not** contain `N`: `⟨φ ∘ mk', ψ⟩_G = 0`.
