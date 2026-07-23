@@ -337,7 +337,14 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
   による乗法、位数 2。`semidihedralAut` (concrete `AddEquiv`, 自身が逆) / `_apply` / `_apply_isUnit`
   (存在=生成元条件、odd fact `z·c=z` 経由) / `_unique` (自己同型は `1` での値で定まる, `map_nsmul`) /
   `_add_self`+`_ne_zero`+`_addOrderOf`=2 (`AddAut` は加法群ゆえ位数 = `addOrderOf`)。全実証明・sorry 無。
-  ⚠ (b)(c) (半直積 SD 内の位数分布・共役類) は counting が重く未着手 (defer)。
+- ✅ 実証明 **3A.1(b)** semidihedral 群内の位数分布 (2026-07-23)。`σ = semidihedralMulAut` (=`a` の
+  `MulAut (Multiplicative (ZMod n))` 版、`MulAutMultiplicative` bridge; apply=rfl、`σ²=1`)、
+  `SemidihedralGroup = Multiplicative (ZMod n) ⋊ ⟨σ⟩` (φ=部分群包含 `H.subtype`、ZMod.lift 不要)、
+  reflection `(x,σ)` (=S−C の元)。`_sq`: `(x,σ)²=inl(z·x)`、`_pow_four`: `(x,σ)⁴=1`、
+  `_ne_one`/`_sq_eq_one_iff`。位数特徴づけ `_orderOf_eq_two_iff` (⟺`z·x=0`=偶)・`_eq_four_iff`
+  (⟺`z·x≠0`=奇、`orderOf_eq_prime_pow`)・`_two_or_four`。半々: `semidihedral_invol_mul_dichotomy`
+  (`z·a∈{0,z}`、induction) + `_invol_ne_zero` + **`semidihedralOrderFlip`** (位数2集合 ≃ 位数4集合、
+  parity flip `x↦x·ofAdd 1`)。全実証明・sorry 無・axiom-clean。⚠ (c) (共役類) は未着手 (defer)。
 - ✅ 実証明 **3A.5** `semidirectConjEquivProd` (`G ⋊ G ≅ G × G`、共役作用の半直積は直積)。同型
   `(n,g)↦(n·g,g)` (逆 `(a,g)↦⟨a·g⁻¹,g⟩`)、map_mul' は `mul_left`/`mul_right`/`conj_apply` 展開 + `group`。
 - ⬜ 残り §3A (いずれも substantial ~50-60 行): **3A.6** (p-群 P が p∤|G| の G に faithful ⟹ ある
