@@ -351,7 +351,7 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
   `(2-4k)(1+2k)=2-8k²≡2`、d=2s→t=u·s)。`_isConj` (差が偶なら共役) + 系 `_isConj_of_two` (両偶)
   ・`_isConj_of_four` (両奇、dichotomy で `z·x=z` 確定)。全実証明・sorry 無・axiom-clean。
   **3A.1 完全完成 (a/b/c)**。
-- ⬜ **3A.2** (一般化四元数群 Q_n、3A.1 に依存) — roadmap (2026-07-23 記録、次イテレーション実行):
+- ✅ 実証明 **3A.2** 一般化四元数群 `Q_n` (位数 n) — 2026-07-23 完成 (ker(ψ) 構成):
   B = C の index-2 部分群 = `Subgroup.zpowers (Multiplicative.ofAdd (2:ZMod n))` (位数 n/2、
   偶元 = squares)。位数 4 の元 {(x,σ): x 奇} は inl(B) の coset `(ofAdd x₀, σ)·inl(B)` をなす
   (x₀ 奇; σ(ofAdd 2k)=ofAdd(-2k) ゆえ shift で {奇}=coset)。Q = coset ∪ inl(B) は位数 n の部分群

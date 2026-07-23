@@ -9,6 +9,7 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.Algebra.Group.End
 import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.Tactic.LinearCombination
+import Mathlib.Data.ZMod.QuotientGroup
 
 /-!
 # Isaacs Chapter 3 — Problems §3A (Split Extensions)
@@ -417,6 +418,165 @@ theorem semidihedralReflection_isConj_of_four (n : ℕ) [NeZero n] (hn : 8 ∣ n
   have e2 := (semidihedral_invol_mul_dichotomy n (dvd_trans (by norm_num) hn)
     (Multiplicative.toAdd x')).resolve_left hx'
   rw [mul_sub, e2, e1, sub_self]
+
+/-! ### Problem 3A.2 — 一般化四元数群 `Q_n = ⟨σ⟩·B ∪ B` (位数 n)
+
+`S = C_n ⋊ ⟨σ⟩` から `ℤ/2` への準同型 `ψ(x,h) = (x の parity) + (h の parity)` を作り、`Q := ker ψ`
+とする。`ψ` 全射ゆえ `|Q| = |S|/2 = n` (= 一般化四元数群 `Q_n`)。左 parity `fn`・H parity `fg` を
+`SemidirectProduct.lift` で束ねる (σ は parity を保存: `w = z-1` 奇)。 -/
+
+/-- `σ` の位数は 2。 -/
+theorem semidihedralMulAut_orderOf (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    orderOf (semidihedralMulAut n hn) = 2 := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  exact orderOf_eq_prime (by rw [pow_two]; exact semidihedralMulAut_sq n hn)
+    (semidihedralMulAut_ne_one n hn)
+
+/-- `H = ⟨σ⟩` の元は `1` か `σ` (位数 2 ゆえ). -/
+theorem semidihedral_H_cases (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    (h : Subgroup.zpowers (semidihedralMulAut n hn)) :
+    h = 1 ∨ h = ⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ := by
+  rcases eq_or_ne h 1 with rfl | hne
+  · exact Or.inl rfl
+  · refine Or.inr ?_
+    have hcard : Nat.card (Subgroup.zpowers (semidihedralMulAut n hn)) = 2 := by
+      rw [Nat.card_zpowers, semidihedralMulAut_orderOf]
+    obtain ⟨y, -, huniq⟩ :=
+      (Nat.card_eq_two_iff' (1 : Subgroup.zpowers (semidihedralMulAut n hn))).mp hcard
+    have hσ : (⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ :
+        Subgroup.zpowers (semidihedralMulAut n hn)) ≠ 1 :=
+      fun hcon => semidihedralMulAut_ne_one n hn (by simpa using Subtype.ext_iff.mp hcon)
+    rw [huniq h hne, huniq _ hσ]
+
+/-- 左成分の parity 準同型 `C_n → ℤ/2`。 -/
+def semidihedralLeftParity (n : ℕ) (hn : 8 ∣ n) :
+    Multiplicative (ZMod n) →* Multiplicative (ZMod 2) where
+  toFun x := Multiplicative.ofAdd
+    (ZMod.castHom (dvd_trans (by norm_num) hn) (ZMod 2) (Multiplicative.toAdd x))
+  map_one' := by simp
+  map_mul' x y := by simp only [toAdd_mul, map_add, ofAdd_add]
+
+@[simp] theorem semidihedralLeftParity_apply (n : ℕ) (hn : 8 ∣ n) (x : Multiplicative (ZMod n)) :
+    semidihedralLeftParity n hn x = Multiplicative.ofAdd
+      (ZMod.castHom (dvd_trans (by norm_num) hn) (ZMod 2) (Multiplicative.toAdd x)) := rfl
+
+open Classical in
+/-- H 成分の parity 準同型 `⟨σ⟩ → ℤ/2` (`σ ↦ 1`)。 -/
+noncomputable def semidihedralRightParity (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    Subgroup.zpowers (semidihedralMulAut n hn) →* Multiplicative (ZMod 2) where
+  toFun h := if h = 1 then 1 else Multiplicative.ofAdd 1
+  map_one' := by simp
+  map_mul' h h' := by
+    have hσσ : (⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ :
+        Subgroup.zpowers (semidihedralMulAut n hn)) *
+        ⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ = 1 :=
+      Subtype.ext (by change semidihedralMulAut n hn * semidihedralMulAut n hn = 1
+                      exact semidihedralMulAut_sq n hn)
+    have hσ1 : (⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ :
+        Subgroup.zpowers (semidihedralMulAut n hn)) ≠ 1 :=
+      fun hcon => semidihedralMulAut_ne_one n hn (by simpa using Subtype.ext_iff.mp hcon)
+    have hof : Multiplicative.ofAdd (1 : ZMod 2) * Multiplicative.ofAdd 1 = 1 := by decide
+    rcases semidihedral_H_cases n hn h with rfl | rfl <;>
+      rcases semidihedral_H_cases n hn h' with rfl | rfl <;>
+      simp [hσσ, hσ1, hof]
+
+/-- `σ` は左 parity を保存: `fn(σ x) = fn(x)` (`w = z-1` が奇 ⟹ `cast w = 1` in `ℤ/2`)。 -/
+theorem semidihedralLeftParity_mulAut (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    (x : Multiplicative (ZMod n)) :
+    semidihedralLeftParity n hn (semidihedralMulAut n hn x) = semidihedralLeftParity n hn x := by
+  have hn2 : ((n / 2 : ℕ) : ZMod 2) = 0 := by rw [ZMod.natCast_eq_zero_iff]; omega
+  have hw : (ZMod.castHom (dvd_trans (by norm_num) hn) (ZMod 2)) (((n / 2 : ℕ) : ZMod n) - 1)
+      = 1 := by rw [map_sub, map_natCast, map_one, hn2]; decide
+  simp only [semidihedralLeftParity_apply, semidihedralMulAut_apply, toAdd_ofAdd, map_mul, hw,
+    one_mul]
+
+/-- **Isaacs Problem 3A.2** の parity 準同型 `ψ : S →* ℤ/2`, `ψ(x,h) = fn(x)·fg(h)`。 -/
+noncomputable def semidihedralParity (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    SemidihedralGroup n hn →* Multiplicative (ZMod 2) :=
+  SemidirectProduct.lift (semidihedralLeftParity n hn) (semidihedralRightParity n hn)
+    (fun g => MonoidHom.ext fun x => by
+      have hcancel : (semidihedralRightParity n hn) g * semidihedralLeftParity n hn x *
+          ((semidihedralRightParity n hn) g)⁻¹ = semidihedralLeftParity n hn x := by
+        rw [mul_comm ((semidihedralRightParity n hn) g), mul_assoc, mul_inv_cancel, mul_one]
+      simp only [MonoidHom.coe_comp, Function.comp_apply, MulEquiv.coe_toMonoidHom,
+        MulAut.conj_apply, hcancel]
+      rcases semidihedral_H_cases n hn g with rfl | rfl
+      · rfl
+      · exact semidihedralLeftParity_mulAut n hn x)
+
+@[simp] theorem semidihedralParity_inl (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    (x : Multiplicative (ZMod n)) :
+    semidihedralParity n hn (SemidirectProduct.inl x) = semidihedralLeftParity n hn x := by
+  rw [semidihedralParity, SemidirectProduct.lift_inl]
+
+/-- **Isaacs Problem 3A.2** の一般化四元数群 `Q_n := ker ψ`。`ψ` 全射ゆえ位数 `|S|/2 = n`。 -/
+noncomputable def semidihedralQuaternion (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    Subgroup (SemidihedralGroup n hn) :=
+  (semidihedralParity n hn).ker
+
+theorem semidihedralParity_surjective (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    Function.Surjective (semidihedralParity n hn) := by
+  have hcases : ∀ z : Multiplicative (ZMod 2), z = 1 ∨ z = Multiplicative.ofAdd 1 := fun z => by
+    rcases (by decide : ∀ a : ZMod 2, a = 0 ∨ a = 1) (Multiplicative.toAdd z) with h | h
+    · exact Or.inl (Multiplicative.toAdd.injective (by rw [h]; rfl))
+    · exact Or.inr (Multiplicative.toAdd.injective (by rw [h]; rfl))
+  intro y
+  rcases hcases y with rfl | rfl
+  · exact ⟨1, map_one _⟩
+  · exact ⟨SemidirectProduct.inl (Multiplicative.ofAdd 1), by
+      rw [semidihedralParity_inl, semidihedralLeftParity_apply, toAdd_ofAdd, map_one]⟩
+
+/-- **Isaacs Problem 3A.2**. `Q_n` は位数 `n` の部分群 (= 一般化四元数群)。 -/
+theorem semidihedralQuaternion_card (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    Nat.card (semidihedralQuaternion n hn) = n := by
+  have hZn : Nat.card (Multiplicative (ZMod n)) = n := by
+    rw [Nat.card_congr (Multiplicative.toAdd (α := ZMod n)), Nat.card_zmod]
+  have hZ2 : Nat.card (Multiplicative (ZMod 2)) = 2 := by
+    rw [Nat.card_congr (Multiplicative.toAdd (α := ZMod 2)), Nat.card_zmod]
+  have hS : Nat.card (SemidihedralGroup n hn) = 2 * n := by
+    rw [SemidirectProduct.card, Nat.card_zpowers, semidihedralMulAut_orderOf, hZn]; ring
+  have hidx : (semidihedralQuaternion n hn).index = 2 := by
+    rw [semidihedralQuaternion, Subgroup.index_ker,
+      MonoidHom.range_eq_top.mpr (semidihedralParity_surjective n hn),
+      Nat.card_congr (Subgroup.topEquiv).toEquiv, hZ2]
+  have hcard := Subgroup.card_mul_index (semidihedralQuaternion n hn)
+  rw [hidx, hS] at hcard
+  omega
+
+theorem semidihedralRightParity_sigma (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
+    semidihedralRightParity n hn ⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩
+      = Multiplicative.ofAdd 1 := by
+  have hσ1 : (⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ :
+      Subgroup.zpowers (semidihedralMulAut n hn)) ≠ 1 :=
+    fun hcon => semidihedralMulAut_ne_one n hn (by simpa using Subtype.ext_iff.mp hcon)
+  simp only [semidihedralRightParity, MonoidHom.coe_mk, OneHom.coe_mk, if_neg hσ1]
+
+theorem semidihedralParity_reflection (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    (x : Multiplicative (ZMod n)) :
+    semidihedralParity n hn (semidihedralReflection n hn x)
+      = semidihedralLeftParity n hn x * Multiplicative.ofAdd 1 := by
+  rw [show semidihedralParity n hn (semidihedralReflection n hn x)
+      = semidihedralLeftParity n hn x *
+        semidihedralRightParity n hn ⟨semidihedralMulAut n hn, Subgroup.mem_zpowers _⟩ from rfl,
+    semidihedralRightParity_sigma]
+
+/-- **Isaacs Problem 3A.2** (`B ⊆ Q`). `inl x` (`= C_n` の元) が `Q` に属す ⟺ `x` が偶。
+`B` = index-2 部分群 (偶元) はちょうど `Q ∩ C`。 -/
+theorem inl_mem_quaternion_iff (n : ℕ) [NeZero n] (hn : 8 ∣ n) (x : Multiplicative (ZMod n)) :
+    SemidirectProduct.inl x ∈ semidihedralQuaternion n hn
+      ↔ (ZMod.castHom (dvd_trans (by norm_num) hn) (ZMod 2)) (Multiplicative.toAdd x) = 0 := by
+  rw [semidihedralQuaternion, MonoidHom.mem_ker, semidihedralParity_inl,
+    semidihedralLeftParity_apply, ofAdd_eq_one]
+
+/-- **Isaacs Problem 3A.2** (位数 4 の coset ⊆ Q). reflection `(x,σ)` が `Q` に属す ⟺ `x` が奇。
+位数 4 の元 (`x` 奇) 全体は `Q` 内の `B`-coset をなす。 -/
+theorem reflection_mem_quaternion_iff (n : ℕ) [NeZero n] (hn : 8 ∣ n)
+    (x : Multiplicative (ZMod n)) :
+    semidihedralReflection n hn x ∈ semidihedralQuaternion n hn
+      ↔ (ZMod.castHom (dvd_trans (by norm_num) hn) (ZMod 2)) (Multiplicative.toAdd x) = 1 := by
+  rw [semidihedralQuaternion, MonoidHom.mem_ker, semidihedralParity_reflection,
+    semidihedralLeftParity_apply, ← ofAdd_add, ofAdd_eq_one]
+  exact (by decide : ∀ a : ZMod 2, (a + 1 = 0 ↔ a = 1)) _
 
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,
