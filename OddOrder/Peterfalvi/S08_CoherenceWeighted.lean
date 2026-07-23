@@ -40,11 +40,11 @@ Plan of record: `notes/peterfalvi/s56_reweighting_plan.md`.
 namespace OddOrder.Peterfalvi.S08
 
 open OddOrder.RepresentationTheory
-open scoped Classical
 
 variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 
+open scoped Classical in
 /-- **Norm-weighted (5.6) X-adjoin input.**  The weighted analogue of `XAdjoinStepInput`: the member
 family `χmem : ι → ClassFunction ↥L ℂ` is a family of (possibly reducible) characters of `S₁`, with
 
@@ -121,6 +121,7 @@ structure XAdjoinStepInputW {A : Set G}
       {(χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj,
        (χ : ClassFunction ↥L ℂ) - a • χmem i₁})
 
+open scoped Classical in
 /-- **Orthogonal integer projection onto a norm-weighted `ZIrr` family.**  The weighted analogue of
 `exists_indexed_intProjection_of_orthonormal_ZIrr`: for `φ ∈ ℤ[Irr G]` and a family
 `vc : ι → ClassFunction G ℂ` of `ZIrr`-members that are pairwise *orthogonal* with squared norms
@@ -158,6 +159,7 @@ theorem exists_indexed_projection_of_orthogonal_ZIrr {G : Type*} [Group G] [Fint
     · intro hni; exact absurd hi hni
   rw [hsum, hcZ i hi, sub_self]
 
+open scoped Classical in
 /-- **Norm-weighted crux1** (Peterfalvi (5.6.1)/(5.6.2) for a reducible member family).  The
 weighted analogue of `crux1_of_memberFamily`: the member family `χmem` is orthogonal with real
 squared norms `mc i` (`hmemortho i j = if i=j then mc i else 0`) and the degree bound is the
@@ -286,6 +288,7 @@ theorem crux1_of_memberFamilyW {A : Set G}
     rw [hlam_def] at hlam0; linarith
   rw [hμeq, hμval]; push_cast [← hmc₁C]; ring
 
+open scoped Classical in
 /-- **Norm-weighted (5.6) forward adjoin engine (general members).**
 
 The weighted analogue of `xAdjoinStep` (case A), generalized so the member family `χmem` may
@@ -467,6 +470,7 @@ noncomputable def xAdjoinStepW
     hS₁ χ hdiffsuppχ hdiffasuppχ hχχ hχbarχbar hχχbar hχbarχ hchi1chi1 hχ_S1 hχbar_S1
     (hmemS1 i₁ hi₁) htau1_memaχ hτdiffZ hcrux1 hcrux2 hSgen hgen
 
+open scoped Classical in
 /-- **Norm-weighted (5.6) forward adjoin engine, reducible BREAK (`‖χ‖² ≠ 1`).**
 
 The `‖χ‖² ≠ 1` analogue of `xAdjoinStepW`: the **break** pair `{χ, χ̄}` may itself be a
@@ -646,6 +650,7 @@ noncomputable def XAdjoinStepInputW.adjoin
     inp.Dmem inp.hortho_mem inp.htau1Dmem inp.hdiffasuppχ inp.htau1_memaχ inp.ha1 inp.hDeg
     inp.hSgen inp.hgen
 
+open scoped Classical in
 /-- **Norm-weighted (5.6) degree-square bound (contrapositive of `xAdjoinStepW`).**
 
 The norm-weighted Peterfalvi (5.6) inequality: if `S₁` is coherent but `S₁ ∪ {χ, χ̄}` is **not**,
@@ -724,6 +729,7 @@ theorem coherentDegreeSqNormBound_of_not_coherentW
     hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho
     Dmem hortho_mem htau1Dmem hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
 
+open scoped Classical in
 /-- **Norm-weighted (5.6) degree-square bound, reducible BREAK (contrapositive of
 `xAdjoinStepW_k`).**
 

@@ -27,7 +27,6 @@ variable [Fintype G]
 
 section SemidirectStructure
 section MobiusAssembly
-open scoped Classical
 
 variable (hyp : Hypothesis G A L)
 
@@ -275,6 +274,7 @@ theorem induceAlphaBTerm_apply (hconj : hyp.HConjInvariant) (α : ClassFunction 
     Subsingleton.elim _ _
   rw [induceAlphaBTerm, h]
 
+open scoped Classical in
 /-- **Peterfalvi (2.10), per-`B` weight simplification.**  For nonempty `B` and `g ∈ (aH(a))^G`, the
 orbit-averaged inclusion–exclusion summand collapses, using `|orbit B|·|N_L(B)| = |L|`
 (`card_orbit_mul_card_setLStabilizer`) and `|M(B)| = |H(B)|·|N_L(B)|` (`card_mBSubgroup`):
@@ -393,6 +393,7 @@ theorem mem_aOrbitFinset {a b : {a : G // a ∈ A}} :
   letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
   simp only [aOrbitFinset, Finset.mem_filter, Finset.mem_univ, true_and]
 
+open scoped Classical in
 /-- **Peterfalvi (2.10), per-`B` weight identity, inner sum over the fixed index `a^L`.**  For
 `g ∈ (aH(a))^G`,
 
