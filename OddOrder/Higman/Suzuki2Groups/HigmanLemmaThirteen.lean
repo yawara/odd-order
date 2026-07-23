@@ -73,3 +73,4 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllDistinctP
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoParameterCoincidence
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoCommonFactorParameters
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoFactorIsomorphism
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoSupportCancellation
