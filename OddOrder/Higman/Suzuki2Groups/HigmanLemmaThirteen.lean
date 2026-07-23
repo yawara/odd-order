@@ -114,3 +114,4 @@ import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAlignedParam
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoAllIsomorphicParameterBranch
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.ExponentTwoContradiction
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourDescent
+import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen.LengthFourContradiction
