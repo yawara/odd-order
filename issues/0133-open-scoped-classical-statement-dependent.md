@@ -38,9 +38,16 @@ leaf build する**方法で判定した (上流を常に無傷に保つので�
   `[Fintype …]` を仮説に足すこと。これは**呼び出し側の API を変える**。
 - 該当 11 ファイルは全て **lane a (Peterfalvi/S\*) または lane c (Appendices)** の territory。
   statement 改変は hub の機械的 call-site 追従の範囲外。
-- 代替案の「`open scoped Classical in` を宣言ごとに付ける」は **warning 数がむしろ増える**
-  (ファイル 1 件 → 宣言 N 件)。`set_option linter.style.openClassical false` で黙らせるのは
-  「decidability を隠している」という指摘自体を消すだけなので採らない。
+- ⚠ **2026-07-23 訂正 (この前提は誤りだった)**: 「`open scoped Classical in` を宣言ごとに付けると
+  warning がむしろ増える (ファイル 1 件 → 宣言 N 件)」は**誤り**。linter は **bare な
+  file/section-level `open (scoped) Classical` だけを flag** し、**per-declaration
+  `open (scoped) Classical in` は flag しない**。linter message 自身が
+  "use `open Classical in` for definitions or instances, the `classical` tactic for proofs" と
+  推奨している。実測: `S04_InduceConjFinset` は `open ... in` を 5 個持つが warning は bare 1 個のみ。
+  → **localization** (bare 除去 + 影響 decl ごとに直前へ `open scoped Classical in`、proof だけなら
+  `classical` タクティク) が linter 公認の fix で、**statement/signature を一切変えない** (option A の
+  `[DecidablePred]`/`[Fintype]` 追加による call-site API 変更は不要)。`set_option ... false` は指摘
+  自体を消すだけなので依然不採用。
 
 ## owner への提案 (どれを採るかは owner 判断)
 
@@ -63,3 +70,37 @@ leaf build する**方法で判定した (上流を常に無傷に保つので�
 - `issues/0132-naming-pairunion-stepdata-too-long.md` (同じく owner 判断待ちの lint)
 - 判定スクリプト: 1 ファイルずつ `open scoped Classical` を除去 → `lake build <module>` →
   `grep -c "^error: <path>"` → `git checkout -- <path>`
+
+---
+
+## ✅ 2026-07-23 実施 (lane a) — 8/11 ファイルを localization で解消
+
+上記「訂正」に基づき **option A でなく localization** で解消 (linter 公認・API 非改変)。手順は
+各ファイルで: **bare `open scoped Classical` を除去 → `lake build` で decidability error 箇所を採取
+→ 各 error を囲む top-level 宣言の docstring 直前へ `open scoped Classical in` を挿入** (proof のみの
+decidability も `open ... in` が宣言全体を覆うので同一手で足りる)。error 行→宣言のマッピングは
+`scratchpad/localize_classical.py` で自動化 (docstring/`@[…]`/`omit … in`/`structure` を跨いで挿入点を
+確定、`@[simp] theorem` と `omit … in` の前置きは要手当)。
+
+**lane-a 所有の 8 ファイル = 全解消** (各 leaf build green・openClassical 0・新規 warning 0):
+
+| ファイル | 局所化した宣言数 |
+|---|---|
+| `S04_InduceConjFinset` | 8 |
+| `S04_DadeIsometry/MobiusAssembly` | 2 |
+| `S08_CaseBAnchoredSeed` | 2 (def) |
+| `S08_CaseBWeightedEndgame` | 4 |
+| `S08_CoherenceWeighted` | 6 + 1 `structure` |
+| `S08_Theorem63` | 3 |
+| `S09_Building78C` | 4 + 1 `@[simp]` |
+| `S09_CertificateDischarge` | 2 |
+
+`bin/lint-baseline.tsv` を 181→173 に ratchet-down (openClassical 8 件除去)。ratchet gate 緑。
+
+**残 3 ファイル (本 issue 継続)** — lane-a territory 外ゆえ未着手:
+- `GroupTheory/RepresentationTheory/InflationInduction` / `NonInflatedDegreeSqInterval` (shared infra)
+- `Appendices/SemilinearField` (lane c)
+
+同一 localization 手順で解消可能 (option A も API 変更も不要)。これらが片付けば baseline から
+openClassical が消え、issue クローズ + `--strict` gate へ一歩前進。**注意**: これらは所有レーンが
+frontier 通過時に、または shared-infra claim の上で解消する (hub 調整)。

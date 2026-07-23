@@ -26,7 +26,6 @@ Prefix-split from `OddOrder.Peterfalvi.S09_CertificateDischarge` (2000-line limi
 -/
 namespace OddOrder.Peterfalvi.S09.Cert
 open OddOrder.RepresentationTheory
-open scoped Classical
 
 variable {L : Type*} [Group L] [Fintype L]
 
@@ -457,6 +456,7 @@ theorem zetaNuRhoNormSq_eq_normQuad {G : Type*} [Group G] [Fintype G] {A : Set G
   rw [h_inner, cexpr_re_eq_normQuad a_ℝ e_ℝ h_ℝ G_ℝ he hh hG,
     OddOrder.Peterfalvi.S09.Hypothesis78.normQuadraticCorrection, ha, he', hh']
 
+open scoped Classical in
 /-- **(1.5.d) degree-sum over distinct induced characters** (`A = ⊥` specialization of the S08
 orbit-count `sum_div_normSq_induce_kernelFilter_eq`).  Summing `χ(1)²/‖χ‖²` over the distinct
 nontrivially-induced characters `Ind_K^L θ` (`θ ≠ 1`) gives `[L:K]·(|K| − 1)`.  With `K = H ◁ L`
@@ -490,6 +490,7 @@ theorem induce_degree_sum_bot {L : Type*} [Group L] [Fintype L] [Invertible (Nat
   congr 2
   exact_mod_cast Nat.card_congr QuotientGroup.quotientBot.toEquiv
 
+open scoped Classical in
 /-- **(1.5.d) family degree-sum** (reindexed to the distinct-induced enumeration).  For a
 `DistinctInducedFamily` enumeration `θ` with `Ind 1_H` at `ind1H`, the family degree-sum over
 `i ≠ ind1H` equals the `induce_degree_sum_bot` image sum `= [L:K]·(|K|−1)`.  The reindexing is

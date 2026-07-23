@@ -38,7 +38,6 @@ therefore the per-`θ` central-character data:
 namespace OddOrder.Peterfalvi.S08
 
 open OddOrder.RepresentationTheory
-open scoped Classical
 
 variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
@@ -1093,6 +1092,7 @@ theorem grid_mu_notMem_Xset
     · rw [hs] at hdvd; exact (dvd_neg).mp hdvd
   exact hw1 (Nat.dvd_one.mp (by exact_mod_cast hdvd1))
 
+open scoped Classical in
 /-- **(6.8.2) the dichotomy extension function** for the full `Xset W₂` coherence.  On the basis
 `Irr L`: an irreducible `X`-member `ω ∈ Xset W₂` maps to its anchored image `Ximg ω`; everything
 else falls back to the column extension `xChiExtensionFun` (which sends a grid `0`-row member
@@ -1264,6 +1264,7 @@ theorem mem_span_scaledDiff_of_mem_zSupportedSpan
     · exact absurd hd (show ev1 χ₁ ≠ 0 from hχ₁1)
   rw [← hyz, hn, zero_smul, add_zero]; exact hy
 
+open scoped Classical in
 /-- **The case-(B) anchored-image function** `Ximg : CF(L) → CF(G)` on the `X`-set: each
 `χ ∈ Xset W₂` maps to the `(6.8.2.3)` virtual character `X` (`caseB_Xset_member_anchored`, chosen),
 elsewhere `0`. -/
