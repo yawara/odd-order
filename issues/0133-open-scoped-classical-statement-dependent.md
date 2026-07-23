@@ -104,3 +104,28 @@ decidability も `open ... in` が宣言全体を覆うので同一手で足り�
 同一 localization 手順で解消可能 (option A も API 変更も不要)。これらが片付けば baseline から
 openClassical が消え、issue クローズ + `--strict` gate へ一歩前進。**注意**: これらは所有レーンが
 frontier 通過時に、または shared-infra claim の上で解消する (hub 調整)。
+
+## ✅ 2026-07-23 実施 (lane c) — 残 3 ファイル localization で解消 → openClassical track 完了
+
+lane a の残した 3 ファイル (SemilinearField = c territory / InflationInduction・
+NonInflatedDegreeSqInterval = shared infra、lane a punt) を **同一 localization 手法** (option A の
+signature 改変でなく、bare `open scoped Classical` 除去 + 影響 decl 直前へ per-decl
+`open scoped Classical in`) で解消。全 leaf build green・openClassical 0・新規 warning 0・statement 非改変:
+
+| ファイル | 局所化した宣言数 |
+|---|---|
+| `Appendices/SemilinearField` (lane c) | 6 |
+| `RepresentationTheory/InflationInduction` (shared) | 5 |
+| `RepresentationTheory/NonInflatedDegreeSqInterval` (shared) | 1 |
+
+⚠ 手順の落とし穴 2 点 (次回のため記録):
+1. **`open scoped Classical in` を `variable` の前に置くと `variable` を食う** (→ "Unknown identifier G")。
+   挿入点は decl 自身の docstring/`@[…]`/`omit … in` の直前まで walk-up し、**`variable` で止める**。
+2. **error のマスキング**: 先頭の decidability error で build が止まり、後続 decl の error が初回 build に
+   出ないことがある。fix→rebuild を **error 0 になるまで反復** (InflationInduction は 2 反復要、
+   初回 4 decl → 再 build で 5 個目の decl @115 が露出)。
+
+shared 2 件は lane a が territory 外として punt していた unclaimed 分を lane c が openClassical track
+一括完了のため引き取り (統計: statement 非改変ゆえ下流 S11/S15 consumer 無影響、full build で確認)。
+
+⟹ **baseline から openClassical 全消。issue 0133 クローズ可** (→ `--strict` gate へ前進、issue 0138)。

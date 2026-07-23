@@ -25,7 +25,6 @@ class equation.
 
 namespace OddOrder.RepresentationTheory
 
-open scoped Classical
 
 variable {G : Type*} [Group G]
 
@@ -61,6 +60,7 @@ theorem subset_characterKernel_inflate_iff (N : Subgroup G) [N.Normal]
 
 variable [Finite G]
 
+open scoped Classical in
 /-- **The kernel-interval degree-square sum** `∑_{N ≤ ker, K ⊄ ker} χ(1)² = |G/N| − |G/(K ⊔ N)|`.
 
 For normal subgroups `N`, `K` of a finite group, the irreducibles of `G` with `N` in their kernel
