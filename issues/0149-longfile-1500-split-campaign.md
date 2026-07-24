@@ -129,6 +129,12 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
   - `S08_SCNFitting.lean` 1597 → 1156 (+ `S08_PiCoreCentralizers.lean` 467)
   - ⚠ 教訓: 宣言境界 cut は必ず docstring 開始行まで walk-up してから切る
     (泣き別れ parse error が 3 file 中 3 回発生 → gen script に walk-up を組み込み済)。
+  - 🚨 教訓 (2026-07-25, AppE で実害): **新 leaf 名は書く前に `git ls-files` で存在確認**。
+    `AppE_RegularOperator.lean` が既存 module (E.3 の 928 行, issue 3021) と衝突し、生成 script が
+    上書き → 1 commit に破壊が入った (importer の AppE_ExponentP/AxiomsCheck は leaf build 範囲外で
+    未検出)。復旧 = 旧内容 restore + 新 leaf は `AppE_CentralizerDecomposition.lean` に改名。
+    walk-up と合わせ、prefix 一致の宣言ターゲットも不可 (`isTypeII_of_isTypeP2` が
+    `…_of_derived_typeF` を掴んだ) — 完全一致行で指定する。
 
 - ✅ BG Ch4 帯 6 file — 2026-07-25 (S14 Basics 1684→1193 + TypeClassification 523 /
   S15 SetupLemma151 1745→1273 + AutAbelianCore 499 / S15 Theorem152Helpers 1616→1200 +

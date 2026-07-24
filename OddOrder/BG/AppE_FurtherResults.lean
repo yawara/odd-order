@@ -12,7 +12,7 @@ import OddOrder.GroupTheory.HallPetresco
 import OddOrder.GroupTheory.RegularPGroup
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.SubgroupInAmbient
-import OddOrder.BG.AppE_RegularOperator
+import OddOrder.BG.AppE_CentralizerDecomposition
 
 /-!
 # BG Appendix E: Further Results of Feit and Thompson
