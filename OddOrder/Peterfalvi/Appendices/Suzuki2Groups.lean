@@ -49,8 +49,9 @@ opaque-`Prop` placeholders were deleted as logically vacuous — issue
 (`GroupTheory/RepresentationTheory/SemilinearFieldAut.lean`, with the
 bundled 2(b) basis and the 2(c) spanning theorem;
 `Algebra/QuadraticMapCoordinates.lean` supplies the dimension count),
-**Proposition 1** (`FieldModel.lean`) and **Proposition 2**
-(`AutomorphismInducedMaps.lean` + `AutomorphismClassification.lean`).
-
-Still to be formalized: the Theorem (e) forward direction (issue 2052).
+**Proposition 1** (`FieldModel.lean`), **Proposition 2**
+(`AutomorphismInducedMaps.lean` + `AutomorphismClassification.lean`), and
+the Theorem (e) forward direction (`TypeBIsomorphicSplit.lean`, issue
+2052).  With these, every numbered statement of Appendix III is
+formalized.
 -/
