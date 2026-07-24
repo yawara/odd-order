@@ -36,10 +36,23 @@ That machinery is the lasting output of this repository, and completing it is no
 - **Peterfalvi**, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000) — the
   character-theoretic half: the Dade isometry, coherence, and the exceptional-character arguments.
 - **Gorenstein**, *Finite Groups* (1968) — **in part only**. Bender–Glauberman repeatedly defers proofs
-  to Gorenstein ("**G**, Thm X.Y.Z"), most visibly around p-stability, ZJ, and small-rank p-groups.
-  Where such a citation is not already covered by Isaacs or by mathlib, the Gorenstein proof is written
-  out here (Theorems 3.4, 3.7/3.8/3.10, 4.15, 5.3.9–5.3.13, 7.6.5 among others, chiefly under
-  `OddOrder/BG/`). Gorenstein is *not* being formalized as a book.
+  to Gorenstein ("**G**, Thm X.Y.Z"), most visibly around p-stability, ZJ, and small-rank p-groups,
+  and Peterfalvi's Appendix C likewise cites Gorenstein for the Brauer–Suzuki theorem (Ch. 12). Where
+  such a citation is not already covered by Isaacs or by mathlib, the Gorenstein proof is written out
+  here (Theorems 3.4, 3.7/3.8/3.10, 4.15, 5.3.9–5.3.13, 7.6.5, Brauer–Suzuki, among others, under
+  `OddOrder/BG/` and `OddOrder/GroupTheory/`). The one open piece is the `Q₈` case of Brauer–Suzuki,
+  which classically requires modular character theory: it is the tree's single remaining `sorry`,
+  frozen as a deliberate long-term project. Gorenstein is *not* being formalized as a book.
+
+Two proofs come from outside these books altogether: the books state the results but take the proofs
+from the original literature, so the sources themselves are formalized here.
+
+- **Higman**, "Suzuki 2-groups" (*Illinois Journal of Mathematics* 7, 1963). Peterfalvi's Appendix III
+  restates Higman's classification of Suzuki 2-groups but explicitly takes its proof from the paper;
+  that proof is formalized in full under [`OddOrder/Higman/`](OddOrder/Higman/) — about 65,000
+  `sorry`-free lines, the largest single item in the library.
+- **Huppert**, *Endliche Gruppen I* (1967), Kapitel II, Satz 3.2: a solvable 2-transitive permutation
+  group has an elementary abelian regular normal subgroup. Needed by Peterfalvi's Appendix C.
 
 Coverage of the three books is tracked result by result. An audit on 2026-07-16 enumerated all
 **815 numbered results**: 467 formalized at full book strength, 78 covered completely by mathlib itself,
@@ -68,7 +81,7 @@ The Lean toolchain is pinned in [`lean-toolchain`](lean-toolchain) and the mathl
 
 | Path | Contents |
 |---|---|
-| [`OddOrder/`](OddOrder/) | The Lean sources (~750 files). `Isaacs/`, `BG/`, `Peterfalvi/` mirror the three books; `GroupTheory/`, `Algebra/`, `Mathlib/` hold general-purpose material |
+| [`OddOrder/`](OddOrder/) | The Lean sources (~1,050 files). `Isaacs/`, `BG/`, `Peterfalvi/` mirror the three books; `Higman/` holds the Suzuki 2-groups paper; `GroupTheory/`, `Algebra/`, `Mathlib/` hold general-purpose material |
 | [`OddOrder/FeitThompson.lean`](OddOrder/FeitThompson.lean) | The main theorem and the minimal-counterexample reduction |
 | [`OddOrder/AxiomsCheck.lean`](OddOrder/AxiomsCheck.lean) | Build-time axiom audit of every load-bearing result |
 | [`ROADMAP.md`](ROADMAP.md) | Long-range plan, phases, dependency graph, per-chapter checklists |
