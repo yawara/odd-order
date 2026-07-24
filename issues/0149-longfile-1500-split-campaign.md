@@ -94,6 +94,12 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
 | `Peterfalvi/S08_CoherenceCore.lean` | 1506 |
 ### 消化記録
 
+- ✅ `BG/Ch1_Preliminary/S03f_Thm36.lean` (3822) — 2026-07-24 endgame 切出し:
+  単一巨大宣言 `thm36_aux` の IH-free な末尾 (3.29)–(3.38) (~1300 行) を新 leaf
+  `S03f_Endgame.lean` (1402 行, stamp 不要) の `endgame_contradiction` へ抽出
+  (文脈は orbit_parity_contradiction と同じ「opaque binder + 定義等式」渡し、
+  hypothesis 41 個)。残 2539 行 → stamp 4000→**2600** に ratchet (worklist 残留 —
+  さらに縮めるには IH 消費部 (3.6)–(3.28) の IH 仮説化が要る)。
 - ✅ `Peterfalvi/Appendices/FeitSibleyTheorem.lean` (1884) — 2026-07-24 prefix-split:
   `FeitSibleySsetCoherence.lean` (892) + 残 1022、両方 stamp 不要化 (issue 0141 close)。
 - ✅ `BG/Ch1_Preliminary/S04g_Thm418.lean` (1965) — 2026-07-24 prefix-split:
