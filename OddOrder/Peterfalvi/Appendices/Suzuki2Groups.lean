@@ -45,9 +45,10 @@ Formalized honestly in the 2026-07-24 campaign (issue 0148; the former
 opaque-`Prop` placeholders were deleted as logically vacuous — issue
 0127 ②): **Lemma 1(a)** (`QuadraticExtensions.lean`), **Lemma 1(c)/(d)**
 (`GroupTheory/CentralExtensionAutomorphisms.lean`), **Lemma 2(a)-(c)**
-(`GroupTheory/RepresentationTheory/SemilinearFieldAut.lean`; the bundled
-`Module.Basis` packaging of 2(b)/(c) is deferred — whnf divergence, see the
-note there), **Proposition 1** (`FieldModel.lean`) and **Proposition 2**
+(`GroupTheory/RepresentationTheory/SemilinearFieldAut.lean`, with the
+bundled 2(b) basis and the 2(c) spanning theorem;
+`Algebra/QuadraticMapCoordinates.lean` supplies the dimension count),
+**Proposition 1** (`FieldModel.lean`) and **Proposition 2**
 (`AutomorphismInducedMaps.lean` + `AutomorphismClassification.lean`).
 
 Still to be formalized: the Theorem (e) forward direction (issue 2052).

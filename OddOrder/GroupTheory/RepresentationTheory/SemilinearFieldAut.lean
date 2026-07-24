@@ -13,6 +13,7 @@ import Mathlib.FieldTheory.Perfect
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 import Mathlib.Algebra.CharP.Two
 import Mathlib.Algebra.CharP.Algebra
+import OddOrder.Algebra.QuadraticMapCoordinates
 
 /-!
 # Semilinear extension: additive automorphisms multiplicative on a generating scalar set
@@ -520,8 +521,10 @@ polarization and Lemma 2(b)), and its diagonal coefficients vanish
 (`autMulQuadratic_diag_eq_zero`, via Frobenius surjectivity and Lemma 2(a)).
 Together these say the family over subsets `{σ, τ}` of size `1` or `2` is
 linearly independent — the book's Lemma 2(c) (which is genuinely
-characteristic-`2`).  The spanning/`Module.Basis` packaging is deferred with
-the 2(b) note below. -/
+characteristic-`2`).  The spanning half is `span_autMulQuadraticMap_eq_top`:
+a wedge of representatives is independent by the coefficient lemmas and its
+size matches the dimension of the quadratic-map space computed by
+`OddOrder.Algebra.CharTwoQuadratic.coordEquiv`. -/
 
 section QuadraticChar2
 
@@ -861,6 +864,114 @@ theorem exists_smul_algAut_of_norm_intertwiner [Finite F]
   rw [hfx x]
   exact Finset.sum_eq_single α (fun γ _ hγ => by rw [hzero γ hγ, zero_mul])
     (fun h => absurd (Finset.mem_univ α) h)
+
+/-- **Peterfalvi Appendix III, Lemma 2(c), spanning side** (p. 140): the
+quadratic family `x ↦ σ(x)·τ(x)` spans the whole space of `𝔽₂`-quadratic
+maps `F → F` over `F`.  The wedge subfamily (one representative per
+unordered pair, via an arbitrary enumeration of `Aut F`) is linearly
+independent by the coefficient lemmas above, and its size `n(n+1)/2`
+matches the dimension of the quadratic-map space computed by the
+coordinate equivalence `OddOrder.Algebra.CharTwoQuadratic.coordEquiv`. -/
+theorem span_autMulQuadraticMap_eq_top [Finite F] :
+    Submodule.span F
+      (Set.range fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
+        autMulQuadraticMap F στ.1 στ.2) = ⊤ := by
+  classical
+  letI : Fintype F := Fintype.ofFinite F
+  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  haveI : SMulCommClass F (ZMod 2) F := SMulCommClass.symm _ _ _
+  -- an enumeration of `Aut F` by `Fin n`, `n` the degree
+  have hcard : Fintype.card (F ≃ₐ[ZMod 2] F) =
+      Module.finrank (ZMod 2) F := by
+    rw [← Nat.card_eq_fintype_card]
+    exact IsGalois.card_aut_eq_finrank (ZMod 2) F
+  let eqv : (F ≃ₐ[ZMod 2] F) ≃ Fin (Module.finrank (ZMod 2) F) :=
+    (Fintype.equivFin _).trans (finCongr hcard)
+  -- the wedge subfamily is independent (Lemma 2(c) coefficient lemmas)
+  have hwedge : LinearIndependent F
+      (fun q : {q : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) //
+          eqv q.1 ≤ eqv q.2} =>
+        autMulQuadraticMap F q.1.1 q.1.2) := by
+    rw [Fintype.linearIndependent_iff]
+    intro c hc
+    set c' : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) → F := fun στ =>
+      if h : eqv στ.1 ≤ eqv στ.2 then c ⟨στ, h⟩ else 0 with hc'def
+    have hsum : (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        c' στ • autMulQuadraticMap F στ.1 στ.2) = 0 := by
+      rw [← Finset.sum_filter_add_sum_filter_not Finset.univ
+        (fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
+          eqv στ.1 ≤ eqv στ.2)]
+      have hz : (∑ στ ∈ Finset.univ.filter
+          (fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
+            ¬ eqv στ.1 ≤ eqv στ.2),
+          c' στ • autMulQuadraticMap F στ.1 στ.2) = 0 := by
+        refine Finset.sum_eq_zero fun στ hστ => ?_
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hστ
+        rw [hc'def]
+        simp only [dif_neg hστ, zero_smul]
+      rw [hz, add_zero,
+        Finset.sum_subtype
+          (p := fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
+            eqv στ.1 ≤ eqv στ.2)
+          (Finset.univ.filter
+            fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
+              eqv στ.1 ≤ eqv στ.2)
+          (fun στ => by simp)
+          (fun στ => c' στ • autMulQuadraticMap F στ.1 στ.2),
+        ← hc]
+      refine Finset.sum_congr rfl fun q _ => ?_
+      simp only [hc'def]
+      rw [dif_pos q.2]
+    intro q
+    rcases eq_or_lt_of_le q.2 with heq | hlt
+    · -- diagonal representative: `eqv`-equal means equal
+      have hqq : q.1.1 = q.1.2 := eqv.injective (Fin.le_antisymm q.2 heq.ge)
+      have hd := autMulQuadratic_diag_eq_zero F c' hsum q.1.1
+      have hval : c' (q.1.1, q.1.1) = c q := by
+        rw [hc'def]
+        have hle : eqv q.1.1 ≤ eqv q.1.1 := le_refl _
+        simp only [dif_pos hle]
+        exact congrArg c (Subtype.ext (Prod.ext rfl hqq))
+      rw [hval] at hd
+      exact hd
+    · -- strict representative: the swapped coefficient is outside the wedge
+      have hs := autMulQuadratic_coeff_symm F c' hsum q.1.1 q.1.2
+      have h1 : c' (q.1.1, q.1.2) = c q := by
+        rw [hc'def]
+        simp only [dif_pos q.2]
+      have h2 : c' (q.1.2, q.1.1) = 0 := by
+        rw [hc'def]
+        simp only [dif_neg (not_le.mpr hlt)]
+      rw [h1, h2] at hs
+      exact hs
+  -- size of the wedge = dimension of the quadratic-map space
+  have hcardeq : Fintype.card
+      {q : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) // eqv q.1 ≤ eqv q.2} =
+      Module.finrank F (QuadraticMap (ZMod 2) F F) := by
+    have he : {q : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) //
+        eqv q.1 ≤ eqv q.2} ≃
+        {p : Fin (Module.finrank (ZMod 2) F) ×
+          Fin (Module.finrank (ZMod 2) F) // p.1 ≤ p.2} :=
+      { toFun := fun q => ⟨(eqv q.1.1, eqv q.1.2), q.2⟩
+        invFun := fun p => ⟨(eqv.symm p.1.1, eqv.symm p.1.2), by
+          simpa using p.2⟩
+        left_inv := fun q => Subtype.ext (Prod.ext (eqv.symm_apply_apply _)
+          (eqv.symm_apply_apply _))
+        right_inv := fun p => Subtype.ext (Prod.ext (eqv.apply_symm_apply _)
+          (eqv.apply_symm_apply _)) }
+    rw [Fintype.card_congr he,
+      LinearEquiv.finrank_eq (OddOrder.Algebra.CharTwoQuadratic.coordEquiv
+        (S := F) (W := F) (Module.finBasis (ZMod 2) F)),
+      Module.finrank_pi]
+  -- independent family of full size spans; the wedge range is a subrange
+  haveI : Nonempty {q : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) //
+      eqv q.1 ≤ eqv q.2} := ⟨⟨(1, 1), le_refl _⟩⟩
+  have hspan := hwedge.span_eq_top_of_card_eq_finrank hcardeq
+  refine le_antisymm le_top ?_
+  rw [← hspan]
+  refine Submodule.span_mono ?_
+  rintro _ ⟨q, rfl⟩
+  exact ⟨q.1, rfl⟩
 
 end QuadraticChar2
 

@@ -37,7 +37,7 @@ Pf 側の再掲は書かない。
       書籍の「P 2-group」仮定は不要 (使うのは W ≤ Z(P) + 両 exponent 2 のみ) なので一般化。
       ⚠ 実装知見: `IsMulCommutative.instCommGroup` は **scoped instance** — `open scoped
       IsMulCommutative` が無いと letI 連鎖が組めず zmodModule の型と不一致になる。
-- [ ] **Lemma 2**: `F_{2^n}` 上の linear / bilinear / quadratic map の基底表示。
+- [x] **Lemma 2** ✅ 2026-07-24 完済 (packaging 込み): `F_{2^n}` 上の linear / bilinear / quadratic map の基底表示。
       **(a) ✅ 2026-07-24 (hub)**: `SemilinearFieldAut.lean` に一般標数で実装 —
       `linearIndependent_algAut_toLinearMap` (Dedekind `linearIndependent_monoidHom` を
       `LinearIndependent.comp` + `.of_comp coeFnLinear` で 𝔽_p-線形写像空間へ転送) /
@@ -61,13 +61,21 @@ Pf 側の再掲は書かない。
       pointwise 証明) → Pi 空間で `basisOfLinearIndependentOfCardEqFinrank`
       → `Basis.map` (constr equiv) で入れ子空間へ。set_option 増量も不要
       (default 200k で通過)。
-      **(c) ✅ 2026-07-24 (hub、独立性側)**: `autMulQuadraticMap σ τ` (QuadraticMap (ZMod 2)、
+      **(c) ✅ 2026-07-24 (hub、独立性側 + spanning 側)**: `autMulQuadraticMap σ τ` (QuadraticMap (ZMod 2)、
       companion = `algAutMulBilin στ + τσ`) / **`autMulQuadratic_coeff_symm`** (消える結合の
       係数は対称 — polar 化で対角が char 2 消滅し、swap 再指数 + 積 monoid 指標の Dedekind
       独立で閉じる) / **`autMulQuadratic_diag_eq_zero`** (対角係数消滅 — swap involution で
       off-diag が打ち消し、`frobeniusEquiv` 全射で (a) に帰着)。ordered-pair 供述にしたので
       Sym2/順序 index が不要になった (2 定理が合わせて「サイズ 1–2 部分集合族の独立性」)。
-      AxiomsCheck 2 assert。spanning 側は (b) と同じ packaging 繰延。
+      AxiomsCheck 2 assert。**spanning 側 ✅ 2026-07-24 (hub)**:
+      `span_autMulQuadraticMap_eq_top` — 汎用インフラ
+      `OddOrder/Algebra/QuadraticMapCoordinates.lean` (𝔽₂ 上の quadratic map
+      は基底値 + 基底 polar で決定 ≃ₗ 座標空間 `{p // p.1 ≤ p.2} → W`;
+      `coordEquiv`) で次元 = n(n+1)/2 を計上し、wedge 代表族 (Aut F の任意
+      enumeration による) の独立性を coeff_symm/diag_eq_zero から導出
+      (⚠ wedge 外に対称 ghost が落ちるので係数消去がそのまま効く)、
+      サイズ = 次元 → span = ⊤ → range 全体の span も ⊤。AxiomsCheck
+      2 assert (span + coordEquiv)。
       ⚠ 実装知見: 入れ子 `F →ₗ F →ₗ F` の module instance は `LinearMap.ext`/評価/`map'`/
       `ker_eq_bot` どれも isDefEq 爆発 — **常に関数空間 (Pi) + MonoidHom 指標側で作業**し、
       入れ子空間には (b) の of_comp 一撃でしか触れないこと。
