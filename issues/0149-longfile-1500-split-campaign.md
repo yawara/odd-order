@@ -94,6 +94,14 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
 | `Peterfalvi/S08_CoherenceCore.lean` | 1506 |
 ### 消化記録
 
+- ✅ Isaacs 帯 3 file — 2026-07-24 文書順 sweep (いずれも section/topic 境界の
+  prefix-split、下流 import 無変更、stamp 除去):
+  - `Ch03_SplitExtensions/Basic.lean` 1740 → 1367 (+ `SemidirectAut.lean` 413: §3A)
+  - `Ch04_Commutators/Main/BaerTrick.lean` 1572 → 1143 (+ `BaerMulGroup.lean` 456:
+    Baer trick 構成層)
+  - `Ch06_FrobeniusActions/FrobeniusActionTI.lean` 1875 → 1447
+    (+ `FrobeniusActionBasics.lean` 471: §6A basics)
+
 - ✅✅ `BG/Ch1_Preliminary/S03f_Thm36.lean` (3822) — 2026-07-24 **完了、stamp 除去**:
   単一巨大宣言 `thm36_aux` の IH-free セグメント 3 つを段階的に切出し、
   3822 → **1301 行** (stamp 4000 → 2600 → 1900 → 除去)。
