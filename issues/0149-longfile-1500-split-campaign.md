@@ -168,7 +168,16 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
      `open scoped Classical in` 等の modifier 行をもう一度戻る (modifier → docstring →
      modifier の交互適用)。
 
+- ✅ Pf S11 帯 5 file — 2026-07-25 (`CuS0` 1823→1166 + `CuS0Basic` 684 /
+  `InnerCompHom` 1734→1022 + `InnerCompHomBasic` 741 / `ChiefFactorCore` 1672→1061 +
+  `ChiefFactorBasic` 637 / `S11_NineElevenCoherence` 1519→893 + `S11_NineElevenSetup` 654
+  (先頭 named section が preamble 複製に混入 → main 側で section 行と scoped variable を除去) /
+  `WielandtSetup` 1517→842 + `WielandtSetupBasic` 712)。
+  ⚠ scan 修正: primed 名 (`foo'`) の使用検出は `\b` 境界では失敗する — 前後 lookaround で判定。
+
 ### ⚠ 第二パス行き (private 網が全域を覆い、clean な宣言境界 cut が存在しない)
+- `Peterfalvi/S10_MinimalSimpleBasic.lean` (1889) — private 網 (622→1534, 674→1534;
+  primed 名 `Msigma_conj_smul'` 含む) で clean cut なし
 
 prefix-split では割れない — 対応には crossing private の public 化 (namespace 付与) という
 設計判断が要るため、campaign 第一巡から除外して後続パスで扱う:
