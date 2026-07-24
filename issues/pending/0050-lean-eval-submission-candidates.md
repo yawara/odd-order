@@ -76,3 +76,11 @@ self-contained / 証明が難しく mathlib 未収録。詳細と全候補は正
   (全 219 problem)。「他者 solved 済み = 候補外」の暗黙の絞りが誤り (per-account sticky) と
   ユーザー指摘で判明 — Burnside p^aq^b / `brauer_character_in_cyclotomic` を proof submit 候補に追加。
   brauer_suzuki 項を 9318-closed/0147-凍結の現況に更新。
+
+---
+
+## ❄ 2026-07-24 FROZEN (ユーザー裁定) — pending へ
+
+lean-eval への proof submit / proposal 活動はユーザー裁定でいったん凍結。
+正本 (`notes/meta/lean_eval_submission.md` — playbook・候補全表・reject 記録) は保存済みで、
+解凍時はそこと本 checklist から再開。
