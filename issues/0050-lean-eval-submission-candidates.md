@@ -8,11 +8,16 @@ created: 2026-05-30
 # lean-eval への proof 提出 (tracker)
 
 > **正本 = [`notes/meta/lean_eval_submission.md`](../notes/meta/lean_eval_submission.md)** (単一ドキュメント)。
-> 提出 playbook・候補全表 (Tier A/B/C)・reject 記録・eval 側仕様は**全てそこ**。
-> 本 issue は actionable checklist のみを持つ tracker。個別提出は per-problem sub-issue (0042 型) を切る。
+> playbook・候補全表 (proof submit 監査 §2.5 / proposal Tier A/B/C)・reject 記録・eval 側仕様は**全てそこ**。
+> 本 issue は actionable checklist のみを持つ tracker。個別作業は per-problem sub-issue (0042 型) を切る。
+>
+> **用語規約 (2026-07-24, ユーザー指示)**: 「submit」= **proof submit (既存 problem への解答提出)
+> のみ**。新規 problem の追加は **proposal (提案)** と呼ぶ。「他者 solved 済み」は proof submit
+> 候補の除外理由にならない (per-account sticky) — この絞りの誤りで Burnside p^aq^b 等を
+> 見落としていた (正本 note §2.5 の全数監査で訂正)。
 >
 > 2026-07-22 に旧 3 note (baer_suzuki / candidates_2026_07_19 / forward_list_2026_07_22) を
-> 1 本に統合 (「proof を submit する」観点)。
+> 1 本に統合。
 
 ## 背景 (要点)
 
@@ -26,16 +31,22 @@ self-contained / 証明が難しく mathlib 未収録。詳細と全候補は正
 - [x] **(整備 2026-07-22) AxiomsCheck 未登録の strong 候補 10 件を登録** — ZJ / Replacement /
       Galois–Burnside / Ch08 Jordan / PSL 単純性 / `isCritical_exists` / `transfer_transfer` /
       Ch01 Fitting 冪零性・最大性 / `span_range_representation_eq_top`。`lake build
-      OddOrder.AxiomsCheck` green (全件 allowlist の 3 公理のみ)。提出前の手動 `#print axioms` が不要に
-- [ ] **🆕 (提案) Glauberman ZJ 定理** — 2026-07-22 完成・AxiomsCheck 登録済
+      OddOrder.AxiomsCheck` green (全件 allowlist の 3 公理のみ)。proposal 前の手動 `#print axioms` が不要に
+- [ ] **🆕 (proof submit) Burnside p^aq^b** = `finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow`。
+      repo `Isaacs.Ch07.burnside_p_pow_q_pow` が eval より一般な形で完成・AxiomsCheck 登録済。
+      主作業 = self-contained workspace 化 (正本 note §2.5)
+- [ ] **🆕 (proof submit) `brauer_character_in_cyclotomic`** — 数学は既済 (trace = 1 の冪根の和、
+      `ClassSumCongruence.lean`)。`CyclotomicField (exponent G) ℚ →+* ℂ` packaging のみ (§2.5)
+- [ ] **🎯 (proof submit・凍結解除待ち) `brauer_suzuki`** — 9318 は |T|≥16 完成で closed (2026-07-23)。
+      残 blocker = Q₈ case (issue 0147 凍結) のみ。eval statement は n=3 (Q₈) を含むため解凍・完成が前提
+- [ ] **🆕 (proposal) Glauberman ZJ 定理** — 2026-07-22 完成・AxiomsCheck 登録済
       (`Subgroup.oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian`、伝説級・mathlib/eval 双方に無い)
-- [ ] **🆕 (提案) B.H.Neumann 位数 3** (`lowerCentralSeries_two_eq_bot_of_fixedPointFree_orderOf_eq_three`、
+- [ ] **🆕 (proposal) B.H.Neumann 位数 3** (`lowerCentralSeries_two_eq_bot_of_fixedPointFree_orderOf_eq_three`、
       登録済・bespoke≈0) + **一般 Hall–Petresco** (`HallPetresco.exists_hallPetresco`、登録済、旧 class≤3 を差替)
-- [ ] **🎯 (解答) `brauer_suzuki` = issue 9318 完走** — Tier B 唯一の「既存未解決を解答」経路 (≈38%、lane c)
-- [ ] **(提案) Jordan の定理** — mathlib が `proof_wanted` で明示、bespoke 0。
+- [ ] **(proposal) Jordan の定理** — mathlib が `proof_wanted` で明示、bespoke 0。
       `lake exe lean-eval validate-manifest` + `check-problem-build` で検証してから PR
-- [ ] **(提案) Chermak–Delgado / Furtwängler / Thompson FPF-nilpotency** を続けて提案 PR。
-      提案先 merge、solver は他者開放 (`feit_thompson` 前例)
+- [ ] **(proposal) Chermak–Delgado / Furtwängler / Thompson FPF-nilpotency** を続けて proposal PR。
+      merge 後、solver は他者開放 (`feit_thompson` 前例)
 - [ ] **(整備) stale docstring 掃除** — `burnside_p_pow_q_pow`「local axiom 封じ込め」/
       `Ch07.normal_J`「Remaining local axioms」/ `AppC_NormSet`「to be formalized」/
       `brauer_permutation_lemma'`「Isaacs Thm 6.32」誤引用ほか (正本 note §8)
@@ -61,3 +72,7 @@ self-contained / 証明が難しく mathlib 未収録。詳細と全候補は正
 - 2026-07-19 候補表を実測で全面差し替え。
 - 2026-07-22 lean-eval 関連 3 note を [`lean_eval_submission.md`](../notes/meta/lean_eval_submission.md)
   に統合、本 issue を tracker 化。ZJ 定理の reject を撤回 (完成確認)。
+- 2026-07-24 **用語統一** (submit = proof submit のみ、新規問題は proposal) + **proof submit 全数監査**
+  (全 219 problem)。「他者 solved 済み = 候補外」の暗黙の絞りが誤り (per-account sticky) と
+  ユーザー指摘で判明 — Burnside p^aq^b / `brauer_character_in_cyclotomic` を proof submit 候補に追加。
+  brauer_suzuki 項を 9318-closed/0147-凍結の現況に更新。

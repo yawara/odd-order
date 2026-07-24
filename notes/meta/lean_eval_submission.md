@@ -11,34 +11,49 @@
 >
 > lean-eval: <https://github.com/leanprover/lean-eval> / 提出先
 > <https://github.com/leanprover/lean-eval-submissions> / 公開面 <https://lean-lang.org/eval/>
+>
+> **用語規約 (2026-07-24, ユーザー指示)**: **「submit / 提出」= proof submit (既存 problem への
+> 解答提出) のみ**を指す。新規 problem の追加は **「proposal / 提案」**と呼び、submit とは言わない。
+> また **「他者 solved 済み」は proof submit 候補の除外理由にならない** (results は per-account
+> sticky、§1.4) — 旧 census はこの絞り込みミスで Burnside p^aq^b 等を候補から落としていた
+> (§2.5 の全数監査で訂正)。
 
 ---
 
-## §0. 現況サマリ (2026-07-22)
+## §0. 現況サマリ (2026-07-24 改訂 — proof submit / proposal を分離)
+
+**proof submit (既存 problem への解答提出)**:
 
 | | 件数 | 内容 |
 |---|---|---|
-| **提出済・solved** | 2 | `feit_thompson` (2026-07-16, #828)、`baer_suzuki` (2026-05-29, #118) |
-| **Tier A: 今すぐ submit 可** | 34 + 🆕6 | axiom-clean 証明済。ほぼ全て**提案** (新規 problem PR) |
-| **Tier B: frontier 完成で submit 可** | 3 | `brauer_suzuki` (既存**未解決**を解答) / Feit–Sibley / Suzuki 分類 |
-| **Tier C: 3 冊経路の外** | 3 | Z* / Gorenstein–Walter / brauer_splitting_field |
+| **済** | 2 | `feit_thompson` (2026-07-16, #828)、`baer_suzuki` (2026-05-29, #118) |
+| **今すぐ可** | 2 | Burnside p^aq^b (`finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow`)、`brauer_character_in_cyclotomic` — 他者 solved 済みだが per-account sticky ゆえ候補 (§2.5) |
+| **凍結解除待ち** | 1 | `brauer_suzuki` (未解決・solver 0)。blocker = Q₈ case のみ (issue 0147 凍結) |
+| **経路外** | 残り全部 | Tier C (§5) + repo に証明の無い problem 群 (§2.5 の判定表) |
 
-**「3 冊が順調に完成すると自然に submit できる」経路**: (i) Tier A の提案群 (今〜)、
-(ii) `brauer_suzuki` の**解答** (issue 9318 完成時)、(iii) Feit–Sibley・Suzuki 分類の提案
-(issue 1054/2053 完成時)。Tier C は 3 冊の外側で、別途 modular 表現論等を立てない限り来ない。
+**problem proposal (新規 problem の提案 PR — submit とは呼ばない)**:
+
+| | 件数 | 内容 |
+|---|---|---|
+| **Tier A: 今すぐ proposal 可** | 34 + 🆕6 | axiom-clean 証明済 (§3) |
+| **Tier B: frontier 完成で proposal 可** | 2 | Feit–Sibley (issue 1054) / Suzuki 分類 (issue 2053) (§4) |
+
+**「3 冊が順調に完成すると自然に届く」経路**: (i) Tier A の proposal 群 (今〜)、
+(ii) `brauer_suzuki` の proof submit (issue 0147 解凍・完成時)、(iii) Feit–Sibley・Suzuki 分類の
+proposal (issue 1054/2053 完成時)。Tier C は 3 冊の外側で、別途 modular 表現論等を立てない限り来ない。
 
 ⚠ lean-eval 作業は 3 冊 frontier に対し**オプショナル・トラック** (0042 scope 注記)。
 
 ---
 
-## §1. proof を submit する手順 (playbook)
+## §1. proof submit / problem proposal の手順 (playbook)
 
 ### §1.1 2 つの経路
 
-- **解答 (solver)**: 既存 problem を解く。`leanprover/lean-eval-submissions` に
+- **proof submit (solver)**: 既存 problem を解く。`leanprover/lean-eval-submissions` に
   「Submit benchmark solution」issue を立て、`Submission.lean` (+ `Submission/`) を出す。
   採点 = **comparator が受理するか否かのみ** (Mathlib 自由使用可)。
-- **提案 (proposer)**: 新規 problem を `leanprover/lean-eval` に PR (`@[eval_problem]` +
+- **problem proposal (proposer)**: 新規 problem を `leanprover/lean-eval` に PR (`@[eval_problem]` +
   `manifests/problems/<id>.toml`)。外部コントリビュータの追加 PR は merge 実績あり。
   → 詳細 §7.2。
 
@@ -82,7 +97,7 @@ option 依存ファイルが落ちる。対策 (odd-order 本体側で非依存�
 
 ---
 
-## §2. 既提出 (2 件)
+## §2. proof submit 済 (2 件)
 
 | problem | 提出日 | Lean 名 | 備考 |
 |---|---|---|---|
@@ -98,9 +113,48 @@ option 依存ファイルが落ちる。対策 (odd-order 本体側で非依存�
 
 ---
 
-## §3. Tier A — 今すぐ submit 可 (ready-now)
+## §2.5 proof submit の全数監査 (2026-07-24)
 
-いずれも実 sorry 0。**AxiomsCheck 登録の有無で提出前作業が変わる** (未登録は提出前に
+**方法**: 全 219 problem (`manifests/problems/`) を repo 実体と突き合わせ。GroupTheory 16 件・
+RepresentationTheory 9 件・NumberTheory の cyclotomic 系 2 件は statement を個別照合、残り topic
+(解析・幾何・位相・力学系等) は repo scope (有限群論 + 通常指標理論) の外。
+problem 追加は 2026-06-23 が最新 (解析系 3 件) で、群論系の新規追加なし。
+
+### 今すぐ proof submit 可 (2)
+
+| problem | 他者 solved | repo 実体 | 残作業 |
+|---|---|---|---|
+| `finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow` (Burnside p^aq^b) | 済 | `Isaacs.Ch07.burnside_p_pow_q_pow` (Ch07_ThompsonSubgroup/Main.lean:917、AxiomsCheck:1687 登録済)。eval より一般 (`p ≠ q` 不要、`Nat.card` + ∃ 形) | statement 橋渡しは数行 (`Fintype.card`→`Nat.card`、`Fact` instance 化)。主作業 = self-contained 化 (§1.2): Ch.7 9-step + normal-J の閉包 vendoring で規模大 (feit_thompson 前例の縮小版) |
+| `brauer_character_in_cyclotomic` | 済 (10 名) | 数学は既済: trace = 固有値和 (`character_isIntegral` 内部、ClassSumCongruence.lean:1053)、有限位数 endo の固有値は 1 の冪根 (`pow_eq_one_of_isRoot_charpoly_of_pow_eq_one`、同 :1030) | `CyclotomicField (Monoid.exponent G) ℚ →+* ℂ` embedding の構成と `φ.range` 所属への packaging (中規模 glue、10 名 solved の易問側) |
+
+### 凍結解除待ち (1)
+
+`brauer_suzuki` (**未解決・solver 0**、2026-07-24 公開面で実測): eval statement は `n ≥ 3` の
+一般化四元数 (`QuaternionGroup (2^(n-2))`、**n=3 = Q₈ を含む**)。repo は cyclic / |T|=4 /
+|T|≥16 が sorry-free 完成済で、唯一の blocker = `brauerSuzuki_quaternionSylow_q8`
+(RankOneAffineModel.lean:294、issue 0147 で凍結中の repo 唯一の実 sorry)。結論形の差
+(eval: `t̄ ∈ Z(G/O(G))` / repo: `O_{2'}(G) ⊔ C_G(z) = ⊤`) の橋渡しは routine。
+
+### repo に証明が無く候補外 (solved/unsolved を問わず判定理由を記録)
+
+| problem | 判定 |
+|---|---|
+| `frobenius_kernel_isNormal` (solved) | 古典 Frobenius 定理 (核 = 集合が正規部分群) は repo にも mathlib にも無い。repo の `IsFrobeniusGroup` は核を仮定する structure (§6 と同判定) |
+| `brauer_fowler` (solved) | repo 不在 (§6) |
+| `commProb_closed` / `golod_shafarevich_inequality` / `boone_higman_*` (solved) | 組合せ群論・確率系で repo 外 |
+| `frobenius_group_determinant` | `MvPolynomial` 群行列式論が repo に無い |
+| `symAction/glAction` Schur–Weyl 2 件 | Schur–Weyl 双対性は repo に無い |
+| `compact_group_semisimple` | コンパクト位相群の連続表現で repo 外 |
+| `cyclotomic_integer_house_le_two` / `_between_two_and_76_33` | Calegari–Morrison–Snyder Thm 1.0.5 — repo の `GaloisRationalInteger` は別内容 (指標積の有理整数性) |
+| `glauberman_zStar` / `gorenstein_walter` / `brauer_splitting_field` | Tier C (§5) |
+| `schreier_conjecture` / `five_transitive_card_classification` | CFSG 依存 |
+| `higman_infinite_simple` / `novikov_unsolvable` | 組合せ群論で無関係 |
+
+---
+
+## §3. Tier A — 今すぐ proposal 可 (ready-now、新規 problem 提案)
+
+いずれも実 sorry 0。**AxiomsCheck 登録の有無で proposal 前作業が変わる** (未登録は proposal 前に
 `#print axioms` で axiom-clean を確定)。2026-07-22 に 34 件全て存続を再検証済 (file 移動軽微 3 件)。
 
 ### §3.1 最優先 5 (bespoke def ほぼ 0)
@@ -143,7 +197,7 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 | 21 | Huppert V.8.15 特別版 (定常点安定化⇒巡回+FPF) | `Peterfalvi.Appendices.Huppert.pGroup_cyclic_fixedPointFree` | Peterfalvi/Appendices/Huppert.lean:720 | :8090 | medium | ★ |
 | 22 | Peterfalvi 付録 I Prop 2 (半線形性つき体構造) | `Peterfalvi.Appendices.Huppert.exists_field_semilinear` | Appendices/SemilinearField.lean:199 | :8870 | high | ★ |
 | 23 | 忠実既約表現⇒中心巡回 (Gorenstein 3.2.2) | `RepresentationTheory.isCyclic_center_of_faithful_irreducible` | RepresentationTheory/AbsolutelyIrreducible.lean:239 | :5481 | high | ★ (易しめ枠) |
-| 24 | \|SL(2,q)\| = q(q−1)(q+1) | `GroupTheory.SpecificGroups.ProjectiveSpecialLinear.natCard_specialLinearGroup_fin_two` | …/RootGroupSylow.lean:106 | :355 | high | ★ (提出時 vestigial `[CharP F 2]` を外す) |
+| 24 | \|SL(2,q)\| = q(q−1)(q+1) | `GroupTheory.SpecificGroups.ProjectiveSpecialLinear.natCard_specialLinearGroup_fin_two` | …/RootGroupSylow.lean:106 | :355 | high | ★ (proposal 時 vestigial `[CharP F 2]` を外す) |
 | 25 | Thompson critical subgroup (G 5.3.11) | `GroupTheory.isCritical_exists` | GroupTheory/CriticalSubgroup.lean:434 | ✅ 登録済 (2026-07-22) | medium | ★★ (docstring 過大表現を写さない) |
 | 26 | **Hall の定理 E/C/D** (可解群) | `Isaacs.Ch03.hall_E_exists`/`hall_C`/`hall_D` | Ch03_SplitExtensions/Basic.lean:1002/1375/1675 | :954/1690/1694 | medium | ★★★ |
 | 27 | Thompson Frobenius 核冪零 (subgroup-pair 形) | `Isaacs.Ch06.IsFrobeniusGroup.isNilpotent_kernel` | Ch06/KernelNilpotent.lean:382 | :1131 | medium | ★ (#4 action 形を優先) |
@@ -182,7 +236,7 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 | BG Cor 1.12 (Ω₁-剛性) | `BG.Ch1.S01.corollary_1_12` | BG/…/S01_Solvable.lean:474 | :2822 | 重い前提 2 本に全面依存 |
 | BG App.C Lemma C.2 | `BG.AppC.NormSet.lemmaC2` | BG/AppC_LemmaC2.lean:25 | :5400 | 条件(A)仮説 `_hA` 未使用 (書籍より強い) |
 | Huppert (Peterfalvi 付録 I Prop 1) | `Peterfalvi.Appendices.Huppert.fitting_cyclic_fixedPointFree` | Appendices/Huppert.lean:1305 | :8093 | 焼き込めば実質 strong |
-| Peterfalvi 付録 I Prop 2(b) | `…Huppert.exists_injective_semilinear_companion` | Appendices/SemilinearField.lean:520 | :8885 | 単独提出不可・#22 とセット |
+| Peterfalvi 付録 I Prop 2(b) | `…Huppert.exists_injective_semilinear_companion` | Appendices/SemilinearField.lean:520 | :8885 | 単独 proposal 不可・#22 とセット |
 | Peterfalvi 付録 C Prop 2 既約性段 | `…NearFields.rightMulAction_irreducible_of_index_two` | Appendices/NearFields.lean:405 | :8901 | 近体系を出すならこちら |
 | Suzuki 群 Sz(q) 単純性 | `GroupTheory.SpecificGroups.Suzuki.standardPermGroup_isSimpleGroup` | …/Suzuki/Simplicity.lean:268 | :918 | 伝説級。`∧ \|G\|=q²(q²+1)(q−1)` 併記推奨・証明込 preamble 600–700 行 |
 | \|Sz(q)\|=q²(q²+1)(q−1) | `…Suzuki.natCard_standardPermGroup` | …/Suzuki/Bruhat.lean:673 | :852 | 単純性と Bruhat 共有 (独立でない) |
@@ -199,23 +253,24 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 
 ---
 
-## §4. Tier B — frontier 完成で submit 可 (arrives-on-completion)
+## §4. Tier B — frontier 完成で届く (arrives-on-completion; `brauer_suzuki` のみ proof submit、他は proposal)
 
 進捗 % は原文ステップ被覆で測定 (scaffold 数でない)、敵対的検証済。
 
-### §4.1 🎯 `brauer_suzuki` — 既存**未解決** problem を「解答」できる唯一の frontier
+### §4.1 🎯 `brauer_suzuki` — 唯一の「既存未解決を proof submit」候補 (Q₈ 凍結解除待ち)
 
-- **issue [9318](../../issues/9318-brauer-suzuki-theorem.md)** (lane c、2026-07-22 b→c 移管)。
+- **issue [9318](../../issues/closed/9318-brauer-suzuki-theorem.md) は 2026-07-23 closed**
+  (cyclic + |T|≥16 完成)。残 blocker は **issue
+  [0147](../../issues/pending/0147-q8-modular-char-theory-frozen.md) (Q₈ case、凍結)** のみ。
 - **定理**: Brauer–Suzuki (1959)。Sylow-2 が cyclic/一般化四元数 ⟹ `G = O_{2'}(G)·C_G(u)`。
   CFSG 礎石補題。Gorenstein Ch.12 (例外指標論)。
-- **eval**: 既存**未解決** `brauer_suzuki` (solver 0) に直接一致 → 完成すれば**提案でなく解答**。
-- **進捗 ≈ 38%**: cyclic 版完全証明済 (`brauerSuzuki_of_isCyclic_sylowTwo`, BrauerSuzuki.lean:47)。
-  四元数版は Gorenstein Lem 1.2→1.6 landing (Setup/Normalizer/TISubset/Character.lean 各 0 sorry・
-  axiom-clean 登録済)。**最難所 = 例外指標 Lem 1.4–1.5 が完了** (θ*=1_G+χ₁−χ 分解)。
-- **残り**: Lem 1.7 (β(y) 対合対 counting) → (9.4.2) class-sum 構造定数接続 → Lem 1.8–1.9 算術 →
-  純群論 endgame (M=⟨対合⟩⊴G, Burnside) → 一般四元数仮説→setup 橋 → top-level 組立 →
-  消費点 `NearFields.lean:789` の sorry 除去。⚠ Q8 (|S|=8) case は Gorenstein 1968 の modular 依存
-  で research-adjacent。target `brauerSuzuki` は未作成、active leaf `BrauerSuzukiCharacter.lean`。
+- **eval**: 既存**未解決** `brauer_suzuki` (solver 0、2026-07-24 実測) に一致 → 完成すれば
+  proposal でなく proof submit。⚠ eval statement は `n ≥ 3` 全体 = **Q₈ (n=3) を含む**ので、
+  凍結解除・完成が前提条件。詳細 = §2.5「凍結解除待ち」。
+- **repo 現況**: cyclic 版 `brauerSuzuki_of_isCyclic_sylowTwo` + 四元数 |T|≥16 版
+  `brauerSuzuki_of_quaternionSylow` + 組立 `RankOneHypothesis.brauerSuzuki`
+  (RankOneAffineModel.lean:313) まで完成。唯一の実 sorry = `brauerSuzuki_quaternionSylow_q8`
+  (同 :294、modular 指標理論、`notes/meta/q8_modular_char_theory_frozen_project.md`)。
 
 ### §4.2 `feit_sibley_coherence` — Feit–Sibley 定理 (提案候補)
 
@@ -231,8 +286,8 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 ### §4.3 Suzuki Zassenhaus 群分類 (Theorem A) — 遠い提案候補
 
 - **issue [2053](../../issues/2053-pf-suzuki-theorem-b.md)** (lane b) は **Theorem B (First Case) のみ**
-  産出 = Theorem A への帰納の 1 case、単独 submit 不可。
-- **提出可能な名前付き定理 = Theorem A** (Suzuki 1962: 奇指数正規 L≅PSL(2,q)/Sz(q)/PSU(3,q))。
+  産出 = Theorem A への帰納の 1 case、単独 proposal 不可。
+- **proposal 可能な名前付き定理 = Theorem A** (Suzuki 1962: 奇指数正規 L≅PSL(2,q)/Sz(q)/PSU(3,q))。
   自然な eval id = `suzuki_zassenhaus_classification`。
 - **進捗**: Theorem B ≈30% (17 step 中 (1)–(6) landing、(7) plan のみ、(8)–(17) 未着手で hard endgame)。
   **Theorem A 全体 ≈15–20%** (Ch.III/IV 未着手・帰納組立未記述)。⚠ `brauer_suzuki` と混同しない
@@ -273,7 +328,7 @@ honest に記録 (安易に「近い」と誤認しない)。
 | `NearFields.nearField_field_structure_of_index_two` | weak — 見送り | 仮説 `A`/`hcomm`/`hidx` が結論に効かない (3 仮説削っても解ける実測) |
 | `Huppert.exists_field_of_irreducible` (付録 I Prop 2(a)) | weak — 見送り | `ψ`/`hirr` が結論に現れず GaloisField 経由で解ける。#22 に差替済 |
 | operator 群 Maschke (`exists_aInvariant_complement…`) | weak — 見送り | 核は mathlib `MonoidAlgebra.Submodule.exists_isCompl`。repo 分は packaging |
-| `AppC.NormSet.normOneFrobenius_isFrobeniusGroup` | weak — 単独提出せず | 番号なし補助構成 |
+| `AppC.NormSet.normOneFrobenius_isFrobeniusGroup` | weak — 単独 proposal せず | 番号なし補助構成 |
 | Peterfalvi (1.2) `irreducibleCharacter_apply_eq_zero…` | weak — 見送り | 前提を与えないと解不能、与えると残り ~90 行帳簿 |
 | Peterfalvi (5.7) `coherent_of_constant_degree` | weak — 見送り | bespoke 15+・6 ファイル焼き込み、かつ特殊化版で「(5.7)」称は過大 |
 | Suzuki `Hypothesis.sylowTwo_isMulCommutative_or_isSuzuki2Group` | weak — 参考枠 | 20 フィールド bespoke 仮説束で独立定理として読めない |
@@ -323,12 +378,14 @@ per_page 付き 2 ページで (1 回の要約 fetch は後半を捏造する事
 1. ✅ **(2026-07-22 完了) AxiomsCheck 未登録の ready-now 10 件を登録** — ZJ / Replacement /
    Galois–Burnside / Jordan / PSL 単純性 / `isCritical_exists` / `transfer_transfer` /
    Ch01 Fitting 冪零性・最大性 / `span_range_representation_eq_top`。全件 `lake build
-   OddOrder.AxiomsCheck` で `depends on 3 axiom(s), all in allowlist` を確認。提出前の手動
+   OddOrder.AxiomsCheck` で `depends on 3 axiom(s), all in allowlist` を確認。proposal 前の手動
    `#print axioms` が不要になった。
-2. 🆕 ZJ 定理を提案 PR に (登録済ゆえ最有力)。
-3. Tier A 提案 PR: Jordan / Chermak–Delgado / Furtwängler / Thompson-FPF + 🆕 B.H.Neumann 位数 3
-   + 一般 Hall–Petresco (#16 差替)。提案先 merge、solver は他者開放 (feit_thompson 前例)。
-4. 🎯 9318 完走 → `brauer_suzuki` 解答 (Tier B 唯一の未解決落とし)。lane c 継続。
-5. stale docstring 掃除 (`burnside_p_pow_q_pow` の「local axiom 封じ込め」、`Ch07.normal_J` の
-   「Remaining local axioms」、`AppC_NormSet` の「to be formalized」、`brauer_permutation_lemma'`
-   の「Isaacs Thm 6.32」誤引用ほか) — 提出物に写すと誤解を招く。
+2. 🆕 **proof submit: Burnside p^aq^b** — workspace を切り self-contained 化 (§2.5)。
+3. 🆕 **proof submit: `brauer_character_in_cyclotomic`** — cyclotomic embedding packaging (§2.5)。
+4. ZJ 定理を proposal PR に (登録済ゆえ最有力)。
+5. Tier A proposal PR: Jordan / Chermak–Delgado / Furtwängler / Thompson-FPF + 🆕 B.H.Neumann 位数 3
+   + 一般 Hall–Petresco (#16 差替)。proposal merge 後、solver は他者開放 (feit_thompson 前例)。
+6. 🎯 issue 0147 解凍・Q₈ 完成 → `brauer_suzuki` proof submit (唯一の既存未解決落とし)。
+7. stale docstring 掃除 — `burnside_p_pow_q_pow` の「local axiom」は 2026-07-24 修正済; 残り =
+   `Ch07.normal_J` の「Remaining local axioms」、`AppC_NormSet` の「to be formalized」、
+   `brauer_permutation_lemma'` の「Isaacs Thm 6.32」誤引用ほか — 公開物に写すと誤解を招く。
