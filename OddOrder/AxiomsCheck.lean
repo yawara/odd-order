@@ -12681,6 +12681,11 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 -- Peterfalvi App.III Theorem (e) forward, model form (coordinate-line split, swap-equivariant)
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.nonempty_isomorphicOrderQModuleSplit_diagonalAuts
+-- Peterfalvi App.III Theorem (e) forward, IsTypeB form (issue 2052 close-out)
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeBData.nonempty_isomorphicOrderQModuleSplit
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.IsTypeB.exists_isomorphicOrderQModuleSplit
 -- Peterfalvi App.III Proposition 2 converse + kernel (every λ·σ is induced; kernel elem. abelian)
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.exists_aut_of_semilinear

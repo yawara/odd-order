@@ -22,10 +22,18 @@ inducing that pair (`exists_diagonalAut`): the compatibility identity
 `q(xa, xb) = xφ(x)·q(a, b)` of the type-B square map feeds the Lemma 1(c)
 sufficiency (`exists_mulEquiv_of_comp_squareMap_eq`).
 
-The isomorphic-split payload of Theorem (e) built from these
-automorphisms — the invariant summands `F × 0` and `0 × F` swapped by a
-`K`-equivariant isomorphism — is assembled downstream in this file's
-follow-up sections.
+The isomorphic-split payload of Theorem (e) is then assembled: the two
+coordinate lines `F × 0` and `0 × F` pull back to invariant complementary
+summands of the central quotient, swapped by a `K`-equivariant
+isomorphism (`nonempty_isomorphicOrderQModuleSplit_of_diagAction`, the
+general engine; `nonempty_isomorphicOrderQModuleSplit_diagonalAuts`, the
+model form), and the split transports along `TypeBData.equivModel` to any
+abstract type-B group (`TypeBData.nonempty_isomorphicOrderQModuleSplit` /
+`IsTypeB.exists_isomorphicOrderQModuleSplit` — the forward half of
+Theorem (e), issue 2052).  Combined with Lemma U
+(`OrderQModuleSplit.nonempty_summandEquiv_of_isomorphic`) this makes the
+summands of *any* invariant split equivariantly isomorphic whenever the
+actor satisfies the freeness/cardinality hypotheses there.
 -/
 
 set_option autoImplicit false
@@ -252,25 +260,28 @@ private theorem quotient_action_eq (hε : epsilon ≠ 0)
   rw [h1, quotientCenterEquiv_mk, quotientCenterEquiv_mk]
   exact hx e
 
+omit [Finite F] in
 open OddOrder.GroupTheory OddOrder.Isaacs.Ch03 in
-/-- **Peterfalvi Appendix III, Theorem (e), forward half, model form**
-(p. 141): for the type-B model the central quotient splits as the direct
-sum of the two coordinate lines `F × 0` and `0 × F`, which are invariant
-under the diagonal actor and equivariantly isomorphic via the coordinate
-swap. -/
-theorem nonempty_isomorphicOrderQModuleSplit_diagonalAuts
-    (hε : epsilon ≠ 0) :
-    Nonempty (IsomorphicOrderQModuleSplit
-      (diagonalAuts phi epsilon).subtype
-      (Subgroup.center (TypeBModel phi epsilon))
-      (IsAInvariant.of_characteristic _)) := by
+/-- **The two-line split from a diagonalizable action** (the engine of the
+Theorem (e) forward half): if the central quotient of `G` is identified
+with the plane `F × F` so that every element of the actor acts diagonally
+by a unit, and the center has order `|F|`, then the two coordinate lines
+pull back to an invariant split with equivariantly isomorphic summands. -/
+theorem nonempty_isomorphicOrderQModuleSplit_of_diagAction
+    {G : Type*} [Group G] {K : Type*} [Group K] (act : K →* MulAut G)
+    (χ : (G ⧸ Subgroup.center G) ≃* Multiplicative (F × F))
+    (hdiag : ∀ k : K, ∃ x : Fˣ,
+      ∀ y : G ⧸ Subgroup.center G,
+        (χ ((IsAInvariant.quotientMulAutHom
+          (IsAInvariant.of_characteristic act) k) y)).toAdd =
+          ((x : F) * (χ y).toAdd.1, (x : F) * (χ y).toAdd.2))
+    (hZcard : Nat.card ↥(Subgroup.center G) = Nat.card F) :
+    Nonempty (IsomorphicOrderQModuleSplit act (Subgroup.center G)
+      (IsAInvariant.of_characteristic act)) := by
   classical
-  set χ := quotientCenterEquiv phi epsilon hε with hχdef
-  set L : Subgroup (TypeBModel phi epsilon ⧸
-      Subgroup.center (TypeBModel phi epsilon)) :=
+  set L : Subgroup (G ⧸ Subgroup.center G) :=
     (leftLine (F := F)).comap χ.toMonoidHom with hLdef
-  set R : Subgroup (TypeBModel phi epsilon ⧸
-      Subgroup.center (TypeBModel phi epsilon)) :=
+  set R : Subgroup (G ⧸ Subgroup.center G) :=
     (rightLine (F := F)).comap χ.toMonoidHom with hRdef
   have hmemL : ∀ y, y ∈ L ↔ (χ y).toAdd.2 = 0 := fun y => by
     rw [hLdef, Subgroup.mem_comap, mem_leftLine_iff]
@@ -279,8 +290,7 @@ theorem nonempty_isomorphicOrderQModuleSplit_diagonalAuts
     rw [hRdef, Subgroup.mem_comap, mem_rightLine_iff]
     exact Iff.rfl
   -- elementary abelian quotient
-  have hEA : IsElementaryAbelian 2
-      (TypeBModel phi epsilon ⧸ Subgroup.center (TypeBModel phi epsilon)) := by
+  have hEA : IsElementaryAbelian 2 (G ⧸ Subgroup.center G) := by
     constructor
     · intro a b
       apply χ.injective
@@ -295,32 +305,26 @@ theorem nonempty_isomorphicOrderQModuleSplit_diagonalAuts
       · rw [Prod.smul_snd, two_nsmul, CharTwo.add_self_eq_zero, Prod.snd_zero]
   -- invariance of the coordinate lines
   have hLinv : IsAInvariant
-      (IsAInvariant.quotientMulAutHom (IsAInvariant.of_characteristic
-        (diagonalAuts phi epsilon).subtype)) L := by
+      (IsAInvariant.quotientMulAutHom
+        (IsAInvariant.of_characteristic act)) L := by
     rw [isAInvariant_iff_smul_mem]
     intro k y hy
-    obtain ⟨x, hx⟩ := k.2
+    obtain ⟨x, hx⟩ := hdiag k
     rw [hmemL] at hy ⊢
-    have h2 := congrArg Prod.snd (quotient_action_eq phi epsilon hε k hx y)
+    have h2 := congrArg Prod.snd (hx y)
     simp only at h2
     rw [h2, hy, mul_zero]
   have hRinv : IsAInvariant
-      (IsAInvariant.quotientMulAutHom (IsAInvariant.of_characteristic
-        (diagonalAuts phi epsilon).subtype)) R := by
+      (IsAInvariant.quotientMulAutHom
+        (IsAInvariant.of_characteristic act)) R := by
     rw [isAInvariant_iff_smul_mem]
     intro k y hy
-    obtain ⟨x, hx⟩ := k.2
+    obtain ⟨x, hx⟩ := hdiag k
     rw [hmemR] at hy ⊢
-    have h1 := congrArg Prod.fst (quotient_action_eq phi epsilon hε k hx y)
+    have h1 := congrArg Prod.fst (hx y)
     simp only at h1
     rw [h1, hy, mul_zero]
   -- cardinalities
-  have hZcard : Nat.card ↥(Subgroup.center (TypeBModel phi epsilon)) =
-      Nat.card F := by
-    rw [center_typeBModel phi epsilon hε]
-    exact (Nat.card_congr (MonoidHom.ofInjective
-      (QuadraticExtension.extension (typeBQuadraticMap phi epsilon)
-        (Module.finBasis (ZMod 2) (F × F))).inl_injective).toEquiv).symm
   have hLLcard : Nat.card ↥(leftLine (F := F)) = Nat.card F := by
     refine Nat.card_congr ⟨fun s => s.val.toAdd.1,
       fun a => ⟨Multiplicative.ofAdd (a, 0), (mem_leftLine_iff _).mpr rfl⟩,
@@ -391,10 +395,7 @@ theorem nonempty_isomorphicOrderQModuleSplit_diagonalAuts
   set swapM : Multiplicative (F × F) ≃* Multiplicative (F × F) :=
     AddEquiv.toMultiplicative (AddEquiv.prodComm (M := F) (N := F))
     with hswapdef
-  set σ : (TypeBModel phi epsilon ⧸
-        Subgroup.center (TypeBModel phi epsilon)) ≃*
-      (TypeBModel phi epsilon ⧸
-        Subgroup.center (TypeBModel phi epsilon)) :=
+  set σ : (G ⧸ Subgroup.center G) ≃* (G ⧸ Subgroup.center G) :=
     (χ.trans swapM).trans χ.symm with hσdef
   have hχσ : ∀ y, χ (σ y) = swapM (χ y) := fun y => χ.apply_symm_apply _
   have hswapAdd : ∀ z : Multiplicative (F × F),
@@ -413,22 +414,160 @@ theorem nonempty_isomorphicOrderQModuleSplit_diagonalAuts
       rw [σ.apply_symm_apply]
       exact hy
   -- equivariance of the swap
-  have hactval : ∀ (k : ↥(diagonalAuts phi epsilon)) y,
+  have hactval : ∀ (k : K) y,
       σ ((IsAInvariant.quotientMulAutHom (IsAInvariant.of_characteristic
-        (diagonalAuts phi epsilon).subtype) k) y) =
+        act) k) y) =
       (IsAInvariant.quotientMulAutHom (IsAInvariant.of_characteristic
-        (diagonalAuts phi epsilon).subtype) k) (σ y) := by
+        act) k) (σ y) := by
     intro k y
-    obtain ⟨x, hx⟩ := k.2
+    obtain ⟨x, hx⟩ := hdiag k
     apply χ.injective
     apply Multiplicative.toAdd.injective
-    have hL' := quotient_action_eq phi epsilon hε k hx y
-    have hR' := quotient_action_eq phi epsilon hε k hx (σ y)
+    have hL' := hx y
+    have hR' := hx (σ y)
     rw [hχσ, hswapAdd, hL', hR', hχσ, hswapAdd]
   exact ⟨⟨⟨hEA, L, R, hLinv, hRinv,
     hLcard.trans hZcard.symm, hRcard.trans hZcard.symm, hcompl⟩,
     ⟨(MulEquiv.subgroupMap σ L).trans (MulEquiv.subgroupCongr hmapσ),
       fun k s => Subtype.ext (hactval k s.val)⟩⟩⟩
+
+
+open OddOrder.GroupTheory OddOrder.Isaacs.Ch03 in
+/-- **Peterfalvi Appendix III, Theorem (e), forward half, model form**
+(p. 141): for the type-B model the central quotient splits as the direct
+sum of the two coordinate lines `F × 0` and `0 × F`, which are invariant
+under the diagonal actor and equivariantly isomorphic via the coordinate
+swap. -/
+theorem nonempty_isomorphicOrderQModuleSplit_diagonalAuts
+    (hε : epsilon ≠ 0) :
+    Nonempty (IsomorphicOrderQModuleSplit
+      (diagonalAuts phi epsilon).subtype
+      (Subgroup.center (TypeBModel phi epsilon))
+      (IsAInvariant.of_characteristic _)) := by
+  refine nonempty_isomorphicOrderQModuleSplit_of_diagAction
+    (diagonalAuts phi epsilon).subtype
+    (quotientCenterEquiv phi epsilon hε) (fun k => ?_) ?_
+  · obtain ⟨x, hx⟩ := k.2
+    exact ⟨x, fun y => quotient_action_eq phi epsilon hε k hx y⟩
+  · rw [center_typeBModel phi epsilon hε]
+    exact (Nat.card_congr (MonoidHom.ofInjective
+      (QuadraticExtension.extension (typeBQuadraticMap phi epsilon)
+        (Module.finBasis (ZMod 2) (F × F))).inl_injective).toEquiv).symm
+/-! ### Transport to an abstract type-B group -/
+
+omit [Finite F] [CharP F 2] in
+/-- A group isomorphism carries the center onto the center. -/
+theorem map_center_mulEquiv {G H : Type*} [Group G] [Group H] (e : G ≃* H) :
+    (Subgroup.center G).map ↑e = Subgroup.center H := by
+  ext h
+  rw [Subgroup.mem_map]
+  constructor
+  · rintro ⟨z, hz, rfl⟩
+    rw [Subgroup.mem_center_iff]
+    intro g
+    have hcomm := Subgroup.mem_center_iff.mp hz (e.symm g)
+    calc g * e z = e (e.symm g * z) := by
+          rw [map_mul, e.apply_symm_apply]
+      _ = e (z * e.symm g) := by rw [hcomm]
+      _ = e z * g := by rw [map_mul, e.apply_symm_apply]
+  · intro hh
+    refine ⟨e.symm h, ?_, e.apply_symm_apply h⟩
+    rw [Subgroup.mem_center_iff]
+    intro g
+    apply e.injective
+    rw [map_mul, map_mul, e.apply_symm_apply]
+    exact Subgroup.mem_center_iff.mp hh (e g)
+
+section Abstract
+
+variable {P : Type*} [Group P] (data : TypeBData P)
+
+local instance : Field data.F := data.fieldF
+local instance : Finite data.F := data.finiteF
+local instance : CharP data.F 2 := data.charTwoF
+local instance : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+
+open OddOrder.GroupTheory OddOrder.Isaacs.Ch03 in
+/-- **Peterfalvi Appendix III, Theorem (e), forward half** (p. 141): an
+abstract type-B group carries an invariant two-summand split of its
+central quotient with equivariantly isomorphic summands, for the
+transported diagonal actor. -/
+theorem TypeBData.nonempty_isomorphicOrderQModuleSplit :
+    Nonempty (IsomorphicOrderQModuleSplit
+      (Subgroup.map (MulAut.congr data.equivModel.symm).toMonoidHom
+        (diagonalAuts data.phi (data.epsilon : data.F))).subtype
+      (Subgroup.center P)
+      (IsAInvariant.of_characteristic _)) := by
+  classical
+  have hε : (data.epsilon : data.F) ≠ 0 := data.epsilon.ne_zero
+  have hcmap : (Subgroup.center P).map ↑data.equivModel =
+      Subgroup.center (TypeBModel data.phi (data.epsilon : data.F)) :=
+    map_center_mulEquiv data.equivModel
+  refine nonempty_isomorphicOrderQModuleSplit_of_diagAction _
+    ((QuotientGroup.congr _ _ data.equivModel hcmap).trans
+      (quotientCenterEquiv data.phi (data.epsilon : data.F) hε))
+    (fun k => ?_) ?_
+  · obtain ⟨Φ, hΦmem, hΦeq⟩ := k.2
+    obtain ⟨x, hx⟩ := hΦmem
+    refine ⟨x, fun y => ?_⟩
+    refine QuotientGroup.induction_on y fun p => ?_
+    have hkval : (k : MulAut P) p =
+        data.equivModel.symm (Φ (data.equivModel p)) := by
+      rw [← hΦeq]
+      rfl
+    have hact : (IsAInvariant.quotientMulAutHom
+        (IsAInvariant.of_characteristic
+          (Subgroup.map (MulAut.congr data.equivModel.symm).toMonoidHom
+            (diagonalAuts data.phi (data.epsilon : data.F))).subtype) k)
+        ((p : P ⧸ Subgroup.center P)) =
+        (((k : MulAut P) p : P) : P ⧸ Subgroup.center P) := rfl
+    have hmodel := quotient_action_eq data.phi (data.epsilon : data.F) hε
+      ⟨Φ, x, hx⟩ hx
+      ((data.equivModel p : TypeBModel data.phi (data.epsilon : data.F)) :
+        TypeBModel data.phi (data.epsilon : data.F) ⧸
+          Subgroup.center (TypeBModel data.phi (data.epsilon : data.F)))
+    have hmact : (IsAInvariant.quotientMulAutHom
+        (IsAInvariant.of_characteristic
+          (diagonalAuts data.phi (data.epsilon : data.F)).subtype)
+        (⟨Φ, x, hx⟩ : ↥(diagonalAuts data.phi (data.epsilon : data.F))))
+        ((data.equivModel p : TypeBModel data.phi (data.epsilon : data.F)) :
+          TypeBModel data.phi (data.epsilon : data.F) ⧸
+            Subgroup.center (TypeBModel data.phi (data.epsilon : data.F))) =
+        ((Φ (data.equivModel p) :
+          TypeBModel data.phi (data.epsilon : data.F)) :
+          TypeBModel data.phi (data.epsilon : data.F) ⧸
+            Subgroup.center (TypeBModel data.phi (data.epsilon : data.F))) :=
+      rfl
+    rw [hact, hmact] at *
+    rw [MulEquiv.trans_apply, MulEquiv.trans_apply]
+    rw [hkval, QuotientGroup.congr_mk, QuotientGroup.congr_mk,
+      data.equivModel.apply_symm_apply]
+    exact hmodel
+  · have h1 : Nat.card ↥(Subgroup.center P) =
+        Nat.card ↥(Subgroup.center
+          (TypeBModel data.phi (data.epsilon : data.F))) :=
+      Nat.card_congr (Subgroup.centerCongr data.equivModel).toEquiv
+    rw [h1, center_typeBModel _ _ hε]
+    exact (Nat.card_congr (MonoidHom.ofInjective
+      (QuadraticExtension.extension
+        (typeBQuadraticMap data.phi (data.epsilon : data.F))
+        (Module.finBasis (ZMod 2)
+          (data.F × data.F))).inl_injective).toEquiv).symm
+
+/-- **Peterfalvi Appendix III, Theorem (e), forward half, `IsTypeB`
+form** (p. 141; issue 2052): a type-B group admits an actor subgroup of
+its automorphism group together with an invariant two-summand split of
+the central quotient whose summands are `K`-equivariantly isomorphic. -/
+theorem IsTypeB.exists_isomorphicOrderQModuleSplit
+    {P : Type*} [Group P] (h : IsTypeB P) :
+    ∃ K : Subgroup (MulAut P),
+      Nonempty (IsomorphicOrderQModuleSplit K.subtype
+        (Subgroup.center P)
+        (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic K.subtype)) := by
+  obtain ⟨data⟩ := h
+  exact ⟨_, data.nonempty_isomorphicOrderQModuleSplit⟩
+
+end Abstract
 
 end
 
