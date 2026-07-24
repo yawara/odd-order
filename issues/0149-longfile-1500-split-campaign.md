@@ -38,7 +38,6 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
 |---|---|
 | `AxiomsCheck.lean` | 12635 |
 | `BG/Ch1_Preliminary/S03f_Thm36.lean` | 3822 |
-| `BG/Ch1_Preliminary/S04g_Thm418.lean` | 1965 |
 | `Peterfalvi/S10_MinimalSimpleBasic.lean` | 1888 |
 | `Isaacs/Ch07_ThompsonSubgroup/S7B2_NormalJ_PComplement.lean` | 1883 |
 | `Isaacs/Ch06_FrobeniusActions/FrobeniusActionTI.lean` | 1875 |
@@ -97,6 +96,9 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
 
 - ✅ `Peterfalvi/Appendices/FeitSibleyTheorem.lean` (1884) — 2026-07-24 prefix-split:
   `FeitSibleySsetCoherence.lean` (892) + 残 1022、両方 stamp 不要化 (issue 0141 close)。
+- ✅ `BG/Ch1_Preliminary/S04g_Thm418.lean` (1965) — 2026-07-24 prefix-split:
+  `S04g_Thm418Core.lean` (958、Thm 4.18 本体+rank 系) + 残 1008 (p-complement 転送 +
+  CharacteristicSylow series 層)、両方 stamp 不要化・下流 import 無変更。
 - ➕ `Higman/Suzuki2Groups/HigmanLowerCentralSpectrum.lean` (1501) を worklist 追加 —
   wc 1499 (lastLine 1500) は linter 境界仕様で unstamped だと警告になるため stamp 1600 を付与。
 
