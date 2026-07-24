@@ -12664,3 +12664,10 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.conj_ne_refl
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.mul_conj
+-- Peterfalvi App.III Proposition 2 (iii) (α ↦ f_α homomorphism; kernel = inducing-id subgroup)
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.autQuotientHom
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.ker_autQuotientHom
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.isElementaryAbelian_ker_autQuotientHom

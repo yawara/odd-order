@@ -110,27 +110,29 @@ Pf 側の再掲は書かない。
         AxiomsCheck 2 assert。実装知見: kernelCoordinate は
         `MonoidHom.ofInjective .symm` で取ると `simp [定義]` 一発で
         inl_kernelCoordinate が閉じる。
-  - [ ] **(iii) 誘導写像機構** — **WIP (2026-07-24 hub、未 commit)**: worktree に
-        `Suzuki2Groups/AutomorphismInducedMaps.lean` (untracked、~300 行) が下書き済み。
-        構成は完成形: `center_eq_range_inl` (hrad) / `map_mem_range_inl_iff`
-        (center characteristic 経由) / `autQuotientFun`・`autKernelFun` /
-        `map_inl`・`map_quotient` / 加法性 2 本 / `autQuotientAddEquiv`・
-        **`autQuotientHom : MulAut X →* AddAut V`** / `autKernel_squareMap`
-        (compat g∘q=q∘f) / `inducesId_of_autQuotient_id` (hspan) /
-        `ker_autQuotientHom` = inducingIdAuts / `isElementaryAbelian_ker`。
-        **残エラー修正 (診断済み、未適用)**:
-        ① `map_inl` の statement を `(w : W)` + `ofAdd w` 形に変更 (現行の
-        `w.toAdd` 形は rw の syntactic match が効かない; 使用箇所 =
-        autKernelFun_add / inducesId の inl 節は `ofAdd_toAdd` で橋渡し)
-        ② `autKernel_squareMap` は rw でなく `change` + 最後 `exact hW.symm`
-        (defeq は exact に任せる) ③ `AddSubgroup.closure_induction` の case 名は
-        additive で `mem/zero/add/neg` (one/mul/inv でない) ④ 残る `show` 3 箇所
-        (autQuotientFun_add / inducesId / ker) を `change` に (linter.style.show)。
-        **適用済み**: Lean 4 の section 変数は proof 内使用だと `include hrad` が
-        必要 (defs は include 前に配置) / `Mathlib.Algebra.Group.Aut` import
-        (AddAut の Group instance) / map_mem_range_inl_iff の二重 rw → 単一 rw。
-        完了後: OddOrder.lean 配線 + AxiomsCheck (autQuotientHom /
-        ker_autQuotientHom / isElementaryAbelian_ker) を忘れない。
+  - [x] **(iii) 誘導写像機構** ✅ 2026-07-24 (hub): 新 leaf
+        `Suzuki2Groups/AutomorphismInducedMaps.lean` (hub 経由配線済) —
+        `center_eq_range_inl` (hrad = polarization 非退化) /
+        `map_mem_range_inl_iff` (center characteristic;
+        `characteristic_iff_comap_eq.mp inferInstance` 形) /
+        `autQuotientFun`・`autKernelFun` / `map_inl`・`map_quotient` /
+        加法性 2 本 / `autQuotientAddEquiv` /
+        **`autQuotientHom : MulAut X →* Multiplicative (AddAut V)`** /
+        `autKernel_squareMap` (compat g∘q=q∘f) /
+        `inducesId_of_autQuotient_id` (hspan) / `ker_autQuotientHom` =
+        inducingIdAuts / `isElementaryAbelian_ker_autQuotientHom`。
+        AxiomsCheck 3 assert (autQuotientHom / ker / isElementaryAbelian)。
+        診断済み修正 ①〜④ (map_inl の ofAdd 形 statement / squareMap は
+        exact 任せ / additive case 名 mem-zero-add-neg / show→change) は
+        全て有効だった。⚠ 追加で必要だった 2 点: (α) 現 mathlib に
+        `Mathlib.Algebra.Group.Aut` は無い — MulAut/AddAut は
+        `Mathlib.Algebra.Group.End` (β) **AddAut は 2026-05-26 に加法群化**
+        (mul_def→add_def 等 deprecated alias 化) — `MulAut X →* AddAut V` は
+        型エラーで、codomain を `Multiplicative (AddAut V)` に包む
+        (Lemma 1(d) の `Multiplicative (V →+ W)` と同じ流儀; map_mul' は
+        AddEquiv ext + `congrArg Multiplicative.ofAdd`、apply 補題は
+        `.toAdd v` 形)。`Characteristic.fixed` も直接射影不可 →
+        `characteristic_iff_comap_eq.mp inferInstance` (repo 慣用形)。
   - [ ] **(iv) norm 全射性**: `FieldModel ε` の `q(x) = x·conj x` は F に全射
         (units 準同型 + cyclic 位数勘定 or mathlib 既存を探す)。kernel 記述
         (iii)+(ii) に接続。
