@@ -9,6 +9,10 @@ import Mathlib.Algebra.Group.End
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.Algebra.Ring.AddAut
 import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.FieldTheory.Perfect
+import Mathlib.LinearAlgebra.QuadraticForm.Basic
+import Mathlib.Algebra.CharP.Two
+import Mathlib.Algebra.CharP.Algebra
 
 /-!
 # Semilinear extension: additive automorphisms multiplicative on a generating scalar set
@@ -426,6 +430,225 @@ theorem card_autProd_eq_finrank_bilinMap [Finite F]
   rw [← Nat.card_eq_fintype_card, Nat.card_prod,
     IsGalois.card_aut_eq_finrank (ZMod p) F,
     finrank_bilinMap_self_eq F p]
+
+/-! ### Peterfalvi Appendix III, Lemma 2(c) — independence side
+
+The `𝔽₂`-quadratic maps `x ↦ σ(x)·τ(x)`: a vanishing linear combination over
+ordered pairs has symmetric coefficients (`autMulQuadratic_coeff_symm`, via
+polarization and Lemma 2(b)), and its diagonal coefficients vanish
+(`autMulQuadratic_diag_eq_zero`, via Frobenius surjectivity and Lemma 2(a)).
+Together these say the family over subsets `{σ, τ}` of size `1` or `2` is
+linearly independent — the book's Lemma 2(c) (which is genuinely
+characteristic-`2`).  The spanning/`Module.Basis` packaging is deferred with
+the 2(b) note below. -/
+
+section QuadraticChar2
+
+variable (F : Type*) [Field F] [Algebra (ZMod 2) F]
+
+/-- The quadratic map `x ↦ σ(x)·τ(x)` attached to a pair of field
+automorphisms (characteristic `2`). -/
+noncomputable def autMulQuadraticMap (σ τ : F ≃ₐ[ZMod 2] F) :
+    QuadraticMap (ZMod 2) F F where
+  toFun x := σ x * τ x
+  toFun_smul a x := by
+    rcases (by decide : ∀ a : ZMod 2, a = 0 ∨ a = 1) a with h | h <;> subst h
+    · simp
+    · simp
+  exists_companion' :=
+    ⟨algAutMulBilin F 2 σ τ + algAutMulBilin F 2 τ σ, by
+      intro x y
+      simp only [map_add, LinearMap.add_apply, algAutMulBilin_apply]
+      ring⟩
+
+@[simp] theorem autMulQuadraticMap_apply (σ τ : F ≃ₐ[ZMod 2] F) (x : F) :
+    autMulQuadraticMap F σ τ x = σ x * τ x :=
+  rfl
+
+/-- **Lemma 2(c), polarization step**: a vanishing combination of the
+`σ(x)·τ(x)` has symmetric coefficients.  (Polarizing kills the diagonal in
+characteristic `2` and leaves the Lemma 2(b) family off the diagonal.) -/
+theorem autMulQuadratic_coeff_symm [Finite F]
+    (c : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) → F)
+    (hc : haveI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+      ∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        c στ • autMulQuadraticMap F στ.1 στ.2 = 0)
+    (σ τ : F ≃ₐ[ZMod 2] F) :
+    c (σ, τ) = c (τ, σ) := by
+  classical
+  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  haveI : CharP F 2 :=
+    charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
+  -- function-level vanishing at every point
+  have happ : ∀ z : F,
+      (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        c στ * (στ.1 z * στ.2 z)) = 0 := by
+    intro z
+    have h1 := congrArg (fun q => q z) hc
+    simpa [QuadraticMap.sum_apply, QuadraticMap.smul_apply, smul_eq_mul]
+      using h1
+  -- polarize: the cross terms carry the 2(b) family
+  have hpolar : ∀ x y : F,
+      (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        (c στ * (στ.1 x * στ.2 y) + c στ * (στ.1 y * στ.2 x))) = 0 := by
+    intro x y
+    have hxy := happ (x + y)
+    have hx := happ x
+    have hy := happ y
+    have hexp : ∀ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        c στ * (στ.1 (x + y) * στ.2 (x + y)) =
+          (c στ * (στ.1 x * στ.2 x) + c στ * (στ.1 y * στ.2 y)) +
+            (c στ * (στ.1 x * στ.2 y) + c στ * (στ.1 y * στ.2 x)) := by
+      intro στ
+      simp only [map_add]
+      ring
+    rw [Finset.sum_congr rfl fun στ _ => hexp στ, Finset.sum_add_distrib,
+      Finset.sum_add_distrib, hx, hy, add_zero, zero_add] at hxy
+    exact hxy
+  -- reorganize the swap term at scalar level
+  have hcombined : ∀ x y : F,
+      (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        (c στ + c (στ.2, στ.1)) * (στ.1 x * στ.2 y)) = 0 := by
+    intro x y
+    have hswap :
+        (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+          c στ * (στ.1 y * στ.2 x)) =
+        ∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+          c (στ.2, στ.1) * (στ.1 x * στ.2 y) := by
+      refine Fintype.sum_equiv (Equiv.prodComm _ _) _ _ fun στ => ?_
+      simp only [Equiv.prodComm_apply, Prod.swap]
+      ring
+    have h0 := hpolar x y
+    rw [Finset.sum_add_distrib, hswap, ← Finset.sum_add_distrib] at h0
+    rw [Finset.sum_congr rfl fun στ _ => (add_mul (c στ) (c (στ.2, στ.1))
+      (στ.1 x * στ.2 y)).symm] at h0
+    exact h0
+  -- Dedekind independence of the pair characters, directly in the function
+  -- space `F × F → F` (all instances are pointwise `Pi` ones — the nested
+  -- bilinear space never appears, dodging the isDefEq blowup)
+  have h0 : LinearIndependent F (fun f : (F × F) →* F => (f : F × F → F)) :=
+    linearIndependent_monoidHom (F × F) F
+  have hinj : Function.Injective
+      (fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
+        algAutPairChar F 2 στ.1 στ.2) := by
+    intro στ στ' h
+    have happ' : ∀ x y : F, στ.1 x * στ.2 y = στ'.1 x * στ'.2 y := fun x y =>
+      DFunLike.congr_fun h (x, y)
+    have h1 : ∀ x : F, στ.1 x = στ'.1 x := fun x => by
+      have := happ' x 1
+      simpa using this
+    have h2 : ∀ y : F, στ.2 y = στ'.2 y := fun y => by
+      have := happ' 1 y
+      simpa using this
+    exact Prod.ext (AlgEquiv.ext h1) (AlgEquiv.ext h2)
+  have hfun := h0.comp _ hinj
+  have hzero :
+      (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        (c στ + c (στ.2, στ.1)) •
+          ((fun f : (F × F) →* F => (f : F × F → F)) ∘
+            fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
+              algAutPairChar F 2 στ.1 στ.2) στ) = 0 := by
+    refine funext fun xy => ?_
+    have hxy := hcombined xy.1 xy.2
+    simpa [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, algAutPairChar]
+      using hxy
+  have hA := Fintype.linearIndependent_iff.mp hfun
+    (fun στ => c στ + c (στ.2, στ.1)) hzero (σ, τ)
+  have h2 : c (σ, τ) + c (τ, σ) = 0 := hA
+  have h3 : c (σ, τ) = (c (σ, τ) + c (τ, σ)) + c (τ, σ) := by
+    rw [add_assoc, CharTwo.add_self_eq_zero, add_zero]
+  rw [h2, zero_add] at h3
+  exact h3
+
+/-- **Lemma 2(c), diagonal step**: the diagonal coefficients of a vanishing
+combination vanish (Frobenius surjectivity reduces to Lemma 2(a)). -/
+theorem autMulQuadratic_diag_eq_zero [Finite F]
+    (c : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) → F)
+    (hc : haveI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+      ∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        c στ • autMulQuadraticMap F στ.1 στ.2 = 0)
+    (σ₀ : F ≃ₐ[ZMod 2] F) :
+    c (σ₀, σ₀) = 0 := by
+  classical
+  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  haveI : CharP F 2 :=
+    charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
+  have hsymm := autMulQuadratic_coeff_symm F c hc
+  have happ : ∀ z : F,
+      (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        c στ * (στ.1 z * στ.2 z)) = 0 := by
+    intro z
+    have h1 := congrArg (fun q => q z) hc
+    simpa [QuadraticMap.sum_apply, QuadraticMap.smul_apply, smul_eq_mul]
+      using h1
+  -- split off the diagonal; the off-diagonal cancels by the swap involution
+  have hdiag : ∀ z : F,
+      (∑ σ : F ≃ₐ[ZMod 2] F, c (σ, σ) * σ (z * z)) = 0 := by
+    intro z
+    have hsplit := happ z
+    rw [← Finset.sum_filter_add_sum_filter_not Finset.univ
+      (fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) => στ.1 = στ.2)] at hsplit
+    have hoff :
+        (∑ στ ∈ Finset.univ.filter
+            (fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) => ¬ στ.1 = στ.2),
+          c στ * (στ.1 z * στ.2 z)) = 0 := by
+      refine Finset.sum_involution (fun στ _ => (στ.2, στ.1)) ?_ ?_ ?_ ?_
+      · intro στ _
+        rw [show c (στ.2, στ.1) = c (στ.1, στ.2) from (hsymm στ.1 στ.2).symm,
+          show (στ.2, στ.1).1 z * (στ.2, στ.1).2 z = στ.1 z * στ.2 z from
+            mul_comm _ _,
+          show c (στ.1, στ.2) = c στ from rfl]
+        exact CharTwo.add_self_eq_zero _
+      · intro στ hστ _
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hστ
+        intro heq
+        exact hστ ((congrArg Prod.fst heq).symm)
+      · intro στ hστ
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hστ ⊢
+        exact fun h => hστ h.symm
+      · intro στ _
+        rfl
+    rw [hoff, add_zero] at hsplit
+    -- the diagonal sum, reindexed by the first coordinate
+    have hreindex :
+        (∑ στ ∈ Finset.univ.filter
+            (fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) => στ.1 = στ.2),
+          c στ * (στ.1 z * στ.2 z)) =
+        ∑ σ : F ≃ₐ[ZMod 2] F, c (σ, σ) * σ (z * z) := by
+      refine Finset.sum_nbij' (i := fun στ => στ.1) (j := fun σ => (σ, σ))
+        ?_ ?_ ?_ ?_ ?_
+      · intro στ _
+        exact Finset.mem_univ _
+      · intro σ _
+        simp
+      · intro στ hστ
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hστ
+        exact Prod.ext rfl hστ
+      · intro σ _
+        rfl
+      · intro στ hστ
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hστ
+        rw [map_mul]
+        have h1 : c στ = c (στ.1, στ.1) := congrArg c (Prod.ext rfl hστ.symm)
+        have h2 : στ.2 z = στ.1 z := congrArg (fun t => t z) hστ.symm
+        rw [h1, h2]
+    rw [hreindex] at hsplit
+    exact hsplit
+  -- Frobenius surjectivity turns `σ(z²)` into `σ(w)` for arbitrary `w`
+  have hlin : (∑ σ : F ≃ₐ[ZMod 2] F, c (σ, σ) • σ.toLinearMap) = 0 := by
+    refine LinearMap.ext fun w => ?_
+    obtain ⟨z, hz⟩ := (frobeniusEquiv F 2).surjective w
+    have hz2 : z * z = w := by
+      rw [← hz]
+      simp [frobeniusEquiv_apply, frobenius_def, pow_two]
+    have hd := hdiag z
+    rw [hz2] at hd
+    simpa [LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul] using hd
+  exact Fintype.linearIndependent_iff.mp
+    (linearIndependent_algAut_toLinearMap F 2)
+    (fun σ => c (σ, σ)) hlin σ₀
+
+end QuadraticChar2
 
 /-! **Lemma 2(b), packaging note.**  `linearIndependent_algAutMulBilin` +
 `card_autProd_eq_finrank_bilinMap` jointly state that the family

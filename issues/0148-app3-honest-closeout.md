@@ -58,13 +58,16 @@ Pf 側の再掲は書かない。
       `@Basis.mk` 全 instance 明示 / instance 径路の pin / mathlib 側の module-instance 整理待ち。
       (追記: spanning を `span_eq_top_of_card_eq_finrank` の theorem 形で出す試みも同じ
       isDefEq 発散 — bundle/spanning とも同根で pending。)
-      **(c) 残 — 設計メモ (2026-07-24)**: quadratic は σ(x)τ(x) 族 ({σ,τ} サイズ 1–2)。
-      index は Sym2 の和分割が Lean では重いので、**`Fintype.equivFin` で Aut に任意の順序を
-      引いて index = Aut ⊕ {(σ,τ) | e σ < e τ}** (対角 + 厳密対) を推奨。証明の 2 段:
-      (c1) polar 化 — `QuadraticMap.polarBilin` は線形、対角項の polar は char 2 で消える
-      (2στ = 0)、off-diag は `algAutMulBilin σ τ + algAutMulBilin τ σ` → (b) 独立性で
-      係数消滅; (c2) 残る対角和 Σ λ_σ σ(x²) = 0 に Frobenius 全射 (finite field で x↦x²
-      bijective) を前合成して (a) に帰着。
+      **(c) ✅ 2026-07-24 (hub、独立性側)**: `autMulQuadraticMap σ τ` (QuadraticMap (ZMod 2)、
+      companion = `algAutMulBilin στ + τσ`) / **`autMulQuadratic_coeff_symm`** (消える結合の
+      係数は対称 — polar 化で対角が char 2 消滅し、swap 再指数 + 積 monoid 指標の Dedekind
+      独立で閉じる) / **`autMulQuadratic_diag_eq_zero`** (対角係数消滅 — swap involution で
+      off-diag が打ち消し、`frobeniusEquiv` 全射で (a) に帰着)。ordered-pair 供述にしたので
+      Sym2/順序 index が不要になった (2 定理が合わせて「サイズ 1–2 部分集合族の独立性」)。
+      AxiomsCheck 2 assert。spanning 側は (b) と同じ packaging 繰延。
+      ⚠ 実装知見: 入れ子 `F →ₗ F →ₗ F` の module instance は `LinearMap.ext`/評価/`map'`/
+      `ker_eq_bot` どれも isDefEq 爆発 — **常に関数空間 (Pi) + MonoidHom 指標側で作業**し、
+      入れ子空間には (b) の of_comp 一撃でしか触れないこと。
 - [ ] **Proposition 1**: `B(n,1,ε)` が field model `q(x) = x·x̄` を許容する。
       `Types.lean` の `TypeBModel`/`typeBQuadraticMap` (φ, ε パラメータ) が
       土台。原文は `references/peterfalvi/pdf/08.0_pp_139_143_On_Suzuki_2-Groups.pdf`
