@@ -648,6 +648,139 @@ theorem autMulQuadratic_diag_eq_zero [Finite F]
     (linearIndependent_algAut_toLinearMap F 2)
     (fun σ => c (σ, σ)) hlin σ₀
 
+/-- **Peterfalvi Appendix III, Proposition 2, semilinear-classification core**
+(equations (3) and (4), p. 143).  Let `κ` be a nontrivial involutive
+automorphism of a finite field `F` of characteristic `2` and let
+`N(x) = x·κ(x)` be the associated norm.  If a nonzero `𝔽₂`-linear map
+`f : F → F` intertwines the norm against some `κ`-twisted linear combination
+of automorphisms — `∑ ρ, μ_ρ·ρ(N(x)) = N(f(x))` — then `f` is a single
+semilinear map `f = λ·σ` with `λ ≠ 0`, and `σ` commutes with `κ`.
+
+Proof: expand `f = ∑ σ λ_σ·σ` (Lemma 2(a)); both sides of the intertwining
+relation are combinations of the quadratic family `x ↦ α(x)·β(x)`, so
+Lemma 2(c) (`autMulQuadratic_diag_eq_zero` / `autMulQuadratic_coeff_symm`)
+yields the book's equations (3) `λ_α·κ(λ_{κα}) = 0` and (4)
+`λ_α·κ(λ_{κβ}) = λ_β·κ(λ_{κα})`, which kill every coefficient except one. -/
+theorem exists_smul_algAut_of_norm_intertwiner [Finite F]
+    (κ : F ≃ₐ[ZMod 2] F) (hκ1 : κ ≠ 1) (hκ2 : κ * κ = 1)
+    (f : F →ₗ[ZMod 2] F) (hf : f ≠ 0) (μ : (F ≃ₐ[ZMod 2] F) → F)
+    (hcompat : haveI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+      ∀ x : F, (∑ ρ : F ≃ₐ[ZMod 2] F, μ ρ * ρ (x * κ x)) = f x * κ (f x)) :
+    ∃ (lam : F) (σ : F ≃ₐ[ZMod 2] F),
+      lam ≠ 0 ∧ κ * σ * κ = σ ∧ ∀ x : F, f x = lam * σ x := by
+  classical
+  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  haveI : CharP F 2 :=
+    charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
+  -- expand `f` over the automorphism basis (Lemma 2(a))
+  obtain ⟨lam, hfx⟩ : ∃ lam : (F ≃ₐ[ZMod 2] F) → F,
+      ∀ x : F, f x = ∑ σ : F ≃ₐ[ZMod 2] F, lam σ * σ x := by
+    refine ⟨fun σ => (algAutLinearBasis F 2).repr f σ, fun x => ?_⟩
+    have h := congrArg (fun g : F →ₗ[ZMod 2] F => g x)
+      ((algAutLinearBasis F 2).sum_repr f)
+    simp only [LinearMap.sum_apply, LinearMap.smul_apply,
+      algAutLinearBasis_apply, AlgEquiv.toLinearMap_apply, smul_eq_mul] at h
+    exact h.symm
+  -- the vanishing quadratic combination feeding Lemma 2(c)
+  have hc : (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+      (lam στ.1 * κ (lam (κ * στ.2)) +
+        if στ.2 = στ.1 * κ then μ στ.1 else 0) •
+        autMulQuadraticMap F στ.1 στ.2) = 0 := by
+    refine QuadraticMap.ext fun z => ?_
+    simp only [QuadraticMap.sum_apply, QuadraticMap.smul_apply,
+      autMulQuadraticMap_apply, smul_eq_mul, QuadraticMap.zero_apply]
+    have hterm : ∀ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        (lam στ.1 * κ (lam (κ * στ.2)) +
+          if στ.2 = στ.1 * κ then μ στ.1 else 0) * (στ.1 z * στ.2 z) =
+          lam στ.1 * κ (lam (κ * στ.2)) * (στ.1 z * στ.2 z) +
+            (if στ.2 = στ.1 * κ then μ στ.1 * (στ.1 z * στ.2 z) else 0) := by
+      intro στ
+      rw [add_mul, ite_mul, zero_mul]
+    rw [Finset.sum_congr rfl fun στ _ => hterm στ, Finset.sum_add_distrib]
+    -- first block: the expansion of `N(f(z))`
+    have hsum1 : (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        lam στ.1 * κ (lam (κ * στ.2)) * (στ.1 z * στ.2 z)) =
+          f z * κ (f z) := by
+      have hκf : κ (f z) = ∑ τ : F ≃ₐ[ZMod 2] F, κ (lam τ) * κ (τ z) := by
+        rw [hfx z, map_sum]
+        exact Finset.sum_congr rfl fun τ _ => map_mul κ _ _
+      rw [hκf, hfx z, Finset.sum_mul_sum, Fintype.sum_prod_type]
+      refine Finset.sum_congr rfl fun σ _ => ?_
+      refine Fintype.sum_equiv (Equiv.mulLeft κ) _ _ fun β => ?_
+      simp only [Equiv.coe_mulLeft]
+      have hβz : κ ((κ * β) z) = β z := by
+        rw [AlgEquiv.mul_apply, ← AlgEquiv.mul_apply κ κ, hκ2,
+          AlgEquiv.one_apply]
+      rw [hβz]
+      ring
+    -- second block: the expansion of `∑ ρ, μ_ρ·ρ(N(z))`
+    have hsum2 : (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        if στ.2 = στ.1 * κ then μ στ.1 * (στ.1 z * στ.2 z) else 0) =
+          ∑ ρ : F ≃ₐ[ZMod 2] F, μ ρ * ρ (z * κ z) := by
+      rw [Fintype.sum_prod_type]
+      refine Finset.sum_congr rfl fun ρ _ => ?_
+      rw [Finset.sum_ite_eq' Finset.univ (ρ * κ)
+        (fun β => μ ρ * (ρ z * β z)), if_pos (Finset.mem_univ _),
+        AlgEquiv.mul_apply, map_mul]
+    rw [hsum1, hsum2, hcompat z]
+    exact CharTwo.add_self_eq_zero _
+  -- equation (3): the diagonal coefficients vanish
+  have h3 : ∀ γ : F ≃ₐ[ZMod 2] F, lam γ * κ (lam (κ * γ)) = 0 := by
+    intro γ
+    have hd : lam γ * κ (lam (κ * γ)) + (if γ = γ * κ then μ γ else 0) = 0 :=
+      autMulQuadratic_diag_eq_zero F _ hc γ
+    rwa [if_neg (fun h => hκ1 (left_eq_mul.mp h)), add_zero] at hd
+  -- equation (4): off-diagonal coefficients are symmetric
+  have h4 : ∀ α β : F ≃ₐ[ZMod 2] F, β ≠ α * κ →
+      lam α * κ (lam (κ * β)) = lam β * κ (lam (κ * α)) := by
+    intro α β hβ
+    have hαne : ¬ α = β * κ := by
+      intro h
+      apply hβ
+      rw [h, mul_assoc, hκ2, mul_one]
+    have hs : lam α * κ (lam (κ * β)) + (if β = α * κ then μ α else 0) =
+        lam β * κ (lam (κ * α)) + (if α = β * κ then μ β else 0) :=
+      autMulQuadratic_coeff_symm F _ hc α β
+    rwa [if_neg hβ, if_neg hαne, add_zero, add_zero] at hs
+  -- pick the surviving index and kill all the others
+  obtain ⟨α, hα⟩ : ∃ σ, lam σ ≠ 0 := by
+    by_contra hall
+    push Not at hall
+    refine hf (LinearMap.ext fun x => ?_)
+    rw [hfx x]
+    simp [hall]
+  have hκα : lam (κ * α) = 0 := by
+    rcases mul_eq_zero.mp (h3 α) with h | h
+    · exact absurd h hα
+    · exact κ.injective (h.trans (map_zero κ).symm)
+  have hcomm : κ * α * κ = α := by
+    by_contra hne
+    have h2 : κ * α ≠ α * κ := fun h =>
+      hne (by rw [h, mul_assoc, hκ2, mul_one])
+    have h0 := h4 α (κ * α) h2
+    rw [← mul_assoc, hκ2, one_mul, hκα, zero_mul] at h0
+    rcases mul_eq_zero.mp h0 with h | h
+    · exact hα h
+    · exact hα (κ.injective (h.trans (map_zero κ).symm))
+  have hzero : ∀ γ : F ≃ₐ[ZMod 2] F, γ ≠ α → lam γ = 0 := by
+    intro γ hγ
+    have h1 : κ * γ ≠ α * κ := by
+      intro h
+      apply hγ
+      have h' : κ * (κ * γ) = κ * (α * κ) := by rw [h]
+      rw [← mul_assoc, hκ2, one_mul] at h'
+      rw [h', ← mul_assoc]
+      exact hcomm
+    have h0 := h4 α (κ * γ) h1
+    rw [← mul_assoc, hκ2, one_mul, hκα, map_zero, mul_zero] at h0
+    rcases mul_eq_zero.mp h0 with h | h
+    · exact absurd h hα
+    · exact κ.injective (h.trans (map_zero κ).symm)
+  refine ⟨lam α, α, hα, hcomm, fun x => ?_⟩
+  rw [hfx x]
+  exact Finset.sum_eq_single α (fun γ _ hγ => by rw [hzero γ hγ, zero_mul])
+    (fun h => absurd (Finset.mem_univ α) h)
+
 end QuadraticChar2
 
 /-! **Lemma 2(b), packaging note.**  `linearIndependent_algAutMulBilin` +

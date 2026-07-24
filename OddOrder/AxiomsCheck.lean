@@ -12664,6 +12664,9 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.conj_ne_refl
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.mul_conj
+-- Peterfalvi App.III Proposition 2 (v) core (eqs (3)(4): norm intertwiner collapses to λ·σ)
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_smul_algAut_of_norm_intertwiner
 -- Peterfalvi App.III Proposition 2 (iv) (norm of the field model is surjective; char-2 scalars)
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.exists_mul_conj_eq

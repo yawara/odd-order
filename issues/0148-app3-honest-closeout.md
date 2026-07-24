@@ -141,14 +141,21 @@ Pf 側の再掲は書かない。
         (`q(a,0) = a²` で第 1 軸のみで全射) /
         `closure_range_typeBQuadraticMap` ((iii) の hspan 供給)。
         anisotropy 仮定も不要。AxiomsCheck 2 assert。
-  - [ ] **(v) semilinear 分類 (核心)**: additive f : E → E, g : F → F,
-        g∘q = q∘f, f ≠ 0 ⟹ f = λ·σ (λ ∈ E*, σ ∈ Gal(E/𝔽₂))。
-        Lemma 2(a) の `algAutLinearBasis` で f を展開、q∘f − g∘q の
-        ordered-pair 係数に `autMulQuadratic_coeff_symm` / `diag_eq_zero` を
-        適用して書籍の (3)(4) → λ 一点集中。前提部品: Fix(conj) = F
-        (Galois 対応: ⟨conj⟩ = ⊤ → fixedField = ⊥) / Gal(E/𝔽₂) abelian
-        (finite field cyclic) / conj∘σ = σ∘conj。逆向き (λ,σ) ↦ (f,g) は
-        直計算 + (i) で lift。
+  - [~] **(v) semilinear 分類 (核心)** — **f-側 collapse ✅ 2026-07-24 (hub)**:
+        `SemilinearFieldAut.lean` に抽象形で追加 —
+        **`exists_smul_algAut_of_norm_intertwiner`**: κ 非自明 involutive
+        (`κ*κ = 1`)、f ≠ 0 𝔽₂-linear、`Σ_ρ μ_ρ ρ(x·κx) = f(x)·κ(f(x))`
+        ⟹ `∃ λ ≠ 0, σ, κσκ = σ ∧ f = λ·σ`。証明 = Lemma 2(a) で展開 →
+        pair 族の vanishing 結合 c(α,β) = λ_α κ(λ_{κβ}) + δ_{β,ακ} μ_α を
+        組み → diag/symm (Lemma 2(c)) が書籍の (3)(4) → 一点集中。
+        AxiomsCheck 1 assert。実装知見: ⚠ **κσκ = σ (可換性) は証明から
+        無料で出る** (Gal abelian を前提部品にする必要なし — α ≠ κακ なら
+        λ_α = 0 になるため)。μ-δ 項は (4) 適用箇所 (β ≠ ακ) で両側とも
+        消えるので対角 δ 対称性も不要。`push_neg` は deprecated → `push Not`;
+        `self_eq_mul_right` → 現 mathlib 名 `left_eq_mul`。
+        **残り**: g-側 μ collapse (g = λκ(λ)·σ|_F) と逆向き (λ,σ) ↦ (f,g)
+        直計算 — (vi) の組み上げと合わせて実施。前提部品のうち
+        Fix(conj) = F は (vi) の接続で必要になった時点で。
   - [ ] **(vi) Prop 2 組み上げ**: `TypeBModel 1 ε` で
         exists_semilinear_of_aut / exists_aut_of_semilinear /
         kernel_elementaryAbelian の 3 定理 + AxiomsCheck。
