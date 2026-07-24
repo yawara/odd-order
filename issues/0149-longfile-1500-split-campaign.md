@@ -115,6 +115,14 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
   - `S03e_Thm35.lean` 1725 → 374 (+ `S03e_Thm35Prelim.lean` 1386: step 機構全部)
   - (S03f_Thm36 は上記 ✅✅ 参照)
 
+- ✅ BG §4 帯 3 file — 2026-07-25 (prefix-split・下流 import 無変更・stamp 除去):
+  - `S04_SmallRankBasic.lean` 1780 → 964 (+ `S04_CommutatorCollection.lean` 857: §4A
+    collection 公式 + Ω₁ exponent)
+  - `S04_PGroupsSmallRank.lean` 1730 → 1259 (+ `S04_ExtraspecialCommutator.lean` 492:
+    Lem 4.15; import 差替え)
+  - `S04f_Omega1.lean` 1607 → 1226 (+ `S04f_AutOrderConstraints.lean` 412: Lem 4.13/4.14)
+- chip 由来 merge (2026-07-25): `S7B1_NormalJ_Setup.lean` の dead private 8 件削除 (−138 行)。
+
 ### ⚠ 第二パス行き (private 網が全域を覆い、clean な宣言境界 cut が存在しない)
 
 prefix-split では割れない — 対応には crossing private の public 化 (namespace 付与) という
@@ -124,6 +132,9 @@ prefix-split では割れない — 対応には crossing private の public 化
   (private 54→1438 等が全域交差)
 - `BG/Ch1_Preliminary/S02_FixedSubmodules.lean` (1553) — fixedOnSubmoduleAndQuotient 網
   (private 22→1366 等)
+- `BG/Ch1_Preliminary/S04f_Blackburn.lean` (1634) — private 29→1152 等が全域交差
+  (clean cut = L25 のみで無意味)
+- `BG/Ch1_Preliminary/S06_Additional.lean` (1677) — clean cut ゼロ (private 508→1495 等)
 
 - ✅✅ `BG/Ch1_Preliminary/S03f_Thm36.lean` (3822) — 2026-07-24 **完了、stamp 除去**:
   単一巨大宣言 `thm36_aux` の IH-free セグメント 3 つを段階的に切出し、
