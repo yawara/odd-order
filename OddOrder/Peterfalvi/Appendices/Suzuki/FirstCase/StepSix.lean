@@ -343,7 +343,7 @@ automorphism homomorphism `dAutHom : D → RingAut F`.
 
 Sorry-free as a `∀`-model statement; a caller supplying the model through
 `exists_affineNearFieldModel` inherits the residual `Q₈` Brauer–Suzuki `sorry`
-(frozen, issue 0147). -/
+(long-term project, issue 0147). -/
 theorem card_field_eq_and_D_eq_one_of_comm :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ∀ {F : Type uG} [NearFields.NearField F]

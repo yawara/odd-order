@@ -281,9 +281,9 @@ private theorem quaternionGroup_closure_pair (n : ℕ) [NeZero n] :
       (Subgroup.subset_closure (Set.mem_insert_of_mem _ rfl)) (ha_mem i)
 
 /-- **Brauer–Suzuki, the `Q₈` case** — the sole remaining `sorry` of Appendix C, Proposition 1,
-**frozen** as a deliberate long-term project (issue 0147,
-`notes/meta/q8_modular_char_theory_frozen_project.md`; background
-`notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`).
+tracked as a deliberate long-term project (issue 0147, thawed 2026-07-25; spine = Navarro 1998
+Ch. 1–7 via the Z*-theorem — spec `notes/meta/q8_modular_char_theory_frozen_project.md`,
+background `notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`).
 
 Gorenstein: "all known proofs require the theory of modular characters" — the `|S| ≥ 16` case is
 proved by ordinary exceptional characters (`brauerSuzuki_of_quaternionSylow`), but for `S ≅ Q₈`
@@ -309,7 +309,7 @@ closed by assembling the Gorenstein Ch. 12 setup (`QuaternionSylowSetup`) from t
 relations transported — and applying `brauerSuzuki_of_quaternionSylow`; `t` equals the setup's
 central involution `z` by uniqueness of involutions in `T`
 (`eq_one_or_eq_z_of_sq_eq_one`).  The sole residual `sorry` is the isolated `|T| = 8` statement
-`brauerSuzuki_quaternionSylow_q8` (modular character theory; frozen, issue 0147). -/
+`brauerSuzuki_quaternionSylow_q8` (modular character theory; long-term project, issue 0147). -/
 theorem RankOneHypothesis.brauerSuzuki {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
     (hyp : RankOneHypothesis G Ω) :
     OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {hyp.t} = ⊤ := by

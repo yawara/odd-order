@@ -500,7 +500,8 @@ Prop 1 のみ (ℒ(F)/F_{r²,2}/Prop 2 は済)。前 BG-remainder audit は「BG
 （`brauerSuzuki_of_quaternionSylow`、axiom-clean、AxiomsCheck 登録、Lem 1.2–1.9 + endgame）。
 
 **Q₈（`|S|=8`）ケースは modular character theory を要する別スケールの greenfield ゆえ、ユーザー裁定
-（2026-07-23）で「書籍選定を含む長期プロジェクト」として凍結** → [issue 0147](pending/0147-q8-modular-char-theory-frozen.md)
+（2026-07-23）で「書籍選定を含む長期プロジェクト」として凍結（→ 2026-07-25 解凍、Navarro spine）**
+→ [issue 0147](../0147-q8-modular-char-theory-frozen.md)
 （+ project spec `notes/meta/q8_modular_char_theory_frozen_project.md`）に分離。
 
 ⟹ 2026-07-23 の「Q₈ = c primary」hub 裁定（本 issue 冒頭付近）は**ユーザーの凍結決定で上書き**。

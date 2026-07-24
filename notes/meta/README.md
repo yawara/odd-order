@@ -31,7 +31,7 @@
 | [`chapter_investigation_framework.md`](chapter_investigation_framework.md) | 章調査の汎用手順 |
 | [`nougat_missing_page_recovery.md`](nougat_missing_page_recovery.md) | mmd MISSING page の復元手順 |
 | [`phase2_cross_refs.md`](phase2_cross_refs.md) | 3 冊間の定理引用クロス参照表 |
-| [`q8_modular_char_theory_frozen_project.md`](q8_modular_char_theory_frozen_project.md) | 【凍結】Q₈ modular character theory 長期計画 (issue 0147) |
+| [`q8_modular_char_theory_frozen_project.md`](q8_modular_char_theory_frozen_project.md) | Q₈ modular character theory 長期計画 (issue 0147; 2026-07-25 解凍、spine = Navarro 1998) |
 | [`lean_eval_submission.md`](lean_eval_submission.md) | lean-eval 提出の正本 (issue 0050 tracker) |
 | [`mathlib_v432_migration.md`](mathlib_v432_migration.md) / [`mathlib_rc2_migration.md`](mathlib_rc2_migration.md) | toolchain bump の手順記録 |
 

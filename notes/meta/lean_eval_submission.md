@@ -28,7 +28,7 @@
 |---|---|---|
 | **済** | 2 | `feit_thompson` (2026-07-16, #828)、`baer_suzuki` (2026-05-29, #118) |
 | **今すぐ可** | 2 | Burnside p^aq^b (`finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow`)、`brauer_character_in_cyclotomic` — 他者 solved 済みだが per-account sticky ゆえ候補 (§2.5) |
-| **凍結解除待ち** | 1 | `brauer_suzuki` (未解決・solver 0)。blocker = Q₈ case のみ (issue 0147 凍結) |
+| **Q₈ 完成待ち** | 1 | `brauer_suzuki` (未解決・solver 0)。blocker = Q₈ case のみ (issue 0147、2026-07-25 解凍・Navarro spine で進行) |
 | **経路外** | 残り全部 | Tier C (§5) + repo に証明の無い problem 群 (§2.5 の判定表) |
 
 **problem proposal (新規 problem の提案 PR — submit とは呼ばない)**:
@@ -39,7 +39,7 @@
 | **Tier B: frontier 完成で proposal 可** | 2 | Feit–Sibley (issue 1054) / Suzuki 分類 (issue 2053) (§4) |
 
 **「3 冊が順調に完成すると自然に届く」経路**: (i) Tier A の proposal 群 (今〜)、
-(ii) `brauer_suzuki` の proof submit (issue 0147 解凍・完成時)、(iii) Feit–Sibley・Suzuki 分類の
+(ii) `brauer_suzuki` の proof submit (issue 0147 完成時; 2026-07-25 解凍済)、(iii) Feit–Sibley・Suzuki 分類の
 proposal (issue 1054/2053 完成時)。Tier C は 3 冊の外側で、別途 modular 表現論等を立てない限り来ない。
 
 ⚠ lean-eval 作業は 3 冊 frontier に対し**オプショナル・トラック** (0042 scope 注記)。
@@ -127,12 +127,12 @@ problem 追加は 2026-06-23 が最新 (解析系 3 件) で、群論系の新�
 | `finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow` (Burnside p^aq^b) | 済 | `Isaacs.Ch07.burnside_p_pow_q_pow` (Ch07_ThompsonSubgroup/Main.lean:917、AxiomsCheck:1687 登録済)。eval より一般 (`p ≠ q` 不要、`Nat.card` + ∃ 形) | statement 橋渡しは数行 (`Fintype.card`→`Nat.card`、`Fact` instance 化)。主作業 = self-contained 化 (§1.2): Ch.7 9-step + normal-J の閉包 vendoring で規模大 (feit_thompson 前例の縮小版) |
 | `brauer_character_in_cyclotomic` | 済 (10 名) | 数学は既済: trace = 固有値和 (`character_isIntegral` 内部、ClassSumCongruence.lean:1053)、有限位数 endo の固有値は 1 の冪根 (`pow_eq_one_of_isRoot_charpoly_of_pow_eq_one`、同 :1030) | `CyclotomicField (Monoid.exponent G) ℚ →+* ℂ` embedding の構成と `φ.range` 所属への packaging (中規模 glue、10 名 solved の易問側) |
 
-### 凍結解除待ち (1)
+### Q₈ 完成待ち (1) — issue 0147 は 2026-07-25 解凍済
 
 `brauer_suzuki` (**未解決・solver 0**、2026-07-24 公開面で実測): eval statement は `n ≥ 3` の
 一般化四元数 (`QuaternionGroup (2^(n-2))`、**n=3 = Q₈ を含む**)。repo は cyclic / |T|=4 /
 |T|≥16 が sorry-free 完成済で、唯一の blocker = `brauerSuzuki_quaternionSylow_q8`
-(RankOneAffineModel.lean:294、issue 0147 で凍結中の repo 唯一の実 sorry)。結論形の差
+(RankOneAffineModel.lean:294、issue 0147 = 2026-07-25 解凍・Navarro spine の repo 唯一の実 sorry)。結論形の差
 (eval: `t̄ ∈ Z(G/O(G))` / repo: `O_{2'}(G) ⊔ C_G(z) = ⊤`) の橋渡しは routine。
 
 ### repo に証明が無く候補外 (solved/unsolved を問わず判定理由を記録)
@@ -257,16 +257,16 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 
 進捗 % は原文ステップ被覆で測定 (scaffold 数でない)、敵対的検証済。
 
-### §4.1 🎯 `brauer_suzuki` — 唯一の「既存未解決を proof submit」候補 (Q₈ 凍結解除待ち)
+### §4.1 🎯 `brauer_suzuki` — 唯一の「既存未解決を proof submit」候補 (Q₈ 完成待ち)
 
 - **issue [9318](../../issues/closed/9318-brauer-suzuki-theorem.md) は 2026-07-23 closed**
   (cyclic + |T|≥16 完成)。残 blocker は **issue
-  [0147](../../issues/pending/0147-q8-modular-char-theory-frozen.md) (Q₈ case、凍結)** のみ。
+  [0147](../../issues/0147-q8-modular-char-theory-frozen.md) (Q₈ case、2026-07-25 解凍・Navarro spine)** のみ。
 - **定理**: Brauer–Suzuki (1959)。Sylow-2 が cyclic/一般化四元数 ⟹ `G = O_{2'}(G)·C_G(u)`。
   CFSG 礎石補題。Gorenstein Ch.12 (例外指標論)。
 - **eval**: 既存**未解決** `brauer_suzuki` (solver 0、2026-07-24 実測) に一致 → 完成すれば
   proposal でなく proof submit。⚠ eval statement は `n ≥ 3` 全体 = **Q₈ (n=3) を含む**ので、
-  凍結解除・完成が前提条件。詳細 = §2.5「凍結解除待ち」。
+  Q₈ 完成が前提条件。詳細 = §2.5「Q₈ 完成待ち」。
 - **repo 現況**: cyclic 版 `brauerSuzuki_of_isCyclic_sylowTwo` + 四元数 |T|≥16 版
   `brauerSuzuki_of_quaternionSylow` + 組立 `RankOneHypothesis.brauerSuzuki`
   (RankOneAffineModel.lean:313) まで完成。唯一の実 sorry = `brauerSuzuki_quaternionSylow_q8`
@@ -385,7 +385,7 @@ per_page 付き 2 ページで (1 回の要約 fetch は後半を捏造する事
 4. ZJ 定理を proposal PR に (登録済ゆえ最有力)。
 5. Tier A proposal PR: Jordan / Chermak–Delgado / Furtwängler / Thompson-FPF + 🆕 B.H.Neumann 位数 3
    + 一般 Hall–Petresco (#16 差替)。proposal merge 後、solver は他者開放 (feit_thompson 前例)。
-6. 🎯 issue 0147 解凍・Q₈ 完成 → `brauer_suzuki` proof submit (唯一の既存未解決落とし)。
+6. 🎯 issue 0147 Q₈ 完成 (2026-07-25 解凍済、Navarro spine) → `brauer_suzuki` proof submit (唯一の既存未解決落とし)。
 7. stale docstring 掃除 — `burnside_p_pow_q_pow` の「local axiom」は 2026-07-24 修正済; 残り =
    `Ch07.normal_J` の「Remaining local axioms」、`AppC_NormSet` の「to be formalized」、
    `brauer_permutation_lemma'` の「Isaacs Thm 6.32」誤引用ほか — 公開物に写すと誤解を招く。

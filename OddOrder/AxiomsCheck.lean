@@ -12245,7 +12245,8 @@ Thm 6.11), and an odd automorphism group of `Q₈` has order dividing `3`
 field case this completes step (6) as a `∀`-model statement
 (`card_field_and_D_of_Q1_eq_bot`).  The two assembled statements
 (`card_D_le_three_of_noncomm`, `card_field_and_D_of_Q1_eq_bot`) use step (5)'s `|F| = 9`,
-which inherits the frozen `Q₈` Brauer–Suzuki sorry (issue 0147) through step (4)'s
+which inherits the residual `Q₈` Brauer–Suzuki sorry (long-term project, issue 0147)
+through step (4)'s
 `card_Q_eq_card_inf_centralizer_pow` → step (2)(b) chain — they are therefore intentionally
 unregistered (like the step (7) endpoints); all the new ingredients below are axiom-clean. -/
 #assert_only_allowed_axioms

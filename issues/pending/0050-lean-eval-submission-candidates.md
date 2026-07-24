@@ -38,7 +38,7 @@ self-contained / 証明が難しく mathlib 未収録。詳細と全候補は正
 - [ ] **🆕 (proof submit) `brauer_character_in_cyclotomic`** — 数学は既済 (trace = 1 の冪根の和、
       `ClassSumCongruence.lean`)。`CyclotomicField (exponent G) ℚ →+* ℂ` packaging のみ (§2.5)
 - [ ] **🎯 (proof submit・凍結解除待ち) `brauer_suzuki`** — 9318 は |T|≥16 完成で closed (2026-07-23)。
-      残 blocker = Q₈ case (issue 0147 凍結) のみ。eval statement は n=3 (Q₈) を含むため解凍・完成が前提
+      残 blocker = Q₈ case (issue 0147; 2026-07-25 解凍・Navarro spine) のみ。eval statement は n=3 (Q₈) を含むため完成が前提
 - [ ] **🆕 (proposal) Glauberman ZJ 定理** — 2026-07-22 完成・AxiomsCheck 登録済
       (`Subgroup.oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian`、伝説級・mathlib/eval 双方に無い)
 - [ ] **🆕 (proposal) B.H.Neumann 位数 3** (`lowerCentralSeries_two_eq_bot_of_fixedPointFree_orderOf_eq_three`、
