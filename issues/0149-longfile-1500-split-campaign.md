@@ -194,6 +194,28 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
 
 **⟹ 第一パス完遂 (2026-07-25)**: 残 stamp = `AxiomsCheck.lean` (恒久例外) + 下記第二パス 6 件のみ。
 
+### 🚧 第二パス残り 4 file — 実装手順 (2026-07-25 03:00 時点)
+
+済: S02_Representations (3 件 public 化) / S02_FixedSubmodules (public 化ゼロ)。
+scanner は改良済み: (a) `\b` でなく lookaround、(b) `private theorem` + 改行名 def を検出。
+残り 4 file と各自の追加要件 (最小 crossing 境界は再計算すること):
+
+1. `S04f_Blackburn` (1634) — **public 化 3 件は適用済み・commit 済み前提で再確認**
+   (blackburn_noncentral_omega1_sup_centralizer_complement_eq_top /
+   …_exists_centralizer_quotient_complement / …_commutator_image_relations は
+   もう public になっている)。preamble に `section BlackburnClassification` ([25,1630] 全域) —
+   leaf で `end BlackburnClassification`、main で section+変数を再オープン。cut ~239。
+2. `S06_Additional` (1677) — public 化 1 件 (commutator_le_sup_commutator、未適用)。
+   body 先頭に cut を跨ぐ section あり (imbalance 1 @264) — section 名を特定して
+   leaf close + main 再オープン。
+3. `ClassSumCongruence` (1602) — crossing 0 の cut は [145,197] のみだが preamble ~107 行ゆえ
+   main が 1500 を超える。**named section (ClassSum/StructureCoeff/…) 単位の再編**が必要:
+   section ClassSum [.,179] + StructureCoeff [~183,310] を leaf へ (section ごと移動なら
+   再オープン不要)、main は残り。mk_conj_eq (private, 227→410) が StructureCoeff 移動で
+   跨ぐ → public 化 1 件。
+4. `S10_MinimalSimpleBasic` (1889) — crossing 1 (cut 523/595/622) — 対象 private を特定して
+   public 化 + 分割。
+
 ### ⚠ 第二パス行き (private 網が全域を覆い、clean な宣言境界 cut が存在しない)
 - `Peterfalvi/S10_MinimalSimpleBasic.lean` (1889) — private 網 (622→1534, 674→1534;
   primed 名 `Msigma_conj_smul'` 含む) で clean cut なし
