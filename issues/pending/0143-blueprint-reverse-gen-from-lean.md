@@ -85,3 +85,10 @@ blueprint が提供したい情報 (何が statement 化され・何が証明済
 - [issue 0139](0139-notes-meta-seibon-log-bunri.md) (survey スナップショット降格の文脈 —
   D が置き換え候補)
 - `notes/meta/three_books_full_survey_2026_07_16.md` (降格済 coverage、D の置換対象)
+
+---
+
+## ❄ 2026-07-24 FROZEN (ユーザー裁定) — pending へ
+
+blueprint 逆生成はユーザー裁定で凍結。実装計画 (§設計・Phase 分割) は本文に保存済み —
+解凍時はそこから再開。forward TeX 不採用の方針 (CLAUDE.md「やらないこと」) は不変。

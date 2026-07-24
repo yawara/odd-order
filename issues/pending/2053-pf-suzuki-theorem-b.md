@@ -469,3 +469,12 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
 Appendices/Suzuki/FirstCase/**` は実 sorry 0。本文 checklist の「残 = (9) p = f」は遅行記述。
 owner (lane b) が次回 sync 時に checklist を実状態へ更新し、Theorem B 最終 assembly の
 有無 (`theoremB` 相当の endpoint 宣言) を明記すること。
+
+---
+
+## ❄ 2026-07-24 FROZEN (ユーザー裁定) — pending へ
+
+Pf II Ch.II Theorem B campaign (lane b の現 frontier) はユーザー裁定で凍結。
+凍結時点の実状態 = StepOne〜StepTen まで leaf 存在・`FirstCase/**` 実 sorry 0
+(checklist は「残 (9) p=f」表記のまま遅行 — 解凍時に実測で再同期すること)。
+Theorem B 最終 assembly の有無も解凍時に確認。lane b の次 frontier は hub 裁定で再割当。

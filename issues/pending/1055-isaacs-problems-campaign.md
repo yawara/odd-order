@@ -430,3 +430,11 @@ build green、AxiomsCheck OK。章単位で commit・issue checkbox 更新。
 - issue 9205 (scope 拡大の裁定元)、`notes/isaacs/frontier_measured_2026_07_19.md` (番号付き結果の完済正本)
 - `references/isaacs/finite-group-theory.pdf` (statement 確定用、PDF ページ = 書籍ページ + 13)
 - CLAUDE.md「トレーサビリティ」「ファイル粒度」「ラッパー方針」
+
+---
+
+## ❄ 2026-07-24 FROZEN (ユーザー裁定) — pending へ
+
+Isaacs Problems campaign (lane a の現 frontier) はユーザー裁定で凍結。再開時は本文の
+文書順 (Ch.1 §A から) と置き場規約 (ChNN/Problems*.lean) をそのまま引き継ぐ。
+lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
