@@ -18,6 +18,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ConjugateSummandSplit
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismInducedMaps
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.AutomorphismClassification
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeBIsomorphicSplit
 
 /-!
 # Peterfalvi Appendix III: On Suzuki 2-Groups

@@ -12675,6 +12675,9 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 -- Peterfalvi App.III Proposition 2 forward half (induced quotient map is semilinear: f_Φ = λ·σ)
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.exists_semilinear_of_aut
+-- Peterfalvi App.III Theorem (e) forward, setup: diagonal automorphisms of the type-B model
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.exists_diagonalAut
 -- Peterfalvi App.III Proposition 2 converse + kernel (every λ·σ is induced; kernel elem. abelian)
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.exists_aut_of_semilinear
