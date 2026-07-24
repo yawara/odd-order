@@ -92,3 +92,10 @@ full build green で以下を解消 (この issue を main の hub 版で受領�
 **繰延 (grandfather)**: `flexible` 73 (AppE_Filiform*、full build + 敵対検証の別パス) /
 `SemilinearField` openClassical (0133) / `FeitThompsonNuGrid` flexible (FT spine, hub wave)。
 S03g `K` は lane d が第2 wave で解消済 (本 issue 対象外)。
+
+---
+
+## ✅ 2026-07-24 close — lane c が全件解消済み
+
+lane c 所有分 123 件 (flexible 73 含む) は lane c が 2026-07-23〜24 に解消済み
+(baseline 199→47 の主要部)。2026-07-24 の fresh full build census で lane c 所有分 0 件を確認。close。

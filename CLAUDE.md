@@ -85,31 +85,30 @@ PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (別 private �
   - **⚠ 新 leaf を作ったら同じ commit で [`OddOrder.lean`](OddOrder.lean) に import を足す (2026-07-20 明文化、issue 0135)**。`OddOrder.lean` は全レーンが触ってよい共有ファイル。配線を忘れると leaf が `lake build OddOrder` の import closure 外に落ち、**hub の合流フルビルドが jobs 数不変・数秒で green を返す** — 新規コードが一度も elaborate されないまま gate を通る (実害 2 件、うち 1 件は 289 行が 1 tick 素通り)。上位 leaf 経由で到達する中間 leaf は配線不要だが、**到達性が自明でないなら足す**。
   - **hub (合流側) の gate**: 合流 tick で 1,500 行超ファイルへの追記を検出 → ⚠ flag 報告 + 分割 issue 起票。**分割の実施 owner は hub** (lane の frontier と衝突しない凍結境界で prefix-split: 先頭 K 宣言を上流ファイルへ、残りが import する。前方参照は構文上不可能ゆえ任意の宣言境界で安全)。手順詳細 = [`notes/meta/merge_monitor.md`](notes/meta/merge_monitor.md)。
 
-### lint 警告ゼロ方針 (ratchet gate)
+### lint 警告ゼロ方針 (--strict gate)
 
 lakefile の `weak.linter.mathlibStandardSet = true` は意図的 (mathlib 互換) ゆえ lint 警告は
-本物の解消対象。放置すると溜まり続け後の一括訂正が高くつく (moore57 は 5031 件まで膨らんだ) —
-**「警告はその commit で直す」を機械で強制**する。正本 = [issue 0138](issues/0138-zero-warning-gate.md)、
-lane 周知 = [`notes/meta/lint_gate_2026_07_22.md`](notes/meta/lint_gate_2026_07_22.md)。
+本物の解消対象。放置すると溜まり続け後の一括訂正が高くつく (moore57 は 5031 件まで膨らんだ)。
+backlog 230 件は 2026-07-22〜24 の wave で**完済** (issue 0138 closed、0123 統合) し、gate は
+**純ゼロ (`bin/check-warnings --strict`)** に切替済み — **非 sorry 警告が 1 件でも CI
+(`lean_action_ci.yml`) が赤**になる。sorry 警告は常に許容 (statement-first spine の正常系)。
 
-- **commit 前に [`bin/check-warnings`](bin/check-warnings) を回す** (ratchet: 現存 backlog は
-  [`bin/lint-baseline.tsv`](bin/lint-baseline.tsv) で grandfather、baseline を超える新規/増加の
-  非 sorry 警告があれば exit 1)。CI (`lean_action_ci.yml`) にも同 step があり全レーンの push ごとに
-  効く。sorry 警告は常に許容 (statement-first spine の正常系)。
-- **新規 lint 警告を増やさない**。意図的追加は `bin/check-warnings --update-baseline` で baseline を
-  更新し commit message に理由を書く (無断の baseline 緩和はしない)。
-- **自領域の残 backlog は frontier 通過時に owner が解消**する (owner が一番安全に直せる)。hub は
-  active-lane ファイルを触らない。⚠ `flexible` / `import` 絞り込み / instance in type 系は leaf
-  build で検出不能な cascade を起こすので **full build 必須 + 敵対的検証** (issue 0123 で main を
-  2 回壊した実績)。⚠ longLine census は **codepoint** で数える (`awk 'length>100'` はバイト数で
-  日本語/unicode 記号を桁違いに過大計上する; 判定は `bin/check-warnings`)。
-- **hub の役割** = frozen×機械カテゴリの cleanup wave + wave 後の baseline 更新 + 合流 tick で lint
-  差分を reconcile (merge_monitor.md の lint ratchet step; **hard-STOP ではない** — genuine math の
-  合流を lint で止めず、新規警告は grandfather + owner flag で債務追跡)。
-- **完了像**: backlog が sorry のみ → gate を `--strict` (純ゼロ) へ切替、issue 0123 を 0138 に統合。
-- 別トラック (owner 判断待ち): `open scoped Classical` = [0133](issues/0133-open-scoped-classical-statement-dependent.md) /
-  `Mathlib.Tactic` 丸 import = [0136](issues/0136-lint-deferred-import-and-generalization.md) /
-  長すぎる宣言名 = [0132](issues/0132-naming-pairunion-stepdata-too-long.md)。
+- **警告はその commit で直す** — commit 前に [`bin/check-warnings`](bin/check-warnings) を回す
+  (増分 replay は取りこぼしうるので、疑わしければ fresh full build で確認)。
+- 折返し不能な長宣言名など**正当な例外のみ** per-decl `set_option linter.<name> false in` +
+  理由コメントで明示する (実例: `S08_CoherenceBasic.lean:859`)。無断の一括 disable はしない。
+- ⚠ `flexible` / `import` 絞り込み / instance in type 系の修正は leaf build で検出不能な cascade を
+  起こすので **full build 必須 + 敵対的検証** (issue 0123 で main を 2 回壊した実績)。
+  `omit` 追加も同種の cascade がある (omit した定理の下流で section var が新たに unused 化 —
+  2026-07-24 wave で 3 件連鎖)。⚠ longLine census は **codepoint** で数える (`awk 'length>100'` は
+  バイト数で日本語/unicode 記号を過大計上; 判定は `bin/check-warnings`)。
+  ⚠ flexible の linter 提示 Try-this は不完全なことがある (unfold 系 simp 引数を欠く) —
+  鵜呑みにせず実際に `simp?` を回して置換し build で検証。
+- [`bin/lint-baseline.tsv`](bin/lint-baseline.tsv) は空のまま保持 (ratchet 機構の遺構; 空 baseline
+  では無印 `bin/check-warnings` も --strict と等価)。無断で baseline を復活させない。
+- 別トラック (owner 判断待ち): `Mathlib.Tactic` 丸 import の残債②のみ =
+  [0136](issues/0136-lint-deferred-import-and-generalization.md) / 長すぎる宣言名の命名リファクタ =
+  [0132](issues/0132-naming-pairunion-stepdata-too-long.md) (警告自体は per-decl 例外で抑制済)。
 
 ### トレーサビリティ (3 層)
 

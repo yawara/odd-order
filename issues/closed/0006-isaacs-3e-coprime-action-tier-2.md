@@ -55,3 +55,13 @@ Phase 1 完成度のためには実装するが, FT 経路としての critical 
 - Isaacs FGT pp.96-104 (§3E)
 
 > 🧾 (2026-07-02 hub 全体レビュー): 前提の Ch.4 §4C/§4D は **完備** (Ch04 Main.lean §4C/§4D = 完成) — ただし本 issue は off-FT-path につき coverage phase まで park 継続。
+
+---
+
+## ✅ 2026-07-24 close — Tier 2 全 5 件は実装済み (stale pending の解消)
+
+実測 (hub issue 監査): Thm 3.26 (nonemptiness / no-fusion / 単射性 3 clause,
+`Ch04_Commutators/ForwardFromCh03.lean` §3E.5) / Lemma 3.32 (cardinality 形, 同 file) /
+Lemma 3.33・Thm 3.31 (Hartley–Turull)・Thm 3.34 (`Ch04_Commutators/HartleyTurull.lean`,
+対応表で ✅) — **全て sorry-free で landing 済み** (repo 全体の実 sorry は凍結 Q₈ の 1 件のみ)。
+pending のまま stale 化していたため close。

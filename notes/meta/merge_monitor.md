@@ -6,6 +6,22 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-24 1x:xx hub 直接作業 tick (ユーザー指示「lint fix をここで一気に進めます」) — 🎯 lint backlog 47→0 完済 + gate --strict 切替 + issue 監査**。
+> ① lint: 残 47 件 (show 31 / sectionVars 8 / Fintype 2 / longLine 2 / flexible 1 / simpa 1 /
+> unusedVars 1) を一括解消 (`e6fc21830`)。omit cascade 3 件 (CaseSplitBCD→Classification) を
+> fixpoint まで追跡。flexible の linter Try-this が不完全 (omegaProdChar unfold 欠落 → instance
+> stuck) だったため実 `simp?` で closed set を取り直した (新知見、CLAUDE.md に記載)。
+> ② gate: baseline 空化 + CI `--strict` 切替 + CLAUDE.md/lint_gate note 更新。0138 完了 close
+> (0123 統合)、per-lane 0144/0145/0146 close、0133 close (c 完了済)。
+> ③ issue 監査 (ユーザー質問起点、open 17 + pending 6 全数): **close 3 件** = 0006 (Tier 2 は
+> 実装済みの stale pending) / 3029 (Ch07 stale docstring 3 サイトを on-sight 修正) / 上記 lint 系。
+> **注記 4 件** = 0127 (残 = ① dedup 2 件のみ、②③完了) / 9164 (共有 bridge landing 済・差し替え未
+> + Higman に同名 private 複製 +1) / 2053 (checklist 遅行: StepNine/Ten 存在・FirstCase sorry 0) /
+> 0141 (a の campaign 完了で blocker 解除、分割実施可)。0132 は per-decl 例外化済みを注記。
+> gate: **fresh 単発 full build (`rm -rf .lake/build`) + `bin/check-warnings --strict` EXIT=0**
+> (16m35s、非 sorry 警告 0)。実 sorry 1 (凍結 Q₈) 非退行。⚠ fresh cold-graph 1 回目に
+> Theorem152Assembly が Ch07 Main.olean 未生成で transient fail — 再実行で再現せず (要 watch)。
+>
 > **▶▶ 2026-07-24 11:xx hub 直接作業セッション (ユーザー裁定「レーンに分配せず hub で b→a→c タスクを閉じる」) — 🎯🎯 残 6 sorry の考察と一括処理。実 sorry 6→1 (残 = 凍結 Q₈ のみ)**。
 > 内訳: ① Suzuki2Groups.lean の空 scaffold 4 本削除 (`3adbd2df8`, 0127 ② 実施; honest 残作業 =
 > **issue 0148**) ② Aut(Q₈) odd bound 新 leaf `GroupTheory/SpecificGroups/QuaternionGroupMulAut`

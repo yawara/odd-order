@@ -460,3 +460,12 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
 - OddOrder/Peterfalvi/Appendices/SemilinearField.lean (App I)
 - OddOrder/Isaacs/Ch10_MoreTransfer/Yoshida.lean:509 (Cor 10.2)
 - OddOrder/GroupTheory/WielandtPerFactorDischarge.lean (要調査)
+
+---
+
+## 📝 2026-07-24 hub 監査メモ (checklist が実装に遅行)
+
+実測: `FirstCase/` に **StepNine.lean / StepTen.lean が既に存在**し、`OddOrder/Peterfalvi/
+Appendices/Suzuki/FirstCase/**` は実 sorry 0。本文 checklist の「残 = (9) p = f」は遅行記述。
+owner (lane b) が次回 sync 時に checklist を実状態へ更新し、Theorem B 最終 assembly の
+有無 (`theoremB` 相当の endpoint 宣言) を明記すること。

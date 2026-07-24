@@ -1300,11 +1300,12 @@ theorem step8b_pullback_normal_P
 /-- **Isaacs Thm 7.6 Step 1-7 conclusion**: `J(P) ≤ O_p(G)`.
 
 Proved by strong induction on `Nat.card G` (so Step 3 can use the IH on proper
-subgroups) + Step 2 extraction (`thompsonJ_le_iff`) + the Step 4-5 axiom
-(`step4_5_normal_J_hypotheses`) + the landed Step 6 (`...isPGroup` /
-`...le_opCore_of_isPGroup` / `...map_eq_bot_of_le_opCore`) + the landed Step 7
-(`omega1ZCenterOpCore_relIndex_inter_A_le`) + the Step 8 axiom
-(`step8_normal_J_closure`). -/
+subgroups) + Step 2 extraction (`thompsonJ_le_iff`) + Steps 4-5
+(`step4_5_normal_J_hypotheses`, proved) + Step 6 (`...isPGroup` /
+`...le_opCore_of_isPGroup` / `...map_eq_bot_of_le_opCore`) + Step 7
+(`omega1ZCenterOpCore_relIndex_inter_A_le`) + Step 8
+(`step8a_PBar_normal_GBar` / `step8b_pullback_normal_P`).  All steps are
+proved theorems (nothing is axiomatized); Ch07 is sorry-free. -/
 theorem thompsonJ_le_opCore_of_normal_J_hypotheses
     {G : Type*} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G)
@@ -1418,10 +1419,11 @@ Steps 1-7 establish `J(P) ≤ O_p(G)` using Thm 7.5 (normal-P), Ch.4 Cor 4.35
 Step 8 propagates normality from `O_p(G)` to `G` via Thm 7.2
 (`thompsonJ_eq_of_le_of_le`) + characteristic-of-characteristic transport.
 
-Remaining local axioms: `step4_5_normal_J_hypotheses` (Step 4+5 = `P = UA` and
-`|Ā| = p`, both using Step 3's IH internally) and `step8_normal_J_closure`
-(Step 8 = Thm 7.5 application + pullback).  All earlier landed bridge lemmas
-(Steps 1, 6, 7) are unconditional. -/
+All eight steps are landed as proved theorems: Steps 4+5 =
+`step4_5_normal_J_hypotheses` (`P = UA` and `|Ā| = p`, both using Step 3's IH
+internally), Step 8 = `step8a_PBar_normal_GBar` + `step8b_pullback_normal_P`
+(Thm 7.5 application + pullback).  Nothing is axiomatized: `normal_J` is
+sorry-free and axiom-clean (asserted in `AxiomsCheck`). -/
 theorem normal_J
     {G : Type*} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G)

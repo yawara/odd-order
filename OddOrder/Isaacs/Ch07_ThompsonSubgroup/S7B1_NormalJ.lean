@@ -19,7 +19,7 @@ variable {G : Type*} [Group G]
 /-! ## §7B: normal-J theorem (pp. 209-214) -/
 
 
-/-! ### Thm 7.6 — normal-J theorem ⭐⭐ (conditional on 8-step argument)
+/-! ### Thm 7.6 — normal-J theorem ⭐⭐ (8-step argument, fully landed)
 
 **Isaacs Thm 7.6** (mmd L3832):
 
@@ -32,9 +32,11 @@ variable {G : Type*} [Group G]
 **proof 戦略** (8 Step, mmd L3832-3896): Thm 7.5 + Ch.6 **6.20** (abelian coprime
 ⟨C_N(a)⟩=N) + Ch.4 **4.35** (Ω₁ fixed) + Hall-Higman 3.21.
 
-The full Goldschmidt-style 8-step proof requires Thm 7.5 (✅ landed) + Ch.6 6.20 +
-Ch.4 4.35 (still pending).  Below we land the **conditional version** that takes
-the minimum-counterexample contradiction as a forward-dependency hypothesis. -/
+The full Goldschmidt-style 8-step proof is landed: Thm 7.5 + Ch.6 6.20
+(`isCyclic_of_faithful_trivial_on_proper_invariant`) + Ch.4 4.35
+(`actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p`).  The
+unconditional `normal_J` lives in `S7B2_NormalJ_PComplement` (sorry-free,
+axiom-clean).  This file lands the Step 1-7 bridge lemmas. -/
 
 /-! ### Step 1 corollaries of Hall-Higman 3.21 (mmd L3837)
 
@@ -1614,11 +1616,10 @@ The book's Step 7 combines:
 * The maximality of `A ∈ E(P)`.
 
 The combined counting argument forces `A ⊆ L`, contradicting the choice of
-`A ⊄ L`.  This is the most delicate part of the Goldschmidt-style proof; we
-**axiomatize the Step 7 conclusion** as the existence of a contradiction from
-the working hypotheses, and use it together with Step 8's wrap-up.
-
-Tracking issue: [`issues/0036-stuck-7-6-step-7.md`](../../../issues/0036-stuck-7-6-step-7.md). -/
+`A ⊄ L`.  This is the most delicate part of the Goldschmidt-style proof; the
+Step 7 conclusion is **landed as the proved theorem**
+`omega1ZCenterOpCore_relIndex_inter_A_le`, consumed by Step 8's wrap-up in
+`S7B2_NormalJ_PComplement`.  (Historical tracking issue 0036 is closed.) -/
 
 
 end OddOrder.Isaacs.Ch07

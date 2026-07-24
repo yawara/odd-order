@@ -102,3 +102,19 @@ Higman Lemmas 1--13 と分類終端を原文順に完遂する。上記の hub �
 OddOrder/Higman / Pf Appendices) は正規。step 1.5 の正本 regex (merge_monitor.md 冒頭ブロック) の
 b_re に `^OddOrder/Higman/` 等を hub が反映済 (b はレーン表のみ更新していたので二重管理分を同期)。
 merge a07d32aab で合流。
+
+---
+
+## 📝 2026-07-24 hub 監査 — 残タスク = ① のみ (② ③ 完了)
+
+- **② ✅ 完了** (2026-07-24 hub 直接作業 tick, commit `3adbd2df8`): 空 scaffold 4 本削除、
+  honest 残作業は issue 0148 へ分離。
+- **③ ✅ 完遂**: Higman program は `higmanClassification` / `higmanClassification_of_isSuzuki2Group`
+  (分類) + `pow_four_eq_one_of_isSuzuki2Group` (Theorem 1(a) exponent 4) まで landing、
+  `OddOrder/Higman/**` 実 sorry 0。
+- **① ❌ 未実施 (本 issue の唯一の残)**: 実測で重複 2 件とも現存 —
+  `cyclic_finite_unique_order_two` (`Higman/Suzuki2Groups/AgemoLayers.lean:347` と
+  `Isaacs/Ch05_Transfer/Basic.lean:764`、両 private) /
+  `lowerCentral_commutatorElement_mul_right_of_class_le_two`
+  (`HigmanLowerCentralGraded.lean:512` private、Ch04 BaerTrick 既存版への repoint 未)。
+  owner = hub、quiet window で実施 (cross-file ゆえ full build gate)。

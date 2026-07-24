@@ -221,3 +221,31 @@ frozen BG Ch1 の **純機械カテゴリのみ**を先行解消 (active-lane �
 
 ⚠ **`unusedFintypeInType` (FeitSibley 75/1017/1033・S11_RFamily 780) は d が触らず owner (0144) へ** —
 どの instance が flagged か / body が Fintype を要求するかは proof 文脈判断が最も安全 (誤ると body 破壊)。
+
+---
+
+## ✅ 2026-07-24 完了 (hub、ユーザー指示「lint fix をここで一気に進めます」) — Phase 2 完了 + Phase 3 (--strict 切替)
+
+残 baseline 47 件 (実測 46 + S05 header は lane a 解消済) を hub が一括解消し、**backlog 0 到達**:
+
+- style.show 31 → `change` / unusedSectionVars 8 → `omit` / unusedFintypeInType 2 /
+  longLine 2 / flexible 1 / unnecessarySimpa 1 / unusedVariables 1 (commit `e6fc21830`)
+- **omit cascade 3 件**: `omit [Finite P]` で署名から instance が消えると、それを cite していた
+  下流定理の同 section var が新たに unused 化して警告が湧く (CaseSplitBCD ×2 → Classification ×1)。
+  fixpoint まで追跡が必要 — full build 2 周で収束確認。
+- **flexible の罠 (新規知見)**: linter が warning に添える Try-this の simp only 集合は
+  **unfold 系引数 (`omegaProdChar`) を欠くことがある** (適用すると instance stuck で build 破壊)。
+  実際に `simp?` を回して closed set を取り直すこと (FeitThompsonNuGrid `colT_finNeg`)。
+- 検証: leaf builds green → full build green → **fresh full rebuild (`rm -rf .lake/build`) green ×2**
+  (1 回目は cold-graph の lake olean 読み込み競合で transient fail → 再現せず) +
+  単発 fresh `--strict` run で確定。sorry 1 (凍結 Q₈ BS) 非退行。
+
+### Phase 3 実施
+
+- `bin/lint-baseline.tsv` を空化 (ヘッダのみ; 空 baseline では無印 gate も strict と等価)。
+- CI (`lean_action_ci.yml`) の gate step を `bin/check-warnings --strict` へ切替。
+- CLAUDE.md「lint 警告ゼロ方針」を --strict 体制に書き換え。
+- issue 0123 (linter-warnings-cleanup) は本 issue が包含 → 統合 close。
+  per-lane 0144/0145/0146 も全件解消につき close (0144 = lane a 解消済 / 0145 = 本 wave /
+  0146 = lane c 解消済)。0133 (openClassical) も lane c 完了済につき close。
+- 残る別トラック: 0136② (AppD hne 一般化) / 0132 (命名リファクタ; 警告は per-decl 例外で抑制済)。

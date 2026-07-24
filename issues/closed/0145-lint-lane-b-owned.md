@@ -64,3 +64,12 @@ commit 前 `bin/check-warnings` / show・longLine は per-site 判断)。
 ## 完了条件
 
 lane b 所有ファイルの非 sorry 警告ゼロ → `bin/check-warnings --update-baseline`。
+
+---
+
+## ✅ 2026-07-24 close — hub がユーザー指示で一括解消
+
+lane b 所有分 45 件は 2026-07-24 にユーザー指示「lint fix をここで一気に進めます」を受け
+hub が main 上で一括解消 (commit `e6fc21830`; b の worktree は clean・未マージ 0 を確認の上)。
+show→change 31 / omit 8+cascade 3 / Fintype 2 / longLine 2 / simpa 1 / `_hb` 1。
+fresh full build + `--strict` で 0 件確認。詳細 = closed/0138 完了節。close。

@@ -78,3 +78,12 @@ issue 0123 の longLine wave で、**行の折り返しでは解消できない*
 
 - `issues/0123-linter-warnings-cleanup.md` (longLine wave 本体)
 - CLAUDE.md「トレーサビリティ」(定理名は記述的命名、番号は docstring のみ)
+
+---
+
+## 📝 2026-07-24 現状 — lint gate 観点は解消済み、残るのは命名判断のみ
+
+該当 2 行は per-decl `set_option linter.style.longLine false in` で明示例外化済み
+(`S08_CoherenceBasic.lean:859` / `S08_CoherenceTheorems.lean:409`) — 2026-07-24 の `--strict`
+gate 切替後も警告は出ない。本 issue に残るのは **`PairUnionBaseAnchorCommonIndexPrimePowerStepData`
+系の語幹短縮という命名リファクタ判断** (owner = lane a) のみで、lint 債務ではない。

@@ -129,3 +129,11 @@ shared 2 件は lane a が territory 外として punt していた unclaimed �
 一括完了のため引き取り (統計: statement 非改変ゆえ下流 S11/S15 consumer 無影響、full build で確認)。
 
 ⟹ **baseline から openClassical 全消。issue 0133 クローズ可** (→ `--strict` gate へ前進、issue 0138)。
+
+---
+
+## ✅ 2026-07-24 close — lane c が openClassical を全件局所化
+
+file-level `open scoped Classical` は repo 全体で 0 (per-decl `open scoped Classical in` 120 箇所へ
+局所化、statement 依存 11 件も含め解消; lane c commits `e4c54ea66`/`6c335ac52`、merge `127e926bf`)。
+2026-07-24 fresh full build で openClassical 警告 0 を確認。close。

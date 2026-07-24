@@ -63,3 +63,15 @@ Suzuki 付録は b territory ゆえ差し替え実施 owner = **b**。重複は�
 (単なる dup) ので緊急性なし — **2053 Theorem B の区切り** (issue 0127 ②の
 Suzuki2Groups 統合と同じタイミング) でまとめて実施すること。hub は tick でこの間
 dup 増殖がないかだけ watch。
+
+---
+
+## 📝 2026-07-24 hub 監査 — 共有 bridge は landing 済み、差し替え未実施 + 複製が 1 件増加
+
+- 共有版 `ringAutMulEquivAlgAut` は `GroupTheory/RepresentationTheory/SemilinearFieldAut.lean:266`
+  に **landing 済み** (`@[simp]` apply / card 補題つき)。
+- 未実施: `Suzuki/SemilinearModel.lean:110` の inline `toAlgAut` (本 issue の元対象) が現存。
+- **新規複製 +1**: `Higman/Suzuki2Groups/HigmanLemmaEleven/TypeAConclusion.lean:271` に
+  `private def ringAutMulEquivAlgAut` (同名 private 複製、lane b が Higman 実装時に導入)。
+  差し替え対象は計 2 箇所に増加。いずれも lane b territory — owner = b (frontier 通過時) or
+  hub (quiet window)。

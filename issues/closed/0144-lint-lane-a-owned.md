@@ -61,3 +61,11 @@ d が先行解消しなかった理由 = **どの instance が flagged か / bod
 ## 完了条件
 
 lane a 所有ファイルの非 sorry 警告ゼロ → `bin/check-warnings --update-baseline`。
+
+---
+
+## ✅ 2026-07-24 close — lane a が全件解消済み
+
+2026-07-24 の census (main、fresh full build) で lane a 所有分の警告は **0 件**。
+FeitSibley unusedFintypeInType / FeitSibleyQ1Component show / S11_RFamily / ChiefFactorCore
+longLine / S13 `A'` を含め全て解消済みを確認 (0138 の完了 wave と同 tick)。close。

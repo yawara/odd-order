@@ -52,3 +52,11 @@ sorry 数不変で main に合流される。
   topic leaves + 必要なら pure re-export hub。
 - **例外 trigger**: どちらかが **2000 行 (hard limit) に到達したら**繰延を破棄し、
   a と衝突しない先頭凍結クラスタのみ緊急 prefix-split。
+
+---
+
+## 📝 2026-07-24 hub 監査 — blocker 解除 (実施可能)
+
+保留理由だった lane a の FeitSibley campaign (issue 1054) は完了し、a は Isaacs Problems
+(1055) へ移動済み → **FeitSibleyTheorem.lean (実測 1882 行) は凍結ゾーン化し、prefix-split を
+実施できる**。owner = hub、quiet window で分割 (手順 = issue 0103 / merge_monitor.md)。

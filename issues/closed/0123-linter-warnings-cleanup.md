@@ -399,3 +399,10 @@ leaf build 2 本で検証 (term-preserving ゆえ full 不要)。→ 非 sorry 4
 
 ⟹ **今この瞬間に安全に mechanical 解消できるものは尽きた** (6 件で打ち止め)。残りは
 (a) レーンの frontier 移動待ち、(b) `open scoped Classical` の非 mechanical wave、(c) 恒久 skip。
+
+---
+
+## ✅ 2026-07-24 close (0138 に統合)
+
+本 issue のスコープ (linter 警告の一括解消) は issue 0138 (zero-warning gate) が包含し、
+2026-07-24 に backlog 0 + `--strict` gate 切替で完了 (0138 の完了節参照)。統合 close。
