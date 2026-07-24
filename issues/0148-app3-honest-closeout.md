@@ -37,9 +37,17 @@ Pf 側の再掲は書かない。
       書籍の「P 2-group」仮定は不要 (使うのは W ≤ Z(P) + 両 exponent 2 のみ) なので一般化。
       ⚠ 実装知見: `IsMulCommutative.instCommGroup` は **scoped instance** — `open scoped
       IsMulCommutative` が無いと letI 連鎖が組めず zmodModule の型と不一致になる。
-- [ ] **Lemma 2**: `F_{2^n}` 上の linear / bilinear / quadratic map の基底表示
-      (`x ↦ Σ aᵢ x^{2ⁱ}` 形)。`HigmanFiniteFieldTrace.lean` に部分素材あり。
-      Prop 1/2 の証明で必要になる範囲を優先。
+- [ ] **Lemma 2**: `F_{2^n}` 上の linear / bilinear / quadratic map の基底表示。
+      **(a) ✅ 2026-07-24 (hub)**: `SemilinearFieldAut.lean` に一般標数で実装 —
+      `linearIndependent_algAut_toLinearMap` (Dedekind `linearIndependent_monoidHom` を
+      `LinearIndependent.comp` + `.of_comp coeFnLinear` で 𝔽_p-線形写像空間へ転送) /
+      `finrank_linearMap_self_eq_finrank` (`Module.finBasis` + `Basis.constr F` の equiv で
+      dim_F Hom = [F:𝔽_p]) / **`algAutLinearBasis : Module.Basis (F ≃ₐ[ZMod p] F) F
+      (F →ₗ[ZMod p] F)`** (`basisOfLinearIndependentOfCardEqFinrank` +
+      `IsGalois.card_aut_eq_finrank`、AxiomsCheck 登録)。
+      **(b)(c) 残**: bilinear は σ(x)τ(y) 族 ((a) を 2 回適用 + dim n²)、quadratic は
+      σ(x)τ(x) 族 ({σ,τ} サイズ 1–2、char 2 特有の対称化)。(b) は
+      `LinearMap.BilinMap (ZMod 2) F F` 上で同じ骨格 (basis constr² + 独立性)。
 - [ ] **Proposition 1**: `B(n,1,ε)` が field model `q(x) = x·x̄` を許容する。
       `Types.lean` の `TypeBModel`/`typeBQuadraticMap` (φ, ε パラメータ) が
       土台。原文は `references/peterfalvi/pdf/08.0_pp_139_143_On_Suzuki_2-Groups.pdf`

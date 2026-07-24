@@ -12638,3 +12638,5 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.centralSquareQuadraticMap
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.centralCommPairing_mk
+-- Peterfalvi App.III Lemma 2(a) (Aut(F) is an F-basis of the 𝔽_p-linear endomaps)
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.algAutLinearBasis

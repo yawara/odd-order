@@ -291,6 +291,62 @@ theorem natCard_ringAut_galoisField (q : ℕ) (hq : q ≠ 0) :
     Nat.card (RingAut (GaloisField p q)) = q := by
   rw [natCard_ringAut_eq_finrank (GaloisField p q) p, GaloisField.finrank p hq]
 
+/-! ### Peterfalvi Appendix III, Lemma 2(a)
+
+The `𝔽_p`-linear endomaps of a finite field `F` form an `F`-vector space with
+basis `Aut(F)` (the book states `p = 2`; the argument is characteristic-free).
+Linear independence is Dedekind's independence of characters
+(`linearIndependent_monoidHom`); the count is
+`dim_F Hom_{𝔽_p}(F, F) = [F : 𝔽_p] = |Aut F|` (the latter by Galois theory of
+finite fields). -/
+
+/-- Coercion of `𝔽_p`-linear endomaps to bare functions, as an `F`-linear map
+(`F` acts on the codomain). -/
+private def coeFnLinear : (F →ₗ[ZMod p] F) →ₗ[F] (F → F) where
+  toFun g := ⇑g
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
+
+/-- **Dedekind independence for field automorphisms**: the automorphisms of
+`F`, viewed as `𝔽_p`-linear endomaps, are `F`-linearly independent. -/
+theorem linearIndependent_algAut_toLinearMap [Finite F] :
+    LinearIndependent F
+      (fun σ : F ≃ₐ[ZMod p] F => (σ.toLinearMap : F →ₗ[ZMod p] F)) := by
+  have h0 : LinearIndependent F (fun f : F →* F => (f : F → F)) :=
+    linearIndependent_monoidHom F F
+  have hinj : Function.Injective (fun σ : F ≃ₐ[ZMod p] F => (σ : F →* F)) := by
+    intro σ τ h
+    ext x
+    exact DFunLike.congr_fun h x
+  have hcomp := h0.comp _ hinj
+  exact hcomp.of_comp (coeFnLinear F p)
+
+/-- `dim_F Hom_{𝔽_p}(F, F) = [F : 𝔽_p]`: evaluation on an `𝔽_p`-basis is an
+`F`-linear equivalence with `F^[F : 𝔽_p]`. -/
+theorem finrank_linearMap_self_eq_finrank [Finite F] :
+    Module.finrank F (F →ₗ[ZMod p] F) = Module.finrank (ZMod p) F := by
+  classical
+  letI : Fintype F := Fintype.ofFinite F
+  let b := Module.finBasis (ZMod p) F
+  rw [← (b.constr F : _ ≃ₗ[F] (F →ₗ[ZMod p] F)).finrank_eq]
+  simp
+
+/-- **Peterfalvi Appendix III, Lemma 2(a)** (p. 140, characteristic-free form):
+the `𝔽_p`-linear mappings `F → F` of a finite field form an `F`-vector space
+with basis the automorphisms of `F`. -/
+noncomputable def algAutLinearBasis [Finite F] :
+    Module.Basis (F ≃ₐ[ZMod p] F) F (F →ₗ[ZMod p] F) :=
+  letI : Fintype (F ≃ₐ[ZMod p] F) := Fintype.ofFinite _
+  basisOfLinearIndependentOfCardEqFinrank
+    (linearIndependent_algAut_toLinearMap F p)
+    (by
+      rw [finrank_linearMap_self_eq_finrank F p, ← Nat.card_eq_fintype_card]
+      exact IsGalois.card_aut_eq_finrank (ZMod p) F)
+
+@[simp] theorem algAutLinearBasis_apply [Finite F] (σ : F ≃ₐ[ZMod p] F) :
+    algAutLinearBasis F p σ = σ.toLinearMap := by
+  simp [algAutLinearBasis]
+
 end FiniteFieldAut
 
 end OddOrder.RepresentationTheory
