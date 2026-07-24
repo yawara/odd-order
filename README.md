@@ -43,14 +43,16 @@ That machinery is the lasting output of this repository, and completing it is no
 
 Coverage of the three books is tracked result by result. An audit on 2026-07-16 enumerated all
 **815 numbered results**: 467 formalized at full book strength, 78 covered completely by mathlib itself,
-54 present in a specialized form awaiting generalization, and 214 remaining work items. That audit is the
-working scope document — see
-[`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md).
-Progress since then lives in the git history and in `issues/`.
+54 present in a specialized form awaiting generalization, and 214 remaining work items. That survey
+([`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md))
+is a snapshot of the phase-two starting point, not a live scope document — later spot checks found some
+of its per-chapter labels unreliable. Current scope and progress are tracked in the git history and in
+`issues/`, with each item re-verified against the tree before work starts.
 
 Everything sits under the `OddOrder` namespace rather than being upstreamed piecemeal, but mathlib
 naming and style conventions are followed throughout so that the general-purpose parts stay
-upstreamable later.
+upstreamable later. The tree builds with zero non-`sorry` warnings under mathlib's standard linter
+set, enforced as a strict gate in CI.
 
 ## Building
 
@@ -76,21 +78,14 @@ The Lean toolchain is pinned in [`lean-toolchain`](lean-toolchain) and the mathl
 | `coq/` | Submodule: [math-comp/odd-order](https://github.com/math-comp/odd-order), the Coq/mathcomp formalization — a **read-only reference**, consulted because its comments fill in steps the textbooks elide. Nothing is translated from it |
 | `references/` | Textbook PDFs and extracted Markdown — gitignored, kept in a separate private repository |
 
-## How this is built
+## Use of AI
 
-The formalization is written by AI agents working in parallel `git worktree` lanes, with a coordinating
-process that merges a lane into `main` only after a full green build, an axiom audit, and a check that no
-proved result has regressed to `sorry`. The conventions those agents follow — file granularity,
-traceability from each Lean declaration back to the printed theorem number, naming, and what *not* to
-do — are documented in [`CLAUDE.md`](CLAUDE.md).
-
-Two deliberate choices are worth flagging for anyone reading the sources. The project does **not** use a
-`leanblueprint`-style TeX dependency graph; the textbooks themselves play that role. And thin renaming
-wrappers — around mathlib, or around existing results in this repository — are not written; the
-correspondences are recorded in docstrings and in `notes/` instead.
-
-The `sorry`s remaining in the tree (currently 23) all belong to the ongoing book-completion work. None is
-reachable from `feitThompson`, which is precisely what the axiom check enforces.
+AI agents were used **heavily** throughout this project: the overwhelming majority of the Lean code,
+notes, and documentation was written by AI, and **not all of it has been human-reviewed**. What stands
+between that and correctness is the Lean kernel — every proof is machine-checked, and the axiom audit
+described above pins down exactly what each result depends on. Where reader skepticism remains
+warranted is the *statements*: whether a Lean declaration faithfully renders the textbook theorem it
+cites. Docstrings carry the book numbering precisely so that this correspondence can be checked.
 
 ## License
 
