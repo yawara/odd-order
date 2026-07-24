@@ -12664,6 +12664,11 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.conj_ne_refl
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.mul_conj
+-- Peterfalvi App.III Proposition 2 (iv) (norm of the field model is surjective; char-2 scalars)
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.exists_mul_conj_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.typeBQuadraticMap_surjective
 -- Peterfalvi App.III Proposition 2 (iii) (α ↦ f_α homomorphism; kernel = inducing-id subgroup)
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.autQuotientHom

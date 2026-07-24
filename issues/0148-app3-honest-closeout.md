@@ -133,9 +133,14 @@ Pf 側の再掲は書かない。
         AddEquiv ext + `congrArg Multiplicative.ofAdd`、apply 補題は
         `.toAdd v` 形)。`Characteristic.fixed` も直接射影不可 →
         `characteristic_iff_comap_eq.mp inferInstance` (repo 慣用形)。
-  - [ ] **(iv) norm 全射性**: `FieldModel ε` の `q(x) = x·conj x` は F に全射
-        (units 準同型 + cyclic 位数勘定 or mathlib 既存を探す)。kernel 記述
-        (iii)+(ii) に接続。
+  - [x] **(iv) norm 全射性** ✅ 2026-07-24 (hub): `FieldModel.lean` 末尾に追加。
+        **units/cyclic 勘定は不要だった** — char 2 では conj がスカラー固定 +
+        Frobenius 全射 (`frobeniusEquiv F 2`, 要 `[Finite F]`) により、
+        `a² = c` なるスカラー a の norm `a·ā = a²` だけで F を尽くす。
+        `exists_mul_conj_eq` (norm 全射) / `typeBQuadraticMap_surjective`
+        (`q(a,0) = a²` で第 1 軸のみで全射) /
+        `closure_range_typeBQuadraticMap` ((iii) の hspan 供給)。
+        anisotropy 仮定も不要。AxiomsCheck 2 assert。
   - [ ] **(v) semilinear 分類 (核心)**: additive f : E → E, g : F → F,
         g∘q = q∘f, f ≠ 0 ⟹ f = λ·σ (λ ∈ E*, σ ∈ Gal(E/𝔽₂))。
         Lemma 2(a) の `algAutLinearBasis` で f を展開、q∘f − g∘q の

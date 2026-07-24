@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Polynomial.SpecificDegree
+import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.LinearAlgebra.Pi
 import Mathlib.RingTheory.AdjoinRoot
 import Mathlib.Algebra.CharP.Two
@@ -32,7 +33,10 @@ Main declarations:
   `F × F ≃ₗ[F] FieldModel ε`, `(a, b) ↦ a + bα`;
 * `FieldModel.conj` — the conjugation automorphism `α ↦ ε + α`, an involution
   (`FieldModel.conj_conj`), nontrivial when `ε ≠ 0` (`FieldModel.conj_ne_refl`);
-* `FieldModel.mul_conj` — **Proposition 1**: `x · x̄ = q(x)`.
+* `FieldModel.mul_conj` — **Proposition 1**: `x · x̄ = q(x)`;
+* `FieldModel.exists_mul_conj_eq` / `typeBQuadraticMap_surjective` — over a
+  finite `F` the norm (equivalently the square map `q`) is surjective, since
+  in characteristic `2` already the scalars `a·ā = a²` exhaust `F`.
 -/
 
 set_option autoImplicit false
@@ -276,7 +280,58 @@ theorem mul_conj (a b : F) :
           (algebraMap F (FieldModel ε) b) ^ 2 *
             algebraMap F (FieldModel ε) ε * alpha ε)
 
+/-! ### Surjectivity of the norm (step (iv) of Proposition 2)
+
+Over a finite `F` of characteristic `2` no counting is needed: squaring is
+surjective on `F` (Frobenius), the conjugation fixes scalars, and so already
+the scalar `a` with `a² = c` has norm `a·ā = a² = c`. -/
+
+section NormSurjectivity
+
+variable [Finite F]
+
+/-- **Norm surjectivity** (toward Proposition 2, p. 142): over a finite `F`
+of characteristic `2` every scalar of the field model is a norm `x·x̄`. -/
+theorem exists_mul_conj_eq (c : F) :
+    ∃ x : FieldModel ε, x * conj ε x = algebraMap F (FieldModel ε) c := by
+  obtain ⟨a, ha⟩ := (frobeniusEquiv F 2).surjective c
+  have ha2 : a ^ 2 = c := ha
+  refine ⟨algebraMap F (FieldModel ε) a, ?_⟩
+  rw [(conj ε).commutes, ← map_mul, ← pow_two, ha2]
+
+end NormSurjectivity
+
 end FieldModel
+
+section NormSurjectivity
+
+variable [Finite F]
+
+/-- **Surjectivity of the type-B square map** `q(a, b) = a² + εab + b²` of
+`B(n, 1, ε)` over a finite field of characteristic `2` (step (iv) of
+Proposition 2): already the first axis realizes every value, since
+`q(a, 0) = a²` and squaring (Frobenius) is surjective. -/
+theorem typeBQuadraticMap_surjective :
+    Function.Surjective (typeBQuadraticMap (1 : RingAut F) ε) := by
+  intro c
+  obtain ⟨a, ha⟩ := (frobeniusEquiv F 2).surjective c
+  have ha2 : a ^ 2 = c := ha
+  refine ⟨(a, 0), ?_⟩
+  rw [typeBQuadraticMap_apply]
+  simp only [RingAut.one_apply, mul_zero, add_zero]
+  rw [← pow_two, ha2]
+
+/-- The values of the type-B square map additively generate all of `W = F` —
+the spanning hypothesis (`hspan`) of the kernel statements of Proposition 2
+(`QuadraticExtension.ker_autQuotientHom`). -/
+theorem closure_range_typeBQuadraticMap :
+    AddSubgroup.closure
+      (Set.range fun p : F × F => typeBQuadraticMap (1 : RingAut F) ε p) =
+      ⊤ := by
+  rw [Set.range_eq_univ.mpr (typeBQuadraticMap_surjective ε),
+    AddSubgroup.closure_univ]
+
+end NormSurjectivity
 
 end
 
