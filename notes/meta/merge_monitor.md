@@ -6,6 +6,21 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-24 夜 hub 直接作業 tick #4 (「続けてください」) — 🎯 App III Lemma 2(b)(c) 完成 = Lemma 1+2 独立性側 全完了。push →45bed1296**。
+> ① **Lemma 2(b)**: `algAutMulBilin` + 独立性 (積 monoid F×F の Dedekind 指標に帰着 — 書籍の
+> 二重和不要) + dim n² + card 補題。bundled Basis は入れ子 `F →ₗ F →ₗ F` の instance isDefEq
+> 発散で繰延 (diagnostics 付きで 0148 記録; span 版も同根)。
+> ② **Lemma 2(c)** (char 2 特有): `autMulQuadraticMap` + `coeff_symm` (polar 化 + swap 再指数 +
+> Pi 空間の指標独立) + `diag_eq_zero` (swap involution 打ち消し + Frobenius 全射で (a) 帰着)。
+> ordered-pair 供述で Sym2 index を回避。
+> ③ 教訓 2 件: (i) 入れ子 LinearMap 空間の module instance は ext/評価/map'/ker_eq_bot 全て
+> isDefEq 爆発 — **関数空間 (Pi)+MonoidHom 指標側で証明を組む** (今回 3 回張り直して確立)。
+> (ii) `lake env lean f | head; echo $?` は **head の exit code** を拾う偽装 green — 判定は
+> エラー行の有無 + 最終 lake build で。⚠ 途中 1 commit を gate 赤 (longLine 1 件) のまま
+> `;`-連結ミスで push → 即 follow-up 修正 (`f5b4bde7f`)、以後 `&&` 徹底。
+> gate: leaf + AxiomsCheck (4604 jobs) green ×2、`--strict` EXIT=0、AxiomsCheck 新 assert 4 本
+> axiom-clean、census 1 非退行。残 (0148): Prop 1 (B(n,1,ε) field model) → Prop 2 (Aut) → 2052。
+>
 > **▶▶ 2026-07-24 夕 hub 直接作業 tick #3 (「gate green のあと進めて」) — 🎯 App III 実数学に着手: Lemma 1(a) + Lemma 2(a) 完成。push →6e3563335**。
 > ① 0149 続き: S04g_Thm418 prefix-split (1965 → Core 958 + 残 1008、消化 2 件目) / 9130 close
 > (補題 trio 集約: Ch03 重複削除 + singleton 版の系化)。ユーザー裁定で 0050/0143/1055/2053 凍結
