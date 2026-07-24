@@ -6,7 +6,18 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
-> **▶▶ 2026-07-24 09:5x 単発 tick (ユーザー明示指示「各レーンの進捗を一回だけ取り込む」) — 🎯 b の *未コミット* 遺留成果 (Higman Theorem 1(a) exponent four) を hub が救出合流。実 sorry 7→6**。a=0 / b=0(commit 済分) / c=0 / d=0。
+> **▶▶ 2026-07-24 11:xx hub 直接作業セッション (ユーザー裁定「レーンに分配せず hub で b→a→c タスクを閉じる」) — 🎯🎯 残 6 sorry の考察と一括処理。実 sorry 6→1 (残 = 凍結 Q₈ のみ)**。
+> 内訳: ① Suzuki2Groups.lean の空 scaffold 4 本削除 (`3adbd2df8`, 0127 ② 実施; honest 残作業 =
+> **issue 0148**) ② Aut(Q₈) odd bound 新 leaf `GroupTheory/SpecificGroups/QuaternionGroupMulAut`
+> (`30fbf39e1`) ③ near-field units ≅ Q₈ 新 leaf `Appendices/NearFieldUnitsQuaternion` (`9f2a052c0`)
+> ④ **StepSix `card_D_le_three_of_noncomm` 実証明 = Pf II Ch.II step (6) 完成** (`f76f13fea`,
+> AxiomsCheck 部品 7 本登録; 組み上げ 2 本は step(5)→(4)→(2)(b) 経由で凍結 Q₈ を継承ゆえ意図的未登録)
+> ⑤ **凍結 sorry を `brauerSuzuki_quaternionSylow_q8` に単離** (`cbe793db7`): |T|≥16 の
+> QuaternionSylowSetup 組み立て + t=z + C₄ 吸収を実証明し、凍結面 = Q₈ statement そのものに縮小
+> (0147/project note の参照更新済 `9ed3b437b`)。9501 は superseded で closed。
+> gate: full build **4648 jobs EXIT=0** (42s 増分) + AxiomsCheck OK + check-warnings ratchet OK
+> (46 ≤ baseline 47) + census 1。⚠ 教訓再演: AxiomsCheck build を `| tail` で確認して偽 green を
+> 1 回踏んだ (既知の EXIT 隠蔽罠) — `> log; echo EXIT=$?` で再検証して捕捉、amend 修正済。
 > **⚠ 全 4 branch は ahead=0 だったが、lane b の worktree に 02:07 以降 7.5h 放置の未コミット成果**
 > (新 leaf `Higman/Suzuki2Groups/ExponentFour.lean` 153 行 + aggregator 配線 + AxiomsCheck 6 assert +
 > Pf StepFive の consumer 差し替え) を検出 — b の session が mid-turn で落ちて stranded になっていた。
