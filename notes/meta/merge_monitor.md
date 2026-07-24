@@ -6,6 +6,25 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-24 夜 hub tick #6 (区切り) — 🎯 App III Prop 1 完成 + Lemma 1(c)(d) 完成 = Lemma 1 全完了。push →a5d9a44b6**。
+> ① **Prop 1 後半** (`ff4f5d9d5`): conj = `AdjoinRoot.liftAlgHom` + `AlgEquiv.ofAlgHom` 自己合成
+> (有限次元論法・field instance 不要) / `equivProd` (powerBasis' reindex + finTwoArrow) /
+> **norm 恒等式 `mul_conj`** (`linear_combination B²·alpha_sq + add_self(…)` — char-2 の 2t=0 を
+> 項として渡す) / `isField`。AxiomsCheck 5 assert。
+> ② **Lemma 1(c)** (`b20d35942`): 新 leaf `GroupTheory/CentralExtensionAutomorphisms.lean` —
+> `twistCoords` で端群 reindex → 同一 square map に還元して既存 `equivOfCommonSquareMap` を cite
+> (書籍の基底持ち上げ再実装不要)。necessity は square 座標直計算。AxiomsCheck 2 assert。
+> ③ **Lemma 1(d)** (`a5d9a44b6`): 同 leaf — deviation Φe·e⁻¹ の座標化で
+> `inducingIdAutsEquivHom : Multiplicative (V →+ W) ≃* inducingIdAuts` +
+> `isElementaryAbelian_inducingIdAuts` (= Prop 2 kernel 部の一般核)。AxiomsCheck 2 assert。
+> ④ Prop 2 は **6 段分解を issue 0148 に記録** ((i)(ii) 完了)。**(iii) 誘導写像機構は WIP**:
+> `Suzuki2Groups/AutomorphismInducedMaps.lean` が worktree に **untracked 未 commit** (main は
+> green のまま)。残エラー 4 種の診断と修正手順は 0148 (iii) 項に精密記録済み — 次セッションは
+> そこから再開。⚠ 教訓: **Lean 4 の section 変数は proof 内のみの使用だと `include` 必須**
+> (statement に現れない hypothesis 変数は Unknown identifier になる; defs は include 前に置く)。
+> gate: 3 commit とも leaf+AxiomsCheck green・新 assert 9 本 axiom-clean・`--strict` EXIT=0・
+> census 1 (凍結 Q₈) 非退行・全 push 済み。lane a/b/c: 変化なし (a/b 凍結 hub 再割当待ち、c 完済)。
+>
 > **▶▶ 2026-07-24 深夜 hub tick #5 (区切り) — App III Lemma 2(c) + Prop 1 前半で session close。push →d0c81638b**。
 > Lemma 2(c) 独立性 2 定理 (coeff_symm/diag_eq_zero、Pi 空間+Frobenius 全射) と Prop 1 前半
 > (新 leaf `Suzuki2Groups/FieldModel.lean`: X²+εX+1 既約 from anisotropy、AdjoinRoot model +

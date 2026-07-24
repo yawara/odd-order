@@ -110,11 +110,27 @@ Pf 側の再掲は書かない。
         AxiomsCheck 2 assert。実装知見: kernelCoordinate は
         `MonoidHom.ofInjective .symm` で取ると `simp [定義]` 一発で
         inl_kernelCoordinate が閉じる。
-  - [ ] **(iii) 誘導写像機構**: anisotropic な `QuadraticExtension` 上で
-        range inl = center (ModelCenters の `mem_center_iff` +
-        `typeBQuadraticMap_radical_eq_zero`) → α ∈ Aut が f_α/g_α を誘導、
-        `autToQuotient : (X ≃* X) →* AddAut V` + compat `g∘q = q∘f` +
-        (f_α = id ∧ q の像が W を張る → g_α = id)。
+  - [ ] **(iii) 誘導写像機構** — **WIP (2026-07-24 hub、未 commit)**: worktree に
+        `Suzuki2Groups/AutomorphismInducedMaps.lean` (untracked、~300 行) が下書き済み。
+        構成は完成形: `center_eq_range_inl` (hrad) / `map_mem_range_inl_iff`
+        (center characteristic 経由) / `autQuotientFun`・`autKernelFun` /
+        `map_inl`・`map_quotient` / 加法性 2 本 / `autQuotientAddEquiv`・
+        **`autQuotientHom : MulAut X →* AddAut V`** / `autKernel_squareMap`
+        (compat g∘q=q∘f) / `inducesId_of_autQuotient_id` (hspan) /
+        `ker_autQuotientHom` = inducingIdAuts / `isElementaryAbelian_ker`。
+        **残エラー修正 (診断済み、未適用)**:
+        ① `map_inl` の statement を `(w : W)` + `ofAdd w` 形に変更 (現行の
+        `w.toAdd` 形は rw の syntactic match が効かない; 使用箇所 =
+        autKernelFun_add / inducesId の inl 節は `ofAdd_toAdd` で橋渡し)
+        ② `autKernel_squareMap` は rw でなく `change` + 最後 `exact hW.symm`
+        (defeq は exact に任せる) ③ `AddSubgroup.closure_induction` の case 名は
+        additive で `mem/zero/add/neg` (one/mul/inv でない) ④ 残る `show` 3 箇所
+        (autQuotientFun_add / inducesId / ker) を `change` に (linter.style.show)。
+        **適用済み**: Lean 4 の section 変数は proof 内使用だと `include hrad` が
+        必要 (defs は include 前に配置) / `Mathlib.Algebra.Group.Aut` import
+        (AddAut の Group instance) / map_mem_range_inl_iff の二重 rw → 単一 rw。
+        完了後: OddOrder.lean 配線 + AxiomsCheck (autQuotientHom /
+        ker_autQuotientHom / isElementaryAbelian_ker) を忘れない。
   - [ ] **(iv) norm 全射性**: `FieldModel ε` の `q(x) = x·conj x` は F に全射
         (units 準同型 + cyclic 位数勘定 or mathlib 既存を探す)。kernel 記述
         (iii)+(ii) に接続。
