@@ -347,6 +347,97 @@ noncomputable def algAutLinearBasis [Finite F] :
     algAutLinearBasis F p σ = σ.toLinearMap := by
   simp [algAutLinearBasis]
 
+/-! ### Peterfalvi Appendix III, Lemma 2(b)
+
+The `𝔽_p`-bilinear maps `F × F → F` form an `F`-vector space with basis the
+family `(x, y) ↦ σ(x)·τ(y)` over pairs of automorphisms (again characteristic
+free).  Independence: fixing the second argument reduces to Lemma 2(a) in the
+first argument, then again in the second; the dimension is `n²`. -/
+
+/-- The bilinear map `(x, y) ↦ σ(x)·τ(y)` attached to a pair of field
+automorphisms. -/
+noncomputable def algAutMulBilin (σ τ : F ≃ₐ[ZMod p] F) :
+    F →ₗ[ZMod p] F →ₗ[ZMod p] F :=
+  (LinearMap.mul (ZMod p) F).compl₁₂ σ.toLinearMap τ.toLinearMap
+
+@[simp] theorem algAutMulBilin_apply (σ τ : F ≃ₐ[ZMod p] F) (x y : F) :
+    algAutMulBilin F p σ τ x y = σ x * τ y :=
+  rfl
+
+/-- Coercion of `𝔽_p`-bilinear maps to bare two-variable functions, as an
+`F`-linear map. -/
+private def coeFnBilin :
+    (F →ₗ[ZMod p] F →ₗ[ZMod p] F) →ₗ[F] (F × F → F) where
+  toFun g := fun xy => g xy.1 xy.2
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
+
+/-- The pair `(σ, τ)` as a monoid character of the product monoid `F × F`
+(the map `(x, y) ↦ σ(x)·τ(y)`). -/
+private def algAutPairChar (σ τ : F ≃ₐ[ZMod p] F) : (F × F) →* F :=
+  ((σ : F →* F).comp (MonoidHom.fst F F)) *
+    ((τ : F →* F).comp (MonoidHom.snd F F))
+
+/-- **Dedekind independence for automorphism pairs**: the bilinear maps
+`(x, y) ↦ σ(x)·τ(y)` are `F`-linearly independent.  Same pattern as
+Lemma 2(a): the pairs are distinct monoid characters of `F × F`, so Dedekind
+independence applies verbatim. -/
+theorem linearIndependent_algAutMulBilin [Finite F] :
+    LinearIndependent F
+      (fun στ : (F ≃ₐ[ZMod p] F) × (F ≃ₐ[ZMod p] F) =>
+        algAutMulBilin F p στ.1 στ.2) := by
+  have h0 : LinearIndependent F (fun f : (F × F) →* F => (f : F × F → F)) :=
+    linearIndependent_monoidHom (F × F) F
+  have hinj : Function.Injective
+      (fun στ : (F ≃ₐ[ZMod p] F) × (F ≃ₐ[ZMod p] F) =>
+        algAutPairChar F p στ.1 στ.2) := by
+    intro στ στ' h
+    have happ : ∀ x y : F, στ.1 x * στ.2 y = στ'.1 x * στ'.2 y := fun x y =>
+      DFunLike.congr_fun h (x, y)
+    have h1 : ∀ x : F, στ.1 x = στ'.1 x := fun x => by
+      have := happ x 1
+      simpa using this
+    have h2 : ∀ y : F, στ.2 y = στ'.2 y := fun y => by
+      have := happ 1 y
+      simpa using this
+    exact Prod.ext (AlgEquiv.ext h1) (AlgEquiv.ext h2)
+  have hcomp := h0.comp _ hinj
+  exact hcomp.of_comp (coeFnBilin F p)
+
+/-- `dim_F` of the space of `𝔽_p`-bilinear maps `F × F → F` is `n²`. -/
+theorem finrank_bilinMap_self_eq [Finite F] :
+    Module.finrank F (F →ₗ[ZMod p] F →ₗ[ZMod p] F) =
+      Module.finrank (ZMod p) F * Module.finrank (ZMod p) F := by
+  classical
+  letI : Fintype F := Fintype.ofFinite F
+  let b := Module.finBasis (ZMod p) F
+  have he := LinearEquiv.finrank_eq
+    (b.constr (M' := F →ₗ[ZMod p] F) F)
+  rw [← he, Module.finrank_pi_fintype F]
+  simp [finrank_linearMap_self_eq_finrank F p, Finset.sum_const]
+
+/-- The index count matches the dimension: `|Aut F|² = n²` (top-level lemma so
+the heavy nested-instance context of the basis construction can cite it
+opaquely — inline `by`-proofs there send `whnf` into instance unfolding). -/
+theorem card_autProd_eq_finrank_bilinMap [Finite F]
+    [Fintype (F ≃ₐ[ZMod p] F)] :
+    Fintype.card ((F ≃ₐ[ZMod p] F) × (F ≃ₐ[ZMod p] F)) =
+      Module.finrank F (F →ₗ[ZMod p] F →ₗ[ZMod p] F) := by
+  rw [← Nat.card_eq_fintype_card, Nat.card_prod,
+    IsGalois.card_aut_eq_finrank (ZMod p) F,
+    finrank_bilinMap_self_eq F p]
+
+/-! **Lemma 2(b), packaging note.**  `linearIndependent_algAutMulBilin` +
+`card_autProd_eq_finrank_bilinMap` jointly state that the family
+`(x, y) ↦ σ(x)·τ(y)` is a basis (a linearly independent family whose
+cardinality equals the finrank spans, in finite dimensions).  The bundled
+`Module.Basis` term (via `basisOfLinearIndependentOfCardEqFinrank`, as in
+Lemma 2(a)) hits a `whnf`/`isDefEq` divergence in the doubly-nested
+`F →ₗ[ZMod p] F →ₗ[ZMod p] F` module-instance stack (issue 0148 に診断記録;
+`maxHeartbeats 3200000` でも不足、`Add.add` 2 万回超 unfold).  Consumers that
+need the bundled basis should construct it at use-site or resume from the
+0148 note. -/
+
 end FiniteFieldAut
 
 end OddOrder.RepresentationTheory

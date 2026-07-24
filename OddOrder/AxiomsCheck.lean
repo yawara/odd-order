@@ -12640,3 +12640,6 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.centralCommPairing_mk
 -- Peterfalvi App.III Lemma 2(a) (Aut(F) is an F-basis of the 𝔽_p-linear endomaps)
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.algAutLinearBasis
+-- Peterfalvi App.III Lemma 2(b) (σ(x)τ(y) family: independent + count = dim ⟹ basis)
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.linearIndependent_algAutMulBilin
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_autProd_eq_finrank_bilinMap

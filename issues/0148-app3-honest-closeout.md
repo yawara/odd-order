@@ -45,9 +45,19 @@ Pf 側の再掲は書かない。
       dim_F Hom = [F:𝔽_p]) / **`algAutLinearBasis : Module.Basis (F ≃ₐ[ZMod p] F) F
       (F →ₗ[ZMod p] F)`** (`basisOfLinearIndependentOfCardEqFinrank` +
       `IsGalois.card_aut_eq_finrank`、AxiomsCheck 登録)。
-      **(b)(c) 残**: bilinear は σ(x)τ(y) 族 ((a) を 2 回適用 + dim n²)、quadratic は
-      σ(x)τ(x) 族 ({σ,τ} サイズ 1–2、char 2 特有の対称化)。(b) は
-      `LinearMap.BilinMap (ZMod 2) F F` 上で同じ骨格 (basis constr² + 独立性)。
+      **(b) ✅ 2026-07-24 (hub、theorem-packaging)**: `algAutMulBilin` (σ(x)τ(y) の bilinear 化、
+      `LinearMap.mul.compl₁₂`) / `linearIndependent_algAutMulBilin` (⭐ 独立性は **F × F の積
+      monoid 上の Dedekind** に帰着 — 対 (σ,τ) を `algAutPairChar : (F × F) →* F` とみなすと
+      (a) と同一パターンで sum 操作不要) / `finrank_bilinMap_self_eq` (dim = n²) /
+      `card_autProd_eq_finrank_bilinMap`。AxiomsCheck 2 assert。
+      ⚠ **bundled `Module.Basis` は繰延**: 二重入れ子 `F →ₗ[ZMod p] F →ₗ[ZMod p] F` 上の
+      `basisOfLinearIndependentOfCardEqFinrank` が whnf/isDefEq 発散 (maxHeartbeats 3.2M でも
+      不足、diagnostics で `Add.add` 23,535 回 unfold を確認; card 補題の top-level 抽出・
+      Nonempty/Fintype letI 明示・Nat.card 経路化はいずれも効かず)。独立性 + card=dim の
+      theorem 2 本が数学的内容としては完結 (有限次元で basis と同値)。bundle 再挑戦の候補 =
+      `@Basis.mk` 全 instance 明示 / instance 径路の pin / mathlib 側の module-instance 整理待ち。
+      **(c) 残**: quadratic は σ(x)τ(x) 族 ({σ,τ} サイズ 1–2、char 2 特有の対称化 — (b) の
+      独立性から `λ_{στ} = 0 (σ≠τ)` を引き、対角項は (a))。
 - [ ] **Proposition 1**: `B(n,1,ε)` が field model `q(x) = x·x̄` を許容する。
       `Types.lean` の `TypeBModel`/`typeBQuadraticMap` (φ, ε パラメータ) が
       土台。原文は `references/peterfalvi/pdf/08.0_pp_139_143_On_Suzuki_2-Groups.pdf`
