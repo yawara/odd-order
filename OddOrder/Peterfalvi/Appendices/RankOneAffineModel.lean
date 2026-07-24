@@ -11,6 +11,7 @@ import OddOrder.Peterfalvi.Appendices.NearFieldClass
 import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
 import OddOrder.GroupTheory.SolvableTwoTransitive
 import OddOrder.GroupTheory.BrauerSuzuki
+import OddOrder.GroupTheory.BrauerSuzukiEndgame
 
 /-!
 # Peterfalvi Appendix C, Proposition 1 — the affine near-field model of a rank-one group
@@ -237,26 +238,201 @@ theorem RankOneHypothesis.exists_regular_normal {G Ω : Type*} [Group G] [MulAct
   · obtain ⟨f, hf⟩ := htrans.exists_smul_eq (g • hyp.basept) hyp.basept
     exact ⟨f, hf⟩
 
-/-- **Brauer–Suzuki for the rank-one group** (Peterfalvi App. C, Prop 1, prerequisite (ii)):
-`O_{2'}(G) ⊔ C_G(t) = ⊤` for the distinguished involution `t`.  A Sylow `2`-subgroup is cyclic or
-generalized quaternion (`sylow_two_isCyclic_or_quaternion`); Brauer–Suzuki applies in each case.
+section BrauerSuzukiAssembly
 
-The **cyclic** branch is closed directly (`brauerSuzuki_of_isCyclic_sylowTwo`, which accepts any
-involution).  The **generalized quaternion** branch splits further: `|S| ≥ 16` is closed by
-`QuaternionSylowSetup.brauerSuzuki_of_quaternionSylow` (Gorenstein Ch. 12, ordinary exceptional
-characters), while `|S| = 8` (`Q₈`) genuinely requires modular character theory (Gorenstein: "all
-known proofs require the theory of modular characters") and is the sole residual research gap of
-Appendix C — off the Feit–Thompson critical path, deferred (see
-`notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`).  The quaternion branch also needs
-`t = z` (the central involution), from uniqueness of involutions in a quaternion Sylow group. -/
+open QuaternionGroup in
+private theorem quaternionGroup_xa_zero_conj_a_one (n : ℕ) :
+    (xa 0 : QuaternionGroup n) * a 1 * (xa 0)⁻¹ = (a 1)⁻¹ := by
+  have hinv : (xa 0 : QuaternionGroup n)⁻¹ = xa (n : ZMod (2 * n)) := by
+    refine inv_eq_of_mul_eq_one_right ?_
+    rw [xa_mul_xa]
+    have h0 : ((n : ZMod (2 * n)) + n - 0) = 0 := by
+      rw [sub_zero, ← Nat.cast_add, ← two_mul, ZMod.natCast_self]
+    rw [h0, a_zero]
+  have hainv : (a 1 : QuaternionGroup n)⁻¹ = a (-1) := by
+    refine inv_eq_of_mul_eq_one_right ?_
+    rw [a_mul_a, add_neg_cancel, a_zero]
+  rw [xa_mul_a, hinv, xa_mul_xa, hainv]
+  congr 1
+  rw [← Nat.cast_add, ← two_mul, ZMod.natCast_self]
+  simp
+
+open QuaternionGroup in
+private theorem quaternionGroup_closure_pair (n : ℕ) [NeZero n] :
+    Subgroup.closure {(a 1 : QuaternionGroup n), xa 0} = ⊤ := by
+  haveI : NeZero (2 * n) := ⟨Nat.mul_ne_zero two_ne_zero (NeZero.ne n)⟩
+  rw [eq_top_iff]
+  rintro w -
+  have ha_mem : ∀ j : ZMod (2 * n),
+      a j ∈ Subgroup.closure {(a 1 : QuaternionGroup n), xa 0} := by
+    intro j
+    have hj : (a j : QuaternionGroup n) = a 1 ^ j.val := by
+      rw [a_one_pow]
+      exact congrArg _ (ZMod.natCast_rightInverse j).symm
+    rw [hj]
+    exact pow_mem (Subgroup.subset_closure (Set.mem_insert _ _)) _
+  cases w with
+  | a i => exact ha_mem i
+  | xa i =>
+    have hi : (xa i : QuaternionGroup n) = xa 0 * a i := by
+      rw [xa_mul_a, zero_add]
+    rw [hi]
+    exact Subgroup.mul_mem _
+      (Subgroup.subset_closure (Set.mem_insert_of_mem _ rfl)) (ha_mem i)
+
+/-- **Brauer–Suzuki, the `Q₈` case** — the sole remaining `sorry` of Appendix C, Proposition 1,
+**frozen** as a deliberate long-term project (issue 0147,
+`notes/meta/q8_modular_char_theory_frozen_project.md`; background
+`notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`).
+
+Gorenstein: "all known proofs require the theory of modular characters" — the `|S| ≥ 16` case is
+proved by ordinary exceptional characters (`brauerSuzuki_of_quaternionSylow`), but for `S ≅ Q₈`
+the modular theory (`p`-modular systems, Brauer characters, blocks, quaternion defect groups) is
+genuinely required and absent from mathlib.  The statement is exactly the missing mathematics: a
+finite group with quaternion Sylow `2`-subgroup of order `8` satisfies `O_{2'}(G) ⊔ C_G(z) = ⊤`
+for every involution `z` of that Sylow subgroup. -/
+theorem brauerSuzuki_quaternionSylow_q8 {G : Type*} [Group G] [Finite G]
+    (T : Sylow 2 G) (hq : Nonempty (↥(T : Subgroup G) ≃* QuaternionGroup 2))
+    {z : G} (hz : z ∈ (T : Subgroup G)) (hz2 : z ^ 2 = 1) (hzne : z ≠ 1) :
+    OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {z} = ⊤ := by
+  sorry
+
+/-- **Brauer–Suzuki for the rank-one group** (Peterfalvi App. C, Prop 1, prerequisite (ii)):
+`O_{2'}(G) ⊔ C_G(t) = ⊤` for the distinguished involution `t`.  The Sylow `2`-subgroup `T`
+containing `t` is cyclic or generalized quaternion (`sylow_two_isCyclic_or_quaternion`);
+Brauer–Suzuki applies in each case.
+
+The **cyclic** branch (which also absorbs `T ≅ QuaternionGroup 1 = C₄`) is
+`brauerSuzuki_of_isCyclic_sylowTwo`.  In the **generalized quaternion** branch, `|T| ≥ 16` is
+closed by assembling the Gorenstein Ch. 12 setup (`QuaternionSylowSetup`) from the isomorphism
+`↥T ≃* QuaternionGroup n` — generators `x = e⁻¹(a 1)`, `y = e⁻¹(xa 0)` with the quaternion
+relations transported — and applying `brauerSuzuki_of_quaternionSylow`; `t` equals the setup's
+central involution `z` by uniqueness of involutions in `T`
+(`eq_one_or_eq_z_of_sq_eq_one`).  The sole residual `sorry` is the isolated `|T| = 8` statement
+`brauerSuzuki_quaternionSylow_q8` (modular character theory; frozen, issue 0147). -/
 theorem RankOneHypothesis.brauerSuzuki {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-    (hyp : RankOneHypothesis G Ω) (S : Sylow 2 G) :
+    (hyp : RankOneHypothesis G Ω) :
     OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {hyp.t} = ⊤ := by
-  rcases hyp.sylow_two_isCyclic_or_quaternion S with hcyc | ⟨_n, _hq⟩
-  · exact OddOrder.GroupTheory.brauerSuzuki_of_isCyclic_sylowTwo S hcyc hyp.t hyp.t_sq hyp.t_ne_one
-  · -- generalized quaternion: `QuaternionSylowSetup` construction (`|S| ≥ 16`) + `t = z`, with the
-    -- residual `Q₈` (`|S| = 8`) case needing modular character theory (deferred research gap).
-    sorry
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- the Sylow `2`-subgroup containing `t`
+  have htP : IsPGroup 2 ↥(Subgroup.zpowers hyp.t) := by
+    refine IsPGroup.of_card (n := 1) ?_
+    rw [Nat.card_zpowers, pow_one]
+    exact orderOf_eq_prime hyp.t_sq hyp.t_ne_one
+  obtain ⟨T, hle⟩ := htP.exists_le_sylow
+  have htT : hyp.t ∈ (T : Subgroup G) := hle (Subgroup.mem_zpowers hyp.t)
+  rcases hyp.sylow_two_isCyclic_or_quaternion T with hcyc | ⟨n, ⟨e⟩⟩
+  · exact OddOrder.GroupTheory.brauerSuzuki_of_isCyclic_sylowTwo T hcyc hyp.t hyp.t_sq
+      hyp.t_ne_one
+  -- `|T| = 4n = 2^k`
+  obtain ⟨k, hk⟩ := T.isPGroup'.exists_card_eq
+  have hn0 : n ≠ 0 := by
+    rintro rfl
+    haveI : Infinite (ZMod (2 * 0)) := ZMod.infinite
+    haveI : Infinite (QuaternionGroup 0) :=
+      Infinite.of_injective (QuaternionGroup.a (n := 0)) fun i j h => by injection h
+    have h0 := Nat.card_congr e.toEquiv
+    rw [hk, Nat.card_eq_zero_of_infinite] at h0
+    exact absurd h0 (by positivity)
+  haveI : NeZero n := ⟨hn0⟩
+  have hn1 : 1 ≤ n := Nat.pos_of_ne_zero hn0
+  have hcards : 2 ^ k = 4 * n := by
+    rw [← hk]
+    calc Nat.card ↥(T : Subgroup G)
+        = Nat.card (QuaternionGroup n) := Nat.card_congr e.toEquiv
+      _ = 4 * n := by rw [Nat.card_eq_fintype_card, QuaternionGroup.card]
+  have hk2 : 2 ≤ k := by
+    by_contra hlt
+    rw [not_le] at hlt
+    have hle : (2 : ℕ) ^ k ≤ 2 :=
+      calc (2 : ℕ) ^ k ≤ 2 ^ 1 := Nat.pow_le_pow_right (by norm_num) (by omega)
+        _ = 2 := by norm_num
+    omega
+  rcases eq_or_lt_of_le hk2 with hk2' | hk3
+  · -- `|T| = 4`: `QuaternionGroup 1 = C₄` is cyclic
+    have hn1' : n = 1 := by rw [← hk2'] at hcards; norm_num at hcards; omega
+    subst hn1'
+    haveI := QuaternionGroup.quaternionGroup_one_isCyclic
+    have hcyc : IsCyclic ↥(T : Subgroup G) :=
+      isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
+    exact OddOrder.GroupTheory.brauerSuzuki_of_isCyclic_sylowTwo T hcyc hyp.t hyp.t_sq
+      hyp.t_ne_one
+  rcases eq_or_lt_of_le (show 3 ≤ k by omega) with hk3' | hk4
+  · -- `|T| = 8`: the frozen `Q₈` statement
+    have hn2 : n = 2 := by rw [← hk3'] at hcards; norm_num at hcards; omega
+    subst hn2
+    exact brauerSuzuki_quaternionSylow_q8 T ⟨e⟩ htT hyp.t_sq hyp.t_ne_one
+  · -- `|T| = 2^k ≥ 16`: assemble the Gorenstein setup and transport `t = z`
+    have hk4' : 4 ≤ k := by omega
+    have hn_pow : n = 2 ^ (k - 2) := by
+      have h1 : (2 : ℕ) ^ k = 4 * 2 ^ (k - 2) := by
+        rw [show (4 : ℕ) = 2 ^ 2 by norm_num, ← pow_add]
+        congr 1
+        omega
+      omega
+    let s₁ : ↥(T : Subgroup G) := e.symm (QuaternionGroup.a 1)
+    let s₂ : ↥(T : Subgroup G) := e.symm (QuaternionGroup.xa 0)
+    have hqconj : s₂ * s₁ * s₂⁻¹ = s₁⁻¹ := by
+      rw [← map_inv, ← map_mul, ← map_mul, quaternionGroup_xa_zero_conj_a_one, map_inv]
+    have hqsq : s₂ ^ 2 = s₁ ^ 2 ^ (k - 2) := by
+      rw [← map_pow, ← map_pow]
+      congr 1
+      rw [QuaternionGroup.xa_sq, QuaternionGroup.a_one_pow]
+      congr 1
+      rw [← hn_pow]
+    let Q : OddOrder.GroupTheory.QuaternionSylowSetup G :=
+      { n := k - 1
+        hn := by omega
+        S := T
+        x := (s₁ : G)
+        y := (s₂ : G)
+        hxS := s₁.2
+        hyS := s₂.2
+        hx_order := by
+          have h1 : orderOf ((s₁ : G)) = orderOf s₁ :=
+            orderOf_injective (T : Subgroup G).subtype Subtype.coe_injective _
+          have h2 : orderOf s₁ = orderOf (QuaternionGroup.a 1 : QuaternionGroup n) :=
+            orderOf_injective e.symm.toMonoidHom e.symm.injective _
+          rw [h1, h2, QuaternionGroup.orderOf_a_one, hn_pow, ← pow_succ']
+          congr 1
+          omega
+        hy_sq := by
+          have := congrArg (Subtype.val) hqsq
+          rw [SubgroupClass.coe_pow, SubgroupClass.coe_pow] at this
+          rw [this]
+          congr 2
+        hconj := by
+          have := congrArg (Subtype.val) hqconj
+          rw [InvMemClass.coe_inv] at this
+          exact this
+        hclosure := by
+          have hQtop : Subgroup.closure {(QuaternionGroup.a 1 : QuaternionGroup n),
+              QuaternionGroup.xa 0} = ⊤ := quaternionGroup_closure_pair n
+          have h1 : (Subgroup.closure {(QuaternionGroup.a 1 : QuaternionGroup n),
+                QuaternionGroup.xa 0}).map e.symm.toMonoidHom
+              = Subgroup.closure ({s₁, s₂} : Set ↥(T : Subgroup G)) := by
+            rw [MonoidHom.map_closure]
+            congr 1
+            rw [Set.image_pair]
+            rfl
+          have hTtop : Subgroup.closure ({s₁, s₂} : Set ↥(T : Subgroup G)) = ⊤ := by
+            rw [← h1, hQtop, Subgroup.map_top_of_surjective _ e.symm.surjective]
+          have h2 : (Subgroup.closure ({s₁, s₂} : Set ↥(T : Subgroup G))).map
+              (T : Subgroup G).subtype
+              = Subgroup.closure {((s₁ : G)), ((s₂ : G))} := by
+            rw [MonoidHom.map_closure]
+            congr 1
+            rw [Set.image_pair]
+            rfl
+          rw [← h2, hTtop, ← MonoidHom.range_eq_map, Subgroup.range_subtype] }
+    have hbs := Q.brauerSuzuki_of_quaternionSylow
+    rcases Q.eq_one_or_eq_z_of_sq_eq_one (s := hyp.t) htT hyp.t_sq with h1 | hz
+    · exact absurd h1 hyp.t_ne_one
+    · rw [hz]
+      exact hbs
+
+end BrauerSuzukiAssembly
 
 open MulAction SubMulAction in
 /-- **`Q` acts regularly on `Ω ∖ {basept}`** (the permutation-action heart of Peterfalvi App. C,
@@ -643,8 +819,7 @@ theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAct
   classical
   haveI := hyp.faithful
   -- Brauer–Suzuki (ii) discharges the odd-core hypothesis (`Q₈` case sorried inside).
-  obtain ⟨S⟩ : Nonempty (Sylow 2 G) := inferInstance
-  have hbs := hyp.brauerSuzuki S
+  have hbs := hyp.brauerSuzuki
   -- Regular normal elementary abelian `F ⊴ G` with `G = F ⋊ H`.
   obtain ⟨p, Fsub, hp, hFnormal, hcomm, hexp, htrans, hcompl, hFodd⟩ :=
     hyp.exists_regular_normal hbs
