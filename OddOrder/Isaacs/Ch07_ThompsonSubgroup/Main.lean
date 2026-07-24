@@ -903,10 +903,10 @@ Matsuyama 2.13 to force `p, q` odd; Step 8 applies the **normal-J theorem
 contradiction from `J(S) ⊴ M` together with Thompson factorization
 properties of `M`.
 
-**Implementation strategy**: the actual 9-step argument is encapsulated in
-the local axiom `noNonsolvableSimplePaQb` (issue 0032).  We carry out the
-strong-induction-on-`Nat.card` reduction, peel off the simplicity reduction
-via `isSimpleGroup_of_minCounterexample`, then invoke the axiom.
+**Implementation strategy**: the actual 9-step argument is the (fully
+proved) theorem `noNonsolvableSimplePaQb` (issue 0032 history).  We carry
+out the strong-induction-on-`Nat.card` reduction, peel off the simplicity
+reduction via `isSimpleGroup_of_minCounterexample`, then invoke it.
 
 ⚠ **書籍どおり `p ≠ q` を仮定しない** (2026-07-19 に一般化)。Isaacs 7.8 は
 「Let `G` be a finite group of order `p^a q^b`, where `p` and `q` are primes」とだけ言い
