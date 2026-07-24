@@ -89,7 +89,40 @@ Pf 側の再掲は書かない。
       AxiomsCheck 5 assert (irreducible/isField/conj_conj/conj_ne_refl/mul_conj) 全て
       axiom-clean。原文 = PDF p. 142。
 - [ ] **Proposition 2**: `B(n,1)` の automorphism map が surjective で
-      kernel が elementary abelian 2-group。
+      kernel が elementary abelian 2-group。原文 = PDF pp. 142-143 (α ↦ f_α は
+      Aut(B(n,1)) から「x ↦ λσ(x) (λ ∈ E*, σ ∈ Aut(E)) の群」への全射 hom、
+      kernel は Lemma 1(d) 経由で elementary abelian)。**6 段分解 (2026-07-24 設計)**:
+  - [x] **(i) Lemma 1(c)** ✅ 2026-07-24 (hub): 新 leaf
+        `GroupTheory/CentralExtensionAutomorphisms.lean` (配線済) —
+        `GroupExtension.twistCoords` (端群の reindex; 中央群不変) /
+        `comp_squareMap_eq_of_mulEquiv` (necessity — square 座標の直計算) /
+        `exists_mulEquiv_of_comp_squareMap_eq` (sufficiency — **T を (f,g) で
+        twist して同一 square map の 2 拡大に還元 → 既存
+        `equivOfCommonSquareMap`**。書籍の基底持ち上げ論法は再実装不要)。
+        AxiomsCheck 2 assert。
+  - [ ] **(ii) Lemma 1(d)**: 同 leaf に追加 — V/W 両方に id を誘導する
+        automorphism 群 ≃* `Multiplicative (V →+ W)` (α x = x·ι(h x̄) の h が
+        additive; 逆向きは α_h が automorphism)。系: W が ZMod 2 加群なら
+        elementary abelian 2-group。
+  - [ ] **(iii) 誘導写像機構**: anisotropic な `QuadraticExtension` 上で
+        range inl = center (ModelCenters の `mem_center_iff` +
+        `typeBQuadraticMap_radical_eq_zero`) → α ∈ Aut が f_α/g_α を誘導、
+        `autToQuotient : (X ≃* X) →* AddAut V` + compat `g∘q = q∘f` +
+        (f_α = id ∧ q の像が W を張る → g_α = id)。
+  - [ ] **(iv) norm 全射性**: `FieldModel ε` の `q(x) = x·conj x` は F に全射
+        (units 準同型 + cyclic 位数勘定 or mathlib 既存を探す)。kernel 記述
+        (iii)+(ii) に接続。
+  - [ ] **(v) semilinear 分類 (核心)**: additive f : E → E, g : F → F,
+        g∘q = q∘f, f ≠ 0 ⟹ f = λ·σ (λ ∈ E*, σ ∈ Gal(E/𝔽₂))。
+        Lemma 2(a) の `algAutLinearBasis` で f を展開、q∘f − g∘q の
+        ordered-pair 係数に `autMulQuadratic_coeff_symm` / `diag_eq_zero` を
+        適用して書籍の (3)(4) → λ 一点集中。前提部品: Fix(conj) = F
+        (Galois 対応: ⟨conj⟩ = ⊤ → fixedField = ⊥) / Gal(E/𝔽₂) abelian
+        (finite field cyclic) / conj∘σ = σ∘conj。逆向き (λ,σ) ↦ (f,g) は
+        直計算 + (i) で lift。
+  - [ ] **(vi) Prop 2 組み上げ**: `TypeBModel 1 ε` で
+        exists_semilinear_of_aut / exists_aut_of_semilinear /
+        kernel_elementaryAbelian の 3 定理 + AxiomsCheck。
 - [ ] Theorem (e) ⟹ 方向は既存 [issue 2052](2052-pf-appendix3-e-forward.md) —
       本 issue とは独立に追跡継続。
 

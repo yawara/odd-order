@@ -9,6 +9,7 @@ import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.GroupTheory.BrauerSuzukiSetup
+import OddOrder.GroupTheory.CentralExtensionAutomorphisms
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -12646,6 +12647,9 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 -- Peterfalvi App.III Lemma 2(c) (σ(x)τ(x) family: symmetric coefficients + diagonal vanishing)
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.autMulQuadratic_coeff_symm
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.autMulQuadratic_diag_eq_zero
+-- Peterfalvi App.III Lemma 1(c) (iso of central extensions inducing (f,g) ⟺ g∘q = q'∘f)
+#assert_only_allowed_axioms GroupExtension.comp_squareMap_eq_of_mulEquiv
+#assert_only_allowed_axioms GroupExtension.exists_mulEquiv_of_comp_squareMap_eq
 -- Peterfalvi App.III Proposition 1 (B(n,1,ε) admits the field model: q(x) = x·x̄)
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.fieldModelPoly_irreducible
