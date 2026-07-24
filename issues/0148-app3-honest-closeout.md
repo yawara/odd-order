@@ -56,8 +56,15 @@ Pf 側の再掲は書かない。
       Nonempty/Fintype letI 明示・Nat.card 経路化はいずれも効かず)。独立性 + card=dim の
       theorem 2 本が数学的内容としては完結 (有限次元で basis と同値)。bundle 再挑戦の候補 =
       `@Basis.mk` 全 instance 明示 / instance 径路の pin / mathlib 側の module-instance 整理待ち。
-      **(c) 残**: quadratic は σ(x)τ(x) 族 ({σ,τ} サイズ 1–2、char 2 特有の対称化 — (b) の
-      独立性から `λ_{στ} = 0 (σ≠τ)` を引き、対角項は (a))。
+      (追記: spanning を `span_eq_top_of_card_eq_finrank` の theorem 形で出す試みも同じ
+      isDefEq 発散 — bundle/spanning とも同根で pending。)
+      **(c) 残 — 設計メモ (2026-07-24)**: quadratic は σ(x)τ(x) 族 ({σ,τ} サイズ 1–2)。
+      index は Sym2 の和分割が Lean では重いので、**`Fintype.equivFin` で Aut に任意の順序を
+      引いて index = Aut ⊕ {(σ,τ) | e σ < e τ}** (対角 + 厳密対) を推奨。証明の 2 段:
+      (c1) polar 化 — `QuadraticMap.polarBilin` は線形、対角項の polar は char 2 で消える
+      (2στ = 0)、off-diag は `algAutMulBilin σ τ + algAutMulBilin τ σ` → (b) 独立性で
+      係数消滅; (c2) 残る対角和 Σ λ_σ σ(x²) = 0 に Frobenius 全射 (finite field で x↦x²
+      bijective) を前合成して (a) に帰着。
 - [ ] **Proposition 1**: `B(n,1,ε)` が field model `q(x) = x·x̄` を許容する。
       `Types.lean` の `TypeBModel`/`typeBQuadraticMap` (φ, ε パラメータ) が
       土台。原文は `references/peterfalvi/pdf/08.0_pp_139_143_On_Suzuki_2-Groups.pdf`

@@ -434,9 +434,9 @@ cardinality equals the finrank spans, in finite dimensions).  The bundled
 `Module.Basis` term (via `basisOfLinearIndependentOfCardEqFinrank`, as in
 Lemma 2(a)) hits a `whnf`/`isDefEq` divergence in the doubly-nested
 `F →ₗ[ZMod p] F →ₗ[ZMod p] F` module-instance stack (issue 0148 に診断記録;
-`maxHeartbeats 3200000` でも不足、`Add.add` 2 万回超 unfold).  Consumers that
-need the bundled basis should construct it at use-site or resume from the
-0148 note. -/
+`maxHeartbeats 3200000` でも不足、`Add.add` 2 万回超 unfold).  `span_eq_top_of_card_eq_finrank` alone diverges the same way, so the spanning
+half is likewise recorded as pending packaging.  Consumers that need the
+bundled basis should construct it at use-site or resume from the 0148 note. -/
 
 end FiniteFieldAut
 
