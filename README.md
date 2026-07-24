@@ -29,7 +29,7 @@ the path through them that the Odd Order Theorem happens to need.
 
 ## The byproduct: a finite group theory library
 
-Proving Feit–Thompson requires nearly all of the finite group theory that mathlib does not yet have.
+Proving Feit–Thompson requires a large body of finite group theory that mathlib does not yet have.
 That machinery is the lasting output of this repository, and completing it is now a goal in its own right:
 
 - **Isaacs**, *Finite Group Theory* (AMS GSM 92, 2008) — the general prerequisites: the Fitting subgroup,
