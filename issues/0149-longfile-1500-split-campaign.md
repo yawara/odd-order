@@ -108,6 +108,22 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
     (+ `S7B1_NormalJ_Setup.lean` 929; private 横断ゼロの Step-6 境界で切断)
   - `Ch07_ThompsonSubgroup/S7B2_NormalJ_PComplement.lean` 1883 → 458
     (+ `S7B2_NormalJClose.lean` 1454: normal-J close; import 連鎖差替えのみ)
+- ✅ BG Ch1 帯 5 file — 2026-07-25 前半 (いずれも prefix-split・下流 import 無変更・stamp 除去):
+  - `S01_Solvable.lean` 1621 → 1165 (+ `S01_BurnsideOperator.lean` 482: §1C)
+  - `S01_FrattiniBurnside.lean` 1572 → 1211 (+ `S01_SolvableBasics.lean` 400: §1A)
+  - `S02_RepresentationsBasic.lean` 1612 → 1372 (+ `S02_RepresentationPropositions.lean` 287: §2A–§2E)
+  - `S03e_Thm35.lean` 1725 → 374 (+ `S03e_Thm35Prelim.lean` 1386: step 機構全部)
+  - (S03f_Thm36 は上記 ✅✅ 参照)
+
+### ⚠ 第二パス行き (private 網が全域を覆い、clean な宣言境界 cut が存在しない)
+
+prefix-split では割れない — 対応には crossing private の public 化 (namespace 付与) という
+設計判断が要るため、campaign 第一巡から除外して後続パスで扱う:
+
+- `BG/Ch1_Preliminary/S02_Representations.lean` (1577) — odd_two_dim 帰納網
+  (private 54→1438 等が全域交差)
+- `BG/Ch1_Preliminary/S02_FixedSubmodules.lean` (1553) — fixedOnSubmoduleAndQuotient 網
+  (private 22→1366 等)
 
 - ✅✅ `BG/Ch1_Preliminary/S03f_Thm36.lean` (3822) — 2026-07-24 **完了、stamp 除去**:
   単一巨大宣言 `thm36_aux` の IH-free セグメント 3 つを段階的に切出し、
