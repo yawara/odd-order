@@ -66,3 +66,17 @@ created: 2026-07-19
 両方まとめて 1 コミットで実施**する。タイミング = レーン frontier 非接触の quiet
 window (BG は凍結済み・S06_Thm64:524 の defeq 依存箇所も凍結領域なので、いつでも
 安全に触れる。優先度は 0127 ① の後)。lane 側は着手不要。
+
+---
+
+## ✅ 2026-07-24 close — `Subgroup.IsPiGroup` を `IsPiSubgroup` の reducible alias 化 (hub)
+
+「やること」の選択肢のうち **abbrev 化**で解消:
+- `Ch03/Theorem315.lean` の `def Subgroup.IsPiGroup` を
+  `abbrev … := H.IsPiSubgroup π` に置換 (OpResidual import 追加、OpResidual ← Ch01 のみで循環なし)。
+- これで S06_Thm64 等の defeq 透過依存は「silent な偶然」から「公式の reducible alias」になり、
+  片方の定義変更・irreducible 化で壊れるリスクが消えた。
+- 検証: Theorem315 leaf (2205 jobs) + 重 consumer 5 本 (Ch03 Main / S06_Thm64 /
+  S7C_ThompsonPComplement / S12_ECore / S01_FrattiniBurnside、3221 jobs) green。
+- 全面的な名前統一 (478 サイトの textual 置換で alias を消す) は upstream 時の低優先
+  mechanical 作業として **9130 に申し送り** (9130 は補題 3 重複の集約が残っており open 継続)。

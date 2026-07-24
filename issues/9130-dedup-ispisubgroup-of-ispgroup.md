@@ -80,3 +80,18 @@ singleton 特殊化 (`isPiSubgroup_of_isPGroup_of_mem hH rfl` で得られる)�
 ## 🧭 HUB RULING (2026-07-22): 9159 と統合実施 (owner = hub)
 
 9159 の HUB RULING を参照 — 両 dedup は hub が quiet window で 1 コミット同時実施。
+
+---
+
+## 📝 2026-07-24 hub 更新 — 9159 は abbrev で close、本 issue に残る作業
+
+- BG 側の重複定義は解消済み (定義 census で `isPiSubgroup_of_isPGroup_of_mem` は
+  OpResidual の 1 本のみ、BG の 16 hits は全て caller)。
+- 9159 (述語重複) は `Subgroup.IsPiGroup := IsPiSubgroup` の abbrev 化で close。
+- **本 issue の残り (lemma 3 重複の集約)**:
+  1. `Subgroup.isPiSubgroup_of_isPGroup_of_mem` (OpResidual :58、canonical)
+  2. `Ch03.Subgroup.IsPiGroup.of_isPGroup_of_mem` (Theorem315 :454、abbrev 経由で同内容)
+  3. `isPiSubgroup_singleton_of_isPGroup` (SubgroupInAmbient :147、singleton 特殊化、参照 20)
+  (2)(3) を (1) へ寄せて削除 or 系化。参照 20+ の repoint を含む mechanical 作業 —
+  quiet window の別 wave で実施。alias `Subgroup.IsPiGroup` の全面 textual 置換 (478 サイト)
+  も同 wave 候補 (upstream 適性; 急がない)。

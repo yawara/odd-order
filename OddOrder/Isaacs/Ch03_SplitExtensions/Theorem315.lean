@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
+import OddOrder.GroupTheory.OpResidual
 
 /-!
 # Theorem315
@@ -294,9 +295,13 @@ mathlib 未収載 (`IsPGroup` の π 版). `IsHallSubgroup π ⊤` と同値だ�
 def IsPiGroup (π : Set ℕ) (G : Type*) [Group G] : Prop :=
   ∀ p ∈ (Nat.card G).primeFactors, p ∈ π
 
-/-- 部分群版: `H ≤ G` が π-group (= `|H|` の全素因子が π). -/
-def Subgroup.IsPiGroup (π : Set ℕ) (H : Subgroup G) : Prop :=
-  ∀ p ∈ (Nat.card H).primeFactors, p ∈ π
+/-- 部分群版: `H ≤ G` が π-group (= `|H|` の全素因子が π).
+
+`_root_.Subgroup.IsPiSubgroup` (`GroupTheory/OpResidual`) の reducible alias (dedup,
+issue 9159)。従来は byte-identical な独立定義が 2 つあり、`S06_Thm64` 等が silent な
+defeq 透過性に依存していた — alias 化で interchange を公式化する。 -/
+abbrev Subgroup.IsPiGroup (π : Set ℕ) (H : Subgroup G) : Prop :=
+  H.IsPiSubgroup π
 
 /-- If `H` is a π-Hall subgroup, every π-subgroup has cardinality dividing `|H|`. -/
 theorem IsHallSubgroup.card_dvd_of_isPiGroup [Finite G] {π : Set ℕ} {H S : Subgroup G}
