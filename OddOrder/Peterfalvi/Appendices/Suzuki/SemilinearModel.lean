@@ -8,6 +8,7 @@ import Mathlib.Algebra.Ring.Action.End
 import Mathlib.Algebra.Ring.AddAut
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.GroupTheory.SemidirectProduct
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 
 /-!
 # Peterfalvi Part II, Chapter I §2 — the semilinear affine group
@@ -107,16 +108,9 @@ variable (F : Type*) [Field F] [Finite F]
 theorem ringAut_isCyclic_of_finite : IsCyclic (RingAut F) := by
   letI : Fact (Nat.Prime (ringChar F)) := ⟨CharP.prime_ringChar F⟩
   letI : Algebra (ZMod (ringChar F)) F := ZMod.algebra F (ringChar F)
-  let toAlgAut : RingAut F →* (F ≃ₐ[ZMod (ringChar F)] F) :=
-    { toFun := fun f => AlgEquiv.ofRingEquiv (f := f) (fun x => by
-        obtain ⟨n, rfl⟩ := ZMod.intCast_surjective x
-        simp)
-      map_one' := by ext; rfl
-      map_mul' := by intro f g; ext; rfl }
-  exact isCyclic_of_injective toAlgAut (by
-    intro f g h
-    ext x
-    exact DFunLike.congr_fun h x)
+  exact isCyclic_of_injective
+    (OddOrder.RepresentationTheory.ringAutMulEquivAlgAut F (ringChar F)).toMonoidHom
+    (OddOrder.RepresentationTheory.ringAutMulEquivAlgAut F (ringChar F)).injective
 
 noncomputable instance instIsCyclicRingAutOfFinite : IsCyclic (RingAut F) :=
   ringAut_isCyclic_of_finite F

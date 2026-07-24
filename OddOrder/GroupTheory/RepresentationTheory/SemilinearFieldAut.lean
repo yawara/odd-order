@@ -261,8 +261,9 @@ variable (F : Type*) [Field F] (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) F]
 functions.  (Every element of `ZMod p` is an integer cast, and ring homs preserve integer casts;
 both group laws are composition, so all four structure fields are `rfl`.)
 
-This is the reusable form of the bridge currently inlined as a `let` inside the proof of
-`ringAut_isCyclic_of_finite` in `OddOrder/Peterfalvi/Appendices/Suzuki/SemilinearModel.lean`. -/
+This is the shared form of the bridge (issue 9164): the former inline copies in
+`Suzuki/SemilinearModel.lean` (`ringAut_isCyclic_of_finite`) and
+`Higman/.../TypeAConclusion.lean` are rerouted here. -/
 def ringAutMulEquivAlgAut : RingAut F ≃* (F ≃ₐ[ZMod p] F) where
   toFun f := AlgEquiv.ofRingEquiv (f := f) fun x => by
     obtain ⟨n, rfl⟩ := ZMod.intCast_surjective x

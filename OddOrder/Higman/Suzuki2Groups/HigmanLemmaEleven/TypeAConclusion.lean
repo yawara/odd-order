@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaEleven.ProperExtension
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 
 /-!
@@ -268,24 +269,12 @@ private theorem frobeniusScalarBaseChange_canonicalSecondBasis
 
 /-! ## The Frobenius automorphism in the type-A model -/
 
-private def ringAutMulEquivAlgAut
-    (F : Type*) [Field F] (p : Nat) [Fact p.Prime]
-    [Algebra (ZMod p) F] :
-    RingAut F ≃* (F ≃ₐ[ZMod p] F) where
-  toFun f := AlgEquiv.ofRingEquiv (f := f) fun x => by
-    obtain ⟨n, rfl⟩ := ZMod.intCast_surjective x
-    simp
-  invFun g := g.toRingEquiv
-  left_inv _ := rfl
-  right_inv _ := rfl
-  map_mul' _ _ := rfl
-
 /-- The ring Frobenius has the expected order over the prime field. -/
 private theorem orderOf_frobeniusEquiv_eq_finrank
     {F : Type*} [Field F] [Finite F]
     (p : Nat) [Fact p.Prime] [CharP F p] [Algebra (ZMod p) F] :
     orderOf (frobeniusEquiv F p) = Module.finrank (ZMod p) F := by
-  let toAlg := ringAutMulEquivAlgAut F p
+  let toAlg := OddOrder.RepresentationTheory.ringAutMulEquivAlgAut F p
   have hmap : toAlg (frobeniusEquiv F p) =
       FiniteField.frobeniusAlgEquivOfAlgebraic (ZMod p) F := by
     ext x

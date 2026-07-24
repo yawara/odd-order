@@ -75,3 +75,15 @@ dup 増殖がないかだけ watch。
   `private def ringAutMulEquivAlgAut` (同名 private 複製、lane b が Higman 実装時に導入)。
   差し替え対象は計 2 箇所に増加。いずれも lane b territory — owner = b (frontier 通過時) or
   hub (quiet window)。
+
+---
+
+## ✅ 2026-07-24 close — 差し替え 2 箇所とも実施 (hub)
+
+- `Suzuki/SemilinearModel.lean` `ringAut_isCyclic_of_finite`: inline `let toAlgAut := {...}` を
+  削除し `(OddOrder.RepresentationTheory.ringAutMulEquivAlgAut F (ringChar F)).toMonoidHom` +
+  `.injective` で `isCyclic_of_injective` に直結 (import 追加、SemilinearFieldAut は
+  Mathlib-only import ゆえ循環なし)。
+- `Higman/.../TypeAConclusion.lean`: 同名 private 複製を削除し共有版へ repoint。
+- 共有版 docstring の「currently inlined」記述を現状へ更新。
+- leaf build green (2582 jobs)。close。
