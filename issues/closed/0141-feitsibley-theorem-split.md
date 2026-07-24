@@ -60,3 +60,16 @@ sorry 数不変で main に合流される。
 保留理由だった lane a の FeitSibley campaign (issue 1054) は完了し、a は Isaacs Problems
 (1055) へ移動済み → **FeitSibleyTheorem.lean (実測 1882 行) は凍結ゾーン化し、prefix-split を
 実施できる**。owner = hub、quiet window で分割 (手順 = issue 0103 / merge_monitor.md)。
+
+---
+
+## ✅ 2026-07-24 close — prefix-split 実施 (hub)
+
+`end Hypothesis` (旧 L894) の凍結境界で分割:
+- 新 leaf `FeitSibleySsetCoherence.lean` (892 行): Sder/Qder 基礎 + `H = Q ⋊ D` counting +
+  `𝒮(Q')` の degree-`d` Remark と coherence (`ssetOf_Qder_coherent`) + step (1)–(2) 供給
+- `FeitSibleyTheorem.lean` (1022 行): reduction 用 degree-square counting + conjugate-pair
+  分解 + FPF 下界 + `𝒮(R)` counting 層
+module 名不変・下流 import (Conclusion/Reductions) 無変更・`private` 0 件・`OddOrder.lean` 配線済。
+leaf build green (4387 jobs、stamp relocation の上流再ビルド込み)。両 file とも 1500 未満 =
+longFile stamp 不要 (0149 worklist 消化 1 件目)。FeitSibleyEndgame (1721) は 0149 で継続。close。

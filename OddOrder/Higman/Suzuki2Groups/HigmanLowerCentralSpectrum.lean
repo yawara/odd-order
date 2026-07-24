@@ -38,6 +38,8 @@ infrastructure for Higman's proof that the first two lower-central layers are
 not isomorphic under the given automorphism.
 -/
 
+set_option linter.style.longFile 1600
+
 set_option autoImplicit false
 
 open Module Polynomial
