@@ -23,6 +23,10 @@ load-bearing result on each build and fails the build if anything falls outside 
 The project is now in its second phase: **formalizing the three source textbooks in full**, not merely
 the path through them that the Odd Order Theorem happens to need.
 
+> 🚧 **One `sorry` remains in the entire tree**: the `Q₈` case of the Brauer–Suzuki theorem — cited by
+> the sources, proved in none of them. The plan to close it: formalize modular character theory up
+> through the Z\*-theorem, following Navarro's *Characters and Blocks of Finite Groups*.
+
 ## The byproduct: a finite group theory library
 
 Proving Feit–Thompson requires nearly all of the finite group theory that mathlib does not yet have.
