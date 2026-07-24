@@ -6,6 +6,21 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-24 夕 hub 直接作業 tick #3 (「gate green のあと進めて」) — 🎯 App III 実数学に着手: Lemma 1(a) + Lemma 2(a) 完成。push →6e3563335**。
+> ① 0149 続き: S04g_Thm418 prefix-split (1965 → Core 958 + 残 1008、消化 2 件目) / 9130 close
+> (補題 trio 集約: Ch03 重複削除 + singleton 版の系化)。ユーザー裁定で 0050/0143/1055/2053 凍結
+> (lane a/b の次 frontier は hub 再割当待ち)。
+> ② **App III Lemma 1(a)** (`QuadraticExtensions.lean`): centralSquare の descend +
+> centralCommPairing を **polarization として定義** (well-definedness 証明を構造的に回避) +
+> `centralSquareQuadraticMap` (QuadraticMap (ZMod 2) bundle)。P 2-group 仮定は不要なので一般形。
+> 知見: `IsMulCommutative.instCommGroup` は scoped — letI 連鎖前に `open scoped IsMulCommutative`。
+> ③ **App III Lemma 2(a)** (`SemilinearFieldAut.lean`): Dedekind 独立の転送 + dim 勘定で
+> `algAutLinearBasis : Basis (F ≃ₐ[ZMod p] F) F (F →ₗ[ZMod p] F)` (一般標数)。
+> gate: 各 commit を leaf+AxiomsCheck (4604 jobs ≈ full) で検証 → `--strict` replay EXIT=0 ×2、
+> AxiomsCheck 新 assert 3 本 (centralSquareQuadraticMap / centralCommPairing_mk /
+> algAutLinearBasis) 全て axiom-clean。census 1 (凍結 Q₈) 非退行。
+> 残 (0148): Lemma 2(b)(c) → Prop 1 → Prop 2、+2052 (e)⟹。手順・部品は 0148 に精密記録済み。
+>
 > **▶▶ 2026-07-24 午後 hub 直接作業 tick #2 (ユーザー指示「issue を片付ける」+「mathlib 基準で分割」+ 凍結 3 件) — 🎯 longFile 1500 移行 + issue 大量処理。push c5ffbeaf5→6c9928daa (8 commits)**。
 > ① **longFile 1500 移行 (0149 新設)**: lakefile を mathlib 素の 1500 に切替、超過 58 file へ
 > per-file stamp (candidate−100)。罠 3 件を実測で踏んで解決: stamp は module docstring 後
