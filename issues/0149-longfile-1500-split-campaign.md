@@ -122,6 +122,13 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
     Lem 4.15; import 差替え)
   - `S04f_Omega1.lean` 1607 → 1226 (+ `S04f_AutOrderConstraints.lean` 412: Lem 4.13/4.14)
 - chip 由来 merge (2026-07-25): `S7B1_NormalJ_Setup.lean` の dead private 8 件削除 (−138 行)。
+- ✅ BG Ch2 S08 帯 3 file — 2026-07-25 (prefix-split・import 連鎖差替え・stamp 除去、
+  gate は帯 push 直前に集約する新規律の初適用):
+  - `S08_FittingOfMaximal.lean` 1607 → 1305 (+ `S08_SCN3Map.lean` 328)
+  - `S08_CenterFittingOpcore.lean` 1602 → 1321 (+ `S08_FittingInGBasic.lean` 318)
+  - `S08_SCNFitting.lean` 1597 → 1156 (+ `S08_PiCoreCentralizers.lean` 467)
+  - ⚠ 教訓: 宣言境界 cut は必ず docstring 開始行まで walk-up してから切る
+    (泣き別れ parse error が 3 file 中 3 回発生 → gen script に walk-up を組み込み済)。
 
 ### ⚠ 第二パス行き (private 網が全域を覆い、clean な宣言境界 cut が存在しない)
 
