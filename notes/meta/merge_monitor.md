@@ -6,6 +6,28 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-24 午後 hub 直接作業 tick #2 (ユーザー指示「issue を片付ける」+「mathlib 基準で分割」+ 凍結 3 件) — 🎯 longFile 1500 移行 + issue 大量処理。push c5ffbeaf5→6c9928daa (8 commits)**。
+> ① **longFile 1500 移行 (0149 新設)**: lakefile を mathlib 素の 1500 に切替、超過 58 file へ
+> per-file stamp (candidate−100)。罠 3 件を実測で踏んで解決: stamp は module docstring 後
+> (import 直後だと style.header 違反) / docstring 本文の「import …」行を import 文と誤認 /
+> linter の行数 = wc+1 (境界 wc1499-1500 の 2 file)。
+> ② **分割 1 件目**: FeitSibleyTheorem 1884 → SsetCoherence 892 + 残 1022 (`end Hypothesis`
+> 凍結境界 prefix-split、下流無変更、0141 close)。
+> ③ **dedup 3 波**: 0127① (cyclic unique-order-2 → CyclicSubgroupUniqueness / mul_right →
+> BaerTrick repoint) / 9164 (toAlgAut ×2 → 共有 ringAutMulEquivAlgAut) / 9159
+> (`Subgroup.IsPiGroup` を IsPiSubgroup の reducible alias 化 — silent defeq 依存を公式化)。
+> ④ 0136② (AppD (D.2) の hne 削除を書籍照合+docstring 注記で仕上げ) / 0139 (notes/meta
+> 正本/ログ分離: log/ へ 25 file + merge_monitor 437KB→93KB 分割 + README index + survey 降格ヘッダ)。
+> ⑤ **ユーザー裁定の凍結 3 件**: 0143 blueprint / 1055 lane-a Isaacs Problems / 2053 lane-b
+> Theorem B → pending/ (lane a/b の次 frontier は hub 再割当待ち、memory 反映済)。
+> issue 収支: **close 16** (0006/0123/0124/0127/0129/0133/0136/0138/0139/0141/0144/0145/0146/
+> 3029/9159/9164) + freeze 3 + 注記 4 (9130/0132/0149/2052 系)。残 open 6。
+> gate: **単独走行 full build + `--strict` EXIT=0** (12m27s、非 sorry 警告 0) + AxiomsCheck
+> green (closure 内) + census 1 (凍結 Q₈) 非退行。⚠ 教訓 2 件: (i) 同一 worktree で gate 走行中に
+> 自分の leaf build を打つと olean race で gate が偽 fail する (1 回踏んで gate 再走) —
+> **gate は単独走行、編集/leaf build は gate の合間に batch**。(ii) fresh cold-graph の lake は
+> ごく稀に scheduling race で「Main.olean 無し」fail する (再現せず、要 watch)。
+>
 > **▶▶ 2026-07-24 1x:xx hub 直接作業 tick (ユーザー指示「lint fix をここで一気に進めます」) — 🎯 lint backlog 47→0 完済 + gate --strict 切替 + issue 監査**。
 > ① lint: 残 47 件 (show 31 / sectionVars 8 / Fintype 2 / longLine 2 / flexible 1 / simpa 1 /
 > unusedVars 1) を一括解消 (`e6fc21830`)。omit cascade 3 件 (CaseSplitBCD→Classification) を
