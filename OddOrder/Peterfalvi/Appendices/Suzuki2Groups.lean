@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.ModelCenters
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.InvariantSummands

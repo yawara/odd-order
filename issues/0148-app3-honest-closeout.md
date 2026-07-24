@@ -69,9 +69,19 @@ Pf 側の再掲は書かない。
       `ker_eq_bot` どれも isDefEq 爆発 — **常に関数空間 (Pi) + MonoidHom 指標側で作業**し、
       入れ子空間には (b) の of_comp 一撃でしか触れないこと。
 - [ ] **Proposition 1**: `B(n,1,ε)` が field model `q(x) = x·x̄` を許容する。
-      `Types.lean` の `TypeBModel`/`typeBQuadraticMap` (φ, ε パラメータ) が
-      土台。原文は `references/peterfalvi/pdf/08.0_pp_139_143_On_Suzuki_2-Groups.pdf`
-      (pdftotext は本章 per-char 崩れのため PDF ページ画像で読むこと)。
+      **前半 ✅ 2026-07-24 (hub)**: 新 leaf `Suzuki2Groups/FieldModel.lean` (hub 配線済) —
+      `fieldModelPoly = X² + εX + 1` (monicity!/compute_degree!) /
+      **`fieldModelPoly_irreducible`** (anisotropy → 根なし → deg-2 既約、
+      `irreducible_of_degree_le_three_of_not_isRoot`) / `epsilon_ne_zero_of_anisotropic` /
+      `FieldModel ε := AdjoinRoot` + `alpha` + `add_self` (2•x=0 経由で **CharP instance 不要**の
+      char-2 補題) + `alpha_sq` (α²=εα+1) + `aeval_conj_root` (ε+α も根)。
+      **後半 残**: ① conj 自己同型 (`AdjoinRoot.liftHom` を ε+α に、bijective 化 =
+      `AlgEquiv.ofBijective` + 有限次元単射⟹全射) + 位数 2 (`algHom_ext` で root 値から) +
+      非自明 (ε≠0) ② F-線形同一視 `(F×F) ≃ₗ[F] FieldModel ε` ((a,b) ↦ a+bα —
+      `AdjoinRoot.powerBasis'` の basis.equivFun + `LinearEquiv.finTwoArrow`) ③ **norm 恒等式**
+      `e (a,b) * conj (e (a,b)) = algebraMap (typeBQuadraticMap 1 ε (a,b))` (α·conj α = 1,
+      α + conj α = ε から展開)。irreducibility は `Fact` 化して field instance を立てる。
+      原文 = PDF p. 142 (ページ画像読み必須)。
 - [ ] **Proposition 2**: `B(n,1)` の automorphism map が surjective で
       kernel が elementary abelian 2-group。
 - [ ] Theorem (e) ⟹ 方向は既存 [issue 2052](2052-pf-appendix3-e-forward.md) —
