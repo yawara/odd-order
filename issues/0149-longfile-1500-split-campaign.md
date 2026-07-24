@@ -94,12 +94,15 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
 | `Peterfalvi/S08_CoherenceCore.lean` | 1506 |
 ### 消化記録
 
-- ✅ `BG/Ch1_Preliminary/S03f_Thm36.lean` (3822) — 2026-07-24 endgame 切出し:
-  単一巨大宣言 `thm36_aux` の IH-free な末尾 (3.29)–(3.38) (~1300 行) を新 leaf
-  `S03f_Endgame.lean` (1402 行, stamp 不要) の `endgame_contradiction` へ抽出
-  (文脈は orbit_parity_contradiction と同じ「opaque binder + 定義等式」渡し、
-  hypothesis 41 個)。残 2539 行 → stamp 4000→**2600** に ratchet (worklist 残留 —
-  さらに縮めるには IH 消費部 (3.6)–(3.28) の IH 仮説化が要る)。
+- ✅✅ `BG/Ch1_Preliminary/S03f_Thm36.lean` (3822) — 2026-07-24 **完了、stamp 除去**:
+  単一巨大宣言 `thm36_aux` の IH-free セグメント 3 つを段階的に切出し、
+  3822 → **1301 行** (stamp 4000 → 2600 → 1900 → 除去)。
+  - `S03f_Endgame.lean` (1402): (3.29)–(3.38)、opaque binder + 定義等式渡し (仮説 41)。
+  - `S03f_R0Action.lean` (802): Phase C (3.17)–(3.21)。VG/KG/S₁/φ は lemma 内部で同一
+    `set` 再構成 → verbatim 移植 (パッチ 2 箇所のみ)、caller が re-`set` で fold。
+  - `S03f_ComplementK.lean` (646): Phase B (3.12)–(3.16)、`∃ K P` package (15 conjuncts)。
+  - 残りは IH を消費する Phase A (3.6)–(3.11) + Phase D (3.22)–(3.28) で分割不能の本体。
+    副産物: thm36_aux の elaboration 50s → 17s。
 - ✅ `Peterfalvi/Appendices/FeitSibleyTheorem.lean` (1884) — 2026-07-24 prefix-split:
   `FeitSibleySsetCoherence.lean` (892) + 残 1022、両方 stamp 不要化 (issue 0141 close)。
 - ✅ `BG/Ch1_Preliminary/S04g_Thm418.lean` (1965) — 2026-07-24 prefix-split:
