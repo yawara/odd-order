@@ -109,3 +109,16 @@ CLAUDE.md「特殊化債務 (`formalized_specialized`) はできる限り一般�
    それでも外してよいが docstring に「書籍は仮説として挙げるが証明に不要」と注記する)。
 2. `include` から外し、caller を更新し、**フルビルド**で検証。
 3. 単独 commit。lint とは混ぜない。
+
+---
+
+## ✅ 2026-07-24 close — ② も完了 (①② とも解消)
+
+② `AppD/MaximalSylowIntersection` の `hne` は lane c の lint wave (`b6d4ccd52`) が
+`omit hne in` で実質除去済みだった (caller 適応済)。本 tick で手順どおり仕上げ:
+1. BG App.D 原文 (pdftotext L7750-7800) を照合 — `P ∩ Q ≠ 1` は Lemma D.1 証明の
+   standing 反例構成にはあるが display (D.2) には不要 ⟹ 「外してよい + docstring 注記」
+2. `include … hne … in omit hne in` の冗長形を `include`(hne 抜き) に整理 +
+   docstring に書籍側仮定の注記を追加
+3. leaf build green (2804 jobs)
+① (S05 import 絞り込み) は 2026-07-23 lane a 実施済み。両項目完了 → close。

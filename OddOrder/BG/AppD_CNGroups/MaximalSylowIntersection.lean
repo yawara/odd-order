@@ -320,9 +320,11 @@ theorem sylow_le_and_eq_normalizer :
   refine ⟨le_of_eq_of_le hPM_eq inf_le_right, ?_⟩
   rw [← hMeq, ← hPM_eq]
 
-include hyp hQP hne hmax hM_ge hM_core in
-omit hne in
+include hyp hQP hmax hM_ge hM_core in
 /-- **BG display (D.2)**: `P ∩ Q = O_p(M)`.
+
+The book's standing configuration (Lemma D.1 proof, p. 153) also assumes `P ∩ Q ≠ 1`; this
+display does not need it, so the formalization drops that hypothesis (issue 0136 ②).
 
 `≤` comes from the 3-step Sylow-intersection identity `inf_sylow_eq_oPiCore`, applied to the
 Sylow `p`-subgroups `P ∩ M` and a `T ⊇ Q ∩ M` of `M`, which are distinct because `Q ∩ M ⊄ P`.
