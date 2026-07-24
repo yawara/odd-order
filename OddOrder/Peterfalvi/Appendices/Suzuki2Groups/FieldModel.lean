@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Polynomial.SpecificDegree
+import Mathlib.LinearAlgebra.Pi
 import Mathlib.RingTheory.AdjoinRoot
 import Mathlib.Algebra.CharP.Two
 import Mathlib.Tactic.ComputeDegree
@@ -25,12 +26,13 @@ quadratic map becomes the norm: `q(x) = x·x̄`.
 Main declarations:
 
 * `fieldModelPoly_irreducible` — `X² + εX + 1` is irreducible (from anisotropy);
-* `FieldModel ε` — the field `F[X]/(X² + εX + 1)` (an `AdjoinRoot`);
-* `fieldModelEquiv` — the `F`-linear identification `F × F ≃ₗ[F] FieldModel ε`
-  (the compatibility of the field structure with the `F`-vector structure);
-* `fieldModelConj` — the conjugation automorphism, of order `2`
-  (`fieldModelConj_conj`, `fieldModelConj_ne_refl`);
-* `fieldModel_mul_conj` — **Proposition 1**: `x · x̄ = q(x)`.
+* `FieldModel ε` — the ring `F[X]/(X² + εX + 1)` (an `AdjoinRoot`; a field under
+  anisotropy, `FieldModel.isField`);
+* `FieldModel.equivProd` — the `F`-linear identification
+  `F × F ≃ₗ[F] FieldModel ε`, `(a, b) ↦ a + bα`;
+* `FieldModel.conj` — the conjugation automorphism `α ↦ ε + α`, an involution
+  (`FieldModel.conj_conj`), nontrivial when `ε ≠ 0` (`FieldModel.conj_ne_refl`);
+* `FieldModel.mul_conj` — **Proposition 1**: `x · x̄ = q(x)`.
 -/
 
 set_option autoImplicit false
@@ -149,6 +151,130 @@ theorem aeval_conj_root :
     exact hchar _
   rw [← add_assoc] at h2
   exact h2
+
+/-- Under anisotropy the model is a field (the defining polynomial is
+irreducible). -/
+theorem isField (hq : (typeBQuadraticMap (1 : RingAut F) ε).Anisotropic) :
+    IsField (FieldModel ε) := by
+  haveI : Fact (Irreducible (fieldModelPoly ε)) :=
+    ⟨fieldModelPoly_irreducible ε hq⟩
+  exact Field.toIsField (FieldModel ε)
+
+/-! ### The conjugation automorphism `α ↦ ε + α` -/
+
+/-- The conjugation `α ↦ ε + α` as an `F`-algebra endomorphism. -/
+def conjAlgHom : FieldModel ε →ₐ[F] FieldModel ε :=
+  AdjoinRoot.liftAlgHom (fieldModelPoly ε) (Algebra.ofId F (FieldModel ε))
+    (algebraMap F (FieldModel ε) ε + alpha ε)
+    (by simpa [Polynomial.aeval_def] using aeval_conj_root ε)
+
+@[simp]
+theorem conjAlgHom_alpha :
+    conjAlgHom ε (alpha ε) = algebraMap F (FieldModel ε) ε + alpha ε :=
+  AdjoinRoot.liftAlgHom_root _ _ _ _
+
+/-- Conjugation is an involution on the algebra-endomorphism level. -/
+theorem conjAlgHom_comp_conjAlgHom :
+    (conjAlgHom ε).comp (conjAlgHom ε) = AlgHom.id F (FieldModel ε) := by
+  apply AdjoinRoot.algHom_ext
+  change conjAlgHom ε (conjAlgHom ε (alpha ε)) = alpha ε
+  rw [conjAlgHom_alpha, map_add, (conjAlgHom ε).commutes, conjAlgHom_alpha,
+    ← add_assoc, add_self, zero_add]
+
+/-- **The conjugation automorphism** of the field model (Proposition 1):
+`α ↦ ε + α`, an `F`-algebra automorphism. -/
+def conj : FieldModel ε ≃ₐ[F] FieldModel ε :=
+  AlgEquiv.ofAlgHom (conjAlgHom ε) (conjAlgHom ε)
+    (conjAlgHom_comp_conjAlgHom ε) (conjAlgHom_comp_conjAlgHom ε)
+
+@[simp]
+theorem conj_alpha :
+    conj ε (alpha ε) = algebraMap F (FieldModel ε) ε + alpha ε :=
+  conjAlgHom_alpha ε
+
+/-- Conjugation is an involution: `conj` has order dividing `2`. -/
+@[simp]
+theorem conj_conj (x : FieldModel ε) : conj ε (conj ε x) = x :=
+  AlgHom.congr_fun (conjAlgHom_comp_conjAlgHom ε) x
+
+omit [CharP F 2] in
+/-- The scalars embed injectively into the model (the defining polynomial has
+positive degree). -/
+theorem algebraMap_injective :
+    Function.Injective (algebraMap F (FieldModel ε)) := by
+  have hdeg : (fieldModelPoly ε).degree ≠ 0 := by
+    have h2 : 0 < (fieldModelPoly ε).natDegree := by
+      rw [fieldModelPoly_natDegree]; norm_num
+    exact ne_of_gt (Polynomial.natDegree_pos_iff_degree_pos.mp h2)
+  rw [AdjoinRoot.algebraMap_eq]
+  exact AdjoinRoot.coe_injective hdeg
+
+/-- Conjugation is nontrivial when `ε ≠ 0`: together with `conj_conj` it has
+exact order `2`. -/
+theorem conj_ne_refl (hε : ε ≠ 0) :
+    conj ε ≠ AlgEquiv.refl := by
+  intro h
+  have h1 : conj ε (alpha ε) = alpha ε := by rw [h]; rfl
+  rw [conj_alpha] at h1
+  have h2 : algebraMap F (FieldModel ε) ε = 0 := by linear_combination h1
+  exact hε (algebraMap_injective ε (h2.trans (map_zero _).symm))
+
+/-! ### The `F`-linear identification `F × F ≃ F[α]` -/
+
+/-- The power basis `(1, α)` of the model, reindexed to `Fin 2`. -/
+def powerBasisFin : Module.Basis (Fin 2) F (FieldModel ε) :=
+  (AdjoinRoot.powerBasis' (fieldModelPoly_monic ε)).basis.reindex
+    (finCongr (fieldModelPoly_natDegree ε))
+
+omit [CharP F 2] in
+theorem powerBasisFin_apply (i : Fin 2) :
+    powerBasisFin ε i = alpha ε ^ (i : ℕ) := by
+  simp only [powerBasisFin, Module.Basis.reindex_apply,
+    PowerBasis.basis_eq_pow, AdjoinRoot.powerBasis'_gen, finCongr_symm,
+    finCongr_apply, Fin.val_cast]
+  rfl
+
+/-- **The `F`-linear identification** of Proposition 1:
+`(a, b) ↦ a + bα` is an `F`-linear equivalence `F × F ≃ F[α]`. -/
+def equivProd : (F × F) ≃ₗ[F] FieldModel ε :=
+  (LinearEquiv.finTwoArrow F F).symm.trans (powerBasisFin ε).equivFun.symm
+
+omit [CharP F 2] in
+theorem equivProd_apply (a b : F) :
+    equivProd ε (a, b) =
+      algebraMap F (FieldModel ε) a +
+        algebraMap F (FieldModel ε) b * alpha ε := by
+  simp only [equivProd, LinearEquiv.trans_apply,
+    Module.Basis.equivFun_symm_apply, Fin.sum_univ_two, powerBasisFin_apply,
+    Algebra.smul_def]
+  norm_num [LinearEquiv.finTwoArrow]
+
+/-! ### Proposition 1: the quadratic map is the norm -/
+
+/-- **Peterfalvi Appendix III, Proposition 1** (p. 142): under the
+identification `(a, b) ↦ a + bα`, the type-B quadratic map of `B(n, 1, ε)`
+becomes the norm of the quadratic extension: `q(x) = x·x̄`. -/
+theorem mul_conj (a b : F) :
+    equivProd ε (a, b) * conj ε (equivProd ε (a, b)) =
+      algebraMap F (FieldModel ε)
+        (typeBQuadraticMap (1 : RingAut F) ε (a, b)) := by
+  rw [equivProd_apply]
+  have hconj :
+      conj ε (algebraMap F (FieldModel ε) a +
+          algebraMap F (FieldModel ε) b * alpha ε) =
+        algebraMap F (FieldModel ε) a +
+          algebraMap F (FieldModel ε) b *
+            (algebraMap F (FieldModel ε) ε + alpha ε) := by
+    rw [map_add, map_mul, conj_alpha, (conj ε).commutes, (conj ε).commutes]
+  rw [hconj, typeBQuadraticMap_apply]
+  simp only [RingAut.one_apply, map_add, map_mul]
+  linear_combination
+    (algebraMap F (FieldModel ε) b) ^ 2 * alpha_sq ε +
+      add_self ε
+        (algebraMap F (FieldModel ε) a * algebraMap F (FieldModel ε) b *
+            alpha ε +
+          (algebraMap F (FieldModel ε) b) ^ 2 *
+            algebraMap F (FieldModel ε) ε * alpha ε)
 
 end FieldModel
 

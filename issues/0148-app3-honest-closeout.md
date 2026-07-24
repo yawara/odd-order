@@ -68,20 +68,26 @@ Pf 側の再掲は書かない。
       ⚠ 実装知見: 入れ子 `F →ₗ F →ₗ F` の module instance は `LinearMap.ext`/評価/`map'`/
       `ker_eq_bot` どれも isDefEq 爆発 — **常に関数空間 (Pi) + MonoidHom 指標側で作業**し、
       入れ子空間には (b) の of_comp 一撃でしか触れないこと。
-- [ ] **Proposition 1**: `B(n,1,ε)` が field model `q(x) = x·x̄` を許容する。
-      **前半 ✅ 2026-07-24 (hub)**: 新 leaf `Suzuki2Groups/FieldModel.lean` (hub 配線済) —
+- [x] **Proposition 1** ✅ 2026-07-24 (hub): `B(n,1,ε)` が field model `q(x) = x·x̄` を許容する。
+      **前半**: 新 leaf `Suzuki2Groups/FieldModel.lean` (hub 配線済) —
       `fieldModelPoly = X² + εX + 1` (monicity!/compute_degree!) /
       **`fieldModelPoly_irreducible`** (anisotropy → 根なし → deg-2 既約、
       `irreducible_of_degree_le_three_of_not_isRoot`) / `epsilon_ne_zero_of_anisotropic` /
       `FieldModel ε := AdjoinRoot` + `alpha` + `add_self` (2•x=0 経由で **CharP instance 不要**の
       char-2 補題) + `alpha_sq` (α²=εα+1) + `aeval_conj_root` (ε+α も根)。
-      **後半 残**: ① conj 自己同型 (`AdjoinRoot.liftHom` を ε+α に、bijective 化 =
-      `AlgEquiv.ofBijective` + 有限次元単射⟹全射) + 位数 2 (`algHom_ext` で root 値から) +
-      非自明 (ε≠0) ② F-線形同一視 `(F×F) ≃ₗ[F] FieldModel ε` ((a,b) ↦ a+bα —
-      `AdjoinRoot.powerBasis'` の basis.equivFun + `LinearEquiv.finTwoArrow`) ③ **norm 恒等式**
-      `e (a,b) * conj (e (a,b)) = algebraMap (typeBQuadraticMap 1 ε (a,b))` (α·conj α = 1,
-      α + conj α = ε から展開)。irreducibility は `Fact` 化して field instance を立てる。
-      原文 = PDF p. 142 (ページ画像読み必須)。
+      **後半**: ① conj 自己同型 = **`AdjoinRoot.liftAlgHom` を ε+α へ** (現 mathlib は
+      `liftHom` でなく `liftAlgHom (i : R →ₐ[S] T)`; i = `Algebra.ofId`、根条件は
+      `simpa [aeval_def]`)。bijective 化は **`AlgEquiv.ofAlgHom` + 自己合成 = id**
+      (`algHom_ext` で root 値のみ、有限次元論法・field instance とも不要) → `conj` /
+      `conj_conj` (involution) / `conj_ne_refl` (ε≠0、`AdjoinRoot.coe_injective` +
+      `linear_combination`) ② `equivProd : (F×F) ≃ₗ[F] FieldModel ε` =
+      `powerBasis'.basis.reindex (finCongr natDegree=2)` の equivFun.symm ∘
+      `finTwoArrow.symm`; apply は `Basis.equivFun_symm_apply` + `Fin.sum_univ_two` +
+      `norm_num [LinearEquiv.finTwoArrow]` ③ **norm 恒等式 `mul_conj`** =
+      `linear_combination B²·alpha_sq + add_self (ABα + B²Eα)` (char-2 の 2t=0 を
+      linear_combination 項として渡すのが鍵) ④ `isField` (Fact 化で field instance)。
+      AxiomsCheck 5 assert (irreducible/isField/conj_conj/conj_ne_refl/mul_conj) 全て
+      axiom-clean。原文 = PDF p. 142。
 - [ ] **Proposition 2**: `B(n,1)` の automorphism map が surjective で
       kernel が elementary abelian 2-group。
 - [ ] Theorem (e) ⟹ 方向は既存 [issue 2052](2052-pf-appendix3-e-forward.md) —

@@ -12646,3 +12646,14 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 -- Peterfalvi App.III Lemma 2(c) (σ(x)τ(x) family: symmetric coefficients + diagonal vanishing)
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.autMulQuadratic_coeff_symm
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.autMulQuadratic_diag_eq_zero
+-- Peterfalvi App.III Proposition 1 (B(n,1,ε) admits the field model: q(x) = x·x̄)
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.fieldModelPoly_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.isField
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.conj_conj
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.conj_ne_refl
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel.mul_conj
