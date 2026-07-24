@@ -101,6 +101,13 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
     Baer trick 構成層)
   - `Ch06_FrobeniusActions/FrobeniusActionTI.lean` 1875 → 1447
     (+ `FrobeniusActionBasics.lean` 471: §6A basics)
+- ✅ Isaacs 帯 残り 3 file — 2026-07-25 (**Isaacs 帯 6/6 完了**):
+  - `Ch06_FrobeniusActions/DQSDRecognition.lean` 1783 → 1050
+    (+ `InvolutionRecognition.lean` 349 + `SelfCentralizingEnlargement.lean` 439)
+  - `Ch07_ThompsonSubgroup/S7B1_NormalJ.lean` 1627 → 730
+    (+ `S7B1_NormalJ_Setup.lean` 929; private 横断ゼロの Step-6 境界で切断)
+  - `Ch07_ThompsonSubgroup/S7B2_NormalJ_PComplement.lean` 1883 → 458
+    (+ `S7B2_NormalJClose.lean` 1454: normal-J close; import 連鎖差替えのみ)
 
 - ✅✅ `BG/Ch1_Preliminary/S03f_Thm36.lean` (3822) — 2026-07-24 **完了、stamp 除去**:
   単一巨大宣言 `thm36_aux` の IH-free セグメント 3 つを段階的に切出し、
