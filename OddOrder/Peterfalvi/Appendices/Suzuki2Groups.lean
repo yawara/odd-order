@@ -22,71 +22,26 @@ import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuotientPlaneModel
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
 2000), Appendix III, pp. 139--143.
 
-This appendix recalls the quadratic-map model of Suzuki 2-groups and Higman's
-classification. Peterfalvi takes the classification proof from [Hi]; its
-formalization is re-exported from `OddOrder.Higman.Suzuki2Groups`.
+This file is the pure re-export hub for the appendix.  The honest coverage:
 
-Definition 1 is encoded by an honest regular automorphism
-action; Higman's theorem (d)--(e) is represented by concrete invariant
-two-summand data; and Definitions 2--3 are the concrete `TypeAData` and
-`TypeBData` models re-exported from `Suzuki2Groups.Types`.
+* **Definition 1** (Suzuki 2-group) — `OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group`
+  (regular cyclic automorphism action on the involutions);
+* **Lemma 1(b)** (group from a quadratic map) — `QuadraticExtensions.lean`
+  (`QuadraticExtension`);
+* **Definitions 2--3** (types A and B) — `Types.lean` (`TypeAData` / `TypeBData`
+  with the concrete `TypeAModel` / `TypeBModel` carriers);
+* **Higman's theorem** (classification) — proved in
+  `OddOrder.Higman.Suzuki2Groups` (`higmanClassification` and the bundled
+  `higmanClassification_of_isSuzuki2Group`); per the 2026-07-19 ruling
+  (issue 0127 ③) no thin Peterfalvi wrapper is re-stated here — cite the
+  Higman theorem directly.  Parts (d)--(e) are represented by the concrete
+  invariant two-summand data (`InvariantSummands.lean`, `SplitUniqueness.lean`,
+  `QuotientPlaneModel.lean`).
+
+Still to be formalized honestly (issue 0148; the former opaque-`Prop`
+placeholders for these were deleted as logically vacuous — issue 0127 ②):
+**Lemma 1(a)** (squaring in a central extension is quadratic, general form),
+**Lemma 2** (map bases over `F_{2^n}`), **Proposition 1** (field model of
+`B(n,1,ε)`), **Proposition 2** (automorphism structure of `B(n,1)`), and the
+Theorem (e) forward direction (issue 2052).
 -/
-
-namespace OddOrder.Peterfalvi.Appendices.Suzuki2Groups
-
-open OddOrder.GroupTheory.Suzuki2Group
--- The declarations below predate the concrete type models and are retained for
--- compatibility only.  Their opaque `Prop` fields do not count as coverage and
--- must not be cited in new proofs.
-
-variable {P V W F : Type*} [Group P]
-
-/-- A proposition-valued carrier for a quadratic map over `F_2`. -/
-structure QuadraticMapData where
-  quadratic_law : Prop
-  quadratic_law_holds : quadratic_law
-  polar_bilinear : Prop
-  polar_bilinear_holds : polar_bilinear
-
-/-- **Peterfalvi Appendix III, Lemma 1(a)**: for a central extension with
-elementary abelian quotient, the squaring map is quadratic. -/
-theorem square_map_quadratic (Wsub : Subgroup P) (hcentral : Wsub ≤ Subgroup.center P)
-    (hW : Prop) (hV : Prop) :
-    hW → hV → Nonempty QuadraticMapData := by
-  sorry
-
-/-- **Peterfalvi Appendix III, Lemma 2**: the linear, bilinear, and quadratic maps
-over a finite field of characteristic two have the stated automorphism bases. -/
-structure FiniteFieldTwoMapBasis where
-  linear_basis : Prop
-  linear_basis_holds : linear_basis
-  bilinear_basis : Prop
-  bilinear_basis_holds : bilinear_basis
-  quadratic_basis : Prop
-  quadratic_basis_holds : quadratic_basis
-
-/-- **Peterfalvi Appendix III, Definitions 2--3**: types A and B. -/
-structure SuzukiTypeData (P : Type*) [Group P] where
-  typeA : Prop
-  typeB : Prop
-  typeC_or_typeD : Prop
-
-/-- **Peterfalvi Appendix III, Higman theorem**: the structural alternatives for
-Suzuki 2-groups. -/
-theorem higman_classification [Finite P] (hP : IsSuzuki2Group P) :
-    ∃ data : SuzukiTypeData P, data.typeA ∨ data.typeB ∨ data.typeC_or_typeD := by
-  sorry
-
-/-- **Peterfalvi Appendix III, Proposition 1**: the group `B(n,1,epsilon)` admits
-the field model `q(x) = x * conjugate x`. -/
-theorem typeB_field_model (hB : Prop) :
-    hB → ∃ fieldModel : Prop, fieldModel := by
-  sorry
-
-/-- **Peterfalvi Appendix III, Proposition 2**: the automorphism map of
-`B(n,1)` is surjective with elementary abelian 2-kernel. -/
-theorem typeB_automorphism_structure (hB : Prop) :
-    hB → ∃ automorphismStructure : Prop, automorphismStructure := by
-  sorry
-
-end OddOrder.Peterfalvi.Appendices.Suzuki2Groups

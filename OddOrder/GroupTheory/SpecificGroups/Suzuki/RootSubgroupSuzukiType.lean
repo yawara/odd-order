@@ -260,8 +260,8 @@ theorem RootGroup.not_isMulCommutative (m : ℕ) (hm : 0 < m) :
     zero_add, add_zero] using hxy
 
 /-- Constructive data for the standard type-A family of Appendix III,
-Definition 2.  Unlike `SuzukiTypeData.typeA`, this contains an actual group
-equivalence to the central extension for `x |-> x * theta(x)`. -/
+Definition 2: an actual group equivalence to the central extension for
+`x |-> x * theta(x)`. -/
 structure StandardTypeAData (P : Type*) [Group P] where
   parameter : ℕ
   parameter_pos : 0 < parameter
