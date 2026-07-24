@@ -175,6 +175,25 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
   `WielandtSetup` 1517→842 + `WielandtSetupBasic` 712)。
   ⚠ scan 修正: primed 名 (`foo'`) の使用検出は `\b` 境界では失敗する — 前後 lookaround で判定。
 
+- ✅ Pf 残り帯 + Higman + 表外 1 — 2026-07-25 (**第一パス完遂**):
+  - `S12_MaximalIII_IV_V` 1702→1109 (+ `S12_MaximalTypesSetup` 619) /
+    `S12_TypeIICrossIsometryPair` 1578→1000 (+ `S12_CrossIsometrySetup` 606)
+  - `S14_MaximalI/FrobeniusStructure` 1801→1130 (+ `FrobeniusStructureBasic` 692) /
+    `S14_MaximalI/WitnessSylowCyclic` 1542→988 (+ `WitnessSylowBasic` 577)
+  - `S15_BridgeCharacter` 1708→1050 (+ `S15_BridgeCharacterBasic` 684)
+  - `S16_CoreSetup` 1607→859 (+ `S16_CoreSetupBasic` 782; section Step4 +
+    namespace FieldNormalizerData を跨ぐため main で再オープン、local instance は
+    `factPPrimeStep4Split` に改名再宣言) /
+    `S16_NonExistenceG/ComparingLM` 1655→1066 (+ `ComparingLMBasic` 615)
+  - `Appendices/FeitSibleyEndgame` 1724→1136+4 (+ `FeitSibleyEndgameSetup` 613;
+    namespace Hypothesis を main で再オープン)
+  - `Higman/…/HigmanLowerCentralSpectrum` 1502→1009 (+ `HigmanSpectrumBilinear` 541;
+    universe 宣言の main 側複製が必要だった)
+  - 表外: `BG/Ch4_FamilyOfMaximal/S15_MF/OpicoreCentralizer` 1502→976
+    (+ `OpicoreCentralizerBasic` 550; 0a6a849aa で stamp されたが worklist 表から漏れていた)
+
+**⟹ 第一パス完遂 (2026-07-25)**: 残 stamp = `AxiomsCheck.lean` (恒久例外) + 下記第二パス 6 件のみ。
+
 ### ⚠ 第二パス行き (private 網が全域を覆い、clean な宣言境界 cut が存在しない)
 - `Peterfalvi/S10_MinimalSimpleBasic.lean` (1889) — private 網 (622→1534, 674→1534;
   primed 名 `Msigma_conj_smul'` 含む) で clean cut なし
