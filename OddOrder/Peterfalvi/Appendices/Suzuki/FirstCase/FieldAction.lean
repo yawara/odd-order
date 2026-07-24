@@ -113,7 +113,7 @@ theorem exists_adapted_field_model :
     have hinr : fc.toHypothesis.fittingSemidirectEquiv
         (SemidirectProduct.inr (fc.toVbar g)) =
         ((fc.toVbar g : ↥fc.toHypothesis.Vbar) : fc.toHypothesis.Dbar) := by
-      show SemidirectProduct.mulEquivSubgroup _
+      change SemidirectProduct.mulEquivSubgroup _
         (SemidirectProduct.inr (fc.toVbar g)) = _
       simp [SemidirectProduct.mulEquivSubgroup]
     have hract : SemidirectProduct.rightFactorAction
@@ -124,7 +124,7 @@ theorem exists_adapted_field_model :
         fc.toHypothesis.conjQ0bar
           ((fc.toVbar g : ↥fc.toHypothesis.Vbar) :
             fc.toHypothesis.Dbar) := by
-      show fc.toHypothesis.conjQ0bar
+      change fc.toHypothesis.conjQ0bar
         (fc.toHypothesis.fittingSemidirectEquiv
           (SemidirectProduct.inr (fc.toVbar g))) = _
       rw [hinr]
@@ -151,7 +151,7 @@ theorem exists_adapted_field_model :
           fc.toHypothesis.Q0 ⊓ Subgroup.centralizer (fc.P : Set G) := by
       intro b hb
       refine ⟨(eQ.symm (Multiplicative.ofAdd b)).2, ?_⟩
-      show ((eQ.symm (Multiplicative.ofAdd b) : ↥fc.toHypothesis.Q0) : G) ∈
+      change ((eQ.symm (Multiplicative.ofAdd b) : ↥fc.toHypothesis.Q0) : G) ∈
         Subgroup.centralizer (fc.P : Set G)
       rw [Subgroup.mem_centralizer_iff]
       intro g hg
@@ -255,8 +255,7 @@ theorem card_Q0_eq_two_pow : Nat.card ↥fc.toHypothesis.Q0 = 2 ^ fc.p := by
           exact Subtype.ext hv
       _ ≤ 2 := by
           rw [Nat.card_coe_set_eq]
-          have := Set.ncard_insert_le (0 : F) ({1} : Set F)
-          simpa [Set.ncard_singleton] using this
+          simp [Set.ncard_singleton]
   have hcardF₀_ge : 2 ≤ Fintype.card ↥F₀ := Fintype.one_lt_card
   have hcardF₀ : Fintype.card ↥F₀ = 2 := le_antisymm hcardF₀_le hcardF₀_ge
   have hcards : Fintype.card F = Fintype.card ↥F₀ ^ Module.finrank ↥F₀ F :=

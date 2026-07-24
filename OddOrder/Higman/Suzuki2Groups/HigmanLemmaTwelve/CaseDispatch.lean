@@ -652,17 +652,17 @@ def shearRescaleLinearEquiv {n : ℕ} (ρ t : GaloisField 2 n) (ht : t ≠ 0) :
     have h2 : (2 : GaloisField 2 n) = 0 := CharTwo.two_eq_zero
     have hti : t⁻¹ * t = 1 := inv_mul_cancel₀ ht
     apply Prod.ext
-    · show w.1 + ρ * w.2 + ρ * t⁻¹ * (t * w.2) = w.1
+    · change w.1 + ρ * w.2 + ρ * t⁻¹ * (t * w.2) = w.1
       linear_combination (ρ * w.2) * hti + (ρ * w.2) * h2
-    · show t⁻¹ * (t * w.2) = w.2
+    · change t⁻¹ * (t * w.2) = w.2
       rw [← mul_assoc, hti, one_mul]
   right_inv w := by
     have h2 : (2 : GaloisField 2 n) = 0 := CharTwo.two_eq_zero
     have hit : t * t⁻¹ = 1 := mul_inv_cancel₀ ht
     apply Prod.ext
-    · show w.1 + ρ * t⁻¹ * w.2 + ρ * (t⁻¹ * w.2) = w.1
+    · change w.1 + ρ * t⁻¹ * w.2 + ρ * (t⁻¹ * w.2) = w.1
       linear_combination (ρ * t⁻¹ * w.2) * h2
-    · show t * (t⁻¹ * w.2) = w.2
+    · change t * (t⁻¹ * w.2) = w.2
       rw [← mul_assoc, hit, one_mul]
 
 @[simp]

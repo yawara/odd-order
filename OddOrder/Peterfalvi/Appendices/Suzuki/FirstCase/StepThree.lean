@@ -1180,7 +1180,7 @@ theorem exists_K_conj_pow_of_irreducible {r : ℕ} (hr : r.Prime)
             rw [hcomm k]
         _ = Additive.ofMul (g ((ψ k) (Additive.toMul y))) := by
             congr 1
-            show g ((ψ k) (g⁻¹ (g (Additive.toMul y)))) = _
+            change g ((ψ k) (g⁻¹ (g (Additive.toMul y)))) = _
             have hz : g⁻¹ (g (Additive.toMul y)) = Additive.toMul y := by
               change (g⁻¹ * g) (Additive.toMul y) = _
               rw [inv_mul_cancel]

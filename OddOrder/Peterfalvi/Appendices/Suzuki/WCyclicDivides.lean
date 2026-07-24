@@ -161,7 +161,7 @@ theorem isCyclic_W_and_card_dvd_of_orderThree
         map_one' := by
           apply LinearMap.ext
           intro c
-          show act 1 c = c
+          change act 1 c = c
           rw [hactdef]
           simp only
           obtain ⟨x, hx⟩ := QuotientGroup.mk_surjective (ψ.symm c)
@@ -174,7 +174,7 @@ theorem isCyclic_W_and_card_dvd_of_orderThree
           intro v u
           apply LinearMap.ext
           intro c
-          show act (v * u) c = act v (act u c)
+          change act (v * u) c = act v (act u c)
           rw [hactdef]
           simp only
           rw [Equiv.symm_apply_apply]
@@ -306,7 +306,7 @@ theorem isCyclic_W_and_card_dvd_of_orderThree
         apply le_antisymm
         · rintro y ⟨x, hx, rfl⟩
           have hx' : ψ x ∈ S := hx
-          show ψ (quotientMulAutHom
+          change ψ (quotientMulAutHom
             (IsAInvariant.of_characteristic hyp.actualKActor.subtype) k x) ∈ S
           rw [hsc]
           exact Submodule.smul_mem S _ hx'
@@ -315,7 +315,7 @@ theorem isCyclic_W_and_card_dvd_of_orderThree
           refine ⟨quotientMulAutHom
             (IsAInvariant.of_characteristic hyp.actualKActor.subtype) k⁻¹ y,
             ?_, ?_⟩
-          · show ψ (quotientMulAutHom
+          · change ψ (quotientMulAutHom
               (IsAInvariant.of_characteristic hyp.actualKActor.subtype)
               k⁻¹ y) ∈ S
             rw [hsc]
@@ -330,7 +330,7 @@ theorem isCyclic_W_and_card_dvd_of_orderThree
           (hWfix e)).toMonoidHom ≤ U := by
         rintro z ⟨x, hx, rfl⟩
         have hx' : ψ x ∈ S := hx
-        show ψ (Suzuki2Groups.quotientCongr (hyp.conjQByW e)
+        change ψ (Suzuki2Groups.quotientCongr (hyp.conjQByW e)
           (hWfix e) x) ∈ S
         rw [← hrhoW_apply]
         exact hSact _ hx'
@@ -344,7 +344,7 @@ theorem isCyclic_W_and_card_dvd_of_orderThree
       exact Subgroup.eq_of_le_of_card_ge hle (le_of_eq hcardle.symm)
     -- the general two-dimensional theorem
     obtain ⟨hcyc, hdvd⟩ :=
-      OddOrder.RepresentationTheory.isCyclic_and_card_dvd_card_add_one_of_projective_no_nontrivial_fixed
+      RepresentationTheory.isCyclic_and_card_dvd_card_add_one_of_projective_no_nontrivial_fixed
         rhoW hfaith hodd hdim hprojfree
     refine ⟨hcyc, ?_⟩
     rwa [GaloisField.card 2 m hm] at hdvd

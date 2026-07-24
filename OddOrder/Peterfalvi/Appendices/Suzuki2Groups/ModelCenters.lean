@@ -121,7 +121,7 @@ theorem mem_center_iff (x : BilinearTwistedProduct B) :
   · intro h g
     ext
     · exact add_comm _ _
-    · show B g.quotient x.quotient + g.central + x.central =
+    · change B g.quotient x.quotient + g.central + x.central =
         B x.quotient g.quotient + x.central + g.central
       rw [h g.quotient]
       abel

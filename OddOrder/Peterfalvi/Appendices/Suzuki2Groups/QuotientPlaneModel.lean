@@ -39,6 +39,7 @@ variable {K : Type u} [Group K] [Finite K] [IsCyclic K]
 variable {Z : Subgroup P} [Z.Normal]
 variable {rho : K →* MulAut P} {hZinv : IsAInvariant rho Z}
 
+omit [Finite K] in
 /-- **The plane model of the central quotient** (Peterfalvi Part II, Ch. I
 §3, Lemma 5, p. 107).  Given an isomorphic order-`q` two-summand split of
 `P ⧸ Z` under a cyclic fixed-point-free actor of order `q - 1 = 2^n - 1`,
@@ -308,7 +309,7 @@ theorem exists_planeCoordinates_of_isomorphicSplit
         IsAInvariant.restrict_apply_val isplit.split.rightInvariant]
     rw [hact, hψapply, hψapply, MulEquiv.symm_apply_apply,
       MulEquiv.symm_apply_apply]
-    show (eX (isplit.split.leftInvariant.restrict k p.1),
+    change (eX (isplit.split.leftInvariant.restrict k p.1),
         eY (isplit.split.rightInvariant.restrict k p.2)) =
       (mu k : GaloisField 2 n) • (eX p.1, eY p.2)
     rw [heXeq, heYeq, Prod.smul_mk, smul_eq_mul, smul_eq_mul]

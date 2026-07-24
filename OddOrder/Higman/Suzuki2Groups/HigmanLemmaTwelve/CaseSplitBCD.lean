@@ -72,6 +72,7 @@ def noncommFactorInclusion
       exact hg)
     data.eQuot
 
+omit [Finite P] in
 /-- **Factor square identity, noncommutative branch.**  The ambient square map
 of the factor inclusion equals the factor's type-A quadratic form `α · θ(α)`. -/
 theorem noncomm_ambientSquare_eq
@@ -660,6 +661,7 @@ variable
     (e : (F × F) ≃ₗ[ZMod 2] Additive (lowerCentralLayer P 0))
     (ePhi : Additive ↑(frattini P) ≃ₗ[ZMod 2] F)
 
+omit [Finite P] in
 /-- The `F × F` coordinate of `x` under the ambient central extension: the layer
 kernel projection followed by `e⁻¹`. -/
 theorem ambientProductExtension_rightHom_toAdd (x : P) :
@@ -668,6 +670,7 @@ theorem ambientProductExtension_rightHom_toAdd (x : P) :
         (frattiniQuotientEquivLayerZero hK0 (QuotientGroup.mk x))) :=
   rfl
 
+omit [Finite P] in
 /-- The Singer embedding of a coordinate `f : F` back into `P` under the ambient
 central extension. -/
 theorem ambientProductExtension_inl_ofAdd (f : F) :
@@ -677,6 +680,7 @@ theorem ambientProductExtension_inl_ofAdd (f : F) :
 
 end ExtensionCoordinates
 
+omit [Finite P] in
 /-- **Higman Lemma 12, the case-assembly glue.**  If the ambient centre
 coordinate of every square agrees with a quadratic map `q` on the `F × F`
 coordinate, then the ambient central extension `ambientProductExtension`
@@ -792,6 +796,7 @@ theorem ambientProductExtension_hsq_actual
 
 /-! ## Actor-equivariance of the factor inclusion (mixed-term prerequisite) -/
 
+omit [Finite P] in
 /-- **Actor-equivariance of the factor inclusion.**  When the factor
 representation `fRep` covers the ambient actor `a` (through `sigma`, with
 `hf_int` recording that `f ∘ sigma = a ∘ f`), the factor inclusion intertwines
@@ -822,6 +827,7 @@ theorem factorInclusion_representation_equivariant
   exact quotientToAmbientLayerZeroLinear_equivariant f a hK0 hf fRep sigma hfRep
     hf_int v
 
+omit [Finite P] in
 /-- **Actor-equivariance of the ambient mixed term.**  In the ambient centre
 coordinate the mixed commutator pairing scales by the central eigenvalue `ν`
 when both arguments are moved by the actor `c`.  This is the composition of the
@@ -864,6 +870,7 @@ theorem mixedTerm_rep_equivariance
   rw [← lowerCentralCommutatorBilinear_equivariant Y.subtype c u v]
   exact ambientCenterCoordinate_compat hEA hK1 hterm ePhi c nu hconj _
 
+omit [Finite P] in
 /-- **Higman's mixed-term eigenvalue relation `M(λα, μβ) = ν · M(α, β)`.**
 For two factor inclusions `fL`, `fR` whose ambient actor images are the scalars
 `λ`, `μ` on their coordinate fields (`hL`, `hR`), the ambient mixed term scales
@@ -1200,7 +1207,7 @@ theorem ambientProductSquare_decomposed_ne_zero
     (hRnormal : Sr.Normal) (hinf : Sl ⊓ Sr = frattini P)
     (hsup : Sl ⊔ Sr = ⊤) (hΦR : frattini P ≤ Sr)
     (hinv : ∀ x : P, x ^ 2 = 1 → x ∈ lowerCentralTerm P 1)
-    {a b : GaloisField 2 n} (ha : a ≠ 0) (hb : b ≠ 0) :
+    {a b : GaloisField 2 n} (ha : a ≠ 0) (_hb : b ≠ 0) :
     letI : IsMulCommutative ↑(frattini P) :=
       IsMulCommutative.of_comm hEA.comm
     letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule

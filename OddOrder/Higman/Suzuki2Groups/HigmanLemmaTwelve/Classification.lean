@@ -116,6 +116,7 @@ theorem isTypeB_of_mixedTerm
     typeBQuadraticMap_apply, hthetaL, hthetaR, hM]
   ring
 
+omit [Finite P] in
 /-- **Higman Lemma 12, type-B endpoint (parametrised by an arbitrary
 coordinate).**  The same engine as `isTypeB_of_mixedTerm`, but for any linear
 coordinate `e` of the zeroth layer whose transported square form is the type-B

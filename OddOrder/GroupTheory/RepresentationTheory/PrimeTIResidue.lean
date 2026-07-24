@@ -669,6 +669,7 @@ noncomputable def _root_.OddOrder.RepresentationTheory.PrimeTIResidueData.ofS06H
         rw [Equiv.apply_symm_apply, hχ₂]
       · exact Or.inr ⟨hirr, fun i j => hne (h.charGroupW2Equiv j) i⟩ }
 
+omit [Fintype ↥(h.W1 ⊔ h.W2)] in
 /-- **Peterfalvi (4.3.c) in residue-grid form** (Coq `prTIirr_id`, issue 2038/9014): the
 prime-TI irreducibles of the `ofS06Hypothesis` residue grid satisfy the value identity
 `mu2 i j (x) = δ_j · ω_{ij}(x)` on the TI set `W ∖ W₂` (`= sdiffTICyclicHypothesis.V`).

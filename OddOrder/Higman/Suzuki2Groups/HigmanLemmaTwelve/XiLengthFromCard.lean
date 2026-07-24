@@ -84,7 +84,7 @@ theorem fixedPointFree_of_actsRegularlyOnInvolutions
   obtain ⟨a, -, hunique⟩ := hreg (t : P) htinv (t : P) htinv
   have hka : k = a := hunique k t.2
   have h1a : (1 : ↥K) = a := hunique 1 (by
-    show ((1 : ↥K) : MulAut P) (t : P) = (t : P)
+    change ((1 : ↥K) : MulAut P) (t : P) = (t : P)
     rw [OneMemClass.coe_one, MulAut.one_apply])
   exact hk (hka.trans h1a.symm)
 
@@ -294,7 +294,7 @@ theorem le_of_adjoin_frobeniusFixed_eq_top
     intro y
     rw [Multiset.mem_toFinset, Polynomial.mem_roots']
     refine ⟨hfne, ?_⟩
-    show f.IsRoot y
+    change f.IsRoot y
     simp [f, Polynomial.IsRoot, hT y]
   have hcardle : Fintype.card (GaloisField 2 m) ≤ 2 ^ n := by
     calc Fintype.card (GaloisField 2 m)
@@ -459,6 +459,7 @@ theorem exists_proper_invariant_subgroup_of_card_sq
     (by omega) hn _ hfix htop
   omega
 
+omit [Finite P] in
 /-- **Regularity counts the involutions**: the orbit map at a base involution
 is a bijection from the actor onto the involutions. -/
 theorem ncard_involutions_eq_card_of_regular
@@ -623,7 +624,7 @@ theorem hasXiLengthThree_of_card_eq_cube
         have hfree' : ∀ k : ↥K, k ≠ 1 →
             ∀ x : P ⧸ involutionSubgroup P,
               IsAInvariant.quotientMulAutHom hΩinv k x = x → x = 1 := by
-          apply OddOrder.Peterfalvi.Appendices.Suzuki2Groups.quotient_fixedPointFree_of_fixedPoints_le
+          apply Peterfalvi.Appendices.Suzuki2Groups.quotient_fixedPointFree_of_fixedPoints_le
             K.subtype (involutionSubgroup P) hΩinv
           · exact OddOrder.Peterfalvi.Appendices.Suzuki2Groups.card_coprime_of_card_eq_sub_one
               (involutionSubgroup P) (by rw [hKcard, hΩcard])
@@ -672,7 +673,7 @@ theorem hasXiLengthThree_of_card_eq_cube
               exact dvd_pow_self 2 hm0)
           have ht1 : t = 1 := by
             apply hinj
-            show t ^ 2 = (1 : P ⧸ involutionSubgroup P) ^ 2
+            change t ^ 2 = (1 : P ⧸ involutionSubgroup P) ^ 2
             rw [one_pow, ← ht]
             exact pow_orderOf_eq_one t
           rw [ht1, orderOf_one] at ht
@@ -732,14 +733,14 @@ theorem hasXiLengthThree_of_card_eq_cube
       no_four_chain_of_card_eq_cube hP2 hn hfree hKcard hcard
         A B C D E hAB hBC hCD hDE⟩
   · rw [← Subtype.coe_lt_coe]
-    show (⊥ : Subgroup P) < involutionSubgroup P
+    change (⊥ : Subgroup P) < involutionSubgroup P
     exact bot_lt_iff_ne_bot.mpr hΩbot
   · rw [← Subtype.coe_lt_coe]
-    show involutionSubgroup P <
+    change involutionSubgroup P <
       V.comap (QuotientGroup.mk' (involutionSubgroup P))
     exact lt_of_le_of_ne hΩB hΩB_ne
   · rw [← Subtype.coe_lt_coe]
-    show V.comap (QuotientGroup.mk' (involutionSubgroup P)) < ⊤
+    change V.comap (QuotientGroup.mk' (involutionSubgroup P)) < ⊤
     exact lt_top_iff_ne_top.mpr hBtop
 
 end OddOrder.Higman.Suzuki2Groups

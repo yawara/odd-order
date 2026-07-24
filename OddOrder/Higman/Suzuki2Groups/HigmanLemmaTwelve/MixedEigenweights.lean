@@ -381,7 +381,7 @@ theorem factorAmbientEigenFamily_eigen
         iota.baseChange F =
       iota.baseChange F ∘ₗ Aq.baseChange F := by
     rw [← LinearMap.baseChange_comp, ← LinearMap.baseChange_comp, hcomp]
-  show (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange F
+  change (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange F
       (iota.baseChange F (conjugateTensorBasisOfLinearEquiv F eQuot i)) = _
   rw [show (lowerCentralLayerRepresentation Y.subtype 0 c).baseChange F
         (iota.baseChange F (conjugateTensorBasisOfLinearEquiv F eQuot i)) =
@@ -525,7 +525,7 @@ theorem exists_factorFamily_of_noncommutative
   · intro g
     rw [lowerCentralLayerRepresentation_apply, lowerCentralLayerAction_apply_mk]
   · intro g
-    show S.subtype ((lowerCentralTerm (↥S) 0).subtype
+    change S.subtype ((lowerCentralTerm (↥S) 0).subtype
         (lowerCentralTermAction hSinv.restrict 0 c g)) =
       (Y.subtype c : MulAut P) (S.subtype ((lowerCentralTerm (↥S) 0).subtype g))
     rw [show (lowerCentralTerm (↥S) 0).subtype

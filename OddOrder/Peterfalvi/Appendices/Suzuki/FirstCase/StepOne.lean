@@ -63,10 +63,10 @@ theorem card_Q0_inf_centralizer_eq_two :
       calc g * (x : G) = (g * (x : G) * g⁻¹) * g := by group
         _ = (x : G) * g := by rw [hconj]
     · intro hx g
-      show actP g x = x
+      change actP g x = x
       apply Subtype.ext
       have hcomm := Subgroup.mem_centralizer_iff.mp hx (g : G) g.2
-      show (g : G) * (x : G) * (g : G)⁻¹ = (x : G)
+      change (g : G) * (x : G) * (g : G)⁻¹ = (x : G)
       calc (g : G) * (x : G) * (g : G)⁻¹
           = ((x : G) * (g : G)) * (g : G)⁻¹ := by rw [← hcomm]
         _ = (x : G) := by group
@@ -157,7 +157,7 @@ theorem K_inf_centralizer_eq_bot :
     apply Subtype.ext
     simp only [Hypothesis.fittingConjAction, MonoidHom.comp_apply,
       Subgroup.normalizerMonoidHom_apply_apply_coe]
-    show ((fc.toVbar g : ↥fc.toHypothesis.Vbar) : fc.toHypothesis.Dbar) *
+    change ((fc.toVbar g : ↥fc.toHypothesis.Vbar) : fc.toHypothesis.Dbar) *
         kbar *
         (((fc.toVbar g : ↥fc.toHypothesis.Vbar) :
           fc.toHypothesis.Dbar))⁻¹ = kbar
@@ -166,7 +166,7 @@ theorem K_inf_centralizer_eq_bot :
     congr 1
     apply Subtype.ext
     have hcomm := Subgroup.mem_centralizer_iff.mp hkC (g : G) g.2
-    show (g : G) * k * (g : G)⁻¹ = k
+    change (g : G) * k * (g : G)⁻¹ = k
     calc (g : G) * k * (g : G)⁻¹ = (k * (g : G)) * (g : G)⁻¹ := by
           rw [← hcomm]
       _ = k := by group

@@ -150,7 +150,7 @@ theorem layerZeroClass_eq_zero_of_mem_frattini
     rw [hK0, Subgroup.mem_subgroupOf]; exact hx
   have h1 : QuotientGroup.mk' (lowerCentralLayerKernel P 0) x = 1 :=
     (QuotientGroup.eq_one_iff _).mpr hmem
-  show Additive.ofMul (QuotientGroup.mk' (lowerCentralLayerKernel P 0) x) = 0
+  change Additive.ofMul (QuotientGroup.mk' (lowerCentralLayerKernel P 0) x) = 0
   exact ofMul_eq_zero.mpr h1
 
 end FactorInclusion
@@ -195,7 +195,7 @@ theorem combinedFactorMap_surjective
     QuotientGroup.mk'_surjective (lowerCentralLayerKernel P 0) y.toMul
   have hy : y = layerZeroClass x := by
     apply Additive.toMul.injective
-    show Additive.toMul y = QuotientGroup.mk' (lowerCentralLayerKernel P 0) x
+    change Additive.toMul y = QuotientGroup.mk' (lowerCentralLayerKernel P 0) x
     exact hx.symm
   have hxmem : (x : P) ∈ fL.range ⊔ fR.range := hsup ▸ Subgroup.mem_top _
   rw [← SetLike.mem_coe, Subgroup.mul_normal] at hxmem
@@ -209,7 +209,7 @@ theorem combinedFactorMap_surjective
     factorInclusion_eQuot_mk, ← layerZeroClass_mul]
   congr 1
   apply Subtype.ext
-  show fL gL * fR gR = (x : P)
+  change fL gL * fR gR = (x : P)
   rw [hgL, hgR]; exact hab
 
 /-- In a `ZMod 2`-module every element is its own negation. -/
@@ -418,7 +418,7 @@ theorem ambientCenterCoordinate_squareMap
   rw [show layerZeroClass x =
       Additive.ofMul (QuotientGroup.mk' (lowerCentralLayerKernel P 0) x) from rfl,
     lowerCentralSquareMapAdditive_mk]
-  show ePhi (ambientLayerOneLinearEquivFrattini hEA hK1 hterm
+  change ePhi (ambientLayerOneLinearEquivFrattini hEA hK1 hterm
       (Additive.ofMul (lowerCentralSquareValue P hSq x))) =
     ePhi (Additive.ofMul ⟨(x : P) ^ 2, hx2⟩)
   rfl
@@ -448,7 +448,7 @@ theorem factorLayerOneEquivAmbientFrattini_squareValue
 theorem homocyclicFourSquareSubgroupEquivFrattini_squareEquiv
     {S : Subgroup P} [Finite ↥S]
     (hcomm : IsMulCommutative ↥S)
-    {index : Type} [Fintype index]
+    {index : Type}
     (equivPi : ↥S ≃* (index → Multiplicative (ZMod 4)))
     (hPhiS : frattini P ≤ S)
     (hN : Agemo (↥S) 2 1 = (frattini P).subgroupOf S)
