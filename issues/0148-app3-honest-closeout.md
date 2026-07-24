@@ -28,12 +28,15 @@ Pf 側の再掲は書かない。
 
 ## やること (文書順)
 
-- [ ] **Lemma 1(a)**: 中心拡大 `W ≤ Z(P)`, `P/W` 元位数 ≤2, `W` 元位数 ≤2 の下で
-      squaring `P/W → W` が quadratic (polar form が bilinear) — 一般形。
-      Higman 側の具体形は `HigmanSquareMap.lean`
-      (`lowerCentralSquareMapAdditive_add` / `lowerCentralSquareQuadraticMap_polarBilin`)
-      に lower-central 特化版があるので、そこから一般化 or 独立に短証明。
-      Lemma 1(b) (逆方向の構成) は `QuadraticExtensions.lean` で実装済。
+- [x] **Lemma 1(a)** ✅ 2026-07-24 (hub): `QuadraticExtensions.lean` (1(b) と同居) に一般形で
+      実装 — `centralSquare` (squaring の descend) / `centralCommPairing` (**polarization として
+      定義**することで well-definedness 証明を丸ごと回避する設計) / `centralCommPairing_mk`
+      (polar form = commutator pairing `⁅y,x⁆`) / `centralCommPairing_mul_left/right`
+      (biadditivity — 今日 dedup したばかりの `commutatorElement_mul_*_of_class_le_two` を cite) /
+      **`centralSquareQuadraticMap`** (bundled `QuadraticMap (ZMod 2)`、AxiomsCheck 登録済)。
+      書籍の「P 2-group」仮定は不要 (使うのは W ≤ Z(P) + 両 exponent 2 のみ) なので一般化。
+      ⚠ 実装知見: `IsMulCommutative.instCommGroup` は **scoped instance** — `open scoped
+      IsMulCommutative` が無いと letI 連鎖が組めず zmodModule の型と不一致になる。
 - [ ] **Lemma 2**: `F_{2^n}` 上の linear / bilinear / quadratic map の基底表示
       (`x ↦ Σ aᵢ x^{2ⁱ}` 形)。`HigmanFiniteFieldTrace.lean` に部分素材あり。
       Prop 1/2 の証明で必要になる範囲を優先。

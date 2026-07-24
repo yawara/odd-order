@@ -12633,3 +12633,8 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 -- Peterfalvi App.IV Feit–Sibley 定理 (d odd ⟹ 𝒮 coherent; campaign issue 1054)
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.FeitSibley.feit_sibley_coherence
+-- Peterfalvi App.III Lemma 1(a) (squaring in a central elementary extension is quadratic)
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.centralSquareQuadraticMap
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.centralCommPairing_mk

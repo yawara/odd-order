@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.ZMod
 import Mathlib.GroupTheory.GroupExtension.Basic
 import Mathlib.LinearAlgebra.QuadraticForm.Basis
 import Mathlib.Tactic.Abel
+import OddOrder.GroupTheory.PRank
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 
 /-!
 # Peterfalvi Appendix III: central extensions from quadratic maps
@@ -22,6 +24,12 @@ on `V × W`.  A quadratic map `q : V → W` over `F₂`, together with an ordere
 basis of `V`, supplies such a bilinear lift through `q.toBilin`.  The resulting
 short exact sequence has central kernel `W`, quotient `V`, and its squaring map
 is exactly `q`.
+
+The converse **Lemma 1(a)** (`centralSquareQuadraticMap` below): for a central
+subgroup `W ≤ Z(P)` with `W` and `P ⧸ W` elementary abelian `2`-groups, squaring
+descends to a quadratic map `P ⧸ W → W` whose polar form is the commutator
+pairing.  (The book states this for `P` a `2`-group; only `W ≤ Z(P)` and the
+exponent-`2` conditions are used, so we formalize the general statement.)
 -/
 
 set_option autoImplicit false
@@ -269,6 +277,216 @@ theorem sq_eq_inl_q (x : QuadraticExtension q basis) :
 end QuadraticExtension
 
 end QuadraticExtension
+
+section CentralSquareQuadratic
+
+/-! ### Lemma 1(a): squaring in a central elementary extension is quadratic
+
+`W ≤ Z(P)` with `W` and `P ⧸ W` elementary abelian `2`-groups.  Squaring
+descends to `centralSquare : P ⧸ W → ↥W`; its polarization
+`centralCommPairing` (defined as the multiplicative polar defect of
+`centralSquare`, hence well defined for free) computes to the descended
+commutator pairing `⁅y, x⁆` and is biadditive by the class-`≤ 2` commutator
+identities. -/
+
+open OddOrder.GroupTheory
+open scoped commutatorElement IsMulCommutative
+
+variable {P : Type uV} [Group P] {W : Subgroup P} [W.Normal]
+
+section Descend
+
+/-- The square of any element lies in `W` (exponent `2` of the quotient). -/
+theorem sq_mem_of_quotient_elementaryAbelian
+    (hV : IsElementaryAbelian 2 (P ⧸ W)) (x : P) : x ^ 2 ∈ W := by
+  have h : ((x : P ⧸ W)) ^ 2 = 1 := hV.pow_eq_one _
+  rwa [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff] at h
+
+/-- Every commutator lies in `W` (commutativity of the quotient). -/
+theorem commutatorElement_mem_of_quotient_elementaryAbelian
+    (hV : IsElementaryAbelian 2 (P ⧸ W)) (x y : P) : ⁅x, y⁆ ∈ W := by
+  rw [← QuotientGroup.eq_one_iff]
+  have h : ((⁅x, y⁆ : P) : P ⧸ W) = ⁅(x : P ⧸ W), (y : P ⧸ W)⁆ := rfl
+  rw [h, commutatorElement_def, hV.comm (x : P ⧸ W) (y : P ⧸ W)]
+  group
+
+/-- The commutator subgroup lies in `W`. -/
+theorem commutator_le_of_quotient_elementaryAbelian
+    (hV : IsElementaryAbelian 2 (P ⧸ W)) : _root_.commutator P ≤ W := by
+  rw [_root_.commutator, Subgroup.commutator_le]
+  exact fun g₁ _ g₂ _ => commutatorElement_mem_of_quotient_elementaryAbelian hV g₁ g₂
+
+/-- **Peterfalvi Appendix III, Lemma 1(a) (raw map).**  Squaring descends to
+`P ⧸ W → ↥W`: representatives differ by a central element of square one. -/
+noncomputable def centralSquare (hWc : W ≤ Subgroup.center P)
+    (hW : IsElementaryAbelian 2 ↥W) (hV : IsElementaryAbelian 2 (P ⧸ W)) :
+    P ⧸ W → ↥W :=
+  Quotient.lift
+    (fun x => (⟨x ^ 2, sq_mem_of_quotient_elementaryAbelian hV x⟩ : ↥W))
+    (by
+      intro x y hxy
+      have hw : x⁻¹ * y ∈ W := QuotientGroup.leftRel_apply.mp hxy
+      have hcen := Subgroup.mem_center_iff.mp (hWc hw)
+      have hsq1 : (x⁻¹ * y) ^ 2 = 1 :=
+        congrArg Subtype.val (hW.pow_eq_one (⟨x⁻¹ * y, hw⟩ : ↥W))
+      apply Subtype.ext
+      change x ^ 2 = y ^ 2
+      have hc : Commute x (x⁻¹ * y) := hcen x
+      have hy : (x * (x⁻¹ * y)) ^ 2 = x ^ 2 * (x⁻¹ * y) ^ 2 := hc.mul_pow 2
+      rw [show x * (x⁻¹ * y) = y by group, hsq1, mul_one] at hy
+      exact hy.symm)
+
+@[simp] theorem centralSquare_mk (hWc : W ≤ Subgroup.center P)
+    (hW : IsElementaryAbelian 2 ↥W) (hV : IsElementaryAbelian 2 (P ⧸ W)) (x : P) :
+    centralSquare hWc hW hV (x : P ⧸ W) =
+      ⟨x ^ 2, sq_mem_of_quotient_elementaryAbelian hV x⟩ :=
+  rfl
+
+/-- The polar defect of the square map.  Defined directly from `centralSquare`,
+so it is well defined with no further quotient argument; `centralCommPairing_mk`
+identifies it with the commutator pairing. -/
+noncomputable def centralCommPairing (hWc : W ≤ Subgroup.center P)
+    (hW : IsElementaryAbelian 2 ↥W) (hV : IsElementaryAbelian 2 (P ⧸ W))
+    (a b : P ⧸ W) : ↥W :=
+  (centralSquare hWc hW hV a * centralSquare hWc hW hV b)⁻¹ *
+    centralSquare hWc hW hV (a * b)
+
+/-- **The polarization identity** `q(ab) = q(a) q(b) · B(a,b)`. -/
+theorem centralSquare_mul (hWc : W ≤ Subgroup.center P)
+    (hW : IsElementaryAbelian 2 ↥W) (hV : IsElementaryAbelian 2 (P ⧸ W))
+    (a b : P ⧸ W) :
+    centralSquare hWc hW hV (a * b) =
+      centralSquare hWc hW hV a * centralSquare hWc hW hV b *
+        centralCommPairing hWc hW hV a b := by
+  rw [centralCommPairing, ← mul_assoc, mul_inv_cancel, one_mul]
+
+/-- **The polar form is the commutator pairing**: `B(x̄, ȳ) = ⁅y, x⁆`
+(from `(xy)² = x² y² ⁅y, x⁆` after central rearrangement). -/
+theorem centralCommPairing_mk (hWc : W ≤ Subgroup.center P)
+    (hW : IsElementaryAbelian 2 ↥W) (hV : IsElementaryAbelian 2 (P ⧸ W))
+    (x y : P) :
+    centralCommPairing hWc hW hV (x : P ⧸ W) (y : P ⧸ W) =
+      ⟨⁅y, x⁆, commutatorElement_mem_of_quotient_elementaryAbelian hV y x⟩ := by
+  have hcomm : ⁅y, x⁆ ∈ W := commutatorElement_mem_of_quotient_elementaryAbelian hV y x
+  have hcen := Subgroup.mem_center_iff.mp (hWc hcomm)
+  have hmk : ((x : P ⧸ W)) * (y : P ⧸ W) = ((x * y : P) : P ⧸ W) := rfl
+  rw [centralCommPairing, hmk, centralSquare_mk, centralSquare_mk, centralSquare_mk]
+  apply Subtype.ext
+  change ((x ^ 2 * y ^ 2 : P))⁻¹ * (x * y) ^ 2 = ⁅y, x⁆
+  have hyx : y * x = ⁅y, x⁆ * x * y := by
+    rw [commutatorElement_def]; group
+  have hsq : (x * y) ^ 2 = x ^ 2 * y ^ 2 * ⁅y, x⁆ := by
+    calc (x * y) ^ 2 = x * (y * x) * y := by rw [pow_two]; group
+      _ = x * (⁅y, x⁆ * x * y) * y := by rw [hyx]
+      _ = x * ⁅y, x⁆ * (x * (y * y)) := by group
+      _ = ⁅y, x⁆ * (x * (x * (y * y))) := by rw [hcen x]; group
+      _ = ⁅y, x⁆ * (x ^ 2 * y ^ 2) := by rw [pow_two, pow_two]; group
+      _ = x ^ 2 * y ^ 2 * ⁅y, x⁆ := by rw [← hcen (x ^ 2 * y ^ 2)]
+  rw [hsq]
+  group
+
+/-- The pairing is biadditive in the left slot (class-`≤ 2` commutator
+identity `⁅z, ab⁆ = ⁅z, a⁆ ⁅z, b⁆` through the descended form). -/
+theorem centralCommPairing_mul_left (hWc : W ≤ Subgroup.center P)
+    (hW : IsElementaryAbelian 2 ↥W) (hV : IsElementaryAbelian 2 (P ⧸ W))
+    (a b c : P ⧸ W) :
+    centralCommPairing hWc hW hV (a * b) c =
+      centralCommPairing hWc hW hV a c * centralCommPairing hWc hW hV b c := by
+  have hC : _root_.commutator P ≤ Subgroup.center P :=
+    (commutator_le_of_quotient_elementaryAbelian hV).trans hWc
+  induction a using Quotient.inductionOn with
+  | h x =>
+  induction b using Quotient.inductionOn with
+  | h y =>
+  induction c using Quotient.inductionOn with
+  | h z =>
+  have hmk : ((x : P ⧸ W)) * (y : P ⧸ W) = ((x * y : P) : P ⧸ W) := rfl
+  rw [hmk, centralCommPairing_mk, centralCommPairing_mk, centralCommPairing_mk]
+  apply Subtype.ext
+  change ⁅z, x * y⁆ = ⁅z, x⁆ * ⁅z, y⁆
+  exact OddOrder.Isaacs.Ch04.commutatorElement_mul_right_of_class_le_two hC z x y
+
+/-- The pairing is biadditive in the right slot. -/
+theorem centralCommPairing_mul_right (hWc : W ≤ Subgroup.center P)
+    (hW : IsElementaryAbelian 2 ↥W) (hV : IsElementaryAbelian 2 (P ⧸ W))
+    (a b c : P ⧸ W) :
+    centralCommPairing hWc hW hV a (b * c) =
+      centralCommPairing hWc hW hV a b * centralCommPairing hWc hW hV a c := by
+  have hC : _root_.commutator P ≤ Subgroup.center P :=
+    (commutator_le_of_quotient_elementaryAbelian hV).trans hWc
+  induction a using Quotient.inductionOn with
+  | h x =>
+  induction b using Quotient.inductionOn with
+  | h y =>
+  induction c using Quotient.inductionOn with
+  | h z =>
+  have hmk : ((y : P ⧸ W)) * (z : P ⧸ W) = ((y * z : P) : P ⧸ W) := rfl
+  rw [hmk, centralCommPairing_mk, centralCommPairing_mk, centralCommPairing_mk]
+  apply Subtype.ext
+  change ⁅y * z, x⁆ = ⁅y, x⁆ * ⁅z, x⁆
+  exact OddOrder.Isaacs.Ch04.commutatorElement_mul_left_of_class_le_two hC y z x
+
+end Descend
+
+section Bundled
+
+variable (hWc : W ≤ Subgroup.center P) (hW : IsElementaryAbelian 2 ↥W)
+  (hV : IsElementaryAbelian 2 (P ⧸ W))
+
+/-- **Peterfalvi Appendix III, Lemma 1(a)** (p. 139, bundled form): for a
+central subgroup `W ≤ Z(P)` with `W` and `P ⧸ W` elementary abelian `2`-groups,
+`x ↦ x²` induces a quadratic mapping `P ⧸ W → W` of `𝔽₂`-vector spaces.  The
+companion bilinear form is the commutator pairing
+(`centralCommPairing_mk`). -/
+noncomputable def centralSquareQuadraticMap :
+    letI : IsMulCommutative (P ⧸ W) := IsMulCommutative.of_comm hV.comm
+    letI : IsMulCommutative ↥W := IsMulCommutative.of_comm hW.comm
+    letI : Module (ZMod 2) (Additive (P ⧸ W)) := hV.zmodModule
+    letI : Module (ZMod 2) (Additive ↥W) := hW.zmodModule
+    QuadraticMap (ZMod 2) (Additive (P ⧸ W)) (Additive ↥W) :=
+  letI : IsMulCommutative (P ⧸ W) := IsMulCommutative.of_comm hV.comm
+  letI : IsMulCommutative ↥W := IsMulCommutative.of_comm hW.comm
+  letI : Module (ZMod 2) (Additive (P ⧸ W)) := hV.zmodModule
+  letI : Module (ZMod 2) (Additive ↥W) := hW.zmodModule
+  { toFun := fun a => Additive.ofMul (centralSquare hWc hW hV a.toMul)
+    toFun_smul := by
+      intro r a
+      rcases (by decide : ∀ r : ZMod 2, r = 0 ∨ r = 1) r with h | h <;> subst h
+      · rw [zero_smul, show ((0 : ZMod 2) * 0) = 0 by decide, zero_smul]
+        have h1 : (Additive.toMul (0 : Additive (P ⧸ W))) = ((1 : P) : P ⧸ W) := rfl
+        rw [h1, centralSquare_mk]
+        refine congrArg Additive.ofMul (Subtype.ext ?_)
+        exact one_pow 2
+      · rw [one_smul, show ((1 : ZMod 2) * 1) = 1 by decide, one_smul]
+    exists_companion' := by
+      classical
+      refine ⟨?_, ?_⟩
+      · -- the commutator pairing, additivized and made `ZMod 2`-linear
+        refine
+          (AddMonoidHom.mk'
+            (fun a =>
+              ((AddMonoidHom.mk'
+                (fun b =>
+                  Additive.ofMul
+                    (centralCommPairing hWc hW hV a.toMul b.toMul))
+                (by
+                  intro b c
+                  exact congrArg Additive.ofMul
+                    (centralCommPairing_mul_right hWc hW hV
+                      a.toMul b.toMul c.toMul))).toZModLinearMap 2))
+            (by
+              intro a b
+              refine LinearMap.ext fun c => ?_
+              exact congrArg Additive.ofMul
+                (centralCommPairing_mul_left hWc hW hV
+                  a.toMul b.toMul c.toMul))).toZModLinearMap 2
+      · intro a b
+        exact congrArg Additive.ofMul
+          (centralSquare_mul hWc hW hV a.toMul b.toMul) }
+
+end Bundled
+
+end CentralSquareQuadratic
 
 end
 
