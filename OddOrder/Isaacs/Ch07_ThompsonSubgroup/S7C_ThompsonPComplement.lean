@@ -867,7 +867,7 @@ theorem isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement
     infer_instance
   have hU_pi :
       OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) U :=
-    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.of_isPGroup_of_mem hU_p (by simp)
+    Subgroup.isPiSubgroup_of_isPGroup_of_mem hU_p (by simp)
   have hU_le_F1 : U ≤ F1 := by
     dsimp [F1]
     rw [show 1 = 0 + 1 by omega,
@@ -978,7 +978,7 @@ theorem isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement
   have htop_pi :
       OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ)
         (⊤ : Subgroup (G ⧸ F2)) :=
-    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.of_isPGroup_of_mem
+    Subgroup.isPiSubgroup_of_isPGroup_of_mem
       (hGF2_p.to_subgroup ⊤) (by simp)
   refine ⟨3, top_le_iff.mp ?_⟩
   rw [show 3 = 2 + 1 by omega,
@@ -1048,7 +1048,7 @@ theorem hasNormalPComplement_of_quotient_of_isPiGroup_compl
   have hP_pi :
       OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p} : Set ℕ)
         (P : Subgroup G) :=
-    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.of_isPGroup_of_mem
+    Subgroup.isPiSubgroup_of_isPGroup_of_mem
       P.isPGroup' (by simp)
   have hPN_coprime :
       Nat.Coprime (Nat.card (P : Subgroup G)) (Nat.card N) :=

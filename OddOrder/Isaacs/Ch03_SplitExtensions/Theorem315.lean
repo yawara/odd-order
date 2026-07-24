@@ -455,21 +455,6 @@ theorem Subgroup.IsPiGroup.le {G : Type*} [Group G] [Finite G] {π : Set ℕ}
   have hdvd : Nat.card ↥H ∣ Nat.card ↥K := Subgroup.card_dvd_of_le hHK
   exact hK p (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hp)
 
-/-- A finite `p`-group is a `π`-group once `p ∈ π`. -/
-theorem Subgroup.IsPiGroup.of_isPGroup_of_mem {G : Type*} [Group G] [Finite G]
-    {π : Set ℕ} {H : Subgroup G} {p : ℕ} [Fact p.Prime]
-    (hH : IsPGroup p H) (hpπ : p ∈ π) :
-    Subgroup.IsPiGroup π H := by
-  intro q hq
-  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (G := H)).mp hH
-  rw [hn] at hq
-  by_cases hn0 : n = 0
-  · simp [hn0] at hq
-  · rw [Nat.primeFactors_prime_pow hn0 Fact.out] at hq
-    rw [Finset.mem_singleton] at hq
-    rw [hq]
-    exact hpπ
-
 /-- **`oPiCore π G = ⊥` ⇒ G で normal π-subgroup は ⊥ のみ**.
 `Subgroup.IsPiGroup.le_oPiCore` + `oPiCore = ⊥` の chain.
 
@@ -503,7 +488,7 @@ theorem Subgroup.IsPiGroup.inf_eq_bot_of_isPGroup_not_mem {G : Type*} [Group G]
     K ⊓ M = ⊥ := by
   apply Subgroup.eq_bot_of_card_eq
   have hM_pi' : Subgroup.IsPiGroup {q | q ∉ π} M :=
-    Subgroup.IsPiGroup.of_isPGroup_of_mem hM hp_notπ
+    _root_.Subgroup.isPiSubgroup_of_isPGroup_of_mem hM hp_notπ
   have hdvdK : Nat.card ↥(K ⊓ M : Subgroup G) ∣ Nat.card K :=
     Subgroup.card_dvd_of_le inf_le_left
   have hdvdM : Nat.card ↥(K ⊓ M : Subgroup G) ∣ Nat.card M :=

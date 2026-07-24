@@ -95,3 +95,18 @@ singleton 特殊化 (`isPiSubgroup_of_isPGroup_of_mem hH rfl` で得られる)�
   (2)(3) を (1) へ寄せて削除 or 系化。参照 20+ の repoint を含む mechanical 作業 —
   quiet window の別 wave で実施。alias `Subgroup.IsPiGroup` の全面 textual 置換 (478 サイト)
   も同 wave 候補 (upstream 適性; 急がない)。
+
+---
+
+## ✅ 2026-07-24 close — 補題 trio 集約完了 (hub)
+
+- (2) `Ch03.Subgroup.IsPiGroup.of_isPGroup_of_mem` を**削除** (canonical (1) と statement 同一の
+  純重複)。caller 4 箇所 (Theorem315 内 1 + S7C_ThompsonPComplement 3) を
+  `Subgroup.isPiSubgroup_of_isPGroup_of_mem` へ repoint。
+- (3) `isPiSubgroup_singleton_of_isPGroup` は **1 行の系**に置換
+  (`isPiSubgroup_of_isPGroup_of_mem hH rfl`; caller 19 箇所は無変更 — 慣用名として保持、
+  重複証明本体は消滅)。
+- BG 側の重複 (発端) は既に解消済みだったことを census で確認済 (前回注記)。
+- leaf build green (2391 jobs)、full --strict gate は wave 末尾。
+- 残る optional 作業 (急がない・upstream 時): alias `Subgroup.IsPiGroup` の全面 textual 置換
+  478 サイト (closed/9159 の注記参照)。close。

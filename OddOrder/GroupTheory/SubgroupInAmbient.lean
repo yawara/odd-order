@@ -143,16 +143,11 @@ theorem isPiSubgroup_of_forall_zpowers_isPiSubgroup_compl_eq_one [Finite G]
     rw [← hx_order, hx_sub_one, orderOf_one]
   exact (Fact.out : q.Prime).ne_one hq_one
 
-/-- A q-group is a singleton pi-subgroup. -/
+/-- A q-group is a singleton pi-subgroup (`isPiSubgroup_of_isPGroup_of_mem` at `π = {q}`;
+kept as a named corollary for its 19 call sites, issue 9130). -/
 theorem isPiSubgroup_singleton_of_isPGroup [Finite G] {q : ℕ} [Fact q.Prime]
-    {H : Subgroup G} (hH : IsPGroup q ↥H) : Subgroup.IsPiSubgroup {q} H := by
-  intro r hr
-  obtain ⟨n, hn⟩ := hH.exists_card_eq
-  by_cases hn0 : n = 0
-  · rw [hn, hn0, pow_zero] at hr
-    simp at hr
-  · rw [hn, Nat.primeFactors_prime_pow hn0 (Fact.out : q.Prime)] at hr
-    simpa using hr
+    {H : Subgroup G} (hH : IsPGroup q ↥H) : Subgroup.IsPiSubgroup {q} H :=
+  Subgroup.isPiSubgroup_of_isPGroup_of_mem hH rfl
 
 /-- A `{q}`-subgroup is a `q`-group. -/
 theorem isPGroup_of_isPiSubgroup_singleton [Finite G] {q : ℕ} [Fact q.Prime]
