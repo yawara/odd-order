@@ -130,6 +130,16 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
   - ⚠ 教訓: 宣言境界 cut は必ず docstring 開始行まで walk-up してから切る
     (泣き別れ parse error が 3 file 中 3 回発生 → gen script に walk-up を組み込み済)。
 
+- ✅ BG Ch4 帯 6 file — 2026-07-25 (S14 Basics 1684→1193 + TypeClassification 523 /
+  S15 SetupLemma151 1745→1273 + AutAbelianCore 499 / S15 Theorem152Helpers 1616→1200 +
+  TypeP1Forcing 439 / S16 TheoremsAE 1813→1294 + TheoremAB 541 / S16 TypeP1Criteria
+  1652→212 + TypeDataBridges 1464 (唯一の private-clean 点 L1467) / S16 TaxonomyOutput
+  1529→543 + LocalTaxonomy 1008)。
+- ✅ BG App + GroupTheory 帯 4 file — 2026-07-25 (AppC_NormSet 1842→919 + NormSetBasic 961 /
+  AppC_FrobeniusClassSum 1871→1351 + NormOneInduce 556 / AppE_FurtherResults 1675→1042 +
+  RegularOperator 670 (section RegularOperator を main 側で再オープン) / CNGroupStructure
+  1588→1179 + CNGroupFrobeniusSteps 442)。
+
 ### ⚠ 第二パス行き (private 網が全域を覆い、clean な宣言境界 cut が存在しない)
 
 prefix-split では割れない — 対応には crossing private の public 化 (namespace 付与) という
@@ -142,6 +152,8 @@ prefix-split では割れない — 対応には crossing private の public 化
 - `BG/Ch1_Preliminary/S04f_Blackburn.lean` (1634) — private 29→1152 等が全域交差
   (clean cut = L25 のみで無意味)
 - `BG/Ch1_Preliminary/S06_Additional.lean` (1677) — clean cut ゼロ (private 508→1495 等)
+- `GroupTheory/RepresentationTheory/ClassSumCongruence.lean` (1602) — named section 網
+  (ClassSum/StructureCoeff/…) と private (227→410, 315→1511) の交差で section 境界 cut が全滅
 
 - ✅✅ `BG/Ch1_Preliminary/S03f_Thm36.lean` (3822) — 2026-07-24 **完了、stamp 除去**:
   単一巨大宣言 `thm36_aux` の IH-free セグメント 3 つを段階的に切出し、
