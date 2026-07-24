@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFour
+import OddOrder.Higman.Suzuki2Groups.ExponentFour
 
 /-!
 # Peterfalvi Part II, Ch. II, step (5): supporting identifications
@@ -36,25 +37,12 @@ open Pointwise
 
 /-! ## Group-theoretic helpers for step (5)
 
-Three self-contained inputs: the exponent of a Suzuki `2`-group (Higman —
-sorried-cite until the Higman campaign lands it), the center of a
-nonabelian group of order `8`, and the cyclicity of odd `p`-subgroups of
-near-field unit groups (they act fixed-point-freely on `(F, +)`). -/
+Three self-contained inputs: Higman's proved exponent bound for Suzuki
+`2`-groups, the center of a nonabelian group of order `8`, and the cyclicity
+of odd `p`-subgroups of near-field unit groups (they act fixed-point-freely
+on `(F, +)`). -/
 
 section StepFiveHelpers
-
-/-- **Peterfalvi p. 110 (inside step (5)) / Appendix III (Higman)**: a
-Suzuki `2`-group has exponent `4` ("`S` is then a Suzuki 2-group and so of
-exponent 4").
-
-**Sorried-cite**: the statement is Higman's theorem (a) (Appendix III,
-p. 141, `S/Z(S)` and `Z(S) = Ω₁(S)` elementary abelian); the Higman
-campaign (`OddOrder/Higman/Suzuki2Groups/**`) is building the proof.
-Tracked in issue 2053. -/
-theorem pow_four_eq_one_of_isSuzuki2Group {P : Type*} [Group P] [Finite P]
-    (hP : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group P) (x : P) :
-    x ^ 4 = 1 := by
-  sorry
 
 /-- A nonabelian group of order `8` has center of order `2`: the center is
 nontrivial (`2`-group), proper (nonabelian), and of index `≠ 2` (a cyclic
@@ -783,8 +771,8 @@ Suzuki `2`-group of exponent `4` (`sylowTwo_isMulCommutative_or_isSuzuki2Group`
 step (4) then makes `|Q| = 8^p = 2^{3p}` a `2`-power, so `Q₁ = 1`
 (`Q1_eq_bot_of_card_two_pow`).
 
-Inherits the step (2)(b) `sorry` (issue 9318) through the near-field model and
-the Higman `sorry` (`pow_four_eq_one_of_isSuzuki2Group`, tracked in 2053). -/
+Inherits the step (2)(b) `sorry` (issue 9318) through the near-field model.
+The Higman exponent-four input is fully proved. -/
 theorem card_nearField_eq_nine_and_Q1_eq_bot :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ∀ {F : Type uG} [NearFields.NearField F]
@@ -890,7 +878,7 @@ theorem card_nearField_eq_nine_and_Q1_eq_bot :
     have huS : toQ u ∈ (S : Subgroup ↥fc.toHypothesis.Q) :=
       fc.mem_sylowTwo_of_orderOf_two_pow S (by rw [hord]; exact hk)
     have h4 : (⟨toQ u, huS⟩ : ↥(S : Subgroup ↥fc.toHypothesis.Q)) ^ 4 = 1 :=
-      pow_four_eq_one_of_isSuzuki2Group hSsuz _
+      OddOrder.Higman.Suzuki2Groups.pow_four_eq_one_of_isSuzuki2Group hSsuz _
     apply htoQinj
     rw [map_pow, map_one]
     have hval := congrArg Subtype.val h4

@@ -327,7 +327,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 12600
+set_option linter.style.longFile 12800
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -8514,6 +8514,27 @@ of length at least four; the center chain then dispatches every Suzuki
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.higmanClassification_of_isSuzuki2Group
 
+/-! **Higman Theorem 1(a)**: each honest type model, hence every Suzuki
+`2`-group, has exponent dividing four. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.pow_four_eq_one_of_isTypeA
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.pow_four_eq_one_of_isTypeB
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.pow_four_eq_one_of_isTypeC
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.pow_four_eq_one_of_isTypeD
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.pow_four_eq_one_of_higmanType
+
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.pow_four_eq_one_of_isSuzuki2Group
+
 /-! **Peterfalvi Appendix III, Theorem (e), recognition half**: a summand
 isomorphism of any invariant two-summand split of `P ⧸ Z(P)` forces
 Frobenius-conjugate factor eigenvalues, which kills the type-C and type-D
@@ -12155,10 +12176,11 @@ pair of noncommuting `2`-elements (`exists_noncommuting_two_elements_of_nearFiel
 given that `2`-elements have order dividing `4`, `T` is `Q₈`, forcing `|F| = 9`, `|F^*| = 8`
 (`nearField_card_eq_nine_of_nilpotent_units`).  All three are sorry-free.
 
-(The `2`-element exponent bound is supplied downstream by the Higman theorem
-`pow_four_eq_one_of_isSuzuki2Group`, and the near-field model by Appendix C Proposition 1 —
-issue 9318.  The step (5) conclusion `card_nearField_eq_nine_and_Q1_eq_bot` therefore inherits
-both sorries and is deliberately NOT asserted here.) -/
+(The `2`-element exponent bound is supplied by the proved Higman theorem
+`pow_four_eq_one_of_isSuzuki2Group`.  The near-field model still comes from
+Appendix C Proposition 1 (issue 9318), so the step (5) conclusion
+`card_nearField_eq_nine_and_Q1_eq_bot` inherits that `sorry` and is deliberately
+NOT asserted here.) -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.exists_nilpotent_units_sylowTwo_decomp
 #assert_only_allowed_axioms

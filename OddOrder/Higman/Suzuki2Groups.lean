@@ -35,6 +35,7 @@ import OddOrder.Higman.Suzuki2Groups.HigmanTypesCD
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaThirteen
 import OddOrder.Higman.Suzuki2Groups.Classification
+import OddOrder.Higman.Suzuki2Groups.ExponentFour
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.Higman.Suzuki2Groups.CenterHomocyclic
 
