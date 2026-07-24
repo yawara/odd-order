@@ -146,6 +146,25 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
   RegularOperator 670 (section RegularOperator を main 側で再オープン) / CNGroupStructure
   1588→1179 + CNGroupFrobeniusSteps 442)。
 
+- ✅ Pf 帯 4 file — 2026-07-25 (S04_DadeIsometryBasic 1688→1398 + S04_DadeHypothesisCore 332
+  (namespace Hypothesis 再オープン + open 復元) / S05_SignedTripleGrid 1833→1345 +
+  S05_NormThreeCharacters 511 / S07 CoherenceUnion 1730→706 + CoherenceExtensionTau2 1042 /
+  S07 FamilyBundleDade 1644→1367 + FamilyBundleBasic 294)。
+  ⚠ 親の namespace 再オープン時は原本の **open 行 (OddOrder.RepresentationTheory /
+  scoped Pointwise) を必ず複製** — 3 file で instance/identifier 解決が落ちた。
+
+### 🚧 次セッションへの注意 — Pf S08 帯 (CoherenceBasic/Core/RestrictExtensionDvd) は要手動精査
+
+2026-07-25 深夜の自動分割試行は **revert 済み** (worktree は clean)。罠が 2 つ:
+1. これらの file は**既に Part1/Part2 分割チェーンの一部** (`S08_CoherenceCorePart2` を import)
+   で、module docstring 内に「`import chain head: Part1 ← Part2 ← …`」という**行頭が
+   `import` の日本語 doc 行**があり、`^import` ベースの import-block 検出を誤らせる
+   (imports の終端は「連続 import 行の末尾」で判定すること)。
+2. `PairUnion*StepData` 構造体群 (issue 0132 の命名問題の当事者) が cut を跨いで参照される。
+   cut 前に構造体 def と全使用点の位置関係を確認すること。
+S08_CaseBAnchoredSeed / S09_CertificateDischarge は罠 1 のみ該当の可能性 — 同じ import 検出
+修正で通る見込み。いずれも privs=0 で境界自体は自由。
+
 ### ⚠ 第二パス行き (private 網が全域を覆い、clean な宣言境界 cut が存在しない)
 
 prefix-split では割れない — 対応には crossing private の public 化 (namespace 付与) という
