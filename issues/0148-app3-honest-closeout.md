@@ -141,7 +141,7 @@ Pf 側の再掲は書かない。
         (`q(a,0) = a²` で第 1 軸のみで全射) /
         `closure_range_typeBQuadraticMap` ((iii) の hspan 供給)。
         anisotropy 仮定も不要。AxiomsCheck 2 assert。
-  - [~] **(v) semilinear 分類 (核心)** — **f-側 collapse ✅ 2026-07-24 (hub)**:
+  - [x] **(v) semilinear 分類 (核心)** — **f-側 collapse ✅ 2026-07-24 (hub)**:
         `SemilinearFieldAut.lean` に抽象形で追加 —
         **`exists_smul_algAut_of_norm_intertwiner`**: κ 非自明 involutive
         (`κ*κ = 1`)、f ≠ 0 𝔽₂-linear、`Σ_ρ μ_ρ ρ(x·κx) = f(x)·κ(f(x))`
@@ -153,12 +153,22 @@ Pf 側の再掲は書かない。
         λ_α = 0 になるため)。μ-δ 項は (4) 適用箇所 (β ≠ ακ) で両側とも
         消えるので対角 δ 対称性も不要。`push_neg` は deprecated → `push Not`;
         `self_eq_mul_right` → 現 mathlib 名 `left_eq_mul`。
-        **残り**: g-側 μ collapse (g = λκ(λ)·σ|_F) と逆向き (λ,σ) ↦ (f,g)
-        直計算 — (vi) の組み上げと合わせて実施。前提部品のうち
-        Fix(conj) = F は (vi) の接続で必要になった時点で。
-  - [ ] **(vi) Prop 2 組み上げ**: `TypeBModel 1 ε` で
-        exists_semilinear_of_aut / exists_aut_of_semilinear /
-        kernel_elementaryAbelian の 3 定理 + AxiomsCheck。
+        **g-側 μ collapse は Prop 2 の statement に不要と判明** (kernel も
+        全射性も f-側のみで述べられる; 逆向きは g を直接構成) — 実施せず。
+  - [x] **(vi) Prop 2 組み上げ** ✅ 2026-07-24 (hub): 新 leaf
+        `Suzuki2Groups/AutomorphismClassification.lean` (hub 配線済) —
+        **`exists_semilinear_of_aut`** (順: f_Φ を equivProd で E に移送 →
+        autKernel_squareMap を mul_conj + 展開 lift で norm-intertwiner 化 →
+        (v) collapse) / **`exists_aut_of_semilinear`** (逆: 任意の λσ に対し
+        g := N(λ)·σ|_F を restrictNormal で構成、σκ = κσ は
+        `IsCyclic Gal` instance (mathlib FieldTheory.Finite.Basic) の生成元
+        zpow 表示で、Lemma 1(c) sufficiency で lift; basis は Fin n 限定 =
+        1(c) の要求) / **`isElementaryAbelian_ker_autQuotientHom_typeB`**
+        (kernel; hspan = (iv) の closure_range)。AxiomsCheck 3 assert。
+        ⚠ 実装知見: FieldModel (= AdjoinRoot) に `ZMod.algebra` の local
+        instance を足すと `AdjoinRoot.instSMulAdjoinRoot` と defeq-非構文的
+        SMul diamond — **Algebra (ZMod 2) F だけ宣言し AdjoinRoot の generic
+        Algebra/IsScalarTower instance に任せる**のが正解。
 - [ ] Theorem (e) ⟹ 方向は既存 [issue 2052](2052-pf-appendix3-e-forward.md) —
       本 issue とは独立に追跡継続。
 
