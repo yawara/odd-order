@@ -49,3 +49,16 @@ math (未所有 shared infra を含む) に降りて実証明する」に従う�
 ## status
 open (c の次 action 待ち)。c が新 frontier に着手 or 9400 再エスカレーションしたら本 issue を
 closed/ へ。
+
+## 2026-07-24 CLOSE (ユーザー裁定で superseded)
+
+ユーザー裁定 2026-07-24: 「レーンに分配せずに、いったんこのハブで b → a → c のタスクを閉じる」。
+本 issue の実測表も stale 化した (StepFive の sorry は Higman Thm 1(a) 合流 `859ce48bf` で閉鎖、
+実 sorry 7→6→2)。hub セッションが直接実施した内容:
+
+- Suzuki2Groups.lean の空 scaffold 4 本削除 (`3adbd2df8`、0127 ② 実施) — 「b の Higman 待ち」gate は消滅
+- StepSix `card_D_le_three_of_noncomm` は Aut(Q₈) bound + near-field units ≅ Q₈ を hub が整備して閉鎖予定
+- RankOneAffineModel の凍結 sorry は |S|≥16 assembly を実証明し Q₈ 単離 statement へ縮小予定
+
+⟹ c への「新 ungated scope を取れ」指示は本 issue としては役目を終えた。c の次 frontier は
+hub の次回 tick で改めて裁定する (Q₈ 凍結 = issue 0147 は不変)。

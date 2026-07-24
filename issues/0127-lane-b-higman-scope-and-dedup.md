@@ -60,7 +60,9 @@ CLAUDE.md「opaque-Prop scaffold は形式化と数えない」に該当。
 **緩和材料**: file 内コメント (`:43-45`) が「これらは coverage に数えない・cite するな」と明記しており、
 grep でも**どの leaf も cite していない**ことを確認済 ⟹ 不健全な土台ではなく死んだ scaffold。
 
-- [ ] issue 2048 / 9160 の統合時に削除する (今すぐ消すと b の active frontier と衝突するため保留)
+- [x] issue 2048 / 9160 の統合時に削除する (今すぐ消すと b の active frontier と衝突するため保留)
+      → **2026-07-24 hub が実施** (`3adbd2df8`; 2048/9160 closed + Higman 完成でトリガー成立)。
+      実体の honest 形式化 (Lemma 1(a)/Lemma 2/Prop 1/Prop 2) は issue 0148 で追跡。
 
 ## ③ ✅ 2026-07-19 ユーザー裁定: Higman を完遂
 
