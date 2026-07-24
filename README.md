@@ -39,10 +39,13 @@ That machinery is the lasting output of this repository, and completing it is no
   to Gorenstein ("**G**, Thm X.Y.Z"), most visibly around p-stability, ZJ, and small-rank p-groups,
   and Peterfalvi's Appendix C likewise cites Gorenstein for the Brauer–Suzuki theorem (Ch. 12). Where
   such a citation is not already covered by Isaacs or by mathlib, the Gorenstein proof is written out
-  here (Theorems 3.4, 3.7/3.8/3.10, 4.15, 5.3.9–5.3.13, 7.6.5, Brauer–Suzuki, among others, under
-  `OddOrder/BG/` and `OddOrder/GroupTheory/`). The one open piece is the `Q₈` case of Brauer–Suzuki,
-  which classically requires modular character theory: it is the tree's single remaining `sorry`,
-  frozen as a deliberate long-term project. Gorenstein is *not* being formalized as a book.
+  here (Theorems 3.4, 3.7/3.8/3.10, 4.15, 5.3.9–5.3.13, 7.6.5, Brauer–Suzuki for `|S| ≥ 16`, among
+  others, under `OddOrder/BG/` and `OddOrder/GroupTheory/`). The one open piece, the `Q₈` case of
+  Brauer–Suzuki, is not in Gorenstein at all: his Ch. 12 proves only `|S| ≥ 16` and states the
+  order-8 case without proof ("all known proofs require the theory of modular characters" — a theory
+  the book never develops). Closing it means building modular character theory up through the
+  Z\*-theorem, following Navarro's *Characters and Blocks of Finite Groups*; it is the tree's single
+  remaining `sorry` and an active long-term project. Gorenstein is *not* being formalized as a book.
 
 Two proofs come from outside these books altogether: the books state the results but take the proofs
 from the original literature, so the sources themselves are formalized here.
