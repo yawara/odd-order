@@ -12650,6 +12650,9 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 -- Peterfalvi App.III Lemma 1(c) (iso of central extensions inducing (f,g) ⟺ g∘q = q'∘f)
 #assert_only_allowed_axioms GroupExtension.comp_squareMap_eq_of_mulEquiv
 #assert_only_allowed_axioms GroupExtension.exists_mulEquiv_of_comp_squareMap_eq
+-- Peterfalvi App.III Lemma 1(d) (auts inducing id on V and W ≅ Hom(V, W); elementary abelian)
+#assert_only_allowed_axioms GroupExtension.inducingIdAutsEquivHom
+#assert_only_allowed_axioms GroupExtension.isElementaryAbelian_inducingIdAuts
 -- Peterfalvi App.III Proposition 1 (B(n,1,ε) admits the field model: q(x) = x·x̄)
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.fieldModelPoly_irreducible

@@ -100,10 +100,16 @@ Pf 側の再掲は書かない。
         twist して同一 square map の 2 拡大に還元 → 既存
         `equivOfCommonSquareMap`**。書籍の基底持ち上げ論法は再実装不要)。
         AxiomsCheck 2 assert。
-  - [ ] **(ii) Lemma 1(d)**: 同 leaf に追加 — V/W 両方に id を誘導する
-        automorphism 群 ≃* `Multiplicative (V →+ W)` (α x = x·ι(h x̄) の h が
-        additive; 逆向きは α_h が automorphism)。系: W が ZMod 2 加群なら
-        elementary abelian 2-group。
+  - [x] **(ii) Lemma 1(d)** ✅ 2026-07-24 (hub): 同 leaf —
+        `GroupExtension.inducingIdAuts` (Subgroup (MulAut E)) /
+        `inducesIdHom` (deviation Φe·e⁻¹ の W 座標が V →+ W;
+        well-definedness は inl 固定のみ、加法性に centrality) /
+        `autOfHom`+`autOfHomHom` (逆向き hom) / injective + range 一致 →
+        **`inducingIdAutsEquivHom : Multiplicative (V →+ W) ≃* inducingIdAuts`** /
+        **`isElementaryAbelian_inducingIdAuts`** (ZMod 2 加群で)。
+        AxiomsCheck 2 assert。実装知見: kernelCoordinate は
+        `MonoidHom.ofInjective .symm` で取ると `simp [定義]` 一発で
+        inl_kernelCoordinate が閉じる。
   - [ ] **(iii) 誘導写像機構**: anisotropic な `QuadraticExtension` 上で
         range inl = center (ModelCenters の `mem_center_iff` +
         `typeBQuadraticMap_radical_eq_zero`) → α ∈ Aut が f_α/g_α を誘導、
