@@ -12233,6 +12233,35 @@ issue 9318 sorry). -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_field_eq_and_D_eq_one_of_comm
 
+/-! **Step (6), `F_{9,2}` case + assembly — COMPLETE** (`FirstCase/StepSix.lean`, 2026-07-24):
+if the model's near-field `F` is noncommutative then `|Σ| = |D| ∈ {1, 3}` ("an odd order group
+of automorphisms of `F_{9,2}` can only have order 1 or 3 as `F*_{9,2}` is quaternion of
+order 8", p. 110).  `dMulAutHom` realizes `D` faithfully as multiplicative automorphisms of
+`F` (no commutativity needed), restriction to units is faithful for a group with zero,
+`Fˣ ≃* Q₈` (`NearFields.unitsMulEquivQuaternionGroup`: unique involution `-1` + Isaacs
+Thm 6.11), and an odd automorphism group of `Q₈` has order dividing `3`
+(`card_dvd_three_of_odd_mulAutQuaternion`, kernel-of-abelianization argument).  With the
+field case this completes step (6) as a `∀`-model statement
+(`card_field_and_D_of_Q1_eq_bot`).  The two assembled statements
+(`card_D_le_three_of_noncomm`, `card_field_and_D_of_Q1_eq_bot`) use step (5)'s `|F| = 9`,
+which inherits the frozen `Q₈` Brauer–Suzuki sorry (issue 0147) through step (4)'s
+`card_Q_eq_card_inf_centralizer_pow` → step (2)(b) chain — they are therefore intentionally
+unregistered (like the step (7) endpoints); all the new ingredients below are axiom-clean. -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.mulAutToAbelianization
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_dvd_three_of_odd_mulAutQuaternion
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_dvd_three_of_odd_mulAut_of_mulEquiv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.NearField.eq_neg_one_of_mul_self_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.unitsMulEquivQuaternionGroup
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.dMulAutHom
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.dMulAutHom_injective
+
 /-! **Peterfalvi Part II, Ch. II, step (7)** (`FirstCase/StepSeven.lean`, issue 2053,
 2026-07-22): `N = P` and `Σ ≅ C_W(P)` (p. 110).  The axiom-clean infrastructure of the
 step (the full `N = P`, `Σ ≅ C_W(P)`, and `N∩W=1` contradiction inherit the issue 9318 +

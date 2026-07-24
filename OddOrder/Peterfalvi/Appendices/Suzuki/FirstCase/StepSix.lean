@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFive
+import OddOrder.Peterfalvi.Appendices.NearFieldUnitsQuaternion
+import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
 
 /-!
 # Peterfalvi Part II, Ch. II, step (6): the arithmetic lemma
@@ -340,7 +342,8 @@ The field-case abstract core
 automorphism homomorphism `dAutHom : D → RingAut F`.
 
 Sorry-free as a `∀`-model statement; a caller supplying the model through
-`exists_affineNearFieldModel` inherits the step (2)(b) `sorry` (issue 9318). -/
+`exists_affineNearFieldModel` inherits the residual `Q₈` Brauer–Suzuki `sorry`
+(frozen, issue 0147). -/
 theorem card_field_eq_and_D_eq_one_of_comm :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ∀ {F : Type uG} [NearFields.NearField F]
@@ -407,31 +410,121 @@ theorem card_field_eq_and_D_eq_one_of_comm :
   exact card_eq_and_aut_trivial_of_field_units_two_pow model.char_prime hm hFcard
     fc.rankOneQuotient.D_odd (fc.dAutHom hcomm model) hφinj
 
+/-- Functorial restriction of monoid automorphisms to the unit group. -/
+private noncomputable def mulAutUnitsHom (M : Type*) [Monoid M] :
+    MulAut M →* MulAut Mˣ where
+  toFun f := Units.mapEquiv f
+  map_one' := by
+    ext u
+    rfl
+  map_mul' f g := by
+    ext u
+    rfl
+
+/-- For a group with zero, an automorphism is determined by its restriction to
+the units: it fixes `0` (the only nonidentity idempotent), and every nonzero
+element is a unit. -/
+private theorem mulAutUnitsHom_injective (M : Type*) [GroupWithZero M] :
+    Function.Injective (mulAutUnitsHom M) := by
+  refine (injective_iff_map_eq_one _).mpr fun f hf => ?_
+  ext x
+  rw [MulAut.one_apply]
+  rcases eq_or_ne x 0 with rfl | hx
+  · -- `f 0` is idempotent, and `f 0 = 1` would force `0 = 1`
+    have h0 : f 0 * f 0 = f 0 := by rw [← map_mul, mul_zero]
+    rcases eq_or_ne (f 0) 0 with h | h
+    · exact h
+    · exfalso
+      have h1 : f 0 = 1 := mul_left_cancel₀ h (h0.trans (mul_one (f 0)).symm)
+      exact zero_ne_one (f.injective (h1.trans (map_one f).symm))
+  · have hu := congrArg
+      (fun σ : MulAut Mˣ => ((σ (Units.mk0 x hx) : Mˣ) : M)) hf
+    simpa [mulAutUnitsHom] using hu
+
+/-- **The near-field automorphism action `Σ = D →* MulAut F`** (p. 110): the
+model's `dAut` action of `D` is a homomorphism into the multiplicative
+automorphisms of `F` — no commutativity of `F` is needed (compare `dAutHom`,
+which upgrades to `RingAut` in the field case).  The homomorphism law follows
+by composing conjugations (`dAut_conj`) and cancelling the injective
+embedding `emb`. -/
+noncomputable def dMulAutHom {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ↥fc.rankOneQuotient.D →* MulAut F :=
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  { toFun := fun g => ⟨(model.dAut g).toEquiv, model.dAut_mul g⟩
+    map_one' := by
+      ext x
+      have hconj := model.dAut_conj 1 x
+      rw [OneMemClass.coe_one, one_mul, inv_one, mul_one] at hconj
+      have : x = model.dAut 1 x :=
+        Multiplicative.ofAdd.injective (model.emb_injective hconj)
+      exact this.symm
+    map_mul' := fun g h => by
+      ext x
+      have hgh := model.dAut_conj (g * h) x
+      have hh := model.dAut_conj h x
+      have hg := model.dAut_conj g (model.dAut h x)
+      rw [MulMemClass.coe_mul] at hgh
+      have hkey : model.emb (Multiplicative.ofAdd (model.dAut (g * h) x)) =
+          model.emb (Multiplicative.ofAdd (model.dAut g (model.dAut h x))) := by
+        rw [← hgh, ← hg, ← hh]
+        group
+      exact Multiplicative.ofAdd.injective (model.emb_injective hkey) }
+
+/-- `dMulAutHom` is injective: `dAut` is faithful. -/
+theorem dMulAutHom_injective {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F) :
+    Function.Injective (fc.dMulAutHom model) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  refine (injective_iff_map_eq_one _).mpr fun g hg => ?_
+  apply model.dAut_injective
+  refine AddEquiv.ext fun x => ?_
+  have hgx : model.dAut g x = x :=
+    congrArg (fun σ : MulAut F => σ x) hg
+  have h1x : model.dAut 1 x = x :=
+    congrArg (fun σ : MulAut F => σ x) (map_one (fc.dMulAutHom model))
+  rw [hgx, h1x]
+
 /-- **Peterfalvi Part II, Ch. II, step (6), `F_{9,2}` case** (p. 110): if the
-model's near-field `F` is noncommutative — so `F ≅ F_{9,2}` by step (5) — then
+model's near-field `F` is noncommutative — so `|F| = 9` by step (5) — then
 `|Σ| = |D| ∈ {1, 3}`.
 
-**Gated `sorry`.**  The book's argument: "an odd order group of automorphisms
-of `F_{9,2}` can only have order 1 or 3 as `F*_{9,2}` is quaternion of order 8"
-— i.e. an automorphism restricts to an automorphism of `F^* = Q₈`, and the odd
-part of `Aut(Q₈) = S₄` is `C₃`.  Formalizing this needs the automorphism theory
-of the twisted near-field `F_{9,2}` (`Twisted`/`TwistData`), which carries no
-automorphism infrastructure yet.  Tracked in issue 2053 (shared-infra
-candidate); `D_odd` is available, only the divisibility `|D| ∣ 3` is missing. -/
+The book's argument: "an odd order group of automorphisms of `F_{9,2}` can
+only have order 1 or 3 as `F*_{9,2}` is quaternion of order 8".  Formally:
+`D` acts faithfully on `F` by near-field automorphisms (`dMulAutHom`), which
+restrict faithfully to the unit group (`mulAutUnitsHom_injective`);
+`Fˣ ≃* Q₈` (`NearFields.unitsMulEquivQuaternionGroup`), and an odd-order
+automorphism group of `Q₈` has order dividing `3`
+(`card_dvd_three_of_odd_mulAut_of_mulEquiv`). -/
 theorem card_D_le_three_of_noncomm {F : Type uG} [NearFields.NearField F]
     (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
       NearFields.AffineNearFieldModel fc.rankOneQuotient F)
     (hncomm : ¬ ∀ x y : F, x * y = y * x) :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     Nat.card ↥fc.rankOneQuotient.D = 1 ∨ Nat.card ↥fc.rankOneQuotient.D = 3 := by
-  sorry
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  -- `|F| = 9` from step (5)
+  rcases fc.card_nearField_eq_nine_and_Q1_eq_bot model with hcomm | ⟨hF9, -, -⟩
+  · exact absurd hcomm hncomm
+  -- `Fˣ ≃* Q₈`
+  obtain ⟨e⟩ := NearFields.unitsMulEquivQuaternionGroup hF9 hncomm
+  -- `D` acts faithfully on `Fˣ`
+  have hdvd : Nat.card ↥fc.rankOneQuotient.D ∣ 3 :=
+    OddOrder.GroupTheory.card_dvd_three_of_odd_mulAut_of_mulEquiv e
+      ((mulAutUnitsHom F).comp (fc.dMulAutHom model))
+      ((mulAutUnitsHom_injective F).comp (fc.dMulAutHom_injective model))
+      fc.rankOneQuotient.D_odd
+  exact Nat.Prime.eq_one_or_self_of_dvd Nat.prime_three _ hdvd
 
 /-- **Peterfalvi Part II, Ch. II, step (6)** (p. 110): assume `Q₁ = 1`.  Either
 `F` is a field, `|F| ∈ {f, 9}` and `Σ = 1`; or `F ≅ F_{9,2}` and `|Σ| ∈ {1, 3}`.
 
-The field case (`card_field_eq_and_D_eq_one_of_comm`) is sorry-free as a
-`∀`-model statement; the `F_{9,2}` case (`card_D_le_three_of_noncomm`) is
-gated on the automorphism theory of `F_{9,2}`. -/
+Both cases (`card_field_eq_and_D_eq_one_of_comm` and
+`card_D_le_three_of_noncomm`) are sorry-free as `∀`-model statements. -/
 theorem card_field_and_D_of_Q1_eq_bot :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ∀ {F : Type uG} [NearFields.NearField F]
