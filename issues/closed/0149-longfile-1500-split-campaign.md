@@ -261,3 +261,15 @@ per-file 例外なしで green。CLAUDE.md「ファイル粒度」の実測値�
 
 - CLAUDE.md「ファイル粒度」(2026-07-24 改訂) / issue 0103 (機械分割の道具) /
   closed/0138 (--strict gate) / 0141 (FeitSibley 分割計画)
+
+
+---
+
+## ✅ CLOSE (2026-07-25)
+
+**campaign 完了**: 全 58 worklist file + 表外 1 (OpicoreCentralizer) + 後日超過 1 (Higman) の
+stamp を除去し、残存 stamp = `AxiomsCheck.lean` (恒久例外) のみ。第一パス = 宣言/section 境界の
+prefix-split (leaf 51 本新設)、第二パス = 最小 crossing 境界での private public 化 (計 9 件) +
+section 単位移動。最終 gate = full build 4716 jobs green + 警告ゼロ (2026-07-25 03:1x)。
+分割手順の教訓 (import run 検出 / docstring+modifier fixpoint walk-up / primed 名 lookaround /
+改行名 private / section・namespace 再オープン / `git ls-files` 衝突確認) は本文の消化記録参照。
