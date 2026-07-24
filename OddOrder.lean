@@ -2,6 +2,7 @@ import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.Algebra.ChevalleyWarning
 import OddOrder.Algebra.FiniteIndexAnnihilator
 import OddOrder.Algebra.PrincipalIdealTheorem
+import OddOrder.Algebra.QuadraticMapCoordinates
 import OddOrder.GroupTheory.AInvariantComplement
 import OddOrder.GroupTheory.SolvablePrimeIndex
 import OddOrder.GroupTheory.AInvariantPiSubgroups
