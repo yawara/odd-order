@@ -153,17 +153,20 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
   ⚠ 親の namespace 再オープン時は原本の **open 行 (OddOrder.RepresentationTheory /
   scoped Pointwise) を必ず複製** — 3 file で instance/identifier 解決が落ちた。
 
-### 🚧 次セッションへの注意 — Pf S08 帯 (CoherenceBasic/Core/RestrictExtensionDvd) は要手動精査
+### ✅ Pf S08 帯 + S09 — 2026-07-25 (再試行で完了)
 
-2026-07-25 深夜の自動分割試行は **revert 済み** (worktree は clean)。罠が 2 つ:
-1. これらの file は**既に Part1/Part2 分割チェーンの一部** (`S08_CoherenceCorePart2` を import)
-   で、module docstring 内に「`import chain head: Part1 ← Part2 ← …`」という**行頭が
-   `import` の日本語 doc 行**があり、`^import` ベースの import-block 検出を誤らせる
-   (imports の終端は「連続 import 行の末尾」で判定すること)。
-2. `PairUnion*StepData` 構造体群 (issue 0132 の命名問題の当事者) が cut を跨いで参照される。
-   cut 前に構造体 def と全使用点の位置関係を確認すること。
-S08_CaseBAnchoredSeed / S09_CertificateDischarge は罠 1 のみ該当の可能性 — 同じ import 検出
-修正で通る見込み。いずれも privs=0 で境界自体は自由。
+- `S08_CoherenceBasic` 1508→797 (+ `S08_SibleyHypothesisBasic` 743) /
+  `S08_CoherenceCore` 1507→793 (+ `S08_SibleyCoherenceLemmas` 744) /
+  `S08_RestrictExtensionDvd` 1516→767 (+ `S08_SibleyRestrictionLemmas` 779) /
+  `S08_CaseBAnchoredSeed` 1527→882 (+ `S08_CaseBSeedSetup` 673) /
+  `S09_CertificateDischarge` 1612→894 (+ `S09_CertificateBasic` 742)。
+- gen script の教訓 2 件 (初回試行は revert 済み):
+  1. **import 挿入位置は「連続 import run の直後」**で判定 — module docstring 内の
+     「`import chain head: …`」という行頭 `import` の doc 行に `^import` 検出が騙され、
+     挿入 import がコメント内部に落ちて無効化していた。
+  2. **walk-up は fixpoint まで** — docstring 開始まで戻った後、その上の
+     `open scoped Classical in` 等の modifier 行をもう一度戻る (modifier → docstring →
+     modifier の交互適用)。
 
 ### ⚠ 第二パス行き (private 網が全域を覆い、clean な宣言境界 cut が存在しない)
 
