@@ -90,8 +90,11 @@ principal 2-block + quaternion defect の局所部分だけで足りるか）を
 - **BS `|S| ≥ 16`**: `GroupTheory/BrauerSuzuki*.lean`（cyclic + 一般化四元数、Lem 1.2–1.9 + endgame、
   axiom-clean、AxiomsCheck 登録）。Q₈ で**再利用可能な純群論部分**（involution 共役類・`⟨involutions⟩`
   正規性・Burnside 2-補群）が既にある。
-- **Q₈ sorry の所在**: `Peterfalvi/Appendices/RankOneAffineModel.lean` の `RankOneHypothesis.brauerSuzuki`
-  内。消費点 `rankOne_affine_nearField`。
+- **Q₈ sorry の所在**: `Peterfalvi/Appendices/RankOneAffineModel.lean` の
+  **`brauerSuzuki_quaternionSylow_q8`**（2026-07-24 に単離: 従来 quaternion 分岐全体を覆っていた
+  sorry から `|S| ≥ 16` setup 組み立て + `t = z` を実証明で切り出し、凍結面は「Q₈ Sylow +
+  その involution z で `O_{2'}(G) ⊔ C_G(z) = ⊤`」という正確な statement のみになった）。
+  消費点 `RankOneHypothesis.brauerSuzuki` → `rankOne_affine_nearField`。
 - **前提調査**: `notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`（Gorenstein Ch.12 原文照合・
   Wong 1972/Mousavi 2020s の bypass 否定・character-free ルート不在の確定）。
 
@@ -101,7 +104,7 @@ principal 2-block + quaternion defect の局所部分だけで足りるか）を
    PDF を確保し、**Q₈ の証明を 1 本、原文で精読**して**最小 infra slice を確定**（§3 の縮小）。
 2. shared-infra claim（9000 番台）を切る → `RepresentationTheory/Modular/` に p-modular system → Brauer 指標 →
    分解/Cartan → principal block → quaternion defect の順で bottom-up。各段 axiom-clean・AxiomsCheck 登録。
-3. Q₈ BS を証明 → `RankOneHypothesis.brauerSuzuki` の Q₈ 分岐の `sorry` を置換 →
+3. Q₈ BS を証明 → `brauerSuzuki_quaternionSylow_q8` の `sorry` を置換 →
    `rankOne_affine_nearField` axiom-clean 完成 → Peterfalvi App C Prop 1 の残 sorry ゼロ。
 4. ⚠ 行間で詰まったら最強モデル（ChatGPT Pro）で証明再構成（[[feedback-ask-chatgpt-for-elided-gaps]]）。
 

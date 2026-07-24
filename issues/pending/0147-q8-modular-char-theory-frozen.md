@@ -36,7 +36,7 @@ deliberate な長期プロジェクト**として**凍結**する。lane c は�
 
 - [ ] 書籍選定を確定（証明 1 本を原文精読 → 最小 infra slice 確定）
 - [ ] p-modular system → Brauer 指標 → 分解/Cartan 行列 → principal block → quaternion defect
-- [ ] Q₈ BS を証明 → `RankOneHypothesis.brauerSuzuki` の Q₈ 分岐 `sorry` を置換
+- [ ] Q₈ BS を証明 → `brauerSuzuki_quaternionSylow_q8` (2026-07-24 単離; RankOneAffineModel.lean) の `sorry` を置換
 
 ## 完了条件（解凍時）
 
