@@ -5,6 +5,8 @@ import OddOrder.Peterfalvi.S14_MaximalI.RhoConstancy
 
 Split from the former monolithic `OddOrder.Peterfalvi.S14_MaximalI` (directory split, issue 0103).
 -/
+
+set_option linter.style.longFile 1900
 namespace OddOrder.Peterfalvi.S14
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

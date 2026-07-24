@@ -20,6 +20,8 @@ The statements live in the `Hypothesis` namespace of
 file.
 -/
 
+set_option linter.style.longFile 1900
+
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 
 open OddOrder.RepresentationTheory

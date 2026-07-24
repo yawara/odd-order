@@ -10,6 +10,8 @@ import OddOrder.BG.Ch1_Preliminary.S01_FrattiniBurnside
 
 Prefix-split from `OddOrder.BG.Ch1_Preliminary.S01_Solvable` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+set_option linter.style.longFile 1700
 namespace OddOrder.BG.Ch1.S01
 open OddOrder.Isaacs.Ch01
 open Pointwise

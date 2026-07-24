@@ -49,6 +49,8 @@ carry Lem 5.1 as an extra assumption. No §5 narrow classification theorem or BG
 assumption belongs in §8.
 -/
 
+set_option linter.style.longFile 1700
+
 namespace OddOrder.BG.Ch2.S08
 
 open OddOrder.GroupTheory

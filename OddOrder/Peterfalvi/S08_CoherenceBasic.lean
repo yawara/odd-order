@@ -19,6 +19,8 @@ Prefix-split from 旧 `S08_CoherenceCore.lean` (11,969 行 → 3 ファイル, i
 import chain head: Part1 ← Part2 ← **S08_CoherenceCore**。**名前を保持**ゆえ下流 import は無改変。
 -/
 
+set_option linter.style.longFile 1600
+
 namespace OddOrder.Peterfalvi.S08
 
 open OddOrder.RepresentationTheory

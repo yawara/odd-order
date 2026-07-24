@@ -50,6 +50,8 @@ Sibling of Theorem 3.4 (`S03d_Thm34.lean`, complete); upstream of Theorem 3.6 (m
 `notes/bg/s03_thm35.md`.
 -/
 
+set_option linter.style.longFile 1800
+
 namespace OddOrder.BG.Ch1.S03e
 
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)

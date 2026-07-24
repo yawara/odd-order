@@ -25,6 +25,8 @@ class-algebra congruence → (8) conclusion) is built on top.
   `x = 1 ∧ m = 2` (the latter reduces to the former by a sign swap of the `e'`).
 -/
 
+set_option linter.style.longFile 1800
+
 namespace OddOrder.Peterfalvi.Appendices.FeitSibley
 
 open OddOrder.RepresentationTheory

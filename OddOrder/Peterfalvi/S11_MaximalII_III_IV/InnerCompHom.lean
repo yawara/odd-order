@@ -6,6 +6,8 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV.CaseBXi
 Prefix-split from `OddOrder.Peterfalvi.S11_MaximalII_III_IV.SummandComplementKernel` (2000-line
 limit, issue 0103 第 2 パス).
 -/
+
+set_option linter.style.longFile 1800
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

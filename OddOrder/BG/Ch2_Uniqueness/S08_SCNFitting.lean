@@ -11,6 +11,8 @@ import OddOrder.BG.Ch2_Uniqueness.S08_CenterFittingOpcore
 Prefix-split from `OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+set_option linter.style.longFile 1600
 namespace OddOrder.BG.Ch2.S08
 open OddOrder.GroupTheory
 open OddOrder.Isaacs

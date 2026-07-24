@@ -7,8 +7,9 @@ defaultTargets = ["OddOrder"]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
 autoImplicit = false
 weak.linter.mathlibStandardSet = true
-weak.linter.style.longFile = 2000 # 分割上限 (CLAUDE.md「ファイル粒度」、mathlib は 1500)
-weak.linter.style.longFileDefValue = 2000 # bound=defValue で「bound 過大」誤警告を抑止
+weak.linter.style.longFile = 1500 # mathlib 準拠の分割上限 (CLAUDE.md「ファイル粒度」、2026-07-24 切替)
+# 超過 file は per-file `set_option linter.style.longFile N` (N = candidate/candidate-100 のみ許容)
+# で grandfather し、分割 campaign (issue 0149) で stamp を除去していく。
 
 [[require]]
 name = "mathlib"

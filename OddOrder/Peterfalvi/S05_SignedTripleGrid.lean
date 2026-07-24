@@ -10,6 +10,8 @@ import OddOrder.Peterfalvi.S05_NormThree
 
 Prefix-split from `OddOrder.Peterfalvi.S05_SignedTripleGrid` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+set_option linter.style.longFile 1900
 namespace OddOrder.Peterfalvi.S05
 open OddOrder.RepresentationTheory
 

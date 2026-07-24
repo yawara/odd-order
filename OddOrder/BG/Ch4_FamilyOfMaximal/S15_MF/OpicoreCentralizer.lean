@@ -6,6 +6,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.PisetBetaDisjoint
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF.TIFailure` (2000-line limit, issue 0103 第
 2 パス).
 -/
+
+set_option linter.style.longFile 1600
 namespace OddOrder.BG.Ch4.S15
 open OddOrder.GroupTheory
 open OddOrder.Isaacs

@@ -35,6 +35,8 @@ therefore the per-`θ` central-character data:
   `0 < constituentWeight` (so `θ` is a positive-weight constituent of `φ_θ`).
 -/
 
+set_option linter.style.longFile 1600
+
 namespace OddOrder.Peterfalvi.S08
 
 open OddOrder.RepresentationTheory

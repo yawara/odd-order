@@ -51,6 +51,8 @@ Thm 3.4 は Ch.1 Thm 1.37 Brodkey に依存 (Ch.1 §1F 未着手).
 ノート: [notes/isaacs/ch03_split.md](../../notes/isaacs/ch03_split.md)
 -/
 
+set_option linter.style.longFile 1800
+
 namespace OddOrder.Isaacs.Ch03
 
 open SemidirectProduct

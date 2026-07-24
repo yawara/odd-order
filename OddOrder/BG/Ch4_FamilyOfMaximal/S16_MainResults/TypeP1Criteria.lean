@@ -13,6 +13,8 @@ issue 0103 第 2 パス).
 Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults` (directory split,
 issue 0103).
 -/
+
+set_option linter.style.longFile 1700
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory
 open OddOrder.Isaacs

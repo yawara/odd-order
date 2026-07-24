@@ -26,6 +26,8 @@ keeps the concrete norm and semidirect-product setup; this file is the first
 class-sum dependent layer for the `q >= 5` branch of Lemma C.2.
 -/
 
+set_option linter.style.longFile 1900
+
 namespace OddOrder.BG.AppC.NormSet
 
 open OddOrder.RepresentationTheory

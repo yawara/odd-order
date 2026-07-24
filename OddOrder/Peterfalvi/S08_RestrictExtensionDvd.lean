@@ -10,6 +10,8 @@ import OddOrder.Peterfalvi.S08_XBlockCounting
 
 Prefix-split from `OddOrder.Peterfalvi.S08_CoherenceCore` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+set_option linter.style.longFile 1600
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
 open scoped commutatorElement

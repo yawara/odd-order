@@ -97,6 +97,8 @@ To each finite-dimensional irreducible complex representation `ρ` of `G` Schur'
 * Peterfalvi, *Character Theory for the Odd Order Theorem*, (6.7.2).
 -/
 
+set_option linter.style.longFile 1700
+
 namespace OddOrder.RepresentationTheory
 
 open scoped MonoidAlgebra

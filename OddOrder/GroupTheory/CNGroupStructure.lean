@@ -53,6 +53,8 @@ this general-purpose leaf free of a dependency on `OddOrder.BG`.  `O_p` is spell
 `OddOrder.GroupTheory.ThreeStepGroup`.
 -/
 
+set_option linter.style.longFile 1600
+
 namespace OddOrder.GroupTheory
 
 open OddOrder.Isaacs

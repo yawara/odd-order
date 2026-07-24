@@ -83,6 +83,8 @@ Lemma 4.17 (`A` solvable `p'`-operator, `r(R) ≤ 2`, `|A|` odd ⇒ `A'` は `p`
 - BG Thm 1.8 (Burnside operator): `OddOrder.BG.Ch1.burnside_operator`.
 -/
 
+set_option linter.style.longFile 1800
+
 namespace OddOrder.BG.Ch1.S04
 
 open OddOrder.BG.Ch1.S02

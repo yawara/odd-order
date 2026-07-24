@@ -10,6 +10,8 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7B1_NormalJ
 (pp. 209-219)
 -/
 
+set_option linter.style.longFile 1900
+
 namespace OddOrder.Isaacs.Ch07
 
 open scoped commutatorElement

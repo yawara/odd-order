@@ -10,6 +10,8 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 enlargement (pp. 192-193)
 -/
 
+set_option linter.style.longFile 1800
+
 namespace OddOrder.Isaacs.Ch06
 
 

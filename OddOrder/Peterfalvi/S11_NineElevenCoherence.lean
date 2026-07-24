@@ -11,6 +11,8 @@ import OddOrder.Peterfalvi.S11_SingleFactorCentralizer
 Prefix-split from `OddOrder.Peterfalvi.S11_NineElevenCoherence` (2000-line limit, issue 0103 第 2
 パス).
 -/
+
+set_option linter.style.longFile 1600
 namespace OddOrder.Peterfalvi.S11
 open OddOrder.RepresentationTheory
 open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)

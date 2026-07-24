@@ -46,6 +46,8 @@ BG §5 Thm 5.6 / Thm 5.7 (`S05_NarrowPGroups`)、Cor 4.19 / Thm 4.20。
 - `r_p(G)` = `pRank G p` (`GroupTheory.PRank`)。
 -/
 
+set_option linter.style.longFile 2000
+
 namespace OddOrder.BG.Ch1.S04
 
 open OddOrder.GroupTheory

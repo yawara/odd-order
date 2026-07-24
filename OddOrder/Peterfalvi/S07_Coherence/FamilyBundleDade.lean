@@ -5,6 +5,8 @@ import OddOrder.Peterfalvi.S07_Coherence.CoherenceUnion
 
 Split from the former monolithic `OddOrder.Peterfalvi.S07_Coherence` (directory split, issue 0103).
 -/
+
+set_option linter.style.longFile 1700
 namespace OddOrder.Peterfalvi.S07
 open OddOrder.RepresentationTheory
 

@@ -117,3 +117,12 @@ S7B2_NormalJ_PComplement (1879)・FrobeniusActionTI (1873)・AppC_FrobeniusClass
 **owner = a への申し送り (active frontier ゆえ hub は race しない)**: Problems.lean は a が毎 tick 演習問題を追記する active file。lane trigger 「次の主結果クラスタに着手するときは新 leaf を切る」に従い、**次のセクション (§1E 以降 or 次章 Problems) は `Ch01_Sylow/Problems/SectionX.lean` の新 leaf に切って `Problems.lean` を re-export hub 化**するのが望ましい (textbook § 構造とも一致、traceability 保持)。2000 接近 or 次の § 境界のいずれか早い方で a が分割。hub は 2000 到達までは watch のみ、a が動かず 2000 接近なら backstop で凍結 § (§1A–1C) を prefix-split。
 
 **✅ 2026-07-23 03:5x 解消**: a が**次 tick で自ら分割**した (commit `690d25865` "split §1D into ProblemsFrobeniusFrattini leaf")。§1D の Frobenius/Frattini 系を新 leaf `ProblemsFrobeniusFrattini.lean` (+340) に移設、`Problems.lean` **1615→1363** (1500 未満に復帰)、`OddOrder.lean:179` に配線済 (orphan 0)。hub の flag → a の自律分割の協調ループが機能。**watch 解除**。
+
+---
+
+## ✅ 2026-07-24 close — issue 0149 (longFile 1500 campaign) に統合
+
+ユーザー裁定で上限が mathlib 準拠 1500 に切替わり、本 issue の watch 対象 3 file
+(S01_Solvable 1619 / TypeP1Criteria 1649 / TheoremsAE 1810) を含む超過 58 file 全てが
+per-file stamp で ratchet 化 + [0149](0149-longfile-1500-split-campaign.md) の worklist に
+収載された。分割の追跡は 0149 に一本化。close。

@@ -62,6 +62,8 @@ pointer comments here at their book positions.  Per-result status:
 | E.5 (`maximalSubgroups_isTypeI_or_isTypeII`) | **proved** — in `AppE_E5Counting.lean` |
 -/
 
+set_option linter.style.longFile 1700
+
 namespace OddOrder.BG.AppE
 
 open OddOrder.GroupTheory

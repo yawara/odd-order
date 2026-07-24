@@ -30,6 +30,8 @@ Keeping the Blackburn apex here avoids an import cycle: `S04e_GorThm37` imports
 `S04_PGroupsSmallRank`, so the final Theorem 4.16 proof cannot live in S04 itself.
 -/
 
+set_option linter.style.longFile 1700
+
 open scoped Pointwise commutatorElement
 
 namespace OddOrder.BG.Ch1.S04

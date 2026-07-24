@@ -10,6 +10,8 @@ import OddOrder.Peterfalvi.S10_StructureSetup
 
 Prefix-split from `OddOrder.Peterfalvi.S10_MinimalSimpleBasic` (2000-line limit, issue 0103 第 2 パス).
 -/
+
+set_option linter.style.longFile 1900
 namespace OddOrder.Peterfalvi.S10
 open OddOrder.GroupTheory
 open OddOrder.Isaacs

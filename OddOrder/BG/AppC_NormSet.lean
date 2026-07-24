@@ -74,6 +74,8 @@ issue 3000 / `notes/bg/appC_normset_plan.md`.
   1994), Appendix C.
 -/
 
+set_option linter.style.longFile 1900
+
 namespace OddOrder.BG.AppC.NormSet
 
 open scoped Pointwise

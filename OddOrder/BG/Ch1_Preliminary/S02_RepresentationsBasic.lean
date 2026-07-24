@@ -190,6 +190,8 @@ Frobenius Actions であって Clifford 章ではない). したがって本節�
   (= 群論本, character/representation theory 章なし)
 -/
 
+set_option linter.style.longFile 1700
+
 namespace OddOrder.BG.Ch1.S02
 
 open scoped Pointwise

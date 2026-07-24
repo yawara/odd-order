@@ -60,6 +60,8 @@ property from `(2.6.b)` using the Wave 1a `ZIrr` lattice.
 Reference note: `notes/peterfalvi/s04_dade_isometry.md`.
 -/
 
+set_option linter.style.longFile 1700
+
 namespace OddOrder.Peterfalvi.S04
 
 open OddOrder.RepresentationTheory

@@ -6,6 +6,8 @@ X coherence
 
 Split from the former monolithic `OddOrder.Peterfalvi.S07_Coherence` (directory split, issue 0103).
 -/
+
+set_option linter.style.longFile 1800
 namespace OddOrder.Peterfalvi.S07
 open OddOrder.RepresentationTheory
 

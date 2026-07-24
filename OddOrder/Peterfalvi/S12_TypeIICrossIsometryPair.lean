@@ -33,6 +33,8 @@ discharged in this file** (via `typeII_tau_diff_inner_chiFam_eq_zero` and
 `typeII_R_mem_inner_chiFam_eq_zero`); the file is sorry-free.
 -/
 
+set_option linter.style.longFile 1600
+
 namespace OddOrder.Peterfalvi.S12
 
 open OddOrder.RepresentationTheory

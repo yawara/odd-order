@@ -9,6 +9,8 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7A2_NormalPThm75
 # Isaacs FGT Ch.7 (Thompson subgroup) — S7B part 1: normal-J (Thm 7.6) Steps 1-6 (pp. 209-214)
 -/
 
+set_option linter.style.longFile 1700
+
 namespace OddOrder.Isaacs.Ch07
 
 open scoped commutatorElement

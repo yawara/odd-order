@@ -30,6 +30,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main
 subgroup-partition helper (pp. 177-183)
 -/
 
+set_option linter.style.longFile 1900
+
 namespace OddOrder.Isaacs.Ch06
 
 section /- 6A: Frobenius action basics (pp. 177-183) -/

@@ -169,6 +169,8 @@ Phase 2a 第 1 波 audit (2026-05-23) で §1 を 4 視点で再調査済.
 進行中.
 -/
 
+set_option linter.style.longFile 1600
+
 namespace OddOrder.BG.Ch1.S01
 
 open OddOrder.Isaacs.Ch01

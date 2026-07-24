@@ -14,6 +14,8 @@ bridge character `β_j = Ind_{PW₁}^S 1 − μ_{0j}`, its Dade image `τ_S(β_{
 `j`-independence, `⟨Γ,1⟩ = 0`, `Γ` real, and the `‖Y‖²` residual bound), packaged in
 `BetaData` / `betaData_of_grid`.
 -/
+
+set_option linter.style.longFile 1800
 namespace OddOrder.Peterfalvi.S15
 open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory

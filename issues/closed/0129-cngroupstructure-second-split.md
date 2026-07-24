@@ -31,3 +31,10 @@ CNGroupStructure.lean が ~1500 行未満、build green、下流 import 無変�
 
 - merge `33e2c794a`、issue 9133 (CN 3-step dichotomy)
 - CLAUDE.md「ファイル粒度」(leaf ≈ 300–1500 行、2000 超は必須分割)
+
+---
+
+## ✅ 2026-07-24 close — issue 0149 (longFile 1500 campaign) に統合
+
+CNGroupStructure.lean (実測 1585 行) は 0149 worklist に収載され stamp ratchet 化済み。
+分割の追跡は 0149 に一本化 (分割方針メモは本 issue 本文を参照のこと)。close。

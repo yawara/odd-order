@@ -6,6 +6,8 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.Notation
 Prefix-split from `OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.TheoremsAE` (2000-line limit,
 issue 0103 第 2 パス).
 -/
+
+set_option linter.style.longFile 1900
 namespace OddOrder.BG.Ch4.S16
 open OddOrder.GroupTheory
 open OddOrder.Isaacs

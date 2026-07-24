@@ -6,6 +6,8 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 Split from the former monolithic `OddOrder.Isaacs.Ch04_Commutators.Main` (directory split, issue
 0103).
 -/
+
+set_option linter.style.longFile 1600
 namespace OddOrder.Isaacs.Ch04
 open scoped commutatorElement
 

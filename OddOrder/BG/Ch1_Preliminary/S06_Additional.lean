@@ -63,6 +63,8 @@ case** で `J(P) ⊴ G` を与える。本ファイルでは、その awkward �
 ステップが要る — 後続コミットで対応。
 -/
 
+set_option linter.style.longFile 1700
+
 namespace OddOrder.BG.Ch1.S06
 
 open OddOrder.Isaacs

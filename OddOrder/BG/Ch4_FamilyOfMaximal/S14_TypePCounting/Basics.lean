@@ -16,6 +16,8 @@ import OddOrder.GroupTheory.PiElementDecomposition
 Split from the former monolithic `OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting` (directory
 split, issue 0103).
 -/
+
+set_option linter.style.longFile 1700
 namespace OddOrder.BG.Ch4.S14
 
 open OddOrder.GroupTheory
