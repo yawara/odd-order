@@ -6,6 +6,28 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-24 09:5x 単発 tick (ユーザー明示指示「各レーンの進捗を一回だけ取り込む」) — 🎯 b の *未コミット* 遺留成果 (Higman Theorem 1(a) exponent four) を hub が救出合流。実 sorry 7→6**。a=0 / b=0(commit 済分) / c=0 / d=0。
+> **⚠ 全 4 branch は ahead=0 だったが、lane b の worktree に 02:07 以降 7.5h 放置の未コミット成果**
+> (新 leaf `Higman/Suzuki2Groups/ExponentFour.lean` 153 行 + aggregator 配線 + AxiomsCheck 6 assert +
+> Pf StepFive の consumer 差し替え) を検出 — b の session が mid-turn で落ちて stranded になっていた。
+> hub が read-only 検証 (sorry-free・leaf build green 4468 jobs) の上で **b の branch に b 名義で commit
+> (`bcf5dbfa2`) → `--no-ff` 合流**。CLAUDE.md「レーンの genuine output は無駄にしない」に沿った救出であり、
+> 破棄・作り直しはしていない。
+> 合流 b (**Higman Suzuki 2-groups, Theorem 1(a) = exponent 4、sorry-free・axiom-clean**): 任意の
+> `ZMod 2`-quadratic central extension で平方が elementary abelian kernel に落ちる (`x^4 = 1`) を証明し、
+> honest type-A/B/C/D model equivalence 経由で transport → 前 tick の分類定理
+> (`higmanClassification_of_isSuzuki2Group`) と合成して `pow_four_eq_one_of_isSuzuki2Group`。
+> **🎯 実 sorry 削減**: Pf `Appendices/Suzuki/FirstCase/StepFive.lean` の sorried-cite
+> `pow_four_eq_one_of_isSuzuki2Group` (issue 2053) を**削除して実証明を cite** — 7→6。
+> **gate: green 4646 jobs (前 4645 +1 = ExponentFour.lean ちょうど・orphan 0) / AxiomsCheck OK (3765 assert
+> 全通過・failure 0、新 assert 6 本 pow_four_eq_one_of_isType{A,B,C,D}/higmanType/isSuzuki2Group が全て
+> 3 axiom allowlist のみ = axiom-clean) / 実 sorry 7→**6** (退行なし・純減) / lint 46 ≤ 47 baseline /
+> push 771d421fc→(本 tick)**。範囲逸脱なし。build wall 1:03。
+> ℹ **レーン稼働状況**: a/c/d は 2026-07-23 20:3x のユーザー指示で凍結継続 (ahead=0・clean)。b も
+> 02:07 以降 file mtime 更新なし = session 停止中 (本 tick は hub 単独操作、cron は動かしていない)。
+> 残 実 sorry 6 = Pf Appendices/Suzuki2Groups.lean 4 (`higman_classification` 他、c territory・c 凍結中) +
+> RankOneAffineModel 1 (Q₈ 凍結 = issue 0147) + StepSix 1 (同 9318/Q₈ 系)。
+>
 > **▶▶ 2026-07-24 02:1x 監視 tick (B 単独) — 🎯🎯 b (Higman Suzuki 2-group classification = Lemma 13 完成) 合流**。b=1(flagship)。
 > 合流 b (**Higman Lemma 13 + Theorem 1 = Suzuki 2-group classification 完成、sorry-free・axiom-clean**): ξ-length bound が length≥4 chain を排除 → center chain が各 Suzuki 2-group を honest type-A/B/C/D model へ dispatch。新 leaf Classification.lean (higmanClassification + higmanClassification_of_isSuzuki2Group、Suzuki2Groups.lean:37 aggregator 経由 WIRED)。exponent-two (ExponentTwoContradiction) + exponent-four (ExponentFourContradiction) の両分岐がこの上位定理で統合。
 > **gate: green 4645 jobs (前 4644 +1 = Classification.lean・orphan 0) / AxiomsCheck OK (新 assert 3 本 higmanLemmaThirteen/higmanClassification/higmanClassification_of_isSuzuki2Group 全通過 = axiom-clean 検証、assert failure 0) / 実 sorry 7→7 非退行 / lint 46 ≤ 47 baseline / push fca642b73→1ab3fd126**。範囲逸脱なし。build wall 1:11。
