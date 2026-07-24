@@ -6,6 +6,14 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-24 深夜 hub tick #5 (区切り) — App III Lemma 2(c) + Prop 1 前半で session close。push →d0c81638b**。
+> Lemma 2(c) 独立性 2 定理 (coeff_symm/diag_eq_zero、Pi 空間+Frobenius 全射) と Prop 1 前半
+> (新 leaf `Suzuki2Groups/FieldModel.lean`: X²+εX+1 既約 from anisotropy、AdjoinRoot model +
+> alpha_sq/aeval_conj_root、hub 配線済) を landing。gate green・census 1 非退行・全 push 済。
+> **次セッションの frontier = 0148**: Prop 1 後半 (conj AlgEquiv → (F×F)≃ₗK → norm 恒等式) →
+> Prop 2 → 2052。手順・mathlib 部品名・instance の罠は全て 0148 に精密記録済み。
+> lane a/b/c: a/b は campaign 凍結中で hub 再割当待ち、c は Q₈ 凍結+territory 完済 (変化なし)。
+>
 > **▶▶ 2026-07-24 夜 hub 直接作業 tick #4 (「続けてください」) — 🎯 App III Lemma 2(b)(c) 完成 = Lemma 1+2 独立性側 全完了。push →45bed1296**。
 > ① **Lemma 2(b)**: `algAutMulBilin` + 独立性 (積 monoid F×F の Dedekind 指標に帰着 — 書籍の
 > 二重和不要) + dim n² + card 補題。bundled Basis は入れ子 `F →ₗ F →ₗ F` の instance isDefEq
