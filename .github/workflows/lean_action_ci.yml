@@ -2,8 +2,34 @@ name: Lean Action CI
 
 on:
   push:
+    # Lean build に影響するファイルのみで起動する。docs/issues/notes-only の push は
+    # skip (実測: docs-only commit の full rebuild で 60 分浪費していた, 2026-07-25 診断)。
+    paths:
+      - 'OddOrder/**'
+      - 'OddOrder.lean'
+      - 'lakefile.toml'
+      - 'lean-toolchain'
+      - 'lake-manifest.json'
+      - 'bin/check-warnings'
+      - 'bin/lint-baseline.tsv'
+      - '.github/workflows/lean_action_ci.yml'
   pull_request:
+    paths:
+      - 'OddOrder/**'
+      - 'OddOrder.lean'
+      - 'lakefile.toml'
+      - 'lean-toolchain'
+      - 'lake-manifest.json'
+      - 'bin/check-warnings'
+      - 'bin/lint-baseline.tsv'
+      - '.github/workflows/lean_action_ci.yml'
   workflow_dispatch:
+
+# hub の push burst で古い commit の run を打ち切る (runner 時間と cache save の浪費防止)。
+# main は hub がローカル full build で gate 済みなので、中間 commit の CI 省略は許容。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -17,7 +43,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+
+      # プロジェクト自身の build 成果 (.lake/build) のみを per-commit で cache する。
+      # lean-action 既定の use-github-cache (.lake 全体 ≈2.6GiB/entry) は使わない:
+      # mathlib build を含めると repo の 10GiB cache 枠が ~4 entry で溢れ、eviction で
+      # incremental が頻繁に死んでいた (2026-07-25 診断)。mathlib + 依存 package の
+      # olean は毎 run `lake exe cache get` が ~1 分で復元するので cache 不要
+      # (cold-start 実測: cache get 以外の再ビルドは Batteries 2 module + cache exe のみ)。
+      - name: Restore project build cache
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: lake-build-${{ runner.os }}-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}-${{ github.sha }}
+          # 2 行目は旧 lean-action cache からの bootstrap 用 (移行後は不発になるだけ; 削除可)
+          restore-keys: |
+            lake-build-${{ runner.os }}-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}-
+            lake-Linux-X64-
+
       - uses: leanprover/lean-action@v1
+        id: lean-build
+        with:
+          use-github-cache: false
 
       # AxiomsCheck verification: re-build OddOrder.AxiomsCheck (cached, fast)
       # and surface the `axioms check OK` info messages in the CI log.
@@ -42,6 +88,15 @@ jobs:
       # 正当な例外は per-decl `set_option linter.<name> false in` + 理由コメントで明示する。
       - name: Lint warning zero gate (bin/check-warnings --strict)
         run: bin/check-warnings --strict
+
+      # build が green なら AxiomsCheck / lint gate の結果に関わらず cache を save する
+      # (gate 赤でも build 成果は次 run の incremental に有効)。
+      - name: Save project build cache
+        if: ${{ !cancelled() && steps.lean-build.outcome == 'success' }}
+        uses: actions/cache/save@v5
+        with:
+          path: .lake/build
+          key: lake-build-${{ runner.os }}-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}-${{ github.sha }}
 
       # GitHub Pages 未有効化のため docgen-action は Pages deploy で 404 失敗する.
       # Pages を有効化するか, deploy を切り離すまで一時無効化.
