@@ -200,7 +200,7 @@ After writing, summarize key findings in <200 words for the parent.
     depth on **gaps**, **sharpened sub-deps**, and **proof-internal mathlib usage**"
   - "Do **not** edit any files. Report only."
 
-2026-05-22 Isaacs Ch.4-7 の例: [`ch04_07_audit_2026_05_22.md`](ch04_07_audit_2026_05_22.md) が
+2026-05-22 Isaacs Ch.4-7 の例: [`ch04_07_audit_2026_05_22.md`](log/ch04_07_audit_2026_05_22.md) が
 このパターンの初出力. これは既存 per-chapter ノート (`ch0{4,5,6,7}_*.md`) が初回調査の時点で
 4 視点を十分にカバーしていなかったための補強. **次回からは初回調査時点で 4 視点を立てる**
 ことで, audit pass を不要にする.
@@ -279,7 +279,7 @@ re-audit) を実施するのが推奨運用. 大規模再調査は不要.
 - [`mathlib_coverage.md`](mathlib_coverage.md): 視点 3 全体像.
 - [`lean_formalization_tips.md`](lean_formalization_tips.md): mathlib API 探索 (3 層運用).
 - [`subagent_orchestration.md`](subagent_orchestration.md): 並列 agent 起動の汎用方針.
-- [`ch04_07_audit_2026_05_22.md`](ch04_07_audit_2026_05_22.md): 再調査 (audit) flow の初出力例.
+- [`ch04_07_audit_2026_05_22.md`](log/ch04_07_audit_2026_05_22.md): 再調査 (audit) flow の初出力例.
 
 ---
 

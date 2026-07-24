@@ -74,7 +74,7 @@ issue 0040「進捗 (12)」参照.  Möbius の **代数的 spine を全て land
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
 
 - **L3, L7, L16, L18 "6 結果 (2.1)-(2.6)"** → **重大誤認: 実際 11 結果 (2.1)-(2.11)** + sub-lemmas (2.10.1)-(2.10.3). 既存表で **(2.7), (2.8), (2.9), (2.10), (2.11) 完全欠落**.
 - (2.7) Adjoint formula は **外部 7 cite** (§7, §9, §12×2, §13, §16×2) で **最重要 forward-export 補題**. 既存「Helper」評価は overstate.

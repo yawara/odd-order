@@ -37,13 +37,13 @@ no-Gorenstein 方針下では **App.B (Puig L(S), Thm B.4) こそが Thm 6.2 の
 スキップ不可。App.B 自体は **完全な証明が BG にあり**(B.1-B.4 written, 実質依存は A.5 のみ、
 B.4 は Isaacs 本人の未公刊証明)。FT-citation-orphan の観察 (L17-18) は正しいが、**「Gorenstein
 依存を断つ代替」という役割を見落とした**のが旧監査の誤り。詳細・依存閉包・J→L 大域置換の検証は
-[`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../meta/bg_s6_appAB_route_2026_05_28.md)。
+[`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../meta/bg_s6_appAB_route_2026_05_28.md)。
 
 ---
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
 
 - **"Lem B.1-B.5" (L6, 333, 343, 408, 504)** → **誤り. B.5 は存在しない**. App.B 全結果は **Lem B.1, B.2, B.3 + Thm B.4 の 4 つのみ**.
 - **`_overview.md` L95 "App.B は App.A 不要で独立着手可"** → **誤り**. **Lem B.3 (L4666) + Thm B.4 Step 3 (L4735) が Thm A.5 cite**. App.B は App.A 下流.

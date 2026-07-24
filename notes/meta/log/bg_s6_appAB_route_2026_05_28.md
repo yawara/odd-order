@@ -165,5 +165,5 @@ Puig の L(S):`X → Y :⟺ Y は X に正規化される abelian 部分群で�
 - [`appA_pstability.md`](../bg/appA_pstability.md): App.A per-section(本 doc で訂正)
 - [`appB_puig.md`](../bg/appB_puig.md): App.B per-section(本 doc で skip 撤回)
 - [`bg_phase2a_wave1_audit_2026_05_23.md`](bg_phase2a_wave1_audit_2026_05_23.md): wave1 監査(本 doc で skip-App.B を反転)
-- [`phase2_cross_refs.md`](phase2_cross_refs.md): 3 冊クロス参照
+- [`phase2_cross_refs.md`](../phase2_cross_refs.md): 3 冊クロス参照
 - repo: `OddOrder/Isaacs/Ch07_ThompsonSubgroup/{S7A1_JpGL2p,S7A2_NormalPThm75,S7B1_NormalJ,S7B2_NormalJ_PComplement}.lean`(7.2/7.3/7.5/7.6/normal_J)、`OddOrder/BG/Ch1_Preliminary/S06_Additional.lean`(reduced-case)

@@ -25,7 +25,7 @@ created: 2026-07-07
 >   (`orthogonality_setup`:1359 / `not_orthogonal_mu0_sub_zeta`:1378 / `final_typeIII_conclusions`:1618)。
 >
 > ⟹ **lane-a の (11.8.6) producer work は完遂**。次目標 = **W2 (9000 typeP_Galois instance tail)** へ pivot
-> (HUB RULING 0101 点5 + `notes/meta/ft_endgame_plan_2026_07_07.md` R1)。本 issue 後半は歴史記録として残置。
+> (HUB RULING 0101 点5 + `notes/meta/log/ft_endgame_plan_2026_07_07.md` R1)。本 issue 後半は歴史記録として残置。
 
 ## 背景 (lane-a, 2026-07-07 code-level 確証)
 

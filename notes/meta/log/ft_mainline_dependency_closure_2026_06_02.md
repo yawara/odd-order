@@ -1,7 +1,7 @@
 # FT mainline dependency closure (2026-06-02)
 
 > ⚠ **STALE（履歴スナップショット, `main`@`4adc1a1`）**。scope / policy / 経路の判断は
-> [`ft_path_policy.md`](ft_path_policy.md) が正本（2026-06-15〜）。本ノートは import closure vs proof
+> [`ft_path_policy.md`](../ft_path_policy.md) が正本（2026-06-15〜）。本ノートは import closure vs proof
 > closure の分離分析として温存。
 
 Snapshot: `main` at `4adc1a1`.

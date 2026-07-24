@@ -11,7 +11,7 @@ ROADMAP 上の位置: **Phase 2b 第 2 波後半** (§4-§5 完成後).
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
 
 - **L3 "5 結果 (4.1)-(4.5)"** → **重大誤認: 実際 10 結果 (4.1)-(4.10)**. 既存表で (4.6) Hypothesis (実は中核), (4.7) Supp 補題, (4.8), (4.9) τ-isometry Thm, (4.10) 4-term identity が完全欠落.
 - **(4.1) orthogonality crit は下流 9 cite (技術 hub)**, (4.3) も 9 cite, **(4.7) Supp は 7 cite (§7 (5.3.b) proof で重要)**. 既存「(4.5) main thm」評価不十分.

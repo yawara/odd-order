@@ -20,7 +20,7 @@ Thm 6.1 = A.4(b) [本 issue]  (§7/§8 が独立に引用)
 BG mmd L4478: 「We now move to Section 6.5 of **G**. By using Theorem A.3 instead of
 Theorem 3.8.4(e), we obtain special cases of Theorems 6.5.1-6.5.3」。つまり A.4 =
 **Gorenstein 6.5.1-6.5.3 を A.3 で置換した翻訳**。経路は
-[`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/bg_s6_appAB_route_2026_05_28.md)、
+[`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md)、
 per-section は [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md)。
 
 ## Statement (BG mmd L4480)
@@ -324,5 +324,5 @@ per-chief-factor p-stability) ⇒ `Ā·C_Ḡ(R̄)/C_Ḡ(R̄) ⊆ O_p(Ḡ/C_Ḡ(R
 - repo: `OddOrder.BG.AppA.thmA3` / `IsPStable` ([AppA_PStability.lean](../OddOrder/BG/AppA_PStability.lean))
 - repo: `OddOrder.Isaacs.Ch01.opCore` (`O_p`), `oPiCore` (`O_{p'}`), `oPiPCore` (`O_{p',p}`) — 要確認
 - closed [#0043](closed/0043-bg-appa-a3-pstability.md) (A.3)
-- notes: [`bg_s6_appAB_route_2026_05_28.md`](../notes/meta/bg_s6_appAB_route_2026_05_28.md) §3 (真のゲート = A.4(b)+A.4(c)),
+- notes: [`bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md) §3 (真のゲート = A.4(b)+A.4(c)),
   [`appA_pstability.md`](../notes/bg/appA_pstability.md)

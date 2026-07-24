@@ -19,7 +19,7 @@ for Theorem 6.2")。Isaacs FGT が Z(J) 定理を省く (p.217) ため、no-Gore
 §7 (Thompson 推移性) → §8-§16。
 
 方針正本: `notes/bg/appB_puig.md`「実装状況 (2026-05-29)」+ 「Lem B.3 / Thm B.4 詳解」、
-`notes/meta/bg_s6_appAB_route_2026_05_28.md`。原文: `references/bg/local-analysis.mmd`
+`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`。原文: `references/bg/local-analysis.mmd`
 L4644-4757 (Lem B.3 = L4644-4684, Thm B.4 = L4686-4757)。
 
 ## やること

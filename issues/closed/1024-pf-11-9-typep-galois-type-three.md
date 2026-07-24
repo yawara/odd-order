@@ -271,7 +271,7 @@ c の hVcomm が cite 可能な signature で供給される。
 - repo: S13_Orthogonality (pin/refuter)、S13_CoreStructure ((11.6)/(11.7))、
   S13_TypeDetermination ((11.9.b))、S11_ImprimitiveUBound (fpf 部品)、issue 9000 (σ-theory engine)
 - issues: 1012 ((9.8) counts — P1 と同根、B1 quotient bridge は §11 では H₀=⊥ で不要)、
-  0101 (R1 pivot)、`notes/meta/ft_endgame_plan_2026_07_07.md` W2
+  0101 (R1 pivot)、`notes/meta/log/ft_endgame_plan_2026_07_07.md` W2
 
 ## 🧭 hub フォローオン (2026-07-12 監視 tick, 9077 RULING #3) — Type-IV 補題を S16 下 leaf へ抽出
 

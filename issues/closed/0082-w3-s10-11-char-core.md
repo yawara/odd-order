@@ -9,7 +9,7 @@ created: 2026-06-25
 
 ## 背景
 
-FT フロンティア再設計 (2026-06-25 relane #9、正本 `notes/meta/ft_frontier_remap_2026_06_25.md`)
+FT フロンティア再設計 (2026-06-25 relane #9、正本 `notes/meta/log/ft_frontier_remap_2026_06_25.md`)
 の **フロント W3** = lane-b 担当。Arm A の **臨界路最狭点・最深** — `feitThompson` の **唯一の bare sorry**
 を含む。issue 2020 を保持。上流 coherence producer 完成済ゆえ actionable-now。
 
@@ -37,7 +37,7 @@ Peterfalvi **内部の §13 type-III/IV 矛盾 endpoint** (`S13_MaximalIII_IV` �
 
 ## 参照
 
-- 正本: `notes/meta/ft_frontier_remap_2026_06_25.md` §2 (W3)
+- 正本: `notes/meta/log/ft_frontier_remap_2026_06_25.md` §2 (W3)
 - 主所有: `OddOrder/Peterfalvi/{S10,S11,S12,S13}*.lean` + `FeitThompson.lean:426` + §3–9 char supply
 - 関連: issue 2020 (この core の旧 issue)、`notes/peterfalvi/s10_13_maximal_structure.md`
 

@@ -25,7 +25,7 @@ BG App.C 経路 (`theoremC` → `final_contradiction`) が carrier だけで閉�
 
 正本: 本ノート。先行: `notes/bg/appC_final_contradiction.md` (位置づけ) /
 `notes/bg/appC_normset_plan.md` (有限体核 — **完成済**, 「残 3 ブロック」記述は stale) /
-`notes/meta/s16_appc_downstream_audit_2026_06_04.md`。
+`notes/meta/log/s16_appc_downstream_audit_2026_06_04.md`。
 
 ---
 
@@ -501,4 +501,4 @@ coprime 作用の標準事実**ゆえ:
 ---
 
 *作成 2026-06-05. 出典 `references/bg/local-analysis.mmd` L4994–5095, PDF pp.150–152.
-先行 `notes/bg/appC_normset_plan.md` (有限体核完成) / `notes/meta/s16_appc_downstream_audit_2026_06_04.md`.*
+先行 `notes/bg/appC_normset_plan.md` (有限体核完成) / `notes/meta/log/s16_appc_downstream_audit_2026_06_04.md`.*

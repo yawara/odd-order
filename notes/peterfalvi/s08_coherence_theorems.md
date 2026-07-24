@@ -14,7 +14,7 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§7 Coherence 完成直後).
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
 
 - **L3 "4 + 2 結果 (6.1)-(6.4), (6.5)-(6.8) は拡張"** → **重大誤認: 実際 8 結果 (6.1)-(6.8) 全て同格 named results**. overview の "4 結果" は `**(N.M)**` grep artifact.
 - **L18, L137, L142, L257 "Sibley 1984 Contemp. Math. 47"** → **完全捏造**. 訂正: Peterfalvi Notes §SS6 (mmd 04.17 L11) 明示「(6.3), (6.5) は **[FT] §11** から; (6.8) only is Sibley」. Sibley 参照は実際 **[Si1] = Sibley 1976 *Illinois J. Math.* 20:434-442** "Coherence in finite groups containing a Frobenius section" + [Si2] unpublished lectures. **"Contemp. Math. 47" は存在しない**.

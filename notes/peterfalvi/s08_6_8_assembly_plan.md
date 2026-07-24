@@ -743,7 +743,7 @@ step1-2 (`retarget_isCoherent_of_supportedDecomposition*`) は **X-family で sc
 **真の fix = `CharacterPsiDecomposition.tau1_inner_eq_on_support` を差分 sublattice `zSpan{χ−χ.conj,χ−ψ}` に弱化**
 (全 4 使用箇所 S07:1227/1296/2216/3473 は差分のみ; ofProjection→decompositionPair→sharedDecomposition→fromDade を
 貫流する htau1_inner_eq param を差分集合 isometry に re-target, ~7-10 関数, invasive=attended)。
-詳細 = `notes/meta/b_xpath_wiring_goal.md` 🛑 LOOP STOPPED 節。✅ step3a (`dadeOrthonormalCharacterImageFamilyOfDiff`,
+詳細 = `notes/meta/log/b_xpath_wiring_goal.md` 🛑 LOOP STOPPED 節。✅ step3a (`dadeOrthonormalCharacterImageFamilyOfDiff`,
 18238b9) は genuine な差分-support R(χ) で field 弱化後の正当部品。
 
 ### I 進捗 2 (2026-06-03 attended, B engine surgery 大幅前進)

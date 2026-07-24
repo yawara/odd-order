@@ -9,7 +9,7 @@ created: 2026-06-25
 
 ## 背景
 
-FT フロンティア再設計 (2026-06-25 relane #9、正本 `notes/meta/ft_frontier_remap_2026_06_25.md`)
+FT フロンティア再設計 (2026-06-25 relane #9、正本 `notes/meta/log/ft_frontier_remap_2026_06_25.md`)
 の **フロント W4** = lane-h 担当。**Arm B (最終矛盾の独立アーム)** — `field_normalizer_structure`
 (Pf 14.2, POLE-2) を構成し App.C Theorem C が消費して p≤q を出す。W1 と upstream gate を共有しない
 完全独立フロント (検証 CLAIM B)。
@@ -34,7 +34,7 @@ FT フロンティア再設計 (2026-06-25 relane #9、正本 `notes/meta/ft_fro
 
 ## 参照
 
-- 正本: `notes/meta/ft_frontier_remap_2026_06_25.md` §2 (W4)
+- 正本: `notes/meta/log/ft_frontier_remap_2026_06_25.md` §2 (W4)
 - 主所有: `OddOrder/Peterfalvi/{S15_SAndT, S15_SAndT_Setup, S16_NonExistenceG}.lean`
 - 関連: `notes/peterfalvi/s13_17_structural_program.md`、旧 issue 2009 (POLE-2、stale pointer、要再 scope)
 

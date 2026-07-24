@@ -1,7 +1,7 @@
 # 自走 goal: (6.8) B step 3-4 — X-family coherence path 配線 (2026-06-03)
 
 > ⚠ **DEAD（退役 worktree `pf-engine-support`、この自走 goal は終了済）**。
-> B-lane の現方針は [`ft_path_policy.md`](ft_path_policy.md) §5 + worktree の `LAUNCH.md`。本ノートは履歴。
+> B-lane の現方針は [`ft_path_policy.md`](../ft_path_policy.md) §5 + worktree の `LAUNCH.md`。本ノートは履歴。
 
 ## 作業場所 (厳守)
 - **ONLY** `/home/ywr/odd-order-pf-engine` (branch `pf-engine-support`)。

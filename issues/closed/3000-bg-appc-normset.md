@@ -9,7 +9,7 @@ created: 2026-06-04
 
 ## 背景
 
-下流監査 (`notes/meta/s16_appc_downstream_audit_2026_06_04.md`) で、`feitThompson` 最終矛盾 (`nonexistence_of_G`)
+下流監査 (`notes/meta/log/s16_appc_downstream_audit_2026_06_04.md`) で、`feitThompson` 最終矛盾 (`nonexistence_of_G`)
 が消費する 2 gap のうち **`AppC.theoremC : FieldNormalizerData → p ≤ q`** が唯一の実質的下流ターゲットと特定。
 これは BG Appendix C (mmd L4855-5005) の有限体 norm-set 論法 (Lemmas C.1-C.3)。BG §7-16 / Pf §10-16 と非交差で
 進められる。実装計画 = `notes/bg/appC_normset_plan.md`。
@@ -306,7 +306,7 @@ created: 2026-06-04
 ## 参照
 
 - 計画: `notes/bg/appC_normset_plan.md`
-- 監査: `notes/meta/s16_appc_downstream_audit_2026_06_04.md`
+- 監査: `notes/meta/log/s16_appc_downstream_audit_2026_06_04.md`
 - 原典: BG mmd `references/bg/local-analysis.mmd` L4855-5005
 - 既存 scaffold: `OddOrder/BG/AppC_FinalContradiction.lean` (theoremC/NormSetData/HypothesisB, opaque)
 

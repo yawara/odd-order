@@ -11,7 +11,7 @@
 > (full build では該当破綻なし)。詳細 = issue 0091。
 
 > lane-h = **W4 = POLE-2 `field_normalizer_structure` (Pf 14.2) char cascade + §15 setup**
-> (正本 `notes/meta/ft_frontier_remap_2026_06_25.md` §2 W4、issue 0083)。Arm B = 最終矛盾の
+> (正本 `notes/meta/log/ft_frontier_remap_2026_06_25.md` §2 W4、issue 0083)。Arm B = 最終矛盾の
 > 独立アーム。W1 (lane-f) と upstream gate を共有しない。
 
 ## 全体構造 (2026-06-25 調査確定)

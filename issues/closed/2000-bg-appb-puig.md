@@ -13,7 +13,7 @@ BG Thm 6.2 (Glauberman Z(J)) は Isaacs FGT が省く (p.217) ため、no-Gorens
 方針下では **BG App.B (Puig L(S)) こそが Thm 6.2 の唯一の自己完結代替**。本 issue は
 その基盤 = `L(S)` 系の定義 + Lemma B.1 + Lemma B.2 を実装する。
 
-方針正本: `notes/meta/bg_s6_appAB_route_2026_05_28.md`、per-section: `notes/bg/appB_puig.md`。
+方針正本: `notes/meta/log/bg_s6_appAB_route_2026_05_28.md`、per-section: `notes/bg/appB_puig.md`。
 原文: `references/bg/local-analysis.mmd` L4517-4642 (定義 + B.1 + B.2)。
 
 **スコープ限定**: A.5 (`thmA5`, issue 0049) に依存しない部分のみ。Lemma B.3 / Theorem B.4
@@ -39,6 +39,6 @@ BG Thm 6.2 (Glauberman Z(J)) は Isaacs FGT が省く (p.217) ため、no-Gorens
 ## 参照
 
 - 並行 (A.5 待ち、本 issue 対象外): Lemma B.3 / Theorem B.4 (= Thm 6.2 代替) → issue 0049 完成後
-- `notes/meta/bg_s6_appAB_route_2026_05_28.md`、`notes/bg/appB_puig.md`
+- `notes/meta/log/bg_s6_appAB_route_2026_05_28.md`、`notes/bg/appB_puig.md`
 - テンプレ: `OddOrder/GroupTheory/ThompsonSubgroup.lean` (J(S) の停留 / char 構造)
 - self-centralizing の核: `OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial`

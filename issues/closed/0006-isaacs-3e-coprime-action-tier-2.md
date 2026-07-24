@@ -51,7 +51,7 @@ Phase 1 完成度のためには実装するが, FT 経路としての critical 
 - [OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean](../OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean) (Tier 1 完成済)
 - [notes/isaacs/ch03_split.md](../notes/isaacs/ch03_split.md) §3E
 - [notes/isaacs/ch04_commutators.md](../notes/isaacs/ch04_commutators.md) §4C-§4D
-- [notes/meta/ch04_07_audit_2026_05_22.md](../notes/meta/ch04_07_audit_2026_05_22.md)
+- [notes/meta/log/ch04_07_audit_2026_05_22.md](../notes/meta/log/ch04_07_audit_2026_05_22.md)
 - Isaacs FGT pp.96-104 (§3E)
 
 > 🧾 (2026-07-02 hub 全体レビュー): 前提の Ch.4 §4C/§4D は **完備** (Ch04 Main.lean §4C/§4D = 完成) — ただし本 issue は off-FT-path につき coverage phase まで park 継続。

@@ -18,7 +18,7 @@ Thm 6.2 ⟸ App.B B.4 ⟸ A.5 ⟸ A.4(c) ⟸ A.3 [本 issue] ⟸ A.2 ✅ ⟸ A.1
 ```
 
 依存閉包・ゲート構造は
-[`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/bg_s6_appAB_route_2026_05_28.md)
+[`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md)
 §0.2 参照. mini-roadmap は
 [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md).
 
@@ -326,4 +326,4 @@ Gorenstein 8.3 proof (mmd L2290–) 翻訳:
 - repo: `OddOrder.Isaacs.Ch02.baerSuzuki_pCore` (Ch02 Main.lean L2134)
 - closed issue [#0041](closed/0041-bg-appa-a2-dim-reduction.md)
 - notes: [`appA_pstability.md`](../notes/bg/appA_pstability.md),
-  [`bg_s6_appAB_route_2026_05_28.md`](../notes/meta/bg_s6_appAB_route_2026_05_28.md)
+  [`bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md)

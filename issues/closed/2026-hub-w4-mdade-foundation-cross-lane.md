@@ -65,7 +65,7 @@ hub が上記 (A)-(D) いずれかで lane-h の次タスクを決定し、LAUNC
 
 ## 参照
 
-- 正本: `notes/peterfalvi/s16_w4_char_cascade.md` (進捗節)、`notes/meta/ft_frontier_remap_2026_06_25.md` §2 W4
+- 正本: `notes/peterfalvi/s16_w4_char_cascade.md` (進捗節)、`notes/meta/log/ft_frontier_remap_2026_06_25.md` §2 W4
 - 関連 issue: 2024 (W4 §16→S09 bridge, checklist 3/4)、0083 (relane #9 W4)、過去 boundary 2021/2023
 - gating sorry: `exists_MHypothesis` (S16:3706)、`complement_inf_Q_structure` (S15:892)
 - producer (cite 待ち): `betaM_expansion_data`/`eta_generic_data`/`normCascadeData`/`caseB_contradiction_data` (S16)

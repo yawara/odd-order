@@ -13,7 +13,7 @@ created: 2026-06-19
 dispatch + 両主枝 sorry-free 化済で残は §13 char (Lane B) に bottom-out ゆえ parked
 ([[ft-endgame-two-poles]] issue 2009)。H は深い char を cite で切り、強み(構造群論)が効く
 **Peterfalvi §10-13 maximal-subgroup 構造**(~37 sorry)を大チャンクで取る。
-設計正本 = `notes/meta/cite_split_three_lanes.md`。
+設計正本 = `notes/meta/log/cite_split_three_lanes.md`。
 
 ## やること
 
@@ -45,7 +45,7 @@ full build green + axiom-clean。leverage: 10.10/10.11 が POLE-1 tp producer (F
 
 ## 参照
 
-- 設計: `notes/meta/cite_split_three_lanes.md`
+- 設計: `notes/meta/log/cite_split_three_lanes.md`
 - parked: issue 2009 (POLE-2 field_normalizer_structure)
 - leverage 先: [[s16-typep-producer-unfillable]] (10.11 → tp producer prime tail)
 - 上流 char gate: issue 1004 (characterData) / Lane B (6.8)

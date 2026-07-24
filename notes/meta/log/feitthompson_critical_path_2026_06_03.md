@@ -1,7 +1,7 @@
 # FeitThompson 実 critical path — 訂正版 roadmap (2026-06-03, upd 2026-06-04)
 
 > ⚠ **STALE（履歴スナップショット）**。scope / policy / 経路・signature 並列化の判断は
-> [`ft_path_policy.md`](ft_path_policy.md) が正本（2026-06-15〜）。本ノートは当時の依存監査として温存。
+> [`ft_path_policy.md`](../ft_path_policy.md) が正本（2026-06-15〜）。本ノートは当時の依存監査として温存。
 
 **経緯**: Peterfalvi (6.8) を T6→T7 と drill する過程で方針エラーが頻発 → 全 spine を 4 並列
 adversarial 監査 (notes/peterfalvi/s08_6_8_assembly_plan.md §G)。監査で **roadmap memory の

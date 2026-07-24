@@ -22,7 +22,7 @@ BG §8 proof (b) は **「Z(J(P)) ⊴ M」(Thm 6.2)** を 3 箇所 (mmd L2456/L2
 - **`OddOrder.BG.AppB.zCenter_lOdd_sup_oPiCore_normal`** (AppB_Thm62.lean:22) = **Thm 6.2 一般形だが Puig `L(S)` 版** `Z(L(S))·O_{p'}(G) ⊴ G`。
 - S06 `normalJ_normal_of_odd` は Z(J) だが **reduced case** (`O_{p'}=⊥` ∧ `P=C_G(Z(P))`) — §8 では使えない。
 
-**方針**: §8 part (b) は **L(S) 形で論証を適応**せよ (`Z(J(P))` → `Z(L(P))`)。理由・依存閉包・ゲート (A.4(b)+A.4(c)) は **`notes/meta/bg_s6_appAB_route_2026_05_28.md`** に集約済 (J→L 大域置換の検証込み)。
+**方針**: §8 part (b) は **L(S) 形で論証を適応**せよ (`Z(J(P))` → `Z(L(P))`)。理由・依存閉包・ゲート (A.4(b)+A.4(c)) は **`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`** に集約済 (J→L 大域置換の検証込み)。
 `zCenter_lOdd_sup_oPiCore_normal` の正確な statement / `L(S)` 定義 (`lOddIn` 等) を AppB_Thm62.lean で確認してから part (b) を設計すること。**N_G(Z(L(P)))=M を回す論法は Z(J) と同型** (L(S) も characteristic in S ⟹ ⊴ M ⟹ N_G ⊇ M)。
 
 ## 2. 利用可能な依存 (EXACT 名、全て build 済・大半 axiom-clean)
@@ -128,7 +128,7 @@ transitivity_propagates (hG) (hA : Hypothesis71 A) (hq : q∈(primesOf A)ᶜ) (P
 ## 7. 参照
 - mmd: `references/bg/local-analysis.mmd` L2315-2485 (§8)。
 - `notes/bg/s08_fitting_max.md` (詳細 mini-roadmap: (8.1)-(8.13) 全式、Thm 6.2 引用 3 箇所の精密文脈)。
-- `notes/meta/bg_s6_appAB_route_2026_05_28.md` (**Thm 6.2 = L(S) 形を使う理由・ゲート**, part (b) 必読)。
+- `notes/meta/log/bg_s6_appAB_route_2026_05_28.md` (**Thm 6.2 = L(S) 形を使う理由・ゲート**, part (b) 必読)。
 - `notes/bg/s06_67_chain_design.md` (本セッション §6→§7 設計、§7 API 規約)。
 - memory `ft-master-roadmap` (全体現在地)。issue 0058 (§8(b) tracker; 0057 is closed)。
 - 次 (§8 後) = §9 Uniqueness Thm 9.1/9.6 (Thm 8.1 を r(F(H))≤2 で使用, mmd L2533)。

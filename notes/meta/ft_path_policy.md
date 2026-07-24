@@ -11,9 +11,9 @@
 >
 > **このファイルが「何が FT 経路上か / どこを触るか / どう並列化するか」の正本。**(旧フェーズ)
 > 毎セッション再発する「これは FT に必要なのか?」の混乱を止めるための単一参照点。
-> 横断スナップショット（[`ft_master_roadmap_2026_05_29.md`](ft_master_roadmap_2026_05_29.md),
-> [`feitthompson_critical_path_2026_06_03.md`](feitthompson_critical_path_2026_06_03.md),
-> [`ft_mainline_dependency_closure_2026_06_02.md`](ft_mainline_dependency_closure_2026_06_02.md)）は
+> 横断スナップショット（[`ft_master_roadmap_2026_05_29.md`](log/ft_master_roadmap_2026_05_29.md),
+> [`feitthompson_critical_path_2026_06_03.md`](log/feitthompson_critical_path_2026_06_03.md),
+> [`ft_mainline_dependency_closure_2026_06_02.md`](log/ft_mainline_dependency_closure_2026_06_02.md)）は
 > 履歴として温存するが **scope/policy の判断はこのファイルが優先**（あれらは日付固定で stale）。
 > 個別ゲートの掘り下げは各 `notes/peterfalvi/*.md` / `notes/bg/*.md` / `issues/` が正本。
 
@@ -269,7 +269,7 @@ producer（§14/§6 構造 obligation）= issue 7001**。standalone な positive
 ## 5. lane 割当（❌ SUPERSEDED — 履歴。現行正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md) の 3 レーン a/b/c、2026-07-02 再編）
 
 > 本節の W1–W4 × F/C/B/H 割当は 2026-06-25 relane #9 時点の記録
-> （当時の正本 = [`ft_frontier_remap_2026_06_25.md`](ft_frontier_remap_2026_06_25.md)）。
+> （当時の正本 = [`ft_frontier_remap_2026_06_25.md`](log/ft_frontier_remap_2026_06_25.md)）。
 > **現在の lane↔クラスタ対応・所有はここを読まないこと** — 2026-06-28 に a/b/c/d へ全面再配分、
 > 2026-07-02 に lane d 退役で a/b/c の 3 レーン。以下は温存された履歴。
 

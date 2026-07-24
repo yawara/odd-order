@@ -7,7 +7,7 @@ ROADMAP 上の位置: **Phase 2b 第 1 波** (Phase 1 Isaacs Ch.指標論完成 
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
 
 - **§3 は dependency-graph leaf**: 内部 self-cite **2 件のみ** ((1.1)→(1.5.e), (1.5.a)→(1.6.a)). 既存「structured」評価は overstate; flat checklist が実態.
 - **内部 hub 訂正**: 既存「(1.4) hub」→ 実は **(1.6) が forward 最多 (7 cites)**. (1.4) は §4 prereq として重要だが overall は (1.6) が上位.

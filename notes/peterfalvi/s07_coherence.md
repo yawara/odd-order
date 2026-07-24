@@ -11,7 +11,7 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§4-§6 完成後).
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
 
 - **L3 "6 結果 (5.1)-(5.6)"** → **重大誤認: 実際 9 結果 (5.1)-(5.9)**. (5.7) degree-regular, (5.8) reducible μ_k, (5.9) automorphism/μ-μ̄ が完全欠落.
 - **(5.5) と (5.7) が forward 最多 hub**: (5.5) ×11 cite (§8, §11, §12, §13, §14×4, §15×2, §16), (5.7) ×10 cite (§8, §11×3, §12×2, §13, §14×2, §16) — "all of S coherent" gateway. (5.8) ×5, (5.9) ×5. 既存「bonus/peripheral」評価は逆.

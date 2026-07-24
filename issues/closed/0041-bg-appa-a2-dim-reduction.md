@@ -29,7 +29,7 @@ _Local Analysis for the Odd Order Theorem_) の局所解析パートを形式化
 
 問題: **Isaacs FGT は Glauberman Z(J)-定理を明示的に省く**(Isaacs p.217)。⇒ Thm 6.2 は
 Isaacs へ「読み替え」不能。解決ルートとして **BG App.A (p-Stability) + App.B (Puig L(S))** を採る
-(設計決定: [`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/bg_s6_appAB_route_2026_05_28.md))。
+(設計決定: [`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md))。
 
 2026-05-28 の kernel-connection spike で、そのルートの **唯一の実質的な数学的欠落** が
 本 issue の対象だと判明した(同ノート **§0**)。依存連鎖:
@@ -250,12 +250,12 @@ A.1: `V` 2-dim over `F` (odd char `p`), `G ≤ GL(V)` 有限既約, `|G|` 奇 �
 - 次元縮約補題(`finrank F V = 2`)が `sorry`/`axiom` 無しで証明され `lake build` が通る。
 - できれば A.1・A.2 も sorry-free で配線(A.2 = 本ルートの真のゲート)。
 - docstring に `**BG Thm A.2** (= Gorenstein 3.8.1 weakening, mmd L2204+)` のトレーサビリティ。
-- 完了後 `notes/meta/bg_s6_appAB_route_2026_05_28.md` §0 と per-section
+- 完了後 `notes/meta/log/bg_s6_appAB_route_2026_05_28.md` §0 と per-section
   [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md) の状態を更新。
 
 ## 参照
 
-- **設計・依存閉包・リスクモデル(必読)**: [`notes/meta/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/bg_s6_appAB_route_2026_05_28.md) **§0 + §0.1**(spike 訂正 + Gorenstein 追加後の再評価)
+- **設計・依存閉包・リスクモデル(必読)**: [`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md) **§0 + §0.1**(spike 訂正 + Gorenstein 追加後の再評価)
 - per-section: [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md) / [`notes/bg/s06_additional.md`](../notes/bg/s06_additional.md)
 - **Gorenstein 1968 原文**(本 issue の primary source、`references/gorenstein/finite-groups.mmd`):
   Ch.3 §8 Thm 8.1 **statement L2204 / proof L2210–L2240**(本 issue の翻訳対象)。

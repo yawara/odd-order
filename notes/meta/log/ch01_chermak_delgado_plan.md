@@ -226,7 +226,7 @@ section /- 1G: Chermak-Delgado (pp. 41-44) -/
 /-! ### §1G 実装は `OddOrder/GroupTheory/ChermakDelgado.lean` に分離
 
 mathlib upstream 視野のため shared module 化. 本 section は re-export と参照のみ.
-詳細は `notes/meta/ch01_chermak_delgado_plan.md`. -/
+詳細は `notes/meta/log/ch01_chermak_delgado_plan.md`. -/
 
 export Subgroup (chermakDelgadoMeasure chermakDelgadoLattice chermakDelgadoSubgroup
   chermakDelgado not_isSimpleGroup_of_chermakDelgadoMeasure_gt)
@@ -295,8 +295,8 @@ Step 9 (任意)     mathlib upstream PR 準備 (Phase 1 完成後)
 - 元 ch.1 note: [`../isaacs/ch01_sylow.md`](../isaacs/ch01_sylow.md)
 - §1F (Brodkey, Chermak-Delgado の corollary): `Ch01_Sylow/Main.lean:2900-3195` 既実装
   (`exists_pair_inf_eq_opCore_of_abelian`, `index_opCore_le_index_sylow_sq`)
-- mathlib 配置慣用: [`forward_dep_policy.md`](forward_dep_policy.md),
-  [`chapter_investigation_framework.md`](chapter_investigation_framework.md) §6.3
+- mathlib 配置慣用: [`forward_dep_policy.md`](../forward_dep_policy.md),
+  [`chapter_investigation_framework.md`](../chapter_investigation_framework.md) §6.3
 
 ---
 

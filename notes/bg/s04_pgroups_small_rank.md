@@ -12,7 +12,7 @@
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
 
 - **"Phase 1 Ch.4 (Commutators) 軽前提"** → **HARD GATE**. Cor 3.28 + Isaacs Thm 4.36 (Ch.4 §4D) が Lem 4.5(a) の必須前提.
 - **"§4 は J(P) を使う"** (prompt 内仮定) → 検証結果 **使わない**. `J(P)` grep on L1359-1788 = 0. §4 自体は `OddOrder/BG/Ch1_Preliminary/` 配下, shared module 不要.

@@ -16,7 +16,7 @@ created: 2026-06-25
 
 ## 背景
 
-FT フロンティア再設計 (2026-06-25 relane #9、正本 `notes/meta/ft_frontier_remap_2026_06_25.md`)
+FT フロンティア再設計 (2026-06-25 relane #9、正本 `notes/meta/log/ft_frontier_remap_2026_06_25.md`)
 の **フロント W2** = lane-c 担当。Arm A の mp 側。§12 char cluster。上流 coherence producer
 ((5.7)/(6.2)/(6.3)/(6.8)) は完成済ゆえ **consumer 側を埋める段階** — lane-c が直前まで作った
 (5.7) `coherent_of_constant_degree` がここで消費される見込み (供給→消費 wiring)。
@@ -261,7 +261,7 @@ doneness 認証 (honest proof の axiom footprint 確定)。残トリガ = (B) b
 
 ## 参照
 
-- 正本: `notes/meta/ft_frontier_remap_2026_06_25.md` §2 (W2)、relane #12 (LAUNCH.md 冒頭、issue 2027)
+- 正本: `notes/meta/log/ft_frontier_remap_2026_06_25.md` §2 (W2)、relane #12 (LAUNCH.md 冒頭、issue 2027)
 - 主所有: `OddOrder/Peterfalvi/S14_MaximalI.lean` (lane-h、2026-06-26 lane-c から継承)
 - 関連: `notes/peterfalvi/s10_13_maximal_structure.md`、issue 2018 (§13 char direction)、2026 (W4→W2 relane)
 

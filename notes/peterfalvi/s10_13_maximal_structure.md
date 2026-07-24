@@ -404,7 +404,7 @@ de-opacify、sorry 数でない [[scaffold-sorry-free-not-done]])。
 
 ## 11. Coherence-free (10.9) landed — unblocks (11.9.b) `q > p` (2026-06-25, lane-b W3, relane #9)
 
-W3 (= lane-b, 正本 `notes/meta/ft_frontier_remap_2026_06_25.md`) の臨界路最狭点 = `card_kappaHall_lt_of_isTypeIIIorIV`
+W3 (= lane-b, 正本 `notes/meta/log/ft_frontier_remap_2026_06_25.md`) の臨界路最狭点 = `card_kappaHall_lt_of_isTypeIIIorIV`
 (FeitThompson.lean:426, Pf (11.9.b) = "type III/IV ⟹ q>p")。textbook (11.9.b) の証明 = "follows from (10.9)
 and (11.8)"。
 

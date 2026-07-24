@@ -150,7 +150,7 @@ Read first:
 - `notes/bg/s08_fitting_max.md`
 - `notes/bg/s09_uniqueness.md`
 - `notes/bg/s16_main_results.md`
-- `notes/meta/ft_mainline_dependency_closure_2026_06_02.md`
+- `notes/meta/log/ft_mainline_dependency_closure_2026_06_02.md`
 - `OddOrder/BG/Ch2_Uniqueness/S07_Transitivity.lean`
 - `OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults.lean`
 

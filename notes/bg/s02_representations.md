@@ -10,7 +10,7 @@
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
 
 - **"§9 周辺で 1-2 箇所のみ被引用" → 完全に誤り**. 実測 §9 = **0 cites**. 実際: §3 ×5 (Prop 2.1, Prop 2.2 ×2, Thm 2.5, Thm 2.6 ×2 + 別 cite), §4 Lem 4.17, §15 Thm 15.7, **App.A Thm A.1 proof (L4464) で Thm 2.6 cite**. 合計 **8+ cites**, §2 は FT 中核.
 - **"optional 節, 形式化は必要時のみ" / "skip 推奨" → 完全に逆**. §3 + App.A の **前提** ⇒ Phase 2a 第 1 波必須.
@@ -596,7 +596,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 
 ### 明示的引用 (2026-05-23 audit)
 
-統合 doc: [`notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
 
 実測:
 - §3: Prop 2.1, Prop 2.2, Thm 2.5, Thm 2.6 の引用が集中.

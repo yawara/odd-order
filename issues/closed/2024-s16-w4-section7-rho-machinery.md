@@ -49,7 +49,7 @@ abstract carrier (`tau : S07.IntegralCharacterMap`, `psi`, `betaM`, `G0`) を S0
 
 ## 参照
 
-- 正本: `notes/peterfalvi/s16_w4_char_cascade.md`、`notes/meta/ft_frontier_remap_2026_06_25.md` §2 W4
+- 正本: `notes/peterfalvi/s16_w4_char_cascade.md`、`notes/meta/log/ft_frontier_remap_2026_06_25.md` §2 W4
 - S09 §7 API: `OddOrder/Peterfalvi/S09_NonexistenceCertain.lean` (Hypothesis71:110 / family_inequality:687 /
   Hypothesis78:1433 / beta:1487)
 - 本セッション: generic_character_bound de-opacify (commit `483a5716`)

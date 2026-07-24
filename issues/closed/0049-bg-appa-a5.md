@@ -99,6 +99,6 @@ self-contained な sup 仮説に留める。)
 
 - BG mmd L4488-4513 (A.5 statement + proof), L4517-4757 (App.B: L(S) 定義 + B.1-B.4)
 - closed [#0047](closed/0047-bg-appa-a4.md) (A.4 a/b/c), workflow run wf_612ed4a4-224 (調査プラン)
-- notes: [`bg_s6_appAB_route_2026_05_28.md`](../notes/meta/bg_s6_appAB_route_2026_05_28.md),
+- notes: [`bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md),
   [`appA_pstability.md`](../notes/bg/appA_pstability.md), [`appB_puig.md`](../notes/bg/appB_puig.md)
 - repo: `AppA_PStability.lean` (thmA4c/stabilityLiftAux), `S01_Solvable.lean` (Prop 1.10/Hall-Higman)

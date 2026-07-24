@@ -65,7 +65,7 @@ hub が lane-h の次タスク (relane 先 or await 体制 or 集約) を LAUNCH
 
 ## 参照
 
-- 正本: issue 0081 (W2 進捗ログ、2026-06-27 再開² entry に詳細) / `notes/meta/ft_frontier_remap_2026_06_25.md`
+- 正本: issue 0081 (W2 進捗ログ、2026-06-27 再開² entry に詳細) / `notes/meta/log/ft_frontier_remap_2026_06_25.md`
 - 本セッション commit: `3ec86cc9` (theorem88_dichotomy honest 構成) / `c469e0f3` (issue 0081 doc)
 - lane-h topic: memory `lane-h-driving-wielandt-91.md` 2026-06-27 entry
 - 関連 HUB issue (過去の同型 starvation): 2021 / 2023 / 2026 / 2027

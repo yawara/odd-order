@@ -100,7 +100,7 @@ S13 `final_typeIII_conclusions` (11.9) が `q>p` を与えるので、char API l
 
 ## 2026-06-25 lane-b (relane #9, W3): coherence-free (10.9) landed — (11.9.b) `q>p` の半分
 
-W3 (= lane-b、正本 `notes/meta/ft_frontier_remap_2026_06_25.md`) 再開。残 char 核 =
+W3 (= lane-b、正本 `notes/meta/log/ft_frontier_remap_2026_06_25.md`) 再開。残 char 核 =
 `card_kappaHall_lt_of_isTypeIIIorIV` (FeitThompson:426, Pf (11.9.b) "type III/IV ⟹ q>p")。
 textbook 証明 = "follows from (10.9) and (11.8)"。
 
