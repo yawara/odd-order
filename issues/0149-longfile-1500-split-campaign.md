@@ -40,7 +40,6 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
 | `BG/Ch1_Preliminary/S03f_Thm36.lean` | 3822 |
 | `BG/Ch1_Preliminary/S04g_Thm418.lean` | 1965 |
 | `Peterfalvi/S10_MinimalSimpleBasic.lean` | 1888 |
-| `Peterfalvi/Appendices/FeitSibleyTheorem.lean` | 1884 |
 | `Isaacs/Ch07_ThompsonSubgroup/S7B2_NormalJ_PComplement.lean` | 1883 |
 | `Isaacs/Ch06_FrobeniusActions/FrobeniusActionTI.lean` | 1875 |
 | `BG/AppC_FrobeniusClassSum.lean` | 1870 |
@@ -94,6 +93,13 @@ bump が必要 = diff に出る)、分割が済んだ file から stamp を除�
 | `Peterfalvi/S08_RestrictExtensionDvd.lean` | 1515 |
 | `Peterfalvi/S08_CoherenceBasic.lean` | 1507 |
 | `Peterfalvi/S08_CoherenceCore.lean` | 1506 |
+### 消化記録
+
+- ✅ `Peterfalvi/Appendices/FeitSibleyTheorem.lean` (1884) — 2026-07-24 prefix-split:
+  `FeitSibleySsetCoherence.lean` (892) + 残 1022、両方 stamp 不要化 (issue 0141 close)。
+- ➕ `Higman/Suzuki2Groups/HigmanLowerCentralSpectrum.lean` (1501) を worklist 追加 —
+  wc 1499 (lastLine 1500) は linter 境界仕様で unstamped だと警告になるため stamp 1600 を付与。
+
 (AxiomsCheck.lean 12635 は機械列挙 file の意図的例外 — stamp 恒久維持、分割対象外。)
 
 ## 完了条件

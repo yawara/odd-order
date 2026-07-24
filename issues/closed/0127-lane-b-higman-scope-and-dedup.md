@@ -118,3 +118,16 @@ merge a07d32aab で合流。
   `lowerCentral_commutatorElement_mul_right_of_class_le_two`
   (`HigmanLowerCentralGraded.lean:512` private、Ch04 BaerTrick 既存版への repoint 未)。
   owner = hub、quiet window で実施 (cross-file ゆえ full build gate)。
+
+---
+
+## ✅ 2026-07-24 close — ① dedup 実施で全項目完了
+
+- `cyclic_finite_unique_order_two` (private ×2) → `GroupTheory/CyclicSubgroupUniqueness.lean` に
+  public `cyclic_eq_of_orderOf_eq_two` として集約 (9161 と同じ dedup 先例 leaf)。
+  AgemoLayers / Isaacs Ch05 Basic の両 private を削除し repoint (import 追加、循環なし)。
+- `lowerCentral_commutatorElement_mul_right_of_class_le_two` (private) → 既存の statement 同一
+  `OddOrder.Isaacs.Ch04.commutatorElement_mul_right_of_class_le_two` (BaerTrick) へ repoint
+  (mul_left は CommutatorIdentities 由来で closure 内だったが mul_right の BaerTrick は未 import
+  だったため import 追加)。
+- leaf build green (2388 jobs)。①②③ 全て完了 → close。

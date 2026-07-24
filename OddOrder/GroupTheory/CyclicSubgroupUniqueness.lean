@@ -52,4 +52,22 @@ theorem cyclic_subgroup_eq_of_card_eq {C : Type*} [Group C] [Finite C] [IsCyclic
     exact Subgroup.eq_of_le_of_card_ge hN_le (by rw [hker_card, hN])
   exact (key (d := Nat.card H₁) rfl).trans (key (d := Nat.card H₁) h.symm).symm
 
+/-- In a finite cyclic group, the element of order 2 is unique (if it exists):
+`φ(2) = 1` via `IsCyclic.card_orderOf_eq_totient`.
+
+Deduplicated from two verbatim `private` copies (Isaacs Ch05 `Basic` and
+Higman `AgemoLayers`; issue 0127 ①). -/
+theorem cyclic_eq_of_orderOf_eq_two {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    {s t : C} (hs : orderOf s = 2) (ht : orderOf t = 2) : s = t := by
+  letI : Fintype C := Fintype.ofFinite C
+  classical
+  have h2_dvd : (2 : ℕ) ∣ Fintype.card C := by
+    rw [← hs]; exact orderOf_dvd_card
+  have h_card : Fintype.card {x : C // orderOf x = 2} = 1 := by
+    rw [Fintype.card_subtype, IsCyclic.card_orderOf_eq_totient h2_dvd, Nat.totient_two]
+  haveI : Subsingleton {x : C // orderOf x = 2} :=
+    Fintype.card_le_one_iff_subsingleton.mp h_card.le
+  exact congrArg Subtype.val
+    (Subsingleton.elim (⟨s, hs⟩ : {x : C // orderOf x = 2}) ⟨t, ht⟩)
+
 end OddOrder.GroupTheory

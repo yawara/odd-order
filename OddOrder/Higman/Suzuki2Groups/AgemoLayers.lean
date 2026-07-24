@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.RepresentationTheory.Irreducible
 import OddOrder.GroupTheory.Homocyclic
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 import OddOrder.GroupTheory.PRank
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 import OddOrder.GroupTheory.SpecificGroups.Suzuki2Group.Basic
@@ -344,23 +345,6 @@ theorem agemoSuccQuotientAction_transitive_on_nonidentity
 
 /-! ## Noncyclicity and transported layer data -/
 
-private theorem cyclic_finite_unique_order_two
-    {P : Type*} [Group P] [Finite P] [IsCyclic P] {s t : P}
-    (hs_ord : orderOf s = 2) (ht_ord : orderOf t = 2) : s = t := by
-  letI : Fintype P := Fintype.ofFinite P
-  have h2_dvd : (2 : ℕ) ∣ Fintype.card P := by
-    rw [← hs_ord]
-    exact orderOf_dvd_card
-  have h_card : Fintype.card {x : P // orderOf x = 2} = 1 := by
-    rw [Fintype.card_subtype, IsCyclic.card_orderOf_eq_totient h2_dvd,
-      Nat.totient_two]
-  haveI : Subsingleton {x : P // orderOf x = 2} :=
-    Fintype.card_le_one_iff_subsingleton.mp h_card.le
-  exact congrArg Subtype.val
-    (Subsingleton.elim
-      (⟨s, hs_ord⟩ : {x : P // orderOf x = 2})
-      ⟨t, ht_ord⟩)
-
 /-- The last nontrivial Agemo layer is not cyclic when the ambient
 homocyclic group has two distinct involutions. -/
 theorem not_isCyclic_lastAgemoLayer_of_two_involutions
@@ -387,7 +371,7 @@ theorem not_isCyclic_lastAgemoLayer_of_two_involutions
       exact congrArg Subtype.val hy1)
   apply hxy
   exact congrArg Subtype.val
-    (cyclic_finite_unique_order_two hxord hyord)
+    (OddOrder.GroupTheory.cyclic_eq_of_orderOf_eq_two hxord hyord)
 
 /-- No quotient of two distinct Agemo layers is cyclic when the
 homocyclic group has two distinct involutions. -/

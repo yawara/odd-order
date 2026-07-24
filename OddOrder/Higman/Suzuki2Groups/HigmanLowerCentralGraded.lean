@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Higman.Suzuki2Groups.AgemoLayers
+import OddOrder.Isaacs.Ch04_Commutators.Main.BaerTrick
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
 
@@ -507,25 +508,6 @@ theorem lowerCentralLayerOneToAmbientQuotient_commutatorValue
   rfl
 
 
-/-- In a class-two group, the commutator is multiplicative in the right slot.
-This is derived from the left-slot identity and commutator inversion. -/
-private theorem lowerCentral_commutatorElement_mul_right_of_class_le_two
-    {G : Type*} [Group G]
-    (hC : _root_.commutator G ≤ Subgroup.center G)
-    (z a b : G) :
-    ⁅z, a * b⁆ = ⁅z, a⁆ * ⁅z, b⁆ := by
-  have hswap : ⁅z, a⁆ * ⁅z, b⁆ = ⁅z, b⁆ * ⁅z, a⁆ := by
-    have hca : ⁅z, a⁆ ∈ Subgroup.center G :=
-      hC (OddOrder.Isaacs.Ch04.commutatorElement_mem_commutator_top z a)
-    exact (Subgroup.mem_center_iff.mp hca _).symm
-  have hinv : ⁅a * b, z⁆⁻¹ = ⁅z, a * b⁆ :=
-    commutatorElement_inv (a * b) z
-  have hleft : ⁅a * b, z⁆ = ⁅a, z⁆ * ⁅b, z⁆ :=
-    OddOrder.Isaacs.Ch04.commutatorElement_mul_left_of_class_le_two
-      hC a b z
-  rw [← hinv, hleft, mul_inv_rev, commutatorElement_inv,
-    commutatorElement_inv, hswap]
-
 /-- The raw commutator value is multiplicative in the right variable. -/
 theorem lowerCentralCommutatorValue_mul_right
     (H : Type uH) [Group H]
@@ -537,7 +519,7 @@ theorem lowerCentralCommutatorValue_mul_right
   rw [map_mul]
   simp only [lowerCentralLayerOneToAmbientQuotient_commutatorValue,
     Subgroup.coe_mul, map_mul]
-  exact lowerCentral_commutatorElement_mul_right_of_class_le_two
+  exact OddOrder.Isaacs.Ch04.commutatorElement_mul_right_of_class_le_two
     (quotient_layerKernel_one_commutator_le_center H) _ _ _
 
 /-- The raw commutator value is multiplicative in the left variable. -/

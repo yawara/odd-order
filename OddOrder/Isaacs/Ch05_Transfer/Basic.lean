@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Transfer
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 import Mathlib.GroupTheory.Focal
 import Mathlib.GroupTheory.Schreier
 import Mathlib.GroupTheory.SpecificGroups.ZGroup
@@ -759,22 +760,6 @@ theorem isaacs_thm_5_17
     intro h_p_dvd_comm
     exact h_M_no_p (h_p_dvd_comm.trans (Subgroup.card_dvd_of_le h_comm_le_M))
 
-/-- Helper: in any finite cyclic group, the element of order 2 is unique (if exists).
-mathlib `IsCyclic.card_orderOf_eq_totient` + `Nat.totient_two = 1` + Subsingleton. -/
-private lemma cyclic_finite_unique_order_two
-    {P : Type*} [Group P] [Finite P] [IsCyclic P] {s t : P}
-    (hs_ord : orderOf s = 2) (ht_ord : orderOf t = 2) : s = t := by
-  haveI : Fintype P := Fintype.ofFinite P
-  classical
-  have h2_dvd : (2 : ℕ) ∣ Fintype.card P := by
-    rw [← hs_ord]; exact orderOf_dvd_card
-  have h_card : Fintype.card {x : P // orderOf x = 2} = 1 := by
-    rw [Fintype.card_subtype, IsCyclic.card_orderOf_eq_totient h2_dvd, Nat.totient_two]
-  haveI : Subsingleton {x : P // orderOf x = 2} :=
-    Fintype.card_le_one_iff_subsingleton.mp h_card.le
-  exact congrArg Subtype.val
-    (Subsingleton.elim (⟨s, hs_ord⟩ : {x : P // orderOf x = 2}) ⟨t, ht_ord⟩)
-
 /-- **Isaacs Cor 5.19** (cyclic Sylow_2 版): `G` 非可換 finite + `P ∈ Syl_2(G)` cyclic
 非自明 ⇒ `G` 単純でない.
 
@@ -786,7 +771,7 @@ Isaacs 原版は `P = A × B` with `A` cyclic strictly largest で, 本定理は
 
 **証明**: `P` cyclic Sylow_2, `|P| = 2^a, a ≥ 1`. Cauchy で order-2 元 `t ∈ P` を取る.
 任意 `n ∈ N_G(P)` で `n * t * n⁻¹ ∈ P` (normalizer) かつ order 2 (semiconjugate);
-cyclic finite group の unique order-2 element (`cyclic_finite_unique_order_two`) で
+cyclic finite group の unique order-2 element (`OddOrder.GroupTheory.cyclic_eq_of_orderOf_eq_two`) で
 `n * t * n⁻¹ = t`, ゆえに `t ∈ Z(N_G(P))`. Thm 5.18 強形
 (`eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer`) で
 `t ∈ G' ⇒ t = 1` だが `orderOf t = 2`, 矛盾 ⇒ `G' < G`. `G` simple なら
@@ -826,14 +811,14 @@ theorem not_isSimpleGroup_of_isCyclic_sylow_two
       have h_sb : SemiconjBy n t (n * t * n⁻¹) := by
         change n * t = (n * t * n⁻¹) * n; group
       exact (SemiconjBy.orderOf_eq n h_sb).symm.trans ht_ord_g
-    -- Lift to ↥P, use cyclic_finite_unique_order_two
+    -- Lift to ↥P, use cyclic_eq_of_orderOf_eq_two
     have ht_P_ord : orderOf (⟨t, ht_inP⟩ : ↥(P : Subgroup G)) = 2 := by
       rw [Subgroup.orderOf_mk]; exact ht_ord_g
     have hntn_P_ord :
         orderOf (⟨n * t * n⁻¹, hntn_inP⟩ : ↥(P : Subgroup G)) = 2 := by
       rw [Subgroup.orderOf_mk]; exact hntn_ord
     have h_eq_P : (⟨n * t * n⁻¹, hntn_inP⟩ : ↥(P : Subgroup G)) = ⟨t, ht_inP⟩ :=
-      cyclic_finite_unique_order_two hntn_P_ord ht_P_ord
+      OddOrder.GroupTheory.cyclic_eq_of_orderOf_eq_two hntn_P_ord ht_P_ord
     have h_g_eq : n * t * n⁻¹ = t := congrArg Subtype.val h_eq_P
     calc n * t = n * t * n⁻¹ * n := by group
       _ = t * n := by rw [h_g_eq]
