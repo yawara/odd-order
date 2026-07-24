@@ -50,14 +50,17 @@ Pf 側の再掲は書かない。
       monoid 上の Dedekind** に帰着 — 対 (σ,τ) を `algAutPairChar : (F × F) →* F` とみなすと
       (a) と同一パターンで sum 操作不要) / `finrank_bilinMap_self_eq` (dim = n²) /
       `card_autProd_eq_finrank_bilinMap`。AxiomsCheck 2 assert。
-      ⚠ **bundled `Module.Basis` は繰延**: 二重入れ子 `F →ₗ[ZMod p] F →ₗ[ZMod p] F` 上の
-      `basisOfLinearIndependentOfCardEqFinrank` が whnf/isDefEq 発散 (maxHeartbeats 3.2M でも
-      不足、diagnostics で `Add.add` 23,535 回 unfold を確認; card 補題の top-level 抽出・
-      Nonempty/Fintype letI 明示・Nat.card 経路化はいずれも効かず)。独立性 + card=dim の
-      theorem 2 本が数学的内容としては完結 (有限次元で basis と同値)。bundle 再挑戦の候補 =
-      `@Basis.mk` 全 instance 明示 / instance 径路の pin / mathlib 側の module-instance 整理待ち。
-      (追記: spanning を `span_eq_top_of_card_eq_finrank` の theorem 形で出す試みも同じ
-      isDefEq 発散 — bundle/spanning とも同根で pending。)
+      **bundled `Module.Basis` ✅ 2026-07-24 (hub、Pi-側転送で解決)**:
+      `algAutMulBilinBasis` + `_apply` simp。二重入れ子空間上の直接構成は
+      whnf/isDefEq 発散 (maxHeartbeats 3.2M 不足、`Add.add` 23,535 回 unfold;
+      `LinearIndependent.map'` での独立性転送も同根で発散 @1.6M) —
+      **効いたルート**: 入れ子空間を通せる唯一の演算 `of_comp` に合わせ、
+      Pi-空間 avatar `i ↦ σ(bᵢ) • τ` の独立性を関数空間 Dedekind から直接
+      導出 (`linearIndependent_bilinPi`; key = `constr_smul_toLinearMap`:
+      constr が avatar を σ(x)τ(y) に運ぶ、`Basis.ext` + `constr_basis` の
+      pointwise 証明) → Pi 空間で `basisOfLinearIndependentOfCardEqFinrank`
+      → `Basis.map` (constr equiv) で入れ子空間へ。set_option 増量も不要
+      (default 200k で通過)。
       **(c) ✅ 2026-07-24 (hub、独立性側)**: `autMulQuadraticMap σ τ` (QuadraticMap (ZMod 2)、
       companion = `algAutMulBilin στ + τσ`) / **`autMulQuadratic_coeff_symm`** (消える結合の
       係数は対称 — polar 化で対角が char 2 消滅し、swap 再指数 + 積 monoid 指標の Dedekind

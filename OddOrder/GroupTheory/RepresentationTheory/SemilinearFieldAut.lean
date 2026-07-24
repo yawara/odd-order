@@ -431,6 +431,87 @@ theorem card_autProd_eq_finrank_bilinMap [Finite F]
     IsGalois.card_aut_eq_finrank (ZMod p) F,
     finrank_bilinMap_self_eq F p]
 
+/-- Evaluating the Lemma 2(b) family on an `𝔽_p`-basis of `F`: the
+`Basis.constr` equivalence carries the `Pi`-space family
+`i ↦ σ(bᵢ) • τ` to the bilinear map `(x, y) ↦ σ(x)·τ(y)`. -/
+private theorem constr_smul_toLinearMap [Finite F] {ι : Type*}
+    (b : Module.Basis ι (ZMod p) F) (σ τ : F ≃ₐ[ZMod p] F) :
+    (b.constr (M' := F →ₗ[ZMod p] F) F)
+        (fun i => σ (b i) • τ.toLinearMap) =
+      algAutMulBilin F p σ τ := by
+  refine b.ext fun i => ?_
+  rw [Module.Basis.constr_basis]
+  refine LinearMap.ext fun y => ?_
+  simp [smul_eq_mul]
+
+/-- Independence of the `Pi`-space avatar `i ↦ σ(bᵢ) • τ` of the
+Lemma 2(b) family — proved from Dedekind independence of the pair
+characters entirely on the function-space side (`of_comp`), never
+touching the doubly-nested hom space. -/
+private theorem linearIndependent_bilinPi [Finite F] {ι : Type*}
+    (b : Module.Basis ι (ZMod p) F) :
+    LinearIndependent F
+      (fun στ : (F ≃ₐ[ZMod p] F) × (F ≃ₐ[ZMod p] F) =>
+        fun i => στ.1 (b i) • στ.2.toLinearMap) := by
+  classical
+  have h0 : LinearIndependent F (fun f : (F × F) →* F => (f : F × F → F)) :=
+    linearIndependent_monoidHom (F × F) F
+  have hinj : Function.Injective
+      (fun στ : (F ≃ₐ[ZMod p] F) × (F ≃ₐ[ZMod p] F) =>
+        algAutPairChar F p στ.1 στ.2) := by
+    intro στ στ' h
+    have happ : ∀ x y : F, στ.1 x * στ.2 y = στ'.1 x * στ'.2 y := fun x y =>
+      DFunLike.congr_fun h (x, y)
+    have h1 : ∀ x : F, στ.1 x = στ'.1 x := fun x => by
+      have := happ x 1
+      simpa using this
+    have h2 : ∀ y : F, στ.2 y = στ'.2 y := fun y => by
+      have := happ 1 y
+      simpa using this
+    exact Prod.ext (AlgEquiv.ext h1) (AlgEquiv.ext h2)
+  have hchar := h0.comp _ hinj
+  have hGP : (⇑((coeFnBilin F p).comp
+        (b.constr (M' := F →ₗ[ZMod p] F) F).toLinearMap)) ∘
+      (fun στ : (F ≃ₐ[ZMod p] F) × (F ≃ₐ[ZMod p] F) =>
+        fun i => στ.1 (b i) • στ.2.toLinearMap) =
+      (fun f : (F × F) →* F => (f : F × F → F)) ∘
+        (fun στ : (F ≃ₐ[ZMod p] F) × (F ≃ₐ[ZMod p] F) =>
+          algAutPairChar F p στ.1 στ.2) := by
+    funext στ
+    change (coeFnBilin F p) ((b.constr (M' := F →ₗ[ZMod p] F) F)
+      (fun i => στ.1 (b i) • στ.2.toLinearMap)) = _
+    rw [constr_smul_toLinearMap]
+    rfl
+  rw [← hGP] at hchar
+  exact hchar.of_comp _
+
+/-- **Peterfalvi Appendix III, Lemma 2(b), bundled form** (p. 140): the
+maps `(x, y) ↦ σ(x)·τ(y)` are an `F`-basis of the `𝔽_p`-bilinear maps
+`F × F → F`.  The term is constructed in the plain `Pi` function space
+`Fin n → (F →ₗ[𝔽_p] F)` (whose instances are pointwise) and transported
+along the `Basis.constr` equivalence; constructing it directly in the
+doubly-nested hom space diverges in `whnf`/`isDefEq` (see the packaging
+note below and issue 0148). -/
+noncomputable def algAutMulBilinBasis [Finite F] :
+    Module.Basis ((F ≃ₐ[ZMod p] F) × (F ≃ₐ[ZMod p] F)) F
+      (F →ₗ[ZMod p] F →ₗ[ZMod p] F) :=
+  letI : Fintype F := Fintype.ofFinite F
+  letI : Fintype (F ≃ₐ[ZMod p] F) := Fintype.ofFinite _
+  (basisOfLinearIndependentOfCardEqFinrank
+    (linearIndependent_bilinPi F p (Module.finBasis (ZMod p) F))
+    ((card_autProd_eq_finrank_bilinMap F p).trans
+      (LinearEquiv.finrank_eq
+        ((Module.finBasis (ZMod p) F).constr
+          (M' := F →ₗ[ZMod p] F) F)).symm)).map
+    ((Module.finBasis (ZMod p) F).constr (M' := F →ₗ[ZMod p] F) F)
+
+@[simp] theorem algAutMulBilinBasis_apply [Finite F]
+    (σ τ : F ≃ₐ[ZMod p] F) :
+    algAutMulBilinBasis F p (σ, τ) = algAutMulBilin F p σ τ := by
+  simp only [algAutMulBilinBasis, Module.Basis.map_apply,
+    coe_basisOfLinearIndependentOfCardEqFinrank]
+  exact constr_smul_toLinearMap F p _ σ τ
+
 /-! ### Peterfalvi Appendix III, Lemma 2(c) — independence side
 
 The `𝔽₂`-quadratic maps `x ↦ σ(x)·τ(x)`: a vanishing linear combination over
@@ -850,17 +931,18 @@ theorem exists_algAut_expansion_algebraMap_comp (g : K →ₗ[ZMod p] K) :
 
 end ExpansionLift
 
-/-! **Lemma 2(b), packaging note.**  `linearIndependent_algAutMulBilin` +
-`card_autProd_eq_finrank_bilinMap` jointly state that the family
-`(x, y) ↦ σ(x)·τ(y)` is a basis (a linearly independent family whose
-cardinality equals the finrank spans, in finite dimensions).  The bundled
-`Module.Basis` term (via `basisOfLinearIndependentOfCardEqFinrank`, as in
-Lemma 2(a)) hits a `whnf`/`isDefEq` divergence in the doubly-nested
-`F →ₗ[ZMod p] F →ₗ[ZMod p] F` module-instance stack (issue 0148 に診断記録;
-`maxHeartbeats 3200000` でも不足、`Add.add` 2 万回超 unfold).
-`span_eq_top_of_card_eq_finrank` alone diverges the same way, so the
-spanning half is likewise recorded as pending packaging.  Consumers that need the
-bundled basis should construct it at use-site or resume from the 0148 note. -/
+/-! **Lemma 2(b), packaging note.**  The bundled basis is
+`algAutMulBilinBasis`.  Direct construction in the doubly-nested
+`F →ₗ[ZMod p] F →ₗ[ZMod p] F` module-instance stack diverges in
+`whnf`/`isDefEq` (`maxHeartbeats 3200000` でも不足、`Add.add` 2 万回超
+unfold; transporting `linearIndependent_algAutMulBilin` through
+`LinearIndependent.map'` diverges the same way — issue 0148 に診断記録).
+The working route mirrors the one nested-space operation that elaborates
+cheaply, `LinearIndependent.of_comp`: prove independence of the `Pi`-space
+avatar `i ↦ σ(bᵢ) • τ` from the function-space Dedekind argument
+(`linearIndependent_bilinPi`), build the basis there with
+`basisOfLinearIndependentOfCardEqFinrank`, and transport along the
+`Basis.constr` equivalence with `Basis.map`. -/
 
 end FiniteFieldAut
 

@@ -12644,6 +12644,8 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 -- Peterfalvi App.III Lemma 2(b) (σ(x)τ(y) family: independent + count = dim ⟹ basis)
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.linearIndependent_algAutMulBilin
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_autProd_eq_finrank_bilinMap
+-- Peterfalvi App.III Lemma 2(b) bundled basis (Pi-side construction, Basis.constr transport)
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.algAutMulBilinBasis
 -- Peterfalvi App.III Lemma 2(c) (σ(x)τ(x) family: symmetric coefficients + diagonal vanishing)
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.autMulQuadratic_coeff_symm
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.autMulQuadratic_diag_eq_zero
