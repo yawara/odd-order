@@ -783,6 +783,73 @@ theorem exists_smul_algAut_of_norm_intertwiner [Finite F]
 
 end QuadraticChar2
 
+/-! ### Lifting an automorphism expansion along a normal extension
+
+The Proposition 2 glue: an `𝔽_p`-linear map `g : K → K` expands over
+`Aut(K)` by Lemma 2(a); along a finite extension `K ⊆ E` every automorphism
+of `K` lifts to `E` (finite extensions of finite fields are normal), so the
+composite `w ↦ ι(g(w))` is a combination `∑ ρ, μ_ρ·ρ` of automorphisms of
+the big field evaluated on `ι(K)`. -/
+
+section ExpansionLift
+
+variable {K E : Type*} [Field K] [Field E] (p : ℕ) [Fact p.Prime]
+  [Algebra (ZMod p) K] [Algebra (ZMod p) E] [Algebra K E]
+  [IsScalarTower (ZMod p) K E] [Finite K] [Finite E]
+
+/-- **Scalar-side expansion over the big automorphism group** (toward
+Peterfalvi Appendix III, Proposition 2): for an `𝔽_p`-linear `g : K → K`
+and a finite extension `K ⊆ E` there are coefficients `μ_ρ ∈ E` with
+`ι(g(w)) = ∑ ρ ∈ Aut(E), μ_ρ·ρ(ι(w))`. -/
+theorem exists_algAut_expansion_algebraMap_comp (g : K →ₗ[ZMod p] K) :
+    ∃ μ : (E ≃ₐ[ZMod p] E) → E,
+      haveI : Fintype (E ≃ₐ[ZMod p] E) := Fintype.ofFinite _
+      ∀ w : K, algebraMap K E (g w) =
+        ∑ ρ : E ≃ₐ[ZMod p] E, μ ρ * ρ (algebraMap K E w) := by
+  classical
+  letI : Fintype (K ≃ₐ[ZMod p] K) := Fintype.ofFinite _
+  letI : Fintype (E ≃ₐ[ZMod p] E) := Fintype.ofFinite _
+  -- Lemma 2(a) expansion of `g` over `Aut(K)`
+  obtain ⟨m, hg⟩ : ∃ m : (K ≃ₐ[ZMod p] K) → K,
+      ∀ w : K, g w = ∑ ρ' : K ≃ₐ[ZMod p] K, m ρ' * ρ' w := by
+    refine ⟨fun ρ' => (algAutLinearBasis K p).repr g ρ', fun w => ?_⟩
+    have h := congrArg (fun t : K →ₗ[ZMod p] K => t w)
+      ((algAutLinearBasis K p).sum_repr g)
+    simp only [LinearMap.sum_apply, LinearMap.smul_apply,
+      algAutLinearBasis_apply, AlgEquiv.toLinearMap_apply, smul_eq_mul] at h
+    exact h.symm
+  -- a set-theoretic section of the surjective restriction homomorphism
+  choose L hL using AlgEquiv.restrictNormalHom_surjective
+    (F := ZMod p) (E := E) (K₁ := K)
+  refine ⟨fun ρ => ∑ ρ' ∈ Finset.univ.filter fun ρ' => L ρ' = ρ,
+    algebraMap K E (m ρ'), fun w => ?_⟩
+  have hlift : ∀ ρ' : K ≃ₐ[ZMod p] K,
+      algebraMap K E (ρ' w) = L ρ' (algebraMap K E w) := by
+    intro ρ'
+    have h1 := DFunLike.congr_fun (hL ρ') w
+    rw [← h1]
+    exact AlgEquiv.restrictNormal_commutes (L ρ') K w
+  calc algebraMap K E (g w)
+      = ∑ ρ' : K ≃ₐ[ZMod p] K,
+          algebraMap K E (m ρ') * L ρ' (algebraMap K E w) := by
+        rw [hg w, map_sum]
+        exact Finset.sum_congr rfl fun ρ' _ => by rw [map_mul, hlift ρ']
+    _ = ∑ ρ : E ≃ₐ[ZMod p] E, ∑ ρ' ∈ Finset.univ.filter fun ρ' => L ρ' = ρ,
+          algebraMap K E (m ρ') * L ρ' (algebraMap K E w) :=
+        (Finset.sum_fiberwise Finset.univ (fun ρ' => L ρ') fun ρ' =>
+          algebraMap K E (m ρ') * L ρ' (algebraMap K E w)).symm
+    _ = ∑ ρ : E ≃ₐ[ZMod p] E, ∑ ρ' ∈ Finset.univ.filter fun ρ' => L ρ' = ρ,
+          algebraMap K E (m ρ') * ρ (algebraMap K E w) := by
+        refine Finset.sum_congr rfl fun ρ _ =>
+          Finset.sum_congr rfl fun ρ' hρ' => ?_
+        rw [(Finset.mem_filter.mp hρ').2]
+    _ = ∑ ρ : E ≃ₐ[ZMod p] E,
+          (∑ ρ' ∈ Finset.univ.filter fun ρ' => L ρ' = ρ,
+            algebraMap K E (m ρ')) * ρ (algebraMap K E w) :=
+        Finset.sum_congr rfl fun ρ _ => (Finset.sum_mul _ _ _).symm
+
+end ExpansionLift
+
 /-! **Lemma 2(b), packaging note.**  `linearIndependent_algAutMulBilin` +
 `card_autProd_eq_finrank_bilinMap` jointly state that the family
 `(x, y) ↦ σ(x)·τ(y)` is a basis (a linearly independent family whose

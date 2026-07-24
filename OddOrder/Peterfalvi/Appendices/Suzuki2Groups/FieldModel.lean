@@ -280,6 +280,39 @@ theorem mul_conj (a b : F) :
           (algebraMap F (FieldModel ε) b) ^ 2 *
             algebraMap F (FieldModel ε) ε * alpha ε)
 
+/-! ### Fixed points of the conjugation -/
+
+/-- Conjugation in coordinates: `κ(a + bα) = (a + bε) + bα`. -/
+theorem conj_equivProd (a b : F) :
+    conj ε (equivProd ε (a, b)) = equivProd ε (a + b * ε, b) := by
+  rw [equivProd_apply, equivProd_apply, map_add, map_mul, conj_alpha,
+    (conj ε).commutes, (conj ε).commutes, map_add, map_mul]
+  ring
+
+/-- **The fixed points of the conjugation are exactly the scalars** (for
+`ε ≠ 0`): in coordinates `κ(a + bα) = (a + bε) + bα`, so fixedness forces
+`b = 0`. -/
+theorem conj_eq_self_iff (hε : ε ≠ 0) (x : FieldModel ε) :
+    conj ε x = x ↔ x ∈ (algebraMap F (FieldModel ε)).range := by
+  obtain ⟨⟨a, b⟩, rfl⟩ := (equivProd ε).surjective x
+  constructor
+  · intro h
+    rw [conj_equivProd] at h
+    have hab := (equivProd ε).injective h
+    have hb : b * ε = 0 := by
+      have h2 := congrArg Prod.fst hab
+      simp only at h2
+      linear_combination h2
+    have hb0 : b = 0 := by
+      rcases mul_eq_zero.mp hb with h' | h'
+      · exact h'
+      · exact absurd h' hε
+    refine ⟨a, ?_⟩
+    rw [hb0, equivProd_apply, map_zero, zero_mul, add_zero]
+  · rintro ⟨c, hc⟩
+    rw [← hc]
+    exact (conj ε).commutes c
+
 /-! ### Surjectivity of the norm (step (iv) of Proposition 2)
 
 Over a finite `F` of characteristic `2` no counting is needed: squaring is
