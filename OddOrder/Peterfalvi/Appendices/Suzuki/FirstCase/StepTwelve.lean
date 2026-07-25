@@ -781,6 +781,64 @@ theorem exists_normal_overgroup_cube
       this.conj_mem y hy ⟨n, hn⟩
     exact ⟨_, h1, rfl⟩
 
+include model in
+/-- **`T ⊴ N_G(R)`** ((12) tail, `m = 1`): a conjugate of `T` inside `R` of order `p`
+either stays in `T` (hence equals it) or lands in `𝒜` — but then invariance of the
+orbit `𝒜` would place `T` itself in `𝒜`, absurd. -/
+theorem conj_sInvertedT_eq_of_mem_normalizer
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {n : G}
+    (hn : n ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) :
+    MulAut.conj n • fc.sInvertedT model = fc.sInvertedT model := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set NR : Subgroup G :=
+    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
+  letI act : MulAction ↥NR (Subgroup G) :=
+    MulAction.compHom _ ((MulAut.conj : G →* MulAut G).comp NR.subtype)
+  have horb := fc.orbit_eq_setOf_prime_order model ind hB2 hm hGp hSigma
+  obtain ⟨hTle, -, -, hTinf⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hTcard : Nat.card ↥(fc.sInvertedT model) = fc.p := by
+    rw [fc.card_sInvertedT model ind hB2 hm, hm, pow_one]
+  have hXcard : Nat.card ↥(MulAut.conj n • fc.sInvertedT model) = fc.p := by
+    rw [← hTcard]
+    exact (Nat.card_congr
+      (Subgroup.equivSMul (MulAut.conj n) (fc.sInvertedT model)).toEquiv).symm
+  have hXle : MulAut.conj n • fc.sInvertedT model ≤ fc.invImageF model := by
+    intro x hx
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hx
+    have h2 : ((MulAut.conj n)⁻¹ • x : G) = n⁻¹ * x * n := by
+      have h3 : ((MulAut.conj n)⁻¹ • x : G) = (MulAut.conj n)⁻¹ x := rfl
+      rw [h3, ← map_inv, MulAut.conj_apply]
+      group
+    rw [h2] at hx
+    have h4 : n⁻¹ * x * n ∈ fc.invImageF model := (hTle.trans le_rfl) hx
+    have h5 := (Subgroup.mem_set_normalizer_iff.mp hn (n⁻¹ * x * n)).mp h4
+    have h6 : n * (n⁻¹ * x * n) * n⁻¹ = x := by group
+    rwa [h6] at h5
+  by_cases hXT : MulAut.conj n • fc.sInvertedT model ≤ fc.sInvertedT model
+  · exact Subgroup.eq_of_le_of_card_ge hXT (by rw [hXcard, hTcard])
+  · exfalso
+    have hXA : MulAut.conj n • fc.sInvertedT model ∈ MulAction.orbit ↥NR fc.P := by
+      rw [horb]
+      exact ⟨hXle, hXcard, hXT⟩
+    obtain ⟨k, hk⟩ := hXA
+    have hTA : fc.sInvertedT model ∈ MulAction.orbit ↥NR fc.P := by
+      refine ⟨(⟨n, hn⟩ : ↥NR)⁻¹ * k, ?_⟩
+      change ((⟨n, hn⟩ : ↥NR)⁻¹ * k) • fc.P = fc.sInvertedT model
+      have hk' : k • fc.P = MulAut.conj n • fc.sInvertedT model := hk
+      have h1 : ((⟨n, hn⟩ : ↥NR)⁻¹ * k) • fc.P
+          = (⟨n, hn⟩ : ↥NR)⁻¹ • (k • fc.P) := mul_smul _ _ _
+      have h2 : (⟨n, hn⟩ : ↥NR) • fc.sInvertedT model
+          = MulAut.conj n • fc.sInvertedT model := rfl
+      rw [h1, hk', ← h2, inv_smul_smul]
+    rw [horb] at hTA
+    exact hTA.2.2 le_rfl
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
