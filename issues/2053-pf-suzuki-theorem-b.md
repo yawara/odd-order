@@ -689,3 +689,27 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   (γ) R₁ = 正規正則部分群の preimage, |R₁| = p³ Sylow → (δ) N_G(R₁) = N_G(R)
   ((11) 型 regularity) → (ε) Isaacs Cor 10.2 transfer → index-p normal →
   ¬(B2) 矛盾 → step_twelve endpoint「(10.2) が成立」。
+
+### (12) tail の PDF 確定読解 (p. 112、2026-07-25 Read で確認)
+
+書籍原文の連鎖 (「As R₁ is non-abelian of order p³...」以降):
+1. **R₁ 非可換**: 可換なら R₁ ≤ C_G(R) = R (centralizer_invImageF_eq!) と
+   |R₁| = p³ > p² が矛盾 — 無料。class 2 < p (p ≥ 3)。
+2. **Hall–Wielandt (class < p 版)**: G/O^p(G) = N_G(R₁)/O^p(N_G(R₁))。
+   repo 資産 = transfer_range_eq_of_nilpotencyClass_lt (Isaacs Cor 10.2) を確認。
+3. **T ⊴ R₁** (δ1): n ∈ R₁ ≤ N_G(R) の n•T は R 内位数 p、n•T ∈ 𝒜 なら
+   orbit 不変性で T ∈ 𝒜 (偽: T ≤ T)、ゆえ ¬(¬ n•T ≤ T) → n•T = T。easy。
+4. **R₁/T 可換** (位数 p² — 自明)。**C_{R₁/R}(s) = 1** = [s] が R₁/R を反転
+   (δ2): ±1 論法の hinv を public 化 — 任意の対合 u ∈ NR/R は σ を反転
+   (k ≡ 1 側は mem_zpowers_of_centralizes → 奇数位数の対合で消滅)。
+   [s] は対合 (s ∉ R、s² = 1)。
+5. **R₁/T = (R/T) × (T₁/T)**, T₁ = [R₁/T, s] 逆像 (δ3): R/T ≅ P は s 中心化、
+   T₁/T は s 反転 — sInvertedT パターンの 1 段上再演。
+6. **N_G(R₁) = N_G(R)** (δ4): 𝒜₁ := R₁/T の位数 p 部分群 ∖ {T₁/T}。
+   C_Q(P) が 𝒜₁ − {R/T} に正則 ((11) 同様) → N_G(R) ⊊ N_G(R₁) なら
+   [N_G(R₁):N_G(R)] = |𝒜₁| = p が (10) に矛盾。
+7. **(ε)**: T₁ は C_Q(P)C_W(P) と P に正規化される → T₁C_Q(P)C_W(P) が
+   N_G(R₁) 内 index p 正規 → 2 と合わせ G に index p 正規部分群 → (B2) 偽 □
+※ (13)–(17) (pp. 113–114 Read 済) は (10.2) 側 endgame (p=3, Z₁=⟨st⟩,
+  PSL(2,8), 弱閉 Z₁PΣ の Hall–Wielandt 可換版, R₂⟨s⟩) — (12) とは独立の次章。
+  (14) は本 campaign の kernel-同定機構 (N_G(RΣ) ↷ 𝒜₂, kernel = RΣ) を再利用可。
