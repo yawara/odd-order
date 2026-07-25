@@ -560,6 +560,26 @@ Ch.2 は全ファイル sorry-free。
 3. `eq_inv_of_mul_eq_one_left h : up = up⁻¹` を simp 補題にすると `up → up⁻¹ → up⁻¹⁻¹ → …` で
    無限ループ (maxRecDepth 到達)。`inv_eq_of_mul_eq_one_left` (`up⁻¹ = up`) を使うこと。
 
+### §3A leaf の分割 (2026-07-25)
+
+`Ch03/Problems.lean` が 1363 行になり上限 1500 に近づいたため、先頭の 3A.1 (semidihedral) /
+3A.2 (一般化四元数群) クラスタを sibling leaf `ProblemsSemidihedral.lean` へ **prefix-split**
+(元 `Problems.lean` がそれを import、module 名不変で下流無影響)。
+分割後: `ProblemsSemidihedral.lean` 588 行 / `Problems.lean` 801 行。宣言数 93 が一致すること
+を確認済。`OddOrder.lean` 配線も同 commit。
+
+### 3A.10 のメモ (次の frontier)
+
+`G := Multiplicative (ZMod p) ≀[H] H` (正則 wreath product)、`A := base group` で全部出る:
+- `A` 正規 (`range_inl_eq_ker_rightHom`)、可換 (成分ごと)、`p`-群 (`|A| = p^|H|`)。
+- `G` は `A` 上分裂 (`inr` が切断)、`G/A ≅ H` (`rightHom` 全射・核 = `A`)。
+- **`A = C_G(A)`**: `x = ⟨f,h⟩` の base への共役は `inl b ↦ inl (b ∘ (h⁻¹ · ·))`
+  (base が可換なので `f` は効かない) ゆえ、中心化条件は `∀ b ω, b(h⁻¹ω) = b(ω)`。
+  `b` を `{1}` の指示関数に取ると `h = 1`、すなわち `x = inl f ∈ A` (3A.9(b) と同じ指示関数の技)。
+  ⚠ この共役公式の補題は今回書きかけて外した (`inl_left_mul_inr_right` に相当する
+  `WreathProduct` 版の分解補題が無いので、`WreathProduct.ext` + `mul_left`/`inv_left` で
+  直接計算する必要がある)。
+
 ### 3A.6 の解析 (2026-07-25、deferred-hard として記録)
 
 **確立できた部分** (次に着手する人はここから始めてよい):
@@ -674,7 +694,7 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
 | 3A.6 | ⏸ **deferred-hard** (2026-07-25 に解析; 下記) |
 | 3A.7 | ⬜ `α ∈ Aut(G)`, `o(α)` の素因子が 2 個以下 ⟹ `⟨α⟩` は `G` 上に regular orbit をもつ |
 | 3A.8 | ✅ **完了** ((a)(b)(c) すべて) |
-| 3A.9 | (a) ✅ (2026-07-25) / (b) ⬜ regular wreath で `C_G(b) = C` なる `b ∈ B` が存在 |
+| 3A.9 | ✅ **完了** ((a)(b)) |
 | 3A.10 | ⬜ 任意の有限群 `H` と素数 `p` に対し、正規可換 `p`-部分群 `A` で `G` が `A` 上分裂し `G/A ≅ H`, `A = C_G(A)` なる `G` が存在 |
 
 - ⬜ **次: §3A 続き or §2A hard tail 再訪。§1D 残り = 1D.5 (Isaacs-noted-hardest)。**
@@ -717,4 +737,5 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 ⚠ `Ch03/Problems.lean` は **1363 行** (上限 1500) — **次の追加の前に §3A leaf を分割する**
 (CLAUDE.md のファイル粒度規約: 3A.1/3A.2 の semidihedral・一般化四元数クラスタ (~550 行) を
 別 leaf へ出すのが自然)。
-**次 frontier = §3A leaf の分割 → 3A.9(b) / 3A.10 → 3A.6 / 3A.7 に戻る → §3B〜。**
+さらに **§3A leaf 分割 ✅ / 3A.9(b) ✅ (3A.9 完了)**。
+**次 frontier = 3A.10** (メモは §3A 節) → 3A.6 / 3A.7 に戻る → §3B〜。
