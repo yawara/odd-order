@@ -923,6 +923,49 @@ theorem not_sigma_sup_P_le_commutator_sylowThree
     omega) hdvd
   omega
 
+/-! ## The endpoint of (17) -/
+
+include model in
+/-- **The final contradiction of (17)** (p. 114), as an engine parameterised by its two
+remaining inputs.
+
+* `hcontrol` is the transfer-control conclusion: by the weak closure of the abelian
+  `Z₁PΣ` in `R₂` (`map_conj_eq_of_le_sylow`), the Hall–Wielandt theorem gives
+  `G/O³(G) ≅ N_G(Z₁PΣ)/O³(N_G(Z₁PΣ))`, so hypothesis (B2) (`p ∤ |G^{ab}|`) transports
+  to `N_G(Z₁PΣ)`.  See issue 9503.
+* `hW3` is the `|W| = 3` branch, where `R₂ = R₁` and the structure of `R̄₁ = R₁/Z₁`
+  produces the quotient of order `3`; the `|W| = 9` branch is
+  `three_dvd_card_abelianization_of_card_W_eq_nine`, proved above. -/
+theorem false_of_transfer_control
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
+    (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G))
+    (hcontrol : ¬ (3 : ℕ) ∣ Nat.card (Abelianization
+      ↥(Subgroup.normalizer ((((Subgroup.zpowers
+            (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+          ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P)
+            : Subgroup G) : Set G))))
+    (hW3 : Nat.card ↥fc.toHypothesis.W = 3 →
+      (3 : ℕ) ∣ Nat.card (Abelianization ↥((S : Subgroup G)
+        ⊔ Subgroup.zpowers fc.toHypothesis.distinguishedInvolution))) :
+    False := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  obtain ⟨-, -, -, -, hW, -⟩ := fc.step_twelve model ind hB2
+  have hNeq : Subgroup.normalizer ((((Subgroup.zpowers
+        (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P)
+        : Subgroup G) : Set G)
+      = (S : Subgroup G)
+        ⊔ Subgroup.zpowers fc.toHypothesis.distinguishedInvolution := by
+    rw [← fc.normalizer_zpowers_eq_normalizer_zpowers_sup_sigma_sup_P model ind hB2
+      S hR₁S]
+    exact fc.normalizer_zpowers_eq_sylow_sup_zpowers model ind hB2 S hR₁S
+  rw [hNeq] at hcontrol
+  rcases hW with h3 | h9
+  · exact hcontrol (hW3 h3)
+  · exact hcontrol
+      (fc.three_dvd_card_abelianization_of_card_W_eq_nine model ind hB2 S hR₁S h9)
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
