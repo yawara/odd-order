@@ -585,3 +585,10 @@ preimage、step (7) の N = P 使用)。主張:
   次 = **T := [R,s] 分解**: s = Q₀ 側の distinguished involution (StepSeven の s/t 系を確認)、
   R abelian + s が R を正規化 → T = {r·(s r s⁻¹)⁻¹ | r ∈ R}-型の構成 or [R,s] 部分群 +
   R = T × C_R(s) = T × P (C_R(s) = P は s-fixed part)。その後 𝒜 の定義と正則性。
+- **R = T × P 分解完成** (`55906c7ee`): `exists_sInverted_complement` — T = s-反転部分群、
+  T⊔P=R / T⊓P=⊥ / s-inverted。並進側の ψ(x)=x·u−x 単射→全射が核。
+  残 (11): (i) T の C_Q(P)C_W(P)-正規化句 — c が s と可換なら即時; s の Q₀-中心性
+  or unique_involution_in_H 経由で c s c⁻¹ = s を先に確立するのが筋。
+  (ii) 𝒜 := {位数 p の R-部分群で T ⊄} の |𝒜| = p^m と C_Q(P) 正則性
+  (a ∈ C_Q(P)# が P₁ ∈ 𝒜 を正規化 → [a,P₁] ⊆ P₁∩T = 1 → a が P₁ 中心化 →
+  a fpf on R/P (u-乗の固定点なし) → P₁ = P)。
