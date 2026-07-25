@@ -33,6 +33,26 @@ variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
   (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     NearFields.AffineNearFieldModel fc.rankOneQuotient F)
 
+/-- **`T = [R, s]`** (step (11), p. 111): the subgroup of `R` cut out by the elements
+inverted by the distinguished involution, packaged as a closure so the definition needs
+no abelianness; once `R` is abelian (`invImageF_mul_comm`) the generating set is itself
+a subgroup and `sInvertedT_spec` collapses the closure. -/
+noncomputable def sInvertedT : Subgroup G :=
+  Subgroup.closure {x | x ∈ fc.invImageF model ∧
+    fc.toHypothesis.distinguishedInvolution * x
+      * fc.toHypothesis.distinguishedInvolution⁻¹ = x⁻¹}
+
+/-- The distinguished involution centralizes `Q`: it lies in `Q₀` (the involutions of
+`H`), and `Q₀ ≤ C_G(Q)` (Ch. I §2, `Q0_le_centralizer_Q`). -/
+theorem distinguishedInvolution_commute_of_mem_Q {a : G} (ha : a ∈ fc.toHypothesis.Q) :
+    fc.toHypothesis.distinguishedInvolution * a
+      = a * fc.toHypothesis.distinguishedInvolution := by
+  have hs0 : fc.toHypothesis.distinguishedInvolution ∈ fc.toHypothesis.Q0 :=
+    ⟨fc.toHypothesis.distinguishedInvolution_sq,
+      fc.toHypothesis.distinguishedInvolution_mem_H⟩
+  exact (Subgroup.mem_centralizer_iff.mp
+    (fc.toHypothesis.Q0_le_centralizer_Q hs0) a ha).symm
+
 include model in
 /-- **Step (11), second assertion (decomposition): `R = T × P`** in existence form —
 `T := {r ∈ R | s·r·s⁻¹ = r⁻¹}`, the elements inverted by the distinguished involution,
@@ -41,15 +61,15 @@ is a complement of `P` in the abelian `R`.  Mechanism: `s` centralizes `P`, so
 right multiplication by `u := qEquiv [s]⁻¹ ≠ 1`, whose fixed points vanish by
 cancellation, making `x ↦ x·u − x` injective hence surjective on the finite `F` —
 so `T` covers every translation class. -/
-theorem exists_sInverted_complement
+theorem sInvertedT_spec
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
     (hm : Nat.card F = fc.p ^ m) :
-    ∃ T : Subgroup G,
-      T ≤ fc.invImageF model ∧
-      (∀ x ∈ T, fc.toHypothesis.distinguishedInvolution * x
+    fc.sInvertedT model ≤ fc.invImageF model ∧
+      (∀ x ∈ fc.sInvertedT model, fc.toHypothesis.distinguishedInvolution * x
         * fc.toHypothesis.distinguishedInvolution⁻¹ = x⁻¹) ∧
-      T ⊔ fc.P = fc.invImageF model ∧ T ⊓ fc.P = ⊥ := by
+      fc.sInvertedT model ⊔ fc.P = fc.invImageF model ∧
+      fc.sInvertedT model ⊓ fc.P = ⊥ := by
   letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   have hab := fc.invImageF_mul_comm model ind hB2 hm
@@ -224,7 +244,50 @@ theorem exists_sInverted_complement
     rw [hre]
     exact Subgroup.mul_mem _ ((le_sup_right : fc.P ≤ T ⊔ fc.P) hkP)
       ((le_sup_left : T ≤ T ⊔ fc.P) ht₀T)
-  exact ⟨T, hTle, fun x hx => hx.2, hsup, hTP⟩
+  have hTeq : fc.sInvertedT model = T := by
+    rw [sInvertedT, ← hsdef]
+    exact Subgroup.closure_eq T
+  rw [hTeq]
+  exact ⟨hTle, fun x hx => hx.2, hsup, hTP⟩
+
+include model in
+/-- Membership in `T` (once `R` is abelian): exactly the elements of `R` inverted by the
+distinguished involution. -/
+theorem mem_sInvertedT_iff
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) {x : G} :
+    x ∈ fc.sInvertedT model ↔ x ∈ fc.invImageF model ∧
+      fc.toHypothesis.distinguishedInvolution * x
+        * fc.toHypothesis.distinguishedInvolution⁻¹ = x⁻¹ := by
+  constructor
+  · intro hx
+    exact ⟨(fc.sInvertedT_spec model ind hB2 hm).1 hx,
+      (fc.sInvertedT_spec model ind hB2 hm).2.1 x hx⟩
+  · intro hx
+    exact Subgroup.subset_closure hx
+
+include model in
+/-- **`C_Q(P)` normalizes `T`** (step (11), p. 112): the distinguished involution is
+central in `Q`, so conjugation by `a ∈ C_Q(P)` preserves the `s`-inverted condition. -/
+theorem conj_mem_sInvertedT_of_mem_Q
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) {a x : G}
+    (haQ : a ∈ fc.toHypothesis.Q) (haL : a ∈ Subgroup.centralizer (fc.P : Set G))
+    (hx : x ∈ fc.sInvertedT model) : a * x * a⁻¹ ∈ fc.sInvertedT model := by
+  rw [fc.mem_sInvertedT_iff model ind hB2 hm] at hx ⊢
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  refine ⟨fc.conj_mem_invImageF model haL hx.1, ?_⟩
+  have h1 : s * a = a * s := fc.distinguishedInvolution_commute_of_mem_Q haQ
+  have h2 : a⁻¹ * s⁻¹ = s⁻¹ * a⁻¹ := by
+    rw [← mul_inv_rev, ← mul_inv_rev, h1]
+  calc s * (a * x * a⁻¹) * s⁻¹
+      = (s * a) * x * (a⁻¹ * s⁻¹) := by group
+    _ = (a * s) * x * (s⁻¹ * a⁻¹) := by rw [h1, h2]
+    _ = a * (s * x * s⁻¹) * a⁻¹ := by group
+    _ = a * x⁻¹ * a⁻¹ := by rw [hx.2]
+    _ = (a * x * a⁻¹)⁻¹ := by group
 
 end FirstCaseHypothesis
 
