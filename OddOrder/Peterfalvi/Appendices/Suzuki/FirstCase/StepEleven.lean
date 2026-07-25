@@ -313,6 +313,54 @@ theorem commutator_invImageF_le_P (ind : Hypothesis.TheoremAInductionBelow G Ω)
   have hkG : r₁ * r₂ * r₁⁻¹ * r₂⁻¹ ∈ fc.kernelN := ⟨_, hmemN, rfl⟩
   rwa [fc.kernelN_eq_P ind] at hkG
 
+/-- **`|R| = |F|·|P| (= p^{m+1})`** (p. 111): Lagrange through the quotient — the image of
+`R` in the faithful quotient is `emb(F)` of order `|F|`, and the fibre is `N = P`
+(step (7), inheriting `ind`). -/
+theorem card_invImageF (ind : Hypothesis.TheoremAInductionBelow G Ω) :
+    Nat.card ↥(fc.invImageF model) = Nat.card F * Nat.card ↥fc.P := by
+  classical
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  set Sbar : Subgroup (↥L ⧸ N') := MonoidHom.range model.emb with hSbardef
+  set Rsub : Subgroup ↥L := Sbar.comap (QuotientGroup.mk' N') with hRsubdef
+  -- `|R| = |Rsub|` (push-forward along the injective inclusion).
+  have hcard_R : Nat.card ↥(fc.invImageF model) = Nat.card ↥Rsub :=
+    Nat.card_congr (Subgroup.equivMapOfInjective _ _ (Subgroup.subtype_injective L)).symm.toEquiv
+  -- `Rsub.index = Sbar.index` (`index_comap` + surjectivity of `mk'`).
+  have hidx : Rsub.index = Sbar.index := by
+    rw [hRsubdef, Subgroup.index_comap,
+      MonoidHom.range_eq_top_of_surjective _ (QuotientGroup.mk'_surjective N'),
+      Subgroup.relIndex_top_right]
+  -- Lagrange in `L` and in the quotient, then cancel the common (nonzero) index.
+  have h1 : Nat.card ↥Rsub * Rsub.index = Nat.card ↥L := Rsub.card_mul_index
+  have h2 : Nat.card ↥Sbar * Sbar.index = Nat.card (↥L ⧸ N') := Sbar.card_mul_index
+  have h3 : Nat.card ↥L = Nat.card (↥L ⧸ N') * Nat.card ↥N' :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup N'
+  -- `|Sbar| = |F|` (the embedding is injective).
+  have hSF : Nat.card ↥Sbar = Nat.card F := by
+    rw [hSbardef]
+    exact Nat.card_congr (MonoidHom.ofInjective model.emb_injective).symm.toEquiv
+  -- `|N'| = |P|` (step (7): `kernelN = P`).
+  have hNP : Nat.card ↥N' = Nat.card ↥fc.P := by
+    have h := fc.kernelN_eq_P ind
+    have hcongr : Nat.card ↥fc.kernelN = Nat.card ↥N' :=
+      Nat.card_congr (Subgroup.equivMapOfInjective _ _
+        (Subgroup.subtype_injective L)).symm.toEquiv
+    rw [← hcongr, h]
+  -- assemble
+  have hne : Sbar.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hkey : Nat.card ↥Rsub * Sbar.index
+      = (Nat.card F * Nat.card ↥fc.P) * Sbar.index := by
+    calc Nat.card ↥Rsub * Sbar.index
+        = Nat.card ↥Rsub * Rsub.index := by rw [hidx]
+      _ = Nat.card ↥L := h1
+      _ = Nat.card (↥L ⧸ N') * Nat.card ↥N' := h3
+      _ = (Nat.card ↥Sbar * Sbar.index) * Nat.card ↥N' := by rw [h2]
+      _ = (Nat.card F * Nat.card ↥fc.P) * Sbar.index := by rw [hSF, hNP]; ring
+  rw [hcard_R]
+  exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hne) hkey
+
 /-- **`Z(R) = P` when `R` is nonabelian** (p. 111, proof of (11), first paragraph):
 the center of `R` (as `R ⊓ C_G(R)`) is `C_G(P)`-invariant and sits between `P` and `R`,
 so the dichotomy applies; the top case would make `R` abelian. -/
