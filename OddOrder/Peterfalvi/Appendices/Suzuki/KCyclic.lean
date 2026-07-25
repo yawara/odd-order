@@ -817,6 +817,98 @@ instance K_isCyclic : IsCyclic ↥hyp.K := by
   rw [hK]
   infer_instance
 
+/-! ## `D = K ⋊ V` (Ch. I §1, the Lemma, for the pair `(D, t)`)
+
+`K` is the set of elements of `D` inverted by `t` and `V = C_D(t)` is the set
+of elements centralised by `t`, so the Lemma gives the factorisation
+`D = V·K` with `K ⊴ D` and `K ⊓ V = 1`. -/
+
+include hyp in
+/-- `K ⊓ V = 1`: an element both inverted and centralised by `t` is an
+involution, and `D` has odd order. -/
+lemma K_inf_V_eq_bot : hyp.K ⊓ hyp.V = ⊥ := by
+  rw [eq_bot_iff]
+  intro x hx
+  obtain ⟨hxK, hxV⟩ := Subgroup.mem_inf.mp hx
+  have hxKSet : x ∈ hyp.KSet := by rw [← hyp.coe_K]; exact hxK
+  have hcomm : x * hyp.t = hyp.t * x :=
+    Subgroup.mem_centralizer_singleton_iff.mp hxV.2
+  have h1 : hyp.t * x * hyp.t = x := by
+    calc hyp.t * x * hyp.t = (x * hyp.t) * hyp.t := by rw [hcomm]
+      _ = x * (hyp.t * hyp.t) := by group
+      _ = x := by rw [hyp.t_mul_t, mul_one]
+  have h2 : x = x⁻¹ := by rw [← hxKSet.2, h1]
+  have hsq : x ^ 2 = 1 := by
+    rw [sq]
+    nth_rewrite 2 [h2]
+    exact mul_inv_cancel x
+  rw [Subgroup.mem_bot]
+  exact eq_one_of_sq_eq_one_of_odd_card hyp.D_odd (hyp.K_le_D hxK) hsq
+
+include hyp in
+/-- **`D = V·K`** (Ch. I §1, the Lemma (a) for `(D, t)`): every element of `D`
+factors as a `t`-centralised element times a `t`-inverted one. -/
+lemma exists_mem_V_mul_mem_K {y : G} (hy : y ∈ hyp.D) :
+    ∃ v ∈ hyp.V, ∃ z ∈ hyp.K, y = v * z := by
+  obtain ⟨⟨⟨v, hv⟩, ⟨z, hz⟩⟩, hvz⟩ :=
+    (invertedProdEquiv (X := hyp.D) hyp.t_mul_t hyp.D_odd
+      (fun x hx => hyp.t_conj_mem_D' hx)).surjective ⟨y, hy⟩
+  refine ⟨v, hv, z, ?_, (congrArg Subtype.val hvz).symm⟩
+  rw [← SetLike.mem_coe, hyp.coe_K]
+  exact hz
+
+include hyp in
+/-- **`C_D(K)` meets `V` in the part of order prime to `|K|`** (the group-theoretic
+content of `C_G(K) = C_D(K) = KW`, p. 113): an element of `D` centralising `K`
+whose order is prime to `|K|` lies in `V = C_D(t)`.
+
+Writing `y = v·z` (`v ∈ V`, `z ∈ K`), the factor `v = y·z⁻¹` again centralises
+`K` (as `K` is abelian), so `v` and `z` commute; then `y ^ n = v ^ n · z ^ n`
+for `n = orderOf y` forces `z ^ n = 1` because `K ⊓ V = 1`, and coprimality
+makes `z` trivial. -/
+lemma mem_V_of_mem_centralizer_K_of_coprime {y : G} (hy : y ∈ hyp.D)
+    (hyc : y ∈ Subgroup.centralizer (hyp.K : Set G))
+    (hcop : Nat.Coprime (orderOf y) (Nat.card ↥hyp.K)) : y ∈ hyp.V := by
+  obtain ⟨v, hv, z, hz, rfl⟩ := hyp.exists_mem_V_mul_mem_K hy
+  -- `v` centralises `K`, hence commutes with `z`.
+  have hzc : z ∈ Subgroup.centralizer (hyp.K : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro w hw
+    have hcomm := mul_comm (⟨w, hw⟩ : ↥hyp.K) (⟨z, hz⟩ : ↥hyp.K)
+    exact congrArg Subtype.val hcomm
+  have hvc : v ∈ Subgroup.centralizer (hyp.K : Set G) := by
+    have h1 : v = (v * z) * z⁻¹ := by group
+    rw [h1]
+    exact mul_mem hyc (Subgroup.inv_mem _ hzc)
+  have hcommvz : Commute v z :=
+    (Subgroup.mem_centralizer_iff.mp hvc z hz).symm
+  -- `(vz) ^ n = v ^ n · z ^ n = 1` splits by `K ⊓ V = 1`.
+  set n := orderOf (v * z) with hn_def
+  have hpow : v ^ n * z ^ n = 1 := by
+    rw [← hcommvz.mul_pow]
+    exact pow_orderOf_eq_one _
+  have hzn : z ^ n ∈ hyp.K ⊓ hyp.V := by
+    refine Subgroup.mem_inf.mpr ⟨hyp.K.pow_mem hz n, ?_⟩
+    have h2 : z ^ n = (v ^ n)⁻¹ := by
+      have h5 : (v ^ n)⁻¹ * (v ^ n * z ^ n) = (v ^ n)⁻¹ * 1 := by rw [hpow]
+      rwa [← mul_assoc, inv_mul_cancel, one_mul, mul_one] at h5
+    rw [h2]
+    exact Subgroup.inv_mem _ (hyp.V.pow_mem hv n)
+  rw [hyp.K_inf_V_eq_bot, Subgroup.mem_bot] at hzn
+  -- the order of `z` divides both `n` and `|K|`.
+  have hord1 : orderOf z ∣ n := orderOf_dvd_of_pow_eq_one hzn
+  have hord2 : orderOf z ∣ Nat.card ↥hyp.K := by
+    have heq : orderOf z = orderOf (⟨z, hz⟩ : ↥hyp.K) :=
+      orderOf_injective hyp.K.subtype (Subgroup.subtype_injective _) ⟨z, hz⟩
+    rw [heq]
+    exact orderOf_dvd_natCard _
+  have hz1 : z = 1 := by
+    have h4 := Nat.dvd_gcd hord1 hord2
+    rw [Nat.Coprime.gcd_eq_one hcop, Nat.dvd_one, orderOf_eq_one_iff] at h4
+    exact h4
+  rw [hz1, mul_one]
+  exact hv
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
