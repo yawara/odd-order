@@ -289,6 +289,153 @@ theorem conj_mem_sInvertedT_of_mem_Q
     _ = a * x⁻¹ * a⁻¹ := by rw [hx.2]
     _ = (a * x * a⁻¹)⁻¹ := by group
 
+include model in
+/-- **`w`-conjugates of the distinguished involution differ by `P`** ((11), the
+`C_W(P)`-normalization input): the faithful quotient `H̄` has a *unique* involution
+(`unique_involution_in_H`), so `[w·s·w⁻¹] = [s]` and the difference lies in `N = P`. -/
+theorem exists_conj_distinguishedInvolution_mem_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω) {w : G}
+    (hwW : w ∈ fc.toHypothesis.W) (hwP : w ∈ Subgroup.centralizer (fc.P : Set G)) :
+    ∃ y ∈ fc.P, w * fc.toHypothesis.distinguishedInvolution * w⁻¹
+      = fc.toHypothesis.distinguishedInvolution * y := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  have hsL : s ∈ L :=
+    fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V fc.P_le_V
+  have hs2 : s * s = 1 := by
+    have h := fc.toHypothesis.distinguishedInvolution_sq
+    rwa [pow_two] at h
+  have hcL : w * s * w⁻¹ ∈ L := L.mul_mem (L.mul_mem hwP hsL) (L.inv_mem hwP)
+  have hsQ : s ∈ fc.toHypothesis.Q :=
+    fc.toHypothesis.mem_Q_of_sq_eq_one_of_mem_H
+      fc.toHypothesis.distinguishedInvolution_mem_H
+      fc.toHypothesis.distinguishedInvolution_sq
+  -- `[s] ∈ H̄`, an involution ≠ 1.
+  have hsbarQ : QuotientGroup.mk' N' ⟨s, hsL⟩ ∈ fc.rankOneQuotient.Q :=
+    Subgroup.mem_map_of_mem _ (Subgroup.mem_subgroupOf.mpr hsQ)
+  have hsbarH : QuotientGroup.mk' N' ⟨s, hsL⟩ ∈ fc.rankOneQuotient.H :=
+    fc.rankOneQuotient.Q_le_H hsbarQ
+  have hsb2 : (QuotientGroup.mk' N' ⟨s, hsL⟩) ^ 2 = 1 := by
+    rw [← map_pow]
+    have h1 : (⟨s, hsL⟩ : ↥L) ^ 2 = 1 := by
+      apply Subtype.ext
+      have := hs2
+      rw [pow_two]
+      exact this
+    rw [h1, map_one]
+  have hsb1 : QuotientGroup.mk' N' ⟨s, hsL⟩ ≠ 1 := by
+    intro h
+    rw [QuotientGroup.mk'_apply] at h
+    have hsN : (⟨s, hsL⟩ : ↥L) ∈ N' := (QuotientGroup.eq_one_iff _).mp h
+    have hND : N' ≤ fc.toHypothesis.D.subgroupOf L := by
+      rw [hN'def, fc.toHypothesis.normalCore_cH_eq_centralizer_cQ fc.P_le_V]
+      exact inf_le_left
+    have hsD : s ∈ fc.toHypothesis.D := Subgroup.mem_subgroupOf.mp (hND hsN)
+    have hbot : s ∈ fc.toHypothesis.Q ⊓ fc.toHypothesis.D := ⟨hsQ, hsD⟩
+    rw [fc.toHypothesis.Q_inf_D_eq_bot, Subgroup.mem_bot] at hbot
+    exact fc.toHypothesis.distinguishedInvolution_ne_one hbot
+  -- `[w s w⁻¹] = [w]·[s]·[w]⁻¹ ∈ H̄`, an involution ≠ 1.
+  have hwD : QuotientGroup.mk' N' ⟨w, hwP⟩ ∈ fc.rankOneQuotient.D :=
+    (fc.sigmaElt hwW hwP).2
+  have hwH : QuotientGroup.mk' N' ⟨w, hwP⟩ ∈ fc.rankOneQuotient.H := by
+    have hDH : fc.rankOneQuotient.D ≤ fc.rankOneQuotient.H := by
+      rw [fc.rankOneQuotient.D_def]; exact inf_le_left
+    exact hDH hwD
+  have hceq : QuotientGroup.mk' N' ⟨w * s * w⁻¹, hcL⟩
+      = QuotientGroup.mk' N' ⟨w, hwP⟩ * QuotientGroup.mk' N' ⟨s, hsL⟩
+        * (QuotientGroup.mk' N' ⟨w, hwP⟩)⁻¹ := by
+    rw [← map_inv, ← map_mul, ← map_mul]
+    rfl
+  have hcbH : QuotientGroup.mk' N' ⟨w * s * w⁻¹, hcL⟩ ∈ fc.rankOneQuotient.H := by
+    rw [hceq]
+    exact Subgroup.mul_mem _ (Subgroup.mul_mem _ hwH hsbarH) (Subgroup.inv_mem _ hwH)
+  have hcb2 : (QuotientGroup.mk' N' ⟨w * s * w⁻¹, hcL⟩) ^ 2 = 1 := by
+    have hBB : QuotientGroup.mk' N' ⟨s, hsL⟩ * QuotientGroup.mk' N' ⟨s, hsL⟩ = 1 := by
+      have h := hsb2
+      rwa [pow_two] at h
+    rw [hceq, pow_two]
+    calc (QuotientGroup.mk' N' ⟨w, hwP⟩ * QuotientGroup.mk' N' ⟨s, hsL⟩
+          * (QuotientGroup.mk' N' ⟨w, hwP⟩)⁻¹)
+        * (QuotientGroup.mk' N' ⟨w, hwP⟩ * QuotientGroup.mk' N' ⟨s, hsL⟩
+          * (QuotientGroup.mk' N' ⟨w, hwP⟩)⁻¹)
+        = QuotientGroup.mk' N' ⟨w, hwP⟩
+          * (QuotientGroup.mk' N' ⟨s, hsL⟩ * QuotientGroup.mk' N' ⟨s, hsL⟩)
+          * (QuotientGroup.mk' N' ⟨w, hwP⟩)⁻¹ := by group
+      _ = 1 := by rw [hBB, mul_one, mul_inv_cancel]
+  have hcb1 : QuotientGroup.mk' N' ⟨w * s * w⁻¹, hcL⟩ ≠ 1 := by
+    rw [hceq]
+    intro h
+    have h2 : QuotientGroup.mk' N' ⟨s, hsL⟩ = 1 := by
+      have h3 := congrArg (fun z => (QuotientGroup.mk' N' ⟨w, hwP⟩)⁻¹ * z
+        * QuotientGroup.mk' N' ⟨w, hwP⟩) h
+      simpa [mul_assoc] using h3
+    exact hsb1 h2
+  -- uniqueness in `H̄` forces the classes equal.
+  obtain ⟨u₀, -, hu₀uniq⟩ := model.unique_involution_in_H
+  have h1 : (⟨QuotientGroup.mk' N' ⟨s, hsL⟩, hsbarH⟩ : ↥fc.rankOneQuotient.H) = u₀ := by
+    apply hu₀uniq
+    constructor
+    · exact hsb2
+    · exact fun h => hsb1 h
+  have h2 : (⟨QuotientGroup.mk' N' ⟨w * s * w⁻¹, hcL⟩, hcbH⟩ :
+      ↥fc.rankOneQuotient.H) = u₀ := by
+    apply hu₀uniq
+    constructor
+    · exact hcb2
+    · exact fun h => hcb1 h
+  have h3 : QuotientGroup.mk' N' ⟨w * s * w⁻¹, hcL⟩ = QuotientGroup.mk' N' ⟨s, hsL⟩ :=
+    congrArg Subtype.val (h2.trans h1.symm)
+  -- descend: `(w s w⁻¹)·s⁻¹ ∈ N = P`.
+  have hdQ : QuotientGroup.mk' N' ((⟨w * s * w⁻¹, hcL⟩ : ↥L) * (⟨s, hsL⟩ : ↥L)⁻¹) = 1 := by
+    rw [map_mul, map_inv, h3, mul_inv_cancel]
+  have hdN : (⟨w * s * w⁻¹, hcL⟩ : ↥L) * (⟨s, hsL⟩ : ↥L)⁻¹ ∈ N' := by
+    rw [QuotientGroup.mk'_apply] at hdQ
+    exact (QuotientGroup.eq_one_iff _).mp hdQ
+  have hyP : w * s * w⁻¹ * s⁻¹ ∈ fc.P := by
+    have hker : w * s * w⁻¹ * s⁻¹ ∈ fc.kernelN := ⟨_, hdN, rfl⟩
+    rwa [fc.kernelN_eq_P ind] at hker
+  refine ⟨w * s * w⁻¹ * s⁻¹, hyP, ?_⟩
+  -- `w s w⁻¹ = y·s = s·y` (`s` centralizes `P ∋ y`).
+  have hcs : (w * s * w⁻¹ * s⁻¹) * s = s * (w * s * w⁻¹ * s⁻¹) :=
+    (Subgroup.mem_centralizer_iff.mp hsL _ hyP)
+  calc w * s * w⁻¹ = (w * s * w⁻¹ * s⁻¹) * s := by group
+    _ = s * (w * s * w⁻¹ * s⁻¹) := hcs
+
+include model in
+/-- **`C_W(P)` normalizes `T`** (step (11), p. 112): `w`-conjugation moves `s` only by a
+`P`-correction (`exists_conj_distinguishedInvolution_mem_P`), and `P` is central in `R`,
+so the `s`-inverted condition is preserved. -/
+theorem conj_mem_sInvertedT_of_mem_centralizer_W
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) {w x : G}
+    (hwW : w ∈ fc.toHypothesis.W) (hwP : w ∈ Subgroup.centralizer (fc.P : Set G))
+    (hx : x ∈ fc.sInvertedT model) : w * x * w⁻¹ ∈ fc.sInvertedT model := by
+  rw [fc.mem_sInvertedT_iff model ind hB2 hm] at hx ⊢
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  refine ⟨fc.conj_mem_invImageF model hwP hx.1, ?_⟩
+  obtain ⟨y, hyP, hws⟩ := fc.exists_conj_distinguishedInvolution_mem_P model ind
+    (fc.toHypothesis.W.inv_mem hwW)
+    ((Subgroup.centralizer (fc.P : Set G)).inv_mem hwP)
+  -- `w⁻¹ s w = s y` (with `(w⁻¹)⁻¹ = w`), so
+  -- `s (w x w⁻¹) s⁻¹ = w (s y) x (s y)⁻¹ w⁻¹ = w (s x s⁻¹) w⁻¹` (P central in `R`).
+  rw [inv_inv] at hws
+  have hyx : y * x * y⁻¹ = x := by
+    have hc := fc.P_le_center_invImageF model hyP hx.1
+    rw [← hc]
+    group
+  have hkey : s * (w * x * w⁻¹) * s⁻¹ = w * ((s * y) * x * (s * y)⁻¹) * w⁻¹ := by
+    have h1 : s * (w * x * w⁻¹) * s⁻¹
+        = w * ((w⁻¹ * s * w) * x * (w⁻¹ * s * w)⁻¹) * w⁻¹ := by group
+    rw [h1, hws]
+  rw [hkey]
+  have h2 : (s * y) * x * (s * y)⁻¹ = s * (y * x * y⁻¹) * s⁻¹ := by group
+  rw [h2, hyx, hx.2]
+  group
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
