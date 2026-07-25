@@ -473,6 +473,7 @@ import OddOrder.Peterfalvi.Appendices.NearFieldClass
 import OddOrder.Peterfalvi.Appendices.NearFieldUnitsQuaternion
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.RankOneAffineModel
+import OddOrder.Peterfalvi.Appendices.RankOneFromPrimeDegree
 import OddOrder.Peterfalvi.Appendices.ExceptionalNearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThree

@@ -675,3 +675,17 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   ⟹ (12) 終盤の実装順: (a) faithful kernel = R の同定 (設計書の主要非自明点) →
   (b) Q̂ := NR⧸kernel + Ω̂ = ↥𝒜 の RankOneHypothesis 全 field →
   (c) rankOne_affine_nearField 適用 → (d) R₁/T₁/Cor 10.2 bridge → step_twelve endpoint。
+- **(12) 終盤の generic 側完成** (9502 closed): `rankOneHypothesisOfCardEqMulPred`
+  (RankOneFromPrimeDegree.lean) が |G|=p(p−1)・degree p・faithful・transitive から
+  RankOneHypothesis を全 field 構成。StepTwelve 側の供給物も完備:
+  kernel = R iff (`mem_invImageF_iff_forall_conj_smul_eq`)、orbit = 𝒜、
+  |D̄|=1 (`sigmaComponent_eq_one_of_card_F_eq_p`)、|Q̄|=|F|−1、
+  [NR:R] = p^m·|Q̄|·|D̄| (`index_invImageF_subgroupOf_normalizer`)。
+  **残る fc-specific plumbing**: (α) Ω₂ := ↥(orbit NR P) carrier +
+  MulAction (↥NR ⧸ R.subgroupOf NR) Ω₂ の構成 (toPermHom → QuotientGroup.lift →
+  compHom) + Finite/Faithful/IsPretransitive instance + card Ω₂ = p +
+  card 商 = p(p−1) → constructor 適用 → (β) rankOne_affine_nearField 適用
+  (hbs = BS Q₈ sorried-cite 経由, 0147 posture) → F₂ near-field |F₂| = p →
+  (γ) R₁ = 正規正則部分群の preimage, |R₁| = p³ Sylow → (δ) N_G(R₁) = N_G(R)
+  ((11) 型 regularity) → (ε) Isaacs Cor 10.2 transfer → index-p normal →
+  ¬(B2) 矛盾 → step_twelve endpoint「(10.2) が成立」。
