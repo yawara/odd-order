@@ -1448,7 +1448,8 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 `MonoidHom.id ↥H` の型が合わない (diamond)。**一般の `ϕ : ↥H →* A` 版で述べる**のが正解
 (Isaacs の `v : G → H/H'` はまさにこの形)。
 | 5A.2 | ✅ | `transfer_top_eq_apply` |
-| 5A.3 | ⬜ 調査済 | 推移律。**(b) の数値部分 `|G:H| = |G:K||K:H|` は mathlib `Subgroup.relIndex_mul_index` で既済**。transversal の積 `ST` の一意分解 (a) / (b) の transversal 性は **mathlib に既製が無い** (`Subgroup.IsComplement` の推移律は未収載; `IsComplement.mul_eq` のみ)。`↥K` の subtype を跨ぐので定式化に注意 — 「`S ⊆ K` かつ `∀ k ∈ K, ∃! s ∈ S, k·s⁻¹ ∈ H`」+「`IsComplement (K : Set G) T`」⟹「`IsComplement (H : Set G) (S * T)`」の形が素直。(c)(d) の pretransfer 合成は mathlib が `diff` 経由の定義なので、この transversal 推移律を作ってから `transfer_def` で両辺を比較する |
+| 5A.3(a)(b) | ✅ | `eq_of_mul_eq_mul_of_isComplement` / `isComplement_mul_of_transversal` (mathlib に `IsComplement` の推移律が無いので自作)。(b) の数値部分は mathlib `relIndex_mul_index` |
+| 5A.3(c)(d) | ⬜ | 推移律。**(b) の数値部分 `|G:H| = |G:K||K:H|` は mathlib `Subgroup.relIndex_mul_index` で既済**。transversal の積 `ST` の一意分解 (a) / (b) の transversal 性は **mathlib に既製が無い** (`Subgroup.IsComplement` の推移律は未収載; `IsComplement.mul_eq` のみ)。`↥K` の subtype を跨ぐので定式化に注意 — 「`S ⊆ K` かつ `∀ k ∈ K, ∃! s ∈ S, k·s⁻¹ ∈ H`」+「`IsComplement (K : Set G) T`」⟹「`IsComplement (H : Set G) (S * T)`」の形が素直。(c)(d) の pretransfer 合成は mathlib が `diff` 経由の定義なので、この transversal 推移律を作ってから `transfer_def` で両辺を比較する |
 
 ### 5A.2 の設計 (2026-07-26 に確定、**実装済** `transfer_top_eq_apply`)
 
