@@ -1058,6 +1058,111 @@ theorem normalizer_sup_nonsplitTorus_V_le
   rw [← h1]
   exact hstep g⁻¹ hginv _ hy
 
+include fc in
+/-- `s` inverts `st`, hence normalizes `Z₁ = ⟨st⟩`. -/
+theorem distinguishedInvolution_mem_normalizer_zpowers :
+    fc.toHypothesis.distinguishedInvolution ∈ Subgroup.normalizer
+      ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) : Subgroup G) : Set G) := by
+  set s : G := fc.toHypothesis.distinguishedInvolution with hs_def
+  have hs2 : s * s = 1 := by
+    rw [← pow_two]; exact fc.toHypothesis.distinguishedInvolution_sq
+  have hsinv : s⁻¹ = s := inv_eq_of_mul_eq_one_right hs2
+  have ht2 : fc.toHypothesis.t * fc.toHypothesis.t = 1 := by
+    rw [← pow_two]; exact fc.toHypothesis.t_sq
+  have hsst : s * (s * fc.toHypothesis.t) * s⁻¹ = (s * fc.toHypothesis.t)⁻¹ := by
+    rw [hsinv, mul_inv_rev, inv_eq_of_mul_eq_one_right ht2,
+      inv_eq_of_mul_eq_one_right hs2]
+    calc s * (s * fc.toHypothesis.t) * s = (s * s) * fc.toHypothesis.t * s := by group
+      _ = fc.toHypothesis.t * s := by rw [hs2, one_mul]
+  have hconj : ∀ y ∈ Subgroup.zpowers (s * fc.toHypothesis.t),
+      s * y * s⁻¹ ∈ Subgroup.zpowers (s * fc.toHypothesis.t) := by
+    intro y hy
+    rw [Subgroup.mem_zpowers_iff] at hy
+    obtain ⟨k, rfl⟩ := hy
+    rw [← conj_zpow, hsst, inv_zpow, ← zpow_neg]
+    exact Subgroup.mem_zpowers_iff.mpr ⟨-k, rfl⟩
+  rw [Subgroup.mem_set_normalizer_iff]
+  intro y
+  refine ⟨fun hy => hconj y hy, fun hy => ?_⟩
+  have h1 : y = s * (s * y * s⁻¹) * s⁻¹ := by
+    rw [hsinv]
+    calc y = (s * s) * y * (s * s) := by rw [hs2]; group
+      _ = s * (s * y * s) * s := by group
+  rw [h1]
+  exact hconj _ hy
+
+include model in
+/-- **`N_G(Z₁) = R₂⟨s⟩`** ((16), p. 114): the kernel of the action of `N_G(Z₁)` on the
+order-`3` group `Z₁` is `C_G(Z₁) = R₂` by (14), and `s` inverts `Z₁`. -/
+theorem normalizer_zpowers_eq_sylow_sup_zpowers
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
+    (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G)) :
+    Subgroup.normalizer ((Subgroup.zpowers
+        (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) : Subgroup G)
+          : Set G)
+      = (S : Subgroup G)
+        ⊔ Subgroup.zpowers fc.toHypothesis.distinguishedInvolution := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  set s : G := fc.toHypothesis.distinguishedInvolution with hs_def
+  have hstord : orderOf (s * fc.toHypothesis.t) = 3 := by
+    rw [hs_def, fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  have hs2 : s * s = 1 := by
+    rw [← pow_two]; exact fc.toHypothesis.distinguishedInvolution_sq
+  have hsinv : s⁻¹ = s := inv_eq_of_mul_eq_one_right hs2
+  have ht2 : fc.toHypothesis.t * fc.toHypothesis.t = 1 := by
+    rw [← pow_two]; exact fc.toHypothesis.t_sq
+  have hsst : s * (s * fc.toHypothesis.t) * s⁻¹ = (s * fc.toHypothesis.t)⁻¹ := by
+    rw [hsinv, mul_inv_rev, inv_eq_of_mul_eq_one_right ht2,
+      inv_eq_of_mul_eq_one_right hs2]
+    calc s * (s * fc.toHypothesis.t) * s = (s * s) * fc.toHypothesis.t * s := by group
+      _ = fc.toHypothesis.t * s := by rw [hs2, one_mul]
+  have hSeq := fc.sylow_eq_centralizer_zpowers model ind hB2 S hR₁S
+  have hcenS : ∀ h : G, h * (s * fc.toHypothesis.t) * h⁻¹ = s * fc.toHypothesis.t →
+      h ∈ (S : Subgroup G) := by
+    intro h hh
+    rw [← hSeq, fc.centralizer_zpowers_st_eq]
+    refine Subgroup.mem_centralizer_singleton_iff.mpr ?_
+    calc h * (s * fc.toHypothesis.t)
+        = (h * (s * fc.toHypothesis.t) * h⁻¹) * h := by group
+      _ = (s * fc.toHypothesis.t) * h := by rw [hh]
+  refine le_antisymm (fun g hg => ?_) ?_
+  · rw [Subgroup.mem_set_normalizer_iff] at hg
+    have hstZ : g * (s * fc.toHypothesis.t) * g⁻¹
+        ∈ Subgroup.zpowers (s * fc.toHypothesis.t) :=
+      (hg _).mp (Subgroup.mem_zpowers _)
+    rcases eq_one_or_eq_or_eq_inv_of_mem_zpowers_of_orderOf_eq_three hstord hstZ
+      with h1 | h2 | h3
+    · exfalso
+      have hst1 : s * fc.toHypothesis.t = 1 := by
+        have h2 : s * fc.toHypothesis.t
+            = g⁻¹ * (g * (s * fc.toHypothesis.t) * g⁻¹) * g := by group
+        rw [h1] at h2
+        simpa using h2
+      rw [hst1, orderOf_one] at hstord
+      omega
+    · exact Subgroup.mem_sup_left (hcenS g h2)
+    · have hgs : (g * s) * (s * fc.toHypothesis.t) * (g * s)⁻¹
+          = s * fc.toHypothesis.t := by
+        calc (g * s) * (s * fc.toHypothesis.t) * (g * s)⁻¹
+            = g * (s * (s * fc.toHypothesis.t) * s⁻¹) * g⁻¹ := by group
+          _ = g * (s * fc.toHypothesis.t)⁻¹ * g⁻¹ := by rw [hsst]
+          _ = (g * (s * fc.toHypothesis.t) * g⁻¹)⁻¹ := by group
+          _ = ((s * fc.toHypothesis.t)⁻¹)⁻¹ := by rw [h3]
+          _ = s * fc.toHypothesis.t := by group
+      have hgeq : g = (g * s) * s := by rw [mul_assoc, hs2, mul_one]
+      rw [hgeq]
+      exact Subgroup.mul_mem _ (Subgroup.mem_sup_left (hcenS (g * s) hgs))
+        (Subgroup.mem_sup_right (Subgroup.mem_zpowers _))
+  · refine sup_le ?_ ?_
+    · rw [← hSeq]
+      exact Subgroup.centralizer_le_normalizer _
+    · rw [Subgroup.zpowers_le]
+      exact fc.distinguishedInvolution_mem_normalizer_zpowers
+
 include model in
 /-- **`N_G(Z₁PΣ) = N_G(Z₁)`** ((16), p. 114, final assertion).
 
