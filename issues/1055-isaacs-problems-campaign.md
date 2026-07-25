@@ -587,6 +587,31 @@ Ch.2 は全ファイル sorry-free。
 metavariable のままだと `MulAction ?m ?m` で instance 解決が詰まる。`conj_inl_of_comm hD x` の
 ように**引数を明示**するか、`rw [← map_mul]; congr 1` のように `inl` を露出させない形にする。
 
+### 3A.7 の証明 (2026-07-25 landing)
+
+`exists_regular_orbit_of_primeFactors_card_le_two`。骨格は 2 段:
+1. 「`g` の安定化群が非自明 ⟹ ある素因子 `r ∣ n := o(α)` で `α^{n/r}` が `g` を固定」。
+   `α^j ≠ 1` が `g` を固定するとき `m := gcd(n,j)` について **Bezout** で `α^m = (α^j)^b`
+   (`α^n = 1` を使う) ゆえ `α^m` も固定、`orderOf (α^j) = n/m ≠ 1` の素因子 `r` を取ると
+   `m·r ∣ n` すなわち `m ∣ n/r` で `α^{n/r} = (α^m)^c` も固定。安定化群は
+   `MulAction.stabilizer (MulAut G) g` として扱うと冪の処理が部分群の閉性で済む。
+2. よって regular orbit が無いと `G` は固定部分群 `F r = eqLocus (α^{n/r}) id` (高々 2 個) の
+   合併。各 `F r` は真部分群 (`orderOf (α^{n/r}) = r > 1`) で、**群は 2 つの真部分群の合併に
+   ならない** (`not_forall_mem_or_mem_of_ne_top`) から矛盾。
+
+⚠ この「2 つの真部分群の合併にならない」は 3A.6 には**そのままでは効かない**: 3A.6 の
+`G = ⋃_{1≠z∈V} C_G(z)` は `V` の階数が 2 以上だと 3 個以上の合併になり、群は 3 個以上の
+真部分群の合併になりうる (階数 1 のときだけこの筋で閉じる)。
+
+## Ch.3 §3B — 次の frontier (演習 3B.1-3B.15)
+
+`§3B` は Schur-Zassenhaus と可解群の節で、演習が 15 問ある:
+3B.1 (可解群の極大部分群は素冪指数) / 3B.2 (可換因子の subnormal 列 ⟹ 可解) /
+3B.3 (合成因子が全て素数位数 ⟺ 可解) / 3B.4 (`|N|` と `|G:N|` 互いに素、`|U| ∣ |G:N|` ⟹
+`U` はある補群に含まれる) / 3B.5 (`P ∈ Syl_p(G)` が中心に含まれる ⟹ `G = X × P`) /
+3B.6 (剰余類の代表の位数) / 3B.7 (supersolvable) / … / 3B.14 (`C = C_G(F(G))`) /
+3B.15 (Berkovich)。文書順に 3B.1 から。
+
 ### 3A.6 の解析 (2026-07-25、deferred-hard として記録)
 
 **確立できた部分** (次に着手する人はここから始めてよい):
@@ -699,7 +724,7 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
 | 3A.4 | ✅ (2026-07-25) |
 | 3A.5 | ✅ (`G ⋊ G ≅ G × G`) |
 | 3A.6 | ⏸ **deferred-hard** (2026-07-25 に解析; 下記) |
-| 3A.7 | ⬜ `α ∈ Aut(G)`, `o(α)` の素因子が 2 個以下 ⟹ `⟨α⟩` は `G` 上に regular orbit をもつ |
+| 3A.7 | ✅ **完了** (2026-07-25) |
 | 3A.8 | ✅ **完了** ((a)(b)(c) すべて) |
 | 3A.9 | ✅ **完了** ((a)(b)) |
 | 3A.10 | ✅ **完了** (`zpWreathBase_spec`) |
@@ -747,6 +772,5 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **§3A leaf 分割 ✅ / 3A.9(b) ✅ (3A.9 完了)**。
 さらに **3A.10 の核 ✅** (`A = C_G(A)`)。
 さらに **3A.10 ✅** ⟹ **§3A は 3A.6 / 3A.7 を除いて完了**。
-**次 frontier = 3A.7** (`α ∈ Aut(G)` で `o(α)` の素因子が 2 個以下 ⟹ `⟨α⟩` は regular orbit を
-もつ) → 3A.6 (deferred-hard、解析は §3A 節) → §3B〜。
-⚠ 3A.6 / 3A.7 はいずれも「本物の定理」寄りで、他の演習より重い。
+さらに **3A.7 ✅** ⟹ **§3A は 3A.6 のみ残り** (deferred-hard)。
+**次 frontier = §3B の演習 (3B.1 から文書順)**。3A.6 は §3B を進めた後に再訪する。
