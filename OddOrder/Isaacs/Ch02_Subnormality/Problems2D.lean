@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch01_Sylow.Problems
 import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.Isaacs.Ch02_Subnormality.Problems
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
 
 /-!
@@ -15,7 +16,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) の章末演習 §2D。いず�
 **Zenkov (Thm 2.18) / Cor 2.19 / Lucchini (Thm 2.20)** を使う。
 
 - **2D.1(a)** `card_lt_card_of_fitting_eq_bot`: `A` 可換 + `F(N) = 1` ⟹ `|A| < |N|`。
-- **2D.1(b)**: `A` 可換 + `|N|`, `|A|` 互いに素 ⟹ `|A| < |N|`。
+- **2D.1(b)** `card_lt_card_of_coprime`: `A` 可換 + `|N|`, `|A|` 互いに素 ⟹ `|A| < |N|`。
 - **2D.2** `card_lt_card_of_isCyclic`: `A` 巡回 + `A ∩ N = 1` + `N ≠ 1` ⟹ `|A| < |N|`。
 
 ⚠ **2D.1 には書籍が書いていない `N ≠ 1` が要る**: `N = 1` なら `C_A(N) = A` なので仮説から
@@ -25,7 +26,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) の章末演習 §2D。いず�
 
 namespace OddOrder.Isaacs.Ch02
 
-open OddOrder.Isaacs.Ch01
+open OddOrder.Isaacs.Ch01 OddOrder.Isaacs.Ch03
 
 variable {G : Type*} [Group G]
 
@@ -105,6 +106,70 @@ theorem card_lt_card_of_fitting_eq_bot [Finite G] {N A : Subgroup G} [N.Normal]
   exact hFne (le_bot_iff.mp
     ((inf_le_inf_left A (le_centralizer_of_inf_eq_bot
       (fitting_inf_eq_bot_of_fitting_eq_bot hFN))).trans hCA.le))
+
+/-- **Isaacs Problem 2D.1(b)**. `G = NA` (`N ⊴ G`, `N ≠ 1`)、`C_A(N) = 1`、`A` 可換で
+`|N|` と `|A|` が互いに素ならば `|A| < |N|`。
+
+`|A| ≥ |N|` と仮定すると **Cor 2.19** で `A ⊓ F(G) ≠ 1`。`π := {q | q ∤ |N|}` とおくと
+`A ⊓ F(G)` は π-群 (位数が `|A|` を割り、`|A|` は `|N|` と互いに素)。`F(G)` は冪零だから
+`↥F(G)` の部分群はすべて部分正規 (Lemma 2.1) で、**2A.1**
+(`le_oPiCore_of_isSubnormal_of_isPiGroup`) より `A ⊓ F(G)` は `O_π(↥F(G))` に含まれる。
+`O_π` は特性的なので `G` へ押し出した `Q` は `G`-正規な π-群、`N` は π'-群だから
+`Q ⊓ N = ⊥`、ゆえに `Q ≤ C_G(N)`。したがって `A ⊓ F(G) ≤ Q ≤ C_G(N)` となり
+`A ⊓ F(G) ≤ A ⊓ C_G(N) = 1` で矛盾。 -/
+theorem card_lt_card_of_coprime [Finite G] {N A : Subgroup G} [N.Normal]
+    (hN : N ≠ ⊥) (hG : N ⊔ A = ⊤)
+    (hA_ab : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
+    (hCA : A ⊓ Subgroup.centralizer (N : Set G) = ⊥)
+    (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥A)) :
+    Nat.card ↥A < Nat.card ↥N := by
+  by_contra hcon
+  push Not at hcon
+  haveI : Nontrivial G := by
+    rcases (Subgroup.nontrivial_iff_ne_bot N).mpr hN with ⟨a, b, hab⟩
+    exact ⟨(a : G), (b : G), fun h => hab (Subtype.ext h)⟩
+  have hFne := inf_fitting_ne_bot_of_abelian_card_ge_index hA_ab
+    (index_le_card_of_card_le hG hcon)
+  set π : Set ℕ := {q : ℕ | ¬ q ∣ Nat.card ↥N} with hπ
+  -- `A ⊓ F(G)` は π-群 (位数が `|A|` を割り `|N|` と互いに素)
+  have hAF_pi : Subgroup.IsPiGroup π (A ⊓ fitting G) := by
+    intro q hq hqN
+    have hqA : q ∣ Nat.card ↥A :=
+      (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le inf_le_left)
+    exact (Nat.mem_primeFactors.mp hq).1.one_lt.ne' (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hqN hqA))
+  -- `↥F(G)` は冪零ゆえ部分群はすべて部分正規、2A.1 で `O_π(↥F(G))` に落ちる
+  haveI hfitnilp : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
+  have hcardeq : Nat.card ↥((A ⊓ fitting G).subgroupOf (fitting G)) = Nat.card ↥(A ⊓ fitting G) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (inf_le_right : A ⊓ fitting G ≤ fitting G)).toEquiv
+  have hsn : ((A ⊓ fitting G).subgroupOf (fitting G)).IsSubnormal :=
+    isSubnormal_of_isNilpotent_finite _
+  have hle : (A ⊓ fitting G).subgroupOf (fitting G) ≤ oPiCore π ↥(fitting G) :=
+    le_oPiCore_of_isSubnormal_of_isPiGroup hsn
+      (fun q hq => hAF_pi q (by rwa [hcardeq] at hq))
+  -- `Q := O_π(↥F(G))` の押し出しは `G`-正規な π-群
+  set Q : Subgroup G := (oPiCore π ↥(fitting G)).map (fitting G).subtype with hQ
+  haveI : Q.Normal := inferInstance
+  have hQpi : Subgroup.IsPiGroup π Q := by
+    intro q hq
+    refine oPiCore.isPiGroup (G := ↥(fitting G)) π q ?_
+    rwa [hQ, ← Nat.card_congr (Subgroup.equivMapOfInjective _ _
+      (fitting G).subtype_injective).toEquiv] at hq
+  have hQN : Q ⊓ N = ⊥ := by
+    by_contra hne
+    haveI : Nontrivial ↥(Q ⊓ N) := (Subgroup.nontrivial_iff_ne_bot _).mpr hne
+    obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd (Finite.one_lt_card (α := ↥(Q ⊓ N))).ne'
+    exact hQpi q (Nat.mem_primeFactors.mpr ⟨hq,
+      hqdvd.trans (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩)
+      (hqdvd.trans (Subgroup.card_dvd_of_le inf_le_right))
+  have hAF_le : A ⊓ fitting G ≤ Q := by
+    rw [hQ, ← Subgroup.map_subgroupOf_eq_of_le (inf_le_right : A ⊓ fitting G ≤ fitting G)]
+    exact Subgroup.map_mono hle
+  refine hFne (le_bot_iff.mp ?_)
+  calc A ⊓ fitting G
+      ≤ A ⊓ Subgroup.centralizer (N : Set G) :=
+        le_inf inf_le_left (hAF_le.trans (le_centralizer_of_inf_eq_bot hQN))
+    _ = ⊥ := hCA
 
 /-- **Isaacs Problem 2D.2**. `G = NA` (`N ⊴ G`, `N ≠ 1`)、`C_A(N) = 1`、`A ∩ N = 1` で
 `A` が巡回ならば `|A| < |N|`。
