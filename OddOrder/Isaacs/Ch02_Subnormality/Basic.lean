@@ -24,10 +24,13 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 2
 
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
-| 2A | 部分正規性の基本・join 定理・Wielandt の F(G) | 2.1 – 2.11 | 着手中 (基礎ラッパー済) |
+| 2A | 部分正規性の基本・join 定理・Wielandt の F(G) | 2.1 – 2.11 | ✅ 完備 |
 | 2B | Baer の定理と Matsuyama の involution 定理 | 2.12 – 2.14 | ✅ 完備 (2.14 = `DihedralBasics.lean`) |
-| 2C | p-local 部分群 | 2.15 – 2.17 | TODO |
-| 2D | Zenkov と Lucchini | 2.18 – 2.20 | TODO (FT 経路で必要なし) |
+| 2C | p-local 部分群 | 2.15 – 2.17 | ✅ 完備 (`Theorem211Wielandt.lean` / `Main.lean`) |
+| 2D | Zenkov と Lucchini | 2.18 – 2.20 | ✅ 完備 (2.20 の本体は `Ch04/ForwardFromCh02.lean`) |
+
+章末演習は `Problems.lean` (§2A + 2B.1) / `ProblemsInvolutions.lean` (§2B の involution 系) /
+`ProblemsNGroups.lean` (§2C の N-群) にある。Ch.2 は全ファイル sorry-free。
 
 ## 方針
 
