@@ -1432,6 +1432,34 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 - **4C.3** は three subgroups lemma (`Subgroup.commutator_commutator_eq_bot_of_rotate`) の
   `(G, A, N)` への直接適用: `⁅⁅A,N⁆,G⁆ = 1` は仮定, `⁅⁅N,G⁆,A⁆ ≤ ⁅N,A⁆ = 1` は `N ⊴ G`。
 
+## Ch.5 §5C (書籍 pp. 162-164 の Problems 5C) — 着手 (2026-07-26)
+
+§5C は 13 問 (5C.1-5C.13)。
+
+| 問題 | 状態 | メモ |
+|---|---|---|
+| 5C.1 | ⬜ | Burnside の正規 p-補群定理を **Thm 5.18 から**導く。⚠ repo には Burnside (`hasNormalPComplement_of_sylow_normalizer_le_centralizer`) も Thm 5.18 強形も landing 済なので、**同一 statement の別証明**にならないよう、鍵の段 `G' ⊓ P = ⊥ ⇒ 正規 p-補群` を独立補題として書くのが筋 |
+| 5C.2 | ⬜ | `U ≤ V ≤ P` (P abelian Sylow-2)、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
+| 5C.3 | ⬜ | `G` 単純で abelian Sylow-2 が位数 `2^5` ⇒ 初等可換 (⚠ pdftotext は `2 5`、PDF 画像で要確認) |
+| 5C.4 | ⬜ | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
+| 5C.5 | ✅ | `exists_mem_normalizer_conj_eq_of_normal` + `eq_of_characteristic_of_conj` (`Problems5C.lean`) |
+| 5C.6 | 🔒 hub | weak closure。**hub レーンが `OddOrder/GroupTheory/WeaklyClosed.lean` で着手中** (issue 9503) — A レーンは触らない |
+| 5C.7 | ⬜ | `\|G\| = 3^a·5·11` ⇒ Sylow-3 が正規 |
+| 5C.8 | ⬜ | `p` が最小素因数 (`p > 2`) で `p^3 ∤ \|G\|` ⇒ 正規 p-補群 |
+| 5C.9 | ⬜ | 非可換単純で偶数位数、`8 ∤ \|G\|` ⇒ `3 \| \|G\|` |
+| 5C.10 | ⬜ | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
+| 5C.11 | ⬜ | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
+| 5C.12 | ⬜ | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
+| 5C.13 | ⬜ | (Navarro) `P = N_G(P)'` なる Sylow `P` ⇒ `N_G(P)` が正規 p-補群をもつ |
+
+### 5C.5 の実装メモ (2026-07-26)
+
+`P` と `P^g` がともに `N_G(B)` の `p`-部分群であることを使い、hub の
+`GroupTheory.exists_mem_conj_le_common` (2 つの `p`-部分群を共通の `p`-部分群へ) で
+`c ∈ N_G(B)` を取る。`P` は Sylow なので共通部分群は `P` 自身、ゆえに `cg ∈ N_G(P)`。
+⚠ `Sylow` の極大性フィールドは `P.3 : IsPGroup p Q → ↑P ≤ Q → Q = ↑P` (**向きに注意**)。
+⚠ `Subgroup.mem_normalizer_fintype` で「片方向の共役閉」から正規化子の元が取れる。
+
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
 | 問題 | 状態 | 実装 |

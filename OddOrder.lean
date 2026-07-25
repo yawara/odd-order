@@ -204,6 +204,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsFaithfulOrbit
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch05_Transfer.Problems
 import OddOrder.Isaacs.Ch05_Transfer.Problems5B
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsDihedralMultiplier
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsProductMultiplier
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsSchurMultiplier
