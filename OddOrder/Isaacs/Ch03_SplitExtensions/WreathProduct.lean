@@ -155,6 +155,51 @@ def wreathEquivRegular : (D ≀[Q] Q) ≃* RegularWreathProduct D Q where
       rfl
     · rfl
 
+/-! ### Problem 3A.9(a) — 推移的作用のとき `C_B(Q)` = 定数関数 -/
+
+/-- **Isaacs Problem 3A.9(a)** (元ごとの形). `Q` の `Ω` への作用が推移的なとき、base group の
+元 `inl f` が `inr q` すべてと可換 ⟺ `f` が定数。
+
+共役公式 `inr q * inl f * (inr q)⁻¹ = inl (f ∘ (q⁻¹ • ·))` (`inr_mul_inl_mul_inr_inv`) から、
+可換性は `f (q⁻¹ • ω) = f ω` (∀ q, ω)、すなわち `f` が `Q`-軌道上で定数。推移的なら全体で定数。 -/
+theorem forall_conj_inr_eq_iff_const [MulAction.IsPretransitive Q Ω] (f : Ω → D) :
+    (∀ q : Q, (inr q : D ≀[Ω] Q) * inl f * (inr q)⁻¹ = inl f) ↔ ∀ ω ω' : Ω, f ω = f ω' := by
+  constructor
+  · intro h ω ω'
+    obtain ⟨q, rfl⟩ := MulAction.exists_smul_eq Q ω ω'
+    have hf : (fun x => f (q⁻¹ • x)) = f :=
+      inl_injective (by rw [← inr_mul_inl_mul_inr_inv]; exact h q)
+    have h2 := congrFun hf (q • ω)
+    rwa [inv_smul_smul] at h2
+  · intro h q
+    rw [inr_mul_inl_mul_inr_inv]
+    exact congrArg inl (funext fun ω => h _ _)
+
+/-- **Isaacs Problem 3A.9(a)**. `Q` の `Ω` への作用が推移的なとき、base group `B` の元で
+`Q` の像 `inr '' Q` に中心化されるものはちょうど定数関数 `Ω → D` の像。 -/
+theorem mem_centralizer_range_inr_iff [MulAction.IsPretransitive Q Ω] [Nonempty Ω]
+    (f : Ω → D) :
+    (inl f : D ≀[Ω] Q) ∈
+        Subgroup.centralizer ((inr : Q →* D ≀[Ω] Q).range : Set (D ≀[Ω] Q)) ↔
+      ∃ d : D, f = Function.const Ω d := by
+  rw [Subgroup.mem_centralizer_iff]
+  constructor
+  · intro h
+    obtain ⟨ω₀⟩ := ‹Nonempty Ω›
+    refine ⟨f ω₀, funext fun ω => ?_⟩
+    refine (forall_conj_inr_eq_iff_const (D := D) (Q := Q) (Ω := Ω) f).mp (fun q => ?_) ω ω₀
+    have hq := h (inr q) ⟨q, rfl⟩
+    calc (inr q : D ≀[Ω] Q) * inl f * (inr q)⁻¹
+        = inl f * inr q * (inr q)⁻¹ := by rw [hq]
+      _ = inl f := by group
+  · rintro ⟨d, rfl⟩ x hx
+    obtain ⟨q, rfl⟩ := hx
+    have hc := (forall_conj_inr_eq_iff_const (D := D) (Q := Q) (Ω := Ω)
+      (Function.const Ω d)).mpr (fun _ _ => rfl) q
+    calc (inr q : D ≀[Ω] Q) * inl (Function.const Ω d)
+        = inr q * inl (Function.const Ω d) * (inr q)⁻¹ * inr q := by group
+      _ = inl (Function.const Ω d) * inr q := by rw [hc]
+
 end WreathProduct
 
 end OddOrder.Isaacs.Ch03
