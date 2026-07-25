@@ -23,6 +23,51 @@ open scoped Pointwise
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
+/-- **Conjugation fixes a subgroup iff the conjugator normalizes it** (bridge between the
+pointwise `MulAut.conj`-action on subgroups and the set-normalizer; used to identify the
+stabilizer in the step (12) orbit count). -/
+theorem conj_smul_eq_iff_mem_normalizer {G' : Type*} [Group G'] {P : Subgroup G'} {g : G'} :
+    MulAut.conj g • P = P ↔ g ∈ Subgroup.normalizer (P : Set G') := by
+  constructor
+  · intro h
+    rw [Subgroup.mem_set_normalizer_iff]
+    intro x
+    constructor
+    · intro hx
+      have h1 : (MulAut.conj g) • x ∈ MulAut.conj g • P :=
+        Subgroup.smul_mem_pointwise_smul _ _ _ hx
+      rw [h] at h1
+      have h2 : ((MulAut.conj g) • x : G') = g * x * g⁻¹ := rfl
+      rwa [h2] at h1
+    · intro hx
+      have h1 : g * x * g⁻¹ ∈ MulAut.conj g • P := by
+        rw [h]
+        exact hx
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at h1
+      have h2 : ((MulAut.conj g)⁻¹ • (g * x * g⁻¹) : G') = x := by
+        have h3 : ((MulAut.conj g)⁻¹ • (g * x * g⁻¹) : G')
+            = (MulAut.conj g)⁻¹ (g * x * g⁻¹) := rfl
+        rw [h3, ← map_inv, MulAut.conj_apply]
+        group
+      rwa [h2] at h1
+  · intro hg
+    ext y
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have h2 : ((MulAut.conj g)⁻¹ • y : G') = g⁻¹ * y * g := by
+      have h3 : ((MulAut.conj g)⁻¹ • y : G') = (MulAut.conj g)⁻¹ y := rfl
+      rw [h3, ← map_inv, MulAut.conj_apply]
+      group
+    rw [h2]
+    have h3 := Subgroup.mem_set_normalizer_iff.mp hg (g⁻¹ * y * g)
+    have h5 : g * (g⁻¹ * y * g) * g⁻¹ = y := by group
+    constructor
+    · intro hy
+      have h4 := h3.mp hy
+      rwa [h5] at h4
+    · intro hy
+      refine h3.mpr ?_
+      rwa [h5]
+
 namespace FirstCaseHypothesis
 
 universe uG uΩ
