@@ -87,3 +87,38 @@ issue 0123 の longLine wave で、**行の折り返しでは解消できない*
 (`S08_CoherenceBasic.lean:859` / `S08_CoherenceTheorems.lean:409`) — 2026-07-24 の `--strict`
 gate 切替後も警告は出ない。本 issue に残るのは **`PairUnionBaseAnchorCommonIndexPrimePowerStepData`
 系の語幹短縮という命名リファクタ判断** (owner = lane a) のみで、lint 債務ではない。
+
+---
+
+## ✅ 2026-07-25 解決 — 両系統を一括 rename して close
+
+ユーザー指示で main セッションが実施 (lane a は 1055 凍結中・hub 裁定待ちのため、この単発
+リファクタは main で消化)。**姉妹構造体 (anchor 無し版) が並存していた**ので、片方だけ縮めると
+「短い名前 = anchored 版、長い名前 = より弱い無印版」という逆転が起きる。よって**両系統を
+一貫した対で rename** した:
+
+| 旧 | 新 |
+|---|---|
+| `PairUnionBaseAnchorCommonIndexPrimePowerStepData` (47字) | `AnchoredPairUnionStepData` (25字) |
+| `pairUnionBaseAnchorCommonIndexPrimePowerData` (派生語幹) | `anchoredPairUnionStepData` |
+| `PairUnionCommonIndexPrimePowerStepData` (38字) | `PairUnionStepData` |
+| `pairUnionCommonIndexPrimePowerData` (派生語幹) | `pairUnionStepData` |
+
+- 選定理由: 姉妹との**判別子は anchor の有無だけ** (anchored 版 = `hanchor` field 追加 +
+  `hlt`/`hlemem` を内部導出) なので、名前に残す概念は `Anchored` + `PairUnion` の 2 つで足りる。
+  common-index / prime-power / base の各条件は両構造体の docstring (T8.11v / T8.11v1) が
+  従来どおり全 field を記述している。issue 提案の `SibleyStepData` は namespace が既に
+  `SibleyDadeHypothesis` で冗長になるため不採用。
+- 派生宣言の語幹が旧 `…PrimePowerData` (Step 脱落) から `…StepData` になり、構造体名と
+  **正確に一致**するようになった (対応が改善)。
+- adapter 3 兄弟 (`xAdjoinStepInput_of_pairUnion[_baseAnchor]_commonIndexPrimePowerSums` 等) は
+  構造体名を含まず 100 桁問題も無いので不変。
+- per-decl longLine 例外 2 件 (`S08_CoherenceBasic` / `S08_CoherenceTheorems`) を除去 —
+  最長の派生名 `Xset_centralCommutator_isCoherent_from_anchoredPairUnionStepData_withCover_of_frobenius`
+  は 87 字で単独行に収まる。残る per-file 例外は `AxiomsCheck.lean` (意図的恒久) のみ。
+- 純 token rename: Lean 6 file + live notes 5 file (`notes/peterfalvi/s08_*`, `s09_*`) を
+  script 一括置換、full build + AxiomsCheck で検証。
+- ついでに S09 の**死んだ longLine 例外を全廃**: `QuadraticTerm.lean` の block 例外 (265/338 対、
+  保護対象は旧語幹の 2 行 = 本 rename で解消) と per-decl 4 件 (433/459/490/545、rename 以前から
+  100 桁超の保護対象が無い stale) + `CoherenceFormula.lean:24-25` の隣接 false/true sandwich
+  (完全に no-op)。⟹ **longLine の per-decl/block 例外は repo 全体で `AxiomsCheck.lean` のみ**になった。

@@ -96,8 +96,10 @@ backlog 230 件は 2026-07-22〜24 の wave で**完済** (issue 0138 closed、0
 
 - **警告はその commit で直す** — commit 前に [`bin/check-warnings`](bin/check-warnings) を回す
   (増分 replay は取りこぼしうるので、疑わしければ fresh full build で確認)。
-- 折返し不能な長宣言名など**正当な例外のみ** per-decl `set_option linter.<name> false in` +
-  理由コメントで明示する (実例: `S08_CoherenceBasic.lean:859`)。無断の一括 disable はしない。
+- **正当な例外のみ** per-decl `set_option linter.<name> false in` + 理由コメントで明示する
+  (実例: `OddOrder/Algebra/ChevalleyWarning.lean:71`)。無断の一括 disable はしない。
+  longLine の per-decl 例外は 0132 の rename で**全廃済** (残るは機械列挙の `AxiomsCheck.lean` のみ)
+  — 新設するときは「折返しで解消できない」ことを先に確認する。
 - ⚠ `flexible` / `import` 絞り込み / instance in type 系の修正は leaf build で検出不能な cascade を
   起こすので **full build 必須 + 敵対的検証** (issue 0123 で main を 2 回壊した実績)。
   `omit` 追加も同種の cascade がある (omit した定理の下流で section var が新たに unused 化 —
@@ -107,9 +109,11 @@ backlog 230 件は 2026-07-22〜24 の wave で**完済** (issue 0138 closed、0
   鵜呑みにせず実際に `simp?` を回して置換し build で検証。
 - [`bin/lint-baseline.tsv`](bin/lint-baseline.tsv) は空のまま保持 (ratchet 機構の遺構; 空 baseline
   では無印 `bin/check-warnings` も --strict と等価)。無断で baseline を復活させない。
-- 別トラック (owner 判断待ち): `Mathlib.Tactic` 丸 import の残債②のみ =
-  [0136](issues/0136-lint-deferred-import-and-generalization.md) / 長すぎる宣言名の命名リファクタ =
-  [0132](issues/0132-naming-pairunion-stepdata-too-long.md) (警告自体は per-decl 例外で抑制済)。
+- 別トラックも完済: `Mathlib.Tactic` 丸 import 残債 =
+  [0136](issues/closed/0136-lint-deferred-import-and-generalization.md) (2026-07-24 close) /
+  長すぎる宣言名の命名リファクタ =
+  [0132](issues/closed/0132-naming-pairunion-stepdata-too-long.md) (2026-07-25 close:
+  `AnchoredPairUnionStepData`/`PairUnionStepData` へ rename)。
 
 ### トレーサビリティ (3 層)
 
