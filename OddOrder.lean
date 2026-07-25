@@ -57,6 +57,7 @@ import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.PrimeComplementResidual
+import OddOrder.GroupTheory.PrimeDegreeTwoTransitive
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory
