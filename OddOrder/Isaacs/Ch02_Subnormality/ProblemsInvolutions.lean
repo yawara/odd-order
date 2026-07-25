@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.SpecificGroups.Dihedral
 import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
 
 /-!
 # Isaacs Chapter 2 — Problems §2B: involution と二面体群 (p. 57)
@@ -38,6 +39,12 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) の章末演習 §2B のうち 
 - **2B.5** (generalized dihedral): 指数 2 の部分群 `B ≤ G` について 3 条件の同値
   (`generalizedDihedral_tfae`) と、そのとき `B` が可換であること
   (`isMulCommutative_of_generalizedDihedral`)。
+- **2B.6**: 有限群 `G` が正規 Sylow `p`-部分群をもつ ⟺ `p`-冪位数の共役元が生成する
+  `⟨x, x^g⟩` がすべて正規 Sylow `p`-部分群をもつ (`exists_normal_sylow_iff_forall_conj_pair`)。
+  Baer-Suzuki (Thm 2.15) が核。
+
+⚠ 本ファイルは §2B の involution / 二面体群まわりの問題を集めた leaf だが、2B.6 だけは
+Sylow の局所判定 (involution とは無関係) — §2B の残り 1 問なのでここに置いている。
 -/
 
 namespace OddOrder.Isaacs.Ch02
@@ -725,6 +732,105 @@ theorem isMulCommutative_of_generalizedDihedral (hB : B.index = 2)
     hinv _ b.2, hinv _ c.2, mul_inv_rev] at hbc
   push_cast
   exact inv_injective (by rw [mul_inv_rev, mul_inv_rev]; exact hbc.symm)
+
+end
+
+section /- Problem 2B.6: 正規 Sylow p-部分群の局所判定 (p. 58) -/
+
+open OddOrder.Isaacs.Ch01
+
+variable {G : Type*} [Group G] {p : ℕ}
+
+/-- 正規 Sylow `p`-部分群は `O_p(G)` に一致する。 -/
+theorem coe_eq_opCore_of_normal [Finite G] [Fact p.Prime] (P : Sylow p G)
+    (hP : (P : Subgroup G).Normal) : (P : Subgroup G) = opCore p G := by
+  haveI := hP
+  exact le_antisymm (normal_pgroup_le_opCore P.2) (opCore_le P)
+
+/-- `p`-冪位数の元で生成される有限群が正規 Sylow `p`-部分群をもつ ⟺ それ自身が `p`-群。
+
+`⟸` は `⊤` を含む Sylow が `⊤` に一致するから。`⟹` は正規 Sylow が一意
+(`Sylow.unique_of_normal`) ゆえ各生成元の `⟨x⟩` がそこに含まれ、生成で `⊤` に一致する。 -/
+theorem exists_normal_sylow_iff_isPGroup {K : Type*} [Group K] [Finite K] [Fact p.Prime]
+    {S : Set K} (hS : ∀ x ∈ S, ∃ n : ℕ, orderOf x = p ^ n) (hgen : Subgroup.closure S = ⊤) :
+    (∃ Q : Sylow p K, (Q : Subgroup K).Normal) ↔ IsPGroup p K := by
+  constructor
+  · rintro ⟨Q, hQ⟩
+    letI := Q.unique_of_normal hQ
+    have htop : (Q : Subgroup K) = ⊤ := by
+      refine top_le_iff.mp ?_
+      rw [← hgen, Subgroup.closure_le]
+      intro x hx
+      obtain ⟨n, hn⟩ := hS x hx
+      have hpg : IsPGroup p ↥(Subgroup.zpowers x) :=
+        IsPGroup.of_card (n := n) (by rw [Nat.card_zpowers, hn])
+      obtain ⟨Q', hQ'⟩ := hpg.exists_le_sylow
+      exact (Subsingleton.elim Q' Q) ▸ hQ' (Subgroup.mem_zpowers x)
+    intro g
+    obtain ⟨n, hn⟩ := Q.2 (⟨g, htop.ge (Subgroup.mem_top g)⟩ : ↥(Q : Subgroup K))
+    exact ⟨n, by simpa using congrArg Subtype.val hn⟩
+  · intro hK
+    obtain ⟨Q, hQ⟩ := (hK.to_subgroup ⊤).exists_le_sylow
+    exact ⟨Q, by rw [top_le_iff.mp hQ]; infer_instance⟩
+
+/-- **Isaacs Problem 2B.6** (p. 58). 有限群 `G` が正規 Sylow `p`-部分群をもつ ⟺
+`p`-冪位数の共役元 `x`, `y = x^g` の生成する部分群 `⟨x, y⟩` がすべて正規 Sylow `p`-部分群をもつ。
+
+`⟨x, x^g⟩` は `p`-冪位数の元で生成されるので、前補題より「正規 Sylow をもつ」と「`p`-群である」
+は同値。したがって右辺は **Baer-Suzuki** (Thm 2.15, `baerSuzuki_pCore`:
+`x ∈ O_p(G) ↔ ∀ g, ⟨x, x^g⟩` が `p`-群) の右辺そのもの。
+
+- `⟸`: 全ての `p`-冪位数の元が `O_p(G)` に入る ⟹ Sylow `P ≤ O_p(G)`、逆は `opCore_le` ゆえ
+  `P = O_p(G)` は正規。
+- `⟹`: 正規 Sylow `P` は `O_p(G)` に一致し (`coe_eq_opCore_of_normal`)、`p`-元は一意な Sylow
+  `P` に入るので `x ∈ O_p(G)`、Baer-Suzuki の順方向で `⟨x, x^g⟩` は `p`-群。 -/
+theorem exists_normal_sylow_iff_forall_conj_pair [Finite G] [Fact p.Prime] :
+    (∃ P : Sylow p G, (P : Subgroup G).Normal) ↔
+      ∀ x g : G, (∃ n : ℕ, orderOf x = p ^ n) →
+        ∃ Q : Sylow p ↥(Subgroup.closure ({x, g * x * g⁻¹} : Set G)),
+          (Q : Subgroup ↥(Subgroup.closure ({x, g * x * g⁻¹} : Set G))).Normal := by
+  have bridge : ∀ x g : G, (∃ n : ℕ, orderOf x = p ^ n) →
+      ((∃ Q : Sylow p ↥(Subgroup.closure ({x, g * x * g⁻¹} : Set G)),
+          (Q : Subgroup ↥(Subgroup.closure ({x, g * x * g⁻¹} : Set G))).Normal)
+        ↔ IsPGroup p ↥(Subgroup.closure ({x, g * x * g⁻¹} : Set G))) := by
+    intro x g hx
+    set H : Subgroup G := Subgroup.closure ({x, g * x * g⁻¹} : Set G) with hH
+    have hxH : x ∈ H := Subgroup.subset_closure (by simp)
+    have hyH : g * x * g⁻¹ ∈ H := Subgroup.subset_closure (by simp)
+    refine exists_normal_sylow_iff_isPGroup
+      (S := {(⟨x, hxH⟩ : ↥H), (⟨g * x * g⁻¹, hyH⟩ : ↥H)}) ?_ ?_
+    · obtain ⟨n, hn⟩ := hx
+      rintro z (rfl | rfl)
+      · exact ⟨n, (Subgroup.orderOf_coe _).symm.trans hn⟩
+      · refine ⟨n, (Subgroup.orderOf_coe _).symm.trans ?_⟩
+        rw [← hn]
+        exact orderOf_injective (MulAut.conj g).toMonoidHom (MulAut.conj g).injective x
+    · apply Subgroup.map_injective H.subtype_injective
+      rw [MonoidHom.map_closure, ← MonoidHom.range_eq_map, Subgroup.range_subtype,
+        Set.image_insert_eq, Set.image_singleton]
+      exact hH.symm
+  constructor
+  · rintro ⟨P, hP⟩ x g hx
+    refine (bridge x g hx).mpr ?_
+    have hxP : x ∈ (P : Subgroup G) := by
+      obtain ⟨n, hn⟩ := hx
+      have hpg : IsPGroup p ↥(Subgroup.zpowers x) :=
+        IsPGroup.of_card (n := n) (by rw [Nat.card_zpowers, hn])
+      obtain ⟨P', hP'⟩ := hpg.exists_le_sylow
+      letI := P.unique_of_normal hP
+      exact (Subsingleton.elim P' P) ▸ hP' (Subgroup.mem_zpowers x)
+    refine (baerSuzuki_pCore x).mp ?_ g
+    rw [← coe_eq_opCore_of_normal P hP]
+    exact hxP
+  · intro h
+    obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
+    have hPle : (P : Subgroup G) ≤ opCore p G := by
+      intro y hy
+      have hy' : ∃ n : ℕ, orderOf y = p ^ n := by
+        obtain ⟨n, hn⟩ := IsPGroup.iff_orderOf.mp P.2 (⟨y, hy⟩ : ↥(P : Subgroup G))
+        exact ⟨n, (Subgroup.orderOf_coe _).trans hn⟩
+      exact (baerSuzuki_pCore y).mpr fun g => (bridge y g hy').mp (h y g hy')
+    exact ⟨P, by rw [le_antisymm hPle (opCore_le P)]; infer_instance⟩
 
 end
 
