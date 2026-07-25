@@ -520,6 +520,26 @@ theorem inf_centralizer_sylow_eq_zpowers
   · exact absurd h1 hne
   · rw [hZ₁card, h3]
 
+include model in
+/-- **`R₂ ≤ C_G(Z₁)`** ((14), p. 113): immediate from `Z₁ = Z(R₂)`.
+
+The reverse inclusion `C_G(Z₁) ≤ R₂` — giving Peterfalvi's `R₂ = C_G(Z₁)` — needs
+step (13) (`C_G(Z₁)` is a `3`-group), which is still in progress. -/
+theorem sylow_le_centralizer_zpowers
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
+    (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G)) :
+    (S : Subgroup G) ≤ Subgroup.centralizer
+      ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) : Subgroup G) : Set G) := by
+  intro g hg
+  refine Subgroup.mem_centralizer_iff.mpr fun y hy => ?_
+  have hyZ : y ∈ (S : Subgroup G)
+      ⊓ Subgroup.centralizer (((S : Subgroup G)) : Set G) := by
+    rw [fc.inf_centralizer_sylow_eq_zpowers model ind hB2 S hR₁S]
+    exact hy
+  exact (Subgroup.mem_centralizer_iff.mp hyZ.2 g hg).symm
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
