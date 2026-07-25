@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.RegularWreathProduct
+import Mathlib.Data.ZMod.Basic
 
 /-!
 # Isaacs §3A: general wreath product over a `G`-set (pp. 73-76)
@@ -123,6 +124,15 @@ theorem range_inl_eq_ker_rightHom :
     rw [MonoidHom.mem_ker, rightHom_apply] at hx
     exact ⟨x.left, by ext <;> simp [hx]⟩
 
+/-- base group は正規 (`= ker rightHom`)。 -/
+instance range_inl_normal : ((inl : (Ω → D) →* D ≀[Ω] Q).range).Normal := by
+  rw [range_inl_eq_ker_rightHom]
+  infer_instance
+
+/-- `rightHom` は全射 (`inr` が切断)。 -/
+theorem rightHom_surjective : Function.Surjective (rightHom : (D ≀[Ω] Q) → Q) :=
+  fun q => ⟨inr q, rfl⟩
+
 /-- Conjugation of a base element by `inr q` permutes the coordinates:
 `inr q * inl f * (inr q)⁻¹ = inl (f ∘ (q⁻¹ • ·))`. -/
 theorem inr_mul_inl_mul_inr_inv (q : Q) (f : Ω → D) :
@@ -154,6 +164,217 @@ def wreathEquivRegular : (D ≀[Q] Q) ≃* RegularWreathProduct D Q where
         (a.left * fun x => b.left (a.right⁻¹ * x)) ω
       rfl
     · rfl
+
+/-- `x` は base 成分と top 成分の積に分解する: `inl x.left * inr x.right = x`
+(`SemidirectProduct.inl_left_mul_inr_right` の wreath 版)。 -/
+@[simp] theorem inl_left_mul_inr_right (x : D ≀[Ω] Q) : inl x.left * inr x.right = x := by
+  refine WreathProduct.ext ?_ ?_
+  · funext ω
+    simp only [mul_left, left_inl, right_inl, left_inr, Pi.mul_apply, Pi.one_apply, mul_one]
+  · simp only [mul_right, right_inl, right_inr, one_mul]
+
+/-! ### Problem 3A.9(a) — 推移的作用のとき `C_B(Q)` = 定数関数 -/
+
+/-- **Isaacs Problem 3A.9(a)** (元ごとの形). `Q` の `Ω` への作用が推移的なとき、base group の
+元 `inl f` が `inr q` すべてと可換 ⟺ `f` が定数。
+
+共役公式 `inr q * inl f * (inr q)⁻¹ = inl (f ∘ (q⁻¹ • ·))` (`inr_mul_inl_mul_inr_inv`) から、
+可換性は `f (q⁻¹ • ω) = f ω` (∀ q, ω)、すなわち `f` が `Q`-軌道上で定数。推移的なら全体で定数。 -/
+theorem forall_conj_inr_eq_iff_const [MulAction.IsPretransitive Q Ω] (f : Ω → D) :
+    (∀ q : Q, (inr q : D ≀[Ω] Q) * inl f * (inr q)⁻¹ = inl f) ↔ ∀ ω ω' : Ω, f ω = f ω' := by
+  constructor
+  · intro h ω ω'
+    obtain ⟨q, rfl⟩ := MulAction.exists_smul_eq Q ω ω'
+    have hf : (fun x => f (q⁻¹ • x)) = f :=
+      inl_injective (by rw [← inr_mul_inl_mul_inr_inv]; exact h q)
+    have h2 := congrFun hf (q • ω)
+    rwa [inv_smul_smul] at h2
+  · intro h q
+    rw [inr_mul_inl_mul_inr_inv]
+    exact congrArg inl (funext fun ω => h _ _)
+
+/-- **Isaacs Problem 3A.9(a)**. `Q` の `Ω` への作用が推移的なとき、base group `B` の元で
+`Q` の像 `inr '' Q` に中心化されるものはちょうど定数関数 `Ω → D` の像。 -/
+theorem mem_centralizer_range_inr_iff [MulAction.IsPretransitive Q Ω] [Nonempty Ω]
+    (f : Ω → D) :
+    (inl f : D ≀[Ω] Q) ∈
+        Subgroup.centralizer ((inr : Q →* D ≀[Ω] Q).range : Set (D ≀[Ω] Q)) ↔
+      ∃ d : D, f = Function.const Ω d := by
+  rw [Subgroup.mem_centralizer_iff]
+  constructor
+  · intro h
+    obtain ⟨ω₀⟩ := ‹Nonempty Ω›
+    refine ⟨f ω₀, funext fun ω => ?_⟩
+    refine (forall_conj_inr_eq_iff_const (D := D) (Q := Q) (Ω := Ω) f).mp (fun q => ?_) ω ω₀
+    have hq := h (inr q) ⟨q, rfl⟩
+    calc (inr q : D ≀[Ω] Q) * inl f * (inr q)⁻¹
+        = inl f * inr q * (inr q)⁻¹ := by rw [hq]
+      _ = inl f := by group
+  · rintro ⟨d, rfl⟩ x hx
+    obtain ⟨q, rfl⟩ := hx
+    have hc := (forall_conj_inr_eq_iff_const (D := D) (Q := Q) (Ω := Ω)
+      (Function.const Ω d)).mpr (fun _ _ => rfl) q
+    calc (inr q : D ≀[Ω] Q) * inl (Function.const Ω d)
+        = inr q * inl (Function.const Ω d) * (inr q)⁻¹ * inr q := by group
+      _ = inl (Function.const Ω d) * inr q := by rw [hc]
+
+/-! ### Problem 3A.9(b) — 正則 wreath product では任意の部分群が base の元の中心化群 -/
+
+/-- **Isaacs Problem 3A.9(b)**. **正則** wreath product `W = D ≀[Q] Q` (`Ω = Q` に左正則作用)
+において、`Q` の任意の部分群 `C` に対し base group の元 `b : Q → D` で
+「`inl b` を中心化する `Q` の元全体がちょうど `C`」となるものが存在する。
+
+`b` を `C` の指示関数 (`C` 上で `d ≠ 1`、外で `1`) に取ればよい: 共役公式から中心化条件は
+`b (g⁻¹ · ω) = b ω` (∀ω)、すなわち `g⁻¹ω ∈ C ↔ ω ∈ C` (∀ω) で、`ω = 1` を入れると
+`g⁻¹ ∈ C`、逆に `g ∈ C` なら `Subgroup.mul_mem_cancel_left` で成立。
+
+⚠ `D` の非自明性は必須 (`D = 1` なら base group が自明で中心化群は常に `Q` 全体)。 -/
+theorem exists_base_centralizer_eq [Nontrivial D] (C : Subgroup Q) :
+    ∃ b : Q → D, ∀ g : Q,
+      ((inr g : D ≀[Q] Q) * inl b * (inr g)⁻¹ = inl b ↔ g ∈ C) := by
+  classical
+  obtain ⟨d, hd⟩ := exists_ne (1 : D)
+  refine ⟨fun ω => if ω ∈ C then d else 1, fun g => ?_⟩
+  rw [inr_mul_inl_mul_inr_inv]
+  constructor
+  · intro h
+    have hf := congrFun (inl_injective h) 1
+    simp only [smul_eq_mul, mul_one] at hf
+    by_contra hg
+    have hginv : g⁻¹ ∉ C := fun hc => hg (by simpa using C.inv_mem hc)
+    rw [if_neg hginv, if_pos C.one_mem] at hf
+    exact hd hf.symm
+  · intro hg
+    refine congrArg inl (funext fun ω => ?_)
+    simp only [smul_eq_mul]
+    exact if_congr (C.mul_mem_cancel_left (C.inv_mem hg)) rfl rfl
+
+/-! ### Problem 3A.10 — 与えられた `H`, `p` に対する `A = C_G(A)` つき分裂拡大 -/
+
+/-- `D` が可換なら、**任意の** `x` による base 元の共役は座標の置換のみ:
+`x * inl b * x⁻¹ = inl (b ∘ (x.right⁻¹ • ·))` (`x.left` の寄与は可換性で相殺する)。 -/
+theorem conj_inl_of_comm (hD : ∀ a b : D, a * b = b * a) (x : D ≀[Ω] Q) (b : Ω → D) :
+    x * inl b * x⁻¹ = inl fun ω => b (x.right⁻¹ • ω) := by
+  refine WreathProduct.ext ?_ ?_
+  · funext ω
+    simp only [mul_left, mul_right, inv_left, left_inl, right_inl, mul_one,
+      Pi.mul_apply, Pi.inv_apply, smul_smul, mul_inv_cancel, one_smul]
+    rw [hD (x.left ω) (b (x.right⁻¹ • ω)), mul_assoc, mul_inv_cancel, mul_one]
+  · simp only [mul_right, right_inl, inv_right, mul_one, mul_inv_cancel]
+
+/-- `x.right = 1` なら `x` は base group の元。 -/
+theorem eq_inl_of_right_eq_one {x : D ≀[Ω] Q} (h : x.right = 1) : x = inl x.left :=
+  WreathProduct.ext rfl (by rw [h, right_inl])
+
+/-- **正則 wreath product では base group は自己中心化的**: `D` 可換かつ非自明なら、
+`W = D ≀[Q] Q` の base group `B = range inl` は `C_W(B) = B` をみたす。
+
+`⊇` は `B` が可換だから。`⊆` は `x` が全ての `inl b` と可換 ⟹ (共役公式より)
+`b (x.right⁻¹ ω) = b ω` (∀ b, ω)、`b` を `{1}` の指示関数、`ω = x.right` に取ると
+`x.right = 1`、すなわち `x ∈ B`。 -/
+theorem centralizer_range_inl_eq [Nontrivial D] (hD : ∀ a b : D, a * b = b * a) :
+    Subgroup.centralizer (((inl : (Q → D) →* D ≀[Q] Q).range : Subgroup (D ≀[Q] Q)) :
+        Set (D ≀[Q] Q))
+      = (inl : (Q → D) →* D ≀[Q] Q).range := by
+  classical
+  obtain ⟨d, hd⟩ := exists_ne (1 : D)
+  refine le_antisymm (fun x hx => ?_) (fun x hx => ?_)
+  · -- `x` が base を中心化 ⟹ `x.right = 1`
+    rw [Subgroup.mem_centralizer_iff] at hx
+    have hconj : ∀ b : Q → D, x * inl b * x⁻¹ = inl b := by
+      intro b
+      have h := hx (inl b) ⟨b, rfl⟩
+      calc x * inl b * x⁻¹ = (inl b * x) * x⁻¹ := by rw [h]
+        _ = inl b := by group
+    have key := hconj fun ω => if ω = 1 then d else 1
+    rw [conj_inl_of_comm hD x] at key
+    have hf := congrFun (inl_injective key) x.right
+    simp only [smul_eq_mul, inv_mul_cancel] at hf
+    have hright : x.right = 1 := by
+      by_contra hne
+      rw [if_neg hne] at hf
+      exact hd hf
+    exact ⟨x.left, (eq_inl_of_right_eq_one hright).symm⟩
+  · -- base group は可換
+    obtain ⟨b, rfl⟩ := hx
+    rw [Subgroup.mem_centralizer_iff]
+    rintro y ⟨c, rfl⟩
+    rw [← map_mul, ← map_mul]
+    congr 1
+    funext ω
+    exact hD _ _
+
+/-! ### Problem 3A.10 — `A = C_G(A)` つき分裂拡大の存在 -/
+
+/-- `Multiplicative (ZMod p)` の元は `p` 乗して `1`。 -/
+theorem multiplicative_zmod_pow_self (p : ℕ) (x : Multiplicative (ZMod p)) : x ^ p = 1 := by
+  apply Multiplicative.toAdd.injective
+  rw [toAdd_pow, toAdd_one, nsmul_eq_mul, ZMod.natCast_self, zero_mul]
+
+/-- **Isaacs Problem 3A.10** の構成: `G := Z_p ≀ H` (正則 wreath product)。 -/
+abbrev zpWreath (H : Type*) [Group H] (p : ℕ) := Multiplicative (ZMod p) ≀[H] H
+
+/-- **Isaacs Problem 3A.10** の `A`: `G = Z_p ≀ H` の base group。 -/
+abbrev zpWreathBase (H : Type*) [Group H] (p : ℕ) : Subgroup (zpWreath H p) :=
+  (inl : (H → Multiplicative (ZMod p)) →* zpWreath H p).range
+
+/-- **Isaacs Problem 3A.10**. 任意の群 `H` と素数 `p` に対し、`G := Z_p ≀ H` (正則 wreath
+product) の base group `A` は次をすべてみたす:
+
+1. `A` は可換、
+2. `A` の各元は `p` 乗して `1` (すなわち `A` は基本アーベル `p`-群)、
+3. `G` は `A` 上**分裂**する (`inr : H →* G` の像が `A` の補群: `A ⊓ inr.range = ⊥`,
+   `A ⊔ inr.range = ⊤`)、
+4. `G ⧸ A ≅ H`、
+5. **`A = C_G(A)`** (`centralizer_range_inl_eq`)。
+
+`A ⊴ G` は `range_inl_normal` (`A = ker rightHom`) で instance として与えてある。
+
+したがって与えられた `H`, `p` に対し所望の `G` が実在する。 -/
+theorem zpWreathBase_spec (H : Type*) [Group H] (p : ℕ) [Fact p.Prime] :
+    (∀ x y : ↥(zpWreathBase H p), x * y = y * x) ∧
+      (∀ x : ↥(zpWreathBase H p), x ^ p = 1) ∧
+      (zpWreathBase H p ⊓ (inr : H →* zpWreath H p).range = ⊥) ∧
+      (zpWreathBase H p ⊔ (inr : H →* zpWreath H p).range = ⊤) ∧
+      Nonempty ((zpWreath H p ⧸ zpWreathBase H p) ≃* H) ∧
+      Subgroup.centralizer ((zpWreathBase H p : Subgroup (zpWreath H p)) :
+        Set (zpWreath H p)) = zpWreathBase H p := by
+  haveI : Fact (1 < p) := ⟨(Fact.out (p := p.Prime)).one_lt⟩
+  haveI : Nontrivial (Multiplicative (ZMod p)) :=
+    Multiplicative.ofAdd.injective.nontrivial
+  have hker : zpWreathBase H p = (rightHom : zpWreath H p →* H).ker :=
+    range_inl_eq_ker_rightHom
+  have hcomm : ∀ a b : Multiplicative (ZMod p), a * b = b * a := fun a b => mul_comm a b
+  refine ⟨?_, ?_, ?_, ?_, ?_, centralizer_range_inl_eq hcomm⟩
+  · -- 可換
+    rintro ⟨_, b, rfl⟩ ⟨_, c, rfl⟩
+    refine Subtype.ext ?_
+    push_cast
+    rw [← map_mul, ← map_mul]
+    congr 1
+    funext ω
+    exact hcomm _ _
+  · -- 各元は `p` 乗して `1`
+    rintro ⟨_, b, rfl⟩
+    refine Subtype.ext ?_
+    push_cast
+    rw [← map_pow]
+    refine (congrArg _ (funext fun ω => multiplicative_zmod_pow_self p (b ω))).trans ?_
+    exact map_one _
+  · -- `A ⊓ inr.range = ⊥`
+    refine le_antisymm (fun x hx => ?_) bot_le
+    obtain ⟨⟨b, hb⟩, ⟨h, hh⟩⟩ := hx
+    have hr : x.right = 1 := by rw [← hb, right_inl]
+    have hl : x.left = 1 := by rw [← hh, left_inr]
+    rw [Subgroup.mem_bot]
+    exact WreathProduct.ext hl hr
+  · -- `A ⊔ inr.range = ⊤`
+    refine le_antisymm le_top (fun x _ => ?_)
+    rw [← inl_left_mul_inr_right x]
+    exact Subgroup.mul_mem_sup ⟨x.left, rfl⟩ ⟨x.right, rfl⟩
+  · -- `G ⧸ A ≅ H`
+    exact ⟨(QuotientGroup.quotientMulEquivOfEq hker).trans
+      (QuotientGroup.quotientKerEquivOfSurjective _ rightHom_surjective)⟩
 
 end WreathProduct
 

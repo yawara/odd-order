@@ -198,4 +198,26 @@ theorem oPiResidual_eq_closure_piPrimeElements [Finite G] :
       hqdvd.trans (orderOf_map_dvd (QuotientGroup.mk' (oPiResidual π G)) g),
       (orderOf_pos g).ne'⟩) hqπ
 
+/-! ### `O^π` の関手性 -/
+
+/-- **`O^π` は群準同型で押し出せる**: 任意の `f : A →* B` について `O^π(A)^f ≤ O^π(B)`。
+
+1B.8(b) で `O^π = ⟨π'-元⟩` ゆえ生成元に帰着し、`orderOf (f a) ∣ orderOf a` (`orderOf_map_dvd`)
+から π'-元の像は π'-元。`f` に全射性も単射性も要らない。 -/
+theorem oPiResidual_map_le {A B : Type*} [Group A] [Finite A] [Group B] [Finite B]
+    (π : Set ℕ) (f : A →* B) : (oPiResidual π A).map f ≤ oPiResidual π B := by
+  rw [oPiResidual_eq_closure_piPrimeElements, oPiResidual_eq_closure_piPrimeElements,
+    MonoidHom.map_closure, Subgroup.closure_le]
+  rintro _ ⟨a, ha, rfl⟩
+  exact Subgroup.subset_closure fun q hq =>
+    ha q (Nat.primeFactors_mono (orderOf_map_dvd f a) (orderOf_pos a).ne' hq)
+
+/-- `H ≤ K` のとき `O^π(H)` は `↥K` の中で `O^π(K)` に入る (`oPiResidual_map_le` の
+`Subgroup.inclusion` 版)。特に `H` が π-perfect (`O^π(H) = ⊤`) なら
+`H.subgroupOf K ≤ O^π(K)`。 -/
+theorem subgroupOf_le_oPiResidual_of_eq_top [Finite G] {H K : Subgroup G} (hHK : H ≤ K)
+    (hH : oPiResidual π ↥H = ⊤) : H.subgroupOf K ≤ oPiResidual π ↥K := by
+  have hmap := oPiResidual_map_le π (Subgroup.inclusion hHK)
+  rwa [hH, ← MonoidHom.range_eq_map, Subgroup.inclusion_range] at hmap
+
 end OddOrder.Isaacs.Ch03

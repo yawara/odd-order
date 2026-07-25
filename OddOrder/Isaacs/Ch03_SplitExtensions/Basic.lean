@@ -1037,17 +1037,17 @@ theorem IsHallSubgroup.eq_of_normal [Finite G] [IsSolvable G] {π : Set ℕ} {H 
   rw [← hg]
   exact (Subgroup.Normal.conj_smul_eq_self g H).symm
 
-/-- **Schur-Zassenhaus D-part (抽象版)**: `M ⊴ G` が可解で補群 `K` を持つとき, `|M|` と
-位数が互いに素な部分群 `U` は `K` の共役 `Kˣ` に含まれる.
+/-- **Schur-Zassenhaus D-part (抽象版)**: `M ⊴ G` が補群 `K` を持ち `M` か `U` の一方が可解なとき,
+`|M|` と位数が互いに素な部分群 `U` は `K` の共役 `Kˣ` (`x ∈ M`) に含まれる.
 
 Hall D-定理 (`hall_D`) のエンジン. 証明: `P := U ⊔ M` の中で `U` も `P ⊓ K` も
 正規部分群 `M.subgroupOf P` (index は `|U|`, よって `|M|` と互いに素) の補群になる.
 Schur-Zassenhaus 共役性 (`IsComplement'.exists_conj_of_coprime`) を `P` 内で適用すると,
 `P ⊓ K` の (`M` の元による) 共役が `U` に一致するので, `U = (P ⊓ K)ᵐ ≤ Kᵐ`. -/
-theorem exists_conj_le_of_isComplement'_of_coprime [Finite G] {M K : Subgroup G} [M.Normal]
-    (hMsolv : IsSolvable ↥M) (hK : M.IsComplement' K) {U : Subgroup G}
+theorem exists_conj_le_of_isComplement'_of_coprime' [Finite G] {M K U : Subgroup G} [M.Normal]
+    (hsolv : IsSolvable ↥M ∨ IsSolvable ↥U) (hK : M.IsComplement' K)
     (hcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥M)) :
-    ∃ x : G, U ≤ K.map (MulAut.conj x).toMonoidHom := by
+    ∃ x ∈ M, U ≤ K.map (MulAut.conj x).toMonoidHom := by
   set P : Subgroup G := U ⊔ M with hP_def
   have hM_le_P : M ≤ P := le_sup_right
   have hU_le_P : U ≤ P := le_sup_left
@@ -1105,14 +1105,24 @@ theorem exists_conj_le_of_isComplement'_of_coprime [Finite G] {M K : Subgroup G}
     rw [h_compl_U.symm.index_eq_card, h_card_UP]
   have h_cop_MP : Nat.Coprime (Nat.card ↥(M.subgroupOf P)) (M.subgroupOf P).index := by
     rw [h_card_MP, h_idx_MP]; exact hcop.symm
-  haveI hMP_solv : IsSolvable ↥(M.subgroupOf P) := by
-    have h_iso := Subgroup.subgroupOfEquivOfLe hM_le_P
-    exact solvable_of_solvable_injective (f := h_iso.toMonoidHom) h_iso.injective
+  -- Schur-Zassenhaus 共役性が要求する「`M` 側か商側のどちらかが可解」を供給する.
+  -- `M` 可解ならそのまま; `U` 可解なら商 `P / M.subgroupOf P ≃* U.subgroupOf P` が可解.
+  have hsolv_P : IsSolvable ↥(M.subgroupOf P) ∨ IsSolvable (↥P ⧸ M.subgroupOf P) := by
+    rcases hsolv with hMsolv | hUsolv
+    · left
+      have h_iso := Subgroup.subgroupOfEquivOfLe hM_le_P
+      exact solvable_of_solvable_injective (f := h_iso.toMonoidHom) h_iso.injective
+    · right
+      haveI : IsSolvable ↥(U.subgroupOf P) := by
+        have h_iso := Subgroup.subgroupOfEquivOfLe hU_le_P
+        exact solvable_of_solvable_injective (f := h_iso.toMonoidHom) h_iso.injective
+      have h_iso := h_compl_U.symm.QuotientMulEquiv
+      exact solvable_of_solvable_injective (f := h_iso.toMonoidHom) h_iso.injective
   -- SZ conjugacy in `P`: conjugate `K.subgroupOf P` to `U.subgroupOf P` by `n ∈ M.subgroupOf P`.
   obtain ⟨n, hn_mem, hn_eq⟩ :=
-    Subgroup.IsComplement'.exists_conj_of_coprime h_cop_MP (Or.inl hMP_solv) h_compl_K h_compl_U
+    Subgroup.IsComplement'.exists_conj_of_coprime h_cop_MP hsolv_P h_compl_K h_compl_U
   let m : G := n.val
-  refine ⟨m, ?_⟩
+  refine ⟨m, Subgroup.mem_subgroupOf.mp hn_mem, ?_⟩
   -- Push `hn_eq` through `P.subtype`: `(P ⊓ K)ᵐ = U`, hence `U ≤ Kᵐ`.
   have h_intertwine : P.subtype.comp (MulAut.conj n).toMonoidHom =
       ((MulAut.conj (n.val : G)).toMonoidHom).comp P.subtype := by
@@ -1129,6 +1139,15 @@ theorem exists_conj_le_of_isComplement'_of_coprime [Finite G] {M K : Subgroup G}
   rw [h_lhs, h_rhs] at h_eq_lifted
   rw [← h_eq_lifted]
   exact Subgroup.map_mono inf_le_right
+
+/-- **Schur-Zassenhaus D-part (`M` 可解版)**: `exists_conj_le_of_isComplement'_of_coprime'` の
+`M` 可解への特殊化. Hall D-定理や BG/Peterfalvi の呼び出し側はこの形を使う. -/
+theorem exists_conj_le_of_isComplement'_of_coprime [Finite G] {M K : Subgroup G} [M.Normal]
+    (hMsolv : IsSolvable ↥M) (hK : M.IsComplement' K) {U : Subgroup G}
+    (hcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥M)) :
+    ∃ x : G, U ≤ K.map (MulAut.conj x).toMonoidHom :=
+  let ⟨x, _, hx⟩ := exists_conj_le_of_isComplement'_of_coprime' (Or.inl hMsolv) hK hcop
+  ⟨x, hx⟩
 
 /-- Hall D-定理の `|G|`-強誘導本体. `hall_E_strong_aux` と同じ骨格 (極小正規 `M`,
 `G/M` への IH, `p ∈ π` / `p ∉ π` 場合分け) に, 「IH は `U` の像を含む π-Hall を返す」
