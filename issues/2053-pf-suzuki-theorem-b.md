@@ -627,3 +627,14 @@ preimage、step (7) の N = P 使用)。主張:
   App II Prop 1 の N_G(R)/R 再実例化 (RankOneHypothesis 構築が本体) →
   Isaacs Cor 10.2 (transfer_range_eq_of_nilpotencyClass_lt) bridge → (B2) 矛盾 →
   step_twelve endpoint「case (10.2) holds」。
+- **m = 1 完成** (`a4b4ffdf7`、StepTwelve.lean 新設): case (10.1) 下で |F| = p、|G|_p = p³。
+  **残 (12) 終盤 (次の設計課題)**: 書籍は N_G(R)/R の 𝒜 への作用に App II Prop 1
+  (rankOne_affine_nearField) を適用 — RankOneHypothesis の新実例化が必要:
+  (i) 𝒜 への N_G(R)/R-作用の 2-推移性 (書籍: C_G(P)‾ = C_Q(P)⋊C_W(P)、C_Q(P) が
+  𝒜−{P} に正則 = 完成済の材料から)、(ii) 忠実性、(iii) 2-rank 1 の継承。
+  結論 N_G(R)/R = (R₁/R) ⋊ C_Q(P)C_W(P)、R₁ = Sylow_p(G) 非可換 p³ class 2 < p →
+  Isaacs Cor 10.2 (transfer_range_eq_of_nilpotencyClass_lt) + focal bridge →
+  T₁C_Q(P)C_W(P) が N_G(R₁) 内 index p 正規 → (B2) 偽。
+  RankOneHypothesis 実例化は StepTwo の rankOneQuotient 構築 (HypothesisA1 経由) と
+  同型のパターンだが、A1 でなく直接 RankOneHypothesis を組む必要がある — フィールド
+  (basept/doubly_transitive/faithful/H/Q/D/t/...) を 𝒜-作用で埋める設計から。
