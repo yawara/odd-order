@@ -1395,7 +1395,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 4D.5 主張本体 | ✅ | `derivedSeries_semidirectProduct_eq_bot_and_ne_bot` (上界 `..._eq_bot` / 下界 `..._ne_bot` / Lemma 4.29 部分群版 `commutator_commutator_inl_inr_map_eq`、新 leaf `ProblemsDerivedLength.lean`) |
 | 4D.5 系 | ✅ | `exists_finite_group_derivedSeries_ne_bot` + `regularPermAut` / `regularPermAut_injective` (同 leaf) |
 | 4D.6 | ✅ | `range_fittingProductHom_eq_fixedPoints` / `ker_fittingProductHom_eq_actionCommutator` (新 leaf `ProblemsFittingMap.lean`) |
-| 4D.7 | ⬜ | `p`-可解 + 巡回 Sylow `p` ⟹ `K ⊆ O_{p'}(G)` |
+| 4D.7 | 🔨 設計確定 | `p`-可解 + 巡回 Sylow `p` ⟹ `K ⊆ O_{p'}(G)` — 下記の設計 |
 
 ### 4D.1 の設計 (実装済)
 
@@ -1450,6 +1450,46 @@ motive 破綻 — 仮説側で `rw [hcardD] at hpow` と書き換える。
 `A`-固定、逆は `θ(c) = c^{|A|}` と「coprime ⟹ `x ↦ x^{|A|}` が `C_G(A)` 上単射 ⟹
 有限性で全射」。核は Lemma 4.28 の `G = C_G(A)·⁅G,A⁆` で `g = c*x` と分解し
 `1 = θ(g) = c^{|A|}` から `c = 1` — **位数の数え上げを経由しない**。
+
+### 4D.7 の設計 (2026-07-26 に確定、未実装)
+
+**statement** (PDF p.159 = 書籍 p.146 で確認済): `G` `p`-可解, Sylow `p`-部分群が巡回,
+`K ≤ G` が `p'`-部分群で `p ∣ |N_G(K)|` ⟹ `K ⊆ O_{p'}(G)`。
+
+**repo での "p-可解"** = `Ch03.IsPiSeparable ({p} : Set ℕ) G` (π = 単元集合では
+π-separable = p-solvable; S7B2 等の既存用法と同じ)。`O_{p'}(G) = oPiCore {p}ᶜ G`,
+`O_p(G) = oPiCore {p} G`。
+
+**証明 (|G| の帰納法、hint どおり 2 ケース)**:
+
+- **Case 1: `O_{p'}(G) ≠ 1`**。`Ḡ := G/O_{p'}(G)` に帰納法。仮説は全部遺伝する
+  (Sylow の像は巡回、`K̄` は `p'`-群、`p ∣ |N_G(K)|` の位数 `p` の元 `x` は
+  `O_{p'}(G)` に入らないので像も位数 `p` で `N_Ḡ(K̄)` に入る)。結論 `K̄ ≤ O_{p'}(Ḡ) = 1`
+  (**`O_{p'}(G/O_{p'}(G)) = 1`** — 引き戻しが `p'`-群の正規部分群になるから) ⟹ `K ≤ O_{p'}(G)`。
+- **Case 2: `O_{p'}(G) = 1`**。まず **`O_p(G)` が正規 Sylow `p`-部分群**であることを示す:
+  1. **Hall–Higman 1.2.3** (repo `Ch03.hall_higman_1_2_3 {p}`, `O_{p'}(G) = ⊥` を仮定) で
+     `C_G(O_p(G)) ≤ O_p(G)`。`O_p(G)` は巡回 Sylow の部分群ゆえ巡回=可換なので逆包含も成立し
+     **`C_G(O_p(G)) = O_p(G)`**。
+  2. `MulAut ↥(O_p(G))` は**可換** (mathlib `IsCyclic.mulAutMulEquiv : MulAut G ≃* (ZMod |G|)ˣ`
+     を `injective` で引き戻す; ZGroup.lean:169 と同じイディオム)。`MulAut.conjNormal` の核が
+     `C_G(O_p(G)) = O_p(G)` なので **`commutator G ≤ O_p(G)`**。
+  3. `O_p(G)` を含む Sylow `p`-部分群 `Q` は `⁅⊤, Q⁆ ≤ commutator G ≤ Q` から正規
+     (`le_normalizer_of_commutator_le`)、正規 `p`-部分群ゆえ `Q ≤ O_p(G)`
+     (`Subgroup.IsPiGroup.le_oPiCore`) ⟹ `Q = O_p(G)` = 正規 Sylow。
+  4. `p ∣ |N_G(K)|` の位数 `p` の元 `x` は Sylow が唯一なので `x ∈ P := O_p(G)`。
+     `⟨x⟩ = Ω₁(P)` は巡回 `p`-群の唯一の位数 `p` 部分群ゆえ **char `P` ⟹ `⊴ G`**。
+  5. `K` は `⟨x⟩` を正規化 (正規)、`x` は `K` を正規化 ⟹ `⁅K, ⟨x⟩⁆ ≤ K ⊓ ⟨x⟩ = 1`
+     (位数互いに素) ⟹ **`x ∈ C_P(K)`, すなわち `C_P(K) ≠ 1`**。
+  6. `K` の `P` への coprime 作用 + `P` 可換で **Thm 4.34** (`fixedPoints ⊓ actionCommutator = ⊥`)。
+     `P` は巡回 `p`-群なので**非自明な部分群 2 つは必ず非自明に交わる** ⟹ `C_P(K) ≠ 1` から
+     `⁅P, K⁆ = 1` ⟹ `K ≤ C_G(P) = P`。`K` は `p'`-群で `P` は `p`-群 ⟹ **`K = 1 = O_{p'}(G)`** ∎
+
+**必要な部品の所在**: Hall–Higman = `Ch03.hall_higman_1_2_3` ✅ / `IsCyclic.mulAutMulEquiv` =
+mathlib ✅ / Thm 4.34 = `fixedPoints_inf_actionCommutator_eq_bot_of_abelian` ✅ /
+`Subgroup.IsPiGroup.le_oPiCore` ✅ / `le_normalizer_of_commutator_le` ✅。
+**新規に要るもの**: (a) `MulAut` 可換 for cyclic (5 行) / (b) `MulAut.conjNormal` の核 =
+centralizer / (c) `O_{p'}(G/O_{p'}(G)) = 1` / (d) 巡回 `p`-群の非自明部分群は非自明に交わる /
+(e) 位数 `p` の元をもつ ⟺ `p ∣ |·|` (Cauchy, mathlib) / (f) 帰納法の骨組み。
 
 ### 4D.3 の設計 (残り (c)–(g))
 
