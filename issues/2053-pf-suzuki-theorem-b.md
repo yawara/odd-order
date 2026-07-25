@@ -792,3 +792,25 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   stab_N(R-line) = NR、orbit ∌ T₁-line (δ4-v)、非 {R,T₁}-line の NR-orbit
   = p−1 → [N:NR] ∈ {1} → N_G(R₁) = N_G(R)) → ε (Cor 10.2 transfer +
   T₁C_Q(P)C_W(P) index-p 正規 → ¬(B2))。
+
+### δ4-iv/vi の精密化 (2026-07-25 再導出 — cyclicity 不要版)
+
+- **(A) 分解 block**: R ⊓ T₁ = T (x = ty ∈ R∩T₁: s-反転と R-可換性で y² = 1)。
+  **NR = R₁·C_G(P)**: R₁ ∩ C_G(P) = R ([x]-order p vs C_G(P)-像の位数 p−1、
+  card 計算は mk'∘subtype の quotientKerEquivRange で |像| = |C|/|C∩R'| = p−1)
+  → card 積で全体。⟹ 任意の k ∈ NR は k = r₁·c (r₁ ∈ R₁, c ∈ C_G(P))。
+- **(B) 全 k ∈ NR は T₁-line を固定**: r₁ は V-自明。c 側: s' := c s c⁻¹ は
+  T を elementwise 反転 (T ⊴ NR) かつ s' ∈ C_G(P) (c ∈ C_G(P))。
+  **w := s'·s は P と T を両方 centralize → w ∈ C_G(R) = R** (L1 再利用!)
+  → s' = w·s、w は V-自明 → s' と s の V-作用一致 → 反転 line 同一
+  → c•(T₁-line) = T₁-line。cyclicity/唯一対合論法は不要。
+- **(C) δ4-iv 本体**: u₁(k) ≡ 1 ∀ k ∈ NR (r₁ V-自明 + c は R/T ≅ P-classes に
+  自明 — c ∈ C_G(P) で T-part しか動かさない)。k が X-line (∉{R,T₁}) も固定
+  すると (R/T ⊕ X/T)-座標で diag(1, u₂); T₁-line は第 3 の固定 line で
+  mixed → u₂ = 1 → V-自明 → δ4-iii で k ∈ R₁。
+- **(D) δ4-vi assembly**: N := N_G(R₁) ⊇ NR (R₁ ⊴ NR)。stab_N(R-line) =
+  N ∩ N_G(R) = NR (T = ⁅R₁,R₁⁆ で N は T 固定 → line-pullback = R 正規化)。
+  orbit of R-line: ∌ T₁-line (δ4-v)。s' := [N:NR] = |orbit|; s' > 1 なら
+  L ∈ orbit∖{R-line}, L ≠ T₁-line → Stab_NR(L) = R₁ ((C)) → NR-suborbit
+  サイズ [NR:R₁] = p−1 → s' ≥ p; p ∤ s' (|N|_p = p³) → s' = p+1 → 全 line
+  ∋ T₁-line ✗。∴ **N_G(R₁) = N_G(R)** □
