@@ -679,7 +679,29 @@ hint = Thm 1.38 (generalized Brodkey)。
    `N ≤ O_p(Γ) = 1` ⟹ `P` は `Δ_g` に faithful に作用する ∎
 
 ⚠ 被覆論法 (`V` 経由) は**筋が悪い**ので追わない (階数 ≥ 2 で被覆数が増え閉じない)。
-**残るのは Lean 実装のみ** (半直積 + Sylow 構造 + repo の Thm 1.38 + 上記の正規性計算)。
+
+#### 🎉 Lean 実装完了 (2026-07-26) — 新 leaf `Ch03_SplitExtensions/ProblemsFaithfulOrbit.lean`
+
+| 部品 | Lean 名 |
+|---|---|
+| `(inl g)⁻¹·inr u·inl g = inl(g⁻¹·(φ u)g)·inr u` | `inl_inv_mul_inr_mul_inl` |
+| Sylow 交叉 = 点安定化群 (元の形) | `conj_inr_mem_inr_range_iff` |
+| `inr(P)` は `Γ` の Sylow | `sylowInrRange` (+ `card_inr_range_eq_pow_factorization`) |
+| `O_p(Γ) = 1` | `opCore_semidirectProduct_eq_bot` (+ `inr_range_inf_centralizer_eq_bot`) |
+| 点安定化群 / 軌道核 (P で正規) | `fixSubgroup` / `orbitKernel` / `orbitKernel_normal` |
+| `inr(P) ⊓ inr(P)^{inl g} = inr(P_g)` | `inr_range_inf_conjInrRange_eq` |
+| ⭐ 軌道核は共役 Sylow でも正規 | `conjInrRange_le_normalizer_orbitKernel_map` |
+| `Γ` の Sylow はすべて `conjInrRange a` | `exists_eq_conjInrRange` |
+| 交叉位数の共役不変性 | `exists_card_inf_eq` |
+| **本体** | `exists_faithful_orbit` |
+
+⚠ 実装知見:
+- `simp` は `φ (v m₀ v⁻¹)` を `(φ v)∘(φ m₀)∘(φ v).symm` に展開するので、軌道核条件を
+  `u = 1` と `u = v⁻¹` で使った 2 式を simp に渡す。
+- `γ.left`/`γ.right` のまま `rw` すると自己参照で潰れる → `obtain ⟨a, b⟩ := γ` で先に分解。
+- `Ch03` は `Ch04` を import できないので `le_normalizer_of_forall_conj_mem` は局所 private 版。
+- 極小性は `Function.argmin` + `Subgroup.eq_of_le_of_card_ge`、
+  共役不変性は `Subgroup.smul_inf` + `Subgroup.equivSMul`。
 
 
 ## Ch.3 (Split Extensions) §3A — 着手 (2026-07-23、§2A hard tail deferred 中の breadth 展開)
@@ -772,7 +794,7 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
 | 3A.3 | ✅ (位数 pm, Z(G)=1) |
 | 3A.4 | ✅ (2026-07-25) |
 | 3A.5 | ✅ (`G ⋊ G ≅ G × G`) |
-| 3A.6 | 🔨 **数学は解決** (2026-07-26; 下記の「欠けていた一手」)、Lean 実装が残り |
+| 3A.6 | ✅ **完了** (2026-07-26) `exists_faithful_orbit` (新 leaf `ProblemsFaithfulOrbit.lean`) |
 | 3A.7 | ✅ **完了** (2026-07-25) |
 | 3A.8 | ✅ **完了** ((a)(b)(c) すべて) |
 | 3A.9 | ✅ **完了** ((a)(b)) |
@@ -1727,7 +1749,8 @@ import 方向的に自然 (現 1033 行 + ~250 行で 1500 上限内)。
 | 1D.19 | ✅ | `Ch01.le_fitting_subgroupOf_of_commutator_le` (+ `center_fitting_map_eq_inf_centralizer`) |
 | 3B.15 | ✅ | `normal_of_index_minimal` (Berkovich) |
 
-⟹ **§3B は 3B.1-3B.15 全完** (3B.12 のみ訂正版)。**Isaacs Ch.3 の章末演習は 3A.6 を除いて全完**。
+⟹ **§3B は 3B.1-3B.15 全完** (3B.12 のみ訂正版)。**2026-07-26 に 3A.6 も完了したので
+Isaacs Ch.3 の章末演習は全問完済** ⟹ あわせて **Isaacs Ch.1–Ch.4 の章末演習が全問完済**。
 
 **設計メモ**:
 
