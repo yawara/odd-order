@@ -1258,7 +1258,36 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 「Expected type must not contain free variables」で落ちる** — `∀ i k : ZMod 4, …` の
 **閉じた補題として切り出してから `decide`** する。
 
-### 🎉 §4A 完済 (4A.1–4A.13 全問)。次は §4B (書籍 p.125–, Hall–Witt 恒等式から)。
+### 🎉 §4A 完済 (4A.1–4A.13 全問)。
+
+## Ch.4 §4B (書籍 p.131 の Problems 4B) — 着手 (2026-07-25)
+
+新 leaf `OddOrder/Isaacs/Ch04_Commutators/ProblemsHallWitt.lean` (`OddOrder.lean` 配線済)。
+§4B は Hall–Witt 恒等式 / three subgroups lemma の節で, repo には既に
+`commutator_commutator_le_of_rotate` (Cor 4.10, mod `N` 版) がある。
+
+- ✅ **4B.1** `exists_characteristic_abelian_not_le_center` (class > 2 ⟹ 中心的でない
+  特性可換部分群が存在)。**答えは `γ_{c-1} = lowerCentralSeries ⊤ (c-2)`**:
+  `⁅γ_{c-1},γ_{c-1}⁆ ≤ γ_{2(c-1)} = 1` (`c ≥ 3` ゆえ `2(c-1) ≥ c+1`; Thm 4.11
+  `commutator_lowerCentralSeries_le`) で可換、`⁅γ_{c-1}, G⁆ = γ_c ≠ 1` で非中心。
+  特性性は mathlib の `lowerCentralSeries_characteristic` instance。
+- ✅ **4B.3** `commutator_lowerCentralSeries_upperCentralSeries_le`
+  (`⁅G^i, Z_j⁆ ≤ Z_{j-i}`) + 系 `…_eq_bot` (`⁅G^i, Z_i⁆ = 1`)。`k` の帰納 + three
+  subgroups lemma。⚠ 添字対応: mathlib の `lowerCentralSeries ⊤ k` = 古典 `G^{k+1}`、
+  `Subgroup.upperCentralSeries G j` = 古典 `Z_j` (`Z_0 = 1`)。
+- ✅ **4B.4(a)(b)** `commutator_le_centralizer_of_centralizes` /
+  `commutator_isCommutative_of_centralizes`。どちらも three subgroups lemma 直接適用。
+  ⚠ **(b) は書籍が `X ⊴ G` を仮定するが不要** — `⁅X,Y⁆` が `X` で正規化されること
+  (`le_normalizer_commutator_left`, 4A.9 で作った) だけで足りる。
+
+⚠ 教訓: root の `upperCentralSeries` は **deprecated** で `Subgroup.upperCentralSeries` と
+**別定数**として扱われ、instance 検索 (Normal) や型が合わない — 新規コードは必ず
+`Subgroup.` 付きで書く。
+
+- ⬜ **4B.2** (`G` 冪零 ⟹ 特性部分群 `K` で `C_G(K) ⊆ K` かつ class(K) ≤ 2; hint = 4B.1)
+- ⬜ **4B.5** (`G` 超可解 ⟹ `M(G)` は class ≤ 3 で冪零)。⚠ `M(G)` = 共役類サイズが
+  2 番目に小さい値 `n₂` 以下の元で生成される部分群 (書籍 p.129, Mann の Thm 4.14/4.15)。
+  repo に `M(G)` の定義があるか要確認 (無ければ先に定義 + Thm 4.15 が要る)。
 
 #### 🎉 4A.11 完了 (2026-07-25) — `ProblemsWreath.lean` に追加
 
