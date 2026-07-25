@@ -819,6 +819,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | # | 状態 | Lean 名 |
 |---|---|---|
 | 4A.1 | ✅ | `commutator_eq_commutator_of_mul_eq_top` |
+| 4A.2 | ✅ | `exists_closure_commutatorTriple_eq_zpowers` (前半) / `exists_card_two_subgroups_commutator_triple_eq_top` (後半 = A₅ 実例 + Note) |
 | 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 類 2 の `commutatorElement_pow_left_of_commutator_le_center`) |
 
 - **4A.1** (`G = AB`, `A`,`B` abelian ⟹ `G' = ⁅A,B⁆`): `⁅A,B⁆` の正規性は既存の
@@ -831,7 +832,22 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   要る (repo は ⊇ 方向 `commutator_sup_pow_closure_le_frattini` のみ)。⊆ 方向は
   「elementary abelian 群の Frattini = ⊥」が要り、repo/mathlib いずれにも無い — 別途整備候補。
 
-### 残り (文書順): 4A.2 (A₅ で `[H,K,L] = G`) / 4A.3 (quasiquaternion) / 4A.5 (extraspecial の
+- **4A.2** (`⁅H,K,L⁆` は `⁅h,k,l⁆` たちで生成されるとは限らない): 前半 (位数 2 の `H,K,L` なら
+  三重交換子の**元**は高々 1 個の非単位元 ⟹ 生成するのは巡回群) は
+  `exists_closure_commutatorTriple_eq_zpowers` で `closure {…} = ⟨⁅⁅h,k⁆,m⁆⟩` と**等式**まで出す
+  (生成元自身が集合の元なので場合分け不要)。汎用補題
+  `commutator_zpowers_eq_zpowers_commutatorElement` (`a² = b² = 1` ⟹ `⁅⟨a⟩,⟨b⟩⁆ = ⟨⁅a,b⁆⟩`) を分離。
+  後半の `A₅` 実例は書籍 Hint どおり `P = ⟨(0 1 2 3 4)⟩`, `H = ⟨(1 4)(2 3)⟩`, `K = ⟨(0 2)(3 4)⟩`
+  (どちらも `N_{A₅}(P) ≅ D₁₀` の折り返し ⟹ `⁅H,K⁆ = P`)、`L = ⟨(0 1)(2 3)⟩` (`P` を正規化しない)。
+  **`⁅P,L⁆ = ⊤` は「`⟨P,L⟩ = A₅` + 単純性」でなく位数で出した**: `⁅rot5,l⁆` (位数 5)、
+  `⁅rot5²,l⁆` (位数 3)、その積 (位数 2) が `⁅P,L⁆` に居る ⟹ `30 ∣ |N| ∣ 60` ⟹ `|N| ∈ {30,60}`、
+  `30` なら指数 2 = `(60).minFac` で `N ⊴ A₅` となり単純性に反する ⟹ `|N| = 60`。
+  具体置換の計算は `Equiv.Perm (Fin 5)` 上の `decide` (冪は `maxRecDepth 8000` が要る)、
+  `↥(alternatingGroup (Fin 5))` へは `Subtype.ext` + `change` で降ろす。
+  Note (「`⁅H,K,L⁆` は `⁅h,k,l⁆` で生成されない」) は前半の巡回性 +
+  `alternatingGroup.isCyclic_iff_card_le_three` で主定理の最後の連言肢に含めた。
+
+### 残り (文書順): 4A.3 (quasiquaternion) / 4A.5 (extraspecial の
 構造 (a)-(e)) / 4A.6 (maximal class) / 4A.7-4A.8 (regular wreath product; §3A で作った
 `WreathProduct` インフラが使える) / 4A.9 / 4A.10 / 4A.11。
 
