@@ -592,3 +592,11 @@ preimage、step (7) の N = P 使用)。主張:
   (ii) 𝒜 := {位数 p の R-部分群で T ⊄} の |𝒜| = p^m と C_Q(P) 正則性
   (a ∈ C_Q(P)# が P₁ ∈ 𝒜 を正規化 → [a,P₁] ⊆ P₁∩T = 1 → a が P₁ 中心化 →
   a fpf on R/P (u-乗の固定点なし) → P₁ = P)。
+- **step (11) 全主張完成** (`a68f08548`〜、StepElevenComplement.lean):
+  sInvertedT def 化 / spec (R = T×P) / C_Q(P)-正規化 (s ∈ Q0 中心性) /
+  C_W(P)-正規化 (H̄ unique involution + N=P 補正) / freeness
+  (`eq_P_of_prime_order_conj_invariant`)。regular の数え上げ形
+  (|𝒜−{P}| = |C_Q(P)| = p^m−1) は (12) が要求する形で assembly 予定。
+  **次 = step (12)**: (10.1) 仮定下で N_G(P) ⊊ N_G(R)、𝒜' = 𝒜 (strongly-real 排除 =
+  Ch.I §3 Lemma 3 の被覆確認から)、[N_G(R):N_G(P)] = p^m → m=1 → App II Prop 1 再適用 →
+  Isaacs Cor 10.2 → (B2) 矛盾。
