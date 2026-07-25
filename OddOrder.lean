@@ -150,6 +150,7 @@ import OddOrder.GroupTheory.SemiDihedral
 import OddOrder.GroupTheory.SylowTransport
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.NonsplitTorus
 import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
