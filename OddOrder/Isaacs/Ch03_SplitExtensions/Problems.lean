@@ -891,6 +891,65 @@ theorem mul_eq_zero_iff_exists_mul {n d m : ℕ} [NeZero n] (hn : d * m = n) (x 
   · rintro ⟨k, rfl⟩
     rw [← mul_assoc, ← Nat.cast_mul, hn, ZMod.natCast_self, zero_mul]
 
+/-- `gcd(a,b) = 1` なら `ZMod n` で `a·A + b·B = 1` をみたす `A, B` がある (Bezout の像)。 -/
+theorem exists_bezout_zmod (n : ℕ) {a b : ℕ} (hab : Nat.Coprime a b) :
+    ∃ A B : ZMod n, (a : ZMod n) * A + (b : ZMod n) * B = 1 := by
+  refine ⟨((Nat.gcdA a b : ℤ) : ZMod n), ((Nat.gcdB a b : ℤ) : ZMod n), ?_⟩
+  have hg := Nat.gcd_eq_gcd_ab a b
+  rw [Nat.Coprime.gcd_eq_one hab] at hg
+  have hcast : (((a : ℤ) * Nat.gcdA a b + (b : ℤ) * Nat.gcdB a b : ℤ) : ZMod n)
+      = ((1 : ℤ) : ZMod n) := by rw [← hg]; norm_cast
+  push_cast at hcast
+  linear_combination hcast
+
+/-- **一意性 (Bezout のみ)**: `gcd(s,m) = 1` のとき、`m` を固定し `s` を反転する `ZMod n` の元は
+高々 1 つ (`u - u'` が `m` と `s` の両方を消すので `1 = sA + mB` を掛けて `0`)。 -/
+theorem eq_of_fixes_inverts {n s m : ℕ} (hcop : Nat.Coprime s m) {u u' : ZMod n}
+    (hu : u * (m : ZMod n) = (m : ZMod n) ∧ u * (s : ZMod n) = -(s : ZMod n))
+    (hu' : u' * (m : ZMod n) = (m : ZMod n) ∧ u' * (s : ZMod n) = -(s : ZMod n)) : u = u' := by
+  obtain ⟨A, B, hAB⟩ := exists_bezout_zmod n hcop
+  have hd : (u - u') * (m : ZMod n) = 0 := by rw [sub_mul, hu.1, hu'.1, sub_self]
+  have hd2 : (u - u') * (s : ZMod n) = 0 := by rw [sub_mul, hu.2, hu'.2, sub_self]
+  refine sub_eq_zero.mp ?_
+  calc u - u' = (u - u') * ((s : ZMod n) * A + (m : ZMod n) * B) := by rw [hAB, mul_one]
+    _ = 0 := by rw [mul_add, ← mul_assoc, ← mul_assoc, hd, hd2]; ring
+
+/-- `s` を反転する元は `s` の倍数も反転する。 -/
+theorem inverts_mul {n : ℕ} {u : ZMod n} {s : ℕ} (h : u * (s : ZMod n) = -(s : ZMod n))
+    (k : ℕ) : u * ((s * k : ℕ) : ZMod n) = -((s * k : ℕ) : ZMod n) := by
+  push_cast
+  rw [← mul_assoc, h]; ring
+
+/-- `s` を固定する元は `s` の倍数も固定する。 -/
+theorem fixes_mul {n : ℕ} {u : ZMod n} {s : ℕ} (h : u * (s : ZMod n) = (s : ZMod n))
+    (k : ℕ) : u * ((s * k : ℕ) : ZMod n) = ((s * k : ℕ) : ZMod n) := by
+  push_cast
+  rw [← mul_assoc, h]
+
+/-- `gcd(a,b) = 1` で `u` が `a·c` と `b·c` をともに反転すれば `c` も反転する。 -/
+theorem inverts_of_inverts_coprime {n : ℕ} {u : ZMod n} {a b c : ℕ} (hab : Nat.Coprime a b)
+    (ha : u * ((a * c : ℕ) : ZMod n) = -((a * c : ℕ) : ZMod n))
+    (hb : u * ((b * c : ℕ) : ZMod n) = -((b * c : ℕ) : ZMod n)) :
+    u * (c : ZMod n) = -(c : ZMod n) := by
+  obtain ⟨A, B, hAB⟩ := exists_bezout_zmod n hab
+  have hc : (c : ZMod n) = ((a * c : ℕ) : ZMod n) * A + ((b * c : ℕ) : ZMod n) * B := by
+    push_cast
+    linear_combination (c : ZMod n) * hAB.symm
+  rw [hc, mul_add, ← mul_assoc, ← mul_assoc, ha, hb]
+  ring
+
+/-- `gcd(a,b) = 1` で `u` が `a·c` を固定し `b·c` を反転すれば… は使わないが、対称形として
+`a·c` と `b·c` をともに固定すれば `c` も固定する。 -/
+theorem fixes_of_fixes_coprime {n : ℕ} {u : ZMod n} {a b c : ℕ} (hab : Nat.Coprime a b)
+    (ha : u * ((a * c : ℕ) : ZMod n) = ((a * c : ℕ) : ZMod n))
+    (hb : u * ((b * c : ℕ) : ZMod n) = ((b * c : ℕ) : ZMod n)) :
+    u * (c : ZMod n) = (c : ZMod n) := by
+  obtain ⟨A, B, hAB⟩ := exists_bezout_zmod n hab
+  have hc : (c : ZMod n) = ((a * c : ℕ) : ZMod n) * A + ((b * c : ℕ) : ZMod n) * B := by
+    push_cast
+    linear_combination (c : ZMod n) * hAB.symm
+  rw [hc, mul_add, ← mul_assoc, ← mul_assoc, ha, hb]
+
 /-- **Isaacs Problem 3A.8(a)** の核. `n = s·m` (`gcd(s,m) = 1`, `n` 奇数, `1 < m`) のとき、
 `ZMod n` に「`s`-捩れの生成元 `m` を固定し `m`-捩れの生成元 `s` を反転する」元 `u` が
 **ちょうど 1 つ**存在する。さらに `u·u = 1` かつ `u ≠ 1` (すなわち `Aut(C)` の involution)。
@@ -990,6 +1049,62 @@ theorem exists_unique_fixes_inverts {n s m : ℕ} [NeZero n] (hn : s * m = n) (h
         _ = 0 := by
             rw [mul_add, ← mul_assoc, ← mul_assoc, hd, hd2]; ring)
     exact this
+
+/-- **Isaacs Problem 3A.8(b)** の核. `n = p·q·r` (互いに素) で、`u_p` (「`p`-捩れの生成元 `qr`
+を固定し `p` を反転する」)、`u_q`、`u_r` を (a) の一意な元とすると `u_p · u_q = u_r`。
+
+`u_p u_q` が `u_r` の 2 条件をみたすことを確かめ、一意性 (`eq_of_fixes_inverts`) で結論:
+- `(u_p u_q)·(pq) = u_p·(-(pq)) = pq` (`u_q` は `q` を、`u_p` は `p` を反転するから両者とも
+  `pq` を反転する)。
+- `(u_p u_q)·(qr) = -(qr)` (`u_q` が反転、`u_p` が固定) かつ `(u_p u_q)·(pr) = -(pr)`
+  (`u_q` が固定、`u_p` が反転) なので、`gcd(q,p) = 1` より `(u_p u_q)·r = -r`
+  (`inverts_of_inverts_coprime`)。
+
+これと `u_p² = u_q² = u_r² = 1` から `{1, u_p, u_q, u_r}` は位数 4 の部分群 (Klein 四元群)。 -/
+theorem mul_eq_of_fixes_inverts_pqr {p q r : ℕ} (hpq : Nat.Coprime p q) (hpr : Nat.Coprime p r)
+    (hqr : Nat.Coprime q r) {up uq ur : ZMod (p * q * r)}
+    (hup : up * ((q * r : ℕ) : ZMod (p * q * r)) = ((q * r : ℕ) : ZMod (p * q * r)) ∧
+      up * (p : ZMod (p * q * r)) = -(p : ZMod (p * q * r)))
+    (huq : uq * ((p * r : ℕ) : ZMod (p * q * r)) = ((p * r : ℕ) : ZMod (p * q * r)) ∧
+      uq * (q : ZMod (p * q * r)) = -(q : ZMod (p * q * r)))
+    (hur : ur * ((p * q : ℕ) : ZMod (p * q * r)) = ((p * q : ℕ) : ZMod (p * q * r)) ∧
+      ur * (r : ZMod (p * q * r)) = -(r : ZMod (p * q * r))) :
+    up * uq = ur := by
+  refine eq_of_fixes_inverts (s := r) (m := p * q)
+    (Nat.Coprime.mul_right hpr.symm hqr.symm) ⟨?_, ?_⟩ hur
+  · have h1 : uq * ((p * q : ℕ) : ZMod (p * q * r)) = -((p * q : ℕ) : ZMod (p * q * r)) := by
+      have h := inverts_mul huq.2 p
+      rwa [Nat.mul_comm q p] at h
+    have h2 : up * ((p * q : ℕ) : ZMod (p * q * r)) = -((p * q : ℕ) : ZMod (p * q * r)) :=
+      inverts_mul hup.2 q
+    rw [mul_assoc up uq, h1, mul_neg, h2, neg_neg]
+  · refine inverts_of_inverts_coprime (a := q) (b := p) (c := r) hpq.symm ?_ ?_
+    · have h1 : uq * ((q * r : ℕ) : ZMod (p * q * r)) = -((q * r : ℕ) : ZMod (p * q * r)) :=
+        inverts_mul huq.2 r
+      rw [mul_assoc up uq, h1, mul_neg, hup.1]
+    · have h2 : up * ((p * r : ℕ) : ZMod (p * q * r)) = -((p * r : ℕ) : ZMod (p * q * r)) :=
+        inverts_mul hup.2 r
+      rw [mul_assoc up uq, huq.1, h2]
+
+/-- **Isaacs Problem 3A.8(a)** (捩れ表現). `n = s·m` (`gcd(s,m) = 1`) で `u` が生成元条件
+`u·m = m`, `u·s = -s` をみたすことは、「`s`-捩れの元をすべて固定し `m`-捩れの元をすべて
+反転する」ことと同値 (`mul_eq_zero_iff_exists_mul` で捩れ = 生成元の倍数)。 -/
+theorem fixes_inverts_iff_torsion {n s m : ℕ} [NeZero n] (hn : s * m = n) {u : ZMod n} :
+    (u * (m : ZMod n) = (m : ZMod n) ∧ u * (s : ZMod n) = -(s : ZMod n)) ↔
+      ((∀ x : ZMod n, (s : ZMod n) * x = 0 → u * x = x) ∧
+        ∀ x : ZMod n, (m : ZMod n) * x = 0 → u * x = -x) := by
+  have hn' : m * s = n := by rw [← hn]; ring
+  constructor
+  · rintro ⟨h1, h2⟩
+    refine ⟨fun x hx => ?_, fun x hx => ?_⟩
+    · obtain ⟨k, rfl⟩ := (mul_eq_zero_iff_exists_mul hn x).mp hx
+      rw [← mul_assoc, h1]
+    · obtain ⟨k, rfl⟩ := (mul_eq_zero_iff_exists_mul hn' x).mp hx
+      rw [← mul_assoc, h2]; ring
+  · rintro ⟨h1, h2⟩
+    refine ⟨h1 _ ?_, h2 _ ?_⟩
+    · rw [← Nat.cast_mul, hn, ZMod.natCast_self]
+    · rw [← Nat.cast_mul, hn', ZMod.natCast_self]
 
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,
