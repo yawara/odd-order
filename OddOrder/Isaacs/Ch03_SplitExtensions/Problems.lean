@@ -782,6 +782,123 @@ theorem no_regular_orbit_klein {p q r : ℕ} (hp : p.Prime) (hq : q.Prime) (hr :
       rw [Nat.cast_mul, ← Nat.cast_mul, hval]
       exact two_mul_ne_zero_of_odd_prime_factor (by ring) hr hr2 (Nat.mul_ne_zero hp0 hq0)
 
+/-! ### Problem 3A.7 — `o(α)` の素因子が 2 個以下なら `⟨α⟩` は regular orbit をもつ
+
+`⟨α⟩` の点 `g` での安定化群が非自明 ⟺ ある素数 `r ∣ n := o(α)` について `α^{n/r}` が `g` を
+固定する。したがって regular orbit が無いとすると `G` は固定部分群 `Fix(α^{n/r})`
+(`r ∣ n` は高々 2 個) の合併になるが、**群は 2 つの真部分群の合併にならない**ので矛盾。
+(3A.8(c) が示すとおり、素因子 3 個では実際に反例がある。) -/
+
+/-- **群は 2 つの真部分群の合併にはならない**。
+
+`H ⊄ K` なる `a ∈ H ∖ K` と `K ⊄ H` なる `b ∈ K ∖ H` を取ると `a*b` はどちらにも入れない。 -/
+theorem not_forall_mem_or_mem_of_ne_top {G : Type*} [Group G] {H K : Subgroup G}
+    (hH : H ≠ ⊤) (hK : K ≠ ⊤) : ¬ ∀ g : G, g ∈ H ∨ g ∈ K := by
+  intro h
+  obtain ⟨a, haH, haK⟩ : ∃ a, a ∈ H ∧ a ∉ K := by
+    by_contra hc
+    push Not at hc
+    exact hK (eq_top_iff.mpr fun g _ => (h g).elim (hc g) id)
+  obtain ⟨b, hbK, hbH⟩ : ∃ b, b ∈ K ∧ b ∉ H := by
+    by_contra hc
+    push Not at hc
+    exact hH (eq_top_iff.mpr fun g _ => (h g).elim id (hc g))
+  rcases h (a * b) with hab | hab
+  · exact hbH (by simpa using H.mul_mem (H.inv_mem haH) hab)
+  · exact haK (by simpa using K.mul_mem hab (K.inv_mem hbK))
+
+/-- 自己同型 `β ≠ 1` の固定部分群は真部分群。 -/
+theorem eqLocus_id_ne_top {G : Type*} [Group G] {β : MulAut G} (hβ : β ≠ 1) :
+    (β.toMonoidHom).eqLocus (MonoidHom.id G) ≠ ⊤ := by
+  intro h
+  refine hβ (MulEquiv.ext fun x => ?_)
+  have hx : x ∈ (β.toMonoidHom).eqLocus (MonoidHom.id G) := h ▸ Subgroup.mem_top x
+  exact hx
+
+/-- **Isaacs Problem 3A.7**. 有限群 `G` の自己同型 `α` について `o(α)` を割る素数が高々 2 個
+ならば、`⟨α⟩` は `G` 上に **regular orbit** をもつ: 安定化群が自明な `g ∈ G` が存在する。 -/
+theorem exists_regular_orbit_of_primeFactors_card_le_two {G : Type*} [Group G] [Finite G]
+    (α : MulAut G) (h2 : (orderOf α).primeFactors.card ≤ 2) :
+    ∃ g : G, ∀ j : ℕ, (α ^ j) g = g → α ^ j = 1 := by
+  classical
+  by_contra hcon
+  push Not at hcon
+  set n := orderOf α with hndef
+  have hn0 : n ≠ 0 := (orderOf_pos α).ne'
+  have hαn : α ^ n = 1 := pow_orderOf_eq_one α
+  -- 各 `g` について、`n` の素因子 `r` で `α^{n/r}` が `g` を固定するものがある
+  have hkey : ∀ g : G, ∃ r ∈ n.primeFactors, (α ^ (n / r)) g = g := by
+    intro g
+    obtain ⟨j, hj, hjne⟩ := hcon g
+    set m := Nat.gcd n j with hmdef
+    have hmn : m ∣ n := Nat.gcd_dvd_left n j
+    have hd : orderOf (α ^ j) = n / m := orderOf_pow α
+    have hd1 : n / m ≠ 1 := fun h => hjne (orderOf_eq_one_iff.mp (by rw [hd, h]))
+    obtain ⟨r, hrp, hrd⟩ := Nat.exists_prime_and_dvd hd1
+    have hmr : m * r ∣ n := by
+      obtain ⟨c, hc⟩ := hrd
+      exact ⟨c, by rw [mul_assoc, ← hc, Nat.mul_div_cancel' hmn]⟩
+    have hrn : r ∣ n := dvd_trans ⟨m, by ring⟩ hmr
+    refine ⟨r, Nat.mem_primeFactors.mpr ⟨hrp, hrn, hn0⟩, ?_⟩
+    -- Bezout で `α^m ∈ ⟨α^j⟩`、よって `α^m` は `g` を固定
+    have hstab : α ^ j ∈ MulAction.stabilizer (MulAut G) g := hj
+    obtain ⟨a, b, hab⟩ : ∃ a b : ℤ, (m : ℤ) = (n : ℤ) * a + (j : ℤ) * b :=
+      ⟨Nat.gcdA n j, Nat.gcdB n j, by exact_mod_cast Nat.gcd_eq_gcd_ab n j⟩
+    have hαm : α ^ m = ((α ^ j) ^ b : MulAut G) := by
+      calc (α : MulAut G) ^ m = α ^ ((m : ℕ) : ℤ) := (zpow_natCast _ _).symm
+        _ = α ^ ((n : ℤ) * a + (j : ℤ) * b) := by rw [hab]
+        _ = (α ^ (n : ℤ)) ^ a * (α ^ (j : ℤ)) ^ b := by rw [zpow_add, zpow_mul, zpow_mul]
+        _ = ((α ^ j) ^ b : MulAut G) := by
+            rw [zpow_natCast, hαn, one_zpow, one_mul, zpow_natCast]
+    have hmstab : α ^ m ∈ MulAction.stabilizer (MulAut G) g := hαm ▸ zpow_mem hstab b
+    obtain ⟨c, hc⟩ : m ∣ n / r := by
+      obtain ⟨t, ht⟩ := hmr
+      exact ⟨t, by rw [ht, show m * r * t = r * (m * t) from by ring,
+        Nat.mul_div_cancel_left _ hrp.pos]⟩
+    have hfix : α ^ (n / r) ∈ MulAction.stabilizer (MulAut G) g := by
+      rw [hc, pow_mul]; exact pow_mem hmstab c
+    exact hfix
+  -- 固定部分群 `F r` は真部分群
+  set F : ℕ → Subgroup G := fun r => ((α ^ (n / r)).toMonoidHom).eqLocus (MonoidHom.id G)
+    with hF
+  have hFmem : ∀ (r : ℕ) (g : G), (α ^ (n / r)) g = g → g ∈ F r := fun _ _ h => h
+  have hFne : ∀ r ∈ n.primeFactors, F r ≠ ⊤ := by
+    intro r hr
+    obtain ⟨hrp, hrn, -⟩ := Nat.mem_primeFactors.mp hr
+    have hdiv : n / r ≠ 0 :=
+      Nat.div_ne_zero_iff.mpr ⟨hrp.pos.ne', Nat.le_of_dvd (Nat.pos_of_ne_zero hn0) hrn⟩
+    have hord : orderOf (α ^ (n / r)) = r := by
+      rw [orderOf_pow_of_dvd hdiv (by rw [← hndef]; exact Nat.div_dvd_of_dvd hrn), ← hndef,
+        Nat.div_div_self hrn hn0]
+    refine eqLocus_id_ne_top fun hcon1 => ?_
+    rw [hcon1, orderOf_one] at hord
+    exact hrp.one_lt.ne hord
+  -- 素因子が高々 2 個 ⟹ `G` は 2 つの真部分群の合併になり矛盾
+  by_cases hemp : n.primeFactors = ∅
+  · obtain ⟨r, hr, -⟩ := hkey 1
+    rw [hemp] at hr
+    exact absurd hr (Finset.notMem_empty r)
+  obtain ⟨p, hp⟩ := Finset.nonempty_iff_ne_empty.mpr hemp
+  have hcard : (n.primeFactors.erase p).card ≤ 1 := by
+    have := Finset.card_erase_of_mem hp
+    omega
+  by_cases hT : n.primeFactors.erase p = ∅
+  · refine hFne p hp (eq_top_iff.mpr fun g _ => ?_)
+    obtain ⟨r, hr, hgr⟩ := hkey g
+    have hrp : r = p := by
+      by_contra hne
+      exact absurd (Finset.mem_erase.mpr ⟨hne, hr⟩) (hT ▸ Finset.notMem_empty r)
+    exact hFmem p g (hrp ▸ hgr)
+  obtain ⟨q, hq⟩ := Finset.nonempty_iff_ne_empty.mpr hT
+  refine not_forall_mem_or_mem_of_ne_top (hFne p hp) (hFne q (Finset.mem_erase.mp hq).2)
+    fun g => ?_
+  obtain ⟨r, hr, hgr⟩ := hkey g
+  by_cases hrp : r = p
+  · exact Or.inl (hFmem p g (hrp ▸ hgr))
+  · have hrq : r = q :=
+      Finset.card_le_one.mp hcard r (Finset.mem_erase.mpr ⟨hrp, hr⟩) q hq
+    exact Or.inr (hFmem q g (hrq ▸ hgr))
+
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,
 a.right·b.right)` を写すと `(a.left·a.right·b.left·b.right, a.right·b.right)` = 直積の積の像。 -/
