@@ -1243,6 +1243,109 @@ theorem mem_P_of_mem_of_distinguishedInvolution_conj_eq
   rw [h4]
   simpa using hy
 
+include model in
+/-- **`T` is central in `R₁`** ((12) tail, δ4a): conjugation by `x ∈ R₁` acts on the
+order-`p` cyclic `T` with exponent `k`, and `k^{orderOf x} ≡ k^{p^a} ≡ k (mod p)`
+(iterated Fermat) forces `k ≡ 1`. -/
+theorem sInvertedT_mul_comm_of_mem
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) :
+    ∀ t ∈ fc.sInvertedT model, ∀ x ∈ R₁, x * t = t * x := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  intro t ht x hx
+  by_cases ht1 : t = 1
+  · rw [ht1, mul_one, one_mul]
+  obtain ⟨hTle, -, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hTcard : Nat.card ↥(fc.sInvertedT model) = fc.p := by
+    rw [fc.card_sInvertedT model ind hB2 hm, hm, pow_one]
+  have hordt : orderOf t = fc.p := orderOf_eq_prime
+    (fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm (hTle ht)) ht1
+  have hTz : fc.sInvertedT model = Subgroup.zpowers t := by
+    refine (Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr ht) ?_).symm
+    rw [Nat.card_zpowers, hordt, hTcard]
+  -- conjugation exponent `k`.
+  have hconj := fc.conj_sInvertedT_eq_of_mem_normalizer model ind hB2 hm hGp hSigma
+    (hR₁le hx)
+  have hmem : x * t * x⁻¹ ∈ fc.sInvertedT model := by
+    have h1 := Subgroup.smul_mem_pointwise_smul t (MulAut.conj x)
+      (fc.sInvertedT model) ht
+    rwa [hconj] at h1
+  rw [hTz] at hmem
+  obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hmem
+  have hconjpow : ∀ (w : G) (m : ℤ), (x * w * x⁻¹) ^ m = x * w ^ m * x⁻¹ :=
+    fun w m => by simp
+  -- iterate the conjugation.
+  have hiter : ∀ n : ℕ, x ^ n * t * (x ^ n)⁻¹ = t ^ (k ^ n) := by
+    intro n
+    induction n with
+    | zero => simp
+    | succ m ihm =>
+      have h1 : x ^ (m + 1) * t * (x ^ (m + 1))⁻¹
+          = x * (x ^ m * t * (x ^ m)⁻¹) * x⁻¹ := by
+        rw [pow_succ']
+        group
+      rw [h1, ihm]
+      calc x * t ^ (k ^ m) * x⁻¹ = (x * t * x⁻¹) ^ (k ^ m) := (hconjpow t _).symm
+        _ = (t ^ k) ^ (k ^ m) := by rw [hk]
+        _ = t ^ (k ^ (m + 1)) := by
+            rw [← zpow_mul]
+            congr 1
+            rw [pow_succ]
+            ring
+  -- `orderOf x` is a `p`-power.
+  have hordx : orderOf x ∣ fc.p ^ 3 := by
+    have h1 : orderOf (R₁.subtype ⟨x, hx⟩) = orderOf (⟨x, hx⟩ : ↥R₁) :=
+      orderOf_injective R₁.subtype R₁.subtype_injective _
+    have h2 : orderOf (⟨x, hx⟩ : ↥R₁) ∣ Nat.card ↥R₁ := orderOf_dvd_natCard _
+    rw [hcard] at h2
+    exact h1 ▸ h2
+  obtain ⟨a, -, hxa⟩ := (Nat.dvd_prime_pow fc.p_prime).mp hordx
+  -- `t^{k^{orderOf x}} = t` and Fermat give `k ≡ 1 (mod p)`.
+  have hfix : t ^ (k ^ (orderOf x)) = t := by
+    have h1 := hiter (orderOf x)
+    rw [pow_orderOf_eq_one] at h1
+    simpa using h1.symm
+  have hdvd1 : (fc.p : ℤ) ∣ k ^ (orderOf x) - 1 := by
+    have h1 : t ^ (k ^ (orderOf x) - 1) = 1 := by
+      rw [zpow_sub, hfix, zpow_one, mul_inv_cancel]
+    have h2 := orderOf_dvd_iff_zpow_eq_one.mpr h1
+    rwa [hordt] at h2
+  have hzmod : ∀ (b : ZMod fc.p) (n : ℕ), b ^ (fc.p ^ n) = b := by
+    intro b n
+    induction n with
+    | zero => simp
+    | succ m ih => rw [pow_succ, pow_mul, ih, ZMod.pow_card]
+  have hdvd2 : (fc.p : ℤ) ∣ k ^ (orderOf x) - k := by
+    have h1 : ((k : ZMod fc.p)) ^ (orderOf x) = (k : ZMod fc.p) := by
+      rw [hxa]
+      exact hzmod _ a
+    have h2 : ((k ^ (orderOf x) - k : ℤ) : ZMod fc.p) = 0 := by
+      push_cast
+      rw [h1]
+      ring
+    exact (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mp h2
+  have hdvd3 : (fc.p : ℤ) ∣ k - 1 := by
+    have h1 : k - 1 = (k ^ (orderOf x) - 1) - (k ^ (orderOf x) - k) := by ring
+    rw [h1]
+    exact dvd_sub hdvd1 hdvd2
+  have h4 : t ^ k = t := by
+    have h5 : t ^ (k - 1) = 1 :=
+      orderOf_dvd_iff_zpow_eq_one.mp (by rw [hordt]; exact hdvd3)
+    calc t ^ k = t ^ (k - 1 + 1) := by congr 1; ring
+      _ = t ^ (k - 1) * t := zpow_add_one t (k - 1)
+      _ = t := by rw [h5, one_mul]
+  have h6 : x * t * x⁻¹ = t := by rw [← hk, h4]
+  calc x * t = (x * t * x⁻¹) * x := by group
+    _ = t * x := by rw [h6]
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
