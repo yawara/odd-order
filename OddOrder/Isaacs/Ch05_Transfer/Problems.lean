@@ -15,6 +15,10 @@ Isaacs の `v : G → H/H'` は `A = H/H'`, `ϕ = 自然な射影` の場合に�
 
 * **5A.1** `transfer_id_eq_pow_index_of_commGroup` — `G` 可換, `|G : H| = n` なら
   `G → H` の transfer は `g ↦ g ^ n`。
+* **5A.3(a)** `eq_of_mul_eq_mul_of_isComplement` — `ST` の元の `s * t` 表示は一意。
+  ⚠ (b) の数値部分 `|G:H| = |G:K|·|K:H|` は mathlib `Subgroup.relIndex_mul_index` が既に
+  与えるのでラッパーは書かない。`ST` が `H` の右 transversal であること自体と (c)(d) は
+  未実装 (issue 1055 参照)。
 * **5A.4(a)** `transfer_eq_pow_index_of_le_center` — `H ≤ Z(G)`, `|G : H| = n` なら
   transfer は `g ↦ ϕ ⟨g ^ n⟩` (`ϕ : ↥H →* A` は任意)。Isaacs の `v : G → H/H'` は
   `A = H/H'` の場合で, `H ≤ Z(G)` なら `H` は可換ゆえ `H' = 1`, `H/H' ≅ H` なので
@@ -173,6 +177,19 @@ theorem transfer_top_eq_apply {G A : Type*} [Group G] [CommGroup A]
   simp only [Subgroup.leftTransversals.diff, hbeta, hconj]
   rw [Finset.prod_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
     show Nat.card (G ⧸ (⊤ : Subgroup G)) = 1 from Subgroup.index_top, pow_one]
+
+
+/-- **Isaacs Problem 5A.3(a)**: `S ⊆ K` で `T` が `K` の右 transversal なら, 積 `ST` の元は
+`s * t` (`s ∈ S`, `t ∈ T`) の形に**一意に**書ける。
+
+`IsComplement (K : Set G) T` の単射性を `(s, t)` と `(s', t')` に適用するだけ
+(`s, s' ∈ K` が効く)。 -/
+theorem eq_of_mul_eq_mul_of_isComplement {G : Type*} [Group G] {K : Subgroup G} {S T : Set G}
+    (hS : S ⊆ K) (hT : Subgroup.IsComplement (K : Set G) T)
+    {s s' : S} {t t' : T} (h : (s : G) * (t : G) = (s' : G) * (t' : G)) :
+    (s : G) = (s' : G) ∧ (t : G) = (t' : G) := by
+  have hpair := hT.1 (a₁ := (⟨(s : G), hS s.2⟩, t)) (a₂ := (⟨(s' : G), hS s'.2⟩, t')) h
+  exact ⟨congrArg (fun p => ((p.1 : G))) hpair, congrArg (fun p => ((p.2 : G))) hpair⟩
 
 
 end
