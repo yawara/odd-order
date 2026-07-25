@@ -258,6 +258,23 @@ theorem finset_card_prime_subgroups_le {E : Subgroup G'} {p : ℕ} (hp : p.Prime
   rw [heq] at hle
   exact Nat.le_of_mul_le_mul_right hle hpos
 
+/-- **Completeness of a `p + 1`-element list of order-`p` subgroups**: if `𝒮`
+already lists `p + 1` distinct subgroups of order `p` of a group of order `p²`,
+then every order-`p` subgroup occurs in `𝒮` (one more would exceed the bound). -/
+theorem mem_of_card_eq_of_prime_subgroups {E : Subgroup G'} {p : ℕ} (hp : p.Prime)
+    (hE : Nat.card ↥E = p ^ 2) (𝒮 : Finset (Subgroup G'))
+    (hmem : ∀ A ∈ 𝒮, A ≤ E ∧ Nat.card ↥A = p) (hcard : 𝒮.card = p + 1)
+    {A : Subgroup G'} (hAE : A ≤ E) (hAc : Nat.card ↥A = p) : A ∈ 𝒮 := by
+  classical
+  by_contra hA
+  have h1 : (insert A 𝒮).card = p + 2 := by
+    rw [Finset.card_insert_of_notMem hA, hcard]
+  have h2 := finset_card_prime_subgroups_le hp hE (insert A 𝒮) (fun B hB => by
+    rcases Finset.mem_insert.mp hB with rfl | hB'
+    · exact ⟨hAE, hAc⟩
+    · exact hmem B hB')
+  omega
+
 end GenericCentre
 
 namespace FirstCaseHypothesis
