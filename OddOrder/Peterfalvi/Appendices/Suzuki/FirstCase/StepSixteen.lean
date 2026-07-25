@@ -296,6 +296,75 @@ theorem commutator_zpowers_sup_sigma_sup_P_sylowThree_le
   rw [hprod, hrfix]
   exact Subgroup.mul_mem _ hxr hxl
 
+include fc in
+/-- **No element `x ∈ V` with `x² ≠ 1` is strongly real** ((16), p. 114, the
+contradiction step; it generalizes `not_isStronglyReal_of_mem_P` from `P` to `V ⊇ PΣ`).
+
+`V = C_D(t) ≤ C_G(s)`, so the involution `s` centralizes `x` and `|C_G(x)|` is even;
+but a strongly real element with `x² ≠ 1` has odd centralizer (Ch. I §3, Lemma 3). -/
+theorem not_isStronglyReal_of_mem_V {x : G} (hx : x ∈ fc.toHypothesis.V)
+    (hx2 : x ^ 2 ≠ 1) : ¬ IsStronglyReal x := by
+  intro hsr
+  obtain ⟨-, hodd⟩ :=
+    fc.toHypothesis.stronglyReal_normalForm_and_centralizer_odd hsr hx2
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  have hsC : s ∈ Subgroup.centralizer ({x} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    rw [Set.mem_singleton_iff] at hy
+    subst hy
+    exact (Subgroup.mem_centralizer_singleton_iff.mp
+      (fc.toHypothesis.V_le_centralizer_distinguishedInvolution hx).2)
+  have hs2 : orderOf s = 2 := by
+    have h1 : s ^ 2 = 1 := fc.toHypothesis.distinguishedInvolution_sq
+    have h2 : orderOf s ∣ 2 := orderOf_dvd_of_pow_eq_one h1
+    rcases (Nat.dvd_prime Nat.prime_two).mp h2 with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h)
+        fc.toHypothesis.distinguishedInvolution_ne_one
+    · exact h
+  have heven : (2 : ℕ) ∣ Nat.card ↥(Subgroup.centralizer ({x} : Set G)) := by
+    have h1 : orderOf (⟨s, hsC⟩ : ↥(Subgroup.centralizer ({x} : Set G)))
+        ∣ Nat.card ↥(Subgroup.centralizer ({x} : Set G)) := orderOf_dvd_natCard _
+    rwa [Subgroup.orderOf_mk, hs2] at h1
+  rcases hodd with ⟨k, hk⟩
+  omega
+
+include model in
+/-- **No nonidentity element of `PΣ` is strongly real** ((16), p. 114): `PΣ ≤ V` and
+its nonidentity elements have order `3`. -/
+theorem not_isStronglyReal_of_mem_P_sup_sigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {x : G}
+    (hx : x ∈ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P)
+    (hx1 : x ≠ 1) : ¬ IsStronglyReal x := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨hpSig, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, -, -, hSig3, -⟩ :=
+    fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  have hle : ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P
+      : Subgroup G) ≤ fc.toHypothesis.V :=
+    sup_le (le_trans inf_le_left fc.toHypothesis.W_le_V) fc.P_le_V
+  refine fc.not_isStronglyReal_of_mem_V (hle hx) ?_
+  -- every element of `ΣP` is killed by `3`
+  have hx3 : x ^ 3 = 1 := by
+    refine pow_eq_one_of_mem_sup_of_commute ?_ ?_ ?_ hx
+    · intro a ha b hb
+      exact (Subgroup.mem_centralizer_iff.mp ha.2 b hb).symm
+    · intro a ha
+      have h := Subgroup.orderOf_dvd_natCard _ ha
+      rw [hSig3] at h
+      exact orderOf_dvd_iff_pow_eq_one.mp h
+    · intro b hb
+      have h := Subgroup.orderOf_dvd_natCard _ hb
+      rw [fc.card_P, hp3] at h
+      exact orderOf_dvd_iff_pow_eq_one.mp h
+  intro h2
+  have hord : orderOf x ∣ 3 := orderOf_dvd_iff_pow_eq_one.mpr hx3
+  have hord2 : orderOf x ∣ 2 := orderOf_dvd_iff_pow_eq_one.mpr h2
+  have h1 : orderOf x = 1 := Nat.eq_one_of_dvd_coprimes (by decide) hord2 hord
+  exact hx1 (orderOf_eq_one_iff.mp h1)
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
