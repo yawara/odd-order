@@ -435,3 +435,38 @@ ChatGPT Pro (reasoning「非常に高い」) に Hall–Wielandt (p 奇 + A 可�
    ← **p 奇はここで効く模様**。(証明は極大部分群 `M ⊵ R` を取る標準論法から開始。)
 
 以降 (§5 以降) は未読 — 次 iteration で読み切って検証する。
+
+
+## ✅ 2026-07-26 決着 — 証明を入手・検証、Lean 化計画確定
+
+ChatGPT Pro の回答 (16m54s + 2m54s 思考) を**全ステップ独立に検証**し、正しいことを確認した。
+証明本文と検証メモは **[`notes/meta/hall_wielandt_proof.md`](../notes/meta/hall_wielandt_proof.md)**
+(本 issue の正本)。要点:
+
+- **Alperin も Grün II(Z(P) 版) も Burnside 融合も使わない** — Gorenstein p.257 の注記と整合。
+- 大域は二重剰余類の明示公式 `T_P^G(λ)(r) − [G:P]λ(r) = Σ_i T_{S_i}^R(δ_i)(r)` 1 本のみ。
+- 局所は「奇素数 local transfer 補題」: `A ⊴ R` 可換・`R = ⟨A,x⟩`・`T_S^R(δ)(x) ≠ 0`・
+  `X_R(x) ∩ S ⊆ ker δ` ⟹ `S = R`。`p > 2` は `(α−1)²b = 0 ⟹ (α−1)^{p-1}b = 0` の
+  指数でのみ効く。**p = 3 なら `1+α+α² = (α−1)²+3α` の恒等式で済む**。
+- 主証明は `x ∈ (P∩G')∖D` を位数最小に取り、(17) の非零項 `i` に補題を適用して `S = R`、
+  すると `A^{g⁻¹} ≤ P` から弱閉性で `g ∈ N`、ゆえに `δ ≡ 0` で矛盾。
+- 副問: 追加構造 (`P = C_G(Z(P))`, `|Z(P)|=3`, class 3, `A ≅ C₃³`) は**不要**。
+  また `Z(P)` の弱閉性は出ない・我々の局所形状は `C₃≀C₃` と両立する、という
+  我々の解析が**独立に裏付けられた**。`[N_G(P):P] ≤ 2` も landed と整合 (sanity check)。
+
+### Lean 化の段取り (既存資産が効く)
+
+| 段 | 内容 | 状態 |
+|---|---|---|
+| 1 | 指標 transfer = `MonoidHom.transfer`、推移律 | ✅ landed (`transfer_transfer`) |
+| 2 | 二重剰余類公式 (17) | `MackeyTransfer.lean` を実測 → 差分実装 |
+| 3 | 局所補題 Case 1 (`x ∉ M`) | ✅ `transfer_eq_pow_of_notMem` (Isaacs 10.6(b)) |
+| 4 | 局所補題 Case 2 (`x ∈ M`) | ✅ `transfer_eq_prod_conj_of_mem` (Isaacs 10.6(a)) |
+| 5 | `X_R(x) ∩ M ⊆ ker μ` の軌道論法 | 新規 (短い) |
+| 6 | `(α−1)²b = 0` + `p=3` 恒等式 | 新規 (短い) |
+| 7 | 主証明 (最小位数 + 弱閉性) | 新規、`IsWeaklyClosed` (landed) を使用 |
+| 8 | `¬3 ∣ |Ab N|` への消費 | ✅ `WeaklyClosed.lean` の focal 連結 |
+
+⟹ **(17) の残ギャップは「Hall–Wielandt の Lean 化」1 本に確定**し、道筋も部品も揃った。
+`A = Z₁ΣP` の弱閉性は (17) で landed 済み・`A` は可換 (landed)・`N_G(A) = N_G(Z₁) = R₂⟨s⟩`
+も landed なので、上記を建てれば `false_of_isWeaklyClosed_zpowers` の兄弟として即接続できる。
