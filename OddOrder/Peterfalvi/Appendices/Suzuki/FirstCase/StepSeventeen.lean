@@ -819,6 +819,110 @@ theorem three_dvd_card_abelianization_of_card_W_eq_nine
     omega
   exact dvd_card_abelianization_of_index_eq_prime (by norm_num) hidx
 
+/-! ## Towards the `|W| = 3` branch -/
+
+include model in
+/-- `Z₁ ⊓ ΣP = 1`: the elements of `Z₁` are strongly real ((16)) while those of
+`(ΣP)^#` are not. -/
+theorem zpowers_inf_sigma_sup_P_eq_bot
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+      ⊓ ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P) = ⊥ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  rw [eq_bot_iff]
+  intro y hy
+  rw [Subgroup.mem_bot]
+  by_contra hy1
+  exact fc.not_isStronglyReal_of_mem_P_sup_sigma model ind hB2 hy.2 hy1
+    (fc.forall_isStronglyReal_mem_zpowers_st model ind hB2 hy.1)
+
+include model in
+/-- `Z₁ ≤ ⁅R₁, R₁⁆`, since `Z₁ = ⁅RΣ, RΣ⁆` by (14) and `RΣ ≤ R₁`. -/
+theorem zpowers_le_commutator_sylowThree
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+      ≤ ⁅fc.sylowThreeNormalizerRSigma model, fc.sylowThreeNormalizerRSigma model⁆ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  rw [← fc.commutator_sup_eq_zpowers model ind hB2]
+  exact Subgroup.commutator_mono (fc.sup_le_sylowThreeNormalizerRSigma model ind hB2)
+    (fc.sup_le_sylowThreeNormalizerRSigma model ind hB2)
+
+include model in
+/-- **`ΣP ⊄ ⁅R₁, R₁⁆`**, given the commutator bound `|⁅R₁, R₁⁆| ≤ 9` ((17), p. 114:
+"`⁅R̄₁, R̄₁⁆` has order `1` or `3`").
+
+Indeed `Z₁ ≤ ⁅R₁, R₁⁆` and `Z₁ ⊓ ΣP = 1`, so `ΣP ≤ ⁅R₁, R₁⁆` would force
+`27 = |Z₁ΣP| ≤ |⁅R₁, R₁⁆| ≤ 9`. -/
+theorem not_sigma_sup_P_le_commutator_sylowThree
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hbound : Nat.card ↥(⁅fc.sylowThreeNormalizerRSigma model,
+      fc.sylowThreeNormalizerRSigma model⁆ : Subgroup G) ≤ 9) :
+    ¬ ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P)
+      ≤ ⁅fc.sylowThreeNormalizerRSigma model,
+        fc.sylowThreeNormalizerRSigma model⁆ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  intro hle
+  obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨hpSig, -, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, -, -, hSig3, -⟩ :=
+    fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  -- `|ΣP| = 9`
+  have hSPcard : Nat.card ↥((fc.toHypothesis.W
+      ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P) = 9 := by
+    have hinf : (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊓ fc.P
+        = ⊥ := by
+      rw [eq_bot_iff]
+      intro x hx
+      have hmem : x ∈ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+          ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊓ fc.P :=
+        ⟨Subgroup.mem_sup_right hx.1, hx.2⟩
+      rwa [fc.zpowers_sup_sigma_inf_P_eq_bot model ind hB2] at hmem
+    rw [card_sup_eq_mul_of_commute
+        (fun a (ha : a ∈ fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))
+          b (hb : b ∈ fc.P) =>
+          (Subgroup.mem_centralizer_iff.mp ha.2 b hb).symm) hinf,
+      hSig3, fc.card_P, hp3]
+  -- `Z₁ΣP ≤ ⁅R₁, R₁⁆` has order `27`
+  have hSPle : ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P)
+      ≤ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P :=
+    sup_le (le_sup_right.trans le_sup_left) le_sup_right
+  have hZle := fc.zpowers_le_commutator_sylowThree model ind hB2
+  have hZSPle : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P)
+      ≤ ⁅fc.sylowThreeNormalizerRSigma model,
+        fc.sylowThreeNormalizerRSigma model⁆ := sup_le hZle hle
+  have hcard27 : Nat.card ↥(Subgroup.zpowers
+      (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+      ⊔ ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P)) = 27 := by
+    rw [card_sup_eq_mul_of_commute
+        (fun a (ha : a ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+            * fc.toHypothesis.t)) b
+          (hb : b ∈ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))
+            ⊔ fc.P) =>
+          fc.mul_comm_of_mem_zpowers_sup_sigma_sup_P model ind hB2
+            (Subgroup.mem_sup_left (Subgroup.mem_sup_left ha))
+            (hSPle hb))
+        (fc.zpowers_inf_sigma_sup_P_eq_bot model ind hB2),
+      Nat.card_zpowers, hstord, hSPcard]
+  have hdvd := Subgroup.card_dvd_of_le hZSPle
+  rw [hcard27] at hdvd
+  have := Nat.le_of_dvd (by
+    have : 0 < Nat.card ↥(⁅fc.sylowThreeNormalizerRSigma model,
+      fc.sylowThreeNormalizerRSigma model⁆ : Subgroup G) := Nat.card_pos
+    omega) hdvd
+  omega
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
