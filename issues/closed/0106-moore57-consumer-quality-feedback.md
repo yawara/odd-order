@@ -213,3 +213,30 @@ moore57 consumer の trigger 発火時に再 activate する。
 ユーザーが本 issue を含む pending 4 件 (0106/0131/2053/8005) の再着手を指示。
 pending の凍結/トリガー待ち/ユーザー判断待ちはいずれも解除 — main セッションが引き取る
 (3 レーンとも 2026-07-23 から停止中・未マージ 0 を確認済、territory 衝突なし)。
+
+## ✅ 2026-07-25 close — queue 全項目を supply 実施 (再活性化指示による)
+
+トリガー待ちだった queue を全消化 (commit 6af2eab24 / 9e7341d7e / 3cc9560b7 / f792d879b /
+daf0844dd / a9a0fdd66):
+
+- **sharpened p²q normality** (P1-2 残件): `normal_of_card_eq_prime_of_card_eq_sq_mul_prime`
+  (Theorem131.lean) — moore57 要望形から **`p < q` を外し `p ≠ q` に一般化** (n_q = p 枝は
+  q ∣ p−1 ∣ p²−1 で `¬q∣p²−1` 1 本に吸収される)。Order275 サイトは 30 行 → 1 call。
+- **CyclicPermEigenCount 一般化** (P2-3): 一般 count
+  `finrank_eigenspace_eq_card_contributing` を公開化 (keystone の count block は消費側に
+  書換)、partial-period 対角係数 `repr_sum_fourier_self_partial_of_pow_{eq,ne}_one`
+  (係数は h/d — カタログの「d」は stabilizer 位数の誤記)、a=1 adapter `monomial_of_perm`。
+  混在軌道 (order-35: 5/7/35) への適用障害は解消。
+- **(1.10) 完備化** (P2-4): docstring 相互参照 / 合成 corollary
+  `int_dvd_of_apply_sub_of_commute` (p ∣ n 着地) / IsCharacter–ZIrr 厳密特化対 2 組を
+  ZIrr 版からの導出に半減 / Galois-fixedness block (×3 コピペ) を
+  `complexRingEquiv_apply_eq_apply_pow_of_mem_ZIrr` に抽出 / (13.10) 平均化形
+  `exists_rat_inv_card_mul_sum_normSq_of_mem_ZIrr_of_cyclicClosed` (非負有理; 部分集合上の
+  整数性は一般に偽と注記)。
+- **fixedSubgroup API 拡充** (P3-6): bot/sup/closure/zpowers/eq_top_iff (↔ K ≤ ker φ) +
+  MulAction.fixedPoints への橋。核 = private fixerSubgroup (stabilizer 型 helper)。
+- **P3-8 (文書所在ずれ)**: 現 repo に stale 記載は grep 0 件 — 既に解消済みで no-op。
+
+AxiomsCheck に主要 6 本を登録。moore57 への返答要点: HOLD トリガー 3 件
+(Theorem131 §2 / CyclicPermEigen 中間層 / (1.10) 系) はすべて supply 済み、次回 bump で
+消費可能。
