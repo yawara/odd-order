@@ -1437,8 +1437,28 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 問題 | 状態 | 実装 |
 |---|---|---|
 | 5B.1 | ✅ `exists_notMem_conj_mem_of_mem_commutator` | `P ∈ Syl_p(G)`, `g ∈ P` 位数 `p`, `g ∈ G'`, `g ∉ P'` ⇒ `g^t ∈ P` なる `t ∉ P` が存在。transfer-evaluation lemma (Thm 5.5 = mathlib `MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot`) を使う |
-| 5B.2 | ⬜ | Dietzmann の状況で `\|X\| = m` なら `\|⟨X⟩\| ≤ n^m`。既存 `Dietzmann.lean` は長さ評価 `(n-1)·\|X\|` までなので、正規形 `x₁^{e₁}⋯x_m^{e_m}` (`0 ≤ e_i < n`) を出す必要がある (既存 `Dietzmann.exists_pow_mul_prod_eq` が「x の出現を先頭に集める」ステップを提供) |
+| 5B.2 | 🔨 **書籍 hint に穴** (下記) | 収集補題 `Dietzmann.exists_pow_mul_prod_eq_notMem` は landing 済 |
 | 5B.3 | ✅ | `exists_finite_normal_iff` (`Problems5B.lean`) + `normal_closure_of_conj_closed` |
+
+### ⚠ 5B.2: 書籍 hint の collection process はそのままでは動かない (2026-07-26)
+
+書籍 hint は「`X = {x₁,…,x_m}` として `⟨X⟩` の各元が `x₁^{e₁}x₂^{e₂}⋯x_m^{e_m}`
+(`0 ≤ e_i < n`) の形に書けることを示せ」。素朴な collection process
+(「`x₁` を全部前に出し、次に `x₂` を全部前に出し、…」) を実際にやると**破綻する**:
+
+`x` を前に出すときは `y·x = x·(x⁻¹ y x)` と書き換えるので、**先行する文字が `x` で共役される**。
+`x₁` の収集後は `x₁` が消えた語 `w'` になる (これは landing 済の
+`Dietzmann.exists_pow_mul_prod_eq_notMem` が与える) が、次に `x₂` を収集すると
+共役 `x₂⁻¹ y x₂` が **`x₁` に戻りうる**。
+
+**反例 (アルゴリズムに対する)**: `G = S₃`, `X = {(12),(13),(23)}`, `n = 2`,
+`x₁ = (12)`, `x₂ = (13)`, `x₃ = (23)`。`w' = (23)(13)` は `x₁` を含まないが、
+`(13)` を前に出すと `(23)(13) = (13)·((13)(23)(13)) = (13)(12)` で `x₁ = (12)` が復活する。
+
+⟹ **主張 `|⟨X⟩| ≤ n^m` 自体は正しい** (上の `S₃` では 8 通りの積が 6 元すべてを覆う) が、
+**hint の手順では証明にならない**。別の議論が要る。次イテレーションで正しい論法を立てる
+(候補: `S = ⟨x₁⟩⟨x₂⟩⋯⟨x_m⟩` が積で閉じることを直接示す / `m` についての帰納で
+適切な正規部分群の連鎖を作る)。
 
 ### ⚠ 5B.1 の書籍訂正 (2026-07-26)
 

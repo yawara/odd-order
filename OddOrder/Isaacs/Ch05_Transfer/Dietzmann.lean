@@ -257,6 +257,33 @@ theorem dietzmann (hfin : X.Finite)
     Finite ↥(Subgroup.closure X) :=
   (dietzmann_setFinite hfin hconj hn hexp).to_subtype
 
+namespace Dietzmann
+
+/-- `x` の出現を**すべて**先頭に集める: `l.prod = x ^ k * l'.prod` で `l'` に `x` は現れない。
+
+`exists_cons_prod_eq_of_mem` を長さについて再帰的に適用し, `x ∉ l` になった時点で止める。
+Problem 5B.2 (`|⟨X⟩| ≤ n^m`) の正規形 `x₁^{e₁}⋯x_m^{e_m}` を作るのに使う。 -/
+theorem exists_pow_mul_prod_eq_notMem (hconj : ∀ x ∈ X, ∀ g : G, g * x * g⁻¹ ∈ X) {x : G} :
+    ∀ (N : ℕ) {l : List G}, l.length ≤ N → (∀ y ∈ l, y ∈ X) →
+      ∃ (k : ℕ) (l' : List G), (∀ y ∈ l', y ∈ X) ∧ x ∉ l' ∧ x ^ k * l'.prod = l.prod := by
+  classical
+  intro N
+  induction N with
+  | zero =>
+    intro l hlen _
+    have hnil : l = [] := List.eq_nil_of_length_eq_zero (by omega)
+    subst hnil
+    exact ⟨0, [], by simp, by simp, by simp⟩
+  | succ N ih =>
+    intro l hlen hl
+    by_cases hx : x ∈ l
+    · obtain ⟨l₁, hl₁X, hl₁prod, hl₁len, _⟩ := exists_cons_prod_eq_of_mem hconj hl hx
+      obtain ⟨k, l', hl'X, hl'notmem, hl'prod⟩ := ih (l := l₁) (by omega) hl₁X
+      exact ⟨k + 1, l', hl'X, hl'notmem, by rw [pow_succ', mul_assoc, hl'prod, hl₁prod]⟩
+    · exact ⟨0, l, hl, hx, by simp⟩
+
+end Dietzmann
+
 end
 
 end OddOrder.Isaacs.Ch05
