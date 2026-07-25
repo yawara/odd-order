@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
 
@@ -112,6 +113,58 @@ theorem exists_sylow_coe_eq_oPiCore_of_isCyclic (p : ℕ) [Fact p.Prime]
   exact ⟨Q, le_antisymm
     (Ch03.Subgroup.IsPiGroup.le_oPiCore
       (Ch03.Subgroup.isPiGroup_singleton_iff_isPGroup.mpr Q.2)) hQ⟩
+
+/-! ### 巡回 `p`-群の部分群束 -/
+
+/-- 非自明な `p`-部分群には位数 `p` の元がある (Cauchy). -/
+theorem exists_orderOf_eq_prime_of_ne_bot {P : Type*} [Group P] [Finite P] {p : ℕ}
+    [Fact p.Prime] (hP : IsPGroup p P) {N : Subgroup P} (hN : N ≠ ⊥) :
+    ∃ x : P, x ∈ N ∧ orderOf x = p := by
+  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN
+  obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := ↥N)).mp (hP.to_subgroup N)
+  have hk0 : k ≠ 0 := by
+    rintro rfl
+    rw [pow_zero] at hk
+    exact (Finite.one_lt_card_iff_nontrivial.mpr ‹Nontrivial ↥N›).ne' hk
+  have hdvd : p ∣ Nat.card ↥N := by
+    rw [hk]
+    exact dvd_pow_self p hk0
+  haveI : Fintype ↥N := Fintype.ofFinite _
+  have hdvd' : p ∣ Fintype.card ↥N := by rwa [← Nat.card_eq_fintype_card]
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card (G := ↥N) p hdvd'
+  have hne : (x : P) ≠ 1 := by
+    intro h
+    have hx1 : x = 1 := Subtype.ext h
+    rw [hx1, orderOf_one] at hx
+    exact (Fact.out : p.Prime).one_lt.ne hx
+  refine ⟨(x : P), x.2, ?_⟩
+  have hpow : ((x : P)) ^ p = 1 := by
+    have hp1 := pow_orderOf_eq_one x
+    rw [hx] at hp1
+    exact congrArg Subtype.val hp1
+  rcases (Fact.out : p.Prime).eq_one_or_self_of_dvd _ (orderOf_dvd_of_pow_eq_one hpow) with h1 | h1
+  · exact absurd (orderOf_eq_one_iff.mp h1) hne
+  · exact h1
+
+/-- **巡回 `p`-群では非自明な部分群 2 つは非自明に交わる**: 位数 `p` の部分群が唯一だから
+(`OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq`)。 -/
+theorem inf_ne_bot_of_isCyclic_of_isPGroup {P : Type*} [Group P] [Finite P] [IsCyclic P]
+    {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P) {H K : Subgroup P}
+    (hH : H ≠ ⊥) (hK : K ≠ ⊥) : H ⊓ K ≠ ⊥ := by
+  obtain ⟨x, hxH, hxo⟩ := exists_orderOf_eq_prime_of_ne_bot hP hH
+  obtain ⟨y, hyK, hyo⟩ := exists_orderOf_eq_prime_of_ne_bot hP hK
+  have heq : Subgroup.zpowers x = Subgroup.zpowers y :=
+    OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq
+      (by rw [Nat.card_zpowers, Nat.card_zpowers, hxo, hyo])
+  have hxK : x ∈ K := by
+    have hmem : x ∈ Subgroup.zpowers y := heq ▸ Subgroup.mem_zpowers x
+    exact (Subgroup.zpowers_le.mpr hyK) hmem
+  rw [Subgroup.ne_bot_iff_exists_ne_one]
+  refine ⟨⟨x, hxH, hxK⟩, ?_⟩
+  intro h
+  have : x = 1 := congrArg Subtype.val h
+  rw [this, orderOf_one] at hxo
+  exact (Fact.out : p.Prime).one_lt.ne hxo
 
 end
 
