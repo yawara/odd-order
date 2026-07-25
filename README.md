@@ -24,8 +24,8 @@ The project is now in its second phase: **formalizing the three source textbooks
 the path through them that the Odd Order Theorem happens to need.
 
 > 🚧 **One `sorry` remains in the Lean sources** (`OddOrder/`): the `Q₈` case of the Brauer–Suzuki
-> theorem — cited by the sources, proved in none of them. Only the results that cite Brauer–Suzuki
-> (Peterfalvi's Appendix C, Proposition 1 and its dependents) are conditional on it; everything else —
+> theorem — cited by the sources, proved in none of them. Only the results that depend on it
+> (Peterfalvi's Appendix C, Proposition 1 and its dependents) are conditional; everything else —
 > `feitThompson` included, as the axiom check above shows — is `sorry`-free. The plan to close it:
 > formalize modular character theory up through the Z\*-theorem, following Navarro's *Characters and
 > Blocks of Finite Groups*.
