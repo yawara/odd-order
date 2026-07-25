@@ -1436,6 +1436,42 @@ theorem index_normalizer_P_subgroupOf_normalizer_invImageF
   rw [← horb]
   omega
 
+include model in
+/-- **`st ∈ T`** (Part II, Ch. II (14), "note that `Z₁ ⊂ T`"): `st` lies in `R`
+(`distinguishedInvolution_mul_t_mem_invImageF`) and `s` inverts it
+(`s·(st)·s⁻¹ = ts = (st)⁻¹`, both being involutions). -/
+theorem distinguishedInvolution_mul_t_mem_sInvertedT
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) :
+    fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t
+      ∈ fc.sInvertedT model := by
+  rw [fc.mem_sInvertedT_iff model ind hB2 hm]
+  refine ⟨fc.distinguishedInvolution_mul_t_mem_invImageF model, ?_⟩
+  set s := fc.toHypothesis.distinguishedInvolution with hs_def
+  have hs2 : s * s = 1 := by
+    rw [← sq]; exact fc.toHypothesis.distinguishedInvolution_sq
+  have ht2 : fc.toHypothesis.t * fc.toHypothesis.t = 1 := by
+    rw [← sq]; exact fc.toHypothesis.t_sq
+  have hsinv : s⁻¹ = s := inv_eq_of_mul_eq_one_right hs2
+  calc s * (s * fc.toHypothesis.t) * s⁻¹
+      = (s * s) * fc.toHypothesis.t * s := by rw [hsinv]; group
+    _ = fc.toHypothesis.t * s := by rw [hs2, one_mul]
+    _ = (s * fc.toHypothesis.t)⁻¹ := by
+        rw [mul_inv_rev, inv_eq_of_mul_eq_one_right ht2, hsinv]
+
+include model in
+/-- **`Z₁ ≤ T`** (Part II, Ch. II (14)): the cyclic group `Z₁ = ⟨st⟩` lies in the
+`s`-inverted part `T` of `R`. -/
+theorem zpowers_distinguishedInvolution_mul_t_le_sInvertedT
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) :
+    Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ≤ fc.sInvertedT model :=
+  Subgroup.zpowers_le.mpr
+    (fc.distinguishedInvolution_mul_t_mem_sInvertedT model ind hB2 hm)
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

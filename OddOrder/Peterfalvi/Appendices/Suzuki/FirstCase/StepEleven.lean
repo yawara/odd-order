@@ -99,6 +99,27 @@ theorem mem_invImageF_iff {x : G}
   · intro h
     exact ⟨⟨x, hxL⟩, Subgroup.mem_comap.mpr h, rfl⟩
 
+include model in
+/-- **`st ∈ R`** (Part II, Ch. II (14), the remark "`Z₁ ⊂ T`"): both `s` and `t`
+centralize `P`, and their images in `C_G(P)/N` are distinct involutions, so the
+image of `st` is a translation (`mk_distinguishedInvolution_mul_t_mem_range_emb`)
+— that is, `st` lies in the preimage `R` of `emb(F)`. -/
+theorem distinguishedInvolution_mul_t_mem_invImageF :
+    fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t
+      ∈ fc.invImageF model := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  have hsL : fc.toHypothesis.distinguishedInvolution
+      ∈ Subgroup.centralizer (fc.P : Set G) :=
+    fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V fc.P_le_V
+  have htL : fc.toHypothesis.t ∈ Subgroup.centralizer (fc.P : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro x hx
+    exact (fc.toHypothesis.commute_t_of_mem_V (fc.P_le_V hx)).eq
+  have hst : fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t
+      ∈ Subgroup.centralizer (fc.P : Set G) := mul_mem hsL htL
+  rw [fc.mem_invImageF_iff model hst]
+  exact fc.mk_distinguishedInvolution_mul_t_mem_range_emb model hst
+
 /-- `R` is normal in `C_G(P)`: the translation subgroup `emb(F)` is normal in the
 quotient (`range_normal`), and normality pulls back along the quotient map. -/
 theorem conj_mem_invImageF {c r : G}

@@ -288,6 +288,121 @@ theorem orderOf_st_eq_char :
     rw [map_mul]; rfl
   rwa [hcoe] at htransfer
 
+include fc in
+/-- **The image of `s·t` in `C_G(P)/N` is a translation** (App. C, Prop 1 via
+`mul_involutions_mem_range`): the images of `s` and `t` are two *distinct*
+nontrivial involutions of the quotient, and in the affine model the product of
+two distinct involutions lies in the regular normal subgroup `emb(F)`.
+
+This is the parenthetical "note that `Z₁ ⊂ T`" of Part II, Ch. II (14): it puts
+`st` into `R`, the preimage of `emb(F)`.  (The involution bookkeeping is the same
+as in `orderOf_st_eq_char`, which needs the same distinctness for its `char`
+computation.) -/
+theorem mk_distinguishedInvolution_mul_t_mem_range_emb
+    {F : Type uG} [NearFields.NearField F]
+    (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+    (hst : fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t
+      ∈ Subgroup.centralizer (fc.P : Set G)) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    QuotientGroup.mk' ((fc.toHypothesis.H.subgroupOf
+        (Subgroup.centralizer (fc.P : Set G))).normalCore)
+        ⟨fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t, hst⟩
+      ∈ MonoidHom.range model.emb := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hNdef
+  have hsL : fc.toHypothesis.distinguishedInvolution ∈ L :=
+    fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V fc.P_le_V
+  have htL : fc.toHypothesis.t ∈ L := by
+    rw [hLdef, Subgroup.mem_centralizer_iff]
+    intro x hx
+    exact (fc.toHypothesis.commute_t_of_mem_V (fc.P_le_V hx)).eq
+  set sL : ↥L := ⟨fc.toHypothesis.distinguishedInvolution, hsL⟩ with hsLdef
+  set tL : ↥L := ⟨fc.toHypothesis.t, htL⟩ with htLdef
+  set pi : ↥L →* (↥L ⧸ N) := QuotientGroup.mk' N with hpidef
+  have hs2 : sL ^ 2 = 1 :=
+    Subtype.ext fc.toHypothesis.distinguishedInvolution_sq
+  have ht2 : tL ^ 2 = 1 := Subtype.ext fc.toHypothesis.t_sq
+  have hsQ : (sL : G) ∈ fc.toHypothesis.Q :=
+    fc.toHypothesis.mem_Q_of_sq_eq_one_of_mem_H
+      fc.toHypothesis.distinguishedInvolution_mem_H
+      fc.toHypothesis.distinguishedInvolution_sq
+  have hcore : N = (fc.toHypothesis.D.subgroupOf L) ⊓
+      Subgroup.centralizer ((fc.toHypothesis.Q.subgroupOf L) : Set ↥L) := by
+    rw [hNdef]; exact fc.toHypothesis.normalCore_cH_eq_centralizer_cQ fc.P_le_V
+  have hNleD : N ≤ fc.toHypothesis.D.subgroupOf L := by
+    rw [hcore]; exact inf_le_left
+  have hNodd : Odd (Nat.card ↥N) :=
+    (fc.toHypothesis.centralizerHypothesisA1 fc.P_le_V).D_odd.of_dvd_nat
+      (Subgroup.card_dvd_of_le hNleD)
+  have hsN : ∀ n ∈ N, Commute sL n := by
+    intro n hn
+    have hnC : n ∈ Subgroup.centralizer
+        ((fc.toHypothesis.Q.subgroupOf L) : Set ↥L) := by
+      rw [hcore] at hn; exact hn.2
+    have hsQL : sL ∈ fc.toHypothesis.Q.subgroupOf L :=
+      Subgroup.mem_subgroupOf.mpr hsQ
+    exact Subgroup.mem_centralizer_iff.mp hnC sL hsQL
+  -- `s ∉ N` (`s ∈ Q ∩ D = 1` would force `s = 1`) and `t ∉ N` (`t ∉ H`)
+  have hsN_not : sL ∉ N := by
+    intro h
+    have hsD : (sL : G) ∈ fc.toHypothesis.D :=
+      Subgroup.mem_subgroupOf.mp (hNleD h)
+    have hbot : (sL : G) ∈ fc.toHypothesis.Q ⊓ fc.toHypothesis.D := ⟨hsQ, hsD⟩
+    rw [fc.toHypothesis.Q_inf_D_eq_bot, Subgroup.mem_bot] at hbot
+    exact fc.toHypothesis.distinguishedInvolution_ne_one hbot
+  have htN_not : tL ∉ N := by
+    intro h
+    have htD : (tL : G) ∈ fc.toHypothesis.D :=
+      Subgroup.mem_subgroupOf.mp (hNleD h)
+    exact fc.toHypothesis.t_not_mem_H (fc.toHypothesis.D_le_H htD)
+  have hne : sL * tL ≠ 1 := by
+    intro h
+    have hst : fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t = 1 := by
+      have := congrArg (Subtype.val) h
+      rwa [Subgroup.coe_mul, Subgroup.coe_one] at this
+    have hst' : fc.toHypothesis.distinguishedInvolution = fc.toHypothesis.t⁻¹ :=
+      mul_eq_one_iff_eq_inv.mp hst
+    apply fc.toHypothesis.t_not_mem_H
+    rw [fc.toHypothesis.t_inv_eq] at hst'
+    exact hst' ▸ fc.toHypothesis.distinguishedInvolution_mem_H
+  -- the images are distinct involutions of the quotient `L/N`
+  have hu2 : (pi sL) ^ 2 = 1 := by rw [← map_pow, hs2, map_one]
+  have hv2 : (pi tL) ^ 2 = 1 := by rw [← map_pow, ht2, map_one]
+  have hu1 : pi sL ≠ 1 := by
+    rw [hpidef, QuotientGroup.mk'_apply, Ne, QuotientGroup.eq_one_iff]
+    exact hsN_not
+  have hv1 : pi tL ≠ 1 := by
+    rw [hpidef, QuotientGroup.mk'_apply, Ne, QuotientGroup.eq_one_iff]
+    exact htN_not
+  have huv : pi sL ≠ pi tL := by
+    intro h
+    have h1 : pi (sL * tL⁻¹) = 1 := by rw [map_mul, map_inv, h, mul_inv_cancel]
+    rw [hpidef, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h1
+    have hstD : ((sL * tL⁻¹ : ↥L) : G) ∈ fc.toHypothesis.D :=
+      Subgroup.mem_subgroupOf.mp (hNleD h1)
+    have hstH : ((sL * tL⁻¹ : ↥L) : G) ∈ fc.toHypothesis.H :=
+      fc.toHypothesis.D_le_H hstD
+    rw [Subgroup.coe_mul, Subgroup.coe_inv] at hstH
+    have htinvH : fc.toHypothesis.t⁻¹ ∈ fc.toHypothesis.H := by
+      have hsinvH : fc.toHypothesis.distinguishedInvolution⁻¹ ∈ fc.toHypothesis.H :=
+        fc.toHypothesis.H.inv_mem fc.toHypothesis.distinguishedInvolution_mem_H
+      have : fc.toHypothesis.distinguishedInvolution⁻¹ *
+          (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t⁻¹) ∈
+          fc.toHypothesis.H := fc.toHypothesis.H.mul_mem hsinvH hstH
+      rwa [← mul_assoc, inv_mul_cancel, one_mul] at this
+    exact fc.toHypothesis.t_not_mem_H
+      (by rw [fc.toHypothesis.t_inv_eq] at htinvH; exact htinvH)
+  have hkey := model.mul_involutions_mem_range (pi sL) (pi tL) hu2 hu1 hv2 hv1 huv
+  have heq : pi sL * pi tL
+      = QuotientGroup.mk' N
+        ⟨fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t, hst⟩ := by
+    rw [← map_mul]
+    rfl
+  rwa [heq] at hkey
+
 /-- **Peterfalvi Part II, Ch. II, step (7), the `|C_Q(P)|` reading** (p. 110,
 "by (6) and (2)(b)"): assuming `Q₁ = 1`, either `|C_Q(P)| = char − 1` (`F` is a
 field of order `char`, the Fermat-prime case), or `|C_Q(P)| = 8` and
