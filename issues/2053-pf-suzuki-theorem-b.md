@@ -689,3 +689,128 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   (γ) R₁ = 正規正則部分群の preimage, |R₁| = p³ Sylow → (δ) N_G(R₁) = N_G(R)
   ((11) 型 regularity) → (ε) Isaacs Cor 10.2 transfer → index-p normal →
   ¬(B2) 矛盾 → step_twelve endpoint「(10.2) が成立」。
+
+### (12) tail の PDF 確定読解 (p. 112、2026-07-25 Read で確認)
+
+書籍原文の連鎖 (「As R₁ is non-abelian of order p³...」以降):
+1. **R₁ 非可換**: 可換なら R₁ ≤ C_G(R) = R (centralizer_invImageF_eq!) と
+   |R₁| = p³ > p² が矛盾 — 無料。class 2 < p (p ≥ 3)。
+2. **Hall–Wielandt (class < p 版)**: G/O^p(G) = N_G(R₁)/O^p(N_G(R₁))。
+   repo 資産 = transfer_range_eq_of_nilpotencyClass_lt (Isaacs Cor 10.2) を確認。
+3. **T ⊴ R₁** (δ1): n ∈ R₁ ≤ N_G(R) の n•T は R 内位数 p、n•T ∈ 𝒜 なら
+   orbit 不変性で T ∈ 𝒜 (偽: T ≤ T)、ゆえ ¬(¬ n•T ≤ T) → n•T = T。easy。
+4. **R₁/T 可換** (位数 p² — 自明)。**C_{R₁/R}(s) = 1** = [s] が R₁/R を反転
+   (δ2): ±1 論法の hinv を public 化 — 任意の対合 u ∈ NR/R は σ を反転
+   (k ≡ 1 側は mem_zpowers_of_centralizes → 奇数位数の対合で消滅)。
+   [s] は対合 (s ∉ R、s² = 1)。
+5. **R₁/T = (R/T) × (T₁/T)**, T₁ = [R₁/T, s] 逆像 (δ3): R/T ≅ P は s 中心化、
+   T₁/T は s 反転 — sInvertedT パターンの 1 段上再演。
+6. **N_G(R₁) = N_G(R)** (δ4): 𝒜₁ := R₁/T の位数 p 部分群 ∖ {T₁/T}。
+   C_Q(P) が 𝒜₁ − {R/T} に正則 ((11) 同様) → N_G(R) ⊊ N_G(R₁) なら
+   [N_G(R₁):N_G(R)] = |𝒜₁| = p が (10) に矛盾。
+7. **(ε)**: T₁ は C_Q(P)C_W(P) と P に正規化される → T₁C_Q(P)C_W(P) が
+   N_G(R₁) 内 index p 正規 → 2 と合わせ G に index p 正規部分群 → (B2) 偽 □
+※ (13)–(17) (pp. 113–114 Read 済) は (10.2) 側 endgame (p=3, Z₁=⟨st⟩,
+  PSL(2,8), 弱閉 Z₁PΣ の Hall–Wielandt 可換版, R₂⟨s⟩) — (12) とは独立の次章。
+  (14) は本 campaign の kernel-同定機構 (N_G(RΣ) ↷ 𝒜₂, kernel = RΣ) を再利用可。
+- δ2 (`conj_eq_inv_of_sq_eq_one`, 9f614e728): 対合は正規 ⟨σ⟩ を反転 — public 化済。
+  ⚠ **適用には Q̂₂ := NR⧸R' の faithful degree-p 作用 instance が必要** (抽象群だけ
+  では偽: C_p × C_{p−1} 反例)。⟹ (α) plumbing を δ2' として 1 定理に集約実装する:
+  **`conj_mk_distinguishedInvolution_zpowers_inv`** (次 iteration):
+  Ω₂ := ↥{X | 𝒜-predicate}; letI MulAction ↥NR Ω₂ (invariance = orbit_eq);
+  φ = toPermHom、hker : R' ≤ φ.ker (kernel iff →)、ψ = QuotientGroup.lift、
+  letI = compHom ψ; Faithful (kernel iff ←)・IsPretransitive (orbit=𝒜)・
+  card Ω₂ = p (ncard_A m=1)・card Q̂₂ = p(p−1) (済) → conj_eq_inv 適用、
+  u := mk ⟨s, s∈NR⟩ (s∈NR: s は T を反転+P 中心化 → R=T·P 正規化;
+  u ≠ 1: s∉R は位数 2 vs |R| = p² 奇数)。
+  結論 = [s] が Q̂₂ の唯一 Sylow-p 生成元を反転 = C_{R₁/R}(s) = 1 (書籍 p.112)。
+  この instance pack は (14) ((10.2) 側 N_G(RΣ) ↷ 𝒜₂) でも再利用できる。
+- δ2' 完了 (`3bcf40314`): `quotient_conj_eq_inv_of_sq_eq_one` — N/R ↷ 𝒜 の
+  instance pack (subtype MulAction + lift 降下 + Faithful/Pretransitive/card) を
+  1 定理に集約し ±1 補題適用。任意の対合が R₁/R を反転。
+- **δ3 への key 観察: T = [R₁,R₁]** (T は R₁ の特性的部分群):
+  [R₁,R₁] ≤ T は |R₁/T| = p² (可換) から自明; [R₁,R₁] ≠ 1 は R₁ 非可換
+  (R₁ 可換 → R₁ ≤ C_G(R) = R が card 矛盾); |T| = p 素数で等号。
+  ⟹ N_G(R₁) は T を正規化 (δ1 の NR 版より強く、char で自動) —
+  δ4 の「N_G(R₁) が R₁/T の line たちに作用」の基盤。
+- 次 iteration: (i) R₁ 非可換 + T = [R₁,R₁] を landing → (ii) δ4 =
+  𝒜₁-line 論法 (C_Q(P) が 𝒜₁∖{R/T} に正則、(11) の
+  invImageF_mul_comm_of_not_dvd_card_D 系のパターンを R₁/T level で再演) →
+  (iii) ε = Cor 10.2 (transfer_range_eq_of_nilpotencyClass_lt、Yoshida.lean) +
+  T₁C_Q(P)C_W(P) index-p 正規 → ¬(B2)。
+
+### δ4 (N_G(R₁) = N_G(R)) の完全分解 (2026-07-25 導出済・matrix-free)
+
+書籍の「As in (11)」の行間を埋める再構成。V := R₁/T (位数 p² 可換、
+⁅R₁,R₁⁆ = T ゆえ R₁-共役は V に自明作用)。「line」= T を含む R₁ の極大部分群
+(= V の位数 p 部分群、全 p+1 本、各 ⊴ R₁)。
+
+- **δ4-i** C_{R₁}(s) = P: C∩R = P (R = T×P、T は s-反転で奇数位数)。
+  R₁∖R の固定元 x は [x] ∈ C_{R₁/R}([s]) = 1 (δ2' の反転) → 矛盾。
+- **δ4-ii** T₁ := {x ∈ R₁ | sxs⁻¹ = x⁻¹}:
+  (a) 部分群: x,y 反転 → ⁅x,y⁆ ∈ T は s-固定 (class-2: ⁅x⁻¹,y⁻¹⁆ = ⁅x,y⁆)
+      かつ s-反転 (∈T) → ⁅x,y⁆² = 1 → 奇数位数で = 1 → 可換 → 積も反転。
+  (b) |T₁| = p²: ψ(g) := g⁻¹·(sgs⁻¹) の像 ⊆ T₁、fiber = C_{R₁}(s)-coset
+      → |image| = p³/p = p²; T₁ ∩ P = 1 で ≤ p²。T ≤ T₁。
+  (c) T₁ の元は strongly real: x = s·(sx)、(sx)² = (sxs⁻¹)x = x⁻¹x = 1。
+  (d) T₁ は line (image in V = 位数 p、pullback 全体)。
+- **δ4-iii** C_{NR}(V) = R₁ かつ C_N(V) = R₁ (N := N_G(R₁)):
+  V に自明 → 全 line 固定 → R を正規化 → ∈ NR; [k] が σ̂ と可換 →
+  [k] ∈ ⟨σ̂⟩ (**要 public 化: PrimeDegreeTwoTransitive の private
+  mem_zpowers_of_centralizes**) → [k] ∈ ⟨σ̂⟩ ∩ (P の stabilizer 像) = 1
+  (freeness) → k ∈ R₁。
+- **δ4-iv** 「第 3 line を固定する k ∈ NR は R₁」: k は R-line (k∈NR) と
+  T₁-line (下記) を常に固定; X ∉ {R-line, T₁-line} も固定なら V 上 3 本の
+  固定 line → scalar → R/T 上自明で λ=1 → V に自明 → δ4-iii で k ∈ R₁。
+  (2 次元の「3 固定直線 → scalar」を V の部分群計算で: x = a·b 分解
+  (a ∈ R/T-方向, b ∈ T₁/T-方向), kxk⁻¹ ∈ xT-line 条件から u = 1。)
+  **T₁-line の NR-不変性**: ksk⁻¹ = s·r₁ (r₁ ∈ R₁; NR/R₁ ≅ C_{p−1} の
+  唯一対合)、r₁ は V に自明作用 → s と ksk⁻¹ の V-作用同一 → 反転 line 同一
+  → k•(T₁-line) = T₁-line。
+- **δ4-v** N-orbit(R-line) ∌ T₁-line: n•R = T₁ なら n•P# ⊆ T₁ が
+  strongly real (δ4-ii-c) だが P-共役は not strongly real
+  (not_isStronglyReal_of_mem_P + 共役不変性) → 矛盾。
+- **δ4-vi** 数え上げ: stab_N(R-line) = N ∩ N_G(R) = NR → |orbit| = [N:NR] =: s'。
+  p ∤ s' (|N|_p = p³)。s' > 1 なら L ∈ orbit ∖ {R-line} (≠ T₁-line, δ4-v);
+  stab_NR(L) = R₁ (δ4-iv) → NR-suborbit サイズ p−1 → s' ≥ p → p∤s' で
+  s' = p+1 → orbit = 全 line ∋ T₁-line ✗。ゆえ s' = 1、**N_G(R₁) = N_G(R)** □
+- ε 資材: この時点で NR = N(R₁)、R₁ = Sylow_p(G) (p³ = |G|_p)、class 2 < p
+  → transfer_range_eq_of_nilpotencyClass_lt (Isaacs Cor 10.2)。index-p 正規:
+  M := T₁·(C_G(P)∩NR)-系 = pullback of (T₁-line 方向 ⋊ 全 K̄) — kernel of
+  NR → NR/R₁-mod... 実装時は hom NR → C_p を V の R/T-成分で構成
+  (K̄ は R/T に自明作用 = C_G(P)、[R₁] → R/T-projection; well-defined-性は
+  ⁅NR,R₁⁆-計算) — 詳細は着手時に再設計。
+- δ4 進捗 (2026-07-25 続き、全 push 済): δ4-i (`280e3b5e0`) / δ4a (`d97d53e10`) /
+  δ4-ii-a (`4e078c8ff`) / δ4-ii-b,c (T₁+card, `80f540c37`, 新 leaf
+  **StepTwelveEndgame.lean**) / δ4-ii-d+v (strongly real + g•R ≠ T₁,
+  `ebe78e35d`) / δ4-iii core+consumer (`807e41451`, `021d8b171`)。
+  generic 側: zpowers_normal_of_orderOf_eq 抽出 + surjective_zpow_smul /
+  mem_zpowers_of_centralizes public 化。
+  **残り**: δ4-iv (第 3 line 固定 k ∈ NR は R₁ — 座標系は R₁ = R·T₁,
+  R ⊓ T₁ = T (card: p²·p²/p = p³); X-line の生成元 x = a·b (a ∈ R, b ∈ T₁)
+  分解で k-共役の T-剰余成分比較 → u = 1 → δ4-iii へ) → δ4-vi (assembly:
+  stab_N(R-line) = NR、orbit ∌ T₁-line (δ4-v)、非 {R,T₁}-line の NR-orbit
+  = p−1 → [N:NR] ∈ {1} → N_G(R₁) = N_G(R)) → ε (Cor 10.2 transfer +
+  T₁C_Q(P)C_W(P) index-p 正規 → ¬(B2))。
+
+### δ4-iv/vi の精密化 (2026-07-25 再導出 — cyclicity 不要版)
+
+- **(A) 分解 block**: R ⊓ T₁ = T (x = ty ∈ R∩T₁: s-反転と R-可換性で y² = 1)。
+  **NR = R₁·C_G(P)**: R₁ ∩ C_G(P) = R ([x]-order p vs C_G(P)-像の位数 p−1、
+  card 計算は mk'∘subtype の quotientKerEquivRange で |像| = |C|/|C∩R'| = p−1)
+  → card 積で全体。⟹ 任意の k ∈ NR は k = r₁·c (r₁ ∈ R₁, c ∈ C_G(P))。
+- **(B) 全 k ∈ NR は T₁-line を固定**: r₁ は V-自明。c 側: s' := c s c⁻¹ は
+  T を elementwise 反転 (T ⊴ NR) かつ s' ∈ C_G(P) (c ∈ C_G(P))。
+  **w := s'·s は P と T を両方 centralize → w ∈ C_G(R) = R** (L1 再利用!)
+  → s' = w·s、w は V-自明 → s' と s の V-作用一致 → 反転 line 同一
+  → c•(T₁-line) = T₁-line。cyclicity/唯一対合論法は不要。
+- **(C) δ4-iv 本体**: u₁(k) ≡ 1 ∀ k ∈ NR (r₁ V-自明 + c は R/T ≅ P-classes に
+  自明 — c ∈ C_G(P) で T-part しか動かさない)。k が X-line (∉{R,T₁}) も固定
+  すると (R/T ⊕ X/T)-座標で diag(1, u₂); T₁-line は第 3 の固定 line で
+  mixed → u₂ = 1 → V-自明 → δ4-iii で k ∈ R₁。
+- **(D) δ4-vi assembly**: N := N_G(R₁) ⊇ NR (R₁ ⊴ NR)。stab_N(R-line) =
+  N ∩ N_G(R) = NR (T = ⁅R₁,R₁⁆ で N は T 固定 → line-pullback = R 正規化)。
+  orbit of R-line: ∌ T₁-line (δ4-v)。s' := [N:NR] = |orbit|; s' > 1 なら
+  L ∈ orbit∖{R-line}, L ≠ T₁-line → Stab_NR(L) = R₁ ((C)) → NR-suborbit
+  サイズ [NR:R₁] = p−1 → s' ≥ p; p ∤ s' (|N|_p = p³) → s' = p+1 → 全 line
+  ∋ T₁-line ✗。∴ **N_G(R₁) = N_G(R)** □
