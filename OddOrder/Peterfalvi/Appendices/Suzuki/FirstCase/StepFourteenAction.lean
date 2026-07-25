@@ -174,6 +174,69 @@ theorem smul_mem_lineSetTwo_iff
   rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h'
 
 include model in
+/-- **`|RΣ| = 3⁴`** in case (10.2): `|R| = |F|·|P| = 27` and `|Σ| = 3`. -/
+theorem card_sup_invImageF_centralizer_W_eq
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    Nat.card ↥(fc.invImageF model
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) = 3 ^ 4 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  obtain ⟨hpSig, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, -, -, hSig3, -⟩ :=
+    fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  have hPcard : Nat.card ↥fc.P = 3 := by rw [fc.card_P, hp3]
+  rw [fc.card_sup_invImageF_centralizer_W model ind, fc.card_invImageF model ind,
+    hF9, hPcard, hSig3]
+  norm_num
+
+include model in
+/-- **`s` normalizes `RΣ`**: it centralizes `P` (Ch. I Prop 5: `P ≤ V = C_D(s)`), hence
+normalizes `R` (step (11)), and it centralizes `Σ ≤ W ≤ V`. -/
+theorem distinguishedInvolution_mem_normalizerRSigma :
+    fc.toHypothesis.distinguishedInvolution ∈ fc.normalizerRSigma model := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  set s : G := fc.toHypothesis.distinguishedInvolution with hs_def
+  have hs2 : s * s = 1 := by
+    have h := fc.toHypothesis.distinguishedInvolution_sq
+    rwa [pow_two] at h
+  have hsinv : s⁻¹ = s := by
+    rw [← mul_one s⁻¹, ← hs2, ← mul_assoc, inv_mul_cancel, one_mul]
+  have hsP : s ∈ Subgroup.centralizer (fc.P : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact Subgroup.mem_centralizer_singleton_iff.mp
+      (fc.toHypothesis.V_le_centralizer_distinguishedInvolution (fc.P_le_V hy)).2
+  have hconj : ∀ y ∈ (fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G),
+      s * y * s⁻¹ ∈ (fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G) := by
+    intro y hy
+    have hy' : y ∈ ((fc.invImageF model : Set G)
+        * ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G) : Subgroup G)
+          : Set G)) := by
+      rw [← fc.coe_sup_invImageF_centralizer_W model]
+      exact hy
+    obtain ⟨r, hr, w, hw, rfl⟩ := hy'
+    have h1 : s * (r * w) * s⁻¹ = (s * r * s⁻¹) * (s * w * s⁻¹) := by group
+    rw [h1]
+    refine Subgroup.mul_mem _
+      (Subgroup.mem_sup_left (fc.conj_mem_invImageF model hsP hr)) ?_
+    have hws : w * s = s * w := Subgroup.mem_centralizer_singleton_iff.mp
+      (fc.centralizer_W_le_centralizer_distinguishedInvolution hw)
+    have h2 : s * w * s⁻¹ = w := by rw [← hws]; group
+    rw [h2]
+    exact Subgroup.mem_sup_right hw
+  have hsinv2 : s⁻¹ * s⁻¹ = 1 := by rw [hsinv]; exact hs2
+  rw [fc.mem_normalizerRSigma_iff model]
+  intro h
+  refine ⟨fun hh => hconj h hh, fun hh => ?_⟩
+  have h3 : s * (s * h * s⁻¹) * s⁻¹ = h := by
+    calc s * (s * h * s⁻¹) * s⁻¹ = (s * s) * h * (s⁻¹ * s⁻¹) := by group
+      _ = h := by rw [hs2, hsinv2, one_mul, mul_one]
+  rw [← h3]
+  exact hconj _ hh
+
+include model in
 /-- **`C_G(Z₁P) = C_G(P) ⊓ C_G(st) = RΣ`** (quoted in (15), p. 113).
 
 `RΣ` centralizes `Z₁P`: `R` is abelian and contains both `st` and `P`, while
@@ -511,6 +574,125 @@ theorem mem_ker_lineSetTwoPermHom_iff
     have hxZ : x ∈ Subgroup.zpowers z ⊔ fc.P := (fc.mem_lineSetTwo.mp A.2).1 hx
     rw [← hcentre] at hxZ
     exact Subgroup.mem_centralizer_iff.mp hxZ.2 (g : G) hg
+
+include model in
+/-- **`RΣ` is not a Sylow `3`-subgroup of `G`** (by (10.2), `|G|₃ = 3⁴·|W|` with
+`|W| ∈ {3, 9}`, while `|RΣ| = 3⁴`), so normalizer growth inside a Sylow `3`-subgroup
+containing `RΣ` produces a `3`-element of `N_G(RΣ)` outside `RΣ`. -/
+theorem exists_orderOf_pow_three_mem_normalizerRSigma_notMem_sup
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    ∃ x ∈ fc.normalizerRSigma model,
+      x ∉ (fc.invImageF model
+          ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)
+        ∧ ∃ j : ℕ, orderOf x = 3 ^ j := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  obtain ⟨-, -, -, -, hW, hGp⟩ := fc.step_twelve model ind hB2
+  have hRScard := fc.card_sup_invImageF_centralizer_W_eq model ind hB2
+  have hRp : IsPGroup 3 ↥(fc.invImageF model
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G) :=
+    IsPGroup.of_card hRScard
+  obtain ⟨X, hRX⟩ := hRp.exists_le_sylow
+  have hXcard : Nat.card ↥(X : Subgroup G)
+      = 3 ^ 4 * Nat.card ↥fc.toHypothesis.W := by
+    rw [Sylow.card_eq_multiplicity]
+    exact hGp
+  have hWge : 3 ≤ Nat.card ↥fc.toHypothesis.W := by rcases hW with h | h <;> omega
+  have hRltX : (fc.invImageF model
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)
+      < (X : Subgroup G) := by
+    refine lt_of_le_of_ne hRX fun h => ?_
+    rw [← h, hRScard] at hXcard
+    have hcon : (3 : ℕ) ^ 4 * 3 ≤ 3 ^ 4 * Nat.card ↥fc.toHypothesis.W := by gcongr
+    rw [← hXcard] at hcon
+    norm_num at hcon
+  have hgrow := OddOrder.BG.Ch2.S08.lt_inf_normalizer_of_isPGroup_lt
+    (p := 3) X.isPGroup' hRltX
+  obtain ⟨x, hxY, hxR⟩ := SetLike.exists_of_lt hgrow
+  refine ⟨x, hxY.2, hxR, ?_⟩
+  obtain ⟨j, hj⟩ := (IsPGroup.iff_orderOf).mp X.isPGroup' ⟨x, hxY.1⟩
+  exact ⟨j, by rwa [Subgroup.orderOf_mk] at hj⟩
+
+include model in
+/-- **`N_G(RΣ)` induces the full symmetric group on `𝒜₂`** ((14), p. 113): the image
+of the action is all of `Sym(𝒜₂) ≅ S₃`.
+
+`|Sym(𝒜₂)| = 3! = 6`.  The distinguished involution `s` normalizes `RΣ` and lies
+outside it (`|RΣ| = 3⁴` is odd), so its image has order `2`; and `RΣ` is not a Sylow
+`3`-subgroup of `G` by (10.2), so `N_G(RΣ)` also contains a `3`-element outside `RΣ`,
+whose image has order `3`.  Hence `6 ∣ |image|` and `|image| ∣ 6`. -/
+theorem lineSetTwoPermHom_surjective
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    Function.Surjective (fc.lineSetTwoPermHom model ind hB2) := by
+  classical
+  haveI : Finite (Subgroup G) :=
+    Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
+  haveI : Finite ↥fc.lineSetTwo := Subtype.finite
+  haveI := Fintype.ofFinite ↥fc.lineSetTwo
+  haveI := Classical.decEq ↥fc.lineSetTwo
+  haveI : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  set φ := fc.lineSetTwoPermHom model ind hB2 with hφ_def
+  -- `|Sym(𝒜₂)| = 3! = 6`
+  have hA3 : Fintype.card ↥fc.lineSetTwo = 3 := by
+    rw [← Nat.card_eq_fintype_card, Nat.card_coe_set_eq,
+      fc.ncard_lineSetTwo model ind hB2]
+  have hcard6 : Nat.card (Equiv.Perm ↥fc.lineSetTwo) = 6 := by
+    rw [Nat.card_eq_fintype_card, Fintype.card_perm, hA3]
+    decide
+  have hRScard := fc.card_sup_invImageF_centralizer_W_eq model ind hB2
+  -- the image of `s` has order `2`
+  have hsN := fc.distinguishedInvolution_mem_normalizerRSigma model
+  have hsnotR : fc.toHypothesis.distinguishedInvolution
+      ∉ (fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G) := by
+    intro hmem
+    have hord : orderOf fc.toHypothesis.distinguishedInvolution = 2 :=
+      orderOf_eq_prime fc.toHypothesis.distinguishedInvolution_sq
+        fc.toHypothesis.distinguishedInvolution_ne_one
+    have hdvd := Subgroup.orderOf_dvd_natCard _ hmem
+    rw [hord, hRScard] at hdvd
+    norm_num at hdvd
+  have hφs2 : orderOf (φ ⟨_, hsN⟩) = 2 := by
+    refine orderOf_eq_prime ?_ fun h => ?_
+    · have hx2 : (⟨_, hsN⟩ : ↥(fc.normalizerRSigma model)) ^ 2 = 1 := by
+        refine Subtype.ext ?_
+        rw [Subgroup.coe_pow, Subgroup.coe_one]
+        exact fc.toHypothesis.distinguishedInvolution_sq
+      rw [← map_pow, hx2, map_one]
+    · exact hsnotR ((fc.mem_ker_lineSetTwoPermHom_iff model ind hB2).mp
+        (MonoidHom.mem_ker.mpr h))
+  have h2dvd : 2 ∣ Nat.card ↥φ.range := by
+    have hd := Subgroup.orderOf_dvd_natCard φ.range
+      (⟨⟨_, hsN⟩, rfl⟩ : φ ⟨_, hsN⟩ ∈ φ.range)
+    rwa [hφs2] at hd
+  -- the image of a `3`-element outside `RΣ` has order `3`
+  obtain ⟨x, hxN, hxR, j, hxord⟩ :=
+    fc.exists_orderOf_pow_three_mem_normalizerRSigma_notMem_sup model ind hB2
+  have hφx1 : φ (⟨x, hxN⟩ : ↥(fc.normalizerRSigma model)) ≠ 1 := fun h =>
+    hxR ((fc.mem_ker_lineSetTwoPermHom_iff model ind hB2).mp
+      (MonoidHom.mem_ker.mpr h))
+  have hdvd3 : orderOf (φ (⟨x, hxN⟩ : ↥(fc.normalizerRSigma model))) ∣ 3 ^ j := by
+    have h1 := orderOf_map_dvd φ (⟨x, hxN⟩ : ↥(fc.normalizerRSigma model))
+    rwa [Subgroup.orderOf_mk, hxord] at h1
+  obtain ⟨i, -, hie⟩ := (Nat.dvd_prime_pow (by norm_num)).mp hdvd3
+  have h3dvd : 3 ∣ Nat.card ↥φ.range := by
+    refine dvd_trans ?_ (Subgroup.orderOf_dvd_natCard φ.range
+      (⟨⟨x, hxN⟩, rfl⟩ : φ (⟨x, hxN⟩ : ↥(fc.normalizerRSigma model)) ∈ φ.range))
+    rw [hie]
+    refine dvd_pow_self 3 fun h => ?_
+    rw [h, pow_zero] at hie
+    exact hφx1 (orderOf_eq_one_iff.mp hie)
+  -- `6 ∣ |image| ∣ 6`
+  have h6 : 6 ∣ Nat.card ↥φ.range := by
+    exact Nat.Coprime.mul_dvd_of_dvd_of_dvd
+      (show Nat.Coprime 2 3 by norm_num) h2dvd h3dvd
+  rw [← MonoidHom.range_eq_top]
+  refine Subgroup.eq_top_of_card_eq _ ?_
+  rw [hcard6]
+  exact Nat.dvd_antisymm (by rw [← hcard6]; exact Subgroup.card_subgroup_dvd_card _) h6
 
 end FirstCaseHypothesis
 
