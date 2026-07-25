@@ -1163,6 +1163,20 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 
 ### 残り (文書順): 4A.9 / 4A.10 / 4A.11 / 4A.12。
 
+#### 🎉 4A.9 完了 (2026-07-25) — 新 leaf `ProblemsIteratedCommutator.lean`
+
+**主結果** (実証明・axiom-clean):
+- `isSubnormal_iff_commIterate_le` = **(a)** (`N ⊴ G`, `N ⊔ A = ⊤`, `M` 安定 ⟹ `A ◁◁ G ⟺ M ≤ A`)
+- `commIterate_le_nilpotentResidual` = **(b)** (`M ≤ A` ⟹ `M ≤ A^∞`; `N` 正規も `G = NA` も不要)
+- `exists_commIterate_stable` (有限群で最終項 `M` が存在 = 系列の安定化)
+
+再利用可能な副産物: `commIterate` (始点と交換相手が別の反復交換子列) と単調性・加法性 /
+`le_normalizer_of_forall_conj_mem` / **`le_normalizer_commutator_left`・`_right`**
+(`⁅H,K⁆` は両因子で正規化される) / `exists_commIterate_top_le_of_isSubnormal`
+(部分正規性の **defect 形** `∃ d, ⁅⊤,A;d⁆ ≤ A`)。
+
+以下は着手前の設計メモ (実装は概ねこの通り):
+
 #### 4A.9 の設計 (2026-07-25、PDF p.137 = 書籍 p.124 で statement 確定)
 
 `G = NA` (`N ⊴ G`, `A ≤ G`)、`M` = 系列 `N ⊇ ⁅N,A⁆ ⊇ ⁅N,A,A⁆ ⊇ ⋯` の最終項。
