@@ -8,6 +8,9 @@ import Lean.Util.CollectAxioms
 import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.BrauerSuzuki
+import OddOrder.GroupTheory.HallWielandt
+import OddOrder.GroupTheory.TransferIndexTwo
+import OddOrder.GroupTheory.WeaklyClosed
 import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.CentralExtensionAutomorphisms
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
@@ -12725,3 +12728,22 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.ker_autQuotientHom
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.isElementaryAbelian_ker_autQuotientHom
+-- Hall–Wielandt (issue 9503): weakly closed subgroups, the odd-prime local transfer lemma,
+-- the double-coset difference formula, and the transfer-control theorem consumed by
+-- Peterfalvi Part II Ch.II (17)
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.IsWeaklyClosed.map_conj
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_mem_normalizer_conj_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.not_dvd_card_abelianization_normalizer
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.transfer_eq_prod_doubleCoset_mul_pow
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.eq_top_of_transfer_ne_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.sylow_le_commutator_normalizer
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.not_dvd_card_abelianization_normalizer_of_abelian
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.transfer_eq_mul_conj_of_index_two

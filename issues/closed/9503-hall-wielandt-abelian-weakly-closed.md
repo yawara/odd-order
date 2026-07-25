@@ -7,6 +7,11 @@ created: 2026-07-26
 
 # Hall-Wielandt (p>2, A abelian weakly closed) — Pf II (17) 用
 
+> ## ✅ **2026-07-26 完了** — 定理を完全形式化し、(17) に配線して step (17) が完結した。
+> 正本: `OddOrder/GroupTheory/HallWielandt.lean` (667 行、sorry 0) +
+> `notes/meta/hall_wielandt_proof.md` (証明と検証メモ) +
+> `FirstCase/StepSeventeenTransfer.lean` の `false_of_step_seventeen`。
+
 ## 🔒 CLAIM (shared infra, hub band 9500)
 
 **claimed by: main/hub session (issue 2053 = Pf Part II Ch.II Theorem B の駆動)**、

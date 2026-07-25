@@ -1502,3 +1502,53 @@ import する形にした。
    `Z₁` 固定)、`N_G(Z₁) = C_G(Z₁)⟨s⟩ = R₂⟨s⟩` ((13)(14) 由来)、
    逆向きは `Z₁PΣ = Ω₁(LV)` (15) が `R₂⟨s⟩` で正規。
 
+
+
+## ✅ step (17) 完結 (2026-07-26) — Theorem B の最終矛盾が landing
+
+`false_of_step_seventeen` (`FirstCase/StepSeventeenTransfer.lean`):
+`A = Z₁ΣP` の可換性 ((16)) と `R₂` 内での弱閉性 ((17) 段 1-2) から、
+**自前で形式化した Hall–Wielandt (p 奇 + A 可換弱閉版)** が (B2) を `N_G(A) = R₂⟨s⟩` に
+輸送し、`|W| = 3 / 9` 両分岐の `3 ∣ |Ab(R₂⟨s⟩)|` と矛盾する。
+
+⟹ **wreath 排除 (Yoshida ルート) も `|W|` の場合分けも不要**になった
+(Yoshida 経由の `|W| = 3` 側の別証明 `false_of_card_W_eq_three` は残置)。
+
+### 経緯 (issue 9503 に詳細)
+1. 書籍が引く Hall–Wielandt (M. Hall Thm 14.4.2) は Gorenstein にも Isaacs にも証明が無い。
+2. Gorenstein p.257 の注記から **Alperin 経由では届かない** ことを確認。
+3. ChatGPT Pro に古典証明を再構成させ、**全ステップを独立に検証**
+   (`notes/meta/hall_wielandt_proof.md`)。
+4. Lean 化: 既存の Mackey 公式 (Isaacs 10.10) と Isaacs 10.6(a)(b) が効き、
+   局所補題の α-多項式論法は初等形 (`y^j x y^{-j} = c^j x`) に単純化して実装。
+
+### 次 = **Theorem B の assembly** (steps (1)–(17) の結合)
+
+
+## ⏸ pending 化 (2026-07-26): 残るのは issue 0147 (Q₈ Brauer–Suzuki) のみ
+
+Theorem B 本体は完成し、フルビルド green・新規 sorry 0。ただし完了条件の
+「AxiomsCheck 登録」は `theoremB` が **9318/0147 の Q₈ Brauer–Suzuki sorry** を
+経由するため未達 (near-field model の存在がそこに依存)。0147 が閉じれば
+`#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.theoremB`
+を足して close できる。⟹ それまで `pending/`。
+
+## ✅ **2026-07-26 Theorem B 完成**
+
+`theoremB` (`FirstCase/TheoremB.lean`):
+```
+(fc : FirstCaseHypothesis G Ω) (ind : TheoremAInductionBelow G Ω) →
+Nonempty (TheoremAConclusion G Ω)
+```
+
+(B2) による二分岐で組み立てた:
+- `p ∣ |G^ab|` ⟹ `G` は単純でない (`not_isSimpleGroup_of_dvd_card_abelianization`)
+  ⟹ Ch.I §3 Prop 2 (`theoremAConclusion_of_not_simple`)
+- `p ∤ |G^ab|` = (B2) ⟹ `rankOne_affine_nearField` で model を取り、`R₁` を含む Sylow 3 で
+  `false_of_step_seventeen` ⟹ 空虚
+
+フルビルド green (4763 jobs)、`--strict` 警告ゼロ、**新規 sorry 0**。
+依存鎖に残る実 sorry は **9318/0147 の Q₈ Brauer–Suzuki のみ** (別 issue の長期プロジェクト)。
+
+⟹ 本 issue の完了条件「Theorem B (`(B1) → Theorem A conclusion`) が sorry-free で landing」
+は **(0147 の既知例外を除いて) 達成**。残タスクは AxiomsCheck 登録。
