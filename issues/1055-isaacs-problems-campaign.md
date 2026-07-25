@@ -1485,7 +1485,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5A.7 | ✅ | `card_ker_lt_relIndex_commutator` (同上)。書籍の `G/C` cyclic 仮定は `BC = G` + `B` cyclic から従うので導出に変更 |
 | 5A.6 | ✅ | `card_ker_dvd_two_of_dihedral` (上界) + `isStemExtension_dihedralReduce` (下界) — `ProblemsDihedralMultiplier.lean`。書籍の `2^n` 版より強い**偶数一般形**で証明 |
 | 5A.8(a) | ✅ | `isStemExtension_prodMap` + `card_ker_prodMap` (`ProblemsSchurMultiplier.lean`) |
-| 5A.8(b) | 🔨 ステップ 1-5 landing 済 (残り 6) | `ProblemsProductMultiplier.lean` に `inf_ker_snd_ker_fst` / `exists_mem_ker_snd_mul_mem_ker_fst` / ⭐`commutator_ker_snd_ker_fst_eq_bot`。残りはステップ 4-6 (下記設計)。準備補題 `not_dvd_card_commutator_of_sylow_le_center` (ステップ 5 用) も landing 済 |
+| 5A.8(b) | 🔨 ステップ 1-5 + `\|Z\| = \|Z_A\|·\|Z_B\|` landing 済 (残り = 商への降下) | `ProblemsProductMultiplier.lean` に `inf_ker_snd_ker_fst` / `exists_mem_ker_snd_mul_mem_ker_fst` / ⭐`commutator_ker_snd_ker_fst_eq_bot`。残りはステップ 4-6 (下記設計)。準備補題 `not_dvd_card_commutator_of_sylow_le_center` (ステップ 5 用) も landing 済 |
 
 ### 5A.8(b) の証明設計 (2026-07-26 確定、実装は次イテレーション)
 
@@ -1548,7 +1548,16 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
   `⁅H,H⁆` ↔ `commutator ↥H` の往復は mathlib `Subgroup.map_subtype_commutator` +
   `Subgroup.equivMapOfInjective` (`card_commutator_subgroup`)。
 - ⚠ `Subgroup.commutator_le_self` は **mathlib に既存** (自作しかけたので削除)。
-- **次はステップ 6** (`Γ_A/Z_B ↠ A` が核 `Z/Z_B` の stem extension、核の位数の積 = `|Z|`)。
+- **`|Z| = |Z_A|·|Z_B|` も landing (2026-07-26)** = `card_ker_eq_mul`。
+  `Z = Z_A ⊔ Z_B` は**再び中心積** (`isCentralProduct_ker`; `Z_A ≤ Γ_A`, `Z_B ≤ Γ_B` と
+  `⁅Γ_A,Γ_B⁆ = ⊥`) で、`Z_A ⊓ Z_B = ⊥` と合わせて内部直積。
+  `CentralProduct.lean` に `range_mulHom` と `card_eq_mul`
+  (「交わらない中心積の位数は因子の位数の積」= `mulHom` が単射で像が `R`) を追加。
+- **残りはステップ 6 の商への降下だけ**: `ψ_A := (fst∘h).restrict Γ_A : ↥Γ_A →* A`,
+  `N_B := Z_B.subgroupOf Γ_A` として `f_A := QuotientGroup.lift N_B ψ_A _ : ↥Γ_A ⧸ N_B →* A`
+  が stem extension であること + `|ker f_A| = |Z_A|`。後者は
+  「`|Z| = |ψ_A.ker| = |N_B| · |ker f_A| = |Z_B| · |ker f_A|`」と `|Z| = |Z_A||Z_B|` の
+  比較で出る (割り算を書かずに済む)。対称に `f_B`。
 
 ### ⚠ 5A.6 の書籍読解訂正 (2026-07-26)
 

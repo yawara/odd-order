@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Subgroup.Center
 import Mathlib.Tactic.Group
+import Mathlib.GroupTheory.Index
 
 /-!
 # Internal central products of subgroups
@@ -261,6 +262,38 @@ theorem commutator_self (h : IsCentralProduct R R₁ R₂) :
   exact Subgroup.mul_mem _
     (Subgroup.mem_sup_left (Subgroup.commutator_mem_commutator hx₁ hx₂))
     (Subgroup.mem_sup_right (Subgroup.commutator_mem_commutator hy₁ hy₂))
+
+/-- 積準同型の像はちょうど `R`。 -/
+theorem range_mulHom (h : IsCentralProduct R R₁ R₂) : h.mulHom.range = R := by
+  apply le_antisymm
+  · rintro g ⟨⟨x, y⟩, rfl⟩
+    exact h.mul_mem x.2 y.2
+  · intro g hg
+    obtain ⟨x, hx, y, hy, rfl⟩ := h.exists_mul hg
+    exact ⟨(⟨x, hx⟩, ⟨y, hy⟩), rfl⟩
+
+/-- 因子が交わらない中心積 (= 内部直積) の位数は因子の位数の積。
+
+`mulHom` は `R₁ ⊓ R₂ = ⊥` のとき単射で像が `R` なので `R₁ × R₂ ≃* R`。 -/
+theorem card_eq_mul (h : IsCentralProduct R R₁ R₂) (hinf : R₁ ⊓ R₂ = ⊥) :
+    Nat.card R = Nat.card R₁ * Nat.card R₂ := by
+  have hinj : Function.Injective h.mulHom := by
+    rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+    rintro ⟨x, y⟩ hxy
+    rw [MonoidHom.mem_ker] at hxy
+    have hxy' : (x : G) * (y : G) = 1 := hxy
+    have hx : (x : G) = (y : G)⁻¹ := by
+      rw [← mul_eq_one_iff_eq_inv]
+      exact hxy'
+    have hmem : (x : G) ∈ R₁ ⊓ R₂ := ⟨x.2, hx ▸ R₂.inv_mem y.2⟩
+    rw [hinf, Subgroup.mem_bot] at hmem
+    have hy : (y : G) = 1 := by
+      rw [hmem, one_mul] at hxy'
+      exact hxy'
+    exact Subgroup.mem_bot.mpr (Prod.ext (Subtype.ext hmem) (Subtype.ext hy))
+  have hcard := Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv
+  rw [h.range_mulHom] at hcard
+  rw [← hcard, Nat.card_prod]
 
 end IsCentralProduct
 

@@ -283,6 +283,43 @@ theorem inf_inf_commutator_eq_bot [Finite Γ] [Finite A] [Finite B] {h : Γ →*
       (hpB.trans (Subgroup.card_dvd_of_le inf_le_right))
   exact hp.ne_one (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hdA hdB))
 
+/-! ### `|Z| = |Z_A| · |Z_B|` -/
+
+/-- `Z_A ≤ Γ_A`, `Z_B ≤ Γ_B` ゆえ `Z_A` と `Z_B` は元ごとに可換で,
+`Z = Z_A ⊔ Z_B` はその中心積。 -/
+theorem isCentralProduct_ker [Finite A] [Finite B] {h : Γ →* A × B}
+    (hsurj : Function.Surjective h) (hst : IsStemExtension h)
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card B)) :
+    OddOrder.GroupTheory.IsCentralProduct h.ker
+      (h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker, ((MonoidHom.snd A B).comp h).ker⁆)
+      (h.ker ⊓ ⁅((MonoidHom.fst A B).comp h).ker, ((MonoidHom.fst A B).comp h).ker⁆) := by
+  set ΓA := ((MonoidHom.snd A B).comp h).ker with hΓA
+  set ΓB := ((MonoidHom.fst A B).comp h).ker with hΓB
+  refine ⟨?_, ?_⟩
+  · refine le_antisymm (fun z hz => ?_) (sup_le inf_le_left inf_le_left)
+    obtain ⟨u, hu, v, hv, rfl⟩ :=
+      exists_mul_mem_inf_commutator hsurj hst hcop hz
+    exact Subgroup.mul_mem_sup hu hv
+  · have hbot : ⁅ΓA, ΓB⁆ = ⊥ := commutator_ker_snd_ker_fst_eq_bot hst.ker_le_center hcop
+    refine le_bot_iff.mp ((Subgroup.commutator_mono ?_ ?_).trans hbot.le)
+    · exact inf_le_right.trans (Subgroup.commutator_le_self _)
+    · exact inf_le_right.trans (Subgroup.commutator_le_self _)
+
+/-- **`|Z| = |Z_A| · |Z_B|`** — 5A.8(b) の数値的な核心。
+
+`Z = Z_A ∘ Z_B` (中心積, `isCentralProduct_ker`) かつ `Z_A ⊓ Z_B = ⊥`
+(`inf_inf_commutator_eq_bot`) なので内部直積。 -/
+theorem card_ker_eq_mul [Finite Γ] [Finite A] [Finite B] {h : Γ →* A × B}
+    (hsurj : Function.Surjective h) (hst : IsStemExtension h)
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card B)) :
+    Nat.card h.ker =
+      Nat.card ((h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker,
+          ((MonoidHom.snd A B).comp h).ker⁆ : Subgroup Γ)) *
+        Nat.card ((h.ker ⊓ ⁅((MonoidHom.fst A B).comp h).ker,
+          ((MonoidHom.fst A B).comp h).ker⁆ : Subgroup Γ)) :=
+  (isCentralProduct_ker hsurj hst hcop).card_eq_mul
+    (inf_inf_commutator_eq_bot hst.ker_le_center hcop)
+
 end
 
 end OddOrder.Isaacs.Ch05
