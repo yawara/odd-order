@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.End
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.Algebra.Group.Subgroup.ZPowers.Basic
+import Mathlib.GroupTheory.GroupAction.Basic
 
 /-!
 # Fixed subgroup of an automorphic action
@@ -35,5 +37,75 @@ def fixedSubgroup (φ : L →* MulAut H) (K : Subgroup L) : Subgroup H where
 theorem fixedSubgroup_antitone (φ : L →* MulAut H) {K K' : Subgroup L} (h : K ≤ K') :
     fixedSubgroup φ K' ≤ fixedSubgroup φ K :=
   fun _ hx l hl => hx l (h hl)
+
+/-- Private helper: the elements of `L` fixing a given point `x ∈ H` form a subgroup
+(the `φ`-stabilizer of `x`).  Kept private: publicly this is `MulAction.stabilizer` for
+the action induced by `φ`, so a public duplicate would be wrapper debt. -/
+private def fixerSubgroup (φ : L →* MulAut H) (x : H) : Subgroup L where
+  carrier := {l | φ l x = x}
+  one_mem' := by simp
+  mul_mem' {a b} ha hb := by
+    simp only [Set.mem_setOf_eq] at ha hb ⊢
+    rw [map_mul, MulAut.mul_apply, hb, ha]
+  inv_mem' {a} ha := by
+    simp only [Set.mem_setOf_eq] at ha ⊢
+    rw [map_inv, MulAut.inv_def]
+    exact (MulEquiv.symm_apply_eq (φ a)).mpr ha.symm
+
+private theorem mem_fixedSubgroup_iff_le_fixerSubgroup {φ : L →* MulAut H} {K : Subgroup L}
+    {x : H} : x ∈ fixedSubgroup φ K ↔ K ≤ fixerSubgroup φ x := Iff.rfl
+
+@[simp] theorem fixedSubgroup_bot (φ : L →* MulAut H) : fixedSubgroup φ ⊥ = ⊤ :=
+  top_le_iff.mp fun _ _ => mem_fixedSubgroup_iff_le_fixerSubgroup.mpr bot_le
+
+/-- Membership in the fixed subgroup of a join: fixed by `K ⊔ K'` iff fixed by both. -/
+theorem fixedSubgroup_sup (φ : L →* MulAut H) (K K' : Subgroup L) :
+    fixedSubgroup φ (K ⊔ K') = fixedSubgroup φ K ⊓ fixedSubgroup φ K' :=
+  le_antisymm
+    (le_inf (fixedSubgroup_antitone φ le_sup_left) (fixedSubgroup_antitone φ le_sup_right))
+    fun _ hx => mem_fixedSubgroup_iff_le_fixerSubgroup.mpr <|
+      sup_le (mem_fixedSubgroup_iff_le_fixerSubgroup.mp hx.1)
+        (mem_fixedSubgroup_iff_le_fixerSubgroup.mp hx.2)
+
+/-- Membership in the fixed subgroup of a closure reduces to the generators. -/
+theorem mem_fixedSubgroup_closure {φ : L →* MulAut H} {s : Set L} {x : H} :
+    x ∈ fixedSubgroup φ (Subgroup.closure s) ↔ ∀ l ∈ s, φ l x = x := by
+  rw [mem_fixedSubgroup_iff_le_fixerSubgroup, Subgroup.closure_le]
+  exact Iff.rfl
+
+/-- Membership in the fixed subgroup of a cyclic subgroup reduces to the generator:
+the `a = 1` plug-and-play form for a single automorphism. -/
+theorem mem_fixedSubgroup_zpowers {φ : L →* MulAut H} {l : L} {x : H} :
+    x ∈ fixedSubgroup φ (Subgroup.zpowers l) ↔ φ l x = x := by
+  rw [mem_fixedSubgroup_iff_le_fixerSubgroup, Subgroup.zpowers_le]
+  exact Iff.rfl
+
+/-- The fixed subgroup is everything iff `K` acts trivially (i.e. `K ≤ ker φ`). -/
+theorem fixedSubgroup_eq_top_iff {φ : L →* MulAut H} {K : Subgroup L} :
+    fixedSubgroup φ K = ⊤ ↔ K ≤ φ.ker := by
+  constructor
+  · intro h l hl
+    rw [MonoidHom.mem_ker]
+    ext x
+    exact ((Subgroup.eq_top_iff' _).mp h x) l hl
+  · intro h
+    rw [Subgroup.eq_top_iff']
+    intro x l hl
+    rw [show φ l = 1 from MonoidHom.mem_ker.mp (h hl)]
+    rfl
+
+/-- `fixedSubgroup φ K` is, as a set, the fixed-point set `MulAction.fixedPoints ↥K H`
+of the `↥K`-action on `H` induced by `φ` (bridging lemma to the mathlib vocabulary; the
+action is not a global instance, hence the `letI`). -/
+theorem coe_fixedSubgroup_eq_fixedPoints (φ : L →* MulAut H) (K : Subgroup L) :
+    letI : MulAction K H := MulAction.compHom H (φ.comp K.subtype)
+    (fixedSubgroup φ K : Set H) = MulAction.fixedPoints K H := by
+  letI : MulAction K H := MulAction.compHom H (φ.comp K.subtype)
+  ext x
+  constructor
+  · intro hx ⟨l, hl⟩
+    exact hx l hl
+  · intro hx l hl
+    exact hx ⟨l, hl⟩
 
 end OddOrder.GroupTheory
