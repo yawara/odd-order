@@ -819,7 +819,13 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | # | 状態 | Lean 名 |
 |---|---|---|
 | 4A.1 | ✅ | `commutator_eq_commutator_of_mul_eq_top` |
-| 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 類 2 の `commutatorElement_pow_left_of_commutator_le_center`) |
+| 4A.2 | ✅ | `exists_closure_commutatorTriple_eq_zpowers` (前半) / `exists_card_two_subgroups_commutator_triple_eq_top` (後半 = A₅ 実例 + Note) |
+| 4A.3 | ✅ | `IsQuasiquaternion` (定義) / `eq_bot_of_isQuasiquaternion_quotient` |
+| 4A.5 | ✅ | (a) `index_centralizer_eq_of_not_mem_center` / (b) `card_closure_pair_eq` / (c) `index_centralizer_closure_pair_eq` / (d) `map_center_centralizer_eq_center` + `isExtraspecial_centralizer_closure_pair` / (e) `exists_index_center_eq_prime_pow_two_mul` (新 leaf `ProblemsExtraspecial.lean`) |
+| 4A.6 | ✅ | `IsMaximalClassPGroup` (定義) / `exists_eq_lowerCentralSeries_of_isMaximalClass` (+ 一意性 `eq_of_normal_of_card_eq_of_isMaximalClass`、新 leaf `ProblemsMaximalClass.lean`) |
+| 4A.7 | ✅ | `exists_orderOf_eq_and_forall_orderOf_dvd` (+ 冪公式 `pow_mk` / 上界 `pow_prime_pow_succ_eq_one`、新 leaf `ProblemsWreath.lean`) |
+| 4A.8(a) | ✅ | `mem_center_iff_exists_const` / `center_eq_inf_centralizer_range_inr` (`ProblemsWreath.lean`) |
+| 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 同値形 `frattini_eq_center_of_commutator_eq_center` + 橋 `isExtraspecial_of_commutator_eq_center`) |
 
 - **4A.1** (`G = AB`, `A`,`B` abelian ⟹ `G' = ⁅A,B⁆`): `⁅A,B⁆` の正規性は既存の
   `commutator_normal_of_sup_eq_top` (Ch.4 Main の Lem 4.1 系) をそのまま使える。
@@ -827,13 +833,86 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 - **4A.4**: repo の `IsExtraspecial` は `frattini_eq_center` を**フィールドとして仮定**して
   いるので、本問 (`P' = Z(P)`, `|Z(P)| = p` ⟹ `P/Z(P)` elementary abelian) は新規内容。
   類 2 の恒等式 `⁅x^n, y⁆ = ⁅x,y⁆^n` を証明して `x^p ∈ Z(P)` を出す。
-  ⚠ 書籍併記の `Z = P' = Φ` 形は `Φ(P) ≤ Z(P)`、すなわち `p`-群での `Φ = P'P^p` の ⊆ 方向が
-  要る (repo は ⊇ 方向 `commutator_sup_pow_closure_le_frattini` のみ)。⊆ 方向は
-  「elementary abelian 群の Frattini = ⊥」が要り、repo/mathlib いずれにも無い — 別途整備候補。
+  **書籍併記の `Z = P' = Φ` 形も完了 (2026-07-25)**: 「repo に `Φ ⊆` 方向が無い」という
+  当初の注記は**誤り**で、Lem 4.5 forward `frattini_le_of_isElementaryAbelian_quotient_of_pgroup`
+  (Ch04 Main/CommutatorIdentities) がちょうど `P/N` elementary abelian ⟹ `Φ(P) ≤ N` を与える。
+  ⟹ `frattini_eq_center_of_commutator_eq_center`、さらに repo の
+  `OddOrder.GroupTheory.IsExtraspecial` (Φ = Z を field に持つ) への橋
+  `isExtraspecial_of_commutator_eq_center` を追加。以後 4A.5 以降は Isaacs の定義
+  (`P' = Z(P)` 位数 `p`) から repo 構造の API をそのまま使える。
 
-### 残り (文書順): 4A.2 (A₅ で `[H,K,L] = G`) / 4A.3 (quasiquaternion) / 4A.5 (extraspecial の
-構造 (a)-(e)) / 4A.6 (maximal class) / 4A.7-4A.8 (regular wreath product; §3A で作った
-`WreathProduct` インフラが使える) / 4A.9 / 4A.10 / 4A.11。
+- **4A.2** (`⁅H,K,L⁆` は `⁅h,k,l⁆` たちで生成されるとは限らない): 前半 (位数 2 の `H,K,L` なら
+  三重交換子の**元**は高々 1 個の非単位元 ⟹ 生成するのは巡回群) は
+  `exists_closure_commutatorTriple_eq_zpowers` で `closure {…} = ⟨⁅⁅h,k⁆,m⁆⟩` と**等式**まで出す
+  (生成元自身が集合の元なので場合分け不要)。汎用補題
+  `commutator_zpowers_eq_zpowers_commutatorElement` (`a² = b² = 1` ⟹ `⁅⟨a⟩,⟨b⟩⁆ = ⟨⁅a,b⁆⟩`) を分離。
+  後半の `A₅` 実例は書籍 Hint どおり `P = ⟨(0 1 2 3 4)⟩`, `H = ⟨(1 4)(2 3)⟩`, `K = ⟨(0 2)(3 4)⟩`
+  (どちらも `N_{A₅}(P) ≅ D₁₀` の折り返し ⟹ `⁅H,K⁆ = P`)、`L = ⟨(0 1)(2 3)⟩` (`P` を正規化しない)。
+  **`⁅P,L⁆ = ⊤` は「`⟨P,L⟩ = A₅` + 単純性」でなく位数で出した**: `⁅rot5,l⁆` (位数 5)、
+  `⁅rot5²,l⁆` (位数 3)、その積 (位数 2) が `⁅P,L⁆` に居る ⟹ `30 ∣ |N| ∣ 60` ⟹ `|N| ∈ {30,60}`、
+  `30` なら指数 2 = `(60).minFac` で `N ⊴ A₅` となり単純性に反する ⟹ `|N| = 60`。
+  具体置換の計算は `Equiv.Perm (Fin 5)` 上の `decide` (冪は `maxRecDepth 8000` が要る)、
+  `↥(alternatingGroup (Fin 5))` へは `Subtype.ext` + `change` で降ろす。
+  Note (「`⁅H,K,L⁆` は `⁅h,k,l⁆` で生成されない」) は前半の巡回性 +
+  `alternatingGroup.isCyclic_iff_card_le_three` で主定理の最後の連言肢に含めた。
+
+- **4A.3** (quasiquaternion 群の Schur 乗数は自明): `Q = CU` (`C,U` 巡回、`C ⊴ Q`、
+  `C ∩ U = Z(Q)`) を `IsQuasiquaternion` として定義し、`Z ≤ G' ⊓ Z(G)` かつ `G ⧸ Z` が
+  quasiquaternion なら `Z = ⊥` を証明。書籍 Hint どおり `C, U` の引き戻し `A, B` を取り、
+  (i) `A = Z⟨a₀⟩` ゆえ `A` abelian (`Z ≤ Z(G)` を使う)、(ii) `G = AB`、
+  (iii) `A ⊓ B = Z(G)`、(iv) `G ⧸ A` 巡回 ⟹ **Lem 4.6 cardinality**
+  (`card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient`) を
+  `G` と `Ḡ = G ⧸ Z` の両方に適用。引き戻しの位数が `|Z|` 倍になること
+  (`card_comap_mk'_eq_mul`、`index_comap_of_surjective` + Lagrange) と `Ḡ' = G'/Z`
+  (`map_commutator_eq` + `comap_map_eq` + `Z ≤ G'`) から `|C||Z| = |C||Z|²` ⟹ `|Z| = 1`。
+  ⚠ counting なので `[Finite G]` を仮定 (書籍も有限群の文脈)。
+
+- **4A.5** (extraspecial の構造 (a)-(e)、新 leaf `Ch04_Commutators/ProblemsExtraspecial.lean`):
+  中心道具は**類 2 の左交換子準同型** `commutatorLeftHom` (`g ↦ ⁅x,g⁆`、核 = `C_P(x)`) と
+  そこから出る恒等式 3 本 (`⁅a,bc⁆ = ⁅a,b⁆⁅a,c⁆` / `⁅a,b⁻¹⁆` / `⁅a,b^n⁆`)。
+  (a) は核・像の Lagrange (`index_ker` + 像が位数 `p` の `Z(P)` の非自明部分群)。
+  (b) は `P/Z(P)` が elementary abelian (4A.4) で `⟨x̄⟩ ⊓ ⟨ȳ⟩ = 1` を示し
+  `|U| = |U の像| · |Z| = p²·p`。
+  **(c)(d)(e) の要は中心積分解 `P = V·U`** (`exists_mem_centralizer_mul_mem_closure_pair`):
+  `⁅x,g⁆ = c^i` から `g(y^i)⁻¹ ∈ C_P(x)`、さらに `⁅y,·⁆` を潰して `V` に落とす。
+  これで (d) の `Z(V) = Z(P)` は**位数勘定なしで**出る (書籍の `P > U` すら不要 —
+  `P > U` は `V` の非可換性、すなわち extraspecial 性の側でだけ要る)。
+  (c) は `|VU|·|V ⊓ U| = |V||U|` に `VU = P`, `V ⊓ U = Z(P)`, `|U| = p³` を代入。
+  (e) は `|Q|` の強帰納法 (書籍 Hint)、基底は `Q = U` (`|Q| = p³`)、段は `V` extraspecial +
+  `[Q:V] = p²` + `Z(V) = Z(Q)`。
+
+- **4A.6** (maximal class、新 leaf `Ch04_Commutators/ProblemsMaximalClass.lean`):
+  ⚠ **mathlib の下降中心列は古典的 `γ_k` から 1 ずれる** (`lowerCentralSeries ⊤ 0 = P`) —
+  古典 `γ_k` = `lowerCentralSeries ⊤ (k-1)`。汎用部品を 4 つ整備:
+  (i) `p`-群で真の部分群は位数が `p` 倍以上違う (`prime_mul_card_dvd_card_of_lt`)、
+  (ii) 下降中心列は類の下で真減少 (`lowerCentralSeries_lt_of_lt_nilpotencyClass`)、
+  (iii) 下方 `p^j ∣ |L_{c-j}|` / 上方 `p^i·|L_i| ∣ |P|`、
+  (iv) **非可換 `p`-群では `p² ∣ |P:P'|`** (`P/P'` 巡回 ⟹ `P/Φ(P)` 巡回 ⟹ Ch01 の
+  `isCyclic_of_frattiniQuotient_isCyclic` で `P` 巡回 ⟹ 可換)。
+  (iii)+(iv) から **`|G| = p^k` (`k ≥ 2`) の `p`-群の類 ≤ `k-1`**
+  (`nilpotencyClass_le_of_card_eq_prime_pow`; BG S04 の同型 lemma とは独立に Isaacs 層で証明 —
+  BG を import すると層が逆流するため) と maximal class での `|L_i| = p^{n-1-i}` が出る。
+  本題は `|P⧸N| = p^k` の類 ≤ `k-1` ⟹ `L_{k-1}(P) ≤ N`、位数一致で `N = L_{k-1}(P)`。
+  ⚠ 書籍の `|N : P| ≥ p²` は誤植で `|P : N| ≥ p²` (指数が `p` 冪なので `p² ∣ |P:N|` と同値)。
+
+- **4A.7** (正則 wreath product `C ≀ U` の元の位数の最大値 = `p^{n+1}`、新 leaf
+  `Ch04_Commutators/ProblemsWreath.lean`): §3A の一般 wreath product `D ≀[Q] Q`
+  (`Q` の左正則作用) で実現。**上界は冪公式を使わない**のがポイント —
+  `rightHom (x^p) = (rightHom x)^p = 1` ⟹ `x^p ∈ range inl` (base 群)、base は指数 `p^n`
+  ⟹ `x^{p^{n+1}} = 1` (`pow_prime_pow_succ_eq_one`)。
+  下界には冪公式 `pow_mk` (`⟨f,q⟩^k` の base 成分 = `∏_{j<k} f((q^j)⁻¹ ω)`、`D` 可換で証明) と
+  `prod_range_card_eq_prod_univ` (生成元の冪で捻った積 = 群全体の積; `Finset.prod_image` +
+  `pow_injOn_Iio_orderOf`) を使い、証人 `x = ⟨δ₁ c, q⟩` に対し `x^p = ⟨const c, 1⟩` (位数 `p^n`)。
+
+- **4A.8(a)** (`Z(P) = C_A(U)` = 定数 tuple 全体): §3A の既存部品がほぼそのまま効く —
+  `centralizer_range_inl_eq` (`C_W(base) = base`) で中心の元が base に入り、
+  `forall_conj_inr_eq_iff_const` (`inr` との可換性 ⟺ 軌道上定数) で定数性が出る。
+  逆向きは定数 tuple が base とも `inr q` とも可換という直接計算。
+
+### 残り (文書順): **4A.8(b)-(d)** (次の frontier: (b) `⁅A,U⁆ = P'` = 成分積 1 の tuple —
+`P = A·U` で `A`,`U` 可換ゆえ **4A.1** が `P' = ⁅A,U⁆` を与え、あとは
+`⁅inl g, inr q⁆ = inl (g · (g∘shift)⁻¹)` と δ-分解 `f = ∏ₓ δₓ(f x)` で augmentation kernel
+との一致を示す; (c) `|Z(P'U)| = p`; (d) maximal class) / 4A.9 / 4A.10 / 4A.11。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
 
