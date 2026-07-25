@@ -504,6 +504,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteenAction
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFourteenSylow
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFifteen
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepFifteenLV
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSixteen
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
