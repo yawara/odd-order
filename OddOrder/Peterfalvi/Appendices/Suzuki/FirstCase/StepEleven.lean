@@ -96,6 +96,47 @@ theorem mem_invImageF_iff {x : G}
   · intro h
     exact ⟨⟨x, hxL⟩, Subgroup.mem_comap.mpr h, rfl⟩
 
+/-- `R` is normal in `C_G(P)`: the translation subgroup `emb(F)` is normal in the
+quotient (`range_normal`), and normality pulls back along the quotient map. -/
+theorem conj_mem_invImageF {c r : G}
+    (hc : c ∈ Subgroup.centralizer (fc.P : Set G))
+    (hr : r ∈ fc.invImageF model) : c * r * c⁻¹ ∈ fc.invImageF model := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  obtain ⟨y, hy, rfl⟩ := hr
+  haveI hn : ((MonoidHom.range model.emb).comap
+      (QuotientGroup.mk' ((fc.toHypothesis.H.subgroupOf
+        (Subgroup.centralizer (fc.P : Set G))).normalCore))).Normal :=
+    model.range_normal.comap _
+  exact ⟨⟨c, hc⟩ * y * ⟨c, hc⟩⁻¹, hn.conj_mem y hy ⟨c, hc⟩, rfl⟩
+
 end FirstCaseHypothesis
+
+/-- **A subgroup of `(F, +)` invariant under right multiplication by every unit is `⊥` or
+`⊤`** (near-field division: `t = x·(x⁻¹·t)` for `x, t ≠ 0`).  This is the mechanism behind
+step (11)'s "`C_Q(P)` acts transitively on `F^*`" collapse: any `C_G(P)`-invariant subgroup
+of `R` strictly between `P` and `R` would project to a proper nonzero `F^*`-invariant
+subgroup of `F`. -/
+theorem addSubgroup_eq_bot_or_top_of_mul_units_mem {F : Type*} [NearFields.NearField F]
+    (S : AddSubgroup F) (hS : ∀ x ∈ S, ∀ u : Fˣ, x * (u : F) ∈ S) :
+    S = ⊥ ∨ S = ⊤ := by
+  by_cases h0 : S = ⊥
+  · exact Or.inl h0
+  · refine Or.inr ?_
+    have hex : ∃ x ∈ S, x ≠ (0 : F) := by
+      by_contra hall
+      push Not at hall
+      refine h0 (le_antisymm (fun y hy => ?_) bot_le)
+      rw [AddSubgroup.mem_bot]
+      exact hall y hy
+    obtain ⟨x, hxS, hx0⟩ := hex
+    rw [eq_top_iff]
+    intro t _
+    by_cases ht : t = 0
+    · rw [ht]; exact S.zero_mem
+    · have hu : IsUnit (x⁻¹ * t) :=
+        isUnit_iff_ne_zero.mpr (mul_ne_zero (inv_ne_zero hx0) ht)
+      obtain ⟨u, hu⟩ := hu
+      have hmem := hS x hxS u
+      rwa [hu, ← mul_assoc, mul_inv_cancel₀ hx0, one_mul] at hmem
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
