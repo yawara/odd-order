@@ -537,15 +537,23 @@ Ch.2 は全ファイル sorry-free。
 `u² = 1` + `u ≠ 1`。**CRT の一般論は不要で Bezout だけで閉じる**のがポイント:
 `sA + mB = 1` から `e := mB` が `e·m = m`, `e·s = 0`, `e² = e` をみたし `u := -1 + 2e`。
 
+**landing 済 (2026-07-25)**:
+- `exists_unique_fixes_inverts` (核: 一意存在 + involution)。
+- Bezout 系の再利用可能な支持補題: `exists_bezout_zmod` / `eq_of_fixes_inverts` (一意性のみを
+  切り出したもの、奇数性不要) / `inverts_mul` / `fixes_mul` / `inverts_of_inverts_coprime` /
+  `fixes_of_fixes_coprime`。
+- (a) の捩れ表現 `fixes_inverts_iff_torsion` (生成元での条件 ⟺ 「`s`-捩れを全部固定し
+  `m`-捩れを全部反転」)。書籍の言い回しに一致。
+- (b) `mul_eq_of_fixes_inverts_pqr` (`u_p · u_q = u_r`) ⟹ `{1,u_p,u_q,u_r}` は Klein 四元群。
+
 **残り**:
-- (a) の言い換え: `mul_eq_zero_iff_exists_mul` (捩れ = 生成元の倍数) を使って
-  「`s`-捩れの元をすべて固定 / `q`-捩れ・`r`-捩れの元をすべて反転」の形に直す
-  (`q`-捩れ ⊆ `qr`-捩れ なので反転側は自動)。`n := p*q*r`, `s := p`, `m := q*r` で適用。
-- (b): `u_p · u_q = u_r` (各素数での剰余 `(1,-1,-1)·(-1,1,-1) = (-1,-1,1)`) を、一意性
-  (`ExistsUnique` の `.unique`) を使って「`u_p u_q` が `u_r` の条件をみたす」→ `= u_r` で出す。
-  `{1, u_p, u_q, u_r}` が位数 4 の部分群 (Klein 四元群)。
+- (a)(b) を `p, q, r` 具体で束ねたまとめ定理 (存在 + Klein 四元群) — 核への 3 回の
+  instantiation (`p*(q*r) = q*(p*r) = r*(p*q) = p*q*r` は `ring`) だけ。
 - (c): `G = C ⋊ K` で、`C` の生成元が誘導する内部自己同型 `α` の `⟨α⟩` が regular orbit を
-  もたないこと。3A.7 (奇素数 3 個 = sharpness 例) の対になる部分。
+  もたないこと (3A.7 の sharpness 例)。
+
+⚠ **実装上の罠**: `ZMod (p*q*r)` では法が型に現れるので `rw [mul_assoc]` が `p * q * r` に
+マッチして motive 破綻する。`mul_assoc up uq` と引数を固定すること。
 
 ### 3A.6 の解析 (2026-07-25、deferred-hard として記録)
 
@@ -660,7 +668,7 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
 | 3A.5 | ✅ (`G ⋊ G ≅ G × G`) |
 | 3A.6 | ⏸ **deferred-hard** (2026-07-25 に解析; 下記) |
 | 3A.7 | ⬜ `α ∈ Aut(G)`, `o(α)` の素因子が 2 個以下 ⟹ `⟨α⟩` は `G` 上に regular orbit をもつ |
-| 3A.8 | (a) 核 ✅ (2026-07-25) / (a) 捩れ表現の言い換え + (b) 位数 4 の部分群 `K` + (c) `C ⋊ K` で regular orbit 無し ⬜ |
+| 3A.8 | (a) ✅ (核 + 捩れ表現) / (b) ✅ (`u_p·u_q = u_r`) / (c) ⬜ `C ⋊ K` で regular orbit 無し |
 | 3A.9 | (a) ✅ (2026-07-25) / (b) ⬜ regular wreath で `C_G(b) = C` なる `b ∈ B` が存在 |
 | 3A.10 | ⬜ 任意の有限群 `H` と素数 `p` に対し、正規可換 `p`-部分群 `A` で `G` が `A` 上分裂し `G/A ≅ H`, `A = C_G(A)` なる `G` が存在 |
 
@@ -700,5 +708,5 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **§2D も完済 (2D.1(a)(b) / 2D.2)** ⟹ **Isaacs Ch.2 の章末演習は全問完済**。
 さらに **3A.4 ✅** (3A.3 / 3A.5 は既済と実測判明)。
 さらに **3A.9(a) ✅**。**3A.6 は deferred-hard** (解析は §3A 節に記録; Brodkey の適用の一手が
-未確定)。さらに **3A.8(a) の核 ✅**。**次 frontier = 3A.8(a) の捩れ表現での言い換え + (b)**
-(メモは §3A 節) → 3A.8(c) / 3A.9(b) / 3A.10 → 3A.6 / 3A.7 に戻る → §3B〜。
+未確定)。さらに **3A.8(a) の核 ✅**。さらに **3A.8(a)(b) ✅**。**次 frontier = 3A.8 のまとめ定理 + (c)** → 3A.9(b) / 3A.10 →
+3A.6 / 3A.7 に戻る → §3B〜。
