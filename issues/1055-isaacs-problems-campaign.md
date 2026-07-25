@@ -989,7 +989,13 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 ⟹ **`lowerCentralSeries ⊤ i = (Δ^i(⊤)).map inl`** (`i ≥ 1`; 基底は 4A.8(b) の
 `P' = ker(coordProd).map inl` と `range Δ_q = ker coordProd`)。
 **元レベルの式 `⁅inl f, y⁆ = inl (Δ_{y.right} f)` は
-`commutatorElement_inl_eq_shiftSubHom` として設置済** (帰納段はこれの closure 化のみ)。
+`commutatorElement_inl_eq_shiftSubHom` として設置済**。さらに
+**`Δ_{q^k} = Δ_q ∘ T_k`** (`shiftSubHom_pow_eq_comp`、`T_k = shiftSumHom q k` は
+群環の `1 + x + ⋯ + x^{k-1}`; 証明は `Finset.prod_range_div` の telescoping) も設置済で、
+これにより「生成元 `q` の `Δ` だけで `⁅A, U⁆` の全生成元が捉えられる」。
+⟹ 残る帰納段は **`⁅S.map inl, ⊤⁆ = (S.map (shiftSubHom q)).map inl`** の closure 計算
+(`Subgroup.commutator_le` で生成元ごとに上の 2 式を使う; `S` の shift 安定性が要る) と、
+`(1-x)` の冪零指数 `n(p-1)+1` の算術。
 
 **(ii) 残る算術 = `Δ = (1-x)` の冪零指数**。`ZMod(p^n)[x]/(x^p-1)` で
 `(1-x)^{n(p-1)+1} = 0` かつ `(1-x)^{n(p-1)} ≠ 0` ⟹ **`class(P) = n(p-1)+1`**。

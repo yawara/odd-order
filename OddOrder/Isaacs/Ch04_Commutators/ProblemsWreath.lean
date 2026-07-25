@@ -663,6 +663,50 @@ theorem commutatorElement_inl_eq_shiftSubHom (f : Q → D) (y : D ≀[Q] Q) :
           rw [hbase, one_mul, commutatorElement_inl_inr_eq_shiftSubHom]
     _ = inl (shiftSubHom y.right f) := hcen
 
+/-- **部分和作用素** `T_k f = ∏_{j<k} (f ∘ shift^j)` (群環の `1 + x + ⋯ + x^{k-1}`). -/
+def shiftSumHom (q : Q) (k : ℕ) : (Q → D) →* (Q → D) where
+  toFun f := fun ω => ∏ j ∈ Finset.range k, f ((q ^ j)⁻¹ * ω)
+  map_one' := by funext ω; simp
+  map_mul' f g := by
+    funext ω
+    change (∏ j ∈ Finset.range k, (f * g) ((q ^ j)⁻¹ * ω))
+      = (∏ j ∈ Finset.range k, f ((q ^ j)⁻¹ * ω)) * ∏ j ∈ Finset.range k, g ((q ^ j)⁻¹ * ω)
+    simp only [Pi.mul_apply]
+    exact Finset.prod_mul_distrib
+
+@[simp]
+theorem shiftSumHom_apply (q : Q) (k : ℕ) (f : Q → D) (ω : Q) :
+    shiftSumHom q k f ω = ∏ j ∈ Finset.range k, f ((q ^ j)⁻¹ * ω) := rfl
+
+/-- **`Δ_{q^k} = Δ_q ∘ T_k`** (群環の `1 - x^k = (1-x)(1 + x + ⋯ + x^{k-1})`).
+
+これで「生成元 `q` の `Δ` だけで `⁅A, U⁆` の全生成元が捉えられる」ことが従い,
+下降中心列の帰納段が `Δ_q` の反復に帰着する. -/
+theorem shiftSubHom_pow_eq_comp (q : Q) (k : ℕ) (f : Q → D) :
+    shiftSubHom (q ^ k) f = shiftSubHom q (shiftSumHom q k f) := by
+  funext ω
+  set G : ℕ → D := fun j => f ((q ^ j)⁻¹ * ω) with hG
+  have hstep : ∀ j : ℕ, f ((q ^ j)⁻¹ * (q⁻¹ * ω)) = G (j + 1) := by
+    intro j
+    have hcomm : (q ^ j)⁻¹ * q⁻¹ = (q ^ (j + 1))⁻¹ := by rw [pow_succ]; group
+    rw [hG]
+    congr 1
+    rw [← mul_assoc, hcomm]
+  have htel : (∏ j ∈ Finset.range k, G (j + 1)) * (∏ j ∈ Finset.range k, G j)⁻¹
+      = G k * (G 0)⁻¹ := by
+    rw [← div_eq_mul_inv, ← div_eq_mul_inv, ← Finset.prod_div_distrib]
+    exact Finset.prod_range_div G k
+  change f ω * (f ((q ^ k)⁻¹ * ω))⁻¹
+    = (∏ j ∈ Finset.range k, G j) * (∏ j ∈ Finset.range k, f ((q ^ j)⁻¹ * (q⁻¹ * ω)))⁻¹
+  rw [Finset.prod_congr rfl (fun j _ => hstep j)]
+  have hG0 : G 0 = f ω := by rw [hG]; simp
+  have hGk : G k = f ((q ^ k)⁻¹ * ω) := rfl
+  calc f ω * (f ((q ^ k)⁻¹ * ω))⁻¹ = G 0 * (G k)⁻¹ := by rw [hG0, hGk]
+    _ = ((∏ j ∈ Finset.range k, G (j + 1)) * (∏ j ∈ Finset.range k, G j)⁻¹)⁻¹ := by
+          rw [htel, mul_inv_rev, inv_inv]
+    _ = (∏ j ∈ Finset.range k, G j) * (∏ j ∈ Finset.range k, G (j + 1))⁻¹ := by
+          rw [mul_inv_rev, inv_inv]
+
 end
 
 end OddOrder.Isaacs.Ch04
