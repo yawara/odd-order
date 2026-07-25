@@ -524,10 +524,8 @@ theorem commutatorElement_pow_left_of_commutator_le_center {G : Type*} [Group G]
 `⁅x, y⁆ ∈ Z(P)` の位数は `p` を割るから `⁅x^p, y⁆ = 1`, すなわち `x^p ∈ Z(P)`.
 ⟹ 商は指数 `p` の abelian 群.
 
-書籍が併記する「同値な形 `Z(P) = P' = Φ(P)`」のうち `Φ(P) ≤ Z(P)` は `p`-群での
-`Φ(P) = P' P^p` (⊆ 方向) が要る — repo には現在 ⊇ 方向
-(`commutator_sup_pow_closure_le_frattini`) しか無いので, ここでは本問の主形
-「`P/Z(P)` が elementary abelian」を形式化する.
+書籍が併記する同値形 `Z(P) = P' = Φ(P)` は下の
+`frattini_eq_center_of_commutator_eq_center` (本結果 + Lem 4.5).
 
 ⚠ `p` の素数性はこの向きには不要 (`|Z(P)| = p` から `Z(P)` の元の位数が `p` を割ることしか
 使わない) ので仮定していない. -/
@@ -558,6 +556,36 @@ theorem isElementaryAbelian_quotient_center_of_commutator_eq_center {p : ℕ}
       exact congrArg Subtype.val this
     rw [hone] at hcompow
     exact (commutatorElement_eq_one_iff_commute.mp hcompow).symm
+
+/-- **Isaacs Problem 4A.4** (書籍併記の同値形, p. 123): `P' = Z(P)` が位数 `p` の
+`p`-群では `Φ(P) = Z(P)`, すなわち `Z(P) = P' = Φ(P)`.
+
+`⊆`: 本問の主形 (`P/Z(P)` が elementary abelian) に Lem 4.5 forward
+(`frattini_le_of_isElementaryAbelian_quotient_of_pgroup`) を適用.
+`⊇`: `Z(P) = P' ≤ Φ(P)` (`commutator_le_frattini_of_pgroup`). -/
+theorem frattini_eq_center_of_commutator_eq_center {p : ℕ} [Fact p.Prime]
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup p P)
+    (hcomm : commutator P = Subgroup.center P)
+    (hcard : Nat.card (Subgroup.center P) = p) :
+    frattini P = Subgroup.center P :=
+  le_antisymm
+    (frattini_le_of_isElementaryAbelian_quotient_of_pgroup hP
+      (isElementaryAbelian_quotient_center_of_commutator_eq_center hcomm hcard))
+    (hcomm ▸ commutator_le_frattini_of_pgroup hP)
+
+/-- Isaacs の extraspecial の定義 (`p`-群で `P' = Z(P)` の位数が `p`) から, repo の
+`OddOrder.GroupTheory.IsExtraspecial` 構造 (`Φ(P) = Z(P)` を field に持つ) を得る.
+
+Problem 4A.4 (`frattini_eq_center_of_commutator_eq_center`) がちょうど不足フィールドを与える. -/
+theorem isExtraspecial_of_commutator_eq_center {p : ℕ} [Fact p.Prime]
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup p P)
+    (hcomm : commutator P = Subgroup.center P)
+    (hcard : Nat.card (Subgroup.center P) = p) :
+    OddOrder.GroupTheory.IsExtraspecial p P :=
+  { isPGroup := hP
+    commutator_eq_center := hcomm
+    frattini_eq_center := frattini_eq_center_of_commutator_eq_center hP hcomm hcard
+    center_card := hcard }
 
 end
 

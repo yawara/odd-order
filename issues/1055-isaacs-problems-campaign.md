@@ -821,7 +821,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | 4A.1 | ✅ | `commutator_eq_commutator_of_mul_eq_top` |
 | 4A.2 | ✅ | `exists_closure_commutatorTriple_eq_zpowers` (前半) / `exists_card_two_subgroups_commutator_triple_eq_top` (後半 = A₅ 実例 + Note) |
 | 4A.3 | ✅ | `IsQuasiquaternion` (定義) / `eq_bot_of_isQuasiquaternion_quotient` |
-| 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 類 2 の `commutatorElement_pow_left_of_commutator_le_center`) |
+| 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 同値形 `frattini_eq_center_of_commutator_eq_center` + 橋 `isExtraspecial_of_commutator_eq_center`) |
 
 - **4A.1** (`G = AB`, `A`,`B` abelian ⟹ `G' = ⁅A,B⁆`): `⁅A,B⁆` の正規性は既存の
   `commutator_normal_of_sup_eq_top` (Ch.4 Main の Lem 4.1 系) をそのまま使える。
@@ -829,9 +829,13 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 - **4A.4**: repo の `IsExtraspecial` は `frattini_eq_center` を**フィールドとして仮定**して
   いるので、本問 (`P' = Z(P)`, `|Z(P)| = p` ⟹ `P/Z(P)` elementary abelian) は新規内容。
   類 2 の恒等式 `⁅x^n, y⁆ = ⁅x,y⁆^n` を証明して `x^p ∈ Z(P)` を出す。
-  ⚠ 書籍併記の `Z = P' = Φ` 形は `Φ(P) ≤ Z(P)`、すなわち `p`-群での `Φ = P'P^p` の ⊆ 方向が
-  要る (repo は ⊇ 方向 `commutator_sup_pow_closure_le_frattini` のみ)。⊆ 方向は
-  「elementary abelian 群の Frattini = ⊥」が要り、repo/mathlib いずれにも無い — 別途整備候補。
+  **書籍併記の `Z = P' = Φ` 形も完了 (2026-07-25)**: 「repo に `Φ ⊆` 方向が無い」という
+  当初の注記は**誤り**で、Lem 4.5 forward `frattini_le_of_isElementaryAbelian_quotient_of_pgroup`
+  (Ch04 Main/CommutatorIdentities) がちょうど `P/N` elementary abelian ⟹ `Φ(P) ≤ N` を与える。
+  ⟹ `frattini_eq_center_of_commutator_eq_center`、さらに repo の
+  `OddOrder.GroupTheory.IsExtraspecial` (Φ = Z を field に持つ) への橋
+  `isExtraspecial_of_commutator_eq_center` を追加。以後 4A.5 以降は Isaacs の定義
+  (`P' = Z(P)` 位数 `p`) から repo 構造の API をそのまま使える。
 
 - **4A.2** (`⁅H,K,L⁆` は `⁅h,k,l⁆` たちで生成されるとは限らない): 前半 (位数 2 の `H,K,L` なら
   三重交換子の**元**は高々 1 個の非単位元 ⟹ 生成するのは巡回群) は
