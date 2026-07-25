@@ -261,6 +261,60 @@ theorem factorization_ne_three
   have hlt := Nat.pow_lt_pow_right fc.p_prime.one_lt (show 2 < 3 by omega)
   omega
 
+include model in
+/-- **Peterfalvi Part II, Ch. II, step (12)** (p. 112): *Case (10.2) holds.*
+
+Assume case (10.1).  The index theorem `[N_G(R) : R] = p^m·|Q̄|·|Σ|` gives
+`p^{2m+1} ∣ |N_G(R)| ∣ |G|` (the cofactor `|Q̄|·|Σ|` is prime to `p`), so
+`2m + 1 ≤ m + 2`, i.e. `m = 1`; but `m = 1` with `|G|_p = p³` is killed by the
+transfer contradiction (`factorization_ne_three`).  Hence the dichotomy of
+step (10) lands in case (10.2). -/
+theorem step_twelve
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    fc.p ∣ Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ∧
+      fc.p = 3 ∧ Nat.card F = 9 ∧ IsCyclic ↥fc.toHypothesis.W ∧
+      (Nat.card ↥fc.toHypothesis.W = 3 ∨ Nat.card ↥fc.toHypothesis.W = 9) ∧
+      3 ^ (Nat.card G).factorization 3 = 3 ^ 4 * Nat.card ↥fc.toHypothesis.W := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  obtain ⟨m, hm1, hm⟩ := fc.card_field_eq_prime_pow model hB2
+  rcases fc.step_ten_dichotomy ind model hB2 hm with ⟨hnSig, hfact⟩ | h102
+  · -- case (10.1): first `m = 1`, then the transfer contradiction.
+    exfalso
+    obtain ⟨e⟩ := fc.sigma_mulEquiv_centralizer_W ind
+    have hSigma : ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D := by
+      rw [Nat.card_congr e.toEquiv]
+      exact hnSig
+    have hGp : fc.p ^ (m + 2) ∣ Nat.card G := by
+      rw [← hfact]
+      exact Nat.ordProj_dvd _ _
+    have hidx := fc.index_invImageF_subgroupOf_normalizer model ind hB2 hm hGp
+      hSigma
+    set NR : Subgroup G :=
+      Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
+    have hleR : fc.invImageF model ≤ NR := Subgroup.le_normalizer
+    have hlagR := ((fc.invImageF model).subgroupOf NR).card_mul_index
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hleR).toEquiv,
+      fc.card_invImageF model ind, hidx] at hlagR
+    -- `p^{2m+1} ∣ |N_G(R)| ∣ |G|`.
+    have h2m1 : fc.p ^ (2 * m + 1) ∣ Nat.card G := by
+      refine dvd_trans ⟨Nat.card ↥(fc.rankOneQuotient).Q
+        * Nat.card ↥(fc.rankOneQuotient).D, ?_⟩
+        (Subgroup.card_subgroup_dvd_card NR)
+      rw [← hlagR, hm, fc.card_P]
+      ring
+    have hle : 2 * m + 1 ≤ m + 2 := by
+      have h3 := (Nat.Prime.pow_dvd_iff_le_factorization fc.p_prime
+        Nat.card_pos.ne').mp h2m1
+      rw [hfact] at h3
+      exact h3
+    have hmeq : m = 1 := by omega
+    subst hmeq
+    exact fc.factorization_ne_three model ind hB2 hm hGp hSigma hfact
+  · exact h102
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
