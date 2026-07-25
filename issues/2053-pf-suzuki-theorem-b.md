@@ -1216,3 +1216,73 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
 6. `L` の元は全て 3-元 (位数 9 の群) ⟹ **`R₁` の定義 (`N_G(RΣ)` の 3-元が生成) から
    `L ≤ R₁` が即出る** (`sylowThreeNormalizerRSigma_def` + `Subgroup.subset_closure`)。
 
+## ✅ step (15) 完結 (2026-07-26、main session)
+
+書籍 (15) の**全主張**が landed。フルビルド green (4755 jobs)、AxiomsCheck OK、
+実 sorry は 9318 (model) 由来の 1 件のみ、非 sorry 警告 0。
+
+### `StepFifteen.lean` (前半: `L` そのもの)
+`L := C_G(st) ⊓ ⟨Q₀,K,t⟩` を **`nonsplitTorus`** と命名 (PSL(2,8) の非分裂極大トーラス)。
+
+| 主張 | 宣言名 |
+|---|---|
+| `L` は位数 9 の巡回群 | `isCyclic_and_card_nonsplitTorus` |
+| `Z₁ ≤ L` | `zpowers_le_nonsplitTorus` |
+| `L ⊓ P = 1` | `nonsplitTorus_inf_P_eq_bot` |
+| `P` が `⟨Q₀,K,t⟩` / `L` を正規化 | `P_le_normalizer_orderThreeGeneratedSubgroup` / `P_le_normalizer_nonsplitTorus` |
+| `\|LP\| = 27`、`L` が `Z₁P` を正規化 | `card_nonsplitTorus_sup_P` / `nonsplitTorus_le_normalizer_zpowers_sup_P` |
+| `L ≤ N_G(RΣ)`、**`L ⊆ R₁`** | `nonsplitTorus_le_normalizerRSigma` / `nonsplitTorus_le_sylowThreeNormalizerRSigma` |
+| `⟨Q₀,K,t⟩ ≤ C_G(W)`、`L ≤ C_G(W)` | `Hypothesis.orderThreeGeneratedSubgroup_le_centralizer_W` / `nonsplitTorus_le_centralizer_W` |
+| `L` の 3-torsion = `Z₁` | `mem_zpowers_st_of_mem_nonsplitTorus_of_pow_three` |
+| `L ⊓ V = 1` (∵ `t ∉ H` ⟹ `st ∉ V`) | `nonsplitTorus_inf_V_eq_bot` |
+| `V` が `L` を正規化 | `V_le_normalizer_nonsplitTorus` |
+| **`s` が `L` を反転** | `conj_distinguishedInvolution_eq_inv_of_mem_nonsplitTorus` |
+| **`RΣ` は指数 3** (書籍の「`TΣ` has exponent 3」) | `pow_three_eq_one_of_mem_sup_invImageF_centralizer_W` |
+| **`L ⊄ RΣ`** ((17) でも使用)、**`P` は `L` を非中心化** | `not_nonsplitTorus_le_sup_invImageF_centralizer_W` / `not_nonsplitTorus_le_centralizer_P` |
+
+- `s` 反転の機構: `x·x^s` は `s`-固定な `L` の元 ⟹ `L ⊓ C_G(s) ≤ L ⊓ V = 1`
+  ⟹ `x^s = x⁻¹` (巡回群の Aut 計算を回避)。
+- `RΣ` 指数 3 の機構: `x = rσ` (R·Σ 分解) で `c = ⁅σ,r⁆ ∈ ⁅RΣ,RΣ⁆ = Z₁ ≤ Z(RΣ) ⊓ R`
+  ⟹ `σ` 共役が `r ↦ cr`, `cr ↦ c²r` ⟹ `(rσ)³ = r³c³ = 1`
+  (class-2 cube 公式の具体化。subtype の `lowerCentralSeries` 配管は不要だった)。
+
+### `StepFifteenLV.lean` (新 leaf、後半: `LV`)
+
+| 主張 | 宣言名 |
+|---|---|
+| `\|LV\| = 27\|W\|`、`LV ≤ R₂` | `card_sup_nonsplitTorus_V` / `sup_nonsplitTorus_V_le_sylow` |
+| **`\|R₂ : LV\| = 3`** | `index_subgroupOf_sup_nonsplitTorus_V_eq_three` |
+| `LW` は可換、`\|LW\| = 9\|W\|`、`LV = (LW)P` | `mul_comm_of_mem_sup_nonsplitTorus_W` / `card_sup_nonsplitTorus_W` / `sup_nonsplitTorus_V_eq` |
+| `C_L(P) = Z₁`、`C_{LW}(P) = Z₁Σ`、`C_{LV}(L) = LW` | `nonsplitTorus_inf_centralizer_P_eq_zpowers` / `sup_nonsplitTorus_W_inf_centralizer_P_eq` / `sup_nonsplitTorus_V_inf_centralizer_nonsplitTorus_eq` |
+| **`Z(LV) = Z₁Σ`** | `inf_centralizer_sup_nonsplitTorus_V_eq` |
+| `W` の 3-torsion = `Σ`、`Ω₁(LW) = Z₁Σ` | `mem_sigma_of_mem_W_of_pow_three` / `pow_three_eq_one_iff_mem_zpowers_sup_sigma` |
+| **`Ω₁(LV) = Z₁ΣP`** | `pow_three_eq_one_iff_mem_zpowers_sup_sigma_sup_P` |
+
+- `Ω₁(LV)` は **regular p-group 理論 ([H] III 1.3(b)) を使わずに閉じた**:
+  `x = aq` (`a ∈ LW`, `q ∈ P`) で `d = a⁻¹a^q ∈ LW` は `d³ = a⁻³(a³)^q = 1`
+  (∵ `a³ ∈ C_{LW}(P) = Z₁Σ`) ⟹ `d ∈ Z₁Σ ≤ C_G(P)` ⟹ `a^q = ad`, `(ad)^q = ad²`
+  ⟹ `x³ = a³d³ = a³`。⟹ `x³ = 1 ⟺ a ∈ Ω₁(LW) = Z₁Σ ⟺ x ∈ Z₁ΣP`。
+  (repo には `GroupTheory/RegularPGroup.lean` の BG E.2(a) engine もあるが、
+  subtype の `lowerCentralSeries` 配管より直接計算が安上がりだった。)
+- generic 追加: `card_sup_eq_mul_of_le_normalizer` / `mem_centralizer_singleton_conj_iff` /
+  `centralizer_union` / `centralizer_sup` / `mem_zpowers_pow_of_pow_eq_one` /
+  `mem_of_pow_eq_one_of_isCyclic_card_sq` / `mul_comm_of_mem_sup_of_commute` /
+  `mul_comm_of_mem_of_isCyclic`。
+
+### 次の一手 = step (16) (p. 114)
+
+> **(16)** `Z₁PΣ ⊆ Z₂(R₁)`、`Z₁` は `Z₁PΣ` の中で強実元だけからなる唯一の位数 3
+> 部分群、`N_G(Z₁PΣ) = N_G(Z₁) = R₂⟨s⟩`。
+
+書籍の証明構造:
+1. `Z(R₁) = Z₁ ⊆ Z₁P = Z(RΣ) ⊴ R₁` ((14)) ⟹ `Z₁P ⊆ Z₂(R₁)`;
+   `Z₁Σ = Z(LV) ⊴ R₁` ((15)) ⟹ `Z₁Σ ⊆ Z₂(R₁)`。⟹ `Z₁PΣ ⊆ Z₂(R₁)`。
+   - 要部品: `Z₁P ⊴ R₁` は landed (`N_G(RΣ)` が `Z₁P` を正規化 = StepFourteen)、
+     **`Z₁Σ ⊴ R₁` は新規** (`Z(LV)` が `R₁` で正規 — `LV ⊴ R₁`? を要確認)。
+     `Z₂` の定義/API (`upperCentralSeries` 2 段目) の repo/mathlib 側の形も要実測。
+2. 強実元の一意性: `X ≤ Z₁PΣ` 位数 3・強実・`X ⊓ Z₁ = 1` を仮定 →
+   `Z₁ = Z(R₁) ⊆ Z₁X ⊆ Z₂(R₁)` ⟹ `R₁` が `Z₁X` 内の `Z₁` 以外の位数 3 部分群を
+   推移的に置換 ⟹ `Z₁X` の元が全部強実 ⟹ `(Z₁X) ⊓ (PΣ) ≠ 1` と矛盾
+   (`P` の非自明元は強実でない = `not_isStronglyReal_of_mem_P`, landed)。
+3. `N_G(Z₁PΣ) ⊆ N_G(Z₁) = C_G(Z₁)⟨s⟩ = R₂⟨s⟩` と `Z₁PΣ = Ω₁(LV) ⊴ R₂⟨s⟩`。
+
