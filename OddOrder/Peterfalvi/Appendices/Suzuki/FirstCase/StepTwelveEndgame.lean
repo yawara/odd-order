@@ -270,6 +270,152 @@ theorem card_sInvertedOvergroup
         exact hine (Subgroup.eq_of_le_of_card_ge hT₁le (le_of_eq h2.symm))
   exact ⟨by rw [hicard, hi2], hTsub, hinfP⟩
 
+include model in
+/-- **Nonidentity elements of `T₁` are strongly real** ((12), p. 112): `x = s·(s x)`
+with both factors nonidentity involutions. -/
+theorem isStronglyReal_of_mem_sInvertedOvergroup
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) {x : G}
+    (hx : x ∈ fc.sInvertedOvergroup R₁) : IsStronglyReal x := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  rw [fc.mem_sInvertedOvergroup_iff model ind hB2 hm hGp hSigma hRle hR₁le hcard] at hx
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  have hs2 : s * s = 1 := by
+    have h := fc.toHypothesis.distinguishedInvolution_sq
+    rwa [pow_two] at h
+  have hsinv : s⁻¹ = s := by
+    rw [← mul_one s⁻¹, ← hs2, ← mul_assoc, inv_mul_cancel, one_mul]
+  have hsx2 : (s * x) * (s * x) = 1 := by
+    have h1 : (s * x) * (s * x) = (s * x * s⁻¹) * ((s * s) * x) := by
+      group
+    rw [h1, hx.2, hs2, one_mul, inv_mul_cancel]
+  have hxo : Odd (orderOf x) := by
+    have h1 : orderOf x ∣ Nat.card ↥R₁ := by
+      have h2 : orderOf (⟨x, hx.1⟩ : ↥R₁) ∣ Nat.card ↥R₁ := orderOf_dvd_natCard _
+      rwa [Subgroup.orderOf_mk] at h2
+    rw [hcard] at h1
+    have hodd : Odd (fc.p ^ 3) := Odd.pow fc.p_odd
+    exact hodd.of_dvd_nat h1
+  have hsx1 : s * x ≠ 1 := by
+    intro h
+    have hxs : x = s := by
+      have h1 : x = s⁻¹ := by
+        have h2 := congrArg (fun z => s⁻¹ * z) h
+        simpa [mul_assoc] using h2
+      rw [h1, hsinv]
+    rw [hxs] at hxo
+    have h2 : orderOf s = 2 := by
+      have h3 : s ^ 2 = 1 := fc.toHypothesis.distinguishedInvolution_sq
+      have h4 : orderOf s ∣ 2 := orderOf_dvd_of_pow_eq_one h3
+      rcases (Nat.dvd_prime Nat.prime_two).mp h4 with h | h
+      · exact absurd (orderOf_eq_one_iff.mp h)
+          fc.toHypothesis.distinguishedInvolution_ne_one
+      · exact h
+    rw [h2] at hxo
+    rcases hxo with ⟨k, hk⟩
+    omega
+  refine ⟨s, ⟨?_, fc.toHypothesis.distinguishedInvolution_ne_one⟩, s * x,
+    ⟨by rw [pow_two]; exact hsx2, hsx1⟩, ?_⟩
+  · rw [pow_two]
+    exact hs2
+  · rw [← mul_assoc, hs2, one_mul]
+
+include model in
+/-- **A conjugate of `P` meets `T₁` trivially** ((12) tail, δ4-v input): nonidentity
+elements of `g·P·g⁻¹` are not strongly real, but those of `T₁` are. -/
+theorem conj_P_inf_sInvertedOvergroup_eq_bot
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) (g : G) :
+    (MulAut.conj g • fc.P) ⊓ fc.sInvertedOvergroup R₁ = ⊥ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  rw [eq_bot_iff]
+  intro x hx
+  rw [Subgroup.mem_inf] at hx
+  obtain ⟨hxP, hxT⟩ := hx
+  rw [Subgroup.mem_bot]
+  by_contra hx1
+  have hsr : IsStronglyReal x :=
+    fc.isStronglyReal_of_mem_sInvertedOvergroup model ind hB2 hm hGp hSigma hRle
+      hR₁le hcard hxT
+  obtain ⟨y, hyP, hyx⟩ := hxP
+  have hy1 : y ≠ 1 := by
+    intro h
+    apply hx1
+    rw [← hyx, h]
+    simp
+  obtain ⟨u, hu, v, hv, huv⟩ := hsr
+  have hysr : IsStronglyReal y := by
+    refine ⟨g⁻¹ * u * g, ⟨?_, ?_⟩, g⁻¹ * v * g, ⟨?_, ?_⟩, ?_⟩
+    · rw [pow_two]
+      have h1 := hu.1
+      rw [pow_two] at h1
+      calc (g⁻¹ * u * g) * (g⁻¹ * u * g) = g⁻¹ * (u * u) * g := by group
+        _ = 1 := by rw [h1]; group
+    · intro h
+      apply hu.2
+      have h2 := congrArg (fun z => g * z * g⁻¹) h
+      simpa [mul_assoc] using h2
+    · rw [pow_two]
+      have h1 := hv.1
+      rw [pow_two] at h1
+      calc (g⁻¹ * v * g) * (g⁻¹ * v * g) = g⁻¹ * (v * v) * g := by group
+        _ = 1 := by rw [h1]; group
+    · intro h
+      apply hv.2
+      have h2 := congrArg (fun z => g * z * g⁻¹) h
+      simpa [mul_assoc] using h2
+    · have h1 : y = g⁻¹ * x * g := by
+        rw [← hyx]
+        change y = g⁻¹ * (g * y * g⁻¹) * g
+        group
+      rw [h1, huv]
+      group
+  exact fc.not_isStronglyReal_of_mem_P hyP hy1 hysr
+
+include model in
+/-- **No conjugate of `R` equals `T₁`** ((12) tail, δ4-v): it would contain a
+conjugate of `P`, which meets `T₁` trivially. -/
+theorem conj_invImageF_ne_sInvertedOvergroup
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) (g : G) :
+    MulAut.conj g • fc.invImageF model ≠ fc.sInvertedOvergroup R₁ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  intro h0
+  have h1 : MulAut.conj g • fc.P ≤ fc.sInvertedOvergroup R₁ := by
+    rw [← h0]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (fc.P_le_invImageF model)
+  have h2 : MulAut.conj g • fc.P
+      = (MulAut.conj g • fc.P) ⊓ fc.sInvertedOvergroup R₁ :=
+    (inf_of_le_left h1).symm
+  have h3 := fc.conj_P_inf_sInvertedOvergroup_eq_bot model ind hB2 hm hGp hSigma hRle
+    hR₁le hcard g
+  have h4 : Nat.card ↥(MulAut.conj g • fc.P) = fc.p := by
+    rw [← fc.card_P]
+    exact (Nat.card_congr (Subgroup.equivSMul (MulAut.conj g) fc.P).toEquiv).symm
+  rw [h2, h3, Subgroup.card_bot] at h4
+  exact fc.p_prime.one_lt.ne h4
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
