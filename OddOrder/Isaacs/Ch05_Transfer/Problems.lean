@@ -16,9 +16,9 @@ Isaacs の `v : G → H/H'` は `A = H/H'`, `ϕ = 自然な射影` の場合に�
 * **5A.1** `transfer_id_eq_pow_index_of_commGroup` — `G` 可換, `|G : H| = n` なら
   `G → H` の transfer は `g ↦ g ^ n`。
 * **5A.3(a)** `eq_of_mul_eq_mul_of_isComplement` — `ST` の元の `s * t` 表示は一意。
-  ⚠ (b) の数値部分 `|G:H| = |G:K|·|K:H|` は mathlib `Subgroup.relIndex_mul_index` が既に
-  与えるのでラッパーは書かない。`ST` が `H` の右 transversal であること自体と (c)(d) は
-  未実装 (issue 1055 参照)。
+* **5A.3(b)** `isComplement_mul_of_transversal` — `ST` は `G` の中で `H` の右 transversal。
+  ⚠ 指数の積 `|G:H| = |G:K|·|K:H|` は mathlib `Subgroup.relIndex_mul_index` が既に
+  与えるのでラッパーは書かない。(c)(d) (pretransfer の合成) は未実装 (issue 1055 参照)。
 * **5A.4(a)** `transfer_eq_pow_index_of_le_center` — `H ≤ Z(G)`, `|G : H| = n` なら
   transfer は `g ↦ ϕ ⟨g ^ n⟩` (`ϕ : ↥H →* A` は任意)。Isaacs の `v : G → H/H'` は
   `A = H/H'` の場合で, `H ≤ Z(G)` なら `H` は可換ゆえ `H' = 1`, `H/H' ≅ H` なので
@@ -31,6 +31,8 @@ Isaacs の `v : G → H/H'` は `A = H/H'`, `ϕ = 自然な射影` の場合に�
 namespace OddOrder.Isaacs.Ch05
 
 open MonoidHom
+
+open scoped Pointwise
 
 section /- Problems 5A (pp. 152-153) -/
 
@@ -190,6 +192,53 @@ theorem eq_of_mul_eq_mul_of_isComplement {G : Type*} [Group G] {K : Subgroup G} 
     (s : G) = (s' : G) ∧ (t : G) = (t' : G) := by
   have hpair := hT.1 (a₁ := (⟨(s : G), hS s.2⟩, t)) (a₂ := (⟨(s' : G), hS s'.2⟩, t')) h
   exact ⟨congrArg (fun p => ((p.1 : G))) hpair, congrArg (fun p => ((p.2 : G))) hpair⟩
+
+
+/-- **Isaacs Problem 5A.3(b)**: `S ⊆ K` が `K` の中で `H` の右 transversal, `T` が `G` の中で
+`K` の右 transversal なら, **積 `ST` は `G` の中で `H` の右 transversal**。
+
+単射性: `h·s·t = h'·s'·t'` で `h·s, h'·s' ∈ K` なので `hT` の単射性から `h·s = h'·s'`,
+`t = t'`。`hS` の一意性を `k := h·s` に使って `s = s'`, したがって `h = h'`。
+全射性: `g = k·t` (`hT`) と `k = h·s` (`hS`) を合わせる。
+
+⚠ 指数の積 `|G:H| = |G:K|·|K:H|` は mathlib `Subgroup.relIndex_mul_index` が既に与える。 -/
+theorem isComplement_mul_of_transversal {G : Type*} [Group G] {H K : Subgroup G}
+    (hHK : H ≤ K) {S T : Set G} (hSsub : S ⊆ (K : Set G))
+    (hS : ∀ k ∈ K, ∃! s : ↥S, k * (s : G)⁻¹ ∈ H)
+    (hT : Subgroup.IsComplement (K : Set G) T) :
+    Subgroup.IsComplement (H : Set G) (S * T) := by
+  constructor
+  · rintro ⟨h, x⟩ ⟨h', x'⟩ heq
+    obtain ⟨s, hs, t, ht, hst⟩ := x.2
+    obtain ⟨s', hs', t', ht', hst'⟩ := x'.2
+    simp only at heq
+    rw [← hst, ← hst'] at heq
+    have hk : ((h : G) * s) ∈ K := K.mul_mem (hHK h.2) (hSsub hs)
+    have hk' : ((h' : G) * s') ∈ K := K.mul_mem (hHK h'.2) (hSsub hs')
+    have hpair := hT.1 (a₁ := (⟨(h : G) * s, hk⟩, ⟨t, ht⟩))
+      (a₂ := (⟨(h' : G) * s', hk'⟩, ⟨t', ht'⟩)) (by simpa [mul_assoc] using heq)
+    have hks : (h : G) * s = (h' : G) * s' := congrArg (fun p => (p.1 : G)) hpair
+    have htt : t = t' := congrArg (fun p => (p.2 : G)) hpair
+    obtain ⟨s₀, -, huniq⟩ := hS ((h : G) * s) hk
+    have e1 : (⟨s, hs⟩ : ↥S) = s₀ := huniq _ (by simp)
+    have e2 : (⟨s', hs'⟩ : ↥S) = s₀ := huniq _ (by
+      rw [hks]
+      simp)
+    have hss : s = s' := congrArg (fun z : ↥S => (z : G)) (e1.trans e2.symm)
+    have hhh : (h : G) = (h' : G) := by
+      have := hks
+      rw [hss] at this
+      exact mul_right_cancel this
+    refine Prod.ext (Subtype.ext hhh) (Subtype.ext ?_)
+    rw [← hst, ← hst', hss, htt]
+  · intro g
+    obtain ⟨⟨k, t⟩, hkt⟩ := hT.2 g
+    obtain ⟨s, hsH, -⟩ := hS (k : G) k.2
+    refine ⟨(⟨(k : G) * (s : G)⁻¹, hsH⟩, ⟨(s : G) * (t : G), ⟨(s : G), s.2, (t : G), t.2, rfl⟩⟩),
+      ?_⟩
+    simp only
+    rw [← hkt]
+    group
 
 
 end
