@@ -337,4 +337,46 @@ theorem eq_top_of_transfer_ne_one [Finite R] {p : ℕ} [Fact p.Prime] (hp2 : p �
 
 end LocalLemma
 
+section MainTheorem
+
+/-- **Weak closure forces `A ⊴ P`**: for `u ∈ P` the conjugate `A^u` again lies in `P`,
+hence equals `A`.  In particular `P ≤ N_G(A)`. -/
+theorem le_normalizer_of_isWeaklyClosed {A P : Subgroup G} (hAP : A ≤ P)
+    (hwc : IsWeaklyClosed A P) : P ≤ Subgroup.normalizer (A : Set G) := by
+  intro u hu
+  have hconj : A.map (MulAut.conj u).toMonoidHom = A := by
+    refine hwc u ?_
+    rintro - ⟨a, ha, rfl⟩
+    have : (MulAut.conj u).toMonoidHom a = u * a * u⁻¹ := rfl
+    rw [this]
+    exact P.mul_mem (P.mul_mem hu (hAP ha)) (P.inv_mem hu)
+  rw [Subgroup.mem_set_normalizer_iff]
+  intro y
+  constructor
+  · intro hy
+    rw [← hconj]
+    exact ⟨y, hy, rfl⟩
+  · intro hy
+    rw [← hconj] at hy
+    obtain ⟨a, ha, hay⟩ := hy
+    have hay' : u * a * u⁻¹ = u * y * u⁻¹ := hay
+    have : a = y := by
+      have h1 := mul_right_cancel hay'
+      exact mul_left_cancel h1
+    rwa [← this]
+
+/-- A nonempty set of group elements contains one of minimal order. -/
+theorem exists_min_orderOf {S : Set G} (hne : S.Nonempty) :
+    ∃ x ∈ S, ∀ y ∈ S, orderOf x ≤ orderOf y := by
+  classical
+  have h : ∃ n, ∃ x ∈ S, orderOf x = n := by
+    obtain ⟨x, hx⟩ := hne
+    exact ⟨orderOf x, x, hx, rfl⟩
+  obtain ⟨x, hxS, hx⟩ := Nat.find_spec h
+  refine ⟨x, hxS, fun y hyS => ?_⟩
+  rw [hx]
+  exact Nat.find_le ⟨y, hyS, rfl⟩
+
+end MainTheorem
+
 end OddOrder.GroupTheory

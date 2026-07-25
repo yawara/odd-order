@@ -470,3 +470,42 @@ ChatGPT Pro の回答 (16m54s + 2m54s 思考) を**全ステップ独立に検�
 ⟹ **(17) の残ギャップは「Hall–Wielandt の Lean 化」1 本に確定**し、道筋も部品も揃った。
 `A = Z₁ΣP` の弱閉性は (17) で landed 済み・`A` は可換 (landed)・`N_G(A) = N_G(Z₁) = R₂⟨s⟩`
 も landed なので、上記を建てれば `false_of_isWeaklyClosed_zpowers` の兄弟として即接続できる。
+
+
+## 🚧 Lean 化の進捗 (2026-07-26)
+
+`OddOrder/GroupTheory/HallWielandt.lean` (新設) に landed:
+
+| 段 | 宣言 | 状態 |
+|---|---|---|
+| 係数線形性 | `transfer_mul` / `transfer_div` | ✅ |
+| (14) | `transfer_comp_subtype_apply` | ✅ |
+| (15) | `sum_index_mackey` | ✅ |
+| **(17)** | `transfer_eq_prod_doubleCoset_mul_pow` | ✅ |
+| `X_R(x)` と閉包 | `powConjSet` / `powConjSet_conj` / `powConjSet_pow` | ✅ |
+| **局所補題** | `eq_top_of_transfer_ne_one` | ✅ |
+| `P ≤ N_G(A)` | `le_normalizer_of_isWeaklyClosed` | ✅ |
+| 最小位数元 | `exists_min_orderOf` | ✅ |
+| **主証明 §4** | `sylow_le_commutator_normalizer` (下記) | ⬜ 次 |
+| 消費形 | `not_dvd_card_abelianization_normalizer_of_abelian` | ⬜ |
+
+⚠ 局所補題の Case 2 は書き起こしの α-多項式論法を**初等形に単純化**した:
+`c := ⁅y,x⁆ ∈ A₀ ∩ M` は `y` と可換なので `y^j x y^{-j} = c^j x`、各項の `p` 乗が
+`X_R(x) ∩ M` に入るので `μ(x)^p = μ(c)^p = 1`、よって
+`∏_{j<p} μ(c^j x) = μ(c)^{p(p−1)/2}·μ(x)^p = 1`。`p` 奇は `p ∣ p(p−1)/2` でのみ効く。
+
+### 主証明の Lean 形 (次の実装対象)
+
+(B2) 側から `P ≤ ⁅G,G⁆` が来るので、書き起こしの `P ∩ G'` を `P` に特殊化してよい:
+
+```
+theorem sylow_le_commutator_normalizer (hp2 : p ≠ 2) (P : Sylow p G)
+    (hAP : A ≤ P) (hAab : A 可換) (hwc : IsWeaklyClosed A P)
+    (hPG' : (P : Subgroup G) ≤ commutator G) :
+    (P : Subgroup G) ≤ (commutator ↥N).map N.subtype        -- N = N_G(A)
+```
+段取り: `D := P ⊓ N'` に対し `P ⊄ D` を仮定 → 位数最小の `x ∈ P ∖ D` →
+`C := Abelianization ↥P ⧸ (D の像)` と `λ` (核がちょうど `D`) → `R := A ⊔ ⟨x⟩` で (17) →
+非零項 `i` に局所補題 (核条件は最小性から) → `S = ⊤` ⟹ `A^{g⁻¹} ≤ P` ⟹ 弱閉性で `g ∈ N`
+⟹ `δ ≡ 0` で矛盾。消費形は landed の `sylow_le_commutator_of_not_dvd` /
+`not_dvd_card_abelianization_of_sylow_le_commutator` で挟むだけ。
