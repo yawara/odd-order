@@ -140,19 +140,16 @@ theorem exists_orderOf_eq_prime_zpowers_normal (hp : p.Prime)
     exact Sylow.normal_of_subsingleton S
   exact ⟨σ, hσ, hnorm⟩
 
-/-- The engine behind this file: a generator `σ` of the unique (normal) Sylow
-`p`-subgroup, which acts freely, and regularly from every base point. -/
-private theorem exists_normal_regular (hp : p.Prime) (hΩ : Nat.card Ω = p)
-    (hG : Nat.card G = p * (p - 1)) :
-    ∃ σ : G, orderOf σ = p ∧ (Subgroup.zpowers σ).Normal ∧
-      (∀ τ ∈ Subgroup.zpowers σ, τ ≠ 1 → ∀ y : Ω, τ • y ≠ y) ∧
-      ∀ a : Ω, Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a) := by
+omit [Finite G] [IsPretransitive G Ω] in
+/-- Regularity of a normal `⟨σ⟩` of order `p` on `p` points, from any base point:
+`i ↦ σ^i • a` is injective (`σ` has no fixed point), hence surjective by counting. -/
+private theorem surjective_zpow_smul (hp : p.Prime) (hΩ : Nat.card Ω = p) {σ : G}
+    (hσ : orderOf σ = p) (hnorm : (Subgroup.zpowers σ).Normal)
+    [IsPretransitive G Ω] [Finite G] (a : Ω) :
+    Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a) := by
   haveI : Fact p.Prime := ⟨hp⟩
-  obtain ⟨σ, hσ, hnorm⟩ := exists_orderOf_eq_prime_zpowers_normal hp hG
-  -- `σ` has no fixed point, so `i ↦ σ^i • a` is injective `ZMod p → Ω`, so surjective.
   have hfree : ∀ (τ : G), τ ∈ Subgroup.zpowers σ → τ ≠ 1 → ∀ y : Ω, τ • y ≠ y :=
     fun τ hτ hτ1 y => not_smul_eq_of_orderOf_eq_prime hp hσ hnorm hτ hτ1 y
-  refine ⟨σ, hσ, hnorm, hfree, fun a => ?_⟩
   have hinj : Function.Injective (fun i : ZMod p => σ ^ (i.val) • a) := by
     have key : ∀ i' j' : ZMod p, j'.val < i'.val →
         σ ^ (i'.val) • a = σ ^ (j'.val) • a → False := by
@@ -179,6 +176,19 @@ private theorem exists_normal_regular (hp : p.Prime) (hΩ : Nat.card Ω = p)
   have h1 : Nat.card (ZMod p) = Nat.card Ω := by
     rw [Nat.card_zmod, hΩ]
   exact ((Nat.bijective_iff_injective_and_card _).mpr ⟨hinj, h1⟩).2
+
+/-- The engine behind this file: a generator `σ` of the unique (normal) Sylow
+`p`-subgroup, which acts freely, and regularly from every base point. -/
+private theorem exists_normal_regular (hp : p.Prime) (hΩ : Nat.card Ω = p)
+    (hG : Nat.card G = p * (p - 1)) :
+    ∃ σ : G, orderOf σ = p ∧ (Subgroup.zpowers σ).Normal ∧
+      (∀ τ ∈ Subgroup.zpowers σ, τ ≠ 1 → ∀ y : Ω, τ • y ≠ y) ∧
+      ∀ a : Ω, Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨σ, hσ, hnorm⟩ := exists_orderOf_eq_prime_zpowers_normal hp hG
+  exact ⟨σ, hσ, hnorm,
+    fun τ hτ hτ1 y => not_smul_eq_of_orderOf_eq_prime hp hσ hnorm hτ hτ1 y,
+    fun a => surjective_zpow_smul hp hΩ hσ hnorm a⟩
 
 /-- **Two-point stabilizers are trivial** for a faithful transitive action of a group
 of order `p(p-1)` on `p` points: any `g` fixing two distinct points is forced to
@@ -298,6 +308,82 @@ private theorem mem_zpowers_of_centralizes {σ : G}
   rw [hu]
   exact Subgroup.pow_mem _ (Subgroup.mem_zpowers σ) _
 
+/-- **Every involution inverts the normal `⟨σ⟩`** (`p` an odd prime): the conjugation
+exponent `k` satisfies `k² ≡ 1 (mod p)`, and `k ≡ 1` would make the involution
+centralize `⟨σ⟩`, hence act as an element of `⟨σ⟩` (regularity), hence lie in the
+odd-order `⟨σ⟩` — impossible.  In step (12) of the first case of the theorem of
+Suzuki this gives `C_{R₁/R}(s) = 1`: the distinguished involution inverts `R₁/R`. -/
+theorem conj_eq_inv_of_sq_eq_one (hp : p.Prime) (hp2 : p ≠ 2)
+    (hΩ : Nat.card Ω = p) {σ u : G}
+    (hσ : orderOf σ = p) (hnorm : (Subgroup.zpowers σ).Normal)
+    (hu2 : u ^ 2 = 1) (hu1 : u ≠ 1) :
+    u * σ * u⁻¹ = σ⁻¹ := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨a⟩ : Nonempty Ω :=
+    (Nat.card_ne_zero.mp (by rw [hΩ]; exact hp.pos.ne')).1
+  have hsurjAll : ∀ y : Ω, Function.Surjective (fun i : ZMod p => σ ^ (i.val) • y) :=
+    fun y => surjective_zpow_smul hp hΩ hσ hnorm y
+  have hNinv : ∀ n ∈ Subgroup.zpowers σ, n ^ 2 = 1 → n = 1 := by
+    intro n hn h2
+    have ho2 : orderOf n ∣ 2 := orderOf_dvd_of_pow_eq_one h2
+    have hop : orderOf n ∣ p := hσ ▸ orderOf_dvd_of_mem_zpowers hn
+    have hg : Nat.gcd 2 p = 1 :=
+      (Nat.coprime_primes Nat.prime_two hp).mpr (fun h => hp2 h.symm)
+    have h3 := Nat.dvd_gcd ho2 hop
+    rw [hg, Nat.dvd_one] at h3
+    exact orderOf_eq_one_iff.mp h3
+  obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp
+    (hnorm.conj_mem σ (Subgroup.mem_zpowers σ) u)
+  have huu : u * u = 1 := by
+    rwa [pow_two] at hu2
+  -- `u² = 1` forces `σ = σ^{k²}`.
+  have hσk2 : (σ ^ k) ^ k = σ := by
+    calc (σ ^ k) ^ k = (u * σ * u⁻¹) ^ k := by rw [hk]
+      _ = u * σ ^ k * u⁻¹ := conj_zpow_eq u σ k
+      _ = u * (u * σ * u⁻¹) * u⁻¹ := by rw [hk]
+      _ = (u * u) * σ * ((u * u))⁻¹ := by group
+      _ = σ := by rw [huu]; group
+  have hdvd : (p : ℤ) ∣ k * k - 1 := by
+    have h2 : σ ^ (k * k - 1) = 1 := by
+      have h2a : σ ^ (k * k) = σ := by
+        rw [zpow_mul]
+        exact hσk2
+      rw [zpow_sub, h2a, zpow_one, mul_inv_cancel]
+    have h3 := orderOf_dvd_iff_zpow_eq_one.mpr h2
+    rwa [hσ] at h3
+  have hfac : (p : ℤ) ∣ (k - 1) * (k + 1) := by
+    have h4 : (k - 1) * (k + 1) = k * k - 1 := by ring
+    rw [h4]
+    exact hdvd
+  rcases ((Nat.prime_iff_prime_int.mp hp).dvd_mul.mp hfac) with hd | hd
+  · -- `k ≡ 1`: `u` would centralize `⟨σ⟩` and be an involution inside it.
+    exfalso
+    have hσk : σ ^ k = σ := by
+      have h4 : σ ^ (k - 1) = 1 :=
+        orderOf_dvd_iff_zpow_eq_one.mp (by rw [hσ]; exact hd)
+      calc σ ^ k = σ ^ (k - 1 + 1) := by congr 1; ring
+        _ = σ ^ (k - 1) * σ := zpow_add_one σ (k - 1)
+        _ = σ := by rw [h4, one_mul]
+    have hcu : u * σ * u⁻¹ = σ := by rw [← hk, hσk]
+    have hcen : ∀ n ∈ Subgroup.zpowers σ, u * n * u⁻¹ = n := by
+      intro n hn
+      obtain ⟨s, hs⟩ := Subgroup.mem_zpowers_iff.mp hn
+      calc u * n * u⁻¹ = u * σ ^ s * u⁻¹ := by rw [hs]
+        _ = (u * σ * u⁻¹) ^ s := (conj_zpow_eq u σ s).symm
+        _ = σ ^ s := by rw [hcu]
+        _ = n := hs
+    exact hu1 (hNinv u (mem_zpowers_of_centralizes hsurjAll a hcen) hu2)
+  · -- `k ≡ -1`: inversion.
+    have h4 : σ ^ (k + 1) = 1 :=
+      orderOf_dvd_iff_zpow_eq_one.mp (by rw [hσ]; exact hd)
+    have h5 : σ ^ k = σ⁻¹ := by
+      have h6 : σ ^ k * σ = 1 := by
+        rw [← zpow_add_one]
+        exact h4
+      exact eq_inv_of_mul_eq_one_left h6
+    rw [hk] at h5
+    exact h5
+
 /-- **No elementary abelian subgroup of order `4`** (2-rank one) for a faithful
 transitive action of a group of order `p(p-1)` on `p` points, `p` an odd prime:
 every involution inverts the regular normal `⟨σ⟩` (its conjugation exponent `k`
@@ -323,61 +409,8 @@ theorem not_exists_elementaryAbelian_four (hp : p.Prime) (hp2 : p ≠ 2)
     rw [hg, Nat.dvd_one] at h3
     exact orderOf_eq_one_iff.mp h3
   -- every nonidentity element of `E` inverts `σ`.
-  have hinv : ∀ u ∈ E, u ≠ 1 → u * σ * u⁻¹ = σ⁻¹ := by
-    intro u hu hu1
-    obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp
-      (hnorm.conj_mem σ (Subgroup.mem_zpowers σ) u)
-    have huu : u * u = 1 := by
-      have := hEsq u hu
-      rwa [pow_two] at this
-    -- `u² = 1` forces `σ = σ^{k²}`.
-    have hσk2 : (σ ^ k) ^ k = σ := by
-      calc (σ ^ k) ^ k = (u * σ * u⁻¹) ^ k := by rw [hk]
-        _ = u * σ ^ k * u⁻¹ := conj_zpow_eq u σ k
-        _ = u * (u * σ * u⁻¹) * u⁻¹ := by rw [hk]
-        _ = (u * u) * σ * ((u * u))⁻¹ := by group
-        _ = σ := by rw [huu]; group
-    have hdvd : (p : ℤ) ∣ k * k - 1 := by
-      have h2 : σ ^ (k * k - 1) = 1 := by
-        have h2a : σ ^ (k * k) = σ := by
-          rw [zpow_mul]
-          exact hσk2
-        rw [zpow_sub, h2a, zpow_one, mul_inv_cancel]
-      have h3 := orderOf_dvd_iff_zpow_eq_one.mpr h2
-      rwa [hσ] at h3
-    have hfac : (p : ℤ) ∣ (k - 1) * (k + 1) := by
-      have h4 : (k - 1) * (k + 1) = k * k - 1 := by ring
-      rw [h4]
-      exact hdvd
-    rcases ((Nat.prime_iff_prime_int.mp hp).dvd_mul.mp hfac) with hd | hd
-    · -- `k ≡ 1`: `u` would centralize `⟨σ⟩` and be an involution inside it.
-      exfalso
-      have hσk : σ ^ k = σ := by
-        have h4 : σ ^ (k - 1) = 1 :=
-          orderOf_dvd_iff_zpow_eq_one.mp (by rw [hσ]; exact hd)
-        calc σ ^ k = σ ^ (k - 1 + 1) := by congr 1; ring
-          _ = σ ^ (k - 1) * σ := zpow_add_one σ (k - 1)
-          _ = σ := by rw [h4, one_mul]
-      have hcu : u * σ * u⁻¹ = σ := by rw [← hk, hσk]
-      have hcen : ∀ n ∈ Subgroup.zpowers σ, u * n * u⁻¹ = n := by
-        intro n hn
-        obtain ⟨s, hs⟩ := Subgroup.mem_zpowers_iff.mp hn
-        calc u * n * u⁻¹ = u * σ ^ s * u⁻¹ := by rw [hs]
-          _ = (u * σ * u⁻¹) ^ s := (conj_zpow_eq u σ s).symm
-          _ = σ ^ s := by rw [hcu]
-          _ = n := hs
-      exact hu1 (hNinv u (mem_zpowers_of_centralizes hsurjAll a hcen)
-        (hEsq u hu))
-    · -- `k ≡ -1`: inversion.
-      have h4 : σ ^ (k + 1) = 1 :=
-        orderOf_dvd_iff_zpow_eq_one.mp (by rw [hσ]; exact hd)
-      have h5 : σ ^ k = σ⁻¹ := by
-        have h6 : σ ^ k * σ = 1 := by
-          rw [← zpow_add_one]
-          exact h4
-        exact eq_inv_of_mul_eq_one_left h6
-      rw [hk] at h5
-      exact h5
+  have hinv : ∀ u ∈ E, u ≠ 1 → u * σ * u⁻¹ = σ⁻¹ := fun u hu hu1 =>
+    conj_eq_inv_of_sq_eq_one hp hp2 hΩ hσ hnorm (hEsq u hu) hu1
   -- two distinct nonidentity elements of `E`.
   haveI : Finite ↥E := Nat.finite_of_card_ne_zero (by rw [hEcard]; norm_num)
   haveI : Nontrivial ↥E := Finite.one_lt_card_iff_nontrivial.mp
