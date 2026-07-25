@@ -1427,10 +1427,32 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
   ((17) endpoint engine; 残り入力 2 つを仮説パラメータ化)。
 
 ### 残り
-0. **|W| = 3 側の σ-1 配管のみ**: `A := Abelianization ↥R₁`、`s` の誘導自己同型 `σ`、
-   `φ(x) = x⁻¹σ(x)` の核が `ΣP` の像 (≠ 1、上記 landed) を含む ⟹ `φ` は非単射 ⟹
-   有限性から非全射 ⟹ `⁅R₁⟨s⟩,R₁⟨s⟩⁆ ≠ R₁` ⟹ `3 ∣ |Ab(R₁⟨s⟩)|`。
-   (`R₂ = R₁` は `|W| = 3` から。)
+0. **|W| = 3 側の σ-1 配管のみ** (数学は確定済、Lean 配管だけ)。実装順:
+   1. `|W| = 3` ⟹ `|R₂| = 3⁵ = |R₁|` ⟹ **`R₂ = R₁`**、`H := R₁⟨s⟩` は `|H| = 2·3⁵`。
+   2. `K := ⁅H,H⁆ ≤ R₁` (`H/R₁` は位数 2 ⟹ 可換)。
+      **`3 ∣ |Ab(H)| ⟺ K ≠ R₁`** (`|Ab(H)| = 2·3⁵/|K|`, `|K|` は 3 冪)。
+   3. `A := Abelianization ↥R₁`、`π := Abelianization.of` (全射)、
+      `σ := Abelianization.map (conj s)`、`φ := fun x => x⁻¹ * σ x` (A 可換ゆえ hom)。
+   4. **`E' := (φ.range).comap π` について `K.subgroupOf R₁ ≤ E'`**:
+      - `σ(x) = x·φ(x)` なので **σ は `A/range φ` 上で自明**に作用する。
+      - `E'` は `R₁` 共役で不変 (内部自己同型は abelianization 上自明) かつ `s` 不変
+        (`σ∘φ = φ∘σ`) ⟹ `E'` の像は `H` で正規。
+      - ⁅a,b⁆ の生成元計算: `a,b ∈ R₁` は `π` で消え、`⁅a,s⁆` は `φ(π a)⁻¹`。
+   5. **`E'.index = φ.range.index = |ker φ| ≥ 3`** (landed generic
+      `index_range_eq_card_ker`; `ker φ ⊇ π(ΣP) ≠ 1` は
+      `not_sigma_sup_P_le_commutator` (landed) と「s が ΣP を中心化」から)。
+      ⟹ `|K| ≤ |R₁|/3 = 3⁴` ⟹ `K ≠ R₁` ⟹ 目標。
+   ⚠ 4 の「生成元での検証」用に **`commutator_le_of_generators` (generic) を landed**
+   (`F` が `X` で正規化され生成集合 `T` の全ペアの交換子を含む ⟹ `⁅X,X⁆ ≤ F`)。
+   `T := ↑R₁ ∪ {s}` で使う。`F` の `H`-正規性も `H ≤ N_G(F)` を生成元 (R₁ と s) で
+   示せばよい (R₁ 側は内部自己同型が abelianization 上自明、s 側は `σ∘φ = φ∘σ`)。
+
+   ⚠ **2026-07-26 の実装試行メモ**: 本体を書き下したが 1 turn では閉じ切らず、
+   sorry を repo に入れない方針で**未完成分は commit しなかった** (generic 部品のみ landed)。
+   詰まりどころは 4 の 4 ケース (R₁×R₁ / R₁×s / s×R₁ / s×s) のうち `⁅a, s⁆` の
+   `π` 像計算 = `φ(π a)⁻¹` を Lean の subtype/Abelianization 越しに書く部分。
+   次 turn は「`⁅a,s⁆ ∈ R₁` の証明」と「`π ⟨⁅a,s⁆⟩ = (φ (π ⟨a⟩))⁻¹`」を
+   独立した `have` に切り出してから本体を組むと通しやすい。
    - (a) の書籍論法 = `R̄₁` は class ≤ 2 (= (16) 第一主張) なので交換子が
      `(R₁/Z₁ΣP) × (R₁/Z₁ΣP) → Z₁ΣP/Z₁` の**交代双線形形式**を誘導し、
      `R₁/Z₁ΣP` は位数 9 (2 次元) ⟹ 像は 1 次元 ⟹ `|⁅R₁,R₁⁆·Z₁/Z₁| ≤ 3`、
