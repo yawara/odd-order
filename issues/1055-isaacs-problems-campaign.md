@@ -1299,9 +1299,33 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
     `map_commutator`)。
   ⚠ 教訓: `x ∈ commutatorMemLeft N y` は `⁅x,y⁆ ∈ N` と defeq だが**構文的に違う**ので
   `commutatorElement_mem_comm` に渡すには `show ⁅x,y⁆ ∈ N from …` の型註釈が要る。
-- ⬜ **4B.5** (`G` 超可解 ⟹ `M(G)` は class ≤ 3 で冪零)。⚠ `M(G)` = 共役類サイズが
-  2 番目に小さい値 `n₂` 以下の元で生成される部分群 (書籍 p.129, Mann の Thm 4.14/4.15)。
-  repo に `M(G)` の定義があるか要確認 (無ければ先に定義 + Thm 4.15 が要る)。
+- ⬜ **4B.5** (`G` 超可解 ⟹ `M(G)` は class ≤ 3 で冪零) — **設計確定・実装途中で中断
+  (2026-07-25、ユーザー区切り)**。
+
+  **`M(G)` と Thm 4.15 は repo に既にある** (`Ch04_Commutators/Mann.lean`):
+  `mannSubgroup G` / `nilpotencyClass_mannSubgroup_le_of_centralizer_eq_self [Finite G]
+  {K} [K.Normal] (hself : Subgroup.centralizer ↑K = K) : nilpotencyClass ↥(mannSubgroup G) ≤ 3`。
+  ⟹ **4B.5 は「超可解群は自己中心化する正規部分群を持つ」に完全に帰着する**。
+
+  **証明 (確定)**: `A` を**可換正規**部分群のうち極大に取る (`Finite.exists_le_maximal`,
+  base `⊥`)。`C := C_G(A) ⊇ A`。`A < C` と仮定すると `C/A ≠ 1` なので `G ⧸ A` の中で
+  `C.map (mk' A)` に含まれる minimal normal 部分群 `M̄` が取れ
+  (`Ch02.exists_isMinimalNormal_le_of_normal`)、**超可解性から `|M̄|` は素数**
+  (`Ch03.card_prime_of_isMinimalNormal_of_isSupersolvable` + `IsSupersolvable.quotient`)
+  ゆえ `M̄` は巡回。引き戻し `B := M̄.comap (mk' A)` は `A < B ⊴ G`, `B ≤ C` で、
+  `A ≤ Z(B)` (∵ `B ≤ C_G(A)`) と `B/A` 巡回から
+  `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` で**可換** ⟹ `A` の極大性に矛盾。
+
+  **中断時点の draft** (~150 行、あと数個の名前解決だけ) は
+  `scratchpad/wip/ProblemsSupersolvableMann.lean` に退避。実測した API の注意点:
+  * `Ch03.IsSupersolvable` / `Ch03.card_prime_of_isMinimalNormal_of_isSupersolvable` は
+    `namespace OddOrder.Isaacs.Ch04` の中で `open OddOrder.Isaacs.Ch03` しても解決しなかった。
+    **`Ch03.` 前置で書く** (同じファイルで `Ch02.exists_isMinimalNormal_le_of_normal` は
+    `Ch02.` 前置で解決している)。
+  * centralizer の正規性は `Subgroup.normal_centralizer` (instance、`[H.Normal]` 付き)。
+    `Subgroup.centralizer_normal_of_normal` は**存在しない**。
+  * `isCyclic_of_prime_card` は `Nat.card ↥M = p` の形を要求する
+    (`(Nat.card ↥M).Prime` からは `⟨_, rfl⟩` 等で渡す)。
 
 #### 🎉 4A.11 完了 (2026-07-25) — `ProblemsWreath.lean` に追加
 
