@@ -102,6 +102,101 @@ noncomputable def sylowInrRange (hP : IsPGroup p P) (hG : ¬ p ∣ Nat.card G) :
     (sylowInrRange (φ := φ) hP hG : Subgroup (G ⋊[φ] P)) =
       (SemidirectProduct.inr : P →* G ⋊[φ] P).range := rfl
 
+/-! ### 点安定化群と軌道核 -/
+
+variable (φ)
+
+/-- `g` を固定する `P` の元全体 (点安定化群). -/
+def fixSubgroup (g : G) : Subgroup P where
+  carrier := {u | (φ u) g = g}
+  one_mem' := by simp
+  mul_mem' := fun {a b} ha hb => by
+    simp only [Set.mem_setOf_eq] at *
+    rw [map_mul, MulAut.mul_apply, hb, ha]
+  inv_mem' := fun {a} ha => by
+    simp only [Set.mem_setOf_eq] at *
+    rw [map_inv]
+    conv_lhs => rw [← ha]
+    simp
+
+omit [Finite G] [Finite P] in
+@[simp] theorem mem_fixSubgroup {g : G} {u : P} : u ∈ fixSubgroup φ g ↔ (φ u) g = g := Iff.rfl
+
+/-- `P`-軌道 `Δ_g = {(φ v) g}` を各点固定する `P` の元全体 (= 軌道への作用の核). -/
+def orbitKernel (g : G) : Subgroup P where
+  carrier := {u | ∀ v : P, (φ u) ((φ v) g) = (φ v) g}
+  one_mem' := by intro v; simp
+  mul_mem' := fun {a b} ha hb v => by
+    simp only [Set.mem_setOf_eq] at *
+    rw [map_mul, MulAut.mul_apply, hb v, ha v]
+  inv_mem' := fun {a} ha v => by
+    simp only [Set.mem_setOf_eq] at *
+    rw [map_inv]
+    conv_lhs => rw [← ha v]
+    simp
+
+omit [Finite G] [Finite P] in
+@[simp] theorem mem_orbitKernel {g : G} {u : P} :
+    u ∈ orbitKernel φ g ↔ ∀ v : P, (φ u) ((φ v) g) = (φ v) g := Iff.rfl
+
+omit [Finite G] [Finite P] in
+theorem orbitKernel_le_fixSubgroup (g : G) : orbitKernel φ g ≤ fixSubgroup φ g := by
+  intro u hu
+  simpa using hu 1
+
+/-- 軌道核は `P` で正規. -/
+instance orbitKernel_normal (g : G) : (orbitKernel φ g).Normal := by
+  refine ⟨fun u hu w => ?_⟩
+  intro v
+  have hinner : ((φ w)⁻¹ : MulAut G) ((φ v) g) = (φ (w⁻¹ * v)) g := by
+    rw [map_mul, map_inv, MulAut.mul_apply]
+  rw [map_mul, map_mul, map_inv, MulAut.mul_apply, MulAut.mul_apply, hinner, hu (w⁻¹ * v),
+    ← hinner]
+  simp
+
+variable {φ}
+
+/-! ### Sylow 交叉 = 点安定化群 -/
+
+/-- 共役部分群 `inr(P)^{inl g}` (`= {inl g · y · (inl g)⁻¹}`). -/
+abbrev conjInrRange (g : G) : Subgroup (G ⋊[φ] P) :=
+  ((SemidirectProduct.inr : P →* G ⋊[φ] P).range).map
+    (MulAut.conj (SemidirectProduct.inl g : G ⋊[φ] P)).toMonoidHom
+
+omit [Finite G] [Finite P] in
+/-- `inr u` が共役 Sylow `conjInrRange g` に入るのは `(φ u) g = g` のとき. -/
+theorem inr_mem_conjInrRange_iff (g : G) (u : P) :
+    (SemidirectProduct.inr u : G ⋊[φ] P) ∈ conjInrRange (φ := φ) g ↔ (φ u) g = g := by
+  rw [← conj_inr_mem_inr_range_iff (φ := φ) g u]
+  constructor
+  · rintro ⟨y, hy, hyx⟩
+    have hy' : y = (SemidirectProduct.inl g)⁻¹ * SemidirectProduct.inr u *
+        SemidirectProduct.inl g := by
+      have hcy : (SemidirectProduct.inl g : G ⋊[φ] P) * y * (SemidirectProduct.inl g)⁻¹
+          = SemidirectProduct.inr u := hyx
+      rw [← hcy]; group
+    rwa [hy'] at hy
+  · intro h
+    refine ⟨(SemidirectProduct.inl g)⁻¹ * SemidirectProduct.inr u * SemidirectProduct.inl g,
+      h, ?_⟩
+    change (SemidirectProduct.inl g : G ⋊[φ] P) *
+      ((SemidirectProduct.inl g)⁻¹ * SemidirectProduct.inr u * SemidirectProduct.inl g) *
+        (SemidirectProduct.inl g)⁻¹ = SemidirectProduct.inr u
+    group
+
+omit [Finite G] [Finite P] in
+/-- **Sylow 交叉 = 点安定化群**: `inr(P) ⊓ inr(P)^{inl g} = inr(P_g)`. -/
+theorem inr_range_inf_conjInrRange_eq (g : G) :
+    ((SemidirectProduct.inr : P →* G ⋊[φ] P).range) ⊓ conjInrRange (φ := φ) g
+      = (fixSubgroup φ g).map (SemidirectProduct.inr : P →* G ⋊[φ] P) := by
+  ext x
+  constructor
+  · rintro ⟨⟨u, rfl⟩, hconj⟩
+    exact ⟨u, (inr_mem_conjInrRange_iff (φ := φ) g u).mp hconj, rfl⟩
+  · rintro ⟨u, hu, rfl⟩
+    exact ⟨⟨u, rfl⟩, (inr_mem_conjInrRange_iff (φ := φ) g u).mpr hu⟩
+
+
 /-! ### `O_p(Γ) = 1` -/
 
 omit [Finite G] [Finite P] in
