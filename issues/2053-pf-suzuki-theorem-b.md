@@ -1321,8 +1321,55 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
 - **`normalizer_zpowers_sup_sigma_sup_P_le_normalizer_zpowers` : `N_G(Z₁PΣ) ≤ N_G(Z₁)`**
   (第三主張の前半)。
 
-### 残り (次セッションの実装順)
-0. **(16) 第三主張の残り**: (i) `N_G(Z₁) = C_G(Z₁)⟨s⟩`
+## ✅ step (16) 完結 (2026-07-26、main session、`FirstCase/StepSixteen.lean` 1249 行)
+
+書籍 (16) の**全 3 主張**が landed。フルビルド green (4756 jobs)、警告 0、
+実 sorry は 9318 (model) 由来の 1 件のみ。
+
+| 主張 | 宣言名 |
+|---|---|
+| `R₁ = RΣL` (構造前提) | `sup_invImageF_centralizer_W_sup_nonsplitTorus_eq` |
+| **`Z₁PΣ ⊆ Z₂(R₁)`** (= `⁅Z₁ΣP, R₁⁆ ≤ Z₁`) | `commutator_zpowers_sup_sigma_sup_P_sylowThree_le` |
+| **強実線の一意性** | `eq_zpowers_of_card_three_of_forall_isStronglyReal` |
+| **`N_G(Z₁PΣ) = N_G(Z₁)`** | `normalizer_zpowers_eq_normalizer_zpowers_sup_sigma_sup_P` |
+| **`N_G(Z₁) = R₂ ⊔ ⟨s⟩`** | `normalizer_zpowers_eq_sylow_sup_zpowers` |
+| 部品: `⁅P,L⁆ ≤ Z₁` / `L ⊓ Z₁Σ = Z₁` | `commutatorElement_mem_zpowers_of_mem_P_of_mem_nonsplitTorus` / `nonsplitTorus_inf_zpowers_sup_sigma_eq` |
+| 部品: `Z₁ΣP` は位数 27 初等可換 | `card_zpowers_sup_sigma{,_sup_P}` / `mul_comm_of_mem_zpowers_sup_sigma{,_sup_P}` / `zpowers_sup_sigma_inf_P_eq_bot` |
+| 部品: 強実 | `not_isStronglyReal_of_mem_V` / `not_isStronglyReal_of_mem_P_sup_sigma` / `forall_isStronglyReal_mem_zpowers_st` / `isStronglyReal_conj` / `isStronglyReal_of_conj_eq_inv` |
+| 部品: LV の正規化 | `distinguishedInvolution_mem_normalizer_sup_nonsplitTorus_V` / `sylow_le_normalizer_sup_nonsplitTorus_V` / `normalizer_sup_nonsplitTorus_V_le` |
+| generic | `conj_pow_eq_mul_pow` / `eq_one_or_eq_or_eq_inv_of_mem_zpowers_of_orderOf_eq_three` |
+
+**設計上の要点 2 つ**:
+- `Z₂(R₁)` を対象として定義せず **`⁅Z₁ΣP, R₁⁆ ≤ Z₁`** の具体形にした。
+  下流が要るのはこの形 (`Z₁X ⊴ R₁`、`R̄₁` の class ≤ 2 が直に出る)。
+- 書籍の「`R₁` が `Z₁X` の線を推移的に置換」は**部分群の軌道でなく元の共役**で実装。
+  `w^{g^m} = w·d^m` (`conj_pow_eq_mul_pow`) で剰余類 `wZ₁` が丸ごと `w` の共役に
+  なるため、軌道–固定点機構が不要になった。
+
+### 次 = step (17) 結論 (p. 114)
+
+書籍の流れ:
+1. `x ∈ G` で `(Z₁PΣ)^x ⊆ R₂` を取る。`Z₁^x ⊄ LV` なら `R₂ = LV ⋊ Z₁^x` かつ
+   `(Z₁PΣ)^x = A × Z₁^x` (A は `LV` の (3,3) 型部分群) → `A ⊆ Ω₁(LV) = Z₁PΣ` で
+   (16) より `A^# は強実でない` ⟹ `A ⊓ Z₁ = 1`, `Z₁ΣP = Z₁A` ⟹ `Z₁^x` が `Z₁ΣP` を
+   中心化 ⟹ `Z₁Σ ⊆ Z(R₂)` で (14) と矛盾。
+2. よって `Z₁^x ⊆ Ω₁(LV) = Z₁ΣP` ⟹ (16) の一意性で `Z₁^x = Z₁` ⟹
+   `x ∈ N_G(Z₁) = R₂⟨s⟩` ⟹ `x` は `Z₁PΣ` を正規化。
+   ⟹ **`Z₁PΣ` は `R₂` 内で weakly closed**、しかも可換。
+3. **Hall–Wielandt (p > 2, A abelian 版)** で `G/O³(G) ≅ R₂⟨s⟩/O³(R₂⟨s⟩)`。
+4. `R̄₁ = R₁/Z₁` の構造 (`R̄Σ = T̄ × P̄ × Σ̄`, `L̄ΣP = L̄ × Σ̄ × P̄`, `L ⊄ RΣ` は landed)
+   と class ≤ 2 (= (16) 第一主張) から `⁅R̄₁,R̄₁⁆` は位数 1 or 3 ⟹
+   `R̄₁/⁅R̄₁,R̄₁⁆` に `s` 中心化の位数 3 商 ⟹ `|W| = 3` なら `R₂ = R₁` で (B2) と矛盾。
+5. `|W| = 9` 側: `C_{R₁}(s) = PΣ`, `W ⊄ R₁`, `R₂ = R₁W`, `R₁⟨s⟩ ⊴ R₂⟨s⟩` ⟹
+   再び (B2) と矛盾。
+
+⚠ **唯一の新規 shared infra = Hall–Wielandt の abelian 版**
+(`A ≤ Z(P)` でなく `p > 2 ∧ A abelian` 版; 本 issue 冒頭「Hall-Wielandt の所在」参照)。
+着手時は **9500 番台で claim** してから (hub バンド)。それ以外の (17) の材料は
+(14)(15)(16) で出揃っている。
+
+### 旧メモ (消化済み)
+0. ~~(16) 第三主張の残り~~ **完了**: (i) `N_G(Z₁) = C_G(Z₁)⟨s⟩`
    (`N/C ↪ Aut(Z₁) ≅ C₂`、`s` は `Z₁` を反転するので指数 2)、
    (ii) `C_G(Z₁) = R₂` (landed `sylow_eq_centralizer_zpowers`)、
    (iii) 逆包含 `R₂⟨s⟩ ≤ N_G(Z₁PΣ)`: `LV ⊴ R₂⟨s⟩` (`|R₂ : LV| = 3` で `R₂` 側は
