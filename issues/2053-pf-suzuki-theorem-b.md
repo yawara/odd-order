@@ -1194,3 +1194,25 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
 3. `s` が `L` を反転 / `V` が `L` を正規化 / `W` が `L` を中心化・`P` は非中心化。
 4. 後半 (`|R₂ : LV| = 3`, `Z(LV) = Z₁Σ`, `Ω₁(LV) = Z₁ΣP`)。
 
+### (15) `L ⊆ R₁` の完全論法 (2026-07-25 導出、部品実在確認済)
+
+`P_le_normalizer_orderThreeGeneratedSubgroup` が landed したので、残りは次の連鎖:
+
+1. **`P` は `L` を正規化**: `P` は `⟨Q₀,K,t⟩` を正規化 (landed) かつ `st` を中心化
+   (`P ≤ R` 可換、`invImageF_mul_comm`) ⟹ `C_G(st)` を正規化 ⟹ 交わりを正規化。
+2. **`Z₁ ≤ L`**: `st ∈ L` から `zpowers_le`。
+3. **`L ⊓ P = ⊥`** — ここが唯一の非自明点。背理法: `L ⊓ P ≠ 1` なら `|P| = 3` 素より
+   `P ≤ L`。`Z₁ ≤ L` も位数 3 で `Z₁ ⊓ P = ⊥` (`zpowers_inf_P_eq_bot`, landed)。
+   ⟹ `Z₁ ⊔ P ≤ L` は位数 9 (`card_sup_eq_mul_of_commute`, StepFourteen) = `|L|`
+   ⟹ `L = Z₁ ⊔ P` ⟹ `L` の全元は 3 乗が 1 (`pow_eq_one_of_mem_sup_of_commute`,
+   StepFourteen)。しかし `L` は位数 9 の**巡回**群ゆえ位数 9 の元を持つ (矛盾)。
+   ⟹ **既存の generic 補題 2 本だけで閉じる (新規 infra 不要)**。
+4. **`LP` は位数 27、`Z₁P` は指数 3 ⟹ 正規** ⟹ `L` は `Z₁P` を正規化。
+   (`card_sup_eq_mul_of_commute` は可換性を要求するので、ここは
+   `Subgroup.card_mul_index` / `Subgroup.normal_of_index_eq_prime` 系を使う;
+   `P` が `L` を正規化するので `L ⊔ P` の位数は `|L|·|P|/|L ⊓ P|`。)
+5. `L` は `C_G(Z₁P) = RΣ` (`centralizer_P_inf_centralizer_mul_t_eq_sup`, landed) を
+   正規化 ⟹ `L ≤ N_G(RΣ)`。
+6. `L` の元は全て 3-元 (位数 9 の群) ⟹ **`R₁` の定義 (`N_G(RΣ)` の 3-元が生成) から
+   `L ≤ R₁` が即出る** (`sylowThreeNormalizerRSigma_def` + `Subgroup.subset_closure`)。
+
