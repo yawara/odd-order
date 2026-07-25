@@ -844,3 +844,19 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   合成 NR → NR/T₁ → (NR/T₁)/((C-像)·付随) の設計は着手時に確定 →
   (ε3) p ∣ |Ab(G)| → ¬hB2 で False → **step_twelve 主定理**
   (case (10.1) → False) を assemble。
+- ε1 完了 (`ff3def388`): [N_G(R), R₁] ≤ T₁。**残る ε2/ε3 (transfer bridge)**:
+  資産確認済 — `transfer_range_eq_of_nilpotencyClass_lt` (Yoshida.lean:518,
+  v(G).range = w(N).range 形、N = normalizer-of-Sylow)、`focalSubgroupTheorem`
+  (Ch05_Transfer/Basic.lean:1158: commutator G ⊓ P = P.focalSubgroup 等 3 conj)。
+  実装計画: (ε2) G-focal ≤ T₁: focalSubgroup の生成元 x⁻¹·(gxg⁻¹) (G-共役対
+  in R₁) — Cor 10.2 の range-equality から fusion 制御を経由するのが本筋だが、
+  直接 route も検討価値: focal = commutator G ⊓ R₁ (focalSubgroupTheorem.1) を
+  使い、p³ ∤ |commutator G| を示す方が軽い可能性 — R₁ ≤ commutator G と仮定
+  すると focal = R₁ で、Cor 10.2 равен-transfer から N-側 transfer が
+  G-transfer と一致 → N-focal ⊇-関係… ここは transferRes/Abelianization の
+  API 精読が必要 (TransferIndexPrime.lean Lemma 10.6/10.7/10.9/10.11 一式あり)。
+  (ε3) p ∣ |Ab(G)|: p³ ∤ |commutator G| (Sylow-共役で R₁ ≤ commutator を排除)
+  → v_p(|Ab G|) = 3 − v_p(|comm|) ≥ 1 → ¬hB2 → **False = step_twelve 完結**。
+  R₁ の class < p: R₁ 非可換 p³ → class = 2 (⁅R₁,R₁⁆ = T ≤ Z(R₁) via δ4a)
+  < 3 ≤ p (p 奇素数)。nilpotencyClass-API との橋 (Group.nilpotencyClass ↥R₁ = 2)
+  は mathlib の nilpotencyClass-le-iff-…-central-series で組む。
