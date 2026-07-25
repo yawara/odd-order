@@ -29,6 +29,8 @@ plan recorded there from the p. 111 reading).
 
 set_option autoImplicit false
 
+open scoped Pointwise
+
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 namespace FirstCaseHypothesis
@@ -360,6 +362,66 @@ theorem card_invImageF (ind : Hypothesis.TheoremAInductionBelow G Ω) :
       _ = (Nat.card F * Nat.card ↥fc.P) * Sbar.index := by rw [hSF, hNP]; ring
   rw [hcard_R]
   exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hne) hkey
+
+include model in
+/-- **`|C_G(P)| = |P|·(|F|·(|Q̄|·|Σ|))`** (order accounting for the Sylow step of (11)):
+Lagrange through the faithful quotient (fibre `N = P`, step (7)) and the affine
+decomposition `C_G(P)/N = F ⋊ H̄` with `H̄ = Q̄·Σ` of the model. -/
+theorem card_centralizer_P (ind : Hypothesis.TheoremAInductionBelow G Ω) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    Nat.card ↥(Subgroup.centralizer (fc.P : Set G))
+      = Nat.card ↥fc.P * (Nat.card F *
+          (Nat.card ↥(fc.rankOneQuotient).Q * Nat.card ↥(fc.rankOneQuotient).D)) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  -- `|L| = |L⧸N'|·|N'|`, `|L⧸N'| = |F|·|H̄|`, `|H̄| = |Q̄|·|D̄|`.
+  have h3 : Nat.card ↥L = Nat.card (↥L ⧸ N') * Nat.card ↥N' :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup N'
+  have h4 : Nat.card ↥(MonoidHom.range model.emb) * Nat.card ↥(fc.rankOneQuotient).H
+      = Nat.card (↥L ⧸ N') := model.isComplement.card_mul
+  have hDH : (fc.rankOneQuotient).D ≤ (fc.rankOneQuotient).H := by
+    rw [(fc.rankOneQuotient).D_def]; exact inf_le_left
+  have hmul : ∀ x ∈ (fc.rankOneQuotient).H, ∃ q ∈ (fc.rankOneQuotient).Q,
+      ∃ d ∈ (fc.rankOneQuotient).D, q * d = x := by
+    intro x hx
+    have hx' : x ∈ ((fc.rankOneQuotient).Q :
+        Set (fc.toHypothesis.centralizerActionQuotient fc.P)) * ((fc.rankOneQuotient).D :
+        Set (fc.toHypothesis.centralizerActionQuotient fc.P)) := by
+      rw [(fc.rankOneQuotient).Q_mul_D_eq_H]; exact hx
+    obtain ⟨q, hq, d, hd, hqd⟩ := hx'
+    exact ⟨q, hq, d, hd, hqd⟩
+  have hDQbot : (fc.rankOneQuotient).D ⊓ (fc.rankOneQuotient).Q = ⊥ := by
+    rw [inf_comm]; exact (fc.rankOneQuotient).Q_inf_D_eq_bot
+  have h5 := (Subgroup.isComplement'_subgroupOf_of_disjoint_mul_eq_univ
+    hDH (fc.rankOneQuotient).Q_le_H hDQbot hmul).card_mul
+  have hQc : Nat.card ↥((fc.rankOneQuotient).Q.subgroupOf (fc.rankOneQuotient).H)
+      = Nat.card ↥(fc.rankOneQuotient).Q :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (fc.rankOneQuotient).Q_le_H).toEquiv
+  have hDc : Nat.card ↥((fc.rankOneQuotient).D.subgroupOf (fc.rankOneQuotient).H)
+      = Nat.card ↥(fc.rankOneQuotient).D :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hDH).toEquiv
+  have hHQD : Nat.card ↥(fc.rankOneQuotient).Q * Nat.card ↥(fc.rankOneQuotient).D
+      = Nat.card ↥(fc.rankOneQuotient).H := by
+    rw [← hQc, ← hDc]; exact h5
+  have hSF : Nat.card ↥(MonoidHom.range model.emb) = Nat.card F :=
+    Nat.card_congr (MonoidHom.ofInjective model.emb_injective).symm.toEquiv
+  have hNP : Nat.card ↥N' = Nat.card ↥fc.P := by
+    have h := fc.kernelN_eq_P ind
+    have hcongr : Nat.card ↥fc.kernelN = Nat.card ↥N' :=
+      Nat.card_congr (Subgroup.equivMapOfInjective _ _
+        (Subgroup.subtype_injective L)).symm.toEquiv
+    rw [← hcongr, h]
+  calc Nat.card ↥L
+      = Nat.card (↥L ⧸ N') * Nat.card ↥N' := h3
+    _ = (Nat.card ↥(MonoidHom.range model.emb) * Nat.card ↥(fc.rankOneQuotient).H)
+        * Nat.card ↥fc.P := by rw [h4, hNP]
+    _ = (Nat.card F * (Nat.card ↥(fc.rankOneQuotient).Q
+        * Nat.card ↥(fc.rankOneQuotient).D)) * Nat.card ↥fc.P := by
+        rw [hSF, hHQD]
+    _ = Nat.card ↥fc.P * (Nat.card F * (Nat.card ↥(fc.rankOneQuotient).Q
+        * Nat.card ↥(fc.rankOneQuotient).D)) := by ring
 
 /-- **`Z(R) = P` when `R` is nonabelian** (p. 111, proof of (11), first paragraph):
 the center of `R` (as `R ⊓ C_G(R)`) is `C_G(P)`-invariant and sits between `P` and `R`,
