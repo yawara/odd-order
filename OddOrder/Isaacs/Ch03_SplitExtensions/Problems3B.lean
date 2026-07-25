@@ -829,6 +829,63 @@ theorem exists_normal_qComplement {G : Type u} [Group G] [Finite G] {q : ℕ} (h
     ∃ H : Subgroup G, H.Normal ∧ ¬ q ∣ Nat.card ↥H ∧ ∃ k : ℕ, H.index = q ^ k :=
   exists_normal_qComplement_aux (Nat.card G) hq hmax hsmall le_rfl
 
+/-! ### Problem 3B.11 — Frattini 部分群の素因数は指数も割る -/
+
+/-- **Isaacs Problem 3B.11** (書籍 p. 85): 有限群 `G` の Frattini 部分群 `Φ(G)` の位数を割る
+素数はすべて `|G : Φ(G)|` も割る.
+
+`p ∤ |G : Φ(G)|` と仮定する. `Q ∈ Syl_p(Φ(G))` の `G` への像 `R` は Frattini 論法
+(`Sylow.normalizer_sup_eq_top`) と `Φ` の非生成性 (`frattini_nongenerating`) から `G` で正規で,
+`[G : R] = [Φ : Q] · [G : Φ]` はどちらの因子も `p` と素だから `|R|` (= `p`-冪) と互いに素.
+Schur-Zassenhaus で補群 `H` を取ると `H ⊔ Φ(G) = ⊤` ゆえ `H = ⊤`, つまり `R = ⊥` となり
+`p ∣ |Φ(G)|` に矛盾する. -/
+theorem prime_dvd_index_frattini_of_dvd_card_frattini {G : Type u} [Group G] [Finite G] {p : ℕ}
+    (hp : p.Prime) (hdvd : p ∣ Nat.card ↥(frattini G)) : p ∣ (frattini G).index := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  by_contra hnd
+  obtain ⟨Q⟩ : Nonempty (Sylow p ↥(frattini G)) := inferInstance
+  set R : Subgroup G := (Q : Subgroup ↥(frattini G)).map (frattini G).subtype with hR_def
+  -- Frattini 論法 + `Φ` の非生成性 ⟹ `R ⊴ G`.
+  have htop : Subgroup.normalizer ((R : Subgroup G) : Set G) ⊔ frattini G = ⊤ :=
+    Sylow.normalizer_sup_eq_top Q
+  have hnormtop : Subgroup.normalizer ((R : Subgroup G) : Set G) = ⊤ :=
+    frattini_nongenerating htop
+  haveI hRnormal : R.Normal := Subgroup.normalizer_eq_top_iff.mp hnormtop
+  have hRle : R ≤ frattini G := Subgroup.map_subtype_le _
+  -- `[G : R] = [Φ : Q] · [G : Φ]` はどちらの因子も `p` と素.
+  have hrel : R.subgroupOf (frattini G) = (Q : Subgroup ↥(frattini G)) := by
+    rw [hR_def, Subgroup.subgroupOf]
+    exact Subgroup.comap_map_eq_self_of_injective Subtype.coe_injective _
+  have hindexeq : (Q : Subgroup ↥(frattini G)).index * (frattini G).index = R.index := by
+    rw [← hrel]
+    exact Subgroup.relIndex_mul_index hRle
+  have hnpindex : ¬ p ∣ R.index := by
+    rw [← hindexeq]
+    intro hcontra
+    rcases (Nat.Prime.dvd_mul hp).mp hcontra with h | h
+    · exact Q.not_dvd_index h
+    · exact hnd h
+  -- `|R|` は `p`-冪なので `[G : R]` と互いに素 ⟹ Schur-Zassenhaus.
+  have hRcard : Nat.card ↥R = Nat.card ↥(Q : Subgroup ↥(frattini G)) :=
+    (Nat.card_congr (Subgroup.equivMapOfInjective _ (frattini G).subtype
+      Subtype.coe_injective).toEquiv).symm
+  obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp Q.isPGroup'
+  have hcop : Nat.Coprime (Nat.card ↥R) R.index := by
+    rw [hRcard, ha]
+    exact Nat.Coprime.pow_left a ((Nat.Prime.coprime_iff_not_dvd hp).mpr hnpindex)
+  obtain ⟨H, hH⟩ := Subgroup.exists_right_complement'_of_coprime hcop
+  -- `H ⊔ Φ = ⊤` ゆえ `H = ⊤`, すなわち `R = ⊥`.
+  have hHtop : H = ⊤ := by
+    refine frattini_nongenerating (K := H) ?_
+    refine top_le_iff.mp ?_
+    rw [← hH.sup_eq_top, sup_comm]
+    exact sup_le_sup_left hRle H
+  rw [hHtop] at hH
+  have hRbot : R = ⊥ := disjoint_top.mp hH.disjoint
+  rw [hR_def, Subgroup.map_eq_bot_iff_of_injective
+    (H := (Q : Subgroup ↥(frattini G))) Subtype.coe_injective] at hRbot
+  exact sylow_ne_bot hdvd Q hRbot
+
 end
 
 end OddOrder.Isaacs.Ch03

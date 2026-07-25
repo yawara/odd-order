@@ -214,6 +214,114 @@ theorem sylow_normal_of_isSupersolvable {G : Type u} [Group G] [Finite G] {p : �
   sylow_normal_of_forall_isCoatom_index_prime
     (fun _ hM => index_prime_of_isCoatom_of_isSupersolvable hG hM) hlarge P
 
+/-- Problem 3B.9 の `|G|`-強帰納法本体. -/
+theorem exists_subgroup_card_eq_of_isSupersolvable_aux (m : ℕ) :
+    ∀ {G : Type u} [Group G] [Finite G], IsSupersolvable G → Nat.card G ≤ m →
+      ∀ n : ℕ, n ∣ Nat.card G → ∃ H : Subgroup G, Nat.card ↥H = n := by
+  induction m with
+  | zero =>
+    intro G _ _ _ hcard
+    have := Nat.card_pos (α := G)
+    omega
+  | succ m ih =>
+    intro G _ _ hG hcard n hn
+    rcases subsingleton_or_nontrivial G with hs | hnt
+    · have hG1 : Nat.card G = 1 := Nat.card_eq_one_iff_unique.mpr ⟨hs, inferInstance⟩
+      rw [hG1] at hn
+      exact ⟨⊥, by rw [Subgroup.card_bot, Nat.eq_one_of_dvd_one hn]⟩
+    · -- 極小正規部分群 `N` の位数は素数 `q` (3B.7(a)).
+      obtain ⟨N, hNmin, -⟩ :=
+        Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
+      haveI hNnormal : N.Normal := hNmin.1
+      have hqprime : (Nat.card ↥N).Prime :=
+        card_prime_of_isMinimalNormal_of_isSupersolvable hG hNmin
+      set q := Nat.card ↥N with hq_def
+      have hprod : q * N.index = Nat.card G := Subgroup.card_mul_index N
+      have hquotcard : Nat.card (G ⧸ N) = N.index := (Subgroup.index_eq_card N).symm
+      have hqpos : 0 < q := hqprime.pos
+      have hidxpos : 0 < N.index := Nat.pos_of_ne_zero fun h => by
+        rw [h, mul_zero] at hprod; exact absurd hprod.symm Nat.card_pos.ne'
+      have hquotle : Nat.card (G ⧸ N) ≤ m := by
+        have h2 : 2 * N.index ≤ q * N.index := Nat.mul_le_mul_right _ hqprime.two_le
+        rw [hquotcard]
+        omega
+      -- 商の中で位数 `n` (または `n / q`) の部分群を取る.
+      by_cases hqn : q ∣ n
+      · -- `q ∣ n`: `G ⧸ N` から位数 `n / q` の部分群を引き戻す.
+        obtain ⟨n', rfl⟩ := hqn
+        have hn' : n' ∣ Nat.card (G ⧸ N) := by
+          rw [hquotcard]
+          have : q * n' ∣ q * N.index := by rw [hprod]; exact hn
+          exact (mul_dvd_mul_iff_left hqpos.ne').mp this
+        obtain ⟨Kbar, hKbar⟩ := ih (hG.quotient N) hquotle n' hn'
+        refine ⟨Kbar.comap (QuotientGroup.mk' N), ?_⟩
+        have hidx : (Kbar.comap (QuotientGroup.mk' N)).index = Kbar.index :=
+          Subgroup.index_comap_of_surjective (H := Kbar) (QuotientGroup.mk'_surjective N)
+        have h1 : Nat.card ↥(Kbar.comap (QuotientGroup.mk' N)) * Kbar.index = Nat.card G := by
+          rw [← hidx]; exact Subgroup.card_mul_index _
+        have h2 : n' * Kbar.index = Nat.card (G ⧸ N) := by
+          rw [← hKbar]; exact Subgroup.card_mul_index _
+        have hKidxpos : 0 < Kbar.index := Nat.pos_of_ne_zero fun h => by
+          rw [h, mul_zero] at h2; exact absurd (h2.trans hquotcard) (by omega)
+        have h3 : Nat.card ↥(Kbar.comap (QuotientGroup.mk' N)) * Kbar.index
+            = (q * n') * Kbar.index := by
+          rw [h1, mul_assoc, h2, hquotcard, hprod]
+        exact Nat.eq_of_mul_eq_mul_right hKidxpos h3
+      · -- `q ∤ n`: 商から位数 `n` の `K̄` を取り, その引き戻し `K` (位数 `q·n`) の中で
+        -- Schur-Zassenhaus により `N` の補群 (位数 `n`) を取る.
+        have hcop : Nat.Coprime q n := (Nat.Prime.coprime_iff_not_dvd hqprime).mpr hqn
+        have hnq : n ∣ Nat.card (G ⧸ N) := by
+          rw [hquotcard]
+          rw [← hprod] at hn
+          exact (Nat.Coprime.dvd_of_dvd_mul_left hcop.symm hn)
+        obtain ⟨Kbar, hKbar⟩ := ih (hG.quotient N) hquotle n hnq
+        set K := Kbar.comap (QuotientGroup.mk' N) with hK_def
+        have hNK : N ≤ K := by
+          intro y hy
+          rw [hK_def, Subgroup.mem_comap]
+          have h1 : (QuotientGroup.mk' N) y = 1 := by
+            simpa using (QuotientGroup.eq_one_iff y).mpr hy
+          rw [h1]
+          exact one_mem _
+        have hidx : K.index = Kbar.index :=
+          Subgroup.index_comap_of_surjective (H := Kbar) (QuotientGroup.mk'_surjective N)
+        have h1 : Nat.card ↥K * Kbar.index = Nat.card G := by
+          rw [← hidx]; exact Subgroup.card_mul_index _
+        have h2 : n * Kbar.index = Nat.card (G ⧸ N) := by
+          rw [← hKbar]; exact Subgroup.card_mul_index _
+        have hKidxpos : 0 < Kbar.index := Nat.pos_of_ne_zero fun h => by
+          rw [h, mul_zero] at h2; exact absurd (h2.trans hquotcard) (by omega)
+        have hKcard : Nat.card ↥K = q * n := by
+          refine Nat.eq_of_mul_eq_mul_right hKidxpos ?_
+          rw [h1, mul_assoc, h2, hquotcard, hprod]
+        -- `↥K` の中で `N.subgroupOf K` は位数 `q`, 指数 `n` の正規部分群.
+        haveI : (N.subgroupOf K).Normal := Subgroup.normal_subgroupOf
+        have hcardNK : Nat.card ↥(N.subgroupOf K) = q :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNK).toEquiv
+        have hidxNK : (N.subgroupOf K).index = n := by
+          have := Subgroup.card_mul_index (N.subgroupOf K)
+          rw [hcardNK, hKcard] at this
+          exact Nat.eq_of_mul_eq_mul_left hqpos this
+        obtain ⟨L, hL⟩ := Subgroup.exists_right_complement'_of_coprime
+          (N := N.subgroupOf K) (by rw [hcardNK, hidxNK]; exact hcop)
+        have hLcard : Nat.card ↥L = n := by
+          rw [← hidxNK]; exact hL.symm.index_eq_card.symm
+        refine ⟨L.map K.subtype, ?_⟩
+        rw [← hLcard]
+        exact Nat.card_congr (Subgroup.equivMapOfInjective L K.subtype
+          Subtype.coe_injective).toEquiv.symm
+
+/-- **Isaacs Problem 3B.9** (書籍 p. 85): 有限**超可解**群 `G` は, `|G|` の任意の約数 `n` に
+対して位数 `n` の部分群を持つ.
+
+極小正規部分群 `N` の位数は素数 `q` (3B.7(a)). `q ∣ n` なら `G ⧸ N` の位数 `n/q` の部分群を
+引き戻す. `q ∤ n` なら `G ⧸ N` の位数 `n` の部分群 `K̄` を引き戻した `K` (位数 `q·n`) の中で
+Schur-Zassenhaus により `N` の補群 (位数 `n`) を取る. -/
+theorem exists_subgroup_card_eq_of_isSupersolvable {G : Type u} [Group G] [Finite G]
+    (hG : IsSupersolvable G) {n : ℕ} (hn : n ∣ Nat.card G) :
+    ∃ H : Subgroup G, Nat.card ↥H = n :=
+  exists_subgroup_card_eq_of_isSupersolvable_aux (Nat.card G) hG le_rfl n hn
+
 end
 
 end OddOrder.Isaacs.Ch03

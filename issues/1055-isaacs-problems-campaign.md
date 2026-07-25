@@ -775,7 +775,7 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **3A.7 ✅** ⟹ **§3A は 3A.6 のみ残り** (deferred-hard)。
 さらに **3B.1 ✅ / 3B.2 ✅ / 3B.3 ✅** (新 leaf `Ch03_SplitExtensions/Problems3B.lean`)。
 さらに **3B.4 ✅ / 3B.5 ✅**。
-**次 frontier = 3B.9 → 3B.11 以降**(3B.10 は 3B.8 の系として先に済ませた)。3A.6 は §3B を進めた後に再訪する。
+**次 frontier = 3B.12 (⚠ 書籍のまま形式化できない — 下記参照) → 3B.13 以降**。3A.6 は §3B を進めた後に再訪する。
 
 ### §3B の記録 (2026-07-25)
 
@@ -793,7 +793,9 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 | 3B.7(a) | ✅ | `card_prime_of_isMinimalNormal_of_isSupersolvable` (新 leaf `ProblemsSupersolvable.lean`) |
 | 3B.7(b) | ✅ | `index_prime_of_isCoatom_of_isSupersolvable` |
 | 3B.8 | ✅ | `sylow_normal_of_forall_isCoatom_index_prime` / `isSolvable_of_forall_isCoatom_index_prime` / `exists_normal_qComplement` |
+| 3B.9 | ✅ | `exists_subgroup_card_eq_of_isSupersolvable` |
 | 3B.10 | ✅ | `sylow_normal_of_isSupersolvable` (3B.7(b) + 3B.8 の核の系) |
+| 3B.11 | ✅ | `prime_dvd_index_frattini_of_dvd_card_frattini` |
 
 **設計メモ**:
 
