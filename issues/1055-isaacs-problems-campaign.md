@@ -600,26 +600,31 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
   ∀(b,k) 可換。k=1: a·φ(h)(b)=b·a ⟹ φ(h)(b)=b ∀b (N 可換) ⟹ φ(h)=id ⟹ h=1 (φ=subtype 単射)。
   h=1,b=1,k=σ: a=σ(a)=×u(a) ⟹ (u-1)·toAdd a=0 ⟹ toAdd a=0 (u≠1 ⟹ u-1 は体 ZMod p の unit)
   ⟹ a=1。~50 行。`Subgroup.mem_center_iff`/`SemidirectProduct.ext`/`SemidirectProduct.mul_left,right`。
-- ⬜ 残り §3A (いずれも substantial ~50-60 行): **3A.6** (p-群 P が p∤|G| の G に faithful ⟹ ある
-  P-orbit で faithful) — repo に **Thm 1.38 (Generalized Brodkey)** あり (`Ch01_Sylow/Main.lean:756`、
-  Sylow 交叉極小で S∩T 内の両正規部分群 ⊆ O_p)。application は `G⋊P` 構成で P を Sylow とみて Brodkey +
-  orbit-stabilizer。**3A.3** (order pm, m|p-1, 正規 P 位数 p, G/P 巡回, Z(G)=1) — construction:
-  `(ZMod p)⋊C`, C≤Aut(ZMod p)=(ZMod p)ˣ 位数 m (巡回ゆえ存在)、加法/乗法 bridging + Z=1 検証。
-  **3A.4** (order q(q-1), 基本アーベル正規, 位数 p 元共役) — roadmap: 有限体 F (|F|=q=p^k) の
-  `G = Multiplicative F ⋊ Fˣ` (φ = `(MulAutMultiplicative F).symm ∘ AddAut.mulLeft` : Fˣ→MulAut)。
-  3A.3 の affineGroup パターン再利用 (**cancel は toAdd で加法に落として instance 衝突回避**)。
-  |G|=q(q-1) (`SemidirectProduct.card`, |Fˣ|=q-1)、N=inl 像 正規 位数 q 基本アーベル (char p ゆえ
-  ∀x xᵖ=1)、位数-p 元 = inl(F\{0}) (h≠1 なら orderOf h | q-1 coprime p ⟹ 位数 p 不可 ⟹ h=1)、
-  Fˣ が F\{0} に推移的 (h=a'/a) ⟹ 全 inl(nonzero) 共役 = 単一共役類。`GaloisField p k` or 任意
-  `[Field F][Fintype F]` で parameterize。~110 行。3A.7 (regular orbit) / 3A.8 (cyclic pqr auto)。
-  **★ 3A.3 の材料確定 (2026-07-23、de-risked)**: bridge は **`IsCyclic.mulAutMulEquiv : MulAut G ≃*
-  (ZMod (Nat.card G))ˣ`** (Cyclic.lean:593) がまさにこれ (先の「bridge 無し」は誤り)。手順:
-  `N := Multiplicative (ZMod p)` (cyclic card p)、`(ZMod p)ˣ` の位数 m 元 `u` (m|p-1, 巡回ゆえ存在) →
-  `σ := mulAutMulEquiv.symm u : MulAut N` 位数 m、`φ : Multiplicative (ZMod m) →* MulAut N` を generator
-  ↦ σ で (injective)、`G := SemidirectProduct N (Multiplicative (ZMod m)) φ`。性質: |G|=pm (`SemidirectProduct`
-  card)、P=inl 像 正規 位数 p、G/P≅Mult(ZMod m) 巡回、Z(G)=1 (φ faithful + 非自明作用の共通固定点=0)。
-  ~50-60 行だが全ピース確定。次イテレーションで構築。残り (§1D 1D.5 / §2A 2A.4-6,9 / §3A 他) も
-  各 ~50-60 行の construction/application。
+- ✅ 実証明 **3A.4** (2026-07-25) `affineGroupOfField` 系: 有限体 `F` の `Fˣ` が `(F,+)` に作用する
+  半直積 `G = Multiplicative F ⋊ Fˣ` (3A.3 の `affineGroup` と同じ `MulAutMultiplicative` +
+  `AddAut.mulLeft` idiom)。`|G| = q(q-1)` / `|ker rightHom| = q` / `ker` は基本アーベル `p`-群 /
+  位数 `p` の元は `right = 1` (`orderOf right` が `p` と `q-1` を割るが互いに素) で
+  `inl x` (`x ≠ 0`) の形、`Fˣ` が `F ∖ {0}` に推移的だから単一共役類
+  (`SemidirectProduct.inl_aut`)。まとめ `exists_group_card_eq_elementaryAbelian_isConj` は
+  `GaloisField p k` を代入 (⚠ `GaloisField.card` は **`Nat.card` で述べられている**ので
+  `Fintype` 経由は不要)。
+
+### ⚠ §3A の被覆は実測で更新 (2026-07-25)
+
+本 issue の §3A 記載は古く、**3A.3 と 3A.5 は既に完成済み**だった (実測で確認)。現状:
+
+| 問題 | 状態 |
+|---|---|
+| 3A.1(a)(b)(c) | ✅ (semidihedral) |
+| 3A.2 | ✅ (一般化四元数群) |
+| 3A.3 | ✅ (位数 pm, Z(G)=1) |
+| 3A.4 | ✅ (2026-07-25) |
+| 3A.5 | ✅ (`G ⋊ G ≅ G × G`) |
+| 3A.6 | ⬜ p-群が faithful に作用 ⟹ ある P-軌道で faithful (**Thm 1.38 Generalized Brodkey** の application、`Ch01_Sylow/Main.lean:756`) |
+| 3A.7 | ⬜ `α ∈ Aut(G)`, `o(α)` の素因子が 2 個以下 ⟹ `⟨α⟩` は `G` 上に regular orbit をもつ |
+| 3A.8 | ⬜ `C` 巡回位数 `pqr` (相異なる奇素数): (a) `Aut(C)` の involution の一意性 / (b) 位数 4 の部分群 `K` / (c) `C ⋊ K` で regular orbit 無し (3A.7 の sharpness) |
+| 3A.9 | ⬜ wreath product `W = H ≀ G`: (a) `C_B(G)` = 定数関数 / (b) regular wreath で `C_G(b) = C` なる `b ∈ B` が存在 |
+| 3A.10 | ⬜ 任意の有限群 `H` と素数 `p` に対し、正規可換 `p`-部分群 `A` で `G` が `A` 上分裂し `G/A ≅ H`, `A = C_G(A)` なる `G` が存在 |
 
 - ⬜ **次: §3A 続き or §2A hard tail 再訪。§1D 残り = 1D.5 (Isaacs-noted-hardest)。**
 
@@ -655,4 +660,6 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **2C.1(a) ✅ / 2C.1(b) ✅ で §2C も完済**。あわせて Ch.2 の陳腐化した被覆表
 (2A/2C/2D を誤って TODO と記載) も実測に合わせて訂正。
 さらに **§2D も完済 (2D.1(a)(b) / 2D.2)** ⟹ **Isaacs Ch.2 の章末演習は全問完済**。
-**次 frontier = Ch.3 §3A の残り (3A.3 / 3A.4 / 3A.6 / 3A.7 / 3A.8)** → §3B〜。
+さらに **3A.4 ✅** (3A.3 / 3A.5 は既済と実測判明)。
+**次 frontier = 3A.6** (Thm 1.38 Generalized Brodkey の application) → 3A.7 / 3A.8 / 3A.9 /
+3A.10 → §3B〜。
