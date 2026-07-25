@@ -1436,7 +1436,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 
 | 問題 | 状態 | 実装 |
 |---|---|---|
-| 5B.1 | ⬜ | `P ∈ Syl_p(G)`, `g ∈ P` 位数 `p`, `g ∈ G'`, `g ∉ P'` ⇒ `g^t ∈ P` なる `t ∉ P` が存在。transfer-evaluation lemma (Thm 5.5 = mathlib `MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot`) を使う |
+| 5B.1 | ✅ `exists_notMem_conj_mem_of_mem_commutator` | `P ∈ Syl_p(G)`, `g ∈ P` 位数 `p`, `g ∈ G'`, `g ∉ P'` ⇒ `g^t ∈ P` なる `t ∉ P` が存在。transfer-evaluation lemma (Thm 5.5 = mathlib `MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot`) を使う |
 | 5B.2 | ⬜ | Dietzmann の状況で `\|X\| = m` なら `\|⟨X⟩\| ≤ n^m`。既存 `Dietzmann.lean` は長さ評価 `(n-1)·\|X\|` までなので、正規形 `x₁^{e₁}⋯x_m^{e_m}` (`0 ≤ e_i < n`) を出す必要がある (既存 `Dietzmann.exists_pow_mul_prod_eq` が「x の出現を先頭に集める」ステップを提供) |
 | 5B.3 | ✅ | `exists_finite_normal_iff` (`Problems5B.lean`) + `normal_closure_of_conj_closed` |
 
