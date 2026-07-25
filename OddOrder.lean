@@ -225,6 +225,7 @@ import OddOrder.Isaacs.Ch04_Commutators.ProblemsMaximalClass
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsCenterIndex
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreath
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreathNonCommutator
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreathClass
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.Isaacs.Ch08_PermutationGroups.AffineGroup

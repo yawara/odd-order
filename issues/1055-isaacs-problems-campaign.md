@@ -1185,7 +1185,29 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 `X.mpr` 形が「Unknown constant X.mpr」になる (`(X _).mpr` と書く) /
 `by` ブロックを入れ子にした改行継続は parse error になりやすい (`have` に切り出す)。
 
-### 残り (文書順): 4A.12。
+#### 🎉 4A.12 (a)(b)(c 一般部分) 完了 (2026-07-25) — 新 leaf `ProblemsWreathNonCommutator.lean`
+
+**主結果** (実証明・axiom-clean):
+- `IsAbelianTwoGen T` (可換かつ 2 元生成)、`𝒯(H)` = その性質の極大元 (`Maximal IsAbelianTwoGen`)
+- `commutatorElement_eq_of_right_commute` : `x.right`, `y.right` 可換なら
+  **`⁅x,y⁆ = inl(Δ_{x.right} y.left)⁻¹ · inl(Δ_{y.right} x.left)`**
+- `exists_maximal_commutator_mem` = **(a)** (`⁅x,y⁆ ∈ B` ⟹ ある極大 `T` で `⁅x,y⁆ ∈ ⁅B,T⁆`)
+- `exists_mem_not_isCommutator` = **(b)** (`∑_T |A|^{|H|−|H:T|} < |A|^{|H|−1}` ⟹
+  `⁅B,U⁆` は交換子でない元を含む; 書籍の `1/|A| > ∑(1/|A|)^{|H:T|}` に `|A|^{|H|}` を掛けた形)
+- `sum_lt_of_card_lt` = **(c) 一般部分** (`H` が可換 2 元生成でなければ `|A| > |𝒯(H)|` で成立)
+
+(a) の鍵は `⁅x,y⁆ ∈ B ⟺ x.right, y.right` が可換で、そのとき交換子が base 側の 2 つの `Δ` に
+分解すること (`⁅inr h, inr k⁆ = inr ⁅h,k⁆ = 1` が効く)。可換 2 元生成部分群を含む極大元は
+`Finite.exists_le_maximal`、`⟨u,v⟩` の可換性は中心化群の二段論法。
+(b) は (a) + 4A.11 の位数 + `Finset.card_biUnion_le` の鳩の巣。
+
+⬜ **残: (c) の `H = D₈` で `m = 3` が取れる部分** (= `|𝒯(D₈)| ≤ 3`)。`D₈` の部分群を
+具体的に列挙する計算なので別途。
+
+⬜ **4A.13 も未着手** (pdftotext が切れていて見落としていた; PDF p.138 で確認):
+`G` 冪零で class `m > 1`, `a ∈ G` ⟹ `H = G'⟨a⟩` の冪零類は `m` 未満。
+
+### 残り (文書順): 4A.12(c) の `D₈` 部分 / 4A.13。
 
 #### 🎉 4A.11 完了 (2026-07-25) — `ProblemsWreath.lean` に追加
 
