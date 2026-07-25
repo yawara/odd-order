@@ -509,3 +509,28 @@ theorem sylow_le_commutator_normalizer (hp2 : p ≠ 2) (P : Sylow p G)
 非零項 `i` に局所補題 (核条件は最小性から) → `S = ⊤` ⟹ `A^{g⁻¹} ≤ P` ⟹ 弱閉性で `g ∈ N`
 ⟹ `δ ≡ 0` で矛盾。消費形は landed の `sylow_le_commutator_of_not_dvd` /
 `not_dvd_card_abelianization_of_sylow_le_commutator` で挟むだけ。
+
+
+### 主証明の実装状況 (2026-07-26 時点、**未コミット WIP**)
+
+`OddOrder/GroupTheory/HallWielandt.lean` の作業ツリーに `sylow_le_commutator_normalizer`
+の**前半が compile 済み** (末尾に `sorry` 1 個、ゆえに未コミット):
+
+- ✅ `N`, `Nc = N'` の設定、`P ≤ N`
+- ✅ 位数最小の `x ∈ P ∖ Nc` の取り出しと `hmin'` (位数が小さい `P` の元は `Nc` に入る)
+- ✅ `D := Nc.subgroupOf P` が `↥P` で正規、`commutator ↥P ≤ D`
+- ✅ **`C := ↥P ⧸ D` の CommGroup instance を手で構成** (`⁅b⁻¹,a⁻¹⁆ ∈ commutator ≤ D`)
+  ⟹ `lam := QuotientGroup.mk' D` と `lam y = 1 ↔ y ∈ D`
+  (当初 `Abelianization ↥P ⧸ (D の像)` で作ろうとしたが Normal instance が通らず、
+   直接商にする方が短かった)
+- ✅ `IsPGroup p C`、`lam ⟨x⟩ ^ [G:P] ≠ 1` (`p ∤ [G:P]`)
+- ✅ `R := A ⊔ ⟨x⟩`、(17) の適用、`transfer lam x = 1` (x ∈ ⁅G,G⁆)
+  ⟹ **非零項 `q` の取り出し** (`transfer δ_q ⟨x⟩ ≠ 1`)
+
+残り (次 iteration):
+1. `hker`: `z ∈ powConjSet ⟨x⟩ p ∩ S` ⟹ `δ z = 1`
+   (`z ≠ 1` なら `orderOf z ∣ orderOf (x^p) < orderOf x` から最小性で `z, g⁻¹zg ∈ Nc`)
+2. `A.subgroupOf R` の正規性・可換性・`(A.subgroupOf R) ⊔ zpowers ⟨x⟩ = ⊤`
+3. 局所補題 `eq_top_of_transfer_ne_one` を適用して `S = ⊤`
+4. `S = ⊤ ⟹ A^{g⁻¹} ≤ P ⟹` 弱閉性で `g ∈ N` `⟹ δ ≡ 0` で矛盾
+5. 消費形 `not_dvd_card_abelianization_normalizer_of_abelian`

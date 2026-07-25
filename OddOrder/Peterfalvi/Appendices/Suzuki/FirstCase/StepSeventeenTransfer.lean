@@ -7,6 +7,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeen
 import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
 import OddOrder.GroupTheory.TransferIndexTwo
 import OddOrder.GroupTheory.WeaklyClosed
+import OddOrder.GroupTheory.HallWielandt
 
 /-!
 # Peterfalvi Part II, Ch. II, step (17): control of the `3`-transfer
@@ -1035,6 +1036,67 @@ theorem false_of_isWeaklyClosed_zpowers
   have hcontrol := OddOrder.GroupTheory.not_dvd_card_abelianization_normalizer
     hWP hWZ hwc hB2'
   rw [fc.normalizer_zpowers_eq_sylow_sup_zpowers model ind hB2 S hR₁S] at hcontrol
+  rcases hW with h3 | h9
+  · exact hcontrol
+      (fc.three_dvd_card_abelianization_of_card_W_eq_three model ind hB2 S hR₁S h3)
+  · exact hcontrol
+      (fc.three_dvd_card_abelianization_of_card_W_eq_nine model ind hB2 S hR₁S h9)
+
+include model in
+/-- **The contradiction of (17)** (p. 114) — the last step of Theorem B.
+
+`A = Z₁ΣP` is abelian ((16)) and weakly closed in the Sylow `3`-subgroup `R₂`
+(`map_conj_eq_of_le_sylow`, (17) steps 1–2), so the Hall–Wielandt theorem
+(`OddOrder.GroupTheory.not_dvd_card_abelianization_normalizer_of_abelian`, `p = 3 > 2`)
+transports hypothesis (B2) to `N_G(A) = N_G(Z₁) = R₂⟨s⟩`.  But `R₂⟨s⟩` has a quotient of
+order `3` in both the `|W| = 3` and the `|W| = 9` branch — contradiction. -/
+theorem false_of_step_seventeen
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
+    (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G)) :
+    False := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  obtain ⟨-, hp3, hF9, -, hW, -⟩ := fc.step_twelve model ind hB2
+  have hB2' : ¬ (3 : ℕ) ∣ Nat.card (Abelianization G) := by rwa [hp3] at hB2
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  -- `A = Z₁ΣP` lies in `R₁ ≤ R₂`
+  have hZ₁R : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ≤ fc.invImageF model :=
+    (fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2 hm).trans
+      (fc.sInvertedT_spec model ind hB2 hm).1
+  have hAR₁ : ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P)
+      ≤ fc.sylowThreeNormalizerRSigma model :=
+    (sup_le (sup_le (hZ₁R.trans le_sup_left) le_sup_right)
+      ((fc.P_le_invImageF model).trans le_sup_left)).trans
+      (fc.sup_le_sylowThreeNormalizerRSigma model ind hB2)
+  have hAS : ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P)
+      ≤ (S : Subgroup G) := hAR₁.trans hR₁S
+  -- `A` is abelian and weakly closed in `R₂`
+  have hAab : ∀ a ∈ ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P),
+      ∀ b ∈ ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P),
+      a * b = b * a := fun _ ha _ hb =>
+    fc.mul_comm_of_mem_zpowers_sup_sigma_sup_P model ind hB2 ha hb
+  have hwc : OddOrder.GroupTheory.IsWeaklyClosed
+      ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P)
+      (S : Subgroup G) := fun x hx =>
+    fc.map_conj_eq_of_le_sylow model ind hB2 S hR₁S hx
+  -- Hall–Wielandt transports (B2) to `N_G(A) = R₂⟨s⟩`
+  have hcontrol := OddOrder.GroupTheory.not_dvd_card_abelianization_normalizer_of_abelian
+    (p := 3) (by norm_num) S hAS hAab hwc hB2'
+  rw [← fc.normalizer_zpowers_eq_normalizer_zpowers_sup_sigma_sup_P model ind hB2 S hR₁S,
+    fc.normalizer_zpowers_eq_sylow_sup_zpowers model ind hB2 S hR₁S] at hcontrol
   rcases hW with h3 | h9
   · exact hcontrol
       (fc.three_dvd_card_abelianization_of_card_W_eq_three model ind hB2 S hR₁S h3)
