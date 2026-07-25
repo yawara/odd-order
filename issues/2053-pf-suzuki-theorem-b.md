@@ -1378,9 +1378,19 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
   **`(Z₁PΣ)^x ≤ R₂ ⟹ (Z₁PΣ)^x = Z₁PΣ`** = Hall–Wielandt の仮説
   「A は R₂ 内で weakly closed」。
 
+### 追加 landed (2026-07-26)
+- **`normalizer_sylow_eq` : `N_G(R₂) = R₂⟨s⟩ = N_G(Z₁PΣ)`**
+  (`R₂ = C_G(Z₁)` と `Z(R₂) = Z₁` ((14)) から両者の正規化が一致)。
+  ⟹ **(17) が要るのは「`N_G(Sylow)` が 3-transfer を制御する」= Yoshida の設定**
+  であり、weakly closed 一般の Hall–Wielandt でなくてよい可能性が高い。
+  9503 の方針を「まず既存 Yoshida (`exists_surjective_wreath_of_transfer_range_lt`)
+  で `R₂ ↠ C₃≀C₃` を排除する」に更新済。
+
 ### 残り
-1. **Hall–Wielandt (abelian 版)** = [issue 9503](9503-hall-wielandt-abelian-weakly-closed.md)
-   (claim 済、hub band)。これが入れば `G/O³(G) ≅ R₂⟨s⟩/O³(R₂⟨s⟩)`。
+1. **transfer 制御** = [issue 9503](9503-hall-wielandt-abelian-weakly-closed.md)
+   (claim 済、hub band)。第一候補 = Yoshida + `R₂ ↠ C₃≀C₃` の排除、
+   fallback = classical Hall–Wielandt (Grün 第二定理)。
+   これが入れば `G/O³(G) ≅ R₂⟨s⟩/O³(R₂⟨s⟩)`。
 2. 書籍 (17) 段 4–5 の最終矛盾 2 本 (`|W| = 3` 側と `|W| = 9` 側)。材料:
    `R₁ = RΣL` (landed)、class ≤ 2 (= (16) 第一主張、landed)、
    `N_G(Z₁) = R₂⟨s⟩` (landed)、(14) の「s は R₁/RΣ を反転」。

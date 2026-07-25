@@ -57,6 +57,33 @@ statement (Peterfalvi p. 108 に明記、[Ha] Thm 14.4.2):
       が出る形に整える
 - [ ] AxiomsCheck 登録
 
+## 🔎 2026-07-26 の発見 — **適用先は Sylow の正規化群だった**
+
+`normalizer_sylow_eq` (StepSeventeen.lean, landed) で
+
+> **`N_G(Z₁PΣ) = N_G(Z₁) = R₂⟨s⟩ = N_G(R₂)`**
+
+が判明した (`R₂ = C_G(Z₁)` と `Z(R₂) = Z₁` ((14)) から、`R₂` の正規化と `Z₁` の
+正規化が一致する)。つまり (17) が要るのは **「`N_G(R₂)` が 3-transfer を制御する」**
+であって、weakly closed 部分群一般の制御ではない。これは **Yoshida の定理
+(repo に landed) の設定そのもの**。
+
+⟹ **方針の第一候補が変わる**: classical Hall-Wielandt (Grün 第二定理) を建てるより、
+既存の Yoshida 機構を使う方が近い:
+
+- `OddOrder.Isaacs.Ch10.exists_surjective_wreath_of_transfer_range_lt`
+  (raw Yoshida 10.1): `N_G(P)` が transfer を制御しないなら `P ↠ C_p ≀ C_p`。
+- ⟹ **`R₂ ↠ C₃ ≀ C₃` の非存在**を (14)-(16) の構造から言えれば完了。
+  - `|C₃≀C₃| = 3⁴`、class 3、`|Z| = 3`、`|Z₂| = 9`、`|W^ab| = 9`、exponent 9。
+  - repo 側の材料: `|R₂| = 3⁵ or 3⁶`、`Z(R₂) = Z₁` (位数 3)、
+    `Z₁PΣ ⊆ Z₂(R₁)` (位数 27)、`⁅RΣ,RΣ⁆ = Z₁`、`⁅Z₁ΣP, R₁⁆ ≤ Z₁`、
+    `R₁ = RΣL`、`|R₂ : LV| = 3`、`Ω₁(LV) = Z₁PΣ`。
+  - ⚠ `Cor 10.2` (class < p 版) は使えない見込み: class(R₁) は 3 になりうる
+    (書籍 (17) が `⁅R̄₁,R̄₁⁆` の位数を 1 or 3 と計算しているので、`[R₁,R₁] ⊄ Z₁`
+    の場合がある)。ただし **class(R₂) ≤ 2 が実は証明できるなら Cor 10.2 で即決**
+    なので、着手時にまず `[R₂,R₂] ≤ Z₁` の可否を検討する価値がある。
+- 第二候補 (fallback): classical Hall-Wielandt / Grün 第二定理を建てる (下記)。
+
 ## 証明方針 (未確定、着手時に精査)
 
 古典的には **Grün の第二定理** (weakly closed abelian `A` ⟹ `N_G(A)` が p-transfer を
