@@ -1444,7 +1444,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.4 | ✅ 完了 (`exists_subgroup_card_eq_of_isZGroup` + `exists_conj_of_card_eq_of_isZGroup`) | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
 | 5C.5 | ✅ | `exists_mem_normalizer_conj_eq_of_normal` + `eq_of_characteristic_of_conj` (`Problems5C.lean`) |
 | 5C.6 | 🔒 hub | weak closure。**hub レーンが `OddOrder/GroupTheory/WeaklyClosed.lean` で着手中** (issue 9503) — A レーンは触らない |
-| 5C.7 | ⬜ | `\|G\| = 3^a·5·11` ⇒ Sylow-3 が正規 |
+| 5C.7 | ✅ 完了 (`normal_sylow_three_of_card_eq`) | `\|G\| = 3^a·5·11` ⇒ Sylow-3 が正規 |
 | 5C.8 | ⬜ | `p` が最小素因数 (`p > 2`) で `p^3 ∤ \|G\|` ⇒ 正規 p-補群 |
 | 5C.9 | ⬜ | 非可換単純で偶数位数、`8 ∤ \|G\|` ⇒ `3 \| \|G\|` |
 | 5C.10 | ⬜ | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
@@ -1560,6 +1560,23 @@ instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbit
 の implicit/explicit の並びを確認してから書く)。
 `|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
 `G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
+
+### 5C.7 の実装メモ (2026-07-26)
+
+**主張** (PDF 実測): `|G| = 3^a · 5 · 11` ⇒ `G` は正規 Sylow 3-部分群を持つ。
+
+**証明** = Burnside の正規 `p`-補群定理を 2 段: Sylow-5 は位数 5 (巡回) で `φ(5) = 4` が
+`|G|` (奇数) と互いに素 ⇒ 正規 5-補群 `K` (位数 `3^a·11`)。`K` の Sylow-11 は位数 11 で
+`φ(11) = 10` が `|K|` と互いに素 ⇒ 正規 11-補群 `L` (位数 `3^a`)。`L` は `K` の正規 Sylow-3
+ゆえ特性 (`Sylow.characteristic_of_normal`)、`K ⊴ G` なので `L ⊴ G`。位数が `G` の Sylow-3
+と一致するので `L` 自身が Sylow-3 で、正規 Sylow は一意 (`Sylow.unique_of_normal`)。
+
+⭐ **mathlib の `IsCyclic.normalizer_le_centralizer` は `p` が最小素因数のときしか使えない**
+(ここは `p = 5, 11` で最小は 3)。一般形 `normalizer_le_centralizer_of_coprime_totient`
+(`gcd(|G|, φ(|P|)) = 1` 版, issue 9210) を新設して使った。
+
+補助: `card_sylow_eq_self_of_sq_not_dvd` (`q ∣ |G|`, `q² ∤ |G|` ⇒ Sylow-`q` の位数 `q`) /
+`factorization_three_pow_mul` / `sq_not_dvd_mul`。
 
 ### 5C.4 の設計と進捗 (2026-07-26)
 
