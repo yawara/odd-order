@@ -294,6 +294,60 @@ theorem dvd_card_orderThree_of_dvd_ncard_invertedBy
   rw [heq]
   exact hdvd2
 
+include hyp in
+/-- **Step (13), the `r = 7` obstruction** (p. 113): no strongly real
+non-involution whose order is prime to `|K|` centralises `K`.
+
+Such a `y` has odd centralizer order (Ch. I §3, Lemma 3), so `y` itself has
+odd order and therefore lies in `D` (it cannot interchange the two fixed
+points of a `1 ≠ k ∈ K`); being prime to `|K|` it then lies in `V = C_D(t)`
+by the `D = K ⋊ V` factorisation.  But then the involution `t` centralises
+`y`, making `|C_G(y)|` even — a contradiction.
+
+This is the group-theoretic content of Peterfalvi's "`C_G(K) = C_D(K) = KW`,
+so `x` cannot centralize a strongly real element of order 3". -/
+theorem not_mem_centralizer_K_of_isStronglyReal {y : G}
+    (hSR : IsStronglyReal y) (hy2 : y ^ 2 ≠ 1)
+    (hcop : Nat.Coprime (orderOf y) (Nat.card ↥hyp.K))
+    (hyK : y ∈ Subgroup.centralizer (hyp.K : Set G)) : False := by
+  classical
+  -- `|C_G(y)|` is odd, hence so is `orderOf y`.
+  have hoddC : Odd (Nat.card ↥(Subgroup.centralizer ({y} : Set G))) :=
+    hyp.centralizer_natCard_odd_of_stronglyReal hSR hy2
+  have hymem : y ∈ Subgroup.centralizer ({y} : Set G) :=
+    Subgroup.mem_centralizer_singleton_iff.mpr rfl
+  have hdvd : orderOf y ∣ Nat.card ↥(Subgroup.centralizer ({y} : Set G)) := by
+    have h1 := orderOf_dvd_natCard
+      (⟨y, hymem⟩ : ↥(Subgroup.centralizer ({y} : Set G)))
+    have heq : orderOf y
+        = orderOf (⟨y, hymem⟩ : ↥(Subgroup.centralizer ({y} : Set G))) :=
+      orderOf_injective (Subgroup.centralizer ({y} : Set G)).subtype
+        (Subgroup.subtype_injective _) ⟨y, hymem⟩
+    rw [heq]
+    exact h1
+  have hoddy : Odd (orderOf y) := by
+    obtain ⟨c, hc⟩ := hdvd
+    rw [hc] at hoddC
+    exact (Nat.odd_mul.mp hoddC).1
+  -- `y` centralises some `1 ≠ k ∈ K`, hence lies in `D`, hence in `V`.
+  obtain ⟨k, hk, hk1⟩ := hyp.exists_ne_one_mem_KSet
+  have hkK : k ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact hk
+  have hyc : y ∈ Subgroup.centralizer ({k} : Set G) :=
+    Subgroup.mem_centralizer_singleton_iff.mpr
+      (Subgroup.mem_centralizer_iff.mp hyK k hkK).symm
+  have hyD : y ∈ hyp.D :=
+    hyp.mem_D_of_odd_orderOf_of_mem_centralizer_KSet hk hk1 hyc hoddy
+  have hyV : y ∈ hyp.V :=
+    hyp.mem_V_of_mem_centralizer_K_of_coprime hyD hyK hcop
+  -- but then the involution `t` centralises `y`.
+  have htC : hyp.t ∈ Subgroup.centralizer ({y} : Set G) :=
+    Subgroup.mem_centralizer_singleton_iff.mpr
+      (Subgroup.mem_centralizer_singleton_iff.mp hyV.2).symm
+  have heven := even_card_of_sq_eq_one_mem htC hyp.t_sq hyp.t_ne_one
+  rw [Nat.odd_iff] at hoddC
+  rw [Nat.even_iff] at heven
+  omega
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

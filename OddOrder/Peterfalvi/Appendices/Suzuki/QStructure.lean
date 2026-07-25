@@ -338,6 +338,96 @@ lemma commute_of_mem_Q0 {a b : G} (ha : a ∈ hyp.Q0) (hb : b ∈ hyp.Q0) :
     (hyp.involutions_H_subset_centralizer_Q ha.2 ha.1 ha1) b
     (hyp.Q0_le_Q hb)).symm
 
+include hyp in
+/-- **Consequence of Prop 1(a)** (used on p. 113): an element of *odd order*
+centralising some `1 ≠ k ∈ K` lies in `D`.
+
+Such an element permutes the two fixed points `{basept, t • basept}` of `k`;
+an odd-order element cannot interchange them, so it fixes both and therefore
+lies in the two-point stabilizer `D`. -/
+lemma mem_D_of_odd_orderOf_of_mem_centralizer_KSet {k : G} (hk : k ∈ hyp.KSet)
+    (hk1 : k ≠ 1) {y : G} (hy : y ∈ Subgroup.centralizer ({k} : Set G))
+    (hodd : Odd (orderOf y)) : y ∈ hyp.D := by
+  classical
+  have hpair := hyp.fixedPoints_zpowers_eq_pair_of_mem_KSet hk hk1
+  have hcomm : k * y = y * k :=
+    (Subgroup.mem_centralizer_singleton_iff.mp hy).symm
+  -- membership in the fixed-point set is just fixing by `k`
+  have hfix_iff : ∀ ω : Ω,
+      ω ∈ fixedPoints (Subgroup.zpowers k) Ω ↔ k • ω = ω := by
+    intro ω
+    constructor
+    · intro h
+      exact h ⟨k, Subgroup.mem_zpowers k⟩
+    · intro h
+      rw [MulAction.mem_fixedPoints]
+      rintro ⟨g, hg⟩
+      obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hg
+      exact Subgroup.zpow_mem (MulAction.stabilizer G ω) h n
+  -- `y` maps `k`-fixed points to `k`-fixed points
+  have hmap : ∀ ω : Ω, k • ω = ω → k • (y • ω) = y • ω := by
+    intro ω hω
+    calc k • (y • ω) = (k * y) • ω := by rw [mul_smul]
+      _ = (y * k) • ω := by rw [hcomm]
+      _ = y • (k • ω) := by rw [mul_smul]
+      _ = y • ω := by rw [hω]
+  have hα : k • hyp.basept = hyp.basept :=
+    (hfix_iff _).mp (by rw [hpair]; exact Or.inl rfl)
+  have hβ : k • (hyp.t • hyp.basept) = hyp.t • hyp.basept :=
+    (hfix_iff _).mp (by rw [hpair]; exact Or.inr rfl)
+  have hne : hyp.t • hyp.basept ≠ hyp.basept :=
+    hyp.smul_basept_ne_of_not_mem_H hyp.t_not_mem_H
+  -- `y • basept` is one of the two fixed points
+  have hyα : y • hyp.basept = hyp.basept ∨
+      y • hyp.basept = hyp.t • hyp.basept := by
+    have h1 : y • hyp.basept ∈ fixedPoints (Subgroup.zpowers k) Ω :=
+      (hfix_iff _).mpr (hmap _ hα)
+    rw [hpair] at h1
+    rcases h1 with h | h
+    · exact Or.inl h
+    · exact Or.inr h
+  -- the swap is impossible for an element of odd order
+  have hfixα : y • hyp.basept = hyp.basept := by
+    rcases hyα with h | hswap
+    · exact h
+    · exfalso
+      have hyβ : y • (hyp.t • hyp.basept) = hyp.basept := by
+        have h1 : y • (hyp.t • hyp.basept) ∈ fixedPoints
+            (Subgroup.zpowers k) Ω := (hfix_iff _).mpr (hmap _ hβ)
+        rw [hpair] at h1
+        rcases h1 with h | h
+        · exact h
+        · exfalso
+          apply hne
+          have h2 : y • (hyp.t • hyp.basept) = y • hyp.basept := by
+            rw [h, hswap]
+          exact (MulAction.injective y) h2
+      -- `y²` fixes both points, so `y^{odd}` still swaps them
+      have hsqβ : y ^ 2 ∈ MulAction.stabilizer G (hyp.t • hyp.basept) := by
+        rw [MulAction.mem_stabilizer_iff, sq, mul_smul, hyβ, hswap]
+      obtain ⟨m, hm⟩ := hodd
+      have hpowfixβ : (y ^ 2) ^ m • (hyp.t • hyp.basept)
+          = hyp.t • hyp.basept :=
+        MulAction.mem_stabilizer_iff.mp (Subgroup.pow_mem _ hsqβ m)
+      have hone : y ^ orderOf y • hyp.basept = hyp.basept := by
+        rw [pow_orderOf_eq_one, one_smul]
+      rw [hm, pow_add, pow_mul, pow_one, mul_smul, hswap, hpowfixβ] at hone
+      exact hne hone
+  have hfixβ : y • (hyp.t • hyp.basept) = hyp.t • hyp.basept := by
+    have h1 : y • (hyp.t • hyp.basept) ∈ fixedPoints
+        (Subgroup.zpowers k) Ω := (hfix_iff _).mpr (hmap _ hβ)
+    rw [hpair] at h1
+    rcases h1 with h | h
+    · exfalso
+      apply hne
+      have h2 : y • (hyp.t • hyp.basept) = y • hyp.basept := by
+        rw [h, hfixα]
+      exact (MulAction.injective y) h2
+    · exact h
+  rw [hyp.D_eq_stabilizer_inf]
+  exact ⟨MulAction.mem_stabilizer_iff.mpr hfixα,
+    MulAction.mem_stabilizer_iff.mpr hfixβ⟩
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
