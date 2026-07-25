@@ -1441,7 +1441,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.1 | ✅ | `not_dvd_card_commutator_of_inf_sylow_eq_bot` + `hasNormalPComplement_of_commutator_inf_sylow_eq_bot` (`Problems5C.lean`)。方針どおり **鍵の段を独立補題**にした (同一 statement の別証明を避ける) |
 | 5C.2 | ✅ 完了 (`card_eq_two_of_characteristic_relIndex_eq_two`) | PDF 確認済。`U ⊆ V ⊆ P ⊆ G`、`P` abelian Sylow-2、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
 | 5C.3 | ✅ 完了 (`sq_eq_one_of_card_sylow_two_eq_32`) | PDF 確認済: `G` 単純で abelian Sylow-2 `P` の位数が `2^5` ⇒ `P` は初等可換 |
-| 5C.4 | ⬜ | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
+| 5C.4 | 🔨 存在部分 完了 (`exists_subgroup_card_eq_of_isZGroup`)、残り = 共役性 | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
 | 5C.5 | ✅ | `exists_mem_normalizer_conj_eq_of_normal` + `eq_of_characteristic_of_conj` (`Problems5C.lean`) |
 | 5C.6 | 🔒 hub | weak closure。**hub レーンが `OddOrder/GroupTheory/WeaklyClosed.lean` で着手中** (issue 9503) — A レーンは触らない |
 | 5C.7 | ⬜ | `\|G\| = 3^a·5·11` ⇒ Sylow-3 が正規 |
@@ -1560,6 +1560,36 @@ instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbit
 の implicit/explicit の並びを確認してから書く)。
 `|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
 `G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
+
+### 5C.4 の設計と進捗 (2026-07-26)
+
+**主張** (p.163): Sylow がすべて巡回 (= mathlib `IsZGroup`) なら、`|G|` の任意の約数 `m` に
+対し位数 `m` の部分群が存在し、位数 `m` の部分群同士は `G`-共役。
+
+**骨格** = mathlib の Z-群 API (実測で確認、自作不要):
+`IsZGroup.isCyclic_commutator` (`G'` 巡回) / `IsZGroup.isCyclic_abelianization` (`G/G'` 巡回) /
+`IsZGroup.coprime_commutator_index` (`gcd(|G'|, |G:G'|) = 1` ⟹ `G'` は**巡回な正規 Hall**)。
+⟹ `m ∣ |G|` は `m = gcd(m,|G'|) · gcd(m,|G:G'|)` と分解する
+(`Nat.gcd_mul_gcd_eq_iff_dvd_mul_of_coprime`)。
+
+✅ **存在部分 landing (2026-07-26)**: `Problems5C4.lean` (新 leaf, `OddOrder.lean` 配線済)。
+巡回群 `G'` の位数 `m₁` の部分群 `M` (巡回ゆえ特性 ⟹ `G` で正規) と、Schur–Zassenhaus 補群
+`H ≅ G/G'` (巡回) の位数 `m₂` の部分群 `H₂` を取り `K := H₂ ⊔ M`。
+補助: `normal_map_subtype_of_characteristic` / `isCyclic_of_isComplement'_commutator`。
+新 shared infra = `exists_subgroup_card_eq_of_isCyclic` + `characteristic_of_isCyclic`
+(`CyclicSubgroupUniqueness.lean` へ追記) と `CardSupInf.lean` (issue 9209)。
+
+**残り (共役性) の設計**: 位数 `m` の部分群 `K₁, K₂` に対し
+1. `|K_i ∩ G'| = m₁`: `d := |K_i ∩ G'|` は `m₁` を割り、`m/d ∣ |G:G'|` かつ `m₁/d ∣ |G'|` なので
+   `m₁/d ∣ gcd(|G'|,|G:G'|) = 1`。
+2. `G'` 巡回 ⟹ 位数 `m₁` の部分群は一意 (`cyclic_subgroup_eq_of_card_eq`) ⟹
+   `K₁ ∩ G' = K₂ ∩ G' =: M` (`G` で正規)。
+3. `Ḡ := G/M` で `K̄_i` は位数 `m₂`、`K̄_i ∩ Ḡ'` は自明。`L_i := K̄_i · (G'/M)` は
+   `Ḡ/(G'/M) ≅ G/G'` (**巡回**) の位数 `m₂` の部分群に対応 ⟹ **一意** ⟹ `L₁ = L₂ =: L`。
+4. `L` の中で `K̄_i` は正規 Hall `G'/M` の補群 ⟹ Schur–Zassenhaus 共役性
+   (`Subgroup.IsComplement'.exists_conj_of_coprime`, repo の
+   `OddOrder/Mathlib/SchurZassenhausConj.lean`) で共役。
+5. 商の対応で `G` に持ち上げる。
 
 ### 5C.1 の実装メモ (2026-07-26)
 

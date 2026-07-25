@@ -59,6 +59,7 @@ import OddOrder.GroupTheory.HallWielandt
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.GroupTheory.AbelianPowerSubgroups
+import OddOrder.GroupTheory.CardSupInf
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.PrimeComplementResidual
@@ -207,6 +208,7 @@ import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch05_Transfer.Problems
 import OddOrder.Isaacs.Ch05_Transfer.Problems5B
 import OddOrder.Isaacs.Ch05_Transfer.Problems5C
+import OddOrder.Isaacs.Ch05_Transfer.Problems5C4
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsDihedralMultiplier
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsProductMultiplier
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsSchurMultiplier
