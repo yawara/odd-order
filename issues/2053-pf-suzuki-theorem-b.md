@@ -501,3 +501,48 @@ pending の凍結/トリガー待ち/ユーザー判断待ちはいずれも解�
 - **Theorem B 最終 assembly (`theoremB` 相当 endpoint) は未作成** (grep 0 件)。
 - ⟹ **真の残作業 = steps (11)〜(17) + Hall-Wielandt abelian 版 (9500 claim 要) + assembly**。
   次の一手 = (11) R = T × P、C_Q(P) の A − {P} 正則作用 (p. 111)。
+
+## 📖 2026-07-25 step (11)(12) 精読ノート (PDF pp. 111-112 直読、実装用)
+
+**(11) statement**: R := F の G 内逆像 (= mk' P : C_G(P) → C_G(P)/P の下で F-並進部分群の
+preimage、step (7) の N = P 使用)。主張:
+(i) **R = T × P** — T は C_Q(P)·C_W(P) に正規化される部分群、**T ⋊ C_Q(P) ≅ F ⋊ F***。
+(ii) **C_Q(P) は 𝒜 − {P} に正則作用** — 𝒜 := 「R の位数 p 部分群で T に含まれないもの」。
+
+**(11) 証明**:
+1. R abelian: 非可換なら [R,R]=Z(R)=P (C_Q(P) が F* に推移的)、N_G(R) ⊆ N_G(P)。
+   - case (10.1): R が N_G(P) の (よって G の) Sylow-p、|R|=p^{m+1} が |G|_p=p^{m+2} と矛盾。
+   - case (10.2): RC_W(P) が N_G(P) の Sylow-3; Σ が R/P≅F に非自明作用 ⟹
+     Z(RC_W(P))=Z(R)=P ⟹ RC_W(P) が G の Sylow-3、|RC_W(P)|=3^4 が |G|_3=3^4|W|≥3^5 と矛盾。
+2. T := [R, s] (s = involution)。R abelian ⟹ R = T × C_R(s) = T × P。
+3. |𝒜| = (p^{m+1}−p^m)/(p−1) = p^m = |F|。正則性: a ∈ C_Q(P)^# が P₁ ∈ 𝒜 を正規化 ⟹
+   a は T を正規化し R/T ≅ P を中心化 ⟹ [a,P₁] ⊆ P₁∩T = 1 ⟹ a が P₁ 中心化。
+   a は R/P に fpf ⟹ C_R(a) = P ⟹ P₁ = P。
+
+**(12) Case (10.2) holds** (= (10.1) を否定):
+1. (10.1) 下で R は N_G(R) の Sylow-p でない ⟹ N_G(P) ⊊ N_G(R)。
+2. 𝒜' := N_G(R) 下の P の軌道。P₁ ∈ 𝒜' ⟹ P₁^# は strongly real でない (Ch.I §3 Lemma 3、
+   P と共役ゆえ)。T の元は s に反転される ⟹ P₁ ∩ T = 1 ⟹ {P} ⊊ 𝒜' ⊆ 𝒜。
+   C_Q(P) の 𝒜−{P} 正則性 ⟹ 𝒜' = 𝒜。[N_G(R):N_G(P)] = |𝒜| = p^m ⟹ (10) より **m = 1、
+   |G|_p = p³**。
+3. N_G(R)/R 内: C_G(P)‾ = C_Q(P)‾ ⋊ C_W(P)‾、C_Q(P)‾ が 𝒜−{P} 正則、C_W(P)‾ が
+   C_Q(P)‾ に忠実。**App II Prop 1 を N_G(R)/R ↷ 𝒜 に適用** ⟹
+   N_G(R)/R = (R₁/R) ⋊ C_Q(P)C_W(P)、R₁ = G の Sylow-p、C_Q(P) が (R₁/R)^# に正則。
+4. R₁ 非可換位数 p³ ⟹ class 2 < p ⟹ **Hall-Wielandt (= Isaacs Cor 10.2 で賄う予定、
+   issue 本文の (12) 注記どおり)**: G/O^p(G) = N_G(R₁)/O^p(N_G(R₁))。
+5. T ⊴ R₁ (N_G(R) が 𝒜 に推移的)。R₁/T = (R/T) × (T₁/T)、T₁ = [R₁/T, s]。
+   𝒜₁ := R₁/T の位数 p 部分群で T₁/T と異なるもの。(11) と同様に C_Q(P) が
+   𝒜₁ − {R/T} に正則 ⟹ N_G(R) ⊊ N_G(R₁) なら [N_G(R₁):N_G(R)] = |𝒜₁| = p が (10) と矛盾
+   ⟹ **N_G(R₁) = N_G(R)**。T₁C_Q(P)C_W(P) が N_G(R₁) 内 index p 正規 ⟹ 4 と合わせ
+   G に index p 正規部分群 ⟹ **(B2) 偽** ⟹ (10.1) 不成立。□
+
+**実装設計メモ**:
+- R の構成 = `(mk' P) ⁻¹' (F-並進部分群の像)` — StepTwo の `exists_affineNearFieldModel`
+  bundle と step (7) `N_eq_P_...` の合流点。model の F-部分群を G に引き戻す comap 構成。
+- (11) は FirstCase/StepEleven.lean 新設 (leaf 配線 = OddOrder.lean 追記を忘れない)。
+- 使用部品: C_Q(P) の F* 推移性 (model qEquiv 経由)、s の反転作用 (Q₀ 系 =
+  `model.orderOf_mul_of_involutions` 周辺)、fpf (`conjQByK_fixed_eq_one` 型)、
+  (10) = `step_ten_dichotomy`。
+- (12) の App II Prop 1 = NearFields.lean `rankOne_affine_nearField` (実 sorry 0、BS Q₈ 継承)
+  を N_G(R)/R に再適用する形 — RankOneHypothesis の新しい実例化が要る。
+- Ch.I §3 Lemma 3 (strongly real) の被覆確認が (12) 着手時の最初の grep 項目。
