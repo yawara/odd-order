@@ -573,3 +573,15 @@ preimage、step (7) の N = P 使用)。主張:
   次 = (10.2) 側 arm (p=3, RC_W(P) が N_G(P) の 3-Sylow、|RC_W(P)|=3^4 vs |G|_3=3^4|W|≥3^5)。
   部品はほぼ同型: card 勘定 (|R·C_W(P)| = |R|·|Σ|/...) + Σ の R/P への非自明作用で
   Z(RC_W(P)) = Z(R) = P。その後 step_ten_dichotomy を消費して無条件 R abelian。
+- **R abelian 両 arm 完成** (`4cff5efb8`〜`8ca894010`): 共有 Sylow engine
+  (`false_of_ppart_subgroup_center_P`) + (10.1) arm + (10.2) arm
+  (Z(R·C_W(P)) = P は faithfulness core `eq_one_of_dAut_sigmaElt_eq_id` 経由)。
+  次 = step_ten_dichotomy を消費する無条件 `invImageF_isMulCommutative`
+  (|F| = p^m の供給 = card_field_eq_prime_pow + char_eq_p の hB2 threading に注意) →
+  T := [R,s] 分解 → |𝒜| = p^m → C_Q(P) 正則性 → step (11) statement 完成。
+- **step (11) 第一主張 (R abelian) 完成** (`71e1d3b12`): `invImageF_mul_comm` が
+  step_ten_dichotomy 消費で両 arm を接続 (無条件、hB2 + |F|=p^m を threading)。
+  p. 111-112 の (11) 証明 ¶1 が完全形式化。
+  次 = **T := [R,s] 分解**: s = Q₀ 側の distinguished involution (StepSeven の s/t 系を確認)、
+  R abelian + s が R を正規化 → T = {r·(s r s⁻¹)⁻¹ | r ∈ R}-型の構成 or [R,s] 部分群 +
+  R = T × C_R(s) = T × P (C_R(s) = P は s-fixed part)。その後 𝒜 の定義と正則性。
