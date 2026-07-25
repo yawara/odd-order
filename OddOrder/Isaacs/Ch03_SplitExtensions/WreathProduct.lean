@@ -200,6 +200,37 @@ theorem mem_centralizer_range_inr_iff [MulAction.IsPretransitive Q Ω] [Nonempty
         = inr q * inl (Function.const Ω d) * (inr q)⁻¹ * inr q := by group
       _ = inl (Function.const Ω d) * inr q := by rw [hc]
 
+/-! ### Problem 3A.9(b) — 正則 wreath product では任意の部分群が base の元の中心化群 -/
+
+/-- **Isaacs Problem 3A.9(b)**. **正則** wreath product `W = D ≀[Q] Q` (`Ω = Q` に左正則作用)
+において、`Q` の任意の部分群 `C` に対し base group の元 `b : Q → D` で
+「`inl b` を中心化する `Q` の元全体がちょうど `C`」となるものが存在する。
+
+`b` を `C` の指示関数 (`C` 上で `d ≠ 1`、外で `1`) に取ればよい: 共役公式から中心化条件は
+`b (g⁻¹ · ω) = b ω` (∀ω)、すなわち `g⁻¹ω ∈ C ↔ ω ∈ C` (∀ω) で、`ω = 1` を入れると
+`g⁻¹ ∈ C`、逆に `g ∈ C` なら `Subgroup.mul_mem_cancel_left` で成立。
+
+⚠ `D` の非自明性は必須 (`D = 1` なら base group が自明で中心化群は常に `Q` 全体)。 -/
+theorem exists_base_centralizer_eq [Nontrivial D] (C : Subgroup Q) :
+    ∃ b : Q → D, ∀ g : Q,
+      ((inr g : D ≀[Q] Q) * inl b * (inr g)⁻¹ = inl b ↔ g ∈ C) := by
+  classical
+  obtain ⟨d, hd⟩ := exists_ne (1 : D)
+  refine ⟨fun ω => if ω ∈ C then d else 1, fun g => ?_⟩
+  rw [inr_mul_inl_mul_inr_inv]
+  constructor
+  · intro h
+    have hf := congrFun (inl_injective h) 1
+    simp only [smul_eq_mul, mul_one] at hf
+    by_contra hg
+    have hginv : g⁻¹ ∉ C := fun hc => hg (by simpa using C.inv_mem hc)
+    rw [if_neg hginv, if_pos C.one_mem] at hf
+    exact hd hf.symm
+  · intro hg
+    refine congrArg inl (funext fun ω => ?_)
+    simp only [smul_eq_mul]
+    exact if_congr (C.mul_mem_cancel_left (C.inv_mem hg)) rfl rfl
+
 end WreathProduct
 
 end OddOrder.Isaacs.Ch03
