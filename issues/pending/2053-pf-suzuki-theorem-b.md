@@ -1525,6 +1525,14 @@ import する形にした。
 ### 次 = **Theorem B の assembly** (steps (1)–(17) の結合)
 
 
+## ⏸ pending 化 (2026-07-26): 残るのは issue 0147 (Q₈ Brauer–Suzuki) のみ
+
+Theorem B 本体は完成し、フルビルド green・新規 sorry 0。ただし完了条件の
+「AxiomsCheck 登録」は `theoremB` が **9318/0147 の Q₈ Brauer–Suzuki sorry** を
+経由するため未達 (near-field model の存在がそこに依存)。0147 が閉じれば
+`#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.theoremB`
+を足して close できる。⟹ それまで `pending/`。
+
 ## ✅ **2026-07-26 Theorem B 完成**
 
 `theoremB` (`FirstCase/TheoremB.lean`):
