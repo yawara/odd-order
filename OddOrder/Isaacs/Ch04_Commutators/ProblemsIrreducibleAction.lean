@@ -25,6 +25,9 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4D.3 (書籍 p. 145)�
 * **(f)** `p > 2` なら `x ^ p = 1` (`pow_eq_one_of_ne_two`)
 * **(g)** `p = 2` なら `x ^ 4 = 1` (`pow_four_eq_one_of_two`)
 
+さらに応用として **Problem 4D.4** (`actionCommutator_eq_bot_of_isPGroup_two_of_fixes_pow_four`):
+奇数位数の `A` が `2`-群 `G` に作用し `x ^ 4 = 1` なる元をすべて固定するなら作用は自明。
+
 ## 基本構造
 
 仮説から直ちに `⁅G, A⁆ = G` (`actionCommutator_eq_top`) と,
@@ -354,6 +357,81 @@ theorem pow_four_eq_one_of_two (h : IsIrreducibleCoprimeAction φ) (hpG : IsPGro
   rwa [← pow_mul] at this
 
 end IsIrreducibleCoprimeAction
+
+/-! ### Problem 4D.4 -/
+
+private lemma card_lt_card_of_lt {X : Type*} [Group X] [Finite X] {H₁ H₂ : Subgroup X}
+    (hlt : H₁ < H₂) : Nat.card ↥H₁ < Nat.card ↥H₂ :=
+  Set.Finite.card_lt_card (Set.toFinite _) (SetLike.coe_ssubset_coe.mpr hlt)
+
+/-- `A`-不変部分群 `H` への制限作用で `A`-不変な `K ≤ H` は, `G` へ押し出しても `A`-不変. -/
+theorem isAInvariant_map_subtype_of_isAInvariant {H : Subgroup G}
+    (hH : Ch03.IsAInvariant φ H) {K : Subgroup ↥H}
+    (hK : Ch03.IsAInvariant (OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH) K) :
+    Ch03.IsAInvariant φ (K.map H.subtype) := by
+  rw [Ch03.isAInvariant_iff_smul_mem]
+  rintro a _ ⟨k, hk, rfl⟩
+  exact ⟨_, hK.smul_mem a hk, rfl⟩
+
+/-- **Isaacs Problem 4D.4**: 奇数位数の `A` が `2`-群 `G` に自己同型で作用し, `x ^ 4 = 1` を
+満たす元をすべて固定するなら, `G` への作用は自明。
+
+`|H|` についての強い帰納法。`A`-不変部分群 `H` への制限作用が非自明なら, 帰納法の仮定より
+`A` は `H` の真の `A`-不変部分群すべてに自明に作用するので `IsIrreducibleCoprimeAction` が
+成立し, **Problem 4D.3(g)** から `H` の全元が `y ^ 4 = 1` を満たす。すると仮定より `A` は
+`H` を固定するので, いずれにせよ `A` は `H` 上で自明に作用する。
+
+⚠ `p` が奇素数のときの対応物は Isaacs **Theorem 4.36** (`x ^ p = 1` を固定すれば自明) で,
+そちらは Baer trick を使う。`p = 2` では `x ^ 2 = 1` では足りず `x ^ 4 = 1` が要る
+(4D.3(g) が与える上界がちょうど `4`)。 -/
+theorem actionCommutator_eq_bot_of_isPGroup_two_of_fixes_pow_four
+    [Finite A] [Finite G] (hG : IsPGroup 2 G) (hA : Odd (Nat.card A))
+    (hfix : ∀ x : G, x ^ 4 = 1 → ∀ a : A, (φ a) x = x) :
+    actionCommutator φ = ⊥ := by
+  have hmod : Nat.card A % 2 = 1 := Nat.odd_iff.mp hA
+  have hnd : ¬ (2 ∣ Nat.card A) := by
+    rintro ⟨k, hk⟩
+    omega
+  have hcop2 : Nat.Coprime (Nat.card A) 2 :=
+    Nat.coprime_comm.mp ((Nat.Prime.coprime_iff_not_dvd Nat.prime_two).mpr hnd)
+  have key : ∀ n : ℕ, ∀ H : Subgroup G, Nat.card ↥H ≤ n → Ch03.IsAInvariant φ H →
+      ∀ a : A, ∀ x ∈ H, (φ a) x = x := by
+    intro n
+    induction n with
+    | zero =>
+      intro H hcard _ _ _ _
+      have hpos : 0 < Nat.card ↥H := Nat.card_pos
+      omega
+    | succ n ih =>
+      intro H hcard hHinv a x hx
+      by_cases hbot : actionCommutator (OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hHinv) = ⊥
+      · exact congrArg Subtype.val
+          ((actionCommutator_eq_bot_iff_acts_trivially _).mp hbot a ⟨x, hx⟩)
+      · have hHp : IsPGroup 2 ↥H := hG.to_subgroup H
+        haveI : Group.IsNilpotent ↥H := hHp.isNilpotent
+        have hcop : Nat.Coprime (Nat.card A) (Nat.card ↥H) := by
+          obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := 2) (G := ↥H)).mp hHp
+          rw [hk]
+          exact Nat.Coprime.pow_right k hcop2
+        have hirr : IsIrreducibleCoprimeAction
+            (OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hHinv) :=
+          { coprime := hcop
+            solvable := Or.inr inferInstance
+            trivial_on_proper := by
+              intro K hKinv hKne b y hy
+              refine Subtype.ext (ih _ ?_ (isAInvariant_map_subtype_of_isAInvariant hHinv hKinv)
+                b (y : G) ⟨y, hy, rfl⟩)
+              rw [Subgroup.card_subtype]
+              have h1 : Nat.card ↥K < Nat.card ↥(⊤ : Subgroup ↥H) :=
+                card_lt_card_of_lt (lt_top_iff_ne_top.mpr hKne)
+              rw [Subgroup.card_top] at h1
+              omega
+            nontrivial := hbot }
+        exact hfix x (congrArg Subtype.val (hirr.pow_four_eq_one_of_two hHp ⟨x, hx⟩)) a
+  rw [actionCommutator_eq_bot_iff_acts_trivially]
+  intro a g
+  exact key (Nat.card ↥(⊤ : Subgroup G)) ⊤ le_rfl
+    (Ch03.isAInvariant_iff_smul_mem.mpr fun _ _ _ => Subgroup.mem_top _) a g (Subgroup.mem_top g)
 
 end
 
