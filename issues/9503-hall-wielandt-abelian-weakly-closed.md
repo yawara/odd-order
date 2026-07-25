@@ -397,3 +397,20 @@ Gorenstein p. 257 は Hall–Wielandt について
 2. **ChatGPT (最強モデル) に古典証明を再構成させる** ([[feedback-ask-chatgpt-for-elided-gaps]])
    — 自己完結プロンプト + 回答の厳密検証が前提。
 3. First Case 側でさらに `⁅R, L⁆` を決める材料を探す (現状 (11)(14)(15) には無い)。
+
+
+## 🤖 2026-07-26 ChatGPT 相談 (実行中)
+
+ChatGPT Pro (reasoning「非常に高い」) に Hall–Wielandt (p 奇 + A 可換弱閉) の
+古典証明を依頼した (chat: "Hall Wielandt Proof")。プロンプトの要点:
+
+- 定理の正確な statement (weakly closed の定義込み)
+- **Alperin 経由・Grün II の `Z(P)` 版で済ませるのは禁止** (Gorenstein p.257 の注記を明示)
+- Lean 4 形式化用なので各ステップ検証可能に、transfer 計算は横断集合を明示
+- `p > 2` をどこで使うかを明示
+- 副問: 本件の追加構造 (`N_G(A) = N_G(P) = N_G(Z(P))`、`P = C_G(Z(P))`、`|Z(P)| = p`、
+  `A` は位数 `p³` の初等可換で `P` に正規、`p = 3` で class(P) = 3 ゆえ class < p 判定は不可、
+  `Z(P)` の弱閉性は仮定できない) の下で近道はあるか
+
+⚠ 回答は **必ず自分で厳密検証**する ([[feedback-ask-chatgpt-for-elided-gaps]])。
+特に「A 可換版が Z(P) 版に帰着できる」系の主張は Gorenstein の注記と矛盾するので疑う。
