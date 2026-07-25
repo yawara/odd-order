@@ -331,8 +331,8 @@ private lemma exists_mem_mul_zpow_of_mem_comap {G : Type*} [Group G] {Z : Subgro
   rw [← QuotientGroup.ker_mk' Z, MonoidHom.mem_ker, map_mul, map_inv, map_zpow, hg, hn,
     mul_inv_cancel]
 
-/-- 引き戻し部分群の位数は `|Z|` 倍. -/
-private lemma card_comap_mk'_eq_mul {G : Type*} [Group G] [Finite G] {Z : Subgroup G} [Z.Normal]
+/-- 引き戻し部分群の位数は `|Z|` 倍: `|φ⁻¹(S)| = |S| · |Z|` (`φ : G ↠ G ⧸ Z`). -/
+theorem card_comap_mk'_eq_mul {G : Type*} [Group G] [Finite G] {Z : Subgroup G} [Z.Normal]
     (S : Subgroup (G ⧸ Z)) :
     Nat.card (S.comap (QuotientGroup.mk' Z)) = Nat.card S * Nat.card Z := by
   have hsurj : Function.Surjective (QuotientGroup.mk' Z) := QuotientGroup.mk'_surjective Z

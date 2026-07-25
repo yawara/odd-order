@@ -220,6 +220,7 @@ import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch04_Commutators.Mann
 import OddOrder.Isaacs.Ch04_Commutators.Problems
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsExtraspecial
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.Isaacs.Ch08_PermutationGroups.AffineGroup
 import OddOrder.Isaacs.Ch08_PermutationGroups.TransitiveAutomorphisms

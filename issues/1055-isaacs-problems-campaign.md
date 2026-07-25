@@ -821,6 +821,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | 4A.1 | ✅ | `commutator_eq_commutator_of_mul_eq_top` |
 | 4A.2 | ✅ | `exists_closure_commutatorTriple_eq_zpowers` (前半) / `exists_card_two_subgroups_commutator_triple_eq_top` (後半 = A₅ 実例 + Note) |
 | 4A.3 | ✅ | `IsQuasiquaternion` (定義) / `eq_bot_of_isQuasiquaternion_quotient` |
+| 4A.5 | ✅ | (a) `index_centralizer_eq_of_not_mem_center` / (b) `card_closure_pair_eq` / (c) `index_centralizer_closure_pair_eq` / (d) `map_center_centralizer_eq_center` + `isExtraspecial_centralizer_closure_pair` / (e) `exists_index_center_eq_prime_pow_two_mul` (新 leaf `ProblemsExtraspecial.lean`) |
 | 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 同値形 `frattini_eq_center_of_commutator_eq_center` + 橋 `isExtraspecial_of_commutator_eq_center`) |
 
 - **4A.1** (`G = AB`, `A`,`B` abelian ⟹ `G' = ⁅A,B⁆`): `⁅A,B⁆` の正規性は既存の
@@ -863,8 +864,21 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   (`map_commutator_eq` + `comap_map_eq` + `Z ≤ G'`) から `|C||Z| = |C||Z|²` ⟹ `|Z| = 1`。
   ⚠ counting なので `[Finite G]` を仮定 (書籍も有限群の文脈)。
 
-### 残り (文書順): 4A.5 (extraspecial の
-構造 (a)-(e)) / 4A.6 (maximal class) / 4A.7-4A.8 (regular wreath product; §3A で作った
+- **4A.5** (extraspecial の構造 (a)-(e)、新 leaf `Ch04_Commutators/ProblemsExtraspecial.lean`):
+  中心道具は**類 2 の左交換子準同型** `commutatorLeftHom` (`g ↦ ⁅x,g⁆`、核 = `C_P(x)`) と
+  そこから出る恒等式 3 本 (`⁅a,bc⁆ = ⁅a,b⁆⁅a,c⁆` / `⁅a,b⁻¹⁆` / `⁅a,b^n⁆`)。
+  (a) は核・像の Lagrange (`index_ker` + 像が位数 `p` の `Z(P)` の非自明部分群)。
+  (b) は `P/Z(P)` が elementary abelian (4A.4) で `⟨x̄⟩ ⊓ ⟨ȳ⟩ = 1` を示し
+  `|U| = |U の像| · |Z| = p²·p`。
+  **(c)(d)(e) の要は中心積分解 `P = V·U`** (`exists_mem_centralizer_mul_mem_closure_pair`):
+  `⁅x,g⁆ = c^i` から `g(y^i)⁻¹ ∈ C_P(x)`、さらに `⁅y,·⁆` を潰して `V` に落とす。
+  これで (d) の `Z(V) = Z(P)` は**位数勘定なしで**出る (書籍の `P > U` すら不要 —
+  `P > U` は `V` の非可換性、すなわち extraspecial 性の側でだけ要る)。
+  (c) は `|VU|·|V ⊓ U| = |V||U|` に `VU = P`, `V ⊓ U = Z(P)`, `|U| = p³` を代入。
+  (e) は `|Q|` の強帰納法 (書籍 Hint)、基底は `Q = U` (`|Q| = p³`)、段は `V` extraspecial +
+  `[Q:V] = p²` + `Z(V) = Z(Q)`。
+
+### 残り (文書順): 4A.6 (maximal class) / 4A.7-4A.8 (regular wreath product; §3A で作った
 `WreathProduct` インフラが使える) / 4A.9 / 4A.10 / 4A.11。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
