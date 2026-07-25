@@ -230,6 +230,43 @@ landed (同 leaf):
 
 現時点の推奨は **1** (下流の一般性も高く、Peterfalvi の引用どおりの定理が手に入る)。
 
+## 🎯 2026-07-26 方針転換 — **Alperin も Grün I も要らない: `Z(R₂)` の弱閉性ルート**
+
+Gorenstein pp. 251-257 を精読した結果、**もっと短い経路**が見つかった。
+
+- Gorenstein Thm 7.5.2 (Grün 第二定理) = 「G が `p`-normal (= `Z(P)` が `P` 内で弱閉)
+  なら `P ∩ G' = P ∩ N'`, `N = N_G(Z(P))`」。証明は Grün 第一定理 (Thm 7.4.2) 経由で、
+  そちらは **Alperin の融合定理**を使う (repo/mathlib に無い、重い)。
+- しかし **Isaacs 演習 5C.6(d)** =「`W ≤ Z(P)` が `P` 内で弱閉なら `N_G(W)` が
+  `P` の `G`-融合を制御する」は **Sylow + 弱閉性だけ**で証明できる (Alperin 不要):
+  > `x, y ∈ P`, `y = x^g` とする。`W ≤ Z(P)` より `W ≤ C_G(y)` かつ `W^g ≤ C_G(y)`。
+  > `C := C_G(y)` の Sylow `p` で両者を共通の `U` に入るよう `c ∈ C` で共役し、
+  > `U ≤ T` (G の Sylow) を取ると `W, W^{gc} ≤ T`。5C.6(a) より `W` は `T` 内でも弱閉
+  > ⟹ `W^{gc} = W` ⟹ `gc ∈ N_G(W)`、かつ `x^{gc} = y^c = y` ⟹ `x ~_N y`。
+- 融合制御 + **focal subgroup 定理 (repo に landed: `Isaacs.Ch05.focalSubgroupTheorem`)**
+  で `P ∩ G' = focal_G(P) = focal_N(P) = P ∩ N'` が出る。
+
+**本 First Case への適用**: `Z(R₂) = Z₁` (landed `inf_centralizer_sylow_eq_zpowers`)、
+`N_G(Z₁) = R₂⟨s⟩` (landed) なので、**`Z₁` が `R₂` 内で弱閉**でありさえすれば
+`R₂ ∩ G' = R₂ ∩ N'` が出て、(B2) (`R₂ ≤ G'`) から `R₂ ≤ N'` ⟹ `¬3 ∣ |Ab N|`。
+**|W| = 3 / 9 の場合分けも wreath 排除も不要**になる (Yoshida ルートを置き換える)。
+
+### 残作業 (この方針)
+- [x] `IsWeaklyClosed` の定義 + **5C.6(a)** (共役 Sylow への弱閉性の移送)
+      = `OddOrder/GroupTheory/WeaklyClosed.lean` (2026-07-26 landed)
+- [ ] **5C.6(d)**: `W ≤ Z(P)` 弱閉 ⟹ `N_G(W)` が `P` の `G`-融合を制御
+      (上の Sylow 論法; `C_G(y)` 内の Sylow 共役 + `IsPGroup.exists_le_sylow`)
+- [ ] focal 連結: 融合制御 ⟹ `focal_G(P) = focal_N(P)` ⟹ `P ∩ G' = P ∩ N'`
+      (repo の `focalSubgroupTheorem` を `G` と `↥N` の両方で使う)
+- [ ] **`Z₁` が `R₂` 内で弱閉** (= この設定での 3-normality) ← **唯一の新しい数学**
+      - 同値形: `Z₁ ≤ Q` (Sylow) ⟹ `Q = R₂`。`R₂ = C_G(Z₁)` なので
+        「`Z₁` を含む Sylow は `Z₁` を中心化する」と言い換わる。
+      - 手掛かり: `Z₁^x ≤ R₂ ⟹ Z₁ ≤ R₂^x` (`R₂ = C_G(Z₁)` から対称に出る)、
+        `E := Z₁Z₁^x` は `C_G(E) = R₂ ⊓ R₂^x` の中心に入る、
+        `Z₁` の元は強実で `C_G(z) = R₂` は奇数位数、
+        (16) の「`A = Z₁ΣP` 内の強実線は `Z₁` だけ」、(17) の `A` の弱閉性。
+      - ⟹ `Z₁^x ≤ A` (または `≤ LV`) さえ言えれば (16) で決着する。
+
 ## 証明方針 (旧、未確定)
 
 古典的には **Grün の第二定理** (weakly closed abelian `A` ⟹ `N_G(A)` が p-transfer を
