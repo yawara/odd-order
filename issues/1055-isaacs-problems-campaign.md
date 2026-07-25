@@ -1485,7 +1485,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5A.7 | ✅ | `card_ker_lt_relIndex_commutator` (同上)。書籍の `G/C` cyclic 仮定は `BC = G` + `B` cyclic から従うので導出に変更 |
 | 5A.6 | ✅ | `card_ker_dvd_two_of_dihedral` (上界) + `isStemExtension_dihedralReduce` (下界) — `ProblemsDihedralMultiplier.lean`。書籍の `2^n` 版より強い**偶数一般形**で証明 |
 | 5A.8(a) | ✅ | `isStemExtension_prodMap` + `card_ker_prodMap` (`ProblemsSchurMultiplier.lean`) |
-| 5A.8(b) | 🔨 ステップ 1-5 前半 landing 済 | `ProblemsProductMultiplier.lean` に `inf_ker_snd_ker_fst` / `exists_mem_ker_snd_mul_mem_ker_fst` / ⭐`commutator_ker_snd_ker_fst_eq_bot`。残りはステップ 4-6 (下記設計)。準備補題 `not_dvd_card_commutator_of_sylow_le_center` (ステップ 5 用) も landing 済 |
+| 5A.8(b) | 🔨 ステップ 1-5 landing 済 (残り 6) | `ProblemsProductMultiplier.lean` に `inf_ker_snd_ker_fst` / `exists_mem_ker_snd_mul_mem_ker_fst` / ⭐`commutator_ker_snd_ker_fst_eq_bot`。残りはステップ 4-6 (下記設計)。準備補題 `not_dvd_card_commutator_of_sylow_le_center` (ステップ 5 用) も landing 済 |
 
 ### 5A.8(b) の証明設計 (2026-07-26 確定、実装は次イテレーション)
 
@@ -1538,9 +1538,17 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
   `exact hmap.symm` 一行で済む (手で語の並べ替えをする必要はない)。
   ⚠ ただし `map_commutatorElement` の引数は**明示的に与える** (期待型からの推論に失敗する)。
 - 5A.8(b) 側では `isCentralProduct_top` / `commutator_eq_sup` / `exists_mul_mem_inf_commutator`。
-- **次はステップ 5 後半** (`Z_A ⊓ Z_B = ⊥`) — `p ∤ |A|` なら `|Γ_A| = |A||Z|` の Sylow-p は
-  `Z` の Sylow-p (中心的) なので `not_dvd_card_commutator_of_sylow_le_center` が効く、
-  という筋。その後ステップ 6 (`Γ_A/Z_B ↠ A` が stem extension)。
+- **ステップ 5 後半も landing (2026-07-26)**: `inf_inf_commutator_eq_bot` = `Z_A ⊓ Z_B = ⊥`。
+  鍵は**抽象化**した `not_dvd_card_commutator_of_ker_le_center`:
+  「中心的な核をもつ `ψ : K →* A'` があり `p ∤ |A'|` なら `p ∤ |K'|`」。
+  `Syl_p(K)` の元は位数が `p` 冪、その `ψ` 像の位数は `|A'|` を割る ⇒ 互いに素で像 = 1 ⇒
+  `Syl_p(K) ≤ ker ψ ≤ Z(K)` ⇒ `not_dvd_card_commutator_of_sylow_le_center`。
+  ⭐ この抽象形にすると `Γ_A` 側と `Γ_B` 側が**同じ補題の 2 適用**で済む
+  (`ψ` = `fst∘h` / `snd∘h` の制限)。`|Γ_A| = |A||Z|` の位数計算は一切不要だった。
+  `⁅H,H⁆` ↔ `commutator ↥H` の往復は mathlib `Subgroup.map_subtype_commutator` +
+  `Subgroup.equivMapOfInjective` (`card_commutator_subgroup`)。
+- ⚠ `Subgroup.commutator_le_self` は **mathlib に既存** (自作しかけたので削除)。
+- **次はステップ 6** (`Γ_A/Z_B ↠ A` が核 `Z/Z_B` の stem extension、核の位数の積 = `|Z|`)。
 
 ### ⚠ 5A.6 の書籍読解訂正 (2026-07-26)
 
