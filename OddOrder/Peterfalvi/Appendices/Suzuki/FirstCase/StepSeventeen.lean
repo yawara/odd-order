@@ -443,6 +443,78 @@ theorem map_conj_eq_of_le_sylow
   fc.map_conj_eq_of_map_conj_zpowers_le model ind hB2 S hR₁S
     (fc.map_conj_zpowers_le_sup_nonsplitTorus_V model ind hB2 S hR₁S hx)
 
+include model in
+/-- **`N_G(R₂) = R₂⟨s⟩ = N_G(Z₁PΣ)`** ((17), p. 114): `R₂ = C_G(Z₁)` and `Z(R₂) = Z₁`
+by (14), so normalizing `R₂` is the same as normalizing `Z₁`. -/
+theorem normalizer_sylow_eq
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
+    (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G)) :
+    Subgroup.normalizer (((S : Subgroup G)) : Set G)
+      = (S : Subgroup G)
+        ⊔ Subgroup.zpowers fc.toHypothesis.distinguishedInvolution := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  have hSeq := fc.sylow_eq_centralizer_zpowers model ind hB2 S hR₁S
+  have hZeq := fc.inf_centralizer_sylow_eq_zpowers model ind hB2 S hR₁S
+  rw [← fc.normalizer_zpowers_eq_sylow_sup_zpowers model ind hB2 S hR₁S]
+  refine le_antisymm (fun g hg => ?_) (fun g hg => ?_)
+  · -- normalizing `R₂` forces normalizing `Z(R₂) = Z₁`
+    rw [Subgroup.mem_set_normalizer_iff] at hg
+    rw [Subgroup.mem_set_normalizer_iff]
+    intro y
+    have hcen : ∀ z : G, z ∈ Subgroup.centralizer (((S : Subgroup G)) : Set G)
+        ↔ g * z * g⁻¹ ∈ Subgroup.centralizer (((S : Subgroup G)) : Set G) := by
+      intro z
+      refine ⟨fun hz => Subgroup.mem_centralizer_iff.mpr fun u hu => ?_,
+        fun hz => Subgroup.mem_centralizer_iff.mpr fun u hu => ?_⟩
+      · have hu' : g⁻¹ * u * g ∈ (S : Subgroup G) := by
+          refine (hg (g⁻¹ * u * g)).mpr ?_
+          rw [show g * (g⁻¹ * u * g) * g⁻¹ = u by group]
+          exact hu
+        have h := Subgroup.mem_centralizer_iff.mp hz _ hu'
+        calc u * (g * z * g⁻¹) = g * ((g⁻¹ * u * g) * z) * g⁻¹ := by group
+          _ = g * (z * (g⁻¹ * u * g)) * g⁻¹ := by rw [h]
+          _ = (g * z * g⁻¹) * u := by group
+      · have hu' : g * u * g⁻¹ ∈ (S : Subgroup G) := (hg u).mp hu
+        have h := Subgroup.mem_centralizer_iff.mp hz _ hu'
+        have h2 : (g * u * g⁻¹) * (g * z * g⁻¹) = (g * z * g⁻¹) * (g * u * g⁻¹) := h
+        have h3 : g * (u * z) * g⁻¹ = g * (z * u) * g⁻¹ := by
+          calc g * (u * z) * g⁻¹ = (g * u * g⁻¹) * (g * z * g⁻¹) := by group
+            _ = (g * z * g⁻¹) * (g * u * g⁻¹) := h2
+            _ = g * (z * u) * g⁻¹ := by group
+        exact mul_left_cancel (mul_right_cancel h3)
+    rw [← hZeq]
+    constructor
+    · rintro ⟨hy1, hy2⟩
+      exact ⟨(hg y).mp hy1, (hcen y).mp hy2⟩
+    · rintro ⟨hy1, hy2⟩
+      exact ⟨(hg y).mpr hy1, (hcen y).mpr hy2⟩
+  · -- normalizing `Z₁` forces normalizing `C_G(Z₁) = R₂`
+    rw [Subgroup.mem_set_normalizer_iff] at hg
+    rw [Subgroup.mem_set_normalizer_iff, ← hSeq]
+    intro y
+    refine ⟨fun hy => Subgroup.mem_centralizer_iff.mpr fun u hu => ?_,
+      fun hy => Subgroup.mem_centralizer_iff.mpr fun u hu => ?_⟩
+    · have hu' : g⁻¹ * u * g ∈ Subgroup.zpowers
+          (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) := by
+        refine (hg (g⁻¹ * u * g)).mpr ?_
+        rw [show g * (g⁻¹ * u * g) * g⁻¹ = u by group]
+        exact hu
+      have h := Subgroup.mem_centralizer_iff.mp hy _ hu'
+      calc u * (g * y * g⁻¹) = g * ((g⁻¹ * u * g) * y) * g⁻¹ := by group
+        _ = g * (y * (g⁻¹ * u * g)) * g⁻¹ := by rw [h]
+        _ = (g * y * g⁻¹) * u := by group
+    · have hu' : g * u * g⁻¹ ∈ Subgroup.zpowers
+        (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) := (hg u).mp hu
+      have h : (g * u * g⁻¹) * (g * y * g⁻¹) = (g * y * g⁻¹) * (g * u * g⁻¹) :=
+        Subgroup.mem_centralizer_iff.mp hy _ hu'
+      have h3 : g * (u * y) * g⁻¹ = g * (y * u) * g⁻¹ := by
+        calc g * (u * y) * g⁻¹ = (g * u * g⁻¹) * (g * y * g⁻¹) := by group
+          _ = (g * y * g⁻¹) * (g * u * g⁻¹) := h
+          _ = g * (y * u) * g⁻¹ := by group
+      exact mul_left_cancel (mul_right_cancel h3)
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
