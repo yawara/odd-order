@@ -438,3 +438,9 @@ build green、AxiomsCheck OK。章単位で commit・issue checkbox 更新。
 Isaacs Problems campaign (lane a の現 frontier) はユーザー裁定で凍結。再開時は本文の
 文書順 (Ch.1 §A から) と置き場規約 (ChNN/Problems*.lean) をそのまま引き継ぐ。
 lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
+
+## ☀ 2026-07-25 UNFROZEN (ユーザー指示) — open へ復帰
+
+ユーザー指示「凍結してた問題を解くやつをやります」で campaign 再開。文書順で最古の未完
+= **§1C の 1C.4 / 1C.5** (deferred-heavy) から再訪 → 以降 1D.5 / §2A hard tail
+(2A.4/5/6/9) / §3A 残り (3A.4/6/7/8) / §3B〜 の順。
