@@ -1112,6 +1112,145 @@ theorem disjoint_conj_of_forall_normalizer_le {G : Type*} [Group G] [Finite G] {
     rwa [inv_mul_cancel_left] at h
   exact hg (by simpa using H.inv_mem hginv)
 
+/-! ### Problem 1D.18 / 1D.19 — Fitting 部分群と中心・中心化群 -/
+
+/-- **Isaacs Problem 1D.18** (書籍 p. 28): 任意の有限群 `G` について
+`F(G / Z(G)) = F(G) / Z(G)`.
+
+`⊇` は `F(G)` の像が正規かつ冪零だから (`nilpotent_normal_le_fitting`).
+`⊆` は `N := F(G/Z(G))` の逆像を取ると `N / Z(G)` が冪零で `Z(G) ≤ Z(N)` なので
+`N / Z(N)` も冪零, `Group.of_quotient_center_nilpotent` で `N` 自身が冪零となり
+`N ≤ F(G)` が従う. -/
+theorem fitting_quotient_center {G : Type*} [Group G] [Finite G] :
+    fitting (G ⧸ Subgroup.center G)
+      = (fitting G).map (QuotientGroup.mk' (Subgroup.center G)) := by
+  refine le_antisymm ?_ ?_
+  · -- `N := F(G/Z)` の逆像は冪零.
+    set N : Subgroup G := (fitting (G ⧸ Subgroup.center G)).comap
+      (QuotientGroup.mk' (Subgroup.center G)) with hN
+    haveI hNnormal : N.Normal := (fitting.normal (G ⧸ Subgroup.center G)).comap _
+    have hmapN : N.map (QuotientGroup.mk' (Subgroup.center G))
+        = fitting (G ⧸ Subgroup.center G) :=
+      Subgroup.map_comap_eq_self_of_surjective
+        (QuotientGroup.mk'_surjective (Subgroup.center G)) _
+    set φ : ↥N →* G ⧸ Subgroup.center G :=
+      (QuotientGroup.mk' (Subgroup.center G)).comp N.subtype with hφ
+    have hker : φ.ker = (Subgroup.center G).subgroupOf N := by
+      ext x
+      simp [hφ, MonoidHom.mem_ker, Subgroup.mem_subgroupOf, QuotientGroup.eq_one_iff]
+    have hrange : φ.range = fitting (G ⧸ Subgroup.center G) := by
+      rw [hφ, MonoidHom.range_comp, Subgroup.range_subtype, hmapN]
+    haveI hnilrange : Group.IsNilpotent ↥φ.range := by
+      rw [hrange]; exact fitting.isNilpotent
+    haveI hquotnil : Group.IsNilpotent (↥N ⧸ φ.ker) :=
+      Group.nilpotent_of_mulEquiv (QuotientGroup.quotientKerEquivRange φ).symm
+    have hcen : φ.ker ≤ Subgroup.center ↥N := by
+      rw [hker]
+      intro x hx
+      rw [Subgroup.mem_center_iff]
+      intro y
+      have hxZ : (x : G) ∈ Subgroup.center G := Subgroup.mem_subgroupOf.mp hx
+      exact Subtype.ext (Subgroup.mem_center_iff.mp hxZ (y : G))
+    haveI hcennil : Group.IsNilpotent (↥N ⧸ Subgroup.center ↥N) := by
+      refine Group.nilpotent_of_surjective
+        (QuotientGroup.map φ.ker (Subgroup.center ↥N) (MonoidHom.id ↥N)
+          (by simpa using hcen)) ?_
+      intro x
+      obtain ⟨y, rfl⟩ := QuotientGroup.mk_surjective x
+      exact ⟨QuotientGroup.mk y, by simp⟩
+    haveI : Group.IsNilpotent ↥N := Group.of_quotient_center_nilpotent inferInstance
+    calc fitting (G ⧸ Subgroup.center G)
+        = N.map (QuotientGroup.mk' (Subgroup.center G)) := hmapN.symm
+      _ ≤ (fitting G).map (QuotientGroup.mk' (Subgroup.center G)) :=
+          Subgroup.map_mono nilpotent_normal_le_fitting
+  · -- `F(G)` の像は正規冪零.
+    haveI : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
+    haveI : Group.IsNilpotent
+        ↥((fitting G).map (QuotientGroup.mk' (Subgroup.center G))) :=
+      Group.nilpotent_of_surjective
+        ((QuotientGroup.mk' (Subgroup.center G)).subgroupMap (fitting G))
+        (MonoidHom.subgroupMap_surjective _ _)
+    haveI : ((fitting G).map (QuotientGroup.mk' (Subgroup.center G))).Normal :=
+      (fitting.normal G).map _ (QuotientGroup.mk'_surjective _)
+    exact nilpotent_normal_le_fitting
+
+/-- `C = C_G(F(G))` のとき `C ⊓ F(G)` (`= Z(F(G))`, 下の `center_fitting_map_eq_inf_centralizer`)
+は `↥C` の中心に含まれる. -/
+theorem fitting_subgroupOf_le_center_of_eq_centralizer {G : Type*} [Group G] {C : Subgroup G}
+    (hC : C = Subgroup.centralizer ((fitting G : Subgroup G) : Set G)) :
+    (fitting G).subgroupOf C ≤ Subgroup.center ↥C := by
+  intro x hx
+  rw [Subgroup.mem_center_iff]
+  intro y
+  have hxF : (x : G) ∈ fitting G := Subgroup.mem_subgroupOf.mp hx
+  have hy : (y : G) ∈ Subgroup.centralizer ((fitting G : Subgroup G) : Set G) := by
+    rw [← hC]; exact y.2
+  exact Subtype.ext ((Subgroup.mem_centralizer_iff.mp hy) (x : G) hxF).symm
+
+/-- `Z(F(G))` を `G` の部分群として見ると `F(G) ⊓ C_G(F(G))` に一致する. -/
+theorem center_fitting_map_eq_inf_centralizer {G : Type*} [Group G] :
+    (Subgroup.center ↥(fitting G)).map (fitting G).subtype
+      = fitting G ⊓ Subgroup.centralizer ((fitting G : Subgroup G) : Set G) := by
+  ext x
+  simp only [Subgroup.mem_map, Subgroup.coe_subtype, Subgroup.mem_inf]
+  constructor
+  · rintro ⟨⟨y, hy⟩, hcen, rfl⟩
+    refine ⟨hy, Subgroup.mem_centralizer_iff.mpr fun z hz => ?_⟩
+    have hzy := Subgroup.mem_center_iff.mp hcen ⟨z, hz⟩
+    exact congrArg Subtype.val hzy
+  · rintro ⟨hxF, hxC⟩
+    refine ⟨⟨x, hxF⟩, ?_, rfl⟩
+    rw [Subgroup.mem_center_iff]
+    intro y
+    exact Subtype.ext ((Subgroup.mem_centralizer_iff.mp hxC) (y : G) y.2)
+
+open scoped commutatorElement in
+/-- **Isaacs Problem 1D.19** (書籍 p. 28): `F = F(G)`, `C = C_G(F)` とすると
+`C / (C ⊓ F)` は非自明な abelian 正規部分群を持たない.
+
+対応定理の形で述べる: `↥C` の正規部分群 `A` の `C/(C ⊓ F)` での像が abelian
+(すなわち `⁅A, A⁆ ≤ F.subgroupOf C`) ならば `A ≤ F.subgroupOf C`.
+
+証明: `C ⊓ F` (= `Z(F)`) は `↥C` の中心に入るので `⁅A, A⁆ ≤ Z(↥C)`, したがって
+`A` の交換子は `Z(↥A)` に入り `A` は冪零 (類 ≤ 2). `C ⊴ G` (正規部分群の中心化群) なので
+`F(↥C)` の像は `G` で正規冪零, つまり `F(↥C) ≤ F.subgroupOf C`
+(`fitting_map_subtype_le_fitting`). `A ⊴ C` が冪零なら `A ≤ F(↥C)` だから結論. -/
+theorem le_fitting_subgroupOf_of_commutator_le {G : Type*} [Group G] [Finite G]
+    {C : Subgroup G} (hC : C = Subgroup.centralizer ((fitting G : Subgroup G) : Set G))
+    {A : Subgroup ↥C} [A.Normal] (hcomm : ⁅A, A⁆ ≤ (fitting G).subgroupOf C) :
+    A ≤ (fitting G).subgroupOf C := by
+  haveI hCnormal : C.Normal := hC ▸ Subgroup.normal_centralizer
+  have hFcen : (fitting G).subgroupOf C ≤ Subgroup.center ↥C :=
+    fitting_subgroupOf_le_center_of_eq_centralizer hC
+  -- `A` の交換子は `Z(↥A)` に入るので `A` は冪零 (類 ≤ 2).
+  have hcomm_center : ∀ a b : ↥A, (⁅a, b⁆ : ↥A) ∈ Subgroup.center ↥A := by
+    intro a b
+    have hmem : (⁅(a : ↥C), (b : ↥C)⁆ : ↥C) ∈ ⁅A, A⁆ :=
+      Subgroup.commutator_mem_commutator a.2 b.2
+    have hcen : (⁅(a : ↥C), (b : ↥C)⁆ : ↥C) ∈ Subgroup.center ↥C := hFcen (hcomm hmem)
+    rw [Subgroup.mem_center_iff]
+    intro y
+    refine Subtype.ext ?_
+    have hy := Subgroup.mem_center_iff.mp hcen (y : ↥C)
+    simpa [commutatorElement_def, mul_assoc] using hy
+  haveI hAcomm : IsMulCommutative (↥A ⧸ Subgroup.center ↥A) := by
+    refine Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr ?_
+    rw [commutator_def, Subgroup.commutator_le]
+    intro a _ b _
+    exact hcomm_center a b
+  haveI : Group.IsNilpotent ↥A := by
+    refine Group.of_quotient_center_nilpotent ?_
+    letI : CommGroup (↥A ⧸ Subgroup.center ↥A) :=
+      { (inferInstance : Group (↥A ⧸ Subgroup.center ↥A)) with
+        mul_comm := fun a b => (IsMulCommutative.is_comm
+          (M := ↥A ⧸ Subgroup.center ↥A)).comm a b }
+    infer_instance
+  -- `A ≤ F(↥C) ≤ F.subgroupOf C`.
+  refine (nilpotent_normal_le_fitting (N := A)).trans ?_
+  intro x hx
+  rw [Subgroup.mem_subgroupOf]
+  exact fitting_map_subtype_le_fitting (Subgroup.mem_map_of_mem C.subtype hx)
+
 end
 
 end OddOrder.Isaacs.Ch01

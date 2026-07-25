@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch02_Subnormality.Problems2D
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems
 
 /-!
@@ -1000,6 +1001,72 @@ theorem exists_greatest_isSolvable_normal {G : Type u} [Group G] [Finite G] :
   have hle : Nat.card ↥(R ⊔ N) ≤ Nat.card ↥R := hRmax _ ⟨inferInstance, hsolv⟩
   have heq : R = R ⊔ N := Subgroup.eq_of_le_of_card_ge le_sup_left hle
   exact heq ▸ le_sup_right
+
+/-! ### Problem 3B.14 — `Z(F(G))` は `C_G(F(G))` の最大可解正規部分群 -/
+
+/-- Problem 3B.14 の帰納本体: `C = C_G(F(G))` の可解正規部分群は `F(G) ⊓ C` に含まれる.
+`|S|` に関する強帰納法で, `⁅S, S⁆ < S` (可解) に帰納法の仮定を当ててから Problem 1D.19
+(`Ch01.le_fitting_subgroupOf_of_commutator_le`) を使う. -/
+theorem isSolvable_normal_le_fitting_subgroupOf_aux {G : Type u} [Group G] [Finite G]
+    {C : Subgroup G} (hC : C = Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G))
+    (n : ℕ) : ∀ S : Subgroup ↥C, S.Normal → IsSolvable ↥S → Nat.card ↥S ≤ n →
+      S ≤ (Ch01.fitting G).subgroupOf C := by
+  induction n with
+  | zero =>
+    intro S _ _ hcard
+    have := Nat.card_pos (α := ↥S)
+    omega
+  | succ n ih =>
+    intro S hSnorm hSsolv hcard
+    haveI := hSnorm
+    haveI := hSsolv
+    rcases eq_or_ne S ⊥ with rfl | hSne
+    · exact bot_le
+    · haveI : Nontrivial ↥S := (Subgroup.nontrivial_iff_ne_bot S).mpr hSne
+      have hlt : ⁅S, S⁆ < S := by
+        rw [← S.range_subtype, MonoidHom.range_eq_map, ← Subgroup.map_commutator,
+          Subgroup.map_subtype_lt_map_subtype]
+        exact IsSolvable.commutator_lt_top_of_nontrivial ↥S
+      haveI hcomm_normal : (⁅S, S⁆ : Subgroup ↥C).Normal := Subgroup.commutator_normal S S
+      haveI hcomm_solv : IsSolvable ↥(⁅S, S⁆ : Subgroup ↥C) :=
+        solvable_of_solvable_injective (f := Subgroup.inclusion hlt.le)
+          (Subgroup.inclusion_injective hlt.le)
+      have hcard' : Nat.card ↥(⁅S, S⁆ : Subgroup ↥C) ≤ n := by
+        have hne : (⁅S, S⁆ : Subgroup ↥C).subgroupOf S ≠ ⊤ := by
+          intro htop
+          rw [Subgroup.subgroupOf_eq_top] at htop
+          exact absurd htop hlt.not_ge
+        have hlt' := Subgroup.card_lt_card_of_ne_top hne
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hlt.le).toEquiv] at hlt'
+        omega
+      exact Ch01.le_fitting_subgroupOf_of_commutator_le hC (ih _ hcomm_normal hcomm_solv hcard')
+
+/-- **Isaacs Problem 3B.14** (書籍 p. 86): `F = F(G)`, `C = C_G(F)` とすると `Z(F)` は `C` の
+**最大の可解正規部分群**である.
+
+`Z(F)` は `G` の部分群としては `F ⊓ C` に一致する
+(`Ch01.center_fitting_map_eq_inf_centralizer`) ので, ここでは `↥C` の部分群
+`F.subgroupOf C` として述べる. 主張は 3 つ: (i) `C` で正規, (ii) 可解 (実際 abelian —
+`F ⊓ C ≤ Z(↥C)`), (iii) `C` の任意の可解正規部分群を含む.
+
+(iii) は Problem 1D.19 (`C/(C ⊓ F)` は非自明な abelian 正規部分群を持たない) から
+`|S|` の帰納法で従う (`isSolvable_normal_le_fitting_subgroupOf_aux`).
+
+書籍の Note: `G` が可解なら `C` 自身が可解正規なので (iii) より `C = Z(F)`, すなわち
+可解群では `C_G(F(G)) ≤ F(G)`. -/
+theorem center_fitting_greatest_isSolvable_normal_centralizer {G : Type u} [Group G] [Finite G]
+    {C : Subgroup G} (hC : C = Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G)) :
+    ((Ch01.fitting G).subgroupOf C).Normal ∧
+      IsSolvable ↥((Ch01.fitting G).subgroupOf C) ∧
+      ∀ S : Subgroup ↥C, S.Normal → IsSolvable ↥S → S ≤ (Ch01.fitting G).subgroupOf C := by
+  haveI hCnormal : C.Normal := hC ▸ Subgroup.normal_centralizer
+  refine ⟨Subgroup.normal_subgroupOf, ?_, fun S hS hSsolv =>
+    isSolvable_normal_le_fitting_subgroupOf_aux hC (Nat.card ↥S) S hS hSsolv le_rfl⟩
+  -- `F ⊓ C ≤ Z(↥C)` なので abelian, 特に可解.
+  have hle := Ch01.fitting_subgroupOf_le_center_of_eq_centralizer hC
+  refine isSolvable_of_comm fun a b => ?_
+  have ha : (a : ↥C) ∈ Subgroup.center ↥C := hle a.2
+  exact Subtype.ext (Subgroup.mem_center_iff.mp ha (b : ↥C)).symm
 
 end
 

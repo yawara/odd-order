@@ -775,8 +775,18 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **3A.7 ✅** ⟹ **§3A は 3A.6 のみ残り** (deferred-hard)。
 さらに **3B.1 ✅ / 3B.2 ✅ / 3B.3 ✅** (新 leaf `Ch03_SplitExtensions/Problems3B.lean`)。
 さらに **3B.4 ✅ / 3B.5 ✅**。
-**次 frontier = 3B.14 → 3B.15 (§3B の残り 2 問)**。3A.6 は §3B を進めた後に再訪する。
-⚠ `Problems3B.lean` は 1006 行 — 3B.14/3B.15 を入れる前後で 3B.8 クラスタ等を別 leaf へ分割する。
+**次 frontier = 3B.15 (Berkovich; §3B 最後の 1 問)**。3A.6 は §3B 完了後に再訪する。
+`Problems3B.lean` は 1073 行 (上限 1500) — 3B.15 追加後も余裕はあるが、§3B 完了時に
+3B.1-3B.6 / 3B.8-3B.15 で 2 leaf に割るのが topic 的に自然。
+
+### §1D の欠落 (2026-07-25 に発見・補充)
+
+§1D は **1D.17 までしか形式化されていなかった** (1D.18 / 1D.19 が欠落)。3B.14 が 1D.19 を
+使うので先に補充した。1D.18 = `F(G/Z(G)) = F(G)/Z(G)`、1D.19 = 「`C = C_G(F)` として
+`C/(C ⊓ F)` は非自明な abelian 正規部分群を持たない」(対応定理の形
+「`A ⊴ ↥C` かつ `⁅A,A⁆ ≤ F.subgroupOf C` ⟹ `A ≤ F.subgroupOf C`」で述べた)。
+⟹ **章末問題の「済」ラベルは番号ごとに実測で確認すること** (§1D は 1D.5 だけが欠落と
+思われていたが実際は 1D.18/1D.19 も欠けていた)。
 
 ### §3B の記録 (2026-07-25)
 
@@ -799,6 +809,9 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 | 3B.11 | ✅ | `prime_dvd_index_frattini_of_dvd_card_frattini` |
 | 3B.12 | ⚠ 訂正版 | `index_sup_eq_relIndex_of_isMinimalNormal_of_not_le` (書籍の主張は偽 — 下記) |
 | 3B.13 | ✅ | `exists_greatest_isSolvable_normal` (+ `isSolvable_sup_of_normal`) |
+| 3B.14 | ✅ | `center_fitting_greatest_isSolvable_normal_centralizer` (1D.19 + `|S|` 帰納) |
+| 1D.18 | ✅ | `Ch01.fitting_quotient_center` (§1D の欠落を補充) |
+| 1D.19 | ✅ | `Ch01.le_fitting_subgroupOf_of_commutator_le` (+ `center_fitting_map_eq_inf_centralizer`) |
 
 **設計メモ**:
 
