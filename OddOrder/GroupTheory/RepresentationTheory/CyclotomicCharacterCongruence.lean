@@ -84,6 +84,11 @@ theorem int_dvd_of_intCast_eq_mul_isIntegral {a b : ℤ} (hb : b ≠ 0) {W : ℂ
 `p ∣ n`.  This is the form actually used in (12.16)/(13.5) — `z` is any algebraic integer of `ℂ`
 (matching the Coq/`Z[η]` formulation), no specific cyclotomic field needed.
 
+**Which (1.10.b) to use** (issue 0106): prefer *this* ℂ-form unless you already carry a
+`NumberField`/`IsCyclotomicExtension` structure — the abstract form
+`int_dvd_of_zeta_sub_one_dvd` says the same thing inside a `p`-th cyclotomic field and pulls
+in the number-field machinery with it.
+
 Proof: `∏_{1≤k<p}(1 - ε^k) = p` (`prod_one_sub_pow_eq_order`), and each `(1 - ε^k) ∣ (1 - ε) ∣ n`
 (`one_sub_pow_dvd_one_sub`) with integral cofactor, so the product `p` divides `n^{p-1}` with
 integral quotient; descending the rational algebraic integer to `ℤ` gives `p ∣ n^{p-1}`, hence
@@ -153,7 +158,12 @@ theorem exists_integral_linearChar_apply_sub {p : ℕ} (hp : 0 < p) {ε : ℂ}
 (`p` an odd prime), if an integer `n` is divisible by `ζ - 1` (`ζ` a primitive `p`-th root of
 unity) with an algebraic-integer quotient `a`, then `p ∣ n`.
 
-Norm argument: `N_{L/ℚ}(ζ - 1) = p`, `N(n) = n^{p-1}`, `N(a) ∈ ℤ`, so `n^{p-1} = p·N(a)`. -/
+Norm argument: `N_{L/ℚ}(ζ - 1) = p`, `N(n) = n^{p-1}`, `N(a) ∈ ℤ`, so `n^{p-1} = p·N(a)`.
+
+**Which (1.10.b) to use** (issue 0106): unless a `NumberField`/`IsCyclotomicExtension`
+structure is already in scope, use the ℂ-form `int_dvd_of_one_sub_primRoot_dvd` instead —
+it is the form the character-theoretic consumers ((12.16)/(13.5)) actually take, and it
+avoids this file's number-field hypotheses. -/
 theorem int_dvd_of_zeta_sub_one_dvd {p : ℕ} [hp : Fact p.Prime] (hp2 : p ≠ 2)
     {L : Type*} [Field L] [NumberField L] [IsCyclotomicExtension {p} ℚ L]
     {ζ : L} (hζ : IsPrimitiveRoot ζ p)
@@ -255,5 +265,21 @@ theorem exists_integral_apply_sub_of_commute {p : ℕ} (hp : 0 < p) {ε : ℂ}
   rwa [ClassFunction.restrict_apply, ClassFunction.restrict_apply,
     show ((⟨x, hxA⟩ * ⟨y, hyA⟩ : ↥A) : G) = x * y from rfl,
     show ((⟨y, hyA⟩ : ↥A) : G) = y from rfl] at he
+
+/-- **Peterfalvi (1.10), composed corollary (a)+(b)** (issue 0106): for a virtual character
+`ψ ∈ ℤ[Irr G]`, an element `x` with `x^p = 1` (`p` prime) and `y` commuting with `x`, if the
+difference `ψ(xy) - ψ(y)` happens to be a rational integer `n`, then `p ∣ n`.
+
+This is the landing form every consumer of (1.10.a) re-glued by hand: (a) gives
+`ψ(xy) - ψ(y) = (1 - ε)·z` with `z` integral, and (b) descends `(n : ℂ) = (1 - ε)·z`
+to `p ∣ n` in `ℤ`.  The primitive root `ε` is only auxiliary — any one works — and is kept
+as a hypothesis so this file needs no analysis import to manufacture one. -/
+theorem int_dvd_of_apply_sub_of_commute {p : ℕ} (hp : p.Prime) {ε : ℂ}
+    (hε : IsPrimitiveRoot ε p) {G : Type*} [Group G] [Finite G]
+    {ψ : ClassFunction G ℂ} (hψ : ψ ∈ ZIrr G) {x y : G} (hx : x ^ p = 1) (hxy : Commute x y)
+    {n : ℤ} (hn : ψ (x * y) - ψ y = (n : ℂ)) : (p : ℤ) ∣ n := by
+  obtain ⟨z, hz, he⟩ := exists_integral_apply_sub_of_commute hp.pos hε hψ hx hxy
+  rw [hn] at he
+  exact int_dvd_of_one_sub_primRoot_dvd hp hε hz he
 
 end OddOrder.RepresentationTheory
