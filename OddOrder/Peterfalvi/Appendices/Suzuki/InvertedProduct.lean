@@ -4,7 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Subgroup.Centralizer
+import Mathlib.GroupTheory.Sylow
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 
@@ -349,5 +351,192 @@ theorem map_eq_inv_of_forall_fixed_eq_one {X : Type*} [Group X] [Finite X]
     have := congrArg (· * z) hy1
     simpa using this
   rw [hxz, hz, hσwn, ← hz]
+
+/-! ## Cauchy's theorem inside `Z` (the Lemma, prime-divisor clause)
+
+If a prime `r` divides `|Z|`, then `Z` contains an element of order `r` (used
+in step (13) of the First Case, where every prime divisor of `|Z|` is then
+sifted through `PSL(2,8)`).  Proof: the number of Sylow `r`-subgroups of `X`
+divides the odd `|X|`, and the involutive automorphism `x ↦ t x t` acts on
+them as a `2`-group, so some Sylow `r`-subgroup `R` is `t`-invariant; the
+Lemma (a) applied to `R` and to `X` shows, by comparing `r`-adic valuations
+in `|X| = |Y||Z|`, that `R` contains a nontrivial `t`-inverted element, and a
+power of it has order exactly `r`. -/
+
+section CauchyInverted
+
+variable {M : Type*} [Group M] [Finite M] {t : M} {X : Subgroup M}
+
+/-- Conjugation by the involution `t` as an automorphism of `↥X`. -/
+private def conjInvolution (ht : t * t = 1) (hnorm : ∀ x ∈ X, t * x * t ∈ X) :
+    MulAut ↥X where
+  toFun x := ⟨t * ↑x * t, hnorm _ x.2⟩
+  invFun x := ⟨t * ↑x * t, hnorm _ x.2⟩
+  left_inv x := by
+    apply Subtype.ext
+    change t * (t * ↑x * t) * t = ↑x
+    calc t * (t * ↑x * t) * t = (t * t) * ↑x * (t * t) := by group
+      _ = ↑x := by rw [ht]; group
+  right_inv x := by
+    apply Subtype.ext
+    change t * (t * ↑x * t) * t = ↑x
+    calc t * (t * ↑x * t) * t = (t * t) * ↑x * (t * t) := by group
+      _ = ↑x := by rw [ht]; group
+  map_mul' x y := by
+    apply Subtype.ext
+    change t * (↑x * ↑y) * t = (t * ↑x * t) * (t * ↑y * t)
+    have h : (t * ↑x * t) * (t * ↑y * t) = t * (↑x * ↑y) * t := by
+      calc (t * ↑x * t) * (t * ↑y * t) = t * ↑x * (t * t) * ↑y * t := by group
+        _ = t * (↑x * ↑y) * t := by rw [ht]; group
+    exact h.symm
+
+omit [Finite M] in
+private lemma conjInvolution_sq (ht : t * t = 1)
+    (hnorm : ∀ x ∈ X, t * x * t ∈ X) :
+    conjInvolution ht hnorm * conjInvolution ht hnorm = 1 := by
+  refine DFunLike.ext _ _ fun x => Subtype.ext ?_
+  change t * (t * ↑x * t) * t = ↑x
+  calc t * (t * ↑x * t) * t = (t * t) * ↑x * (t * t) := by group
+    _ = ↑x := by rw [ht]; group
+
+/-- A positive `Nat.card` divisor of an odd number is odd. -/
+private lemma odd_of_dvd {a b : ℕ} (hodd : Odd b) (h : a ∣ b) : Odd a := by
+  obtain ⟨c, rfl⟩ := h
+  exact (Nat.odd_mul.mp hodd).1
+
+/-- **The Lemma, prime-divisor clause (Cauchy inside `Z`)**: if a prime `r`
+divides `|Z|`, then `Z` contains an element of order `r`. -/
+theorem exists_orderOf_eq_prime_of_dvd_ncard_invertedBy
+    (ht : t * t = 1) (hodd : Odd (Nat.card X))
+    (hnorm : ∀ x ∈ X, t * x * t ∈ X) {r : ℕ} (hr : r.Prime)
+    (hdvd : r ∣ (invertedBy X t).ncard) :
+    ∃ x ∈ invertedBy X t, orderOf x = r := by
+  classical
+  haveI : Fact r.Prime := ⟨hr⟩
+  set ψ : MulAut ↥X := conjInvolution ht hnorm with hψ_def
+  have hψ2 : ψ * ψ = 1 := conjInvolution_sq ht hnorm
+  -- the `2`-group `⟨ψ⟩` acts on the Sylow `r`-subgroups of `X`
+  set S : Subgroup (MulAut ↥X) := Subgroup.zpowers ψ with hS_def
+  have hS2 : IsPGroup 2 ↥S := by
+    have hord : orderOf ψ ∣ 2 :=
+      orderOf_dvd_of_pow_eq_one (by rw [pow_two]; exact hψ2)
+    rcases (Nat.dvd_prime Nat.prime_two).mp hord with h1 | h2
+    · exact IsPGroup.of_card (n := 0) (by rw [Nat.card_zpowers, h1, pow_zero])
+    · exact IsPGroup.of_card (n := 1) (by rw [Nat.card_zpowers, h2, pow_one])
+  -- the number of Sylow `r`-subgroups is odd, so some `R` is `ψ`-fixed
+  have hsylodd : Odd (Nat.card (Sylow r ↥X)) := by
+    have hP : Nonempty (Sylow r ↥X) := inferInstance
+    obtain ⟨P⟩ := hP
+    exact odd_of_dvd hodd
+      ((Sylow.card_dvd_index P).trans (Subgroup.index_dvd_card _))
+  have hmod' := hS2.card_modEq_card_fixedPoints (Sylow r ↥X)
+  have hmod : Nat.card (Sylow r ↥X) % 2
+      = Nat.card ↥(MulAction.fixedPoints ↥S (Sylow r ↥X)) % 2 := hmod'
+  have hfpodd : Odd (Nat.card
+      ↥(MulAction.fixedPoints ↥S (Sylow r ↥X))) := by
+    rw [Nat.odd_iff] at hsylodd ⊢
+    omega
+  have hfp_ne : (MulAction.fixedPoints ↥S (Sylow r ↥X)).Nonempty := by
+    rw [← Set.nonempty_coe_sort]
+    exact (Nat.card_pos_iff.mp hfpodd.pos).1
+  obtain ⟨R, hRfix⟩ := hfp_ne
+  have hψR : ψ • R = R := hRfix ⟨ψ, Subgroup.mem_zpowers ψ⟩
+  -- the `M`-form of `R` is a `t`-invariant subgroup carrying the `r`-part
+  set R' : Subgroup M := (R : Subgroup ↥X).map X.subtype with hR'_def
+  have hR'le : R' ≤ X := Subgroup.map_subtype_le _
+  have hcoeψR : ψ • (R : Subgroup ↥X) = (R : Subgroup ↥X) := by
+    have h0 := congrArg (fun P : Sylow r ↥X => (P : Subgroup ↥X)) hψR
+    rwa [Sylow.pointwise_smul_def] at h0
+  have hnormR' : ∀ x ∈ R', t * x * t ∈ R' := by
+    intro x hx
+    obtain ⟨y, hy, rfl⟩ := hx
+    have h1 : ψ • y ∈ ψ • (R : Subgroup ↥X) :=
+      Subgroup.smul_mem_pointwise_smul y ψ _ hy
+    rw [hcoeψR] at h1
+    exact ⟨ψ • y, h1, rfl⟩
+  -- Lemma (a) for `R'` and for `X`
+  have hoddR' : Odd (Nat.card ↥R') :=
+    odd_of_dvd hodd (Subgroup.card_dvd_of_le hR'le)
+  have hlemR := card_eq_card_centralizer_mul_ncard_invertedBy (X := R') ht
+    hoddR' hnormR'
+  have hlemX := card_eq_card_centralizer_mul_ncard_invertedBy (X := X) ht
+    hodd hnorm
+  -- `|R'| = r ^ K`, the full `r`-part of `|X|`
+  set K : ℕ := (Nat.card ↥X).factorization r with hK_def
+  have hcardR' : Nat.card ↥R' = r ^ K := by
+    rw [hR'_def, Nat.card_congr (Subgroup.equivMapOfInjective _ _
+      (Subgroup.subtype_injective X)).symm.toEquiv]
+    exact R.card_eq_multiplicity
+  -- `|C_{R'}(t)| = r ^ j` with `j ≤ v_r |C_X(t)|`
+  have hYR_dvd_R' : Nat.card ↥(R' ⊓ Subgroup.centralizer ({t} : Set M))
+      ∣ r ^ K := by
+    rw [← hcardR']
+    exact Subgroup.card_dvd_of_le inf_le_left
+  obtain ⟨j, hjK, hYRcard⟩ := (Nat.dvd_prime_pow hr).mp hYR_dvd_R'
+  have hj_le : j ≤ (Nat.card
+      ↥(X ⊓ Subgroup.centralizer ({t} : Set M))).factorization r := by
+    apply (Nat.Prime.pow_dvd_iff_le_factorization hr Nat.card_pos.ne').mp
+    rw [← hYRcard]
+    exact Subgroup.card_dvd_of_le (inf_le_inf hR'le le_rfl)
+  -- valuation bookkeeping in `|X| = |Y||Z|`: `v_r|Z| ≥ 1`
+  have hJpos : 0 < (invertedBy X t).ncard := by
+    rw [Set.ncard_pos (Set.toFinite _)]
+    exact ⟨1, X.one_mem, by rw [mul_one, ht, inv_one]⟩
+  have hKsplit : K = (Nat.card
+        ↥(X ⊓ Subgroup.centralizer ({t} : Set M))).factorization r
+      + ((invertedBy X t).ncard).factorization r := by
+    rw [hK_def, hlemX, Nat.factorization_mul Nat.card_pos.ne' hJpos.ne',
+      Finsupp.add_apply]
+  have hJv : 1 ≤ ((invertedBy X t).ncard).factorization r :=
+    hr.factorization_pos_of_dvd hJpos.ne' hdvd
+  -- the inverted part of `R'` has size `r ^ (K − j)` with `K − j ≥ 1`
+  have hZReq : (invertedBy R' t).ncard = r ^ (K - j) := by
+    have h5 : r ^ j * r ^ (K - j) = r ^ K := by
+      rw [← pow_add]
+      congr 1
+      omega
+    apply Nat.eq_of_mul_eq_mul_left (pow_pos hr.pos j)
+    rw [h5, ← hcardR', hlemR, hYRcard]
+  have h1lt : 1 < (invertedBy R' t).ncard := by
+    rw [hZReq]
+    calc 1 < r := hr.one_lt
+      _ ≤ r ^ (K - j) := Nat.le_self_pow (by omega) r
+  obtain ⟨z, hz, hzne⟩ : ∃ z ∈ invertedBy R' t, z ≠ 1 := by
+    by_contra hcon
+    push Not at hcon
+    have hsub : invertedBy R' t ⊆ ({1} : Set M) := fun z hz => hcon z hz
+    have hle1 := Set.ncard_le_ncard hsub (Set.finite_singleton 1)
+    rw [Set.ncard_singleton] at hle1
+    omega
+  -- a suitable power of `z` has order exactly `r`
+  have hordz : orderOf z ∣ r ^ K := by
+    rw [← hcardR']
+    exact orderOf_dvd_of_pow_eq_one (invertedBy.pow_card_eq_one_of_mem hz.1)
+  obtain ⟨i, hiK, hiord⟩ := (Nat.dvd_prime_pow hr).mp hordz
+  have hi1 : 1 ≤ i := by
+    by_contra h0
+    push Not at h0
+    have h00 : i = 0 := by omega
+    rw [h00, pow_zero] at hiord
+    exact hzne (orderOf_eq_one_iff.mp hiord)
+  refine ⟨z ^ r ^ (i - 1), ⟨X.pow_mem (hR'le hz.1) _,
+    invertedBy.t_conj_pow ht hz.2 _⟩, ?_⟩
+  have hne1 : z ^ r ^ (i - 1) ≠ 1 := by
+    intro h1
+    have hdvd2 : orderOf z ∣ r ^ (i - 1) := orderOf_dvd_of_pow_eq_one h1
+    rw [hiord] at hdvd2
+    have hle := (Nat.pow_dvd_pow_iff_le_right hr.one_lt).mp hdvd2
+    omega
+  have hpow : (z ^ r ^ (i - 1)) ^ r = 1 := by
+    rw [← pow_mul]
+    have h6 : r ^ (i - 1) * r = r ^ i := by
+      rw [← pow_succ]
+      congr 1
+      omega
+    rw [h6, ← hiord]
+    exact pow_orderOf_eq_one z
+  exact orderOf_eq_prime hpow hne1
+
+end CauchyInverted
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
