@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import Mathlib.Data.ZMod.Basic
 
 /-!
 # Isaacs Chapter 4 — Problem 4D.5 (半直積の導来長)
@@ -27,8 +28,9 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4D.5 (書籍 p. 146)�
   `commutator_commutator_inl_inr_map_eq`) ことから `W ≤ (B ⋊ A)^{(k)}` が `k ≤ m + 1` まで
   押し上がり, 忠実性が `W ≠ 1` を与える。
 
-⚠ 書籍の後半「任意に大きい導来長の可解群が存在する」(正則 wreath 積 `C ≀ A` を使う) は
-後続 iteration。
+* **系** `exists_finite_group_derivedSeries_ne_bot` — 任意の `n` に対し導来長がちょうど
+  `n + 1` の有限可解群が存在する (書籍後半「任意に大きい導来長の可解群」)。正則 wreath 積
+  `ZMod p ≀ A` を半直積 `(A → ZMod p) ⋊ A` (`regularPermAut`) として直接構成する。
 -/
 
 namespace OddOrder.Isaacs.Ch04
@@ -196,6 +198,106 @@ theorem derivedSeries_semidirectProduct_eq_bot_and_ne_bot [Finite A] [Finite B]
     derivedSeries (B ⋊[φ] A) (m + 2) = ⊥ ∧ derivedSeries (B ⋊[φ] A) (m + 1) ≠ ⊥ :=
   ⟨derivedSeries_semidirectProduct_eq_bot φ hAtop,
     derivedSeries_semidirectProduct_ne_bot φ hφ hV hcop⟩
+
+/-! ### 系: 任意に大きい導来長の可解群
+
+書籍の hint は正則 wreath 積 `C ≀ A` を使う。ここでは同型な半直積
+`(A → C) ⋊ A` (座標を正則作用で置換) を直接構成する。 -/
+
+section RegularPerm
+
+variable {A D : Type*} [Group A] [CommGroup D]
+
+/-- **正則作用による座標置換**: `A` の `(A → D)` への作用 `(φ a) f = fun ω => f (a⁻¹ * ω)`。
+半直積 `(A → D) ⋊ A` は正則 wreath 積 `D ≀ A` に他ならない。 -/
+def regularPermAut : A →* MulAut (A → D) where
+  toFun a :=
+    { toFun := fun f ω => f (a⁻¹ * ω)
+      invFun := fun f ω => f (a * ω)
+      left_inv := fun f => by ext ω; simp
+      right_inv := fun f => by ext ω; simp
+      map_mul' := fun _ _ => rfl }
+  map_one' := by ext f ω; simp
+  map_mul' a b := by ext f ω; simp [mul_assoc]
+
+@[simp] theorem regularPermAut_apply (a : A) (f : A → D) (ω : A) :
+    (regularPermAut a) f ω = f (a⁻¹ * ω) := rfl
+
+/-- 正則置換作用は忠実 (`D` が非自明なら). -/
+theorem regularPermAut_injective [Nontrivial D] :
+    Function.Injective (regularPermAut (A := A) (D := D)) := by
+  classical
+  rw [injective_iff_map_eq_one]
+  intro a ha
+  by_contra hane
+  obtain ⟨d, hd⟩ := exists_ne (1 : D)
+  have h1 : (regularPermAut (A := A) (D := D) a) (fun ω => if ω = 1 then d else 1) =
+      (fun ω => if ω = 1 then d else 1) := by rw [ha]; rfl
+  have h2 := congrFun h1 a
+  rw [regularPermAut_apply, inv_mul_cancel] at h2
+  simp only [if_neg hane] at h2
+  exact hd h2
+
+end RegularPerm
+
+/-- **Isaacs Problem 4D.5** (系): 任意の `n` に対し導来長がちょうど `n + 1` の有限可解群が
+存在する。特に可解群の導来長には上界が無い。
+
+`n` についての帰納法。`n = 0` は位数 `2` の巡回群。`A` の導来長が `n + 1` のとき,
+`|A^{(n)}|` を割らない素数 `p` を取り (無限に素数があるので取れる),
+`B := (A → ZMod p)` (乗法的に見る) との半直積 `B ⋊ A` = 正則 wreath 積 `ZMod p ≀ A` が
+導来長 `n + 2` を持つ (`derivedSeries_semidirectProduct_eq_bot_and_ne_bot`)。
+`B` は基本アーベル `p`-群なので `(|B|, |A^{(n)}|) = 1`, 作用は正則ゆえ忠実。 -/
+theorem exists_finite_group_derivedSeries_ne_bot (n : ℕ) :
+    ∃ (G : Type) (_ : Group G) (_ : Finite G),
+      derivedSeries G n ≠ ⊥ ∧ derivedSeries G (n + 1) = ⊥ := by
+  induction n with
+  | zero =>
+    refine ⟨Multiplicative (ZMod 2), inferInstance, inferInstance, ?_, ?_⟩
+    · rw [derivedSeries_zero]
+      exact top_ne_bot
+    · rw [derivedSeries_succ, derivedSeries_zero]
+      rw [Subgroup.commutator_eq_bot_iff_le_centralizer]
+      intro x _
+      rw [Subgroup.mem_centralizer_iff]
+      intro y _
+      exact mul_comm y x
+  | succ n ih =>
+    obtain ⟨A, instA, instFA, hne, hbot⟩ := ih
+    letI := instA
+    letI := instFA
+    -- `|A^{(n)}|` を割らない素数 `p`
+    obtain ⟨p, hple, hp⟩ := Nat.exists_infinite_primes (Nat.card ↥(derivedSeries A n) + 1)
+    haveI : Fact p.Prime := ⟨hp⟩
+    haveI : Fact (1 < p) := ⟨hp.one_lt⟩
+    have hpnd : ¬ p ∣ Nat.card ↥(derivedSeries A n) := by
+      intro hdvd
+      have hpos : 0 < Nat.card ↥(derivedSeries A n) := Nat.card_pos
+      have := Nat.le_of_dvd hpos hdvd
+      omega
+    have hcardD : Nat.card (Multiplicative (ZMod p)) = p := by
+      simp [Nat.card_eq_fintype_card, ZMod.card p]
+    -- `B := A → ZMod p` (乗法的) は基本アーベル `p`-群
+    have hBp : IsPGroup p (A → Multiplicative (ZMod p)) := by
+      intro f
+      refine ⟨1, ?_⟩
+      ext ω
+      have hpow : (f ω) ^ (Nat.card (Multiplicative (ZMod p))) = 1 := pow_card_eq_one'
+      rw [hcardD] at hpow
+      simp only [pow_one, Pi.pow_apply, Pi.one_apply]
+      exact hpow
+    obtain ⟨k, hk⟩ :=
+      (IsPGroup.iff_card (p := p) (G := A → Multiplicative (ZMod p))).mp hBp
+    have hcop : Nat.Coprime (Nat.card ↥(derivedSeries A n))
+        (Nat.card (A → Multiplicative (ZMod p))) := by
+      rw [hk]
+      exact Nat.Coprime.pow_right k
+        (Nat.coprime_comm.mp ((Nat.Prime.coprime_iff_not_dvd hp).mpr hpnd))
+    obtain ⟨h1, h2⟩ := derivedSeries_semidirectProduct_eq_bot_and_ne_bot
+      (A := A) (B := A → Multiplicative (ZMod p)) regularPermAut regularPermAut_injective
+      hbot hne hcop
+    exact ⟨(A → Multiplicative (ZMod p)) ⋊[regularPermAut] A, inferInstance, inferInstance,
+      h2, h1⟩
 
 end
 
