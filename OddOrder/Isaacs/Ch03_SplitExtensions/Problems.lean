@@ -1106,6 +1106,61 @@ theorem fixes_inverts_iff_torsion {n s m : ℕ} [NeZero n] (hn : s * m = n) {u :
     · rw [← Nat.cast_mul, hn, ZMod.natCast_self]
     · rw [← Nat.cast_mul, hn', ZMod.natCast_self]
 
+/-- **Isaacs Problem 3A.8(a)(b)** (まとめ). `p, q, r` を相異なる奇素数とし
+`C = ZMod (p·q·r)` (位数 `pqr` の巡回群) とすると、`Aut(C)` (= 単元倍) の中に
+「1 つの素数捩れを固定し他 2 つを反転する」involution `u_p, u_q, u_r` がそれぞれ**一意に**
+存在し、`u_p·u_q = u_r`, `u_q·u_r = u_p`, `u_r·u_p = u_q` をみたす。
+したがって `{1, u_p, u_q, u_r}` は `Aut(C)` の位数 4 の部分群 (Klein 四元群)。
+
+捩れ表現との対応は `fixes_inverts_iff_torsion` (生成元条件 ⟺ 捩れ全体での固定/反転)。 -/
+theorem exists_klein_four_pqr {p q r : ℕ} (hp : p.Prime) (hq : q.Prime) (hr : r.Prime)
+    (hpq : p ≠ q) (hpr : p ≠ r) (hqr : q ≠ r)
+    (hp2 : p ≠ 2) (hq2 : q ≠ 2) (hr2 : r ≠ 2) :
+    ∃ up uq ur : ZMod (p * q * r),
+      (up * ((q * r : ℕ) : ZMod (p * q * r)) = ((q * r : ℕ) : ZMod (p * q * r)) ∧
+        up * (p : ZMod (p * q * r)) = -(p : ZMod (p * q * r))) ∧
+      (uq * ((p * r : ℕ) : ZMod (p * q * r)) = ((p * r : ℕ) : ZMod (p * q * r)) ∧
+        uq * (q : ZMod (p * q * r)) = -(q : ZMod (p * q * r))) ∧
+      (ur * ((p * q : ℕ) : ZMod (p * q * r)) = ((p * q : ℕ) : ZMod (p * q * r)) ∧
+        ur * (r : ZMod (p * q * r)) = -(r : ZMod (p * q * r))) ∧
+      (up * up = 1 ∧ uq * uq = 1 ∧ ur * ur = 1) ∧
+      (up ≠ 1 ∧ uq ≠ 1 ∧ ur ≠ 1) ∧
+      (up * uq = ur ∧ uq * ur = up ∧ ur * up = uq) := by
+  haveI : NeZero (p * q * r) :=
+    ⟨Nat.mul_ne_zero (Nat.mul_ne_zero hp.pos.ne' hq.pos.ne') hr.pos.ne'⟩
+  -- 互いに素性
+  have cpq : Nat.Coprime p q := (Nat.coprime_primes hp hq).mpr hpq
+  have cpr : Nat.Coprime p r := (Nat.coprime_primes hp hr).mpr hpr
+  have cqr : Nat.Coprime q r := (Nat.coprime_primes hq hr).mpr hqr
+  -- `n` は奇数
+  have hodd : ¬ (2 ∣ p * q * r) := by
+    intro h
+    rcases (Nat.Prime.dvd_mul Nat.prime_two).mp h with h' | h'
+    · rcases (Nat.Prime.dvd_mul Nat.prime_two).mp h' with h'' | h''
+      · exact hp2 ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hp).mp h'').symm
+      · exact hq2 ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hq).mp h'').symm
+    · exact hr2 ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hr).mp h').symm
+  have hlt : ∀ a b : ℕ, a.Prime → b.Prime → 1 < a * b := fun a b ha hb =>
+    lt_of_lt_of_le (by norm_num) (Nat.mul_le_mul ha.two_le hb.two_le)
+  -- 3 回の instantiation
+  obtain ⟨up, hup, -⟩ := exists_unique_fixes_inverts (n := p * q * r) (s := p) (m := q * r)
+    (by ring) (hlt q r hq hr) (cpq.mul_right cpr) hodd
+  obtain ⟨uq, huq, -⟩ := exists_unique_fixes_inverts (n := p * q * r) (s := q) (m := p * r)
+    (by ring) (hlt p r hp hr) (cpq.symm.mul_right cqr) hodd
+  obtain ⟨ur, hur, -⟩ := exists_unique_fixes_inverts (n := p * q * r) (s := r) (m := p * q)
+    (by ring) (hlt p q hp hq) (cpr.symm.mul_right cqr.symm) hodd
+  -- Klein 四元群の関係式
+  have hkey : up * uq = ur :=
+    mul_eq_of_fixes_inverts_pqr cpq cpr cqr hup.1 huq.1 hur.1
+  refine ⟨up, uq, ur, hup.1, huq.1, hur.1, ⟨hup.2.1, huq.2.1, hur.2.1⟩,
+    ⟨hup.2.2, huq.2.2, hur.2.2⟩, hkey, ?_, ?_⟩
+  · calc uq * ur = uq * (up * uq) := by rw [hkey]
+      _ = up * (uq * uq) := by ring
+      _ = up := by rw [huq.2.1, mul_one]
+  · calc ur * up = (up * uq) * up := by rw [hkey]
+      _ = (up * up) * uq := by ring
+      _ = uq := by rw [hup.2.1, one_mul]
+
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,
 a.right·b.right)` を写すと `(a.left·a.right·b.left·b.right, a.right·b.right)` = 直積の積の像。 -/
