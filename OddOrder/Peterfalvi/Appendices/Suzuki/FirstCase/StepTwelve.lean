@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import OddOrder.GroupTheory.PrimeDegreeTwoTransitive
 
 /-!
 # Peterfalvi Part II, Ch. II, step (12): case (10.2) holds
@@ -669,6 +670,116 @@ theorem index_invImageF_subgroupOf_normalizer
     _ = Nat.card F * Nat.card ↥fc.P * (fc.p ^ m
           * (Nat.card ↥(fc.rankOneQuotient).Q
             * Nat.card ↥(fc.rankOneQuotient).D)) := by ring
+
+include model in
+/-- **`|N_G(R)/R| = p(p-1)` when `m = 1`** ((12), p. 113): the index formula with
+`|Q̄| = p - 1` and `Σ = 1`. -/
+theorem card_quotient_invImageF_eq
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) :
+    Nat.card (↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+        ⧸ (fc.invImageF model).subgroupOf
+          (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)))
+      = fc.p * (fc.p - 1) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  have hidx := fc.index_invImageF_subgroupOf_normalizer model ind hB2 hm hGp hSigma
+  have hQ : Nat.card ↥(fc.rankOneQuotient).Q = fc.p - 1 := by
+    rw [fc.card_rankOneQ_eq_pred_card_F model hm, hm, pow_one]
+  have hD1 : Nat.card ↥(fc.rankOneQuotient).D = 1 := by
+    have hall := fc.sigmaComponent_eq_one_of_card_F_eq_p model (by rw [hm, pow_one])
+    rw [Nat.card_eq_one_iff_unique]
+    exact ⟨⟨fun a b => by rw [hall a, hall b]⟩, ⟨1⟩⟩
+  have h1 : ((fc.invImageF model).subgroupOf
+      (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))).index
+      = fc.p * (fc.p - 1) := by
+    rw [hidx, hQ, hD1, pow_one, mul_one]
+  rw [← h1]
+  rfl
+
+include model in
+/-- **`R₁`: the preimage in `N_G(R)` of the normal order-`p` subgroup of
+`N_G(R)/R`** ((12), p. 113 — App. II, Prop. 1 applied to `N_G(R)/R`):
+`R ≤ R₁ ≤ N_G(R)`, `|R₁| = p³`, and `R₁ ⊴ N_G(R)`. -/
+theorem exists_normal_overgroup_cube
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) :
+    ∃ R₁ : Subgroup G,
+      fc.invImageF model ≤ R₁ ∧
+      R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) ∧
+      Nat.card ↥R₁ = fc.p ^ 3 ∧
+      ∀ n ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G),
+        ∀ x ∈ R₁, n * x * n⁻¹ ∈ R₁ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set NR : Subgroup G :=
+    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
+  set R' : Subgroup ↥NR := (fc.invImageF model).subgroupOf NR with hR'def
+  have hcardQ := fc.card_quotient_invImageF_eq model ind hB2 hm hGp hSigma
+  obtain ⟨σ, hσ, hσnorm⟩ :=
+    OddOrder.GroupTheory.exists_orderOf_eq_prime_zpowers_normal fc.p_prime hcardQ
+  set Rc : Subgroup ↥NR :=
+    (Subgroup.zpowers σ).comap (QuotientGroup.mk' R') with hRcdef
+  have hleR : fc.invImageF model ≤ NR := Subgroup.le_normalizer
+  refine ⟨Rc.map NR.subtype, ?_, Subgroup.map_subtype_le Rc, ?_, ?_⟩
+  · -- `R ≤ R₁`: the kernel of `mk'` sits inside the preimage.
+    have h1 : R' ≤ Rc := by
+      intro y hy
+      have h2 : QuotientGroup.mk' R' y = 1 := by
+        rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+        exact hy
+      rw [hRcdef, Subgroup.mem_comap, h2]
+      exact one_mem _
+    have h3 := Subgroup.map_mono (f := NR.subtype) h1
+    rwa [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hleR] at h3
+  · -- `|R₁| = p³`.
+    have hinj : Function.Injective NR.subtype := Subgroup.subtype_injective NR
+    have hcard1 : Nat.card ↥(Rc.map NR.subtype) = Nat.card ↥Rc :=
+      Nat.card_congr (Subgroup.equivMapOfInjective _ _ hinj).symm.toEquiv
+    -- Lagrange through the quotient.
+    have hidxc : Rc.index = (Subgroup.zpowers σ).index := by
+      rw [hRcdef, Subgroup.index_comap,
+        MonoidHom.range_eq_top_of_surjective _ (QuotientGroup.mk'_surjective R'),
+        Subgroup.relIndex_top_right]
+    have h1 : Nat.card ↥Rc * Rc.index = Nat.card ↥NR := Rc.card_mul_index
+    have h2 : Nat.card ↥(Subgroup.zpowers σ) * (Subgroup.zpowers σ).index
+        = Nat.card (↥NR ⧸ R') := (Subgroup.zpowers σ).card_mul_index
+    have h3 : Nat.card ↥NR = Nat.card (↥NR ⧸ R') * Nat.card ↥R' :=
+      Subgroup.card_eq_card_quotient_mul_card_subgroup R'
+    have hR'card : Nat.card ↥R' = fc.p * fc.p := by
+      have h4 : Nat.card ↥R' = Nat.card ↥(fc.invImageF model) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hleR).toEquiv
+      rw [h4, fc.card_invImageF model ind, hm, pow_one, fc.card_P]
+    have hMcard : Nat.card ↥(Subgroup.zpowers σ) = fc.p := by
+      rw [Nat.card_zpowers, hσ]
+    have hne : (Subgroup.zpowers σ).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+    have hkey : Nat.card ↥Rc * (Subgroup.zpowers σ).index
+        = (fc.p ^ 3) * (Subgroup.zpowers σ).index := by
+      calc Nat.card ↥Rc * (Subgroup.zpowers σ).index
+          = Nat.card ↥Rc * Rc.index := by rw [hidxc]
+        _ = Nat.card ↥NR := h1
+        _ = Nat.card (↥NR ⧸ R') * Nat.card ↥R' := h3
+        _ = (Nat.card ↥(Subgroup.zpowers σ) * (Subgroup.zpowers σ).index)
+            * Nat.card ↥R' := by rw [h2]
+        _ = (fc.p ^ 3) * (Subgroup.zpowers σ).index := by
+            rw [hMcard, hR'card]; ring
+    rw [hcard1]
+    exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hne) hkey
+  · -- `R₁ ⊴ N_G(R)`.
+    intro n hn x hx
+    obtain ⟨y, hy, rfl⟩ := hx
+    haveI : (Subgroup.zpowers σ).Normal := hσnorm
+    haveI : Rc.Normal := Subgroup.Normal.comap this (QuotientGroup.mk' R')
+    have h1 : (⟨n, hn⟩ : ↥NR) * y * (⟨n, hn⟩ : ↥NR)⁻¹ ∈ Rc :=
+      this.conj_mem y hy ⟨n, hn⟩
+    exact ⟨_, h1, rfl⟩
 
 end FirstCaseHypothesis
 
