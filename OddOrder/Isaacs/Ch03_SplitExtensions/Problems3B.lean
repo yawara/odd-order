@@ -233,6 +233,136 @@ theorem isSolvable_iff_forall_prime_card_of_simple_factors {G : Type u} [Group G
     rw [hker i hi] at hmemker
     simpa [Subgroup.mem_subgroupOf, commutatorElement_def] using hmemker
 
+/-! ### Problem 3B.4 — 補群は与えられた小部分群を含むように取れる
+
+`N ⊴ G` で `|N|` と `|G : N|` が互いに素, `U ≤ G` の位数が `|G : N|` を割り, `N` か `U` の
+一方が可解なら, `U` を含む `N` の補群が存在する。Schur-Zassenhaus の存在部で補群 `K` を 1 つ
+取り, D-part (`exists_conj_le_of_isComplement'_of_coprime'`) で `U ≤ K^x` となる共役を選べば,
+`K^x` も `N` の補群 (`isComplement'_conj`)。 -/
+
+/-- 正規部分群 `N` の補群の共役もまた `N` の補群 (`N` は共役で不変)。 -/
+theorem isComplement'_conj {G : Type*} [Group G] {N K : Subgroup G} [hN : N.Normal]
+    (hK : N.IsComplement' K) (x : G) :
+    N.IsComplement' (K.map (MulAut.conj x).toMonoidHom) := by
+  have hNconj : N.map (MulAut.conj x).toMonoidHom = N := by
+    ext y
+    simp only [Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+    refine ⟨?_, fun hy => ⟨x⁻¹ * y * x, ?_, by group⟩⟩
+    · rintro ⟨n, hn, rfl⟩
+      exact hN.conj_mem n hn x
+    · simpa using hN.conj_mem y hy x⁻¹
+  refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+  · rw [Subgroup.disjoint_def]
+    intro g hgN hgKx
+    obtain ⟨k, hk, hkg⟩ := hgKx
+    have h1 : x⁻¹ * g * x ∈ N := by simpa using hN.conj_mem g hgN x⁻¹
+    have h2 : x⁻¹ * g * x ∈ K := by
+      have : x⁻¹ * (x * k * x⁻¹) * x = k := by group
+      rw [← hkg]
+      simpa [this] using hk
+    have := Subgroup.disjoint_def.mp hK.disjoint h1 h2
+    have hx : g = x * (x⁻¹ * g * x) * x⁻¹ := by group
+    rw [hx, this]; group
+  · have hsup : N ⊔ K.map (MulAut.conj x).toMonoidHom = ⊤ := by
+      conv_lhs => rw [← hNconj]
+      rw [← Subgroup.map_sup, hK.sup_eq_top,
+        Subgroup.map_top_of_surjective _ (MulAut.conj x).surjective]
+    rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top]
+
+/-- **Isaacs Problem 3B.4** (書籍 p. 84): `N ⊴ G` で `|N|` と `|G : N|` が互いに素とする.
+`U ≤ G` の位数が `|G : N|` を割り, `N` と `U` の少なくとも一方が可解なら, `U` はある
+`N` の補群 `H` に含まれる.
+
+Schur-Zassenhaus の存在部 (`Subgroup.exists_right_complement'_of_coprime`) で補群 `K` を取り,
+D-part (`exists_conj_le_of_isComplement'_of_coprime'`; 「`N` か `U` の一方が可解」版に一般化済)
+で `U ≤ K^x` を与える `x` を選ぶ. `N` は正規なので `K^x` も補群 (`isComplement'_conj`). -/
+theorem exists_isComplement'_le_of_coprime {G : Type u} [Group G] [Finite G] {N U : Subgroup G}
+    [N.Normal] (hcop : Nat.Coprime (Nat.card ↥N) N.index) (hU : Nat.card ↥U ∣ N.index)
+    (hsolv : IsSolvable ↥N ∨ IsSolvable ↥U) :
+    ∃ H : Subgroup G, N.IsComplement' H ∧ U ≤ H := by
+  obtain ⟨K, hK⟩ := Subgroup.exists_right_complement'_of_coprime hcop
+  have hcopU : Nat.Coprime (Nat.card ↥U) (Nat.card ↥N) :=
+    Nat.Coprime.coprime_dvd_left hU hcop.symm
+  obtain ⟨x, hx⟩ := exists_conj_le_of_isComplement'_of_coprime' hsolv hK hcopU
+  exact ⟨K.map (MulAut.conj x).toMonoidHom, isComplement'_conj hK x, hx⟩
+
+/-! ### Problem 3B.5 — 中心に含まれる Sylow p-部分群と p-正則元
+
+`P ∈ Syl_p(G)` が `P ≤ Z(G)` を満たすとき, 位数が `p` で割れない元全体 `X` は部分群で
+`G = X × P` (内部直積)。`P` は中心にあるので正規で, `|P|` と `|G : P|` は互いに素だから
+Schur-Zassenhaus で補群 `X` が取れる。`P` が中心にあることから `X` は `G` で正規になり,
+`g = x·u` (`x ∈ X`, `u ∈ P`) の分解と `o(x·u) = o(x)·o(u)` (可換 + 互いに素) から
+`X` はちょうど p-正則元の集合。 -/
+
+/-- **Isaacs Problem 3B.5** (書籍 p. 84): `P ∈ Syl_p(G)` が `P ≤ Z(G)` なら, 位数が `p` で
+割り切れない元の集合 `X` は `G` の部分群であり, `G = X × P` (`X ⊴ G` かつ `X` は `P` の補群).
+
+`X` が正規かつ `P` の補群であることが「`G = X × P` が内部直積」の内容 (`P ≤ Z(G)` ゆえ `P` も
+正規で, 2 つの正規部分群が自明交叉かつ積が `G`). -/
+theorem exists_subgroup_orderOf_not_dvd_isComplement' {G : Type u} [Group G] [Finite G] {p : ℕ}
+    [hp : Fact p.Prime] (P : Sylow p G) (hPZ : (P : Subgroup G) ≤ Subgroup.center G) :
+    ∃ X : Subgroup G, (↑X : Set G) = {g : G | ¬ p ∣ orderOf g} ∧ X.Normal ∧
+      (P : Subgroup G).IsComplement' X := by
+  -- `P ≤ Z(G)` なので `P ⊴ G`.
+  haveI hPnormal : (P : Subgroup G).Normal := by
+    constructor
+    intro n hn g
+    have hc : g * n = n * g := Subgroup.mem_center_iff.mp (hPZ hn) g
+    have : g * n * g⁻¹ = n := by rw [hc, mul_assoc, mul_inv_cancel, mul_one]
+    rw [this]; exact hn
+  -- Schur-Zassenhaus で補群 `X` を取る (`|P|` と `|G : P|` は互いに素).
+  obtain ⟨X, hX⟩ := Subgroup.exists_right_complement'_of_coprime P.card_coprime_index
+  have hcardX : Nat.card ↥X = (P : Subgroup G).index := hX.symm.index_eq_card.symm
+  have hidx : ¬ p ∣ (P : Subgroup G).index := P.not_dvd_index
+  -- `X` の元の位数は `|X| = |G : P|` を割るので `p` と素.
+  have hXp' : ∀ x ∈ X, ¬ p ∣ orderOf x := by
+    intro x hxX hdvd
+    have h1 : orderOf (⟨x, hxX⟩ : ↥X) ∣ Nat.card ↥X := orderOf_dvd_natCard _
+    rw [Subgroup.orderOf_mk] at h1
+    exact hidx (dvd_trans hdvd (hcardX ▸ h1))
+  -- `P` の元の位数は `p`-冪.
+  have hPp : ∀ u ∈ (P : Subgroup G), ∃ k : ℕ, orderOf u ∣ p ^ k := by
+    intro u huP
+    obtain ⟨k, hk⟩ := P.isPGroup' ⟨u, huP⟩
+    refine ⟨k, orderOf_dvd_of_pow_eq_one ?_⟩
+    simpa [Subgroup.orderOf_mk] using congrArg Subtype.val hk
+  -- `G = X ⊔ P` の分解 `g = x * u`.
+  have hdecomp : ∀ g : G, ∃ x ∈ X, ∃ u ∈ (P : Subgroup G), x * u = g := by
+    intro g
+    have hg : g ∈ X ⊔ (P : Subgroup G) := by rw [hX.symm.sup_eq_top]; trivial
+    exact Subgroup.mem_sup_of_normal_right.mp hg
+  refine ⟨X, ?_, ⟨?_⟩, hX⟩
+  · -- `↑X = { g | p ∤ o(g) }`
+    ext g
+    simp only [SetLike.mem_coe, Set.mem_setOf_eq]
+    refine ⟨hXp' g, fun hnd => ?_⟩
+    obtain ⟨x, hxX, u, huP, rfl⟩ := hdecomp g
+    -- `x` と `u` は可換で位数が互いに素なので `o(x*u) = o(x)*o(u)`.
+    have hcomm : Commute x u := (Subgroup.mem_center_iff.mp (hPZ huP) x)
+    obtain ⟨k, hk⟩ := hPp u huP
+    have hcop : (orderOf x).Coprime (orderOf u) :=
+      Nat.Coprime.coprime_dvd_right hk
+        (Nat.Coprime.pow_right k ((Nat.Prime.coprime_iff_not_dvd hp.out).mpr (hXp' x hxX)).symm)
+    rw [hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcop] at hnd
+    -- `p ∤ o(x)o(u)` から `o(u) = 1`, 即ち `u = 1`.
+    have hpu : ¬ p ∣ orderOf u := fun h => hnd (h.mul_left _)
+    have hu1 : orderOf u = 1 :=
+      Nat.Coprime.eq_one_of_dvd
+        (Nat.Coprime.pow_right k ((Nat.Prime.coprime_iff_not_dvd hp.out).mpr hpu).symm) hk
+    rw [orderOf_eq_one_iff.mp hu1, mul_one]
+    exact hxX
+  · -- `X ⊴ G` (`P` が中心にあるので共役は `X` の元による共役に帰着).
+    intro n hn g
+    obtain ⟨x, hxX, u, huP, rfl⟩ := hdecomp g
+    have h1 : u * n = n * u := (Subgroup.mem_center_iff.mp (hPZ huP) n).symm
+    have hcalc : x * u * n * (x * u)⁻¹ = x * n * x⁻¹ := by
+      rw [mul_inv_rev]
+      calc x * u * n * (u⁻¹ * x⁻¹) = x * (u * n) * u⁻¹ * x⁻¹ := by group
+        _ = x * (n * u) * u⁻¹ * x⁻¹ := by rw [h1]
+        _ = x * n * x⁻¹ := by group
+    rw [hcalc]
+    exact X.mul_mem (X.mul_mem hxX hn) (X.inv_mem hxX)
+
 end
 
 end OddOrder.Isaacs.Ch03

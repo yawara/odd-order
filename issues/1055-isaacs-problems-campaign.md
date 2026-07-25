@@ -773,4 +773,34 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **3A.10 の核 ✅** (`A = C_G(A)`)。
 さらに **3A.10 ✅** ⟹ **§3A は 3A.6 / 3A.7 を除いて完了**。
 さらに **3A.7 ✅** ⟹ **§3A は 3A.6 のみ残り** (deferred-hard)。
-**次 frontier = §3B の演習 (3B.1 から文書順)**。3A.6 は §3B を進めた後に再訪する。
+さらに **3B.1 ✅ / 3B.2 ✅ / 3B.3 ✅** (新 leaf `Ch03_SplitExtensions/Problems3B.lean`)。
+さらに **3B.4 ✅ / 3B.5 ✅**。
+**次 frontier = 3B.6 から文書順**。3A.6 は §3B を進めた後に再訪する。
+
+### §3B の記録 (2026-07-25)
+
+| # | 状態 | Lean 名 (`OddOrder.Isaacs.Ch03`) |
+|---|---|---|
+| 3B.1 | ✅ | `index_isPrimePow_of_isCoatom` (+ 対応定理 `isCoatom_map_mk'_of_isCoatom`) |
+| 3B.2 | ✅ | `isSolvable_of_commutator_series` (+ 教科書形との往復 3 補題) |
+| 3B.3 | ✅ | `isSolvable_iff_forall_prime_card_of_simple_factors` |
+| 3B.4 | ✅ | `exists_isComplement'_le_of_coprime` (+ `isComplement'_conj`) |
+| 3B.5 | ✅ | `exists_subgroup_orderOf_not_dvd_isComplement'` |
+
+**設計メモ**:
+
+- **3B.2/3B.3 の「列」の表し方**: 因子が abelian という仮説は交換子形
+  `⁅Nᵢ₊₁, Nᵢ₊₁⁆ ≤ Nᵢ` で表した。これなら包含も正規性も有限性も要らず (すべて従属)、
+  教科書形 (`Nᵢ ⊴ Nᵢ₊₁` + 商 abelian) との往復は 3 補題
+  (`commutator_le_of_quotient_isMulCommutative` / `normal_subgroupOf_of_commutator_le` /
+  `quotient_isMulCommutative_of_commutator_le`) が与える。
+  3B.3 の**単純因子**は商群を直接書くと仮説内で `Normal` instance を捏ねる必要が出るので、
+  「抽象群 `Qᵢ` + 全射 `Nᵢ₊₁ ↠ Qᵢ` (核 = `Nᵢ`)」の形で与えた (`Qᵢ ≅ Nᵢ₊₁/Nᵢ` と同値)。
+
+- **3B.4 のために Basic.lean の SZ D-part を一般化した**:
+  `exists_conj_le_of_isComplement'_of_coprime` は `IsSolvable ↥M` を要求していたが、
+  教科書 3B.4 は「`N` **または** `U` が可解」で足りる。そこで一般版
+  `exists_conj_le_of_isComplement'_of_coprime'` (`IsSolvable ↥M ∨ IsSolvable ↥U`) を新設し、
+  既存名はその `Or.inl` 特殊化として残した (BG/Peterfalvi 側 5 箇所の呼び出しは無変更)。
+  `U` 可解の側は `IsComplement'.QuotientMulEquiv` で `↥P ⧸ M.subgroupOf P ≃* ↥(U.subgroupOf P)`
+  を作り、SZ 共役性の「商が可解」枝に流す。
