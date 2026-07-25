@@ -1015,3 +1015,18 @@ docstring ラベル `Isaacs <Thm|Lem|Cor|...> N.M` を機械的に突き合わ�
 冪零群の特徴づけなど **mathlib が直接持つもの**が並んでおり、薄いラッパー禁止方針で
 意図的に書いていない可能性が高い。Ch8 の 8.27 (`A_n` 単純性) も mathlib 済。
 ⟹ **着手前に 1 件ずつ実測確認する** ([[verify-port-state-by-number-not-coq-name]])。
+
+### Isaacs の判定 (2026-07-26 実測)
+
+Ch8 のラベル無し 18 件を実測した結果、**大半は mathlib 被覆**と確認:
+- `Mathlib/GroupTheory/GroupAction/{Blocks,Primitive,MultiplePrimitivity}.lean` が
+  ブロック系・原始性・多重可移性の API を持つ ⟹ 8.11–8.22 (ブロック・原始性の基本補題群) は
+  薄いラッパー禁止方針で**意図的に不在**。
+- Jordan の定理は `Ch08_PermutationGroups/PCycleJordan.lean` に **`Isaacs Thm 8.23`** として存在
+  (私が欠番と見た 8.17/8.18 とは別番号でカバーされている)。
+- 8.27 (`Aₙ` の単純性) も mathlib 済 (`alternatingGroup`)。
+
+同様に Ch1 の欠番 (Sylow C/D・Frattini 論法・`n_p ≡ 1`・冪零群の特徴づけ) も mathlib 被覆。
+
+⟹ **Isaacs は実質完済**。残る個別項目は Problems (issue 1055 = lane a 領域) が主。
+次の frontier 探索は **BG / Peterfalvi 本文**の番号付き結果の突き合わせで行う。
