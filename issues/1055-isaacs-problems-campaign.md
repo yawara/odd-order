@@ -1447,10 +1447,16 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 `letI` で供給すると, その instance の `toGroup` が `Subgroup.toGroup` と構文的に一致せず
 `MonoidHom.id ↥H` の型が合わない (diamond)。**一般の `ϕ : ↥H →* A` 版で述べる**のが正解
 (Isaacs の `v : G → H/H'` はまさにこの形)。
-| 5A.2 | ⬜ 設計確定 | `H = ⊤` で `transfer ϕ g = ϕ ⟨g, mem_top g⟩` (下記) |
-| 5A.3 | ⬜ | 推移律 (transversal の積 `ST`、pretransfer の合成)。mathlib は `diff` 経由の定義なので要検討 |
+| 5A.2 | ✅ | `transfer_top_eq_apply` |
+| 5A.3 | ⬜ 調査済 | 推移律。**(b) の数値部分 `|G:H| = |G:K||K:H|` は mathlib `Subgroup.relIndex_mul_index` で既済**。transversal の積 `ST` の一意分解 (a) / (b) の transversal 性は **mathlib に既製が無い** (`Subgroup.IsComplement` の推移律は未収載; `IsComplement.mul_eq` のみ)。`↥K` の subtype を跨ぐので定式化に注意 — 「`S ⊆ K` かつ `∀ k ∈ K, ∃! s ∈ S, k·s⁻¹ ∈ H`」+「`IsComplement (K : Set G) T`」⟹「`IsComplement (H : Set G) (S * T)`」の形が素直。(c)(d) の pretransfer 合成は mathlib が `diff` 経由の定義なので、この transversal 推移律を作ってから `transfer_def` で両辺を比較する |
 
-### 5A.2 の設計 (2026-07-26 に確定、未実装)
+### 5A.2 の設計 (2026-07-26 に確定、**実装済** `transfer_top_eq_apply`)
+
+⚠ 実装知見: `diff` は **`Subgroup.leftTransversals.diff`** (MonoidHom 名前空間ではない) /
+`Fintype (G ⧸ H)` は **`letI`** で入れる (`haveI` だと `diff` の `let` が展開した
+`Subgroup.fintypeQuotientOfFiniteIndex` と defeq 判定に失敗する) /
+`transfer_eq_pow` は key 仮説が `H = ⊤` で偽なので使えない。
+
 
 **statement**: `A` 可換, `ϕ : ↥(⊤ : Subgroup G) →* A` に対し
 `transfer ϕ g = ϕ ⟨g, Subgroup.mem_top g⟩`。Isaacs の `v : G → G/G'` は
