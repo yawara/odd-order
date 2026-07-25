@@ -1523,3 +1523,24 @@ import する形にした。
    局所補題の α-多項式論法は初等形 (`y^j x y^{-j} = c^j x`) に単純化して実装。
 
 ### 次 = **Theorem B の assembly** (steps (1)–(17) の結合)
+
+
+## ✅ **2026-07-26 Theorem B 完成**
+
+`theoremB` (`FirstCase/TheoremB.lean`):
+```
+(fc : FirstCaseHypothesis G Ω) (ind : TheoremAInductionBelow G Ω) →
+Nonempty (TheoremAConclusion G Ω)
+```
+
+(B2) による二分岐で組み立てた:
+- `p ∣ |G^ab|` ⟹ `G` は単純でない (`not_isSimpleGroup_of_dvd_card_abelianization`)
+  ⟹ Ch.I §3 Prop 2 (`theoremAConclusion_of_not_simple`)
+- `p ∤ |G^ab|` = (B2) ⟹ `rankOne_affine_nearField` で model を取り、`R₁` を含む Sylow 3 で
+  `false_of_step_seventeen` ⟹ 空虚
+
+フルビルド green (4763 jobs)、`--strict` 警告ゼロ、**新規 sorry 0**。
+依存鎖に残る実 sorry は **9318/0147 の Q₈ Brauer–Suzuki のみ** (別 issue の長期プロジェクト)。
+
+⟹ 本 issue の完了条件「Theorem B (`(B1) → Theorem A conclusion`) が sorry-free で landing」
+は **(0147 の既知例外を除いて) 達成**。残タスクは AxiomsCheck 登録。
