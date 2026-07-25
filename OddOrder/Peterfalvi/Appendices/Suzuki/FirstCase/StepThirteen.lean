@@ -116,6 +116,149 @@ lemma centralizer_mul_t_inf_centralizer_eq_V :
   rw [hyp.centralizer_mul_t_inf_eq_centralizer_t_inf,
     hyp.centralizer_t_inf_centralizer_eq_V]
 
+include hyp in
+/-- `st` is strongly real (it is the product of the two involutions `s`
+and `t`). -/
+lemma isStronglyReal_distinguishedInvolution_mul_t :
+    IsStronglyReal (hyp.distinguishedInvolution * hyp.t) :=
+  ⟨hyp.distinguishedInvolution,
+    ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_ne_one⟩,
+    hyp.t, ⟨hyp.t_sq, hyp.t_ne_one⟩, rfl⟩
+
+include hyp in
+/-- `s` inverts `st` (`s·(st)·s = ts = (st)⁻¹`), hence normalizes its
+centralizer. -/
+lemma conj_mem_centralizer_mul_t (x : G)
+    (hx : x ∈ Subgroup.centralizer {hyp.distinguishedInvolution * hyp.t}) :
+    hyp.distinguishedInvolution * x * hyp.distinguishedInvolution
+      ∈ Subgroup.centralizer {hyp.distinguishedInvolution * hyp.t} := by
+  set s := hyp.distinguishedInvolution with hs_def
+  set c : G := s * hyp.t with hc_def
+  have hs2 : s * s = 1 := by rw [← sq]; exact hyp.distinguishedInvolution_sq
+  have ht2 : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+  -- `s c s = c⁻¹`
+  have hinv : s * c * s = c⁻¹ := by
+    have hL : s * c * s = hyp.t * s := by
+      rw [hc_def]
+      calc s * (s * hyp.t) * s = (s * s) * hyp.t * s := by group
+        _ = hyp.t * s := by rw [hs2, one_mul]
+    have hR : c⁻¹ = hyp.t * s := by
+      rw [hc_def, mul_inv_rev, inv_eq_of_mul_eq_one_right ht2,
+        inv_eq_of_mul_eq_one_right hs2]
+    rw [hL, hR]
+  have hsc : s * c = c⁻¹ * s := by
+    calc s * c = s * c * (s * s) := by rw [hs2, mul_one]
+      _ = (s * c * s) * s := by group
+      _ = c⁻¹ * s := by rw [hinv]
+  have hsc' : s * c⁻¹ = c * s := by
+    have h1 : s * c⁻¹ * s = c := by
+      have h2 := congrArg (fun y : G => y⁻¹) hinv
+      simp only [mul_inv_rev, inv_inv] at h2
+      rw [inv_eq_of_mul_eq_one_right hs2, ← mul_assoc] at h2
+      exact h2
+    calc s * c⁻¹ = s * c⁻¹ * (s * s) := by rw [hs2, mul_one]
+      _ = (s * c⁻¹ * s) * s := by group
+      _ = c * s := by rw [h1]
+  rw [Subgroup.mem_centralizer_singleton_iff] at hx ⊢
+  have hxc : Commute x c := hx
+  have hxci : x * c⁻¹ = c⁻¹ * x := hxc.inv_right.eq
+  calc s * x * s * c = s * x * (s * c) := by group
+    _ = s * x * (c⁻¹ * s) := by rw [hsc]
+    _ = s * (x * c⁻¹) * s := by group
+    _ = s * (c⁻¹ * x) * s := by rw [hxci]
+    _ = (s * c⁻¹) * (x * s) := by group
+    _ = (c * s) * (x * s) := by rw [hsc']
+    _ = c * (s * x * s) := by group
+
+include hyp in
+/-- **Step (13), the counting identity** (p. 113):
+`|C_G(st)| = |V| · |J|` where `J = {x ∈ C_G(st) | sxs = x⁻¹}`.
+
+This is Ch. I §1, the Lemma (a), applied to the involution `s` acting on the
+odd-order group `C_G(st)` (odd by Ch. I §3, Lemma 3, since `st` is strongly
+real and not an involution), together with `C_G(st) ∩ C_G(s) = V`. -/
+theorem card_centralizer_mul_t_eq
+    (hst2 : (hyp.distinguishedInvolution * hyp.t) ^ 2 ≠ 1) :
+    Nat.card ↥(Subgroup.centralizer
+        ({hyp.distinguishedInvolution * hyp.t} : Set G))
+      = Nat.card ↥hyp.V *
+        (invertedBy (Subgroup.centralizer
+          ({hyp.distinguishedInvolution * hyp.t} : Set G))
+          hyp.distinguishedInvolution).ncard := by
+  have hs2 : hyp.distinguishedInvolution * hyp.distinguishedInvolution = 1 := by
+    rw [← sq]; exact hyp.distinguishedInvolution_sq
+  have hodd : Odd (Nat.card ↥(Subgroup.centralizer
+      ({hyp.distinguishedInvolution * hyp.t} : Set G))) :=
+    hyp.centralizer_natCard_odd_of_stronglyReal
+      hyp.isStronglyReal_distinguishedInvolution_mul_t hst2
+  have hkey := card_eq_card_centralizer_mul_ncard_invertedBy
+    (X := Subgroup.centralizer ({hyp.distinguishedInvolution * hyp.t} : Set G))
+    hs2 hodd hyp.conj_mem_centralizer_mul_t
+  rwa [hyp.centralizer_mul_t_inf_centralizer_eq_V] at hkey
+
+include hyp in
+/-- **Step (13)** (p. 113): every prime `r` dividing `|J|` occurs as the order
+of an element `u·t` with `u ∈ Q₀#`.
+
+By the prime-divisor clause of Ch. I §1 (Cauchy inside `Z`) there is `x ∈ J`
+of order `r`; as `s` inverts `x`, the element `x = s·(sx)` is a product of two
+involutions, so Ch. I §3 Lemma 3 conjugates it into the normal form `u·t`
+with `u ∈ Q₀#`. -/
+theorem exists_mem_Q0_orderOf_mul_t_eq_of_dvd_ncard_invertedBy
+    (hst2 : (hyp.distinguishedInvolution * hyp.t) ^ 2 ≠ 1)
+    {r : ℕ} (hr : r.Prime)
+    (hdvd : r ∣ (invertedBy (Subgroup.centralizer
+      ({hyp.distinguishedInvolution * hyp.t} : Set G))
+      hyp.distinguishedInvolution).ncard) :
+    ∃ u : G, u ∈ hyp.Q0 ∧ u ≠ 1 ∧ orderOf (u * hyp.t) = r := by
+  set s := hyp.distinguishedInvolution with hs_def
+  have hs2 : s * s = 1 := by rw [← sq]; exact hyp.distinguishedInvolution_sq
+  have hodd : Odd (Nat.card ↥(Subgroup.centralizer ({s * hyp.t} : Set G))) :=
+    hyp.centralizer_natCard_odd_of_stronglyReal
+      hyp.isStronglyReal_distinguishedInvolution_mul_t hst2
+  -- `r` is odd: it divides `|J|`, which divides the odd `|C_G(st)|`.
+  have hrne2 : r ≠ 2 := by
+    intro h2
+    have hJdvd : (invertedBy (Subgroup.centralizer ({s * hyp.t} : Set G)) s).ncard
+        ∣ Nat.card ↥(Subgroup.centralizer ({s * hyp.t} : Set G)) :=
+      Dvd.intro_left _ (hyp.card_centralizer_mul_t_eq hst2).symm
+    have h2dvd : (2 : ℕ) ∣ Nat.card ↥(Subgroup.centralizer ({s * hyp.t} : Set G)) :=
+      (h2 ▸ hdvd).trans hJdvd
+    rw [Nat.odd_iff] at hodd
+    omega
+  -- Cauchy inside `J`.
+  obtain ⟨x, hxJ, hxord⟩ := exists_orderOf_eq_prime_of_dvd_ncard_invertedBy
+    hs2 hodd hyp.conj_mem_centralizer_mul_t hr hdvd
+  have hx2 : x ^ 2 ≠ 1 := by
+    intro h
+    have hdvd2 : orderOf x ∣ 2 := orderOf_dvd_of_pow_eq_one h
+    rw [hxord] at hdvd2
+    exact hrne2 ((Nat.prime_dvd_prime_iff_eq hr Nat.prime_two).mp hdvd2)
+  -- `x` is strongly real: `x = s · (sx)` with `(sx)² = 1`.
+  have hv2 : (s * x) ^ 2 = 1 := by
+    rw [sq]
+    calc (s * x) * (s * x) = (s * x * s) * x := by group
+      _ = x⁻¹ * x := by rw [hxJ.2]
+      _ = 1 := inv_mul_cancel x
+  have hv1 : s * x ≠ 1 := by
+    intro h
+    have hxs : x = s := by
+      have h1 : s * (s * x) = s * 1 := by rw [h]
+      rw [← mul_assoc, hs2, one_mul, mul_one] at h1
+      exact h1
+    rw [hxs] at hx2
+    exact hx2 hyp.distinguishedInvolution_sq
+  have hSR : IsStronglyReal x :=
+    ⟨s, ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_ne_one⟩,
+      s * x, ⟨hv2, hv1⟩, by rw [← mul_assoc, hs2, one_mul]⟩
+  -- normal form (Ch. I §3, Lemma 3).
+  obtain ⟨u, huQ0, hu1, hconj⟩ := hyp.exists_isConj_mul_t_of_stronglyReal hSR hx2
+  refine ⟨u, huQ0, hu1, ?_⟩
+  obtain ⟨g, hg⟩ := isConj_iff.mp hconj
+  rw [← hg, ← hxord]
+  exact orderOf_injective (MulAut.conj g).toMonoidHom
+    (MulAut.conj g).injective x
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
