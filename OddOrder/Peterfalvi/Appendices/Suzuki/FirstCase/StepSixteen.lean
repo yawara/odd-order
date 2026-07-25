@@ -21,7 +21,7 @@ by (15), so `R₁ = RΣL`.
 
 set_option autoImplicit false
 
-open scoped Pointwise
+open scoped Pointwise commutatorElement
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
@@ -86,6 +86,284 @@ theorem sup_invImageF_centralizer_W_sup_nonsplitTorus_eq
   · refine Subgroup.eq_of_le_of_card_ge hle ?_
     rw [hm, h3, hRScard, hR₁card]
     norm_num
+
+include model in
+/-- `L ⊓ Z₁Σ = Z₁`: a factor `σ ∈ Σ ≤ W` of an element of `L` would lie in
+`L ⊓ W = 1`. -/
+theorem nonsplitTorus_inf_zpowers_sup_sigma_eq
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    fc.nonsplitTorus ⊓ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+      = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  have hcoe := coe_sup_eq_mul_of_commute
+    (fun _ (ha : _ ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)) _
+      (hb : _ ∈ fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) =>
+      fc.commute_of_mem_nonsplitTorus_of_mem_W (fc.zpowers_le_nonsplitTorus ha) hb.1)
+  refine le_antisymm (fun x hx => ?_)
+    (le_inf fc.zpowers_le_nonsplitTorus le_sup_left)
+  have hx' : x ∈ ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) : Subgroup G) : Set G)
+      * ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G) : Subgroup G)
+        : Set G) := by
+    rw [← hcoe]; exact hx.2
+  obtain ⟨z, hz, σ, hσ, hzσ0⟩ := hx'
+  have hzσ : z * σ = x := hzσ0
+  have hzL : z ∈ fc.nonsplitTorus := fc.zpowers_le_nonsplitTorus hz
+  have hσL : σ ∈ fc.nonsplitTorus := by
+    have : σ = z⁻¹ * x := by rw [← hzσ]; group
+    rw [this]
+    exact Subgroup.mul_mem _ (Subgroup.inv_mem _ hzL) hx.1
+  have hσ1 : σ = 1 := by
+    have hmem : σ ∈ fc.nonsplitTorus ⊓ fc.toHypothesis.W := ⟨hσL, hσ.1⟩
+    rwa [fc.nonsplitTorus_inf_W_eq_bot model ind hB2, Subgroup.mem_bot] at hmem
+  rw [← hzσ, hσ1, mul_one]
+  exact hz
+
+include model in
+/-- **`⁅P, L⁆ ≤ Z₁`**: `l⁻¹·l^q` lies in `Z₁Σ` by (15) and in `L` because `P`
+normalizes `L`, hence in `L ⊓ Z₁Σ = Z₁`. -/
+theorem commutatorElement_mem_zpowers_of_mem_P_of_mem_nonsplitTorus
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {q l : G} (hq : q ∈ fc.P)
+    (hl : l ∈ fc.nonsplitTorus) :
+    ⁅q, l⁆ ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  have hconj : q * l * q⁻¹ ∈ fc.nonsplitTorus := by
+    have hn := fc.P_le_normalizer_nonsplitTorus model ind hB2 hq
+    rw [Subgroup.mem_set_normalizer_iff] at hn
+    exact (hn l).mp hl
+  have hdZS := fc.inv_mul_conj_mem_zpowers_sup_sigma model ind hB2
+    (Subgroup.mem_sup_left hl) hq
+  have hdL : l⁻¹ * (q * l * q⁻¹) ∈ fc.nonsplitTorus :=
+    Subgroup.mul_mem _ (Subgroup.inv_mem _ hl) hconj
+  have hdZ : l⁻¹ * (q * l * q⁻¹)
+      ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) := by
+    rw [← fc.nonsplitTorus_inf_zpowers_sup_sigma_eq model ind hB2]
+    exact ⟨hdL, hdZS⟩
+  -- `⁅q, l⁆ = l·(l⁻¹·l^q)·l⁻¹` and `l` centralizes `st`
+  have hlst : l * (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+      = (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) * l := by
+    rw [fc.nonsplitTorus_def] at hl
+    exact Subgroup.mem_centralizer_singleton_iff.mp hl.1
+  have hlcen : ∀ z ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t), l * z * l⁻¹ = z := by
+    intro z hz
+    have hcen : l ∈ Subgroup.centralizer ((Subgroup.zpowers
+        (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+          : Subgroup G) : Set G) := by
+      rw [fc.centralizer_zpowers_st_eq]
+      exact Subgroup.mem_centralizer_singleton_iff.mpr hlst
+    have := Subgroup.mem_centralizer_iff.mp hcen z hz
+    rw [← this]; group
+  have heq : ⁅q, l⁆ = l * (l⁻¹ * (q * l * q⁻¹)) * l⁻¹ := by
+    rw [commutatorElement_def]; group
+  rw [heq, hlcen _ hdZ]
+  exact hdZ
+
+include model in
+/-- **`⁅Z₁ΣP, R₁⁆ ≤ Z₁`**, i.e. `Z₁PΣ ⊆ Z₂(R₁)` ((16), p. 114).
+
+`Z₁ΣP ≤ RΣ` and `⁅RΣ, RΣ⁆ = Z₁` by (14) handle the `RΣ`-part of `R₁ = RΣL`; against
+`L` the factors `Z₁Σ` centralize `L` (they lie in `L` itself and in `W`) and
+`⁅P, L⁆ ≤ Z₁`. -/
+theorem commutator_zpowers_sup_sigma_sup_P_sylowThree_le
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    ⁅(Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P,
+      fc.sylowThreeNormalizerRSigma model⁆
+      ≤ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  have hZ₁R : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ≤ fc.invImageF model :=
+    (fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2 hm).trans
+      (fc.sInvertedT_spec model ind hB2 hm).1
+  -- `Z₁ΣP ≤ RΣ`
+  have hZSP_le : (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P
+      ≤ fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) :=
+    sup_le (sup_le (hZ₁R.trans le_sup_left) le_sup_right)
+      ((fc.P_le_invImageF model).trans le_sup_left)
+  -- `Z₁Σ` centralizes `L`
+  have hZScenL : ∀ z ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)),
+      ∀ l ∈ fc.nonsplitTorus, z * l = l * z := by
+    obtain ⟨hLcyc, -⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
+    have hle : (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+        ≤ Subgroup.centralizer (fc.nonsplitTorus : Set G) := by
+      refine sup_le ?_ ?_
+      · intro z hz
+        refine Subgroup.mem_centralizer_iff.mpr fun y hy => ?_
+        exact mul_comm_of_mem_of_isCyclic hLcyc hy (fc.zpowers_le_nonsplitTorus hz)
+      · intro z hz
+        refine Subgroup.mem_centralizer_iff.mpr fun y hy => ?_
+        exact fc.commute_of_mem_nonsplitTorus_of_mem_W hy hz.1
+    intro z hz l hl
+    exact (Subgroup.mem_centralizer_iff.mp (hle hz) l hl).symm
+  -- against `L`
+  have hL : ∀ x ∈ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P,
+      ∀ l ∈ fc.nonsplitTorus, ⁅x, l⁆ ∈ Subgroup.zpowers
+        (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) := by
+    have hcoe := coe_sup_eq_mul_of_commute
+      (fun _ (ha : _ ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) _
+        (hb : _ ∈ fc.P) =>
+        (Subgroup.mem_centralizer_iff.mp
+          (sup_le (fc.zpowers_st_le_centralizer_P model ind hB2) inf_le_right ha) _
+            hb).symm)
+    intro x hx l hl
+    have hx' : x ∈ ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)
+          : Set G) * (fc.P : Set G) := by
+      rw [← hcoe]; exact hx
+    obtain ⟨z, hz, q, hq, rfl⟩ := hx'
+    have hql : q * l * q⁻¹ ∈ fc.nonsplitTorus := by
+      have hn := fc.P_le_normalizer_nonsplitTorus model ind hB2 hq
+      rw [Subgroup.mem_set_normalizer_iff] at hn
+      exact (hn l).mp hl
+    have hsplit : ⁅z * q, l⁆ = ⁅q, l⁆ := by
+      have h1 : z * (q * l * q⁻¹) = (q * l * q⁻¹) * z := hZScenL z hz _ hql
+      rw [commutatorElement_def, commutatorElement_def]
+      calc z * q * l * (z * q)⁻¹ * l⁻¹ = z * (q * l * q⁻¹) * z⁻¹ * l⁻¹ := by group
+        _ = (q * l * q⁻¹) * z * z⁻¹ * l⁻¹ := by rw [h1]
+        _ = q * l * q⁻¹ * l⁻¹ := by group
+    rw [hsplit]
+    exact fc.commutatorElement_mem_zpowers_of_mem_P_of_mem_nonsplitTorus model ind hB2
+      hq hl
+  -- assembly, using `R₁ = RΣL`
+  rw [Subgroup.commutator_le]
+  intro x hx y hy
+  rw [← fc.sup_invImageF_centralizer_W_sup_nonsplitTorus_eq model ind hB2] at hy
+  have hcoeR : (((fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+      ⊔ fc.nonsplitTorus : Subgroup G) : Set G)
+      = ((fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)
+          : Set G) * (fc.nonsplitTorus : Set G) := by
+    refine Subgroup.coe_mul_of_right_le_normalizer_left _ _ ?_
+    intro b hb
+    exact fc.sylowThreeNormalizerRSigma_le model
+      (fc.nonsplitTorus_le_sylowThreeNormalizerRSigma model ind hB2 hb)
+  have hy' : y ∈ ((fc.invImageF model
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)
+        : Set G) * (fc.nonsplitTorus : Set G) := by rw [← hcoeR]; exact hy
+  obtain ⟨r, hr, l, hl, rfl⟩ := hy'
+  -- `⁅x, rl⁆ = ⁅x, r⁆ · r⁅x, l⁆r⁻¹`
+  have hxr : ⁅x, r⁆ ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) := by
+    rw [← fc.commutator_sup_eq_zpowers model ind hB2]
+    exact Subgroup.commutator_mem_commutator (hZSP_le hx) hr
+  have hxl := hL x hx l hl
+  have hrfix : r * ⁅x, l⁆ * r⁻¹ = ⁅x, l⁆ := by
+    have hZcen : ∀ z ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t), z * r = r * z := by
+      intro z hz
+      have hmem : z ∈ (fc.invImageF model
+          ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)
+            ⊓ Subgroup.centralizer (((fc.invImageF model
+              ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+                : Subgroup G) : Set G) := by
+        rw [fc.inf_centralizer_sup_eq_zpowers_sup_P model ind hB2]
+        exact Subgroup.mem_sup_left hz
+      exact (Subgroup.mem_centralizer_iff.mp hmem.2 r hr).symm
+    rw [← hZcen _ hxl]; group
+  have hprod : ⁅x, r * l⁆ = ⁅x, r⁆ * (r * ⁅x, l⁆ * r⁻¹) := by
+    rw [commutatorElement_def, commutatorElement_def, commutatorElement_def]
+    group
+  rw [hprod, hrfix]
+  exact Subgroup.mul_mem _ hxr hxl
+
+include fc in
+/-- **No element `x ∈ V` with `x² ≠ 1` is strongly real** ((16), p. 114, the
+contradiction step; it generalizes `not_isStronglyReal_of_mem_P` from `P` to `V ⊇ PΣ`).
+
+`V = C_D(t) ≤ C_G(s)`, so the involution `s` centralizes `x` and `|C_G(x)|` is even;
+but a strongly real element with `x² ≠ 1` has odd centralizer (Ch. I §3, Lemma 3). -/
+theorem not_isStronglyReal_of_mem_V {x : G} (hx : x ∈ fc.toHypothesis.V)
+    (hx2 : x ^ 2 ≠ 1) : ¬ IsStronglyReal x := by
+  intro hsr
+  obtain ⟨-, hodd⟩ :=
+    fc.toHypothesis.stronglyReal_normalForm_and_centralizer_odd hsr hx2
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  have hsC : s ∈ Subgroup.centralizer ({x} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    rw [Set.mem_singleton_iff] at hy
+    subst hy
+    exact (Subgroup.mem_centralizer_singleton_iff.mp
+      (fc.toHypothesis.V_le_centralizer_distinguishedInvolution hx).2)
+  have hs2 : orderOf s = 2 := by
+    have h1 : s ^ 2 = 1 := fc.toHypothesis.distinguishedInvolution_sq
+    have h2 : orderOf s ∣ 2 := orderOf_dvd_of_pow_eq_one h1
+    rcases (Nat.dvd_prime Nat.prime_two).mp h2 with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h)
+        fc.toHypothesis.distinguishedInvolution_ne_one
+    · exact h
+  have heven : (2 : ℕ) ∣ Nat.card ↥(Subgroup.centralizer ({x} : Set G)) := by
+    have h1 : orderOf (⟨s, hsC⟩ : ↥(Subgroup.centralizer ({x} : Set G)))
+        ∣ Nat.card ↥(Subgroup.centralizer ({x} : Set G)) := orderOf_dvd_natCard _
+    rwa [Subgroup.orderOf_mk, hs2] at h1
+  rcases hodd with ⟨k, hk⟩
+  omega
+
+include model in
+/-- **No nonidentity element of `PΣ` is strongly real** ((16), p. 114): `PΣ ≤ V` and
+its nonidentity elements have order `3`. -/
+theorem not_isStronglyReal_of_mem_P_sup_sigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {x : G}
+    (hx : x ∈ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P)
+    (hx1 : x ≠ 1) : ¬ IsStronglyReal x := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨hpSig, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, -, -, hSig3, -⟩ :=
+    fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  have hle : ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P
+      : Subgroup G) ≤ fc.toHypothesis.V :=
+    sup_le (le_trans inf_le_left fc.toHypothesis.W_le_V) fc.P_le_V
+  refine fc.not_isStronglyReal_of_mem_V (hle hx) ?_
+  -- every element of `ΣP` is killed by `3`
+  have hx3 : x ^ 3 = 1 := by
+    refine pow_eq_one_of_mem_sup_of_commute ?_ ?_ ?_ hx
+    · intro a ha b hb
+      exact (Subgroup.mem_centralizer_iff.mp ha.2 b hb).symm
+    · intro a ha
+      have h := Subgroup.orderOf_dvd_natCard _ ha
+      rw [hSig3] at h
+      exact orderOf_dvd_iff_pow_eq_one.mp h
+    · intro b hb
+      have h := Subgroup.orderOf_dvd_natCard _ hb
+      rw [fc.card_P, hp3] at h
+      exact orderOf_dvd_iff_pow_eq_one.mp h
+  intro h2
+  have hord : orderOf x ∣ 3 := orderOf_dvd_iff_pow_eq_one.mpr hx3
+  have hord2 : orderOf x ∣ 2 := orderOf_dvd_iff_pow_eq_one.mpr h2
+  have h1 : orderOf x = 1 := Nat.eq_one_of_dvd_coprimes (by decide) hord2 hord
+  exact hx1 (orderOf_eq_one_iff.mp h1)
 
 end FirstCaseHypothesis
 
