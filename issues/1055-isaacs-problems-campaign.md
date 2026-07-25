@@ -824,6 +824,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | 4A.5 | ✅ | (a) `index_centralizer_eq_of_not_mem_center` / (b) `card_closure_pair_eq` / (c) `index_centralizer_closure_pair_eq` / (d) `map_center_centralizer_eq_center` + `isExtraspecial_centralizer_closure_pair` / (e) `exists_index_center_eq_prime_pow_two_mul` (新 leaf `ProblemsExtraspecial.lean`) |
 | 4A.6 | ✅ | `IsMaximalClassPGroup` (定義) / `exists_eq_lowerCentralSeries_of_isMaximalClass` (+ 一意性 `eq_of_normal_of_card_eq_of_isMaximalClass`、新 leaf `ProblemsMaximalClass.lean`) |
 | 4A.7 | ✅ | `exists_orderOf_eq_and_forall_orderOf_dvd` (+ 冪公式 `pow_mk` / 上界 `pow_prime_pow_succ_eq_one`、新 leaf `ProblemsWreath.lean`) |
+| 4A.8(b) | ✅ | `commutator_range_inl_range_inr_eq` (`⁅A,U⁆ = ker(座標積)` の像) + `commutator_eq_commutator_range_inl_range_inr` (4A.1 経由 `P' = ⁅A,U⁆`) + まとめ `commutator_eq_coordProdHom_ker_map` |
 | 4A.8(a) | ✅ | `mem_center_iff_exists_const` / `center_eq_inf_centralizer_range_inr` (`ProblemsWreath.lean`) |
 | 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 同値形 `frattini_eq_center_of_commutator_eq_center` + 橋 `isExtraspecial_of_commutator_eq_center`) |
 
@@ -909,9 +910,9 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   `forall_conj_inr_eq_iff_const` (`inr` との可換性 ⟺ 軌道上定数) で定数性が出る。
   逆向きは定数 tuple が base とも `inr q` とも可換という直接計算。
 
-### 4A.8(b) の設計 (2026-07-25 に 1 度着手して撤退、次 iteration の出発点)
+### 4A.8(b) 完了 (2026-07-25) — 実装知見
 
-`⁅A,U⁆ = P'` = 「成分の積が `1`」の tuple 全体。段取りは確定済み:
+`⁅A,U⁆ = P'` = 「成分の積が `1`」の tuple 全体。実装で効いた点:
 
 1. `coordProdHom : (Q → D) →* D`, `f ↦ ∏ ω, f ω` (`D` 可換ゆえ準同型)。
 2. `prod_smul_eq`: `∏ ω, f (q⁻¹ ω) = ∏ ω, f ω` (`Fintype.prod_equiv (Equiv.mulLeft q⁻¹)`)。
@@ -924,8 +925,13 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
    δ-分解 `f = ∏_x (δ_x (f x) · (δ_1 (f x))⁻¹)` (`Finset.univ_prod_mulSingle` +
    `Finset.prod_apply` で `∏_x (δ_1 (f x))⁻¹ = 1` を `∏ f = 1` から出す)。
 6. `P' = ⁅A,U⁆` 自体は **4A.1** (`commutator_eq_commutator_of_mul_eq_top`) —
-   `P = A·U` は `eq_inl_mul_inr`、`A`/`U` の `IsMulCommutative` instance は要作成
-   (`U ≅ Q` が可換であること、つまり `Q` 可換の仮定が要る)。
+   `P = A·U` は §3A の既存 simp 補題 `inl_left_mul_inr_right`、`A`/`U` の
+   `IsMulCommutative` instance はその場で構成 (`U` 側は `Q` 可換の仮定が要る)。
+7. ⚠ **最後の積は base 群 (可換) の中で取る**: `map_prod` は codomain に `CommMonoid` を
+   要求するので wreath product では使えない。`Subgroup.comap inl ⁅A,U⁆` の中で
+   `Subgroup.prod_mem` を使う。
+8. ⚠ `Subgroup.map` の存在形が与える membership は `x ∈ ↑K` (Set 強制) なので
+   `rw [MonoidHom.mem_ker]` は当たらない — `change` で `∏ ω, … = 1` に落とす。
 
 ### 残り (文書順): **4A.8(b)-(d)** ((c) `|Z(P'U)| = p`; (d) `n=1` なら `P` が maximal class、
 一般に `P'U` が maximal class) / 4A.9 / 4A.10 / 4A.11。

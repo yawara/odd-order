@@ -27,6 +27,8 @@ namespace OddOrder.Isaacs.Ch04
 
 open OddOrder.Isaacs.Ch03 OddOrder.Isaacs.Ch03.WreathProduct
 
+open scoped commutatorElement
+
 section /- Problem 4A.7: regular wreath product (p. 124) -/
 
 variable {D Q : Type*} [CommGroup D] [Group Q]
@@ -181,14 +183,6 @@ theorem exists_orderOf_eq_and_forall_orderOf_dvd [Finite D] [Finite Q]
 
 /-! ### Problem 4A.8(a) — `Z(P) = C_A(U)` = 定数 tuple -/
 
-/-- 任意の元は `inl` 成分と `inr` 成分の積. -/
-theorem eq_inl_mul_inr (x : D ≀[Q] Q) : x = inl x.left * inr x.right := by
-  ext ω
-  · change x.left ω = (x.left * fun ω => (1 : Q → D) ((1 : Q)⁻¹ • ω)) ω
-    simp
-  · change x.right = 1 * x.right
-    rw [one_mul]
-
 /-- **Isaacs Problem 4A.8(a)** (書籍 p. 124): 正則 wreath product `P = A ⋊ U` の中心は
 「全成分が等しい tuple」全体, すなわち `Z(P) = C_A(U)`.
 
@@ -233,6 +227,133 @@ theorem center_eq_inf_centralizer_range_inr [Nontrivial D] :
   · rintro ⟨⟨f, rfl⟩, hcent⟩
     obtain ⟨d, hd⟩ := (mem_centralizer_range_inr_iff (D := D) (Q := Q) (Ω := Q) f).mp hcent
     exact ⟨d, congrArg inl hd⟩
+
+/-! ### Problem 4A.8(b) — `⁅A, U⁆ = P'` = 成分の積が `1` の tuple -/
+
+/-- base 群の座標積 `f ↦ ∏ ω, f ω` (`D` 可換なので準同型). -/
+def coordProdHom [Fintype Q] : (Q → D) →* D where
+  toFun f := ∏ ω, f ω
+  map_one' := by simp
+  map_mul' f g := by simp [Finset.prod_mul_distrib]
+
+/-- 座標の平行移動は座標積を変えない. -/
+theorem prod_smul_eq [Fintype Q] (f : Q → D) (q : Q) : ∏ ω, f (q⁻¹ * ω) = ∏ ω, f ω :=
+  Fintype.prod_equiv (Equiv.mulLeft q⁻¹) _ _ fun _ => rfl
+
+/-- base と `inr` の交換子: `⁅inl f, inr q⁆ = inl (fun ω => f ω · (f (q⁻¹ ω))⁻¹)`. -/
+theorem commutatorElement_inl_inr (f : Q → D) (q : Q) :
+    ⁅(inl f : D ≀[Q] Q), inr q⁆ = inl (fun ω => f ω * (f (q⁻¹ * ω))⁻¹) := by
+  rw [commutatorElement_def]
+  ext ω
+  · simp [smul_eq_mul]
+  · simp
+
+/-- **Isaacs Problem 4A.8(b)** (書籍 p. 124): `⁅A, U⁆` は「成分の積が `1`」の tuple 全体.
+
+`⊆`: `⁅inl f, inr q⁆` の座標積は `(∏ f)(∏ f)⁻¹ = 1` (平行移動が積を変えないから).
+`⊇`: `⁅inl (δ_x d), inr (y x⁻¹)⁆ = inl (δ_x d · (δ_y d)⁻¹)` なので, 積が `1` の `f` を
+`f = ∏_x (δ_x (f x) · (δ_1 (f x))⁻¹)` と分解すればよい. -/
+theorem commutator_range_inl_range_inr_eq [Fintype Q] :
+    ⁅(inl : (Q → D) →* D ≀[Q] Q).range, (inr : Q →* D ≀[Q] Q).range⁆
+      = (coordProdHom (D := D) (Q := Q)).ker.map inl := by
+  classical
+  refine le_antisymm (Subgroup.commutator_le.2 ?_) ?_
+  · rintro _ ⟨f, rfl⟩ _ ⟨q, rfl⟩
+    refine ⟨fun ω => f ω * (f (q⁻¹ * ω))⁻¹, ?_, (commutatorElement_inl_inr f q).symm⟩
+    change (∏ ω, f ω * (f (q⁻¹ * ω))⁻¹) = 1
+    calc (∏ ω, f ω * (f (q⁻¹ * ω))⁻¹)
+        = (∏ ω, f ω) * ∏ ω, (f (q⁻¹ * ω))⁻¹ := Finset.prod_mul_distrib
+      _ = (∏ ω, f ω) * (∏ ω, f (q⁻¹ * ω))⁻¹ := by rw [Finset.prod_inv_distrib]
+      _ = (∏ ω, f ω) * (∏ ω, f ω)⁻¹ := by rw [prod_smul_eq]
+      _ = 1 := mul_inv_cancel _
+  · -- `δ_x d · (δ_y d)⁻¹` が交換子に入る
+    have hgen : ∀ (x y : Q) (d : D),
+        (inl (fun ω => (Pi.mulSingle x d : Q → D) ω * ((Pi.mulSingle y d : Q → D) ω)⁻¹)
+          : D ≀[Q] Q)
+          ∈ ⁅(inl : (Q → D) →* D ≀[Q] Q).range, (inr : Q →* D ≀[Q] Q).range⁆ := by
+      intro x y d
+      have hshift : ∀ ω : Q,
+          (Pi.mulSingle x d : Q → D) ((y * x⁻¹)⁻¹ * ω) = (Pi.mulSingle y d : Q → D) ω := by
+        intro ω
+        by_cases hω : ω = y
+        · rw [hω, show ((y * x⁻¹)⁻¹ * y) = x by group, Pi.mulSingle_eq_same,
+            Pi.mulSingle_eq_same]
+        · rw [Pi.mulSingle_eq_of_ne hω, Pi.mulSingle_eq_of_ne]
+          intro hcon
+          refine hω ?_
+          have h2 : (y * x⁻¹) * ((y * x⁻¹)⁻¹ * ω) = (y * x⁻¹) * x := by rw [hcon]
+          calc ω = (y * x⁻¹) * ((y * x⁻¹)⁻¹ * ω) := by group
+            _ = (y * x⁻¹) * x := h2
+            _ = y := by group
+      have hcomm : ⁅(inl (Pi.mulSingle x d) : D ≀[Q] Q), inr (y * x⁻¹)⁆
+          = inl (fun ω => (Pi.mulSingle x d : Q → D) ω *
+              ((Pi.mulSingle y d : Q → D) ω)⁻¹) := by
+        rw [commutatorElement_inl_inr]
+        exact congrArg inl (funext fun ω => by rw [hshift ω])
+      rw [← hcomm]
+      exact Subgroup.commutator_mem_commutator ⟨_, rfl⟩ ⟨_, rfl⟩
+    rintro _ ⟨f, hf, rfl⟩
+    have hf' : (∏ ω, f ω) = 1 := hf
+    -- `f = ∏ x, (δ_x (f x) · (δ_1 (f x))⁻¹)`
+    have hdecomp :
+        (∏ x : Q, (fun ω => (Pi.mulSingle x (f x) : Q → D) ω *
+          ((Pi.mulSingle (1 : Q) (f x) : Q → D) ω)⁻¹)) = f := by
+      funext ω
+      rw [Finset.prod_apply]
+      have h1 : (∏ x : Q, (Pi.mulSingle x (f x) : Q → D) ω) = f ω := by
+        have hu := congrFun (Finset.univ_prod_mulSingle f) ω
+        rwa [Finset.prod_apply] at hu
+      have h2 : (∏ x : Q, (Pi.mulSingle (1 : Q) (f x) : Q → D) ω) = 1 := by
+        by_cases hω : ω = (1 : Q)
+        · rw [hω]
+          simpa only [Pi.mulSingle_eq_same] using hf'
+        · simp [Pi.mulSingle_eq_of_ne hω]
+      calc (∏ x : Q, ((Pi.mulSingle x (f x) : Q → D) ω *
+              ((Pi.mulSingle (1 : Q) (f x) : Q → D) ω)⁻¹))
+          = (∏ x : Q, (Pi.mulSingle x (f x) : Q → D) ω)
+              * ∏ x : Q, ((Pi.mulSingle (1 : Q) (f x) : Q → D) ω)⁻¹ := Finset.prod_mul_distrib
+        _ = f ω * (∏ x : Q, (Pi.mulSingle (1 : Q) (f x) : Q → D) ω)⁻¹ := by
+              rw [h1, Finset.prod_inv_distrib]
+        _ = f ω := by rw [h2, inv_one, mul_one]
+    -- 積は base 群 (可換) の中で取り, `inl` の引き戻し部分群に入ることを使う
+    have hmem : (∏ x : Q, (fun ω => (Pi.mulSingle x (f x) : Q → D) ω *
+        ((Pi.mulSingle (1 : Q) (f x) : Q → D) ω)⁻¹))
+          ∈ Subgroup.comap (inl : (Q → D) →* D ≀[Q] Q)
+            ⁅(inl : (Q → D) →* D ≀[Q] Q).range, (inr : Q →* D ≀[Q] Q).range⁆ :=
+      Subgroup.prod_mem _ fun x _ => Subgroup.mem_comap.mpr (hgen x 1 (f x))
+    rw [← hdecomp]
+    exact hmem
+
+/-- `P = A · U` (`A` = base, `U` = `inr` の像) と両者の可換性から, **4A.1** で
+`P' = ⁅A, U⁆` (`Q` が可換, たとえば位数 `p` の巡回群のとき). -/
+theorem commutator_eq_commutator_range_inl_range_inr (hQcomm : ∀ a b : Q, a * b = b * a) :
+    commutator (D ≀[Q] Q)
+      = ⁅(inl : (Q → D) →* D ≀[Q] Q).range, (inr : Q →* D ≀[Q] Q).range⁆ := by
+  haveI : IsMulCommutative ((inl : (Q → D) →* D ≀[Q] Q).range) := by
+    refine ⟨⟨fun a b => Subtype.ext ?_⟩⟩
+    obtain ⟨f, hf⟩ := a.2
+    obtain ⟨g, hg⟩ := b.2
+    change (a : D ≀[Q] Q) * b = (b : D ≀[Q] Q) * a
+    rw [← hf, ← hg, ← map_mul, ← map_mul, mul_comm]
+  haveI : IsMulCommutative ((inr : Q →* D ≀[Q] Q).range) := by
+    refine ⟨⟨fun a b => Subtype.ext ?_⟩⟩
+    obtain ⟨q, hq⟩ := a.2
+    obtain ⟨q', hq'⟩ := b.2
+    change (a : D ≀[Q] Q) * b = (b : D ≀[Q] Q) * a
+    rw [← hq, ← hq', ← map_mul, ← map_mul, hQcomm]
+  refine commutator_eq_commutator_of_mul_eq_top ?_ ?_
+  · rw [eq_top_iff]
+    intro x _
+    rw [← inl_left_mul_inr_right x]
+    exact Subgroup.mul_mem_sup ⟨_, rfl⟩ ⟨_, rfl⟩
+  · exact fun g => ⟨inl g.left, ⟨_, rfl⟩, inr g.right, ⟨_, rfl⟩, inl_left_mul_inr_right g⟩
+
+/-- **Isaacs Problem 4A.8(b)** (まとめ): `Q` 可換のとき `P' = ⁅A, U⁆` は
+「成分の積が `1`」の tuple 全体. -/
+theorem commutator_eq_coordProdHom_ker_map [Fintype Q] (hQcomm : ∀ a b : Q, a * b = b * a) :
+    commutator (D ≀[Q] Q) = (coordProdHom (D := D) (Q := Q)).ker.map inl := by
+  rw [commutator_eq_commutator_range_inl_range_inr hQcomm,
+    commutator_range_inl_range_inr_eq]
 
 end
 
