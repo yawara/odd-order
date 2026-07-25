@@ -1,0 +1,275 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelve
+
+/-!
+# Peterfalvi Part II, Ch. II, step (12): the endgame
+
+T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
+2000), Part II, Ch. II, (12), pp. 112–113 (conclusion).
+
+The `s`-inverted complement `T₁ ≤ R₁` (order `p²`, all of whose nonidentity
+elements are strongly real), the identification `N_G(R₁) = N_G(R)`, and the
+final Hall–Wielandt/transfer contradiction with hypothesis (B2).
+-/
+
+set_option autoImplicit false
+
+open scoped Pointwise commutatorElement
+
+namespace OddOrder.Peterfalvi.Appendices.Suzuki
+
+namespace FirstCaseHypothesis
+
+universe uG uΩ
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (fc : FirstCaseHypothesis G Ω)
+  {F : Type uG} [NearFields.NearField F]
+  (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+
+/-- **`T₁`: the `s`-inverted part of `R₁`** ((12), p. 112).  Defined as a closure so
+that it is a subgroup unconditionally; under the step-(12) hypotheses the generating
+set is itself closed under multiplication (`mul_comm_of_conj_eq_inv`), see
+`sInvertedOvergroup_spec`. -/
+def sInvertedOvergroup (R₁ : Subgroup G) : Subgroup G :=
+  Subgroup.closure {x : G | x ∈ R₁ ∧ fc.toHypothesis.distinguishedInvolution * x
+    * fc.toHypothesis.distinguishedInvolution⁻¹ = x⁻¹}
+
+include model in
+/-- **Membership in `T₁`** collapses to the generating set: the `s`-inverted elements
+of `R₁` form a subgroup (they commute pairwise). -/
+theorem mem_sInvertedOvergroup_iff
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) {x : G} :
+    x ∈ fc.sInvertedOvergroup R₁ ↔ x ∈ R₁ ∧
+      fc.toHypothesis.distinguishedInvolution * x
+        * fc.toHypothesis.distinguishedInvolution⁻¹ = x⁻¹ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  have hs2 : s * s = 1 := by
+    have h := fc.toHypothesis.distinguishedInvolution_sq
+    rwa [pow_two] at h
+  set S₁ : Set G := {y : G | y ∈ R₁ ∧ s * y * s⁻¹ = y⁻¹} with hS₁def
+  have hsub : ∃ H : Subgroup G, (H : Set G) = S₁ := by
+    refine ⟨⟨⟨⟨S₁, ?_⟩, ?_⟩, ?_⟩, rfl⟩
+    · -- mul_mem
+      rintro a b ⟨haR, hai⟩ ⟨hbR, hbi⟩
+      refine ⟨mul_mem haR hbR, ?_⟩
+      have hcomm := fc.mul_comm_of_conj_eq_inv model ind hB2 hm hGp hSigma hRle
+        hR₁le hcard haR hbR hai hbi
+      calc s * (a * b) * s⁻¹ = (s * a * s⁻¹) * (s * b * s⁻¹) := by group
+        _ = a⁻¹ * b⁻¹ := by rw [hai, hbi]
+        _ = (b * a)⁻¹ := by rw [mul_inv_rev]
+        _ = (a * b)⁻¹ := by rw [hcomm]
+    · -- one_mem
+      exact ⟨one_mem _, by simp⟩
+    · -- inv_mem
+      rintro a ⟨haR, hai⟩
+      refine ⟨inv_mem haR, ?_⟩
+      calc s * a⁻¹ * s⁻¹ = (s * a * s⁻¹)⁻¹ := by group
+        _ = (a⁻¹)⁻¹ := by rw [hai]
+  obtain ⟨H, hH⟩ := hsub
+  have h1 : fc.sInvertedOvergroup R₁ = H := by
+    have h2 : fc.sInvertedOvergroup R₁ = Subgroup.closure S₁ := rfl
+    rw [h2, ← hH, Subgroup.closure_eq]
+  rw [h1, ← SetLike.mem_coe, hH]
+  exact Iff.rfl
+
+include model in
+/-- **`|T₁| = p²`, `T ≤ T₁`, and `T₁ ⊓ P = ⊥`** ((12), p. 112): the twisted-cocycle
+map `g ↦ (s g s⁻¹)·g⁻¹` has fibers the cosets of `C_{R₁}(s) = P`, so its image —
+inside `T₁` — has `p²` elements; conversely `T₁ ∩ P = 1` keeps `|T₁| ∣ p³` at `p²`. -/
+theorem card_sInvertedOvergroup
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3)
+    (hR₁n : ∀ n ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G),
+      ∀ x ∈ R₁, n * x * n⁻¹ ∈ R₁) :
+    Nat.card ↥(fc.sInvertedOvergroup R₁) = fc.p ^ 2 ∧
+      fc.sInvertedT model ≤ fc.sInvertedOvergroup R₁ ∧
+      fc.sInvertedOvergroup R₁ ⊓ fc.P = ⊥ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  have hs2 : s * s = 1 := by
+    have h := fc.toHypothesis.distinguishedInvolution_sq
+    rwa [pow_two] at h
+  have hmemiff := fun (x : G) =>
+    fc.mem_sInvertedOvergroup_iff model ind hB2 hm hGp hSigma hRle hR₁le hcard (x := x)
+  obtain ⟨hTle, hTinv, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hsNR : s ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) :=
+    fc.distinguishedInvolution_mem_normalizer_invImageF model ind hB2 hm
+  -- `T ≤ T₁`.
+  have hTsub : fc.sInvertedT model ≤ fc.sInvertedOvergroup R₁ := by
+    intro t ht
+    rw [hmemiff]
+    exact ⟨hRle (hTle ht), hTinv t ht⟩
+  -- `T₁ ⊓ P = ⊥`.
+  have hinfP : fc.sInvertedOvergroup R₁ ⊓ fc.P = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    rw [Subgroup.mem_inf] at hx
+    obtain ⟨hx1, hx2⟩ := hx
+    rw [Subgroup.mem_bot]
+    rw [hmemiff] at hx1
+    have h1 : s * x * s⁻¹ = x := by
+      have h2 := Subgroup.mem_centralizer_iff.mp
+        (fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V fc.P_le_V) x hx2
+      rw [← hsdef] at h2
+      rw [← h2]
+      group
+    have h3 : x = x⁻¹ := by rw [← hx1.2, h1]
+    have h4 : x ^ 2 = 1 := by
+      rw [pow_two]
+      nth_rewrite 1 [h3]
+      group
+    have h5 : orderOf x ∣ 2 := orderOf_dvd_of_pow_eq_one h4
+    have h6 : x ^ fc.p = 1 := fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm
+      (fc.P_le_invImageF model hx2)
+    have h7 : orderOf x ∣ fc.p := orderOf_dvd_of_pow_eq_one h6
+    obtain ⟨j, hj⟩ := fc.p_odd
+    have h8 := Nat.dvd_gcd h5 h7
+    have h9 : Nat.gcd 2 fc.p = 1 :=
+      (Nat.coprime_primes Nat.prime_two fc.p_prime).mpr (by omega)
+    rw [h9, Nat.dvd_one] at h8
+    exact orderOf_eq_one_iff.mp h8
+  -- lower bound `p²` via the twisted-cocycle map on `R₁ ⧸ P`.
+  have hPle : fc.P ≤ R₁ := (fc.P_le_invImageF model).trans hRle
+  set C' : Subgroup ↥R₁ := fc.P.subgroupOf R₁ with hC'def
+  have hFwd : ∀ g : ↥R₁, (s * (g : G) * s⁻¹) * (g : G)⁻¹ ∈ fc.sInvertedOvergroup R₁ := by
+    intro g
+    rw [hmemiff]
+    constructor
+    · exact mul_mem (hR₁n s hsNR _ g.2) (inv_mem g.2)
+    · have hss : s⁻¹ = s := by
+        rw [← mul_one s⁻¹, ← hs2, ← mul_assoc, inv_mul_cancel, one_mul]
+      have hexp : ((s * (g : G) * s⁻¹) * (g : G)⁻¹)⁻¹
+          = (g : G) * s * (g : G)⁻¹ * s⁻¹ := by group
+      rw [hexp, hss]
+      calc s * (s * (g : G) * s * (g : G)⁻¹) * s
+          = (s * s) * ((g : G) * s * (g : G)⁻¹ * s) := by group
+        _ = (g : G) * s * (g : G)⁻¹ * s := by rw [hs2, one_mul]
+  have hSound : ∀ a b : ↥R₁, (a : G)⁻¹ * (b : G) ∈ fc.P →
+      (s * (a : G) * s⁻¹) * (a : G)⁻¹ = (s * (b : G) * s⁻¹) * (b : G)⁻¹ := by
+    intro a b hab
+    have h1 : s * ((a : G)⁻¹ * (b : G)) * s⁻¹ = (a : G)⁻¹ * (b : G) := by
+      have h2 := Subgroup.mem_centralizer_iff.mp
+        (fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V fc.P_le_V)
+        _ hab
+      rw [← hsdef] at h2
+      rw [← h2]
+      group
+    -- `s b s⁻¹ = s a s⁻¹ · a⁻¹ b`.
+    have h3 : s * (b : G) * s⁻¹ = (s * (a : G) * s⁻¹) * ((a : G)⁻¹ * (b : G)) := by
+      calc s * (b : G) * s⁻¹
+          = (s * (a : G) * s⁻¹) * (s * ((a : G)⁻¹ * (b : G)) * s⁻¹) := by group
+        _ = (s * (a : G) * s⁻¹) * ((a : G)⁻¹ * (b : G)) := by rw [h1]
+    rw [h3]
+    group
+  -- descend to the quotient and inject into `T₁`.
+  let Fbar : (↥R₁ ⧸ C') → ↥(fc.sInvertedOvergroup R₁) :=
+    Quotient.lift (fun g : ↥R₁ => (⟨(s * (g : G) * s⁻¹) * (g : G)⁻¹, hFwd g⟩ :
+        ↥(fc.sInvertedOvergroup R₁)))
+      (by
+        intro a b hab
+        have h1 : a⁻¹ * b ∈ C' := (QuotientGroup.leftRel_apply).mp hab
+        have h2 : (a : G)⁻¹ * (b : G) ∈ fc.P := by
+          have h3 : ((a⁻¹ * b : ↥R₁) : G) ∈ fc.P := Subgroup.mem_subgroupOf.mp h1
+          simpa using h3
+        exact Subtype.ext (hSound a b h2))
+  have hFinj : Function.Injective Fbar := by
+    intro qa qb h
+    obtain ⟨a, rfl⟩ := Quotient.exists_rep qa
+    obtain ⟨b, rfl⟩ := Quotient.exists_rep qb
+    have h1 : (s * (a : G) * s⁻¹) * (a : G)⁻¹ = (s * (b : G) * s⁻¹) * (b : G)⁻¹ :=
+      congrArg Subtype.val h
+    -- reverse the fiber computation: `a⁻¹ b` is `s`-fixed, hence in `P`.
+    have h2 : s * ((a : G)⁻¹ * (b : G)) * s⁻¹ = (a : G)⁻¹ * (b : G) := by
+      have h3 : s * (b : G) * s⁻¹ = (s * (a : G) * s⁻¹) * ((a : G)⁻¹ * (b : G)) := by
+        calc s * (b : G) * s⁻¹
+            = ((s * (a : G) * s⁻¹) * (a : G)⁻¹) * (b : G) := by rw [h1]; group
+          _ = (s * (a : G) * s⁻¹) * ((a : G)⁻¹ * (b : G)) := by group
+      calc s * ((a : G)⁻¹ * (b : G)) * s⁻¹
+          = (s * (a : G) * s⁻¹)⁻¹ * (s * (b : G) * s⁻¹) := by group
+        _ = (a : G)⁻¹ * (b : G) := by rw [h3]; group
+    have h4 : (a : G)⁻¹ * (b : G) ∈ fc.P := by
+      have h5 : (a : G)⁻¹ * (b : G) ∈ R₁ := mul_mem (inv_mem a.2) b.2
+      exact fc.mem_P_of_mem_of_distinguishedInvolution_conj_eq model ind hB2 hm hGp
+        hSigma hR₁le hcard h5 h2
+    apply Quotient.sound
+    have h6 : a⁻¹ * b ∈ C' := by
+      rw [Subgroup.mem_subgroupOf]
+      simpa using h4
+    exact QuotientGroup.leftRel_apply.mpr h6
+  -- cardinalities.
+  have hC'card : Nat.card ↥C' = fc.p := by
+    rw [hC'def, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPle).toEquiv, fc.card_P]
+  have hQcard : Nat.card (↥R₁ ⧸ C') = fc.p ^ 2 := by
+    have h1 := C'.card_mul_index
+    rw [hC'card, hcard] at h1
+    apply Nat.eq_of_mul_eq_mul_left fc.p_prime.pos
+    calc fc.p * Nat.card (↥R₁ ⧸ C') = fc.p ^ 3 := h1
+      _ = fc.p * fc.p ^ 2 := by ring
+  have hlower : fc.p ^ 2 ≤ Nat.card ↥(fc.sInvertedOvergroup R₁) := by
+    rw [← hQcard]
+    exact Nat.card_le_card_of_injective Fbar hFinj
+  -- upper bound: `|T₁| ∣ p³` and `T₁ ≠ R₁`.
+  have hT₁le : fc.sInvertedOvergroup R₁ ≤ R₁ := by
+    intro x hx
+    exact ((hmemiff x).mp hx).1
+  have hdvd : Nat.card ↥(fc.sInvertedOvergroup R₁) ∣ fc.p ^ 3 := by
+    have h1 := Subgroup.card_dvd_of_le hT₁le
+    rwa [hcard] at h1
+  obtain ⟨i, hi3, hicard⟩ := (Nat.dvd_prime_pow fc.p_prime).mp hdvd
+  have hine : fc.sInvertedOvergroup R₁ ≠ R₁ := by
+    intro h0
+    have h1 : fc.P ≤ fc.sInvertedOvergroup R₁ := by
+      rw [h0]
+      exact hPle
+    have h2 : fc.P = ⊥ := by
+      rw [eq_bot_iff]
+      intro x hx
+      have h3 : x ∈ fc.sInvertedOvergroup R₁ ⊓ fc.P := ⟨h1 hx, hx⟩
+      rwa [hinfP] at h3
+    have h4 := fc.card_P
+    rw [h2, Subgroup.card_bot] at h4
+    exact fc.p_prime.one_lt.ne h4
+  have hi2 : i = 2 := by
+    rcases Nat.lt_or_ge i 2 with h | h
+    · exfalso
+      have h1 : Nat.card ↥(fc.sInvertedOvergroup R₁) < fc.p ^ 2 := by
+        rw [hicard]
+        exact Nat.pow_lt_pow_right fc.p_prime.one_lt h
+      omega
+    · rcases Nat.lt_or_ge i 3 with h' | h'
+      · omega
+      · exfalso
+        have h1 : i = 3 := by omega
+        have h2 : Nat.card ↥(fc.sInvertedOvergroup R₁) = Nat.card ↥R₁ := by
+          rw [hicard, h1, hcard]
+        exact hine (Subgroup.eq_of_le_of_card_ge hT₁le (le_of_eq h2.symm))
+  exact ⟨by rw [hicard, hi2], hTsub, hinfP⟩
+
+end FirstCaseHypothesis
+
+end OddOrder.Peterfalvi.Appendices.Suzuki
