@@ -860,3 +860,22 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   R₁ の class < p: R₁ 非可換 p³ → class = 2 (⁅R₁,R₁⁆ = T ≤ Z(R₁) via δ4a)
   < 3 ≤ p (p 奇素数)。nilpotencyClass-API との橋 (Group.nilpotencyClass ↥R₁ = 2)
   は mathlib の nilpotencyClass-le-iff-…-central-series で組む。
+- **ε2/ε3 完結 = step (12) 完結** (`cf9996d97`, 2026-07-25): 新 leaf
+  **StepTwelveTransfer.lean** — `factorization_ne_three` (case (10.1) の閉鎖):
+  hfact (v_p(|G|) = 3) を仮定して False。route は focal 計算を経ず range 消滅で直行:
+  (i) `nilpotencyClass_overgroup_le_two` (δ4a の T-中心性 + `⁅R₁,R₁⁆ = T` +
+  mathlib `Subgroup.map_subtype_commutator` / `lowerCentralSeries_eq_bot_iff…`);
+  (ii) R₁ = `Sylow.ofCard` (hfact で card p³ = full p-part) → **Isaacs Cor 10.2**
+  (`transfer_range_eq_of_nilpotencyClass_lt`, class 2 < p) で G/N-transfer range
+  一致; (iii) generic `transfer_abelianization_range_eq_bot` (hB2 → G-transfer
+  range = ⊥、|range| が |G^ab| と p-冪の公約数); (iv) generic
+  `transfer_eq_pow_of_map_conj_eq` (x の全共役 ∈ H + ϕ-値共役不変 →
+  transfer = ϕ(x)^index; 正規部分群では既存の transversal-不変版が使えないための
+  変種) を ψ = mk'(T̄₁) ∘ transferRes に適用 — ϕ-不変性は **ε1**
+  (`commutator_mem_sInvertedOvergroup`: ⁅s⁻¹,x⁻¹⁆ ∈ T₁) から。
+  π(of x)^[N:R₁] = π(w x) = 1、p ∤ [N:R₁]
+  (`not_p_dvd_index_subgroupOf_normalizer_overgroup`) + 商が p-群 → of x ∈ T̄₁ →
+  ker of = commutator → x ∈ T·T₁ = T₁ → R₁ ≤ T₁ → p³ ≤ p² 矛盾 □
+  **⟹ (12) は全部品 sorry-free で完結。次 frontier = 文書順で (13)–(17)
+  ((10.2) 側 endgame: p = 3, Z₁ = ⟨st⟩, PSL(2,8), Hall–Wielandt 可換版, R₂⟨s⟩;
+  pp. 113–114 Read 済、(14) は kernel-同定機構を δ2'/δ4 から再利用)。**
