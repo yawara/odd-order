@@ -334,6 +334,84 @@ theorem opCore_semidirectProduct_eq_bot (hP : IsPGroup p P) (hG : ¬ p ∣ Nat.c
   exact le_inf hYle hcent
 
 
+/-! ### Problem 3A.6 本体 -/
+
+/-- 任意の Sylow 対の交叉の位数は, ある `a` について `inr(P) ⊓ conjInrRange a` の位数に等しい. -/
+theorem exists_card_inf_eq (hP : IsPGroup p P) (hG : ¬ p ∣ Nat.card G)
+    (S T : Sylow p (G ⋊[φ] P)) :
+    ∃ a : G, Nat.card ↥((S : Subgroup (G ⋊[φ] P)) ⊓ (T : Subgroup (G ⋊[φ] P)))
+      = Nat.card ↥(((SemidirectProduct.inr : P →* G ⋊[φ] P).range) ⊓
+          conjInrRange (φ := φ) a) := by
+  obtain ⟨b, hb⟩ := exists_eq_conjInrRange (φ := φ) hP hG S
+  obtain ⟨c, hc⟩ := exists_eq_conjInrRange (φ := φ) hP hG T
+  refine ⟨b⁻¹ * c, ?_⟩
+  have hsplit : (SemidirectProduct.inl c : G ⋊[φ] P)
+      = SemidirectProduct.inl b * SemidirectProduct.inl (b⁻¹ * c) := by
+    rw [← map_mul]; congr 1; group
+  rw [hb, hc, conjInrRange_eq_smul, conjInrRange_eq_smul, conjInrRange_eq_smul, hsplit,
+    map_mul, mul_smul, ← Subgroup.smul_inf]
+  exact Nat.card_congr (Subgroup.equivSMul _ _).symm.toEquiv
+
+/-- **Isaacs Problem 3A.6**: `p`-群 `P` が `p ∤ |G|` の群 `G` に**忠実に**自己同型で作用する
+なら, ある `P`-軌道 `Δ_g` の上でも `P` は忠実に作用する。
+
+`Γ = G ⋊ P` の中で `|inr(P) ⊓ inr(P)^{inl g}|` を最小にする `g` を取ると, これは `Γ` の
+**包含極小 Sylow 交叉** (`exists_card_inf_eq` で任意の対の交叉位数がこの形の値になるから)。
+軌道核 `inr(N)` はその交叉に含まれ, `inr(P)` と `inr(P)^{inl g}` の**両方で正規**
+(`conjInrRange_le_normalizer_orbitKernel_map` ⭐) なので **Thm 1.38** より
+`inr(N) ≤ O_p(Γ) = 1`。 -/
+theorem exists_faithful_orbit (hP : IsPGroup p P) (hG : ¬ p ∣ Nat.card G)
+    (hφ : Function.Injective φ) :
+    ∃ g : G, ∀ u : P, (∀ v : P, (φ u) ((φ v) g) = (φ v) g) → u = 1 := by
+  classical
+  haveI : Nonempty G := ⟨1⟩
+  set F : G → ℕ := fun a => Nat.card ↥(((SemidirectProduct.inr : P →* G ⋊[φ] P).range) ⊓
+    conjInrRange (φ := φ) a) with hF
+  obtain ⟨g, hgmin⟩ : ∃ g : G, ∀ a : G, F g ≤ F a :=
+    ⟨Function.argmin F, fun a => Function.argmin_le F a⟩
+  refine ⟨g, fun u hu => ?_⟩
+  set Y : Sylow p (G ⋊[φ] P) := sylowInrRange (φ := φ) hP hG with hY
+  set T : Sylow p (G ⋊[φ] P) := (SemidirectProduct.inl g : G ⋊[φ] P) • Y with hTdef
+  have hTcoe : (T : Subgroup (G ⋊[φ] P)) = conjInrRange (φ := φ) g := by
+    rw [hTdef, Sylow.coe_subgroup_smul, conjInrRange_eq_smul]; rfl
+  have hYcoe : (Y : Subgroup (G ⋊[φ] P)) = (SemidirectProduct.inr : P →* G ⋊[φ] P).range := rfl
+  -- 包含極小性
+  have hmin : ∀ S' T' : Sylow p (G ⋊[φ] P),
+      (S' : Subgroup (G ⋊[φ] P)) ⊓ (T' : Subgroup (G ⋊[φ] P)) ≤
+        (Y : Subgroup (G ⋊[φ] P)) ⊓ (T : Subgroup (G ⋊[φ] P)) →
+      (S' : Subgroup (G ⋊[φ] P)) ⊓ (T' : Subgroup (G ⋊[φ] P)) =
+        (Y : Subgroup (G ⋊[φ] P)) ⊓ (T : Subgroup (G ⋊[φ] P)) := by
+    intro S' T' hle
+    obtain ⟨a, ha⟩ := exists_card_inf_eq (φ := φ) hP hG S' T'
+    refine (Subgroup.eq_of_le_of_card_ge hle ?_)
+    rw [ha, hYcoe, hTcoe]
+    exact hgmin a
+  -- 軌道核の像
+  set K : Subgroup (G ⋊[φ] P) :=
+    (orbitKernel φ g).map (SemidirectProduct.inr : P →* G ⋊[φ] P) with hK
+  have hKle : K ≤ (Y : Subgroup (G ⋊[φ] P)) ⊓ (T : Subgroup (G ⋊[φ] P)) := by
+    rw [hYcoe, hTcoe, inr_range_inf_conjInrRange_eq]
+    exact Subgroup.map_mono (orbitKernel_le_fixSubgroup φ g)
+  have hYN : (Y : Subgroup (G ⋊[φ] P)) ≤ Subgroup.normalizer (K : Set (G ⋊[φ] P)) := by
+    rw [hYcoe]
+    refine le_normalizer_of_forall_conj_mem' ?_
+    rintro _ ⟨v, rfl⟩ _ ⟨m, hm, rfl⟩
+    exact ⟨v * m * v⁻¹, (orbitKernel_normal φ g).conj_mem m hm v, by
+      rw [map_mul, map_mul, map_inv]⟩
+  have hTN : (T : Subgroup (G ⋊[φ] P)) ≤ Subgroup.normalizer (K : Set (G ⋊[φ] P)) := by
+    rw [hTcoe]
+    exact conjInrRange_le_normalizer_orbitKernel_map g
+  have hKop := OddOrder.Isaacs.Ch01.opCore_eq_inf_of_minimal_sylow_inter Y T hmin hKle hYN hTN
+  rw [opCore_semidirectProduct_eq_bot (φ := φ) hP hG hφ, le_bot_iff] at hKop
+  have hbot : orbitKernel φ g = ⊥ := by
+    have hle := (Subgroup.map_eq_bot_iff _).mp hKop
+    have hker : (SemidirectProduct.inr : P →* G ⋊[φ] P).ker = ⊥ :=
+      (MonoidHom.ker_eq_bot_iff _).mpr SemidirectProduct.inr_injective
+    rwa [hker, le_bot_iff] at hle
+  have : u ∈ orbitKernel φ g := hu
+  rwa [hbot, Subgroup.mem_bot] at this
+
+
 end
 
 end OddOrder.Isaacs.Ch03
