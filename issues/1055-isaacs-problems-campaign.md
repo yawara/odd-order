@@ -824,6 +824,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | 4A.5 | ✅ | (a) `index_centralizer_eq_of_not_mem_center` / (b) `card_closure_pair_eq` / (c) `index_centralizer_closure_pair_eq` / (d) `map_center_centralizer_eq_center` + `isExtraspecial_centralizer_closure_pair` / (e) `exists_index_center_eq_prime_pow_two_mul` (新 leaf `ProblemsExtraspecial.lean`) |
 | 4A.6 | ✅ | `IsMaximalClassPGroup` (定義) / `exists_eq_lowerCentralSeries_of_isMaximalClass` (+ 一意性 `eq_of_normal_of_card_eq_of_isMaximalClass`、新 leaf `ProblemsMaximalClass.lean`) |
 | 4A.7 | ✅ | `exists_orderOf_eq_and_forall_orderOf_dvd` (+ 冪公式 `pow_mk` / 上界 `pow_prime_pow_succ_eq_one`、新 leaf `ProblemsWreath.lean`) |
+| 4A.8(c) | ⚠ 反例調査中 | `p=2, n=1` (`P = D₈`) では `|Z(P'U)| = 4 ≠ p` — 下記 |
 | 4A.8(b) | ✅ | `commutator_range_inl_range_inr_eq` (`⁅A,U⁆ = ker(座標積)` の像) + `commutator_eq_commutator_range_inl_range_inr` (4A.1 経由 `P' = ⁅A,U⁆`) + まとめ `commutator_eq_coordProdHom_ker_map` |
 | 4A.8(a) | ✅ | `mem_center_iff_exists_const` / `center_eq_inf_centralizer_range_inr` (`ProblemsWreath.lean`) |
 | 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 同値形 `frattini_eq_center_of_commutator_eq_center` + 橋 `isExtraspecial_of_commutator_eq_center`) |
@@ -933,7 +934,28 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 8. ⚠ `Subgroup.map` の存在形が与える membership は `x ∈ ↑K` (Set 強制) なので
    `rw [MonoidHom.mem_ker]` は当たらない — `change` で `∏ ω, … = 1` に落とす。
 
-### 残り (文書順): **4A.8(b)-(d)** ((c) `|Z(P'U)| = p`; (d) `n=1` なら `P` が maximal class、
+### ⚠ 4A.8(c) は `p = 2, n = 1` で偽の疑い (2026-07-25、要 PDF 再確認)
+
+書籍 (p. 124): 「(c) Show `|Z(P'U)| = p`.」 だが **`p = 2, n = 1` は反例に見える**:
+
+- `C = C₂`, `A = C₂ × C₂`, `U = C₂` (成分交換) ⟹ `P = C₂ ≀ C₂ = D₈` (位数 8)
+- `P' = ⁅A,U⁆ = {(a,b) : ab = 1} = {(1,1), (d,d)} = Z(P)` (位数 2、`D₈` は extraspecial)
+- `P'` は中心なので `P'U = Z(P) × ⟨u⟩ ≅ C₂ × C₂` は **abelian**、ゆえに `|Z(P'U)| = 4 ≠ 2`
+
+`p = 2, n = 2` (`C = C₄`) では `P' = {(a,a⁻¹)} ≅ C₄` で `u` 共役が `(a,a⁻¹) ↦ (a⁻¹,a)` ゆえ
+`P'U` は非可換、`Z(P'U) = {(a,a⁻¹) : a² = 1}` は位数 2 = `p` ✅。奇素数でも同様。
+⟹ **正しい主張は「`p` が奇 または `n ≥ 2`」の条件付き**と思われる。3B.12 と同型の書籍の穴。
+次 iteration で PDF ページ画像を再確認し、条件付きの形で形式化する。
+
+### 4A.8(c) の設計 (次 iteration の出発点)
+
+`P'U = ker(augHom)` は **本 commit で確立済** (`commutator_sup_range_inr_eq_ker_augHom`)。
+残りは `Z(ker augHom) = {inl (const d) : dᵖ = 1}` と `|{d : dᵖ = 1}| = p` (巡回群の `Ω₁`)。
+中心の元の右成分が `1` であることは、`P'` の元 `δ_x(d)·δ_y(d)⁻¹` (積 = 1 ✓) に対する
+共役不変性から出す (§3A `conj_inl_of_comm`) — ⚠ `p=2, n=1` ではこの強制が破れる
+(`d = d⁻¹` になるため) のが上記反例の正体。
+
+### 残り (文書順): **4A.8(c)(d)** ((d) `n=1` なら `P` が maximal class、
 一般に `P'U` が maximal class) / 4A.9 / 4A.10 / 4A.11。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)

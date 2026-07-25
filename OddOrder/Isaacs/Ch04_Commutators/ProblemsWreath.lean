@@ -355,6 +355,43 @@ theorem commutator_eq_coordProdHom_ker_map [Fintype Q] (hQcomm : ∀ a b : Q, a 
   rw [commutator_eq_commutator_range_inl_range_inr hQcomm,
     commutator_range_inl_range_inr_eq]
 
+/-! ### `P' U` = 増大射 (座標積) の核 -/
+
+/-- **増大射** `x ↦ ∏ ω, x.left ω`: wreath product 全体で定義された準同型.
+
+`(x y).left = x.left · (y.left ∘ shift)` で shift は座標積を変えないので乗法的. -/
+def augHom [Fintype Q] : (D ≀[Q] Q) →* D where
+  toFun x := ∏ ω, x.left ω
+  map_one' := by simp
+  map_mul' x y := by
+    change (∏ ω, (x * y).left ω) = (∏ ω, x.left ω) * ∏ ω, y.left ω
+    calc (∏ ω, (x * y).left ω)
+        = ∏ ω, (x.left ω * y.left (x.right⁻¹ * ω)) := by
+          refine Finset.prod_congr rfl fun ω _ => ?_
+          change (x.left * fun ω => y.left (x.right⁻¹ • ω)) ω = _
+          rw [Pi.mul_apply]
+          rfl
+      _ = (∏ ω, x.left ω) * ∏ ω, y.left (x.right⁻¹ * ω) := Finset.prod_mul_distrib
+      _ = (∏ ω, x.left ω) * ∏ ω, y.left ω := by rw [prod_smul_eq]
+
+/-- **`P' U = ker(増大射)`** (`Q` 可換のとき): 「成分の積が `1`」の元全体.
+
+`⊇` は `P' = ⁅A,U⁆` (4A.8(b)) と `inr` の像がどちらも核に入ること,
+`⊆` は `x = inl x.left · inr x.right` (§3A) の分解で `inl x.left ∈ P'`. -/
+theorem commutator_sup_range_inr_eq_ker_augHom [Fintype Q] (hQcomm : ∀ a b : Q, a * b = b * a) :
+    commutator (D ≀[Q] Q) ⊔ (inr : Q →* D ≀[Q] Q).range = (augHom (D := D) (Q := Q)).ker := by
+  rw [commutator_eq_coordProdHom_ker_map hQcomm]
+  refine le_antisymm (sup_le ?_ ?_) fun x hx => ?_
+  · rintro _ ⟨f, hf, rfl⟩
+    change (∏ ω, (inl f : D ≀[Q] Q).left ω) = 1
+    exact hf
+  · rintro _ ⟨q, rfl⟩
+    change (∏ ω, (inr q : D ≀[Q] Q).left ω) = 1
+    simp
+  · have hker : (∏ ω, x.left ω) = 1 := hx
+    rw [← inl_left_mul_inr_right x]
+    exact Subgroup.mul_mem_sup ⟨x.left, hker, rfl⟩ ⟨x.right, rfl⟩
+
 end
 
 end OddOrder.Isaacs.Ch04
