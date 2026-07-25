@@ -1481,7 +1481,27 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 ⚠ `transfer_eq_pow` は使えない (key 仮説「`g₀⁻¹ g^k g₀ = g^k`」は `H = ⊤` では偽)。
 `diff` は `let` を含む noncomputable def なので `simp only [MonoidHom.diff]` で展開する。
 | 5A.4 | ✅ | (a) `transfer_eq_pow_index_of_le_center` / (b) `inf_ker_transfer_eq_bot_of_le_center` + `sup_ker_transfer_eq_top_of_le_center` (+ `normal_of_le_center`) |
-| 5A.5–5A.8 | ⬜ | **Schur 乗数 `M(G)`** が要る (5A.5 巡回-by-巡回 / 5A.6 二面体群 / 5A.7 / 5A.8 直積)。repo の Schur 乗数まわりの資産を先に実測すること |
+| 5A.5 | ✅ | `card_ker_dvd_relIndex_commutator` (`ProblemsSchurMultiplier.lean`) — **`M(G)` を定義せず stem extension の ∀-形**で述べた (下記) |
+| 5A.7 | ✅ | `card_ker_lt_relIndex_commutator` (同上)。書籍の `G/C` cyclic 仮定は `BC = G` + `B` cyclic から従うので導出に変更 |
+| 5A.6 / 5A.8 | ⬜ | **∃-側 (下界) が残る** — `M(D_{2n})` = 2 の下界 / `|M(A×B)| ≥ |M(A)||M(B)|` は具体的な stem extension の**構成**が要る。上界側は 5A.5 と同じ ∀-形で書ける。issue 9206 |
+
+### 5A.5 / 5A.7 の設計 (2026-07-26 確定・実装済)
+
+Schur 乗数 `M(G)` の universal object (Schur 表現群) は mathlib にも本リポにも無い
+(issue 9206 で 3 案を実測比較) が、**5A.5 / 5A.7 の主張は上界なので
+「`ker f ≤ Γ' ⊓ Z(Γ)` なる全射 `f : Γ →* G` すべてについて」の ∀-形で述べれば
+`M(G)` の定義を一切必要としない** (`|M(G)|` は `Nat.card (ker f)` の最大値)。
+`CentralTransfer.lean` の Thm 5.4 弱形と同じ流儀。
+
+* 述語 `IsStemExtension f` は**部分群 `Z` + 同型 `Γ/Z ≅ G` でなく全射 `f` + `ker f`** で持つ。
+  これにより Noether III の transport が丸ごと不要になり、`|C : G'| = |f⁻¹C : Γ'|` が
+  `Subgroup.relIndex_comap` / `comap_map_eq` / `map_comap_eq_self_of_surjective` の 3 行で出る。
+* `f⁻¹(C)` の可換性は mathlib `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` を
+  制限 hom `(f.comp A.subtype).codRestrict C _ : ↥A →* ↥C` に適用 (生成元を取る手作業は不要)。
+* 5A.7 の核心は `Γ = f⁻¹(B)·f⁻¹(C)` ⟹ `f⁻¹(B) ∩ f⁻¹(C) ≤ Z(Γ)`。
+  `B ∩ C > 1` の非自明元の持ち上げが `ker f` の外の `f⁻¹(C) ∩ Z(Γ)` の元になり、
+  `ker f ⊊ f⁻¹(C) ∩ Z(Γ)` から厳密不等式。
+* ⚠ `Subgroup.relIndex_comap` の第 1 明示引数は comap される側 `H` (`H f K` の順)。
 
 ## Ch.4 §4D (書籍 p. 145 の Problems 4D) — 進行中 (2026-07-25)
 

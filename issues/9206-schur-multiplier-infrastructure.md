@@ -81,7 +81,30 @@ Isaacs Thm 5.4 弱形 (`not_isMulCommutative_sylow_of_le_commutator_inf_center`)
 
 - [x] 3 案の実測比較 (2026-07-26)
 - [x] 採用方針の決定 (∀-形で `M(G)` 定義を回避)
-- [ ] 中心拡大述語の切り出し
-- [ ] 5A.5 / 5A.7 (∀-形の上界)
-- [ ] 5A.6 / 5A.8
+- [x] 中心拡大述語の切り出し = `IsStemExtension f` (全射 `f : Γ →* G` + `ker f ≤ Γ' ⊓ Z(Γ)`)
+      — 同型 `Γ/Z ≅ G` を運ぶより核で表す方が comap 計算が全部効いて圧倒的に軽い
+      (`Subgroup.relIndex_comap` / `comap_map_eq` / `map_comap_eq_self_of_surjective` で
+      `|C : G'| = |f⁻¹C : Γ'|` が 3 行)
+- [x] **5A.5** `card_ker_dvd_relIndex_commutator` (2026-07-26)
+- [x] **5A.7** `card_ker_lt_relIndex_commutator` (2026-07-26)
+- [ ] 5A.6 (`|M(D_{2n})| = 2`, n > 2) — 上界 `≤ 2` は 5A.5 で出る (C = 巡回 n, G' = C^2 …)
+      が, **下界 (= 2 を実現する stem extension の構成)** が要る
+- [ ] 5A.8(a) `|M(A×B)| ≥ |M(A)||M(B)|` / (b) coprime のとき等号
+      — (a) も ∃-側ゆえ具体構成が要る
 - [ ] Isaacs Thm 5.4 の full 形 (要 universal object かを再判定)
+
+## 実装メモ (2026-07-26)
+
+`OddOrder/Isaacs/Ch05_Transfer/ProblemsSchurMultiplier.lean`。
+
+- `IsStemExtension` を「部分群 `Z` + 同型 `Γ/Z ≅ G`」でなく「全射 `f` + `ker f`」で持つのが鍵。
+  quotient-of-quotient (Noether III) の transport が丸ごと不要になる。
+- `A := f⁻¹(C)` の可換性は mathlib
+  `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` を制限 hom
+  `(f.comp A.subtype).codRestrict C _ : ↥A →* ↥C` に適用するのが最短
+  (生成元を取って `a = γ^k z` と書く手作業は不要)。
+- `Γ/f⁻¹(C) ≅ G/C` は `QuotientGroup.quotientKerEquivOfSurjective ((mk' C).comp f)` +
+  `quotientMulEquivOfEq`。
+- ⚠ `Subgroup.relIndex_comap` の第 1 明示引数は `H` (comap される側) — `f` を先に渡すと
+  `Subgroup ?m` と型が合わずエラー。正しくは `Subgroup.relIndex_comap H f K`。
+- ⚠ `push_neg` は deprecated 警告 (`--strict` 赤) — `Nat.le_of_not_lt` を直接使う。
