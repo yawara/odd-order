@@ -142,7 +142,17 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   ⚠ 教訓: `set` の let 変数は補題適用時に値へ展開され omega が別 atom 視 → `rw [← hDdef]` で
   畳み直す / minimal import では `norm_num` の `Nat.Prime` 拡張が無い → `Mathlib.Tactic.NormNum.Prime`
   を明示 import / `Finset.card_sdiff` は現 mathlib で仮定無し形 (`card_sdiff_of_subset` を使う)。
-- ⏸ **§1C 残り = 1C.5 のみ** (A_{p+1} の Sylow 正規化群、対称群 cycle-type 計数、次に再訪)。
+- ✅ 実証明 **1C.5** (2026-07-25、新 leaf `Ch01_Sylow/ProblemsAlternating.lean`):
+  `two_mul_card_normalizer_sylow_alternating` (`2|N_{A_{p+1}}(P)| = p(p−1)`, p 奇素数) +
+  除算形 `card_normalizer_sylow_alternating` (`= p(p−1)/2`)。hint 通り位数 p 元 = p-cycle
+  (`cycleType_prime_order` + 台 `(n+1)p ≤ p+1` → n=0、p 奇数で偶置換 `IsCycle.sign`) を計数:
+  `card_of_cycleType_mul_eq` (mathlib Perm/Centralizer) で `c·p = (p+1)!`、強化した
+  `natCard_orderOf_eq_of_sylow_card_eq` (ProblemsOrder120 の計数補題を iff/Nat.card 版に格上げ:
+  素数位数 Sylow ⟹ 位数 q 元ちょうど n_q(q−1) 個) で `c = n_p(p−1)`、`|N|·n_p = |A|`・
+  `2|A| = (p+1)!` (`two_mul_nat_card_alternatingGroup`+`Nat.card_perm`) を掛け合わせ cancel。
+  ⚠ p = 2 (A₃) では不成立 (|N|=3≠1) ゆえ `3 ≤ p` を仮定 (Isaacs 暗黙、docstring 注記)。
+  全実証明・axiom-clean。⚠ 教訓: factorial `!` 記法は `open scoped Nat` が要 (minimal import)。
+- 🎉 **§1C 完了 (全 8 問)**: 1C.1/1C.2ab/1C.3ab/1C.4/1C.5/1C.6ab/1C.7/1C.8 全て実証明。
 - ⏸ **後回し (重い/特殊、後で戻る)**: **1C.4** (\|G\|=120 index 3 or 5)。n_2∈{1,3,5} は清潔
   (正規化群 index or 商 order 15)、但し **n_2=15 の場合が構造的に重い** (S_5 型、index-5 部分群 S_4 の
   存在は列挙でなく構造 — 計数だけでは矛盾を出せないことを確認済)。**1C.5** (A_{p+1} で

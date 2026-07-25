@@ -67,10 +67,11 @@ theorem card_sup_of_normal_of_coprime {G : Type*} [Group G] [Finite G]
 
 open scoped Classical in
 /-- Sylow `q`-部分群がどれも素数位数 `q` ちょうどのとき、それらの非単位元を集めた集合は
-ちょうど `n_q·(q−1)` 個で、各元の位数は `q` (相異なる素数位数 Sylow の交わりは自明)。 -/
+ちょうど `n_q·(q−1)` 個で、その元は**ちょうど**位数 `q` の元全体 (相異なる素数位数 Sylow の
+交わりは自明 + 位数 `q` の元の生成する部分群は Sylow に入る)。 -/
 theorem exists_finset_orderOf_eq_card_sylow_mul {G : Type*} [Group G] [Finite G] {q : ℕ}
     [Fact q.Prime] (hq : ∀ P : Sylow q G, Nat.card (P : Subgroup G) = q) :
-    ∃ U : Finset G, U.card = Nat.card (Sylow q G) * (q - 1) ∧ ∀ x ∈ U, orderOf x = q := by
+    ∃ U : Finset G, U.card = Nat.card (Sylow q G) * (q - 1) ∧ ∀ x, x ∈ U ↔ orderOf x = q := by
   haveI : Fintype G := Fintype.ofFinite G
   haveI : Fintype (Sylow q G) := Fintype.ofFinite _
   have hqprime : q.Prime := Fact.out
@@ -99,16 +100,40 @@ theorem exists_finset_orderOf_eq_card_sylow_mul {G : Type*} [Group G] [Finite G]
     rw [Finset.card_biUnion hf_pwd]
     simp_rw [hf_card]
     rw [Finset.sum_const, smul_eq_mul, Finset.card_univ, Nat.card_eq_fintype_card]
-  · intro x hx
+  · intro x
     simp only [Finset.mem_biUnion, Finset.mem_univ, true_and, Finset.mem_sdiff,
-      Set.mem_toFinset, Finset.mem_singleton] at hx
-    obtain ⟨P, hxP, hx_ne⟩ := hx
-    have h_ord_dvd : orderOf (⟨x, hxP⟩ : (P : Subgroup G)) ∣ Nat.card (P : Subgroup G) :=
-      orderOf_dvd_natCard _
-    rw [hq P, Subgroup.orderOf_mk] at h_ord_dvd
-    rcases (Nat.dvd_prime hqprime).mp h_ord_dvd with h1 | hqq
-    · exact absurd (orderOf_eq_one_iff.mp h1) hx_ne
-    · exact hqq
+      Set.mem_toFinset, Finset.mem_singleton]
+    constructor
+    · rintro ⟨P, hxP, hx_ne⟩
+      have h_ord_dvd : orderOf (⟨x, hxP⟩ : (P : Subgroup G)) ∣ Nat.card (P : Subgroup G) :=
+        orderOf_dvd_natCard _
+      rw [hq P, Subgroup.orderOf_mk] at h_ord_dvd
+      rcases (Nat.dvd_prime hqprime).mp h_ord_dvd with h1 | hqq
+      · exact absurd (orderOf_eq_one_iff.mp h1) hx_ne
+      · exact hqq
+    · intro hx
+      have hx_ne : x ≠ 1 := by
+        intro h1
+        rw [h1, orderOf_one] at hx
+        exact hqprime.one_lt.ne' hx.symm
+      have hpg : IsPGroup q (Subgroup.zpowers x) := by
+        apply IsPGroup.of_card (n := 1)
+        rw [Nat.card_zpowers, hx, pow_one]
+      obtain ⟨Q, hQ⟩ := hpg.exists_le_sylow
+      exact ⟨Q, hQ (Subgroup.mem_zpowers x), hx_ne⟩
+
+/-- Sylow `q`-部分群がどれも素数位数 `q` ちょうどのとき、位数 `q` の元はちょうど
+`n_q·(q−1)` 個 (`exists_finset_orderOf_eq_card_sylow_mul` の `Nat.card` 版)。 -/
+theorem natCard_orderOf_eq_of_sylow_card_eq {G : Type*} [Group G] [Finite G] {q : ℕ}
+    [Fact q.Prime] (hq : ∀ P : Sylow q G, Nat.card (P : Subgroup G) = q) :
+    Nat.card {x : G // orderOf x = q} = Nat.card (Sylow q G) * (q - 1) := by
+  haveI : Fintype G := Fintype.ofFinite G
+  classical
+  obtain ⟨U, hUcard, hUmem⟩ := exists_finset_orderOf_eq_card_sylow_mul hq
+  rw [Nat.card_eq_fintype_card, Fintype.card_subtype, ← hUcard]
+  congr 1
+  ext x
+  simp [hUmem x]
 
 /-- 相異なる素数 `q₁ ≠ q₂` の Sylow がどちらも素数位数ちょうどのとき、位数 `q₁`・`q₂` の
 元の計数から `n_{q₁}·(q₁−1) + n_{q₂}·(q₂−1) ≤ |G| − 1`。 -/
@@ -124,16 +149,16 @@ theorem card_sylow_mul_add_card_sylow_mul_le {G : Type*} [Group G] [Finite G] {q
   have hdisj : Disjoint U₁ U₂ := by
     rw [Finset.disjoint_left]
     intro x hx1 hx2
-    exact hne ((hU₁ord x hx1).symm.trans (hU₂ord x hx2))
+    exact hne (((hU₁ord x).mp hx1).symm.trans ((hU₂ord x).mp hx2))
   have hsub : U₁ ∪ U₂ ⊆ (Finset.univ : Finset G) \ {1} := by
     intro x hx
     refine Finset.mem_sdiff.mpr ⟨Finset.mem_univ _, ?_⟩
     simp only [Finset.mem_singleton]
     rintro rfl
     rcases Finset.mem_union.mp hx with hx' | hx'
-    · have h := hU₁ord 1 hx'; rw [orderOf_one] at h
+    · have h := (hU₁ord 1).mp hx'; rw [orderOf_one] at h
       exact (Fact.out (p := q₁.Prime)).one_lt.ne' h.symm
-    · have h := hU₂ord 1 hx'; rw [orderOf_one] at h
+    · have h := (hU₂ord 1).mp hx'; rw [orderOf_one] at h
       exact (Fact.out (p := q₂.Prime)).one_lt.ne' h.symm
   have hle := Finset.card_le_card hsub
   rw [Finset.card_union_of_disjoint hdisj, hU₁card, hU₂card] at hle
