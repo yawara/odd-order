@@ -822,6 +822,25 @@ theorem lowerCentralSeries_eq_map_shiftSubSeq {q : Q} (hq : ∀ q' : Q, ∃ k : 
     rw [Subgroup.lowerCentralSeries_succ, ih]
     exact commutator_map_inl_top_eq hq (shiftSubSeq_shift_stable q (i + 1))
 
+/-! ### 4A.8(d)(β) への準備: ノルム関係式 `N · (1 - x) = 0` -/
+
+/-- `q` が `Q` 全体を生成するとき, 部分和 `T_{|Q|} f` は**定数関数** (座標積 = ノルム). -/
+theorem shiftSumHom_card_eq_const [Fintype Q] {q : Q} (hq : orderOf q = Fintype.card Q)
+    (f : Q → D) : shiftSumHom q (Fintype.card Q) f = Function.const Q (∏ y, f y) := by
+  funext ω
+  exact prod_range_card_eq_prod_univ hq f ω
+
+/-- **ノルム関係式** `Δ_q ∘ T_{|Q|} = 1`: 群環の `(1-x)·N = 0`.
+
+`T_{|Q|} f` は定数なので平行移動で不変, ゆえに `Δ_q` で消える. -/
+theorem shiftSubHom_shiftSumHom_card [Fintype Q] {q : Q} (hq : orderOf q = Fintype.card Q)
+    (f : Q → D) : shiftSubHom q (shiftSumHom q (Fintype.card Q) f) = 1 := by
+  rw [shiftSumHom_card_eq_const hq]
+  funext ω
+  change (∏ y, f y) * ((∏ y, f y))⁻¹ = (1 : Q → D) ω
+  rw [mul_inv_cancel]
+  rfl
+
 end
 
 end OddOrder.Isaacs.Ch04

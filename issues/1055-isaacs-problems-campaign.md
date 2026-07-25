@@ -1002,10 +1002,19 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 (`lowerCentralSeries ⊤ (i+1) = (shiftSubSeq q (i+1)).map inl`、
 `shiftSubSeq q i = Δ^i(⊤)`)。基底は 4A.8(b)、shift 安定性の保存は
 `shiftSubHom_comp_shiftHom` (`Δ` と `shift` の可換性) + `Subgroup.map_map`。
+**(β) の第一歩も設置**: `shiftSumHom_card_eq_const` (`T_{|Q|} f` は定数 = ノルム) と
+`shiftSubHom_shiftSumHom_card` (**`Δ_q ∘ T_{|Q|} = 1`**, 群環の `(1-x)·N = 0`)。
 ⟹ **残るのは (β) `(1-x)` の冪零指数 `n(p-1)+1` の算術だけ**:
 `shiftSubSeq q i = ⊥ ⟺ i ≥ n(p-1)+1` を示せば `class(P) = n(p-1)+1` が出る
 (`lowerCentralSeries_eq_bot_iff_nilpotencyClass_le` 経由)。`P'U` 側も同様に
 `Δ` の反復を `ker coordProd` から始めればよい。
+
+**(β) の当面の目標は `n = 1` の場合** (書籍の「`n = 1` なら `P` は maximal class」):
+`D` が指数 `p` なら `V = Q → D` は `ZMod p`-加群で `Δ = 1 - σ` (`σ` = 平行移動, `σ^p = 1`)、
+標数 `p` の可換環 `ZMod p[σ]` で **freshman's dream** `(1-σ)^p = 1 - σ^p = 0`
+(mathlib `add_pow_char`) ⟹ `class(P) ≤ p`。下界は `Δ^{p-1}(δ₁ c) = const c ≠ 1`
+(ノルム関係式の相棒: `(1-x)^{p-1} = N` mod `p`) ⟹ `class(P) = p = np` で maximal class。
+一般 `n` の sharp 値 `n(p-1)+1` は `(1-x)^p = p·(1-x)s` の filtration が要る。
 
 **(ii) 残る算術 = `Δ = (1-x)` の冪零指数**。`ZMod(p^n)[x]/(x^p-1)` で
 `(1-x)^{n(p-1)+1} = 0` かつ `(1-x)^{n(p-1)} ≠ 0` ⟹ **`class(P) = n(p-1)+1`**。
