@@ -1042,6 +1042,19 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 必要 import は `Mathlib.Algebra.{Field.ZMod, Polynomial.Coeff, Polynomial.Div, Ring.GeomSum}`
 (本 commit で追加済)。
 
+**位数側も `n=1` 特殊形を landing**: `card_wreath_of_card_eq_prime`
+(`|C| = |Q| = p` ⟹ `|C ≀ Q| = p^{p+1}`) — maximal class の判定 `class = p` と対になる。
+
+**残りは linchpin 本体 1 本のみ**。ルート A の必要形 (次 iteration の出発点):
+```
+theorem shiftSubHom_iterate_apply (q : Q) (f : Q → D) (k : ℕ) (ω : Q) :
+    (shiftSubHom q)^[k] f ω
+      = ∏ j ∈ Finset.range (k+1), (f ((q ^ j)⁻¹ * ω)) ^ ((-1)^j * (k.choose j) : ℤ)
+```
+帰納段は `Δ(g) ω = g ω * (g (q⁻¹ω))⁻¹` に IH を代入し、
+`g(q⁻¹ω)` 側の添字を `j ↦ j+1` にずらして (`Finset.prod_range_succ'` 系) Pascal
+`(-1)^j C(k,j) - (-1)^{j-1} C(k,j-1) = (-1)^j C(k+1,j)` を使う。
+
 linchpin の証明ルート 2 つ:
 1. **pointwise 二項展開**: `Δ^k f ω = ∏_{j≤k} f((q^j)⁻¹ω)^{(-1)^j C(k,j)}` を `k` の帰納
    (Pascal) で示し、`k = p-1` で `C(p-1,j) ≡ (-1)^j (mod p)` を使うと指数が全部 `1` になる。

@@ -912,6 +912,13 @@ theorem cast_choose_prime_sub_one (r : ℕ) (hr : Nat.Prime r) :
     rw [hval, pow_succ]
     ring
 
+omit [CommGroup D] [Group Q] in
+/-- `n = 1` の場合の位数: `|C| = |Q| = p` なら `|C ≀ Q| = p^{p+1}`
+(maximal class の判定 `class = p` と対になる). -/
+theorem card_wreath_of_card_eq_prime [Finite Q] [Finite D] {r : ℕ}
+    (hD : Nat.card D = r) (hQ : Nat.card Q = r) : Nat.card (D ≀[Q] Q) = r ^ (r + 1) := by
+  rw [OddOrder.Isaacs.Ch03.WreathProduct.card (D := D) (Q := Q) (Ω := Q), hD, hQ, pow_succ]
+
 end
 
 end OddOrder.Isaacs.Ch04
