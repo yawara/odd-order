@@ -1091,6 +1091,122 @@ theorem normalizer_P_lt_normalizer_invImageF
     exact Nat.le_of_dvd (Nat.pow_pos fc.p_prime.pos) hjdvd
   omega
 
+include model in
+/-- **`|𝒜| = p^m`** (step (12), p. 112): the order-`p` subgroups of `R` outside `T` are
+parametrized bijectively by `T` via `t ↦ ⟨x₀·t⟩` (`x₀` a fixed generator of `P`), and
+`|T| = |F| = p^m`. -/
+theorem ncard_prime_order_not_le_sInvertedT
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) {x₀ : G} (hx₀ : x₀ ∈ fc.P) (hx₀1 : x₀ ≠ 1) :
+    Set.ncard {P₁ : Subgroup G | P₁ ≤ fc.invImageF model ∧
+        Nat.card ↥P₁ = fc.p ∧ ¬ P₁ ≤ fc.sInvertedT model}
+      = fc.p ^ m := by
+  classical
+  obtain ⟨hTle, -, hTsup, hTinf⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hab := fc.invImageF_mul_comm model ind hB2 hm
+  set A : Set (Subgroup G) := {P₁ : Subgroup G | P₁ ≤ fc.invImageF model ∧
+      Nat.card ↥P₁ = fc.p ∧ ¬ P₁ ≤ fc.sInvertedT model} with hAdef
+  have hx₀R : x₀ ∈ fc.invImageF model := fc.P_le_invImageF model hx₀
+  have hx₀T : x₀ ∉ fc.sInvertedT model := by
+    intro h
+    have h1 : x₀ ∈ fc.sInvertedT model ⊓ fc.P := ⟨h, hx₀⟩
+    rw [hTinf, Subgroup.mem_bot] at h1
+    exact hx₀1 h1
+  have hordx₀ : orderOf x₀ = fc.p := by
+    have h1 : orderOf x₀ ∣ fc.p := by
+      have h2 : orderOf (⟨x₀, hx₀⟩ : ↥fc.P) ∣ Nat.card ↥fc.P := orderOf_dvd_natCard _
+      rwa [fc.card_P, Subgroup.orderOf_mk] at h2
+    rcases (Nat.dvd_prime fc.p_prime).mp h1 with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h) hx₀1
+    · exact h
+  -- the parametrization `f : T → 𝒜`.
+  have hgen : ∀ t : ↥(fc.sInvertedT model), Subgroup.zpowers (x₀ * (t : G)) ∈ A := by
+    intro t
+    have htR : (t : G) ∈ fc.invImageF model := hTle t.2
+    have hxtR : x₀ * (t : G) ∈ fc.invImageF model := (fc.invImageF model).mul_mem hx₀R htR
+    have hxt1 : x₀ * (t : G) ≠ 1 := by
+      intro h
+      have h1 : x₀ = (t : G)⁻¹ := by
+        have h2 := congrArg (fun z => z * (t : G)⁻¹) h
+        simpa [mul_assoc] using h2
+      exact hx₀T (h1 ▸ (fc.sInvertedT model).inv_mem t.2)
+    have hord : orderOf (x₀ * (t : G)) = fc.p := by
+      have h1 : orderOf (x₀ * (t : G)) ∣ fc.p := orderOf_dvd_of_pow_eq_one
+        (fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm hxtR)
+      rcases (Nat.dvd_prime fc.p_prime).mp h1 with h | h
+      · exact absurd (orderOf_eq_one_iff.mp h) hxt1
+      · exact h
+    refine ⟨(Subgroup.zpowers_le).mpr hxtR, ?_, ?_⟩
+    · rw [Nat.card_zpowers, hord]
+    · intro h
+      have h1 : x₀ * (t : G) ∈ fc.sInvertedT model := h (Subgroup.mem_zpowers _)
+      have h2 : x₀ ∈ fc.sInvertedT model := by
+        have h3 := (fc.sInvertedT model).mul_mem h1 ((fc.sInvertedT model).inv_mem t.2)
+        simpa [mul_assoc] using h3
+      exact hx₀T h2
+  set f : ↥(fc.sInvertedT model) → ↥A :=
+    fun t => ⟨Subgroup.zpowers (x₀ * (t : G)), hgen t⟩ with hfdef
+  have hfinj : Function.Injective f := by
+    intro t t' htt'
+    have h1 : Subgroup.zpowers (x₀ * (t : G)) = Subgroup.zpowers (x₀ * (t' : G)) :=
+      congrArg Subtype.val htt'
+    have h2 : x₀ * (t' : G) ∈ Subgroup.zpowers (x₀ * (t : G)) := by
+      rw [h1]
+      exact Subgroup.mem_zpowers _
+    obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp h2
+    have htR : (t : G) ∈ fc.invImageF model := hTle t.2
+    have hcomm : Commute x₀ (t : G) := hab _ hx₀R _ htR
+    have hpow : (x₀ * (t : G)) ^ k = x₀ ^ k * (t : G) ^ k := hcomm.mul_zpow k
+    rw [hpow] at hk
+    -- `x₀^{k−1} = t'·(t^k)⁻¹ ∈ P ⊓ T = ⊥`.
+    have hsep : x₀ ^ (k - 1) = (t' : G) * ((t : G) ^ k)⁻¹ := by
+      have h4 : x₀ ^ (k - 1) = x₀⁻¹ * x₀ ^ k := by
+        rw [← zpow_neg_one, ← zpow_add]
+        congr 1
+        ring
+      have h5 : x₀ ^ k = x₀ * (t' : G) * ((t : G) ^ k)⁻¹ := by
+        rw [← hk]
+        group
+      rw [h4, h5]
+      group
+    have hmemP : x₀ ^ (k - 1) ∈ fc.P := Subgroup.zpow_mem _ hx₀ _
+    have hmemT : x₀ ^ (k - 1) ∈ fc.sInvertedT model := by
+      rw [hsep]
+      exact (fc.sInvertedT model).mul_mem t'.2
+        ((fc.sInvertedT model).inv_mem (Subgroup.zpow_mem _ t.2 _))
+    have hone : x₀ ^ (k - 1) = 1 := by
+      have h4 : x₀ ^ (k - 1) ∈ fc.sInvertedT model ⊓ fc.P := ⟨hmemT, hmemP⟩
+      rwa [hTinf, Subgroup.mem_bot] at h4
+    have hdvd : (fc.p : ℤ) ∣ (k - 1) := by
+      rw [← hordx₀]
+      exact orderOf_dvd_iff_zpow_eq_one.mpr hone
+    obtain ⟨j, hj⟩ := hdvd
+    -- `t' = t^k = t·(t^p)^j = t`.
+    have htp : (t : G) ^ (fc.p : ℤ) = 1 := by
+      rw [zpow_natCast]
+      exact fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm htR
+    have ht' : (t' : G) = (t : G) := by
+      have h5 : (t' : G) = x₀ ^ (k - 1) * ((t : G) ^ k) := by
+        rw [hsep]
+        group
+      rw [hone, one_mul] at h5
+      have h6 : k = 1 + fc.p * j := by omega
+      rw [h5, h6, zpow_add, zpow_one, zpow_mul, htp, one_zpow, mul_one]
+    exact Subtype.ext ht'.symm
+  have hfsurj : Function.Surjective f := by
+    rintro ⟨P₁, hP₁R, hP₁c, hP₁T⟩
+    obtain ⟨t, htT, -, heq⟩ :=
+      fc.exists_mem_sInvertedT_zpowers_eq_of_prime_order model ind hB2 hm
+        hx₀ hx₀1 hP₁R hP₁c hP₁T
+    exact ⟨⟨t, htT⟩, Subtype.ext heq.symm⟩
+  have hbij : Function.Bijective f := ⟨hfinj, hfsurj⟩
+  calc Set.ncard A = Nat.card ↥A := (Nat.card_coe_set_eq A).symm
+    _ = Nat.card ↥(fc.sInvertedT model) :=
+        (Nat.card_congr (Equiv.ofBijective f hbij)).symm
+    _ = Nat.card F := fc.card_sInvertedT model ind hB2 hm
+    _ = fc.p ^ m := hm
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
