@@ -191,6 +191,7 @@ import OddOrder.Isaacs.Ch02_Subnormality.ProblemsNGroups
 import OddOrder.Isaacs.Ch02_Subnormality.Problems2D
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
+import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSemidihedral
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
