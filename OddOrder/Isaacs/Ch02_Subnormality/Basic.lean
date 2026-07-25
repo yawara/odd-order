@@ -1190,11 +1190,17 @@ private theorem coe_sup_eq_set_mul_of_set_mul_comm {H K : Subgroup G}
   rfl
 
 open scoped Pointwise in
-/-- Thm 2.8 のメイン induction 補助補題 (|G| ≤ n に generalize). -/
-private theorem isSubnormal_of_permutable_aux :
+/-- Thm 2.8 と Problem 2B.1 に共通のメイン induction 補助補題 (|G| ≤ n に generalize).
+
+各共役 `S^x` について「`⟨S, S^x⟩ = S ⊔ S^x` が冪零」または「`S·S^x = S^x·S`」の
+**どちらか**が成り立てば `S ⊴⊴ G`。証明が仮説に要求するのは 2 点だけ:
+(i) 真部分群 `H ⊇ S` へ降りること、(ii) `S ⊔ S^x = ⊤` を排除できること
+(冪零側は「冪零群の部分群はすべて部分正規」= Lemma 2.1、permutable 側は Lemma 2.10)。 -/
+private theorem isSubnormal_of_nilpotent_or_permutable_aux :
     ∀ n, ∀ (G : Type*) [Group G] [Finite G],
       Nat.card G ≤ n → ∀ {S : Subgroup G},
-      (∀ x : G, (S : Set G) * (((MulAut.conj x) • S : Subgroup G) : Set G)
+      (∀ x : G, Group.IsNilpotent ↥(S ⊔ ((MulAut.conj x) • S : Subgroup G)) ∨
+          (S : Set G) * (((MulAut.conj x) • S : Subgroup G) : Set G)
               = (((MulAut.conj x) • S : Subgroup G) : Set G) * (S : Set G)) →
       S.IsSubnormal := by
   intro n
@@ -1203,7 +1209,7 @@ private theorem isSubnormal_of_permutable_aux :
     intro G _ _ hG S _
     exact absurd (Nat.le_zero.mp hG) Nat.card_pos.ne'
   | succ n ih =>
-    intro G _ _ _ S hperm
+    intro G _ _ _ S hyp
     by_contra hSn
     -- S < ⊤.
     have hSlt : S < (⊤ : Subgroup G) := by
@@ -1220,11 +1226,19 @@ private theorem isSubnormal_of_permutable_aux :
         omega
       refine ih H hHcard ?_
       intro y
-      -- Permutability transfer G → ↥H via Subgroup.conj_smul_subgroupOf.
-      rw [Subgroup.conj_smul_subgroupOf hSH]
-      -- Lift to G via H.subtype injective image, then apply G-permutability.
       have hSy_le_H : ((MulAut.conj (y : G)) • S : Subgroup G) ≤ H :=
         Subgroup.conj_smul_le_of_le hSH y
+      -- 共役の transfer G → ↥H via Subgroup.conj_smul_subgroupOf (両 disjunct に効く).
+      rw [Subgroup.conj_smul_subgroupOf hSH]
+      rcases hyp (y : G) with hnil | hperm
+      -- 冪零側: `(S ⊔ S^y).subgroupOf H ≃* S ⊔ S^y` で冪零性を移送.
+      · refine Or.inl ?_
+        haveI := hnil
+        rw [← Subgroup.subgroupOf_sup hSH hSy_le_H]
+        exact Group.nilpotent_of_mulEquiv
+          (Subgroup.subgroupOfEquivOfLe (sup_le hSH hSy_le_H)).symm
+      -- permutable 側: `H.subtype` の像で G に持ち上げて G-permutability を使う.
+      refine Or.inr ?_
       apply H.subtype_injective.image_injective
       simp only [Set.image_mul]
       have hS_im : H.subtype '' ((S.subgroupOf H : Subgroup ↥H) : Set ↥H) = (S : Set G) := by
@@ -1242,18 +1256,24 @@ private theorem isSubnormal_of_permutable_aux :
             from (Subgroup.coe_map _ _).symm,
             Subgroup.map_subgroupOf_eq_of_le hSy_le_H]
       rw [hS_im, hSy_im]
-      exact hperm (y : G)
+      exact hperm
     -- Zipper Lemma で `S` を含む極大部分群 `M` の一意性.
     obtain ⟨M, hMcoatom, hSM, hMuniq⟩ := zipper_lemma hS_in_H hSn
     -- 各 x : G で `MulAut.conj x • S ≤ M`.
     have hSx_le_M : ∀ x : G, ((MulAut.conj x) • S : Subgroup G) ≤ M := by
       intro x
-      -- `S ⊔ S^x ≠ ⊤`: 集合等式から Lemma 2.10 で `S = ⊤` を排除.
+      -- `S ⊔ S^x ≠ ⊤`: 冪零側は Lemma 2.1, permutable 側は Lemma 2.10 で排除.
       have hSup_lt : (S ⊔ ((MulAut.conj x) • S : Subgroup G) : Subgroup G) ≠ ⊤ := by
         intro hSup_top
+        rcases hyp x with hnil | hperm
+        · -- `S ⊔ S^x = ⊤` かつ冪零 ⟹ `G` 自身が冪零 ⟹ 全部分群が部分正規, `hSn` に矛盾.
+          rw [hSup_top] at hnil
+          haveI := hnil
+          haveI : Group.IsNilpotent G := Group.nilpotent_of_mulEquiv Subgroup.topEquiv
+          exact hSn (isSubnormal_of_isNilpotent_finite S)
         have hHK_eq : ((S ⊔ ((MulAut.conj x) • S : Subgroup G) : Subgroup G) : Set G)
             = (S : Set G) * (((MulAut.conj x) • S : Subgroup G) : Set G) :=
-          coe_sup_eq_set_mul_of_set_mul_comm (hperm x)
+          coe_sup_eq_set_mul_of_set_mul_comm hperm
         have huniv : (S : Set G) * (((MulAut.conj x) • S : Subgroup G) : Set G) = Set.univ := by
           rw [← hHK_eq, hSup_top]
           rfl
@@ -1311,7 +1331,23 @@ theorem isSubnormal_of_permutable_with_conjugates [Finite G] {S : Subgroup G}
     (hperm : ∀ x : G, (S : Set G) * (((MulAut.conj x) • S : Subgroup G) : Set G)
                     = (((MulAut.conj x) • S : Subgroup G) : Set G) * (S : Set G)) :
     S.IsSubnormal :=
-  isSubnormal_of_permutable_aux (Nat.card G) G le_rfl hperm
+  isSubnormal_of_nilpotent_or_permutable_aux (Nat.card G) G le_rfl fun x => Or.inr (hperm x)
+
+open scoped Pointwise in
+/-- **Isaacs Problem 2B.1** (Thm 2.8 の disjunctive 強化). 有限群 `G` の部分群 `S` について、
+**各** `x : G` ごとに「`⟨S, S^x⟩ = S ⊔ S^x` が冪零」**または**「`S · S^x = S^x · S` (集合等式)」
+のどちらかが成り立てば、`S` は `G` で部分正規。
+
+`x` ごとに二択でよい (どちらか一方が全 `x` で成り立つ必要はない) のが Thm 2.8 との差。
+証明は Thm 2.8 と同じ `|G|`-induction + Zipper Lemma で、共通核
+`isSubnormal_of_nilpotent_or_permutable_aux` が両者を賄う。冪零側の分岐で使うのは
+「冪零群の部分群はすべて部分正規」(Lemma 2.1 = `isSubnormal_of_isNilpotent_finite`)。 -/
+theorem isSubnormal_of_forall_nilpotent_or_permutable [Finite G] {S : Subgroup G}
+    (h : ∀ x : G, Group.IsNilpotent ↥(S ⊔ ((MulAut.conj x) • S : Subgroup G)) ∨
+        (S : Set G) * (((MulAut.conj x) • S : Subgroup G) : Set G)
+              = (((MulAut.conj x) • S : Subgroup G) : Set G) * (S : Set G)) :
+    S.IsSubnormal :=
+  isSubnormal_of_nilpotent_or_permutable_aux (Nat.card G) G le_rfl h
 
 end
 end OddOrder.Isaacs.Ch02

@@ -13,10 +13,14 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
 
 /-!
-# Isaacs Chapter 2 — Problems §2A (Subnormality)
+# Isaacs Chapter 2 — Problems §2A / §2B (Subnormality)
 
-Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 2 "Subnormality" の章末演習 §2A
-(pp. 53-54)。部分正規性 (`Subgroup.IsSubnormal`, mathlib inductive) の基本性質を扱う。
+Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 2 "Subnormality" の章末演習のうち
+**部分正規性そのものを扱う問題** — §2A 全部 (pp. 53-54) と §2B.1 (p. 57)。部分正規性
+(`Subgroup.IsSubnormal`, mathlib inductive) の基本性質を扱う。
+
+§2B の involution / 二面体群まわりの問題 (2B.2-2B.5) は topic が異なるので
+`ProblemsInvolutions.lean` に置く。
 
 方針は Ch.1 の `Ch01_Sylow/Problems.lean` と同じ (ラッパーは書かず実証明; 教科書番号は docstring)。
 -/
@@ -764,6 +768,18 @@ theorem isSubnormal_iff_forall_isStronglyConjugate_eq {G : Type*} [Group G] [Fin
     have hfix : strongClosure H = H :=
       le_antisymm (strongClosure_le fun Y hY => (h Y hY).le) (le_strongClosure H)
     exact hfix ▸ strongClosure_isSubnormal H
+
+end
+
+section /- Problems 2B: 部分正規性まわり (p. 57) -/
+
+/-
+**Isaacs Problem 2B.1** (`H ≤ G` で各 `g` ごとに `⟨H, H^g⟩` 冪零 or `HH^g = H^gH` ⟹ `H ◁◁ G`):
+`OddOrder.Isaacs.Ch02.isSubnormal_of_forall_nilpotent_or_permutable` (`Basic.lean`) が実体。
+Thm 2.8 (permutability ⇒ subnormality) と `|G|`-induction + Zipper の**核を共有する**ので、
+Thm 2.8 の隣 (共通核 `isSubnormal_of_nilpotent_or_permutable_aux`) に置いた。
+ここでは純粋リネームを書かない (ラッパー方針)。
+-/
 
 end
 
