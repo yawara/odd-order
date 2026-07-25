@@ -820,6 +820,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 |---|---|---|
 | 4A.1 | ✅ | `commutator_eq_commutator_of_mul_eq_top` |
 | 4A.2 | ✅ | `exists_closure_commutatorTriple_eq_zpowers` (前半) / `exists_card_two_subgroups_commutator_triple_eq_top` (後半 = A₅ 実例 + Note) |
+| 4A.3 | ✅ | `IsQuasiquaternion` (定義) / `eq_bot_of_isQuasiquaternion_quotient` |
 | 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 類 2 の `commutatorElement_pow_left_of_commutator_le_center`) |
 
 - **4A.1** (`G = AB`, `A`,`B` abelian ⟹ `G' = ⁅A,B⁆`): `⁅A,B⁆` の正規性は既存の
@@ -847,7 +848,18 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   Note (「`⁅H,K,L⁆` は `⁅h,k,l⁆` で生成されない」) は前半の巡回性 +
   `alternatingGroup.isCyclic_iff_card_le_three` で主定理の最後の連言肢に含めた。
 
-### 残り (文書順): 4A.3 (quasiquaternion) / 4A.5 (extraspecial の
+- **4A.3** (quasiquaternion 群の Schur 乗数は自明): `Q = CU` (`C,U` 巡回、`C ⊴ Q`、
+  `C ∩ U = Z(Q)`) を `IsQuasiquaternion` として定義し、`Z ≤ G' ⊓ Z(G)` かつ `G ⧸ Z` が
+  quasiquaternion なら `Z = ⊥` を証明。書籍 Hint どおり `C, U` の引き戻し `A, B` を取り、
+  (i) `A = Z⟨a₀⟩` ゆえ `A` abelian (`Z ≤ Z(G)` を使う)、(ii) `G = AB`、
+  (iii) `A ⊓ B = Z(G)`、(iv) `G ⧸ A` 巡回 ⟹ **Lem 4.6 cardinality**
+  (`card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient`) を
+  `G` と `Ḡ = G ⧸ Z` の両方に適用。引き戻しの位数が `|Z|` 倍になること
+  (`card_comap_mk'_eq_mul`、`index_comap_of_surjective` + Lagrange) と `Ḡ' = G'/Z`
+  (`map_commutator_eq` + `comap_map_eq` + `Z ≤ G'`) から `|C||Z| = |C||Z|²` ⟹ `|Z| = 1`。
+  ⚠ counting なので `[Finite G]` を仮定 (書籍も有限群の文脈)。
+
+### 残り (文書順): 4A.5 (extraspecial の
 構造 (a)-(e)) / 4A.6 (maximal class) / 4A.7-4A.8 (regular wreath product; §3A で作った
 `WreathProduct` インフラが使える) / 4A.9 / 4A.10 / 4A.11。
 

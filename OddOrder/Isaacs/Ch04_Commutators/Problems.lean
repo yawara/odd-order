@@ -301,6 +301,204 @@ theorem exists_card_two_subgroups_commutator_triple_eq_top :
 
 end
 
+/-! ### Problem 4A.3 — quasiquaternion 群の Schur 乗数は自明 -/
+
+/-- 群 `Q` が **quasiquaternion** (Isaacs Problem 4A.3, 書籍 p. 123): `Q = CU` で
+`C`, `U` は巡回部分群, `C ⊴ Q`, かつ `C ∩ U = Z(Q)`.
+
+書籍の注意: 一般四元数群と半二面体群はこの条件を満たす.
+`C ⊴ Q` ゆえ「`Q = CU` (積集合)」は `C ⊔ U = ⊤` と同値だが, ここでは書籍どおり積の形で書く. -/
+def IsQuasiquaternion (Q : Type*) [Group Q] : Prop :=
+  ∃ C U : Subgroup Q, C.Normal ∧ IsCyclic C ∧ IsCyclic U ∧
+    (∀ q : Q, ∃ c ∈ C, ∃ u ∈ U, c * u = q) ∧ C ⊓ U = Subgroup.center Q
+
+/-- 巡回部分群の生成元を, 部分群の元でなく群の元として取り出す. -/
+private lemma exists_generator_mem {Q : Type*} [Group Q] {S : Subgroup Q} (hS : IsCyclic S) :
+    ∃ s ∈ S, ∀ x ∈ S, ∃ n : ℤ, s ^ n = x := by
+  obtain ⟨⟨s, hs⟩, hgen⟩ := hS.exists_generator
+  refine ⟨s, hs, fun x hx => ?_⟩
+  obtain ⟨n, hn⟩ := hgen ⟨x, hx⟩
+  exact ⟨n, by simpa using congrArg Subtype.val hn⟩
+
+/-- `S ≤ G ⧸ Z` の生成元 `s` を `g` に持ち上げておくと, `S` の引き戻しの元は `z * g ^ n`
+(`z ∈ Z`) の形に書ける. -/
+private lemma exists_mem_mul_zpow_of_mem_comap {G : Type*} [Group G] {Z : Subgroup G} [Z.Normal]
+    {S : Subgroup (G ⧸ Z)} {s : G ⧸ Z} (hgen : ∀ y ∈ S, ∃ n : ℤ, s ^ n = y)
+    {g : G} (hg : QuotientGroup.mk' Z g = s) {x : G} (hx : x ∈ S.comap (QuotientGroup.mk' Z)) :
+    ∃ z ∈ Z, ∃ n : ℤ, x = z * g ^ n := by
+  obtain ⟨n, hn⟩ := hgen _ (Subgroup.mem_comap.mp hx)
+  refine ⟨x * (g ^ n)⁻¹, ?_, n, by group⟩
+  rw [← QuotientGroup.ker_mk' Z, MonoidHom.mem_ker, map_mul, map_inv, map_zpow, hg, hn,
+    mul_inv_cancel]
+
+/-- 引き戻し部分群の位数は `|Z|` 倍. -/
+private lemma card_comap_mk'_eq_mul {G : Type*} [Group G] [Finite G] {Z : Subgroup G} [Z.Normal]
+    (S : Subgroup (G ⧸ Z)) :
+    Nat.card (S.comap (QuotientGroup.mk' Z)) = Nat.card S * Nat.card Z := by
+  have hsurj : Function.Surjective (QuotientGroup.mk' Z) := QuotientGroup.mk'_surjective Z
+  have h1 : Nat.card (S.comap (QuotientGroup.mk' Z)) * S.index = Nat.card G := by
+    rw [← Subgroup.index_comap_of_surjective S hsurj]
+    exact Subgroup.card_mul_index _
+  have h2 : Nat.card S * S.index = Z.index := by
+    rw [Subgroup.index_eq_card (H := Z)]
+    exact Subgroup.card_mul_index S
+  have h3 : Nat.card Z * Z.index = Nat.card G := Subgroup.card_mul_index Z
+  have hne : S.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+  refine Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hne) ?_
+  rw [h1, ← h3, ← h2]
+  ring
+
+/-- **Isaacs Problem 4A.3** (書籍 p. 123): `Z ≤ G' ∩ Z(G)` で `G ⧸ Z` が quasiquaternion なら
+`Z = 1` — すなわち **quasiquaternion 群の Schur 乗数は自明** (書籍 Note).
+
+証明 (書籍 Hint): `Ḡ = G ⧸ Z` の定義に現れる `C`, `U` の引き戻しを `A`, `B` とする.
+- `A ⧸ Z ≅ C` は巡回で `Z ≤ Z(G)` なので `A = Z⟨a₀⟩`, したがって `A` は abelian (同様に `B`).
+- `Ḡ = CU` を持ち上げて `G = AB`. ゆえに `A ⊓ B = Z(G)`: `A ⊓ B` の元は `A` とも `B` とも
+  可換なので `G = AB` 全体と可換; 逆は中心の像が商の中心 `C ⊓ U` に入ることから.
+- `A ⊴ G` は abelian で `G ⧸ A` は巡回 (`Ḡ ⧸ C` が `U` の像で生成される) なので Lem 4.6:
+  `|G'| · |A ⊓ Z(G)| = |A|`, ここで `Z(G) = A ⊓ B ≤ A` ゆえ `|G'| · |Z(G)| = |A|`.
+  同じことを `Ḡ` と `C` に適用して `|Ḡ'| · |Z(Ḡ)| = |C|`.
+- 引き戻しの位数は `|Z|` 倍 (`A = comap C`, `Z(G) = comap Z(Ḡ)`, `G' = comap Ḡ'` — 最後は
+  `Z ≤ G'` を使う) なので `|C| |Z| = (|Ḡ'| |Z|) (|Z(Ḡ)| |Z|) = |C| |Z|²`, ゆえに `|Z| = 1`. -/
+theorem eq_bot_of_isQuasiquaternion_quotient {G : Type*} [Group G] [Finite G]
+    (Z : Subgroup G) [Z.Normal] (hZcomm : Z ≤ commutator G)
+    (hZcent : Z ≤ Subgroup.center G) (hQ : IsQuasiquaternion (G ⧸ Z)) : Z = ⊥ := by
+  obtain ⟨C, U, hCnorm, hCcyc, hUcyc, hprod, hinf⟩ := hQ
+  haveI := hCnorm
+  set φ := QuotientGroup.mk' Z with hφ
+  have hsurj : Function.Surjective φ := QuotientGroup.mk'_surjective Z
+  set A := C.comap φ with hA
+  set B := U.comap φ with hB
+  haveI hAnorm : A.Normal := hCnorm.comap φ
+  -- `Z` は `A`, `B` に含まれる (ker φ ≤ 引き戻し)
+  have hZA : Z ≤ A := fun z hz => by
+    simp only [hA, Subgroup.mem_comap]
+    rw [show φ z = 1 by rw [hφ, ← MonoidHom.mem_ker, QuotientGroup.ker_mk']; exact hz]
+    exact one_mem C
+  have hZB : Z ≤ B := fun z hz => by
+    simp only [hB, Subgroup.mem_comap]
+    rw [show φ z = 1 by rw [hφ, ← MonoidHom.mem_ker, QuotientGroup.ker_mk']; exact hz]
+    exact one_mem U
+  -- 中心の元はすべての元と可換
+  have hcent : ∀ z ∈ Z, ∀ y : G, Commute z y := fun z hz y =>
+    (Subgroup.mem_center_iff.mp (hZcent hz) y).symm
+  -- 生成元とその持ち上げ
+  obtain ⟨c₀, hc₀C, hc₀gen⟩ := exists_generator_mem hCcyc
+  obtain ⟨u₀, hu₀U, hu₀gen⟩ := exists_generator_mem hUcyc
+  obtain ⟨a₀, ha₀⟩ := hsurj c₀
+  obtain ⟨b₀, hb₀⟩ := hsurj u₀
+  -- `A`, `B` の元の形
+  have hAform : ∀ x ∈ A, ∃ z ∈ Z, ∃ n : ℤ, x = z * a₀ ^ n := fun x hx =>
+    exists_mem_mul_zpow_of_mem_comap hc₀gen ha₀ hx
+  have hBform : ∀ x ∈ B, ∃ z ∈ Z, ∃ n : ℤ, x = z * b₀ ^ n := fun x hx =>
+    exists_mem_mul_zpow_of_mem_comap hu₀gen hb₀ hx
+  -- `Z⟨g⟩` の形の元同士は可換
+  have hcomm_form : ∀ (g : G) (z₁ z₂ : G), z₁ ∈ Z → z₂ ∈ Z → ∀ m n : ℤ,
+      (z₁ * g ^ m) * (z₂ * g ^ n) = (z₂ * g ^ n) * (z₁ * g ^ m) := by
+    intro g z₁ z₂ hz₁ hz₂ m n
+    exact (Commute.mul_left (hcent z₁ hz₁ _)
+      (Commute.mul_right (hcent z₂ hz₂ (g ^ m)).symm ((Commute.refl g).zpow_zpow m n))).eq
+  have hAab : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := by
+    intro x hx y hy
+    obtain ⟨z₁, hz₁, m, rfl⟩ := hAform x hx
+    obtain ⟨z₂, hz₂, n, rfl⟩ := hAform y hy
+    exact hcomm_form a₀ z₁ z₂ hz₁ hz₂ m n
+  have hBab : ∀ x ∈ B, ∀ y ∈ B, x * y = y * x := by
+    intro x hx y hy
+    obtain ⟨z₁, hz₁, m, rfl⟩ := hBform x hx
+    obtain ⟨z₂, hz₂, n, rfl⟩ := hBform y hy
+    exact hcomm_form b₀ z₁ z₂ hz₁ hz₂ m n
+  -- `G = AB`
+  have hGAB : ∀ g : G, ∃ x ∈ A, ∃ y ∈ B, x * y = g := by
+    intro g
+    obtain ⟨c, hc, u, hu, hcu⟩ := hprod (φ g)
+    obtain ⟨x, hx⟩ := hsurj c
+    obtain ⟨y, hy⟩ := hsurj u
+    have hxA : x ∈ A := by simp only [hA, Subgroup.mem_comap, hx]; exact hc
+    have hyB : y ∈ B := by simp only [hB, Subgroup.mem_comap, hy]; exact hu
+    have hz : g * (x * y)⁻¹ ∈ Z := by
+      rw [← QuotientGroup.ker_mk' Z, MonoidHom.mem_ker, ← hφ, map_mul, map_inv, map_mul, hx, hy,
+        hcu, mul_inv_cancel]
+    exact ⟨g * (x * y)⁻¹ * x, A.mul_mem (hZA hz) hxA, y, hyB, by group⟩
+  -- `A ⊓ B = Z(G)`
+  have hABcenter : A ⊓ B = Subgroup.center G := by
+    refine le_antisymm (fun x hx => Subgroup.mem_center_iff.mpr fun g => ?_) (fun x hx => ?_)
+    · obtain ⟨a, ha, b, hb, rfl⟩ := hGAB g
+      rw [mul_assoc, hBab b hb x hx.2, ← mul_assoc, hAab a ha x hx.1, mul_assoc]
+    · have hxc : φ x ∈ Subgroup.center (G ⧸ Z) := by
+        refine Subgroup.mem_center_iff.mpr fun q => ?_
+        obtain ⟨y, rfl⟩ := hsurj q
+        rw [← map_mul, ← map_mul, Subgroup.mem_center_iff.mp hx y]
+      rw [← hinf] at hxc
+      exact ⟨Subgroup.mem_comap.mpr hxc.1, Subgroup.mem_comap.mpr hxc.2⟩
+  -- `G ⧸ A` は巡回
+  have hGAcyc : IsCyclic (G ⧸ A) := by
+    refine ⟨(b₀ : G ⧸ A), fun x => ?_⟩
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective x
+    obtain ⟨a, ha, b, hb, rfl⟩ := hGAB g
+    obtain ⟨z, hz, n, rfl⟩ := hBform b hb
+    refine ⟨n, ?_⟩
+    change ((b₀ : G ⧸ A)) ^ n = ((a * (z * b₀ ^ n) : G) : G ⧸ A)
+    rw [← QuotientGroup.mk_zpow, QuotientGroup.eq]
+    have : (b₀ ^ n)⁻¹ * (a * (z * b₀ ^ n)) = (b₀ ^ n)⁻¹ * (a * z) * b₀ ^ n := by group
+    rw [this]
+    exact hAnorm.conj_mem' _ (A.mul_mem ha (hZA hz)) _
+  -- `Ḡ ⧸ C` は巡回
+  have hGCcyc : IsCyclic ((G ⧸ Z) ⧸ C) := by
+    refine ⟨(u₀ : (G ⧸ Z) ⧸ C), fun x => ?_⟩
+    obtain ⟨q, rfl⟩ := QuotientGroup.mk_surjective x
+    obtain ⟨c, hc, u, hu, rfl⟩ := hprod q
+    obtain ⟨n, rfl⟩ := hu₀gen u hu
+    refine ⟨n, ?_⟩
+    change ((u₀ : (G ⧸ Z) ⧸ C)) ^ n = ((c * u₀ ^ n : G ⧸ Z) : (G ⧸ Z) ⧸ C)
+    rw [← QuotientGroup.mk_zpow, QuotientGroup.eq]
+    have : (u₀ ^ n)⁻¹ * (c * u₀ ^ n) = (u₀ ^ n)⁻¹ * c * u₀ ^ n := by group
+    rw [this]
+    exact hCnorm.conj_mem' _ hc _
+  -- Lem 4.6 を `G` と `Ḡ` に適用
+  have hlem1 : Nat.card (commutator G) * Nat.card (Subgroup.center G) = Nat.card A := by
+    have h := card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient
+      (A := A) hAab hGAcyc
+    rwa [show A ⊓ Subgroup.center G = Subgroup.center G by
+      rw [← hABcenter]; exact inf_eq_right.mpr inf_le_left] at h
+  have hlem2 : Nat.card (commutator (G ⧸ Z)) * Nat.card (Subgroup.center (G ⧸ Z))
+      = Nat.card C := by
+    have hCab : ∀ x ∈ C, ∀ y ∈ C, x * y = y * x := by
+      intro x hx y hy
+      obtain ⟨m, rfl⟩ := hc₀gen x hx
+      obtain ⟨n, rfl⟩ := hc₀gen y hy
+      exact ((Commute.refl c₀).zpow_zpow m n).eq
+    have h := card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient
+      (A := C) hCab hGCcyc
+    rwa [show C ⊓ Subgroup.center (G ⧸ Z) = Subgroup.center (G ⧸ Z) by
+      rw [← hinf]; exact inf_eq_right.mpr inf_le_left] at h
+  -- 引き戻しの位数関係
+  have hcardA : Nat.card A = Nat.card C * Nat.card Z := card_comap_mk'_eq_mul C
+  have hcardZG : Nat.card (Subgroup.center G)
+      = Nat.card (Subgroup.center (G ⧸ Z)) * Nat.card Z := by
+    rw [← card_comap_mk'_eq_mul (Subgroup.center (G ⧸ Z)), ← hinf, Subgroup.comap_inf, hABcenter]
+  have hcardG' : Nat.card (commutator G) = Nat.card (commutator (G ⧸ Z)) * Nat.card Z := by
+    rw [← card_comap_mk'_eq_mul (commutator (G ⧸ Z))]
+    congr 1
+    have hmap : (commutator G).map φ = commutator (G ⧸ Z) := by
+      rw [map_commutator_eq, MonoidHom.range_eq_top.mpr hsurj, ← commutator_def]
+    rw [← hmap, Subgroup.comap_map_eq, QuotientGroup.ker_mk', sup_eq_left.mpr hZcomm]
+  -- 位数の勘定
+  have hkey : Nat.card C * Nat.card Z = Nat.card C * (Nat.card Z * Nat.card Z) := by
+    calc Nat.card C * Nat.card Z = Nat.card A := hcardA.symm
+      _ = Nat.card (commutator G) * Nat.card (Subgroup.center G) := hlem1.symm
+      _ = (Nat.card (commutator (G ⧸ Z)) * Nat.card Z)
+            * (Nat.card (Subgroup.center (G ⧸ Z)) * Nat.card Z) := by rw [hcardG', hcardZG]
+      _ = (Nat.card (commutator (G ⧸ Z)) * Nat.card (Subgroup.center (G ⧸ Z)))
+            * (Nat.card Z * Nat.card Z) := by ring
+      _ = Nat.card C * (Nat.card Z * Nat.card Z) := by rw [hlem2]
+  have hCpos : 0 < Nat.card C := Nat.card_pos
+  have hZpos : 0 < Nat.card Z := Nat.card_pos
+  have hZ1 : Nat.card Z = 1 := by
+    have := Nat.eq_of_mul_eq_mul_left hCpos hkey
+    nlinarith
+  exact Subgroup.card_eq_one.mp hZ1
+
 /-! ### Problem 4A.4 — extraspecial なら `P / Z(P)` は elementary abelian -/
 
 /-- 類 2 の群 (`G' ≤ Z(G)`) では `⁅x ^ n, y⁆ = ⁅x, y⁆ ^ n`. -/
