@@ -1432,6 +1432,21 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 - **4C.3** は three subgroups lemma (`Subgroup.commutator_commutator_eq_bot_of_rotate`) の
   `(G, A, N)` への直接適用: `⁅⁅A,N⁆,G⁆ = 1` は仮定, `⁅⁅N,G⁆,A⁆ ≤ ⁅N,A⁆ = 1` は `N ⊴ G`。
 
+## Ch.5 §5A (書籍 pp. 152-153 の Problems 5A) — 着手 (2026-07-26)
+
+新 leaf `OddOrder/Isaacs/Ch05_Transfer/Problems.lean` (namespace `OddOrder.Isaacs.Ch05`、
+`OddOrder.lean` 配線済)。mathlib の transfer は
+`MonoidHom.transfer (ϕ : ↥H →* A) : G →* A` (`A` 可換) で、Isaacs の `v : G → H/H'` は
+`A = H/H'`, `ϕ` = 自然な射影の場合。
+
+| # | 状態 | Lean 名 / メモ |
+|---|---|---|
+| 5A.1 | ✅ | `transfer_id_eq_pow_index_of_commGroup` / `coe_transfer_id_of_commGroup` |
+| 5A.2 | ⬜ | `v : G → G/G'` は自然な射影 (= `H = ⊤` の場合)。`transfer_eq_pow` は使えない (key 仮説が偽) ので `diff` の定義を展開する必要あり |
+| 5A.3 | ⬜ | 推移律 (transversal の積 `ST`、pretransfer の合成)。mathlib は `diff` 経由の定義なので要検討 |
+| 5A.4 | ⬜ | `H ≤ Z(G)`, `|G:H| = n`: (a) `v(h) = h^n` (mathlib `transfer_center_eq_pow` と同型の議論)、(b) `(|H|, n) = 1` ⟹ `G = H × ker v`。⚠ 一般の `H ≤ Z(G)` では `CommGroup ↥H` が instance で来ないので statement 内 `letI` が要る (repo の `quotient_isMulCommutative_of_commutator_le` と同じ手) |
+| 5A.5–5A.8 | ⬜ | **Schur 乗数 `M(G)`** が要る (5A.5 巡回-by-巡回 / 5A.6 二面体群 / 5A.7 / 5A.8 直積)。repo の Schur 乗数まわりの資産を先に実測すること |
+
 ## Ch.4 §4D (書籍 p. 145 の Problems 4D) — 進行中 (2026-07-25)
 
 7 問 (4D.1–4D.7)。coprime action の節。
