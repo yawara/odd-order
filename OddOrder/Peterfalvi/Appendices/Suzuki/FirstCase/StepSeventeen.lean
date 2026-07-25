@@ -40,6 +40,39 @@ theorem isStronglyReal_inv {x : G'} (hx : IsStronglyReal x) : IsStronglyReal x�
   have hvinv : v⁻¹ = v := inv_eq_of_mul_eq_one_right (by rw [← pow_two]; exact hv2)
   exact ⟨v, ⟨hv2, hv1⟩, u, ⟨hu2, hu1⟩, by rw [mul_inv_rev, huinv, hvinv]⟩
 
+/-- A normal subgroup of prime index `p` forces `p ∣ |G^{ab}|`. -/
+theorem dvd_card_abelianization_of_index_eq_prime [Finite G'] {H : Subgroup G'}
+    [H.Normal] {p : ℕ} (hp : p.Prime) (hidx : H.index = p) :
+    p ∣ Nat.card (Abelianization G') := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI hcyc : IsCyclic (G' ⧸ H) :=
+    isCyclic_of_prime_card (α := G' ⧸ H) (p := p)
+      (by rw [← Subgroup.index_eq_card, hidx])
+  haveI : IsMulCommutative (G' ⧸ H) := IsCyclic.isMulCommutative
+  have hcomm : commutator G' ≤ H := by
+    rw [commutator_def]
+    refine Subgroup.commutator_le.mpr fun a _ b _ => ?_
+    rw [← QuotientGroup.eq_one_iff]
+    have h := ‹IsMulCommutative (G' ⧸ H)›.is_comm.comm
+      (QuotientGroup.mk (s := H) a) (QuotientGroup.mk (s := H) b)
+    calc QuotientGroup.mk (s := H) ⁅a, b⁆
+        = ⁅QuotientGroup.mk (s := H) a, QuotientGroup.mk (s := H) b⁆ := by
+          simp [commutatorElement_def, QuotientGroup.mk_mul, QuotientGroup.mk_inv]
+      _ = 1 := commutatorElement_eq_one_iff_commute.mpr h
+  let f : Abelianization G' →* G' ⧸ H :=
+    QuotientGroup.map (commutator G') H (MonoidHom.id G') (by simpa using hcomm)
+  have hsurj : Function.Surjective f := by
+    intro y
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective (s := H) y
+    exact ⟨Abelianization.of g, rfl⟩
+  have hcard : Nat.card (G' ⧸ H) ∣ Nat.card (Abelianization G') := by
+    obtain ⟨e⟩ : Nonempty ((Abelianization G' ⧸ f.ker) ≃* (G' ⧸ H)) :=
+      ⟨QuotientGroup.quotientKerEquivOfSurjective f hsurj⟩
+    rw [← Nat.card_congr e.toEquiv, ← Subgroup.index_eq_card]
+    exact Subgroup.index_dvd_card _
+  rwa [← Subgroup.index_eq_card, hidx] at hcard
+
 end GenericStronglyReal
 
 namespace FirstCaseHypothesis
@@ -514,6 +547,277 @@ theorem normalizer_sylow_eq
           _ = (g * y * g⁻¹) * (g * u * g⁻¹) := h
           _ = g * (y * u) * g⁻¹ := by group
       exact mul_left_cancel (mul_right_cancel h3)
+
+include model in
+/-- **`W ⊄ R₁` when `|W| = 9`** ((17), p. 114, last paragraph).
+
+Peterfalvi argues through `C_{R₁}(s) = PΣ`; here it is quicker to compare centres:
+if `W ≤ R₁` then `LV ≤ R₁`, and `|LV| = 27·|W| = 3⁵ = |R₁|` forces `LV = R₁`, whence
+`Z₁Σ = Z(LV) = Z(R₁) = Z₁` — impossible since `|Z₁Σ| = 9` and `|Z₁| = 3`. -/
+theorem not_W_le_sylowThree_of_card_W_eq_nine
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hW9 : Nat.card ↥fc.toHypothesis.W = 9) :
+    ¬ fc.toHypothesis.W ≤ fc.sylowThreeNormalizerRSigma model := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  intro hWR₁
+  have hR₁card := fc.card_sylowThreeNormalizerRSigma model ind hB2
+  have hLVcard : Nat.card ↥(fc.nonsplitTorus ⊔ fc.toHypothesis.V) = 3 ^ 5 := by
+    rw [fc.card_sup_nonsplitTorus_V model ind hB2, hW9]
+    norm_num
+  have hPR₁ : fc.P ≤ fc.sylowThreeNormalizerRSigma model :=
+    ((fc.P_le_invImageF model).trans le_sup_left).trans
+      (fc.sup_le_sylowThreeNormalizerRSigma model ind hB2)
+  have hLVle : fc.nonsplitTorus ⊔ fc.toHypothesis.V
+      ≤ fc.sylowThreeNormalizerRSigma model := by
+    refine sup_le (fc.nonsplitTorus_le_sylowThreeNormalizerRSigma model ind hB2) ?_
+    rw [← fc.W_join_P_eq_V]
+    exact sup_le hWR₁ hPR₁
+  have hLVeq : fc.nonsplitTorus ⊔ fc.toHypothesis.V
+      = fc.sylowThreeNormalizerRSigma model :=
+    Subgroup.eq_of_le_of_card_ge hLVle (by rw [hLVcard, hR₁card])
+  -- the two centres disagree
+  have hZLV := fc.inf_centralizer_sup_nonsplitTorus_V_eq model ind hB2
+  have hZR₁ := fc.inf_centralizer_sylowThree_eq_zpowers model ind hB2
+  rw [hLVeq, hZR₁] at hZLV
+  have h9 := fc.card_zpowers_sup_sigma model ind hB2
+  obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  rw [← hZLV, Nat.card_zpowers, hstord] at h9
+  omega
+
+include model in
+/-- **`R₂⟨s⟩` has a quotient of order `3` when `|W| = 9`** ((17), p. 114, last
+paragraph): `R₂ = R₁W` with `R₁` of index `3`, and `s` centralizes `W`, so `R₁⟨s⟩` is
+normal of index `3` in `R₂⟨s⟩`. -/
+theorem three_dvd_card_abelianization_of_card_W_eq_nine
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
+    (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G))
+    (hW9 : Nat.card ↥fc.toHypothesis.W = 9) :
+    (3 : ℕ) ∣ Nat.card (Abelianization ↥((S : Subgroup G)
+      ⊔ Subgroup.zpowers fc.toHypothesis.distinguishedInvolution)) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  set s : G := fc.toHypothesis.distinguishedInvolution with hs_def
+  have hsord : orderOf s = 2 :=
+    orderOf_eq_prime fc.toHypothesis.distinguishedInvolution_sq
+      fc.toHypothesis.distinguishedInvolution_ne_one
+  have hR₁card := fc.card_sylowThreeNormalizerRSigma model ind hB2
+  obtain ⟨-, -, -, -, -, hGp⟩ := fc.step_twelve model ind hB2
+  have hScard : Nat.card ↥(S : Subgroup G) = 3 ^ 6 := by
+    rw [Sylow.card_eq_multiplicity, hGp, hW9]
+    norm_num
+  -- `R₁` is normal of index `3` in `R₂`
+  have hR₁idx : ((fc.sylowThreeNormalizerRSigma model).subgroupOf
+      (S : Subgroup G)).index = 3 := by
+    have h := ((fc.sylowThreeNormalizerRSigma model).subgroupOf
+      (S : Subgroup G)).card_mul_index
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hR₁S).toEquiv, hR₁card,
+      hScard] at h
+    omega
+  haveI hR₁norm : ((fc.sylowThreeNormalizerRSigma model).subgroupOf
+      (S : Subgroup G)).Normal :=
+    Subgroup.normal_of_index_eq_minFac_card (by rw [hR₁idx, hScard]; norm_num)
+  have hconjR₁ : ∀ g ∈ (S : Subgroup G), ∀ a ∈ fc.sylowThreeNormalizerRSigma model,
+      g * a * g⁻¹ ∈ fc.sylowThreeNormalizerRSigma model := by
+    intro g hg a ha
+    have h := hR₁norm.conj_mem ⟨a, hR₁S ha⟩ (by rwa [Subgroup.mem_subgroupOf])
+      ⟨g, hg⟩
+    rwa [Subgroup.mem_subgroupOf] at h
+  -- `s` normalizes `R₁` and `R₂`
+  have hsR₁ : ∀ a ∈ fc.sylowThreeNormalizerRSigma model,
+      s * a * s⁻¹ ∈ fc.sylowThreeNormalizerRSigma model := fun a ha =>
+    fc.conj_mem_sylowThreeNormalizerRSigma model
+      (fc.distinguishedInvolution_mem_normalizerRSigma model) ha
+  have hsS : s ∈ Subgroup.normalizer (((S : Subgroup G)) : Set G) := by
+    rw [fc.normalizer_sylow_eq model ind hB2 S hR₁S]
+    exact Subgroup.mem_sup_right (Subgroup.mem_zpowers _)
+  -- `R₂ = R₁W`
+  have hWS : fc.toHypothesis.W ≤ (S : Subgroup G) :=
+    ((fc.toHypothesis.W_le_V.trans le_sup_right).trans
+      (fc.sup_nonsplitTorus_V_le_sylow model ind hB2 S hR₁S))
+  have hR₂eq : fc.sylowThreeNormalizerRSigma model ⊔ fc.toHypothesis.W
+      = (S : Subgroup G) := by
+    refine Subgroup.eq_of_le_of_card_ge (sup_le hR₁S hWS) ?_
+    obtain ⟨m, hm⟩ := Subgroup.card_dvd_of_le
+      (le_sup_left : fc.sylowThreeNormalizerRSigma model ≤ _ ⊔ fc.toHypothesis.W)
+    have hdvd : Nat.card ↥(fc.sylowThreeNormalizerRSigma model
+        ⊔ fc.toHypothesis.W) ∣ Nat.card ↥(S : Subgroup G) :=
+      Subgroup.card_dvd_of_le (sup_le hR₁S hWS)
+    have hm3 : m ∣ 3 := by
+      rw [hm, hR₁card, hScard] at hdvd
+      refine (Nat.mul_dvd_mul_iff_left (show 0 < 3 ^ 5 by norm_num)).mp ?_
+      calc 3 ^ 5 * m ∣ 3 ^ 6 := hdvd
+        _ = 3 ^ 5 * 3 := by norm_num
+    rcases (Nat.dvd_prime (by norm_num)).mp hm3 with h1 | h3
+    · exfalso
+      refine fc.not_W_le_sylowThree_of_card_W_eq_nine model ind hB2 hW9 ?_
+      have heq : fc.sylowThreeNormalizerRSigma model ⊔ fc.toHypothesis.W
+          = fc.sylowThreeNormalizerRSigma model :=
+        (Subgroup.eq_of_le_of_card_ge le_sup_left (by rw [hm, h1, mul_one])).symm
+      rw [← heq]
+      exact le_sup_right
+    · rw [hm, h3, hR₁card, hScard]
+      norm_num
+  -- every element of `R₂` sends `s` into `R₁⟨s⟩`
+  have hcoeR₂ : ((S : Subgroup G) : Set G)
+      = ((fc.sylowThreeNormalizerRSigma model : Subgroup G) : Set G)
+        * (fc.toHypothesis.W : Set G) := by
+    rw [← hR₂eq]
+    refine Subgroup.coe_mul_of_right_le_normalizer_left _ _ ?_
+    intro w hw
+    rw [Subgroup.mem_set_normalizer_iff]
+    intro y
+    refine ⟨fun hy => hconjR₁ w (hWS hw) y hy, fun hy => ?_⟩
+    have h1 : w⁻¹ * (w * y * w⁻¹) * w⁻¹⁻¹ = y := by group
+    rw [← h1]
+    exact hconjR₁ w⁻¹ (Subgroup.inv_mem _ (hWS hw)) _ hy
+  have hconjS : ∀ g ∈ (S : Subgroup G),
+      g * s * g⁻¹ ∈ fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s := by
+    intro g hg
+    have hg' : g ∈ ((fc.sylowThreeNormalizerRSigma model : Subgroup G) : Set G)
+        * (fc.toHypothesis.W : Set G) := by rw [← hcoeR₂]; exact hg
+    obtain ⟨a, ha, w, hw, hawg⟩ := hg'
+    have haw : a * w = g := hawg
+    have hws : w * s = s * w := Subgroup.mem_centralizer_singleton_iff.mp
+      (fc.toHypothesis.V_le_centralizer_distinguishedInvolution
+        (fc.toHypothesis.W_le_V hw)).2
+    have hcalc : g * s * g⁻¹ = (a * (s * a⁻¹ * s⁻¹)) * s := by
+      calc g * s * g⁻¹ = a * (w * s * w⁻¹) * a⁻¹ := by rw [← haw]; group
+        _ = a * s * a⁻¹ := by rw [hws]; group
+        _ = (a * (s * a⁻¹ * s⁻¹)) * s := by group
+    rw [hcalc]
+    refine Subgroup.mul_mem _ (Subgroup.mem_sup_left ?_)
+      (Subgroup.mem_sup_right (Subgroup.mem_zpowers _))
+    exact Subgroup.mul_mem _ ha (hsR₁ a⁻¹ (Subgroup.inv_mem _ ha))
+  -- `R₁⟨s⟩` is normal in `R₂⟨s⟩`
+  have hnorm : ∀ g ∈ (S : Subgroup G) ⊔ Subgroup.zpowers s,
+      ∀ y ∈ fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s,
+      g * y * g⁻¹ ∈ fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s := by
+    have hgen : ((S : Subgroup G) ⊔ Subgroup.zpowers s)
+        ≤ Subgroup.normalizer (((fc.sylowThreeNormalizerRSigma model
+          ⊔ Subgroup.zpowers s : Subgroup G)) : Set G) := by
+      refine sup_le ?_ ?_
+      · intro g hg
+        have hconj : ∀ h : G, (∀ a ∈ fc.sylowThreeNormalizerRSigma model,
+              h * a * h⁻¹ ∈ fc.sylowThreeNormalizerRSigma model) →
+            (h * s * h⁻¹ ∈ fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s) →
+            ∀ y ∈ fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s,
+              h * y * h⁻¹ ∈ fc.sylowThreeNormalizerRSigma model
+                ⊔ Subgroup.zpowers s := by
+          intro h hR hs y hy
+          have hsub : fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s
+              ≤ Subgroup.comap (MulAut.conj h).toMonoidHom
+                (fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s) := by
+            refine sup_le (fun a ha => Subgroup.mem_sup_left (hR a ha))
+              (Subgroup.zpowers_le.mpr hs)
+          exact hsub hy
+        rw [Subgroup.mem_set_normalizer_iff]
+        intro y
+        refine ⟨fun hy => hconj g (fun a ha => hconjR₁ g hg a ha) (hconjS g hg) y hy,
+          fun hy => ?_⟩
+        have h1 : g⁻¹ * (g * y * g⁻¹) * g⁻¹⁻¹ = y := by group
+        rw [← h1]
+        refine hconj g⁻¹ (fun a ha => hconjR₁ g⁻¹ (Subgroup.inv_mem _ hg) a ha) ?_ _ hy
+        exact hconjS g⁻¹ (Subgroup.inv_mem _ hg)
+      · rw [Subgroup.zpowers_le, Subgroup.mem_set_normalizer_iff]
+        have hs2 : s * s = 1 := by
+          rw [← pow_two]; exact fc.toHypothesis.distinguishedInvolution_sq
+        have hsinv : s⁻¹ = s := inv_eq_of_mul_eq_one_right hs2
+        have hconj : ∀ y ∈ fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s,
+            s * y * s⁻¹ ∈ fc.sylowThreeNormalizerRSigma model
+              ⊔ Subgroup.zpowers s := by
+          have hsub : fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s
+              ≤ Subgroup.comap (MulAut.conj s).toMonoidHom
+                (fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s) := by
+            refine sup_le (fun a ha => Subgroup.mem_sup_left (hsR₁ a ha))
+              (Subgroup.zpowers_le.mpr (Subgroup.mem_sup_right ?_))
+            have hss : (MulAut.conj s).toMonoidHom s = s := by
+              change s * s * s⁻¹ = s
+              group
+            rw [hss]
+            exact Subgroup.mem_zpowers _
+          intro y hy
+          exact hsub hy
+        intro y
+        refine ⟨fun hy => hconj y hy, fun hy => ?_⟩
+        have h1 : y = s * (s * y * s⁻¹) * s⁻¹ := by
+          rw [hsinv]
+          calc y = (s * s) * y * (s * s) := by rw [hs2]; group
+            _ = s * (s * y * s) * s := by group
+        rw [h1]
+        exact hconj _ hy
+    intro g hg y hy
+    have h := Subgroup.mem_set_normalizer_iff.mp (hgen hg) y
+    exact h.mp hy
+  -- cardinalities and the index
+  have hR₁inf : fc.sylowThreeNormalizerRSigma model ⊓ Subgroup.zpowers s = ⊥ :=
+    (fc.sylowThree_sup_zpowers_distinguishedInvolution model ind hB2).2
+  have hSinf : (S : Subgroup G) ⊓ Subgroup.zpowers s = ⊥ := by
+    rw [eq_bot_iff]
+    intro y hy
+    rw [Subgroup.mem_bot]
+    have h2 : orderOf y ∣ 2 := by
+      have h := Subgroup.orderOf_dvd_natCard _ hy.2
+      rwa [Nat.card_zpowers, hsord] at h
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_orderOf).mp S.isPGroup' ⟨y, hy.1⟩
+    rw [Subgroup.orderOf_mk] at hk
+    have h3 : orderOf y ∣ 3 ^ k := by rw [hk]
+    have h1 : orderOf y = 1 := Nat.eq_one_of_dvd_coprimes
+      (Nat.Coprime.pow_right k (by norm_num)) h2 h3
+    exact orderOf_eq_one_iff.mp h1
+  have hcardR₁s : Nat.card ↥(fc.sylowThreeNormalizerRSigma model
+      ⊔ Subgroup.zpowers s) = 3 ^ 5 * 2 := by
+    rw [card_sup_eq_mul_of_le_normalizer (fun b hb => ?_) hR₁inf, hR₁card,
+      Nat.card_zpowers, hsord]
+    rw [Subgroup.mem_set_normalizer_iff]
+    obtain ⟨k, rfl⟩ := hb
+    intro y
+    have hsk : ∀ a ∈ fc.sylowThreeNormalizerRSigma model,
+        s ^ k * a * (s ^ k)⁻¹ ∈ fc.sylowThreeNormalizerRSigma model := by
+      intro a ha
+      exact fc.conj_mem_sylowThreeNormalizerRSigma model
+        (Subgroup.zpow_mem _ (fc.distinguishedInvolution_mem_normalizerRSigma model) k)
+        ha
+    refine ⟨fun hy => hsk y hy, fun hy => ?_⟩
+    have h1 : (s ^ k)⁻¹ * (s ^ k * y * (s ^ k)⁻¹) * ((s ^ k)⁻¹)⁻¹ = y := by group
+    rw [← h1]
+    have hsk' : ∀ a ∈ fc.sylowThreeNormalizerRSigma model,
+        (s ^ k)⁻¹ * a * ((s ^ k)⁻¹)⁻¹ ∈ fc.sylowThreeNormalizerRSigma model := by
+      intro a ha
+      exact fc.conj_mem_sylowThreeNormalizerRSigma model
+        (Subgroup.inv_mem _ (Subgroup.zpow_mem _
+          (fc.distinguishedInvolution_mem_normalizerRSigma model) k)) ha
+    exact hsk' _ hy
+  have hcardSs : Nat.card ↥((S : Subgroup G) ⊔ Subgroup.zpowers s)
+      = 3 ^ 6 * 2 := by
+    rw [card_sup_eq_mul_of_le_normalizer (fun b hb => ?_) hSinf, hScard,
+      Nat.card_zpowers, hsord]
+    obtain ⟨k, rfl⟩ := hb
+    exact Subgroup.zpow_mem _ hsS k
+  have hleSs : fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s
+      ≤ (S : Subgroup G) ⊔ Subgroup.zpowers s :=
+    sup_le (hR₁S.trans le_sup_left) le_sup_right
+  haveI hnormSub : ((fc.sylowThreeNormalizerRSigma model
+      ⊔ Subgroup.zpowers s).subgroupOf
+        ((S : Subgroup G) ⊔ Subgroup.zpowers s)).Normal := by
+    constructor
+    intro n hn g
+    rw [Subgroup.mem_subgroupOf] at hn ⊢
+    exact hnorm g g.2 n hn
+  have hidx : ((fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s).subgroupOf
+      ((S : Subgroup G) ⊔ Subgroup.zpowers s)).index = 3 := by
+    have h := ((fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s).subgroupOf
+      ((S : Subgroup G) ⊔ Subgroup.zpowers s)).card_mul_index
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hleSs).toEquiv, hcardR₁s,
+      hcardSs] at h
+    omega
+  exact dvd_card_abelianization_of_index_eq_prime (by norm_num) hidx
 
 end FirstCaseHypothesis
 

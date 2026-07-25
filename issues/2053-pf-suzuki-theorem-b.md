@@ -1386,7 +1386,22 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
   9503 の方針を「まず既存 Yoshida (`exists_surjective_wreath_of_transfer_range_lt`)
   で `R₂ ↠ C₃≀C₃` を排除する」に更新済。
 
+### 追加 landed (2026-07-26 続き) — **|W| = 9 側の最終矛盾が完了**
+- `dvd_card_abelianization_of_index_eq_prime` (generic): 素数指数の正規部分群 ⟹
+  `p ∣ |G^ab|`
+- **`not_W_le_sylowThree_of_card_W_eq_nine` : `W ⊄ R₁`**
+  ⚠ 書籍は `C_{R₁}(s) = PΣ` 経由だが、**中心の比較で簡略化**:
+  `W ≤ R₁` なら `LV ≤ R₁` かつ `|LV| = 27·9 = 3⁵ = |R₁|` ⟹ `LV = R₁` ⟹
+  `Z₁Σ = Z(LV) = Z(R₁) = Z₁` で `9 = 3` の矛盾。(14)(15) の中心計算だけで済む。
+- **`three_dvd_card_abelianization_of_card_W_eq_nine` : `3 ∣ |Ab(R₂⟨s⟩)|`**
+  (`R₂ = R₁W`、`s` は `W` を中心化 ⟹ `R₁⟨s⟩ ⊴ R₂⟨s⟩` で指数
+  `(2·3⁶)/(2·3⁵) = 3`)。
+
 ### 残り
+0. **|W| = 3 側の最終矛盾** (`R₂ = R₁` の分岐)。書籍は `R̄₁ = R₁/Z₁` の構造
+   (`R̄Σ = T̄×P̄×Σ̄` と `L̄ΣP = L̄×Σ̄×P̄` で生成、class ≤ 2 で `|⁅R̄₁,R̄₁⁆| ∈ {1,3}`、
+   `s` が `Σ̄P̄` を中心化) から `R̄₁/⁅R̄₁,R̄₁⁆ ⋊ ⟨s⟩` の位数 3 商を作る。
+   ⟹ 目標は同じ **`3 ∣ |Ab(R₂⟨s⟩)|`** (= `3 ∣ |Ab(N_G(RΣ))|`, `R₂ = R₁` なので)。
 1. **transfer 制御** = [issue 9503](9503-hall-wielandt-abelian-weakly-closed.md)
    (claim 済、hub band)。第一候補 = Yoshida + `R₂ ↠ C₃≀C₃` の排除、
    fallback = classical Hall–Wielandt (Grün 第二定理)。
