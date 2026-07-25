@@ -25,6 +25,50 @@ open scoped Pointwise commutatorElement
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
+section GenericConj
+
+variable {G' : Type*} [Group G']
+
+/-- Iterating a conjugation relation `a^g = a·d` with `d` central for `a` and `g`. -/
+theorem conj_pow_eq_mul_pow {a d g : G'} (hda : Commute d a) (hdg : Commute d g)
+    (h : g * a * g⁻¹ = a * d) : ∀ m : ℕ, g ^ m * a * (g ^ m)⁻¹ = a * d ^ m := by
+  intro m
+  induction m with
+  | zero => simp
+  | succ n ih =>
+      calc g ^ (n + 1) * a * (g ^ (n + 1))⁻¹
+          = g * (g ^ n * a * (g ^ n)⁻¹) * g⁻¹ := by rw [pow_succ']; group
+        _ = g * (a * d ^ n) * g⁻¹ := by rw [ih]
+        _ = (g * a * g⁻¹) * (g * d ^ n * g⁻¹) := by group
+        _ = (a * d) * d ^ n := by
+              rw [h, ← (hdg.pow_left n).eq]
+              group
+        _ = a * d ^ (n + 1) := by rw [pow_succ]; group
+
+/-- A conjugate of a strongly real element is strongly real. -/
+theorem isStronglyReal_conj {x : G'} (hx : IsStronglyReal x) (g : G') :
+    IsStronglyReal (g * x * g⁻¹) := by
+  obtain ⟨u, ⟨hu2, hu1⟩, v, ⟨hv2, hv1⟩, rfl⟩ := hx
+  refine ⟨g * u * g⁻¹, ⟨?_, ?_⟩, g * v * g⁻¹, ⟨?_, ?_⟩, by group⟩
+  · rw [show (g * u * g⁻¹) ^ 2 = g * u ^ 2 * g⁻¹ by rw [pow_two, pow_two]; group,
+      hu2]
+    group
+  · intro h
+    refine hu1 ?_
+    have h2 : u = g⁻¹ * (g * u * g⁻¹) * g := by group
+    rw [h] at h2
+    simpa using h2
+  · rw [show (g * v * g⁻¹) ^ 2 = g * v ^ 2 * g⁻¹ by rw [pow_two, pow_two]; group,
+      hv2]
+    group
+  · intro h
+    refine hv1 ?_
+    have h2 : v = g⁻¹ * (g * v * g⁻¹) * g := by group
+    rw [h] at h2
+    simpa using h2
+
+end GenericConj
+
 namespace FirstCaseHypothesis
 
 universe uG uΩ
@@ -364,6 +408,136 @@ theorem not_isStronglyReal_of_mem_P_sup_sigma
   have hord2 : orderOf x ∣ 2 := orderOf_dvd_iff_pow_eq_one.mpr h2
   have h1 : orderOf x = 1 := Nat.eq_one_of_dvd_coprimes (by decide) hord2 hord
   exact hx1 (orderOf_eq_one_iff.mp h1)
+
+/-! ## The elementary abelian group `Z₁ΣP` of order `27` -/
+
+include model in
+/-- `Z₁Σ ⊓ P = 1`: a nonidentity element would generate `P` inside `Z(LV) = Z₁Σ`,
+making `P` centralize `L`. -/
+theorem zpowers_sup_sigma_inf_P_eq_bot
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊓ fc.P = ⊥ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hPcard : Nat.card ↥fc.P = 3 := by rw [fc.card_P, hp3]
+  have hZScen : (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+      ≤ Subgroup.centralizer (((fc.nonsplitTorus ⊔ fc.toHypothesis.V) : Subgroup G)
+        : Set G) := by
+    rw [← fc.inf_centralizer_sup_nonsplitTorus_V_eq model ind hB2]
+    exact inf_le_right
+  rw [eq_bot_iff]
+  intro y hy
+  rw [Subgroup.mem_bot]
+  by_contra hy1
+  have hyord : orderOf y = 3 := by
+    have h := fc.P.orderOf_dvd_natCard hy.2
+    rw [hPcard] at h
+    rcases (Nat.dvd_prime (by norm_num)).mp h with h1 | h3
+    · exact absurd (orderOf_eq_one_iff.mp h1) hy1
+    · exact h3
+  have hgen : Subgroup.zpowers y = fc.P :=
+    Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hy.2)
+      (by rw [Nat.card_zpowers, hyord, hPcard])
+  refine fc.not_nonsplitTorus_le_centralizer_P model ind hB2 fun l hl => ?_
+  refine Subgroup.mem_centralizer_iff.mpr fun q hq => ?_
+  rw [← hgen] at hq
+  obtain ⟨k, rfl⟩ := hq
+  have hycen := Subgroup.mem_centralizer_iff.mp (hZScen hy.1) l
+    (Subgroup.mem_sup_left hl)
+  exact (Commute.zpow_left (Commute.symm hycen) k).eq
+
+include model in
+/-- `Z₁Σ` is abelian: it is `Z(LV)` by (15). -/
+theorem mul_comm_of_mem_zpowers_sup_sigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {a b : G}
+    (ha : a ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+    (hb : b ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :
+    a * b = b * a := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  rw [← fc.inf_centralizer_sup_nonsplitTorus_V_eq model ind hB2] at ha hb
+  exact (Subgroup.mem_centralizer_iff.mp ha.2 b hb.1).symm
+
+include model in
+/-- `Z₁ΣP` is abelian. -/
+theorem mul_comm_of_mem_zpowers_sup_sigma_sup_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {a b : G}
+    (ha : a ∈ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P)
+    (hb : b ∈ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P) :
+    a * b = b * a := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  have habR := fc.invImageF_mul_comm model ind hB2 hm
+  refine mul_comm_of_mem_sup_of_commute
+    (fun _ h₁ _ h₂ => fc.mul_comm_of_mem_zpowers_sup_sigma model ind hB2 h₁ h₂)
+    (fun _ h₁ _ h₂ => habR _ (fc.P_le_invImageF model h₁) _
+      (fc.P_le_invImageF model h₂))
+    (fun _ h₁ _ h₂ => (Subgroup.mem_centralizer_iff.mp
+      (sup_le (fc.zpowers_st_le_centralizer_P model ind hB2) inf_le_right h₁) _ h₂).symm)
+    ha hb
+
+include model in
+/-- `|Z₁Σ| = 9`. -/
+theorem card_zpowers_sup_sigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    Nat.card ↥(Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) = 9 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨hpSig, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, -, -, hSig3, -⟩ :=
+    fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  have hinf : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t)
+      ⊓ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    have hmem : x ∈ fc.nonsplitTorus ⊓ fc.toHypothesis.W :=
+      ⟨fc.zpowers_le_nonsplitTorus hx.1, hx.2.1⟩
+    rwa [fc.nonsplitTorus_inf_W_eq_bot model ind hB2] at hmem
+  rw [card_sup_eq_mul_of_commute
+      (fun _ (ha : _ ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)) _
+        (hb : _ ∈ fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) =>
+        fc.commute_of_mem_nonsplitTorus_of_mem_W (fc.zpowers_le_nonsplitTorus ha) hb.1)
+      hinf,
+    Nat.card_zpowers, hstord, hSig3]
+
+include model in
+/-- `|Z₁ΣP| = 27`. -/
+theorem card_zpowers_sup_sigma_sup_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    Nat.card ↥((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P) = 27 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  rw [card_sup_eq_mul_of_commute
+      (fun _ ha _ hb => (Subgroup.mem_centralizer_iff.mp
+        (sup_le (fc.zpowers_st_le_centralizer_P model ind hB2) inf_le_right ha) _ hb).symm)
+      (fc.zpowers_sup_sigma_inf_P_eq_bot model ind hB2),
+    fc.card_zpowers_sup_sigma model ind hB2, fc.card_P, hp3]
 
 end FirstCaseHypothesis
 
