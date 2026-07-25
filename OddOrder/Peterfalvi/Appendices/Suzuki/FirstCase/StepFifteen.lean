@@ -186,6 +186,95 @@ theorem P_le_normalizer_orderThreeGeneratedSubgroup :
   rw [← h1]
   exact hconj x⁻¹ (Subgroup.inv_mem _ hxP) _ hy
 
+include fc in
+/-- **`Z₁ ≤ L`** ((15), p. 113): `st` centralizes itself and lies in `⟨Q₀, K, t⟩`. -/
+theorem zpowers_le_centralizer_inf_orderThreeGeneratedSubgroup :
+    Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+      ≤ Subgroup.centralizer ({fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t} : Set G)
+        ⊓ fc.toHypothesis.orderThreeGeneratedSubgroup := by
+  have hsQ0 : fc.toHypothesis.distinguishedInvolution ∈ fc.toHypothesis.Q0 :=
+    ⟨fc.toHypothesis.distinguishedInvolution_sq,
+      fc.toHypothesis.distinguishedInvolution_mem_H⟩
+  refine Subgroup.zpowers_le.mpr ⟨Subgroup.mem_centralizer_singleton_iff.mpr rfl, ?_⟩
+  exact Subgroup.mul_mem _ (fc.toHypothesis.orderThree_Q0_le hsQ0)
+    fc.toHypothesis.orderThree_t_mem
+
+include model in
+/-- **`L ⊓ P = 1`** ((15), p. 113).
+
+If not, then `P ≤ L` (as `|P| = 3` is prime), so `Z₁P ≤ L`; but `|Z₁P| = 9 = |L|`, so
+`L = Z₁P` would have exponent `3`, contradicting the cyclicity of `L` of order `9`. -/
+theorem inf_P_eq_bot_of_centralizer_inf_orderThreeGeneratedSubgroup
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    (Subgroup.centralizer ({fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t} : Set G)
+        ⊓ fc.toHypothesis.orderThreeGeneratedSubgroup) ⊓ fc.P = ⊥ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  obtain ⟨hLcyc, hLcard⟩ :=
+    fc.isCyclic_and_card_centralizer_inf_orderThreeGeneratedSubgroup model ind hB2
+  set L : Subgroup G := Subgroup.centralizer
+    ({fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t} : Set G)
+      ⊓ fc.toHypothesis.orderThreeGeneratedSubgroup with hL_def
+  have hZ₁L := fc.zpowers_le_centralizer_inf_orderThreeGeneratedSubgroup
+  rw [eq_bot_iff]
+  intro y hy
+  rw [Subgroup.mem_bot]
+  by_contra hy1
+  -- `P = ⟨y⟩ ≤ L`
+  have hPcard : Nat.card ↥fc.P = 3 := by rw [fc.card_P, hp3]
+  have hyord : orderOf y = 3 := by
+    have h := fc.P.orderOf_dvd_natCard hy.2
+    rw [hPcard] at h
+    rcases (Nat.dvd_prime (by norm_num)).mp h with h1 | h3
+    · exact absurd (orderOf_eq_one_iff.mp h1) hy1
+    · exact h3
+  have hPL : fc.P ≤ L := by
+    have hgen : Subgroup.zpowers y = fc.P :=
+      Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hy.2)
+        (by rw [Nat.card_zpowers, hyord, hPcard])
+    rw [← hgen]
+    exact Subgroup.zpowers_le.mpr hy.1
+  -- `L = Z₁P`, hence of exponent `3`
+  have habR := fc.invImageF_mul_comm model ind hB2 hm
+  have hcomm : ∀ a ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t), ∀ b ∈ fc.P, a * b = b * a := by
+    intro a ha b hb
+    exact habR a ((fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2
+      hm).trans (fc.sInvertedT_spec model ind hB2 hm).1 ha) b (fc.P_le_invImageF model hb)
+  have hsupL : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ⊔ fc.P = L :=
+    Subgroup.eq_of_le_of_card_ge (sup_le hZ₁L hPL)
+      (by rw [hLcard, fc.card_zpowers_sup_P_eq_nine model ind hB2])
+  have hcube : ∀ x ∈ L, x ^ 3 = 1 := by
+    intro x hx
+    rw [← hsupL] at hx
+    refine pow_eq_one_of_mem_sup_of_commute hcomm ?_ ?_ hx
+    · intro a ha
+      have h := Subgroup.orderOf_dvd_natCard _ ha
+      rw [Nat.card_zpowers, fc.orderOf_st_eq_char model, fc.char_eq_p model hB2,
+        hp3] at h
+      exact orderOf_dvd_iff_pow_eq_one.mp h
+    · intro b hb
+      have h := fc.P.orderOf_dvd_natCard hb
+      rw [hPcard] at h
+      exact orderOf_dvd_iff_pow_eq_one.mp h
+  -- but `L` is cyclic of order `9`
+  obtain ⟨g, hg⟩ := hLcyc.exists_generator
+  have hgtop : Subgroup.zpowers g = ⊤ := by
+    rw [eq_top_iff]
+    exact fun x _ => hg x
+  have hgord : orderOf (g : G) = 9 := by
+    rw [Subgroup.orderOf_coe, ← Nat.card_zpowers, hgtop, Subgroup.card_top, hLcard]
+  have hg3 : (g : G) ^ 3 = 1 := hcube _ g.2
+  have := orderOf_dvd_of_pow_eq_one hg3
+  rw [hgord] at this
+  omega
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
