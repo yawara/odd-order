@@ -151,6 +151,106 @@ theorem repr_sum_fourier_self_free
     rw [if_neg (fun heq => hk (hfree k heq)), mul_zero, mul_zero]
   · intro hc0; exact absurd (Finset.mem_univ _) hc0
 
+/-- **Plain permutation operators are monomial with weight `1`** (issue 0106, the `a = 1`
+adapter): a `T` that permutes the basis on the nose satisfies the existential monomial
+hypothesis `hmon` taken by the orbit-assembly theorems below, plug-and-play. -/
+theorem monomial_of_perm
+    (hperm : ∀ (k : ℕ) (c : κ), (T ^ k) (b c) = b ((σ ^ k) c)) :
+    ∀ (k : ℕ) (c : κ), ∃ a : F, (T ^ k) (b c) = a • b ((σ ^ k) c) :=
+  fun k c => ⟨1, by rw [one_smul]; exact hperm k c⟩
+
+/-- Core computation behind the partial-period diagonal coefficients (issue 0106): for a
+*plain permutation* operator, if the `ZMod h`-stabilizer of `c` consists exactly of the
+multiples of `d` (`d ∣ h`, i.e. the `σ`-orbit of `c` has size `d`), the diagonal Fourier
+coefficient reduces to the stabilizer geometric sum `∑_{j < h/d} ((ε^m)⁻¹^d)^j`. -/
+private theorem repr_sum_fourier_self_stabilizer
+    (hperm : ∀ (k : ℕ) (c : κ), (T ^ k) (b c) = b ((σ ^ k) c))
+    {ε : F} {m : ℕ} {c : κ} {d : ℕ} (hd : d ∣ h) (hd0 : d ≠ 0)
+    (hstab : ∀ k : ZMod h, (σ ^ k.val) c = c ↔ d ∣ k.val) :
+    b.repr (∑ k : ZMod h, ((ε ^ m)⁻¹ ^ k.val) • (T ^ k.val) (b c)) c
+      = ∑ j ∈ Finset.range (h / d), ((ε ^ m)⁻¹ ^ d) ^ j := by
+  classical
+  set ζ : F := (ε ^ m)⁻¹ with hζdef
+  -- coordinate of each summand: `ζ^k` on the stabilizer, `0` off it.
+  have hcoord : ∀ k : ZMod h,
+      b.repr ((ζ ^ k.val) • (T ^ k.val) (b c)) c
+        = if (σ ^ k.val) c = c then ζ ^ k.val else 0 := by
+    intro k
+    rw [hperm k.val c]
+    simp only [map_smul, Finsupp.smul_apply, Basis.repr_self, smul_eq_mul,
+      Finsupp.single_apply]
+    split_ifs with h1
+    · rw [mul_one]
+    · rw [mul_zero]
+  rw [map_sum]
+  simp only [Finsupp.coe_finsetSum, Finset.sum_apply]
+  rw [Finset.sum_congr rfl (fun k _ => hcoord k), Finset.sum_ite, Finset.sum_const_zero,
+    add_zero]
+  -- the stabilizer sum reindexes over `j < h/d` via `k = d·j`.
+  have hdj_lt : ∀ j ∈ Finset.range (h / d), d * j < h := by
+    intro j hj
+    have hj' : j < h / d := Finset.mem_range.mp hj
+    calc d * j < d * (h / d) :=
+          (Nat.mul_lt_mul_left (Nat.pos_of_ne_zero hd0)).mpr hj'
+      _ = h := Nat.mul_div_cancel' hd
+  have hval_cast : ∀ j ∈ Finset.range (h / d), ((d * j : ℕ) : ZMod h).val = d * j := by
+    intro j hj
+    rw [ZMod.val_natCast]
+    exact Nat.mod_eq_of_lt (hdj_lt j hj)
+  refine Finset.sum_nbij' (fun k => k.val / d) (fun j => ((d * j : ℕ) : ZMod h))
+    ?_ ?_ ?_ ?_ ?_
+  · intro k hk
+    have hdvd : d ∣ k.val := (hstab k).mp (Finset.mem_filter.mp hk).2
+    exact Finset.mem_range.mpr (Nat.div_lt_div_of_lt_of_dvd hd (ZMod.val_lt k))
+  · intro j hj
+    refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, (hstab _).mpr ?_⟩
+    rw [hval_cast j hj]
+    exact Dvd.intro j rfl
+  · intro k hk
+    have hdvd : d ∣ k.val := (hstab k).mp (Finset.mem_filter.mp hk).2
+    rw [Nat.mul_div_cancel' hdvd, ZMod.natCast_val, ZMod.cast_id]
+  · intro j hj
+    rw [hval_cast j hj, Nat.mul_div_cancel_left j (Nat.pos_of_ne_zero hd0)]
+  · intro k hk
+    have hdvd : d ∣ k.val := (hstab k).mp (Finset.mem_filter.mp hk).2
+    rw [← pow_mul, Nat.mul_div_cancel' hdvd]
+
+/-- **Diagonal coordinate on a partial-period orbit, contributing case** (issue 0106): if the
+`σ`-orbit of `c` has size `d` (stabilizer = multiples of `d`, `d ∣ h`) and `(ε^m)^d = 1`
+(i.e. `ord(ε^m) ∣ d`), the diagonal Fourier coefficient is `h/d` — nonzero whenever
+`char F ∤ h`.  Extends `repr_sum_fourier_self_free` (the free case `d = h`) to the mixed
+orbit sizes of a plain permutation operator. -/
+theorem repr_sum_fourier_self_partial_of_pow_eq_one
+    (hperm : ∀ (k : ℕ) (c : κ), (T ^ k) (b c) = b ((σ ^ k) c))
+    {ε : F} {m : ℕ} {c : κ} {d : ℕ} (hd : d ∣ h) (hd0 : d ≠ 0)
+    (hstab : ∀ k : ZMod h, (σ ^ k.val) c = c ↔ d ∣ k.val)
+    (hpow : (ε ^ m) ^ d = 1) :
+    b.repr (∑ k : ZMod h, ((ε ^ m)⁻¹ ^ k.val) • (T ^ k.val) (b c)) c = ((h / d : ℕ) : F) := by
+  rw [repr_sum_fourier_self_stabilizer b T σ hperm hd hd0 hstab]
+  have hζd : ((ε ^ m)⁻¹) ^ d = 1 := by rw [inv_pow, hpow, inv_one]
+  simp [hζd]
+
+/-- **Diagonal coordinate on a partial-period orbit, non-contributing case** (issue 0106): if
+the `σ`-orbit of `c` has size `d` (stabilizer = multiples of `d`, `d ∣ h`) but
+`(ε^m)^d ≠ 1` (i.e. `ord(ε^m) ∤ d`), the diagonal Fourier coefficient vanishes — the orbit
+does not contribute to `E_{ε^m}`. -/
+theorem repr_sum_fourier_self_partial_of_pow_ne_one
+    (hperm : ∀ (k : ℕ) (c : κ), (T ^ k) (b c) = b ((σ ^ k) c))
+    {ε : F} {m : ℕ} (hεh : ε ^ h = 1) {c : κ} {d : ℕ} (hd : d ∣ h) (hd0 : d ≠ 0)
+    (hstab : ∀ k : ZMod h, (σ ^ k.val) c = c ↔ d ∣ k.val)
+    (hpow : (ε ^ m) ^ d ≠ 1) :
+    b.repr (∑ k : ZMod h, ((ε ^ m)⁻¹ ^ k.val) • (T ^ k.val) (b c)) c = 0 := by
+  rw [repr_sum_fourier_self_stabilizer b T σ hperm hd hd0 hstab]
+  have hζd : ((ε ^ m)⁻¹) ^ d ≠ 1 := by
+    rw [inv_pow, ne_eq, inv_eq_one]; exact hpow
+  have hζh : (((ε ^ m)⁻¹) ^ d) ^ (h / d) = 1 := by
+    rw [← pow_mul, Nat.mul_div_cancel' hd, inv_pow, ← pow_mul, mul_comm m h,
+      pow_mul, hεh, one_pow, inv_one]
+  have hkey : (∑ j ∈ Finset.range (h / d), (((ε ^ m)⁻¹) ^ d) ^ j)
+      * ((((ε ^ m)⁻¹) ^ d) - 1) = 0 := by
+    rw [geom_sum_mul, hζh, sub_self]
+  exact (mul_eq_zero.mp hkey).resolve_right (sub_ne_zero.mpr hζd)
+
 /-- **The Fourier projection of a fixed point is a scalar multiple of it.** If `T (b c₀) = b c₀`
 (eigenvalue `1`), then `∑_k (ε^m)⁻¹^{k} • T^{k}(b c₀) = (∑_k (ε^m)⁻¹^{k}) • b c₀`.
 -/
@@ -224,6 +324,54 @@ theorem finrank_eigenspace_eq_card (b : Basis κ F W) (T : Module.End F W) {ε :
     linearIndependent_of_triangular b _ rep hdiag hoff
   rw [hspan, finrank_span_eq_card hli]
 
+/-- **General orbit count** (issue 0106, publicized from the `count` block of
+`finrank_eigenspace_fixed_succ`): `dim E_{ε^m} = #(contributing orbits)`.  Given a `Finset S`
+of orbit representatives such that
+
+* every index is either in the orbit of some `s ∈ S` or has vanishing Fourier projection
+  (`hcover`) — so `S` carries every contributing orbit,
+* distinct elements of `S` lie in distinct orbits (`hdisj`), and
+* each `s ∈ S` has nonzero diagonal Fourier coordinate (`hdiag` — supplied by
+  `repr_sum_fourier_self_free` for free orbits, `repr_sum_fourier_self_partial_of_pow_eq_one`
+  for partial-period orbits of a plain permutation),
+
+the `ε^m`-eigenspace of `T` has dimension exactly `S.card`. -/
+theorem finrank_eigenspace_eq_card_contributing [Finite κ]
+    (b : Basis κ F W) (T : Module.End F W) (σ : Equiv.Perm κ)
+    (hmon : ∀ (k : ℕ) (c : κ), ∃ a : F, (T ^ k) (b c) = a • b ((σ ^ k) c))
+    (hTh : T ^ h = 1)
+    {ε : F} (hε : ε ≠ 0) (hεh : ε ^ h = 1) (hh : (h : F) ≠ 0) (m : ℕ)
+    (S : Finset κ)
+    (hcover : ∀ c : κ, (∃ s ∈ S, ∃ k : ZMod h, (σ ^ k.val) s = c) ∨
+      (∑ l : ZMod h, ((ε ^ m)⁻¹ ^ l.val) • (T ^ l.val) (b c)) = 0)
+    (hdisj : ∀ s ∈ S, ∀ s' ∈ S, (∃ k : ZMod h, (σ ^ k.val) s = s') → s = s')
+    (hdiag : ∀ s ∈ S,
+      b.repr (∑ l : ZMod h, ((ε ^ m)⁻¹ ^ l.val) • (T ^ l.val) (b s)) s ≠ 0) :
+    Module.finrank F (Module.End.eigenspace T (ε ^ m)) = S.card := by
+  classical
+  haveI : Fintype κ := Fintype.ofFinite κ
+  have hspan : Module.End.eigenspace T (ε ^ m) = Submodule.span F (Set.range fun i : ↥S =>
+      ∑ l : ZMod h, ((ε ^ m)⁻¹ ^ l.val) • (T ^ l.val) (b (i : κ))) := by
+    rw [eigenspace_eq_span_fourier b T hε hεh hTh hh m]
+    refine le_antisymm (Submodule.span_le.mpr ?_) (Submodule.span_mono ?_)
+    · rintro _ ⟨c, rfl⟩
+      rcases hcover c with ⟨s, hsS, hk⟩ | hzero
+      · refine Submodule.span_mono ?_ (fourier_mem_span_rep b T σ hmon hTh hε hεh m hk)
+        rw [Set.singleton_subset_iff]
+        exact ⟨⟨s, hsS⟩, rfl⟩
+      · change (∑ l : ZMod h, ((ε ^ m)⁻¹ ^ l.val) • (T ^ l.val) (b c)) ∈ _
+        rw [hzero]
+        exact Submodule.zero_mem _
+    · rintro _ ⟨i, rfl⟩; exact ⟨(i : κ), rfl⟩
+  have hoff : ∀ i i' : ↥S, i ≠ i' →
+      b.repr (∑ l : ZMod h, ((ε ^ m)⁻¹ ^ l.val) • (T ^ l.val) (b (i : κ))) (i' : κ) = 0 := by
+    rintro ⟨s, hsS⟩ ⟨s', hs'S⟩ hne
+    refine repr_sum_fourier_orbit_zero b T σ hmon (fun k hk => ?_)
+    exact (fun h => hne (Subtype.ext h)) (hdisj s hsS s' hs'S ⟨k, hk⟩)
+  have hcard := finrank_eigenspace_eq_card b T (Subtype.val : ↥S → κ) hspan
+    (fun i => hdiag (i : κ) i.2) hoff
+  rw [hcard, Fintype.card_coe]
+
 /-! ### The keystone `dim E₀ = dim E_m + 1` -/
 
 /-- **Keystone (BG (2.11)).** For a monomial permutation operator `T` on `b : Basis κ F W`
@@ -292,57 +440,34 @@ theorem finrank_eigenspace_fixed_succ [Finite κ]
     have hne1 : (ε ^ m')⁻¹ ≠ 1 := by rw [ne_eq, inv_eq_one]; exact hm'
     rw [sum_fourier_fixed_eq b T hc₀ m', sum_pow_val_eq_zero hroot hne1, zero_smul]
   -- per-character count: `dim E_{ε^m'} = #{contributing orbit reps}`
+  -- (delegated to `finrank_eigenspace_eq_card_contributing`, issue 0106)
   have count : ∀ m' : ℕ, Module.finrank F (Module.End.eigenspace T (ε ^ m'))
       = (Finset.univ.filter (fun c => rep c = c ∧ (ε ^ m' = 1 ∨ c ≠ c₀))).card := by
     intro m'
     set S : Finset κ := Finset.univ.filter (fun c => rep c = c ∧ (ε ^ m' = 1 ∨ c ≠ c₀)) with hSdef
     have hSmem : ∀ c, c ∈ S ↔ rep c = c ∧ (ε ^ m' = 1 ∨ c ≠ c₀) := by
       intro c; rw [hSdef, Finset.mem_filter]; exact and_iff_right (Finset.mem_univ c)
-    -- each projection lies in the span of the representative projections
-    have hgen : ∀ c, (∑ l : ZMod h, ((ε ^ m')⁻¹ ^ l.val) • (T ^ l.val) (b c))
-        ∈ Submodule.span F (Set.range fun i : ↥S =>
-          ∑ l : ZMod h, ((ε ^ m')⁻¹ ^ l.val) • (T ^ l.val) (b (i : κ))) := by
-      intro c
+    refine finrank_eigenspace_eq_card_contributing b T σ hmon hTh hε0 hεh hh m' S ?_ ?_ ?_
+    · intro c
       by_cases hm1 : ε ^ m' = 1
-      · refine Submodule.span_mono ?_
-          (fourier_mem_span_rep b T σ hmon hTh hε0 hεh m' (hrep_equiv c))
-        rw [Set.singleton_subset_iff]
-        exact ⟨⟨rep c, (hSmem _).2 ⟨hrep_idem c, Or.inl hm1⟩⟩, rfl⟩
+      · exact Or.inl ⟨rep c, (hSmem _).2 ⟨hrep_idem c, Or.inl hm1⟩, hrep_equiv c⟩
       · by_cases hc0 : rep c = c₀
-        · have hcc0 : c = c₀ := honly_c₀ c hc0
-          rw [hcc0, hg_c₀_zero m' hm1]; exact Submodule.zero_mem _
-        · refine Submodule.span_mono ?_
-            (fourier_mem_span_rep b T σ hmon hTh hε0 hεh m' (hrep_equiv c))
-          rw [Set.singleton_subset_iff]
-          exact ⟨⟨rep c, (hSmem _).2 ⟨hrep_idem c, Or.inr hc0⟩⟩, rfl⟩
-    have hspan : Module.End.eigenspace T (ε ^ m') = Submodule.span F (Set.range fun i : ↥S =>
-        ∑ l : ZMod h, ((ε ^ m')⁻¹ ^ l.val) • (T ^ l.val) (b (i : κ))) := by
-      rw [eigenspace_eq_span_fourier b T hε0 hεh hTh hh m']
-      refine le_antisymm (Submodule.span_le.mpr ?_) (Submodule.span_mono ?_)
-      · rintro _ ⟨c, rfl⟩; exact hgen c
-      · rintro _ ⟨i, rfl⟩; exact ⟨(i : κ), rfl⟩
-    have hdiag : ∀ i : ↥S,
-        b.repr (∑ l : ZMod h, ((ε ^ m')⁻¹ ^ l.val) • (T ^ l.val) (b (i : κ))) (i : κ) ≠ 0 := by
-      rintro ⟨c, hcS⟩
-      rw [hSmem] at hcS
-      by_cases hc0 : c = c₀
+        · exact Or.inr (by rw [honly_c₀ c hc0]; exact hg_c₀_zero m' hm1)
+        · exact Or.inl ⟨rep c, (hSmem _).2 ⟨hrep_idem c, Or.inr hc0⟩, hrep_equiv c⟩
+    · intro s hsS s' hs'S hss'
+      exact hdistinct s s' ((hSmem s).mp hsS).1 ((hSmem s').mp hs'S).1 hss'
+    · intro s hsS
+      rw [hSmem] at hsS
+      by_cases hc0 : s = c₀
       · subst hc0
-        have hm1 : ε ^ m' = 1 := hcS.2.resolve_right (by simp)
+        have hm1 : ε ^ m' = 1 := hsS.2.resolve_right (by simp)
         rw [sum_fourier_fixed_eq b T hc₀ m', hm1, inv_one]
         simp only [one_pow]
         rw [sum_one_eq_card]
         simp only [map_smul, Finsupp.smul_apply, Basis.repr_self, Finsupp.single_eq_same,
           smul_eq_mul, mul_one]
         exact hh
-      · rw [repr_sum_fourier_self_free b T σ hmon (hfree c hc0)]; exact one_ne_zero
-    have hoff : ∀ i i' : ↥S, i ≠ i' →
-        b.repr (∑ l : ZMod h, ((ε ^ m')⁻¹ ^ l.val) • (T ^ l.val) (b (i : κ))) (i' : κ) = 0 := by
-      rintro ⟨c, hcS⟩ ⟨c', hc'S⟩ hne
-      rw [hSmem] at hcS hc'S
-      refine repr_sum_fourier_orbit_zero b T σ hmon (fun k hk => ?_)
-      exact (fun h => hne (Subtype.ext h)) (hdistinct c c' hcS.1 hc'S.1 ⟨k, hk⟩)
-    have hcard := finrank_eigenspace_eq_card b T (Subtype.val : ↥S → κ) hspan hdiag hoff
-    rw [hcard, Fintype.card_coe]
+      · rw [repr_sum_fourier_self_free b T σ hmon (hfree s hc0)]; exact one_ne_zero
   -- combine the two counts; the total orbit count cancels.
   rw [count 0, count m]
   have hPeq : (Finset.univ.filter (fun c => rep c = c ∧ (ε ^ 0 = 1 ∨ c ≠ c₀)))

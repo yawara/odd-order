@@ -9,6 +9,7 @@ import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 
 /-!
 # Algebraic integers fixed by all Galois automorphisms are rational integers
@@ -125,66 +126,22 @@ theorem exists_pow_of_complexRingEquiv (σ : ℂ ≃+* ℂ) {n : ℕ} (hn : n �
     rw [← hj_eq, map_pow, ← hk_eq, ← pow_mul, ← pow_mul, Nat.mul_comm]
 
 open OddOrder.RepresentationTheory in
-/-- **The product of a character over a cyclic-closed `Finset` is a rational integer.**
-If `A : Finset G` is closed under `x ↦ x ^ k` for every `k` coprime to `|G|` (so `A` is a union of
-"cyclic equivalence classes"), then `∏_{x ∈ A} φ(x)` is a rational integer for any character `φ`:
-it is an algebraic integer (a product of character values, each integral by `character_isIntegral`)
-fixed by every `σ : ℂ ≃+* ℂ`.  Fixedness holds because `σ` acts as a uniform power `(· ^ k)`,
-`k` coprime to `|G|`, on all roots of unity (`exists_pow_of_complexRingEquiv`), so
-`σ (φ x) = φ (x ^ k)` (Peterfalvi (1.9), `map_character_eq_character_pow`), and `x ↦ x ^ k` permutes
-`A`; reindexing leaves the product unchanged.  This is the multiplicative heart of the field-norm
-step in [Isaacs] Lemma 3.14 / Peterfalvi (13.9.b). -/
-theorem exists_int_prod_character_of_cyclicClosed {G : Type*} [Group G] [Finite G]
-    {φ : ClassFunction G ℂ} (hφ : IsCharacter φ) {A : Finset G}
-    (hclosed : ∀ x ∈ A, ∀ k : ℕ, k.Coprime (Nat.card G) → x ^ k ∈ A) :
-    ∃ z : ℤ, (z : ℂ) = ∏ x ∈ A, φ x := by
-  classical
-  obtain ⟨V, _, _, _, ρ, hchar⟩ := id hφ
-  have hφx : ∀ x, φ x = ρ.character x := fun x => congrFun hchar x
-  -- The product is an algebraic integer (each factor is a character value).
-  have hint : IsIntegral ℤ (∏ x ∈ A, φ x) := by
-    refine IsIntegral.prod _ (fun x _ => ?_)
-    rw [hφx x]; exact character_isIntegral ρ x
-  -- It is fixed by every ring automorphism of `ℂ`.
-  refine exists_int_of_isIntegral_of_forall_complexRingEquiv_fixed hint (fun σ => ?_)
-  set N := Nat.card G with hNdef
-  have hN0 : N ≠ 0 := Nat.card_pos.ne'
-  obtain ⟨k, hkcop, hkσ⟩ := exists_pow_of_complexRingEquiv σ hN0
-  set t := N.totient with htdef
-  have ht1 : 1 ≤ t := Nat.totient_pos.mpr (Nat.pos_of_ne_zero hN0)
-  have hpowN : ∀ w : G, w ^ N = 1 := fun w => by rw [hNdef]; exact pow_card_eq_one'
-  -- `x ↦ x ^ k` is undone by `x ↦ x ^ (k ^ (t-1))` on `N`-torsion elements (Euler).
-  have hround : ∀ w : G, (w ^ k) ^ (k ^ (t - 1)) = w := by
-    intro w
-    rw [← pow_mul]
-    have hkt : k * k ^ (t - 1) = k ^ t := by rw [← pow_succ']; congr 1; omega
-    rw [hkt]
-    have hord : orderOf w ∣ N := orderOf_dvd_of_pow_eq_one (hpowN w)
-    have hmod : k ^ t ≡ 1 [MOD orderOf w] := (Nat.ModEq.pow_totient hkcop).of_dvd hord
-    rw [pow_eq_pow_iff_modEq.mpr hmod, pow_one]
-  -- Hence `x ↦ x ^ k` is injective on `A`, and maps `A` onto `A`.
-  have hinj : ∀ x ∈ A, ∀ y ∈ A, x ^ k = y ^ k → x = y := by
-    intro x _ y _ hxy
-    have h := hround x
-    rw [hxy, hround y] at h
-    exact h.symm
-  have himg : A.image (· ^ k) = A := by
-    refine Finset.eq_of_subset_of_card_le (fun y hy => ?_) ?_
-    · obtain ⟨x, hx, rfl⟩ := Finset.mem_image.mp hy
-      exact hclosed x hx k hkcop
-    · rw [Finset.card_image_of_injOn (fun x hx y hy => hinj x hx y hy)]
-  -- `σ (φ x) = φ (x ^ k)` for `x ∈ A`, then reindex.
-  have hstep : ∀ x ∈ A, σ (φ x) = φ (x ^ k) := by
-    intro x _
-    have hσx : ∀ ζ : ℂ, ζ ^ orderOf x = 1 → σ ζ = ζ ^ k := by
-      intro ζ hζ
-      refine hkσ ζ ?_
-      obtain ⟨c, hc⟩ := orderOf_dvd_of_pow_eq_one (hpowN x)
-      rw [hc, pow_mul, hζ, one_pow]
-    have h := hφ.mapRingEquiv_apply_eq_apply_pow σ (isOfFinOrder_of_finite x) hσx
-    rwa [ClassFunction.mapRingEquiv_apply] at h
-  rw [map_prod, Finset.prod_congr rfl hstep, ← Finset.prod_image
-    (fun x hx y hy => hinj x hx y hy), himg]
+/-- **Galois-fixedness step, extracted** (issue 0106): a ring automorphism `σ : ℂ ≃+* ℂ` that
+acts as `(· ^ k)` on all `|G|`-th roots of unity substitutes the coprime power on virtual
+character values: `σ (φ w) = φ (w ^ k)` (Peterfalvi (1.9), `ZIrr` form).  The order-of-`w`
+torsion descent packaged here was previously copied inline by each of the product/sum
+integrality theorems below. -/
+theorem complexRingEquiv_apply_eq_apply_pow_of_mem_ZIrr {G : Type*} [Group G] [Finite G]
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) (σ : ℂ ≃+* ℂ) {k : ℕ}
+    (hkσ : ∀ ζ : ℂ, ζ ^ Nat.card G = 1 → σ ζ = ζ ^ k) (w : G) :
+    σ (φ w) = φ (w ^ k) := by
+  have hσw : ∀ ζ : ℂ, ζ ^ orderOf w = 1 → σ ζ = ζ ^ k := by
+    intro ζ hζ
+    refine hkσ ζ ?_
+    obtain ⟨c, hc⟩ := orderOf_dvd_of_pow_eq_one (pow_card_eq_one' (x := w))
+    rw [hc, pow_mul, hζ, one_pow]
+  have h := mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr hφ σ (isOfFinOrder_of_finite w) hσw
+  rwa [ClassFunction.mapRingEquiv_apply] at h
 
 open OddOrder.RepresentationTheory in
 /-- **Virtual-character values are algebraic integers** (general form, `OddOrder.Algebra` copy of
@@ -289,16 +246,8 @@ theorem exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed {G : Type*} [Group G] 
     have hN0 : Nat.card G ≠ 0 := Nat.card_pos.ne'
     obtain ⟨k, hkcop, hkσ⟩ := exists_pow_of_complexRingEquiv σ hN0
     obtain ⟨hinj, himg⟩ := powClosed_image_pow_eq_of_cyclicClosed hclosed hkcop
-    have hpowN : ∀ w : G, w ^ Nat.card G = 1 := fun w => pow_card_eq_one'
-    have hσval : ∀ w : G, σ (φ w) = φ (w ^ k) := by
-      intro w
-      have hσw : ∀ ζ : ℂ, ζ ^ orderOf w = 1 → σ ζ = ζ ^ k := by
-        intro ζ hζ
-        refine hkσ ζ ?_
-        obtain ⟨c, hc⟩ := orderOf_dvd_of_pow_eq_one (hpowN w)
-        rw [hc, pow_mul, hζ, one_pow]
-      have h := mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr hφ σ (isOfFinOrder_of_finite w) hσw
-      rwa [ClassFunction.mapRingEquiv_apply] at h
+    have hσval : ∀ w : G, σ (φ w) = φ (w ^ k) :=
+      complexRingEquiv_apply_eq_apply_pow_of_mem_ZIrr hφ σ hkσ
     have hstep : ∀ x ∈ A, σ (φ x * φ x⁻¹) = φ (x ^ k) * φ ((x ^ k)⁻¹) := by
       intro x _
       rw [map_mul, hσval x, hσval x⁻¹, inv_pow]
@@ -321,28 +270,21 @@ theorem exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed {G : Type*} [Group G] 
   exact_mod_cast congrArg Int.cast (Int.toNat_of_nonneg hz0)
 
 open OddOrder.RepresentationTheory in
-/-- **[Isaacs] Lemma 3.14 (product form).** If `φ` is a character and `A` is a cyclic-closed
-`Finset` (closed under `x ↦ x ^ k`, `k` coprime `|G|`) on which `φ` never vanishes, then
-`∏_{x ∈ A} ‖φ(x)‖² ≥ 1`.  Indeed `∏_{x ∈ A} φ(x)` is a *nonzero* rational integer
-(`exists_int_prod_character_of_cyclicClosed` + nowhere-zero), so `∏ ‖φ(x)‖ = ‖∏ φ(x)‖ = |z| ≥ 1`. -/
-theorem one_le_prod_normSq_character_of_cyclicClosed {G : Type*} [Group G] [Finite G]
-    {φ : ClassFunction G ℂ} (hφ : IsCharacter φ) {A : Finset G}
-    (hclosed : ∀ x ∈ A, ∀ k : ℕ, k.Coprime (Nat.card G) → x ^ k ∈ A)
-    (hne : ∀ x ∈ A, φ x ≠ 0) :
-    1 ≤ ∏ x ∈ A, ‖φ x‖ ^ 2 := by
-  obtain ⟨z, hz⟩ := exists_int_prod_character_of_cyclicClosed hφ hclosed
-  have hprodne : (∏ x ∈ A, φ x) ≠ 0 := Finset.prod_ne_zero_iff.mpr hne
-  have hz0 : z ≠ 0 := by
-    intro h
-    apply hprodne
-    rw [← hz, h, Int.cast_zero]
-  have hnorm : ∏ x ∈ A, ‖φ x‖ ^ 2 = ‖(z : ℂ)‖ ^ 2 := by
-    rw [Finset.prod_pow, ← norm_prod, ← hz]
-  rw [hnorm]
-  have hzabs : (1 : ℝ) ≤ ‖(z : ℂ)‖ := by
-    rw [Complex.norm_intCast]
-    exact_mod_cast Int.one_le_abs hz0
-  nlinarith [hzabs, norm_nonneg ((z : ℂ))]
+/-- **(13.10) averaging form** (issue 0106): the group-order average
+`(1/|G|)·∑_{x∈A} ‖φ(x)‖²` of a virtual character over a cyclic-closed `Finset` is a
+*nonnegative rational* — the numerator is a natural number by
+`exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed`.  This is the rationality input for the
+(13.10) atoms of the form `slam = (1/|G|)·Σ_{G₀}‖λ^{τ₁}‖²` (integrality over a proper subset
+`A ⊊ G` does *not* hold in general — only the full-group average is an inner product). -/
+theorem exists_rat_inv_card_mul_sum_normSq_of_mem_ZIrr_of_cyclicClosed {G : Type*} [Group G]
+    [Finite G] {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) {A : Finset G}
+    (hclosed : ∀ x ∈ A, ∀ k : ℕ, k.Coprime (Nat.card G) → x ^ k ∈ A) :
+    ∃ q : ℚ, 0 ≤ q ∧ (q : ℝ) = (Nat.card G : ℝ)⁻¹ * ∑ x ∈ A, ‖φ x‖ ^ 2 := by
+  obtain ⟨n, hn⟩ := exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed hφ hclosed
+  refine ⟨(n : ℚ) / (Nat.card G : ℚ), by positivity, ?_⟩
+  rw [← hn]
+  push_cast
+  ring
 
 open OddOrder.RepresentationTheory in
 /-- **Virtual-character product over a cyclic-closed set is a rational integer** — the `ℤ[Irr]`
@@ -361,16 +303,8 @@ theorem exists_int_prod_of_mem_ZIrr_of_cyclicClosed {G : Type*} [Group G] [Finit
     have hN0 : Nat.card G ≠ 0 := Nat.card_pos.ne'
     obtain ⟨k, hkcop, hkσ⟩ := exists_pow_of_complexRingEquiv σ hN0
     obtain ⟨hinj, himg⟩ := powClosed_image_pow_eq_of_cyclicClosed hclosed hkcop
-    have hpowN : ∀ w : G, w ^ Nat.card G = 1 := fun w => pow_card_eq_one'
-    have hσval : ∀ w : G, σ (φ w) = φ (w ^ k) := by
-      intro w
-      have hσw : ∀ ζ : ℂ, ζ ^ orderOf w = 1 → σ ζ = ζ ^ k := by
-        intro ζ hζ
-        refine hkσ ζ ?_
-        obtain ⟨c, hc⟩ := orderOf_dvd_of_pow_eq_one (hpowN w)
-        rw [hc, pow_mul, hζ, one_pow]
-      have h := mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr hφ σ (isOfFinOrder_of_finite w) hσw
-      rwa [ClassFunction.mapRingEquiv_apply] at h
+    have hσval : ∀ w : G, σ (φ w) = φ (w ^ k) :=
+      complexRingEquiv_apply_eq_apply_pow_of_mem_ZIrr hφ σ hkσ
     calc σ (∏ x ∈ A, φ x)
         = ∏ x ∈ A, φ (x ^ k) := by
           rw [map_prod]; exact Finset.prod_congr rfl (fun x _ => hσval x)
@@ -401,6 +335,42 @@ theorem one_le_prod_normSq_of_mem_ZIrr_of_cyclicClosed {G : Type*} [Group G] [Fi
     rw [Complex.norm_intCast]
     exact_mod_cast Int.one_le_abs hz0
   nlinarith [hzabs, norm_nonneg ((z : ℂ))]
+
+open OddOrder.RepresentationTheory in
+/-- Local bridge `IsCharacter φ → φ ∈ ZIrr G`.  The public `IsCharacter.mem_ZIrr` lives in
+`Clifford.lean`, which is outside this file's import closure — this `private` copy avoids
+both the heavy import and a public duplicate (issue 0106 dedup). -/
+private theorem mem_ZIrr_of_isCharacter {G : Type*} [Group G] [Finite G]
+    {φ : ClassFunction G ℂ} (hφ : IsCharacter φ) : φ ∈ ZIrr G := by
+  obtain ⟨V, _, _, _, ρ, hchar⟩ := hφ
+  have heq : φ = ⟨ρ.character, fun g h => ρ.char_conj g h⟩ :=
+    ClassFunction.ext (congrFun hchar)
+  rw [heq]
+  exact character_mem_ZIrr ρ
+
+open OddOrder.RepresentationTheory in
+/-- **The product of a character over a cyclic-closed `Finset` is a rational integer**
+(multiplicative heart of [Isaacs] Lemma 3.14 / Peterfalvi (13.9.b)).  Strict special case of
+`exists_int_prod_of_mem_ZIrr_of_cyclicClosed` — a character is a virtual character
+(`IsCharacter.mem_ZIrr`); kept under its historical name for the existing call sites
+(issue 0106 dedup: previously an independent 50-line proof). -/
+theorem exists_int_prod_character_of_cyclicClosed {G : Type*} [Group G] [Finite G]
+    {φ : ClassFunction G ℂ} (hφ : IsCharacter φ) {A : Finset G}
+    (hclosed : ∀ x ∈ A, ∀ k : ℕ, k.Coprime (Nat.card G) → x ^ k ∈ A) :
+    ∃ z : ℤ, (z : ℂ) = ∏ x ∈ A, φ x :=
+  exists_int_prod_of_mem_ZIrr_of_cyclicClosed (mem_ZIrr_of_isCharacter hφ) hclosed
+
+open OddOrder.RepresentationTheory in
+/-- **[Isaacs] Lemma 3.14 (product form).** If `φ` is a character and `A` is a cyclic-closed
+`Finset` (closed under `x ↦ x ^ k`, `k` coprime `|G|`) on which `φ` never vanishes, then
+`∏_{x ∈ A} ‖φ(x)‖² ≥ 1`.  Strict special case of
+`one_le_prod_normSq_of_mem_ZIrr_of_cyclicClosed` (issue 0106 dedup). -/
+theorem one_le_prod_normSq_character_of_cyclicClosed {G : Type*} [Group G] [Finite G]
+    {φ : ClassFunction G ℂ} (hφ : IsCharacter φ) {A : Finset G}
+    (hclosed : ∀ x ∈ A, ∀ k : ℕ, k.Coprime (Nat.card G) → x ^ k ∈ A)
+    (hne : ∀ x ∈ A, φ x ≠ 0) :
+    1 ≤ ∏ x ∈ A, ‖φ x‖ ^ 2 :=
+  one_le_prod_normSq_of_mem_ZIrr_of_cyclicClosed (mem_ZIrr_of_isCharacter hφ) hclosed hne
 
 open OddOrder.RepresentationTheory in
 /-- **Virtual characters have integer degree**: `φ(1) ∈ ℤ` for `φ ∈ ℤ[Irr G]` — irreducible

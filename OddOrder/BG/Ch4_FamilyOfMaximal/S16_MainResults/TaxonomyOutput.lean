@@ -46,8 +46,53 @@ theorem isHallSubgroup_subgroupOf_of_le [Finite G] {π : Set ℕ} {H K : Subgrou
     exact hH.2 q (Nat.mem_primeFactors.mpr
       ⟨hq.1, hq.2.1.trans hdvd, Subgroup.index_ne_zero_of_finite⟩) hqπ
 
+/-- **§16 helper** (issue 8005): the `κ(M)`-Hall factor of a type-P maximal subgroup is
+nontrivial — `κ(M)` is nonempty, each `p ∈ κ(M)` divides `|M|` via the rank-one witness
+`P ≤ M`, and the Hall subgroup must catch that `p` (else `p` divides its index). -/
+theorem kappaHall_ne_bot_of_isTypeP [Finite G] {M K : Subgroup G}
+    (hP : S14.IsTypeP M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) : K ≠ ⊥ := by
+  obtain ⟨p, hpκ⟩ := hP
+  obtain ⟨hpprime, -, P, hPmem, hPM, -⟩ := id hpκ
+  have hcardP : Nat.card ↥P = p := by
+    have h := (mem_elemAbelianOfRank.mp hPmem).2
+    rwa [pow_one] at h
+  have hpM : p ∣ Nat.card ↥M := hcardP ▸ Subgroup.card_dvd_of_le hPM
+  intro hKbot
+  have hidx : (K.subgroupOf M).index = Nat.card ↥M := by
+    rw [hKbot, Subgroup.bot_subgroupOf, Subgroup.index_bot]
+  exact hK.2 p (Nat.mem_primeFactors.mpr
+    ⟨hpprime, hidx ▸ hpM, hidx ▸ Nat.card_pos.ne'⟩) hpκ
+
+/-- **§16 helper** (issue 8005): an `IsComplement'` between `subgroupOf`-images lifts to the
+ambient lattice equations `A ⊔ B = M`, `A ⊓ B = ⊥` (for `A, B ≤ M`). -/
+theorem sup_eq_and_inf_eq_bot_of_isComplement'_subgroupOf {M A B : Subgroup G}
+    (hA : A ≤ M) (hB : B ≤ M)
+    (h : Subgroup.IsComplement' (A.subgroupOf M) (B.subgroupOf M)) :
+    A ⊔ B = M ∧ A ⊓ B = ⊥ := by
+  constructor
+  · refine le_antisymm (sup_le hA hB) ?_
+    have hsup := h.sup_eq_top
+    rw [← Subgroup.subgroupOf_sup hA hB] at hsup
+    exact Subgroup.subgroupOf_eq_top.mp hsup
+  · refine le_bot_iff.mp fun x hx => ?_
+    obtain ⟨hxA, hxB⟩ := Subgroup.mem_inf.mp hx
+    have hxM : x ∈ M := hA hxA
+    have hxb : (⟨x, hxM⟩ : ↥M) ∈ A.subgroupOf M ⊓ B.subgroupOf M :=
+      ⟨Subgroup.mem_subgroupOf.mpr hxA, Subgroup.mem_subgroupOf.mpr hxB⟩
+    have h1 := h.disjoint.le_bot hxb
+    rw [Subgroup.mem_bot] at h1 ⊢
+    exact congrArg Subtype.val h1
+
 /-- **BG Theorem I** (mmd L4526): nilpotent Hall conjugacy and the global maximal
-subgroup dichotomy used by Peterfalvi (8.8). -/
+subgroup dichotomy used by Peterfalvi (8.8).
+
+**Tame-embedding structure restored (issue 8005, 2026-07-25)**: the second disjunct now
+carries the mmd clauses (1)(2) that the original port dropped — `W₁, W₂ ≠ 1`, the
+normalizer-`V` property `N_G(W₀) = W` for every nonempty subset `W₀ ⊆ W ∖ W₁ ∖ W₂`
+(from the `Ẑ` TI-property of Theorem 14.7 + `W` cyclic), and the decompositions
+`S = W₁S'`, `T = W₂T'` with `S' ∩ W₁ = T' ∩ W₂ = 1` (from Theorem 14.7 part (h),
+`S' = [S,S]`, `T' = [T,T]`). -/
 theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     (∀ H : Subgroup G, Group.IsNilpotent ↥H →
@@ -61,9 +106,14 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
           W = W1 ⊔ W2 ∧ IsCyclic ↥W ∧ S ⊓ T = W ∧
           OddOrder.GroupTheory.IsTypeNonI S ∧ OddOrder.GroupTheory.IsTypeNonI T ∧
           (OddOrder.GroupTheory.IsTypeII S ∨ OddOrder.GroupTheory.IsTypeII T) ∧
-          ∀ M : Subgroup G, M ∈ maximalSubgroups G →
+          (∀ M : Subgroup G, M ∈ maximalSubgroups G →
             OddOrder.GroupTheory.IsTypeI M ∨ S14.IsConjugateSubgroup M S ∨
-              S14.IsConjugateSubgroup M T) := by
+              S14.IsConjugateSubgroup M T) ∧
+          W1 ≠ ⊥ ∧ W2 ≠ ⊥ ∧
+          (∀ W₀ : Set G, W₀ ⊆ ((W : Set G) \ (W1 : Set G)) \ (W2 : Set G) →
+            W₀.Nonempty → Subgroup.normalizer W₀ = W) ∧
+          ∃ S' T' : Subgroup G,
+            S = W1 ⊔ S' ∧ T = W2 ⊔ T' ∧ S' ⊓ W1 = ⊥ ∧ T' ⊓ W2 = ⊥) := by
   classical
   refine ⟨?_, ?_⟩
   · -- **Theorem I, first assertion** (mmd L4524): nilpotent Hall fusion is `N_G(H)`-controlled.
@@ -138,8 +188,8 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
       set Kstar : Subgroup G :=
         OddOrder.BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G) with hKstardef
       -- Theorem 14.7 (`typeP_duality`): the dual pair `S, T := Mstar`, with covering.
-      obtain ⟨_, _, Mstar, ⟨hMstarMem, hMstarP, hSnconjMstar,
-          ⟨hKstarMstar, hKstar_hall, hK_eq⟩, hcyc, _, hP2disj, hcover⟩, _⟩ :=
+      obtain ⟨hparthS, _, Mstar, ⟨hMstarMem, hMstarP, hSnconjMstar,
+          ⟨hKstarMstar, hKstar_hall, hK_eq⟩, hcyc, hTI, hP2disj, hcover⟩, _⟩ :=
         typeP_duality hG hS hSP (Subgroup.map_subtype_le K') hK hKstardef
       -- A Hall `(κ(S) ∪ σ(S))'`-subgroup `U` of `S` (Hall's theorem in the solvable `S`), needed
       -- to invoke `typeP_pair_inf_eq` (the reverse inclusion `S ∩ Mstar ≤ K ⊔ K*`).
@@ -150,7 +200,7 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
       have hU : Ch03.IsHallSubgroup ((S14.kappa S ∪ OddOrder.BG.Ch3.S10.sigma S)ᶜ)
           ((U'.map S.subtype).subgroupOf S) := by rw [hUeq]; exact hU'
       refine Or.inr ⟨S, Mstar, K, Kstar, K ⊔ Kstar, hS, hMstarMem, ?_, rfl, hcyc, ?_, ?_, ?_, ?_,
-          ?_⟩
+          ?_, ?_, ?_, ?_, ?_⟩
       · -- `S ≠ Mstar`: else `S` would be conjugate to itself `= Mstar`, against `¬conj S Mstar`.
         rintro rfl
         exact hSnconjMstar (S14.IsConjugateSubgroup.refl S)
@@ -172,6 +222,60 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
         by_cases hMI : OddOrder.GroupTheory.IsTypeI M
         · exact Or.inl hMI
         · exact Or.inr (hcover M hM (notTypeI_imp_typeP M hM hMI))
+      · -- `W₁ = K ≠ ⊥` (restored, mmd L4526 (1)): `κ(S) ≠ ∅` and `K` is its Hall factor.
+        exact kappaHall_ne_bot_of_isTypeP hSP hK
+      · -- `W₂ = K* ≠ ⊥` (restored): `K*` is the `κ(Mstar)`-Hall factor, `Mstar` type P.
+        exact kappaHall_ne_bot_of_isTypeP hMstarP hKstar_hall
+      · -- normalizer-`V` (restored, mmd L4526 (1)): `N_G(W₀) = W` for nonempty `W₀ ⊆ W∖W₁∖W₂`.
+        -- `≤` is the `Ẑ` TI-property (Theorem 14.7); `≥` is `W` cyclic hence abelian.
+        intro W₀ hW₀sub hW₀ne
+        have hzsub : W₀ ⊆ zTilde K Kstar := by
+          intro x hx
+          have h := hW₀sub hx
+          rw [Set.sdiff_sdiff] at h
+          exact h
+        refine le_antisymm ?_ ?_
+        · intro g hg
+          obtain ⟨x, hx⟩ := hW₀ne
+          exact hTI g ⟨x, hzsub hx,
+            hzsub ((Subgroup.mem_set_normalizer_iff.mp hg x).mp hx)⟩
+        · intro w hw
+          have hfix : ∀ n ∈ (K ⊔ Kstar : Subgroup G), w * n * w⁻¹ = n := by
+            intro n hn
+            haveI := hcyc
+            letI : CommGroup ↥(K ⊔ Kstar : Subgroup G) := IsCyclic.commGroup
+            have hcm := congrArg Subtype.val
+              (mul_comm (⟨w, hw⟩ : ↥(K ⊔ Kstar : Subgroup G)) ⟨n, hn⟩)
+            simp only [Subgroup.coe_mul] at hcm
+            rw [mul_inv_eq_iff_eq_mul]
+            exact hcm
+          rw [Subgroup.mem_set_normalizer_iff]
+          intro n
+          constructor
+          · intro hn
+            rw [hfix n (hzsub hn).1]
+            exact hn
+          · intro hn'
+            have hnW : n ∈ (K ⊔ Kstar : Subgroup G) := by
+              have hmem : w * n * w⁻¹ ∈ (K ⊔ Kstar : Subgroup G) := (hzsub hn').1
+              have h2 : w⁻¹ * (w * n * w⁻¹) * w ∈ (K ⊔ Kstar : Subgroup G) :=
+                Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.inv_mem _ hw) hmem) hw
+              simpa [mul_assoc] using h2
+            rwa [hfix n hnW] at hn'
+      · -- decompositions (restored, mmd L4526 (2)): `S = W₁S'`, `T = W₂T'` with trivial
+        -- intersections, `S' = [S,S]`, `T' = [Mstar,Mstar]`, from Theorem 14.7 part (h).
+        have hparthT :
+            Subgroup.IsComplement' ((derivedInG Mstar).subgroupOf Mstar)
+              (Kstar.subgroupOf Mstar) :=
+          (typeP_duality hG hMstarMem hMstarP hKstarMstar hKstar_hall hK_eq).1
+        obtain ⟨hSsup, hSinf⟩ := sup_eq_and_inf_eq_bot_of_isComplement'_subgroupOf
+          (Subgroup.map_subtype_le _) (Subgroup.map_subtype_le K') hparthS
+        obtain ⟨hTsup, hTinf⟩ := sup_eq_and_inf_eq_bot_of_isComplement'_subgroupOf
+          (Subgroup.map_subtype_le _) hKstarMstar hparthT
+        exact ⟨derivedInG S, derivedInG Mstar,
+          by rw [sup_comm]; exact hSsup.symm,
+          by rw [sup_comm]; exact hTsup.symm,
+          hSinf, hTinf⟩
 
 /-- **Assembly for BG Theorem II (Ti)** (mmd L4546--L4550), as a `sorry`-free,
 axiom-clean *gated-endpoint skeleton*.
