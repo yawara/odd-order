@@ -1053,10 +1053,28 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   どちらに当たるか不定** — 対象を `have` で等式化するか `conv_rhs` で明示する
 - Pascal は `Nat.choose_succ_succ' k i` + `push_cast` + `ring`
 
-**⟹ 残るのは linchpin の仕上げ 1 手**: `k = p-1` を代入し
-`cast_choose_prime_sub_one` (`C(p-1,j) ≡ (-1)^j mod p`) と `D` の指数 `p` から
-「zpow の指数を mod p で潰して全部 1 にする」ステップ (`zpow_eq_zpow_iff_modCast` 的な
-補題か、`d ^ (m : ℤ) = d ^ (m % p)` を指数 `p` から出す) を書けば `Δ^{p-1} = T_p`。
+**🎉 linchpin 完成 (2026-07-25)**: `shiftSubHom_iterate_prime_sub_one`
+(`Δ_q^{p-1} f = T_p f`、指数 `p` の可換 base `D` に対する作用素等式)。仕上げは
+ルート A (pointwise 二項展開) で、部品 2 本:
+- `zpow_eq_self_of_pow_eq_one` (`d^r = 1` ∧ `(m : ZMod r) = 1` ⟹ `d ^ m = d`。
+  `ZMod.intCast_zmod_eq_zero_iff_dvd` で `m = 1 + r·c` に分解し `zpow_add`/`zpow_mul`)
+- `cast_neg_one_pow_mul_choose_prime_sub_one` (`(-1)^j·C(r-1,j) ≡ 1 (mod r)`
+  = `cast_choose_prime_sub_one` の系、`(-1)^j·(-1)^j = 1`)
+
+**⟹ 4A.8(d) の `P` 側 (`n = 1`) 完了**:
+- `shiftSubHom_iterate_prime_eq_one` (上界 `Δ^p = Δ ∘ T_p = 1`)
+- `mem_shiftSubSeq_iff` (`g ∈ Δ^i(⊤) ⟺ ∃ f, Δ^[i] f = g`) →
+  `shiftSubSeq_prime_eq_bot` / `shiftSubSeq_prime_sub_one_ne_bot`
+  (下界の witness = 指示関数 `δ₁ c`、`Δ^{p-1}(δ₁ c) = T_p(δ₁ c) = const c ≠ 1`)
+- `nilpotencyClass_wreath_eq_of_exponent_prime` (**`class(D ≀ Q) = p`**、
+  `lowerCentralSeries_eq_map_shiftSubSeq` + `lowerCentralSeries_eq_bot_iff_nilpotencyClass_le`;
+  `IsNilpotent` 自体も `Subgroup.nilpotent_iff_lowerCentralSeries` で上界から得る)
+- **`isMaximalClassPGroup_wreath`** (`|C| = |Q| = p` ⟹ `C ≀ Q` は maximal class;
+  `|P| = p^{p+1}` = `card_wreath_of_card_eq_prime`、`class + 1 = p + 1`)。axiom-clean。
+
+⚠ 教訓: `orderOf_eq_card_of_forall_mem_zpowers` の結論は `Nat.card` (`Fintype.card` でない) /
+`Subgroup.map_eq_bot_iff_of_injective` は `H` が**明示引数** (`_ inl_injective`) /
+`⟨(k:ℤ), _⟩ : q^k ∈ zpowers q` の証明義務は β-未簡約 (`rw [zpow_natCast]` 不可、`simp`)。
 
 linchpin の証明ルート 2 つ:
 1. **pointwise 二項展開**: `Δ^k f ω = ∏_{j≤k} f((q^j)⁻¹ω)^{(-1)^j C(k,j)}` を `k` の帰納
@@ -1101,8 +1119,15 @@ class を決める。⟹ **群環の `(x-1)`-filtration を Lean で立てるの
 `card_ker_powMonoidHom_prime` (位数 `p^n` の巡回群で `x^p = 1` の解は `p` 個 —
 像 `⟨c^p⟩` の位数が `p^{n-1}` であることと Lagrange) と `d ↦ inl (const d)` の全単射。
 
-### 残り (文書順): **4A.8(c)(d)** ((d) `n=1` なら `P` が maximal class、
-一般に `P'U` が maximal class) / 4A.9 / 4A.10 / 4A.11。
+### 残り (文書順): **4A.8(d) の `P'U` 側** (一般 `n` で `P'U` が maximal class) /
+4A.9 / 4A.10 / 4A.11。
+
+**`P'U` 側の設計**: `K := P'U = ker augHom = I.map inl ⊔ range inr` (`I = ker coordProd =
+range Δ = shiftSubSeq q 1`)。`commutatorElement_inl_eq_shiftSubHom` は `y` が `K` の元でも
+そのまま成り立ち, `⊇` 側は `inr q ∈ K` から出るので `commutator_map_inl_top_eq` を
+「`range inr ≤ K` なる任意の `K`」へ一般化すれば `γ_{i+1}(K) = Δ^{i+1}(⊤).map inl`
+(= `γ_{i+2}(P)`) が同じ帰納で出る。`n = 1` なら `|K| = p^p`, `class(K) = p - 1` で
+maximal class。一般 `n` は `(1-x)`-filtration (下記) が要る。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
 

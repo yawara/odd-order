@@ -9,7 +9,7 @@ import Mathlib.Algebra.Polynomial.Coeff
 import Mathlib.Algebra.Polynomial.Div
 import Mathlib.Algebra.Ring.GeomSum
 import OddOrder.Isaacs.Ch03_SplitExtensions.WreathProduct
-import OddOrder.Isaacs.Ch04_Commutators.Problems
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsMaximalClass
 
 /-!
 # Isaacs Chapter 4 — Problem 4A.7 (正則 wreath product の元の位数)
@@ -970,6 +970,148 @@ theorem shiftSubHom_iterate_apply (q : Q) (f : Q → D) (k : ℕ) (ω : Q) :
       rw [Nat.choose_succ_succ' k i]
       push_cast
       ring
+
+/-- **`r` を法として `1` に合同な指数は zpow で潰せる**: `d ^ r = 1` かつ `m ≡ 1 (mod r)` なら
+`d ^ m = d`. 二項係数 `(-1)^j C(p-1,j) ≡ 1 (mod p)` を指数から消すのに使う. -/
+theorem zpow_eq_self_of_pow_eq_one {M : Type*} [Group M] {r : ℕ} {d : M} (hd : d ^ r = 1)
+    {m : ℤ} (hm : ((m : ZMod r)) = 1) : d ^ m = d := by
+  have hdvd : (r : ℤ) ∣ m - 1 := by
+    refine (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mp ?_
+    push_cast
+    rw [hm, sub_self]
+  obtain ⟨c, hc⟩ := hdvd
+  have hm' : m = 1 + (r : ℤ) * c := by linarith
+  rw [hm', zpow_add, zpow_one, zpow_mul, zpow_natCast, hd, one_zpow, mul_one]
+
+/-- `(-1)^j · C(r-1, j) ≡ 1 (mod r)` (`j < r`, `r` 素数): `cast_choose_prime_sub_one` の系. -/
+theorem cast_neg_one_pow_mul_choose_prime_sub_one {r : ℕ} (hr : Nat.Prime r) {j : ℕ}
+    (hj : j < r) : ((((-1) ^ j * ((r - 1).choose j) : ℤ) : ZMod r)) = 1 := by
+  push_cast
+  rw [cast_choose_prime_sub_one r hr j hj, ← mul_pow]
+  simp
+
+/-- **4A.8(d)(β) の linchpin** `Δ_q^{p-1} = T_p` (作用素の等式).
+
+指数 `p` の可換群 `D` に対して, 群環 `F_p[x]/(x^p-1)` の恒等式
+`(1-x)^{p-1} = 1 + x + ⋯ + x^{p-1}` (`one_sub_X_pow_prime_sub_one`) の作用素版.
+二項展開 (`shiftSubHom_iterate_apply`) の係数 `(-1)^j C(p-1,j)` が `mod p` で全部 `1` になる
+(`cast_choose_prime_sub_one`) ので, 指数 `p` の `D` では zpow がすべて `1` 乗に潰れる. -/
+theorem shiftSubHom_iterate_prime_sub_one {r : ℕ} (hr : Nat.Prime r) (hD : ∀ d : D, d ^ r = 1)
+    (q : Q) (f : Q → D) :
+    (⇑(shiftSubHom (D := D) q))^[r - 1] f = shiftSumHom q r f := by
+  have hr1 : r - 1 + 1 = r := by have := hr.two_le; omega
+  funext ω
+  rw [shiftSubHom_iterate_apply, shiftSumHom_apply, hr1]
+  exact Finset.prod_congr rfl fun j hj =>
+    zpow_eq_self_of_pow_eq_one (hD _)
+      (cast_neg_one_pow_mul_choose_prime_sub_one hr (Finset.mem_range.mp hj))
+
+/-- **上界** `Δ_q^p = 1`: linchpin `Δ^{p-1} = T_p` とノルム関係式 `Δ ∘ T_p = 1` の合成. -/
+theorem shiftSubHom_iterate_prime_eq_one [Fintype Q] {r : ℕ} (hr : Nat.Prime r)
+    (hD : ∀ d : D, d ^ r = 1) {q : Q} (hq : orderOf q = Fintype.card Q)
+    (hQcard : Fintype.card Q = r) (f : Q → D) :
+    (⇑(shiftSubHom (D := D) q))^[r] f = 1 := by
+  have hr1 : r - 1 + 1 = r := by have := hr.two_le; omega
+  have hnorm := shiftSubHom_shiftSumHom_card (D := D) hq f
+  rw [hQcard] at hnorm
+  rw [← hr1, Function.iterate_succ_apply', shiftSubHom_iterate_prime_sub_one hr hD]
+  exact hnorm
+
+/-- `Δ^i(⊤)` の元はちょうど `Δ` の `i` 回反復の像. -/
+theorem mem_shiftSubSeq_iff (q : Q) (i : ℕ) (g : Q → D) :
+    g ∈ shiftSubSeq (D := D) q i ↔ ∃ f, (⇑(shiftSubHom q))^[i] f = g := by
+  induction i generalizing g with
+  | zero => simp
+  | succ i ih =>
+    rw [shiftSubSeq_succ, Subgroup.mem_map]
+    constructor
+    · rintro ⟨h, hh, rfl⟩
+      obtain ⟨f, rfl⟩ := (ih h).mp hh
+      exact ⟨f, Function.iterate_succ_apply' _ _ _⟩
+    · rintro ⟨f, rfl⟩
+      exact ⟨(⇑(shiftSubHom (D := D) q))^[i] f, (ih _).mpr ⟨f, rfl⟩,
+        (Function.iterate_succ_apply' _ _ _).symm⟩
+
+/-- **上界 (部分群版)** `Δ^p(⊤) = ⊥`. -/
+theorem shiftSubSeq_prime_eq_bot [Fintype Q] {r : ℕ} (hr : Nat.Prime r)
+    (hD : ∀ d : D, d ^ r = 1) {q : Q} (hq : orderOf q = Fintype.card Q)
+    (hQcard : Fintype.card Q = r) : shiftSubSeq (D := D) q r = ⊥ := by
+  refine eq_bot_iff.mpr fun g hg => ?_
+  obtain ⟨f, rfl⟩ := (mem_shiftSubSeq_iff q r g).mp hg
+  rw [Subgroup.mem_bot]
+  exact shiftSubHom_iterate_prime_eq_one hr hD hq hQcard f
+
+/-- **下界 (部分群版)** `Δ^{p-1}(⊤) ≠ ⊥`: 指示関数 `δ₁ c` に linchpin を当てると
+`Δ^{p-1}(δ₁ c) = T_p(δ₁ c) = const c ≠ 1`. -/
+theorem shiftSubSeq_prime_sub_one_ne_bot [Fintype Q] [Nontrivial D] {r : ℕ}
+    (hr : Nat.Prime r) (hD : ∀ d : D, d ^ r = 1) {q : Q} (hq : orderOf q = Fintype.card Q)
+    (hQcard : Fintype.card Q = r) : shiftSubSeq (D := D) q (r - 1) ≠ ⊥ := by
+  classical
+  intro hbot
+  obtain ⟨c, hc⟩ := exists_ne (1 : D)
+  have key : shiftSumHom q r (fun ω : Q => if ω = 1 then c else 1) = 1 := by
+    have hmem := (mem_shiftSubSeq_iff (D := D) q (r - 1)
+      ((⇑(shiftSubHom (D := D) q))^[r - 1] fun ω : Q => if ω = 1 then c else 1)).mpr ⟨_, rfl⟩
+    rw [hbot, Subgroup.mem_bot, shiftSubHom_iterate_prime_sub_one hr hD] at hmem
+    exact hmem
+  have hconst : shiftSumHom q r (fun ω : Q => if ω = 1 then c else 1)
+      = Function.const Q (∏ y : Q, if y = 1 then c else 1) := by
+    rw [← hQcard]
+    exact shiftSumHom_card_eq_const hq _
+  rw [hconst] at key
+  have hval := congrFun key 1
+  simp only [Function.const_apply, Pi.one_apply] at hval
+  rw [prod_ite_eq_self 1 c] at hval
+  exact hc hval
+
+/-- **Problem 4A.8(d) の核**: base が指数 `p` (非自明), `Q` が位数 `p` の巡回群なら
+`P = D ≀ Q` の冪零類はちょうど `p`.
+
+`γ_{i+1}(P) = Δ^i(A)` (`lowerCentralSeries_eq_map_shiftSubSeq`) と, 上界 `Δ^p = 1` /
+下界 `Δ^{p-1}(δ₁ c) ≠ 1` (どちらも linchpin `Δ^{p-1} = T_p` から) を合わせる. -/
+theorem nilpotencyClass_wreath_eq_of_exponent_prime [Fintype Q] [Nontrivial D] {r : ℕ}
+    (hr : Nat.Prime r) (hD : ∀ d : D, d ^ r = 1) {q : Q} (hqgen : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k)
+    (hQcard : Fintype.card Q = r) : Group.nilpotencyClass (D ≀[Q] Q) = r := by
+  classical
+  have hr2 := hr.two_le
+  have hq : orderOf q = Fintype.card Q := by
+    rw [← Nat.card_eq_fintype_card]
+    refine orderOf_eq_card_of_forall_mem_zpowers fun x => ?_
+    obtain ⟨k, rfl⟩ := hqgen x
+    exact ⟨(k : ℤ), by simp⟩
+  -- 上界: `γ_{p+1}(P) = ⊥`
+  have htop : Subgroup.lowerCentralSeries (⊤ : Subgroup (D ≀[Q] Q)) r = ⊥ := by
+    have hidx := lowerCentralSeries_eq_map_shiftSubSeq (D := D) hqgen (r - 1)
+    rw [show r - 1 + 1 = r by omega] at hidx
+    rw [hidx, shiftSubSeq_prime_eq_bot hr hD hq hQcard, Subgroup.map_bot]
+  haveI : Group.IsNilpotent (D ≀[Q] Q) :=
+    Subgroup.nilpotent_iff_lowerCentralSeries.mpr ⟨r, htop⟩
+  have hle := Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp htop
+  -- 下界: `γ_p(P) ≠ ⊥`
+  have hlow : Subgroup.lowerCentralSeries (⊤ : Subgroup (D ≀[Q] Q)) (r - 1) ≠ ⊥ := by
+    have hidx := lowerCentralSeries_eq_map_shiftSubSeq (D := D) hqgen (r - 2)
+    rw [show r - 2 + 1 = r - 1 by omega] at hidx
+    rw [hidx]
+    intro h
+    exact shiftSubSeq_prime_sub_one_ne_bot hr hD hq hQcard
+      ((Subgroup.map_eq_bot_iff_of_injective _ inl_injective).mp h)
+  have hlt : ¬ Group.nilpotencyClass (D ≀[Q] Q) ≤ r - 1 := fun h =>
+    hlow (Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr h)
+  omega
+
+/-- **Problem 4A.8(d) (`n = 1`)**: `|C| = |Q| = p` のとき `P = C ≀ Q` は **maximal class**.
+
+`|P| = p^{p+1}` (`card_wreath_of_card_eq_prime`) で冪零類が `p`
+(`nilpotencyClass_wreath_eq_of_exponent_prime`) ゆえ `class + 1 = p + 1` = 指数. -/
+theorem isMaximalClassPGroup_wreath [Finite Q] [Finite D] [Nontrivial D] {r : ℕ}
+    (hr : Nat.Prime r) (hDcard : Nat.card D = r) {q : Q} (hqgen : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k)
+    (hQcard : Nat.card Q = r) : IsMaximalClassPGroup r (D ≀[Q] Q) := by
+  letI : Fintype Q := Fintype.ofFinite Q
+  have hD : ∀ d : D, d ^ r = 1 := fun d => by rw [← hDcard]; exact pow_card_eq_one'
+  have hcard : Nat.card (D ≀[Q] Q) = r ^ (r + 1) := card_wreath_of_card_eq_prime hDcard hQcard
+  refine ⟨IsPGroup.of_card hcard, r + 1, hcard, ?_⟩
+  rw [nilpotencyClass_wreath_eq_of_exponent_prime hr hD hqgen
+    (by rw [← Nat.card_eq_fintype_card]; exact hQcard)]
 
 end
 
