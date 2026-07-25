@@ -21,7 +21,7 @@ In the notation of (11) (`R` the preimage of the near-field `F`, `T = [R, s]`,
 
 set_option autoImplicit false
 
-open scoped Pointwise
+open scoped Pointwise commutatorElement
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
@@ -142,6 +142,39 @@ theorem inf_centralizer_eq_of_index_sq_of_not_comm {K Z : Subgroup G'} {p : ℕ}
     exact Nat.eq_of_mul_eq_mul_right hppos h4
   have hCZ : Nat.card ↥C = Nat.card ↥Z := by rw [ha, ha1, mul_one]
   exact (Subgroup.eq_of_le_of_card_ge hZ (le_of_eq hCZ)).symm
+
+/-- If `N ≤ K` is normalized by `K` and `[K : N] = p²`, then `⁅K, K⁆ ≤ N`
+(groups of order `p²` are commutative). -/
+theorem commutator_le_of_card_eq_prime_sq_mul {K N : Subgroup G'} {p : ℕ}
+    (hp : p.Prime) (hNK : N ≤ K)
+    (hnorm : ∀ x ∈ K, ∀ n ∈ N, x * n * x⁻¹ ∈ N)
+    (hcard : Nat.card ↥K = p ^ 2 * Nat.card ↥N) :
+    ⁅K, K⁆ ≤ N := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  set Ns : Subgroup ↥K := N.subgroupOf K with hNs_def
+  haveI hNsn : Ns.Normal := by
+    constructor
+    intro n hn g
+    rw [hNs_def, Subgroup.mem_subgroupOf] at hn ⊢
+    exact hnorm (g : G') g.2 (n : G') hn
+  have hNscard : Nat.card ↥Ns = Nat.card ↥N :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNK).toEquiv
+  have hidx : Nat.card (↥K ⧸ Ns) = p ^ 2 := by
+    have h1 := Ns.card_mul_index
+    rw [hNscard, hcard, Subgroup.index_eq_card] at h1
+    have hpos : 0 < Nat.card ↥N := Nat.card_pos
+    have h2 : Nat.card ↥N * Nat.card (↥K ⧸ Ns) = Nat.card ↥N * p ^ 2 := by
+      rw [h1]; ring
+    exact Nat.eq_of_mul_eq_mul_left hpos h2
+  haveI : IsMulCommutative (↥K ⧸ Ns) :=
+    IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) hidx
+  have hcomm : _root_.commutator ↥K ≤ Ns :=
+    Subgroup.Normal.quotient_commutative_iff_commutator_le.mp inferInstance
+  have hmap := Subgroup.map_mono (f := K.subtype) hcomm
+  rw [Subgroup.map_subtype_commutator, hNs_def,
+    Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hNK] at hmap
+  exact hmap
 
 end GenericCentre
 
@@ -331,6 +364,165 @@ theorem inf_centralizer_sup_eq_zpowers_sup_P
   · exact fc.zpowers_mul_t_sup_P_le_center_sup model ind hB2 hm
   · rw [hRScard, hZ₁Pcard]
     norm_num
+
+include model in
+/-- **Peterfalvi Part II, Ch. II, step (14): `⁅RΣ, RΣ⁆ = Z₁`** (p. 113).
+
+Both `Z₁P` and `T` have index `9 = 3²` in `RΣ` and are normalized by it (the
+first is central by (14)(i), the second because `R` is abelian and `Σ`
+normalizes `T`), so the commutator subgroup lies in `Z₁P ⊓ T = Z₁` (Dedekind,
+using `Z₁ ≤ T` and `T ⊓ P = 1`).  It is nontrivial since `RΣ` is nonabelian,
+and `|Z₁| = 3` is prime. -/
+theorem commutator_sup_eq_zpowers
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    ⁅fc.invImageF model
+          ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)),
+        fc.invImageF model
+          ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))⁆
+      = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨hpSig, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, -, -, hSig3, -⟩ :=
+    fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  set R : Subgroup G := fc.invImageF model with hR_def
+  set Sg : Subgroup G :=
+    fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G) with hSg_def
+  set T : Subgroup G := fc.sInvertedT model with hT_def
+  set Z₁ : Subgroup G := Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+    * fc.toHypothesis.t) with hZ₁_def
+  have hPcard : Nat.card ↥fc.P = 3 := by rw [fc.card_P, hp3]
+  have hRcard : Nat.card ↥R = 27 := by
+    rw [hR_def, fc.card_invImageF model ind, hF9, hPcard]
+  have hRScard : Nat.card ↥(R ⊔ Sg) = 81 := by
+    rw [hR_def, hSg_def, fc.card_sup_invImageF_centralizer_W model ind]
+    rw [← hR_def, ← hSg_def, hRcard, hSig3]
+  have hTcard : Nat.card ↥T = 9 := by
+    rw [hT_def, fc.card_sInvertedT model ind hB2 hm, hF9]
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  have hZ₁card : Nat.card ↥Z₁ = 3 := by rw [hZ₁_def, Nat.card_zpowers, hstord]
+  have hZ₁T : Z₁ ≤ T :=
+    fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2 hm
+  have hTR : T ≤ R := (fc.sInvertedT_spec model ind hB2 hm).1
+  have hPR : fc.P ≤ R := fc.P_le_invImageF model
+  have habR := fc.invImageF_mul_comm model ind hB2 hm
+  -- `⁅RΣ, RΣ⁆ ≤ Z₁P` (the quotient by the central `Z₁P` has order 9)
+  have hZ₁Pcard : Nat.card ↥(Z₁ ⊔ fc.P) = 9 := by
+    have hZ₁P : Z₁ ⊓ fc.P = ⊥ := by
+      rw [eq_bot_iff]
+      intro x hx
+      have hx' : x ∈ T ⊓ fc.P := ⟨hZ₁T hx.1, hx.2⟩
+      rwa [(fc.sInvertedT_spec model ind hB2 hm).2.2.2] at hx'
+    rw [card_sup_eq_mul_of_commute
+      (fun a ha b hb => habR a (hZ₁T ha |> hTR) b (hPR hb)) hZ₁P, hZ₁card, hPcard]
+  have hcentral := fc.zpowers_mul_t_sup_P_le_center_sup model ind hB2 hm
+  have hle1 : ⁅R ⊔ Sg, R ⊔ Sg⁆ ≤ Z₁ ⊔ fc.P := by
+    refine commutator_le_of_card_eq_prime_sq_mul (p := 3) (by norm_num)
+      (fun x hx => (hcentral hx).1) (fun x hx n hn => ?_)
+      (by rw [hRScard, hZ₁Pcard]; norm_num)
+    have hcomm : x * n = n * x :=
+      Subgroup.mem_centralizer_iff.mp (hcentral hn).2 x hx
+    have h1 : x * n * x⁻¹ = n := by rw [hcomm]; group
+    rw [h1]
+    exact hn
+  -- `⁅RΣ, RΣ⁆ ≤ T` (the quotient by `T` has order 9 as well)
+  have hTle : T ≤ R ⊔ Sg := hTR.trans le_sup_left
+  have hle2 : ⁅R ⊔ Sg, R ⊔ Sg⁆ ≤ T := by
+    refine commutator_le_of_card_eq_prime_sq_mul (p := 3) (by norm_num) hTle
+      (fun x hx n hn => ?_) (by rw [hRScard, hTcard]; norm_num)
+    -- `R` normalizes `T` (it is abelian) and so does `Σ`
+    have hnormR : ∀ r ∈ R, ∀ y ∈ T, r * y * r⁻¹ ∈ T := by
+      intro r hr y hy
+      have h1 : r * y * r⁻¹ = y := by
+        rw [habR r hr y (hTR hy)]; group
+      rw [h1]; exact hy
+    have hnormS : ∀ w ∈ Sg, ∀ y ∈ T, w * y * w⁻¹ ∈ T := by
+      intro w hw y hy
+      exact fc.conj_mem_sInvertedT_of_mem_centralizer_W model ind hB2 hm
+        hw.1 hw.2 hy
+    have hnormRS : ∀ z ∈ R ⊔ Sg, ∀ y ∈ T, z * y * z⁻¹ ∈ T := by
+      intro z hz y hy
+      have hz' : z ∈ ((R : Set G) * (Sg : Set G)) := by
+        rw [← fc.coe_sup_invImageF_centralizer_W model]
+        exact hz
+      obtain ⟨r, hr, w, hw, rfl⟩ := hz'
+      have h2 : r * w * y * (r * w)⁻¹ = r * (w * y * w⁻¹) * r⁻¹ := by group
+      rw [h2]
+      exact hnormR r hr _ (hnormS w hw y hy)
+    exact hnormRS x hx n hn
+  -- `Z₁P ⊓ T = Z₁` and the commutator is nontrivial
+  have hinf : (Z₁ ⊔ fc.P) ⊓ T = Z₁ := by
+    refine le_antisymm ?_ (le_inf le_sup_left hZ₁T)
+    intro x hx
+    obtain ⟨hxZP, hxT⟩ := hx
+    have hxZP' : x ∈ ((Z₁ : Set G) * (fc.P : Set G)) := by
+      have hcoe : ((Z₁ ⊔ fc.P : Subgroup G) : Set G)
+          = (Z₁ : Set G) * (fc.P : Set G) := by
+        refine Subgroup.coe_mul_of_right_le_normalizer_left _ _ ?_
+        intro b hb
+        rw [Subgroup.mem_normalizer_iff]
+        intro a
+        constructor
+        · intro ha
+          have h1 : b * a * b⁻¹ = a := by
+            rw [← habR a (hTR (hZ₁T ha)) b (hPR hb)]; group
+          rw [h1]; exact ha
+        · intro ha
+          have h1 : (b * a * b⁻¹) * b = b * (b * a * b⁻¹) :=
+            habR _ (hTR (hZ₁T ha)) b (hPR hb)
+          have h2 : b * a = b * (b * a * b⁻¹) := by rw [← h1]; group
+          have h3 : a = b * a * b⁻¹ := mul_left_cancel h2
+          rw [h3]; exact ha
+      rw [← hcoe]; exact hxZP
+    obtain ⟨z, hz, y, hy, rfl⟩ := hxZP'
+    -- `y = z⁻¹·(zy) ∈ P ⊓ T = 1`
+    have hyT : y ∈ T := by
+      have h4 : y = z⁻¹ * (z * y) := by group
+      rw [h4]
+      exact mul_mem (T.inv_mem (hZ₁T hz)) hxT
+    have hyb : y ∈ T ⊓ fc.P := ⟨hyT, hy⟩
+    rw [(fc.sInvertedT_spec model ind hB2 hm).2.2.2, Subgroup.mem_bot] at hyb
+    simpa [hyb] using hz
+  have hne : ⁅R ⊔ Sg, R ⊔ Sg⁆ ≠ ⊥ := by
+    intro h
+    have hnc : ∀ x ∈ R ⊔ Sg, ∀ y ∈ R ⊔ Sg, x * y = y * x := by
+      intro x hx y hy
+      have hmem : ⁅x, y⁆ ∈ ⁅R ⊔ Sg, R ⊔ Sg⁆ := Subgroup.commutator_mem_commutator hx hy
+      rw [h, Subgroup.mem_bot] at hmem
+      exact (commutatorElement_eq_one_iff_mul_comm.mp hmem)
+    -- but a nonidentity element of `Σ` does not centralize `R`
+    have hSgne : Sg ≠ ⊥ := by
+      intro h0
+      rw [h0, Subgroup.card_bot] at hSig3
+      omega
+    obtain ⟨w, hwSg, hw1⟩ : ∃ w ∈ Sg, w ≠ 1 := by
+      by_contra hcon
+      push Not at hcon
+      exact hSgne (by
+        rw [eq_bot_iff]
+        intro x hx
+        rw [Subgroup.mem_bot]
+        exact hcon x hx)
+    refine fc.not_forall_comm_of_mem_centralizer_W model ind hwSg.1 hwSg.2 hw1 ?_
+    intro r hr
+    exact hnc w ((le_sup_right : Sg ≤ R ⊔ Sg) hwSg) r
+      ((le_sup_left : R ≤ R ⊔ Sg) hr)
+  -- a nontrivial subgroup of the order-3 group `Z₁`
+  have hcle : ⁅R ⊔ Sg, R ⊔ Sg⁆ ≤ Z₁ := by
+    rw [← hinf]
+    exact le_inf hle1 hle2
+  refine Subgroup.eq_of_le_of_card_ge hcle ?_
+  have hdvd := Subgroup.card_dvd_of_le hcle
+  rw [hZ₁card] at hdvd
+  rcases (Nat.dvd_prime (by norm_num)).mp hdvd with h1 | h3
+  · exfalso
+    exact hne (Subgroup.card_eq_one.mp h1)
+  · rw [h3, hZ₁card]
 
 end FirstCaseHypothesis
 
