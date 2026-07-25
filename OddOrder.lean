@@ -497,6 +497,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelve
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveEndgame
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveConclusion
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveTransfer
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepThirteen
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
