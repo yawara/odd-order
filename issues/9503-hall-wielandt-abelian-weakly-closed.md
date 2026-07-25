@@ -348,3 +348,31 @@ landed の `card_commutator_sylowThree_le` の中身は `⁅R₁,R₁⁆ ≤ Z�
 2. だめなら `Z(M) = Z₁Σ` + `C_{R₂}(K)` 指数 3 の Lean 化を進めて残りケースを縮める。
 3. 最後の手段: 「`A` 可換弱閉 + `p` 奇」版 Hall–Wielandt の再構成
    (Grün 第一定理 ⟹ Alperin が必要で重い; ChatGPT 相談の対象)。
+
+
+## 🧭 2026-07-26 方針決定 — 古典機構 (Alperin → Grün I → Grün II) を建てる
+
+上記の解析で、`|W| = 9` 側も `Z₁` 弱閉性も **`⁅R₁,R₁⁆ ≤ Z₁Σ` (⟺ `⁅R,L⁆` の
+`P`-成分が消えること)** に帰着したが、これは**書籍が決めていない**
+(Peterfalvi (17) は「`⁅R̄₁,R̄₁⁆` の位数は 1 or 3」と両方を許したまま
+Hall–Wielandt に渡す)。`s` 作用 (s は `T` と `L` を反転、`P`・`Σ` を中心化) でも
+`c = ⁅u,v⁆` の `P`-成分は決まらない。⟹ **First Case 側の材料だけでは閉じない**。
+
+したがって残る道は、Peterfalvi が引いている定理そのもの
+(**`p` 奇 + `A` 可換弱閉版の Hall–Wielandt = Grün 第二定理**) を建てること。
+Gorenstein Ch.7 に完全な証明系列がある (本 repo の方針で Gorenstein は
+「行間を埋めるために参照する」対象):
+
+1. **Alperin の融合定理** (Gorenstein §7.2, Thm 2.6/2.7; tame intersection):
+   `G`-融合は `N_G(P ⊓ Q)` (tame intersection) の族で生成される。
+   mathlib にも repo にも無い ⟹ 新規 (最大の塊)。
+2. **Grün 第一定理** (Gorenstein Thm 7.4.2): `P ∩ G' = ⟨P ∩ N_G(P)', P ∩ Q' | Q ∈ Syl_p⟩`。
+   Alperin から数十行。
+3. **Grün 第二定理** (Gorenstein Thm 7.5.2) の論法を `A` 可換弱閉版に適用。
+   本 repo には既に `IsWeaklyClosed` + 5C.6(a) + 融合制御→focal の連結
+   (`WeaklyClosed.lean`) と focal subgroup 定理があるので、Grün I が入れば
+   `P ∩ G' = P ∩ N'` まで到達できる。
+
+⟹ 次セッションからは Gorenstein §7.2 (Alperin) の精読と Lean 化に着手する。
+規模は大きいが、Alperin の融合定理・Grün の両定理はいずれも 3 冊スコープの
+下流でも再利用できる本物の基盤 (CLAUDE.md「コスト・規模は着手判断基準でない」)。
