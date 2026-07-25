@@ -530,6 +530,27 @@ Ch.2 は全ファイル sorry-free。
   2D.1 でも同じ暗黙の仮定を置くのが原意と解し docstring に明記。
 - 🎉 **§2D 完済** ⟹ **Isaacs Ch.2 の章末演習 (§2A-§2D) 全問完済**。
 
+### 3A.6 の解析 (2026-07-25、deferred-hard として記録)
+
+**確立できた部分** (次に着手する人はここから始めてよい):
+- `Γ := G ⋊ P` を作ると `p ∤ |G|` ゆえ `P ∈ Syl_p(Γ)`、Sylow p-部分群は `{P^g : g ∈ G}`。
+- **`P ∩ P^g = P_g` (= `g` の `P`-安定化群)**: `u ∈ P` に対し `g⁻¹ u g = (g⁻¹ · u(g)) u` なので
+  `g⁻¹ u g ∈ P ⟺ u(g) = g`。すなわち **Sylow 交叉 = 点安定化群**。
+- **`O_p(Γ) = 1`**: `O_p(Γ) ∩ G = 1` (位数) ゆえ `[O_p(Γ), G] = 1` で `O_p(Γ) ≤ C_Γ(G)`、
+  かつ `O_p(Γ) ≤ P`、`P` の作用が faithful なので `P ∩ C_Γ(G) = 1`。
+- **軌道 `Δ = P·h` 上の核は `core_P(P_h)`** (`P_{u(h)} = (P ∩ P^h)^{u⁻¹}` から)。
+- **`core_P(P_h) = 1 ⟺ P_h ∩ Z(P) = 1`** (`p`-群の非自明正規部分群は中心と非自明に交わる;
+  逆に `Z(P)` の位数 `p` の元は `P`-正規)。⟹ **目標は「`C_{Z(P)}(h) = 1` なる `h ∈ G` の存在」**、
+  さらに `V := Ω_1(Z(P))` として「`G ≠ ⋃_{1≠z∈V} C_G(z)`」と同値。
+- Brodkey (Thm 1.38) + `O_p(Γ) = 1` から、交わり極小な Sylow 対 `(S,T)` について
+  **`Z(S) ∩ Z(T) = 1`** は出る (`Z(S) ∩ Z(T)` は `Z(S)` の部分群ゆえ `S`-正規、同様に `T`-正規)。
+
+**詰まっている一手**: 必要なのは `Z(P) ∩ P^h = 1` (より強い) であって `Z(P) ∩ Z(P^h) = 1` では
+足りない。`core_P(D)` が `P^h` でも正規になる (⟹ Brodkey が直接使える) ことが示せれば閉じるが、
+交わり極小性からそれを出す一手が未確定。**次に試すこと**: (i) Isaacs p.76 前後の本文/他の演習で
+1.38 の使い方を確認、(ii) 極小 Sylow 交叉の古典補題 (`N_S(D) ∩ N_T(D)` 系) を当たる、
+(iii) [[feedback-ask-chatgpt-for-elided-gaps]] に従い最強モデルに再構成を依頼。
+
 ## Ch.3 (Split Extensions) §3A — 着手 (2026-07-23、§2A hard tail deferred 中の breadth 展開)
 
 新 leaf `OddOrder/Isaacs/Ch03_SplitExtensions/Problems.lean` (namespace `OddOrder.Isaacs.Ch03`、
@@ -620,10 +641,10 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
 | 3A.3 | ✅ (位数 pm, Z(G)=1) |
 | 3A.4 | ✅ (2026-07-25) |
 | 3A.5 | ✅ (`G ⋊ G ≅ G × G`) |
-| 3A.6 | ⬜ p-群が faithful に作用 ⟹ ある P-軌道で faithful (**Thm 1.38 Generalized Brodkey** の application、`Ch01_Sylow/Main.lean:756`) |
+| 3A.6 | ⏸ **deferred-hard** (2026-07-25 に解析; 下記) |
 | 3A.7 | ⬜ `α ∈ Aut(G)`, `o(α)` の素因子が 2 個以下 ⟹ `⟨α⟩` は `G` 上に regular orbit をもつ |
 | 3A.8 | ⬜ `C` 巡回位数 `pqr` (相異なる奇素数): (a) `Aut(C)` の involution の一意性 / (b) 位数 4 の部分群 `K` / (c) `C ⋊ K` で regular orbit 無し (3A.7 の sharpness) |
-| 3A.9 | ⬜ wreath product `W = H ≀ G`: (a) `C_B(G)` = 定数関数 / (b) regular wreath で `C_G(b) = C` なる `b ∈ B` が存在 |
+| 3A.9 | (a) ✅ (2026-07-25) / (b) ⬜ regular wreath で `C_G(b) = C` なる `b ∈ B` が存在 |
 | 3A.10 | ⬜ 任意の有限群 `H` と素数 `p` に対し、正規可換 `p`-部分群 `A` で `G` が `A` 上分裂し `G/A ≅ H`, `A = C_G(A)` なる `G` が存在 |
 
 - ⬜ **次: §3A 続き or §2A hard tail 再訪。§1D 残り = 1D.5 (Isaacs-noted-hardest)。**
@@ -661,5 +682,6 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 (2A/2C/2D を誤って TODO と記載) も実測に合わせて訂正。
 さらに **§2D も完済 (2D.1(a)(b) / 2D.2)** ⟹ **Isaacs Ch.2 の章末演習は全問完済**。
 さらに **3A.4 ✅** (3A.3 / 3A.5 は既済と実測判明)。
-**次 frontier = 3A.6** (Thm 1.38 Generalized Brodkey の application) → 3A.7 / 3A.8 / 3A.9 /
-3A.10 → §3B〜。
+さらに **3A.9(a) ✅**。**3A.6 は deferred-hard** (解析は §3A 節に記録; Brodkey の適用の一手が
+未確定)。**次 frontier = 3A.8(a)(b)** (巡回 `pqr` の `Aut` の involution — 具体計算で着手可能) →
+3A.9(b) / 3A.10 → 3A.6 / 3A.7 に戻る → §3B〜。
