@@ -239,4 +239,34 @@ theorem exists_isCyclic_card_nine_specialLinearGroup
 
 end SL
 
+section PSL
+
+variable (F : Type*) [Field F] [Finite F] [CharP F 2]
+
+/-- In characteristic two the centre of `SL(2, F)` is trivial, so
+`PSL(2, F) ≃* SL(2, F)`. -/
+noncomputable def pslMulEquivSL :
+    Matrix.ProjectiveSpecialLinearGroup (Fin 2) F
+      ≃* Matrix.SpecialLinearGroup (Fin 2) F :=
+  (QuotientGroup.quotientMulEquivOfEq
+      (SpecificGroups.ProjectiveSpecialLinear.center_specialLinearGroup_fin_two_eq_bot
+        (F := F))).trans
+    QuotientGroup.quotientBot
+
+/-- `|PSL(2, F)| = 504` when `|F| = 8`. -/
+theorem natCard_projectiveSpecialLinearGroup_eq_of_card_eq_eight
+    (hF : Nat.card F = 8) :
+    Nat.card (Matrix.ProjectiveSpecialLinearGroup (Fin 2) F) = 504 := by
+  rw [SpecificGroups.ProjectiveSpecialLinear.natCard_projectiveSpecialLinearGroup_fin_two,
+    hF]
+
+/-- **`PSL(2, 8)` contains a cyclic subgroup of order `9`** (the nonsplit torus). -/
+theorem exists_isCyclic_card_nine_projectiveSpecialLinearGroup (hF : Nat.card F = 8) :
+    ∃ C : Subgroup (Matrix.ProjectiveSpecialLinearGroup (Fin 2) F),
+      IsCyclic ↥C ∧ Nat.card ↥C = 9 :=
+  exists_isCyclic_card_nine_of_mulEquiv (pslMulEquivSL F).symm
+    (exists_isCyclic_card_nine_specialLinearGroup F hF)
+
+end PSL
+
 end OddOrder.GroupTheory.ProjectiveSpecialLinear
