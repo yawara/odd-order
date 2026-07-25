@@ -1033,12 +1033,16 @@ r ∣ 504 ∧ r 奇 ⟹ r ∈ {3,7}、(13-iv) で 7 を排除 ⟹ |J| は 3-冪�
   共役像の等式は normalizer の elementwise 版から ext で作る。
 
 ### 残り (次セッションの実装順)
-1. **|𝒜₂| = 3**: 𝒜₂ := Z₁P (位数 9 の初等アーベル) の位数 3 部分群 ∖ {Z₁}。
-   汎用形は「位数 p² の初等アーベル群の位数 p 部分群はちょうど p+1 個」。
-   上界は δ4 の `finset_card_lines_le` (StepTwelveConclusion:416) と同型の
-   「相異なる 2 つは自明に交わる ⟹ 非単位元が分割」議論、下界は
-   P・⟨zy⟩・⟨zy²⟩ (z = Z₁ の生成元, y = P の生成元) の 3 つを exhibit。
-   もしくは x ↦ zpowers x の fiber (= 各 line の生成元 p−1 個) 数え。
+1. **|𝒜₂| = 3** — generic 部品は **完了** (`b1ebb0711` / `082977ee7` / `aa82a0300`):
+   `finset_card_prime_subgroups_le` (≤ p+1) /
+   `mem_of_card_eq_of_prime_subgroups` (p+1 個挙げれば完全) /
+   **`card_eq_of_forall_zpowers_mem` (= p+1; 生成元の像で Finset を作る版)**。
+   残り = FirstCase 側で 𝒮 := `Finset.image (zpowers ·) ((Z₁P : Set G).toFinset \ {1})`
+   を `haveI := Fintype.ofFinite G; classical` の下で組み、hmem/hall を与えて
+   |𝒮| = 4 → 𝒜₂ := 𝒮.erase Z₁ で card 3。⚠ Z₁P の非単位元が全て位数 3
+   (Z₁·P 可換で両者指数 3) を先に出すこと。
+   ⚠ `primeLines` を top-level def にすると `Fintype ↑↑E` が立たない
+   (Finite → Fintype は proof 内 haveI が要る) ので Finset は呼び出し側で作る。
 2. **作用と kernel**: N_G(RΣ) ↷ 𝒜₂ (1 の不変性から)。kernel の元は特に
    P ∈ 𝒜₂ を固定 ⟹ kernel ≤ N_G(P) = R·C_Q(P)·Σ、C_Q(P)^# は 𝒜−{P} に
    自由 ((11) の `invImageF_mul_comm_of_not_dvd_card_D` 系) ⟹ kernel = RΣ。
