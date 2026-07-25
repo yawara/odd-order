@@ -432,4 +432,84 @@ theorem mulTransversal_leftQuotientEquiv {G : Type*} [Group G] {H K : Subgroup G
     (((mulTransversal hHK T S).2.leftQuotientEquiv q : G)) = mulTransversalFun hHK T S q :=
   Subgroup.IsComplement.leftQuotientEquiv_apply (mulTransversalFun_spec hHK T S) q
 
+/-! ### 5A.3(d): transfer の推移律 -/
+
+/-- `Subgroup.leftTransversals.diff` の展開形 (定義そのもの)。
+
+`diff` の定義には `let _ := H.fintypeQuotientOfFiniteIndex` が入るので, 展開形でも同じ
+`Fintype` instance を使う。証明項は proof irrelevance で吸収されるので `rfl` で通る。 -/
+theorem diff_eq_prod {G A : Type*} [Group G] [CommGroup A] {H : Subgroup G} [H.FiniteIndex]
+    (ϕ : ↥H →* A) (X Y : H.LeftTransversal) :
+    Subgroup.leftTransversals.diff ϕ X Y =
+      letI := H.fintypeQuotientOfFiniteIndex
+      ∏ q : G ⧸ H, ϕ ⟨(X.2.leftQuotientEquiv q : G)⁻¹ * (Y.2.leftQuotientEquiv q : G),
+        QuotientGroup.eq.mp
+          ((Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv X.2 q).trans
+            (Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv Y.2 q).symm)⟩ :=
+  rfl
+
+/-- 積 transversal の代表元を `quotientEquivProd` の成分で書いた形。 -/
+theorem mulTransversal_apply_symm {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal)
+    (q₁ : G ⧸ K) (r : ↥K ⧸ H.subgroupOf K) :
+    (((mulTransversal hHK T S).2.leftQuotientEquiv
+        ((quotientEquivProd hHK T).symm (q₁, r)) : G))
+      = (T.2.leftQuotientEquiv q₁ : G) * ((S.2.leftQuotientEquiv r : ↥K) : G) := by
+  rw [mulTransversal_leftQuotientEquiv]
+  simp only [mulTransversalFun, Equiv.apply_symm_apply]
+
+/-- transfer の推移律に現れる `K` の元 `m_{q} = τ(q)⁻¹ · g · τ(g⁻¹ • q)`。
+
+`diff` の因子 `(τ q)⁻¹ · ((g • T) q)` そのもの。 -/
+noncomputable def transferCocycle {G : Type*} [Group G] {K : Subgroup G}
+    (T : K.LeftTransversal) (g : G) (q : G ⧸ K) : ↥K :=
+  ⟨(T.2.leftQuotientEquiv q : G)⁻¹ * g * (T.2.leftQuotientEquiv (g⁻¹ • q) : G), by
+    have h2 := Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv T.2 (g⁻¹ • q)
+    have h1 : (QuotientGroup.mk (g⁻¹ * (T.2.leftQuotientEquiv q : G)) : G ⧸ K) = g⁻¹ • q := by
+      have h0 := Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv T.2 q
+      calc (QuotientGroup.mk (g⁻¹ * (T.2.leftQuotientEquiv q : G)) : G ⧸ K)
+          = g⁻¹ • (QuotientGroup.mk (T.2.leftQuotientEquiv q : G) : G ⧸ K) := rfl
+        _ = g⁻¹ • q := congrArg (fun x => g⁻¹ • x) h0
+    have hmem := QuotientGroup.eq.mp (h1.trans h2.symm)
+    have heq : (g⁻¹ * (T.2.leftQuotientEquiv q : G))⁻¹ *
+        (T.2.leftQuotientEquiv (g⁻¹ • q) : G)
+        = (T.2.leftQuotientEquiv q : G)⁻¹ * g * (T.2.leftQuotientEquiv (g⁻¹ • q) : G) := by
+      group
+    rwa [heq] at hmem⟩
+
+/-- `g⁻¹` 作用の下での `quotientEquivProd` 成分の変化。 -/
+theorem quotientEquivProd_smul_symm {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (g : G) (q₁ : G ⧸ K) (k : ↥K) :
+    (quotientEquivProd hHK T) (g⁻¹ • (quotientEquivProd hHK T).symm (q₁, QuotientGroup.mk k))
+      = (g⁻¹ • q₁, QuotientGroup.mk ((transferCocycle T g q₁)⁻¹ * k)) := by
+  rw [quotientEquivProd_symm_apply]
+  have hsm : g⁻¹ • (QuotientGroup.mk ((T.2.leftQuotientEquiv q₁ : G) * (k : G)) : G ⧸ H)
+      = QuotientGroup.mk (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))) := rfl
+  rw [hsm]
+  have hfst : (QuotientGroup.mk (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))) : G ⧸ K)
+      = g⁻¹ • q₁ := by
+    have h0 := Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv T.2 q₁
+    have hk : (QuotientGroup.mk (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))) : G ⧸ K)
+        = QuotientGroup.mk (g⁻¹ * (T.2.leftQuotientEquiv q₁ : G)) := by
+      refine (QuotientGroup.eq.mpr ?_).symm
+      have hgrp : (g⁻¹ * (T.2.leftQuotientEquiv q₁ : G))⁻¹ *
+          (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))) = (k : G) := by group
+      rw [hgrp]
+      exact k.2
+    calc (QuotientGroup.mk (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))) : G ⧸ K)
+        = QuotientGroup.mk (g⁻¹ * (T.2.leftQuotientEquiv q₁ : G)) := hk
+      _ = g⁻¹ • (QuotientGroup.mk (T.2.leftQuotientEquiv q₁ : G) : G ⧸ K) := rfl
+      _ = g⁻¹ • q₁ := congrArg (fun x => g⁻¹ • x) h0
+  refine Prod.ext hfst ?_
+  refine QuotientGroup.eq.mpr ?_
+  rw [Subgroup.mem_subgroupOf]
+  simp only [Subgroup.coe_mul, Subgroup.coe_inv, hfst]
+  have hgrp : ((T.2.leftQuotientEquiv (g⁻¹ • q₁) : G)⁻¹ *
+      (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))))⁻¹ *
+      ((((transferCocycle T g q₁) : ↥K) : G)⁻¹ * (k : G)) = 1 := by
+    simp only [transferCocycle]
+    group
+  rw [hgrp]
+  exact H.one_mem
+
 end OddOrder.Isaacs.Ch05

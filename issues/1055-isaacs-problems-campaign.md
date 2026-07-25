@@ -1487,10 +1487,21 @@ mathlib `Subgroup.isComplement_range_left` (「`∀ q, (F q : G ⧸ H) = q` な�
 ここで `m := ⟨τ(g⁻¹•q₁)⁻¹ · g⁻¹ · τ(q₁)⟩ ∈ K`。ゆえに
 `∏_r ϕ(…) = diff_{H'} ϕ' S (m⁻¹ • S) = transfer_{H'≤K} ϕ' m⁻¹`,
 `∏_{q₁} が diff_K (transfer ϕ') T (g•T) = transfer_K (transfer ϕ') g`。
-実装は (a) `MonoidHom.transfer_def` で両辺を `diff` にする、(b) `diff` を展開して
-`Equiv.prod_comp (quotientEquivProd …)` + `Fintype.prod_prod_type` で二重積化、
-(c) `Subgroup.smul_leftQuotientEquiv'` (`((f•S) q : G) = f • S (f⁻¹ • q)`) で
-`g•P`, `m⁻¹•S` を書き下して因子を照合。
+**部品は 2026-07-26 にすべて landing**:
+* `diff_eq_prod` — `Subgroup.leftTransversals.diff` の展開形。⭐ **`rfl` で通る**
+  (`let _ := H.fintypeQuotientOfFiniteIndex` を展開形でも使い、membership 証明項は
+  proof irrelevance で吸収される)。
+* `mulTransversal_apply_symm` — `P (e.symm (q₁, r)) = τ q₁ · σ r`。
+* `transferCocycle T g q := ⟨τ(q)⁻¹ · g · τ(g⁻¹•q)⟩ ∈ K` — 外側 `diff` の因子そのもの。
+* `quotientEquivProd_smul_symm` — `e (g⁻¹ • e.symm (q₁, ⟦k⟧)) = (g⁻¹•q₁, ⟦m⁻¹ · k⟧)`,
+  `m = transferCocycle T g q₁`。
+  ⚠ **`m` と `m⁻¹` の取り違えに注意** (第 2 成分に現れるのは `m⁻¹ = τ(g⁻¹•q₁)⁻¹ g⁻¹ τ(q₁)`、
+  `diff` の因子は `m` 自身)。1 回間違えて `group` が閉じずに発覚した。
+
+残りは最終組み立てのみ: (a) `MonoidHom.transfer_def` で両辺を `diff` に、(b) `diff_eq_prod`
++ `Equiv.prod_comp (quotientEquivProd …).symm` + `Fintype.prod_prod_type` で二重積化、
+(c) `Subgroup.smul_apply_eq_smul_apply_inv_smul` で `g•P` と `m•S` を書き下し、因子
+`(σ r)⁻¹ · m · σ(m⁻¹ • r)` を内側 `diff ϕ' S (m • S) = transfer ϕ' m` と照合。
 
 ### 5A.2 の設計 (2026-07-26 に確定、**実装済** `transfer_top_eq_apply`)
 
