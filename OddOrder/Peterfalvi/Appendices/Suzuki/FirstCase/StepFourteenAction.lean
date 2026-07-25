@@ -694,6 +694,192 @@ theorem lineSetTwoPermHom_surjective
   rw [hcard6]
   exact Nat.dvd_antisymm (by rw [← hcard6]; exact Subgroup.card_subgroup_dvd_card _) h6
 
+include model in
+/-- **`|N_G(RΣ)| = 2·3⁵`** ((14), p. 113): the action on `𝒜₂` has kernel `RΣ`
+(order `3⁴`) and image all of `Sym(𝒜₂)` (order `3! = 6`). -/
+theorem card_normalizerRSigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    Nat.card ↥(fc.normalizerRSigma model) = 2 * 3 ^ 5 := by
+  classical
+  haveI : Finite (Subgroup G) :=
+    Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
+  haveI : Finite ↥fc.lineSetTwo := Subtype.finite
+  haveI := Fintype.ofFinite ↥fc.lineSetTwo
+  haveI := Classical.decEq ↥fc.lineSetTwo
+  set φ := fc.lineSetTwoPermHom model ind hB2 with hφ_def
+  have hRle : (fc.invImageF model
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)
+      ≤ fc.normalizerRSigma model := Subgroup.le_normalizer
+  have hker : φ.ker = (fc.invImageF model
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))).subgroupOf
+        (fc.normalizerRSigma model) := by
+    ext g
+    rw [Subgroup.mem_subgroupOf]
+    exact fc.mem_ker_lineSetTwoPermHom_iff model ind hB2
+  have hkercard : Nat.card ↥φ.ker = 3 ^ 4 := by
+    rw [hker, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRle).toEquiv]
+    exact fc.card_sup_invImageF_centralizer_W_eq model ind hB2
+  have hA3 : Fintype.card ↥fc.lineSetTwo = 3 := by
+    rw [← Nat.card_eq_fintype_card, Nat.card_coe_set_eq,
+      fc.ncard_lineSetTwo model ind hB2]
+  have hrange : Nat.card ↥φ.range = 6 := by
+    rw [MonoidHom.range_eq_top.mpr (fc.lineSetTwoPermHom_surjective model ind hB2),
+      Subgroup.card_top, Nat.card_eq_fintype_card, Fintype.card_perm, hA3]
+    decide
+  have hq := Subgroup.card_eq_card_quotient_mul_card_subgroup φ.ker
+  rw [Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv, hrange,
+    hkercard] at hq
+  rw [hq]
+  norm_num
+
+/-- **`R₁`** ((14), p. 113): the unique Sylow `3`-subgroup of `N_G(RΣ)`.
+
+Since `|N_G(RΣ)| = 2·3⁵`, its Sylow `3`-subgroup has index `2`, hence is normal and
+unique, and therefore consists of all the `3`-elements of `N_G(RΣ)`.  That is the
+choice-free description used as the definition here. -/
+noncomputable def sylowThreeNormalizerRSigma : Subgroup G :=
+  Subgroup.closure {g : G | g ∈ fc.normalizerRSigma model ∧ ∃ j : ℕ, orderOf g = 3 ^ j}
+
+include model in
+theorem sylowThreeNormalizerRSigma_def :
+    fc.sylowThreeNormalizerRSigma model
+      = Subgroup.closure {g : G | g ∈ fc.normalizerRSigma model
+        ∧ ∃ j : ℕ, orderOf g = 3 ^ j} := rfl
+
+include model in
+/-- **`R₁` is the image of any Sylow `3`-subgroup of `N_G(RΣ)`** ((14), p. 113): the
+Sylow `3`-subgroup has index `2` in `N_G(RΣ)`, hence is normal and unique, so it
+absorbs every `3`-element. -/
+theorem sylowThreeNormalizerRSigma_eq_map
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (S : Sylow 3 ↥(fc.normalizerRSigma model)) :
+    fc.sylowThreeNormalizerRSigma model
+      = (S : Subgroup ↥(fc.normalizerRSigma model)).map
+        (fc.normalizerRSigma model).subtype
+      ∧ Nat.card ↥(S : Subgroup ↥(fc.normalizerRSigma model)) = 3 ^ 5 := by
+  classical
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have hNcard := fc.card_normalizerRSigma model ind hB2
+  obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp S.isPGroup'
+  have hmul := (S : Subgroup ↥(fc.normalizerRSigma model)).card_mul_index
+  rw [hk, hNcard] at hmul
+  have hnd := S.not_dvd_index
+  have hcop : Nat.Coprime (3 ^ 5)
+      ((S : Subgroup ↥(fc.normalizerRSigma model)).index) :=
+    Nat.Coprime.pow_left 5 ((Nat.Prime.coprime_iff_not_dvd (by norm_num)).mpr hnd)
+  have h1 : (3 : ℕ) ^ 5 ∣ 3 ^ k := by
+    refine hcop.dvd_of_dvd_mul_right ?_
+    rw [hmul]
+    exact ⟨2, by ring⟩
+  have h2 : (3 : ℕ) ^ k ∣ 3 ^ 5 :=
+    (Nat.Coprime.pow_left k (by norm_num)).dvd_of_dvd_mul_left ⟨_, hmul.symm⟩
+  have hkeq : k = 5 :=
+    le_antisymm ((Nat.pow_dvd_pow_iff_le_right (by norm_num)).mp h2)
+      ((Nat.pow_dvd_pow_iff_le_right (by norm_num)).mp h1)
+  have hScard : Nat.card ↥(S : Subgroup ↥(fc.normalizerRSigma model)) = 3 ^ 5 := by
+    rw [hk, hkeq]
+  have hSidx : (S : Subgroup ↥(fc.normalizerRSigma model)).index = 2 := by
+    rw [hkeq] at hmul
+    exact Nat.eq_of_mul_eq_mul_left (by norm_num : (0 : ℕ) < 3 ^ 5)
+      (by rw [hmul]; ring)
+  haveI hSn : (S : Subgroup ↥(fc.normalizerRSigma model)).Normal :=
+    Subgroup.normal_of_index_eq_two hSidx
+  letI := Sylow.unique_of_normal S hSn
+  refine ⟨le_antisymm ?_ ?_, hScard⟩
+  · rw [fc.sylowThreeNormalizerRSigma_def model, Subgroup.closure_le]
+    rintro g ⟨hgN, j, hj⟩
+    have hz : IsPGroup 3
+        ↥(Subgroup.zpowers (⟨g, hgN⟩ : ↥(fc.normalizerRSigma model))) :=
+      IsPGroup.of_card (n := j) (by rw [Nat.card_zpowers, Subgroup.orderOf_mk, hj])
+    obtain ⟨Q, hQ⟩ := hz.exists_le_sylow
+    have hmemQ : (⟨g, hgN⟩ : ↥(fc.normalizerRSigma model))
+        ∈ (Q : Subgroup ↥(fc.normalizerRSigma model)) := hQ (Subgroup.mem_zpowers _)
+    rw [Subsingleton.elim Q S] at hmemQ
+    exact ⟨⟨g, hgN⟩, hmemQ, rfl⟩
+  · rintro x ⟨y, hy, rfl⟩
+    rw [fc.sylowThreeNormalizerRSigma_def model]
+    refine Subgroup.subset_closure ⟨y.2, ?_⟩
+    obtain ⟨j, hj⟩ := (IsPGroup.iff_orderOf).mp S.isPGroup' ⟨y, hy⟩
+    refine ⟨j, ?_⟩
+    change orderOf ((y : G)) = 3 ^ j
+    rw [Subgroup.orderOf_coe]
+    rwa [Subgroup.orderOf_mk] at hj
+
+include model in
+/-- **`|R₁| = 3⁵`** ((14), p. 113). -/
+theorem card_sylowThreeNormalizerRSigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    Nat.card ↥(fc.sylowThreeNormalizerRSigma model) = 3 ^ 5 := by
+  classical
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  obtain ⟨S⟩ : Nonempty (Sylow 3 ↥(fc.normalizerRSigma model)) := inferInstance
+  obtain ⟨hEq, hScard⟩ := fc.sylowThreeNormalizerRSigma_eq_map model ind hB2 S
+  rw [hEq, Subgroup.card_map_of_injective (Subgroup.subtype_injective _)]
+  exact hScard
+
+include model in
+theorem sylowThreeNormalizerRSigma_le :
+    fc.sylowThreeNormalizerRSigma model ≤ fc.normalizerRSigma model := by
+  rw [fc.sylowThreeNormalizerRSigma_def model, Subgroup.closure_le]
+  rintro y ⟨hyN, -⟩
+  exact hyN
+
+include model in
+/-- **`RΣ ≤ R₁`**: every element of `RΣ` is a `3`-element of `N_G(RΣ)` (`|RΣ| = 3⁴`). -/
+theorem sup_le_sylowThreeNormalizerRSigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    (fc.invImageF model
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)
+      ≤ fc.sylowThreeNormalizerRSigma model := by
+  have hRScard := fc.card_sup_invImageF_centralizer_W_eq model ind hB2
+  intro x hx
+  rw [fc.sylowThreeNormalizerRSigma_def model]
+  refine Subgroup.subset_closure ⟨Subgroup.le_normalizer hx, ?_⟩
+  have hdvd := Subgroup.orderOf_dvd_natCard _ hx
+  rw [hRScard] at hdvd
+  obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow (by norm_num)).mp hdvd
+  exact ⟨j, hj⟩
+
+include model in
+/-- The set of `3`-elements of `N_G(RΣ)` is invariant under conjugation by
+`N_G(RΣ)`. -/
+theorem conj_image_threeElements_eq {g : G} (hg : g ∈ fc.normalizerRSigma model) :
+    (fun y => g * y * g⁻¹) ''
+        {y : G | y ∈ fc.normalizerRSigma model ∧ ∃ j : ℕ, orderOf y = 3 ^ j}
+      = {y : G | y ∈ fc.normalizerRSigma model ∧ ∃ j : ℕ, orderOf y = 3 ^ j} := by
+  have horder : ∀ a b : G, orderOf (a * b * a⁻¹) = orderOf b := fun a b =>
+    orderOf_injective (MulAut.conj a).toMonoidHom (MulAut.conj a).injective b
+  ext z
+  constructor
+  · rintro ⟨y, ⟨hyN, j, hj⟩, rfl⟩
+    exact ⟨Subgroup.mul_mem _ (Subgroup.mul_mem _ hg hyN) (Subgroup.inv_mem _ hg),
+      j, by rw [horder]; exact hj⟩
+  · rintro ⟨hzN, j, hj⟩
+    refine ⟨g⁻¹ * z * g, ⟨Subgroup.mul_mem _
+      (Subgroup.mul_mem _ (Subgroup.inv_mem _ hg) hzN) hg, j, ?_⟩, by group⟩
+    have h1 : g⁻¹ * z * g = g⁻¹ * z * (g⁻¹)⁻¹ := by rw [inv_inv]
+    rw [h1, horder]
+    exact hj
+
+include model in
+/-- **`R₁ ⊴ N_G(RΣ)`** ((14), p. 113): `R₁` is generated by the `3`-elements of
+`N_G(RΣ)`, a conjugation-invariant set. -/
+theorem conj_mem_sylowThreeNormalizerRSigma {g : G}
+    (hg : g ∈ fc.normalizerRSigma model) {x : G}
+    (hx : x ∈ fc.sylowThreeNormalizerRSigma model) :
+    g * x * g⁻¹ ∈ fc.sylowThreeNormalizerRSigma model := by
+  have hmap : (fc.sylowThreeNormalizerRSigma model).map (MulAut.conj g).toMonoidHom
+      = fc.sylowThreeNormalizerRSigma model := by
+    rw [fc.sylowThreeNormalizerRSigma_def model, MonoidHom.map_closure]
+    congr 1
+    exact fc.conj_image_threeElements_eq model hg
+  rw [← hmap]
+  exact Subgroup.mem_map_of_mem _ hx
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
