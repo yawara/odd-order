@@ -823,6 +823,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | 4A.3 | ✅ | `IsQuasiquaternion` (定義) / `eq_bot_of_isQuasiquaternion_quotient` |
 | 4A.5 | ✅ | (a) `index_centralizer_eq_of_not_mem_center` / (b) `card_closure_pair_eq` / (c) `index_centralizer_closure_pair_eq` / (d) `map_center_centralizer_eq_center` + `isExtraspecial_centralizer_closure_pair` / (e) `exists_index_center_eq_prime_pow_two_mul` (新 leaf `ProblemsExtraspecial.lean`) |
 | 4A.6 | ✅ | `IsMaximalClassPGroup` (定義) / `exists_eq_lowerCentralSeries_of_isMaximalClass` (+ 一意性 `eq_of_normal_of_card_eq_of_isMaximalClass`、新 leaf `ProblemsMaximalClass.lean`) |
+| 4A.7 | ✅ | `exists_orderOf_eq_and_forall_orderOf_dvd` (+ 冪公式 `pow_mk` / 上界 `pow_prime_pow_succ_eq_one`、新 leaf `ProblemsWreath.lean`) |
 | 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 同値形 `frattini_eq_center_of_commutator_eq_center` + 橋 `isExtraspecial_of_commutator_eq_center`) |
 
 - **4A.1** (`G = AB`, `A`,`B` abelian ⟹ `G' = ⁅A,B⁆`): `⁅A,B⁆` の正規性は既存の
@@ -893,8 +894,16 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   本題は `|P⧸N| = p^k` の類 ≤ `k-1` ⟹ `L_{k-1}(P) ≤ N`、位数一致で `N = L_{k-1}(P)`。
   ⚠ 書籍の `|N : P| ≥ p²` は誤植で `|P : N| ≥ p²` (指数が `p` 冪なので `p² ∣ |P:N|` と同値)。
 
-### 残り (文書順): 4A.7-4A.8 (regular wreath product; §3A で作った
-`WreathProduct` インフラが使える) / 4A.9 / 4A.10 / 4A.11。
+- **4A.7** (正則 wreath product `C ≀ U` の元の位数の最大値 = `p^{n+1}`、新 leaf
+  `Ch04_Commutators/ProblemsWreath.lean`): §3A の一般 wreath product `D ≀[Q] Q`
+  (`Q` の左正則作用) で実現。**上界は冪公式を使わない**のがポイント —
+  `rightHom (x^p) = (rightHom x)^p = 1` ⟹ `x^p ∈ range inl` (base 群)、base は指数 `p^n`
+  ⟹ `x^{p^{n+1}} = 1` (`pow_prime_pow_succ_eq_one`)。
+  下界には冪公式 `pow_mk` (`⟨f,q⟩^k` の base 成分 = `∏_{j<k} f((q^j)⁻¹ ω)`、`D` 可換で証明) と
+  `prod_range_card_eq_prod_univ` (生成元の冪で捻った積 = 群全体の積; `Finset.prod_image` +
+  `pow_injOn_Iio_orderOf`) を使い、証人 `x = ⟨δ₁ c, q⟩` に対し `x^p = ⟨const c, 1⟩` (位数 `p^n`)。
+
+### 残り (文書順): 4A.8 (4A.7 の P の (a)-(d)) / 4A.9 / 4A.10 / 4A.11。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
 
