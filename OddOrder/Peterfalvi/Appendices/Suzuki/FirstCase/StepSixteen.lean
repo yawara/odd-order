@@ -45,6 +45,22 @@ theorem conj_pow_eq_mul_pow {a d g : G'} (hdg : Commute d g)
               group
         _ = a * d ^ (n + 1) := by rw [pow_succ]; group
 
+/-- An element inverted by an involution `u` is strongly real, unless it equals `u`. -/
+theorem isStronglyReal_of_conj_eq_inv {u x : G'} (hu2 : u ^ 2 = 1) (hu1 : u ≠ 1)
+    (hinv : u * x * u⁻¹ = x⁻¹) (hxu : x ≠ u) : IsStronglyReal x := by
+  have hu2' : u * u = 1 := by rw [← pow_two]; exact hu2
+  have huinv : u⁻¹ = u := inv_eq_of_mul_eq_one_right hu2'
+  refine ⟨u, ⟨hu2, hu1⟩, u * x, ⟨?_, ?_⟩, by rw [← mul_assoc, hu2', one_mul]⟩
+  · have h1 : u * x * u = x⁻¹ := by rw [← hinv, huinv]
+    calc (u * x) ^ 2 = (u * x * u) * x := by rw [pow_two]; group
+      _ = x⁻¹ * x := by rw [h1]
+      _ = 1 := by group
+  · intro h
+    refine hxu ?_
+    have h2 : x = u⁻¹ * (u * x) := by group
+    rw [h, huinv] at h2
+    simpa using h2
+
 /-- A conjugate of a strongly real element is strongly real. -/
 theorem isStronglyReal_conj {x : G'} (hx : IsStronglyReal x) (g : G') :
     IsStronglyReal (g * x * g⁻¹) := by
@@ -806,6 +822,83 @@ theorem eq_zpowers_of_card_three_of_forall_isStronglyReal
         (Subgroup.mem_sup_left (Subgroup.mem_sup_left hz)) (hXle hw)
     rw [hyconj]
     exact isStronglyReal_conj (hXsr w hw hw1) _
+
+include model in
+/-- **Every element of `Z₁` is strongly real**: `s` inverts `st`, hence all its powers,
+and no power of `st` equals `s` (odd order versus order `2`). -/
+theorem forall_isStronglyReal_mem_zpowers_st
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {x : G}
+    (hx : x ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t)) : IsStronglyReal x := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  set s : G := fc.toHypothesis.distinguishedInvolution with hs_def
+  have hs2 : s ^ 2 = 1 := fc.toHypothesis.distinguishedInvolution_sq
+  have hs2' : s * s = 1 := by rw [← pow_two]; exact hs2
+  have hsinv : s⁻¹ = s := inv_eq_of_mul_eq_one_right hs2'
+  -- `s` inverts every element of `Z₁`
+  have hinvz : s * x * s⁻¹ = x⁻¹ := by
+    obtain ⟨k, rfl⟩ := hx
+    have hbase : s * (s * fc.toHypothesis.t) * s⁻¹
+        = (s * fc.toHypothesis.t)⁻¹ := by
+      have ht2 : fc.toHypothesis.t * fc.toHypothesis.t = 1 := by
+        rw [← pow_two]; exact fc.toHypothesis.t_sq
+      rw [hsinv, mul_inv_rev, inv_eq_of_mul_eq_one_right ht2,
+        inv_eq_of_mul_eq_one_right hs2']
+      calc s * (s * fc.toHypothesis.t) * s = (s * s) * fc.toHypothesis.t * s := by group
+        _ = fc.toHypothesis.t * s := by rw [hs2', one_mul]
+    calc s * (s * fc.toHypothesis.t) ^ k * s⁻¹
+        = (s * (s * fc.toHypothesis.t) * s⁻¹) ^ k := by rw [conj_zpow]
+      _ = ((s * fc.toHypothesis.t)⁻¹) ^ k := by rw [hbase]
+      _ = ((s * fc.toHypothesis.t) ^ k)⁻¹ := by rw [inv_zpow]
+  rcases eq_or_ne x s with rfl | hxs
+  · -- `x = s` is impossible: `s` has order `2`, elements of `Z₁` order dividing `3`
+    exfalso
+    have hxord : orderOf s ∣ 3 := by
+      have h := Subgroup.orderOf_dvd_natCard _ hx
+      rwa [Nat.card_zpowers, hstord] at h
+    have hs2ord : orderOf s ∣ 2 := orderOf_dvd_of_pow_eq_one hs2
+    have h1 : orderOf s = 1 := Nat.eq_one_of_dvd_coprimes (by decide) hs2ord hxord
+    exact fc.toHypothesis.distinguishedInvolution_ne_one (orderOf_eq_one_iff.mp h1)
+  · exact isStronglyReal_of_conj_eq_inv hs2
+      fc.toHypothesis.distinguishedInvolution_ne_one hinvz hxs
+
+include model in
+/-- **`N_G(Z₁PΣ) ≤ N_G(Z₁)`** ((16), p. 114): `Z₁^g` is again a subgroup of order `3`
+of `Z₁PΣ` consisting of strongly real elements, hence equals `Z₁`. -/
+theorem normalizer_zpowers_sup_sigma_sup_P_le_normalizer_zpowers
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    Subgroup.normalizer ((((Subgroup.zpowers
+          (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P)
+          : Subgroup G) : Set G)
+      ≤ Subgroup.normalizer ((Subgroup.zpowers
+        (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) : Subgroup G)
+          : Set G) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  intro g hg
+  rw [Subgroup.mem_set_normalizer_iff] at hg
+  rw [Subgroup.mem_normalizer_iff_map_conj_eq]
+  refine fc.eq_zpowers_of_card_three_of_forall_isStronglyReal model ind hB2 ?_ ?_ ?_
+  · rintro x ⟨z, hz, rfl⟩
+    exact (hg z).mp (Subgroup.mem_sup_left (Subgroup.mem_sup_left hz))
+  · rw [Subgroup.card_map_of_injective, Nat.card_zpowers, hstord]
+    exact fun a b h => by
+      simpa using congrArg (fun y => (MulAut.conj g).symm y) h
+  · rintro x ⟨z, hz, rfl⟩ -
+    exact isStronglyReal_conj
+      (fc.forall_isStronglyReal_mem_zpowers_st model ind hB2 hz) g
 
 end FirstCaseHypothesis
 
