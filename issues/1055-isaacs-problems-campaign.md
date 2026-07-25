@@ -1045,15 +1045,18 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 **位数側も `n=1` 特殊形を landing**: `card_wreath_of_card_eq_prime`
 (`|C| = |Q| = p` ⟹ `|C ≀ Q| = p^{p+1}`) — maximal class の判定 `class = p` と対になる。
 
-**残りは linchpin 本体 1 本のみ**。ルート A の必要形 (次 iteration の出発点):
-```
-theorem shiftSubHom_iterate_apply (q : Q) (f : Q → D) (k : ℕ) (ω : Q) :
-    (shiftSubHom q)^[k] f ω
-      = ∏ j ∈ Finset.range (k+1), (f ((q ^ j)⁻¹ * ω)) ^ ((-1)^j * (k.choose j) : ℤ)
-```
-帰納段は `Δ(g) ω = g ω * (g (q⁻¹ω))⁻¹` に IH を代入し、
-`g(q⁻¹ω)` 側の添字を `j ↦ j+1` にずらして (`Finset.prod_range_succ'` 系) Pascal
-`(-1)^j C(k,j) - (-1)^{j-1} C(k,j-1) = (-1)^j C(k+1,j)` を使う。
+**二項展開 `shiftSubHom_iterate_apply` は landing 済 (2026-07-25)**:
+`Δ^k f ω = ∏_{j ≤ k} f((q^j)⁻¹ω)^{(-1)^j C(k,j)}`。実装知見:
+- `Function.iterate_succ_apply'` で `Δ^[k+1] = Δ ∘ Δ^[k]` に開く
+- 添字ずらし `(q^j)⁻¹(q⁻¹ω) = (q^{j+1})⁻¹ω` は `group`
+- ⚠ **`rw [Finset.prod_congr …]` / `rw [Finset.prod_range_succ]` は積が 2 つあると
+  どちらに当たるか不定** — 対象を `have` で等式化するか `conv_rhs` で明示する
+- Pascal は `Nat.choose_succ_succ' k i` + `push_cast` + `ring`
+
+**⟹ 残るのは linchpin の仕上げ 1 手**: `k = p-1` を代入し
+`cast_choose_prime_sub_one` (`C(p-1,j) ≡ (-1)^j mod p`) と `D` の指数 `p` から
+「zpow の指数を mod p で潰して全部 1 にする」ステップ (`zpow_eq_zpow_iff_modCast` 的な
+補題か、`d ^ (m : ℤ) = d ^ (m % p)` を指数 `p` から出す) を書けば `Δ^{p-1} = T_p`。
 
 linchpin の証明ルート 2 つ:
 1. **pointwise 二項展開**: `Δ^k f ω = ∏_{j≤k} f((q^j)⁻¹ω)^{(-1)^j C(k,j)}` を `k` の帰納

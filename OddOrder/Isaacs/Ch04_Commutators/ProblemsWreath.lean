@@ -919,6 +919,58 @@ theorem card_wreath_of_card_eq_prime [Finite Q] [Finite D] {r : ℕ}
     (hD : Nat.card D = r) (hQ : Nat.card Q = r) : Nat.card (D ≀[Q] Q) = r ^ (r + 1) := by
   rw [OddOrder.Isaacs.Ch03.WreathProduct.card (D := D) (Q := Q) (Ω := Q), hD, hQ, pow_succ]
 
+/-- **`Δ_q` の反復の二項展開**: `Δ^k f ω = ∏_{j ≤ k} f((q^j)⁻¹ω)^{(-1)^j C(k,j)}`.
+
+群環の `(1-x)^k = ∑_j (-1)^j C(k,j) x^j` の作用素版. 帰納段は
+`Δ(g) ω = g ω · (g(q⁻¹ω))⁻¹` に IH を入れ, 第 2 項の添字を `j ↦ j+1` にずらして
+Pascal `(-1)^j C(k,j) - (-1)^{j-1} C(k,j-1) = (-1)^j C(k+1,j)` を使う.
+
+`k = p-1` と `cast_choose_prime_sub_one` (`C(p-1,j) ≡ (-1)^j mod p`) を合わせると,
+指数 `p` の `D` では指数がすべて `1` になり linchpin `Δ^{p-1} = T_p` が出る. -/
+theorem shiftSubHom_iterate_apply (q : Q) (f : Q → D) (k : ℕ) (ω : Q) :
+    (⇑(shiftSubHom (D := D) q))^[k] f ω
+      = ∏ j ∈ Finset.range (k + 1), (f ((q ^ j)⁻¹ * ω)) ^ ((-1) ^ j * (k.choose j) : ℤ) := by
+  induction k generalizing ω with
+  | zero => simp
+  | succ k ih =>
+    rw [Function.iterate_succ_apply']
+    change ((⇑(shiftSubHom (D := D) q))^[k] f) ω
+      * (((⇑(shiftSubHom (D := D) q))^[k] f) (q⁻¹ * ω))⁻¹ = _
+    rw [ih ω, ih (q⁻¹ * ω)]
+    have hshift : ∀ j : ℕ, (q ^ j)⁻¹ * (q⁻¹ * ω) = (q ^ (j + 1))⁻¹ * ω := by
+      intro j
+      rw [← mul_assoc]
+      congr 1
+      rw [pow_succ]
+      group
+    have hsecond : (∏ j ∈ Finset.range (k + 1),
+          f ((q ^ j)⁻¹ * (q⁻¹ * ω)) ^ ((-1) ^ j * (k.choose j) : ℤ))
+        = ∏ j ∈ Finset.range (k + 1),
+          f ((q ^ (j + 1))⁻¹ * ω) ^ ((-1) ^ j * (k.choose j) : ℤ) :=
+      Finset.prod_congr rfl fun j _ => by rw [hshift j]
+    rw [hsecond]
+    set A : ℕ → D := fun j => f ((q ^ j)⁻¹ * ω) with hA
+    have hL : (∏ j ∈ Finset.range (k + 1), A j ^ ((-1) ^ j * (k.choose j) : ℤ))
+        = ∏ j ∈ Finset.range (k + 2), A j ^ ((-1) ^ j * (k.choose j) : ℤ) := by
+      conv_rhs => rw [Finset.prod_range_succ]
+      simp [Nat.choose_succ_self]
+    have hR : (∏ j ∈ Finset.range (k + 1), A (j + 1) ^ ((-1) ^ j * (k.choose j) : ℤ))
+        = ∏ j ∈ Finset.range (k + 2), A j ^ (if j = 0 then 0 else
+            ((-1) ^ (j - 1) * (k.choose (j - 1)) : ℤ)) := by
+      conv_rhs => rw [Finset.prod_range_succ']
+      simp
+    rw [hL, hR, ← Finset.prod_inv_distrib, ← Finset.prod_mul_distrib]
+    refine Finset.prod_congr rfl fun j _ => ?_
+    rw [← zpow_neg, ← zpow_add]
+    congr 1
+    rcases Nat.eq_zero_or_pos j with rfl | hj0
+    · simp
+    · obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
+      simp only [if_neg (Nat.succ_ne_zero i), Nat.add_sub_cancel]
+      rw [Nat.choose_succ_succ' k i]
+      push_cast
+      ring
+
 end
 
 end OddOrder.Isaacs.Ch04
