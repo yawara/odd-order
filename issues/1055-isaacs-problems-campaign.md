@@ -1484,7 +1484,39 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5A.5 | ✅ | `card_ker_dvd_relIndex_commutator` (`ProblemsSchurMultiplier.lean`) — **`M(G)` を定義せず stem extension の ∀-形**で述べた (下記) |
 | 5A.7 | ✅ | `card_ker_lt_relIndex_commutator` (同上)。書籍の `G/C` cyclic 仮定は `BC = G` + `B` cyclic から従うので導出に変更 |
 | 5A.6 | ✅ | `card_ker_dvd_two_of_dihedral` (上界) + `isStemExtension_dihedralReduce` (下界) — `ProblemsDihedralMultiplier.lean`。書籍の `2^n` 版より強い**偶数一般形**で証明 |
-| 5A.8 | ⬜ | (a) `|M(A×B)| ≥ |M(A)||M(B)|` は ∃-側ゆえ具体構成が要る / (b) coprime のとき等号。issue 9206 |
+| 5A.8(a) | ✅ | `isStemExtension_prodMap` + `card_ker_prodMap` (`ProblemsSchurMultiplier.lean`) |
+| 5A.8(b) | 🔨 設計確定・着手中 | coprime のとき等号。下記の完全な証明設計あり。準備補題 `not_dvd_card_commutator_of_sylow_le_center` は landing 済 |
+
+### 5A.8(b) の証明設計 (2026-07-26 確定、実装は次イテレーション)
+
+**∀-形の主張**: `h : Γ →* A × B` が stem extension で `|A|`, `|B|` が互いに素なら,
+`A` の stem extension `f` と `B` の stem extension `g` が存在して
+`|ker h| = |ker f| · |ker g|`。(a) と合わせて `|M(A×B)| = |M(A)||M(B)|` の位数版。
+
+記号: `Z := ker h`, `Γ_A := ker ((snd).comp h)` (= `h⁻¹(A × 1)`),
+`Γ_B := ker ((fst).comp h)`, `n := |A|`, `m := |B|`。
+
+1. `Γ_A ⊓ Γ_B = Z`, かつ `∀ γ, ∃ x ∈ Γ_A, y ∈ Γ_B, γ = x·y` (h の全射性から)。
+2. **`⁅Γ_A, Γ_B⁆ = ⊥`** ⭐ ここが coprime を使う要:
+   `x ∈ Γ_A`, `y ∈ Γ_B` なら `⁅x,y⁆ ∈ Γ_A ⊓ Γ_B = Z ≤ Z(Γ)`。
+   `h (x^n) = (h x)^n = (a^n, 1) = 1` (`pow_card_eq_one`) なので **`x^n ∈ Z`**
+   — 剰余群を作らずに済むのがポイント。`⁅x,y⁆` が中心的なので
+   `⁅x,y⁆^n = ⁅x^n, y⁆ = 1` (帰納法: `⁅ab,y⁆ = a⁅b,y⁆a⁻¹⁅a,y⁆` で中心性から
+   `= ⁅b,y⁆⁅a,y⁆`)。同様に `⁅x,y⁆^m = 1`。coprime ⇒ `⁅x,y⁆ = 1`。
+3. `Γ = Γ_A·Γ_B` かつ `⁅Γ_A,Γ_B⁆ = ⊥` ⇒ `Γ' = ⁅Γ_A,Γ_A⁆ ⊔ ⁅Γ_B,Γ_B⁆`
+   (`Γ_A × Γ_B → Γ` が全射準同型で `(H×K)' = H'×K'`)。
+4. `Z_A := Z ⊓ ⁅Γ_A,Γ_A⁆`, `Z_B := Z ⊓ ⁅Γ_B,Γ_B⁆` とおくと **`Z = Z_A · Z_B`**:
+   `z ∈ Z ≤ Γ'` を `z = u·v` (`u ∈ ⁅Γ_A,Γ_A⁆ ≤ Γ_A`, `v ∈ ⁅Γ_B,Γ_B⁆ ≤ Γ_B`) と書くと
+   `v = u⁻¹z ∈ Γ_A ⊓ Γ_B = Z` ゆえ `v ∈ Z_B`, `u = zv⁻¹ ∈ Z_A`。
+5. **`Z_A ⊓ Z_B = ⊥`**: `p ∤ n` なら `Γ_A` の Sylow-`p` は中心的
+   (`|Γ_A| = n|Z|` で `Z ≤ Z(Γ)` ゆえ `Z` の Sylow-`p` が `Γ_A` の Sylow-`p`) なので
+   **`not_dvd_card_commutator_of_sylow_le_center`** より `p ∤ |⁅Γ_A,Γ_A⁆|`。
+   ⇒ `|Z_A|` の素因数は `n` を割り, `|Z_B|` の素因数は `m` を割る。coprime ⇒ 交わりは自明。
+6. `Γ_A/Z_B ↠ A` は核 `Z/Z_B` の stem extension (`Z = Z_A Z_B ≤ ⁅Γ_A,Γ_A⁆·Z_B`),
+   同様に `Γ_B/Z_A ↠ B`。核の位数の積 = `|Z|²/(|Z_A||Z_B|) = |Z|` (5 で `|Z_A||Z_B| = |Z|`)。
+
+⚠ 実装上の重さ: `⁅H, K⁆` (Γ 内の部分群としての交換子) と `commutator ↥H` の往復,
+`Γ_A × Γ_B → Γ` の準同型構成。~400 行規模の見込み。
 
 ### ⚠ 5A.6 の書籍読解訂正 (2026-07-26)
 

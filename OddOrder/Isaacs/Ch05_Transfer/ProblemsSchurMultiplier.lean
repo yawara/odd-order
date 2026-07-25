@@ -38,6 +38,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 5A.5 / 5A.7 (書籍 p
 * `card_ker_lt_relIndex_commutator` — **Problem 5A.7** の ∀-形。
 -/
 
+open scoped IsMulCommutative
+
 namespace OddOrder.Isaacs.Ch05
 
 section /- 5A: Schur multiplier bounds (p. 153) -/
@@ -305,6 +307,35 @@ theorem card_ker_prodMap {Γ A Δ B : Type*} [Group Γ] [Group A] [Group Δ] [Gr
     Nat.card (f.prodMap g).ker = Nat.card f.ker * Nat.card g.ker := by
   rw [MonoidHom.ker_prodMap, Nat.card_congr (Subgroup.prodEquiv f.ker g.ker).toEquiv,
     Nat.card_prod]
+
+/-! ### Problem 5A.8(b) の準備 -/
+
+/-- Sylow `p`-部分群が中心に含まれるなら `p ∤ |G'|`。
+
+Burnside (mathlib `MonoidHom.transferSylow`) で `N = ker (transferSylow P)` を取ると
+`G/N` は可換 (`↥P` が可換なので交換子は `N` に落ちる) ゆえ `G' ≤ N` で,
+`p ∤ |N|` (`MonoidHom.not_dvd_card_ker_transferSylow`)。
+
+Problem 5A.8(b) で「`Z ∩ ⁅Γ_A, Γ_A⁆` の素因数は `|A|` を割る」を示すのに使う。 -/
+theorem not_dvd_card_commutator_of_sylow_le_center {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) (hP : (P : Subgroup G) ≤ Subgroup.center G) :
+    ¬ p ∣ Nat.card (_root_.commutator G) := by
+  have hnorm : Subgroup.normalizer (P : Subgroup G) ≤
+      Subgroup.centralizer ((P : Subgroup G) : Set G) := by
+    intro x _
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact ((Subgroup.mem_center_iff.mp (hP hy)) x).symm
+  have hker : _root_.commutator G ≤ (MonoidHom.transferSylow P hnorm).ker := by
+    rw [_root_.commutator_def, Subgroup.commutator_le]
+    intro a _ b _
+    rw [MonoidHom.mem_ker, map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
+    haveI : IsMulCommutative (P : Subgroup G) :=
+      ⟨⟨fun u v => Subtype.ext (hnorm (Subgroup.le_normalizer v.2) u u.2)⟩⟩
+    exact mul_comm (MonoidHom.transferSylow P hnorm a) (MonoidHom.transferSylow P hnorm b)
+  intro hdvd
+  exact MonoidHom.not_dvd_card_ker_transferSylow P hnorm
+    (hdvd.trans (Subgroup.card_dvd_of_le hker))
 
 end
 
