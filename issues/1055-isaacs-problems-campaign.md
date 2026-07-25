@@ -811,6 +811,30 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 安定化群 `H_v < H` から `N ⊔ H_v` が真部分群になり、その指数 = 軌道の大きさ `≤ |N| - 1`
 `< |N| = [G:H]` で最小性に矛盾 (`MulAction.index_stabilizer` を使用)。
 
+## Ch.4 (Commutators) §4A — 着手 (2026-07-25)
+
+新 leaf `OddOrder/Isaacs/Ch04_Commutators/Problems.lean` (namespace `OddOrder.Isaacs.Ch04`、
+`OddOrder.lean` 配線済)。§4A は 11 問 (4A.1-4A.11)。
+
+| # | 状態 | Lean 名 |
+|---|---|---|
+| 4A.1 | ✅ | `commutator_eq_commutator_of_mul_eq_top` |
+| 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 類 2 の `commutatorElement_pow_left_of_commutator_le_center`) |
+
+- **4A.1** (`G = AB`, `A`,`B` abelian ⟹ `G' = ⁅A,B⁆`): `⁅A,B⁆` の正規性は既存の
+  `commutator_normal_of_sup_eq_top` (Ch.4 Main の Lem 4.1 系) をそのまま使える。
+  商で `A` の像と `B` の像が可換 + 各々 abelian ⟹ 商 abelian ⟹ `G' ≤ ⁅A,B⁆`。
+- **4A.4**: repo の `IsExtraspecial` は `frattini_eq_center` を**フィールドとして仮定**して
+  いるので、本問 (`P' = Z(P)`, `|Z(P)| = p` ⟹ `P/Z(P)` elementary abelian) は新規内容。
+  類 2 の恒等式 `⁅x^n, y⁆ = ⁅x,y⁆^n` を証明して `x^p ∈ Z(P)` を出す。
+  ⚠ 書籍併記の `Z = P' = Φ` 形は `Φ(P) ≤ Z(P)`、すなわち `p`-群での `Φ = P'P^p` の ⊆ 方向が
+  要る (repo は ⊇ 方向 `commutator_sup_pow_closure_le_frattini` のみ)。⊆ 方向は
+  「elementary abelian 群の Frattini = ⊥」が要り、repo/mathlib いずれにも無い — 別途整備候補。
+
+### 残り (文書順): 4A.2 (A₅ で `[H,K,L] = G`) / 4A.3 (quasiquaternion) / 4A.5 (extraspecial の
+構造 (a)-(e)) / 4A.6 (maximal class) / 4A.7-4A.8 (regular wreath product; §3A で作った
+`WreathProduct` インフラが使える) / 4A.9 / 4A.10 / 4A.11。
+
 ### §1D の欠落 (2026-07-25 に発見・補充)
 
 §1D は **1D.17 までしか形式化されていなかった** (1D.18 / 1D.19 が欠落)。3B.14 が 1D.19 を
