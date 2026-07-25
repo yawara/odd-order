@@ -395,6 +395,44 @@ theorem center_eq_P_of_not_isMulCommutative
     obtain ⟨r₁, h₁, r₂, h₂, hne⟩ := hnab
     exact hne (Subgroup.mem_centralizer_iff.mp ((h.ge h₁).2) r₂ h₂).symm
 
+/-- **`N_G(R) ≤ N_G(P)` when `R` is nonabelian** (p. 111): a normalizer of `R` permutes
+`Z(R) = R ⊓ C_G(R)` (conjugation is a group automorphism), and `Z(R) = P` by
+`center_eq_P_of_not_isMulCommutative`. -/
+theorem normalizer_invImageF_le_normalizer_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hnab : ∃ r₁ ∈ fc.invImageF model, ∃ r₂ ∈ fc.invImageF model, r₁ * r₂ ≠ r₂ * r₁) :
+    Subgroup.normalizer (fc.invImageF model : Set G)
+      ≤ Subgroup.normalizer (fc.P : Set G) := by
+  set R : Subgroup G := fc.invImageF model with hRdef
+  have hZP := fc.center_eq_P_of_not_isMulCommutative model ind hnab
+  intro g hg
+  rw [Subgroup.mem_set_normalizer_iff] at hg ⊢
+  intro x
+  -- conjugation by `g` preserves `R ⊓ C_G(R)`, which equals `P`.
+  have key : ∀ y : G, y ∈ R ⊓ Subgroup.centralizer (R : Set G) ↔
+      g * y * g⁻¹ ∈ R ⊓ Subgroup.centralizer (R : Set G) := by
+    intro y
+    constructor
+    · rintro ⟨hyR, hyC⟩
+      refine ⟨(hg y).mp hyR, Subgroup.mem_centralizer_iff.mpr fun r hr => ?_⟩
+      have hr' : g⁻¹ * r * g ∈ R := by
+        have h1 := (hg (g⁻¹ * r * g)).mpr
+        simp only [mul_assoc, mul_inv_cancel_left] at h1 ⊢
+        exact h1 (by simpa [mul_assoc] using hr)
+      have hc := Subgroup.mem_centralizer_iff.mp hyC _ hr'
+      -- `(g⁻¹ r g)·y = y·(g⁻¹ r g)` ⟹ `r·(g y g⁻¹) = (g y g⁻¹)·r`
+      have h2 := congrArg (fun z => g * z * g⁻¹) hc
+      simpa [mul_assoc] using h2
+    · rintro ⟨hyR, hyC⟩
+      refine ⟨(hg y).mpr hyR, Subgroup.mem_centralizer_iff.mpr fun r hr => ?_⟩
+      have hr' : g * r * g⁻¹ ∈ R := (hg r).mp hr
+      have hc := Subgroup.mem_centralizer_iff.mp hyC _ hr'
+      -- `(g r g⁻¹)·(g y g⁻¹) = (g y g⁻¹)·(g r g⁻¹)` ⟹ `r y = y r`
+      have h2 := congrArg (fun z => g⁻¹ * z * g) hc
+      simpa [mul_assoc] using h2
+  rw [← hZP]
+  exact key x
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
