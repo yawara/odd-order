@@ -1441,7 +1441,31 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
 `StepSeventeenWeakClosure.lean` に移し、`StepSeventeen.lean` (両分岐 + endpoint) が
 import する形にした。
 
-### 残り (Theorem B (17) の唯一のギャップ)
+### ✅ transfer 制御 landed (2026-07-26、`FirstCase/StepSeventeenTransfer.lean` 新 leaf)
+
+**Hall–Wielandt を建てずに Yoshida + 指数 2 の transfer 明示計算で解決**
+(詳細と宣言表 = [issue 9503](9503-hall-wielandt-abelian-weakly-closed.md))。
+
+- `OddOrder/GroupTheory/TransferIndexTwo.lean` に **`transfer_eq_mul_conj_of_index_two`**
+  (`[G:H] = 2`, `s ∉ H` ⟹ `transfer ϕ x = ϕ(x)·ϕ(s⁻¹xs)`) を追加。
+  2 元横断集合の構成は不要で、任意の横断集合の代表元での共役を `ϕ` が
+  `H`-共役不変であることで潰す (`map_eq_of_conj_eq`)。
+- **`not_three_dvd_card_abelianization_normalizer_sylow`** :
+  `R₂ ↠ C₃≀C₃` が無ければ `¬3 ∣ |Ab(N_G(R₂))|`。
+  (Yoshida の二分岐 → (B2) で `v_G = ⊥` → 上の公式で `x·x^s ∈ ⁅N,N⁆` →
+  `le_commutator_of_conj_mul_mem` → 指数 2 で `Ab(N)` は 2-群。)
+- **`not_surjective_wreath_of_card_W_eq_three`** : `|W| = 3` では `R₂ = R₁` (位数 3⁵) で
+  `ker φ` は位数 3 ⟹ 中心的 ⟹ `= Z₁`、かつ (16) から `γ₃(R₂) ≤ Z₁` なので
+  商の class ≤ 2 < 3 = class(C₃≀C₃) (`nilpotencyClass_wreath`)。
+- **`false_of_no_wreath_quotient`** (wreath 排除を仮説にした (17) の矛盾) と
+  **`false_of_card_W_eq_three`** (|W| = 3 側 (17) 完結)。
+- generic 部品: `lowerCentralSeries_eq_bot_of_le_ker` /
+  `mem_center_of_conj_mem_zpowers_of_orderOf_eq_three` / `map_center_subtype`。
+
+⟹ **(17) の残ギャップは `|W| = 9` での `R₂ ↠ C₃≀C₃` 排除 1 本のみ**
+(`|R₂| = 3⁶`、`ker φ` が位数 9 で中心性論法が効かない; 9503 に材料と 3 候補ルートを記載)。
+
+### 残り (旧メモ: Theorem B (17) のギャップ)
 1. **transfer 制御** = [issue 9503](9503-hall-wielandt-abelian-weakly-closed.md)
    (claim 済、hub band)。第一候補 = Yoshida + `R₂ ↠ C₃≀C₃` の排除、
    fallback = classical Hall–Wielandt (Grün 第二定理)。

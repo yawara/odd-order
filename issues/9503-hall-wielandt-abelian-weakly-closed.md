@@ -120,7 +120,51 @@ statement (Peterfalvi p. 108 に明記、[Ha] Thm 14.4.2):
    `⁅R₁,R₁⁆ ≤ Z₁ΣP` と `|⁅R₁,R₁⁆| ≤ 9` (landed)、`Z₁PΣ ⊆ Z₂(R₁)`、
    `C₃≀C₃` 側は位数 3⁴・class 3・`|Z| = 3`・`|Z₂| = 9`・`|W^ab| = 9`・exponent 9。
 
-## 証明方針 (未確定、着手時に精査)
+## ✅ 2026-07-26 実装 — transfer 制御は landed、残りは `|W| = 9` の wreath 排除のみ
+
+新 leaf **`OddOrder/GroupTheory/TransferIndexTwo.lean`** (generic) と
+**`FirstCase/StepSeventeenTransfer.lean`** (適用) で上記 3 段のうち **1, 2 が完了**。
+
+| 内容 | 宣言名 |
+|---|---|
+| **指数 2 の transfer 公式** `v(x) = ϕ(x)·ϕ(s⁻¹xs)` | `OddOrder.GroupTheory.transfer_eq_mul_conj_of_index_two` |
+| `ϕ` は `H`-共役を同一視 (A 可換) | `OddOrder.GroupTheory.map_eq_of_conj_eq` |
+| `x·x^s ∈ ⁅N,N⁆` (∀x) ∧ 奇数位数 ⟹ `P ≤ ⁅N,N⁆` | `le_commutator_of_conj_mul_mem` (既 landed) |
+| 指数 2 + `P ≤ ⁅N,N⁆` ⟹ `¬p ∣ |Ab N|` (p 奇) | `not_dvd_card_abelianization_of_le_commutator` (既 landed) |
+| **transfer 制御 (Yoshida 分岐込み)** `¬3 ∣ |Ab(N_G(R₂))|` | `not_three_dvd_card_abelianization_normalizer_sylow` |
+| 全射 `f` の kernel が lower central series を含む ⟹ 商の class ≤ n | `lowerCentralSeries_eq_bot_of_le_ker` (generic) |
+| 位数 3 の正規部分群は奇数位数群で中心的 | `mem_center_of_conj_mem_zpowers_of_orderOf_eq_three` (generic) |
+| `Z(↥H)` の像 = `H ⊓ C(H)` | `map_center_subtype` (generic) |
+| **`|W| = 3` の wreath 排除** | `not_surjective_wreath_of_card_W_eq_three` |
+| (17) の矛盾 (wreath 排除を仮説に) | `false_of_no_wreath_quotient` |
+| **`|W| = 3` 側 (17) 完結** | `false_of_card_W_eq_three` |
+
+**`|W| = 3` の wreath 排除の論法** (書籍には無い、Yoshida 経由ゆえの追加分):
+`|R₂| = 3⁵`・`|C₃≀C₃| = 3⁴` ⟹ `|ker φ| = 3`。位数 3 の正規部分群は
+(奇数位数ゆえ) 中心的で `Z(R₂) = Z₁` も位数 3 ⟹ **`ker φ = Z₁`**。
+一方 (16) の `⁅R₁,R₁⁆ ≤ Z₁ΣP` と `⁅Z₁ΣP,R₁⁆ ≤ Z₁` から
+`γ₃(R₂) = ⁅⁅R₂,R₂⁆,R₂⁆ ≤ Z₁ = ker φ` ⟹ 商の class ≤ 2。
+しかし `nilpotencyClass_wreath` (repo 既 landed) より class(C₃≀C₃) = 3 ⟹ 矛盾。
+
+### 🚧 残り = **`|W| = 9` の wreath 排除だけ**
+
+`|W| = 9` では `|R₂| = 3⁶`・`R₂ = R₁W` (`R₁ ⊴ R₂` 指数 3、`|R₁| = 3⁵`)、
+`|ker φ| = 9` になるので上の「位数 3 ⟹ 中心」論法が効かない。判明している道具:
+
+- `K := ker φ ⊴ R₂`、`|K| = 9` ⟹ `Z₁ = Z(R₂) ≤ K` (非自明正規部分群は中心と交わる)
+  かつ `K ≤ Z₂(R₂)`。
+- ⟹ `C₃≀C₃` は `R₂/Z₁` の商。よって **`γ₃(R₂) ≤ Z₁` (= class(R̄₂) ≤ 2) が言えれば即決**
+  (|W| = 3 側と同じ機構)。
+- あるいは `K ⊄ R₁` なら `φ(R₁) = C₃≀C₃` で `class(R₁/Z₁) ≤ 2` と矛盾 (これは landed
+  の (16) から出る) ⟹ **残る場合は `K ≤ R₁`** (さらに `LV ≠ R₁` (W ⊄ R₁) を使うと
+  `K ≤ R₁ ⊓ LV = LΣP`)。
+- 別ルート: `|Ab(C₃≀C₃)| = 9` を計算すれば `|⁅R₂,R₂⁆| ≥ 27` が出るので
+  `|⁅R₂,R₂⁆| ≤ 9` 系の上界が取れれば矛盾 (ただし `⁅R₁,W⁆` の評価が要る)。
+
+⟹ 次の一手は **`⁅R₁, W⁆` の構造** (特に `⁅R, W⁆`、`R = invImageF`) を (14) の材料から
+詰めて `γ₃(R₂) ≤ Z₁` を出すこと。
+
+## 証明方針 (旧、未確定)
 
 古典的には **Grün の第二定理** (weakly closed abelian `A` ⟹ `N_G(A)` が p-transfer を
 制御) 経由。素材として repo にある Yoshida/Mackey transfer 基盤が使える見込み。
@@ -131,8 +175,9 @@ statement (Peterfalvi p. 108 に明記、[Ha] Thm 14.4.2):
 
 ## 完了条件
 
-- 上記主定理が sorry-free で landing、AxiomsCheck 登録
-- Pf II (17) が `G/O³(G) ≅ R₂⟨s⟩/O³(R₂⟨s⟩)` 相当を実際に消費できる
+- ✅ transfer 制御 (`not_three_dvd_card_abelianization_normalizer_sylow`) が sorry-free で landing
+- ✅ `|W| = 3` 側 (17) が `False` まで到達 (`false_of_card_W_eq_three`)
+- [ ] `|W| = 9` 側の wreath 排除 (上記) ⟹ `false_of_no_wreath_quotient` が両分岐で discharge
 
 ## 参照
 
