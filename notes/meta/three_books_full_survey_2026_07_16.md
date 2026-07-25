@@ -987,3 +987,31 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
   1. ✅ ft_path_policy.md §0 と CLAUDE.md の FT 経路限定文言を改訂 (フェーズ移行注記 + 特殊化一般化デフォルト + 低優先繰延)
   2. ✅ レーン再配分 → 正本 [`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md) (a = Isaacs 本文完備化 / b = Ch.8+Suzuki チェーン / c = Ch.10+BG 残+Pf 残)
   3. ✅ S14 凍結 mis-encoding 2 件 (`nonidentity_covered_by_sigma_pieces`, `sigmaLength_one_frobenius_type`) を**削除** — どちらも consumer 0 で faithful 版は証明済 (Mtilde/zTilde cover API 群 / `S16.non_disjoint_signalizer_frobenius`)。実 sorry 25 → 23 (記録 = notes/bg/s14_typeP_counting.md)
+
+---
+
+## 🔄 2026-07-26 再実測 (main session) — ラベル突き合わせ
+
+**方法**: Isaacs 本文 (`pdftotext`) の `N.M. Theorem/Lemma/Corollary` と、repo の
+docstring ラベル `Isaacs <Thm|Lem|Cor|...> N.M` を機械的に突き合わせ。
+⚠ repo の語彙は **`Thm`/`Lem`/`Cor`** (略号) なので `Lemma` で grep すると
+大量の偽陽性が出る (最初の計測で Ch8 を 26 件と誤報した原因)。
+
+| 章 | 本文 | ラベル無し |
+|---|---|---|
+| Ch1 | 46 | 10 (1.4, 1.6, 1.8, 1.12–1.15, 1.18, 1.21, 1.25) |
+| Ch2 | 19 | 0 |
+| Ch3 | 29 | 4 (3.7–3.10) |
+| Ch4 | 38 | 2 (4.9, 4.37) |
+| Ch5 | 30 | 6 (5.1, 5.2, 5.14–5.16, 5.23) |
+| Ch6 | 24 | 0 |
+| Ch7 | 8 | 0 |
+| **Ch8** | 43 | **18** (8.2, 8.3, 8.11–8.22, 8.27–8.30) |
+| Ch9 | 31 | 0 |
+| Ch10 | 25 | 2 (10.8, 10.17) |
+| 計 | | **42** |
+
+⚠ **「ラベル無し」≠ 未形式化**。Ch1 の欠番は Sylow C/D・Frattini 論法・`n_p ≡ 1`・
+冪零群の特徴づけなど **mathlib が直接持つもの**が並んでおり、薄いラッパー禁止方針で
+意図的に書いていない可能性が高い。Ch8 の 8.27 (`A_n` 単純性) も mathlib 済。
+⟹ **着手前に 1 件ずつ実測確認する** ([[verify-port-state-by-number-not-coq-name]])。
