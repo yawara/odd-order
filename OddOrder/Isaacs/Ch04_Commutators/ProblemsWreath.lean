@@ -3,6 +3,11 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.Data.Nat.Choose.Dvd
+import Mathlib.Algebra.Polynomial.Coeff
+import Mathlib.Algebra.Polynomial.Div
+import Mathlib.Algebra.Ring.GeomSum
 import OddOrder.Isaacs.Ch03_SplitExtensions.WreathProduct
 import OddOrder.Isaacs.Ch04_Commutators.Problems
 
@@ -764,6 +769,155 @@ theorem commutator_map_inl_top_eq {q : Q} (hq : ∀ q' : Q, ∃ k : ℕ, q' = q 
   · rintro _ ⟨_, ⟨f, hf, rfl⟩, rfl⟩
     rw [← commutatorElement_inl_inr_eq_shiftSubHom]
     exact Subgroup.commutator_mem_commutator ⟨f, hf, rfl⟩ (Subgroup.mem_top _)
+
+/-- `Δ_q` と平行移動は可換 (群環では `(1-x)` と `x` の可換性). -/
+theorem shiftSubHom_comp_shiftHom (q : Q) :
+    (shiftSubHom (D := D) q).comp (shiftHom q) = (shiftHom q).comp (shiftSubHom q) := by
+  ext f ω
+  rfl
+
+/-- `Δ_q` の反復で得られる部分群列 `Δ^i(⊤)`. -/
+def shiftSubSeq (q : Q) : ℕ → Subgroup (Q → D)
+  | 0 => ⊤
+  | (i + 1) => (shiftSubSeq q i).map (shiftSubHom q)
+
+@[simp]
+theorem shiftSubSeq_zero (q : Q) : shiftSubSeq (D := D) q 0 = ⊤ := rfl
+
+@[simp]
+theorem shiftSubSeq_succ (q : Q) (i : ℕ) :
+    shiftSubSeq (D := D) q (i + 1) = (shiftSubSeq q i).map (shiftSubHom q) := rfl
+
+/-- 各 `Δ^i(⊤)` は shift 安定. -/
+theorem shiftSubSeq_shift_stable (q : Q) (i : ℕ) :
+    (shiftSubSeq (D := D) q i).map (shiftHom q) ≤ shiftSubSeq q i := by
+  induction i with
+  | zero => exact le_top
+  | succ i ih =>
+    rw [shiftSubSeq_succ, Subgroup.map_map, ← shiftSubHom_comp_shiftHom, ← Subgroup.map_map]
+    exact Subgroup.map_mono ih
+
+/-- **4A.8(d) の下降中心列**: `γ_{i+2}(P) = (Δ^{i+1}(A)) の像`
+(mathlib の添字では `lowerCentralSeries ⊤ (i+1)`).
+
+基底は 4A.8(b) (`P' = ⁅A, U⁆`), 帰納段は `commutator_map_inl_top_eq`. -/
+theorem lowerCentralSeries_eq_map_shiftSubSeq {q : Q} (hq : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k)
+    (i : ℕ) :
+    Subgroup.lowerCentralSeries (⊤ : Subgroup (D ≀[Q] Q)) (i + 1)
+      = (shiftSubSeq (D := D) q (i + 1)).map inl := by
+  have hQcomm : ∀ a b : Q, a * b = b * a := by
+    intro a b
+    obtain ⟨j, rfl⟩ := hq a
+    obtain ⟨k, rfl⟩ := hq b
+    exact (Commute.pow_pow (Commute.refl q) j k).eq
+  induction i with
+  | zero =>
+    rw [Subgroup.top_lowerCentralSeries_one]
+    have hcomm : commutator (D ≀[Q] Q)
+        = ⁅(⊤ : Subgroup (Q → D)).map (inl : (Q → D) →* D ≀[Q] Q),
+            (⊤ : Subgroup (D ≀[Q] Q))⁆ := by
+      refine le_antisymm ?_ ?_
+      · rw [commutator_eq_commutator_range_inl_range_inr hQcomm, ← MonoidHom.range_eq_map]
+        exact Subgroup.commutator_mono le_rfl le_top
+      · rw [_root_.commutator_def]
+        exact Subgroup.commutator_mono le_top le_rfl
+    rw [hcomm]
+    exact commutator_map_inl_top_eq hq (le_top : (⊤ : Subgroup (Q → D)).map (shiftHom q) ≤ ⊤)
+  | succ i ih =>
+    rw [Subgroup.lowerCentralSeries_succ, ih]
+    exact commutator_map_inl_top_eq hq (shiftSubSeq_shift_stable q (i + 1))
+
+/-! ### 4A.8(d)(β) への準備: ノルム関係式 `N · (1 - x) = 0` -/
+
+/-- `q` が `Q` 全体を生成するとき, 部分和 `T_{|Q|} f` は**定数関数** (座標積 = ノルム). -/
+theorem shiftSumHom_card_eq_const [Fintype Q] {q : Q} (hq : orderOf q = Fintype.card Q)
+    (f : Q → D) : shiftSumHom q (Fintype.card Q) f = Function.const Q (∏ y, f y) := by
+  funext ω
+  exact prod_range_card_eq_prod_univ hq f ω
+
+/-- **ノルム関係式** `Δ_q ∘ T_{|Q|} = 1`: 群環の `(1-x)·N = 0`.
+
+`T_{|Q|} f` は定数なので平行移動で不変, ゆえに `Δ_q` で消える. -/
+theorem shiftSubHom_shiftSumHom_card [Fintype Q] {q : Q} (hq : orderOf q = Fintype.card Q)
+    (f : Q → D) : shiftSubHom q (shiftSumHom q (Fintype.card Q) f) = 1 := by
+  rw [shiftSumHom_card_eq_const hq]
+  funext ω
+  change (∏ y, f y) * ((∏ y, f y))⁻¹ = (1 : Q → D) ω
+  rw [mul_inv_cancel]
+  rfl
+
+/-! ### 4A.8(d)(β) の linchpin (多項式版) -/
+
+/-- **標数 `p` の多項式恒等式** `(1 - X)^{p-1} = 1 + X + ⋯ + X^{p-1}`.
+
+`(1-X)^p = 1 - X^p` (`sub_pow_char`) と幾何級数 `(1-X)·∑_{j<p} X^j = 1 - X^p`
+(`mul_neg_geom_sum`) を比べ, 整域 `(ZMod p)[X]` で `1 - X ≠ 0` を約す.
+
+これが 4A.8(d) の linchpin `Δ_q^{p-1} = T_p` の多項式側の実体
+(`Δ = 1 - x`, `T_p = 1 + x + ⋯ + x^{p-1}` を `x ↦ 平行移動` で作用させる). -/
+theorem one_sub_X_pow_prime_sub_one (p : ℕ) [Fact p.Prime] :
+    (1 - Polynomial.X : Polynomial (ZMod p)) ^ (p - 1)
+      = ∑ j ∈ Finset.range p, (Polynomial.X : Polynomial (ZMod p)) ^ j := by
+  have hp : 0 < p := Nat.Prime.pos Fact.out
+  have h1 : (1 - Polynomial.X : Polynomial (ZMod p)) ^ p = 1 - Polynomial.X ^ p := by
+    rw [sub_pow_char]
+    simp
+  have h2 : (1 - Polynomial.X : Polynomial (ZMod p))
+      * (∑ j ∈ Finset.range p, (Polynomial.X : Polynomial (ZMod p)) ^ j)
+      = 1 - Polynomial.X ^ p := mul_neg_geom_sum Polynomial.X p
+  have hne : (1 - Polynomial.X : Polynomial (ZMod p)) ≠ 0 := by
+    intro h
+    have hcoef := congrArg (fun r => Polynomial.coeff r 1) h
+    simp [Polynomial.coeff_one] at hcoef
+  have hsplit : (1 - Polynomial.X : Polynomial (ZMod p)) ^ p
+      = (1 - Polynomial.X) * (1 - Polynomial.X) ^ (p - 1) := by
+    rw [← pow_succ']
+    congr 1
+    omega
+  rw [hsplit, ← h2] at h1
+  exact mul_left_cancel₀ hne h1
+
+/-- **`(r-1).choose j ≡ (-1)^j (mod r)`** (`j < r`, `r` 素数).
+
+mathlib に無いので自前で証明 (2026-07-25 に grep 済). Pascal
+`r.choose (j+1) = (r-1).choose j + (r-1).choose (j+1)` と
+`r ∣ r.choose (j+1)` (`Nat.Prime.dvd_choose_self`) から `j` の帰納で従う.
+
+4A.8(d) の linchpin を pointwise 二項展開で示すときの係数計算に使う
+(`Δ^{r-1}` の指数がすべて `1` になる理由). -/
+theorem cast_choose_prime_sub_one (r : ℕ) (hr : Nat.Prime r) :
+    ∀ j : ℕ, j < r → (((r - 1).choose j : ℕ) : ZMod r) = (-1) ^ j := by
+  have hr1 : 1 ≤ r := hr.one_lt.le
+  intro j
+  induction j with
+  | zero => intro _; simp
+  | succ j ih =>
+    intro hj
+    have hjr : j < r := by omega
+    have hpascal : r.choose (j + 1) = (r - 1).choose j + (r - 1).choose (j + 1) := by
+      have hrs : r = (r - 1) + 1 := by omega
+      rw [hrs, Nat.choose_succ_succ]
+      congr 1
+    have hdvd : r ∣ r.choose (j + 1) := Nat.Prime.dvd_choose_self hr (by omega) (by omega)
+    have hzero : ((r.choose (j + 1) : ℕ) : ZMod r) = 0 := by
+      obtain ⟨c, hc⟩ := hdvd
+      rw [hc]
+      push_cast
+      simp
+    rw [hpascal] at hzero
+    push_cast at hzero
+    rw [ih hjr] at hzero
+    have hval : (((r - 1).choose (j + 1) : ℕ) : ZMod r) = -(-1) ^ j :=
+      eq_neg_of_add_eq_zero_right hzero
+    rw [hval, pow_succ]
+    ring
+
+omit [CommGroup D] [Group Q] in
+/-- `n = 1` の場合の位数: `|C| = |Q| = p` なら `|C ≀ Q| = p^{p+1}`
+(maximal class の判定 `class = p` と対になる). -/
+theorem card_wreath_of_card_eq_prime [Finite Q] [Finite D] {r : ℕ}
+    (hD : Nat.card D = r) (hQ : Nat.card Q = r) : Nat.card (D ≀[Q] Q) = r ^ (r + 1) := by
+  rw [OddOrder.Isaacs.Ch03.WreathProduct.card (D := D) (Q := Q) (Ω := Q), hD, hQ, pow_succ]
 
 end
 

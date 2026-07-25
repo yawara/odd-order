@@ -824,6 +824,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | 4A.5 | ✅ | (a) `index_centralizer_eq_of_not_mem_center` / (b) `card_closure_pair_eq` / (c) `index_centralizer_closure_pair_eq` / (d) `map_center_centralizer_eq_center` + `isExtraspecial_centralizer_closure_pair` / (e) `exists_index_center_eq_prime_pow_two_mul` (新 leaf `ProblemsExtraspecial.lean`) |
 | 4A.6 | ✅ | `IsMaximalClassPGroup` (定義) / `exists_eq_lowerCentralSeries_of_isMaximalClass` (+ 一意性 `eq_of_normal_of_card_eq_of_isMaximalClass`、新 leaf `ProblemsMaximalClass.lean`) |
 | 4A.7 | ✅ | `exists_orderOf_eq_and_forall_orderOf_dvd` (+ 冪公式 `pow_mk` / 上界 `pow_prime_pow_succ_eq_one`、新 leaf `ProblemsWreath.lean`) |
+| 4A.8(d) | 🔨 進行中 | 位数・下降中心列の翻訳 (`lowerCentralSeries_eq_map_shiftSubSeq`) 完了、残りは linchpin `Δ^{p-1} = T_p` 1 本 — 下記 |
 | 4A.8(c) | ✅ 訂正版 | `forall_commute_ker_augHom_iff` + 位数 `card_center_ker_augHom` (`|Z(P'U)| = p`)。書籍の主張は `p=2, n=1` で偽 — 下記 |
 | 4A.8(b) | ✅ | `commutator_range_inl_range_inr_eq` (`⁅A,U⁆ = ker(座標積)` の像) + `commutator_eq_commutator_range_inl_range_inr` (4A.1 経由 `P' = ⁅A,U⁆`) + まとめ `commutator_eq_coordProdHom_ker_map` |
 | 4A.8(a) | ✅ | `mem_center_iff_exists_const` / `center_eq_inf_centralizer_range_inr` (`ProblemsWreath.lean`) |
@@ -998,10 +999,75 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 `⁅S.map inl, ⊤⁆ = (S.map (shiftSubHom q)).map inl`)。
 補助は `shiftHom` (平行移動)・`shift_pow_mem_of_shift_stable`・
 `shiftSumHom_mem_of_shift_stable`。
-⟹ 残るのは (α) `lowerCentralSeries ⊤ (i+1) = (Δ^{i+1} ⊤).map inl` の帰納
-(基底は 4A.8(b) で `commutator P = ⁅A,U⁆ = ⁅range inl, ⊤⁆`、
-`Δ` と `shift` の可換性で shift 安定性が保存されることを使う) と、
-(β) `(1-x)` の冪零指数 `n(p-1)+1` の算術。
+**(α) も完了**: `lowerCentralSeries_eq_map_shiftSubSeq`
+(`lowerCentralSeries ⊤ (i+1) = (shiftSubSeq q (i+1)).map inl`、
+`shiftSubSeq q i = Δ^i(⊤)`)。基底は 4A.8(b)、shift 安定性の保存は
+`shiftSubHom_comp_shiftHom` (`Δ` と `shift` の可換性) + `Subgroup.map_map`。
+**(β) の第一歩も設置**: `shiftSumHom_card_eq_const` (`T_{|Q|} f` は定数 = ノルム) と
+`shiftSubHom_shiftSumHom_card` (**`Δ_q ∘ T_{|Q|} = 1`**, 群環の `(1-x)·N = 0`)。
+⟹ **残るのは (β) `(1-x)` の冪零指数 `n(p-1)+1` の算術だけ**:
+`shiftSubSeq q i = ⊥ ⟺ i ≥ n(p-1)+1` を示せば `class(P) = n(p-1)+1` が出る
+(`lowerCentralSeries_eq_bot_iff_nilpotencyClass_le` 経由)。`P'U` 側も同様に
+`Δ` の反復を `ker coordProd` から始めればよい。
+
+#### (β) の linchpin = **`Δ^{p-1} = T_p` (作用素として)**
+
+`D` が指数 `p` のとき、群環 `F_p[x]/(x^p-1)` の恒等式 `(1-x)^{p-1} = 1 + x + ⋯ + x^{p-1} = N`
+が成り立つ。これさえ Lean で言えれば
+`Δ^p = Δ ∘ Δ^{p-1} = Δ ∘ T_p = 1` (**既証の `shiftSubHom_shiftSumHom_card`**) で上界が出て、
+下界も `Δ^{p-1}(δ₁ c) = T_p(δ₁ c) = const c ≠ 1` (`shiftSumHom_card_eq_const`) で即出る。
+⟹ **`class(P) = p` (n=1 で maximal class) は linchpin 1 本に還元済み**。
+
+**mathlib の部品は調査済み (2026-07-25)**:
+- `sub_pow_char_of_commute (h : Commute x y) : (x - y)^p = x^p - y^p`
+  (`Mathlib/Algebra/CharP/Lemmas.lean` L223) — **可換とは限らない環でも可換な元同士なら使える**
+  ので、**自己準同型環 `AddMonoid.End V` の中で `1` と `σ` に直接適用できる**。
+  ただし `[ExpChar R p]` インスタンスが要る。
+- インスタンスを避けるなら `Commute.add_pow` (二項定理) + `Nat.Prime.dvd_choose_self`
+  (`0 < k < p` で `p ∣ C(p,k)`) + 「`V` の指数が `p` ⟹ `End V` で `p • x = 0`」で
+  `(1-σ)^p = 1 + (-σ)^p = 1 + (-1)^p·1 = 0` (`p` 奇なら `1 - 1`、`p = 2` なら `1 + 1 = 2 = 0`)。
+- `(p-1).choose j ≡ (-1)^j [ZMOD p]` は mathlib に無いが **自前で証明済**
+  (`cast_choose_prime_sub_one`; Pascal + `Nat.Prime.dvd_choose_self` の帰納、13 行)。
+  ⚠ `Nat.Prime` は `Irreducible` の別名なので **dot 記法 `hr.dvd_choose_self` は
+  `Irreducible.dvd_choose_self` に解決されて失敗する** — 完全名で書くこと。
+
+⚠ なお `Δ^p = 0` だけでは `class(P) ≤ p` (上界) しか出ない。maximal class には
+`Δ^{p-1} ≠ 0` (下界) が要り、そこは linchpin `Δ^{p-1} = T_p` が最短。
+
+**多項式側は landing 済 (2026-07-25)**: `one_sub_X_pow_prime_sub_one`
+(`(1 - X)^{p-1} = ∑_{j<p} X^j` in `(ZMod p)[X]`; `sub_pow_char` + `mul_neg_geom_sum` +
+整域での約分)。⟹ 残るのは**作用素への移送**だけ:
+`V = Additive (Q → D)` (指数 `p` ⟹ `ZMod p`-加群) 上で `Polynomial.aeval σ` を使い、
+`aeval σ (1 - X) = Δ`, `aeval σ (∑_{j<p} X^j) = T_p` を確認すれば `Δ^{p-1} = T_p` が出る。
+必要 import は `Mathlib.Algebra.{Field.ZMod, Polynomial.Coeff, Polynomial.Div, Ring.GeomSum}`
+(本 commit で追加済)。
+
+**位数側も `n=1` 特殊形を landing**: `card_wreath_of_card_eq_prime`
+(`|C| = |Q| = p` ⟹ `|C ≀ Q| = p^{p+1}`) — maximal class の判定 `class = p` と対になる。
+
+**残りは linchpin 本体 1 本のみ**。ルート A の必要形 (次 iteration の出発点):
+```
+theorem shiftSubHom_iterate_apply (q : Q) (f : Q → D) (k : ℕ) (ω : Q) :
+    (shiftSubHom q)^[k] f ω
+      = ∏ j ∈ Finset.range (k+1), (f ((q ^ j)⁻¹ * ω)) ^ ((-1)^j * (k.choose j) : ℤ)
+```
+帰納段は `Δ(g) ω = g ω * (g (q⁻¹ω))⁻¹` に IH を代入し、
+`g(q⁻¹ω)` 側の添字を `j ↦ j+1` にずらして (`Finset.prod_range_succ'` 系) Pascal
+`(-1)^j C(k,j) - (-1)^{j-1} C(k,j-1) = (-1)^j C(k+1,j)` を使う。
+
+linchpin の証明ルート 2 つ:
+1. **pointwise 二項展開**: `Δ^k f ω = ∏_{j≤k} f((q^j)⁻¹ω)^{(-1)^j C(k,j)}` を `k` の帰納
+   (Pascal) で示し、`k = p-1` で `C(p-1,j) ≡ (-1)^j (mod p)` を使うと指数が全部 `1` になる。
+   要調査: mathlib に `(p-1).choose j ≡ (-1)^j [ZMOD p]` があるか。
+2. **多項式環経由**: `F_p[x]` は整域なので `(1-x)^p = 1 - x^p = N·(1-x)` から `(1-x)` を約して
+   `(1-x)^{p-1} = N`。`V ≅ F_p[x]/(x^p-1)` (n=1 なので `D ≅ F_p`) の同型を作る手間がかかる。
+
+**(β) の当面の目標は `n = 1` の場合** (書籍の「`n = 1` なら `P` は maximal class」):
+`D` が指数 `p` なら `V = Q → D` は `ZMod p`-加群で `Δ = 1 - σ` (`σ` = 平行移動, `σ^p = 1`)、
+標数 `p` の可換環 `ZMod p[σ]` で **freshman's dream** `(1-σ)^p = 1 - σ^p = 0`
+(mathlib `add_pow_char`) ⟹ `class(P) ≤ p`。下界は `Δ^{p-1}(δ₁ c) = const c ≠ 1`
+(ノルム関係式の相棒: `(1-x)^{p-1} = N` mod `p`) ⟹ `class(P) = p = np` で maximal class。
+一般 `n` の sharp 値 `n(p-1)+1` は `(1-x)^p = p·(1-x)s` の filtration が要る。
 
 **(ii) 残る算術 = `Δ = (1-x)` の冪零指数**。`ZMod(p^n)[x]/(x^p-1)` で
 `(1-x)^{n(p-1)+1} = 0` かつ `(1-x)^{n(p-1)} ≠ 0` ⟹ **`class(P) = n(p-1)+1`**。
