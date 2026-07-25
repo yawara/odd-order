@@ -450,7 +450,18 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       結論 = p=3 ∧ |F|=9 ∧ W cyclic ∧ |W|∈{3,9} ∧ |G|_3 = 3^4·|W|。
       ⚠ 書籍 (12) 中の Hall-Wielandt 言及は Cor 10.2 range-equality 直用で回避済
       ((17) 用 abelian 版とは別)。
-- [ ] (13)–(16)
+- [x] **(13) — 完了 (2026-07-25)**: `exists_card_centralizer_st_eq_three_pow` /
+      `isPGroup_three_centralizer_Z₁` (`54b472b8b`, 新 leaf
+      `FirstCase/StepThirteen.lean`)。C_G(Z₁) は 3-群 (Z₁ = ⟨st⟩)。
+      chain = (13-i) centralizer 恒等式 (`059f53f03`) → (13-ii)
+      |C_G(st)| = |V|·|J| (`bd5484c64`) → (13a) Cauchy-in-J
+      (`8330e0c13`, InvertedProduct.lean) + (13-iii-a/b) |J| の素因数は
+      u·t の位数で |L| = |Q₀||K|(|Q₀|+1) を割る (`7b71b1839`/`77f4521f7`;
+      |L| は `card_orderThreeGeneratedSubgroup` `d65f71609`) → (13-iv)
+      r = |K| (=7) の排除 (`7c366997d` D = K ⋊ V / `393268394` 奇位数 →
+      D / `06c49e107` 中核 / `49b196568` Sylow 輸送 / `216bb3f75` 本体) →
+      (13-v) |J| = 3^n (`815653e8a`) + |V| = |P||W| (`ff2a73e33`) → assembly。
+- [ ] (14)–(16)
 - [ ] Hall-Wielandt abelian 版 (shared infra、claim してから)
 - [ ] (17) 結論 → Theorem B assembly
 
