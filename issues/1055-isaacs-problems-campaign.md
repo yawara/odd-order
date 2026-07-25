@@ -1187,6 +1187,36 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 
 ### 残り (文書順): 4A.11 / 4A.12。
 
+#### 4A.11 の設計 (2026-07-25、着手前メモ)
+
+書籍 (p.125): `G = A ≀ H` 正則 wreath (`A` 可換, `H` 有限), base `B = {f : H → A}`, `K ⊆ H`。
+**`⁅B,K⁆` = 「`H` の各**左**剰余類上で値の積が単位元」な `f` 全体**、したがって
+**`|⁅B,K⁆| = |A|^{|H| − |H:K|}`**。hint の作用は `f^h(x) = f(x h⁻¹)`。
+
+⚠ **repo の wreath は左移動** (`shiftHom q f ω = f (q⁻¹ω)`, `commutatorElement_inl_inr`) なので、
+`Δ_q` が触る位置は `{ω, q⁻¹ω}`、`q ∈ K` を動かすと **右剰余類 `Kω`**。剰余類の**個数**は
+左右で同じなので位数の主張は不変。docstring に convention 差を明記すること。
+
+- 定義: `cosetProdKer K : Subgroup (Q → D)` = `{f | ∀ ω, ∏ k : K, f (k * ω) = 1}`
+  (`∏ k : K` と書けば Finset の剰余類を扱わずに済むのが要点)。
+- **⊆**: `Subgroup.commutator_le` で生成元 `⁅inl f, inr q⁆ = inl (Δ_q f)` (`q ∈ K`) に帰着。
+  `∏_k (Δ_q f)(kω) = ∏_k f(kω) · (∏_k f(q⁻¹kω))⁻¹` で `k ↦ q⁻¹k` は `K` の全単射ゆえ 1。
+- **⊇**: 既存 4A.8(b) (`commutator_range_inl_range_inr_eq`) の証明を一般化。
+  * `hgen`: `⁅inl (δ_x d), inr (y·x⁻¹)⁆ = inl (δ_x d · (δ_y d)⁻¹)` は **`y·x⁻¹ ∈ K`**
+    (⟺ `y ∈ Kx` 同一右剰余類) のときに `⁅B, K.map inr⁆` の元。
+  * 分解: 代表元関数 `ρ` (各右剰余類から 1 点、クラス上定数) を取り
+    `f = ∏_{x:Q} (δ_x (f x) · (δ_{ρ x}(f x))⁻¹)`。評価すると
+    `f ω · (∏_{x : ρ x = ω} f x)⁻¹` で、`ρ ω ≠ ω` なら空積、`ρ ω = ω` なら剰余類上の積 = 1。
+  * `ρ` は `MulAction.orbitRel` (K の左移動作用、軌道 = 右剰余類) の `Quotient.out`、
+    または `QuotientGroup.rightRel K` の `Quotient.out` で作る。
+- **位数**: `cosetProdKer K = ker Φ`, `Φ : (Q→D) →* (剰余類 → D)`, `Φ f C = ∏_{y∈C} f y` は全射
+  ⟹ `|ker| = |D|^{|Q|} / |D|^{|Q:K|} = |D|^{|Q| − |Q:K|}`。
+
+⚠ **4A.8(b) は `K = ⊤` の特殊化**なので、一般版が landing したら
+`ProblemsWreath.lean` の `commutator_range_inl_range_inr_eq` を一般版の系に置換して
+重複を消す (単一右剰余類 `Q` 上の積 = `coordProdHom`)。一般版は ProblemsWreath 内に置くのが
+import 方向的に自然 (現 1033 行 + ~250 行で 1500 上限内)。
+
 #### 🎉 4A.9 完了 (2026-07-25) — 新 leaf `ProblemsIteratedCommutator.lean`
 
 **主結果** (実証明・axiom-clean):
