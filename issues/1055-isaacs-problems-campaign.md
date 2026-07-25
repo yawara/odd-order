@@ -775,9 +775,14 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **3A.7 ✅** ⟹ **§3A は 3A.6 のみ残り** (deferred-hard)。
 さらに **3B.1 ✅ / 3B.2 ✅ / 3B.3 ✅** (新 leaf `Ch03_SplitExtensions/Problems3B.lean`)。
 さらに **3B.4 ✅ / 3B.5 ✅**。
-**次 frontier = 3B.15 (Berkovich; §3B 最後の 1 問)**。3A.6 は §3B 完了後に再訪する。
-`Problems3B.lean` は 1073 行 (上限 1500) — 3B.15 追加後も余裕はあるが、§3B 完了時に
-3B.1-3B.6 / 3B.8-3B.15 で 2 leaf に割るのが topic 的に自然。
+**次 frontier = (1) `Problems3B.lean` (1300 行) の prefix-split → (2) 3A.6 再訪 →
+(3) Ch.4 以降の章末演習の実測確認と文書順の続行**。
+
+3B.15 (Berkovich) の証明: 最小指数の `H` は極大。極小正規 `N` について `N ≤ H` なら
+`G ⧸ N` へ落として帰納法。`N ≰ H` なら `G = N ⋊ H` で `N` への `H` の共役作用を見る —
+`C_N(H) = N` なら `N` が `H` を正規化して `H ⊴ G`、`C_N(H) = 1` なら `v ∈ N \ {1}` の
+安定化群 `H_v < H` から `N ⊔ H_v` が真部分群になり、その指数 = 軌道の大きさ `≤ |N| - 1`
+`< |N| = [G:H]` で最小性に矛盾 (`MulAction.index_stabilizer` を使用)。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
 
@@ -812,6 +817,9 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 | 3B.14 | ✅ | `center_fitting_greatest_isSolvable_normal_centralizer` (1D.19 + `|S|` 帰納) |
 | 1D.18 | ✅ | `Ch01.fitting_quotient_center` (§1D の欠落を補充) |
 | 1D.19 | ✅ | `Ch01.le_fitting_subgroupOf_of_commutator_le` (+ `center_fitting_map_eq_inf_centralizer`) |
+| 3B.15 | ✅ | `normal_of_index_minimal` (Berkovich) |
+
+⟹ **§3B は 3B.1-3B.15 全完** (3B.12 のみ訂正版)。**Isaacs Ch.3 の章末演習は 3A.6 を除いて全完**。
 
 **設計メモ**:
 

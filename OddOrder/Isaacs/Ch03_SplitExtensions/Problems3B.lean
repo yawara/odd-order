@@ -1068,6 +1068,233 @@ theorem center_fitting_greatest_isSolvable_normal_centralizer {G : Type u} [Grou
   have ha : (a : ↥C) ∈ Subgroup.center ↥C := hle a.2
   exact Subtype.ext (Subgroup.mem_center_iff.mp ha (b : ↥C)).symm
 
+/-! ### Problem 3B.15 (Berkovich) — 最小指数の真部分群は正規 -/
+
+/-- Problem 3B.15 の `|G|`-強帰納法本体. -/
+theorem normal_of_index_minimal_aux (n : ℕ) :
+    ∀ {G : Type u} [Group G] [Finite G] [IsSolvable G] (H : Subgroup G),
+      Nat.card G ≤ n → H ≠ ⊤ → (∀ K : Subgroup G, K ≠ ⊤ → H.index ≤ K.index) → H.Normal := by
+  induction n with
+  | zero =>
+    intro G _ _ _ H hcard _ _
+    have := Nat.card_pos (α := G)
+    omega
+  | succ n ih =>
+    intro G _ _ _ H hcard hHne hmin
+    -- 最小指数の真部分群は極大.
+    have hcoatom : IsCoatom H := by
+      refine ⟨hHne, fun K hHK => ?_⟩
+      by_contra hKne
+      have hrel : H.relIndex K * K.index = H.index := Subgroup.relIndex_mul_index hHK.le
+      have hne1 : H.relIndex K ≠ 1 := by
+        intro h1
+        have hKH : K ≤ H := by
+          have htop : H.subgroupOf K = ⊤ := Subgroup.index_eq_one.mp h1
+          rwa [Subgroup.subgroupOf_eq_top] at htop
+        exact absurd (le_antisymm hHK.le hKH) hHK.ne
+      have hne0 : H.relIndex K ≠ 0 := by
+        intro h0
+        rw [h0, zero_mul] at hrel
+        exact Subgroup.index_ne_zero_of_finite hrel.symm
+      have h2 : 2 * K.index ≤ H.relIndex K * K.index :=
+        Nat.mul_le_mul_right _ (by omega)
+      have hKpos : 0 < K.index := Nat.pos_of_ne_zero (Subgroup.index_ne_zero_of_finite)
+      have := hmin K hKne
+      omega
+    haveI hnt : Nontrivial G := by
+      rcases subsingleton_or_nontrivial G with hs | h
+      · exact absurd (by ext x; simp [Subsingleton.elim x (1 : G)] : H = ⊤) hHne
+      · exact h
+    obtain ⟨N, hNmin, -⟩ :=
+      Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
+    haveI hNnormal : N.Normal := hNmin.1
+    by_cases hNH : N ≤ H
+    · -- `N ≤ H`: `G ⧸ N` に落として帰納法.
+      have hHmap_ne : H.map (QuotientGroup.mk' N) ≠ ⊤ := by
+        intro htop
+        apply hHne
+        have hcm := congrArg (Subgroup.comap (QuotientGroup.mk' N)) htop
+        rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk', sup_eq_left.mpr hNH,
+          Subgroup.comap_top] at hcm
+      have hHmap_index : (H.map (QuotientGroup.mk' N)).index = H.index :=
+        Subgroup.index_map_eq _ (QuotientGroup.mk'_surjective N)
+          (by rw [QuotientGroup.ker_mk']; exact hNH)
+      have hmin' : ∀ K : Subgroup (G ⧸ N), K ≠ ⊤ →
+          (H.map (QuotientGroup.mk' N)).index ≤ K.index := by
+        intro K hK
+        rw [hHmap_index,
+          ← Subgroup.index_comap_of_surjective (H := K) (QuotientGroup.mk'_surjective N)]
+        refine hmin _ fun htop => hK ?_
+        rw [← Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N) K, htop,
+          Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)]
+      haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNmin.2.1
+      have hNcard : 1 < Nat.card ↥N := Finite.one_lt_card
+      have hprod : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
+      have hcardquot : Nat.card (G ⧸ N) ≤ n := by
+        have h2 : 2 * N.index ≤ Nat.card ↥N * N.index := Nat.mul_le_mul_right _ hNcard
+        rw [← Subgroup.index_eq_card]
+        omega
+      haveI hHmapnormal : (H.map (QuotientGroup.mk' N)).Normal :=
+        ih _ hcardquot hHmap_ne hmin'
+      have hHeq : H = (H.map (QuotientGroup.mk' N)).comap (QuotientGroup.mk' N) := by
+        rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk', sup_eq_left.mpr hNH]
+      rw [hHeq]
+      exact hHmapnormal.comap _
+    · -- `N ≰ H`: `G = N ⋊ H` で `N` への `H` の作用を見る.
+      have hsup : N ⊔ H = ⊤ := by
+        rw [sup_comm]
+        refine hcoatom.2 _ (lt_of_le_of_ne le_sup_left fun h => hNH ?_)
+        exact h ▸ le_sup_right
+      have habel : ∀ x ∈ N, ∀ y ∈ N, x * y = y * x := solvable_minimal_normal_isAbelian hNmin
+      have hinf : N ⊓ H = ⊥ := by
+        have hinf_normal : (N ⊓ H).Normal := by
+          constructor
+          intro x hx g
+          have hg : g ∈ N ⊔ H := by rw [hsup]; trivial
+          rw [Subgroup.mem_sup_of_normal_left] at hg
+          obtain ⟨u, huN, m, hmH, rfl⟩ := hg
+          have hy : m * x * m⁻¹ ∈ N ⊓ H :=
+            ⟨hNnormal.conj_mem x hx.1 m, H.mul_mem (H.mul_mem hmH hx.2) (H.inv_mem hmH)⟩
+          have hcomm : u * (m * x * m⁻¹) = (m * x * m⁻¹) * u := habel u huN _ hy.1
+          have hrw : u * m * x * (u * m)⁻¹ = m * x * m⁻¹ := by
+            calc u * m * x * (u * m)⁻¹ = u * (m * x * m⁻¹) * u⁻¹ := by group
+              _ = (m * x * m⁻¹) * u * u⁻¹ := by rw [hcomm]
+              _ = m * x * m⁻¹ := by group
+          rw [hrw]
+          exact hy
+        rcases hNmin.2.2 (N ⊓ H) hinf_normal inf_le_left with h | h
+        · exact h
+        · exact absurd (h ▸ (inf_le_right : N ⊓ H ≤ H)) hNH
+      -- `Z := N ⊓ C_G(H)` は `G` で正規.
+      have hZnormal : (N ⊓ Subgroup.centralizer (H : Set G)).Normal := by
+        constructor
+        intro x hx g
+        have hg : g ∈ N ⊔ H := by rw [hsup]; trivial
+        rw [Subgroup.mem_sup_of_normal_left] at hg
+        obtain ⟨u, huN, m, hmH, rfl⟩ := hg
+        have hxH : m * x * m⁻¹ = x := by
+          have hc := (Subgroup.mem_centralizer_iff.mp hx.2) m hmH
+          rw [hc]
+          group
+        have hxu : u * x * u⁻¹ = x := by
+          have hc := habel u huN x hx.1
+          rw [hc]
+          group
+        have hrw : u * m * x * (u * m)⁻¹ = x := by
+          calc u * m * x * (u * m)⁻¹ = u * (m * x * m⁻¹) * u⁻¹ := by group
+            _ = u * x * u⁻¹ := by rw [hxH]
+            _ = x := hxu
+        rw [hrw]
+        exact hx
+      rcases hNmin.2.2 _ hZnormal inf_le_left with hZbot | hZeq
+      · -- `C_N(H) = 1`: 極小指数に矛盾する部分群を作る.
+        exfalso
+        obtain ⟨v, hvN, hv1⟩ : ∃ v ∈ N, v ≠ 1 := by
+          by_contra hcon
+          push Not at hcon
+          exact hNmin.2.1 (le_bot_iff.mp fun x hx => Subgroup.mem_bot.mpr (hcon x hx))
+        have hvC : v ∉ Subgroup.centralizer (H : Set G) := by
+          intro hc
+          have hmem : v ∈ N ⊓ Subgroup.centralizer (H : Set G) := ⟨hvN, hc⟩
+          rw [hZbot, Subgroup.mem_bot] at hmem
+          exact hv1 hmem
+        letI : MulAction ↥H G :=
+          MulAction.compHom G ((MulAut.conj : G →* MulAut G).comp H.subtype)
+        have hsmul : ∀ (h : ↥H) (x : G), h • x = (h : G) * x * (h : G)⁻¹ := fun _ _ => rfl
+        -- 安定化群は真の部分群.
+        have hstab_ne : MulAction.stabilizer ↥H v ≠ ⊤ := by
+          intro htop
+          refine hvC (Subgroup.mem_centralizer_iff.mpr fun g hg => ?_)
+          have hmem : (⟨g, hg⟩ : ↥H) ∈ MulAction.stabilizer ↥H v := by rw [htop]; trivial
+          have hfix : g * v * g⁻¹ = v := by
+            have := MulAction.mem_stabilizer_iff.mp hmem
+            rwa [hsmul] at this
+          calc g * v = (g * v * g⁻¹) * g := by group
+            _ = v * g := by rw [hfix]
+        -- 軌道は `N \ {1}` に含まれる.
+        have horbit_sub : MulAction.orbit ↥H v ⊆ (N : Set G) \ {1} := by
+          rintro _ ⟨h, rfl⟩
+          change (h : G) * v * (h : G)⁻¹ ∈ (N : Set G) \ {1}
+          refine ⟨hNnormal.conj_mem v hvN (h : G), ?_⟩
+          simp only [Set.mem_singleton_iff]
+          intro hone
+          apply hv1
+          have : v = (h : G)⁻¹ * ((h : G) * v * (h : G)⁻¹) * (h : G) := by group
+          rw [this, hone]
+          group
+        have hncard : (MulAction.orbit ↥H v).ncard ≤ Nat.card ↥N - 1 := by
+          have hsub := Set.ncard_le_ncard horbit_sub (Set.toFinite _)
+          have hdiff : ((N : Set G) \ {1}).ncard = (N : Set G).ncard - 1 :=
+            Set.ncard_sdiff_singleton_of_mem N.one_mem
+          rw [hdiff, ← Nat.card_coe_set_eq] at hsub
+          exact hsub
+        -- `K := N ⊔ (stabilizer の像)` は真部分群で指数が `|N|` 未満.
+        set Hv : Subgroup G := (MulAction.stabilizer ↥H v).map H.subtype with hHv
+        have hHvH : Hv ≤ H := Subgroup.map_subtype_le _
+        have hHvcard : Nat.card ↥Hv = Nat.card ↥(MulAction.stabilizer ↥H v) :=
+          (Nat.card_congr (Subgroup.equivMapOfInjective _ H.subtype
+            H.subtype_injective).toEquiv).symm
+        have hindexH : H.index = Nat.card ↥N := by
+          have h := Ch02.index_mul_card_inf_eq_card_of_sup_eq_top (N := N) (A := H) hsup
+          rwa [hinf, Subgroup.card_bot, mul_one] at h
+        -- `|N ⊔ Hv| = |N| * |Hv|`
+        have hNHvinf : N ⊓ Hv = ⊥ :=
+          le_bot_iff.mp (hinf ▸ inf_le_inf_left N hHvH)
+        have hcardK : Nat.card ↥(N ⊔ Hv) = Nat.card ↥N * Nat.card ↥Hv := by
+          have h1 := Ch01.card_mul_card_inf N Hv
+          rw [hNHvinf, Subgroup.card_bot, mul_one] at h1
+          rw [← h1, ← Subgroup.normal_mul, SetLike.coe_sort_coe]
+        have hcardG : Nat.card ↥N * Nat.card ↥H = Nat.card G := by
+          have h1 := Ch01.card_mul_card_inf N H
+          rw [hinf, Subgroup.card_bot, mul_one] at h1
+          rw [← h1, ← Subgroup.normal_mul, SetLike.coe_sort_coe, hsup]
+          simp
+        have hstabcard : Nat.card ↥(MulAction.stabilizer ↥H v) *
+            (MulAction.stabilizer ↥H v).index = Nat.card ↥H :=
+          Subgroup.card_mul_index _
+        have hKindex : (N ⊔ Hv).index = (MulAction.stabilizer ↥H v).index := by
+          have hmul : (N ⊔ Hv).index * (Nat.card ↥N * Nat.card ↥Hv) = Nat.card G := by
+            rw [← hcardK, mul_comm]
+            exact Subgroup.card_mul_index _
+          have hmul2 : (MulAction.stabilizer ↥H v).index * (Nat.card ↥N * Nat.card ↥Hv)
+              = Nat.card G := by
+            rw [hHvcard, ← hcardG, ← hstabcard]
+            ring
+          exact Nat.eq_of_mul_eq_mul_right (Nat.mul_pos Nat.card_pos Nat.card_pos)
+            (hmul.trans hmul2.symm)
+        have hKne : N ⊔ Hv ≠ ⊤ := by
+          intro htop
+          have hstabtop : MulAction.stabilizer ↥H v = ⊤ := by
+            have h1 : (N ⊔ Hv).index = 1 := by rw [htop]; exact Subgroup.index_top
+            rw [hKindex] at h1
+            exact Subgroup.index_eq_one.mp h1
+          exact hstab_ne hstabtop
+        -- 極小性と軌道の評価が衝突する.
+        have hle := hmin _ hKne
+        rw [hindexH, hKindex, MulAction.index_stabilizer] at hle
+        have hNpos : 1 ≤ Nat.card ↥N := Nat.card_pos
+        omega
+      · -- `C_N(H) = N`: `N` が `H` を中心化するので `H ⊴ G`.
+        have hNC : N ≤ Subgroup.centralizer (H : Set G) := by
+          rw [← hZeq]
+          exact inf_le_right
+        refine Subgroup.normalizer_eq_top_iff.mp (top_le_iff.mp ?_)
+        rw [← hsup]
+        exact sup_le (hNC.trans (Subgroup.centralizer_le_normalizer _)) Subgroup.le_normalizer
+
+/-- **Isaacs Problem 3B.15** (Berkovich, 書籍 p. 86): 有限**可解**群 `G` の真部分群のうち
+指数が最小のものは `G` で正規.
+
+`|G|` の強帰納法. 最小指数の `H` は極大なので, 極小正規部分群 `N` について
+`N ≤ H` なら `G ⧸ N` に落として帰納法, `N ≰ H` なら `G = N ⋊ H` で `N` への `H` の共役作用を見る.
+`C_N(H) = N` なら `N` が `H` を正規化するので `H ⊴ G`. `C_N(H) = 1` の場合は
+`v ∈ N \ {1}` の安定化群 `H_v < H` を取ると `N ⊔ H_v` は真部分群で,
+その指数は軌道の大きさ `≤ |N| - 1 < |N| = [G : H]` となり `H` の最小性に矛盾する. -/
+theorem normal_of_index_minimal {G : Type u} [Group G] [Finite G] [IsSolvable G]
+    {H : Subgroup G} (hHne : H ≠ ⊤)
+    (hmin : ∀ K : Subgroup G, K ≠ ⊤ → H.index ≤ K.index) : H.Normal :=
+  normal_of_index_minimal_aux (Nat.card G) H le_rfl hHne hmin
+
 end
 
 end OddOrder.Isaacs.Ch03
