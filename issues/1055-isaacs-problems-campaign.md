@@ -1439,8 +1439,8 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 問題 | 状態 | メモ |
 |---|---|---|
 | 5C.1 | ✅ | `not_dvd_card_commutator_of_inf_sylow_eq_bot` + `hasNormalPComplement_of_commutator_inf_sylow_eq_bot` (`Problems5C.lean`)。方針どおり **鍵の段を独立補題**にした (同一 statement の別証明を避ける) |
-| 5C.2 | ⬜ | `U ≤ V ≤ P` (P abelian Sylow-2)、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
-| 5C.3 | ⬜ | `G` 単純で abelian Sylow-2 が位数 `2^5` ⇒ 初等可換 (⚠ pdftotext は `2 5`、PDF 画像で要確認) |
+| 5C.2 | 🔨 証明確定 (下記) | PDF 確認済。`U ⊆ V ⊆ P ⊆ G`、`P` abelian Sylow-2、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
+| 5C.3 | 🔨 設計確定 (下記) | PDF 確認済: `G` 単純で abelian Sylow-2 `P` の位数が `2^5` ⇒ `P` は初等可換 |
 | 5C.4 | ⬜ | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
 | 5C.5 | ✅ | `exists_mem_normalizer_conj_eq_of_normal` + `eq_of_characteristic_of_conj` (`Problems5C.lean`) |
 | 5C.6 | 🔒 hub | weak closure。**hub レーンが `OddOrder/GroupTheory/WeaklyClosed.lean` で着手中** (issue 9503) — A レーンは触らない |
@@ -1451,6 +1451,34 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.11 | ⬜ | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
 | 5C.12 | ⬜ | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
 | 5C.13 | ⬜ | (Navarro) `P = N_G(P)'` なる Sylow `P` ⇒ `N_G(P)` が正規 p-補群をもつ |
+
+### 5C.2 の証明 (2026-07-26 に導出、PDF p.162 = PDF ページ 175 で主張確認済)
+
+**主張**: `U ⊆ V ⊆ P ⊆ G`、`P` は `G` の abelian Sylow-2、`U`, `V` は `P` の特性部分群で
+`|V : U| = 2`。`G` が単純なら `|G| = 2`。
+
+**証明** (⭐ transfer 評価 + fusion control):
+`P` が abelian なので `N := N_G(P)` は `P` 内の fusion を制御する
+(Burnside; repo の Cor 5.22 = `Basic.lean` の fusion-control 系)。
+`U`, `V` は `P` の特性部分群なので `N` は両方を保ち、`|V/U| = 2` かつ `Aut(C₂) = 1` より
+**`N` は `V/U` に自明に作用する**。
+transfer `v : G →* P` (P abelian) を取ると、transfer 評価の各因子
+`t x^{n_t} t⁻¹` は `x ∈ V` のとき `V` に入り、fusion が `N` 由来なので
+**`≡ x^{n_t} (mod U)`**。`∑ n_t = |G : P|` だから `v(x) ≡ x^{|G:P|} (mod U)`。
+`|G:P|` は奇数なので `x ∈ V \ U` に対し `v(x) ∉ U`、特に `v(x) ≠ 1`。
+一方 `G` が非可換単純なら `G = G'` で `v(G) = v(G') = 1` (`P` 可換) — 矛盾。
+よって `G` は可換単純 = 素数位数。`V/U` が位数 2 を含むので `2 ∣ |G|` ⇒ `|G| = 2`。
+
+### 5C.3 の設計 (2026-07-26)
+
+`|P| = 2^5` で `G` 単純 ⇒ `G` は非可換単純 (可換単純は素数位数で Sylow-2 が位数 32 に
+ならない)。`P` が初等可換でないとすると `P` は巡回因子の直積で、ある因子の位数が `≥ 4`。
+**因子の分割 (5 の分割) のうち「最大部分がただ 1 つ」なら repo の Cor 5.19
+(`SylowTwoDirectFactor.lean`、書籍一般形) が非単純性を与えて矛盾**。
+⚠ **`(2,2,1)` = `C₄ × C₄ × C₂` だけは最大部分が 2 つあり Cor 5.19 で覆えない**。
+この場合は **5C.2** を `U := ℧¹(P) = P²` (位数 4)、`V := Ω₁(P)` (位数 8) に適用する
+(`|V : U| = 2`、どちらも特性部分群) と `|G| = 2` となって矛盾。
+⟹ **5C.3 は 5C.2 に依存する**。実装順は 5C.2 → 5C.3。
 
 ### 5C.1 の実装メモ (2026-07-26)
 
