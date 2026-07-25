@@ -630,7 +630,7 @@ has been discharged.  The fields are indexed by the same finite enumeration of t
 accumulator `pairUnion (xBaseBlock Z) pair i`, so downstream callers can supply the character-degree
 and p-power data directly without rebuilding the member-family facts or the `XAdjoinStepInput`
 record by hand. -/
-structure PairUnionCommonIndexPrimePowerStepData
+structure PairUnionStepData
     (hyp : SibleyDadeHypothesis G L H)
     {Z : Subgroup ↥L}
     {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {i : ℕ}
@@ -687,7 +687,7 @@ This is the chain-step payload matching
 `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`: the caller supplies the
 chosen anchor in `xBaseBlock Z`, and the adapter derives the sorted-degree facts
 `d₁ < dχ` and `∀ j, d₁ ≤ dmem j` internally. -/
-structure PairUnionBaseAnchorCommonIndexPrimePowerStepData
+structure AnchoredPairUnionStepData
     (hyp : SibleyDadeHypothesis G L H)
     {Z : Subgroup ↥L}
     {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {i : ℕ}

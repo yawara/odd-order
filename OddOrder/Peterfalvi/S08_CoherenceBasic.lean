@@ -39,10 +39,10 @@ open scoped Classical in
 
 This is the chain-level consumer of `xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums`.
 The caller no longer has to construct an `XAdjoinStepInput` at each step: it supplies only a
-`PairUnionCommonIndexPrimePowerStepData` package for the actual prefix accumulator chosen by the
+`PairUnionStepData` package for the actual prefix accumulator chosen by the
 conjugate-pair cover.  The adapter folds the chain using
 `Xset_isCoherent_from_adjoinSteps_of_irreducible_X` and constructs each step input internally. -/
-noncomputable def Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X
+noncomputable def Xset_isCoherent_from_pairUnionStepData_of_irreducible_X
     (hyp : SibleyDadeHypothesis G L H)
     {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
     (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) (hXne : (hyp.Xset Z).Nonempty)
@@ -58,7 +58,7 @@ noncomputable def Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irr
         (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
           (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
       ∀ i, i < N →
-        PairUnionCommonIndexPrimePowerStepData hyp (Z := Z) (pair := pair) (i := i) (χs := χs)) :
+        PairUnionStepData hyp (Z := Z) (pair := pair) (i := i) (χs := χs)) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset Z)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   refine hyp.Xset_isCoherent_from_adjoinSteps_of_irreducible_X hZH hX hXne ?_
@@ -76,10 +76,10 @@ open scoped Classical in
 
 This is the chain-level consumer of
 `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`.  Compared with
-`Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X`, each step package no
+`Xset_isCoherent_from_pairUnionStepData_of_irreducible_X`, each step package no
 longer includes the sorted-degree fields `d₁ < dχ` and `∀ j, d₁ ≤ dmem j`; the base-block anchor
 and pair-cover disjointness provide them internally. -/
-noncomputable def Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X
+noncomputable def Xset_isCoherent_from_anchoredPairUnionStepData_of_irreducible_X
     (hyp : SibleyDadeHypothesis G L H)
     {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
     (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) (hXne : (hyp.Xset Z).Nonempty)
@@ -95,7 +95,7 @@ noncomputable def Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerD
         (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
           (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
       ∀ i, i < N →
-        PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+        AnchoredPairUnionStepData hyp
           (Z := Z) (pair := pair) (i := i) (χs := χs)) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset Z)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
@@ -109,13 +109,13 @@ noncomputable def Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerD
     data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hidx_p
 
 /-- **(T8.11w1c) base-anchor X-chain coherence, completeness-exposing variant.**  Like
-`Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X` but the
+`Xset_isCoherent_from_anchoredPairUnionStepData_of_irreducible_X` but the
 per-step
 producer `hstepData` additionally receives the Xset-cover completeness witness `hcover` (finding #6)
 — required to build the per-step `tailSet`/`htail_le`/`hsum`.  Routes through the `…withCover…`
 engine.  Additive (no existing signature changes). -/
 noncomputable def
-    Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X
+    Xset_isCoherent_from_anchoredPairUnionStepData_withCover_of_irreducible_X
     (hyp : SibleyDadeHypothesis G L H)
     {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
     (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) (hXne : (hyp.Xset Z).Nonempty)
@@ -133,7 +133,7 @@ noncomputable def
       (∀ φ ∈ hyp.Xset Z, φ ∈ hyp.xBaseBlock Z ∨
         ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j) →
       ∀ i, i < N →
-        PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+        AnchoredPairUnionStepData hyp
           (Z := Z) (pair := pair) (i := i) (χs := χs)) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset Z)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
@@ -146,18 +146,14 @@ noncomputable def
     data.hdχ data.hd₁ data.hdmem data.hθχ data.hθ₁ data.hθmem data.hθtail
     data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hidx_p
 
--- The declaration name alone is 106 characters, so the `def` line cannot fit in 100 columns.
-set_option linter.style.longLine false in
 /-- **(6.6)/(6.8.1), central-`Zc`, completeness-exposing form (redesign L2 outer shell,
 withCover).**
-Same as
-`Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+Same as `Xset_centralCommutator_isCoherent_from_anchoredPairUnionStepData_of_frobenius`
 but the `hstepData` producer receives the Xset-cover completeness witness `hcover` (finding #6),
-which
-the monolith needs to build `tailSet`/`htail_le`/`hsum`.  Routes through the `…withCover…`
+which the monolith needs to build `tailSet`/`htail_le`/`hsum`.  Routes through the `…withCover…`
 consumer. -/
 noncomputable def
-    Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_frobenius
+    Xset_centralCommutator_isCoherent_from_anchoredPairUnionStepData_withCover_of_frobenius
     (hyp : SibleyDadeHypothesis G L H)
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
     (hHnonab : _root_.commutator ↥H ≠ ⊥)
@@ -177,14 +173,14 @@ noncomputable def
       (∀ φ ∈ hyp.Xset hyp.centralCommutator, φ ∈ hyp.xBaseBlock hyp.centralCommutator ∨
         ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j) →
       ∀ i, i < N →
-        PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+        AnchoredPairUnionStepData hyp
           (Z := hyp.centralCommutator) (pair := pair) (i := i) (χs := χs)) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   letI : H.Normal := hyp.H_normal
   haveI := hyp.centralCommutator_normal
   exact
-    hyp.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X
+    hyp.Xset_isCoherent_from_anchoredPairUnionStepData_withCover_of_irreducible_X
       (Z := hyp.centralCommutator) hyp.centralCommutator_le
       (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
       (hyp.Xset_centralCommutator_nonempty hF hHnonab) hstepData
@@ -347,7 +343,7 @@ subgroup `Z` of `L` with `Z ≤ H` central in `H` (`Z.subgroupOf H ≤ Z(H)`, th
 (`hX` — the book's hypothesis `𝒳 ⊆ Irr L`), that `X` is nonempty (`hXne` — in the book from
 `Z ≠ 1` via (1.1)), that `H` is a `p`-group for a prime `p ≥ 3` (the book reduces to this case
 by (6.5), and `p` is odd since `|L|` is), and that `|L:H|` is coprime to `p` (`hidxp`, from
-(6.4.c)/(6.5.c)).  Builds the per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData` for
+(6.4.c)/(6.5.c)).  Builds the per-step `AnchoredPairUnionStepData` for
 every chain step and feeds it to the `…withCover…` generic shell.  The central-commutator
 (`Zc = Z(H) ∩ H′`) instantiations (`…_of_frobenius`, `…_of_c2_caseA`) are thin specializations
 differing only in how `hX`/`hXne`/`hidxp` are produced
@@ -379,7 +375,7 @@ noncomputable def Xset_isCoherent_of_irreducible_X
   have hZqle : Nat.card (↥H ⧸ Z.subgroupOf H) ≤ Nat.card ↥H :=
     Nat.le_of_dvd Nat.card_pos (Subgroup.card_quotient_dvd_card _)
   refine
-    hyp.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X
+    hyp.Xset_isCoherent_from_anchoredPairUnionStepData_withCover_of_irreducible_X
       (Z := Z) hZle hX hXne ?_
   intro pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi
   -- `χs i ∈ X(Zc)`
@@ -527,7 +523,7 @@ noncomputable def Xset_isCoherent_of_irreducible_X
 open scoped Classical in
 /-- **(6.6)/(6.8) X = S − S(Zc) coherence at the central commutator — the L2 producer.**
 The redesign's L2 deliverable: `X(Zc)` is coherent, with `Zc = Z(H) ∩ H′` central.  Builds the
-per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData` (the first-ever such term) for every
+per-step `AnchoredPairUnionStepData` (the first-ever such term) for every
 chain step and feeds it to the `…withCover…` Zc shell.  Per step: the current head `χs i` and every
 `X`-member `Ind θ` have degree `|L:H|·p^k` (`exists_index_primePow_degree_of_mem_S`), the central
 degree bound `θχ² ≤ |H:Zc|` holds ([Is] Cor 2.30 via

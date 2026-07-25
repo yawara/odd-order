@@ -763,7 +763,7 @@ image、(7.8.b)、(7.9) decomposition が `CharacterEstimateData` まで同時�
 ### 2026-06-05 pass: S08 Frobenius coherence to H78 Ind-chain socket
 
 S09 に `Hypothesis78.indChainDecomposition_of_coherenceOn` と
-`Hypothesis78.indChainDecomposition_of_sibley_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData`
+`Hypothesis78.indChainDecomposition_of_sibley_frobenius_anchoredPairUnionStepData`
 を追加した。
 
 S08 の Frobenius/base-anchor X-chain、Y coherence、generator-level mixed-inner glue から、

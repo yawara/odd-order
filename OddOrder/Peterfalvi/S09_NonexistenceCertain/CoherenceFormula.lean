@@ -21,8 +21,6 @@ variable {G : Type*} [Group G] [Fintype G]
 variable {A : Set G} {L : Subgroup G} [Fintype L]
 variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
 
-set_option linter.style.longLine false
-set_option linter.style.longLine true
 
 
 /-- Arithmetic core of Peterfalvi (7.8.b): if `2e + 1 ≤ h`, then the

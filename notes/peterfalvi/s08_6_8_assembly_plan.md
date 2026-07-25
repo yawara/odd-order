@@ -622,7 +622,7 @@ mmd (5.6)(04.7 L59-105) + (6.8.1)(04.8 L166-177) + 既存 S07 machinery を精�
 #### J.3.8 ✅ capstone X-empty (abelian) case closed (2026-06-05, commit 166d3b5)
 `sibleySetup_is_coherent` の bare sorry を `by_cases hXe : Xset ⁅H,H⁆ = ∅` に分割:
 - **X-empty branch 完全証明**: `coherenceTarget_of_Xset_empty`(新, axiom-clean): `X=∅ ⟹ S=Y`(`Xset_union_Yset_eq_S` で `S=∅∪Yset=Yset`)⟹ `CoherenceTarget = coherentYset`(Y-coherence, T6 既 landed)。glue 不要。
-- **X-nonempty branch のみ sorry**(真の §8 glue): `hyp.cases`(Frobenius/CertainType)で分岐。`hXne` は `hXe` 否定から放電可。Frobenius case = `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`(5925, sorry-free)を invoke、要 `hF`(cases)+ **`hstepData`**(`PairUnionBaseAnchorCommonIndexPrimePowerStepData`@5685 構成 = (6.6) prime-power 次数 gap, **bottleneck = hard content**)+ glue(`ν`/`hagree`/`hmixed`/`hgen`)。**次セッション = hstepData 構成 + glue data 供給**。
+- **X-nonempty branch のみ sorry**(真の §8 glue): `hyp.cases`(Frobenius/CertainType)で分岐。`hXne` は `hXe` 否定から放電可。Frobenius case = `coherentS_of_frobenius_anchoredPairUnionStepData_generator_mixed_inner`(5925, sorry-free)を invoke、要 `hF`(cases)+ **`hstepData`**(`AnchoredPairUnionStepData`@5685 構成 = (6.6) prime-power 次数 gap, **bottleneck = hard content**)+ glue(`ν`/`hagree`/`hmixed`/`hgen`)。**次セッション = hstepData 構成 + glue data 供給**。
 
 #### J.3.9 ✅ (6.5) p-群還元の group-theory core landed (2026-06-05, commit f2aea41)
 
@@ -786,7 +786,7 @@ Da=decompositionDaFromDadeOfDiff、hY=dade_Y_collapse_of_family(差分弱化)。
 ### 🔴 残 (sorry filling, `hyp.cases` で c1/c2 分岐):
 - **shared glue** (両 case 要, 構造的): `hXirr` (Xset 既約) / `hgen` (Xset∪Yset span gen) / `ν` (合成 ext) /
   `hmixed` (cross-inner)。部分支援あり (`inner_span_Xset_Yset_eq_zero_of_irreducible_X` 既在)。
-- **Frobenius (c1)**: `hstepData` = `PairUnionBaseAnchorCommonIndexPrimePowerStepData` (S08_CoherenceCore:8743,
+- **Frobenius (c1)**: `hstepData` = `AnchoredPairUnionStepData` (S08_CoherenceCore:8743,
   ~30 field の per-step 素冪次数データ; idx/p/m₁/mχ/mmem… = Ind from Frobenius kernel の次数の素冪構造、
   (6.6)) を構成 = **T7 char-theory 本体 (genuine, 中〜大)**。→ `Xset_commutator..._of_frobenius hF hXne hstepData`
   を hX に渡し `coherentS_..._generator_mixed_inner` で組立。
@@ -810,14 +810,14 @@ Da=decompositionDaFromDadeOfDiff、hY=dade_Y_collapse_of_family(差分弱化)。
 **訂正**: cont.⁴ で「shared glue hXirr 要」としたが**誤り** — 既存:
 - `isIrreducibleCharacter_of_mem_Xset_of_frobenius` (S08_CoherenceCore:5067, Frobenius hXirr)
 - `isIrreducibleCharacter_of_mem_Xset_caseA` (5275, c2 case-A hXirr)
-- **Frobenius CoherenceTarget producer `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`
+- **Frobenius CoherenceTarget producer `coherentS_of_frobenius_anchoredPairUnionStepData_generator_mixed_inner`
   (10057)**: `hF + hXne + hstepData + ν + hagreeX + hagreeY + hmixed + hgen → CoherenceTarget`
   (hXirr は内部 discharge)。⟹ Frobenius branch = この def 1 呼び出し + (hstepData, ν, hagreeX/Y, hmixed, hgen) 構成。
 (自作 `Xset_irreducible_of_frobenius` は冗長判明 → reverted。教訓: 部品 build 前に既存 lemma を grep。)
 
 ### ⚠ 正味進捗評価 (honest): case-B は RECON 3 tick で net-0 code (redundant 1 個 revert)。
 infra はほぼ全 BUILT (10057 + capstone 5026 + 両 hXirr + Y-coh + engine)。残は**大 piece のみ**:
-- **Frobenius**: `hstepData` (PairUnionBaseAnchorCommonIndexPrimePowerStepData, ~30 field, (6.6) 素冪次数
+- **Frobenius**: `hstepData` (AnchoredPairUnionStepData, ~30 field, (6.6) 素冪次数
   解析 = deg(Indθ)=|W₁|θ(1), θ(1)=p^m for p-group H) = **不可分の大構造 (incremental landable でない)**。
   + glue (ν/hagreeX/hagreeY/hmixed/hgen)。
 - **c2**: Hypothesis46-from-Sibley bridge (subH/A_covers/tic 構築) + glue。
@@ -832,7 +832,7 @@ infra はほぼ全 BUILT (10057 + capstone 5026 + 両 hXirr + Y-coh + engine)。
 S08_CoherenceCore 全体 sorry-free (唯一の sorry = S08_CoherenceTheorems:59 X-nonempty branch)。
 
 **case-B X-nonempty sorry の真の残り** (infra は Y-coh/capstone glue/X-coh constructor/両 hXirr 全 built):
-- **Frobenius**: hstepData (`PairUnionBaseAnchorCommonIndexPrimePowerStepData`, ~30-field 不可分構造,
+- **Frobenius**: hstepData (`AnchoredPairUnionStepData`, ~30-field 不可分構造,
   prime-power 次数 = **H p-群要**; SibleyDadeHypothesis.H は NILPOTENT のみ ⟹ p-群還元 (6.5) が前提) + glue。
 - **c2**: Hypothesis46-from-Sibley bridge (Hypothesis46 全 field 構築, (6.5)-independent だが不可分大構造) + glue。
 - 両 branch とも**大・不可分構造 (sorry scaffold 不可) + deep sub-pieces** ⟹ 60s-loop-grind に不適。
@@ -1441,7 +1441,7 @@ case-B coherence capstone (`sibleySetup_is_coherent` の case-B branch) への p
 
 ### 🔑 reuse 可能 (generic, 大幅省力):
 - **X-coherence は Z-parametrized generic**: `Xset_centralCommutator_isCoherent_of_irreducible_X`
-  (S08_CoherenceCore:9112) は `Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover
+  (S08_CoherenceCore:9112) は `Xset_isCoherent_from_anchoredPairUnionStepData_withCover
   _of_irreducible_X (Z := ...)` (:9137) に delegate。Z=W₂ で reuse 可。per-step prime-power degree data
   は case-independent (X-degrees)。**case-B X-coherence = generic reuse + math-B X-irreducibility**。
 - **§7 glue** (`coherentXunionYset_...glued_withDiagonal` / `coherentUnion_of_glued`) generic。
@@ -3204,7 +3204,7 @@ Lean commit なし。dispatch トリオ完成後の残務 = **cX 組立 (T8-anal
 - `per_phi_anchored_image` (CB2:1908) — per-φ image family の汎用 producer (`caseB_per_phi_anchored_fromYset` がその case-B 実体)。
 - **base 部品**: `certainTypeSet_isCoherent_tau_canonical` (S08CB:170, **unconditional**, μ_j columns coherence per nontrivial k)。
 - **glue shell**: `coherentXunionYset_caseB_of_glued` (CB2:1616, sorry-free) — cX + ν + agreement/hmixed/D/hgen → `IsCoherent hyp.tau (Xset W2 ∪ Yset)`。
-- **capstone template (Frobenius)**: `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner` (S08CT:388 経由) — Z=⁅H,H⁆ で直接 S。case-B はこの mirror を Z=W₂ で。
+- **capstone template (Frobenius)**: `coherentS_of_frobenius_anchoredPairUnionStepData_generator_mixed_inner` (S08CT:388 経由) — Z=⁅H,H⁆ で直接 S。case-B はこの mirror を Z=W₂ で。
 - **set bridge**: `Xset_commutator_eq_Xset_union_filtrationDiff` (CorePart2:877)。
 - **case-A pure-cX テンプレート**: `Xset_centralCommutator_isCoherent_of_irreducible_X` (CoreCore:1046) — 但し **全 X-member 既約**前提 (common-index prime-power degree machinery + xBaseBlock anchor)。case-B は **mixed** (columns μ_j + irreducible Ind θ) ゆえ直接流用不可。
 

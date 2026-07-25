@@ -1119,7 +1119,7 @@ degree theory を要する:
    **dadeIntegralCharacterMap レベル**で、hyp.tau bridge を持たない。⟹ **新規 `Xset_isCoherent_from_adjoinStepsW`
    (weighted chain + certainTypeSet base + Dade→hyp.tau congr)を構築要**(irreducible 版を mirror、laborious)。
 2. **per-step `hDeg : 2a < ∑ deg²/mc` = 真の gate = (6.6) degree-divisibility math**: Frobenius は
-   `PairUnionCommonIndexPrimePowerStepData`(prime-power / common-index / [Is] Cor 2.30 central bound)で
+   `PairUnionStepData`(prime-power / common-index / [Is] Cor 2.30 central bound)で
    hDeg を構築。case-B はこの **weighted 版 producer (= notes/s08_6_8_blocker_central_Z.md の "producer monolith")**
    を要する。**これが (6.6) の数学的核**。brick 3 (`sMember_degreeSqNormBound`) は field assembly を済ませたが
    **Y-anchor 前提**(η∈S₁)で、X-chain は **column-anchor**(certainTypeSet 基準)ゆえ deg/a 定義が異なり直接再利用不可。

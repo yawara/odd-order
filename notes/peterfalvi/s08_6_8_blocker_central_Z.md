@@ -34,8 +34,8 @@ Cor 2.30 = `IsIrreducibleCharacter.exists_degree_sq_le_index`
 - `Xset Z := S − S(Z)` (S08:3475). Its own docstring: *"for a normal `Z ⊆ Z(H)`"*.
 - `Yset := S(⁅H,H⁆) = S(H′)` (S08:3480).
 - Capstone routes through
-  `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`
-  → `Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+  `coherentS_of_frobenius_anchoredPairUnionStepData_generator_mixed_inner`
+  → `Xset_commutator_isCoherent_from_anchoredPairUnionStepData_of_frobenius`
   which instantiates the general (6.6) consumer at **`Z := ⁅H,H⁆`** (S08:7456).
 - This buys the clean partition `Xset ⁅H,H⁆ ∪ Yset = S` (S08:3607) and the tidy X-empty branch
   (`coherenceTarget_of_Xset_empty`), **but ⁅H,H⁆ ⊄ Z(H)** (class ≥ 3 p-groups), so (6.6)/Cor 2.30
@@ -43,7 +43,7 @@ Cor 2.30 = `IsIrreducibleCharacter.exists_degree_sq_le_index`
 
 ## Why the producer field is unfillable at `Z = ⁅H,H⁆`
 
-Step-data `PairUnionBaseAnchorCommonIndexPrimePowerStepData` (S08:7265) carries, per step:
+Step-data `AnchoredPairUnionStepData` (S08:7265) carries, per step:
 `hθsq_le_qtot : θχ*θχ ≤ qtot`, `hqtot : qtot = p^mq`, `htotal : total = qtot*c`,
 `hsum : ∑members² + ∑tail² = total`.
 
@@ -64,7 +64,7 @@ Cor 2.30 only yields `θ² ≤ |H:Z(H)|`; concluding `θ² ≤ |H:⁅H,H⁆|` wo
 
 ## The general (6.6) machinery is SOUND — only the (6.8) instantiation is wrong
 
-`Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X` (S08:7360) is
+`Xset_isCoherent_from_anchoredPairUnionStepData_of_irreducible_X` (S08:7360) is
 parameterized by a general normal `Z`; the bound is a *hypothesis* of the step data. At a **central**
 `Z` (`Z ≤ Z(H)`) the field is fillable (Cor 2.30). So the (6.6) consumer is reusable as-is; the bug
 is purely the §8 capstone-level choice `Z := ⁅H,H⁆` and the `X ⊔ Y = S` shortcut.
@@ -106,7 +106,7 @@ injective `H.subtype`); `Zc ≠ ⊥` when `H` nonabelian (use `isNilpotent_norma
 @S08:645 with `N = ⁅H,H⁆ ≠ ⊥`, giving `⁅H,H⁆ ⊓ center ≠ ⊥`).
 
 **L2 — `X = Xset Zc` coherence at central `Zc`.** REUSE the general consumer
-`Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X (Z := Zc)`
+`Xset_isCoherent_from_anchoredPairUnionStepData_of_irreducible_X (Z := Zc)`
 (S08:7360) — it is SOUND for any Z; the producer `hstepData` is now HONESTLY fillable because
 `hθsq_le_qtot : θχ² ≤ qtot` = `exists_degree_sq_le_index (Zc.subgroupOf H) (L1 centrality)`. The
 building blocks `sum_re_sq_Xset_eq` / `index_mul_card_sub_factor` are already stated for general Z, so
@@ -139,7 +139,7 @@ from-scratch formalization of the class-algebra `ω`/`a_{ijs}` argument (that is
 tools EXIST. Substantial but unblocked.
 
 ### Reuse / rework map
-- **Keep (Z-generic, sound):** `Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X`,
+- **Keep (Z-generic, sound):** `Xset_isCoherent_from_anchoredPairUnionStepData_of_irreducible_X`,
   `sum_re_sq_Xset_eq`, `index_mul_card_sub_factor`, `exists_degree_sq_le_index`, `coherentYset`,
   `coherentUnion_of_glued`, `exists_coherentBreakPair`, `coherentDegreeSumBound_of_not_coherent`,
   `exists_pairUnion_memberFamily_of_irreducible_X`, all the per-member degree blocks.
@@ -179,13 +179,13 @@ larger remaining lift.**
     helpers (all pre-existing) and ℝ→ℕ casting via `index_mul_card_sub_factor`.
 - **🔜 NEXT: L2 (the producer monolith), then L3, then capstone wiring.**
   - **L2**: `X = Xset Zc` coherence at central `Zc`. REUSE the general consumer
-    `Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X (Z := Zc)`
+    `Xset_isCoherent_from_anchoredPairUnionStepData_of_irreducible_X (Z := Zc)`
     (S08:~7460). **✅ linchpin landed** (`exists_source_primePow_centralBound_of_mem_Xset`, commit
     `a119d9c`): for `χ∈X(Z)`, `χ(1)=|L:H|·p^k ∧ (p^k)²≤|H:Z|` — the `hθχ`/`hθsq_le_qtot` data, now
     fillable at central `Zc`. `isIrreducibleCharacter_of_mem_Xset_of_frobenius` confirmed Z-generic.
     **✅ hXne landed (2026-06-07, commit `264966a`)**: `Xset_centralCommutator_nonempty` (via Z-generic
     `Xset_nonempty_of_subgroupOf_ne_bot`, degree-sum positivity — no Clifford theory). **✅ outer shell
-    landed (commit `a9054c4`)**: `Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+    landed (commit `a9054c4`)**: `Xset_centralCommutator_isCoherent_from_anchoredPairUnionStepData_of_frobenius`
     — the Zc instantiation of the consumer, all prereqs discharged, `hstepData` confirmed to TYPECHECK
     at `Z := Zc` (so the producer goal is well-formed and satisfiable).
     **Sole remaining L2 hole = constructing the producer `hstepData` monolith** (single atomic
@@ -201,7 +201,7 @@ larger remaining lift.**
        `θtail j` = source p-degree of `j`; `∑_{Fin k} dmem² + ∑_{tailSet}(idx·θtail)² = ∑_{X(Zc)} = total`
        via `Finset.sum_sdiff` (accumulator ⊆ X) + `sum_re_sq_Xset_eq` (ℕ-cast); `htail_le` from the
        degree-sorted chain (`hmono`): tail degrees ≥ `dχ`.
-    4. package `PairUnionBaseAnchorCommonIndexPrimePowerStepData ⟨…⟩`; feed the consumer.
+    4. package `AnchoredPairUnionStepData ⟨…⟩`; feed the consumer.
     Also needs `H` a `p`-group (from `isPGroup_of_not_coherent`, capstone ¬-coherent branch) and
     `(Xset Zc).Nonempty`.
   - **L3**: ν glue → `Nonempty (IsCoherent (Xset Zc ∪ Yset))` via `coherentUnion_of_glued`; needs
@@ -251,8 +251,8 @@ green, 1 sorry @ capstone S08:7919). New facts beyond the progress log above:
    of `Xset Z`, sorted/disjoint) is a genuine counterexample to the producer goal.
    **Fix = thread `hcover` through the callback contract**: add it to `adjoinSteps`' `hstep` type +
    pass it (6703); thread into the base-anchor consumer's `hstepData`
-   (`…BaseAnchorCommonIndexPrimePowerData_of_irreducible_X` @ S08:7697) and its callers (the ⁅H,H⁆
-   wrapper @ 7850, the Zc shell `a9054c4`, the capstone glue `coherentS_of_frobenius_…BaseAnchor…`
+   (`…anchoredPairUnionStepData_of_irreducible_X` @ S08:7697) and its callers (the ⁅H,H⁆
+   wrapper @ 7850, the Zc shell `a9054c4`, the capstone glue `coherentS_of_frobenius_anchoredPairUnion…`
    @ ~7951/7966, and **S09:1648** `indChainDecomposition_of_sibley_…`). The common-index consumer
    (@ 7660) + its wrapper can accept-and-ignore the new `hcover` (their path isn't being built).
    ~7 defs across S08+S09, mechanical (everyone threads one extra hypothesis; only the eventual
@@ -287,8 +287,8 @@ confirmed present, no prerequisite *theorem* is missing — it is all assembly.
 **Precise next-step ordering for L2** (2026-06-07): ✅ `hXne` (`264966a`) + ✅ Zc shell (`a9054c4`).
 **✅ (1) finding-#6 contract fix DONE (`2e46520`, additive)**: three `…withCover…` defs expose
 `hcover` to the StepData producer (engine `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X`,
-consumer `…BaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X`, Zc shell
-`Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_frobenius`).
+consumer `…anchoredPairUnionStepData_withCover_of_irreducible_X`, Zc shell
+`Xset_centralCommutator_isCoherent_from_anchoredPairUnionStepData_withCover_of_frobenius`).
 No existing signatures touched → S09 untouched, full build green. **✅ (2) the L2 producer monolith
 DONE (`d21d788`, sorry-free + axiom-clean)**: `Xset_centralCommutator_isCoherent_of_frobenius` builds
 the first-ever `…StepData` term for every chain step and feeds the `…withCover…` Zc shell →

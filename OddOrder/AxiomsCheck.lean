@@ -3918,16 +3918,16 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_isCoherent_from_pairUnionStepData_of_irreducible_X
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_isCoherent_from_anchoredPairUnionStepData_of_irreducible_X
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionStepData_of_frobenius
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_commutator_isCoherent_from_anchoredPairUnionStepData_of_frobenius
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.mem_xSetFinset_iff_mem_Xset
@@ -4215,10 +4215,10 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_frobenius_generator_mixed_inner
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionCommonIndexPrimePowerData_generator_mixed_inner
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionStepData_generator_mixed_inner
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_frobenius_anchoredPairUnionStepData_generator_mixed_inner
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Xset_caseA
 -- Peterfalvi (4.1) (mmd 04.6 L5): signed irreducibles with orthogonal, degree-`0` signed
@@ -4272,7 +4272,7 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_re_nonpos
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.indChainDecomposition_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.indChainDecomposition_of_frobenius_anchoredPairUnionStepData_generator_mixed_inner
 -- Peterfalvi (7.8) bridge from the S09 `ν` interface to a concrete S07 coherence witness.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.nu_mem_ZIrr_of_isCoherent
@@ -4289,7 +4289,7 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_coherenceOn
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_sibley_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_sibley_frobenius_anchoredPairUnionStepData
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.indChain_image_eq_of_isCoherent

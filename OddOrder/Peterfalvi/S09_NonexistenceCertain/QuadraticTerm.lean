@@ -262,7 +262,6 @@ noncomputable def indChainDecomposition_of_coherenceOn
   image_eq t := by
     rw [← hcoh.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul, ← hnu]
 
-set_option linter.style.longLine false
 open scoped Classical in
 /-- **Peterfalvi (6.8.1) → (7.10), Frobenius/base-anchor form.**
 
@@ -276,7 +275,7 @@ The remaining inputs are the genuine (6.6)/(6.8) payload: the `X`-chain step
 data, the `ν` agreement/mixed-inner facts for the final glue, and the chosen
 orthonormal source chain in the Xset/H-prime union with supported scaled differences. -/
 noncomputable def
-    indChainDecomposition_of_sibley_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData
+    indChainDecomposition_of_sibley_frobenius_anchoredPairUnionStepData
     (H78 : Hypothesis78 G A L)
     {H : Subgroup L} [Invertible (Nat.card ↥H : ℂ)]
     (hyp : OddOrder.Peterfalvi.S08.SibleyDadeHypothesis G L H) [H.Normal]
@@ -295,11 +294,11 @@ noncomputable def
         (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
           (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
       ∀ i, i < N →
-        OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+        OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.AnchoredPairUnionStepData hyp
           (Z := ⁅H, H⁆) (pair := pair) (i := i) (χs := χs))
     (hagreeX : ∀ x ∈ hyp.Xset ⁅H, H⁆,
       H78.nu x =
-        (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+        (hyp.Xset_commutator_isCoherent_from_anchoredPairUnionStepData_of_frobenius
           hF hXne hstepData).extension x)
     (hagreeY : ∀ y ∈ hyp.Yset, H78.nu y = hyp.coherentYset.extension y)
     (hmixed : ∀ x ∈ hyp.Xset ⁅H, H⁆, ∀ y ∈ hyp.Yset,
@@ -324,7 +323,7 @@ noncomputable def
         (OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.Peterfalvi.S08.sharpImage H) L)) :
     OddOrder.Peterfalvi.S08.IndChainDecomposition (L := ↥L) (G := G) hyp.tau ζ d := by
   let hX :=
-    hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+    hyp.Xset_commutator_isCoherent_from_anchoredPairUnionStepData_of_frobenius
       hF hXne hstepData
   let hcoh : OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
       (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
@@ -335,7 +334,6 @@ noncomputable def
   exact H78.indChainDecomposition_of_coherenceOn hcoh (by rfl)
     hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
 
-set_option linter.style.longLine true
 
 /-- H78-facing per-term Ind equation in the constructed Ind-chain package. -/
 theorem indChain_image_eq_of_isCoherent
@@ -430,7 +428,6 @@ theorem indChain_inner_chi_weightedOutput_of_isCoherent
   change ClassFunction.inner (data.χ t) data.weightedOutput = (d t : ℂ)
   exact data.inner_chi_weightedOutput t
 
-set_option linter.style.longLine false in
 /-- H78-facing raw weighted Ind equation before collecting the reference term. -/
 theorem indChain_image_weightedDifferenceInput_of_isCoherent
     (H78 : Hypothesis78 G A L)
@@ -456,7 +453,6 @@ theorem indChain_image_weightedDifferenceInput_of_isCoherent
     ∑ t : Fin n, (d t) • (data.χ t - (d t) • data.χ 0)
   exact data.image_weightedDifferenceInput
 
-set_option linter.style.longLine false in
 /-- H78-facing normalized weighted Ind equation, with the integer-square coefficient.
 
 This consumes the same concrete S07 coherence witness as
@@ -487,7 +483,6 @@ theorem
     data.weightedOutput - (∑ t : Fin n, (d t : ℂ) ^ 2) • data.χ 0
   exact data.image_weightedDifferenceInput_eq_weightedOutput_sub_sum_sq_smul_chi_zero
 
-set_option linter.style.longLine false in
 /-- H78-facing normalized weighted Ind equation, with the Parseval norm coefficient. -/
 theorem
     indChain_image_weightedDifferenceInput_eq_weightedOutput_sub_norm_smul_chi_zero_of_isCoherent
@@ -542,7 +537,6 @@ theorem indChain_inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm_of
     1 - ClassFunction.inner data.weightedOutput data.weightedOutput
   exact data.inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm
 
-set_option linter.style.longLine false in
 /-- H78-facing reference coefficient of the raw weighted Ind image. -/
 theorem indChain_inner_chi_zero_image_weightedDifferenceInput_of_isCoherent
     (H78 : Hypothesis78 G A L)

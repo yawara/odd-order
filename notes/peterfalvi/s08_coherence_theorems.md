@@ -323,8 +323,8 @@ allowlist):
   cover / non-real / conjugate-support / conjugate-membership / orthonormality を `Xset` facts と pairUnion
   closure から内部構成し、残入力を同じ enumeration 上の genuine (6.6) degree・p-power・sum・coprimality data
   だけにした。
-- **2026-06-04 追記 9**: **`PairUnionCommonIndexPrimePowerStepData`** と
-  **`Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X`** を追加。chain-level の
+- **2026-06-04 追記 9**: **`PairUnionStepData`** と
+  **`Xset_isCoherent_from_pairUnionStepData_of_irreducible_X`** を追加。chain-level の
   `hstep` callback は `XAdjoinStepInput` を直接返さず、actual pair-cover prefix ごとの common-index/p-power
   degree data package を返せばよくなった。adapter が各 step で `pairUnion` bookkeeping と arithmetic constructor
   を接続し、`Xset_isCoherent_from_adjoinSteps_of_irreducible_X` に fold する。
@@ -333,8 +333,8 @@ allowlist):
   **`xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`** を追加。chosen anchor `χ₁` が
   minimal-degree base block にいることから prefix member 全体の `d₁≤dmem j` を導出し、current pair が
   prefix と disjoint であることから `χs i∉xBaseBlock Z`、従って `d₁<dχ` を内部化した。
-- **2026-06-04 追記 11**: **`PairUnionBaseAnchorCommonIndexPrimePowerStepData`** と
-  **`Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X`** を追加。
+- **2026-06-04 追記 11**: **`AnchoredPairUnionStepData`** と
+  **`Xset_isCoherent_from_anchoredPairUnionStepData_of_irreducible_X`** を追加。
   追記 10 の base-anchor step adapter を chain-level consumer に持ち上げ、per-step data package から
   `hlt : d₁<dχ` と `hlemem : ∀j, d₁≤dmem j` を削除。caller は actual pair-cover prefix の enumeration,
   base-block anchor, common-index/p-power/sum/coprimality data を渡せば、chain fold が `X` coherence
@@ -344,7 +344,7 @@ allowlist):
   **`normalizedDegreeGap_of_natDegreeSumCommonIndexPrimePowerGap`** /
   **`xAdjoinStepInput_of_memberFamily_degreeDivisibility_commonIndexNatGap`** を追加。common `idx`
   + p-power residual factorizations + `d₁ < dχ` から直接 degree gap を作るため、common-index
-  constructor/`PairUnion*CommonIndexPrimePowerStepData` から quotient data
+  constructor/`(Anchored)PairUnionStepData` から quotient data
   `q`, `m`, `q = p^m`, `dχ = q*d₁` を削除した。これで §6.6 step data は別途 ratio を命名せず、
   character degree factorizations・degree sort・sum/coprimality data だけを渡せばよい。
 
@@ -1694,8 +1694,8 @@ orthogonality/generation 入力を構成すること。
 
 `S08_CoherenceTheorems.lean` に (6.8.1) Frobenius alternative 用の `Z=H'` 特殊化を追加:
 
-- `SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius`
-- `SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+- `SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionStepData_of_frobenius`
+- `SibleyDadeHypothesis.Xset_commutator_isCoherent_from_anchoredPairUnionStepData_of_frobenius`
 
 どちらも既存の generic `Xset_isCoherent_from_*_of_irreducible_X` に対して、`H'≤H`,
 `H'⊴L`, `X⊆Irr L` を内部 discharge する adapter。残る入力は `Xset H'` nonempty と各 step の
@@ -1792,11 +1792,11 @@ S08 に Frobenius/c1 route の capstone adapter を追加。pass 19 では final
 `τ₃` data を受けられるようになったが、caller はまだ `hX : IsCoherent τ (Xset H') A` を別途渡す
 形だった。この pass で既存の (6.6) X-chain constructors と final glue を合成した:
 
-- `SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionCommonIndexPrimePowerData_generator_mixed_inner`:
-  `Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius` で `X` coherence を
+- `SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionStepData_generator_mixed_inner`:
+  `Xset_commutator_isCoherent_from_pairUnionStepData_of_frobenius` で `X` coherence を
   内部構成し、その extension に対する generator-level `τ₃` agreement/mixed-inner/generation から
   `hyp.CoherenceTarget` を返す。
-- `SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`:
+- `SibleyDadeHypothesis.coherentS_of_frobenius_anchoredPairUnionStepData_generator_mixed_inner`:
   base-anchor step package 版。同じ capstone だが sorted-degree facts は step package からではなく
   既存 base-anchor adapter が内部導出する。
 
@@ -1808,7 +1808,7 @@ supported-span generation に縮約された。`hX` witness 自体は caller が
 ### 2026-06-04 pass 21: Frobenius c1 capstone to S09 Ind-chain data
 
 S08 に S09-facing adapter
-`SibleyDadeHypothesis.indChainDecomposition_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`
+`SibleyDadeHypothesis.indChainDecomposition_of_frobenius_anchoredPairUnionStepData_generator_mixed_inner`
 を追加。base-anchor common-index p-power X-chain data と generator-level `τ₃` glue から
 `hyp.CoherenceTarget` を内部構成し、`IndChainDecomposition.ofIsCoherent` で §9 の weighted-sum
 consumer package へ直接変換する。

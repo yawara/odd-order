@@ -405,8 +405,6 @@ end IndChainDecomposition
 
 namespace SibleyDadeHypothesis
 
--- The declaration name alone is 101 characters, so the `def` line cannot fit in 100 columns.
-set_option linter.style.longLine false in
 /-- **(6.8.1) → (7.10), Frobenius case:** an `IndChainDecomposition` from the
 base-anchor common-index p-power X-chain data and generator-level `τ₃` glue.
 
@@ -415,7 +413,7 @@ This is the S09-facing consumer form of the Frobenius/c1 capstone: it first buil
 turns that coherence witness into the `IndChainDecomposition` package used by the §9 weighted-sum
 argument. -/
 noncomputable def
-    indChainDecomposition_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+    indChainDecomposition_of_frobenius_anchoredPairUnionStepData_generator_mixed_inner
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
     {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
@@ -435,11 +433,11 @@ noncomputable def
         (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
           (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
       ∀ i, i < N →
-        PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+        AnchoredPairUnionStepData hyp
           (Z := ⁅H, H⁆) (pair := pair) (i := i) (χs := χs))
     (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
     (hagreeX : ∀ x ∈ hyp.Xset ⁅H, H⁆, ν x =
-      (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+      (hyp.Xset_commutator_isCoherent_from_anchoredPairUnionStepData_of_frobenius
         hF hXne hstepData).extension x)
     (hagreeY : ∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y)
     (hmixed : ∀ x ∈ hyp.Xset ⁅H, H⁆, ∀ y ∈ hyp.Yset,
@@ -462,7 +460,7 @@ noncomputable def
         (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) :
     IndChainDecomposition (L := ↥L) (G := G) hyp.tau ζ d := by
   exact IndChainDecomposition.ofIsCoherent
-    (hyp.coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+    (hyp.coherentS_of_frobenius_anchoredPairUnionStepData_generator_mixed_inner
       hF hXne hstepData ν hagreeX hagreeY hmixed hgen)
     hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
 
