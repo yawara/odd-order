@@ -573,3 +573,9 @@ preimage、step (7) の N = P 使用)。主張:
   次 = (10.2) 側 arm (p=3, RC_W(P) が N_G(P) の 3-Sylow、|RC_W(P)|=3^4 vs |G|_3=3^4|W|≥3^5)。
   部品はほぼ同型: card 勘定 (|R·C_W(P)| = |R|·|Σ|/...) + Σ の R/P への非自明作用で
   Z(RC_W(P)) = Z(R) = P。その後 step_ten_dichotomy を消費して無条件 R abelian。
+- **R abelian 両 arm 完成** (`4cff5efb8`〜`8ca894010`): 共有 Sylow engine
+  (`false_of_ppart_subgroup_center_P`) + (10.1) arm + (10.2) arm
+  (Z(R·C_W(P)) = P は faithfulness core `eq_one_of_dAut_sigmaElt_eq_id` 経由)。
+  次 = step_ten_dichotomy を消費する無条件 `invImageF_isMulCommutative`
+  (|F| = p^m の供給 = card_field_eq_prime_pow + char_eq_p の hB2 threading に注意) →
+  T := [R,s] 分解 → |𝒜| = p^m → C_Q(P) 正則性 → step (11) statement 完成。
