@@ -32,6 +32,9 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) の章末演習 §2B のうち 
 - **2B.3** (一般の有限群): 共役でない 2 つの involution `s, t` に対し、両方と可換で
   どちらとも異なる involution が存在する (`exists_involution_commuting_of_not_isConj`)。
   二面体群の構造定理は使わず、`s`, `t` が `st` を反転することだけから示す。
+- **2B.4** (一般の有限群): Sylow 2-部分群が 2 つ以上あり互いに自明交叉 (TI) なら、involution は
+  ちょうど 1 つの共役類をなす (`isConj_of_orderOf_eq_two_of_sylow_ti` +
+  `exists_orderOf_eq_two_of_exists_sylow_two_ne`)。2B.3 が核。
 -/
 
 namespace OddOrder.Isaacs.Ch02
@@ -487,6 +490,142 @@ theorem exists_involution_commuting_of_not_isConj [Finite G] {s t : G}
     have hq1 : q = 1 := hforce t htu h
     rw [hq1, pow_one, hudef] at h
     exact hs1 (by simpa using h)
+
+end
+
+section /- Problem 2B.4: TI Sylow 2-部分群と involution の共役類 (p. 57) -/
+
+variable {G : Type*} [Group G]
+
+/-- involution はある Sylow 2-部分群に属する (`⟨s⟩` は位数 2 の 2-群)。 -/
+theorem exists_sylow_two_mem [Finite G] {s : G} (hs : orderOf s = 2) :
+    ∃ P : Sylow 2 G, s ∈ P := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hpg : IsPGroup 2 (Subgroup.zpowers s) :=
+    IsPGroup.of_card (n := 1) (by rw [Nat.card_zpowers, hs, pow_one])
+  obtain ⟨P, hP⟩ := hpg.exists_le_sylow
+  exact ⟨P, hP (Subgroup.mem_zpowers s)⟩
+
+/-- **可換な 2 つの involution は共通の Sylow 2-部分群に属する**: `⟨s, z⟩` は生成元が可換ゆえ
+可換群で、生成元の 2 乗が `1` だから全元の 2 乗も `1` — すなわち 2-群。 -/
+theorem exists_sylow_two_mem_of_commute [Finite G] {s z : G}
+    (hs : orderOf s = 2) (hz : orderOf z = 2) (hcz : Commute s z) :
+    ∃ P : Sylow 2 G, s ∈ P ∧ z ∈ P := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hs2 : s * s = 1 := by rw [← sq]; exact hs ▸ pow_orderOf_eq_one s
+  have hz2 : z * z = 1 := by rw [← sq]; exact hz ▸ pow_orderOf_eq_one z
+  set k : Set G := {s, z} with hkdef
+  -- `k` の元は互いに可換 ⟹ `closure k` の元も互いに可換
+  have hkc : k ⊆ (Subgroup.centralizer k : Set G) := by
+    intro x hx
+    rw [SetLike.mem_coe, Subgroup.mem_centralizer_iff]
+    intro h hh
+    rcases hx with rfl | rfl <;> rcases hh with rfl | rfl
+    exacts [rfl, hcz.symm.eq, hcz.eq, rfl]
+  have h1 : Subgroup.closure k ≤ Subgroup.centralizer k := (Subgroup.closure_le _).mpr hkc
+  have h2 := Subgroup.closure_le_centralizer_centralizer k
+  have hcomm : ∀ x ∈ Subgroup.closure k, ∀ y ∈ Subgroup.closure k, x * y = y * x :=
+    fun x hx y hy => (Subgroup.mem_centralizer_iff.mp (h2 hx) y (h1 hy)).symm
+  -- 全元が 2 乗して `1`
+  have hsq : ∀ g ∈ Subgroup.closure k, g * g = 1 := by
+    intro g hg
+    induction hg using Subgroup.closure_induction with
+    | mem x hx => rcases hx with rfl | rfl; exacts [hs2, hz2]
+    | one => rw [mul_one]
+    | mul x y hx hy ihx ihy =>
+      calc x * y * (x * y) = x * (y * x) * y := by group
+        _ = x * (x * y) * y := by rw [hcomm y hy x hx]
+        _ = x * x * (y * y) := by group
+        _ = 1 := by rw [ihx, ihy, mul_one]
+    | inv x _ ih => rw [inv_eq_of_mul_eq_one_left ih]; exact ih
+  have hpg : IsPGroup 2 (Subgroup.closure k) := fun g => ⟨1, by
+    apply Subtype.ext
+    rw [Subgroup.coe_pow, Subgroup.coe_one, pow_one, sq]
+    exact hsq (g : G) g.2⟩
+  obtain ⟨P, hP⟩ := hpg.exists_le_sylow
+  exact ⟨P, hP (Subgroup.subset_closure (by simp [hkdef])),
+    hP (Subgroup.subset_closure (by simp [hkdef]))⟩
+
+/-- Sylow 2-部分群が互いに自明交叉 (TI) なら、involution を含む Sylow 2-部分群は一意。 -/
+theorem sylow_two_eq_of_ti [Finite G]
+    (hti : ∀ P Q : Sylow 2 G, P ≠ Q → (P : Subgroup G) ⊓ (Q : Subgroup G) = ⊥)
+    {s : G} (hs : orderOf s = 2) {P Q : Sylow 2 G} (hP : s ∈ P) (hQ : s ∈ Q) : P = Q := by
+  by_contra hne
+  have hmem : s ∈ (P : Subgroup G) ⊓ (Q : Subgroup G) := ⟨hP, hQ⟩
+  rw [hti P Q hne, Subgroup.mem_bot] at hmem
+  rw [hmem, orderOf_one] at hs
+  omega
+
+/-- 相異なる Sylow 2-部分群に属する involution は共役 (2B.4 の核)。
+
+対偶: 共役でなければ 2B.3 で両方と可換な involution `z` が取れ、`⟨s, z⟩` と `⟨t, z⟩` は
+それぞれ Sylow 2-部分群 `R`, `S` に入る。`z ≠ 1` が両方に属すので TI 仮定で `R = S`、
+さらに一意性で `P = R = S = Q` となって仮定に反する。 -/
+theorem isConj_of_sylow_two_ne [Finite G]
+    (hti : ∀ P Q : Sylow 2 G, P ≠ Q → (P : Subgroup G) ⊓ (Q : Subgroup G) = ⊥)
+    {a b : G} (ha : orderOf a = 2) (hb : orderOf b = 2) {P Q : Sylow 2 G}
+    (haP : a ∈ P) (hbQ : b ∈ Q) (hPQ : P ≠ Q) : IsConj a b := by
+  by_contra hnc
+  obtain ⟨z, hz, -, -, hca, hcb⟩ := exists_involution_commuting_of_not_isConj ha hb hnc
+  obtain ⟨R, haR, hzR⟩ := exists_sylow_two_mem_of_commute ha hz hca.symm
+  obtain ⟨S, hbS, hzS⟩ := exists_sylow_two_mem_of_commute hb hz hcb.symm
+  exact hPQ ((sylow_two_eq_of_ti hti ha haP haR).trans
+    ((sylow_two_eq_of_ti hti hz hzR hzS).trans (sylow_two_eq_of_ti hti hb hbS hbQ)))
+
+/-- **Isaacs Problem 2B.4**. `G` が 2 つ以上の Sylow 2-部分群をもち、相異なる Sylow 2-部分群が
+自明にしか交わらない (TI) ならば、`G` の involution は**ちょうど 1 つの共役類**をなす。
+
+`isConj_of_sylow_two_ne` で「相異なる Sylow 2-部分群の involution は共役」。同じ Sylow
+`P` に属する `s, t` については、`P` と異なる Sylow `Q` を取り (Sylow 2-部分群は 2 つ以上)、
+Sylow の共役性 `Q = g • P` から `Q` 内の involution `g s g⁻¹` を作って経由すればよい。 -/
+theorem isConj_of_orderOf_eq_two_of_sylow_ti [Finite G]
+    (hmany : ∃ P Q : Sylow 2 G, P ≠ Q)
+    (hti : ∀ P Q : Sylow 2 G, P ≠ Q → (P : Subgroup G) ⊓ (Q : Subgroup G) = ⊥)
+    {s t : G} (hs : orderOf s = 2) (ht : orderOf t = 2) : IsConj s t := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨Ps, hsP⟩ := exists_sylow_two_mem hs
+  obtain ⟨Pt, htP⟩ := exists_sylow_two_mem ht
+  by_cases hPQ : Ps = Pt
+  · -- 同じ Sylow に属する場合: 別の Sylow の involution を経由する
+    obtain ⟨P₁, P₂, hne⟩ := hmany
+    obtain ⟨Q, hQne⟩ : ∃ Q : Sylow 2 G, Q ≠ Ps := by
+      by_cases h : P₁ = Ps
+      · exact ⟨P₂, fun hc => hne (h.trans hc.symm)⟩
+      · exact ⟨P₁, h⟩
+    obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Ps Q
+    have hu : orderOf (g * s * g⁻¹) = 2 := by
+      rw [← hs]
+      exact orderOf_injective (MulAut.conj g).toMonoidHom (MulAut.conj g).injective s
+    have huQ : g * s * g⁻¹ ∈ (Q : Subgroup G) := by
+      rw [← hg, Sylow.coe_subgroup_smul]
+      exact Subgroup.smul_mem_pointwise_smul s (MulAut.conj g) _ hsP
+    exact (isConj_iff.mpr ⟨g, rfl⟩).trans
+      (isConj_of_sylow_two_ne hti ht hu htP huQ (hPQ ▸ fun hc => hQne hc.symm)).symm
+  · exact isConj_of_sylow_two_ne hti hs ht hsP htP hPQ
+
+/-- **Isaacs Problem 2B.4** (共役類が空でないこと). Sylow 2-部分群が 2 つ以上あれば involution は
+実在する — したがって 2B.4 の結論は「ちょうど 1 つの共役類」であって空ではない。
+
+`P ≠ Q` なら少なくとも一方の Sylow 2-部分群は `⊥` でなく、非自明な 2-群には Cauchy で
+位数 2 の元がある。 -/
+theorem exists_orderOf_eq_two_of_exists_sylow_two_ne [Finite G]
+    (hmany : ∃ P Q : Sylow 2 G, P ≠ Q) : ∃ s : G, orderOf s = 2 := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨P₁, P₂, hne⟩ := hmany
+  obtain ⟨P, hP⟩ : ∃ P : Sylow 2 G, (P : Subgroup G) ≠ ⊥ := by
+    by_contra h
+    push Not at h
+    exact hne (Sylow.ext ((h P₁).trans (h P₂).symm))
+  haveI : Nontrivial ↥(P : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hP
+  obtain ⟨n, hn⟩ := P.2.exists_card_eq
+  have hcard1 : 1 < Nat.card ↥(P : Subgroup G) := Finite.one_lt_card
+  have hdvd : 2 ∣ Nat.card ↥(P : Subgroup G) := by
+    rw [hn] at hcard1 ⊢
+    rcases n with _ | n
+    · simp at hcard1
+    · exact dvd_pow_self 2 (Nat.succ_ne_zero n)
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := ↥(P : Subgroup G)) 2 hdvd
+  exact ⟨(x : G), (Subgroup.orderOf_coe x).trans hx⟩
 
 end
 
