@@ -993,9 +993,15 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 **`Δ_{q^k} = Δ_q ∘ T_k`** (`shiftSubHom_pow_eq_comp`、`T_k = shiftSumHom q k` は
 群環の `1 + x + ⋯ + x^{k-1}`; 証明は `Finset.prod_range_div` の telescoping) も設置済で、
 これにより「生成元 `q` の `Δ` だけで `⁅A, U⁆` の全生成元が捉えられる」。
-⟹ 残る帰納段は **`⁅S.map inl, ⊤⁆ = (S.map (shiftSubHom q)).map inl`** の closure 計算
-(`Subgroup.commutator_le` で生成元ごとに上の 2 式を使う; `S` の shift 安定性が要る) と、
-`(1-x)` の冪零指数 `n(p-1)+1` の算術。
+**帰納段も設置済**: `commutator_map_inl_top_eq`
+(`S` が shift 安定 = `S.map (shiftHom q) ≤ S` なら
+`⁅S.map inl, ⊤⁆ = (S.map (shiftSubHom q)).map inl`)。
+補助は `shiftHom` (平行移動)・`shift_pow_mem_of_shift_stable`・
+`shiftSumHom_mem_of_shift_stable`。
+⟹ 残るのは (α) `lowerCentralSeries ⊤ (i+1) = (Δ^{i+1} ⊤).map inl` の帰納
+(基底は 4A.8(b) で `commutator P = ⁅A,U⁆ = ⁅range inl, ⊤⁆`、
+`Δ` と `shift` の可換性で shift 安定性が保存されることを使う) と、
+(β) `(1-x)` の冪零指数 `n(p-1)+1` の算術。
 
 **(ii) 残る算術 = `Δ = (1-x)` の冪零指数**。`ZMod(p^n)[x]/(x^p-1)` で
 `(1-x)^{n(p-1)+1} = 0` かつ `(1-x)^{n(p-1)} ≠ 0` ⟹ **`class(P) = n(p-1)+1`**。

@@ -707,6 +707,64 @@ theorem shiftSubHom_pow_eq_comp (q : Q) (k : ℕ) (f : Q → D) :
     _ = (∏ j ∈ Finset.range k, G j) * (∏ j ∈ Finset.range k, G (j + 1))⁻¹ := by
           rw [mul_inv_rev, inv_inv]
 
+/-- 座標の平行移動 `shift_q f = f ∘ (q⁻¹ · ·)` (群環の `x ·`). -/
+def shiftHom (q : Q) : (Q → D) →* (Q → D) where
+  toFun f := fun ω => f (q⁻¹ * ω)
+  map_one' := rfl
+  map_mul' _ _ := rfl
+
+@[simp]
+theorem shiftHom_apply (q : Q) (f : Q → D) (ω : Q) : shiftHom q f ω = f (q⁻¹ * ω) := rfl
+
+/-- shift 安定な部分群は `q` の冪の shift でも閉じている. -/
+theorem shift_pow_mem_of_shift_stable {S : Subgroup (Q → D)} {q : Q}
+    (hS : S.map (shiftHom q) ≤ S) :
+    ∀ (j : ℕ) (f : Q → D), f ∈ S → (fun ω => f ((q ^ j)⁻¹ * ω)) ∈ S := by
+  intro j
+  induction j with
+  | zero => intro f hf; simpa using hf
+  | succ j ih =>
+    intro f hf
+    have hstep : (fun ω => f ((q ^ (j + 1))⁻¹ * ω))
+        = shiftHom q (fun ω => f ((q ^ j)⁻¹ * ω)) := by
+      funext ω
+      change f ((q ^ (j + 1))⁻¹ * ω) = f ((q ^ j)⁻¹ * (q⁻¹ * ω))
+      congr 1
+      rw [← mul_assoc, pow_succ]
+      group
+    rw [hstep]
+    exact hS ⟨_, ih f hf, rfl⟩
+
+/-- 部分和 `T_k f` は shift 安定な部分群に留まる. -/
+theorem shiftSumHom_mem_of_shift_stable {S : Subgroup (Q → D)} {q : Q}
+    (hS : S.map (shiftHom q) ≤ S) (k : ℕ) {f : Q → D} (hf : f ∈ S) :
+    shiftSumHom q k f ∈ S := by
+  have hprod : shiftSumHom q k f
+      = ∏ j ∈ Finset.range k, (fun ω => f ((q ^ j)⁻¹ * ω)) := by
+    funext ω
+    rw [Finset.prod_apply]
+    rfl
+  rw [hprod]
+  exact Subgroup.prod_mem _ fun j _ => shift_pow_mem_of_shift_stable hS j f hf
+
+/-- **下降中心列の帰納段**: `S` が shift 安定なら `⁅S の像, ⊤⁆ = (Δ_q(S)) の像`.
+
+`⊆` は `⁅inl f, y⁆ = inl (Δ_{y.right} f)` と `Δ_{q^k} = Δ_q ∘ T_k`, `T_k f ∈ S`,
+`⊇` は `inl (Δ_q f) = ⁅inl f, inr q⁆`. -/
+theorem commutator_map_inl_top_eq {q : Q} (hq : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k)
+    {S : Subgroup (Q → D)} (hS : S.map (shiftHom q) ≤ S) :
+    ⁅S.map (inl : (Q → D) →* D ≀[Q] Q), (⊤ : Subgroup (D ≀[Q] Q))⁆
+      = (S.map (shiftSubHom q)).map inl := by
+  refine le_antisymm (Subgroup.commutator_le.2 ?_) ?_
+  · rintro _ ⟨f, hf, rfl⟩ y -
+    obtain ⟨k, hk⟩ := hq y.right
+    rw [commutatorElement_inl_eq_shiftSubHom, hk, shiftSubHom_pow_eq_comp]
+    exact ⟨shiftSubHom q (shiftSumHom q k f),
+      ⟨shiftSumHom q k f, shiftSumHom_mem_of_shift_stable hS k hf, rfl⟩, rfl⟩
+  · rintro _ ⟨_, ⟨f, hf, rfl⟩, rfl⟩
+    rw [← commutatorElement_inl_inr_eq_shiftSubHom]
+    exact Subgroup.commutator_mem_commutator ⟨f, hf, rfl⟩ (Subgroup.mem_top _)
+
 end
 
 end OddOrder.Isaacs.Ch04
