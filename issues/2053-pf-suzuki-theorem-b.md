@@ -1153,3 +1153,66 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
 (`|R₂ : LV| = 3`, `Z(LV) = Z₁Σ`, `Ω₁(LV) = Z₁ΣP`) は `L` が取れてからの群論で、
 `C_G(Z₁P) = RΣ` (landed) がそのまま使える。
 
+## ✅ step (15) 前半完了 + 非分裂トーラス infra (2026-07-25 深夜、main session)
+
+### landed
+**新 leaf `GroupTheory/SpecificGroups/ProjectiveSpecialLinear/NonsplitTorus.lean`**
+(5 段計画をそのまま実装、`OddOrder.lean` 配線済):
+- `normOneUnits` / `card_normOneUnits` : 二次拡大のノルム 1 単数群は位数 q+1
+  (mathlib `FiniteField.unitsMap_norm_surjective`)、`isCyclic_normOneUnits`
+- `normOneToSL` / `exists_isCyclic_card_eq_card_add_one` : `E¹ ↪ SL(2,F)`
+  (`Algebra.leftMulMatrix`、det = ノルム は `Algebra.norm_eq_matrix_det`)
+- `exists_isCyclic_card_specialLinearGroup_eq_card_add_one` : 任意の有限体で成立
+  ⚠ **二次拡大の存在は mathlib の `FiniteField.Extension k p n` がそのまま使えた**
+  (`finrank_extension`、Field/Finite/Algebra は derive 済) — 自前の ZMod/GaloisField
+  plumbing は不要だった
+- 位数 504 の群の generic 補題: `card_sylow_three_eq_nine` /
+  `card_dvd_nine_of_isPGroup_three` / **`exists_isCyclic_card_nine_mem`** /
+  `exists_isCyclic_card_nine_of_mulEquiv`
+- `pslMulEquivSL` (char 2 の `Z(SL₂) = ⊥` から) /
+  `exists_isCyclic_card_nine_projectiveSpecialLinearGroup`
+
+**新 leaf `FirstCase/StepFifteen.lean`**:
+- **`isCyclic_and_card_centralizer_inf_orderThreeGeneratedSubgroup`** :
+  `L := C_G(st) ⊓ ⟨Q₀,K,t⟩` は**位数 9 の巡回群** (書籍 (15) 冒頭)。
+  `V ≠ ⊥` → Lemma 4 の `exists_orderThreeGeneratedSubgroup_mulEquiv_psl2` →
+  `|F'| = |Q₀| = 2^p = 8` → `|⟨Q₀,K,t⟩| = 504` → トーラス転送 → `st` を含む
+  Sylow-3 `S` (巡回・位数 9) は可換ゆえ `S ≤ L`、逆に `L` は 3-群 ((13)) で
+  `|L| ∣ 9` ⟹ `L = S`
+
+### (15) の残りと必要な部品 (実測メモ)
+1. **`Z₁ ≤ L`** : `st ∈ L` かつ `L` 巡回位数 9 ⟹ `Z₁ = ⟨st⟩` は唯一の位数 3 部分群。
+2. **`L ⊆ R₁`** : 書籍は「`|LP : Z₁P| = 3` ⟹ `L` は `Z₁P` を正規化 ⟹
+   `C_G(Z₁P) = RΣ` を正規化 ⟹ `L ≤ N_G(RΣ)`」。`R₁` は
+   **`N_G(RΣ)` の 3-元が生成する部分群**として定義したので、
+   **`L ≤ N_G(RΣ)` さえ出れば `L ≤ R₁` は定義から即出る** (L の元は全て 3-元)。
+   - そのために要る鍵 = **`P` が `⟨Q₀,K,t⟩` を正規化する**
+     (⟹ `P` は `L = C_G(st) ⊓ ⟨Q₀,K,t⟩` を正規化。`P` が `st` を中心化するのは
+     `R` 可換から既出)。⚠ **repo に該当補題は grep で見つからない** ⟹ ここが次の主コスト。
+     出れば `LP` は位数 27 の群で `Z₁P` は指数 3 ⟹ 正規 ⟹ `L` が `Z₁P` を正規化。
+   - `C_G(Z₁P) = RΣ` は `centralizer_P_inf_centralizer_mul_t_eq_sup` として landed 済。
+3. `s` が `L` を反転 / `V` が `L` を正規化 / `W` が `L` を中心化・`P` は非中心化。
+4. 後半 (`|R₂ : LV| = 3`, `Z(LV) = Z₁Σ`, `Ω₁(LV) = Z₁ΣP`)。
+
+### (15) `L ⊆ R₁` の完全論法 (2026-07-25 導出、部品実在確認済)
+
+`P_le_normalizer_orderThreeGeneratedSubgroup` が landed したので、残りは次の連鎖:
+
+1. **`P` は `L` を正規化**: `P` は `⟨Q₀,K,t⟩` を正規化 (landed) かつ `st` を中心化
+   (`P ≤ R` 可換、`invImageF_mul_comm`) ⟹ `C_G(st)` を正規化 ⟹ 交わりを正規化。
+2. **`Z₁ ≤ L`**: `st ∈ L` から `zpowers_le`。
+3. **`L ⊓ P = ⊥`** — ここが唯一の非自明点。背理法: `L ⊓ P ≠ 1` なら `|P| = 3` 素より
+   `P ≤ L`。`Z₁ ≤ L` も位数 3 で `Z₁ ⊓ P = ⊥` (`zpowers_inf_P_eq_bot`, landed)。
+   ⟹ `Z₁ ⊔ P ≤ L` は位数 9 (`card_sup_eq_mul_of_commute`, StepFourteen) = `|L|`
+   ⟹ `L = Z₁ ⊔ P` ⟹ `L` の全元は 3 乗が 1 (`pow_eq_one_of_mem_sup_of_commute`,
+   StepFourteen)。しかし `L` は位数 9 の**巡回**群ゆえ位数 9 の元を持つ (矛盾)。
+   ⟹ **既存の generic 補題 2 本だけで閉じる (新規 infra 不要)**。
+4. **`LP` は位数 27、`Z₁P` は指数 3 ⟹ 正規** ⟹ `L` は `Z₁P` を正規化。
+   (`card_sup_eq_mul_of_commute` は可換性を要求するので、ここは
+   `Subgroup.card_mul_index` / `Subgroup.normal_of_index_eq_prime` 系を使う;
+   `P` が `L` を正規化するので `L ⊔ P` の位数は `|L|·|P|/|L ⊓ P|`。)
+5. `L` は `C_G(Z₁P) = RΣ` (`centralizer_P_inf_centralizer_mul_t_eq_sup`, landed) を
+   正規化 ⟹ `L ≤ N_G(RΣ)`。
+6. `L` の元は全て 3-元 (位数 9 の群) ⟹ **`R₁` の定義 (`N_G(RΣ)` の 3-元が生成) から
+   `L ≤ R₁` が即出る** (`sylowThreeNormalizerRSigma_def` + `Subgroup.subset_closure`)。
+

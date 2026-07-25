@@ -173,12 +173,12 @@ theorem card_sylow_three_eq_nine (hG : Nat.card G = 504) (T : Sylow 3 G) :
   rw [hk, hk2]
   norm_num
 
-/-- A `3`-subgroup of a group of order `504` has order dividing `9`. -/
-theorem card_dvd_nine_of_isPGroup_three (hG : Nat.card G = 504)
-    {H : Subgroup G} (hH : IsPGroup 3 ↥H) : Nat.card ↥H ∣ 9 := by
+omit [Finite G] in
+/-- A `3`-subgroup whose order divides `504 = 2³·3²·7` has order dividing `9`. -/
+theorem card_dvd_nine_of_isPGroup_three {H : Subgroup G} [Finite ↥H]
+    (hH : IsPGroup 3 ↥H) (hdvd : Nat.card ↥H ∣ 504) : Nat.card ↥H ∣ 9 := by
   haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp hH
-  have hdvd : Nat.card ↥H ∣ 504 := hG ▸ Subgroup.card_subgroup_dvd_card H
   rw [hk] at hdvd ⊢
   refine (Nat.Coprime.pow_left k
     (show Nat.Coprime 3 56 by norm_num)).dvd_of_dvd_mul_left ?_
