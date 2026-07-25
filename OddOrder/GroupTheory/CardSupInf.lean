@@ -53,4 +53,10 @@ theorem card_sup_eq_mul_of_disjoint_normal [Finite G] {H N : Subgroup G} [N.Norm
   rw [hdisj, Subgroup.card_bot, mul_one] at h
   exact h
 
+/-- `H ≤ K` なら `|H| ∣ |K|` (ラグランジュ)。 -/
+theorem card_dvd_card_of_le [Finite G] {H K : Subgroup G} (h : H ≤ K) :
+    Nat.card ↥H ∣ Nat.card ↥K := by
+  have hd := Subgroup.card_subgroup_dvd_card (H.subgroupOf K)
+  rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h).toEquiv] at hd
+
 end OddOrder.GroupTheory

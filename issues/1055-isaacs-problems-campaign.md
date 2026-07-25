@@ -1441,7 +1441,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.1 | ✅ | `not_dvd_card_commutator_of_inf_sylow_eq_bot` + `hasNormalPComplement_of_commutator_inf_sylow_eq_bot` (`Problems5C.lean`)。方針どおり **鍵の段を独立補題**にした (同一 statement の別証明を避ける) |
 | 5C.2 | ✅ 完了 (`card_eq_two_of_characteristic_relIndex_eq_two`) | PDF 確認済。`U ⊆ V ⊆ P ⊆ G`、`P` abelian Sylow-2、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
 | 5C.3 | ✅ 完了 (`sq_eq_one_of_card_sylow_two_eq_32`) | PDF 確認済: `G` 単純で abelian Sylow-2 `P` の位数が `2^5` ⇒ `P` は初等可換 |
-| 5C.4 | 🔨 存在部分 完了 (`exists_subgroup_card_eq_of_isZGroup`)、残り = 共役性 | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
+| 5C.4 | ✅ 完了 (`exists_subgroup_card_eq_of_isZGroup` + `exists_conj_of_card_eq_of_isZGroup`) | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
 | 5C.5 | ✅ | `exists_mem_normalizer_conj_eq_of_normal` + `eq_of_characteristic_of_conj` (`Problems5C.lean`) |
 | 5C.6 | 🔒 hub | weak closure。**hub レーンが `OddOrder/GroupTheory/WeaklyClosed.lean` で着手中** (issue 9503) — A レーンは触らない |
 | 5C.7 | ⬜ | `\|G\| = 3^a·5·11` ⇒ Sylow-3 が正規 |
@@ -1579,7 +1579,21 @@ instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbit
 新 shared infra = `exists_subgroup_card_eq_of_isCyclic` + `characteristic_of_isCyclic`
 (`CyclicSubgroupUniqueness.lean` へ追記) と `CardSupInf.lean` (issue 9209)。
 
-**残り (共役性) の設計**: 位数 `m` の部分群 `K₁, K₂` に対し
+✅ **共役性 landing (2026-07-26)** — ⭐ **商群 `G/M` を経由しない経路**に差し替えた。
+下記の当初設計 (step 3-5 で `G/M` を作る) は不要で、鍵は
+**`m₁ = |K ⊓ G'|` と `m₂ = f` が互いに素**であること (`m₁ ∣ |G'|`, `f ∣ |G:G'|`):
+
+* `K_i` 自身も Z-群なので**存在部分を再利用**して位数 `f` の部分群 `Q_i ≤ K_i` を取れる。
+* `gcd(f, |G'|) = 1` より `Q_i ⊓ G' = ⊥`、かつ `|Q_i| · |G'| = |L|` なので
+  `Q_i` は `↥L` の中で正規 Hall `G'` の**補群**。⟹ Schur–Zassenhaus 共役性を
+  `↥L` を ambient として直接適用できる (`Subgroup.IsComplement'.exists_conj_of_coprime`)。
+* `K_i = Q_i ⊔ (K_i ⊓ G')` で `K_i ⊓ G'` は `G` 正規なので共役で不変 ⟹ `K₁^n = K₂`。
+
+補助定理: `exists_index_factor` (`|K| = |K ⊓ G'| · f`, `|K ⊔ G'| = |G'| · f`, `f ∣ |G:G'|`) /
+`card_inf_commutator` / `inf_commutator_eq_of_card_eq` / `normal_inf_commutator` /
+`sup_commutator_eq_of_card_eq` / `card_map_mk'_mul_card` / `mem_normalizer_of_normal`。
+
+~~**残り (共役性) の設計**~~ (当初案、上記に置換): 位数 `m` の部分群 `K₁, K₂` に対し
 1. `|K_i ∩ G'| = m₁`: `d := |K_i ∩ G'|` は `m₁` を割り、`m/d ∣ |G:G'|` かつ `m₁/d ∣ |G'|` なので
    `m₁/d ∣ gcd(|G'|,|G:G'|) = 1`。
 2. `G'` 巡回 ⟹ 位数 `m₁` の部分群は一意 (`cyclic_subgroup_eq_of_card_eq`) ⟹
