@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.CentralCommutatorPower
+import OddOrder.GroupTheory.CentralProduct
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsSchurMultiplier
 
 /-!
@@ -28,8 +29,13 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 5A.8(b) (書籍 p. 153
 2. `Γ = Γ_A · Γ_B` (`exists_mem_ker_snd_mul_mem_ker_fst`)。
 3. ⭐ **`⁅Γ_A, Γ_B⁆ = ⊥`** (`commutator_ker_snd_ker_fst_eq_bot`) — ここが coprime を使う要。
 
-本ファイルは 1-3 を提供する。残り (`Γ' = ⁅Γ_A,Γ_A⁆ ⊔ ⁅Γ_B,Γ_B⁆`, `Z = Z_A Z_B`,
-`Z_A ⊓ Z_B = ⊥`, 商への降下) は issue 1055 の設計に従って続きを実装する。
+4. `Γ` は `Γ_A` と `Γ_B` の**中心積** (`isCentralProduct_top`) なので
+   `Γ' = ⁅Γ_A,Γ_A⁆ ⊔ ⁅Γ_B,Γ_B⁆` (`commutator_eq_sup`)。
+5. `Z = Z_A · Z_B` (`exists_mul_mem_inf_commutator`), ここで
+   `Z_A := Z ⊓ ⁅Γ_A,Γ_A⁆`, `Z_B := Z ⊓ ⁅Γ_B,Γ_B⁆`。
+
+本ファイルは 1-5 の前半を提供する。残り (`Z_A ⊓ Z_B = ⊥`, 商への降下) は
+issue 1055 の設計に従って続きを実装する。
 
 ## `⁅Γ_A, Γ_B⁆ = ⊥` の証明 (書籍の行間)
 
@@ -111,6 +117,77 @@ theorem commutator_ker_snd_ker_fst_eq_bot [Finite A] [Finite B] {h : Γ →* A �
     Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd (orderOf_dvd_of_pow_eq_one hpowA)
       (orderOf_dvd_of_pow_eq_one hpowB))
   exact orderOf_eq_one_iff.mp hone
+
+/-! ### ステップ 4: `Γ` は `Γ_A` と `Γ_B` の中心積 -/
+
+/-- `h` が全射で `ker h ≤ Z(Γ)`, `|A|`, `|B|` 互いに素なら, `Γ` は `Γ_A` と `Γ_B` の中心積。 -/
+theorem isCentralProduct_top [Finite A] [Finite B] {h : Γ →* A × B}
+    (hsurj : Function.Surjective h) (hker : h.ker ≤ Subgroup.center Γ)
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card B)) :
+    OddOrder.GroupTheory.IsCentralProduct (⊤ : Subgroup Γ)
+      ((MonoidHom.snd A B).comp h).ker ((MonoidHom.fst A B).comp h).ker where
+  sup_eq := by
+    refine (eq_top_iff.mpr fun γ _ => ?_).symm
+    obtain ⟨x, hx, y, hy, rfl⟩ := exists_mem_ker_snd_mul_mem_ker_fst hsurj γ
+    exact Subgroup.mul_mem_sup hx hy
+  commutator_eq_bot := commutator_ker_snd_ker_fst_eq_bot hker hcop
+
+/-- 部分群の自己交換子は自分自身に含まれる: `⁅H, H⁆ ≤ H`。 -/
+private theorem commutator_self_le {H : Subgroup Γ} : ⁅H, H⁆ ≤ H :=
+  Subgroup.commutator_le.mpr fun a ha b hb => by
+    rw [commutatorElement_def]
+    exact H.mul_mem (H.mul_mem (H.mul_mem ha hb) (H.inv_mem ha)) (H.inv_mem hb)
+
+/-- **ステップ 4**: `Γ' = ⁅Γ_A, Γ_A⁆ ⊔ ⁅Γ_B, Γ_B⁆`。 -/
+theorem commutator_eq_sup [Finite A] [Finite B] {h : Γ →* A × B}
+    (hsurj : Function.Surjective h) (hker : h.ker ≤ Subgroup.center Γ)
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card B)) :
+    _root_.commutator Γ =
+      ⁅((MonoidHom.snd A B).comp h).ker, ((MonoidHom.snd A B).comp h).ker⁆ ⊔
+        ⁅((MonoidHom.fst A B).comp h).ker, ((MonoidHom.fst A B).comp h).ker⁆ := by
+  rw [_root_.commutator_def]
+  exact (isCentralProduct_top hsurj hker hcop).commutator_self
+
+/-! ### ステップ 5 前半: `Z = Z_A · Z_B` -/
+
+/-- **ステップ 5 前半**: `Z := ker h` の各元は `Z ⊓ ⁅Γ_A,Γ_A⁆` の元と `Z ⊓ ⁅Γ_B,Γ_B⁆` の元の積。
+
+`Z ≤ Γ' = ⁅Γ_A,Γ_A⁆ ⊔ ⁅Γ_B,Γ_B⁆` で, この join もまた中心積なので `z = u · v` と分解できる。
+`u ∈ ⁅Γ_A,Γ_A⁆ ≤ Γ_A` と `z ∈ Z ≤ Γ_A` から `v = u⁻¹ z ∈ Γ_A ⊓ Γ_B = Z`, 対称に `u ∈ Z`。 -/
+theorem exists_mul_mem_inf_commutator [Finite A] [Finite B] {h : Γ →* A × B}
+    (hsurj : Function.Surjective h) (hst : IsStemExtension h)
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card B)) {z : Γ} (hz : z ∈ h.ker) :
+    ∃ u ∈ h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker, ((MonoidHom.snd A B).comp h).ker⁆,
+      ∃ v ∈ h.ker ⊓ ⁅((MonoidHom.fst A B).comp h).ker, ((MonoidHom.fst A B).comp h).ker⁆,
+        z = u * v := by
+  set ΓA := ((MonoidHom.snd A B).comp h).ker with hΓA
+  set ΓB := ((MonoidHom.fst A B).comp h).ker with hΓB
+  have hbot : ⁅ΓA, ΓB⁆ = ⊥ := commutator_ker_snd_ker_fst_eq_bot hst.ker_le_center hcop
+  -- `⁅ΓA,ΓA⁆ ⊔ ⁅ΓB,ΓB⁆` もまた中心積
+  have hsub : OddOrder.GroupTheory.IsCentralProduct (⁅ΓA, ΓA⁆ ⊔ ⁅ΓB, ΓB⁆) ⁅ΓA, ΓA⁆ ⁅ΓB, ΓB⁆ :=
+    ⟨rfl, le_bot_iff.mp
+      ((Subgroup.commutator_mono commutator_self_le commutator_self_le).trans hbot.le)⟩
+  have hzsup : z ∈ ⁅ΓA, ΓA⁆ ⊔ ⁅ΓB, ΓB⁆ := by
+    rw [← commutator_eq_sup hsurj hst.ker_le_center hcop]
+    exact hst.ker_le_commutator hz
+  obtain ⟨u, hu, v, hv, rfl⟩ := hsub.exists_mul hzsup
+  -- `Γ_A ⊓ Γ_B = ker h`
+  have hinf := inf_ker_snd_ker_fst h
+  have huA : u ∈ ΓA := commutator_self_le hu
+  have hvB : v ∈ ΓB := commutator_self_le hv
+  have hzA : u * v ∈ ΓA := (inf_ker_snd_ker_fst h ▸ hz : _ ∈ ΓA ⊓ ΓB).1
+  have hvA : v ∈ ΓA := by
+    have hvu : v = u⁻¹ * (u * v) := by group
+    rw [hvu]
+    exact ΓA.mul_mem (ΓA.inv_mem huA) hzA
+  have hvZ : v ∈ h.ker := by
+    rw [← hinf]
+    exact ⟨hvA, hvB⟩
+  have huZ : u ∈ h.ker := by
+    have : u = (u * v) * v⁻¹ := by group
+    rw [this]
+    exact h.ker.mul_mem hz (h.ker.inv_mem hvZ)
+  exact ⟨u, ⟨huZ, hu⟩, v, ⟨hvZ, hv⟩, rfl⟩
 
 end
 

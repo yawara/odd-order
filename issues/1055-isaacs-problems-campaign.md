@@ -1485,7 +1485,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5A.7 | ✅ | `card_ker_lt_relIndex_commutator` (同上)。書籍の `G/C` cyclic 仮定は `BC = G` + `B` cyclic から従うので導出に変更 |
 | 5A.6 | ✅ | `card_ker_dvd_two_of_dihedral` (上界) + `isStemExtension_dihedralReduce` (下界) — `ProblemsDihedralMultiplier.lean`。書籍の `2^n` 版より強い**偶数一般形**で証明 |
 | 5A.8(a) | ✅ | `isStemExtension_prodMap` + `card_ker_prodMap` (`ProblemsSchurMultiplier.lean`) |
-| 5A.8(b) | 🔨 ステップ 1-3 landing 済 | `ProblemsProductMultiplier.lean` に `inf_ker_snd_ker_fst` / `exists_mem_ker_snd_mul_mem_ker_fst` / ⭐`commutator_ker_snd_ker_fst_eq_bot`。残りはステップ 4-6 (下記設計)。準備補題 `not_dvd_card_commutator_of_sylow_le_center` (ステップ 5 用) も landing 済 |
+| 5A.8(b) | 🔨 ステップ 1-5 前半 landing 済 | `ProblemsProductMultiplier.lean` に `inf_ker_snd_ker_fst` / `exists_mem_ker_snd_mul_mem_ker_fst` / ⭐`commutator_ker_snd_ker_fst_eq_bot`。残りはステップ 4-6 (下記設計)。準備補題 `not_dvd_card_commutator_of_sylow_le_center` (ステップ 5 用) も landing 済 |
 
 ### 5A.8(b) の証明設計 (2026-07-26 確定、実装は次イテレーション)
 
@@ -1529,9 +1529,18 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
   取れる (`MonoidHom.snd_apply` という simp 補題は存在しない)。
 - ステップ 3 では `IsStemExtension` の全射性も交換子群条件も不要 — 仮説は
   `ker h ≤ Z(Γ)` と coprime だけ。
-- 次はステップ 4 (`Γ' = ⁅Γ_A,Γ_A⁆ ⊔ ⁅Γ_B,Γ_B⁆`)。`OddOrder/GroupTheory/CentralProduct.lean`
-  の `IsCentralProduct` (= `R = R₁ ⊔ R₂` かつ `⁅R₁,R₂⁆ = ⊥`) が**まさにこの状況の既存述語**
-  なので、そこに `commutator` 補題を足すのが筋。
+- **ステップ 4-5 前半も landing (2026-07-26)**。既存述語 `IsCentralProduct` に共通 API を追加:
+  `exists_mul` (中心積の元は `x·y` に分解; `closure_induction`)、`mulHom` (`R₁ × R₂ →* G`)、
+  `commutatorElement_mul_mul` (`⁅x₁y₁, x₂y₂⁆ = ⁅x₁,x₂⁆⁅y₁,y₂⁆`)、
+  `commutator_self` (`⁅R,R⁆ = ⁅R₁,R₁⁆ ⊔ ⁅R₂,R₂⁆`)。
+  ⭐ `commutatorElement_mul_mul` は **`mulHom` の `map_commutatorElement` の像そのもの**で、
+  積群の交換子が成分ごとであることも部分群 coe が積・逆元と可換であることも定義上等しいので
+  `exact hmap.symm` 一行で済む (手で語の並べ替えをする必要はない)。
+  ⚠ ただし `map_commutatorElement` の引数は**明示的に与える** (期待型からの推論に失敗する)。
+- 5A.8(b) 側では `isCentralProduct_top` / `commutator_eq_sup` / `exists_mul_mem_inf_commutator`。
+- **次はステップ 5 後半** (`Z_A ⊓ Z_B = ⊥`) — `p ∤ |A|` なら `|Γ_A| = |A||Z|` の Sylow-p は
+  `Z` の Sylow-p (中心的) なので `not_dvd_card_commutator_of_sylow_le_center` が効く、
+  という筋。その後ステップ 6 (`Γ_A/Z_B ↠ A` が stem extension)。
 
 ### ⚠ 5A.6 の書籍読解訂正 (2026-07-26)
 
