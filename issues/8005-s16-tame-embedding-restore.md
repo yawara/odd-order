@@ -69,3 +69,39 @@ Thm I / Thm II の statement が mmd L4526 / L4548 と faithful に一致 (tame-
 ユーザーが本 issue を含む pending 4 件 (0106/0131/2053/8005) の再着手を指示。
 pending の凍結/トリガー待ち/ユーザー判断待ちはいずれも解除 — main セッションが引き取る
 (3 レーンとも 2026-07-23 から停止中・未マージ 0 を確認済、territory 衝突なし)。
+
+## 📝 2026-07-25 実測再監査 + Thm I 側完了
+
+**状態 drift**: 本 issue と正本プラン (§12.3, 2026-06-15) は「Thm I/II は sorried、復元 =
+sorry-neutral な結論強化」を前提していたが、現在は **theoremI が実証明済み**
+(dichotomy 本体 = typeP_duality + typeP_pair_inf_eq + Prop 16.1 bridges)、
+**theoremII_tame_embedding も wrapper の 2 義務 (hPieceInv/hMaxUnique) が inline 消化済み**
+(hPieceInv = order-determination 経由、hMaxUnique =
+`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`)。
+⟹ 復元 = 「新句の実証明」に性質が変わった。
+
+**✅ Thm I 復元 完了 (commit `0c03444b8`)** — mmd L4526 (1)(2) を全て**実証明**で復元
+(sorry 追加ゼロ):
+- `W₁ ≠ ⊥ ∧ W₂ ≠ ⊥` (`kappaHall_ne_bot_of_isTypeP` 新設 — hKM 仮説は不要と判明し省略)
+- normalizer-V: `∀ nonempty W₀ ⊆ W∖W₁∖W₂, N_G(W₀) = W`。**§12.3 の想定より軽かった** —
+  ≤ は typeP_duality が返す Ẑ TI-性質 (従来 discard slot)、≥ は W cyclic→abelian の
+  pointwise 固定。W₀ は Set (mathlib 現行 `Subgroup.normalizer` は Set を直接取る)
+- `S = W₁ ⊔ S'`, `T = W₂ ⊔ T'`, `S'⊓W₁ = T'⊓W₂ = ⊥` (S'=[S,S], T'=[T,T]) —
+  Thm 14.7 part (h) の S 側 (discard slot) + Mstar 側 (typeP_duality 再適用)。
+  `sup_eq_and_inf_eq_bot_of_isComplement'_subgroupOf` 新設
+- (8.8) consumer 更新 = rcases に discard 4 slot 追加のみ (レーン停止中ゆえ
+  §12.3 の「(8.8) 同時更新」を clean に実施、shape-preserving folding 不要)
+
+**残 = Thm II (Tii)/(Tiii)**。実測に基づく再評価:
+- (Tii)(a)-(e) + (Tiii) は現在の theoremII (Ti + D⊆A(M) + conjunct-3) の**先にある
+  未形式化の本物の数学** (M_i family の構成 = D 上の N[x] の共役類代表系 + (a)-(e) の検証)。
+  plumbing ではない。
+- 統合先の候補 2 択: (i) 実証明 campaign (BG §16 深部、multi-session)、(ii) §12.3 の
+  encoding で statement-first endpoint (`theoremII_supporting_structure` 新設、sorried)。
+- ⚠ (e) の積構造 (`C_{H_i}(y)C_M(y)` — ⊔ は over-approx) と (Tiii) の
+  Frobenius kernel/complement モデル化は §12.3 自身が「Pf 消費形に合わせる」と留保。
+  Pf (8.12)/(8.13) の per-element 半分は BG §16 側に landing 済
+  (`existsUnique_maximal_centralizer_le_typeI_or_typeII`) だが、(Tii) family を消費する
+  Pf 側 statement は依然不在。encoding 確定にはこの consumer 形が最良の情報源。
+- 次アクション: (ii) statement-first を §12.3 encoding で書き、(e)/(Tiii) は
+  Set-積の honest 形を採る (⊔ over-approx は不可)。その後実証明 campaign を積む。
