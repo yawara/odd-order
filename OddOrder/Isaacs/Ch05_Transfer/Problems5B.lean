@@ -430,7 +430,107 @@ theorem exists_counts_lt {G : Type*} [Group G] (xs : Fin m → G) {n : ℕ} (hn 
             exact hκ4 i
         · simp only [List.map_cons, List.prod_cons, hκ3]
 
+/-- 単調増加なリストは重複度ベクトルで決まる。 -/
+theorem eq_of_count_eq {κ κ' : List (Fin m)} (h : κ.IsChain (· ≤ ·)) (h' : κ'.IsChain (· ≤ ·))
+    (hc : ∀ i, κ.count i = κ'.count i) : κ = κ' :=
+  List.Perm.eq_of_sortedLE (List.sortedLE_iff_isChain.mpr h) (List.sortedLE_iff_isChain.mpr h')
+    (List.perm_iff_count.mpr hc)
+
+/-- `xs` の像の元からなるリストは添字列で書ける。 -/
+theorem exists_index_list {G : Type*} [Group G] (xs : Fin m → G) :
+    ∀ {l : List G}, (∀ y ∈ l, y ∈ Set.range xs) → ∃ ι : List (Fin m), (ι.map xs).prod = l.prod := by
+  intro l
+  induction l with
+  | nil => exact fun _ => ⟨[], rfl⟩
+  | cons a t ih =>
+    intro hl
+    obtain ⟨i, hi⟩ := hl a (by simp)
+    obtain ⟨ι, hι⟩ := ih (fun y hy => hl y (List.mem_cons_of_mem _ hy))
+    exact ⟨i :: ι, by simp [hi, hι]⟩
+
 end Sort5B2
+
+/-- ⭐ **Isaacs Problem 5B.2** (添字形): `xs : Fin m → G` の像が共役で閉じ, 各 `xs i ^ n = 1`
+なら `|⟨range xs⟩| ≤ n ^ m`。
+
+**証明**: `⟨range xs⟩` の元は `xs` の元の積 (`x⁻¹ = x^{n-1}` なので逆元は不要;
+既存 `Dietzmann.exists_list_subset_prod_eq`)。添字列に直し, 隣接交換で単調増加に整列し
+(`Sort5B2.exists_chain'_map_prod_eq`), 各重複度を `n` 未満に落とす
+(`Sort5B2.exists_counts_lt`)。単調増加列は重複度ベクトルで決まる (`Sort5B2.eq_of_count_eq`)
+ので, そのような添字列は `Fin m → Fin n` に単射的に埋まり, 個数は `n^m` 以下。 -/
+theorem card_closure_range_le {G : Type*} [Group G] {m : ℕ} (xs : Fin m → G) {n : ℕ}
+    (hn : 0 < n) (hexp : ∀ i, xs i ^ n = 1)
+    (hconj : ∀ i j : Fin m, ∃ k : Fin m, (xs j)⁻¹ * xs i * xs j = xs k) :
+    Nat.card ↥(Subgroup.closure (Set.range xs)) ≤ n ^ m := by
+  classical
+  have hinj : Function.Injective
+      (fun κ : {κ : List (Fin m) // κ.IsChain (· ≤ ·) ∧ ∀ i, κ.count i < n} =>
+        (fun i => (⟨(κ : List (Fin m)).count i, κ.2.2 i⟩ : Fin n))) := by
+    intro κ κ' h
+    refine Subtype.ext (Sort5B2.eq_of_count_eq κ.2.1 κ'.2.1 fun i => ?_)
+    exact congrArg Fin.val (congrFun h i)
+  haveI : Finite {κ : List (Fin m) // κ.IsChain (· ≤ ·) ∧ ∀ i, κ.count i < n} :=
+    Finite.of_injective _ hinj
+  have hcardT : Nat.card {κ : List (Fin m) // κ.IsChain (· ≤ ·) ∧ ∀ i, κ.count i < n} ≤ n ^ m := by
+    calc Nat.card {κ : List (Fin m) // κ.IsChain (· ≤ ·) ∧ ∀ i, κ.count i < n}
+        ≤ Nat.card (Fin m → Fin n) := Nat.card_le_card_of_injective _ hinj
+      _ = n ^ m := by simp
+  have hmem : ∀ κ : {κ : List (Fin m) // κ.IsChain (· ≤ ·) ∧ ∀ i, κ.count i < n},
+      (((κ : List (Fin m)).map xs).prod) ∈ Subgroup.closure (Set.range xs) := by
+    intro κ
+    refine Subgroup.list_prod_mem _ fun y hy => ?_
+    obtain ⟨i, -, rfl⟩ := List.mem_map.mp hy
+    exact Subgroup.subset_closure ⟨i, rfl⟩
+  refine le_trans (Nat.card_le_card_of_surjective
+    (fun κ => (⟨_, hmem κ⟩ : ↥(Subgroup.closure (Set.range xs)))) ?_) hcardT
+  rintro ⟨g, hg⟩
+  have hexp' : ∀ x ∈ Set.range xs, x ^ n = 1 := by
+    rintro x ⟨i, rfl⟩
+    exact hexp i
+  have hg' : g ∈ Submonoid.closure (Set.range xs ∪ (Set.range xs)⁻¹) := by
+    rw [← Subgroup.closure_toSubmonoid]
+    exact hg
+  obtain ⟨l, hlmem, hlprod⟩ := Submonoid.exists_list_of_mem_closure hg'
+  simp only [Set.mem_union, Set.mem_inv] at hlmem
+  obtain ⟨l₁, hl₁X, hl₁prod⟩ := Dietzmann.exists_list_subset_prod_eq hn hexp' hlmem
+  obtain ⟨ι, hι⟩ := Sort5B2.exists_index_list xs hl₁X
+  obtain ⟨κ, hκchain, hκprod, -⟩ := Sort5B2.exists_chain'_map_prod_eq xs hconj ι
+  obtain ⟨κ', hκ'chain, hκ'cnt, -, hκ'prod⟩ :=
+    Sort5B2.exists_counts_lt xs hn hexp κ.length κ le_rfl hκchain
+  refine ⟨⟨κ', hκ'chain, hκ'cnt⟩, Subtype.ext ?_⟩
+  change (κ'.map xs).prod = g
+  rw [hκ'prod, hκprod, hι, hl₁prod, hlprod]
+
+
+/-- ⭐ **Isaacs Problem 5B.2** (書籍の形): Dietzmann (Thm 5.10) の状況で `|X| = m` なら
+`|⟨X⟩| ≤ n ^ m`。
+
+`X` の枚挙 `xs : Fin m → G` を取り `card_closure_range_le` を適用するだけ。 -/
+theorem card_closure_le_pow_card {G : Type*} [Group G] {X : Set G} (hfin : X.Finite)
+    (hconj : ∀ x ∈ X, ∀ g : G, g * x * g⁻¹ ∈ X) {n : ℕ} (hn : 0 < n)
+    (hexp : ∀ x ∈ X, x ^ n = 1) :
+    Nat.card ↥(Subgroup.closure X) ≤ n ^ hfin.toFinset.card := by
+  classical
+  set e : Fin hfin.toFinset.card ≃ ↥hfin.toFinset := hfin.toFinset.equivFin.symm with he
+  set xs : Fin hfin.toFinset.card → G := fun i => ((e i : G)) with hxs
+  have hrange : Set.range xs = X := by
+    ext y
+    constructor
+    · rintro ⟨i, rfl⟩
+      exact hfin.mem_toFinset.mp (e i).2
+    · intro hy
+      exact ⟨e.symm ⟨y, hfin.mem_toFinset.mpr hy⟩, by simp [hxs]⟩
+  have hexp' : ∀ i, xs i ^ n = 1 := fun i => hexp _ (by rw [← hrange]; exact ⟨i, rfl⟩)
+  have hconj' : ∀ i j, ∃ k, (xs j)⁻¹ * xs i * xs j = xs k := by
+    intro i j
+    have hmem : (xs j)⁻¹ * xs i * xs j ∈ X := by
+      have := hconj (xs i) (by rw [← hrange]; exact ⟨i, rfl⟩) (xs j)⁻¹
+      simpa using this
+    rw [← hrange] at hmem
+    obtain ⟨k, hk⟩ := hmem
+    exact ⟨k, hk.symm⟩
+  have := card_closure_range_le xs hn hexp' hconj'
+  rwa [hrange] at this
 
 end
 

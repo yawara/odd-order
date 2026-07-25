@@ -1437,7 +1437,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 問題 | 状態 | 実装 |
 |---|---|---|
 | 5B.1 | ✅ `exists_notMem_conj_mem_of_mem_commutator` | `P ∈ Syl_p(G)`, `g ∈ P` 位数 `p`, `g ∈ G'`, `g ∉ P'` ⇒ `g^t ∈ P` なる `t ∉ P` が存在。transfer-evaluation lemma (Thm 5.5 = mathlib `MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot`) を使う |
-| 5B.2 | 🔨 **書籍 hint に穴** (下記) | 収集補題 `Dietzmann.exists_pow_mul_prod_eq_notMem` は landing 済 |
+| 5B.2 | ✅ | `card_closure_le_pow_card` (書籍の形) / `card_closure_range_le` (添字形) — `Problems5B.lean` |
 | 5B.3 | ✅ | `exists_finite_normal_iff` (`Problems5B.lean`) + `normal_closure_of_conj_closed` |
 
 ### 5B.2: 正しい論法 (2026-07-26 に確定) — 隣接交換によるソート
@@ -1482,9 +1482,16 @@ Lean 用の具体的な減少測度は **`m` 進数値 `μ(ι) := ∑_p ι_p · 
 ⚠ `List.Chain'` は deprecated、`List.IsChain` を使う (`List.isChain_cons` /
 `isChain_nil` / `isChain_singleton`)。
 
-**残り**: ソート済添字列を `x₁^{a₁}⋯x_m^{a_m}` に読み替え、`(Fin m → Fin n)` からの
-全射で `Nat.card ⟨X⟩ ≤ n^m` (`Nat.card_le_card_of_surjective`)。指数は `x^n = 1` で
-`n` 未満に落とす。`⟨X⟩` の元が `X` の元の積であることは `x⁻¹ = x^(n-1)` から。
+**2026-07-26 に完成**。数え上げは**正規形の一意性**で回した:
+`eq_of_count_eq` (単調増加列は重複度ベクトルで決まる; `List.Perm.eq_of_sortedLE` +
+`List.sortedLE_iff_isChain` + `List.perm_iff_count` で 1 行) から
+`{κ // κ.IsChain (· ≤ ·) ∧ ∀ i, κ.count i < n} ↪ (Fin m → Fin n)` を作り、
+そこからの全射で `Nat.card ⟨X⟩ ≤ n^m` (`Nat.card_le_card_of_surjective`)。
+⭐ **重複度ベクトルから整列列を構成する必要はない** (単射だけで足りる) のが軽量化の要点。
+書籍の形 `card_closure_le_pow_card` は `Finset.equivFin` で枚挙を作って添字形に流すだけ。
+
+⚠ mathlib API: `List.eq_of_perm_of_sorted` は無い — `List.Perm.eq_of_sortedLE` +
+`List.sortedLE_iff_isChain` を使う。
 
 ⚠ **`S₃` は「因子がすべて `≤ n` の subnormal 列」では説明できない** (`|S₃| = 6 = 2·3` で
 `3 > 2`) ので、`n^m` は**衝突込みの数え上げ**でしか出ない。鎖による評価を試みても無駄。
