@@ -568,17 +568,25 @@ Ch.2 は全ファイル sorry-free。
 分割後: `ProblemsSemidihedral.lean` 588 行 / `Problems.lean` 801 行。宣言数 93 が一致すること
 を確認済。`OddOrder.lean` 配線も同 commit。
 
-### 3A.10 のメモ (次の frontier)
+### 3A.10 のメモ
 
-`G := Multiplicative (ZMod p) ≀[H] H` (正則 wreath product)、`A := base group` で全部出る:
-- `A` 正規 (`range_inl_eq_ker_rightHom`)、可換 (成分ごと)、`p`-群 (`|A| = p^|H|`)。
-- `G` は `A` 上分裂 (`inr` が切断)、`G/A ≅ H` (`rightHom` 全射・核 = `A`)。
-- **`A = C_G(A)`**: `x = ⟨f,h⟩` の base への共役は `inl b ↦ inl (b ∘ (h⁻¹ · ·))`
-  (base が可換なので `f` は効かない) ゆえ、中心化条件は `∀ b ω, b(h⁻¹ω) = b(ω)`。
-  `b` を `{1}` の指示関数に取ると `h = 1`、すなわち `x = inl f ∈ A` (3A.9(b) と同じ指示関数の技)。
-  ⚠ この共役公式の補題は今回書きかけて外した (`inl_left_mul_inr_right` に相当する
-  `WreathProduct` 版の分解補題が無いので、`WreathProduct.ext` + `mul_left`/`inv_left` で
-  直接計算する必要がある)。
+`G := Multiplicative (ZMod p) ≀[H] H` (正則 wreath product)、`A := base group` で全部出る。
+
+**landing 済 (2026-07-25)**: `conj_inl_of_comm` (`D` 可換なら任意の `x` による base 元の共役は
+座標置換のみ — `WreathProduct.ext` + `mul_left`/`inv_left` から直接計算) /
+`eq_inl_of_right_eq_one` / **`centralizer_range_inl_eq`** (= `A = C_G(A)`、指示関数の技)。
+
+**残り (束ね上げ)**:
+- `A` 正規: `range_inl_eq_ker_rightHom` + `MonoidHom.normal_ker`。
+- `A` 可換: 成分ごと (`Multiplicative (ZMod p)` は可換)。
+- `A` は `p`-群: 各元 `inl b` について `(inl b)^p = inl (b^p) = 1`
+  (`toAdd (x^p) = p • toAdd x = (p : ZMod p) * toAdd x = 0`、`ZMod.natCast_self`)。
+- 分裂: `rightHom_comp_inr` (`inr` が切断) + `range_inl_eq_ker_rightHom`。
+- `G/A ≅ H`: `QuotientGroup.quotientKerEquivOfSurjective rightHom rightHom_surjective`。
+
+⚠ 実装上の罠 (今回): `WreathProduct` の補題を `rw`/`congrArg` で使うとき、`Ω` が
+metavariable のままだと `MulAction ?m ?m` で instance 解決が詰まる。`conj_inl_of_comm hD x` の
+ように**引数を明示**するか、`rw [← map_mul]; congr 1` のように `inl` を露出させない形にする。
 
 ### 3A.6 の解析 (2026-07-25、deferred-hard として記録)
 
@@ -695,7 +703,7 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
 | 3A.7 | ⬜ `α ∈ Aut(G)`, `o(α)` の素因子が 2 個以下 ⟹ `⟨α⟩` は `G` 上に regular orbit をもつ |
 | 3A.8 | ✅ **完了** ((a)(b)(c) すべて) |
 | 3A.9 | ✅ **完了** ((a)(b)) |
-| 3A.10 | ⬜ 任意の有限群 `H` と素数 `p` に対し、正規可換 `p`-部分群 `A` で `G` が `A` 上分裂し `G/A ≅ H`, `A = C_G(A)` なる `G` が存在 |
+| 3A.10 | 核 ✅ (`centralizer_range_inl_eq` = `A = C_G(A)`) / まとめ ⬜ |
 
 - ⬜ **次: §3A 続き or §2A hard tail 再訪。§1D 残り = 1D.5 (Isaacs-noted-hardest)。**
 
@@ -738,4 +746,6 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 (CLAUDE.md のファイル粒度規約: 3A.1/3A.2 の semidihedral・一般化四元数クラスタ (~550 行) を
 別 leaf へ出すのが自然)。
 さらに **§3A leaf 分割 ✅ / 3A.9(b) ✅ (3A.9 完了)**。
-**次 frontier = 3A.10** (メモは §3A 節) → 3A.6 / 3A.7 に戻る → §3B〜。
+さらに **3A.10 の核 ✅** (`A = C_G(A)`)。
+**次 frontier = 3A.10 の束ね上げ** (正規/可換/`p`-群/分裂/`G/A ≅ H`; メモは §3A 節) →
+3A.6 / 3A.7 に戻る → §3B〜。
