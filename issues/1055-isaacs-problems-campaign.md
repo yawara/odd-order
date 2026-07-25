@@ -824,6 +824,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | 4A.5 | ✅ | (a) `index_centralizer_eq_of_not_mem_center` / (b) `card_closure_pair_eq` / (c) `index_centralizer_closure_pair_eq` / (d) `map_center_centralizer_eq_center` + `isExtraspecial_centralizer_closure_pair` / (e) `exists_index_center_eq_prime_pow_two_mul` (新 leaf `ProblemsExtraspecial.lean`) |
 | 4A.6 | ✅ | `IsMaximalClassPGroup` (定義) / `exists_eq_lowerCentralSeries_of_isMaximalClass` (+ 一意性 `eq_of_normal_of_card_eq_of_isMaximalClass`、新 leaf `ProblemsMaximalClass.lean`) |
 | 4A.7 | ✅ | `exists_orderOf_eq_and_forall_orderOf_dvd` (+ 冪公式 `pow_mk` / 上界 `pow_prime_pow_succ_eq_one`、新 leaf `ProblemsWreath.lean`) |
+| 4A.8(a) | ✅ | `mem_center_iff_exists_const` / `center_eq_inf_centralizer_range_inr` (`ProblemsWreath.lean`) |
 | 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 同値形 `frattini_eq_center_of_commutator_eq_center` + 橋 `isExtraspecial_of_commutator_eq_center`) |
 
 - **4A.1** (`G = AB`, `A`,`B` abelian ⟹ `G' = ⁅A,B⁆`): `⁅A,B⁆` の正規性は既存の
@@ -903,7 +904,15 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   `prod_range_card_eq_prod_univ` (生成元の冪で捻った積 = 群全体の積; `Finset.prod_image` +
   `pow_injOn_Iio_orderOf`) を使い、証人 `x = ⟨δ₁ c, q⟩` に対し `x^p = ⟨const c, 1⟩` (位数 `p^n`)。
 
-### 残り (文書順): 4A.8 (4A.7 の P の (a)-(d)) / 4A.9 / 4A.10 / 4A.11。
+- **4A.8(a)** (`Z(P) = C_A(U)` = 定数 tuple 全体): §3A の既存部品がほぼそのまま効く —
+  `centralizer_range_inl_eq` (`C_W(base) = base`) で中心の元が base に入り、
+  `forall_conj_inr_eq_iff_const` (`inr` との可換性 ⟺ 軌道上定数) で定数性が出る。
+  逆向きは定数 tuple が base とも `inr q` とも可換という直接計算。
+
+### 残り (文書順): **4A.8(b)-(d)** (次の frontier: (b) `⁅A,U⁆ = P'` = 成分積 1 の tuple —
+`P = A·U` で `A`,`U` 可換ゆえ **4A.1** が `P' = ⁅A,U⁆` を与え、あとは
+`⁅inl g, inr q⁆ = inl (g · (g∘shift)⁻¹)` と δ-分解 `f = ∏ₓ δₓ(f x)` で augmentation kernel
+との一致を示す; (c) `|Z(P'U)| = p`; (d) maximal class) / 4A.9 / 4A.10 / 4A.11。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
 

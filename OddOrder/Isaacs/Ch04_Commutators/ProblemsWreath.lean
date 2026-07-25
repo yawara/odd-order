@@ -179,6 +179,61 @@ theorem exists_orderOf_eq_and_forall_orderOf_dvd [Finite D] [Finite Q]
     exact hnotdvd (by rw [hkeq]; exact pow_dvd_pow p (by omega))
   rw [hkeq, this]
 
+/-! ### Problem 4A.8(a) — `Z(P) = C_A(U)` = 定数 tuple -/
+
+/-- 任意の元は `inl` 成分と `inr` 成分の積. -/
+theorem eq_inl_mul_inr (x : D ≀[Q] Q) : x = inl x.left * inr x.right := by
+  ext ω
+  · change x.left ω = (x.left * fun ω => (1 : Q → D) ((1 : Q)⁻¹ • ω)) ω
+    simp
+  · change x.right = 1 * x.right
+    rw [one_mul]
+
+/-- **Isaacs Problem 4A.8(a)** (書籍 p. 124): 正則 wreath product `P = A ⋊ U` の中心は
+「全成分が等しい tuple」全体, すなわち `Z(P) = C_A(U)`.
+
+`⊇`: 定数 tuple は base とも (base が可換ゆえ) `inr q` とも (共役が成分の置換だけゆえ) 可換.
+`⊆`: 中心の元は base を中心化するので `C_W(base) = base` (§3A `centralizer_range_inl_eq`) より
+base に入り, さらに `inr` と可換なので §3A `forall_conj_inr_eq_iff_const` で定数. -/
+theorem mem_center_iff_exists_const [Nontrivial D] (x : D ≀[Q] Q) :
+    x ∈ Subgroup.center (D ≀[Q] Q) ↔ ∃ d : D, x = inl (Function.const Q d) := by
+  constructor
+  · intro hx
+    -- base を中心化 ⟹ base の元
+    have hbase : x ∈ (inl : (Q → D) →* D ≀[Q] Q).range := by
+      rw [← centralizer_range_inl_eq (Q := Q) (fun a b => mul_comm a b)]
+      exact Subgroup.center_le_centralizer _ hx
+    obtain ⟨f, rfl⟩ := hbase
+    -- `inr` と可換 ⟹ 定数
+    have hconst : ∀ ω ω' : Q, f ω = f ω' := by
+      refine (forall_conj_inr_eq_iff_const (D := D) (Q := Q) (Ω := Q) f).mp fun q => ?_
+      have hq := Subgroup.mem_center_iff.mp hx (inr q)
+      calc (inr q : D ≀[Q] Q) * inl f * (inr q)⁻¹ = inl f * inr q * (inr q)⁻¹ := by rw [hq]
+        _ = inl f := by group
+    exact ⟨f 1, congrArg inl (funext fun ω => hconst ω 1)⟩
+  · rintro ⟨d, rfl⟩
+    refine Subgroup.mem_center_iff.mpr fun y => ?_
+    ext ω
+    · change (y.left * fun ω => Function.const Q d (y.right⁻¹ • ω)) ω
+        = (Function.const Q d * fun ω => y.left ((1 : Q)⁻¹ • ω)) ω
+      simp [mul_comm]
+    · change y.right * 1 = 1 * y.right
+      rw [one_mul, mul_one]
+
+/-- **Isaacs Problem 4A.8(a)** (等式形): `Z(P) = A ⊓ C_P(U) = C_A(U)`. -/
+theorem center_eq_inf_centralizer_range_inr [Nontrivial D] :
+    Subgroup.center (D ≀[Q] Q)
+      = (inl : (Q → D) →* D ≀[Q] Q).range
+        ⊓ Subgroup.centralizer ((inr : Q →* D ≀[Q] Q).range : Set (D ≀[Q] Q)) := by
+  ext x
+  rw [Subgroup.mem_inf, mem_center_iff_exists_const]
+  constructor
+  · rintro ⟨d, rfl⟩
+    exact ⟨⟨_, rfl⟩, (mem_centralizer_range_inr_iff (D := D) (Q := Q) (Ω := Q) _).mpr ⟨d, rfl⟩⟩
+  · rintro ⟨⟨f, rfl⟩, hcent⟩
+    obtain ⟨d, hd⟩ := (mem_centralizer_range_inr_iff (D := D) (Q := Q) (Ω := Q) f).mp hcent
+    exact ⟨d, congrArg inl hd⟩
+
 end
 
 end OddOrder.Isaacs.Ch04
