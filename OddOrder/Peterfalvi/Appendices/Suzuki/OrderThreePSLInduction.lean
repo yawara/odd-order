@@ -555,6 +555,35 @@ noncomputable def orderThreeHypothesisOfAction
       exact hEsq (x : G) hx
 
 
+include hyp in
+/-- **`|⟨Q₀, K, t⟩| = |Q₀|·|K|·(|Q₀| + 1)`** (Ch. I §3, the group of Lemma 4).
+
+The Bruhat subgroup `L` carries a faithful doubly transitive action on its
+own orbit satisfying the standing hypothesis with `Q = Q₀` and `D = K`, so the
+order formula `|G| = |Q|·|D|·(|Q| + 1)` of Prop 1(c) applies to it.  (In the
+First Case this reads `|L| = 8·7·9 = 504 = |PSL(2,8)|`.) -/
+theorem card_orderThreeGeneratedSubgroup
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3) :
+    Nat.card ↥L
+      = Nat.card ↥hyp.Q0 * Nat.card ↥hyp.K * (Nat.card ↥hyp.Q0 + 1) := by
+  have hBruhat : (L : Set G) = hyp.orderThreeBruhatSet := by
+    rw [hyp.orderThreeGeneratedSubgroup_eq_bruhatSubgroup hst]
+    exact hyp.coe_orderThreeBruhatSubgroup hst
+  have hTwo : IsMultiplyPretransitive L hyp.OrderThreeOrbit 2 :=
+    hyp.orderThree_isMultiplyPretransitive_two hBruhat
+  have hFaithful : FaithfulSMul L hyp.OrderThreeOrbit :=
+    hyp.orderThree_faithfulSMul hBruhat
+  have hcardQ : Nat.card ↥(hyp.Q0.subgroupOf L) = Nat.card ↥hyp.Q0 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.orderThree_Q0_le).toEquiv
+  have hcardD : Nat.card ↥(hyp.K.subgroupOf L) = Nat.card ↥hyp.K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.orderThree_K_le).toEquiv
+  have h := (hyp.orderThreeHypothesisOfAction hBruhat hTwo hFaithful).card_G_eq
+  rw [show (hyp.orderThreeHypothesisOfAction hBruhat hTwo hFaithful).Q
+      = hyp.Q0.subgroupOf L from rfl,
+    show (hyp.orderThreeHypothesisOfAction hBruhat hTwo hFaithful).D
+      = hyp.K.subgroupOf L from rfl, hcardQ, hcardD] at h
+  exact h
+
 /-- An involution belongs to every normal subgroup of odd index. -/
 lemma mem_subgroup_of_sq_eq_one_of_odd_index
     {A : Type*} [Group A] [Finite A] (R : Subgroup A)
