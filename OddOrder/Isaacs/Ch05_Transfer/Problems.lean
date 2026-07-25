@@ -292,4 +292,96 @@ theorem isComplement_mul_of_transversal_left {G : Type*} [Group G] {H K : Subgro
         _ = (s : G)⁻¹ * (k : G) := by rw [hkeq, hs'val]
 
 
+/-! ### 5A.3(c)(d) 用: 商の分解 -/
+
+/-- `H ≤ K` と `G` 内の `K` の左 transversal `T` から作る全単射
+`G ⧸ H ≃ (G ⧸ K) × (↥K ⧸ H.subgroupOf K)`。
+
+`⟦g⟧_H ↦ (⟦g⟧_K, ⟦τ(⟦g⟧_K)⁻¹ · g⟧)` (`τ` は `T` の代表元取り)。逆は `(q, ⟦k⟧) ↦ ⟦τ(q) · k⟧`。
+
+⚠ mathlib に同等物は無い (`quotientEquivProdOfLE` 不在を確認済)。
+transfer の推移律 (5A.3(d)) で `∏_{G ⧸ H}` を `∏_{G ⧸ K} ∏_{K ⧸ H'}` に分解するのに使う。 -/
+noncomputable def quotientEquivProd {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) : G ⧸ H ≃ (G ⧸ K) × (↥K ⧸ H.subgroupOf K) where
+  toFun q := Quotient.liftOn' q
+    (fun g => (QuotientGroup.mk g,
+      QuotientGroup.mk ⟨(T.2.leftQuotientEquiv (QuotientGroup.mk g) : G)⁻¹ * g,
+        Subgroup.IsComplement.inv_toLeftFun_mul_mem T.2 g⟩))
+    (by
+      intro a b hab
+      have hH : a⁻¹ * b ∈ H := QuotientGroup.leftRel_apply.mp hab
+      have hK : (QuotientGroup.mk a : G ⧸ K) = QuotientGroup.mk b :=
+        QuotientGroup.eq.mpr (hHK hH)
+      refine Prod.ext hK ?_
+      refine QuotientGroup.eq.mpr ?_
+      rw [Subgroup.mem_subgroupOf]
+      simp only [Subgroup.coe_mul, Subgroup.coe_inv, hK]
+      have hgrp : ((T.2.leftQuotientEquiv (QuotientGroup.mk b) : G)⁻¹ * a)⁻¹ *
+          ((T.2.leftQuotientEquiv (QuotientGroup.mk b) : G)⁻¹ * b) = a⁻¹ * b := by group
+      rw [hgrp]
+      exact hH)
+  invFun p := Quotient.liftOn' p.2
+    (fun k => (QuotientGroup.mk ((T.2.leftQuotientEquiv p.1 : G) * (k : G)) : G ⧸ H))
+    (by
+      intro a b hab
+      have hH : (a : G)⁻¹ * (b : G) ∈ H := by
+        have hab' := QuotientGroup.leftRel_apply.mp hab
+        rw [Subgroup.mem_subgroupOf] at hab'
+        simpa using hab'
+      refine QuotientGroup.eq.mpr ?_
+      have hgrp : ((T.2.leftQuotientEquiv p.1 : G) * (a : G))⁻¹ *
+          ((T.2.leftQuotientEquiv p.1 : G) * (b : G)) = (a : G)⁻¹ * (b : G) := by group
+      rw [hgrp]
+      exact hH)
+  left_inv q := by
+    induction q using QuotientGroup.induction_on with
+    | H g =>
+      refine QuotientGroup.eq.mpr ?_
+      change ((T.2.leftQuotientEquiv (QuotientGroup.mk g) : G) *
+          ((T.2.leftQuotientEquiv (QuotientGroup.mk g) : G)⁻¹ * g))⁻¹ * g ∈ H
+      have hgrp : ((T.2.leftQuotientEquiv (QuotientGroup.mk g) : G) *
+          ((T.2.leftQuotientEquiv (QuotientGroup.mk g) : G)⁻¹ * g))⁻¹ * g = 1 := by group
+      rw [hgrp]
+      exact H.one_mem
+  right_inv p := by
+    obtain ⟨q, r⟩ := p
+    induction r using QuotientGroup.induction_on with
+    | H k =>
+      have hmk : (QuotientGroup.mk ((T.2.leftQuotientEquiv q : G) * (k : G)) : G ⧸ K) = q := by
+        have h1 : (QuotientGroup.mk ((T.2.leftQuotientEquiv q : G) * (k : G)) : G ⧸ K)
+            = QuotientGroup.mk (T.2.leftQuotientEquiv q : G) := by
+          refine (QuotientGroup.eq.mpr ?_).symm
+          have hgrp : ((T.2.leftQuotientEquiv q : G))⁻¹ *
+              ((T.2.leftQuotientEquiv q : G) * (k : G)) = (k : G) := by group
+          rw [hgrp]
+          exact k.2
+        rw [h1]
+        exact Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv T.2 q
+      refine Prod.ext hmk ?_
+      refine QuotientGroup.eq.mpr ?_
+      rw [Subgroup.mem_subgroupOf]
+      simp only [Subgroup.coe_mul, Subgroup.coe_inv, hmk]
+      have hgrp : ((T.2.leftQuotientEquiv q : G)⁻¹ *
+          ((T.2.leftQuotientEquiv q : G) * (k : G)))⁻¹ * (k : G) = 1 := by group
+      rw [hgrp]
+      exact H.one_mem
+
+/-- `quotientEquivProd` の逆写像の計算則。 -/
+theorem quotientEquivProd_symm_apply {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (q : G ⧸ K) (k : ↥K) :
+    (quotientEquivProd hHK T).symm (q, QuotientGroup.mk k)
+      = QuotientGroup.mk ((T.2.leftQuotientEquiv q : G) * (k : G)) := rfl
+
+/-- `quotientEquivProd` の第 1 成分は `G ⧸ K` への自然な射影。 -/
+theorem quotientEquivProd_apply_fst {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (g : G) :
+    ((quotientEquivProd hHK T) (QuotientGroup.mk g)).1 = QuotientGroup.mk g := rfl
+
+/-- `quotientEquivProd` の第 2 成分の計算則。 -/
+theorem quotientEquivProd_apply_snd {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (g : G) :
+    ((quotientEquivProd hHK T) (QuotientGroup.mk g)).2 =
+      QuotientGroup.mk ⟨(T.2.leftQuotientEquiv (QuotientGroup.mk g) : G)⁻¹ * g,
+        Subgroup.IsComplement.inv_toLeftFun_mul_mem T.2 g⟩ := rfl
+
 end OddOrder.Isaacs.Ch05

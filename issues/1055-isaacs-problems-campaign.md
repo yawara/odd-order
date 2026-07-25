@@ -1467,10 +1467,20 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 `transfer_{K≤G} (transfer_{(H.subgroupOf K)≤K} ϕ') = transfer_{H≤G} ϕ`
 (`ϕ' = ϕ ∘ (Subgroup.subgroupOfEquivOfLe hHK)`)。
 ⚠ **mathlib に transfer の推移律は無い** (`Mathlib/GroupTheory/Transfer.lean` を grep 済)。
-残作業: (i) `T * S` を `H.LeftTransversal` として束ねる、(ii) `diff ϕ (TS) (g • TS)` を
-`G ⧸ H ≃ (G ⧸ K) × (K ⧸ H.subgroupOf K)` に沿った二重積に分解する
-(⚠ mathlib に `quotientEquivProdOfLE` は無いので transversal 経由で作る)、
-(iii) 内側の積が `transfer_{H'≤K} ϕ'` の値に一致することを見る。
+**(ii) の Equiv は landing 済 (2026-07-26)**: `quotientEquivProd hHK T :
+G ⧸ H ≃ (G ⧸ K) × (↥K ⧸ H.subgroupOf K)` (`⟦g⟧_H ↦ (⟦g⟧_K, ⟦τ(⟦g⟧_K)⁻¹ g⟧)`)。
+⭐ **`T * S` を Set として作らなくてよい**のが要点 — 分解 Equiv は `T` だけで決まり、
+`S` は不要。計算則 `quotientEquivProd_symm_apply` / `_apply_fst` / `_apply_snd` はすべて `rfl`。
+⚠ `left_inv` は `Quotient.liftOn'` の beta/iota 簡約が `rw` に効かないので `change` で
+明示的に落とす必要がある。
+
+残作業: (i) `∏_{G ⧸ H}` を `quotientEquivProd` で `∏_{G ⧸ K} ∏_{K ⧸ H'}` に書き換える
+(`Equiv.prod_comp` + `Fintype.prod_prod_type`)、(ii) `T * S` を `H.LeftTransversal` として
+束ね (`isComplement_mul_of_transversal_left` から)、その `leftQuotientEquiv` が
+`(q, r) ↦ τ q * σ r` になることを見る、(iii) 内側の積が
+`diff_{H'≤K} ϕ' S (m_q • S) = transfer_{H'≤K} ϕ' m_q` (`m_q = (τ(g•q))⁻¹ g τ q ∈ K`) に
+一致することを見て、外側が `diff_K (transfer ϕ') T (g•T) = transfer_K (transfer ϕ') g` に
+なることを確認する。
 
 ### 5A.2 の設計 (2026-07-26 に確定、**実装済** `transfer_top_eq_apply`)
 
