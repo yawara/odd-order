@@ -129,8 +129,20 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   `|S_a(G)|≡|Fix_G|`・`|S_a(P)|≡|Fix_P|`、`Fix_G ≃ Fix_P` を `D↦D.subgroupOf P` で全単射
   (`conj_smul_subgroupOf` で正規性移送、`map_subgroupOf_eq_of_le`/`comap_map_eq_self_of_injective`
   で往復、`subgroupOfEquivOfLe` で位数保存)。**🎉 §1C の一般 Sylow 問題 (1C.6/1C.7/1C.8) 全完了**。
-- ⏸ **§1C 残り = 1C.4 / 1C.5 のみ** (上記「後回し」、重い/特殊)。次は **§1D** に進む
-  (1C.4/1C.5 は §1D 以降の合間に再訪)。
+- ✅ 実証明 **1C.4** (2026-07-25 解凍後 1 発目、新 leaf `Ch01_Sylow/ProblemsOrder120.lean` ~420 行):
+  `exists_subgroup_index_eq_three_or_five_of_card_onetwenty` (|G|=120 ⟹ 指数 3 か 5 の部分群)。
+  n₂∈{1,3,5,15}: 3/5 は `Sylow.card_eq_index_normalizer`、1 は P⊔F 位数 40、**15 は Thm 1.16**
+  (`card_sylow_modEq_one_of_max_inter`、repo Basic.lean) で交わり最大対の relIndex d∣14 ∧ d∣8 ∧ d≠1
+  ⟹ d=2 ⟹ |S∩T|=4、指数 2 ⟹ 正規 (`normal_of_index_eq_two`) ⟹ S,T ≤ N:=N_G(S∩T)、
+  |N|∈{24,40,120}。120 case は S∩T◁G → G/(S∩T) 位数 30 → **補題** (位数 30 群は指数 3 or 5
+  部分群を持つ: n₅=6∧n₃=10 は計数矛盾 24+20>29 → 正規 Sylow5/3 ⊔ Sylow2) → `comap` 引き戻し
+  (`index_comap_of_surjective`)。再利用 helper: `card_sup_of_normal_of_coprime` (正規×coprime join
+  の位数積) / `exists_finset_orderOf_eq_card_sylow_mul` (素数位数 Sylow 非単位元 = n_q(q−1) 個) /
+  `card_sylow_mul_add_card_sylow_mul_le` (2 素数計数 ≤ |G|−1)。全実証明・axiom-clean。
+  ⚠ 教訓: `set` の let 変数は補題適用時に値へ展開され omega が別 atom 視 → `rw [← hDdef]` で
+  畳み直す / minimal import では `norm_num` の `Nat.Prime` 拡張が無い → `Mathlib.Tactic.NormNum.Prime`
+  を明示 import / `Finset.card_sdiff` は現 mathlib で仮定無し形 (`card_sdiff_of_subset` を使う)。
+- ⏸ **§1C 残り = 1C.5 のみ** (A_{p+1} の Sylow 正規化群、対称群 cycle-type 計数、次に再訪)。
 - ⏸ **後回し (重い/特殊、後で戻る)**: **1C.4** (\|G\|=120 index 3 or 5)。n_2∈{1,3,5} は清潔
   (正規化群 index or 商 order 15)、但し **n_2=15 の場合が構造的に重い** (S_5 型、index-5 部分群 S_4 の
   存在は列挙でなく構造 — 計数だけでは矛盾を出せないことを確認済)。**1C.5** (A_{p+1} で
