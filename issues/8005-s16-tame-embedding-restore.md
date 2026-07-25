@@ -61,3 +61,11 @@ Thm I / Thm II の statement が mmd L4526 / L4548 と faithful に一致 (tame-
 本 issue は **trigger-gated task で trigger 未発火のまま** (Pf 側に tame-embedding 構造を
 消費する補題は依然出現していない; BG 側 frontier は凍結)。open に置く意味が無いため
 `issues/pending/` へ移動 — trigger (Pf consumer 出現) 発火時に再 activate。
+
+---
+
+## 🔓 2026-07-25 再活性化 (ユーザー指示)
+
+ユーザーが本 issue を含む pending 4 件 (0106/0131/2053/8005) の再着手を指示。
+pending の凍結/トリガー待ち/ユーザー判断待ちはいずれも解除 — main セッションが引き取る
+(3 レーンとも 2026-07-23 から停止中・未マージ 0 を確認済、territory 衝突なし)。

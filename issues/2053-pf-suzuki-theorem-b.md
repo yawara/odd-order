@@ -478,3 +478,11 @@ Pf II Ch.II Theorem B campaign (lane b の現 frontier) はユーザー裁定で
 凍結時点の実状態 = StepOne〜StepTen まで leaf 存在・`FirstCase/**` 実 sorry 0
 (checklist は「残 (9) p=f」表記のまま遅行 — 解凍時に実測で再同期すること)。
 Theorem B 最終 assembly の有無も解凍時に確認。lane b の次 frontier は hub 裁定で再割当。
+
+---
+
+## 🔓 2026-07-25 再活性化 (ユーザー指示)
+
+ユーザーが本 issue を含む pending 4 件 (0106/0131/2053/8005) の再着手を指示。
+pending の凍結/トリガー待ち/ユーザー判断待ちはいずれも解除 — main セッションが引き取る
+(3 レーンとも 2026-07-23 から停止中・未マージ 0 を確認済、territory 衝突なし)。

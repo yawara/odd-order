@@ -214,3 +214,11 @@ ScheduleWakeup を呼ばず turn 終了」。CLAUDE.md の「/loop self-pacing 6
   (unsupervised レーンへの介入は不可能)。
 - 残る恒久対策 (再開プロンプト定型化 / wakeup 忘れの自動 nudge = harness/運用側の変更) は
   **ユーザー判断待ち** → pending へ。stall 再発時は本 issue に事例を追記する。
+
+---
+
+## 🔓 2026-07-25 再活性化 (ユーザー指示)
+
+ユーザーが本 issue を含む pending 4 件 (0106/0131/2053/8005) の再着手を指示。
+pending の凍結/トリガー待ち/ユーザー判断待ちはいずれも解除 — main セッションが引き取る
+(3 レーンとも 2026-07-23 から停止中・未マージ 0 を確認済、territory 衝突なし)。

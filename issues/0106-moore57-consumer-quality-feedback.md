@@ -205,3 +205,11 @@ moore57 側の pin bump と消費検証も完了した。即時 work order は�
 トリガーとする queue であり、現 FT path からは要求されていない。
 したがって source-of-truth を `issues/pending/` へ移し、FT または
 moore57 consumer の trigger 発火時に再 activate する。
+
+---
+
+## 🔓 2026-07-25 再活性化 (ユーザー指示)
+
+ユーザーが本 issue を含む pending 4 件 (0106/0131/2053/8005) の再着手を指示。
+pending の凍結/トリガー待ち/ユーザー判断待ちはいずれも解除 — main セッションが引き取る
+(3 レーンとも 2026-07-23 から停止中・未マージ 0 を確認済、territory 衝突なし)。
