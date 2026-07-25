@@ -775,8 +775,14 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **3A.7 ✅** ⟹ **§3A は 3A.6 のみ残り** (deferred-hard)。
 さらに **3B.1 ✅ / 3B.2 ✅ / 3B.3 ✅** (新 leaf `Ch03_SplitExtensions/Problems3B.lean`)。
 さらに **3B.4 ✅ / 3B.5 ✅**。
-**次 frontier = (1) `Problems3B.lean` (1300 行) の prefix-split → (2) 3A.6 再訪 →
-(3) Ch.4 以降の章末演習の実測確認と文書順の続行**。
+**次 frontier = (1) 3A.6 再訪 (1 iteration 時間箱) → (2) Isaacs Ch.4 §4A から文書順**。
+
+⚠ **実測 (2026-07-25)**: `Problem NX.Y` docstring を Ch.4-Ch.10 で grep すると **0 件** —
+**Ch.4 以降の章末演習は 1 問も形式化されていない**。Ch.1-Ch.3 (+ Ch.2 全問, §3A/§3B) が
+済んだので、campaign の残りは Ch.4 以降が主戦場。
+
+prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolvability.lean`
+(3B.1-3B.3, 239 行) + `Problems3B.lean` (3B.4-3B.15, 1093 行)。
 
 3B.15 (Berkovich) の証明: 最小指数の `H` は極大。極小正規 `N` について `N ≤ H` なら
 `G ⧸ N` へ落として帰納法。`N ≰ H` なら `G = N ⋊ H` で `N` への `H` の共役作用を見る —
