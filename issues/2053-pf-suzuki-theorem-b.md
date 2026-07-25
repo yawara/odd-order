@@ -609,3 +609,11 @@ preimage、step (7) の N = P 使用)。主張:
   残り部品: N_G(P) ⊊ N_G(R) (Sylow 成長、engine の部品再利用) / orbit-stabilizer /
   m = 1 / N_G(R)/R への App II Prop 1 再実例化 / Isaacs Cor 10.2 bridge
   (transfer range → G/O^p 同型、issue 本文 (12) 注記) / (B2) 矛盾で (10.1) 否定。
+- step (12) 続き (`52bce6ebc`/`8c1cba24f`): 𝒜 上界 (⟨x₀·t⟩ 生成) + N_G(P) ⊊ N_G(R)
+  (case 10.1) + p∤|Q̄| helper。**次 = orbit-stabilizer**: N_G(R)-共役軌道 orbit(P) の
+  |orbit| = [N_G(R) : N_G(P)] (stab = N_G(P): N_G(P) ≤ N_G(R) は landing 済の hle 部分) と、
+  |orbit| = p^m の挟み撃ち (上界 = 𝒜↪T 全射性; 下界 = C_Q(P)-自由軌道
+  eq_P_of_prime_order_conj_invariant + |C_Q(P)| = p^m−1)。mathlib の
+  MulAction.orbitEquivQuotientStabilizer を Subgroup-conj 作用
+  (MulAut.conj • : G ↷ Subgroup G の restriction) で使う。その後 m = 1 →
+  |G|_p = p³ → App II Prop 1 再実例化 (N_G(R)/R) → Cor 10.2 bridge → (B2) 矛盾。
