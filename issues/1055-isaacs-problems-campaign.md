@@ -1442,9 +1442,14 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | # | 状態 | Lean 名 / メモ |
 |---|---|---|
 | 5A.1 | ✅ | `transfer_id_eq_pow_index_of_commGroup` / `coe_transfer_id_of_commGroup` |
+
+⚠ **余域を `↥H` に取る版は避ける**: `H ≤ Z(G)` の一般形で `CommGroup ↥H` を statement 内
+`letI` で供給すると, その instance の `toGroup` が `Subgroup.toGroup` と構文的に一致せず
+`MonoidHom.id ↥H` の型が合わない (diamond)。**一般の `ϕ : ↥H →* A` 版で述べる**のが正解
+(Isaacs の `v : G → H/H'` はまさにこの形)。
 | 5A.2 | ⬜ | `v : G → G/G'` は自然な射影 (= `H = ⊤` の場合)。`transfer_eq_pow` は使えない (key 仮説が偽) ので `diff` の定義を展開する必要あり |
 | 5A.3 | ⬜ | 推移律 (transversal の積 `ST`、pretransfer の合成)。mathlib は `diff` 経由の定義なので要検討 |
-| 5A.4 | ⬜ | `H ≤ Z(G)`, `|G:H| = n`: (a) `v(h) = h^n` (mathlib `transfer_center_eq_pow` と同型の議論)、(b) `(|H|, n) = 1` ⟹ `G = H × ker v`。⚠ 一般の `H ≤ Z(G)` では `CommGroup ↥H` が instance で来ないので statement 内 `letI` が要る (repo の `quotient_isMulCommutative_of_commutator_le` と同じ手) |
+| 5A.4 | ✅ | (a) `transfer_eq_pow_index_of_le_center` / (b) `inf_ker_transfer_eq_bot_of_le_center` + `sup_ker_transfer_eq_top_of_le_center` (+ `normal_of_le_center`) |
 | 5A.5–5A.8 | ⬜ | **Schur 乗数 `M(G)`** が要る (5A.5 巡回-by-巡回 / 5A.6 二面体群 / 5A.7 / 5A.8 直積)。repo の Schur 乗数まわりの資産を先に実測すること |
 
 ## Ch.4 §4D (書籍 p. 145 の Problems 4D) — 進行中 (2026-07-25)
