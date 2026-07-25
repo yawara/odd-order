@@ -644,6 +644,40 @@ theorem P_le_normalizer_sup_nonsplitTorus_W
   rwa [h4] at h3
 
 include model in
+/-- **`⁅LW, P⁆ ≤ Z₁Σ`** ((15), p. 114; also the engine of (16)): for `a ∈ LW` and
+`q ∈ P` the element `a⁻¹·a^q` lies in `Z₁Σ = Ω₁(LW)`.
+
+Its cube is `a⁻³·(a³)^q = 1`, because `a³ ∈ C_{LW}(P) = Z₁Σ` is centralized by `q`. -/
+theorem inv_mul_conj_mem_zpowers_sup_sigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {a q : G}
+    (ha : a ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W) (hq : q ∈ fc.P) :
+    a⁻¹ * (q * a * q⁻¹) ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  have hZScen : (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+      ≤ Subgroup.centralizer (fc.P : Set G) :=
+    sup_le (fc.zpowers_st_le_centralizer_P model ind hB2) inf_le_right
+  have hσa : q * a * q⁻¹ ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W := by
+    have hn := fc.P_le_normalizer_sup_nonsplitTorus_W model ind hB2 hq
+    rw [Subgroup.mem_set_normalizer_iff] at hn
+    exact (hn a).mp ha
+  have hdLW : a⁻¹ * (q * a * q⁻¹) ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W :=
+    Subgroup.mul_mem _ (Subgroup.inv_mem _ ha) hσa
+  have hcommd : Commute a⁻¹ (q * a * q⁻¹) :=
+    fc.mul_comm_of_mem_sup_nonsplitTorus_W model ind hB2 (Subgroup.inv_mem _ ha) hσa
+  have hfixa3 : q * a ^ 3 * q⁻¹ = a ^ 3 := by
+    have hmem3 := fc.pow_three_mem_zpowers_sup_sigma model ind hB2 ha
+    have hc := Subgroup.mem_centralizer_iff.mp (hZScen hmem3) q hq
+    rw [hc]; group
+  have hd3 : (a⁻¹ * (q * a * q⁻¹)) ^ 3 = 1 := by
+    rw [hcommd.mul_pow, inv_pow, conj_pow, hfixa3, inv_mul_cancel]
+  exact (fc.pow_three_eq_one_iff_mem_zpowers_sup_sigma model ind hB2 hdLW).mp hd3
+
+include model in
 /-- **`Ω₁(LV) = Z₁ΣP`** ((15), p. 114).
 
 Write `x = aq` with `a ∈ LW` and `q ∈ P`.  The commutator `d = a⁻¹·a^q` lies in `LW`
@@ -693,19 +727,12 @@ theorem pow_three_eq_one_iff_mem_zpowers_sup_sigma_sup_P
     set d : G := a⁻¹ * (q * a * q⁻¹) with hd_def
     have hdLW : d ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W :=
       Subgroup.mul_mem _ (Subgroup.inv_mem _ haLW) hσa
-    have hcommd : Commute a⁻¹ (q * a * q⁻¹) :=
-      fc.mul_comm_of_mem_sup_nonsplitTorus_W model ind hB2
-        (Subgroup.inv_mem _ haLW) hσa
-    have hfixa3 : q * a ^ 3 * q⁻¹ = a ^ 3 := by
-      have hmem3 := fc.pow_three_mem_zpowers_sup_sigma model ind hB2 haLW
-      have hc := Subgroup.mem_centralizer_iff.mp (hZScen hmem3) q hqP
-      rw [hc]; group
-    have hd3 : d ^ 3 = 1 := by
-      rw [hd_def, hcommd.mul_pow, inv_pow, conj_pow, hfixa3, inv_mul_cancel]
     have hdZS : d ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t)
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) :=
-      (fc.pow_three_eq_one_iff_mem_zpowers_sup_sigma model ind hB2 hdLW).mp hd3
+      fc.inv_mul_conj_mem_zpowers_sup_sigma model ind hB2 haLW hqP
+    have hd3 : d ^ 3 = 1 :=
+      fc.pow_three_eq_one_of_mem_zpowers_sup_sigma model ind hB2 hdZS
     have hdfix : q * d * q⁻¹ = d := by
       have hc := Subgroup.mem_centralizer_iff.mp (hZScen hdZS) q hqP
       rw [hc]; group
