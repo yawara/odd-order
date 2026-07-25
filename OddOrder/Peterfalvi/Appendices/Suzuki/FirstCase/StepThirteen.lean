@@ -643,4 +643,56 @@ theorem exists_ncard_invertedBy_eq_three_pow
 
 end Hypothesis
 
+namespace FirstCaseHypothesis
+
+universe uG uΩ
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (fc : FirstCaseHypothesis G Ω)
+
+include fc in
+/-- **`|V| = |P|·|W|`** (step (1), `V = W ⋊ P`): the decomposition
+`v = g·(g⁻¹v)` with `g ∈ P`, `g⁻¹v ∈ W` makes `(g, w) ↦ g·w` a surjection
+`P × W → V`, and `P ⊓ W = 1` makes it injective. -/
+theorem card_V_eq_card_P_mul_card_W :
+    Nat.card ↥fc.toHypothesis.V
+      = Nat.card ↥fc.P * Nat.card ↥fc.toHypothesis.W := by
+  classical
+  -- the multiplication map `P × W → V`
+  have hmem : ∀ z : ↥fc.P × ↥fc.toHypothesis.W,
+      (z.1 : G) * (z.2 : G) ∈ fc.toHypothesis.V := by
+    rintro ⟨⟨g, hg⟩, ⟨w, hw⟩⟩
+    exact mul_mem (fc.P_le_V hg) (fc.toHypothesis.W_le_V hw)
+  set f : ↥fc.P × ↥fc.toHypothesis.W → ↥fc.toHypothesis.V := fun z =>
+    ⟨(z.1 : G) * (z.2 : G), hmem z⟩ with hf_def
+  have hinj : Function.Injective f := by
+    rintro ⟨⟨g₁, hg₁⟩, ⟨w₁, hw₁⟩⟩ ⟨⟨g₂, hg₂⟩, ⟨w₂, hw₂⟩⟩ heq
+    have h1 : g₁ * w₁ = g₂ * w₂ := congrArg Subtype.val heq
+    have h2 : g₂⁻¹ * g₁ = w₂ * w₁⁻¹ := by
+      have h3 : g₂⁻¹ * (g₁ * w₁) = g₂⁻¹ * (g₂ * w₂) := by rw [h1]
+      rw [← mul_assoc, ← mul_assoc, inv_mul_cancel, one_mul] at h3
+      have h4 : (g₂⁻¹ * g₁ * w₁) * w₁⁻¹ = w₂ * w₁⁻¹ := by rw [h3]
+      rwa [mul_assoc, mul_inv_cancel, mul_one] at h4
+    have hbot : g₂⁻¹ * g₁ ∈ fc.P ⊓ fc.toHypothesis.W := by
+      refine ⟨mul_mem (Subgroup.inv_mem _ hg₂) hg₁, ?_⟩
+      rw [h2]
+      exact mul_mem hw₂ (Subgroup.inv_mem _ hw₁)
+    rw [fc.P_inf_W_eq_bot, Subgroup.mem_bot, inv_mul_eq_one] at hbot
+    subst hbot
+    have hww : w₁ = w₂ := mul_left_cancel h1
+    subst hww
+    rfl
+  have hsurj : Function.Surjective f := by
+    rintro ⟨v, hv⟩
+    obtain ⟨g, hg, hw⟩ := fc.exists_decomp_of_mem_V hv
+    refine ⟨⟨⟨g, hg⟩, ⟨g⁻¹ * v, hw⟩⟩, ?_⟩
+    refine Subtype.ext ?_
+    change g * (g⁻¹ * v) = v
+    group
+  have hbij : Function.Bijective f := ⟨hinj, hsurj⟩
+  rw [← Nat.card_prod]
+  exact (Nat.card_congr (Equiv.ofBijective f hbij)).symm
+
+end FirstCaseHypothesis
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
