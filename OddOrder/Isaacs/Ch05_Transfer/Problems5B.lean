@@ -327,6 +327,109 @@ theorem exists_chain'_map_prod_eq {G : Type*} [Group G] (xs : Fin m → G)
       obtain ⟨κ, hκ1, hκ2, hκ3⟩ := ih _ (hM ▸ hdec) (pre ++ j :: k :: post) rfl
       exact ⟨κ, hκ1, hκ2.trans hprod, hκ3.trans hlen⟩
 
+/-- 単調増加なリストで, 先頭 `a` が最小かつ `a` の重複度が `k` 以上なら,
+先頭 `k` 個はすべて `a`。 -/
+theorem take_eq_replicate_of_isChain :
+    ∀ (l : List (Fin m)) (a : Fin m) (k : ℕ), l.IsChain (· ≤ ·) → (∀ y ∈ l, a ≤ y) →
+      k ≤ l.count a → l.take k = List.replicate k a := by
+  intro l
+  induction l with
+  | nil => intro a k _ _ hk; simp at hk; simp [hk]
+  | cons b t ih =>
+    intro a k hchain hmin hk
+    cases k with
+    | zero => simp
+    | succ k' =>
+      have hba : a ≤ b := hmin b (by simp)
+      by_cases hab : b = a
+      · subst hab
+        have hchain' : t.IsChain (· ≤ ·) := (List.isChain_cons.mp hchain).2
+        have hmin' : ∀ y ∈ t, b ≤ y := fun y hy => hmin y (List.mem_cons_of_mem _ hy)
+        have hk' : k' ≤ t.count b := by
+          rw [List.count_cons_self] at hk
+          omega
+        rw [List.take_succ_cons, ih b k' hchain' hmin' hk', List.replicate_succ]
+      · exfalso
+        have hzero : t.count a = 0 := by
+          refine List.count_eq_zero_of_not_mem fun hmem => ?_
+          have hbt : b ≤ a := by
+            have hchain' := List.isChain_cons.mp hchain
+            exact List.rel_of_pairwise_cons (List.isChain_iff_pairwise.mp hchain) hmem
+          exact hab (le_antisymm hbt hba)
+        rw [List.count_cons_of_ne (Ne.symm (fun h => hab h.symm)), hzero] at hk
+        omega
+
+/-- ⭐ 単調増加な添字列は, 積を保ったまま各添字の重複度を `n` 未満にできる。 -/
+theorem exists_counts_lt {G : Type*} [Group G] (xs : Fin m → G) {n : ℕ} (hn : 0 < n)
+    (hexp : ∀ i : Fin m, xs i ^ n = 1) :
+    ∀ (N : ℕ) (κ : List (Fin m)), κ.length ≤ N → κ.IsChain (· ≤ ·) →
+      ∃ κ' : List (Fin m), κ'.IsChain (· ≤ ·) ∧ (∀ i, κ'.count i < n) ∧
+        (∀ i, κ'.count i ≤ κ.count i) ∧ (κ'.map xs).prod = (κ.map xs).prod := by
+  intro N
+  induction N with
+  | zero =>
+    intro κ hlen _
+    have : κ = [] := List.eq_nil_of_length_eq_zero (by omega)
+    subst this
+    exact ⟨[], List.isChain_nil, fun i => by simpa using hn, fun i => by simp, rfl⟩
+  | succ N ih =>
+    intro κ hlen hchain
+    cases κ with
+    | nil => exact ⟨[], List.isChain_nil, fun i => by simpa using hn, fun i => by simp, rfl⟩
+    | cons a t =>
+      by_cases hcnt : n ≤ (a :: t).count a
+      · -- 先頭 `n` 個はすべて `a`; 落としても積は変わらない
+        have hmin : ∀ y ∈ a :: t, a ≤ y := by
+          intro y hy
+          rcases List.mem_cons.mp hy with rfl | hy
+          · exact le_rfl
+          · exact List.rel_of_pairwise_cons (List.isChain_iff_pairwise.mp hchain) hy
+        have htake := take_eq_replicate_of_isChain (a :: t) a n hchain hmin hcnt
+        have hsplit : (a :: t) = List.replicate n a ++ (a :: t).drop n := by
+          conv_lhs => rw [← List.take_append_drop n (a :: t)]
+          rw [htake]
+        have hdroplen : ((a :: t).drop n).length ≤ N := by
+          have hd : ((a :: t).drop n).length = (a :: t).length - n := List.length_drop
+          simp only [List.length_cons] at hd hlen ⊢
+          omega
+        have hdropchain : ((a :: t).drop n).IsChain (· ≤ ·) := hchain.drop n
+        obtain ⟨κ', hκ1, hκ2, hκ4, hκ3⟩ := ih _ hdroplen hdropchain
+        refine ⟨κ', hκ1, hκ2, fun i => (hκ4 i).trans
+          ((List.drop_sublist n (a :: t)).count_le i), ?_⟩
+        rw [hκ3]
+        conv_rhs => rw [hsplit]
+        simp only [List.map_append, List.prod_append, List.map_replicate, List.prod_replicate,
+          hexp, one_mul]
+      · -- 先頭を残して残りを再帰
+        have hchain' : t.IsChain (· ≤ ·) := (List.isChain_cons.mp hchain).2
+        obtain ⟨κ', hκ1, hκ2, hκ4, hκ3⟩ :=
+          ih t (by simp only [List.length_cons] at hlen; omega) hchain'
+        have hcnt' : (a :: t).count a < n := by omega
+        refine ⟨a :: κ', ?_, ?_, ?_, ?_⟩
+        · refine List.isChain_cons.mpr ⟨?_, hκ1⟩
+          intro y hy
+          have hyκ : y ∈ κ' := List.mem_of_mem_head? hy
+          have hyt : y ∈ t := by
+            have h1 : 0 < κ'.count y := List.count_pos_iff.mpr hyκ
+            have h2 : 0 < t.count y := lt_of_lt_of_le h1 (hκ4 y)
+            exact List.count_pos_iff.mp h2
+          exact List.rel_of_pairwise_cons (List.isChain_iff_pairwise.mp hchain) hyt
+        · intro i
+          rcases eq_or_ne i a with rfl | hia
+          · rw [List.count_cons_self]
+            rw [List.count_cons_self] at hcnt'
+            have := hκ4 i
+            omega
+          · rw [List.count_cons_of_ne (Ne.symm hia)]
+            exact hκ2 i
+        · intro i
+          rcases eq_or_ne i a with rfl | hia
+          · rw [List.count_cons_self, List.count_cons_self]
+            exact Nat.succ_le_succ (hκ4 i)
+          · rw [List.count_cons_of_ne (Ne.symm hia), List.count_cons_of_ne (Ne.symm hia)]
+            exact hκ4 i
+        · simp only [List.map_cons, List.prod_cons, hκ3]
+
 end Sort5B2
 
 end
