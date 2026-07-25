@@ -199,6 +199,32 @@ theorem card_centralizer_mul_t_eq
   rwa [hyp.centralizer_mul_t_inf_centralizer_eq_V] at hkey
 
 include hyp in
+/-- An element of `J = {x ∈ C_G(st) | sxs = x⁻¹}` which is not an involution
+is strongly real: `x = s·(sx)` with `(sx)² = (sxs)x = x⁻¹x = 1`. -/
+lemma isStronglyReal_of_mem_invertedBy_centralizer {x : G}
+    (hxJ : x ∈ invertedBy (Subgroup.centralizer
+      ({hyp.distinguishedInvolution * hyp.t} : Set G))
+      hyp.distinguishedInvolution)
+    (hx2 : x ^ 2 ≠ 1) : IsStronglyReal x := by
+  set s := hyp.distinguishedInvolution with hs_def
+  have hs2 : s * s = 1 := by rw [← sq]; exact hyp.distinguishedInvolution_sq
+  have hv2 : (s * x) ^ 2 = 1 := by
+    rw [sq]
+    calc (s * x) * (s * x) = (s * x * s) * x := by group
+      _ = x⁻¹ * x := by rw [hxJ.2]
+      _ = 1 := inv_mul_cancel x
+  have hv1 : s * x ≠ 1 := by
+    intro h
+    have hxs : x = s := by
+      have h1 : s * (s * x) = s * 1 := by rw [h]
+      rw [← mul_assoc, hs2, one_mul, mul_one] at h1
+      exact h1
+    rw [hxs] at hx2
+    exact hx2 hyp.distinguishedInvolution_sq
+  exact ⟨s, ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_ne_one⟩,
+    s * x, ⟨hv2, hv1⟩, by rw [← mul_assoc, hs2, one_mul]⟩
+
+include hyp in
 /-- **Step (13)** (p. 113): every prime `r` dividing `|J|` occurs as the order
 of an element `u·t` with `u ∈ Q₀#`.
 
@@ -237,22 +263,8 @@ theorem exists_mem_Q0_orderOf_mul_t_eq_of_dvd_ncard_invertedBy
     rw [hxord] at hdvd2
     exact hrne2 ((Nat.prime_dvd_prime_iff_eq hr Nat.prime_two).mp hdvd2)
   -- `x` is strongly real: `x = s · (sx)` with `(sx)² = 1`.
-  have hv2 : (s * x) ^ 2 = 1 := by
-    rw [sq]
-    calc (s * x) * (s * x) = (s * x * s) * x := by group
-      _ = x⁻¹ * x := by rw [hxJ.2]
-      _ = 1 := inv_mul_cancel x
-  have hv1 : s * x ≠ 1 := by
-    intro h
-    have hxs : x = s := by
-      have h1 : s * (s * x) = s * 1 := by rw [h]
-      rw [← mul_assoc, hs2, one_mul, mul_one] at h1
-      exact h1
-    rw [hxs] at hx2
-    exact hx2 hyp.distinguishedInvolution_sq
   have hSR : IsStronglyReal x :=
-    ⟨s, ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_ne_one⟩,
-      s * x, ⟨hv2, hv1⟩, by rw [← mul_assoc, hs2, one_mul]⟩
+    hyp.isStronglyReal_of_mem_invertedBy_centralizer hxJ hx2
   -- normal form (Ch. I §3, Lemma 3).
   obtain ⟨u, huQ0, hu1, hconj⟩ := hyp.exists_isConj_mul_t_of_stronglyReal hSR hx2
   refine ⟨u, huQ0, hu1, ?_⟩
@@ -430,6 +442,140 @@ theorem exists_conj_mem_K_of_orderOf_eq
       simpa using h6.symm
     rw [h5, orderOf_one] at hwq
     exact hq.one_lt.ne' hwq.symm
+
+include hyp in
+/-- **Step (13), the exclusion of `r = |K|`** (p. 113): the prime `q = |K|`
+does not divide `|J|`.
+
+Otherwise `J` contains an element `x` of order `q`; being strongly real, `x` is
+conjugate to some `u·t` (`u ∈ Q₀#`) inside the Lemma-4 group `L`, and there to a
+generator `k` of `K` (Sylow).  Transporting `st` along the same conjugation
+produces a strongly real element `y` of order 3 centralising `K`, which is
+impossible. -/
+theorem not_card_K_dvd_ncard_invertedBy
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    {q : ℕ} (hq : q.Prime) (hqK : Nat.card ↥hyp.K = q)
+    (hqQ0 : ¬ q ∣ Nat.card ↥hyp.Q0 * (Nat.card ↥hyp.Q0 + 1)) (hq3 : q ≠ 3) :
+    ¬ q ∣ (invertedBy (Subgroup.centralizer
+      ({hyp.distinguishedInvolution * hyp.t} : Set G))
+      hyp.distinguishedInvolution).ncard := by
+  classical
+  intro hdvd
+  set s := hyp.distinguishedInvolution with hs_def
+  have hs2 : s * s = 1 := by rw [← sq]; exact hyp.distinguishedInvolution_sq
+  have hst2 : (s * hyp.t) ^ 2 ≠ 1 := by
+    intro h
+    have h2 : orderOf (s * hyp.t) ∣ 2 := orderOf_dvd_of_pow_eq_one h
+    rw [hst] at h2
+    have h3 := Nat.le_of_dvd (by norm_num) h2
+    omega
+  have hodd : Odd (Nat.card ↥(Subgroup.centralizer ({s * hyp.t} : Set G))) :=
+    hyp.centralizer_natCard_odd_of_stronglyReal
+      hyp.isStronglyReal_distinguishedInvolution_mul_t hst2
+  -- `q = |K|` is odd, since `K ≤ D` and `|D|` is odd.
+  have hqodd : Odd q := by
+    rw [← hqK]
+    obtain ⟨c, hc⟩ := Subgroup.card_dvd_of_le hyp.K_le_D
+    have hD := hyp.D_odd
+    rw [hc] at hD
+    exact (Nat.odd_mul.mp hD).1
+  -- Cauchy inside `J` gives `x` of order `q`.
+  obtain ⟨x, hxJ, hxord⟩ := exists_orderOf_eq_prime_of_dvd_ncard_invertedBy
+    hs2 hodd hyp.conj_mem_centralizer_mul_t hq hdvd
+  have hx2 : x ^ 2 ≠ 1 := by
+    intro h
+    have h1 : orderOf x ∣ 2 := orderOf_dvd_of_pow_eq_one h
+    rw [hxord] at h1
+    have h2 := (Nat.prime_dvd_prime_iff_eq hq Nat.prime_two).mp h1
+    rw [h2] at hqodd
+    exact (Nat.not_odd_iff_even.mpr (even_two)) hqodd
+  have hSR := hyp.isStronglyReal_of_mem_invertedBy_centralizer hxJ hx2
+  -- normal form and Sylow transport: `x` is conjugate to a generator of `K`.
+  obtain ⟨u, huQ0, -, hconj⟩ := hyp.exists_isConj_mul_t_of_stronglyReal hSR hx2
+  obtain ⟨c₁, hc₁⟩ := isConj_iff.mp hconj
+  have hordut : orderOf (u * hyp.t) = q := by
+    rw [← hc₁, ← hxord]
+    exact orderOf_injective (MulAut.conj c₁).toMonoidHom
+      (MulAut.conj c₁).injective x
+  have humem : u * hyp.t ∈ hyp.orderThreeGeneratedSubgroup :=
+    mul_mem (hyp.orderThree_Q0_le huQ0) hyp.orderThree_t_mem
+  obtain ⟨g, hgK, hgne⟩ :=
+    hyp.exists_conj_mem_K_of_orderOf_eq hst hq hqK hqQ0 humem hordut
+  set c : G := g * c₁ with hc_def
+  set k : G := g * (u * hyp.t) * g⁻¹ with hk_def
+  have hcx : c * x * c⁻¹ = k := by
+    rw [hc_def, hk_def, ← hc₁]
+    group
+  -- `K` is generated by `k`.
+  have hKz : hyp.K = Subgroup.zpowers k := by
+    refine (Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hgK) ?_).symm
+    have hordk : orderOf k = q := by
+      have h1 : orderOf k ∣ q := by
+        rw [← hqK]
+        have h2 := orderOf_dvd_natCard (⟨k, hgK⟩ : ↥hyp.K)
+        have heq : orderOf k = orderOf (⟨k, hgK⟩ : ↥hyp.K) :=
+          orderOf_injective hyp.K.subtype (Subgroup.subtype_injective _) ⟨k, hgK⟩
+        rw [heq]
+        exact h2
+      rcases (Nat.dvd_prime hq).mp h1 with h | h
+      · exact absurd (orderOf_eq_one_iff.mp h) hgne
+      · exact h
+    rw [Nat.card_zpowers, hordk, hqK]
+  -- transport `st` along the same conjugation
+  set y : G := c * (s * hyp.t) * c⁻¹ with hy_def
+  have hyord : orderOf y = 3 := by
+    rw [hy_def, ← hst]
+    exact orderOf_injective (MulAut.conj c).toMonoidHom
+      (MulAut.conj c).injective (s * hyp.t)
+  have hySR : IsStronglyReal y := by
+    refine ⟨c * s * c⁻¹, ⟨?_, ?_⟩, c * hyp.t * c⁻¹, ⟨?_, ?_⟩, by rw [hy_def]; group⟩
+    · have h := hyp.distinguishedInvolution_sq
+      calc (c * s * c⁻¹) ^ 2 = (c * s * c⁻¹) * (c * s * c⁻¹) := pow_two _
+        _ = c * (s * s) * c⁻¹ := by group
+        _ = c * s ^ 2 * c⁻¹ := by rw [pow_two]
+        _ = c * 1 * c⁻¹ := by rw [h]
+        _ = 1 := by group
+    · intro h
+      apply hyp.distinguishedInvolution_ne_one
+      have h1 : c⁻¹ * (c * s * c⁻¹) * c = s := by group
+      rw [h] at h1
+      simpa using h1.symm
+    · calc (c * hyp.t * c⁻¹) ^ 2
+          = (c * hyp.t * c⁻¹) * (c * hyp.t * c⁻¹) := pow_two _
+        _ = c * (hyp.t * hyp.t) * c⁻¹ := by group
+        _ = c * hyp.t ^ 2 * c⁻¹ := by rw [pow_two]
+        _ = c * 1 * c⁻¹ := by rw [hyp.t_sq]
+        _ = 1 := by group
+    · intro h
+      apply hyp.t_ne_one
+      have h1 : c⁻¹ * (c * hyp.t * c⁻¹) * c = hyp.t := by group
+      rw [h] at h1
+      simpa using h1.symm
+  have hy2 : y ^ 2 ≠ 1 := by
+    intro h
+    have h1 : orderOf y ∣ 2 := orderOf_dvd_of_pow_eq_one h
+    rw [hyord] at h1
+    have h2 := Nat.le_of_dvd (by norm_num) h1
+    omega
+  -- `y` centralises `k`, hence all of `K = ⟨k⟩`
+  have hyk : y * k = k * y := by
+    have hxst : x * (s * hyp.t) = (s * hyp.t) * x :=
+      Subgroup.mem_centralizer_singleton_iff.mp hxJ.1
+    rw [hy_def, ← hcx]
+    calc (c * (s * hyp.t) * c⁻¹) * (c * x * c⁻¹)
+        = c * ((s * hyp.t) * x) * c⁻¹ := by group
+      _ = c * (x * (s * hyp.t)) * c⁻¹ := by rw [hxst]
+      _ = (c * x * c⁻¹) * (c * (s * hyp.t) * c⁻¹) := by group
+  have hyK : y ∈ Subgroup.centralizer (hyp.K : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro h hh
+    rw [hKz, SetLike.mem_coe, Subgroup.mem_zpowers_iff] at hh
+    obtain ⟨n, rfl⟩ := hh
+    exact (Commute.zpow_left (show Commute k y from hyk.symm) n).eq
+  -- contradiction with the `r = 7` obstruction
+  refine hyp.not_mem_centralizer_K_of_isStronglyReal hySR hy2 ?_ hyK
+  rw [hyord, hqK]
+  exact (Nat.coprime_primes (by norm_num) hq).mpr (fun h => hq3 h.symm)
 
 end Hypothesis
 
