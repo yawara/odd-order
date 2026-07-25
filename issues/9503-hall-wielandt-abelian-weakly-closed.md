@@ -108,8 +108,13 @@ statement (Peterfalvi p. 108 に明記、[Ha] Thm 14.4.2):
   **`R₂ ↠ C₃ ≀ C₃`** が出るので、これを (14)-(16) の構造で排除する。
 
 ### 実装順 (次セッション)
-1. `v_N(x) = π(x)·σ(π(x))` の計算 (`MonoidHom.transfer` を横断集合 `{1,s}` で;
-   repo の `MackeyTransfer.lean` / `TransferInvariantTransversal.lean` の技法を流用)。
+1. `v_N(x) = π(x)·σ(π(x))` の計算。**mathlib の入口は確認済**:
+   `MonoidHom.transfer_def (g) : transfer ϕ g = diff ϕ T (g • T)` (任意の左横断集合 `T`)
+   と `MonoidHom.diff` (`Mathlib/GroupTheory/Transfer.lean`)。
+   `G := ↥N`, `H := R₂.subgroupOf N` (正規・指数 2)、`T := {1, s}` を
+   `Subgroup.LeftTransversal` として構成し、`G ⧸ H` (2 元) 上の積を展開すると
+   `v(x) = ϕ(x)·ϕ(s⁻¹xs)` で、`s² = 1` より `= π(x)·σ(π(x))`。
+   ⚠ 主な工作は「2 元の横断集合の構成」と「商上の積の展開」。
 2. 上記 1→2→3 の連結 (数学は上のとおり短い)。
 3. `R₂ ↠ C₃≀C₃` の排除。材料: `|R₂| = 3⁵ or 3⁶`、`Z(R₂) = Z₁` (位数 3)、
    `⁅R₁,R₁⁆ ≤ Z₁ΣP` と `|⁅R₁,R₁⁆| ≤ 9` (landed)、`Z₁PΣ ⊆ Z₂(R₁)`、
