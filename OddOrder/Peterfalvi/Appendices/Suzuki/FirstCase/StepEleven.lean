@@ -593,6 +593,69 @@ theorem invImageF_mul_comm_of_not_dvd_card_D
     exact Nat.le_of_dvd (Nat.pow_pos fc.p_prime.pos) hkdvd
   omega
 
+include model in
+/-- **A nonidentity element of `C_W(P)` does not centralize `R`** ((10.2) arm of (11)):
+if `w` centralized `R`, its class `[w] ∈ Σ` would act trivially on the translations
+(`dAut_conj` + injectivity of `emb`), so `[w] = 1` by faithfulness (`dAut_injective`),
+i.e. `w ∈ N = P` (step (7), inheriting `ind`); but `P ⊓ W = ⊥`. -/
+theorem not_forall_comm_of_mem_centralizer_W
+    (ind : Hypothesis.TheoremAInductionBelow G Ω) {w : G}
+    (hwW : w ∈ fc.toHypothesis.W) (hwP : w ∈ Subgroup.centralizer (fc.P : Set G))
+    (hw1 : w ≠ 1) :
+    ¬ (∀ r ∈ fc.invImageF model, w * r = r * w) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  intro hcen
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  -- `dAut 1 = id` (specialize `dAut_conj` at the identity).
+  have hdone : ∀ x : F, model.dAut 1 x = x := by
+    intro x
+    have h := model.dAut_conj 1 x
+    simp only [OneMemClass.coe_one, one_mul, inv_one, mul_one] at h
+    exact (model.emb_injective h).symm ▸ rfl
+  -- `dAut [w] = id`: every translation has a representative in `R`, which `w` centralizes.
+  have hdw : ∀ x : F, model.dAut (fc.sigmaElt hwW hwP) x = x := by
+    intro x
+    obtain ⟨y, hy⟩ := QuotientGroup.mk'_surjective N' (model.emb (Multiplicative.ofAdd x))
+    have hyR : (y : G) ∈ fc.invImageF model :=
+      ⟨y, Subgroup.mem_comap.mpr (by rw [hy]; exact ⟨Multiplicative.ofAdd x, rfl⟩), rfl⟩
+    have hcomm := hcen (y : G) hyR
+    have hconj := model.dAut_conj (fc.sigmaElt hwW hwP) x
+    -- LHS of `dAut_conj` is `[w]·(mk' y)·[w]⁻¹ = mk' (⟨w⟩·y·⟨w⟩⁻¹) = mk' y`.
+    have hwy : (⟨w, hwP⟩ : ↥L) * y * (⟨w, hwP⟩ : ↥L)⁻¹ = y := by
+      apply Subtype.ext
+      have : w * (y : G) * w⁻¹ = (y : G) := by
+        rw [hcomm]; group
+      simpa using this
+    have hlhs : ((fc.sigmaElt hwW hwP : ↥fc.rankOneQuotient.D) : ↥L ⧸ N')
+        * model.emb (Multiplicative.ofAdd x)
+        * ((fc.sigmaElt hwW hwP : ↥fc.rankOneQuotient.D) : ↥L ⧸ N')⁻¹
+        = model.emb (Multiplicative.ofAdd x) := by
+      have hcoe : ((fc.sigmaElt hwW hwP : ↥fc.rankOneQuotient.D) : ↥L ⧸ N')
+          = QuotientGroup.mk' N' ⟨w, hwP⟩ := rfl
+      rw [hcoe, ← hy, ← map_inv, ← map_mul, ← map_mul, hwy]
+    rw [hlhs] at hconj
+    exact model.emb_injective hconj.symm
+  -- faithfulness: `[w] = 1`, so `w ∈ N = P`, contradicting `P ⊓ W = ⊥`.
+  have hone : fc.sigmaElt hwW hwP = 1 := by
+    apply model.dAut_injective
+    ext x
+    rw [hdw x, hdone x]
+  have hwN : (⟨w, hwP⟩ : ↥L) ∈ N' := by
+    have h2 : ((fc.sigmaElt hwW hwP : ↥fc.rankOneQuotient.D) : ↥L ⧸ N')
+        = ((1 : ↥fc.rankOneQuotient.D) : ↥L ⧸ N') :=
+      congrArg (fun z : ↥fc.rankOneQuotient.D => (z : ↥L ⧸ N')) hone
+    rw [OneMemClass.coe_one] at h2
+    have h1 : QuotientGroup.mk' N' ⟨w, hwP⟩ = 1 := h2
+    rw [QuotientGroup.mk'_apply] at h1
+    exact (QuotientGroup.eq_one_iff _).mp h1
+  have hwP' : w ∈ fc.P := by
+    have hker : w ∈ fc.kernelN := ⟨_, hwN, rfl⟩
+    rwa [fc.kernelN_eq_P ind] at hker
+  have : w ∈ fc.P ⊓ fc.toHypothesis.W := ⟨hwP', hwW⟩
+  rw [fc.P_inf_W_eq_bot, Subgroup.mem_bot] at this
+  exact hw1 this
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
