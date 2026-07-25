@@ -442,7 +442,14 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       `lemmaFive_of_orderThree` ⟹ IsCyclic W ∧ |W|∣2^p+1=9。|Σ|=3∣|W| (`card_dvd_of_le`)
       で |W|≠1 ⟹ |W|∈{3,9} (`dvd_prime_pow`)。|G|_3 = `factorization_card_G_eq` (m=2) +
       |W|=3^k で 3^4·|W|。
-- [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
+- [x] (11)–(12) — **完了 (2026-07-25)**。(11) = StepTwelve.lean 前半 (R = T×P、
+      𝒜 正則作用、index 定理は一般 m)。(12) = δ1–δ4 + ε1–ε3 (StepTwelve{,Endgame,
+      Conclusion,Transfer}.lean) → **`step_twelve` (StepTwelveTransfer.lean,
+      `e9256e1dc`): "Case (10.2) holds"** — (10.1) 下で m = 1 を index 定理
+      (p^{2m+1} ∣ |G| → 2m+1 ≤ m+2) で導出し `factorization_ne_three` で排除。
+      結論 = p=3 ∧ |F|=9 ∧ W cyclic ∧ |W|∈{3,9} ∧ |G|_3 = 3^4·|W|。
+      ⚠ 書籍 (12) 中の Hall-Wielandt 言及は Cor 10.2 range-equality 直用で回避済
+      ((17) 用 abelian 版とは別)。
 - [ ] (13)–(16)
 - [ ] Hall-Wielandt abelian 版 (shared infra、claim してから)
 - [ ] (17) 結論 → Theorem B assembly
