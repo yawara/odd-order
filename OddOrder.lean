@@ -228,6 +228,7 @@ import OddOrder.Isaacs.Ch04_Commutators.ProblemsDihedralEight
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsCenterIndex
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsHallWitt
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsSupersolvableMann
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreath
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreathNonCommutator
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreathClass
