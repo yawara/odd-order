@@ -1484,12 +1484,27 @@ motive 破綻 — 仮説側で `rw [hcardD] at hpow` と書き換える。
      `P` は巡回 `p`-群なので**非自明な部分群 2 つは必ず非自明に交わる** ⟹ `C_P(K) ≠ 1` から
      `⁅P, K⁆ = 1` ⟹ `K ≤ C_G(P) = P`。`K` は `p'`-群で `P` は `p`-群 ⟹ **`K = 1 = O_{p'}(G)`** ∎
 
-**必要な部品の所在**: Hall–Higman = `Ch03.hall_higman_1_2_3` ✅ / `IsCyclic.mulAutMulEquiv` =
-mathlib ✅ / Thm 4.34 = `fixedPoints_inf_actionCommutator_eq_bot_of_abelian` ✅ /
-`Subgroup.IsPiGroup.le_oPiCore` ✅ / `le_normalizer_of_commutator_le` ✅。
-**新規に要るもの**: (a) `MulAut` 可換 for cyclic (5 行) / (b) `MulAut.conjNormal` の核 =
-centralizer / (c) `O_{p'}(G/O_{p'}(G)) = 1` / (d) 巡回 `p`-群の非自明部分群は非自明に交わる /
-(e) 位数 `p` の元をもつ ⟺ `p ∣ |·|` (Cauchy, mathlib) / (f) 帰納法の骨組み。
+**実装状況 (2026-07-26)** — 新 leaf `Ch04_Commutators/ProblemsCyclicSylow.lean`:
+
+| 部品 | 状態 |
+|---|---|
+| Hall–Higman 1.2.3 | ✅ 既存 `Ch03.hall_higman_1_2_3` |
+| `IsCyclic.mulAutMulEquiv` | ✅ mathlib |
+| Thm 4.34 | ✅ 既存 `fixedPoints_inf_actionCommutator_eq_bot_of_abelian` |
+| (a) 巡回群の `MulAut` は可換 | ✅ `mulAut_mul_comm_of_isCyclic` |
+| (b) `ker (MulAut.conjNormal) = C_G(N)` | ✅ `ker_conjNormal_eq_centralizer` |
+| `C_G(O_p(G)) = O_p(G)` | ✅ `centralizer_oPiCore_eq` |
+| `G' ≤ O_p(G)` | ✅ `commutator_le_oPiCore_of_isCyclic` |
+| `IsPiGroup {p} ↔ IsPGroup p` | ✅ `Ch03.Subgroup.isPiGroup_singleton_iff_isPGroup` (Theorem315.lean に新設) |
+| **`O_p(G)` は正規 Sylow** | ✅ `exists_sylow_coe_eq_oPiCore_of_isCyclic` |
+| (d) 巡回 `p`-群の非自明部分群は非自明に交わる | ✅ `inf_ne_bot_of_isCyclic_of_isPGroup` (+ `exists_orderOf_eq_prime_of_ne_bot`) |
+| (c) `O_{p'}(G/O_{p'}(G)) = 1` | ✅ 既存 `Ch03.oPiCore_quotient_self_eq_bot` |
+| **残り**: `Ω₁(P) ⊴ G` / coprime 作用で `C_P(K) ≠ 1 ⟹ ⁅P,K⁆ = 1` / Case 1 の商への遺伝 / 本体の帰納 | ⬜ |
+
+⚠ **BG 側に重複**: `isPiGroup_singleton_of_isPGroup` / `isPGroup_of_isPiGroup_singleton`
+(`BG/Ch1_Preliminary/S04g_Thm418Core.lean`, `PLengthTransfer.lean`) は今回 Isaacs Ch03 に
+新設した iff 版と同内容。BG は Isaacs を import するので **BG 側を上流版へ redirect** できる
+(hub 案件、lane a の territory 外なので今回は触らない)。
 
 ### 4D.3 の設計 (残り (c)–(g))
 
