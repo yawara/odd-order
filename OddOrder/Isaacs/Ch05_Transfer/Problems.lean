@@ -243,4 +243,53 @@ theorem isComplement_mul_of_transversal {G : Type*} [Group G] {H K : Subgroup G}
 
 end
 
+
+open scoped Pointwise in
+/-- **Isaacs Problem 5A.3(b), 左 transversal 版**: `H ≤ K ≤ G` で `T` が `G` の中の `K` の
+左 transversal, `S ⊆ K` が `K` の中の `H` の左 transversal なら `T * S` は `G` の中の
+`H` の左 transversal。
+
+書籍は右 transversal で述べるが (上の `isComplement_mul_of_transversal`), mathlib の
+`MonoidHom.transfer` は**左** transversal (`Subgroup.LeftTransversal`) で定義されているので,
+5A.3(c)(d) (transfer の推移律) にはこちらの向きが要る。
+
+**証明**: `g = t·k` (`hT` の一意分解), `k = s·h` (`hS` の一意分解) から `g = (t·s)·h`。
+一意性は逆向きに 2 段の一意性を使う。 -/
+theorem isComplement_mul_of_transversal_left {G : Type*} [Group G] {H K : Subgroup G}
+    (hHK : H ≤ K) {S T : Set G} (hSsub : S ⊆ (K : Set G))
+    (hS : ∀ k ∈ K, ∃! s : ↥S, (s : G)⁻¹ * k ∈ H)
+    (hT : Subgroup.IsComplement T (K : Set G)) :
+    Subgroup.IsComplement (T * S) (H : Set G) := by
+  rw [Subgroup.isComplement_iff_existsUnique]
+  intro g
+  obtain ⟨⟨t, k⟩, htk, huniq⟩ := Subgroup.isComplement_iff_existsUnique.mp hT g
+  obtain ⟨s, hs, hsuniq⟩ := hS (k : G) k.2
+  refine ⟨(⟨(t : G) * (s : G), Set.mul_mem_mul t.2 s.2⟩, ⟨(s : G)⁻¹ * (k : G), hs⟩), ?_, ?_⟩
+  · change (t : G) * (s : G) * ((s : G)⁻¹ * (k : G)) = g
+    calc (t : G) * (s : G) * ((s : G)⁻¹ * (k : G)) = (t : G) * (k : G) := by group
+      _ = g := htk
+  · rintro ⟨⟨x, hx⟩, ⟨h, hh⟩⟩ hxh
+    have hxh' : x * h = g := hxh
+    obtain ⟨t', ht', s', hs', hts'⟩ := Set.mem_mul.mp hx
+    have hsK : s' ∈ K := hSsub hs'
+    have hhK : h ∈ K := hHK hh
+    have hpair := huniq (⟨t', ht'⟩, ⟨s' * h, K.mul_mem hsK hhK⟩) (by
+      change t' * (s' * h) = g
+      rw [← mul_assoc, hts']
+      exact hxh')
+    have ht'eq : t' = (t : G) := congrArg (fun p => ((p.1 : ↥T) : G)) hpair
+    have hkeq : s' * h = (k : G) := congrArg (fun p => ((p.2 : ↥(K : Set G)) : G)) hpair
+    have hs'mem : ((⟨s', hs'⟩ : ↥S) : G)⁻¹ * (k : G) ∈ H := by
+      rw [← hkeq]
+      simpa using hh
+    have hs'eq : (⟨s', hs'⟩ : ↥S) = s := hsuniq _ hs'mem
+    have hs'val : s' = (s : G) := congrArg Subtype.val hs'eq
+    refine Prod.ext (Subtype.ext ?_) (Subtype.ext ?_)
+    · calc x = t' * s' := hts'.symm
+        _ = (t : G) * (s : G) := by rw [ht'eq, hs'val]
+    · change h = (s : G)⁻¹ * (k : G)
+      calc h = s'⁻¹ * (s' * h) := by group
+        _ = (s : G)⁻¹ * (k : G) := by rw [hkeq, hs'val]
+
+
 end OddOrder.Isaacs.Ch05

@@ -1449,7 +1449,28 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 (Isaacs の `v : G → H/H'` はまさにこの形)。
 | 5A.2 | ✅ | `transfer_top_eq_apply` |
 | 5A.3(a)(b) | ✅ | `eq_of_mul_eq_mul_of_isComplement` / `isComplement_mul_of_transversal` (mathlib に `IsComplement` の推移律が無いので自作)。(b) の数値部分は mathlib `relIndex_mul_index` |
-| 5A.3(c)(d) | ⬜ 調査済 | **transfer の推移律**。mathlib は pretransfer を持たず `diff` 経由なので、Isaacs の `w = v ∘ V_T` は「`H ≤ K ≤ G`, `ϕ : ↥H →* A` に対し `transfer_{K≤G} (transfer_{(H.subgroupOf K) ≤ K} ϕ') = transfer_{H≤G} ϕ`」の形になる (`ϕ'` は `↥(H.subgroupOf K) ≃* ↥H` を経由した `ϕ`)。`subgroupOf` の同型を挟むのが主な摩擦。5A.3(b) で作った `isComplement_mul_of_transversal` を `LeftTransversal` に持ち上げ、`transfer_def` で両辺の `diff` を `S * T` 上の積として比較するのが素直な経路 | 推移律。**(b) の数値部分 `|G:H| = |G:K||K:H|` は mathlib `Subgroup.relIndex_mul_index` で既済**。transversal の積 `ST` の一意分解 (a) / (b) の transversal 性は **mathlib に既製が無い** (`Subgroup.IsComplement` の推移律は未収載; `IsComplement.mul_eq` のみ)。`↥K` の subtype を跨ぐので定式化に注意 — 「`S ⊆ K` かつ `∀ k ∈ K, ∃! s ∈ S, k·s⁻¹ ∈ H`」+「`IsComplement (K : Set G) T`」⟹「`IsComplement (H : Set G) (S * T)`」の形が素直。(c)(d) の pretransfer 合成は mathlib が `diff` 経由の定義なので、この transversal 推移律を作ってから `transfer_def` で両辺を比較する |
+| 5A.3(c)(d) | 🔨 左版 transversal 積 landing 済 | **transfer の推移律**。mathlib は pretransfer を持たず `diff` 経由なので、Isaacs の `w = v ∘ V_T` は「`H ≤ K ≤ G`, `ϕ : ↥H →* A` に対し `transfer_{K≤G} (transfer_{(H.subgroupOf K) ≤ K} ϕ') = transfer_{H≤G} ϕ`」の形になる (`ϕ'` は `↥(H.subgroupOf K) ≃* ↥H` を経由した `ϕ`)。`subgroupOf` の同型を挟むのが主な摩擦。5A.3(b) で作った `isComplement_mul_of_transversal` を `LeftTransversal` に持ち上げ、`transfer_def` で両辺の `diff` を `S * T` 上の積として比較するのが素直な経路 | 推移律。**(b) の数値部分 `|G:H| = |G:K||K:H|` は mathlib `Subgroup.relIndex_mul_index` で既済**。transversal の積 `ST` の一意分解 (a) / (b) の transversal 性は **mathlib に既製が無い** (`Subgroup.IsComplement` の推移律は未収載; `IsComplement.mul_eq` のみ)。`↥K` の subtype を跨ぐので定式化に注意 — 「`S ⊆ K` かつ `∀ k ∈ K, ∃! s ∈ S, k·s⁻¹ ∈ H`」+「`IsComplement (K : Set G) T`」⟹「`IsComplement (H : Set G) (S * T)`」の形が素直。(c)(d) の pretransfer 合成は mathlib が `diff` 経由の定義なので、この transversal 推移律を作ってから `transfer_def` で両辺を比較する |
+
+### 5A.3(c)(d) の実装状況 (2026-07-26)
+
+⚠ **書籍は右 transversal、mathlib の `MonoidHom.transfer` は左 transversal**
+(`Subgroup.LeftTransversal` = `{S // IsComplement S H}`) で定義されている。
+そこで (b) の左版 `isComplement_mul_of_transversal_left`
+(`T` が `K` の左 transversal, `S ⊆ K` が `K` 内の `H` の左 transversal ⇒ `T * S` が
+`H` の左 transversal) を landing 済 (`Problems.lean`)。
+
+**5A.3(c) の書籍の主張 (PDF p.152 = PDF ページ 165 で確認)**:
+`(st)·g = s·(t g (t·g)⁻¹) · (t·g)`。`·` は transversal の「代表元へ落とす」作用。
+これは左版では「`T * S` 上の `g` 作用が `T` 成分と `S` 成分に分かれる」ことにあたる。
+
+**5A.3(d) = transfer の推移律**:
+`transfer_{K≤G} (transfer_{(H.subgroupOf K)≤K} ϕ') = transfer_{H≤G} ϕ`
+(`ϕ' = ϕ ∘ (Subgroup.subgroupOfEquivOfLe hHK)`)。
+⚠ **mathlib に transfer の推移律は無い** (`Mathlib/GroupTheory/Transfer.lean` を grep 済)。
+残作業: (i) `T * S` を `H.LeftTransversal` として束ねる、(ii) `diff ϕ (TS) (g • TS)` を
+`G ⧸ H ≃ (G ⧸ K) × (K ⧸ H.subgroupOf K)` に沿った二重積に分解する
+(⚠ mathlib に `quotientEquivProdOfLE` は無いので transversal 経由で作る)、
+(iii) 内側の積が `transfer_{H'≤K} ϕ'` の値に一致することを見る。
 
 ### 5A.2 の設計 (2026-07-26 に確定、**実装済** `transfer_top_eq_apply`)
 
