@@ -253,11 +253,15 @@ Gorenstein pp. 251-257 を精読した結果、**もっと短い経路**が見�
 
 ### 残作業 (この方針)
 - [x] `IsWeaklyClosed` の定義 + **5C.6(a)** (共役 Sylow への弱閉性の移送)
-      = `OddOrder/GroupTheory/WeaklyClosed.lean` (2026-07-26 landed)
-- [ ] **5C.6(d)**: `W ≤ Z(P)` 弱閉 ⟹ `N_G(W)` が `P` の `G`-融合を制御
-      (上の Sylow 論法; `C_G(y)` 内の Sylow 共役 + `IsPGroup.exists_le_sylow`)
-- [ ] focal 連結: 融合制御 ⟹ `focal_G(P) = focal_N(P)` ⟹ `P ∩ G' = P ∩ N'`
-      (repo の `focalSubgroupTheorem` を `G` と `↥N` の両方で使う)
+- [x] **5C.6(d)** `exists_mem_normalizer_conj_eq` : `W ≤ Z(P)` 弱閉 ⟹ `N_G(W)` が
+      `P` の `G`-融合を制御 (`C_G(y)` 内で 2 つの `p`-部分群を共通 Sylow へ =
+      `exists_mem_conj_le_common`)
+- [x] focal 連結 `focalSubgroup_le_map_of_fusion_control` +
+      `sylow_le_commutator_of_not_dvd` / `not_dvd_card_abelianization_of_sylow_le_commutator`
+- [x] **`not_dvd_card_abelianization_normalizer`** : `W ≤ Z(P)` 弱閉 ∧ `¬p ∣ |Ab G|`
+      ⟹ `¬p ∣ |Ab(N_G(W))|` (= (17) が要る形の Hall–Wielandt)
+- [x] (17) への配線 `false_of_isWeaklyClosed_zpowers` : **`Z₁` の弱閉性から (17) の
+      矛盾が両分岐まとめて出る** (wreath 排除も `|W|` の場合分けも不要)
 - [ ] **`Z₁` が `R₂` 内で弱閉** (= この設定での 3-normality) ← **唯一の新しい数学**
       - 同値形: `Z₁ ≤ Q` (Sylow) ⟹ `Q = R₂`。`R₂ = C_G(Z₁)` なので
         「`Z₁` を含む Sylow は `Z₁` を中心化する」と言い換わる。
@@ -265,7 +269,15 @@ Gorenstein pp. 251-257 を精読した結果、**もっと短い経路**が見�
         `E := Z₁Z₁^x` は `C_G(E) = R₂ ⊓ R₂^x` の中心に入る、
         `Z₁` の元は強実で `C_G(z) = R₂` は奇数位数、
         (16) の「`A = Z₁ΣP` 内の強実線は `Z₁` だけ」、(17) の `A` の弱閉性。
-      - ⟹ `Z₁^x ≤ A` (または `≤ LV`) さえ言えれば (16) で決着する。
+      - ⟹ `Z₁^x ≤ A` (または `≤ LV`) さえ言えれば (16) で決着する
+        (`Ω₁(LV) = A` より `Z₁^x ≤ LV` で十分)。
+      - ⚠ 書籍が `Z(P)` でなく `A = Z₁PΣ` (可換・弱閉・p 奇) 版の Hall–Wielandt を
+        引いているのは、`Z₁` の弱閉性が自明でないからかもしれない。
+        代替案: 5C.6(d) の証明は「`W ≤ C_G(x) ∩ C_G(y)`」しか使わないので
+        **`A` の元の融合は `N_G(A)` が制御する**ことは同じ論法で出る (`A` 可換)。
+        ただし focal 部分群は `R₂` の**全**元の融合を要するので、それだけでは足りない。
+        ⟹ 次の一手は (i) `Z₁` の弱閉性を (13)–(17) の構造から詰める、または
+        (ii) 「`A` 可換弱閉 + p 奇」版 Hall–Wielandt の証明を再構成する。
 
 ## 証明方針 (旧、未確定)
 
