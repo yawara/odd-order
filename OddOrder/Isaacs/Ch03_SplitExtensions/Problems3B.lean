@@ -283,7 +283,7 @@ theorem exists_isComplement'_le_of_coprime {G : Type u} [Group G] [Finite G] {N 
   obtain ⟨K, hK⟩ := Subgroup.exists_right_complement'_of_coprime hcop
   have hcopU : Nat.Coprime (Nat.card ↥U) (Nat.card ↥N) :=
     Nat.Coprime.coprime_dvd_left hU hcop.symm
-  obtain ⟨x, hx⟩ := exists_conj_le_of_isComplement'_of_coprime' hsolv hK hcopU
+  obtain ⟨x, -, hx⟩ := exists_conj_le_of_isComplement'_of_coprime' hsolv hK hcopU
   exact ⟨K.map (MulAut.conj x).toMonoidHom, isComplement'_conj hK x, hx⟩
 
 /-! ### Problem 3B.5 — 中心に含まれる Sylow p-部分群と p-正則元
@@ -362,6 +362,236 @@ theorem exists_subgroup_orderOf_not_dvd_isComplement' {G : Type u} [Group G] [Fi
         _ = x * n * x⁻¹ := by group
     rw [hcalc]
     exact X.mul_mem (X.mul_mem hxX hn) (X.inv_mem hxX)
+
+/-! ### Problem 3B.6 — 剰余類 `Ng` の中の「π-元」代表
+
+`N ⊴ G`, `g ∈ G` で `Ng ∈ G/N` の位数を `m` とする。
+(a) `Ng` の中に「位数の素因数がすべて `m` を割る」元 `h` が取れる。
+(b) さらに `m` と `|N|` が互いに素なら `o(h) = m` ちょうど。
+
+教科書の hint は「`π` を `m` の素因数の集合として `NC = N⟨g⟩` なる巡回 π-部分群 `C` を取れ」。
+ここでは `⟨g⟩` (可換ゆえ可解) に Hall E-定理 (`hall_E_exists`) を当てて `|⟨g⟩| = k · s`
+(`k` は π-数, `s` は π'-数) の分解を得, 中国剰余定理で `t ≡ 1 (mod m)`, `t ≡ 0 (mod s)`
+なる `t` を取って `h := g ^ t` とする。 -/
+
+/-- **Isaacs Problem 3B.6(a)** (書籍 p. 84): `N ⊴ G` とし `Ng ∈ G ⧸ N` の位数を `m` とすると,
+剰余類 `Ng` の中に「位数の素因数がすべて `m` を割る」元 `h` が存在する. -/
+theorem exists_mem_coset_primeFactors_orderOf_dvd {G : Type u} [Group G] [Finite G]
+    {N : Subgroup G} [N.Normal] (g : G) :
+    ∃ h : G, (↑h : G ⧸ N) = (↑g : G ⧸ N) ∧
+      ∀ p ∈ (orderOf h).primeFactors, p ∣ orderOf (↑g : G ⧸ N) := by
+  classical
+  set m := orderOf (↑g : G ⧸ N) with hm_def
+  have hn0 : orderOf g ≠ 0 := (orderOf_pos g).ne'
+  -- `⟨g⟩` は可換ゆえ可解. Hall E で π-Hall 部分群 `C` を取る (π = `m` の約数の集合).
+  haveI : IsSolvable ↥(Subgroup.zpowers g) :=
+    isSolvable_of_comm fun a b => (IsMulCommutative.is_comm (M := ↥(Subgroup.zpowers g))).comm a b
+  obtain ⟨C, hC⟩ := hall_E_exists (G := ↥(Subgroup.zpowers g)) {q : ℕ | q ∣ m}
+  have hks : Nat.card ↥C * C.index = orderOf g := by
+    rw [Subgroup.card_mul_index, Nat.card_zpowers]
+  have hk0 : Nat.card ↥C ≠ 0 := Nat.card_pos.ne'
+  have hs0 : C.index ≠ 0 := by
+    intro h
+    rw [h, mul_zero] at hks
+    exact hn0 hks.symm
+  have hsn : C.index ∣ orderOf g := ⟨Nat.card ↥C, by rw [← hks, Nat.mul_comm]⟩
+  -- `m` は π-数, `C.index` は π'-数なので互いに素.
+  have hcop : Nat.Coprime m C.index := by
+    rw [Nat.Coprime]
+    by_contra hne
+    obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd hne
+    have hpm : p ∣ m := hpd.trans (Nat.gcd_dvd_left _ _)
+    have hps : p ∣ C.index := hpd.trans (Nat.gcd_dvd_right _ _)
+    exact hC.2 p (Nat.mem_primeFactors.mpr ⟨hp, hps, hs0⟩) hpm
+  -- 中国剰余定理: `t ≡ 1 (mod m)`, `t ≡ 0 (mod C.index)`.
+  obtain ⟨t, ht1, ht0⟩ := Nat.chineseRemainder hcop 1 0
+  have hst : C.index ∣ t := (Nat.modEq_zero_iff_dvd).mp ht0
+  obtain ⟨t', hts⟩ := hst
+  refine ⟨g ^ t, ?_, ?_⟩
+  · -- `t ≡ 1 (mod m)` なので `(↑g)^t = ↑g`.
+    have h1 : (↑g : G ⧸ N) ^ t = (↑g : G ⧸ N) ^ 1 := pow_eq_pow_iff_modEq.mpr ht1
+    rw [pow_one] at h1
+    simpa using h1
+  · -- `C.index ∣ t` なので `o(g^t) ∣ o(g^C.index) = |C|`, その素因数は π (= `m` の約数).
+    intro p hp
+    have hgs : orderOf (g ^ C.index) = Nat.card ↥C := by
+      rw [orderOf_pow' _ hs0, Nat.gcd_eq_right hsn, ← hks,
+        Nat.mul_div_cancel _ (Nat.pos_of_ne_zero hs0)]
+    have hdvd : orderOf (g ^ t) ∣ Nat.card ↥C := by
+      rw [hts, pow_mul, ← hgs]
+      exact orderOf_pow_dvd t'
+    exact hC.1 p (Nat.primeFactors_mono hdvd hk0 hp)
+
+/-- **Isaacs Problem 3B.6(b)** (書籍 p. 84): さらに `m = o(Ng)` と `|N|` が互いに素なら,
+(a) の元 `h` の位数はちょうど `m`.
+
+`m ∣ o(h)` は `Nh = Ng` から従い, 逆に `h^m ∈ N` なので `o(h)/m = o(h^m)` は `|N|` を割る.
+`o(h)` の素因数はすべて `m` を割る (= `|N|` を割らない) から `o(h)/m = 1`. -/
+theorem orderOf_eq_of_primeFactors_orderOf_dvd_of_coprime {G : Type u} [Group G] [Finite G]
+    {N : Subgroup G} [N.Normal] {g h : G} (hcoset : (↑h : G ⧸ N) = (↑g : G ⧸ N))
+    (hprimes : ∀ p ∈ (orderOf h).primeFactors, p ∣ orderOf (↑g : G ⧸ N))
+    (hcop : Nat.Coprime (orderOf (↑g : G ⧸ N)) (Nat.card ↥N)) :
+    orderOf h = orderOf (↑g : G ⧸ N) := by
+  classical
+  set m := orderOf (↑g : G ⧸ N) with hm_def
+  have hh0 : orderOf h ≠ 0 := (orderOf_pos h).ne'
+  -- `m = o(Nh) ∣ o(h)`.
+  have hmdvd : m ∣ orderOf h := by
+    rw [hm_def, ← hcoset]
+    exact orderOf_dvd_of_pow_eq_one (by rw [← QuotientGroup.mk_pow, pow_orderOf_eq_one]; rfl)
+  -- `h ^ m ∈ N` なので `o(h ^ m) ∣ |N|`.
+  have hmemN : h ^ m ∈ N := by
+    have : ((h ^ m : G) : G ⧸ N) = 1 := by
+      rw [QuotientGroup.mk_pow, hcoset, hm_def, pow_orderOf_eq_one]
+    exact (QuotientGroup.eq_one_iff _).mp this
+  have hdvdN : orderOf (h ^ m) ∣ Nat.card ↥N := by
+    have := orderOf_dvd_natCard (⟨h ^ m, hmemN⟩ : ↥N)
+    rwa [Subgroup.orderOf_mk] at this
+  -- `o(h ^ m) = o(h) / m`.
+  have hm0 : m ≠ 0 := (orderOf_pos (↑g : G ⧸ N)).ne'
+  have hquot : orderOf (h ^ m) = orderOf h / m := by
+    rw [orderOf_pow' _ hm0, Nat.gcd_eq_right hmdvd]
+  -- `o(h)/m` の素因数は `m` を割り, かつ `|N|` を割る ⟹ 互いに素より 1.
+  have hdiv : orderOf h / m ∣ Nat.card ↥N := hquot ▸ hdvdN
+  have hdivm : orderOf h / m ∣ orderOf h := Nat.div_dvd_of_dvd hmdvd
+  have h1 : orderOf h / m = 1 := by
+    by_contra hne
+    obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd hne
+    have hpq : p ∣ orderOf h := hpd.trans hdivm
+    have hpN : p ∣ Nat.card ↥N := hpd.trans hdiv
+    have hpm : p ∣ m := hprimes p (Nat.mem_primeFactors.mpr ⟨hp, hpq, hh0⟩)
+    have hdvd1 : p ∣ 1 := by
+      have hg := Nat.dvd_gcd hpm hpN
+      rwa [Nat.Coprime.gcd_eq_one hcop] at hg
+    exact hp.one_lt.ne' (Nat.dvd_one.mp hdvd1)
+  have := Nat.div_mul_cancel hmdvd
+  rw [h1, one_mul] at this
+  exact this.symm
+
+/-- `N ⊴ G` と `K ≤ G` の位数が互いに素で `N ⊔ K = H` なら, `H` の中で `K` は `N` の補群. -/
+theorem isComplement'_subgroupOf_of_coprime {G : Type*} [Group G] [Finite G] {N K H : Subgroup G}
+    [N.Normal] (hsup : N ⊔ K = H) (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥K)) :
+    (N.subgroupOf H).IsComplement' (K.subgroupOf H) := by
+  have hNH : N ≤ H := hsup ▸ le_sup_left
+  have hKH : K ≤ H := hsup ▸ le_sup_right
+  have hinf : (N ⊓ K : Subgroup G) = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
+  apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+  · rw [Subgroup.disjoint_def]
+    intro y hyN hyK
+    have hy : (y : G) ∈ (N ⊓ K : Subgroup G) :=
+      ⟨Subgroup.mem_subgroupOf.mp hyN, Subgroup.mem_subgroupOf.mp hyK⟩
+    rw [hinf, Subgroup.mem_bot] at hy
+    exact Subtype.ext hy
+  · rw [Set.eq_univ_iff_forall]
+    rintro ⟨y, hyH⟩
+    have hy : y ∈ N ⊔ K := by rw [hsup]; exact hyH
+    rw [Subgroup.mem_sup_of_normal_left] at hy
+    obtain ⟨u, huN, k, hkK, heq⟩ := hy
+    exact ⟨⟨u, hNH huN⟩, Subgroup.mem_subgroupOf.mpr huN, ⟨k, hKH hkK⟩,
+      Subgroup.mem_subgroupOf.mpr hkK, Subtype.ext heq⟩
+
+/-- **Isaacs Problem 3B.6(c)** (書籍 p. 84): `N ⊴ G` で `o(h)` と `|N|` が互いに素とする.
+`Nh` が `G ⧸ N` の中で自身の逆元と共役なら, `h` は `G` の中で `h⁻¹` と共役.
+
+教科書の hint どおり: `x` を `(Nh)^{Nx} = (Nh)⁻¹` なる元とすると `x` は `H := N⟨h⟩` を正規化し,
+`⟨h⟩` と `⟨h^x⟩` はどちらも `H` の中で `N` の補群. Schur-Zassenhaus D-part
+(`exists_conj_le_of_isComplement'_of_coprime'`; 商 `H/N ≅ ⟨h⟩` は巡回=可解なので `U` 可解枝で
+使える) が `⟨h^x⟩ ≤ ⟨h⟩^y` (`y ∈ N`) を与え, `⟨h⟩ ⊓ N = 1` から像を比べて `h^{xy⁻¹} = h⁻¹`. -/
+theorem isConj_inv_of_quotient_isConj_inv {G : Type u} [Group G] [Finite G] {N : Subgroup G}
+    [N.Normal] {h : G} (hcop : Nat.Coprime (Nat.card ↥N) (orderOf h))
+    (hconj : IsConj (↑h : G ⧸ N) (↑h : G ⧸ N)⁻¹) : IsConj h h⁻¹ := by
+  classical
+  obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective c
+  set K := Subgroup.zpowers h with hK_def
+  set H := N ⊔ K with hH_def
+  have hcop' : Nat.Coprime (Nat.card ↥N) (Nat.card ↥K) := by
+    rw [hK_def, Nat.card_zpowers]; exact hcop
+  -- `h₂ := x h x⁻¹` の `G ⧸ N` での像は `(↑h)⁻¹`.
+  set h₂ := x * h * x⁻¹ with hh₂_def
+  have himg : (↑h₂ : G ⧸ N) = (↑h : G ⧸ N)⁻¹ := by
+    rw [hh₂_def]
+    simp only [QuotientGroup.mk_mul, QuotientGroup.mk_inv]
+    exact hc
+  have hh₂H : h₂ ∈ H := by
+    have hmemN : h₂ * h ∈ N := by
+      rw [← QuotientGroup.eq_one_iff, QuotientGroup.mk_mul, himg, inv_mul_cancel]
+    have hrw : h₂ = h₂ * h * h⁻¹ := by group
+    rw [hrw]
+    exact Subgroup.mul_mem _ ((le_sup_left : N ≤ H) hmemN)
+      ((le_sup_right : K ≤ H) (Subgroup.inv_mem _ (Subgroup.mem_zpowers h)))
+  set K₂ := Subgroup.zpowers h₂ with hK₂_def
+  have hK₂H : K₂ ≤ H := Subgroup.zpowers_le.mpr hh₂H
+  have hKH : K ≤ H := le_sup_right
+  have hNH : N ≤ H := le_sup_left
+  -- `H` の中で `K` は `N` の補群.
+  haveI : (N.subgroupOf H).Normal := Subgroup.normal_subgroupOf
+  have hcompl : (N.subgroupOf H).IsComplement' (K.subgroupOf H) :=
+    isComplement'_subgroupOf_of_coprime rfl hcop'
+  -- `o(h₂) = o(h)` なので `U := K₂.subgroupOf H` の位数は `|N|` と互いに素.
+  have hord₂ : orderOf h₂ = orderOf h := by
+    have hinj := orderOf_injective (MulAut.conj x).toMonoidHom (MulEquiv.injective _) h
+    simpa [hh₂_def, MulAut.conj_apply] using hinj
+  have hcardU : Nat.card ↥(K₂.subgroupOf H) = orderOf h := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK₂H).toEquiv, hK₂_def, Nat.card_zpowers,
+      hord₂]
+  have hcardM : Nat.card ↥(N.subgroupOf H) = Nat.card ↥N :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNH).toEquiv
+  have hcopU : Nat.Coprime (Nat.card ↥(K₂.subgroupOf H)) (Nat.card ↥(N.subgroupOf H)) := by
+    rw [hcardU, hcardM]; exact hcop.symm
+  -- `U` は巡回群 `K₂` と同型ゆえ可解.
+  have hsolvU : IsSolvable ↥(K₂.subgroupOf H) := by
+    haveI : IsSolvable ↥K₂ :=
+      isSolvable_of_comm fun a b => (IsMulCommutative.is_comm (M := ↥K₂)).comm a b
+    exact solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hK₂H).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hK₂H).injective
+  -- Schur-Zassenhaus D-part: `U ≤ (K.subgroupOf H)^y` なる `y ∈ N.subgroupOf H`.
+  obtain ⟨y, hyN, hyle⟩ :=
+    exists_conj_le_of_isComplement'_of_coprime' (Or.inr hsolvU) hcompl hcopU
+  have hmem : (⟨h₂, hh₂H⟩ : ↥H) ∈ K₂.subgroupOf H :=
+    Subgroup.mem_subgroupOf.mpr (Subgroup.mem_zpowers h₂)
+  obtain ⟨k, hkK, hkeq⟩ := Subgroup.mem_map.mp (hyle hmem)
+  -- `G` の元として: `y k y⁻¹ = h₂`, `k ∈ K`, `y ∈ N`.
+  have hkG : (k : G) ∈ K := Subgroup.mem_subgroupOf.mp hkK
+  have hyG : (y : G) ∈ N := Subgroup.mem_subgroupOf.mp hyN
+  have hkeqG : (y : G) * (k : G) * (y : G)⁻¹ = h₂ := congrArg Subtype.val hkeq
+  have hkval : (k : G) = (y : G)⁻¹ * h₂ * (y : G) := by
+    rw [← hkeqG]; group
+  -- `k` の像は `(↑h)⁻¹` なので `k * h ∈ N ⊓ K = ⊥`, つまり `k = h⁻¹`.
+  have hkimg : ((k : G) : G ⧸ N) = (↑h : G ⧸ N)⁻¹ := by
+    have hy1 : ((y : G) : G ⧸ N) = 1 := (QuotientGroup.eq_one_iff _).mpr hyG
+    rw [hkval]
+    simp only [QuotientGroup.mk_mul, QuotientGroup.mk_inv, hy1, himg, inv_one, one_mul, mul_one]
+  have hkhN : (k : G) * h ∈ N := by
+    rw [← QuotientGroup.eq_one_iff, QuotientGroup.mk_mul, hkimg, inv_mul_cancel]
+  have hkhK : (k : G) * h ∈ K := Subgroup.mul_mem _ hkG (Subgroup.mem_zpowers h)
+  have hkh1 : (k : G) * h = 1 := by
+    have hinf : (N ⊓ K : Subgroup G) = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop').eq_bot
+    have : (k : G) * h ∈ (N ⊓ K : Subgroup G) := ⟨hkhN, hkhK⟩
+    rwa [hinf, Subgroup.mem_bot] at this
+  have hkinv : (k : G) = h⁻¹ := eq_inv_iff_mul_eq_one.mpr hkh1
+  -- `h⁻¹ = (y⁻¹ x) h (y⁻¹ x)⁻¹`.
+  refine isConj_iff.mpr ⟨(y : G)⁻¹ * x, ?_⟩
+  rw [← hkinv, hkval, hh₂_def]
+  group
+
+/-- **Isaacs Problem 3B.6 (まとめ)** (書籍 p. 84): `m := o(Ng)` が `|N|` と互いに素で,
+`Ng` が `G ⧸ N` の中で自身の逆元と共役なら, 剰余類 `Ng` の中に
+「位数がちょうど `m`」かつ「`G` の中で自身の逆元と共役」な元 `h` が存在する.
+
+(a) で `h` を取り, (b) で `o(h) = m`, (c) で `h ~ h⁻¹`. -/
+theorem exists_mem_coset_orderOf_eq_and_isConj_inv {G : Type u} [Group G] [Finite G]
+    {N : Subgroup G} [N.Normal] {g : G}
+    (hcop : Nat.Coprime (orderOf (↑g : G ⧸ N)) (Nat.card ↥N))
+    (hconj : IsConj (↑g : G ⧸ N) (↑g : G ⧸ N)⁻¹) :
+    ∃ h : G, (↑h : G ⧸ N) = (↑g : G ⧸ N) ∧ orderOf h = orderOf (↑g : G ⧸ N) ∧ IsConj h h⁻¹ := by
+  obtain ⟨h, hcoset, hprimes⟩ := exists_mem_coset_primeFactors_orderOf_dvd (N := N) g
+  have hord : orderOf h = orderOf (↑g : G ⧸ N) :=
+    orderOf_eq_of_primeFactors_orderOf_dvd_of_coprime (N := N) hcoset hprimes hcop
+  refine ⟨h, hcoset, hord, isConj_inv_of_quotient_isConj_inv (N := N) ?_ ?_⟩
+  · rw [hord]; exact hcop.symm
+  · rw [hcoset]; exact hconj
 
 end
 

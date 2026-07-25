@@ -1038,7 +1038,7 @@ theorem IsHallSubgroup.eq_of_normal [Finite G] [IsSolvable G] {π : Set ℕ} {H 
   exact (Subgroup.Normal.conj_smul_eq_self g H).symm
 
 /-- **Schur-Zassenhaus D-part (抽象版)**: `M ⊴ G` が補群 `K` を持ち `M` か `U` の一方が可解なとき,
-`|M|` と位数が互いに素な部分群 `U` は `K` の共役 `Kˣ` に含まれる.
+`|M|` と位数が互いに素な部分群 `U` は `K` の共役 `Kˣ` (`x ∈ M`) に含まれる.
 
 Hall D-定理 (`hall_D`) のエンジン. 証明: `P := U ⊔ M` の中で `U` も `P ⊓ K` も
 正規部分群 `M.subgroupOf P` (index は `|U|`, よって `|M|` と互いに素) の補群になる.
@@ -1047,7 +1047,7 @@ Schur-Zassenhaus 共役性 (`IsComplement'.exists_conj_of_coprime`) を `P` 内�
 theorem exists_conj_le_of_isComplement'_of_coprime' [Finite G] {M K U : Subgroup G} [M.Normal]
     (hsolv : IsSolvable ↥M ∨ IsSolvable ↥U) (hK : M.IsComplement' K)
     (hcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥M)) :
-    ∃ x : G, U ≤ K.map (MulAut.conj x).toMonoidHom := by
+    ∃ x ∈ M, U ≤ K.map (MulAut.conj x).toMonoidHom := by
   set P : Subgroup G := U ⊔ M with hP_def
   have hM_le_P : M ≤ P := le_sup_right
   have hU_le_P : U ≤ P := le_sup_left
@@ -1122,7 +1122,7 @@ theorem exists_conj_le_of_isComplement'_of_coprime' [Finite G] {M K U : Subgroup
   obtain ⟨n, hn_mem, hn_eq⟩ :=
     Subgroup.IsComplement'.exists_conj_of_coprime h_cop_MP hsolv_P h_compl_K h_compl_U
   let m : G := n.val
-  refine ⟨m, ?_⟩
+  refine ⟨m, Subgroup.mem_subgroupOf.mp hn_mem, ?_⟩
   -- Push `hn_eq` through `P.subtype`: `(P ⊓ K)ᵐ = U`, hence `U ≤ Kᵐ`.
   have h_intertwine : P.subtype.comp (MulAut.conj n).toMonoidHom =
       ((MulAut.conj (n.val : G)).toMonoidHom).comp P.subtype := by
@@ -1146,7 +1146,8 @@ theorem exists_conj_le_of_isComplement'_of_coprime [Finite G] {M K : Subgroup G}
     (hMsolv : IsSolvable ↥M) (hK : M.IsComplement' K) {U : Subgroup G}
     (hcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥M)) :
     ∃ x : G, U ≤ K.map (MulAut.conj x).toMonoidHom :=
-  exists_conj_le_of_isComplement'_of_coprime' (Or.inl hMsolv) hK hcop
+  let ⟨x, _, hx⟩ := exists_conj_le_of_isComplement'_of_coprime' (Or.inl hMsolv) hK hcop
+  ⟨x, hx⟩
 
 /-- Hall D-定理の `|G|`-強誘導本体. `hall_E_strong_aux` と同じ骨格 (極小正規 `M`,
 `G/M` への IH, `p ∈ π` / `p ∉ π` 場合分け) に, 「IH は `U` の像を含む π-Hall を返す」

@@ -775,7 +775,7 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **3A.7 ✅** ⟹ **§3A は 3A.6 のみ残り** (deferred-hard)。
 さらに **3B.1 ✅ / 3B.2 ✅ / 3B.3 ✅** (新 leaf `Ch03_SplitExtensions/Problems3B.lean`)。
 さらに **3B.4 ✅ / 3B.5 ✅**。
-**次 frontier = 3B.6 から文書順**。3A.6 は §3B を進めた後に再訪する。
+**次 frontier = 3B.7 (supersolvable) から文書順**。3A.6 は §3B を進めた後に再訪する。
 
 ### §3B の記録 (2026-07-25)
 
@@ -786,6 +786,10 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 | 3B.3 | ✅ | `isSolvable_iff_forall_prime_card_of_simple_factors` |
 | 3B.4 | ✅ | `exists_isComplement'_le_of_coprime` (+ `isComplement'_conj`) |
 | 3B.5 | ✅ | `exists_subgroup_orderOf_not_dvd_isComplement'` |
+| 3B.6(a) | ✅ | `exists_mem_coset_primeFactors_orderOf_dvd` |
+| 3B.6(b) | ✅ | `orderOf_eq_of_primeFactors_orderOf_dvd_of_coprime` |
+| 3B.6(c) | ✅ | `isConj_inv_of_quotient_isConj_inv` (+ `isComplement'_subgroupOf_of_coprime`) |
+| 3B.6 まとめ | ✅ | `exists_mem_coset_orderOf_eq_and_isConj_inv` |
 
 **設計メモ**:
 
@@ -804,3 +808,16 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
   既存名はその `Or.inl` 特殊化として残した (BG/Peterfalvi 側 5 箇所の呼び出しは無変更)。
   `U` 可解の側は `IsComplement'.QuotientMulEquiv` で `↥P ⧸ M.subgroupOf P ≃* ↥(U.subgroupOf P)`
   を作り、SZ 共役性の「商が可解」枝に流す。
+  さらに 3B.6(c) のために結論も強化した (`∃ x ∈ M, U ≤ K^x` — 共役元が `M` の中にあることは
+  証明中で既に得ていた情報)。既存名の側で `⟨x, _, hx⟩` に落とすので下流は無変更。
+
+- **3B.6(a) の π-分解は Hall E-定理で得る**: `⟨g⟩` は可換ゆえ可解なので `hall_E_exists` が
+  π-Hall 部分群 `C` を与え、`|⟨g⟩| = |C| · [⟨g⟩:C]` が求める π/π'-分解になる (自然数の
+  π-part を factorization で作る必要がない)。あとは中国剰余定理で `t ≡ 1 (mod m)`,
+  `[⟨g⟩:C] ∣ t` なる `t` を取り `h := g^t`。教科書 hint の「`NC = N⟨g⟩` なる巡回 π-部分群 `C`」
+  と同じ道具立て。
+
+- **3B.6(c)**: `H := N⟨h⟩` の中で `⟨h⟩` は `N` の補群 (`isComplement'_subgroupOf_of_coprime`
+  を新規に証明)。`h₂ := x h x⁻¹` の生成する `⟨h₂⟩` は位数 `o(h)` で `|N|` と互いに素なので
+  D-part の **`U` 可解枝** (`⟨h₂⟩` は巡回) が使え、`⟨h₂⟩ ≤ ⟨h⟩^y` (`y ∈ N`) を得る。
+  `⟨h⟩ ⊓ N = 1` より `G ⧸ N` での像を比べて `k = h⁻¹`, すなわち `h ~ h⁻¹`。
