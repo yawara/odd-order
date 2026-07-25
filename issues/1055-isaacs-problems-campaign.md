@@ -1395,7 +1395,9 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 4D.5 主張本体 | ✅ | `derivedSeries_semidirectProduct_eq_bot_and_ne_bot` (上界 `..._eq_bot` / 下界 `..._ne_bot` / Lemma 4.29 部分群版 `commutator_commutator_inl_inr_map_eq`、新 leaf `ProblemsDerivedLength.lean`) |
 | 4D.5 系 | ✅ | `exists_finite_group_derivedSeries_ne_bot` + `regularPermAut` / `regularPermAut_injective` (同 leaf) |
 | 4D.6 | ✅ | `range_fittingProductHom_eq_fixedPoints` / `ker_fittingProductHom_eq_actionCommutator` (新 leaf `ProblemsFittingMap.lean`) |
-| 4D.7 | 🔨 設計確定 | `p`-可解 + 巡回 Sylow `p` ⟹ `K ⊆ O_{p'}(G)` — 下記の設計 |
+| 4D.7 | ✅ | `le_oPiCore_compl_of_sylow_isCyclic` (新 leaf `ProblemsCyclicSylow.lean`) |
+
+### 🎉 §4D 完済 (4D.1–4D.7 全 7 問) ⟹ **Isaacs Ch.4 の章末演習 (§4A–§4D) 全完**
 
 ### 4D.1 の設計 (実装済)
 
@@ -1502,7 +1504,12 @@ motive 破綻 — 仮説側で `rw [hcardD] at hpow` と書き換える。
 | `Ω₁(P) ⊴ G` (一般形: 正規巡回部分群の部分群は正規) | ✅ `normal_of_le_of_isCyclic` |
 | coprime 作用で `C_P(K) ≠ 1 ⟹ ⁅P,K⁆ = 1` | ✅ `le_centralizer_of_isCyclic_of_exists_fixed` |
 | **Case 2 本体** (`O_{p'}(G) = ⊥` ⟹ `K = ⊥`) | ✅ `eq_bot_of_oPiCore_compl_eq_bot` |
-| **残り**: Case 1 の商への遺伝 + 本体の帰納 | ⬜ |
+| **本体** | ✅ `le_oPiCore_compl_of_sylow_isCyclic` |
+
+⭐ **書籍の hint (`|G|` の帰納法) は不要だった**: `O_{p'}(G/O_{p'}(G)) = 1` が常に成り立つ
+(`Ch03.oPiCore_quotient_self_eq_bot`) ので, 商 `G/O_{p'}(G)` に Case 2 を **1 回適用する
+だけ**で済む。商への遺伝に要ったのは `Ch01.exists_sylow_map_eq` (自作 1B.5(b)) +
+`isCyclic_map_of_isCyclic` + `map_normalizer_le_normalizer_map` の 3 点のみ。
 
 **残りの組み立て手順** (次 iteration):
 
