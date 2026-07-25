@@ -1304,8 +1304,31 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
   `V ⊇ PΣ` に一般化) と **`not_isStronglyReal_of_mem_P_sup_sigma`**
   (ΣP の非自明元は強実でない) — (16) 第二主張の矛盾側。
 
+### 追加 landed (2026-07-26 続き)
+- **`eq_zpowers_of_card_three_of_forall_isStronglyReal` : (16) 第二主張**
+  (`X ≤ Z₁ΣP` 位数 3 で全元強実 ⟹ `X = Z₁`)。
+  ⚠ 書籍の「`R₁` が `Z₁X` の線を推移的に置換」を**部分群の軌道でなく元の共役**で
+  実装 — 軌道-固定点機構が不要になった: `X ≠ Z₁` なら `Z(R₁) = Z₁` より `X` を
+  中心化しない `g ∈ R₁` があり、`w ∈ X#` に対し `d = w⁻¹w^g ∈ Z₁` が非自明 ⟹
+  `⟨d⟩ = Z₁`、`conj_pow_eq_mul_pow` で `w^{g^m} = w·d^m` ⟹ 剰余類 `wZ₁` が
+  丸ごと `w` の共役。`Z₁X ⊓ ΣP ≠ 1` (位数 27 の初等可換内の位数 9 二つ) の元が
+  強実になり `not_isStronglyReal_of_mem_P_sup_sigma` と矛盾。
+- 部品: `conj_pow_eq_mul_pow` / `isStronglyReal_conj` /
+  `isStronglyReal_of_conj_eq_inv` (対合に反転される元は強実) /
+  `zpowers_sup_sigma_inf_P_eq_bot` / `mul_comm_of_mem_zpowers_sup_sigma{,_sup_P}` /
+  `card_zpowers_sup_sigma{,_sup_P}` (= 9, 27) /
+  **`forall_isStronglyReal_mem_zpowers_st`** (Z₁ の全元が強実)。
+- **`normalizer_zpowers_sup_sigma_sup_P_le_normalizer_zpowers` : `N_G(Z₁PΣ) ≤ N_G(Z₁)`**
+  (第三主張の前半)。
+
 ### 残り (次セッションの実装順)
-1. **第二主張 (強実線の一意性)**: `X ≤ Z₁ΣP` 位数 3・全元強実・`X ⊓ Z₁ = 1` を仮定 →
+0. **(16) 第三主張の残り**: (i) `N_G(Z₁) = C_G(Z₁)⟨s⟩`
+   (`N/C ↪ Aut(Z₁) ≅ C₂`、`s` は `Z₁` を反転するので指数 2)、
+   (ii) `C_G(Z₁) = R₂` (landed `sylow_eq_centralizer_zpowers`)、
+   (iii) 逆包含 `R₂⟨s⟩ ≤ N_G(Z₁PΣ)`: `LV ⊴ R₂⟨s⟩` (`|R₂ : LV| = 3` で `R₂` 側は
+   minFac 正規、`s` は `L` を反転し `V` を中心化) + `Z₁PΣ = Ω₁(LV)` (15) が
+   自己同型不変 (元の 3 乗条件) ⟹ 正規。
+1. ~~第二主張~~ **完了** (上記)。旧メモ: `X ≤ Z₁ΣP` 位数 3・全元強実・`X ⊓ Z₁ = 1` を仮定 →
    (a) `Z₁X ⊴ R₁` (`⁅Z₁ΣP,R₁⁆ ≤ Z₁ ≤ Z₁X` から即)、
    (b) `R₁` は `Z₁X` 内の `Z₁` 以外の位数 3 部分群 3 個に作用し**固定点なし**
    (固定線は `R₁` 正規の位数 3 ⟹ `Z(R₁) = Z₁` と交わる ⟹ `= Z₁` で矛盾) ⟹
