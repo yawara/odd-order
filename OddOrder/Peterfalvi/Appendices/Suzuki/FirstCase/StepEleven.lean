@@ -278,6 +278,75 @@ theorem eq_P_or_eq_invImageF_of_conj_invariant
     rw [hre]
     exact S.mul_mem (hPS hkG) hyS
 
+/-- `P` is central in `R`: every element of `R ≤ C_G(P)` centralizes `P`. -/
+theorem P_le_center_invImageF {x r : G} (hx : x ∈ fc.P)
+    (hr : r ∈ fc.invImageF model) : r * x = x * r :=
+  (Subgroup.mem_centralizer_iff.mp (fc.invImageF_le_centralizer model hr) x hx).symm
+
+/-- The commutator of `R` lands in `P`: the faithful quotient image of `R` is the
+translation subgroup `emb(F)`, which is abelian, so commutators die in `N = P`
+(step (7), inheriting `ind`). -/
+theorem commutator_invImageF_le_P (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    {r₁ r₂ : G} (h₁ : r₁ ∈ fc.invImageF model) (h₂ : r₂ ∈ fc.invImageF model) :
+    r₁ * r₂ * r₁⁻¹ * r₂⁻¹ ∈ fc.P := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  have h₁L : r₁ ∈ L := fc.invImageF_le_centralizer model h₁
+  have h₂L : r₂ ∈ L := fc.invImageF_le_centralizer model h₂
+  -- both classes are translations; translations commute (`F` is abelian);
+  -- so the commutator class is `1`, i.e. the commutator lies in `N = P`.
+  obtain ⟨y₁, hy₁⟩ := (fc.mem_invImageF_iff model h₁L).mp h₁
+  obtain ⟨y₂, hy₂⟩ := (fc.mem_invImageF_iff model h₂L).mp h₂
+  have hcommQ : QuotientGroup.mk' N'
+      ((⟨r₁, h₁L⟩ : ↥L) * ⟨r₂, h₂L⟩ * (⟨r₁, h₁L⟩ : ↥L)⁻¹ * (⟨r₂, h₂L⟩ : ↥L)⁻¹) = 1 := by
+    have e1 : QuotientGroup.mk' N' (⟨r₁, h₁L⟩ : ↥L) = model.emb y₁ := hy₁.symm
+    have e2 : QuotientGroup.mk' N' (⟨r₂, h₂L⟩ : ↥L) = model.emb y₂ := hy₂.symm
+    rw [map_mul, map_mul, map_mul, map_inv, map_inv, e1, e2, ← map_inv, ← map_inv,
+      ← map_mul, ← map_mul, ← map_mul,
+      show y₁ * y₂ * y₁⁻¹ * y₂⁻¹ = 1 by rw [mul_comm y₁ y₂]; group,
+      map_one]
+  have hmemN : ((⟨r₁, h₁L⟩ : ↥L) * ⟨r₂, h₂L⟩ * (⟨r₁, h₁L⟩ : ↥L)⁻¹ * (⟨r₂, h₂L⟩ : ↥L)⁻¹)
+      ∈ N' := by
+    rw [QuotientGroup.mk'_apply] at hcommQ
+    exact (QuotientGroup.eq_one_iff _).mp hcommQ
+  have hkG : r₁ * r₂ * r₁⁻¹ * r₂⁻¹ ∈ fc.kernelN := ⟨_, hmemN, rfl⟩
+  rwa [fc.kernelN_eq_P ind] at hkG
+
+/-- **`Z(R) = P` when `R` is nonabelian** (p. 111, proof of (11), first paragraph):
+the center of `R` (as `R ⊓ C_G(R)`) is `C_G(P)`-invariant and sits between `P` and `R`,
+so the dichotomy applies; the top case would make `R` abelian. -/
+theorem center_eq_P_of_not_isMulCommutative
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hnab : ∃ r₁ ∈ fc.invImageF model, ∃ r₂ ∈ fc.invImageF model, r₁ * r₂ ≠ r₂ * r₁) :
+    fc.invImageF model ⊓ Subgroup.centralizer (fc.invImageF model : Set G) = fc.P := by
+  set R : Subgroup G := fc.invImageF model with hRdef
+  set ZR : Subgroup G := R ⊓ Subgroup.centralizer (R : Set G) with hZRdef
+  have hPZ : fc.P ≤ ZR := by
+    intro x hx
+    refine ⟨fc.P_le_invImageF model hx, Subgroup.mem_centralizer_iff.mpr fun r hr => ?_⟩
+    exact fc.P_le_center_invImageF model hx hr
+  have hZR : ZR ≤ R := inf_le_left
+  have hZinv : ∀ c ∈ Subgroup.centralizer (fc.P : Set G), ∀ s ∈ ZR,
+      c * s * c⁻¹ ∈ ZR := by
+    intro c hc s hs
+    obtain ⟨hsR, hsC⟩ := hs
+    refine ⟨fc.conj_mem_invImageF model hc hsR, Subgroup.mem_centralizer_iff.mpr
+      fun r hr => ?_⟩
+    -- `r` commutes with `c s c⁻¹` because `c⁻¹ r c ∈ R` commutes with `s`.
+    have hrc : c⁻¹ * r * c ∈ R := by
+      have := fc.conj_mem_invImageF model (Subgroup.inv_mem _ hc) hr
+      simpa using this
+    have hcomm := Subgroup.mem_centralizer_iff.mp hsC _ hrc
+    -- `(c⁻¹ r c) s = s (c⁻¹ r c)`  ⟹  `r (c s c⁻¹) = (c s c⁻¹) r`
+    have h1 := congrArg (fun z => c * z * c⁻¹) hcomm
+    simpa [mul_assoc] using h1
+  rcases fc.eq_P_or_eq_invImageF_of_conj_invariant model ind hPZ hZR hZinv with h | h
+  · exact h
+  · exfalso
+    obtain ⟨r₁, h₁, r₂, h₂, hne⟩ := hnab
+    exact hne (Subgroup.mem_centralizer_iff.mp ((h.ge h₁).2) r₂ h₂).symm
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
