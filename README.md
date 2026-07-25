@@ -23,9 +23,12 @@ load-bearing result on each build and fails the build if anything falls outside 
 The project is now in its second phase: **formalizing the three source textbooks in full**, not merely
 the path through them that the Odd Order Theorem happens to need.
 
-> 🚧 **One `sorry` remains in the entire tree**: the `Q₈` case of the Brauer–Suzuki theorem — cited by
-> the sources, proved in none of them. The plan to close it: formalize modular character theory up
-> through the Z\*-theorem, following Navarro's *Characters and Blocks of Finite Groups*.
+> 🚧 **One `sorry` remains in the Lean sources** (`OddOrder/`): the `Q₈` case of the Brauer–Suzuki
+> theorem — cited by the sources, proved in none of them. Only the results that cite Brauer–Suzuki
+> (Peterfalvi's Appendix C, Proposition 1 and its dependents) are conditional on it; everything else —
+> `feitThompson` included, as the axiom check above shows — is `sorry`-free. The plan to close it:
+> formalize modular character theory up through the Z\*-theorem, following Navarro's *Characters and
+> Blocks of Finite Groups*.
 
 ## The byproduct: a finite group theory library
 
@@ -48,7 +51,7 @@ That machinery is the lasting output of this repository, and completing it is no
   Brauer–Suzuki, is not in Gorenstein at all: his Ch. 12 proves only `|S| ≥ 16` and states the
   order-8 case without proof ("all known proofs require the theory of modular characters" — a theory
   the book never develops). Closing it means building modular character theory up through the
-  Z\*-theorem, following Navarro's *Characters and Blocks of Finite Groups*; it is the tree's single
+  Z\*-theorem, following Navarro's *Characters and Blocks of Finite Groups*; it is the library's single
   remaining `sorry` and an active long-term project. Gorenstein is *not* being formalized as a book.
 
 Two proofs come from outside these books altogether: the books state the results but take the proofs
