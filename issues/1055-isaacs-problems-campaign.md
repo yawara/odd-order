@@ -961,6 +961,71 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   なり mismatch する。補助は `classical` の後に `have` でインライン定義する。
 - `∏ ω, Pi.mulSingle x d ω = d` は `Finset.prod_eq_single x` + 上記 simp で通る (確認済)。
 
+### 4A.8(d) の分析 (2026-07-25、次 iteration の出発点)
+
+書籍: 「`n = 1` なら `P` は maximal class、一般に `P'U` は maximal class」。
+
+**位数は本 commit で確定** (`card_ker_augHom_eq` / §3A `WreathProduct.card`):
+`|P| = |C|^{|Q|}·|Q| = p^{np+1}`、`|P'U| = p^{n(p-1)+1}` (`augHom` が全射ゆえ
+`|ker| = |P|/|C|`)。⟹ maximal class の主張は
+「`class(P) = np`」(`n = 1` のとき `= p`) と「`class(P'U) = n(p-1)`」。
+
+**第一歩は本 commit で設置**: `shiftSubHom q : (Q → D) →* (Q → D)`,
+`Δ_q f = f · (f ∘ shift_q)⁻¹` (= 群環の `(1-q)·` 作用) と
+`commutatorElement_inl_inr_eq_shiftSubHom` (`⁅inl f, inr q⁆ = inl (Δ_q f)`)、
+`range_shiftSubHom_le_ker_coordProdHom` (`(1-q)R ⊆ I`)。
+次は **`γ_{i+1}(P) = (Δ_q)^i(A) の像`** を帰納で立てる。
+⚠ `⁅H, K ⊔ L⁆` の分配は**偽**なので (memory: lean-subgroup-commutator-api-traps)、
+`⁅L_i, ⊤⁆` を `⁅·, A⁆` と `⁅·, U⁆` に割るには good-elements 法が要る。
+
+#### 4A.8(d) の完全な設計 (2026-07-25 に手計算で確定、数値検証済み)
+
+**(i) 下降中心列の帰納形**: `S ≤ (Q → D)` が shift 安定なら
+`⁅S.map inl, ⊤⁆ = (S.map (shiftSubHom q)).map inl`。理由:
+`⁅inl f, inl g * inr q'⁆ = inl (Δ_{q'} f)` (base 可換で `⁅inl f, inl g⁆ = 1`、
+`⁅a, bc⁆ = ⁅a,b⁆ · b⁅a,c⁆b⁻¹` の第 2 項の共役も base 可換で消える)。
+`Q = ⟨q⟩` が位数 `p` なら `Δ_{q^k} f = Δ_q (∏_{j<k} f∘shift^j)` (群環の
+`1 - x^k = (1-x)(1 + x + … + x^{k-1})`) なので、生成元 `q` の分だけで足りる。
+⟹ **`lowerCentralSeries ⊤ i = (Δ^i(⊤)).map inl`** (`i ≥ 1`; 基底は 4A.8(b) の
+`P' = ker(coordProd).map inl` と `range Δ_q = ker coordProd`)。
+**元レベルの式 `⁅inl f, y⁆ = inl (Δ_{y.right} f)` は
+`commutatorElement_inl_eq_shiftSubHom` として設置済**。さらに
+**`Δ_{q^k} = Δ_q ∘ T_k`** (`shiftSubHom_pow_eq_comp`、`T_k = shiftSumHom q k` は
+群環の `1 + x + ⋯ + x^{k-1}`; 証明は `Finset.prod_range_div` の telescoping) も設置済で、
+これにより「生成元 `q` の `Δ` だけで `⁅A, U⁆` の全生成元が捉えられる」。
+**帰納段も設置済**: `commutator_map_inl_top_eq`
+(`S` が shift 安定 = `S.map (shiftHom q) ≤ S` なら
+`⁅S.map inl, ⊤⁆ = (S.map (shiftSubHom q)).map inl`)。
+補助は `shiftHom` (平行移動)・`shift_pow_mem_of_shift_stable`・
+`shiftSumHom_mem_of_shift_stable`。
+⟹ 残るのは (α) `lowerCentralSeries ⊤ (i+1) = (Δ^{i+1} ⊤).map inl` の帰納
+(基底は 4A.8(b) で `commutator P = ⁅A,U⁆ = ⁅range inl, ⊤⁆`、
+`Δ` と `shift` の可換性で shift 安定性が保存されることを使う) と、
+(β) `(1-x)` の冪零指数 `n(p-1)+1` の算術。
+
+**(ii) 残る算術 = `Δ = (1-x)` の冪零指数**。`ZMod(p^n)[x]/(x^p-1)` で
+`(1-x)^{n(p-1)+1} = 0` かつ `(1-x)^{n(p-1)} ≠ 0` ⟹ **`class(P) = n(p-1)+1`**。
+- `p=2, n=1`: `(1-x)² = 0` ⟹ class 2。`|P| = 8` (`D₈`) で maximal class ✓
+- `p=3, n=1`: class 3、`|P| = 3⁴` で maximal class ✓
+- `p=2, n=2`: `(1-x)² = 2(1-x)`, `(1-x)³ = 0` ⟹ class 3。`|P| = 2⁵` なので
+  maximal class には class 4 が要る ⟹ **`P` は maximal class でない** ✓
+  (書籍が `n = 1` に限定しているのと整合)
+- 一般に `class(P) = n(p-1)+1` と maximal class の要求 `np` が一致するのは **`n = 1` のときだけ** ✓
+
+**(iii) `P'U` 側**: `class(P'U) = n(p-1)`、`|P'U| = p^{n(p-1)+1}` なので**常に maximal class** ✓
+(`p=2,n=2` で検算: `P' = (1-x)R ≅ C₄`, `Δ(P') = (1-x)²R ≅ C₂`, `(1-x)³R = 0`
+⟹ class 2、`|P'U| = 8` ⟹ maximal class ✓)。
+
+**残りの下降中心列の計算**は群環のフィルトレーションに落ちる:
+`A = C^Q` を `ZMod(p^n)[Q] = ZMod(p^n)[x]/(x^p - 1)` (`x = u`) と見ると
+`⁅A, U⁆` は `(x-1)A`、以降 `γ_{i+1}(P) = (x-1)^i A` (`i ≥ 1`)。
+`(x-1)^p ≡ x^p - 1 = 0 (mod p)` なので `(x-1)` 冪の減少列が `p`-進的に落ちる速さが
+class を決める。⟹ **群環の `(x-1)`-filtration を Lean で立てるのが本体** (規模大)。
+`ProblemsMaximalClass.lean` の下降中心列部品 (真減少・`p` 冪の上下界) は再利用できる。
+
+⚠ 4A.8(c) と違い `p = 2, n = 1` でも成立する (`D₈` は位数 8・class 2 = 3-1 で maximal class、
+`P'U ≅ C₂×C₂` は位数 4・class 1 = 2-1 でやはり maximal class)。
+
 ### 4A.8(c) 完了 (位数まで)
 
 `card_center_ker_augHom : |Z(P'U)| = p` (仮説 `hd` の下)。部品は

@@ -570,6 +570,201 @@ theorem card_center_ker_augHom [Fintype Q] [Finite D] [Fact p.Prime] (hQcard : N
   rw [← Nat.card_eq_of_bijective _ hFbij]
   exact card_ker_powMonoidHom_prime hcyc hD hn
 
+/-! ### `P` と `P'U` の位数 (4A.8(d) の maximal class 判定に要る) -/
+
+omit [Group Q] in
+/-- 指示関数の座標積は値そのもの. -/
+theorem prod_ite_eq_self [Fintype Q] [DecidableEq Q] (x : Q) (c : D) :
+    (∏ ω, (if ω = x then c else 1)) = c := by
+  rw [Finset.prod_eq_single x] <;> simp +contextual
+
+/-- 増大射は全射 (指示関数で任意の値が実現できる). -/
+theorem augHom_surjective [Fintype Q] : Function.Surjective (augHom (D := D) (Q := Q)) := by
+  classical
+  intro d
+  refine ⟨inl (fun ω => if ω = (1 : Q) then d else 1), ?_⟩
+  change (∏ ω, (if ω = (1 : Q) then d else 1)) = d
+  exact prod_ite_eq_self 1 d
+
+/-- `|P' U| · |C| = |P|`: `P'U = ker(augHom)` で `augHom` は `C` の上へ全射. -/
+theorem card_ker_augHom_mul [Fintype Q] [Finite D] :
+    Nat.card ((augHom (D := D) (Q := Q)).ker) * Nat.card D = Nat.card (D ≀[Q] Q) := by
+  have hidx : ((augHom (D := D) (Q := Q)).ker).index = Nat.card D := by
+    rw [Subgroup.index_ker, MonoidHom.range_eq_top.mpr augHom_surjective]
+    exact Subgroup.card_top
+  rw [← hidx]
+  exact Subgroup.card_mul_index _
+
+/-- `|P| = |C|^{|Q|} · |Q|` (§3A `WreathProduct.card`) から `|P'U| = |C|^{|Q| - 1} · |Q|`. -/
+theorem card_ker_augHom_eq [Fintype Q] [Finite D] :
+    Nat.card ((augHom (D := D) (Q := Q)).ker) * Nat.card D
+      = Nat.card D ^ Nat.card Q * Nat.card Q := by
+  rw [card_ker_augHom_mul]
+  exact OddOrder.Isaacs.Ch03.WreathProduct.card (D := D) (Q := Q) (Ω := Q)
+
+/-! ### 4A.8(d) の準備: 「`1 - x`」作用素 -/
+
+/-- base 群上の **`1 - x` 作用素** `Δ_q f = f · (f ∘ shift_q)⁻¹`.
+
+群環 `ZMod(p^n)[Q]` の言葉では `f ↦ (1 - q) · f`. 交換子 `⁅inl f, inr q⁆` の base 成分が
+ちょうどこれ (`commutatorElement_inl_inr`) なので, 下降中心列
+`γ_{i+1}(P) = (1-q)^i A` の解析はこの作用素の反復に帰着する. -/
+def shiftSubHom (q : Q) : (Q → D) →* (Q → D) where
+  toFun f := fun ω => f ω * (f (q⁻¹ * ω))⁻¹
+  map_one' := by funext ω; simp
+  map_mul' f g := by
+    funext ω
+    change f ω * g ω * (f (q⁻¹ * ω) * g (q⁻¹ * ω))⁻¹
+      = (f ω * (f (q⁻¹ * ω))⁻¹) * (g ω * (g (q⁻¹ * ω))⁻¹)
+    rw [mul_inv_rev]
+    simp [mul_comm, mul_left_comm, mul_assoc]
+
+@[simp]
+theorem shiftSubHom_apply (q : Q) (f : Q → D) (ω : Q) :
+    shiftSubHom q f ω = f ω * (f (q⁻¹ * ω))⁻¹ := rfl
+
+/-- 交換子公式の作用素形: `⁅inl f, inr q⁆ = inl (Δ_q f)`. -/
+theorem commutatorElement_inl_inr_eq_shiftSubHom (f : Q → D) (q : Q) :
+    ⁅(inl f : D ≀[Q] Q), inr q⁆ = inl (shiftSubHom q f) :=
+  commutatorElement_inl_inr f q
+
+/-- `Δ_q` の像は増大射の核に入る (座標積が消える): 群環の `(1-q)·R ⊆ I` に対応. -/
+theorem range_shiftSubHom_le_ker_coordProdHom [Fintype Q] (q : Q) :
+    (shiftSubHom (D := D) q).range ≤ (coordProdHom (D := D) (Q := Q)).ker := by
+  rintro _ ⟨f, rfl⟩
+  change (∏ ω, (f ω * (f (q⁻¹ * ω))⁻¹)) = 1
+  calc (∏ ω, f ω * (f (q⁻¹ * ω))⁻¹)
+      = (∏ ω, f ω) * ∏ ω, (f (q⁻¹ * ω))⁻¹ := Finset.prod_mul_distrib
+    _ = (∏ ω, f ω) * (∏ ω, f (q⁻¹ * ω))⁻¹ := by rw [Finset.prod_inv_distrib]
+    _ = (∏ ω, f ω) * (∏ ω, f ω)⁻¹ := by rw [prod_smul_eq]
+    _ = 1 := mul_inv_cancel _
+
+/-- **base の元と任意の元の交換子**: `⁅inl f, y⁆ = inl (Δ_{y.right} f)`.
+
+`y = inl y.left · inr y.right` と分解すると, `⁅inl f, inl g⁆ = 1` (base は可換) で
+残る `⁅inl f, inr q⁆ = inl (Δ_q f)` の共役も base 内なので消える.
+下降中心列 `γ_{i+1}(P) = Δ^i(A)` の帰納段はこの式そのもの. -/
+theorem commutatorElement_inl_eq_shiftSubHom (f : Q → D) (y : D ≀[Q] Q) :
+    ⁅(inl f : D ≀[Q] Q), y⁆ = inl (shiftSubHom y.right f) := by
+  have hbase : ⁅(inl f : D ≀[Q] Q), (inl y.left : D ≀[Q] Q)⁆ = 1 := by
+    rw [commutatorElement_eq_one_iff_commute]
+    change (inl f : D ≀[Q] Q) * inl y.left = (inl y.left : D ≀[Q] Q) * inl f
+    rw [← map_mul, ← map_mul, mul_comm]
+  have hcen : (inl y.left : D ≀[Q] Q) * inl (shiftSubHom y.right f) * (inl y.left)⁻¹
+      = inl (shiftSubHom y.right f) := by
+    rw [← map_inv, ← map_mul, ← map_mul, mul_comm y.left, mul_assoc, mul_inv_cancel, mul_one]
+  calc ⁅(inl f : D ≀[Q] Q), y⁆
+      = ⁅(inl f : D ≀[Q] Q), (inl y.left : D ≀[Q] Q) * inr y.right⁆ := by
+          rw [inl_left_mul_inr_right]
+    _ = ⁅(inl f : D ≀[Q] Q), (inl y.left : D ≀[Q] Q)⁆ * (inl y.left : D ≀[Q] Q)
+          * ⁅(inl f : D ≀[Q] Q), (inr y.right : D ≀[Q] Q)⁆ * (inl y.left : D ≀[Q] Q)⁻¹ :=
+        commutatorElement_mul_right_eq_mul_conj _ _ _
+    _ = (inl y.left : D ≀[Q] Q) * inl (shiftSubHom y.right f) * (inl y.left : D ≀[Q] Q)⁻¹ := by
+          rw [hbase, one_mul, commutatorElement_inl_inr_eq_shiftSubHom]
+    _ = inl (shiftSubHom y.right f) := hcen
+
+/-- **部分和作用素** `T_k f = ∏_{j<k} (f ∘ shift^j)` (群環の `1 + x + ⋯ + x^{k-1}`). -/
+def shiftSumHom (q : Q) (k : ℕ) : (Q → D) →* (Q → D) where
+  toFun f := fun ω => ∏ j ∈ Finset.range k, f ((q ^ j)⁻¹ * ω)
+  map_one' := by funext ω; simp
+  map_mul' f g := by
+    funext ω
+    change (∏ j ∈ Finset.range k, (f * g) ((q ^ j)⁻¹ * ω))
+      = (∏ j ∈ Finset.range k, f ((q ^ j)⁻¹ * ω)) * ∏ j ∈ Finset.range k, g ((q ^ j)⁻¹ * ω)
+    simp only [Pi.mul_apply]
+    exact Finset.prod_mul_distrib
+
+@[simp]
+theorem shiftSumHom_apply (q : Q) (k : ℕ) (f : Q → D) (ω : Q) :
+    shiftSumHom q k f ω = ∏ j ∈ Finset.range k, f ((q ^ j)⁻¹ * ω) := rfl
+
+/-- **`Δ_{q^k} = Δ_q ∘ T_k`** (群環の `1 - x^k = (1-x)(1 + x + ⋯ + x^{k-1})`).
+
+これで「生成元 `q` の `Δ` だけで `⁅A, U⁆` の全生成元が捉えられる」ことが従い,
+下降中心列の帰納段が `Δ_q` の反復に帰着する. -/
+theorem shiftSubHom_pow_eq_comp (q : Q) (k : ℕ) (f : Q → D) :
+    shiftSubHom (q ^ k) f = shiftSubHom q (shiftSumHom q k f) := by
+  funext ω
+  set G : ℕ → D := fun j => f ((q ^ j)⁻¹ * ω) with hG
+  have hstep : ∀ j : ℕ, f ((q ^ j)⁻¹ * (q⁻¹ * ω)) = G (j + 1) := by
+    intro j
+    have hcomm : (q ^ j)⁻¹ * q⁻¹ = (q ^ (j + 1))⁻¹ := by rw [pow_succ]; group
+    rw [hG]
+    congr 1
+    rw [← mul_assoc, hcomm]
+  have htel : (∏ j ∈ Finset.range k, G (j + 1)) * (∏ j ∈ Finset.range k, G j)⁻¹
+      = G k * (G 0)⁻¹ := by
+    rw [← div_eq_mul_inv, ← div_eq_mul_inv, ← Finset.prod_div_distrib]
+    exact Finset.prod_range_div G k
+  change f ω * (f ((q ^ k)⁻¹ * ω))⁻¹
+    = (∏ j ∈ Finset.range k, G j) * (∏ j ∈ Finset.range k, f ((q ^ j)⁻¹ * (q⁻¹ * ω)))⁻¹
+  rw [Finset.prod_congr rfl (fun j _ => hstep j)]
+  have hG0 : G 0 = f ω := by rw [hG]; simp
+  have hGk : G k = f ((q ^ k)⁻¹ * ω) := rfl
+  calc f ω * (f ((q ^ k)⁻¹ * ω))⁻¹ = G 0 * (G k)⁻¹ := by rw [hG0, hGk]
+    _ = ((∏ j ∈ Finset.range k, G (j + 1)) * (∏ j ∈ Finset.range k, G j)⁻¹)⁻¹ := by
+          rw [htel, mul_inv_rev, inv_inv]
+    _ = (∏ j ∈ Finset.range k, G j) * (∏ j ∈ Finset.range k, G (j + 1))⁻¹ := by
+          rw [mul_inv_rev, inv_inv]
+
+/-- 座標の平行移動 `shift_q f = f ∘ (q⁻¹ · ·)` (群環の `x ·`). -/
+def shiftHom (q : Q) : (Q → D) →* (Q → D) where
+  toFun f := fun ω => f (q⁻¹ * ω)
+  map_one' := rfl
+  map_mul' _ _ := rfl
+
+@[simp]
+theorem shiftHom_apply (q : Q) (f : Q → D) (ω : Q) : shiftHom q f ω = f (q⁻¹ * ω) := rfl
+
+/-- shift 安定な部分群は `q` の冪の shift でも閉じている. -/
+theorem shift_pow_mem_of_shift_stable {S : Subgroup (Q → D)} {q : Q}
+    (hS : S.map (shiftHom q) ≤ S) :
+    ∀ (j : ℕ) (f : Q → D), f ∈ S → (fun ω => f ((q ^ j)⁻¹ * ω)) ∈ S := by
+  intro j
+  induction j with
+  | zero => intro f hf; simpa using hf
+  | succ j ih =>
+    intro f hf
+    have hstep : (fun ω => f ((q ^ (j + 1))⁻¹ * ω))
+        = shiftHom q (fun ω => f ((q ^ j)⁻¹ * ω)) := by
+      funext ω
+      change f ((q ^ (j + 1))⁻¹ * ω) = f ((q ^ j)⁻¹ * (q⁻¹ * ω))
+      congr 1
+      rw [← mul_assoc, pow_succ]
+      group
+    rw [hstep]
+    exact hS ⟨_, ih f hf, rfl⟩
+
+/-- 部分和 `T_k f` は shift 安定な部分群に留まる. -/
+theorem shiftSumHom_mem_of_shift_stable {S : Subgroup (Q → D)} {q : Q}
+    (hS : S.map (shiftHom q) ≤ S) (k : ℕ) {f : Q → D} (hf : f ∈ S) :
+    shiftSumHom q k f ∈ S := by
+  have hprod : shiftSumHom q k f
+      = ∏ j ∈ Finset.range k, (fun ω => f ((q ^ j)⁻¹ * ω)) := by
+    funext ω
+    rw [Finset.prod_apply]
+    rfl
+  rw [hprod]
+  exact Subgroup.prod_mem _ fun j _ => shift_pow_mem_of_shift_stable hS j f hf
+
+/-- **下降中心列の帰納段**: `S` が shift 安定なら `⁅S の像, ⊤⁆ = (Δ_q(S)) の像`.
+
+`⊆` は `⁅inl f, y⁆ = inl (Δ_{y.right} f)` と `Δ_{q^k} = Δ_q ∘ T_k`, `T_k f ∈ S`,
+`⊇` は `inl (Δ_q f) = ⁅inl f, inr q⁆`. -/
+theorem commutator_map_inl_top_eq {q : Q} (hq : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k)
+    {S : Subgroup (Q → D)} (hS : S.map (shiftHom q) ≤ S) :
+    ⁅S.map (inl : (Q → D) →* D ≀[Q] Q), (⊤ : Subgroup (D ≀[Q] Q))⁆
+      = (S.map (shiftSubHom q)).map inl := by
+  refine le_antisymm (Subgroup.commutator_le.2 ?_) ?_
+  · rintro _ ⟨f, hf, rfl⟩ y -
+    obtain ⟨k, hk⟩ := hq y.right
+    rw [commutatorElement_inl_eq_shiftSubHom, hk, shiftSubHom_pow_eq_comp]
+    exact ⟨shiftSubHom q (shiftSumHom q k f),
+      ⟨shiftSumHom q k f, shiftSumHom_mem_of_shift_stable hS k hf, rfl⟩, rfl⟩
+  · rintro _ ⟨_, ⟨f, hf, rfl⟩, rfl⟩
+    rw [← commutatorElement_inl_inr_eq_shiftSubHom]
+    exact Subgroup.commutator_mem_commutator ⟨f, hf, rfl⟩ (Subgroup.mem_top _)
+
 end
 
 end OddOrder.Isaacs.Ch04
