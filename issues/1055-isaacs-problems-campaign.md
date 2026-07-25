@@ -1161,7 +1161,36 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 **部分群側**を拾う (元側を書換えたいなら `have` で等式化) / `prod_smul_eq` は
 `∏ ω, f (q⁻¹ * ω)` の形にしか rw できない (`f y ^ e j` を噛ませたら `exact` で defeq 渡し)。
 
-### 残り (文書順): 4A.9 / 4A.10 / 4A.11。
+### 残り (文書順): 4A.9 / 4A.10 / 4A.11 / 4A.12。
+
+#### 4A.9 の設計 (2026-07-25、PDF p.137 = 書籍 p.124 で statement 確定)
+
+`G = NA` (`N ⊴ G`, `A ≤ G`)、`M` = 系列 `N ⊇ ⁅N,A⁆ ⊇ ⁅N,A,A⁆ ⊇ ⋯` の最終項。
+**(a) `A ◁◁ G` (⚠ subnormal、PDF 画像で `⊲⊲` を確認) ⟺ `M ⊆ A`** / **(b) `M ⊆ A` なら `M ⊆ A^∞`**。
+
+- 定義: `commIterate N A 0 = N`, `commIterate N A (i+1) = ⁅commIterate N A i, A⁆`
+  (新 leaf `Ch04_Commutators/ProblemsIteratedCommutator.lean`)。
+- **(a) ⟸**: 部分正規鎖は `A = L_k A ≤ ⋯ ≤ L_1 A ≤ L_0 A = N ⊔ A = ⊤` (`L_i := commIterate`)。
+  各段 `W := L_{i+1} ⊔ A ⊴ L_i ⊔ A` は `Subgroup.normal_subgroupOf_iff_le_normalizer` +
+  `sup_le` で 2 本に分ける:
+  * `A ≤ N_G(W)`: `A ≤ W` ゆえ `⁅A,W⁆ ≤ ⁅W,W⁆ ≤ W` (`le_normalizer_of_commutator_le`)。
+  * `L_i ≤ N_G(W)`: 共役 `f = MulAut.conj x` (`x ∈ L_i`) で `W.map f = L_{i+1}.map f ⊔ A.map f`
+    (`Subgroup.map_sup`)。`L_{i+1}.map f = L_{i+1}` は「**`⁅H,K⁆` は `H` で正規化される**」
+    (`⁅hx,y⁆ = h⁅x,y⁆h⁻¹⁅h,y⁆` = `commutatorElement_mul_left_eq_conj_mul` から)、
+    `A.map f ≤ W` は `xax⁻¹ = ⁅x,a⁆·a ∈ L_{i+1}A`。`x⁻¹` にも適用して両包含。
+  ⚠ `⁅H, K ⊔ L⁆` の分配は偽なので使わない (`sup_le` を **normalizer 側**で使うのが要点)。
+- **(a) ⟹**: `IsSubnormal A` の構造帰納で **`∃ d, commIterate ⊤ A d ≤ A`** (defect 版):
+  `top` は `d = 0`、`step (A ≤ K) (K subnormal) (A ⊴ K)` は IH の `d` に対し
+  `commIterate ⊤ A d ≤ commIterate ⊤ K d ≤ K` (第 2 引数単調) から
+  `commIterate ⊤ A (d+1) = ⁅…, A⁆ ≤ ⁅K,A⁆ ≤ A`。あとは `M = ⁅M,A⁆` を `d` 回反復して
+  `M = commIterate M A d ≤ commIterate ⊤ A d ≤ A`。
+- **(b)**: `M = ⁅M,A⁆` と `M ≤ A` から `M = commIterate M A i ≤ Subgroup.lowerCentralSeries A i`
+  (∀ i) ⟹ `M ≤ ⨅ i, … = nilpotentResidual A` (= `A^∞`)。
+  ⚠ `nilpotentResidual` は `Ch09_MoreSubnormality/NilpotentResidual.lean` だが、そこは
+  **Ch01 しか import しない**ので Ch04 から import しても cycle 無し (実測済)。
+- `M` は「最終項」= 有限性で `L k = L (k+1)` となる `k` の値。仮説として
+  `hM : commIterate N A k = commIterate N A (k+1)` を取る形が扱いやすい
+  (存在は減少列の安定性から別途)。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
 
