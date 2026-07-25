@@ -19,6 +19,8 @@ with hypothesis (B2).
 
 set_option autoImplicit false
 
+open scoped Pointwise
+
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 namespace FirstCaseHypothesis
@@ -94,6 +96,89 @@ theorem m_eq_one_of_factorization
     rw [hm] at h2
     simp at h2
   omega
+
+include model in
+/-- **The `N_G(R)`-orbit of `P` is exactly `𝒜`** (step (12) tail input): the orbit sits
+inside `𝒜` (conjugates stay in `R`, keep order `p`, and stay outside `T` by the
+strongly-real exclusion), and the orbit count `p^m` (index theorem) matches `|𝒜|`. -/
+theorem orbit_eq_setOf_prime_order
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m)
+    (hGp : fc.p ^ (m + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) :
+    letI act : MulAction
+        ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) (Subgroup G) :=
+      MulAction.compHom _ ((MulAut.conj : G →* MulAut G).comp
+        (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)).subtype)
+    MulAction.orbit
+        ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) fc.P
+      = {P₁ : Subgroup G | P₁ ≤ fc.invImageF model ∧ Nat.card ↥P₁ = fc.p ∧
+          ¬ P₁ ≤ fc.sInvertedT model} := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set NR : Subgroup G :=
+    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
+  letI act : MulAction ↥NR (Subgroup G) :=
+    MulAction.compHom _ ((MulAut.conj : G →* MulAut G).comp NR.subtype)
+  -- subset (same argument as in the index theorem).
+  have hsub : MulAction.orbit ↥NR fc.P ⊆ {P₁ : Subgroup G |
+      P₁ ≤ fc.invImageF model ∧ Nat.card ↥P₁ = fc.p ∧
+        ¬ P₁ ≤ fc.sInvertedT model} := by
+    rintro Q ⟨n, rfl⟩
+    change MulAut.conj (n : G) • fc.P ≤ fc.invImageF model ∧ _ ∧ _
+    have hcard : Nat.card ↥(MulAut.conj (n : G) • fc.P) = fc.p := by
+      rw [← fc.card_P]
+      exact (Nat.card_congr (Subgroup.equivSMul (MulAut.conj (n : G)) fc.P).toEquiv).symm
+    refine ⟨?_, hcard, ?_⟩
+    · intro x hx
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hx
+      have h2 : ((MulAut.conj (n : G))⁻¹ • x : G) = (n : G)⁻¹ * x * (n : G) := by
+        have h3 : ((MulAut.conj (n : G))⁻¹ • x : G) = (MulAut.conj (n : G))⁻¹ x := rfl
+        rw [h3, ← map_inv, MulAut.conj_apply]
+        group
+      rw [h2] at hx
+      have h4 : (n : G)⁻¹ * x * (n : G) ∈ fc.invImageF model :=
+        fc.P_le_invImageF model hx
+      have h5 := (Subgroup.mem_set_normalizer_iff.mp n.2 ((n : G)⁻¹ * x * (n : G))).mp h4
+      have h6 : (n : G) * ((n : G)⁻¹ * x * (n : G)) * (n : G)⁻¹ = x := by group
+      rwa [h6] at h5
+    · intro hleT
+      have hbot := fc.conj_P_inf_sInvertedT_eq_bot model ind hB2 hm (n : G)
+      have h1 : MulAut.conj (n : G) • fc.P
+          = (MulAut.conj (n : G) • fc.P) ⊓ fc.sInvertedT model :=
+        (inf_of_le_left hleT).symm
+      rw [h1, hbot, Subgroup.card_bot] at hcard
+      exact fc.p_prime.one_lt.ne hcard
+  -- cardinality match via the index theorem.
+  obtain ⟨x₀, hx₀P, hx₀1⟩ : ∃ x₀ ∈ fc.P, x₀ ≠ (1 : G) := by
+    by_contra hall
+    push Not at hall
+    have h1 : fc.P = ⊥ := by
+      rw [eq_bot_iff]
+      intro x hx
+      rw [Subgroup.mem_bot]
+      exact hall x hx
+    have h2 := fc.card_P
+    rw [h1, Subgroup.card_bot] at h2
+    exact fc.p_prime.one_lt.ne h2
+  have hAcard := fc.ncard_prime_order_not_le_sInvertedT model ind hB2 hm hx₀P hx₀1
+  have hidx := fc.index_normalizer_P_subgroupOf_normalizer_invImageF model ind hB2 hm
+    hGp hSigma
+  have horbcard : (MulAction.orbit ↥NR fc.P).ncard = fc.p ^ m := by
+    rw [← Nat.card_coe_set_eq,
+      Nat.card_congr (MulAction.orbitEquivQuotientStabilizer ↥NR fc.P)]
+    have hstab : MulAction.stabilizer ↥NR fc.P
+        = (Subgroup.normalizer (fc.P : Set G)).subgroupOf NR := by
+      ext n
+      rw [MulAction.mem_stabilizer_iff, Subgroup.mem_subgroupOf]
+      change (MulAut.conj (n : G) • fc.P = fc.P) ↔ _
+      exact conj_smul_eq_iff_mem_normalizer
+    rw [hstab]
+    exact hidx ▸ rfl
+  refine Set.eq_of_subset_of_ncard_le hsub ?_ (Set.toFinite _)
+  rw [hAcard, horbcard]
 
 end FirstCaseHypothesis
 
