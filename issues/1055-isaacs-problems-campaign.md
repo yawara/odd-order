@@ -1485,7 +1485,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5A.7 | ✅ | `card_ker_lt_relIndex_commutator` (同上)。書籍の `G/C` cyclic 仮定は `BC = G` + `B` cyclic から従うので導出に変更 |
 | 5A.6 | ✅ | `card_ker_dvd_two_of_dihedral` (上界) + `isStemExtension_dihedralReduce` (下界) — `ProblemsDihedralMultiplier.lean`。書籍の `2^n` 版より強い**偶数一般形**で証明 |
 | 5A.8(a) | ✅ | `isStemExtension_prodMap` + `card_ker_prodMap` (`ProblemsSchurMultiplier.lean`) |
-| 5A.8(b) | 🔨 ステップ 1-5 + `\|Z\| = \|Z_A\|·\|Z_B\|` landing 済 (残り = 商への降下) | `ProblemsProductMultiplier.lean` に `inf_ker_snd_ker_fst` / `exists_mem_ker_snd_mul_mem_ker_fst` / ⭐`commutator_ker_snd_ker_fst_eq_bot`。残りはステップ 4-6 (下記設計)。準備補題 `not_dvd_card_commutator_of_sylow_le_center` (ステップ 5 用) も landing 済 |
+| 5A.8(b) | ✅ | `card_ker_eq_mul_card_ker_stem` (`ProblemsProductMultiplier.lean`) | `ProblemsProductMultiplier.lean` に `inf_ker_snd_ker_fst` / `exists_mem_ker_snd_mul_mem_ker_fst` / ⭐`commutator_ker_snd_ker_fst_eq_bot`。残りはステップ 4-6 (下記設計)。準備補題 `not_dvd_card_commutator_of_sylow_le_center` (ステップ 5 用) も landing 済 |
 
 ### 5A.8(b) の証明設計 (2026-07-26 確定、実装は次イテレーション)
 
@@ -1558,12 +1558,16 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
   `K ⧸ N →* A'` は stem extension で `|N|·|ker| = |ker ψ|`」。
   ⭐ **抽象化しておくと `A` 側と `B` 側が同じ補題の 2 適用**になる。
   位数部分は `(mk' N).restrict ψ.ker` に第一同型 + Lagrange (`Subgroup.index_ker`) を当てるだけ。
-- **残りは `isStemExtension_lift` の 2 適用のみ**: `K = ↥Γ_A`,
-  `ψ = ((fst∘h)).restrict Γ_A`, `N = Z_B.subgroupOf Γ_A` (正規性は `Z_B ⊴ Γ` が仮説不要で
-  従う — `h.ker` 正規 + `⁅Γ_B,Γ_B⁆` 正規 + `inf` 正規 — ので
-  `Subgroup.normal_subgroupOf` が instance で効く)。仮説 `ker ψ ≤ K' ⊔ N` は
-  `Z = Z_A·Z_B` と `Z_A ≤ ⁅Γ_A,Γ_A⁆` から。`|ker f_A| = |Z_A|` は
-  `|Z_B|·|ker f_A| = |ψ.ker| = |Z| = |Z_A||Z_B|` を `Nat.eq_of_mul_eq_mul_left` で割る。
+- **5A.8(b) 完成 (2026-07-26)**: `prodStemHomFst h : ↥Γ_A ⧸ Z_B →* A` /
+  `prodStemHomSnd h : ↥Γ_B ⧸ Z_A →* B` を `QuotientGroup.lift` で定義し、
+  `isStemExtension_lift` を 2 回適用 → `card_ker_eq_mul_card_ker_stem`。
+  `Z_B ⊴ Γ` は仮説不要 (`h.ker` 正規 + `⁅Γ_B,Γ_B⁆` 正規 + `inf` 正規) なので
+  `Subgroup.normal_subgroupOf` が instance で効き、商が仮説なしで型付く。
+  ⚠ `Subgroup.subgroupOf_le_subgroupOf` は存在しない — `subgroupOf = comap subtype` なので
+  `Subgroup.comap_mono` を使う。
+  ⚠ `Subgroup.mul_mem_sup` は第 1 因子が左の summand にある形しか取れない。順序が逆のときは
+  `Subgroup.mul_mem _ (mem_sup_right …) (mem_sup_left …)`
+  (誤って `mul_mem_sup (mem_sup_left …)` と書くと whnf timeout になる)。
 
 ### ⚠ 5A.6 の書籍読解訂正 (2026-07-26)
 

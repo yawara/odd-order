@@ -34,8 +34,11 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 5A.8(b) (書籍 p. 153
 5. `Z = Z_A · Z_B` (`exists_mul_mem_inf_commutator`), ここで
    `Z_A := Z ⊓ ⁅Γ_A,Γ_A⁆`, `Z_B := Z ⊓ ⁅Γ_B,Γ_B⁆`。
 
-本ファイルは 1-5 の前半を提供する。残り (`Z_A ⊓ Z_B = ⊥`, 商への降下) は
-issue 1055 の設計に従って続きを実装する。
+6. `Z_A ⊓ Z_B = ⊥` (`inf_inf_commutator_eq_bot`) と `|Z| = |Z_A|·|Z_B|` (`card_ker_eq_mul`)。
+7. 商への降下 (`isStemExtension_lift`) を 2 回適用して
+   `prodStemHomFst h : ↥Γ_A ⧸ Z_B →* A` と `prodStemHomSnd h : ↥Γ_B ⧸ Z_A →* B` が
+   それぞれ核 `Z_A`, `Z_B` の stem extension であることを得る
+   (`card_ker_eq_mul_card_ker_stem`)。
 
 ## `⁅Γ_A, Γ_B⁆ = ⊥` の証明 (書籍の行間)
 
@@ -387,6 +390,216 @@ theorem isStemExtension_lift {K A' : Type*} [Group K] [Group A'] [Finite K]
     rw [hker, ← hlag]
     congr 1
     exact (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hN).toEquiv).symm
+
+/-! ### 5A.8(b) の完成: 両側の stem extension -/
+
+/-- `Γ_A` 上の `A` への制限の核は `Z` (を `Γ_A` の部分群として見たもの)。 -/
+theorem ker_restrict_fst (h : Γ →* A × B) :
+    (((MonoidHom.fst A B).comp h).restrict ((MonoidHom.snd A B).comp h).ker).ker
+      = h.ker.subgroupOf ((MonoidHom.snd A B).comp h).ker := by
+  ext x
+  rw [MonoidHom.mem_ker, Subgroup.mem_subgroupOf, MonoidHom.mem_ker]
+  exact ⟨fun h1 => Prod.ext h1 x.2, fun h1 => congrArg Prod.fst h1⟩
+
+/-- `Γ_B` 上の `B` への制限の核は `Z`。 -/
+theorem ker_restrict_snd (h : Γ →* A × B) :
+    (((MonoidHom.snd A B).comp h).restrict ((MonoidHom.fst A B).comp h).ker).ker
+      = h.ker.subgroupOf ((MonoidHom.fst A B).comp h).ker := by
+  ext x
+  rw [MonoidHom.mem_ker, Subgroup.mem_subgroupOf, MonoidHom.mem_ker]
+  exact ⟨fun h1 => Prod.ext x.2 h1, fun h1 => congrArg Prod.snd h1⟩
+
+/-- `Z ≤ Z(Γ)` かつ `Z ≤ K` なら `Z` を `K` の部分群として見たものは `K` の中心に入る。 -/
+theorem ker_subgroupOf_le_center {h : Γ →* A × B} (hker : h.ker ≤ Subgroup.center Γ)
+    {K : Subgroup Γ} : h.ker.subgroupOf K ≤ Subgroup.center ↥K := by
+  intro x hx
+  rw [Subgroup.mem_subgroupOf] at hx
+  rw [Subgroup.mem_center_iff]
+  intro g
+  exact Subtype.ext ((Subgroup.mem_center_iff.mp (hker hx)) (g : Γ))
+
+/-- `⁅K, K⁆` を `K` の部分群として見たものは `commutator ↥K`。 -/
+theorem commutator_subgroupOf (K : Subgroup Γ) :
+    (⁅K, K⁆ : Subgroup Γ).subgroupOf K = _root_.commutator ↥K := by
+  rw [← K.map_subtype_commutator]
+  exact Subgroup.comap_map_eq_self (by rw [K.ker_subtype]; exact bot_le)
+
+/-- `Z ≤ ⁅Γ_A, Γ_A⁆ · Z_B` を `Γ_A` の中で見た形。 -/
+theorem ker_subgroupOf_le_sup_fst [Finite A] [Finite B] {h : Γ →* A × B}
+    (hsurj : Function.Surjective h) (hst : IsStemExtension h)
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card B)) :
+    h.ker.subgroupOf ((MonoidHom.snd A B).comp h).ker ≤
+      _root_.commutator ↥((MonoidHom.snd A B).comp h).ker ⊔
+        (h.ker ⊓ ⁅((MonoidHom.fst A B).comp h).ker,
+          ((MonoidHom.fst A B).comp h).ker⁆).subgroupOf ((MonoidHom.snd A B).comp h).ker := by
+  intro x hx
+  rw [Subgroup.mem_subgroupOf] at hx
+  obtain ⟨u, hu, v, hv, huv⟩ := exists_mul_mem_inf_commutator hsurj hst hcop hx
+  have huΓ : u ∈ ((MonoidHom.snd A B).comp h).ker :=
+    Subgroup.commutator_le_self _ hu.2
+  have hvΓ : v ∈ ((MonoidHom.snd A B).comp h).ker := by
+    have : v ∈ h.ker := hv.1
+    rw [MonoidHom.mem_ker] at this ⊢
+    rw [MonoidHom.comp_apply, this]
+    rfl
+  have hxuv : x = (⟨u, huΓ⟩ : ↥((MonoidHom.snd A B).comp h).ker) * ⟨v, hvΓ⟩ := Subtype.ext huv
+  rw [hxuv]
+  refine Subgroup.mul_mem_sup ?_ (Subgroup.mem_subgroupOf.mpr hv)
+  rw [← commutator_subgroupOf]
+  exact Subgroup.mem_subgroupOf.mpr hu.2
+
+/-- `Z ≤ ⁅Γ_B, Γ_B⁆ · Z_A` を `Γ_B` の中で見た形。 -/
+theorem ker_subgroupOf_le_sup_snd [Finite A] [Finite B] {h : Γ →* A × B}
+    (hsurj : Function.Surjective h) (hst : IsStemExtension h)
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card B)) :
+    h.ker.subgroupOf ((MonoidHom.fst A B).comp h).ker ≤
+      _root_.commutator ↥((MonoidHom.fst A B).comp h).ker ⊔
+        (h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker,
+          ((MonoidHom.snd A B).comp h).ker⁆).subgroupOf ((MonoidHom.fst A B).comp h).ker := by
+  intro x hx
+  rw [Subgroup.mem_subgroupOf] at hx
+  obtain ⟨u, hu, v, hv, huv⟩ := exists_mul_mem_inf_commutator hsurj hst hcop hx
+  have hvΓ : v ∈ ((MonoidHom.fst A B).comp h).ker :=
+    Subgroup.commutator_le_self _ hv.2
+  have huΓ : u ∈ ((MonoidHom.fst A B).comp h).ker := by
+    have hmem : u ∈ h.ker := hu.1
+    rw [MonoidHom.mem_ker] at hmem ⊢
+    rw [MonoidHom.comp_apply, hmem]
+    rfl
+  have hxuv : x = (⟨u, huΓ⟩ : ↥((MonoidHom.fst A B).comp h).ker) * ⟨v, hvΓ⟩ := Subtype.ext huv
+  rw [hxuv]
+  refine Subgroup.mul_mem _ (Subgroup.mem_sup_right (Subgroup.mem_subgroupOf.mpr hu))
+    (Subgroup.mem_sup_left ?_)
+  rw [← commutator_subgroupOf]
+  exact Subgroup.mem_subgroupOf.mpr hv.2
+
+/-- `Z_B` (を `Γ_A` の部分群として見たもの) は `Γ_A → A` の核に含まれる。 -/
+theorem zB_subgroupOf_le_ker (h : Γ →* A × B) :
+    (h.ker ⊓ ⁅((MonoidHom.fst A B).comp h).ker,
+        ((MonoidHom.fst A B).comp h).ker⁆).subgroupOf ((MonoidHom.snd A B).comp h).ker ≤
+      (((MonoidHom.fst A B).comp h).restrict ((MonoidHom.snd A B).comp h).ker).ker := by
+  rw [ker_restrict_fst]
+  exact Subgroup.comap_mono inf_le_left
+
+/-- `Z_A` (を `Γ_B` の部分群として見たもの) は `Γ_B → B` の核に含まれる。 -/
+theorem zA_subgroupOf_le_ker (h : Γ →* A × B) :
+    (h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker,
+        ((MonoidHom.snd A B).comp h).ker⁆).subgroupOf ((MonoidHom.fst A B).comp h).ker ≤
+      (((MonoidHom.snd A B).comp h).restrict ((MonoidHom.fst A B).comp h).ker).ker := by
+  rw [ker_restrict_snd]
+  exact Subgroup.comap_mono inf_le_left
+
+/-- **5A.8(b) の `A` 側 stem extension** `↥Γ_A ⧸ Z_B →* A`。 -/
+noncomputable def prodStemHomFst (h : Γ →* A × B) :
+    (↥((MonoidHom.snd A B).comp h).ker ⧸
+      (h.ker ⊓ ⁅((MonoidHom.fst A B).comp h).ker,
+        ((MonoidHom.fst A B).comp h).ker⁆).subgroupOf ((MonoidHom.snd A B).comp h).ker) →* A :=
+  QuotientGroup.lift _ (((MonoidHom.fst A B).comp h).restrict ((MonoidHom.snd A B).comp h).ker)
+    (zB_subgroupOf_le_ker h)
+
+/-- **5A.8(b) の `B` 側 stem extension** `↥Γ_B ⧸ Z_A →* B`。 -/
+noncomputable def prodStemHomSnd (h : Γ →* A × B) :
+    (↥((MonoidHom.fst A B).comp h).ker ⧸
+      (h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker,
+        ((MonoidHom.snd A B).comp h).ker⁆).subgroupOf ((MonoidHom.fst A B).comp h).ker) →* B :=
+  QuotientGroup.lift _ (((MonoidHom.snd A B).comp h).restrict ((MonoidHom.fst A B).comp h).ker)
+    (zA_subgroupOf_le_ker h)
+
+/-- `ker h ≤ Γ_A`。 -/
+theorem ker_le_ker_comp_snd (h : Γ →* A × B) : h.ker ≤ ((MonoidHom.snd A B).comp h).ker := by
+  intro z hz
+  rw [MonoidHom.mem_ker] at hz ⊢
+  rw [MonoidHom.comp_apply, hz]
+  rfl
+
+/-- `ker h ≤ Γ_B`。 -/
+theorem ker_le_ker_comp_fst (h : Γ →* A × B) : h.ker ≤ ((MonoidHom.fst A B).comp h).ker := by
+  intro z hz
+  rw [MonoidHom.mem_ker] at hz ⊢
+  rw [MonoidHom.comp_apply, hz]
+  rfl
+
+/-- **Problem 5A.8(b), `A` 側**: `↥Γ_A ⧸ Z_B →* A` は stem extension で核の位数は `|Z_A|`。 -/
+theorem isStemExtension_prodStemHomFst [Finite Γ] [Finite A] [Finite B] {h : Γ →* A × B}
+    (hsurj : Function.Surjective h) (hst : IsStemExtension h)
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card B)) :
+    IsStemExtension (prodStemHomFst h) ∧
+      Nat.card (prodStemHomFst h).ker =
+        Nat.card ((h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker,
+          ((MonoidHom.snd A B).comp h).ker⁆ : Subgroup Γ)) := by
+  have hZB : (h.ker ⊓ ⁅((MonoidHom.fst A B).comp h).ker,
+      ((MonoidHom.fst A B).comp h).ker⁆ : Subgroup Γ) ≤ ((MonoidHom.snd A B).comp h).ker :=
+    inf_le_left.trans (ker_le_ker_comp_snd h)
+  have hres := isStemExtension_lift (ψ := ((MonoidHom.fst A B).comp h).restrict
+      ((MonoidHom.snd A B).comp h).ker)
+    (by
+      intro a
+      obtain ⟨γ, hγ⟩ := hsurj (a, 1)
+      have hmem : γ ∈ ((MonoidHom.snd A B).comp h).ker := by
+        rw [MonoidHom.mem_ker, MonoidHom.comp_apply, hγ]
+        rfl
+      exact ⟨⟨γ, hmem⟩, by
+        change (h γ).1 = a
+        rw [hγ]⟩)
+    (by rw [ker_restrict_fst]; exact ker_subgroupOf_le_center hst.ker_le_center)
+    (zB_subgroupOf_le_ker h)
+    (by rw [ker_restrict_fst]; exact ker_subgroupOf_le_sup_fst hsurj hst hcop)
+  refine ⟨hres.1, ?_⟩
+  have hcard := hres.2
+  rw [ker_restrict_fst,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZB).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (ker_le_ker_comp_snd h)).toEquiv,
+    card_ker_eq_mul hsurj hst hcop, mul_comm] at hcard
+  exact Nat.eq_of_mul_eq_mul_right Nat.card_pos hcard
+
+/-- **Problem 5A.8(b), `B` 側**: `↥Γ_B ⧸ Z_A →* B` は stem extension で核の位数は `|Z_B|`。 -/
+theorem isStemExtension_prodStemHomSnd [Finite Γ] [Finite A] [Finite B] {h : Γ →* A × B}
+    (hsurj : Function.Surjective h) (hst : IsStemExtension h)
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card B)) :
+    IsStemExtension (prodStemHomSnd h) ∧
+      Nat.card (prodStemHomSnd h).ker =
+        Nat.card ((h.ker ⊓ ⁅((MonoidHom.fst A B).comp h).ker,
+          ((MonoidHom.fst A B).comp h).ker⁆ : Subgroup Γ)) := by
+  have hZA : (h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker,
+      ((MonoidHom.snd A B).comp h).ker⁆ : Subgroup Γ) ≤ ((MonoidHom.fst A B).comp h).ker :=
+    inf_le_left.trans (ker_le_ker_comp_fst h)
+  have hres := isStemExtension_lift (ψ := ((MonoidHom.snd A B).comp h).restrict
+      ((MonoidHom.fst A B).comp h).ker)
+    (by
+      intro b
+      obtain ⟨γ, hγ⟩ := hsurj (1, b)
+      have hmem : γ ∈ ((MonoidHom.fst A B).comp h).ker := by
+        rw [MonoidHom.mem_ker, MonoidHom.comp_apply, hγ]
+        rfl
+      exact ⟨⟨γ, hmem⟩, by
+        change (h γ).2 = b
+        rw [hγ]⟩)
+    (by rw [ker_restrict_snd]; exact ker_subgroupOf_le_center hst.ker_le_center)
+    (zA_subgroupOf_le_ker h)
+    (by rw [ker_restrict_snd]; exact ker_subgroupOf_le_sup_snd hsurj hst hcop)
+  refine ⟨hres.1, ?_⟩
+  have hcard := hres.2
+  rw [ker_restrict_snd,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZA).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (ker_le_ker_comp_fst h)).toEquiv,
+    card_ker_eq_mul hsurj hst hcop] at hcard
+  exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hcard
+
+/-- **Isaacs Problem 5A.8(b)** (∀-形の完成): `|A|`, `|B|` が互いに素で `h : Γ →* A × B` が
+stem extension なら, `A` の stem extension `prodStemHomFst h` と `B` の stem extension
+`prodStemHomSnd h` があって `|ker h| = |ker f_A| · |ker f_B|`。
+
+5A.8(a) (`isStemExtension_prodMap` / `card_ker_prodMap`) と合わせて
+`|M(A × B)| = |M(A)| |M(B)|` の位数版になる。 -/
+theorem card_ker_eq_mul_card_ker_stem [Finite Γ] [Finite A] [Finite B] {h : Γ →* A × B}
+    (hsurj : Function.Surjective h) (hst : IsStemExtension h)
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card B)) :
+    IsStemExtension (prodStemHomFst h) ∧ IsStemExtension (prodStemHomSnd h) ∧
+      Nat.card h.ker =
+        Nat.card (prodStemHomFst h).ker * Nat.card (prodStemHomSnd h).ker := by
+  obtain ⟨hA, hcA⟩ := isStemExtension_prodStemHomFst hsurj hst hcop
+  obtain ⟨hB, hcB⟩ := isStemExtension_prodStemHomSnd hsurj hst hcop
+  exact ⟨hA, hB, by rw [hcA, hcB]; exact card_ker_eq_mul hsurj hst hcop⟩
 
 end
 
