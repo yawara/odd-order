@@ -725,3 +725,16 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   u ≠ 1: s∉R は位数 2 vs |R| = p² 奇数)。
   結論 = [s] が Q̂₂ の唯一 Sylow-p 生成元を反転 = C_{R₁/R}(s) = 1 (書籍 p.112)。
   この instance pack は (14) ((10.2) 側 N_G(RΣ) ↷ 𝒜₂) でも再利用できる。
+- δ2' 完了 (`3bcf40314`): `quotient_conj_eq_inv_of_sq_eq_one` — N/R ↷ 𝒜 の
+  instance pack (subtype MulAction + lift 降下 + Faithful/Pretransitive/card) を
+  1 定理に集約し ±1 補題適用。任意の対合が R₁/R を反転。
+- **δ3 への key 観察: T = [R₁,R₁]** (T は R₁ の特性的部分群):
+  [R₁,R₁] ≤ T は |R₁/T| = p² (可換) から自明; [R₁,R₁] ≠ 1 は R₁ 非可換
+  (R₁ 可換 → R₁ ≤ C_G(R) = R が card 矛盾); |T| = p 素数で等号。
+  ⟹ N_G(R₁) は T を正規化 (δ1 の NR 版より強く、char で自動) —
+  δ4 の「N_G(R₁) が R₁/T の line たちに作用」の基盤。
+- 次 iteration: (i) R₁ 非可換 + T = [R₁,R₁] を landing → (ii) δ4 =
+  𝒜₁-line 論法 (C_Q(P) が 𝒜₁∖{R/T} に正則、(11) の
+  invImageF_mul_comm_of_not_dvd_card_D 系のパターンを R₁/T level で再演) →
+  (iii) ε = Cor 10.2 (transfer_range_eq_of_nilpotencyClass_lt、Yoshida.lean) +
+  T₁C_Q(P)C_W(P) index-p 正規 → ¬(B2)。
