@@ -1026,9 +1026,10 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 - インスタンスを避けるなら `Commute.add_pow` (二項定理) + `Nat.Prime.dvd_choose_self`
   (`0 < k < p` で `p ∣ C(p,k)`) + 「`V` の指数が `p` ⟹ `End V` で `p • x = 0`」で
   `(1-σ)^p = 1 + (-σ)^p = 1 + (-1)^p·1 = 0` (`p` 奇なら `1 - 1`、`p = 2` なら `1 + 1 = 2 = 0`)。
-- ⚠ `(p-1).choose j ≡ (-1)^j [ZMOD p]` は **mathlib に見当たらない** (grep 済) ので、
-  ルート 1 を採るなら自前で帰納する必要がある。⟹ **ルート 2 (多項式環) か、
-  `Δ^p = 0` だけ上の方法で出して下界を別途工夫する方が安い**。
+- `(p-1).choose j ≡ (-1)^j [ZMOD p]` は mathlib に無いが **自前で証明済**
+  (`cast_choose_prime_sub_one`; Pascal + `Nat.Prime.dvd_choose_self` の帰納、13 行)。
+  ⚠ `Nat.Prime` は `Irreducible` の別名なので **dot 記法 `hr.dvd_choose_self` は
+  `Irreducible.dvd_choose_self` に解決されて失敗する** — 完全名で書くこと。
 
 ⚠ なお `Δ^p = 0` だけでは `class(P) ≤ p` (上界) しか出ない。maximal class には
 `Δ^{p-1} ≠ 0` (下界) が要り、そこは linchpin `Δ^{p-1} = T_p` が最短。

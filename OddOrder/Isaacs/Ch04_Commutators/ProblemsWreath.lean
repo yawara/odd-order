@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Field.ZMod
+import Mathlib.Data.Nat.Choose.Dvd
 import Mathlib.Algebra.Polynomial.Coeff
 import Mathlib.Algebra.Polynomial.Div
 import Mathlib.Algebra.Ring.GeomSum
@@ -875,6 +876,41 @@ theorem one_sub_X_pow_prime_sub_one (p : ℕ) [Fact p.Prime] :
     omega
   rw [hsplit, ← h2] at h1
   exact mul_left_cancel₀ hne h1
+
+/-- **`(r-1).choose j ≡ (-1)^j (mod r)`** (`j < r`, `r` 素数).
+
+mathlib に無いので自前で証明 (2026-07-25 に grep 済). Pascal
+`r.choose (j+1) = (r-1).choose j + (r-1).choose (j+1)` と
+`r ∣ r.choose (j+1)` (`Nat.Prime.dvd_choose_self`) から `j` の帰納で従う.
+
+4A.8(d) の linchpin を pointwise 二項展開で示すときの係数計算に使う
+(`Δ^{r-1}` の指数がすべて `1` になる理由). -/
+theorem cast_choose_prime_sub_one (r : ℕ) (hr : Nat.Prime r) :
+    ∀ j : ℕ, j < r → (((r - 1).choose j : ℕ) : ZMod r) = (-1) ^ j := by
+  have hr1 : 1 ≤ r := hr.one_lt.le
+  intro j
+  induction j with
+  | zero => intro _; simp
+  | succ j ih =>
+    intro hj
+    have hjr : j < r := by omega
+    have hpascal : r.choose (j + 1) = (r - 1).choose j + (r - 1).choose (j + 1) := by
+      have hrs : r = (r - 1) + 1 := by omega
+      rw [hrs, Nat.choose_succ_succ]
+      congr 1
+    have hdvd : r ∣ r.choose (j + 1) := Nat.Prime.dvd_choose_self hr (by omega) (by omega)
+    have hzero : ((r.choose (j + 1) : ℕ) : ZMod r) = 0 := by
+      obtain ⟨c, hc⟩ := hdvd
+      rw [hc]
+      push_cast
+      simp
+    rw [hpascal] at hzero
+    push_cast at hzero
+    rw [ih hjr] at hzero
+    have hval : (((r - 1).choose (j + 1) : ℕ) : ZMod r) = -(-1) ^ j :=
+      eq_neg_of_add_eq_zero_right hzero
+    rw [hval, pow_succ]
+    ring
 
 end
 
