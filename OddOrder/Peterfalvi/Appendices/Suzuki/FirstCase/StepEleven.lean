@@ -907,6 +907,56 @@ theorem invImageF_mul_comm_of_card_D_eq_p
   exact fc.false_of_ppart_subgroup_center_P
     (fc.sup_centralizer_W_inf_centralizer_eq_P model ind hnab) hcardS hCeq hpQ hG5
 
+include model in
+/-- **Step (11), first assertion: `R` is abelian** (p. 111–112): both branches of the
+step (10) dichotomy kill a nonabelian `R` via the shared Sylow engine — case (10.1)
+through `R` itself, case (10.2) through `R·C_W(P)`.  Inherits the step (2)(b) `sorry`
+(issue 9318) + Higman through `step_ten_dichotomy`. -/
+theorem invImageF_mul_comm
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) :
+    ∀ r₁ ∈ fc.invImageF model, ∀ r₂ ∈ fc.invImageF model, r₁ * r₂ = r₂ * r₁ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  obtain ⟨e⟩ := fc.sigma_mulEquiv_centralizer_W ind
+  have hDCW : Nat.card ↥(fc.rankOneQuotient).D
+      = Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) :=
+    Nat.card_congr e.toEquiv
+  rcases fc.step_ten_dichotomy ind model hB2 hm with ⟨hnd, hfact⟩ | ⟨hd, -, -, -, hW, hfact⟩
+  · -- case (10.1): the `R`-arm.
+    refine fc.invImageF_mul_comm_of_not_dvd_card_D model ind hm ?_ ?_
+    · have h1 : fc.p ^ (m + 2) = fc.p ^ ((Nat.card G).factorization fc.p) := by
+        rw [hfact]
+      rw [h1]
+      exact (Nat.Prime.pow_dvd_iff_le_factorization fc.p_prime
+        Nat.card_pos.ne').mpr le_rfl
+    · rw [hDCW]
+      exact hnd
+  · -- case (10.2): the `R·C_W(P)`-arm.
+    obtain ⟨hp3, hF9, -, hCW3, -⟩ :=
+      fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hd
+    refine fc.invImageF_mul_comm_of_card_D_eq_p model ind ?_ ?_ ?_
+    · rw [hF9, hp3]
+      norm_num
+    · -- `p^5 ∣ |G|` from `3^{|G|_3} = 3^4·|W|`, `|W| ∈ {3, 9}`.
+      rw [hp3]
+      have hf5 : 5 ≤ (Nat.card G).factorization 3 := by
+        rcases hW with h3 | h9
+        · rw [h3] at hfact
+          have h35 : (3 : ℕ) ^ ((Nat.card G).factorization 3) = 3 ^ 5 := by
+            rw [hfact]; norm_num
+          have := Nat.pow_right_injective (by norm_num) h35
+          omega
+        · rw [h9] at hfact
+          have h36 : (3 : ℕ) ^ ((Nat.card G).factorization 3) = 3 ^ 6 := by
+            rw [hfact]; norm_num
+          have := Nat.pow_right_injective (by norm_num) h36
+          omega
+      exact dvd_trans (pow_dvd_pow 3 hf5)
+        ((Nat.Prime.pow_dvd_iff_le_factorization Nat.prime_three
+          Nat.card_pos.ne').mpr le_rfl)
+    · rw [hDCW, hCW3, hp3]
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
