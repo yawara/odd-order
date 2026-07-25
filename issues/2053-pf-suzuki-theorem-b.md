@@ -1363,6 +1363,28 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
 5. `|W| = 9` 側: `C_{R₁}(s) = PΣ`, `W ⊄ R₁`, `R₂ = R₁W`, `R₁⟨s⟩ ⊴ R₂⟨s⟩` ⟹
    再び (B2) と矛盾。
 
+## 🚧 step (17) 進捗 (2026-07-26、`FirstCase/StepSeventeen.lean` 新 leaf)
+
+### landed — **書籍 (17) の弱閉性パート (段 1–2) が完了**
+- `isStronglyReal_inv` (generic) : 強実元の逆元は強実
+- `mem_zpowers_of_isStronglyReal_of_mem` : **Z₁PΣ の強実元 = Z₁ の元**
+  (強実 y ∉ Z₁ があれば ⟨y⟩ = {1,y,y⁻¹} が全元強実な位数 3 部分群 ⟹ (16) に反する)
+- `map_conj_zpowers_le_sup_nonsplitTorus_V` : **`Z₁^x ⊄ LV` の排除** (書籍 (17) 段 1)
+  A = (Z₁PΣ)^x ⊓ LV の位数 9 は `relIndex_dvd_index_of_normal` を ↥R₂ 内で使って
+  (`relIndex_subgroupOf` で持ち上げ) 導く。A ⊓ Z₁ = 1 は「(Z₁PΣ)^x の強実元は
+  Z₁^x のもの」から。⟹ Z₁A = Z₁PΣ を Z₁^x が中心化 ⟹ Z₁Σ = Z(LV) ⊆ Z(R₂) = Z₁ で
+  |Z₁Σ| = 9 と矛盾。
+- `map_conj_eq_of_map_conj_zpowers_le` / **`map_conj_eq_of_le_sylow`** :
+  **`(Z₁PΣ)^x ≤ R₂ ⟹ (Z₁PΣ)^x = Z₁PΣ`** = Hall–Wielandt の仮説
+  「A は R₂ 内で weakly closed」。
+
+### 残り
+1. **Hall–Wielandt (abelian 版)** = [issue 9503](9503-hall-wielandt-abelian-weakly-closed.md)
+   (claim 済、hub band)。これが入れば `G/O³(G) ≅ R₂⟨s⟩/O³(R₂⟨s⟩)`。
+2. 書籍 (17) 段 4–5 の最終矛盾 2 本 (`|W| = 3` 側と `|W| = 9` 側)。材料:
+   `R₁ = RΣL` (landed)、class ≤ 2 (= (16) 第一主張、landed)、
+   `N_G(Z₁) = R₂⟨s⟩` (landed)、(14) の「s は R₁/RΣ を反転」。
+
 ⚠ **唯一の新規 shared infra = Hall–Wielandt の abelian 版**
 (`A ≤ Z(P)` でなく `p > 2 ∧ A abelian` 版; 本 issue 冒頭「Hall-Wielandt の所在」参照)。
 着手時は **9500 番台で claim** してから (hub バンド)。それ以外の (17) の材料は
