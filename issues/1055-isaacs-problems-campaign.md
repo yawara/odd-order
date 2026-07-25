@@ -1207,7 +1207,28 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 ⬜ **4A.13 も未着手** (pdftotext が切れていて見落としていた; PDF p.138 で確認):
 `G` 冪零で class `m > 1`, `a ∈ G` ⟹ `H = G'⟨a⟩` の冪零類は `m` 未満。
 
-### 残り (文書順): 4A.12(c) の `D₈` 部分 / 4A.13。
+#### 4A.13 の設計 (2026-07-25、着手前メモ)
+
+書籍 (p.125): `G` 冪零で class `m > 1`, `a ∈ G` ⟹ **`H = G'⟨a⟩` の冪零類は `m` 未満**。
+
+- 添字: mathlib の `lowerCentralSeries X i` = 古典的 `γ_{i+1}(X)`。示すべきは
+  `Subgroup.lowerCentralSeries H (m-1) = ⊥` (⟹ `class(↥H) ≤ m-1 < m`)。
+  部分群の類への翻訳は **`nilpotencyClass_le_iff_lowerCentralSeries_eq_bot`**
+  (4A.10 の `ProblemsCenterIndex.lean` に既設) が使える。
+- **鍵の主張**: `k ≥ 1` で `H.lowerCentralSeries k ≤ (⊤ : Subgroup G).lowerCentralSeries (k+1)`
+  (古典形 `γ_i(H) ≤ γ_{i+1}(G)`, `i ≥ 2`)。`k = m-1` で右辺 `= γ_{m+1}(G) = ⊥`。
+- **帰納段**は易しい: `⁅L, H⁆ ≤ ⁅γ_{k+2}, ⊤⁆ = γ_{k+3}`。
+- **基底 `⁅H,H⁆ ≤ γ_3(G) = ⁅G', ⊤⁆` が本体**。`G/γ_3` で `Ḡ'` は中心的なので
+  `H̄ = Ḡ'⟨ā⟩` は可換、という筋。⁅H ⊔ K, ·⁆ の分配は使えないので **good-elements 二段**で:
+  * `N := γ_3` は正規。`{x | ⁅x,y⁆ ∈ N}` と `{y | ⁅x,y⁆ ∈ N}` はそれぞれ部分群
+    (`⁅x₁x₂,y⁆ = x₁⁅x₂,y⁆x₁⁻¹·⁅x₁,y⁆` と `N` 正規; 逆元は `commutatorElement_inv_left`)。
+  * 第 1 段: `{y | ⁅a,y⁆ ∈ N}` は `G'` (∵ `⁅G,G'⁆ = γ_3`) と `a` を含む ⟹ `H` を含む
+    ⟹ `⁅a, H⁆ ≤ N`。
+  * 第 2 段: `{x | ∀ y ∈ H, ⁅x,y⁆ ∈ N}` は `G'` (∵ `⁅G',G⁆ = γ_3`) と `a` (第 1 段) を含む
+    ⟹ `H` を含む ⟹ `⁅H,H⁆ ≤ N`。
+- `H := commutator G ⊔ Subgroup.zpowers a`。`Subgroup.closure_le` で generator に落とす。
+
+### 残り (文書順): 4A.12(c) の `D₈` 部分 (`|𝒯(D₈)| ≤ 3` の具体計算) / 4A.13。
 
 #### 🎉 4A.11 完了 (2026-07-25) — `ProblemsWreath.lean` に追加
 
