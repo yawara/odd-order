@@ -52,6 +52,7 @@ import OddOrder.GroupTheory.MaximalClassPGroup
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.IsMetacyclic
 import OddOrder.GroupTheory.MackeyTransfer
+import OddOrder.GroupTheory.TransferIndexTwo
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.GroupTheory.OmegaSubgroup
