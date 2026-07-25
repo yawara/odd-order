@@ -828,3 +828,35 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   N_G(R₁) = N_G(R)。→ (ε) R₁ Sylow + class 2 < p → Cor 10.2
   (transfer_range_eq_of_nilpotencyClass_lt) + T₁C_Q(P)C_W(P) index-p 正規
   (M := 逆像 of hom NR → R/T-方向) → p ∣ |Ab(G)| → ¬(B2) → step_twelve 完結。
+- **δ4 完結** (2026-07-25, `56f588501`): N_G(R₁) = N_G(R) が landed。全 chain =
+  C1 (`a2be30c94`) / C2 (`9c5ae1a2c`) / D1+D2 (`75a4dcca2`) / D3 counting
+  (`872b33f59`) / D-assembly (`56f588501`)、第 3 leaf StepTwelveConclusion。
+  **残るは ε のみ**: (ε1) R₁ は G の Sylow-p (card p³ = p-part hfact +
+  Sylow.ofCard); R₁ 非可換 (commutator ≠ ⊥) → class 2 < p →
+  transfer_range_eq_of_nilpotencyClass_lt (Isaacs Cor 10.2, Yoshida.lean) で
+  G/O^p(G) ≅ N_G(R₁)/O^p(N_G(R₁))-型の結論を取得 (正確な statement 形は
+  Yoshida.lean を読んで適合) → (ε2) NR = N_G(R₁) に index-p 正規部分群:
+  M := T₁ ⊔ (C-part)… 実装候補: hom NR → ↥R₁⧸(T₁-sub) ≅ C_p を
+  [NR,NR] ≤ R₁ + T₁ ⊴ NR + R₁/T₁ ≅ C_p (card p³/p²) で構成 —
+  NR/T₁-商で R₁/T₁ が中心的位数 p、NR/(T₁·[C-part])… 具体形:
+  NR ⧸ T₁-normal (T₁ ⊴ NR ✓ conj_sInvertedOvergroup_eq!) の中で
+  R₁/T₁ (位数 p) と (C_G(P)-像) の積; [NR,NR] ≤ R₁ → NR/R₁ 可換 →
+  合成 NR → NR/T₁ → (NR/T₁)/((C-像)·付随) の設計は着手時に確定 →
+  (ε3) p ∣ |Ab(G)| → ¬hB2 で False → **step_twelve 主定理**
+  (case (10.1) → False) を assemble。
+- ε1 完了 (`ff3def388`): [N_G(R), R₁] ≤ T₁。**残る ε2/ε3 (transfer bridge)**:
+  資産確認済 — `transfer_range_eq_of_nilpotencyClass_lt` (Yoshida.lean:518,
+  v(G).range = w(N).range 形、N = normalizer-of-Sylow)、`focalSubgroupTheorem`
+  (Ch05_Transfer/Basic.lean:1158: commutator G ⊓ P = P.focalSubgroup 等 3 conj)。
+  実装計画: (ε2) G-focal ≤ T₁: focalSubgroup の生成元 x⁻¹·(gxg⁻¹) (G-共役対
+  in R₁) — Cor 10.2 の range-equality から fusion 制御を経由するのが本筋だが、
+  直接 route も検討価値: focal = commutator G ⊓ R₁ (focalSubgroupTheorem.1) を
+  使い、p³ ∤ |commutator G| を示す方が軽い可能性 — R₁ ≤ commutator G と仮定
+  すると focal = R₁ で、Cor 10.2 равен-transfer から N-側 transfer が
+  G-transfer と一致 → N-focal ⊇-関係… ここは transferRes/Abelianization の
+  API 精読が必要 (TransferIndexPrime.lean Lemma 10.6/10.7/10.9/10.11 一式あり)。
+  (ε3) p ∣ |Ab(G)|: p³ ∤ |commutator G| (Sylow-共役で R₁ ≤ commutator を排除)
+  → v_p(|Ab G|) = 3 − v_p(|comm|) ≥ 1 → ¬hB2 → **False = step_twelve 完結**。
+  R₁ の class < p: R₁ 非可換 p³ → class = 2 (⁅R₁,R₁⁆ = T ≤ Z(R₁) via δ4a)
+  < 3 ≤ p (p 奇素数)。nilpotencyClass-API との橋 (Group.nilpotencyClass ↥R₁ = 2)
+  は mathlib の nilpotencyClass-le-iff-…-central-series で組む。
