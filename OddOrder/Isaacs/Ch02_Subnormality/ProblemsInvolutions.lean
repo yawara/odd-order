@@ -35,6 +35,9 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) の章末演習 §2B のうち 
 - **2B.4** (一般の有限群): Sylow 2-部分群が 2 つ以上あり互いに自明交叉 (TI) なら、involution は
   ちょうど 1 つの共役類をなす (`isConj_of_orderOf_eq_two_of_sylow_ti` +
   `exists_orderOf_eq_two_of_exists_sylow_two_ne`)。2B.3 が核。
+- **2B.5** (generalized dihedral): 指数 2 の部分群 `B ≤ G` について 3 条件の同値
+  (`generalizedDihedral_tfae`) と、そのとき `B` が可換であること
+  (`isMulCommutative_of_generalizedDihedral`)。
 -/
 
 namespace OddOrder.Isaacs.Ch02
@@ -626,6 +629,102 @@ theorem exists_orderOf_eq_two_of_exists_sylow_two_ne [Finite G]
     · exact dvd_pow_self 2 (Nat.succ_ne_zero n)
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := ↥(P : Subgroup G)) 2 hdvd
   exact ⟨(x : G), (Subgroup.orderOf_coe x).trans hx⟩
+
+end
+
+section /- Problem 2B.5: generalized dihedral (指数 2 の部分群) (p. 57) -/
+
+variable {G : Type*} [Group G] {B : Subgroup G}
+
+/-- 指数 2 の部分群の外にある 2 元は同じ剰余類に属する。 -/
+theorem inv_mul_mem_of_notMem_of_index_eq_two (hB : B.index = 2) {x y : G}
+    (hx : x ∉ B) (hy : y ∉ B) : x⁻¹ * y ∈ B := by
+  obtain ⟨a, ha⟩ := Subgroup.index_eq_two_iff'.mp hB
+  have hax : a * x ∈ B := by rcases ha x with ⟨h, -⟩ | ⟨h, -⟩; exacts [h, absurd h hx]
+  have hay : a * y ∈ B := by rcases ha y with ⟨h, -⟩ | ⟨h, -⟩; exacts [h, absurd h hy]
+  have := B.mul_mem (B.inv_mem hax) hay
+  simpa [mul_assoc] using this
+
+/-- 部分群の元と外の元の積は外にある。 -/
+theorem mul_notMem_of_mem_of_notMem {b t : G} (hb : b ∈ B) (ht : t ∉ B) : b * t ∉ B :=
+  fun h => ht (by simpa using B.mul_mem (B.inv_mem hb) h)
+
+/-- 指数 2 の部分群は真部分群ゆえ外に元がある。 -/
+theorem exists_notMem_of_index_eq_two (hB : B.index = 2) : ∃ t : G, t ∉ B := by
+  by_contra hcon
+  push Not at hcon
+  have hBtop : B = ⊤ := le_antisymm le_top fun x _ => hcon x
+  rw [hBtop, Subgroup.index_top] at hB
+  omega
+
+/-- **Isaacs Problem 2B.5**. `B ≤ G` を指数 2 の部分群とすると、次は同値:
+1. `G ∖ B` に involution `t` があって全ての `b ∈ B` を反転する (`b^t = b⁻¹`)。
+2. `G ∖ B` は involution だけからなる。
+3. `G ∖ B` の全ての元 `t` は involution であり、全ての `b ∈ B` を反転する。
+
+(この状況で `G` は **generalized dihedral** と呼ばれる。)
+
+`t` は involution なので `t⁻¹ = t`、したがって Isaacs の `b^t = t⁻¹ b t` と
+ここでの `t * b * t⁻¹` は一致する。
+
+- (1) ⟹ (2): `x ∉ B` は `x = t * b` (`b := t⁻¹ * x ∈ B`) と書け、反転則から
+  `x² = (t b)(t b) = (b⁻¹ t)(t b) = b⁻¹ b = 1`、かつ `x ≠ 1` (`1 ∈ B`)。
+- (2) ⟹ (3): `b ∈ B`, `t ∉ B` なら `b * t ∉ B` も involution ゆえ `b t b t = 1`、
+  すなわち `t b t = b⁻¹`。
+- (3) ⟹ (1): 指数 2 ゆえ `G ∖ B` は空でない。 -/
+theorem generalizedDihedral_tfae (hB : B.index = 2) :
+    List.TFAE
+      [∃ t : G, t ∉ B ∧ orderOf t = 2 ∧ ∀ b ∈ B, t * b * t⁻¹ = b⁻¹,
+        ∀ t : G, t ∉ B → orderOf t = 2,
+        ∀ t : G, t ∉ B → orderOf t = 2 ∧ ∀ b ∈ B, t * b * t⁻¹ = b⁻¹] := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  tfae_have 1 → 2 := by
+    rintro ⟨t, htB, ht2, htinv⟩ x hx
+    have htt : t * t = 1 := by rw [← sq]; exact ht2 ▸ pow_orderOf_eq_one t
+    have hbmem : t⁻¹ * x ∈ B := inv_mul_mem_of_notMem_of_index_eq_two hB (by simpa using htB) hx
+    have hxeq : x = t * (t⁻¹ * x) := by group
+    refine orderOf_eq_prime ?_ (fun h => hx (h ▸ B.one_mem))
+    rw [sq]
+    nth_rewrite 1 [hxeq]
+    nth_rewrite 2 [hxeq]
+    have hinv := htinv _ hbmem
+    calc t * (t⁻¹ * x) * (t * (t⁻¹ * x))
+        = (t * (t⁻¹ * x) * t⁻¹) * (t * t) * (t⁻¹ * x) := by group
+      _ = (t⁻¹ * x)⁻¹ * (t * t) * (t⁻¹ * x) := by rw [hinv]
+      _ = 1 := by rw [htt, mul_one, inv_mul_cancel]
+  tfae_have 2 → 3 := by
+    intro h t htB
+    refine ⟨h t htB, fun b hb => ?_⟩
+    have htt : t * t = 1 := by rw [← sq]; exact (h t htB) ▸ pow_orderOf_eq_one t
+    have hbt := mul_notMem_of_mem_of_notMem hb htB
+    have hbt2 : b * t * (b * t) = 1 := by
+      rw [← sq]; exact (h _ hbt) ▸ pow_orderOf_eq_one _
+    rw [inv_eq_of_mul_eq_one_left htt]
+    calc t * b * t = b⁻¹ * (b * t * (b * t)) := by group
+      _ = b⁻¹ := by rw [hbt2, mul_one]
+  tfae_have 3 → 1 := by
+    intro h
+    obtain ⟨t, ht⟩ := exists_notMem_of_index_eq_two hB
+    exact ⟨t, ht, (h t ht).1, (h t ht).2⟩
+  tfae_finish
+
+/-- **Isaacs Problem 2B.5** (最後の主張). generalized dihedral のとき `B` は可換。
+
+`t ∉ B` を取ると `t (bc) t⁻¹ = (bc)⁻¹ = c⁻¹b⁻¹` と
+`t (bc) t⁻¹ = (t b t⁻¹)(t c t⁻¹) = b⁻¹c⁻¹` から `b⁻¹c⁻¹ = c⁻¹b⁻¹`、逆元をとって `bc = cb`。 -/
+theorem isMulCommutative_of_generalizedDihedral (hB : B.index = 2)
+    (h : ∀ t : G, t ∉ B → orderOf t = 2) : IsMulCommutative B := by
+  obtain ⟨t, ht⟩ := exists_notMem_of_index_eq_two hB
+  have h23 : (∀ t : G, t ∉ B → orderOf t = 2) →
+      ∀ t : G, t ∉ B → orderOf t = 2 ∧ ∀ b ∈ B, t * b * t⁻¹ = b⁻¹ :=
+    ((generalizedDihedral_tfae hB).out 1 2).mp
+  have hinv : ∀ b ∈ B, t * b * t⁻¹ = b⁻¹ := (h23 h t ht).2
+  refine ⟨⟨fun b c => Subtype.ext ?_⟩⟩
+  have hbc : t * ((b : G) * c) * t⁻¹ = ((b : G) * c)⁻¹ := hinv _ (B.mul_mem b.2 c.2)
+  rw [show t * ((b : G) * c) * t⁻¹ = (t * (b : G) * t⁻¹) * (t * (c : G) * t⁻¹) from by group,
+    hinv _ b.2, hinv _ c.2, mul_inv_rev] at hbc
+  push_cast
+  exact inv_injective (by rw [mul_inv_rev, mul_inv_rev]; exact hbc.symm)
 
 end
 
