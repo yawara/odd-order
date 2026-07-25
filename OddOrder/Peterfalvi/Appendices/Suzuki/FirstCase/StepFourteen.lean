@@ -449,6 +449,25 @@ variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
   (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     NearFields.AffineNearFieldModel fc.rankOneQuotient F)
 
+/-- **`𝒜₂`** ((14), p. 113): the subgroups of order `3` of `Z₁P` distinct from
+`Z₁ = ⟨st⟩`.  Since `Z₁P = Z(RΣ)` and `Z₁ = ⁅RΣ, RΣ⁆`, the normalizer `N_G(RΣ)`
+permutes `𝒜₂`; the book's `𝒜₂ ⊂ 𝒜` is the observation that `Z₁P ⊓ T = Z₁`, so a
+member of `𝒜₂` is not contained in `T`. -/
+def lineSetTwo : Set (Subgroup G) :=
+  {A : Subgroup G | A ≤ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ⊔ fc.P
+    ∧ Nat.card ↥A = 3
+    ∧ A ≠ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t)}
+
+@[simp]
+theorem mem_lineSetTwo {A : Subgroup G} :
+    A ∈ fc.lineSetTwo ↔ A ≤ Subgroup.zpowers
+        (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) ⊔ fc.P
+      ∧ Nat.card ↥A = 3
+      ∧ A ≠ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) := Iff.rfl
+
 include fc in
 /-- `Σ = C_W(P)` centralizes the distinguished involution `s`: `Σ ≤ W ≤ V` and
 `V = C_D(s)` (Ch. I Prop 5). -/
@@ -617,20 +636,21 @@ include model in
 `Z₁P` — the four "lines" of the elementary abelian group `Z₁P` of order `9` — the
 subset `𝒜₂ = 𝒜 ∖ {Z₁}` has exactly three elements.  `N_G(RΣ)` permutes `𝒜₂`,
 because it normalizes both `Z₁P = Z(RΣ)` and `Z₁ = ⁅RΣ, RΣ⁆`. -/
-theorem ncard_prime_subgroups_zpowers_sup_P_ne_zpowers
+theorem ncard_lineSetTwo
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
-    {A : Subgroup G | A ≤ Subgroup.zpowers
-          (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) ⊔ fc.P
-        ∧ Nat.card ↥A = 3
-        ∧ A ≠ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
-          * fc.toHypothesis.t)}.ncard = 3 := by
+    fc.lineSetTwo.ncard = 3 := by
   letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
       * fc.toHypothesis.t) = 3 := by
     rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  change {A : Subgroup G | A ≤ Subgroup.zpowers
+      (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) ⊔ fc.P
+      ∧ Nat.card ↥A = 3
+      ∧ A ≠ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)}.ncard = 3
   refine ncard_prime_subgroups_ne_eq (p := 3) (by norm_num) ?_
     (fun x hx hx1 => fc.orderOf_eq_three_of_mem_zpowers_sup_P model ind hB2 hx hx1)
     le_sup_left (by rw [Nat.card_zpowers, hstord])
