@@ -953,6 +953,114 @@ theorem exists_mem_sInvertedT_zpowers_eq_of_prime_order
       exact (Subgroup.eq_of_le_of_card_ge hle (by rw [hP₁c, hcardz])).ge
     · exact (Subgroup.zpowers_le).mpr hξP₁
 
+include model in
+/-- `p ∤ |Q̄|` (the multiplicative part has order `|F| − 1`). -/
+theorem not_p_dvd_card_rankOneQ {m : ℕ} (hm : Nat.card F = fc.p ^ m) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).Q := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  haveI : Finite F := Nat.finite_of_card_ne_zero
+    (by rw [hm]; exact (Nat.pow_pos fc.p_prime.pos).ne')
+  have hQcard : Nat.card ↥(fc.rankOneQuotient).Q = fc.p ^ m - 1 := by
+    haveI := Fintype.ofFinite F
+    haveI := Classical.decEq F
+    rw [Nat.card_congr model.qEquiv.toEquiv, Nat.card_eq_fintype_card,
+      Fintype.card_units, ← Nat.card_eq_fintype_card, hm]
+  have hm1 : 1 ≤ m := by
+    by_contra hm0
+    push Not at hm0
+    interval_cases m
+    have h2 : 1 < Nat.card F := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+    rw [hm] at h2
+    simp at h2
+  rw [hQcard]
+  intro hdvd
+  have hple : fc.p ∣ fc.p ^ m := dvd_pow_self _ (by omega)
+  have h1 : fc.p ∣ 1 := by
+    have := Nat.dvd_sub hple hdvd
+    rwa [Nat.sub_sub_self (Nat.one_le_pow _ _ fc.p_prime.pos)] at this
+  exact fc.p_prime.one_lt.ne' (Nat.dvd_one.mp h1)
+
+include model in
+/-- **`N_G(P) ⊊ N_G(R)` in case (10.1)** (step (12) opening, p. 112): `C_G(P) = N_G(P)`
+normalizes `R`, and normalizer growth inside a Sylow `p`-subgroup of `G` produces a
+`p`-subgroup of `N_G(R)` strictly larger than the full `p`-part `p^{m+1}` of `C_G(P)`. -/
+theorem normalizer_P_lt_normalizer_invImageF
+    (ind : Hypothesis.TheoremAInductionBelow G Ω) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m)
+    (hGp : fc.p ^ (m + 2) ∣ Nat.card G) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D →
+      Subgroup.normalizer (fc.P : Set G)
+        < Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  intro hSigma
+  -- `≤`: `N_G(P) = C_G(P)` normalizes `R`.
+  have hle : Subgroup.normalizer (fc.P : Set G)
+      ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) := by
+    rw [fc.normalizer_P_eq_centralizer]
+    intro c hc
+    rw [Subgroup.mem_set_normalizer_iff]
+    intro n
+    constructor
+    · intro hn
+      exact fc.conj_mem_invImageF model hc hn
+    · intro hn
+      have h1 := fc.conj_mem_invImageF model
+        ((Subgroup.centralizer (fc.P : Set G)).inv_mem hc) hn
+      simpa [mul_assoc] using h1
+  refine lt_of_le_of_ne hle fun heq => ?_
+  -- normalizer growth inside a Sylow `p`-subgroup.
+  have hcardR : Nat.card ↥(fc.invImageF model) = fc.p ^ (m + 1) := by
+    rw [fc.card_invImageF model ind, hm, fc.card_P]; ring
+  have hRp : IsPGroup fc.p ↥(fc.invImageF model) := IsPGroup.of_card hcardR
+  obtain ⟨X, hRX⟩ := hRp.exists_le_sylow
+  have hXdvd : fc.p ^ (m + 2) ∣ Nat.card ↥(X : Subgroup G) := by
+    rw [Sylow.card_eq_multiplicity]
+    exact pow_dvd_pow _ ((Nat.Prime.pow_dvd_iff_le_factorization fc.p_prime
+      Nat.card_pos.ne').mp hGp)
+  have hRltX : fc.invImageF model < (X : Subgroup G) := by
+    refine lt_of_le_of_ne hRX fun h => ?_
+    rw [← h, hcardR, Nat.pow_dvd_pow_iff_le_right fc.p_prime.one_lt] at hXdvd
+    omega
+  have hgrow := OddOrder.BG.Ch2.S08.lt_inf_normalizer_of_isPGroup_lt
+    (p := fc.p) X.isPGroup' hRltX
+  set Y : Subgroup G := (X : Subgroup G) ⊓
+    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hYdef
+  -- `Y ≤ N_G(R) = N_G(P) = C_G(P)`, but `|Y| > p^{m+1}` = full `p`-part of `|C_G(P)|`.
+  have hYC : Y ≤ Subgroup.centralizer (fc.P : Set G) := by
+    refine le_trans inf_le_right ?_
+    rw [← heq, fc.normalizer_P_eq_centralizer]
+  have hYp : IsPGroup fc.p ↥Y := X.isPGroup'.to_le inf_le_left
+  obtain ⟨j, hj⟩ := (IsPGroup.iff_card).mp hYp
+  have hlt : fc.p ^ (m + 1) < Nat.card ↥Y := by
+    rw [← hcardR]
+    have hdvd : Nat.card ↥(fc.invImageF model) ∣ Nat.card ↥Y :=
+      Subgroup.card_dvd_of_le hgrow.le
+    refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos hdvd) fun heq2 => ?_
+    exact hgrow.ne (Subgroup.eq_of_le_of_card_ge hgrow.le heq2.ge)
+  have hCeq : Nat.card ↥(Subgroup.centralizer (fc.P : Set G))
+      = fc.p ^ (m + 1) * (Nat.card ↥(fc.rankOneQuotient).Q
+        * Nat.card ↥(fc.rankOneQuotient).D) := by
+    rw [fc.card_centralizer_P model ind, fc.card_P, hm]; ring
+  have hpc : ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).Q
+      * Nat.card ↥(fc.rankOneQuotient).D :=
+    fun hdvd => ((fc.p_prime.dvd_mul).mp hdvd).elim
+      (fc.not_p_dvd_card_rankOneQ model hm) hSigma
+  have hYdvd : Nat.card ↥Y ∣ Nat.card ↥(Subgroup.centralizer (fc.P : Set G)) :=
+    Subgroup.card_dvd_of_le hYC
+  rw [hCeq, hj] at hYdvd
+  have hpc' : Nat.Coprime fc.p (Nat.card ↥(fc.rankOneQuotient).Q
+      * Nat.card ↥(fc.rankOneQuotient).D) :=
+    (Nat.Prime.coprime_iff_not_dvd fc.p_prime).mpr hpc
+  have hjdvd : fc.p ^ j ∣ fc.p ^ (m + 1) :=
+    (Nat.Coprime.dvd_of_dvd_mul_right (Nat.Coprime.pow_left j hpc')) hYdvd
+  have hle2 : Nat.card ↥Y ≤ fc.p ^ (m + 1) := by
+    rw [hj]
+    exact Nat.le_of_dvd (Nat.pow_pos fc.p_prime.pos) hjdvd
+  omega
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
