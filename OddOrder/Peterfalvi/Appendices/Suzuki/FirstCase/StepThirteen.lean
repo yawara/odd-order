@@ -259,6 +259,41 @@ theorem exists_mem_Q0_orderOf_mul_t_eq_of_dvd_ncard_invertedBy
   exact orderOf_injective (MulAut.conj g).toMonoidHom
     (MulAut.conj g).injective x
 
+include hyp in
+/-- **Step (13)** (p. 113): if `st` has order three, every prime dividing
+`|J|` divides `|⟨Q₀, K, t⟩| = |Q₀|·|K|·(|Q₀| + 1)`.
+
+The `J`-side prime `r` is realised as the order of some `u·t` with
+`u ∈ Q₀#`, and `u·t` lies in the Lemma-4 group.  (In the First Case this
+reads `r ∣ 8·7·9 = 504 = |PSL(2,8)|`, so an odd `r` is `3` or `7`.) -/
+theorem dvd_card_orderThree_of_dvd_ncard_invertedBy
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    {r : ℕ} (hr : r.Prime)
+    (hdvd : r ∣ (invertedBy (Subgroup.centralizer
+      ({hyp.distinguishedInvolution * hyp.t} : Set G))
+      hyp.distinguishedInvolution).ncard) :
+    r ∣ Nat.card ↥hyp.Q0 * Nat.card ↥hyp.K * (Nat.card ↥hyp.Q0 + 1) := by
+  have hst2 : (hyp.distinguishedInvolution * hyp.t) ^ 2 ≠ 1 := by
+    intro h
+    have h2 : orderOf (hyp.distinguishedInvolution * hyp.t) ∣ 2 :=
+      orderOf_dvd_of_pow_eq_one h
+    rw [hst] at h2
+    have h3 := Nat.le_of_dvd (by norm_num) h2
+    omega
+  obtain ⟨u, huQ0, -, hord⟩ :=
+    hyp.exists_mem_Q0_orderOf_mul_t_eq_of_dvd_ncard_invertedBy hst2 hr hdvd
+  rw [← hyp.card_orderThreeGeneratedSubgroup hst, ← hord]
+  have humem : u * hyp.t ∈ hyp.orderThreeGeneratedSubgroup :=
+    mul_mem (hyp.orderThree_Q0_le huQ0) hyp.orderThree_t_mem
+  have hdvd2 := orderOf_dvd_natCard
+    (⟨u * hyp.t, humem⟩ : ↥hyp.orderThreeGeneratedSubgroup)
+  have heq : orderOf (u * hyp.t)
+      = orderOf (⟨u * hyp.t, humem⟩ : ↥hyp.orderThreeGeneratedSubgroup) :=
+    orderOf_injective hyp.orderThreeGeneratedSubgroup.subtype
+      (Subgroup.subtype_injective _) ⟨u * hyp.t, humem⟩
+  rw [heq]
+  exact hdvd2
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
