@@ -9,6 +9,7 @@ import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Data.Finite.Prod
 import Mathlib.Data.Set.Finite.Basic
+import Mathlib.Tactic.Group
 
 /-!
 # Isaacs Thm 5.10: Dietzmann's theorem (p. 159)
@@ -224,7 +225,68 @@ theorem finite_setOf_prod_of_length_le (hfin : X.Finite) (N : ℕ) :
       simp only [List.length_cons] at hlen
       omega
 
+/-- `g` が `Y` を共役で保つなら `⟨Y⟩` も保つ。 -/
+theorem conj_mem_closure_of_conj_mem {Y : Set G} {g : G}
+    (hg : ∀ z ∈ Y, g * z * g⁻¹ ∈ Y) :
+    ∀ h ∈ Subgroup.closure Y, g * h * g⁻¹ ∈ Subgroup.closure Y := by
+  intro h hh
+  induction hh using Subgroup.closure_induction with
+  | mem z hz => exact Subgroup.subset_closure (hg z hz)
+  | one => simp
+  | mul a b _ _ ha hb =>
+    have hab : g * (a * b) * g⁻¹ = g * a * g⁻¹ * (g * b * g⁻¹) := by group
+    rw [hab]
+    exact mul_mem ha hb
+  | inv a _ ha =>
+    have hinv : g * a⁻¹ * g⁻¹ = (g * a * g⁻¹)⁻¹ := by group
+    rw [hinv]
+    exact inv_mem ha
+
+/-- ⭐ `X` が共役閉なら, `x ∈ X` による共役は `X \ {x}` を保つ。
+
+`g * y * g⁻¹ = g` は `y = g` と同値なので, `x` による共役は `x` 自身にしか落ちない。
+Problem 5B.2 の鍵。 -/
+theorem conj_mem_sdiff_singleton (hconj : ∀ y ∈ X, ∀ g : G, g * y * g⁻¹ ∈ X) (x : G) :
+    ∀ y ∈ X \ {x}, x * y * x⁻¹ ∈ X \ {x} := by
+  rintro y ⟨hyX, hyx⟩
+  refine ⟨hconj y hyX x, fun h => hyx ?_⟩
+  have hy : y = x := by
+    have := h
+    calc y = x⁻¹ * (x * y * x⁻¹) * x := by group
+      _ = x⁻¹ * x * x := by rw [this]
+      _ = x := by group
+  exact hy
+
+/-- ⭐ **Problem 5B.2 の鍵**: `X` が共役閉なら `⟨X \ {x}⟩` は `⟨X⟩` の中で正規。
+
+`x` は `X \ {x}` を共役で保つので `⟨X \ {x}⟩` を正規化し (`conj_mem_sdiff_singleton`),
+`X \ {x}` の元は部分群 `⟨X \ {x}⟩` の元なので自明に正規化する。`⟨X⟩` はこの 2 種で生成される。 -/
+theorem closure_le_normalizer_closure_sdiff (hconj : ∀ y ∈ X, ∀ g : G, g * y * g⁻¹ ∈ X)
+    (x : G) : Subgroup.closure X ≤ Subgroup.normalizer (Subgroup.closure (X \ {x})) := by
+  rw [Subgroup.closure_le]
+  intro y hy
+  simp only [SetLike.mem_coe]
+  rcases eq_or_ne y x with rfl | hyx
+  · rw [Subgroup.mem_normalizer_iff]
+    intro h
+    constructor
+    · exact fun hh => conj_mem_closure_of_conj_mem (conj_mem_sdiff_singleton hconj y) h hh
+    · intro hh
+      have hinv : ∀ z ∈ X \ {y}, y⁻¹ * z * (y⁻¹)⁻¹ ∈ X \ {y} := by
+        rintro z ⟨hzX, hzy⟩
+        refine ⟨by simpa using hconj z hzX y⁻¹, fun hcon => hzy ?_⟩
+        have : z = y := by
+          calc z = y * (y⁻¹ * z * (y⁻¹)⁻¹) * y⁻¹ := by group
+            _ = y * y * y⁻¹ := by rw [hcon]
+            _ = y := by group
+        exact this
+      have := conj_mem_closure_of_conj_mem hinv _ hh
+      have hsimp : y⁻¹ * (y * h * y⁻¹) * (y⁻¹)⁻¹ = h := by group
+      rwa [hsimp] at this
+  · exact Subgroup.le_normalizer (Subgroup.subset_closure ⟨hy, hyx⟩)
+
 end Dietzmann
+
 
 /-- **Isaacs Thm 5.10** (Dietzmann), `Set.Finite` form: if `X` is a finite subset of a (not
 necessarily finite) group `G`, closed under conjugation, and there is `n > 0` with `x ^ n = 1`
@@ -281,6 +343,7 @@ theorem exists_pow_mul_prod_eq_notMem (hconj : ∀ x ∈ X, ∀ g : G, g * x * g
       obtain ⟨k, l', hl'X, hl'notmem, hl'prod⟩ := ih (l := l₁) (by omega) hl₁X
       exact ⟨k + 1, l', hl'X, hl'notmem, by rw [pow_succ', mul_assoc, hl'prod, hl₁prod]⟩
     · exact ⟨0, l, hl, hx, by simp⟩
+
 
 end Dietzmann
 
