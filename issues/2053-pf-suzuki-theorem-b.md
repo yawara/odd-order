@@ -1442,9 +1442,17 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
       `index_range_eq_card_ker`; `ker φ ⊇ π(ΣP) ≠ 1` は
       `not_sigma_sup_P_le_commutator` (landed) と「s が ΣP を中心化」から)。
       ⟹ `|K| ≤ |R₁|/3 = 3⁴` ⟹ `K ≠ R₁` ⟹ 目標。
-   ⚠ 4 の「生成元での検証」は `⁅H,H⁆ ≤ (E'.map R₁.subtype)` を
-   `Subgroup.commutator_le` で全ペアに対して示す必要があるので、
-   `↑H = ↑R₁ * ↑⟨s⟩` 分解 (s が R₁ を正規化) で `a = a₀s^i`, `b = b₀s^j` と書いて計算する。
+   ⚠ 4 の「生成元での検証」用に **`commutator_le_of_generators` (generic) を landed**
+   (`F` が `X` で正規化され生成集合 `T` の全ペアの交換子を含む ⟹ `⁅X,X⁆ ≤ F`)。
+   `T := ↑R₁ ∪ {s}` で使う。`F` の `H`-正規性も `H ≤ N_G(F)` を生成元 (R₁ と s) で
+   示せばよい (R₁ 側は内部自己同型が abelianization 上自明、s 側は `σ∘φ = φ∘σ`)。
+
+   ⚠ **2026-07-26 の実装試行メモ**: 本体を書き下したが 1 turn では閉じ切らず、
+   sorry を repo に入れない方針で**未完成分は commit しなかった** (generic 部品のみ landed)。
+   詰まりどころは 4 の 4 ケース (R₁×R₁ / R₁×s / s×R₁ / s×s) のうち `⁅a, s⁆` の
+   `π` 像計算 = `φ(π a)⁻¹` を Lean の subtype/Abelianization 越しに書く部分。
+   次 turn は「`⁅a,s⁆ ∈ R₁` の証明」と「`π ⟨⁅a,s⁆⟩ = (φ (π ⟨a⟩))⁻¹`」を
+   独立した `have` に切り出してから本体を組むと通しやすい。
    - (a) の書籍論法 = `R̄₁` は class ≤ 2 (= (16) 第一主張) なので交換子が
      `(R₁/Z₁ΣP) × (R₁/Z₁ΣP) → Z₁ΣP/Z₁` の**交代双線形形式**を誘導し、
      `R₁/Z₁ΣP` は位数 9 (2 次元) ⟹ 像は 1 次元 ⟹ `|⁅R₁,R₁⁆·Z₁/Z₁| ≤ 3`、
