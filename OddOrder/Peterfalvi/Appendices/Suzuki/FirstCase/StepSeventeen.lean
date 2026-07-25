@@ -1357,6 +1357,20 @@ theorem commutator_sylowThree_le_zpowers_sup_sigma_sup_P
     map_commutatorElement (fc.sylowThreeNormalizerRSigma model).subtype _ _
   rwa [hcoe] at hone
 
+include model in
+/-- **`ΣP ⊄ ⁅R₁, R₁⁆`** ((17), p. 114), with all hypotheses discharged: the commutator
+subgroup has order at most `9` (alternating-form bound) while `Z₁ΣP ≤ ⁅R₁,R₁⁆` would
+have order `27`. -/
+theorem not_sigma_sup_P_le_commutator
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    ¬ ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P)
+      ≤ ⁅fc.sylowThreeNormalizerRSigma model,
+        fc.sylowThreeNormalizerRSigma model⁆ :=
+  fc.not_sigma_sup_P_le_commutator_sylowThree model ind hB2
+    (fc.card_commutator_sylowThree_le model ind hB2
+      (fc.commutator_sylowThree_le_zpowers_sup_sigma_sup_P model ind hB2))
+
 /-! ## The endpoint of (17) -/
 
 include model in

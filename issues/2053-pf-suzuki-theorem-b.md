@@ -1414,8 +1414,23 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
    **全射でない** ⟹ `K/⁅R₁,R₁⁆ = range φ ≠ A` ⟹ `K ≠ R₁` ⟹ 目標。
    ⚠ 書籍の `A = A⁺ ⊕ A⁻` 分解は不要 (単射 ⟺ 全射で済む)。
 
+### |W| = 3 側の landed (2026-07-26 続き)
+- `commutator_le_of_two_generators` (generic): `Z ≤ N ≤ X`、`Z` が `X` を中心化、
+  `⁅N,X⁆ ≤ Z`、`⁅X,X⁆ ≤ N`、`X = ⟨N, u, v⟩` ⟹ **`⁅X,X⁆ ≤ Z⟨⁅u,v⁆⟩`**
+  (書籍の「交代形式の像は 1 次元」の群論版。両変数の `closure_induction` 2 段)。
+- `commutator_sylowThree_le_zpowers_sup_sigma_sup_P` : **`⁅R₁,R₁⁆ ≤ Z₁ΣP`**
+  (`Z₁ΣP ⊴ R₁` (16) + 商が位数 9 = 3² ⟹ 可換)。
+- `card_commutator_sylowThree_le` : **`|⁅R₁,R₁⁆| ≤ 9`**
+  (`u ∈ R ∖ Z₁P` と `L` の生成元 `v` で `R₁ = closure(Z₁ΣP ∪ {u,v})`)。
+- **`not_sigma_sup_P_le_commutator`** : **`ΣP ⊄ ⁅R₁,R₁⁆`** (無仮説形)。
+- `dvd_card_abelianization_of_index_eq_prime` (generic) / `false_of_transfer_control`
+  ((17) endpoint engine; 残り入力 2 つを仮説パラメータ化)。
+
 ### 残り
-0. **|W| = 3 側**: 上記の (a) 仮説 **`|⁅R₁,R₁⁆| ≤ 9`** の証明と、(b) 段 2 の配管。
+0. **|W| = 3 側の σ-1 配管のみ**: `A := Abelianization ↥R₁`、`s` の誘導自己同型 `σ`、
+   `φ(x) = x⁻¹σ(x)` の核が `ΣP` の像 (≠ 1、上記 landed) を含む ⟹ `φ` は非単射 ⟹
+   有限性から非全射 ⟹ `⁅R₁⟨s⟩,R₁⟨s⟩⁆ ≠ R₁` ⟹ `3 ∣ |Ab(R₁⟨s⟩)|`。
+   (`R₂ = R₁` は `|W| = 3` から。)
    - (a) の書籍論法 = `R̄₁` は class ≤ 2 (= (16) 第一主張) なので交換子が
      `(R₁/Z₁ΣP) × (R₁/Z₁ΣP) → Z₁ΣP/Z₁` の**交代双線形形式**を誘導し、
      `R₁/Z₁ΣP` は位数 9 (2 次元) ⟹ 像は 1 次元 ⟹ `|⁅R₁,R₁⁆·Z₁/Z₁| ≤ 3`、
