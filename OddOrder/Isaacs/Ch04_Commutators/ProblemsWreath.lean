@@ -489,6 +489,87 @@ theorem forall_commute_ker_augHom_iff [Fintype Q] [Fact p.Prime] (hQcard : Nat.c
     intro y _
     exact (Subgroup.mem_center_iff.mp ((mem_center_iff_exists_const _).mpr ⟨c, rfl⟩) y).symm
 
+/-- 位数 `p^n` (`n ≥ 1`) の巡回群では `x ^ p = 1` の解はちょうど `p` 個
+(= `Ω₁` の位数; 4A.8(c) の位数勘定に使う). -/
+theorem card_ker_powMonoidHom_prime [Finite D] [Fact p.Prime] (hcyc : IsCyclic D)
+    (hD : Nat.card D = p ^ n) (hn : 0 < n) :
+    Nat.card ((powMonoidHom p : D →* D).ker) = p := by
+  have hp : p.Prime := Fact.out
+  obtain ⟨c, hc⟩ := hcyc.exists_generator
+  have hcorder : orderOf c = p ^ n := by
+    rw [orderOf_eq_card_of_forall_mem_zpowers hc, hD]
+  -- 像は `⟨c^p⟩`
+  have hrange : (powMonoidHom p : D →* D).range = Subgroup.zpowers (c ^ p) := by
+    refine le_antisymm ?_ ?_
+    · rintro _ ⟨x, rfl⟩
+      obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp (hc x)
+      refine ⟨k, ?_⟩
+      change (c ^ p) ^ k = x ^ p
+      rw [← hk, ← zpow_natCast c p, ← zpow_mul, ← zpow_natCast (c ^ k) p, ← zpow_mul, mul_comm]
+    · rw [Subgroup.zpowers_le]
+      exact ⟨c, rfl⟩
+  -- `|range| = p^(n-1)`
+  have hcardrange : Nat.card ((powMonoidHom p : D →* D).range) = p ^ (n - 1) := by
+    rw [hrange, Nat.card_zpowers, orderOf_pow, hcorder]
+    have hgcd : Nat.gcd (p ^ n) p = p := by
+      have hdvd : p ∣ p ^ n := dvd_pow_self p (by omega)
+      exact Nat.gcd_eq_right hdvd
+    rw [hgcd]
+    calc p ^ n / p = p ^ n / p ^ 1 := by rw [pow_one]
+      _ = p ^ (n - 1) := Nat.pow_div (by omega) hp.pos
+  -- Lagrange
+  have hmul : Nat.card ((powMonoidHom p : D →* D).ker)
+      * ((powMonoidHom p : D →* D).ker).index = Nat.card D := Subgroup.card_mul_index _
+  rw [Subgroup.index_ker, hcardrange, hD] at hmul
+  have hpow : p ^ n = p * p ^ (n - 1) := by
+    rw [← pow_succ']
+    congr 1
+    omega
+  rw [hpow] at hmul
+  exact Nat.eq_of_mul_eq_mul_right (pow_pos hp.pos (n - 1)) hmul
+
+/-- **Isaacs Problem 4A.8(c)** (位数, 訂正版, 書籍 p. 124): 仮説 `hd` の下で `|Z(P'U)| = p`.
+
+`Z(P'U) = {inl (const d) : d^p = 1}` (`forall_commute_ker_augHom_iff`) と
+「位数 `p^n` の巡回群で `x^p = 1` の解は `p` 個」(`card_ker_powMonoidHom_prime`) を
+`d ↦ inl (const d)` の全単射で繋ぐ. -/
+theorem card_center_ker_augHom [Fintype Q] [Finite D] [Fact p.Prime] (hQcard : Nat.card Q = p)
+    (hD : Nat.card D = p ^ n) (hn : 0 < n) (hcyc : IsCyclic D)
+    (hd : ∃ d : D, d ≠ 1 ∧ (3 ≤ p ∨ d ^ 2 ≠ 1)) :
+    Nat.card (Subgroup.center ↥((augHom (D := D) (Q := Q)).ker)) = p := by
+  have hcardQ : Fintype.card Q = p := by rw [← Nat.card_eq_fintype_card, hQcard]
+  have hchar := forall_commute_ker_augHom_iff (D := D) (Q := Q) hQcard hd
+  have hmem : ∀ d : D, d ^ p = 1 →
+      (inl (Function.const Q d) : D ≀[Q] Q) ∈ (augHom (D := D) (Q := Q)).ker := by
+    intro d hdp
+    change (∏ _ω : Q, d) = 1
+    rw [Finset.prod_const, Finset.card_univ, hcardQ]
+    exact hdp
+  have hcen : ∀ (d : D) (hdp : d ^ p = 1),
+      (⟨inl (Function.const Q d), hmem d hdp⟩ : ↥(augHom (D := D) (Q := Q)).ker)
+        ∈ Subgroup.center ↥(augHom (D := D) (Q := Q)).ker := by
+    intro d hdp
+    refine Subgroup.mem_center_iff.mpr fun y => Subtype.ext ?_
+    exact ((hchar _ (hmem d hdp)).mpr ⟨d, hdp, rfl⟩ (y : D ≀[Q] Q) y.2).symm
+  have hFbij : Function.Bijective
+      (fun d : ↥((powMonoidHom p : D →* D).ker) =>
+        (⟨⟨inl (Function.const Q (d : D)), hmem (d : D) d.2⟩, hcen (d : D) d.2⟩ :
+          ↥(Subgroup.center ↥(augHom (D := D) (Q := Q)).ker))) := by
+    constructor
+    · intro d₁ d₂ hEq
+      have hval : (inl (Function.const Q (d₁ : D)) : D ≀[Q] Q)
+          = inl (Function.const Q (d₂ : D)) :=
+        congrArg Subtype.val (congrArg Subtype.val hEq)
+      exact Subtype.ext (congrFun (inl_injective hval) 1)
+    · rintro ⟨⟨z, hzH⟩, hzc⟩
+      have hcommz : ∀ y ∈ (augHom (D := D) (Q := Q)).ker, z * y = y * z := by
+        intro y hy
+        exact congrArg Subtype.val (Subgroup.mem_center_iff.mp hzc ⟨y, hy⟩).symm
+      obtain ⟨d, hdp, rfl⟩ := (hchar z hzH).mp hcommz
+      exact ⟨⟨d, hdp⟩, rfl⟩
+  rw [← Nat.card_eq_of_bijective _ hFbij]
+  exact card_ker_powMonoidHom_prime hcyc hD hn
+
 end
 
 end OddOrder.Isaacs.Ch04

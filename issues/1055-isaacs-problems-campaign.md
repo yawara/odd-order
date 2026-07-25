@@ -824,7 +824,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | 4A.5 | ✅ | (a) `index_centralizer_eq_of_not_mem_center` / (b) `card_closure_pair_eq` / (c) `index_centralizer_closure_pair_eq` / (d) `map_center_centralizer_eq_center` + `isExtraspecial_centralizer_closure_pair` / (e) `exists_index_center_eq_prime_pow_two_mul` (新 leaf `ProblemsExtraspecial.lean`) |
 | 4A.6 | ✅ | `IsMaximalClassPGroup` (定義) / `exists_eq_lowerCentralSeries_of_isMaximalClass` (+ 一意性 `eq_of_normal_of_card_eq_of_isMaximalClass`、新 leaf `ProblemsMaximalClass.lean`) |
 | 4A.7 | ✅ | `exists_orderOf_eq_and_forall_orderOf_dvd` (+ 冪公式 `pow_mk` / 上界 `pow_prime_pow_succ_eq_one`、新 leaf `ProblemsWreath.lean`) |
-| 4A.8(c) | ✅ 訂正版 | `forall_commute_ker_augHom_iff` (書籍の主張は `p=2, n=1` で偽 — 下記) |
+| 4A.8(c) | ✅ 訂正版 | `forall_commute_ker_augHom_iff` + 位数 `card_center_ker_augHom` (`|Z(P'U)| = p`)。書籍の主張は `p=2, n=1` で偽 — 下記 |
 | 4A.8(b) | ✅ | `commutator_range_inl_range_inr_eq` (`⁅A,U⁆ = ker(座標積)` の像) + `commutator_eq_commutator_range_inl_range_inr` (4A.1 経由 `P' = ⁅A,U⁆`) + まとめ `commutator_eq_coordProdHom_ker_map` |
 | 4A.8(a) | ✅ | `mem_center_iff_exists_const` / `center_eq_inf_centralizer_range_inr` (`ProblemsWreath.lean`) |
 | 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 同値形 `frattini_eq_center_of_commutator_eq_center` + 橋 `isExtraspecial_of_commutator_eq_center`) |
@@ -961,11 +961,11 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   なり mismatch する。補助は `classical` の後に `have` でインライン定義する。
 - `∏ ω, Pi.mulSingle x d ω = d` は `Finset.prod_eq_single x` + 上記 simp で通る (確認済)。
 
-### 4A.8(c) 残り: 位数の勘定
+### 4A.8(c) 完了 (位数まで)
 
-`forall_commute_ker_augHom_iff` で `Z(P'U) = {inl (const d) : d^p = 1}` は確定。
-`|Z(P'U)| = p` にするには `|{d : D | d^p = 1}| = p` (位数 `p^n` の巡回群の `Ω₁`) と
-`d ↦ inl (const d)` の単射性を繋ぐだけ (subtype の card 計算)。次 iteration で。
+`card_center_ker_augHom : |Z(P'U)| = p` (仮説 `hd` の下)。部品は
+`card_ker_powMonoidHom_prime` (位数 `p^n` の巡回群で `x^p = 1` の解は `p` 個 —
+像 `⟨c^p⟩` の位数が `p^{n-1}` であることと Lagrange) と `d ↦ inl (const d)` の全単射。
 
 ### 残り (文書順): **4A.8(c)(d)** ((d) `n=1` なら `P` が maximal class、
 一般に `P'U` が maximal class) / 4A.9 / 4A.10 / 4A.11。
