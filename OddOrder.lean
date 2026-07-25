@@ -193,6 +193,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSemidihedral
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3BSolvability
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
 import OddOrder.Isaacs.Ch05_Transfer.Main
