@@ -679,6 +679,75 @@ theorem mem_of_forall_conj_mul_inv_mem_sInvertedT
   rw [h9]
   exact mul_mem (inv_mem (hRle h7)) (Subgroup.zpow_mem R₁ hx₁R₁ w)
 
+include model in
+/-- **`R ⊓ T₁ = T`** ((12) tail, coordinate block): an `s`-inverted element of
+`R = T·P` has trivial `P`-component. -/
+theorem invImageF_inf_sInvertedOvergroup
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) :
+    fc.invImageF model ⊓ fc.sInvertedOvergroup R₁ = fc.sInvertedT model := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  obtain ⟨hTle, hTinv, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hab := fc.invImageF_mul_comm model ind hB2 hm
+  apply le_antisymm
+  · intro x hx
+    rw [Subgroup.mem_inf] at hx
+    obtain ⟨hxR, hxT₁⟩ := hx
+    rw [fc.mem_sInvertedOvergroup_iff model ind hB2 hm hGp hSigma hRle hR₁le hcard]
+      at hxT₁
+    have hxTP : x ∈ (fc.sInvertedT model : Set G) * (fc.P : Set G) := by
+      rw [← fc.coe_invImageF_eq_sInvertedT_mul_P model ind hB2 hm]
+      exact hxR
+    obtain ⟨t, ht, y, hy, rfl⟩ := hxTP
+    have hsy : s * y * s⁻¹ = y := by
+      have h1 := Subgroup.mem_centralizer_iff.mp
+        (fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V fc.P_le_V) y hy
+      rw [← hsdef] at h1
+      rw [← h1]
+      group
+    have h1 : s * (t * y) * s⁻¹ = t⁻¹ * y := by
+      calc s * (t * y) * s⁻¹ = (s * t * s⁻¹) * (s * y * s⁻¹) := by group
+        _ = t⁻¹ * y := by rw [hTinv t ht, hsy]
+    have h2 : t⁻¹ * y = t⁻¹ * y⁻¹ := by
+      rw [← h1, hxT₁.2, mul_inv_rev]
+      have h3 : y * t = t * y := hab y (fc.P_le_invImageF model hy) t
+        ((fc.sInvertedT_spec model ind hB2 hm).1 ht)
+      calc y⁻¹ * t⁻¹ = (t * y)⁻¹ := by rw [mul_inv_rev]
+        _ = (y * t)⁻¹ := by rw [h3]
+        _ = t⁻¹ * y⁻¹ := by rw [mul_inv_rev]
+    have h4 : y = y⁻¹ := mul_left_cancel h2
+    have h5 : y = 1 := by
+      have h6 : y ^ 2 = 1 := by
+        rw [pow_two]
+        nth_rewrite 1 [h4]
+        group
+      have h7 : orderOf y ∣ 2 := orderOf_dvd_of_pow_eq_one h6
+      have h8 : y ^ fc.p = 1 := fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm
+        (fc.P_le_invImageF model hy)
+      have h9 : orderOf y ∣ fc.p := orderOf_dvd_of_pow_eq_one h8
+      obtain ⟨j, hj⟩ := fc.p_odd
+      have h10 := Nat.dvd_gcd h7 h9
+      have h11 : Nat.gcd 2 fc.p = 1 :=
+        (Nat.coprime_primes Nat.prime_two fc.p_prime).mpr (by omega)
+      rw [h11, Nat.dvd_one] at h10
+      exact orderOf_eq_one_iff.mp h10
+    rw [h5]
+    simpa using ht
+  · intro t ht
+    rw [Subgroup.mem_inf]
+    refine ⟨hTle ht, ?_⟩
+    rw [fc.mem_sInvertedOvergroup_iff model ind hB2 hm hGp hSigma hRle hR₁le hcard]
+    exact ⟨hRle (hTle ht), hTinv t ht⟩
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
