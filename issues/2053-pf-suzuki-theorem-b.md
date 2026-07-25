@@ -947,3 +947,48 @@ t-不変 Sylow → 付値比較)。下流 4556 jobs green。
 - ⟹ (13) は複数 iteration 規模。順: (13-i) centralizer 恒等式 2 本 →
   (13-ii) |C| = |V|·|J| 分解 + |V| 3-冪 → (13-iii) r ∈ {3,7} (PSL card) →
   (13-iv) r = 7 排除 (C_G(K) = KW) → assembly。
+
+**(13-i)〜(13-iii-b) 完了 (2026-07-25)**:
+- (13-i) `centralizer_mul_t_inf_eq_centralizer_t_inf` /
+  `centralizer_t_inf_centralizer_eq_V` / `centralizer_mul_t_inf_centralizer_eq_V`
+  (`059f53f03`)。V の G-level 特徴付けは Q の Ω−{basept} 正則性
+  (`qRegularEquiv` 単射) で basept 固定を出す route。
+- (13-ii) `card_centralizer_mul_t_eq` : |C_G(st)| = |V|·|J| (`bd5484c64`)。
+- (13-iii-a) `exists_mem_Q0_orderOf_mul_t_eq_of_dvd_ncard_invertedBy` (`7b71b1839`)。
+- **|L| = |Q₀|·|K|·(|Q₀|+1)** = `card_orderThreeGeneratedSubgroup`
+  (OrderThreePSLInduction.lean, `d65f71609`)。⚠ **mathlib に PSL の位数は無い**
+  (`ProjectiveSpecialLinearGroup.lean` は 39 行の定義のみ; `card_GL_field` から
+  |SL₂| を出す route は数百行)。**Lemma 4 の PSL 同型を経由せず、L 自身が満たす
+  Hypothesis (Q := Q₀, D := K) に Prop 1(c) の順序公式 `card_G_eq` を適用**して
+  |L| を得る — 帰納法仮説も V ≠ ⊥ も不要 (hst のみ)、29 行。
+- (13-iii-b) `dvd_card_orderThree_of_dvd_ncard_invertedBy` (`77f4521f7`)。
+
+### (13-iv) r = 7 排除の完全論法 (2026-07-25 導出、部品実在確認済)
+
+書籍の「C_G(K) = C_D(K) = KW ⟹ x は strongly real な位数 3 元を中心化できない」
+の行間を埋めた版。**新規 infra 不要 — 全部品が repo に実在**:
+
+1. **x ~ K の生成元**: r = 7 のとき (13-iii-a) の u·t ∈ L は位数 7、
+   |L| = 8·7·9 ゆえ ⟨u·t⟩ は L の Sylow-7、K ≤ L も位数 7 = Sylow-7
+   ⟹ L 内共役 (`IsPGroup.exists_le_sylow`/`Sylow.conj` 系)。
+2. **y := (st) の共役 ∈ C_G(k)**: x ∈ J ⊆ C_G(st) ⟹ st ∈ C_G(x) = C_G(k)^g。
+   y は strongly real (st の共役) で位数 3。
+3. **y ∈ D**: y は k を中心化 ⟹ Fix(⟨k⟩) を保つ。Prop 1(a)
+   (`fixedPoints_zpowers_eq_pair_of_mem_KSet`) で Fix(⟨k⟩) = {basept, t•basept}
+   の 2 点。y は奇位数ゆえ 2 点集合上の誘導置換は自明 ⟹ 両点固定 ⟹
+   `D_eq_stabilizer_inf` で y ∈ D。
+4. **y ∈ V**: **D = K ⋊ V** — `coe_K` (K = KSet = invertedBy D t)、
+   `K_normal` ((K.subgroupOf D).Normal, KCyclic.lean:799)、
+   |D| = |V|·|KSet.ncard| (§1 Lemma (a); `V_eq_centralizer_distinguishedInvolution`
+   の証明中に既出)、K ⊓ V = 1 (t に反転かつ中心化 ⟹ x² = 1 ⟹ D 奇位数で 1)。
+   K は巡回 (`K_isCyclic`, KCyclic.lean:813) ゆえ **C_D(k) = K × C_V(k)**
+   (v ∈ C_V(k) は K = ⟨k⟩ 全体を中心化するので直積)。y の位数 3 は |K| = 7 と互いに素
+   ⟹ K-成分は 1 ⟹ y ∈ C_V(k) ≤ V = C_D(t)。
+5. **矛盾**: y ∈ V ⟹ t ∈ C_G(y)、t は対合 ⟹ |C_G(y)| 偶。一方 y は
+   strongly real かつ y² ≠ 1 ⟹ |C_G(y)| 奇 (Lemma 3 centralizer clause,
+   `centralizer_natCard_odd_of_stronglyReal`)。∴ r ≠ 7 □
+
+⟹ **(13-v) assembly**: (10.2) で |Q₀| = 2^p = 8・|K| = 2^p−1 = 7 を入れると
+r ∣ 504 ∧ r 奇 ⟹ r ∈ {3,7}、(13-iv) で 7 を排除 ⟹ |J| は 3-冪。
+|V| = |W|·|P| (step (1) の V = W ⋊ P) は (10.2) で 3-冪 ⟹ |C_G(Z₁)| = |V|·|J|
+は 3-冪 = **(13) 完了**。C_G(⟨st⟩) = C_G(st) の橋 (zpowers の centralizer) も要。
