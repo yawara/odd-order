@@ -24,6 +24,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 5C (書籍 pp. 162-16
 本ファイルでは扱わない。
 -/
 
+open scoped commutatorElement
+
 namespace OddOrder.Isaacs.Ch05
 
 section /- 5C: Problems (pp. 162-164) -/
@@ -227,6 +229,196 @@ theorem transfer_inv_pow_mul_mem_map {A : Type*} [CommGroup A] [Finite G] {p : �
   refine Subgroup.prod_mem _ fun q _ => ?_
   exact ⟨⟨(x ^ n q)⁻¹ * (q.out.out⁻¹ * x ^ n q * q.out.out), hUP (hu q)⟩,
     Subgroup.mem_subgroupOf.mpr (by simpa using hu q), rfl⟩
+
+/-- ⭐ **Problem 5C.2 の核**: `G` が完全群 (`G' = G`) なら, 可換 Sylow-2 `P` の中に
+`N_G(P)` 不変で「指数 2」の対 `U ≤ V` (`V` の元の 2 乗が `U` に入る) と `U` の外の元は
+共存できない。
+
+**証明**: `A := Abelianization ↥P`, `ϕ := Abelianization.of` (`P` 可換なので `ϕ` は単射)。
+`transfer_inv_pow_mul_mem_map` より `(ϕ⟨x⟩^{|G:P|})⁻¹ · transfer ϕ x ∈ ϕ(U)`。
+`G' = G` かつ `A` 可換なので `transfer ϕ x = 1`, ゆえに `ϕ⟨x^{|G:P|}⟩ ∈ ϕ(U)`,
+`ϕ` 単射より `x^{|G:P|} ∈ U`。しかし `|G:P|` は奇数 (`Sylow.not_dvd_index`) で
+`x ∉ U`, `y ∈ V ⇒ y² ∈ U` だから `x^{奇数} ∉ U` — 矛盾。 -/
+theorem not_mem_of_commutator_eq_top [Finite G] (P : Sylow 2 G)
+    (hab : ∀ a ∈ (P : Subgroup G), ∀ b ∈ (P : Subgroup G), a * b = b * a)
+    (hperfect : _root_.commutator G = ⊤)
+    {U V : Subgroup G} (hUP : U ≤ (P : Subgroup G)) (hVP : V ≤ (P : Subgroup G))
+    (hUV : ∀ n ∈ Subgroup.normalizer ((P : Subgroup G) : Set G), ∀ y ∈ V,
+      y⁻¹ * (n * y * n⁻¹) ∈ U)
+    (hsq : ∀ y ∈ V, y ^ 2 ∈ U)
+    {x : G} (hx : x ∈ V) (hxU : x ∉ U) : False := by
+  classical
+  set ϕ : ↥(P : Subgroup G) →* Abelianization ↥(P : Subgroup G) := Abelianization.of with hϕ
+  -- `ϕ` は単射 (`P` 可換ゆえ `commutator ↥P = ⊥`)
+  have hcomm_bot : _root_.commutator ↥(P : Subgroup G) = ⊥ := by
+    rw [_root_.commutator_def, eq_bot_iff, Subgroup.commutator_le]
+    intro a _ b _
+    rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_mul_comm]
+    exact Subtype.ext (hab a a.2 b b.2)
+  have hinj : Function.Injective ϕ := by
+    rw [← MonoidHom.ker_eq_bot_iff]
+    rw [hϕ]
+    change (QuotientGroup.mk' (_root_.commutator ↥(P : Subgroup G))).ker = ⊥
+    rw [QuotientGroup.ker_mk']
+    exact hcomm_bot
+  -- transfer は `G' = G` 上で自明
+  have htriv : MonoidHom.transfer ϕ x = 1 := by
+    have hle : _root_.commutator G ≤ (MonoidHom.transfer ϕ).ker := by
+      rw [_root_.commutator_def, Subgroup.commutator_le]
+      intro a _ b _
+      rw [MonoidHom.mem_ker, map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
+      exact mul_comm _ _
+    exact MonoidHom.mem_ker.mp (hle (hperfect ▸ Subgroup.mem_top x))
+  have hmem := transfer_inv_pow_mul_mem_map P ϕ hab hUP hVP hUV hx
+  rw [htriv, mul_one] at hmem
+  -- `x ^ |G:P| ∈ U`
+  have hpowmem : x ^ (P : Subgroup G).index ∈ U := by
+    have hmem' : ϕ ⟨x, hVP hx⟩ ^ (P : Subgroup G).index ∈
+        (U.subgroupOf (P : Subgroup G)).map ϕ := by
+      simpa using Subgroup.inv_mem _ hmem
+    rw [← map_pow] at hmem'
+    obtain ⟨u, hu, hueq⟩ := hmem'
+    have hueq' : u = (⟨x, hVP hx⟩ : ↥(P : Subgroup G)) ^ (P : Subgroup G).index := hinj hueq
+    have hu' : ((u : G)) ∈ U := hu
+    rw [hueq'] at hu'
+    simpa using hu'
+  -- `|G:P|` は奇数
+  have hodd : ¬ 2 ∣ (P : Subgroup G).index := P.not_dvd_index
+  have hsplit : x ^ (P : Subgroup G).index
+      = (x ^ 2) ^ ((P : Subgroup G).index / 2) * x := by
+    rw [← pow_mul, ← pow_succ]
+    congr 1
+    omega
+  rw [hsplit] at hpowmem
+  refine hxU ?_
+  have hsqU : (x ^ 2) ^ ((P : Subgroup G).index / 2) ∈ U :=
+    U.pow_mem (hsq x hx) _
+  have := U.mul_mem (U.inv_mem hsqU) hpowmem
+  simpa using this
+
+/-- `H` の特性部分群 (`A : Subgroup ↥H`) を `G` 側に押し出したものは `N_G(H)` の共役で不変。
+
+`Subgroup.normalizerMonoidHom : N(H) →* MulAut H` で共役を `↥H` の自己同型にし,
+`A` の特性性 (`characteristic_iff_map_eq`) を適用する。 -/
+theorem conj_mem_map_subtype_of_characteristic {H : Subgroup G} {A : Subgroup ↥H}
+    [A.Characteristic] {n : G} (hn : n ∈ Subgroup.normalizer (H : Set G))
+    {u : G} (hu : u ∈ A.map H.subtype) : n * u * n⁻¹ ∈ A.map H.subtype := by
+  obtain ⟨a, ha, rfl⟩ := hu
+  have hmap := (Subgroup.characteristic_iff_map_eq (H := A)).mp ‹_›
+    (Subgroup.normalizerMonoidHom H ⟨n, hn⟩)
+  exact ⟨Subgroup.normalizerMonoidHom H ⟨n, hn⟩ a, hmap ▸ ⟨a, ha, rfl⟩, rfl⟩
+
+/-- `|V : U| = 2` かつ `V` 可換なら, `V` の `U` 外の 2 元は `U` を法として一致する。 -/
+theorem inv_mul_mem_of_relIndex_eq_two {U V : Subgroup G}
+    (hcomm : ∀ a ∈ V, ∀ b ∈ V, a * b = b * a) (hidx : U.relIndex V = 2)
+    {y z : G} (hy : y ∈ V) (hz : z ∈ V) (hyU : y ∉ U) (hzU : z ∉ U) : y⁻¹ * z ∈ U := by
+  obtain ⟨a, -, hxor⟩ := Subgroup.relIndex_eq_two_iff.mp hidx
+  have hya : y * a ∈ U := by
+    rcases hxor y hy with ⟨h1, -⟩ | ⟨h1, -⟩
+    · exact h1
+    · exact absurd h1 hyU
+  have hza : z * a ∈ U := by
+    rcases hxor z hz with ⟨h1, -⟩ | ⟨h1, -⟩
+    · exact h1
+    · exact absurd h1 hzU
+  have hyz : y * z⁻¹ ∈ U := by
+    have := U.mul_mem hya (U.inv_mem hza)
+    simpa [mul_assoc] using this
+  have hcomm' : y⁻¹ * z = (y * z⁻¹)⁻¹ := by
+    rw [mul_inv_rev, inv_inv]
+    exact hcomm y⁻¹ (V.inv_mem hy) z hz
+  rw [hcomm']
+  exact U.inv_mem hyz
+
+/-- ⭐ **Isaacs Problem 5C.2**: `P` を `G` の可換な Sylow 2-部分群, `U ≤ V` を `P` の
+特性部分群で `|V : U| = 2` とする。`G` が単純なら `|G| = 2`。
+
+**証明**: `G' = G` (非可換単純) と仮定すると `not_mem_of_commutator_eq_top` が矛盾を出す
+(transfer 評価 + `N_G(P)` の fusion 制御)。よって `G' = ⊥`, すなわち `G` は可換単純ゆえ
+素数位数。`V \ U` の元は `P` の非自明元なので `2 ∣ |G|`, ゆえに `|G| = 2`。
+
+⭐ 書籍の設定にある `U ⊆ V` は**不要** (`Subgroup.relIndex` = `|V : U ⊓ V|` の形で
+`|V : U| = 2` を課せば十分)。`U ≤ V` を満たす呼び出し側はそのまま使える。 -/
+theorem card_eq_two_of_characteristic_relIndex_eq_two [Finite G] [IsSimpleGroup G]
+    (P : Sylow 2 G) (hab : ∀ a ∈ (P : Subgroup G), ∀ b ∈ (P : Subgroup G), a * b = b * a)
+    {U V : Subgroup ↥(P : Subgroup G)} [U.Characteristic] [V.Characteristic]
+    (hidx : U.relIndex V = 2) :
+    Nat.card G = 2 := by
+  classical
+  set U₀ : Subgroup G := U.map (P : Subgroup G).subtype with hU₀
+  set V₀ : Subgroup G := V.map (P : Subgroup G).subtype with hV₀
+  have hUP : U₀ ≤ (P : Subgroup G) := Subgroup.map_subtype_le U
+  have hVP : V₀ ≤ (P : Subgroup G) := Subgroup.map_subtype_le V
+  -- `↥P` 側の relIndex 2 を `G` 側へ移す
+  have hmem : ∀ a : ↥(P : Subgroup G), ((a : G) ∈ U₀ ↔ a ∈ U) ∧ ((a : G) ∈ V₀ ↔ a ∈ V) := fun a =>
+    ⟨Subgroup.mem_map_iff_mem Subtype.coe_injective,
+      Subgroup.mem_map_iff_mem Subtype.coe_injective⟩
+  have hidx₀ : U₀.relIndex V₀ = 2 := by
+    obtain ⟨a, haV, hxor⟩ := Subgroup.relIndex_eq_two_iff.mp hidx
+    refine Subgroup.relIndex_eq_two_iff.mpr ⟨(a : G), (hmem a).2.mpr haV, ?_⟩
+    rintro - ⟨b, hb, rfl⟩
+    have := hxor b hb
+    rcases this with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · exact Or.inl ⟨(hmem (b * a)).1.mpr h1, fun hcon => h2 ((hmem b).1.mp hcon)⟩
+    · exact Or.inr ⟨(hmem b).1.mpr h1, fun hcon => h2 ((hmem (b * a)).1.mp hcon)⟩
+  have hVcomm : ∀ x ∈ V₀, ∀ y ∈ V₀, x * y = y * x := fun x hx y hy =>
+    hab x (hVP hx) y (hVP hy)
+  -- `U₀` 外の 2 元は法 `U₀` で一致
+  have hUne : ∀ y ∈ V₀, ∀ z ∈ V₀, y ∉ U₀ → z ∉ U₀ → y⁻¹ * z ∈ U₀ :=
+    fun y hy z hz hyU hzU => inv_mul_mem_of_relIndex_eq_two hVcomm hidx₀ hy hz hyU hzU
+  have hsq : ∀ y ∈ V₀, y ^ 2 ∈ U₀ := by
+    intro y hy
+    by_cases hyU : y ∈ U₀
+    · simpa [sq] using U₀.mul_mem hyU hyU
+    · have := hUne y⁻¹ (V₀.inv_mem hy) y hy (fun hcon => hyU (by simpa using U₀.inv_mem hcon)) hyU
+      simpa [sq] using this
+  -- `N_G(P)` は `V₀/U₀` に自明作用
+  have hfus : ∀ n ∈ Subgroup.normalizer ((P : Subgroup G) : Set G), ∀ y ∈ V₀,
+      y⁻¹ * (n * y * n⁻¹) ∈ U₀ := by
+    intro n hn y hy
+    have hn' : n⁻¹ ∈ Subgroup.normalizer ((P : Subgroup G) : Set G) := Subgroup.inv_mem _ hn
+    refine inv_mul_conj_mem_of_index_two hUne (fun u hu => ?_) (fun u hu => ?_)
+      (fun w hw => ?_) hy
+    · exact conj_mem_map_subtype_of_characteristic hn hu
+    · have h := conj_mem_map_subtype_of_characteristic hn' hu
+      rwa [inv_inv] at h
+    · exact conj_mem_map_subtype_of_characteristic hn hw
+  -- `V₀ \ U₀` の元を取る
+  obtain ⟨a, haV, hxor⟩ := Subgroup.relIndex_eq_two_iff.mp hidx₀
+  have haU : a ∉ U₀ := by
+    have := hxor 1 V₀.one_mem
+    rcases this with ⟨-, h2⟩ | ⟨-, h2⟩
+    · exact absurd U₀.one_mem h2
+    · intro hcon; exact h2 (by simpa using hcon)
+  -- `G` は可換 (さもなくば `G' = ⊤` で矛盾)
+  have hcomm : ∀ x y : G, x * y = y * x := by
+    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (_root_.commutator G) inferInstance with
+      hbot | htop
+    · intro x y
+      have hmem2 : ⁅x, y⁆ ∈ _root_.commutator G := by
+        rw [_root_.commutator_def]
+        exact Subgroup.commutator_mem_commutator (Subgroup.mem_top x) (Subgroup.mem_top y)
+      rw [hbot, Subgroup.mem_bot] at hmem2
+      exact commutatorElement_eq_one_iff_mul_comm.mp hmem2
+    · exact absurd (not_mem_of_commutator_eq_top P hab htop hUP hVP hfus hsq haV haU)
+        (by simp)
+  -- 可換単純 ⇒ 素数位数, かつ `a ≠ 1` が 2-元なので `2 ∣ |G|`
+  letI : CommGroup G := { (inferInstance : Group G) with mul_comm := hcomm }
+  have hprime : (Nat.card G).Prime := IsSimpleGroup.prime_card
+  have ha1 : a ≠ 1 := fun hcon => haU (hcon ▸ U₀.one_mem)
+  obtain ⟨k, hk⟩ := IsPGroup.iff_orderOf.mp P.2 (⟨a, hVP haV⟩ : ↥(P : Subgroup G))
+  have hord : orderOf a = 2 ^ k := by
+    rw [← hk]
+    exact Subgroup.orderOf_coe (⟨a, hVP haV⟩ : ↥(P : Subgroup G))
+  have hk0 : k ≠ 0 := by
+    rintro rfl
+    rw [pow_zero, orderOf_eq_one_iff] at hord
+    exact ha1 hord
+  have h2 : (2 : ℕ) ∣ Nat.card G := by
+    refine dvd_trans ?_ (orderOf_dvd_natCard a)
+    rw [hord]
+    exact dvd_pow_self 2 hk0
+  exact ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hprime).mp h2).symm
 
 /-! ### Problem 5C.5 -/
 
