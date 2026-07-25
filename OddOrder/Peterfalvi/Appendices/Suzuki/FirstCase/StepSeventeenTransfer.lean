@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeen
 import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
 import OddOrder.GroupTheory.TransferIndexTwo
+import OddOrder.GroupTheory.WeaklyClosed
 
 /-!
 # Peterfalvi Part II, Ch. II, step (17): control of the `3`-transfer
@@ -999,6 +1000,46 @@ theorem false_of_card_W_eq_three
     False :=
   fc.false_of_no_wreath_quotient model ind hB2 S hR₁S
     (fun φ => fc.not_surjective_wreath_of_card_W_eq_three model ind hB2 S hR₁S hW3 φ)
+
+include model in
+/-- **The contradiction of (17) from the weak closure of `Z₁`** (p. 114; issue 9503).
+
+`Z₁ = Z(R₂)` is central in the Sylow `3`-subgroup `R₂`, so if it is weakly closed in
+`R₂` then `N_G(Z₁) = R₂⟨s⟩` controls the `3`-transfer
+(`OddOrder.GroupTheory.not_dvd_card_abelianization_normalizer`, i.e. Isaacs 5C.6(d) plus
+the focal subgroup theorem — the form of the Hall–Wielandt theorem that (17) needs).
+Hypothesis (B2) then forbids the quotient of order `3` of `R₂⟨s⟩` produced in both the
+`|W| = 3` and the `|W| = 9` branch. -/
+theorem false_of_isWeaklyClosed_zpowers
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
+    (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G))
+    (hwc : OddOrder.GroupTheory.IsWeaklyClosed
+      (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t))
+      (S : Subgroup G)) :
+    False := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  obtain ⟨-, hp3, -, -, hW, -⟩ := fc.step_twelve model ind hB2
+  have hB2' : ¬ (3 : ℕ) ∣ Nat.card (Abelianization G) := by rwa [hp3] at hB2
+  have hZeq := fc.inf_centralizer_sylow_eq_zpowers model ind hB2 S hR₁S
+  have hWP : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ≤ (S : Subgroup G) := by
+    rw [← hZeq]
+    exact inf_le_left
+  have hWZ : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ≤ Subgroup.centralizer (((S : Subgroup G)) : Set G) := by
+    rw [← hZeq]
+    exact inf_le_right
+  have hcontrol := OddOrder.GroupTheory.not_dvd_card_abelianization_normalizer
+    hWP hWZ hwc hB2'
+  rw [fc.normalizer_zpowers_eq_sylow_sup_zpowers model ind hB2 S hR₁S] at hcontrol
+  rcases hW with h3 | h9
+  · exact hcontrol
+      (fc.three_dvd_card_abelianization_of_card_W_eq_three model ind hB2 S hR₁S h3)
+  · exact hcontrol
+      (fc.three_dvd_card_abelianization_of_card_W_eq_nine model ind hB2 S hR₁S h9)
 
 end FirstCaseHypothesis
 
