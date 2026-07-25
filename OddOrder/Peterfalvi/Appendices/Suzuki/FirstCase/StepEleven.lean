@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 
 /-!
 # Peterfalvi Part II, Ch. II, step (11): `R = T × P` and the regular action
@@ -28,6 +29,8 @@ plan recorded there from the p. 111 reading).
 -/
 
 set_option autoImplicit false
+
+open scoped Pointwise
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
@@ -277,6 +280,381 @@ theorem eq_P_or_eq_invImageF_of_conj_invariant
     have hre : r = (r * (y : G)⁻¹) * (y : G) := by group
     rw [hre]
     exact S.mul_mem (hPS hkG) hyS
+
+/-- `P` is central in `R`: every element of `R ≤ C_G(P)` centralizes `P`. -/
+theorem P_le_center_invImageF {x r : G} (hx : x ∈ fc.P)
+    (hr : r ∈ fc.invImageF model) : r * x = x * r :=
+  (Subgroup.mem_centralizer_iff.mp (fc.invImageF_le_centralizer model hr) x hx).symm
+
+/-- The commutator of `R` lands in `P`: the faithful quotient image of `R` is the
+translation subgroup `emb(F)`, which is abelian, so commutators die in `N = P`
+(step (7), inheriting `ind`). -/
+theorem commutator_invImageF_le_P (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    {r₁ r₂ : G} (h₁ : r₁ ∈ fc.invImageF model) (h₂ : r₂ ∈ fc.invImageF model) :
+    r₁ * r₂ * r₁⁻¹ * r₂⁻¹ ∈ fc.P := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  have h₁L : r₁ ∈ L := fc.invImageF_le_centralizer model h₁
+  have h₂L : r₂ ∈ L := fc.invImageF_le_centralizer model h₂
+  -- both classes are translations; translations commute (`F` is abelian);
+  -- so the commutator class is `1`, i.e. the commutator lies in `N = P`.
+  obtain ⟨y₁, hy₁⟩ := (fc.mem_invImageF_iff model h₁L).mp h₁
+  obtain ⟨y₂, hy₂⟩ := (fc.mem_invImageF_iff model h₂L).mp h₂
+  have hcommQ : QuotientGroup.mk' N'
+      ((⟨r₁, h₁L⟩ : ↥L) * ⟨r₂, h₂L⟩ * (⟨r₁, h₁L⟩ : ↥L)⁻¹ * (⟨r₂, h₂L⟩ : ↥L)⁻¹) = 1 := by
+    have e1 : QuotientGroup.mk' N' (⟨r₁, h₁L⟩ : ↥L) = model.emb y₁ := hy₁.symm
+    have e2 : QuotientGroup.mk' N' (⟨r₂, h₂L⟩ : ↥L) = model.emb y₂ := hy₂.symm
+    rw [map_mul, map_mul, map_mul, map_inv, map_inv, e1, e2, ← map_inv, ← map_inv,
+      ← map_mul, ← map_mul, ← map_mul,
+      show y₁ * y₂ * y₁⁻¹ * y₂⁻¹ = 1 by rw [mul_comm y₁ y₂]; group,
+      map_one]
+  have hmemN : ((⟨r₁, h₁L⟩ : ↥L) * ⟨r₂, h₂L⟩ * (⟨r₁, h₁L⟩ : ↥L)⁻¹ * (⟨r₂, h₂L⟩ : ↥L)⁻¹)
+      ∈ N' := by
+    rw [QuotientGroup.mk'_apply] at hcommQ
+    exact (QuotientGroup.eq_one_iff _).mp hcommQ
+  have hkG : r₁ * r₂ * r₁⁻¹ * r₂⁻¹ ∈ fc.kernelN := ⟨_, hmemN, rfl⟩
+  rwa [fc.kernelN_eq_P ind] at hkG
+
+/-- **`|R| = |F|·|P| (= p^{m+1})`** (p. 111): Lagrange through the quotient — the image of
+`R` in the faithful quotient is `emb(F)` of order `|F|`, and the fibre is `N = P`
+(step (7), inheriting `ind`). -/
+theorem card_invImageF (ind : Hypothesis.TheoremAInductionBelow G Ω) :
+    Nat.card ↥(fc.invImageF model) = Nat.card F * Nat.card ↥fc.P := by
+  classical
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  set Sbar : Subgroup (↥L ⧸ N') := MonoidHom.range model.emb with hSbardef
+  set Rsub : Subgroup ↥L := Sbar.comap (QuotientGroup.mk' N') with hRsubdef
+  -- `|R| = |Rsub|` (push-forward along the injective inclusion).
+  have hcard_R : Nat.card ↥(fc.invImageF model) = Nat.card ↥Rsub :=
+    Nat.card_congr (Subgroup.equivMapOfInjective _ _ (Subgroup.subtype_injective L)).symm.toEquiv
+  -- `Rsub.index = Sbar.index` (`index_comap` + surjectivity of `mk'`).
+  have hidx : Rsub.index = Sbar.index := by
+    rw [hRsubdef, Subgroup.index_comap,
+      MonoidHom.range_eq_top_of_surjective _ (QuotientGroup.mk'_surjective N'),
+      Subgroup.relIndex_top_right]
+  -- Lagrange in `L` and in the quotient, then cancel the common (nonzero) index.
+  have h1 : Nat.card ↥Rsub * Rsub.index = Nat.card ↥L := Rsub.card_mul_index
+  have h2 : Nat.card ↥Sbar * Sbar.index = Nat.card (↥L ⧸ N') := Sbar.card_mul_index
+  have h3 : Nat.card ↥L = Nat.card (↥L ⧸ N') * Nat.card ↥N' :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup N'
+  -- `|Sbar| = |F|` (the embedding is injective).
+  have hSF : Nat.card ↥Sbar = Nat.card F := by
+    rw [hSbardef]
+    exact Nat.card_congr (MonoidHom.ofInjective model.emb_injective).symm.toEquiv
+  -- `|N'| = |P|` (step (7): `kernelN = P`).
+  have hNP : Nat.card ↥N' = Nat.card ↥fc.P := by
+    have h := fc.kernelN_eq_P ind
+    have hcongr : Nat.card ↥fc.kernelN = Nat.card ↥N' :=
+      Nat.card_congr (Subgroup.equivMapOfInjective _ _
+        (Subgroup.subtype_injective L)).symm.toEquiv
+    rw [← hcongr, h]
+  -- assemble
+  have hne : Sbar.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hkey : Nat.card ↥Rsub * Sbar.index
+      = (Nat.card F * Nat.card ↥fc.P) * Sbar.index := by
+    calc Nat.card ↥Rsub * Sbar.index
+        = Nat.card ↥Rsub * Rsub.index := by rw [hidx]
+      _ = Nat.card ↥L := h1
+      _ = Nat.card (↥L ⧸ N') * Nat.card ↥N' := h3
+      _ = (Nat.card ↥Sbar * Sbar.index) * Nat.card ↥N' := by rw [h2]
+      _ = (Nat.card F * Nat.card ↥fc.P) * Sbar.index := by rw [hSF, hNP]; ring
+  rw [hcard_R]
+  exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hne) hkey
+
+include model in
+/-- **`|C_G(P)| = |P|·(|F|·(|Q̄|·|Σ|))`** (order accounting for the Sylow step of (11)):
+Lagrange through the faithful quotient (fibre `N = P`, step (7)) and the affine
+decomposition `C_G(P)/N = F ⋊ H̄` with `H̄ = Q̄·Σ` of the model. -/
+theorem card_centralizer_P (ind : Hypothesis.TheoremAInductionBelow G Ω) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    Nat.card ↥(Subgroup.centralizer (fc.P : Set G))
+      = Nat.card ↥fc.P * (Nat.card F *
+          (Nat.card ↥(fc.rankOneQuotient).Q * Nat.card ↥(fc.rankOneQuotient).D)) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  -- `|L| = |L⧸N'|·|N'|`, `|L⧸N'| = |F|·|H̄|`, `|H̄| = |Q̄|·|D̄|`.
+  have h3 : Nat.card ↥L = Nat.card (↥L ⧸ N') * Nat.card ↥N' :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup N'
+  have h4 : Nat.card ↥(MonoidHom.range model.emb) * Nat.card ↥(fc.rankOneQuotient).H
+      = Nat.card (↥L ⧸ N') := model.isComplement.card_mul
+  have hDH : (fc.rankOneQuotient).D ≤ (fc.rankOneQuotient).H := by
+    rw [(fc.rankOneQuotient).D_def]; exact inf_le_left
+  have hmul : ∀ x ∈ (fc.rankOneQuotient).H, ∃ q ∈ (fc.rankOneQuotient).Q,
+      ∃ d ∈ (fc.rankOneQuotient).D, q * d = x := by
+    intro x hx
+    have hx' : x ∈ ((fc.rankOneQuotient).Q :
+        Set (fc.toHypothesis.centralizerActionQuotient fc.P)) * ((fc.rankOneQuotient).D :
+        Set (fc.toHypothesis.centralizerActionQuotient fc.P)) := by
+      rw [(fc.rankOneQuotient).Q_mul_D_eq_H]; exact hx
+    obtain ⟨q, hq, d, hd, hqd⟩ := hx'
+    exact ⟨q, hq, d, hd, hqd⟩
+  have hDQbot : (fc.rankOneQuotient).D ⊓ (fc.rankOneQuotient).Q = ⊥ := by
+    rw [inf_comm]; exact (fc.rankOneQuotient).Q_inf_D_eq_bot
+  have h5 := (Subgroup.isComplement'_subgroupOf_of_disjoint_mul_eq_univ
+    hDH (fc.rankOneQuotient).Q_le_H hDQbot hmul).card_mul
+  have hQc : Nat.card ↥((fc.rankOneQuotient).Q.subgroupOf (fc.rankOneQuotient).H)
+      = Nat.card ↥(fc.rankOneQuotient).Q :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (fc.rankOneQuotient).Q_le_H).toEquiv
+  have hDc : Nat.card ↥((fc.rankOneQuotient).D.subgroupOf (fc.rankOneQuotient).H)
+      = Nat.card ↥(fc.rankOneQuotient).D :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hDH).toEquiv
+  have hHQD : Nat.card ↥(fc.rankOneQuotient).Q * Nat.card ↥(fc.rankOneQuotient).D
+      = Nat.card ↥(fc.rankOneQuotient).H := by
+    rw [← hQc, ← hDc]; exact h5
+  have hSF : Nat.card ↥(MonoidHom.range model.emb) = Nat.card F :=
+    Nat.card_congr (MonoidHom.ofInjective model.emb_injective).symm.toEquiv
+  have hNP : Nat.card ↥N' = Nat.card ↥fc.P := by
+    have h := fc.kernelN_eq_P ind
+    have hcongr : Nat.card ↥fc.kernelN = Nat.card ↥N' :=
+      Nat.card_congr (Subgroup.equivMapOfInjective _ _
+        (Subgroup.subtype_injective L)).symm.toEquiv
+    rw [← hcongr, h]
+  calc Nat.card ↥L
+      = Nat.card (↥L ⧸ N') * Nat.card ↥N' := h3
+    _ = (Nat.card ↥(MonoidHom.range model.emb) * Nat.card ↥(fc.rankOneQuotient).H)
+        * Nat.card ↥fc.P := by rw [h4, hNP]
+    _ = (Nat.card F * (Nat.card ↥(fc.rankOneQuotient).Q
+        * Nat.card ↥(fc.rankOneQuotient).D)) * Nat.card ↥fc.P := by
+        rw [hSF, hHQD]
+    _ = Nat.card ↥fc.P * (Nat.card F * (Nat.card ↥(fc.rankOneQuotient).Q
+        * Nat.card ↥(fc.rankOneQuotient).D)) := by ring
+
+/-- **`Z(R) = P` when `R` is nonabelian** (p. 111, proof of (11), first paragraph):
+the center of `R` (as `R ⊓ C_G(R)`) is `C_G(P)`-invariant and sits between `P` and `R`,
+so the dichotomy applies; the top case would make `R` abelian. -/
+theorem center_eq_P_of_not_isMulCommutative
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hnab : ∃ r₁ ∈ fc.invImageF model, ∃ r₂ ∈ fc.invImageF model, r₁ * r₂ ≠ r₂ * r₁) :
+    fc.invImageF model ⊓ Subgroup.centralizer (fc.invImageF model : Set G) = fc.P := by
+  set R : Subgroup G := fc.invImageF model with hRdef
+  set ZR : Subgroup G := R ⊓ Subgroup.centralizer (R : Set G) with hZRdef
+  have hPZ : fc.P ≤ ZR := by
+    intro x hx
+    refine ⟨fc.P_le_invImageF model hx, Subgroup.mem_centralizer_iff.mpr fun r hr => ?_⟩
+    exact fc.P_le_center_invImageF model hx hr
+  have hZR : ZR ≤ R := inf_le_left
+  have hZinv : ∀ c ∈ Subgroup.centralizer (fc.P : Set G), ∀ s ∈ ZR,
+      c * s * c⁻¹ ∈ ZR := by
+    intro c hc s hs
+    obtain ⟨hsR, hsC⟩ := hs
+    refine ⟨fc.conj_mem_invImageF model hc hsR, Subgroup.mem_centralizer_iff.mpr
+      fun r hr => ?_⟩
+    -- `r` commutes with `c s c⁻¹` because `c⁻¹ r c ∈ R` commutes with `s`.
+    have hrc : c⁻¹ * r * c ∈ R := by
+      have := fc.conj_mem_invImageF model (Subgroup.inv_mem _ hc) hr
+      simpa using this
+    have hcomm := Subgroup.mem_centralizer_iff.mp hsC _ hrc
+    -- `(c⁻¹ r c) s = s (c⁻¹ r c)`  ⟹  `r (c s c⁻¹) = (c s c⁻¹) r`
+    have h1 := congrArg (fun z => c * z * c⁻¹) hcomm
+    simpa [mul_assoc] using h1
+  rcases fc.eq_P_or_eq_invImageF_of_conj_invariant model ind hPZ hZR hZinv with h | h
+  · exact h
+  · exfalso
+    obtain ⟨r₁, h₁, r₂, h₂, hne⟩ := hnab
+    exact hne (Subgroup.mem_centralizer_iff.mp ((h.ge h₁).2) r₂ h₂).symm
+
+/-- **`N_G(R) ≤ N_G(P)` when `R` is nonabelian** (p. 111): a normalizer of `R` permutes
+`Z(R) = R ⊓ C_G(R)` (conjugation is a group automorphism), and `Z(R) = P` by
+`center_eq_P_of_not_isMulCommutative`. -/
+theorem normalizer_invImageF_le_normalizer_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hnab : ∃ r₁ ∈ fc.invImageF model, ∃ r₂ ∈ fc.invImageF model, r₁ * r₂ ≠ r₂ * r₁) :
+    Subgroup.normalizer (fc.invImageF model : Set G)
+      ≤ Subgroup.normalizer (fc.P : Set G) := by
+  set R : Subgroup G := fc.invImageF model with hRdef
+  have hZP := fc.center_eq_P_of_not_isMulCommutative model ind hnab
+  intro g hg
+  rw [Subgroup.mem_set_normalizer_iff] at hg ⊢
+  intro x
+  -- conjugation by `g` preserves `R ⊓ C_G(R)`, which equals `P`.
+  have key : ∀ y : G, y ∈ R ⊓ Subgroup.centralizer (R : Set G) ↔
+      g * y * g⁻¹ ∈ R ⊓ Subgroup.centralizer (R : Set G) := by
+    intro y
+    constructor
+    · rintro ⟨hyR, hyC⟩
+      refine ⟨(hg y).mp hyR, Subgroup.mem_centralizer_iff.mpr fun r hr => ?_⟩
+      have hr' : g⁻¹ * r * g ∈ R := by
+        have h1 := (hg (g⁻¹ * r * g)).mpr
+        simp only [mul_assoc, mul_inv_cancel_left] at h1 ⊢
+        exact h1 (by simpa [mul_assoc] using hr)
+      have hc := Subgroup.mem_centralizer_iff.mp hyC _ hr'
+      -- `(g⁻¹ r g)·y = y·(g⁻¹ r g)` ⟹ `r·(g y g⁻¹) = (g y g⁻¹)·r`
+      have h2 := congrArg (fun z => g * z * g⁻¹) hc
+      simpa [mul_assoc] using h2
+    · rintro ⟨hyR, hyC⟩
+      refine ⟨(hg y).mpr hyR, Subgroup.mem_centralizer_iff.mpr fun r hr => ?_⟩
+      have hr' : g * r * g⁻¹ ∈ R := (hg r).mp hr
+      have hc := Subgroup.mem_centralizer_iff.mp hyC _ hr'
+      -- `(g r g⁻¹)·(g y g⁻¹) = (g y g⁻¹)·(g r g⁻¹)` ⟹ `r y = y r`
+      have h2 := congrArg (fun z => g⁻¹ * z * g) hc
+      simpa [mul_assoc] using h2
+  rw [← hZP]
+  exact key x
+
+include model in
+/-- **`R` is abelian — case (10.1) arm** (p. 111, proof of (11) ¶1): under `p ∤ |Σ|` and
+`p^{m+2} ∣ |G|`, a nonabelian `R` would have `Z(R) = P`, hence
+`N_G(R) ≤ N_G(P) = C_G(P)` (step (1)); `R` is then a `p`-subgroup of `C_G(P)` of full
+`p`-part `p^{m+1}`, while normalizer growth inside a Sylow `p`-subgroup of `G`
+(`lt_inf_normalizer_of_isPGroup_lt`) manufactures a strictly larger `p`-subgroup of
+`C_G(P)` — impossible. -/
+theorem invImageF_mul_comm_of_not_dvd_card_D
+    (ind : Hypothesis.TheoremAInductionBelow G Ω) {m : ℕ}
+    (hFcard : Nat.card F = fc.p ^ m)
+    (hGp : fc.p ^ (m + 2) ∣ Nat.card G) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D →
+      ∀ r₁ ∈ fc.invImageF model, ∀ r₂ ∈ fc.invImageF model, r₁ * r₂ = r₂ * r₁ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  haveI : Finite F := Nat.finite_of_card_ne_zero
+    (by rw [hFcard]; exact (Nat.pow_pos fc.p_prime.pos).ne')
+  intro hSigma
+  by_contra hcon
+  push Not at hcon
+  obtain ⟨r₁, h₁, r₂, h₂, hne⟩ := hcon
+  have hnab : ∃ x ∈ fc.invImageF model, ∃ y ∈ fc.invImageF model, x * y ≠ y * x :=
+    ⟨r₁, h₁, r₂, h₂, hne⟩
+  -- `|R| = p^{m+1}`, so `R` is a `p`-group.
+  have hcardR : Nat.card ↥(fc.invImageF model) = fc.p ^ (m + 1) := by
+    rw [fc.card_invImageF model ind, hFcard, fc.card_P]; ring
+  have hRp : IsPGroup fc.p ↥(fc.invImageF model) := IsPGroup.of_card hcardR
+  obtain ⟨X, hRX⟩ := hRp.exists_le_sylow
+  have hXdvd : fc.p ^ (m + 2) ∣ Nat.card ↥(X : Subgroup G) := by
+    rw [Sylow.card_eq_multiplicity]
+    exact pow_dvd_pow _ ((Nat.Prime.pow_dvd_iff_le_factorization fc.p_prime
+      Nat.card_pos.ne').mp hGp)
+  -- `R < X` (orders `p^{m+1} < p^{m+2} ≤ |X|`).
+  have hRltX : fc.invImageF model < (X : Subgroup G) := by
+    refine lt_of_le_of_ne hRX fun h => ?_
+    rw [← h, hcardR, Nat.pow_dvd_pow_iff_le_right fc.p_prime.one_lt] at hXdvd
+    omega
+  -- normalizer growth inside `X`.
+  have hgrow := OddOrder.BG.Ch2.S08.lt_inf_normalizer_of_isPGroup_lt
+    (p := fc.p) X.isPGroup' hRltX
+  set Y : Subgroup G := (X : Subgroup G) ⊓
+    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hYdef
+  -- `Y ≤ C_G(P)`.
+  have hYC : Y ≤ Subgroup.centralizer (fc.P : Set G) := by
+    refine le_trans inf_le_right ?_
+    rw [← fc.normalizer_P_eq_centralizer]
+    exact fc.normalizer_invImageF_le_normalizer_P model ind hnab
+  -- `|Y|` is a `p`-power strictly above `p^{m+1}`.
+  have hYp : IsPGroup fc.p ↥Y := X.isPGroup'.to_le inf_le_left
+  obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp hYp
+  have hRltY : fc.p ^ (m + 1) < Nat.card ↥Y := by
+    rw [← hcardR]
+    have hdvd : Nat.card ↥(fc.invImageF model) ∣ Nat.card ↥Y :=
+      Subgroup.card_dvd_of_le hgrow.le
+    refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos hdvd) fun heq => ?_
+    exact hgrow.ne (Subgroup.eq_of_le_of_card_ge hgrow.le heq.ge)
+  -- `p`-part accounting of `|C_G(P)|`.
+  have hCeq : Nat.card ↥(Subgroup.centralizer (fc.P : Set G))
+      = fc.p ^ (m + 1) * (Nat.card ↥(fc.rankOneQuotient).Q
+        * Nat.card ↥(fc.rankOneQuotient).D) := by
+    rw [fc.card_centralizer_P model ind, fc.card_P, hFcard]; ring
+  have hQcard : Nat.card ↥(fc.rankOneQuotient).Q = fc.p ^ m - 1 := by
+    haveI := Fintype.ofFinite F
+    haveI := Classical.decEq F
+    rw [Nat.card_congr model.qEquiv.toEquiv, Nat.card_eq_fintype_card,
+      Fintype.card_units, ← Nat.card_eq_fintype_card, hFcard]
+  have hm1 : 1 ≤ m := by
+    by_contra hm0
+    push Not at hm0
+    interval_cases m
+    have h2 : 1 < Nat.card F := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+    rw [hFcard] at h2
+    simp at h2
+  have hpQ : ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).Q := by
+    rw [hQcard]
+    intro hdvd
+    have hple : fc.p ∣ fc.p ^ m := dvd_pow_self _ (by omega)
+    have h1 : fc.p ∣ 1 := by
+      have := Nat.dvd_sub hple hdvd
+      rwa [Nat.sub_sub_self (Nat.one_le_pow _ _ fc.p_prime.pos)] at this
+    exact fc.p_prime.one_lt.ne' (Nat.dvd_one.mp h1)
+  have hpc : Nat.Coprime fc.p (Nat.card ↥(fc.rankOneQuotient).Q
+      * Nat.card ↥(fc.rankOneQuotient).D) :=
+    (Nat.Prime.coprime_iff_not_dvd fc.p_prime).mpr
+      (fun hdvd => ((fc.p_prime.dvd_mul).mp hdvd).elim hpQ hSigma)
+  -- `|Y| = p^k ∣ p^{m+1}·c` with `p ∤ c` forces `|Y| ≤ p^{m+1}` — contradiction.
+  have hYdvd : Nat.card ↥Y ∣ Nat.card ↥(Subgroup.centralizer (fc.P : Set G)) :=
+    Subgroup.card_dvd_of_le hYC
+  rw [hCeq, hk] at hYdvd
+  have hkdvd : fc.p ^ k ∣ fc.p ^ (m + 1) :=
+    (Nat.Coprime.dvd_of_dvd_mul_right (Nat.Coprime.pow_left k hpc)) hYdvd
+  have : Nat.card ↥Y ≤ fc.p ^ (m + 1) := by
+    rw [hk]
+    exact Nat.le_of_dvd (Nat.pow_pos fc.p_prime.pos) hkdvd
+  omega
+
+include model in
+/-- **A nonidentity element of `C_W(P)` does not centralize `R`** ((10.2) arm of (11)):
+if `w` centralized `R`, its class `[w] ∈ Σ` would act trivially on the translations
+(`dAut_conj` + injectivity of `emb`), so `[w] = 1` by faithfulness (`dAut_injective`),
+i.e. `w ∈ N = P` (step (7), inheriting `ind`); but `P ⊓ W = ⊥`. -/
+theorem not_forall_comm_of_mem_centralizer_W
+    (ind : Hypothesis.TheoremAInductionBelow G Ω) {w : G}
+    (hwW : w ∈ fc.toHypothesis.W) (hwP : w ∈ Subgroup.centralizer (fc.P : Set G))
+    (hw1 : w ≠ 1) :
+    ¬ (∀ r ∈ fc.invImageF model, w * r = r * w) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  intro hcen
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  -- `dAut 1 = id` (specialize `dAut_conj` at the identity).
+  have hdone : ∀ x : F, model.dAut 1 x = x := by
+    intro x
+    have h := model.dAut_conj 1 x
+    simp only [OneMemClass.coe_one, one_mul, inv_one, mul_one] at h
+    exact (model.emb_injective h).symm ▸ rfl
+  -- `dAut [w] = id`: every translation has a representative in `R`, which `w` centralizes.
+  have hdw : ∀ x : F, model.dAut (fc.sigmaElt hwW hwP) x = x := by
+    intro x
+    obtain ⟨y, hy⟩ := QuotientGroup.mk'_surjective N' (model.emb (Multiplicative.ofAdd x))
+    have hyR : (y : G) ∈ fc.invImageF model :=
+      ⟨y, Subgroup.mem_comap.mpr (by rw [hy]; exact ⟨Multiplicative.ofAdd x, rfl⟩), rfl⟩
+    have hcomm := hcen (y : G) hyR
+    have hconj := model.dAut_conj (fc.sigmaElt hwW hwP) x
+    -- LHS of `dAut_conj` is `[w]·(mk' y)·[w]⁻¹ = mk' (⟨w⟩·y·⟨w⟩⁻¹) = mk' y`.
+    have hwy : (⟨w, hwP⟩ : ↥L) * y * (⟨w, hwP⟩ : ↥L)⁻¹ = y := by
+      apply Subtype.ext
+      have : w * (y : G) * w⁻¹ = (y : G) := by
+        rw [hcomm]; group
+      simpa using this
+    have hlhs : ((fc.sigmaElt hwW hwP : ↥fc.rankOneQuotient.D) : ↥L ⧸ N')
+        * model.emb (Multiplicative.ofAdd x)
+        * ((fc.sigmaElt hwW hwP : ↥fc.rankOneQuotient.D) : ↥L ⧸ N')⁻¹
+        = model.emb (Multiplicative.ofAdd x) := by
+      have hcoe : ((fc.sigmaElt hwW hwP : ↥fc.rankOneQuotient.D) : ↥L ⧸ N')
+          = QuotientGroup.mk' N' ⟨w, hwP⟩ := rfl
+      rw [hcoe, ← hy, ← map_inv, ← map_mul, ← map_mul, hwy]
+    rw [hlhs] at hconj
+    exact model.emb_injective hconj.symm
+  -- faithfulness: `[w] = 1`, so `w ∈ N = P`, contradicting `P ⊓ W = ⊥`.
+  have hone : fc.sigmaElt hwW hwP = 1 := by
+    apply model.dAut_injective
+    ext x
+    rw [hdw x, hdone x]
+  have hwN : (⟨w, hwP⟩ : ↥L) ∈ N' := by
+    have h2 : ((fc.sigmaElt hwW hwP : ↥fc.rankOneQuotient.D) : ↥L ⧸ N')
+        = ((1 : ↥fc.rankOneQuotient.D) : ↥L ⧸ N') :=
+      congrArg (fun z : ↥fc.rankOneQuotient.D => (z : ↥L ⧸ N')) hone
+    rw [OneMemClass.coe_one] at h2
+    have h1 : QuotientGroup.mk' N' ⟨w, hwP⟩ = 1 := h2
+    rw [QuotientGroup.mk'_apply] at h1
+    exact (QuotientGroup.eq_one_iff _).mp h1
+  have hwP' : w ∈ fc.P := by
+    have hker : w ∈ fc.kernelN := ⟨_, hwN, rfl⟩
+    rwa [fc.kernelN_eq_P ind] at hker
+  have : w ∈ fc.P ⊓ fc.toHypothesis.W := ⟨hwP', hwW⟩
+  rw [fc.P_inf_W_eq_bot, Subgroup.mem_bot] at this
+  exact hw1 this
 
 end FirstCaseHypothesis
 

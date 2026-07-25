@@ -546,3 +546,30 @@ preimage、step (7) の N = P 使用)。主張:
 - (12) の App II Prop 1 = NearFields.lean `rankOne_affine_nearField` (実 sorry 0、BS Q₈ 継承)
   を N_G(R)/R に再適用する形 — RankOneHypothesis の新しい実例化が要る。
 - Ch.I §3 Lemma 3 (strongly real) の被覆確認が (12) 着手時の最初の grep 項目。
+
+## 🚧 2026-07-25 step (11) 進捗 (FirstCase/StepEleven.lean、全 push 済)
+
+**landing 済 (全て leaf+root green・警告ゼロ、∀-model 形で leaf 自体は axiom-clean)**:
+- `invImageF` (R = emb(F) の mk' preimage の G 押し出し) + le_centralizer / P_le / mem_iff
+- `conj_mem_invImageF` (R ⊴ C_G(P)、range_normal の comap)
+- `addSubgroup_eq_bot_or_top_of_mul_units_mem` (near-field F*-右乗不変 → ⊥∨⊤)
+- `conjInvariant_eq_bot_or_range_emb` (model-level、qEquiv_conj 消費; generic 形)
+- `eq_P_or_eq_invImageF_of_conj_invariant` (G-level 二択、ind 消費で kernelN=P)
+- `P_le_center_invImageF` / `commutator_invImageF_le_P` (⁅R,R⁆ ≤ N=P)
+- `center_eq_P_of_not_isMulCommutative` (Z(R) = P、非可換時)
+- `card_invImageF` (|R| = |F|·|P|、Lagrange×2 + index_comap)
+- `normalizer_invImageF_le_normalizer_P` (N_G(R) ≤ N_G(P)、Z(R)=P の特性性)
+
+**次 = R abelian の完成 (p. 111 証明 1 の残り = 位数矛盾)**。ポイント:
+- **step (1) の `normalizer_P_eq_centralizer` (N_G(P) = C_G(P)) が使える** ⟹ 書籍の
+  「R Sylow in N_G(P)」は C_G(P) の p-part 勘定に還元 (Aut(P) 埋め込み不要)。
+- |C_G(P)| = |N'|·|F|·|Q̄|·|D̄| (Lagrange + model.isComplement.card_mul + Q_mul_D_eq_H)、
+  p-part = p^{m+1} (p∤(p^m−1) + case (10.1) の p∤|Σ|)。
+- (10.1): R < P₁ (Sylow_p G, p^{m+2}) → p-群の normalizer 成長 (mathlib 名要確認:
+  IsPGroup 系 lt_normalizer) → N_{P₁}(R) ≤ N_G(R) ≤ C_G(P) が p-part 超過で矛盾。
+- (10.2): RC_W(P) を 3-Sylow として同型の論法 (|RC_W(P)|=3^4 vs |G|_3=3^4|W|≥3^5)。
+- その後: T := [R,s] 分解 (R abelian + s 反転) → |𝒜| = p^m → 正則性 (a fpf on R/P)。
+- **(10.1) 側 R abelian 完了** (`a1b9159c3`): `invImageF_mul_comm_of_not_dvd_card_D`。
+  次 = (10.2) 側 arm (p=3, RC_W(P) が N_G(P) の 3-Sylow、|RC_W(P)|=3^4 vs |G|_3=3^4|W|≥3^5)。
+  部品はほぼ同型: card 勘定 (|R·C_W(P)| = |R|·|Σ|/...) + Σ の R/P への非自明作用で
+  Z(RC_W(P)) = Z(R) = P。その後 step_ten_dichotomy を消費して無条件 R abelian。
