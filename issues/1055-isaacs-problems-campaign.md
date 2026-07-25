@@ -1485,7 +1485,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5A.7 | ✅ | `card_ker_lt_relIndex_commutator` (同上)。書籍の `G/C` cyclic 仮定は `BC = G` + `B` cyclic から従うので導出に変更 |
 | 5A.6 | ✅ | `card_ker_dvd_two_of_dihedral` (上界) + `isStemExtension_dihedralReduce` (下界) — `ProblemsDihedralMultiplier.lean`。書籍の `2^n` 版より強い**偶数一般形**で証明 |
 | 5A.8(a) | ✅ | `isStemExtension_prodMap` + `card_ker_prodMap` (`ProblemsSchurMultiplier.lean`) |
-| 5A.8(b) | 🔨 設計確定・着手中 | coprime のとき等号。下記の完全な証明設計あり。準備補題 `not_dvd_card_commutator_of_sylow_le_center` は landing 済 |
+| 5A.8(b) | 🔨 ステップ 1-3 landing 済 | `ProblemsProductMultiplier.lean` に `inf_ker_snd_ker_fst` / `exists_mem_ker_snd_mul_mem_ker_fst` / ⭐`commutator_ker_snd_ker_fst_eq_bot`。残りはステップ 4-6 (下記設計)。準備補題 `not_dvd_card_commutator_of_sylow_le_center` (ステップ 5 用) も landing 済 |
 
 ### 5A.8(b) の証明設計 (2026-07-26 確定、実装は次イテレーション)
 
@@ -1517,6 +1517,21 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 
 ⚠ 実装上の重さ: `⁅H, K⁆` (Γ 内の部分群としての交換子) と `commutator ↥H` の往復,
 `Γ_A × Γ_B → Γ` の準同型構成。~400 行規模の見込み。
+
+**実装メモ (2026-07-26、ステップ 1-3 landing 済)**
+
+- ステップ 2 の `⁅x,y⁆^n = ⁅x^n,y⁆` には**中心的交換子の双線形性**が要るが、repo の既存版は
+  BG (Isaacs の下流) にしかなかったので**上流の共有 leaf**
+  `OddOrder/GroupTheory/CentralCommutatorPower.lean` を新設した (issue 9207、BG 側の
+  重複解消は hub へ申し送り)。
+- `Γ_A`, `Γ_B` は `((MonoidHom.snd A B).comp h).ker` / `((MonoidHom.fst A B).comp h).ker`
+  として持つのが軽い。`(h x).2 = 1` は `MonoidHom.mem_ker` 後に **defeq でそのまま `have`** で
+  取れる (`MonoidHom.snd_apply` という simp 補題は存在しない)。
+- ステップ 3 では `IsStemExtension` の全射性も交換子群条件も不要 — 仮説は
+  `ker h ≤ Z(Γ)` と coprime だけ。
+- 次はステップ 4 (`Γ' = ⁅Γ_A,Γ_A⁆ ⊔ ⁅Γ_B,Γ_B⁆`)。`OddOrder/GroupTheory/CentralProduct.lean`
+  の `IsCentralProduct` (= `R = R₁ ⊔ R₂` かつ `⁅R₁,R₂⁆ = ⊥`) が**まさにこの状況の既存述語**
+  なので、そこに `commutator` 補題を足すのが筋。
 
 ### ⚠ 5A.6 の書籍読解訂正 (2026-07-26)
 

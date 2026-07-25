@@ -14,6 +14,7 @@ import OddOrder.GroupTheory.BrauerSuzukiCharacter
 import OddOrder.GroupTheory.BrauerSuzukiInvolutions
 import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
+import OddOrder.GroupTheory.CentralCommutatorPower
 import OddOrder.GroupTheory.CentralElementaryExtension
 import OddOrder.GroupTheory.CentralExtensionAutomorphisms
 import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
@@ -202,6 +203,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsFaithfulOrbit
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch05_Transfer.Problems
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsDihedralMultiplier
+import OddOrder.Isaacs.Ch05_Transfer.ProblemsProductMultiplier
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsSchurMultiplier
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
