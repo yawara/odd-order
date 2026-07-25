@@ -828,3 +828,19 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   N_G(R₁) = N_G(R)。→ (ε) R₁ Sylow + class 2 < p → Cor 10.2
   (transfer_range_eq_of_nilpotencyClass_lt) + T₁C_Q(P)C_W(P) index-p 正規
   (M := 逆像 of hom NR → R/T-方向) → p ∣ |Ab(G)| → ¬(B2) → step_twelve 完結。
+- **δ4 完結** (2026-07-25, `56f588501`): N_G(R₁) = N_G(R) が landed。全 chain =
+  C1 (`a2be30c94`) / C2 (`9c5ae1a2c`) / D1+D2 (`75a4dcca2`) / D3 counting
+  (`872b33f59`) / D-assembly (`56f588501`)、第 3 leaf StepTwelveConclusion。
+  **残るは ε のみ**: (ε1) R₁ は G の Sylow-p (card p³ = p-part hfact +
+  Sylow.ofCard); R₁ 非可換 (commutator ≠ ⊥) → class 2 < p →
+  transfer_range_eq_of_nilpotencyClass_lt (Isaacs Cor 10.2, Yoshida.lean) で
+  G/O^p(G) ≅ N_G(R₁)/O^p(N_G(R₁))-型の結論を取得 (正確な statement 形は
+  Yoshida.lean を読んで適合) → (ε2) NR = N_G(R₁) に index-p 正規部分群:
+  M := T₁ ⊔ (C-part)… 実装候補: hom NR → ↥R₁⧸(T₁-sub) ≅ C_p を
+  [NR,NR] ≤ R₁ + T₁ ⊴ NR + R₁/T₁ ≅ C_p (card p³/p²) で構成 —
+  NR/T₁-商で R₁/T₁ が中心的位数 p、NR/(T₁·[C-part])… 具体形:
+  NR ⧸ T₁-normal (T₁ ⊴ NR ✓ conj_sInvertedOvergroup_eq!) の中で
+  R₁/T₁ (位数 p) と (C_G(P)-像) の積; [NR,NR] ≤ R₁ → NR/R₁ 可換 →
+  合成 NR → NR/T₁ → (NR/T₁)/((C-像)·付随) の設計は着手時に確定 →
+  (ε3) p ∣ |Ab(G)| → ¬hB2 で False → **step_twelve 主定理**
+  (case (10.1) → False) を assemble。
