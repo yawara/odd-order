@@ -320,6 +320,189 @@ theorem centralizer_invImageF_eq
     intro y hy
     exact fc.invImageF_mul_comm model ind hB2 hm y hy r hr
 
+include model in
+/-- **An element fixing every member of `𝒜` (setwise) centralizes `R`** ((12) tail,
+faithfulness input).  Such an `n` fixes `P ∈ 𝒜`, hence centralizes `P` (step (1):
+`N_G(P) = C_G(P)`).  For `t ∈ T`, `t ≠ 1`, both `⟨x₀·t⟩` and `⟨x₀²·t⟩` lie in `𝒜`
+(`x₀` a nonidentity element of `P`, `x₀² ≠ 1` as `p` is odd); matching the unique
+`T·P`-decompositions of the two conjugation relations pins the conjugation exponent
+to `k ≡ 1 (mod p)`, so `n` centralizes `T` — no projective geometry needed.
+`R = T·P` finishes. -/
+theorem mul_comm_invImageF_of_forall_conj_smul_eq
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) {n : G}
+    (hfix : ∀ P₁ : Subgroup G, P₁ ≤ fc.invImageF model → Nat.card ↥P₁ = fc.p →
+      ¬ P₁ ≤ fc.sInvertedT model → MulAut.conj n • P₁ = P₁) :
+    ∀ r ∈ fc.invImageF model, n * r = r * n := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  obtain ⟨hTle, -, -, hTinf⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hab := fc.invImageF_mul_comm model ind hB2 hm
+  -- `n` centralizes `P`.
+  have hPnotT : ¬ fc.P ≤ fc.sInvertedT model := by
+    intro hle
+    have h1 : fc.P = ⊥ := by rw [← inf_eq_right.mpr hle, hTinf]
+    have h2 := fc.card_P
+    rw [h1, Subgroup.card_bot] at h2
+    exact fc.p_prime.one_lt.ne h2
+  have hnP : ∀ x ∈ fc.P, n * x * n⁻¹ = x := by
+    have hPfix := hfix fc.P (fc.P_le_invImageF model) fc.card_P hPnotT
+    have hnC : n ∈ Subgroup.centralizer (fc.P : Set G) := by
+      rw [← fc.normalizer_P_eq_centralizer]
+      exact conj_smul_eq_iff_mem_normalizer.mp hPfix
+    intro x hx
+    have h1 := Subgroup.mem_centralizer_iff.mp hnC x hx
+    rw [← h1]; group
+  -- a nonidentity element of `P`, of order `p`.
+  obtain ⟨x₀, hx₀P, hx₀1⟩ : ∃ x₀ ∈ fc.P, x₀ ≠ (1 : G) := by
+    by_contra hall
+    push Not at hall
+    have h1 : fc.P = ⊥ := by
+      rw [eq_bot_iff]
+      intro x hx
+      rw [Subgroup.mem_bot]
+      exact hall x hx
+    have h2 := fc.card_P
+    rw [h1, Subgroup.card_bot] at h2
+    exact fc.p_prime.one_lt.ne h2
+  have hx₀R : x₀ ∈ fc.invImageF model := fc.P_le_invImageF model hx₀P
+  have hordx : orderOf x₀ = fc.p := orderOf_eq_prime
+    (fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm hx₀R) hx₀1
+  -- generic brick: `⟨z·t⟩ ∈ 𝒜` is fixed, for `z ∈ P`, `t ∈ T`, both nonidentity.
+  have hAgen : ∀ z ∈ fc.P, ∀ t ∈ fc.sInvertedT model, z ≠ 1 → t ≠ 1 →
+      MulAut.conj n • Subgroup.zpowers (z * t) = Subgroup.zpowers (z * t) := by
+    intro z hz t ht hz1 ht1
+    have hzR : z ∈ fc.invImageF model := fc.P_le_invImageF model hz
+    have htR : t ∈ fc.invImageF model := hTle ht
+    have hzt1 : z * t ≠ 1 := by
+      intro h0
+      have h1 : t = z⁻¹ := eq_inv_of_mul_eq_one_right h0
+      have h2 : t ∈ fc.sInvertedT model ⊓ fc.P := ⟨ht, by rw [h1]; exact fc.P.inv_mem hz⟩
+      rw [hTinf, Subgroup.mem_bot] at h2
+      exact ht1 h2
+    have hord : orderOf (z * t) = fc.p := orderOf_eq_prime
+      (fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm (mul_mem hzR htR)) hzt1
+    refine hfix _ ?_ ?_ ?_
+    · rw [Subgroup.zpowers_le]
+      exact mul_mem hzR htR
+    · rw [Nat.card_zpowers, hord]
+    · intro hle
+      have h1 : z * t ∈ fc.sInvertedT model := hle (Subgroup.mem_zpowers _)
+      have h2 : z ∈ fc.sInvertedT model := by
+        have h3 : z = (z * t) * t⁻¹ := by group
+        rw [h3]
+        exact mul_mem h1 ((fc.sInvertedT model).inv_mem ht)
+      have h4 : z ∈ fc.sInvertedT model ⊓ fc.P := ⟨h2, hz⟩
+      rw [hTinf, Subgroup.mem_bot] at h4
+      exact hz1 h4
+  -- `n` centralizes `T`.
+  have hnT : ∀ t ∈ fc.sInvertedT model, n * t * n⁻¹ = t := by
+    intro t ht
+    by_cases ht1 : t = 1
+    · rw [ht1]; group
+    have htR : t ∈ fc.invImageF model := hTle ht
+    have hordt : orderOf t = fc.p := orderOf_eq_prime
+      (fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm htR) ht1
+    have hcomm : Commute x₀ t := hab x₀ hx₀R t htR
+    -- `x₀² ≠ 1` since `p` is odd.
+    have hx₀2 : x₀ * x₀ ≠ 1 := by
+      intro h0
+      have h1 : orderOf x₀ ∣ 2 := orderOf_dvd_of_pow_eq_one (by rw [pow_two]; exact h0)
+      rw [hordx] at h1
+      have h2 := (Nat.prime_dvd_prime_iff_eq fc.p_prime Nat.prime_two).mp h1
+      obtain ⟨j, hj⟩ := fc.p_odd
+      omega
+    have hx₀2P : x₀ * x₀ ∈ fc.P := mul_mem hx₀P hx₀P
+    have hcomm2 : Commute (x₀ * x₀) t := hab _ (fc.P_le_invImageF model hx₀2P) t htR
+    -- first relation: `n t n⁻¹ = x₀^(k-1)·t^k` from `⟨x₀·t⟩` fixed.
+    have hmem1 : n * (x₀ * t) * n⁻¹ ∈ Subgroup.zpowers (x₀ * t) := by
+      have h1 := Subgroup.smul_mem_pointwise_smul (x₀ * t) (MulAut.conj n)
+        (Subgroup.zpowers (x₀ * t)) (Subgroup.mem_zpowers _)
+      rw [hAgen x₀ hx₀P t ht hx₀1 ht1] at h1
+      have h2 : MulAut.conj n • (x₀ * t) = n * (x₀ * t) * n⁻¹ := rfl
+      rwa [h2] at h1
+    obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hmem1
+    have hntn : n * t * n⁻¹ = x₀ ^ (k - 1) * t ^ k := by
+      have h1 : n * (x₀ * t) * n⁻¹ = (n * x₀ * n⁻¹) * (n * t * n⁻¹) := by group
+      rw [hnP x₀ hx₀P] at h1
+      have h3 : x₀ * (n * t * n⁻¹) = x₀ ^ k * t ^ k := by
+        rw [← h1, ← hcomm.mul_zpow, hk]
+      have h4 : n * t * n⁻¹ = x₀⁻¹ * (x₀ ^ k * t ^ k) := by
+        rw [← h3]; group
+      rw [h4, ← mul_assoc]
+      congr 1
+      rw [← zpow_neg_one, ← zpow_add]
+      congr 1
+      ring
+    -- second relation from `⟨x₀²·t⟩` pins `k ≡ 1 (mod p)`.
+    have hmem2 : n * ((x₀ * x₀) * t) * n⁻¹ ∈ Subgroup.zpowers ((x₀ * x₀) * t) := by
+      have h1 := Subgroup.smul_mem_pointwise_smul ((x₀ * x₀) * t) (MulAut.conj n)
+        (Subgroup.zpowers ((x₀ * x₀) * t)) (Subgroup.mem_zpowers _)
+      rw [hAgen (x₀ * x₀) hx₀2P t ht hx₀2 ht1] at h1
+      have h2 : MulAut.conj n • ((x₀ * x₀) * t) = n * ((x₀ * x₀) * t) * n⁻¹ := rfl
+      rwa [h2] at h1
+    obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp hmem2
+    have hL : n * ((x₀ * x₀) * t) * n⁻¹ = x₀ ^ (k + 1) * t ^ k := by
+      have h1 : n * ((x₀ * x₀) * t) * n⁻¹
+          = (n * x₀ * n⁻¹) * (n * x₀ * n⁻¹) * (n * t * n⁻¹) := by group
+      rw [hnP x₀ hx₀P, hntn] at h1
+      rw [h1]
+      group
+    have hR : ((x₀ * x₀) * t) ^ j = x₀ ^ (2 * j) * t ^ j := by
+      rw [hcomm2.mul_zpow]
+      congr 1
+      rw [← zpow_two, ← zpow_mul]
+    have hmatch : x₀ ^ (k + 1) * t ^ k = x₀ ^ (2 * j) * t ^ j := by
+      rw [← hL, ← hj, hR]
+    have hsep : x₀ ^ (k + 1 - 2 * j) = t ^ (j - k) := by
+      calc x₀ ^ (k + 1 - 2 * j)
+          = x₀ ^ (-(2 * j)) * x₀ ^ (k + 1) := by
+            rw [← zpow_add]
+            congr 1
+            ring
+        _ = x₀ ^ (-(2 * j)) * ((x₀ ^ (k + 1) * t ^ k) * t ^ (-k)) := by
+            rw [mul_assoc (x₀ ^ (k + 1)), ← zpow_add t k (-k), add_neg_cancel, zpow_zero,
+              mul_one]
+        _ = x₀ ^ (-(2 * j)) * ((x₀ ^ (2 * j) * t ^ j) * t ^ (-k)) := by rw [hmatch]
+        _ = t ^ (j - k) := by
+            rw [← mul_assoc, ← mul_assoc, ← zpow_add x₀ (-(2 * j)) (2 * j), neg_add_cancel,
+              zpow_zero, one_mul, ← zpow_add t j (-k), sub_eq_add_neg]
+    have hsep1 : x₀ ^ (k + 1 - 2 * j) = 1 := by
+      have h4 : x₀ ^ (k + 1 - 2 * j) ∈ fc.sInvertedT model ⊓ fc.P :=
+        ⟨hsep ▸ zpow_mem ht _, zpow_mem hx₀P _⟩
+      rwa [hTinf, Subgroup.mem_bot] at h4
+    have hdvd1 : (fc.p : ℤ) ∣ (k + 1 - 2 * j) := by
+      rw [← hordx]
+      exact orderOf_dvd_iff_zpow_eq_one.mpr hsep1
+    have hdvd2 : (fc.p : ℤ) ∣ (j - k) := by
+      rw [← hordt]
+      exact orderOf_dvd_iff_zpow_eq_one.mpr (hsep ▸ hsep1)
+    have hdvd3 : (fc.p : ℤ) ∣ (k - 1) := by
+      have h1 : k - 1 = -(k + 1 - 2 * j) - 2 * (j - k) := by ring
+      rw [h1]
+      exact dvd_sub (dvd_neg.mpr hdvd1) (hdvd2.mul_left 2)
+    rw [hntn]
+    have h1 : x₀ ^ (k - 1) = 1 := orderOf_dvd_iff_zpow_eq_one.mp (by rw [hordx]; exact hdvd3)
+    have h2 : t ^ k = t := by
+      have h4 : t ^ (k - 1) = 1 := orderOf_dvd_iff_zpow_eq_one.mp (by rw [hordt]; exact hdvd3)
+      calc t ^ k = t ^ (k - 1 + 1) := by congr 1; ring
+        _ = t ^ (k - 1) * t := zpow_add_one t (k - 1)
+        _ = t := by rw [h4, one_mul]
+    rw [h1, h2, one_mul]
+  -- assemble via `R = T·P`.
+  intro r hr
+  have hrmem : r ∈ (fc.sInvertedT model : Set G) * (fc.P : Set G) := by
+    rw [← fc.coe_invImageF_eq_sInvertedT_mul_P model ind hB2 hm]
+    exact hr
+  obtain ⟨t, ht, x, hx, rfl⟩ := hrmem
+  have h1 : n * (t * x) * n⁻¹ = t * x := by
+    have h2 : n * (t * x) * n⁻¹ = (n * t * n⁻¹) * (n * x * n⁻¹) := by group
+    rw [h2, hnT t ht, hnP x hx]
+  calc n * (t * x) = (n * (t * x) * n⁻¹) * n := by group
+    _ = (t * x) * n := by rw [h1]
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
