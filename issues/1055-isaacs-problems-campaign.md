@@ -31,7 +31,7 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.2 Subnormality
 - [ ] Ch.3 Split Extensions
 - [ ] Ch.4 Commutators
-- [ ] Ch.5 Transfer
+- [x] Ch.5 Transfer — **着手 (2026-07-26)**、下記 §5A 節参照
 - [ ] Ch.6 Frobenius Actions
 - [ ] Ch.7 Thompson Subgroup
 - [ ] Ch.8 Permutation Groups
