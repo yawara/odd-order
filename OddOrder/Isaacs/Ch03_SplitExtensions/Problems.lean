@@ -1225,6 +1225,124 @@ theorem conj_pow_fixes_iff {n : ℕ} {K : Subgroup (ZMod n)ˣ} (j : ℕ)
     simp only [toAdd_ofAdd]
     linear_combination h
 
+/-- 3 つの involution `up, uq, ur` (Klein 関係式つき) が張る `(ZMod n)ˣ` の位数 4 の部分群。 -/
+def kleinSubgroup {n : ℕ} (up uq ur : (ZMod n)ˣ)
+    (hpp : up * up = 1) (hqq : uq * uq = 1) (hrr : ur * ur = 1)
+    (hpq : up * uq = ur) : Subgroup (ZMod n)ˣ where
+  carrier := {1, up, uq, ur}
+  one_mem' := by simp
+  mul_mem' := by
+    have hpr : up * ur = uq := by rw [← hpq, ← mul_assoc, hpp, one_mul]
+    have hqr : uq * ur = up := by rw [← hpq, mul_comm up uq, ← mul_assoc, hqq, one_mul]
+    have hqp : uq * up = ur := by rw [mul_comm]; exact hpq
+    have hrp : ur * up = uq := by rw [mul_comm]; exact hpr
+    have hrq : ur * uq = up := by rw [mul_comm]; exact hqr
+    intro a b ha hb
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at ha hb ⊢
+    rcases ha with ha | ha | ha | ha <;> rcases hb with hb | hb | hb | hb <;>
+      rw [ha, hb] <;>
+      simp only [one_mul, mul_one, hpp, hqq, hrr, hpq, hpr, hqr, hqp, hrp, hrq] <;> tauto
+  inv_mem' := by
+    intro a ha
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at ha ⊢
+    rcases ha with ha | ha | ha | ha <;> rw [ha] <;>
+      simp only [inv_one, inv_eq_of_mul_eq_one_left hpp, inv_eq_of_mul_eq_one_left hqq,
+        inv_eq_of_mul_eq_one_left hrr] <;> tauto
+
+@[simp] theorem mem_kleinSubgroup {n : ℕ} {up uq ur : (ZMod n)ˣ} {hpp hqq hrr hpq}
+    {k : (ZMod n)ˣ} :
+    k ∈ kleinSubgroup up uq ur hpp hqq hrr hpq ↔ k = 1 ∨ k = up ∨ k = uq ∨ k = ur := Iff.rfl
+
+/-- `n = a·b` で `a` が奇素数なら `2·b ≠ 0` in `ZMod n` (`a ∣ 2` が偽だから)。 -/
+theorem two_mul_ne_zero_of_odd_prime_factor {n a b : ℕ} (hab : a * b = n) (ha : a.Prime)
+    (ha2 : a ≠ 2) (hb : b ≠ 0) : (2 : ZMod n) * ((b : ℕ) : ZMod n) ≠ 0 := by
+  intro h
+  have hcast : ((2 * b : ℕ) : ZMod n) = 0 := by rw [Nat.cast_mul, Nat.cast_ofNat]; exact h
+  obtain ⟨c, hc⟩ := (ZMod.natCast_eq_zero_iff _ _).mp hcast
+  have hbpos : 0 < b := Nat.pos_of_ne_zero hb
+  have h2 : 2 = a * c := by
+    refine Nat.eq_of_mul_eq_mul_right hbpos ?_
+    calc 2 * b = n * c := hc
+      _ = a * c * b := by rw [← hab]; ring
+  rcases Nat.Prime.eq_one_or_self_of_dvd Nat.prime_two a ⟨c, h2⟩ with h' | h'
+  · exact ha.one_lt.ne' h'
+  · exact ha2 h'
+
+/-- `α^j ≠ 1` の判定: ある `k ∈ K` で `j·(1-k) ≠ 0` なら `α^j ≠ 1`。 -/
+theorem conj_pow_ne_one {n : ℕ} {K : Subgroup (ZMod n)ˣ} (j : ℕ) (k : K)
+    (h : (j : ZMod n) * (1 - (↑(k : (ZMod n)ˣ) : ZMod n)) ≠ 0) :
+    ((MulAut.conj (SemidirectProduct.inl (Multiplicative.ofAdd (1 : ZMod n))
+      : zmodSemidirect n K)) ^ j) ≠ 1 := fun hcon =>
+  h ((conj_pow_fixes_iff j ⟨1, k⟩).mp (by rw [hcon]; rfl))
+
+/-- **Isaacs Problem 3A.8(c)**. `p, q, r` を相異なる奇素数、`C = ZMod (pqr)`、`K` を (b) の
+Klein 四元群、`G = C ⋊ K` とし、`α` を `C` の生成元 `c = inl (ofAdd 1)` が誘導する内部自己同型
+とすると、**`⟨α⟩` は `G` 上に regular orbit をもたない**: どの `g ∈ G` にも `g` を固定する
+非自明な `α^j` が存在する。
+
+`conj_pow_fixes_iff` で `α^j` が `⟨x,k⟩` を固定 ⟺ `j·(1-k) = 0` なので、`k` の 4 通りで
+`j` を選べばよい: `k = 1` なら `j = 1` (非自明性は `u_p ≠ 1`)、`k = u_p` なら `j = qr`
+(`u_p·(qr) = qr` から固定、非自明性は `qr·(1-u_q) = 2qr ≠ 0`)、`k = u_q` なら `j = pr`、
+`k = u_r` なら `j = pq`。 -/
+theorem no_regular_orbit_klein {p q r : ℕ} (hp : p.Prime) (hq : q.Prime) (hr : r.Prime)
+    (hp2 : p ≠ 2) (hq2 : q ≠ 2) (hr2 : r ≠ 2)
+    {up uq ur : (ZMod (p * q * r))ˣ}
+    (hpp : up * up = 1) (hqq : uq * uq = 1) (hrr : ur * ur = 1) (hpq : up * uq = ur)
+    (hupfix : (↑up : ZMod (p * q * r)) * ((q * r : ℕ) : ZMod (p * q * r))
+      = ((q * r : ℕ) : ZMod (p * q * r)))
+    (huqfix : (↑uq : ZMod (p * q * r)) * ((p * r : ℕ) : ZMod (p * q * r))
+      = ((p * r : ℕ) : ZMod (p * q * r)))
+    (hurfix : (↑ur : ZMod (p * q * r)) * ((p * q : ℕ) : ZMod (p * q * r))
+      = ((p * q : ℕ) : ZMod (p * q * r)))
+    (hupinv : (↑up : ZMod (p * q * r)) * (p : ZMod (p * q * r)) = -(p : ZMod (p * q * r)))
+    (huqinv : (↑uq : ZMod (p * q * r)) * (q : ZMod (p * q * r)) = -(q : ZMod (p * q * r)))
+    (hup1 : (↑up : ZMod (p * q * r)) ≠ 1)
+    (g : zmodSemidirect (p * q * r) (kleinSubgroup up uq ur hpp hqq hrr hpq)) :
+    ∃ j : ℕ,
+      ((MulAut.conj (SemidirectProduct.inl (Multiplicative.ofAdd (1 : ZMod (p * q * r)))
+        : zmodSemidirect (p * q * r) (kleinSubgroup up uq ur hpp hqq hrr hpq))) ^ j) g = g ∧
+      ((MulAut.conj (SemidirectProduct.inl (Multiplicative.ofAdd (1 : ZMod (p * q * r)))
+        : zmodSemidirect (p * q * r) (kleinSubgroup up uq ur hpp hqq hrr hpq))) ^ j) ≠ 1 := by
+  have hq0 : q ≠ 0 := hq.pos.ne'
+  have hr0 : r ≠ 0 := hr.pos.ne'
+  have hp0 : p ≠ 0 := hp.pos.ne'
+  -- `u` が `s` を反転すれば `s` の倍数も反転する (値レベル)
+  have hup_pq : (↑up : ZMod (p * q * r)) * ((p * q : ℕ) : ZMod (p * q * r))
+      = -((p * q : ℕ) : ZMod (p * q * r)) := inverts_mul hupinv q
+  have hup_pr : (↑up : ZMod (p * q * r)) * ((p * r : ℕ) : ZMod (p * q * r))
+      = -((p * r : ℕ) : ZMod (p * q * r)) := inverts_mul hupinv r
+  have huq_qr : (↑uq : ZMod (p * q * r)) * ((q * r : ℕ) : ZMod (p * q * r))
+      = -((q * r : ℕ) : ZMod (p * q * r)) := inverts_mul huqinv r
+  -- 各 `k` で `j` を選ぶ
+  rcases (mem_kleinSubgroup (up := up) (uq := uq) (ur := ur)).mp g.right.2 with hk | hk | hk | hk
+  · refine ⟨1, (conj_pow_fixes_iff 1 g).mpr ?_, conj_pow_ne_one 1 ⟨up, by simp⟩ ?_⟩
+    · rw [hk]; simp
+    · simpa using sub_ne_zero.mpr (Ne.symm hup1)
+  · refine ⟨q * r, (conj_pow_fixes_iff (q * r) g).mpr ?_,
+      conj_pow_ne_one (q * r) ⟨uq, by simp⟩ ?_⟩
+    · rw [hk, Nat.cast_mul, ← Nat.cast_mul]
+      linear_combination -hupfix
+    · have hval : ((q * r : ℕ) : ZMod (p * q * r)) * (1 - (↑uq : ZMod (p * q * r)))
+          = 2 * ((q * r : ℕ) : ZMod (p * q * r)) := by linear_combination -huq_qr
+      rw [Nat.cast_mul, ← Nat.cast_mul, hval]
+      exact two_mul_ne_zero_of_odd_prime_factor (by ring) hp hp2 (Nat.mul_ne_zero hq0 hr0)
+  · refine ⟨p * r, (conj_pow_fixes_iff (p * r) g).mpr ?_,
+      conj_pow_ne_one (p * r) ⟨up, by simp⟩ ?_⟩
+    · rw [hk, Nat.cast_mul, ← Nat.cast_mul]
+      linear_combination -huqfix
+    · have hval : ((p * r : ℕ) : ZMod (p * q * r)) * (1 - (↑up : ZMod (p * q * r)))
+          = 2 * ((p * r : ℕ) : ZMod (p * q * r)) := by linear_combination -hup_pr
+      rw [Nat.cast_mul, ← Nat.cast_mul, hval]
+      exact two_mul_ne_zero_of_odd_prime_factor (by ring) hq hq2 (Nat.mul_ne_zero hp0 hr0)
+  · refine ⟨p * q, (conj_pow_fixes_iff (p * q) g).mpr ?_,
+      conj_pow_ne_one (p * q) ⟨up, by simp⟩ ?_⟩
+    · rw [hk, Nat.cast_mul, ← Nat.cast_mul]
+      linear_combination -hurfix
+    · have hval : ((p * q : ℕ) : ZMod (p * q * r)) * (1 - (↑up : ZMod (p * q * r)))
+          = 2 * ((p * q : ℕ) : ZMod (p * q * r)) := by linear_combination -hup_pq
+      rw [Nat.cast_mul, ← Nat.cast_mul, hval]
+      exact two_mul_ne_zero_of_odd_prime_factor (by ring) hr hr2 (Nat.mul_ne_zero hp0 hq0)
+
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,
 a.right·b.right)` を写すと `(a.left·a.right·b.left·b.right, a.right·b.right)` = 直積の積の像。 -/
