@@ -546,21 +546,19 @@ Ch.2 は全ファイル sorry-free。
   `m`-捩れを全部反転」)。書籍の言い回しに一致。
 - (b) `mul_eq_of_fixes_inverts_pqr` (`u_p · u_q = u_r`) ⟹ `{1,u_p,u_q,u_r}` は Klein 四元群。
 
-**(c) の基盤 landing 済 (2026-07-25)**: `zmodUnitsAction` / `zmodSemidirect n K` /
-`conj_inl_apply` (`conj (inl (ofAdd t)) ⟨x,k⟩ = ⟨x + t(1-k), k⟩`) / `inl_ofAdd_one_pow` /
-**`conj_pow_fixes_iff`** (`α^j` が `⟨x,k⟩` を固定 ⟺ `j·(1-k) = 0`)。
+**(c) も landing 済 (2026-07-25)** ⟹ **3A.8 完了**。
+基盤: `zmodUnitsAction` / `zmodSemidirect n K` / `conj_inl_apply` / `inl_ofAdd_one_pow` /
+`conj_pow_fixes_iff` (`α^j` が `⟨x,k⟩` を固定 ⟺ `j·(1-k) = 0`)。
+本体: `kleinSubgroup` (3 involution が張る位数 4 の部分群) / `mem_kleinSubgroup` /
+`two_mul_ne_zero_of_odd_prime_factor` / `conj_pow_ne_one` / **`no_regular_orbit_klein`**。
 
-**(c) の残り**: `K := {1, u_p, u_q, u_r}` を `(ZMod n)ˣ` の部分群として構成し
-(`u` は `u*u = 1` から `Units.mk u u` で単元化、Klein 関係式は `exists_klein_four_pqr`)、
-各 `k ∈ K` に対し `j` を取って「`α^j` が固定するが `α^j ≠ 1`」を示す:
-- `k = 1`: `j = 1`。`α ≠ 1` は `1·(1-u_p) = 1-u_p ≠ 0` (`u_p ≠ 1`) から。
-- `k = u_p`: `j = qr`。固定は `u_p·(qr) = qr` ⟹ `qr·(1-u_p) = 0`。`α^{qr} ≠ 1` は
-  `qr·(1-u_q) = qr - (u_q·q)·r = qr + qr = 2qr ≠ 0` (`n = pqr ∤ 2qr` ⟸ `p` 奇素数) から。
-- `k = u_q`, `u_r` も同様 (`j = pr`, `pq`)。
-`α^j ≠ 1` は「`α^j` が動かす元を 1 つ挙げる」形で示せば十分 (`conj_pow_fixes_iff` の対偶)。
-
-⚠ **実装上の罠**: `ZMod (p*q*r)` では法が型に現れるので `rw [mul_assoc]` が `p * q * r` に
-マッチして motive 破綻する。`mul_assoc up uq` と引数を固定すること。
+⚠ **実装上の罠 3 件** (同種の作業で再発しうる):
+1. `ZMod (p*q*r)` は**法が型に現れる**ので `rw [mul_assoc]` が型内の `p * q * r` にマッチして
+   motive 破綻する。`mul_assoc up uq` と引数を固定すること。
+2. 構造体フィールドの証明で `rcases ha with rfl|…` を使うと、**定義の束縛変数** (`up` 等) が
+   substitution で消える。`rw [ha]` を使うこと。
+3. `eq_inv_of_mul_eq_one_left h : up = up⁻¹` を simp 補題にすると `up → up⁻¹ → up⁻¹⁻¹ → …` で
+   無限ループ (maxRecDepth 到達)。`inv_eq_of_mul_eq_one_left` (`up⁻¹ = up`) を使うこと。
 
 ### 3A.6 の解析 (2026-07-25、deferred-hard として記録)
 
@@ -675,7 +673,7 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
 | 3A.5 | ✅ (`G ⋊ G ≅ G × G`) |
 | 3A.6 | ⏸ **deferred-hard** (2026-07-25 に解析; 下記) |
 | 3A.7 | ⬜ `α ∈ Aut(G)`, `o(α)` の素因子が 2 個以下 ⟹ `⟨α⟩` は `G` 上に regular orbit をもつ |
-| 3A.8 | (a)(b) ✅ / (c) 基盤 ✅ (作用公式 `conj_pow_fixes_iff`) / (c) 本体 ⬜ |
+| 3A.8 | ✅ **完了** ((a)(b)(c) すべて) |
 | 3A.9 | (a) ✅ (2026-07-25) / (b) ⬜ regular wreath で `C_G(b) = C` なる `b ∈ B` が存在 |
 | 3A.10 | ⬜ 任意の有限群 `H` と素数 `p` に対し、正規可換 `p`-部分群 `A` で `G` が `A` 上分裂し `G/A ≅ H`, `A = C_G(A)` なる `G` が存在 |
 
@@ -715,5 +713,8 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **§2D も完済 (2D.1(a)(b) / 2D.2)** ⟹ **Isaacs Ch.2 の章末演習は全問完済**。
 さらに **3A.4 ✅** (3A.3 / 3A.5 は既済と実測判明)。
 さらに **3A.9(a) ✅**。**3A.6 は deferred-hard** (解析は §3A 節に記録; Brodkey の適用の一手が
-未確定)。さらに **3A.8(a) の核 ✅**。さらに **3A.8(a)(b) ✅**。さらに **3A.8(a)(b) のまとめ ✅**。さらに **3A.8(c) の基盤 ✅**。**次 frontier = 3A.8(c) 本体** (`K` の構成と各 `k` での `j` の
-選択; 手順は §3A 節) → 3A.9(b) / 3A.10 → 3A.6 / 3A.7 に戻る → §3B〜。
+未確定)。さらに **3A.8(a) の核 ✅**。さらに **3A.8(a)(b) ✅**。さらに **3A.8(a)(b) のまとめ ✅**。さらに **3A.8(c) の基盤 ✅**。さらに **3A.8(c) ✅ ⟹ 3A.8 完了**。
+⚠ `Ch03/Problems.lean` は **1363 行** (上限 1500) — **次の追加の前に §3A leaf を分割する**
+(CLAUDE.md のファイル粒度規約: 3A.1/3A.2 の semidihedral・一般化四元数クラスタ (~550 行) を
+別 leaf へ出すのが自然)。
+**次 frontier = §3A leaf の分割 → 3A.9(b) / 3A.10 → 3A.6 / 3A.7 に戻る → §3B〜。**
