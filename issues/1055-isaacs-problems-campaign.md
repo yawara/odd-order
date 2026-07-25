@@ -824,6 +824,8 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | 4A.5 | ✅ | (a) `index_centralizer_eq_of_not_mem_center` / (b) `card_closure_pair_eq` / (c) `index_centralizer_closure_pair_eq` / (d) `map_center_centralizer_eq_center` + `isExtraspecial_centralizer_closure_pair` / (e) `exists_index_center_eq_prime_pow_two_mul` (新 leaf `ProblemsExtraspecial.lean`) |
 | 4A.6 | ✅ | `IsMaximalClassPGroup` (定義) / `exists_eq_lowerCentralSeries_of_isMaximalClass` (+ 一意性 `eq_of_normal_of_card_eq_of_isMaximalClass`、新 leaf `ProblemsMaximalClass.lean`) |
 | 4A.7 | ✅ | `exists_orderOf_eq_and_forall_orderOf_dvd` (+ 冪公式 `pow_mk` / 上界 `pow_prime_pow_succ_eq_one`、新 leaf `ProblemsWreath.lean`) |
+| 4A.8(c) | ✅ 訂正版 | `forall_commute_ker_augHom_iff` + 位数 `card_center_ker_augHom` (`|Z(P'U)| = p`)。書籍の主張は `p=2, n=1` で偽 — 下記 |
+| 4A.8(b) | ✅ | `commutator_range_inl_range_inr_eq` (`⁅A,U⁆ = ker(座標積)` の像) + `commutator_eq_commutator_range_inl_range_inr` (4A.1 経由 `P' = ⁅A,U⁆`) + まとめ `commutator_eq_coordProdHom_ker_map` |
 | 4A.8(a) | ✅ | `mem_center_iff_exists_const` / `center_eq_inf_centralizer_range_inr` (`ProblemsWreath.lean`) |
 | 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 同値形 `frattini_eq_center_of_commutator_eq_center` + 橋 `isExtraspecial_of_commutator_eq_center`) |
 
@@ -909,10 +911,64 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   `forall_conj_inr_eq_iff_const` (`inr` との可換性 ⟺ 軌道上定数) で定数性が出る。
   逆向きは定数 tuple が base とも `inr q` とも可換という直接計算。
 
-### 残り (文書順): **4A.8(b)-(d)** (次の frontier: (b) `⁅A,U⁆ = P'` = 成分積 1 の tuple —
-`P = A·U` で `A`,`U` 可換ゆえ **4A.1** が `P' = ⁅A,U⁆` を与え、あとは
-`⁅inl g, inr q⁆ = inl (g · (g∘shift)⁻¹)` と δ-分解 `f = ∏ₓ δₓ(f x)` で augmentation kernel
-との一致を示す; (c) `|Z(P'U)| = p`; (d) maximal class) / 4A.9 / 4A.10 / 4A.11。
+### 4A.8(b) 完了 (2026-07-25) — 実装知見
+
+`⁅A,U⁆ = P'` = 「成分の積が `1`」の tuple 全体。実装で効いた点:
+
+1. `coordProdHom : (Q → D) →* D`, `f ↦ ∏ ω, f ω` (`D` 可換ゆえ準同型)。
+2. `prod_smul_eq`: `∏ ω, f (q⁻¹ ω) = ∏ ω, f ω` (`Fintype.prod_equiv (Equiv.mulLeft q⁻¹)`)。
+3. **交換子公式** `⁅inl f, inr q⁆ = inl (fun ω => f ω * (f (q⁻¹ ω))⁻¹)`。
+   ⚠ **pointwise (`fun ω => …`) で書くこと** — Pi の `f * g⁻¹` 形で書くと
+   `HMul (Q → D) D` の instance 解決に失敗する (撤退の原因)。証明は `ext ω` +
+   構造 simp 補題 (`mul_left`/`inv_left`/`one_left` …) で、`change` は右成分で通らない。
+4. `⊆`: 上の公式の座標積 = `(∏f)(∏f)⁻¹ = 1` (2 を使う)。
+5. `⊇`: `⁅inl (δ_x d), inr (y x⁻¹)⁆ = inl (δ_x d · (δ_y d)⁻¹)` (shift が `δ_x ↦ δ_{qx}`) と
+   δ-分解 `f = ∏_x (δ_x (f x) · (δ_1 (f x))⁻¹)` (`Finset.univ_prod_mulSingle` +
+   `Finset.prod_apply` で `∏_x (δ_1 (f x))⁻¹ = 1` を `∏ f = 1` から出す)。
+6. `P' = ⁅A,U⁆` 自体は **4A.1** (`commutator_eq_commutator_of_mul_eq_top`) —
+   `P = A·U` は §3A の既存 simp 補題 `inl_left_mul_inr_right`、`A`/`U` の
+   `IsMulCommutative` instance はその場で構成 (`U` 側は `Q` 可換の仮定が要る)。
+7. ⚠ **最後の積は base 群 (可換) の中で取る**: `map_prod` は codomain に `CommMonoid` を
+   要求するので wreath product では使えない。`Subgroup.comap inl ⁅A,U⁆` の中で
+   `Subgroup.prod_mem` を使う。
+8. ⚠ `Subgroup.map` の存在形が与える membership は `x ∈ ↑K` (Set 強制) なので
+   `rw [MonoidHom.mem_ker]` は当たらない — `change` で `∏ ω, … = 1` に落とす。
+
+### ⚠ 4A.8(c) は `p = 2, n = 1` で偽の疑い (2026-07-25、要 PDF 再確認)
+
+書籍 (p. 124): 「(c) Show `|Z(P'U)| = p`.」 だが **`p = 2, n = 1` は反例に見える**:
+
+- `C = C₂`, `A = C₂ × C₂`, `U = C₂` (成分交換) ⟹ `P = C₂ ≀ C₂ = D₈` (位数 8)
+- `P' = ⁅A,U⁆ = {(a,b) : ab = 1} = {(1,1), (d,d)} = Z(P)` (位数 2、`D₈` は extraspecial)
+- `P'` は中心なので `P'U = Z(P) × ⟨u⟩ ≅ C₂ × C₂` は **abelian**、ゆえに `|Z(P'U)| = 4 ≠ 2`
+
+`p = 2, n = 2` (`C = C₄`) では `P' = {(a,a⁻¹)} ≅ C₄` で `u` 共役が `(a,a⁻¹) ↦ (a⁻¹,a)` ゆえ
+`P'U` は非可換、`Z(P'U) = {(a,a⁻¹) : a² = 1}` は位数 2 = `p` ✅。奇素数でも同様。
+⟹ **正しい主張は「`p` が奇 または `n ≥ 2`」の条件付き**と思われる。3B.12 と同型の書籍の穴。
+次 iteration で PDF ページ画像を再確認し、条件付きの形で形式化する。
+
+### 4A.8(c) の Lean 実装知見 (2026-07-25、3 回目で完成)
+
+**解決策 = `Pi.mulSingle` を使わず `if ω = x then d else 1` を直接書く**。指示関数は自前で
+定義してしまえば型推論の問題は起きず、`Finset.prod_eq_single x` + `simp +contextual` で
+`∏ ω, (if ω = x then c else 1) = c` も通る。以下は 2 回目の着手で判明した詰まり:
+
+- ⚠ `Pi.mulSingle_eq_of_ne h d` / `Pi.mulSingle_eq_same x d` のように**値を位置引数で渡すと
+  依存族 `f` がメタ変数のまま残り** application type mismatch になる (非依存族
+  `fun _ : Q => D` でも同じ)。`(f := …)` という名前付き指定も**不可** (implicit 名が `f` でない)。
+  ⟹ **`simp [Pi.mulSingle_apply, hb]` で潰す**のが確実 (`Pi.mulSingle_apply` が `if` 形に開く)。
+- ⚠ 証明中の `classical` と、補助補題の statement にある `[DecidableEq Q]` は**別 instance**に
+  なり mismatch する。補助は `classical` の後に `have` でインライン定義する。
+- `∏ ω, Pi.mulSingle x d ω = d` は `Finset.prod_eq_single x` + 上記 simp で通る (確認済)。
+
+### 4A.8(c) 完了 (位数まで)
+
+`card_center_ker_augHom : |Z(P'U)| = p` (仮説 `hd` の下)。部品は
+`card_ker_powMonoidHom_prime` (位数 `p^n` の巡回群で `x^p = 1` の解は `p` 個 —
+像 `⟨c^p⟩` の位数が `p^{n-1}` であることと Lagrange) と `d ↦ inl (const d)` の全単射。
+
+### 残り (文書順): **4A.8(c)(d)** ((d) `n=1` なら `P` が maximal class、
+一般に `P'U` が maximal class) / 4A.9 / 4A.10 / 4A.11。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
 
