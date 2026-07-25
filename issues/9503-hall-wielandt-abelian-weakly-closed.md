@@ -414,3 +414,24 @@ ChatGPT Pro (reasoning「非常に高い」) に Hall–Wielandt (p 奇 + A 可�
 
 ⚠ 回答は **必ず自分で厳密検証**する ([[feedback-ask-chatgpt-for-elided-gaps]])。
 特に「A 可換版が Z(P) 版に帰着できる」系の主張は Gorenstein の注記と矛盾するので疑う。
+
+### 回答 (16m54s 思考、chat URL: https://chatgpt.com/c/6a6509e6-1728-83e8-a764-3c52c0c97acb)
+
+前半の骨格 (2026-07-26 時点で読めた範囲、**未検証**):
+
+1. **§1**: 目標は `P ∩ G' = P ∩ N'` (focal 版)。`O^p` 版へは **Tate の定理**で上げる
+   (「focal 版と O^p 版の差が Tate の定理の内容」)。Alperin は使わない旨を明言。
+   ⚠ 参考文献リード: 「character-transfer による後年の一般化 (条件 `[x,y;p−1] ∈ Φ*(A)`)」
+   があり、可換版はその特殊化 (`[x,y;p−1] = 1`) だという (北大リポジトリの論文を引用)。
+2. **§2**: 弱閉性から即 `A ⊴ P` かつ `P ≤ N` (`u ∈ P` に対し `A^u ≤ P` ⟹ `A^u = A`)。
+   ⟹ `P` は `N` の Sylow でもあり、`D := P ∩ N' ⊵ P'` で `P/D` は可換 p-群。
+3. **§3**: 文字 transfer `T_H^K(χ)(k) = Σ_{t∈T} χ(h(t,k))` と推移律、
+   さらに二重剰余類分解 `G = ⊔ P g_i R` (`R ≤ P`)、`S_i = R ∩ g_i^{-1} P g_i` による
+   **明示公式 (17)**: `T_P^G(λ)(r) − [G:P]·λ(r) = Σ_i T_{S_i}^R(δ_i)(r)`、
+   ただし `λ_i(s) = λ(g_i s g_i^{-1})`, `δ_i = λ_i − λ|_{S_i}`。横断集合も明示。
+4. **§4 「odd-prime local transfer lemma」**: `R` p-群 (p 奇)、`A ⊴ R` 可換、`R = ⟨A,x⟩`、
+   `S ≤ R`、`δ : S → C` が `T_S^R(δ)(x) ≠ 0` と `X_R(x) ∩ S ⊆ ker δ`
+   (`X_R(x) := {(x^{p^k})^r}` = `⟨x^p⟩` の R-共役の合併) を満たすなら `S = R`。
+   ← **p 奇はここで効く模様**。(証明は極大部分群 `M ⊵ R` を取る標準論法から開始。)
+
+以降 (§5 以降) は未読 — 次 iteration で読み切って検証する。
