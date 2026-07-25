@@ -1286,3 +1286,38 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
    (`P` の非自明元は強実でない = `not_isStronglyReal_of_mem_P`, landed)。
 3. `N_G(Z₁PΣ) ⊆ N_G(Z₁) = C_G(Z₁)⟨s⟩ = R₂⟨s⟩` と `Z₁PΣ = Ω₁(LV) ⊴ R₂⟨s⟩`。
 
+## 🚧 step (16) 進捗 (2026-07-26、main session、`FirstCase/StepSixteen.lean` 新 leaf)
+
+### landed
+- **`sup_invImageF_centralizer_W_sup_nonsplitTorus_eq` : `R₁ = RΣL`**
+  (|RΣ| = 3⁴ / |R₁| = 3⁵ で RΣ 極大、`L ⊄ RΣ` (15))。(17) の「R̄₁ は R̄Σ と
+  L̄ΣP で生成」の土台。
+- **`commutator_zpowers_sup_sigma_sup_P_sylowThree_le` : `⁅Z₁ΣP, R₁⁆ ≤ Z₁`**
+  = 書籍の `Z₁PΣ ⊆ Z₂(R₁)`。⚠ **Z₂ を対象として定義せず具体形で述べた** —
+  下流が要るのはこの形 (`Z₁X ⊴ R₁` と `R̄₁` の class ≤ 2 が直に出る)。
+  分解 = `R₁ = RΣL`、RΣ 側は `Z₁ΣP ≤ RΣ` + `⁅RΣ,RΣ⁆ = Z₁` (14)、L 側は
+  `Z₁Σ` が `L` を中心化 + **`⁅P,L⁆ ≤ Z₁`**。
+  - 部品: `inv_mul_conj_mem_zpowers_sup_sigma` (StepFifteenLV から抽出:
+    `a ∈ LW, q ∈ P ⟹ a⁻¹a^q ∈ Z₁Σ`)、`nonsplitTorus_inf_zpowers_sup_sigma_eq`
+    (`L ⊓ Z₁Σ = Z₁`)、`commutatorElement_mem_zpowers_of_mem_P_of_mem_nonsplitTorus`。
+- **`not_isStronglyReal_of_mem_V`** (landed の `not_isStronglyReal_of_mem_P` を
+  `V ⊇ PΣ` に一般化) と **`not_isStronglyReal_of_mem_P_sup_sigma`**
+  (ΣP の非自明元は強実でない) — (16) 第二主張の矛盾側。
+
+### 残り (次セッションの実装順)
+1. **第二主張 (強実線の一意性)**: `X ≤ Z₁ΣP` 位数 3・全元強実・`X ⊓ Z₁ = 1` を仮定 →
+   (a) `Z₁X ⊴ R₁` (`⁅Z₁ΣP,R₁⁆ ≤ Z₁ ≤ Z₁X` から即)、
+   (b) `R₁` は `Z₁X` 内の `Z₁` 以外の位数 3 部分群 3 個に作用し**固定点なし**
+   (固定線は `R₁` 正規の位数 3 ⟹ `Z(R₁) = Z₁` と交わる ⟹ `= Z₁` で矛盾) ⟹
+   3-群が 3 元集合に固定点なしで作用 ⟹ 推移的、
+   (c) ⟹ `Z₁X` の全元が強実 (Z₁ 側は `isStronglyReal_distinguishedInvolution_mul_t`)、
+   (d) `(Z₁X) ⊓ (ΣP) ≠ 1` (位数 27 の初等可換 `Z₁ΣP` 内の位数 9 二つ) ⟹
+   `not_isStronglyReal_of_mem_P_sup_sigma` と矛盾。
+   - 要部品: `|Z₁ΣP| = 27` と初等可換性 (指数 3 は
+     `pow_three_eq_one_iff_mem_zpowers_sup_sigma_sup_P` の ⟸ で既済)、
+     位数 p² 群の「位数 p 部分群はちょうど p+1 個」系 (StepFourteen の
+     `card_lineSet_eq` / `lineSetTwo` 周りの **generic 補題が再利用できるか要実測**)。
+2. **第三主張**: `N_G(Z₁PΣ) ⊆ N_G(Z₁)` (共役は強実線を強実線に送る ⟹ 一意性で
+   `Z₁` 固定)、`N_G(Z₁) = C_G(Z₁)⟨s⟩ = R₂⟨s⟩` ((13)(14) 由来)、
+   逆向きは `Z₁PΣ = Ω₁(LV)` (15) が `R₂⟨s⟩` で正規。
+
