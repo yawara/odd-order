@@ -621,3 +621,9 @@ preimage、step (7) の N = P 使用)。主張:
   not_p_dvd_card_rankOneQ helpers)。step (12) 残 = orbit-stabilizer
   (N_G(R)-軌道 = 𝒜 の挟み撃ち: 上界 |𝒜| = p^m + 下界 C_Q(P) 自由軌道) →
   [N_G(R):N_G(P)] = p^m → m = 1 → App II Prop 1 (N_G(R)/R) → Cor 10.2 bridge → (B2)。
+- **[N_G(R):N_G(P)] = p^m 完成** (`e1a47f1ea`): orbit-stabilizer 挟み撃ち monolith。
+  数え上げ phase 完結。次 = 新 leaf StepTwelve.lean で m = 1 (index·|N_G(P)| の p-part
+  = p^{2m+1} ∣ |G|_p = p^{m+2} → m ≤ 1; m ≥ 1 は F nontrivial) → |G|_p = p³ →
+  App II Prop 1 の N_G(R)/R 再実例化 (RankOneHypothesis 構築が本体) →
+  Isaacs Cor 10.2 (transfer_range_eq_of_nilpotencyClass_lt) bridge → (B2) 矛盾 →
+  step_twelve endpoint「case (10.2) holds」。
