@@ -1501,25 +1501,24 @@ motive 破綻 — 仮説側で `rw [hcardD] at hpow` と書き換える。
 | (c) `O_{p'}(G/O_{p'}(G)) = 1` | ✅ 既存 `Ch03.oPiCore_quotient_self_eq_bot` |
 | `Ω₁(P) ⊴ G` (一般形: 正規巡回部分群の部分群は正規) | ✅ `normal_of_le_of_isCyclic` |
 | coprime 作用で `C_P(K) ≠ 1 ⟹ ⁅P,K⁆ = 1` | ✅ `le_centralizer_of_isCyclic_of_exists_fixed` |
+| **Case 2 本体** (`O_{p'}(G) = ⊥` ⟹ `K = ⊥`) | ✅ `eq_bot_of_oPiCore_compl_eq_bot` |
 | **残り**: Case 1 の商への遺伝 + 本体の帰納 | ⬜ |
 
 **残りの組み立て手順** (次 iteration):
 
-- **Case 2 (`O_{p'}(G) = ⊥`) の閉じ方** — 部品は全部揃っている:
-  `P := O_p(G)` は正規 Sylow (`exists_sylow_coe_eq_oPiCore_of_isCyclic`)、
-  `p ∣ |N_G(K)|` から Cauchy で位数 `p` の `x ∈ N_G(K)`、`x` は `p`-元で Sylow が唯一
-  (`Sylow.unique_of_normal`) ゆえ `x ∈ P`、`⟨x⟩ ⊴ G` (`normal_of_le_of_isCyclic`)。
-  `⁅k, x⁆ ∈ K ⊓ ⟨x⟩ = ⊥` (位数互いに素; `k·(x k⁻¹ x⁻¹) ∈ K` は `x ∈ N_G(K)` から,
-  `(k x k⁻¹)·x⁻¹ ∈ ⟨x⟩` は正規性から) ⟹ `K` は `x` を中心化 ⟹
-  `le_centralizer_of_isCyclic_of_exists_fixed` で `K ≤ C_G(P) = P`
-  (`centralizer_oPiCore_eq`) ⟹ `K` は `p'`-群 ∩ `p`-群 = `⊥`。
+- **Case 2 (`O_{p'}(G) = ⊥`)**: ✅ 実装済 (`eq_bot_of_oPiCore_compl_eq_bot`)。
 - **Case 1 (`O_{p'}(G) ≠ ⊥`)**: `Ḡ = G/O_{p'}(G)` への遺伝に要るもの —
   `Ch03.quotient_isPiSeparable` ✅ / Sylow の像が Sylow = 自作 **1B.5(b)**
   `exists_sylow_map_eq` ✅ (+ Sylow 共役性で「商の任意の Sylow は像」) / `K̄` の位数は `|K|` を
   割る / `mk' x` の位数は `p` (`x ∉ O_{p'}(G)` は位数から) / 結論は
   `Ch03.oPiCore_quotient_self_eq_bot` ✅ で `K̄ = ⊥` ⟹ `K ≤ ker (mk') = O_{p'}(G)`。
-- **仮説の形**: 「Sylow `p` が巡回」は `∀ Q : Sylow p G, IsCyclic ↥(Q : Subgroup G)` で持つのが
-  商への遺伝で扱いやすい (Sylow は共役なので `∃` 版と同値)。
+- **仮説の形 (2026-07-26 に再検討、こちらを推奨)**: 「Sylow `p` が巡回」は帰納法では
+  **`∀ H : Subgroup G, IsPGroup p ↥H → IsCyclic ↥H`** (「すべての `p`-部分群が巡回」) の形で
+  持つのがよい。Sylow 版とは同値 (各 `p`-部分群は Sylow に含まれ, 巡回群の部分群は巡回) で,
+  Case 2 (`eq_bot_of_oPiCore_compl_eq_bot` は `∀ Q : Sylow p G, IsCyclic` を取る) へは即座に
+  渡せる。**商への遺伝**は: `H̄ ≤ G/O` が `p`-群なら `H := comap (mk' O) H̄` の Sylow
+  `p`-部分群 `S` が `mk'` で `H̄` へ**同型に**写る (`S ⊓ O = 1` は位数互いに素から,
+  `|S| = |H| の p-部分 = |H̄|`) ので `H̄ ≅ S` 巡回。これが Case 1 の唯一の非自明な plumbing。
 
 ⚠ **BG 側に重複**: `isPiGroup_singleton_of_isPGroup` / `isPGroup_of_isPiGroup_singleton`
 (`BG/Ch1_Preliminary/S04g_Thm418Core.lean`, `PLengthTransfer.lean`) は今回 Isaacs Ch03 に
