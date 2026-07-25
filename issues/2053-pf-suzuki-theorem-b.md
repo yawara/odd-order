@@ -617,3 +617,7 @@ preimage、step (7) の N = P 使用)。主張:
   MulAction.orbitEquivQuotientStabilizer を Subgroup-conj 作用
   (MulAut.conj • : G ↷ Subgroup G の restriction) で使う。その後 m = 1 →
   |G|_p = p³ → App II Prop 1 再実例化 (N_G(R)/R) → Cor 10.2 bridge → (B2) 矛盾。
+- **|𝒜| = p^m 完成** (`ncard_prime_order_not_le_sInvertedT` + card_sInvertedT/
+  not_p_dvd_card_rankOneQ helpers)。step (12) 残 = orbit-stabilizer
+  (N_G(R)-軌道 = 𝒜 の挟み撃ち: 上界 |𝒜| = p^m + 下界 C_Q(P) 自由軌道) →
+  [N_G(R):N_G(P)] = p^m → m = 1 → App II Prop 1 (N_G(R)/R) → Cor 10.2 bridge → (B2)。
