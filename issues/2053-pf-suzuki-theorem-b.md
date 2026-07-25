@@ -486,3 +486,18 @@ Theorem B 最終 assembly の有無も解凍時に確認。lane b の次 frontie
 ユーザーが本 issue を含む pending 4 件 (0106/0131/2053/8005) の再着手を指示。
 pending の凍結/トリガー待ち/ユーザー判断待ちはいずれも解除 — main セッションが引き取る
 (3 レーンとも 2026-07-23 から停止中・未マージ 0 を確認済、territory 衝突なし)。
+
+## 📝 2026-07-25 解凍・実測再同期 (再活性化指示による)
+
+- **FirstCase/** 全 12 file (Basic/FieldAction/StepOne〜StepTen) = 実 sorry 0** (comment-strip
+  census で確認)。checklist の「残 = (9) p = f」は遅行 — **(1)〜(10) は全て完結済み**。
+  StepSix の gated sorry (`card_D_le_three_of_noncomm`) も解消済み。
+- **Higman Thm 1(a) landing 済** (lane b 最終 commit `bcf5dbfa2`):
+  `pow_four_eq_one_of_isSuzuki2Group` (Higman/Suzuki2Groups/ExponentFour.lean) は sorry 0。
+  StepFive の sorried-cite は実証明化された。
+- **NearFields.lean = 実 sorry 0** — `rankOne_affine_nearField` 本体は証明済み。残る sorryAx
+  経路は上流 **BS Q₈ (|S|=8)** のみ (= issue 0147、Navarro PDF 購入待ち)。Theorem B の
+  axiom 状態はこれを継承する (sorried-cite 方針どおり、campaign は block されない)。
+- **Theorem B 最終 assembly (`theoremB` 相当 endpoint) は未作成** (grep 0 件)。
+- ⟹ **真の残作業 = steps (11)〜(17) + Hall-Wielandt abelian 版 (9500 claim 要) + assembly**。
+  次の一手 = (11) R = T × P、C_Q(P) の A − {P} 正則作用 (p. 111)。
