@@ -268,6 +268,44 @@ theorem card_ker_lt_relIndex_commutator {Γ G : Type*} [Group Γ] [Group G] [Fin
   rw [htrans, hidx]
   exact hlt
 
+/-! ### Problem 5A.8(a) -/
+
+/-- **Isaacs Problem 5A.8(a)**: `f`, `g` がそれぞれ `A`, `B` の stem extension なら
+`f × g` は `A × B` の stem extension。
+
+`ker (f × g) = ker f × ker g` (`MonoidHom.ker_prodMap`) と
+`Z(Γ × Δ) = Z(Γ) × Z(Δ)` (`Subgroup.center_prod`),
+`(Γ × Δ)' = Γ' × Δ'` (`Subgroup.commutator_prod_prod` の `⊤` 特殊化) から直ちに従う。 -/
+theorem isStemExtension_prodMap {Γ A Δ B : Type*} [Group Γ] [Group A] [Group Δ] [Group B]
+    {f : Γ →* A} {g : Δ →* B} (hf : IsStemExtension f) (hg : IsStemExtension g) :
+    IsStemExtension (f.prodMap g) := by
+  refine ⟨?_, ?_, ?_⟩
+  · rintro ⟨a, b⟩
+    obtain ⟨x, hx⟩ := hf.surjective a
+    obtain ⟨y, hy⟩ := hg.surjective b
+    exact ⟨(x, y), by simp [hx, hy]⟩
+  · have htop : ((⊤ : Subgroup Γ).prod (⊤ : Subgroup Δ)) = (⊤ : Subgroup (Γ × Δ)) :=
+      Subgroup.top_prod_top
+    have hcomm : _root_.commutator (Γ × Δ)
+        = (_root_.commutator Γ).prod (_root_.commutator Δ) := by
+      rw [_root_.commutator_def, ← htop, Subgroup.commutator_prod_prod, ← _root_.commutator_def,
+        ← _root_.commutator_def]
+    rw [MonoidHom.ker_prodMap, hcomm]
+    exact Subgroup.prod_mono hf.ker_le_commutator hg.ker_le_commutator
+  · rw [MonoidHom.ker_prodMap, Subgroup.center_prod]
+    exact Subgroup.prod_mono hf.ker_le_center hg.ker_le_center
+
+/-- 直積 stem extension の核の位数は各核の位数の積。
+
+`isStemExtension_prodMap` と併せて **`|M(A × B)| ≥ |M(A)| |M(B)|`** (Problem 5A.8(a)) を与える:
+`A`, `B` それぞれで核が最大の stem extension を取れば, その直積が `A × B` の stem extension
+で核の位数は `|M(A)| |M(B)|`。 -/
+theorem card_ker_prodMap {Γ A Δ B : Type*} [Group Γ] [Group A] [Group Δ] [Group B]
+    (f : Γ →* A) (g : Δ →* B) :
+    Nat.card (f.prodMap g).ker = Nat.card f.ker * Nat.card g.ker := by
+  rw [MonoidHom.ker_prodMap, Nat.card_congr (Subgroup.prodEquiv f.ker g.ker).toEquiv,
+    Nat.card_prod]
+
 end
 
 end OddOrder.Isaacs.Ch05
