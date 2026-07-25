@@ -824,6 +824,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | 4A.5 | ✅ | (a) `index_centralizer_eq_of_not_mem_center` / (b) `card_closure_pair_eq` / (c) `index_centralizer_closure_pair_eq` / (d) `map_center_centralizer_eq_center` + `isExtraspecial_centralizer_closure_pair` / (e) `exists_index_center_eq_prime_pow_two_mul` (新 leaf `ProblemsExtraspecial.lean`) |
 | 4A.6 | ✅ | `IsMaximalClassPGroup` (定義) / `exists_eq_lowerCentralSeries_of_isMaximalClass` (+ 一意性 `eq_of_normal_of_card_eq_of_isMaximalClass`、新 leaf `ProblemsMaximalClass.lean`) |
 | 4A.7 | ✅ | `exists_orderOf_eq_and_forall_orderOf_dvd` (+ 冪公式 `pow_mk` / 上界 `pow_prime_pow_succ_eq_one`、新 leaf `ProblemsWreath.lean`) |
+| 4A.8(d) | 🔨 進行中 | 位数・下降中心列の翻訳 (`lowerCentralSeries_eq_map_shiftSubSeq`) 完了、残りは linchpin `Δ^{p-1} = T_p` 1 本 — 下記 |
 | 4A.8(c) | ✅ 訂正版 | `forall_commute_ker_augHom_iff` + 位数 `card_center_ker_augHom` (`|Z(P'U)| = p`)。書籍の主張は `p=2, n=1` で偽 — 下記 |
 | 4A.8(b) | ✅ | `commutator_range_inl_range_inr_eq` (`⁅A,U⁆ = ker(座標積)` の像) + `commutator_eq_commutator_range_inl_range_inr` (4A.1 経由 `P' = ⁅A,U⁆`) + まとめ `commutator_eq_coordProdHom_ker_map` |
 | 4A.8(a) | ✅ | `mem_center_iff_exists_const` / `center_eq_inf_centralizer_range_inr` (`ProblemsWreath.lean`) |
@@ -1008,6 +1009,21 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 `shiftSubSeq q i = ⊥ ⟺ i ≥ n(p-1)+1` を示せば `class(P) = n(p-1)+1` が出る
 (`lowerCentralSeries_eq_bot_iff_nilpotencyClass_le` 経由)。`P'U` 側も同様に
 `Δ` の反復を `ker coordProd` から始めればよい。
+
+#### (β) の linchpin = **`Δ^{p-1} = T_p` (作用素として)**
+
+`D` が指数 `p` のとき、群環 `F_p[x]/(x^p-1)` の恒等式 `(1-x)^{p-1} = 1 + x + ⋯ + x^{p-1} = N`
+が成り立つ。これさえ Lean で言えれば
+`Δ^p = Δ ∘ Δ^{p-1} = Δ ∘ T_p = 1` (**既証の `shiftSubHom_shiftSumHom_card`**) で上界が出て、
+下界も `Δ^{p-1}(δ₁ c) = T_p(δ₁ c) = const c ≠ 1` (`shiftSumHom_card_eq_const`) で即出る。
+⟹ **`class(P) = p` (n=1 で maximal class) は linchpin 1 本に還元済み**。
+
+linchpin の証明ルート 2 つ:
+1. **pointwise 二項展開**: `Δ^k f ω = ∏_{j≤k} f((q^j)⁻¹ω)^{(-1)^j C(k,j)}` を `k` の帰納
+   (Pascal) で示し、`k = p-1` で `C(p-1,j) ≡ (-1)^j (mod p)` を使うと指数が全部 `1` になる。
+   要調査: mathlib に `(p-1).choose j ≡ (-1)^j [ZMOD p]` があるか。
+2. **多項式環経由**: `F_p[x]` は整域なので `(1-x)^p = 1 - x^p = N·(1-x)` から `(1-x)` を約して
+   `(1-x)^{p-1} = N`。`V ≅ F_p[x]/(x^p-1)` (n=1 なので `D ≅ F_p`) の同型を作る手間がかかる。
 
 **(β) の当面の目標は `n = 1` の場合** (書籍の「`n = 1` なら `P` は maximal class」):
 `D` が指数 `p` なら `V = Q → D` は `ZMod p`-加群で `Δ = 1 - σ` (`σ` = 平行移動, `σ^p = 1`)、
