@@ -768,6 +768,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
    失敗は報告)。変化なし/全 abort なら push しない。
 6. **サマリ報告**: 各レーン {マージ済 N commits / コンフリクト abort / 待機 / 変化なし} + 未マージ残数
    + サイズ flag + push 結果。
+6.5. **レーン生存確認 (issue 0131、2026-07-25 に正式ステップ化)**: 毎 tick、各稼働レーンの 3 点シグネチャで
+   停止を検出する: (i) transcript mtime (`ls -t ~/.claude/projects/-home-ywr-odd-order-<lane>/*.jsonl | head -1`
+   が **20 分超凍結**)、(ii) 最終 commit 時刻 (`git -C /home/ywr/odd-order-<lane> log -1 --format=%cd`)、
+   (iii) worktree cwd プロセスの child 有無 (idle)。`git log` 単独では「大きめの commit 執筆中」と区別
+   できないので必ず transcript mtime と併用。3 点そろったら **transcript 末尾で 3 類型を判定**
+   (issue 0131 の 2026-07-20 17:08 追記が正本):
+   - `ScheduleWakeup({stop:true})` **無し** + 達成報告で turn 終了 → **障害 (第 1 類型)** → ユーザーへ報告
+     (⚠ tail が `assistant text` でも mtime frozen なら停止 — 「稼働中」と即断しない)
+   - `stop:true` **有り** + 理由が「区切り/裁定待ち」 → 第 2 類型 (規約と食い違い、要是正) → 報告
+   - `stop:true` **有り** + 理由が **context 枯渇** + handoff 完備 → **規約準拠** (是正不要、再開依頼のみ)
+   hub からレーンの unsupervised セッションへメッセージは送れない ([[cross-lane-sync-via-notes]]) ため、
+   検出時の行動は**報告のみ** (再開はユーザー操作)。
 7. **❄ FROZEN 2026-06-18 — LOOP GATE VERDICT 維持 (2026-06-17 追加, [`lane_loop_policy.md`](lane_loop_policy.md); LOOP GATE 機構停止中。⚠ 以下の例中のレーン名 h/G/F/B は 2026-06-28 改名前の旧名 = 履歴。現行レーンは a/b/c)**: 各 worktree の
    `LAUNCH.md` 冒頭「▶ LOOP GATE」ブロックは各レーンが起動時に `/loop` を自己選択する判定材料。**毎 tick で
    再監査はしない** (重い)。代わりに、今 tick のマージが**他レーンの gate を解いた**ときだけ VERDICT を見直す:

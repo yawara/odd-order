@@ -69,15 +69,15 @@ a は 02:38 の `ScheduleWakeup(60s)` を最後に、02:54 の「**(8.18) 全体
 
 ## やること
 
-- [ ] **hub tick の検出項目に「レーン停止」を正式に追加** — 判定は
+- [x] **hub tick の検出項目に「レーン停止」を正式に追加** — 判定は
       `~/.claude/projects/-home-ywr-odd-order-<lane>/*.jsonl` の最終更新時刻 (transcript が
       止まっていればセッションが終わっている)。`git log` の最終 commit 時刻だけでは
       「大きめのコミットを書いている最中」と区別できない (実際 c は 21:00 時点では生きていた)
-- [ ] 停止を検出したら**報告する** (hub からレーンの unsupervised セッションへメッセージは送れない
+- [x] 停止を検出したら**報告する** (hub からレーンの unsupervised セッションへメッセージは送れない
       = [[cross-lane-sync-via-notes]])。再開はユーザーの操作が要る
-- [ ] レーン再開プロンプトに **「turn を終えるときは必ず `ScheduleWakeup(delaySeconds: 60)` を
+- [x] レーン再開プロンプトに **「turn を終えるときは必ず `ScheduleWakeup(delaySeconds: 60)` を
       呼ぶ。issue を閉じた・main と同期した・区切りがついたは停止理由にならない」**を明記する
-- [ ] 2 回とも「main 同期直後の clean 状態」で止まっている点を追加調査 —
+- [x] 2 回とも「main 同期直後の clean 状態」で止まっている点を追加調査 —
       同期完了が「タスク完了」と解釈されている可能性が高い
 
 ## 完了条件
@@ -222,3 +222,24 @@ ScheduleWakeup を呼ばず turn 終了」。CLAUDE.md の「/loop self-pacing 6
 ユーザーが本 issue を含む pending 4 件 (0106/0131/2053/8005) の再着手を指示。
 pending の凍結/トリガー待ち/ユーザー判断待ちはいずれも解除 — main セッションが引き取る
 (3 レーンとも 2026-07-23 から停止中・未マージ 0 を確認済、territory 衝突なし)。
+
+## ✅ 2026-07-25 close — 恒久対策を実装 (ユーザー再活性化指示による)
+
+やること 4 点の消化:
+
+1. **hub tick への停止検出の正式組み込み** — `merge_monitor.md`「各イテレーションの手順」に
+   **手順 6.5「レーン生存確認」**を新設: 3 点シグネチャ (transcript mtime 20 分超凍結 /
+   最終 commit 時刻 / cwd プロセス idle) + transcript 末尾での 3 類型判定 (第 1 類型 =
+   wakeup 無し達成報告 / 第 2 類型 = stop:true+区切り理由 / 規約準拠 = stop:true+context 枯渇
+   +handoff)。従来は運用実態のみで明文ステップが無かった (2026-07-22 ruling の「手順 (7)」
+   参照は凍結済 LOOP GATE 項の誤指し)。
+2. **検出時の報告** — 手順 6.5 に「行動は報告のみ (hub からレーンへ送信不可)」を明記。
+3. **再開プロンプトの wakeup 必須文言** — `worktree_setup.md` に**定型再開プロンプト**を新設
+   (順序規則「report を書いたら同じ turn 内で必ず ScheduleWakeup(60s)」を核に、進捗不良
+   =報告+続行、context 枯渇=handoff+stop:true を明記)。CLAUDE.md「/loop self-pacing」節にも
+   同じ順序規則を追記 (常時ロードされる正本)。
+4. **「main 同期直後の clean 状態」の追加調査** — 3・4 例目で仮説が
+   **「達成感のある turn の終わり」**に一般化され追認済 (main 同期はその一種)。個別調査は不要。
+
+**残す宿題 (本 issue の scope 外)**: wakeup 忘れの自動 nudge (harness hook 等) は未実装。
+停止が再発したら本 issue を再 open して事例を追記し、その時点で自動化を検討する。

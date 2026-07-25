@@ -101,3 +101,27 @@ symlink は worktree 削除で一緒に消える. `.git/info/exclude` の `refer
 - [`subagent_orchestration.md`](subagent_orchestration.md): 並行作業を切るか判断する基準.
 - [`forward_dep_policy.md`](forward_dep_policy.md): 章間 forward dep の扱い (worktree 合流時の名前衝突回避).
 - CLAUDE.md "並行作業 (worktree)" セクションから参照.
+
+## レーン再開プロンプト (定型、issue 0131)
+
+レーンを再開するときは以下をそのまま貼る (`<lane>` を a/b/c に置換)。停止障害 4 例
+(issue 0131) の共通トリガー =「達成感のある turn の終わりで wakeup 予約が抜ける」への
+対策として、**停止条件の列挙でなく順序の規則**として書いてある。
+
+```
+<lane>レーンを再開します。起動時 main 同期 (git merge main) → frontier 確認 (issues/ + notes/)
+→ /loop 自走 (self-pacing, wakeup 60s 固定) に入ってください。
+
+順序規則 (issue 0131): report を書いたら、その同じ turn 内で必ず
+ScheduleWakeup(delaySeconds: 60) を呼ぶ。issue を閉じた・main と同期した・定理が landing した・
+区切りがついた、はすべて継続の合図であって停止理由ではない。
+停止してよいのは STOP 条件 (unsound carrier / 新 axiom / build 破壊・sorry regression /
+真の設計分岐) と context 枯渇のみ。context 枯渇時は issue に次の一手を明記した handoff を
+残して ScheduleWakeup({stop: true}) で止まる。
+進捗不良を検知したら報告し、そのうえで実装に移って続行する。報告は停止理由ではない。
+```
+
+- 正本: CLAUDE.md「レーンの `/loop` self-pacing wakeup = 60s」節の順序規則 (2026-07-25 追記) と
+  issue 0131 (停止 3 類型・hub 側検出は `merge_monitor.md` 手順 6.5)。
+- wakeup 忘れの**自動 nudge** (harness 側 hook 等) は未実装 — 再発したら 0131 を再 open して
+  事例を追記し、その時点で検討する。
