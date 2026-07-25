@@ -253,30 +253,85 @@ theorem commutatorElement_inl_inr (f : Q → D) (q : Q) :
   · simp [smul_eq_mul]
   · simp
 
-/-- **Isaacs Problem 4A.8(b)** (書籍 p. 124): `⁅A, U⁆` は「成分の積が `1`」の tuple 全体.
+/-! ### Problem 4A.11 — `⁅B, K⁆` の剰余類による特徴づけ (p. 125) -/
 
-`⊆`: `⁅inl f, inr q⁆` の座標積は `(∏ f)(∏ f)⁻¹ = 1` (平行移動が積を変えないから).
-`⊇`: `⁅inl (δ_x d), inr (y x⁻¹)⁆ = inl (δ_x d · (δ_y d)⁻¹)` なので, 積が `1` の `f` を
-`f = ∏_x (δ_x (f x) · (δ_1 (f x))⁻¹)` と分解すればよい. -/
-theorem commutator_range_inl_range_inr_eq [Fintype Q] :
-    ⁅(inl : (Q → D) →* D ≀[Q] Q).range, (inr : Q →* D ≀[Q] Q).range⁆
-      = (coordProdHom (D := D) (Q := Q)).ker.map inl := by
-  classical
+open scoped Classical in
+/-- **各右剰余類 `Kω` 上で座標積が `1`** な tuple 全体 (Isaacs Problem 4A.11 の右辺).
+
+⚠ 書籍は `H` の作用を `f^h(x) = f(x h⁻¹)` に取るので**左**剰余類だが, 本 repo の wreath は
+左移動 `f ↦ f(q⁻¹ ·)` なので **右**剰余類 `Kω` になる (剰余類の個数は同じなので位数の
+主張は不変). -/
+noncomputable def cosetProdKer [Fintype Q] (K : Subgroup Q) : Subgroup (Q → D) where
+  carrier := {f | ∀ ω : Q, ∏ x ∈ Finset.univ.filter (fun x : Q => x * ω⁻¹ ∈ K), f x = 1}
+  one_mem' := by intro ω; simp
+  mul_mem' {a b} ha hb := by
+    intro ω
+    change ∏ x ∈ Finset.univ.filter (fun x : Q => x * ω⁻¹ ∈ K), (a * b) x = 1
+    simp only [Pi.mul_apply]
+    rw [Finset.prod_mul_distrib, ha ω, hb ω, one_mul]
+  inv_mem' {a} ha := by
+    intro ω
+    change ∏ x ∈ Finset.univ.filter (fun x : Q => x * ω⁻¹ ∈ K), a⁻¹ x = 1
+    simp only [Pi.inv_apply]
+    rw [Finset.prod_inv_distrib, ha ω, inv_one]
+
+open scoped Classical in
+theorem mem_cosetProdKer_iff [Fintype Q] (K : Subgroup Q) (f : Q → D) :
+    f ∈ cosetProdKer (D := D) K ↔
+      ∀ ω : Q, ∏ x ∈ Finset.univ.filter (fun x : Q => x * ω⁻¹ ∈ K), f x = 1 := Iff.rfl
+
+open scoped Classical in
+/-- `K = ⊤` なら右剰余類は `Q` ただ 1 つなので, 条件は「全成分の積が `1`」. -/
+theorem cosetProdKer_top [Fintype Q] :
+    cosetProdKer (D := D) (⊤ : Subgroup Q) = (coordProdHom (D := D) (Q := Q)).ker := by
+  have hfilt : Finset.univ.filter (fun x : Q => x * (1 : Q)⁻¹ ∈ (⊤ : Subgroup Q))
+      = Finset.univ := Finset.filter_true_of_mem fun x _ => Subgroup.mem_top _
+  ext f
+  rw [mem_cosetProdKer_iff, MonoidHom.mem_ker]
+  refine ⟨fun h => ?_, fun h ω => ?_⟩
+  · have h1 := h 1
+    rwa [hfilt] at h1
+  · rw [Finset.filter_true_of_mem fun x _ => Subgroup.mem_top _]
+    exact h
+
+open scoped Classical in
+/-- **Isaacs Problem 4A.11** (書籍 p. 125): `K ≤ Q` に対し
+
+`⁅B, K⁆` = 「`Q` の各右剰余類 `Kω` 上で座標積が `1`」な tuple 全体.
+
+`⊆`: `⁅inl f, inr q⁆` の base 成分 `Δ_q f` は, `q ∈ K` ゆえ剰余類 `Kω` を保つ平行移動で
+積が打ち消し合う。`⊇`: 同一剰余類の 2 点で支持された `δ_x d · (δ_y d)⁻¹`
+(`y x⁻¹ ∈ K`) が `⁅inl (δ_x d), inr (y x⁻¹)⁆` で得られ, 各剰余類から代表元 `ρ` を選んで
+`f = ∏_x (δ_x (f x) · (δ_{ρ x}(f x))⁻¹)` と分解できる (剰余類上の積が `1` ゆえ
+代表元の寄与が消える). -/
+theorem commutator_range_inl_map_inr_eq [Fintype Q] (K : Subgroup Q) :
+    ⁅(inl : (Q → D) →* D ≀[Q] Q).range, K.map (inr : Q →* D ≀[Q] Q)⁆
+      = (cosetProdKer (D := D) K).map inl := by
   refine le_antisymm (Subgroup.commutator_le.2 ?_) ?_
-  · rintro _ ⟨f, rfl⟩ _ ⟨q, rfl⟩
+  · rintro _ ⟨f, rfl⟩ _ ⟨q, hq, rfl⟩
     refine ⟨fun ω => f ω * (f (q⁻¹ * ω))⁻¹, ?_, (commutatorElement_inl_inr f q).symm⟩
-    change (∏ ω, f ω * (f (q⁻¹ * ω))⁻¹) = 1
-    calc (∏ ω, f ω * (f (q⁻¹ * ω))⁻¹)
-        = (∏ ω, f ω) * ∏ ω, (f (q⁻¹ * ω))⁻¹ := Finset.prod_mul_distrib
-      _ = (∏ ω, f ω) * (∏ ω, f (q⁻¹ * ω))⁻¹ := by rw [Finset.prod_inv_distrib]
-      _ = (∏ ω, f ω) * (∏ ω, f ω)⁻¹ := by rw [prod_smul_eq]
-      _ = 1 := mul_inv_cancel _
-  · -- `δ_x d · (δ_y d)⁻¹` が交換子に入る
-    have hgen : ∀ (x y : Q) (d : D),
+    intro ω
+    have hset : ∀ x : Q, x ∈ Finset.univ.filter (fun x : Q => x * ω⁻¹ ∈ K) ↔
+        (Equiv.mulLeft q⁻¹) x ∈ Finset.univ.filter (fun x : Q => x * ω⁻¹ ∈ K) := by
+      intro x
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Equiv.coe_mulLeft]
+      refine ⟨fun h => ?_, fun h => ?_⟩
+      · rw [mul_assoc]
+        exact K.mul_mem (K.inv_mem hq) h
+      · have hx : x * ω⁻¹ = q * (q⁻¹ * x * ω⁻¹) := by group
+        rw [hx]
+        exact K.mul_mem hq h
+    have hre : (∏ x ∈ Finset.univ.filter (fun x : Q => x * ω⁻¹ ∈ K), f (q⁻¹ * x))
+        = ∏ x ∈ Finset.univ.filter (fun x : Q => x * ω⁻¹ ∈ K), f x :=
+      Finset.prod_equiv (Equiv.mulLeft q⁻¹) hset fun i _ => rfl
+    change (∏ x ∈ Finset.univ.filter (fun x : Q => x * ω⁻¹ ∈ K), (f x * (f (q⁻¹ * x))⁻¹)) = 1
+    rw [Finset.prod_mul_distrib, Finset.prod_inv_distrib, hre, mul_inv_cancel]
+  · -- 同一剰余類の 2 点で支持された元が交換子に入る
+    have hgen : ∀ (x y : Q), y * x⁻¹ ∈ K → ∀ d : D,
         (inl (fun ω => (Pi.mulSingle x d : Q → D) ω * ((Pi.mulSingle y d : Q → D) ω)⁻¹)
-          : D ≀[Q] Q)
-          ∈ ⁅(inl : (Q → D) →* D ≀[Q] Q).range, (inr : Q →* D ≀[Q] Q).range⁆ := by
-      intro x y d
+            : D ≀[Q] Q)
+          ∈ ⁅(inl : (Q → D) →* D ≀[Q] Q).range, K.map (inr : Q →* D ≀[Q] Q)⁆ := by
+      intro x y hyx d
       have hshift : ∀ ω : Q,
           (Pi.mulSingle x d : Q → D) ((y * x⁻¹)⁻¹ * ω) = (Pi.mulSingle y d : Q → D) ω := by
         intro ω
@@ -296,38 +351,78 @@ theorem commutator_range_inl_range_inr_eq [Fintype Q] :
         rw [commutatorElement_inl_inr]
         exact congrArg inl (funext fun ω => by rw [hshift ω])
       rw [← hcomm]
-      exact Subgroup.commutator_mem_commutator ⟨_, rfl⟩ ⟨_, rfl⟩
+      exact Subgroup.commutator_mem_commutator ⟨_, rfl⟩ ⟨y * x⁻¹, hyx, rfl⟩
     rintro _ ⟨f, hf, rfl⟩
-    have hf' : (∏ ω, f ω) = 1 := hf
-    -- `f = ∏ x, (δ_x (f x) · (δ_1 (f x))⁻¹)`
+    -- 右剰余類の setoid と代表元
+    let S : Setoid Q :=
+      { r := fun a b => a * b⁻¹ ∈ K
+        iseqv := ⟨fun a => by simp,
+          fun {a b} h => by simpa using K.inv_mem h,
+          fun {a b c} hab hbc => by simpa [mul_assoc] using K.mul_mem hab hbc⟩ }
+    set ρ : Q → Q := fun ω => (Quotient.mk S ω).out with hρdef
+    have hρrel : ∀ ω : Q, ρ ω * ω⁻¹ ∈ K := by
+      intro ω
+      exact Quotient.exact (Quotient.out_eq (Quotient.mk S ω))
+    have hρeq : ∀ ω ω' : Q, ω * ω'⁻¹ ∈ K → ρ ω = ρ ω' := fun ω ω' h =>
+      congrArg Quotient.out (Quotient.sound (a := ω) (b := ω') h)
+    have hρidem : ∀ ω : Q, ρ (ρ ω) = ρ ω := fun ω => hρeq _ _ (hρrel ω)
+    -- `f = ∏_x (δ_x (f x) · (δ_{ρ x}(f x))⁻¹)`
     have hdecomp :
         (∏ x : Q, (fun ω => (Pi.mulSingle x (f x) : Q → D) ω *
-          ((Pi.mulSingle (1 : Q) (f x) : Q → D) ω)⁻¹)) = f := by
+          ((Pi.mulSingle (ρ x) (f x) : Q → D) ω)⁻¹)) = f := by
       funext ω
       rw [Finset.prod_apply]
       have h1 : (∏ x : Q, (Pi.mulSingle x (f x) : Q → D) ω) = f ω := by
         have hu := congrFun (Finset.univ_prod_mulSingle f) ω
         rwa [Finset.prod_apply] at hu
-      have h2 : (∏ x : Q, (Pi.mulSingle (1 : Q) (f x) : Q → D) ω) = 1 := by
-        by_cases hω : ω = (1 : Q)
-        · rw [hω]
-          simpa only [Pi.mulSingle_eq_same] using hf'
-        · simp [Pi.mulSingle_eq_of_ne hω]
+      have h2 : (∏ x : Q, (Pi.mulSingle (ρ x) (f x) : Q → D) ω) = 1 := by
+        simp only [Pi.mulSingle_apply]
+        rw [Finset.prod_ite, Finset.prod_const_one, mul_one]
+        by_cases hω : ρ ω = ω
+        · have hfilt : Finset.univ.filter (fun x : Q => ω = ρ x)
+              = Finset.univ.filter (fun x : Q => x * ω⁻¹ ∈ K) := by
+            refine Finset.filter_congr fun x _ => ?_
+            refine ⟨fun h => ?_, fun h => ?_⟩
+            · have hr := hρrel x
+              rw [← h] at hr
+              simpa using K.inv_mem hr
+            · rw [← hω]
+              exact (hρeq x ω h).symm
+          rw [hfilt]
+          exact hf ω
+        · have hempty : Finset.univ.filter (fun x : Q => ω = ρ x) = ∅ := by
+            refine Finset.filter_eq_empty_iff.mpr fun x _ h => hω ?_
+            rw [h, hρidem x, ← h]
+          rw [hempty, Finset.prod_empty]
       calc (∏ x : Q, ((Pi.mulSingle x (f x) : Q → D) ω *
-              ((Pi.mulSingle (1 : Q) (f x) : Q → D) ω)⁻¹))
+              ((Pi.mulSingle (ρ x) (f x) : Q → D) ω)⁻¹))
           = (∏ x : Q, (Pi.mulSingle x (f x) : Q → D) ω)
-              * ∏ x : Q, ((Pi.mulSingle (1 : Q) (f x) : Q → D) ω)⁻¹ := Finset.prod_mul_distrib
-        _ = f ω * (∏ x : Q, (Pi.mulSingle (1 : Q) (f x) : Q → D) ω)⁻¹ := by
+              * ∏ x : Q, ((Pi.mulSingle (ρ x) (f x) : Q → D) ω)⁻¹ := Finset.prod_mul_distrib
+        _ = f ω * (∏ x : Q, (Pi.mulSingle (ρ x) (f x) : Q → D) ω)⁻¹ := by
               rw [h1, Finset.prod_inv_distrib]
         _ = f ω := by rw [h2, inv_one, mul_one]
-    -- 積は base 群 (可換) の中で取り, `inl` の引き戻し部分群に入ることを使う
     have hmem : (∏ x : Q, (fun ω => (Pi.mulSingle x (f x) : Q → D) ω *
-        ((Pi.mulSingle (1 : Q) (f x) : Q → D) ω)⁻¹))
+        ((Pi.mulSingle (ρ x) (f x) : Q → D) ω)⁻¹))
           ∈ Subgroup.comap (inl : (Q → D) →* D ≀[Q] Q)
-            ⁅(inl : (Q → D) →* D ≀[Q] Q).range, (inr : Q →* D ≀[Q] Q).range⁆ :=
-      Subgroup.prod_mem _ fun x _ => Subgroup.mem_comap.mpr (hgen x 1 (f x))
+            ⁅(inl : (Q → D) →* D ≀[Q] Q).range, K.map (inr : Q →* D ≀[Q] Q)⁆ :=
+      Subgroup.prod_mem _ fun x _ =>
+        Subgroup.mem_comap.mpr (hgen x (ρ x) (hρrel x) (f x))
     rw [← hdecomp]
     exact hmem
+
+
+/-! ### Problem 4A.8(b) (再掲) — `⁅A, U⁆ = P'` -/
+
+/-- **Isaacs Problem 4A.8(b)** (書籍 p. 124): `⁅A, U⁆` は「成分の積が `1`」の tuple 全体.
+
+Problem 4A.11 (`commutator_range_inl_map_inr_eq`) の `K = ⊤` の場合
+(右剰余類が `Q` ただ 1 つなので条件は「全成分の積が `1`」= `cosetProdKer_top`). -/
+theorem commutator_range_inl_range_inr_eq [Fintype Q] :
+    ⁅(inl : (Q → D) →* D ≀[Q] Q).range, (inr : Q →* D ≀[Q] Q).range⁆
+      = (coordProdHom (D := D) (Q := Q)).ker.map inl := by
+  rw [MonoidHom.range_eq_map (inr : Q →* D ≀[Q] Q), commutator_range_inl_map_inr_eq,
+    cosetProdKer_top]
+
 
 /-- `P = A · U` (`A` = base, `U` = `inr` の像) と両者の可換性から, **4A.1** で
 `P' = ⁅A, U⁆` (`Q` が可換, たとえば位数 `p` の巡回群のとき). -/
