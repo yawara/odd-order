@@ -1161,7 +1161,31 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 **部分群側**を拾う (元側を書換えたいなら `have` で等式化) / `prod_smul_eq` は
 `∏ ω, f (q⁻¹ * ω)` の形にしか rw できない (`f y ^ e j` を噛ませたら `exact` で defeq 渡し)。
 
-### 残り (文書順): 4A.9 / 4A.10 / 4A.11 / 4A.12。
+#### 🎉 4A.10 完了 (2026-07-25) — 新 leaf `ProblemsCenterIndex.lean`
+
+**主結果** (実証明・axiom-clean): `card_commutator_le_of_index_center_le`
+= 書籍そのままの **`p`-群 `P` で `|P : Z(P)| ≤ p^n` ⟹ `|P'| ≤ p^{n(n-1)/2}`**。
+
+- 中核 `card_commutator_le_of_normal_cyclic_quotient`:
+  **`Q ⊴ G`, `G/Q` cyclic, `Z(G) ≤ Q` ⟹ `|G'| ≤ |⁅Q,Q⁆| · |Q : Z(G)|`**。
+  `Ḡ = G/⁅Q,Q⁆` で `Ā = Q/⁅Q,Q⁆` は可換正規 (`⁅q₁,q₂⁆ ∈ ⁅Q,Q⁆`)、`Ḡ/Ā ≅ G/Q`
+  (`QuotientGroup.quotientQuotientEquivQuotient`) が cyclic なので **repo の Lemma 4.6 位数形**
+  `card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient` が
+  `|Ḡ'|·|Ā ⊓ Z(Ḡ)| = |Ā|` を与える。`Z(G)` の像 ⊆ `Ā ⊓ Z(Ḡ)` と像・核の位数関係で
+  `|G'|·|Z(G) の像| ≤ |Z(G) の像|·|⁅Q,Q⁆|·|Q:Z(G)|`、約せば結論。
+- 支持補題 `card_map_mul_card_inf_ker` (`|f(H)|·|H ⊓ ker f| = |H|`; `MonoidHom.restrict` +
+  `Subgroup.index_ker`)。
+- 帰納 `card_commutator_le_pow_choose_two` は **`n.choose 2` で述べる**のが要点
+  (Pascal `(n+1).choose 2 = n.choose 2 + n` がそのまま指数の勘定)。書籍形への変換は
+  `Nat.choose_two_right`。`Z(P)` を含む極大部分群は `IsCoatomic.eq_top_or_exists_le_coatom`
+  + `NormalizerCondition.normal_of_coatom` (冪零) + 1D.6 `isCoatom_iff_index_prime`。
+
+⚠ 教訓: `commutator_eq_bot_iff_center_eq_top` / `NormalizerCondition.normal_of_coatom` /
+`Subgroup.isNilpotent_iff_lowerCentralSeries` はいずれも **section 変数が明示引数**ゆえ
+`X.mpr` 形が「Unknown constant X.mpr」になる (`(X _).mpr` と書く) /
+`by` ブロックを入れ子にした改行継続は parse error になりやすい (`have` に切り出す)。
+
+### 残り (文書順): 4A.11 / 4A.12。
 
 #### 🎉 4A.9 完了 (2026-07-25) — 新 leaf `ProblemsIteratedCommutator.lean`
 
