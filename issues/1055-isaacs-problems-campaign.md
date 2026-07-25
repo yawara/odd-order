@@ -351,10 +351,23 @@ mathlib inductive (`top`/`step`)。
   - ✅ 実証明 **2A.8** `commutator_eq_bot_of_ne_of_isSubnormal_of_simple` (異なる非可換単純な部分正規 `S,T`
     ⟹ `⁅S,T⁆=⊥`)。非可換単純部分正規は component (`isQuasisimple_of_isSimpleGroup_not_isMulCommutative`)、
     異なる component は可換 (`IsComponent.commutator_eq_bot_of_ne`、Ch09)。import 追加 = Ch09 SubnormalSocle。
-  - ⏸ **残り §2A (deferred-hard、repo 直接対応薄い)**: 2A.4 (Wielandt: S 単純が全 subnormal と permute
-    ⟹ 全 subnormal を正規化) / 2A.5 (minimal normal = 単純直積、socle 分解が必要) / 2A.6 / 2A.9
-    (H◁◁G π-perfect ⟹ O^π(G) が H を正規化)。**2A.9 メモ**: `H≤O^π(G)` は導ける (H/(H∩O^π(G)) は
-    π-群商ゆえ π-perfect の H で自明) が、正規化は subtle。いずれも ~40-60 行 machinery ゆえ専用 session。
+  - ✅ 実証明 **2A.4** (2026-07-25、Wielandt 部分群): `le_normalizer_of_isSubnormal_of_forall_mul_comm`
+    (S 単純が全 subnormal J と `SJ = JS` ⟹ S は全 subnormal を正規化)。**|G| 強帰納法 +
+    IsSubnormal 構造帰納**。step (H⊴K'◁◁G, IH: S≤N(K')): K'=⊤ 自明 / **S≤K'** は ↥K' に降下
+    (仮説移送: `IsSubnormal.trans'` (mathlib) で subnormal を G へ戻し permutability を
+    elementwise transport、単純性は `MulEquiv.isSimpleGroup`+`subgroupOfEquivOfLe`、結論は
+    `subgroupOf_normalizer_eq`) / **S⊄K'** は S⊓K'⊴S (S≤N(K')) + 単純性で S⊓K'=⊥ →
+    K:=S⊔H は台集合 S·H (helper `coe_sup_of_mul_comm` 新設 = SH=HS→部分群構成) →
+    M:=normalClosure(H) in ↥K が ≤K' (k=s·h の共役が K' に残る、`normalClosure_le_normal`) →
+    S⊓M=⊥ → 計数 |S||M| ≤ |K| = |S||H| (`card_mul_card_inf`) → M=H → H⊴K
+    (`normal_subgroupOf_iff_le_normalizer`) → S≤K≤N(H)。~180 行・axiom-clean。
+    ⚠ 教訓: 型を跨ぐ強帰納法は `∀ (n) (G : Type*) (_ : Group G) (_ : Finite G), card ≤ n → …` の
+    explicit binder 形で書き、適用時は `inferInstance` 明示 / `Set.mem_mul` の obtain した eq は
+    β-未簡約 (`show a*b = c*d from heq` で reduce してから rw)。
+  - ⏸ **残り §2A (deferred-hard)**: 2A.5 (minimal normal = 単純直積、内部直積機構が必要) /
+    2A.6 (2A.5 の帰結: N 内の非可換正規は X のメンバーを含む) / 2A.9 (H◁◁G π-perfect ⟹
+    O^π(G) が H を正規化; `H≤O^π(G)` は導出済みの見込み、正規化が subtle) /
+    **2A.10** (strongly conjugate ⟺ subnormal — 従来リストから漏れていたので追加)。
 
 ## Ch.3 (Split Extensions) §3A — 着手 (2026-07-23、§2A hard tail deferred 中の breadth 展開)
 
