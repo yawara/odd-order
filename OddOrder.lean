@@ -223,6 +223,7 @@ import OddOrder.Isaacs.Ch04_Commutators.Problems
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsExtraspecial
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsMaximalClass
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsNilpotencyClass
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsDihedralEight
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsCenterIndex
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsWreath

@@ -1242,8 +1242,23 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
     ⟹ `H` を含む ⟹ `⁅H,H⁆ ≤ N`。
 - `H := commutator G ⊔ Subgroup.zpowers a`。`Subgroup.closure_le` で generator に落とす。
 
-### 残り: **4A.12(c) の `D₈` 部分のみ** (`|𝒯(D₈)| ≤ 3` の具体計算)。
-これ以外の §4A (4A.1–4A.13) は完済。
+#### 🎉 4A.12(c) の `D₈` 部分 完了 (2026-07-25) — 新 leaf `ProblemsDihedralEight.lean`
+
+`sum_lt_of_three_lt_card_dihedralFour` : **`H = D₈` なら `|A| > 3` で (b) の不等式が成立**
+(= 書籍の「`m = 3` が取れる」)。核は `card_le_three_of_maximal_dihedralFour` (`|𝒯(D₈)| ≤ 3`)。
+
+`D₈ = DihedralGroup 4` の可換部分群は 3 つの指数 2 部分群
+`⟨r⟩ = closure {r 1}` / `closure {r 2, sr 0}` / `closure {r 2, sr 1}` のいずれかに含まれる:
+- 鏡映 `sr i ∈ T` があれば, `r k` との可換性から `2k = 0` (⟹ `k ∈ {0,2}`)、
+  `sr j` との可換性から `2(i-j) = 0` (⟹ `j ∈ {i, i+2}`) ⟹ `T ≤ closure {r 2, sr i}`。
+- 鏡映が無ければ `T ≤ ⟨r⟩` (`r_one_pow`)。
+- `closure {r 2, sr (i+2)} = closure {r 2, sr i}` (`sr (i+2) = r 2 · sr i`) なので候補は 3 つ。
+
+⚠ 教訓: `ZMod 4` の算術は `decide` で済むが、**文脈に自由変数があると `revert; decide` は
+「Expected type must not contain free variables」で落ちる** — `∀ i k : ZMod 4, …` の
+**閉じた補題として切り出してから `decide`** する。
+
+### 🎉 §4A 完済 (4A.1–4A.13 全問)。次は §4B (書籍 p.125–, Hall–Witt 恒等式から)。
 
 #### 🎉 4A.11 完了 (2026-07-25) — `ProblemsWreath.lean` に追加
 
