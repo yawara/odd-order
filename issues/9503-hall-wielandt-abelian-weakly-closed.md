@@ -300,3 +300,51 @@ Gorenstein pp. 251-257 を精読した結果、**もっと短い経路**が見�
 - references/peterfalvi/pdf/05.4_pp_108_114_The_First_Case.pdf p. 108 (statement) / p. 114 (使用)
 - OddOrder/Isaacs/Ch10_MoreTransfer/Yoshida.lean (class < p 版、既存)
 - OddOrder/Peterfalvi/Appendices/Suzuki/FirstCase/StepTwelveTransfer.lean (既存版の消費例)
+
+
+## 🔎 2026-07-26 追加解析 — `Z₁` の弱閉性 vs `|W| = 9` wreath 排除
+
+### `Z₁` の弱閉性について分かったこと
+
+`Z₁^x ≤ R₂` を仮定して `u := z^x` (z = st) とおくと:
+
+- `R₂ = C_G(Z₁)` から対称に **`Z₁ ≤ R₂^x = C_G(u)`**、`E := ⟨z,u⟩` は
+  `J := R₂ ⊓ R₂^x = C_G(E) = C_{R₂}(u) = C_{R₂^x}(z)` の中心に入る。
+- (16) の強実線一意性から **`u ∉ A`** かつ (共役版で) **`z ∉ A^x`**。
+- ⟹ `u ∈ LV` (⟺ `u ∈ Ω₁(LV) = A`) が言えれば終わるが、landed の step-1 補題
+  (`map_conj_zpowers_le_sup_nonsplitTorus_V`) は仮説が **`A^x ≤ R₂`** (位数 27 の
+  共役全体) で、`Z₁^x ≤ R₂` だけからは走らない。
+- ⚠ **書籍が `Z(P)` 版でなく `A` 可換版の Hall–Wielandt を引いているのは、
+  `Z₁` の弱閉性 (= 3-normality) が手に入らないからかもしれない**。
+  (13) の「`C_G(st)` は 3-群」は `st` 固有の counting で、`R₂` の他の位数 3 元を
+  特徴づけるものではない。
+- 一般論としても `p`-normality は仮説であって自動ではない (Gorenstein 7.5 冒頭)。
+
+### `|W| = 9` wreath 排除の残りケースの絞り込み (新規)
+
+`K := ker φ` (位数 9、`Z₁ ≤ K ≤ M := R₁ ⊓ LV`、`|M| = 3⁴`) について:
+
+1. `K ⊴ R₂` かつ `|K| = 9` ⟹ `R₂/C_{R₂}(K) ↪ Aut(K)`。`Aut(C₉) = C₆` /
+   `Aut(C₃²) = GL(2,3)` (位数 48) のいずれでも 3-part は 3 ⟹
+   **`C := C_{R₂}(K)` の指数は ≤ 3**。`C = R₂` なら `K ≤ Z(R₂) = Z₁` で位数矛盾
+   ⟹ **指数はちょうど 3**。
+2. `C ≠ R₁` (`Z(R₁) = Z₁` は位数 3 < 9)。`C = LV` なら `K ≤ Z(LV) = Z₁Σ` ⟹ **`K = Z₁Σ`**。
+3. `C ≠ LV` のときも、`W₃ = C₃≀C₃` の極大部分群はすべて `Φ(W₃) = W' = M/K` を含むので
+   `M ≤ C` ⟹ `M` が `K` を中心化 ⟹ **`K ≤ Z(M)`**。
+   ⟹ **`Z(M) = Z₁Σ` (位数 9) を示せば `K = Z₁Σ` が確定する**。
+4. `K = Z₁Σ` なら `⁅LV,LV⁆ ≤ Z₁Σ = K` (landed) なので
+   `not_and_commutator_le_map_ker_of_card_W_eq_nine` (landed) より
+   **`⁅R₁,R₁⁆ ⊄ Z₁Σ`** が必要になる。
+
+⟹ **両ルートの合流点 = `⁅R₁, R₁⁆ ≤ Z₁Σ`**。
+landed の `card_commutator_sylowThree_le` の中身は `⁅R₁,R₁⁆ ≤ Z₁⟨⁅u,v⁆⟩`
+(`u ∈ R ∖ Z₁P`, `v` は `L` の生成元) なので、これは **`⁅R, L⁆ ≤ Z₁Σ`**
+(すなわち `⁅T, L⁆` の評価) に帰着する。既知: `R₁ ≤ N_G(RΣ)` より `⁅R,L⁆ ≤ RΣ`、
+`⁅R₁,R₁⁆ ≤ A` より `⁅R,L⁆ ≤ A`、`A ⊓ R = Z₁P`。**要るのは「P-成分が消える」こと**。
+
+### 次の一手 (優先順)
+1. `⁅R, L⁆ ≤ Z₁Σ` (⟺ `⁅R₁,R₁⁆ ≤ Z₁Σ`) を (11)(14)(15) の材料で詰める。
+   出れば `|W| = 9` の wreath 排除が (上の 1–4 と landed 補題で) 閉じる見込み。
+2. だめなら `Z(M) = Z₁Σ` + `C_{R₂}(K)` 指数 3 の Lean 化を進めて残りケースを縮める。
+3. 最後の手段: 「`A` 可換弱閉 + `p` 奇」版 Hall–Wielandt の再構成
+   (Grün 第一定理 ⟹ Alperin が必要で重い; ChatGPT 相談の対象)。
