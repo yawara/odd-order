@@ -1553,11 +1553,17 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
   `⁅Γ_A,Γ_B⁆ = ⊥`) で、`Z_A ⊓ Z_B = ⊥` と合わせて内部直積。
   `CentralProduct.lean` に `range_mulHom` と `card_eq_mul`
   (「交わらない中心積の位数は因子の位数の積」= `mulHom` が単射で像が `R`) を追加。
-- **残りはステップ 6 の商への降下だけ**: `ψ_A := (fst∘h).restrict Γ_A : ↥Γ_A →* A`,
-  `N_B := Z_B.subgroupOf Γ_A` として `f_A := QuotientGroup.lift N_B ψ_A _ : ↥Γ_A ⧸ N_B →* A`
-  が stem extension であること + `|ker f_A| = |Z_A|`。後者は
-  「`|Z| = |ψ_A.ker| = |N_B| · |ker f_A| = |Z_B| · |ker f_A|`」と `|Z| = |Z_A||Z_B|` の
-  比較で出る (割り算を書かずに済む)。対称に `f_B`。
+- **商への降下の抽象形 `isStemExtension_lift` を landing (2026-07-26)**:
+  「`ψ : K →* A'` が全射・核が中心的、`N ⊴ K` が `N ≤ ker ψ` かつ `ker ψ ≤ K' ⊔ N` ⇒
+  `K ⧸ N →* A'` は stem extension で `|N|·|ker| = |ker ψ|`」。
+  ⭐ **抽象化しておくと `A` 側と `B` 側が同じ補題の 2 適用**になる。
+  位数部分は `(mk' N).restrict ψ.ker` に第一同型 + Lagrange (`Subgroup.index_ker`) を当てるだけ。
+- **残りは `isStemExtension_lift` の 2 適用のみ**: `K = ↥Γ_A`,
+  `ψ = ((fst∘h)).restrict Γ_A`, `N = Z_B.subgroupOf Γ_A` (正規性は `Z_B ⊴ Γ` が仮説不要で
+  従う — `h.ker` 正規 + `⁅Γ_B,Γ_B⁆` 正規 + `inf` 正規 — ので
+  `Subgroup.normal_subgroupOf` が instance で効く)。仮説 `ker ψ ≤ K' ⊔ N` は
+  `Z = Z_A·Z_B` と `Z_A ≤ ⁅Γ_A,Γ_A⁆` から。`|ker f_A| = |Z_A|` は
+  `|Z_B|·|ker f_A| = |ψ.ker| = |Z| = |Z_A||Z_B|` を `Nat.eq_of_mul_eq_mul_left` で割る。
 
 ### ⚠ 5A.6 の書籍読解訂正 (2026-07-26)
 

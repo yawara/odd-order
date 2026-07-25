@@ -320,6 +320,74 @@ theorem card_ker_eq_mul [Finite Γ] [Finite A] [Finite B] {h : Γ →* A × B}
   (isCentralProduct_ker hsurj hst hcop).card_eq_mul
     (inf_inf_commutator_eq_bot hst.ker_le_center hcop)
 
+/-! ### 商への降下 (抽象形) -/
+
+/-- **商への降下**: `ψ : K →* A'` が全射で核が中心的, `N ⊴ K` が `N ≤ ker ψ` かつ
+`ker ψ ≤ K' ⊔ N` をみたすなら, `K ⧸ N →* A'` は stem extension で
+`|N| · |ker| = |ker ψ|`。
+
+Problem 5A.8(b) では `K = Γ_A`, `ψ = (fst ∘ h) の制限`, `N = Z_B` (対称に `Γ_B`, `Z_A`)
+として使う。抽象化しておくことで `A` 側と `B` 側が同じ補題の 2 適用で済む。 -/
+theorem isStemExtension_lift {K A' : Type*} [Group K] [Group A'] [Finite K]
+    {ψ : K →* A'} (hψ : Function.Surjective ψ) (hcen : ψ.ker ≤ Subgroup.center K)
+    {N : Subgroup K} [N.Normal] (hN : N ≤ ψ.ker)
+    (hgen : ψ.ker ≤ _root_.commutator K ⊔ N) :
+    IsStemExtension (QuotientGroup.lift N ψ hN) ∧
+      Nat.card N * Nat.card (QuotientGroup.lift N ψ hN).ker = Nat.card ψ.ker := by
+  -- 核は `ψ.ker` の像
+  have hker : (QuotientGroup.lift N ψ hN).ker = ψ.ker.map (QuotientGroup.mk' N) := by
+    ext x
+    obtain ⟨k, rfl⟩ := QuotientGroup.mk_surjective x
+    constructor
+    · intro hx
+      exact ⟨k, MonoidHom.mem_ker.mp hx, rfl⟩
+    · rintro ⟨y, hy, hyx⟩
+      have hxy : y⁻¹ * k ∈ N := QuotientGroup.eq.mp hyx
+      have : k ∈ ψ.ker := by
+        have := ψ.ker.mul_mem hy (hN hxy)
+        simpa using this
+      exact MonoidHom.mem_ker.mpr (MonoidHom.mem_ker.mp this)
+  refine ⟨⟨?_, ?_, ?_⟩, ?_⟩
+  · -- 全射
+    intro a
+    obtain ⟨k, hk⟩ := hψ a
+    exact ⟨QuotientGroup.mk k, hk⟩
+  · -- 核 ≤ 交換子群
+    rw [hker]
+    refine (Subgroup.map_mono hgen).trans ?_
+    rw [Subgroup.map_sup]
+    have hmapc : (_root_.commutator K).map (QuotientGroup.mk' N) = _root_.commutator (K ⧸ N) := by
+      rw [_root_.commutator_def, Subgroup.map_commutator,
+        Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N), ← _root_.commutator_def]
+    have hmapN : N.map (QuotientGroup.mk' N) = ⊥ := by
+      rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    rw [hmapc, hmapN, sup_bot_eq]
+  · -- 核 ≤ 中心
+    rw [hker]
+    rintro _ ⟨y, hy, rfl⟩
+    rw [Subgroup.mem_center_iff]
+    intro g
+    obtain ⟨k, rfl⟩ := QuotientGroup.mk_surjective g
+    have := (Subgroup.mem_center_iff.mp (hcen hy)) k
+    exact congrArg (QuotientGroup.mk' N) this
+  · -- 位数
+    have hφ : ((QuotientGroup.mk' N).restrict ψ.ker).ker = N.subgroupOf ψ.ker := by
+      ext x
+      simp [Subgroup.mem_subgroupOf]
+    have hrange : ((QuotientGroup.mk' N).restrict ψ.ker).range =
+        ψ.ker.map (QuotientGroup.mk' N) := by
+      ext x
+      constructor
+      · rintro ⟨⟨y, hy⟩, rfl⟩
+        exact ⟨y, hy, rfl⟩
+      · rintro ⟨y, hy, rfl⟩
+        exact ⟨⟨y, hy⟩, rfl⟩
+    have hlag := Subgroup.card_mul_index ((QuotientGroup.mk' N).restrict ψ.ker).ker
+    rw [Subgroup.index_ker, hrange, hφ] at hlag
+    rw [hker, ← hlag]
+    congr 1
+    exact (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hN).toEquiv).symm
+
 end
 
 end OddOrder.Isaacs.Ch05
