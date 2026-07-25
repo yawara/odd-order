@@ -1439,7 +1439,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 問題 | 状態 | メモ |
 |---|---|---|
 | 5C.1 | ✅ | `not_dvd_card_commutator_of_inf_sylow_eq_bot` + `hasNormalPComplement_of_commutator_inf_sylow_eq_bot` (`Problems5C.lean`)。方針どおり **鍵の段を独立補題**にした (同一 statement の別証明を避ける) |
-| 5C.2 | 🔨 証明確定 (下記) | PDF 確認済。`U ⊆ V ⊆ P ⊆ G`、`P` abelian Sylow-2、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
+| 5C.2 | 🔨 fusion 段 landing 済 (下記) | PDF 確認済。`U ⊆ V ⊆ P ⊆ G`、`P` abelian Sylow-2、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
 | 5C.3 | 🔨 設計確定 (下記) | PDF 確認済: `G` 単純で abelian Sylow-2 `P` の位数が `2^5` ⇒ `P` は初等可換 |
 | 5C.4 | ⬜ | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
 | 5C.5 | ✅ | `exists_mem_normalizer_conj_eq_of_normal` + `eq_of_characteristic_of_conj` (`Problems5C.lean`) |
@@ -1479,6 +1479,26 @@ transfer `v : G →* P` (P abelian) を取ると、transfer 評価の各因子
 この場合は **5C.2** を `U := ℧¹(P) = P²` (位数 4)、`V := Ω₁(P)` (位数 8) に適用する
 (`|V : U| = 2`、どちらも特性部分群) と `|G| = 2` となって矛盾。
 ⟹ **5C.3 は 5C.2 に依存する**。実装順は 5C.2 → 5C.3。
+
+### 5C.2 の実装状況 (2026-07-26)
+
+**fusion 段は landing 済** (`Problems5C.lean`):
+* `inv_mul_conj_mem_of_index_two` — `|V:U| = 2` かつ `U, V` が `n`-共役不変なら
+  `n` は `V/U` に自明作用 (`x ∉ U` なら `n x n⁻¹ ∉ U` で、`U` 外の 2 元は法 `U` で一致)
+* ⭐ `inv_mul_conj_mem_of_fusion` — `P` 可換 Sylow で `V ≤ P`、`N_G(P)` が `V/U` に自明作用
+  ⇒ **`V` の元の `G`-共役で `P` に入るものは `U` を法として元と一致**
+  (Isaacs Lemma 5.12 `normalizer_controls_centralizer_fusion` で `G`-共役を `N_G(P)`-共役へ)
+
+**残り (transfer 段)**: `ϕ := (QuotientGroup.mk' (U.subgroupOf P)) : ↥P →* ↥P ⧸ U'`
+(`P` 可換なので `U'` 正規・商も可換) の transfer `v' : G →* ↥P ⧸ U'` を取り、
+**5B.1 で使った `MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot`** で
+`v'(x) = ∏_q ϕ⟨w_q⁻¹ x^{n_q} w_q⟩` と展開する。各因子は上の fusion 段で
+`ϕ⟨x^{n_q}⟩` に等しく、`∑ n_q = |G:P|` (5B.1 と同じ `Subgroup.quotientEquivSigmaZMod` +
+`Nat.card_sigma` + `Nat.card_zmod`) なので `v'(x) = ϕ⟨x^{|G:P|}⟩`。
+⚠ **mathlib の `MonoidHom.transfer_eq_pow` は「厳密な固定」を要求するので使えない**
+(法 `U` で十分という弱い仮定では通らない) — 軌道分解版を使うこと。
+`|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
+`G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
 
 ### 5C.1 の実装メモ (2026-07-26)
 

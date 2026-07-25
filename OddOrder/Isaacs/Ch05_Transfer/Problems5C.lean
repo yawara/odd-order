@@ -131,6 +131,48 @@ theorem hasNormalPComplement_of_commutator_inf_sylow_eq_bot [Finite G] {p : ℕ}
   rw [hQcard, P.card_eq_multiplicity]
   exact Nat.Coprime.pow_right _ ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hpN).symm
 
+/-! ### Problem 5C.2 の要 -/
+
+/-- `U ≤ V` で `V` 可換, `|V : U| = 2` (2 つの `U` 外の元は `U` を法として一致),
+`U`, `V` が `n` の共役で不変なら, `n` は `V/U` に自明に作用する。 -/
+theorem inv_mul_conj_mem_of_index_two {U V : Subgroup G}
+    (hUne : ∀ y ∈ V, ∀ z ∈ V, y ∉ U → z ∉ U → y⁻¹ * z ∈ U)
+    {n : G} (hUinv : ∀ u ∈ U, n * u * n⁻¹ ∈ U) (hUinv' : ∀ u ∈ U, n⁻¹ * u * n ∈ U)
+    (hVinv : ∀ y ∈ V, n * y * n⁻¹ ∈ V)
+    {x : G} (hx : x ∈ V) : x⁻¹ * (n * x * n⁻¹) ∈ U := by
+  by_cases hxU : x ∈ U
+  · exact U.mul_mem (U.inv_mem hxU) (hUinv x hxU)
+  · have hnx : n * x * n⁻¹ ∈ V := hVinv x hx
+    have hnxU : n * x * n⁻¹ ∉ U := by
+      intro hcon
+      have hback : n⁻¹ * (n * x * n⁻¹) * n = x := by group
+      exact hxU (hback ▸ hUinv' _ hcon)
+    exact hUne x hx _ hnx hxU hnxU
+
+/-- ⭐ **Problem 5C.2 の fusion 段**: `P` が可換 Sylow で `V ≤ P`, かつ `N_G(P)` が
+`V/U` に自明作用するなら, `V` の元の `G`-共役で `P` に入るものは `U` を法として元と一致する。
+
+`P` が可換なので `V ≤ P ≤ C_G(P)` で, Isaacs Lemma 5.12
+(`normalizer_controls_centralizer_fusion`) により `G`-共役は `N_G(P)`-共役に置き換えられる。 -/
+theorem inv_mul_conj_mem_of_fusion [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hab : ∀ a ∈ (P : Subgroup G), ∀ b ∈ (P : Subgroup G), a * b = b * a)
+    {U V : Subgroup G} (hVP : V ≤ (P : Subgroup G))
+    (hUV : ∀ n ∈ Subgroup.normalizer ((P : Subgroup G) : Set G), ∀ x ∈ V,
+      x⁻¹ * (n * x * n⁻¹) ∈ U)
+    {x g : G} (hx : x ∈ V) (hgx : g * x * g⁻¹ ∈ (P : Subgroup G)) :
+    x⁻¹ * (g * x * g⁻¹) ∈ U := by
+  have hxC : x ∈ Subgroup.centralizer ((P : Subgroup G) : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro q hq
+    exact hab q hq x (hVP hx)
+  have hyC : g * x * g⁻¹ ∈ Subgroup.centralizer ((P : Subgroup G) : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro q hq
+    exact hab q hq _ hgx
+  obtain ⟨n, hnN, hneq⟩ := normalizer_controls_centralizer_fusion P hxC hyC rfl
+  rw [← hneq]
+  exact hUV n hnN x hx
+
 /-! ### Problem 5C.5 -/
 
 /-- **Isaacs Problem 5C.5**: `P ∈ Syl_p(G)` の正規部分群 `A`, `B` が `G`-共役なら,
