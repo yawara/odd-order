@@ -1440,7 +1440,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 |---|---|---|
 | 5C.1 | ✅ | `not_dvd_card_commutator_of_inf_sylow_eq_bot` + `hasNormalPComplement_of_commutator_inf_sylow_eq_bot` (`Problems5C.lean`)。方針どおり **鍵の段を独立補題**にした (同一 statement の別証明を避ける) |
 | 5C.2 | ✅ 完了 (`card_eq_two_of_characteristic_relIndex_eq_two`) | PDF 確認済。`U ⊆ V ⊆ P ⊆ G`、`P` abelian Sylow-2、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
-| 5C.3 | 🔨 設計確定 (下記) | PDF 確認済: `G` 単純で abelian Sylow-2 `P` の位数が `2^5` ⇒ `P` は初等可換 |
+| 5C.3 | ✅ 完了 (`sq_eq_one_of_card_sylow_two_eq_32`) | PDF 確認済: `G` 単純で abelian Sylow-2 `P` の位数が `2^5` ⇒ `P` は初等可換 |
 | 5C.4 | ⬜ | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
 | 5C.5 | ✅ | `exists_mem_normalizer_conj_eq_of_normal` + `eq_of_characteristic_of_conj` (`Problems5C.lean`) |
 | 5C.6 | 🔒 hub | weak closure。**hub レーンが `OddOrder/GroupTheory/WeaklyClosed.lean` で着手中** (issue 9503) — A レーンは触らない |
@@ -1479,6 +1479,28 @@ transfer `v : G →* P` (P abelian) を取ると、transfer 評価の各因子
 この場合は **5C.2** を `U := ℧¹(P) = P²` (位数 4)、`V := Ω₁(P)` (位数 8) に適用する
 (`|V : U| = 2`、どちらも特性部分群) と `|G| = 2` となって矛盾。
 ⟹ **5C.3 は 5C.2 に依存する**。実装順は 5C.2 → 5C.3。
+
+✅ **5C.3 landing (2026-07-26)** — ただし**書籍の分割数え上げは採らなかった**。
+⭐ **有限可換群の構造定理を使わずに済む書き換え**を見つけた: `n` 乗写像の核 `Ω_n` と像 `℧_n`
+(新 shared leaf `AbelianPowerSubgroups.lean`, issue 9208) は第一同型定理で
+`|Ω_n| · |℧_n| = |Q|` を満たす。位数 32 では `|℧₂| = |powImage Q 2|` の値
+(`1,2,4,8,16,32`) で場合分けし、鎖 `℧₂ ≥ ℧₄ ≥ ℧₈` の**隣接比が 2 の箇所**を探せばよい:
+
+* 比 2 の隣接対がそのまま 5C.2 に渡す特性部分群対。
+* 比 1 (鎖が止まる) なら不動点補題 `powKernel_two_pow_mul_eq` で `Ω = ⊤` となり位数に矛盾。
+* `℧ = ⊥` に落ちた段は `℧ ≤ Ω₂` (`powImage_le_powKernel`) なので `Ω₂` との対を取る。
+
+分割 `(2,2,1)` (= `C₄×C₄×C₂`, 書籍で Cor 5.19 が効かない唯一の型) はこの枠組では
+`|℧₂| = 4, |Ω₂| = 8` の枝として自動的に処理される。Cor 5.19 (`SylowTwoDirectFactor.lean`)
+は**結局使わなかった**。
+主定理 = `sq_eq_one_of_card_sylow_two_eq_32` / `isElementaryAbelian_of_card_sylow_two_eq_32`、
+核 = `exists_characteristic_relIndex_two_of_card_32`。
+
+⭐ 罠: `hpair _ _ inferInstance ...` のように**存在命題を作る補助の引数をメタ変数のままにすると
+`inferInstance` が無関係な部分群の `Characteristic` を拾って**変な unify をする
+(結論が `∃` なのでゴールから決まらない) — `U`, `W` を明示する。
+`norm_num at h` は `↥(powImage Q 2)` を生の subtype に展開してしまうので
+数値の正規化には `simp only [Nat.reducePow]` を使う。
 
 ### 5C.2 の実装状況 (2026-07-26)
 

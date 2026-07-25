@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.SchurZassenhaus
+import OddOrder.GroupTheory.AbelianPowerSubgroups
 import OddOrder.GroupTheory.WeaklyClosed
 import OddOrder.Isaacs.Ch05_Transfer.Basic
 
@@ -419,6 +420,196 @@ theorem card_eq_two_of_characteristic_relIndex_eq_two [Finite G] [IsSimpleGroup 
     rw [hord]
     exact dvd_pow_self 2 hk0
   exact ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hprime).mp h2).symm
+
+/-! ### Problem 5C.3 -/
+
+open OddOrder.GroupTheory in
+/-- ⭐ **Problem 5C.3 の群論的核**: 位数 32 の可換群 `Q` が初等可換でなければ,
+指数 2 の特性部分群対が存在する。
+
+**証明**: `n` 乗写像の核 `Ω_n` と像 `℧_n` の位数は `|Ω_n| · |℧_n| = 32` を満たす
+(`card_powKernel_mul_card_powImage`)。`|℧₂|` (`= |℧¹(Q)|`) で場合分けし,
+`℧` の鎖 `℧₂ ≥ ℧₄ ≥ ℧₈` の位数比が 2 になる箇所を探す。比が 2 になる隣接対は
+そのまま求める対であり, 比が 1 (鎖が止まる) なら不動点補題
+`powKernel_two_pow_mul_eq` で `Ω = ⊤` となって位数勘定に矛盾する。
+`℧` が `⊥` に落ちた段では `℧ ≤ Ω₂` が成り立つので `Ω₂` との対を取る。
+
+(書籍は `P` の巡回直積分解を使って分割 `5 = 4+1 = 3+2 = ...` を数え上げ,
+`(2,2,1)` 型だけ `℧¹`/`Ω₁` を使うが, ここでは**構造定理を使わず位数の関係式だけ**で
+同じ場合分けを実行している。) -/
+theorem exists_characteristic_relIndex_two_of_card_32 {Q : Type*} [Group Q]
+    [IsMulCommutative Q] [Finite Q] (hcard : Nat.card Q = 32)
+    {x : Q} (hx : x ^ 2 ≠ 1) :
+    ∃ U W : Subgroup Q, U.Characteristic ∧ W.Characteristic ∧ U.relIndex W = 2 := by
+  classical
+  -- (0) 道具立て
+  have hprod : ∀ n : ℕ, Nat.card (powKernel Q n) * Nat.card (powImage Q n) = 32 := fun n => by
+    rw [card_powKernel_mul_card_powImage, hcard]
+  have hdvd : ∀ U W : Subgroup Q, U ≤ W → Nat.card U ∣ Nat.card W := by
+    intro U W hUW
+    have h := Subgroup.card_mul_index (U.subgroupOf W)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUW).toEquiv] at h
+    exact ⟨_, h.symm⟩
+  have hmk : ∀ U W : Subgroup Q, U ≤ W → Nat.card W = 2 * Nat.card U → U.relIndex W = 2 := by
+    intro U W hUW hc
+    have h := Subgroup.card_mul_index (U.subgroupOf W)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUW).toEquiv, hc] at h
+    have hpos : 0 < Nat.card U := Nat.card_pos
+    rw [mul_comm 2 (Nat.card U)] at h
+    rw [Subgroup.relIndex]
+    exact Nat.eq_of_mul_eq_mul_left hpos h
+  have hpair : ∀ U W : Subgroup Q, U.Characteristic → W.Characteristic → U ≤ W →
+      Nat.card W = 2 * Nat.card U →
+      ∃ U W : Subgroup Q, U.Characteristic ∧ W.Characteristic ∧ U.relIndex W = 2 :=
+    fun U W hU hW hUW hc => ⟨U, W, hU, hW, hmk U W hUW hc⟩
+  have hcardTop : Nat.card (⊤ : Subgroup Q) = 32 := by rw [Subgroup.card_top, hcard]
+  have htop32 : powKernel Q 32 = ⊤ :=
+    powKernel_eq_top fun y => by rw [← hcard]; exact pow_card_eq_one'
+  -- 鎖の包含 (数値版)
+  have hI42 : powImage Q 4 ≤ powImage Q 2 := by simpa using powImage_mul_le (Q := Q) 2 2
+  have hI84 : powImage Q 8 ≤ powImage Q 4 := by simpa using powImage_mul_le (Q := Q) 2 4
+  -- (1) `℧` の位数が止まったら `Ω = ⊤`
+  have hstick : ∀ n k : ℕ, 2 ^ k * n = 32 →
+      Nat.card (powImage Q (2 * n)) = Nat.card (powImage Q n) →
+      Nat.card (powKernel Q n) = 32 := by
+    intro n k hk hcards
+    have h1 := hprod n
+    have h2 := hprod (2 * n)
+    rw [hcards] at h2
+    have hpos : 0 < Nat.card (powImage Q n) := Nat.card_pos
+    have hOm : Nat.card (powKernel Q n) = Nat.card (powKernel Q (2 * n)) :=
+      Nat.eq_of_mul_eq_mul_right hpos (h1.trans h2.symm)
+    have heq : powKernel Q n = powKernel Q (2 * n) :=
+      Subgroup.eq_of_le_of_card_ge (powKernel_le_mul 2 n) (le_of_eq hOm.symm)
+    have hfix := powKernel_two_pow_mul_eq heq.symm k
+    rw [hk, htop32] at hfix
+    rw [← hfix, hcardTop]
+  have hstick2 : Nat.card (powImage Q 4) = Nat.card (powImage Q 2) →
+      Nat.card (powKernel Q 2) = 32 := by
+    intro h
+    exact hstick 2 4 (by norm_num) (by simpa using h)
+  have hstick4 : Nat.card (powImage Q 8) = Nat.card (powImage Q 4) →
+      Nat.card (powKernel Q 4) = 32 := by
+    intro h
+    exact hstick 4 3 (by norm_num) (by simpa using h)
+  -- (2) `℧_n = ⊥` なら `Ω_n = ⊤`
+  have hOmTop : ∀ n : ℕ, Nat.card (powImage Q n) = 1 → powKernel Q n = ⊤ := by
+    intro n h
+    refine Subgroup.eq_top_of_card_eq _ ?_
+    have hn := hprod n
+    rw [h, mul_one] at hn
+    rw [hn, hcard]
+  have hle2 : powKernel Q 4 = ⊤ → powImage Q 2 ≤ powKernel Q 2 := fun h =>
+    powImage_le_powKernel (m := 2) (n := 2) (by simpa using h)
+  have hle4 : powKernel Q 8 = ⊤ → powImage Q 4 ≤ powKernel Q 2 := fun h =>
+    powImage_le_powKernel (m := 4) (n := 2) (by simpa using h)
+  -- (3) `|℧₁| = |powImage Q 2|` で場合分け
+  have hb5 : Nat.card (powImage Q 2) ∣ 2 ^ 5 :=
+    ⟨Nat.card (powKernel Q 2), by rw [show (2 : ℕ) ^ 5 = 32 by norm_num, ← hprod 2]; ring⟩
+  obtain ⟨j, hj, hbj⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp hb5
+  have hab := hprod 2
+  interval_cases j <;> simp only [Nat.reducePow] at hbj <;> rw [hbj] at hab
+  · -- `|℧₁| = 1` ⇒ `Ω₁ = ⊤` ⇒ 初等可換 (仮定 `hx` に矛盾)
+    exact absurd ((hOmTop 2 hbj) ▸ Subgroup.mem_top x : x ∈ powKernel Q 2) hx
+  · -- `|℧₁| = 2` ⇒ `|Ω₁| = 16`: 対 `(Ω₁, ⊤)`
+    exact hpair (powKernel Q 2) ⊤ inferInstance inferInstance le_top
+      (by rw [hcardTop]; omega)
+  · -- `|℧₁| = 4` ⇒ `|Ω₁| = 8`
+    have hc : Nat.card (powImage Q 4) ∣ 2 ^ 2 := by
+      have := hdvd _ _ hI42
+      rw [hbj] at this
+      simpa using this
+    obtain ⟨i, hi, hci⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp hc
+    have hcd := hprod 4
+    interval_cases i <;> simp only [Nat.reducePow] at hci <;> rw [hci] at hcd
+    · -- `℧₂ = ⊥` ⇒ `℧₁ ≤ Ω₁`, 対 `(℧₁, Ω₁)` (`8 = 2 · 4`)
+      exact hpair (powImage Q 2) (powKernel Q 2) inferInstance inferInstance
+        (hle2 (hOmTop 4 hci)) (by rw [hbj]; omega)
+    · -- 対 `(℧₂, ℧₁)` (`4 = 2 · 2`)
+      exact hpair (powImage Q 4) (powImage Q 2) inferInstance inferInstance hI42
+        (by rw [hbj, hci])
+    · -- `|℧₂| = |℧₁|` ⇒ 鎖が止まり `|Ω₁| = 32`: 矛盾
+      have := hstick2 (by rw [hbj, hci])
+      omega
+  · -- `|℧₁| = 8` ⇒ `|Ω₁| = 4`
+    have hc : Nat.card (powImage Q 4) ∣ 2 ^ 3 := by
+      have := hdvd _ _ hI42
+      rw [hbj] at this
+      simpa using this
+    obtain ⟨i, hi, hci⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp hc
+    have hcd := hprod 4
+    interval_cases i <;> simp only [Nat.reducePow] at hci <;> rw [hci] at hcd
+    · -- `℧₂ = ⊥` ⇒ `℧₁ ≤ Ω₁` だが `|℧₁| = 8 > 4 = |Ω₁|`: 矛盾
+      have := hdvd _ _ (hle2 (hOmTop 4 hci))
+      rw [hbj] at this
+      omega
+    · -- `|℧₂| = 2`: さらに `|℧₃|` で分岐
+      have he : Nat.card (powImage Q 8) ∣ 2 ^ 1 := by
+        have := hdvd _ _ hI84
+        rw [hci] at this
+        simpa using this
+      obtain ⟨l, hl, hel⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp he
+      interval_cases l <;> simp only [Nat.reducePow] at hel
+      · -- `℧₃ = ⊥` ⇒ `℧₂ ≤ Ω₁`, 対 `(℧₂, Ω₁)` (`4 = 2 · 2`)
+        exact hpair (powImage Q 4) (powKernel Q 2) inferInstance inferInstance
+          (hle4 (hOmTop 8 hel)) (by rw [hci]; omega)
+      · -- `|℧₃| = |℧₂|` ⇒ 鎖が止まり `|Ω₂| = 32` だが `|Ω₂| · 2 = 32`: 矛盾
+        have := hstick4 (by rw [hel, hci])
+        omega
+    · -- 対 `(℧₂, ℧₁)` (`8 = 2 · 4`)
+      exact hpair (powImage Q 4) (powImage Q 2) inferInstance inferInstance hI42
+        (by rw [hbj, hci])
+    · -- `|℧₂| = |℧₁|` ⇒ 鎖が止まり `|Ω₁| = 32`: 矛盾
+      have := hstick2 (by rw [hbj, hci])
+      omega
+  · -- `|℧₁| = 16` ⇒ 対 `(℧₁, ⊤)`
+    exact hpair (powImage Q 2) ⊤ inferInstance inferInstance le_top
+      (by rw [hcardTop, hbj])
+  · -- `|℧₁| = 32` ⇒ `|Ω₁| = 1` だが位数 2 の元が存在: 矛盾
+    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    haveI : Fintype Q := Fintype.ofFinite Q
+    obtain ⟨y, hy⟩ := exists_prime_orderOf_dvd_card (G := Q) 2
+      (by rw [← Nat.card_eq_fintype_card, hcard]; norm_num)
+    have hyK : y ∈ powKernel Q 2 := by
+      rw [mem_powKernel, ← hy]
+      exact pow_orderOf_eq_one y
+    have hy1 : y ≠ 1 := by
+      intro hcon
+      rw [hcon, orderOf_one] at hy
+      omega
+    have hsub : Subsingleton (powKernel Q 2) := Nat.card_eq_one_iff_unique.mp (by omega) |>.1
+    exact absurd (congrArg Subtype.val
+      (Subsingleton.elim (⟨y, hyK⟩ : powKernel Q 2) 1)) hy1
+
+open OddOrder.GroupTheory in
+/-- ⭐ **Isaacs Problem 5C.3** (p.162): `G` が単純で位数 `2^5 = 32` の可換 Sylow 2-部分群 `P`
+を持つなら, `P` は初等可換 (全ての元の 2 乗が 1)。
+
+**証明**: `P` が初等可換でなければ `exists_characteristic_relIndex_two_of_card_32` が
+`P` 内に指数 2 の特性部分群対を与える。Problem 5C.2
+(`card_eq_two_of_characteristic_relIndex_eq_two`) より `|G| = 2` だが,
+`32 = |P| ∣ |G|` に矛盾。 -/
+theorem sq_eq_one_of_card_sylow_two_eq_32 [Finite G] [IsSimpleGroup G] (P : Sylow 2 G)
+    [IsMulCommutative ↥(P : Subgroup G)]
+    (hcard : Nat.card ↥(P : Subgroup G) = 32) (y : ↥(P : Subgroup G)) : y ^ 2 = 1 := by
+  by_contra hy
+  obtain ⟨U, W, hU, hW, hidx⟩ :=
+    exists_characteristic_relIndex_two_of_card_32 (Q := ↥(P : Subgroup G)) hcard hy
+  haveI := hU
+  haveI := hW
+  have hab : ∀ a ∈ (P : Subgroup G), ∀ b ∈ (P : Subgroup G), a * b = b * a := fun a ha b hb =>
+    congrArg Subtype.val (mul_comm' (⟨a, ha⟩ : ↥(P : Subgroup G)) ⟨b, hb⟩)
+  have h2 := card_eq_two_of_characteristic_relIndex_eq_two P hab hidx
+  have hdvd : Nat.card ↥(P : Subgroup G) ∣ Nat.card G := Subgroup.card_subgroup_dvd_card _
+  rw [hcard, h2] at hdvd
+  exact absurd hdvd (by norm_num)
+
+/-- **Problem 5C.3** (`IsElementaryAbelian` 版)。 -/
+theorem isElementaryAbelian_of_card_sylow_two_eq_32 [Finite G] [IsSimpleGroup G] (P : Sylow 2 G)
+    [IsMulCommutative ↥(P : Subgroup G)]
+    (hcard : Nat.card ↥(P : Subgroup G) = 32) :
+    (P : Subgroup G).IsElementaryAbelian 2 :=
+  ⟨fun a b => mul_comm' a b, fun a => sq_eq_one_of_card_sylow_two_eq_32 P hcard a⟩
 
 /-! ### Problem 5C.5 -/
 
