@@ -522,6 +522,304 @@ theorem finset_card_lines_le {A T' : Subgroup G} (hT'A : T' ≤ A)
   rw [heq] at hle
   exact Nat.le_of_mul_le_mul_right hle hpos
 
+include model in
+/-- **`N_G(R₁) = N_G(R)`** ((12) tail, δ4-D): the coset-to-line map
+`m·N_G(R) ↦ m•R` is injective into the lines avoiding `T₁`, so
+`s' := [N_G(R₁) : N_G(R)] ≤ p`; a proper element `n` spawns `p - 1` distinct
+cosets `[k·n]` besides `[1]` (their lines `k•(n•R)` are distinct by the
+third-line theorem), so `s' ≥ p`; but `p ∤ s'` since `R₁` carries the full
+`p`-part of `|G|`. -/
+theorem normalizer_overgroup_eq_normalizer_invImageF
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hfact : (Nat.card G).factorization fc.p = 3)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3)
+    (hR₁n : ∀ n ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G),
+      ∀ x ∈ R₁, n * x * n⁻¹ ∈ R₁) :
+    Subgroup.normalizer ((R₁ : Subgroup G) : Set G)
+      = Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  set NR : Subgroup G :=
+    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
+  set N : Subgroup G := Subgroup.normalizer ((R₁ : Subgroup G) : Set G) with hNdef
+  obtain ⟨hTle, hTinv, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hTcard : Nat.card ↥(fc.sInvertedT model) = fc.p := by
+    rw [fc.card_sInvertedT model ind hB2 hm, hm, pow_one]
+  have hRcard : Nat.card ↥(fc.invImageF model) = fc.p ^ 2 := by
+    rw [fc.card_invImageF model ind, hm, pow_one, fc.card_P, pow_two]
+  have hcommT := fc.commutator_eq_sInvertedT model ind hB2 hm hGp hSigma hRle
+    hR₁le hcard
+  obtain ⟨hT₁card, hTsubT₁, hT₁infP⟩ := fc.card_sInvertedOvergroup model ind hB2 hm
+    hGp hSigma hRle hR₁le hcard hR₁n
+  have hT₁le : fc.sInvertedOvergroup R₁ ≤ R₁ := fun x hx =>
+    ((fc.mem_sInvertedOvergroup_iff model ind hB2 hm hGp hSigma hRle hR₁le
+      hcard).mp hx).1
+  -- `N_G(R) ≤ N_G(R₁)`.
+  have hNRle : NR ≤ N := by
+    intro k hk
+    rw [hNdef, Subgroup.mem_set_normalizer_iff]
+    intro x
+    constructor
+    · intro hx
+      exact hR₁n k hk x hx
+    · intro hx
+      have h1 := hR₁n k⁻¹ (Subgroup.inv_mem _ hk) _ hx
+      simpa [mul_assoc] using h1
+  apply le_antisymm ?_ hNRle
+  by_contra hnle
+  obtain ⟨n, hnN, hnNR⟩ := SetLike.not_le_iff_exists.mp hnle
+  -- every `m ∈ N` fixes `T` setwise and sends `R` to a line.
+  have hmT : ∀ m ∈ N, MulAut.conj m • fc.sInvertedT model = fc.sInvertedT model := by
+    intro m hm
+    have h1 : MulAut.conj m • R₁ = R₁ := conj_smul_eq_iff_mem_normalizer.mpr hm
+    have h2 : MulAut.conj m • ⁅R₁, R₁⁆ = ⁅R₁, R₁⁆ := by
+      rw [Subgroup.pointwise_smul_def, Subgroup.map_commutator]
+      rw [show R₁.map ((MulDistribMulAction.toMonoidEnd (MulAut G) G)
+          (MulAut.conj m)) = R₁ from h1]
+    rw [← hcommT]
+    exact h2
+  have hline : ∀ m ∈ N,
+      fc.sInvertedT model ≤ MulAut.conj m • fc.invImageF model ∧
+      MulAut.conj m • fc.invImageF model ≤ R₁ ∧
+      Nat.card ↥(MulAut.conj m • fc.invImageF model) = fc.p ^ 2 := by
+    intro m hm
+    refine ⟨?_, ?_, ?_⟩
+    · have h1 : MulAut.conj m • fc.sInvertedT model
+          ≤ MulAut.conj m • fc.invImageF model :=
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hTle
+      rwa [hmT m hm] at h1
+    · have h1 : MulAut.conj m • fc.invImageF model ≤ MulAut.conj m • R₁ :=
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hRle
+      rwa [conj_smul_eq_iff_mem_normalizer.mpr hm] at h1
+    · rw [← hRcard]
+      exact (Nat.card_congr
+        (Subgroup.equivSMul (MulAut.conj m) (fc.invImageF model)).toEquiv).symm
+  -- the coset-to-line map `Φ`.
+  haveI := Fintype.ofFinite (↥N ⧸ NR.subgroupOf N)
+  set Φ : (↥N ⧸ NR.subgroupOf N) → Subgroup G :=
+    Quotient.lift (fun m : ↥N => MulAut.conj (m : G) • fc.invImageF model)
+      (by
+        intro a b hab
+        have h1 : (a : G)⁻¹ * (b : G) ∈ NR := by
+          have h2 := (QuotientGroup.leftRel_apply).mp hab
+          have h3 := Subgroup.mem_subgroupOf.mp h2
+          simpa using h3
+        have h3 : MulAut.conj ((a : G)⁻¹ * (b : G)) • fc.invImageF model
+            = fc.invImageF model := conj_smul_eq_iff_mem_normalizer.mpr h1
+        have h4 : MulAut.conj (b : G) • fc.invImageF model
+            = MulAut.conj (a : G) • (MulAut.conj ((a : G)⁻¹ * (b : G))
+              • fc.invImageF model) := by
+          rw [← mul_smul, ← map_mul]
+          congr 2
+          group
+        rw [h3] at h4
+        exact h4.symm) with hΦdef
+  have hΦmk : ∀ m : ↥N, Φ (QuotientGroup.mk m)
+      = MulAut.conj (m : G) • fc.invImageF model := fun m => rfl
+  have hΦinj : Function.Injective Φ := by
+    intro qa qb h
+    obtain ⟨a, rfl⟩ := Quotient.exists_rep qa
+    obtain ⟨b, rfl⟩ := Quotient.exists_rep qb
+    have h1 : MulAut.conj (a : G) • fc.invImageF model
+        = MulAut.conj (b : G) • fc.invImageF model := h
+    have h2 : MulAut.conj ((b : G)⁻¹ * (a : G)) • fc.invImageF model
+        = fc.invImageF model := by
+      rw [map_mul, mul_smul, h1, ← mul_smul, ← map_mul, inv_mul_cancel, map_one,
+        one_smul]
+    have h3 : (b : G)⁻¹ * (a : G) ∈ NR := conj_smul_eq_iff_mem_normalizer.mp h2
+    apply Quotient.sound
+    refine (QuotientGroup.leftRel_apply).mpr ?_
+    rw [Subgroup.mem_subgroupOf]
+    have h4 : ((a⁻¹ * b : ↥N) : G) = (a : G)⁻¹ * (b : G) := by simp
+    rw [h4]
+    have h5 := NR.inv_mem h3
+    simpa using h5
+  -- upper bound: `s' ≤ p`.
+  set 𝒮₀ : Finset (Subgroup G) := Finset.image Φ Finset.univ with h𝒮₀def
+  have h𝒮₀card : 𝒮₀.card = Nat.card (↥N ⧸ NR.subgroupOf N) := by
+    rw [h𝒮₀def, Finset.card_image_of_injective _ hΦinj, Finset.card_univ,
+      Nat.card_eq_fintype_card]
+  have hT₁not : fc.sInvertedOvergroup R₁ ∉ 𝒮₀ := by
+    intro h0
+    rw [h𝒮₀def, Finset.mem_image] at h0
+    obtain ⟨q, -, hq⟩ := h0
+    obtain ⟨m, rfl⟩ := Quotient.exists_rep q
+    rw [hΦmk] at hq
+    exact fc.conj_invImageF_ne_sInvertedOvergroup model ind hB2 hm hGp hSigma hRle
+      hR₁le hcard (m : G) hq
+  have hupper : Nat.card (↥N ⧸ NR.subgroupOf N) ≤ fc.p := by
+    have h1 := fc.finset_card_lines_le (hT'A := hTle.trans hRle)
+      hTcard hcard (insert (fc.sInvertedOvergroup R₁) 𝒮₀) ?_
+    · rw [Finset.card_insert_of_notMem hT₁not, h𝒮₀card] at h1
+      omega
+    · intro Y hY
+      rw [Finset.mem_insert] at hY
+      rcases hY with rfl | hY
+      · exact ⟨hTsubT₁, hT₁le, hT₁card⟩
+      · rw [h𝒮₀def, Finset.mem_image] at hY
+        obtain ⟨q, -, rfl⟩ := hY
+        obtain ⟨m, rfl⟩ := Quotient.exists_rep q
+        rw [hΦmk]
+        exact hline (m : G) m.2
+  -- lower bound: `s' ≥ p` via the `[k·n]`-family.
+  haveI := Fintype.ofFinite (↥NR ⧸ R₁.subgroupOf NR)
+  set ψ : (↥NR ⧸ R₁.subgroupOf NR) → (↥N ⧸ NR.subgroupOf N) :=
+    Quotient.lift (fun k : ↥NR => (QuotientGroup.mk
+        (⟨(k : G) * n, mul_mem (hNRle k.2) hnN⟩ : ↥N) : ↥N ⧸ NR.subgroupOf N))
+      (by
+        intro a b hab
+        have h1 : (a : G)⁻¹ * (b : G) ∈ R₁ := by
+          have h2 := (QuotientGroup.leftRel_apply).mp hab
+          have h3 := Subgroup.mem_subgroupOf.mp h2
+          simpa using h3
+        apply Quotient.sound
+        refine (QuotientGroup.leftRel_apply).mpr ?_
+        rw [Subgroup.mem_subgroupOf]
+        have h4 : (((⟨(a : G) * n, mul_mem (hNRle a.2) hnN⟩ : ↥N)⁻¹
+            * (⟨(b : G) * n, mul_mem (hNRle b.2) hnN⟩ : ↥N) : ↥N) : G)
+            = n⁻¹ * ((a : G)⁻¹ * (b : G)) * n := by
+          change ((a : G) * n)⁻¹ * ((b : G) * n)
+            = n⁻¹ * ((a : G)⁻¹ * (b : G)) * n
+          group
+        rw [h4]
+        -- `n⁻¹ R₁ n = R₁ ≤ N_G(R)`.
+        have h5 : n⁻¹ * ((a : G)⁻¹ * (b : G)) * n ∈ R₁ := by
+          have h6 := (Subgroup.mem_set_normalizer_iff.mp hnN
+            (n⁻¹ * ((a : G)⁻¹ * (b : G)) * n)).mpr ?_
+          · exact h6
+          · have h7 : n * (n⁻¹ * ((a : G)⁻¹ * (b : G)) * n) * n⁻¹
+                = (a : G)⁻¹ * (b : G) := by group
+            rw [h7]
+            exact h1
+        exact hR₁le h5) with hψdef
+  have hψmk : ∀ k : ↥NR, ψ (QuotientGroup.mk k)
+      = (QuotientGroup.mk (⟨(k : G) * n, mul_mem (hNRle k.2) hnN⟩ : ↥N)) :=
+    fun k => rfl
+  -- `X := n•R` is a line distinct from `R` and `T₁`.
+  have hXprops := hline n hnN
+  have hXneR : MulAut.conj n • fc.invImageF model ≠ fc.invImageF model := by
+    intro h0
+    exact hnNR (conj_smul_eq_iff_mem_normalizer.mp h0)
+  have hXneT₁ : MulAut.conj n • fc.invImageF model ≠ fc.sInvertedOvergroup R₁ :=
+    fc.conj_invImageF_ne_sInvertedOvergroup model ind hB2 hm hGp hSigma hRle hR₁le
+      hcard n
+  have hψinj : Function.Injective ψ := by
+    intro qa qb h
+    obtain ⟨a, rfl⟩ := Quotient.exists_rep qa
+    obtain ⟨b, rfl⟩ := Quotient.exists_rep qb
+    rw [hψmk, hψmk] at h
+    -- pass through `Φ`: the lines `a•X` and `b•X` coincide.
+    have h1 := congrArg Φ h
+    rw [hΦmk, hΦmk] at h1
+    simp only at h1
+    -- `(b⁻¹ a)` fixes the line `X`.
+    have h2 : MulAut.conj ((b : G)⁻¹ * (a : G))
+        • (MulAut.conj n • fc.invImageF model)
+        = MulAut.conj n • fc.invImageF model := by
+      rw [map_mul, mul_smul]
+      have h3 : MulAut.conj (a : G) • (MulAut.conj n • fc.invImageF model)
+          = MulAut.conj (b : G) • (MulAut.conj n • fc.invImageF model) := by
+        rw [← mul_smul, ← map_mul, ← mul_smul, ← map_mul]
+        exact h1
+      rw [h3, ← mul_smul, ← map_mul, ← mul_smul, ← map_mul]
+      have h4 : (b : G)⁻¹ * (b : G) * n = n := by group
+      rw [h4]
+    have h5 : (b : G)⁻¹ * (a : G) ∈ R₁ :=
+      fc.mem_of_conj_smul_eq_of_ne model ind hB2 hm hGp hSigma hRle hR₁le hcard
+        hR₁n hXprops.1 hXprops.2.1 hXprops.2.2 hXneR hXneT₁
+        (mul_mem (NR.inv_mem b.2) a.2) h2
+    apply Quotient.sound
+    refine (QuotientGroup.leftRel_apply).mpr ?_
+    rw [Subgroup.mem_subgroupOf]
+    have h6 : ((a⁻¹ * b : ↥NR) : G) = (a : G)⁻¹ * (b : G) := by simp
+    rw [h6]
+    have h7 := R₁.inv_mem h5
+    simpa using h7
+  have hone_not : (QuotientGroup.mk (1 : ↥N) : ↥N ⧸ NR.subgroupOf N)
+      ∉ Set.range ψ := by
+    rintro ⟨q, hq⟩
+    obtain ⟨k, rfl⟩ := Quotient.exists_rep q
+    rw [hψmk] at hq
+    have h1 : (1 : ↥N)⁻¹ * (⟨(k : G) * n, mul_mem (hNRle k.2) hnN⟩ : ↥N)
+        ∈ NR.subgroupOf N := QuotientGroup.eq.mp hq.symm
+    rw [Subgroup.mem_subgroupOf] at h1
+    have h2 : (k : G) * n ∈ NR := by simpa using h1
+    have h3 : n ∈ NR := by
+      have h4 : n = (k : G)⁻¹ * ((k : G) * n) := by group
+      rw [h4]
+      exact mul_mem (NR.inv_mem k.2) h2
+    exact hnNR h3
+  -- `|NR/R₁| = p - 1`.
+  have hNRcard : Nat.card ↥NR = fc.p ^ 3 * (fc.p - 1) := by
+    have h1 := ((fc.invImageF model).subgroupOf NR).card_mul_index
+    have h2 : Nat.card ↥((fc.invImageF model).subgroupOf NR)
+        = Nat.card ↥(fc.invImageF model) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe Subgroup.le_normalizer).toEquiv
+    have h3 : ((fc.invImageF model).subgroupOf NR).index = fc.p * (fc.p - 1) :=
+      fc.card_quotient_invImageF_eq model ind hB2 hm hGp hSigma
+    rw [h2, h3, hRcard] at h1
+    rw [← h1]
+    ring
+  have hquotcard : Nat.card (↥NR ⧸ R₁.subgroupOf NR) = fc.p - 1 := by
+    have h1 := (R₁.subgroupOf NR).card_mul_index
+    have h2 : Nat.card ↥(R₁.subgroupOf NR) = fc.p ^ 3 := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hR₁le).toEquiv, hcard]
+    rw [h2, hNRcard] at h1
+    have h3 : (R₁.subgroupOf NR).index
+        = Nat.card (↥NR ⧸ R₁.subgroupOf NR) := rfl
+    rw [h3] at h1
+    exact Nat.eq_of_mul_eq_mul_left (Nat.pos_of_ne_zero
+      (by have := fc.p_prime.pos; positivity)) h1
+  have hlower : fc.p ≤ Nat.card (↥N ⧸ NR.subgroupOf N) := by
+    have h1 : Nat.card (↥NR ⧸ R₁.subgroupOf NR)
+        ≤ Nat.card {q : ↥N ⧸ NR.subgroupOf N // q ∈ Set.range ψ} := by
+      refine Nat.card_le_card_of_injective
+        (fun q => ⟨ψ q, Set.mem_range_self q⟩) ?_
+      intro q q' hqq
+      exact hψinj (congrArg Subtype.val hqq)
+    have h2 : Nat.card {q : ↥N ⧸ NR.subgroupOf N // q ∈ Set.range ψ} + 1
+        ≤ Nat.card (↥N ⧸ NR.subgroupOf N) := by
+      classical
+      have h3 : (Set.range ψ).ncard + 1 ≤ Nat.card (↥N ⧸ NR.subgroupOf N) := by
+        have h4 : insert (QuotientGroup.mk (1 : ↥N) : ↥N ⧸ NR.subgroupOf N)
+            (Set.range ψ) ⊆ Set.univ := Set.subset_univ _
+        have h5 := Set.ncard_le_ncard h4 (Set.toFinite _)
+        rw [Set.ncard_insert_of_notMem hone_not (Set.toFinite _),
+          Set.ncard_univ] at h5
+        exact h5
+      rwa [← Nat.card_coe_set_eq] at h3
+    have h4 := le_trans (Nat.add_le_add_right h1 1) h2
+    rw [hquotcard] at h4
+    have h5 := fc.p_prime.pos
+    omega
+  -- `p ∤ s'`.
+  have hpnot : ¬ fc.p ∣ Nat.card (↥N ⧸ NR.subgroupOf N) := by
+    intro hdvd
+    have h1 : (NR.subgroupOf N).index = Nat.card (↥N ⧸ NR.subgroupOf N) := rfl
+    have h2 : (R₁.subgroupOf N).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+    have h3 : (NR.subgroupOf N).index ∣ (R₁.subgroupOf N).index := by
+      refine Subgroup.index_dvd_of_le ?_
+      intro x hx
+      rw [Subgroup.mem_subgroupOf] at hx ⊢
+      exact hR₁le hx
+    have h4 : fc.p ∣ (R₁.subgroupOf N).index := by
+      refine dvd_trans ?_ h3
+      rw [h1]
+      exact hdvd
+    exact fc.not_p_dvd_index_subgroupOf_normalizer_overgroup hfact hcard
+      (hR₁le.trans hNRle) h4
+  -- squeeze.
+  have hfinal : Nat.card (↥N ⧸ NR.subgroupOf N) = fc.p := le_antisymm hupper hlower
+  exact hpnot (hfinal ▸ dvd_refl fc.p)
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
