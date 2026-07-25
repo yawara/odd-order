@@ -144,58 +144,129 @@ theorem exists_isCyclic_card_specialLinearGroup_eq_card_add_one
 
 end AnyFiniteField
 
-section SylowThree
+section OrderFiveHundredFour
 
-/-- **Every Sylow `3`-subgroup of `SL(2, F)` with `|F| = 8` is cyclic of order `9`.**
+variable {G : Type*} [Group G] [Finite G]
 
-`|SL(2,8)| = 8·7·9`, so a Sylow `3`-subgroup has order `9`; the nonsplit torus is a
-cyclic subgroup of that order, hence is a Sylow `3`-subgroup, and all Sylow
-`3`-subgroups are isomorphic.
-
-This is the input for Peterfalvi Part II, Ch. II, (15): in `⟨Q₀, K, t⟩ ≅ PSL(2, 8)`
-the centralizer of the order-`3` element `st` is cyclic of order `9`. -/
-theorem isCyclic_and_card_sylow_three_of_card_eq_eight
-    (F : Type*) [Field F] [Finite F] [CharP F 2] (hF : Nat.card F = 8)
-    (S : Sylow 3 (Matrix.SpecialLinearGroup (Fin 2) F)) :
-    IsCyclic ↥(S : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F))
-      ∧ Nat.card ↥(S : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)) = 9 := by
+/-- In a group of order `504 = 2³·3²·7` every Sylow `3`-subgroup has order `9`. -/
+theorem card_sylow_three_eq_nine (hG : Nat.card G = 504) (T : Sylow 3 G) :
+    Nat.card ↥(T : Subgroup G) = 9 := by
   haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
-  have hSL : Nat.card (Matrix.SpecialLinearGroup (Fin 2) F) = 504 := by
-    rw [SpecificGroups.ProjectiveSpecialLinear.natCard_specialLinearGroup_fin_two, hF]
-  have hcard : ∀ T : Sylow 3 (Matrix.SpecialLinearGroup (Fin 2) F),
-      Nat.card ↥(T : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)) = 9 := by
-    intro T
-    obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp T.isPGroup'
-    have hmul := (T : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)).card_mul_index
-    rw [hk, hSL] at hmul
-    have hnd := T.not_dvd_index
-    have hcop : Nat.Coprime ((3 : ℕ) ^ 2)
-        ((T : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)).index) :=
-      Nat.Coprime.pow_left 2 ((Nat.Prime.coprime_iff_not_dvd (by norm_num)).mpr hnd)
-    have h1 : (3 : ℕ) ^ 2 ∣ 3 ^ k := by
-      refine hcop.dvd_of_dvd_mul_right ?_
-      rw [hmul]
-      exact ⟨56, by norm_num⟩
-    have h2 : (3 : ℕ) ^ k ∣ 3 ^ 2 := by
-      refine (Nat.Coprime.pow_left k (show Nat.Coprime 3 56 by norm_num)).dvd_of_dvd_mul_left ?_
-      rw [show (56 : ℕ) * 3 ^ 2 = 504 by norm_num]
-      exact ⟨_, hmul.symm⟩
-    have hk2 : k = 2 :=
-      le_antisymm ((Nat.pow_dvd_pow_iff_le_right (by norm_num)).mp h2)
-        ((Nat.pow_dvd_pow_iff_le_right (by norm_num)).mp h1)
-    rw [hk, hk2]
-    norm_num
-  refine ⟨?_, hcard S⟩
-  obtain ⟨C, hCcyc, hCcard⟩ := exists_isCyclic_card_specialLinearGroup_eq_card_add_one F
-  rw [hF] at hCcard
+  obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp T.isPGroup'
+  have hmul := (T : Subgroup G).card_mul_index
+  rw [hk, hG] at hmul
+  have hnd := T.not_dvd_index
+  have hcop : Nat.Coprime ((3 : ℕ) ^ 2) ((T : Subgroup G).index) :=
+    Nat.Coprime.pow_left 2 ((Nat.Prime.coprime_iff_not_dvd (by norm_num)).mpr hnd)
+  have h1 : (3 : ℕ) ^ 2 ∣ 3 ^ k := by
+    refine hcop.dvd_of_dvd_mul_right ?_
+    rw [hmul]
+    exact ⟨56, by norm_num⟩
+  have h2 : (3 : ℕ) ^ k ∣ 3 ^ 2 := by
+    refine (Nat.Coprime.pow_left k
+      (show Nat.Coprime 3 56 by norm_num)).dvd_of_dvd_mul_left ?_
+    rw [show (56 : ℕ) * 3 ^ 2 = 504 by norm_num]
+    exact ⟨_, hmul.symm⟩
+  have hk2 : k = 2 :=
+    le_antisymm ((Nat.pow_dvd_pow_iff_le_right (by norm_num)).mp h2)
+      ((Nat.pow_dvd_pow_iff_le_right (by norm_num)).mp h1)
+  rw [hk, hk2]
+  norm_num
+
+/-- A `3`-subgroup of a group of order `504` has order dividing `9`. -/
+theorem card_dvd_nine_of_isPGroup_three (hG : Nat.card G = 504)
+    {H : Subgroup G} (hH : IsPGroup 3 ↥H) : Nat.card ↥H ∣ 9 := by
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp hH
+  have hdvd : Nat.card ↥H ∣ 504 := hG ▸ Subgroup.card_subgroup_dvd_card H
+  rw [hk] at hdvd ⊢
+  refine (Nat.Coprime.pow_left k
+    (show Nat.Coprime 3 56 by norm_num)).dvd_of_dvd_mul_left ?_
+  rw [show (56 : ℕ) * 9 = 504 by norm_num]
+  exact hdvd
+
+/-- **In a group of order `504` possessing a cyclic subgroup of order `9`** (such as
+`PSL(2, 8)`), every element of order `3` lies in a cyclic subgroup of order `9`, namely
+a Sylow `3`-subgroup. -/
+theorem exists_isCyclic_card_nine_mem (hG : Nat.card G = 504)
+    (hC : ∃ C : Subgroup G, IsCyclic ↥C ∧ Nat.card ↥C = 9)
+    {x : G} (hx : orderOf x = 3) :
+    ∃ S : Subgroup G, x ∈ S ∧ IsCyclic ↥S ∧ Nat.card ↥S = 9 := by
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  obtain ⟨C, hCcyc, hCcard⟩ := hC
   have hCp : IsPGroup 3 ↥C := IsPGroup.of_card (n := 2) (by rw [hCcard]; norm_num)
   obtain ⟨Q, hCQ⟩ := hCp.exists_le_sylow
-  have hCQeq : C = (Q : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)) :=
-    Subgroup.eq_of_le_of_card_ge hCQ (by rw [hcard Q, hCcard])
-  have hQcyc : IsCyclic ↥(Q : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)) := by
-    rw [← hCQeq]; exact hCcyc
-  exact isCyclic_of_surjective (Sylow.equiv Q S) (Sylow.equiv Q S).surjective
+  have hCQeq : C = (Q : Subgroup G) :=
+    Subgroup.eq_of_le_of_card_ge hCQ (by rw [card_sylow_three_eq_nine hG Q, hCcard])
+  have hQcyc : IsCyclic ↥(Q : Subgroup G) := by rw [← hCQeq]; exact hCcyc
+  have hxp : IsPGroup 3 ↥(Subgroup.zpowers x) :=
+    IsPGroup.of_card (n := 1) (by rw [Nat.card_zpowers, hx]; norm_num)
+  obtain ⟨S, hS⟩ := hxp.exists_le_sylow
+  exact ⟨(S : Subgroup G), hS (Subgroup.mem_zpowers x),
+    isCyclic_of_surjective (Sylow.equiv Q S) (Sylow.equiv Q S).surjective,
+    card_sylow_three_eq_nine hG S⟩
 
-end SylowThree
+omit [Finite G] in
+/-- Transport of "there is a cyclic subgroup of order `9`" along an isomorphism. -/
+theorem exists_isCyclic_card_nine_of_mulEquiv {H : Type*} [Group H]
+    (e : G ≃* H) (hC : ∃ C : Subgroup G, IsCyclic ↥C ∧ Nat.card ↥C = 9) :
+    ∃ C : Subgroup H, IsCyclic ↥C ∧ Nat.card ↥C = 9 := by
+  obtain ⟨C, hCcyc, hCcard⟩ := hC
+  refine ⟨C.map e.toMonoidHom, ?_, ?_⟩
+  · exact isCyclic_of_surjective _
+      (Subgroup.equivMapOfInjective C e.toMonoidHom e.injective).surjective
+  · rw [← hCcard]
+    exact Nat.card_congr
+      (Subgroup.equivMapOfInjective C e.toMonoidHom e.injective).toEquiv.symm
+
+end OrderFiveHundredFour
+
+section SL
+
+/-- `|SL(2, F)| = 504` when `|F| = 8`. -/
+theorem natCard_specialLinearGroup_eq_of_card_eq_eight
+    (F : Type*) [Field F] [Finite F] [CharP F 2] (hF : Nat.card F = 8) :
+    Nat.card (Matrix.SpecialLinearGroup (Fin 2) F) = 504 := by
+  rw [SpecificGroups.ProjectiveSpecialLinear.natCard_specialLinearGroup_fin_two, hF]
+
+/-- The nonsplit torus of `SL(2, F)` for `|F| = 8` is cyclic of order `9`. -/
+theorem exists_isCyclic_card_nine_specialLinearGroup
+    (F : Type*) [Field F] [Finite F] (hF : Nat.card F = 8) :
+    ∃ C : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F),
+      IsCyclic ↥C ∧ Nat.card ↥C = 9 := by
+  obtain ⟨C, hCcyc, hCcard⟩ := exists_isCyclic_card_specialLinearGroup_eq_card_add_one F
+  exact ⟨C, hCcyc, by rw [hCcard, hF]⟩
+
+end SL
+
+section PSL
+
+variable (F : Type*) [Field F] [Finite F] [CharP F 2]
+
+/-- In characteristic two the centre of `SL(2, F)` is trivial, so
+`PSL(2, F) ≃* SL(2, F)`. -/
+noncomputable def pslMulEquivSL :
+    Matrix.ProjectiveSpecialLinearGroup (Fin 2) F
+      ≃* Matrix.SpecialLinearGroup (Fin 2) F :=
+  (QuotientGroup.quotientMulEquivOfEq
+      (SpecificGroups.ProjectiveSpecialLinear.center_specialLinearGroup_fin_two_eq_bot
+        (F := F))).trans
+    QuotientGroup.quotientBot
+
+/-- `|PSL(2, F)| = 504` when `|F| = 8`. -/
+theorem natCard_projectiveSpecialLinearGroup_eq_of_card_eq_eight
+    (hF : Nat.card F = 8) :
+    Nat.card (Matrix.ProjectiveSpecialLinearGroup (Fin 2) F) = 504 := by
+  rw [SpecificGroups.ProjectiveSpecialLinear.natCard_projectiveSpecialLinearGroup_fin_two,
+    hF]
+
+/-- **`PSL(2, 8)` contains a cyclic subgroup of order `9`** (the nonsplit torus). -/
+theorem exists_isCyclic_card_nine_projectiveSpecialLinearGroup (hF : Nat.card F = 8) :
+    ∃ C : Subgroup (Matrix.ProjectiveSpecialLinearGroup (Fin 2) F),
+      IsCyclic ↥C ∧ Nat.card ↥C = 9 :=
+  exists_isCyclic_card_nine_of_mulEquiv (pslMulEquivSL F).symm
+    (exists_isCyclic_card_nine_specialLinearGroup F hF)
+
+end PSL
 
 end OddOrder.GroupTheory.ProjectiveSpecialLinear
