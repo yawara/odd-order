@@ -30,6 +30,71 @@ open scoped Pointwise
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
+section GenericProduct
+
+variable {G' : Type*} [Group G']
+
+/-- `|A ⊔ B| = |A|·|B|` when `B` normalizes `A` and the two meet trivially. -/
+theorem card_sup_eq_mul_of_le_normalizer {A B : Subgroup G'}
+    (hB : ∀ b ∈ B, b ∈ Subgroup.normalizer (A : Set G')) (hinf : A ⊓ B = ⊥) :
+    Nat.card ↥(A ⊔ B) = Nat.card ↥A * Nat.card ↥B := by
+  classical
+  have hcoe : ((A ⊔ B : Subgroup G') : Set G') = (A : Set G') * (B : Set G') :=
+    Subgroup.coe_mul_of_right_le_normalizer_left _ _ hB
+  have hmul : ∀ x ∈ A ⊔ B, ∃ a ∈ A, ∃ b ∈ B, a * b = x := by
+    intro x hx
+    have hx' : x ∈ ((A : Set G') * (B : Set G')) := by rw [← hcoe]; exact hx
+    obtain ⟨a, ha, b, hb, rfl⟩ := hx'
+    exact ⟨a, ha, b, hb, rfl⟩
+  have hbot : B ⊓ A = ⊥ := by rw [inf_comm]; exact hinf
+  have hcompl := (Subgroup.isComplement'_subgroupOf_of_disjoint_mul_eq_univ
+    (le_sup_right : B ≤ A ⊔ B) (le_sup_left : A ≤ A ⊔ B) hbot hmul).card_mul
+  have hAc : Nat.card ↥(A.subgroupOf (A ⊔ B)) = Nat.card ↥A :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv
+  have hBc : Nat.card ↥(B.subgroupOf (A ⊔ B)) = Nat.card ↥B :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+  rw [← hAc, ← hBc]
+  exact hcompl.symm
+
+/-- Conjugation by an element normalizing `X` preserves the centralizer of `X`. -/
+theorem conj_mem_centralizer_of_forall_mem_iff {X : Subgroup G'} {g : G'}
+    (hg : ∀ y : G', y ∈ X ↔ g * y * g⁻¹ ∈ X) {c : G'}
+    (hc : c ∈ Subgroup.centralizer (X : Set G')) :
+    g * c * g⁻¹ ∈ Subgroup.centralizer (X : Set G') := by
+  refine Subgroup.mem_centralizer_iff.mpr fun x hx => ?_
+  have hx' : g⁻¹ * x * g ∈ X := by
+    refine (hg (g⁻¹ * x * g)).mpr ?_
+    have h1 : g * (g⁻¹ * x * g) * g⁻¹ = x := by group
+    rw [h1]; exact hx
+  have hcx := Subgroup.mem_centralizer_iff.mp hc _ hx'
+  calc x * (g * c * g⁻¹) = g * ((g⁻¹ * x * g) * c) * g⁻¹ := by group
+    _ = g * (c * (g⁻¹ * x * g)) * g⁻¹ := by rw [hcx]
+    _ = (g * c * g⁻¹) * x := by group
+
+/-- An element normalizing a subgroup normalizes its centralizer. -/
+theorem mem_normalizer_centralizer_of_mem_normalizer {X : Subgroup G'} {g : G'}
+    (hg : ∀ y : G', y ∈ X ↔ g * y * g⁻¹ ∈ X) (c : G') :
+    c ∈ Subgroup.centralizer (X : Set G')
+      ↔ g * c * g⁻¹ ∈ Subgroup.centralizer (X : Set G') := by
+  have hginv : ∀ y : G', y ∈ X ↔ g⁻¹ * y * g⁻¹⁻¹ ∈ X := by
+    intro y
+    rw [inv_inv]
+    have h1 : g * (g⁻¹ * y * g) * g⁻¹ = y := by group
+    refine ⟨fun hy => (hg (g⁻¹ * y * g)).mpr (by rw [h1]; exact hy), fun hy => ?_⟩
+    have h2 := (hg (g⁻¹ * y * g)).mp hy
+    rwa [h1] at h2
+  refine ⟨fun h => conj_mem_centralizer_of_forall_mem_iff hg h, fun h => ?_⟩
+  have h3 := conj_mem_centralizer_of_forall_mem_iff hginv h
+  have h4 : g⁻¹ * (g * c * g⁻¹) * g⁻¹⁻¹ = c := by group
+  rwa [h4] at h3
+
+/-- Conjugation by `a` preserves commuting with `z` when `a` itself commutes with `z`. -/
+theorem commute_conj_of_commute {a b z : G'} (ha : Commute a z) (hb : Commute b z) :
+    Commute (a * b * a⁻¹) z :=
+  Commute.mul_left (Commute.mul_left ha hb) ha.inv_left
+
+end GenericProduct
+
 namespace FirstCaseHypothesis
 
 universe uG uΩ
