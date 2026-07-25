@@ -570,6 +570,38 @@ theorem card_center_ker_augHom [Fintype Q] [Finite D] [Fact p.Prime] (hQcard : N
   rw [← Nat.card_eq_of_bijective _ hFbij]
   exact card_ker_powMonoidHom_prime hcyc hD hn
 
+/-! ### `P` と `P'U` の位数 (4A.8(d) の maximal class 判定に要る) -/
+
+omit [Group Q] in
+/-- 指示関数の座標積は値そのもの. -/
+theorem prod_ite_eq_self [Fintype Q] [DecidableEq Q] (x : Q) (c : D) :
+    (∏ ω, (if ω = x then c else 1)) = c := by
+  rw [Finset.prod_eq_single x] <;> simp +contextual
+
+/-- 増大射は全射 (指示関数で任意の値が実現できる). -/
+theorem augHom_surjective [Fintype Q] : Function.Surjective (augHom (D := D) (Q := Q)) := by
+  classical
+  intro d
+  refine ⟨inl (fun ω => if ω = (1 : Q) then d else 1), ?_⟩
+  change (∏ ω, (if ω = (1 : Q) then d else 1)) = d
+  exact prod_ite_eq_self 1 d
+
+/-- `|P' U| · |C| = |P|`: `P'U = ker(augHom)` で `augHom` は `C` の上へ全射. -/
+theorem card_ker_augHom_mul [Fintype Q] [Finite D] :
+    Nat.card ((augHom (D := D) (Q := Q)).ker) * Nat.card D = Nat.card (D ≀[Q] Q) := by
+  have hidx : ((augHom (D := D) (Q := Q)).ker).index = Nat.card D := by
+    rw [Subgroup.index_ker, MonoidHom.range_eq_top.mpr augHom_surjective]
+    exact Subgroup.card_top
+  rw [← hidx]
+  exact Subgroup.card_mul_index _
+
+/-- `|P| = |C|^{|Q|} · |Q|` (§3A `WreathProduct.card`) から `|P'U| = |C|^{|Q| - 1} · |Q|`. -/
+theorem card_ker_augHom_eq [Fintype Q] [Finite D] :
+    Nat.card ((augHom (D := D) (Q := Q)).ker) * Nat.card D
+      = Nat.card D ^ Nat.card Q * Nat.card Q := by
+  rw [card_ker_augHom_mul]
+  exact OddOrder.Isaacs.Ch03.WreathProduct.card (D := D) (Q := Q) (Ω := Q)
+
 end
 
 end OddOrder.Isaacs.Ch04
