@@ -419,15 +419,41 @@ mathlib inductive (`top`/`step`)。
   (ii) `S ⊔ S^x = ⊤` 排除 = `topEquiv` で `G` 冪零 ⟹ Lemma 2.1 で全部分群部分正規 ⟹ 仮定に矛盾。
   Thm 2.8 の signature は不変 (`fun x => Or.inr (hperm x)`) ゆえ下流無影響。
   `Problems.lean` 側は §2B section を起こしてポインタのみ記録 (ラッパー方針)。
-- ⬜ **残り §2B** (topic が involution / 二面体群なので新 leaf `ProblemsInvolutions.lean` 予定):
-  **2B.2** (二面体群 `D_{2n}` の involution 個数と共役類: n 奇 ⟹ n 個 1 類、n 偶 ⟹ n+1 個 3 類
-  サイズ 1, n/2, n/2) / **2B.3** (非共役 involution `s,t` ⟹ 両方と可換な第 3 の involution が存在) /
-  **2B.4** (Sylow 2 が複数かつ相異なる 2 つが自明交叉 ⟹ involution の共役類は 1 つ) /
+- ✅ 新 leaf `OddOrder/Isaacs/Ch02_Subnormality/ProblemsInvolutions.lean` (`OddOrder.lean` 配線済)。
+  ⚠ repo の `DihedralBasics.lean` は「巡回部分群を反転する involution」型の**抽象**補題群
+  (Lemma 2.14 / Matsuyama 用) で mathlib の具体 `DihedralGroup n` は扱っていない — 別物なので
+  本 leaf は mathlib `DihedralGroup n` (`r i` / `sr i`, `i : ZMod n`) の上で議論する。
+- ✅ 実証明 **2B.2(a)** (2026-07-25、`n` 奇): involution の分類 (`orderOf_r_eq_two_iff`:
+  `orderOf (r i) = 2 ⟺ i ≠ 0 ∧ 2i = 0`) から `2` が `ZMod n` の単元ゆえ involution = 鏡映全体
+  (`orderOf_eq_two_iff_of_odd`)、個数 `n` (`card_involutions_of_odd`)、単一共役類
+  (`isConj_sr_of_odd`: `k + k = i - j` を解いて `r k` で共役)。共役計算 `r_conj_sr`
+  (`sr i ↦ sr (i - 2j)`) / `sr_conj_sr` (`sr i ↦ sr (2j - i)`) を helper に。
+- ✅ 実証明 **2B.2(b)** (`n = m + m` 偶): `add_self_eq_zero_iff_of_even` (`2i = 0` の解は `0` と `m`
+  のみ; `i.val` に降りて `(m+m) ∣ 2·i.val` から `c < 2` 場合分け) ⟹ involution = 全鏡映 + `r m`
+  で `n + 1` 個 (`card_involutions_of_even`)。共役類はちょうど 3 つ・サイズ `1, m, m`:
+  * `r m` は中心的 (`r_natCast_half_mem_center`、`-m = m` から) ⟹ 類 `{r m}` サイズ 1。
+  * **鏡映の類は添字の「偶奇」で決まる**: `parityHom m : ZMod (m+m) →+* ZMod 2` (`2 ∣ n` の
+    `ZMod.castHom`) を導入し `parityHom_eq_zero_iff` (`= 0 ⟺` 二倍元) →
+    `isConj_sr_sr_iff_of_even`。fiber の個数は `k ↦ k + 1` が 2 fiber 間の全単射 + 互いに補集合
+    (`Set.ncard_add_ncard_compl`) から `m` (`ncard_parityHom_fiber`) ⟹ `ncard_conjClass_sr = m`。
+  * 3 類の非共役性 = `not_isConj_sr_zero_sr_one` / `not_isConj_sr_r` (後者は
+    `exists_sr_of_isConj_sr` = 「鏡映の共役元は鏡映」から)。
+- ✅ 実証明 **2B.3** `exists_involution_commuting_of_not_isConj` (有限群で非共役な involution
+  `s, t` ⟹ 両方と可換で両者と異なる involution が存在)。**二面体群の構造定理を経由しない**:
+  `u := s*t` を `s`,`t` が反転することだけ使い、`|u|` 奇なら `u^{(|u|+1)/2}` 共役で
+  `s ↦ u s = s t s⁻¹` ゆえ `s ~ t` (仮定に反する) ⟹ `|u| = 2q` 偶、`z := u^q` が求めるもの。
+  ⚠ 有限性は本質的 (`D∞` が反例) — docstring 明記。
+- ⬜ **残り §2B**: **2B.4** (Sylow 2 が複数かつ相異なる 2 つが自明交叉 ⟹ involution の共役類は 1 つ) /
   **2B.5** (`|G:B|=2` の 3 条件同値 + generalized dihedral ⟹ `B` 可換) /
   **2B.6** (正規 Sylow p ⟺ p-冪位数の共役元対 `⟨x,y⟩` が全て正規 Sylow p を持つ)。
-  ⚠ repo の `DihedralBasics.lean` は「巡回部分群を反転する involution」型の**抽象**補題群
-  (Lemma 2.14 / Matsuyama 用) で、mathlib の具体 `DihedralGroup n` は扱っていない —
-  2B.2 は mathlib `DihedralGroup` 側の API から。
+  - **★ 2B.4 の証明計画 (確定済)**: 非共役 involution `s,t` に 2B.3 を適用して `z` を得ると
+    `⟨s,z⟩`・`⟨t,z⟩` はいずれも 2-群 ⟹ Sylow 2 に入り、`z ≠ 1` が共通ゆえ TI 仮定で**同一の
+    Sylow 2**に入る。対偶で「**異なる Sylow 2 に属する involution は共役**」。Sylow 2 が複数
+    あるので、任意の `s, t` に対し両者の Sylow と異なる Sylow `S''` を取り、そこの involution
+    `s''` (位数偶 + Cauchy) を経由して `s ~ s'' ~ t`。
+    材料: `Subgroup.isMulCommutative_closure` (可換な生成集合 ⟹ closure 可換、
+    `Mathlib/GroupTheory/Subgroup/Centralizer.lean:136`) で `closure {s,z}` の可換性 →
+    `closure_induction` で全元 `g*g = 1` → `IsPGroup 2` → `IsPGroup.exists_le_sylow`。
 
 ## Ch.3 (Split Extensions) §3A — 着手 (2026-07-23、§2A hard tail deferred 中の breadth 展開)
 
@@ -549,5 +575,6 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 
 **2026-07-25 の消化**: 1C.4 ✅ / 1C.5 ✅ / 1D.5 ✅ / 2A.4 ✅ / 2A.5(a)(b)(c) ✅ / 2A.6 ✅ /
 2A.9 ✅ / 2A.10 ✅ (**§2A 完済**) / 2B.1 ✅。
-**次 frontier = §2B の 2B.2-2B.6** (新 leaf `Ch02_Subnormality/ProblemsInvolutions.lean`)、
-以降 §2C (2C.1) / §2D (2D.1, 2D.2, …) / §3A 残り (3A.3/4/6/7/8) / §3B〜。
+さらに 2B.2(a)(b) ✅ / 2B.3 ✅ (新 leaf `Ch02_Subnormality/ProblemsInvolutions.lean`)。
+**次 frontier = 2B.4** (証明計画は §2B 節に確定記載) → 2B.5 / 2B.6 →
+§2C (2C.1) / §2D (2D.1, 2D.2, …) / §3A 残り (3A.3/4/6/7/8) / §3B〜。
