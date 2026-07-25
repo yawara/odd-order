@@ -576,13 +576,12 @@ Ch.2 は全ファイル sorry-free。
 座標置換のみ — `WreathProduct.ext` + `mul_left`/`inv_left` から直接計算) /
 `eq_inl_of_right_eq_one` / **`centralizer_range_inl_eq`** (= `A = C_G(A)`、指示関数の技)。
 
-**残り (束ね上げ)**:
-- `A` 正規: `range_inl_eq_ker_rightHom` + `MonoidHom.normal_ker`。
-- `A` 可換: 成分ごと (`Multiplicative (ZMod p)` は可換)。
-- `A` は `p`-群: 各元 `inl b` について `(inl b)^p = inl (b^p) = 1`
-  (`toAdd (x^p) = p • toAdd x = (p : ZMod p) * toAdd x = 0`、`ZMod.natCast_self`)。
-- 分裂: `rightHom_comp_inr` (`inr` が切断) + `range_inl_eq_ker_rightHom`。
-- `G/A ≅ H`: `QuotientGroup.quotientKerEquivOfSurjective rightHom rightHom_surjective`。
+**束ね上げも landing 済 (2026-07-25)** ⟹ **3A.10 完了**。`zpWreath` / `zpWreathBase` /
+`zpWreathBase_spec` (可換・`p` 乗して 1・分裂 (`A ⊓ inr.range = ⊥`, `A ⊔ inr.range = ⊤`)・
+`G/A ≅ H`・`A = C_G(A)`)。`A ⊴ G` は `range_inl_normal` を instance 化。
+あわせて `WreathProduct` の一般 API を補完: `inl_left_mul_inr_right` (`SemidirectProduct` 側に
+あって wreath 版に無かった分解補題) / `range_inl_normal` / `rightHom_surjective`。
+
 
 ⚠ 実装上の罠 (今回): `WreathProduct` の補題を `rw`/`congrArg` で使うとき、`Ω` が
 metavariable のままだと `MulAction ?m ?m` で instance 解決が詰まる。`conj_inl_of_comm hD x` の
@@ -703,7 +702,7 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
 | 3A.7 | ⬜ `α ∈ Aut(G)`, `o(α)` の素因子が 2 個以下 ⟹ `⟨α⟩` は `G` 上に regular orbit をもつ |
 | 3A.8 | ✅ **完了** ((a)(b)(c) すべて) |
 | 3A.9 | ✅ **完了** ((a)(b)) |
-| 3A.10 | 核 ✅ (`centralizer_range_inl_eq` = `A = C_G(A)`) / まとめ ⬜ |
+| 3A.10 | ✅ **完了** (`zpWreathBase_spec`) |
 
 - ⬜ **次: §3A 続き or §2A hard tail 再訪。§1D 残り = 1D.5 (Isaacs-noted-hardest)。**
 
@@ -747,5 +746,7 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 別 leaf へ出すのが自然)。
 さらに **§3A leaf 分割 ✅ / 3A.9(b) ✅ (3A.9 完了)**。
 さらに **3A.10 の核 ✅** (`A = C_G(A)`)。
-**次 frontier = 3A.10 の束ね上げ** (正規/可換/`p`-群/分裂/`G/A ≅ H`; メモは §3A 節) →
-3A.6 / 3A.7 に戻る → §3B〜。
+さらに **3A.10 ✅** ⟹ **§3A は 3A.6 / 3A.7 を除いて完了**。
+**次 frontier = 3A.7** (`α ∈ Aut(G)` で `o(α)` の素因子が 2 個以下 ⟹ `⟨α⟩` は regular orbit を
+もつ) → 3A.6 (deferred-hard、解析は §3A 節) → §3B〜。
+⚠ 3A.6 / 3A.7 はいずれも「本物の定理」寄りで、他の演習より重い。
