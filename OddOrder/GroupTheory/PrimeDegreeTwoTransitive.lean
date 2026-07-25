@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Sylow
 import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
+import Mathlib.RingTheory.Int.Basic
 
 /-!
 # Degree-`p` faithful transitive actions of order `p(p-1)` are two-transitive
@@ -94,13 +95,13 @@ private theorem not_smul_eq_of_orderOf_eq_prime (hp : p.Prime) {σ : G}
   rw [hσ1, orderOf_one] at hσ
   exact hp.one_lt.ne' hσ.symm
 
-/-- **Two-point stabilizers are trivial** for a faithful transitive action of a group
-of order `p(p-1)` on `p` points: any `g` fixing two distinct points is forced to
-commute with the normal Sylow `p`-generator `σ` (conjugation preserves the unique
-power sending the first point to the second), hence fixes all of `Ω`. -/
-theorem eq_one_of_smul_eq_of_smul_eq (hp : p.Prime) (hΩ : Nat.card Ω = p)
-    (hG : Nat.card G = p * (p - 1)) {g : G} {a b : Ω} (hab : a ≠ b)
-    (hga : g • a = a) (hgb : g • b = b) : g = 1 := by
+/-- The engine behind this file: a generator `σ` of the unique (normal) Sylow
+`p`-subgroup, which acts freely, and regularly from every base point. -/
+private theorem exists_normal_regular (hp : p.Prime) (hΩ : Nat.card Ω = p)
+    (hG : Nat.card G = p * (p - 1)) :
+    ∃ σ : G, orderOf σ = p ∧ (Subgroup.zpowers σ).Normal ∧
+      (∀ τ ∈ Subgroup.zpowers σ, τ ≠ 1 → ∀ y : Ω, τ • y ≠ y) ∧
+      ∀ a : Ω, Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a) := by
   haveI : Fact p.Prime := ⟨hp⟩
   -- Cauchy: an element of order `p`.
   haveI := Fintype.ofFinite G
@@ -138,6 +139,7 @@ theorem eq_one_of_smul_eq_of_smul_eq (hp : p.Prime) (hΩ : Nat.card Ω = p)
   -- `σ` has no fixed point, so `i ↦ σ^i • a` is injective `ZMod p → Ω`, so surjective.
   have hfree : ∀ (τ : G), τ ∈ N → τ ≠ 1 → ∀ y : Ω, τ • y ≠ y := fun τ hτ hτ1 y =>
     not_smul_eq_of_orderOf_eq_prime hp hσ hnorm hτ hτ1 y
+  refine ⟨σ, hσ, hnorm, hfree, fun a => ?_⟩
   have hinj : Function.Injective (fun i : ZMod p => σ ^ (i.val) • a) := by
     have key : ∀ i' j' : ZMod p, j'.val < i'.val →
         σ ^ (i'.val) • a = σ ^ (j'.val) • a → False := by
@@ -161,10 +163,22 @@ theorem eq_one_of_smul_eq_of_smul_eq (hp : p.Prime) (hΩ : Nat.card Ω = p)
     rcases Nat.lt_or_ge j.val i.val with h | h
     · exact key i j h hij
     · exact key j i (lt_of_le_of_ne h hvne) hij.symm
-  have hsurj : Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a) := by
-    have h1 : Nat.card (ZMod p) = Nat.card Ω := by
-      rw [Nat.card_zmod, hΩ]
-    exact ((Nat.bijective_iff_injective_and_card _).mpr ⟨hinj, h1⟩).2
+  have h1 : Nat.card (ZMod p) = Nat.card Ω := by
+    rw [Nat.card_zmod, hΩ]
+  exact ((Nat.bijective_iff_injective_and_card _).mpr ⟨hinj, h1⟩).2
+
+/-- **Two-point stabilizers are trivial** for a faithful transitive action of a group
+of order `p(p-1)` on `p` points: any `g` fixing two distinct points is forced to
+commute with the normal Sylow `p`-generator `σ` (conjugation preserves the unique
+power sending the first point to the second), hence fixes all of `Ω`. -/
+theorem eq_one_of_smul_eq_of_smul_eq (hp : p.Prime) (hΩ : Nat.card Ω = p)
+    (hG : Nat.card G = p * (p - 1)) {g : G} {a b : Ω} (hab : a ≠ b)
+    (hga : g • a = a) (hgb : g • b = b) : g = 1 := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨σ, hσ, hnorm, hfree, hsurjAll⟩ := exists_normal_regular hp hΩ hG
+  set N : Subgroup G := Subgroup.zpowers σ with hNdef
+  have hcardN : Nat.card N = p := by rw [hNdef, Nat.card_zpowers, hσ]
+  have hsurj := hsurjAll a
   -- write `b = σ^i • a`, `i ≠ 0`.
   obtain ⟨i, hi⟩ := hsurj b
   simp only at hi
@@ -236,6 +250,171 @@ theorem eq_one_of_smul_eq_of_smul_eq (hp : p.Prime) (hΩ : Nat.card Ω = p)
     _ = (g * σ ^ (j.val) * g⁻¹) • a := by
         rw [mul_smul (g * σ ^ (j.val)) g⁻¹, hga']
     _ = σ ^ (j.val) • a := by rw [hcj]
+
+omit [Finite G] in
+/-- Conjugation spreads from a generator to all its integer powers. -/
+private theorem conj_zpow_eq (u x : G) (s : ℤ) :
+    (u * x * u⁻¹) ^ s = u * x ^ s * u⁻¹ := by simp
+
+omit [Finite G] [Finite Ω] [IsPretransitive G Ω] in
+/-- An element centralizing the regular normal subgroup `⟨σ⟩` acts as one of its
+elements, hence (by faithfulness) lies in it. -/
+private theorem mem_zpowers_of_centralizes {σ : G}
+    (hsurjAll : ∀ a : Ω, Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a))
+    (a : Ω) {u : G} (hcen : ∀ n ∈ Subgroup.zpowers σ, u * n * u⁻¹ = n) :
+    u ∈ Subgroup.zpowers σ := by
+  obtain ⟨s, hs⟩ := hsurjAll a (u • a)
+  simp only at hs
+  have hall : ∀ z : Ω, u • z = σ ^ (s.val) • z := by
+    intro z
+    obtain ⟨j, hj⟩ := hsurjAll a z
+    simp only at hj
+    have hc := hcen (σ ^ (j.val)) (Subgroup.pow_mem _ (Subgroup.mem_zpowers σ) _)
+    have hc' : u * σ ^ (j.val) = σ ^ (j.val) * u := by
+      have h1 := congrArg (fun w => w * u) hc
+      simpa [mul_assoc] using h1
+    calc u • z = u • σ ^ (j.val) • a := by rw [hj]
+      _ = (u * σ ^ (j.val)) • a := by rw [mul_smul]
+      _ = (σ ^ (j.val) * u) • a := by rw [hc']
+      _ = σ ^ (j.val) • u • a := by rw [mul_smul]
+      _ = σ ^ (j.val) • σ ^ (s.val) • a := by rw [← hs]
+      _ = σ ^ (s.val) • σ ^ (j.val) • a := by
+          rw [smul_smul, smul_smul, ← pow_add, ← pow_add, Nat.add_comm]
+      _ = σ ^ (s.val) • z := by rw [hj]
+  have hu : u = σ ^ (s.val) := eq_of_smul_eq_smul hall
+  rw [hu]
+  exact Subgroup.pow_mem _ (Subgroup.mem_zpowers σ) _
+
+/-- **No elementary abelian subgroup of order `4`** (2-rank one) for a faithful
+transitive action of a group of order `p(p-1)` on `p` points, `p` an odd prime:
+every involution inverts the regular normal `⟨σ⟩` (its conjugation exponent `k`
+satisfies `k² ≡ 1`, and `k ≡ 1` would put the involution inside the odd-order
+`⟨σ⟩`), so the product of two distinct commuting involutions centralizes `⟨σ⟩`
+and dies the same way. -/
+theorem not_exists_elementaryAbelian_four (hp : p.Prime) (hp2 : p ≠ 2)
+    (hΩ : Nat.card Ω = p) (hG : Nat.card G = p * (p - 1)) :
+    ¬ ∃ E : Subgroup G, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1 := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  rintro ⟨E, hEcard, hEsq⟩
+  obtain ⟨σ, hσ, hnorm, hfree, hsurjAll⟩ := exists_normal_regular hp hΩ hG
+  obtain ⟨a⟩ : Nonempty Ω :=
+    (Nat.card_ne_zero.mp (by rw [hΩ]; exact hp.pos.ne')).1
+  -- `⟨σ⟩` has odd order, hence no involutions.
+  have hNinv : ∀ n ∈ Subgroup.zpowers σ, n ^ 2 = 1 → n = 1 := by
+    intro n hn h2
+    have ho2 : orderOf n ∣ 2 := orderOf_dvd_of_pow_eq_one h2
+    have hop : orderOf n ∣ p := hσ ▸ orderOf_dvd_of_mem_zpowers hn
+    have hg : Nat.gcd 2 p = 1 :=
+      (Nat.coprime_primes Nat.prime_two hp).mpr (fun h => hp2 h.symm)
+    have h3 := Nat.dvd_gcd ho2 hop
+    rw [hg, Nat.dvd_one] at h3
+    exact orderOf_eq_one_iff.mp h3
+  -- every nonidentity element of `E` inverts `σ`.
+  have hinv : ∀ u ∈ E, u ≠ 1 → u * σ * u⁻¹ = σ⁻¹ := by
+    intro u hu hu1
+    obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp
+      (hnorm.conj_mem σ (Subgroup.mem_zpowers σ) u)
+    have huu : u * u = 1 := by
+      have := hEsq u hu
+      rwa [pow_two] at this
+    -- `u² = 1` forces `σ = σ^{k²}`.
+    have hσk2 : (σ ^ k) ^ k = σ := by
+      calc (σ ^ k) ^ k = (u * σ * u⁻¹) ^ k := by rw [hk]
+        _ = u * σ ^ k * u⁻¹ := conj_zpow_eq u σ k
+        _ = u * (u * σ * u⁻¹) * u⁻¹ := by rw [hk]
+        _ = (u * u) * σ * ((u * u))⁻¹ := by group
+        _ = σ := by rw [huu]; group
+    have hdvd : (p : ℤ) ∣ k * k - 1 := by
+      have h2 : σ ^ (k * k - 1) = 1 := by
+        have h2a : σ ^ (k * k) = σ := by
+          rw [zpow_mul]
+          exact hσk2
+        rw [zpow_sub, h2a, zpow_one, mul_inv_cancel]
+      have h3 := orderOf_dvd_iff_zpow_eq_one.mpr h2
+      rwa [hσ] at h3
+    have hfac : (p : ℤ) ∣ (k - 1) * (k + 1) := by
+      have h4 : (k - 1) * (k + 1) = k * k - 1 := by ring
+      rw [h4]
+      exact hdvd
+    rcases ((Nat.prime_iff_prime_int.mp hp).dvd_mul.mp hfac) with hd | hd
+    · -- `k ≡ 1`: `u` would centralize `⟨σ⟩` and be an involution inside it.
+      exfalso
+      have hσk : σ ^ k = σ := by
+        have h4 : σ ^ (k - 1) = 1 :=
+          orderOf_dvd_iff_zpow_eq_one.mp (by rw [hσ]; exact hd)
+        calc σ ^ k = σ ^ (k - 1 + 1) := by congr 1; ring
+          _ = σ ^ (k - 1) * σ := zpow_add_one σ (k - 1)
+          _ = σ := by rw [h4, one_mul]
+      have hcu : u * σ * u⁻¹ = σ := by rw [← hk, hσk]
+      have hcen : ∀ n ∈ Subgroup.zpowers σ, u * n * u⁻¹ = n := by
+        intro n hn
+        obtain ⟨s, hs⟩ := Subgroup.mem_zpowers_iff.mp hn
+        calc u * n * u⁻¹ = u * σ ^ s * u⁻¹ := by rw [hs]
+          _ = (u * σ * u⁻¹) ^ s := (conj_zpow_eq u σ s).symm
+          _ = σ ^ s := by rw [hcu]
+          _ = n := hs
+      exact hu1 (hNinv u (mem_zpowers_of_centralizes hsurjAll a hcen)
+        (hEsq u hu))
+    · -- `k ≡ -1`: inversion.
+      have h4 : σ ^ (k + 1) = 1 :=
+        orderOf_dvd_iff_zpow_eq_one.mp (by rw [hσ]; exact hd)
+      have h5 : σ ^ k = σ⁻¹ := by
+        have h6 : σ ^ k * σ = 1 := by
+          rw [← zpow_add_one]
+          exact h4
+        exact eq_inv_of_mul_eq_one_left h6
+      rw [hk] at h5
+      exact h5
+  -- two distinct nonidentity elements of `E`.
+  haveI : Finite ↥E := Nat.finite_of_card_ne_zero (by rw [hEcard]; norm_num)
+  haveI : Nontrivial ↥E := Finite.one_lt_card_iff_nontrivial.mp
+    (by rw [hEcard]; norm_num)
+  obtain ⟨u', hu'⟩ := exists_ne (1 : ↥E)
+  obtain ⟨v', hv'1, hv'u⟩ : ∃ v' : ↥E, v' ≠ 1 ∧ v' ≠ u' := by
+    by_contra hall
+    push Not at hall
+    have hle : Nat.card ↥E ≤ 2 := by
+      have hsub : (Set.univ : Set ↥E) ⊆ {1, u'} := by
+        intro x _
+        by_cases hx : x = 1
+        · exact Or.inl hx
+        · exact Or.inr (hall x hx)
+      calc Nat.card ↥E = (Set.univ : Set ↥E).ncard := (Set.ncard_univ _).symm
+        _ ≤ ({1, u'} : Set ↥E).ncard := Set.ncard_le_ncard hsub (Set.toFinite _)
+        _ ≤ 2 := by
+            have h1 := Set.ncard_insert_le (1 : ↥E) {u'}
+            simpa [Set.ncard_singleton] using h1
+    omega
+  -- the product centralizes `σ`, is an involution, hence dies in `⟨σ⟩`.
+  have huv1 : ((u' : G)) * ((v' : G)) ≠ 1 := by
+    intro h0
+    have h1 : (u' : G)⁻¹ = (v' : G) := inv_eq_of_mul_eq_one_right h0
+    have huu : (u' : G) * (u' : G) = 1 := by
+      have := hEsq _ u'.2
+      rwa [pow_two] at this
+    have h2 : (u' : G)⁻¹ = (u' : G) := inv_eq_of_mul_eq_one_right huu
+    exact hv'u (Subtype.ext (h1.symm.trans h2))
+  have hcuv : (u' : G) * (v' : G) * σ * ((u' : G) * (v' : G))⁻¹ = σ := by
+    have h1 := hinv _ u'.2 (fun h0 => hu' (Subtype.ext h0))
+    have h2 := hinv _ v'.2 (fun h0 => hv'1 (Subtype.ext h0))
+    calc (u' : G) * (v' : G) * σ * ((u' : G) * (v' : G))⁻¹
+        = (u' : G) * ((v' : G) * σ * (v' : G)⁻¹) * (u' : G)⁻¹ := by group
+      _ = (u' : G) * σ⁻¹ * (u' : G)⁻¹ := by rw [h2]
+      _ = ((u' : G) * σ * (u' : G)⁻¹)⁻¹ := by group
+      _ = σ⁻¹⁻¹ := by rw [h1]
+      _ = σ := inv_inv σ
+  have hcen : ∀ n ∈ Subgroup.zpowers σ,
+      (u' : G) * (v' : G) * n * ((u' : G) * (v' : G))⁻¹ = n := by
+    intro n hn
+    obtain ⟨s, hs⟩ := Subgroup.mem_zpowers_iff.mp hn
+    calc (u' : G) * (v' : G) * n * ((u' : G) * (v' : G))⁻¹
+        = (u' : G) * (v' : G) * σ ^ s * ((u' : G) * (v' : G))⁻¹ := by rw [hs]
+      _ = ((u' : G) * (v' : G) * σ * ((u' : G) * (v' : G))⁻¹) ^ s :=
+          (conj_zpow_eq _ σ s).symm
+      _ = σ ^ s := by rw [hcuv]
+      _ = n := hs
+  exact huv1 (hNinv _ (mem_zpowers_of_centralizes hsurjAll a hcen)
+    (hEsq _ (mul_mem u'.2 v'.2)))
 
 /-- **A faithful transitive action of a group of order `p(p-1)` on `p` points is
 two-transitive** (indeed sharply so): two-point stabilizers are trivial, so the
