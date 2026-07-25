@@ -1382,13 +1382,50 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 - **4C.3** は three subgroups lemma (`Subgroup.commutator_commutator_eq_bot_of_rotate`) の
   `(G, A, N)` への直接適用: `⁅⁅A,N⁆,G⁆ = 1` は仮定, `⁅⁅N,G⁆,A⁆ ≤ ⁅N,A⁆ = 1` は `N ⊴ G`。
 
-## Ch.4 §4D (書籍 p. 145 の Problems 4D) — 次の frontier
+## Ch.4 §4D (書籍 p. 145 の Problems 4D) — 進行中 (2026-07-25)
 
-7 問 (4D.1–4D.7)。coprime action の節。4D.1 (`N ⊇ C_G(N)` + coprime で trivial/faithful が
-`N` から `G` へ伝播) / 4D.2 (odd class ≤2 群の加法構造で `xy - yx = ⁅x,y⁆`) /
-4D.3 (真 `A`-不変部分群に自明作用 ⟹ `G` は `p`-群…の 7 小問) / 4D.4 (2-群, `x⁴=1` を固定
-⟹ 自明) / 4D.5 (derived length `n+1`) / 4D.6 (Fitting の定理の写像 `θ` の像と核) /
-4D.7 (`p`-可解 + 巡回 Sylow `p`)。
+7 問 (4D.1–4D.7)。coprime action の節。
+
+| # | 状態 | Lean 名 (`OddOrder.Isaacs.Ch04`) / leaf |
+|---|---|---|
+| 4D.1(a)(b) | ✅ | `commutator_eq_bot_of_centralizer_le_of_coprime` / `inf_centralizer_eq_bot_of_centralizer_le_of_coprime` (`ProblemsCoprimeAction.lean`) |
+| 4D.2 | ✅ | `baerAdd_mul_inv_of_commutator_le_center` / `baerMul_div_eq_commutator` (`ProblemsBaerAddition.lean`) |
+| 4D.3(a)(b) | ✅ | `IsIrreducibleCoprimeAction.exists_isPGroup` / `.commutator_le_center` (`ProblemsIrreducibleAction.lean`) |
+| 4D.3(c)–(g) | ⬜ | 下記の設計どおり (同 leaf に追記) |
+| 4D.4 | ⬜ | 2-群 + 奇数位数 `A` が `x⁴=1` を全部固定 ⟹ 自明 |
+| 4D.5 | ⬜ | derived length `n+1` (+ 任意に大きい導来長の可解群) |
+| 4D.6 | ⬜ | Fitting の定理 (Thm 4.34) の写像 `θ` で `θ(G) = C_G(A)`, `ker θ = ⁅G,A⁆` |
+| 4D.7 | ⬜ | `p`-可解 + 巡回 Sylow `p` ⟹ `K ⊆ O_{p'}(G)` |
+
+### 4D.1 の設計 (実装済)
+
+周囲群 `Γ` の部分群として述べる。鍵は `mem_of_pow_card_eq_one_of_mem_centralizer`
+(`C_Γ(N)` の元で `|A|` 乗が 1 のものは `A` に入る) — `x = a·g` 分解 + `C_Γ(N) ⊓ G ≤ N` +
+互いに素性。これで `G ≤ N_Γ(A)` が出て `⁅G,A⁆ ≤ G ⊓ A = 1`。(b) は `A₀ := A ⊓ C_Γ(N)` に (a)。
+
+### 4D.3 の設計 (残り (c)–(g))
+
+`IsIrreducibleCoprimeAction φ` (coprime + (A or G 可解) + 真の `A`-不変部分群に自明作用 +
+`G` に非自明作用) の下で、既に得ているもの:
+`actionCommutator_eq_top` (`⁅G,A⁆ = G`) / `le_fixedPoints_of_ne_top` + `fixedPoints_ne_top`
+(**`C_G(A)` が唯一の極大 `A`-不変部分群**) / (a) `p`-群 / (b) `G' ≤ Z(G)`。
+
+- **(c)** `G' < H < G` なる `A`-不変 `H` は無い。Thm 4.34 (Fitting,
+  `fixedPoints_inf_actionCommutator_eq_bot_of_abelian`) を `G/G'` (可換) への作用に適用:
+  `⁅G/G', A⁆ = ⁅G,A⁆G'/G' = G/G'` なので `C_{G/G'}(A) = 1`。`H` が真の `A`-不変なら `A` は
+  `H` 上で自明 ⟹ `H/G' ≤ C_{G/G'}(A) = 1` ⟹ `H = G'`。
+  ⚠ 商への作用は `Ch03.IsAInvariant.quotientMulAutHom` (`ThreeSubgroups.lean` に
+  `fixedPointsOfMulAut_quotientMulAutHom_eq_map` あり)。
+- **(d)** `G/G'` は基本アーベル。`℧₁(G/G')` の引き戻しは `G'` を含む `A`-不変部分群ゆえ (c) で
+  `G'` か `G`。`G` なら `G/G' = (G/G')^p` で有限 `p`-群ゆえ `G/G' = 1` = `G = G'`, `G` が
+  非自明 `p`-群であることに矛盾。よって `(G/G')^p = 1`。
+- **(e)** `G'` は基本アーベル。(b) で `G' ≤ Z(G)` ゆえ可換。class ≤2 なので交換子は双線形で
+  `⁅x,y⁆^p = ⁅x^p, y⁆`、(d) より `x^p ∈ G' ≤ Z(G)` ゆえ `= 1`。`G'` は交換子で生成。
+- **(f)** `p > 2` ⟹ `x^p = 1`。class ≤2 + `G'` の exponent `p` (e) + `p` 奇 ⟹
+  `x ↦ x^p` は準同型 `φ_p : G →* G`。像は `G'` に入り (d)、`G'` 上では自明 (e) なので
+  `G/G' →* G'` を誘導し, これは `A`-同変。`A` は `G'` (target) に自明作用するので
+  誘導写像は `⁅G/G', A⁆ = G/G'` 上で自明 ⟹ 恒等的に 1 ⟹ `x^p = 1`。
+- **(g)** `p = 2` ⟹ `x⁴ = 1`。(d) で `x² ∈ G'`、(e) で `G'` の exponent は 2 ⟹ `x⁴ = 1`。
 
 #### 🎉 4A.11 完了 (2026-07-25) — `ProblemsWreath.lean` に追加
 
