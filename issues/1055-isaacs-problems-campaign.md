@@ -775,7 +775,8 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **3A.7 ✅** ⟹ **§3A は 3A.6 のみ残り** (deferred-hard)。
 さらに **3B.1 ✅ / 3B.2 ✅ / 3B.3 ✅** (新 leaf `Ch03_SplitExtensions/Problems3B.lean`)。
 さらに **3B.4 ✅ / 3B.5 ✅**。
-**次 frontier = 3B.12 (⚠ 書籍のまま形式化できない — 下記参照) → 3B.13 以降**。3A.6 は §3B を進めた後に再訪する。
+**次 frontier = 3B.14 → 3B.15 (§3B の残り 2 問)**。3A.6 は §3B を進めた後に再訪する。
+⚠ `Problems3B.lean` は 1006 行 — 3B.14/3B.15 を入れる前後で 3B.8 クラスタ等を別 leaf へ分割する。
 
 ### §3B の記録 (2026-07-25)
 
@@ -796,6 +797,8 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 | 3B.9 | ✅ | `exists_subgroup_card_eq_of_isSupersolvable` |
 | 3B.10 | ✅ | `sylow_normal_of_isSupersolvable` (3B.7(b) + 3B.8 の核の系) |
 | 3B.11 | ✅ | `prime_dvd_index_frattini_of_dvd_card_frattini` |
+| 3B.12 | ⚠ 訂正版 | `index_sup_eq_relIndex_of_isMinimalNormal_of_not_le` (書籍の主張は偽 — 下記) |
+| 3B.13 | ✅ | `exists_greatest_isSolvable_normal` (+ `isSolvable_sup_of_normal`) |
 
 **設計メモ**:
 
@@ -837,6 +840,22 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
   `G ⧸ P` への帰納法で従う。**正規 `q`-補群は「`|H|` が `q` で割れない正規部分群で `[G:H]` が
   `q`-冪」**という指数形で述べた (存在量化の中で `G ⧸ H` を書くと `H.Normal` instance が
   statement 内で取れないため; 書籍の定義「指数が Sylow `q`-部分群の位数に等しい部分群」と同値)。
+
+### ⚠ 3B.12 は書籍の主張のままでは**偽** (2026-07-25 に反例を確認)
+
+書籍 (p. 85): 「`G` 可解, `Φ(G) = 1`, `M` 極大, `H ⊆ M` ⟹ `G` は指数 `|M : H|` の部分群を持つ」。
+**反例 = `G = A₄`**:
+
+- `A₄` は可解、`Φ(A₄) = 1` (極大部分群は `V₄` と 4 個の `C₃`、共通部分は 1)
+- `M = V₄` は極大 (指数 3; 位数 6 の部分群が無いので極大)
+- `H = ⟨(12)(34)⟩ ≤ M` で `|M : H| = 2`
+- しかし `A₄` は指数 2 (= 位数 6) の部分群を持たない (古典的事実)
+
+原文は PDF ページ画像 (書籍 p.85 = PDF p.98) で確認済 — OCR の読み違いではなく確かに `H ⊆ M`。
+書籍の議論が通るのは「**`M` に含まれない極小正規部分群 `N` がある**」場合で、そのとき
+`G = N ⋊ M` から `N ⊔ H` がちょうど指数 `|M : H|` を与える。`A₄` の `M = V₄` は唯一の極小正規
+部分群 `V₄` 自身を含むので、この条件が破れている。⟹ 訂正版
+`index_sup_eq_relIndex_of_isMinimalNormal_of_not_le` を形式化し、docstring に反例を明記した。
 
 - **3B.6(c)**: `H := N⟨h⟩` の中で `⟨h⟩` は `N` の補群 (`isComplement'_subgroupOf_of_coprime`
   を新規に証明)。`h₂ := x h x⁻¹` の生成する `⟨h₂⟩` は位数 `o(h)` で `|N|` と互いに素なので

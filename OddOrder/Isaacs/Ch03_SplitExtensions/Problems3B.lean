@@ -886,6 +886,121 @@ theorem prime_dvd_index_frattini_of_dvd_card_frattini {G : Type u} [Group G] [Fi
     (H := (Q : Subgroup ↥(frattini G))) Subtype.coe_injective] at hRbot
   exact sylow_ne_bot hdvd Q hRbot
 
+/-! ### Problem 3B.12 — 極大部分群の中の部分群と同じ指数をもつ部分群
+
+⚠ **書籍の主張はそのままでは偽** (下の docstring の反例を参照)。成り立つのは「`M` に含まれない
+極小正規部分群 `N` がある」場合で, そのとき `N ⊔ H` がちょうど指数 `|M : H|` を与える。 -/
+
+/-- **Isaacs Problem 3B.12** (書籍 p. 85) の**訂正版**: `G` 可解, `M` 極大, `N` を `M` に
+含まれない極小正規部分群, `H ≤ M` とすると, `N ⊔ H` の指数はちょうど `|M : H|`.
+
+⚠ **書籍の主張 (「`Φ(G) = 1` で `M` 極大, `H ≤ M` なら `G` は指数 `|M : H|` の部分群を持つ」)
+は偽**. 反例: `G = A₄` は可解で `Φ(A₄) = 1` (極大部分群は `V₄` と 4 個の `C₃` で共通部分は 1),
+`M = V₄` は極大, `H = ⟨(12)(34)⟩ ≤ M` で `|M : H| = 2` だが `A₄` は指数 2 (位数 6) の部分群を
+持たない. 書籍の議論が通るのは「`M` が極小正規部分群 `N` を含まない」場合だけで, `A₄` の
+`M = V₄` は唯一の極小正規部分群 `V₄` 自身を含んでしまう.
+
+証明: 極大性から `N ⊔ M = ⊤`. `N` は可解群の極小正規部分群ゆえ abelian で, `N ⊓ M` は `N` にも
+`M` にも正規化されるから `G = NM` で正規, 極小性と `N ≰ M` より `N ⊓ M = ⊥`. よって
+`|G| = |N||M|`, `|N ⊔ H| = |N||H|` となり `[G : N ⊔ H] = |M|/|H| = [M : H]`. -/
+theorem index_sup_eq_relIndex_of_isMinimalNormal_of_not_le {G : Type u} [Group G] [Finite G]
+    [IsSolvable G] {M N H : Subgroup G} (hM : IsCoatom M) (hN : Ch02.IsMinimalNormal N)
+    (hNM : ¬ N ≤ M) (hHM : H ≤ M) : (N ⊔ H).index = H.relIndex M := by
+  haveI hNnormal : N.Normal := hN.1
+  -- `N ⊔ M = ⊤` かつ `N ⊓ M = ⊥`.
+  have hsup : N ⊔ M = ⊤ := by
+    rw [sup_comm]
+    refine hM.2 _ (lt_of_le_of_ne le_sup_left fun h => hNM ?_)
+    exact h ▸ le_sup_right
+  have habel : ∀ x ∈ N, ∀ y ∈ N, x * y = y * x := solvable_minimal_normal_isAbelian hN
+  have hinf_normal : (N ⊓ M).Normal := by
+    constructor
+    intro x hx g
+    have hg : g ∈ N ⊔ M := by rw [hsup]; trivial
+    rw [Subgroup.mem_sup_of_normal_left] at hg
+    obtain ⟨u, huN, m, hmM, rfl⟩ := hg
+    have hy : m * x * m⁻¹ ∈ N ⊓ M :=
+      ⟨hNnormal.conj_mem x hx.1 m, M.mul_mem (M.mul_mem hmM hx.2) (M.inv_mem hmM)⟩
+    have hcomm : u * (m * x * m⁻¹) = (m * x * m⁻¹) * u := habel u huN _ hy.1
+    have hrw : u * m * x * (u * m)⁻¹ = m * x * m⁻¹ := by
+      calc u * m * x * (u * m)⁻¹ = u * (m * x * m⁻¹) * u⁻¹ := by group
+        _ = (m * x * m⁻¹) * u * u⁻¹ := by rw [hcomm]
+        _ = m * x * m⁻¹ := by group
+    rw [hrw]
+    exact hy
+  have hNinfM : N ⊓ M = ⊥ := by
+    rcases hN.2.2 (N ⊓ M) hinf_normal inf_le_left with h | h
+    · exact h
+    · exact absurd (h ▸ (inf_le_right : N ⊓ M ≤ M)) hNM
+  -- `|G| = |M| · |N|`.
+  have hMindex : M.index = Nat.card ↥N := by
+    have h := Ch02.index_mul_card_inf_eq_card_of_sup_eq_top (N := N) (A := M) hsup
+    rwa [hNinfM, Subgroup.card_bot, mul_one] at h
+  have hGcard : Nat.card ↥M * Nat.card ↥N = Nat.card G := by
+    rw [← hMindex]; exact Subgroup.card_mul_index M
+  -- `|N ⊔ H| = |N| · |H|`.
+  have hNH : N ⊓ H = ⊥ := by
+    have h : N ⊓ H ≤ N ⊓ M := inf_le_inf_left N hHM
+    rw [hNinfM] at h
+    exact le_bot_iff.mp h
+  have hNHcard : Nat.card ↥(N ⊔ H) = Nat.card ↥N * Nat.card ↥H := by
+    have h1 := Ch01.card_mul_card_inf N H
+    rw [hNH, Subgroup.card_bot, mul_one] at h1
+    rw [← h1, ← Subgroup.normal_mul, SetLike.coe_sort_coe]
+  -- `[M : H] = |M| / |H|`.
+  have hrel : Nat.card ↥H * H.relIndex M = Nat.card ↥M := by
+    have h1 : Nat.card ↥(H.subgroupOf M) * (H.subgroupOf M).index = Nat.card ↥M :=
+      Subgroup.card_mul_index _
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHM).toEquiv] at h1
+  -- 3 つを組み合わせて指数を計算する.
+  have hidx : (N ⊔ H).index * Nat.card ↥(N ⊔ H) = Nat.card G := by
+    rw [mul_comm]; exact Subgroup.card_mul_index _
+  rw [hNHcard] at hidx
+  have hkey : (N ⊔ H).index * (Nat.card ↥N * Nat.card ↥H)
+      = H.relIndex M * (Nat.card ↥N * Nat.card ↥H) := by
+    rw [hidx, ← hGcard, ← hrel]
+    ring
+  refine Nat.eq_of_mul_eq_mul_right ?_ hkey
+  exact Nat.mul_pos Nat.card_pos Nat.card_pos
+
+/-! ### Problem 3B.13 — 可解根基 (最大の可解正規部分群) -/
+
+/-- 正規かつ可解な 2 つの部分群の結びも可解 (第二同型定理 + 拡大の可解性). -/
+theorem isSolvable_sup_of_normal {G : Type*} [Group G] [Finite G] (R N : Subgroup G) [R.Normal]
+    [N.Normal] [IsSolvable ↥R] [IsSolvable ↥N] : IsSolvable ↥(R ⊔ N) := by
+  haveI : IsSolvable (↥R ⧸ N.subgroupOf R) := inferInstance
+  haveI : IsSolvable (↥(R ⊔ N) ⧸ N.subgroupOf (R ⊔ N)) :=
+    solvable_of_solvable_injective
+      (f := (QuotientGroup.quotientInfEquivProdNormalQuotient R N).symm.toMonoidHom)
+      (QuotientGroup.quotientInfEquivProdNormalQuotient R N).symm.injective
+  exact solvable_of_ker_le_range (N.subgroupOf (R ⊔ N)).subtype
+    (QuotientGroup.mk' (N.subgroupOf (R ⊔ N)))
+    (by rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
+
+/-- **Isaacs Problem 3B.13** (書籍 p. 85): 有限群は**可解な正規部分群のうち最大のもの**
+(可解根基) をただ一つ持つ.
+
+位数最大の可解正規部分群 `R` を取る. 任意の可解正規部分群 `N` に対し `R ⊔ N` も可解正規
+(`isSolvable_sup_of_normal`) なので位数の最大性から `R ⊔ N = R`, すなわち `N ≤ R`. -/
+theorem exists_greatest_isSolvable_normal {G : Type u} [Group G] [Finite G] :
+    ∃ R : Subgroup G, R.Normal ∧ IsSolvable ↥R ∧
+      ∀ N : Subgroup G, N.Normal → IsSolvable ↥N → N ≤ R := by
+  classical
+  obtain ⟨R, hRmem, hRmax⟩ :=
+    Set.exists_max_image {K : Subgroup G | K.Normal ∧ IsSolvable ↥K}
+      (fun K : Subgroup G => Nat.card ↥K) (Set.toFinite _)
+      ⟨⊥, inferInstance, inferInstance⟩
+  obtain ⟨hRnorm, hRsolv⟩ := hRmem
+  refine ⟨R, hRnorm, hRsolv, fun N hN hNsolv => ?_⟩
+  haveI := hRnorm
+  haveI := hN
+  haveI := hRsolv
+  haveI := hNsolv
+  have hsolv : IsSolvable ↥(R ⊔ N) := isSolvable_sup_of_normal R N
+  have hle : Nat.card ↥(R ⊔ N) ≤ Nat.card ↥R := hRmax _ ⟨inferInstance, hsolv⟩
+  have heq : R = R ⊔ N := Subgroup.eq_of_le_of_card_ge le_sup_left hle
+  exact heq ▸ le_sup_right
+
 end
 
 end OddOrder.Isaacs.Ch03
