@@ -231,6 +231,61 @@ theorem exists_base_centralizer_eq [Nontrivial D] (C : Subgroup Q) :
     simp only [smul_eq_mul]
     exact if_congr (C.mul_mem_cancel_left (C.inv_mem hg)) rfl rfl
 
+/-! ### Problem 3A.10 — 与えられた `H`, `p` に対する `A = C_G(A)` つき分裂拡大 -/
+
+/-- `D` が可換なら、**任意の** `x` による base 元の共役は座標の置換のみ:
+`x * inl b * x⁻¹ = inl (b ∘ (x.right⁻¹ • ·))` (`x.left` の寄与は可換性で相殺する)。 -/
+theorem conj_inl_of_comm (hD : ∀ a b : D, a * b = b * a) (x : D ≀[Ω] Q) (b : Ω → D) :
+    x * inl b * x⁻¹ = inl fun ω => b (x.right⁻¹ • ω) := by
+  refine WreathProduct.ext ?_ ?_
+  · funext ω
+    simp only [mul_left, mul_right, inv_left, left_inl, right_inl, mul_one,
+      Pi.mul_apply, Pi.inv_apply, smul_smul, mul_inv_cancel, one_smul]
+    rw [hD (x.left ω) (b (x.right⁻¹ • ω)), mul_assoc, mul_inv_cancel, mul_one]
+  · simp only [mul_right, right_inl, inv_right, mul_one, mul_inv_cancel]
+
+/-- `x.right = 1` なら `x` は base group の元。 -/
+theorem eq_inl_of_right_eq_one {x : D ≀[Ω] Q} (h : x.right = 1) : x = inl x.left :=
+  WreathProduct.ext rfl (by rw [h, right_inl])
+
+/-- **正則 wreath product では base group は自己中心化的**: `D` 可換かつ非自明なら、
+`W = D ≀[Q] Q` の base group `B = range inl` は `C_W(B) = B` をみたす。
+
+`⊇` は `B` が可換だから。`⊆` は `x` が全ての `inl b` と可換 ⟹ (共役公式より)
+`b (x.right⁻¹ ω) = b ω` (∀ b, ω)、`b` を `{1}` の指示関数、`ω = x.right` に取ると
+`x.right = 1`、すなわち `x ∈ B`。 -/
+theorem centralizer_range_inl_eq [Nontrivial D] (hD : ∀ a b : D, a * b = b * a) :
+    Subgroup.centralizer (((inl : (Q → D) →* D ≀[Q] Q).range : Subgroup (D ≀[Q] Q)) :
+        Set (D ≀[Q] Q))
+      = (inl : (Q → D) →* D ≀[Q] Q).range := by
+  classical
+  obtain ⟨d, hd⟩ := exists_ne (1 : D)
+  refine le_antisymm (fun x hx => ?_) (fun x hx => ?_)
+  · -- `x` が base を中心化 ⟹ `x.right = 1`
+    rw [Subgroup.mem_centralizer_iff] at hx
+    have hconj : ∀ b : Q → D, x * inl b * x⁻¹ = inl b := by
+      intro b
+      have h := hx (inl b) ⟨b, rfl⟩
+      calc x * inl b * x⁻¹ = (inl b * x) * x⁻¹ := by rw [h]
+        _ = inl b := by group
+    have key := hconj fun ω => if ω = 1 then d else 1
+    rw [conj_inl_of_comm hD x] at key
+    have hf := congrFun (inl_injective key) x.right
+    simp only [smul_eq_mul, inv_mul_cancel] at hf
+    have hright : x.right = 1 := by
+      by_contra hne
+      rw [if_neg hne] at hf
+      exact hd hf
+    exact ⟨x.left, (eq_inl_of_right_eq_one hright).symm⟩
+  · -- base group は可換
+    obtain ⟨b, rfl⟩ := hx
+    rw [Subgroup.mem_centralizer_iff]
+    rintro y ⟨c, rfl⟩
+    rw [← map_mul, ← map_mul]
+    congr 1
+    funext ω
+    exact hD _ _
+
 end WreathProduct
 
 end OddOrder.Isaacs.Ch03
