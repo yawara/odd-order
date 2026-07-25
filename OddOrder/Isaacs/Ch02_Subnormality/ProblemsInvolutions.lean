@@ -29,6 +29,9 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) の章末演習 §2B のうち 
   (`conjClass_r_natCast_half_eq` / `ncard_conjClass_sr` / `not_isConj_sr_zero_sr_one`)。
   鏡映の共役類は添字の「偶奇」で決まる (`parityHom : ZMod (m+m) →+* ZMod 2`,
   `isConj_sr_sr_iff_of_even`)。
+- **2B.3** (一般の有限群): 共役でない 2 つの involution `s, t` に対し、両方と可換で
+  どちらとも異なる involution が存在する (`exists_involution_commuting_of_not_isConj`)。
+  二面体群の構造定理は使わず、`s`, `t` が `st` を反転することだけから示す。
 -/
 
 namespace OddOrder.Isaacs.Ch02
@@ -390,5 +393,101 @@ theorem not_isConj_sr_zero_sr_one {m : ℕ} [NeZero m] :
 end
 
 end DihedralGroup
+
+section /- Problem 2B.3: 非共役な involution から可換な第 3 の involution (p. 57) -/
+
+variable {G : Type*} [Group G]
+
+/-- involution `s` は `s * t` を反転する。 -/
+private theorem conj_mul_eq_inv_left {s t : G} (hs : s * s = 1) (ht : t * t = 1) :
+    s * (s * t) * s⁻¹ = (s * t)⁻¹ := by
+  rw [mul_inv_rev, inv_eq_of_mul_eq_one_left hs, inv_eq_of_mul_eq_one_left ht]
+  calc s * (s * t) * s = s * s * (t * s) := by group
+    _ = t * s := by rw [hs, one_mul]
+
+/-- involution `t` も `s * t` を反転する。 -/
+private theorem conj_mul_eq_inv_right {s t : G} (hs : s * s = 1) (ht : t * t = 1) :
+    t * (s * t) * t⁻¹ = (s * t)⁻¹ := by
+  rw [mul_inv_rev, inv_eq_of_mul_eq_one_left hs, inv_eq_of_mul_eq_one_left ht]
+  calc t * (s * t) * t = (t * s) * (t * t) := by group
+    _ = t * s := by rw [ht, mul_one]
+
+/-- `u` を反転する元は `u` の冪も反転する (共役写像が群準同型であることの `map_pow`)。 -/
+private theorem conj_pow_eq_inv {x u : G} (h : x * u * x⁻¹ = u⁻¹) (j : ℕ) :
+    x * u ^ j * x⁻¹ = (u ^ j)⁻¹ := by
+  have hmap : (MulAut.conj x) (u ^ j) = ((MulAut.conj x) u) ^ j := map_pow _ _ _
+  simpa [MulAut.conj_apply, h, inv_pow] using hmap
+
+/-- **Isaacs Problem 2B.3**. `s`, `t` を有限群 `G` の involution とし、`G` で共役でないとする。
+このとき `s`, `t` と異なる involution `z ∈ G` で `s`, `t` の両方と可換なものが存在する。
+
+証明: `u := s * t` とおくと `s`, `t` はいずれも `u` を反転する (`s u s⁻¹ = u⁻¹`)。
+`n := |u|` が**奇数**なら `K := (n+1)/2` として `u^K` による共役が
+`s ↦ u^{K+K} s = u^{n+1} s = u s = s t s⁻¹` を与え、`s ~ sts⁻¹ ~ t` で共役になってしまう —
+ゆえに `n` は偶数。`n = 2q` として `z := u^q` が求めるもの: `z² = u^n = 1`、`z ≠ 1`
+(`0 < q < n`)、`s z s⁻¹ = z⁻¹ = z` で可換。`z = s` なら `z = u^q` は `u` と可換なので
+`u = s u s⁻¹ = u⁻¹`, ゆえに `n ∣ 2`, `q = 1`, `z = u = st = s` から `t = 1` で矛盾
+(`z = t` も同様に `s = 1`)。
+
+⚠ 有限性は本質的: 無限二面体群 `D∞` は反例 (中心が自明で、`s` と可換な involution は `s` のみ)。 -/
+theorem exists_involution_commuting_of_not_isConj [Finite G] {s t : G}
+    (hs : orderOf s = 2) (ht : orderOf t = 2) (hnc : ¬ IsConj s t) :
+    ∃ z : G, orderOf z = 2 ∧ z ≠ s ∧ z ≠ t ∧ Commute z s ∧ Commute z t := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hs2 : s * s = 1 := by rw [← sq]; exact hs ▸ pow_orderOf_eq_one s
+  have ht2 : t * t = 1 := by rw [← sq]; exact ht ▸ pow_orderOf_eq_one t
+  have hs1 : s ≠ 1 := fun h => by rw [h, orderOf_one] at hs; omega
+  have ht1 : t ≠ 1 := fun h => by rw [h, orderOf_one] at ht; omega
+  set u : G := s * t with hudef
+  have hsu : s * u * s⁻¹ = u⁻¹ := conj_mul_eq_inv_left hs2 ht2
+  have htu : t * u * t⁻¹ = u⁻¹ := conj_mul_eq_inv_right hs2 ht2
+  have hnpos : 0 < orderOf u := orderOf_pos u
+  -- `|u|` は偶数 (奇数だと `s ~ t` になる)
+  have heven : 2 ∣ orderOf u := by
+    by_contra hodd
+    apply hnc
+    have hmod : orderOf u % 2 = 1 := Nat.two_dvd_ne_zero.mp hodd
+    set K := (orderOf u + 1) / 2 with hKdef
+    have hKK : K + K = orderOf u + 1 := by omega
+    have hconj : s * u ^ K * s⁻¹ = (u ^ K)⁻¹ := conj_pow_eq_inv hsu K
+    have hconj' : s * (u ^ K)⁻¹ * s⁻¹ = u ^ K := by
+      rw [show s * (u ^ K)⁻¹ * s⁻¹ = (s * u ^ K * s⁻¹)⁻¹ from by group, hconj, inv_inv]
+    have hmove : s * (u ^ K)⁻¹ = u ^ K * s := mul_inv_eq_iff_eq_mul.mp hconj'
+    have hkey : u ^ K * s * (u ^ K)⁻¹ = u * s := by
+      rw [mul_assoc, hmove, ← mul_assoc, ← pow_add, hKK, pow_succ, pow_orderOf_eq_one, one_mul]
+    refine (isConj_iff.mpr ⟨u ^ K, hkey⟩).trans (isConj_iff.mpr ⟨s, ?_⟩).symm
+    rw [inv_eq_of_mul_eq_one_left hs2, hudef]
+  obtain ⟨q, hq⟩ := heven
+  have hqpos : 0 < q := by omega
+  have hzsq : u ^ q * u ^ q = 1 := by
+    rw [← pow_add, show q + q = orderOf u from by omega, pow_orderOf_eq_one]
+  have hzne : u ^ q ≠ 1 := fun h => by
+    have := Nat.le_of_dvd hqpos (orderOf_dvd_of_pow_eq_one h)
+    omega
+  have hzinv : (u ^ q)⁻¹ = u ^ q := inv_eq_of_mul_eq_one_left hzsq
+  -- `z = u^q` が `s`, `t` と可換
+  have hcomm : ∀ x : G, x * u * x⁻¹ = u⁻¹ → Commute (u ^ q) x := fun x hx => by
+    have h := conj_pow_eq_inv hx q
+    rw [hzinv] at h
+    exact (mul_inv_eq_iff_eq_mul.mp h).symm
+  -- `z = s` や `z = t` は `u² = 1` を強制し `s = 1` / `t = 1` に至る
+  have hforce : ∀ x : G, x * u * x⁻¹ = u⁻¹ → u ^ q = x → q = 1 := fun x hx hxq => by
+    have hxu : x * u = u * x := by rw [← hxq]; exact ((Commute.refl u).pow_left q).eq
+    have hinv : u = u⁻¹ := by rw [← hx, hxu, mul_assoc, mul_inv_cancel, mul_one]
+    have hdvd : orderOf u ∣ 2 := orderOf_dvd_of_pow_eq_one (by
+      rw [sq]; exact mul_eq_one_iff_eq_inv.mpr hinv)
+    have := Nat.le_of_dvd (by norm_num) hdvd
+    omega
+  refine ⟨u ^ q, orderOf_eq_prime (by rw [sq]; exact hzsq) hzne, ?_, ?_, hcomm s hsu, hcomm t htu⟩
+  · intro h
+    have hq1 : q = 1 := hforce s hsu h
+    rw [hq1, pow_one, hudef] at h
+    exact ht1 (by simpa using h)
+  · intro h
+    have hq1 : q = 1 := hforce t htu h
+    rw [hq1, pow_one, hudef] at h
+    exact hs1 (by simpa using h)
+
+end
 
 end OddOrder.Isaacs.Ch02
