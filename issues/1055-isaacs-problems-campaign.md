@@ -1284,7 +1284,21 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 **別定数**として扱われ、instance 検索 (Normal) や型が合わない — 新規コードは必ず
 `Subgroup.` 付きで書く。
 
-- ⬜ **4B.2** (`G` 冪零 ⟹ 特性部分群 `K` で `C_G(K) ⊆ K` かつ class(K) ≤ 2; hint = 4B.1)
+- ✅ **4B.2** `exists_characteristic_selfCentralizing_class_le_two`
+  (`G` 冪零 ⟹ 特性部分群 `K` で `C_G(K) ⊆ K` かつ class ≤ 2)。
+  `K` を「特性かつ class ≤ 2」の極大元に取り、`C := C_G(K)` として:
+  * **吸収補題**: `A ≤ C` が特性 class ≤2 なら `A ⊔ K` も特性 class ≤2 ⟹ 極大性で `A ≤ K`。
+    join の class ≤ 2 は新補題 `lowerCentralSeries_sup_eq_bot`
+    (`⁅A,K⁆ = 1` + 両方 class ≤2 ⟹ `A ⊔ K` も class ≤2; `commutatorMemLeft` の good-elements
+    二段を 2 回) と `characteristic_sup` (`characteristic_iff_map_eq` + `map_sup`)。
+  * `C` 自身が class ≤2 なら吸収で終わり。そうでなければ **4B.1 と同じ `A := γ_{c-1}(C)`**
+    (`c = class(↥C) ≥ 3`) が特性可換 ⟹ 吸収で `A ≤ K` ⟹ `C = C_G(K) ≤ C_G(A)` から
+    `⁅A,C⁆ = γ_c(C) = 1` で `c` の最小性に矛盾。
+  * 相対下降中心列の交換子評価 `commutator_lowerCentralSeries_le'` (Thm 4.11 の相対版) は
+    `↥S` の ⊤ 版を `S.subtype` で押し出して得た (`top_subtype_lowerCentralSeries` +
+    `map_commutator`)。
+  ⚠ 教訓: `x ∈ commutatorMemLeft N y` は `⁅x,y⁆ ∈ N` と defeq だが**構文的に違う**ので
+  `commutatorElement_mem_comm` に渡すには `show ⁅x,y⁆ ∈ N from …` の型註釈が要る。
 - ⬜ **4B.5** (`G` 超可解 ⟹ `M(G)` は class ≤ 3 で冪零)。⚠ `M(G)` = 共役類サイズが
   2 番目に小さい値 `n₂` 以下の元で生成される部分群 (書籍 p.129, Mann の Thm 4.14/4.15)。
   repo に `M(G)` の定義があるか要確認 (無ければ先に定義 + Thm 4.15 が要る)。
