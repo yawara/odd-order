@@ -780,3 +780,15 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   NR → NR/R₁-mod... 実装時は hom NR → C_p を V の R/T-成分で構成
   (K̄ は R/T に自明作用 = C_G(P)、[R₁] → R/T-projection; well-defined-性は
   ⁅NR,R₁⁆-計算) — 詳細は着手時に再設計。
+- δ4 進捗 (2026-07-25 続き、全 push 済): δ4-i (`280e3b5e0`) / δ4a (`d97d53e10`) /
+  δ4-ii-a (`4e078c8ff`) / δ4-ii-b,c (T₁+card, `80f540c37`, 新 leaf
+  **StepTwelveEndgame.lean**) / δ4-ii-d+v (strongly real + g•R ≠ T₁,
+  `ebe78e35d`) / δ4-iii core+consumer (`807e41451`, `021d8b171`)。
+  generic 側: zpowers_normal_of_orderOf_eq 抽出 + surjective_zpow_smul /
+  mem_zpowers_of_centralizes public 化。
+  **残り**: δ4-iv (第 3 line 固定 k ∈ NR は R₁ — 座標系は R₁ = R·T₁,
+  R ⊓ T₁ = T (card: p²·p²/p = p³); X-line の生成元 x = a·b (a ∈ R, b ∈ T₁)
+  分解で k-共役の T-剰余成分比較 → u = 1 → δ4-iii へ) → δ4-vi (assembly:
+  stab_N(R-line) = NR、orbit ∌ T₁-line (δ4-v)、非 {R,T₁}-line の NR-orbit
+  = p−1 → [N:NR] ∈ {1} → N_G(R₁) = N_G(R)) → ε (Cor 10.2 transfer +
+  T₁C_Q(P)C_W(P) index-p 正規 → ¬(B2))。
