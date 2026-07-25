@@ -709,6 +709,134 @@ theorem conj_distinguishedInvolution_eq_inv_of_mem_nonsplitTorus
   exact eq_inv_of_mul_eq_one_right hy1'
 
 include model in
+/-- **`RΣ` has exponent `3`** ((15), p. 113: `P` fails to centralize `L` "due to the
+structure of `C_G(P)` (`TΣ` has exponent `3`)").
+
+Write `x = rσ` with `r ∈ R` and `σ ∈ Σ` (the product decomposition of (11)).  The
+commutator `c = ⁅σ, r⁆` lies in `⁅RΣ, RΣ⁆ = Z₁ ≤ Z(RΣ) ⊓ R` by (14), so it is killed
+by `3` and commutes with `r`; conjugation by `σ` therefore sends `r` to `cr` and `cr`
+to `c²r`, whence `(rσ)³ = r³c³ = 1`. -/
+theorem pow_three_eq_one_of_mem_sup_invImageF_centralizer_W
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    {x : G} (hx : x ∈ (fc.invImageF model
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)) :
+    x ^ 3 = 1 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨hpSig, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, -, -, hSig3, -⟩ :=
+    fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  have hZ₁R : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ≤ fc.invImageF model :=
+    (fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2 hm).trans
+      (fc.sInvertedT_spec model ind hB2 hm).1
+  have habR := fc.invImageF_mul_comm model ind hB2 hm
+  -- `Z₁` is central in `RΣ`
+  have hZcen : ∀ z ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t), ∀ y ∈ (fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G),
+      z * y = y * z := by
+    intro z hz y hy
+    have hmem : z ∈ (fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)
+          ⊓ Subgroup.centralizer (((fc.invImageF model
+            ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+              : Subgroup G) : Set G) := by
+      rw [fc.inf_centralizer_sup_eq_zpowers_sup_P model ind hB2]
+      exact Subgroup.mem_sup_left hz
+    exact (Subgroup.mem_centralizer_iff.mp hmem.2 y hy).symm
+  -- decompose `x = r·σ`
+  have hx' : x ∈ ((fc.invImageF model : Set G)
+      * ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G) : Subgroup G)
+        : Set G)) := by
+    rw [← fc.coe_sup_invImageF_centralizer_W model]
+    exact hx
+  obtain ⟨r, hr, w, hw, rfl⟩ := hx'
+  have hrRS : r ∈ (fc.invImageF model
+    ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G) :=
+    Subgroup.mem_sup_left hr
+  have hwRS : w ∈ (fc.invImageF model
+    ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G) :=
+    Subgroup.mem_sup_right hw
+  set c : G := w * r * w⁻¹ * r⁻¹ with hc_def
+  have hcmem : c ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) := by
+    rw [← fc.commutator_sup_eq_zpowers model ind hB2]
+    exact Subgroup.commutator_mem_commutator hwRS hrRS
+  have hc3 : c ^ 3 = 1 := by
+    have h := Subgroup.orderOf_dvd_natCard _ hcmem
+    rw [Nat.card_zpowers, hstord] at h
+    exact orderOf_dvd_iff_pow_eq_one.mp h
+  have hr3 : r ^ 3 = 1 := by
+    have h := fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm hr
+    rwa [hp3] at h
+  have hw3 : w ^ 3 = 1 := by
+    have h := Subgroup.orderOf_dvd_natCard _ hw
+    rw [hSig3] at h
+    exact orderOf_dvd_iff_pow_eq_one.mp h
+  have hcomm2 : c * r = r * c := habR c (hZ₁R hcmem) r hr
+  have hconj1 : w * r * w⁻¹ = c * r := by rw [hc_def]; group
+  have hwc : w * c * w⁻¹ = c := by
+    have h := hZcen c hcmem w hwRS
+    rw [← h]; group
+  have hconj2 : w * (c * r) * w⁻¹ = c * (c * r) := by
+    calc w * (c * r) * w⁻¹ = (w * c * w⁻¹) * (w * r * w⁻¹) := by group
+      _ = c * (c * r) := by rw [hwc, hconj1]
+  have hexpand : (r * w) ^ 3
+      = r * (w * r * w⁻¹) * (w * (w * r * w⁻¹) * w⁻¹) * w ^ 3 := by
+    rw [pow_three', pow_three']
+    group
+  rw [hexpand, hconj1, hconj2, hw3, mul_one]
+  calc r * (c * r) * (c * (c * r))
+      = r * (r * c) * (c * (r * c)) := by rw [hcomm2]
+    _ = r * (r * c) * ((c * r) * c) := by group
+    _ = r * (r * c) * ((r * c) * c) := by rw [hcomm2]
+    _ = (r * r) * (c * r) * (c * c) := by group
+    _ = (r * r) * (r * c) * (c * c) := by rw [hcomm2]
+    _ = r ^ 3 * c ^ 3 := by rw [pow_three', pow_three']; group
+    _ = 1 := by rw [hr3, hc3, one_mul]
+
+include model in
+/-- **`L ⊄ RΣ`** ((15), p. 113, and quoted again in (17)): `RΣ` has exponent `3` while
+`L` is cyclic of order `9`. -/
+theorem not_nonsplitTorus_le_sup_invImageF_centralizer_W
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    ¬ fc.nonsplitTorus ≤ (fc.invImageF model
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G) := by
+  intro hle
+  obtain ⟨hLcyc, hLcard⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
+  obtain ⟨g, hg⟩ := hLcyc.exists_generator
+  have hgord : orderOf ((g : G)) = 9 := by
+    have hgtop : Subgroup.zpowers g = ⊤ := eq_top_iff.mpr fun x _ => hg x
+    rw [Subgroup.orderOf_coe, ← Nat.card_zpowers, hgtop, Subgroup.card_top, hLcard]
+  have h3 := fc.pow_three_eq_one_of_mem_sup_invImageF_centralizer_W model ind hB2
+    (hle g.2)
+  have hdvd := orderOf_dvd_of_pow_eq_one h3
+  rw [hgord] at hdvd
+  norm_num at hdvd
+
+include model in
+/-- **`P` does not centralize `L`** ((15), p. 113): otherwise
+`L ≤ C_G(P) ⊓ C_G(st) = RΣ` by (14), contradicting `L ⊄ RΣ`. -/
+theorem not_nonsplitTorus_le_centralizer_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    ¬ fc.nonsplitTorus ≤ Subgroup.centralizer (fc.P : Set G) := by
+  intro hle
+  refine fc.not_nonsplitTorus_le_sup_invImageF_centralizer_W model ind hB2 ?_
+  rw [← fc.centralizer_P_inf_centralizer_mul_t_eq_sup model ind hB2]
+  intro x hx
+  refine ⟨hle hx, ?_⟩
+  rw [fc.nonsplitTorus_def] at hx
+  exact hx.1
+
+include model in
 /-- **`L ≤ R₁`** ((15), p. 113): every element of `L` is a `3`-element of `N_G(RΣ)`,
 and `R₁` is by definition generated by those. -/
 theorem nonsplitTorus_le_sylowThreeNormalizerRSigma
