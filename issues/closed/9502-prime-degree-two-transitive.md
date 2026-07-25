@@ -38,3 +38,12 @@ pair-transitive。
 
 **消費者**: Pf II step (12) 終盤 (issue 2053) — N_G(R)/R ↷ 𝒜 (m=1: degree p,
 位数 p(p−1)) の 2-推移性 = RankOneHypothesis.doubly_transitive field。
+
+## 完了 (2026-07-25)
+
+3 成果物すべて landed:
+- `isMultiplyPretransitive_of_card_eq_mul_pred` (2-推移性; fe7e06034)
+- `not_exists_elementaryAbelian_four` (2-rank one, ±1 論法; d6de49756)
+- `rankOneHypothesisOfCardEqMulPred` (RankOneHypothesis 全 field constructor,
+  Appendices/RankOneFromPrimeDegree.lean; aabed0e77)
+core は private exists_normal_regular に集約。すべて警告ゼロ・root 配線済。
