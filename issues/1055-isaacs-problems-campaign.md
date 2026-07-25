@@ -1447,8 +1447,32 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 `letI` で供給すると, その instance の `toGroup` が `Subgroup.toGroup` と構文的に一致せず
 `MonoidHom.id ↥H` の型が合わない (diamond)。**一般の `ϕ : ↥H →* A` 版で述べる**のが正解
 (Isaacs の `v : G → H/H'` はまさにこの形)。
-| 5A.2 | ⬜ | `v : G → G/G'` は自然な射影 (= `H = ⊤` の場合)。`transfer_eq_pow` は使えない (key 仮説が偽) ので `diff` の定義を展開する必要あり |
+| 5A.2 | ⬜ 設計確定 | `H = ⊤` で `transfer ϕ g = ϕ ⟨g, mem_top g⟩` (下記) |
 | 5A.3 | ⬜ | 推移律 (transversal の積 `ST`、pretransfer の合成)。mathlib は `diff` 経由の定義なので要検討 |
+
+### 5A.2 の設計 (2026-07-26 に確定、未実装)
+
+**statement**: `A` 可換, `ϕ : ↥(⊤ : Subgroup G) →* A` に対し
+`transfer ϕ g = ϕ ⟨g, Subgroup.mem_top g⟩`。Isaacs の `v : G → G/G'` は
+`A = G/G'`, `ϕ` = 自然な射影の場合で, これがまさに「transfer = 自然な射影」。
+
+**証明**:
+1. `[(⊤ : Subgroup G).FiniteIndex]` (`Subgroup.index_top = 1`)。
+2. `transfer_def ϕ T g : transfer ϕ g = diff ϕ T (g • T)` (`T` は任意の left transversal;
+   `default` でよい)。
+3. `diff ϕ S T = ∏ q : G ⧸ H, ϕ ⟨(α q)⁻¹ * β q, _⟩` (`α = S.2.leftQuotientEquiv`,
+   `β = T.2.leftQuotientEquiv`) を展開。`Subsingleton (G ⧸ ⊤)`
+   (`QuotientGroup.subsingleton_quotient_top`) なので **積は 1 項**
+   (`Fintype.prod_subsingleton`)。
+4. ⭐ **鍵の mathlib 補題** `Subgroup.smul_apply_eq_smul_apply_inv_smul (f) (S) (q) :
+   ((f • S).2.leftQuotientEquiv q : G) = f • (S.2.leftQuotientEquiv (f⁻¹ • q) : G)`。
+   subsingleton なので `g⁻¹ • q = q`, したがって `β q = g * (α q)`。
+5. よって唯一の項は `ϕ ⟨(α q)⁻¹ * g * (α q)⟩` = `g` の**共役**の `ϕ`-像。
+   `↥⊤` では `⟨x⁻¹ g x⟩ = ⟨x⟩⁻¹ * ⟨g⟩ * ⟨x⟩` で **`A` が可換**だから
+   `ϕ ⟨x⁻¹ g x⟩ = ϕ ⟨g⟩` ∎
+
+⚠ `transfer_eq_pow` は使えない (key 仮説「`g₀⁻¹ g^k g₀ = g^k`」は `H = ⊤` では偽)。
+`diff` は `let` を含む noncomputable def なので `simp only [MonoidHom.diff]` で展開する。
 | 5A.4 | ✅ | (a) `transfer_eq_pow_index_of_le_center` / (b) `inf_ker_transfer_eq_bot_of_le_center` + `sup_ker_transfer_eq_top_of_le_center` (+ `normal_of_le_center`) |
 | 5A.5–5A.8 | ⬜ | **Schur 乗数 `M(G)`** が要る (5A.5 巡回-by-巡回 / 5A.6 二面体群 / 5A.7 / 5A.8 直積)。repo の Schur 乗数まわりの資産を先に実測すること |
 
