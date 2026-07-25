@@ -358,6 +358,57 @@ theorem mem_of_conj_smul_eq_of_ne
   exact fc.mem_of_forall_conj_mul_inv_mem_sInvertedT model ind hB2 hm hGp hSigma
     hRle hR₁le hcard hk hall
 
+include model in
+/-- Lines of `R₁/T` are normal in `R₁`: `⁅R₁, X⁆ ≤ ⁅R₁, R₁⁆ = T ≤ X`. -/
+theorem conj_mem_of_le_of_mem
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) {X : Subgroup G}
+    (hTX : fc.sInvertedT model ≤ X) (hXle : X ≤ R₁) {r x : G}
+    (hr : r ∈ R₁) (hx : x ∈ X) :
+    r * x * r⁻¹ ∈ X := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  have hcommT := fc.commutator_eq_sInvertedT model ind hB2 hm hGp hSigma hRle
+    hR₁le hcard
+  have h1 : ⁅r, x⁆ ∈ fc.sInvertedT model := by
+    rw [← hcommT]
+    exact Subgroup.commutator_mem_commutator hr (hXle hx)
+  have h2 : r * x * r⁻¹ = ⁅r, x⁆ * x := by
+    rw [commutatorElement_def]
+    group
+  rw [h2]
+  exact mul_mem (hTX h1) hx
+
+omit model in
+/-- **`p ∤ [N_G(R₁) : R₁]`**: `R₁` carries the full `p`-part `p³` of `|G|`. -/
+theorem not_p_dvd_index_subgroupOf_normalizer_overgroup
+    (hfact : (Nat.card G).factorization fc.p = 3) {R₁ : Subgroup G}
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) {N : Subgroup G} (hle : R₁ ≤ N) :
+    ¬ fc.p ∣ (R₁.subgroupOf N).index := by
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  intro hdvd
+  have h1 := (R₁.subgroupOf N).card_mul_index
+  have h2 : Nat.card ↥(R₁.subgroupOf N) = fc.p ^ 3 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv, hcard]
+  rw [h2] at h1
+  obtain ⟨d, hd⟩ := hdvd
+  have h3 : fc.p ^ 4 ∣ Nat.card ↥N := by
+    refine ⟨d, ?_⟩
+    rw [← h1, hd]
+    ring
+  have h4 : fc.p ^ 4 ∣ Nat.card G :=
+    h3.trans (Subgroup.card_subgroup_dvd_card N)
+  have h5 := (Nat.Prime.pow_dvd_iff_le_factorization fc.p_prime
+    Nat.card_pos.ne').mp h4
+  rw [hfact] at h5
+  omega
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
