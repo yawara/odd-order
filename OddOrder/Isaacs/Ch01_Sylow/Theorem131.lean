@@ -483,6 +483,58 @@ theorem sylow_normal_of_card_eq_sq_mul_prime
       left
       exact sylow_normal_of_card_eq_sq_mul_prime_lt hqp_lt hcard
 
+/-- **Isaacs Thm 1.31, sharpened direct form** (issue 0106, moore57 実需).
+`|G| = p²·q` (`p ≠ q` 素数) で `q ∤ p² − 1` なら、**与えられた位数 `q` の部分群が
+そのまま正規** — 選言 (`∃ Sylow p 正規 ∨ ∃ Sylow q 正規`) を経由せず、手元の
+部分群 (例: `zpowers σ₀`) に正規性が直接着地する。
+
+仮定は `¬ q ∣ p² − 1` の 1 本でよい: `n_q ∈ {1, p, p²}` のうち `n_q = p` 枝は
+`q ∣ p − 1` を強いるが `p − 1 ∣ p² − 1` なのでこれも `q ∣ p² − 1` に含まれ、
+両枝が同時に消える (moore57 の要望形にあった `p < q` は不要 — `¬ q ∣ p² − 1` と
+`q ∣ p + 1 ⟹ q ∣ p² − 1` の対偶から `q > p + 1` が自動で従う)。 -/
+theorem normal_of_card_eq_prime_of_card_eq_sq_mul_prime
+    [Finite G] {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
+    (hpq : p ≠ q) (hndvd : ¬ q ∣ p ^ 2 - 1) (hcard : Nat.card G = p ^ 2 * q)
+    (K : Subgroup G) (hK : Nat.card K = q) : K.Normal := by
+  haveI : Fintype G := Fintype.ofFinite G
+  classical
+  -- n_q ∣ p² and n_q ≡ 1 (mod q) force n_q = 1 under `¬ q ∣ p² − 1`.
+  obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
+  have hidx : (Q : Subgroup G).index = p ^ 2 :=
+    index_sylow_q_of_card_eq_sq_mul_prime hpq hcard Q
+  have hdvd_psq : Nat.card (Sylow q G) ∣ p ^ 2 := by
+    rw [← hidx]; exact Sylow.card_dvd_index Q
+  have hmod : Nat.card (Sylow q G) ≡ 1 [MOD q] := card_sylow_modEq_one q G
+  obtain ⟨k, hk, hk_eq⟩ := (Nat.dvd_prime_pow hp.out).mp hdvd_psq
+  have hone : Nat.card (Sylow q G) = 1 := by
+    rcases Nat.eq_zero_or_pos k with rfl | hkpos
+    · simpa using hk_eq
+    · exfalso
+      rw [hk_eq] at hmod
+      have hpk_ge : 1 ≤ p ^ k := Nat.one_le_iff_ne_zero.mpr (pow_ne_zero _ hp.out.ne_zero)
+      have hq_dvd : q ∣ p ^ k - 1 := (Nat.modEq_iff_dvd' hpk_ge).mp hmod.symm
+      have hdvd2 : p ^ k - 1 ∣ p ^ 2 - 1 := by
+        have hp_ge1 : 1 ≤ p := hp.out.one_lt.le
+        interval_cases k
+        · -- k = 1: p − 1 ∣ p² − 1 = (p − 1)(p + 1)
+          have h_factor : p ^ 2 - 1 = (p - 1) * (p + 1) := by
+            have : (p - 1) * (p + 1) + 1 = p ^ 2 := by zify [hp_ge1]; ring
+            omega
+          rw [pow_one, h_factor]
+          exact Dvd.intro _ rfl
+        · exact dvd_rfl
+      exact hndvd (hq_dvd.trans hdvd2)
+  haveI : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hone).1
+  -- K is a q-group of full multiplicity, hence equals THE (unique, normal) Sylow q.
+  have hKp : IsPGroup q K := IsPGroup.of_card (n := 1) (by rw [hK, pow_one])
+  obtain ⟨Q', hKQ'⟩ := hKp.exists_le_sylow
+  have hcardQ' : Nat.card (Q' : Subgroup G) = q :=
+    card_sylow_q_of_card_eq_sq_mul_prime hpq hcard Q'
+  have hKeq : K = (Q' : Subgroup G) :=
+    Subgroup.eq_of_le_of_card_ge hKQ' (by rw [hK, hcardQ'])
+  rw [hKeq]
+  exact Sylow.normal_of_subsingleton Q'
+
 /-! ### Thm 1.32 — `|G| = p³q` helpers and main theorem. -/
 
 /-- Distinct Sylow `q` subgroups of prime order `q` intersect trivially. -/
