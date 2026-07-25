@@ -1439,7 +1439,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 問題 | 状態 | メモ |
 |---|---|---|
 | 5C.1 | ✅ | `not_dvd_card_commutator_of_inf_sylow_eq_bot` + `hasNormalPComplement_of_commutator_inf_sylow_eq_bot` (`Problems5C.lean`)。方針どおり **鍵の段を独立補題**にした (同一 statement の別証明を避ける) |
-| 5C.2 | 🔨 fusion 段 + transfer 段 landing 済 (残り = 組み立て) | PDF 確認済。`U ⊆ V ⊆ P ⊆ G`、`P` abelian Sylow-2、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
+| 5C.2 | ✅ 完了 (`card_eq_two_of_characteristic_relIndex_eq_two`) | PDF 確認済。`U ⊆ V ⊆ P ⊆ G`、`P` abelian Sylow-2、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
 | 5C.3 | 🔨 設計確定 (下記) | PDF 確認済: `G` 単純で abelian Sylow-2 `P` の位数が `2^5` ⇒ `P` は初等可換 |
 | 5C.4 | ⬜ | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
 | 5C.5 | ✅ | `exists_mem_normalizer_conj_eq_of_normal` + `eq_of_characteristic_of_conj` (`Problems5C.lean`) |
@@ -1511,7 +1511,17 @@ transfer `v : G →* P` (P abelian) を取ると、transfer 評価の各因子
 `ϕ := Abelianization.of` を取る (`P` 可換なので `commutator ↥P = ⊥` で `ϕ` は単射、
 `ϕ(x^{|G:P|}) ∈ ϕ(U)` から `x^{|G:P|} ∈ U` が戻せる)。
 
-**残り (組み立て)**: `|G:P|` 奇数 (`Sylow.not_dvd_index`) と `|V:U| = 2` から
+✅ **組み立て landing (2026-07-26) — 5C.2 完了**:
+`not_mem_of_commutator_eq_top` (完全群での矛盾) + `conj_mem_map_subtype_of_characteristic`
+(`Subgroup.normalizerMonoidHom` で「特性部分群は `N_G(P)`-共役不変」) +
+`inv_mul_mem_of_relIndex_eq_two` (`Subgroup.relIndex_eq_two_iff`) を経て主定理
+`card_eq_two_of_characteristic_relIndex_eq_two`。
+⭐ **書籍の `U ⊆ V` は不要**と判明したので落とした (`relIndex` で `|V:U| = 2` を課せば十分)。
+⭐ 罠: `set Pg := (P : Subgroup G)` は `U V : Subgroup ↥(P:Subgroup G)` の**型を書き換えて
+仮説を shadow する** (`U✝`) ので使わない。`IsPGroup` は `∀ g, ∃ k, g ^ p ^ k = 1` であって
+`orderOf g = p ^ k` ではない (後者は `IsPGroup.iff_orderOf`)。
+
+~~**残り (組み立て)**~~: `|G:P|` 奇数 (`Sylow.not_dvd_index`) と `|V:U| = 2` から
 `x ∈ V \ U` に対し `x^{|G:P|} ∉ U` ⇒ `transfer ϕ x ≠ 1`。一方 `G` 非可換単純なら
 `G = G'` かつ `A` 可換なので `transfer ϕ (G') = 1` で矛盾 ⇒ `G` 可換単純 = 素数位数、
 `2 ∣ |G|` で `|G| = 2`。

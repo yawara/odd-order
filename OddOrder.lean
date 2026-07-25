@@ -58,6 +58,7 @@ import OddOrder.GroupTheory.WeaklyClosed
 import OddOrder.GroupTheory.HallWielandt
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.NarrowPGroup
+import OddOrder.GroupTheory.AbelianPowerSubgroups
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.PrimeComplementResidual
