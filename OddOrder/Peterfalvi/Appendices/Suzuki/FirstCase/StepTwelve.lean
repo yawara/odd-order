@@ -180,6 +180,146 @@ theorem orbit_eq_setOf_prime_order
   refine Set.eq_of_subset_of_ncard_le hsub ?_ (Set.toFinite _)
   rw [hAcard, horbcard]
 
+include model in
+/-- **`R` is self-centralizing: `C_G(R) = R`** ((12) tail, faithfulness input).  A
+centralizing element lies in `C_G(P)` (as `P ≤ R`), its class in the affine quotient
+decomposes as `translation · q̄ · d̄`, and centralizing all translations forces
+`dAut d̄ x · u_q̄ = x` for every `x : F`; evaluating at `x = 1` kills the `Q̄`-component
+(`dAut` is multiplicative, so `dAut d̄ 1 = 1`), and then `dAut` faithfulness kills the
+`Σ`-component, leaving a translation class — i.e. membership in `R`.  Conversely `R`
+is abelian. -/
+theorem centralizer_invImageF_eq
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) :
+    Subgroup.centralizer ((fc.invImageF model : Subgroup G) : Set G)
+      = fc.invImageF model := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  apply le_antisymm
+  · intro c hc
+    have hcL : c ∈ L := by
+      rw [hLdef, Subgroup.mem_centralizer_iff]
+      intro x hx
+      exact Subgroup.mem_centralizer_iff.mp hc x (fc.P_le_invImageF model hx)
+    -- the class of `c` centralizes every translation.
+    have hcen : ∀ x : F,
+        QuotientGroup.mk' N' ⟨c, hcL⟩ * model.emb (Multiplicative.ofAdd x)
+          * (QuotientGroup.mk' N' ⟨c, hcL⟩)⁻¹ = model.emb (Multiplicative.ofAdd x) := by
+      intro x
+      obtain ⟨y, hy⟩ := QuotientGroup.mk'_surjective N'
+        (model.emb (Multiplicative.ofAdd x))
+      have hyR : (y : G) ∈ fc.invImageF model :=
+        ⟨y, Subgroup.mem_comap.mpr (by rw [hy]; exact ⟨Multiplicative.ofAdd x, rfl⟩), rfl⟩
+      have h1 := Subgroup.mem_centralizer_iff.mp hc _ hyR
+      have hcyG : c * (y : G) * c⁻¹ = (y : G) := by
+        rw [← h1]; group
+      have hpush : QuotientGroup.mk' N' ⟨c, hcL⟩ * QuotientGroup.mk' N' y
+            * (QuotientGroup.mk' N' ⟨c, hcL⟩)⁻¹
+          = QuotientGroup.mk' N' y := by
+        rw [← map_inv, ← map_mul, ← map_mul]
+        exact congrArg _ (Subtype.ext hcyG)
+      rw [← hy]
+      exact hpush
+    -- decompose the class along `quotient = emb(F) ⋊ H̄`, then split `H̄ = Q̄·D̄`.
+    obtain ⟨⟨a, hbar⟩, hprod, -⟩ :=
+      model.isComplement.existsUnique (QuotientGroup.mk' N' ⟨c, hcL⟩)
+    have hhH : (hbar : ↥L ⧸ N') ∈ ((fc.rankOneQuotient).Q : Set (↥L ⧸ N'))
+        * ((fc.rankOneQuotient).D : Set (↥L ⧸ N')) := by
+      rw [(fc.rankOneQuotient).Q_mul_D_eq_H]
+      exact hbar.2
+    obtain ⟨qb, hqb, db, hdb, hqd⟩ := hhH
+    obtain ⟨za, hza⟩ := MonoidHom.mem_range.mp a.2
+    have hacomm : ∀ w : Multiplicative F,
+        (a : ↥L ⧸ N') * model.emb w = model.emb w * (a : ↥L ⧸ N') := by
+      intro w
+      rw [← hza, ← map_mul, ← map_mul, mul_comm]
+    -- the affine part of conjugation by `[c]` is trivial: `dAut d̄ x · u = x`.
+    have hkey : ∀ x : F,
+        model.dAut ⟨db, hdb⟩ x
+            * ((model.qEquiv (⟨qb, hqb⟩ : ↥(fc.rankOneQuotient).Q)⁻¹ : Fˣ) : F) = x := by
+      intro x
+      have hd' : db * model.emb (Multiplicative.ofAdd x) * db⁻¹
+          = model.emb (Multiplicative.ofAdd (model.dAut ⟨db, hdb⟩ x)) :=
+        model.dAut_conj ⟨db, hdb⟩ x
+      have hq' : qb * model.emb (Multiplicative.ofAdd (model.dAut ⟨db, hdb⟩ x)) * qb⁻¹
+          = model.emb (Multiplicative.ofAdd (model.dAut ⟨db, hdb⟩ x
+              * ((model.qEquiv (⟨qb, hqb⟩ : ↥(fc.rankOneQuotient).Q)⁻¹ : Fˣ) : F))) :=
+        model.qEquiv_conj ⟨qb, hqb⟩ (model.dAut ⟨db, hdb⟩ x)
+      have h1 := hcen x
+      rw [← hprod, ← hqd] at h1
+      have h4 : (a : ↥L ⧸ N')
+            * (qb * (db * model.emb (Multiplicative.ofAdd x) * db⁻¹) * qb⁻¹)
+            * (a : ↥L ⧸ N')⁻¹
+          = model.emb (Multiplicative.ofAdd x) := by
+        calc (a : ↥L ⧸ N')
+              * (qb * (db * model.emb (Multiplicative.ofAdd x) * db⁻¹) * qb⁻¹)
+              * (a : ↥L ⧸ N')⁻¹
+            = (a : ↥L ⧸ N') * (qb * db) * model.emb (Multiplicative.ofAdd x)
+              * ((a : ↥L ⧸ N') * (qb * db))⁻¹ := by
+              rw [mul_inv_rev, mul_inv_rev]; group
+          _ = model.emb (Multiplicative.ofAdd x) := h1
+      rw [hd', hq', hacomm] at h4
+      have h5 : model.emb (Multiplicative.ofAdd (model.dAut ⟨db, hdb⟩ x
+            * ((model.qEquiv (⟨qb, hqb⟩ : ↥(fc.rankOneQuotient).Q)⁻¹ : Fˣ) : F)))
+          = model.emb (Multiplicative.ofAdd x) := by
+        rwa [mul_assoc, mul_inv_cancel, mul_one] at h4
+      exact Multiplicative.ofAdd.injective (model.emb_injective h5)
+    -- `x = 1` kills the `Q̄`-component …
+    have hd1 : model.dAut ⟨db, hdb⟩ 1 = 1 := by
+      have hmul := model.dAut_mul ⟨db, hdb⟩ 1 1
+      rw [one_mul] at hmul
+      have hne : model.dAut ⟨db, hdb⟩ 1 ≠ 0 := by
+        intro h0
+        have h00 : model.dAut ⟨db, hdb⟩ 0 = 0 := map_zero _
+        exact one_ne_zero ((model.dAut ⟨db, hdb⟩).injective (h0.trans h00.symm))
+      have hc' : model.dAut ⟨db, hdb⟩ 1 * 1
+          = model.dAut ⟨db, hdb⟩ 1 * model.dAut ⟨db, hdb⟩ 1 := by
+        rw [mul_one]; exact hmul
+      exact (mul_left_cancel₀ hne hc').symm
+    have hu1 : ((model.qEquiv (⟨qb, hqb⟩ : ↥(fc.rankOneQuotient).Q)⁻¹ : Fˣ) : F) = 1 := by
+      have h := hkey 1
+      rwa [hd1, one_mul] at h
+    have hq1 : qb = 1 := by
+      have h1 : model.qEquiv (⟨qb, hqb⟩ : ↥(fc.rankOneQuotient).Q)⁻¹ = 1 :=
+        Units.ext (hu1.trans Units.val_one.symm)
+      have h2 : (⟨qb, hqb⟩ : ↥(fc.rankOneQuotient).Q)⁻¹ = 1 := by
+        apply model.qEquiv.injective
+        rw [h1, map_one]
+      have h3 : (⟨qb, hqb⟩ : ↥(fc.rankOneQuotient).Q) = 1 := by
+        rw [← inv_inv (⟨qb, hqb⟩ : ↥(fc.rankOneQuotient).Q), h2, inv_one]
+      have h4 := congrArg Subtype.val h3
+      simpa using h4
+    -- … and then `dAut` faithfulness kills the `Σ`-component.
+    have hdx : ∀ x : F, model.dAut ⟨db, hdb⟩ x = x := by
+      intro x
+      have h := hkey x
+      rwa [hu1, mul_one] at h
+    have hdone : ∀ x : F, model.dAut 1 x = x := by
+      intro x
+      have h := model.dAut_conj 1 x
+      simp only [OneMemClass.coe_one, one_mul, inv_one, mul_one] at h
+      exact (model.emb_injective h).symm ▸ rfl
+    have hd_eq : (⟨db, hdb⟩ : ↥(fc.rankOneQuotient).D) = 1 := by
+      apply model.dAut_injective
+      ext x
+      rw [hdx x]
+      exact (hdone x).symm
+    have hdb1 : db = 1 := by
+      have h := congrArg Subtype.val hd_eq
+      simpa using h
+    -- the class is a translation, i.e. `c ∈ R`.
+    have hfin : QuotientGroup.mk' N' ⟨c, hcL⟩ ∈ MonoidHom.range model.emb := by
+      rw [← hprod, ← hqd, hq1, hdb1]
+      simp
+    exact ⟨⟨c, hcL⟩, Subgroup.mem_comap.mpr hfin, rfl⟩
+  · intro r hr
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact fc.invImageF_mul_comm model ind hB2 hm y hy r hr
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
