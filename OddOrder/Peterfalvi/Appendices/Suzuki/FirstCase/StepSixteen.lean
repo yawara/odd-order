@@ -30,7 +30,7 @@ section GenericConj
 variable {G' : Type*} [Group G']
 
 /-- Iterating a conjugation relation `a^g = a·d` with `d` central for `a` and `g`. -/
-theorem conj_pow_eq_mul_pow {a d g : G'} (hda : Commute d a) (hdg : Commute d g)
+theorem conj_pow_eq_mul_pow {a d g : G'} (hdg : Commute d g)
     (h : g * a * g⁻¹ = a * d) : ∀ m : ℕ, g ^ m * a * (g ^ m)⁻¹ = a * d ^ m := by
   intro m
   induction m with
@@ -538,6 +538,274 @@ theorem card_zpowers_sup_sigma_sup_P
         (sup_le (fc.zpowers_st_le_centralizer_P model ind hB2) inf_le_right ha) _ hb).symm)
       (fc.zpowers_sup_sigma_inf_P_eq_bot model ind hB2),
     fc.card_zpowers_sup_sigma model ind hB2, fc.card_P, hp3]
+
+/-! ## `Z₁` is the unique strongly real line of `Z₁ΣP` -/
+
+include model in
+/-- **`Z₁` is the only subgroup of order `3` in `Z₁PΣ` consisting of strongly real
+elements** ((16), p. 114).
+
+If `X ≠ Z₁` is such a subgroup, some `g ∈ R₁` fails to centralize `X` (else
+`X ≤ Z(R₁) = Z₁`), and then for every `w ∈ X^#` the commutator `d = w⁻¹·w^g` lies in
+`Z₁` — by `⁅Z₁ΣP, R₁⁆ ≤ Z₁` — and is nontrivial, hence generates `Z₁`.  So
+`w^{g^m} = w·d^m` runs over the whole coset `wZ₁`, and every element of `Z₁X` outside
+`Z₁` is `R₁`-conjugate to an element of `X^#`, hence strongly real.  But `Z₁X` and `ΣP`
+are subgroups of order `9` of the elementary abelian group `Z₁ΣP` of order `27`, so
+they meet nontrivially — and no nonidentity element of `ΣP` is strongly real. -/
+theorem eq_zpowers_of_card_three_of_forall_isStronglyReal
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {X : Subgroup G}
+    (hXle : X ≤ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P)
+    (hXcard : Nat.card ↥X = 3)
+    (hXsr : ∀ x ∈ X, x ≠ 1 → IsStronglyReal x) :
+    X = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  have hZ₁card : Nat.card ↥(Subgroup.zpowers
+      (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)) = 3 := by
+    rw [Nat.card_zpowers, hstord]
+  -- `Z₁ΣP ≤ RΣ ≤ R₁`
+  have hZ₁R : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ≤ fc.invImageF model :=
+    (fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2 hm).trans
+      (fc.sInvertedT_spec model ind hB2 hm).1
+  have hZSP_RS : ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P)
+      ≤ fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) :=
+    sup_le (sup_le (hZ₁R.trans le_sup_left) le_sup_right)
+      ((fc.P_le_invImageF model).trans le_sup_left)
+  have hZSP_R₁ : ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P)
+      ≤ fc.sylowThreeNormalizerRSigma model :=
+    hZSP_RS.trans (fc.sup_le_sylowThreeNormalizerRSigma model ind hB2)
+  by_contra hne
+  -- a nonidentity element of `X`
+  obtain ⟨w₀, hw₀X, hw₀1⟩ : ∃ w ∈ X, w ≠ 1 := by
+    by_contra hcon
+    push Not at hcon
+    have : X = ⊥ := by
+      rw [eq_bot_iff]
+      intro x hx
+      rw [Subgroup.mem_bot]
+      exact hcon x hx
+    rw [this, Subgroup.card_bot] at hXcard
+    omega
+  -- every nonidentity element of `X` generates `X`
+  have hgenX : ∀ w ∈ X, w ≠ 1 → Subgroup.zpowers w = X := by
+    intro w hw hw1
+    refine Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hw) ?_
+    have h := Subgroup.orderOf_dvd_natCard _ hw
+    rw [hXcard] at h
+    rcases (Nat.dvd_prime (by norm_num)).mp h with h1 | h3
+    · exact absurd (orderOf_eq_one_iff.mp h1) hw1
+    · rw [hXcard, Nat.card_zpowers, h3]
+  -- some `g ∈ R₁` moves `w₀`
+  obtain ⟨g, hgR₁, hgw⟩ : ∃ g ∈ fc.sylowThreeNormalizerRSigma model,
+      g * w₀ * g⁻¹ ≠ w₀ := by
+    by_contra hcon
+    push Not at hcon
+    refine hne ?_
+    have hw₀Z : w₀ ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) := by
+      rw [← fc.inf_centralizer_sylowThree_eq_zpowers model ind hB2]
+      refine ⟨hZSP_R₁ (hXle hw₀X), Subgroup.mem_centralizer_iff.mpr fun y hy => ?_⟩
+      have h := hcon y hy
+      calc y * w₀ = (y * w₀ * y⁻¹) * y := by group
+        _ = w₀ * y := by rw [h]
+    refine Subgroup.eq_of_le_of_card_ge ?_ (by rw [hXcard, hZ₁card])
+    rw [← hgenX w₀ hw₀X hw₀1]
+    exact Subgroup.zpowers_le.mpr hw₀Z
+  -- for every `w ∈ X^#` the commutator with `g` generates `Z₁`
+  have hkey : ∀ w ∈ X, w ≠ 1 → ∃ d : G, Subgroup.zpowers d
+      = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) ∧ g * w * g⁻¹ = w * d := by
+    intro w hwX hw1
+    refine ⟨w⁻¹ * (g * w * g⁻¹), ?_, by group⟩
+    have hdZ : w⁻¹ * (g * w * g⁻¹)
+        ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t) := by
+      have hmem : ⁅w⁻¹, g⁆ ∈ ⁅((Subgroup.zpowers
+            (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+          ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P),
+          fc.sylowThreeNormalizerRSigma model⁆ :=
+        Subgroup.commutator_mem_commutator
+          (Subgroup.inv_mem _ (hXle hwX)) hgR₁
+      have := fc.commutator_zpowers_sup_sigma_sup_P_sylowThree_le model ind hB2 hmem
+      rwa [show ⁅w⁻¹, g⁆ = w⁻¹ * (g * w * g⁻¹) by rw [commutatorElement_def]; group]
+        at this
+    have hd1 : w⁻¹ * (g * w * g⁻¹) ≠ 1 := by
+      intro hd
+      refine hgw ?_
+      have hfix : g * w * g⁻¹ = w := by
+        have h2 : w * (w⁻¹ * (g * w * g⁻¹)) = w * 1 := by rw [hd]
+        simpa using h2
+      have hw₀mem : w₀ ∈ Subgroup.zpowers w := by
+        rw [hgenX w hwX hw1]; exact hw₀X
+      obtain ⟨k, rfl⟩ := hw₀mem
+      calc g * w ^ k * g⁻¹ = (g * w * g⁻¹) ^ k := by rw [conj_zpow]
+        _ = w ^ k := by rw [hfix]
+    refine Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hdZ) ?_
+    rw [hZ₁card, Nat.card_zpowers]
+    have h := Subgroup.orderOf_dvd_natCard _ hdZ
+    rw [hZ₁card] at h
+    rcases (Nat.dvd_prime (by norm_num)).mp h with h1 | h3
+    · exact absurd (orderOf_eq_one_iff.mp h1) hd1
+    · omega
+  -- `Z₁` is central in `R₁`
+  have hZ₁cen : ∀ d ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t), ∀ y ∈ fc.sylowThreeNormalizerRSigma model,
+      d * y = y * d := by
+    intro d hd y hy
+    have hmem : d ∈ fc.sylowThreeNormalizerRSigma model
+        ⊓ Subgroup.centralizer ((fc.sylowThreeNormalizerRSigma model : Subgroup G)
+          : Set G) := by
+      rw [fc.inf_centralizer_sylowThree_eq_zpowers model ind hB2]
+      exact hd
+    exact (Subgroup.mem_centralizer_iff.mp hmem.2 y hy).symm
+  -- `Z₁X` and `ΣP` meet nontrivially inside `Z₁ΣP`
+  have hZXcard : Nat.card ↥(Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ⊔ X) = 9 := by
+    have hinf : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) ⊓ X = ⊥ := by
+      rw [eq_bot_iff]
+      intro x hx
+      rw [Subgroup.mem_bot]
+      by_contra hx1
+      refine hne ?_
+      have h1 : Subgroup.zpowers x = X := hgenX x hx.2 hx1
+      have hxord : orderOf x = 3 := by
+        have h := Subgroup.orderOf_dvd_natCard _ hx.1
+        rw [hZ₁card] at h
+        rcases (Nat.dvd_prime (by norm_num)).mp h with ha | hb
+        · exact absurd (orderOf_eq_one_iff.mp ha) hx1
+        · exact hb
+      have h2 : Subgroup.zpowers x = Subgroup.zpowers
+          (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) :=
+        Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hx.1)
+          (by rw [hZ₁card, Nat.card_zpowers, hxord])
+      rw [← h1, h2]
+    rw [card_sup_eq_mul_of_commute
+        (fun a ha b hb => fc.mul_comm_of_mem_zpowers_sup_sigma_sup_P model ind hB2
+          (Subgroup.mem_sup_left (Subgroup.mem_sup_left ha)) (hXle hb))
+        hinf, hZ₁card, hXcard]
+  have hSPcard : Nat.card ↥((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))
+      ⊔ fc.P) = 9 := by
+    obtain ⟨hpSig, -, -, -, -, -⟩ := fc.step_twelve model ind hB2
+    obtain ⟨-, -, -, hSig3, -⟩ :=
+      fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+    have hinf : (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊓ fc.P
+        = ⊥ := by
+      rw [eq_bot_iff]
+      intro x hx
+      have hmem : x ∈ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+          ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊓ fc.P :=
+        ⟨Subgroup.mem_sup_right hx.1, hx.2⟩
+      rwa [fc.zpowers_sup_sigma_inf_P_eq_bot model ind hB2] at hmem
+    rw [card_sup_eq_mul_of_commute
+        (fun a (ha : a ∈ fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))
+          b (hb : b ∈ fc.P) =>
+          (Subgroup.mem_centralizer_iff.mp ha.2 b hb).symm) hinf,
+      hSig3, fc.card_P, hp3]
+  obtain ⟨y, hyZX, hySP, hy1⟩ : ∃ y : G, y ∈ Subgroup.zpowers
+      (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) ⊔ X
+      ∧ y ∈ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P
+      ∧ y ≠ 1 := by
+    by_contra hcon
+    push Not at hcon
+    have hbot : (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) ⊔ X)
+        ⊓ ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P) = ⊥ := by
+      rw [eq_bot_iff]
+      intro x hx
+      rw [Subgroup.mem_bot]
+      exact hcon x hx.1 hx.2
+    have hleZSP : (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t) ⊔ X)
+        ⊔ ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P)
+        ≤ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+            * fc.toHypothesis.t)
+          ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P :=
+      sup_le (sup_le (le_sup_left.trans le_sup_left) hXle)
+        (sup_le (le_sup_right.trans le_sup_left) le_sup_right)
+    have hcard81 : Nat.card ↥((Subgroup.zpowers
+        (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) ⊔ X)
+        ⊔ ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P)) = 81 := by
+      rw [card_sup_eq_mul_of_commute
+          (fun a ha b hb => fc.mul_comm_of_mem_zpowers_sup_sigma_sup_P model ind hB2
+            (hleZSP (Subgroup.mem_sup_left ha)) (hleZSP (Subgroup.mem_sup_right hb)))
+          hbot, hZXcard, hSPcard]
+    have hdvd := Subgroup.card_dvd_of_le hleZSP
+    rw [hcard81, fc.card_zpowers_sup_sigma_sup_P model ind hB2] at hdvd
+    exact absurd (Nat.le_of_dvd (by norm_num) hdvd) (by norm_num)
+  -- decompose `y = z·w` with `z ∈ Z₁`, `w ∈ X`
+  have hcoe := coe_sup_eq_mul_of_commute
+    (fun _ (ha : _ ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)) _ (hb : _ ∈ X) =>
+      fc.mul_comm_of_mem_zpowers_sup_sigma_sup_P model ind hB2
+        (Subgroup.mem_sup_left (Subgroup.mem_sup_left ha)) (hXle hb))
+  have hy' : y ∈ ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) : Subgroup G) : Set G) * (X : Set G) := by
+    rw [← hcoe]; exact hyZX
+  obtain ⟨z, hz, w, hw, hzw0⟩ := hy'
+  have hzw : z * w = y := hzw0
+  -- `y` is strongly real, contradicting `not_isStronglyReal_of_mem_P_sup_sigma`
+  refine fc.not_isStronglyReal_of_mem_P_sup_sigma model ind hB2 hySP hy1 ?_
+  rcases eq_or_ne w 1 with rfl | hw1
+  · -- `y ∈ Z₁^#`, so `Z₁ = ⟨y⟩ ≤ ΣP` and `st` itself lies in `ΣP`
+    exfalso
+    have hyZ : y ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) := by rw [← hzw, mul_one]; exact hz
+    have hyord : orderOf y = 3 := by
+      have h := Subgroup.orderOf_dvd_natCard _ hyZ
+      rw [hZ₁card] at h
+      rcases (Nat.dvd_prime (by norm_num)).mp h with ha | hb
+      · exact absurd (orderOf_eq_one_iff.mp ha) hy1
+      · exact hb
+    have hgen : Subgroup.zpowers y = Subgroup.zpowers
+        (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) :=
+      Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hyZ)
+        (by rw [hZ₁card, Nat.card_zpowers, hyord])
+    have hstSP : fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t
+        ∈ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P := by
+      have : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t) ≤ (fc.toHypothesis.W
+            ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P := by
+        rw [← hgen]
+        exact Subgroup.zpowers_le.mpr hySP
+      exact this (Subgroup.mem_zpowers _)
+    have hst1 : fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t ≠ 1 := by
+      intro h
+      rw [h, orderOf_one] at hstord
+      omega
+    exact fc.not_isStronglyReal_of_mem_P_sup_sigma model ind hB2 hstSP hst1
+      fc.toHypothesis.isStronglyReal_distinguishedInvolution_mul_t
+  · -- `y` is `R₁`-conjugate to `w ∈ X^#`
+    obtain ⟨d, hdgen, hdconj⟩ := hkey w hw hw1
+    have hzd : z ∈ Subgroup.zpowers d := by rw [hdgen]; exact hz
+    obtain ⟨mnat, hmnat0⟩ := (mem_powers_iff_mem_zpowers).mpr hzd
+    have hmnat : d ^ mnat = z := hmnat0
+    have hdg : Commute d g := by
+      refine hZ₁cen d ?_ g hgR₁
+      rw [← hdgen]
+      exact Subgroup.mem_zpowers _
+    have hyconj : y = g ^ mnat * w * (g ^ mnat)⁻¹ := by
+      rw [conj_pow_eq_mul_pow hdg hdconj mnat, hmnat, ← hzw]
+      exact fc.mul_comm_of_mem_zpowers_sup_sigma_sup_P model ind hB2
+        (Subgroup.mem_sup_left (Subgroup.mem_sup_left hz)) (hXle hw)
+    rw [hyconj]
+    exact isStronglyReal_conj (hXsr w hw hw1) _
 
 end FirstCaseHypothesis
 
