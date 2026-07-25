@@ -356,14 +356,6 @@ theorem lowerCentralSeries_ker_augHom_eq [Fintype Q] {q : Q}
     rw [Subgroup.lowerCentralSeries_succ, ih]
     exact commutator_map_inl_eq hq (shiftSubSeq_shift_stable q (i + 2)) (inr_mem_ker_augHom q)
 
-/-- 部分群の冪零類は**環境群の中で計算した**下降中心列で判定できる. -/
-theorem nilpotencyClass_le_iff_lowerCentralSeries_eq_bot {G : Type*} [Group G] (S : Subgroup G)
-    [Group.IsNilpotent ↥S] {m : ℕ} :
-    Group.nilpotencyClass ↥S ≤ m ↔ S.lowerCentralSeries m = ⊥ := by
-  rw [← Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le,
-    ← Subgroup.top_subtype_lowerCentralSeries S m,
-    Subgroup.map_eq_bot_iff_of_injective _ (Subgroup.subtype_injective S)]
-
 /-- **`class(P'U) = n(p-1)`** (`P'U = ker(増大射)`).
 
 `γ_{i+2}(P'U) = Δ^{i+2}(A)` なので `P` より 1 段だけ短い. -/

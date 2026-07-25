@@ -1207,6 +1207,20 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 ⬜ **4A.13 も未着手** (pdftotext が切れていて見落としていた; PDF p.138 で確認):
 `G` 冪零で class `m > 1`, `a ∈ G` ⟹ `H = G'⟨a⟩` の冪零類は `m` 未満。
 
+#### 🎉 4A.13 完了 (2026-07-25) — 新 leaf `ProblemsNilpotencyClass.lean`
+
+`nilpotencyClass_commutator_sup_zpowers_lt` : **`G` 冪零・class `m > 1` ⟹
+`class(G'⟨a⟩) < m`** (実証明・axiom-clean、有限性の仮定は不要)。
+
+- `commutatorMemLeft N y` = `{x | ⁅x,y⁆ ∈ N}` (`N ⊴ G` で部分群)
+- `commutator_self_le_lowerCentralSeries_two` = 基底 `⁅H,H⁆ ≤ γ₃(G)`
+  (good-elements 二段: `⁅a, H⁆ ≤ γ₃` を先に出し、それを使って `H ≤ commutatorMemLeft γ₃ y`)
+- `lowerCentralSeries_commutator_sup_zpowers_le` = `γ_i(H) ≤ γ_{i+1}(G)` の帰納
+- 部分群の類への翻訳は `nilpotencyClass_le_iff_lowerCentralSeries_eq_bot`
+  (4A.8(d) で作ったもの。汎用なので `ProblemsWreathClass` → **`ProblemsMaximalClass`** へ移設)
+
+以下は着手前の設計メモ (実装は概ねこの通り):
+
 #### 4A.13 の設計 (2026-07-25、着手前メモ)
 
 書籍 (p.125): `G` 冪零で class `m > 1`, `a ∈ G` ⟹ **`H = G'⟨a⟩` の冪零類は `m` 未満**。
@@ -1228,7 +1242,8 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
     ⟹ `H` を含む ⟹ `⁅H,H⁆ ≤ N`。
 - `H := commutator G ⊔ Subgroup.zpowers a`。`Subgroup.closure_le` で generator に落とす。
 
-### 残り (文書順): 4A.12(c) の `D₈` 部分 (`|𝒯(D₈)| ≤ 3` の具体計算) / 4A.13。
+### 残り: **4A.12(c) の `D₈` 部分のみ** (`|𝒯(D₈)| ≤ 3` の具体計算)。
+これ以外の §4A (4A.1–4A.13) は完済。
 
 #### 🎉 4A.11 完了 (2026-07-25) — `ProblemsWreath.lean` に追加
 
