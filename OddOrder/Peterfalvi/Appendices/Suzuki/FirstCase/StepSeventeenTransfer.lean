@@ -159,6 +159,148 @@ theorem exists_mem_center_of_normal_ne_bot {P : Type*} [Group P] [Finite P] {p :
     calc g * (b : P) = (g * (b : P) * g⁻¹) * g := by group
       _ = (b : P) * g := by rw [hcoe]
 
+/-- If a subgroup `X` and the kernel of a surjection `f` generate `A`, then `X` already
+maps onto `B`. -/
+theorem map_eq_top_of_sup_ker_eq_top (f : A →* B) (hf : Function.Surjective f)
+    {X : Subgroup A} (hX : X ⊔ f.ker = ⊤) : X.map f = ⊤ := by
+  have hker : (f.ker).map f = ⊥ :=
+    le_antisymm (Subgroup.map_le_iff_le_comap.mpr (by rw [MonoidHom.comap_bot])) bot_le
+  calc X.map f = X.map f ⊔ (f.ker).map f := by rw [hker, sup_bot_eq]
+    _ = (X ⊔ f.ker).map f := (Subgroup.map_sup _ _ _).symm
+    _ = ⊤ := by rw [hX, Subgroup.map_top_of_surjective f hf]
+
+/-- A subgroup of prime index is maximal: it generates the whole group together with
+any subgroup it does not contain. -/
+theorem sup_eq_top_of_index_prime {X K : Subgroup A} {p : ℕ} (hp : p.Prime)
+    (hX : X.index = p) (hK : ¬ K ≤ X) : X ⊔ K = ⊤ := by
+  have hle : X ≤ X ⊔ K := le_sup_left
+  have hmul := Subgroup.relIndex_mul_index hle
+  have hdvd : (X ⊔ K).index ∣ p := hX ▸ Subgroup.index_dvd_of_le hle
+  rcases (Nat.dvd_prime hp).mp hdvd with h1 | hp'
+  · exact Subgroup.index_eq_one.mp h1
+  · exfalso
+    rw [hp', hX] at hmul
+    have hone : X.relIndex (X ⊔ K) = 1 :=
+      Nat.eq_of_mul_eq_mul_right hp.pos (by rw [hmul, one_mul])
+    exact hK (le_trans le_sup_right (Subgroup.relIndex_eq_one.mp hone))
+
+/-- `C₃ ≀ C₃` has order `3⁴`. -/
+theorem card_wreathThree :
+    Nat.card (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)) = 3 ^ 4 := by
+  rw [RegularWreathProduct.card]
+  have h1 : Nat.card (Multiplicative (ZMod 3)) = 3 := by
+    rw [Nat.card_congr Multiplicative.toAdd, Nat.card_zmod]
+  rw [h1]
+  norm_num
+
+/-- `C₃ ≀ C₃` is a finite `3`-group, hence nilpotent. -/
+theorem isNilpotent_wreathThree :
+    Group.IsNilpotent (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)) := by
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  exact (IsPGroup.of_card card_wreathThree).isNilpotent
+
+/-- **No `C₃ ≀ C₃` quotient from a subgroup of class `≤ 2` that supplements the kernel.**
+If `X` supplements `ker f` and `⁅⁅X, X⁆, X⁆ ≤ ker f`, then `f` cannot be onto `C₃ ≀ C₃`,
+whose nilpotence class is `3`. -/
+theorem false_of_wreathThree_quotient
+    (f : A →* (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)))
+    (hf : Function.Surjective f) {X : Subgroup A} (hX : X ⊔ f.ker = ⊤)
+    (h : Subgroup.lowerCentralSeries X 2 ≤ f.ker) : False := by
+  haveI := isNilpotent_wreathThree
+  have hbot := lowerCentralSeries_eq_bot_of_subgroup_le_ker f
+    (map_eq_top_of_sup_ker_eq_top f hf hX) h
+  have hcls := Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp hbot
+  rw [OddOrder.Isaacs.Ch10.nilpotencyClass_wreath 3] at hcls
+  omega
+
+/-- The commutator subgroup lies in every normal subgroup of prime index (the quotient
+is cyclic of prime order, hence abelian). -/
+theorem commutator_le_of_index_prime [Finite A] {H : Subgroup A} [H.Normal] {p : ℕ}
+    [Fact p.Prime] (hH : H.index = p) : commutator A ≤ H := by
+  have hQcard : Nat.card (A ⧸ H) = p := by rw [← Subgroup.index_eq_card, hH]
+  haveI : IsCyclic (A ⧸ H) := isCyclic_of_prime_card hQcard
+  letI : CommGroup (A ⧸ H) := IsCyclic.commGroup
+  have hker := Abelianization.commutator_subset_ker (QuotientGroup.mk' H)
+  rwa [QuotientGroup.ker_mk'] at hker
+
+/-- **Two subgroups of index `3` that are abelian modulo the kernel cannot produce a
+`C₃ ≀ C₃` quotient.**  The images `X̄`, `Ȳ` are abelian of index `3`, so
+`⁅Q, Q⁆ ≤ X̄ ⊓ Ȳ`, while `X̄ ⊓ Ȳ` is centralised by both `X̄` and `Ȳ` and hence lies in
+`Z(Q)`; the quotient would have nilpotence class at most `2`, not `3`. -/
+theorem false_of_two_abelian_of_index_three
+    (f : A →* (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)))
+    (hf : Function.Surjective f) {X Y : Subgroup A} (hXY : X ⊔ Y = ⊤)
+    (hXidx : X.index = 3) (hYidx : Y.index = 3)
+    (hkX : f.ker ≤ X) (hkY : f.ker ≤ Y)
+    (hX : ⁅X, X⁆ ≤ f.ker) (hY : ⁅Y, Y⁆ ≤ f.ker) : False := by
+  classical
+  haveI := isNilpotent_wreathThree
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  -- the images are abelian
+  have habel : ∀ {Z : Subgroup A}, ⁅Z, Z⁆ ≤ f.ker →
+      ∀ a ∈ Z.map f, ∀ b ∈ Z.map f, a * b = b * a := by
+    intro Z hZ a ha b hb
+    have hbot : ⁅Z.map f, Z.map f⁆ = ⊥ := by
+      rw [← Subgroup.map_commutator, eq_bot_iff]
+      exact Subgroup.map_le_iff_le_comap.mpr (by rwa [MonoidHom.comap_bot])
+    have := Subgroup.commutator_le.mp (le_of_eq hbot) a ha b hb
+    rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_mul_comm] at this
+    exact this
+  -- the images have index `3`, hence are normal with abelian quotient
+  have hidxX : (X.map f).index = 3 := by rw [Subgroup.index_map_eq _ hf hkX, hXidx]
+  have hidxY : (Y.map f).index = 3 := by rw [Subgroup.index_map_eq _ hf hkY, hYidx]
+  have hmin : (Nat.card (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3))).minFac = 3 := by
+    rw [card_wreathThree]
+    norm_num
+  haveI : (X.map f).Normal :=
+    Subgroup.normal_of_index_eq_minFac_card (by rw [hidxX, hmin])
+  haveI : (Y.map f).Normal :=
+    Subgroup.normal_of_index_eq_minFac_card (by rw [hidxY, hmin])
+  have hcommX := commutator_le_of_index_prime (H := X.map f) hidxX
+  have hcommY := commutator_le_of_index_prime (H := Y.map f) hidxY
+  -- the intersection is central
+  have hcen : X.map f ⊓ Y.map f ≤ Subgroup.center _ := by
+    intro z hz
+    rw [Subgroup.mem_center_iff]
+    intro g
+    have hg : g ∈ (X.map f) ⊔ (Y.map f) := by
+      rw [← Subgroup.map_sup, hXY, Subgroup.map_top_of_surjective f hf]
+      exact Subgroup.mem_top g
+    have hgen : Subgroup.closure ((X.map f : Set _) ∪ (Y.map f : Set _))
+        = X.map f ⊔ Y.map f := by
+      rw [Subgroup.closure_union, Subgroup.closure_eq, Subgroup.closure_eq]
+    refine Subgroup.closure_induction (p := fun u _ => u * z = z * u) ?_ ?_ ?_ ?_
+      (by rw [hgen]; exact hg)
+    · rintro u (hu | hu)
+      · exact habel hX u hu z hz.1
+      · exact habel hY u hu z hz.2
+    · group
+    · intro u v _ _ hu hv
+      calc u * v * z = u * (v * z) := by group
+        _ = u * (z * v) := by rw [hv]
+        _ = (u * z) * v := by group
+        _ = (z * u) * v := by rw [hu]
+        _ = z * (u * v) := by group
+    · intro u _ hu
+      have : u⁻¹ * (u * z) * u⁻¹ = u⁻¹ * (z * u) * u⁻¹ := by rw [hu]
+      calc u⁻¹ * z = u⁻¹ * (z * u) * u⁻¹ := by group
+        _ = u⁻¹ * (u * z) * u⁻¹ := by rw [this]
+        _ = z * u⁻¹ := by group
+  -- hence the class is at most `2`
+  have hbot : Subgroup.lowerCentralSeries
+      (⊤ : Subgroup (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3))) 2 = ⊥ := by
+    rw [Subgroup.lowerCentralSeries_succ, Subgroup.lowerCentralSeries_succ,
+      Subgroup.lowerCentralSeries_zero, eq_bot_iff, Subgroup.commutator_le]
+    intro a ha b _
+    have haX : a ∈ X.map f ⊓ Y.map f :=
+      ⟨hcommX (by rwa [commutator_def]), hcommY (by rwa [commutator_def])⟩
+    have := Subgroup.mem_center_iff.mp (hcen haX) b
+    rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_mul_comm]
+    exact this.symm
+  have hcls := Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp hbot
+  rw [OddOrder.Isaacs.Ch10.nilpotencyClass_wreath 3] at hcls
+  omega
+
 /-- The centre of a subgroup, viewed inside the ambient group, is the intersection of
 the subgroup with its centraliser. -/
 theorem map_center_subtype (H : Subgroup A) :
@@ -624,6 +766,195 @@ theorem not_surjective_wreath_of_card_W_eq_three
   have hcls := Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp hbot
   rw [OddOrder.Isaacs.Ch10.nilpotencyClass_wreath 3] at hcls
   omega
+
+include model in
+/-- **Every nontrivial normal subgroup of `R₂` contains `Z₁`** ((17) support for
+`|W| = 9`): it meets the centre `Z(R₂) = Z₁` (`exists_mem_center_of_normal_ne_bot`),
+which has order `3`. -/
+theorem zpowers_le_map_of_normal_ne_bot
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
+    (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G))
+    {K : Subgroup ↥(S : Subgroup G)} [K.Normal] (hK : K ≠ ⊥) :
+    Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
+      ≤ K.map (S : Subgroup G).subtype := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  obtain ⟨z, hzK, hz1, hzc⟩ := exists_mem_center_of_normal_ne_bot S.2 hK
+  have hzZ : ((z : G)) ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) := by
+    have hmap := map_center_subtype (S : Subgroup G)
+    rw [fc.inf_centralizer_sylow_eq_zpowers model ind hB2 S hR₁S] at hmap
+    have hz : (z : G) ∈ (Subgroup.center ↥(S : Subgroup G)).map
+        (S : Subgroup G).subtype := ⟨z, hzc, rfl⟩
+    rwa [hmap] at hz
+  have hzne : (z : G) ≠ 1 := fun h => hz1 (Subtype.ext h)
+  have hzmem : (z : G) ∈ K.map (S : Subgroup G).subtype := ⟨z, hzK, rfl⟩
+  rcases eq_one_or_eq_or_eq_inv_of_mem_zpowers_of_orderOf_eq_three hstord hzZ with h | h | h
+  · exact absurd h hzne
+  · rw [← h]
+    exact Subgroup.zpowers_le.mpr hzmem
+  · rw [show fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t = ((z : G))⁻¹ by
+      rw [h, inv_inv], Subgroup.zpowers_inv]
+    exact Subgroup.zpowers_le.mpr hzmem
+
+include model in
+/-- **`|W| = 9`: the kernel of a `C₃ ≀ C₃` quotient of `R₂` lies in `R₁ ⊓ LV`** ((17),
+p. 114; issue 9503).
+
+`R₁` and `LV` both have index `3` in `R₂ = S`.  If the kernel `K` avoided one of them,
+that subgroup would supplement `K` and hence map *onto* `C₃ ≀ C₃`; but `⁅⁅R₁, R₁⁆, R₁⁆ ≤
+Z₁ ≤ K` by (16) and `⁅⁅LV, LV⁆, LV⁆ = 1`, so the image would have nilpotence class at
+most `2`, whereas `C₃ ≀ C₃` has class `3`. -/
+theorem map_ker_le_inf_of_card_W_eq_nine
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
+    (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G))
+    (hW9 : Nat.card ↥fc.toHypothesis.W = 9)
+    (φ : ↥(S : Subgroup G) →*
+      (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)))
+    (hφ : Function.Surjective φ) :
+    (φ.ker).map (S : Subgroup G).subtype
+      ≤ fc.sylowThreeNormalizerRSigma model
+        ⊓ (fc.nonsplitTorus ⊔ fc.toHypothesis.V) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  obtain ⟨-, -, -, -, -, hGp⟩ := fc.step_twelve model ind hB2
+  have hR₁card : Nat.card ↥(fc.sylowThreeNormalizerRSigma model) = 3 ^ 5 :=
+    fc.card_sylowThreeNormalizerRSigma model ind hB2
+  have hLVcard : Nat.card ↥(fc.nonsplitTorus ⊔ fc.toHypothesis.V) = 3 ^ 5 := by
+    rw [fc.card_sup_nonsplitTorus_V model ind hB2, hW9]
+    norm_num
+  have hScard : Nat.card ↥(S : Subgroup G) = 3 ^ 6 := by
+    rw [Sylow.card_eq_multiplicity, hGp, hW9]
+    norm_num
+  have hLVS : fc.nonsplitTorus ⊔ fc.toHypothesis.V ≤ (S : Subgroup G) :=
+    fc.sup_nonsplitTorus_V_le_sylow model ind hB2 S hR₁S
+  -- the kernel has order `9`
+  have hkercard : Nat.card ↥(φ.ker) = 9 := by
+    have h := φ.ker.card_mul_index
+    rw [Subgroup.index_ker, MonoidHom.range_eq_top.mpr hφ, Subgroup.card_top,
+      card_wreathThree, hScard] at h
+    have h6 : (3 : ℕ) ^ 6 = 9 * 3 ^ 4 := by norm_num
+    rw [h6] at h
+    exact Nat.eq_of_mul_eq_mul_right (by norm_num) h
+  have hkerne : φ.ker ≠ ⊥ := by
+    intro h
+    rw [h, Subgroup.card_bot] at hkercard
+    omega
+  have hZ₁ker := fc.zpowers_le_map_of_normal_ne_bot model ind hB2 S hR₁S hkerne
+  -- a subgroup of order `3⁵` has index `3`
+  have hidx : ∀ X : Subgroup G, X ≤ (S : Subgroup G) → Nat.card ↥X = 3 ^ 5 →
+      (X.subgroupOf (S : Subgroup G)).index = 3 := by
+    intro X hXS hXcard
+    have h := (X.subgroupOf (S : Subgroup G)).card_mul_index
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXS).toEquiv, hXcard, hScard] at h
+    omega
+  -- the branch argument
+  have hbranch : ∀ X : Subgroup G, X ≤ (S : Subgroup G) → Nat.card ↥X = 3 ^ 5 →
+      Subgroup.lowerCentralSeries X 2 ≤ Subgroup.zpowers
+        (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) →
+      (φ.ker).map (S : Subgroup G).subtype ≤ X := by
+    intro X hXS hXcard hlcs
+    have hle : φ.ker ≤ X.subgroupOf (S : Subgroup G) := by
+      by_contra hcon
+      refine false_of_wreathThree_quotient φ hφ
+        (sup_eq_top_of_index_prime (by norm_num) (hidx X hXS hXcard) hcon) ?_
+      refine (Subgroup.map_le_map_iff_of_injective (Subgroup.subtype_injective _)).mp ?_
+      rw [Subgroup.map_lowerCentralSeries, Subgroup.subgroupOf_map_subtype,
+        inf_eq_left.mpr hXS]
+      exact le_trans hlcs hZ₁ker
+    calc (φ.ker).map (S : Subgroup G).subtype
+        ≤ (X.subgroupOf (S : Subgroup G)).map (S : Subgroup G).subtype :=
+          Subgroup.map_mono hle
+      _ = X ⊓ (S : Subgroup G) := Subgroup.subgroupOf_map_subtype _ _
+      _ ≤ X := inf_le_left
+  refine le_inf (hbranch _ hR₁S hR₁card ?_) (hbranch _ hLVS hLVcard ?_)
+  · rw [Subgroup.lowerCentralSeries_succ, Subgroup.lowerCentralSeries_succ,
+      Subgroup.lowerCentralSeries_zero]
+    refine le_trans (Subgroup.commutator_mono
+      (fc.commutator_sylowThree_le_zpowers_sup_sigma_sup_P model ind hB2) le_rfl) ?_
+    exact fc.commutator_zpowers_sup_sigma_sup_P_sylowThree_le model ind hB2
+  · rw [fc.lowerCentralSeries_sup_nonsplitTorus_V_eq_bot model ind hB2]
+    exact bot_le
+
+include model in
+/-- **`|W| = 9`: a `C₃ ≀ C₃` quotient of `R₂` cannot contain both `⁅R₁, R₁⁆` and
+`⁅LV, LV⁆` in its kernel** ((17), p. 114; issue 9503).
+
+`R₁` and `LV` are distinct subgroups of index `3` (as `W ≤ LV` but `W ⊄ R₁`) that
+contain the kernel (`map_ker_le_inf_of_card_W_eq_nine`); if both were abelian modulo
+the kernel, `false_of_two_abelian_of_index_three` would force the quotient to have
+class at most `2`. -/
+theorem not_and_commutator_le_map_ker_of_card_W_eq_nine
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
+    (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G))
+    (hW9 : Nat.card ↥fc.toHypothesis.W = 9)
+    (φ : ↥(S : Subgroup G) →*
+      (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)))
+    (hφ : Function.Surjective φ) :
+    ¬ (⁅fc.sylowThreeNormalizerRSigma model, fc.sylowThreeNormalizerRSigma model⁆
+        ≤ (φ.ker).map (S : Subgroup G).subtype
+      ∧ ⁅fc.nonsplitTorus ⊔ fc.toHypothesis.V, fc.nonsplitTorus ⊔ fc.toHypothesis.V⁆
+        ≤ (φ.ker).map (S : Subgroup G).subtype) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  rintro ⟨hcommR₁, hcommLV⟩
+  obtain ⟨-, -, -, -, -, hGp⟩ := fc.step_twelve model ind hB2
+  have hR₁card : Nat.card ↥(fc.sylowThreeNormalizerRSigma model) = 3 ^ 5 :=
+    fc.card_sylowThreeNormalizerRSigma model ind hB2
+  have hLVcard : Nat.card ↥(fc.nonsplitTorus ⊔ fc.toHypothesis.V) = 3 ^ 5 := by
+    rw [fc.card_sup_nonsplitTorus_V model ind hB2, hW9]
+    norm_num
+  have hScard : Nat.card ↥(S : Subgroup G) = 3 ^ 6 := by
+    rw [Sylow.card_eq_multiplicity, hGp, hW9]
+    norm_num
+  have hLVS : fc.nonsplitTorus ⊔ fc.toHypothesis.V ≤ (S : Subgroup G) :=
+    fc.sup_nonsplitTorus_V_le_sylow model ind hB2 S hR₁S
+  have hidx : ∀ X : Subgroup G, X ≤ (S : Subgroup G) → Nat.card ↥X = 3 ^ 5 →
+      (X.subgroupOf (S : Subgroup G)).index = 3 := by
+    intro X hXS hXcard
+    have h := (X.subgroupOf (S : Subgroup G)).card_mul_index
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXS).toEquiv, hXcard, hScard] at h
+    omega
+  -- both contain the kernel
+  have hkerle := fc.map_ker_le_inf_of_card_W_eq_nine model ind hB2 S hR₁S hW9 φ hφ
+  have hkX : φ.ker ≤ (fc.sylowThreeNormalizerRSigma model).subgroupOf (S : Subgroup G) :=
+    Subgroup.map_le_iff_le_comap.mp (le_trans hkerle inf_le_left)
+  have hkY : φ.ker ≤ (fc.nonsplitTorus ⊔ fc.toHypothesis.V).subgroupOf (S : Subgroup G) :=
+    Subgroup.map_le_iff_le_comap.mp (le_trans hkerle inf_le_right)
+  -- they are distinct, hence generate
+  have hne : ¬ ((fc.nonsplitTorus ⊔ fc.toHypothesis.V).subgroupOf (S : Subgroup G)
+      ≤ (fc.sylowThreeNormalizerRSigma model).subgroupOf (S : Subgroup G)) := by
+    intro hle
+    refine fc.not_W_le_sylowThree_of_card_W_eq_nine model ind hB2 hW9 fun w hw => ?_
+    have hwLV : w ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.V :=
+      Subgroup.mem_sup_right (fc.toHypothesis.W_le_V hw)
+    have := hle (Subgroup.mem_subgroupOf.mpr (by exact hwLV) :
+      (⟨w, hLVS hwLV⟩ : ↥(S : Subgroup G))
+        ∈ (fc.nonsplitTorus ⊔ fc.toHypothesis.V).subgroupOf (S : Subgroup G))
+    exact Subgroup.mem_subgroupOf.mp this
+  -- transport the commutator hypotheses into `↥S`
+  have hcomm : ∀ X : Subgroup G, X ≤ (S : Subgroup G) →
+      ⁅X, X⁆ ≤ (φ.ker).map (S : Subgroup G).subtype →
+      ⁅X.subgroupOf (S : Subgroup G), X.subgroupOf (S : Subgroup G)⁆ ≤ φ.ker := by
+    intro X hXS hXcomm
+    refine (Subgroup.map_le_map_iff_of_injective (Subgroup.subtype_injective _)).mp ?_
+    rw [Subgroup.map_commutator, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hXS]
+    exact hXcomm
+  exact false_of_two_abelian_of_index_three φ hφ
+    (sup_eq_top_of_index_prime (by norm_num)
+      (hidx _ hR₁S hR₁card) hne)
+    (hidx _ hR₁S hR₁card) (hidx _ hLVS hLVcard) hkX hkY
+    (hcomm _ hR₁S hcommR₁) (hcomm _ hLVS hcommLV)
 
 include model in
 /-- **The contradiction of (17), given that `R₂` has no `C₃ ≀ C₃` quotient.**

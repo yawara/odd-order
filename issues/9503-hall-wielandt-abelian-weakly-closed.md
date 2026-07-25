@@ -190,8 +190,45 @@ landed (同 leaf):
    `v ∈ L` の `⁅u,v⁆` で張られる)、`R ≤ C_G(P)` (`invImageF_le_centralizer`)、
    `R` は可換 (`invImageF_mul_comm`)、`Z₁ ≤ R`、`R ⊓ Σ = 1`。
 
-⟹ 次の一手は上記 2, 3 の Lean 組み立て (部品は揃っている) と、
-`⁅R₁,R₁⁆ ≤ Z₁Σ` (⟺ `⁅u,v⁆ ∈ Z₁Σ`) の検討。
+### 2026-07-26 続き 2: 場合分け 2,3 を landed + **`⁅R₂,R₂⁆` 上界ルートは死んだ**
+
+landed (同 leaf):
+
+| 内容 | 宣言名 |
+|---|---|
+| 素数指数の部分群は極大 (含まれない部分群と生成すると `⊤`) | `sup_eq_top_of_index_prime` (generic) |
+| `X ⊔ ker f = ⊤` なら `X.map f = ⊤` | `map_eq_top_of_sup_ker_eq_top` (generic) |
+| `|C₃≀C₃| = 3⁴` / 冪零 | `card_wreathThree` / `isNilpotent_wreathThree` (generic) |
+| `X` が kernel を補い `γ₃(X) ≤ ker` なら `C₃≀C₃` 商は不可能 | `false_of_wreathThree_quotient` (generic) |
+| 素数指数の正規部分群は `commutator` を含む | `commutator_le_of_index_prime` (generic) |
+| **指数 3 の 2 つが kernel mod で可換なら `C₃≀C₃` 商は不可能** | `false_of_two_abelian_of_index_three` (generic) |
+| **`|W| = 9`: `ker φ ≤ R₁ ⊓ LV`** (場合分け 2,3 の実装) | `map_ker_le_inf_of_card_W_eq_nine` |
+| **`|W| = 9`: `⁅R₁,R₁⁆ ≤ K` と `⁅LV,LV⁆ ≤ K` は両立しない** | `not_and_commutator_le_map_ker_of_card_W_eq_nine` |
+
+⚠ **重要な否定的所見 (2026-07-26)**: `|W| = 9` では **`⁅R₂,R₂⁆ ⊄ RΣ`**、したがって
+`⁅R₂,R₂⁆ ≤ Z₁Σ` も `≤ Z₁ΣP` も**偽**。理由: `⁅R,W⁆ ≤ RΣ` なら `W ≤ N_G(RΣ)` となり
+`R₂ = R₁W` が `N_G(RΣ)` の位数 3⁶ の 3-部分群になる。しかし `R₁` (位数 3⁵) は
+`N_G(RΣ)` の Sylow 3-部分群 (定義) なので矛盾。
+⟹ 「`|⁅R₂,R₂⁆|` を小さく抑えて `|R₂^ab|` を大きくする」系のルート
+(`γ₃(R₂) ≤ Z₁` 経由も含む) は**すべて死んだ**。
+残る構造的手掛かりは `⁅R₂,R₂⁆ ≤ R₁ ⊓ LV = LΣP` (位数 3⁴) と `⊄ Z₁ΣP` のみ。
+
+### ⟹ 残ギャップの評価 (2026-07-26)
+
+`|W| = 9` の wreath 排除は、**landed の (14)–(16) 構造だけでは閉じない**見込み。
+`⁅R, W⁆` (= `W` の `R` への作用) の構造が要るが、書籍 (17) はそこを論じない
+(Hall–Wielandt で一気に飛ばすため)。したがって選択肢は:
+
+1. **古典的 Hall–Wielandt (Grün 第二定理) を建てる** — 原典 M. Hall [1] pp. 206-212 は
+   手元に無く、Gorenstein は「we do not require it, we shall not prove it here」と
+   明言 (p. 257)。⟹ 証明の再構成が必要 ([[feedback-ask-chatgpt-for-elided-gaps]] の
+   適用場面: 最強モデルに証明を再構成させ、repo の Mackey/focal/transfer 基盤で形式化)。
+   repo にある素材: `focalSubgroupTheorem` (Isaacs Ch5)、`MackeyTransfer.lean`、
+   `transfer_transfer` / `transferRes` / Yoshida 一式。
+2. `⁅R, W⁆` の構造を (11)(14) の材料から詰めて `|W| = 9` 専用の排除を作る
+   (書籍に対応論法が無いので独自論法になる)。
+
+現時点の推奨は **1** (下流の一般性も高く、Peterfalvi の引用どおりの定理が手に入る)。
 
 ## 証明方針 (旧、未確定)
 
