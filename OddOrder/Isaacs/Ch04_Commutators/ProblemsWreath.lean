@@ -392,6 +392,103 @@ theorem commutator_sup_range_inr_eq_ker_augHom [Fintype Q] (hQcomm : ∀ a b : Q
     rw [← inl_left_mul_inr_right x]
     exact Subgroup.mul_mem_sup ⟨x.left, hker, rfl⟩ ⟨x.right, rfl⟩
 
+/-! ### Problem 4A.8(c) — `Z(P'U)` の決定 (⚠ 書籍の主張は `p = 2, n = 1` で偽) -/
+
+/-- **Isaacs Problem 4A.8(c)** (訂正版, 書籍 p. 124): `P'U = ker(augHom)` の元が
+`P'U` 全体と可換 ⟺ それは `d^p = 1` なる定数 tuple.
+
+⚠ **仮説 `hd` が要る**: 書籍は無条件に `|Z(P'U)| = p` と述べるが, `p = 2`, `n = 1`
+(`C₂ ≀ C₂ = D₈`) では `P' = Z(P)` ゆえ `P'U ≅ C₂ × C₂` が可換で `|Z(P'U)| = 4 ≠ p`.
+`hd` (「`d ≠ 1` かつ (`p ≥ 3` または `d² ≠ 1`)」なる `d` の存在) はちょうどこの例外を外す
+条件で, `C` が位数 `p^n` の巡回群なら「`p` が奇 または `n ≥ 2`」と同値.
+
+証明: `z` が `P'` の元 `g = δ₁(d) · δ_q(d)⁻¹` (座標積 = 1) と可換なら, 共役が座標の
+平行移動なので `g(q⁻¹ ω) = g(ω)`. `ω = 1` で評価すると, `q⁻¹ ≠ q` のとき `d = 1`,
+`q⁻¹ = q` (このとき `p = 2`) のとき `d = d⁻¹` となり, どちらも `hd` に反する ⟹ `q = 1`.
+あとは `inr` との可換性から `f` が定数, 座標積が `d^p = 1`. -/
+theorem forall_commute_ker_augHom_iff [Fintype Q] [Fact p.Prime] (hQcard : Nat.card Q = p)
+    (hd : ∃ d : D, d ≠ 1 ∧ (3 ≤ p ∨ d ^ 2 ≠ 1)) (z : D ≀[Q] Q)
+    (hz : z ∈ (augHom (D := D) (Q := Q)).ker) :
+    (∀ y ∈ (augHom (D := D) (Q := Q)).ker, z * y = y * z)
+      ↔ ∃ d : D, d ^ p = 1 ∧ z = inl (Function.const Q d) := by
+  classical
+  have hcardQ : Fintype.card Q = p := by rw [← Nat.card_eq_fintype_card, hQcard]
+  obtain ⟨d, hd1, hd2⟩ := hd
+  haveI : Nontrivial D := ⟨⟨d, 1, hd1⟩⟩
+  constructor
+  · intro hcomm
+    -- Step A: `z.right = 1`
+    have hright : z.right = 1 := by
+      by_contra hq
+      have hprod_if : ∀ (x : Q) (c : D), (∏ ω, (if ω = x then c else 1)) = c := by
+        intro x c
+        rw [Finset.prod_eq_single x] <;> simp +contextual
+      set q := z.right with hqdef
+      set g : Q → D :=
+        fun ω => (if ω = (1 : Q) then d else 1) * (if ω = q then d else 1)⁻¹ with hg
+      have hgker : (inl g : D ≀[Q] Q) ∈ (augHom (D := D) (Q := Q)).ker := by
+        change (∏ ω, g ω) = 1
+        rw [hg, Finset.prod_mul_distrib, Finset.prod_inv_distrib, hprod_if, hprod_if,
+          mul_inv_cancel]
+      have hconj : ∀ ω : Q, g (q⁻¹ • ω) = g ω := by
+        have hzg := hcomm _ hgker
+        have hcj : z * inl g * z⁻¹ = inl g := by rw [hzg]; group
+        rw [conj_inl_of_comm (fun a b => mul_comm a b) z g] at hcj
+        intro ω
+        exact congrFun (inl_injective hcj) ω
+      have hq1 : (1 : Q) ≠ q := Ne.symm hq
+      have hqinv_ne : q⁻¹ ≠ (1 : Q) := fun h => hq (by rw [← inv_inv q, h, inv_one])
+      have h1 : g 1 = d := by simp [hg, hq1]
+      have hkey : g q⁻¹ = d := by
+        have hc1 := hconj 1
+        rw [smul_eq_mul, mul_one, h1] at hc1
+        exact hc1
+      by_cases hqq : q⁻¹ = q
+      · -- `q² = 1` かつ `q ≠ 1` ⟹ `p = 2`, よって `hd2` は `d² ≠ 1` の側
+        have hgval : g q⁻¹ = d⁻¹ := by simp [hg, hqq, hq]
+        have hdd : d * d = 1 := by
+          have hinv : d = d⁻¹ := hkey.symm.trans hgval
+          nth_rewrite 2 [hinv]
+          exact mul_inv_cancel d
+        have hd2' : d ^ 2 ≠ 1 := by
+          rcases hd2 with h3 | h2
+          · exfalso
+            have hq2 : q ^ 2 = 1 := by
+              rw [pow_two]
+              nth_rewrite 1 [← hqq]
+              exact inv_mul_cancel q
+            have horder : orderOf q = 2 := orderOf_eq_prime hq2 hq
+            have hdvd : orderOf q ∣ Nat.card Q := orderOf_dvd_natCard q
+            rw [horder, hQcard] at hdvd
+            have := (Nat.prime_dvd_prime_iff_eq Nat.prime_two (Fact.out : p.Prime)).mp hdvd
+            omega
+          · exact h2
+        exact hd2' (by rw [pow_two]; exact hdd)
+      · have hgval : g q⁻¹ = 1 := by simp [hg, hqinv_ne, hqq]
+        exact hd1 (hkey.symm.trans hgval)
+    -- Step B: `z = inl f` で `f` は定数
+    have hzinl : z = inl z.left := eq_inl_of_right_eq_one hright
+    have hconst : ∀ ω ω' : Q, z.left ω = z.left ω' := by
+      refine (forall_conj_inr_eq_iff_const (D := D) (Q := Q) (Ω := Q) z.left).mp fun q' => ?_
+      have hinr : (inr q' : D ≀[Q] Q) ∈ (augHom (D := D) (Q := Q)).ker := by
+        change (∏ ω, (inr q' : D ≀[Q] Q).left ω) = 1
+        simp
+      have hzq := hcomm _ hinr
+      calc (inr q' : D ≀[Q] Q) * inl z.left * (inr q')⁻¹
+          = inr q' * z * (inr q')⁻¹ := by rw [← hzinl]
+        _ = z * inr q' * (inr q')⁻¹ := by rw [hzq]
+        _ = z := by group
+        _ = inl z.left := hzinl
+    refine ⟨z.left 1, ?_, hzinl.trans (congrArg inl (funext fun ω => hconst ω 1))⟩
+    have hker : (∏ ω, z.left ω) = 1 := hz
+    calc (z.left 1) ^ p = ∏ _ω : Q, z.left 1 := by
+          rw [Finset.prod_const, Finset.card_univ, hcardQ]
+      _ = ∏ ω, z.left ω := Finset.prod_congr rfl fun ω _ => (hconst ω 1).symm
+      _ = 1 := hker
+  · rintro ⟨c, hcp, rfl⟩
+    intro y _
+    exact (Subgroup.mem_center_iff.mp ((mem_center_iff_exists_const _).mpr ⟨c, rfl⟩) y).symm
+
 end
 
 end OddOrder.Isaacs.Ch04
