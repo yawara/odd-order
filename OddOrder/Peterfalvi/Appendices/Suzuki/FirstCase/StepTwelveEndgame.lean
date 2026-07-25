@@ -549,6 +549,136 @@ theorem quotient_mem_zpowers_of_mul_comm
       _ = n := hw
   exact OddOrder.GroupTheory.mem_zpowers_of_centralizes hsurjAll a hcen
 
+include model in
+/-- **An element of `N_G(R)` acting trivially on `R₁/T` lies in `R₁`** ((12) tail,
+δ4-iii): its class in `N_G(R)/R` commutes with the class of any `x₁ ∈ R₁ ∖ R`
+(commutators land in `T ≤ R`), hence lies in `R₁/R` by
+`quotient_mem_zpowers_of_mul_comm`. -/
+theorem mem_of_forall_conj_mul_inv_mem_sInvertedT
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) {k : G}
+    (hk : k ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcen : ∀ x ∈ R₁, k * x * k⁻¹ * x⁻¹ ∈ fc.sInvertedT model) :
+    k ∈ R₁ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  obtain ⟨hTle, -, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hcardQ := fc.card_quotient_invImageF_eq model ind hB2 hm hGp hSigma
+  -- an element of `R₁` outside `R`.
+  have hnle : ¬ R₁ ≤ fc.invImageF model := by
+    intro h
+    have h2 := Subgroup.card_le_of_le h
+    rw [hcard, fc.card_invImageF model ind, hm, pow_one, fc.card_P] at h2
+    have h3 := fc.p_prime.two_le
+    have h4 : fc.p ^ 3 = (fc.p * fc.p) * fc.p := by ring
+    rw [h4] at h2
+    have h5 : (fc.p * fc.p) * fc.p ≤ (fc.p * fc.p) * 1 := by rwa [mul_one]
+    have h6 : fc.p ≤ 1 :=
+      Nat.le_of_mul_le_mul_left h5 (Nat.mul_pos fc.p_prime.pos fc.p_prime.pos)
+    omega
+  obtain ⟨x₁, hx₁R₁, hx₁nR⟩ := SetLike.not_le_iff_exists.mp hnle
+  -- its class has order `p` and generates the normal Sylow of `N/R`.
+  have hx₁NR : x₁ ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) :=
+    hR₁le hx₁R₁
+  set R' : Subgroup
+      ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) :=
+    (fc.invImageF model).subgroupOf
+      (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) with hR'def
+  have hξ1 : QuotientGroup.mk' R' ⟨x₁, hx₁NR⟩ ≠ 1 := by
+    intro h0
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h0
+    exact hx₁nR (Subgroup.mem_subgroupOf.mp h0)
+  have hordx : orderOf x₁ ∣ fc.p ^ 3 := by
+    have h1 : orderOf (R₁.subtype ⟨x₁, hx₁R₁⟩) = orderOf (⟨x₁, hx₁R₁⟩ : ↥R₁) :=
+      orderOf_injective R₁.subtype R₁.subtype_injective _
+    have h2 : orderOf (⟨x₁, hx₁R₁⟩ : ↥R₁) ∣ Nat.card ↥R₁ := orderOf_dvd_natCard _
+    rw [hcard] at h2
+    exact h1 ▸ h2
+  have hordxNR : orderOf
+      ((Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)).subtype
+        ⟨x₁, hx₁NR⟩)
+      = orderOf (⟨x₁, hx₁NR⟩ :
+        ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))) :=
+    orderOf_injective _ (Subgroup.subtype_injective _) _
+  have hordξ3 : orderOf (QuotientGroup.mk' R' ⟨x₁, hx₁NR⟩) ∣ fc.p ^ 3 := by
+    refine (orderOf_map_dvd (QuotientGroup.mk' R') _).trans ?_
+    have h9 : orderOf (⟨x₁, hx₁NR⟩ :
+        ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)))
+        = orderOf x₁ := by
+      rw [← hordxNR, Subgroup.subtype_apply]
+    rw [h9]
+    exact hordx
+  have hordξQ : orderOf (QuotientGroup.mk' R' ⟨x₁, hx₁NR⟩)
+      ∣ fc.p * (fc.p - 1) := by
+    have h1 : orderOf (QuotientGroup.mk' R' ⟨x₁, hx₁NR⟩)
+        ∣ Nat.card (_ ⧸ R') := orderOf_dvd_natCard _
+    rwa [hcardQ] at h1
+  have hordξ : orderOf (QuotientGroup.mk' R' ⟨x₁, hx₁NR⟩) = fc.p := by
+    have hcopP : Nat.Coprime fc.p (fc.p - 1) :=
+      (Nat.Prime.coprime_iff_not_dvd fc.p_prime).mpr (fun h => by
+        have h1 := Nat.le_of_dvd (by have := fc.p_prime.two_le; omega) h
+        have := fc.p_prime.two_le
+        omega)
+    have h5 : orderOf (QuotientGroup.mk' R' ⟨x₁, hx₁NR⟩) ∣ fc.p :=
+      (Nat.Coprime.coprime_dvd_left hordξ3 (hcopP.pow_left 3)).dvd_of_dvd_mul_right
+        hordξQ
+    rcases (fc.p_prime.eq_one_or_self_of_dvd _ h5).symm with heq | heq
+    · exact heq
+    · exact absurd (orderOf_eq_one_iff.mp heq) hξ1
+  have hσn := OddOrder.GroupTheory.zpowers_normal_of_orderOf_eq fc.p_prime hcardQ hordξ
+  -- the class of `k` commutes with the class of `x₁`.
+  have hcomm : QuotientGroup.mk' R' ⟨k, hk⟩ * QuotientGroup.mk' R' ⟨x₁, hx₁NR⟩
+      = QuotientGroup.mk' R' ⟨x₁, hx₁NR⟩ * QuotientGroup.mk' R' ⟨k, hk⟩ := by
+    have h1 : k * x₁ * k⁻¹ * x₁⁻¹ ∈ fc.invImageF model := hTle (hcen x₁ hx₁R₁)
+    have h2 : (⟨k, hk⟩ * ⟨x₁, hx₁NR⟩ * (⟨k, hk⟩ :
+        ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)))⁻¹
+        * (⟨x₁, hx₁NR⟩ :
+          ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)))⁻¹)
+        ∈ R' := by
+      rw [Subgroup.mem_subgroupOf]
+      exact h1
+    have h3 : QuotientGroup.mk' R' (⟨k, hk⟩ * ⟨x₁, hx₁NR⟩ * (⟨k, hk⟩ :
+        ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)))⁻¹
+        * (⟨x₁, hx₁NR⟩ :
+          ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)))⁻¹)
+        = 1 := by
+      rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+      exact h2
+    rw [map_mul, map_mul, map_mul, map_inv, map_inv] at h3
+    have h4 := congrArg (fun z => z * (QuotientGroup.mk' R' ⟨x₁, hx₁NR⟩)
+      * (QuotientGroup.mk' R' ⟨k, hk⟩)) h3
+    simpa [mul_assoc] using h4
+  -- conclude via the centralizer collapse.
+  have hkmem := fc.quotient_mem_zpowers_of_mul_comm model ind hB2 hm hGp hSigma
+    hordξ hσn hcomm
+  obtain ⟨w, hw⟩ := Subgroup.mem_zpowers_iff.mp hkmem
+  have h5 : QuotientGroup.mk' R' ((⟨x₁, hx₁NR⟩ :
+      ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))) ^ w)
+      = QuotientGroup.mk' R' ⟨k, hk⟩ := by
+    rw [map_zpow]
+    exact hw
+  have h6 : (⟨x₁, hx₁NR⟩ :
+      ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))) ^ w
+      * (⟨k, hk⟩ :
+        ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)))⁻¹
+      ∈ R' := by
+    rw [← QuotientGroup.eq_one_iff, ← QuotientGroup.mk'_apply, map_mul, map_inv, h5]
+    group
+  rw [Subgroup.mem_subgroupOf] at h6
+  have h7 : x₁ ^ w * k⁻¹ ∈ fc.invImageF model := by
+    simpa using h6
+  have h9 : k = (x₁ ^ w * k⁻¹)⁻¹ * x₁ ^ w := by group
+  rw [h9]
+  exact mul_mem (inv_mem (hRle h7)) (Subgroup.zpow_mem R₁ hx₁R₁ w)
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
