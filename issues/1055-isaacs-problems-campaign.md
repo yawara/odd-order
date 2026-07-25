@@ -1497,6 +1497,23 @@ transfer `v : G →* P` (P abelian) を取ると、transfer 評価の各因子
 `Nat.card_sigma` + `Nat.card_zmod`) なので `v'(x) = ϕ⟨x^{|G:P|}⟩`。
 ⚠ **mathlib の `MonoidHom.transfer_eq_pow` は「厳密な固定」を要求するので使えない**
 (法 `U` で十分という弱い仮定では通らない) — 軌道分解版を使うこと。
+
+⭐ **商群 `↥P ⧸ U` を作る必要はない** (2026-07-26 の知見): `↥P` が可換なので、
+軌道分解の各因子が `x^{n_q}` と `U` を法として一致すれば、**積もそのまま**
+`x^{∑ n_q} = x^{|G:P|}` と法 `U` で一致する (`Finset.prod_mul_distrib` +
+`Finset.prod_pow_eq_pow_sum`)。結論は
+`(x ^ |G:P|)⁻¹ * (transfer (MonoidHom.id ↥P) x : G) ∈ U` の形で書ける。
+
+⚠ **未解決の実装障害 (2026-07-26)**: `↥P` の **`CommGroup` instance diamond**。
+`MonoidHom.transfer` は target に `CommGroup` を要求するが、`↥P` には
+`Subgroup.toGroup` 由来の `Group` があるため、`haveI : CommGroup ↥P` を入れると
+`MonoidHom.id ↥P` の型 (`Subgroup.toGroup` 側) と
+`transfer_eq_prod_quotient_orbitRel_zpowers_quot` が要求する型 (`CommGroup.toGroup` 側) が
+unify しない。`Ch05_Transfer/CentralTransfer.lean` の Thm 5.3 は
+`@MonoidHom.transfer G _ ↑P ↑P ((haveI := hPab; (inferInstance : CommGroup ↥↑P)))
+(MonoidHom.id ↑P) _` の `@` 明示形で回避しているので、**評価補題側も同じ `@` 明示形で
+instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot`
+の implicit/explicit の並びを確認してから書く)。
 `|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
 `G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
 
