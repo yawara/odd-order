@@ -161,8 +161,37 @@ statement (Peterfalvi p. 108 に明記、[Ha] Thm 14.4.2):
 - 別ルート: `|Ab(C₃≀C₃)| = 9` を計算すれば `|⁅R₂,R₂⁆| ≥ 27` が出るので
   `|⁅R₂,R₂⁆| ≤ 9` 系の上界が取れれば矛盾 (ただし `⁅R₁,W⁆` の評価が要る)。
 
-⟹ 次の一手は **`⁅R₁, W⁆` の構造** (特に `⁅R, W⁆`、`R = invImageF`) を (14) の材料から
-詰めて `γ₃(R₂) ≤ Z₁` を出すこと。
+### 2026-07-26 続き: `|W| = 9` 側の部品 landed + 場合分けの確定
+
+landed (同 leaf):
+
+| 内容 | 宣言名 |
+|---|---|
+| 有限 p-群の非自明正規部分群は中心と交わる | `exists_mem_center_of_normal_ne_bot` (generic) |
+| 部分群 `X` が全射 `f` で `⊤` に落ちるとき `lcs X n ≤ ker f ⟹ lcs ⊤ n = ⊥` | `lowerCentralSeries_eq_bot_of_subgroup_le_ker` (generic) |
+| **`⁅W, P⁆ ≤ Σ`** (W 巡回・`w⁹ = 1`・`P` は `W³ ≤ Σ` を中心化) | `commutatorElement_mem_sigma_of_mem_W_of_mem_P` |
+| **`⁅LV, LV⁆ ≤ Z₁Σ`** (`⁅L,W⁆ = 1`, `⁅P,L⁆ ≤ Z₁`, `⁅W,P⁆ ≤ Σ`) | `commutator_sup_nonsplitTorus_V_le` |
+| **`γ₃(LV) = 1`** (`Z₁Σ = Z(LV)` が `LV` を中心化) | `lowerCentralSeries_sup_nonsplitTorus_V_eq_bot` |
+
+これで `|W| = 9` の残り場合分けが確定した (`K := ker φ`、`|K| = 9`):
+
+1. `Z₁ = Z(R₂) ≤ K` (上の generic 補題; `|Z(R₂)| = 3`)。
+2. **`K ⊄ R₁` なら終わり**: `R₁` は指数 3 = 極大 ⟹ `φ(R₁) = C₃≀C₃`、
+   一方 (16) の `γ₃(R₁) ≤ Z₁ ≤ K` ⟹ 商の class ≤ 2 で矛盾。
+3. **`K ⊄ LV` なら終わり**: 同様に `φ(LV) = C₃≀C₃`、しかし `γ₃(LV) = 1` (landed) ⟹
+   class ≤ 2 で矛盾 (`K` の情報すら不要)。
+4. ⟹ **残るのは `K ≤ R₁ ⊓ LV = LΣP` (位数 3⁴) の場合のみ**。
+   このとき `R₁/K` と `LV/K` は `C₃≀C₃` の相異なる指数 3 部分群で、
+   両者が可換なら交わり `M/K` が中心に入り class ≤ 2 で矛盾するので、
+   **少なくとも一方は非可換** = `⁅R₁,R₁⁆ ⊄ K` または `⁅LV,LV⁆ ⊄ K`。
+   `⁅LV,LV⁆ ≤ Z₁Σ` なので、`K = Z₁Σ` の場合は `⁅R₁,R₁⁆ ⊄ Z₁Σ` が必要。
+   ⟹ **決め手の候補 = `⁅R₁, R₁⁆ ≤ Z₁Σ` の証明** (これが出れば `K = Z₁Σ` 分岐が死ぬ)。
+   材料: `card_commutator_sylowThree_le` (`|⁅R₁,R₁⁆| ≤ 9`、生成元 `u ∈ R∖Z₁P` と
+   `v ∈ L` の `⁅u,v⁆` で張られる)、`R ≤ C_G(P)` (`invImageF_le_centralizer`)、
+   `R` は可換 (`invImageF_mul_comm`)、`Z₁ ≤ R`、`R ⊓ Σ = 1`。
+
+⟹ 次の一手は上記 2, 3 の Lean 組み立て (部品は揃っている) と、
+`⁅R₁,R₁⁆ ≤ Z₁Σ` (⟺ `⁅u,v⁆ ∈ Z₁Σ`) の検討。
 
 ## 証明方針 (旧、未確定)
 
