@@ -861,6 +861,136 @@ theorem exists_group_card_eq_elementaryAbelian_isConj (p k : ℕ) [Fact p.Prime]
     affineGroupOfField_ker_isElementaryAbelian _ p,
     fun g h => affineGroupOfField_isConj_of_orderOf_eq _ p⟩
 
+/-! ### Problem 3A.8 — 位数 `pqr` の巡回群の `Aut` にある Klein 四元群
+
+巡回群 `C = ZMod n` の自己同型は単元倍。`n = s·m` (`gcd(s,m) = 1`) のとき「`s`-捩れを固定し
+`m`-捩れを反転する」自己同型は、生成元での条件 `u·m = m`, `u·s = -s` と同値で、Bezout
+`sA + mB = 1` から `u := -1 + 2·(mB)` として**明示的に構成**できる (CRT の一般論は不要)。 -/
+
+/-- `n = d·m` のとき、`ZMod n` の `d`-捩れ (`d·x = 0`) はちょうど `m` の倍数全体。
+
+`⟸` は `d·m = n ≡ 0`。`⟹` は `x.val` に降りて `n ∣ d·x.val`、`d` で割って `m ∣ x.val`。 -/
+theorem mul_eq_zero_iff_exists_mul {n d m : ℕ} [NeZero n] (hn : d * m = n) (x : ZMod n) :
+    (d : ZMod n) * x = 0 ↔ ∃ k : ZMod n, x = (m : ZMod n) * k := by
+  have hd0 : 0 < d := by
+    rcases Nat.eq_zero_or_pos d with h0 | h0
+    · exact absurd hn.symm (by rw [h0, zero_mul]; exact (NeZero.ne n))
+    · exact h0
+  constructor
+  · intro h
+    have hval : ((d * x.val : ℕ) : ZMod n) = 0 := by
+      rw [Nat.cast_mul, ZMod.natCast_val, ZMod.cast_id]
+      exact h
+    obtain ⟨c, hc⟩ := (ZMod.natCast_eq_zero_iff _ _).mp hval
+    have hxval : x.val = m * c := by
+      refine Nat.eq_of_mul_eq_mul_left hd0 ?_
+      rw [hc, ← hn]; ring
+    refine ⟨(c : ZMod n), ?_⟩
+    have hcast : ((x.val : ℕ) : ZMod n) = ((m * c : ℕ) : ZMod n) := by rw [hxval]
+    rwa [ZMod.natCast_val, ZMod.cast_id, Nat.cast_mul] at hcast
+  · rintro ⟨k, rfl⟩
+    rw [← mul_assoc, ← Nat.cast_mul, hn, ZMod.natCast_self, zero_mul]
+
+/-- **Isaacs Problem 3A.8(a)** の核. `n = s·m` (`gcd(s,m) = 1`, `n` 奇数, `1 < m`) のとき、
+`ZMod n` に「`s`-捩れの生成元 `m` を固定し `m`-捩れの生成元 `s` を反転する」元 `u` が
+**ちょうど 1 つ**存在する。さらに `u·u = 1` かつ `u ≠ 1` (すなわち `Aut(C)` の involution)。
+
+構成: Bezout `sA + mB = 1` に対し `e := mB` は `m ∣ e`, `s ∣ e - 1` をみたし (`e² = e`)、
+`u := -1 + 2e` が条件をみたす。一意性は `(u - u')·m = 0 = (u - u')·s` と
+`u - u' = (u-u')(sA + mB) = 0` から。 -/
+theorem exists_unique_fixes_inverts {n s m : ℕ} [NeZero n] (hn : s * m = n) (hm : 1 < m)
+    (hcop : Nat.Coprime s m) (hodd : ¬ (2 ∣ n)) :
+    ∃! u : ZMod n, (u * (m : ZMod n) = (m : ZMod n) ∧ u * (s : ZMod n) = -(s : ZMod n)) ∧
+      u * u = 1 ∧ u ≠ 1 := by
+  obtain ⟨A, B, hAB⟩ : ∃ A B : ℤ, (s : ℤ) * A + (m : ℤ) * B = 1 := by
+    refine ⟨Nat.gcdA s m, Nat.gcdB s m, ?_⟩
+    have hg := Nat.gcd_eq_gcd_ab s m
+    rw [Nat.Coprime.gcd_eq_one hcop] at hg
+    exact_mod_cast hg.symm
+  -- `e := mB` (整数) の像
+  set E : ℤ := (m : ℤ) * B with hE
+  set e : ZMod n := (E : ZMod n) with he
+  have hnZ : ((n : ℤ)) = (s : ℤ) * (m : ℤ) := by exact_mod_cast hn.symm
+  -- `e·m = m`, `e·s = 0`, `e² = e`
+  have hem : e * (m : ZMod n) = (m : ZMod n) := by
+    have : ((E * m - m : ℤ) : ZMod n) = 0 := by
+      rw [ZMod.intCast_zmod_eq_zero_iff_dvd]
+      refine ⟨-A, ?_⟩
+      have : E * (m : ℤ) - (m : ℤ) = (m : ℤ) * (E - 1) := by ring
+      rw [this, show E - 1 = -((s : ℤ) * A) from by rw [hE]; linarith [hAB], hnZ]
+      ring
+    have h2 : (E : ZMod n) * ((m : ℤ) : ZMod n) - ((m : ℤ) : ZMod n) = 0 := by
+      push_cast at this ⊢; linear_combination this
+    push_cast at h2
+    rw [he]; linear_combination h2
+  have hes : e * (s : ZMod n) = 0 := by
+    have : ((E * s : ℤ) : ZMod n) = 0 := by
+      rw [ZMod.intCast_zmod_eq_zero_iff_dvd]
+      exact ⟨B, by rw [hE, hnZ]; ring⟩
+    push_cast at this
+    rw [he]; linear_combination this
+  have hee : e * e = e := by
+    have : ((E * E - E : ℤ) : ZMod n) = 0 := by
+      rw [ZMod.intCast_zmod_eq_zero_iff_dvd]
+      refine ⟨-(A * B), ?_⟩
+      have : E * E - E = E * (E - 1) := by ring
+      rw [this, show E - 1 = -((s : ℤ) * A) from by rw [hE]; linarith [hAB], hE, hnZ]
+      ring
+    push_cast at this
+    rw [he]; linear_combination this
+  refine ⟨-1 + 2 * e, ⟨⟨?_, ?_⟩, ?_, ?_⟩, ?_⟩
+  · rw [add_mul, neg_one_mul, mul_assoc, hem]; ring
+  · rw [add_mul, neg_one_mul, mul_assoc, hes]; ring
+  · have : (-1 + 2 * e) * (-1 + 2 * e) = 1 - 4 * e + 4 * (e * e) := by ring
+    rw [this, hee]; ring
+  · intro hcon
+    -- `u = 1` ⟹ `n ∣ 2sA` ⟹ `m ∣ 2A`、Bezout と合わせて `m ∣ 2`、`m` 奇で `1 < m` に矛盾
+    have h1 : ((2 * (s : ℤ) * A : ℤ) : ZMod n) = 0 := by
+      have he1 : e - 1 = ((-((s : ℤ) * A) : ℤ) : ZMod n) := by
+        rw [he, ← Int.cast_one, ← Int.cast_sub]
+        congr 1
+        rw [hE]; linarith [hAB]
+      have h2 : (2 : ZMod n) * (e - 1) = 0 := by linear_combination hcon
+      rw [he1] at h2
+      push_cast at h2 ⊢
+      linear_combination -h2
+    rw [ZMod.intCast_zmod_eq_zero_iff_dvd, hnZ] at h1
+    have hs0 : (0 : ℤ) < (s : ℤ) := by
+      rcases Nat.eq_zero_or_pos s with h0 | h0
+      · exact absurd hn.symm (by rw [h0, zero_mul]; exact (NeZero.ne n))
+      · exact_mod_cast h0
+    have hm2A : (m : ℤ) ∣ 2 * A := by
+      obtain ⟨c, hc⟩ := h1
+      refine ⟨c, ?_⟩
+      refine mul_left_cancel₀ (ne_of_gt hs0) ?_
+      linarith [hc]
+    obtain ⟨c, hc⟩ := hm2A
+    have hm2 : (m : ℤ) ∣ 2 := ⟨(s : ℤ) * c + 2 * B, by linear_combination (s : ℤ) * hc - 2 * hAB⟩
+    have hmodd : ¬ (2 ∣ m) := fun ⟨c', hc'⟩ => hodd ⟨s * c', by rw [← hn, hc']; ring⟩
+    have hmle : m ≤ 2 := by exact_mod_cast Int.le_of_dvd two_pos hm2
+    exact hmodd (by omega)
+  · rintro y ⟨⟨hy1, hy2⟩, -, -⟩
+    have hd : (y - (-1 + 2 * e)) * (m : ZMod n) = 0 := by
+      rw [sub_mul, hy1]
+      rw [add_mul, neg_one_mul, mul_assoc, hem]
+      ring
+    have hd2 : (y - (-1 + 2 * e)) * (s : ZMod n) = 0 := by
+      rw [sub_mul, hy2]
+      rw [add_mul, neg_one_mul, mul_assoc, hes]
+      ring
+    have hone : ((s : ZMod n)) * ((A : ℤ) : ZMod n) + ((m : ZMod n)) * ((B : ℤ) : ZMod n)
+        = 1 := by
+      have : (((s : ℤ) * A + (m : ℤ) * B : ℤ) : ZMod n) = ((1 : ℤ) : ZMod n) := by rw [hAB]
+      push_cast at this
+      linear_combination this
+    have := sub_eq_zero.mp (by
+      calc y - (-1 + 2 * e)
+          = (y - (-1 + 2 * e)) * (((s : ZMod n)) * ((A : ℤ) : ZMod n)
+              + ((m : ZMod n)) * ((B : ℤ) : ZMod n)) := by rw [hone, mul_one]
+        _ = 0 := by
+            rw [mul_add, ← mul_assoc, ← mul_assoc, hd, hd2]; ring)
+    exact this
+
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,
 a.right·b.right)` を写すと `(a.left·a.right·b.left·b.right, a.right·b.right)` = 直積の積の像。 -/
