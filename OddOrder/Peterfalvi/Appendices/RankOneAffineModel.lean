@@ -158,6 +158,11 @@ structure AffineNearFieldModel {G Ω : Type*} [Group G] [MulAction G Ω] [Finite
   /-- If `u ≠ v` are involutions of `G` then `|uv|` is the characteristic of `F`. -/
   orderOf_mul_of_involutions : ∀ u v : G, u ^ 2 = 1 → u ≠ 1 → v ^ 2 = 1 → v ≠ 1 → u ≠ v →
     orderOf (u * v) = char
+  /-- The product of two distinct involutions of `G` is a *translation*: both involutions
+  invert the abelian regular normal subgroup, so their product centralizes it and hence
+  lies in it.  (Peterfalvi App. C, Prop 1; used for `Z₁ ⊆ T` in Part II, Ch. II (14).) -/
+  mul_involutions_mem_range : ∀ u v : G, u ^ 2 = 1 → u ≠ 1 → v ^ 2 = 1 → v ≠ 1 → u ≠ v →
+    u * v ∈ MonoidHom.range emb
 
 -- (`rankOne_affine_nearField` is stated and proved below, after its prerequisites
 -- `oddCore_ne_bot` / `exists_regular_normal` / `brauerSuzuki` / `exists_conj_regular`.)
@@ -562,7 +567,8 @@ theorem RankOneHypothesis.model_involution_data {G Ω : Type*} [Group G] [MulAct
     (hcompl : Subgroup.IsComplement' Fsub hyp.H) (hexp : ∀ x ∈ Fsub, x ^ p = 1)
     (hFodd : Odd (Nat.card ↥Fsub)) :
     (∃! u : ↥hyp.H, (u : G) ^ 2 = 1 ∧ (u : G) ≠ 1) ∧
-      (∀ u v : G, u ^ 2 = 1 → u ≠ 1 → v ^ 2 = 1 → v ≠ 1 → u ≠ v → orderOf (u * v) = p) := by
+      (∀ u v : G, u ^ 2 = 1 → u ≠ 1 → v ^ 2 = 1 → v ≠ 1 → u ≠ v →
+        u * v ∈ Fsub ∧ orderOf (u * v) = p) := by
   classical
   haveI := hyp.faithful
   haveI h2t := hyp.doubly_transitive
@@ -792,6 +798,7 @@ theorem RankOneHypothesis.model_involution_data {G Ω : Type*} [Group G] [MulAct
       have h1 : u⁻¹ = v := mul_eq_one_iff_inv_eq.mp h
       have h2 : u⁻¹ = u := mul_eq_one_iff_inv_eq.mp (by rw [← pow_two]; exact hu2)
       rw [← h1, h2]
+    refine ⟨huvF, ?_⟩
     have hdvd : orderOf (u * v) ∣ p := orderOf_dvd_of_pow_eq_one (hexp _ huvF)
     rcases (Nat.Prime.eq_one_or_self_of_dvd hp _ hdvd) with h1 | hp'
     · exact absurd (orderOf_eq_one_iff.mp h1) huv1
@@ -941,7 +948,12 @@ theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAct
       char := p
       char_prime := hp
       char_spec := ?_
-      orderOf_mul_of_involutions := (hyp.model_involution_data hp htrans hcompl hexp hFodd).2 }
+      orderOf_mul_of_involutions := fun u v hu2 hu1 hv2 hv1 huv =>
+        ((hyp.model_involution_data hp htrans hcompl hexp hFodd).2 u v hu2 hu1 hv2 hv1 huv).2
+      mul_involutions_mem_range := fun u v hu2 hu1 hv2 hv1 huv => by
+        rw [hrange]
+        exact ((hyp.model_involution_data hp htrans hcompl hexp hFodd).2
+          u v hu2 hu1 hv2 hv1 huv).1 }
   · -- qEquiv_conj: conjugation by `q` = right mult by `qEquiv q⁻¹` (`mul_mulEquivUnits_inv`).
     intro q x
     simp only [hemb_apply]
