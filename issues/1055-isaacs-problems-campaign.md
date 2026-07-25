@@ -1474,13 +1474,23 @@ G ⧸ H ≃ (G ⧸ K) × (↥K ⧸ H.subgroupOf K)` (`⟦g⟧_H ↦ (⟦g⟧_K, 
 ⚠ `left_inv` は `Quotient.liftOn'` の beta/iota 簡約が `rw` に効かないので `change` で
 明示的に落とす必要がある。
 
-残作業: (i) `∏_{G ⧸ H}` を `quotientEquivProd` で `∏_{G ⧸ K} ∏_{K ⧸ H'}` に書き換える
-(`Equiv.prod_comp` + `Fintype.prod_prod_type`)、(ii) `T * S` を `H.LeftTransversal` として
-束ね (`isComplement_mul_of_transversal_left` から)、その `leftQuotientEquiv` が
-`(q, r) ↦ τ q * σ r` になることを見る、(iii) 内側の積が
-`diff_{H'≤K} ϕ' S (m_q • S) = transfer_{H'≤K} ϕ' m_q` (`m_q = (τ(g•q))⁻¹ g τ q ∈ K`) に
-一致することを見て、外側が `diff_K (transfer ϕ') T (g•T) = transfer_K (transfer ϕ') g` に
-なることを確認する。
+**積 transversal も landing (2026-07-26)**: `mulTransversalFun` (`q ↦ τ(q₁)·σ(q₂)`) /
+`mulTransversalFun_spec` / `mulTransversal` / `mulTransversal_leftQuotientEquiv`。
+⭐ **`Set` の積を作らず `Set.range F` として構成する**のが要点 —
+mathlib `Subgroup.isComplement_range_left` (「`∀ q, (F q : G ⧸ H) = q` なら
+`Set.range F` は左 transversal」) と `Subgroup.IsComplement.leftQuotientEquiv_apply` で
+**transversal 性と代表元計算則が同時に**手に入り、`isComplement_mul_of_transversal_left`
+(書籍 5A.3(b) の忠実な形式化として保持) を経由する必要すらない。
+
+**残作業 = 最終計算のみ**。因子の計算は次のとおり確認済 (紙の上):
+`q = e.symm (q₁, r)` に対し `(P q)⁻¹ · (g•P) q = (σ r)⁻¹ · m⁻¹ · σ(m•r)`,
+ここで `m := ⟨τ(g⁻¹•q₁)⁻¹ · g⁻¹ · τ(q₁)⟩ ∈ K`。ゆえに
+`∏_r ϕ(…) = diff_{H'} ϕ' S (m⁻¹ • S) = transfer_{H'≤K} ϕ' m⁻¹`,
+`∏_{q₁} が diff_K (transfer ϕ') T (g•T) = transfer_K (transfer ϕ') g`。
+実装は (a) `MonoidHom.transfer_def` で両辺を `diff` にする、(b) `diff` を展開して
+`Equiv.prod_comp (quotientEquivProd …)` + `Fintype.prod_prod_type` で二重積化、
+(c) `Subgroup.smul_leftQuotientEquiv'` (`((f•S) q : G) = f • S (f⁻¹ • q)`) で
+`g•P`, `m⁻¹•S` を書き下して因子を照合。
 
 ### 5A.2 の設計 (2026-07-26 に確定、**実装済** `transfer_top_eq_apply`)
 

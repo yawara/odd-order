@@ -384,4 +384,52 @@ theorem quotientEquivProd_apply_snd {G : Type*} [Group G] {H K : Subgroup G} (hH
       QuotientGroup.mk ⟨(T.2.leftQuotientEquiv (QuotientGroup.mk g) : G)⁻¹ * g,
         Subgroup.IsComplement.inv_toLeftFun_mul_mem T.2 g⟩ := rfl
 
+/-! ### 5A.3(c)(d) 用: 積 transversal -/
+
+/-- 積 transversal の代表元関数 `q ↦ τ(q₁) · σ(q₂)`
+(`q₁`, `q₂` は `quotientEquivProd` による `q` の 2 成分)。 -/
+noncomputable def mulTransversalFun {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal) (q : G ⧸ H) : G :=
+  (T.2.leftQuotientEquiv ((quotientEquivProd hHK T) q).1 : G) *
+    ((S.2.leftQuotientEquiv ((quotientEquivProd hHK T) q).2 : ↥K) : G)
+
+/-- `mulTransversalFun` は各剰余類の代表元を与える。 -/
+theorem mulTransversalFun_spec {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal) (q : G ⧸ H) :
+    (QuotientGroup.mk (mulTransversalFun hHK T S q) : G ⧸ H) = q := by
+  induction q using QuotientGroup.induction_on with
+  | H g =>
+    refine QuotientGroup.eq.mpr ?_
+    set k : ↥K := ⟨(T.2.leftQuotientEquiv (QuotientGroup.mk g) : G)⁻¹ * g,
+      Subgroup.IsComplement.inv_toLeftFun_mul_mem T.2 g⟩ with hk
+    have hmem : ((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K))⁻¹ * k ∈ H.subgroupOf K :=
+      Subgroup.IsComplement.inv_toLeftFun_mul_mem S.2 k
+    rw [Subgroup.mem_subgroupOf] at hmem
+    have hval : ((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K) : G)⁻¹ * (k : G) ∈ H := by
+      simpa using hmem
+    change (mulTransversalFun hHK T S (QuotientGroup.mk g))⁻¹ * g ∈ H
+    have hfun : mulTransversalFun hHK T S (QuotientGroup.mk g) =
+        (T.2.leftQuotientEquiv (QuotientGroup.mk g) : G) *
+          ((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K) : G) := rfl
+    rw [hfun]
+    have hgrp : ((T.2.leftQuotientEquiv (QuotientGroup.mk g) : G) *
+        ((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K) : G))⁻¹ * g =
+        ((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K) : G)⁻¹ * (k : G) := by
+      rw [hk]
+      group
+    rw [hgrp]
+    exact hval
+
+/-- `T` と `S` から作る `H` の左 transversal (5A.3(b) の左版の transversal 化)。 -/
+noncomputable def mulTransversal {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal) : H.LeftTransversal :=
+  ⟨Set.range (mulTransversalFun hHK T S),
+    Subgroup.isComplement_range_left (mulTransversalFun_spec hHK T S)⟩
+
+/-- 積 transversal の代表元取りは `mulTransversalFun` そのもの。 -/
+theorem mulTransversal_leftQuotientEquiv {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal) (q : G ⧸ H) :
+    (((mulTransversal hHK T S).2.leftQuotientEquiv q : G)) = mulTransversalFun hHK T S q :=
+  Subgroup.IsComplement.leftQuotientEquiv_apply (mulTransversalFun_spec hHK T S) q
+
 end OddOrder.Isaacs.Ch05
