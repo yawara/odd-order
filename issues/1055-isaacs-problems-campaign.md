@@ -1390,8 +1390,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 |---|---|---|
 | 4D.1(a)(b) | ✅ | `commutator_eq_bot_of_centralizer_le_of_coprime` / `inf_centralizer_eq_bot_of_centralizer_le_of_coprime` (`ProblemsCoprimeAction.lean`) |
 | 4D.2 | ✅ | `baerAdd_mul_inv_of_commutator_le_center` / `baerMul_div_eq_commutator` (`ProblemsBaerAddition.lean`) |
-| 4D.3(a)(b) | ✅ | `IsIrreducibleCoprimeAction.exists_isPGroup` / `.commutator_le_center` (`ProblemsIrreducibleAction.lean`) |
-| 4D.3(c)–(g) | ⬜ | 下記の設計どおり (同 leaf に追記) |
+| 4D.3 | ✅ 全 7 小問 | `IsIrreducibleCoprimeAction.*` (`ProblemsIrreducibleAction.lean`): (a) `exists_isPGroup` / (b) `commutator_le_center` / (c) `fixedPoints_eq_commutator` + `eq_commutator_or_eq_top_of_isAInvariant` / (d) `pow_mem_commutator` + `pow_eq_one_quotient_commutator` / (e) `pow_eq_one_of_mem_commutator` / (f) `pow_eq_one_of_ne_two` / (g) `pow_four_eq_one_of_two` |
 | 4D.4 | ⬜ | 2-群 + 奇数位数 `A` が `x⁴=1` を全部固定 ⟹ 自明 |
 | 4D.5 | ⬜ | derived length `n+1` (+ 任意に大きい導来長の可解群) |
 | 4D.6 | ⬜ | Fitting の定理 (Thm 4.34) の写像 `θ` で `θ(G) = C_G(A)`, `ker θ = ⁅G,A⁆` |
@@ -1426,6 +1425,20 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
   `G/G' →* G'` を誘導し, これは `A`-同変。`A` は `G'` (target) に自明作用するので
   誘導写像は `⁅G/G', A⁆ = G/G'` 上で自明 ⟹ 恒等的に 1 ⟹ `x^p = 1`。
 - **(g)** `p = 2` ⟹ `x⁴ = 1`。(d) で `x² ∈ G'`、(e) で `G'` の exponent は 2 ⟹ `x⁴ = 1`。
+
+⚠ 実装知見 (2026-07-25、全 7 小問完了):
+- `G ⧸ commutator G` に **`CommGroup` instance は無い** (mathlib は `Abelianization` を別 def に
+  している)。repo 既存パターン `letI : CommGroup X := { (inferInstance : Group X) with
+  mul_comm := … }` で供給する (`Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr le_rfl`
+  から `IsMulCommutative` を得て `.is_comm.comm`)。この letI の下で
+  `fixedPoints_inf_actionCommutator_eq_bot_of_abelian` (Thm 4.34) がそのまま適用できた
+  (Group instance は structure eta で defeq)。
+- 副産物 `frattini_eq_commutator` (`Φ(G) = G'`)。`frattini G ≠ ⊤` は mathlib
+  `frattini_nongenerating` を `K = ⊥` で使う (`⊥ ⊔ Φ = ⊤ → ⊥ = ⊤` の矛盾)。
+- class ≤2 の道具は Ch04 Main に既存: `mul_pow_of_class_le_two` ((x*y)^n の collection 公式) /
+  `commutatorElement_pow_left_of_class_le_two` (⁅x^n,z⁆ = ⁅x,z⁆^n) /
+  `commutatorElement_mem_commutator_top`。
+- `omit [Finite A] [Finite G] in` は **docstring より前**に書く (後ろだと構文エラー)。
 
 #### 🎉 4A.11 完了 (2026-07-25) — `ProblemsWreath.lean` に追加
 
