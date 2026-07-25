@@ -1445,7 +1445,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.5 | ✅ | `exists_mem_normalizer_conj_eq_of_normal` + `eq_of_characteristic_of_conj` (`Problems5C.lean`) |
 | 5C.6 | 🔒 hub | weak closure。**hub レーンが `OddOrder/GroupTheory/WeaklyClosed.lean` で着手中** (issue 9503) — A レーンは触らない |
 | 5C.7 | ✅ 完了 (`normal_sylow_three_of_card_eq`) | `\|G\| = 3^a·5·11` ⇒ Sylow-3 が正規 |
-| 5C.8 | ⬜ | `p` が最小素因数 (`p > 2`) で `p^3 ∤ \|G\|` ⇒ 正規 p-補群 |
+| 5C.8 | ✅ 完了 (`hasNormalPComplement_of_minFac_of_not_dvd_pow_three`) | `p` が最小素因数 (`p > 2`) で `p^3 ∤ \|G\|` ⇒ 正規 p-補群 |
 | 5C.9 | ⬜ | 非可換単純で偶数位数、`8 ∤ \|G\|` ⇒ `3 \| \|G\|` |
 | 5C.10 | ⬜ | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
 | 5C.11 | ⬜ | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
@@ -1560,6 +1560,27 @@ instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbit
 の implicit/explicit の並びを確認してから書く)。
 `|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
 `G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
+
+### 5C.8 の実装メモ (2026-07-26)
+
+**主張** (PDF 実測): `p > 2` が `|G|` の最小素因数で `p^3 ∤ |G|` ⇒ `G` は正規 `p`-補群を持つ。
+
+Sylow-`p` `P` は位数 `p^n` (`n ≤ 2`) ゆえ可換なので、Burnside
+(`Basic.lean` の `hasNormalPComplement_of_sylow_normalizer_le_centralizer`) より
+`N_G(P) ≤ C_G(P)` を示せばよい。`N/C ↪ Aut(P)` なので `|N : C|` は `|Aut P|` と `|G|` の
+両方を割り、`P` 可換ゆえ `p ∤ |N : C|`。素数 `q ∣ |N:C|` があれば最小性から `q > p`。
+
+⭐ **`|Aut P|` を計算せずに済ませた**。書籍の標準証明は
+`|Aut(C_p × C_p)| = |GL_2(F_p)| = p(p-1)^2(p+1)` を使うが、mathlib に `Aut` の同型計算が
+無い。代わりに位数 `q` の自己同型 `σ` を取り、`⟨σ⟩` の `P` への作用で軌道数え上げ
+(`IsPGroup.card_modEq_card_fixedPoints`) すると `p^n ≡ |Fix σ| (mod q)`、
+`Fix σ = σ.toMonoidHom.eqLocus (MonoidHom.id P)` は `σ ≠ 1` ゆえ真部分群なので
+`q ∣ p^n - p^k` (`k < n ≤ 2`) ⟹ `q ∣ p - 1` か `q ∣ p^2 - 1`。前者は `q > p` に反し、
+後者は `q ∣ p + 1` ⟹ `q = p + 1` が偶数で `q` 奇素数に反する。
+定理名 = `not_dvd_card_mulAut_of_card_eq_pow` (`Problems5C8.lean`)。
+
+⚠ 罠: `MulAction.fixedPoints` の `Nat.card` は `↥(↑S : Set P)` の形で出るので
+`Nat.card ↥S` への `rw` が通らない (`rw [← hkcard]; exact hmod` で defeq を使って渡す)。
 
 ### 5C.7 の実装メモ (2026-07-26)
 
