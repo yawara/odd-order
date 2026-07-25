@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.FieldTheory.Finite.Extension
 import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
 
 /-!
@@ -122,5 +122,23 @@ theorem exists_isCyclic_card_eq_card_add_one (h2 : Module.finrank F E = 2) :
       (MonoidHom.ofInjective (normOneToSL_injective F E b)).toEquiv).symm
 
 end Embedding
+
+section AnyFiniteField
+
+/-- **The nonsplit torus of `SL(2, F)`** for an arbitrary finite field `F` with `q`
+elements: `SL(2, F)` contains a cyclic subgroup of order `q + 1`.
+
+The quadratic extension is `FiniteField.Extension F p 2`. -/
+theorem exists_isCyclic_card_specialLinearGroup_eq_card_add_one
+    (F : Type*) [Field F] [Finite F] :
+    ∃ C : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F),
+      IsCyclic ↥C ∧ Nat.card ↥C = Nat.card F + 1 := by
+  obtain ⟨p, hp⟩ := CharP.exists F
+  haveI := hp
+  haveI : Fact p.Prime := ⟨CharP.char_is_prime F p⟩
+  exact exists_isCyclic_card_eq_card_add_one F (FiniteField.Extension F p 2)
+    (FiniteField.finrank_extension F p 2)
+
+end AnyFiniteField
 
 end OddOrder.GroupTheory.ProjectiveSpecialLinear
