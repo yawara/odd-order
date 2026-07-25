@@ -139,4 +139,65 @@ theorem addSubgroup_eq_bot_or_top_of_mul_units_mem {F : Type*} [NearFields.NearF
       have hmem := hS x hxS u
       rwa [hu, ← mul_assoc, mul_inv_cancel₀ hx0, one_mul] at hmem
 
+/-- **Model-level transitivity collapse**: a subgroup of the affine quotient contained in
+the translation subgroup `emb(F)` and invariant under `Q`-conjugation is `⊥` or all of
+`emb(F)` — via `qEquiv_conj`, `Q ≅ F^*` acts on the nonzero translations exactly as right
+multiplication, and `addSubgroup_eq_bot_or_top_of_mul_units_mem` applies to the additive
+shadow.  This is the "`C_Q(P)` acts transitively on `F^*`" mechanism of step (11). -/
+theorem conjInvariant_eq_bot_or_range_emb
+    {G' Ω' : Type*} [Group G'] [MulAction G' Ω'] [Finite G']
+    {hyp : NearFields.RankOneHypothesis G' Ω'} {F : Type*} [NearFields.NearField F]
+    (model : NearFields.AffineNearFieldModel hyp F) {S : Subgroup G'}
+    (hle : S ≤ MonoidHom.range model.emb)
+    (hinv : ∀ q : ↥hyp.Q, ∀ z ∈ S, (q : G') * z * (q : G')⁻¹ ∈ S) :
+    S = ⊥ ∨ S = MonoidHom.range model.emb := by
+  classical
+  -- the additive shadow of `S` in `F`
+  set A : AddSubgroup F :=
+    { carrier := {x | model.emb (Multiplicative.ofAdd x) ∈ S}
+      zero_mem' := by
+        change model.emb (Multiplicative.ofAdd 0) ∈ S
+        rw [show Multiplicative.ofAdd (0 : F) = 1 from rfl, map_one]
+        exact S.one_mem
+      add_mem' := fun {a b} ha hb => by
+        change model.emb (Multiplicative.ofAdd (a + b)) ∈ S
+        rw [show Multiplicative.ofAdd (a + b)
+            = Multiplicative.ofAdd a * Multiplicative.ofAdd b from rfl, map_mul]
+        exact S.mul_mem ha hb
+      neg_mem' := fun {a} ha => by
+        change model.emb (Multiplicative.ofAdd (-a)) ∈ S
+        rw [show Multiplicative.ofAdd (-a) = (Multiplicative.ofAdd a)⁻¹ from rfl, map_inv]
+        exact S.inv_mem ha } with hAdef
+  have hAinv : ∀ x ∈ A, ∀ u : Fˣ, x * (u : F) ∈ A := by
+    intro x hx u
+    set q : ↥hyp.Q := (model.qEquiv.symm u)⁻¹ with hqdef
+    have hconj := model.qEquiv_conj q x
+    have hqq : model.qEquiv q⁻¹ = u := by
+      rw [hqdef, inv_inv, MulEquiv.apply_symm_apply]
+    rw [hqq] at hconj
+    have hmem := hinv q _ hx
+    rw [hconj] at hmem
+    exact hmem
+  rcases addSubgroup_eq_bot_or_top_of_mul_units_mem A hAinv with hA | hA
+  · left
+    rw [eq_bot_iff]
+    intro z hz
+    obtain ⟨y, hy⟩ := hle hz
+    have hxA : (Multiplicative.toAdd y) ∈ A := by
+      change model.emb (Multiplicative.ofAdd (Multiplicative.toAdd y)) ∈ S
+      rw [show Multiplicative.ofAdd (Multiplicative.toAdd y) = y from rfl, hy]
+      exact hz
+    rw [hA, AddSubgroup.mem_bot] at hxA
+    have hy1 : y = 1 := by
+      have h1 := congrArg Multiplicative.ofAdd hxA
+      rw [show Multiplicative.ofAdd (Multiplicative.toAdd y) = y from rfl] at h1
+      rw [h1]; rfl
+    rw [Subgroup.mem_bot, ← hy, hy1, map_one]
+  · right
+    refine le_antisymm hle ?_
+    rintro z ⟨y, rfl⟩
+    have hxA : Multiplicative.toAdd y ∈ A := hA ▸ AddSubgroup.mem_top _
+    have : model.emb (Multiplicative.ofAdd (Multiplicative.toAdd y)) ∈ S := hxA
+    rwa [show Multiplicative.ofAdd (Multiplicative.toAdd y) = y from rfl] at this
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
