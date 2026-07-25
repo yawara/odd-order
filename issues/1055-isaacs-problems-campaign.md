@@ -970,7 +970,15 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 `|ker| = |P|/|C|`)。⟹ maximal class の主張は
 「`class(P) = np`」(`n = 1` のとき `= p`) と「`class(P'U) = n(p-1)`」。
 
-**残りは下降中心列の計算**で、これは群環の филь트레이션に落ちる:
+**第一歩は本 commit で設置**: `shiftSubHom q : (Q → D) →* (Q → D)`,
+`Δ_q f = f · (f ∘ shift_q)⁻¹` (= 群環の `(1-q)·` 作用) と
+`commutatorElement_inl_inr_eq_shiftSubHom` (`⁅inl f, inr q⁆ = inl (Δ_q f)`)、
+`range_shiftSubHom_le_ker_coordProdHom` (`(1-q)R ⊆ I`)。
+次は **`γ_{i+1}(P) = (Δ_q)^i(A) の像`** を帰納で立てる。
+⚠ `⁅H, K ⊔ L⁆` の分配は**偽**なので (memory: lean-subgroup-commutator-api-traps)、
+`⁅L_i, ⊤⁆` を `⁅·, A⁆` と `⁅·, U⁆` に割るには good-elements 法が要る。
+
+**残りの下降中心列の計算**は群環のフィルトレーションに落ちる:
 `A = C^Q` を `ZMod(p^n)[Q] = ZMod(p^n)[x]/(x^p - 1)` (`x = u`) と見ると
 `⁅A, U⁆` は `(x-1)A`、以降 `γ_{i+1}(P) = (x-1)^i A` (`i ≥ 1`)。
 `(x-1)^p ≡ x^p - 1 = 0 (mod p)` なので `(x-1)` 冪の減少列が `p`-進的に落ちる速さが

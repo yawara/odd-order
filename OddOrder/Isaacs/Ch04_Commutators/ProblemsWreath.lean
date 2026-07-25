@@ -602,6 +602,43 @@ theorem card_ker_augHom_eq [Fintype Q] [Finite D] :
   rw [card_ker_augHom_mul]
   exact OddOrder.Isaacs.Ch03.WreathProduct.card (D := D) (Q := Q) (Ω := Q)
 
+/-! ### 4A.8(d) の準備: 「`1 - x`」作用素 -/
+
+/-- base 群上の **`1 - x` 作用素** `Δ_q f = f · (f ∘ shift_q)⁻¹`.
+
+群環 `ZMod(p^n)[Q]` の言葉では `f ↦ (1 - q) · f`. 交換子 `⁅inl f, inr q⁆` の base 成分が
+ちょうどこれ (`commutatorElement_inl_inr`) なので, 下降中心列
+`γ_{i+1}(P) = (1-q)^i A` の解析はこの作用素の反復に帰着する. -/
+def shiftSubHom (q : Q) : (Q → D) →* (Q → D) where
+  toFun f := fun ω => f ω * (f (q⁻¹ * ω))⁻¹
+  map_one' := by funext ω; simp
+  map_mul' f g := by
+    funext ω
+    change f ω * g ω * (f (q⁻¹ * ω) * g (q⁻¹ * ω))⁻¹
+      = (f ω * (f (q⁻¹ * ω))⁻¹) * (g ω * (g (q⁻¹ * ω))⁻¹)
+    rw [mul_inv_rev]
+    simp [mul_comm, mul_left_comm, mul_assoc]
+
+@[simp]
+theorem shiftSubHom_apply (q : Q) (f : Q → D) (ω : Q) :
+    shiftSubHom q f ω = f ω * (f (q⁻¹ * ω))⁻¹ := rfl
+
+/-- 交換子公式の作用素形: `⁅inl f, inr q⁆ = inl (Δ_q f)`. -/
+theorem commutatorElement_inl_inr_eq_shiftSubHom (f : Q → D) (q : Q) :
+    ⁅(inl f : D ≀[Q] Q), inr q⁆ = inl (shiftSubHom q f) :=
+  commutatorElement_inl_inr f q
+
+/-- `Δ_q` の像は増大射の核に入る (座標積が消える): 群環の `(1-q)·R ⊆ I` に対応. -/
+theorem range_shiftSubHom_le_ker_coordProdHom [Fintype Q] (q : Q) :
+    (shiftSubHom (D := D) q).range ≤ (coordProdHom (D := D) (Q := Q)).ker := by
+  rintro _ ⟨f, rfl⟩
+  change (∏ ω, (f ω * (f (q⁻¹ * ω))⁻¹)) = 1
+  calc (∏ ω, f ω * (f (q⁻¹ * ω))⁻¹)
+      = (∏ ω, f ω) * ∏ ω, (f (q⁻¹ * ω))⁻¹ := Finset.prod_mul_distrib
+    _ = (∏ ω, f ω) * (∏ ω, f (q⁻¹ * ω))⁻¹ := by rw [Finset.prod_inv_distrib]
+    _ = (∏ ω, f ω) * (∏ ω, f ω)⁻¹ := by rw [prod_smul_eq]
+    _ = 1 := mul_inv_cancel _
+
 end
 
 end OddOrder.Isaacs.Ch04
