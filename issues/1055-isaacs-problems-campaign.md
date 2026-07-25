@@ -1432,6 +1432,24 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 - **4C.3** は three subgroups lemma (`Subgroup.commutator_commutator_eq_bot_of_rotate`) の
   `(G, A, N)` への直接適用: `⁅⁅A,N⁆,G⁆ = 1` は仮定, `⁅⁅N,G⁆,A⁆ ≤ ⁅N,A⁆ = 1` は `N ⊴ G`。
 
+## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
+
+| 問題 | 状態 | 実装 |
+|---|---|---|
+| 5B.1 | ⬜ | `P ∈ Syl_p(G)`, `g ∈ P` 位数 `p`, `g ∈ G'`, `g ∉ P'` ⇒ `g^t ∈ P` なる `t ∉ P` が存在。transfer-evaluation lemma (Thm 5.5 = mathlib `MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot`) を使う |
+| 5B.2 | ⬜ | Dietzmann の状況で `\|X\| = m` なら `\|⟨X⟩\| ≤ n^m`。既存 `Dietzmann.lean` は長さ評価 `(n-1)·\|X\|` までなので、正規形 `x₁^{e₁}⋯x_m^{e_m}` (`0 ≤ e_i < n`) を出す必要がある (既存 `Dietzmann.exists_pow_mul_prod_eq` が「x の出現を先頭に集める」ステップを提供) |
+| 5B.3 | ✅ | `exists_finite_normal_iff` (`Problems5B.lean`) + `normal_closure_of_conj_closed` |
+
+### ⚠ 5B.1 の書籍訂正 (2026-07-26)
+
+書籍の印刷は「show that `g^t ∈ P'` for some element `t ∈ G` with `t ∉ P`」だが、
+**巻末 errata の項目 3 (p. 157) が「`P` の dash を削れ」= `g^t ∈ P` に訂正**している。
+PDF ページ画像 (書籍 p.157 = PDF p.170) と errata の両方で確認済。
+数学的にも訂正版が正しい: transfer-evaluation で `V(g) = ∏_{n_t=1} g^{t⁻¹}` (mod `P'`) となり、
+もし全ての `t` で `g^{t⁻¹} ≡ g` (mod `P'`) なら `V(g) ≡ g^N`, `N = #{t : n_t=1} ≢ 0 (mod p)`
+となって `V(g) ∈ P'` に矛盾。`P` の元による共役は `P/P'` に自明に作用するので、
+`g^{t⁻¹} ∉ gP'` なる `t` は `t ∉ P` をみたす。
+
 ## Ch.5 §5A (書籍 pp. 152-153 の Problems 5A) — **完了 (2026-07-26)**
 
 新 leaf `OddOrder/Isaacs/Ch05_Transfer/Problems.lean` (namespace `OddOrder.Isaacs.Ch05`、
