@@ -540,6 +540,21 @@ theorem sylow_le_centralizer_zpowers
     exact hy
   exact (Subgroup.mem_centralizer_iff.mp hyZ.2 g hg).symm
 
+include model in
+/-- **`R₂ = C_G(Z₁)`** ((14), p. 113, final assertion): `R₂ ≤ C_G(Z₁)` because
+`Z₁ = Z(R₂)`, and `C_G(Z₁)` is a `3`-group by (13), so it cannot properly contain the
+Sylow `3`-subgroup `R₂`. -/
+theorem sylow_eq_centralizer_zpowers
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
+    (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G)) :
+    Subgroup.centralizer
+        ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t) : Subgroup G) : Set G)
+      = (S : Subgroup G) :=
+  S.is_maximal' (fc.isPGroup_three_centralizer_Z₁ model ind hB2)
+    (fc.sylow_le_centralizer_zpowers model ind hB2 S hR₁S)
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

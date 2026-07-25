@@ -1091,8 +1091,27 @@ r ∣ 504 ∧ r 奇 ⟹ r ∈ {3,7}、(13-iv) で 7 を排除 ⟹ |J| は 3-冪�
 ⟹ **残る (14) の主張は `C_G(Z₁) ≤ R₂` のみ**で、これは (13)
 (`C_G(Z₁)` は 3-群) が閉じれば `R₂` が Sylow-3 であることから即従う。
 
-### 次の一手 = (13-iv) r = 7 排除
+### ⚠ 上記「次の一手 = (13-iv)」は stale だった (2026-07-25 実測で訂正)
 
-(13) の残りは上記 §「(13-iv) r = 7 排除の完全論法」に導出済み (部品実在確認済)。
-これを実装 → (13-v) assembly → (13) 完了 → (14) の `R₂ = C_G(Z₁)` を追記。
-その後 (15) へ (`C_G(Z₁P) = RΣ` は既に landed なので (15) の該当行は即使える)。
+**step (13) は既に完結済み** — `54b472b8b` "step (13) 完結 — C_G(Z₁) は 3-群"。
+r = 7 排除は `not_card_K_dvd_ncard_invertedBy` (StepThirteen.lean:455) として
+landed 済で、最終形は `isPGroup_three_centralizer_Z₁` (同 :752)。
+FirstCase 配下に実 sorry は 0 (コメント除去して計測)。
+
+⟹ これを使って **`sylow_eq_centralizer_zpowers` : `R₂ = C_G(Z₁)` を追加**し、
+**step (14) は全主張 landed で完了**。
+
+### 次の一手 = step (15)
+
+書籍 p.113-114:
+> **(15)** There is a subgroup `L` of `R₁` which is cyclic of order 9, inverted by
+> `s`, normalized by `V` and centralized by `W` but not by `P`. It is also the case
+> that `|R₂ : LV| = 3`, `Z(LV) = Z₁Σ` and `Ω₁(LV) = Z₁ΣP`.
+
+`L := C_G(st) ⊓ ⟨Q₀,K,t⟩`。書籍は `⟨Q₀,K,t⟩ ≅ PSL(2,8)` から
+「`L` は位数 9 の巡回群でその元は `s` に反転される」を読み取る。
+repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀|·|K|·(|Q₀|+1)`
+= 504、`OrderThreePSLInduction.lean`)。**PSL(2,8) の位数 3 元の中心化群が位数 9 巡回**
+に相当する repo 補題の有無を先に実測すること (無ければそこが (15) の主コスト)。
+`C_G(Z₁P) = RΣ` は landed 済なので「`L` normalizes `C_G(Z₁P) = RΣ` ⟹ `L ⊂ R₁`」
+の行はすぐ使える。
