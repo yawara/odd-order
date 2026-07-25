@@ -738,3 +738,45 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   invImageF_mul_comm_of_not_dvd_card_D 系のパターンを R₁/T level で再演) →
   (iii) ε = Cor 10.2 (transfer_range_eq_of_nilpotencyClass_lt、Yoshida.lean) +
   T₁C_Q(P)C_W(P) index-p 正規 → ¬(B2)。
+
+### δ4 (N_G(R₁) = N_G(R)) の完全分解 (2026-07-25 導出済・matrix-free)
+
+書籍の「As in (11)」の行間を埋める再構成。V := R₁/T (位数 p² 可換、
+⁅R₁,R₁⁆ = T ゆえ R₁-共役は V に自明作用)。「line」= T を含む R₁ の極大部分群
+(= V の位数 p 部分群、全 p+1 本、各 ⊴ R₁)。
+
+- **δ4-i** C_{R₁}(s) = P: C∩R = P (R = T×P、T は s-反転で奇数位数)。
+  R₁∖R の固定元 x は [x] ∈ C_{R₁/R}([s]) = 1 (δ2' の反転) → 矛盾。
+- **δ4-ii** T₁ := {x ∈ R₁ | sxs⁻¹ = x⁻¹}:
+  (a) 部分群: x,y 反転 → ⁅x,y⁆ ∈ T は s-固定 (class-2: ⁅x⁻¹,y⁻¹⁆ = ⁅x,y⁆)
+      かつ s-反転 (∈T) → ⁅x,y⁆² = 1 → 奇数位数で = 1 → 可換 → 積も反転。
+  (b) |T₁| = p²: ψ(g) := g⁻¹·(sgs⁻¹) の像 ⊆ T₁、fiber = C_{R₁}(s)-coset
+      → |image| = p³/p = p²; T₁ ∩ P = 1 で ≤ p²。T ≤ T₁。
+  (c) T₁ の元は strongly real: x = s·(sx)、(sx)² = (sxs⁻¹)x = x⁻¹x = 1。
+  (d) T₁ は line (image in V = 位数 p、pullback 全体)。
+- **δ4-iii** C_{NR}(V) = R₁ かつ C_N(V) = R₁ (N := N_G(R₁)):
+  V に自明 → 全 line 固定 → R を正規化 → ∈ NR; [k] が σ̂ と可換 →
+  [k] ∈ ⟨σ̂⟩ (**要 public 化: PrimeDegreeTwoTransitive の private
+  mem_zpowers_of_centralizes**) → [k] ∈ ⟨σ̂⟩ ∩ (P の stabilizer 像) = 1
+  (freeness) → k ∈ R₁。
+- **δ4-iv** 「第 3 line を固定する k ∈ NR は R₁」: k は R-line (k∈NR) と
+  T₁-line (下記) を常に固定; X ∉ {R-line, T₁-line} も固定なら V 上 3 本の
+  固定 line → scalar → R/T 上自明で λ=1 → V に自明 → δ4-iii で k ∈ R₁。
+  (2 次元の「3 固定直線 → scalar」を V の部分群計算で: x = a·b 分解
+  (a ∈ R/T-方向, b ∈ T₁/T-方向), kxk⁻¹ ∈ xT-line 条件から u = 1。)
+  **T₁-line の NR-不変性**: ksk⁻¹ = s·r₁ (r₁ ∈ R₁; NR/R₁ ≅ C_{p−1} の
+  唯一対合)、r₁ は V に自明作用 → s と ksk⁻¹ の V-作用同一 → 反転 line 同一
+  → k•(T₁-line) = T₁-line。
+- **δ4-v** N-orbit(R-line) ∌ T₁-line: n•R = T₁ なら n•P# ⊆ T₁ が
+  strongly real (δ4-ii-c) だが P-共役は not strongly real
+  (not_isStronglyReal_of_mem_P + 共役不変性) → 矛盾。
+- **δ4-vi** 数え上げ: stab_N(R-line) = N ∩ N_G(R) = NR → |orbit| = [N:NR] =: s'。
+  p ∤ s' (|N|_p = p³)。s' > 1 なら L ∈ orbit ∖ {R-line} (≠ T₁-line, δ4-v);
+  stab_NR(L) = R₁ (δ4-iv) → NR-suborbit サイズ p−1 → s' ≥ p → p∤s' で
+  s' = p+1 → orbit = 全 line ∋ T₁-line ✗。ゆえ s' = 1、**N_G(R₁) = N_G(R)** □
+- ε 資材: この時点で NR = N(R₁)、R₁ = Sylow_p(G) (p³ = |G|_p)、class 2 < p
+  → transfer_range_eq_of_nilpotencyClass_lt (Isaacs Cor 10.2)。index-p 正規:
+  M := T₁·(C_G(P)∩NR)-系 = pullback of (T₁-line 方向 ⋊ 全 K̄) — kernel of
+  NR → NR/R₁-mod... 実装時は hom NR → C_p を V の R/T-成分で構成
+  (K̄ は R/T に自明作用 = C_G(P)、[R₁] → R/T-projection; well-defined-性は
+  ⁅NR,R₁⁆-計算) — 詳細は着手時に再設計。
