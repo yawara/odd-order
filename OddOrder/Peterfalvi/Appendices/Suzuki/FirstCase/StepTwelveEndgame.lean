@@ -416,6 +416,139 @@ theorem conj_invImageF_ne_sInvertedOvergroup
   rw [h2, h3, Subgroup.card_bot] at h4
   exact fc.p_prime.one_lt.ne h4
 
+include model in
+/-- **An element of `N_G(R)/R` commuting with the normal order-`p` subgroup lies in
+it** ((12) tail, δ4-iii core): the faithful degree-`p` action on `𝒜` makes the
+centralizer of the regular normal subgroup collapse into it. -/
+theorem quotient_mem_zpowers_of_mul_comm
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D)
+    {σ q : ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+      ⧸ (fc.invImageF model).subgroupOf
+        (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))}
+    (hσ : orderOf σ = fc.p) (hσn : (Subgroup.zpowers σ).Normal)
+    (hq : q * σ = σ * q) :
+    q ∈ Subgroup.zpowers σ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  revert σ q
+  set NR : Subgroup G :=
+    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
+  set R' : Subgroup ↥NR := (fc.invImageF model).subgroupOf NR with hR'def
+  intro σ q hσ hσn hq
+  have horb := fc.orbit_eq_setOf_prime_order model ind hB2 hm hGp hSigma
+  letI actNR : MulAction ↥NR (Subgroup G) :=
+    MulAction.compHom _ ((MulAut.conj : G →* MulAut G).comp NR.subtype)
+  set A : Set (Subgroup G) := {P₁ : Subgroup G | P₁ ≤ fc.invImageF model ∧
+    Nat.card ↥P₁ = fc.p ∧ ¬ P₁ ≤ fc.sInvertedT model} with hAdef
+  have hpres : ∀ (n : ↥NR) (X : Subgroup G), X ∈ A →
+      MulAut.conj (n : G) • X ∈ A := by
+    intro n X hX
+    rw [← horb] at hX ⊢
+    obtain ⟨k, hk⟩ := hX
+    refine ⟨n * k, ?_⟩
+    have hk' : k • fc.P = X := hk
+    change (n * k) • fc.P = MulAut.conj (n : G) • X
+    rw [mul_smul, hk']
+    rfl
+  letI actA : MulAction ↥NR ↥A :=
+    { smul := fun n X => ⟨MulAut.conj (n : G) • (X : Subgroup G), hpres n X X.2⟩
+      one_smul := fun X => Subtype.ext (by
+        change MulAut.conj ((1 : ↥NR) : G) • (X : Subgroup G) = X
+        rw [OneMemClass.coe_one, map_one, one_smul])
+      mul_smul := fun n k X => Subtype.ext (by
+        change MulAut.conj ((n * k : ↥NR) : G) • (X : Subgroup G)
+          = MulAut.conj (n : G) • MulAut.conj (k : G) • (X : Subgroup G)
+        rw [Subgroup.coe_mul, map_mul, mul_smul]) }
+  have hsmulA : ∀ (n : ↥NR) (X : ↥A),
+      ((n • X : ↥A) : Subgroup G) = MulAut.conj (n : G) • (X : Subgroup G) :=
+    fun n X => rfl
+  set φ : ↥NR →* Equiv.Perm ↥A := MulAction.toPermHom ↥NR ↥A with hφdef
+  have hker : R' ≤ φ.ker := by
+    intro x hx
+    have hxR : (x : G) ∈ fc.invImageF model := Subgroup.mem_subgroupOf.mp hx
+    rw [MonoidHom.mem_ker]
+    apply Equiv.ext
+    intro X
+    have h2 := (fc.mem_invImageF_iff_forall_conj_smul_eq model ind hB2 hm).mp hxR
+      X.1 X.2.1 X.2.2.1 X.2.2.2
+    have h3 : x • X = X := Subtype.ext (by rw [hsmulA]; exact h2)
+    have h4 : (φ x) X = X := h3
+    simpa using h4
+  set ψ : (↥NR ⧸ R') →* Equiv.Perm ↥A := QuotientGroup.lift R' φ hker with hψdef
+  letI actQ : MulAction (↥NR ⧸ R') ↥A := MulAction.compHom _ ψ
+  have hsmulQ : ∀ (n : ↥NR) (X : ↥A),
+      (QuotientGroup.mk' R' n) • X = n • X := fun n X => rfl
+  haveI hfaith : FaithfulSMul (↥NR ⧸ R') ↥A := by
+    constructor
+    intro m₁ m₂ h
+    have h1 : ∀ X : ↥A, (m₂⁻¹ * m₁) • X = X := by
+      intro X
+      rw [mul_smul, h X, inv_smul_smul]
+    obtain ⟨n, hn⟩ := QuotientGroup.mk'_surjective R' (m₂⁻¹ * m₁)
+    have h2 : (n : G) ∈ fc.invImageF model := by
+      rw [fc.mem_invImageF_iff_forall_conj_smul_eq model ind hB2 hm]
+      intro P₁ hP₁le hP₁card hP₁T
+      have h3 := h1 ⟨P₁, hP₁le, hP₁card, hP₁T⟩
+      rw [← hn, hsmulQ] at h3
+      exact congrArg Subtype.val h3
+    have h4 : m₂⁻¹ * m₁ = 1 := by
+      rw [← hn, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+      exact h2
+    exact (inv_mul_eq_one.mp h4).symm
+  haveI htrans : MulAction.IsPretransitive (↥NR ⧸ R') ↥A := by
+    constructor
+    intro X Y
+    have hX : (X : Subgroup G) ∈ MulAction.orbit ↥NR fc.P := by
+      rw [horb]; exact X.2
+    have hY : (Y : Subgroup G) ∈ MulAction.orbit ↥NR fc.P := by
+      rw [horb]; exact Y.2
+    obtain ⟨kX, hkX⟩ := hX
+    obtain ⟨kY, hkY⟩ := hY
+    have hkX' : kX • fc.P = (X : Subgroup G) := hkX
+    have hkY' : kY • fc.P = (Y : Subgroup G) := hkY
+    refine ⟨QuotientGroup.mk' R' (kY * kX⁻¹), ?_⟩
+    rw [hsmulQ]
+    apply Subtype.ext
+    rw [hsmulA]
+    change ((kY * kX⁻¹) • (X : Subgroup G) : Subgroup G) = Y
+    rw [← hkX', mul_smul, inv_smul_smul, hkY']
+  have hΩcard : Nat.card ↥A = fc.p := by
+    obtain ⟨x₀, hx₀P, hx₀1⟩ : ∃ x₀ ∈ fc.P, x₀ ≠ (1 : G) := by
+      by_contra hall
+      push Not at hall
+      have h1 : fc.P = ⊥ := by
+        rw [eq_bot_iff]
+        intro x hx
+        rw [Subgroup.mem_bot]
+        exact hall x hx
+      have h2 := fc.card_P
+      rw [h1, Subgroup.card_bot] at h2
+      exact fc.p_prime.one_lt.ne h2
+    have hA := fc.ncard_prime_order_not_le_sInvertedT model ind hB2 hm hx₀P hx₀1
+    rw [Nat.card_coe_set_eq, hA, pow_one]
+  obtain ⟨a⟩ : Nonempty ↥A :=
+    (Nat.card_ne_zero.mp (by rw [hΩcard]; exact fc.p_prime.pos.ne')).1
+  have hsurjAll : ∀ y : ↥A,
+      Function.Surjective (fun i : ZMod fc.p => σ ^ (i.val) • y) :=
+    fun y => OddOrder.GroupTheory.surjective_zpow_smul fc.p_prime hΩcard hσ hσn y
+  have hcen : ∀ n ∈ Subgroup.zpowers σ, q * n * q⁻¹ = n := by
+    intro n hn
+    obtain ⟨w, hw⟩ := Subgroup.mem_zpowers_iff.mp hn
+    have hq' : q * σ * q⁻¹ = σ := by
+      rw [hq]
+      group
+    calc q * n * q⁻¹ = q * σ ^ w * q⁻¹ := by rw [hw]
+      _ = (q * σ * q⁻¹) ^ w := by simp
+      _ = σ ^ w := by rw [hq']
+      _ = n := hw
+  exact OddOrder.GroupTheory.mem_zpowers_of_centralizes hsurjAll a hcen
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
