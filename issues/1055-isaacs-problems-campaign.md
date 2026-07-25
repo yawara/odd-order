@@ -1483,7 +1483,22 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5A.4 | ✅ | (a) `transfer_eq_pow_index_of_le_center` / (b) `inf_ker_transfer_eq_bot_of_le_center` + `sup_ker_transfer_eq_top_of_le_center` (+ `normal_of_le_center`) |
 | 5A.5 | ✅ | `card_ker_dvd_relIndex_commutator` (`ProblemsSchurMultiplier.lean`) — **`M(G)` を定義せず stem extension の ∀-形**で述べた (下記) |
 | 5A.7 | ✅ | `card_ker_lt_relIndex_commutator` (同上)。書籍の `G/C` cyclic 仮定は `BC = G` + `B` cyclic から従うので導出に変更 |
-| 5A.6 / 5A.8 | ⬜ | **∃-側 (下界) が残る** — `M(D_{2n})` = 2 の下界 / `|M(A×B)| ≥ |M(A)||M(B)|` は具体的な stem extension の**構成**が要る。上界側は 5A.5 と同じ ∀-形で書ける。issue 9206 |
+| 5A.6 | ✅ | `card_ker_dvd_two_of_dihedral` (上界) + `isStemExtension_dihedralReduce` (下界) — `ProblemsDihedralMultiplier.lean`。書籍の `2^n` 版より強い**偶数一般形**で証明 |
+| 5A.8 | ⬜ | (a) `|M(A×B)| ≥ |M(A)||M(B)|` は ∃-側ゆえ具体構成が要る / (b) coprime のとき等号。issue 9206 |
+
+### ⚠ 5A.6 の書籍読解訂正 (2026-07-26)
+
+`pdftotext` は**上付き文字を落とす**ので 5A.6 が「dihedral of order **2n** where n > 2」と
+読めるが、この読みは**偽** (n 奇数なら `M(D_{2n}) = 1`; `D_6 = S_3` は Sylow が全て巡回で
+Isaacs 自身の Cor 5.4 から `M = 1`)。PDF ページ画像 (書籍 p.153 = PDF p.166) で確認した
+正しい主張は **「dihedral of order `2^n` where `n ≥ 2`」= 二面体 2-群**。
+同じ潰れは書籍 p.76 の semidihedral `SD_{2^n}` でも起きている。
+⟹ **添字に「数字+文字」(`2n`, `pn` …) が現れたら上付き潰れを疑い PDF 画像で確認する。**
+
+実装は書籍の `2^n` 版より強い**偶数一般形**:「`m` 偶数 ⇒ 位数 `2m` の二面体群の
+Schur 乗数は位数 2」(`m` 奇数なら 5A.5 から直ちに `M = 1` なので偶数条件は本質的)。
+下界の witness は `D_{4t} ↠ D_{2t}` (核 `⟨r (2t)⟩`、中心的かつ `⁅r t, sr 0⁆ = r (2t)`
+ゆえ交換子群に入る)。
 
 ### 5A.5 / 5A.7 の設計 (2026-07-26 確定・実装済)
 

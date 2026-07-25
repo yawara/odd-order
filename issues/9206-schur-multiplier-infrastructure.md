@@ -87,8 +87,12 @@ Isaacs Thm 5.4 弱形 (`not_isMulCommutative_sylow_of_le_commutator_inf_center`)
       `|C : G'| = |f⁻¹C : Γ'|` が 3 行)
 - [x] **5A.5** `card_ker_dvd_relIndex_commutator` (2026-07-26)
 - [x] **5A.7** `card_ker_lt_relIndex_commutator` (2026-07-26)
-- [ ] 5A.6 (`|M(D_{2n})| = 2`, n > 2) — 上界 `≤ 2` は 5A.5 で出る (C = 巡回 n, G' = C^2 …)
-      が, **下界 (= 2 を実現する stem extension の構成)** が要る
+- [x] **5A.6** (2026-07-26) — 上界 `card_ker_dvd_two_of_dihedral` + 下界
+      `isStemExtension_dihedralReduce` (`ProblemsDihedralMultiplier.lean`)。
+      ⚠ 書籍は `2^n` (二面体 2-群) であって `2n` ではない (`pdftotext` の上付き潰れ;
+      `2n` 版は n 奇数で偽)。実装は**偶数一般形**でより強い。
+      下界の witness = reduction hom `D_{4t} ↠ D_{2t}` — **∃-側は universal object を
+      要さず具体構成 1 本で足りる**ことの実例
 - [ ] 5A.8(a) `|M(A×B)| ≥ |M(A)||M(B)|` / (b) coprime のとき等号
       — (a) も ∃-側ゆえ具体構成が要る
 - [ ] Isaacs Thm 5.4 の full 形 (要 universal object かを再判定)
