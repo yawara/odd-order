@@ -123,6 +123,34 @@ theorem mem_zpowers_pow_of_pow_eq_one {g x : G'} {p : ℕ} (hp : p ≠ 0)
   rw [Subgroup.mem_zpowers_iff]
   exact ⟨m, by rw [← zpow_natCast g p, ← zpow_mul]⟩
 
+/-- In a cyclic group of order `p²` a subgroup of order `p` contains every element
+killed by `p` (it is the unique such subgroup). -/
+theorem mem_of_pow_eq_one_of_isCyclic_card_sq [Finite G'] {A B : Subgroup G'} {p : ℕ}
+    (hp : p ≠ 0)
+    (hAcyc : IsCyclic ↥A) (hAcard : Nat.card ↥A = p * p) (hBA : B ≤ A)
+    (hBcard : Nat.card ↥B = p) {x : G'} (hx : x ∈ A) (hxp : x ^ p = 1) : x ∈ B := by
+  classical
+  obtain ⟨g, hg⟩ := hAcyc.exists_generator
+  have hgord : orderOf ((g : G')) = p * p := by
+    have hgtop : Subgroup.zpowers g = ⊤ := eq_top_iff.mpr fun y _ => hg y
+    rw [Subgroup.orderOf_coe, ← Nat.card_zpowers, hgtop, Subgroup.card_top, hAcard]
+  have hmemzp : ∀ {y : G'}, y ∈ A → y ∈ Subgroup.zpowers ((g : G')) := by
+    intro y hy
+    obtain ⟨k, hk⟩ := hg ⟨y, hy⟩
+    exact ⟨k, congrArg Subtype.val hk⟩
+  have hgpord : orderOf ((g : G') ^ p) = p := by
+    rw [orderOf_pow, hgord, Nat.gcd_eq_right ⟨p, rfl⟩, Nat.mul_div_cancel _ (Nat.pos_of_ne_zero hp)]
+  have hBle : B ≤ Subgroup.zpowers ((g : G') ^ p) := by
+    intro b hb
+    refine mem_zpowers_pow_of_pow_eq_one hp hgord (hmemzp (hBA hb)) ?_
+    have h := Subgroup.orderOf_dvd_natCard _ hb
+    rw [hBcard] at h
+    exact orderOf_dvd_iff_pow_eq_one.mp h
+  have hBeq : B = Subgroup.zpowers ((g : G') ^ p) :=
+    Subgroup.eq_of_le_of_card_ge hBle (by rw [Nat.card_zpowers, hgpord, hBcard])
+  rw [hBeq]
+  exact mem_zpowers_pow_of_pow_eq_one hp hgord (hmemzp hx) hxp
+
 /-- The centralizer of a union is the intersection of the centralizers. -/
 theorem centralizer_union (s t : Set G') :
     Subgroup.centralizer (s ∪ t)

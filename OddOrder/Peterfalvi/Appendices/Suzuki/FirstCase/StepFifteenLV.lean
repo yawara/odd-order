@@ -384,7 +384,7 @@ theorem sup_nonsplitTorus_V_inf_centralizer_nonsplitTorus_eq
       fc.mul_comm_of_mem_sup_nonsplitTorus_W model ind hB2 (Subgroup.mem_sup_left hy) hx
   refine (Subgroup.eq_of_le_of_card_ge hLWle ?_).symm
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   obtain ⟨m, hm⟩ := Subgroup.card_dvd_of_le hLWle
   have hdvd2 : Nat.card ↥((fc.nonsplitTorus ⊔ fc.toHypothesis.V)
       ⊓ Subgroup.centralizer (fc.nonsplitTorus : Set G))
@@ -466,6 +466,282 @@ theorem inf_centralizer_sup_nonsplitTorus_V_eq
         exact Subgroup.mem_centralizer_iff.mpr fun y hy =>
           mul_comm_of_mem_of_isCyclic hWcyc hy hσ.1
       · exact inf_le_right
+
+/-! ## `Ω₁(LV) = Z₁ΣP` -/
+
+include model in
+/-- **The `3`-torsion of `W` is `Σ`**: `W` is cyclic of order `3` or `9` by (10.2), and
+`|Σ| = 3`. -/
+theorem mem_sigma_of_mem_W_of_pow_three
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {w : G} (hw : w ∈ fc.toHypothesis.W)
+    (hw3 : w ^ 3 = 1) :
+    w ∈ fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  obtain ⟨hpSig, -, -, hWcyc, hWcard, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, -, -, hSig3, -⟩ :=
+    fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  rcases hWcard with h3 | h9
+  · have heq : fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)
+        = fc.toHypothesis.W :=
+      Subgroup.eq_of_le_of_card_ge inf_le_left (by rw [h3, hSig3])
+    rw [heq]
+    exact hw
+  · exact mem_of_pow_eq_one_of_isCyclic_card_sq (by norm_num) hWcyc
+      (by rw [h9]) inf_le_left hSig3 hw hw3
+
+include model in
+/-- `Z₁Σ` has exponent `3`: `|Z₁| = |Σ| = 3` and the two centralize each other. -/
+theorem pow_three_eq_one_of_mem_zpowers_sup_sigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {x : G}
+    (hx : x ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :
+    x ^ 3 = 1 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  obtain ⟨hpSig, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, -, -, hSig3, -⟩ :=
+    fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  refine pow_eq_one_of_mem_sup_of_commute ?_ ?_ ?_ hx
+  · intro a ha b hb
+    exact fc.commute_of_mem_nonsplitTorus_of_mem_W (fc.zpowers_le_nonsplitTorus ha) hb.1
+  · intro a ha
+    have h := Subgroup.orderOf_dvd_natCard _ ha
+    rw [Nat.card_zpowers, hstord] at h
+    exact orderOf_dvd_iff_pow_eq_one.mp h
+  · intro b hb
+    have h := Subgroup.orderOf_dvd_natCard _ hb
+    rw [hSig3] at h
+    exact orderOf_dvd_iff_pow_eq_one.mp h
+
+include model in
+/-- **`Ω₁(LW) = Z₁Σ`** ((15), p. 114): in the abelian group `LW = L × W`, an element
+`lw` is killed by `3` exactly when both components are, i.e. when `l ∈ Z₁` and
+`w ∈ Σ`. -/
+theorem pow_three_eq_one_iff_mem_zpowers_sup_sigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {x : G}
+    (hx : x ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W) :
+    x ^ 3 = 1 ↔ x ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  refine ⟨fun h3 => ?_, fun hmem =>
+    fc.pow_three_eq_one_of_mem_zpowers_sup_sigma model ind hB2 hmem⟩
+  have hcoe := coe_sup_eq_mul_of_commute
+    (fun _ (ha : _ ∈ fc.nonsplitTorus) _ (hb : _ ∈ fc.toHypothesis.W) =>
+      fc.commute_of_mem_nonsplitTorus_of_mem_W ha hb)
+  have hx' : x ∈ (fc.nonsplitTorus : Set G) * (fc.toHypothesis.W : Set G) := by
+    rw [← hcoe]; exact hx
+  obtain ⟨l, hl, w, hw, rfl⟩ := hx'
+  have hlL : l ∈ fc.nonsplitTorus := hl
+  have hwW : w ∈ fc.toHypothesis.W := hw
+  have hcomm : Commute l w := fc.commute_of_mem_nonsplitTorus_of_mem_W hlL hwW
+  have hsplit : l ^ 3 * w ^ 3 = 1 := by
+    rw [← hcomm.mul_pow]
+    exact h3
+  have hl3 : l ^ 3 = 1 := by
+    have hmem : l ^ 3 ∈ fc.nonsplitTorus ⊓ fc.toHypothesis.W := by
+      refine ⟨pow_mem hlL 3, ?_⟩
+      have : l ^ 3 = (w ^ 3)⁻¹ := by
+        rw [eq_inv_iff_mul_eq_one]; exact hsplit
+      rw [this]
+      exact Subgroup.inv_mem _ (pow_mem hwW 3)
+    rwa [fc.nonsplitTorus_inf_W_eq_bot model ind hB2, Subgroup.mem_bot] at hmem
+  have hw3 : w ^ 3 = 1 := by rw [hl3, one_mul] at hsplit; exact hsplit
+  exact Subgroup.mul_mem _
+    (Subgroup.mem_sup_left
+      (fc.mem_zpowers_st_of_mem_nonsplitTorus_of_pow_three model ind hB2 hlL hl3))
+    (Subgroup.mem_sup_right (fc.mem_sigma_of_mem_W_of_pow_three model ind hB2 hwW hw3))
+
+include model in
+/-- Cubes of `LW` lie in `Z₁Σ`: `LW` has exponent dividing `9`. -/
+theorem pow_three_mem_zpowers_sup_sigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {x : G}
+    (hx : x ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W) :
+    x ^ 3 ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, -, -, -, hWcard, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, hLcard⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
+  refine (fc.pow_three_eq_one_iff_mem_zpowers_sup_sigma model ind hB2
+    (pow_mem hx 3)).mp ?_
+  -- `LW` has exponent dividing `9`
+  have hcoe := coe_sup_eq_mul_of_commute
+    (fun _ (ha : _ ∈ fc.nonsplitTorus) _ (hb : _ ∈ fc.toHypothesis.W) =>
+      fc.commute_of_mem_nonsplitTorus_of_mem_W ha hb)
+  have hx' : x ∈ (fc.nonsplitTorus : Set G) * (fc.toHypothesis.W : Set G) := by
+    rw [← hcoe]; exact hx
+  obtain ⟨l, hl, w, hw, rfl⟩ := hx'
+  have hlL : l ∈ fc.nonsplitTorus := hl
+  have hwW : w ∈ fc.toHypothesis.W := hw
+  have hcomm : Commute l w := fc.commute_of_mem_nonsplitTorus_of_mem_W hlL hwW
+  have hl9 : l ^ 9 = 1 := by
+    have h := Subgroup.orderOf_dvd_natCard _ hlL
+    rw [hLcard] at h
+    exact orderOf_dvd_iff_pow_eq_one.mp h
+  have hw9 : w ^ 9 = 1 := by
+    have h := Subgroup.orderOf_dvd_natCard _ hwW
+    have h9 : Nat.card ↥fc.toHypothesis.W ∣ 9 := by
+      rcases hWcard with h | h
+      · rw [h]; norm_num
+      · rw [h]
+    exact orderOf_dvd_iff_pow_eq_one.mp (h.trans h9)
+  calc ((l * w) ^ 3) ^ 3 = (l * w) ^ 9 := by rw [← pow_mul]
+    _ = l ^ 9 * w ^ 9 := hcomm.mul_pow 9
+    _ = 1 := by rw [hl9, hw9, one_mul]
+
+include model in
+/-- `P` normalizes `LW`. -/
+theorem P_le_normalizer_sup_nonsplitTorus_W
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    fc.P ≤ Subgroup.normalizer
+      (((fc.nonsplitTorus ⊔ fc.toHypothesis.W) : Subgroup G) : Set G) := by
+  intro y hy
+  have hnL := fc.P_le_normalizer_nonsplitTorus model ind hB2 hy
+  have hnW := fc.P_le_normalizer_W hy
+  rw [Subgroup.mem_set_normalizer_iff] at hnL ⊢
+  rw [Subgroup.mem_normalizer_iff] at hnW
+  have hconj : ∀ g : G, ∀ z ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W,
+      (∀ u : G, u ∈ fc.nonsplitTorus ↔ g * u * g⁻¹ ∈ fc.nonsplitTorus) →
+      (∀ u : G, u ∈ fc.toHypothesis.W ↔ g * u * g⁻¹ ∈ fc.toHypothesis.W) →
+      g * z * g⁻¹ ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W := by
+    intro g z hz hL hW
+    have hsub : fc.nonsplitTorus ⊔ fc.toHypothesis.W
+        ≤ Subgroup.comap (MulAut.conj g).toMonoidHom
+          (fc.nonsplitTorus ⊔ fc.toHypothesis.W) := by
+      refine sup_le (fun u hu => ?_) (fun u hu => ?_)
+      · exact Subgroup.mem_sup_left ((hL u).mp hu)
+      · exact Subgroup.mem_sup_right ((hW u).mp hu)
+    exact hsub hz
+  intro z
+  refine ⟨fun hz => hconj y z hz hnL hnW, fun hz => ?_⟩
+  have hLinv : ∀ u : G, u ∈ fc.nonsplitTorus ↔ y⁻¹ * u * y⁻¹⁻¹ ∈ fc.nonsplitTorus := by
+    intro u
+    rw [inv_inv]
+    have h1 : y * (y⁻¹ * u * y) * y⁻¹ = u := by group
+    refine ⟨fun hu => (hnL (y⁻¹ * u * y)).mpr (by rw [h1]; exact hu), fun hu => ?_⟩
+    have h2 := (hnL (y⁻¹ * u * y)).mp hu
+    rwa [h1] at h2
+  have hWinv : ∀ u : G, u ∈ fc.toHypothesis.W ↔ y⁻¹ * u * y⁻¹⁻¹ ∈ fc.toHypothesis.W := by
+    intro u
+    rw [inv_inv]
+    have h1 : y * (y⁻¹ * u * y) * y⁻¹ = u := by group
+    refine ⟨fun hu => (hnW (y⁻¹ * u * y)).mpr (by rw [h1]; exact hu), fun hu => ?_⟩
+    have h2 := (hnW (y⁻¹ * u * y)).mp hu
+    rwa [h1] at h2
+  have h3 := hconj y⁻¹ _ hz hLinv hWinv
+  have h4 : y⁻¹ * (y * z * y⁻¹) * y⁻¹⁻¹ = z := by group
+  rwa [h4] at h3
+
+include model in
+/-- **`Ω₁(LV) = Z₁ΣP`** ((15), p. 114).
+
+Write `x = aq` with `a ∈ LW` and `q ∈ P`.  The commutator `d = a⁻¹·a^q` lies in `LW`
+and is killed by `3` (because `a³ ∈ C_{LW}(P) = Z₁Σ`), hence lies in `Z₁Σ ≤ C_G(P)`,
+so conjugation by `q` sends `a` to `ad` and `ad` to `ad²`; therefore
+`x³ = a³d³ = a³`.  Thus `x³ = 1` iff `a ∈ Ω₁(LW) = Z₁Σ`, i.e. iff `x ∈ Z₁ΣP`, and
+conversely `Z₁ΣP` has exponent `3`. -/
+theorem pow_three_eq_one_iff_mem_zpowers_sup_sigma_sup_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {x : G}
+    (hx : x ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.V) :
+    x ^ 3 = 1 ↔ x ∈ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hPcard : Nat.card ↥fc.P = 3 := by rw [fc.card_P, hp3]
+  -- `Z₁Σ` centralizes `P`
+  have hZScen : (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+      ≤ Subgroup.centralizer (fc.P : Set G) :=
+    sup_le (fc.zpowers_st_le_centralizer_P model ind hB2) inf_le_right
+  refine ⟨fun h3 => ?_, fun hmem => ?_⟩
+  · -- decompose `x = a·q`
+    rw [fc.sup_nonsplitTorus_V_eq] at hx
+    have hcoe : (((fc.nonsplitTorus ⊔ fc.toHypothesis.W) ⊔ fc.P : Subgroup G) : Set G)
+        = ((fc.nonsplitTorus ⊔ fc.toHypothesis.W : Subgroup G) : Set G)
+          * (fc.P : Set G) :=
+      Subgroup.coe_mul_of_right_le_normalizer_left _ _
+        (fc.P_le_normalizer_sup_nonsplitTorus_W model ind hB2)
+    have hx' : x ∈ ((fc.nonsplitTorus ⊔ fc.toHypothesis.W : Subgroup G) : Set G)
+        * (fc.P : Set G) := by rw [← hcoe]; exact hx
+    obtain ⟨a, ha, q, hq, rfl⟩ := hx'
+    have haLW : a ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W := ha
+    have hqP : q ∈ fc.P := hq
+    have hq3 : q ^ 3 = 1 := by
+      have h := Subgroup.orderOf_dvd_natCard _ hqP
+      rw [hPcard] at h
+      exact orderOf_dvd_iff_pow_eq_one.mp h
+    -- the commutator `d`
+    have hσa : q * a * q⁻¹ ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W := by
+      have hn := fc.P_le_normalizer_sup_nonsplitTorus_W model ind hB2 hqP
+      rw [Subgroup.mem_set_normalizer_iff] at hn
+      exact (hn a).mp haLW
+    set d : G := a⁻¹ * (q * a * q⁻¹) with hd_def
+    have hdLW : d ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W :=
+      Subgroup.mul_mem _ (Subgroup.inv_mem _ haLW) hσa
+    have hcommd : Commute a⁻¹ (q * a * q⁻¹) :=
+      fc.mul_comm_of_mem_sup_nonsplitTorus_W model ind hB2
+        (Subgroup.inv_mem _ haLW) hσa
+    have hfixa3 : q * a ^ 3 * q⁻¹ = a ^ 3 := by
+      have hmem3 := fc.pow_three_mem_zpowers_sup_sigma model ind hB2 haLW
+      have hc := Subgroup.mem_centralizer_iff.mp (hZScen hmem3) q hqP
+      rw [hc]; group
+    have hd3 : d ^ 3 = 1 := by
+      rw [hd_def, hcommd.mul_pow, inv_pow, conj_pow, hfixa3, inv_mul_cancel]
+    have hdZS : d ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) :=
+      (fc.pow_three_eq_one_iff_mem_zpowers_sup_sigma model ind hB2 hdLW).mp hd3
+    have hdfix : q * d * q⁻¹ = d := by
+      have hc := Subgroup.mem_centralizer_iff.mp (hZScen hdZS) q hqP
+      rw [hc]; group
+    -- `(aq)³ = a³d³ = a³`
+    have hσa_eq : q * a * q⁻¹ = a * d := by rw [hd_def]; group
+    have hσ2a : q * (a * d) * q⁻¹ = a * d * d := by
+      calc q * (a * d) * q⁻¹ = (q * a * q⁻¹) * (q * d * q⁻¹) := by group
+        _ = (a * d) * d := by rw [hσa_eq, hdfix]
+    have hcommad : Commute a d :=
+      fc.mul_comm_of_mem_sup_nonsplitTorus_W model ind hB2 haLW hdLW
+    have hexpand : (a * q) ^ 3
+        = a * (q * a * q⁻¹) * (q * (q * a * q⁻¹) * q⁻¹) * q ^ 3 := by
+      rw [pow_three', pow_three']
+      group
+    have hcube : (a * q) ^ 3 = a ^ 3 := by
+      rw [hexpand, hσa_eq, hσ2a, hq3, mul_one]
+      calc a * (a * d) * (a * d * d) = (a * a * a) * (d * d * d) := by
+            rw [show a * (a * d) * (a * d * d) = a * a * (d * a) * (d * d) by group,
+              ← hcommad.eq]
+            group
+        _ = a ^ 3 * d ^ 3 := by rw [pow_three', pow_three']
+        _ = a ^ 3 := by rw [hd3, mul_one]
+    have ha3 : a ^ 3 = 1 := by rw [← hcube]; exact h3
+    exact Subgroup.mul_mem _
+      (Subgroup.mem_sup_left
+        ((fc.pow_three_eq_one_iff_mem_zpowers_sup_sigma model ind hB2 haLW).mp ha3))
+      (Subgroup.mem_sup_right hqP)
+  · -- `Z₁ΣP` has exponent `3`
+    refine pow_eq_one_of_mem_sup_of_commute ?_ ?_ ?_ hmem
+    · intro z hz y hy
+      exact (Subgroup.mem_centralizer_iff.mp (hZScen hz) y hy).symm
+    · exact fun z hz => fc.pow_three_eq_one_of_mem_zpowers_sup_sigma model ind hB2 hz
+    · intro y hy
+      have h := Subgroup.orderOf_dvd_natCard _ hy
+      rw [hPcard] at h
+      exact orderOf_dvd_iff_pow_eq_one.mp h
 
 end FirstCaseHypothesis
 
