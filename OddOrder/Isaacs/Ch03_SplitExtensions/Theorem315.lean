@@ -761,6 +761,29 @@ theorem Subgroup.IsPiGroup.primeFactors_quotient_subgroupOf
   rw [Subgroup.nat_card_quotient_subgroupOf_eq_card_map N K] at hp
   exact hMap p hp
 
+/-- **`{p}`-群 ⟺ `p`-群**: 単元集合の π-群条件は mathlib の `IsPGroup` と同値。
+
+`⟸` は `|H| = p ^ k` の素因子が `p` のみだから, `⟹` は
+`Nat.eq_prime_pow_of_unique_prime_dvd` (唯一の素因子をもつ自然数は素数冪)。 -/
+theorem Subgroup.isPiGroup_singleton_iff_isPGroup {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] {H : Subgroup G} :
+    Subgroup.IsPiGroup ({p} : Set ℕ) H ↔ IsPGroup p ↥H := by
+  constructor
+  · intro hH
+    rw [IsPGroup.iff_card]
+    refine ⟨(Nat.card ↥H).primeFactorsList.length, ?_⟩
+    refine Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne' ?_
+    intro q hq hq_dvd
+    exact Set.mem_singleton_iff.mp
+      (hH q (Nat.mem_primeFactors.mpr ⟨hq, hq_dvd, Nat.card_pos.ne'⟩))
+  · intro hH q hq
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hH
+    rw [hk, Nat.mem_primeFactors] at hq
+    have hq_eq : q = p :=
+      (Nat.prime_dvd_prime_iff_eq hq.1 (Fact.out : p.Prime)).mp
+        (hq.1.dvd_of_dvd_pow hq.2.1)
+    simp [hq_eq]
+
 /-- **`oPiCore` は `π` について monotone**: `π₁ ⊆ π₂ ⇒ oPiCore π₁ G ≤ oPiCore π₂ G`.
 π を広げると normal π-subgroup の集合は大きくなり, iSup も増える. -/
 theorem oPiCore_mono {π₁ π₂ : Set ℕ} (h : π₁ ⊆ π₂) (G : Type*) [Group G] :
