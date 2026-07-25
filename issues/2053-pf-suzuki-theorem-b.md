@@ -621,3 +621,50 @@ preimage、step (7) の N = P 使用)。主張:
   not_p_dvd_card_rankOneQ helpers)。step (12) 残 = orbit-stabilizer
   (N_G(R)-軌道 = 𝒜 の挟み撃ち: 上界 |𝒜| = p^m + 下界 C_Q(P) 自由軌道) →
   [N_G(R):N_G(P)] = p^m → m = 1 → App II Prop 1 (N_G(R)/R) → Cor 10.2 bridge → (B2)。
+- **[N_G(R):N_G(P)] = p^m 完成** (`e1a47f1ea`): orbit-stabilizer 挟み撃ち monolith。
+  数え上げ phase 完結。次 = 新 leaf StepTwelve.lean で m = 1 (index·|N_G(P)| の p-part
+  = p^{2m+1} ∣ |G|_p = p^{m+2} → m ≤ 1; m ≥ 1 は F nontrivial) → |G|_p = p³ →
+  App II Prop 1 の N_G(R)/R 再実例化 (RankOneHypothesis 構築が本体) →
+  Isaacs Cor 10.2 (transfer_range_eq_of_nilpotencyClass_lt) bridge → (B2) 矛盾 →
+  step_twelve endpoint「case (10.2) holds」。
+- **m = 1 完成** (`a4b4ffdf7`、StepTwelve.lean 新設): case (10.1) 下で |F| = p、|G|_p = p³。
+  **残 (12) 終盤 (次の設計課題)**: 書籍は N_G(R)/R の 𝒜 への作用に App II Prop 1
+  (rankOne_affine_nearField) を適用 — RankOneHypothesis の新実例化が必要:
+  (i) 𝒜 への N_G(R)/R-作用の 2-推移性 (書籍: C_G(P)‾ = C_Q(P)⋊C_W(P)、C_Q(P) が
+  𝒜−{P} に正則 = 完成済の材料から)、(ii) 忠実性、(iii) 2-rank 1 の継承。
+  結論 N_G(R)/R = (R₁/R) ⋊ C_Q(P)C_W(P)、R₁ = Sylow_p(G) 非可換 p³ class 2 < p →
+  Isaacs Cor 10.2 (transfer_range_eq_of_nilpotencyClass_lt) + focal bridge →
+  T₁C_Q(P)C_W(P) が N_G(R₁) 内 index p 正規 → (B2) 偽。
+  RankOneHypothesis 実例化は StepTwo の rankOneQuotient 構築 (HypothesisA1 経由) と
+  同型のパターンだが、A1 でなく直接 RankOneHypothesis を組む必要がある — フィールド
+  (basept/doubly_transitive/faithful/H/Q/D/t/...) を 𝒜-作用で埋める設計から。
+
+### (12) 終盤: RankOneHypothesis (N_G(R)/R ↷ 𝒜) の field 別設計 (2026-07-25 具体化)
+
+m = 1 後は |𝒜| = p、R = T×P は rank-2 elementary abelian (|R| = p²)。
+carrier: quotient Q̂ := ↥NR ⧸ (R.subgroupOf NR) (R ⊴ NR は normalizer の定義)、
+Ω̂ := ↥(orbit) or subtype of 𝒜 (**先に orbit = 𝒜 を Set.eq_of_subset_of_ncard_le で確定**:
+subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
+- basept := ⟨P, ...⟩
+- doubly_transitive: 推移性 (orbit=𝒜) + stabilizer 内 C_Q(P) の 𝒜−{P} 正則性
+  (mathlib の 2-pretransitive 判定: isMultiplyPretransitive_of_...one-point-stab 推移;
+  `MulAction.is_two_pretransitive_iff`-系を要調査)
+- faithful: kernel = R — ⊇ は R abelian (conj 自明)、⊆ は「全 P₁ ∈ 𝒜 + T? を固定する
+  元は R の全 order-p 部分群 (p+1 本) を正規化」→ R 上の作用が各巡回部分群を保つ →
+  scalar-型 → C_G(R) ∩ NR ∩ ... = R·C-系の同定が必要 (要: C_G(R) ⊓ NR の分析;
+  Z(R)=R (abelian) なので C_G(R) ⊇ R; C_G(R) ∩ NR / R が全 P₁ 固定と交わる部分)。
+  ⚠ ここが (12) 終盤の主要な非自明部分 — 書籍は暗黙 (「Proposition 1 ... can then be
+  applied」)。faithful 化は kernel で割る手 (StepTwo と同じ normalCore quotient) が安全:
+  Q̂ := NR ⧸ (kernel of NR ↷ 𝒜) とし、kernel = R を別 lemma にする (kernel ⊆ N_G(P₁)∀ →
+  kernel ⊆ N_G(P) = C_G(P) → kernel の元は R-decomposition r·w... C_G(P)-元で全 P₁ 固定 →
+  freeness から C_Q(P)-成分 = 1 → D̄-成分も W-型 normalization で制約 → ∈ R)。
+- t: 位数 2 で P を動かす元の存在 — C_Q(P) ∋ s は P を固定するので不可。書籍の構造
+  N_G(R)/R = (R₁/R) ⋊ C_Q(P)C_W(P) の R₁/R 側からではなく、2-推移性から:
+  P ↔ P₁ を swap する g の 2-part (odd-order 部分を冪で消す; |swap-元| の 2-part が
+  依然 swap する) — `exists_involution_conj_of_odd_orderOf` (Suzuki/Basic:54) 型の補題流用。
+- H/Q/D: H = stabilizer(P)-image、Q := C_Q(P)-image、D := H ⊓ H^t (D_def 通り定義)。
+  Q_normal/Q_mul_D/Q_even/D_odd/2-rank: C_G(P) = P·(F⋊F*⋊Σ)-構造からの読み出し +
+  2-rank-1 は G の (B1) から部分群継承。
+- 適用後: model' で N_G(R)/R = F'⋊(F'*⋊Σ') 形 → R₁ := 逆像 (Sylow_p(G)、|R₁| = p³) →
+  T₁ := [R₁/T, s]-系 → N_G(R₁) = N_G(R) (11)-型正則性論法の再利用 → T₁C_Q(P)C_W(P)
+  index p 正規 → Isaacs Cor 10.2 + focal bridge → (B2) 偽。

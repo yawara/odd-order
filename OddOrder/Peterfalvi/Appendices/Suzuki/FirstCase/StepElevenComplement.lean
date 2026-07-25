@@ -1252,6 +1252,190 @@ theorem ncard_prime_order_not_le_sInvertedT
     _ = Nat.card F := fc.card_sInvertedT model ind hB2 hm
     _ = fc.p ^ m := hm
 
+include model in
+/-- **`[N_G(R) : N_G(P)] = p^m` in case (10.1)** (step (12), p. 112): the `N_G(R)`-orbit
+of `P` is squeezed between the free `C_Q(P)`-suborbit through any `P₁ ≠ P`
+(`1 + (p^m − 1)` members) and the parameter count `|𝒜| = p^m`; orbit–stabilizer
+identifies the orbit size with the index of `N_G(P)`. -/
+theorem index_normalizer_P_subgroupOf_normalizer_invImageF
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m)
+    (hGp : fc.p ^ (m + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) :
+    ((Subgroup.normalizer (fc.P : Set G)).subgroupOf
+      (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))).index
+      = fc.p ^ m := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Finite F := Nat.finite_of_card_ne_zero
+    (by rw [hm]; exact (Nat.pow_pos fc.p_prime.pos).ne')
+  set NR : Subgroup G :=
+    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
+  have hlt := fc.normalizer_P_lt_normalizer_invImageF model ind hm hGp hSigma
+  have hle : Subgroup.normalizer (fc.P : Set G) ≤ NR := hlt.le
+  letI act : MulAction ↥NR (Subgroup G) :=
+    MulAction.compHom _ ((MulAut.conj : G →* MulAut G).comp NR.subtype)
+  -- stabilizer of `P` = `N_G(P)`.
+  have hstab : MulAction.stabilizer ↥NR fc.P
+      = (Subgroup.normalizer (fc.P : Set G)).subgroupOf NR := by
+    ext n
+    rw [MulAction.mem_stabilizer_iff, Subgroup.mem_subgroupOf]
+    change (MulAut.conj (n : G) • fc.P = fc.P) ↔ _
+    exact conj_smul_eq_iff_mem_normalizer
+  -- orbit–stabilizer.
+  have horb : Nat.card (MulAction.orbit ↥NR fc.P)
+      = ((Subgroup.normalizer (fc.P : Set G)).subgroupOf NR).index := by
+    rw [Nat.card_congr (MulAction.orbitEquivQuotientStabilizer ↥NR fc.P), hstab,
+      Subgroup.index]
+  -- a nonidentity generator of `P` (for the `𝒜`-count).
+  obtain ⟨x₀, hx₀P, hx₀1⟩ : ∃ x₀ ∈ fc.P, x₀ ≠ (1 : G) := by
+    by_contra hall
+    push Not at hall
+    have h1 : fc.P = ⊥ := by
+      rw [eq_bot_iff]
+      intro x hx
+      rw [Subgroup.mem_bot]
+      exact hall x hx
+    have h2 := fc.card_P
+    rw [h1, Subgroup.card_bot] at h2
+    exact fc.p_prime.one_lt.ne h2
+  -- upper bound: the orbit sits inside `𝒜`.
+  have hsub : MulAction.orbit ↥NR fc.P ⊆ {P₁ : Subgroup G |
+      P₁ ≤ fc.invImageF model ∧ Nat.card ↥P₁ = fc.p ∧
+        ¬ P₁ ≤ fc.sInvertedT model} := by
+    rintro Q ⟨n, rfl⟩
+    change MulAut.conj (n : G) • fc.P ≤ fc.invImageF model ∧ _ ∧ _
+    have hcard : Nat.card ↥(MulAut.conj (n : G) • fc.P) = fc.p := by
+      rw [← fc.card_P]
+      exact (Nat.card_congr (Subgroup.equivSMul (MulAut.conj (n : G)) fc.P).toEquiv).symm
+    refine ⟨?_, hcard, ?_⟩
+    · intro x hx
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hx
+      have h2 : ((MulAut.conj (n : G))⁻¹ • x : G) = (n : G)⁻¹ * x * (n : G) := by
+        have h3 : ((MulAut.conj (n : G))⁻¹ • x : G) = (MulAut.conj (n : G))⁻¹ x := rfl
+        rw [h3, ← map_inv, MulAut.conj_apply]
+        group
+      rw [h2] at hx
+      have h4 : (n : G)⁻¹ * x * (n : G) ∈ fc.invImageF model :=
+        fc.P_le_invImageF model hx
+      have h5 := (Subgroup.mem_set_normalizer_iff.mp n.2 ((n : G)⁻¹ * x * (n : G))).mp h4
+      have h6 : (n : G) * ((n : G)⁻¹ * x * (n : G)) * (n : G)⁻¹ = x := by group
+      rwa [h6] at h5
+    · intro hleT
+      have hbot := fc.conj_P_inf_sInvertedT_eq_bot model ind hB2 hm (n : G)
+      have h1 : MulAut.conj (n : G) • fc.P
+          = (MulAut.conj (n : G) • fc.P) ⊓ fc.sInvertedT model :=
+        (inf_of_le_left hleT).symm
+      rw [h1, hbot, Subgroup.card_bot] at hcard
+      exact fc.p_prime.one_lt.ne hcard
+  have hub : Nat.card (MulAction.orbit ↥NR fc.P) ≤ fc.p ^ m := by
+    have h1 := Set.ncard_le_ncard hsub (Set.toFinite _)
+    rw [fc.ncard_prime_order_not_le_sInvertedT model ind hB2 hm hx₀P hx₀1] at h1
+    rwa [Nat.card_coe_set_eq]
+  -- lower bound: `P` plus a free `C_Q(P)`-suborbit.
+  obtain ⟨n₀, hn₀⟩ : ∃ n₀ : ↥NR, (n₀ : G) ∉ Subgroup.normalizer (fc.P : Set G) := by
+    by_contra hall
+    push Not at hall
+    refine hlt.ne (le_antisymm hle fun g hg => ?_)
+    exact hall ⟨g, hg⟩
+  set P₁ : Subgroup G := MulAut.conj ((n₀ : ↥NR) : G) • fc.P with hP₁def
+  have hP₁orb : P₁ ∈ MulAction.orbit ↥NR fc.P := ⟨n₀, rfl⟩
+  have hP₁ne : P₁ ≠ fc.P := fun h => hn₀ (conj_smul_eq_iff_mem_normalizer.mp h)
+  have hP₁A := hsub hP₁orb
+  -- centralizer of `P` normalizes `P` (pointwise).
+  have hCle : Subgroup.centralizer (fc.P : Set G)
+      ≤ Subgroup.normalizer (fc.P : Set G) := by
+    intro c hc
+    rw [Subgroup.mem_set_normalizer_iff]
+    intro x
+    constructor
+    · intro hx
+      have h1 := Subgroup.mem_centralizer_iff.mp hc x hx
+      have h2 : c * x * c⁻¹ = x := by rw [← h1]; group
+      rwa [h2]
+    · intro hx
+      have h1 := Subgroup.mem_centralizer_iff.mp hc _ hx
+      have h2 : x = c⁻¹ * (c * x * c⁻¹) * c := by group
+      have h3 : c⁻¹ * (c * x * c⁻¹) * c = c * x * c⁻¹ := by
+        have h4 := congrArg (fun z => c⁻¹ * z) h1
+        simpa [mul_assoc] using h4
+      rw [h2, h3]
+      exact hx
+  set CQP : Subgroup G :=
+    fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G) with hCQPdef
+  obtain ⟨eu⟩ := fc.centralizer_inf_mulEquiv_units model
+  have hCQPcard : Nat.card ↥CQP = fc.p ^ m - 1 := by
+    haveI := Fintype.ofFinite F
+    haveI := Classical.decEq F
+    rw [Nat.card_congr eu.toEquiv, Nat.card_eq_fintype_card, Fintype.card_units,
+      ← Nat.card_eq_fintype_card, hm]
+  have hmemNR : ∀ a : ↥CQP, (a : G) ∈ NR := fun a => hle (hCle a.2.2)
+  set ι : ↥CQP → Subgroup G := fun a => MulAut.conj ((a : G)) • P₁ with hιdef
+  have hιorb : ∀ a, ι a ∈ MulAction.orbit ↥NR fc.P := by
+    intro a
+    refine ⟨(⟨(a : G), hmemNR a⟩ : ↥NR) * n₀, ?_⟩
+    change MulAut.conj (((⟨(a : G), hmemNR a⟩ : ↥NR) * n₀ : ↥NR) : G) • fc.P = ι a
+    rw [show (((⟨(a : G), hmemNR a⟩ : ↥NR) * n₀ : ↥NR) : G)
+      = (a : G) * ((n₀ : ↥NR) : G) from rfl, map_mul, mul_smul]
+  have hιne : ∀ a, ι a ≠ fc.P := by
+    intro a h
+    have h1 : P₁ = (MulAut.conj ((a : G)))⁻¹ • fc.P := by
+      rw [← h, show ι a = MulAut.conj ((a : G)) • P₁ from rfl, inv_smul_smul]
+    have h2 : (MulAut.conj ((a : G)))⁻¹ • fc.P = fc.P := by
+      rw [← map_inv]
+      exact conj_smul_eq_iff_mem_normalizer.mpr
+        ((Subgroup.normalizer (fc.P : Set G)).inv_mem (hCle a.2.2))
+    exact hP₁ne (h1.trans h2)
+  have hιinj : Function.Injective ι := by
+    intro a a' haa'
+    have h2 : (MulAut.conj ((a' : G)))⁻¹ • (MulAut.conj ((a : G)) • P₁) = P₁ := by
+      have h3 : ι a = ι a' := haa'
+      change (MulAut.conj ((a' : G)))⁻¹ • (ι a) = P₁
+      rw [h3]
+      change (MulAut.conj ((a' : G)))⁻¹ • (MulAut.conj ((a' : G)) • P₁) = P₁
+      rw [inv_smul_smul]
+    rw [← mul_smul, ← map_inv, ← map_mul] at h2
+    by_contra hne
+    have hna : ((a' : G))⁻¹ * (a : G) ≠ 1 := by
+      intro h
+      apply hne
+      apply Subtype.ext
+      have h4 := congrArg (fun z => (a' : G) * z) h
+      simpa [mul_assoc] using h4
+    have hmemQ : ((a' : G))⁻¹ * (a : G) ∈ fc.toHypothesis.Q :=
+      fc.toHypothesis.Q.mul_mem (fc.toHypothesis.Q.inv_mem a'.2.1) a.2.1
+    have hmemC : ((a' : G))⁻¹ * (a : G) ∈ Subgroup.centralizer (fc.P : Set G) :=
+      (Subgroup.centralizer (fc.P : Set G)).mul_mem
+        ((Subgroup.centralizer (fc.P : Set G)).inv_mem a'.2.2) a.2.2
+    have hnormz := conj_smul_eq_iff_mem_normalizer.mp h2
+    have hnorm' : ∀ x ∈ P₁, (((a' : G))⁻¹ * (a : G)) * x * (((a' : G))⁻¹ * (a : G))⁻¹ ∈ P₁ :=
+      fun x hx => (Subgroup.mem_set_normalizer_iff.mp hnormz x).mp hx
+    exact hP₁ne (fc.eq_P_of_prime_order_conj_invariant model ind hB2 hm
+      hmemQ hmemC hna hP₁A.1 hP₁A.2.1 hP₁A.2.2 hnorm')
+  have hlb : fc.p ^ m ≤ Nat.card (MulAction.orbit ↥NR fc.P) := by
+    have hins : insert fc.P (Set.range ι) ⊆ MulAction.orbit ↥NR fc.P := by
+      rintro Q hQ
+      rcases Set.mem_insert_iff.mp hQ with rfl | ⟨a, rfl⟩
+      · exact MulAction.mem_orbit_self _
+      · exact hιorb a
+    have hPnotin : fc.P ∉ Set.range ι := by
+      rintro ⟨a, ha⟩
+      exact hιne a ha
+    have h1 : (insert fc.P (Set.range ι)).ncard ≤ (MulAction.orbit ↥NR fc.P).ncard :=
+      Set.ncard_le_ncard hins (Set.toFinite _)
+    have h2 : (Set.range ι).ncard = fc.p ^ m - 1 := by
+      rw [← hCQPcard, ← Nat.card_coe_set_eq]
+      exact (Nat.card_congr (Equiv.ofInjective ι hιinj)).symm
+    have h3 : (insert fc.P (Set.range ι)).ncard = fc.p ^ m - 1 + 1 := by
+      rw [Set.ncard_insert_of_notMem hPnotin (Set.toFinite _), h2]
+    have hp1 : 1 ≤ fc.p ^ m := Nat.one_le_pow _ _ fc.p_prime.pos
+    rw [Nat.card_coe_set_eq]
+    omega
+  rw [← horb]
+  omega
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
