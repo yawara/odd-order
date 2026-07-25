@@ -443,17 +443,31 @@ mathlib inductive (`top`/`step`)。
   `u := s*t` を `s`,`t` が反転することだけ使い、`|u|` 奇なら `u^{(|u|+1)/2}` 共役で
   `s ↦ u s = s t s⁻¹` ゆえ `s ~ t` (仮定に反する) ⟹ `|u| = 2q` 偶、`z := u^q` が求めるもの。
   ⚠ 有限性は本質的 (`D∞` が反例) — docstring 明記。
-- ⬜ **残り §2B**: **2B.4** (Sylow 2 が複数かつ相異なる 2 つが自明交叉 ⟹ involution の共役類は 1 つ) /
-  **2B.5** (`|G:B|=2` の 3 条件同値 + generalized dihedral ⟹ `B` 可換) /
-  **2B.6** (正規 Sylow p ⟺ p-冪位数の共役元対 `⟨x,y⟩` が全て正規 Sylow p を持つ)。
-  - **★ 2B.4 の証明計画 (確定済)**: 非共役 involution `s,t` に 2B.3 を適用して `z` を得ると
-    `⟨s,z⟩`・`⟨t,z⟩` はいずれも 2-群 ⟹ Sylow 2 に入り、`z ≠ 1` が共通ゆえ TI 仮定で**同一の
-    Sylow 2**に入る。対偶で「**異なる Sylow 2 に属する involution は共役**」。Sylow 2 が複数
-    あるので、任意の `s, t` に対し両者の Sylow と異なる Sylow `S''` を取り、そこの involution
-    `s''` (位数偶 + Cauchy) を経由して `s ~ s'' ~ t`。
-    材料: `Subgroup.isMulCommutative_closure` (可換な生成集合 ⟹ closure 可換、
-    `Mathlib/GroupTheory/Subgroup/Centralizer.lean:136`) で `closure {s,z}` の可換性 →
-    `closure_induction` で全元 `g*g = 1` → `IsPGroup 2` → `IsPGroup.exists_le_sylow`。
+- ✅ 実証明 **2B.4** `isConj_of_orderOf_eq_two_of_sylow_ti` (Sylow 2 が複数 + 互いに自明交叉 (TI)
+  ⟹ involution はちょうど 1 つの共役類)。計画どおり:
+  * `exists_sylow_two_mem` (involution はある Sylow 2 に入る) /
+    `exists_sylow_two_mem_of_commute` (**可換な 2 つの involution は共通の Sylow 2 に入る** —
+    `closure {s,z}` の可換性は `Subgroup.closure_le_centralizer_centralizer` から出し、
+    `closure_induction` で全元 `g*g = 1` ⟹ `IsPGroup 2`) / `sylow_two_eq_of_ti` (一意性)。
+  * 核 `isConj_of_sylow_two_ne`: 相異なる Sylow 2 の involution は共役 (対偶で 2B.3 の `z` を
+    取ると両方が同じ Sylow に落ちて矛盾)。
+  * 同じ Sylow の場合は Sylow の共役性 (`MulAction.exists_smul_eq` + `Sylow.coe_subgroup_smul`)
+    で別 Sylow 内に `g s g⁻¹` を作って経由。
+  * `exists_orderOf_eq_two_of_exists_sylow_two_ne` で involution の実在も示し「ちょうど 1 つ」
+    が空でないことを保証。
+- ✅ 実証明 **2B.5** `generalizedDihedral_tfae` (`List.TFAE`) + `isMulCommutative_of_generalizedDihedral`。
+  指数 2 の `B ≤ G` について (1) `G∖B` に `B` を反転する involution が在る / (2) `G∖B` が
+  involution だけ / (3) `G∖B` の全元が `B` を反転する involution、の同値と `B` の可換性。
+  支持: `inv_mul_mem_of_notMem_of_index_eq_two` (`Subgroup.index_eq_two_iff'` から) /
+  `mul_notMem_of_mem_of_notMem` / `exists_notMem_of_index_eq_two`。**有限性不要**。
+- ✅ 実証明 **2B.6** `exists_normal_sylow_iff_forall_conj_pair` (正規 Sylow p ⟺ `p`-冪位数の
+  共役元対 `⟨x, x^g⟩` が全て正規 Sylow p をもつ)。核は repo 既存の **Baer-Suzuki**
+  (Thm 2.15 = `Theorem211Wielandt.lean` の `baerSuzuki_pCore`)。橋渡し 2 補題を新設:
+  `coe_eq_opCore_of_normal` (正規 Sylow = `O_p(G)`) と `exists_normal_sylow_iff_isPGroup`
+  (`p`-冪位数の元で生成される群では「正規 Sylow をもつ」=「`p`-群」)。後者で右辺が
+  Baer-Suzuki の右辺そのものになる。生成元を部分群型へ移す配線は
+  `Subgroup.map_injective H.subtype_injective` + `MonoidHom.map_closure`。
+- 🎉 **§2B 完済** (2B.1-2B.6)。
 
 ## Ch.3 (Split Extensions) §3A — 着手 (2026-07-23、§2A hard tail deferred 中の breadth 展開)
 
@@ -576,5 +590,5 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 **2026-07-25 の消化**: 1C.4 ✅ / 1C.5 ✅ / 1D.5 ✅ / 2A.4 ✅ / 2A.5(a)(b)(c) ✅ / 2A.6 ✅ /
 2A.9 ✅ / 2A.10 ✅ (**§2A 完済**) / 2B.1 ✅。
 さらに 2B.2(a)(b) ✅ / 2B.3 ✅ (新 leaf `Ch02_Subnormality/ProblemsInvolutions.lean`)。
-**次 frontier = 2B.4** (証明計画は §2B 節に確定記載) → 2B.5 / 2B.6 →
-§2C (2C.1) / §2D (2D.1, 2D.2, …) / §3A 残り (3A.3/4/6/7/8) / §3B〜。
+さらに 2B.4 ✅ / 2B.5 ✅ / 2B.6 ✅ で **§2B も完済**。
+**次 frontier = §2C (2C.1)** → §2D (2D.1, 2D.2, …) → §3A 残り (3A.3/4/6/7/8) → §3B〜。
