@@ -409,6 +409,119 @@ theorem not_p_dvd_index_subgroupOf_normalizer_overgroup
   rw [hfact] at h5
   omega
 
+omit model in
+/-- **At most `p + 1` lines**: subgroups `T' ≤ Y ≤ A` with `|T'| = p`, `|Y| = p²`,
+`|A| = p³` pairwise intersect in `T'`, so the sets `Y ∖ T'` (each of size `p² - p`)
+are disjoint inside `A ∖ T'` (of size `p³ - p`). -/
+theorem finset_card_lines_le {A T' : Subgroup G} (hT'A : T' ≤ A)
+    (hT : Nat.card ↥T' = fc.p) (hA : Nat.card ↥A = fc.p ^ 3)
+    (𝒮 : Finset (Subgroup G))
+    (hmem : ∀ Y ∈ 𝒮, T' ≤ Y ∧ Y ≤ A ∧ Nat.card ↥Y = fc.p ^ 2) :
+    𝒮.card ≤ fc.p + 1 := by
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  haveI := Fintype.ofFinite G
+  have hpairinf : ∀ Y ∈ 𝒮, ∀ Y' ∈ 𝒮, Y ≠ Y' → Y ⊓ Y' = T' := by
+    intro Y hY Y' hY' hne
+    obtain ⟨hTY, hYA, hYc⟩ := hmem Y hY
+    obtain ⟨hTY', hY'A, hY'c⟩ := hmem Y' hY'
+    have hTinf : T' ≤ Y ⊓ Y' := le_inf hTY hTY'
+    have hdvd : Nat.card ↥(Y ⊓ Y') ∣ fc.p ^ 2 := by
+      have h1 := Subgroup.card_dvd_of_le (inf_le_left : Y ⊓ Y' ≤ Y)
+      rwa [hYc] at h1
+    obtain ⟨i, hi2, hicard⟩ := (Nat.dvd_prime_pow fc.p_prime).mp hdvd
+    have hge : fc.p ≤ Nat.card ↥(Y ⊓ Y') := by
+      have h1 := Subgroup.card_le_of_le hTinf
+      rwa [hT] at h1
+    have hne2 : Nat.card ↥(Y ⊓ Y') ≠ fc.p ^ 2 := by
+      intro h0
+      have h1 : Y ⊓ Y' = Y :=
+        Subgroup.eq_of_le_of_card_ge inf_le_left (by rw [h0, hYc])
+      have h2 : Y ⊓ Y' = Y' :=
+        Subgroup.eq_of_le_of_card_ge inf_le_right (by rw [h0, hY'c])
+      exact hne (h1.symm.trans h2)
+    have hi1 : i = 1 := by
+      have h2 : 1 ≤ i := by
+        by_contra h3
+        push Not at h3
+        have h4 : i = 0 := by omega
+        rw [h4, pow_zero] at hicard
+        rw [hicard] at hge
+        have := fc.p_prime.one_lt
+        omega
+      rcases Nat.lt_or_ge i 2 with h | h
+      · omega
+      · exfalso
+        have h5 : i = 2 := by omega
+        rw [h5] at hicard
+        exact hne2 hicard
+    exact (Subgroup.eq_of_le_of_card_ge hTinf
+      (by rw [hicard, hi1, hT, pow_one])).symm
+  set D : Subgroup G → Finset G :=
+    fun Y => (Y : Set G).toFinset \ (T' : Set G).toFinset with hDdef
+  have hcardT : (T' : Set G).toFinset.card = fc.p := by
+    rw [Set.toFinset_card, ← Nat.card_eq_fintype_card, Nat.card_coe_set_eq]
+    exact hT
+  have hDcard : ∀ Y ∈ 𝒮, (D Y).card = fc.p ^ 2 - fc.p := by
+    intro Y hY
+    obtain ⟨hTY, hYA, hYc⟩ := hmem Y hY
+    have h1 : (T' : Set G).toFinset ⊆ (Y : Set G).toFinset := by
+      intro x hx
+      rw [Set.mem_toFinset] at hx ⊢
+      exact hTY hx
+    rw [hDdef]
+    rw [Finset.card_sdiff, Finset.inter_eq_left.mpr h1, hcardT]
+    congr 1
+    rw [Set.toFinset_card, ← Nat.card_eq_fintype_card, Nat.card_coe_set_eq]
+    exact hYc
+  have hdisj : ∀ Y ∈ 𝒮, ∀ Y' ∈ 𝒮, Y ≠ Y' → Disjoint (D Y) (D Y') := by
+    intro Y hY Y' hY' hne
+    rw [Finset.disjoint_left]
+    intro x hx hx'
+    rw [hDdef] at hx hx'
+    simp only [Finset.mem_sdiff, Set.mem_toFinset, SetLike.mem_coe] at hx hx'
+    have h1 : x ∈ Y ⊓ Y' := ⟨hx.1, hx'.1⟩
+    rw [hpairinf Y hY Y' hY' hne] at h1
+    exact hx.2 h1
+  have hsub : 𝒮.biUnion D ⊆ (A : Set G).toFinset \ (T' : Set G).toFinset := by
+    intro x hx
+    rw [Finset.mem_biUnion] at hx
+    obtain ⟨Y, hY, hxY⟩ := hx
+    obtain ⟨hTY, hYA, -⟩ := hmem Y hY
+    rw [hDdef] at hxY
+    simp only [Finset.mem_sdiff, Set.mem_toFinset, SetLike.mem_coe] at hxY ⊢
+    exact ⟨hYA hxY.1, hxY.2⟩
+  have hAcard : ((A : Set G).toFinset \ (T' : Set G).toFinset).card
+      = fc.p ^ 3 - fc.p := by
+    have h1 : (T' : Set G).toFinset ⊆ (A : Set G).toFinset := by
+      intro x hx
+      rw [Set.mem_toFinset] at hx ⊢
+      exact hT'A hx
+    rw [Finset.card_sdiff, Finset.inter_eq_left.mpr h1, hcardT]
+    congr 1
+    rw [Set.toFinset_card, ← Nat.card_eq_fintype_card, Nat.card_coe_set_eq]
+    exact hA
+  have hsum : (𝒮.biUnion D).card = 𝒮.card * (fc.p ^ 2 - fc.p) := by
+    rw [Finset.card_biUnion hdisj, Finset.sum_congr rfl hDcard, Finset.sum_const,
+      smul_eq_mul]
+  have hle := Finset.card_le_card hsub
+  rw [hsum, hAcard] at hle
+  have hple : fc.p ≤ fc.p ^ 2 := by
+    have := fc.p_prime.one_lt
+    nlinarith
+  have hple3 : fc.p ≤ fc.p ^ 3 := by
+    have := fc.p_prime.one_lt
+    nlinarith
+  have hpos : 0 < fc.p ^ 2 - fc.p := by
+    have h2 := fc.p_prime.one_lt
+    have h3 : fc.p < fc.p ^ 2 := by nlinarith
+    omega
+  have heq : fc.p ^ 3 - fc.p = (fc.p + 1) * (fc.p ^ 2 - fc.p) := by
+    zify [hple, hple3]
+    ring
+  rw [heq] at hle
+  exact Nat.le_of_mul_le_mul_right hle hpos
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
