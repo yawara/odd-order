@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.RegularWreathProduct
+import Mathlib.Data.ZMod.Basic
 
 /-!
 # Isaacs §3A: general wreath product over a `G`-set (pp. 73-76)
@@ -123,6 +124,15 @@ theorem range_inl_eq_ker_rightHom :
     rw [MonoidHom.mem_ker, rightHom_apply] at hx
     exact ⟨x.left, by ext <;> simp [hx]⟩
 
+/-- base group は正規 (`= ker rightHom`)。 -/
+instance range_inl_normal : ((inl : (Ω → D) →* D ≀[Ω] Q).range).Normal := by
+  rw [range_inl_eq_ker_rightHom]
+  infer_instance
+
+/-- `rightHom` は全射 (`inr` が切断)。 -/
+theorem rightHom_surjective : Function.Surjective (rightHom : (D ≀[Ω] Q) → Q) :=
+  fun q => ⟨inr q, rfl⟩
+
 /-- Conjugation of a base element by `inr q` permutes the coordinates:
 `inr q * inl f * (inr q)⁻¹ = inl (f ∘ (q⁻¹ • ·))`. -/
 theorem inr_mul_inl_mul_inr_inv (q : Q) (f : Ω → D) :
@@ -154,6 +164,14 @@ def wreathEquivRegular : (D ≀[Q] Q) ≃* RegularWreathProduct D Q where
         (a.left * fun x => b.left (a.right⁻¹ * x)) ω
       rfl
     · rfl
+
+/-- `x` は base 成分と top 成分の積に分解する: `inl x.left * inr x.right = x`
+(`SemidirectProduct.inl_left_mul_inr_right` の wreath 版)。 -/
+@[simp] theorem inl_left_mul_inr_right (x : D ≀[Ω] Q) : inl x.left * inr x.right = x := by
+  refine WreathProduct.ext ?_ ?_
+  · funext ω
+    simp only [mul_left, left_inl, right_inl, left_inr, Pi.mul_apply, Pi.one_apply, mul_one]
+  · simp only [mul_right, right_inl, right_inr, one_mul]
 
 /-! ### Problem 3A.9(a) — 推移的作用のとき `C_B(Q)` = 定数関数 -/
 
@@ -285,6 +303,78 @@ theorem centralizer_range_inl_eq [Nontrivial D] (hD : ∀ a b : D, a * b = b * a
     congr 1
     funext ω
     exact hD _ _
+
+/-! ### Problem 3A.10 — `A = C_G(A)` つき分裂拡大の存在 -/
+
+/-- `Multiplicative (ZMod p)` の元は `p` 乗して `1`。 -/
+theorem multiplicative_zmod_pow_self (p : ℕ) (x : Multiplicative (ZMod p)) : x ^ p = 1 := by
+  apply Multiplicative.toAdd.injective
+  rw [toAdd_pow, toAdd_one, nsmul_eq_mul, ZMod.natCast_self, zero_mul]
+
+/-- **Isaacs Problem 3A.10** の構成: `G := Z_p ≀ H` (正則 wreath product)。 -/
+abbrev zpWreath (H : Type*) [Group H] (p : ℕ) := Multiplicative (ZMod p) ≀[H] H
+
+/-- **Isaacs Problem 3A.10** の `A`: `G = Z_p ≀ H` の base group。 -/
+abbrev zpWreathBase (H : Type*) [Group H] (p : ℕ) : Subgroup (zpWreath H p) :=
+  (inl : (H → Multiplicative (ZMod p)) →* zpWreath H p).range
+
+/-- **Isaacs Problem 3A.10**. 任意の群 `H` と素数 `p` に対し、`G := Z_p ≀ H` (正則 wreath
+product) の base group `A` は次をすべてみたす:
+
+1. `A` は可換、
+2. `A` の各元は `p` 乗して `1` (すなわち `A` は基本アーベル `p`-群)、
+3. `G` は `A` 上**分裂**する (`inr : H →* G` の像が `A` の補群: `A ⊓ inr.range = ⊥`,
+   `A ⊔ inr.range = ⊤`)、
+4. `G ⧸ A ≅ H`、
+5. **`A = C_G(A)`** (`centralizer_range_inl_eq`)。
+
+`A ⊴ G` は `range_inl_normal` (`A = ker rightHom`) で instance として与えてある。
+
+したがって与えられた `H`, `p` に対し所望の `G` が実在する。 -/
+theorem zpWreathBase_spec (H : Type*) [Group H] (p : ℕ) [Fact p.Prime] :
+    (∀ x y : ↥(zpWreathBase H p), x * y = y * x) ∧
+      (∀ x : ↥(zpWreathBase H p), x ^ p = 1) ∧
+      (zpWreathBase H p ⊓ (inr : H →* zpWreath H p).range = ⊥) ∧
+      (zpWreathBase H p ⊔ (inr : H →* zpWreath H p).range = ⊤) ∧
+      Nonempty ((zpWreath H p ⧸ zpWreathBase H p) ≃* H) ∧
+      Subgroup.centralizer ((zpWreathBase H p : Subgroup (zpWreath H p)) :
+        Set (zpWreath H p)) = zpWreathBase H p := by
+  haveI : Fact (1 < p) := ⟨(Fact.out (p := p.Prime)).one_lt⟩
+  haveI : Nontrivial (Multiplicative (ZMod p)) :=
+    Multiplicative.ofAdd.injective.nontrivial
+  have hker : zpWreathBase H p = (rightHom : zpWreath H p →* H).ker :=
+    range_inl_eq_ker_rightHom
+  have hcomm : ∀ a b : Multiplicative (ZMod p), a * b = b * a := fun a b => mul_comm a b
+  refine ⟨?_, ?_, ?_, ?_, ?_, centralizer_range_inl_eq hcomm⟩
+  · -- 可換
+    rintro ⟨_, b, rfl⟩ ⟨_, c, rfl⟩
+    refine Subtype.ext ?_
+    push_cast
+    rw [← map_mul, ← map_mul]
+    congr 1
+    funext ω
+    exact hcomm _ _
+  · -- 各元は `p` 乗して `1`
+    rintro ⟨_, b, rfl⟩
+    refine Subtype.ext ?_
+    push_cast
+    rw [← map_pow]
+    refine (congrArg _ (funext fun ω => multiplicative_zmod_pow_self p (b ω))).trans ?_
+    exact map_one _
+  · -- `A ⊓ inr.range = ⊥`
+    refine le_antisymm (fun x hx => ?_) bot_le
+    obtain ⟨⟨b, hb⟩, ⟨h, hh⟩⟩ := hx
+    have hr : x.right = 1 := by rw [← hb, right_inl]
+    have hl : x.left = 1 := by rw [← hh, left_inr]
+    rw [Subgroup.mem_bot]
+    exact WreathProduct.ext hl hr
+  · -- `A ⊔ inr.range = ⊤`
+    refine le_antisymm le_top (fun x _ => ?_)
+    rw [← inl_left_mul_inr_right x]
+    exact Subgroup.mul_mem_sup ⟨x.left, rfl⟩ ⟨x.right, rfl⟩
+  · -- `G ⧸ A ≅ H`
+    exact ⟨(QuotientGroup.quotientMulEquivOfEq hker).trans
+      (QuotientGroup.quotientKerEquivOfSurjective _ rightHom_surjective)⟩
 
 end WreathProduct
 
