@@ -1003,3 +1003,51 @@ t-不変 Sylow → 付値比較)。下流 4556 jobs green。
 r ∣ 504 ∧ r 奇 ⟹ r ∈ {3,7}、(13-iv) で 7 を排除 ⟹ |J| は 3-冪。
 |V| = |W|·|P| (step (1) の V = W ⋊ P) は (10.2) で 3-冪 ⟹ |C_G(Z₁)| = |V|·|J|
 は 3-冪 = **(13) 完了**。C_G(⟨st⟩) = C_G(st) の橋 (zpowers の centralizer) も要。
+
+## 📐 step (14) 進捗と残り (2026-07-25、main session)
+
+新 leaf **`FirstCase/StepFourteen.lean`** (OddOrder.lean 配線済)。
+
+### landed
+- **前提「Z₁ ⊂ T」** (書籍 p.113 の括弧書き; 形式化では非自明):
+  `AffineNearFieldModel` に **`mul_involutions_mem_range`** を追加 (`174146bb1`)
+  — 相異なる 2 対合の積は移動群 `range emb` に入る。この事実は
+  `RankOneHypothesis.model_involution_data` の証明内に `huvF : u*v ∈ Fsub` として
+  既にあったので、結論を強化して露出させただけ (新規数学なし)。
+  → `mk_distinguishedInvolution_mul_t_mem_range_emb` (StepSeven) →
+  `distinguishedInvolution_mul_t_mem_invImageF` (StepEleven, st ∈ R) →
+  `distinguishedInvolution_mul_t_mem_sInvertedT` /
+  `zpowers_..._le_sInvertedT` (StepElevenComplement, Z₁ ≤ T) — `72f802781`。
+- **(14)(i) `Z(RΣ) = Z₁P`** = `inf_centralizer_sup_eq_zpowers_sup_P` (`a76bfc612`)。
+  中心は G 内で `RΣ ⊓ C_G(RΣ)` と表現 (subtype の center より下流が楽)。
+  汎用 3 補題 (`dabd49d97`): `card_sup_eq_mul_of_commute` /
+  `center_eq_inf_centralizer_subgroupOf` /
+  `inf_centralizer_eq_of_index_sq_of_not_comm`。
+- **`⁅RΣ,RΣ⁆ = Z₁`** = `commutator_sup_eq_zpowers` (`4c02c2b96`)。
+  ⚠ 書籍の "Since Z₁ = [RΣ,RΣ]" は Σ の T 上の作用 (F₉ の transvection) 解析に
+  見えるが、**Z₁P と T がともに指数 p² の正規部分群 ⟹ 交換子群は両方に含まれ、
+  Z₁P ⊓ T = Z₁ (Dedekind)** で回避できる。汎用
+  `commutator_le_of_card_eq_prime_sq_mul` を追加。
+- **N_G(RΣ) は Z₁ / Z₁P を保つ** (`446e42486`)。⚠ `Subgroup.pointwise_smul_def` は
+  `MulDistribMulAction.toMonoidEnd` 形で `MulEquiv.toMonoidHom` と噛み合わないので
+  共役像の等式は normalizer の elementwise 版から ext で作る。
+
+### 残り (次セッションの実装順)
+1. **|𝒜₂| = 3** — generic 部品は **完了** (`b1ebb0711` / `082977ee7` / `aa82a0300`):
+   `finset_card_prime_subgroups_le` (≤ p+1) /
+   `mem_of_card_eq_of_prime_subgroups` (p+1 個挙げれば完全) /
+   **`card_eq_of_forall_zpowers_mem` (= p+1; 生成元の像で Finset を作る版)**。
+   残り = FirstCase 側で 𝒮 := `Finset.image (zpowers ·) ((Z₁P : Set G).toFinset \ {1})`
+   を `haveI := Fintype.ofFinite G; classical` の下で組み、hmem/hall を与えて
+   |𝒮| = 4 → 𝒜₂ := 𝒮.erase Z₁ で card 3。⚠ Z₁P の非単位元が全て位数 3
+   (Z₁·P 可換で両者指数 3) を先に出すこと。
+   ⚠ `primeLines` を top-level def にすると `Fintype ↑↑E` が立たない
+   (Finite → Fintype は proof 内 haveI が要る) ので Finset は呼び出し側で作る。
+2. **作用と kernel**: N_G(RΣ) ↷ 𝒜₂ (1 の不変性から)。kernel の元は特に
+   P ∈ 𝒜₂ を固定 ⟹ kernel ≤ N_G(P) = R·C_Q(P)·Σ、C_Q(P)^# は 𝒜−{P} に
+   自由 ((11) の `invImageF_mul_comm_of_not_dvd_card_D` 系) ⟹ kernel = RΣ。
+3. **S₃ の実現**: ⟨s⟩ が 𝒜₂ ∖ {P} (2 元) を交換 ((11) の正則性) + RΣ が
+   Sylow-3 でない ((10.2) の |G|_3 = 3^4|W| ≥ 3^5 > 81 = |RΣ|) ゆえ
+   N_G(RΣ) ⊄ N_G(P) ⟹ 推移的 ⟹ 全 S₃。
+4. **R₁**: S₃ の A₃ の逆像 (|R₁| = 3·81 = 3^5)。以降 (14) の後半
+   (|R₂:R₁| ∈ {1,3}, Z(R₁) = Z(R₂) = Z₁, R₂ = C_G(Z₁) — 最後は (13) を使う)。
