@@ -988,6 +988,8 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 `1 - x^k = (1-x)(1 + x + … + x^{k-1})`) なので、生成元 `q` の分だけで足りる。
 ⟹ **`lowerCentralSeries ⊤ i = (Δ^i(⊤)).map inl`** (`i ≥ 1`; 基底は 4A.8(b) の
 `P' = ker(coordProd).map inl` と `range Δ_q = ker coordProd`)。
+**元レベルの式 `⁅inl f, y⁆ = inl (Δ_{y.right} f)` は
+`commutatorElement_inl_eq_shiftSubHom` として設置済** (帰納段はこれの closure 化のみ)。
 
 **(ii) 残る算術 = `Δ = (1-x)` の冪零指数**。`ZMod(p^n)[x]/(x^p-1)` で
 `(1-x)^{n(p-1)+1} = 0` かつ `(1-x)^{n(p-1)} ≠ 0` ⟹ **`class(P) = n(p-1)+1`**。

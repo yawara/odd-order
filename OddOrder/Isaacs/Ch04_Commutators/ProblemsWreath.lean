@@ -639,6 +639,30 @@ theorem range_shiftSubHom_le_ker_coordProdHom [Fintype Q] (q : Q) :
     _ = (∏ ω, f ω) * (∏ ω, f ω)⁻¹ := by rw [prod_smul_eq]
     _ = 1 := mul_inv_cancel _
 
+/-- **base の元と任意の元の交換子**: `⁅inl f, y⁆ = inl (Δ_{y.right} f)`.
+
+`y = inl y.left · inr y.right` と分解すると, `⁅inl f, inl g⁆ = 1` (base は可換) で
+残る `⁅inl f, inr q⁆ = inl (Δ_q f)` の共役も base 内なので消える.
+下降中心列 `γ_{i+1}(P) = Δ^i(A)` の帰納段はこの式そのもの. -/
+theorem commutatorElement_inl_eq_shiftSubHom (f : Q → D) (y : D ≀[Q] Q) :
+    ⁅(inl f : D ≀[Q] Q), y⁆ = inl (shiftSubHom y.right f) := by
+  have hbase : ⁅(inl f : D ≀[Q] Q), (inl y.left : D ≀[Q] Q)⁆ = 1 := by
+    rw [commutatorElement_eq_one_iff_commute]
+    change (inl f : D ≀[Q] Q) * inl y.left = (inl y.left : D ≀[Q] Q) * inl f
+    rw [← map_mul, ← map_mul, mul_comm]
+  have hcen : (inl y.left : D ≀[Q] Q) * inl (shiftSubHom y.right f) * (inl y.left)⁻¹
+      = inl (shiftSubHom y.right f) := by
+    rw [← map_inv, ← map_mul, ← map_mul, mul_comm y.left, mul_assoc, mul_inv_cancel, mul_one]
+  calc ⁅(inl f : D ≀[Q] Q), y⁆
+      = ⁅(inl f : D ≀[Q] Q), (inl y.left : D ≀[Q] Q) * inr y.right⁆ := by
+          rw [inl_left_mul_inr_right]
+    _ = ⁅(inl f : D ≀[Q] Q), (inl y.left : D ≀[Q] Q)⁆ * (inl y.left : D ≀[Q] Q)
+          * ⁅(inl f : D ≀[Q] Q), (inr y.right : D ≀[Q] Q)⁆ * (inl y.left : D ≀[Q] Q)⁻¹ :=
+        commutatorElement_mul_right_eq_mul_conj _ _ _
+    _ = (inl y.left : D ≀[Q] Q) * inl (shiftSubHom y.right f) * (inl y.left : D ≀[Q] Q)⁻¹ := by
+          rw [hbase, one_mul, commutatorElement_inl_inr_eq_shiftSubHom]
+    _ = inl (shiftSubHom y.right f) := hcen
+
 end
 
 end OddOrder.Isaacs.Ch04
