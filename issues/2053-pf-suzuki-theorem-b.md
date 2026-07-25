@@ -1115,3 +1115,41 @@ repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀
 に相当する repo 補題の有無を先に実測すること (無ければそこが (15) の主コスト)。
 `C_G(Z₁P) = RΣ` は landed 済なので「`L` normalizes `C_G(Z₁P) = RΣ` ⟹ `L ⊂ R₁`」
 の行はすぐ使える。
+
+## 📐 step (15) の構造分析 (2026-07-25 実測、main session)
+
+書籍 p.113-114 の (15) 冒頭:
+> `L := C_G(st) ⊓ ⟨Q₀,K,t⟩`。`⟨Q₀,K,t⟩ ≅ PSL(2,8)` ゆえ `L` は位数 9 の巡回群で、
+> その元は `s` に反転される。
+
+**核心の未形式化部品 = 「PSL(2,q) (q = 2ⁿ) の位数 3 元の中心化群は位数 q+1 の巡回群」**。
+
+### repo 実測 (grep 済、名前まで確認)
+- ✅ `natCard_projectiveSpecialLinearGroup_fin_two` : `|PSL(2,F)| = q(q−1)(q+1)`
+  (`GroupTheory/SpecificGroups/ProjectiveSpecialLinear/RootGroupSylow.lean`)
+  ⚠ 本 issue 上部の「mathlib に PSL の位数は無い」は mathlib についての記述で、
+  **repo 側には自前の位数公式がある** (混同注意)
+- ✅ `center_specialLinearGroup_fin_two_eq_bot` : char 2 で `Z(SL₂) = 1` (⟹ PSL = SL)
+- ✅ `exists_orderThreeGeneratedSubgroup_mulEquiv_psl2` : `⟨Q₀,K,t⟩ ≃* PSL(2,F)`, `|F| = |Q₀|`
+- ✅ root group (単数冪部分群) 系の infra 一式 (`RootGroup.lean`)
+- ❌ **非分裂トーラス (位数 q+1 の巡回群) は無い**。既存の "torus" 記述は分裂トーラス
+  (Borel の対角部分, PSU 側) のみ。⟹ ここが (15) の主コスト
+
+### 実装計画 (generic な新 leaf を上流から積む)
+1. **非スカラー 2×2 行列 `M` の `M₂(F)` 内中心化環は `F[M]`** (2 次元可換代数)。
+   まず mathlib に既存が無いか確認 (`Matrix` の centralizer 系)。
+2. `M ∈ SL₂(F)`、char 2、`M ≠ 1` かつ奇位数 ⟹ 特性多項式 `X² + tr(M)·X + 1` は
+   重根なし (重根 ⟺ `tr M = 0` ⟺ `M` は unipotent ⟹ 位数 2 の冪)。
+   ⟹ `F[M] ≅ F × F` (分裂) または `F_{q²}` (非分裂)。
+3. `C_{SL₂}(M) = {A ∈ F[M] : det A = 1} = ker(代数ノルム)`
+   — 分裂なら位数 `q−1` の巡回群、非分裂なら位数 `q+1` の巡回群
+   (有限体乗法群の巡回性 + ノルム全射)。
+4. char 2 で `PSL = SL` ゆえそのまま移送。
+5. `q = 8` に特殊化: 位数 3 の元は `3 ∤ 7 = q−1`, `3 ∣ 9 = q+1` ⟹ 非分裂側
+   ⟹ 中心化群は位数 9 の巡回群。`s` による反転は「トーラスを正規化する対合は
+   反転する」(Weyl 元の作用) から。
+
+規模: 複数 iteration。1 → 5 の順で積む。(15) の後半
+(`|R₂ : LV| = 3`, `Z(LV) = Z₁Σ`, `Ω₁(LV) = Z₁ΣP`) は `L` が取れてからの群論で、
+`C_G(Z₁P) = RΣ` (landed) がそのまま使える。
+
