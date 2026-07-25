@@ -668,3 +668,10 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
 - 適用後: model' で N_G(R)/R = F'⋊(F'*⋊Σ') 形 → R₁ := 逆像 (Sylow_p(G)、|R₁| = p³) →
   T₁ := [R₁/T, s]-系 → N_G(R₁) = N_G(R) (11)-型正則性論法の再利用 → T₁C_Q(P)C_W(P)
   index p 正規 → Isaacs Cor 10.2 + focal bridge → (B2) 偽。
+- orbit = 𝒜 landing (`6c5201918`/`a3ccd51bd`)。2-推移性の mathlib 入口確定:
+  `MulAction.is_two_pretransitive_iff` (pair-moving 判定) — 推移性 (orbit=𝒜) +
+  stabilizer(P) 内 C_Q(P) の 𝒜−{P} 正則性から標準組み立て (a≠b, c≠d:
+  transitivity で a→c、stabilizer(c)-側の正則性で残り 1 点合わせ)。
+  ⟹ (12) 終盤の実装順: (a) faithful kernel = R の同定 (設計書の主要非自明点) →
+  (b) Q̂ := NR⧸kernel + Ω̂ = ↥𝒜 の RankOneHypothesis 全 field →
+  (c) rankOne_affine_nearField 適用 → (d) R₁/T₁/Cor 10.2 bridge → step_twelve endpoint。
