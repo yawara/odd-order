@@ -3,6 +3,8 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.Abelianization.Defs
+import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Transfer
 
 /-!
@@ -395,5 +397,49 @@ theorem transfer_transfer (ϕ : ↥H →* A) :
     (smulSection_spec g f₀ hf₀) s₀ hs₀).symm
 
 end TransferTransitivity
+
+section AbelianizationTransfer
+
+/-- **Vanishing of the transfer into the abelianisation of a `p`-subgroup** when
+`p ∤ |G^{ab}|`: the transfer lands in a commutative group, so it factors through
+`G^{ab}` and the order of its image divides `|G^{ab}|`; but the image lives in the
+`p`-group `H^{ab}`, so its order is a power of `p`.  Coprimality forces the image
+to be trivial. -/
+theorem transfer_abelianization_range_eq_bot {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G} (hH : IsPGroup p ↥H)
+    (hab : ¬ p ∣ Nat.card (Abelianization G)) :
+    (MonoidHom.transfer (Abelianization.of (G := ↥H))).range = ⊥ := by
+  classical
+  set v := MonoidHom.transfer (Abelianization.of (G := ↥H)) with hv_def
+  rw [← Subgroup.card_eq_one]
+  -- the order of the image is the index of the kernel …
+  have h1 : Nat.card v.range = v.ker.index := by
+    rw [Subgroup.index_eq_card]
+    exact (Nat.card_congr (QuotientGroup.quotientKerEquivRange v).toEquiv).symm
+  -- … which divides `|G^{ab}|` since `G' ≤ ker v` …
+  have h2 : v.ker.index ∣ Nat.card (Abelianization G) := by
+    have h3 : Nat.card (Abelianization G) = (commutator G).index := rfl
+    rw [h3]
+    exact Subgroup.index_dvd_of_le (Abelianization.commutator_subset_ker v)
+  -- … and also divides the `p`-power `|H^{ab}|`.
+  have h5 : IsPGroup p (Abelianization ↥H) := hH.to_quotient (commutator ↥H)
+  haveI : Finite (Abelianization ↥H) := Quotient.finite _
+  obtain ⟨k, hk⟩ := h5.exists_card_eq
+  have h4 : Nat.card v.range ∣ p ^ k := by
+    rw [← hk]
+    exact Subgroup.card_subgroup_dvd_card v.range
+  obtain ⟨i, -, hi⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp h4
+  rcases Nat.eq_zero_or_pos i with hi0 | hipos
+  · rw [hi0, pow_zero] at hi
+    exact hi
+  · exfalso
+    apply hab
+    have h6 : p ∣ Nat.card v.range := by
+      rw [hi]
+      exact dvd_pow_self p hipos.ne'
+    rw [h1] at h6
+    exact h6.trans h2
+
+end AbelianizationTransfer
 
 end OddOrder.GroupTheory

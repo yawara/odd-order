@@ -442,7 +442,14 @@ InductionNonSimple で済) して番号付き steps (1)–(17):
       `lemmaFive_of_orderThree` ⟹ IsCyclic W ∧ |W|∣2^p+1=9。|Σ|=3∣|W| (`card_dvd_of_le`)
       で |W|≠1 ⟹ |W|∈{3,9} (`dvd_prime_pow`)。|G|_3 = `factorization_card_G_eq` (m=2) +
       |W|=3^k で 3^4·|W|。
-- [ ] (11)–(12) (Cor 10.2 bridge: transfer range → G/O^p 同型)
+- [x] (11)–(12) — **完了 (2026-07-25)**。(11) = StepTwelve.lean 前半 (R = T×P、
+      𝒜 正則作用、index 定理は一般 m)。(12) = δ1–δ4 + ε1–ε3 (StepTwelve{,Endgame,
+      Conclusion,Transfer}.lean) → **`step_twelve` (StepTwelveTransfer.lean,
+      `e9256e1dc`): "Case (10.2) holds"** — (10.1) 下で m = 1 を index 定理
+      (p^{2m+1} ∣ |G| → 2m+1 ≤ m+2) で導出し `factorization_ne_three` で排除。
+      結論 = p=3 ∧ |F|=9 ∧ W cyclic ∧ |W|∈{3,9} ∧ |G|_3 = 3^4·|W|。
+      ⚠ 書籍 (12) 中の Hall-Wielandt 言及は Cor 10.2 range-equality 直用で回避済
+      ((17) 用 abelian 版とは別)。
 - [ ] (13)–(16)
 - [ ] Hall-Wielandt abelian 版 (shared infra、claim してから)
 - [ ] (17) 結論 → Theorem B assembly
@@ -860,3 +867,62 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   R₁ の class < p: R₁ 非可換 p³ → class = 2 (⁅R₁,R₁⁆ = T ≤ Z(R₁) via δ4a)
   < 3 ≤ p (p 奇素数)。nilpotencyClass-API との橋 (Group.nilpotencyClass ↥R₁ = 2)
   は mathlib の nilpotencyClass-le-iff-…-central-series で組む。
+- **ε2/ε3 完結 = step (12) 完結** (`cf9996d97`, 2026-07-25): 新 leaf
+  **StepTwelveTransfer.lean** — `factorization_ne_three` (case (10.1) の閉鎖):
+  hfact (v_p(|G|) = 3) を仮定して False。route は focal 計算を経ず range 消滅で直行:
+  (i) `nilpotencyClass_overgroup_le_two` (δ4a の T-中心性 + `⁅R₁,R₁⁆ = T` +
+  mathlib `Subgroup.map_subtype_commutator` / `lowerCentralSeries_eq_bot_iff…`);
+  (ii) R₁ = `Sylow.ofCard` (hfact で card p³ = full p-part) → **Isaacs Cor 10.2**
+  (`transfer_range_eq_of_nilpotencyClass_lt`, class 2 < p) で G/N-transfer range
+  一致; (iii) generic `transfer_abelianization_range_eq_bot` (hB2 → G-transfer
+  range = ⊥、|range| が |G^ab| と p-冪の公約数); (iv) generic
+  `transfer_eq_pow_of_map_conj_eq` (x の全共役 ∈ H + ϕ-値共役不変 →
+  transfer = ϕ(x)^index; 正規部分群では既存の transversal-不変版が使えないための
+  変種) を ψ = mk'(T̄₁) ∘ transferRes に適用 — ϕ-不変性は **ε1**
+  (`commutator_mem_sInvertedOvergroup`: ⁅s⁻¹,x⁻¹⁆ ∈ T₁) から。
+  π(of x)^[N:R₁] = π(w x) = 1、p ∤ [N:R₁]
+  (`not_p_dvd_index_subgroupOf_normalizer_overgroup`) + 商が p-群 → of x ∈ T̄₁ →
+  ker of = commutator → x ∈ T·T₁ = T₁ → R₁ ≤ T₁ → p³ ≤ p² 矛盾 □
+  **⟹ (12) は全部品 sorry-free で完結。次 frontier = 文書順で (13)–(17)
+  ((10.2) 側 endgame: p = 3, Z₁ = ⟨st⟩, PSL(2,8), Hall–Wielandt 可換版, R₂⟨s⟩;
+  pp. 113–114 Read 済、(14) は kernel-同定機構を δ2'/δ4 から再利用)。**
+
+### (13) C_G(Z₁) は 3-群 — 実装計画 (2026-07-25 精読・部品確定済)
+
+原文 p. 113 (PDF page 6 直読済)。Z₁ = ⟨st⟩、orderOf(st) = 3 ((10.2) の
+`orderOf_st_eq_char` + char = 3)。証明 = |C_G(Z₁)| = |C∩C_G(s)|·|J| 分解
+(J = s-反転元集合) → 両因子が 3-冪。**部品は全て実在確認済**:
+
+- **Odd |C_G(st)|**: `centralizer_natCard_odd_of_stronglyReal` (StronglyReal.lean:469)
+  に x := st (st = s·t は def どおり strongly real、(st)² ≠ 1 は位数 3)。
+- **§1 Lemma (a)**: `card_eq_card_centralizer_mul_ncard_invertedBy`
+  (InvertedProduct.lean:244; X := C_G(st)、t := s、hodd ↑、hnorm = s は st を反転
+  → C_G(st) を正規化)。
+- **C ⊓ C_G(s) = V = WP**: C_G(st)∩C_G(s) = C_G(s)∩C_G(t) (可換性の同値変形)
+  = V (Ch.I の V-特徴付け; 所在は実装時に grep) — |V| = |W|·|P| は 3-冪
+  ((10.2): |W| ∈ {3,9}, |P| = 3)。
+- **(13a) 新 generic 補題 (唯一の新規 infra)**: 「r prime ∣ |invertedBy X t| →
+  ∃ x ∈ invertedBy X t, orderOf x = r」(Cauchy-in-J)。証明 (自己完結 ~100 行,
+  重 machinery 不要): X⟨t⟩ 内で R ∈ Syl_r(X) に Frattini → coset X·t 内の
+  2-元 trick で対合 u ∈ N(R) ∩ X·t → **既存 `exists_mem_normalizer_conj_of_odd_orderOf`**
+  (StronglyReal.lean:40, 対合対の奇積 dihedral 共役が normalizer 保存) で
+  u = t^c (c ∈ X) → R^{c⁻¹} は t-不変 Sylow → Lemma (a) を R^{c⁻¹} に適用、
+  r-進付値の積乗法性 (|X| = |Y|·|J|) で C_R(t) < R → 非自明 s-反転 r-冪元 →
+  冪で位数 r (invertedBy は冪閉)。置き場 = StronglyReal.lean generic 節
+  (dihedral 補題と同居) or InvertedProduct.lean (import 向き確認)。
+- **r ∈ {3,7}**: x ∈ J 位数 r、strongly real (x = t·(tx)、(tx)² = 1) →
+  normal form `exists_isConj_mul_t_of_stronglyReal` (x ~ u·t, u ∈ Q₀#) →
+  u·t ∈ ⟨Q₀,K,t⟩ =: L ≅ PSL(2,8) (**Lemma 4** =
+  `exists_orderThreeGeneratedSubgroup_mulEquiv_psl2`, hst = orderOf(st) = 3,
+  q = |Q₀| = 2³) → r ∣ |PSL(2,F₈)| = 504 = 2³·3²·7、r 奇 (J ⊆ C 奇) → r ∈ {3,7}。
+  ⚠ |PSL(2,F₈)| = 504 の card 計算が repo に要るか確認
+  (Matrix.ProjectiveSpecialLinearGroup card — mathlib/repo grep)。
+- **r = 7 の排除**: 7-Sylow(L) = K-共役 (|K| = 2^p−1 = 7)、x ~ k ∈ K^# →
+  C_G(x) ≅ C_G(k)、Ch.I §2 Prop 1(a) (K^# は固定点 2 個) → C_G(k) = C_D(K) = KW。
+  st ∈ C_G(x) の像 = KW 内 strongly real 位数 3 元 — KW の位数 3 元は W 側、
+  W^# は strongly real でない (Ch.I 系; 所在実装時 grep — FirstCase の
+  `not_isStronglyReal_of_mem_P` 同型パターン) → 矛盾。
+- **assembly**: |C| = |V|·|J|、|V| = 3-冪、|J| の素因数は 3 のみ → C は 3-群
+  (`IsPGroup.of_card`-style: card = 3^k 形へ)。
+
+実装順: (13a) generic → (13) 本体 (新 leaf `FirstCase/StepThirteen.lean`)。

@@ -108,6 +108,47 @@ theorem transfer_eq_pow_of_conj_invariant_transversal [H.FiniteIndex]
   rw [hprod, Finset.prod_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
     ← Subgroup.index_eq_card]
 
+/-- **Transfer of an element with `ϕ`-constant conjugates.** If every conjugate
+`s⁻¹ * x * s` of `x ∈ H` lies again in `H` (e.g. when `H` is normal) and `ϕ` takes
+the same value on all of them (e.g. when `ϕ` kills the image of `⁅H, G⁆`), then
+`transfer ϕ x = ϕ ⟨x, hx⟩ ^ H.index`.
+
+Here no transversal needs to be conjugation-invariant: left multiplication by `x`
+fixes every coset `gH` (because `g⁻¹xg ∈ H`), so each factor of the transfer
+product is the `ϕ`-value of a conjugate `rep(q)⁻¹ * x * rep(q)`. -/
+theorem transfer_eq_pow_of_map_conj_eq [H.FiniteIndex]
+    (ϕ : H →* A) {x : G} (hx : x ∈ H)
+    (hmem : ∀ s : G, s⁻¹ * x * s ∈ H)
+    (hϕ : ∀ s : G, ϕ ⟨s⁻¹ * x * s, hmem s⟩ = ϕ ⟨x, hx⟩) :
+    MonoidHom.transfer ϕ x = ϕ ⟨x, hx⟩ ^ H.index := by
+  classical
+  letI := H.fintypeQuotientOfFiniteIndex
+  set S : H.LeftTransversal := default with hS_def
+  -- left multiplication by `x⁻¹` fixes every coset of `H`.
+  have hfix : ∀ q : G ⧸ H, x⁻¹ • q = q := by
+    intro q
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective q
+    rw [Quotient.smul_mk, smul_eq_mul, QuotientGroup.eq]
+    have h1 : (x⁻¹ * g)⁻¹ * g = g⁻¹ * x * g := by group
+    rw [h1]
+    exact hmem g
+  -- each factor of the transfer product is a conjugate of `x`.
+  have hfactor : ∀ q : G ⧸ H,
+      (S.2.leftQuotientEquiv q : G)⁻¹ * ((x • S).2.leftQuotientEquiv q : G)
+        = (S.2.leftQuotientEquiv q : G)⁻¹ * x * (S.2.leftQuotientEquiv q : G) := by
+    intro q
+    rw [smul_apply_eq_smul_apply_inv_smul x S q, smul_eq_mul, hfix q, mul_assoc]
+  rw [MonoidHom.transfer_def ϕ S]
+  have hprod : Subgroup.leftTransversals.diff ϕ S (x • S)
+      = ∏ _q : G ⧸ H, ϕ ⟨x, hx⟩ := by
+    unfold Subgroup.leftTransversals.diff
+    simp only
+    exact Finset.prod_congr rfl fun q _ =>
+      (congrArg ϕ (Subtype.ext (hfactor q))).trans
+        (hϕ (S.2.leftQuotientEquiv q : G))
+  rw [hprod, Finset.prod_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
+    ← Subgroup.index_eq_card]
+
 /-- **Transfer over a conjugation-invariant right transversal.** If a *right*
 transversal `T` of `H ≤ G` (`IsComplement ↑H T`) is invariant under conjugation by
 `x ∈ H`, then `transfer ϕ x = ϕ ⟨x, hx⟩ ^ H.index`.  (Its pointwise inverse `T⁻¹` is
