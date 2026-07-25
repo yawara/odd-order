@@ -574,6 +574,159 @@ theorem eq_P_of_prime_order_conj_invariant
     rwa [fc.kernelN_eq_P ind] at hker
   exact Subgroup.eq_of_le_of_card_ge hle (by rw [fc.card_P, hP₁c])
 
+/-- **Elements of `P^#` are not strongly real** (step (12) input, p. 112): a strongly
+real `x ∈ P^#` has `x² ≠ 1` (odd prime order), so Lemma 3 makes `|C_G(x)|` odd — but
+`C_G(x) = C_G(P)` contains the distinguished involution. -/
+theorem not_isStronglyReal_of_mem_P {x : G} (hx : x ∈ fc.P) (hx1 : x ≠ 1) :
+    ¬ IsStronglyReal x := by
+  intro hsr
+  -- `x` generates `P`, so `C_G(P) ≤ C_G(x)`.
+  have hord : orderOf x = fc.p := by
+    have h1 : orderOf x ∣ fc.p := by
+      have h2 : orderOf (⟨x, hx⟩ : ↥fc.P) ∣ Nat.card ↥fc.P := orderOf_dvd_natCard _
+      rwa [fc.card_P, Subgroup.orderOf_mk] at h2
+    rcases (Nat.dvd_prime fc.p_prime).mp h1 with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h) hx1
+    · exact h
+  have hx2 : x ^ 2 ≠ 1 := by
+    intro h
+    have h1 : orderOf x ∣ 2 := orderOf_dvd_of_pow_eq_one h
+    rw [hord] at h1
+    have h6 : fc.p = 2 :=
+      (Nat.prime_dvd_prime_iff_eq fc.p_prime Nat.prime_two).mp h1
+    rcases fc.p_odd with ⟨k, hk⟩
+    omega
+  obtain ⟨-, hodd⟩ :=
+    fc.toHypothesis.stronglyReal_normalForm_and_centralizer_odd hsr hx2
+  -- the distinguished involution centralizes `x ∈ P`, giving even order.
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  have hsC : s ∈ Subgroup.centralizer ({x} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    rw [Set.mem_singleton_iff] at hy
+    subst hy
+    exact Subgroup.mem_centralizer_iff.mp
+      (fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V fc.P_le_V) y hx
+  have hs2 : orderOf s = 2 := by
+    have h1 : s ^ 2 = 1 := fc.toHypothesis.distinguishedInvolution_sq
+    have h2 : orderOf s ∣ 2 := orderOf_dvd_of_pow_eq_one h1
+    rcases (Nat.dvd_prime Nat.prime_two).mp h2 with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h)
+        fc.toHypothesis.distinguishedInvolution_ne_one
+    · exact h
+  have heven : (2 : ℕ) ∣ Nat.card ↥(Subgroup.centralizer ({x} : Set G)) := by
+    have h1 : orderOf (⟨s, hsC⟩ : ↥(Subgroup.centralizer ({x} : Set G)))
+        ∣ Nat.card ↥(Subgroup.centralizer ({x} : Set G)) := orderOf_dvd_natCard _
+    rwa [Subgroup.orderOf_mk, hs2] at h1
+  rcases hodd with ⟨k, hk⟩
+  omega
+
+include model in
+/-- **Elements of `T` are strongly real** (step (12) input): `x = s·(s·x)`, and `s·x`
+is an involution because `s` inverts `x` — while `x ≠ s` since `|R|` is odd. -/
+theorem isStronglyReal_of_mem_sInvertedT
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) {x : G}
+    (hx : x ∈ fc.sInvertedT model) : IsStronglyReal x := by
+  rw [fc.mem_sInvertedT_iff model ind hB2 hm] at hx
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  have hs2 : s * s = 1 := by
+    have h := fc.toHypothesis.distinguishedInvolution_sq
+    rwa [pow_two] at h
+  have hsinv : s⁻¹ = s := by
+    rw [← mul_one s⁻¹, ← hs2, ← mul_assoc, inv_mul_cancel, one_mul]
+  -- `s x` is an involution: `(s x)² = (s x s⁻¹)·(s² x)·… = x⁻¹·x = 1`.
+  have hsx2 : (s * x) * (s * x) = 1 := by
+    have h1 : (s * x) * (s * x) = (s * x * s⁻¹) * ((s * s) * x) := by
+      group
+    rw [h1, hx.2, hs2, one_mul, inv_mul_cancel]
+  -- `s x ≠ 1`: else `x = s`, but `x ∈ R` has odd order and `s` has order `2`.
+  have hxo : Odd (orderOf x) := by
+    have h1 : orderOf x ∣ Nat.card ↥(fc.invImageF model) := by
+      have h2 : orderOf (⟨x, hx.1⟩ : ↥(fc.invImageF model))
+          ∣ Nat.card ↥(fc.invImageF model) := orderOf_dvd_natCard _
+      rwa [Subgroup.orderOf_mk] at h2
+    rw [fc.card_invImageF model ind, hm, fc.card_P] at h1
+    have hodd : Odd (fc.p ^ m * fc.p) := by
+      rcases fc.p_odd with ⟨k, hk⟩
+      exact (Odd.pow ⟨k, hk⟩).mul ⟨k, hk⟩
+    exact hodd.of_dvd_nat h1
+  have hsx1 : s * x ≠ 1 := by
+    intro h
+    have hxs : x = s := by
+      have h1 : x = s⁻¹ := by
+        have h2 := congrArg (fun z => s⁻¹ * z) h
+        simpa [mul_assoc] using h2
+      rw [h1, hsinv]
+    rw [hxs] at hxo
+    have h2 : orderOf s = 2 := by
+      have h3 : s ^ 2 = 1 := fc.toHypothesis.distinguishedInvolution_sq
+      have h4 : orderOf s ∣ 2 := orderOf_dvd_of_pow_eq_one h3
+      rcases (Nat.dvd_prime Nat.prime_two).mp h4 with h | h
+      · exact absurd (orderOf_eq_one_iff.mp h)
+          fc.toHypothesis.distinguishedInvolution_ne_one
+      · exact h
+    rw [h2] at hxo
+    rcases hxo with ⟨k, hk⟩
+    omega
+  refine ⟨s, ⟨?_, fc.toHypothesis.distinguishedInvolution_ne_one⟩, s * x,
+    ⟨by rw [pow_two]; exact hsx2, hsx1⟩, ?_⟩
+  · rw [pow_two]
+    exact hs2
+  · rw [← mul_assoc, hs2, one_mul]
+
+include model in
+/-- **A conjugate of `P` meets `T` trivially** (step (12), p. 112): nonidentity elements
+of `g·P·g⁻¹` are not strongly real (conjugation preserves strong reality and
+`not_isStronglyReal_of_mem_P`), while nonidentity elements of `T` are. -/
+theorem conj_P_inf_sInvertedT_eq_bot
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) (g : G) :
+    (MulAut.conj g • fc.P) ⊓ fc.sInvertedT model = ⊥ := by
+  rw [eq_bot_iff]
+  rintro x ⟨hxP, hxT⟩
+  rw [Subgroup.mem_bot]
+  by_contra hx1
+  have hsr : IsStronglyReal x :=
+    fc.isStronglyReal_of_mem_sInvertedT model ind hB2 hm hxT
+  -- transport back along the conjugation.
+  obtain ⟨y, hyP, hyx⟩ := hxP
+  have hy1 : y ≠ 1 := by
+    intro h
+    apply hx1
+    rw [← hyx, h]
+    simp
+  obtain ⟨u, hu, v, hv, huv⟩ := hsr
+  have hysr : IsStronglyReal y := by
+    refine ⟨g⁻¹ * u * g, ⟨?_, ?_⟩, g⁻¹ * v * g, ⟨?_, ?_⟩, ?_⟩
+    · rw [pow_two]
+      have h1 := hu.1
+      rw [pow_two] at h1
+      calc (g⁻¹ * u * g) * (g⁻¹ * u * g) = g⁻¹ * (u * u) * g := by group
+        _ = 1 := by rw [h1]; group
+    · intro h
+      apply hu.2
+      have h2 := congrArg (fun z => g * z * g⁻¹) h
+      simpa [mul_assoc] using h2
+    · rw [pow_two]
+      have h1 := hv.1
+      rw [pow_two] at h1
+      calc (g⁻¹ * v * g) * (g⁻¹ * v * g) = g⁻¹ * (v * v) * g := by group
+        _ = 1 := by rw [h1]; group
+    · intro h
+      apply hv.2
+      have h2 := congrArg (fun z => g * z * g⁻¹) h
+      simpa [mul_assoc] using h2
+    · have h3 : y = g⁻¹ * x * g := by
+        rw [← hyx]
+        simp [MulAut.conj_apply]
+        group
+      rw [h3, huv]
+      group
+  exact fc.not_isStronglyReal_of_mem_P hyP hy1 hysr
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
