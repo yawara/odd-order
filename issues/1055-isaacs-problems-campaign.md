@@ -1391,8 +1391,9 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 4D.1(a)(b) | ✅ | `commutator_eq_bot_of_centralizer_le_of_coprime` / `inf_centralizer_eq_bot_of_centralizer_le_of_coprime` (`ProblemsCoprimeAction.lean`) |
 | 4D.2 | ✅ | `baerAdd_mul_inv_of_commutator_le_center` / `baerMul_div_eq_commutator` (`ProblemsBaerAddition.lean`) |
 | 4D.3 | ✅ 全 7 小問 | `IsIrreducibleCoprimeAction.*` (`ProblemsIrreducibleAction.lean`): (a) `exists_isPGroup` / (b) `commutator_le_center` / (c) `fixedPoints_eq_commutator` + `eq_commutator_or_eq_top_of_isAInvariant` / (d) `pow_mem_commutator` + `pow_eq_one_quotient_commutator` / (e) `pow_eq_one_of_mem_commutator` / (f) `pow_eq_one_of_ne_two` / (g) `pow_four_eq_one_of_two` |
-| 4D.4 | ⬜ | 2-群 + 奇数位数 `A` が `x⁴=1` を全部固定 ⟹ 自明 |
-| 4D.5 | ⬜ | derived length `n+1` (+ 任意に大きい導来長の可解群) |
+| 4D.4 | ✅ | `actionCommutator_eq_bot_of_isPGroup_two_of_fixes_pow_four` (`ProblemsIrreducibleAction.lean`) |
+| 4D.5 上界 | ✅ | `derivedSeries_semidirectProduct_eq_bot` + `derivedSeries_le_range_inl` (新 leaf `ProblemsDerivedLength.lean`) |
+| 4D.5 下界 + 系 | ⬜ | `(B ⋊ A)^{(n)} ≠ 1` と「任意に大きい導来長」— 下記の設計 |
 | 4D.6 | ⬜ | Fitting の定理 (Thm 4.34) の写像 `θ` で `θ(G) = C_G(A)`, `ker θ = ⁅G,A⁆` |
 | 4D.7 | ⬜ | `p`-可解 + 巡回 Sylow `p` ⟹ `K ⊆ O_{p'}(G)` |
 
@@ -1401,6 +1402,38 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 周囲群 `Γ` の部分群として述べる。鍵は `mem_of_pow_card_eq_one_of_mem_centralizer`
 (`C_Γ(N)` の元で `|A|` 乗が 1 のものは `A` に入る) — `x = a·g` 分解 + `C_Γ(N) ⊓ G ≤ N` +
 互いに素性。これで `G ≤ N_Γ(A)` が出て `⁅G,A⁆ ≤ G ⊓ A = 1`。(b) は `A₀ := A ⊓ C_Γ(N)` に (a)。
+
+### 4D.4 の設計 (実装済)
+
+`|H|` の強い帰納法。`A`-不変部分群 `H` への制限作用 (`Ch03.IsAInvariant.toMulAutHom`) が
+非自明なら、帰納法の仮定で `H` の真の `A`-不変部分群すべてに自明作用 ⟹
+`IsIrreducibleCoprimeAction` 成立 ⟹ **4D.3(g)** で `H` の全元が `y⁴ = 1` ⟹ 仮定で固定。
+補助 `isAInvariant_map_subtype_of_isAInvariant`。
+⚠ `Ch03.IsAInvariant.toMulAutHom` は `ThreeSubgroups.lean` で `_root_.` 無しに宣言されており
+実名が `OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom` — namespace Ch04 の
+中では `OddOrder.Isaacs.Ch03.…` とフルに書く (`Ch03.…` では解決しない)。
+
+### 4D.5 の設計 (下界 + 系が残り)
+
+**上界 (実装済)**: `rightHom : B ⋊ A ↠ A` で `(B ⋊ A)^{(n)} ≤ ker rightHom = inl(B)`、
+`inl(B)` 可換ゆえ `(B ⋊ A)^{(n+1)} = 1`。coprime も faithful も不要。
+
+**下界 (残り)**: `V := A^{(n-1)} ≠ 1` (導来長がちょうど `n`)。`(|B|, |V|) = 1` と `B` 可換から
+Lemma 4.29 (`⁅B, V, V⁆ = ⁅B, V⁆`; repo は `actionCommutator` 形) が使える。
+半直積 `Γ = B ⋊ A` の中で `W := ⁅inl(B), inr(V)⁆` とおくと:
+- `inr(V) ≤ Γ^{(k)}` (∀ `k ≤ n-1`; `inr` は導来列を保つ + `V = A^{(n-1)} ≤ A^{(k)}`)
+- `W ≤ Γ^{(k)}` を `k ≤ n-1` について帰納: `k → k+1` は `W = ⁅W, inr V⁆` (4.29) と
+  `W, inr V ≤ Γ^{(k)}` から `W ≤ ⁅Γ^{(k)}, Γ^{(k)}⁆ = Γ^{(k+1)}`。
+- 仕上げ: `k = n-1` で `W = ⁅W, inr V⁆ ≤ Γ^{(n)}`、`W ≠ 1` は faithful から
+  (`⁅B, V⁆ = 1` なら `V` が `B` に自明作用 ⟹ `V = 1` に矛盾)。
+⟹ `Γ^{(n)} ≠ 1` かつ `Γ^{(n+1)} = 1` で導来長ちょうど `n+1`。
+
+**系 (任意に大きい導来長)**: hint どおり `C ≀ A` (regular wreath product; repo は 4A.7 の
+`ProblemsWreath.lean` に `D ≀[Q] Q` を持つ)。`C` = 位数 `p` 巡回 (`p ∤ |A^{(n-1)}|`) とすると
+`B := (A → C)` は基本アーベル `p`-群で `|B| = p^{|A|}` ゆえ coprime、`A` の正則作用は忠実。
+`n` についての帰納で導来長 `n` の可解群が全ての `n` で存在。
+⚠ 「導来長」の述語は mathlib にも repo にも無い — `derivedSeries G n = ⊥ ∧ derivedSeries G (n-1) ≠ ⊥`
+の形で直接述べるのが軽い (新しい `def derivedLength` を導入する必要はない)。
 
 ### 4D.3 の設計 (残り (c)–(g))
 
