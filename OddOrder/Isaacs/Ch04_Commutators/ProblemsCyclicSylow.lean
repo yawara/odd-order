@@ -166,6 +166,68 @@ theorem inf_ne_bot_of_isCyclic_of_isPGroup {P : Type*} [Group P] [Finite P] [IsC
   rw [this, orderOf_one] at hxo
   exact (Fact.out : p.Prime).one_lt.ne hxo
 
+/-! ### 正規巡回部分群まわり -/
+
+/-- **正規な巡回部分群の部分群は `G` で正規**: 巡回群では位数ごとに部分群が唯一なので
+`H ≤ P` は `P` の特性部分群であり, `P ⊴ G` から `H ⊴ G`。 -/
+theorem normal_of_le_of_isCyclic {P H : Subgroup G} [P.Normal]
+    (hcyc : IsCyclic ↥P) (hHP : H ≤ P) : H.Normal := by
+  have key : ∀ g : G, H.map (MulAut.conj g).toMonoidHom = H := by
+    intro g
+    have hle : H.map (MulAut.conj g).toMonoidHom ≤ P := by
+      rintro _ ⟨h, hh, rfl⟩
+      exact ‹P.Normal›.conj_mem _ (hHP hh) g
+    have hcard : Nat.card ↥((H.map (MulAut.conj g).toMonoidHom).subgroupOf P)
+        = Nat.card ↥(H.subgroupOf P) := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHP).toEquiv]
+      exact (Nat.card_congr
+        (Subgroup.equivMapOfInjective H _ (MulAut.conj g).injective).toEquiv).symm
+    have heq := OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq (C := ↥P) hcard
+    have hmap := congrArg (fun S : Subgroup ↥P => S.map P.subtype) heq
+    simp only [Subgroup.subgroupOf_map_subtype] at hmap
+    rwa [inf_eq_left.mpr hle, inf_eq_left.mpr hHP] at hmap
+  refine ⟨fun n hn g => ?_⟩
+  have hmem : g * n * g⁻¹ ∈ H.map (MulAut.conj g).toMonoidHom := ⟨n, hn, rfl⟩
+  rwa [key g] at hmem
+
+/-- **巡回 `p`-群への coprime 作用は非自明な固定点があれば自明**: `P ⊴ G` が巡回 `p`-群,
+`K` の位数が `|P|` と互いに素で, `K` が `P` の非自明な元を中心化するなら `K ≤ C_G(P)`。
+
+**Theorem 4.34** (Fitting, `fixedPoints_inf_actionCommutator_eq_bot_of_abelian`) が
+`C_P(K) ⊓ ⁅P, K⁆ = 1` を与え, 巡回 `p`-群では非自明部分群 2 つが非自明に交わる
+(`inf_ne_bot_of_isCyclic_of_isPGroup`) ので `C_P(K) ≠ 1` から `⁅P, K⁆ = 1`。 -/
+theorem le_centralizer_of_isCyclic_of_exists_fixed {p : ℕ} [Fact p.Prime]
+    {P K : Subgroup G} [P.Normal] (hPp : IsPGroup p ↥P) (hcyc : IsCyclic ↥P)
+    (hKcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥P))
+    {x : G} (hxP : x ∈ P) (hxne : x ≠ 1) (hxfix : ∀ k ∈ K, k * x * k⁻¹ = x) :
+    K ≤ Subgroup.centralizer (P : Set G) := by
+  letI : CommGroup ↥P := hcyc.commGroup
+  set ψ : ↥K →* MulAut ↥P := (MulAut.conjNormal (H := P)).comp K.subtype with hψ
+  have hbot := fixedPoints_inf_actionCommutator_eq_bot_of_abelian ψ hKcop
+  have hfixne : Subgroup.fixedPointsOfMulAut ψ ≠ ⊥ := by
+    rw [Subgroup.ne_bot_iff_exists_ne_one]
+    refine ⟨⟨⟨x, hxP⟩, ?_⟩, ?_⟩
+    · rw [Subgroup.mem_fixedPointsOfMulAut]
+      intro k
+      refine Subtype.ext ?_
+      rw [hψ, MonoidHom.comp_apply, MulAut.conjNormal_apply]
+      exact hxfix (k : G) k.2
+    · intro h
+      exact hxne (congrArg Subtype.val (congrArg Subtype.val h))
+  have hac : actionCommutator ψ = ⊥ := by
+    by_contra hne
+    exact inf_ne_bot_of_isCyclic_of_isPGroup hPp hfixne hne hbot
+  intro k hk
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  have htriv := (actionCommutator_eq_bot_iff_acts_trivially ψ).mp hac ⟨k, hk⟩ ⟨y, hy⟩
+  have hval : k * y * k⁻¹ = y := by
+    have := congrArg Subtype.val htriv
+    rwa [hψ, MonoidHom.comp_apply, MulAut.conjNormal_apply] at this
+  calc y * k = (k * y * k⁻¹) * k := by rw [hval]
+    _ = k * y := by group
+
 end
 
 end OddOrder.Isaacs.Ch04
