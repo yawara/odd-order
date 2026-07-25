@@ -600,3 +600,12 @@ preimage、step (7) の N = P 使用)。主張:
   **次 = step (12)**: (10.1) 仮定下で N_G(P) ⊊ N_G(R)、𝒜' = 𝒜 (strongly-real 排除 =
   Ch.I §3 Lemma 3 の被覆確認から)、[N_G(R):N_G(P)] = p^m → m=1 → App II Prop 1 再適用 →
   Isaacs Cor 10.2 → (B2) 矛盾。
+- **step (12) 進捗**: strongly-real 3 補題 (`7f8e5063a`) + ↑R=↑T·↑P public 化 +
+  R exponent p (`dae631f5a`)。
+  **|𝒜| = p^m の設計 (一般 subgroup 計数を回避)**: 𝒜 ≃ T の complement bijection —
+  t ↦ ⟨x₀·t⟩ (x₀ = P の生成元)。単射 = (x₀t)^k = x₀t' ⟹ x₀^{k−1} ∈ P∩T = ⊥;
+  全射 = P₁ ∈ 𝒜 は P₁∩T = ⊥ (素数位数) で R/T ≅ P に同型に乗る ⟹ ξ = x₀·t ∈ P₁。
+  orbit 論法は |𝒜−{P}| = p^m−1 = |C_Q(P)| + freeness で単一自由軌道 → 𝒜' = 𝒜。
+  残り部品: N_G(P) ⊊ N_G(R) (Sylow 成長、engine の部品再利用) / orbit-stabilizer /
+  m = 1 / N_G(R)/R への App II Prop 1 再実例化 / Isaacs Cor 10.2 bridge
+  (transfer range → G/O^p 同型、issue 本文 (12) 注記) / (B2) 矛盾で (10.1) 否定。
