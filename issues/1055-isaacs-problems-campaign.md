@@ -546,11 +546,22 @@ Ch.2 は全ファイル sorry-free。
   `m`-捩れを全部反転」)。書籍の言い回しに一致。
 - (b) `mul_eq_of_fixes_inverts_pqr` (`u_p · u_q = u_r`) ⟹ `{1,u_p,u_q,u_r}` は Klein 四元群。
 
-**残り**:
-- (a)(b) を `p, q, r` 具体で束ねたまとめ定理 (存在 + Klein 四元群) — 核への 3 回の
-  instantiation (`p*(q*r) = q*(p*r) = r*(p*q) = p*q*r` は `ring`) だけ。
-- (c): `G = C ⋊ K` で、`C` の生成元が誘導する内部自己同型 `α` の `⟨α⟩` が regular orbit を
-  もたないこと (3A.7 の sharpness 例)。
+**残り = (c) のみ**。**★ 計算は済んでいる (2026-07-25)**:
+`G = Multiplicative (ZMod n) ⋊ K` (`K = {1,u_p,u_q,u_r} ≤ (ZMod n)ˣ` が乗法で作用)、
+`c := inl (ofAdd 1)` (`C` の生成元)、`α := MulAut.conj c` とすると
+
+    α^j (x, k) = (x + j·(1 - k), k)      （加法表記、`k` は単元倍として作用）
+
+なので `α^j` が `(x,k)` を固定 ⟺ `j·(1-k) = 0` in `ZMod n`。
+- `k = 1`: 全ての `j` が固定 (安定化群 = `⟨α⟩` 全体)。
+- `k = u_p`: `1 - u_p ≡ 0 (mod p)`, `≡ 2 (mod q,r)` で `q,r` は奇ゆえ
+  `gcd(1-u_p, n) = p` ⟹ 固定 ⟺ `qr ∣ j` ⟹ 安定化群は位数 `p > 1`。
+- `k = u_q`, `u_r` も同様に位数 `q`, `r`。
+また `orderOf α = n` (`α^j = 1` ⟺ `qr ∣ j` かつ `pr ∣ j` かつ `pq ∣ j` ⟺ `n ∣ j`)。
+⟹ **どの軌道も安定化群が非自明** = regular orbit 無し。
+
+実装は `SemidirectProduct (Multiplicative (ZMod n)) K φ` (`φ : K →* MulAut (Multiplicative
+(ZMod n))` は 3A.3/3A.4 の `MulAutMultiplicative` + `AddAut.mulLeft` idiom) の構成が主。
 
 ⚠ **実装上の罠**: `ZMod (p*q*r)` では法が型に現れるので `rw [mul_assoc]` が `p * q * r` に
 マッチして motive 破綻する。`mul_assoc up uq` と引数を固定すること。
@@ -668,7 +679,7 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
 | 3A.5 | ✅ (`G ⋊ G ≅ G × G`) |
 | 3A.6 | ⏸ **deferred-hard** (2026-07-25 に解析; 下記) |
 | 3A.7 | ⬜ `α ∈ Aut(G)`, `o(α)` の素因子が 2 個以下 ⟹ `⟨α⟩` は `G` 上に regular orbit をもつ |
-| 3A.8 | (a) ✅ (核 + 捩れ表現) / (b) ✅ (`u_p·u_q = u_r`) / (c) ⬜ `C ⋊ K` で regular orbit 無し |
+| 3A.8 | (a)(b) ✅ (まとめ `exists_klein_four_pqr`) / (c) ⬜ `C ⋊ K` で regular orbit 無し |
 | 3A.9 | (a) ✅ (2026-07-25) / (b) ⬜ regular wreath で `C_G(b) = C` なる `b ∈ B` が存在 |
 | 3A.10 | ⬜ 任意の有限群 `H` と素数 `p` に対し、正規可換 `p`-部分群 `A` で `G` が `A` 上分裂し `G/A ≅ H`, `A = C_G(A)` なる `G` が存在 |
 
@@ -708,5 +719,5 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **§2D も完済 (2D.1(a)(b) / 2D.2)** ⟹ **Isaacs Ch.2 の章末演習は全問完済**。
 さらに **3A.4 ✅** (3A.3 / 3A.5 は既済と実測判明)。
 さらに **3A.9(a) ✅**。**3A.6 は deferred-hard** (解析は §3A 節に記録; Brodkey の適用の一手が
-未確定)。さらに **3A.8(a) の核 ✅**。さらに **3A.8(a)(b) ✅**。**次 frontier = 3A.8 のまとめ定理 + (c)** → 3A.9(b) / 3A.10 →
-3A.6 / 3A.7 に戻る → §3B〜。
+未確定)。さらに **3A.8(a) の核 ✅**。さらに **3A.8(a)(b) ✅**。さらに **3A.8(a)(b) のまとめ ✅**。**次 frontier = 3A.8(c)** (計算は §3A 節に確定記載) →
+3A.9(b) / 3A.10 → 3A.6 / 3A.7 に戻る → §3B〜。
