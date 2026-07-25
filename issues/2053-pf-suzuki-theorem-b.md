@@ -1051,3 +1051,48 @@ r ∣ 504 ∧ r 奇 ⟹ r ∈ {3,7}、(13-iv) で 7 を排除 ⟹ |J| は 3-冪�
    N_G(RΣ) ⊄ N_G(P) ⟹ 推移的 ⟹ 全 S₃。
 4. **R₁**: S₃ の A₃ の逆像 (|R₁| = 3·81 = 3^5)。以降 (14) の後半
    (|R₂:R₁| ∈ {1,3}, Z(R₁) = Z(R₂) = Z₁, R₂ = C_G(Z₁) — 最後は (13) を使う)。
+
+## ✅ step (14) 完了 (2026-07-25 夜、main session)
+
+`R₂ = C_G(Z₁)` の逆包含 (= (13) 依存) を除き、書籍 (14) の全主張が landed。
+新 leaf 2 本 (`OddOrder.lean` 配線済):
+
+**`FirstCase/StepFourteenAction.lean` (812 行)** — `N_G(RΣ)` の `𝒜₂` 上の作用
+- generic: `smul_eq_map_conj` / `mem_conj_smul_iff` / `conj_mem_of_conj_smul_eq` /
+  `conj_smul_eq_of_forall_comm` / **`commute_of_odd_orderOf_of_conj_mem_zpowers`**
+  (位数 3 の部分群を正規化する奇位数元はそれを中心化する)
+- `normalizerRSigma` = `N_G(RΣ)`、`lineSetTwoPermHom : N_G(RΣ) →* Sym(𝒜₂)`
+  (mathlib の `MulAut G ↷ Subgroup G` pointwise 作用 + `Equiv.Perm.subtypePerm`)
+- **`centralizer_P_inf_centralizer_mul_t_eq_sup`** : `C_G(Z₁P) = C_G(P) ⊓ C_G(st) = RΣ`
+  — 書籍 (15) が引用する事実。`|C_G(P)| = 3⁴·8` (`card_centralizer_P_eq`) と
+  「`st` は strongly real ⟹ `|C_G(st)|` 奇」で、奇約数は `3⁴` を割る
+- **`mem_ker_lineSetTwoPermHom_iff`** : kernel = `RΣ`。書籍の
+  `N_G(P) = R·C_Q(P)·Σ` 構造分解は使わず、`P ∈ 𝒜₂` 固定 ⟹ `N_G(P) = C_G(P)`、
+  `⟨(st)y⟩` も固定 ⟹ `Z₁ × P` 分解の一意性で `k ≡ 1 (mod 3)` ⟹ `st` も中心化
+- **`lineSetTwoPermHom_surjective`** : 像 = `Sym(𝒜₂)` 全体。書籍の「⟨s⟩ 正則 +
+  推移的」を「像の位数が 2 でも 3 でも割れる ⟹ 6 ∣ |image| ∣ 3! = 6」に整理
+  (`s ∈ N_G(RΣ)`、`RΣ` は Sylow-3 でない ⟹ normalizer 増大で 3-元)
+- `card_normalizerRSigma` : `|N_G(RΣ)| = 2·3⁵`
+
+**`FirstCase/StepFourteenSylow.lean` (~560 行)** — `R₁` と `R₂`
+- **`sylowThreeNormalizerRSigma`** (= `R₁`) : `N_G(RΣ)` の 3-元が生成する部分群
+  として **choice-free に定義**。書籍「S₃ の構造から R₁ が存在」は
+  「Sylow-3 は指数 2 ⟹ 正規 ⟹ 一意 ⟹ 全 3-元を含む」と読み替え
+- `card_sylowThreeNormalizerRSigma` : `|R₁| = 3⁵` / `sup_le_...` : `RΣ ≤ R₁` /
+  `conj_mem_...` : `R₁ ⊴ N_G(RΣ)` (3-元集合の共役不変性から直接)
+- `sylowThree_sup_zpowers_distinguishedInvolution` : **`N_G(RΣ) = R₁ ⋊ ⟨s⟩`**
+- `inf_centralizer_P_eq_of_isPGroup` : `RΣ` を含む任意の 3-部分群 `K` で `C_K(P) = RΣ`
+- **`inf_centralizer_sylowThree_eq_zpowers`** : `Z(R₁) = Z₁`
+  (推移性の代わりに `C_G(Z₁P) = RΣ` + 位数比較)
+- `card_sylow_eq` : `|R₂| ∈ {3⁵, 3⁶}` (= 書籍の `|R₂:R₁| ∈ {1,3}`)
+- **`inf_centralizer_sylow_eq_zpowers`** : `Z(R₂) = Z₁`
+- `sylow_le_centralizer_zpowers` : `R₂ ≤ C_G(Z₁)`
+
+⟹ **残る (14) の主張は `C_G(Z₁) ≤ R₂` のみ**で、これは (13)
+(`C_G(Z₁)` は 3-群) が閉じれば `R₂` が Sylow-3 であることから即従う。
+
+### 次の一手 = (13-iv) r = 7 排除
+
+(13) の残りは上記 §「(13-iv) r = 7 排除の完全論法」に導出済み (部品実在確認済)。
+これを実装 → (13-v) assembly → (13) 完了 → (14) の `R₂ = C_G(Z₁)` を追記。
+その後 (15) へ (`C_G(Z₁P) = RΣ` は既に landed なので (15) の該当行は即使える)。
