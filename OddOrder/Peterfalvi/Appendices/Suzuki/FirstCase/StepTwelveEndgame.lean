@@ -899,6 +899,133 @@ theorem commutator_mem_of_mem_normalizer
   rw [h9]
   exact mul_mem (inv_mem (hRle h7)) (Subgroup.zpow_mem R₁ hx₁R₁ w)
 
+include model in
+/-- **`R₁ ⊓ C_G(P) = R`** ((12) tail, δ4-A2): a centralizing element of `R₁` outside
+`R` would have class of order `p` in `N_G(R)/R`, yet `x^{p-1} ∈ R` since
+`|C_G(P)/R| = p - 1`. -/
+theorem inf_centralizer_eq_invImageF
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) :
+    R₁ ⊓ Subgroup.centralizer (fc.P : Set G) = fc.invImageF model := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  set C : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hCdef
+  have hCle : C ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) := by
+    have h1 := (fc.normalizer_P_lt_normalizer_invImageF model ind hm hGp hSigma).le
+    rw [fc.normalizer_P_eq_centralizer] at h1
+    exact h1
+  have hRleC : fc.invImageF model ≤ C := fc.invImageF_le_centralizer model
+  -- `R ⊴ C` and the quotient has order `p - 1`.
+  haveI hnorm : ((fc.invImageF model).subgroupOf C).Normal := by
+    constructor
+    intro t ht n
+    rw [Subgroup.mem_subgroupOf] at ht ⊢
+    have h1 := (Subgroup.mem_set_normalizer_iff.mp (hCle n.2) (t : G)).mp ht
+    exact h1
+  have hqcard : Nat.card (↥C ⧸ (fc.invImageF model).subgroupOf C) = fc.p - 1 := by
+    have h1 := ((fc.invImageF model).subgroupOf C).card_mul_index
+    have h2 : Nat.card ↥((fc.invImageF model).subgroupOf C)
+        = Nat.card ↥(fc.invImageF model) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRleC).toEquiv
+    have hCcard : Nat.card ↥C = (fc.p * fc.p) * (fc.p - 1) := by
+      rw [hCdef, fc.card_centralizer_P model ind, fc.card_P, hm, pow_one,
+        fc.card_rankOneQ_eq_pred_card_F model hm, hm, pow_one]
+      have hD1 : Nat.card ↥(fc.rankOneQuotient).D = 1 := by
+        have hall := fc.sigmaComponent_eq_one_of_card_F_eq_p model
+          (by rw [hm, pow_one])
+        rw [Nat.card_eq_one_iff_unique]
+        exact ⟨⟨fun a b => by rw [hall a, hall b]⟩, ⟨1⟩⟩
+      rw [hD1, mul_one]
+      ring
+    rw [h2, fc.card_invImageF model ind, hm, pow_one, fc.card_P, hCcard] at h1
+    apply Nat.eq_of_mul_eq_mul_left (Nat.mul_pos fc.p_prime.pos fc.p_prime.pos)
+    calc (fc.p * fc.p) * Nat.card (↥C ⧸ (fc.invImageF model).subgroupOf C)
+        = (fc.p * fc.p) * (fc.p - 1) := h1
+      _ = (fc.p * fc.p) * (fc.p - 1) := rfl
+  apply le_antisymm
+  · intro x hx
+    rw [Subgroup.mem_inf] at hx
+    obtain ⟨hx1, hx2⟩ := hx
+    by_contra hxnR
+    -- `x^{p-1} ∈ R`.
+    have hxpow : x ^ (fc.p - 1) ∈ fc.invImageF model := by
+      have h1 : orderOf (QuotientGroup.mk' ((fc.invImageF model).subgroupOf C)
+          ⟨x, hx2⟩) ∣ fc.p - 1 := by
+        have h2 := orderOf_dvd_natCard (QuotientGroup.mk'
+          ((fc.invImageF model).subgroupOf C) ⟨x, hx2⟩)
+        rwa [hqcard] at h2
+      have h3 : (QuotientGroup.mk' ((fc.invImageF model).subgroupOf C)
+          ⟨x, hx2⟩) ^ (fc.p - 1) = 1 := orderOf_dvd_iff_pow_eq_one.mp h1
+      rw [← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h3
+      exact Subgroup.mem_subgroupOf.mp h3
+    -- but the class of `x` in `N_G(R)/R` has order `p`.
+    have hxNR : x ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) :=
+      hR₁le hx1
+    set R' : Subgroup
+        ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) :=
+      (fc.invImageF model).subgroupOf
+        (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) with hR'def
+    have hcardQ := fc.card_quotient_invImageF_eq model ind hB2 hm hGp hSigma
+    have hξ1 : QuotientGroup.mk' R' ⟨x, hxNR⟩ ≠ 1 := by
+      intro h0
+      rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h0
+      exact hxnR (Subgroup.mem_subgroupOf.mp h0)
+    have hordx : orderOf x ∣ fc.p ^ 3 := by
+      have h1 : orderOf (R₁.subtype ⟨x, hx1⟩) = orderOf (⟨x, hx1⟩ : ↥R₁) :=
+        orderOf_injective R₁.subtype R₁.subtype_injective _
+      have h2 : orderOf (⟨x, hx1⟩ : ↥R₁) ∣ Nat.card ↥R₁ := orderOf_dvd_natCard _
+      rw [hcard] at h2
+      exact h1 ▸ h2
+    have hordxNR : orderOf
+        ((Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)).subtype
+          ⟨x, hxNR⟩)
+        = orderOf (⟨x, hxNR⟩ :
+          ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))) :=
+      orderOf_injective _ (Subgroup.subtype_injective _) _
+    have hordξ3 : orderOf (QuotientGroup.mk' R' ⟨x, hxNR⟩) ∣ fc.p ^ 3 := by
+      refine (orderOf_map_dvd (QuotientGroup.mk' R') _).trans ?_
+      have h9 : orderOf (⟨x, hxNR⟩ :
+          ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)))
+          = orderOf x := by
+        rw [← hordxNR, Subgroup.subtype_apply]
+      rw [h9]
+      exact hordx
+    have hordξQ : orderOf (QuotientGroup.mk' R' ⟨x, hxNR⟩) ∣ fc.p * (fc.p - 1) := by
+      have h1 := orderOf_dvd_natCard (QuotientGroup.mk' R' ⟨x, hxNR⟩)
+      rwa [hcardQ] at h1
+    have hcopP : Nat.Coprime fc.p (fc.p - 1) :=
+      (Nat.Prime.coprime_iff_not_dvd fc.p_prime).mpr (fun h => by
+        have h1 := Nat.le_of_dvd (by have := fc.p_prime.two_le; omega) h
+        have := fc.p_prime.two_le
+        omega)
+    have h5 : orderOf (QuotientGroup.mk' R' ⟨x, hxNR⟩) ∣ fc.p :=
+      (Nat.Coprime.coprime_dvd_left hordξ3 (hcopP.pow_left 3)).dvd_of_dvd_mul_right
+        hordξQ
+    have hordξ : orderOf (QuotientGroup.mk' R' ⟨x, hxNR⟩) = fc.p := by
+      rcases (fc.p_prime.eq_one_or_self_of_dvd _ h5).symm with heq | heq
+      · exact heq
+      · exact absurd (orderOf_eq_one_iff.mp heq) hξ1
+    -- contradiction: `[x]^{p-1} = 1` forces `p ∣ p - 1`.
+    have h6 : (QuotientGroup.mk' R' ⟨x, hxNR⟩) ^ (fc.p - 1) = 1 := by
+      rw [← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+      rw [Subgroup.mem_subgroupOf]
+      simpa using hxpow
+    have h8 : fc.p ∣ fc.p - 1 := by
+      have h8' := orderOf_dvd_of_pow_eq_one h6
+      rwa [hordξ] at h8'
+    have h10 := Nat.le_of_dvd (by have := fc.p_prime.two_le; omega) h8
+    have := fc.p_prime.two_le
+    omega
+  · exact le_inf hRle hRleC
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
