@@ -84,6 +84,42 @@ statement (Peterfalvi p. 108 に明記、[Ha] Thm 14.4.2):
     なので、着手時にまず `[R₂,R₂] ≤ Z₁` の可否を検討する価値がある。
 - 第二候補 (fallback): classical Hall-Wielandt / Grün 第二定理を建てる (下記)。
 
+## 🔎 2026-07-26 の第二の発見 — **一般 Hall-Wielandt は要らない**
+
+`N := N_G(R₂) = R₂⟨s⟩` では **`R₂ ⊴ N` かつ `[N : R₂] = 2`** なので、N-level transfer が
+明示計算できる:
+
+> `A := R₂^ab`、`π : R₂ → A`、`σ` = `s` の誘導自己同型とすると、`x ∈ R₂` に対し
+> **`v_N(x) = π(x) · σ(π(x))`** (横断集合 `{1, s}`)。
+
+これを使うと **focal subgroup 定理も Grün も不要**で次が出る:
+
+1. `v_N` が自明 ⟹ `∀ y ∈ A, y·σ(y) = 1` ⟹ **`σ = inv` on `A`**。
+2. すると `y⁻¹σ(y) = y⁻²` で、`A` は奇数位数ゆえ `y ↦ y⁻²` は**全射** ⟹
+   `⁅N,N⁆` の `A` における像は `A` 全体 ⟹ `R₂ ≤ ⁅N,N⁆` ⟹
+   `Ab(N)` は位数 2 の `N/R₂` の商 ⟹ **`¬ 3 ∣ |Ab(N)|`**。
+3. これは **landed の `3 ∣ |Ab(R₂⟨s⟩)|`** (`three_dvd_card_abelianization_of_card_W_eq_{three,nine}`)
+   と矛盾 ⟹ (17) 完了。
+
+⟹ **残るのは Yoshida の二分岐だけ**:
+- `v_G.range = v_N.range` なら (B2) の `v_G.range = ⊥`
+  (`transfer_abelianization_range_eq_bot`, landed) から `v_N` 自明 ⟹ 上記で矛盾。
+- さもなくば `exists_surjective_wreath_of_transfer_range_lt` で
+  **`R₂ ↠ C₃ ≀ C₃`** が出るので、これを (14)-(16) の構造で排除する。
+
+### 実装順 (次セッション)
+1. `v_N(x) = π(x)·σ(π(x))` の計算。**mathlib の入口は確認済**:
+   `MonoidHom.transfer_def (g) : transfer ϕ g = diff ϕ T (g • T)` (任意の左横断集合 `T`)
+   と `MonoidHom.diff` (`Mathlib/GroupTheory/Transfer.lean`)。
+   `G := ↥N`, `H := R₂.subgroupOf N` (正規・指数 2)、`T := {1, s}` を
+   `Subgroup.LeftTransversal` として構成し、`G ⧸ H` (2 元) 上の積を展開すると
+   `v(x) = ϕ(x)·ϕ(s⁻¹xs)` で、`s² = 1` より `= π(x)·σ(π(x))`。
+   ⚠ 主な工作は「2 元の横断集合の構成」と「商上の積の展開」。
+2. 上記 1→2→3 の連結 (数学は上のとおり短い)。
+3. `R₂ ↠ C₃≀C₃` の排除。材料: `|R₂| = 3⁵ or 3⁶`、`Z(R₂) = Z₁` (位数 3)、
+   `⁅R₁,R₁⁆ ≤ Z₁ΣP` と `|⁅R₁,R₁⁆| ≤ 9` (landed)、`Z₁PΣ ⊆ Z₂(R₁)`、
+   `C₃≀C₃` 側は位数 3⁴・class 3・`|Z| = 3`・`|Z₂| = 9`・`|W^ab| = 9`・exponent 9。
+
 ## 証明方針 (未確定、着手時に精査)
 
 古典的には **Grün の第二定理** (weakly closed abelian `A` ⟹ `N_G(A)` が p-transfer を
