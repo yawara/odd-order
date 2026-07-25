@@ -10,6 +10,7 @@ import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
 
 /-!
 # Isaacs Chapter 2 — Problems §2A (Subnormality)
@@ -693,6 +694,76 @@ theorem exists_mem_le_of_normal_le_sSup_of_not_isMulCommutative {G : Type*} [Gro
     exact (Subgroup.commute_of_normal_of_disjoint U M hU (hX M hM).1 hdisj u m hu hm).eq
   exact ⟨⟨fun a b => Subtype.ext
     (Subgroup.mem_centralizer_iff.mp (hcent (hUle b.2)) a a.2)⟩⟩
+
+open Pointwise OddOrder.Isaacs.Ch03 in
+/-- **Isaacs Problem 2A.9**. `H ◁◁ G` が **π-perfect** (`H = O^π(H)`、すなわち `↥H` の π-residual
+が `⊤`) ならば `O_π(G)` は `H` を正規化する。
+
+証明 (Isaacs の hint「`G = H·O_π(G)` と仮定してよい」を `K := H ⊔ O_π(G)` への降下として実装):
+`P := O_π(G)` は正規ゆえ `↑K = ↑H · ↑P`、積の位数公式 (`Ch01.card_mul_card_inf`) と Lagrange で
+`|K : H| · |H ⊓ P| = |P|`、よって `|K : H|` は `|P|` を割り (`oPiCore.isPiGroup` で) π-数。
+2A.2 を `↥K` に適用して `O^π(K) ≤ H.subgroupOf K`。逆向きは π-perfect 性を
+`Subgroup.inclusion : ↥H →* ↥K` で押し出して `H.subgroupOf K ≤ O^π(K)`
+(`subgroupOf_le_oPiResidual_of_eq_top`)。したがって `H.subgroupOf K = O^π(K)` は `↥K` で正規、
+`normal_subgroupOf_iff_le_normalizer` で `P ≤ K ≤ N_G(H)`。 -/
+theorem oPiCore_le_normalizer_of_isSubnormal_of_oPiResidual_eq_top {G : Type*} [Group G]
+    [Finite G] {π : Set ℕ} {H : Subgroup G} (hH : H.IsSubnormal)
+    (hperf : oPiResidual π ↥H = ⊤) : oPiCore π G ≤ Subgroup.normalizer H := by
+  set P : Subgroup G := oPiCore π G with hPdef
+  set K : Subgroup G := H ⊔ P with hKdef
+  have hHK : H ≤ K := le_sup_left
+  -- |K| · |H ⊓ P| = |H| · |P| (P 正規ゆえ ↑K = ↑H · ↑P)
+  have hKcoe : Nat.card ↥K = Nat.card (↑H * ↑P : Set G) := by
+    rw [← Subgroup.mul_normal, SetLike.coe_sort_coe, hKdef]
+  have hcard : Nat.card ↥K * Nat.card ↥(H ⊓ P) = Nat.card ↥H * Nat.card ↥P := by
+    rw [hKcoe, Ch01.card_mul_card_inf H P]
+  -- |K : H| · |H ⊓ P| = |P|
+  have hidxP : (H.subgroupOf K).index * Nat.card ↥(H ⊓ P) = Nat.card ↥P := by
+    have hlag : Nat.card ↥H * (H.subgroupOf K).index = Nat.card ↥K := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHK).toEquiv]
+      exact Subgroup.card_mul_index _
+    refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥H)) ?_
+    rw [← mul_assoc, hlag, hcard]
+  -- ゆえに |K : H| は π-数
+  have hidx : ∀ q ∈ (H.subgroupOf K).index.primeFactors, q ∈ π := fun q hq =>
+    oPiCore.isPiGroup π q
+      (Nat.primeFactors_mono ⟨_, hidxP.symm⟩ Nat.card_pos.ne' hq)
+  -- 2A.2 (↥K 版) と π-perfect 性で H.subgroupOf K = O^π(↥K)
+  have hle₁ : oPiResidual π ↥K ≤ H.subgroupOf K :=
+    oPiResidual_le_of_isSubnormal_of_index_isPiNumber hH.subgroupOf hidx
+  have hle₂ : H.subgroupOf K ≤ oPiResidual π ↥K :=
+    subgroupOf_le_oPiResidual_of_eq_top hHK hperf
+  haveI hnorm : (H.subgroupOf K).Normal := by
+    rw [le_antisymm hle₂ hle₁]; infer_instance
+  exact le_sup_right.trans ((Subgroup.normal_subgroupOf_iff_le_normalizer hHK).mp hnorm)
+
+open OddOrder.Isaacs.Ch09 in
+/-- **Isaacs Problem 2A.10**. `H, K ≤ G` が **強共役** (strongly conjugate) とは
+`⟨H, K⟩ = H ⊔ K` の中で共役なこと (`Ch09.IsStronglyConjugate`)。このとき
+`H ◁◁ G ⟺ H に強共役な部分群は H 自身だけ`。
+
+書籍 p. 290 が「2A.10 は Bartels の定理 (Thm 9.28) の直接の帰結」と述べる通りに実装:
+- `⟸` 強共役が `H` のみなら `H^{(G)} = H` (`strongClosure` の定義)、Bartels
+  (`strongClosure_isSubnormal`) で `H` は部分正規。
+- `⟹` `H ◁◁ G` なら Lemma 9.29(a) (`strongClosure_le_of_isSubnormal`) で `H^{(G)} ≤ H`、
+  よって強共役 `K` は `K ≤ H` かつ `|K| = |H|` (共役ゆえ) で `K = H`。 -/
+theorem isSubnormal_iff_forall_isStronglyConjugate_eq {G : Type*} [Group G] [Finite G]
+    (H : Subgroup G) :
+    H.IsSubnormal ↔ ∀ K : Subgroup G, IsStronglyConjugate H K → K = H := by
+  constructor
+  · intro hH K hK
+    have hKsc : K ≤ strongClosure H :=
+      le_sSup (show K ∈ {Y : Subgroup G | IsStronglyConjugate H Y} from hK)
+    have hKle : K ≤ H := hKsc.trans (strongClosure_le_of_isSubnormal hH H le_rfl)
+    obtain ⟨g, -, rfl⟩ := hK
+    refine Subgroup.eq_of_le_of_card_ge hKle (le_of_eq ?_)
+    rw [conjAct_smul_eq_map]
+    exact Nat.card_congr
+      (Subgroup.equivMapOfInjective H _ (MulAut.conj g).injective).toEquiv
+  · intro h
+    have hfix : strongClosure H = H :=
+      le_antisymm (strongClosure_le fun Y hY => (h Y hY).le) (le_strongClosure H)
+    exact hfix ▸ strongClosure_isSubnormal H
 
 end
 
