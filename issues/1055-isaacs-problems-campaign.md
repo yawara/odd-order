@@ -909,10 +909,26 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   `forall_conj_inr_eq_iff_const` (`inr` との可換性 ⟺ 軌道上定数) で定数性が出る。
   逆向きは定数 tuple が base とも `inr q` とも可換という直接計算。
 
-### 残り (文書順): **4A.8(b)-(d)** (次の frontier: (b) `⁅A,U⁆ = P'` = 成分積 1 の tuple —
-`P = A·U` で `A`,`U` 可換ゆえ **4A.1** が `P' = ⁅A,U⁆` を与え、あとは
-`⁅inl g, inr q⁆ = inl (g · (g∘shift)⁻¹)` と δ-分解 `f = ∏ₓ δₓ(f x)` で augmentation kernel
-との一致を示す; (c) `|Z(P'U)| = p`; (d) maximal class) / 4A.9 / 4A.10 / 4A.11。
+### 4A.8(b) の設計 (2026-07-25 に 1 度着手して撤退、次 iteration の出発点)
+
+`⁅A,U⁆ = P'` = 「成分の積が `1`」の tuple 全体。段取りは確定済み:
+
+1. `coordProdHom : (Q → D) →* D`, `f ↦ ∏ ω, f ω` (`D` 可換ゆえ準同型)。
+2. `prod_smul_eq`: `∏ ω, f (q⁻¹ ω) = ∏ ω, f ω` (`Fintype.prod_equiv (Equiv.mulLeft q⁻¹)`)。
+3. **交換子公式** `⁅inl f, inr q⁆ = inl (fun ω => f ω * (f (q⁻¹ ω))⁻¹)`。
+   ⚠ **pointwise (`fun ω => …`) で書くこと** — Pi の `f * g⁻¹` 形で書くと
+   `HMul (Q → D) D` の instance 解決に失敗する (撤退の原因)。証明は `ext ω` +
+   構造 simp 補題 (`mul_left`/`inv_left`/`one_left` …) で、`change` は右成分で通らない。
+4. `⊆`: 上の公式の座標積 = `(∏f)(∏f)⁻¹ = 1` (2 を使う)。
+5. `⊇`: `⁅inl (δ_x d), inr (y x⁻¹)⁆ = inl (δ_x d · (δ_y d)⁻¹)` (shift が `δ_x ↦ δ_{qx}`) と
+   δ-分解 `f = ∏_x (δ_x (f x) · (δ_1 (f x))⁻¹)` (`Finset.univ_prod_mulSingle` +
+   `Finset.prod_apply` で `∏_x (δ_1 (f x))⁻¹ = 1` を `∏ f = 1` から出す)。
+6. `P' = ⁅A,U⁆` 自体は **4A.1** (`commutator_eq_commutator_of_mul_eq_top`) —
+   `P = A·U` は `eq_inl_mul_inr`、`A`/`U` の `IsMulCommutative` instance は要作成
+   (`U ≅ Q` が可換であること、つまり `Q` 可換の仮定が要る)。
+
+### 残り (文書順): **4A.8(b)-(d)** ((c) `|Z(P'U)| = p`; (d) `n=1` なら `P` が maximal class、
+一般に `P'U` が maximal class) / 4A.9 / 4A.10 / 4A.11。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
 
