@@ -130,6 +130,62 @@ theorem isCyclic_and_card_centralizer_inf_orderThreeGeneratedSubgroup
       (by rw [hS'card]; exact Nat.le_of_dvd (by norm_num) hLnine)).symm
   exact ⟨hLeq ▸ hS'cyc, hLeq ▸ hS'card⟩
 
+include fc in
+/-- **`P` normalizes `⟨Q₀, K, t⟩`** ((15), p. 113, "As `P` normalizes `⟨Q₀,K,t⟩`…").
+
+`P ≤ V ≤ D ≤ H`: conjugation by an element of `H` preserves `Q₀ = {x ∈ H | x² = 1}`;
+`K` is normal in `D` (Ch. I §2, Prop 2); and `P ≤ V = C_D(t)` centralizes `t`. -/
+theorem P_le_normalizer_orderThreeGeneratedSubgroup :
+    fc.P ≤ Subgroup.normalizer
+      ((fc.toHypothesis.orderThreeGeneratedSubgroup : Subgroup G) : Set G) := by
+  have hconj : ∀ x ∈ fc.P, ∀ y ∈ fc.toHypothesis.orderThreeGeneratedSubgroup,
+      x * y * x⁻¹ ∈ fc.toHypothesis.orderThreeGeneratedSubgroup := by
+    intro x hxP
+    have hxV : x ∈ fc.toHypothesis.V := fc.P_le_V hxP
+    have hxD : x ∈ fc.toHypothesis.D := fc.toHypothesis.V_le_D hxV
+    have hxH : x ∈ fc.toHypothesis.H := fc.toHypothesis.D_le_H hxD
+    have hxt : x * fc.toHypothesis.t = fc.toHypothesis.t * x :=
+      fc.toHypothesis.commute_t_of_mem_V hxV
+    have hsub : fc.toHypothesis.orderThreeGeneratedSubgroup
+        ≤ Subgroup.comap (MulAut.conj x).toMonoidHom
+          fc.toHypothesis.orderThreeGeneratedSubgroup := by
+      refine sup_le (sup_le ?_ ?_) ?_
+      · intro q hq
+        rw [Subgroup.mem_comap]
+        refine fc.toHypothesis.orderThree_Q0_le ?_
+        rw [fc.toHypothesis.mem_Q0_iff] at hq ⊢
+        refine ⟨?_, Subgroup.mul_mem _ (Subgroup.mul_mem _ hxH hq.2)
+          (Subgroup.inv_mem _ hxH)⟩
+        change (x * q * x⁻¹) ^ 2 = 1
+        rw [pow_two]
+        calc x * q * x⁻¹ * (x * q * x⁻¹) = x * (q * q) * x⁻¹ := by group
+          _ = 1 := by rw [← pow_two, hq.1]; group
+      · intro k hk
+        rw [Subgroup.mem_comap]
+        refine (le_sup_left : fc.toHypothesis.orderThreeBorel
+          ≤ fc.toHypothesis.orderThreeGeneratedSubgroup) (Subgroup.mem_sup_right ?_)
+        have hkD : k ∈ fc.toHypothesis.D := fc.toHypothesis.K_le_D hk
+        have hn := (fc.toHypothesis.K_normal).conj_mem
+          (⟨k, hkD⟩ : ↥fc.toHypothesis.D)
+          (by rwa [Subgroup.mem_subgroupOf]) (⟨x, hxD⟩ : ↥fc.toHypothesis.D)
+        rwa [Subgroup.mem_subgroupOf] at hn
+      · rw [Subgroup.zpowers_le, Subgroup.mem_comap]
+        change x * fc.toHypothesis.t * x⁻¹
+          ∈ fc.toHypothesis.orderThreeGeneratedSubgroup
+        have h1 : x * fc.toHypothesis.t * x⁻¹ = fc.toHypothesis.t := by
+          rw [hxt]; group
+        rw [h1]
+        exact fc.toHypothesis.orderThree_t_mem
+    intro y hy
+    exact hsub hy
+  intro x hxP
+  rw [Subgroup.mem_set_normalizer_iff]
+  intro y
+  refine ⟨fun hy => hconj x hxP y hy, fun hy => ?_⟩
+  have h1 : x⁻¹ * (x * y * x⁻¹) * x⁻¹⁻¹ = y := by group
+  rw [← h1]
+  exact hconj x⁻¹ (Subgroup.inv_mem _ hxP) _ hy
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
