@@ -509,14 +509,26 @@ Ch.2 は全ファイル sorry-free。
 
 §2D の演習は 2 問。**Zenkov (Thm 2.18) と Cor 2.19 が repo に既存**なので素材は揃っている。
 
-- ⬜ **2D.1**: `G = NA`, `N ⊴ G`, `C_A(N) = 1`, `A` 可換のとき
-  (a) `F(N) = 1` ⟹ `|A| < |N|` / (b) `|N|` と `|A|` が互いに素 ⟹ `|A| < |N|`。
-- ⬜ **2D.2**: `G = NA`, `N ⊴ G`, `C_A(N) = 1`, `A ∩ N = 1`、`N` 非自明で `A` 巡回 ⟹
-  `|A| < |N|`。
-- 材料: `Ch02/Main.lean` の `zenkov_minimal_le_fitting` (Thm 2.18) /
-  `inf_fitting_ne_bot_of_abelian_card_ge_index` (Cor 2.19、`|A| ≥ |G:A|` なら
-  `A ⊓ F(G) ≠ ⊥`)。2D.1 は Cor 2.19 の対偶 (`A ⊓ F(G) = ⊥` を `C_A(N) = 1` と
-  `F(N) = 1` から出す) が本命。
+- ✅ 新 leaf `OddOrder/Isaacs/Ch02_Subnormality/Problems2D.lean` (`OddOrder.lean` 配線済)。
+  素材は repo 既存の Cor 2.19 (`inf_fitting_ne_bot_of_abelian_card_ge_index`) と
+  Lucchini (`Ch04.lucchini_index_normalCore_lt_index`)。共通の位数補題
+  `index_mul_card_inf_eq_card_of_sup_eq_top` (`|G:A|·|N ∩ A| = |N|`) /
+  `index_le_card_of_card_le` / `le_centralizer_of_inf_eq_bot` を先に用意。
+- ✅ 実証明 **2D.1(a)** `card_lt_card_of_fitting_eq_bot`: `|A| ≥ |N|` を仮定すると Cor 2.19 で
+  `A ⊓ F(G) ≠ 1`、`F(N) = 1` から `F(G) ⊓ N = ⊥` (新補題
+  `fitting_inf_eq_bot_of_fitting_eq_bot`、Thm 2.2 経由) ⟹ `F(G) ≤ C_G(N)` ⟹
+  `A ⊓ F(G) ≤ A ⊓ C_G(N) = 1` で矛盾。
+- ✅ 実証明 **2D.1(b)** `card_lt_card_of_coprime`: 同じ骨格で、`F(N) = 1` の代わりに
+  `π := {q | q ∤ |N|}` を使う。`A ⊓ F(G)` は π-群、`F(G)` 冪零ゆえ `↥F(G)` 内で部分正規、
+  **自分で証明した 2A.1** (`le_oPiCore_of_isSubnormal_of_isPiGroup`) で `O_π(↥F(G))` に落ち、
+  `O_π` 特性的ゆえ押し出し `Q` は `G`-正規な π-群 ⟹ `Q ⊓ N = ⊥` ⟹ `Q ≤ C_G(N)` ⟹ 矛盾。
+- ✅ 実証明 **2D.2** `card_lt_card_of_isCyclic`: `core_G(A) ⊓ N ≤ A ⊓ N = 1` かつ両者正規で
+  `core_G(A) ≤ A ⊓ C_G(N) = 1`、**Lucchini** の `|A : core_G(A)| < |G:A|` に `|G:A| = |N|`
+  を代入。
+- ⚠ **2D.1 は書籍が書いていない `N ≠ 1` を要する** (`N = 1` なら `C_A(N) = A` ゆえ `A = 1` で
+  `|A| = |N| = 1`、結論 `|A| < |N|` が偽)。2D.2 では書籍自身が `N` 非自明を明示しているので
+  2D.1 でも同じ暗黙の仮定を置くのが原意と解し docstring に明記。
+- 🎉 **§2D 完済** ⟹ **Isaacs Ch.2 の章末演習 (§2A-§2D) 全問完済**。
 
 ## Ch.3 (Split Extensions) §3A — 着手 (2026-07-23、§2A hard tail deferred 中の breadth 展開)
 
@@ -642,4 +654,5 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに 2B.4 ✅ / 2B.5 ✅ / 2B.6 ✅ で **§2B も完済**。
 さらに **2C.1(a) ✅ / 2C.1(b) ✅ で §2C も完済**。あわせて Ch.2 の陳腐化した被覆表
 (2A/2C/2D を誤って TODO と記載) も実測に合わせて訂正。
-**次 frontier = §2D (2D.1, 2D.2)** → §3A 残り (3A.3/4/6/7/8) → §3B〜。
+さらに **§2D も完済 (2D.1(a)(b) / 2D.2)** ⟹ **Isaacs Ch.2 の章末演習は全問完済**。
+**次 frontier = Ch.3 §3A の残り (3A.3 / 3A.4 / 3A.6 / 3A.7 / 3A.8)** → §3B〜。
