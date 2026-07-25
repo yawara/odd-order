@@ -185,6 +185,7 @@ import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch02_Subnormality.Problems
+import OddOrder.Isaacs.Ch02_Subnormality.ProblemsInvolutions
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems
