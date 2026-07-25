@@ -108,7 +108,7 @@ theorem orbit_eq_setOf_prime_order
     (hGp : fc.p ^ (m + 2) ∣ Nat.card G)
     (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
       ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) :
-    letI act : MulAction
+    letI : MulAction
         ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) (Subgroup G) :=
       MulAction.compHom _ ((MulAut.conj : G →* MulAut G).comp
         (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)).subtype)
