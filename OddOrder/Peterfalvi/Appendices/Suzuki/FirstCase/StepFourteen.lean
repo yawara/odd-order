@@ -30,26 +30,33 @@ section GenericCentre
 variable {G' : Type*} [Group G'] [Finite G']
 
 omit [Finite G'] in
+/-- Two elementwise commuting subgroups multiply out: `A ⊔ B = A · B` as sets. -/
+theorem coe_sup_eq_mul_of_commute {A B : Subgroup G'}
+    (hcomm : ∀ a ∈ A, ∀ b ∈ B, a * b = b * a) :
+    ((A ⊔ B : Subgroup G') : Set G') = (A : Set G') * (B : Set G') := by
+  refine Subgroup.coe_mul_of_right_le_normalizer_left _ _ ?_
+  intro b hb
+  rw [Subgroup.mem_normalizer_iff]
+  intro a
+  constructor
+  · intro ha
+    have h1 : b * a * b⁻¹ = a := by
+      rw [← hcomm a ha b hb]; group
+    rw [h1]; exact ha
+  · intro ha
+    have h1 : (b * a * b⁻¹) * b = b * (b * a * b⁻¹) := hcomm _ ha b hb
+    have h2 : b * a = b * (b * a * b⁻¹) := by rw [← h1]; group
+    have h3 : a = b * a * b⁻¹ := mul_left_cancel h2
+    rw [h3]; exact ha
+
+omit [Finite G'] in
 /-- `|A ⊔ B| = |A|·|B|` for two elementwise commuting subgroups meeting trivially. -/
 theorem card_sup_eq_mul_of_commute {A B : Subgroup G'}
     (hcomm : ∀ a ∈ A, ∀ b ∈ B, a * b = b * a) (hinf : A ⊓ B = ⊥) :
     Nat.card ↥(A ⊔ B) = Nat.card ↥A * Nat.card ↥B := by
   classical
-  have hcoe : ((A ⊔ B : Subgroup G') : Set G') = (A : Set G') * (B : Set G') := by
-    refine Subgroup.coe_mul_of_right_le_normalizer_left _ _ ?_
-    intro b hb
-    rw [Subgroup.mem_normalizer_iff]
-    intro a
-    constructor
-    · intro ha
-      have h1 : b * a * b⁻¹ = a := by
-        rw [← hcomm a ha b hb]; group
-      rw [h1]; exact ha
-    · intro ha
-      have h1 : (b * a * b⁻¹) * b = b * (b * a * b⁻¹) := hcomm _ ha b hb
-      have h2 : b * a = b * (b * a * b⁻¹) := by rw [← h1]; group
-      have h3 : a = b * a * b⁻¹ := mul_left_cancel h2
-      rw [h3]; exact ha
+  have hcoe : ((A ⊔ B : Subgroup G') : Set G') = (A : Set G') * (B : Set G') :=
+    coe_sup_eq_mul_of_commute hcomm
   have hmul : ∀ x ∈ A ⊔ B, ∃ a ∈ A, ∃ b ∈ B, a * b = x := by
     intro x hx
     have hx' : x ∈ ((A : Set G') * (B : Set G')) := by rw [← hcoe]; exact hx
@@ -368,6 +375,68 @@ theorem card_eq_of_forall_zpowers_mem {E : Subgroup G'} {p : ℕ} (hp : p.Prime)
   rw [heq] at hsum
   exact Nat.eq_of_mul_eq_mul_right hpos hsum
 
+omit [Finite G'] in
+/-- An exponent bound passes from two elementwise commuting subgroups to their join. -/
+theorem pow_eq_one_of_mem_sup_of_commute {A B : Subgroup G'} {n : ℕ}
+    (hcomm : ∀ a ∈ A, ∀ b ∈ B, a * b = b * a)
+    (hA : ∀ a ∈ A, a ^ n = 1) (hB : ∀ b ∈ B, b ^ n = 1) {x : G'}
+    (hx : x ∈ A ⊔ B) : x ^ n = 1 := by
+  have hx' : x ∈ ((A : Set G') * (B : Set G')) := by
+    rw [← coe_sup_eq_mul_of_commute hcomm]; exact hx
+  obtain ⟨a, ha, b, hb, rfl⟩ := hx'
+  have hc : Commute a b := hcomm a ha b hb
+  rw [hc.mul_pow, hA a ha, hB b hb, one_mul]
+
+/-- **Exactly `p + 1` subgroups of order `p`** in a group `E` of order `p²` all of
+whose nonidentity elements have order `p` (an elementary abelian group of rank `2`,
+whose order-`p` subgroups are the `p + 1` lines through the origin). -/
+theorem ncard_prime_subgroups_eq {E : Subgroup G'} {p : ℕ} (hp : p.Prime)
+    (hE : Nat.card ↥E = p ^ 2) (hord : ∀ x ∈ E, x ≠ 1 → orderOf x = p) :
+    {A : Subgroup G' | A ≤ E ∧ Nat.card ↥A = p}.ncard = p + 1 := by
+  classical
+  haveI := Fintype.ofFinite G'
+  set 𝒮 : Finset (Subgroup G') :=
+    ((E : Set G').toFinset \ {1}).image (fun x => Subgroup.zpowers x) with h𝒮_def
+  have hmem : ∀ A ∈ 𝒮, A ≤ E ∧ Nat.card ↥A = p := by
+    intro A hA
+    rw [h𝒮_def, Finset.mem_image] at hA
+    obtain ⟨x, hx, rfl⟩ := hA
+    simp only [Finset.mem_sdiff, Set.mem_toFinset, SetLike.mem_coe,
+      Finset.mem_singleton] at hx
+    exact ⟨Subgroup.zpowers_le.mpr hx.1,
+      by rw [Nat.card_zpowers, hord x hx.1 hx.2]⟩
+  have hall : ∀ x ∈ E, x ≠ 1 → Subgroup.zpowers x ∈ 𝒮 := by
+    intro x hxE hx1
+    rw [h𝒮_def, Finset.mem_image]
+    refine ⟨x, ?_, rfl⟩
+    simp only [Finset.mem_sdiff, Set.mem_toFinset, SetLike.mem_coe,
+      Finset.mem_singleton]
+    exact ⟨hxE, hx1⟩
+  have hcard := card_eq_of_forall_zpowers_mem hp hE 𝒮 hmem hall
+  have hset : (𝒮 : Set (Subgroup G'))
+      = {A : Subgroup G' | A ≤ E ∧ Nat.card ↥A = p} := by
+    ext A
+    simp only [Finset.mem_coe, Set.mem_setOf_eq]
+    refine ⟨fun hA => hmem A hA, fun hA => ?_⟩
+    exact mem_of_card_eq_of_prime_subgroups hp hE 𝒮 hmem hcard hA.1 hA.2
+  rw [← hset, Set.ncard_coe_finset, hcard]
+
+/-- **`p` further lines**: after removing one order-`p` subgroup `Z`, the remaining
+order-`p` subgroups of an elementary abelian group of order `p²` number `p`. -/
+theorem ncard_prime_subgroups_ne_eq {E Z : Subgroup G'} {p : ℕ} (hp : p.Prime)
+    (hE : Nat.card ↥E = p ^ 2) (hord : ∀ x ∈ E, x ≠ 1 → orderOf x = p)
+    (hZE : Z ≤ E) (hZc : Nat.card ↥Z = p) :
+    {A : Subgroup G' | A ≤ E ∧ Nat.card ↥A = p ∧ A ≠ Z}.ncard = p := by
+  have hsplit : {A : Subgroup G' | A ≤ E ∧ Nat.card ↥A = p ∧ A ≠ Z}
+      = {A : Subgroup G' | A ≤ E ∧ Nat.card ↥A = p} \ {Z} := by
+    ext A
+    simp only [Set.mem_setOf_eq, Set.mem_sdiff, Set.mem_singleton_iff]
+    tauto
+  have hZmem : Z ∈ {A : Subgroup G' | A ≤ E ∧ Nat.card ↥A = p} := ⟨hZE, hZc⟩
+  rw [hsplit, Set.ncard_sdiff_singleton_of_mem hZmem,
+    ncard_prime_subgroups_eq hp hE hord]
+  omega
+
 end GenericCentre
 
 namespace FirstCaseHypothesis
@@ -472,6 +541,103 @@ theorem zpowers_mul_t_sup_P_le_center_sup
   exact sup_le (hZ₁R.trans le_sup_left) (hPR.trans le_sup_left)
 
 include model in
+/-- **`|Z₁P| = 9`** ((14), p. 113, case (10.2)): `Z₁ = ⟨st⟩` and `P` are order-`3`
+subgroups of the abelian group `R`, and they meet trivially since `Z₁ ≤ T` and
+`T ⊓ P = 1`. -/
+theorem card_zpowers_sup_P_eq_nine
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    Nat.card ↥(Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) ⊔ fc.P) = 9 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  have hPcard : Nat.card ↥fc.P = 3 := by rw [fc.card_P, hp3]
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  have hZ₁card : Nat.card ↥(Subgroup.zpowers
+      (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)) = 3 := by
+    rw [Nat.card_zpowers, hstord]
+  have hZ₁T := fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2 hm
+  have hTR := (fc.sInvertedT_spec model ind hB2 hm).1
+  have hPR := fc.P_le_invImageF model
+  have habR := fc.invImageF_mul_comm model ind hB2 hm
+  have hZ₁P : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ⊓ fc.P = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    have hx' : x ∈ fc.sInvertedT model ⊓ fc.P := ⟨hZ₁T hx.1, hx.2⟩
+    rwa [(fc.sInvertedT_spec model ind hB2 hm).2.2.2] at hx'
+  rw [card_sup_eq_mul_of_commute
+    (fun a ha b hb => habR a (hTR (hZ₁T ha)) b (hPR hb)) hZ₁P, hZ₁card, hPcard]
+
+include model in
+/-- **Every nonidentity element of `Z₁P` has order `3`** ((14), p. 113, case (10.2)):
+`Z₁` and `P` commute inside the abelian `R` and both have exponent `3`, so `Z₁P` is
+elementary abelian of order `9`. -/
+theorem orderOf_eq_three_of_mem_zpowers_sup_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {x : G}
+    (hx : x ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) ⊔ fc.P) (hx1 : x ≠ 1) :
+    orderOf x = 3 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  set Z₁ : Subgroup G := Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+    * fc.toHypothesis.t) with hZ₁_def
+  have hPcard : Nat.card ↥fc.P = 3 := by rw [fc.card_P, hp3]
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  have hZ₁card : Nat.card ↥Z₁ = 3 := by rw [hZ₁_def, Nat.card_zpowers, hstord]
+  have hZ₁T := fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2 hm
+  have hTR := (fc.sInvertedT_spec model ind hB2 hm).1
+  have hPR := fc.P_le_invImageF model
+  have habR := fc.invImageF_mul_comm model ind hB2 hm
+  have hcube : ∀ (A : Subgroup G), Nat.card ↥A = 3 → ∀ a ∈ A, a ^ 3 = 1 := by
+    intro A hA a ha
+    have h := A.orderOf_dvd_natCard ha
+    rw [hA] at h
+    exact orderOf_dvd_iff_pow_eq_one.mp h
+  have hx3 : x ^ 3 = 1 :=
+    pow_eq_one_of_mem_sup_of_commute
+      (fun a ha b hb => habR a (hTR (hZ₁T ha)) b (hPR hb))
+      (hcube Z₁ hZ₁card) (hcube fc.P hPcard) hx
+  rcases (Nat.dvd_prime (by norm_num)).mp
+    (orderOf_dvd_iff_pow_eq_one.mpr hx3) with h1 | h3
+  · exact absurd (orderOf_eq_one_iff.mp h1) hx1
+  · exact h3
+
+include model in
+/-- **`|𝒜₂| = 3`** ((14), p. 113): writing `𝒜` for the set of order-`3` subgroups of
+`Z₁P` — the four "lines" of the elementary abelian group `Z₁P` of order `9` — the
+subset `𝒜₂ = 𝒜 ∖ {Z₁}` has exactly three elements.  `N_G(RΣ)` permutes `𝒜₂`,
+because it normalizes both `Z₁P = Z(RΣ)` and `Z₁ = ⁅RΣ, RΣ⁆`. -/
+theorem ncard_prime_subgroups_zpowers_sup_P_ne_zpowers
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    {A : Subgroup G | A ≤ Subgroup.zpowers
+          (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) ⊔ fc.P
+        ∧ Nat.card ↥A = 3
+        ∧ A ≠ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)}.ncard = 3 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  refine ncard_prime_subgroups_ne_eq (p := 3) (by norm_num) ?_
+    (fun x hx hx1 => fc.orderOf_eq_three_of_mem_zpowers_sup_P model ind hB2 hx hx1)
+    le_sup_left (by rw [Nat.card_zpowers, hstord])
+  rw [fc.card_zpowers_sup_P_eq_nine model ind hB2]
+  norm_num
+
+include model in
 /-- **Peterfalvi Part II, Ch. II, step (14), first assertion** (p. 113):
 `Z(RΣ) = Z₁P`, with the centre taken inside `G` as `RΣ ⊓ C_G(RΣ)`.
 
@@ -512,26 +678,8 @@ theorem inf_centralizer_sup_eq_zpowers_sup_P
     rw [hR_def, hSg_def, fc.card_sup_invImageF_centralizer_W model ind]
     rw [← hR_def, ← hSg_def, hRcard, hSig3]
   -- `|Z₁| = 3` and `Z₁ ⊓ P = 1`, so `|Z₁P| = 9`
-  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
-      * fc.toHypothesis.t) = 3 := by
-    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
-  have hZ₁card : Nat.card ↥Z₁ = 3 := by rw [hZ₁_def, Nat.card_zpowers, hstord]
-  have hZ₁T : Z₁ ≤ fc.sInvertedT model :=
-    fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2 hm
-  have hTP : fc.sInvertedT model ⊓ fc.P = ⊥ :=
-    (fc.sInvertedT_spec model ind hB2 hm).2.2.2
-  have hZ₁P : Z₁ ⊓ fc.P = ⊥ := by
-    rw [eq_bot_iff]
-    intro x hx
-    have : x ∈ fc.sInvertedT model ⊓ fc.P := ⟨hZ₁T hx.1, hx.2⟩
-    rwa [hTP] at this
-  have habR := fc.invImageF_mul_comm model ind hB2 hm
-  have hZ₁R : Z₁ ≤ R := hZ₁T.trans (fc.sInvertedT_spec model ind hB2 hm).1
-  have hPR : fc.P ≤ R := fc.P_le_invImageF model
-  have hcomm : ∀ a ∈ Z₁, ∀ b ∈ fc.P, a * b = b * a := fun a ha b hb =>
-    habR a (hZ₁R ha) b (hPR hb)
-  have hZ₁Pcard : Nat.card ↥(Z₁ ⊔ fc.P) = 9 := by
-    rw [card_sup_eq_mul_of_commute hcomm hZ₁P, hZ₁card, hPcard]
+  have hZ₁Pcard : Nat.card ↥(Z₁ ⊔ fc.P) = 9 :=
+    fc.card_zpowers_sup_P_eq_nine model ind hB2
   -- `RΣ` is nonabelian: a nonidentity element of `Σ` does not centralize `R`
   have hSgne : Sg ≠ ⊥ := by
     intro h
@@ -604,14 +752,8 @@ theorem commutator_sup_eq_zpowers
   have hPR : fc.P ≤ R := fc.P_le_invImageF model
   have habR := fc.invImageF_mul_comm model ind hB2 hm
   -- `⁅RΣ, RΣ⁆ ≤ Z₁P` (the quotient by the central `Z₁P` has order 9)
-  have hZ₁Pcard : Nat.card ↥(Z₁ ⊔ fc.P) = 9 := by
-    have hZ₁P : Z₁ ⊓ fc.P = ⊥ := by
-      rw [eq_bot_iff]
-      intro x hx
-      have hx' : x ∈ T ⊓ fc.P := ⟨hZ₁T hx.1, hx.2⟩
-      rwa [(fc.sInvertedT_spec model ind hB2 hm).2.2.2] at hx'
-    rw [card_sup_eq_mul_of_commute
-      (fun a ha b hb => habR a (hZ₁T ha |> hTR) b (hPR hb)) hZ₁P, hZ₁card, hPcard]
+  have hZ₁Pcard : Nat.card ↥(Z₁ ⊔ fc.P) = 9 :=
+    fc.card_zpowers_sup_P_eq_nine model ind hB2
   have hcentral := fc.zpowers_mul_t_sup_P_le_center_sup model ind hB2 hm
   have hle1 : ⁅R ⊔ Sg, R ⊔ Sg⁆ ≤ Z₁ ⊔ fc.P := by
     refine commutator_le_of_card_eq_prime_sq_mul (p := 3) (by norm_num)
