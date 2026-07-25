@@ -20,7 +20,7 @@ with hypothesis (B2).
 
 set_option autoImplicit false
 
-open scoped Pointwise
+open scoped Pointwise commutatorElement
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
@@ -963,6 +963,97 @@ theorem quotient_conj_eq_inv_of_sq_eq_one
     omega
   exact OddOrder.GroupTheory.conj_eq_inv_of_sq_eq_one fc.p_prime hp2 hΩcard
     hσ hσn hu2 hu1
+
+include model in
+/-- **`⁅R₁, R₁⁆ = T`** ((12) tail): `R₁` is nonabelian (else `R₁ ≤ C_G(R) = R`,
+impossible by order), its commutator lands in `T` (the quotient `R₁/T` has order
+`p²`, hence is abelian), and `|T| = p` leaves no room: the commutator subgroup is
+exactly `T`.  In particular `T` is invariant under every automorphism of `R₁`,
+e.g. under all of `N_G(R₁)`. -/
+theorem commutator_eq_sInvertedT
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) :
+    ⁅R₁, R₁⁆ = fc.sInvertedT model := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  obtain ⟨hTle, -, -, hTinf⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hTcard : Nat.card ↥(fc.sInvertedT model) = fc.p := by
+    rw [fc.card_sInvertedT model ind hB2 hm, hm, pow_one]
+  -- `R₁` is nonabelian.
+  have hnab : ¬ ∀ x ∈ R₁, ∀ y ∈ R₁, x * y = y * x := by
+    intro hab
+    have h1 : R₁ ≤ Subgroup.centralizer
+        ((fc.invImageF model : Subgroup G) : Set G) := by
+      intro x hx
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy
+      exact (hab x hx y (hRle hy)).symm
+    rw [fc.centralizer_invImageF_eq model ind hB2 hm] at h1
+    have h2 := Subgroup.card_le_of_le h1
+    rw [hcard, fc.card_invImageF model ind, hm, pow_one, fc.card_P] at h2
+    have h3 := fc.p_prime.two_le
+    have h4 : fc.p ^ 3 = (fc.p * fc.p) * fc.p := by ring
+    rw [h4] at h2
+    have h5 : (fc.p * fc.p) * fc.p ≤ (fc.p * fc.p) * 1 := by
+      rwa [mul_one]
+    have h6 : fc.p ≤ 1 :=
+      Nat.le_of_mul_le_mul_left h5 (Nat.mul_pos fc.p_prime.pos fc.p_prime.pos)
+    omega
+  -- `T ⊴ R₁`, and `R₁/T` has order `p²`, hence is abelian.
+  have hTR₁ : fc.sInvertedT model ≤ R₁ := hTle.trans hRle
+  haveI hTnorm : ((fc.sInvertedT model).subgroupOf R₁).Normal := by
+    constructor
+    intro t ht n
+    rw [Subgroup.mem_subgroupOf] at ht ⊢
+    have h1 := fc.conj_sInvertedT_eq_of_mem_normalizer model ind hB2 hm hGp hSigma
+      (hR₁le n.2)
+    have h3 := Subgroup.smul_mem_pointwise_smul (↑t : G) (MulAut.conj (↑n : G))
+      (fc.sInvertedT model) ht
+    rw [h1] at h3
+    exact h3
+  have hq : Nat.card (↥R₁ ⧸ (fc.sInvertedT model).subgroupOf R₁) = fc.p ^ 2 := by
+    have h1 := ((fc.sInvertedT model).subgroupOf R₁).card_mul_index
+    have h2 : Nat.card ↥((fc.sInvertedT model).subgroupOf R₁) = fc.p := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hTR₁).toEquiv, hTcard]
+    rw [h2, hcard] at h1
+    apply Nat.eq_of_mul_eq_mul_left fc.p_prime.pos
+    calc fc.p * Nat.card (↥R₁ ⧸ (fc.sInvertedT model).subgroupOf R₁)
+        = fc.p ^ 3 := h1
+      _ = fc.p * fc.p ^ 2 := by ring
+  haveI hcomm : IsMulCommutative (↥R₁ ⧸ (fc.sInvertedT model).subgroupOf R₁) :=
+    IsPGroup.isMulCommutative_of_card_eq_prime_sq hq
+  -- commutators land in `T`.
+  have hle : ⁅R₁, R₁⁆ ≤ fc.sInvertedT model := by
+    rw [Subgroup.commutator_le]
+    intro x hx y hy
+    have hmk : QuotientGroup.mk' ((fc.sInvertedT model).subgroupOf R₁)
+        ⁅(⟨x, hx⟩ : ↥R₁), (⟨y, hy⟩ : ↥R₁)⁆ = 1 := by
+      rw [map_commutatorElement]
+      exact commutatorElement_eq_one_iff_mul_comm.mpr (hcomm.is_comm.comm _ _)
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+      Subgroup.mem_subgroupOf] at hmk
+    exact hmk
+  -- nontriviality and the order-`p` squeeze.
+  have hne : ⁅R₁, R₁⁆ ≠ ⊥ := by
+    intro h0
+    apply hnab
+    intro x hx y hy
+    have h1 := Subgroup.commutator_eq_bot_iff_le_centralizer.mp h0
+    exact (Subgroup.mem_centralizer_iff.mp (h1 hx) y hy).symm
+  have hdvd : Nat.card ↥⁅R₁, R₁⁆ ∣ fc.p := by
+    rw [← hTcard]
+    exact Subgroup.card_dvd_of_le hle
+  rcases (fc.p_prime.eq_one_or_self_of_dvd _ hdvd).symm with heq | heq
+  · exact Subgroup.eq_of_le_of_card_ge hle (by rw [heq, hTcard])
+  · exact absurd (Subgroup.eq_bot_of_card_eq _ heq) hne
 
 end FirstCaseHypothesis
 
