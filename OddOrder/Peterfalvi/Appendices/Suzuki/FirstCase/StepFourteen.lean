@@ -25,6 +25,126 @@ open scoped Pointwise
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
+section GenericCentre
+
+variable {G' : Type*} [Group G'] [Finite G']
+
+omit [Finite G'] in
+/-- `|A ⊔ B| = |A|·|B|` for two elementwise commuting subgroups meeting trivially. -/
+theorem card_sup_eq_mul_of_commute {A B : Subgroup G'}
+    (hcomm : ∀ a ∈ A, ∀ b ∈ B, a * b = b * a) (hinf : A ⊓ B = ⊥) :
+    Nat.card ↥(A ⊔ B) = Nat.card ↥A * Nat.card ↥B := by
+  classical
+  have hcoe : ((A ⊔ B : Subgroup G') : Set G') = (A : Set G') * (B : Set G') := by
+    refine Subgroup.coe_mul_of_right_le_normalizer_left _ _ ?_
+    intro b hb
+    rw [Subgroup.mem_normalizer_iff]
+    intro a
+    constructor
+    · intro ha
+      have h1 : b * a * b⁻¹ = a := by
+        rw [← hcomm a ha b hb]; group
+      rw [h1]; exact ha
+    · intro ha
+      have h1 : (b * a * b⁻¹) * b = b * (b * a * b⁻¹) := hcomm _ ha b hb
+      have h2 : b * a = b * (b * a * b⁻¹) := by rw [← h1]; group
+      have h3 : a = b * a * b⁻¹ := mul_left_cancel h2
+      rw [h3]; exact ha
+  have hmul : ∀ x ∈ A ⊔ B, ∃ a ∈ A, ∃ b ∈ B, a * b = x := by
+    intro x hx
+    have hx' : x ∈ ((A : Set G') * (B : Set G')) := by rw [← hcoe]; exact hx
+    obtain ⟨a, ha, b, hb, rfl⟩ := hx'
+    exact ⟨a, ha, b, hb, rfl⟩
+  have hbot : B ⊓ A = ⊥ := by rw [inf_comm]; exact hinf
+  have hcompl := (Subgroup.isComplement'_subgroupOf_of_disjoint_mul_eq_univ
+    (le_sup_right : B ≤ A ⊔ B) (le_sup_left : A ≤ A ⊔ B) hbot hmul).card_mul
+  have hAc : Nat.card ↥(A.subgroupOf (A ⊔ B)) = Nat.card ↥A :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv
+  have hBc : Nat.card ↥(B.subgroupOf (A ⊔ B)) = Nat.card ↥B :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+  rw [← hAc, ← hBc]
+  exact hcompl.symm
+
+omit [Finite G'] in
+/-- The centre of a subgroup `K`, computed inside `K`, is `(K ⊓ C_G(K))` transported
+along `subgroupOf`. -/
+theorem center_eq_inf_centralizer_subgroupOf (K : Subgroup G') :
+    Subgroup.center ↥K = (K ⊓ Subgroup.centralizer (K : Set G')).subgroupOf K := by
+  ext x
+  rw [Subgroup.mem_center_iff, Subgroup.mem_subgroupOf, Subgroup.mem_inf,
+    Subgroup.mem_centralizer_iff]
+  constructor
+  · intro h
+    refine ⟨x.2, ?_⟩
+    intro g hg
+    have := h ⟨g, hg⟩
+    exact congrArg Subtype.val this
+  · rintro ⟨-, h2⟩ y
+    exact Subtype.ext (h2 (y : G') y.2)
+
+/-- **A `p²`-index central subgroup of a nonabelian group is the whole centre.**
+If `Z ≤ Z(K)` has index `p²` (`p` prime) and `K` is nonabelian, then the centre
+cannot be larger: index `1` or `p` would make `K/Z(K)` cyclic. -/
+theorem inf_centralizer_eq_of_index_sq_of_not_comm {K Z : Subgroup G'} {p : ℕ}
+    (hp : p.Prime) (hZ : Z ≤ K ⊓ Subgroup.centralizer (K : Set G'))
+    (hcard : Nat.card ↥K = p ^ 2 * Nat.card ↥Z)
+    (hnc : ¬ ∀ x ∈ K, ∀ y ∈ K, x * y = y * x) :
+    K ⊓ Subgroup.centralizer (K : Set G') = Z := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  set C : Subgroup G' := K ⊓ Subgroup.centralizer (K : Set G') with hC_def
+  have hCK : C ≤ K := inf_le_left
+  obtain ⟨a, ha⟩ := Subgroup.card_dvd_of_le hZ
+  set b := (C.subgroupOf K).index with hb_def
+  have hlag : Nat.card ↥C * b = Nat.card ↥K := by
+    have h := (C.subgroupOf K).card_mul_index
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCK).toEquiv] at h
+  have hZpos : 0 < Nat.card ↥Z := Nat.card_pos
+  have hab : a * b = p ^ 2 := by
+    have h1 : Nat.card ↥Z * (a * b) = Nat.card ↥Z * p ^ 2 := by
+      rw [← mul_assoc, ← ha, hlag, hcard]; ring
+    exact Nat.eq_of_mul_eq_mul_left hZpos h1
+  -- the quotient `K/Z(K)` has order `b`, and it is not cyclic
+  have hZidx : Subgroup.center ↥K = C.subgroupOf K :=
+    center_eq_inf_centralizer_subgroupOf K
+  have hcardq : Nat.card (↥K ⧸ Subgroup.center ↥K) = b := by
+    rw [hZidx, hb_def, Subgroup.index_eq_card]
+  have hnotcyc : ¬ IsCyclic (↥K ⧸ Subgroup.center ↥K) := by
+    intro hcyc
+    refine hnc ?_
+    have hcomm : IsMulCommutative ↥K :=
+      MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
+        (QuotientGroup.mk' (Subgroup.center ↥K)) (by rw [QuotientGroup.ker_mk'])
+    intro x hx y hy
+    exact congrArg Subtype.val (hcomm.is_comm.comm (⟨x, hx⟩ : ↥K) ⟨y, hy⟩)
+  have hb1 : b ≠ 1 := by
+    intro h
+    apply hnotcyc
+    haveI : Subsingleton (↥K ⧸ Subgroup.center ↥K) := by
+      have h0 : Nat.card (↥K ⧸ Subgroup.center ↥K) = 1 := by rw [hcardq, h]
+      exact (Nat.card_eq_one_iff_unique.mp h0).1
+    exact isCyclic_of_subsingleton
+  have hbp : b ≠ p := fun h =>
+    hnotcyc (isCyclic_of_prime_card (p := p) (by rw [hcardq, h]))
+  -- `b ∣ p²` with `b ∉ {1, p}` forces `b = p²`, hence `a = 1`
+  have hbdvd : b ∣ p ^ 2 := ⟨a, by rw [← hab]; ring⟩
+  obtain ⟨i, hi2, hi⟩ := (Nat.dvd_prime_pow hp).mp hbdvd
+  have hi_eq : i = 2 := by
+    interval_cases i
+    · exact absurd (by rw [hi, pow_zero] : b = 1) hb1
+    · exact absurd (by rw [hi, pow_one] : b = p) hbp
+    · rfl
+  have ha1 : a = 1 := by
+    rw [hi_eq] at hi
+    rw [hi] at hab
+    have hppos : 0 < p ^ 2 := pow_pos hp.pos 2
+    have h4 : a * p ^ 2 = 1 * p ^ 2 := by rw [one_mul]; exact hab
+    exact Nat.eq_of_mul_eq_mul_right hppos h4
+  have hCZ : Nat.card ↥C = Nat.card ↥Z := by rw [ha, ha1, mul_one]
+  exact (Subgroup.eq_of_le_of_card_ge hZ (le_of_eq hCZ)).symm
+
+end GenericCentre
+
 namespace FirstCaseHypothesis
 
 universe uG uΩ
