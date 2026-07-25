@@ -503,6 +503,58 @@ theorem mul_comm_invImageF_of_forall_conj_smul_eq
   calc n * (t * x) = (n * (t * x) * n⁻¹) * n := by group
     _ = (t * x) * n := by rw [h1]
 
+include model in
+/-- **Kernel identification for the action on `𝒜`** ((12) tail): an element fixes every
+member of `𝒜` setwise iff it lies in `R`.  Forward: `R` is abelian, so conjugation by
+`r ∈ R` fixes every subgroup of `R` elementwise.  Backward: the two-point argument
+(`mul_comm_invImageF_of_forall_conj_smul_eq`) makes `n` centralize `R`, and `R` is
+self-centralizing (`centralizer_invImageF_eq`).  Hence `N_G(R)/R` acts faithfully
+on `𝒜`. -/
+theorem mem_invImageF_iff_forall_conj_smul_eq
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) {n : G} :
+    n ∈ fc.invImageF model ↔
+      (∀ P₁ : Subgroup G, P₁ ≤ fc.invImageF model → Nat.card ↥P₁ = fc.p →
+        ¬ P₁ ≤ fc.sInvertedT model → MulAut.conj n • P₁ = P₁) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  have hab := fc.invImageF_mul_comm model ind hB2 hm
+  constructor
+  · intro hnR P₁ hP₁le hP₁card hP₁T
+    -- conjugation by `n ∈ R` is the identity on `R ⊇ P₁`.
+    have key : ∀ y ∈ fc.invImageF model, n⁻¹ * y * n = y := by
+      intro y hy
+      have hcomm := hab n hnR y hy
+      calc n⁻¹ * y * n = n⁻¹ * (y * n) := by group
+        _ = n⁻¹ * (n * y) := by rw [← hcomm]
+        _ = y := by group
+    ext x
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hinv : ((MulAut.conj n)⁻¹ • x : G) = n⁻¹ * x * n := by
+      have h3 : ((MulAut.conj n)⁻¹ • x : G) = (MulAut.conj n)⁻¹ x := rfl
+      rw [h3, ← map_inv, MulAut.conj_apply]
+      group
+    rw [hinv]
+    constructor
+    · intro hx
+      have hcomm := hab n hnR _ (hP₁le hx)
+      have h4 : n * (n⁻¹ * x * n) * n⁻¹ = n⁻¹ * x * n := by
+        rw [hcomm]; group
+      have h5 : x = n⁻¹ * x * n := by
+        calc x = n * (n⁻¹ * x * n) * n⁻¹ := by group
+          _ = n⁻¹ * x * n := h4
+      rw [h5]
+      exact hx
+    · intro hx
+      rw [key x (hP₁le hx)]
+      exact hx
+  · intro hfix
+    have h1 : n ∈ Subgroup.centralizer ((fc.invImageF model : Subgroup G) : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy
+      exact (fc.mul_comm_invImageF_of_forall_conj_smul_eq model ind hB2 hm hfix y hy).symm
+    rwa [fc.centralizer_invImageF_eq model ind hB2 hm] at h1
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
