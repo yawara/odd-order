@@ -228,6 +228,119 @@ theorem le_centralizer_of_isCyclic_of_exists_fixed {p : ℕ} [Fact p.Prime]
   calc y * k = (k * y * k⁻¹) * k := by rw [hval]
     _ = k * y := by group
 
+/-! ### Problem 4D.7 — `O_{p'}(G) = 1` の場合 -/
+
+/-- **Isaacs Problem 4D.7 (Case 2)**: `G` が `p`-可分, Sylow `p`-部分群が巡回,
+`O_{p'}(G) = 1` のとき, `p ∣ |N_G(K)|` なる `p'`-部分群 `K` は自明。
+
+`P := O_p(G)` は正規 Sylow (`exists_sylow_coe_eq_oPiCore_of_isCyclic`)。`p ∣ |N_G(K)|` から
+位数 `p` の `x ∈ N_G(K)` を取ると, Sylow が唯一なので `x ∈ P`, `⟨x⟩ ⊴ G`
+(`normal_of_le_of_isCyclic`)。`⁅k, x⁆ ∈ K ⊓ ⟨x⟩ = 1` なので `K` は `x` を中心化し,
+`le_centralizer_of_isCyclic_of_exists_fixed` から `K ≤ C_G(P) = P`。`K` は `p'`-群,
+`P` は `p`-群なので `K = 1`。 -/
+theorem eq_bot_of_oPiCore_compl_eq_bot (p : ℕ) [Fact p.Prime]
+    [Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hp' : Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥)
+    (hcyc : ∀ Q : Sylow p G, IsCyclic ↥(Q : Subgroup G))
+    {K : Subgroup G} (hK : ¬ p ∣ Nat.card ↥K)
+    (hN : p ∣ Nat.card ↥(Subgroup.normalizer (K : Set G))) :
+    K = ⊥ := by
+  -- `O_p(G)` は `p`-群で, 巡回 Sylow の部分群だから巡回
+  have hOp : IsPGroup p ↥(Ch03.oPiCore ({p} : Set ℕ) G) :=
+    Ch03.Subgroup.isPiGroup_singleton_iff_isPGroup.mp (Ch03.oPiCore.isPiGroup ({p} : Set ℕ))
+  have hOcyc : IsCyclic ↥(Ch03.oPiCore ({p} : Set ℕ) G) := by
+    obtain ⟨Q, hQ⟩ := hOp.exists_le_sylow
+    haveI := hcyc Q
+    exact isCyclic_of_surjective
+      (Subgroup.subgroupOfEquivOfLe hQ).toMonoidHom (Equiv.surjective _)
+  -- `P := O_p(G)` は正規 Sylow
+  obtain ⟨P, hP⟩ := exists_sylow_coe_eq_oPiCore_of_isCyclic p hp' hOcyc
+  haveI hPnormal : (P : Subgroup G).Normal := by rw [hP]; infer_instance
+  -- `p ∣ |N_G(K)|` から位数 `p` の元 `x ∈ N_G(K)`
+  haveI : Fintype ↥(Subgroup.normalizer (K : Set G)) := Fintype.ofFinite _
+  obtain ⟨x₀, hx₀⟩ := exists_prime_orderOf_dvd_card
+    (G := ↥(Subgroup.normalizer (K : Set G))) p (by rwa [← Nat.card_eq_fintype_card])
+  set x : G := (x₀ : G) with hxdef
+  have hxN : x ∈ Subgroup.normalizer (K : Set G) := x₀.2
+  have hxo : orderOf x = p := by
+    have hne : x ≠ 1 := by
+      intro h
+      have : x₀ = 1 := Subtype.ext h
+      rw [this, orderOf_one] at hx₀
+      exact (Fact.out : p.Prime).one_lt.ne hx₀
+    have hpow : x ^ p = 1 := by
+      have h1 := pow_orderOf_eq_one x₀
+      rw [hx₀] at h1
+      exact congrArg Subtype.val h1
+    rcases (Fact.out : p.Prime).eq_one_or_self_of_dvd _
+      (orderOf_dvd_of_pow_eq_one hpow) with h1 | h1
+    · exact absurd (orderOf_eq_one_iff.mp h1) hne
+    · exact h1
+  -- `x` は `p`-元なので唯一の Sylow `P` に入る
+  have hxP : x ∈ (P : Subgroup G) := by
+    have hzp : IsPGroup p ↥(Subgroup.zpowers x) := by
+      rw [IsPGroup.iff_card, Nat.card_zpowers, hxo]
+      exact ⟨1, (pow_one p).symm⟩
+    obtain ⟨Q, hQ⟩ := hzp.exists_le_sylow
+    haveI := Sylow.unique_of_normal P hPnormal
+    have hQP : Q = P := Subsingleton.elim Q P
+    rw [hQP] at hQ
+    exact hQ (Subgroup.mem_zpowers x)
+  -- `⟨x⟩ ⊴ G`
+  haveI hzn : (Subgroup.zpowers x).Normal := by
+    refine normal_of_le_of_isCyclic (P := (P : Subgroup G)) ?_ ?_
+    · rw [hP]; exact hOcyc
+    · exact (Subgroup.zpowers_le).mpr hxP
+  -- `K ⊓ ⟨x⟩ = 1`
+  have hinf : K ⊓ Subgroup.zpowers x = ⊥ := by
+    rw [← Subgroup.card_eq_one]
+    have d1 : Nat.card ↥(K ⊓ Subgroup.zpowers x) ∣ Nat.card ↥K :=
+      Subgroup.card_dvd_of_le inf_le_left
+    have d2 : Nat.card ↥(K ⊓ Subgroup.zpowers x) ∣ p := by
+      have := Subgroup.card_dvd_of_le (inf_le_right : K ⊓ Subgroup.zpowers x ≤ _)
+      rwa [Nat.card_zpowers, hxo] at this
+    rcases (Fact.out : p.Prime).eq_one_or_self_of_dvd _ d2 with h1 | h1
+    · exact h1
+    · exact absurd (h1 ▸ d1) hK
+  -- `K` は `x` を中心化
+  have hfix : ∀ k ∈ K, k * x * k⁻¹ = x := by
+    intro k hk
+    have h1 : k * x * k⁻¹ * x⁻¹ ∈ K := by
+      have hxk : x * k⁻¹ * x⁻¹ ∈ K :=
+        (Subgroup.mem_normalizer_iff.mp hxN k⁻¹).mp (K.inv_mem hk)
+      have : k * (x * k⁻¹ * x⁻¹) ∈ K := K.mul_mem hk hxk
+      simpa [mul_assoc] using this
+    have h2 : k * x * k⁻¹ * x⁻¹ ∈ Subgroup.zpowers x :=
+      (Subgroup.zpowers x).mul_mem (hzn.conj_mem x (Subgroup.mem_zpowers x) k)
+        ((Subgroup.zpowers x).inv_mem (Subgroup.mem_zpowers x))
+    have hone : k * x * k⁻¹ * x⁻¹ = 1 := by
+      have : k * x * k⁻¹ * x⁻¹ ∈ K ⊓ Subgroup.zpowers x := ⟨h1, h2⟩
+      rwa [hinf, Subgroup.mem_bot] at this
+    exact mul_inv_eq_one.mp hone
+  -- `K ≤ C_G(P) = P`
+  have hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(P : Subgroup G)) := by
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p)).mp P.2
+    rw [hn]
+    exact Nat.Coprime.pow_right n
+      (Nat.coprime_comm.mp ((Nat.Prime.coprime_iff_not_dvd (Fact.out : p.Prime)).mpr hK))
+  have hxne : x ≠ 1 := by
+    intro h
+    rw [h, orderOf_one] at hxo
+    exact (Fact.out : p.Prime).one_lt.ne hxo
+  have hKC : K ≤ Subgroup.centralizer ((P : Subgroup G) : Set G) :=
+    le_centralizer_of_isCyclic_of_exists_fixed (p := p) P.2 (hP ▸ hOcyc) hcop hxP hxne hfix
+  have hKP : K ≤ (P : Subgroup G) := by
+    rw [hP] at hKC ⊢
+    rwa [centralizer_oPiCore_eq p hp' hOcyc] at hKC
+  -- `K` は `p'`-群かつ `p`-群 ⟹ 自明
+  rw [← Subgroup.card_eq_one]
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p)).mp P.2
+  have hdvd : Nat.card ↥K ∣ p ^ n := hn ▸ Subgroup.card_dvd_of_le hKP
+  rcases (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp hdvd with ⟨m, hm, hcard⟩
+  rcases Nat.eq_zero_or_pos m with rfl | hpos
+  · simpa using hcard
+  · exact absurd (hcard ▸ dvd_pow_self p hpos.ne') hK
+
 end
 
 end OddOrder.Isaacs.Ch04
