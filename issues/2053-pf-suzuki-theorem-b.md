@@ -569,3 +569,7 @@ preimage、step (7) の N = P 使用)。主張:
   IsPGroup 系 lt_normalizer) → N_{P₁}(R) ≤ N_G(R) ≤ C_G(P) が p-part 超過で矛盾。
 - (10.2): RC_W(P) を 3-Sylow として同型の論法 (|RC_W(P)|=3^4 vs |G|_3=3^4|W|≥3^5)。
 - その後: T := [R,s] 分解 (R abelian + s 反転) → |𝒜| = p^m → 正則性 (a fpf on R/P)。
+- **(10.1) 側 R abelian 完了** (`a1b9159c3`): `invImageF_mul_comm_of_not_dvd_card_D`。
+  次 = (10.2) 側 arm (p=3, RC_W(P) が N_G(P) の 3-Sylow、|RC_W(P)|=3^4 vs |G|_3=3^4|W|≥3^5)。
+  部品はほぼ同型: card 勘定 (|R·C_W(P)| = |R|·|Σ|/...) + Σ の R/P への非自明作用で
+  Z(RC_W(P)) = Z(R) = P。その後 step_ten_dichotomy を消費して無条件 R abelian。
