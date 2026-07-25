@@ -173,6 +173,61 @@ theorem inv_mul_conj_mem_of_fusion [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylo
   rw [← hneq]
   exact hUV n hnN x hx
 
+/-- ⭐ **Problem 5C.2 の transfer 段** (可換な target `A` を変数にした形):
+`P` 可換 Sylow, `V ≤ P`, `N_G(P)` が `V/U` に自明作用するとき, 任意の可換群への
+準同型 `ϕ : ↥P →* A` の transfer は `x ∈ V` 上で `ϕ(x)^{|G:P|}` と `ϕ(U)` を法として一致する。
+
+⭐ **target を変数 `A` にすると `↥P` の `CommGroup` instance diamond を完全に回避できる**
+(`↥P` 自身や `↥P ⧸ U` を target にすると `Subgroup.toGroup` と `CommGroup.toGroup` が
+unify しない)。5C.2 では `A := Abelianization ↥P`, `ϕ := Abelianization.of` を取る
+(`P` 可換なので `ϕ` は単射)。
+
+軌道分解版の transfer 評価の各因子を fusion 段 (`inv_mul_conj_mem_of_fusion`) で
+`ϕ(x^{n_q}) · ϕ(u_q)` (`u_q ∈ U`) に分解し, `A` 可換ゆえ積をまとめる。
+⚠ mathlib の `MonoidHom.transfer_eq_pow` は「共役が元を厳密に固定する」ことを要求するので
+使えない (法 `U` の弱い仮定しかない)。 -/
+theorem transfer_inv_pow_mul_mem_map {A : Type*} [CommGroup A] [Finite G] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p G) (ϕ : ↥(P : Subgroup G) →* A)
+    (hab : ∀ a ∈ (P : Subgroup G), ∀ b ∈ (P : Subgroup G), a * b = b * a)
+    {U V : Subgroup G} (hUP : U ≤ (P : Subgroup G)) (hVP : V ≤ (P : Subgroup G))
+    (hUV : ∀ n ∈ Subgroup.normalizer ((P : Subgroup G) : Set G), ∀ y ∈ V,
+      y⁻¹ * (n * y * n⁻¹) ∈ U)
+    {x : G} (hx : x ∈ V) :
+    (ϕ ⟨x, hVP hx⟩ ^ (P : Subgroup G).index)⁻¹ * MonoidHom.transfer ϕ x ∈
+      (U.subgroupOf (P : Subgroup G)).map ϕ := by
+  classical
+  haveI : Fintype (MulAction.orbitRel.Quotient (Subgroup.zpowers x) (G ⧸ (P : Subgroup G))) :=
+    Fintype.ofFinite _
+  set n : MulAction.orbitRel.Quotient (Subgroup.zpowers x) (G ⧸ (P : Subgroup G)) → ℕ :=
+    fun q => Function.minimalPeriod (fun y : G ⧸ (P : Subgroup G) => x • y) q.out with hn
+  have hu : ∀ q, ((x ^ n q)⁻¹ * (q.out.out⁻¹ * x ^ n q * q.out.out)) ∈ U := by
+    intro q
+    have hmem := QuotientGroup.out_conj_pow_minimalPeriod_mem (P : Subgroup G) x q.out
+    have hconj : q.out.out⁻¹ * (x ^ n q) * (q.out.out⁻¹)⁻¹ ∈ (P : Subgroup G) := by
+      simpa using hmem
+    simpa using inv_mul_conj_mem_of_fusion P hab hVP hUV (V.pow_mem hx (n q)) hconj
+  have hsplit : ∀ q, ϕ ⟨q.out.out⁻¹ * x ^ n q * q.out.out,
+      QuotientGroup.out_conj_pow_minimalPeriod_mem (P : Subgroup G) x q.out⟩
+      = ϕ ⟨x, hVP hx⟩ ^ n q *
+        ϕ ⟨(x ^ n q)⁻¹ * (q.out.out⁻¹ * x ^ n q * q.out.out), hUP (hu q)⟩ := by
+    intro q
+    rw [← map_pow, ← map_mul]
+    congr 1
+    refine Subtype.ext ?_
+    simp only [Subgroup.coe_mul, SubmonoidClass.coe_pow]
+    group
+  have hsum : ∑ q, n q = (P : Subgroup G).index := by
+    have hcard := Nat.card_congr (Subgroup.quotientEquivSigmaZMod (P : Subgroup G) x)
+    rw [Nat.card_sigma] at hcard
+    simp only [Nat.card_zmod] at hcard
+    exact hcard.symm
+  rw [MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot ϕ x,
+    Finset.prod_congr rfl (fun q _ => hsplit q), Finset.prod_mul_distrib,
+    Finset.prod_pow_eq_pow_sum, hsum, inv_mul_cancel_left]
+  refine Subgroup.prod_mem _ fun q _ => ?_
+  exact ⟨⟨(x ^ n q)⁻¹ * (q.out.out⁻¹ * x ^ n q * q.out.out), hUP (hu q)⟩,
+    Subgroup.mem_subgroupOf.mpr (by simpa using hu q), rfl⟩
+
 /-! ### Problem 5C.5 -/
 
 /-- **Isaacs Problem 5C.5**: `P ∈ Syl_p(G)` の正規部分群 `A`, `B` が `G`-共役なら,

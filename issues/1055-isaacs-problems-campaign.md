@@ -1439,7 +1439,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 問題 | 状態 | メモ |
 |---|---|---|
 | 5C.1 | ✅ | `not_dvd_card_commutator_of_inf_sylow_eq_bot` + `hasNormalPComplement_of_commutator_inf_sylow_eq_bot` (`Problems5C.lean`)。方針どおり **鍵の段を独立補題**にした (同一 statement の別証明を避ける) |
-| 5C.2 | 🔨 fusion 段 landing 済 (下記) | PDF 確認済。`U ⊆ V ⊆ P ⊆ G`、`P` abelian Sylow-2、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
+| 5C.2 | 🔨 fusion 段 + transfer 段 landing 済 (残り = 組み立て) | PDF 確認済。`U ⊆ V ⊆ P ⊆ G`、`P` abelian Sylow-2、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
 | 5C.3 | 🔨 設計確定 (下記) | PDF 確認済: `G` 単純で abelian Sylow-2 `P` の位数が `2^5` ⇒ `P` は初等可換 |
 | 5C.4 | ⬜ | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
 | 5C.5 | ✅ | `exists_mem_normalizer_conj_eq_of_normal` + `eq_of_characteristic_of_conj` (`Problems5C.lean`) |
@@ -1504,7 +1504,19 @@ transfer `v : G →* P` (P abelian) を取ると、transfer 評価の各因子
 `Finset.prod_pow_eq_pow_sum`)。結論は
 `(x ^ |G:P|)⁻¹ * (transfer (MonoidHom.id ↥P) x : G) ∈ U` の形で書ける。
 
-⚠ **未解決の実装障害 (2026-07-26)**: `↥P` の **`CommGroup` instance diamond**。
+✅ **transfer 段 landing (2026-07-26)**: `transfer_inv_pow_mul_mem_map`
+「`ϕ : ↥P →* A` (`A` 可換) の transfer は `x ∈ V` 上で `ϕ(x)^{|G:P|}` と `ϕ(U)` を法として
+一致する」。⭐ **target を変数 `A` にすると instance diamond が完全に消える**
+(下記の障害はこれで解消)。5C.2 の組み立てでは `A := Abelianization ↥P`,
+`ϕ := Abelianization.of` を取る (`P` 可換なので `commutator ↥P = ⊥` で `ϕ` は単射、
+`ϕ(x^{|G:P|}) ∈ ϕ(U)` から `x^{|G:P|} ∈ U` が戻せる)。
+
+**残り (組み立て)**: `|G:P|` 奇数 (`Sylow.not_dvd_index`) と `|V:U| = 2` から
+`x ∈ V \ U` に対し `x^{|G:P|} ∉ U` ⇒ `transfer ϕ x ≠ 1`。一方 `G` 非可換単純なら
+`G = G'` かつ `A` 可換なので `transfer ϕ (G') = 1` で矛盾 ⇒ `G` 可換単純 = 素数位数、
+`2 ∣ |G|` で `|G| = 2`。
+
+~~⚠ 未解決の実装障害 (解消済)~~: `↥P` の **`CommGroup` instance diamond**。
 `MonoidHom.transfer` は target に `CommGroup` を要求するが、`↥P` には
 `Subgroup.toGroup` 由来の `Group` があるため、`haveI : CommGroup ↥P` を入れると
 `MonoidHom.id ↥P` の型 (`Subgroup.toGroup` 側) と
