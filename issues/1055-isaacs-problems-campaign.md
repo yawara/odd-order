@@ -469,6 +469,33 @@ mathlib inductive (`top`/`step`)。
   `Subgroup.map_injective H.subtype_injective` + `MonoidHom.map_closure`。
 - 🎉 **§2B 完済** (2B.1-2B.6)。
 
+## Ch.2 (Subnormality) §2C — 着手 (2026-07-25)
+
+新 leaf `OddOrder/Isaacs/Ch02_Subnormality/ProblemsNGroups.lean` (`OddOrder.lean` 配線済)。
+§2C の演習は **2C.1 のみ** ((a)(b) の 2 パート)。`IsLocal` (local 部分群) は §2C 本文の
+`Theorem211Wielandt.lean` に既存、本 leaf で `IsNGroup` (全 local 部分群が可解) を定義。
+
+- ✅ 実証明 **2C.1(a)** `isSolvable_quotient_of_isNGroup` (N-群の真の準同型像 `G ⧸ N`
+  (`N ≠ ⊥`) は可解)。`p ∣ |N|` の Sylow `P ∈ Syl_p(N)` を `G` 側に写した `Q ≠ ⊥` について
+  Frattini (`Sylow.normalizer_sup_eq_top`) で `N_G(Q) ⊔ N = ⊤`、`N_G(Q)` は local ゆえ可解、
+  `N` 正規で `↑(N_G(Q) ⊔ N) = ↑N_G(Q)·↑N` だから `N_G(Q) → G ⧸ N` 全射 ⟹
+  `solvable_of_surjective`。
+- ⬜ **次: 2C.1(b)** (非可解 N-群は一意な minimal normal `S` をもち `S` は非可換単純)。
+  **★ 証明計画 (確定)**:
+  * **一意性**: 相異なる minimal normal `S₁ ≠ S₂` があれば `S₁ ⊓ S₂ = ⊥` ゆえ `G` は
+    `G/S₁ × G/S₂` に埋め込まれ、(a) で両方可解 ⟹ `G` 可解で仮定に反する。
+  * **`S` 非可換 (さらに非可解)**: `S` 可解なら (a) の `G/S` 可解と合わせ `G` 可解で矛盾。
+  * **`S` 単純**: `S` が単純でないとして `T` を `S` の minimal normal (`T < S`) とする。
+    `T` の `G`-共役はいずれも `S` の minimal normal で、相異なるものは交わりが自明ゆえ
+    元ごとに可換。`T^G = S` (`S` の minimality) で `T < S` だから共役は 2 個以上ある。
+    `T` は非可換 (全共役が可換な可換群なら `S` が可換になる) ゆえ非可解
+    (minimal normal で導来部分群が `⊥` でない)。`p ∣ |T₁|` の Sylow `P ≠ ⊥` を取ると
+    別の共役 `T₂ ≤ C_G(T₁) ≤ N_G(P)` で `N_G(P)` が非可解 — local 部分群の可解性に矛盾。
+  * 材料: 自分で証明した **2A.5** (`Ch02/Problems.lean` の
+    `exists_indep_isSimpleGroup_sSup_eq_top` 等) も使える見込みだが、上の直接論法なら
+    直積分解を経由せずに済む。`Subgroup.commute_of_normal_of_disjoint` / `normalClosure` /
+    `IsSolvable` の部分群・商・拡大での閉性が要。
+
 ## Ch.3 (Split Extensions) §3A — 着手 (2026-07-23、§2A hard tail deferred 中の breadth 展開)
 
 新 leaf `OddOrder/Isaacs/Ch03_SplitExtensions/Problems.lean` (namespace `OddOrder.Isaacs.Ch03`、
@@ -591,4 +618,5 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 2A.9 ✅ / 2A.10 ✅ (**§2A 完済**) / 2B.1 ✅。
 さらに 2B.2(a)(b) ✅ / 2B.3 ✅ (新 leaf `Ch02_Subnormality/ProblemsInvolutions.lean`)。
 さらに 2B.4 ✅ / 2B.5 ✅ / 2B.6 ✅ で **§2B も完済**。
-**次 frontier = §2C (2C.1)** → §2D (2D.1, 2D.2, …) → §3A 残り (3A.3/4/6/7/8) → §3B〜。
+さらに **2C.1(a) ✅**。**次 frontier = 2C.1(b)** (証明計画は §2C 節に確定記載) →
+§2D (2D.1, 2D.2, …) → §3A 残り (3A.3/4/6/7/8) → §3B〜。
