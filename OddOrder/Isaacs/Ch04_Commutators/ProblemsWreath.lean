@@ -3,6 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.Algebra.Polynomial.Coeff
+import Mathlib.Algebra.Polynomial.Div
+import Mathlib.Algebra.Ring.GeomSum
 import OddOrder.Isaacs.Ch03_SplitExtensions.WreathProduct
 import OddOrder.Isaacs.Ch04_Commutators.Problems
 
@@ -840,6 +844,37 @@ theorem shiftSubHom_shiftSumHom_card [Fintype Q] {q : Q} (hq : orderOf q = Finty
   change (∏ y, f y) * ((∏ y, f y))⁻¹ = (1 : Q → D) ω
   rw [mul_inv_cancel]
   rfl
+
+/-! ### 4A.8(d)(β) の linchpin (多項式版) -/
+
+/-- **標数 `p` の多項式恒等式** `(1 - X)^{p-1} = 1 + X + ⋯ + X^{p-1}`.
+
+`(1-X)^p = 1 - X^p` (`sub_pow_char`) と幾何級数 `(1-X)·∑_{j<p} X^j = 1 - X^p`
+(`mul_neg_geom_sum`) を比べ, 整域 `(ZMod p)[X]` で `1 - X ≠ 0` を約す.
+
+これが 4A.8(d) の linchpin `Δ_q^{p-1} = T_p` の多項式側の実体
+(`Δ = 1 - x`, `T_p = 1 + x + ⋯ + x^{p-1}` を `x ↦ 平行移動` で作用させる). -/
+theorem one_sub_X_pow_prime_sub_one (p : ℕ) [Fact p.Prime] :
+    (1 - Polynomial.X : Polynomial (ZMod p)) ^ (p - 1)
+      = ∑ j ∈ Finset.range p, (Polynomial.X : Polynomial (ZMod p)) ^ j := by
+  have hp : 0 < p := Nat.Prime.pos Fact.out
+  have h1 : (1 - Polynomial.X : Polynomial (ZMod p)) ^ p = 1 - Polynomial.X ^ p := by
+    rw [sub_pow_char]
+    simp
+  have h2 : (1 - Polynomial.X : Polynomial (ZMod p))
+      * (∑ j ∈ Finset.range p, (Polynomial.X : Polynomial (ZMod p)) ^ j)
+      = 1 - Polynomial.X ^ p := mul_neg_geom_sum Polynomial.X p
+  have hne : (1 - Polynomial.X : Polynomial (ZMod p)) ≠ 0 := by
+    intro h
+    have hcoef := congrArg (fun r => Polynomial.coeff r 1) h
+    simp [Polynomial.coeff_one] at hcoef
+  have hsplit : (1 - Polynomial.X : Polynomial (ZMod p)) ^ p
+      = (1 - Polynomial.X) * (1 - Polynomial.X) ^ (p - 1) := by
+    rw [← pow_succ']
+    congr 1
+    omega
+  rw [hsplit, ← h2] at h1
+  exact mul_left_cancel₀ hne h1
 
 end
 

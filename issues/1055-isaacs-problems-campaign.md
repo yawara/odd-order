@@ -1033,6 +1033,14 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 ⚠ なお `Δ^p = 0` だけでは `class(P) ≤ p` (上界) しか出ない。maximal class には
 `Δ^{p-1} ≠ 0` (下界) が要り、そこは linchpin `Δ^{p-1} = T_p` が最短。
 
+**多項式側は landing 済 (2026-07-25)**: `one_sub_X_pow_prime_sub_one`
+(`(1 - X)^{p-1} = ∑_{j<p} X^j` in `(ZMod p)[X]`; `sub_pow_char` + `mul_neg_geom_sum` +
+整域での約分)。⟹ 残るのは**作用素への移送**だけ:
+`V = Additive (Q → D)` (指数 `p` ⟹ `ZMod p`-加群) 上で `Polynomial.aeval σ` を使い、
+`aeval σ (1 - X) = Δ`, `aeval σ (∑_{j<p} X^j) = T_p` を確認すれば `Δ^{p-1} = T_p` が出る。
+必要 import は `Mathlib.Algebra.{Field.ZMod, Polynomial.Coeff, Polynomial.Div, Ring.GeomSum}`
+(本 commit で追加済)。
+
 linchpin の証明ルート 2 つ:
 1. **pointwise 二項展開**: `Δ^k f ω = ∏_{j≤k} f((q^j)⁻¹ω)^{(-1)^j C(k,j)}` を `k` の帰納
    (Pascal) で示し、`k = p-1` で `C(p-1,j) ≡ (-1)^j (mod p)` を使うと指数が全部 `1` になる。
