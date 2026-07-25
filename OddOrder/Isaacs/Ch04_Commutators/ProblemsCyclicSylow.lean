@@ -4,14 +4,25 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.CyclicSubgroupUniqueness
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroupsCoprime
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsIteratedCommutator
 
 /-!
-# Isaacs Chapter 4 — Problem 4D.7 の準備 (巡回 Sylow と正規 Sylow)
+# Isaacs Chapter 4 — Problem 4D.7 (巡回 Sylow をもつ `p`-可解群)
 
-Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4D.7 (書籍 p. 146) の
-hint 「`O_{p'}(G) = 1` のときは `G` が正規 Sylow `p`-部分群を持つことを示せ」の部分。
+Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4D.7 (書籍 p. 146)。
+
+**主結果** `le_oPiCore_compl_of_sylow_isCyclic`: `G` が `p`-可解 (`p`-可分) で Sylow
+`p`-部分群が巡回, `K ≤ G` が `p'`-部分群で `p ∣ |N_G(K)|` なら `K ⊆ O_{p'}(G)`。
+
+書籍の hint は `|G|` の帰納法だが, **`O_{p'}(G/O_{p'}(G)) = 1` が常に成り立つ**
+(`Ch03.oPiCore_quotient_self_eq_bot`) ので, 商 `G/O_{p'}(G)` に
+`O_{p'} = 1` の場合 (`eq_bot_of_oPiCore_compl_eq_bot`) を **1 回適用するだけ**で済み,
+帰納法は要らない。
+
+以下はその `O_{p'}(G) = 1` の場合 (hint の「`G` は正規 Sylow `p`-部分群を持つ」) の道具立て。
 
 `G` が `p`-可分 (repo では `Ch03.IsPiSeparable {p} G`) で `O_{p'}(G) = 1`,
 `O_p(G)` が巡回のとき:
@@ -340,6 +351,116 @@ theorem eq_bot_of_oPiCore_compl_eq_bot (p : ℕ) [Fact p.Prime]
   rcases Nat.eq_zero_or_pos m with rfl | hpos
   · simpa using hcard
   · exact absurd (hcard ▸ dvd_pow_self p hpos.ne') hK
+
+/-! ### Problem 4D.7 本体 -/
+
+omit [Finite G] in
+/-- 巡回部分群の準同型像は巡回. -/
+theorem isCyclic_map_of_isCyclic {H : Type*} [Group H] {S : Subgroup G} (hS : IsCyclic ↥S)
+    (f : G →* H) : IsCyclic ↥(S.map f) :=
+  haveI := hS
+  isCyclic_of_surjective ((f.comp S.subtype).codRestrict (S.map f) fun x => ⟨x, x.2, rfl⟩)
+    (by rintro ⟨_, x, hx, rfl⟩; exact ⟨⟨x, hx⟩, rfl⟩)
+
+omit [Finite G] in
+/-- 準同型は正規化群を正規化群へ写す: `f (N_G(K)) ≤ N_H(f(K))`。
+
+`f g · f k · (f g)⁻¹ = f (g k g⁻¹)` で `g k g⁻¹ ∈ K` だから
+(`le_normalizer_of_forall_conj_mem`, Problem 4A.9)。 -/
+theorem map_normalizer_le_normalizer_map {H : Type*} [Group H] (f : G →* H) (K : Subgroup G) :
+    (Subgroup.normalizer (K : Set G)).map f ≤
+      Subgroup.normalizer ((K.map f : Subgroup H) : Set H) := by
+  refine le_normalizer_of_forall_conj_mem ?_
+  rintro _ ⟨g, hg, rfl⟩ _ ⟨k, hk, rfl⟩
+  refine ⟨g * k * g⁻¹, (Subgroup.mem_normalizer_iff.mp hg k).mp hk, ?_⟩
+  rw [map_mul, map_mul, map_inv]
+
+/-- **Isaacs Problem 4D.7**: `G` が `p`-可解 (`p`-可分) で Sylow `p`-部分群が巡回,
+`K ≤ G` が `p'`-部分群で `p ∣ |N_G(K)|` なら `K ⊆ O_{p'}(G)`。
+
+hint は `|G|` の帰納法だが, **`O_{p'}(G/O_{p'}(G)) = 1` が常に成り立つ**
+(`Ch03.oPiCore_quotient_self_eq_bot`) ので, 商 `Ḡ = G/O_{p'}(G)` に Case 2
+(`eq_bot_of_oPiCore_compl_eq_bot`) を **1 回適用するだけ**で済む (帰納法は不要)。 -/
+theorem le_oPiCore_compl_of_sylow_isCyclic (p : ℕ) [Fact p.Prime]
+    [Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hcyc : ∀ Q : Sylow p G, IsCyclic ↥(Q : Subgroup G))
+    {K : Subgroup G} (hK : ¬ p ∣ Nat.card ↥K)
+    (hN : p ∣ Nat.card ↥(Subgroup.normalizer (K : Set G))) :
+    K ≤ Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G := by
+  set O : Subgroup G := Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G with hOdef
+  set θ : G →* G ⧸ O := QuotientGroup.mk' O with hθ
+  have hθsurj : Function.Surjective θ := QuotientGroup.mk'_surjective O
+  -- 商では `O_{p'} = ⊥`
+  have hquotbot : Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} (G ⧸ O) = ⊥ :=
+    Ch03.oPiCore_quotient_self_eq_bot _
+  -- 商の Sylow `p`-部分群も巡回
+  have hcycq : ∀ Qbar : Sylow p (G ⧸ O), IsCyclic ↥(Qbar : Subgroup (G ⧸ O)) := by
+    intro Qbar
+    obtain ⟨S, hS⟩ := Ch01.exists_sylow_map_eq hθsurj Qbar
+    have : IsCyclic ↥((S : Subgroup G).map θ) := isCyclic_map_of_isCyclic (hcyc S) θ
+    rwa [hS] at this
+  -- `p ∤ |O|`
+  have hOp' : ¬ p ∣ Nat.card ↥O := by
+    intro hdvd
+    have := Ch03.oPiCore.isPiGroup (G := G) {q | q ∉ ({p} : Set ℕ)} p
+      (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)
+    exact this rfl
+  -- 位数 `p` の `x ∈ N_G(K)`
+  haveI : Fintype ↥(Subgroup.normalizer (K : Set G)) := Fintype.ofFinite _
+  obtain ⟨x₀, hx₀⟩ := exists_prime_orderOf_dvd_card
+    (G := ↥(Subgroup.normalizer (K : Set G))) p (by rwa [← Nat.card_eq_fintype_card])
+  have hxN : (x₀ : G) ∈ Subgroup.normalizer (K : Set G) := x₀.2
+  have hxo : orderOf (x₀ : G) = p := by
+    have hne : (x₀ : G) ≠ 1 := by
+      intro h
+      have h1 : x₀ = 1 := Subtype.ext h
+      rw [h1, orderOf_one] at hx₀
+      exact (Fact.out : p.Prime).one_lt.ne hx₀
+    have hpow : ((x₀ : G)) ^ p = 1 := by
+      have h1 := pow_orderOf_eq_one x₀
+      rw [hx₀] at h1
+      exact congrArg Subtype.val h1
+    rcases (Fact.out : p.Prime).eq_one_or_self_of_dvd _
+      (orderOf_dvd_of_pow_eq_one hpow) with h1 | h1
+    · exact absurd (orderOf_eq_one_iff.mp h1) hne
+    · exact h1
+  -- `θ x` も位数 `p` で `N_Ḡ(K̄)` に入る
+  have hxnotO : (x₀ : G) ∉ O := by
+    intro hmem
+    refine hOp' ?_
+    have : orderOf (⟨(x₀ : G), hmem⟩ : ↥O) ∣ Nat.card ↥O := orderOf_dvd_natCard _
+    have horder : orderOf (⟨(x₀ : G), hmem⟩ : ↥O) = p :=
+      (Subgroup.orderOf_mk _ hmem).trans hxo
+    rwa [horder] at this
+  have hθxo : orderOf (θ (x₀ : G)) = p := by
+    have hne : θ (x₀ : G) ≠ 1 := by
+      rw [hθ, QuotientGroup.mk'_apply, Ne, QuotientGroup.eq_one_iff]
+      exact hxnotO
+    have hpow : (θ (x₀ : G)) ^ p = 1 := by
+      have hxp : ((x₀ : G)) ^ p = 1 := by
+        have h1 := pow_orderOf_eq_one (x₀ : G)
+        rwa [hxo] at h1
+      rw [← map_pow, hxp, map_one]
+    rcases (Fact.out : p.Prime).eq_one_or_self_of_dvd _
+      (orderOf_dvd_of_pow_eq_one hpow) with h1 | h1
+    · exact absurd (orderOf_eq_one_iff.mp h1) hne
+    · exact h1
+  have hθxN : θ (x₀ : G) ∈
+      Subgroup.normalizer ((K.map θ : Subgroup (G ⧸ O)) : Set (G ⧸ O)) :=
+    map_normalizer_le_normalizer_map θ K ⟨(x₀ : G), hxN, rfl⟩
+  have hNq : p ∣ Nat.card ↥(Subgroup.normalizer ((K.map θ : Subgroup (G ⧸ O)) : Set (G ⧸ O))) := by
+    have hdvd := orderOf_dvd_natCard (⟨θ (x₀ : G), hθxN⟩ :
+      ↥(Subgroup.normalizer ((K.map θ : Subgroup (G ⧸ O)) : Set (G ⧸ O))))
+    rwa [Subgroup.orderOf_mk _ hθxN, hθxo] at hdvd
+  -- `p ∤ |K̄|`
+  have hKq : ¬ p ∣ Nat.card ↥(K.map θ) := by
+    intro hdvd
+    refine hK (hdvd.trans ?_)
+    exact Subgroup.card_map_dvd _ _
+  -- Case 2 を商に適用
+  have hKbot : K.map θ = ⊥ := eq_bot_of_oPiCore_compl_eq_bot p hquotbot hcycq hKq hNq
+  have hle : K ≤ θ.ker := (Subgroup.map_eq_bot_iff K).mp hKbot
+  rwa [hθ, QuotientGroup.ker_mk'] at hle
 
 end
 
