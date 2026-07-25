@@ -96,49 +96,54 @@ private theorem not_smul_eq_of_orderOf_eq_prime (hp : p.Prime) {σ : G}
   exact hp.one_lt.ne' hσ.symm
 
 omit [MulAction G Ω] [Finite Ω] [FaithfulSMul G Ω] [IsPretransitive G Ω] in
-/-- **A group of order `p(p-1)` has a normal subgroup of order `p`** — action-free
-core: Cauchy provides `σ` of order `p`, and the Sylow count (`≡ 1 (mod p)`,
-dividing `p - 1`) forces `⟨σ⟩` to be the unique, hence normal, Sylow
-`p`-subgroup.  (In step (12) of the first case of the theorem of Suzuki this is
-Appendix II, Prop. 1's regular normal subgroup `R₁/R` of `N_G(R)/R`.) -/
-theorem exists_orderOf_eq_prime_zpowers_normal (hp : p.Prime)
-    (hG : Nat.card G = p * (p - 1)) :
-    ∃ σ : G, orderOf σ = p ∧ (Subgroup.zpowers σ).Normal := by
+/-- **In a group of order `p(p-1)`, the cyclic subgroup on any element of order `p`
+is normal** — action-free: the Sylow count (`≡ 1 (mod p)`, dividing `p - 1`) is `1`,
+and `⟨σ⟩` has full Sylow `p`-order. -/
+theorem zpowers_normal_of_orderOf_eq (hp : p.Prime)
+    (hG : Nat.card G = p * (p - 1)) {σ : G} (hσ : orderOf σ = p) :
+    (Subgroup.zpowers σ).Normal := by
   haveI : Fact p.Prime := ⟨hp⟩
-  -- Cauchy: an element of order `p`.
-  haveI := Fintype.ofFinite G
-  obtain ⟨σ, hσ⟩ := exists_prime_orderOf_dvd_card (G := G) p
-    (by rw [← Nat.card_eq_fintype_card, hG]; exact ⟨p - 1, rfl⟩)
   set N : Subgroup G := Subgroup.zpowers σ with hNdef
   have hcardN : Nat.card N = p := by rw [hNdef, Nat.card_zpowers, hσ]
-  -- `N` is the unique (hence normal) Sylow `p`-subgroup.
   have hfact : (Nat.card G).factorization p = 1 := by
     rw [hG]
     have h1 : p - 1 ≠ 0 := by have := hp.one_lt; omega
     rw [Nat.factorization_mul hp.pos.ne' h1, Finsupp.add_apply,
       hp.factorization_self, Nat.factorization_eq_zero_of_not_dvd
         (fun hdvd => by have := Nat.le_of_dvd (by omega) hdvd; omega)]
-  have hnorm : N.Normal := by
-    set S : Sylow p G := Sylow.ofCard N (by rw [hcardN, hfact, pow_one])
-    have hidx : (S : Subgroup G).index = p - 1 := by
-      have h1 := (S : Subgroup G).card_mul_index
-      have h2 : Nat.card (S : Subgroup G) = p := hcardN
-      rw [h2, hG] at h1
-      exact Nat.eq_of_mul_eq_mul_left hp.pos h1
-    have hdvd : Nat.card (Sylow p G) ∣ p - 1 := hidx ▸ S.card_dvd_index
-    have hone : Nat.card (Sylow p G) = 1 := by
-      have h1 := card_sylow_modEq_one p G
-      have h2 : Nat.card (Sylow p G) ≤ p - 1 :=
-        Nat.le_of_dvd (by have := hp.one_lt; omega) hdvd
-      have h3 : Nat.card (Sylow p G) % p = 1 % p := h1
-      have h4 : 1 % p = 1 := Nat.one_mod_eq_one.mpr hp.one_lt.ne'
-      have h5 : Nat.card (Sylow p G) % p = Nat.card (Sylow p G) :=
-        Nat.mod_eq_of_lt (by have := hp.one_lt; omega)
-      omega
-    haveI : Subsingleton (Sylow p G) :=
-      (Nat.card_eq_one_iff_unique.mp hone).1
-    exact Sylow.normal_of_subsingleton S
-  exact ⟨σ, hσ, hnorm⟩
+  set S : Sylow p G := Sylow.ofCard N (by rw [hcardN, hfact, pow_one])
+  have hidx : (S : Subgroup G).index = p - 1 := by
+    have h1 := (S : Subgroup G).card_mul_index
+    have h2 : Nat.card (S : Subgroup G) = p := hcardN
+    rw [h2, hG] at h1
+    exact Nat.eq_of_mul_eq_mul_left hp.pos h1
+  have hdvd : Nat.card (Sylow p G) ∣ p - 1 := hidx ▸ S.card_dvd_index
+  have hone : Nat.card (Sylow p G) = 1 := by
+    have h1 := card_sylow_modEq_one p G
+    have h2 : Nat.card (Sylow p G) ≤ p - 1 :=
+      Nat.le_of_dvd (by have := hp.one_lt; omega) hdvd
+    have h3 : Nat.card (Sylow p G) % p = 1 % p := h1
+    have h4 : 1 % p = 1 := Nat.one_mod_eq_one.mpr hp.one_lt.ne'
+    have h5 : Nat.card (Sylow p G) % p = Nat.card (Sylow p G) :=
+      Nat.mod_eq_of_lt (by have := hp.one_lt; omega)
+    omega
+  haveI : Subsingleton (Sylow p G) :=
+    (Nat.card_eq_one_iff_unique.mp hone).1
+  exact Sylow.normal_of_subsingleton S
+
+omit [MulAction G Ω] [Finite Ω] [FaithfulSMul G Ω] [IsPretransitive G Ω] in
+/-- **A group of order `p(p-1)` has a normal subgroup of order `p`** — action-free
+core: Cauchy provides `σ` of order `p`, and `⟨σ⟩` is the unique Sylow
+`p`-subgroup.  (In step (12) of the first case of the theorem of Suzuki this is
+Appendix II, Prop. 1's regular normal subgroup `R₁/R` of `N_G(R)/R`.) -/
+theorem exists_orderOf_eq_prime_zpowers_normal (hp : p.Prime)
+    (hG : Nat.card G = p * (p - 1)) :
+    ∃ σ : G, orderOf σ = p ∧ (Subgroup.zpowers σ).Normal := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI := Fintype.ofFinite G
+  obtain ⟨σ, hσ⟩ := exists_prime_orderOf_dvd_card (G := G) p
+    (by rw [← Nat.card_eq_fintype_card, hG]; exact ⟨p - 1, rfl⟩)
+  exact ⟨σ, hσ, zpowers_normal_of_orderOf_eq hp hG hσ⟩
 
 omit [Finite G] [IsPretransitive G Ω] in
 /-- Regularity of a normal `⟨σ⟩` of order `p` on `p` points, from any base point:
