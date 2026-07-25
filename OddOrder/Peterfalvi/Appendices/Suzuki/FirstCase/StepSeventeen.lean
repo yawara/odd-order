@@ -1267,6 +1267,96 @@ theorem card_commutator_sylowThree_le
       omega
   exact le_trans (Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hbound)) hMcard
 
+include model in
+/-- **`⁅R₁, R₁⁆ ≤ Z₁ΣP`**: `Z₁ΣP` is normal in `R₁` by (16), and the quotient has
+order `3⁵/27 = 9 = 3²`, hence is abelian. -/
+theorem commutator_sylowThree_le_zpowers_sup_sigma_sup_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    ⁅fc.sylowThreeNormalizerRSigma model, fc.sylowThreeNormalizerRSigma model⁆
+      ≤ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  have hZ₁R : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ≤ fc.invImageF model :=
+    (fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2 hm).trans
+      (fc.sInvertedT_spec model ind hB2 hm).1
+  have hZSP_R₁ : ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P)
+      ≤ fc.sylowThreeNormalizerRSigma model :=
+    (sup_le (sup_le (hZ₁R.trans le_sup_left) le_sup_right)
+      ((fc.P_le_invImageF model).trans le_sup_left)).trans
+      (fc.sup_le_sylowThreeNormalizerRSigma model ind hB2)
+  have hcommZ := fc.commutator_zpowers_sup_sigma_sup_P_sylowThree_le model ind hB2
+  -- `Z₁ΣP` is normal in `R₁`
+  haveI hnorm : (((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P).subgroupOf
+        (fc.sylowThreeNormalizerRSigma model)).Normal := by
+    constructor
+    intro n hn g
+    rw [Subgroup.mem_subgroupOf] at hn ⊢
+    have hc : ⁅(n : G), (g : G)⁆ ∈ Subgroup.zpowers
+        (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) :=
+      hcommZ (Subgroup.commutator_mem_commutator hn g.2)
+    have h1 : ((g : G) * (n : G) * (g : G)⁻¹) = ⁅(n : G), (g : G)⁆⁻¹ * (n : G) := by
+      rw [commutatorElement_def]; group
+    change ((g : G) * (n : G) * (g : G)⁻¹) ∈ _
+    rw [h1]
+    exact Subgroup.mul_mem _
+      (Subgroup.inv_mem _ (Subgroup.mem_sup_left (Subgroup.mem_sup_left hc))) hn
+  -- the quotient has order `9`
+  have hZSPcard := fc.card_zpowers_sup_sigma_sup_P model ind hB2
+  have hR₁card := fc.card_sylowThreeNormalizerRSigma model ind hB2
+  have hcardQ : Nat.card (↥(fc.sylowThreeNormalizerRSigma model)
+      ⧸ ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P).subgroupOf
+          (fc.sylowThreeNormalizerRSigma model)) = 3 ^ 2 := by
+    rw [← Subgroup.index_eq_card]
+    have h := (((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P).subgroupOf
+        (fc.sylowThreeNormalizerRSigma model)).card_mul_index
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZSP_R₁).toEquiv, hZSPcard,
+      hR₁card] at h
+    omega
+  haveI : IsMulCommutative (↥(fc.sylowThreeNormalizerRSigma model)
+      ⧸ ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t)
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P).subgroupOf
+          (fc.sylowThreeNormalizerRSigma model)) :=
+    IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := 3) hcardQ
+  -- commutators die in the quotient
+  refine Subgroup.commutator_le.mpr fun a ha b hb => ?_
+  have hq := ‹IsMulCommutative _›.is_comm.comm
+    (QuotientGroup.mk (⟨a, ha⟩ : ↥(fc.sylowThreeNormalizerRSigma model)))
+    (QuotientGroup.mk (⟨b, hb⟩ : ↥(fc.sylowThreeNormalizerRSigma model)))
+  set N₀ : Subgroup ↥(fc.sylowThreeNormalizerRSigma model) :=
+    ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t)
+      ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P).subgroupOf
+        (fc.sylowThreeNormalizerRSigma model) with hN₀_def
+  have hone : ⁅(⟨a, ha⟩ : ↥(fc.sylowThreeNormalizerRSigma model)),
+      (⟨b, hb⟩ : ↥(fc.sylowThreeNormalizerRSigma model))⁆ ∈ N₀ := by
+    have h1 : (QuotientGroup.mk' N₀)
+        ⁅(⟨a, ha⟩ : ↥(fc.sylowThreeNormalizerRSigma model)),
+          (⟨b, hb⟩ : ↥(fc.sylowThreeNormalizerRSigma model))⁆ = 1 := by
+      rw [map_commutatorElement]
+      exact commutatorElement_eq_one_iff_commute.mpr hq
+    rwa [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h1
+  rw [hN₀_def, Subgroup.mem_subgroupOf] at hone
+  have hcoe : ((⁅(⟨a, ha⟩ : ↥(fc.sylowThreeNormalizerRSigma model)),
+      (⟨b, hb⟩ : ↥(fc.sylowThreeNormalizerRSigma model))⁆ : _) : G) = ⁅a, b⁆ :=
+    map_commutatorElement (fc.sylowThreeNormalizerRSigma model).subtype _ _
+  rwa [hcoe] at hone
+
 /-! ## The endpoint of (17) -/
 
 include model in
