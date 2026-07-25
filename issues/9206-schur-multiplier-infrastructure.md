@@ -50,9 +50,38 @@ Isaacs の定義は「中心拡大 `Γ` で `Z ≤ Γ' ⊓ Z(Γ)` となる `Z` 
 ⚠ 1 は Isaacs の流儀に最も近く 5A.5-5A.8 の証明もそのまま写せるが、存在証明が重い。
 2/3 は定義が軽い代わりに Isaacs の議論との橋渡しが要る。**着手時に 3 案を実測比較すること**。
 
+## 3 案の実測 (2026-07-26)
+
+| 案 | mathlib の現状 | 評価 |
+|---|---|---|
+| 1. Schur 表現群 (中心拡大の universal) | 中心拡大そのものは `GroupExtension` があり repo にも `GroupTheory/CentralElementaryExtension.lean` 等の資産あり。**universal / 表現群の存在は無い** | Isaacs の議論に最も近いが**存在証明が重い** |
+| 2. `H₂(G, ℤ)` | `Mathlib/RepresentationTheory/Homological/GroupHomology/LowDegree.lean` に **`abbrev H2 := groupHomology A 2`** が実在 (`GroupCohomology` 側にも `H2`)。ただし **`H₂` と中心拡大を結ぶ補題は mathlib に無い** (`grep central extension` は 0 件) | 定義は軽いが Isaacs の議論との橋渡しを自作することになる |
+| 3. Hopf の公式 | `FreeGroup` / `PresentedGroup` はあるが Hopf 公式は無い | 同上 + 表示の扱いが重い |
+
+## ⭐ 採用方針 (2026-07-26 に決定): **まず `M(G)` を定義せずに書けるところまで書く**
+
+5A.5-5A.8 の内容を見ると, **上界の主張はすべて「任意の中心拡大について」の ∀-形で述べられる**:
+
+- **5A.5** `|M(G)| ∣ |C : G'|` ⟹ 「`Γ` が `G` の中心拡大で `Z ≤ Γ' ⊓ Z(Γ)` なら `|Z| ∣ |C : G'|`」
+- **5A.7** `|M(G)| < n` ⟹ 同様の ∀-形
+- **5A.6 / 5A.8** の上界側も ∀-形
+
+これらは **`M(G)` の定義 (universal object の存在) をまったく必要としない**。repo の
+Isaacs Thm 5.4 弱形 (`not_isMulCommutative_sylow_of_le_commutator_inf_center`) が
+すでに同じ流儀を採っている。
+
+`M(G)` の定義が本当に要るのは **∃-側** (5A.6 の `|M(D)| = 2` の下界, 5A.8(a) の
+`≥ |M(A)||M(B)|`) だけで, そこは**具体的な中心拡大を構成**すれば足りる (universal 性は不要)。
+
+⟹ **手順**: (i) 「中心拡大 + `Z ≤ Γ' ⊓ Z(Γ)`」を述語として切り出す →
+(ii) 5A.5 / 5A.7 と 5A.6 / 5A.8 の上界を ∀-形で証明 →
+(iii) ∃-側は具体構成 → (iv) それでも universal object が要ると判明した場合にのみ案 1/2 に進む。
+
 ## 状態
 
-- [ ] 3 案の実測比較 (mathlib の群コホモロジー / 自由群表示の成熟度)
-- [ ] `M(G)` の定義と基本性質
-- [ ] 5A.5 / 5A.6 / 5A.7 / 5A.8
-- [ ] Isaacs Thm 5.4 の full 形
+- [x] 3 案の実測比較 (2026-07-26)
+- [x] 採用方針の決定 (∀-形で `M(G)` 定義を回避)
+- [ ] 中心拡大述語の切り出し
+- [ ] 5A.5 / 5A.7 (∀-形の上界)
+- [ ] 5A.6 / 5A.8
+- [ ] Isaacs Thm 5.4 の full 形 (要 universal object かを再判定)
