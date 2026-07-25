@@ -203,6 +203,62 @@ theorem index_range_eq_card_ker {A : Type*} [Group A] [Finite A] (φ : A →* A)
     rw [h1, ← h2]; ring
   exact Nat.eq_of_mul_eq_mul_left hpos h3
 
+/-- If `F` is normalized by `X` and contains all commutators of a generating set of `X`,
+then `⁅X, X⁆ ≤ F`. -/
+theorem commutator_le_of_generators {X F : Subgroup G'} {T : Set G'}
+    (hgen : Subgroup.closure T = X)
+    (hFconj : ∀ x ∈ X, ∀ f ∈ F, x * f * x⁻¹ ∈ F)
+    (hbase : ∀ a ∈ T, ∀ b ∈ T, ⁅a, b⁆ ∈ F) :
+    ⁅X, X⁆ ≤ F := by
+  classical
+  have hright : ∀ a : G', (∀ b ∈ T, ⁅a, b⁆ ∈ F) → ∀ b ∈ X, ⁅a, b⁆ ∈ F := by
+    intro a hb b hbX
+    rw [← hgen] at hbX
+    induction hbX using Subgroup.closure_induction with
+    | mem y hy => exact hb y hy
+    | one =>
+        rw [show ⁅a, (1 : G')⁆ = 1 by rw [commutatorElement_def]; group]
+        exact F.one_mem
+    | mul x y hx _ ihx ihy =>
+        have hxX : x ∈ X := by rw [← hgen]; exact hx
+        have heq : ⁅a, x * y⁆ = ⁅a, x⁆ * (x * ⁅a, y⁆ * x⁻¹) := by
+          rw [commutatorElement_def, commutatorElement_def, commutatorElement_def]
+          group
+        rw [heq]
+        exact F.mul_mem ihx (hFconj x hxX _ ihy)
+    | inv x hx ihx =>
+        have hxX : x ∈ X := by rw [← hgen]; exact hx
+        have heq : ⁅a, x⁻¹⁆ = x⁻¹ * ⁅a, x⁆⁻¹ * (x⁻¹)⁻¹ := by
+          rw [commutatorElement_def, commutatorElement_def]; group
+        rw [heq]
+        exact hFconj x⁻¹ (X.inv_mem hxX) _ (F.inv_mem ihx)
+  refine Subgroup.commutator_le.mpr fun a ha b hb => ?_
+  have hall : ∀ a ∈ X, ∀ b ∈ X, ⁅a, b⁆ ∈ F := by
+    intro a haX
+    rw [← hgen] at haX
+    induction haX using Subgroup.closure_induction with
+    | mem y hy => exact hright y (fun b hbT => hbase y hy b hbT)
+    | one =>
+        intro b _
+        rw [show ⁅(1 : G'), b⁆ = 1 by rw [commutatorElement_def]; group]
+        exact F.one_mem
+    | mul x y hx _ ihx ihy =>
+        intro b hbX
+        have hxX : x ∈ X := by rw [← hgen]; exact hx
+        have heq : ⁅x * y, b⁆ = (x * ⁅y, b⁆ * x⁻¹) * ⁅x, b⁆ := by
+          rw [commutatorElement_def, commutatorElement_def, commutatorElement_def]
+          group
+        rw [heq]
+        exact F.mul_mem (hFconj x hxX _ (ihy b hbX)) (ihx b hbX)
+    | inv x hx ihx =>
+        intro b hbX
+        have hxX : x ∈ X := by rw [← hgen]; exact hx
+        have heq : ⁅x⁻¹, b⁆ = x⁻¹ * ⁅x, b⁆⁻¹ * (x⁻¹)⁻¹ := by
+          rw [commutatorElement_def, commutatorElement_def]; group
+        rw [heq]
+        exact hFconj x⁻¹ (X.inv_mem hxX) _ (F.inv_mem (ihx b hbX))
+  exact hall a ha b hb
+
 end GenericStronglyReal
 
 namespace FirstCaseHypothesis
