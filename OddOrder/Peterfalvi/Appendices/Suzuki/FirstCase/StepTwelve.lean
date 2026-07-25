@@ -1346,6 +1346,74 @@ theorem sInvertedT_mul_comm_of_mem
   calc x * t = (x * t * x⁻¹) * x := by group
     _ = t * x := by rw [h6]
 
+include model in
+/-- **Elements of `R₁` inverted by `s` commute** ((12) tail, δ4-ii): their commutator
+`c ∈ ⁅R₁,R₁⁆ = T` is central in `R₁`, so `⁅x⁻¹,y⁻¹⁆ = c`; but `s` conjugates it to
+both `c` (inverting each argument) and `c⁻¹` (`c ∈ T`), so `c² = 1` and `c = 1` by
+odd order. -/
+theorem mul_comm_of_conj_eq_inv
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) {x y : G} (hx : x ∈ R₁) (hy : y ∈ R₁)
+    (hxi : fc.toHypothesis.distinguishedInvolution * x
+      * fc.toHypothesis.distinguishedInvolution⁻¹ = x⁻¹)
+    (hyi : fc.toHypothesis.distinguishedInvolution * y
+      * fc.toHypothesis.distinguishedInvolution⁻¹ = y⁻¹) :
+    x * y = y * x := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  obtain ⟨hTle, hTinv, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hcT : ⁅x, y⁆ ∈ fc.sInvertedT model := by
+    rw [← fc.commutator_eq_sInvertedT model ind hB2 hm hGp hSigma hRle hR₁le hcard]
+    exact Subgroup.commutator_mem_commutator hx hy
+  have hcen := fc.sInvertedT_mul_comm_of_mem model ind hB2 hm hGp hSigma hR₁le hcard
+  have hcx : ⁅x, y⁆ * x = x * ⁅x, y⁆ := (hcen ⁅x, y⁆ hcT x hx).symm
+  have hcy : ⁅x, y⁆ * y = y * ⁅x, y⁆ := (hcen ⁅x, y⁆ hcT y hy).symm
+  have h1 : x * y = ⁅x, y⁆ * (y * x) := by
+    rw [commutatorElement_def]
+    group
+  have hcyx : ⁅x, y⁆ * (y * x) = (y * x) * ⁅x, y⁆ := by
+    rw [← mul_assoc, hcy, mul_assoc, hcx, ← mul_assoc]
+  have h2 : ⁅x⁻¹, y⁻¹⁆ = ⁅x, y⁆ := by
+    rw [commutatorElement_def, inv_inv, inv_inv]
+    calc x⁻¹ * y⁻¹ * x * y = (y * x)⁻¹ * (x * y) := by group
+      _ = (y * x)⁻¹ * (⁅x, y⁆ * (y * x)) := by rw [← h1]
+      _ = (y * x)⁻¹ * ((y * x) * ⁅x, y⁆) := by rw [hcyx]
+      _ = ⁅x, y⁆ := by group
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  have h4 : s * ⁅x, y⁆ * s⁻¹ = ⁅x⁻¹, y⁻¹⁆ := by
+    have h5 := map_commutatorElement (MulAut.conj s) x y
+    have h6 : (MulAut.conj s) ⁅x, y⁆ = s * ⁅x, y⁆ * s⁻¹ := rfl
+    have h7 : (MulAut.conj s) x = s * x * s⁻¹ := rfl
+    have h8 : (MulAut.conj s) y = s * y * s⁻¹ := rfl
+    rw [h6, h7, h8, hxi, hyi] at h5
+    exact h5
+  have h9 : s * ⁅x, y⁆ * s⁻¹ = ⁅x, y⁆⁻¹ := hTinv _ hcT
+  rw [h4, h2] at h9
+  have h10 : ⁅x, y⁆ ^ 2 = 1 := by
+    rw [pow_two]
+    nth_rewrite 1 [h9]
+    group
+  have h11 : ⁅x, y⁆ = 1 := by
+    have h12 : orderOf ⁅x, y⁆ ∣ 2 := orderOf_dvd_of_pow_eq_one h10
+    have h13 : ⁅x, y⁆ ^ fc.p = 1 :=
+      fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm (hTle hcT)
+    have h14 : orderOf ⁅x, y⁆ ∣ fc.p := orderOf_dvd_of_pow_eq_one h13
+    obtain ⟨j, hj⟩ := fc.p_odd
+    have h15 := Nat.dvd_gcd h12 h14
+    have h16 : Nat.gcd 2 fc.p = 1 :=
+      (Nat.coprime_primes Nat.prime_two fc.p_prime).mpr (by omega)
+    rw [h16, Nat.dvd_one] at h15
+    exact orderOf_eq_one_iff.mp h15
+  exact commutatorElement_eq_one_iff_mul_comm.mp h11
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
