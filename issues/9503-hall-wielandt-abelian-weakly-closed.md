@@ -373,6 +373,27 @@ Gorenstein Ch.7 に完全な証明系列がある (本 repo の方針で Gorenst
    (`WeaklyClosed.lean`) と focal subgroup 定理があるので、Grün I が入れば
    `P ∩ G' = P ∩ N'` まで到達できる。
 
-⟹ 次セッションからは Gorenstein §7.2 (Alperin) の精読と Lean 化に着手する。
-規模は大きいが、Alperin の融合定理・Grün の両定理はいずれも 3 冊スコープの
-下流でも再利用できる本物の基盤 (CLAUDE.md「コスト・規模は着手判断基準でない」)。
+⚠ **2026-07-26 追記: この段取りは Gorenstein 自身の注記で否定される**。
+Gorenstein p. 257 は Hall–Wielandt について
+> "There exist other deeper results, notably the Hall-Wielandt theorem, which give
+> conditions on weakly closed subgroups `W` of `P` **other than `Z(P)`** ... (See M. Hall
+> [1], pp. 206-212.) **This theorem does not seem to be a direct consequence of
+> Alperin's theorem**; and, as we do not require it, we shall not prove it here."
+
+と明言している。すなわち:
+
+- Gorenstein Thm 7.5.2 (Grün 第二定理) = **`Z(P)` 版のみ** (p-normal 前提)。
+  Alperin → Grün I → これ、の系列は `Z(P)` 版までしか届かない。
+- Peterfalvi が引く **`A` 可換版 (Hall Thm 14.4.2)** は Alperin の直接の系ではない。
+
+⟹ Alperin を建てても `Z₁` の弱閉性 (3-normality) が無ければ (17) は閉じない。
+そして `Z₁` の弱閉性は landed の材料からは出ない (上記解析)。
+
+### ⟹ 現状の選択肢 (2026-07-26 時点)
+
+1. **M. Hall, *The Theory of Groups* (1959) pp. 206-212 (Thm 14.4.2) の入手**。
+   これが Peterfalvi の引用元そのもので、`p > 2 ∧ A` 可換版の証明が載っている。
+   references/ に無いのでユーザーへ入手可否を報告する (issue 0147 の Navarro と同型)。
+2. **ChatGPT (最強モデル) に古典証明を再構成させる** ([[feedback-ask-chatgpt-for-elided-gaps]])
+   — 自己完結プロンプト + 回答の厳密検証が前提。
+3. First Case 側でさらに `⁅R, L⁆` を決める材料を探す (現状 (11)(14)(15) には無い)。
