@@ -822,6 +822,7 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 | 4A.2 | ✅ | `exists_closure_commutatorTriple_eq_zpowers` (前半) / `exists_card_two_subgroups_commutator_triple_eq_top` (後半 = A₅ 実例 + Note) |
 | 4A.3 | ✅ | `IsQuasiquaternion` (定義) / `eq_bot_of_isQuasiquaternion_quotient` |
 | 4A.5 | ✅ | (a) `index_centralizer_eq_of_not_mem_center` / (b) `card_closure_pair_eq` / (c) `index_centralizer_closure_pair_eq` / (d) `map_center_centralizer_eq_center` + `isExtraspecial_centralizer_closure_pair` / (e) `exists_index_center_eq_prime_pow_two_mul` (新 leaf `ProblemsExtraspecial.lean`) |
+| 4A.6 | ✅ | `IsMaximalClassPGroup` (定義) / `exists_eq_lowerCentralSeries_of_isMaximalClass` (+ 一意性 `eq_of_normal_of_card_eq_of_isMaximalClass`、新 leaf `ProblemsMaximalClass.lean`) |
 | 4A.4 | ✅ | `isElementaryAbelian_quotient_center_of_commutator_eq_center` (+ 同値形 `frattini_eq_center_of_commutator_eq_center` + 橋 `isExtraspecial_of_commutator_eq_center`) |
 
 - **4A.1** (`G = AB`, `A`,`B` abelian ⟹ `G' = ⁅A,B⁆`): `⁅A,B⁆` の正規性は既存の
@@ -878,7 +879,21 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
   (e) は `|Q|` の強帰納法 (書籍 Hint)、基底は `Q = U` (`|Q| = p³`)、段は `V` extraspecial +
   `[Q:V] = p²` + `Z(V) = Z(Q)`。
 
-### 残り (文書順): 4A.6 (maximal class) / 4A.7-4A.8 (regular wreath product; §3A で作った
+- **4A.6** (maximal class、新 leaf `Ch04_Commutators/ProblemsMaximalClass.lean`):
+  ⚠ **mathlib の下降中心列は古典的 `γ_k` から 1 ずれる** (`lowerCentralSeries ⊤ 0 = P`) —
+  古典 `γ_k` = `lowerCentralSeries ⊤ (k-1)`。汎用部品を 4 つ整備:
+  (i) `p`-群で真の部分群は位数が `p` 倍以上違う (`prime_mul_card_dvd_card_of_lt`)、
+  (ii) 下降中心列は類の下で真減少 (`lowerCentralSeries_lt_of_lt_nilpotencyClass`)、
+  (iii) 下方 `p^j ∣ |L_{c-j}|` / 上方 `p^i·|L_i| ∣ |P|`、
+  (iv) **非可換 `p`-群では `p² ∣ |P:P'|`** (`P/P'` 巡回 ⟹ `P/Φ(P)` 巡回 ⟹ Ch01 の
+  `isCyclic_of_frattiniQuotient_isCyclic` で `P` 巡回 ⟹ 可換)。
+  (iii)+(iv) から **`|G| = p^k` (`k ≥ 2`) の `p`-群の類 ≤ `k-1`**
+  (`nilpotencyClass_le_of_card_eq_prime_pow`; BG S04 の同型 lemma とは独立に Isaacs 層で証明 —
+  BG を import すると層が逆流するため) と maximal class での `|L_i| = p^{n-1-i}` が出る。
+  本題は `|P⧸N| = p^k` の類 ≤ `k-1` ⟹ `L_{k-1}(P) ≤ N`、位数一致で `N = L_{k-1}(P)`。
+  ⚠ 書籍の `|N : P| ≥ p²` は誤植で `|P : N| ≥ p²` (指数が `p` 冪なので `p² ∣ |P:N|` と同値)。
+
+### 残り (文書順): 4A.7-4A.8 (regular wreath product; §3A で作った
 `WreathProduct` インフラが使える) / 4A.9 / 4A.10 / 4A.11。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
