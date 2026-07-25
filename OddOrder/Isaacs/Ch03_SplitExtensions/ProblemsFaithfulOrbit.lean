@@ -197,6 +197,45 @@ theorem inr_range_inf_conjInrRange_eq (g : G) :
     exact ⟨⟨u, rfl⟩, (inr_mem_conjInrRange_iff (φ := φ) g u).mpr hu⟩
 
 
+/-! ### ⭐ 軌道核は共役 Sylow でも正規 (欠けていた一手) -/
+
+/-- 正規化群の片側判定 (Ch04 の `le_normalizer_of_forall_conj_mem` と同内容; Ch03 は
+Ch04 を import できないので局所版)。 -/
+private theorem le_normalizer_of_forall_conj_mem' {Γ : Type*} [Group Γ] {S T : Subgroup Γ}
+    (h : ∀ x ∈ S, ∀ z ∈ T, x * z * x⁻¹ ∈ T) : S ≤ Subgroup.normalizer (T : Set Γ) := by
+  intro x hx
+  rw [Subgroup.mem_normalizer_iff]
+  refine fun z => ⟨fun hz => h x hx z hz, fun hz => ?_⟩
+  have hz' := h x⁻¹ (S.inv_mem hx) _ hz
+  have hcancel : x⁻¹ * (x * z * x⁻¹) * x⁻¹⁻¹ = z := by group
+  rwa [hcancel] at hz'
+
+omit [Finite G] [Finite P] in
+/-- **⭐ 軌道核 `inr(N)` は共役 Sylow `inr(P)^{inl g}` でも正規** — Isaacs 3A.6 で長く
+欠けていた一手 (issue 1055)。
+
+`t = inl g · inr v · (inl g)⁻¹ = inl w · inr v` (`w := g · ((φ v) g)⁻¹`) と書くと
+`t · inr m₀ · t⁻¹ = inl (w · ((φ m) w)⁻¹) · inr m` (`m := v m₀ v⁻¹`)。ここで `m` は軌道
+`Δ_g` を各点固定するので `g` と `(φ v) g` を固定し, **自己同型ゆえその差 `w` も固定**する。
+したがって `t · inr m₀ · t⁻¹ = inr m ∈ inr(N)`。 -/
+theorem conjInrRange_le_normalizer_orbitKernel_map (g : G) :
+    conjInrRange (φ := φ) g ≤ Subgroup.normalizer
+      ((((orbitKernel φ g).map (SemidirectProduct.inr : P →* G ⋊[φ] P)) :
+        Subgroup (G ⋊[φ] P)) : Set (G ⋊[φ] P)) := by
+  refine le_normalizer_of_forall_conj_mem' ?_
+  rintro _ ⟨_, ⟨v, rfl⟩, rfl⟩ _ ⟨m₀, hm₀, rfl⟩
+  have hmK : v * m₀ * v⁻¹ ∈ orbitKernel φ g := (orbitKernel_normal φ g).conj_mem m₀ hm₀ v
+  have hm₀' : ∀ u : P, (φ m₀) ((φ u) g) = (φ u) g := hm₀
+  have h0 : (φ m₀) g = g := by simpa using hm₀' 1
+  have h3 : (φ m₀) ((MulEquiv.symm (φ v)) g) = (MulEquiv.symm (φ v)) g := by
+    have h := hm₀' v⁻¹
+    rwa [map_inv] at h
+  refine ⟨v * m₀ * v⁻¹, hmK, ?_⟩
+  ext
+  · simp [MulAut.conj_apply, h0, h3, mul_assoc]
+  · simp
+
+
 /-! ### `O_p(Γ) = 1` -/
 
 omit [Finite G] [Finite P] in
