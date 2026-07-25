@@ -187,6 +187,7 @@ import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch02_Subnormality.Problems
 import OddOrder.Isaacs.Ch02_Subnormality.ProblemsInvolutions
 import OddOrder.Isaacs.Ch02_Subnormality.ProblemsNGroups
+import OddOrder.Isaacs.Ch02_Subnormality.Problems2D
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiResidual
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems
