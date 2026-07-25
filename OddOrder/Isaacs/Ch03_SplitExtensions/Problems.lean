@@ -1161,6 +1161,70 @@ theorem exists_klein_four_pqr {p q r : ℕ} (hp : p.Prime) (hq : q.Prime) (hr : 
       _ = (up * up) * uq := by ring
       _ = uq := by rw [hup.2.1, one_mul]
 
+/-! ### Problem 3A.8(c) — `C ⋊ K` で `⟨α⟩` は regular orbit をもたない
+
+`K ≤ (ZMod n)ˣ` が乗法で `C = Multiplicative (ZMod n)` に作用する半直積 `G = C ⋊ K` で、
+`C` の生成元 `c = inl (ofAdd 1)` が誘導する内部自己同型 `α = conj c` は
+
+    α^j ⟨x, k⟩ = ⟨x + j·(1 - k), k⟩
+
+と作用する。したがって `α^j` が `⟨x,k⟩` を固定 ⟺ `j·(1-k) = 0`。 -/
+
+/-- `(ZMod n)ˣ` の `Multiplicative (ZMod n)` への乗法作用 (加法群の自己同型として)。 -/
+noncomputable def zmodUnitsAction (n : ℕ) : (ZMod n)ˣ →* MulAut (Multiplicative (ZMod n)) :=
+  (MulAutMultiplicative (ZMod n)).symm.toMonoidHom.comp AddAut.mulLeft
+
+@[simp] theorem zmodUnitsAction_apply {n : ℕ} (u : (ZMod n)ˣ) (x : Multiplicative (ZMod n)) :
+    zmodUnitsAction n u x = Multiplicative.ofAdd ((↑u : ZMod n) * Multiplicative.toAdd x) := rfl
+
+/-- `G = Multiplicative (ZMod n) ⋊ K` (`K ≤ (ZMod n)ˣ` が乗法で作用)。 -/
+abbrev zmodSemidirect (n : ℕ) (K : Subgroup (ZMod n)ˣ) :=
+  SemidirectProduct (Multiplicative (ZMod n)) K ((zmodUnitsAction n).comp K.subtype)
+
+/-- `inl (ofAdd t)` による共役の作用: `⟨x, k⟩ ↦ ⟨x + t·(1 - k), k⟩`。 -/
+theorem conj_inl_apply {n : ℕ} {K : Subgroup (ZMod n)ˣ} (t : ZMod n)
+    (g : zmodSemidirect n K) :
+    (MulAut.conj (SemidirectProduct.inl (Multiplicative.ofAdd t) : zmodSemidirect n K)) g
+      = ⟨Multiplicative.ofAdd (Multiplicative.toAdd g.left
+          + t * (1 - (↑(g.right : (ZMod n)ˣ) : ZMod n))), g.right⟩ := by
+  refine SemidirectProduct.ext ?_ ?_
+  · apply Multiplicative.toAdd.injective
+    simp only [MulAut.conj_apply, SemidirectProduct.mul_left, SemidirectProduct.mul_right,
+      SemidirectProduct.left_inl, SemidirectProduct.right_inl, SemidirectProduct.inv_left,
+      map_one, MulAut.one_apply, one_mul, inv_one,
+      zmodUnitsAction_apply, MonoidHom.comp_apply, Subgroup.coe_subtype,
+      toAdd_mul, toAdd_ofAdd, toAdd_inv]
+    ring
+  · simp [MulAut.conj_apply, SemidirectProduct.mul_right, SemidirectProduct.inv_right]
+
+/-- `c := inl (ofAdd 1)` の `j` 乗は `inl (ofAdd j)`。 -/
+theorem inl_ofAdd_one_pow {n : ℕ} {K : Subgroup (ZMod n)ˣ} (j : ℕ) :
+    (SemidirectProduct.inl (Multiplicative.ofAdd (1 : ZMod n)) : zmodSemidirect n K) ^ j
+      = SemidirectProduct.inl (Multiplicative.ofAdd (j : ZMod n)) := by
+  rw [← map_pow]
+  congr 1
+  apply Multiplicative.toAdd.injective
+  rw [toAdd_pow, toAdd_ofAdd, toAdd_ofAdd, nsmul_eq_mul, mul_one]
+
+/-- **3A.8(c) の鍵**: `α = conj (inl (ofAdd 1))` の `j` 乗が `⟨x, k⟩` を固定するのは
+`j·(1-k) = 0` のとき、かつそのときに限る。 -/
+theorem conj_pow_fixes_iff {n : ℕ} {K : Subgroup (ZMod n)ˣ} (j : ℕ)
+    (g : zmodSemidirect n K) :
+    ((MulAut.conj (SemidirectProduct.inl (Multiplicative.ofAdd (1 : ZMod n))
+      : zmodSemidirect n K)) ^ j) g = g ↔
+      (j : ZMod n) * (1 - (↑(g.right : (ZMod n)ˣ) : ZMod n)) = 0 := by
+  rw [← map_pow, inl_ofAdd_one_pow, conj_inl_apply]
+  constructor
+  · intro h
+    have hl := congrArg (Multiplicative.toAdd ∘ SemidirectProduct.left) h
+    simp only [Function.comp_apply, toAdd_ofAdd] at hl
+    linear_combination hl
+  · intro h
+    refine SemidirectProduct.ext ?_ rfl
+    apply Multiplicative.toAdd.injective
+    simp only [toAdd_ofAdd]
+    linear_combination h
+
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,
 a.right·b.right)` を写すと `(a.left·a.right·b.left·b.right, a.right·b.right)` = 直積の積の像。 -/
