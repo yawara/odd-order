@@ -95,13 +95,15 @@ private theorem not_smul_eq_of_orderOf_eq_prime (hp : p.Prime) {σ : G}
   rw [hσ1, orderOf_one] at hσ
   exact hp.one_lt.ne' hσ.symm
 
-/-- The engine behind this file: a generator `σ` of the unique (normal) Sylow
-`p`-subgroup, which acts freely, and regularly from every base point. -/
-private theorem exists_normal_regular (hp : p.Prime) (hΩ : Nat.card Ω = p)
+omit [MulAction G Ω] [Finite Ω] [FaithfulSMul G Ω] [IsPretransitive G Ω] in
+/-- **A group of order `p(p-1)` has a normal subgroup of order `p`** — action-free
+core: Cauchy provides `σ` of order `p`, and the Sylow count (`≡ 1 (mod p)`,
+dividing `p - 1`) forces `⟨σ⟩` to be the unique, hence normal, Sylow
+`p`-subgroup.  (In step (12) of the first case of the theorem of Suzuki this is
+Appendix II, Prop. 1's regular normal subgroup `R₁/R` of `N_G(R)/R`.) -/
+theorem exists_orderOf_eq_prime_zpowers_normal (hp : p.Prime)
     (hG : Nat.card G = p * (p - 1)) :
-    ∃ σ : G, orderOf σ = p ∧ (Subgroup.zpowers σ).Normal ∧
-      (∀ τ ∈ Subgroup.zpowers σ, τ ≠ 1 → ∀ y : Ω, τ • y ≠ y) ∧
-      ∀ a : Ω, Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a) := by
+    ∃ σ : G, orderOf σ = p ∧ (Subgroup.zpowers σ).Normal := by
   haveI : Fact p.Prime := ⟨hp⟩
   -- Cauchy: an element of order `p`.
   haveI := Fintype.ofFinite G
@@ -136,9 +138,20 @@ private theorem exists_normal_regular (hp : p.Prime) (hΩ : Nat.card Ω = p)
     haveI : Subsingleton (Sylow p G) :=
       (Nat.card_eq_one_iff_unique.mp hone).1
     exact Sylow.normal_of_subsingleton S
+  exact ⟨σ, hσ, hnorm⟩
+
+/-- The engine behind this file: a generator `σ` of the unique (normal) Sylow
+`p`-subgroup, which acts freely, and regularly from every base point. -/
+private theorem exists_normal_regular (hp : p.Prime) (hΩ : Nat.card Ω = p)
+    (hG : Nat.card G = p * (p - 1)) :
+    ∃ σ : G, orderOf σ = p ∧ (Subgroup.zpowers σ).Normal ∧
+      (∀ τ ∈ Subgroup.zpowers σ, τ ≠ 1 → ∀ y : Ω, τ • y ≠ y) ∧
+      ∀ a : Ω, Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨σ, hσ, hnorm⟩ := exists_orderOf_eq_prime_zpowers_normal hp hG
   -- `σ` has no fixed point, so `i ↦ σ^i • a` is injective `ZMod p → Ω`, so surjective.
-  have hfree : ∀ (τ : G), τ ∈ N → τ ≠ 1 → ∀ y : Ω, τ • y ≠ y := fun τ hτ hτ1 y =>
-    not_smul_eq_of_orderOf_eq_prime hp hσ hnorm hτ hτ1 y
+  have hfree : ∀ (τ : G), τ ∈ Subgroup.zpowers σ → τ ≠ 1 → ∀ y : Ω, τ • y ≠ y :=
+    fun τ hτ hτ1 y => not_smul_eq_of_orderOf_eq_prime hp hσ hnorm hτ hτ1 y
   refine ⟨σ, hσ, hnorm, hfree, fun a => ?_⟩
   have hinj : Function.Injective (fun i : ZMod p => σ ^ (i.val) • a) := by
     have key : ∀ i' j' : ZMod p, j'.val < i'.val →
