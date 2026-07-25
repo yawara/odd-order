@@ -436,6 +436,144 @@ theorem conj_mem_sInvertedT_of_mem_centralizer_W
   rw [h2, hyx, hx.2]
   group
 
+include model in
+/-- **Step (11), freeness of the `C_Q(P)`-action on `𝒜 − {P}`** (p. 112): a nonidentity
+`a ∈ C_Q(P)` normalizes no order-`p` subgroup `P₁ ≤ R` outside `T` except `P` itself —
+`[a, P₁] ≤ P₁ ⊓ T = ⊥` (via the `T`-normalization and `a` centralizing `R/T`), so `a`
+centralizes `P₁`; but `a` is fixed-point-free on the translations, forcing `P₁ ≤ P`. -/
+theorem eq_P_of_prime_order_conj_invariant
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) {a : G}
+    (haQ : a ∈ fc.toHypothesis.Q) (haL : a ∈ Subgroup.centralizer (fc.P : Set G))
+    (ha1 : a ≠ 1)
+    {P₁ : Subgroup G} (hP₁R : P₁ ≤ fc.invImageF model)
+    (hP₁c : Nat.card ↥P₁ = fc.p) (hP₁T : ¬ P₁ ≤ fc.sInvertedT model)
+    (hnorm : ∀ x ∈ P₁, a * x * a⁻¹ ∈ P₁) : P₁ = fc.P := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  set T : Subgroup G := fc.sInvertedT model with hTdef
+  obtain ⟨hTle, -, hTsup, -⟩ := fc.sInvertedT_spec model ind hB2 hm
+  -- `P₁ ⊓ T = ⊥` (prime order + not contained).
+  have hinf : P₁ ⊓ T = ⊥ := by
+    have hdvd : Nat.card ↥(P₁ ⊓ T) ∣ fc.p := by
+      rw [← hP₁c]
+      exact Subgroup.card_dvd_of_le inf_le_left
+    rcases (Nat.dvd_prime fc.p_prime).mp hdvd with h1 | hp
+    · exact Subgroup.card_eq_one.mp h1
+    · exfalso
+      have heq : P₁ ⊓ T = P₁ :=
+        Subgroup.eq_of_le_of_card_ge inf_le_left (by rw [hp, hP₁c])
+      exact hP₁T (heq ▸ inf_le_right)
+  -- product decomposition of `R`: `↑R = ↑T·↑P` (`P` is central in `R` and normalizes `T`).
+  have hPnormT : fc.P ≤ Subgroup.normalizer (T : Set G) := by
+    intro y hy
+    rw [Subgroup.mem_set_normalizer_iff]
+    intro τ
+    have hfix : ∀ τ' ∈ T, y * τ' * y⁻¹ = τ' := by
+      intro τ' hτ'
+      have hc := fc.P_le_center_invImageF model hy (hTle hτ')
+      rw [← hc]
+      group
+    constructor
+    · intro hτ
+      rw [hfix τ hτ]
+      exact hτ
+    · intro hτ'
+      have h1 := hfix _ hτ'
+      have h2 : y * τ * y⁻¹ = τ := by
+        have h3 := congrArg (fun z => y⁻¹ * z * y) h1
+        simpa [mul_assoc] using h3
+      rw [← h2]
+      exact hτ'
+  have hcoe : ((fc.invImageF model : Subgroup G) : Set G) = (T : Set G) * (fc.P : Set G) := by
+    rw [← hTsup]
+    exact Subgroup.coe_mul_of_right_le_normalizer_left _ _ hPnormT
+  -- `a` centralizes `P₁`.
+  have hcen : ∀ x ∈ P₁, a * x * a⁻¹ = x := by
+    intro x hx
+    have hxR : x ∈ fc.invImageF model := hP₁R hx
+    have hx' : x ∈ ((T : Set G) * (fc.P : Set G)) := by
+      rw [← hcoe]
+      exact hxR
+    obtain ⟨τ, hτ, y, hy, rfl⟩ := hx'
+    have hay : a * y * a⁻¹ = y := by
+      have hc := Subgroup.mem_centralizer_iff.mp haL y hy
+      rw [← hc]
+      group
+    have hcommT : a * (τ * y) * a⁻¹ * (τ * y)⁻¹ ∈ T := by
+      have hkey : a * (τ * y) * a⁻¹ * (τ * y)⁻¹
+          = (a * τ * a⁻¹) * ((a * y * a⁻¹) * y⁻¹) * τ⁻¹ := by group
+      rw [hkey, hay, mul_inv_cancel, mul_one]
+      exact T.mul_mem
+        (fc.conj_mem_sInvertedT_of_mem_Q model ind hB2 hm haQ haL hτ)
+        (T.inv_mem hτ)
+    have hcommP₁ : a * (τ * y) * a⁻¹ * (τ * y)⁻¹ ∈ P₁ :=
+      P₁.mul_mem (hnorm _ hx) (P₁.inv_mem hx)
+    have hbot : a * (τ * y) * a⁻¹ * (τ * y)⁻¹ ∈ P₁ ⊓ T := ⟨hcommP₁, hcommT⟩
+    rw [hinf, Subgroup.mem_bot] at hbot
+    exact mul_inv_eq_one.mp hbot
+  -- `a` is fixed-point-free on the translations: `P₁ ≤ P`.
+  have haLmem : a ∈ L := haL
+  have habarQ : QuotientGroup.mk' N' ⟨a, haLmem⟩ ∈ fc.rankOneQuotient.Q :=
+    Subgroup.mem_map_of_mem _ (Subgroup.mem_subgroupOf.mpr haQ)
+  set aQ : ↥fc.rankOneQuotient.Q := ⟨QuotientGroup.mk' N' ⟨a, haLmem⟩, habarQ⟩ with haQdef
+  have haQne : aQ ≠ 1 := by
+    intro h
+    have h1 : QuotientGroup.mk' N' ⟨a, haLmem⟩ = 1 := congrArg Subtype.val h
+    rw [QuotientGroup.mk'_apply] at h1
+    have haN : (⟨a, haLmem⟩ : ↥L) ∈ N' := (QuotientGroup.eq_one_iff _).mp h1
+    have hND : N' ≤ fc.toHypothesis.D.subgroupOf L := by
+      rw [hN'def, fc.toHypothesis.normalCore_cH_eq_centralizer_cQ fc.P_le_V]
+      exact inf_le_left
+    have haD : a ∈ fc.toHypothesis.D := Subgroup.mem_subgroupOf.mp (hND haN)
+    have hbot : a ∈ fc.toHypothesis.Q ⊓ fc.toHypothesis.D := ⟨haQ, haD⟩
+    rw [fc.toHypothesis.Q_inf_D_eq_bot, Subgroup.mem_bot] at hbot
+    exact ha1 hbot
+  have huane : ((model.qEquiv aQ⁻¹ : Fˣ) : F) ≠ 1 := by
+    intro h
+    have h1 : model.qEquiv aQ⁻¹ = 1 := Units.ext h
+    have h2 : aQ⁻¹ = 1 := model.qEquiv.injective (by rw [h1, map_one])
+    exact haQne (by rwa [inv_eq_one] at h2)
+  have hle : P₁ ≤ fc.P := by
+    intro x hx
+    have hxR : x ∈ fc.invImageF model := hP₁R hx
+    have hxL : x ∈ L := fc.invImageF_le_centralizer model hxR
+    obtain ⟨z', hz'⟩ := (fc.mem_invImageF_iff model hxL).mp hxR
+    have hfix := hcen x hx
+    have hqfix : (aQ : ↥L ⧸ N') * QuotientGroup.mk' N' ⟨x, hxL⟩ * (aQ : ↥L ⧸ N')⁻¹
+        = QuotientGroup.mk' N' ⟨x, hxL⟩ := by
+      have hcoeA : (aQ : ↥L ⧸ N') = QuotientGroup.mk' N' ⟨a, haLmem⟩ := rfl
+      rw [hcoeA, ← map_inv, ← map_mul, ← map_mul]
+      congr 1
+      exact Subtype.ext hfix
+    have hconj := model.qEquiv_conj aQ (Multiplicative.toAdd z')
+    rw [show Multiplicative.ofAdd (Multiplicative.toAdd z') = z' from rfl] at hconj
+    have hz'' : model.emb (Multiplicative.ofAdd
+        (Multiplicative.toAdd z' * ((model.qEquiv aQ⁻¹ : Fˣ) : F))) = model.emb z' := by
+      rw [← hconj, hz', hqfix]
+    have h6 := model.emb_injective hz''
+    have h7 := congrArg Multiplicative.toAdd h6
+    rw [show Multiplicative.toAdd (Multiplicative.ofAdd (Multiplicative.toAdd z'
+      * ((model.qEquiv aQ⁻¹ : Fˣ) : F))) = Multiplicative.toAdd z'
+        * ((model.qEquiv aQ⁻¹ : Fˣ) : F) from rfl] at h7
+    have hz0 : Multiplicative.toAdd z' = 0 := by
+      by_contra hne
+      exact huane (mul_left_cancel₀ hne (h7.trans (mul_one _).symm))
+    have hz1 : z' = 1 := by
+      have h8 := congrArg Multiplicative.ofAdd hz0
+      rwa [show Multiplicative.ofAdd (Multiplicative.toAdd z') = z' from rfl] at h8
+    have hxN : (⟨x, hxL⟩ : ↥L) ∈ N' := by
+      have h9 : QuotientGroup.mk' N' ⟨x, hxL⟩ = 1 := by
+        rw [← hz', hz1, map_one]
+      rw [QuotientGroup.mk'_apply] at h9
+      exact (QuotientGroup.eq_one_iff _).mp h9
+    have hker : x ∈ fc.kernelN := ⟨_, hxN, rfl⟩
+    rwa [fc.kernelN_eq_P ind] at hker
+  exact Subgroup.eq_of_le_of_card_ge hle (by rw [fc.card_P, hP₁c])
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
