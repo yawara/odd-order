@@ -926,3 +926,24 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   (`IsPGroup.of_card`-style: card = 3^k 形へ)。
 
 実装順: (13a) generic → (13) 本体 (新 leaf `FirstCase/StepThirteen.lean`)。
+
+**(13a) 完了 (`8330e0c13`)**: `exists_orderOf_eq_prime_of_dvd_ncard_invertedBy`
+(InvertedProduct.lean 末尾、conjInvolution MulAut + Sylow 数奇 + 2-群固定点合同で
+t-不変 Sylow → 付値比較)。下流 4556 jobs green。
+
+**(13) 本体の追加 scoping (2026-07-25 実測)**:
+- `V := D ⊓ centralizer {t}` (Basic.lean:189)、**Prop 5 =
+  `V_eq_centralizer_distinguishedInvolution` : V = D ⊓ centralizer {s}**
+  (CentralizerStructure.lean:143)。
+- **C_G(t) ⊓ C_G(s) = V の G-level 版は未形式化** — route: 対合の固定点一意性
+  (x ∈ C_G(t)∩C_G(s) は s/t 各々の唯一固定点を固定 → 2 点固定 → x ∈ D、
+  `exists_fixedPoint_of_involution` + 一意性 lemma を grep)。
+  C_G(st)∩C_G(s) = C_G(t)∩C_G(s) は elementary (s と st に可換 ⟺ s と t に可換)。
+- **§2 Prop 1(a) は action form** (`ActualKActor.lean:56`)。C_G(k) = KW (k ∈ K^#)
+  の subgroup-level 版は組み立てが要る (r = 7 排除 branch の主部品)。
+- |PSL(2,F₈)| = 504 / |L| card: repo に orderThreeBruhatSet の card lemma 無し、
+  mathlib の PSL card は要調査 (`Matrix.card_special_linear_group...` 系)。
+  代替 = Bruhat 分解の直接 counting (|L| = |Q₀K|(1+|Q₀|))。
+- ⟹ (13) は複数 iteration 規模。順: (13-i) centralizer 恒等式 2 本 →
+  (13-ii) |C| = |V|·|J| 分解 + |V| 3-冪 → (13-iii) r ∈ {3,7} (PSL card) →
+  (13-iv) r = 7 排除 (C_G(K) = KW) → assembly。
