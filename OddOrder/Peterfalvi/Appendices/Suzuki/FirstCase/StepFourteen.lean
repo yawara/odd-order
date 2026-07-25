@@ -524,6 +524,84 @@ theorem commutator_sup_eq_zpowers
     exact hne (Subgroup.card_eq_one.mp h1)
   · rw [h3, hZ₁card]
 
+include model in
+/-- **`N_G(RΣ)` normalizes `Z₁`** ((14), p. 113): `Z₁ = ⁅RΣ, RΣ⁆` is preserved by
+every automorphism of `RΣ`, in particular by conjugation from `N_G(RΣ)`. -/
+theorem conj_mem_zpowers_of_mem_normalizer_sup
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {g : G}
+    (hg : g ∈ Subgroup.normalizer
+      (((fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+          : Subgroup G) : Set G)) {x : G}
+    (hx : x ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t)) :
+    g * x * g⁻¹ ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set K : Subgroup G := fc.invImageF model
+    ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) with hK_def
+  have hKn : ∀ y : G, y ∈ K ↔ g * y * g⁻¹ ∈ K :=
+    Subgroup.mem_set_normalizer_iff.mp hg
+  have hcomm := fc.commutator_sup_eq_zpowers model ind hB2
+  rw [← hcomm] at hx ⊢
+  have hmapK : K.map (MulAut.conj g).toMonoidHom = K := by
+    ext y
+    simp only [Subgroup.mem_map]
+    constructor
+    · rintro ⟨z, hz, rfl⟩
+      exact (hKn z).mp hz
+    · intro hy
+      refine ⟨g⁻¹ * y * g, (hKn (g⁻¹ * y * g)).mpr ?_, ?_⟩
+      · have h1 : g * (g⁻¹ * y * g) * g⁻¹ = y := by group
+        rw [h1]; exact hy
+      · change g * (g⁻¹ * y * g) * g⁻¹ = y
+        group
+  have hmem : (MulAut.conj g).toMonoidHom x
+      ∈ (⁅K, K⁆).map (MulAut.conj g).toMonoidHom :=
+    Subgroup.mem_map_of_mem _ hx
+  rw [Subgroup.map_commutator, hmapK] at hmem
+  exact hmem
+
+include model in
+/-- **`N_G(RΣ)` normalizes `Z₁P`** ((14), p. 113): `Z₁P = Z(RΣ)` is preserved by
+conjugation from `N_G(RΣ)` (an automorphism of `RΣ` preserves its centre). -/
+theorem conj_mem_zpowers_sup_P_of_mem_normalizer_sup
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {g : G}
+    (hg : g ∈ Subgroup.normalizer
+      (((fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+          : Subgroup G) : Set G)) {x : G}
+    (hx : x ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) ⊔ fc.P) :
+    g * x * g⁻¹ ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ⊔ fc.P := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set K : Subgroup G := fc.invImageF model
+    ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) with hK_def
+  have hKg : ∀ y : G, y ∈ K ↔ g * y * g⁻¹ ∈ K :=
+    Subgroup.mem_set_normalizer_iff.mp hg
+  have hcent := fc.inf_centralizer_sup_eq_zpowers_sup_P model ind hB2
+  rw [← hcent] at hx ⊢
+  refine Subgroup.mem_inf.mpr ⟨(hKg x).mp (Subgroup.mem_inf.mp hx).1, ?_⟩
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  -- `g⁻¹ y g ∈ K` commutes with `x`
+  have hyK : g⁻¹ * y * g ∈ K := by
+    refine (hKg (g⁻¹ * y * g)).mpr ?_
+    have h1 : g * (g⁻¹ * y * g) * g⁻¹ = y := by group
+    rw [h1]
+    exact hy
+  have hcx : (g⁻¹ * y * g) * x = x * (g⁻¹ * y * g) :=
+    Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp hx).2 _ hyK
+  calc y * (g * x * g⁻¹)
+      = g * ((g⁻¹ * y * g) * x) * g⁻¹ := by group
+    _ = g * (x * (g⁻¹ * y * g)) * g⁻¹ := by rw [hcx]
+    _ = (g * x * g⁻¹) * y := by group
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
