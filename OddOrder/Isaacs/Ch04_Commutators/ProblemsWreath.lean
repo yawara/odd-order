@@ -765,6 +765,63 @@ theorem commutator_map_inl_top_eq {q : Q} (hq : ∀ q' : Q, ∃ k : ℕ, q' = q 
     rw [← commutatorElement_inl_inr_eq_shiftSubHom]
     exact Subgroup.commutator_mem_commutator ⟨f, hf, rfl⟩ (Subgroup.mem_top _)
 
+/-- `Δ_q` と平行移動は可換 (群環では `(1-x)` と `x` の可換性). -/
+theorem shiftSubHom_comp_shiftHom (q : Q) :
+    (shiftSubHom (D := D) q).comp (shiftHom q) = (shiftHom q).comp (shiftSubHom q) := by
+  ext f ω
+  rfl
+
+/-- `Δ_q` の反復で得られる部分群列 `Δ^i(⊤)`. -/
+def shiftSubSeq (q : Q) : ℕ → Subgroup (Q → D)
+  | 0 => ⊤
+  | (i + 1) => (shiftSubSeq q i).map (shiftSubHom q)
+
+@[simp]
+theorem shiftSubSeq_zero (q : Q) : shiftSubSeq (D := D) q 0 = ⊤ := rfl
+
+@[simp]
+theorem shiftSubSeq_succ (q : Q) (i : ℕ) :
+    shiftSubSeq (D := D) q (i + 1) = (shiftSubSeq q i).map (shiftSubHom q) := rfl
+
+/-- 各 `Δ^i(⊤)` は shift 安定. -/
+theorem shiftSubSeq_shift_stable (q : Q) (i : ℕ) :
+    (shiftSubSeq (D := D) q i).map (shiftHom q) ≤ shiftSubSeq q i := by
+  induction i with
+  | zero => exact le_top
+  | succ i ih =>
+    rw [shiftSubSeq_succ, Subgroup.map_map, ← shiftSubHom_comp_shiftHom, ← Subgroup.map_map]
+    exact Subgroup.map_mono ih
+
+/-- **4A.8(d) の下降中心列**: `γ_{i+2}(P) = (Δ^{i+1}(A)) の像`
+(mathlib の添字では `lowerCentralSeries ⊤ (i+1)`).
+
+基底は 4A.8(b) (`P' = ⁅A, U⁆`), 帰納段は `commutator_map_inl_top_eq`. -/
+theorem lowerCentralSeries_eq_map_shiftSubSeq {q : Q} (hq : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k)
+    (i : ℕ) :
+    Subgroup.lowerCentralSeries (⊤ : Subgroup (D ≀[Q] Q)) (i + 1)
+      = (shiftSubSeq (D := D) q (i + 1)).map inl := by
+  have hQcomm : ∀ a b : Q, a * b = b * a := by
+    intro a b
+    obtain ⟨j, rfl⟩ := hq a
+    obtain ⟨k, rfl⟩ := hq b
+    exact (Commute.pow_pow (Commute.refl q) j k).eq
+  induction i with
+  | zero =>
+    rw [Subgroup.top_lowerCentralSeries_one]
+    have hcomm : commutator (D ≀[Q] Q)
+        = ⁅(⊤ : Subgroup (Q → D)).map (inl : (Q → D) →* D ≀[Q] Q),
+            (⊤ : Subgroup (D ≀[Q] Q))⁆ := by
+      refine le_antisymm ?_ ?_
+      · rw [commutator_eq_commutator_range_inl_range_inr hQcomm, ← MonoidHom.range_eq_map]
+        exact Subgroup.commutator_mono le_rfl le_top
+      · rw [_root_.commutator_def]
+        exact Subgroup.commutator_mono le_top le_rfl
+    rw [hcomm]
+    exact commutator_map_inl_top_eq hq (le_top : (⊤ : Subgroup (Q → D)).map (shiftHom q) ≤ ⊤)
+  | succ i ih =>
+    rw [Subgroup.lowerCentralSeries_succ, ih]
+    exact commutator_map_inl_top_eq hq (shiftSubSeq_shift_stable q (i + 1))
+
 end
 
 end OddOrder.Isaacs.Ch04

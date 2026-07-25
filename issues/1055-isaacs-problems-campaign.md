@@ -998,10 +998,14 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 `⁅S.map inl, ⊤⁆ = (S.map (shiftSubHom q)).map inl`)。
 補助は `shiftHom` (平行移動)・`shift_pow_mem_of_shift_stable`・
 `shiftSumHom_mem_of_shift_stable`。
-⟹ 残るのは (α) `lowerCentralSeries ⊤ (i+1) = (Δ^{i+1} ⊤).map inl` の帰納
-(基底は 4A.8(b) で `commutator P = ⁅A,U⁆ = ⁅range inl, ⊤⁆`、
-`Δ` と `shift` の可換性で shift 安定性が保存されることを使う) と、
-(β) `(1-x)` の冪零指数 `n(p-1)+1` の算術。
+**(α) も完了**: `lowerCentralSeries_eq_map_shiftSubSeq`
+(`lowerCentralSeries ⊤ (i+1) = (shiftSubSeq q (i+1)).map inl`、
+`shiftSubSeq q i = Δ^i(⊤)`)。基底は 4A.8(b)、shift 安定性の保存は
+`shiftSubHom_comp_shiftHom` (`Δ` と `shift` の可換性) + `Subgroup.map_map`。
+⟹ **残るのは (β) `(1-x)` の冪零指数 `n(p-1)+1` の算術だけ**:
+`shiftSubSeq q i = ⊥ ⟺ i ≥ n(p-1)+1` を示せば `class(P) = n(p-1)+1` が出る
+(`lowerCentralSeries_eq_bot_iff_nilpotencyClass_le` 経由)。`P'U` 側も同様に
+`Δ` の反復を `ker coordProd` から始めればよい。
 
 **(ii) 残る算術 = `Δ = (1-x)` の冪零指数**。`ZMod(p^n)[x]/(x^p-1)` で
 `(1-x)^{n(p-1)+1} = 0` かつ `(1-x)^{n(p-1)} ≠ 0` ⟹ **`class(P) = n(p-1)+1`**。
