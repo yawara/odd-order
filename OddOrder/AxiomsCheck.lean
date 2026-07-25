@@ -1926,6 +1926,9 @@ one-element lemma).  All axiom-clean. -/
 -- COMMUTING with `x`, `ψ(xy)-ψ(y) = (1-ε)·z`.  Reduce to the abelian subgroup `A=⟨x,y⟩` via
 -- `restrict_mem_ZIrr` + `exists_integral_zirr_apply_sub`.  Directly usable by (12.16)/(13.5).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_integral_apply_sub_of_commute
+-- Pf (1.10) composed (a)+(b) (issue 0106): same setting, and the difference `ψ(xy)-ψ(y)` happens to
+-- be a rational integer `n` ⟹ `p ∣ n`.  The landing form every consumer previously re-glued.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.int_dvd_of_apply_sub_of_commute
 -- [Isaacs] Lemma 3.14 / Pf (13.9.b) ANT core: an algebraic integer `α : ℂ` fixed by every ring
 -- automorphism `σ : ℂ ≃+* ℂ` is a rational integer (works inside the splitting field `ℚ(rootSet)`,
 -- Galois correspondence + `ℤ` integrally closed in `ℚ`).  Feeds the field-norm-`≥ 1` step of (13.9.b).
@@ -1938,6 +1941,10 @@ one-element lemma).  All axiom-clean. -/
 -- `σ(χ x)=χ(x^k)` + reindex).  Its nowhere-zero form gives `∏_{x∈A} ‖χ(x)‖² ≥ 1` (field-norm `≥ 1`).
 #assert_only_allowed_axioms OddOrder.Algebra.exists_int_prod_character_of_cyclicClosed
 #assert_only_allowed_axioms OddOrder.Algebra.one_le_prod_normSq_character_of_cyclicClosed
+-- (13.10) averaging form (issue 0106): `(1/|G|)·∑_{x∈A}‖φ(x)‖²` over a cyclic-closed `Finset` is a
+-- nonnegative rational (numerator ∈ ℕ via the sum form of [Isaacs] 3.14 / Pf (13.9.b)).
+#assert_only_allowed_axioms
+  OddOrder.Algebra.exists_rat_inv_card_mul_sum_normSq_of_mem_ZIrr_of_cyclicClosed
 -- Pf (12.4) pin (b) step 1: general TI-induction self-value — for a TI subset `A` rel. `L` and an
 -- `A`-supported class function `α`, `Ind_L^G α` agrees with `α` on `A`.  Generalizes the TI-cyclic
 -- `induce_apply_eq_self_of_mem_V` to arbitrary TI subsets (the value-half of "Dade map = Ind").
@@ -5451,6 +5458,17 @@ set_option linter.style.longLine false in
 -- satisfy `dim E₀ = dim E_m + 1` (`m ≢ 0`).  Combines the abstract orbit-count
 -- (`CyclicPermEigen.finrank_eigenspace_fixed_succ`) with the Burnside-basis monomial action.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_cyclicEndConjEigenspaceFin_succ
+
+-- CyclicPermEigen generalization (issue 0106): `dim E_{ε^m} = #(contributing orbits)` for any
+-- representative Finset (publicized from the keystone's inline count), plus the partial-period
+-- diagonal coefficients (orbit size `d ∣ h`: `h/d` if `(ε^m)^d = 1`, else `0`) for plain
+-- permutation operators — the mixed-orbit-size (5/7/35-type) consumer entry points.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.CyclicPermEigen.finrank_eigenspace_eq_card_contributing
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.CyclicPermEigen.repr_sum_fourier_self_partial_of_pow_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.CyclicPermEigen.repr_sum_fourier_self_partial_of_pow_ne_one
 
 -- BG Prop 2.2(a) (alg-closed Clifford) materialised for an extraspecial `H`: the restriction
 -- `Res^G_H ρ` of a faithful irreducible `ρ` is irreducible — `hVP`, via Clifford multiplicity-one
@@ -12620,6 +12638,9 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 -- Isaacs Ch.1: Fitting 部分群 F(G) の冪零性・最大性 (Thm 1.28)
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch01.fitting.isNilpotent
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+-- Isaacs Thm 1.31 sharpened 直接形 (issue 0106): |G|=p²q, p≠q, q∤p²−1 ⟹ 与えられた位数 q の
+-- 部分群がそのまま正規 (moore57 実測需要の着地形; 選言なし)。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch01.normal_of_card_eq_prime_of_card_eq_sq_mul_prime
 -- 一般群論: Thompson critical subgroup / transfer 推移律
 #assert_only_allowed_axioms OddOrder.GroupTheory.isCritical_exists
 #assert_only_allowed_axioms OddOrder.GroupTheory.transfer_transfer
