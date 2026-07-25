@@ -1119,15 +1119,49 @@ class を決める。⟹ **群環の `(x-1)`-filtration を Lean で立てるの
 `card_ker_powMonoidHom_prime` (位数 `p^n` の巡回群で `x^p = 1` の解は `p` 個 —
 像 `⟨c^p⟩` の位数が `p^{n-1}` であることと Lagrange) と `d ↦ inl (const d)` の全単射。
 
-### 残り (文書順): **4A.8(d) の `P'U` 側** (一般 `n` で `P'U` が maximal class) /
-4A.9 / 4A.10 / 4A.11。
+### 🎉 4A.8(d) 完了 (2026-07-25、一般 `n`) — 新 leaf `ProblemsWreathClass.lean`
 
-**`P'U` 側の設計**: `K := P'U = ker augHom = I.map inl ⊔ range inr` (`I = ker coordProd =
-range Δ = shiftSubSeq q 1`)。`commutatorElement_inl_eq_shiftSubHom` は `y` が `K` の元でも
-そのまま成り立ち, `⊇` 側は `inr q ∈ K` から出るので `commutator_map_inl_top_eq` を
-「`range inr ≤ K` なる任意の `K`」へ一般化すれば `γ_{i+1}(K) = Δ^{i+1}(⊤).map inl`
-(= `γ_{i+2}(P)`) が同じ帰納で出る。`n = 1` なら `|K| = p^p`, `class(K) = p - 1` で
-maximal class。一般 `n` は `(1-x)`-filtration (下記) が要る。
+**主結果** (すべて実証明・axiom-clean):
+- `nilpotencyClass_wreath_eq`: **`class(C ≀ Q) = n(p-1)+1`** (`C` の指数がちょうど `p^n`)
+- `isMaximalClassPGroup_wreath_iff`: **`P` が maximal class ⟺ `n = 1`**
+  (`|P| = p^{np+1}` ゆえ maximal class は `class = np` を要求、一致は `n=1` のみ)
+- `nilpotencyClass_ker_augHom_eq`: **`class(P'U) = n(p-1)`**
+- `isMaximalClassPGroup_ker_augHom`: **`P'U` は常に maximal class** (`|P'U| = p^{n(p-1)+1}`)
+
+**手法 = 群環 `ℤ/p^n[x]/(x^p-1)` の `(1-x)`-filtration を「作用素の言葉だけ」で実行**
+(加群も多項式環も構成しない — ここが実装上の要):
+- **基底** `exists_witness_shiftSubHom_iterate_prime_sub_one`:
+  `Δ^{p-1} f = T_p f · g^p` **かつ** `T_p g = (T_p f)⁻¹`。前者は二項展開の係数を
+  `(-1)^j C(p-1,j) = 1 + p·e_j` と分解 (`e_j = ((-1)^j C(p-1,j) - 1)/p`、割り切れは
+  `cast_choose_prime_sub_one`)、後者は `∑_j e_j = -1` (交代和
+  `Int.alternating_sum_range_choose_of_ne` = `0`) で、群環の `y^{p-1} = N + p·s` と
+  `N·s = s(1)·N = -N` (`s(1) = -1`) にちょうど対応。**`D` の指数に仮定は要らない**。
+- **帰納** `exists_shiftSubHom_iterate_mul_prime_sub_one`:
+  `Δ^{(m+1)(p-1)} f = (T_p f)^{(-1)^m p^m} · g^{p^{m+1}}` かつ
+  `T_p g = (T_p f)^{(-1)^{m+1}}`。段では `Δ^{p-1}(T_p f) = 1` (定数を消す = `y·N = 0`) で
+  第 1 因子が落ち、`(T_p h)^{p^m}` が新しい第 1 因子になる。
+- 指数 `p^n` なら第 2 因子が消えて **`Δ^{n(p-1)} f = (T_p f)^{(-1)^{n-1}p^{n-1}}`**。
+  上界は `Δ ∘ T_p = 1`、下界は `f = δ₁ c` で `T_p f = const c` と `c^{p^{n-1}} ≠ 1`。
+- **`P'U` 側**: `commutator_map_inl_eq` を「`inr q ∈ K` なる任意の `K`」へ一般化 (`⊤` 版は
+  その特殊化) し、基底 `commutator_ker_augHom_self` (`⁅P'U,P'U⁆ = Δ²(A) の像`) を
+  `x = inl x.left · inr x.right` 分解 + `⁅inr a, inr b⁆ = 1` (Q 可換) + 正規性による共役吸収で
+  出す。以降 `lowerCentralSeries_ker_augHom_eq` は同じ帰納。部分群の類は
+  `nilpotencyClass_le_iff_lowerCentralSeries_eq_bot` (`top_subtype_lowerCentralSeries` 経由) で
+  環境群の下降中心列に翻訳。
+
+⚠ **一般版が n=1 版を包含**するので、`ProblemsWreath.lean` 側の n=1 専用系
+(`shiftSubHom_iterate_prime_eq_one` / `shiftSubSeq_prime_eq_bot` /
+`shiftSubSeq_prime_sub_one_ne_bot` / `nilpotencyClass_wreath_eq_of_exponent_prime` /
+`isMaximalClassPGroup_wreath`) は削除した (同事実 2 本立ては証明分裂の元)。
+linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、標数 `p` 限定) と
+多項式版 `one_sub_X_pow_prime_sub_one` は書籍の論法そのものなので残す。
+
+⚠ 教訓: `Subgroup.isNilpotent_iff_lowerCentralSeries` は `S` が**明示引数** (`(… _).mpr`) /
+`Div Int` = `Int.ediv` ゆえ `Int.mul_ediv_cancel'` が使える / `conv_lhs` は `∈` の左辺 =
+**部分群側**を拾う (元側を書換えたいなら `have` で等式化) / `prod_smul_eq` は
+`∏ ω, f (q⁻¹ * ω)` の形にしか rw できない (`f y ^ e j` を噛ませたら `exact` で defeq 渡し)。
+
+### 残り (文書順): 4A.9 / 4A.10 / 4A.11。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
 

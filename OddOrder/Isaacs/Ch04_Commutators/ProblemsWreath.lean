@@ -752,14 +752,17 @@ theorem shiftSumHom_mem_of_shift_stable {S : Subgroup (Q → D)} {q : Q}
   rw [hprod]
   exact Subgroup.prod_mem _ fun j _ => shift_pow_mem_of_shift_stable hS j f hf
 
-/-- **下降中心列の帰納段**: `S` が shift 安定なら `⁅S の像, ⊤⁆ = (Δ_q(S)) の像`.
+/-- **下降中心列の帰納段**: `S` が shift 安定で `K` が `inr q` を含めば
+`⁅S の像, K⁆ = (Δ_q(S)) の像`.
 
-`⊆` は `⁅inl f, y⁆ = inl (Δ_{y.right} f)` と `Δ_{q^k} = Δ_q ∘ T_k`, `T_k f ∈ S`,
-`⊇` は `inl (Δ_q f) = ⁅inl f, inr q⁆`. -/
-theorem commutator_map_inl_top_eq {q : Q} (hq : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k)
-    {S : Subgroup (Q → D)} (hS : S.map (shiftHom q) ≤ S) :
-    ⁅S.map (inl : (Q → D) →* D ≀[Q] Q), (⊤ : Subgroup (D ≀[Q] Q))⁆
-      = (S.map (shiftSubHom q)).map inl := by
+`⊆` は `⁅inl f, y⁆ = inl (Δ_{y.right} f)` と `Δ_{q^k} = Δ_q ∘ T_k`, `T_k f ∈ S`
+(`y ∈ K` は使わない), `⊇` は `inl (Δ_q f) = ⁅inl f, inr q⁆`.
+
+`K = ⊤` が `P` の下降中心列, `K = ker(augHom)` が `P'U` の下降中心列を与える. -/
+theorem commutator_map_inl_eq {q : Q} (hq : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k)
+    {S : Subgroup (Q → D)} (hS : S.map (shiftHom q) ≤ S)
+    {K : Subgroup (D ≀[Q] Q)} (hK : (inr q : D ≀[Q] Q) ∈ K) :
+    ⁅S.map (inl : (Q → D) →* D ≀[Q] Q), K⁆ = (S.map (shiftSubHom q)).map inl := by
   refine le_antisymm (Subgroup.commutator_le.2 ?_) ?_
   · rintro _ ⟨f, hf, rfl⟩ y -
     obtain ⟨k, hk⟩ := hq y.right
@@ -768,7 +771,7 @@ theorem commutator_map_inl_top_eq {q : Q} (hq : ∀ q' : Q, ∃ k : ℕ, q' = q 
       ⟨shiftSumHom q k f, shiftSumHom_mem_of_shift_stable hS k hf, rfl⟩, rfl⟩
   · rintro _ ⟨_, ⟨f, hf, rfl⟩, rfl⟩
     rw [← commutatorElement_inl_inr_eq_shiftSubHom]
-    exact Subgroup.commutator_mem_commutator ⟨f, hf, rfl⟩ (Subgroup.mem_top _)
+    exact Subgroup.commutator_mem_commutator ⟨f, hf, rfl⟩ hK
 
 /-- `Δ_q` と平行移動は可換 (群環では `(1-x)` と `x` の可換性). -/
 theorem shiftSubHom_comp_shiftHom (q : Q) :
@@ -800,7 +803,7 @@ theorem shiftSubSeq_shift_stable (q : Q) (i : ℕ) :
 /-- **4A.8(d) の下降中心列**: `γ_{i+2}(P) = (Δ^{i+1}(A)) の像`
 (mathlib の添字では `lowerCentralSeries ⊤ (i+1)`).
 
-基底は 4A.8(b) (`P' = ⁅A, U⁆`), 帰納段は `commutator_map_inl_top_eq`. -/
+基底は 4A.8(b) (`P' = ⁅A, U⁆`), 帰納段は `commutator_map_inl_eq`. -/
 theorem lowerCentralSeries_eq_map_shiftSubSeq {q : Q} (hq : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k)
     (i : ℕ) :
     Subgroup.lowerCentralSeries (⊤ : Subgroup (D ≀[Q] Q)) (i + 1)
@@ -822,10 +825,11 @@ theorem lowerCentralSeries_eq_map_shiftSubSeq {q : Q} (hq : ∀ q' : Q, ∃ k : 
       · rw [_root_.commutator_def]
         exact Subgroup.commutator_mono le_top le_rfl
     rw [hcomm]
-    exact commutator_map_inl_top_eq hq (le_top : (⊤ : Subgroup (Q → D)).map (shiftHom q) ≤ ⊤)
+    exact commutator_map_inl_eq hq (le_top : (⊤ : Subgroup (Q → D)).map (shiftHom q) ≤ ⊤)
+      (Subgroup.mem_top _)
   | succ i ih =>
     rw [Subgroup.lowerCentralSeries_succ, ih]
-    exact commutator_map_inl_top_eq hq (shiftSubSeq_shift_stable q (i + 1))
+    exact commutator_map_inl_eq hq (shiftSubSeq_shift_stable q (i + 1)) (Subgroup.mem_top _)
 
 /-! ### 4A.8(d)(β) への準備: ノルム関係式 `N · (1 - x) = 0` -/
 
@@ -995,7 +999,10 @@ theorem cast_neg_one_pow_mul_choose_prime_sub_one {r : ℕ} (hr : Nat.Prime r) {
 指数 `p` の可換群 `D` に対して, 群環 `F_p[x]/(x^p-1)` の恒等式
 `(1-x)^{p-1} = 1 + x + ⋯ + x^{p-1}` (`one_sub_X_pow_prime_sub_one`) の作用素版.
 二項展開 (`shiftSubHom_iterate_apply`) の係数 `(-1)^j C(p-1,j)` が `mod p` で全部 `1` になる
-(`cast_choose_prime_sub_one`) ので, 指数 `p` の `D` では zpow がすべて `1` 乗に潰れる. -/
+(`cast_choose_prime_sub_one`) ので, 指数 `p` の `D` では zpow がすべて `1` 乗に潰れる.
+
+一般の指数 `p^n` では等式でなく `Δ^{p-1} f = T_p f · g^p` の形になり, そこから
+`class(P) = n(p-1)+1` が出る ([`ProblemsWreathClass`](ProblemsWreathClass.lean)). -/
 theorem shiftSubHom_iterate_prime_sub_one {r : ℕ} (hr : Nat.Prime r) (hD : ∀ d : D, d ^ r = 1)
     (q : Q) (f : Q → D) :
     (⇑(shiftSubHom (D := D) q))^[r - 1] f = shiftSumHom q r f := by
@@ -1005,17 +1012,6 @@ theorem shiftSubHom_iterate_prime_sub_one {r : ℕ} (hr : Nat.Prime r) (hD : ∀
   exact Finset.prod_congr rfl fun j hj =>
     zpow_eq_self_of_pow_eq_one (hD _)
       (cast_neg_one_pow_mul_choose_prime_sub_one hr (Finset.mem_range.mp hj))
-
-/-- **上界** `Δ_q^p = 1`: linchpin `Δ^{p-1} = T_p` とノルム関係式 `Δ ∘ T_p = 1` の合成. -/
-theorem shiftSubHom_iterate_prime_eq_one [Fintype Q] {r : ℕ} (hr : Nat.Prime r)
-    (hD : ∀ d : D, d ^ r = 1) {q : Q} (hq : orderOf q = Fintype.card Q)
-    (hQcard : Fintype.card Q = r) (f : Q → D) :
-    (⇑(shiftSubHom (D := D) q))^[r] f = 1 := by
-  have hr1 : r - 1 + 1 = r := by have := hr.two_le; omega
-  have hnorm := shiftSubHom_shiftSumHom_card (D := D) hq f
-  rw [hQcard] at hnorm
-  rw [← hr1, Function.iterate_succ_apply', shiftSubHom_iterate_prime_sub_one hr hD]
-  exact hnorm
 
 /-- `Δ^i(⊤)` の元はちょうど `Δ` の `i` 回反復の像. -/
 theorem mem_shiftSubSeq_iff (q : Q) (i : ℕ) (g : Q → D) :
@@ -1031,87 +1027,6 @@ theorem mem_shiftSubSeq_iff (q : Q) (i : ℕ) (g : Q → D) :
     · rintro ⟨f, rfl⟩
       exact ⟨(⇑(shiftSubHom (D := D) q))^[i] f, (ih _).mpr ⟨f, rfl⟩,
         (Function.iterate_succ_apply' _ _ _).symm⟩
-
-/-- **上界 (部分群版)** `Δ^p(⊤) = ⊥`. -/
-theorem shiftSubSeq_prime_eq_bot [Fintype Q] {r : ℕ} (hr : Nat.Prime r)
-    (hD : ∀ d : D, d ^ r = 1) {q : Q} (hq : orderOf q = Fintype.card Q)
-    (hQcard : Fintype.card Q = r) : shiftSubSeq (D := D) q r = ⊥ := by
-  refine eq_bot_iff.mpr fun g hg => ?_
-  obtain ⟨f, rfl⟩ := (mem_shiftSubSeq_iff q r g).mp hg
-  rw [Subgroup.mem_bot]
-  exact shiftSubHom_iterate_prime_eq_one hr hD hq hQcard f
-
-/-- **下界 (部分群版)** `Δ^{p-1}(⊤) ≠ ⊥`: 指示関数 `δ₁ c` に linchpin を当てると
-`Δ^{p-1}(δ₁ c) = T_p(δ₁ c) = const c ≠ 1`. -/
-theorem shiftSubSeq_prime_sub_one_ne_bot [Fintype Q] [Nontrivial D] {r : ℕ}
-    (hr : Nat.Prime r) (hD : ∀ d : D, d ^ r = 1) {q : Q} (hq : orderOf q = Fintype.card Q)
-    (hQcard : Fintype.card Q = r) : shiftSubSeq (D := D) q (r - 1) ≠ ⊥ := by
-  classical
-  intro hbot
-  obtain ⟨c, hc⟩ := exists_ne (1 : D)
-  have key : shiftSumHom q r (fun ω : Q => if ω = 1 then c else 1) = 1 := by
-    have hmem := (mem_shiftSubSeq_iff (D := D) q (r - 1)
-      ((⇑(shiftSubHom (D := D) q))^[r - 1] fun ω : Q => if ω = 1 then c else 1)).mpr ⟨_, rfl⟩
-    rw [hbot, Subgroup.mem_bot, shiftSubHom_iterate_prime_sub_one hr hD] at hmem
-    exact hmem
-  have hconst : shiftSumHom q r (fun ω : Q => if ω = 1 then c else 1)
-      = Function.const Q (∏ y : Q, if y = 1 then c else 1) := by
-    rw [← hQcard]
-    exact shiftSumHom_card_eq_const hq _
-  rw [hconst] at key
-  have hval := congrFun key 1
-  simp only [Function.const_apply, Pi.one_apply] at hval
-  rw [prod_ite_eq_self 1 c] at hval
-  exact hc hval
-
-/-- **Problem 4A.8(d) の核**: base が指数 `p` (非自明), `Q` が位数 `p` の巡回群なら
-`P = D ≀ Q` の冪零類はちょうど `p`.
-
-`γ_{i+1}(P) = Δ^i(A)` (`lowerCentralSeries_eq_map_shiftSubSeq`) と, 上界 `Δ^p = 1` /
-下界 `Δ^{p-1}(δ₁ c) ≠ 1` (どちらも linchpin `Δ^{p-1} = T_p` から) を合わせる. -/
-theorem nilpotencyClass_wreath_eq_of_exponent_prime [Fintype Q] [Nontrivial D] {r : ℕ}
-    (hr : Nat.Prime r) (hD : ∀ d : D, d ^ r = 1) {q : Q} (hqgen : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k)
-    (hQcard : Fintype.card Q = r) : Group.nilpotencyClass (D ≀[Q] Q) = r := by
-  classical
-  have hr2 := hr.two_le
-  have hq : orderOf q = Fintype.card Q := by
-    rw [← Nat.card_eq_fintype_card]
-    refine orderOf_eq_card_of_forall_mem_zpowers fun x => ?_
-    obtain ⟨k, rfl⟩ := hqgen x
-    exact ⟨(k : ℤ), by simp⟩
-  -- 上界: `γ_{p+1}(P) = ⊥`
-  have htop : Subgroup.lowerCentralSeries (⊤ : Subgroup (D ≀[Q] Q)) r = ⊥ := by
-    have hidx := lowerCentralSeries_eq_map_shiftSubSeq (D := D) hqgen (r - 1)
-    rw [show r - 1 + 1 = r by omega] at hidx
-    rw [hidx, shiftSubSeq_prime_eq_bot hr hD hq hQcard, Subgroup.map_bot]
-  haveI : Group.IsNilpotent (D ≀[Q] Q) :=
-    Subgroup.nilpotent_iff_lowerCentralSeries.mpr ⟨r, htop⟩
-  have hle := Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp htop
-  -- 下界: `γ_p(P) ≠ ⊥`
-  have hlow : Subgroup.lowerCentralSeries (⊤ : Subgroup (D ≀[Q] Q)) (r - 1) ≠ ⊥ := by
-    have hidx := lowerCentralSeries_eq_map_shiftSubSeq (D := D) hqgen (r - 2)
-    rw [show r - 2 + 1 = r - 1 by omega] at hidx
-    rw [hidx]
-    intro h
-    exact shiftSubSeq_prime_sub_one_ne_bot hr hD hq hQcard
-      ((Subgroup.map_eq_bot_iff_of_injective _ inl_injective).mp h)
-  have hlt : ¬ Group.nilpotencyClass (D ≀[Q] Q) ≤ r - 1 := fun h =>
-    hlow (Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr h)
-  omega
-
-/-- **Problem 4A.8(d) (`n = 1`)**: `|C| = |Q| = p` のとき `P = C ≀ Q` は **maximal class**.
-
-`|P| = p^{p+1}` (`card_wreath_of_card_eq_prime`) で冪零類が `p`
-(`nilpotencyClass_wreath_eq_of_exponent_prime`) ゆえ `class + 1 = p + 1` = 指数. -/
-theorem isMaximalClassPGroup_wreath [Finite Q] [Finite D] [Nontrivial D] {r : ℕ}
-    (hr : Nat.Prime r) (hDcard : Nat.card D = r) {q : Q} (hqgen : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k)
-    (hQcard : Nat.card Q = r) : IsMaximalClassPGroup r (D ≀[Q] Q) := by
-  letI : Fintype Q := Fintype.ofFinite Q
-  have hD : ∀ d : D, d ^ r = 1 := fun d => by rw [← hDcard]; exact pow_card_eq_one'
-  have hcard : Nat.card (D ≀[Q] Q) = r ^ (r + 1) := card_wreath_of_card_eq_prime hDcard hQcard
-  refine ⟨IsPGroup.of_card hcard, r + 1, hcard, ?_⟩
-  rw [nilpotencyClass_wreath_eq_of_exponent_prime hr hD hqgen
-    (by rw [← Nat.card_eq_fintype_card]; exact hQcard)]
 
 end
 
