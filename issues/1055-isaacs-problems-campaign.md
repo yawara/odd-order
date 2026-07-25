@@ -1432,7 +1432,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 - **4C.3** は three subgroups lemma (`Subgroup.commutator_commutator_eq_bot_of_rotate`) の
   `(G, A, N)` への直接適用: `⁅⁅A,N⁆,G⁆ = 1` は仮定, `⁅⁅N,G⁆,A⁆ ≤ ⁅N,A⁆ = 1` は `N ⊴ G`。
 
-## Ch.5 §5A (書籍 pp. 152-153 の Problems 5A) — 着手 (2026-07-26)
+## Ch.5 §5A (書籍 pp. 152-153 の Problems 5A) — **完了 (2026-07-26)**
 
 新 leaf `OddOrder/Isaacs/Ch05_Transfer/Problems.lean` (namespace `OddOrder.Isaacs.Ch05`、
 `OddOrder.lean` 配線済)。mathlib の transfer は
@@ -1449,7 +1449,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 (Isaacs の `v : G → H/H'` はまさにこの形)。
 | 5A.2 | ✅ | `transfer_top_eq_apply` |
 | 5A.3(a)(b) | ✅ | `eq_of_mul_eq_mul_of_isComplement` / `isComplement_mul_of_transversal` (mathlib に `IsComplement` の推移律が無いので自作)。(b) の数値部分は mathlib `relIndex_mul_index` |
-| 5A.3(c)(d) | 🔨 左版 transversal 積 landing 済 | **transfer の推移律**。mathlib は pretransfer を持たず `diff` 経由なので、Isaacs の `w = v ∘ V_T` は「`H ≤ K ≤ G`, `ϕ : ↥H →* A` に対し `transfer_{K≤G} (transfer_{(H.subgroupOf K) ≤ K} ϕ') = transfer_{H≤G} ϕ`」の形になる (`ϕ'` は `↥(H.subgroupOf K) ≃* ↥H` を経由した `ϕ`)。`subgroupOf` の同型を挟むのが主な摩擦。5A.3(b) で作った `isComplement_mul_of_transversal` を `LeftTransversal` に持ち上げ、`transfer_def` で両辺の `diff` を `S * T` 上の積として比較するのが素直な経路 | 推移律。**(b) の数値部分 `|G:H| = |G:K||K:H|` は mathlib `Subgroup.relIndex_mul_index` で既済**。transversal の積 `ST` の一意分解 (a) / (b) の transversal 性は **mathlib に既製が無い** (`Subgroup.IsComplement` の推移律は未収載; `IsComplement.mul_eq` のみ)。`↥K` の subtype を跨ぐので定式化に注意 — 「`S ⊆ K` かつ `∀ k ∈ K, ∃! s ∈ S, k·s⁻¹ ∈ H`」+「`IsComplement (K : Set G) T`」⟹「`IsComplement (H : Set G) (S * T)`」の形が素直。(c)(d) の pretransfer 合成は mathlib が `diff` 経由の定義なので、この transversal 推移律を作ってから `transfer_def` で両辺を比較する |
+| 5A.3(c)(d) | ✅ | `transfer_transfer` (transfer の推移律、mathlib に無い新規形式化) | **transfer の推移律**。mathlib は pretransfer を持たず `diff` 経由なので、Isaacs の `w = v ∘ V_T` は「`H ≤ K ≤ G`, `ϕ : ↥H →* A` に対し `transfer_{K≤G} (transfer_{(H.subgroupOf K) ≤ K} ϕ') = transfer_{H≤G} ϕ`」の形になる (`ϕ'` は `↥(H.subgroupOf K) ≃* ↥H` を経由した `ϕ`)。`subgroupOf` の同型を挟むのが主な摩擦。5A.3(b) で作った `isComplement_mul_of_transversal` を `LeftTransversal` に持ち上げ、`transfer_def` で両辺の `diff` を `S * T` 上の積として比較するのが素直な経路 | 推移律。**(b) の数値部分 `|G:H| = |G:K||K:H|` は mathlib `Subgroup.relIndex_mul_index` で既済**。transversal の積 `ST` の一意分解 (a) / (b) の transversal 性は **mathlib に既製が無い** (`Subgroup.IsComplement` の推移律は未収載; `IsComplement.mul_eq` のみ)。`↥K` の subtype を跨ぐので定式化に注意 — 「`S ⊆ K` かつ `∀ k ∈ K, ∃! s ∈ S, k·s⁻¹ ∈ H`」+「`IsComplement (K : Set G) T`」⟹「`IsComplement (H : Set G) (S * T)`」の形が素直。(c)(d) の pretransfer 合成は mathlib が `diff` 経由の定義なので、この transversal 推移律を作ってから `transfer_def` で両辺を比較する |
 
 ### 5A.3(c)(d) の実装状況 (2026-07-26)
 
@@ -1498,10 +1498,12 @@ mathlib `Subgroup.isComplement_range_left` (「`∀ q, (F q : G ⧸ H) = q` な�
   ⚠ **`m` と `m⁻¹` の取り違えに注意** (第 2 成分に現れるのは `m⁻¹ = τ(g⁻¹•q₁)⁻¹ g⁻¹ τ(q₁)`、
   `diff` の因子は `m` 自身)。1 回間違えて `group` が閉じずに発覚した。
 
-残りは最終組み立てのみ: (a) `MonoidHom.transfer_def` で両辺を `diff` に、(b) `diff_eq_prod`
-+ `Equiv.prod_comp (quotientEquivProd …).symm` + `Fintype.prod_prod_type` で二重積化、
-(c) `Subgroup.smul_apply_eq_smul_apply_inv_smul` で `g•P` と `m•S` を書き下し、因子
-`(σ r)⁻¹ · m · σ(m⁻¹ • r)` を内側 `diff ϕ' S (m • S) = transfer ϕ' m` と照合。
+**2026-07-26 に完成**: `mulTransversal_diff_factor` (因子 `(P q)⁻¹·(g•P)q =
+(σ⟦k⟧)⁻¹·m·σ(m⁻¹•⟦k⟧)` を `↥K` 側の `diff` 因子に落とす) + `transfer_transfer` (本体)。
+本体は `transfer_def` → `diff_eq_prod` → `Equiv.prod_comp (quotientEquivProd …).symm`
+→ `Fintype.prod_prod_type` → `Finset.prod_congr` 2 段、で 20 行ほど。
+⚠ `Subtype.mk` の中を `rw` すると motive エラーになるので、先に `change` で
+coe を剥がしてから rewrite する。
 
 ### 5A.2 の設計 (2026-07-26 に確定、**実装済** `transfer_top_eq_apply`)
 

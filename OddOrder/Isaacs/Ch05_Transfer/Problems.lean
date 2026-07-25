@@ -512,4 +512,84 @@ theorem quotientEquivProd_smul_symm {G : Type*} [Group G] {H K : Subgroup G} (hH
   rw [hgrp]
   exact H.one_mem
 
+/-- 積 transversal での `diff` の因子を `↥K` の中の `diff` の因子に落とす計算。
+
+`q = e.symm (q₁, ⟦k⟧)` に対し `(P q)⁻¹ · (g • P) q = (σ⟦k⟧)⁻¹ · m · σ(m⁻¹ • ⟦k⟧)`
+(`m = transferCocycle T g q₁`)。右辺は `↥K` の中の `diff ϕ' S (m • S)` の因子そのもの。 -/
+theorem mulTransversal_diff_factor {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal) (g : G) (q₁ : G ⧸ K)
+    (k : ↥K) :
+    (((mulTransversal hHK T S).2.leftQuotientEquiv
+        ((quotientEquivProd hHK T).symm (q₁, QuotientGroup.mk k)) : G))⁻¹ *
+      (((g • mulTransversal hHK T S).2.leftQuotientEquiv
+        ((quotientEquivProd hHK T).symm (q₁, QuotientGroup.mk k)) : G))
+      = (((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K))⁻¹ *
+          ((transferCocycle T g q₁ • S).2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K) : ↥K) := by
+  set m := transferCocycle T g q₁ with hm
+  -- 左側の代表元
+  rw [mulTransversal_apply_symm]
+  -- `g • P` の代表元
+  rw [Subgroup.smul_apply_eq_smul_apply_inv_smul g (mulTransversal hHK T S)]
+  rw [mulTransversal_leftQuotientEquiv]
+  simp only [mulTransversalFun]
+  rw [quotientEquivProd_smul_symm hHK T g q₁ k]
+  -- 右辺の `m • S` の代表元
+  rw [Subgroup.smul_apply_eq_smul_apply_inv_smul m S]
+  -- あとは `↥K` 側の値を `G` 側へ落として群論的に整理
+  have hsmul : (m⁻¹ • (QuotientGroup.mk k : ↥K ⧸ H.subgroupOf K))
+      = QuotientGroup.mk (m⁻¹ * k) := rfl
+  rw [hsmul]
+  simp only [Subgroup.coe_mul, Subgroup.coe_inv, smul_eq_mul, hm, transferCocycle]
+  group
+
+/-- **Isaacs Problem 5A.3(d)** (transfer の推移律): `H ≤ K ≤ G` のとき, `↥K` の中での
+`H.subgroupOf K` への transfer と, `K` への transfer の合成は, `H` への transfer に等しい。
+
+書籍は右 transversal と pretransfer で述べるが (`w(g) = v(V_T(g))`), mathlib の
+`MonoidHom.transfer` は左 transversal の `diff` で定義されているので, その形で述べる。
+
+⚠ mathlib に transfer の推移律は無い (`Mathlib/GroupTheory/Transfer.lean` を確認済)。
+
+**証明**: `K` の左 transversal `T` と `↥K` の中の `H.subgroupOf K` の左 transversal `S` から
+積 transversal `P` を作り, `G ⧸ H ≃ (G ⧸ K) × (↥K ⧸ H.subgroupOf K)`
+(`quotientEquivProd`) で `diff ϕ P (g • P)` の積を二重積に分解する。
+内側の積は `diff ϕ' S (m • S) = transfer ϕ' m` (`m = transferCocycle T g q₁`) に一致し,
+外側は `diff (transfer ϕ') T (g • T)` そのものになる。 -/
+theorem transfer_transfer {G A : Type*} [Group G] [CommGroup A] {H K : Subgroup G}
+    (hHK : H ≤ K) (ϕ : ↥H →* A) [H.FiniteIndex] [K.FiniteIndex]
+    [(H.subgroupOf K).FiniteIndex] :
+    MonoidHom.transfer (MonoidHom.transfer
+        (ϕ.comp (Subgroup.subgroupOfEquivOfLe hHK).toMonoidHom)) = MonoidHom.transfer ϕ := by
+  set ϕ' := ϕ.comp (Subgroup.subgroupOfEquivOfLe hHK).toMonoidHom with hϕ'
+  ext g
+  set T : K.LeftTransversal := default with hT
+  set S : (H.subgroupOf K).LeftTransversal := default with hS
+  letI := H.fintypeQuotientOfFiniteIndex
+  letI := K.fintypeQuotientOfFiniteIndex
+  letI := (H.subgroupOf K).fintypeQuotientOfFiniteIndex
+  rw [MonoidHom.transfer_def (MonoidHom.transfer ϕ') T g,
+    MonoidHom.transfer_def ϕ (mulTransversal hHK T S) g, diff_eq_prod, diff_eq_prod]
+  symm
+  rw [← Equiv.prod_comp (quotientEquivProd hHK T).symm, Fintype.prod_prod_type]
+  refine Finset.prod_congr rfl fun q₁ _ => ?_
+  -- 外側の因子は `transferCocycle T g q₁`
+  have hmem : (T.2.leftQuotientEquiv q₁ : G)⁻¹ * ((g • T).2.leftQuotientEquiv q₁ : G) ∈ K :=
+    QuotientGroup.eq.mp
+      ((Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv T.2 q₁).trans
+        (Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv (g • T).2 q₁).symm)
+  have houter : (⟨(T.2.leftQuotientEquiv q₁ : G)⁻¹ *
+      ((g • T).2.leftQuotientEquiv q₁ : G), hmem⟩ : ↥K) = transferCocycle T g q₁ := by
+    refine Subtype.ext ?_
+    change (T.2.leftQuotientEquiv q₁ : G)⁻¹ * ((g • T).2.leftQuotientEquiv q₁ : G)
+        = ((transferCocycle T g q₁ : ↥K) : G)
+    rw [Subgroup.smul_apply_eq_smul_apply_inv_smul g T q₁]
+    simp only [transferCocycle, smul_eq_mul]
+    group
+  rw [houter, MonoidHom.transfer_def ϕ' S (transferCocycle T g q₁), diff_eq_prod]
+  refine Finset.prod_congr rfl fun r _ => ?_
+  induction r using QuotientGroup.induction_on with
+  | H k =>
+    refine congrArg ϕ (Subtype.ext ?_)
+    exact mulTransversal_diff_factor hHK T S g q₁ k
+
 end OddOrder.Isaacs.Ch05
