@@ -577,6 +577,70 @@ theorem not_card_K_dvd_ncard_invertedBy
   rw [hyord, hqK]
   exact (Nat.coprime_primes (by norm_num) hq).mpr (fun h => hq3 h.symm)
 
+include hyp in
+/-- **Step (13), the `J`-side conclusion** (p. 113): in the First-Case numerics
+(`|Q₀| = 8`, `|K| = 7`) the set `J` has `3`-power cardinality.
+
+Every prime `r` dividing `|J|` divides `|L| = 8·7·9 = 504`, is odd (as `|J|`
+divides the odd `|C_G(st)|`), and is not `7` by the previous theorem; so `r = 3`
+and `|J|` is a power of `3`. -/
+theorem exists_ncard_invertedBy_eq_three_pow
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hQ0 : Nat.card ↥hyp.Q0 = 8) (hK : Nat.card ↥hyp.K = 7) :
+    ∃ n : ℕ, (invertedBy (Subgroup.centralizer
+      ({hyp.distinguishedInvolution * hyp.t} : Set G))
+      hyp.distinguishedInvolution).ncard = 3 ^ n := by
+  classical
+  set s := hyp.distinguishedInvolution with hs_def
+  set N : ℕ := (invertedBy (Subgroup.centralizer ({s * hyp.t} : Set G)) s).ncard
+    with hN_def
+  have hst2 : (s * hyp.t) ^ 2 ≠ 1 := by
+    intro h
+    have h2 : orderOf (s * hyp.t) ∣ 2 := orderOf_dvd_of_pow_eq_one h
+    rw [hst] at h2
+    have h3 := Nat.le_of_dvd (by norm_num) h2
+    omega
+  -- `|J|` divides the odd `|C_G(st)|`
+  have hoddC : Odd (Nat.card ↥(Subgroup.centralizer ({s * hyp.t} : Set G))) :=
+    hyp.centralizer_natCard_odd_of_stronglyReal
+      hyp.isStronglyReal_distinguishedInvolution_mul_t hst2
+  have hNdvd : N ∣ Nat.card ↥(Subgroup.centralizer ({s * hyp.t} : Set G)) :=
+    Dvd.intro_left _ (hyp.card_centralizer_mul_t_eq hst2).symm
+  have hNodd : Odd N := by
+    obtain ⟨c, hc⟩ := hNdvd
+    rw [hc] at hoddC
+    exact (Nat.odd_mul.mp hoddC).1
+  have hNne : N ≠ 0 := by
+    intro h
+    rw [h, Nat.odd_iff] at hNodd
+    omega
+  -- every prime divisor of `N` equals `3`
+  refine ⟨N.primeFactorsList.length, Nat.eq_prime_pow_of_unique_prime_dvd hNne ?_⟩
+  intro r hr hrdvd
+  have hrL : r ∣ Nat.card ↥hyp.Q0 * Nat.card ↥hyp.K * (Nat.card ↥hyp.Q0 + 1) :=
+    hyp.dvd_card_orderThree_of_dvd_ncard_invertedBy hst hr hrdvd
+  rw [hQ0, hK] at hrL
+  have hr2 : r ≠ 2 := by
+    intro h
+    rw [h] at hrdvd
+    rw [Nat.odd_iff] at hNodd
+    omega
+  have hr7 : r ≠ 7 := by
+    intro h
+    refine hyp.not_card_K_dvd_ncard_invertedBy hst (by norm_num) hK ?_
+      (by norm_num) (h ▸ hrdvd)
+    rw [hQ0]
+    norm_num
+  -- `r ∣ 8·7·9` with `r ∉ {2, 7}` forces `r = 3`
+  rcases (Nat.Prime.dvd_mul hr).mp hrL with h | h
+  · rcases (Nat.Prime.dvd_mul hr).mp h with h' | h'
+    · exact absurd ((Nat.prime_dvd_prime_iff_eq hr Nat.prime_two).mp
+        (hr.dvd_of_dvd_pow (n := 3) (by rw [show (2 : ℕ) ^ 3 = 8 from rfl]; exact h')))
+        hr2
+    · exact absurd ((Nat.prime_dvd_prime_iff_eq hr (by norm_num)).mp h') hr7
+  · exact (Nat.prime_dvd_prime_iff_eq hr (by norm_num)).mp
+      (hr.dvd_of_dvd_pow (n := 2) (by rw [show (3 : ℕ) ^ 2 = 9 from rfl]; exact h))
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
