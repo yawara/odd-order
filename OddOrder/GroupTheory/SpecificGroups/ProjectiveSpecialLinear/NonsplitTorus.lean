@@ -27,6 +27,8 @@ set_option autoImplicit false
 
 namespace OddOrder.GroupTheory.ProjectiveSpecialLinear
 
+open Module
+
 open scoped Pointwise
 
 section NormOne
@@ -81,5 +83,44 @@ theorem card_normOneUnits (h2 : Module.finrank F E = 2) :
   exact (Nat.eq_of_mul_eq_mul_left hpos hker).symm
 
 end NormOne
+
+section Embedding
+
+variable (F E : Type*) [Field F] [Field E] [Algebra F E] [Finite E]
+
+/-- **The nonsplit torus embedding**: multiplication by a norm-one unit of a quadratic
+extension `E / F` is an `F`-linear endomorphism of `E` of determinant `1`, i.e. an
+element of `SL(2, F)` once a basis is chosen. -/
+noncomputable def normOneToSL (b : Basis (Fin 2) F E) :
+    ↥(normOneUnits F E) →* Matrix.SpecialLinearGroup (Fin 2) F where
+  toFun u := ⟨Algebra.leftMulMatrix b ((u : Eˣ) : E), by
+    rw [← Algebra.norm_eq_matrix_det b]
+    exact (mem_normOneUnits_iff F E).mp u.2⟩
+  map_one' := Subtype.ext (by simp)
+  map_mul' u v := Subtype.ext (by simp)
+
+omit [Finite E] in
+theorem normOneToSL_injective (b : Basis (Fin 2) F E) :
+    Function.Injective (normOneToSL F E b) := fun _ _ huv =>
+  Subtype.ext (Units.ext
+    (Algebra.leftMulMatrix_injective b (congrArg Subtype.val huv)))
+
+/-- **The nonsplit torus of `SL(2, F)`**: if the finite field `F` (with `q` elements)
+has a quadratic extension `E`, then `SL(2, F)` contains a cyclic subgroup of order
+`q + 1`, namely the image of the norm-one units of `E`. -/
+theorem exists_isCyclic_card_eq_card_add_one (h2 : Module.finrank F E = 2) :
+    ∃ C : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F),
+      IsCyclic ↥C ∧ Nat.card ↥C = Nat.card F + 1 := by
+  haveI : Finite F := Finite.of_injective _ (algebraMap F E).injective
+  haveI : Module.Finite F E := Module.Finite.of_finite
+  haveI := isCyclic_normOneUnits F E
+  set b : Basis (Fin 2) F E := Module.finBasisOfFinrankEq F E h2 with hb
+  refine ⟨(normOneToSL F E b).range, ?_, ?_⟩
+  · exact isCyclic_of_surjective _ (normOneToSL F E b).rangeRestrict_surjective
+  · rw [← card_normOneUnits F E h2]
+    exact (Nat.card_congr
+      (MonoidHom.ofInjective (normOneToSL_injective F E b)).toEquiv).symm
+
+end Embedding
 
 end OddOrder.GroupTheory.ProjectiveSpecialLinear
