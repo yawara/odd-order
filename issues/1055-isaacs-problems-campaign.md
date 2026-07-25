@@ -480,21 +480,43 @@ mathlib inductive (`top`/`step`)。
   Frattini (`Sylow.normalizer_sup_eq_top`) で `N_G(Q) ⊔ N = ⊤`、`N_G(Q)` は local ゆえ可解、
   `N` 正規で `↑(N_G(Q) ⊔ N) = ↑N_G(Q)·↑N` だから `N_G(Q) → G ⧸ N` 全射 ⟹
   `solvable_of_surjective`。
-- ⬜ **次: 2C.1(b)** (非可解 N-群は一意な minimal normal `S` をもち `S` は非可換単純)。
-  **★ 証明計画 (確定)**:
-  * **一意性**: 相異なる minimal normal `S₁ ≠ S₂` があれば `S₁ ⊓ S₂ = ⊥` ゆえ `G` は
-    `G/S₁ × G/S₂` に埋め込まれ、(a) で両方可解 ⟹ `G` 可解で仮定に反する。
-  * **`S` 非可換 (さらに非可解)**: `S` 可解なら (a) の `G/S` 可解と合わせ `G` 可解で矛盾。
-  * **`S` 単純**: `S` が単純でないとして `T` を `S` の minimal normal (`T < S`) とする。
-    `T` の `G`-共役はいずれも `S` の minimal normal で、相異なるものは交わりが自明ゆえ
-    元ごとに可換。`T^G = S` (`S` の minimality) で `T < S` だから共役は 2 個以上ある。
-    `T` は非可換 (全共役が可換な可換群なら `S` が可換になる) ゆえ非可解
-    (minimal normal で導来部分群が `⊥` でない)。`p ∣ |T₁|` の Sylow `P ≠ ⊥` を取ると
-    別の共役 `T₂ ≤ C_G(T₁) ≤ N_G(P)` で `N_G(P)` が非可解 — local 部分群の可解性に矛盾。
-  * 材料: 自分で証明した **2A.5** (`Ch02/Problems.lean` の
-    `exists_indep_isSimpleGroup_sSup_eq_top` 等) も使える見込みだが、上の直接論法なら
-    直積分解を経由せずに済む。`Subgroup.commute_of_normal_of_disjoint` / `normalClosure` /
-    `IsSolvable` の部分群・商・拡大での閉性が要。
+- ✅ 実証明 **2C.1(b)** (2026-07-25)。4 定理に分割:
+  * `exists_isMinimalNormal_of_not_isSolvable` (存在) / `isMinimalNormal_unique_of_isNGroup`
+    (一意性: `S₁ ⊓ S₂ = ⊥` から `G ↪ (G⧸S₁)×(G⧸S₂)`、(a) で両因子可解 ⟹ `G` 可解で矛盾) /
+    `not_isSolvable_of_isMinimalNormal_of_isNGroup` / `isSimpleGroup_of_isMinimalNormal_of_isNGroup` /
+    `not_isMulCommutative_of_isMinimalNormal_of_isNGroup`。
+  * 単純性は計画どおり: `↥S` の minimal normal `T` が `⊤` でなければ、`T` を動かす `g` が
+    存在し (さもなくば押し出しが `G`-正規で `S` の minimality に反する)、`V := T^g` と
+    `T ⊓ V = ⊥` から元ごと可換 ⟹ `T` の素数位数元の `⟨x⟩` について `V ≤ C_G(⟨x⟩) ≤ N_G(⟨x⟩)`
+    が可解 ⟹ `T` 可解 ⟹ `⁅T,T⁆ = ⊥` (minimality + `commutator_lt_top_of_nontrivial`) ⟹
+    `T` 冪零 ⟹ `T ≤ F(↥S)` (Thm 2.2) ⟹ `F(↥S)` の押し出しが `G`-正規非自明 ⟹
+    `F(↥S) = ⊤` ⟹ `↥S` 冪零 ⟹ 可解で矛盾。
+  * ⚠ `IsSolvable.commutator_lt_of_ne_bot` は**周囲の群**の可解性を要求するので使えず、
+    `commutator ↥T = ⊤` に落として `IsSolvable.commutator_lt_top_of_nontrivial` を使う。
+- 🎉 **§2C 完済** (2C.1(a)(b))。
+
+## Ch.2 numbered results の被覆 — 陳腐化 docstring を訂正 (2026-07-25)
+
+§2D の演習を見に行く過程で `Ch02_Subnormality/Basic.lean` の章被覆表が FT 経路時代のまま
+**実測と食い違っている**ことが判明し訂正 (commit 済): 2A「着手中」/ 2C・2D「TODO」は
+すべて誤りで、**2.1-2.20 は全部実在**する (2.18 = `zenkov_minimal_le_fitting`,
+2.19 = `inf_fitting_ne_bot_of_abelian_card_ge_index`, 2.20 本体 =
+`Ch04/ForwardFromCh02.lean` の `lucchini_index_normalCore_lt_index`)。`Main.lean` の
+「`lucchini_K_bot_aux` axiom」注記も誤り (実際は private theorem) で訂正済。
+Ch.2 は全ファイル sorry-free。
+
+## Ch.2 (Subnormality) §2D — 次の frontier
+
+§2D の演習は 2 問。**Zenkov (Thm 2.18) と Cor 2.19 が repo に既存**なので素材は揃っている。
+
+- ⬜ **2D.1**: `G = NA`, `N ⊴ G`, `C_A(N) = 1`, `A` 可換のとき
+  (a) `F(N) = 1` ⟹ `|A| < |N|` / (b) `|N|` と `|A|` が互いに素 ⟹ `|A| < |N|`。
+- ⬜ **2D.2**: `G = NA`, `N ⊴ G`, `C_A(N) = 1`, `A ∩ N = 1`、`N` 非自明で `A` 巡回 ⟹
+  `|A| < |N|`。
+- 材料: `Ch02/Main.lean` の `zenkov_minimal_le_fitting` (Thm 2.18) /
+  `inf_fitting_ne_bot_of_abelian_card_ge_index` (Cor 2.19、`|A| ≥ |G:A|` なら
+  `A ⊓ F(G) ≠ ⊥`)。2D.1 は Cor 2.19 の対偶 (`A ⊓ F(G) = ⊥` を `C_A(N) = 1` と
+  `F(N) = 1` から出す) が本命。
 
 ## Ch.3 (Split Extensions) §3A — 着手 (2026-07-23、§2A hard tail deferred 中の breadth 展開)
 
@@ -618,5 +640,6 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 2A.9 ✅ / 2A.10 ✅ (**§2A 完済**) / 2B.1 ✅。
 さらに 2B.2(a)(b) ✅ / 2B.3 ✅ (新 leaf `Ch02_Subnormality/ProblemsInvolutions.lean`)。
 さらに 2B.4 ✅ / 2B.5 ✅ / 2B.6 ✅ で **§2B も完済**。
-さらに **2C.1(a) ✅**。**次 frontier = 2C.1(b)** (証明計画は §2C 節に確定記載) →
-§2D (2D.1, 2D.2, …) → §3A 残り (3A.3/4/6/7/8) → §3B〜。
+さらに **2C.1(a) ✅ / 2C.1(b) ✅ で §2C も完済**。あわせて Ch.2 の陳腐化した被覆表
+(2A/2C/2D を誤って TODO と記載) も実測に合わせて訂正。
+**次 frontier = §2D (2D.1, 2D.2)** → §3A 残り (3A.3/4/6/7/8) → §3B〜。
