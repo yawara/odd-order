@@ -190,6 +190,19 @@ theorem commutator_le_of_two_generators [Finite G'] {X N Z : Subgroup G'} {u v :
         exact hMconj x⁻¹ (X.inv_mem hxX) _ (M.inv_mem (ihx b hbX))
   exact hall a ha b hb
 
+/-- For an endomorphism of a finite group, the index of the range equals the size of the
+kernel. -/
+theorem index_range_eq_card_ker {A : Type*} [Group A] [Finite A] (φ : A →* A) :
+    φ.range.index = Nat.card ↥φ.ker := by
+  have h1 := φ.range.card_mul_index
+  have h2 := φ.ker.card_mul_index
+  rw [Subgroup.index_ker] at h2
+  have hpos : 0 < Nat.card ↥φ.range := Nat.card_pos
+  have h3 : Nat.card ↥φ.range * φ.range.index
+      = Nat.card ↥φ.range * Nat.card ↥φ.ker := by
+    rw [h1, ← h2]; ring
+  exact Nat.eq_of_mul_eq_mul_left hpos h3
+
 end GenericStronglyReal
 
 namespace FirstCaseHypothesis
