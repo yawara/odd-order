@@ -1446,7 +1446,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.6 | 🔒 hub | weak closure。**hub レーンが `OddOrder/GroupTheory/WeaklyClosed.lean` で着手中** (issue 9503) — A レーンは触らない |
 | 5C.7 | ✅ 完了 (`normal_sylow_three_of_card_eq`) | `\|G\| = 3^a·5·11` ⇒ Sylow-3 が正規 |
 | 5C.8 | ✅ 完了 (`hasNormalPComplement_of_minFac_of_not_dvd_pow_three`) | `p` が最小素因数 (`p > 2`) で `p^3 ∤ \|G\|` ⇒ 正規 p-補群 |
-| 5C.9 | ⬜ | 非可換単純で偶数位数、`8 ∤ \|G\|` ⇒ `3 \| \|G\|` |
+| 5C.9 | ✅ 完了 (`three_dvd_card_of_isSimpleGroup_of_not_dvd_eight`) | 非可換単純で偶数位数、`8 ∤ \|G\|` ⇒ `3 \| \|G\|` |
 | 5C.10 | ⬜ | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
 | 5C.11 | ⬜ | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
 | 5C.12 | ⬜ | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
@@ -1561,6 +1561,20 @@ instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbit
 `|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
 `G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
 
+### 5C.9 の実装メモ (2026-07-26)
+
+**主張** (PDF 実測): `G` 非可換単純, `|G|` 偶数, `8 ∤ |G|` ⇒ `3 ∣ |G|`。
+
+Sylow-2 `P` は位数 `2^n` (`1 ≤ n ≤ 2`) ゆえ可換。`3 ∤ |G|` と仮定すると
+`|N_G(P) : C_G(P)|` を割る素数 `q` は `q ≠ 2` (`P ≤ C_G(P)`) で、5C.8 の軌道数え上げ補題
+`exists_dvd_pow_sub_one_of_dvd_card_mulAut` より `q ∣ 2^m - 1` (`1 ≤ m ≤ 2`)。
+`m = 1` なら `q = 1`、`m = 2` なら `q = 3` — どちらも矛盾なので `N_G(P) = C_G(P)`。
+Burnside で正規 2-補群 `K` が取れ、単純性から `K = ⊥` (⇒ `P = ⊤` ⇒ `G` 可換、矛盾) か
+`K = ⊤` (⇒ `|P| = 1` ⇒ `2 ∤ |G|`、矛盾)。
+
+⭐ 書籍は `Aut(C₂ × C₂) ≅ S₃` を使うが、**5C.8 の補題を一般形に切り出して共用した**
+(`hp2 : p ≠ 2` を外し `q ≠ p` だけを仮定する形にリファクタ) ので `|Aut P|` の計算は不要。
+
 ### 5C.8 の実装メモ (2026-07-26)
 
 **主張** (PDF 実測): `p > 2` が `|G|` の最小素因数で `p^3 ∤ |G|` ⇒ `G` は正規 `p`-補群を持つ。
@@ -1578,6 +1592,9 @@ Sylow-`p` `P` は位数 `p^n` (`n ≤ 2`) ゆえ可換なので、Burnside
 `q ∣ p^n - p^k` (`k < n ≤ 2`) ⟹ `q ∣ p - 1` か `q ∣ p^2 - 1`。前者は `q > p` に反し、
 後者は `q ∣ p + 1` ⟹ `q = p + 1` が偶数で `q` 奇素数に反する。
 定理名 = `not_dvd_card_mulAut_of_card_eq_pow` (`Problems5C8.lean`)。
+⭐ **2026-07-26 に一般形 `exists_dvd_pow_sub_one_of_dvd_card_mulAut` へリファクタ**
+(`p` の奇偶も `q > p` も仮定せず「`q ≠ p` なら `∃ m, 1 ≤ m ≤ n, q ∣ p^m - 1`」)。
+5C.9 が `p = 2` で同じ補題を使う。
 
 ⚠ 罠: `MulAction.fixedPoints` の `Nat.card` は `↥(↑S : Set P)` の形で出るので
 `Nat.card ↥S` への `rw` が通らない (`rw [← hkcard]; exact hmod` で defeq を使って渡す)。

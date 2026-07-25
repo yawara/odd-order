@@ -32,15 +32,21 @@ variable {G : Type*} [Group G]
 
 section /- 5C.8: 最小奇素数と `p^3 ∤ |G|` (p. 163) -/
 
-/-- ⭐ 位数 `p^n` (`n ≤ 2`, `p` 奇素数) の群には位数 `q > p` の素数位数自己同型が無い。
+/-- ⭐ **軌道数え上げによる自己同型の制約**: 位数 `p^n` の群 `P` の自己同型群の位数を割る
+素数 `q ≠ p` は, ある `1 ≤ m ≤ n` に対し `q ∣ p^m - 1` を満たす。
 
-`⟨σ⟩` (位数 `q`) の `P` への作用の軌道数え上げ `p^n ≡ |Fix σ| (mod q)` と
-`Fix σ` が真部分群であることから `q ∣ p^{n-k} - 1` (`1 ≤ n - k ≤ 2`) を得る。 -/
-theorem not_dvd_card_mulAut_of_card_eq_pow {P : Type*} [Group P] [Finite P] {p n q : ℕ}
-    (hp : p.Prime) (hp2 : p ≠ 2) (hcard : Nat.card P = p ^ n) (hn : n ≤ 2)
-    (hq : q.Prime) (hqp : p < q) : ¬ q ∣ Nat.card (MulAut P) := by
+位数 `q` の自己同型 `σ` を取り (`exists_prime_orderOf_dvd_card`), `⟨σ⟩` の `P` への作用で
+軌道数え上げ (`IsPGroup.card_modEq_card_fixedPoints`) すると `p^n ≡ |Fix σ| (mod q)`。
+`Fix σ = σ.toMonoidHom.eqLocus (MonoidHom.id P)` は `σ ≠ 1` ゆえ真部分群なので
+`|Fix σ| = p^k` (`k < n`) で `q ∣ p^n - p^k = p^k (p^{n-k} - 1)`, `q ≠ p` より
+`q ∣ p^{n-k} - 1`。
+
+⭐ **`|Aut P|` の具体形 (`|GL_n(F_p)|` 等) を一切使わない**ので, `p = 2` でも `p` 奇でも
+そのまま使える (Problem 5C.8 は `p` 奇, 5C.9 は `p = 2` で使う)。 -/
+theorem exists_dvd_pow_sub_one_of_dvd_card_mulAut {P : Type*} [Group P] [Finite P] {p n q : ℕ}
+    (hp : p.Prime) (hcard : Nat.card P = p ^ n) (hq : q.Prime) (hqp : q ≠ p)
+    (hdvd : q ∣ Nat.card (MulAut P)) : ∃ m, 1 ≤ m ∧ m ≤ n ∧ q ∣ p ^ m - 1 := by
   classical
-  intro hdvd
   have hp2le : 2 ≤ p := hp.two_le
   haveI : Fact q.Prime := ⟨hq⟩
   haveI : Fintype (MulAut P) := Fintype.ofFinite _
@@ -67,11 +73,11 @@ theorem not_dvd_card_mulAut_of_card_eq_pow {P : Type*} [Group P] [Finite P] {p n
   -- `Fix σ` は真部分群
   have hne : σ.toMonoidHom.eqLocus (MonoidHom.id P) ≠ ⊤ := by
     intro htop
-    have : σ = 1 := by
+    have hs1 : σ = 1 := by
       ext x
       have hx : x ∈ σ.toMonoidHom.eqLocus (MonoidHom.id P) := htop ▸ Subgroup.mem_top x
       exact hx
-    rw [this, orderOf_one] at hσ
+    rw [hs1, orderOf_one] at hσ
     exact hq.one_lt.ne hσ
   obtain ⟨k, hk, hkcard⟩ :=
     (Nat.dvd_prime_pow hp).mp
@@ -86,29 +92,37 @@ theorem not_dvd_card_mulAut_of_card_eq_pow {P : Type*} [Group P] [Finite P] {p n
   have hple : p ^ k ≤ p ^ n := Nat.pow_le_pow_right hp.one_lt.le hkn.le
   have hqdvd : q ∣ p ^ n - p ^ k := (Nat.modEq_iff_dvd' hple).mp hmod2.symm
   have hfactor : p ^ n - p ^ k = p ^ k * (p ^ (n - k) - 1) := by
-    have : p ^ n = p ^ k * p ^ (n - k) := by
+    have hsplit : p ^ n = p ^ k * p ^ (n - k) := by
       rw [← pow_add]
       congr 1
       omega
-    rw [this, Nat.mul_sub, mul_one]
+    rw [hsplit, Nat.mul_sub, mul_one]
   rw [hfactor] at hqdvd
-  have hqnp : ¬ q ∣ p ^ k := by
-    intro hc
-    have := (Nat.Prime.dvd_of_dvd_pow hq hc)
-    have hqle : q ≤ p := Nat.le_of_dvd hp.pos this
-    omega
-  have hq1 : q ∣ p ^ (n - k) - 1 := by
-    rcases (Nat.Prime.dvd_mul hq).mp hqdvd with hA | hB
-    · exact absurd hA hqnp
-    · exact hB
-  -- `n - k ∈ {1, 2}` で矛盾
-  have hnk : n - k = 1 ∨ n - k = 2 := by omega
-  rcases hnk with h1 | h2
-  · rw [h1, pow_one] at hq1
+  have hqnp : ¬ q ∣ p ^ k := fun hc =>
+    hqp ((Nat.prime_dvd_prime_iff_eq hq hp).mp (hq.dvd_of_dvd_pow hc))
+  refine ⟨n - k, by omega, by omega, ?_⟩
+  rcases (Nat.Prime.dvd_mul hq).mp hqdvd with hA | hB
+  · exact absurd hA hqnp
+  · exact hB
+
+/-- 位数 `p^n` (`n ≤ 2`, `p` 奇素数) の群には位数 `q > p` の素数位数自己同型が無い。
+
+`exists_dvd_pow_sub_one_of_dvd_card_mulAut` で `q ∣ p^m - 1` (`m ∈ {1, 2}`) に落とす。
+`m = 1` なら `q ∣ p - 1` で `q > p` に反し, `m = 2` なら `q ∣ p + 1` から `q = p + 1` が
+偶数となって `q` が奇素数であることに反する。 -/
+theorem not_dvd_card_mulAut_of_card_eq_pow {P : Type*} [Group P] [Finite P] {p n q : ℕ}
+    (hp : p.Prime) (hp2 : p ≠ 2) (hcard : Nat.card P = p ^ n) (hn : n ≤ 2)
+    (hq : q.Prime) (hqp : p < q) : ¬ q ∣ Nat.card (MulAut P) := by
+  intro hdvd
+  have hp2le : 2 ≤ p := hp.two_le
+  obtain ⟨m, hm1, hmn, hq1⟩ :=
+    exists_dvd_pow_sub_one_of_dvd_card_mulAut hp hcard hq (by omega) hdvd
+  have hm2 : m ≤ 2 := by omega
+  interval_cases m
+  · rw [pow_one] at hq1
     have := Nat.le_of_dvd (by omega) hq1
     omega
-  · rw [h2] at hq1
-    have hsq : p ^ 2 - 1 = (p - 1) * (p + 1) := by
+  · have hsq : p ^ 2 - 1 = (p - 1) * (p + 1) := by
       rw [Nat.sub_mul, one_mul, Nat.mul_add, mul_one, pow_two]
       omega
     rw [hsq] at hq1
