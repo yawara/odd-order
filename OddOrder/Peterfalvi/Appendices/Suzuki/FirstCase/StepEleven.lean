@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
+import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 
 /-!
 # Peterfalvi Part II, Ch. II, step (11): `R = T × P` and the regular action
@@ -494,6 +495,103 @@ theorem normalizer_invImageF_le_normalizer_P
       simpa [mul_assoc] using h2
   rw [← hZP]
   exact key x
+
+include model in
+/-- **`R` is abelian — case (10.1) arm** (p. 111, proof of (11) ¶1): under `p ∤ |Σ|` and
+`p^{m+2} ∣ |G|`, a nonabelian `R` would have `Z(R) = P`, hence
+`N_G(R) ≤ N_G(P) = C_G(P)` (step (1)); `R` is then a `p`-subgroup of `C_G(P)` of full
+`p`-part `p^{m+1}`, while normalizer growth inside a Sylow `p`-subgroup of `G`
+(`lt_inf_normalizer_of_isPGroup_lt`) manufactures a strictly larger `p`-subgroup of
+`C_G(P)` — impossible. -/
+theorem invImageF_mul_comm_of_not_dvd_card_D
+    (ind : Hypothesis.TheoremAInductionBelow G Ω) {m : ℕ}
+    (hFcard : Nat.card F = fc.p ^ m)
+    (hGp : fc.p ^ (m + 2) ∣ Nat.card G) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D →
+      ∀ r₁ ∈ fc.invImageF model, ∀ r₂ ∈ fc.invImageF model, r₁ * r₂ = r₂ * r₁ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  haveI : Finite F := Nat.finite_of_card_ne_zero
+    (by rw [hFcard]; exact (Nat.pow_pos fc.p_prime.pos).ne')
+  intro hSigma
+  by_contra hcon
+  push Not at hcon
+  obtain ⟨r₁, h₁, r₂, h₂, hne⟩ := hcon
+  have hnab : ∃ x ∈ fc.invImageF model, ∃ y ∈ fc.invImageF model, x * y ≠ y * x :=
+    ⟨r₁, h₁, r₂, h₂, hne⟩
+  -- `|R| = p^{m+1}`, so `R` is a `p`-group.
+  have hcardR : Nat.card ↥(fc.invImageF model) = fc.p ^ (m + 1) := by
+    rw [fc.card_invImageF model ind, hFcard, fc.card_P]; ring
+  have hRp : IsPGroup fc.p ↥(fc.invImageF model) := IsPGroup.of_card hcardR
+  obtain ⟨X, hRX⟩ := hRp.exists_le_sylow
+  have hXdvd : fc.p ^ (m + 2) ∣ Nat.card ↥(X : Subgroup G) := by
+    rw [Sylow.card_eq_multiplicity]
+    exact pow_dvd_pow _ ((Nat.Prime.pow_dvd_iff_le_factorization fc.p_prime
+      Nat.card_pos.ne').mp hGp)
+  -- `R < X` (orders `p^{m+1} < p^{m+2} ≤ |X|`).
+  have hRltX : fc.invImageF model < (X : Subgroup G) := by
+    refine lt_of_le_of_ne hRX fun h => ?_
+    rw [← h, hcardR, Nat.pow_dvd_pow_iff_le_right fc.p_prime.one_lt] at hXdvd
+    omega
+  -- normalizer growth inside `X`.
+  have hgrow := OddOrder.BG.Ch2.S08.lt_inf_normalizer_of_isPGroup_lt
+    (p := fc.p) X.isPGroup' hRltX
+  set Y : Subgroup G := (X : Subgroup G) ⊓
+    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hYdef
+  -- `Y ≤ C_G(P)`.
+  have hYC : Y ≤ Subgroup.centralizer (fc.P : Set G) := by
+    refine le_trans inf_le_right ?_
+    rw [← fc.normalizer_P_eq_centralizer]
+    exact fc.normalizer_invImageF_le_normalizer_P model ind hnab
+  -- `|Y|` is a `p`-power strictly above `p^{m+1}`.
+  have hYp : IsPGroup fc.p ↥Y := X.isPGroup'.to_le inf_le_left
+  obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp hYp
+  have hRltY : fc.p ^ (m + 1) < Nat.card ↥Y := by
+    rw [← hcardR]
+    have hdvd : Nat.card ↥(fc.invImageF model) ∣ Nat.card ↥Y :=
+      Subgroup.card_dvd_of_le hgrow.le
+    refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos hdvd) fun heq => ?_
+    exact hgrow.ne (Subgroup.eq_of_le_of_card_ge hgrow.le heq.ge)
+  -- `p`-part accounting of `|C_G(P)|`.
+  have hCeq : Nat.card ↥(Subgroup.centralizer (fc.P : Set G))
+      = fc.p ^ (m + 1) * (Nat.card ↥(fc.rankOneQuotient).Q
+        * Nat.card ↥(fc.rankOneQuotient).D) := by
+    rw [fc.card_centralizer_P model ind, fc.card_P, hFcard]; ring
+  have hQcard : Nat.card ↥(fc.rankOneQuotient).Q = fc.p ^ m - 1 := by
+    haveI := Fintype.ofFinite F
+    haveI := Classical.decEq F
+    rw [Nat.card_congr model.qEquiv.toEquiv, Nat.card_eq_fintype_card,
+      Fintype.card_units, ← Nat.card_eq_fintype_card, hFcard]
+  have hm1 : 1 ≤ m := by
+    by_contra hm0
+    push Not at hm0
+    interval_cases m
+    have h2 : 1 < Nat.card F := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+    rw [hFcard] at h2
+    simp at h2
+  have hpQ : ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).Q := by
+    rw [hQcard]
+    intro hdvd
+    have hple : fc.p ∣ fc.p ^ m := dvd_pow_self _ (by omega)
+    have h1 : fc.p ∣ 1 := by
+      have := Nat.dvd_sub hple hdvd
+      rwa [Nat.sub_sub_self (Nat.one_le_pow _ _ fc.p_prime.pos)] at this
+    exact fc.p_prime.one_lt.ne' (Nat.dvd_one.mp h1)
+  have hpc : Nat.Coprime fc.p (Nat.card ↥(fc.rankOneQuotient).Q
+      * Nat.card ↥(fc.rankOneQuotient).D) :=
+    (Nat.Prime.coprime_iff_not_dvd fc.p_prime).mpr
+      (fun hdvd => ((fc.p_prime.dvd_mul).mp hdvd).elim hpQ hSigma)
+  -- `|Y| = p^k ∣ p^{m+1}·c` with `p ∤ c` forces `|Y| ≤ p^{m+1}` — contradiction.
+  have hYdvd : Nat.card ↥Y ∣ Nat.card ↥(Subgroup.centralizer (fc.P : Set G)) :=
+    Subgroup.card_dvd_of_le hYC
+  rw [hCeq, hk] at hYdvd
+  have hkdvd : fc.p ^ k ∣ fc.p ^ (m + 1) :=
+    (Nat.Coprime.dvd_of_dvd_mul_right (Nat.Coprime.pow_left k hpc)) hYdvd
+  have : Nat.card ↥Y ≤ fc.p ^ (m + 1) := by
+    rw [hk]
+    exact Nat.le_of_dvd (Nat.pow_pos fc.p_prime.pos) hkdvd
+  omega
 
 end FirstCaseHypothesis
 
