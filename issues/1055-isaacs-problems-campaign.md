@@ -1018,6 +1018,21 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 下界も `Δ^{p-1}(δ₁ c) = T_p(δ₁ c) = const c ≠ 1` (`shiftSumHom_card_eq_const`) で即出る。
 ⟹ **`class(P) = p` (n=1 で maximal class) は linchpin 1 本に還元済み**。
 
+**mathlib の部品は調査済み (2026-07-25)**:
+- `sub_pow_char_of_commute (h : Commute x y) : (x - y)^p = x^p - y^p`
+  (`Mathlib/Algebra/CharP/Lemmas.lean` L223) — **可換とは限らない環でも可換な元同士なら使える**
+  ので、**自己準同型環 `AddMonoid.End V` の中で `1` と `σ` に直接適用できる**。
+  ただし `[ExpChar R p]` インスタンスが要る。
+- インスタンスを避けるなら `Commute.add_pow` (二項定理) + `Nat.Prime.dvd_choose_self`
+  (`0 < k < p` で `p ∣ C(p,k)`) + 「`V` の指数が `p` ⟹ `End V` で `p • x = 0`」で
+  `(1-σ)^p = 1 + (-σ)^p = 1 + (-1)^p·1 = 0` (`p` 奇なら `1 - 1`、`p = 2` なら `1 + 1 = 2 = 0`)。
+- ⚠ `(p-1).choose j ≡ (-1)^j [ZMOD p]` は **mathlib に見当たらない** (grep 済) ので、
+  ルート 1 を採るなら自前で帰納する必要がある。⟹ **ルート 2 (多項式環) か、
+  `Δ^p = 0` だけ上の方法で出して下界を別途工夫する方が安い**。
+
+⚠ なお `Δ^p = 0` だけでは `class(P) ≤ p` (上界) しか出ない。maximal class には
+`Δ^{p-1} ≠ 0` (下界) が要り、そこは linchpin `Δ^{p-1} = T_p` が最短。
+
 linchpin の証明ルート 2 つ:
 1. **pointwise 二項展開**: `Δ^k f ω = ∏_{j≤k} f((q^j)⁻¹ω)^{(-1)^j C(k,j)}` を `k` の帰納
    (Pascal) で示し、`k = p-1` で `C(p-1,j) ≡ (-1)^j (mod p)` を使うと指数が全部 `1` になる。
