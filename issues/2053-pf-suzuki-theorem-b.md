@@ -814,3 +814,17 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   L ∈ orbit∖{R-line}, L ≠ T₁-line → Stab_NR(L) = R₁ ((C)) → NR-suborbit
   サイズ [NR:R₁] = p−1 → s' ≥ p; p ∤ s' (|N|_p = p³) → s' = p+1 → 全 line
   ∋ T₁-line ✗。∴ **N_G(R₁) = N_G(R)** □
+- δ4 続き (全 push 済): [NR,NR] ≤ R₁ (`f6e0db94f`, exists_quotient_generator
+  private 抽出 + action-free 交換子補題 `b438fcf71`) / R₁ ⊓ C_G(P) = R
+  (`078f74aa1`, C/R 商位数 p−1 vs [x]-order p) / **NR = R₁·C_G(P)**
+  (`7e0d0f44a`, 埋め込み card 下界 + coe 積分解) / R ⊓ T₁ = T (`68960e933`)。
+  **残り 4 部品**: (B-final) conj k • T₁ = T₁ — X₁ := {x ∈ R₁ | sxs⁻¹x ∈ T}
+  を S₁-式 inline 部分群化 (mul: ⁅x⁻¹,y⁻¹⁆ ∈ T = δ3 + T 中心 δ4a)、
+  X₁ ⊓ R = T (x=ty → y² ∈ T∩P = 1)、X₁ ≠ R₁ → card 挟み撃ちで X₁ = T₁;
+  kT₁k⁻¹ ⊆ X₁ は s' = ⁅k,s⁆·s (⁅k,s⁆ ∈ R₁) で mod-T 反転が保たれることから。
+  → (C) k が X-line (∉{R,T₁}) 固定 → k = r·c 分解で R/T-方向自明 (c ∈ C_G(P)
+  は R/T ≅ P-classes に自明) + T₁-line 固定 → V-自明 → δ4-iii で k ∈ R₁。
+  → (D) assembly: stab_N(R-line) = NR、orbit ∌ T₁-line、suborbit p−1 →
+  N_G(R₁) = N_G(R)。→ (ε) R₁ Sylow + class 2 < p → Cor 10.2
+  (transfer_range_eq_of_nilpotencyClass_lt) + T₁C_Q(P)C_W(P) index-p 正規
+  (M := 逆像 of hom NR → R/T-方向) → p ∣ |Ab(G)| → ¬(B2) → step_twelve 完結。

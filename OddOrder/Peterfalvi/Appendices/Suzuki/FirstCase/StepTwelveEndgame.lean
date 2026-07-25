@@ -1026,6 +1026,381 @@ theorem inf_centralizer_eq_invImageF
     omega
   · exact le_inf hRle hRleC
 
+include model in
+/-- **`N_G(R) = R₁ · C_G(P)`** ((12) tail, δ4-A2): the quotient `C_G(P)/R` of order
+`p - 1` embeds into `(R₁ ⊔ C_G(P))/R₁`, so the join has full order `p³(p-1)`, and the
+join is a product since `C_G(P)` normalizes `R₁`. -/
+theorem exists_mul_eq_of_mem_normalizer
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3)
+    (hR₁n : ∀ n ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G),
+      ∀ x ∈ R₁, n * x * n⁻¹ ∈ R₁) {k : G}
+    (hk : k ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) :
+    ∃ r ∈ R₁, ∃ c ∈ Subgroup.centralizer (fc.P : Set G), k = r * c := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  set C : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hCdef
+  have hCle : C ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) := by
+    have h1 := (fc.normalizer_P_lt_normalizer_invImageF model ind hm hGp hSigma).le
+    rw [fc.normalizer_P_eq_centralizer] at h1
+    exact h1
+  have hRleC : fc.invImageF model ≤ C := fc.invImageF_le_centralizer model
+  have hinf := fc.inf_centralizer_eq_invImageF model ind hB2 hm hGp hSigma hRle
+    hR₁le hcard
+  set S : Subgroup G := R₁ ⊔ C with hSdef
+  have hSle : S ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) :=
+    sup_le hR₁le hCle
+  have hR₁S : R₁ ≤ S := le_sup_left
+  have hCS : C ≤ S := le_sup_right
+  -- the `C/R`-quotient embeds into `S/R₁`.
+  haveI hnormR₁S : (R₁.subgroupOf S).Normal := by
+    constructor
+    intro t ht n
+    rw [Subgroup.mem_subgroupOf] at ht ⊢
+    exact hR₁n (↑n) (hSle n.2) _ ht
+  haveI hnormR : ((fc.invImageF model).subgroupOf C).Normal := by
+    constructor
+    intro t ht n
+    rw [Subgroup.mem_subgroupOf] at ht ⊢
+    exact (Subgroup.mem_set_normalizer_iff.mp (hCle n.2) (t : G)).mp ht
+  have hqcard : Nat.card (↥C ⧸ (fc.invImageF model).subgroupOf C) = fc.p - 1 := by
+    have h1 := ((fc.invImageF model).subgroupOf C).card_mul_index
+    have h2 : Nat.card ↥((fc.invImageF model).subgroupOf C)
+        = Nat.card ↥(fc.invImageF model) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRleC).toEquiv
+    have hCcard : Nat.card ↥C = (fc.p * fc.p) * (fc.p - 1) := by
+      rw [hCdef, fc.card_centralizer_P model ind, fc.card_P, hm, pow_one,
+        fc.card_rankOneQ_eq_pred_card_F model hm, hm, pow_one]
+      have hD1 : Nat.card ↥(fc.rankOneQuotient).D = 1 := by
+        have hall := fc.sigmaComponent_eq_one_of_card_F_eq_p model
+          (by rw [hm, pow_one])
+        rw [Nat.card_eq_one_iff_unique]
+        exact ⟨⟨fun a b => by rw [hall a, hall b]⟩, ⟨1⟩⟩
+      rw [hD1, mul_one]
+      ring
+    rw [h2, fc.card_invImageF model ind, hm, pow_one, fc.card_P, hCcard] at h1
+    exact Nat.eq_of_mul_eq_mul_left (Nat.mul_pos fc.p_prime.pos fc.p_prime.pos) h1
+  -- the embedding.
+  let ι : (↥C ⧸ (fc.invImageF model).subgroupOf C) → (↥S ⧸ R₁.subgroupOf S) :=
+    Quotient.lift (fun c : ↥C => QuotientGroup.mk' (R₁.subgroupOf S)
+        ⟨(c : G), hCS c.2⟩)
+      (by
+        intro a b hab
+        have h1 : (a : G)⁻¹ * (b : G) ∈ fc.invImageF model := by
+          have h2 := (QuotientGroup.leftRel_apply).mp hab
+          have h3 := Subgroup.mem_subgroupOf.mp h2
+          simpa using h3
+        rw [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq]
+        rw [Subgroup.mem_subgroupOf]
+        have h4 : ((⟨(a : G), hCS a.2⟩ : ↥S)⁻¹ * ⟨(b : G), hCS b.2⟩ : ↥S)
+            = (⟨(a : G)⁻¹ * (b : G), mul_mem (inv_mem (hCS a.2)) (hCS b.2)⟩ : ↥S) :=
+          rfl
+        rw [h4]
+        exact hRle h1)
+  have hι : Function.Injective ι := by
+    intro qa qb h
+    obtain ⟨a, rfl⟩ := Quotient.exists_rep qa
+    obtain ⟨b, rfl⟩ := Quotient.exists_rep qb
+    have h1 : QuotientGroup.mk' (R₁.subgroupOf S) ⟨(a : G), hCS a.2⟩
+        = QuotientGroup.mk' (R₁.subgroupOf S) ⟨(b : G), hCS b.2⟩ := h
+    rw [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq] at h1
+    rw [Subgroup.mem_subgroupOf] at h1
+    have h2 : (a : G)⁻¹ * (b : G) ∈ R₁ := by simpa using h1
+    have h3 : (a : G)⁻¹ * (b : G) ∈ fc.invImageF model := by
+      rw [← hinf]
+      exact ⟨h2, mul_mem (C.inv_mem a.2) b.2⟩
+    apply Quotient.sound
+    refine QuotientGroup.leftRel_apply.mpr ?_
+    rw [Subgroup.mem_subgroupOf]
+    simpa using h3
+  -- cardinalities force `S = N_G(R)`.
+  have hidxS : fc.p - 1 ≤ Nat.card (↥S ⧸ R₁.subgroupOf S) := by
+    rw [← hqcard]
+    exact Nat.card_le_card_of_injective ι hι
+  have hScard : Nat.card ↥S = fc.p ^ 3 * Nat.card (↥S ⧸ R₁.subgroupOf S) := by
+    have h1 := (R₁.subgroupOf S).card_mul_index
+    have h2 : Nat.card ↥(R₁.subgroupOf S) = Nat.card ↥R₁ :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hR₁S).toEquiv
+    rw [h2, hcard] at h1
+    exact h1.symm
+  have hNRcard : Nat.card
+      ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+      = fc.p ^ 3 * (fc.p - 1) := by
+    have h1 := ((fc.invImageF model).subgroupOf
+      (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))).card_mul_index
+    have h2 : Nat.card ↥((fc.invImageF model).subgroupOf
+        (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)))
+        = Nat.card ↥(fc.invImageF model) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe Subgroup.le_normalizer).toEquiv
+    have h3 : ((fc.invImageF model).subgroupOf
+        (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))).index
+        = fc.p * (fc.p - 1) :=
+      fc.card_quotient_invImageF_eq model ind hB2 hm hGp hSigma
+    rw [h2, h3, fc.card_invImageF model ind, hm, pow_one, fc.card_P] at h1
+    rw [← h1]
+    ring
+  have hSeq : S = Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) := by
+    apply Subgroup.eq_of_le_of_card_ge hSle
+    rw [hNRcard, hScard]
+    calc fc.p ^ 3 * (fc.p - 1)
+        ≤ fc.p ^ 3 * Nat.card (↥S ⧸ R₁.subgroupOf S) := by
+          exact Nat.mul_le_mul_left _ hidxS
+      _ = fc.p ^ 3 * Nat.card (↥S ⧸ R₁.subgroupOf S) := rfl
+  -- the join is a product.
+  have hprod : ((S : Subgroup G) : Set G) = (R₁ : Set G) * (C : Set G) := by
+    rw [hSdef]
+    refine Subgroup.coe_mul_of_right_le_normalizer_left _ _ ?_
+    intro c hc
+    rw [Subgroup.mem_set_normalizer_iff]
+    intro r
+    constructor
+    · intro hr
+      exact hR₁n c (hCle hc) r hr
+    · intro hr
+      have h1 := hR₁n c⁻¹ (Subgroup.inv_mem _ (hCle hc)) _ hr
+      simpa [mul_assoc] using h1
+  have hkS : k ∈ ((S : Subgroup G) : Set G) := by
+    rw [hSeq]
+    exact hk
+  rw [hprod] at hkS
+  obtain ⟨r, hr, c, hc, rfl⟩ := hkS
+  exact ⟨r, hr, c, hc, rfl⟩
+
+include model in
+/-- **`T₁ ⊴ N_G(R)`** ((12) tail, δ4-B): the set `X₁` of mod-`T` inverted elements of
+`R₁` is a subgroup (commutators land in the central `T`) squeezed to `T₁` by
+cardinality, and conjugation twists exact inversion only by central `T`-elements
+(`⁅k⁻¹, s⁆ ∈ R₁`). -/
+theorem conj_sInvertedOvergroup_eq
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3)
+    (hR₁n : ∀ n ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G),
+      ∀ x ∈ R₁, n * x * n⁻¹ ∈ R₁) {k : G}
+    (hk : k ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) :
+    MulAut.conj k • fc.sInvertedOvergroup R₁ = fc.sInvertedOvergroup R₁ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  obtain ⟨hTle, hTinv, -, hTinfP⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hTcard : Nat.card ↥(fc.sInvertedT model) = fc.p := by
+    rw [fc.card_sInvertedT model ind hB2 hm, hm, pow_one]
+  have hcen := fc.sInvertedT_mul_comm_of_mem model ind hB2 hm hGp hSigma hR₁le hcard
+  have hcommT := fc.commutator_eq_sInvertedT model ind hB2 hm hGp hSigma hRle
+    hR₁le hcard
+  obtain ⟨hT₁card, hTsubT₁, hT₁infP⟩ := fc.card_sInvertedOvergroup model ind hB2 hm
+    hGp hSigma hRle hR₁le hcard hR₁n
+  have hmemiff := fun (x : G) =>
+    fc.mem_sInvertedOvergroup_iff model ind hB2 hm hGp hSigma hRle hR₁le hcard (x := x)
+  have hab := fc.invImageF_mul_comm model ind hB2 hm
+  -- the mod-`T` inverted subgroup `X₁`.
+  set S₁ : Set G := {x : G | x ∈ R₁ ∧
+    s * x * s⁻¹ * x ∈ fc.sInvertedT model} with hS₁def
+  have hsub : ∃ H : Subgroup G, (H : Set G) = S₁ := by
+    refine ⟨⟨⟨⟨S₁, ?_⟩, ?_⟩, ?_⟩, rfl⟩
+    · -- mul_mem
+      rintro a b ⟨haR, hai⟩ ⟨hbR, hbi⟩
+      refine ⟨mul_mem haR hbR, ?_⟩
+      have hcm : ⁅a⁻¹, b⁻¹⁆ ∈ fc.sInvertedT model := by
+        rw [← hcommT]
+        exact Subgroup.commutator_mem_commutator (inv_mem haR) (inv_mem hbR)
+      have hfinal : s * (a * b) * s⁻¹ * (a * b)
+          = (s * a * s⁻¹ * a) * ((s * b * s⁻¹ * b) * ⁅a⁻¹, b⁻¹⁆) := by
+        have hswap := hcen _ hbi a⁻¹ (inv_mem haR)
+        calc s * (a * b) * s⁻¹ * (a * b)
+            = ((s * a * s⁻¹ * a) * (a⁻¹ * (s * b * s⁻¹ * b))) * (b⁻¹ * a * b) := by
+              group
+          _ = ((s * a * s⁻¹ * a) * ((s * b * s⁻¹ * b) * a⁻¹)) * (b⁻¹ * a * b) := by
+              rw [hswap]
+          _ = (s * a * s⁻¹ * a) * ((s * b * s⁻¹ * b) * ⁅a⁻¹, b⁻¹⁆) := by
+              rw [commutatorElement_def, inv_inv, inv_inv]
+              group
+      rw [hfinal]
+      exact mul_mem hai (mul_mem hbi hcm)
+    · -- one_mem
+      refine ⟨one_mem _, ?_⟩
+      have h1 : s * 1 * s⁻¹ * 1 = 1 := by group
+      rw [h1]
+      exact one_mem _
+    · -- inv_mem
+      rintro a ⟨haR, hai⟩
+      refine ⟨inv_mem haR, ?_⟩
+      have h1 : s * a⁻¹ * s⁻¹ * a⁻¹ = a * (s * a * s⁻¹ * a)⁻¹ * a⁻¹ := by group
+      rw [h1]
+      have h3 := hcen _ ((fc.sInvertedT model).inv_mem hai) a haR
+      rw [h3]
+      have h4 : (s * a * s⁻¹ * a)⁻¹ * a * a⁻¹ = (s * a * s⁻¹ * a)⁻¹ := by group
+      rw [h4]
+      exact (fc.sInvertedT model).inv_mem hai
+  obtain ⟨X₁, hX₁⟩ := hsub
+  have hX₁mem : ∀ x : G, x ∈ X₁ ↔ (x ∈ R₁ ∧
+      s * x * s⁻¹ * x ∈ fc.sInvertedT model) := by
+    intro x
+    rw [← SetLike.mem_coe, hX₁]
+    exact Iff.rfl
+  have hT₁X₁ : fc.sInvertedOvergroup R₁ ≤ X₁ := by
+    intro x hx
+    rw [hmemiff] at hx
+    rw [hX₁mem]
+    refine ⟨hx.1, ?_⟩
+    rw [hx.2, inv_mul_cancel]
+    exact one_mem _
+  -- `X₁ ⊓ R = T`.
+  have hX₁R : X₁ ⊓ fc.invImageF model = fc.sInvertedT model := by
+    apply le_antisymm
+    · intro x hx
+      rw [Subgroup.mem_inf] at hx
+      obtain ⟨hx1, hx2⟩ := hx
+      rw [hX₁mem] at hx1
+      have hxTP : x ∈ (fc.sInvertedT model : Set G) * (fc.P : Set G) := by
+        rw [← fc.coe_invImageF_eq_sInvertedT_mul_P model ind hB2 hm]
+        exact hx2
+      obtain ⟨t, ht, y, hy, rfl⟩ := hxTP
+      have hsy : s * y * s⁻¹ = y := by
+        have h1 := Subgroup.mem_centralizer_iff.mp
+          (fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V
+            fc.P_le_V) y hy
+        rw [← hsdef] at h1
+        rw [← h1]
+        group
+      have hty : t * y = y * t := hab t (hTle ht) y (fc.P_le_invImageF model hy)
+      have hd : s * (t * y) * s⁻¹ * (t * y) = y * y := by
+        calc s * (t * y) * s⁻¹ * (t * y)
+            = ((s * t * s⁻¹) * (s * y * s⁻¹)) * (t * y) := by group
+          _ = (t⁻¹ * y) * (t * y) := by rw [hTinv t ht, hsy]
+          _ = (t⁻¹ * (y * t)) * y := by group
+          _ = (t⁻¹ * (t * y)) * y := by rw [hty]
+          _ = y * y := by group
+      rw [hd] at hx1
+      have hyy : y * y ∈ fc.sInvertedT model ⊓ fc.P :=
+        ⟨hx1.2, mul_mem hy hy⟩
+      rw [hTinfP, Subgroup.mem_bot] at hyy
+      have hy1 : y = 1 := by
+        have h6 : y ^ 2 = 1 := by rw [pow_two]; exact hyy
+        have h7 : orderOf y ∣ 2 := orderOf_dvd_of_pow_eq_one h6
+        have h8 : y ^ fc.p = 1 := fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm
+          (fc.P_le_invImageF model hy)
+        have h9 : orderOf y ∣ fc.p := orderOf_dvd_of_pow_eq_one h8
+        obtain ⟨j, hj⟩ := fc.p_odd
+        have h10 := Nat.dvd_gcd h7 h9
+        have h11 : Nat.gcd 2 fc.p = 1 :=
+          (Nat.coprime_primes Nat.prime_two fc.p_prime).mpr (by omega)
+        rw [h11, Nat.dvd_one] at h10
+        exact orderOf_eq_one_iff.mp h10
+      rw [hy1]
+      simpa using ht
+    · intro t ht
+      rw [Subgroup.mem_inf]
+      refine ⟨?_, hTle ht⟩
+      rw [hX₁mem]
+      refine ⟨hRle (hTle ht), ?_⟩
+      rw [hTinv t ht, inv_mul_cancel]
+      exact one_mem _
+  -- the cardinality squeeze `X₁ = T₁`.
+  have hX₁le : X₁ ≤ R₁ := fun x hx => ((hX₁mem x).mp hx).1
+  have hX₁eq : X₁ = fc.sInvertedOvergroup R₁ := by
+    have hdvd : Nat.card ↥X₁ ∣ fc.p ^ 3 := by
+      have h1 := Subgroup.card_dvd_of_le hX₁le
+      rwa [hcard] at h1
+    obtain ⟨i, hi3, hicard⟩ := (Nat.dvd_prime_pow fc.p_prime).mp hdvd
+    have hge : fc.p ^ 2 ≤ Nat.card ↥X₁ := by
+      rw [← hT₁card]
+      exact Subgroup.card_le_of_le hT₁X₁
+    have hne : X₁ ≠ R₁ := by
+      intro h0
+      have h1 : fc.invImageF model ≤ X₁ := h0 ▸ hRle
+      have h2 : X₁ ⊓ fc.invImageF model = fc.invImageF model :=
+        inf_eq_right.mpr h1
+      rw [hX₁R] at h2
+      have h3 : Nat.card ↥(fc.invImageF model) = fc.p := by rw [← h2, hTcard]
+      rw [fc.card_invImageF model ind, hm, pow_one, fc.card_P] at h3
+      have h4 := fc.p_prime.one_lt
+      nlinarith
+    have hi2 : i = 2 := by
+      rcases Nat.lt_or_ge i 2 with h | h
+      · exfalso
+        have h1 : Nat.card ↥X₁ < fc.p ^ 2 := by
+          rw [hicard]
+          exact Nat.pow_lt_pow_right fc.p_prime.one_lt h
+        omega
+      · rcases Nat.lt_or_ge i 3 with h' | h'
+        · omega
+        · exfalso
+          have h1 : i = 3 := by omega
+          have h2 : Nat.card ↥X₁ = Nat.card ↥R₁ := by
+            rw [hicard, h1, hcard]
+          exact hne (Subgroup.eq_of_le_of_card_ge hX₁le (le_of_eq h2.symm))
+    exact (Subgroup.eq_of_le_of_card_ge hT₁X₁
+      (by rw [hicard, hi2, hT₁card])).symm
+  -- conjugates stay mod-`T` inverted.
+  have hsNR : s ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) :=
+    fc.distinguishedInvolution_mem_normalizer_invImageF model ind hB2 hm
+  have hconjle : MulAut.conj k • fc.sInvertedOvergroup R₁ ≤ X₁ := by
+    intro x hx
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hx
+    have h2 : ((MulAut.conj k)⁻¹ • x : G) = k⁻¹ * x * k := by
+      have h3 : ((MulAut.conj k)⁻¹ • x : G) = (MulAut.conj k)⁻¹ x := rfl
+      rw [h3, ← map_inv, MulAut.conj_apply]
+      group
+    rw [h2] at hx
+    rw [hmemiff] at hx
+    have hxR₁ : x ∈ R₁ := by
+      have h3 : x = k * (k⁻¹ * x * k) * k⁻¹ := by group
+      rw [h3]
+      exact hR₁n k hk _ hx.1
+    rw [hX₁mem]
+    refine ⟨hxR₁, ?_⟩
+    have hr₂ : ⁅k⁻¹, s⁆ ∈ R₁ :=
+      fc.commutator_mem_of_mem_normalizer model ind hB2 hm hGp hSigma hRle hR₁le
+        hcard (Subgroup.inv_mem _ hk) hsNR
+    have hc : ⁅⁅k⁻¹, s⁆, (k⁻¹ * x * k)⁻¹⁆ ∈ fc.sInvertedT model := by
+      rw [← hcommT]
+      exact Subgroup.commutator_mem_commutator hr₂ (inv_mem hx.1)
+    have hkey : s * x * s⁻¹ * x = k * ⁅⁅k⁻¹, s⁆, (k⁻¹ * x * k)⁻¹⁆ * k⁻¹ := by
+      have hs' : k⁻¹ * s * k = ⁅k⁻¹, s⁆ * s := by
+        rw [commutatorElement_def]
+        group
+      have hinvx₀ : s * (k⁻¹ * x * k) * s⁻¹ = (k⁻¹ * x * k)⁻¹ := hx.2
+      calc s * x * s⁻¹ * x
+          = k * ((k⁻¹ * s * k) * (k⁻¹ * x * k) * (k⁻¹ * s * k)⁻¹ * (k⁻¹ * x * k))
+            * k⁻¹ := by group
+        _ = k * ((⁅k⁻¹, s⁆ * s) * (k⁻¹ * x * k) * (⁅k⁻¹, s⁆ * s)⁻¹ * (k⁻¹ * x * k))
+            * k⁻¹ := by rw [hs']
+        _ = k * (⁅k⁻¹, s⁆ * (s * (k⁻¹ * x * k) * s⁻¹) * ⁅k⁻¹, s⁆⁻¹ * (k⁻¹ * x * k))
+            * k⁻¹ := by group
+        _ = k * (⁅k⁻¹, s⁆ * (k⁻¹ * x * k)⁻¹ * ⁅k⁻¹, s⁆⁻¹ * (k⁻¹ * x * k)) * k⁻¹ := by
+            rw [hinvx₀]
+        _ = k * ⁅⁅k⁻¹, s⁆, (k⁻¹ * x * k)⁻¹⁆ * k⁻¹ := by
+            rw [commutatorElement_def, commutatorElement_def, inv_inv]
+            group
+    rw [hkey]
+    have h6 := fc.conj_sInvertedT_eq_of_mem_normalizer model ind hB2 hm hGp hSigma hk
+    have h7 := Subgroup.smul_mem_pointwise_smul ⁅⁅k⁻¹, s⁆, (k⁻¹ * x * k)⁻¹⁆
+      (MulAut.conj k) (fc.sInvertedT model) hc
+    rwa [h6] at h7
+  -- conclude by cardinality.
+  rw [hX₁eq] at hconjle
+  apply Subgroup.eq_of_le_of_card_ge hconjle
+  have h8 : Nat.card ↥(MulAut.conj k • fc.sInvertedOvergroup R₁)
+      = Nat.card ↥(fc.sInvertedOvergroup R₁) :=
+    (Nat.card_congr (Subgroup.equivSMul (MulAut.conj k) _).toEquiv).symm
+  rw [h8]
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
