@@ -200,4 +200,84 @@ theorem conjInvariant_eq_bot_or_range_emb
     have : model.emb (Multiplicative.ofAdd (Multiplicative.toAdd y)) ∈ S := hxA
     rwa [show Multiplicative.ofAdd (Multiplicative.toAdd y) = y from rfl] at this
 
+namespace FirstCaseHypothesis
+
+universe uG' uΩ'
+
+variable {G : Type uG'} {Ω : Type uΩ'} [Group G] [MulAction G Ω] [Finite G]
+  (fc : FirstCaseHypothesis G Ω)
+  {F : Type uG'} [NearFields.NearField F]
+  (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+
+/-- **Step (11) invariant-subgroup dichotomy** (the "`C_Q(P)` acts transitively on `F^*`"
+consequence at the `G`-level): a `C_G(P)`-conjugation-invariant subgroup `S` with
+`P ≤ S ≤ R` is `P` or `R`.  The image of `S` in the faithful quotient is a
+`Q`-conjugation-invariant subgroup of the translations, hence `⊥` or all of `emb(F)`
+(`conjInvariant_eq_bot_or_range_emb`); pulling back, `S ≤ N = P` (step (7), inheriting
+`ind`) or `R ≤ S·N = S`. -/
+theorem eq_P_or_eq_invImageF_of_conj_invariant
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    {S : Subgroup G} (hPS : fc.P ≤ S) (hSR : S ≤ fc.invImageF model)
+    (hinv : ∀ c ∈ Subgroup.centralizer (fc.P : Set G), ∀ s ∈ S, c * s * c⁻¹ ∈ S) :
+    S = fc.P ∨ S = fc.invImageF model := by
+  classical
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  have hSL : S ≤ L := hSR.trans (fc.invImageF_le_centralizer model)
+  -- the image of `S` in the faithful quotient
+  set Sbar : Subgroup (fc.toHypothesis.centralizerActionQuotient fc.P) :=
+    (S.subgroupOf L).map (QuotientGroup.mk' N') with hSbardef
+  have hSbar_le : Sbar ≤ MonoidHom.range model.emb := by
+    rintro z ⟨y, hy, rfl⟩
+    have hyS : (y : G) ∈ S := Subgroup.mem_subgroupOf.mp hy
+    have h := (fc.mem_invImageF_iff model y.2).mp (hSR hyS)
+    have hye : (⟨(y : G), y.2⟩ : ↥L) = y := Subtype.ext rfl
+    rwa [hye] at h
+  have hSbar_inv : ∀ q : ↥(fc.rankOneQuotient).Q, ∀ z ∈ Sbar,
+      (q : fc.toHypothesis.centralizerActionQuotient fc.P) * z *
+        (q : fc.toHypothesis.centralizerActionQuotient fc.P)⁻¹ ∈ Sbar := by
+    intro q z hz
+    obtain ⟨y, hy, rfl⟩ := hz
+    obtain ⟨c, hc⟩ := QuotientGroup.mk'_surjective N' (q : _)
+    refine ⟨c * y * c⁻¹,
+      Subgroup.mem_subgroupOf.mpr
+        (hinv (c : G) c.2 (y : G) (Subgroup.mem_subgroupOf.mp hy)),
+      by rw [map_mul, map_mul, map_inv, hc]⟩
+  rcases conjInvariant_eq_bot_or_range_emb model hSbar_le hSbar_inv with hbot | htop
+  · -- `S̄ = ⊥`: every element of `S` lies in `N`, and `N = P` (step (7)).
+    left
+    refine le_antisymm (fun s hs => ?_) hPS
+    have hsL : s ∈ L := hSL hs
+    have hz : QuotientGroup.mk' N' ⟨s, hsL⟩ ∈ Sbar :=
+      ⟨⟨s, hsL⟩, Subgroup.mem_subgroupOf.mpr hs, rfl⟩
+    rw [hbot, Subgroup.mem_bot, QuotientGroup.mk'_apply] at hz
+    have hsN : (⟨s, hsL⟩ : ↥L) ∈ N' := (QuotientGroup.eq_one_iff _).mp hz
+    have hker : s ∈ fc.kernelN := ⟨⟨s, hsL⟩, hsN, rfl⟩
+    rwa [fc.kernelN_eq_P ind] at hker
+  · -- `S̄ = emb(F)`: every element of `R` differs from one of `S` by `N = P ≤ S`.
+    right
+    refine le_antisymm hSR (fun r hr => ?_)
+    have hrL : r ∈ L := fc.invImageF_le_centralizer model hr
+    have hz : QuotientGroup.mk' N' ⟨r, hrL⟩ ∈ Sbar := by
+      rw [htop]
+      have h := (fc.mem_invImageF_iff model hrL).mp hr
+      exact h
+    obtain ⟨y, hy, hyr⟩ := hz
+    have hyS : (y : G) ∈ S := Subgroup.mem_subgroupOf.mp hy
+    -- `mk' y = mk' ⟨r⟩` forces `⟨r⟩·y⁻¹ ∈ N'`, i.e. `r·y⁻¹ ∈ N = P ≤ S`.
+    have h1 : QuotientGroup.mk' N' ((⟨r, hrL⟩ : ↥L) * y⁻¹) = 1 := by
+      rw [map_mul, map_inv, ← hyr, mul_inv_cancel]
+    have hdiff : (⟨r, hrL⟩ : ↥L) * y⁻¹ ∈ N' := by
+      rw [QuotientGroup.mk'_apply] at h1
+      exact (QuotientGroup.eq_one_iff _).mp h1
+    have hkG : r * (y : G)⁻¹ ∈ fc.kernelN := ⟨_, hdiff, rfl⟩
+    rw [fc.kernelN_eq_P ind] at hkG
+    have hre : r = (r * (y : G)⁻¹) * (y : G) := by group
+    rw [hre]
+    exact S.mul_mem (hPS hkG) hyS
+
+end FirstCaseHypothesis
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
