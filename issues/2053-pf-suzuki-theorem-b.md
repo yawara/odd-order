@@ -886,3 +886,43 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
   **⟹ (12) は全部品 sorry-free で完結。次 frontier = 文書順で (13)–(17)
   ((10.2) 側 endgame: p = 3, Z₁ = ⟨st⟩, PSL(2,8), Hall–Wielandt 可換版, R₂⟨s⟩;
   pp. 113–114 Read 済、(14) は kernel-同定機構を δ2'/δ4 から再利用)。**
+
+### (13) C_G(Z₁) は 3-群 — 実装計画 (2026-07-25 精読・部品確定済)
+
+原文 p. 113 (PDF page 6 直読済)。Z₁ = ⟨st⟩、orderOf(st) = 3 ((10.2) の
+`orderOf_st_eq_char` + char = 3)。証明 = |C_G(Z₁)| = |C∩C_G(s)|·|J| 分解
+(J = s-反転元集合) → 両因子が 3-冪。**部品は全て実在確認済**:
+
+- **Odd |C_G(st)|**: `centralizer_natCard_odd_of_stronglyReal` (StronglyReal.lean:469)
+  に x := st (st = s·t は def どおり strongly real、(st)² ≠ 1 は位数 3)。
+- **§1 Lemma (a)**: `card_eq_card_centralizer_mul_ncard_invertedBy`
+  (InvertedProduct.lean:244; X := C_G(st)、t := s、hodd ↑、hnorm = s は st を反転
+  → C_G(st) を正規化)。
+- **C ⊓ C_G(s) = V = WP**: C_G(st)∩C_G(s) = C_G(s)∩C_G(t) (可換性の同値変形)
+  = V (Ch.I の V-特徴付け; 所在は実装時に grep) — |V| = |W|·|P| は 3-冪
+  ((10.2): |W| ∈ {3,9}, |P| = 3)。
+- **(13a) 新 generic 補題 (唯一の新規 infra)**: 「r prime ∣ |invertedBy X t| →
+  ∃ x ∈ invertedBy X t, orderOf x = r」(Cauchy-in-J)。証明 (自己完結 ~100 行,
+  重 machinery 不要): X⟨t⟩ 内で R ∈ Syl_r(X) に Frattini → coset X·t 内の
+  2-元 trick で対合 u ∈ N(R) ∩ X·t → **既存 `exists_mem_normalizer_conj_of_odd_orderOf`**
+  (StronglyReal.lean:40, 対合対の奇積 dihedral 共役が normalizer 保存) で
+  u = t^c (c ∈ X) → R^{c⁻¹} は t-不変 Sylow → Lemma (a) を R^{c⁻¹} に適用、
+  r-進付値の積乗法性 (|X| = |Y|·|J|) で C_R(t) < R → 非自明 s-反転 r-冪元 →
+  冪で位数 r (invertedBy は冪閉)。置き場 = StronglyReal.lean generic 節
+  (dihedral 補題と同居) or InvertedProduct.lean (import 向き確認)。
+- **r ∈ {3,7}**: x ∈ J 位数 r、strongly real (x = t·(tx)、(tx)² = 1) →
+  normal form `exists_isConj_mul_t_of_stronglyReal` (x ~ u·t, u ∈ Q₀#) →
+  u·t ∈ ⟨Q₀,K,t⟩ =: L ≅ PSL(2,8) (**Lemma 4** =
+  `exists_orderThreeGeneratedSubgroup_mulEquiv_psl2`, hst = orderOf(st) = 3,
+  q = |Q₀| = 2³) → r ∣ |PSL(2,F₈)| = 504 = 2³·3²·7、r 奇 (J ⊆ C 奇) → r ∈ {3,7}。
+  ⚠ |PSL(2,F₈)| = 504 の card 計算が repo に要るか確認
+  (Matrix.ProjectiveSpecialLinearGroup card — mathlib/repo grep)。
+- **r = 7 の排除**: 7-Sylow(L) = K-共役 (|K| = 2^p−1 = 7)、x ~ k ∈ K^# →
+  C_G(x) ≅ C_G(k)、Ch.I §2 Prop 1(a) (K^# は固定点 2 個) → C_G(k) = C_D(K) = KW。
+  st ∈ C_G(x) の像 = KW 内 strongly real 位数 3 元 — KW の位数 3 元は W 側、
+  W^# は strongly real でない (Ch.I 系; 所在実装時 grep — FirstCase の
+  `not_isStronglyReal_of_mem_P` 同型パターン) → 矛盾。
+- **assembly**: |C| = |V|·|J|、|V| = 3-冪、|J| の素因数は 3 のみ → C は 3-群
+  (`IsPGroup.of_card`-style: card = 3^k 形へ)。
+
+実装順: (13a) generic → (13) 本体 (新 leaf `FirstCase/StepThirteen.lean`)。
