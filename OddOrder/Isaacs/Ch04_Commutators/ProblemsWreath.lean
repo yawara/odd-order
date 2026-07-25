@@ -255,6 +255,40 @@ theorem commutatorElement_inl_inr (f : Q → D) (q : Q) :
 
 /-! ### Problem 4A.11 — `⁅B, K⁆` の剰余類による特徴づけ (p. 125) -/
 
+/-- 右剰余類の同値関係 `a ~ b ⟺ a b⁻¹ ∈ K` (同値類は `Kb`). -/
+def rightCosetSetoid (K : Subgroup Q) : Setoid Q where
+  r a b := a * b⁻¹ ∈ K
+  iseqv := ⟨fun _ => by simp, fun {_ _} h => by simpa using K.inv_mem h,
+    fun {_ _ _} hab hbc => by simpa [mul_assoc] using K.mul_mem hab hbc⟩
+
+/-- 各右剰余類から選んだ代表元 (`Quotient.out`). -/
+noncomputable def cosetRep (K : Subgroup Q) (ω : Q) : Q :=
+  (Quotient.mk (rightCosetSetoid K) ω).out
+
+theorem cosetRep_rel (K : Subgroup Q) (ω : Q) : cosetRep K ω * ω⁻¹ ∈ K :=
+  Quotient.exact (Quotient.out_eq (Quotient.mk (rightCosetSetoid K) ω))
+
+theorem cosetRep_eq_of_rel {K : Subgroup Q} {ω ω' : Q} (h : ω * ω'⁻¹ ∈ K) :
+    cosetRep K ω = cosetRep K ω' :=
+  congrArg Quotient.out (Quotient.sound (s := rightCosetSetoid K) h)
+
+theorem cosetRep_idem (K : Subgroup Q) (ω : Q) : cosetRep K (cosetRep K ω) = cosetRep K ω :=
+  cosetRep_eq_of_rel (cosetRep_rel K ω)
+
+open scoped Classical in
+/-- 代表元は同じ剰余類の元同士で一致するので, 剰余類の filter は代表元でも同じ. -/
+theorem filter_mem_cosetRep (K : Subgroup Q) [Fintype Q] (ω : Q) :
+    Finset.univ.filter (fun x : Q => x * (cosetRep K ω)⁻¹ ∈ K)
+      = Finset.univ.filter (fun x : Q => x * ω⁻¹ ∈ K) := by
+  refine Finset.filter_congr fun x _ => ?_
+  have hr : cosetRep K ω * ω⁻¹ ∈ K := cosetRep_rel K ω
+  refine ⟨fun h => ?_, fun h => ?_⟩
+  · have := K.mul_mem h hr
+    simpa [mul_assoc] using this
+  · have := K.mul_mem h (K.inv_mem hr)
+    simpa [mul_assoc] using this
+
+
 open scoped Classical in
 /-- **各右剰余類 `Kω` 上で座標積が `1`** な tuple 全体 (Isaacs Problem 4A.11 の右辺).
 
@@ -353,19 +387,11 @@ theorem commutator_range_inl_map_inr_eq [Fintype Q] (K : Subgroup Q) :
       rw [← hcomm]
       exact Subgroup.commutator_mem_commutator ⟨_, rfl⟩ ⟨y * x⁻¹, hyx, rfl⟩
     rintro _ ⟨f, hf, rfl⟩
-    -- 右剰余類の setoid と代表元
-    let S : Setoid Q :=
-      { r := fun a b => a * b⁻¹ ∈ K
-        iseqv := ⟨fun a => by simp,
-          fun {a b} h => by simpa using K.inv_mem h,
-          fun {a b c} hab hbc => by simpa [mul_assoc] using K.mul_mem hab hbc⟩ }
-    set ρ : Q → Q := fun ω => (Quotient.mk S ω).out with hρdef
-    have hρrel : ∀ ω : Q, ρ ω * ω⁻¹ ∈ K := by
-      intro ω
-      exact Quotient.exact (Quotient.out_eq (Quotient.mk S ω))
-    have hρeq : ∀ ω ω' : Q, ω * ω'⁻¹ ∈ K → ρ ω = ρ ω' := fun ω ω' h =>
-      congrArg Quotient.out (Quotient.sound (a := ω) (b := ω') h)
-    have hρidem : ∀ ω : Q, ρ (ρ ω) = ρ ω := fun ω => hρeq _ _ (hρrel ω)
+    -- 右剰余類の代表元
+    set ρ : Q → Q := cosetRep K with hρdef
+    have hρrel : ∀ ω : Q, ρ ω * ω⁻¹ ∈ K := cosetRep_rel K
+    have hρeq : ∀ ω ω' : Q, ω * ω'⁻¹ ∈ K → ρ ω = ρ ω' := fun _ _ h => cosetRep_eq_of_rel h
+    have hρidem : ∀ ω : Q, ρ (ρ ω) = ρ ω := cosetRep_idem K
     -- `f = ∏_x (δ_x (f x) · (δ_{ρ x}(f x))⁻¹)`
     have hdecomp :
         (∏ x : Q, (fun ω => (Pi.mulSingle x (f x) : Q → D) ω *
@@ -410,6 +436,104 @@ theorem commutator_range_inl_map_inr_eq [Fintype Q] (K : Subgroup Q) :
     rw [← hdecomp]
     exact hmem
 
+
+/-! ### Problem 4A.11 の位数 -/
+
+/-- `(k, t) ↦ k t` は `K × T ≃ Q` (`T` = 代表元の集合). -/
+theorem card_cosetRepFixed_mul_card (K : Subgroup Q) [Finite Q] :
+    Nat.card {x : Q // cosetRep K x = x} * Nat.card K = Nat.card Q := by
+  rw [← Nat.card_prod]
+  refine Nat.card_eq_of_bijective
+    (fun p : {x : Q // cosetRep K x = x} × K => ((p.2 : Q) * (p.1 : Q))) ⟨?_, ?_⟩
+  · rintro ⟨⟨t₁, ht₁⟩, ⟨k₁, hk₁⟩⟩ ⟨⟨t₂, ht₂⟩, ⟨k₂, hk₂⟩⟩ h
+    simp only at h
+    have hrel : t₁ * t₂⁻¹ ∈ K := by
+      have heq : t₁ * t₂⁻¹ = k₁⁻¹ * ((k₁ * t₁) * (k₂ * t₂)⁻¹) * k₂ := by group
+      rw [heq, h, mul_inv_cancel]
+      simpa using K.mul_mem (K.inv_mem hk₁) hk₂
+    have ht : t₁ = t₂ := by
+      have := cosetRep_eq_of_rel (K := K) hrel
+      rwa [ht₁, ht₂] at this
+    subst ht
+    have hk : k₁ = k₂ := mul_right_cancel h
+    subst hk
+    rfl
+  · intro x
+    refine ⟨(⟨cosetRep K x, cosetRep_idem K x⟩, ⟨x * (cosetRep K x)⁻¹, ?_⟩), by group⟩
+    simpa using K.inv_mem (cosetRep_rel K x)
+
+/-- 代表元の個数は剰余類の個数 `|Q : K|`. -/
+theorem card_cosetRepFixed (K : Subgroup Q) [Finite Q] :
+    Nat.card {x : Q // cosetRep K x = x} = K.index := by
+  refine Nat.eq_of_mul_eq_mul_right (Nat.card_pos (α := K)) ?_
+  rw [card_cosetRepFixed_mul_card K, ← Subgroup.card_mul_index K, mul_comm]
+
+open scoped Classical in
+/-- 各代表元での剰余類積を取る準同型 (核が `cosetProdKer K`, 全射). -/
+noncomputable def cosetProdRepHom [Fintype Q] (K : Subgroup Q) :
+    (Q → D) →* ({x : Q // cosetRep K x = x} → D) where
+  toFun f t := ∏ x ∈ Finset.univ.filter (fun x : Q => x * (t : Q)⁻¹ ∈ K), f x
+  map_one' := by funext t; simp
+  map_mul' f g := by
+    funext t
+    simp only [Pi.mul_apply]
+    exact Finset.prod_mul_distrib
+
+open scoped Classical in
+theorem ker_cosetProdRepHom [Fintype Q] (K : Subgroup Q) :
+    (cosetProdRepHom (D := D) K).ker = cosetProdKer (D := D) K := by
+  ext f
+  rw [MonoidHom.mem_ker, mem_cosetProdKer_iff]
+  refine ⟨fun h ω => ?_, fun h => funext fun t => h (t : Q)⟩
+  have ht := congrFun h ⟨cosetRep K ω, cosetRep_idem K ω⟩
+  rw [← filter_mem_cosetRep K ω]
+  exact ht
+
+open scoped Classical in
+theorem surjective_cosetProdRepHom [Fintype Q] (K : Subgroup Q) :
+    Function.Surjective (cosetProdRepHom (D := D) K) := by
+  intro h
+  refine ⟨fun x => if hx : cosetRep K x = x then h ⟨x, hx⟩ else 1, ?_⟩
+  funext t
+  change (∏ x ∈ Finset.univ.filter (fun x : Q => x * (t : Q)⁻¹ ∈ K),
+      (if hx : cosetRep K x = x then h ⟨x, hx⟩ else 1)) = h t
+  rw [Finset.prod_eq_single (t : Q)]
+  · rw [dif_pos t.2]
+  · intro b hb hbt
+    refine dif_neg fun hbfix => hbt ?_
+    have hbrel : b * (t : Q)⁻¹ ∈ K := (Finset.mem_filter.mp hb).2
+    have hcr := cosetRep_eq_of_rel (K := K) hbrel
+    rwa [hbfix, t.2] at hcr
+  · intro hnot
+    exact absurd (Finset.mem_filter.mpr ⟨Finset.mem_univ _, by simp⟩) hnot
+
+/-- **Isaacs Problem 4A.11 (位数, 積の形)**: `|⁅B,K⁆| · |A|^{|H:K|} = |A|^{|H|}`. -/
+theorem card_cosetProdKer_mul [Fintype Q] [Finite D] (K : Subgroup Q) :
+    Nat.card (cosetProdKer (D := D) K) * Nat.card D ^ K.index = Nat.card D ^ Nat.card Q := by
+  have hker := Subgroup.card_mul_index (cosetProdRepHom (D := D) K).ker
+  rw [Subgroup.index_ker, MonoidHom.range_eq_top.mpr (surjective_cosetProdRepHom K),
+    Subgroup.card_top, ker_cosetProdRepHom, Nat.card_fun, card_cosetRepFixed,
+    Nat.card_fun] at hker
+  exact hker
+
+/-- **Isaacs Problem 4A.11 (位数, 書籍の形)**: `|⁅B, K⁆| = |A|^{|H| − |H:K|}`. -/
+theorem card_commutator_range_inl_map_inr [Finite Q] [Finite D] (K : Subgroup Q) :
+    Nat.card ((⁅(inl : (Q → D) →* D ≀[Q] Q).range, K.map (inr : Q →* D ≀[Q] Q)⁆ :
+        Subgroup (D ≀[Q] Q)))
+      = Nat.card D ^ (Nat.card Q - K.index) := by
+  letI : Fintype Q := Fintype.ofFinite Q
+  have hidx : K.index ≤ Nat.card Q :=
+    Nat.le_of_dvd Nat.card_pos (Subgroup.index_dvd_card K)
+  have hpos : 0 < Nat.card D ^ K.index := pow_pos Nat.card_pos _
+  have hmap : Nat.card ((⁅(inl : (Q → D) →* D ≀[Q] Q).range,
+      K.map (inr : Q →* D ≀[Q] Q)⁆ : Subgroup (D ≀[Q] Q)))
+        = Nat.card (cosetProdKer (D := D) K) := by
+    rw [commutator_range_inl_map_inr_eq]
+    exact (Nat.card_congr (Subgroup.equivMapOfInjective _ _ inl_injective).toEquiv).symm
+  refine Nat.eq_of_mul_eq_mul_right hpos ?_
+  rw [hmap, card_cosetProdKer_mul, ← pow_add]
+  congr 1
+  omega
 
 /-! ### Problem 4A.8(b) (再掲) — `⁅A, U⁆ = P'` -/
 

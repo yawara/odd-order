@@ -1185,7 +1185,28 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 `X.mpr` 形が「Unknown constant X.mpr」になる (`(X _).mpr` と書く) /
 `by` ブロックを入れ子にした改行継続は parse error になりやすい (`have` に切り出す)。
 
-### 残り (文書順): 4A.11 / 4A.12。
+### 残り (文書順): 4A.12。
+
+#### 🎉 4A.11 完了 (2026-07-25) — `ProblemsWreath.lean` に追加
+
+**主結果** (実証明・axiom-clean):
+- `commutator_range_inl_map_inr_eq` : **`⁅B, K⁆ = (cosetProdKer K).map inl`**
+  (`cosetProdKer K` = 各右剰余類 `Kω` 上で座標積が `1` な tuple 全体)
+- `card_commutator_range_inl_map_inr` : **`|⁅B,K⁆| = |A|^{|H| − |H:K|}`** (書籍の形)
+- 積の形 `card_cosetProdKer_mul` (`|⁅B,K⁆| · |A|^{|H:K|} = |A|^{|H|}`; ℕ の切り捨て減算を避ける)
+
+支持部品: `rightCosetSetoid` / `cosetRep` (`Quotient.out` による代表元) + 3 補題 /
+`filter_mem_cosetRep` / `cosetProdRepHom` (各代表元での剰余類積、核 = `cosetProdKer`、全射) /
+`card_cosetRepFixed` (代表元の個数 = `K.index`; `K × T ≃ Q`, `(k,t) ↦ kt` の全単射から)。
+
+⚠ **4A.8(b) は `K = ⊤` の特殊化**なので従来の独立証明 (~70 行) を削除し
+`cosetProdKer_top` 経由の系に置換した (同事実の二重管理を解消)。
+
+⚠ 教訓: `open scoped Classical in` は **docstring より前**に置く (後ろだと parse error) /
+`Nat.card ⁅A,B⁆` は `(… : Subgroup G)` の型註釈が要る (`Bracket … Type` に取られる) /
+`Fintype ↥K` は `[Fintype Q]` だけでは合成されない (classical か `DecidablePred` が要る)。
+
+以下は着手前の設計メモ (実装は概ねこの通り):
 
 #### 4A.11 の設計 (2026-07-25、着手前メモ)
 
