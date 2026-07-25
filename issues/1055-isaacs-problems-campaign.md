@@ -1472,10 +1472,19 @@ Lean 用の具体的な減少測度は **`m` 進数値 `μ(ι) := ∑_p ι_p · 
 帰納は閉じない — 上の論法とは別筋) / `conj_mem_closure_of_conj_mem` /
 `exists_pow_mul_prod_eq_notMem`。
 
-**実装計画**: 語を `List (Fin m)` で持ち、評価 `ev : List (Fin m) → G`、測度 `μ`、
-「`∀ ι, ∃ κ, κ.Sorted (· ≤ ·) ∧ ev κ = ev ι`」を `μ` についての強帰納で示す。
-その後ソート済添字列を `x₁^{a₁}⋯x_m^{a_m}` に読み替え、`(Fin m → Fin n)` からの全射で
-`Nat.card ⟨X⟩ ≤ n^m` を出す。
+**実装状況 (2026-07-26)**: **組合せ部分は landing 済** (`Problems5B.lean` の
+`namespace Sort5B2`):
+* `measure` (`m` 進数値) と `measure_lt` / `measure_cons_lt` / `measure_append_lt`
+* `exists_inversion` — ソートされていない添字列には隣接逆転がある
+* ⭐ `exists_chain'_map_prod_eq` — 共役閉な枚挙 `xs : Fin m → G` に対し
+  **任意の添字列は同じ積を与える単調増加な添字列に書き換えられる** (`measure` の強帰納)
+
+⚠ `List.Chain'` は deprecated、`List.IsChain` を使う (`List.isChain_cons` /
+`isChain_nil` / `isChain_singleton`)。
+
+**残り**: ソート済添字列を `x₁^{a₁}⋯x_m^{a_m}` に読み替え、`(Fin m → Fin n)` からの
+全射で `Nat.card ⟨X⟩ ≤ n^m` (`Nat.card_le_card_of_surjective`)。指数は `x^n = 1` で
+`n` 未満に落とす。`⟨X⟩` の元が `X` の元の積であることは `x⁻¹ = x^(n-1)` から。
 
 ⚠ **`S₃` は「因子がすべて `≤ n` の subnormal 列」では説明できない** (`|S₃| = 6 = 2·3` で
 `3 > 2`) ので、`n^m` は**衝突込みの数え上げ**でしか出ない。鎖による評価を試みても無駄。

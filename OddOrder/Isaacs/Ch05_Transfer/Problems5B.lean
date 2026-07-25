@@ -235,6 +235,100 @@ theorem exists_notMem_conj_mem_of_mem_commutator [Finite G] {p : ℕ} [Fact p.Pr
     · exact absurd h hnot
     · exact h ▸ dvd_rfl
 
+/-! ### Problem 5B.2: 添字列のソート (隣接交換 + 辞書式降下)
+
+書籍 hint の collection process を**隣接交換によるソート**として実装する。
+`x_i x_j = x_j · (x_j⁻¹ x_i x_j)` で逆転 (`j < i`) を解消すると, 添字列の
+`m` 進数値 `measure` が狭義減少するので停止する。 -/
+
+namespace Sort5B2
+
+variable {m : ℕ}
+
+/-- 添字列の `m` 進数値 (先頭が最上位桁)。隣接交換の停止性の測度。 -/
+def measure (m : ℕ) : List (Fin m) → ℕ
+  | [] => 0
+  | a :: t => (a : ℕ) * m ^ t.length + measure m t
+
+theorem measure_lt (m : ℕ) : ∀ ι : List (Fin m), measure m ι < m ^ ι.length
+  | [] => by simp [measure]
+  | a :: t => by
+    have ht := measure_lt m t
+    have ha : (a : ℕ) + 1 ≤ m := a.isLt
+    have hcalc : ((a : ℕ) + 1) * m ^ t.length ≤ m * m ^ t.length :=
+      Nat.mul_le_mul_right _ ha
+    simp only [measure, List.length_cons, pow_succ']
+    nlinarith [ht, hcalc]
+
+theorem measure_cons_lt {a b : Fin m} {t t' : List (Fin m)}
+    (hab : (b : ℕ) < (a : ℕ)) (hlen : t'.length = t.length) :
+    measure m (b :: t') < measure m (a :: t) := by
+  have h1 : measure m t' < m ^ t'.length := measure_lt m t'
+  rw [hlen] at h1
+  have h2 : ((b : ℕ) + 1) * m ^ t.length ≤ (a : ℕ) * m ^ t.length :=
+    Nat.mul_le_mul_right _ hab
+  simp only [measure, hlen]
+  nlinarith [h1, h2, Nat.zero_le (measure m t)]
+
+theorem measure_append_lt (pre : List (Fin m)) {r r' : List (Fin m)}
+    (hlen : r'.length = r.length) (h : measure m r' < measure m r) :
+    measure m (pre ++ r') < measure m (pre ++ r) := by
+  induction pre with
+  | nil => simpa using h
+  | cons a t ih =>
+    have hle : (t ++ r').length = (t ++ r).length := by
+      simp [hlen]
+    simp only [List.cons_append, measure, hle]
+    omega
+
+/-- ソートされていない添字列には隣接する逆転がある。 -/
+theorem exists_inversion {ι : List (Fin m)} (h : ¬ ι.IsChain (· ≤ ·)) :
+    ∃ (pre post : List (Fin m)) (i j : Fin m),
+      ι = pre ++ i :: j :: post ∧ (j : ℕ) < (i : ℕ) := by
+  induction ι with
+  | nil => exact absurd List.isChain_nil h
+  | cons a t ih =>
+    cases t with
+    | nil => exact absurd (List.isChain_singleton a) h
+    | cons b t' =>
+      by_cases hab : a ≤ b
+      · have ht : ¬ (b :: t').IsChain (· ≤ ·) := fun hc =>
+          h (List.isChain_cons.mpr ⟨by simpa using hab, hc⟩)
+        obtain ⟨pre, post, i, j, heq, hij⟩ := ih ht
+        exact ⟨a :: pre, post, i, j, by rw [heq]; rfl, hij⟩
+      · exact ⟨[], t', a, b, rfl, Fin.lt_def.mp (not_le.mp hab)⟩
+
+/-- ⭐ **Problem 5B.2 の核**: 共役閉な枚挙 `xs : Fin m → G` に対し, 任意の添字列は
+同じ積を与える**単調増加な**添字列に書き換えられる。
+
+`measure` についての強帰納。逆転 `x_i x_j` (`j < i`) を `x_j x_k`
+(`xs k = (xs j)⁻¹ * xs i * xs j`) に書き換えると `measure` が狭義減少する。 -/
+theorem exists_chain'_map_prod_eq {G : Type*} [Group G] (xs : Fin m → G)
+    (hconj : ∀ i j : Fin m, ∃ k : Fin m, (xs j)⁻¹ * xs i * xs j = xs k) :
+    ∀ ι : List (Fin m), ∃ κ : List (Fin m), κ.IsChain (· ≤ ·) ∧
+      (κ.map xs).prod = (ι.map xs).prod ∧ κ.length = ι.length := by
+  intro ι
+  induction hM : measure m ι using Nat.strong_induction_on generalizing ι with
+  | _ M ih =>
+    by_cases hs : ι.IsChain (· ≤ ·)
+    · exact ⟨ι, hs, rfl, rfl⟩
+    · obtain ⟨pre, post, i, j, rfl, hij⟩ := exists_inversion hs
+      obtain ⟨k, hk⟩ := hconj i j
+      have hprod : ((pre ++ j :: k :: post).map xs).prod =
+          ((pre ++ i :: j :: post).map xs).prod := by
+        simp only [List.map_append, List.map_cons, List.prod_append, List.prod_cons]
+        congr 1
+        rw [← hk]
+        group
+      have hlen : (pre ++ j :: k :: post).length = (pre ++ i :: j :: post).length := by
+        simp
+      have hdec : measure m (pre ++ j :: k :: post) < measure m (pre ++ i :: j :: post) :=
+        measure_append_lt pre (by simp) (measure_cons_lt hij (by simp))
+      obtain ⟨κ, hκ1, hκ2, hκ3⟩ := ih _ (hM ▸ hdec) (pre ++ j :: k :: post) rfl
+      exact ⟨κ, hκ1, hκ2.trans hprod, hκ3.trans hlen⟩
+
+end Sort5B2
+
 end
 
 end OddOrder.Isaacs.Ch05
