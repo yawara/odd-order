@@ -1299,8 +1299,18 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
     `map_commutator`)。
   ⚠ 教訓: `x ∈ commutatorMemLeft N y` は `⁅x,y⁆ ∈ N` と defeq だが**構文的に違う**ので
   `commutatorElement_mem_comm` に渡すには `show ⁅x,y⁆ ∈ N from …` の型註釈が要る。
-- ⬜ **4B.5** (`G` 超可解 ⟹ `M(G)` は class ≤ 3 で冪零) — **設計確定・実装途中で中断
-  (2026-07-25、ユーザー区切り)**。
+- ✅ **4B.5 完了 (2026-07-25)** — 新 leaf `Ch04_Commutators/ProblemsSupersolvableMann.lean`
+  (167 行、`OddOrder.lean` 配線済、全実証明・axiom-clean)。
+  `exists_normal_centralizer_eq_self_of_isSupersolvable` (超可解群は自己中心化する正規部分群を
+  持つ) + `nilpotencyClass_mannSubgroup_le_of_isSupersolvable` (`class M(G) ≤ 3`) +
+  `isNilpotent_mannSubgroup_of_isSupersolvable`。下記の設計どおり。
+  ⚠ 実装で判明した追加の API 注意:
+  * `isCyclic_of_prime_card` は `[Fact p.Prime]` を要求 → `haveI : Fact (Nat.card ↥M).Prime := ⟨h⟩`
+    を置いてから `isCyclic_of_prime_card (p := Nat.card ↥M) rfl`。
+  * `QuotientGroup.eq_one_iff.mpr ha` は項として書くと "Unknown constant" になる
+    (`rw` の中で使うときは `have h1 : mk' A a = 1 := by rw [...]; exact ha` に分解する)。
+  * 最後の `Mbar = ⊥` からの矛盾は `simp at hprime` では閉じない
+    (`simp only [Subgroup.card_bot]` + `Nat.not_prime_one`)。
 
   **`M(G)` と Thm 4.15 は repo に既にある** (`Ch04_Commutators/Mann.lean`):
   `mannSubgroup G` / `nilpotencyClass_mannSubgroup_le_of_centralizer_eq_self [Finite G]
@@ -1326,6 +1336,59 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
     `Subgroup.centralizer_normal_of_normal` は**存在しない**。
   * `isCyclic_of_prime_card` は `Nat.card ↥M = p` の形を要求する
     (`(Nat.card ↥M).Prime` からは `⟨_, rfl⟩` 等で渡す)。
+
+### 🎉 §4B 完済 (4B.1–4B.5 全 5 問)。
+
+## Ch.4 §4C (書籍 p. 137 の Problems 4C) — 🎉 完済 (2026-07-25)
+
+新 leaf `OddOrder/Isaacs/Ch04_Commutators/ProblemsStabilityGroup.lean` (331 行、
+`OddOrder.lean` 配線済、全実証明・axiom-clean)。§4C は「`A` が `G` に自己同型で作用する」
+節で, Isaacs 自身が「`A` と `G` をともに半直積 `Γ = G ⋊ A` の部分群とみなす」と宣言している
+(p. 131) ので, **周囲群 `Γ` の部分群 `G`, `A`** に対する形で述べた (半直積はその特別な場合)。
+
+「`A` が鎖 `1 = H₀ ⊆ ⋯ ⊆ H_m = G` を stabilize する」(= `H_{i-1}` の `H_i` における各右剰余類が
+`A`-不変) は交換子で `⁅H i, A⁆ ≤ H (i-1)` と同値 ⟹ 構造体 `StabilizesChain` (`base` + `step`)。
+書籍の有限鎖 (条件は `0 < i ≤ m` のみ) との橋渡しは `stabilizesChain_min`
+(`H (min i m)` で上端 `G` に延長; `G ⊴ Γ` ゆえ `⁅G,A⁆ ≤ G` で延長部分は自動)。
+
+| # | 状態 | Lean 名 (`OddOrder.Isaacs.Ch04`) |
+|---|---|---|
+| 4C.1 | ✅ | `exists_stabilizes_isSubnormal_chain` (+ 有限鎖版 `..._of_finite`) |
+| 4C.2 | ✅ | `StabilizesChain.nilpotencyClass_le` / `.isNilpotent` (+ 有限鎖版 `nilpotencyClass_le_of_stabilizes_finite_normal_chain`) |
+| 4C.3 | ✅ | `commutator_commutator_eq_bot_of_trivial_on_normal` (+ `le_centralizer_commutator_of_trivial_on_normal`) |
+
+**設計メモ**:
+
+- **4C.1 の「部分正規部分群の鎖」= 反復交換子列**: `M i := ⁅G, A; m - i⁆` (4A.9 の
+  `commIterate`)。`⁅L, A⁆` が `L` に正規化される (`le_normalizer_commutator_left`, 4A.9) ので
+  各段 `⁅G,A;j+1⁆ ⊴ ⁅G,A;j⁆` が部分正規段になり, `⁅G,A;0⁆ = G ⊴ Γ` からの帰納で
+  `IsSubnormal` (Γ 内)。`↥G` 内の部分正規は `IsSubnormal.comap G.subtype` で即出る
+  (`subgroupOf = comap subtype`)。停止 `M 0 = ⊥` は `⁅G,A;j⁆ ≤ H (m-j)` の帰納。
+  再利用 helper: `commIterate_le_commIterate_of_le` (添字一般の単調減少) /
+  `isSubnormal_commIterate` / `normal_subgroupOf_commIterate_succ` /
+  `commIterate_le_of_stabilizesChain` / `le_normalizer_of_normal`。
+- **4C.2 の核 = `commutator_lowerCentralSeries_le`**: `⁅H i, γ_{j+1}(A)⁆ ≤ H (i - (j+1))` を
+  `j` の帰納で示す。各段は Isaacs **Cor 4.10** (three subgroups lemma の mod `N` 形
+  `commutator_commutator_le_of_rotate`) を `H₁ = γ_{j+1}(A)`, `H₂ = A`, `H₃ = H i`,
+  `N = H (i-(j+2))` に適用: `⁅⁅A, H i⁆, γ⁆ ≤ ⁅H(i-1), γ⁆ ≤ N` と
+  `⁅⁅H i, γ⁆, A⁆ ≤ ⁅H(i-(j+1)), A⁆ ≤ N`。**`H i` の `Γ` 内正規性**が `N.Normal` として
+  ここで要る = 4C.2 が「正規部分群の鎖」を要求する理由。仕上げは `i = m`, `j = m-1` で
+  `⁅H m, γ_m(A)⁆ ≤ H 0 = ⊥` ⟹ `γ_m(A) ≤ A ⊓ C_Γ(G) = ⊥` (faithfulness) ⟹
+  `nilpotencyClass_le_of_lowerCentralSeries_eq_bot` (Mann.lean)。
+  ⚠ ℕ の切り捨て減算のおかげで `i ≤ j` の縮退段も `H 0 = ⊥` に落ちて自動的に正しい
+  (`commutator_le_pred` の `i = 0` 場合が `⁅⊥, A⁆ = ⊥`)。
+  ⚠ **書籍の `m ≥ 1` は不要** (`m = 0` なら `G = H 0 = 1` で faithfulness が `A = 1` を
+  強いる) — 仮定から落として docstring に注記。
+- **4C.3** は three subgroups lemma (`Subgroup.commutator_commutator_eq_bot_of_rotate`) の
+  `(G, A, N)` への直接適用: `⁅⁅A,N⁆,G⁆ = 1` は仮定, `⁅⁅N,G⁆,A⁆ ≤ ⁅N,A⁆ = 1` は `N ⊴ G`。
+
+## Ch.4 §4D (書籍 p. 145 の Problems 4D) — 次の frontier
+
+7 問 (4D.1–4D.7)。coprime action の節。4D.1 (`N ⊇ C_G(N)` + coprime で trivial/faithful が
+`N` から `G` へ伝播) / 4D.2 (odd class ≤2 群の加法構造で `xy - yx = ⁅x,y⁆`) /
+4D.3 (真 `A`-不変部分群に自明作用 ⟹ `G` は `p`-群…の 7 小問) / 4D.4 (2-群, `x⁴=1` を固定
+⟹ 自明) / 4D.5 (derived length `n+1`) / 4D.6 (Fitting の定理の写像 `θ` の像と核) /
+4D.7 (`p`-可解 + 巡回 Sylow `p`)。
 
 #### 🎉 4A.11 完了 (2026-07-25) — `ProblemsWreath.lean` に追加
 
