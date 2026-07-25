@@ -93,6 +93,28 @@ theorem commute_conj_of_commute {a b z : G'} (ha : Commute a z) (hb : Commute b 
     Commute (a * b * a⁻¹) z :=
   Commute.mul_left (Commute.mul_left ha hb) ha.inv_left
 
+/-- An element commuting with `z` normalizes `C_G(z)`. -/
+theorem mem_centralizer_singleton_conj_iff {a z : G'} (ha : Commute a z) (y : G') :
+    y ∈ Subgroup.centralizer ({z} : Set G')
+      ↔ a * y * a⁻¹ ∈ Subgroup.centralizer ({z} : Set G') := by
+  have hfwd : ∀ {b c : G'}, Commute b z → c ∈ Subgroup.centralizer ({z} : Set G') →
+      b * c * b⁻¹ ∈ Subgroup.centralizer ({z} : Set G') := fun hb hc =>
+    Subgroup.mem_centralizer_singleton_iff.mpr
+      (commute_conj_of_commute hb (Subgroup.mem_centralizer_singleton_iff.mp hc))
+  refine ⟨fun hy => hfwd ha hy, fun hy => ?_⟩
+  have h := hfwd ha.inv_left hy
+  have h1 : a⁻¹ * (a * y * a⁻¹) * a⁻¹⁻¹ = y := by group
+  rwa [h1] at h
+
+/-- The centralizer of a union is the intersection of the centralizers. -/
+theorem centralizer_union (s t : Set G') :
+    Subgroup.centralizer (s ∪ t)
+      = Subgroup.centralizer s ⊓ Subgroup.centralizer t := by
+  ext x
+  simp only [Subgroup.mem_centralizer_iff, Subgroup.mem_inf, Set.mem_union]
+  exact ⟨fun h => ⟨fun y hy => h y (Or.inl hy), fun y hy => h y (Or.inr hy)⟩,
+    fun h y hy => hy.elim (h.1 y) (h.2 y)⟩
+
 end GenericProduct
 
 namespace FirstCaseHypothesis
@@ -105,23 +127,35 @@ variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
   (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     NearFields.AffineNearFieldModel fc.rankOneQuotient F)
 
+/-- **`L`** ((15), p. 113): the subgroup `L = C_G(st) ⊓ ⟨Q₀, K, t⟩`.
+
+Under the isomorphism `⟨Q₀, K, t⟩ ≅ PSL(2, 8)` of Ch. I §3, Lemma 4 this is the
+centralizer of a semisimple element of order `3`, that is the nonsplit maximal torus,
+cyclic of order `q + 1 = 9`. -/
+noncomputable def nonsplitTorus : Subgroup G :=
+  Subgroup.centralizer ({fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t} : Set G)
+    ⊓ fc.toHypothesis.orderThreeGeneratedSubgroup
+
+include fc in
+theorem nonsplitTorus_def :
+    fc.nonsplitTorus = Subgroup.centralizer ({fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t} : Set G)
+      ⊓ fc.toHypothesis.orderThreeGeneratedSubgroup := rfl
+
 include model in
 /-- **`L = C_G(st) ⊓ ⟨Q₀, K, t⟩` is cyclic of order `9`** ((15), p. 113).
 
 `⟨Q₀, K, t⟩ ≅ PSL(2, 8)` has order `504`, and its Sylow `3`-subgroups are cyclic of
 order `9` (the nonsplit torus).  The one containing `st` is abelian, hence centralizes
 `st`, so it lies inside `L`; and `L` is a `3`-group by (13), so `|L|` divides `9`. -/
-theorem isCyclic_and_card_centralizer_inf_orderThreeGeneratedSubgroup
+theorem isCyclic_and_card_nonsplitTorus
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
-    IsCyclic ↥(Subgroup.centralizer ({fc.toHypothesis.distinguishedInvolution
-          * fc.toHypothesis.t} : Set G)
-        ⊓ fc.toHypothesis.orderThreeGeneratedSubgroup)
-      ∧ Nat.card ↥(Subgroup.centralizer ({fc.toHypothesis.distinguishedInvolution
-          * fc.toHypothesis.t} : Set G)
-        ⊓ fc.toHypothesis.orderThreeGeneratedSubgroup) = 9 := by
+    IsCyclic ↥fc.nonsplitTorus ∧ Nat.card ↥fc.nonsplitTorus = 9 := by
   letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
+  rw [fc.nonsplitTorus_def]
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   set z : G := fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t with hz_def
   set L₀ : Subgroup G := fc.toHypothesis.orderThreeGeneratedSubgroup with hL₀_def
@@ -253,11 +287,10 @@ theorem P_le_normalizer_orderThreeGeneratedSubgroup :
 
 include fc in
 /-- **`Z₁ ≤ L`** ((15), p. 113): `st` centralizes itself and lies in `⟨Q₀, K, t⟩`. -/
-theorem zpowers_le_centralizer_inf_orderThreeGeneratedSubgroup :
+theorem zpowers_le_nonsplitTorus :
     Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
-      ≤ Subgroup.centralizer ({fc.toHypothesis.distinguishedInvolution
-          * fc.toHypothesis.t} : Set G)
-        ⊓ fc.toHypothesis.orderThreeGeneratedSubgroup := by
+      ≤ fc.nonsplitTorus := by
+  rw [fc.nonsplitTorus_def]
   have hsQ0 : fc.toHypothesis.distinguishedInvolution ∈ fc.toHypothesis.Q0 :=
     ⟨fc.toHypothesis.distinguishedInvolution_sq,
       fc.toHypothesis.distinguishedInvolution_mem_H⟩
@@ -270,22 +303,17 @@ include model in
 
 If not, then `P ≤ L` (as `|P| = 3` is prime), so `Z₁P ≤ L`; but `|Z₁P| = 9 = |L|`, so
 `L = Z₁P` would have exponent `3`, contradicting the cyclicity of `L` of order `9`. -/
-theorem inf_P_eq_bot_of_centralizer_inf_orderThreeGeneratedSubgroup
+theorem nonsplitTorus_inf_P_eq_bot
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
-    (Subgroup.centralizer ({fc.toHypothesis.distinguishedInvolution
-          * fc.toHypothesis.t} : Set G)
-        ⊓ fc.toHypothesis.orderThreeGeneratedSubgroup) ⊓ fc.P = ⊥ := by
+    fc.nonsplitTorus ⊓ fc.P = ⊥ := by
   letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
-  obtain ⟨hLcyc, hLcard⟩ :=
-    fc.isCyclic_and_card_centralizer_inf_orderThreeGeneratedSubgroup model ind hB2
-  set L : Subgroup G := Subgroup.centralizer
-    ({fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t} : Set G)
-      ⊓ fc.toHypothesis.orderThreeGeneratedSubgroup with hL_def
-  have hZ₁L := fc.zpowers_le_centralizer_inf_orderThreeGeneratedSubgroup
+  obtain ⟨hLcyc, hLcard⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
+  set L : Subgroup G := fc.nonsplitTorus with hL_def
+  have hZ₁L := fc.zpowers_le_nonsplitTorus
   rw [eq_bot_iff]
   intro y hy
   rw [Subgroup.mem_bot]
@@ -339,6 +367,140 @@ theorem inf_P_eq_bot_of_centralizer_inf_orderThreeGeneratedSubgroup
   have := orderOf_dvd_of_pow_eq_one hg3
   rw [hgord] at this
   omega
+
+include model in
+/-- **`P` normalizes `L`** ((15), p. 113, "As `P` normalizes `⟨Q₀, K, t⟩` …").
+
+`P` normalizes `⟨Q₀, K, t⟩` and centralizes `st` (both lie in the abelian group `R`
+of (11)), hence normalizes `L = C_G(st) ⊓ ⟨Q₀, K, t⟩`. -/
+theorem P_le_normalizer_nonsplitTorus
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    fc.P ≤ Subgroup.normalizer ((fc.nonsplitTorus : Subgroup G) : Set G) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  have habR := fc.invImageF_mul_comm model ind hB2 hm
+  have hstR : fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t
+      ∈ fc.invImageF model :=
+    (fc.sInvertedT_spec model ind hB2 hm).1
+      (fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2 hm
+        (Subgroup.mem_zpowers _))
+  intro x hxP
+  have hxst : Commute x (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) :=
+    habR x (fc.P_le_invImageF model hxP) _ hstR
+  have hxL₀ := Subgroup.mem_set_normalizer_iff.mp
+    (fc.P_le_normalizer_orderThreeGeneratedSubgroup hxP)
+  rw [fc.nonsplitTorus_def, Subgroup.mem_set_normalizer_iff]
+  intro y
+  simp only [SetLike.mem_coe, Subgroup.mem_inf]
+  constructor
+  · rintro ⟨hy1, hy2⟩
+    exact ⟨(mem_centralizer_singleton_conj_iff hxst y).mp hy1, (hxL₀ y).mp hy2⟩
+  · rintro ⟨hy1, hy2⟩
+    exact ⟨(mem_centralizer_singleton_conj_iff hxst y).mpr hy1, (hxL₀ y).mpr hy2⟩
+
+include model in
+/-- **`|LP| = 27`** ((15), p. 113): `|L| = 9`, `|P| = 3` and `L ⊓ P = 1`. -/
+theorem card_nonsplitTorus_sup_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    Nat.card ↥(fc.nonsplitTorus ⊔ fc.P) = 27 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, hLcard⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
+  rw [card_sup_eq_mul_of_le_normalizer
+      (fun b hb => fc.P_le_normalizer_nonsplitTorus model ind hB2 hb)
+      (fc.nonsplitTorus_inf_P_eq_bot model ind hB2),
+    hLcard, fc.card_P, hp3]
+
+include model in
+/-- **`L` normalizes `Z₁P`** ((15), p. 113): `Z₁P` has index `3` in the group `LP` of
+order `27`, hence is normal in it. -/
+theorem nonsplitTorus_le_normalizer_zpowers_sup_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    fc.nonsplitTorus ≤ Subgroup.normalizer
+      ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) ⊔ fc.P : Subgroup G) : Set G) := by
+  classical
+  set M : Subgroup G := fc.nonsplitTorus ⊔ fc.P with hM_def
+  set Z : Subgroup G := Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+    * fc.toHypothesis.t) ⊔ fc.P with hZ_def
+  have hZM : Z ≤ M :=
+    sup_le (fc.zpowers_le_nonsplitTorus.trans le_sup_left) le_sup_right
+  have hMcard : Nat.card ↥M = 27 := fc.card_nonsplitTorus_sup_P model ind hB2
+  have hZcard : Nat.card ↥Z = 9 := fc.card_zpowers_sup_P_eq_nine model ind hB2
+  have hNcard : Nat.card ↥(Z.subgroupOf M) = 9 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZM).toEquiv]; exact hZcard
+  have hidx : (Z.subgroupOf M).index = 3 := by
+    have h := (Z.subgroupOf M).card_mul_index
+    rw [hNcard, hMcard] at h
+    omega
+  haveI hnorm : (Z.subgroupOf M).Normal :=
+    Subgroup.normal_of_index_eq_minFac_card (by rw [hidx, hMcard]; norm_num)
+  have hconj : ∀ g ∈ M, ∀ y ∈ Z, g * y * g⁻¹ ∈ Z := by
+    intro g hgM y hyZ
+    have h := hnorm.conj_mem ⟨y, hZM hyZ⟩ (by rwa [Subgroup.mem_subgroupOf]) ⟨g, hgM⟩
+    rwa [Subgroup.mem_subgroupOf] at h
+  intro x hxL
+  have hxM : x ∈ M := by rw [hM_def]; exact Subgroup.mem_sup_left hxL
+  rw [Subgroup.mem_set_normalizer_iff]
+  intro y
+  refine ⟨fun hy => hconj x hxM y hy, fun hy => ?_⟩
+  have h1 : x⁻¹ * (x * y * x⁻¹) * x⁻¹⁻¹ = y := by group
+  rw [← h1]
+  exact hconj x⁻¹ (Subgroup.inv_mem _ hxM) _ hy
+
+include model in
+/-- **`L ≤ N_G(RΣ)`** ((15), p. 113): `L` normalizes `Z₁P`, hence also its centralizer
+`C_G(Z₁P) = C_G(P) ⊓ C_G(st) = RΣ` (quoted in (15), proved in (14)). -/
+theorem nonsplitTorus_le_normalizerRSigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    fc.nonsplitTorus ≤ fc.normalizerRSigma model := by
+  classical
+  set Z : Subgroup G := Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+    * fc.toHypothesis.t) ⊔ fc.P with hZ_def
+  have hZclosure : Z = Subgroup.closure
+      (({fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t} : Set G)
+        ∪ (fc.P : Set G)) := by
+    rw [hZ_def, Subgroup.closure_union, Subgroup.zpowers_eq_closure, Subgroup.closure_eq]
+  have hcen : Subgroup.centralizer ((Z : Subgroup G) : Set G)
+      = fc.invImageF model
+        ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
+    rw [← fc.centralizer_P_inf_centralizer_mul_t_eq_sup model ind hB2, hZclosure,
+      Subgroup.centralizer_closure, centralizer_union, inf_comm]
+  intro x hx
+  have hxn : ∀ y : G, y ∈ Z ↔ x * y * x⁻¹ ∈ Z := by
+    have h := Subgroup.mem_set_normalizer_iff.mp
+      (fc.nonsplitTorus_le_normalizer_zpowers_sup_P model ind hB2 hx)
+    simpa only [SetLike.mem_coe] using h
+  change x ∈ Subgroup.normalizer (((fc.invImageF model
+    ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) : Subgroup G) : Set G)
+  rw [← hcen, Subgroup.mem_set_normalizer_iff]
+  intro y
+  simpa only [SetLike.mem_coe] using
+    mem_normalizer_centralizer_of_mem_normalizer hxn y
+
+include model in
+/-- **`L ≤ R₁`** ((15), p. 113): every element of `L` is a `3`-element of `N_G(RΣ)`,
+and `R₁` is by definition generated by those. -/
+theorem nonsplitTorus_le_sylowThreeNormalizerRSigma
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    fc.nonsplitTorus ≤ fc.sylowThreeNormalizerRSigma model := by
+  obtain ⟨-, hLcard⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
+  intro x hx
+  rw [fc.sylowThreeNormalizerRSigma_def model]
+  refine Subgroup.subset_closure
+    ⟨fc.nonsplitTorus_le_normalizerRSigma model ind hB2 hx, ?_⟩
+  have hdvd := Subgroup.orderOf_dvd_natCard _ hx
+  rw [hLcard, show (9 : ℕ) = 3 ^ 2 by norm_num] at hdvd
+  obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow (by norm_num)).mp hdvd
+  exact ⟨j, hj⟩
 
 end FirstCaseHypothesis
 
