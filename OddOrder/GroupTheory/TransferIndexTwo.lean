@@ -28,7 +28,89 @@ open scoped commutatorElement
 
 namespace OddOrder.GroupTheory
 
+open Subgroup Subgroup.leftTransversals MulAction
+open scoped Pointwise
+
 variable {G : Type*} [Group G]
+
+section Transfer
+
+variable {H : Subgroup G} {A : Type*} [CommGroup A]
+
+/-- `ϕ` identifies `H`-conjugate elements, because `A` is commutative. -/
+lemma map_eq_of_conj_eq (ϕ : ↥H →* A) {a b h : G} (ha : a ∈ H) (hb : b ∈ H) (hh : h ∈ H)
+    (heq : a = h⁻¹ * b * h) : ϕ ⟨a, ha⟩ = ϕ ⟨b, hb⟩ := by
+  have hsub : (⟨a, ha⟩ : ↥H) = (⟨h, hh⟩ : ↥H)⁻¹ * ⟨b, hb⟩ * ⟨h, hh⟩ := Subtype.ext heq
+  rw [hsub, map_mul, map_mul, map_inv, mul_right_comm, inv_mul_cancel, one_mul]
+
+/-- **Transfer over a normal subgroup of index two.**
+
+If `[G : H] = 2` and `s ∉ H`, then for `x ∈ H` whose `G`-conjugates all stay in `H`
+(e.g. `H` normal) the transfer is the product of the `ϕ`-values of `x` and of its
+`s`-conjugate:
+
+`transfer ϕ x = ϕ x * ϕ (s⁻¹ x s)`.
+
+Indeed left multiplication by `x` fixes both cosets of `H`, so the transfer product has
+one factor per coset, namely `ϕ` of the conjugate of `x` by a representative; the two
+representatives can be taken to be `1` and `s` since `ϕ` is constant on `H`-conjugacy
+classes (`A` is commutative). -/
+theorem transfer_eq_mul_conj_of_index_two [H.FiniteIndex] (ϕ : ↥H →* A) (hidx : H.index = 2)
+    {x : G} (hx : x ∈ H) (hconj : ∀ g : G, g⁻¹ * x * g ∈ H) {s : G} (hs : s ∉ H) :
+    MonoidHom.transfer ϕ x = ϕ ⟨x, hx⟩ * ϕ ⟨s⁻¹ * x * s, hconj s⟩ := by
+  classical
+  letI := H.fintypeQuotientOfFiniteIndex
+  set S : H.LeftTransversal := default with hS_def
+  set rep : G ⧸ H → G := fun q => (S.2.leftQuotientEquiv q : G) with hrep_def
+  -- The chosen representative of `q` lies in `q`.
+  have hrep_mk : ∀ q : G ⧸ H, ((rep q : G) : G ⧸ H) = q := fun q =>
+    S.2.quotientGroupMk_leftQuotientEquiv q
+  -- Left multiplication by `x⁻¹` fixes every coset of `H`.
+  have hfix : ∀ q : G ⧸ H, x⁻¹ • q = q := by
+    intro q
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective q
+    rw [Quotient.smul_mk, smul_eq_mul, QuotientGroup.eq]
+    have h1 : (x⁻¹ * g)⁻¹ * g = g⁻¹ * x * g := by group
+    rw [h1]
+    exact hconj g
+  -- Hence each factor of the transfer product is a conjugate of `x`.
+  have hfactor : ∀ q : G ⧸ H,
+      (rep q)⁻¹ * ((x • S).2.leftQuotientEquiv q : G) = (rep q)⁻¹ * x * rep q := by
+    intro q
+    rw [hrep_def]
+    rw [smul_apply_eq_smul_apply_inv_smul x S q, smul_eq_mul, hfix q, mul_assoc]
+  rw [MonoidHom.transfer_def ϕ S]
+  have hprod : Subgroup.leftTransversals.diff ϕ S (x • S)
+      = ∏ q : G ⧸ H, ϕ ⟨(rep q)⁻¹ * x * rep q, hconj (rep q)⟩ := by
+    unfold Subgroup.leftTransversals.diff
+    simp only
+    exact Finset.prod_congr rfl fun q _ => congrArg ϕ (Subtype.ext (hfactor q))
+  rw [hprod]
+  -- The quotient has exactly the two elements `1` and `s`.
+  have hne : ((1 : G) : G ⧸ H) ≠ ((s : G) : G ⧸ H) := by
+    rw [Ne, QuotientGroup.eq]
+    simpa using hs
+  have hcard : Fintype.card (G ⧸ H) = 2 := by
+    rw [← Nat.card_eq_fintype_card, ← Subgroup.index_eq_card, hidx]
+  have huniv : (Finset.univ : Finset (G ⧸ H)) = {((1 : G) : G ⧸ H), ((s : G) : G ⧸ H)} :=
+    (Finset.eq_univ_of_card _ (by rw [Finset.card_pair hne, hcard])).symm
+  rw [huniv, Finset.prod_pair hne]
+  -- The representative of the trivial coset lies in `H`.
+  have h1 : rep ((1 : G) : G ⧸ H) ∈ H := by
+    have := hrep_mk ((1 : G) : G ⧸ H)
+    rw [QuotientGroup.eq] at this
+    simpa using this
+  -- The representative of the other coset lies in `s * H`.
+  have h2 : s⁻¹ * rep ((s : G) : G ⧸ H) ∈ H := by
+    have := hrep_mk ((s : G) : G ⧸ H)
+    rw [QuotientGroup.eq] at this
+    simpa [mul_inv_rev] using H.inv_mem this
+  congr 1
+  · exact map_eq_of_conj_eq ϕ _ hx h1 rfl
+  · refine map_eq_of_conj_eq ϕ _ (hconj s) h2 ?_
+    group
+
+end Transfer
 
 /-- An element of odd order lies in every subgroup containing its square. -/
 theorem mem_of_sq_mem_of_odd_orderOf {K : Subgroup G} {x : G} (hodd : Odd (orderOf x))
