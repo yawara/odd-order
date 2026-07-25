@@ -593,6 +593,242 @@ theorem exists_mem_coset_orderOf_eq_and_isConj_inv {G : Type u} [Group G] [Finit
   · rw [hord]; exact hcop.symm
   · rw [hcoset]; exact hconj
 
+/-! ### Problem 3B.8 — 極大部分群の指数がすべて素数な有限群
+
+そのような群は可解で, 最大素因数 `p` の Sylow `p`-部分群が正規, 最小素因数 `q` の正規
+`q`-補群を持つ (書籍の Note: 実際には超可解だが, それは Huppert の難しい定理). -/
+
+/-- 極大部分群の指数がすべて素数なら, **最大**素因数 `p` の Sylow `p`-部分群は正規.
+
+`P` が正規でないとすると `N_G(P)` を含む極大部分群 `M` が取れ, `[G:M] = r` は素数.
+`P ∈ Syl_p(M)` かつ `N_M(P) = N_G(P)` なので Sylow の個数は `n_p(G) = n_p(M) · r`.
+両者とも `≡ 1 (mod p)` なので `r ≡ 1 (mod p)`, つまり `r > p` となり `p` の最大性に反する. -/
+theorem sylow_normal_of_forall_isCoatom_index_prime {G : Type u} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] (hmax : ∀ M : Subgroup G, IsCoatom M → M.index.Prime)
+    (hlarge : ∀ r ∈ (Nat.card G).primeFactors, r ≤ p) (P : Sylow p G) :
+    (P : Subgroup G).Normal := by
+  by_contra hnn
+  have hne : Subgroup.normalizer ((P : Subgroup G) : Set G) ≠ ⊤ := fun h =>
+    hnn (Subgroup.normalizer_eq_top_iff.mp h)
+  obtain ⟨M, hMcoatom, hle⟩ :=
+    (IsCoatomic.eq_top_or_exists_le_coatom
+      (Subgroup.normalizer ((P : Subgroup G) : Set G))).resolve_left hne
+  have hPM : (P : Subgroup G) ≤ M := le_trans Subgroup.le_normalizer hle
+  have hrprime : M.index.Prime := hmax M hMcoatom
+  have hcountG : Nat.card (Sylow p G) = (Subgroup.normalizer ((P : Subgroup G) : Set G)).index :=
+    P.card_eq_index_normalizer
+  have hcountM : Nat.card (Sylow p ↥M)
+      = ((Subgroup.normalizer ((P : Subgroup G) : Set G)).subgroupOf M).index := by
+    rw [(P.subtype hPM).card_eq_index_normalizer]
+    congr 1
+    exact (Subgroup.subgroupOf_normalizer_eq hPM).symm
+  have hmul : Nat.card (Sylow p ↥M) * M.index = Nat.card (Sylow p G) := by
+    rw [hcountM, hcountG]
+    exact Subgroup.relIndex_mul_index hle
+  have h1 : Nat.card (Sylow p G) ≡ 1 [MOD p] := card_sylow_modEq_one p G
+  have h2 : Nat.card (Sylow p ↥M) ≡ 1 [MOD p] := card_sylow_modEq_one p ↥M
+  have hr1 : M.index ≡ 1 [MOD p] := by
+    have h3 : Nat.card (Sylow p ↥M) * M.index ≡ 1 * M.index [MOD p] := Nat.ModEq.mul_right _ h2
+    rw [one_mul, hmul] at h3
+    exact h3.symm.trans h1
+  have htwo : 2 ≤ M.index := hrprime.two_le
+  have hple : p ≤ M.index - 1 :=
+    Nat.le_of_dvd (by omega) ((Nat.modEq_iff_dvd' hrprime.one_lt.le).mp hr1.symm)
+  have hrle : M.index ≤ p :=
+    hlarge M.index (Nat.mem_primeFactors.mpr ⟨hrprime, M.index_dvd_card, Nat.card_pos.ne'⟩)
+  omega
+
+/-- Sylow `p`-部分群が正規で `p ∣ |G|` なら `G` の位数は真に減る (商へ降りる帰納法の道具). -/
+theorem sylow_ne_bot {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hp : p ∣ Nat.card G) (P : Sylow p G) : (P : Subgroup G) ≠ ⊥ := by
+  intro hbot
+  have hcard : Nat.card ↥(P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=
+    Subgroup.card_mul_index _
+  rw [hbot, Subgroup.card_bot, one_mul] at hcard
+  refine P.not_dvd_index ?_
+  rw [hbot, hcard]
+  exact hp
+
+/-- 極大部分群の指数がすべて素数な有限群の商群も同じ仮説を満たす. -/
+theorem forall_isCoatom_index_prime_quotient {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    (hmax : ∀ M : Subgroup G, IsCoatom M → M.index.Prime) :
+    ∀ M : Subgroup (G ⧸ N), IsCoatom M → M.index.Prime := by
+  intro M hM
+  have hcoatom : IsCoatom (M.comap (QuotientGroup.mk' N)) :=
+    Subgroup.isCoatom_comap_of_surjective (QuotientGroup.mk'_surjective N) hM
+  have hindex := Subgroup.index_comap_of_surjective (H := M) (QuotientGroup.mk'_surjective N)
+  rw [← hindex]
+  exact hmax _ hcoatom
+
+/-- Problem 3B.8 前半の `|G|`-強帰納法本体. -/
+theorem isSolvable_of_forall_isCoatom_index_prime_aux (n : ℕ) :
+    ∀ {G : Type u} [Group G] [Finite G],
+      (∀ M : Subgroup G, IsCoatom M → M.index.Prime) → Nat.card G ≤ n → IsSolvable G := by
+  induction n with
+  | zero =>
+    intro G _ _ _ hcard
+    have := Nat.card_pos (α := G)
+    omega
+  | succ n ih =>
+    intro G _ _ hmax hcard
+    rcases subsingleton_or_nontrivial G with hs | hnt
+    · infer_instance
+    · -- 最大素因数 `p` の Sylow 部分群は正規.
+      have hcard1 : 1 < Nat.card G := Finite.one_lt_card
+      have hne : (Nat.card G).primeFactors.Nonempty := Nat.nonempty_primeFactors.mpr hcard1
+      set p := (Nat.card G).primeFactors.max' hne with hp_def
+      have hpmem : p ∈ (Nat.card G).primeFactors := Finset.max'_mem _ _
+      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpmem⟩
+      have hpdvd : p ∣ Nat.card G := Nat.dvd_of_mem_primeFactors hpmem
+      have hlarge : ∀ r ∈ (Nat.card G).primeFactors, r ≤ p := fun r hr => Finset.le_max' _ r hr
+      obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
+      haveI hPnormal : (P : Subgroup G).Normal :=
+        sylow_normal_of_forall_isCoatom_index_prime hmax hlarge P
+      haveI hPsolv : IsSolvable ↥(P : Subgroup G) := by
+        haveI := P.isPGroup'.isNilpotent
+        infer_instance
+      -- 商 `G ⧸ P` は真に小さく, 同じ仮説を満たす.
+      have hPne : (P : Subgroup G) ≠ ⊥ := sylow_ne_bot hpdvd P
+      haveI : Nontrivial ↥(P : Subgroup G) :=
+        (Subgroup.nontrivial_iff_ne_bot _).mpr hPne
+      have hPcard : 1 < Nat.card ↥(P : Subgroup G) := Finite.one_lt_card
+      have hprod : Nat.card ↥(P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=
+        Subgroup.card_mul_index _
+      have hquot : Nat.card (G ⧸ (P : Subgroup G)) ≤ n := by
+        have h2 : 2 * (P : Subgroup G).index
+            ≤ Nat.card ↥(P : Subgroup G) * (P : Subgroup G).index :=
+          Nat.mul_le_mul_right _ hPcard
+        rw [← Subgroup.index_eq_card]
+        omega
+      haveI : IsSolvable (G ⧸ (P : Subgroup G)) :=
+        ih (forall_isCoatom_index_prime_quotient hmax) hquot
+      exact solvable_of_ker_le_range ((P : Subgroup G).subtype)
+        (QuotientGroup.mk' (P : Subgroup G))
+        (by rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
+
+/-- **Isaacs Problem 3B.8 前半** (書籍 p. 85): 有限群 `G` の極大部分群の指数がすべて素数なら
+`G` は可解.
+
+最大素因数 `p` の Sylow `p`-部分群 `P` は正規 (`sylow_normal_of_forall_isCoatom_index_prime`)
+で, 商 `G ⧸ P` も同じ仮説を満たすから帰納法で可解. `P` は `p`-群ゆえ冪零・可解なので `G` も可解. -/
+theorem isSolvable_of_forall_isCoatom_index_prime {G : Type u} [Group G] [Finite G]
+    (hmax : ∀ M : Subgroup G, IsCoatom M → M.index.Prime) : IsSolvable G :=
+  isSolvable_of_forall_isCoatom_index_prime_aux (Nat.card G) hmax le_rfl
+
+/-- Problem 3B.8 後半の `|G|`-強帰納法本体 (正規 `q`-補群の構成). -/
+theorem exists_normal_qComplement_aux (n : ℕ) :
+    ∀ {G : Type u} [Group G] [Finite G] {q : ℕ}, q.Prime →
+      (∀ M : Subgroup G, IsCoatom M → M.index.Prime) →
+      (∀ r ∈ (Nat.card G).primeFactors, q ≤ r) → Nat.card G ≤ n →
+      ∃ H : Subgroup G, H.Normal ∧ ¬ q ∣ Nat.card ↥H ∧ ∃ k : ℕ, H.index = q ^ k := by
+  induction n with
+  | zero =>
+    intro G _ _ q _ _ _ hcard
+    have := Nat.card_pos (α := G)
+    omega
+  | succ n ih =>
+    intro G _ _ q hq hmax hsmall hcard
+    haveI : Fact q.Prime := ⟨hq⟩
+    by_cases hall : ∀ d : ℕ, d.Prime → d ∣ Nat.card G → d = q
+    · -- `|G|` が `q`-冪: `H = ⊥` が正規 `q`-補群.
+      refine ⟨⊥, inferInstance, ?_, ?_⟩
+      · intro hdvd
+        rw [Subgroup.card_bot] at hdvd
+        exact hq.one_lt.ne' (Nat.dvd_one.mp hdvd)
+      · refine ⟨(Nat.card G).primeFactorsList.length, ?_⟩
+        rw [Subgroup.index_bot]
+        exact Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne'
+          fun {d} hd hdvd => hall d hd hdvd
+    · -- `q` と異なる素因数がある ⟹ 最大素因数 `p ≠ q` の Sylow を割って帰納法.
+      push Not at hall
+      obtain ⟨d, hdprime, hddvd, hdne⟩ := hall
+      have hcard1 : 1 < Nat.card G := by
+        have h1 := Nat.le_of_dvd Nat.card_pos hddvd
+        have h2 := hdprime.two_le
+        omega
+      have hne : (Nat.card G).primeFactors.Nonempty := Nat.nonempty_primeFactors.mpr hcard1
+      set p := (Nat.card G).primeFactors.max' hne with hp_def
+      have hpmem : p ∈ (Nat.card G).primeFactors := Finset.max'_mem _ _
+      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpmem⟩
+      have hpdvd : p ∣ Nat.card G := Nat.dvd_of_mem_primeFactors hpmem
+      have hlarge : ∀ r ∈ (Nat.card G).primeFactors, r ≤ p := fun r hr => Finset.le_max' _ r hr
+      have hdmem : d ∈ (Nat.card G).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hdprime, hddvd, Nat.card_pos.ne'⟩
+      have hqd : q ≤ d := hsmall d hdmem
+      have hdp : d ≤ p := Finset.le_max' _ d hdmem
+      have hpq : p ≠ q := by omega
+      obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
+      haveI hPnormal : (P : Subgroup G).Normal :=
+        sylow_normal_of_forall_isCoatom_index_prime hmax hlarge P
+      have hPne : (P : Subgroup G) ≠ ⊥ := sylow_ne_bot hpdvd P
+      haveI : Nontrivial ↥(P : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hPne
+      have hPcard : 1 < Nat.card ↥(P : Subgroup G) := Finite.one_lt_card
+      have hprod : Nat.card ↥(P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=
+        Subgroup.card_mul_index _
+      have hquot : Nat.card (G ⧸ (P : Subgroup G)) ≤ n := by
+        have h2 : 2 * (P : Subgroup G).index
+            ≤ Nat.card ↥(P : Subgroup G) * (P : Subgroup G).index :=
+          Nat.mul_le_mul_right _ hPcard
+        rw [← Subgroup.index_eq_card]
+        omega
+      have hsmall' : ∀ r ∈ (Nat.card (G ⧸ (P : Subgroup G))).primeFactors, q ≤ r := by
+        intro r hr
+        refine hsmall r (Nat.mem_primeFactors.mpr
+          ⟨Nat.prime_of_mem_primeFactors hr, ?_, Nat.card_pos.ne'⟩)
+        refine (Nat.dvd_of_mem_primeFactors hr).trans ?_
+        rw [← Subgroup.index_eq_card]
+        exact Subgroup.index_dvd_card _
+      obtain ⟨Hbar, hHbarNormal, hHbarcard, hHbarP⟩ :=
+        ih hq (forall_isCoatom_index_prime_quotient hmax) hsmall' hquot
+      haveI := hHbarNormal
+      refine ⟨Hbar.comap (QuotientGroup.mk' (P : Subgroup G)), hHbarNormal.comap _, ?_, ?_⟩
+      · -- `q ∣ |H|` なら Cauchy で位数 `q` の元 `y` が取れ, その像で矛盾.
+        intro hdvdH
+        obtain ⟨x, hx⟩ :=
+          exists_prime_orderOf_dvd_card' (G := ↥(Hbar.comap (QuotientGroup.mk' (P : Subgroup G))))
+            q hdvdH
+        have hyH : (x : G) ∈ Hbar.comap (QuotientGroup.mk' (P : Subgroup G)) := x.2
+        have hordy : orderOf (x : G) = q := by rw [Subgroup.orderOf_coe]; exact hx
+        have hzHbar : (QuotientGroup.mk' (P : Subgroup G)) (x : G) ∈ Hbar :=
+          Subgroup.mem_comap.mp hyH
+        have hordz : orderOf ((QuotientGroup.mk' (P : Subgroup G)) (x : G)) ∣ q := by
+          rw [← hordy]
+          exact orderOf_map_dvd _ _
+        rcases (Nat.dvd_prime hq).mp hordz with h1 | hqq
+        · -- 像が自明 ⟹ `y ∈ P` ⟹ `q ∣ p`-冪 ⟹ `q = p`, 矛盾.
+          have hyP : (x : G) ∈ (P : Subgroup G) :=
+            (QuotientGroup.eq_one_iff _).mp (orderOf_eq_one_iff.mp h1)
+          obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp P.isPGroup'
+          have hqdvd : q ∣ p ^ a := by
+            rw [← ha, ← hordy, ← Subgroup.orderOf_mk (H := (P : Subgroup G)) (x : G) hyP]
+            exact orderOf_dvd_natCard _
+          exact hpq ((Nat.prime_dvd_prime_iff_eq hq Fact.out).mp (hq.dvd_of_dvd_pow hqdvd)).symm
+        · -- 像の位数が `q` ⟹ `q ∣ |H̄|`, 矛盾.
+          refine hHbarcard ?_
+          have hd := orderOf_dvd_natCard
+            (⟨(QuotientGroup.mk' (P : Subgroup G)) (x : G), hzHbar⟩ : ↥Hbar)
+          rwa [Subgroup.orderOf_mk, hqq] at hd
+      · -- 指数は商へ落としても不変なので `[G : H] = [G/P : H̄] = q^k`.
+        obtain ⟨k, hk⟩ := hHbarP
+        refine ⟨k, ?_⟩
+        rw [Subgroup.index_comap_of_surjective (H := Hbar)
+          (QuotientGroup.mk'_surjective (P : Subgroup G))]
+        exact hk
+
+/-- **Isaacs Problem 3B.8 後半** (書籍 p. 85): 有限群 `G` の極大部分群の指数がすべて素数なら,
+最小素因数 `q` について `G` は**正規 `q`-補群**を持つ (位数が `q` で割れない正規部分群 `H` で
+指数 `[G : H]` が `q`-冪 — 書籍の言う「指数が Sylow `q`-部分群の位数に等しい部分群」).
+
+最大素因数 `p` の Sylow `p`-部分群 `P` は正規 (`sylow_normal_of_forall_isCoatom_index_prime`).
+`|G|` が `q`-冪なら `H = ⊥`. そうでなければ `p ≠ q` で, `G ⧸ P` に帰納法を適用して得た `H̄` の
+引き戻しが求めるもの (`|H|` が `q` で割れないことは Cauchy の定理で示し, 指数は
+`[G : H] = [G/P : H̄]` で `q`-冪). -/
+theorem exists_normal_qComplement {G : Type u} [Group G] [Finite G] {q : ℕ} (hq : q.Prime)
+    (hmax : ∀ M : Subgroup G, IsCoatom M → M.index.Prime)
+    (hsmall : ∀ r ∈ (Nat.card G).primeFactors, q ≤ r) :
+    ∃ H : Subgroup G, H.Normal ∧ ¬ q ∣ Nat.card ↥H ∧ ∃ k : ℕ, H.index = q ^ k :=
+  exists_normal_qComplement_aux (Nat.card G) hq hmax hsmall le_rfl
+
 end
 
 end OddOrder.Isaacs.Ch03

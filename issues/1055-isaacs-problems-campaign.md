@@ -775,7 +775,7 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **3A.7 ✅** ⟹ **§3A は 3A.6 のみ残り** (deferred-hard)。
 さらに **3B.1 ✅ / 3B.2 ✅ / 3B.3 ✅** (新 leaf `Ch03_SplitExtensions/Problems3B.lean`)。
 さらに **3B.4 ✅ / 3B.5 ✅**。
-**次 frontier = 3B.8 から文書順**。3A.6 は §3B を進めた後に再訪する。
+**次 frontier = 3B.9 → 3B.11 以降**(3B.10 は 3B.8 の系として先に済ませた)。3A.6 は §3B を進めた後に再訪する。
 
 ### §3B の記録 (2026-07-25)
 
@@ -792,6 +792,8 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 | 3B.6 まとめ | ✅ | `exists_mem_coset_orderOf_eq_and_isConj_inv` |
 | 3B.7(a) | ✅ | `card_prime_of_isMinimalNormal_of_isSupersolvable` (新 leaf `ProblemsSupersolvable.lean`) |
 | 3B.7(b) | ✅ | `index_prime_of_isCoatom_of_isSupersolvable` |
+| 3B.8 | ✅ | `sylow_normal_of_forall_isCoatom_index_prime` / `isSolvable_of_forall_isCoatom_index_prime` / `exists_normal_qComplement` |
+| 3B.10 | ✅ | `sylow_normal_of_isSupersolvable` (3B.7(b) + 3B.8 の核の系) |
 
 **設計メモ**:
 
@@ -825,6 +827,14 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
   商の `Normal` instance を仮説内で作らずに済み、`Nᵢ ≤ Nᵢ₊₁` も自動。
   `IsSupersolvable.isSolvable` は 3B.2 経由、`IsSupersolvable.quotient` も証明済 (3B.7(b) の
   帰納で使う)。3B.9 / 3B.10 も同じ定義を使う予定。
+
+- **3B.8 の核 = Sylow 個数の合同式**: 「極大部分群の指数がすべて素数」⟹ 最大素因数 `p` の
+  Sylow `p`-部分群は正規。`P` が非正規なら `N_G(P) ≤ M` (極大) が取れ、`P ∈ Syl_p(M)` かつ
+  `N_M(P) = N_G(P)` なので `n_p(G) = n_p(M)·[G:M]`。両者 `≡ 1 (mod p)` から `[G:M] ≡ 1 (mod p)`
+  ⟹ `[G:M] > p` で `p` の最大性に矛盾。可解性と正規 `q`-補群 (最小素因数 `q`) はこの核 +
+  `G ⧸ P` への帰納法で従う。**正規 `q`-補群は「`|H|` が `q` で割れない正規部分群で `[G:H]` が
+  `q`-冪」**という指数形で述べた (存在量化の中で `G ⧸ H` を書くと `H.Normal` instance が
+  statement 内で取れないため; 書籍の定義「指数が Sylow `q`-部分群の位数に等しい部分群」と同値)。
 
 - **3B.6(c)**: `H := N⟨h⟩` の中で `⟨h⟩` は `N` の補群 (`isComplement'_subgroupOf_of_coprime`
   を新規に証明)。`h₂ := x h x⁻¹` の生成する `⟨h₂⟩` は位数 `o(h)` で `|N|` と互いに素なので

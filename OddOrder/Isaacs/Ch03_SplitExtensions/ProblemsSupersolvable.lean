@@ -203,6 +203,17 @@ theorem index_prime_of_isCoatom_of_isSupersolvable {G : Type u} [Group G] [Finit
     (hG : IsSupersolvable G) {M : Subgroup G} (hM : IsCoatom M) : M.index.Prime :=
   index_prime_of_isCoatom_of_isSupersolvable_aux (Nat.card G) M hG le_rfl hM
 
+/-- **Isaacs Problem 3B.10** (書籍 p. 85): 有限**超可解**群 `G` の最大素因数 `p` について
+Sylow `p`-部分群は正規.
+
+3B.7(b) より `G` の極大部分群の指数はすべて素数なので, Problem 3B.8 の核
+(`sylow_normal_of_forall_isCoatom_index_prime`) がそのまま適用できる. -/
+theorem sylow_normal_of_isSupersolvable {G : Type u} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    (hG : IsSupersolvable G) (hlarge : ∀ r ∈ (Nat.card G).primeFactors, r ≤ p) (P : Sylow p G) :
+    (P : Subgroup G).Normal :=
+  sylow_normal_of_forall_isCoatom_index_prime
+    (fun _ hM => index_prime_of_isCoatom_of_isSupersolvable hG hM) hlarge P
+
 end
 
 end OddOrder.Isaacs.Ch03
