@@ -978,6 +978,30 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 ⚠ `⁅H, K ⊔ L⁆` の分配は**偽**なので (memory: lean-subgroup-commutator-api-traps)、
 `⁅L_i, ⊤⁆` を `⁅·, A⁆` と `⁅·, U⁆` に割るには good-elements 法が要る。
 
+#### 4A.8(d) の完全な設計 (2026-07-25 に手計算で確定、数値検証済み)
+
+**(i) 下降中心列の帰納形**: `S ≤ (Q → D)` が shift 安定なら
+`⁅S.map inl, ⊤⁆ = (S.map (shiftSubHom q)).map inl`。理由:
+`⁅inl f, inl g * inr q'⁆ = inl (Δ_{q'} f)` (base 可換で `⁅inl f, inl g⁆ = 1`、
+`⁅a, bc⁆ = ⁅a,b⁆ · b⁅a,c⁆b⁻¹` の第 2 項の共役も base 可換で消える)。
+`Q = ⟨q⟩` が位数 `p` なら `Δ_{q^k} f = Δ_q (∏_{j<k} f∘shift^j)` (群環の
+`1 - x^k = (1-x)(1 + x + … + x^{k-1})`) なので、生成元 `q` の分だけで足りる。
+⟹ **`lowerCentralSeries ⊤ i = (Δ^i(⊤)).map inl`** (`i ≥ 1`; 基底は 4A.8(b) の
+`P' = ker(coordProd).map inl` と `range Δ_q = ker coordProd`)。
+
+**(ii) 残る算術 = `Δ = (1-x)` の冪零指数**。`ZMod(p^n)[x]/(x^p-1)` で
+`(1-x)^{n(p-1)+1} = 0` かつ `(1-x)^{n(p-1)} ≠ 0` ⟹ **`class(P) = n(p-1)+1`**。
+- `p=2, n=1`: `(1-x)² = 0` ⟹ class 2。`|P| = 8` (`D₈`) で maximal class ✓
+- `p=3, n=1`: class 3、`|P| = 3⁴` で maximal class ✓
+- `p=2, n=2`: `(1-x)² = 2(1-x)`, `(1-x)³ = 0` ⟹ class 3。`|P| = 2⁵` なので
+  maximal class には class 4 が要る ⟹ **`P` は maximal class でない** ✓
+  (書籍が `n = 1` に限定しているのと整合)
+- 一般に `class(P) = n(p-1)+1` と maximal class の要求 `np` が一致するのは **`n = 1` のときだけ** ✓
+
+**(iii) `P'U` 側**: `class(P'U) = n(p-1)`、`|P'U| = p^{n(p-1)+1}` なので**常に maximal class** ✓
+(`p=2,n=2` で検算: `P' = (1-x)R ≅ C₄`, `Δ(P') = (1-x)²R ≅ C₂`, `(1-x)³R = 0`
+⟹ class 2、`|P'U| = 8` ⟹ maximal class ✓)。
+
 **残りの下降中心列の計算**は群環のフィルトレーションに落ちる:
 `A = C^Q` を `ZMod(p^n)[Q] = ZMod(p^n)[x]/(x^p - 1)` (`x = u`) と見ると
 `⁅A, U⁆` は `(x-1)A`、以降 `γ_{i+1}(P) = (x-1)^i A` (`i ≥ 1`)。
