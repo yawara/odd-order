@@ -713,3 +713,15 @@ subset = monolith 内 hsub を public 化、ncard = index 定理 + ncard_A)。
 ※ (13)–(17) (pp. 113–114 Read 済) は (10.2) 側 endgame (p=3, Z₁=⟨st⟩,
   PSL(2,8), 弱閉 Z₁PΣ の Hall–Wielandt 可換版, R₂⟨s⟩) — (12) とは独立の次章。
   (14) は本 campaign の kernel-同定機構 (N_G(RΣ) ↷ 𝒜₂, kernel = RΣ) を再利用可。
+- δ2 (`conj_eq_inv_of_sq_eq_one`, 9f614e728): 対合は正規 ⟨σ⟩ を反転 — public 化済。
+  ⚠ **適用には Q̂₂ := NR⧸R' の faithful degree-p 作用 instance が必要** (抽象群だけ
+  では偽: C_p × C_{p−1} 反例)。⟹ (α) plumbing を δ2' として 1 定理に集約実装する:
+  **`conj_mk_distinguishedInvolution_zpowers_inv`** (次 iteration):
+  Ω₂ := ↥{X | 𝒜-predicate}; letI MulAction ↥NR Ω₂ (invariance = orbit_eq);
+  φ = toPermHom、hker : R' ≤ φ.ker (kernel iff →)、ψ = QuotientGroup.lift、
+  letI = compHom ψ; Faithful (kernel iff ←)・IsPretransitive (orbit=𝒜)・
+  card Ω₂ = p (ncard_A m=1)・card Q̂₂ = p(p−1) (済) → conj_eq_inv 適用、
+  u := mk ⟨s, s∈NR⟩ (s∈NR: s は T を反転+P 中心化 → R=T·P 正規化;
+  u ≠ 1: s∉R は位数 2 vs |R| = p² 奇数)。
+  結論 = [s] が Q̂₂ の唯一 Sylow-p 生成元を反転 = C_{R₁/R}(s) = 1 (書籍 p.112)。
+  この instance pack は (14) ((10.2) 側 N_G(RΣ) ↷ 𝒜₂) でも再利用できる。
