@@ -775,7 +775,7 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 さらに **3A.7 ✅** ⟹ **§3A は 3A.6 のみ残り** (deferred-hard)。
 さらに **3B.1 ✅ / 3B.2 ✅ / 3B.3 ✅** (新 leaf `Ch03_SplitExtensions/Problems3B.lean`)。
 さらに **3B.4 ✅ / 3B.5 ✅**。
-**次 frontier = 3B.7 (supersolvable) から文書順**。3A.6 は §3B を進めた後に再訪する。
+**次 frontier = 3B.8 から文書順**。3A.6 は §3B を進めた後に再訪する。
 
 ### §3B の記録 (2026-07-25)
 
@@ -790,6 +790,8 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 | 3B.6(b) | ✅ | `orderOf_eq_of_primeFactors_orderOf_dvd_of_coprime` |
 | 3B.6(c) | ✅ | `isConj_inv_of_quotient_isConj_inv` (+ `isComplement'_subgroupOf_of_coprime`) |
 | 3B.6 まとめ | ✅ | `exists_mem_coset_orderOf_eq_and_isConj_inv` |
+| 3B.7(a) | ✅ | `card_prime_of_isMinimalNormal_of_isSupersolvable` (新 leaf `ProblemsSupersolvable.lean`) |
+| 3B.7(b) | ✅ | `index_prime_of_isCoatom_of_isSupersolvable` |
 
 **設計メモ**:
 
@@ -816,6 +818,13 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
   π-part を factorization で作る必要がない)。あとは中国剰余定理で `t ≡ 1 (mod m)`,
   `[⟨g⟩:C] ∣ t` なる `t` を取り `h := g^t`。教科書 hint の「`NC = N⟨g⟩` なる巡回 π-部分群 `C`」
   と同じ道具立て。
+
+- **3B.7 で超可解群を定義した** (`ProblemsSupersolvable.lean`, repo/mathlib いずれにも無かった):
+  `IsSupersolvable G := ∃ r N, (∀ i, (N i).Normal) ∧ N 0 = ⊥ ∧ N r = ⊤ ∧
+  ∀ i < r, ∃ x ∈ N (i+1), N (i+1) = N i ⊔ ⟨x⟩`。因子の巡回性を `Nᵢ₊₁ = Nᵢ ⊔ ⟨x⟩` で表すと
+  商の `Normal` instance を仮説内で作らずに済み、`Nᵢ ≤ Nᵢ₊₁` も自動。
+  `IsSupersolvable.isSolvable` は 3B.2 経由、`IsSupersolvable.quotient` も証明済 (3B.7(b) の
+  帰納で使う)。3B.9 / 3B.10 も同じ定義を使う予定。
 
 - **3B.6(c)**: `H := N⟨h⟩` の中で `⟨h⟩` は `N` の補群 (`isComplement'_subgroupOf_of_coprime`
   を新規に証明)。`h₂ := x h x⁻¹` の生成する `⟨h₂⟩` は位数 `o(h)` で `|N|` と互いに素なので
