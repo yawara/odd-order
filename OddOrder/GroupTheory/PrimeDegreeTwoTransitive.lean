@@ -28,6 +28,8 @@ namespace OddOrder.GroupTheory
 
 open MulAction
 
+open scoped commutatorElement
+
 variable {G : Type*} {Ω : Type*} [Group G] [Finite G] [MulAction G Ω] [Finite Ω]
 
 section PrimeDegree
@@ -466,6 +468,93 @@ theorem not_exists_elementaryAbelian_four (hp : p.Prime) (hp2 : p ≠ 2)
       _ = n := hs
   exact huv1 (hNinv _ (mem_zpowers_of_centralizes hsurjAll a hcen)
     (hEsq _ (mul_mem u'.2 v'.2)))
+omit [Finite G] [MulAction G Ω] [Finite Ω] [FaithfulSMul G Ω] [IsPretransitive G Ω] in
+/-- **Commutators centralize a normal cyclic `⟨σ⟩`** — action-free: the conjugation
+exponents on `⟨σ⟩` multiply commutatively mod `orderOf σ`, so a commutator conjugates
+`σ` with exponent `≡ 1`.  (In particular `G/⟨σ⟩` is abelian whenever the centralizer
+of `⟨σ⟩` is contained in it.)  Stated with `orderOf σ = p` only to keep the
+divisibility bookkeeping in one variable; primality is not used. -/
+theorem commutatorElement_mul_comm_of_zpowers_normal {σ : G}
+    (hσ : orderOf σ = p) (hnorm : (Subgroup.zpowers σ).Normal) (c d : G) :
+    ⁅c, d⁆ * σ = σ * ⁅c, d⁆ := by
+  have hconj : ∀ g : G, ∃ a : ℤ, g * σ * g⁻¹ = σ ^ a := by
+    intro g
+    obtain ⟨a, ha⟩ := Subgroup.mem_zpowers_iff.mp
+      (hnorm.conj_mem σ (Subgroup.mem_zpowers σ) g)
+    exact ⟨a, ha.symm⟩
+  have hconjpow : ∀ (g w : G) (m : ℤ), g * w ^ m * g⁻¹ = (g * w * g⁻¹) ^ m := by
+    intro g w m
+    simp
+  have hconjpow' : ∀ (g w : G) (m : ℤ), g⁻¹ * w ^ m * g = (g⁻¹ * w * g) ^ m := by
+    intro g w m
+    simpa using hconjpow g⁻¹ w m
+  obtain ⟨a, ha⟩ := hconj c
+  obtain ⟨b, hb⟩ := hconj d
+  obtain ⟨a', ha'⟩ := hconj c⁻¹
+  obtain ⟨b', hb'⟩ := hconj d⁻¹
+  rw [inv_inv] at ha' hb'
+  -- `a·a' ≡ 1` and `b·b' ≡ 1 (mod p)`.
+  have hinv : ∀ {x y : ℤ}, c * σ * c⁻¹ = σ ^ x → c⁻¹ * σ * c = σ ^ y →
+      (p : ℤ) ∣ x * y - 1 := by
+    intro x y hx hy
+    have h1 : σ = σ ^ (y * x) := by
+      calc σ = c * (c⁻¹ * σ * c) * c⁻¹ := by group
+        _ = c * σ ^ y * c⁻¹ := by rw [hy]
+        _ = (c * σ * c⁻¹) ^ y := by rw [hconjpow]
+        _ = (σ ^ x) ^ y := by rw [hx]
+        _ = σ ^ (y * x) := by rw [← zpow_mul, mul_comm]
+    have h2 : σ ^ (x * y - 1) = 1 := by
+      rw [zpow_sub, zpow_one, mul_comm x y, ← h1]
+      exact mul_inv_cancel σ
+    have h3 := orderOf_dvd_iff_zpow_eq_one.mpr h2
+    rwa [hσ] at h3
+  have hinvD : ∀ {x y : ℤ}, d * σ * d⁻¹ = σ ^ x → d⁻¹ * σ * d = σ ^ y →
+      (p : ℤ) ∣ x * y - 1 := by
+    intro x y hx hy
+    have h1 : σ = σ ^ (y * x) := by
+      calc σ = d * (d⁻¹ * σ * d) * d⁻¹ := by group
+        _ = d * σ ^ y * d⁻¹ := by rw [hy]
+        _ = (d * σ * d⁻¹) ^ y := by rw [hconjpow]
+        _ = (σ ^ x) ^ y := by rw [hx]
+        _ = σ ^ (y * x) := by rw [← zpow_mul, mul_comm]
+    have h2 : σ ^ (x * y - 1) = 1 := by
+      rw [zpow_sub, zpow_one, mul_comm x y, ← h1]
+      exact mul_inv_cancel σ
+    have h3 := orderOf_dvd_iff_zpow_eq_one.mpr h2
+    rwa [hσ] at h3
+  have haa' := hinv ha ha'
+  have hbb' := hinvD hb hb'
+  -- the commutator conjugates `σ` with exponent `a·b·a'·b' ≡ 1`.
+  have hcomm : ⁅c, d⁆ * σ * ⁅c, d⁆⁻¹ = σ ^ (a * (b * (a' * b'))) := by
+    rw [commutatorElement_def]
+    calc c * d * c⁻¹ * d⁻¹ * σ * (c * d * c⁻¹ * d⁻¹)⁻¹
+        = c * (d * (c⁻¹ * (d⁻¹ * σ * d) * c) * d⁻¹) * c⁻¹ := by group
+      _ = c * (d * (c⁻¹ * σ ^ b' * c) * d⁻¹) * c⁻¹ := by rw [hb']
+      _ = c * (d * (c⁻¹ * σ * c) ^ b' * d⁻¹) * c⁻¹ := by rw [hconjpow']
+      _ = c * (d * (σ ^ a') ^ b' * d⁻¹) * c⁻¹ := by rw [ha']
+      _ = c * (d * σ ^ (a' * b') * d⁻¹) * c⁻¹ := by rw [← zpow_mul]
+      _ = c * (d * σ * d⁻¹) ^ (a' * b') * c⁻¹ := by rw [hconjpow]
+      _ = c * (σ ^ b) ^ (a' * b') * c⁻¹ := by rw [hb]
+      _ = c * σ ^ (b * (a' * b')) * c⁻¹ := by rw [← zpow_mul]
+      _ = (c * σ * c⁻¹) ^ (b * (a' * b')) := by rw [hconjpow]
+      _ = (σ ^ a) ^ (b * (a' * b')) := by rw [ha]
+      _ = σ ^ (a * (b * (a' * b'))) := by rw [← zpow_mul]
+  have hexp : (p : ℤ) ∣ a * (b * (a' * b')) - 1 := by
+    have h1 : a * (b * (a' * b')) - 1
+        = (a * a' - 1) * (b * b') + (b * b' - 1) := by ring
+    rw [h1]
+    exact dvd_add (Dvd.dvd.mul_right haa' _) hbb'
+  have hfix : σ ^ (a * (b * (a' * b'))) = σ := by
+    have h1 : σ ^ (a * (b * (a' * b')) - 1) = 1 :=
+      orderOf_dvd_iff_zpow_eq_one.mp (by rw [hσ]; exact hexp)
+    calc σ ^ (a * (b * (a' * b')))
+        = σ ^ (a * (b * (a' * b')) - 1 + 1) := by congr 1; ring
+      _ = σ ^ (a * (b * (a' * b')) - 1) * σ := zpow_add_one _ _
+      _ = σ := by rw [h1, one_mul]
+  have h2 : ⁅c, d⁆ * σ * ⁅c, d⁆⁻¹ = σ := by rw [hcomm, hfix]
+  calc ⁅c, d⁆ * σ = (⁅c, d⁆ * σ * ⁅c, d⁆⁻¹) * ⁅c, d⁆ := by group
+    _ = σ * ⁅c, d⁆ := by rw [h2]
+
 
 /-- **A faithful transitive action of a group of order `p(p-1)` on `p` points is
 two-transitive** (indeed sharply so): two-point stabilizers are trivial, so the
