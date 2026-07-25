@@ -1392,8 +1392,8 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 4D.2 | ✅ | `baerAdd_mul_inv_of_commutator_le_center` / `baerMul_div_eq_commutator` (`ProblemsBaerAddition.lean`) |
 | 4D.3 | ✅ 全 7 小問 | `IsIrreducibleCoprimeAction.*` (`ProblemsIrreducibleAction.lean`): (a) `exists_isPGroup` / (b) `commutator_le_center` / (c) `fixedPoints_eq_commutator` + `eq_commutator_or_eq_top_of_isAInvariant` / (d) `pow_mem_commutator` + `pow_eq_one_quotient_commutator` / (e) `pow_eq_one_of_mem_commutator` / (f) `pow_eq_one_of_ne_two` / (g) `pow_four_eq_one_of_two` |
 | 4D.4 | ✅ | `actionCommutator_eq_bot_of_isPGroup_two_of_fixes_pow_four` (`ProblemsIrreducibleAction.lean`) |
-| 4D.5 上界 | ✅ | `derivedSeries_semidirectProduct_eq_bot` + `derivedSeries_le_range_inl` (新 leaf `ProblemsDerivedLength.lean`) |
-| 4D.5 下界 + 系 | ⬜ | `(B ⋊ A)^{(n)} ≠ 1` と「任意に大きい導来長」— 下記の設計 |
+| 4D.5 主張本体 | ✅ | `derivedSeries_semidirectProduct_eq_bot_and_ne_bot` (上界 `..._eq_bot` / 下界 `..._ne_bot` / Lemma 4.29 部分群版 `commutator_commutator_inl_inr_map_eq`、新 leaf `ProblemsDerivedLength.lean`) |
+| 4D.5 系 | ⬜ | 「任意に大きい導来長の可解群が存在」— 正則 wreath 積 `C ≀ A` (4A.7 の `D ≀[Q] Q` を再利用) |
 | 4D.6 | ⬜ | Fitting の定理 (Thm 4.34) の写像 `θ` で `θ(G) = C_G(A)`, `ker θ = ⁅G,A⁆` |
 | 4D.7 | ⬜ | `p`-可解 + 巡回 Sylow `p` ⟹ `K ⊆ O_{p'}(G)` |
 
@@ -1418,7 +1418,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 **上界 (実装済)**: `rightHom : B ⋊ A ↠ A` で `(B ⋊ A)^{(n)} ≤ ker rightHom = inl(B)`、
 `inl(B)` 可換ゆえ `(B ⋊ A)^{(n+1)} = 1`。coprime も faithful も不要。
 
-**下界 (残り)**: `V := A^{(n-1)} ≠ 1` (導来長がちょうど `n`)。`(|B|, |V|) = 1` と `B` 可換から
+**下界 (実装済)**: `V := A^{(n-1)} ≠ 1` (導来長がちょうど `n`)。`(|B|, |V|) = 1` と `B` 可換から
 Lemma 4.29 (`⁅B, V, V⁆ = ⁅B, V⁆`; repo は `actionCommutator` 形) が使える。
 半直積 `Γ = B ⋊ A` の中で `W := ⁅inl(B), inr(V)⁆` とおくと:
 - `inr(V) ≤ Γ^{(k)}` (∀ `k ≤ n-1`; `inr` は導来列を保つ + `V = A^{(n-1)} ≤ A^{(k)}`)
@@ -1427,6 +1427,12 @@ Lemma 4.29 (`⁅B, V, V⁆ = ⁅B, V⁆`; repo は `actionCommutator` 形) が�
 - 仕上げ: `k = n-1` で `W = ⁅W, inr V⁆ ≤ Γ^{(n)}`、`W ≠ 1` は faithful から
   (`⁅B, V⁆ = 1` なら `V` が `B` に自明作用 ⟹ `V = 1` に矛盾)。
 ⟹ `Γ^{(n)} ≠ 1` かつ `Γ^{(n+1)} = 1` で導来長ちょうど `n+1`。
+⚠ 実装知見: **BG に同型の subgroup 版 4.29 (`commutator_commutator_right_eq`) があるが
+BG は Isaacs を import するので Ch04 からは使えない** (import cycle)。Ch04 内では
+制限作用の半直積 `Δ = B ⋊[φ∘V.subtype] ↥V` で Γ 形 4.29 を使い、
+`F = SemidirectProduct.map (id B) V.subtype : Δ →* Γ` で `Subgroup.map_commutator` により
+押し出すのが正しい経路 (`commutator_commutator_inl_inr_map_eq`)。
+⚠ `derivedSeries_antitone` は群を**明示引数**で取る (`derivedSeries_antitone A hk`)。
 
 **系 (任意に大きい導来長)**: hint どおり `C ≀ A` (regular wreath product; repo は 4A.7 の
 `ProblemsWreath.lean` に `D ≀[Q] Q` を持つ)。`C` = 位数 `p` 巡回 (`p ∤ |A^{(n-1)}|`) とすると
