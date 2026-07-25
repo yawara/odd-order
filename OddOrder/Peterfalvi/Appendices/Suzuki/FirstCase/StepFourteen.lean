@@ -275,6 +275,99 @@ theorem mem_of_card_eq_of_prime_subgroups {E : Subgroup G'} {p : ℕ} (hp : p.Pr
     · exact hmem B hB')
   omega
 
+/-- **Exactly `p + 1` lines**: if a `Finset` `𝒮` consists of order-`p` subgroups of
+`E` (`|E| = p²`, all nonidentity elements of order `p`) and contains the cyclic group
+of every nonidentity element of `E`, then `|𝒮| = p + 1` — the `p - 1` nonidentity
+elements of the members partition the `p² - 1` nonidentity elements of `E`. -/
+theorem card_eq_of_forall_zpowers_mem {E : Subgroup G'} {p : ℕ} (hp : p.Prime)
+    (hE : Nat.card ↥E = p ^ 2)
+    (𝒮 : Finset (Subgroup G'))
+    (hmem : ∀ A ∈ 𝒮, A ≤ E ∧ Nat.card ↥A = p)
+    (hall : ∀ x ∈ E, x ≠ 1 → Subgroup.zpowers x ∈ 𝒮) :
+    𝒮.card = p + 1 := by
+  classical
+  haveI := Fintype.ofFinite G'
+  have hpairinf : ∀ A ∈ 𝒮, ∀ B ∈ 𝒮, A ≠ B → A ⊓ B = ⊥ := by
+    intro A hA B hB hne
+    obtain ⟨-, hAc⟩ := hmem A hA
+    obtain ⟨-, hBc⟩ := hmem B hB
+    have hdvd : Nat.card ↥(A ⊓ B) ∣ p := by
+      have h1 := Subgroup.card_dvd_of_le (inf_le_left : A ⊓ B ≤ A)
+      rwa [hAc] at h1
+    rcases (Nat.dvd_prime hp).mp hdvd with h1 | hp'
+    · exact Subgroup.card_eq_one.mp h1
+    · exfalso
+      have h2 : A ⊓ B = A :=
+        Subgroup.eq_of_le_of_card_ge inf_le_left (by rw [hp', hAc])
+      have h3 : A ⊓ B = B :=
+        Subgroup.eq_of_le_of_card_ge inf_le_right (by rw [hp', hBc])
+      exact hne (h2.symm.trans h3)
+  set D : Subgroup G' → Finset G' :=
+    fun A => (A : Set G').toFinset \ {1} with hD_def
+  have hDcard : ∀ A ∈ 𝒮, (D A).card = p - 1 := by
+    intro A hA
+    obtain ⟨-, hAc⟩ := hmem A hA
+    have h1 : ({1} : Finset G') ⊆ (A : Set G').toFinset := by
+      intro x hx
+      rw [Finset.mem_singleton] at hx
+      rw [Set.mem_toFinset, hx]
+      exact A.one_mem
+    rw [hD_def, Finset.card_sdiff, Finset.inter_eq_left.mpr h1,
+      Finset.card_singleton]
+    congr 1
+    rw [Set.toFinset_card, ← Nat.card_eq_fintype_card, Nat.card_coe_set_eq]
+    exact hAc
+  have hdisj : ∀ A ∈ 𝒮, ∀ B ∈ 𝒮, A ≠ B → Disjoint (D A) (D B) := by
+    intro A hA B hB hne
+    rw [Finset.disjoint_left]
+    intro x hx hx'
+    rw [hD_def] at hx hx'
+    simp only [Finset.mem_sdiff, Set.mem_toFinset, SetLike.mem_coe,
+      Finset.mem_singleton] at hx hx'
+    have h1 : x ∈ A ⊓ B := ⟨hx.1, hx'.1⟩
+    rw [hpairinf A hA B hB hne, Subgroup.mem_bot] at h1
+    exact hx.2 h1
+  have hcover : 𝒮.biUnion D = (E : Set G').toFinset \ {1} := by
+    apply Finset.Subset.antisymm
+    · intro x hx
+      rw [Finset.mem_biUnion] at hx
+      obtain ⟨A, hA, hxA⟩ := hx
+      obtain ⟨hAE, -⟩ := hmem A hA
+      rw [hD_def] at hxA
+      simp only [Finset.mem_sdiff, Set.mem_toFinset, SetLike.mem_coe,
+        Finset.mem_singleton] at hxA ⊢
+      exact ⟨hAE hxA.1, hxA.2⟩
+    · intro x hx
+      simp only [Finset.mem_sdiff, Set.mem_toFinset, SetLike.mem_coe,
+        Finset.mem_singleton] at hx
+      rw [Finset.mem_biUnion]
+      refine ⟨Subgroup.zpowers x, hall x hx.1 hx.2, ?_⟩
+      rw [hD_def]
+      simp only [Finset.mem_sdiff, Set.mem_toFinset, SetLike.mem_coe,
+        Finset.mem_singleton]
+      exact ⟨Subgroup.mem_zpowers x, hx.2⟩
+  have hEcard : ((E : Set G').toFinset \ {1}).card = p ^ 2 - 1 := by
+    have h1 : ({1} : Finset G') ⊆ (E : Set G').toFinset := by
+      intro x hx
+      rw [Finset.mem_singleton] at hx
+      rw [Set.mem_toFinset, hx]
+      exact E.one_mem
+    rw [Finset.card_sdiff, Finset.inter_eq_left.mpr h1, Finset.card_singleton]
+    congr 1
+    rw [Set.toFinset_card, ← Nat.card_eq_fintype_card, Nat.card_coe_set_eq]
+    exact hE
+  have hsum : 𝒮.card * (p - 1) = p ^ 2 - 1 := by
+    rw [← hEcard, ← hcover, Finset.card_biUnion hdisj,
+      Finset.sum_congr rfl hDcard, Finset.sum_const, smul_eq_mul]
+  have h1lt := hp.one_lt
+  have hpos : 0 < p - 1 := by omega
+  have heq : p ^ 2 - 1 = (p + 1) * (p - 1) := by
+    have h2 : 1 ≤ p ^ 2 := Nat.one_le_pow _ _ hp.pos
+    zify [h2, h1lt.le]
+    ring
+  rw [heq] at hsum
+  exact Nat.eq_of_mul_eq_mul_right hpos hsum
+
 end GenericCentre
 
 namespace FirstCaseHypothesis
