@@ -947,6 +947,18 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 ⟹ **正しい主張は「`p` が奇 または `n ≥ 2`」の条件付き**と思われる。3B.12 と同型の書籍の穴。
 次 iteration で PDF ページ画像を再確認し、条件付きの形で形式化する。
 
+### 4A.8(c) の Lean 実装知見 (2026-07-25 の 2 回目の着手で判明、次 iteration 用)
+
+statement は確定済 (下記)。詰まりは **`Pi.mulSingle` の型推論**に集中している:
+
+- ⚠ `Pi.mulSingle_eq_of_ne h d` / `Pi.mulSingle_eq_same x d` のように**値を位置引数で渡すと
+  依存族 `f` がメタ変数のまま残り** application type mismatch になる (非依存族
+  `fun _ : Q => D` でも同じ)。`(f := …)` という名前付き指定も**不可** (implicit 名が `f` でない)。
+  ⟹ **`simp [Pi.mulSingle_apply, hb]` で潰す**のが確実 (`Pi.mulSingle_apply` が `if` 形に開く)。
+- ⚠ 証明中の `classical` と、補助補題の statement にある `[DecidableEq Q]` は**別 instance**に
+  なり mismatch する。補助は `classical` の後に `have` でインライン定義する。
+- `∏ ω, Pi.mulSingle x d ω = d` は `Finset.prod_eq_single x` + 上記 simp で通る (確認済)。
+
 ### 4A.8(c) の設計 (次 iteration の出発点)
 
 `P'U = ker(augHom)` は **本 commit で確立済** (`commutator_sup_range_inr_eq_ker_augHom`)。
