@@ -140,6 +140,41 @@ theorem sup_ker_transfer_eq_top_of_le_center {G A : Type*} [Group G] [CommGroup 
     ((le_sup_left : H ≤ _) h.2)
 
 
+/-- **Isaacs Problem 5A.2**: `H = ⊤` のときの transfer は `ϕ` そのもの。
+
+Isaacs の `v : G → G/G'` は `A = G/G'`, `ϕ` = 自然な射影の場合なので, これがまさに
+「transfer は自然な射影に他ならない」。
+
+`G ⧸ ⊤` は 1 点なので `diff` の積は 1 項だけで, その項は `g` の**共役**の `ϕ`-像
+(`Subgroup.smul_apply_eq_smul_apply_inv_smul`)。`A` が可換なので `ϕ ⟨g⟩` に等しい。
+⚠ `transfer_eq_pow` は使えない (key 仮説「`g₀⁻¹ g^k g₀ = g^k`」は `H = ⊤` では偽)。 -/
+theorem transfer_top_eq_apply {G A : Type*} [Group G] [CommGroup A]
+    [(⊤ : Subgroup G).FiniteIndex] (ϕ : (⊤ : Subgroup G) →* A) (g : G) :
+    transfer ϕ g = ϕ ⟨g, Subgroup.mem_top g⟩ := by
+  classical
+  haveI hss : Subsingleton (G ⧸ (⊤ : Subgroup G)) := QuotientGroup.subsingleton_quotient_top
+  letI hfin : Fintype (G ⧸ (⊤ : Subgroup G)) := Subgroup.fintypeQuotientOfFiniteIndex
+  have hconj : ∀ x : G,
+      ϕ ⟨x⁻¹ * (g * x), Subgroup.mem_top _⟩ = ϕ ⟨g, Subgroup.mem_top g⟩ := by
+    intro x
+    have hx : (⟨x⁻¹ * (g * x), Subgroup.mem_top _⟩ : (⊤ : Subgroup G))
+        = (⟨x, Subgroup.mem_top x⟩ : (⊤ : Subgroup G))⁻¹ *
+            ⟨g, Subgroup.mem_top g⟩ * ⟨x, Subgroup.mem_top x⟩ :=
+      Subtype.ext (by simp [mul_assoc])
+    rw [hx, map_mul, map_mul, map_inv, mul_right_comm, inv_mul_cancel, one_mul]
+  have hbeta : ∀ q : G ⧸ (⊤ : Subgroup G),
+      (((g • (default : (⊤ : Subgroup G).LeftTransversal)).2.leftQuotientEquiv q : G))
+        = g * ((default : (⊤ : Subgroup G).LeftTransversal).2.leftQuotientEquiv q : G) := by
+    intro q
+    rw [Subgroup.smul_apply_eq_smul_apply_inv_smul g default q,
+      Subsingleton.elim (g⁻¹ • q) q]
+    rfl
+  rw [transfer_def ϕ (default : (⊤ : Subgroup G).LeftTransversal) g]
+  simp only [Subgroup.leftTransversals.diff, hbeta, hconj]
+  rw [Finset.prod_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
+    show Nat.card (G ⧸ (⊤ : Subgroup G)) = 1 from Subgroup.index_top, pow_one]
+
+
 end
 
 end OddOrder.Isaacs.Ch05
