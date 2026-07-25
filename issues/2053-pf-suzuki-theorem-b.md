@@ -1502,3 +1502,24 @@ import する形にした。
    `Z₁` 固定)、`N_G(Z₁) = C_G(Z₁)⟨s⟩ = R₂⟨s⟩` ((13)(14) 由来)、
    逆向きは `Z₁PΣ = Ω₁(LV)` (15) が `R₂⟨s⟩` で正規。
 
+
+
+## ✅ step (17) 完結 (2026-07-26) — Theorem B の最終矛盾が landing
+
+`false_of_step_seventeen` (`FirstCase/StepSeventeenTransfer.lean`):
+`A = Z₁ΣP` の可換性 ((16)) と `R₂` 内での弱閉性 ((17) 段 1-2) から、
+**自前で形式化した Hall–Wielandt (p 奇 + A 可換弱閉版)** が (B2) を `N_G(A) = R₂⟨s⟩` に
+輸送し、`|W| = 3 / 9` 両分岐の `3 ∣ |Ab(R₂⟨s⟩)|` と矛盾する。
+
+⟹ **wreath 排除 (Yoshida ルート) も `|W|` の場合分けも不要**になった
+(Yoshida 経由の `|W| = 3` 側の別証明 `false_of_card_W_eq_three` は残置)。
+
+### 経緯 (issue 9503 に詳細)
+1. 書籍が引く Hall–Wielandt (M. Hall Thm 14.4.2) は Gorenstein にも Isaacs にも証明が無い。
+2. Gorenstein p.257 の注記から **Alperin 経由では届かない** ことを確認。
+3. ChatGPT Pro に古典証明を再構成させ、**全ステップを独立に検証**
+   (`notes/meta/hall_wielandt_proof.md`)。
+4. Lean 化: 既存の Mackey 公式 (Isaacs 10.10) と Isaacs 10.6(a)(b) が効き、
+   局所補題の α-多項式論法は初等形 (`y^j x y^{-j} = c^j x`) に単純化して実装。
+
+### 次 = **Theorem B の assembly** (steps (1)–(17) の結合)
