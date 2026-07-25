@@ -1055,6 +1055,194 @@ theorem commutator_eq_sInvertedT
   · exact Subgroup.eq_of_le_of_card_ge hle (by rw [heq, hTcard])
   · exact absurd (Subgroup.eq_bot_of_card_eq _ heq) hne
 
+include model in
+/-- The distinguished involution normalizes `R = T·P`: it inverts `T` and
+centralizes `P`. -/
+theorem distinguishedInvolution_mem_normalizer_invImageF
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) :
+    fc.toHypothesis.distinguishedInvolution
+      ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  obtain ⟨hTle, hTinv, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hsP : ∀ y ∈ fc.P, s * y * s⁻¹ = y := by
+    intro y hy
+    have h1 := Subgroup.mem_centralizer_iff.mp
+      (fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V fc.P_le_V) y hy
+    rw [← hsdef] at h1
+    rw [← h1]
+    group
+  have hfwd : ∀ r ∈ fc.invImageF model, s * r * s⁻¹ ∈ fc.invImageF model := by
+    intro r hr
+    have hrTP : r ∈ (fc.sInvertedT model : Set G) * (fc.P : Set G) := by
+      rw [← fc.coe_invImageF_eq_sInvertedT_mul_P model ind hB2 hm]
+      exact hr
+    obtain ⟨t, ht, y, hy, rfl⟩ := hrTP
+    have h1 : s * (t * y) * s⁻¹ = (s * t * s⁻¹) * (s * y * s⁻¹) := by group
+    rw [h1, hTinv t ht, hsP y hy]
+    exact mul_mem ((fc.invImageF model).inv_mem (hTle ht)) (fc.P_le_invImageF model hy)
+  have hs2 : s * s = 1 := by
+    have := fc.toHypothesis.distinguishedInvolution_sq
+    rwa [pow_two] at this
+  rw [Subgroup.mem_set_normalizer_iff]
+  intro r
+  constructor
+  · exact fun hr => hfwd r hr
+  · intro hr
+    have h2 := hfwd _ hr
+    have h3 : s * (s * r * s⁻¹) * s⁻¹ = r := by
+      calc s * (s * r * s⁻¹) * s⁻¹ = (s * s) * r * ((s * s))⁻¹ := by group
+        _ = r := by rw [hs2]; group
+    rwa [h3] at h2
+
+include model in
+/-- **`C_{R₁}(s) = P`** ((12) tail, δ4-i): an element of `R₁` centralized by the
+distinguished involution lies in `P`.  Outside `R` its class in `N_G(R)/R` would be
+a fixed point of an involution acting by inversion (`quotient_conj_eq_inv_of_sq_eq_one`);
+inside `R = T·P` the `T`-component is both inverted and fixed, hence trivial. -/
+theorem mem_P_of_mem_of_distinguishedInvolution_conj_eq
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3) {x : G} (hx : x ∈ R₁)
+    (hfix : fc.toHypothesis.distinguishedInvolution * x
+      * fc.toHypothesis.distinguishedInvolution⁻¹ = x) :
+    x ∈ fc.P := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
+  obtain ⟨hTle, hTinv, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
+  set NR : Subgroup G :=
+    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
+  set R' : Subgroup ↥NR := (fc.invImageF model).subgroupOf NR with hR'def
+  have hcardQ := fc.card_quotient_invImageF_eq model ind hB2 hm hGp hSigma
+  -- step 1: `x ∈ R`.
+  have hxR : x ∈ fc.invImageF model := by
+    by_contra hxnR
+    have hxNR : x ∈ NR := hR₁le hx
+    have hsNR : s ∈ NR :=
+      fc.distinguishedInvolution_mem_normalizer_invImageF model ind hB2 hm
+    have hξ1 : QuotientGroup.mk' R' ⟨x, hxNR⟩ ≠ 1 := by
+      intro h0
+      rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h0
+      exact hxnR (Subgroup.mem_subgroupOf.mp h0)
+    -- `orderOf ξ = p`.
+    have hordx : orderOf x ∣ fc.p ^ 3 := by
+      have h1 : orderOf (R₁.subtype ⟨x, hx⟩) = orderOf (⟨x, hx⟩ : ↥R₁) :=
+        orderOf_injective R₁.subtype R₁.subtype_injective _
+      have h2 : orderOf (⟨x, hx⟩ : ↥R₁) ∣ Nat.card ↥R₁ := orderOf_dvd_natCard _
+      rw [hcard] at h2
+      exact h1 ▸ h2
+    have hordxNR : orderOf (NR.subtype ⟨x, hxNR⟩) = orderOf (⟨x, hxNR⟩ : ↥NR) :=
+      orderOf_injective NR.subtype NR.subtype_injective _
+    have hordξ3 : orderOf (QuotientGroup.mk' R' ⟨x, hxNR⟩) ∣ fc.p ^ 3 := by
+      refine (orderOf_map_dvd (QuotientGroup.mk' R') _).trans ?_
+      have h9 : orderOf (⟨x, hxNR⟩ : ↥NR) = orderOf x := by
+        rw [← hordxNR, Subgroup.subtype_apply]
+      rw [h9]
+      exact hordx
+    have hordξQ : orderOf (QuotientGroup.mk' R' ⟨x, hxNR⟩) ∣ fc.p * (fc.p - 1) := by
+      have h1 : orderOf (QuotientGroup.mk' R' ⟨x, hxNR⟩) ∣ Nat.card (↥NR ⧸ R') :=
+        orderOf_dvd_natCard _
+      rwa [hcardQ] at h1
+    have hordξ : orderOf (QuotientGroup.mk' R' ⟨x, hxNR⟩) = fc.p := by
+      have hcopP : Nat.Coprime fc.p (fc.p - 1) :=
+        (Nat.Prime.coprime_iff_not_dvd fc.p_prime).mpr (fun h => by
+          have h1 := Nat.le_of_dvd (by have := fc.p_prime.two_le; omega) h
+          have := fc.p_prime.two_le
+          omega)
+      have h5 : orderOf (QuotientGroup.mk' R' ⟨x, hxNR⟩) ∣ fc.p :=
+        (Nat.Coprime.coprime_dvd_left hordξ3 (hcopP.pow_left 3)).dvd_of_dvd_mul_right
+          hordξQ
+      rcases (fc.p_prime.eq_one_or_self_of_dvd _ h5).symm with heq | heq
+      · exact heq
+      · exact absurd (orderOf_eq_one_iff.mp heq) hξ1
+    have hnorm := OddOrder.GroupTheory.zpowers_normal_of_orderOf_eq fc.p_prime
+      hcardQ hordξ
+    -- the involution class of `s`.
+    have hs2 : s ^ 2 = 1 := fc.toHypothesis.distinguishedInvolution_sq
+    have hυ2 : (QuotientGroup.mk' R' ⟨s, hsNR⟩) ^ 2 = 1 := by
+      rw [← map_pow]
+      have h1 : (⟨s, hsNR⟩ : ↥NR) ^ 2 = 1 := by
+        ext
+        exact hs2
+      rw [h1, map_one]
+    have hυ1 : QuotientGroup.mk' R' ⟨s, hsNR⟩ ≠ 1 := by
+      intro h0
+      rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h0
+      have h1 : s ∈ fc.invImageF model := Subgroup.mem_subgroupOf.mp h0
+      have h2 : orderOf s = 2 := orderOf_eq_prime hs2
+        fc.toHypothesis.distinguishedInvolution_ne_one
+      have h3 : s ^ fc.p = 1 :=
+        fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm h1
+      have h4 : orderOf s ∣ fc.p := orderOf_dvd_of_pow_eq_one h3
+      rw [h2] at h4
+      obtain ⟨j, hj⟩ := fc.p_odd
+      have h5 := Nat.le_of_dvd fc.p_prime.pos h4
+      omega
+    have hinv := fc.quotient_conj_eq_inv_of_sq_eq_one model ind hB2 hm hGp hSigma
+      hordξ hnorm hυ2 hυ1
+    -- but the class is also fixed.
+    have hfixq : QuotientGroup.mk' R' ⟨s, hsNR⟩ * QuotientGroup.mk' R' ⟨x, hxNR⟩
+        * (QuotientGroup.mk' R' ⟨s, hsNR⟩)⁻¹ = QuotientGroup.mk' R' ⟨x, hxNR⟩ := by
+      rw [← map_inv, ← map_mul, ← map_mul]
+      congr 1
+      ext
+      exact hfix
+    rw [hinv] at hfixq
+    have h6 : (QuotientGroup.mk' R' ⟨x, hxNR⟩) ^ 2 = 1 := by
+      rw [pow_two]
+      nth_rewrite 1 [← hfixq]
+      group
+    have h7 : orderOf (QuotientGroup.mk' R' ⟨x, hxNR⟩) ∣ 2 :=
+      orderOf_dvd_of_pow_eq_one h6
+    rw [hordξ] at h7
+    obtain ⟨j, hj⟩ := fc.p_odd
+    have h8 := Nat.le_of_dvd (by norm_num) h7
+    have h9 := fc.p_prime.two_le
+    omega
+  -- step 2: `x = t·y` with `t` both inverted and fixed.
+  have hxTP : x ∈ (fc.sInvertedT model : Set G) * (fc.P : Set G) := by
+    rw [← fc.coe_invImageF_eq_sInvertedT_mul_P model ind hB2 hm]
+    exact hxR
+  obtain ⟨t, ht, y, hy, rfl⟩ := hxTP
+  have hsy : s * y * s⁻¹ = y := by
+    have h1 := Subgroup.mem_centralizer_iff.mp
+      (fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V fc.P_le_V) y hy
+    rw [← hsdef] at h1
+    rw [← h1]
+    group
+  have h1 : s * (t * y) * s⁻¹ = t⁻¹ * y := by
+    calc s * (t * y) * s⁻¹ = (s * t * s⁻¹) * (s * y * s⁻¹) := by group
+      _ = t⁻¹ * y := by rw [hTinv t ht, hsy]
+  rw [h1] at hfix
+  have h2 : t⁻¹ = t := mul_right_cancel hfix
+  have h3 : t ^ 2 = 1 := by
+    rw [pow_two]
+    nth_rewrite 1 [← h2]
+    group
+  have h4 : t = 1 := by
+    have h5 : orderOf t ∣ 2 := orderOf_dvd_of_pow_eq_one h3
+    have h6 : t ^ fc.p = 1 :=
+      fc.pow_p_eq_one_of_mem_invImageF model ind hB2 hm (hTle ht)
+    have h7 : orderOf t ∣ fc.p := orderOf_dvd_of_pow_eq_one h6
+    obtain ⟨j, hj⟩ := fc.p_odd
+    have h8 := Nat.dvd_gcd h5 h7
+    have h9 : Nat.gcd 2 fc.p = 1 := by
+      have := (Nat.coprime_primes Nat.prime_two fc.p_prime).mpr (by omega)
+      exact this
+    rw [h9, Nat.dvd_one] at h8
+    exact orderOf_eq_one_iff.mp h8
+  rw [h4]
+  simpa using hy
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
