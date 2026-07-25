@@ -148,7 +148,7 @@ theorem exists_orderOf_eq_prime_zpowers_normal (hp : p.Prime)
 omit [Finite G] [IsPretransitive G Ω] in
 /-- Regularity of a normal `⟨σ⟩` of order `p` on `p` points, from any base point:
 `i ↦ σ^i • a` is injective (`σ` has no fixed point), hence surjective by counting. -/
-private theorem surjective_zpow_smul (hp : p.Prime) (hΩ : Nat.card Ω = p) {σ : G}
+theorem surjective_zpow_smul (hp : p.Prime) (hΩ : Nat.card Ω = p) {σ : G}
     (hσ : orderOf σ = p) (hnorm : (Subgroup.zpowers σ).Normal)
     [IsPretransitive G Ω] [Finite G] (a : Ω) :
     Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a) := by
@@ -287,7 +287,7 @@ private theorem conj_zpow_eq (u x : G) (s : ℤ) :
 omit [Finite G] [Finite Ω] [IsPretransitive G Ω] in
 /-- An element centralizing the regular normal subgroup `⟨σ⟩` acts as one of its
 elements, hence (by faithfulness) lies in it. -/
-private theorem mem_zpowers_of_centralizes {σ : G}
+theorem mem_zpowers_of_centralizes {σ : G}
     (hsurjAll : ∀ a : Ω, Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a))
     (a : Ω) {u : G} (hcen : ∀ n ∈ Subgroup.zpowers σ, u * n * u⁻¹ = n) :
     u ∈ Subgroup.zpowers σ := by
