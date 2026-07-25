@@ -203,6 +203,39 @@ theorem conjInvariant_eq_bot_or_range_emb
     have : model.emb (Multiplicative.ofAdd (Multiplicative.toAdd y)) ∈ S := hxA
     rwa [show Multiplicative.ofAdd (Multiplicative.toAdd y) = y from rfl] at this
 
+/-- **Generic center-normalizer nesting**: if `S ⊓ C_G(S) = P` (the center of `S`
+realized in the ambient group equals `P`), then `N_G(S) ≤ N_G(P)` — conjugation by a
+normalizer of `S` permutes `S ⊓ C_G(S)`.  Consumed by both arms of the step (11)
+Sylow contradiction (relocation candidate: `OddOrder/GroupTheory`). -/
+theorem normalizer_set_le_normalizer_of_inf_centralizer_eq {G' : Type*} [Group G']
+    {S P : Subgroup G'} (h : S ⊓ Subgroup.centralizer (S : Set G') = P) :
+    Subgroup.normalizer (S : Set G') ≤ Subgroup.normalizer (P : Set G') := by
+  intro g hg
+  rw [Subgroup.mem_set_normalizer_iff] at hg ⊢
+  intro x
+  have key : ∀ y : G', y ∈ S ⊓ Subgroup.centralizer (S : Set G') ↔
+      g * y * g⁻¹ ∈ S ⊓ Subgroup.centralizer (S : Set G') := by
+    intro y
+    constructor
+    · rintro ⟨hyR, hyC⟩
+      refine ⟨(hg y).mp hyR, Subgroup.mem_centralizer_iff.mpr fun r hr => ?_⟩
+      have hr' : g⁻¹ * r * g ∈ S := by
+        have h1 := (hg (g⁻¹ * r * g)).mpr
+        simp only [mul_assoc, mul_inv_cancel_left] at h1 ⊢
+        exact h1 (by simpa [mul_assoc] using hr)
+      have hc := Subgroup.mem_centralizer_iff.mp hyC _ hr'
+      have h2 := congrArg (fun z => g * z * g⁻¹) hc
+      simpa [mul_assoc] using h2
+    · rintro ⟨hyR, hyC⟩
+      refine ⟨(hg y).mpr hyR, Subgroup.mem_centralizer_iff.mpr fun r hr => ?_⟩
+      have hr' : g * r * g⁻¹ ∈ S := (hg r).mp hr
+      have hc := Subgroup.mem_centralizer_iff.mp hyC _ hr'
+      have h2 := congrArg (fun z => g⁻¹ * z * g) hc
+      simpa [mul_assoc] using h2
+  rw [← h]
+  exact key x
+
+
 namespace FirstCaseHypothesis
 
 universe uG' uΩ'
@@ -465,36 +498,57 @@ theorem normalizer_invImageF_le_normalizer_P
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hnab : ∃ r₁ ∈ fc.invImageF model, ∃ r₂ ∈ fc.invImageF model, r₁ * r₂ ≠ r₂ * r₁) :
     Subgroup.normalizer (fc.invImageF model : Set G)
-      ≤ Subgroup.normalizer (fc.P : Set G) := by
-  set R : Subgroup G := fc.invImageF model with hRdef
-  have hZP := fc.center_eq_P_of_not_isMulCommutative model ind hnab
-  intro g hg
-  rw [Subgroup.mem_set_normalizer_iff] at hg ⊢
-  intro x
-  -- conjugation by `g` preserves `R ⊓ C_G(R)`, which equals `P`.
-  have key : ∀ y : G, y ∈ R ⊓ Subgroup.centralizer (R : Set G) ↔
-      g * y * g⁻¹ ∈ R ⊓ Subgroup.centralizer (R : Set G) := by
-    intro y
-    constructor
-    · rintro ⟨hyR, hyC⟩
-      refine ⟨(hg y).mp hyR, Subgroup.mem_centralizer_iff.mpr fun r hr => ?_⟩
-      have hr' : g⁻¹ * r * g ∈ R := by
-        have h1 := (hg (g⁻¹ * r * g)).mpr
-        simp only [mul_assoc, mul_inv_cancel_left] at h1 ⊢
-        exact h1 (by simpa [mul_assoc] using hr)
-      have hc := Subgroup.mem_centralizer_iff.mp hyC _ hr'
-      -- `(g⁻¹ r g)·y = y·(g⁻¹ r g)` ⟹ `r·(g y g⁻¹) = (g y g⁻¹)·r`
-      have h2 := congrArg (fun z => g * z * g⁻¹) hc
-      simpa [mul_assoc] using h2
-    · rintro ⟨hyR, hyC⟩
-      refine ⟨(hg y).mpr hyR, Subgroup.mem_centralizer_iff.mpr fun r hr => ?_⟩
-      have hr' : g * r * g⁻¹ ∈ R := (hg r).mp hr
-      have hc := Subgroup.mem_centralizer_iff.mp hyC _ hr'
-      -- `(g r g⁻¹)·(g y g⁻¹) = (g y g⁻¹)·(g r g⁻¹)` ⟹ `r y = y r`
-      have h2 := congrArg (fun z => g⁻¹ * z * g) hc
-      simpa [mul_assoc] using h2
-  rw [← hZP]
-  exact key x
+      ≤ Subgroup.normalizer (fc.P : Set G) :=
+  normalizer_set_le_normalizer_of_inf_centralizer_eq
+    (fc.center_eq_P_of_not_isMulCommutative model ind hnab)
+
+
+/-- **Shared Sylow-contradiction engine for step (11)** (both arms): there is no
+`p`-subgroup `S ≤ C_G(P)` of full `p`-part (`|S| = p^k`, `|C_G(P)| = p^k·c`, `p ∤ c`) with
+`S ⊓ C_G(S) = P`, once `p^{k+1} ∣ |G|`: normalizer growth inside a Sylow `p`-subgroup of
+`G` produces a `p`-subgroup of `N_G(S) ≤ N_G(P) = C_G(P)` (step (1)) strictly larger than
+`p^k`. -/
+theorem false_of_ppart_subgroup_center_P {S : Subgroup G} {k c : ℕ}
+    (hZ : S ⊓ Subgroup.centralizer (S : Set G) = fc.P)
+    (hcard : Nat.card ↥S = fc.p ^ k)
+    (hC : Nat.card ↥(Subgroup.centralizer (fc.P : Set G)) = fc.p ^ k * c)
+    (hpc : ¬ fc.p ∣ c)
+    (hGdvd : fc.p ^ (k + 1) ∣ Nat.card G) : False := by
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have hSp : IsPGroup fc.p ↥S := IsPGroup.of_card hcard
+  obtain ⟨X, hSX⟩ := hSp.exists_le_sylow
+  have hXdvd : fc.p ^ (k + 1) ∣ Nat.card ↥(X : Subgroup G) := by
+    rw [Sylow.card_eq_multiplicity]
+    exact pow_dvd_pow _ ((Nat.Prime.pow_dvd_iff_le_factorization fc.p_prime
+      Nat.card_pos.ne').mp hGdvd)
+  have hSltX : S < (X : Subgroup G) := by
+    refine lt_of_le_of_ne hSX fun h => ?_
+    rw [← h, hcard, Nat.pow_dvd_pow_iff_le_right fc.p_prime.one_lt] at hXdvd
+    omega
+  have hgrow := OddOrder.BG.Ch2.S08.lt_inf_normalizer_of_isPGroup_lt
+    (p := fc.p) X.isPGroup' hSltX
+  set Y : Subgroup G := (X : Subgroup G) ⊓ Subgroup.normalizer (S : Set G) with hYdef
+  have hYC : Y ≤ Subgroup.centralizer (fc.P : Set G) := by
+    refine le_trans inf_le_right ?_
+    rw [← fc.normalizer_P_eq_centralizer]
+    exact normalizer_set_le_normalizer_of_inf_centralizer_eq hZ
+  have hYp : IsPGroup fc.p ↥Y := X.isPGroup'.to_le inf_le_left
+  obtain ⟨j, hj⟩ := (IsPGroup.iff_card).mp hYp
+  have hlt : fc.p ^ k < Nat.card ↥Y := by
+    rw [← hcard]
+    have hdvd : Nat.card ↥S ∣ Nat.card ↥Y := Subgroup.card_dvd_of_le hgrow.le
+    refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos hdvd) fun heq => ?_
+    exact hgrow.ne (Subgroup.eq_of_le_of_card_ge hgrow.le heq.ge)
+  have hYdvd : Nat.card ↥Y ∣ Nat.card ↥(Subgroup.centralizer (fc.P : Set G)) :=
+    Subgroup.card_dvd_of_le hYC
+  rw [hC, hj] at hYdvd
+  have hpc' : Nat.Coprime fc.p c := (Nat.Prime.coprime_iff_not_dvd fc.p_prime).mpr hpc
+  have hjdvd : fc.p ^ j ∣ fc.p ^ k :=
+    (Nat.Coprime.dvd_of_dvd_mul_right (Nat.Coprime.pow_left j hpc')) hYdvd
+  have hle : Nat.card ↥Y ≤ fc.p ^ k := by
+    rw [hj]
+    exact Nat.le_of_dvd (Nat.pow_pos fc.p_prime.pos) hjdvd
+  omega
 
 include model in
 /-- **`R` is abelian — case (10.1) arm** (p. 111, proof of (11) ¶1): under `p ∤ |Σ|` and
@@ -520,40 +574,8 @@ theorem invImageF_mul_comm_of_not_dvd_card_D
   obtain ⟨r₁, h₁, r₂, h₂, hne⟩ := hcon
   have hnab : ∃ x ∈ fc.invImageF model, ∃ y ∈ fc.invImageF model, x * y ≠ y * x :=
     ⟨r₁, h₁, r₂, h₂, hne⟩
-  -- `|R| = p^{m+1}`, so `R` is a `p`-group.
   have hcardR : Nat.card ↥(fc.invImageF model) = fc.p ^ (m + 1) := by
     rw [fc.card_invImageF model ind, hFcard, fc.card_P]; ring
-  have hRp : IsPGroup fc.p ↥(fc.invImageF model) := IsPGroup.of_card hcardR
-  obtain ⟨X, hRX⟩ := hRp.exists_le_sylow
-  have hXdvd : fc.p ^ (m + 2) ∣ Nat.card ↥(X : Subgroup G) := by
-    rw [Sylow.card_eq_multiplicity]
-    exact pow_dvd_pow _ ((Nat.Prime.pow_dvd_iff_le_factorization fc.p_prime
-      Nat.card_pos.ne').mp hGp)
-  -- `R < X` (orders `p^{m+1} < p^{m+2} ≤ |X|`).
-  have hRltX : fc.invImageF model < (X : Subgroup G) := by
-    refine lt_of_le_of_ne hRX fun h => ?_
-    rw [← h, hcardR, Nat.pow_dvd_pow_iff_le_right fc.p_prime.one_lt] at hXdvd
-    omega
-  -- normalizer growth inside `X`.
-  have hgrow := OddOrder.BG.Ch2.S08.lt_inf_normalizer_of_isPGroup_lt
-    (p := fc.p) X.isPGroup' hRltX
-  set Y : Subgroup G := (X : Subgroup G) ⊓
-    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hYdef
-  -- `Y ≤ C_G(P)`.
-  have hYC : Y ≤ Subgroup.centralizer (fc.P : Set G) := by
-    refine le_trans inf_le_right ?_
-    rw [← fc.normalizer_P_eq_centralizer]
-    exact fc.normalizer_invImageF_le_normalizer_P model ind hnab
-  -- `|Y|` is a `p`-power strictly above `p^{m+1}`.
-  have hYp : IsPGroup fc.p ↥Y := X.isPGroup'.to_le inf_le_left
-  obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp hYp
-  have hRltY : fc.p ^ (m + 1) < Nat.card ↥Y := by
-    rw [← hcardR]
-    have hdvd : Nat.card ↥(fc.invImageF model) ∣ Nat.card ↥Y :=
-      Subgroup.card_dvd_of_le hgrow.le
-    refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos hdvd) fun heq => ?_
-    exact hgrow.ne (Subgroup.eq_of_le_of_card_ge hgrow.le heq.ge)
-  -- `p`-part accounting of `|C_G(P)|`.
   have hCeq : Nat.card ↥(Subgroup.centralizer (fc.P : Set G))
       = fc.p ^ (m + 1) * (Nat.card ↥(fc.rankOneQuotient).Q
         * Nat.card ↥(fc.rankOneQuotient).D) := by
@@ -578,20 +600,9 @@ theorem invImageF_mul_comm_of_not_dvd_card_D
       have := Nat.dvd_sub hple hdvd
       rwa [Nat.sub_sub_self (Nat.one_le_pow _ _ fc.p_prime.pos)] at this
     exact fc.p_prime.one_lt.ne' (Nat.dvd_one.mp h1)
-  have hpc : Nat.Coprime fc.p (Nat.card ↥(fc.rankOneQuotient).Q
-      * Nat.card ↥(fc.rankOneQuotient).D) :=
-    (Nat.Prime.coprime_iff_not_dvd fc.p_prime).mpr
-      (fun hdvd => ((fc.p_prime.dvd_mul).mp hdvd).elim hpQ hSigma)
-  -- `|Y| = p^k ∣ p^{m+1}·c` with `p ∤ c` forces `|Y| ≤ p^{m+1}` — contradiction.
-  have hYdvd : Nat.card ↥Y ∣ Nat.card ↥(Subgroup.centralizer (fc.P : Set G)) :=
-    Subgroup.card_dvd_of_le hYC
-  rw [hCeq, hk] at hYdvd
-  have hkdvd : fc.p ^ k ∣ fc.p ^ (m + 1) :=
-    (Nat.Coprime.dvd_of_dvd_mul_right (Nat.Coprime.pow_left k hpc)) hYdvd
-  have : Nat.card ↥Y ≤ fc.p ^ (m + 1) := by
-    rw [hk]
-    exact Nat.le_of_dvd (Nat.pow_pos fc.p_prime.pos) hkdvd
-  omega
+  exact fc.false_of_ppart_subgroup_center_P
+    (fc.center_eq_P_of_not_isMulCommutative model ind hnab) hcardR hCeq
+    (fun hdvd => ((fc.p_prime.dvd_mul).mp hdvd).elim hpQ hSigma) hGp
 
 include model in
 /-- **A nonidentity element of `C_W(P)` does not centralize `R`** ((10.2) arm of (11)):
