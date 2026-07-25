@@ -1393,8 +1393,8 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 4D.3 | ✅ 全 7 小問 | `IsIrreducibleCoprimeAction.*` (`ProblemsIrreducibleAction.lean`): (a) `exists_isPGroup` / (b) `commutator_le_center` / (c) `fixedPoints_eq_commutator` + `eq_commutator_or_eq_top_of_isAInvariant` / (d) `pow_mem_commutator` + `pow_eq_one_quotient_commutator` / (e) `pow_eq_one_of_mem_commutator` / (f) `pow_eq_one_of_ne_two` / (g) `pow_four_eq_one_of_two` |
 | 4D.4 | ✅ | `actionCommutator_eq_bot_of_isPGroup_two_of_fixes_pow_four` (`ProblemsIrreducibleAction.lean`) |
 | 4D.5 主張本体 | ✅ | `derivedSeries_semidirectProduct_eq_bot_and_ne_bot` (上界 `..._eq_bot` / 下界 `..._ne_bot` / Lemma 4.29 部分群版 `commutator_commutator_inl_inr_map_eq`、新 leaf `ProblemsDerivedLength.lean`) |
-| 4D.5 系 | ⬜ | 「任意に大きい導来長の可解群が存在」— 正則 wreath 積 `C ≀ A` (4A.7 の `D ≀[Q] Q` を再利用) |
-| 4D.6 | ⬜ | Fitting の定理 (Thm 4.34) の写像 `θ` で `θ(G) = C_G(A)`, `ker θ = ⁅G,A⁆` |
+| 4D.5 系 | ✅ | `exists_finite_group_derivedSeries_ne_bot` + `regularPermAut` / `regularPermAut_injective` (同 leaf) |
+| 4D.6 | ✅ | `range_fittingProductHom_eq_fixedPoints` / `ker_fittingProductHom_eq_actionCommutator` (新 leaf `ProblemsFittingMap.lean`) |
 | 4D.7 | ⬜ | `p`-可解 + 巡回 Sylow `p` ⟹ `K ⊆ O_{p'}(G)` |
 
 ### 4D.1 の設計 (実装済)
@@ -1434,12 +1434,22 @@ BG は Isaacs を import するので Ch04 からは使えない** (import cycle
 押し出すのが正しい経路 (`commutator_commutator_inl_inr_map_eq`)。
 ⚠ `derivedSeries_antitone` は群を**明示引数**で取る (`derivedSeries_antitone A hk`)。
 
-**系 (任意に大きい導来長)**: hint どおり `C ≀ A` (regular wreath product; repo は 4A.7 の
-`ProblemsWreath.lean` に `D ≀[Q] Q` を持つ)。`C` = 位数 `p` 巡回 (`p ∤ |A^{(n-1)}|`) とすると
-`B := (A → C)` は基本アーベル `p`-群で `|B| = p^{|A|}` ゆえ coprime、`A` の正則作用は忠実。
-`n` についての帰納で導来長 `n` の可解群が全ての `n` で存在。
-⚠ 「導来長」の述語は mathlib にも repo にも無い — `derivedSeries G n = ⊥ ∧ derivedSeries G (n-1) ≠ ⊥`
-の形で直接述べるのが軽い (新しい `def derivedLength` を導入する必要はない)。
+**系 (実装済)**: `C ≀ A` (regular wreath product)。⚠ repo の `WreathProduct` (Ch03,
+`D ≀[Ω] Q`) は独立 structure で `SemidirectProduct` ではないため 4D.5 本体に載らない —
+同型な半直積 `(A → C) ⋊ A` を `regularPermAut` (座標を `f ↦ fun ω => f (a⁻¹ * ω)` で置換)
+として直接構成した。`C` = 位数 `p` 巡回 (`p ∤ |A^{(n-1)}|`, `Nat.exists_infinite_primes`)
+とすると `B := (A → C)` は基本アーベル `p`-群 (各座標の位数が `p` を割る) ゆえ
+`Nat.card B = p^k` で coprime、正則作用は忠実 (1 の指示関数を `a` で評価)。
+⚠ 「導来長」の述語は導入せず `derivedSeries G n ≠ ⊥ ∧ derivedSeries G (n+1) = ⊥` で述べた。
+⚠ `Nat.card (Multiplicative (ZMod p)) = p` を使う `rw` は `Fact p.Prime` が `p` に依存して
+motive 破綻 — 仮説側で `rw [hcardD] at hpow` と書き換える。
+
+### 4D.6 の設計 (実装済)
+
+`θ = fittingProductHom φ` (`ThreeSubgroupsCoprime.lean`)。像は添字付け替え `a ↦ b*a` で
+`A`-固定、逆は `θ(c) = c^{|A|}` と「coprime ⟹ `x ↦ x^{|A|}` が `C_G(A)` 上単射 ⟹
+有限性で全射」。核は Lemma 4.28 の `G = C_G(A)·⁅G,A⁆` で `g = c*x` と分解し
+`1 = θ(g) = c^{|A|}` から `c = 1` — **位数の数え上げを経由しない**。
 
 ### 4D.3 の設計 (残り (c)–(g))
 
