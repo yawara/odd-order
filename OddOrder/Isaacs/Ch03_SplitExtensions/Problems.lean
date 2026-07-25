@@ -12,6 +12,8 @@ import Mathlib.Tactic.LinearCombination
 import Mathlib.Data.ZMod.QuotientGroup
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.RingTheory.ZMod.UnitsCyclic
+import Mathlib.FieldTheory.Finite.GaloisField
+import OddOrder.GroupTheory.ElementaryAbelian
 
 /-!
 # Isaacs Chapter 3 — Problems §3A (Split Extensions)
@@ -718,6 +720,146 @@ theorem exists_group_card_eq_normal_cyclic_center_trivial (p m : ℕ) [Fact p.Pr
     intro h; rw [h, orderOf_one] at hu; omega
   exact ⟨u, by rw [affineGroup_card, hu], affineGroup_card_ker u,
     affineGroup_quotient_isCyclic u, affineGroup_center_eq_bot hune⟩
+
+/-! ### Problem 3A.4 — 位数 `q(q-1)` の群 (正規基本アーベル位数 `q`, 位数 `p` の元は単一共役類)
+
+Isaacs の hint どおり、位数 `q` の有限体 `F` の乗法群 `Fˣ` が加法群 `(F,+)` に自己同型として
+作用する半直積 `G = Multiplicative F ⋊ Fˣ` を取る。`|G| = q(q-1)`、`ker rightHom` (= `inl` 像)
+は位数 `q` の正規基本アーベル部分群、位数 `p` (= `char F`) の元は `inl x` (`x ≠ 0`) 全体で、
+`Fˣ` が `F ∖ {0}` に推移的だからちょうど 1 つの共役類をなす。 -/
+
+/-- 有限体 `F` の乗法群による `Multiplicative F` への作用 (加法群の自己同型として)。 -/
+noncomputable def fieldMulAction (F : Type*) [Field F] : Fˣ →* MulAut (Multiplicative F) :=
+  (MulAutMultiplicative F).symm.toMonoidHom.comp AddAut.mulLeft
+
+@[simp] theorem fieldMulAction_apply {F : Type*} [Field F] (u : Fˣ) (x : Multiplicative F) :
+    fieldMulAction F u x = Multiplicative.ofAdd ((↑u : F) * Multiplicative.toAdd x) := rfl
+
+/-- 位数 `q(q-1)` の群 `G = Multiplicative F ⋊ Fˣ` (`F` は有限体)。 -/
+abbrev affineGroupOfField (F : Type*) [Field F] :=
+  SemidirectProduct (Multiplicative F) Fˣ (fieldMulAction F)
+
+/-- 有限体の乗法群の位数は `q - 1`。 -/
+theorem natCard_units_field (F : Type*) [Field F] [Finite F] :
+    Nat.card Fˣ = Nat.card F - 1 := by
+  classical
+  haveI := Fintype.ofFinite F
+  rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Fintype.card_units]
+
+/-- **Isaacs Problem 3A.4** (位数). `|G| = q(q-1)`。 -/
+theorem affineGroupOfField_card (F : Type*) [Field F] [Finite F] :
+    Nat.card (affineGroupOfField F) = Nat.card F * (Nat.card F - 1) := by
+  rw [affineGroupOfField, SemidirectProduct.card,
+    Nat.card_congr (Multiplicative.toAdd (α := F)), natCard_units_field]
+
+/-- **Isaacs Problem 3A.4** (正規部分群の位数). `|ker rightHom| = q` (`ker` は正規)。 -/
+theorem affineGroupOfField_card_ker (F : Type*) [Field F] :
+    Nat.card (SemidirectProduct.rightHom : affineGroupOfField F →* Fˣ).ker
+      = Nat.card F := by
+  rw [← SemidirectProduct.range_inl_eq_ker_rightHom,
+    ← Nat.card_congr (MonoidHom.ofInjective
+      (SemidirectProduct.inl_injective (φ := fieldMulAction F))).toEquiv,
+    Nat.card_congr (Multiplicative.toAdd (α := F))]
+
+/-- `char F = p` なら `Multiplicative F` の元は `p` 乗して `1`。 -/
+theorem multiplicative_pow_char_eq_one {F : Type*} [Field F] (p : ℕ) [CharP F p]
+    (x : Multiplicative F) : x ^ p = 1 := by
+  apply Multiplicative.toAdd.injective
+  rw [toAdd_pow, toAdd_one, nsmul_eq_mul, CharP.cast_eq_zero F p, zero_mul]
+
+/-- `ker rightHom` の元は `inl` の像。 -/
+theorem eq_inl_of_mem_ker {F : Type*} [Field F] {g : affineGroupOfField F}
+    (hg : g.right = 1) : g = SemidirectProduct.inl g.left := by
+  conv_lhs => rw [← SemidirectProduct.inl_left_mul_inr_right g]
+  rw [hg, map_one, mul_one]
+
+/-- **Isaacs Problem 3A.4** (基本アーベル). `ker rightHom` は基本アーベル `p`-群。 -/
+theorem affineGroupOfField_ker_isElementaryAbelian (F : Type*) [Field F] (p : ℕ) [CharP F p] :
+    ((SemidirectProduct.rightHom : affineGroupOfField F →* Fˣ).ker).IsElementaryAbelian p := by
+  refine ⟨fun x y => Subtype.ext ?_, fun x => Subtype.ext ?_⟩
+  · have hx : (x : affineGroupOfField F).right = 1 := x.2
+    have hy : (y : affineGroupOfField F).right = 1 := y.2
+    push_cast
+    refine SemidirectProduct.ext ?_ ?_
+    · simp only [SemidirectProduct.mul_left, hx, hy, map_one, MulAut.one_apply]
+      exact mul_comm _ _
+    · simp only [SemidirectProduct.mul_right, hx, hy, mul_one]
+  · have hx : (x : affineGroupOfField F).right = 1 := x.2
+    push_cast
+    rw [eq_inl_of_mem_ker hx, ← map_pow, multiplicative_pow_char_eq_one p, map_one]
+
+/-- 位数 `p^n` (`n ≥ 1`) の有限体では `p ∤ |Fˣ| = q - 1`。 -/
+theorem not_dvd_natCard_units (F : Type*) [Field F] [Finite F] (p : ℕ) [Fact p.Prime]
+    [CharP F p] : ¬ (p ∣ Nat.card Fˣ) := by
+  classical
+  haveI := Fintype.ofFinite F
+  obtain ⟨n, -, hcard⟩ := FiniteField.card F p
+  have hcard' : Nat.card F = p ^ (n : ℕ) := by rw [Nat.card_eq_fintype_card, hcard]
+  have hpn : p ∣ Nat.card F := hcard' ▸ dvd_pow_self p n.2.ne'
+  have hge : 1 ≤ Nat.card F := Nat.one_le_iff_ne_zero.mpr Nat.card_pos.ne'
+  rw [natCard_units_field]
+  intro hdvd
+  have h1 : p ∣ Nat.card F - (Nat.card F - 1) := Nat.dvd_sub hpn hdvd
+  rw [show Nat.card F - (Nat.card F - 1) = 1 from by omega] at h1
+  exact (Fact.out (p := p.Prime)).one_lt.ne' (Nat.dvd_one.mp h1)
+
+/-- **Isaacs Problem 3A.4** (位数 `p` の元の形). 位数 `p` の元の `right` 成分は `1`
+(`orderOf right` は `p` と `q-1` を割るが両者は互いに素)。 -/
+theorem affineGroupOfField_right_eq_one_of_orderOf (F : Type*) [Field F] [Finite F]
+    (p : ℕ) [Fact p.Prime] [CharP F p] {g : affineGroupOfField F} (hg : orderOf g = p) :
+    g.right = 1 := by
+  have hdvd : orderOf g.right ∣ p := hg ▸ orderOf_map_dvd SemidirectProduct.rightHom g
+  have hcard : orderOf g.right ∣ Nat.card Fˣ := orderOf_dvd_natCard _
+  rcases (Nat.dvd_prime (Fact.out (p := p.Prime))).mp hdvd with h | h
+  · exact orderOf_eq_one_iff.mp h
+  · exact absurd (h ▸ hcard) (not_dvd_natCard_units F p)
+
+/-- `Fˣ` の推移性: `a, b ≠ 0` なら `inl (ofAdd a)` と `inl (ofAdd b)` は `inr (b/a)` で共役。 -/
+theorem isConj_inl_of_ne_zero {F : Type*} [Field F] {a b : F} (ha : a ≠ 0) (hb : b ≠ 0) :
+    IsConj (SemidirectProduct.inl (Multiplicative.ofAdd a) : affineGroupOfField F)
+      (SemidirectProduct.inl (Multiplicative.ofAdd b)) := by
+  refine isConj_iff.mpr ⟨SemidirectProduct.inr (Units.mk0 (b / a) (div_ne_zero hb ha)), ?_⟩
+  rw [← map_inv SemidirectProduct.inr, ← SemidirectProduct.inl_aut]
+  refine SemidirectProduct.inl_inj.mpr ?_
+  apply Multiplicative.toAdd.injective
+  simp only [fieldMulAction_apply, toAdd_ofAdd, Units.val_mk0]
+  field_simp
+
+/-- **Isaacs Problem 3A.4** (位数 `p` の元は単一共役類). `Fˣ` が `F ∖ {0}` に推移的なので、
+位数 `p` の元 (= `inl x`, `x ≠ 0`) はすべて共役。 -/
+theorem affineGroupOfField_isConj_of_orderOf_eq (F : Type*) [Field F] [Finite F]
+    (p : ℕ) [Fact p.Prime] [CharP F p] {g h : affineGroupOfField F}
+    (hg : orderOf g = p) (hh : orderOf h = p) : IsConj g h := by
+  have hgl := eq_inl_of_mem_ker (affineGroupOfField_right_eq_one_of_orderOf F p hg)
+  have hhl := eq_inl_of_mem_ker (affineGroupOfField_right_eq_one_of_orderOf F p hh)
+  have hgne : Multiplicative.toAdd g.left ≠ 0 := by
+    intro hz
+    rw [hgl, show g.left = 1 from Multiplicative.toAdd.injective hz, map_one,
+      orderOf_one] at hg
+    exact (Fact.out (p := p.Prime)).one_lt.ne hg
+  have hhne : Multiplicative.toAdd h.left ≠ 0 := by
+    intro hz
+    rw [hhl, show h.left = 1 from Multiplicative.toAdd.injective hz, map_one,
+      orderOf_one] at hh
+    exact (Fact.out (p := p.Prime)).one_lt.ne hh
+  have key := isConj_inl_of_ne_zero (F := F) hgne hhne
+  rwa [ofAdd_toAdd, ofAdd_toAdd, ← hgl, ← hhl] at key
+
+/-- **Isaacs Problem 3A.4** (まとめ・存在). `q = p^k` (`k ≥ 1`) のとき、位数 `q(q-1)` の群 `G` で
+位数 `q` の正規基本アーベル部分群をもち、`G` の位数 `p` の元がすべて共役なものが存在する。 -/
+theorem exists_group_card_eq_elementaryAbelian_isConj (p k : ℕ) [Fact p.Prime] (hk : k ≠ 0) :
+    Nat.card (affineGroupOfField (GaloisField p k)) = p ^ k * (p ^ k - 1) ∧
+      Nat.card (SemidirectProduct.rightHom :
+        affineGroupOfField (GaloisField p k) →* (GaloisField p k)ˣ).ker = p ^ k ∧
+      ((SemidirectProduct.rightHom :
+        affineGroupOfField (GaloisField p k) →* (GaloisField p k)ˣ).ker).IsElementaryAbelian p ∧
+      ∀ g h : affineGroupOfField (GaloisField p k),
+        orderOf g = p → orderOf h = p → IsConj g h := by
+  have hcard : Nat.card (GaloisField p k) = p ^ k := GaloisField.card p k hk
+  exact ⟨by rw [affineGroupOfField_card, hcard],
+    by rw [affineGroupOfField_card_ker, hcard],
+    affineGroupOfField_ker_isElementaryAbelian _ p,
+    fun g h => affineGroupOfField_isConj_of_orderOf_eq _ p⟩
 
 /-- **Isaacs Problem 3A.5**. 有限群 `G` について、`G` の自身への共役作用で作った半直積 `G ⋊ G` は
 直積 `G × G` に同型。同型 `(n, g) ↦ (n·g, g)` は準同型: 半直積の積 `(a.left · a.right·b.left·a.right⁻¹,
