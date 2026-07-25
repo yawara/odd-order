@@ -643,4 +643,124 @@ theorem exists_ncard_invertedBy_eq_three_pow
 
 end Hypothesis
 
+namespace FirstCaseHypothesis
+
+universe uG uΩ
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (fc : FirstCaseHypothesis G Ω)
+  {F : Type uG} [NearFields.NearField F]
+  (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    NearFields.AffineNearFieldModel fc.rankOneQuotient F)
+
+include fc in
+/-- **`|V| = |P|·|W|`** (step (1), `V = W ⋊ P`): the decomposition
+`v = g·(g⁻¹v)` with `g ∈ P`, `g⁻¹v ∈ W` makes `(g, w) ↦ g·w` a surjection
+`P × W → V`, and `P ⊓ W = 1` makes it injective. -/
+theorem card_V_eq_card_P_mul_card_W :
+    Nat.card ↥fc.toHypothesis.V
+      = Nat.card ↥fc.P * Nat.card ↥fc.toHypothesis.W := by
+  classical
+  -- the multiplication map `P × W → V`
+  have hmem : ∀ z : ↥fc.P × ↥fc.toHypothesis.W,
+      (z.1 : G) * (z.2 : G) ∈ fc.toHypothesis.V := by
+    rintro ⟨⟨g, hg⟩, ⟨w, hw⟩⟩
+    exact mul_mem (fc.P_le_V hg) (fc.toHypothesis.W_le_V hw)
+  set f : ↥fc.P × ↥fc.toHypothesis.W → ↥fc.toHypothesis.V := fun z =>
+    ⟨(z.1 : G) * (z.2 : G), hmem z⟩ with hf_def
+  have hinj : Function.Injective f := by
+    rintro ⟨⟨g₁, hg₁⟩, ⟨w₁, hw₁⟩⟩ ⟨⟨g₂, hg₂⟩, ⟨w₂, hw₂⟩⟩ heq
+    have h1 : g₁ * w₁ = g₂ * w₂ := congrArg Subtype.val heq
+    have h2 : g₂⁻¹ * g₁ = w₂ * w₁⁻¹ := by
+      have h3 : g₂⁻¹ * (g₁ * w₁) = g₂⁻¹ * (g₂ * w₂) := by rw [h1]
+      rw [← mul_assoc, ← mul_assoc, inv_mul_cancel, one_mul] at h3
+      have h4 : (g₂⁻¹ * g₁ * w₁) * w₁⁻¹ = w₂ * w₁⁻¹ := by rw [h3]
+      rwa [mul_assoc, mul_inv_cancel, mul_one] at h4
+    have hbot : g₂⁻¹ * g₁ ∈ fc.P ⊓ fc.toHypothesis.W := by
+      refine ⟨mul_mem (Subgroup.inv_mem _ hg₂) hg₁, ?_⟩
+      rw [h2]
+      exact mul_mem hw₂ (Subgroup.inv_mem _ hw₁)
+    rw [fc.P_inf_W_eq_bot, Subgroup.mem_bot, inv_mul_eq_one] at hbot
+    subst hbot
+    have hww : w₁ = w₂ := mul_left_cancel h1
+    subst hww
+    rfl
+  have hsurj : Function.Surjective f := by
+    rintro ⟨v, hv⟩
+    obtain ⟨g, hg, hw⟩ := fc.exists_decomp_of_mem_V hv
+    refine ⟨⟨⟨g, hg⟩, ⟨g⁻¹ * v, hw⟩⟩, ?_⟩
+    refine Subtype.ext ?_
+    change g * (g⁻¹ * v) = v
+    group
+  have hbij : Function.Bijective f := ⟨hinj, hsurj⟩
+  rw [← Nat.card_prod]
+  exact (Nat.card_congr (Equiv.ofBijective f hbij)).symm
+
+include model in
+/-- **Peterfalvi Part II, Ch. II, step (13)** (p. 113): *`C_G(Z₁)` is a
+`3`-group*, where `Z₁ = ⟨st⟩`.
+
+By step (12) we are in case (10.2), so `p = 3`, `|Q₀| = 2³ = 8`,
+`|K| = |Q₀| − 1 = 7` and `|W| ∈ {3, 9}`; also `|st| = char F = p = 3`.  The
+Lemma-(a) count `|C_G(st)| = |V|·|J|` then has both factors a power of `3`:
+`|V| = |P|·|W|` by the splitting `V = W ⋊ P`, and `|J|` because its prime
+divisors divide `|⟨Q₀,K,t⟩| = 504`, are odd, and cannot equal `7`. -/
+theorem exists_card_centralizer_st_eq_three_pow
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    ∃ n : ℕ, Nat.card ↥(Subgroup.centralizer
+        ({fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t}
+          : Set G)) = 3 ^ n := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  -- step (12): case (10.2) holds
+  obtain ⟨-, hp3, -, -, hW, -⟩ := fc.step_twelve model ind hB2
+  -- the First-Case numerics
+  have hQ0 : Nat.card ↥fc.toHypothesis.Q0 = 8 := by
+    rw [fc.card_Q0_eq_two_pow, hp3]
+    norm_num
+  have hK : Nat.card ↥fc.toHypothesis.K = 7 := by
+    rw [fc.toHypothesis.card_K_eq_card_Q0_sub_one, hQ0]
+  have hst : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  have hst2 : (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) ^ 2 ≠ 1 := by
+    intro h
+    have h2 : orderOf (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) ∣ 2 := orderOf_dvd_of_pow_eq_one h
+    rw [hst] at h2
+    have h3 := Nat.le_of_dvd (by norm_num) h2
+    omega
+  -- `|J|` is a power of `3`
+  obtain ⟨n, hn⟩ :=
+    fc.toHypothesis.exists_ncard_invertedBy_eq_three_pow hst hQ0 hK
+  -- `|V| = |P|·|W|` is a power of `3`
+  have hV : ∃ a : ℕ, Nat.card ↥fc.toHypothesis.V = 3 ^ a := by
+    have hVeq := fc.card_V_eq_card_P_mul_card_W
+    rw [fc.card_P, hp3] at hVeq
+    rcases hW with h | h
+    · exact ⟨2, by rw [hVeq, h]; norm_num⟩
+    · exact ⟨3, by rw [hVeq, h]; norm_num⟩
+  obtain ⟨a, ha⟩ := hV
+  refine ⟨a + n, ?_⟩
+  rw [fc.toHypothesis.card_centralizer_mul_t_eq hst2, ha, hn, pow_add]
+
+include model in
+/-- **Step (13), stated for `Z₁ = ⟨st⟩`** (p. 113): `C_G(Z₁)` is a `3`-group.
+(The centralizer of a cyclic subgroup is the centralizer of a generator.) -/
+theorem isPGroup_three_centralizer_Z₁
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    IsPGroup 3 ↥(Subgroup.centralizer
+      ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+        * fc.toHypothesis.t) : Subgroup G) : Set G)) := by
+  obtain ⟨n, hn⟩ := fc.exists_card_centralizer_st_eq_three_pow model ind hB2
+  refine IsPGroup.of_card (n := n) ?_
+  rw [← hn]
+  congr 1
+  rw [Subgroup.zpowers_eq_closure, Subgroup.centralizer_closure]
+
+end FirstCaseHypothesis
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
