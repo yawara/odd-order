@@ -364,10 +364,70 @@ mathlib inductive (`top`/`step`)。
     ⚠ 教訓: 型を跨ぐ強帰納法は `∀ (n) (G : Type*) (_ : Group G) (_ : Finite G), card ≤ n → …` の
     explicit binder 形で書き、適用時は `inferInstance` 明示 / `Set.mem_mul` の obtain した eq は
     β-未簡約 (`show a*b = c*d from heq` で reduce してから rw)。
-  - ⏸ **残り §2A (deferred-hard)**: 2A.5 (minimal normal = 単純直積、内部直積機構が必要) /
-    2A.6 (2A.5 の帰結: N 内の非可換正規は X のメンバーを含む) / 2A.9 (H◁◁G π-perfect ⟹
-    O^π(G) が H を正規化; `H≤O^π(G)` は導出済みの見込み、正規化が subtle) /
-    **2A.10** (strongly conjugate ⟺ subnormal — 従来リストから漏れていたので追加)。
+  - ✅ 実証明 **2A.5(a)(b)(c) + 2A.6** (2026-07-25、deferred-hard tail 完遂)。`X` = minimal normal
+    の任意族、`N := sSup X`。
+    - **2A.5(a)** `exists_subfamily_indep_sSup_eq` (**種付き強化形**): 独立な部分族 `Y₀ ⊆ X` を与えると
+      `Y₀ ⊆ Y ⊆ X` で独立かつ `sSup Y = sSup X` なる `Y` が存在 (= `N` は `X` のいくつかのメンバーの
+      直積; 「独立性 + join」が内部直積の定式化)。`Finite.exists_le_maximal` で独立性を保つ極大部分族
+      `Y` を取り、`M ⊄ sSup Y` なる `M ∈ X` があれば `M ⊓ sSup Y ⊴ G` が minimality で `⊥` ゆえ
+      `insert M Y` も独立 (`T ∈ Y` 側は `x ∈ T ⊓ (sSup (Y∖{T}) ⊔ M)` を `x = w·m` に分解、
+      `M` 正規で `mul_normal`) → 極大性に矛盾。**種 `Y₀` が (b) の鍵** (`Y₀ = ∅` が Isaacs の原題)。
+    - **hint** `socle_eq_top_of_forall_isMinimalNormal` (`Soc(N) = N`): 各 `M ∈ X` で
+      `M.subgroupOf N` 内の minimal normal `W` を取り (`exists_isMinimalNormal_le`)、`G`-正規閉包
+      `= M` (minimality)。各 `G`-共役は `MulAut.conjNormal` による `↥N` の自己同型像ゆえ minimal
+      normal のまま (`IsMinimalNormal.map_equiv`) → `(socle ↥N).map N.subtype` は `G`-正規で
+      `normalClosure W` を含む。helper `apply_mem_socle` (socle は自己同型不変、`iSup_induction`)。
+    - **2A.5(b)** `isSimpleGroup_of_isMinimalNormal_of_forall_isMinimalNormal`: `Soc(N) = N` の下で
+      (a) を**種 `{V}`** で `↥N` に適用し `N = V ⊔ rest` (独立)。`rest` は `V` と disjoint な正規の
+      join ゆえ `V` を中心化 → 任意の `K ⊴ ↥V` の押し出しは `V`-共役 (正規性) と `rest`-共役 (中心化)
+      で不変 → `↥N`-正規 → `V` の minimality で `⊥` か `V`。
+    - **2A.5(c)** `exists_indep_isSimpleGroup_sSup_eq_top`: (a) を全 minimal normal の族に適用
+      (join = socle = `⊤`)、各メンバーの単純性は (b)。
+    - **2A.6** `exists_mem_le_of_normal_le_sSup_of_not_isMulCommutative`: 対偶で全 `M ∈ X` に
+      `U ⊓ M = ⊥` (minimality) → `Subgroup.commute_of_normal_of_disjoint` で `M ≤ C_G(U)` →
+      `U ≤ N ≤ C_G(U)` で `U` 可換、矛盾。
+    - ~294 行・sorry 0・`--strict` lint clean。あわせて 2A.4 の帰納核と主定理の間に挟まっていた
+      本ブロックを主定理の後ろへ移し文書順・凝集を回復。
+  - ✅ 実証明 **2A.9** (2026-07-25) `oPiCore_le_normalizer_of_isSubnormal_of_oPiResidual_eq_top`:
+    `H ◁◁ G` が π-perfect (`H = O^π(H)`、形式化は `oPiResidual π ↥H = ⊤`) ⟹ `O_π(G)` が `H` を正規化。
+    Isaacs の hint「`G = H·O_π(G)` と仮定してよい」を **`K := H ⊔ O_π(G)` への降下**として実装:
+    `P := O_π(G)` 正規ゆえ `↑K = ↑H·↑P`、`Ch01.card_mul_card_inf` + Lagrange で
+    `|K:H|·|H⊓P| = |P|` ⟹ `|K:H| ∣ |P|` は π-数 (`oPiCore.isPiGroup`) ⟹ 2A.2 を `↥K` に適用して
+    `O^π(K) ≤ H.subgroupOf K`。逆向きは π-perfect 性を `Subgroup.inclusion : ↥H →* ↥K` で押し出す。
+    ⟹ `H.subgroupOf K = O^π(K)` は `↥K` で正規 ⟹ `P ≤ K ≤ N_G(H)`。
+    **支持 API 新設 (Ch03 `PiResidual.lean`、mathlib 流の関手性)**: `oPiResidual_map_le`
+    (任意の `f : A →* B` で `O^π(A)^f ≤ O^π(B)`; 1B.8(b) の π'-元生成 + `orderOf_map_dvd`、
+    全射性も単射性も不要) / `subgroupOf_le_oPiResidual_of_eq_top`。
+  - ✅ 実証明 **2A.10** (2026-07-25) `isSubnormal_iff_forall_isStronglyConjugate_eq`:
+    `H ◁◁ G ⟺ H に強共役な部分群は H 自身だけ`。⚠ **repo に既に Bartels (Thm 9.28) が完備**
+    (`Ch09/SubnormalClosure.lean` の `strongClosure_isSubnormal`、sorry 0) で、書籍 p.290 が
+    「2A.10 は Bartels の直接の帰結」と明記する通りに導出できた: `⟸` は `H^{(G)} = H` + Bartels、
+    `⟹` は Lem 9.29(a) (`strongClosure_le_of_isSubnormal`) で `K ≤ H^{(G)} ≤ H` かつ `|K|=|H|`。
+    強共役の定義 `Ch09.IsStronglyConjugate` も既存 (再定義しない)。Ch09 は Ch02 **Basic** しか
+    import しないので Ch02 Problems → Ch09 の import に cycle 無し。
+  - 🎉 **§2A 完済** (2A.1-2A.10 全 10 問)。
+
+## Ch.2 (Subnormality) §2B — 着手 (2026-07-25)
+
+- ✅ 実証明 **2B.1** `isSubnormal_of_forall_nilpotent_or_permutable` (`Basic.lean` 置き):
+  各 `g` ごとに「`⟨H,H^g⟩` 冪零」**or**「`HH^g = H^gH`」⟹ `H ◁◁ G`。**Thm 2.8
+  (permutability ⇒ subnormality) の disjunctive 強化**で、`|G|`-induction + Zipper の骨格が
+  完全に共通 ⟹ 既存 `isSubnormal_of_permutable_aux` を
+  `isSubnormal_of_nilpotent_or_permutable_aux` に一般化して**両者で核を共有**
+  (重複コード ~100 行を作らない)。仮説が使われる 2 箇所だけ冪零分岐を追加:
+  (i) 真部分群への降下 = `subgroupOf_sup` + `subgroupOfEquivOfLe` で冪零性移送、
+  (ii) `S ⊔ S^x = ⊤` 排除 = `topEquiv` で `G` 冪零 ⟹ Lemma 2.1 で全部分群部分正規 ⟹ 仮定に矛盾。
+  Thm 2.8 の signature は不変 (`fun x => Or.inr (hperm x)`) ゆえ下流無影響。
+  `Problems.lean` 側は §2B section を起こしてポインタのみ記録 (ラッパー方針)。
+- ⬜ **残り §2B** (topic が involution / 二面体群なので新 leaf `ProblemsInvolutions.lean` 予定):
+  **2B.2** (二面体群 `D_{2n}` の involution 個数と共役類: n 奇 ⟹ n 個 1 類、n 偶 ⟹ n+1 個 3 類
+  サイズ 1, n/2, n/2) / **2B.3** (非共役 involution `s,t` ⟹ 両方と可換な第 3 の involution が存在) /
+  **2B.4** (Sylow 2 が複数かつ相異なる 2 つが自明交叉 ⟹ involution の共役類は 1 つ) /
+  **2B.5** (`|G:B|=2` の 3 条件同値 + generalized dihedral ⟹ `B` 可換) /
+  **2B.6** (正規 Sylow p ⟺ p-冪位数の共役元対 `⟨x,y⟩` が全て正規 Sylow p を持つ)。
+  ⚠ repo の `DihedralBasics.lean` は「巡回部分群を反転する involution」型の**抽象**補題群
+  (Lemma 2.14 / Matsuyama 用) で、mathlib の具体 `DihedralGroup n` は扱っていない —
+  2B.2 は mathlib `DihedralGroup` 側の API から。
 
 ## Ch.3 (Split Extensions) §3A — 着手 (2026-07-23、§2A hard tail deferred 中の breadth 展開)
 
@@ -486,3 +546,8 @@ lane a の次 frontier は hub 裁定 (9500 番台) で再割当。
 ユーザー指示「凍結してた問題を解くやつをやります」で campaign 再開。文書順で最古の未完
 = **§1C の 1C.4 / 1C.5** (deferred-heavy) から再訪 → 以降 1D.5 / §2A hard tail
 (2A.4/5/6/9) / §3A 残り (3A.4/6/7/8) / §3B〜 の順。
+
+**2026-07-25 の消化**: 1C.4 ✅ / 1C.5 ✅ / 1D.5 ✅ / 2A.4 ✅ / 2A.5(a)(b)(c) ✅ / 2A.6 ✅ /
+2A.9 ✅ / 2A.10 ✅ (**§2A 完済**) / 2B.1 ✅。
+**次 frontier = §2B の 2B.2-2B.6** (新 leaf `Ch02_Subnormality/ProblemsInvolutions.lean`)、
+以降 §2C (2C.1) / §2D (2D.1, 2D.2, …) / §3A 残り (3A.3/4/6/7/8) / §3B〜。
