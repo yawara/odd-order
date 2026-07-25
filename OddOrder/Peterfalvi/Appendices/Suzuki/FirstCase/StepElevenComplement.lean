@@ -437,6 +437,39 @@ theorem conj_mem_sInvertedT_of_mem_centralizer_W
   group
 
 include model in
+/-- **`↑R = ↑T·↑P`** (set product): `P` is central in `R`, hence normalizes `T`
+pointwise, and `T ⊔ P = R`. -/
+theorem coe_invImageF_eq_sInvertedT_mul_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) :
+    ((fc.invImageF model : Subgroup G) : Set G)
+      = (fc.sInvertedT model : Set G) * (fc.P : Set G) := by
+  obtain ⟨hTle, -, hTsup, -⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hPnormT : fc.P ≤ Subgroup.normalizer ((fc.sInvertedT model : Subgroup G) : Set G) := by
+    intro y hy
+    rw [Subgroup.mem_set_normalizer_iff]
+    intro τ
+    have hfix : ∀ τ' ∈ fc.sInvertedT model, y * τ' * y⁻¹ = τ' := by
+      intro τ' hτ'
+      have hc := fc.P_le_center_invImageF model hy (hTle hτ')
+      rw [← hc]
+      group
+    constructor
+    · intro hτ
+      rw [hfix τ hτ]
+      exact hτ
+    · intro hτ'
+      have h1 := hfix _ hτ'
+      have h2 : y * τ * y⁻¹ = τ := by
+        have h3 := congrArg (fun z => y⁻¹ * z * y) h1
+        simpa [mul_assoc] using h3
+      rw [← h2]
+      exact hτ'
+  rw [← hTsup]
+  exact Subgroup.coe_mul_of_right_le_normalizer_left _ _ hPnormT
+
+include model in
 /-- **Step (11), freeness of the `C_Q(P)`-action on `𝒜 − {P}`** (p. 112): a nonidentity
 `a ∈ C_Q(P)` normalizes no order-`p` subgroup `P₁ ≤ R` outside `T` except `P` itself —
 `[a, P₁] ≤ P₁ ⊓ T = ⊥` (via the `T`-normalization and `a` centralizing `R/T`), so `a`
@@ -467,30 +500,7 @@ theorem eq_P_of_prime_order_conj_invariant
       have heq : P₁ ⊓ T = P₁ :=
         Subgroup.eq_of_le_of_card_ge inf_le_left (by rw [hp, hP₁c])
       exact hP₁T (heq ▸ inf_le_right)
-  -- product decomposition of `R`: `↑R = ↑T·↑P` (`P` is central in `R` and normalizes `T`).
-  have hPnormT : fc.P ≤ Subgroup.normalizer (T : Set G) := by
-    intro y hy
-    rw [Subgroup.mem_set_normalizer_iff]
-    intro τ
-    have hfix : ∀ τ' ∈ T, y * τ' * y⁻¹ = τ' := by
-      intro τ' hτ'
-      have hc := fc.P_le_center_invImageF model hy (hTle hτ')
-      rw [← hc]
-      group
-    constructor
-    · intro hτ
-      rw [hfix τ hτ]
-      exact hτ
-    · intro hτ'
-      have h1 := hfix _ hτ'
-      have h2 : y * τ * y⁻¹ = τ := by
-        have h3 := congrArg (fun z => y⁻¹ * z * y) h1
-        simpa [mul_assoc] using h3
-      rw [← h2]
-      exact hτ'
-  have hcoe : ((fc.invImageF model : Subgroup G) : Set G) = (T : Set G) * (fc.P : Set G) := by
-    rw [← hTsup]
-    exact Subgroup.coe_mul_of_right_le_normalizer_left _ _ hPnormT
+  have hcoe := fc.coe_invImageF_eq_sInvertedT_mul_P model ind hB2 hm
   -- `a` centralizes `P₁`.
   have hcen : ∀ x ∈ P₁, a * x * a⁻¹ = x := by
     intro x hx
@@ -726,6 +736,61 @@ theorem conj_P_inf_sInvertedT_eq_bot
       rw [h3, huv]
       group
   exact fc.not_isStronglyReal_of_mem_P hyP hy1 hysr
+
+include model in
+/-- **`R` has exponent `p`** (the counting input of step (12)): the `T`-component has
+exponent `p` because the translations do (`char F = p`, steps (7)/(9)) and `T ⊓ P = ⊥`;
+the `P`-component because `|P| = p`. -/
+theorem pow_p_eq_one_of_mem_invImageF
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m) {r : G}
+    (hr : r ∈ fc.invImageF model) : r ^ fc.p = 1 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
+  set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
+  obtain ⟨-, -, -, hTinf⟩ := fc.sInvertedT_spec model ind hB2 hm
+  have hr' : r ∈ ((fc.sInvertedT model : Subgroup G) : Set G) * (fc.P : Set G) := by
+    rw [← fc.coe_invImageF_eq_sInvertedT_mul_P model ind hB2 hm]
+    exact hr
+  obtain ⟨τ, hτ, y, hy, rfl⟩ := hr'
+  -- the `T`-component: `τ^p ∈ T ⊓ P = ⊥`.
+  have hτR : τ ∈ fc.invImageF model :=
+    (fc.sInvertedT_spec model ind hB2 hm).1 hτ
+  have hτL : τ ∈ L := fc.invImageF_le_centralizer model hτR
+  obtain ⟨z', hz'⟩ := (fc.mem_invImageF_iff model hτL).mp hτR
+  have hchar := fc.char_eq_p model hB2
+  have hz0 : z' ^ fc.p = 1 := by
+    have h1 : fc.p • (Multiplicative.toAdd z') = 0 := by
+      rw [← hchar]
+      exact model.char_spec _
+    have h2 : z' ^ fc.p
+        = Multiplicative.ofAdd (fc.p • Multiplicative.toAdd z') := rfl
+    rw [h2, h1]
+    rfl
+  have hτpP : τ ^ fc.p ∈ fc.P := by
+    have hq : QuotientGroup.mk' N' ((⟨τ, hτL⟩ : ↥L) ^ fc.p) = 1 := by
+      rw [map_pow, ← hz', ← map_pow, hz0, map_one]
+    have hN : (⟨τ, hτL⟩ : ↥L) ^ fc.p ∈ N' := by
+      rw [QuotientGroup.mk'_apply] at hq
+      exact (QuotientGroup.eq_one_iff _).mp hq
+    have hker : τ ^ fc.p ∈ fc.kernelN := ⟨_, hN, rfl⟩
+    rwa [fc.kernelN_eq_P ind] at hker
+  have hτp1 : τ ^ fc.p = 1 := by
+    have hmem : τ ^ fc.p ∈ fc.sInvertedT model ⊓ fc.P :=
+      ⟨(fc.sInvertedT model).pow_mem hτ _, hτpP⟩
+    rwa [hTinf, Subgroup.mem_bot] at hmem
+  -- the `P`-component: `y^p = 1` (`|P| = p`).
+  have hyp1 : y ^ fc.p = 1 := by
+    have h1 : (⟨y, hy⟩ : ↥fc.P) ^ Nat.card ↥fc.P = 1 := pow_card_eq_one'
+    rw [fc.card_P] at h1
+    have h2 := congrArg Subtype.val h1
+    simpa using h2
+  -- combine in the abelian `R`.
+  have hcomm : Commute τ y :=
+    fc.invImageF_mul_comm model ind hB2 hm τ hτR y (fc.P_le_invImageF model hy)
+  rw [hcomm.mul_pow, hτp1, hyp1, one_mul]
 
 end FirstCaseHypothesis
 
