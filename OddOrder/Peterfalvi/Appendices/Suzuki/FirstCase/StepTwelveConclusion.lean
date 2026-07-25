@@ -820,6 +820,127 @@ theorem normalizer_overgroup_eq_normalizer_invImageF
   have hfinal : Nat.card (↥N ⧸ NR.subgroupOf N) = fc.p := le_antisymm hupper hlower
   exact hpnot (hfinal ▸ dvd_refl fc.p)
 
+include model in
+/-- **`[N_G(R), R₁] ≤ T₁`** ((12) tail, ε1 — the focal content): for `y = x·t₁`
+(`R₁ = R·T₁`) the commutator splits as `⁅k,y⁆ = ⁅k,x⁆ · x⁅k,t₁⁆x⁻¹` with
+`⁅k,x⁆ ∈ T ≤ T₁` (the `R/T`-axis is centralized) and `x⁅k,t₁⁆x⁻¹ ∈ T₁`
+(`T₁ ⊴ N_G(R)`). -/
+theorem commutator_mem_sInvertedOvergroup
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
+    (hm : Nat.card F = fc.p ^ 1)
+    (hGp : fc.p ^ (1 + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {R₁ : Subgroup G}
+    (hRle : fc.invImageF model ≤ R₁)
+    (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hcard : Nat.card ↥R₁ = fc.p ^ 3)
+    (hR₁n : ∀ n ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G),
+      ∀ x ∈ R₁, n * x * n⁻¹ ∈ R₁) {k y : G}
+    (hk : k ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
+    (hy : y ∈ R₁) :
+    ⁅k, y⁆ ∈ fc.sInvertedOvergroup R₁ := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  obtain ⟨hTle, -, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
+  obtain ⟨hT₁card, hTsubT₁, -⟩ := fc.card_sInvertedOvergroup model ind hB2 hm
+    hGp hSigma hRle hR₁le hcard hR₁n
+  have hT₁le : fc.sInvertedOvergroup R₁ ≤ R₁ := fun z hz =>
+    ((fc.mem_sInvertedOvergroup_iff model ind hB2 hm hGp hSigma hRle hR₁le
+      hcard).mp hz).1
+  -- `R₁ = R · T₁` (cardinality of the join).
+  have hRcard : Nat.card ↥(fc.invImageF model) = fc.p ^ 2 := by
+    rw [fc.card_invImageF model ind, hm, pow_one, fc.card_P, pow_two]
+  have hsup : fc.invImageF model ⊔ fc.sInvertedOvergroup R₁ = R₁ := by
+    have hle : fc.invImageF model ⊔ fc.sInvertedOvergroup R₁ ≤ R₁ :=
+      sup_le hRle hT₁le
+    have hdvd : Nat.card ↥(fc.invImageF model ⊔ fc.sInvertedOvergroup R₁)
+        ∣ fc.p ^ 3 := by
+      have h1 := Subgroup.card_dvd_of_le hle
+      rwa [hcard] at h1
+    obtain ⟨i, hi3, hicard⟩ := (Nat.dvd_prime_pow fc.p_prime).mp hdvd
+    have hge : fc.p ^ 2 ≤ Nat.card
+        ↥(fc.invImageF model ⊔ fc.sInvertedOvergroup R₁) := by
+      have h1 := Subgroup.card_le_of_le (le_sup_left : fc.invImageF model
+        ≤ fc.invImageF model ⊔ fc.sInvertedOvergroup R₁)
+      rwa [hRcard] at h1
+    have hne2 : Nat.card ↥(fc.invImageF model ⊔ fc.sInvertedOvergroup R₁)
+        ≠ fc.p ^ 2 := by
+      intro h0
+      have h1 : fc.invImageF model = fc.invImageF model ⊔ fc.sInvertedOvergroup R₁ :=
+        Subgroup.eq_of_le_of_card_ge le_sup_left (by rw [h0, hRcard])
+      have h2 : fc.sInvertedOvergroup R₁ ≤ fc.invImageF model := by
+        rw [h1]
+        exact le_sup_right
+      have h3 : fc.sInvertedOvergroup R₁ ⊓ fc.invImageF model
+          = fc.sInvertedOvergroup R₁ := inf_eq_left.mpr h2
+      rw [inf_comm, fc.invImageF_inf_sInvertedOvergroup model ind hB2 hm hGp hSigma
+        hRle hR₁le hcard] at h3
+      have h4 : Nat.card ↥(fc.sInvertedT model) = fc.p ^ 2 := by
+        rw [h3, hT₁card]
+      rw [fc.card_sInvertedT model ind hB2 hm, hm, pow_one] at h4
+      have h5 := fc.p_prime.one_lt
+      nlinarith
+    have hi : i = 3 := by
+      have h1 : fc.p ^ 2 ≤ fc.p ^ i := hicard ▸ hge
+      have h2 : 2 ≤ i := by
+        by_contra h3
+        push Not at h3
+        have h4 : fc.p ^ i < fc.p ^ 2 := Nat.pow_lt_pow_right fc.p_prime.one_lt h3
+        omega
+      rcases Nat.lt_or_ge i 3 with h | h
+      · exfalso
+        have h5 : i = 2 := by omega
+        rw [h5] at hicard
+        exact hne2 hicard
+      · omega
+    apply Subgroup.eq_of_le_of_card_ge hle
+    rw [hcard, hicard, hi]
+  have hprod : ((fc.invImageF model ⊔ fc.sInvertedOvergroup R₁ : Subgroup G) : Set G)
+      = (fc.invImageF model : Set G) * (fc.sInvertedOvergroup R₁ : Set G) := by
+    refine Subgroup.coe_mul_of_right_le_normalizer_left _ _ ?_
+    intro z hz
+    exact hR₁le (hT₁le hz)
+  have hyP : y ∈ ((fc.invImageF model ⊔ fc.sInvertedOvergroup R₁ :
+      Subgroup G) : Set G) := by
+    rw [hsup]
+    exact hy
+  rw [hprod] at hyP
+  obtain ⟨x, hx, t₁, ht₁, rfl⟩ := hyP
+  -- split the commutator.
+  have hsplit : ⁅k, x * t₁⁆ = ⁅k, x⁆ * (x * ⁅k, t₁⁆ * x⁻¹) := by
+    have h0 : k * (x * t₁) * k⁻¹ * (x * t₁)⁻¹
+        = (k * x * k⁻¹ * x⁻¹) * (x * (k * t₁ * k⁻¹ * t₁⁻¹) * x⁻¹) := by
+      simp only [mul_inv_rev, mul_assoc, inv_mul_cancel_left]
+    simpa only [commutatorElement_def] using h0
+  rw [hsplit]
+  refine mul_mem ?_ ?_
+  · -- `⁅k, x⁆ ∈ T ≤ T₁`.
+    refine hTsubT₁ ?_
+    have h1 := fc.conj_mul_inv_mem_sInvertedT_of_mem_invImageF model ind hB2 hm hGp
+      hSigma hRle hR₁le hcard hR₁n hk hx
+    have h2 : ⁅k, x⁆ = k * x * k⁻¹ * x⁻¹ := commutatorElement_def k x
+    rw [h2]
+    exact h1
+  · -- `x·⁅k,t₁⁆·x⁻¹ ∈ T₁` (`T₁ ⊴ N_G(R)`).
+    have h1 : ⁅k, t₁⁆ ∈ fc.sInvertedOvergroup R₁ := by
+      have h2 : k * t₁ * k⁻¹ ∈ fc.sInvertedOvergroup R₁ := by
+        have h3 := fc.conj_sInvertedOvergroup_eq model ind hB2 hm hGp hSigma hRle
+          hR₁le hcard hR₁n hk
+        have h4 := Subgroup.smul_mem_pointwise_smul t₁ (MulAut.conj k)
+          (fc.sInvertedOvergroup R₁) ht₁
+        rwa [h3] at h4
+      have h5 : ⁅k, t₁⁆ = (k * t₁ * k⁻¹) * t₁⁻¹ := by
+        rw [commutatorElement_def]
+      rw [h5]
+      exact mul_mem h2 ((fc.sInvertedOvergroup R₁).inv_mem ht₁)
+    have h6 := fc.conj_sInvertedOvergroup_eq model ind hB2 hm hGp hSigma hRle
+      hR₁le hcard hR₁n (hR₁le (hRle hx))
+    have h7 := Subgroup.smul_mem_pointwise_smul ⁅k, t₁⁆ (MulAut.conj x)
+      (fc.sInvertedOvergroup R₁) h1
+    rwa [h6] at h7
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
