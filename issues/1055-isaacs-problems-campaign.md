@@ -1438,7 +1438,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 
 | 問題 | 状態 | メモ |
 |---|---|---|
-| 5C.1 | ⬜ | Burnside の正規 p-補群定理を **Thm 5.18 から**導く。⚠ repo には Burnside (`hasNormalPComplement_of_sylow_normalizer_le_centralizer`) も Thm 5.18 強形も landing 済なので、**同一 statement の別証明**にならないよう、鍵の段 `G' ⊓ P = ⊥ ⇒ 正規 p-補群` を独立補題として書くのが筋 |
+| 5C.1 | ✅ | `not_dvd_card_commutator_of_inf_sylow_eq_bot` + `hasNormalPComplement_of_commutator_inf_sylow_eq_bot` (`Problems5C.lean`)。方針どおり **鍵の段を独立補題**にした (同一 statement の別証明を避ける) |
 | 5C.2 | ⬜ | `U ≤ V ≤ P` (P abelian Sylow-2)、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
 | 5C.3 | ⬜ | `G` 単純で abelian Sylow-2 が位数 `2^5` ⇒ 初等可換 (⚠ pdftotext は `2 5`、PDF 画像で要確認) |
 | 5C.4 | ⬜ | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
@@ -1451,6 +1451,19 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.11 | ⬜ | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
 | 5C.12 | ⬜ | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
 | 5C.13 | ⬜ | (Navarro) `P = N_G(P)'` なる Sylow `P` ⇒ `N_G(P)` が正規 p-補群をもつ |
+
+### 5C.1 の実装メモ (2026-07-26)
+
+* `p ∤ |G'|`: `G'` の位数 `p` の元 `x` を取ると `⟨x⟩` はある Sylow `Q` に入り `Q` は `P` に共役、
+  `G'` 正規なので `x^g ∈ G' ⊓ P = ⊥` で矛盾。⭐ **「N 正規なら N ⊓ P ∈ Syl_p(N)」を経由せずに済む**。
+* `Abelianization G` は可換なので Sylow が正規 ⇒ **Schur-Zassenhaus**
+  (`Subgroup.exists_right_complement'_of_coprime`) で `p`-補群 `K` を取り、
+  `N := (Abelianization.of)⁻¹(K)`。`|G : N| = |PA| = |P|` (`Sylow.card_eq_multiplicity` +
+  `p ∤ |G'|` から `p`-指数が一致)、`p ∤ |N|` は `p^{v+1} ∤ |G|` から。
+* 各 Sylow `Q` に対する `IsComplement'` は `Subgroup.isComplement'_of_card_mul_and_disjoint`
+  + `Subgroup.disjoint_of_coprime_natCard`。
+⚠ `Abelianization G := G ⧸ commutator G` なので全射性は `QuotientGroup.induction_on` で出る
+(`Abelianization.of_surjective` / `induction_on` は存在しない)。
 
 ### 5C.5 の実装メモ (2026-07-26)
 
