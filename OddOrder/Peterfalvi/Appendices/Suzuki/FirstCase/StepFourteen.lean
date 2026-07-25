@@ -246,6 +246,92 @@ theorem zpowers_mul_t_sup_P_le_center_sup
   refine le_inf ?_ (fun z hz => hcent z hz)
   exact sup_le (hZ₁R.trans le_sup_left) (hPR.trans le_sup_left)
 
+include model in
+/-- **Peterfalvi Part II, Ch. II, step (14), first assertion** (p. 113):
+`Z(RΣ) = Z₁P`, with the centre taken inside `G` as `RΣ ⊓ C_G(RΣ)`.
+
+In case (10.2) (which holds by step (12)) we have `p = 3`, `|F| = 9`, `|Σ| = 3`,
+so `|R| = |F|·|P| = 27` and `|RΣ| = 81`, while `|Z₁P| = |Z₁|·|P| = 9` (the two
+factors commute inside the abelian `R` and meet trivially since `Z₁ ≤ T` and
+`T ⊓ P = 1`).  Thus `Z₁P` has index `3²` in `RΣ`, and `RΣ` is nonabelian because
+a nonidentity element of `Σ` fails to centralize `R`; the centre can therefore be
+no larger than `Z₁P`. -/
+theorem inf_centralizer_sup_eq_zpowers_sup_P
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
+    (fc.invImageF model
+          ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+        ⊓ Subgroup.centralizer
+          (((fc.invImageF model
+            ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
+              : Subgroup G) : Set G)
+      = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+          * fc.toHypothesis.t) ⊔ fc.P := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  -- case (10.2) numerics
+  obtain ⟨hpSig, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
+  obtain ⟨-, -, -, hSig3, -⟩ :=
+    fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
+  have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
+  set R : Subgroup G := fc.invImageF model with hR_def
+  set Sg : Subgroup G :=
+    fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G) with hSg_def
+  set Z₁ : Subgroup G := Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+    * fc.toHypothesis.t) with hZ₁_def
+  -- `|R| = 27` and `|RΣ| = 81`
+  have hPcard : Nat.card ↥fc.P = 3 := by rw [fc.card_P, hp3]
+  have hRcard : Nat.card ↥R = 27 := by
+    rw [hR_def, fc.card_invImageF model ind, hF9, hPcard]
+  have hRScard : Nat.card ↥(R ⊔ Sg) = 81 := by
+    rw [hR_def, hSg_def, fc.card_sup_invImageF_centralizer_W model ind]
+    rw [← hR_def, ← hSg_def, hRcard, hSig3]
+  -- `|Z₁| = 3` and `Z₁ ⊓ P = 1`, so `|Z₁P| = 9`
+  have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
+      * fc.toHypothesis.t) = 3 := by
+    rw [fc.orderOf_st_eq_char model, fc.char_eq_p model hB2, hp3]
+  have hZ₁card : Nat.card ↥Z₁ = 3 := by rw [hZ₁_def, Nat.card_zpowers, hstord]
+  have hZ₁T : Z₁ ≤ fc.sInvertedT model :=
+    fc.zpowers_distinguishedInvolution_mul_t_le_sInvertedT model ind hB2 hm
+  have hTP : fc.sInvertedT model ⊓ fc.P = ⊥ :=
+    (fc.sInvertedT_spec model ind hB2 hm).2.2.2
+  have hZ₁P : Z₁ ⊓ fc.P = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    have : x ∈ fc.sInvertedT model ⊓ fc.P := ⟨hZ₁T hx.1, hx.2⟩
+    rwa [hTP] at this
+  have habR := fc.invImageF_mul_comm model ind hB2 hm
+  have hZ₁R : Z₁ ≤ R := hZ₁T.trans (fc.sInvertedT_spec model ind hB2 hm).1
+  have hPR : fc.P ≤ R := fc.P_le_invImageF model
+  have hcomm : ∀ a ∈ Z₁, ∀ b ∈ fc.P, a * b = b * a := fun a ha b hb =>
+    habR a (hZ₁R ha) b (hPR hb)
+  have hZ₁Pcard : Nat.card ↥(Z₁ ⊔ fc.P) = 9 := by
+    rw [card_sup_eq_mul_of_commute hcomm hZ₁P, hZ₁card, hPcard]
+  -- `RΣ` is nonabelian: a nonidentity element of `Σ` does not centralize `R`
+  have hSgne : Sg ≠ ⊥ := by
+    intro h
+    rw [h, Subgroup.card_bot] at hSig3
+    omega
+  obtain ⟨w, hwSg, hw1⟩ : ∃ w ∈ Sg, w ≠ 1 := by
+    by_contra hcon
+    push Not at hcon
+    exact hSgne (by
+      rw [eq_bot_iff]
+      intro x hx
+      rw [Subgroup.mem_bot]
+      exact hcon x hx)
+  have hnc : ¬ ∀ x ∈ R ⊔ Sg, ∀ y ∈ R ⊔ Sg, x * y = y * x := by
+    intro hcomm'
+    refine fc.not_forall_comm_of_mem_centralizer_W model ind hwSg.1 hwSg.2 hw1 ?_
+    intro r hr
+    exact hcomm' w ((le_sup_right : Sg ≤ R ⊔ Sg) hwSg) r
+      ((le_sup_left : R ≤ R ⊔ Sg) hr)
+  -- assemble
+  refine inf_centralizer_eq_of_index_sq_of_not_comm (p := 3) (by norm_num) ?_ ?_ hnc
+  · exact fc.zpowers_mul_t_sup_P_le_center_sup model ind hB2 hm
+  · rw [hRScard, hZ₁Pcard]
+    norm_num
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
