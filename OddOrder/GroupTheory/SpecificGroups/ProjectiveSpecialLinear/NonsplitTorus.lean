@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.FieldTheory.Finite.Extension
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.GCD
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylow
 import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
 
 /-!
@@ -140,5 +143,59 @@ theorem exists_isCyclic_card_specialLinearGroup_eq_card_add_one
     (FiniteField.finrank_extension F p 2)
 
 end AnyFiniteField
+
+section SylowThree
+
+/-- **Every Sylow `3`-subgroup of `SL(2, F)` with `|F| = 8` is cyclic of order `9`.**
+
+`|SL(2,8)| = 8·7·9`, so a Sylow `3`-subgroup has order `9`; the nonsplit torus is a
+cyclic subgroup of that order, hence is a Sylow `3`-subgroup, and all Sylow
+`3`-subgroups are isomorphic.
+
+This is the input for Peterfalvi Part II, Ch. II, (15): in `⟨Q₀, K, t⟩ ≅ PSL(2, 8)`
+the centralizer of the order-`3` element `st` is cyclic of order `9`. -/
+theorem isCyclic_and_card_sylow_three_of_card_eq_eight
+    (F : Type*) [Field F] [Finite F] [CharP F 2] (hF : Nat.card F = 8)
+    (S : Sylow 3 (Matrix.SpecialLinearGroup (Fin 2) F)) :
+    IsCyclic ↥(S : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F))
+      ∧ Nat.card ↥(S : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)) = 9 := by
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have hSL : Nat.card (Matrix.SpecialLinearGroup (Fin 2) F) = 504 := by
+    rw [SpecificGroups.ProjectiveSpecialLinear.natCard_specialLinearGroup_fin_two, hF]
+  have hcard : ∀ T : Sylow 3 (Matrix.SpecialLinearGroup (Fin 2) F),
+      Nat.card ↥(T : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)) = 9 := by
+    intro T
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp T.isPGroup'
+    have hmul := (T : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)).card_mul_index
+    rw [hk, hSL] at hmul
+    have hnd := T.not_dvd_index
+    have hcop : Nat.Coprime ((3 : ℕ) ^ 2)
+        ((T : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)).index) :=
+      Nat.Coprime.pow_left 2 ((Nat.Prime.coprime_iff_not_dvd (by norm_num)).mpr hnd)
+    have h1 : (3 : ℕ) ^ 2 ∣ 3 ^ k := by
+      refine hcop.dvd_of_dvd_mul_right ?_
+      rw [hmul]
+      exact ⟨56, by norm_num⟩
+    have h2 : (3 : ℕ) ^ k ∣ 3 ^ 2 := by
+      refine (Nat.Coprime.pow_left k (show Nat.Coprime 3 56 by norm_num)).dvd_of_dvd_mul_left ?_
+      rw [show (56 : ℕ) * 3 ^ 2 = 504 by norm_num]
+      exact ⟨_, hmul.symm⟩
+    have hk2 : k = 2 :=
+      le_antisymm ((Nat.pow_dvd_pow_iff_le_right (by norm_num)).mp h2)
+        ((Nat.pow_dvd_pow_iff_le_right (by norm_num)).mp h1)
+    rw [hk, hk2]
+    norm_num
+  refine ⟨?_, hcard S⟩
+  obtain ⟨C, hCcyc, hCcard⟩ := exists_isCyclic_card_specialLinearGroup_eq_card_add_one F
+  rw [hF] at hCcard
+  have hCp : IsPGroup 3 ↥C := IsPGroup.of_card (n := 2) (by rw [hCcard]; norm_num)
+  obtain ⟨Q, hCQ⟩ := hCp.exists_le_sylow
+  have hCQeq : C = (Q : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)) :=
+    Subgroup.eq_of_le_of_card_ge hCQ (by rw [hcard Q, hCcard])
+  have hQcyc : IsCyclic ↥(Q : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F)) := by
+    rw [← hCQeq]; exact hCcyc
+  exact isCyclic_of_surjective (Sylow.equiv Q S) (Sylow.equiv Q S).surjective
+
+end SylowThree
 
 end OddOrder.GroupTheory.ProjectiveSpecialLinear
