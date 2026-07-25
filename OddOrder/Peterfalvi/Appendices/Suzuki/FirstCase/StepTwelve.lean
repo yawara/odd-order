@@ -555,6 +555,121 @@ theorem mem_invImageF_iff_forall_conj_smul_eq
       exact (fc.mul_comm_invImageF_of_forall_conj_smul_eq model ind hB2 hm hfix y hy).symm
     rwa [fc.centralizer_invImageF_eq model ind hB2 hm] at h1
 
+include model in
+/-- **`Σ` is trivial when `|F| = p`** ((12) tail): `dAut d` is additive and fixes `1`
+(multiplicativity), and `1` additively generates the order-`p` group `F`, so
+`dAut d = id`; faithfulness collapses `d` to `1`. -/
+theorem sigmaComponent_eq_one_of_card_F_eq_p (hF : Nat.card F = fc.p) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ∀ d : ↥(fc.rankOneQuotient).D, d = 1 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  intro d
+  haveI : Finite F := Nat.finite_of_card_ne_zero (by rw [hF]; exact fc.p_prime.pos.ne')
+  -- `1` additively generates `F`.
+  have hgen : ∀ y : F, y ∈ AddSubgroup.zmultiples (1 : F) := by
+    intro y
+    have hcard : Nat.card ↥(AddSubgroup.zmultiples (1 : F)) ∣ fc.p := by
+      have hc := AddSubgroup.card_addSubgroup_dvd_card (AddSubgroup.zmultiples (1 : F))
+      rwa [hF] at hc
+    rcases (fc.p_prime.eq_one_or_self_of_dvd _ hcard).symm with heq | heq
+    · have htop : AddSubgroup.zmultiples (1 : F) = ⊤ :=
+        AddSubgroup.eq_top_of_card_eq _ (by rw [heq, hF])
+      rw [htop]
+      trivial
+    · exfalso
+      haveI hsing := (Nat.card_eq_one_iff_unique.mp heq).1
+      have h1 : (⟨1, AddSubgroup.mem_zmultiples 1⟩ :
+          ↥(AddSubgroup.zmultiples (1 : F)))
+          = ⟨0, zero_mem _⟩ := Subsingleton.elim _ _
+      exact one_ne_zero (congrArg Subtype.val h1)
+  -- `dAut d 1 = 1` by multiplicativity.
+  have hd1 : model.dAut d 1 = 1 := by
+    have hmul := model.dAut_mul d 1 1
+    rw [one_mul] at hmul
+    have hne : model.dAut d 1 ≠ 0 := by
+      intro h0
+      have h00 : model.dAut d 0 = 0 := map_zero _
+      exact one_ne_zero ((model.dAut d).injective (h0.trans h00.symm))
+    have hc' : model.dAut d 1 * 1 = model.dAut d 1 * model.dAut d 1 := by
+      rw [mul_one]; exact hmul
+    exact (mul_left_cancel₀ hne hc').symm
+  -- hence `dAut d` is the identity, and `dAut 1` is too.
+  have hdone : ∀ x : F, model.dAut 1 x = x := by
+    intro x
+    have h := model.dAut_conj 1 x
+    simp only [OneMemClass.coe_one, one_mul, inv_one, mul_one] at h
+    exact (model.emb_injective h).symm ▸ rfl
+  apply model.dAut_injective
+  ext x
+  obtain ⟨n, hn⟩ := AddSubgroup.mem_zmultiples_iff.mp (hgen x)
+  rw [← hn, map_zsmul, hd1, hdone (n • 1)]
+
+include model in
+/-- **`|Q̄| = |F| − 1`**: `qEquiv` identifies `Q̄` with `F^*`. -/
+theorem card_rankOneQ_eq_pred_card_F {m : ℕ} (hm : Nat.card F = fc.p ^ m) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    Nat.card ↥(fc.rankOneQuotient).Q = Nat.card F - 1 := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  haveI : Finite F := Nat.finite_of_card_ne_zero
+    (by rw [hm]; exact (Nat.pow_pos fc.p_prime.pos).ne')
+  haveI := Fintype.ofFinite F
+  rw [Nat.card_congr model.qEquiv.toEquiv, Nat.card_eq_fintype_card,
+    Nat.card_eq_fintype_card, Fintype.card_units]
+
+include model in
+/-- **`[N_G(R) : R] = p^m · |Q̄| · |D̄|`** ((12) tail): Lagrange along
+`R ≤ C_G(P) = N_G(P) ≤ N_G(R)` with the index theorem `[N_G(R) : N_G(P)] = p^m`
+and the order formula for `C_G(P)`. -/
+theorem index_invImageF_subgroupOf_normalizer
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
+    (hm : Nat.card F = fc.p ^ m)
+    (hGp : fc.p ^ (m + 2) ∣ Nat.card G)
+    (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+      ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) :
+    letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+    ((fc.invImageF model).subgroupOf
+        (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))).index
+      = fc.p ^ m * (Nat.card ↥(fc.rankOneQuotient).Q
+          * Nat.card ↥(fc.rankOneQuotient).D) := by
+  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  classical
+  set NR : Subgroup G :=
+    Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
+  -- `|NR| = |N_G(P)| · p^m`.
+  have hidx := fc.index_normalizer_P_subgroupOf_normalizer_invImageF model ind hB2 hm
+    hGp hSigma
+  have hleNP : Subgroup.normalizer (fc.P : Set G) ≤ NR :=
+    (fc.normalizer_P_lt_normalizer_invImageF model ind hm hGp hSigma).le
+  have hlag := ((Subgroup.normalizer (fc.P : Set G)).subgroupOf NR).card_mul_index
+  rw [hidx, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hleNP).toEquiv] at hlag
+  -- `|N_G(P)| = |C_G(P)| = |P|·(|F|·(|Q̄|·|D̄|))`.
+  have hNPeq : Nat.card ↥(Subgroup.normalizer (fc.P : Set G))
+      = Nat.card ↥fc.P * (Nat.card F * (Nat.card ↥(fc.rankOneQuotient).Q
+          * Nat.card ↥(fc.rankOneQuotient).D)) := by
+    rw [fc.normalizer_P_eq_centralizer]
+    exact fc.card_centralizer_P model ind
+  -- Lagrange along `R ≤ NR`.
+  have hleR : fc.invImageF model ≤ NR := Subgroup.le_normalizer
+  have hlagR := ((fc.invImageF model).subgroupOf NR).card_mul_index
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hleR).toEquiv,
+    fc.card_invImageF model ind] at hlagR
+  -- combine and cancel `|F|·|P| ≠ 0`.
+  rw [← hlagR, hNPeq] at hlag
+  haveI : Finite F := Nat.finite_of_card_ne_zero
+    (by rw [hm]; exact (Nat.pow_pos fc.p_prime.pos).ne')
+  have hpos : 0 < Nat.card F * Nat.card ↥fc.P :=
+    Nat.mul_pos Nat.card_pos Nat.card_pos
+  apply Nat.eq_of_mul_eq_mul_left hpos
+  calc Nat.card F * Nat.card ↥fc.P
+        * ((fc.invImageF model).subgroupOf NR).index
+      = Nat.card ↥fc.P * (Nat.card F * (Nat.card ↥(fc.rankOneQuotient).Q
+          * Nat.card ↥(fc.rankOneQuotient).D)) * fc.p ^ m := hlag.symm
+    _ = Nat.card F * Nat.card ↥fc.P * (fc.p ^ m
+          * (Nat.card ↥(fc.rankOneQuotient).Q
+            * Nat.card ↥(fc.rankOneQuotient).D)) := by ring
+
 end FirstCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
