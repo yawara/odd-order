@@ -1091,8 +1091,65 @@ r ∣ 504 ∧ r 奇 ⟹ r ∈ {3,7}、(13-iv) で 7 を排除 ⟹ |J| は 3-冪�
 ⟹ **残る (14) の主張は `C_G(Z₁) ≤ R₂` のみ**で、これは (13)
 (`C_G(Z₁)` は 3-群) が閉じれば `R₂` が Sylow-3 であることから即従う。
 
-### 次の一手 = (13-iv) r = 7 排除
+### ⚠ 上記「次の一手 = (13-iv)」は stale だった (2026-07-25 実測で訂正)
 
-(13) の残りは上記 §「(13-iv) r = 7 排除の完全論法」に導出済み (部品実在確認済)。
-これを実装 → (13-v) assembly → (13) 完了 → (14) の `R₂ = C_G(Z₁)` を追記。
-その後 (15) へ (`C_G(Z₁P) = RΣ` は既に landed なので (15) の該当行は即使える)。
+**step (13) は既に完結済み** — `54b472b8b` "step (13) 完結 — C_G(Z₁) は 3-群"。
+r = 7 排除は `not_card_K_dvd_ncard_invertedBy` (StepThirteen.lean:455) として
+landed 済で、最終形は `isPGroup_three_centralizer_Z₁` (同 :752)。
+FirstCase 配下に実 sorry は 0 (コメント除去して計測)。
+
+⟹ これを使って **`sylow_eq_centralizer_zpowers` : `R₂ = C_G(Z₁)` を追加**し、
+**step (14) は全主張 landed で完了**。
+
+### 次の一手 = step (15)
+
+書籍 p.113-114:
+> **(15)** There is a subgroup `L` of `R₁` which is cyclic of order 9, inverted by
+> `s`, normalized by `V` and centralized by `W` but not by `P`. It is also the case
+> that `|R₂ : LV| = 3`, `Z(LV) = Z₁Σ` and `Ω₁(LV) = Z₁ΣP`.
+
+`L := C_G(st) ⊓ ⟨Q₀,K,t⟩`。書籍は `⟨Q₀,K,t⟩ ≅ PSL(2,8)` から
+「`L` は位数 9 の巡回群でその元は `s` に反転される」を読み取る。
+repo 側の材料: `card_orderThreeGeneratedSubgroup` (`|⟨Q₀,K,t⟩| = |Q₀|·|K|·(|Q₀|+1)`
+= 504、`OrderThreePSLInduction.lean`)。**PSL(2,8) の位数 3 元の中心化群が位数 9 巡回**
+に相当する repo 補題の有無を先に実測すること (無ければそこが (15) の主コスト)。
+`C_G(Z₁P) = RΣ` は landed 済なので「`L` normalizes `C_G(Z₁P) = RΣ` ⟹ `L ⊂ R₁`」
+の行はすぐ使える。
+
+## 📐 step (15) の構造分析 (2026-07-25 実測、main session)
+
+書籍 p.113-114 の (15) 冒頭:
+> `L := C_G(st) ⊓ ⟨Q₀,K,t⟩`。`⟨Q₀,K,t⟩ ≅ PSL(2,8)` ゆえ `L` は位数 9 の巡回群で、
+> その元は `s` に反転される。
+
+**核心の未形式化部品 = 「PSL(2,q) (q = 2ⁿ) の位数 3 元の中心化群は位数 q+1 の巡回群」**。
+
+### repo 実測 (grep 済、名前まで確認)
+- ✅ `natCard_projectiveSpecialLinearGroup_fin_two` : `|PSL(2,F)| = q(q−1)(q+1)`
+  (`GroupTheory/SpecificGroups/ProjectiveSpecialLinear/RootGroupSylow.lean`)
+  ⚠ 本 issue 上部の「mathlib に PSL の位数は無い」は mathlib についての記述で、
+  **repo 側には自前の位数公式がある** (混同注意)
+- ✅ `center_specialLinearGroup_fin_two_eq_bot` : char 2 で `Z(SL₂) = 1` (⟹ PSL = SL)
+- ✅ `exists_orderThreeGeneratedSubgroup_mulEquiv_psl2` : `⟨Q₀,K,t⟩ ≃* PSL(2,F)`, `|F| = |Q₀|`
+- ✅ root group (単数冪部分群) 系の infra 一式 (`RootGroup.lean`)
+- ❌ **非分裂トーラス (位数 q+1 の巡回群) は無い**。既存の "torus" 記述は分裂トーラス
+  (Borel の対角部分, PSU 側) のみ。⟹ ここが (15) の主コスト
+
+### 実装計画 (generic な新 leaf を上流から積む)
+1. **非スカラー 2×2 行列 `M` の `M₂(F)` 内中心化環は `F[M]`** (2 次元可換代数)。
+   まず mathlib に既存が無いか確認 (`Matrix` の centralizer 系)。
+2. `M ∈ SL₂(F)`、char 2、`M ≠ 1` かつ奇位数 ⟹ 特性多項式 `X² + tr(M)·X + 1` は
+   重根なし (重根 ⟺ `tr M = 0` ⟺ `M` は unipotent ⟹ 位数 2 の冪)。
+   ⟹ `F[M] ≅ F × F` (分裂) または `F_{q²}` (非分裂)。
+3. `C_{SL₂}(M) = {A ∈ F[M] : det A = 1} = ker(代数ノルム)`
+   — 分裂なら位数 `q−1` の巡回群、非分裂なら位数 `q+1` の巡回群
+   (有限体乗法群の巡回性 + ノルム全射)。
+4. char 2 で `PSL = SL` ゆえそのまま移送。
+5. `q = 8` に特殊化: 位数 3 の元は `3 ∤ 7 = q−1`, `3 ∣ 9 = q+1` ⟹ 非分裂側
+   ⟹ 中心化群は位数 9 の巡回群。`s` による反転は「トーラスを正規化する対合は
+   反転する」(Weyl 元の作用) から。
+
+規模: 複数 iteration。1 → 5 の順で積む。(15) の後半
+(`|R₂ : LV| = 3`, `Z(LV) = Z₁Σ`, `Ω₁(LV) = Z₁ΣP`) は `L` が取れてからの群論で、
+`C_G(Z₁P) = RΣ` (landed) がそのまま使える。
+
