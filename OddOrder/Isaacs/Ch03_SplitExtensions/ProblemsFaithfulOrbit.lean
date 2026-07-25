@@ -236,6 +236,31 @@ theorem conjInrRange_le_normalizer_orbitKernel_map (g : G) :
   · simp
 
 
+/-! ### `Γ` の Sylow はすべて `conjInrRange a` の形 -/
+
+omit [Finite G] [Finite P] in
+theorem conjInrRange_eq_smul (g : G) :
+    conjInrRange (φ := φ) g = MulAut.conj (SemidirectProduct.inl g : G ⋊[φ] P) •
+      ((SemidirectProduct.inr : P →* G ⋊[φ] P).range) := rfl
+
+/-- `Γ` の任意の Sylow `p`-部分群は `inr(P)^{inl a}` の形 (`γ = inl γ.left · inr γ.right` と
+分解し, `inr γ.right` は `inr(P)` を動かさない)。 -/
+theorem exists_eq_conjInrRange (hP : IsPGroup p P) (hG : ¬ p ∣ Nat.card G)
+    (S : Sylow p (G ⋊[φ] P)) :
+    ∃ a : G, (S : Subgroup (G ⋊[φ] P)) = conjInrRange (φ := φ) a := by
+  obtain ⟨γ, hγ⟩ := MulAction.exists_smul_eq (G ⋊[φ] P) (sylowInrRange (φ := φ) hP hG) S
+  obtain ⟨a, b⟩ := γ
+  refine ⟨a, ?_⟩
+  have hstep : (SemidirectProduct.inr b : G ⋊[φ] P) •
+      (sylowInrRange (φ := φ) hP hG) = sylowInrRange (φ := φ) hP hG := by
+    refine Sylow.ext ?_
+    rw [Sylow.coe_subgroup_smul]
+    exact Subgroup.conj_smul_eq_self_of_mem ⟨b, rfl⟩
+  rw [← hγ, SemidirectProduct.mk_eq_inl_mul_inr b a, mul_smul, hstep,
+    Sylow.coe_subgroup_smul, conjInrRange_eq_smul]
+  rfl
+
+
 /-! ### `O_p(Γ) = 1` -/
 
 omit [Finite G] [Finite P] in
