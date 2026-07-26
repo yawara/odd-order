@@ -266,3 +266,30 @@ NonExistenceGCore 75 / AppendixC3 72 / CoreSetupBasic 62 = **計 892 行**。
 ⚠ 各 file は C.3 以外の §16 材料とも混在しているので、**file 丸ごと移動ではなく
 `FieldNormalizerData` を取る宣言だけを抜き出して BG 側へ移す**。移した分は S16 側から削除し、
 S16 spine は `toHypothesisBAbstract` (step 2a) 経由で繋ぎ直す。
+
+## 🧱 受け皿の完成 (2026-07-26)
+
+`AppC_HypothesisB.lean` に step 2b の置換先を全部揃えた:
+
+* `conditionA` / `primeLine` / `primeLineElement` / `primeLineGenerator` — `(p, q)`-level。
+* `HypothesisBAbstract p q G` — 書籍 (B)。
+* `FieldNormalizerData p q G` (`extends HypothesisBAbstract`) — (B)+(A) に `P`/`U`/`W₂` の
+  名前を付けただけの packaging。`HypothesisBAbstract.toFieldNormalizerData` が全域構成
+  (3 本の定義等式は `rfl`) なので強化でないことが型で保証される。
+* `W2_normalizes_Q` / `W2_conj_y_normalizes_U` は導出補題として用意済 (chain の呼び名を保存)。
+
+⚠ **S16 側の定義本体を BG の新名へ差し替えるのは無駄**と判明 (試して revert):
+`fieldNormalizerPrimeLineElement` 等を BG 名へ向けると、それを `dsimp`/`rw` で展開していた
+10 箇所が壊れる。しかし step 2b では S16 側の定義自体が消えて **呼び出し側が**
+`AppC.primeLineElement p q c` に置換されるので、S16 の body を先に差し替える必要は無い。
+必要なのは「BG 側に名前が存在すること」だけで、それは完了した。
+(subgroup 3 本 = `fieldNormalizer{Kernel,Complement,PrimeLine}` は step 1 で差し替え済。
+そちらは unfold 依存が 8 箇所で済んだので実施した。)
+
+### step 2b 実行の残り
+
+`S16_CoreLemmas` の 630--1265 行 (= `FieldNormalizerData` namespace、31 宣言) から始めて
+chain の import 順に、`{hyp} (data : FieldNormalizerData hyp)` を
+`{p q} [Fact p.Prime] (data : AppC.FieldNormalizerData p q G)` へ機械置換し、
+宣言を BG 側 leaf へ移す。S16 spine は `toHypothesisBAbstract` +
+`HypothesisBAbstract.toFieldNormalizerData` 経由で繋ぎ直す。

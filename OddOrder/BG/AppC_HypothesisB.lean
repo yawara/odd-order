@@ -63,6 +63,18 @@ noncomputable def primeLine (p q : ℕ) [Fact p.Prime] :
   NormSet.normOneFrobeniusSubspaceKernel p q
     (Submodule.span (ZMod p) ({(1 : GaloisField p q)} : Set (GaloisField p q)))
 
+/-- The element of the prime-field line `P₀ ≤ P ≤ H` corresponding to a scalar `c : ZMod p`,
+i.e. `algebraMap c ∈ 𝔽_p ⊆ 𝔽_{p^q}` read inside the additive kernel. -/
+noncomputable def primeLineElement (p q : ℕ) [Fact p.Prime] (c : ZMod p) :
+    NormSet.normOneFrobeniusGroup p q :=
+  SemidirectProduct.inl (Multiplicative.ofAdd (algebraMap (ZMod p) (GaloisField p q) c))
+
+/-- The distinguished nonidentity element of the prime-field line `P₀`, corresponding to
+`1 : 𝔽_{p^q}` in BG Appendix C. -/
+noncomputable def primeLineGenerator (p q : ℕ) [Fact p.Prime] :
+    NormSet.normOneFrobeniusGroup p q :=
+  SemidirectProduct.inl (Multiplicative.ofAdd (1 : GaloisField p q))
+
 /-- **BG Appendix C, Hypothesis (B)** (p. 145), in the book's `p, q, G`-abstract form: no
 Peterfalvi Section 16 configuration anywhere in the statement.
 
