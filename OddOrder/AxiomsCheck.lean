@@ -3679,6 +3679,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.xAdjoinStepW_k_general
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.coherentDegreeSqNormBound_of_not_coherentW_k_general
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.xAdjoinStepW_general
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.coherentDegreeSqNormBound_of_not_coherentW_general
 -- h56 hdatum discharge helpers: the per-member (5.2.d) datum for an *irreducible* member
 -- (`memberExtensionDecomposition` with the coherent extension, coupling definitional), the break
 -- decomposition `Da` for an *irreducible* break (`decompositionDaFromDadeOfDiff`, `tau1 = τ`

@@ -37,9 +37,14 @@ four Dade-consuming helpers become:
 4. `retarget_isCoherent_of_extensionImage_k` → `retarget_isCoherent_of_extensionImage_k_general`
    below.
 
-The engine itself is `xAdjoinStepW_k_general`, with the contrapositive degree bound
-`coherentDegreeSqNormBound_of_not_coherentW_k_general`.  The Dade-specialized names in
-`S08_CoherenceWeighted` are thin instantiations of these, so every existing consumer is unchanged.
+The engines are `xAdjoinStepW_k_general` (reducible break) and `xAdjoinStepW_general` (orthonormal
+break, the `‖χ‖² = 1` case, taking the break's (5.2.d) family as a parameter instead of building
+the conjugate-pair Dade family), with the contrapositive degree bounds
+`coherentDegreeSqNormBound_of_not_coherentW_k_general` /
+`coherentDegreeSqNormBound_of_not_coherentW_general`.  The Dade-named `S08.xAdjoinStepW_k`,
+`S08.xAdjoinStepW` and their bounds are thin instantiations at the ambient family `Samb = univ`
+(legitimate because the Dade isometry is defined on *all* `A₀`-supported class functions, not just
+on `ℤ[𝒮]` — see `mem_zSupportedSpan_univ_iff`), so every existing consumer is unchanged.
 
 See issue 0154.
 -/
@@ -614,6 +619,68 @@ noncomputable def xAdjoinStepW_k_general
     (hmemS1 i₁ hi₁) htau1_memaχ hτdiffZ hcrux1 hcrux2 hSgen hgen
 
 open scoped Classical in
+/-- **General norm-weighted (5.6) forward adjoin engine, irreducible break** (generalizes
+`S08.xAdjoinStepW`, `S08_CoherenceWeighted.lean`, from the Feit–Thompson Dade map to an arbitrary
+isometry `τ`).
+
+The `‖χ‖² = 1` case of `xAdjoinStepW_k_general`: the adjoined pair `{χ, χ̄}` is orthonormal (as in
+case (A) of (6.8.3) and in every application where the break is irreducible), while the non-anchor
+**members** may still be reducible.  The break's (5.2.d) image family `Rχ` is a parameter — the
+Dade version builds it internally from `dadeOrthonormalCharacterImageFamilyOfDiff`, which needs
+`χ ∈ Irr L`; here it is supplied, so the statement is `τ`-general.  The break decomposition is then
+`decompositionDaFromDiff_general` (auxiliary isometry `τ` itself, so `Da.tau1 = τ` by `rfl`). -/
+noncomputable def xAdjoinStepW_general
+    {τ : IntegralCharacterMap L G} {A : Set L} {Samb : Set (ClassFunction L ℂ)}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {S₁ : Set (ClassFunction L ℂ)}
+    (hS₁ : IsCoherent τ S₁ A) (hS₁Samb : S₁ ⊆ Samb)
+    (hisom : ∀ (T : Set (ClassFunction L ℂ)), (∀ s ∈ T, s ∈ zSupportedSpan (L := L) Samb A) →
+      ∀ φ ζ : ClassFunction L ℂ, φ ∈ Submodule.span ℤ T → ζ ∈ Submodule.span ℤ T →
+        ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
+    (χ : ClassFunction L ℂ)
+    (Rχ : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    (hχχ : ClassFunction.inner χ χ = 1)
+    (hχbarχbar : ClassFunction.inner χ.conj χ.conj = 1)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0)
+    (hχbarχ : ClassFunction.inner χ.conj χ = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner χ.conj x = 0)
+    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction L ℂ) (deg : ι → ℕ) (i₁ : ι)
+    (hi₁ : i₁ ∈ s)
+    (hmemdegdiffmem : ∀ i ∈ s, χmem i - deg i • χmem i₁ ∈ zSupportedSpan (L := L) S₁ A)
+    (hmemS1 : ∀ i ∈ s, χmem i ∈ S₁)
+    (mc : ι → ℝ) (hmempos : ∀ i ∈ s, 0 < mc i)
+    (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (χmem i) (χmem j) = if i = j then (mc i : ℂ) else 0)
+    {a : ℕ}
+    (Dmem : ∀ i ∈ s, CharacterPsiDecomposition (L := L) (G := G) τ (χmem i) 0)
+    (hortho_mem : ∀ i (hi : i ∈ s), (Dmem i hi).imageFamily.Orthogonal Rχ)
+    (htau1Dmem : ∀ i (hi : i ∈ s), (Dmem i hi).tau1 (χmem i) = hS₁.extension (χmem i))
+    (hdiffmem : χ - χ.conj ∈ zSupportedSpan (L := L) Samb A)
+    (hadiffmem : χ - a • χmem i₁ ∈ zSupportedSpan (L := L) Samb A)
+    (htau1_memaχ : τ (χ - a • χmem i₁) ∈ ZIrr G)
+    (ha1 : deg i₁ = 1)
+    (hDeg : 2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2 / mc i)
+    (hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
+      (zSupportedSpan (L := L) S₁ A ∪ {χmem i₁}))
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, χ.conj}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - χ.conj, χ - a • χmem i₁})) :
+    IsCoherent τ (S₁ ∪ {χ, χ.conj}) A := by
+  classical
+  have hχaχ1 : ClassFunction.inner χ (a • χmem i₁ : ClassFunction L ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁),
+      OddOrder.RepresentationTheory.inner_smul_right, hχ_S1 _ (hmemS1 i₁ hi₁), mul_zero]
+  have hχbaraχ1 : ClassFunction.inner χ.conj (a • χmem i₁ : ClassFunction L ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁),
+      OddOrder.RepresentationTheory.inner_smul_right, hχbar_S1 _ (hmemS1 i₁ hi₁), mul_zero]
+  exact xAdjoinStepW_k_general hS₁ hS₁Samb hisom χ
+    (by rw [hχχ]; norm_num) (by rw [hχbarχbar]; norm_num) hχχbar hχbarχ hχ_S1 hχbar_S1
+    s χmem deg i₁ hi₁ hmemdegdiffmem hmemS1 mc hmempos hmemortho Dmem
+    (decompositionDaFromDiff_general (τ := τ) (Samb := Samb) Rχ hisom hdiffmem hadiffmem
+      htau1_memaχ hχaχ1 hχbaraχ1 hχχbar)
+    rfl hortho_mem htau1Dmem hdiffmem hadiffmem htau1_memaχ ha1 hDeg hSgen hgen
+
+open scoped Classical in
 /-- **General norm-weighted (5.6) degree-square bound** (contrapositive of `xAdjoinStepW_k_general`;
 generalizes `S08.coherentDegreeSqNormBound_of_not_coherentW_k` from the Dade map to an arbitrary
 isometry `τ`).
@@ -664,5 +731,54 @@ theorem coherentDegreeSqNormBound_of_not_coherentW_k_general
   exact hnc ⟨xAdjoinStepW_k_general hS₁ hS₁Samb hisom χ hχχne hχbarχbarne hχχbar hχbarχ
     hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffmem hmemS1 mc hmempos hmemortho
     Dmem Da hDatau1 hortho_mem htau1Dmem hdiffmem hadiffmem htau1_memaχ ha1 hlt hSgen hgen⟩
+
+open scoped Classical in
+/-- **General norm-weighted (5.6) degree-square bound, irreducible break** (contrapositive of
+`xAdjoinStepW_general`; generalizes `S08.coherentDegreeSqNormBound_of_not_coherentW`).
+
+If `S₁` is coherent but `S₁ ∪ {χ, χ̄}` is **not**, for an orthonormal break pair `{χ, χ̄}`, then
+`∑ deg(i)²/‖χmem i‖² ≤ 2a`. -/
+theorem coherentDegreeSqNormBound_of_not_coherentW_general
+    {τ : IntegralCharacterMap L G} {A : Set L} {Samb : Set (ClassFunction L ℂ)}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {S₁ : Set (ClassFunction L ℂ)}
+    (hS₁ : IsCoherent τ S₁ A) (hS₁Samb : S₁ ⊆ Samb)
+    (hisom : ∀ (T : Set (ClassFunction L ℂ)), (∀ s ∈ T, s ∈ zSupportedSpan (L := L) Samb A) →
+      ∀ φ ζ : ClassFunction L ℂ, φ ∈ Submodule.span ℤ T → ζ ∈ Submodule.span ℤ T →
+        ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
+    (χ : ClassFunction L ℂ)
+    (Rχ : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    (hχχ : ClassFunction.inner χ χ = 1)
+    (hχbarχbar : ClassFunction.inner χ.conj χ.conj = 1)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0)
+    (hχbarχ : ClassFunction.inner χ.conj χ = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner χ.conj x = 0)
+    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction L ℂ) (deg : ι → ℕ) (i₁ : ι)
+    (hi₁ : i₁ ∈ s)
+    (hmemdegdiffmem : ∀ i ∈ s, χmem i - deg i • χmem i₁ ∈ zSupportedSpan (L := L) S₁ A)
+    (hmemS1 : ∀ i ∈ s, χmem i ∈ S₁)
+    (mc : ι → ℝ) (hmempos : ∀ i ∈ s, 0 < mc i)
+    (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (χmem i) (χmem j) = if i = j then (mc i : ℂ) else 0)
+    {a : ℕ}
+    (Dmem : ∀ i ∈ s, CharacterPsiDecomposition (L := L) (G := G) τ (χmem i) 0)
+    (hortho_mem : ∀ i (hi : i ∈ s), (Dmem i hi).imageFamily.Orthogonal Rχ)
+    (htau1Dmem : ∀ i (hi : i ∈ s), (Dmem i hi).tau1 (χmem i) = hS₁.extension (χmem i))
+    (hdiffmem : χ - χ.conj ∈ zSupportedSpan (L := L) Samb A)
+    (hadiffmem : χ - a • χmem i₁ ∈ zSupportedSpan (L := L) Samb A)
+    (htau1_memaχ : τ (χ - a • χmem i₁) ∈ ZIrr G)
+    (ha1 : deg i₁ = 1)
+    (hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
+      (zSupportedSpan (L := L) S₁ A ∪ {χmem i₁}))
+    (hgen : zSupportedSpan (L := L) (S₁ ∪ {χ, χ.conj}) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) S₁ A ∪ {χ - χ.conj, χ - a • χmem i₁}))
+    (hnc : ¬ Nonempty (IsCoherent τ (S₁ ∪ {χ, χ.conj}) A)) :
+    ∑ i ∈ s, ((deg i : ℝ)) ^ 2 / mc i ≤ 2 * (a : ℝ) := by
+  by_contra hlt
+  push Not at hlt
+  exact hnc ⟨xAdjoinStepW_general hS₁ hS₁Samb hisom χ Rχ hχχ hχbarχbar hχχbar hχbarχ
+    hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffmem hmemS1 mc hmempos hmemortho
+    Dmem hortho_mem htau1Dmem hdiffmem hadiffmem htau1_memaχ ha1 hlt hSgen hgen⟩
 
 end OddOrder.Peterfalvi.S07

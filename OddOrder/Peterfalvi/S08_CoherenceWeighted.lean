@@ -283,103 +283,26 @@ noncomputable def xAdjoinStepW
       (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L) := by
   classical
-  -- The trivially-derived orthogonalities `χ, χ̄ ⊥ a·χ₁` for the χ-decomposition `Da`.
-  have hχaχ1 : ClassFunction.inner (χ : ClassFunction ↥L ℂ)
-      (a • (χmem i₁ : ClassFunction ↥L ℂ)) = 0 := by
-    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁ : ClassFunction ↥L ℂ),
-      OddOrder.RepresentationTheory.inner_smul_right, hχ_S1 _ (hmemS1 i₁ hi₁), mul_zero]
-  have hχbaraχ1 : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj
-      (a • (χmem i₁ : ClassFunction ↥L ℂ)) = 0 := by
-    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁ : ClassFunction ↥L ℂ),
-      OddOrder.RepresentationTheory.inner_smul_right, hχbar_S1 _ (hmemS1 i₁ hi₁), mul_zero]
-  -- The χ-decomposition for the degree-matched difference `χ − a·χ₁`.
-  -- (`let`, not `have`/`set`, so `Da.tau1 = τ` / `Da.imageFamily = R(χ)` reduce definitionally.)
-  let Da := OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp χ hrealχ hdiffsuppχ
-    hdiffasuppχ htau1_memaχ hχaχ1 hχbaraχ1 hχχbar
-  -- `Da.X ∈ ZIrr` (integer combination of the orthonormal `R(χ)` family) ⟹ `Da.Y ∈ ZIrr`.
-  have hDaX_ZIrr : Da.X ∈ ZIrr G := by
-    rw [Da.X_eq]
-    refine Submodule.sum_mem _ (fun α hα => ?_)
-    rw [Int.cast_smul_eq_zsmul ℂ (Da.coeff α) α]
-    exact Submodule.smul_mem _ (Da.coeff α) (Da.imageFamily.mem_ZIrr α hα)
-  have hYeq : Da.Y = Da.X - OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-      (hyp.fullDadeIsometryData)
-      ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)) := by
-    have h : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
-        ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)) = Da.X - Da.Y :=
-      Da.tau1_image
-    rw [h]; abel
-  have hDaY_ZIrr : Da.Y ∈ ZIrr G := by
-    rw [hYeq]; exact Submodule.sub_mem _ hDaX_ZIrr htau1_memaχ
-  have hchi1chi1 : ClassFunction.inner (χmem i₁ : ClassFunction ↥L ℂ)
-      (χmem i₁ : ClassFunction ↥L ℂ) = ((mc i₁ : ℝ) : ℂ) := by
-    rw [hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl]
-  -- (5.2.e) `⟨Da.X, ν χᵢ⟩ = 0` per member.
-  have hXortho : ∀ i ∈ s, ClassFunction.inner Da.X (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) =
-      0 :=
-    fun i hi =>
-      inner_decomposition_X_extension_member_eq_zero hS₁ Da (Dmem i hi) (hortho_mem i hi)
-        (htau1Dmem i hi)
-  -- (5.6.1) cross-term `hfound` per member (`inner_dade_extension_of_supported`).
-  have hfound : ∀ i ∈ s, ClassFunction.inner
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
-        ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)))
-      (hS₁.extension ((χmem i : ClassFunction ↥L ℂ) - deg i • (χmem i₁ : ClassFunction ↥L ℂ))) =
-      ClassFunction.inner ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ))
-        ((χmem i : ClassFunction ↥L ℂ) - deg i • (χmem i₁ : ClassFunction ↥L ℂ)) := fun i hi => by
-    refine inner_dade_extension_of_supported hyp hS₁ hdiffasuppχ ?_
+  -- Same `Samb = univ` instantiation as `xAdjoinStepW_k`; the break's (5.2.d) family is the
+  -- two-element conjugate-pair Dade family (which is why `χ` must be irreducible here).
+  refine OddOrder.Peterfalvi.S07.xAdjoinStepW_general (Samb := Set.univ) hS₁ (Set.subset_univ _)
+    (dade_hisom_of_zSupportedSpan hyp Set.univ) (χ : ClassFunction ↥L ℂ)
+    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp χ hrealχ hdiffsuppχ)
+    hχχ hχbarχbar hχχbar hχbarχ hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ ?_ hmemS1 mc hmempos hmemortho
+    Dmem hortho_mem htau1Dmem ?_ ?_ htau1_memaχ ha1 hDeg hSgen hgen
+  -- the scaled member differences lie in the `A₀`-supported part of `ℤ[S₁]`
+  · intro i hi
     refine OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr ⟨?_, hmemdegdiffsupp i hi⟩
     refine Submodule.sub_mem _ (Submodule.subset_span (hmemS1 i hi)) ?_
     rw [← Nat.cast_smul_eq_nsmul ℤ (deg i) (χmem i₁ : ClassFunction ↥L ℂ)]
     exact Submodule.smul_mem _ _ (Submodule.subset_span (hmemS1 i₁ hi₁))
-  -- The (5.6.1) member coefficient `⟨Da.Y, ν χᵢ⟩` in the `lambda_eq_zero_and_Z_eq_zero` form.
-  have hcoeffval : ∀ i ∈ s, ClassFunction.inner Da.Y
-      (hS₁.extension (χmem i : ClassFunction ↥L ℂ)) =
-      (a : ℂ) * ((mc i₁ : ℝ) : ℂ) * (if i = i₁ then 1 else 0) -
-        ((a : ℂ) * ((mc i₁ : ℝ) : ℂ) + ClassFunction.inner
-          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
-            ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)))
-          (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ))) * (deg i : ℂ) := by
-    intro i hi
-    have key := inner_Y_extension_member_eq hyp hS₁ χ hYeq (hXortho i hi) (hfound i hi)
-      (hχ_S1 _ (hmemS1 i hi)) (hχ_S1 _ (hmemS1 i₁ hi₁)) hchi1chi1
-    rw [hmemortho i₁ hi₁ i hi] at key
-    rw [key]
-    rcases eq_or_ne i i₁ with h | h
-    · subst h; simp
-    · rw [if_neg h, if_neg (fun hc : i₁ = i => h hc.symm)]; ring
-  -- crux1 via the λ-form collapse.
-  have hcrux1 : ClassFunction.inner
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
-        ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)))
-      (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ)) = -((a : ℂ) * ((mc i₁ : ℝ) : ℂ)) :=
-    crux1_of_memberFamilyW hyp
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) rfl
-      hS₁ (χ : ClassFunction ↥L ℂ) s (fun i => (χmem i : ClassFunction ↥L ℂ)) deg i₁ hi₁ Da
-      hDaY_ZIrr hmemS1
-      mc hmempos hmemortho hcoeffval htau1_memaχ ha1 hDeg
-  -- crux2 clean: `⟨τ(χ − χ̄), ν χ₁⟩ = 0` from `R(χ) ⊥ R(χ₁)`.
-  have hcrux2 : ClassFunction.inner
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
-        ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj))
-      (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ)) = 0 := by
-    rw [OddOrder.RepresentationTheory.inner_conj_symm, Da.imageFamily.image_eq,
-      OddOrder.RepresentationTheory.inner_sum_right,
-      Finset.sum_eq_zero (fun α hα =>
-        OddOrder.Peterfalvi.S07.inner_extension_member_orthogonal_imageSet hS₁ Da.imageFamily
-          (Dmem i₁ hi₁) (hortho_mem i₁ hi₁) (htau1Dmem i₁ hi₁) hα), star_zero]
-  -- `(χ − χ̄)^τ ∈ ZIrr` from the `R(χ)` family (`image_eq`); `(χ − a·χ₁)^τ ∈ ZIrr` is
-  -- `htau1_memaχ`.
-  have hτdiffZ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-      (hyp.fullDadeIsometryData)
-      ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj) ∈ ZIrr G := by
-    rw [Da.imageFamily.image_eq]
-    exact Submodule.sum_mem _ (fun α hα => Da.imageFamily.mem_ZIrr α hα)
-  -- Adjoin via the (T8.11 option A) bridge.
-  exact retarget_isCoherent_of_extensionImage hyp
-    (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) rfl
-    hS₁ χ hdiffsuppχ hdiffasuppχ hχχ hχbarχbar hχχbar hχbarχ hchi1chi1 hχ_S1 hχbar_S1
-    (hmemS1 i₁ hi₁) htau1_memaχ hτdiffZ hcrux1 hcrux2 hSgen hgen
+  -- `χ − χ̄` and `χ − a·χ₁` are `A₀`-supported (`Samb = univ` makes the span clause vacuous)
+  · refine OddOrder.Peterfalvi.S07.mem_zSupportedSpan_univ_iff.mpr ?_
+    rw [show (χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj
+      = -((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)) from by abel,
+      ClassFunction.support_neg]
+    exact hdiffsuppχ
+  · exact OddOrder.Peterfalvi.S07.mem_zSupportedSpan_univ_iff.mpr hdiffasuppχ
 
 open scoped Classical in
 /-- **Norm-weighted (5.6) forward adjoin engine, reducible BREAK (`‖χ‖² ≠ 1`).**
