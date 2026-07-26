@@ -185,4 +185,49 @@ theorem exists_scalar_of_finrank_eq_one_of_mapsTo
     _ = c • (a • (v : N)) := by rw [smul_comm]
     _ = c • x := by rw [hav]
 
+open Module in
+/-- **The character of an invariant line.**  If every `ρ g` maps the `1`-dimensional subspace `W`
+into itself, the scalars supplied by `exists_scalar_of_finrank_eq_one_of_mapsTo` assemble into a
+monoid homomorphism `χ : Q →* K` with `ρ g x = χ g • x` for all `x ∈ W`.
+
+The scalar is unique because `W` contains a nonzero vector, and uniqueness upgrades
+`ρ 1 = 1` and `ρ (g * h) = ρ g ∘ ρ h` to `χ 1 = 1` and `χ (g * h) = χ g * χ h`.  (`χ` lands in
+`K` as a multiplicative monoid; each value is a unit since `χ g * χ g⁻¹ = χ 1 = 1`.)
+
+This is BG Lemma 2.7's pair of characters `χ₁, χ₂ : Q →* 𝔽_p^×`, one for each line of the
+decomposition `exists_isCompl_finrank_one_of_not_isSimpleModule` (issue 0150). -/
+theorem exists_monoidHom_scalar_of_finrank_eq_one
+    {K N : Type*} [Field K] [AddCommGroup N] [Module K N] {Q : Type*} [Group Q]
+    (ρ : Representation K Q N) {W : Submodule K N} (hW : finrank K W = 1)
+    (hinv : ∀ g : Q, ∀ x ∈ W, ρ g x ∈ W) :
+    ∃ χ : Q →* K, ∀ (g : Q) (x : N), x ∈ W → ρ g x = χ g • x := by
+  classical
+  obtain ⟨v, hv0, -⟩ := finrank_eq_one_iff'.mp hW
+  have hvW : (v : N) ∈ W := v.2
+  have hvne : (v : N) ≠ 0 := fun h => hv0 (Subtype.ext h)
+  have huniq : ∀ c c' : K, c • (v : N) = c' • (v : N) → c = c' := by
+    intro c c' h
+    have hsub : (c - c') • (v : N) = 0 := by rw [sub_smul, h, sub_self]
+    rcases smul_eq_zero.mp hsub with h1 | h2
+    · linear_combination (norm := ring_nf) h1
+    · exact absurd h2 hvne
+  have hex : ∀ g : Q, ∃ c : K, ∀ x ∈ W, ρ g x = c • x := fun g =>
+    exists_scalar_of_finrank_eq_one_of_mapsTo hW (ρ g) (hinv g)
+  set c : Q → K := fun g => (hex g).choose with hc_def
+  have hc : ∀ (g : Q) (x : N), x ∈ W → ρ g x = c g • x := fun g => (hex g).choose_spec
+  have hone : c 1 = 1 := by
+    refine huniq _ _ ?_
+    rw [← hc 1 v hvW, map_one]
+    simp
+  have hmul : ∀ g h : Q, c (g * h) = c g * c h := by
+    intro g h
+    refine huniq _ _ ?_
+    have h1 : ρ (g * h) (v : N) = c (g * h) • (v : N) := hc _ v hvW
+    have h2 : ρ (g * h) (v : N) = ρ g (ρ h (v : N)) := by rw [map_mul]; rfl
+    have h3 : ρ h (v : N) = c h • (v : N) := hc h v hvW
+    have h4 : ρ g (c h • (v : N)) = c h • (c g • (v : N)) := by
+      rw [map_smul, hc g v hvW]
+    rw [← h1, h2, h3, h4, smul_smul, mul_comm]
+  exact ⟨⟨⟨c, hone⟩, fun {g h} => hmul g h⟩, hc⟩
+
 end OddOrder.RepresentationTheory
