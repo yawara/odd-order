@@ -36,20 +36,14 @@ isometry `hyp.tau` (Dade datum on `A(L)`) after the ambient identification `shar
 the map is an *arbitrary* linear extension off the supported lattice
 (`dadeIntegralCharacterMap_apply_of_support`), so only the identical datum (transported), not a
 re-construction via `of_isTISubset`, reproduces `hyp.tau`. -/
-theorem hconj_transport_ambient {L : Subgroup G} [Fintype G] {A A' : Set G} (hEq : A = A')
-    (dade : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : dade.HConjInvariant) :
-    (hEq ▸ dade : OddOrder.Peterfalvi.S04.Hypothesis G A' L).HConjInvariant := by
-  subst hEq; exact hconj
-
 theorem dadeIntegralCharacterMap_transport_ambient {L : Subgroup G} [Fintype G] [Fintype ↥L]
     [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
     {A A' : Set G} (hEq : A = A')
-    (dade : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : dade.HConjInvariant)
-    (hconj' : (hEq ▸ dade : OddOrder.Peterfalvi.S04.Hypothesis G A' L).HConjInvariant) :
+    (dade : OddOrder.Peterfalvi.S04.Hypothesis G A L) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hEq ▸ dade)
-        ((hEq ▸ dade).fullDadeIsometryData hconj')
+        ((hEq ▸ dade).fullDadeIsometryData)
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dade
-        (dade.fullDadeIsometryData hconj) := by
+        (dade.fullDadeIsometryData) := by
   subst hEq; rfl
 
 /-- **The centralizer-support of `N^#` collapses to `N^#` for a Frobenius `L` with kernel `N`.**
@@ -182,7 +176,7 @@ noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
   have hconj' : (hEq ▸ hyp.dadeData.dade :
       OddOrder.Peterfalvi.S04.Hypothesis G
         (OddOrder.Peterfalvi.S08.sharpImage (hyp.H.subgroupOf L)) L).HConjInvariant :=
-    hconj_transport_ambient hEq hyp.dadeData.dade hyp.hconj
+    OddOrder.Peterfalvi.S04.Hypothesis.hConjInvariant _
   have hoddL : Odd (Nat.card ↥L) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
   refine
     { H := hyp.H.subgroupOf L
@@ -204,7 +198,7 @@ noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
           S_eq := rfl
           cases := Or.inl hfrob }
       tau_eq :=
-        dadeIntegralCharacterMap_transport_ambient hEq hyp.dadeData.dade hyp.hconj hconj'
+        dadeIntegralCharacterMap_transport_ambient hEq hyp.dadeData.dade
       S_eq := rfl
       A0_eq := by rw [hset]; rfl }
   -- `H = L_F` is nilpotent: `maxNilpotentNormalHall` nilpotency transported to the

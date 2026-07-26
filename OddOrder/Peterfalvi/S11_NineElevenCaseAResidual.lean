@@ -68,8 +68,8 @@ theorem caseA_sThree_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (chars : Section11CharacterData data chief)
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj46 : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj46)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -120,7 +120,7 @@ theorem caseA_sThree_coherent [Finite G] {M : Subgroup G} {A : Set G}
   exact OddOrder.Peterfalvi.S07.uniform_degree_coherence_of_families
     ((sOf_finite data (chief.H0 ⊔ cprimeSub data chief)).subset Set.sdiff_subset)
     hχ₀
-    (fun η hη => sOf_memberRFamily hG hM data h46 hKeq hconj46 htau hKsupp hη.1)
+    (fun η hη => sOf_memberRFamily hG hM data h46 hKeq htau hKsupp hη.1)
     (fun a ha b hb hab =>
       OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
         (hIKF ha.1) (hIKF hb.1) hab)
@@ -128,17 +128,17 @@ theorem caseA_sThree_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (fun {φ ψ} hφ hψ => by
       rw [htau]
       exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported h46.dade0
-        hconj46 (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hφ)
+        (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hφ)
         (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hψ))
     (fun a ha b hb => by
       rw [htau]
       exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        h46.dade0 hconj46 (hsuppdiff a ha b hb)
+        h46.dade0 (hsuppdiff a ha b hb)
         (Submodule.sub_mem _ (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hIKF ha.1))
           (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hIKF hb.1))))
     hsuppdiff
     (fun {φ ξ} hφ hξ h1 h2 =>
-      sOf_memberRFamily_orthogonal hG hM data h46 hKeq hconj46 htau hKsupp hVsub hφ.1 hξ.1 h1 h2)
+      sOf_memberRFamily_orthogonal hG hM data h46 hKeq htau hKsupp hVsub hφ.1 hξ.1 h1 h2)
     (fun a ha => (hS3deg a ha).trans (hS3deg χ₀ hχ₀).symm)
     (by
       rw [hS3deg χ₀ hχ₀]
@@ -172,8 +172,8 @@ theorem caseA_normBound_of_sevenEightRefutation [Finite G] {M : Subgroup G} {A :
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj46 : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj46)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -191,7 +191,7 @@ theorem caseA_normBound_of_sevenEightRefutation [Finite G] {M : Subgroup G} {A :
   intro S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs h2a hCUprime hS3deg hcount hFbound hS2deg
   set A0 : Set ↥M := OddOrder.Peterfalvi.S04.supportInSubgroup
     (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M with hA0def
-  obtain ⟨c₃⟩ := caseA_sThree_coherent hG hM chars h46 hKeq hconj46 htau hKsupp hVsub
+  obtain ⟨c₃⟩ := caseA_sThree_coherent hG hM chars h46 hKeq htau hKsupp hVsub
     hS₂conj hS₃ne hS3deg
   obtain ⟨U₁, hCU₁, hU₁U, hU₁a, hTI⟩ := caseA_nineElevenTwo_tiWitness caseA hS3deg hS2deg
   have hUpU₁ : uprimeSub data ≤ U₁ := by
@@ -283,7 +283,7 @@ theorem caseA_normBound_of_sevenEightRefutation [Finite G] {M : Subgroup G} {A :
       ∈ OddOrder.RepresentationTheory.ZIrr G := by
     rw [htau]
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      h46.dade0 hconj46 hαsupp hαZIrr
+      h46.dade0 hαsupp hαZIrr
   have htauiso : ∀ {φ ψ : ClassFunction ↥M ℂ}, φ.support ⊆ A0 → ψ.support ⊆ A0 →
       ClassFunction.inner
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau φ)
@@ -292,7 +292,7 @@ theorem caseA_normBound_of_sevenEightRefutation [Finite G] {M : Subgroup G} {A :
     intro φ ψ hφ hψ
     rw [htau]
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported h46.dade0
-      hconj46 hφ hψ
+      hφ hψ
   have hταnorm := htauiso hαsupp hαsupp
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄, x ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) →
       x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
@@ -436,8 +436,8 @@ theorem caseA_sevenEightRefutation [Finite G] {M : Subgroup G} {A : Set G}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj46 : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj46)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -480,13 +480,13 @@ theorem caseA_sevenEightRefutation [Finite G] {M : Subgroup G} {A : Set G}
     intro φ ψ hφ hψ
     rw [htaudef, htau]
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported h46.dade0
-      hconj46 hφ hψ
+      hφ hψ
   have htauZ : ∀ {φ : ClassFunction ↥M ℂ}, φ.support ⊆ A0 →
       φ ∈ OddOrder.RepresentationTheory.ZIrr ↥M → tau φ ∈ OddOrder.RepresentationTheory.ZIrr G := by
     intro φ hsupp hZ
     rw [htaudef, htau]
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported h46.dade0
-      hconj46 hsupp hZ
+      hsupp hZ
   -- ── the (9.11.2) TI-witness supplies `U₁` with `C ≤ U₁ ≤ U`, `[U:U₁] = a`
   obtain ⟨U₁, hCU₁, hU₁U, hU₁a, -⟩ := caseA_nineElevenTwo_tiWitness caseA hS3deg hS2deg
   obtain ⟨e, hedef⟩ : ∃ e : ℕ, e = (cSub data chief).relIndex U₁ := ⟨_, rfl⟩
@@ -596,7 +596,7 @@ theorem caseA_sevenEightRefutation [Finite G] {M : Subgroup G} {A : Set G}
   have hcross : ∀ φ ∈ S₂, ∀ lam ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) \ S₂,
       ClassFunction.inner (c₁.extension φ) (c₃.extension lam) = 0 := by
     intro φ hφ lam hlam
-    exact sOf_coherent_extension_cross_orthogonal hG hM data h46 hKeq hconj46 htau hKsupp hVsub
+    exact sOf_coherent_extension_cross_orthogonal hG hM data h46 hKeq htau hKsupp hVsub
       hS₂sub hS₃sub c₁ c₃ hφ (hS₂conj hφ) hlam (hS₃conj lam hlam)
       (fun h => hlam.2 (h ▸ hφ)) (fun h => (hS₃conj lam hlam).2 (h ▸ hφ))
   -- ── `β = λ₁ − e·ψ₁`: support, integrality, `τ`-image
@@ -829,8 +829,8 @@ theorem caseA_normBound [Finite G] {M : Subgroup G} {A : Set G}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj46 : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj46)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -839,8 +839,8 @@ theorem caseA_normBound [Finite G] {M : Subgroup G} {A : Set G}
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M) :=
-  caseA_normBound_of_sevenEightRefutation hG hM caseA h46 hKeq hconj46 htau hKsupp hVsub
-    (caseA_sevenEightRefutation hG hM caseA h46 hKeq hconj46 htau hKsupp hVsub)
+  caseA_normBound_of_sevenEightRefutation hG hM caseA h46 hKeq htau hKsupp hVsub
+    (caseA_sevenEightRefutation hG hM caseA h46 hKeq htau hKsupp hVsub)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11.2)–(9.11.8), discharged at §9 level**: the equality-configuration
@@ -856,8 +856,8 @@ theorem caseA_equalityRefutation [Finite G] {M : Subgroup G} {A : Set G}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj46 : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj46)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -868,7 +868,7 @@ theorem caseA_equalityRefutation [Finite G] {M : Subgroup G} {A : Set G}
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M) :=
   caseA_equalityRefutation_of_sTwoExtraction_normBound hG caseA _ _
     (caseA_sTwoExtraction hG hM caseA _ _)
-    (caseA_normBound hG hM caseA h46 hKeq hconj46 htau hKsupp hVsub)
+    (caseA_normBound hG hM caseA h46 hKeq htau hKsupp hVsub)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11) at §9 level, with the case (9.7.a) residual discharged** (issue 1045).
@@ -890,8 +890,7 @@ theorem nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub data)
     (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
-    (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
@@ -905,9 +904,9 @@ theorem nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
         (h46.tau.restrict Set.subset_union_left hAnorm))
       (sOf data (chief.H0 ⊔ chars.Cprime))
       (OddOrder.Peterfalvi.S04.supportInSubgroup A M)) :=
-  sOf_nineEleven_coherent hG hM chars h46 hKeq hHle hconj htau hAnorm hKsupp hVsub dd hdd
+  sOf_nineEleven_coherent hG hM chars h46 hKeq hHle htau hAnorm hKsupp hVsub dd hdd
     (fun caseA => caseA_irrCut_two_le_ncard hG hM caseA)
-    (fun caseA => caseA_equalityRefutation hG hM caseA h46 hKeq hconj htau hKsupp hVsub)
+    (fun caseA => caseA_equalityRefutation hG hM caseA h46 hKeq htau hKsupp hVsub)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11) for a maximal subgroup of type II** (issue 1045 / hub issue 9163 §3).
@@ -930,8 +929,7 @@ theorem typeII_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub (typesIIIIIIVSetup_of_isTypeII hM htypeII))
     (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
-    (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
@@ -949,7 +947,7 @@ theorem typeII_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
   nineEleven_coherent hG hM
     (mkSection11CharacterData (typesIIIIIIVSetup_of_isTypeII hM htypeII) chief
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau))
-    h46 hKeq hHle hconj htau hAnorm hKsupp hVsub dd hdd
+    h46 hKeq hHle htau hAnorm hKsupp hVsub dd hdd
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11) at the `A₀` level, with the case (9.7.a) residual discharged.**
@@ -966,8 +964,7 @@ theorem nineEleven_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub data)
     (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
-    (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
@@ -980,9 +977,9 @@ theorem nineEleven_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
       (sOf data (chief.H0 ⊔ chars.Cprime))
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) :=
-  sOf_nineEleven_coherent_A0 hG hM chars h46 hKeq hHle hconj htau hAnorm hKsupp hVsub dd hdd
+  sOf_nineEleven_coherent_A0 hG hM chars h46 hKeq hHle htau hAnorm hKsupp hVsub dd hdd
     (fun caseA => caseA_irrCut_two_le_ncard hG hM caseA)
-    (fun caseA => caseA_equalityRefutation hG hM caseA h46 hKeq hconj htau hKsupp hVsub)
+    (fun caseA => caseA_equalityRefutation hG hM caseA h46 hKeq htau hKsupp hVsub)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (10.11), the type-II second assertion** (issue 1048): for a maximal subgroup `M`
@@ -1013,8 +1010,7 @@ theorem typeII_sSet_coherent [Finite G] {M : Subgroup G} {A : Set G}
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub (typesIIIIIIVSetup_of_isTypeII hM htypeII))
     (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
-    (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
@@ -1058,7 +1054,7 @@ theorem typeII_sSet_coherent [Finite G] {M : Subgroup G} {A : Set G}
   have hCp : cprimeSub (typesIIIIIIVSetup_of_isTypeII hM htypeII) chief = ⊥ :=
     typeII_cprimeSub_eq_bot chief hUab
   refine ⟨⟨hpW2, hHpq, hHEA⟩, ?_⟩
-  have hcoh := typeII_nineEleven_coherent hG hM htypeII chief h46 hKeq hHle hconj htau
+  have hcoh := typeII_nineEleven_coherent hG hM htypeII chief h46 hKeq hHle htau
     hAnorm hKsupp hVsub dd hdd
   rwa [hH0bot, hCp, sup_bot_eq, sOf_bot_eq_sSet] at hcoh
 

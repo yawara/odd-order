@@ -39,8 +39,8 @@ noncomputable def Q_sharp_hypothesis76_base [Fintype G] [Invertible (Nat.card G 
       (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G)) hyp.T := by
   refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeBase
     (Q_sharp_hypothesis71 hG hyp hvd)
-    (((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
-      (Q_sharp_hconj hG hyp hvd)).toDadeIsometryData.isDadeIsometry) hyp.Q ?_ ?_ rfl φ₀
+    (((Q_sharp_dadeHypothesis hG hyp
+        hvd).fullDadeIsometryData).toDadeIsometryData.isDadeIsometry) hyp.Q ?_ ?_ rfl φ₀
   · rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
   · intro l h hh
     have hnorm : Subgroup.normalizer (hyp.Q : Set G) = hyp.T := normalizer_Q_eq_T hG hyp
@@ -766,13 +766,13 @@ theorem Q_sharp_hypothesis76_base_cCoeff_int [Finite G]
     exact Submodule.sub_mem _ (hzetaZ i) (hzetaZ 0)
   -- The Dade image is a virtual character ((2.10) `preserves_virtualCharacters`).
   have hτeq : (Q_sharp_hypothesis76_base hG hyp hvd φ₀).hyp71.τ
-      = ((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
-          (Q_sharp_hconj hG hyp hvd)).toDadeIsometryData.toDadeMap := rfl
+      = ((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData).toDadeIsometryData.toDadeMap
+          := rfl
   have hpres : (Q_sharp_hypothesis76_base hG hyp hvd φ₀).hyp71.τ
       ((Q_sharp_hypothesis76_base hG hyp hvd φ₀).psiSupp i) ∈ ZIrr G := by
     rw [hτeq]
-    exact ((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
-      (Q_sharp_hconj hG hyp hvd)).preserves_virtualCharacters _ hψZ
+    exact ((Q_sharp_dadeHypothesis hG hyp
+        hvd).fullDadeIsometryData).preserves_virtualCharacters _ hψZ
   -- `c_i = ⟨τψ_i, χ⟩ ∈ ℤ`.
   rw [OddOrder.Peterfalvi.S09.Hypothesis76.cCoeff]
   exact ClassFunction.inner_mem_ZIrr_int hpres hχ

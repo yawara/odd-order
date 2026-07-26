@@ -53,7 +53,7 @@ theorem tSideCoherentExtension_inner_trivial [Finite G]
     intro c x
     simpa only [tSideDadeMap] using
       (OddOrder.Peterfalvi.S09.Cert.dadeIntegralCharacterMap_smul_complex
-        side.dade (side.dade.fullDadeIsometryData side.hconj) c x)
+        side.dade (side.dade.fullDadeIsometryData) c x)
   have hconstG :
       OddOrder.Peterfalvi.S09.Hypothesis71.constOne G =
         trivialClassFunction G := by
@@ -116,12 +116,12 @@ theorem tSideDadeMap_conj_of_support [Finite G]
     rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]
     rfl
   change (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap side.dade
-      (side.dade.fullDadeIsometryData side.hconj) φ).conj =
+      (side.dade.fullDadeIsometryData) φ).conj =
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap side.dade
-      (side.dade.fullDadeIsometryData side.hconj) φ.conj
+      (side.dade.fullDadeIsometryData) φ.conj
   rw [hbridgeG, hbridgeT]
   exact (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mapRingEquiv_comm
-    side.dade (side.dade.fullDadeIsometryData side.hconj)
+    side.dade (side.dade.fullDadeIsometryData)
     Complex.conjAe.toRingEquiv hφ).symm
 
 open scoped Classical in

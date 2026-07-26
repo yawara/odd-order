@@ -205,7 +205,7 @@ theorem xchi_inner_eq_of_anchored
       = ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
           (OddOrder.Peterfalvi.S06.columnSum h46 χ₂') + (a₀ : ℂ) ^ 2 := by
     rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-        hyp.dade hyp.hconj
+        hyp.dade
         (S := ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁,
           OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁} : Set (ClassFunction ↥L ℂ)))
         (by intro s hs; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs

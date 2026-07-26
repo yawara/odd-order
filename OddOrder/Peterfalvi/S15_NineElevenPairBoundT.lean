@@ -208,13 +208,13 @@ noncomputable def Hypothesis.sSet_memberPsiDecomp_T [Finite G]
     {S₂ : Set (ClassFunction ↥hyp.T ℂ)}
     (hS₂coh : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)))
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData))
       S₂ (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))
     {φ : ClassFunction ↥hyp.T ℂ} (hφ : φ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
     (hφS₂ : φ ∈ S₂) (hφcS₂ : (φ : ClassFunction ↥hyp.T ℂ).conj ∈ S₂) :
     { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥hyp.T) (G := G)
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-          ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))) φ 0 //
+          ((hyp.dadeHypT hG hTP).fullDadeIsometryData)) φ 0 //
       D.imageFamily = hyp.sSet_memberRFamily_T hG hnoV pins hvd hTP Tdata hU hW1 hW2 hφ ∧
       D.tau1 φ = hS₂coh.extension φ } := by
   classical
@@ -277,7 +277,7 @@ noncomputable def Hypothesis.sSet_breakPsiDecomp_T [Finite G]
     (hdiffasupp : (χ - a • χ₁).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)
     (htau1_mema : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData)
         (χ - a • χ₁) ∈ ZIrr G)
     (hχaχ1 : ClassFunction.inner χ (a • χ₁ : ClassFunction ↥hyp.T ℂ) = 0)
     (hχbaraχ1 : ClassFunction.inner (χ : ClassFunction ↥hyp.T ℂ).conj
@@ -285,9 +285,9 @@ noncomputable def Hypothesis.sSet_breakPsiDecomp_T [Finite G]
     (hχχbar : ClassFunction.inner χ (χ : ClassFunction ↥hyp.T ℂ).conj = 0) :
     { Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥hyp.T) (G := G)
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-          ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))) χ (a • χ₁) //
+          ((hyp.dadeHypT hG hTP).fullDadeIsometryData)) χ (a • χ₁) //
       Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-          ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)) ∧
+          ((hyp.dadeHypT hG hTP).fullDadeIsometryData) ∧
       Da.imageFamily = hyp.sSet_memberRFamily_T hG hnoV pins hvd hTP Tdata hU hW1 hW2 hχ } := by
   classical
   haveI := hyp.finiteG
@@ -308,10 +308,10 @@ noncomputable def Hypothesis.sSet_breakPsiDecomp_T [Finite G]
   exact ⟨OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
     (hyp.sSet_memberRFamily_T hG hnoV pins hvd hTP Tdata hU hW1 hW2 hχ)
     (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-      ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)))
+      ((hyp.dadeHypT hG hTP).fullDadeIsometryData))
     (fun ψ' ζ' hψ' hζ' =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-        (hyp.dadeHypT hG hTP) (hyp.dadeHypT_hconj hG hTP) hSdiff hψ' hζ')
+        (hyp.dadeHypT hG hTP) hSdiff hψ' hζ')
     rfl htau1_mema hχaχ1 hχbaraχ1 hχχbar, rfl, rfl⟩
 
 set_option maxHeartbeats 1600000 in
@@ -363,14 +363,14 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
       f ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.T) S₂
         (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) →
       hyp.indT f = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)) f := fun f hf => by
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData) f := fun f hf => by
     rw [hyp.indT_apply, ← hyp.tInstance_dade_eq_induce hG hnoV hTP
       (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hf).2]
   have cohS₂ := cohS₂_indT.congrMap hindT_dade
   -- (2) not-coherent (Dade side) from `hnopair` (indT side), the contrapositive of `congrMap`.
   have hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)))
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData))
       (S₂ ∪ {χ, χ.conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)) := by
     rintro ⟨c⟩
@@ -536,12 +536,12 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T :=
     hyp.sSet_scaledDiff_support_T hG hvd hχS (hmemsSet i₁) hψdeg
   have htau1ψ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-      ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))
+      ((hyp.dadeHypT hG hTP).fullDadeIsometryData)
       (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
         (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ)
         - e • χmem i₁) ∈ ZIrr G :=
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported (hyp.dadeHypT hG hTP)
-      (hyp.dadeHypT_hconj hG hTP) hdiffasuppχ
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported (hyp.dadeHypT hG
+        hTP) hdiffasuppχ
       (Submodule.sub_mem _ (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr hχfam)
         (nsmul_mem (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hmemfam i₁)) e))
   have hcover : ∀ x ∈ S₂, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧ χmem j = x := by
@@ -608,7 +608,7 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
         (fun h => hχcnotS₂ (h ▸ hmemS1set i)))
   -- (9) fire the norm-weighted (5.6) engine (contrapositive of `xAdjoinStepW_k`).
   have hbound := OddOrder.Peterfalvi.S08.coherentDegreeSqNormBound_of_not_coherentW_k
-    (hyp.dadeHypT hG hTP) (hyp.dadeHypT_hconj hG hTP) cohS₂
+    (hyp.dadeHypT hG hTP) cohS₂
     (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)
       (ξ : ClassFunction ↥(OddOrder.Peterfalvi.S11.huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) ℂ))
     hdiffsuppχ hχχne hχbχbne hχψb hχbψ hψ_S1 hψbar_S1

@@ -207,7 +207,7 @@ theorem Hypothesis.coherentIndS_muColumn_vanish_regular [Finite G]
   -- `c(γ)` is the honest `A₀`-Dade image, vanishing at the regular `x`
   have hcγ : c.extension γ
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-          ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) γ := by
+          ((hyp.dadeHypS0 hG).fullDadeIsometryData) γ := by
     rw [c.extends_on_supported γ ⟨hγspan, hγsupp⟩, hyp.indS_apply,
       hyp.sInstance_dade0_eq_induce hG hnoV hγA0supp]
   have hcγx : c.extension γ x = 0 := by
@@ -285,7 +285,7 @@ theorem Hypothesis.coherentIndS_muColumn_pin_of_irr [Finite G]
         (sSet (hyp.toTypesIIIIIIVSetupS hG))
         (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S) →
       hyp.indS φ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) φ := fun φ hφ => by
+        ((hyp.dadeHypS hG).fullDadeIsometryData) φ := fun φ hφ => by
     rw [hyp.indS_apply, hyp.sInstance_dade_eq_induce hG hnoV hφ.2]
   obtain ⟨E, hEsub, hEsum⟩ :=
     hyp.sSet_coherent_extension_eq_sum_memberRFamily hG hnoV

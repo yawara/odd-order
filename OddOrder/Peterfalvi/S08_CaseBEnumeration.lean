@@ -314,7 +314,7 @@ noncomputable def caseB_member_psiDecomposition
       have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_conj_inner hyp (hxeq ▸ hirrx)
-    exact memberExtensionDecomposition hyp.dade hyp.hconj hS₁coh ⟨x, hirrx⟩
+    exact memberExtensionDecomposition hyp.dade hS₁coh ⟨x, hirrx⟩
       hreal hdiffsupp hxS₁ (hS₁conj.conj_mem hxS₁) hνZ hχχbar
 
 /-- **Peterfalvi (6.8.2) case-(B) per-member `(5.4)` decomposition bundled with its (5.2.e)
@@ -369,7 +369,7 @@ noncomputable def caseB_member_orthoDatum
     (hxbarχbar : ClassFunction.inner x.conj (χ : ClassFunction ↥L ℂ).conj = 0) :
     { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau x 0 //
       D.imageFamily.Orthogonal (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-          hyp.dade hyp.hconj χ hrealχ hdiffsuppχ) ∧
+          hyp.dade χ hrealχ hdiffsuppχ) ∧
         D.tau1 x = hS₁coh.extension x } := by
   classical
   haveI : Fintype ↥H := Fintype.ofFinite _
@@ -405,7 +405,7 @@ noncomputable def caseB_member_orthoDatum
       { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau
           (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) 0 //
         D.imageFamily.Orthogonal (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-            hyp.dade hyp.hconj χ hrealχ hdiffsuppχ) ∧
+            hyp.dade χ hrealχ hdiffsuppχ) ∧
           D.tau1 (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
             = hS₁coh.extension (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) })
   · -- irreducible branch
@@ -424,10 +424,10 @@ noncomputable def caseB_member_orthoDatum
       have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_conj_inner hyp (hxeq ▸ hirrx)
-    refine ⟨memberExtensionDecomposition hyp.dade hyp.hconj hS₁coh ⟨x, hirrx⟩
+    refine ⟨memberExtensionDecomposition hyp.dade hS₁coh ⟨x, hirrx⟩
       hreal hdiffsupp hxS₁ (hS₁conj.conj_mem hxS₁) hνZ hχχbar, ?_, rfl⟩
     -- `(Dmem).imageFamily = R(x)` (the Dade difference family), `⊥ R(χ)` by the (5.2.e) lemma.
-    exact dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp.dade hyp.hconj
+    exact dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp.dade
       hreal hdiffsupp hrealχ hdiffsuppχ hxχ hxχbar hxbarχ hxbarχbar
 
 /-- **(6.8.2) per-member `(5.4)` decomposition bundled with its (5.2.e) cross-orthogonality, for a
@@ -527,7 +527,7 @@ noncomputable def caseB_member_orthoDatum_columnBreak
       have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_conj_inner hyp (hxeq ▸ hirrx)
-    refine ⟨memberExtensionDecomposition hyp.dade hyp.hconj hS₁coh ⟨x, hirrx⟩
+    refine ⟨memberExtensionDecomposition hyp.dade hS₁coh ⟨x, hirrx⟩
       hreal hdiffsupp hxS₁ (hS₁conj.conj_mem hxS₁) hνZ hχχbar, ?_, rfl⟩
     -- `(Dmem).imageFamily = R(x)` (Dade difference family) `⊥ R(μ_b) = certainTypeR χ₂b`.
     exact dadeOfDiff_imageSet_orthogonal_certainTypeR hyp h46 hHK hχ₂b hdegb ⟨x, hirrx⟩
@@ -897,7 +897,7 @@ theorem sMember_degreeSqNormBound_of_not_coherent
   have datum : ∀ i : Fin k,
       { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau (χmem i) 0 //
         D.imageFamily.Orthogonal (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-            hyp.dade hyp.hconj ⟨ψ, hψirr⟩ hrealψ hdiffsuppψ) ∧
+            hyp.dade ⟨ψ, hψirr⟩ hrealψ hdiffsuppψ) ∧
           D.tau1 (χmem i) = hS₁coh.extension (χmem i) } := fun i => by
     refine caseB_member_orthoDatum hyp h46 hHK hS₁sub hS₁coh hS₁conj (hmemS1set i)
       (hS₁coh.extension_mem_ZIrr (χmem i) (Submodule.subset_span (hmemS1set i)))
@@ -909,7 +909,7 @@ theorem sMember_degreeSqNormBound_of_not_coherent
     · rw [inner_conj_symm ψ.conj ((χmem i).conj),
         hψbar_S1 ((χmem i).conj) (hS₁conj (hmemS1set i)), star_zero]
   -- (7) feed everything to the norm-weighted (5.6) engine.
-  have hbound := coherentDegreeSqNormBound_of_not_coherentW hyp.dade hyp.hconj hS₁coh
+  have hbound := coherentDegreeSqNormBound_of_not_coherentW hyp.dade hS₁coh
     ⟨ψ, hψirr⟩ hrealψ hdiffsuppψ hψψ hψbarψbar hψψbar hψbarψ hψ_S1 hψbar_S1
     (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁) hmemdegdiffsupp
     (fun i _ => hmemS1set i) mc (fun i _ => hmcpos i)
@@ -996,7 +996,7 @@ theorem sMember_degreeSqNormBound_of_not_coherent_columnBreak
     rw [OddOrder.Peterfalvi.S06.columnSum_def]
     exact Submodule.sum_mem _ (fun i _ => ((h46.columnFamily χ₂b).mu i).mem_ZIrr)
   have htau1ψ : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b - a • (χmem i₁)) ∈ ZIrr G :=
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp.dade hyp.hconj
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp.dade
       hdiffasuppψ
       (Submodule.sub_mem _ hψZ (nsmul_mem hanchorIrr.mem_ZIrr a))
   -- (5) generation bridges; `hbar1` from the column's real degree.
@@ -1056,7 +1056,7 @@ theorem sMember_degreeSqNormBound_of_not_coherent_columnBreak
   let Da := columnDecompositionTau hyp h46 hχ₂b hdegb (η₁ := χmem i₁) (a := a)
     (caseB_column_mapagree hyp h46 hχ₂b) hSdiffDa htau1ψ hχψ hχbarψ
   -- (7) feed everything to the reducible-break norm-weighted (5.6) contrapositive.
-  have hbound := coherentDegreeSqNormBound_of_not_coherentW_k hyp.dade hyp.hconj hS₁coh
+  have hbound := coherentDegreeSqNormBound_of_not_coherentW_k hyp.dade hS₁coh
     (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) hdiffsuppψ hψψne hψbarψbarne hψψbar hψbarψ
     hψ_S1 hψbar_S1
     (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁) hmemdegdiffsupp

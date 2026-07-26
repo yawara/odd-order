@@ -236,7 +236,6 @@ theorem hypothesis78_nu_zeta_sub_conj_support_at
       i hodd hnilp C hFrob hr'
   have hagree := Cert.coherence_hagree_dadeMap
     (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
-    (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj
     (F.coherence i hodd hnilp C hFrob) hr_mem hr'_mem
     (m0 := 1) (mi := 1) (by norm_num) (by norm_num) hsupp'
   have heq :
@@ -244,8 +243,8 @@ theorem hypothesis78_nu_zeta_sub_conj_support_at
           ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta r) -
         (F.hypothesis78 i hodd hnilp C hFrob).nu
           ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta r') =
-        ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade.fullDadeIsometryData
-            (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj).toDadeMap
+        ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
+              |>.fullDadeIsometryData.toDadeMap)
             ⟨_, (ClassFunction.mem_supportedSubmodule).mpr hsupp'⟩ := by
     rw [F.hypothesis78_nu_eq i hodd hnilp C hFrob,
       ← one_smul ℂ ((F.coherence i hodd hnilp C hFrob).extension
@@ -257,9 +256,7 @@ theorem hypothesis78_nu_zeta_sub_conj_support_at
   by_contra hgnot
   have hdade :=
     ((F.sibleyDadeHypothesis_of_frobenius
-        i hodd hnilp C hFrob).dade.fullDadeIsometryData
-      (F.sibleyDadeHypothesis_of_frobenius
-        i hodd hnilp C hFrob).hconj).toDadeIsometryData.isDadeMap
+        i hodd hnilp C hFrob).dade.fullDadeIsometryData).toDadeIsometryData.isDadeMap
   exact hg (hdade.map_eq_zero_of_not_mem_dadeSupport _ g hgnot)
 
 /-- Every non-principal coherent image has norm one. -/

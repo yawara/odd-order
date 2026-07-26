@@ -82,7 +82,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_natDegreeGap
     (hp : 3 ≤ p) (hpos₁ : 0 < d₁)
     (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
     (hdvd : dχ * dχ ∣ D) (hDpos : 0 < D) :
-    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) :=
+    XAdjoinStepInput hyp.dade hcoh (χs i) :=
   hyp.xAdjoinStepInput_of_memberFamily_degreeRatios hZH hX
     hpair0 hpair1 hpairs hdisj hi hcover hi₁ hmemreal hmemdiffsupp
     hmemS1 hmembarS1 hmemconjortho hmemortho ha1 hdeg_mem hdegχ
@@ -145,7 +145,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_natGap
     (hp : 3 ≤ p) (hpos₁ : 0 < d₁)
     (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
     (hdvd : dχ * dχ ∣ D) (hDpos : 0 < D) :
-    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+    XAdjoinStepInput hyp.dade hcoh (χs i) := by
   classical
   let hratioFamily :=
     OddOrder.Peterfalvi.S03.exists_pos_natDegreeRatioFamily_of_dvd
@@ -227,7 +227,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_commonInde
     (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
     (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
     (hdvd : dχ * dχ ∣ D) (hDpos : 0 < D) :
-    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+    XAdjoinStepInput hyp.dade hcoh (χs i) := by
   classical
   let hratioFamily :=
     OddOrder.Peterfalvi.S03.exists_pos_natDegreeRatioFamily_of_dvd
@@ -318,7 +318,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePower
     (hqtot : qtot = p ^ mq) (hθsq_le_qtot : θχ * θχ ≤ qtot)
     (htotal : total = qtot * c) (hidx_D : idx * idx ∣ D)
     (hidx_p : Nat.Coprime idx p) :
-    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+    XAdjoinStepInput hyp.dade hcoh (χs i) := by
   have hidxpos : 0 < idx := commonIndex_pos_of_natDegree_factor hχone hdχ
   have hcop : Nat.Coprime idx θχ := coprime_commonIndex_primePower hidx_p hθχ
   have hdvd : dχ * dχ ∣ D :=
@@ -392,7 +392,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
     (hsum : D + (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
     (hqtot : qtot = p ^ mq) (hθsq_le_qtot : θχ * θχ ≤ qtot)
     (htotal : total = qtot * c) (hidx_p : Nat.Coprime idx p) :
-    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+    XAdjoinStepInput hyp.dade hcoh (χs i) := by
   have hidxpos : 0 < idx := commonIndex_pos_of_natDegree_factor hχone hdχ
   have hdvds :=
     OddOrder.Peterfalvi.S08.degreeDivisibilityInputs_of_commonIndex_primePowerData
@@ -463,7 +463,7 @@ noncomputable def xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
       (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
     (hqtot : qtot = p ^ mq) (hθsq_le_qtot : θχ * θχ ≤ qtot)
     (htotal : total = qtot * c) (hidx_p : Nat.Coprime idx p) :
-    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+    XAdjoinStepInput hyp.dade hcoh (χs i) := by
   let S₁ : Set (ClassFunction ↥L ℂ) :=
     OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i
   have hS₁X : S₁ ⊆ hyp.Xset Z := by
@@ -588,7 +588,7 @@ noncomputable def xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePower
       (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
     (hqtot : qtot = p ^ mq) (hθsq_le_qtot : θχ * θχ ≤ qtot)
     (htotal : total = qtot * c) (hidx_p : Nat.Coprime idx p) :
-    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+    XAdjoinStepInput hyp.dade hcoh (χs i) := by
   let S₁ : Set (ClassFunction ↥L ℂ) :=
     OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i
   have hS₁X : S₁ ⊆ hyp.Xset Z := by

@@ -406,7 +406,7 @@ noncomputable def tau {M : Subgroup G} (hyp : Hypothesis M) :
     OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G :=
   haveI := hyp.finiteG
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+    (hyp.dadeData.dade.fullDadeIsometryData)
 
 open scoped FiniteInduce in
 /-- **The §10 Dade isometry `τ` commutes with coefficientwise ring automorphisms** (Peterfalvi
@@ -419,7 +419,7 @@ theorem tau_mapRingEquiv_comm [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     hyp.tau (ClassFunction.mapRingEquiv σc φ) = ClassFunction.mapRingEquiv σc (hyp.tau φ) := by
   haveI := hyp.finiteG
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mapRingEquiv_comm
-    hyp.dadeData.dade (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) σc hφ
+    hyp.dadeData.dade (hyp.dadeData.dade.fullDadeIsometryData) σc hφ
 
 open scoped FiniteInduce in
 /-- **`A(M)` is `M`-invariant**: `M ≤ N_G(A(M))` — the easy half of Peterfalvi (8.16) for the
@@ -545,8 +545,8 @@ open scoped FiniteInduce in
 
 Built genuinely from the §10 Dade isometry on `A_0(M)` (carried by `hyp.dadeData`/`hyp.hconj`) by
 restricting to the `M`-stable subset `A(M) = typePA ⊆ A_0(M) = typePA0` (`Set.subset_union_left`):
-`FullDadeIsometryData.restrict` restricts the Dade map and its `IsDadeMap` certificate, and
-`S04.HConjInvariant.restrict` restricts the `L`-equivariance.  The `M`-stability
+`FullDadeIsometryData.restrict` restricts the Dade map and its `IsDadeMap` certificate, and the
+`L`-equivariance of the restricted datum is `S04.Hypothesis.hConjInvariant`.  The `M`-stability
 the `M`-stability of `A(M)` is supplied by `le_normalizer_typePA`, so this
 construction is self-contained from the genuine `Hypothesis` (**sorry-free**, no external `hN`).
 
@@ -559,11 +559,11 @@ noncomputable def toHypothesis71 {M : Subgroup G} [Finite G] (hyp : Hypothesis M
       (↑l : G) * a * (↑l : G)⁻¹ ∈ typePA M hyp.typeP := fun l a ha =>
     ((Subgroup.mem_set_normalizer_iff).mp (hyp.le_normalizer_typePA l.2) a).mp ha
   { hyp := hyp.dadeData.dade.restrict Set.subset_union_left hnorm
-    τ := ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict
+    τ := ((hyp.dadeData.dade.fullDadeIsometryData).restrict
       Set.subset_union_left hnorm).toDadeMap
-    isDadeMap := ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict
+    isDadeMap := ((hyp.dadeData.dade.fullDadeIsometryData).restrict
       Set.subset_union_left hnorm).toDadeIsometryData.isDadeMap
-    hConjInvariant := hyp.hconj.restrict Set.subset_union_left hnorm }
+    hConjInvariant := OddOrder.Peterfalvi.S04.Hypothesis.hConjInvariant _ }
 
 open scoped FiniteInduce in
 /-- **The Peterfalvi (7.4) one-member family `{(M, A(M))}`** — the direct input to the family
@@ -582,7 +582,7 @@ noncomputable def toFamilyHypothesis71 {M : Subgroup G} [Finite G] (hyp : Hypoth
     have hnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ typePA M hyp.typeP →
         (↑l : G) * a * (↑l : G)⁻¹ ∈ typePA M hyp.typeP := fun l a ha =>
       ((Subgroup.mem_set_normalizer_iff).mp (hyp.le_normalizer_typePA l.2) a).mp ha
-    exact ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict
+    exact ((hyp.dadeData.dade.fullDadeIsometryData).restrict
       Set.subset_union_left hnorm).toDadeIsometryData.isDadeIsometry
   pairwise_disjoint := fun i j hij => absurd (Subsingleton.elim i j) hij
 
@@ -1365,7 +1365,7 @@ noncomputable def Hypothesis.toHypothesis46 [Finite G] (hG : OddOrder.BG.IsMinim
       exact ⟨Subgroup.mem_subgroupOf.mp (Subgroup.mem_inf.mp hx).2,
         fun h1 => hx1 (OneMemClass.coe_eq_one.mp (Set.mem_singleton_iff.mp h1))⟩
     dade0 := hyp.dadeData.dade
-    tau := hyp.dadeData.dade.fullDadeIsometryData hyp.hconj }
+    tau := hyp.dadeData.dade.fullDadeIsometryData }
 
 /-- **A finite non-perfect group has a non-trivial linear character.**  If `commutator K ≠ ⊤`
 (the abelianization `K/[K,K]` is non-trivial), there is a non-trivial degree-one irreducible

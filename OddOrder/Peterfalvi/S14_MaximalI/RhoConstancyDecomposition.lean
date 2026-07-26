@@ -189,7 +189,7 @@ theorem Sset_diff_tau_support_subset_ftThickenedA1 {L : Subgroup G} [Finite G]
           ⟨chi - chi.conj, (ClassFunction.mem_supportedSubmodule).mpr hsuppA1⟩ := by
     rw [OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_restrict_apply]
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hsuppA
+      (hyp.dadeData.dade.fullDadeIsometryData) hsuppA
   -- the restricted Dade support is the faithful thickened `A₁`-support
   have hsub : (hyp.dadeData.dade.restrict hA₁A hA₁norm).dadeSupport ⊆
       OddOrder.Peterfalvi.S10.ftThickenedSupport L (A1 L PeterfalviType.I) := by
@@ -228,7 +228,7 @@ theorem constituentDiff_tau_support_subset_ftThickenedA {L : Subgroup G} [Finite
           ⟨(φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj,
             (ClassFunction.mem_supportedSubmodule).mpr hsupp⟩ :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
-      hyp.dadeData.dade (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hsupp
+      hyp.dadeData.dade (hyp.dadeData.dade.fullDadeIsometryData) hsupp
   intro g hg
   rw [ClassFunction.mem_support, htau_eq] at hg
   by_contra hgnot
@@ -343,7 +343,7 @@ theorem constituentDiff_tau_inner_eq_zero_of_ne {L : Subgroup G} [Finite G]
       exact constituentDiff_support_subset data hφ'
   -- The Dade isometry transports the pairing to `L`.
   refine Eq.trans (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dadeData.dade hyp.hconj hSsupp
+    hyp.dadeData.dade hSsupp
     (Submodule.subset_span (Set.mem_insert _ _))
     (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))) ?_
   -- `L`-side: expand into four `Irr L` deltas, all off-diagonal.
@@ -412,7 +412,7 @@ theorem constituentDiff_tau_inner_eq_zero_of_ne_across {L : Subgroup G} [Finite 
       subst hs
       exact constituentDiff_support_subset data2 hφ'
   refine Eq.trans (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dadeData.dade hyp.hconj hSsupp
+    hyp.dadeData.dade hSsupp
     (Submodule.subset_span (Set.mem_insert _ _))
     (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))) ?_
   have hcross : ∀ a c : IrreducibleCharacter ↥L,
@@ -486,7 +486,7 @@ theorem constituent_diffImage_inner_zero_of_disjoint {L1 L2 : Subgroup G} [Finit
   have hXZIrr : X ∈ OddOrder.RepresentationTheory.ZIrr G := by
     rw [hX]
     refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp2.dadeData.dade hyp2.hconj hfsupp ?_
+      hyp2.dadeData.dade hfsupp ?_
     rw [hdiff_eq]
     exact Submodule.sum_mem _ fun φ _ => Submodule.sub_mem _ φ.mem_ZIrr
       (OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L2) φ).mem_ZIrr
@@ -880,13 +880,13 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
     intro i
     change hyp.tau (irreducibleCharacterDifference fam i) ∈ ZIrr G
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.dadeData.dade hyp.hconj (hdiff_supp i)
+      hyp.dadeData.dade (hdiff_supp i)
       (Submodule.sub_mem _ (fam i).mem_ZIrr (fam 0).mem_ZIrr)
   have hzero : IsometryDifferenceImagesVanishAtOne hyp.tau fam := by
     intro i
     change hyp.tau (irreducibleCharacterDifference fam i) (1 : G) = 0
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
-      hyp.dadeData.dade hyp.hconj (hdiff_supp i)
+      hyp.dadeData.dade (hdiff_supp i)
   have hisom : ∀ i j, ClassFunction.inner (isometryDifferenceImage hyp.tau fam i)
       (isometryDifferenceImage hyp.tau fam j)
       = ClassFunction.inner (irreducibleCharacterDifference fam i)
@@ -895,7 +895,7 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
     change ClassFunction.inner (hyp.tau (irreducibleCharacterDifference fam i))
       (hyp.tau (irreducibleCharacterDifference fam j)) = _
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-      hyp.dadeData.dade hyp.hconj hSsupp (Submodule.subset_span ⟨i, rfl⟩)
+      hyp.dadeData.dade hSsupp (Submodule.subset_span ⟨i, rfl⟩)
       (Submodule.subset_span ⟨j, rfl⟩)
   -- (6) apply the (1.4) keystone.
   obtain ⟨sdf, himage⟩ :=

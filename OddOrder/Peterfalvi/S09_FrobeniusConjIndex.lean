@@ -318,7 +318,6 @@ theorem hypothesis78_nu_zeta_sub_conj_support [Fintype G] [Invertible (Nat.card 
     rw [one_smul]; exact F.hypothesis78_zeta_sub_conj_support i hodd hnilp C hFrob hj₁
   have hagree := coherence_hagree_dadeMap
     (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
-    (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj
     (F.coherence i hodd hnilp C hFrob) hzd_mem hj₁_mem
     (m0 := 1) (mi := 1) (by norm_num) (by norm_num) hsupp'
   have heq : (F.hypothesis78 i hodd hnilp C hFrob).nu
@@ -326,8 +325,8 @@ theorem hypothesis78_nu_zeta_sub_conj_support [Fintype G] [Invertible (Nat.card 
           (F.hypothesis78 i hodd hnilp C hFrob).zetaDistinct)
       - (F.hypothesis78 i hodd hnilp C hFrob).nu
           ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j₁)
-      = ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade.fullDadeIsometryData
-          (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj).toDadeMap
+      = ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
+            |>.fullDadeIsometryData.toDadeMap)
           ⟨_, (ClassFunction.mem_supportedSubmodule).mpr hsupp'⟩ := by
     rw [F.hypothesis78_nu_eq i hodd hnilp C hFrob,
       ← one_smul ℂ ((F.coherence i hodd hnilp C hFrob).extension
@@ -338,8 +337,8 @@ theorem hypothesis78_nu_zeta_sub_conj_support [Fintype G] [Invertible (Nat.card 
   rw [ClassFunction.mem_support] at hg
   by_contra hgnot
   have hdade :=
-    ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade.fullDadeIsometryData
-      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj).toDadeIsometryData.isDadeMap
+    (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
+      |>.fullDadeIsometryData.toDadeIsometryData.isDadeMap
   exact hg (hdade.map_eq_zero_of_not_mem_dadeSupport _ g hgnot)
 
 open OddOrder.Peterfalvi.S09.Cert in
@@ -369,8 +368,7 @@ theorem hypothesis78_beta_conj_sub [Fintype G] [Invertible (Nat.card G : ℂ)]
   classical
   set pf := F.sibleyPlacedFamily i hodd hnilp C hFrob with hpf
   set hyp := (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade with hhyp
-  set hconj := (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj with hhconj
-  set dade := hyp.fullDadeIsometryData hconj with hdade
+  set dade := hyp.fullDadeIsometryData with hdade
   obtain ⟨j₁, hj₁ne, hj₁⟩ := F.exists_conjIndex_hypothesis78 i hodd hnilp C hFrob
   have hzeta : ∀ j, (F.hypothesis78 i hodd hnilp C hFrob).hyp76.zeta j
       = ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (pf.θ j : ClassFunction _ ℂ) :=
@@ -399,7 +397,7 @@ theorem hypothesis78_beta_conj_sub [Fintype G] [Invertible (Nat.card G : ℂ)]
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
           (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i) := by
     rw [one_smul]; exact F.hypothesis78_zeta_sub_conj_support i hodd hnilp C hFrob hj₁
-  have hagree := coherence_hagree_dadeMap hyp hconj
+  have hagree := coherence_hagree_dadeMap hyp
     (F.coherence i hodd hnilp C hFrob) hzd_mem hj₁_mem
     (m0 := 1) (mi := 1) (by norm_num) (by norm_num) hsupp'
   -- `dade.toDadeMap` on supported functions is `dadeIntegralCharacterMap hyp dade` (a `ℤ`-linear
@@ -655,7 +653,6 @@ noncomputable def hypothesis78_betaDecomp [Fintype G] [Invertible (Nat.card G : 
       linear_combination -h1
     have hres := coherence_hagree_dadeMap
       (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
-      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj
       (F.coherence i hodd hnilp C hFrob) hSj hS0 (m0 := deg_0) (mi := deg_j) hdeg0_ne hd
       ((F.hypothesis78 i hodd hnilp C hFrob).hyp76.psi_support j)
     rw [F.hypothesis78_nu_eq i hodd hnilp C hFrob]

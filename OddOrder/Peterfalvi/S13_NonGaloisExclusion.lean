@@ -672,7 +672,7 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
   have hτφZ : τφ ∈ ZIrr G := by
     rw [hτφdef]
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.base.dadeData.dade hyp.base.hconj hφsupp
+      hyp.base.dadeData.dade hφsupp
       (Submodule.sub_mem _ hμ0Z hζirr.mem_ZIrr)
   obtain ⟨s, hs⟩ := ClassFunction.inner_mem_ZIrr_int hτφZ hclamZ
   have hteq : ClassFunction.inner τφ (c.extension μ) = ((m : ℤ) : ℂ) * ((s : ℤ) : ℂ) := by

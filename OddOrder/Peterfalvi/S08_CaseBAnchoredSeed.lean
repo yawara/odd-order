@@ -353,7 +353,7 @@ theorem inner_eq_of_anchored_varying
   have hττ : ClassFunction.inner (hyp.tau (χi - ai • η₁)) (hyp.tau (χj - aj • η₁))
       = ClassFunction.inner χi χj + (ai : ℂ) * (aj : ℂ) := by
     rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade
-        hyp.hconj (S := ({χi - ai • η₁, χj - aj • η₁} : Set (ClassFunction ↥L ℂ)))
+      (S := ({χi - ai • η₁, χj - aj • η₁} : Set (ClassFunction ↥L ℂ)))
         (by intro s hs; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
             rcases hs with rfl | rfl; exacts [hsuppi, hsuppj])
         (Submodule.subset_span (Set.mem_insert _ _))
@@ -819,8 +819,8 @@ noncomputable def caseBXset_isCoherent
 
 /-- **⚠ Structural record — the recorded obstruction is GONE as of 2026-07-19; re-evaluate before
 reusing this note.**  The map convention here is correct
-(`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` defeq, so
-`xChainCoherentW hyp.dade hyp.hconj` lands at `hyp.tau` — no retargeting).
+(`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData)` defeq, so
+`xChainCoherentW hyp.dade` lands at `hyp.tau` — no retargeting).
 
 The original record read: "the `hstep` hypothesis is unsatisfiable at step 0, because
 `XAdjoinStepInputW` requires a **norm-1 anchor** in the accumulator (`hanchorNorm : mc i₁ = 1`) and
@@ -864,17 +864,17 @@ noncomputable def caseB_Xset_isCoherent_of_hstepW
           ∃ j, j < N ∧ χ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j) →
         ∀ i, i < N → ∀ (hcoh : OddOrder.Peterfalvi.S07.IsCoherent
             (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dade
-              (hyp.dade.fullDadeIsometryData hyp.hconj))
+              (hyp.dade.fullDadeIsometryData))
             (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L)
               (OddOrder.Peterfalvi.S06.certainTypeSet h46 k) pair i)
             (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)),
-          XAdjoinStepInputW hyp.dade hyp.hconj hcoh (χs i)) :
+          XAdjoinStepInputW hyp.dade hcoh (χs i)) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset h46.W2)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   classical
   choose pair N χs hpair0 hpair1 hpairs hcover using
     caseB_Xset_conjugatePairCover hyp h46 hHK hbase hnonS₀_irr
-  exact xChainCoherentW hyp.dade hyp.hconj pair N χs hpair0 hpair1 hbase hpairs hcover
+  exact xChainCoherentW hyp.dade pair N χs hpair0 hpair1 hbase hpairs hcover
     (hyp.certainTypeSet_isCoherent_tau_canonical h46 hk)
     (fun i hi hcoh => hstep pair N χs hpair0 hpair1 hpairs hcover i hi hcoh)
 

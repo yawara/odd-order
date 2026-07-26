@@ -413,10 +413,10 @@ a direct corollary but needs the full (5.6.1)→(5.6.2) `Y`-collapse. -/
 theorem inner_dade_extension_of_supported
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     {S₁ : Set (ClassFunction ↥L ℂ)}
     (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     {u : ClassFunction ↥L ℂ}
     (husupp : u.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
@@ -424,7 +424,7 @@ theorem inner_dade_extension_of_supported
     (hδ : δ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L)) :
     ClassFunction.inner
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) u)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) u)
         (hS₁.extension δ) =
       ClassFunction.inner u δ := by
   -- `ν δ = τ δ` since `δ` is supported (the coherent extension agrees with `τ` on `CF(L,A)`).
@@ -432,7 +432,7 @@ theorem inner_dade_extension_of_supported
   -- Dade isometry on the supported pair `{u, δ}`.
   have hδsupp : δ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L :=
     (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mp hδ).2
-  refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+  refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp
     (S := {u, δ}) ?_ (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))
   intro s hs
   simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
@@ -523,10 +523,10 @@ The remaining (5.4) orthogonality scalars `⟨χ, 0⟩ = ⟨χ̄, 0⟩ = 0` are 
 noncomputable def memberExtensionDecomposition
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     {S₁ : Set (ClassFunction ↥L ℂ)}
     (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     (χ : IrreducibleCharacter ↥L)
     (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
@@ -537,7 +537,7 @@ noncomputable def memberExtensionDecomposition
     (hνZ : hS₁.extension (χ : ClassFunction ↥L ℂ) ∈ ZIrr G)
     (hχχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ).conj = 0) :
     OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (χ : ClassFunction ↥L ℂ) 0 := by
   classical
   have hχmem : (χ : ClassFunction ↥L ℂ) ∈ Submodule.span ℤ S₁ := Submodule.subset_span hχ_S1
@@ -563,7 +563,7 @@ noncomputable def memberExtensionDecomposition
           ClassFunction.support_neg]
         exact hdiffsupp⟩
   exact OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
-    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp)
+    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp χ hreal hdiffsupp)
     hS₁.extension
     (fun φ ζ hφ hζ => hS₁.extension_inner_eq φ ζ (hle hφ) (hle hζ))
     (hS₁.extends_on_supported _ hdiffsupported)
@@ -586,7 +586,7 @@ reduced source pairing `⟨x − x̄, χ − χ̄⟩` expands to the four cross 
 theorem inner_dadeDiff_conjDifference_eq_zero
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     {x χ : ClassFunction ↥L ℂ}
     (hxdiffsupp : (x.conj - x).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     (hχdiffsupp : (χ.conj - χ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
@@ -594,9 +594,9 @@ theorem inner_dadeDiff_conjDifference_eq_zero
     (hxbarχ : ClassFunction.inner x.conj χ = 0) (hxbarχbar : ClassFunction.inner x.conj χ.conj = 0)
         :
     ClassFunction.inner
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
           (x - x.conj))
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
           (χ - χ.conj)) = 0 := by
   classical
   have hS : ∀ s ∈ ({x - x.conj, χ - χ.conj} : Set (ClassFunction ↥L ℂ)),
@@ -606,7 +606,7 @@ theorem inner_dadeDiff_conjDifference_eq_zero
     rcases hs with rfl | rfl
     · rw [show x - x.conj = -(x.conj - x) by abel, ClassFunction.support_neg]; exact hxdiffsupp
     · rw [show χ - χ.conj = -(χ.conj - χ) by abel, ClassFunction.support_neg]; exact hχdiffsupp
-  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hS
     (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))]
   simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     hxχ, hxχbar, hxbarχ, hxbarχbar, sub_self]
@@ -623,7 +623,7 @@ via
 theorem dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     {x χ : IrreducibleCharacter ↥L}
     (hxreal : ¬ ClassFunction.IsReal (x : ClassFunction ↥L ℂ))
     (hxdiffsupp : ((x : ClassFunction ↥L ℂ).conj - (x : ClassFunction ↥L ℂ)).support ⊆
@@ -636,9 +636,9 @@ theorem dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
     (hxbarχ : ClassFunction.inner (x : ClassFunction ↥L ℂ).conj (χ : ClassFunction ↥L ℂ) = 0)
     (hxbarχbar :
       ClassFunction.inner (x : ClassFunction ↥L ℂ).conj (χ : ClassFunction ↥L ℂ).conj = 0) :
-    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj x hxreal
+    (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp x hxreal
         hxdiffsupp).Orthogonal
-      (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal
+      (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp χ hreal
         hχdiffsupp) := by
   unfold OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
   refine OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage_orthogonal _ _
@@ -646,7 +646,7 @@ theorem dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
       _ _ ?_)
   rw [← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference,
     ← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference]
-  exact inner_dadeDiff_conjDifference_eq_zero hyp hconj hxdiffsupp hχdiffsupp
+  exact inner_dadeDiff_conjDifference_eq_zero hyp hxdiffsupp hχdiffsupp
     hxχ hxχbar hxbarχ hxbarχbar
 
 /-- **Member-side R-orthogonality `⟨Da.X, ν χ₁⟩ = 0`, fully assembled for the induced `Da`.**
@@ -663,10 +663,10 @@ This leaves only the (5.6.1)/(5.6.2) `Y`-collapse `Da.Y = a·ν χ₁` as the re
 theorem inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     {S₁ : Set (ClassFunction ↥L ℂ)}
     (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     (χ chi1 : IrreducibleCharacter ↥L) {a : ℕ}
     (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
@@ -675,7 +675,7 @@ theorem inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero
     (hdiffasuppχ : ((χ : ClassFunction ↥L ℂ) - a • (chi1 : ClassFunction ↥L ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     (htau1_memaχ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-      (hyp.fullDadeIsometryData hconj)
+      (hyp.fullDadeIsometryData)
       ((χ : ClassFunction ↥L ℂ) - a • (chi1 : ClassFunction ↥L ℂ)) ∈ ZIrr G)
     (hχaχ1 : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (a • (chi1 : ClassFunction ↥L ℂ)) = 0)
     (hχbaraχ1 : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj
@@ -694,15 +694,15 @@ theorem inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero
     (hc1barχbar : ClassFunction.inner (chi1 : ClassFunction ↥L ℂ).conj
       (χ : ClassFunction ↥L ℂ).conj = 0) :
     ClassFunction.inner
-        (OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp hconj χ hrealχ hdiffsuppχ
+        (OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp χ hrealχ hdiffsuppχ
           hdiffasuppχ htau1_memaχ hχaχ1 hχbaraχ1 hχχbar').X
         (hS₁.extension (chi1 : ClassFunction ↥L ℂ)) = 0 :=
   inner_decomposition_X_extension_member_eq_zero hS₁
-    (OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp hconj χ hrealχ hdiffsuppχ
+    (OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp χ hrealχ hdiffsuppχ
       hdiffasuppχ htau1_memaχ hχaχ1 hχbaraχ1 hχχbar')
-    (memberExtensionDecomposition hyp hconj hS₁ chi1 hrealc1 hdiffsuppc1 hc1S1 hc1barS1 hνZc1
+    (memberExtensionDecomposition hyp hS₁ chi1 hrealc1 hdiffsuppc1 hc1S1 hc1barS1 hνZc1
       hc1c1bar)
-    (dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp hconj hrealc1 hdiffsuppc1 hrealχ
+    (dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp hrealc1 hdiffsuppc1 hrealχ
       hdiffsuppχ hc1χ hc1χbar hc1barχ hc1barχbar)
     rfl
 

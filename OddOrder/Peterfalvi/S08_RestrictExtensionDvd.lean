@@ -112,7 +112,7 @@ theorem orthogonal_normOne_tau_scaledDiff_add_extension_general
     have hvZ : v ∈ ZIrr G := by
       rw [hv]
       exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        hyp.dade hyp.hconj hsuppX hsrcZ
+        hyp.dade hsuppX hsrcZ
     have he₁Z : cY.extension η₁ ∈ ZIrr G :=
       cY.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁)
     have haZ : (a : ℂ) • cY.extension η₁ ∈ ZIrr G := by
@@ -203,7 +203,7 @@ theorem orthogonal_normOne_tau_scaledDiff_add_extension_general_c2_caseA
     have hvZ : v ∈ ZIrr G := by
       rw [hv]
       exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        hyp.dade hyp.hconj hsuppX hsrcZ
+        hyp.dade hsuppX hsrcZ
     have he₁Z : cY.extension η₁ ∈ ZIrr G :=
       cY.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁)
     have haZ : (a : ℂ) • cY.extension η₁ ∈ ZIrr G := by
@@ -289,7 +289,7 @@ theorem inner_tau_scaledDiff_tau_Xset_diff_of_frobenius
   have hsuppX2 : (χ₂ - χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_diffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₂) (hyp.Xset_subset_S hχ₁) hdeg2
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dade hyp.hconj (S := ({χ₁ - a • η₁, χ₂ - χ₁} : Set (ClassFunction ↥L ℂ)))
+    hyp.dade (S := ({χ₁ - a • η₁, χ₂ - χ₁} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs
         simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
         rcases hs with rfl | rfl
@@ -350,7 +350,7 @@ theorem inner_tau_scaledDiff_tau_Xset_diff_c2_caseA
   have hsuppX2 : (χ₂ - χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_diffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₂) (hyp.Xset_subset_S hχ₁) hdeg2
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dade hyp.hconj (S := ({χ₁ - a • η₁, χ₂ - χ₁} : Set (ClassFunction ↥L ℂ)))
+    hyp.dade (S := ({χ₁ - a • η₁, χ₂ - χ₁} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs
         simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
         rcases hs with rfl | rfl

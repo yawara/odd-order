@@ -202,7 +202,7 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_columnZero_const [Finite G]
     Submodule.sum_mem _ (fun r _ => (hyp.muGrid_isIrreducible hG hodd r 0).mem_ZIrr)
   have hψZ : hyp.tau ((∑ r : Fin hyp.w1, hyp.muGrid hG hodd r 0) - ζ) ∈ ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.dadeData.dade hyp.hconj hsupp (Submodule.sub_mem _ hμ0Z hζirr.mem_ZIrr)
+      hyp.dadeData.dade hsupp (Submodule.sub_mem _ hμ0Z hζirr.mem_ZIrr)
   -- the Galois move on the punctured column `0`
   have hprime : (Nat.card (typePData_toTICyclicHypothesis hyp.typeP hodd).W1).Prime :=
     hyp.w1_prime_of_typeIIIorIV htype
@@ -267,7 +267,7 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_const [Finite G]
     Submodule.sum_mem _ (fun r _ => (hyp.muGrid_isIrreducible hG hodd r 0).mem_ZIrr)
   have hψZ : hyp.tau ((∑ r : Fin hyp.w1, hyp.muGrid hG hodd r 0) - ζ) ∈ ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.dadeData.dade hyp.hconj hsupp (Submodule.sub_mem _ hμ0Z hζirr.mem_ZIrr)
+      hyp.dadeData.dade hsupp (Submodule.sub_mem _ hμ0Z hζirr.mem_ZIrr)
   have hprime : (Nat.card (typePData_toTICyclicHypothesis hyp.typeP hodd).W2).Prime :=
     hyp.w2_prime hG
   obtain ⟨u, hmove⟩ :=
@@ -359,7 +359,7 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_ortho
   have hψZ : ψ ∈ ZIrr G := by
     rw [hψ]
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.dadeData.dade hyp.hconj hsupp (Submodule.sub_mem _ hμ0Z hζirr.mem_ZIrr)
+      hyp.dadeData.dade hsupp (Submodule.sub_mem _ hμ0Z hζirr.mem_ZIrr)
   have hψnorm : ClassFunction.inner ψ ψ = ((hyp.w1 + 1 : ℕ) : ℂ) := by
     rw [hψ, hyp.tau_inner_eq_of_supported hsupp hsupp,
       inner_muColumnZero_sub_zeta_self hG hyp hζirr hζ1]

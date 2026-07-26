@@ -818,7 +818,7 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
         (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hψ))
     (fun a ha b hb =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        hyp.base.dadeData.dade hyp.base.hconj (hsuppdiff a ha b hb)
+        hyp.base.dadeData.dade (hsuppdiff a ha b hb)
         (Submodule.sub_mem _ (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hIKF ha))
           (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hIKF hb))))
     hsuppdiff

@@ -319,7 +319,7 @@ theorem typeIBetaL_support_subset_dadeSupport [Finite G] {L : Subgroup G}
   rw [typeIBetaL,
     show typeISetup.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
         typeISetup.dadeData.dade
-        (typeISetup.dadeData.dade.fullDadeIsometryData typeISetup.hconj) from rfl,
+        (typeISetup.dadeData.dade.fullDadeIsometryData) from rfl,
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support _ _ hsupp]
   exact (typeISetup.dadeData.dade.isDadeMap_dadeMap).map_eq_zero_of_not_mem_dadeSupport _ _ hnot
 
@@ -340,7 +340,7 @@ theorem tau_support_subset_dadeSupport [Finite G] {L : Subgroup G}
   change typeISetup.tau ψ x = 0
   rw [show typeISetup.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
         typeISetup.dadeData.dade
-        (typeISetup.dadeData.dade.fullDadeIsometryData typeISetup.hconj) from rfl,
+        (typeISetup.dadeData.dade.fullDadeIsometryData) from rfl,
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support _ _ hψ]
   exact (typeISetup.dadeData.dade.isDadeMap_dadeMap).map_eq_zero_of_not_mem_dadeSupport _ _ hnot
 
@@ -363,7 +363,7 @@ noncomputable def tauTbetaGrid [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     (hyp : Hypothesis (G := G)) (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T)
     (Tdata : TypePData hyp.T) : ClassFunction G ℂ :=
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
-    ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata))
+    ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData)
     (betaTGridChar hyp)
 
 /-- **`A(M) ⊆ H^#` for a Frobenius type-I maximal** (with `sharpSubgroup_H_subset_typeIA`,
@@ -406,7 +406,7 @@ theorem dadeSupport_betaGrid_disjoint_support_of_c_eq_one [Finite G]
     (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
     Disjoint χ.support
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
-        ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
+        ((hyp.dadeHypS0 _hG).fullDadeIsometryData)
         (betaGrid hyp j)).support := by
   classical
   rw [Set.disjoint_left]
@@ -430,7 +430,7 @@ theorem dadeSupport_betaGrid_disjoint_support_of_c_eq_one [Finite G]
     rwa [typeISetup.typeI.typeF.H_eq] at hdvd
   -- S-side: `orderOf x ∣ p^q · (q·p)`
   have hbridge : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
-        ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
+        ((hyp.dadeHypS0 _hG).fullDadeIsometryData)
         (betaGrid hyp j)
       = ClassFunction.induce hyp.S (betaGrid hyp j) :=
     hyp.sInstance_dade0_eq_induce _hG hnoV
@@ -524,7 +524,7 @@ theorem typeIBetaL_dadeS_betaGrid_disjoint_support_of_c_eq_one [Finite G]
     (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
     Disjoint (typeIBetaL typeISetup φ).support
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
-        ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
+        ((hyp.dadeHypS0 _hG).fullDadeIsometryData)
         (betaGrid hyp j)).support :=
   dadeSupport_betaGrid_disjoint_support_of_c_eq_one _hG hnoV hyp hc1 typeISetup
     (typeIBetaL typeISetup φ)
@@ -744,10 +744,10 @@ theorem typeIBetaL_inner_eta_row_sub_eq_zero_of_c_eq_one [Finite G]
   -- `η_{0j} − η_{0j'} = τ_S(β_{j'}) − τ_S(β_j)` from the two `Γ`-identities.
   have hkey : hyp.eta ⟨0, hyp.q_prime.pos⟩ j - hyp.eta ⟨0, hyp.q_prime.pos⟩ j'
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
-          ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
+          ((hyp.dadeHypS0 _hG).fullDadeIsometryData)
           (betaGrid hyp j')
         - OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 _hG)
-          ((hyp.dadeHypS0 _hG).fullDadeIsometryData (hyp.dadeHypS0_hconj _hG))
+          ((hyp.dadeHypS0 _hG).fullDadeIsometryData)
           (betaGrid hyp j) := by
     have h3 := h1.trans h2.symm
     rw [← sub_eq_zero] at h3 ⊢

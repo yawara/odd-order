@@ -122,7 +122,7 @@ every supported sublattice.
 
 Proof: every `φ, ζ ∈ zSpan S` is supported (`support_subset_of_mem_zSpan_of_supported`), so
 `dadeIntegralCharacterMap φ = hyp.dadeMap ⟨φ,_⟩` (`dadeIntegralCharacterMap_apply_of_support`); the
-isometry property of `hyp.dadeMap` (via `hyp.dadeIsometryData hconj`, whose `toDadeMap` *is*
+isometry property of `hyp.dadeMap` (via `hyp.dadeIsometryData`, whose `toDadeMap` *is*
 `hyp.dadeMap`) closes `⟨τ φ, τ ζ⟩ = ⟨φ, ζ⟩`.
 
 So for the running (5.4) `τ₁` *equal to* `τ` on the supported sublattice (the (5.1) base case, where
@@ -131,14 +131,14 @@ So for the running (5.4) `τ₁` *equal to* `τ` on the supported sublattice (th
 the support; the supported-lattice inner-preservation used by the `(5.4.b)/(5.5)/(5.6.2)` proofs is
 exactly what this supplies.) -/
 theorem dadeIntegralCharacterMap_inner_eq_on_supported_span
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {S : Set (ClassFunction (↥L) ℂ)}
     (hS : ∀ s ∈ S, s.support ⊆ supportInSubgroup A L)
     {φ ζ : ClassFunction (↥L) ℂ}
     (hφ : φ ∈ zSpan (L := ↥L) S) (hζ : ζ ∈ zSpan (L := ↥L) S) :
     ClassFunction.inner
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) φ)
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) ζ) =
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) φ)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) ζ) =
       ClassFunction.inner φ ζ := by
   have hφsupp : φ.support ⊆ supportInSubgroup A L :=
     support_subset_of_mem_zSpan_of_supported hS hφ
@@ -147,12 +147,12 @@ theorem dadeIntegralCharacterMap_inner_eq_on_supported_span
   rw [dadeIntegralCharacterMap_apply_of_support hyp _ hφsupp,
     dadeIntegralCharacterMap_apply_of_support hyp _ hζsupp]
   -- The (2.6.a) isometry property of the explicit (2.5) Dade map, on the supported pair.
-  have hiso := (hyp.dadeIsometryData hconj).isDadeIsometry.inner_eq
+  have hiso := (hyp.dadeIsometryData).isDadeIsometry.inner_eq
     (⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφsupp⟩ :
       S04.SupportedClassFunctions (G := G) ℂ A L)
     (⟨ζ, (ClassFunction.mem_supportedSubmodule).mpr hζsupp⟩ :
       S04.SupportedClassFunctions (G := G) ℂ A L)
-  rwa [hyp.dadeIsometryData_toDadeMap hconj] at hiso
+  rwa [hyp.dadeIsometryData_toDadeMap] at hiso
 
 /-- **Pair form of `dadeIntegralCharacterMap_inner_eq_on_supported_span`** (issue 0099): the Dade
 base map preserves the inner product of any two **`A`-supported** class functions — no ambient
@@ -162,14 +162,14 @@ unconditional supply for the `S07.Hypothesis.tau_isometry_diff` field in its (00
 `ℤ[S, A]`-membership, and the `ℤ[S]` halves are not needed at all — so this works for **any**
 family, mixed degrees included. -/
 theorem dadeIntegralCharacterMap_inner_eq_of_supported
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {φ ζ : ClassFunction (↥L) ℂ}
     (hφ : φ.support ⊆ supportInSubgroup A L) (hζ : ζ.support ⊆ supportInSubgroup A L) :
     ClassFunction.inner
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) φ)
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) ζ) =
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) φ)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) ζ) =
       ClassFunction.inner φ ζ := by
-  refine dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+  refine dadeIntegralCharacterMap_inner_eq_on_supported_span hyp
     (S := {φ, ζ}) ?_ (Submodule.subset_span (Set.mem_insert _ _))
     (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
   intro s hs
@@ -180,7 +180,7 @@ theorem dadeIntegralCharacterMap_inner_eq_of_supported
 
 /-- **Inner-product preservation for the Dade base map, from any isometry datum.**  Generalises
 `dadeIntegralCharacterMap_inner_eq_on_supported_span`: the lift preserves inner products on the
-supported span for **any** `FullDadeIsometryData dade` — not only `hyp.fullDadeIsometryData hconj`.
+supported span for **any** `FullDadeIsometryData dade` — not only `hyp.fullDadeIsometryData`.
 On the supported subspace the lift agrees with `hyp.dadeMap`, and `hyp.dadeMap = dade.toDadeMap`
 by Dade-map uniqueness (`IsDadeMap.unique`), so the isometry `dade.inner_eq` applies.  This is what
 the certain-type Dade `h.tau` (a generic `FullDadeIsometryData`, with no `HConjInvariant`) needs to
@@ -212,17 +212,17 @@ lies in `ℤ[Irr G]`.  On the supported subspace the lift agrees with the explic
 (2.6.b) virtual-character preservation `PreservesVirtualCharacters` (`maps_virtualCharacter`).
 This is the Round-B supply of the `ZIrr`-membership facts feeding `decompositionPairFromDade`. -/
 theorem dadeIntegralCharacterMap_mem_ZIrr_of_supported
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {φ : ClassFunction (↥L) ℂ} (hφsupp : φ.support ⊆ supportInSubgroup A L)
     (hφZ : φ ∈ ZIrr (↥L)) :
-    dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) φ ∈ ZIrr G := by
+    dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) φ ∈ ZIrr G := by
   rw [dadeIntegralCharacterMap_apply_of_support hyp _ hφsupp]
   -- `hyp.dadeMap` is the underlying `toDadeMap` of `fullDadeIsometryData`; apply (2.6.b).
-  have hpv := (hyp.fullDadeIsometryData hconj).maps_virtualCharacter
+  have hpv := (hyp.fullDadeIsometryData).maps_virtualCharacter
     (⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφsupp⟩ :
       S04.SupportedClassFunctions (G := G) ℂ A L) hφZ
-  rwa [show (hyp.fullDadeIsometryData hconj).toDadeMap = hyp.dadeMap (k := ℂ) from
-    hyp.dadeIsometryData_toDadeMap hconj] at hpv
+  rwa [show (hyp.fullDadeIsometryData).toDadeMap = hyp.dadeMap (k := ℂ) from
+    hyp.dadeIsometryData_toDadeMap] at hpv
 
 /-- **The Dade base map sends supported class functions to functions vanishing at `1`.**
 
@@ -233,9 +233,9 @@ map `hyp.dadeMap ⟨φ,_⟩` (`dadeIntegralCharacterMap_apply_of_support`), whic
 (`one_notMem_dadeSupport`), the value at `1` is `0`.  This discharges the (1.4)
 `IsometryDifferenceImagesVanishAtOne` hypothesis for the Dade map. -/
 theorem dadeIntegralCharacterMap_apply_one_eq_zero
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {φ : ClassFunction (↥L) ℂ} (hφsupp : φ.support ⊆ supportInSubgroup A L) :
-    (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) φ) (1 : G) = 0 := by
+    (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) φ) (1 : G) = 0 := by
   rw [dadeIntegralCharacterMap_apply_of_support hyp _ hφsupp]
   exact (hyp.isDadeMap_dadeMap (k := ℂ)).map_eq_zero_of_not_mem_dadeSupport
     (⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφsupp⟩ :
@@ -265,16 +265,16 @@ from the Dade isometry on the two-element family `{χ, χ̄}`:
 This is the Round-B gateway: it supplies the `imageFamily` argument of `decompositionPairFromDade`
 from the real Dade τ. -/
 noncomputable def dadeOrthonormalCharacterImageFamily
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     (χ : IrreducibleCharacter (↥L))
     (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
     (hχsupp : (χ : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
     (hχbarsupp : (χ : ClassFunction (↥L) ℂ).conj.support ⊆ supportInSubgroup A L) :
     OrthonormalCharacterImageFamily (L := ↥L) (G := G)
-      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (χ : ClassFunction (↥L) ℂ) := by
   classical
-  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) with hτ_def
+  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) with hτ_def
   set fam : Fin 2 → IrreducibleCharacter (↥L) := conjPairFamily (L := ↥L) χ with hfam
   -- The two difference generators `χ - χ` (= 0) and `χ̄ - χ` are supported, in `ℤ[χ, χ̄]`.
   have hfam0 : (fam 0 : ClassFunction (↥L) ℂ) = (χ : ClassFunction (↥L) ℂ) := by
@@ -315,21 +315,21 @@ noncomputable def dadeOrthonormalCharacterImageFamily
   -- (1.4) hypothesis (virtual): `(fam i - χ)^τ ∈ ℤ[Irr G]`.
   have hvirtual : IsometryDifferenceImagesAreVirtual (G := G) (H := ↥L) τ fam := by
     intro i
-    refine dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj (hdiff_supp i) ?_
+    refine dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp (hdiff_supp i) ?_
     -- `(fam i) - χ ∈ ℤ[Irr L]`: difference of two irreducibles.
     refine Submodule.sub_mem _ ?_ (fam 0).mem_ZIrr
     exact (fam i).mem_ZIrr
   -- (1.4) hypothesis (vanish at 1).
   have hzero : IsometryDifferenceImagesVanishAtOne (G := G) (H := ↥L) τ fam := by
     intro i
-    exact dadeIntegralCharacterMap_apply_one_eq_zero hyp hconj (hdiff_supp i)
+    exact dadeIntegralCharacterMap_apply_one_eq_zero hyp (hdiff_supp i)
   -- (1.4) hypothesis (inner product preserved): both differences live in the supported `ℤ[χ, χ̄]`.
   have hisom : ∀ i j,
       ClassFunction.inner (isometryDifferenceImage τ fam i) (isometryDifferenceImage τ fam j) =
         ClassFunction.inner (irreducibleCharacterDifference fam i)
           (irreducibleCharacterDifference fam j) := by
     intro i j
-    exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hSsupp
+    exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hSsupp
       (hdiff_zspan i) (hdiff_zspan j)
   -- Assemble: the §3 keystone difference image, lifted to the orthonormal family.
   exact (characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom).toOrthonormalImage
@@ -353,16 +353,16 @@ generators the (1.4)/(2.6.a) keystone uses.  No `χ`/`χ̄` individual support i
 `dadeOrthonormalCharacterImageFamily` (individual supports) is recovered as the special case where
 `hdiffsupp` is derived from `hχsupp`, `hχbarsupp`. -/
 noncomputable def dadeCharacterDifferenceImageOfDiff
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     (χ : IrreducibleCharacter (↥L))
     (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
     (hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
       supportInSubgroup A L) :
     CharacterDifferenceImage (L := ↥L) (G := G)
-      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (χ : ClassFunction (↥L) ℂ) := by
   classical
-  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) with hτ_def
+  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) with hτ_def
   set fam : Fin 2 → IrreducibleCharacter (↥L) := conjPairFamily (L := ↥L) χ with hfam
   have hfam0 : (fam 0 : ClassFunction (↥L) ℂ) = (χ : ClassFunction (↥L) ℂ) := by
     simp [hfam, conjPairFamily]
@@ -397,18 +397,18 @@ noncomputable def dadeCharacterDifferenceImageOfDiff
   -- (1.4) hypotheses, all from the difference support.
   have hvirtual : IsometryDifferenceImagesAreVirtual (G := G) (H := ↥L) τ fam := by
     intro i
-    refine dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj (hdiff_supp i) ?_
+    refine dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp (hdiff_supp i) ?_
     refine Submodule.sub_mem _ ?_ (fam 0).mem_ZIrr
     exact (fam i).mem_ZIrr
   have hzero : IsometryDifferenceImagesVanishAtOne (G := G) (H := ↥L) τ fam := by
     intro i
-    exact dadeIntegralCharacterMap_apply_one_eq_zero hyp hconj (hdiff_supp i)
+    exact dadeIntegralCharacterMap_apply_one_eq_zero hyp (hdiff_supp i)
   have hisom : ∀ i j,
       ClassFunction.inner (isometryDifferenceImage τ fam i) (isometryDifferenceImage τ fam j) =
         ClassFunction.inner (irreducibleCharacterDifference fam i)
           (irreducibleCharacterDifference fam j) := by
     intro i j
-    exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hDsupp
+    exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hDsupp
       (hdiff_in_D i) (hdiff_in_D j)
   exact characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom
 
@@ -418,15 +418,15 @@ lifted to the orthonormal family `R(χ) = {ε·μ, −ε·ν}` via `toOrthonorma
 itself is unsupported since `χ(1) ≠ 0`).  The underlying `{μ, ν, ε}` data is
 `dadeCharacterDifferenceImageOfDiff` (consumed by the cross-`L` (4.1) orthogonality of (12.3)). -/
 noncomputable def dadeOrthonormalCharacterImageFamilyOfDiff
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     (χ : IrreducibleCharacter (↥L))
     (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
     (hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
       supportInSubgroup A L) :
     OrthonormalCharacterImageFamily (L := ↥L) (G := G)
-      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (χ : ClassFunction (↥L) ℂ) :=
-  (dadeCharacterDifferenceImageOfDiff hyp hconj χ hreal hdiffsupp).toOrthonormalImage
+  (dadeCharacterDifferenceImageOfDiff hyp χ hreal hdiffsupp).toOrthonormalImage
 
 /-- **The supported per-step decomposition `Da` of `χ − a·χ₁`, for an UNSUPPORTED `χ` (X-family).**
 
@@ -442,24 +442,24 @@ the
 `ZIrr`-membership only on `χ − a·χ₁` (`htau1_mema`, the degree-matched difference vanishing at `1`).
 `R(χ)` is the difference-support family `dadeOrthonormalCharacterImageFamilyOfDiff`. -/
 noncomputable def decompositionDaFromDadeOfDiff
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     (χ : IrreducibleCharacter (↥L))
     (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
     {chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
     (hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
       supportInSubgroup A L)
     (hdiffasupp : ((χ : ClassFunction (↥L) ℂ) - a • chi1).support ⊆ supportInSubgroup A L)
-    (htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+    (htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
       ((χ : ClassFunction (↥L) ℂ) - a • chi1) ∈ ZIrr G)
     (hχaχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (a • chi1 : ClassFunction (↥L) ℂ) = 0)
     (hχbaraχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj
       (a • chi1 : ClassFunction (↥L) ℂ) = 0)
     (hχχbar' : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ).conj = 0) :
     CharacterPsiDecomposition (L := ↥L) (G := G)
-      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (χ : ClassFunction (↥L) ℂ) (a • chi1) := by
   classical
-  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) with hτ
+  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) with hτ
   -- The difference set `{χ−χ̄, χ−a·χ₁}` is supported (`χ−χ̄` via `hdiffsupp` up to sign).
   have hSdiff : ∀ s ∈ ({(χ : ClassFunction (↥L) ℂ) - (χ : ClassFunction (↥L) ℂ).conj,
       (χ : ClassFunction (↥L) ℂ) - a • chi1} : Set (ClassFunction (↥L) ℂ)),
@@ -473,9 +473,9 @@ noncomputable def decompositionDaFromDadeOfDiff
       exact hdiffsupp
     · exact hdiffasupp
   exact CharacterPsiDecomposition.ofProjection
-    (dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp) τ
+    (dadeOrthonormalCharacterImageFamilyOfDiff hyp χ hreal hdiffsupp) τ
     (fun φ ζ hφ hζ =>
-      dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hSdiff hφ hζ)
+      dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hSdiff hφ hζ)
     rfl htau1_mema hχaχ1 hχbaraχ1 hχχbar'
 
 /-- **Peterfalvi (5.2.e) inner-product core for the Dade families.**
@@ -488,7 +488,7 @@ inner-preservation (`dadeIntegralCharacterMap_inner_eq_on_supported_span`) reduc
 input of `orthogonal_of_signedDifference_inner_eq_zero` for the Dade `R(·)` families (feeding the
 per-member `(5.2.e)` orthogonality `hmemOrtho` of `DadeChainStep`). -/
 theorem dadeIntegralCharacterMap_inner_conjDifference_eq_zero
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {x χ : ClassFunction (↥L) ℂ}
     (hxsupp : x.support ⊆ supportInSubgroup A L)
     (hxbarsupp : x.conj.support ⊆ supportInSubgroup A L)
@@ -498,8 +498,8 @@ theorem dadeIntegralCharacterMap_inner_conjDifference_eq_zero
     (hxbarχ : ClassFunction.inner x.conj χ = 0)
     (hxbarχbar : ClassFunction.inner x.conj χ.conj = 0) :
     ClassFunction.inner
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) (x - x.conj))
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) (χ - χ.conj)) = 0 := by
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) (x - x.conj))
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) (χ - χ.conj)) = 0 := by
   classical
   have hS : ∀ s ∈ ({x, x.conj, χ, χ.conj} : Set (ClassFunction (↥L) ℂ)),
       s.support ⊆ supportInSubgroup A L := by
@@ -516,7 +516,7 @@ theorem dadeIntegralCharacterMap_inner_conjDifference_eq_zero
   have hχ_span : (χ - χ.conj) ∈
       zSpan (L := ↥L) ({x, x.conj, χ, χ.conj} : Set (ClassFunction (↥L) ℂ)) :=
     Submodule.sub_mem _ (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))
-  rw [dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS hx_span hχ_span]
+  rw [dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hS hx_span hχ_span]
   simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     hxχ, hxχbar, hxbarχ, hxbarχbar, sub_self]
 
@@ -530,7 +530,7 @@ The orthonormal image families `R(x)` and `R(χ)` produced from the Dade isometr
 `(5.2.e)` orthogonality `hmemOrtho` of `DadeChainStep` for members built by
 `decompositionPairFromDadeOfIrreducible`. -/
 theorem dadeOrthonormalCharacterImageFamily_orthogonal
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {x χ : IrreducibleCharacter (↥L)}
     (hxreal : ¬ ClassFunction.IsReal (x : ClassFunction (↥L) ℂ))
     (hxsupp : (x : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
@@ -543,14 +543,14 @@ theorem dadeOrthonormalCharacterImageFamily_orthogonal
     (hxbarχ : ClassFunction.inner (x : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ) = 0)
     (hxbarχbar :
       ClassFunction.inner (x : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ).conj = 0) :
-    (dadeOrthonormalCharacterImageFamily hyp hconj x hxreal hxsupp hxbarsupp).Orthogonal
-      (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp) := by
+    (dadeOrthonormalCharacterImageFamily hyp x hxreal hxsupp hxbarsupp).Orthogonal
+      (dadeOrthonormalCharacterImageFamily hyp χ hreal hχsupp hχbarsupp) := by
   unfold dadeOrthonormalCharacterImageFamily
   refine CharacterDifferenceImage.toOrthonormalImage_orthogonal _ _
     (CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero _ _ ?_)
   rw [← CharacterDifferenceImage.image_eq_signedDifference,
     ← CharacterDifferenceImage.image_eq_signedDifference]
-  exact dadeIntegralCharacterMap_inner_conjDifference_eq_zero hyp hconj
+  exact dadeIntegralCharacterMap_inner_conjDifference_eq_zero hyp
     hxsupp hxbarsupp hχsupp hχbarsupp hxχ hxχbar hxbarχ hxbarχbar
 
 /-- **Peterfalvi (5.6.3) / Round-24 (ii): the per-step decomposition pair `(D₀, Da)`, produced
@@ -570,24 +570,24 @@ unblocked.  The structural τ₁-agreement `Da.tau1 χ = D₀.tau1 χ` is `rfl`
 (`decompositionPair_tau1_agree`), so this pair feeds `retarget_isCoherent_of_sharedDecomposition`
 directly.  This closes Round-24 (ii): the per-step `(D₀, Da)` production from the Dade isometry. -/
 noncomputable def decompositionPairFromDade
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {χ chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
     (imageFamily : OrthonormalCharacterImageFamily (L := ↥L) (G := G)
-      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) χ)
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) χ)
     (hχsupp : χ.support ⊆ supportInSubgroup A L)
     (hχbarsupp : χ.conj.support ⊆ supportInSubgroup A L)
     (haχ1supp : (a • chi1 : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
     (htau1_mem0 :
-      dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) (χ - 0) ∈ ZIrr G)
+      dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) (χ - 0) ∈ ZIrr G)
     (htau1_mema :
-      dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) (χ - a • chi1) ∈ ZIrr G)
+      dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) (χ - a • chi1) ∈ ZIrr G)
     (hχχ1 : ClassFunction.inner χ chi1 = 0)
     (hχbarχ1 : ClassFunction.inner χ.conj chi1 = 0)
     (hχχbar : ClassFunction.inner χ χ.conj = 0) :
     CharacterPsiDecomposition (L := ↥L) (G := G)
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) χ 0 ×
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) χ 0 ×
       CharacterPsiDecomposition (L := ↥L) (G := G)
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) χ (a • chi1) :=
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) χ (a • chi1) :=
   -- Every generator of the sponsoring lattice `{χ, χ̄, 0, a·χ₁}` is supported, so the Dade
   -- isometry's `CF(L,A)` inner-preservation supplies the lattice-relative `htau1_inner_eq`.
   have hS : ∀ s ∈ ({χ, χ.conj, 0, a • chi1} : Set (ClassFunction (↥L) ℂ)),
@@ -600,9 +600,9 @@ noncomputable def decompositionPairFromDade
     · simpa only [ClassFunction.support_zero] using Set.empty_subset _
     · exact haχ1supp
   CharacterPsiDecomposition.decompositionPair imageFamily
-    (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
     (fun φ ζ hφ hζ =>
-      dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS hφ hζ)
+      dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hS hφ hζ)
     rfl htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar
 
 /-- **Round B assembly: the fully Dade-derived per-step decomposition pair.**
@@ -617,7 +617,7 @@ Round B) **and** the two `ZIrr`-membership facts `(χ−0)^τ, (χ−a·χ₁)^�
 input fully constructive from the real Dade τ: feed the result to
 `retarget_isCoherent_of_sharedDecomposition`. -/
 noncomputable def decompositionPairFromDadeOfIrreducible
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     (χ : IrreducibleCharacter (↥L)) {chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
     (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
     (hχsupp : (χ : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
@@ -628,24 +628,24 @@ noncomputable def decompositionPairFromDadeOfIrreducible
     (hχbarχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj chi1 = 0)
     (hχχbar : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ).conj = 0) :
     CharacterPsiDecomposition (L := ↥L) (G := G)
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
         (χ : ClassFunction (↥L) ℂ) 0 ×
       CharacterPsiDecomposition (L := ↥L) (G := G)
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
         (χ : ClassFunction (↥L) ℂ) (a • chi1) :=
   -- `(χ − 0)^τ ∈ ℤ[Irr G]`: `χ` itself is supported and in `ℤ[Irr L]`.
-  have hmem0 : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+  have hmem0 : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
       ((χ : ClassFunction (↥L) ℂ) - 0) ∈ ZIrr G :=
-    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp
       (by simpa only [sub_zero] using hχsupp) (by simpa only [sub_zero] using χ.mem_ZIrr)
   -- `(χ − a·χ₁)^τ ∈ ℤ[Irr G]`: difference of supported virtual characters.
-  have hmema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+  have hmema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
       ((χ : ClassFunction (↥L) ℂ) - a • chi1) ∈ ZIrr G :=
-    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp
       ((ClassFunction.support_sub_subset _ _).trans (Set.union_subset hχsupp haχ1supp))
       (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem hchi1Z a))
-  decompositionPairFromDade hyp hconj
-    (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
+  decompositionPairFromDade hyp
+    (dadeOrthonormalCharacterImageFamily hyp χ hreal hχsupp hχbarsupp)
     hχsupp hχbarsupp haχ1supp hmem0 hmema hχχ1 hχbarχ1 hχχbar
 
 open OddOrder.RepresentationTheory in
@@ -673,12 +673,12 @@ orthogonality of `S₁`), the family memberships/supports/non-vanishing, the per
 (`Dmem`/`hmemTau1`/`hmemOrtho`, exactly the `DadeChainStep` fields), and the degree inequality
 (c). -/
 theorem dade_Y_collapse_of_family
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {S₁ : Set (ClassFunction (↥L) ℂ)}
     {χ chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
     (Da : CharacterPsiDecomposition (L := ↥L) (G := G)
-      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) χ (a • chi1))
-    (hDa_tau1 : Da.tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) χ (a • chi1))
+    (hDa_tau1 : Da.tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
     {ι : Type*} {s : Finset ι} {i₁ : ι}
     (B : CharacterFamilyBundle (L := ↥L) χ chi1 (a : ℝ) s i₁)
     (hfam_mem : ∀ i ∈ s, B.chiFam i ∈ S₁)
@@ -689,9 +689,9 @@ theorem dade_Y_collapse_of_family
     (hdiffasupp : ((χ : ClassFunction (↥L) ℂ) - a • chi1).support ⊆ supportInSubgroup A L)
     (Dmem : (x : ClassFunction (↥L) ℂ) → x ∈ S₁ →
       CharacterPsiDecomposition (L := ↥L) (G := G)
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) x 0)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) x 0)
     (hmemTau1 : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
-      (Dmem x hx).tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (Dmem x hx).tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
     (hmemOrtho : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
       (Dmem x hx).imageFamily.Orthogonal Da.imageFamily)
     (hdiff_ZIrr : Da.tau1 (χ - a • chi1) ∈ ZIrr G)
@@ -748,14 +748,14 @@ theorem dade_Y_collapse_of_family
         ClassFunction.inner (B.chiFam i) (B.chiFam j) := by
     intro i hi j hj
     rw [hDa_tau1]
-    exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS₀supp
+    exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hS₀supp
       (hfam_zspan i hi) (hfam_zspan j hj)
   have hiso_cross : ∀ i ∈ s,
       ClassFunction.inner (Da.tau1 (χ - a • chi1)) (Da.tau1 (B.chiFam i - B.ratio i • chi1)) =
         ClassFunction.inner (χ - a • chi1) (B.chiFam i - B.ratio i • chi1) := by
     intro i hi
     rw [hDa_tau1]
-    exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hS₀supp
+    exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hS₀supp
       hdiff_zspan (hfamdiff_zspan i hi)
   -- `R(χ) ⊥ S₁^{τ₁}` ((5.5)+(5.2.e)): `χᵢ^{τ₁} = (Dmem χᵢ).X ∈ ℤ[R(χᵢ)] ⊥ R(χ)`.
   have hXortho : ∀ α ∈ Da.imageFamily.imageSet, ∀ i ∈ s,
@@ -773,7 +773,7 @@ theorem dade_Y_collapse_of_family
     exact (congrArg (ClassFunction.inner α) hX).trans h0
   have hvc1_ZIrr : Da.tau1 chi1 ∈ ZIrr G := by
     rw [hDa_tau1]
-    exact dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj hchi1_supp hchi1_ZIrr
+    exact dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hchi1_supp hchi1_ZIrr
   exact Da.Y_collapse_of_family B mc hmc hmc_pos hmc1_int hiso_fam hiso_cross hXortho hvc1_ZIrr
     hdiff_ZIrr hdeg_c
 
@@ -795,7 +795,7 @@ The orthonormality `{χ, χ̄}` (`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar`) is
 This is the missing base case: every prior coherence producer *consumed* a coherent set but none
 *constructed* the seed. -/
 noncomputable def coherentPair_fromDade
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     (χ : IrreducibleCharacter (↥L))
     (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
     (hχsupp : (χ : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
@@ -806,11 +806,11 @@ noncomputable def coherentPair_fromDade
     (hχbarχ : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ) = 0)
     (hχχbar : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ).conj = 0)
     (h1notA : (1 : G) ∉ A) :
-    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       {(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj} (supportInSubgroup A L) := by
   classical
   -- The `ψ = 0` decomposition `D₀` (via `decompositionPairFromDadeOfIrreducible` with `χ₁ = 0`).
-  set D₀ := (decompositionPairFromDadeOfIrreducible hyp hconj χ hreal hχsupp hχbarsupp
+  set D₀ := (decompositionPairFromDadeOfIrreducible hyp χ hreal hχsupp hχbarsupp
     (chi1 := 0) (a := 0) (Submodule.zero_mem _) (by simp) (by simp) (by simp) hχχbar).1 with hD₀
   -- The orthonormal target pair `{X, X̄}` from `R(χ)`.
   have P := D₀.retargetTargetPair hχχ hχbarχbar hχχbar hχbarχ
@@ -850,7 +850,7 @@ difference); `coherentEqualDegree` then assembles the coherence.  This is the **
 (6.6) equal-minimal-degree prefix and the (6.8) `Y = S(H')`**, both produced directly from the real
 Dade τ with no opaque hypotheses (the equal degree and supports are the genuine (6.8) data). -/
 noncomputable def coherentEqualDegree_fromDade
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {n : ℕ} [NeZero n] (hn : 2 ≤ n)
     (χ : Fin n → IrreducibleCharacter (↥L))
     (hχinj : Function.Injective χ)
@@ -858,10 +858,10 @@ noncomputable def coherentEqualDegree_fromDade
       = ((χ 0 : ClassFunction (↥L) ℂ) : ↥L → ℂ) 1)
     (hsuppdiff : ∀ j, (irreducibleCharacterDifference χ j).support ⊆ supportInSubgroup A L)
     (h1notA : (1 : G) ∉ A) :
-    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (Set.range (fun j => (χ j : ClassFunction (↥L) ℂ))) (supportInSubgroup A L) := by
   classical
-  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) with hτ
+  set τ := dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) with hτ
   -- Source orthonormality from the distinct irreducible characters.
   have horthχ : ∀ i j, ClassFunction.inner ((χ i : ClassFunction (↥L) ℂ))
       ((χ j : ClassFunction (↥L) ℂ)) = if i = j then (1 : ℂ) else 0 := by
@@ -882,15 +882,15 @@ noncomputable def coherentEqualDegree_fromDade
     fun i => Submodule.subset_span (Set.mem_range_self i)
   -- Discharge the three (1.4) hypotheses for the Dade base map.
   have hvirtual : IsometryDifferenceImagesAreVirtual (G := G) (H := ↥L) τ χ := fun i =>
-    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj (hdiff_supp i)
+    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp (hdiff_supp i)
       (Submodule.sub_mem _ (χ i).mem_ZIrr (χ 0).mem_ZIrr)
   have hzero : IsometryDifferenceImagesVanishAtOne (G := G) (H := ↥L) τ χ := fun i =>
-    dadeIntegralCharacterMap_apply_one_eq_zero hyp hconj (hdiff_supp i)
+    dadeIntegralCharacterMap_apply_one_eq_zero hyp (hdiff_supp i)
   have hisom : ∀ i j, ClassFunction.inner (isometryDifferenceImage τ χ i)
       (isometryDifferenceImage τ χ j) =
       ClassFunction.inner (irreducibleCharacterDifference χ i)
         (irreducibleCharacterDifference χ j) := fun i j =>
-    dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hdiffSset
+    dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hdiffSset
       (hdiff_zspan i) (hdiff_zspan j)
   -- (1.4): the signed irreducible-difference family `{μⱼ, ε}` (extracted via `Exists.choose`,
   -- as the conclusion is data in `Type`, not a `Prop`).
@@ -958,17 +958,17 @@ its `tau1` field equal to `τ` (`hmemTau1Base`).
 This closes the running-`τ₁` instantiation: a `coherentPairChain` step is now DISCHARGED from the
 real Dade τ + the prior coherence, with no opaque auxiliary-isometry agreement hypothesis. -/
 noncomputable def retarget_isCoherent_fromDade
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {S₁ : Set (ClassFunction (↥L) ℂ)} {A' : Set ↥L}
-    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) S₁ A')
+    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) S₁ A')
     (χ : IrreducibleCharacter (↥L)) {chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
     (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
     (hχsupp : (χ : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
     (hχbarsupp : (χ : ClassFunction (↥L) ℂ).conj.support ⊆ supportInSubgroup A L)
     (haχ1supp : (a • chi1 : ClassFunction (↥L) ℂ).support ⊆ supportInSubgroup A L)
-    (htau1_mem0 : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+    (htau1_mem0 : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
       ((χ : ClassFunction (↥L) ℂ) - 0) ∈ ZIrr G)
-    (htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+    (htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
       ((χ : ClassFunction (↥L) ℂ) - a • chi1) ∈ ZIrr G)
     (hχχ : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ) = 1)
     (hχbarχbar :
@@ -976,13 +976,13 @@ noncomputable def retarget_isCoherent_fromDade
     (hχbarχ : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj (χ : ClassFunction (↥L) ℂ) = 0)
     (Dmem : (x : ClassFunction (↥L) ℂ) → x ∈ S₁ →
       CharacterPsiDecomposition (L := ↥L) (G := G)
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) x 0)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) x 0)
     (hmemTau1Base : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
-      (Dmem x hx).tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (Dmem x hx).tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
     (hmemSupp : ∀ x ∈ S₁, x ∈ zSupportedSpan (L := ↥L) S₁ A')
     (hmemOrtho : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
       (Dmem x hx).imageFamily.Orthogonal
-        (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp))
+        (dadeOrthonormalCharacterImageFamily hyp χ hreal hχsupp hχbarsupp))
     (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ) x = 0)
     (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj x = 0)
     (hchi1 : chi1 ∈ S₁)
@@ -992,9 +992,9 @@ noncomputable def retarget_isCoherent_fromDade
     (hχχbar' : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (χ : ClassFunction (↥L) ℂ).conj = 0)
     (hY :
       ((CharacterPsiDecomposition.decompositionPair
-        (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
-        (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+        (dadeOrthonormalCharacterImageFamily hyp χ hreal hχsupp hχbarsupp)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
+        (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp
           (by
             intro s hs
             simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
@@ -1005,9 +1005,9 @@ noncomputable def retarget_isCoherent_fromDade
             · exact haχ1supp) hφ hζ)
         rfl htau1_mem0 htau1_mema hχχ1 hχbarχ1 hχχbar').2).Y =
         a • ((CharacterPsiDecomposition.decompositionPair
-        (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
-        (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+        (dadeOrthonormalCharacterImageFamily hyp χ hreal hχsupp hχbarsupp)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
+        (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp
           (by
             intro s hs
             simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
@@ -1022,12 +1022,12 @@ noncomputable def retarget_isCoherent_fromDade
       Submodule.span ℤ (zSupportedSpan (L := ↥L) S₁ A' ∪
         {(χ : ClassFunction (↥L) ℂ) - (χ : ClassFunction (↥L) ℂ).conj,
          (χ : ClassFunction (↥L) ℂ) - a • chi1})) :
-    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (S₁ ∪ {(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj}) A' :=
   retarget_isCoherent_of_sharedDecomposition hS₁
-    (dadeOrthonormalCharacterImageFamily hyp hconj χ hreal hχsupp hχbarsupp)
-    (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
-    (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+    (dadeOrthonormalCharacterImageFamily hyp χ hreal hχsupp hχbarsupp)
+    (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
+    (fun φ ζ hφ hζ => dadeIntegralCharacterMap_inner_eq_on_supported_span hyp
       (by
         intro s hs
         simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
@@ -1059,15 +1059,15 @@ adapter `retarget_isCoherent_of_supportedDecomposition_and_memberFamily` — **n
 supports `hdiffsupp : (χ̄ − χ) ∈ CF(L,A)` and `hdiffasupp : (χ − a·χ₁) ∈ CF(L,A)` (both vanish at
 `1`).  `htau1_diff` and `Da.tau1 = τ` are structural (`rfl`); `hY` is the (5.6.2) collapse. -/
 noncomputable def retarget_isCoherent_fromDade_X
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {S₁ : Set (ClassFunction (↥L) ℂ)} {A' : Set ↥L}
-    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) S₁ A')
+    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) S₁ A')
     (χ : IrreducibleCharacter (↥L)) {chi1 : ClassFunction (↥L) ℂ} {a : ℕ}
     (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
     (hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
       supportInSubgroup A L)
     (hdiffasupp : ((χ : ClassFunction (↥L) ℂ) - a • chi1).support ⊆ supportInSubgroup A L)
-    (htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+    (htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
       ((χ : ClassFunction (↥L) ℂ) - a • chi1) ∈ ZIrr G)
     (hχaχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ) (a • chi1 : ClassFunction (↥L) ℂ) = 0)
     (hχbaraχ1 : ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj
@@ -1080,31 +1080,31 @@ noncomputable def retarget_isCoherent_fromDade_X
     (hchi1chi1 : ClassFunction.inner chi1 chi1 = 1)
     (Dmem : (x : ClassFunction (↥L) ℂ) → x ∈ S₁ →
       CharacterPsiDecomposition (L := ↥L) (G := G)
-        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) x 0)
+        (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) x 0)
     (hmemTau1Base : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
-      (Dmem x hx).tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (Dmem x hx).tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
     (hmemSupp : ∀ x ∈ S₁, x ∈ zSupportedSpan (L := ↥L) S₁ A')
     (hmemOrtho : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
       (Dmem x hx).imageFamily.Orthogonal
-        (dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp))
+        (dadeOrthonormalCharacterImageFamilyOfDiff hyp χ hreal hdiffsupp))
     (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ) x = 0)
     (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ).conj x = 0)
     (hchi1 : chi1 ∈ S₁)
     (hchi1supp : chi1 ∈ zSupportedSpan (L := ↥L) S₁ A')
     (hY :
-      (decompositionDaFromDadeOfDiff hyp hconj χ hreal hdiffsupp hdiffasupp htau1_mema
+      (decompositionDaFromDadeOfDiff hyp χ hreal hdiffsupp hdiffasupp htau1_mema
         hχaχ1 hχbaraχ1 hχχbar').Y =
-        a • (decompositionDaFromDadeOfDiff hyp hconj χ hreal hdiffsupp hdiffasupp htau1_mema
+        a • (decompositionDaFromDadeOfDiff hyp χ hreal hdiffsupp hdiffasupp htau1_mema
           hχaχ1 hχbaraχ1 hχχbar').tau1 chi1)
     (hgen : zSupportedSpan (L := ↥L) (S₁ ∪ {(χ : ClassFunction (↥L) ℂ),
         (χ : ClassFunction (↥L) ℂ).conj}) A' ⊆
       Submodule.span ℤ (zSupportedSpan (L := ↥L) S₁ A' ∪
         {(χ : ClassFunction (↥L) ℂ) - (χ : ClassFunction (↥L) ℂ).conj,
          (χ : ClassFunction (↥L) ℂ) - a • chi1})) :
-    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (S₁ ∪ {(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj}) A' :=
   retarget_isCoherent_of_supportedDecomposition_and_memberFamily hS₁
-    (decompositionDaFromDadeOfDiff hyp hconj χ hreal hdiffsupp hdiffasupp htau1_mema
+    (decompositionDaFromDadeOfDiff hyp χ hreal hdiffsupp hdiffasupp htau1_mema
       hχaχ1 hχbaraχ1 hχχbar')
     rfl hχχ hχbarχbar hχχbar' hχbarχ hchi1chi1
     Dmem hmemOrtho
@@ -1117,7 +1117,7 @@ noncomputable def retarget_isCoherent_fromDade_X
 
 /-- **The genuine per-step (6.6) content, after the Dade isometry has supplied everything it can.**
 
-`DadeChainStep hyp hconj S₁ A χ` bundles the inputs of one (5.6) adjoining step
+`DadeChainStep hyp S₁ A χ` bundles the inputs of one (5.6) adjoining step
 `IsCoherent τ S₁ A → IsCoherent τ (S₁ ∪ {↑χ, (↑χ).conj}) A` against the Dade base map
 `τ = dadeIntegralCharacterMap` that are **NOT** the Dade isometry's responsibility — the genuine
 character-degree content of (6.6) — leaving the Round-B/Dade-supplied parts
@@ -1145,7 +1145,7 @@ through the difference generators (`zSupportedSpan_adjoinPair_subset_span`), dis
 by
 `advance` from `hmemSupp` and `hchi1supp` (no (4.7) `ℤ[S, L^#] = ℤ[S, A]` needed). -/
 structure DadeChainStep
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     (S₁ : Set (ClassFunction (↥L) ℂ)) (A' : Set ↥L)
     (χ : IrreducibleCharacter (↥L)) where
   /-- The distinguished member `χ₁`. -/
@@ -1177,16 +1177,16 @@ structure DadeChainStep
   /-- The per-member `ψ = 0` decomposition family of `S₁` ((5.5)). -/
   Dmem : (x : ClassFunction (↥L) ℂ) → x ∈ S₁ →
     CharacterPsiDecomposition (L := ↥L) (G := G)
-      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) x 0
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) x 0
   /-- Each member's auxiliary isometry is the base map `τ` (running `τ₁ = τ`). -/
   hmemTau1Base : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
-    (Dmem x hx).tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+    (Dmem x hx).tau1 = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
   /-- Every member of `S₁` is supported. -/
   hmemSupp : ∀ x ∈ S₁, x ∈ zSupportedSpan (L := ↥L) S₁ A'
   /-- Per-member `R(x) ⊥ R(χ)` ((5.2.e)). -/
   hmemOrtho : ∀ (x : ClassFunction (↥L) ℂ) (hx : x ∈ S₁),
     (Dmem x hx).imageFamily.Orthogonal
-      (dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp)
+      (dadeOrthonormalCharacterImageFamilyOfDiff hyp χ hreal hdiffsupp)
   /-- `χ ⊥ S₁`. -/
   hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction (↥L) ℂ) x = 0
   /-- `χ̄ ⊥ S₁`. -/
@@ -1225,7 +1225,7 @@ structure DadeChainStep
 
 namespace DadeChainStep
 
-variable {hyp : S04.Hypothesis G A L} {hconj : hyp.HConjInvariant}
+variable {hyp : S04.Hypothesis G A L}
 variable {S₁ : Set (ClassFunction (↥L) ℂ)} {A' : Set ↥L} {χ : IrreducibleCharacter (↥L)}
 
 /-- **The genuine per-step content advances coherence by one Dade step.**
@@ -1236,9 +1236,9 @@ adjoining step against the real Dade base map: the Round-B `R(χ)` and (2.6.b) `
 built internally, the running `τ₁ = τ` agreements are `rfl`/`extends_on_supported`, and the
 genuine character data is read off `step`'s fields.  It is a single call to
 `retarget_isCoherent_fromDade`. -/
-noncomputable def advance (step : DadeChainStep hyp hconj S₁ A' χ)
-    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) S₁ A') :
-    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+noncomputable def advance (step : DadeChainStep hyp S₁ A' χ)
+    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) S₁ A') :
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (S₁ ∪ {(χ : ClassFunction (↥L) ℂ), (χ : ClassFunction (↥L) ℂ).conj}) A' := by
   have hmemS₁ : ∀ x ∈ step.famS, x ∈ S₁ := fun x hx => step.famS_eq ▸ Finset.mem_coe.mpr hx
   have hchi1mem : step.chi1 ∈ step.famS := by
@@ -1264,18 +1264,18 @@ noncomputable def advance (step : DadeChainStep hyp hconj S₁ A' χ)
       (step.a • step.chi1 : ClassFunction (↥L) ℂ) = 0 := by
     rw [← Nat.cast_smul_eq_nsmul ℂ step.a step.chi1,
       OddOrder.RepresentationTheory.inner_smul_right, step.hχbarχ1, mul_zero]
-  have htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)
+  have htau1_mema : dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)
       ((χ : ClassFunction (↥L) ℂ) - step.a • step.chi1) ∈ ZIrr G :=
-    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj step.hdiffasupp
+    dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp step.hdiffasupp
       (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem step.hchi1Z step.a))
-  refine retarget_isCoherent_fromDade_X hyp hconj hS₁ χ step.hreal step.hdiffsupp step.hdiffasupp
+  refine retarget_isCoherent_fromDade_X hyp hS₁ χ step.hreal step.hdiffsupp step.hdiffasupp
     htau1_mema hχaχ1 hχbaraχ1 step.hχχ step.hχbarχbar step.hχbarχ step.hχχbar' step.hchi1chi1
     step.Dmem step.hmemTau1Base step.hmemSupp step.hmemOrtho
     step.hχ_S1 step.hχbar_S1 step.hchi1 step.hchi1supp ?_
     (zSupportedSpan_adjoinPair_subset_span step.hmemSupp step.hchi1supp)
   -- The (5.6.2) collapse `hY`, proved from the family data (difference-support).
-  exact dade_Y_collapse_of_family hyp hconj
-    (decompositionDaFromDadeOfDiff hyp hconj χ step.hreal step.hdiffsupp step.hdiffasupp htau1_mema
+  exact dade_Y_collapse_of_family hyp
+    (decompositionDaFromDadeOfDiff hyp χ step.hreal step.hdiffsupp step.hdiffasupp htau1_mema
       hχaχ1 hχbaraχ1 step.hχχbar')
     rfl B (fun i hi => hmemS₁ i hi) step.famNe
     step.famSupp (step.famSupp _ hchi1mem) step.hchi1Z step.hdiffasupp step.Dmem step.hmemTau1Base
@@ -1283,7 +1283,7 @@ noncomputable def advance (step : DadeChainStep hyp hconj S₁ A' χ)
 
 /-- **One `coherentPairChain` step, in the engine's accumulator shape, from the Dade isometry.**
 
-Given the genuine per-step (6.6) content `step : DadeChainStep hyp hconj (pairUnion S₀ pair i) A χ`
+Given the genuine per-step (6.6) content `step : DadeChainStep hyp (pairUnion S₀ pair i) A χ`
 together with the requirement that the `i`-th adjoined pair is `{↑χ, (↑χ).conj}`
 (`hpair0 : (pair i).1 = ↑χ`, `hpair1 : (pair i).2 = (↑χ).conj`), this produces the per-step map
 `IsCoherent τ (pairUnion S₀ pair i) A → IsCoherent τ (pairUnion S₀ pair (i+1)) A` that the
@@ -1295,16 +1295,16 @@ This is the `hstep` building block for `peterfalvi_66_coherence_of_X_from_dade`:
 fully Dade-derived (5.6) adjoining, with the only remaining content being the source-side (6.6)
 degree data packaged in `step`. -/
 noncomputable def chainStepAdvance
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : S04.Hypothesis G A L)
     {S₀ : Set (ClassFunction (↥L) ℂ)} {A' : Set ↥L}
     (pair : ℕ → ClassFunction (↥L) ℂ × ClassFunction (↥L) ℂ) (i : ℕ)
     {χ : IrreducibleCharacter (↥L)}
     (hpair0 : (pair i).1 = (χ : ClassFunction (↥L) ℂ))
     (hpair1 : (pair i).2 = (χ : ClassFunction (↥L) ℂ).conj)
-    (step : DadeChainStep hyp hconj (pairUnion (L := ↥L) S₀ pair i) A' χ)
-    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    (step : DadeChainStep hyp (pairUnion (L := ↥L) S₀ pair i) A' χ)
+    (hS₁ : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (pairUnion (L := ↥L) S₀ pair i) A') :
-    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (pairUnion (L := ↥L) S₀ pair (i + 1)) A' :=
   (pairUnion_succ_eq_union_pair (L := ↥L) hpair0 hpair1).symm ▸ step.advance hS₁
 
@@ -1313,7 +1313,7 @@ end DadeChainStep
 /-- **Peterfalvi (6.6): `X = S − S(Z)` is coherent — instantiated at the real Dade isometry.**
 
 The (6.6) conclusion with the coherence base map **fixed** to the genuine Dade base map
-`τ = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)`, and the per-step `hstep` of the
+`τ = dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)`, and the per-step `hstep` of the
 `coherentPairChain` engine **constructed** — no longer posited — from the Dade isometry plus the
 prior step's coherence.
 
@@ -1322,7 +1322,7 @@ by, for each adjoined pair `i < N`:
 * `hpairχ i hi` — an irreducible character `χᵢ` of `L` realizing the `i`-th pair as `{χᵢ, χ̄ᵢ}`
   (`(pair i) = (↑χᵢ, (↑χᵢ).conj)`); and
 * `hstepData i hi` — the genuine per-step (6.6) degree/orthogonality content
-  `DadeChainStep hyp hconj (pairUnion S₀ pair i) A χᵢ` over the running accumulator.
+  `DadeChainStep hyp (pairUnion S₀ pair i) A χᵢ` over the running accumulator.
 
 Each step is then discharged by `DadeChainStep.chainStepAdvance` — one fully Dade-derived (5.6)
 adjoining (`retarget_isCoherent_fromDade`): the orthonormal image `R(χᵢ)`
@@ -1339,7 +1339,7 @@ inputs that remain are the genuine (6.6) character-degree content (the enumerati
 Dade isometry's responsibility.  It is the (6.6) coherence-of-X with its (5.6) per-step machinery
 dischargeable from the Dade isometry. -/
 noncomputable def peterfalvi_66_coherence_of_X_from_dade
-    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant) {A' : Set ↥L}
+    (hyp : S04.Hypothesis G A L) {A' : Set ↥L}
     {X S₀ : Set (ClassFunction (↥L) ℂ)}
     (hXfin : X.Finite)
     {e : Fin X.ncard → ClassFunction (↥L) ℂ} (hsurj : ∀ χ ∈ X, ∃ i, e i = χ)
@@ -1347,18 +1347,18 @@ noncomputable def peterfalvi_66_coherence_of_X_from_dade
     (hS₀ : S₀ ⊆ X) (hpairs : ∀ j, j < N → pairSet (L := ↥L) pair j ⊆ X)
     (hcoverIdx : ∀ i : Fin X.ncard,
       e i ∈ S₀ ∨ ∃ j, j < N ∧ e i ∈ pairSet (L := ↥L) pair j)
-    (h0 : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) S₀ A')
+    (h0 : IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) S₀ A')
     (hpairχ : ∀ i, i < N → IrreducibleCharacter (↥L))
     (hpair0 : ∀ (i : ℕ) (hi : i < N), (pair i).1 = ((hpairχ i hi : IrreducibleCharacter (↥L)) :
       ClassFunction (↥L) ℂ))
     (hpair1 : ∀ (i : ℕ) (hi : i < N), (pair i).2 =
       ((hpairχ i hi : IrreducibleCharacter (↥L)) : ClassFunction (↥L) ℂ).conj)
     (hstepData : ∀ (i : ℕ) (hi : i < N),
-      DadeChainStep hyp hconj (pairUnion (L := ↥L) S₀ pair i) A' (hpairχ i hi)) :
-    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) X A' :=
+      DadeChainStep hyp (pairUnion (L := ↥L) S₀ pair i) A' (hpairχ i hi)) :
+    IsCoherent (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) X A' :=
   peterfalvi_66_coherence_of_X hXfin hsurj pair N hS₀ hpairs hcoverIdx h0
     (fun i hi hS₁ =>
-      DadeChainStep.chainStepAdvance hyp hconj pair i (hpair0 i hi) (hpair1 i hi)
+      DadeChainStep.chainStepAdvance hyp pair i (hpair0 i hi) (hpair1 i hi)
         (hstepData i hi) hS₁)
 
 end DadeBaseMap

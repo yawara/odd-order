@@ -754,22 +754,22 @@ consumes (`H71.τ ⟨ζ_i − d_i ζ_0, _⟩ = ν ζ_i − d_i ν ζ_0` with `H7
 `ν = hcoh.extension`). -/
 theorem coherence_hagree_dadeMap {G : Type*} [Group G] {A : Set G} {L : Subgroup G}
     [Fintype G] [Fintype ↥L] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     {S : Set (ClassFunction ↥L ℂ)}
     (hcoh : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) S
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) S
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     {ζi ζ0 : ClassFunction ↥L ℂ} (hζi : ζi ∈ S) (hζ0 : ζ0 ∈ S)
     {m0 mi : ℕ} (hm0_ne : (m0 : ℂ) ≠ 0) {di : ℂ} (hdi : di = (mi : ℂ) / (m0 : ℂ))
     (hsupp : (ζi - di • ζ0).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L) :
-    (hyp.fullDadeIsometryData hconj).toDadeMap
+    (hyp.fullDadeIsometryData).toDadeMap
         ⟨ζi - di • ζ0, (ClassFunction.mem_supportedSubmodule).mpr hsupp⟩
       = hcoh.extension ζi - di • hcoh.extension ζ0 := by
   have h1 := coherence_hagree hcoh
-    (dadeIntegralCharacterMap_smul_complex hyp (hyp.fullDadeIsometryData hconj)) hζi hζ0 hm0_ne hdi
+    (dadeIntegralCharacterMap_smul_complex hyp (hyp.fullDadeIsometryData)) hζi hζ0 hm0_ne hdi
     hsupp
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp
-    (hyp.fullDadeIsometryData hconj) hsupp] at h1
+    (hyp.fullDadeIsometryData) hsupp] at h1
   exact h1
 
 /-- **The coherent extension is isometric on the family** (§12→§7 bridge, the `nu_isometry`

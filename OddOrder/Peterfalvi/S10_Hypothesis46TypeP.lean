@@ -148,7 +148,6 @@ noncomputable def typePData_toHypothesis46_ofSupport (data : TypePData M)
     (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1))
     (A : Set G)
     (dade0 : OddOrder.Peterfalvi.S04.Hypothesis G (A ∪ conjClassSetIn M (typePV M data)) M)
-    (hconj : dade0.HConjInvariant)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
     (H : Subgroup ↥M) (hHnorm : H.Normal)
     (hW2H : data.W2.subgroupOf M ≤ H)
@@ -169,7 +168,7 @@ noncomputable def typePData_toHypothesis46_ofSupport (data : TypePData M)
     subH_le_K := hHK
     A_covers := hcover
     dade0 := dade0
-    tau := dade0.fullDadeIsometryData hconj }
+    tau := dade0.fullDadeIsometryData }
 
 open OddOrder.Peterfalvi.S12 in
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -189,7 +188,7 @@ noncomputable def typePData_toHypothesis46 (data : TypePData M)
     (hW2H : data.W2.subgroupOf M ≤ H)
     (hHK : H ≤ (derivedInG M).subgroupOf M) :
     OddOrder.Peterfalvi.S06.Hypothesis46 (typePA M data) M :=
-  typePData_toHypothesis46_ofSupport data hodd hHall (typePA M data) d.dade d.hconj
+  typePData_toHypothesis46_ofSupport data hodd hHall (typePA M data) d.dade
     (conj_mem_typePA data) H hHnorm hW2H hHK
     (fun _ _ _ x hx hx1 => by
       rw [typePA_eq_sharpSubgroup_derivedInG]
@@ -264,13 +263,12 @@ noncomputable def typePACore_toHypothesis46 (data : TypePData M)
     (hodd : Odd (Nat.card G))
     (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1))
     (dade0 : OddOrder.Peterfalvi.S04.Hypothesis G (typePACore0 M data) M)
-    (hconj : dade0.HConjInvariant)
     (H : Subgroup ↥M) (hHnorm : H.Normal)
     (hW2H : data.W2.subgroupOf M ≤ H)
     (hHσ : H ≤ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
     (hσK : OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M) :
     OddOrder.Peterfalvi.S06.Hypothesis46 (typePACore M) M :=
-  typePData_toHypothesis46_ofSupport data hodd hHall (typePACore M) dade0 hconj
+  typePData_toHypothesis46_ofSupport data hodd hHall (typePACore M) dade0
     (fun l _ ha => typePACore_conj_mem l.2 ha) H hHnorm hW2H
     (hHσ.trans (Subgroup.comap_mono hσK))
     (by
@@ -302,11 +300,10 @@ noncomputable def typePACore_toHypothesis46_core (data : TypePData M)
     (hodd : Odd (Nat.card G))
     (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1))
     (dade0 : OddOrder.Peterfalvi.S04.Hypothesis G (typePACore0 M data) M)
-    (hconj : dade0.HConjInvariant)
     (hW2σ : data.W2 ≤ OddOrder.BG.Ch3.S10.Msigma M)
     (hσK : OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M) :
     OddOrder.Peterfalvi.S06.Hypothesis46 (typePACore M) M :=
-  typePACore_toHypothesis46 data hodd hHall dade0 hconj
+  typePACore_toHypothesis46 data hodd hHall dade0
     ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
     (by rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance)
     (Subgroup.comap_mono hW2σ) (le_refl _) hσK
@@ -321,11 +318,10 @@ noncomputable def typePACore_toHypothesis46_hallKernel (data : TypePData M)
     (hodd : Odd (Nat.card G))
     (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1))
     (dade0 : OddOrder.Peterfalvi.S04.Hypothesis G (typePACore0 M data) M)
-    (hconj : dade0.HConjInvariant)
     (hHσ : data.H ≤ OddOrder.BG.Ch3.S10.Msigma M)
     (hσK : OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M) :
     OddOrder.Peterfalvi.S06.Hypothesis46 (typePACore M) M :=
-  typePACore_toHypothesis46 data hodd hHall dade0 hconj (data.H.subgroupOf M)
+  typePACore_toHypothesis46 data hodd hHall dade0 (data.H.subgroupOf M)
     (by rw [data.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M)
     (Subgroup.comap_mono (data.W2_le.trans inf_le_left))
     (Subgroup.comap_mono hHσ) hσK

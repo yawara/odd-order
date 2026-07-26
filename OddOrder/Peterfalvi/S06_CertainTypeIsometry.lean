@@ -89,8 +89,7 @@ for free.  Mirror of the `(L, W)`-side `toTICyclicFullDadeApplication`. -/
 noncomputable def ticVdiffFullDadeApplication (h : Hypothesis46 A L)
     [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)] :
     OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (ticVdiff h) :=
-  ⟨(ticVdiff h).toDadeHypothesis.fullDadeIsometryData
-    (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+  ⟨(ticVdiff h).toDadeHypothesis.fullDadeIsometryData⟩
 
 /-- `tic.W = (W₁ ⊔ W₂).map (L ↪ G)`: the ambient (3.1)-for-`G` group is the `G`-image of the
 certain-type `W = W₁ ⊔ W₂ ≤ L`.  (Named so the bridge `ticWEquivSdiffW` and its coherence share one

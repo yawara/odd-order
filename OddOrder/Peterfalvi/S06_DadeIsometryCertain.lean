@@ -451,8 +451,6 @@ noncomputable def sdiffFullDadeIsometryData [Fintype L]
     [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] :
     OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := L) h.sdiffDadeHypothesis :=
   h.sdiffDadeHypothesis.fullDadeIsometryData
-    (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _
-      (fun _ => rfl))
 
 end Hypothesis
 

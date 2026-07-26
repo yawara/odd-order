@@ -43,7 +43,7 @@ Sibley–Dade map `hyp.tau`, dispatched on whether `Ind^L_H θ` is a reducible c
   rebuilt certain-type `R(μ_j)` family), with the column character rewritten to `Ind^L_H θ` along
   the witness equation;
 * **irreducible branch** (no nontrivial column equals `Ind^L_H θ`): `irreducibleDecompositionTau`
-  (`decompositionDaFromDadeOfDiff hyp.dade hyp.hconj`).
+  (`decompositionDaFromDadeOfDiff hyp.dade`).
 
 Both branches land in the *same* map `hyp.tau`, so the family
 `fun i => caseB_constituentDecomposition …` feeds the pinning `per_phi_anchored_image`.  The per-`θ`
@@ -324,7 +324,7 @@ theorem irreducibleDecompositionTau_X_orthogonal
         (irreducibleDecompositionTau hyp θ hirr hreal hdiffsupp hdiffasupp htau1_mema
           hχaχ1 hχbaraχ1 hχχbar').X
         (cY.extension η₁) = 0 :=
-  inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero hyp.dade hyp.hconj cY
+  inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero hyp.dade cY
     ⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ ⟨η₁, hη₁irr⟩
     hreal hdiffsupp hdiffasupp htau1_mema hχaχ1 hχbaraχ1 hχχbar'
     hrealc1 hdiffsuppc1 hc1S1 hc1barS1 hνZc1 hc1c1bar hc1χ hc1χbar hc1barχ hc1barχbar

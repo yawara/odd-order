@@ -121,7 +121,7 @@ noncomputable def sOf_H0Cprime_memberRFamily
     have hdiffsupp := OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
       hyp.base.mderivSharp_subset_A0 hηIKF0
     exact OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-      hyp.base.dadeData.dade hyp.base.hconj ⟨η, hirr⟩ hreal hdiffsupp
+      hyp.base.dadeData.dade ⟨η, hirr⟩ hreal hdiffsupp
   · -- column: rebuild `certainTypeR` at the abstract member `η`
     have hex := sOf_H0Cprime_reducible_eq_columnSum hG hyp hη hirr
     let k := hex.choose
@@ -162,7 +162,7 @@ theorem sOf_H0Cprime_memberRFamily_imageSet_of_irr
           (OddOrder.GroupTheory.typePA0 M hyp.base.typeP) M),
       (sOf_H0Cprime_memberRFamily hG hyp hη).imageSet =
         (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-          hyp.base.dadeData.dade hyp.base.hconj ⟨η, hirr⟩ hr hs).imageSet := by
+          hyp.base.dadeData.dade ⟨η, hirr⟩ hr hs).imageSet := by
   haveI := hyp.base.finiteG
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hηIKF0 : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
@@ -361,7 +361,7 @@ noncomputable def SOf_memberRFamily
     have hdiffsupp := OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
       hyp.base.mderivSharp_subset_A0 hηIKF0
     exact OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-      hyp.base.dadeData.dade hyp.base.hconj ⟨η, hirr⟩ hreal hdiffsupp
+      hyp.base.dadeData.dade ⟨η, hirr⟩ hreal hdiffsupp
   · -- column: rebuild `certainTypeR` at the abstract member `η`
     have hex := SOf_reducible_eq_columnSum hG hyp hη hirr
     let k := hex.choose
@@ -400,7 +400,7 @@ theorem SOf_memberRFamily_imageSet_of_irr
           (OddOrder.GroupTheory.typePA0 M hyp.base.typeP) M),
       (SOf_memberRFamily hG hyp hη).imageSet =
         (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-          hyp.base.dadeData.dade hyp.base.hconj ⟨η, hirr⟩ hr hs).imageSet := by
+          hyp.base.dadeData.dade ⟨η, hirr⟩ hr hs).imageSet := by
   haveI := hyp.base.finiteG
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hηIKF0 : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
@@ -641,7 +641,7 @@ theorem caseA_sThree_coherent
         (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hψ))
     (fun a ha b hb =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        hyp.base.dadeData.dade hyp.base.hconj (hsuppdiff a ha b hb)
+        hyp.base.dadeData.dade (hsuppdiff a ha b hb)
         (Submodule.sub_mem _
           (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hIKF ha.1))
           (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hIKF hb.1))))

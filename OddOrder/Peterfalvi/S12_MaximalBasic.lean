@@ -999,7 +999,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
   -- The restricted Dade isometry certificate for `H71.τ = toHypothesis71.τ`.
   have hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := M)
       hyp.toHypothesis71.τ :=
-    ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict Set.subset_union_left
+    ((hyp.dadeData.dade.fullDadeIsometryData).restrict Set.subset_union_left
       hnorm).toDadeIsometryData.isDadeIsometry
   -- **`ν`-isometry** on the family (`ν = coh.tau1 = coherent extension`).
   have hnu_isometry : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
@@ -1016,16 +1016,16 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
           - d i • coh.tau1 (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
     intro i hi0 hi_ind
     obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ i)
-    have hcohag := coherence_hagree_dadeMap hyp.dadeData.dade hyp.hconj coh.coherent
+    have hcohag := coherence_hagree_dadeMap hyp.dadeData.dade coh.coherent
       (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
       (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (hsupp_full i)
     have hbridge : hyp.toHypothesis71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
           - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩
-        = (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeMap
+        = (hyp.dadeData.dade.fullDadeIsometryData).toDadeMap
           ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
             - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ),
             (ClassFunction.mem_supportedSubmodule).mpr (hsupp_full i)⟩ := by
-      change ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict Set.subset_union_left
+      change ((hyp.dadeData.dade.fullDadeIsometryData).restrict Set.subset_union_left
           hnorm).toDadeMap ⟨_, psi_support i⟩ = _
       rw [OddOrder.Peterfalvi.S04.FullDadeIsometryData.restrict_apply]
       exact congrArg _ (Subtype.ext rfl)
@@ -1115,7 +1115,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
       (Hypothesis71.constOne ↥M) = 0 := inner_induce_constOne_eq_zero K θ0' hθ0'_ne
   have hτ_smul : ∀ (c : ℂ) (x : ClassFunction ↥M ℂ), hyp.tau (c • x) = c • hyp.tau x :=
     dadeIntegralCharacterMap_smul_complex hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+      (hyp.dadeData.dade.fullDadeIsometryData)
   have htau1 : ∀ φ : ClassFunction ↥M ℂ, φ.support ⊆ hyp.A0 →
       ClassFunction.inner (hyp.tau φ) (Hypothesis71.constOne G)
         = ClassFunction.inner φ (Hypothesis71.constOne ↥M) := by
@@ -1123,7 +1123,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
     rw [show hyp.tau φ = hyp.dadeData.dade.dadeMap (k := ℂ)
         ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩ from
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hφ]
+        (hyp.dadeData.dade.fullDadeIsometryData) hφ]
     exact inner_tau_supported_constOne
       ({ hyp := hyp.dadeData.dade
          τ := hyp.dadeData.dade.dadeMap (k := ℂ)

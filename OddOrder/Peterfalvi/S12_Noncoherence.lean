@@ -403,12 +403,12 @@ theorem typeV_sixFiveA_bound [Finite G]
         (not_le_of_gt hH₁H)
     have hAcoh' : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+          (hyp.dadeData.dade.fullDadeIsometryData))
         (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A)
         hyp.A0) := hAcoh
     have hBncoh' : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+          (hyp.dadeData.dade.fullDadeIsometryData))
         (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
         hyp.A0) := fun h => hBncoh h
     exact hyp.exists_source_index_le_two_psi_of_ne_top hG hAne hBne

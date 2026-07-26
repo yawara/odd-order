@@ -178,14 +178,14 @@ theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (_hj : (j : ℕ) ≠ 0) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData)
         (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
           - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
       = hyp.eta ⟨0, hyp.q_prime.pos⟩ j
           - hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩ := by
   classical
   set D := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) with hD
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData) with hD
   by_cases hj1 : j = ⟨1, by have := hyp.three_le_p; omega⟩
   · -- Trivial column `j = #1`: both `μ`- and `η`-differences vanish, and `τ_S 0 = 0`.
     simp only [hj1, sub_self, map_zero]
@@ -208,7 +208,7 @@ theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hXZ : D (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
           - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) ∈ ZIrr G :=
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG) hsupp hZIrrS
+        (hyp.dadeHypS0 hG) hsupp hZIrrS
     -- (b) `‖μ_{0j} − μ_{0,#1}‖² = 2` (two distinct irreducibles).
     have hinner : ∀ φ ψ : ClassFunction ↥hyp.S ℂ, IsIrreducibleCharacter φ →
         IsIrreducibleCharacter ψ → ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
@@ -242,7 +242,7 @@ theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (D (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
           - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)) = 2 := by
       rw [hD, OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-        (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG) hsupp hsupp]
+        (hyp.dadeHypS0 hG) hsupp hsupp]
       exact hnorm2
     -- (c) `X − (η_{0j} − η_{0,#1})` vanishes on the regular set `V` (prime-`TI` `V`-value pin).
     have hvanish : ∀ x ∈ conjClassSet
@@ -275,12 +275,12 @@ theorem tauS_mu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (i : Fin hyp.q) {j1 j2 : Fin hyp.p}
     (hj1 : j1 ≠ ⟨0, hyp.p_prime.pos⟩) (hj2 : j2 ≠ ⟨0, hyp.p_prime.pos⟩) (hj12 : j1 ≠ j2) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData)
         (hyp.mu i j1 - hyp.mu i j2)
       = hyp.eta i j1 - hyp.eta i j2 := by
   classical
   set D := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) with hD
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData) with hD
   have hμaIrr : IsIrreducibleCharacter (hyp.mu i j1) := hyp.mu_irreducible _ _
   have hμbIrr : IsIrreducibleCharacter (hyp.mu i j2) := hyp.mu_irreducible _ _
   have h_ab : ClassFunction.inner (hyp.mu i j1) (hyp.mu i j2) = 0 := by
@@ -293,7 +293,7 @@ theorem tauS_mu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- (a) `X ∈ ZIrr G`.
   have hXZ : D (hyp.mu i j1 - hyp.mu i j2) ∈ ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG) hsupp hZIrrS
+      (hyp.dadeHypS0 hG) hsupp hZIrrS
   -- (b) `‖μ_{i,j₁} − μ_{i,j₂}‖² = 2`, transported through the Dade isometry.
   have hnorm2 : ClassFunction.inner (hyp.mu i j1 - hyp.mu i j2)
       (hyp.mu i j1 - hyp.mu i j2) = 2 := by
@@ -304,7 +304,7 @@ theorem tauS_mu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hX2 : ClassFunction.inner (D (hyp.mu i j1 - hyp.mu i j2))
       (D (hyp.mu i j1 - hyp.mu i j2)) = 2 := by
     rw [hD, OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-      (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG) hsupp hsupp]
+      (hyp.dadeHypS0 hG) hsupp hsupp]
     exact hnorm2
   -- (c) `X − (η_{i,j₁} − η_{i,j₂})` vanishes on the regular set `V^S`.
   have hvanish : ∀ x ∈ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
@@ -338,7 +338,7 @@ theorem gammaGrid_defGamma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : (j : ℕ) ≠ 0) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) (betaGrid hyp j)
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData) (betaGrid hyp j)
         - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + hyp.eta ⟨0, hyp.q_prime.pos⟩ j
       = GammaGrid hG hyp := by
   have hcross := tauS_mu_row0_cross hG hnoV hyp j hj
@@ -347,16 +347,16 @@ theorem gammaGrid_defGamma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) := by
     simp only [betaGrid]; abel
   have key : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) (betaGrid hyp j)
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData) (betaGrid hyp j)
       - OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-          ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+          ((hyp.dadeHypS0 hG).fullDadeIsometryData)
           (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩)
       = hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩
         - hyp.eta ⟨0, hyp.q_prime.pos⟩ j := by
     rw [← map_sub, hbeta, map_neg, hcross]; abel
   simp only [GammaGrid, tauSbetaGrid]
   set D := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-    ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) with hD
+    ((hyp.dadeHypS0 hG).fullDadeIsometryData) with hD
   rw [← sub_eq_zero, show
       (D (betaGrid hyp j) - OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
           + hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
@@ -572,7 +572,7 @@ theorem gammaGrid_real_of_c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   -- the Dade lift commutes with conjugation on the `A₀(S)`-supported `β_{#1}`
   have hDconj : (tauSbetaGrid hG hyp).conj
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-          ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+          ((hyp.dadeHypS0 hG).fullDadeIsometryData)
           (betaGrid hyp j') := by
     rw [tauSbetaGrid,
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_conj_of_support _ _
@@ -713,7 +713,7 @@ private theorem gammaGrid_Y_norm_bound_aux [Finite G]
       = ((((hyp.u : ℚ) - 1) / (hyp.q : ℚ) + 2 : ℚ) : ℂ) := by
     rw [tauSbetaGrid,
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-        (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG)
+        (hyp.dadeHypS0 hG)
         (betaGrid_A0_support_of_c_eq_one hG hyp hc1 j1 hj1ne)
         (betaGrid_A0_support_of_c_eq_one hG hyp hc1 j1 hj1ne)]
     exact betaGrid_norm_of_c_eq_one hG hyp hc1 j1 hj1ne
@@ -941,12 +941,12 @@ theorem tauT_nu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (j : Fin hyp.p) {r s : Fin hyp.q}
     (hr : r ≠ ⟨0, hyp.q_prime.pos⟩) (hs : s ≠ ⟨0, hyp.q_prime.pos⟩) (hrs : r ≠ s) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
-        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata))
+        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData)
         (hyp.nu r j - hyp.nu s j)
       = hyp.eta r j - hyp.eta s j := by
   classical
   set D := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
-      ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata))
+      ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData)
     with hD
   have hνaIrr : IsIrreducibleCharacter (hyp.nu r j) := pins.nu_irreducible _ _
   have hνbIrr : IsIrreducibleCharacter (hyp.nu s j) := pins.nu_irreducible _ _
@@ -960,7 +960,7 @@ theorem tauT_nu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- (a) `X ∈ ZIrr G`.
   have hXZ : D (hyp.nu r j - hyp.nu s j) ∈ ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      (hyp.dadeHypT0 hG hTP Tdata) (hyp.dadeHypT0_hconj hG hTP Tdata) hsupp hZIrrT
+      (hyp.dadeHypT0 hG hTP Tdata) hsupp hZIrrT
   -- (b) norm `2`, transported through the Dade isometry.
   have hnorm2 : ClassFunction.inner (hyp.nu r j - hyp.nu s j)
       (hyp.nu r j - hyp.nu s j) = 2 := by
@@ -971,7 +971,7 @@ theorem tauT_nu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hX2 : ClassFunction.inner (D (hyp.nu r j - hyp.nu s j))
       (D (hyp.nu r j - hyp.nu s j)) = 2 := by
     rw [hD, OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-      (hyp.dadeHypT0 hG hTP Tdata) (hyp.dadeHypT0_hconj hG hTP Tdata) hsupp hsupp]
+      (hyp.dadeHypT0 hG hTP Tdata) hsupp hsupp]
     exact hnorm2
   -- (c) `X − (η_{r,j} − η_{s,j})` vanishes on the regular set.
   have hvanish : ∀ x ∈ conjClassSet
@@ -1010,7 +1010,7 @@ theorem tauT_nuRow_diff_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hreq : η = ∑ j : Fin hyp.p, hyp.nu r j)
     (hseq : (η : ClassFunction ↥hyp.T ℂ).conj = ∑ j : Fin hyp.p, hyp.nu s j) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData)
         (η - (η : ClassFunction ↥hyp.T ℂ).conj)
       = ∑ j : Fin hyp.p, (hyp.eta r j - hyp.eta s j) := by
   classical
@@ -1034,11 +1034,10 @@ theorem tauT_nuRow_diff_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (S10.typePACore_subset_A0Set Tdata))
   -- the honest `A`-Dade agrees with the `A₀`-Dade on the `A(T)`-supported row difference.
   have hτeq : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP))
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData)
         (η - (η : ClassFunction ↥hyp.T ℂ).conj)
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
-          ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData
-            (hyp.dadeHypT0_hconj hG hTP Tdata))
+          ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData)
           (η - (η : ClassFunction ↥hyp.T ℂ).conj) := by
     rw [hyp.tInstance_dade_eq_induce hG hnoV hTP hAsupp,
       hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hA0supp]

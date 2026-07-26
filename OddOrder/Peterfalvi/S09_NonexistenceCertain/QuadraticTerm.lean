@@ -134,13 +134,12 @@ theorem beta_mem_ZIrr_of_sourceDiff_mem_ZIrr (H78 : Hypothesis78 G A L)
     OddOrder.Peterfalvi.S04.IsDadeMap.unique H78.hyp76.hyp71.isDadeMap
       (H78.hyp76.hyp71.hyp.isDadeMap_dadeMap (k := ℂ))
   have hvirt :=
-    (H78.hyp76.hyp71.hyp.fullDadeIsometryData
-      H78.hyp76.hyp71.hConjInvariant).maps_virtualCharacter H78.indMinusZetaSupp hdiffZ
+    H78.hyp76.hyp71.hyp.fullDadeIsometryData.maps_virtualCharacter
+      H78.indMinusZetaSupp hdiffZ
   rw [beta, hτ]
-  rwa [show (H78.hyp76.hyp71.hyp.fullDadeIsometryData
-        H78.hyp76.hyp71.hConjInvariant).toDadeMap =
+  rwa [show H78.hyp76.hyp71.hyp.fullDadeIsometryData.toDadeMap =
         H78.hyp76.hyp71.hyp.dadeMap (k := ℂ) from
-      H78.hyp76.hyp71.hyp.dadeIsometryData_toDadeMap H78.hyp76.hyp71.hConjInvariant] at hvirt
+      H78.hyp76.hyp71.hyp.dadeIsometryData_toDadeMap] at hvirt
 
 /-- The source difference `Ind 1_H - ζ` is virtual when the `Ind 1_H`
 source term is virtual and the distinguished `ζ` is irreducible. -/

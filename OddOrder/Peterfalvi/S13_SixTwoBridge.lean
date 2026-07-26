@@ -206,7 +206,7 @@ theorem exists_source_index_le_two_psi
         OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
       ∀ (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+          (hyp.dadeData.dade.fullDadeIsometryData))
         S₁ hyp.A0),
       ∀ (ψ : ClassFunction ↥M ℂ),
         ψ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
@@ -215,26 +215,26 @@ theorem exists_source_index_le_two_psi
       ∀ (a : ℕ), ψ 1 = (a : ℂ) * χ₁ 1 →
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+          (hyp.dadeData.dade.fullDadeIsometryData))
         (S₁ ∪ {ψ, ψ.conj}) hyp.A0) →
       ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-            (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) ψ (a • χ₁),
+            (hyp.dadeData.dade.fullDadeIsometryData)) ψ (a • χ₁),
         Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) ∧
+          (hyp.dadeData.dade.fullDadeIsometryData) ∧
         ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
             (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-              (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+              (hyp.dadeData.dade.fullDadeIsometryData)) χ 0,
           D.imageFamily.Orthogonal Da.imageFamily ∧
           D.tau1 χ = hS₁coh.extension χ)
     (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A')
       hyp.A0))
     (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
       hyp.A0)) :
     ∃ θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M),
@@ -253,7 +253,7 @@ theorem exists_source_index_le_two_psi
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     infer_instance
   exact OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_break
-    hyp.dadeData.dade hyp.hconj (hyp.card_odd_of_isMinimalSimpleOdd hG)
+    hyp.dadeData.dade (hyp.card_odd_of_isMinimalSimpleOdd hG)
     hyp.mderivSharp_subset_A0 hyp.one_notMem_A0 hanchor hSBne hdatum hAcoh hBncoh
 
 /-- **The h56 producer with anchor and nonemptiness auto-discharged**: only the coherence
@@ -273,7 +273,7 @@ theorem exists_source_index_le_two_psi_of_ne_top
         S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
       ∀ (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+          (hyp.dadeData.dade.fullDadeIsometryData))
         S₁ hyp.A0),
       ∀ (ψ : ClassFunction ↥M ℂ),
         ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
@@ -282,25 +282,25 @@ theorem exists_source_index_le_two_psi_of_ne_top
       ∀ (a : ℕ), ψ 1 = (a : ℂ) * χ₁ 1 →
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+          (hyp.dadeData.dade.fullDadeIsometryData))
         (S₁ ∪ {ψ, ψ.conj}) hyp.A0) →
       ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-            (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) ψ (a • χ₁),
+            (hyp.dadeData.dade.fullDadeIsometryData)) ψ (a • χ₁),
         Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) ∧
+          (hyp.dadeData.dade.fullDadeIsometryData) ∧
         ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
             (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-              (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+              (hyp.dadeData.dade.fullDadeIsometryData)) χ 0,
           D.imageFamily.Orthogonal Da.imageFamily ∧
           D.tau1 χ = hS₁coh.extension χ)
     (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A') hyp.A0))
     (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B) hyp.A0)) :
     ∃ θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M),
       (↑(B.subgroupOf ((derivedInG M).subgroupOf M)) :
@@ -337,7 +337,7 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
       S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
     (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       S₁ hyp.A0)
     (ψ : ClassFunction ↥M ℂ)
     (hψB : ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
@@ -346,17 +346,17 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
     (a : ℕ) (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
     (hbreak : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       (S₁ ∪ {ψ, ψ.conj}) hyp.A0))
     (hψred : ¬ IsIrreducibleCharacter ψ) :
     ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) ψ (a • χ₁),
+          (hyp.dadeData.dade.fullDadeIsometryData)) ψ (a • χ₁),
       Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) ∧
+        (hyp.dadeData.dade.fullDadeIsometryData) ∧
       ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-            (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+            (hyp.dadeData.dade.fullDadeIsometryData)) χ 0,
         D.imageFamily.Orthogonal Da.imageFamily ∧
         D.tau1 χ = hS₁coh.extension χ := by
   haveI := hyp.finiteG
@@ -414,9 +414,9 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
     · exact hsupp2
   -- integrality of `τ(ψ − a·χ₁)`
   have hmemZ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) (ψ - a • χ₁) ∈ ZIrr G := by
+      (hyp.dadeData.dade.fullDadeIsometryData) (ψ - a • χ₁) ∈ ZIrr G := by
     refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.dadeData.dade hyp.hconj hsupp2 ?_
+      hyp.dadeData.dade hsupp2 ?_
     refine Submodule.sub_mem _ (S08.inducedKernelFamily_mem_ZIrr hψbot) ?_
     exact nsmul_mem (S08.inducedKernelFamily_mem_ZIrr hχ₁bot) a
   -- the three inner-product vanishings
@@ -437,10 +437,10 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
     (hyp.columnImageFamilyCohFree hG hmu hzS hz1 hzconj hδpm hδj hk0 hk'0
       (Ne.symm hk'k) hcolconj)
     (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (hyp.dadeData.dade.fullDadeIsometryData))
     (fun φ ζ hφ hζ =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-        hyp.dadeData.dade hyp.hconj hSdiff hφ hζ)
+        hyp.dadeData.dade hSdiff hφ hζ)
     rfl hmemZ hinner1 hinner2 hinner3, rfl, ?_⟩
   -- member clause: per-`χ` decomposition against the column `Da`
   intro χ hχS₁
@@ -456,7 +456,7 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
   by_cases hχirr : IsIrreducibleCharacter χ
   · -- irreducible member: the (5.8) member datum, orthogonal to the column via (A)+(B)
     obtain ⟨D, hDfam, hDtau⟩ := S08.inducedKernelFamily_memberDatum_of_irreducible
-      hyp.dadeData.dade hyp.hconj hModd hyp.mderivSharp_subset_A0 hS₁sub' hS₁conj hS₁coh
+      hyp.dadeData.dade hModd hyp.mderivSharp_subset_A0 hS₁sub' hS₁conj hS₁coh
       hχS₁ hχirr
     refine ⟨D, ?_, hDtau⟩
     intro α hα β hβ
@@ -475,9 +475,9 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
       have hmem : χ - χ.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M)
           ({χ - χ.conj} : Set (ClassFunction ↥M ℂ)) := Submodule.subset_span rfl
       have hpres := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-        hyp.dadeData.dade hyp.hconj hset hmem hmem
+        hyp.dadeData.dade hset hmem hmem
       rw [show hyp.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) from rfl, hpres,
+        (hyp.dadeData.dade.fullDadeIsometryData) from rfl, hpres,
         ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
         ClassFunction.inner_sub_right]
       have h11 : ClassFunction.inner χ χ = 1 := by
@@ -628,7 +628,7 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     (hS₁sub : S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥)
     (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       S₁ hyp.A0)
     {ψ : ClassFunction ↥M ℂ}
     (hψB : ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
@@ -640,9 +640,9 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     (hχred : ¬ IsIrreducibleCharacter χ) :
     ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+          (hyp.dadeData.dade.fullDadeIsometryData)) χ 0,
       D.imageFamily.Orthogonal
-        (S08.inducedKernelFamily_breakDa_of_irreducible hyp.dadeData.dade hyp.hconj
+        (S08.inducedKernelFamily_breakDa_of_irreducible hyp.dadeData.dade
           (card_odd_of_isMinimalSimpleOdd hG hyp) hyp.mderivSharp_subset_A0 hS₁sub hψB hψirr
           hψnotS1 hψcnotS1 hχ₁S₁ hψdeg).1.imageFamily ∧
       D.tau1 χ = hS₁coh.extension χ := by
@@ -671,7 +671,7 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     exact hχbot
   -- the coherent extension as `τ₁`
   set τexp := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) with hτexp
+    (hyp.dadeData.dade.fullDadeIsometryData) with hτexp
   -- supports via the family scaled-diff (`d = 1`, reducible-safe)
   obtain ⟨θχc, -, -, hχ1⟩ := S08.inducedKernelFamily_apply_one hχbot
   obtain ⟨nθχc, -, hnθχc, -⟩ := θχc.isIrreducible.exists_natDegree_charValue_one_dvd_card
@@ -721,9 +721,9 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
     have hmem : ψ - ψ.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M)
         ({ψ - ψ.conj} : Set (ClassFunction ↥M ℂ)) := Submodule.subset_span rfl
     have hpres := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-      hyp.dadeData.dade hyp.hconj hset hmem hmem
+      hyp.dadeData.dade hset hmem hmem
     rw [show hyp.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) from rfl, hpres,
+      (hyp.dadeData.dade.fullDadeIsometryData) from rfl, hpres,
       ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
       ClassFunction.inner_sub_right]
     have h11 : ClassFunction.inner ψ ψ = 1 := by
@@ -764,7 +764,7 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
       intro i' k'
       have hβ0 : ClassFunction.inner β (hyp.alignedOmegaSigmaGrid hG hG.odd i' k') = 0 := by
         refine OddOrder.Peterfalvi.S12.OrthonormalCharacterImageFamily.elt_inner_eq_zero
-          (R := (S08.inducedKernelFamily_breakDa_of_irreducible hyp.dadeData.dade hyp.hconj
+          (R := (S08.inducedKernelFamily_breakDa_of_irreducible hyp.dadeData.dade
             (card_odd_of_isMinimalSimpleOdd hG hyp) hyp.mderivSharp_subset_A0 hS₁sub hψB hψirr
             hψnotS1 hψcnotS1 hχ₁S₁ hψdeg).1.imageFamily) hβ
           (hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hG.odd i' k') ?_ ?_ ?_
@@ -811,7 +811,7 @@ theorem sixTwoDecompositionData [Finite G]
         S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
       ∀ (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+          (hyp.dadeData.dade.fullDadeIsometryData))
         S₁ hyp.A0),
       ∀ (ψ : ClassFunction ↥M ℂ),
         ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
@@ -820,16 +820,16 @@ theorem sixTwoDecompositionData [Finite G]
       ∀ (a : ℕ), ψ 1 = (a : ℂ) * χ₁ 1 →
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+          (hyp.dadeData.dade.fullDadeIsometryData))
         (S₁ ∪ {ψ, ψ.conj}) hyp.A0) →
       ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-            (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) ψ (a • χ₁),
+            (hyp.dadeData.dade.fullDadeIsometryData)) ψ (a • χ₁),
         Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) ∧
+          (hyp.dadeData.dade.fullDadeIsometryData) ∧
         ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
             (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-              (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+              (hyp.dadeData.dade.fullDadeIsometryData)) χ 0,
           D.imageFamily.Orthogonal Da.imageFamily ∧
           D.tau1 χ = hS₁coh.extension χ := by
   intro S₁ hS₁conj hsub hS₁coh ψ hψB hψnotS1 hψcnotS1 χ₁ hχ₁S₁ a hψdeg hbreak
@@ -842,13 +842,13 @@ theorem sixTwoDecompositionData [Finite G]
   by_cases hψirr : IsIrreducibleCharacter ψ
   · -- irreducible break: the S08 general discharge
     set bd := S08.inducedKernelFamily_breakDa_of_irreducible
-      hyp.dadeData.dade hyp.hconj hodd hyp.mderivSharp_subset_A0 hS₁sub hψB hψirr
+      hyp.dadeData.dade hodd hyp.mderivSharp_subset_A0 hS₁sub hψB hψirr
       hψnotS1 hψcnotS1 hχ₁S₁ hψdeg with hbd
     refine ⟨bd.1, bd.2.1, ?_⟩
     intro χ hχS₁
     by_cases hχirr : IsIrreducibleCharacter χ
     · exact S08.inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr
-        hyp.dadeData.dade hyp.hconj hodd hyp.mderivSharp_subset_A0 hS₁sub hS₁conj hS₁coh
+        hyp.dadeData.dade hodd hyp.mderivSharp_subset_A0 hS₁sub hS₁conj hS₁coh
         hψB hψirr hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
     · exact sixTwoMemberDatum_of_reducible_member hG hyp hmu hδpm hδj hzS hz1 hS₁conj
         hS₁sub hS₁coh hψB hψirr
@@ -878,11 +878,11 @@ theorem exists_source_of_coherence_dichotomy
     (hBne : B.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤)
     (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A') hyp.A0))
     (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B) hyp.A0)) :
     ∃ θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M),
       (↑(B.subgroupOf ((derivedInG M).subgroupOf M)) :
@@ -922,11 +922,11 @@ theorem six_two_dichotomy_bound
         Subgroup.center (↥C ⧸ B.subgroupOf C))
     (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A') hyp.A0))
     (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B) hyp.A0)) :
     (Nat.card (↥((derivedInG M).subgroupOf M) ⧸
         A'.subgroupOf ((derivedInG M).subgroupOf M)) : ℝ) - 1 ≤

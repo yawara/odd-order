@@ -117,7 +117,7 @@ theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_general_caseB
     have hvZ : hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
         - ((W2.subgroupOf H).index : ℂ) • η₁) ∈ ZIrr G :=
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        hyp.dade hyp.hconj hsuppX hsrcZ
+        hyp.dade hsuppX hsrcZ
     have he₁Z : ((W2.subgroupOf H).index : ℂ) • cY.extension η₁ ∈ ZIrr G := by
       rw [Nat.cast_smul_eq_nsmul]
       exact nsmul_mem (cY.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁)) (W2.subgroupOf H).index

@@ -629,7 +629,7 @@ theorem Hypothesis.tau_inner_trivial [Finite G] {M : Subgroup G} (hyp : Hypothes
   -- `hyp.tau φ = dadeMap ⟨φ, supported⟩` on the supported subspace.
   have he : hyp.tau φ = hyp.dadeData.dade.dadeMap (k := ℂ) ⟨φ, hmem⟩ := by
     change OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) φ
+        (hyp.dadeData.dade.fullDadeIsometryData) φ
       = hyp.dadeData.dade.dadeMap (k := ℂ) ⟨φ, hmem⟩
     rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade _ hφ]
   -- the coset average of `1_G` is the constant `1` (= `1_M`).
@@ -645,7 +645,7 @@ theorem Hypothesis.tau_inner_trivial [Finite G] {M : Subgroup G} (hyp : Hypothes
     exact_mod_cast Nat.card_pos.ne'
   rw [he]
   exact OddOrder.Peterfalvi.S04.adjoint_formula hyp.dadeData.dade hyp.dadeData.dade.dadeMap
-    (hyp.dadeData.dade.isDadeMap_dadeMap (k := ℂ)) hyp.hconj ⟨φ, hmem⟩ (trivialClassFunction G)
+    (hyp.dadeData.dade.isDadeMap_dadeMap (k := ℂ)) ⟨φ, hmem⟩ (trivialClassFunction G)
     (trivialClassFunction (↥M)) hψ
 
 open scoped FiniteInduce in
@@ -668,7 +668,7 @@ theorem Hypothesis.tau_apply_eq_zero_of_not_mem_dadeSupport [Finite G] {M : Subg
   haveI := hyp.finiteG
   classical
   change OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) φ g = 0
+      (hyp.dadeData.dade.fullDadeIsometryData) φ g = 0
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade _ hφ]
   exact (hyp.dadeData.dade.isDadeMap_dadeMap (k := ℂ)).map_eq_zero_of_not_mem_dadeSupport
     (⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩ :

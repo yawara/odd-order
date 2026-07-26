@@ -21,7 +21,6 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
-
 namespace FrobeniusFamily
 
 variable {k : ℕ}
@@ -447,7 +446,7 @@ noncomputable def familyHypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ)]
     letI : Invertible (Nat.card ↥(F.L i) : ℂ) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L i)).ne')
     exact OddOrder.Peterfalvi.S04.isDadeIsometry_of_isDadeMap (F.hypothesis71 i).hyp
-      (F.hypothesis71 i).τ (F.hypothesis71 i).isDadeMap (F.hypothesis71 i).hConjInvariant
+      (F.hypothesis71 i).τ (F.hypothesis71 i).isDadeMap
   pairwise_disjoint := fun i j hij => by
     rw [F.dadeSupport_hypothesis71_eq_kernelSpread i, F.dadeSupport_hypothesis71_eq_kernelSpread j]
     exact F.kernelSpread_disjoint hij

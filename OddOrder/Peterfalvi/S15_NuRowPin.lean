@@ -225,15 +225,13 @@ theorem coherentIndT_image_inner_eta_eq_zero [Finite G]
   -- `τ = Ind_T^G` equals the `A₀(T)`-Dade image on the `A₀(T)`-supported difference.
   have hmaps : hyp.indT (ζ - ζ.conj) =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
-        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData
-          (hyp.dadeHypT0_hconj hG hTP Tdata)) (ζ - ζ.conj) := by
+        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData) (ζ - ζ.conj) := by
     rw [hyp.indT_apply]
     exact (hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hA0Supp).symm
   -- the coherent conjugate difference agrees with that Dade image.
   have hextDiff : coh.extension ζ - coh.extension ζ.conj =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
-        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData
-          (hyp.dadeHypT0_hconj hG hTP Tdata)) (ζ - ζ.conj) := by
+        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData) (ζ - ζ.conj) := by
     rw [← hmaps, ← coh.extends_on_supported (ζ - ζ.conj) hdiffSupported, map_sub]
   -- the crux: the difference vanishes on the saturated regular set.
   have hvanish : ∀ x ∈ OddOrder.GroupTheory.conjClassSet
@@ -386,8 +384,7 @@ theorem Hypothesis.coherentIndT_nuRow_vanish_regular [Finite G]
   -- `c(γ)` is the honest `A₀(T)`-Dade image, vanishing at the regular `x`
   have hcγ : c.extension γ
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
-          ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData
-            (hyp.dadeHypT0_hconj hG hTP Tdata)) γ := by
+          ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData) γ := by
     rw [c.extends_on_supported γ ⟨hγspan, hγsupp⟩, hyp.indT_apply,
       hyp.tInstance_dade0_eq_induce hG hnoV hTP Tdata hγA0supp]
   have hcγx : c.extension γ x = 0 := by
@@ -502,7 +499,7 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
         (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
         (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) →
       hyp.indT φ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)) φ :=
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData) φ :=
     fun φ hφ => by
       rw [hyp.indT_apply, hyp.tInstance_dade_eq_induce hG hnoV hTP hφ.2]
   obtain ⟨E, hEsub, hEsum⟩ :=

@@ -479,7 +479,7 @@ theorem Hypothesis.cross_dade_inner_eq_zero_at_pair [Finite G]
   rw [ClassFunction.mem_support] at hg1 hg2
   -- `M`-side base point: `g ~ a·h`, `a ∈ Supp(φ) ⊆ (M′)^#`, `h ∈ H(a)`
   have hg1' : (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) φ) g ≠ 0 := hg1
+      (hyp.dadeData.dade.fullDadeIsometryData) φ) g ≠ 0 := hg1
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
     hyp.dadeData.dade _ hφA0] at hg1'
   obtain ⟨a, h, hh, hconja, hvala⟩ :=
@@ -640,16 +640,14 @@ theorem Hypothesis.tau1_zeta_inner_extension_lam_eq_zero_at_pair [Finite G]
     have hz : (coh.tau1 params.zeta - coh.tau1 params.zeta.conj) (1 : G) = 0 := by
       rw [hMdiff]
       exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
-        hyp.dadeData.dade hyp.hconj (hyp.zeta_sub_conj_support hG hG.odd hζS hζirr)
+        hyp.dadeData.dade (hyp.zeta_sub_conj_support hG hG.odd hζS hζirr)
     rw [ClassFunction.sub_apply] at hz
     exact sub_eq_zero.mp hz
   have hcd1 : (c.extension lam) 1 = (c.extension lam.conj) 1 := by
     have hz : (c.extension lam - c.extension lam.conj) (1 : G) = 0 := by
       rw [hSdiff]
       exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
-        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).dade0
-        (typeIIHypothesis46_dade0_hConjInvariant hG mp.S_maximal
-          (section16_S_isTypeII hG mp) data.typeP) hsuppA0
+        (typeIIHypothesis46 hG mp.S_maximal (section16_S_isTypeII hG mp) data.typeP).dade0 hsuppA0
     rw [ClassFunction.sub_apply] at hz
     exact sub_eq_zero.mp hz
   exact orthonormal_vchar_diff_ortho haZ hbZ hcZ hdZ ha1 hb1 hc1 hd1 hab hcd hdiff hab1 hcd1

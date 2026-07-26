@@ -910,10 +910,9 @@ noncomputable def Q_sharp_hypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ
     (hyp : Hypothesis (G := G)) (hvd : hyp.v * hyp.d ≠ 1) :
     OddOrder.Peterfalvi.S09.Hypothesis71 G (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G)) hyp.T :=
   { hyp := Q_sharp_dadeHypothesis hG hyp hvd
-    τ := ((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
-      (Q_sharp_hconj hG hyp hvd)).toDadeIsometryData.toDadeMap
-    isDadeMap := ((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
-      (Q_sharp_hconj hG hyp hvd)).toDadeIsometryData.isDadeMap
+    τ := ((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData).toDadeIsometryData.toDadeMap
+    isDadeMap := ((Q_sharp_dadeHypothesis hG hyp
+        hvd).fullDadeIsometryData).toDadeIsometryData.isDadeMap
     hConjInvariant := Q_sharp_hconj hG hyp hvd }
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
@@ -925,8 +924,8 @@ noncomputable def Q_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ
     OddOrder.Peterfalvi.S09.Hypothesis76 G
       (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G)) hyp.T := by
   refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDade (Q_sharp_hypothesis71 hG hyp hvd)
-    (((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
-      (Q_sharp_hconj hG hyp hvd)).toDadeIsometryData.isDadeIsometry) hyp.Q ?_ ?_ rfl
+    (((Q_sharp_dadeHypothesis hG hyp
+        hvd).fullDadeIsometryData).toDadeIsometryData.isDadeIsometry) hyp.Q ?_ ?_ rfl
   · rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
   · intro l h hh
     have := T_normalizes_Q_sharp hG hyp

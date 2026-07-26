@@ -337,7 +337,7 @@ theorem inner_beta_nu_zeta_eq
     rw [ClassFunction.mem_support] at hg
     by_contra hgnot
     have hdade := (dataL.typeIHyp.dadeData.dade.fullDadeIsometryData
-      dataL.typeIHyp.hconj).toDadeIsometryData.isDadeMap
+).toDadeIsometryData.isDadeMap
     exact hg (hdade.map_eq_zero_of_not_mem_dadeSupport _ g hgnot)
   have hzero : ClassFunction.inner ((dataM.h78 hG).beta)
       ((dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta i)

@@ -109,13 +109,13 @@ theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
   -- (13.2.e) `τ = Ind_S^G` equals the `A₀(S)`-Dade image on the `A₀(S)`-supported difference.
   have hmaps : hyp.indS (ζ - ζ.conj) =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) (ζ - ζ.conj) := by
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData) (ζ - ζ.conj) := by
     rw [hyp.indS_apply]
     exact (hyp.sInstance_dade0_eq_induce hG hnoV hA0Supp).symm
   -- the coherent conjugate difference agrees with that Dade image.
   have hextDiff : coh.extension ζ - coh.extension ζ.conj =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) (ζ - ζ.conj) := by
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData) (ζ - ζ.conj) := by
     rw [← hmaps, ← coh.extends_on_supported (ζ - ζ.conj) hdiffSupported, map_sub]
   -- the crux: the difference vanishes on the saturated regular set.
   have hvanish : ∀ x ∈ OddOrder.GroupTheory.conjClassSet
@@ -125,7 +125,7 @@ theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
     obtain ⟨w, hw, g, hg⟩ := OddOrder.GroupTheory.mem_conjClassSet.mp hx
     rw [hextDiff]
     rw [← (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) (ζ - ζ.conj)).of_isConj
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData) (ζ - ζ.conj)).of_isConj
         (isConj_iff.mpr ⟨g, hg⟩)]
     -- `w` is a regular `W`-element, hence a `typePV`-point of the `S`-data.
     have hwV : w ∈ OddOrder.GroupTheory.typePV hyp.S hyp.Sdata := by
@@ -137,7 +137,7 @@ theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
     have hwA0 : w ∈ S10.typePACore0 hyp.S hyp.Sdata :=
       Or.inr (OddOrder.GroupTheory.subset_conjClassSetIn hwV)
     rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS0 hG)
-      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hA0Supp]
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData) hA0Supp]
     let a : {a : G // a ∈ S10.typePACore0 hyp.S hyp.Sdata} := ⟨w, hwA0⟩
     have hwh : w ∈ (hyp.dadeHypS0 hG).hCoset a :=
       ⟨1, (hyp.dadeHypS0 hG).H a |>.one_mem, by simp [a]⟩

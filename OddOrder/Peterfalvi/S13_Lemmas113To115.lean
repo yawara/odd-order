@@ -118,12 +118,12 @@ theorem coherent_S_of_coherent_SH0C [Finite G]
         (not_le_of_gt hH₁H)
     have hAcoh' : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.base.dadeData.dade
-          (hyp.base.dadeData.dade.fullDadeIsometryData hyp.base.hconj))
+          (hyp.base.dadeData.dade.fullDadeIsometryData))
         (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A)
         hyp.base.A0) := hAcoh
     have hBncoh' : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.base.dadeData.dade
-          (hyp.base.dadeData.dade.fullDadeIsometryData hyp.base.hconj))
+          (hyp.base.dadeData.dade.fullDadeIsometryData))
         (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
         hyp.base.A0) := fun h => hBncoh h
     exact hyp.base.exists_source_of_coherence_dichotomy _hG
@@ -169,7 +169,7 @@ theorem coherent_quotient_bound_of_noncoherent [Finite G]
   -- coherence dichotomy at the pinned family (`SOf_eq`; `tau`/`A0` are definitional)
   have hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.base.dadeData.dade
-        (hyp.base.dadeData.dade.fullDadeIsometryData hyp.base.hconj))
+        (hyp.base.dadeData.dade.fullDadeIsometryData))
       (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
         (H1.subgroupOf M)) hyp.base.A0) := by
     have h := hcoh
@@ -177,7 +177,7 @@ theorem coherent_quotient_bound_of_noncoherent [Finite G]
     exact h
   have hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.base.dadeData.dade
-        (hyp.base.dadeData.dade.fullDadeIsometryData hyp.base.hconj))
+        (hyp.base.dadeData.dade.fullDadeIsometryData))
       (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
         (hyp.H0C.subgroupOf M)) hyp.base.A0) := by
     have h := hnc
@@ -312,7 +312,7 @@ all-reducible assembly (issue 1019 update⁶⁰) — the §12-world analogue of 
 
 No `congrMap` seam is needed: under `toHypothesis46` the certain-type Dade map
 `dadeIntegralCharacterMap h46.dade0 h46.tau` is *definitionally* `hyp.tau`
-(`dade0 := hyp.dadeData.dade` and `tau := ….fullDadeIsometryData hyp.hconj` are the very
+(`dade0 := hyp.dadeData.dade` and `tau := ….fullDadeIsometryData` are the very
 components of `S12.Hypothesis.tau`).  The support moves from `A(M)` to `A₀(M) = A(M) ∪ V^M` by
 `S07.isCoherent_of_supportedSpan_le`: every column `μ_j` vanishes off `A(M) ∪ {1}`
 (`columnSum_support_subset`), so an `A₀`-supported `ℤ[𝒯]`-combination is automatically
@@ -969,14 +969,14 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂).conj x = 0)
     (Dmem : ∀ x ∈ s, OddOrder.Peterfalvi.S07.CharacterPsiDecomposition
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) x 0)
+        (hyp.dadeData.dade.fullDadeIsometryData)) x 0)
     (htau1Dmem : ∀ x (hx : x ∈ s), (Dmem x hx).tau1 x = hS₁.extension x)
     (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) (1 • χ₁))
     (hDatau1 : Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (hyp.dadeData.dade.fullDadeIsometryData))
     (hortho_mem : ∀ x (hx : x ∈ s), (Dmem x hx).imageFamily.Orthogonal Da.imageFamily)
     (hdiffasuppχ : ((OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
       - χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.A0)
@@ -1055,11 +1055,11 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
       - (1 : ℕ) • χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.A0 := by
     rw [one_smul]; exact hdiffasuppχ
   have htau1_memaχ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+      (hyp.dadeData.dade.fullDadeIsometryData)
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
         - (1 : ℕ) • χ₁) ∈ ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp.dadeData.dade
-      hyp.hconj hdiffasupp' hμχ₁Z
+      hdiffasupp' hμχ₁Z
   -- the (5.6.c) weighted degree bound: `2·1 < ∑ 1²/1 = |s|`
   have hDeg' : 2 * ((1 : ℕ) : ℝ) < ∑ _x ∈ s, ((1 : ℕ) : ℝ) ^ 2 / (1 : ℝ) := by
     simpa using hDeg
@@ -1094,7 +1094,7 @@ noncomputable def adjoin_muColumnPair_of_irrFamily [Finite G]
     (a := 1) hSgen
     (by rw [Nat.cast_one, one_mul]; exact hdeganchor) hbar1 hchi1_ne hyp.one_notMem_A0
   -- fire the reducible-break weighted adjoin engine
-  exact OddOrder.Peterfalvi.S08.xAdjoinStepW_k hyp.dadeData.dade hyp.hconj hS₁
+  exact OddOrder.Peterfalvi.S08.xAdjoinStepW_k hyp.dadeData.dade hS₁
     (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) hdiffsuppχ
     hχχne hχbarχbarne hχχbar hχbarχ hμ_S1 hμbar_S1 s id (fun _ => 1) χ₁ hχ₁s
     hmemdegdiffsupp (fun x hx => hsS₁ (Finset.mem_coe.mpr hx)) (fun _ => (1 : ℝ))

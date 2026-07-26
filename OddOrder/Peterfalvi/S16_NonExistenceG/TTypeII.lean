@@ -239,7 +239,7 @@ private theorem sSideGamma_mem_ZIrr_of_c_eq_one [Finite G]
   have htauZ : OddOrder.Peterfalvi.S15.tauSbetaGrid hG hyp.base ∈ ZIrr G := by
     simpa [OddOrder.Peterfalvi.S15.tauSbetaGrid, j] using
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        (hyp.base.dadeHypS0 hG) (hyp.base.dadeHypS0_hconj hG)
+        (hyp.base.dadeHypS0 hG)
         (OddOrder.Peterfalvi.S15.betaGrid_A0_support_of_c_eq_one
           hG hyp.base hc1 j (by simp [j])) hbetaZ)
   have honeZ : (trivialIrreducibleCharacter G : ClassFunction G ℂ) ∈ ZIrr G :=

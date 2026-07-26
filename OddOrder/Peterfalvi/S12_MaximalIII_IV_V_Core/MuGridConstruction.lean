@@ -99,8 +99,7 @@ noncomputable def Hypothesis.omegaSigmaGrid [Finite G] (_hG : OddOrder.BG.IsMini
   haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
   haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
-    ⟨tic.toDadeHypothesis.fullDadeIsometryData
-      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+    ⟨tic.toDadeHypothesis.fullDadeIsometryData⟩
   have hVeq : tic.V = tic.Vdiff := rfl
   exact fun i j => tic.omegaSigmaGrid hVeq app i j
 
@@ -141,8 +140,7 @@ noncomputable def Hypothesis.alignedOmegaSigmaGrid [Finite G]
   haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
   haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
-    ⟨tic.toDadeHypothesis.fullDadeIsometryData
-      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+    ⟨tic.toDadeHypothesis.fullDadeIsometryData⟩
   -- the `W ≤ M ≤ G` isomorphism `↥tic.W ≃* ↥(h.W₁ ⊔ h.W₂)`.
   let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
     (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
@@ -163,8 +161,7 @@ noncomputable def Hypothesis.canonicalFullDadeApp [Finite G]
     (hodd : Odd (Nat.card G)) :
     OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication
       (typePData_toTICyclicHypothesis hyp.typeP hodd) :=
-  ⟨(typePData_toTICyclicHypothesis hyp.typeP hodd).toDadeHypothesis.fullDadeIsometryData
-    (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+  ⟨(typePData_toTICyclicHypothesis hyp.typeP hodd).toDadeHypothesis.fullDadeIsometryData⟩
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), aligned ω^σ-grid is a `χ`-family member** (the §10 analogue of the §6

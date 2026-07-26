@@ -1078,10 +1078,8 @@ noncomputable def H_sharp_hypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ
     (hyp : Hypothesis (G := G)) :
     OddOrder.Peterfalvi.S09.Hypothesis71 G (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S :=
   { hyp := H_sharp_dadeHypothesis hG hyp
-    τ := ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
-      (H_sharp_hconj hG hyp)).toDadeIsometryData.toDadeMap
-    isDadeMap := ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
-      (H_sharp_hconj hG hyp)).toDadeIsometryData.isDadeMap
+    τ := ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData).toDadeIsometryData.toDadeMap
+    isDadeMap := ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData).toDadeIsometryData.isDadeMap
     hConjInvariant := H_sharp_hconj hG hyp }
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
@@ -1101,8 +1099,7 @@ noncomputable def H_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ
         by
   refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeTrivialBase (H_sharp_hypothesis71 hG hyp) ?_
       hyp.H ?_ ?_ rfl
-  · exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
-      (H_sharp_hconj hG hyp)).toDadeIsometryData.isDadeIsometry
+  · exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
   · have hUS : hyp.U ≤ hyp.S := by
       have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
       exact le_trans h1 (Subgroup.map_subtype_le _)

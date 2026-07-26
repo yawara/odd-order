@@ -1045,7 +1045,7 @@ open scoped Classical in
 /-- **T-side type-`P` Dade integral character map `τ_T`** (issue 9072 foundation, step 2).
 The genuine §7 integral character map of the (8.15) support datum
 (`tSideDadeSupport_nonempty`), pinned exactly as the type-I `S14.Hypothesis.tau`:
-`τ_T = dadeIntegralCharacterMap dadeData.dade (dadeData.dade.fullDadeIsometryData dadeData.hconj)`.
+`τ_T = dadeIntegralCharacterMap dadeData.dade (dadeData.dade.fullDadeIsometryData)`.
 This is the `tauT` field of the T-side `S07.Hypothesis calT1_set (sigmaSharp T)` package that
 `T_typeIII_calT1_coherent`/`T_typeIII_ratio_le`'s `horth` carrier consumes. -/
 noncomputable def tSideDadeMap (hyp : Hypothesis (G := G)) [Fintype G] [Fintype ↥hyp.base.T]
@@ -1054,8 +1054,7 @@ noncomputable def tSideDadeMap (hyp : Hypothesis (G := G)) [Fintype G] [Fintype 
     OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥hyp.base.T) G :=
   haveI := hyp.base.finiteG
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (tSideDadeSupport_nonempty hG hyp).some.dade
-    ((tSideDadeSupport_nonempty hG hyp).some.dade.fullDadeIsometryData
-      (tSideDadeSupport_nonempty hG hyp).some.hconj)
+    ((tSideDadeSupport_nonempty hG hyp).some.dade.fullDadeIsometryData)
 
 open scoped Classical in
 /-- **`τ_T` is a difference-isometry on any `A₁(T)`-supported family** (issue 9072 foundation,
@@ -1092,7 +1091,7 @@ theorem tSideDadeMap_isometry_diff (hyp : Hypothesis (G := G)) [Fintype G] [Fint
     · exact hSsupp c hc d hd
   simp only [tSideDadeMap]
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    (tSideDadeSupport_nonempty hG hyp).some.dade (tSideDadeSupport_nonempty hG hyp).some.hconj
+    (tSideDadeSupport_nonempty hG hyp).some.dade
     hS (Submodule.subset_span (Set.mem_insert _ _))
     (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
 

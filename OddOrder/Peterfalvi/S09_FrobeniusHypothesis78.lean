@@ -89,10 +89,10 @@ noncomputable def sibleyToHypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ
     (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
     Hypothesis71 G (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i) where
   hyp := (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
-  τ := ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade.fullDadeIsometryData
-    (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj).toDadeIsometryData.toDadeMap
-  isDadeMap := ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade.fullDadeIsometryData
-    (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj).toDadeIsometryData.isDadeMap
+  τ := (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
+    |>.fullDadeIsometryData.toDadeIsometryData.toDadeMap
+  isDadeMap := (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
+    |>.fullDadeIsometryData.toDadeIsometryData.isDadeMap
   hConjInvariant := (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj
 
 /-- **The distinguished character for the `i`-th Frobenius member** (Peterfalvi (7.8)/(12.13)
@@ -252,8 +252,7 @@ noncomputable def hypothesis78 [Fintype G] [Invertible (Nat.card G : ℂ)]
   -- Dade map's own `isDadeIsometry` (matching `sibleyToHypothesis71.τ` definitionally).
   refine hypothesis78OfDade (F.sibleyToHypothesis71 i hodd hnilp C hFrob)
     (OddOrder.Peterfalvi.S04.isDadeIsometry_of_isDadeMap _ _
-      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).isDadeMap
-      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).hConjInvariant)
+      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).isDadeMap)
     (F.H i) hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
     coh.extension ?_ ?_
   · -- `nu_isometry`: the coherent extension is isometric on the family members.
@@ -262,8 +261,8 @@ noncomputable def hypothesis78 [Fintype G] [Invertible (Nat.card G : ℂ)]
   · -- `hagree`: the (7.8.a) coherence agreement `τ ψ_j = ν ζ_j − d_j ν ζ_0`.
     intro a _ha0 ha_ind
     obtain ⟨deg_a, -, hdeg_a_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ a)
-    exact coherence_hagree_dadeMap (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
-      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj coh
+    exact coherence_hagree_dadeMap
+      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade coh
       (hSmem a ha_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_a) (by norm_num)
       (by rw [hd a, hdeg_a_eq, Nat.cast_one, div_one]) (psi_support a)
 

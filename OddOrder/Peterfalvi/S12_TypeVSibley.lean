@@ -352,15 +352,14 @@ theorem typeVSibleyDadeHypothesis_tau_agree [Finite G]
     exact OddOrder.Peterfalvi.S10.typePA_conj_mem M hyp.typeP l.2 ha
   -- (2.5): the Sibley datum agrees with the (2.11)-restricted `A₀`-datum on the TI pair
   have h25 := dadeIntegralCharacterMap_eq_of_forall_H_eq_bot
-    ((typeVSibleyDadeHypothesis hG hyp dV hTI).dade.fullDadeIsometryData
-      (typeVSibleyDadeHypothesis hG hyp dV hTI).hconj)
-    ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict hAsub hnorm')
+    ((typeVSibleyDadeHypothesis hG hyp dV hTI).dade.fullDadeIsometryData)
+    ((hyp.dadeData.dade.fullDadeIsometryData).restrict hAsub hnorm')
     (fun a => (typeVSibleyDadeHypothesis hG hyp dV hTI).dade.H_eq_bot_of_isTISubset hTI_M a)
     (fun a => (hyp.dadeData.dade.restrict hAsub hnorm').H_eq_bot_of_isTISubset hTI_M a)
     hφ
   -- (2.11): the restricted datum's map is `hyp.tau` on `A`-supported functions
   have h211 := OddOrder.Peterfalvi.S08.dadeIntegralCharacterMap_restrict_eq_of_support
-    hyp.dadeData.dade (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hAsub hnorm' hφ
+    hyp.dadeData.dade (hyp.dadeData.dade.fullDadeIsometryData) hAsub hnorm' hφ
   exact h25.trans h211
 
 end OddOrder.Peterfalvi.S12

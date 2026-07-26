@@ -966,8 +966,7 @@ TI set `V = W − (W₁ ∪ W₂)`, whose local subgroups are all trivial (`H(a)
 `HConjInvariant` holds for free.  This `app` drives the §5 σ-machinery on `(L, W)`. -/
 noncomputable def toTICyclicFullDadeApplication :
     OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication h.toTICyclicHypothesis :=
-  ⟨h.toTICyclicHypothesis.toDadeHypothesis.fullDadeIsometryData
-    (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+  ⟨h.toTICyclicHypothesis.toDadeHypothesis.fullDadeIsometryData⟩
 
 /-- **Peterfalvi (4.3.b), the certain-type characters as σ-images.**  For each `W₂`-column `χ₂`
 and `W₁`-index `i`, the (3.2) isometry `σ` of the `(L, W)` TI-cyclic setup sends the linear

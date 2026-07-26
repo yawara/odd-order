@@ -540,7 +540,7 @@ theorem pair_tau_diff_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     · -- the Dade isometry on the supported span
       intro φ ζ hφ hζ
       exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-        hyp.dadeData.dade hyp.hconj (S := {φ, ζ})
+        hyp.dadeData.dade (S := {φ, ζ})
         (by
           rintro s (rfl | hs)
           · exact hφ.2
@@ -550,7 +550,7 @@ theorem pair_tau_diff_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     · -- τ-images of differences are virtual characters
       intro a ha b hb
       exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        hyp.dadeData.dade hyp.hconj (hsuppQ a ha b hb)
+        hyp.dadeData.dade (hsuppQ a ha b hb)
         (Submodule.sub_mem _ (decomposition_mem_ZIrr (data a (hmemS a ha)))
           (decomposition_mem_ZIrr (data b (hmemS b hb))))
     · -- supports of differences

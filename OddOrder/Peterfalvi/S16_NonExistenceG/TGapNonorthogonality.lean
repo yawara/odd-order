@@ -128,7 +128,7 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_grid_orthogonal [Finit
     Submodule.sub_mem _ hμ0Z hζirr.mem_ZIrr
   have hψZ : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ) ∈ ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.dadeData.dade hyp.hconj hsupp hdiffZ
+      hyp.dadeData.dade hsupp hdiffZ
   have heζZ : (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G :=
     (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
   have heζcZ : (hyp.SHC_isCoherent hG).extension ζ.conj ∈ ZIrr G :=
@@ -711,9 +711,7 @@ theorem Hypothesis.alignedOmegaSigmaGrid_apply_eq_sourceCharacter [Finite G]
   haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
   haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
-    ⟨tic.toDadeHypothesis.fullDadeIsometryData
-      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _
-        (fun _ => rfl))⟩
+    ⟨tic.toDadeHypothesis.fullDadeIsometryData⟩
   let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
     (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
       (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)

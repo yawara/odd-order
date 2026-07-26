@@ -90,13 +90,11 @@ theorem H_sharp_hypothesis76_base_cCoeff_int [Fintype G]
     rw [OddOrder.Peterfalvi.S09.Hypothesis76.psiSupp_coe, hd1, one_smul]
     exact Submodule.sub_mem _ (hzetaZ i) (hzetaZ 0)
   have htauEq : (H_sharp_hypothesis76_base hG hyp φ₀).hyp71.τ
-      = ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
-          (H_sharp_hconj hG hyp)).toDadeIsometryData.toDadeMap := rfl
+      = ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData).toDadeIsometryData.toDadeMap := rfl
   have hpres : (H_sharp_hypothesis76_base hG hyp φ₀).hyp71.τ
       ((H_sharp_hypothesis76_base hG hyp φ₀).psiSupp i) ∈ ZIrr G := by
     rw [htauEq]
-    exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
-      (H_sharp_hconj hG hyp)).preserves_virtualCharacters _ hpsiZ
+    exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData).preserves_virtualCharacters _ hpsiZ
   rw [OddOrder.Peterfalvi.S09.Hypothesis76.cCoeff]
   exact ClassFunction.inner_mem_ZIrr_int hpres hχ
 

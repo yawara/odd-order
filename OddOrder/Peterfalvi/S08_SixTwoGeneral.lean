@@ -468,7 +468,7 @@ supports (`inducedKernelFamily_scaledDiff_support`), integrality
 and the break fields (`inducedKernelFamily_breakChar_fields`). -/
 theorem inducedKernelFamily_degreeSqNormReBound_of_break_k
     {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     (hodd : Odd (Nat.card ↥L))
     {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 →
@@ -477,7 +477,7 @@ theorem inducedKernelFamily_degreeSqNormReBound_of_break_k
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥)
     (hS₁fin : S₁.Finite)
     (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
     (hχ₁deg : χ₁ 1 = (K.index : ℂ))
@@ -485,18 +485,18 @@ theorem inducedKernelFamily_degreeSqNormReBound_of_break_k
     (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
     {a : ℕ} (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
     (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       ψ (a • χ₁))
     (hDatau1 : Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-      (hyp.fullDadeIsometryData hconj))
+      (hyp.fullDadeIsometryData))
     (datum : ∀ χ ∈ S₁,
       { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-            (hyp.fullDadeIsometryData hconj)) χ 0 //
+            (hyp.fullDadeIsometryData)) χ 0 //
         D.imageFamily.Orthogonal Da.imageFamily ∧
         D.tau1 χ = hS₁coh.extension χ })
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (S₁ ∪ {ψ, ψ.conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
     ∃ (k : ℕ) (χmem : Fin k → ClassFunction ↥L ℂ) (mc : Fin k → ℝ),
@@ -555,8 +555,8 @@ theorem inducedKernelFamily_degreeSqNormReBound_of_break_k
     inducedKernelFamily_scaledDiff_support hKsupp hψB (hmemfam i₁) (d := a) hψdeg
   -- (7) Dade-image integrality of the break difference
   have htau1ψ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-      (hyp.fullDadeIsometryData hconj) (ψ - a • χmem i₁) ∈ ZIrr G := by
-    refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+      (hyp.fullDadeIsometryData) (ψ - a • χmem i₁) ∈ ZIrr G := by
+    refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp
       hdiffasuppψ ?_
     exact Submodule.sub_mem _ (inducedKernelFamily_mem_ZIrr hψB)
       (nsmul_mem (inducedKernelFamily_mem_ZIrr (hmemfam i₁)) a)
@@ -580,7 +580,7 @@ theorem inducedKernelFamily_degreeSqNormReBound_of_break_k
     (χ := ψ) (chibar := ψ.conj) (chi1 := χmem i₁) (a := a)
     hSgen hψdeg hbar1 hχ₁ne h1A
   -- (9) feed the norm-weighted reducible-break engine
-  have hbound := coherentDegreeSqNormBound_of_not_coherentW_k hyp hconj hS₁coh
+  have hbound := coherentDegreeSqNormBound_of_not_coherentW_k hyp hS₁coh
     ψ hdiffsuppψ hψψne hψbψbne hψψb hψbψ hψ_S1 hψbar_S1
     (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
     hmemdegdiffsupp (fun j _ => hmemS1set j) mc (fun j _ => hmcpos j)
@@ -617,7 +617,7 @@ giving `|L:K|·(|K:A'| − 1) ≤ 2·ψ(1)·χ₁(1)` (general-kernel form of
 `sSubFiltration_sum_le_two_psi_caseB`/`_columnBreak`). -/
 theorem inducedKernelFamily_SA_sum_le_two_psi_k
     {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     (hodd : Odd (Nat.card ↥L))
     {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 →
@@ -626,7 +626,7 @@ theorem inducedKernelFamily_SA_sum_le_two_psi_k
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥)
     (hS₁fin : S₁.Finite)
     (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     {A' : Subgroup ↥L} [A'.Normal] (hSAsub : inducedKernelFamily K A' ⊆ S₁)
     {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
@@ -635,25 +635,25 @@ theorem inducedKernelFamily_SA_sum_le_two_psi_k
     (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
     {a : ℕ} (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
     (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       ψ (a • χ₁))
     (hDatau1 : Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-      (hyp.fullDadeIsometryData hconj))
+      (hyp.fullDadeIsometryData))
     (datum : ∀ χ ∈ S₁,
       { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-            (hyp.fullDadeIsometryData hconj)) χ 0 //
+            (hyp.fullDadeIsometryData)) χ 0 //
         D.imageFamily.Orthogonal Da.imageFamily ∧
         D.tau1 χ = hS₁coh.extension χ })
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (S₁ ∪ {ψ, ψ.conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
     (K.index : ℝ) * ((Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1)
       ≤ 2 * (ψ 1).re * (χ₁ 1).re := by
   classical
   obtain ⟨k, χmem, mc, hinj, hrange, hmcpos, hmcnorm, hfambound⟩ :=
-    inducedKernelFamily_degreeSqNormReBound_of_break_k hyp hconj hodd hKsupp h1A hS₁sub hS₁fin
+    inducedKernelFamily_degreeSqNormReBound_of_break_k hyp hodd hKsupp h1A hS₁sub hS₁fin
       hS₁coh hχ₁S₁ hχ₁deg hψB hψnotS1 hψcnotS1 hψdeg Da hDatau1 datum hnc
   have hSAsum := sum_re_div_normSq_inducedKernelFamily_eq (K := K) (X := A')
   set SAfilt := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
@@ -756,20 +756,20 @@ discharged from the family layer.  This reduces the `hdatum` obligation of
 μ-column members the full datum is grid-side (issue 2022). -/
 noncomputable def inducedKernelFamily_memberDatum_of_irreducible
     {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥)
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
     (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     {χ : ClassFunction ↥L ℂ} (hχS₁ : χ ∈ S₁) (hχirr : IsIrreducibleCharacter χ) :
     { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
         χ 0 //
-      D.imageFamily = OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj
+      D.imageFamily = OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp
         ⟨χ, hχirr⟩ (inducedKernelFamily_hasNoRealCharacters hodd ⊥ (hS₁sub hχS₁))
         (inducedKernelFamily_conjDiff_support hKsupp (hS₁sub hχS₁)) ∧
       D.tau1 χ = hS₁coh.extension χ } := by
@@ -784,7 +784,7 @@ noncomputable def inducedKernelFamily_memberDatum_of_irreducible
       (inducedKernelFamily_closedUnderConjugate ⊥ hχfam) (fun h => hreal h.symm)
   have hνZ : hS₁coh.extension χ ∈ ZIrr G :=
     hS₁coh.extension_mem_ZIrr χ (Submodule.subset_span hχS₁)
-  exact ⟨memberExtensionDecomposition hyp hconj hS₁coh ⟨χ, hχirr⟩ hreal hdiffsupp
+  exact ⟨memberExtensionDecomposition hyp hS₁coh ⟨χ, hχirr⟩ hreal hdiffsupp
     hχS₁ (hS₁conj hχS₁) hνZ hχχbar, rfl, rfl⟩
 
 omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
@@ -835,7 +835,7 @@ input — non-reality, difference supports, `ZIrr`-integrality of `τ(ψ − a·
 the h56 producer to the pairs involving a *reducible* (μ-column) object. -/
 noncomputable def inducedKernelFamily_breakDa_of_irreducible
     {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
@@ -845,11 +845,11 @@ noncomputable def inducedKernelFamily_breakDa_of_irreducible
     {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
     {a : ℕ} (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1) :
     { Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
         ψ (a • χ₁) //
       Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-        (hyp.fullDadeIsometryData hconj) ∧
-      Da.imageFamily = OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj
+        (hyp.fullDadeIsometryData) ∧
+      Da.imageFamily = OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp
         ⟨ψ, hψirr⟩
         (inducedKernelFamily_hasNoRealCharacters hodd ⊥ (inducedKernelFamily_subset_bot B hψB))
         (inducedKernelFamily_conjDiff_support hKsupp (inducedKernelFamily_subset_bot B hψB)) }
@@ -867,8 +867,8 @@ noncomputable def inducedKernelFamily_breakDa_of_irreducible
       OddOrder.Peterfalvi.S04.supportInSubgroup A L :=
     inducedKernelFamily_scaledDiff_support hKsupp hψB hχ₁fam (d := a) hψdeg
   have htau1_mema : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-      (hyp.fullDadeIsometryData hconj) (ψ - a • χ₁) ∈ ZIrr G := by
-    refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hconj
+      (hyp.fullDadeIsometryData) (ψ - a • χ₁) ∈ ZIrr G := by
+    refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp
       hdiffasupp ?_
     exact Submodule.sub_mem _ (inducedKernelFamily_mem_ZIrr hψfam)
       (nsmul_mem (inducedKernelFamily_mem_ZIrr hχ₁fam) a)
@@ -886,7 +886,7 @@ noncomputable def inducedKernelFamily_breakDa_of_irreducible
       hψbarχ₁, mul_zero]
   have hψψbar : ClassFunction.inner ψ ψ.conj = 0 :=
     inducedKernelFamily_pairwise_orthogonal hψfam hψcfam (fun h => hreal h.symm)
-  exact ⟨OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp hconj ⟨ψ, hψirr⟩ hreal
+  exact ⟨OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp ⟨ψ, hψirr⟩ hreal
     hdiffsupp hdiffasupp htau1_mema hψaχ₁ hψbaraχ₁ hψψbar, rfl, rfl⟩
 
 /-- **The full `hdatum` clause for an irreducible member against an irreducible break** — the
@@ -900,14 +900,14 @@ After this, the §11-side `hdatum` work is exactly the pairs involving a reducib
 (issue 2022). -/
 theorem inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr
     {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥)
     (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
     (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     {B : Subgroup ↥L} {ψ : ClassFunction ↥L ℂ} (hψB : ψ ∈ inducedKernelFamily K B)
     (hψirr : IsIrreducibleCharacter ψ) (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
@@ -915,15 +915,15 @@ theorem inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr
     {a : ℕ} (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
     {χ : ClassFunction ↥L ℂ} (hχS₁ : χ ∈ S₁) (hχirr : IsIrreducibleCharacter χ) :
     ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
         χ 0,
       D.imageFamily.Orthogonal
-        (inducedKernelFamily_breakDa_of_irreducible hyp hconj hodd hKsupp hS₁sub hψB hψirr
+        (inducedKernelFamily_breakDa_of_irreducible hyp hodd hKsupp hS₁sub hψB hψirr
           hψnotS1 hψcnotS1 hχ₁S₁ hψdeg).1.imageFamily ∧
       D.tau1 χ = hS₁coh.extension χ := by
-  set md := inducedKernelFamily_memberDatum_of_irreducible hyp hconj hodd hKsupp
+  set md := inducedKernelFamily_memberDatum_of_irreducible hyp hodd hKsupp
     hS₁sub hS₁conj hS₁coh hχS₁ hχirr with hmd
-  set bd := inducedKernelFamily_breakDa_of_irreducible hyp hconj hodd hKsupp hS₁sub hψB hψirr
+  set bd := inducedKernelFamily_breakDa_of_irreducible hyp hodd hKsupp hS₁sub hψB hψirr
     hψnotS1 hψcnotS1 hχ₁S₁ hψdeg with hbd
   refine ⟨md.1, ?_, md.2.2⟩
   -- rewrite both image families to the explicit difference-support Dade `R(·)` families,
@@ -948,7 +948,7 @@ theorem inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr
   have hχbarψbar : ClassFunction.inner χ.conj ψ.conj = 0 :=
     inducedKernelFamily_pairwise_orthogonal hχcfam hψcfam
       (fun h => hψcnotS1 (h ▸ hχbarS₁))
-  exact dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp hconj
+  exact dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp
     (inducedKernelFamily_hasNoRealCharacters hodd ⊥ hχfam)
     (inducedKernelFamily_conjDiff_support hKsupp hχfam)
     (inducedKernelFamily_hasNoRealCharacters hodd ⊥ hψfam)
@@ -989,7 +989,7 @@ with `|K:A'| − 1 ≤ 2·ψ(1)`; unpacking `ψ = Ind_K^L θ` gives exactly the 
 and the anchor is discharged by the general family layer of this file. -/
 theorem exists_source_index_le_two_psi_of_break
     {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     (hodd : Odd (Nat.card ↥L))
     {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 →
@@ -1002,29 +1002,29 @@ theorem exists_source_index_le_two_psi_of_break
       OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ →
       S₁ ⊆ inducedKernelFamily K A' ∪ inducedKernelFamily K B →
       ∀ (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
         S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L)),
       ∀ (ψ : ClassFunction ↥L ℂ), ψ ∈ inducedKernelFamily K B → ψ ∉ S₁ → ψ.conj ∉ S₁ →
       ∀ (χ₁ : ClassFunction ↥L ℂ), χ₁ ∈ S₁ →
       ∀ (a : ℕ), ψ 1 = (a : ℂ) * χ₁ 1 →
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
         (S₁ ∪ {ψ, ψ.conj}) (OddOrder.Peterfalvi.S04.supportInSubgroup A L)) →
       ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-            (hyp.fullDadeIsometryData hconj)) ψ (a • χ₁),
+            (hyp.fullDadeIsometryData)) ψ (a • χ₁),
         Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-          (hyp.fullDadeIsometryData hconj) ∧
+          (hyp.fullDadeIsometryData) ∧
         ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
             (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-              (hyp.fullDadeIsometryData hconj)) χ 0,
+              (hyp.fullDadeIsometryData)) χ 0,
           D.imageFamily.Orthogonal Da.imageFamily ∧
           D.tau1 χ = hS₁coh.extension χ)
     (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (inducedKernelFamily K A') (OddOrder.Peterfalvi.S04.supportInSubgroup A L)))
     (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (inducedKernelFamily K B) (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
     ∃ θ : IrreducibleCharacter ↥K,
       (↑(B.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
@@ -1050,7 +1050,7 @@ theorem exists_source_index_le_two_psi_of_break
   -- the first-obstruction break pair over `S(A') ∪ S(B)`.
   obtain ⟨S₁, ψ, hS₁conj, hSaS₁, hS₁un, hψB, hψnotS₁, hψcnotS₁, hS₁coh, hbreak⟩ :=
     exists_coherentBreakPair_union
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
       (inducedKernelFamily_finite A') (inducedKernelFamily_finite B)
       (inducedKernelFamily_closedUnderConjugate A')
       (inducedKernelFamily_closedUnderConjugate B)
@@ -1073,7 +1073,7 @@ theorem exists_source_index_le_two_psi_of_break
   obtain ⟨Da, hDatau1, hdat⟩ := hdatum S₁ hS₁conj hS₁un hcoh ψ hψB hψnotS₁ hψcnotS₁
     χ₁ (hSaS₁ hχ₁A') a hψdeg hbreak
   -- the (6.2) `S(A')`-sum bound at the break.
-  have hbound := inducedKernelFamily_SA_sum_le_two_psi_k hyp hconj hodd hKsupp h1A
+  have hbound := inducedKernelFamily_SA_sum_le_two_psi_k hyp hodd hKsupp h1A
     hS₁bot hS₁fin hcoh hSaS₁ (hSaS₁ hχ₁A') hχ₁deg hψB hψnotS₁ hψcnotS₁ hψdeg
     Da hDatau1
     (fun χ hχ => ⟨(hdat χ hχ).choose, (hdat χ hχ).choose_spec⟩)

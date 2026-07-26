@@ -124,7 +124,6 @@ theorem hypothesis78_weightedNuSum_inner_nu_zeta_eq_d_at
     show H78.zetaDistinct = 0 from rfl, hprojection, div_eq_iff hz0]
   exact H78.hyp76.zeta_one_eq_d_mul r
 
-
 omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
 /-- On every nonzero, non-principal member, the concrete coherent extension
 agrees with the Dade map on the degree-zero source difference. -/
@@ -185,7 +184,6 @@ theorem hypothesis78_coherence_agreement_at
     linear_combination -h
   have hagree := Cert.coherence_hagree_dadeMap
     (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
-    (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj
     (F.coherence i hodd hnilp C hFrob) hr_mem h0_mem
     (m0 := deg_0) (mi := deg_r) hdeg_0_ne hd
     (H78.hyp76.psi_support r)
@@ -925,6 +923,5 @@ theorem exists_weightedGammaDecomposition_on_reverseCoefficientZeroIndices
 end FamilyRealization
 
 end FrobeniusFamily
-
 
 end OddOrder.Peterfalvi.S09

@@ -55,7 +55,7 @@ theorem SibleyDadeHypothesis.inner_self_tau_indW2_sub_smul
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.support_indW2_sub_smul_subset_sharpImage hW2H φ hη₁ c h1
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dade hyp.hconj
+    hyp.dade
     (S := {ClassFunction.induce W2 φ - c • η₁})
     (by intro s hs; rw [Set.mem_singleton_iff] at hs; rw [hs]; exact hsupp)
     (Submodule.subset_span rfl) (Submodule.subset_span rfl)
@@ -125,7 +125,7 @@ theorem SibleyDadeHypothesis.inner_tau_indW2_sub_smul_tau_Yset_diff
     hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη') (hyp.Yset_subset_S hη₁)
       ((hyp.Yset_apply_one hη').trans (hyp.Yset_apply_one hη₁).symm)
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dade hyp.hconj
+    hyp.dade
     (S := ({ClassFunction.induce W2 φ - c • η₁, η' - η₁} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs
         simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
@@ -509,7 +509,7 @@ theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_caseB
     have hvZ : hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
         - ((W2.subgroupOf H).index : ℂ) • η₁) ∈ ZIrr G :=
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        hyp.dade hyp.hconj hsuppX hsrcZ
+        hyp.dade hsuppX hsrcZ
     have he₁Z : ((W2.subgroupOf H).index : ℂ) • hyp.coherentYset.extension η₁ ∈ ZIrr G := by
       rw [Nat.cast_smul_eq_nsmul]
       exact nsmul_mem (hyp.coherentYset.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁))

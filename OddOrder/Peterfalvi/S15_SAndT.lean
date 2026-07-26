@@ -498,7 +498,7 @@ theorem inner_tauSbetaGrid_coh_ext_zeta_eq_of_c_eq_one [Finite G]
       rw [ClassFunction.mem_support] at hg
       by_contra hgnot
       have hdade := (dataL.typeIHyp.dadeData.dade.fullDadeIsometryData
-        dataL.typeIHyp.hconj).toDadeIsometryData.isDadeMap
+).toDadeIsometryData.isDadeMap
       exact hg (hdade.map_eq_zero_of_not_mem_dadeSupport _ g hgnot)
     have hzero : ClassFunction.inner (tauSbetaGrid hG hyp)
         (dataL.coh.extension (dataL.zeta i)

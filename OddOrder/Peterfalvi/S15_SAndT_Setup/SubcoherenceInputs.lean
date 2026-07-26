@@ -740,17 +740,17 @@ theorem Hypothesis.sInstance_dade_eq_induce_of_supported_trivial_H [Fintype G] [
     {f : ClassFunction ↥hyp.S ℂ}
     (hf : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A₁ hyp.S) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) f
+        ((hyp.dadeHypS hG).fullDadeIsometryData) f
       = ClassFunction.induce hyp.S f := by
   have hfA : f.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S :=
     hf.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA₁A)
   have h1 : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) f
+        ((hyp.dadeHypS hG).fullDadeIsometryData) f
       = (hyp.dadeHypS hG).dadeMap (k := ℂ)
         ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hfA⟩ :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS hG)
-      ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) hfA
+      ((hyp.dadeHypS hG).fullDadeIsometryData) hfA
   rw [h1]
   -- `⟨f, hfA⟩` is defeq to `inclusion hA₁A ⟨f, hf⟩` (same carrier `f`), so step 3 applies directly.
   exact OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H (hyp.dadeHypS hG)
@@ -868,7 +868,7 @@ theorem Hypothesis.sInstance_dade_eq_induce [Fintype G] [Finite G]
     (hf : f.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) f
+        ((hyp.dadeHypS hG).fullDadeIsometryData) f
       = ClassFunction.induce hyp.S f :=
   hyp.sInstance_dade_eq_induce_of_supported_trivial_H hG (subset_refl _)
     (fun l _ ha => S10.typePACore_conj_mem l.2 ha)

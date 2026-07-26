@@ -80,8 +80,7 @@ theorem tSide_etaGridProjection_residual_ne_zero_of_coherent_pair [Finite G]
       ClassFunction.inner (tSideDadeMap hyp hG φ) (tSideDadeMap hyp hG theta) ≠ 0 := by
     simp only [tSideDadeMap]
     rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-      (tSideDadeSupport_nonempty hG hyp).some.dade
-      (tSideDadeSupport_nonempty hG hyp).some.hconj hφsupp hthetaSupp]
+      (tSideDadeSupport_nonempty hG hyp).some.dade hφsupp hthetaSupp]
     simpa [theta] using hφpair
   have hζeta := T_typeIII_coherent_image_inner_eta_eq_zero hG hyp hIII
     hyp07.conjugate_closed hyp07.no_real_characters hsupp coh hζ hζirr

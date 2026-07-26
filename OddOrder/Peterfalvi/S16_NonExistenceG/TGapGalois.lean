@@ -64,9 +64,9 @@ theorem tSideDadeMap_mapRingEquiv_bridge [Finite G]
   let side := (tSideDadeSupport_nonempty hG hyp).some
   change ClassFunction.mapRingEquiv σc
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap side.dade
-        (side.dade.fullDadeIsometryData side.hconj) (ν0 - ζ)) = _
+        (side.dade.fullDadeIsometryData) (ν0 - ζ)) = _
   rw [← OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mapRingEquiv_comm
-    side.dade (side.dade.fullDadeIsometryData side.hconj) σc hbridgeSupp]
+    side.dade (side.dade.fullDadeIsometryData) σc hbridgeSupp]
   change tSideDadeMap hyp hG (ClassFunction.mapRingEquiv σc (ν0 - ζ)) = _
   rw [← map_add]
   congr 1
@@ -132,8 +132,7 @@ theorem tSideDadeMap_inner_galois_eq_intCast [Finite G]
   apply ClassFunction.inner_eq_intCast_of_mapRingEquiv_eq_add σc m
   · simpa [tSideDadeMap] using
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        (tSideDadeSupport_nonempty hG hyp).some.dade
-        (tSideDadeSupport_nonempty hG hyp).some.hconj hbridgeSupp hbridgeZ)
+        (tSideDadeSupport_nonempty hG hyp).some.dade hbridgeSupp hbridgeZ)
   · exact hηZ
   · exact tSideDadeMap_mapRingEquiv_bridge hG hyp σc hν0 hbridgeSupp
   · exact hη

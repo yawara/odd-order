@@ -381,8 +381,8 @@ theorem chiRho_adjoint {G : Type*} [Group G] [Fintype G]
     (χ : ClassFunction G ℂ) :
     ClassFunction.inner (H71.τ α) χ =
       ClassFunction.inner (α : ClassFunction L ℂ) (H71.chiRhoCF χ) :=
-  OddOrder.Peterfalvi.S04.adjoint_formula H71.hyp H71.τ H71.isDadeMap
-    H71.hConjInvariant α χ (H71.chiRhoCF χ) (H71.chiRhoCF_eq_adjointAverageFun χ)
+  OddOrder.Peterfalvi.S04.adjoint_formula H71.hyp H71.τ H71.isDadeMap α χ
+    (H71.chiRhoCF χ) (H71.chiRhoCF_eq_adjointAverageFun χ)
 
 /-- **Peterfalvi (7.2.b).** `‖χ^ρ‖² ≤ ‖χ‖²` for any `χ ∈ CF(G)`.
 

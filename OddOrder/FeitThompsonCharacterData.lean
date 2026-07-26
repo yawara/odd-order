@@ -110,8 +110,7 @@ noncomputable def tiCyclicWDadeApp :
     OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (G := G)
       (tiCyclicW hG mp tp) :=
   OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication.mk
-    ((tiCyclicW hG mp tp).toDadeHypothesis.fullDadeIsometryData
-      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)))
+    (tiCyclicW hG mp tp).toDadeHypothesis.fullDadeIsometryData
 
 /-- **The (3.2) Dade σ-integral on `W = tp.W`** (see the section header above): the σ-isometry of
 `tiCyclicW`, re-viewed as an integral character map. -/
@@ -236,9 +235,7 @@ noncomputable def hyp46Smp :
     dade0 := (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePACore0 hG
         mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade
     tau := ((OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePACore0 hG
-          mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade).fullDadeIsometryData
-      (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePACore0 hG
-        mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.hconj }
+          mp.S_maximal mp.S_typeP2.1 tp.Sdata).some.dade).fullDadeIsometryData }
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **The Dade-free (4.6) core on the `muS` producer instance** (issue 9081): the structural

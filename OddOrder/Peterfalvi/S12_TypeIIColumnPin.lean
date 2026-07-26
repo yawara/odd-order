@@ -211,7 +211,6 @@ theorem typeII_T2_extension_lam_eq_single [Finite G]
       (α : ClassFunction G ℂ),
       α ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
         (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
-        (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
         ⟨lam, hlam_irr⟩ hr hs).imageSet ∧
       c.extension lam = α := by
   classical
@@ -271,7 +270,6 @@ theorem typeII_T2_extension_lam_eq_single [Finite G]
     OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
       (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
         (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
-        (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
         ⟨lam, hlam_irr⟩ hr hs)
       c.extension
       (fun φ ζ hφ hζ => c.extension_inner_eq φ ζ (hspan hφ) (hspan hζ))
@@ -321,7 +319,6 @@ theorem typeII_dadeOfDiff_member_inner_chiFam_eq_zero [Finite G]
     {β : ClassFunction G ℂ}
     (hβ : β ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
       (typeIIHypothesis46 hG hSmax hSII data).dade0
-      (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data)
       χ hrealχ hdiffsuppχ).imageSet)
     (pq : (((OddOrder.Peterfalvi.S06.ticVdiff
         (typeIIHypothesis46 hG hSmax hSII data)).W1.subgroupOf
@@ -379,17 +376,14 @@ theorem typeII_dadeOfDiff_member_inner_chiFam_eq_zero [Finite G]
       ∃ cd : OddOrder.Peterfalvi.S07.CharacterDifferenceImage (G := G)
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
           (typeIIHypothesis46 hG hSmax hSII data).dade0
-          ((typeIIHypothesis46 hG hSmax hSII data).dade0.fullDadeIsometryData
-            (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data)))
+          ((typeIIHypothesis46 hG hSmax hSII data).dade0.fullDadeIsometryData))
         (χ : ClassFunction ↥S ℂ),
         OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-            (typeIIHypothesis46 hG hSmax hSII data).dade0
-            (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data) χ hrealχ hdiffsuppχ
+            (typeIIHypothesis46 hG hSmax hSII data).dade0 χ hrealχ hdiffsuppχ
           = cd.toOrthonormalImage := ⟨_, rfl⟩
   have hcdimg : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
       (typeIIHypothesis46 hG hSmax hSII data).dade0
-      ((typeIIHypothesis46 hG hSmax hSII data).dade0.fullDadeIsometryData
-        (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data))
+      ((typeIIHypothesis46 hG hSmax hSII data).dade0.fullDadeIsometryData)
       ((χ : ClassFunction ↥S ℂ) - (χ : ClassFunction ↥S ℂ).conj)
       = (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction := by
     rw [cd.image_eq, smul_sub, Int.cast_smul_eq_zsmul, Int.cast_smul_eq_zsmul]

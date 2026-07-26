@@ -60,7 +60,7 @@ the `(4.6.e)` datum.  Given the pin `hdd` — that `dd`'s Dade hypothesis **is**
 it is for the intended producer — the two maps agree wherever it matters, because
 `dadeIntegralCharacterMap_apply_of_support` collapses *any* `dadeIntegralCharacterMap` over a fixed
 `S04.Hypothesis` to that hypothesis's own `dadeMap` on supported arguments.  The isometry data play
-no role there, so no agreement between `dd.dade.fullDadeIsometryData dd.hconj` and
+no role there, so no agreement between `dd.dade.fullDadeIsometryData` and
 `h46.tau.restrict …` is needed — only between the underlying hypotheses. -/
 theorem sOf_degreeSubfamily_coherent_restrict [Finite G] {M : Subgroup G} {A : Set G}
     (hodd : Odd (Nat.card ↥M)) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
@@ -89,7 +89,7 @@ theorem sOf_degreeSubfamily_coherent_restrict [Finite G] {M : Subgroup G} {A : S
               (hKeq ▸ sOf_subset_inducedNonKernelFamily hG hM data Y hx.1))
             (fun _ hx => hx.2.1) (fun _ hx => irrCut_conjClosed data Y d hx)).tau
           = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dd.dade
-            (dd.dade.fullDadeIsometryData dd.hconj) from rfl,
+            (dd.dade.fullDadeIsometryData) from rfl,
         OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support dd.dade _ hφ.2,
         OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
           (h46.dade0.restrict Set.subset_union_left hAnorm) _ hφ.2, hdd]
@@ -112,8 +112,8 @@ noncomputable def sOf_memberPsiDecomposition [Finite G] {M : Subgroup G} {A : Se
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -126,7 +126,7 @@ noncomputable def sOf_memberPsiDecomposition [Finite G] {M : Subgroup G} {A : Se
     (hsuppχ : ((χ : ClassFunction ↥M ℂ) - (χ : ClassFunction ↥M ℂ).conj).support ⊆ A0) :
     OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0
-      (h46.dade0.fullDadeIsometryData hconj)) χ 0 := by
+      (h46.dade0.fullDadeIsometryData)) χ 0 := by
   classical
   haveI := derivedInG_subgroupOf_normal M
   have hχ : χ ∈ sOf data Y := hS₁sub hχS₁
@@ -141,7 +141,7 @@ noncomputable def sOf_memberPsiDecomposition [Finite G] {M : Subgroup G} {A : Se
     · exact Submodule.sub_mem _ (Submodule.subset_span hχS₁) (Submodule.subset_span hχc)
     · rw [sub_zero]; exact Submodule.subset_span hχS₁
   refine OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
-    ((sOf_memberRFamily hG hM data h46 hKeq hconj htau hKsupp hχ).congrTau (by rw [htau]))
+    ((sOf_memberRFamily hG hM data h46 hKeq htau hKsupp hχ).congrTau (by rw [htau]))
     hS₁coh.extension
     (fun φ ζ hφ hζ => hS₁coh.extension_inner_eq φ ζ (hspan φ hφ) (hspan ζ hζ))
     ((hS₁coh.extends_on_supported _ ⟨?_, hsuppχ⟩).trans (by rw [htau])) ?_ (by simp) (by simp) ?_
@@ -176,8 +176,8 @@ noncomputable def sOf_breakPsiDecomposition [Finite G] {M : Subgroup G} {A : Set
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -189,7 +189,7 @@ noncomputable def sOf_breakPsiDecomposition [Finite G] {M : Subgroup G} {A : Set
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M) :
     OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0
-      (h46.dade0.fullDadeIsometryData hconj)) ψ (a • χ₁) := by
+      (h46.dade0.fullDadeIsometryData)) ψ (a • χ₁) := by
   classical
   haveI := derivedInG_subgroupOf_normal M
   have hψbot := sOf_subset_inducedKernelFamily_bot hG hM data Y hψ
@@ -222,12 +222,12 @@ noncomputable def sOf_breakPsiDecomposition [Finite G] {M : Subgroup G} {A : Set
   have hsmulcast : (a • χ₁ : ClassFunction ↥M ℂ) = (a : ℂ) • χ₁ :=
     (Nat.cast_smul_eq_nsmul ℂ a χ₁).symm
   refine OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
-    ((sOf_memberRFamily hG hM data h46 hKeq hconj htau hKsupp hψ).congrTau (by rw [htau])) _
+    ((sOf_memberRFamily hG hM data h46 hKeq htau hKsupp hψ).congrTau (by rw [htau])) _
     (fun φ ζ hφ hζ => ?_) rfl ?_ ?_ ?_ ?_
-  · exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported h46.dade0 hconj
+  · exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported h46.dade0
       (hspan φ hφ) (hspan ζ hζ)
   · -- `τ (ψ − a·χ₁) ∈ ℤ[Irr G]`
-    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported h46.dade0 hconj
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported h46.dade0
       hsuppa (Submodule.sub_mem _
         (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr hψbot)
         (nsmul_mem (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr hχ₁bot) a))
@@ -262,8 +262,8 @@ theorem sOf_sixTwoDecompositionData [Finite G] {M : Subgroup G} {A : Set G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -283,12 +283,12 @@ theorem sOf_sixTwoDecompositionData [Finite G] {M : Subgroup G} {A : Set G}
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M) :
     ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0
-      (h46.dade0.fullDadeIsometryData hconj)) ψ (a • χ₁),
+      (h46.dade0.fullDadeIsometryData)) ψ (a • χ₁),
       Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0
-      (h46.dade0.fullDadeIsometryData hconj) ∧
+      (h46.dade0.fullDadeIsometryData) ∧
       ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
           (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0
-      (h46.dade0.fullDadeIsometryData hconj)) χ 0,
+      (h46.dade0.fullDadeIsometryData)) χ 0,
         D.imageFamily.Orthogonal Da.imageFamily ∧
         D.tau1 χ = hS₁coh.extension χ := by
   classical
@@ -296,7 +296,7 @@ theorem sOf_sixTwoDecompositionData [Finite G] {M : Subgroup G} {A : Set G}
   have hψbot := sOf_subset_inducedKernelFamily_bot hG hM data Y hψ
   have hψcbot := sOf_subset_inducedKernelFamily_bot hG hM data Y
     (sOf_closedUnderConjugate data Y hψ)
-  refine ⟨sOf_breakPsiDecomposition hG hM data h46 hKeq hconj htau hKsupp a hψ (hS₁sub hχ₁S₁)
+  refine ⟨sOf_breakPsiDecomposition hG hM data h46 hKeq htau hKsupp a hψ (hS₁sub hχ₁S₁)
     (fun h => hψnotS₁ (h ▸ hχ₁S₁)) (fun h => hψcnotS₁ (h ▸ hχ₁S₁)) hsuppa, rfl, ?_⟩
   intro χ hχS₁
   have hχ : χ ∈ sOf data Y := hS₁sub hχS₁
@@ -308,10 +308,10 @@ theorem sOf_sixTwoDecompositionData [Finite G] {M : Subgroup G} {A : Set G}
     rw [show (χ : ClassFunction ↥M ℂ) - (χ : ClassFunction ↥M ℂ).conj
         = -((χ : ClassFunction ↥M ℂ).conj - χ) by abel, ClassFunction.support_neg]
     exact OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support hKsupp hχbot
-  refine ⟨sOf_memberPsiDecomposition hG hM data h46 hKeq hconj htau hKsupp hS₁sub hS₁conj hS₁coh
+  refine ⟨sOf_memberPsiDecomposition hG hM data h46 hKeq htau hKsupp hS₁sub hS₁conj hS₁coh
     hχS₁ hsuppχ, ?_, rfl⟩
   -- `R(χ) ⊥ R(ψ)`: the (5.2.e) cross-orthogonality at the two vanishing inner products
-  exact sOf_memberRFamily_orthogonal hG hM data h46 hKeq hconj htau hKsupp hVsub hχ hψ
+  exact sOf_memberRFamily_orthogonal hG hM data h46 hKeq htau hKsupp hVsub hχ hψ
     (OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hχbot hψbot
       (fun h => hψnotS₁ (h ▸ hχS₁)))
     (OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hχbot hψcbot
@@ -940,8 +940,7 @@ theorem sOf_degreeSubfamily_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
     (dd : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M A)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
     (hdd : dd.dade = h46.dade0.restrict Set.subset_union_left hAnorm)
-    (hconj : h46.dade0.HConjInvariant)
-    (_htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (_htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
     (data : TypesIIIIIIVSetup M) (Y : Subgroup G) (d : ℕ)
     (hKeq : h46.toCore.K = (derivedInG M).subgroupOf M)
@@ -1034,7 +1033,7 @@ anchor degree `(qa)²` to `sumnS F ≤ 2q²a·d`.
 
 ⚠ Two syntactically distinct forms of the same `τ` meet here: the `R`-families are produced for
 `h46.tau` (`certainTypeR` fixes that), while the engine hardcodes
-`h46.dade0.fullDadeIsometryData hconj`.  The decomposition data are already transported (via
+`h46.dade0.fullDadeIsometryData`.  The decomposition data are already transported (via
 `OrthonormalCharacterImageFamily.congrTau`), and the coherence crosses by `IsCoherent.congrMap`,
 which keeps `.extension` *definitionally* — that is what lets the per-member clauses
 `(Dmem i).tau1 = hS₁.extension` still typecheck.  Rewriting the hypotheses instead does not work:
@@ -1045,8 +1044,8 @@ theorem caseA_pairBound [Finite G] {M : Subgroup G} {A : Set G}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -1126,7 +1125,7 @@ theorem caseA_pairBound [Finite G] {M : Subgroup G} {A : Set G}
   have hdiffasuppψ : ((ψ : ClassFunction ↥M ℂ) - e • χmem i₁).support ⊆ A0 :=
     OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support hKsupp hψbot
       (hmemfam i₁) hψdeg
-  obtain ⟨Da, hDatau1, hdatum⟩ := sOf_sixTwoDecompositionData hG hM data h46 hKeq hconj htau
+  obtain ⟨Da, hDatau1, hdatum⟩ := sOf_sixTwoDecompositionData hG hM data h46 hKeq htau
     hKsupp hVsub hS₂sub hS₂conj cohS₂ e hψS hψnotS₂ hψcnotS₂ (hmemS1set i₁) hdiffasuppψ
   choose Dfun hDorth hDtau using hdatum
   obtain ⟨-, hψψne, hψbψbne, hψbψ, hψψb, hdiffsuppψ, hψ_S1, hψbar_S1⟩ :=
@@ -1137,10 +1136,10 @@ theorem caseA_pairBound [Finite G] {M : Subgroup G} {A : Set G}
     OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support hKsupp (hmemfam i)
       (hmemfam i₁) (hdeg_anchor i)
   have htau1ψ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0
-      (h46.dade0.fullDadeIsometryData hconj)
+      (h46.dade0.fullDadeIsometryData)
       ((ψ : ClassFunction ↥M ℂ) - e • χmem i₁) ∈ ZIrr G := by
     refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      h46.dade0 hconj hdiffasuppψ ?_
+      h46.dade0 hdiffasuppψ ?_
     exact Submodule.sub_mem _ (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr hψbot)
       (nsmul_mem (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hmemfam i₁)) e)
   have hcover : ∀ x ∈ S₂, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧ χmem j = x := by
@@ -1182,7 +1181,7 @@ theorem caseA_pairBound [Finite G] {M : Subgroup G} {A : Set G}
   -- `IsCoherent` is data, so a `have` makes `.extension` opaque and strands the `hDtau` clauses.
   rw [htau] at hnc
   have hbound := OddOrder.Peterfalvi.S08.coherentDegreeSqNormBound_of_not_coherentW_k
-    h46.dade0 hconj (cohS₂.congrMap (fun φ _ => by rw [htau])) (ψ : ClassFunction ↥M ℂ)
+    h46.dade0 (cohS₂.congrMap (fun φ _ => by rw [htau])) (ψ : ClassFunction ↥M ℂ)
     hdiffsuppψ hψψne hψbψbne hψψb hψbψ hψ_S1 hψbar_S1
     (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
     hmemdegdiffsupp (fun j _ => hmemS1set j)
@@ -1247,8 +1246,7 @@ theorem sOf_nineEleven_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub data)
     (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
-    (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
@@ -1273,7 +1271,7 @@ theorem sOf_nineEleven_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
   rcases clifford_dichotomy hG chars with hA | hB
   · refine caseA_coherent_sOf_cprime_of_refuter hG chars _ _ hA.some
       (sOf_degreeSubfamily_coherent_A0
-        (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) h46 dd hAnorm hdd hconj htau
+        (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) h46 dd hAnorm hdd htau
         hG hM data (chief.H0 ⊔ cprimeSub data chief) (data.q * hA.some.a)
         (hKeq.trans (huSub_eq_derivedInG_subgroupOf data)) hHle
         (Nat.cast_ne_zero.mpr (Nat.mul_pos data.nontrivial.2.1.pos hA.some.a_pos).ne')
@@ -1282,9 +1280,9 @@ theorem sOf_nineEleven_coherent_A0 [Finite G] {M : Subgroup G} {A : Set G}
           (h46.dade.subset_sharp
             (OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp h))).2 rfl)).some
       (caseA_refuter_of_equality_refutation hG hA.some _ _
-        (caseA_pairBound hG hM hA.some h46 hKeq hconj htau hKsupp hVsub)
+        (caseA_pairBound hG hM hA.some h46 hKeq htau hKsupp hVsub)
         (hrefuteEq hA.some))
-  · exact caseB_coherent_sOf_cprime hG hM chars hB.some h46 hKeq hconj htau hKsupp hVsub hη₁
+  · exact caseB_coherent_sOf_cprime hG hM chars hB.some h46 hKeq htau hKsupp hVsub hη₁
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11) at §9 level**: `𝒮(H₀C′)` is coherent for `τ`, under Hypothesis (9.5) alone.
@@ -1329,8 +1327,7 @@ theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hKeq : h46.K = huSub data)
     (hHle : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ h46.subH)
-    (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hAnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
@@ -1355,7 +1352,7 @@ theorem sOf_nineEleven_coherent [Finite G] {M : Subgroup G} {A : Set G}
   obtain ⟨η₁, hη₁⟩ := sOf_cprime_nonempty hG (chief := chief)
   exact ⟨sOf_coherent_restrict hG hM data h46 h46.toCore hAnorm
     (hKeq.trans (huSub_eq_derivedInG_subgroupOf data)) hHle hη₁
-    (sOf_nineEleven_coherent_A0 hG hM chars h46 hKeq hHle hconj htau hAnorm hKsupp hVsub
+    (sOf_nineEleven_coherent_A0 hG hM chars h46 hKeq hHle htau hAnorm hKsupp hVsub
       dd hdd h2 hrefuteEq).some⟩
 
 end OddOrder.Peterfalvi.S11

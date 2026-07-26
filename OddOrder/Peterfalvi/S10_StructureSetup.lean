@@ -1000,8 +1000,9 @@ namespace DadeSupportHypothesisData
 /-- **Restrict an (8.15) Dade support datum to a smaller `M`-stable support** — Peterfalvi (2.11)
 at the level of the whole (8.15) package.
 
-`S04.Hypothesis.restrict` restricts the Dade hypothesis, `S04.HConjInvariant.restrict` its
-`M`-equivariance, and the faithful-kernel pin transports by `ftSupportKernel_congr_of_subset`.
+`S04.Hypothesis.restrict` restricts the Dade hypothesis (its `M`-equivariance needs no transport:
+`S04.Hypothesis.hConjInvariant` proves (2.4.a) for the restricted datum outright), and the
+faithful-kernel pin transports by `ftSupportKernel_congr_of_subset`.
 Only `N_G(A₁) = M` has to be supplied afresh, since (8.16) is a statement about the particular
 support.
 
@@ -1018,7 +1019,7 @@ noncomputable def restrict [Fintype G] {M : Subgroup G} {A A₁ : Set G}
   H_eq_ftSupportKernel := fun a => by
     rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H, d.H_eq_ftSupportKernel,
       ftSupportKernel_congr_of_subset hA₁A a.2]
-  hconj := d.hconj.restrict hA₁A hA₁norm
+  hconj := OddOrder.Peterfalvi.S04.Hypothesis.hConjInvariant _
 
 /-- The restricted datum's Dade hypothesis is the restriction — the pin `hdd` that the §9 (9.11)
 chain asks for, definitionally. -/

@@ -157,10 +157,10 @@ theorem Hypothesis.sInstance_dade0_eq_induce [Fintype G] [Finite G]
     (hf : f.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.S hyp.Sdata) hyp.S) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) f
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData) f
       = ClassFunction.induce hyp.S f := by
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS0 hG)
-    ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hf]
+    ((hyp.dadeHypS0 hG).fullDadeIsometryData) hf]
   exact OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H (hyp.dadeHypS0 hG)
     (subset_refl _)
     (fun l _ ha => (S10.typePACore0_conj_mem hyp.Sdata l.2).mpr ha)
@@ -196,7 +196,7 @@ noncomputable def Hypothesis.hyp46S [Finite G] (hyp : Hypothesis (G := G))
   S10.typePACore_toHypothesis46_core hyp.Sdata hG.odd
     (OddOrder.Peterfalvi.S12.typePData_W1_hall_coprime hG hyp.S_maximal (hyp.S_isTypeP hG)
       hyp.Sdata)
-    (hyp.dadeHypS0 hG) (hyp.dadeHypS0_hconj hG)
+    (hyp.dadeHypS0 hG)
     (by
       -- `W₂ ≤ M_F = maxNilpotentNormalHall S ≤ M_σ`.
       have hW2H : hyp.Sdata.W2 ≤ hyp.Sdata.H := le_trans hyp.Sdata.W2_le inf_le_left
@@ -324,7 +324,7 @@ theorem Hypothesis.residueS_mu2_diff_dade_apply_of_mem_V [Finite G]
             : OddOrder.RepresentationTheory.ClassFunction ↥hyp.S ℂ) 1)
     {v : G} (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (hyp.hyp46S hG)).V) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-        ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+        ((hyp.dadeHypS0 hG).fullDadeIsometryData)
         (((hyp.residueS hG).mu2 i j : OddOrder.RepresentationTheory.ClassFunction ↥hyp.S ℂ)
           - ((hyp.residueS hG).mu2 i k
               : OddOrder.RepresentationTheory.ClassFunction ↥hyp.S ℂ)) v
@@ -350,7 +350,7 @@ theorem Hypothesis.residueS_mu2_diff_dade_apply_of_mem_V [Finite G]
   have hsupp := hyp.residueS_mu2_diff_support hG i hj0 hk0 hdeg
   -- Dade lift = Dade map on supported inputs
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS0 hG)
-    ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hsupp]
+    ((hyp.dadeHypS0 hG).fullDadeIsometryData) hsupp]
   -- the supported element is `certainTypeDiffSupported` (same underlying function), and the Dade
   -- map is `hyp46S.tau.toDadeMap` (`dadeIsometryData_toDadeMap`, `rfl`); conclude by the §6
   -- certain-type value identity on the regular set.
@@ -422,7 +422,7 @@ theorem Hypothesis.tauS_mu_row0_vanish_on_V [Fintype G] [Finite G]
     (hj0 : (j : ℕ) ≠ 0) :
     ∀ x ∈ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-          ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+          ((hyp.dadeHypS0 hG).fullDadeIsometryData)
           (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
             - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
         - (hyp.eta ⟨0, hyp.q_prime.pos⟩ j
@@ -448,7 +448,7 @@ theorem Hypothesis.tauS_mu_row0_vanish_on_V [Fintype G] [Finite G]
   have hsupp := hyp.tauS_mu_row0_diff_support hG j hj0
   rw [OddOrder.RepresentationTheory.ClassFunction.sub_apply,
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS0 hG)
-      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hsupp,
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData) hsupp,
     (hyp.dadeHypS0 hG).dadeMap_apply]
   have h1H : (1 : G) ∈ (hyp.dadeHypS0 hG).H ⟨w, hwA0⟩ := by
     rw [hyp.forall_dadeHypS0_H_eq_bot hG hnoV ⟨w, hwA0⟩]
@@ -508,7 +508,7 @@ theorem Hypothesis.tauS_mu_vanish_on_V [Fintype G] [Finite G]
     (hj1 : j1 ≠ ⟨0, hyp.p_prime.pos⟩) (hj2 : j2 ≠ ⟨0, hyp.p_prime.pos⟩) :
     ∀ x ∈ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-          ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+          ((hyp.dadeHypS0 hG).fullDadeIsometryData)
           (hyp.mu i j1 - hyp.mu i j2)
         - (hyp.eta i j1 - hyp.eta i j2)) x = 0 := by
   classical
@@ -530,7 +530,7 @@ theorem Hypothesis.tauS_mu_vanish_on_V [Fintype G] [Finite G]
   have hsupp := hyp.tauS_mu_diff_support hG i hj1 hj2
   rw [OddOrder.RepresentationTheory.ClassFunction.sub_apply,
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypS0 hG)
-      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG)) hsupp,
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData) hsupp,
     (hyp.dadeHypS0 hG).dadeMap_apply]
   have h1H : (1 : G) ∈ (hyp.dadeHypS0 hG).H ⟨w, hwA0⟩ := by
     rw [hyp.forall_dadeHypS0_H_eq_bot hG hnoV ⟨w, hwA0⟩]
@@ -615,7 +615,7 @@ theorem Hypothesis.tauT_nu_vanish_on_V [Fintype G] [Finite G]
     (hr : r ≠ ⟨0, hyp.q_prime.pos⟩) (hs : s ≠ ⟨0, hyp.q_prime.pos⟩) :
     ∀ x ∈ conjClassSet ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))),
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
-          ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata))
+          ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData)
           (hyp.nu r j - hyp.nu s j)
         - (hyp.eta r j - hyp.eta s j)) x = 0 := by
   classical
@@ -638,7 +638,7 @@ theorem Hypothesis.tauT_nu_vanish_on_V [Fintype G] [Finite G]
   rw [OddOrder.RepresentationTheory.ClassFunction.sub_apply,
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
       (hyp.dadeHypT0 hG hTP Tdata)
-      ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata))
+      ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData)
       hsupp,
     (hyp.dadeHypT0 hG hTP Tdata).dadeMap_apply]
   have h1H : (1 : G) ∈ (hyp.dadeHypT0 hG hTP Tdata).H ⟨w, hwA0⟩ := by
@@ -710,10 +710,10 @@ theorem Hypothesis.tInstance_dade_eq_induce [Fintype G] [Finite G]
     (hf : f.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
-        ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)) f
+        ((hyp.dadeHypT hG hTP).fullDadeIsometryData) f
       = ClassFunction.induce hyp.T f := by
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support (hyp.dadeHypT hG hTP)
-    ((hyp.dadeHypT hG hTP).fullDadeIsometryData (hyp.dadeHypT_hconj hG hTP)) hf]
+    ((hyp.dadeHypT hG hTP).fullDadeIsometryData) hf]
   exact OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H
     (hyp.dadeHypT hG hTP)
     (subset_refl _)
@@ -736,11 +736,11 @@ theorem Hypothesis.tInstance_dade0_eq_induce [Fintype G] [Finite G]
     (hf : f.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore0 hyp.T Tdata) hyp.T) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT0 hG hTP Tdata)
-        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata)) f
+        ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData) f
       = ClassFunction.induce hyp.T f := by
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
     (hyp.dadeHypT0 hG hTP Tdata)
-    ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData (hyp.dadeHypT0_hconj hG hTP Tdata)) hf]
+    ((hyp.dadeHypT0 hG hTP Tdata).fullDadeIsometryData) hf]
   exact OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H
     (hyp.dadeHypT0 hG hTP Tdata)
     (subset_refl _)

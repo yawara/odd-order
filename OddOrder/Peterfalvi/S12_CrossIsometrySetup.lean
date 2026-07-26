@@ -90,7 +90,6 @@ theorem typeII_tau_diff_inner_chiFam_eq_zero [Finite G]
       (typeIIHypothesis46 hG hSmax hSII data.typeP).tau (lam - lam.conj) ∈ ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
       (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
-      (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
       hsuppA0
       (Submodule.sub_mem _
         (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr hlamIKF)
@@ -110,8 +109,7 @@ theorem typeII_tau_diff_inner_chiFam_eq_zero [Finite G]
         (typeIIHypothesis46 hG hSmax hSII data.typeP).tau (lam - lam.conj))
       = ClassFunction.inner (lam - lam.conj) (lam - lam.conj) :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-      (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
-      (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP) hsuppA0 hsuppA0
+      (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0 hsuppA0 hsuppA0
   have hψ2 : ClassFunction.inner
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap
         (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0

@@ -131,7 +131,7 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
     Submodule.sub_mem _ hμ0Z hζirr.mem_ZIrr
   have hψZ : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ) ∈ ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.dadeData.dade hyp.hconj hsupp hdiffZ
+      hyp.dadeData.dade hsupp hdiffZ
   have heζZ : (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G :=
     (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
   have heζcZ : (hyp.SHC_isCoherent hG).extension ζ.conj ∈ ZIrr G :=

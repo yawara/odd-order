@@ -549,7 +549,7 @@ theorem inner_tau_scaledDiff_tau_Xset_scaledDiff_of_frobenius
       (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₃) (hyp.Xset_subset_S hχ₁) hd
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dade hyp.hconj (S := ({χ₁ - a • η₁, χ₃ - d • χ₁} : Set (ClassFunction ↥L ℂ)))
+    hyp.dade (S := ({χ₁ - a • η₁, χ₃ - d • χ₁} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs
         simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
         rcases hs with rfl | rfl
@@ -614,7 +614,7 @@ theorem inner_tau_scaledDiff_tau_Xset_scaledDiff_c2_caseA
       (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₃) (hyp.Xset_subset_S hχ₁) hd
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dade hyp.hconj (S := ({χ₁ - a • η₁, χ₃ - d • χ₁} : Set (ClassFunction ↥L ℂ)))
+    hyp.dade (S := ({χ₁ - a • η₁, χ₃ - d • χ₁} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs
         simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
         rcases hs with rfl | rfl

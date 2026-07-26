@@ -107,7 +107,7 @@ theorem Sset_degreeSumBound_of_not_coherent [Finite G] {L : Subgroup G} (hyp : H
     Sset_scaledDiff_supported hyp hfrob hAH hψS (hmemS i₁) hψratio
   have htau1ψ : hyp.tau (ψ - a • (χmem i₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.dadeData.dade hyp.hconj hdiffasuppψ
+      hyp.dadeData.dade hdiffasuppψ
       (Submodule.sub_mem _ (IrreducibleCharacter.mem_ZIrr ⟨ψ, hψirr⟩)
         (nsmul_mem (IrreducibleCharacter.mem_ZIrr (χmem i₁)) a))
   have hcover : ∀ x ∈ S₁, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧
@@ -131,7 +131,7 @@ theorem Sset_degreeSumBound_of_not_coherent [Finite G] {L : Subgroup G} (hyp : H
   refine ⟨k, χmem, deg, a, hχinj, hrange, fun j => by rw [hdeg_eq j, hi₁eq],
     by rw [hψratio, hi₁eq], ?_⟩
   have hbound := OddOrder.Peterfalvi.S08.coherentDegreeSumBound_of_not_coherent
-    hyp.dadeData.dade hyp.hconj hS₁coh ⟨ψ, hψirr⟩ hrealψ hdiffsuppψ hψψ hψbarψbar hψψbar hψbarψ
+    hyp.dadeData.dade hS₁coh ⟨ψ, hψirr⟩ hrealψ hdiffsuppψ hψψ hψbarψbar hψψbar hψbarψ
     hψ_S1 hψbar_S1 (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
     (fun j _ => hmemreal j) (fun j _ => hmemdiffsupp j) (fun j _ => hmemdegdiffsupp j)
     (fun j _ => hmemS1 j) (fun j _ => hmembarS1 j) (fun j _ => hmemconjortho j)
@@ -522,7 +522,7 @@ theorem SsubFiltration_commutator_tau_isometry_diff [Finite G] {L : Subgroup G}
     · exact SsubFiltration_commutator_diff_supported hyp hAH ha hb
     · exact SsubFiltration_commutator_diff_supported hyp hAH hc hd
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dadeData.dade hyp.hconj hS (Submodule.subset_span (Set.mem_insert _ _))
+    hyp.dadeData.dade hS (Submodule.subset_span (Set.mem_insert _ _))
     (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -547,7 +547,7 @@ theorem Sset_tau_isometry_diff [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     · exact Sset_diff_supported hyp hab hAH ha hb
     · exact Sset_diff_supported hyp hab hAH hc hd
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dadeData.dade hyp.hconj hS (Submodule.subset_span (Set.mem_insert _ _))
+    hyp.dadeData.dade hS (Submodule.subset_span (Set.mem_insert _ _))
     (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -562,7 +562,7 @@ theorem Sset_tau_diff_mem_ZIrr [Finite G] {L : Subgroup G} (hyp : Hypothesis L) 
     {a b : ClassFunction ↥L ℂ} (ha : a ∈ hyp.Sset) (hb : b ∈ hyp.Sset) :
     hyp.tau (a - b) ∈ ZIrr G := by
   refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-    hyp.dadeData.dade hyp.hconj (Sset_diff_supported hyp hab hAH ha hb) ?_
+    hyp.dadeData.dade (Sset_diff_supported hyp hab hAH ha hb) ?_
   exact Submodule.sub_mem _
     (IrreducibleCharacter.mem_ZIrr ⟨a, Sset_isIrreducibleCharacter hyp hfrob ha⟩)
     (IrreducibleCharacter.mem_ZIrr ⟨b, Sset_isIrreducibleCharacter hyp hfrob hb⟩)
@@ -580,7 +580,7 @@ noncomputable def Sset_differenceImage [Finite G] {L : Subgroup G} (hyp : Hypoth
     (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
     OddOrder.Peterfalvi.S07.CharacterDifferenceImage hyp.tau χ :=
-  OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade hyp.hconj
+  OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade
     ⟨χ, Sset_isIrreducibleCharacter hyp hfrob hχ⟩
     (Sset_hasNoRealCharacters hyp hodd hfrob hχ)
     (Sset_diff_supported hyp hab hAH (Sset_closedUnderConjugate hyp hχ) hχ)
@@ -681,7 +681,7 @@ theorem SsubFiltration_commutator_tau_diff_mem_ZIrr [Finite G] {L : Subgroup G} 
       ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆) :
     hyp.tau (a - b) ∈ ZIrr G := by
   refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-    hyp.dadeData.dade hyp.hconj (SsubFiltration_commutator_diff_supported hyp hAH ha hb) ?_
+    hyp.dadeData.dade (SsubFiltration_commutator_diff_supported hyp hAH ha hb) ?_
   exact Submodule.sub_mem _
     (IrreducibleCharacter.mem_ZIrr
       ⟨a, Sset_isIrreducibleCharacter hyp hfrob (hyp.SsubFiltration_subset_Sset ha)⟩)
@@ -700,7 +700,7 @@ noncomputable def SsubFiltration_commutator_differenceImage [Finite G] {L : Subg
     (hχ : χ ∈ hyp.SsubFiltration
       ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆) :
     OddOrder.Peterfalvi.S07.CharacterDifferenceImage hyp.tau χ :=
-  OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade hyp.hconj
+  OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade
     ⟨χ, Sset_isIrreducibleCharacter hyp hfrob (hyp.SsubFiltration_subset_Sset hχ)⟩
     (Sset_hasNoRealCharacters hyp hodd hfrob (hyp.SsubFiltration_subset_Sset hχ))
     (SsubFiltration_commutator_diff_supported hyp hAH
@@ -819,7 +819,7 @@ theorem frobenius_typeI_coherent_of_abelianKernel [Finite G]
     { tau := hyp.tau
       tau_isometry_diff := fun _ _ hφ hψ =>
         OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-          hyp.dadeData.dade hyp.hconj hφ.2 hψ.2
+          hyp.dadeData.dade hφ.2 hψ.2
       conjugate_closed := Sset_closedUnderConjugate hyp
       no_real_characters := Sset_hasNoRealCharacters hyp hodd hfrob
       pairwise_orthogonal := Sset_pairwiseOrthogonal hyp hodd hfrob
@@ -920,7 +920,7 @@ theorem SsubFiltration_commutator_coherent [Finite G] {L : Subgroup G}
     { tau := hyp.tau
       tau_isometry_diff := fun _ _ hφ hψ =>
         OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-          hyp.dadeData.dade hyp.hconj hφ.2 hψ.2
+          hyp.dadeData.dade hφ.2 hψ.2
       conjugate_closed := fun _ hχ => SsubFiltration_commutator_closedUnderConjugate hyp hχ
       no_real_characters := fun _ hχ =>
         Sset_hasNoRealCharacters hyp hodd hfrob (hyp.SsubFiltration_subset_Sset hχ)

@@ -839,11 +839,11 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
             (typeIHyp.typeI.typeF.H.subgroupOf M) (θ 0 : ClassFunction _ ℂ)) := by
     intro i _ hi_ind
     obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ i)
-    exact coherence_hagree_dadeMap typeIHyp.dadeData.dade typeIHyp.hconj coh
+    exact coherence_hagree_dadeMap typeIHyp.dadeData.dade coh
       (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
       (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
   refine ⟨hypothesis78OfDade typeIHyp.toHypothesis71
-    (typeIHyp.dadeData.dade.fullDadeIsometryData typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
+    (typeIHyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
     typeIHyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
     hdeg_match coh.extension hnu_isometry hagree, ?_, rfl, ?_, ?_, ?_⟩
   · exact typeIHyp.typeI.typeF.H_eq
@@ -888,7 +888,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           = ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf M)
             (θ ind1H : ClassFunction _ ℂ) from by rw [h0triv, htriv])).symm
     set H78 := hypothesis78OfDade typeIHyp.toHypothesis71
-      (typeIHyp.dadeData.dade.fullDadeIsometryData typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
+      (typeIHyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
       typeIHyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
       hdeg_match coh.extension hnu_isometry hagree with hH78def
     have hKcard : Nat.card ↥(typeIHyp.typeI.typeF.H.subgroupOf M)
@@ -919,7 +919,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         rw [← hKcard, ← hcompl, Nat.mul_div_cancel_left _ Nat.card_pos]
       rw [hke, hce]; exact hfrobB
     exact zetaNuRhoNormSqGeOfDade typeIHyp.toHypothesis71
-      (typeIHyp.dadeData.dade.fullDadeIsometryData typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
+      (typeIHyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
       typeIHyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
       hdeg_match coh.extension hnu_isometry hagree
       (OddOrder.Peterfalvi.S14.witness_L_hzeta0nu hG typeIHyp hFrobG coh hAH (θ 0) hθ0_ne)

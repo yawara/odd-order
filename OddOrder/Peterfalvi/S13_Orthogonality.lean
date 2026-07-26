@@ -100,7 +100,7 @@ Every input is definitional or an existing §10/§12 lemma:
 
 * `τ` and `A₀` — `hyp.base.tau` *is* `dadeIntegralCharacterMap h46.dade0 h46.tau` and
   `hyp.base.A0` *is* `supportInSubgroup (A(M) ∪ V^M) M`, since `toHypothesis46` stores
-  `dade0 := hyp.dadeData.dade` and `tau := …fullDadeIsometryData hyp.hconj` and `tic_V` is `rfl`;
+  `dade0 := hyp.dadeData.dade` and `tau := …fullDadeIsometryData` and `tic_V` is `rfl`;
 * `hKeq` — `h46.K` is the `typePData_toS06Hypothesis` field `(M')^{subgroupOf}`, and
   `S11.huSub_eq_derivedInG_subgroupOf` says `HU = M'`;
 * `hHle` — `h46.subH` is *also* `M'` here ((4.6.c) is instantiated at `H = K`), and the §9 chain
@@ -133,7 +133,7 @@ theorem coherent_sOf_H0Cprime_of_section9 [Finite G]
     (hyp.base.toHypothesis46 hG hG.odd)
     (OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf hyp.s11Setup).symm
     (Subgroup.subgroupOf_mono M (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hyp.base.maximal))
-    hyp.base.hconj rfl hnorm hyp.base.mderivSharp_subset_A0
+      rfl hnorm hyp.base.mderivSharp_subset_A0
     (fun v hv => OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.base.typeP hv)
     (hyp.base.dadeData.restrict Set.subset_union_left hnorm
       (OddOrder.Peterfalvi.S12.Hypothesis.normalizer_typePA_eq hG hyp.base)) rfl

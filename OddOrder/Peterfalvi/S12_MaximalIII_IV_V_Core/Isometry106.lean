@@ -95,7 +95,7 @@ theorem Hypothesis.muGridAlpha_tau_mem_ZIrr [Finite G] (hG : OddOrder.BG.IsMinim
     · rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hζirr.mem_ZIrr n
   have hsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-    hyp.dadeData.dade hyp.hconj hsupp hαZ
+    hyp.dadeData.dade hsupp hαZ
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `a = 0`**: the integer `a = (α_{ij}^τ, ζ^{τ₁}) + n` of the (10.5) Cauchy–
@@ -358,7 +358,7 @@ theorem Hypothesis.tau_chidiff_inner_alignedOmega_eq_zero [Finite G]
   have hsupp := hyp.zeta_sub_conj_support hG hodd hχS hχirr
   have hTZ : hyp.tau (χ - χ.conj) ∈ ZIrr G := by
     refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.dadeData.dade hyp.hconj hsupp ?_
+      hyp.dadeData.dade hsupp ?_
     exact Submodule.sub_mem _ hχirr.mem_ZIrr hχcirr.mem_ZIrr
   have hT2 : ClassFunction.inner (hyp.tau (χ - χ.conj)) (hyp.tau (χ - χ.conj)) = 2 := by
     have hset : ∀ s ∈ ({χ - χ.conj} : Set (ClassFunction ↥M ℂ)), s.support ⊆
@@ -368,9 +368,9 @@ theorem Hypothesis.tau_chidiff_inner_alignedOmega_eq_zero [Finite G]
     have hmem : χ - χ.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M)
         ({χ - χ.conj} : Set (ClassFunction ↥M ℂ)) := Submodule.subset_span rfl
     have hpres := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-      hyp.dadeData.dade hyp.hconj hset hmem hmem
+      hyp.dadeData.dade hset hmem hmem
     rw [show hyp.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) from rfl, hpres,
+      (hyp.dadeData.dade.fullDadeIsometryData) from rfl, hpres,
       ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
       ClassFunction.inner_sub_right]
     have h11 : ClassFunction.inner χ χ = 1 := by
@@ -536,8 +536,7 @@ theorem Hypothesis.tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
   haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
   haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
-    ⟨tic.toDadeHypothesis.fullDadeIsometryData
-      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+    ⟨tic.toDadeHypothesis.fullDadeIsometryData⟩
   have hVeq : tic.V = tic.Vdiff := rfl
   -- `ζ̄ ∈ S` irreducible; the `τ₁`-images are orthonormal norm-`1` virtual characters of `G`.
   have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
@@ -743,9 +742,9 @@ theorem Hypothesis.tau_muGrid_row_diff [Finite G]
             Set (ClassFunction ↥M ℂ)) :=
       Submodule.subset_span rfl
     have hpres := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-      hyp.dadeData.dade hyp.hconj hset hmem hmem
+      hyp.dadeData.dade hset hmem hmem
     rw [show hyp.tau = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) from rfl]
+      (hyp.dadeData.dade.fullDadeIsometryData) from rfl]
     rw [hpres]
     exact hsrc
   -- the σ-grid enumeration and the trichotomy engine

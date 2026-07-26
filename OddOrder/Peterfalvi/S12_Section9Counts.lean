@@ -1067,7 +1067,7 @@ noncomputable def Hypothesis.columnBreakDa [Finite G]
     (hμZ : OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂ ∈ ZIrr ↥M) :
     OddOrder.Peterfalvi.S07.CharacterPsiDecomposition
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (hyp.dadeData.dade.fullDadeIsometryData))
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂)
       ((1 : ℕ) • χ₁) := by
   haveI := hyp.finiteG
@@ -1082,11 +1082,11 @@ noncomputable def Hypothesis.columnBreakDa [Finite G]
     rw [one_smul]
     exact Submodule.sub_mem _ hμZ hχ₁irr.mem_ZIrr
   have htau1_mema : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+      (hyp.dadeData.dade.fullDadeIsometryData)
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
         - (1 : ℕ) • χ₁) ∈ ZIrr G :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp.dadeData.dade
-      hyp.hconj hsupp1 hZ
+      hsupp1 hZ
   have hχψ : ClassFunction.inner
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂)
       (((1 : ℕ) • χ₁ : ClassFunction ↥M ℂ)) = 0 := by

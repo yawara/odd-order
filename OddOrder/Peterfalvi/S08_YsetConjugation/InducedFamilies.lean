@@ -37,7 +37,7 @@ variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 noncomputable abbrev tau (hyp : SibleyDadeHypothesis G L H) :
     OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G :=
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dade
-    (hyp.dade.fullDadeIsometryData hyp.hconj)
+    (hyp.dade.fullDadeIsometryData)
 
 /-- The (6.8) coherence target: `S` is coherent for the **real Dade map** `tau`.  This is exactly
 the conclusion shape produced by the §7 engine, hence honestly dischargeable — unlike the legacy
@@ -56,7 +56,7 @@ theorem inner_tau_eq_inner_restrict (hyp : SibleyDadeHypothesis G L H)
     (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
     (ψ : ClassFunction G ℂ) :
     ClassFunction.inner (hyp.tau α) ψ = ClassFunction.inner α (ClassFunction.restrict L ψ) :=
-  inner_dadeIntegralCharacterMap_eq_inner_restrict hyp.dade hyp.hconj hyp.dade_H_eq_bot hαsupp ψ
+  inner_dadeIntegralCharacterMap_eq_inner_restrict hyp.dade hyp.dade_H_eq_bot hαsupp ψ
 
 /-- (6.8)(a) consequence: `[L : H] = |W₁|`.  From the complement `L = H ⋊ W₁` (`hyp.split`).
 This is the common degree of the members of `Y = S(H')`: by [Is] Thm 6.34
@@ -156,7 +156,7 @@ noncomputable def coherentInducedDegreeOneFamily
   have h1notA : (1 : G) ∉ sharpImage H := by
     intro h
     exact h.2 rfl
-  exact OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dade hyp.hconj hn η hηinj
+  exact OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dade hn η hηinj
     hdeg hsuppdiff h1notA
 
 /-- **(6.8)(c2) inertia equality** for a nontrivial linear `θ`.

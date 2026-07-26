@@ -182,11 +182,11 @@ noncomputable def inducedKernelFamily_subcoherent
   have hKsupp := mderivSharp_subset_supportInSubgroup_typePA0 (M := M) data
   refine OddOrder.Peterfalvi.S07.irrSubcoherent
     (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap d.dade
-      (d.dade.fullDadeIsometryData d.hconj))
+      (d.dade.fullDadeIsometryData))
     (OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M data) M)
     (fun χ hχ => ?_) hconjS ?_ ?_ ?_ ?_
   · -- `Rdatum`: the 2-element (5.2.d) datum from the Dade isometry, per irreducible member.
-    exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff d.dade d.hconj
+    exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff d.dade
       ⟨χ, hirr χ hχ⟩
       (OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hodd ⊥ (hsub hχ))
       (OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support hKsupp (hsub hχ))
@@ -212,7 +212,7 @@ noncomputable def inducedKernelFamily_subcoherent
   · -- `hiso`: the (5.2.b) lattice isometry, unconditional on the `A₀`-supported sublattice.
     exact fun φ ψ hφ hψ =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-        d.dade d.hconj hφ.2 hψ.2
+        d.dade hφ.2 hψ.2
 
 /-- **Peterfalvi (8.15), claim 3, book-literal shape `A = M^#`.**
 
@@ -253,11 +253,11 @@ noncomputable def inducedKernelFamily_subcoherent_sharp
     exact hKsupp x (Subgroup.mem_subgroupOf.mpr hxK) hx1
   refine OddOrder.Peterfalvi.S07.irrSubcoherent
     (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap d.dade
-      (d.dade.fullDadeIsometryData d.hconj))
+      (d.dade.fullDadeIsometryData))
     ({(1 : ↥M)}ᶜ)
     (fun χ hχ => ?_) hconjS ?_ ?_ ?_ ?_
   · -- `Rdatum`: same Dade 2-element datum (its support input is `A₀`-side, independent of `A`).
-    exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff d.dade d.hconj
+    exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff d.dade
       ⟨χ, hirr χ hχ⟩
       (OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hodd ⊥ (hsub hχ))
       (OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support hKsupp (hsub hχ))
@@ -283,7 +283,7 @@ noncomputable def inducedKernelFamily_subcoherent_sharp
   · -- `hiso` on `Z[S, M^#]`: narrow to `A₀`-support, then the Dade brick.
     exact fun φ ψ hφ hψ =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-        d.dade d.hconj (hnarrow φ hφ) (hnarrow ψ hψ)
+        d.dade (hnarrow φ hφ) (hnarrow ψ hψ)
 
 end SubcoherentTypeP
 
@@ -490,11 +490,11 @@ noncomputable def inducedNonKernelFamily_subcoherent {A : Set G}
     inducedNonKernelFamily_subset_inducedKernelFamily_bot (hsub hχ)
   refine OddOrder.Peterfalvi.S07.irrSubcoherent
     (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap d.dade
-      (d.dade.fullDadeIsometryData d.hconj))
+      (d.dade.fullDadeIsometryData))
     (OddOrder.Peterfalvi.S04.supportInSubgroup A M)
     (fun χ hχ => ?_) hconjS ?_ ?_ ?_ ?_
   · -- `Rdatum`: the (5.2.d) datum, with the **(4.7)** support estimate in place of `(M')^# ⊆ A`
-    exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff d.dade d.hconj
+    exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff d.dade
       ⟨χ, hirr χ hχ⟩
       (OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hodd ⊥ (hbot hχ))
       (by
@@ -514,7 +514,7 @@ noncomputable def inducedNonKernelFamily_subcoherent {A : Set G}
   · exact fun χ hχ => inducedNonKernelFamily_conjDiff_support h46 (hsub hχ)
   · exact fun φ ψ hφ hψ =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-        d.dade d.hconj hφ.2 hψ.2
+        d.dade hφ.2 hψ.2
 
 /-- **Peterfalvi (5.7) on the (8.15.3) family**: a uniform-degree subfamily is coherent.
 
@@ -566,7 +566,7 @@ theorem inducedNonKernelFamily_degreeSubfamily_coherent {A : Set G}
       hdeg0) h1A hsuppdiff
   -- `hZIrr`: the Dade map carries `A`-supported virtual characters into `ℤ[Irr G]`.
   intro a ha b hb
-  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported d.dade d.hconj
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported d.dade
     (hsuppdiff a ha b hb)
     (Submodule.sub_mem _ (hirrS a ha).mem_ZIrr (hirrS b hb).mem_ZIrr)
 
@@ -618,8 +618,7 @@ noncomputable def typePACore_subcoherent [Finite G]
       (OddOrder.Peterfalvi.S04.supportInSubgroup (typePACore M) M) :=
   inducedNonKernelFamily_subcoherent hodd
     (typePACore_toHypothesis46_core data hG.odd hHall
-      (dadeSupportHypothesisData_typePACore0 hG hM hTP data).some.dade
-      (dadeSupportHypothesisData_typePACore0 hG hM hTP data).some.hconj hW2σ hσK).toCore
+      (dadeSupportHypothesisData_typePACore0 hG hM hTP data).some.dade hW2σ hσK).toCore
     (dadeSupportHypothesisData_typePACore hG hM hTP).some
     hsub hirr hconjS
 

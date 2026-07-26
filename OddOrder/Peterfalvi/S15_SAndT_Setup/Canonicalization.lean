@@ -177,13 +177,11 @@ theorem H_sharp_cCoeff_int [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)
     exact Submodule.sub_mem _ (hzetaZ i) (hzetaZ 0)
   -- The Dade image is a virtual character ((2.10) `preserves_virtualCharacters`).
   have hτeq : (H_sharp_hypothesis76 hG hyp).hyp71.τ
-      = ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
-          (H_sharp_hconj hG hyp)).toDadeIsometryData.toDadeMap := rfl
+      = ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData).toDadeIsometryData.toDadeMap := rfl
   have hpres : (H_sharp_hypothesis76 hG hyp).hyp71.τ
       ((H_sharp_hypothesis76 hG hyp).psiSupp i) ∈ ZIrr G := by
     rw [hτeq]
-    exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
-      (H_sharp_hconj hG hyp)).preserves_virtualCharacters _ hψZ
+    exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData).preserves_virtualCharacters _ hψZ
   -- `c_i = ⟨τψ_i, η₁₀⟩ ∈ ℤ`.
   rw [OddOrder.Peterfalvi.S09.Hypothesis76.cCoeff]
   exact ClassFunction.inner_mem_ZIrr_int hpres hχ

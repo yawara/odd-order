@@ -381,7 +381,7 @@ theorem Hypothesis.tau_apply_of_mem_typePV [Finite G] {M : Subgroup G} (hyp : Hy
     rw [typePA0]
     exact Set.mem_union_right _ (OddOrder.GroupTheory.subset_conjClassSetIn hv)
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_mem hyp.dadeData.dade
-    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hφ hvA0
+    (hyp.dadeData.dade.fullDadeIsometryData) hφ hvA0
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), the Dade-image value on `V`** (the "vanishes on `V`" leg of the Dade-image
@@ -472,7 +472,7 @@ theorem Hypothesis.tau_inner_eq_of_supported [Finite G] {M : Subgroup G}
   have hψ' : ψ ∈ OddOrder.Peterfalvi.S07.zSpan ({φ, ψ} : Set (ClassFunction ↥M ℂ)) :=
     Submodule.subset_span (Set.mem_insert_of_mem _ rfl)
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dadeData.dade hyp.hconj hS hφ' hψ'
+    hyp.dadeData.dade hS hφ' hψ'
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `‖α_{ij}^τ‖² = 2 + n²`**: the Dade image `α_{ij}^τ` has the same norm as

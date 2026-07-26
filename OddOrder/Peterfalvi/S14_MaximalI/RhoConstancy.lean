@@ -96,11 +96,11 @@ theorem coherent_extension_mem_span_imageFamily {L : Subgroup G} [Finite G] (hyp
     coh.extension (χ : ClassFunction ↥L ℂ) ∈
       Submodule.span ℤ
         ((OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-          hyp.dadeData.dade hyp.hconj χ hχreal hdiffsupp).imageSet :
+          hyp.dadeData.dade χ hχreal hdiffsupp).imageSet :
           Set (ClassFunction G ℂ)) := by
   classical
   set imF := OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-    hyp.dadeData.dade hyp.hconj χ hχreal hdiffsupp with himF
+    hyp.dadeData.dade χ hχreal hdiffsupp with himF
   -- membership of `χ`, `χ̄`, and `χ − χ̄` in the coherent lattice `ℤ[S]`.
   have hχ_zSpan : (χ : ClassFunction ↥L ℂ) ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset :=
     Submodule.subset_span hχmem
@@ -154,7 +154,7 @@ family `S` lies in `ℤ[R(χ)] = Submodule.span ℤ (Rset data)`.
 
 The (5.5) image family `dadeOrthonormalCharacterImageFamilyOfDiff … φ` is *definitionally* the block
 `R₁(φ) = R1 data hφ` — both are the `toOrthonormalImage` of the same
-`dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade hyp.hconj φ (data.not_real φ hφ)
+`dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade φ (data.not_real φ hφ)
 (R1_diffsupp data hφ)` — which is a subfamily of `R(χ) = Rset data`, so
 `coherent_extension_mem_span_imageFamily` lands in `ℤ[R(χ)]` after `span_mono`.  The orthogonality
 `⟨φ, φ̄⟩ = 0` comes for free from `data.not_real φ hφ` (a non-real irreducible is orthogonal to its
@@ -472,7 +472,7 @@ theorem typeI_tau_eq_induce_of_supported_trivial_H {L : Subgroup G} [Finite G] (
   have h1 : hyp.tau f = hyp.dadeData.dade.dadeMap (k := ℂ)
       ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hfA⟩ :=
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hfA
+      (hyp.dadeData.dade.fullDadeIsometryData) hfA
   rw [h1]
   -- `⟨f, hfA⟩` is defeq to `inclusion hA₁A ⟨f, hf⟩` (same carrier `f`), so step 3 applies directly.
   exact dadeMap_eq_induce_of_supported_on_trivial_H hyp.dadeData.dade hA₁A hA₁norm hH₁

@@ -191,12 +191,12 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general
         if_neg (fun h => hχ'ne h.symm)])
     (by -- hdiff
       rw [hXeq, hYeq, inner_conj_symm (hXc.extension xdiff) (hYc.extension ydiff),
-        inner_extension_eq_inner_of_supported hyp.dade hyp.hconj hXc hYc hx_supp hy_supp,
+        inner_extension_eq_inner_of_supported hyp.dade hXc hYc hx_supp hy_supp,
         hsrc0, star_zero])
     (by -- hα1
-      rw [hYeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj hYc hy_supp)
+      rw [hYeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hYc hy_supp)
     (by -- hγδ1
-      rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj hXc hx_supp)
+      rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hXc hx_supp)
   rw [inner_conj_symm (hYc.extension η) (hXc.extension χ), hconcl.1, star_zero]
 
 /-- **Case-(A)/c2 mirror of `inner_extension_Xset_centralCommutator_Yset_eq_zero_general`.**  Same
@@ -314,12 +314,12 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general_c2_caseA
         if_neg (fun h => hχ'ne h.symm)])
     (by -- hdiff
       rw [hXeq, hYeq, inner_conj_symm (hXc.extension xdiff) (hYc.extension ydiff),
-        inner_extension_eq_inner_of_supported hyp.dade hyp.hconj hXc hYc hx_supp hy_supp,
+        inner_extension_eq_inner_of_supported hyp.dade hXc hYc hx_supp hy_supp,
         hsrc0, star_zero])
     (by -- hα1
-      rw [hYeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj hYc hy_supp)
+      rw [hYeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hYc hy_supp)
     (by -- hγδ1
-      rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj hXc hx_supp)
+      rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hXc hx_supp)
   rw [inner_conj_symm (hYc.extension η) (hXc.extension χ), hconcl.1, star_zero]
 
 /-- **Peterfalvi (6.8.1) `himg_ortho`** at the fixed Frobenius-case witnesses `τ₂ =

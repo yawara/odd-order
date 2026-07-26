@@ -58,7 +58,7 @@ theorem certainTypeR_imageSet_orthogonal_dadeOfDiff
     (hdiffsuppχ : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :
     ∀ α ∈ (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ hdeg).imageSet,
-    ∀ β ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dade hyp.hconj χ
+    ∀ β ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dade χ
         hrealχ hdiffsuppχ).imageSet,
       ClassFunction.inner α β = 0 := by
   -- The whole argument is now the general (5.2.e) mixed-stratum theorem
@@ -70,7 +70,7 @@ theorem certainTypeR_imageSet_orthogonal_dadeOfDiff
         -((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)) by abel,
       ClassFunction.support_neg]
     exact hdiffsuppχ
-  exact certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV h46 hχ₂ hdeg hyp.dade hyp.hconj
+  exact certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV h46 hχ₂ hdeg hyp.dade
     χ hrealχ hdiffsuppχ
     (fun v hv => tau_apply_eq_zero_of_mem_ticVdiffV hyp h46 hHK hsuppsub hv)
 
@@ -96,7 +96,7 @@ theorem dadeOfDiff_imageSet_orthogonal_certainTypeR
     (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
     (hdiffsuppχ : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :
-    ∀ α ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dade hyp.hconj χ
+    ∀ α ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dade χ
         hrealχ hdiffsuppχ).imageSet,
     ∀ β ∈ (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ hdeg).imageSet,
       ClassFunction.inner α β = 0 := by

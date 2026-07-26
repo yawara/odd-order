@@ -252,14 +252,14 @@ noncomputable def toFamilyHypothesis71 [Finite G] {hyp : Hypothesis (G := G)}
   invertibleL := fun _ => inferInstance
   hyp71 := fun _ =>
     { hyp := Mdata.typeIHyp.dadeData.dade
-      τ := (Mdata.typeIHyp.dadeData.dade.fullDadeIsometryData Mdata.typeIHyp.hconj).toDadeMap
+      τ := (Mdata.typeIHyp.dadeData.dade.fullDadeIsometryData).toDadeMap
       isDadeMap :=
         (Mdata.typeIHyp.dadeData.dade.fullDadeIsometryData
-          Mdata.typeIHyp.hconj).toDadeIsometryData.isDadeMap
+).toDadeIsometryData.isDadeMap
       hConjInvariant := Mdata.typeIHyp.hconj }
   isDadeIsometry := fun _ =>
     (Mdata.typeIHyp.dadeData.dade.fullDadeIsometryData
-      Mdata.typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
+).toDadeIsometryData.isDadeIsometry
   pairwise_disjoint := fun i j hij => absurd (Subsingleton.elim i j) hij
 
 end MHypothesis

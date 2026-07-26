@@ -489,7 +489,7 @@ theorem caseB_anchoredImage_seam_all_Yset
   have hiso : ClassFunction.inner
         (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)) (hyp.tau (y - η₁))
       = ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁) (y - η₁) :=
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade
       (S := ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁, y - η₁}
         : Set (ClassFunction ↥L ℂ)))
       (by intro s hs; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
@@ -614,10 +614,10 @@ theorem inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible
     (by rw [cX.extension_inner_eq χ χ.conj hχs hχ's, hinner χ χ.conj hχirr hχirr.conj, if_neg hχne])
     (by
       rw [hXeq, hYeq, inner_conj_symm (cX.extension xdiff) (cY.extension ydiff),
-        inner_extension_eq_inner_of_supported hyp.dade hyp.hconj cX cY hx_supp hy_supp,
+        inner_extension_eq_inner_of_supported hyp.dade cX cY hx_supp hy_supp,
         hsrc0, star_zero])
-    (by rw [hYeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj cY hy_supp)
-    (by rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj cX hx_supp)
+    (by rw [hYeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade cY hy_supp)
+    (by rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade cX hx_supp)
   rw [inner_conj_symm (cY.extension η) (cX.extension χ), hconcl.1, star_zero]
 
 /-- **(6.8.2) case-(B) `X ∪ Y` glue `hmixed`** — the seam orthogonality

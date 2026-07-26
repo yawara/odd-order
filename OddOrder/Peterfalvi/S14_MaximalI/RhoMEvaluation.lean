@@ -228,7 +228,7 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The (12.15) `ρ_M`-machinery over `A₁(M) = K^#`** — the (7.1) data with `M` and `A₁(M)`
 in place of `L` and `A`, exactly as Peterfalvi defines `ρ_M`.  Built by restricting the
 counterexample's §10 Dade datum from `A(M)` to the `M`-stable subset `K^# = H_M^# ⊆ A(M)`
-(`S04.Hypothesis.restrict` / `FullDadeIsometryData.restrict` / `HConjInvariant.restrict`, the
+(`S04.Hypothesis.restrict` / `FullDadeIsometryData.restrict`, the
 S12 type-`P` `toHypothesis71` pattern).  The `A₁`-based `ρ_M` is the one whose (7.3) norm bound
 runs over the thickened `Ã₁(M)`, disjoint from `Ã₁(L)` by (8.17) — the (12.16) requirement. -/
 noncomputable def hypothesis71SharpKernel [Finite G]
@@ -237,13 +237,12 @@ noncomputable def hypothesis71SharpKernel [Finite G]
       (sharpSubgroup hypM.typeI.typeF.H) ctr.M :=
   { hyp := hypM.dadeData.dade.restrict (sharpSubgroup_H_subset_typeIA hypM.typeI)
       (sharpSubgroup_H_conj_mem hypM)
-    τ := ((hypM.dadeData.dade.fullDadeIsometryData hypM.hconj).restrict
+    τ := ((hypM.dadeData.dade.fullDadeIsometryData).restrict
       (sharpSubgroup_H_subset_typeIA hypM.typeI) (sharpSubgroup_H_conj_mem hypM)).toDadeMap
-    isDadeMap := ((hypM.dadeData.dade.fullDadeIsometryData hypM.hconj).restrict
+    isDadeMap := ((hypM.dadeData.dade.fullDadeIsometryData).restrict
       (sharpSubgroup_H_subset_typeIA hypM.typeI)
       (sharpSubgroup_H_conj_mem hypM)).toDadeIsometryData.isDadeMap
-    hConjInvariant := hypM.hconj.restrict (sharpSubgroup_H_subset_typeIA hypM.typeI)
-      (sharpSubgroup_H_conj_mem hypM) }
+    hConjInvariant := OddOrder.Peterfalvi.S04.Hypothesis.hConjInvariant _ }
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.15), first claim, `A₁(M)`-form**: the `A₁(M) = K^#`-based `ρ_M`

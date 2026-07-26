@@ -619,8 +619,7 @@ noncomputable def H_sharp_hypothesis76_base [Fintype G] [Invertible (Nat.card G 
       (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S := by
   refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDadeBase
     (H_sharp_hypothesis71 hG hyp) ?_ hyp.H ?_ ?_ rfl φ₀
-  · exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
-      (H_sharp_hconj hG hyp)).toDadeIsometryData.isDadeIsometry
+  · exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
   · have hUS : hyp.U ≤ hyp.S := by
       have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
       exact le_trans h1 (Subgroup.map_subtype_le _)

@@ -230,7 +230,7 @@ theorem inner_tau_scaledDiff_tau_Yset_diff_of_frobenius
       ((hyp.Yset_apply_one hη').trans (hyp.Yset_apply_one hη).symm)
   -- Dade isometry on the supported pair.
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dade hyp.hconj (S := ({χ₁ - a • η, η' - η} : Set (ClassFunction ↥L ℂ)))
+    hyp.dade (S := ({χ₁ - a • η, η' - η} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs
         simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
         rcases hs with rfl | rfl
@@ -289,7 +289,7 @@ theorem inner_tau_scaledDiff_tau_Yset_diff_c2_caseA
       ((hyp.Yset_apply_one hη').trans (hyp.Yset_apply_one hη).symm)
   -- Dade isometry on the supported pair.
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dade hyp.hconj (S := ({χ₁ - a • η, η' - η} : Set (ClassFunction ↥L ℂ)))
+    hyp.dade (S := ({χ₁ - a • η, η' - η} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs
         simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
         rcases hs with rfl | rfl
@@ -363,7 +363,7 @@ theorem inner_self_tau_scaledDiff_of_frobenius
     hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη)
       hdeg
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dade hyp.hconj (S := ({χ₁ - a • η} : Set (ClassFunction ↥L ℂ)))
+    hyp.dade (S := ({χ₁ - a • η} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs; rw [Set.mem_singleton_iff] at hs; rw [hs]; exact hsupp)
     (Submodule.subset_span rfl) (Submodule.subset_span rfl)
   rw [hiso, ← Nat.cast_smul_eq_nsmul ℂ a η]
@@ -415,7 +415,7 @@ theorem inner_self_tau_scaledDiff_c2_caseA
     hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη)
       hdeg
   have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-    hyp.dade hyp.hconj (S := ({χ₁ - a • η} : Set (ClassFunction ↥L ℂ)))
+    hyp.dade (S := ({χ₁ - a • η} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs; rw [Set.mem_singleton_iff] at hs; rw [hs]; exact hsupp)
     (Submodule.subset_span rfl) (Submodule.subset_span rfl)
   rw [hiso, ← Nat.cast_smul_eq_nsmul ℂ a η]

@@ -173,7 +173,7 @@ noncomputable def Hypothesis.sSet_member_differenceImage [Fintype G] [Finite G]
         (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ))) :
     OddOrder.Peterfalvi.S07.CharacterDifferenceImage (L := ↥hyp.S) (G := G)
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
+        ((hyp.dadeHypS hG).fullDadeIsometryData))
       (induceHU (hyp.toTypesIIIIIIVSetupS hG)
         (ξ : ClassFunction ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) ℂ)) := by
   -- Bundle the (irreducible) member as an `IrreducibleCharacter ↥S`.
@@ -190,7 +190,7 @@ noncomputable def Hypothesis.sSet_member_differenceImage [Fintype G] [Finite G]
     hyp.sSet_member_diffsupp hG hξ
   -- Package via the general (5.3.a) Dade R-datum constructor.
   exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff
-    (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) φ hreal hdiffsupp
+    (hyp.dadeHypS hG) φ hreal hdiffsupp
 
 open OddOrder.Peterfalvi.S11 in
 /-- **The uniform-degree irreducible sub-family `S₁(d) = {φ ∈ 𝒮 | φ irreducible, φ(1) = d}`**
@@ -323,7 +323,7 @@ noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
   classical
   -- The honest (13.2.e) Dade isometry `τ = Ind_S^G`.
   set τ := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-    ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)) with hτ
+    ((hyp.dadeHypS hG).fullDadeIsometryData) with hτ
   -- Conjugation stability of `S₁(d)` (uses `star d = d`), extracted as
   -- `sSetIrrDeg_closedUnderConjugate`.
   have hconjmem := hyp.sSetIrrDeg_closedUnderConjugate hG d hd
@@ -358,7 +358,7 @@ noncomputable def Hypothesis.sSetIrrDeg_subcoherent [Fintype G] [Finite G]
     -- pair brick (only the supportedness halves of the `ℤ[S₁(d), A(S)]` memberships are used).
     intro φ ψ hφ hψ
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-      (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hφ.2 hψ.2
+      (hyp.dadeHypS hG) hφ.2 hψ.2
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -397,7 +397,7 @@ theorem Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
     (h2 : 2 ≤ (hyp.sSetIrrDeg hG d).ncard) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
+        ((hyp.dadeHypS hG).fullDadeIsometryData))
       (hyp.sSetIrrDeg hG d)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)) := by
   classical
@@ -437,7 +437,7 @@ theorem Hypothesis.sSetIrrDeg_coherent [Fintype G] [Finite G]
     have hab_Z : (a - b : ClassFunction ↥hyp.S ℂ) ∈ OddOrder.RepresentationTheory.ZIrr ↥hyp.S :=
       Submodule.sub_mem _ ha.2.1.mem_ZIrr hb.2.1.mem_ZIrr
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hab_supp hab_Z
+      (hyp.dadeHypS hG) hab_supp hab_Z
   -- Fire the (5.7)∘(5.3.a) uniform-degree coherence producer on `S' = S = S₁(d)`.
   exact OddOrder.Peterfalvi.S07.coherent_subset_of_constant_degree hyp'
     (subset_refl _) hyp'.conjugate_closed hSfin h2 hirr hZIrr hconst hdeg0 h1A hsuppdiff

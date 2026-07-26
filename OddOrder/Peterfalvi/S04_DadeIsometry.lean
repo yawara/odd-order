@@ -378,18 +378,18 @@ This isolates the remaining content of (2.6.b) to the (2.10) identity
 is `zsmul_induceAlphaBTerm_sum_mem_ZIrr`. -/
 theorem preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum
     [Fintype G] [Invertible (Nat.card G : ℂ)]
-    {hyp : Hypothesis G A L} (hconj : hyp.HConjInvariant)
+    {hyp : Hypothesis G A L}
     (hτ : ∀ α : SupportedClassFunctions (G := G) ℂ A L,
         ((α : ClassFunction L ℂ) ∈ ZIrr L) →
         ∃ (s : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty})
           (c : {B : Finset {a : G // a ∈ A} // B.Nonempty} → ℤ),
           hyp.dadeMap (k := ℂ) α
-            = ∑ p ∈ s, c p • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p) :
+            = ∑ p ∈ s, c p • hyp.induceAlphaBTerm (α : ClassFunction L ℂ) p) :
     PreservesVirtualCharacters (G := G) (A := A) (L := L) (hyp.dadeMap (k := ℂ)) := by
   intro α hα
   obtain ⟨s, c, hsum⟩ := hτ α hα
   rw [hsum]
-  exact hyp.zsmul_induceAlphaBTerm_sum_mem_ZIrr hconj hα s c
+  exact hyp.zsmul_induceAlphaBTerm_sum_mem_ZIrr hα s c
 
 variable [StarRing k]
 variable [Fintype G] [Fintype L]
@@ -573,7 +573,6 @@ This lemma is Peterfalvi §4's heaviest external export: §7 (5.4), §9 (7.2.b),
 2026-05-23). -/
 theorem adjoint_formula
     (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
-    (hconj : hyp.HConjInvariant)
     (α : SupportedClassFunctions (G := G) ℂ A L)
     (χ : ClassFunction G ℂ) (ψ : ClassFunction L ℂ)
     (hψ : ∀ a : {a : G // a ∈ A},
@@ -699,7 +698,7 @@ theorem adjoint_formula
     · have hN : (∑ a : {a : G // a ∈ A},
             (if (∃ x ∈ hyp.H a, IsConj (a.1 * x) b)
               then (Nat.card (centralizerIn L a.1) : ℂ) else 0)) = (Nat.card L : ℂ) := by
-        rw [← Finset.sum_filter, ← Nat.cast_sum, hyp.sum_card_centralizerIn_eq hconj hb]
+        rw [← Finset.sum_filter, ← Nat.cast_sum, hyp.sum_card_centralizerIn_eq hb]
       rw [hN, mul_comm]
     · have hF0 : F b = 0 := by
         rw [hF]
@@ -766,26 +765,26 @@ This is the textbook proof of (2.6.a): since `β^τ` is constant on each coset
 assuming the isometry property separately. -/
 theorem isDadeIsometry_of_isDadeMap
     (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
-    (hconj : hyp.HConjInvariant) :
+    :
     IsDadeIsometry (k := ℂ) τ where
   inner_eq α β :=
-    adjoint_formula hyp τ hτ hconj α (τ β) (β : ClassFunction L ℂ)
+    adjoint_formula hyp τ hτ α (τ β) (β : ClassFunction L ℂ)
       (fun a => (adjointAverageFun_dadeMap_eq hyp τ hτ β a).symm)
 
 /-- Bundle a Dade map satisfying the (2.5) equations into a `DadeIsometryData`,
 using `isDadeIsometry_of_isDadeMap` to supply the (2.6.a) isometry property. -/
 noncomputable def DadeIsometryData.ofIsDadeMap
     (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
-    (hconj : hyp.HConjInvariant) :
+    :
     DadeIsometryData (G := G) (k := ℂ) hyp where
   toDadeMap := τ
   isDadeMap := hτ
-  isDadeIsometry := isDadeIsometry_of_isDadeMap hyp τ hτ hconj
+  isDadeIsometry := isDadeIsometry_of_isDadeMap hyp τ hτ
 
 @[simp] theorem DadeIsometryData.ofIsDadeMap_toDadeMap
     (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
-    (hconj : hyp.HConjInvariant) :
-    (DadeIsometryData.ofIsDadeMap hyp τ hτ hconj).toDadeMap = τ :=
+    :
+    (DadeIsometryData.ofIsDadeMap hyp τ hτ).toDadeMap = τ :=
   rfl
 
 /-- **The explicit Dade isometry of Peterfalvi (2.5)–(2.6.a).**  Bundles the pointwise
@@ -793,16 +792,17 @@ Dade map `dadeMap` (satisfying the (2.5) equations, `isDadeMap_dadeMap`) with th
 isometry property, supplied automatically by `isDadeIsometry_of_isDadeMap`.
 
 This realizes the previously interface-only `DadeIsometryData` as an actual construction,
-relative to Hypothesis (2.2) plus the (2.4.a) `L`-equivariance `HConjInvariant`.
+relative to Hypothesis (2.2) alone — the (2.4.a) `L`-equivariance it needs is the theorem
+`Hypothesis.hConjInvariant`, not an assumption.
 Virtual-character preservation (2.6.b) — which upgrades this to a `FullDadeIsometryData` —
 needs the (2.10) inclusion–exclusion and is tracked separately (issue 0040). -/
-noncomputable def Hypothesis.dadeIsometryData (hconj : hyp.HConjInvariant) :
+noncomputable def Hypothesis.dadeIsometryData :
     DadeIsometryData (G := G) (k := ℂ) hyp :=
   DadeIsometryData.ofIsDadeMap hyp (hyp.dadeMap (k := ℂ))
-    (hyp.isDadeMap_dadeMap (k := ℂ)) hconj
+    (hyp.isDadeMap_dadeMap (k := ℂ))
 
-@[simp] theorem Hypothesis.dadeIsometryData_toDadeMap (hconj : hyp.HConjInvariant) :
-    (hyp.dadeIsometryData hconj).toDadeMap = hyp.dadeMap (k := ℂ) :=
+@[simp] theorem Hypothesis.dadeIsometryData_toDadeMap :
+    (hyp.dadeIsometryData).toDadeMap = hyp.dadeMap (k := ℂ) :=
   rfl
 
 /-! ### Peterfalvi (2.10), the pointwise inclusion–exclusion identity and `FullDadeIsometryData`
@@ -826,13 +826,13 @@ where `mobiusTermCF (rep C) = (-1)^{|rep C|} Ind_{M(rep C)}^G α_{rep C}`.  On t
 (`sum_mobiusTermCF_transversalRep_eq_neg`); off the support both sides vanish — `α^τ(g) = 0` by the
 (2.5) definition, and each `Ind_{M(rep C)} α_{rep C}(g) = 0` by
 `induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport`. -/
-theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF (hconj : hyp.HConjInvariant)
+theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF
     (α : SupportedClassFunctions (G := G) ℂ A L) :
     letI := hyp.conjFinsetAction
     letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
     hyp.dadeMap (k := ℂ) α
       = (⟨fun g => -∑ C : hyp.conjClassQuotient,
-            hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C),
+            hyp.mobiusTermCF (α : ClassFunction L ℂ) g (hyp.transversalRep C),
           by
             intro g x
             classical
@@ -841,14 +841,14 @@ theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF (hconj : hyp.HConjInvariant)
             by_cases hC : (hyp.transversalRep C).Nonempty
             · letI : Invertible (Nat.card (mBSubgroup hyp (hyp.transversalRep C) hC) : ℂ) :=
                 invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-              rw [hyp.mobiusTermCF_of_nonempty hconj _ g hC,
-                hyp.mobiusTermCF_of_nonempty hconj _ (x * g * x⁻¹) hC]
+              rw [hyp.mobiusTermCF_of_nonempty _ g hC,
+                hyp.mobiusTermCF_of_nonempty _ (x * g * x⁻¹) hC]
               congr 1
-              rw [hyp.induceAlphaBTerm_apply hconj _ hC, hyp.induceAlphaBTerm_apply hconj _ hC]
+              rw [hyp.induceAlphaBTerm_apply _ hC, hyp.induceAlphaBTerm_apply _ hC]
               exact (ClassFunction.induce (mBSubgroup hyp (hyp.transversalRep C) hC)
-                (alphaB hyp hconj hC (α : ClassFunction L ℂ))).2 g x
-            · rw [hyp.mobiusTermCF_of_not_nonempty hconj _ g hC,
-                hyp.mobiusTermCF_of_not_nonempty hconj _ (x * g * x⁻¹) hC]⟩
+                (alphaB hyp hC (α : ClassFunction L ℂ))).2 g x
+            · rw [hyp.mobiusTermCF_of_not_nonempty _ g hC,
+                hyp.mobiusTermCF_of_not_nonempty _ (x * g * x⁻¹) hC]⟩
           : ClassFunction G ℂ) := by
   classical
   letI := hyp.conjFinsetAction
@@ -856,24 +856,24 @@ theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF (hconj : hyp.HConjInvariant)
   refine ClassFunction.ext fun g => ?_
   change hyp.dadeValue (α : SupportedClassFunctions (G := G) ℂ A L) g
     = -∑ C : hyp.conjClassQuotient,
-        hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C)
+        hyp.mobiusTermCF (α : ClassFunction L ℂ) g (hyp.transversalRep C)
   by_cases hg : g ∈ hyp.dadeSupport
   · -- support side: the transversal sum is `-α(a)`.
     obtain ⟨a, h, hh, hga⟩ := hyp.mem_dadeSupport_iff.mp hg
     rw [hyp.dadeValue_eq α hh hga,
-      hyp.sum_mobiusTermCF_transversalRep_eq_neg hconj α hh hga, neg_neg]
+      hyp.sum_mobiusTermCF_transversalRep_eq_neg α hh hga, neg_neg]
   · -- non-support side: both sides are `0`.
     rw [hyp.dadeValue_of_not_mem_dadeSupport α hg]
     rw [show (∑ C : hyp.conjClassQuotient,
-          hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C)) = 0 from ?_,
+          hyp.mobiusTermCF (α : ClassFunction L ℂ) g (hyp.transversalRep C)) = 0 from ?_,
       neg_zero]
     refine Finset.sum_eq_zero fun C _ => ?_
     by_cases hC : (hyp.transversalRep C).Nonempty
     · letI : Invertible (Nat.card (mBSubgroup hyp (hyp.transversalRep C) hC) : ℂ) :=
         invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-      rw [hyp.mobiusTermCF_of_nonempty hconj _ g hC, hyp.induceAlphaBTerm_apply hconj _ hC,
-        hyp.induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport hconj hC α hg, mul_zero]
-    · rw [hyp.mobiusTermCF_of_not_nonempty hconj _ g hC]
+      rw [hyp.mobiusTermCF_of_nonempty _ g hC, hyp.induceAlphaBTerm_apply _ hC,
+        hyp.induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport hC α hg, mul_zero]
+    · rw [hyp.mobiusTermCF_of_not_nonempty _ g hC]
 
 open scoped Classical in
 omit [Fintype ↥L] in
@@ -890,16 +890,16 @@ This converts the (2.10) identity into the `∑ c_p • induceAlphaBTerm p` shap
 with
 nonempty representative to `⟨rep C, _⟩` and back via `p ↦ mk'' p.1` (`Quotient.out_eq'`); the empty
 classes contribute `0` on the left and are excluded on the right. -/
-theorem Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype (hconj : hyp.HConjInvariant)
+theorem Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype
     (α : SupportedClassFunctions (G := G) ℂ A L) (g : G) :
     letI := hyp.conjFinsetAction
     letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
     letI : Fintype {B : Finset {a : G // a ∈ A} // B.Nonempty} := Fintype.ofFinite _
     (∑ C : hyp.conjClassQuotient,
-        hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C))
+        hyp.mobiusTermCF (α : ClassFunction L ℂ) g (hyp.transversalRep C))
       = ∑ p ∈ (Finset.univ : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty}).filter
           (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),
-          ((-1 : ℂ) ^ p.1.card) * hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p g := by
+          ((-1 : ℂ) ^ p.1.card) * hyp.induceAlphaBTerm (α : ClassFunction L ℂ) p g := by
   classical
   letI := hyp.conjFinsetAction
   letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
@@ -937,11 +937,11 @@ theorem Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype (hconj : hyp.H
     · -- summand agreement
       intro C hC
       rw [Finset.mem_filter] at hC
-      rw [hyp.mobiusTermCF_of_nonempty hconj _ g hC.2]
+      rw [hyp.mobiusTermCF_of_nonempty _ g hC.2]
   · -- the dropped terms (empty reps) are zero: if the summand is nonzero, the rep is nonempty.
     intro C _ hC
     by_contra hne
-    exact hC (hyp.mobiusTermCF_of_not_nonempty hconj _ g hne)
+    exact hC (hyp.mobiusTermCF_of_not_nonempty _ g hne)
 
 omit [Fintype G] in
 omit [Invertible (Nat.card G : ℂ)] in
@@ -966,9 +966,9 @@ reindexed over the representative subtype by `sum_mobiusTermCF_transversalRep_eq
 the bridge `preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum`: the right-hand side is a
 `ℤ`-linear combination (`c p = -(-1)^{|p.1|}`) of inclusion–exclusion summands `induceAlphaBTerm`,
 each a virtual character (`induceAlphaBTerm_mem_ZIrr`), so `α^τ ∈ ℤ[Irr G]`. -/
-theorem Hypothesis.preservesVirtualCharacters_dadeMap (hconj : hyp.HConjInvariant) :
+theorem Hypothesis.preservesVirtualCharacters_dadeMap :
     PreservesVirtualCharacters (G := G) (A := A) (L := L) (hyp.dadeMap (k := ℂ)) := by
-  refine preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum hconj ?_
+  refine preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum ?_
   intro α _
   letI := hyp.conjFinsetAction
   letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
@@ -977,36 +977,36 @@ theorem Hypothesis.preservesVirtualCharacters_dadeMap (hconj : hyp.HConjInvarian
       (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),
     fun p => -((-1 : ℤ) ^ p.1.card), ?_⟩
   refine ClassFunction.ext fun g => ?_
-  rw [hyp.dadeMap_eq_neg_sum_mobiusTermCF hconj α]
+  rw [hyp.dadeMap_eq_neg_sum_mobiusTermCF α]
   change -∑ C : hyp.conjClassQuotient,
-      hyp.mobiusTermCF hconj (α : ClassFunction L ℂ) g (hyp.transversalRep C)
+      hyp.mobiusTermCF (α : ClassFunction L ℂ) g (hyp.transversalRep C)
     = (∑ p ∈ (Finset.univ : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty}).filter
         (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),
-        (-((-1 : ℤ) ^ p.1.card)) • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p) g
-  rw [hyp.sum_mobiusTermCF_transversalRep_eq_sum_subtype hconj α g,
+        (-((-1 : ℤ) ^ p.1.card)) • hyp.induceAlphaBTerm (α : ClassFunction L ℂ) p) g
+  rw [hyp.sum_mobiusTermCF_transversalRep_eq_sum_subtype α g,
     classFunction_finset_sum_apply, ← Finset.sum_neg_distrib]
   refine Finset.sum_congr rfl fun p _ => ?_
   -- `(-(-1)^|p.1| • Ind p) g = -((-1)^|p.1| · Ind p g)`.
-  rw [show (-((-1 : ℤ) ^ p.1.card)) • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p
-      = (((-((-1 : ℤ) ^ p.1.card) : ℤ) : ℂ)) • hyp.induceAlphaBTerm hconj (α : ClassFunction L ℂ) p
+  rw [show (-((-1 : ℤ) ^ p.1.card)) • hyp.induceAlphaBTerm (α : ClassFunction L ℂ) p
+      = (((-((-1 : ℤ) ^ p.1.card) : ℤ) : ℂ)) • hyp.induceAlphaBTerm (α : ClassFunction L ℂ) p
       from by rw [Int.cast_smul_eq_zsmul], ClassFunction.smul_apply]
   push_cast
   ring
 
 /-- **Peterfalvi (2.6).**  The full complex Dade-isometry package: the (2.5) Dade-map equations, the
 (2.6.a) normalized isometry, and the (2.6.b) virtual-character preservation, all constructed from
-Hypothesis (2.2) plus the (2.4.a) `L`-equivariance `HConjInvariant`.
+Hypothesis (2.2) alone (the (2.4.a) `L`-equivariance is the theorem `Hypothesis.hConjInvariant`).
 
 This is the honest construction of `FullDadeIsometryData` (no longer an interface assumption):
 `toDadeIsometryData` is the `dadeIsometryData` built from the explicit (2.5) Dade map, and
 `preserves_virtualCharacters` is the (2.10) inclusion–exclusion result
 `preservesVirtualCharacters_dadeMap`. -/
-noncomputable def Hypothesis.fullDadeIsometryData (hconj : hyp.HConjInvariant) :
+noncomputable def Hypothesis.fullDadeIsometryData :
     FullDadeIsometryData (G := G) hyp where
-  toDadeIsometryData := hyp.dadeIsometryData hconj
+  toDadeIsometryData := hyp.dadeIsometryData
   preserves_virtualCharacters := by
-    rw [hyp.dadeIsometryData_toDadeMap hconj]
-    exact hyp.preservesVirtualCharacters_dadeMap hconj
+    rw [hyp.dadeIsometryData_toDadeMap]
+    exact hyp.preservesVirtualCharacters_dadeMap
 
 end AdjointFormula
 

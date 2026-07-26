@@ -261,13 +261,13 @@ inner product of the extensions equals the source inner product:
 supported lattice (`extends_on_supported`), reducing to the Dade isometry
 `dadeIntegralCharacterMap_inner_eq_on_supported_span` (applied on the pair `{x, y}`). -/
 theorem inner_extension_eq_inner_of_supported
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     {X Y : Set (ClassFunction ↥L ℂ)}
     (hX : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) X
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) X
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     (hY : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) Y
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) Y
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     {x y : ClassFunction ↥L ℂ}
     (hx : x ∈ OddOrder.Peterfalvi.S07.zSupportedSpan X
@@ -276,7 +276,7 @@ theorem inner_extension_eq_inner_of_supported
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L)) :
     ClassFunction.inner (hX.extension x) (hY.extension y) = ClassFunction.inner x y := by
   rw [hX.extends_on_supported x hx, hY.extends_on_supported y hy]
-  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp
     (S := ({x, y} : Set (ClassFunction ↥L ℂ)))
     (by intro s hs
         simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
@@ -290,17 +290,17 @@ theorem inner_extension_eq_inner_of_supported
 `(hX.extension x)(1) = 0` for `x ∈ ℤ[X, A]`.  (`extends_on_supported` to the Dade map, then
 `dadeIntegralCharacterMap_apply_one_eq_zero`.)  Supplies the degree-`0` hypotheses of (4.1). -/
 theorem extension_apply_one_eq_zero_of_supported
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     {X : Set (ClassFunction ↥L ℂ)}
     (hX : OddOrder.Peterfalvi.S07.IsCoherent
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) X
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData)) X
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
     {x : ClassFunction ↥L ℂ}
     (hx : x ∈ OddOrder.Peterfalvi.S07.zSupportedSpan X
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L)) :
     (hX.extension x) (1 : G) = 0 := by
   rw [hX.extends_on_supported x hx]
-  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero hyp hconj hx.2
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero hyp hx.2
 
 end DadeCoherenceUnion
 
@@ -378,17 +378,17 @@ This is the (2.7) `adjoint_formula` specialized to the TI situation, where the a
 `Res_L(η₁^{τ₁})` decomposition: it converts the `G`-side pairing of a Dade image with `ψ` into the
 `L`-side pairing of the supported source with `Res_L ψ`. -/
 theorem inner_dadeIntegralCharacterMap_eq_inner_restrict
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥)
     {α : ClassFunction ↥L ℂ}
     (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     (ψ : ClassFunction G ℂ) :
     ClassFunction.inner
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) α) ψ
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData) α) ψ
       = ClassFunction.inner α (ClassFunction.restrict L ψ) := by
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp _ hαsupp]
   refine OddOrder.Peterfalvi.S04.adjoint_formula hyp (hyp.dadeMap (k := ℂ))
-    (hyp.isDadeMap_dadeMap (k := ℂ)) hconj
+    (hyp.isDadeMap_dadeMap (k := ℂ))
     ⟨α, (ClassFunction.mem_supportedSubmodule).mpr hαsupp⟩ ψ (ClassFunction.restrict L ψ)
     (fun a => ?_)
   rw [adjointAverageFun_eq_of_H_eq_bot hyp ψ a (hH a), ClassFunction.restrict_apply]

@@ -47,9 +47,9 @@ but with symbolic `⟨χ,χ⟩` / `⟨chibar,chibar⟩` in place of `1`. -/
 noncomputable def retarget_isCoherent_of_extensionImage_k
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
-    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
     (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
-    (hτ : τ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+    (hτ : τ = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
     {S₁ : Set (ClassFunction ↥L ℂ)}
     (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
       τ S₁
@@ -115,7 +115,7 @@ noncomputable def retarget_isCoherent_of_extensionImage_k
         ({χ - chibar, χ - a • chi1} : Set (ClassFunction ↥L ℂ)) →
       ClassFunction.inner (τ φ) (τ ψ) = ClassFunction.inner φ ψ := fun φ ψ hφ hψ => by
     rw [hτ]
-    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp
       hSdiff hφ hψ
   -- Dade-image inner products (Dade isometry + source orthonormality), now symbolic in `⟨χ,χ⟩`.
   have huu : ClassFunction.inner (τ (χ - a • chi1))
@@ -217,7 +217,7 @@ noncomputable def retarget_isCoherent_of_extensionImage_k
             · exact hmem.2
             · exact hdiffasupp
           rw [hνy, hτ, OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-            hyp hconj hySdiff (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp)),
+            hyp hySdiff (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp)),
             ← Nat.cast_smul_eq_nsmul ℂ a chi1]
           simp only [ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right,
             hyχ, star_natCast]
@@ -264,7 +264,7 @@ noncomputable def retarget_isCoherent_of_extensionImage_k
             · rw [show χ - chibar = -(chibar - χ) from by abel, ClassFunction.support_neg]
               exact hdiffsupp
           rw [hνy, hτ, OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-            hyp hconj hySdiff (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))]
+            hyp hySdiff (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))]
           simp only [ClassFunction.inner_sub_right, hyχ, hyχbar, sub_zero]
         · rw [Set.mem_singleton_iff.mp hy1, hvd]
     | zero => simp

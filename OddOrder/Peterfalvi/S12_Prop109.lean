@@ -507,7 +507,7 @@ theorem inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2 [Finite G]
   have hψZ : ψ ∈ ZIrr G := by
     rw [hψ]
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.dadeData.dade hyp.hconj hsupp hdiffZ
+      hyp.dadeData.dade hsupp hdiffZ
   have hψnorm : ClassFunction.inner ψ ψ = ((hyp.w1 + 1 : ℕ) : ℂ) := by
     rw [hψ, hyp.tau_inner_eq_of_supported hsupp hsupp,
       inner_muColumnZero_sub_zeta_self hG hyp hzirr hz1]
@@ -662,7 +662,7 @@ noncomputable def Hypothesis.inducedFamily_isCoherent_of_equalDegreeFamily [Fini
   have hsuppdiff : ∀ j, (irreducibleCharacterDifference χ j).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M := fun j =>
     hyp.inducedFamily_sub_support (hmem j) (hmem 0) (hdeg j)
-  exact OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dadeData.dade hyp.hconj hn χ
+  exact OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dadeData.dade hn χ
     hχinj hdeg hsuppdiff h1notA
 
 /-- **The degree-`w₁` irreducible subfamily `S(HC) = S₁`** of `S = inducedFamily M`: the
@@ -853,7 +853,7 @@ noncomputable def Hypothesis.inducedFamily_irreducible_Rdatum [Finite G]
   have hdiffsupp : ((χ : ClassFunction ↥M ℂ).conj - (χ : ClassFunction ↥M ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M :=
     hyp.inducedFamily_sub_support hcS hχ hdeg
-  exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade hyp.hconj χ
+  exact OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade χ
     hreal hdiffsupp
 
 /-- **`ℤ[S(HC)]`-vanishing-at-`1` combinations are `A_0`-supported** (the Peterfalvi (5.x)

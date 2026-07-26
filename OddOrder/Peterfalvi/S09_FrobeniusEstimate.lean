@@ -189,8 +189,7 @@ theorem hzeta0nu [Fintype G] [Invertible (Nat.card G : ℂ)]
           ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩ from
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
         (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
-        ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade.fullDadeIsometryData
-          (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj) hφ]
+        ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade.fullDadeIsometryData) hφ]
     exact inner_tau_supported_constOne (F.sibleyToHypothesis71 i hodd hnilp C hFrob)
       ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
   have hτ_smul : ∀ (c : ℂ) (x : ClassFunction ↥(F.L i) ℂ),
@@ -198,8 +197,7 @@ theorem hzeta0nu [Fintype G] [Invertible (Nat.card G : ℂ)]
         = c • (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).tau x :=
     dadeIntegralCharacterMap_smul_complex
       (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
-      ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade.fullDadeIsometryData
-        (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj)
+      ((F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade.fullDadeIsometryData)
   exact coherence_extension_orthogonal_constOne (F.coherence i hodd hnilp C hFrob) hτ_smul htau1
     hmem0 hmem0' hnorm0 hnorm0' horth hsupp h1_0 h1_0'
 
@@ -335,15 +333,14 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
             (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ)) := by
     intro a _ha0 ha_ind
     obtain ⟨deg_a, -, hdeg_a_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ a)
-    exact coherence_hagree_dadeMap (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
-      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj coh
+    exact coherence_hagree_dadeMap
+      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade coh
       (hSmem a ha_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_a) (by norm_num)
       (by rw [hd a, hdeg_a_eq, Nat.cast_one, div_one]) (psi_support a)
   -- The concrete `Hypothesis78`.
   set H78 := hypothesis78OfDade (F.sibleyToHypothesis71 i hodd hnilp C hFrob)
     (OddOrder.Peterfalvi.S04.isDadeIsometry_of_isDadeMap _ _
-      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).isDadeMap
-      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).hConjInvariant)
+      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).isDadeMap)
     (F.H i) hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
     coh.extension hnu_isometry hagree with hH78def
   -- (7.8.a) `a`: `(β, ζ_0^ν) + 1 ∈ ℤ`.
@@ -379,8 +376,7 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
   rw [← hcoh] at hz0
   have hbound := zetaNuRhoNormSqGeOfDade (F.sibleyToHypothesis71 i hodd hnilp C hFrob)
     (OddOrder.Peterfalvi.S04.isDadeIsometry_of_isDadeMap _ _
-      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).isDadeMap
-      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).hConjInvariant)
+      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).isDadeMap)
     (F.H i) hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
     coh.extension hnu_isometry hagree hz0
     (inner_self_induce_eq_one_of_frobeniusGroup hFrob (θ 0) hθ0_ne)

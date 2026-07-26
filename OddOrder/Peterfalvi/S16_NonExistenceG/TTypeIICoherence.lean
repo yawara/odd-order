@@ -231,7 +231,7 @@ noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
       (L := ↥hyp.base.T) (G := G) (tSideDadeMap hyp hG) χ := fun χ hχ =>
     -- Package `χ` (an irreducible member) as an `IrreducibleCharacter ↥T`; `(ζ : CF) = χ` by `rfl`.
     OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff
-      (tSideDadeSupport_nonempty hG hyp).some.dade (tSideDadeSupport_nonempty hG hyp).some.hconj
+      (tSideDadeSupport_nonempty hG hyp).some.dade
       ⟨χ, hirr χ hχ⟩ (hreal hχ) (hconjDiff_supp _ hχ)
   -- Assemble via the (5.3)(a) `irrSubcoherent` (0099 form: `hconjsupp` + `zSupportedSpan` isometry,
   -- the latter unconditional from the Dade pair brick).
@@ -241,7 +241,7 @@ noncomputable def T_typeIII_hyp07 [Finite G] (hyp : Hypothesis (G := G))
     (fun φ ψ hφ hψ => by
       simp only [tSideDadeMap]
       exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-        (tSideDadeSupport_nonempty hG hyp).some.dade (tSideDadeSupport_nonempty hG hyp).some.hconj
+        (tSideDadeSupport_nonempty hG hyp).some.dade
         hφ.2 hψ.2)
 
 open scoped Classical in
@@ -462,7 +462,7 @@ theorem T_typeIII_calT1_isCoherent [Finite G] (hyp : Hypothesis (G := G))
     rw [htau]
     simp only [tSideDadeMap]
     refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      (tSideDadeSupport_nonempty hG hyp).some.dade (tSideDadeSupport_nonempty hG hyp).some.hconj
+      (tSideDadeSupport_nonempty hG hyp).some.dade
       (hdiff_supp a ha b hb) ?_
     exact Submodule.sub_mem _ (hirr a ha).mem_ZIrr (hirr b hb).mem_ZIrr
   -- Feed the coherence engine `T_typeIII_calT1_coherent`.
@@ -598,12 +598,12 @@ theorem T_typeIII_coherent_image_inner_eta_eq_zero [Finite G]
     hdiffSupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA1A0)
   have hmaps : tSideDadeMap hyp hG (ζ - ζ.conj) =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
-        (full.dade.fullDadeIsometryData full.hconj) (ζ - ζ.conj) := by
+        (full.dade.fullDadeIsometryData) (ζ - ζ.conj) := by
     simpa only [full] using
       tSideDadeMap_eq_full_typeP1DadeMap_of_support hG hyp dataT hP1 hdiffSupp
   have hextDiff : coh.extension ζ - coh.extension ζ.conj =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
-        (full.dade.fullDadeIsometryData full.hconj) (ζ - ζ.conj) := by
+        (full.dade.fullDadeIsometryData) (ζ - ζ.conj) := by
     rw [← hmaps, ← coh.extends_on_supported (ζ - ζ.conj) hdiffSupported, map_sub]
   have hW : dataT.W = hyp.base.W := by
     rw [dataT.W_eq, hW1, hW2, hyp.base.W_eq_join, sup_comm]
@@ -617,13 +617,13 @@ theorem T_typeIII_coherent_image_inner_eta_eq_zero [Finite G]
     obtain ⟨w, hw, g, hg⟩ := hx
     rw [hextDiff]
     rw [← (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
-      (full.dade.fullDadeIsometryData full.hconj) (ζ - ζ.conj)).of_isConj
+      (full.dade.fullDadeIsometryData) (ζ - ζ.conj)).of_isConj
         (isConj_iff.mpr ⟨g, hg⟩)]
     have hwV : w ∈ OddOrder.GroupTheory.typePV hyp.base.T dataT := hV.symm ▸ hw
     have hwA0 : w ∈ OddOrder.GroupTheory.typePA0 hyp.base.T dataT :=
       Set.mem_union_right _ (OddOrder.GroupTheory.subset_conjClassSetIn hwV)
     rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support full.dade
-      (full.dade.fullDadeIsometryData full.hconj) hfullSupp]
+      (full.dade.fullDadeIsometryData) hfullSupp]
     let a : {a : G // a ∈ OddOrder.GroupTheory.typePA0 hyp.base.T dataT} := ⟨w, hwA0⟩
     have hwh : w ∈ full.dade.hCoset a := ⟨1, full.dade.H a |>.one_mem, by simp [a]⟩
     rw [full.dade.isDadeMap_dadeMap.map_eq_of_mem_hCoset _ a hwh]

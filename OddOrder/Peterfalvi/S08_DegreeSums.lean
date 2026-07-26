@@ -473,7 +473,7 @@ theorem scaledDiff_dadeImage_mem_ZIrr (hyp : SibleyDadeHypothesis G L H)
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :
     hyp.tau ((χ : ClassFunction ↥L ℂ) - a • (χ₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G := by
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-    hyp.dade hyp.hconj hdiffasupp
+    hyp.dade hdiffasupp
     (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem χ₁.mem_ZIrr a))
 
 /-- **(T8.11f) X-members with a degree ratio have supported scaled difference.**
@@ -599,7 +599,7 @@ theorem sMember_degreeSumBound_of_not_coherent (hyp : SibleyDadeHypothesis G L H
   -- (8) feed everything to B1
   refine ⟨k, χmem, deg, a, hχinj, hrange, fun j => by rw [hdeg_eq j, hi₁eq],
     by rw [hψratio, hi₁eq], ?_⟩
-  have hbound := coherentDegreeSumBound_of_not_coherent hyp.dade hyp.hconj hS₁coh
+  have hbound := coherentDegreeSumBound_of_not_coherent hyp.dade hS₁coh
     ⟨ψ, hψirr⟩ hrealψ hdiffsuppψ hψψ hψbarψbar hψψbar hψbarψ hψ_S1 hψbar_S1
     (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
     (fun j _ => hmemreal j) (fun j _ => hmemdiffsupp j) (fun j _ => hmemdegdiffsupp j)

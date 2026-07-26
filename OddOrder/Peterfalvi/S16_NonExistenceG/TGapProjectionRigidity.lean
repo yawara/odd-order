@@ -64,7 +64,7 @@ theorem tSideDadeMap_vanish_on_etaRegular [Finite G]
     hφsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA1A0)
   have hmaps : tSideDadeMap hyp hG φ =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
-        (full.dade.fullDadeIsometryData full.hconj) φ := by
+        (full.dade.fullDadeIsometryData) φ := by
     simpa only [full] using
       tSideDadeMap_eq_full_typeP1DadeMap_of_support hG hyp dataT hP1 hφsupp
   have hW : dataT.W = hyp.base.W := by
@@ -76,13 +76,13 @@ theorem tSideDadeMap_vanish_on_etaRegular [Finite G]
   obtain ⟨w, hw, g, hg⟩ := hx
   rw [hmaps]
   rw [← (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
-    (full.dade.fullDadeIsometryData full.hconj) φ).of_isConj
+    (full.dade.fullDadeIsometryData) φ).of_isConj
       (isConj_iff.mpr ⟨g, hg⟩)]
   have hwV : w ∈ OddOrder.GroupTheory.typePV hyp.base.T dataT := hV.symm ▸ hw
   have hwA0 : w ∈ OddOrder.GroupTheory.typePA0 hyp.base.T dataT :=
     Set.mem_union_right _ (OddOrder.GroupTheory.subset_conjClassSetIn hwV)
   rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support full.dade
-    (full.dade.fullDadeIsometryData full.hconj) hfullSupp]
+    (full.dade.fullDadeIsometryData) hfullSupp]
   let a : {a : G // a ∈ OddOrder.GroupTheory.typePA0 hyp.base.T dataT} := ⟨w, hwA0⟩
   have hwh : w ∈ full.dade.hCoset a := ⟨1, full.dade.H a |>.one_mem, by simp [a]⟩
   rw [full.dade.isDadeMap_dadeMap.map_eq_of_mem_hCoset _ a hwh]

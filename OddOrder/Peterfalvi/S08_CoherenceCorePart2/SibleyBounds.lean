@@ -910,7 +910,7 @@ noncomputable def xBaseBlock_isCoherent_of_irreducible_X (hyp : SibleyDadeHypoth
   -- `1 ∉ A = H^#`.
   have h1notA : (1 : G) ∉ sharpImage H := by simp [sharpImage]
   -- Apply the §7 base engine; its `range χ = S₀` and Dade map `= hyp.tau`.
-  have hcoh := OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dade hyp.hconj
+  have hcoh := OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dade
     hk2 χ hχinj hdeg hsuppdiff h1notA
   rw [hrange] at hcoh
   exact hcoh
@@ -1133,7 +1133,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeRatios
     (hdegχ : (χs i : ClassFunction ↥L ℂ) 1 =
       (a : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1)
     (hDeg : 2 * (a : ℝ) < ∑ j ∈ s, ((deg j : ℝ)) ^ 2) :
-    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+    XAdjoinStepInput hyp.dade hcoh (χs i) := by
   classical
   let S₁ : Set (ClassFunction ↥L ℂ) :=
     OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i
@@ -1158,7 +1158,7 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeRatios
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.xMember_scaledDiffSupport_of_degreeData hχX (hmemX i₁ hi₁) hdegχ
   have htau1_memaχ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dade
-      (hyp.dade.fullDadeIsometryData hyp.hconj)
+      (hyp.dade.fullDadeIsometryData)
       ((χs i : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G := by
     simpa [SibleyDadeHypothesis.tau] using hyp.scaledDiff_dadeImage_mem_ZIrr hdiffasuppχ
   have hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
@@ -1229,7 +1229,7 @@ noncomputable def Xset_isCoherent_from_adjoinSteps_of_irreducible_X
       ∀ i, i < N → ∀ (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
           (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
           (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)),
-        XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i)) :
+        XAdjoinStepInput hyp.dade hcoh (χs i)) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset Z)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   classical
@@ -1260,7 +1260,7 @@ noncomputable def Xset_isCoherent_from_adjoinSteps_of_irreducible_X
     have hci := hcoverIdx i
     rw [hi] at hci
     exact hci
-  exact xChainCoherent hyp.dade hyp.hconj pair N χs hpair0 hpair1
+  exact xChainCoherent hyp.dade pair N χs hpair0 hpair1
     (hyp.xBaseBlock_subset Z) hpairs hcover
     (hyp.xBaseBlock_isCoherent_of_irreducible_X hZH hX hXne)
     (fun i hi hcoh => hstep pair N χs hpair0 hpair1 hpairs hdisj hmono i hi hcoh)
@@ -1293,7 +1293,7 @@ noncomputable def Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
       ∀ i, i < N → ∀ (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
           (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
           (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)),
-        XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i)) :
+        XAdjoinStepInput hyp.dade hcoh (χs i)) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset Z)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   classical
@@ -1324,7 +1324,7 @@ noncomputable def Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
     have hci := hcoverIdx i
     rw [hi] at hci
     exact hci
-  exact xChainCoherent hyp.dade hyp.hconj pair N χs hpair0 hpair1
+  exact xChainCoherent hyp.dade pair N χs hpair0 hpair1
     (hyp.xBaseBlock_subset Z) hpairs hcover
     (hyp.xBaseBlock_isCoherent_of_irreducible_X hZH hX hXne)
     (fun i hi hcoh => hstep pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi hcoh)

@@ -217,7 +217,7 @@ theorem hagree (hG : OddOrder.BG.IsMinimalSimpleOdd G) (i : Fin (data.n + 1))
       = data.coh.extension (data.zeta i)
         - data.d i • data.coh.extension (data.zeta 0) := by
   obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (data.θ i)
-  exact coherence_hagree_dadeMap data.typeIHyp.dadeData.dade data.typeIHyp.hconj data.coh
+  exact coherence_hagree_dadeMap data.typeIHyp.dadeData.dade data.coh
     (data.zeta_mem_Sset hi) (data.zeta_mem_Sset (Ne.symm data.ind1H_ne_zero))
     (m0 := 1) (mi := deg_i) (by norm_num)
     (by rw [show data.d i
@@ -232,7 +232,7 @@ noncomputable def h78 (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
   letI := data.kernelIn_normal
   hypothesis78OfDade data.typeIHyp.toHypothesis71
     (data.typeIHyp.dadeData.dade.fullDadeIsometryData
-      data.typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
+).toDadeIsometryData.isDadeIsometry
     data.kernel data.kernel_le data.kernel_conj_mem (data.typeIA_eq_sharp)
     data.θ data.inj data.cover data.d (data.psi_support hG) data.zeta_deg
     data.ind1H data.ind1H_ne_zero data.triv data.zeta_deg_match
@@ -440,11 +440,11 @@ theorem nu_zeta_sub_conj_support (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         - (1 : ℂ) • (data.h78 hG).hyp76.zeta j₁).support
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L data.typeIHyp.typeI) L := by
     rw [one_smul]; exact data.zeta_sub_conj_support hG hj₁
-  have hagree := coherence_hagree_dadeMap data.typeIHyp.dadeData.dade data.typeIHyp.hconj
+  have hagree := coherence_hagree_dadeMap data.typeIHyp.dadeData.dade
     data.coh hzd_mem hj₁_mem (m0 := 1) (mi := 1) (by norm_num) (by norm_num) hsupp'
   have heq : (data.h78 hG).nu ((data.h78 hG).hyp76.zeta (data.h78 hG).zetaDistinct)
       - (data.h78 hG).nu ((data.h78 hG).hyp76.zeta j₁)
-      = (data.typeIHyp.dadeData.dade.fullDadeIsometryData data.typeIHyp.hconj).toDadeMap
+      = (data.typeIHyp.dadeData.dade.fullDadeIsometryData).toDadeMap
           ⟨_, (ClassFunction.mem_supportedSubmodule).mpr hsupp'⟩ := by
     rw [data.h78_nu_eq,
       ← one_smul ℂ (data.coh.extension ((data.h78 hG).hyp76.zeta j₁))]
@@ -454,7 +454,7 @@ theorem nu_zeta_sub_conj_support (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [ClassFunction.mem_support] at hg
   by_contra hgnot
   have hdade := (data.typeIHyp.dadeData.dade.fullDadeIsometryData
-    data.typeIHyp.hconj).toDadeIsometryData.isDadeMap
+).toDadeIsometryData.isDadeMap
   exact hg (hdade.map_eq_zero_of_not_mem_dadeSupport _ g hgnot)
 
 /-! ## The (7.8.a) `BetaDecomp` and the (7.9) delta reality -/
@@ -474,7 +474,7 @@ noncomputable def betaDecomp (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
   letI := data.kernelIn_normal
   betaDecompOfDade data.typeIHyp.toHypothesis71
     (data.typeIHyp.dadeData.dade.fullDadeIsometryData
-      data.typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
+).toDadeIsometryData.isDadeIsometry
     data.kernel data.kernel_le data.kernel_conj_mem (data.typeIA_eq_sharp)
     data.θ data.inj data.cover data.d (data.psi_support hG) data.zeta_deg
     data.ind1H data.ind1H_ne_zero data.triv data.zeta_deg_match
@@ -599,8 +599,7 @@ theorem beta_conj_sub (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
   classical
   haveI := data.kernelIn_normal
   set hyp := data.typeIHyp.dadeData.dade with hhyp
-  set hconj := data.typeIHyp.hconj with hhconj
-  set dade := hyp.fullDadeIsometryData hconj with hdade
+  set dade := hyp.fullDadeIsometryData with hdade
   obtain ⟨j₁, hj₁ne, hj₁⟩ := data.exists_conjIndex hG
   -- `ζ_ind = Ind 1_H` is real.
   have hind_real : ((data.h78 hG).hyp76.zeta ((data.h78 hG).ind1H)).conj
@@ -618,7 +617,7 @@ theorem beta_conj_sub (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
         - (1 : ℂ) • (data.h78 hG).hyp76.zeta j₁).support
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L data.typeIHyp.typeI) L := by
     rw [one_smul]; exact data.zeta_sub_conj_support hG hj₁
-  have hagree := coherence_hagree_dadeMap hyp hconj data.coh hzd_mem hj₁_mem
+  have hagree := coherence_hagree_dadeMap hyp data.coh hzd_mem hj₁_mem
     (m0 := 1) (mi := 1) (by norm_num) (by norm_num) hsupp'
   -- `dade.toDadeMap` on supported functions is the ℤ-linear `dadeIntegralCharacterMap`.
   have hbridge : ∀ (φ : ClassFunction ↥L ℂ)
@@ -822,11 +821,11 @@ theorem nu_zeta_sub_conj_support_at (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         - (1 : ℂ) • (data.h78 hG).hyp76.zeta i').support
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L data.typeIHyp.typeI) L := by
     rw [one_smul]; exact data.zeta_sub_conj_support_at hG hi'
-  have hagree := coherence_hagree_dadeMap data.typeIHyp.dadeData.dade data.typeIHyp.hconj
+  have hagree := coherence_hagree_dadeMap data.typeIHyp.dadeData.dade
     data.coh hzi_mem hi'_mem (m0 := 1) (mi := 1) (by norm_num) (by norm_num) hsupp'
   have heq : (data.h78 hG).nu ((data.h78 hG).hyp76.zeta i)
       - (data.h78 hG).nu ((data.h78 hG).hyp76.zeta i')
-      = (data.typeIHyp.dadeData.dade.fullDadeIsometryData data.typeIHyp.hconj).toDadeMap
+      = (data.typeIHyp.dadeData.dade.fullDadeIsometryData).toDadeMap
           ⟨_, (ClassFunction.mem_supportedSubmodule).mpr hsupp'⟩ := by
     rw [data.h78_nu_eq,
       ← one_smul ℂ (data.coh.extension ((data.h78 hG).hyp76.zeta i'))]
@@ -836,7 +835,7 @@ theorem nu_zeta_sub_conj_support_at (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [ClassFunction.mem_support] at hg
   by_contra hgnot
   have hdade := (data.typeIHyp.dadeData.dade.fullDadeIsometryData
-    data.typeIHyp.hconj).toDadeIsometryData.isDadeMap
+).toDadeIsometryData.isDadeMap
   exact hg (hdade.map_eq_zero_of_not_mem_dadeSupport _ g hgnot)
 
 /-- **Each `ζ_i^ν` (`i ≠ ind1H`) is a unit-norm virtual character.** -/

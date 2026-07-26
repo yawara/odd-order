@@ -367,7 +367,7 @@ theorem tSideDadeMap_inner_trivial [Finite G]
   have he : tSideDadeMap hyp hG φ =
       side.dade.dadeMap (k := ℂ) ⟨φ, hmem⟩ := by
     change OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap side.dade
-        (side.dade.fullDadeIsometryData side.hconj) φ =
+        (side.dade.fullDadeIsometryData) φ =
       side.dade.dadeMap (k := ℂ) ⟨φ, hmem⟩
     rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
       side.dade _ hφ]
@@ -386,7 +386,7 @@ theorem tSideDadeMap_inner_trivial [Finite G]
   rw [he]
   exact OddOrder.Peterfalvi.S04.adjoint_formula side.dade
     side.dade.dadeMap
-    (side.dade.isDadeMap_dadeMap (k := ℂ)) side.hconj
+    (side.dade.isDadeMap_dadeMap (k := ℂ))
     ⟨φ, hmem⟩ (trivialClassFunction G)
     (trivialClassFunction ↥hyp.base.T) hψ
 
@@ -457,11 +457,11 @@ theorem exists_typeIII_primeTIDifference_with_anchor_inner [Finite G]
   have hτZ : tSideDadeMap hyp hG (ν0 - ζ) ∈ ZIrr G := by
     simpa [tSideDadeMap] using
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        side.dade side.hconj hβsupp hβZ)
+        side.dade hβsupp hβZ)
   have hτ1 : tSideDadeMap hyp hG (ν0 - ζ) 1 = 0 := by
     simpa [tSideDadeMap] using
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
-        side.dade side.hconj hβsupp)
+        side.dade hβsupp)
   refine ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, ?_, hνinner⟩
   rw [ClassFunction.conj_sub, hνR]
 
@@ -656,11 +656,11 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm [Finite G]
   have hτZ : tSideDadeMap hyp hG (ν0 - ζ) ∈ ZIrr G := by
     simpa [tSideDadeMap] using
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        side.dade side.hconj hβsupp hβZ)
+        side.dade hβsupp hβZ)
   have hτ1 : tSideDadeMap hyp hG (ν0 - ζ) 1 = 0 := by
     simpa [tSideDadeMap] using
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
-        side.dade side.hconj hβsupp)
+        side.dade hβsupp)
   have hτnorm : ClassFunction.inner (tSideDadeMap hyp hG (ν0 - ζ))
       (tSideDadeMap hyp hG (ν0 - ζ)) = ((hyp.base.p : ℕ) + 1 : ℂ) := by
     have hS : ∀ s ∈ ({ν0 - ζ} : Set (ClassFunction ↥hyp.base.T ℂ)),
@@ -670,9 +670,9 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm [Finite G]
       simpa only [Set.mem_singleton_iff] using hs ▸ hβsupp
     rw [show tSideDadeMap hyp hG =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap side.dade
-        (side.dade.fullDadeIsometryData side.hconj) from rfl]
+        (side.dade.fullDadeIsometryData) from rfl]
     rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-      side.dade side.hconj hS
+      side.dade hS
       (Submodule.subset_span (Set.mem_singleton (ν0 - ζ)))
       (Submodule.subset_span (Set.mem_singleton (ν0 - ζ))), hβnorm]
   refine ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, ?_, hνone, hβnorm, hτnorm⟩
@@ -814,11 +814,11 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_
   have hτZ : tSideDadeMap hyp hG (ν0 - ζ) ∈ ZIrr G := by
     simpa [tSideDadeMap] using
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        side.dade side.hconj hβsupp hβZ)
+        side.dade hβsupp hβZ)
   have hτ1 : tSideDadeMap hyp hG (ν0 - ζ) 1 = 0 := by
     simpa [tSideDadeMap] using
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
-        side.dade side.hconj hβsupp)
+        side.dade hβsupp)
   have hζν : ClassFunction.inner ζ ν0 = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hνζ, star_zero]
   have hβnorm : ClassFunction.inner (ν0 - ζ) (ν0 - ζ) =
@@ -835,9 +835,9 @@ theorem exists_typeIII_induced_primeTIDifference_with_norm_anchor_orthogonality_
       simpa only [Set.mem_singleton_iff] using hs ▸ hβsupp
     rw [show tSideDadeMap hyp hG =
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap side.dade
-        (side.dade.fullDadeIsometryData side.hconj) from rfl]
+        (side.dade.fullDadeIsometryData) from rfl]
     rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-      side.dade side.hconj hS
+      side.dade hS
       (Submodule.subset_span (Set.mem_singleton (ν0 - ζ)))
       (Submodule.subset_span (Set.mem_singleton (ν0 - ζ))), hβnorm]
   refine ⟨ν0, hνZ, hνR, hβZ, hβsupp, hτZ, hτ1, ?_, hνone,

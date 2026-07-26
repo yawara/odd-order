@@ -298,8 +298,7 @@ noncomputable def typeIIHypothesis46 [Finite G]
       rw [Subgroup.mem_centralizer_singleton_iff]
       exact congrArg Subtype.val (Subgroup.mem_centralizer_singleton_iff.mp hxC)
     dade0 := typeIIDadeHypothesis0 hG hSmax hSII data
-    tau := (typeIIDadeHypothesis0 hG hSmax hSII data).fullDadeIsometryData
-      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)) }
+    tau := (typeIIDadeHypothesis0 hG hSmax hSII data).fullDadeIsometryData }
 
 open OddOrder.Peterfalvi.S11 in
 open scoped Classical FiniteInduce in
@@ -467,7 +466,6 @@ theorem typeII_certainTypeR_imageSet_orthogonal_dadeOfDiff [Finite G]
         hχ₂ hdeg).imageSet,
     ∀ β ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
         (typeIIHypothesis46 hG hSmax hSII data).dade0
-        (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data)
         χ hrealχ hdiffsuppχ).imageSet,
       ClassFunction.inner α β = 0 := by
   classical
@@ -484,8 +482,7 @@ theorem typeII_certainTypeR_imageSet_orthogonal_dadeOfDiff [Finite G]
     exact hdiffsuppχA
   exact OddOrder.Peterfalvi.S08.certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV
     (typeIIHypothesis46 hG hSmax hSII data) hχ₂ hdeg
-    (typeIIHypothesis46 hG hSmax hSII data).dade0
-    (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data) χ hrealχ hdiffsuppχ
+    (typeIIHypothesis46 hG hSmax hSII data).dade0 χ hrealχ hdiffsuppχ
     (fun v hv => typeII_tau_apply_eq_zero_of_mem_ticVdiffV hG hSmax hSII data hsuppsub hv)
 
 /-! ### The (10.7) `T2 = {λ, λ̄, ν, ν̄}` family: membership, support and degree bookkeeping -/
@@ -674,7 +671,6 @@ noncomputable def typeII_T2_memberRFamily [Finite G]
       rw [hn, star_natCast]
     exact OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
       (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
-      (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
       ⟨η, hirr⟩ hreal hdiffsupp
   · -- reducible: rebuild `certainTypeR` at the abstract member (column extracted by choice)
     have hex := typeII_reducible_inducedKernelFamily_eq_columnSum hG hSmax hSII data.typeP
@@ -727,7 +723,6 @@ theorem typeII_T2_memberRFamily_imageSet_of_irr [Finite G]
       (typeII_T2_memberRFamily hG hSmax hSII data hlam_mem hnu_mem hdeg hη).imageSet =
         (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
           (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
-          (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
           ⟨η, hirr⟩ hr hs).imageSet := by
   classical
   have hModd : Odd (Nat.card ↥S) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card S)
@@ -851,7 +846,6 @@ theorem typeII_T2_memberRFamily_orthogonal [Finite G]
       rw [inner_conj_conj, h1, star_zero]
     exact OddOrder.Peterfalvi.S08.dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
       (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
-      (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
       (x := ⟨φ, hφirr⟩) (χ := ⟨ξ, hξirr⟩)
       hrφ hsφ hrξ hsξ h1 h2 hbarχ hbarχbar α hα β hβ
   · -- irr × column
@@ -976,13 +970,11 @@ theorem typeII_T2_coherent [Finite G]
     (fun {φ ψ} hφ hψ =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
         (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
-        (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
         (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hφ)
         (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hψ))
     (fun a ha b hb =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
         (typeIIHypothesis46 hG hSmax hSII data.typeP).dade0
-        (typeIIHypothesis46_dade0_hConjInvariant hG hSmax hSII data.typeP)
         (hsuppdiff a ha b hb)
         (Submodule.sub_mem _
           (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hT2IKF a ha))

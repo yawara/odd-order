@@ -204,7 +204,7 @@ theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
       (χ : ↥hyp.S → ℂ) 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * chars.u : ℕ) : ℂ)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
-        ((hyp.dadeHypS hG).fullDadeIsometryData (hyp.dadeHypS_hconj hG)))
+        ((hyp.dadeHypS hG).fullDadeIsometryData))
       (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)) := by
   classical
@@ -251,10 +251,10 @@ theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
     hN
     (fun {φ ψ} hφ hψ =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
-        (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG) hφ.2 hψ.2)
+        (hyp.dadeHypS hG) hφ.2 hψ.2)
     (fun a ha b hb =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-        (hyp.dadeHypS hG) (hyp.dadeHypS_hconj hG)
+        (hyp.dadeHypS hG)
         (hsuppdiff a ha b hb)
         (Submodule.sub_mem _ (sSet_subset_ZIrr _ ha.1) (sSet_subset_ZIrr _ hb.1)))
     hsuppdiff

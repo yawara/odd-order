@@ -153,12 +153,12 @@ theorem witness_dade_psi_rho_norm_ge [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
             (θ 0 : ClassFunction _ ℂ)) := by
     intro i _ hi_ind
     obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ i)
-    exact coherence_hagree_dadeMap hyp.dadeData.dade hyp.hconj coh
+    exact coherence_hagree_dadeMap hyp.dadeData.dade coh
       (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
       (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
   -- The concrete witness `Hypothesis78`, anchored at `ζ_0 = dade.chi`.
   set H78 := hypothesis78OfDade hyp.toHypothesis71
-    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+    (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
     hyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
     coh.extension hnu_isometry hagree with hH78def
   -- (7.8) input `a`: `(β, ζ_0^ν) + 1 ∈ ℤ`.
@@ -196,7 +196,7 @@ theorem witness_dade_psi_rho_norm_ge [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   -- The (7.8.b) bound for `H78`.
   have hbound : 1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤ H78.zetaNuRhoNormSq :=
     zetaNuRhoNormSqGeOfDade hyp.toHypothesis71
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+      (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
       hyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
       hdeg_match coh.extension hnu_isometry hagree
       (witness_L_hzeta0nu hG hyp hC coh hAH (θ 0) hθ0_ne)
@@ -277,10 +277,10 @@ theorem witness_dade_psi_rhoM_rho_normSq_lt_one [Finite G]
     exact inner_self_induce_eq_one_of_frobeniusGroup hC θlin hθlin_ne
   -- The two (7.3) integral inequalities.
   have h73L := Hypothesis71.chiRho_integral_inequality hyp.toHypothesis71
-    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+    (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
     dade.psi
   have h73M := Hypothesis71.chiRho_integral_inequality (hypothesis71SharpKernel hypM)
-    ((hypM.dadeData.dade.fullDadeIsometryData hypM.hconj).restrict
+    ((hypM.dadeData.dade.fullDadeIsometryData).restrict
       (sharpSubgroup_H_subset_typeIA hypM.typeI)
       (sharpSubgroup_H_conj_mem hypM)).toDadeIsometryData.isDadeIsometry
     dade.psi

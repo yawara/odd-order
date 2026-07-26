@@ -135,7 +135,7 @@ noncomputable def tau {L : Subgroup G} (hyp : Hypothesis L) :
     OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G :=
   haveI := hyp.finiteG
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+    (hyp.dadeData.dade.fullDadeIsometryData)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The Peterfalvi (7.1) `ρ`-machinery data for `(L, A(L))`** — the §7 foundation for the (12.16)
@@ -149,8 +149,8 @@ certificate, and the `L`-equivariance transfer directly.  This `S09.Hypothesis71
 noncomputable def toHypothesis71 {L : Subgroup G} [Finite G] (hyp : Hypothesis L) :
     OddOrder.Peterfalvi.S09.Hypothesis71 G (typeIA L hyp.typeI) L where
   hyp := hyp.dadeData.dade
-  τ := (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.toDadeMap
-  isDadeMap := (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeMap
+  τ := (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.toDadeMap
+  isDadeMap := (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeMap
   hConjInvariant := hyp.hconj
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -732,7 +732,7 @@ noncomputable def R1cdi {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFuncti
       hyp.tau (φ : ClassFunction ↥L ℂ) :=
   haveI := hyp.finiteG
   OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff
-    hyp.dadeData.dade hyp.hconj φ (data.not_real φ hφ) (R1_diffsupp data hφ)
+    hyp.dadeData.dade φ (data.not_real φ hφ) (R1_diffsupp data hφ)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.2.b), the orthonormal block `R₁(φ)`**: for a constituent `φ ∈ S(χ)`, the

@@ -161,7 +161,7 @@ theorem caseB_member_seam_all_Yset
   -- the Dade isometry of `τ` on the supported pair `{χ − a₀η₁, y − η₁}`.
   have hiso : ClassFunction.inner (hyp.tau (χ - a₀ • η₁)) (hyp.tau (y - η₁))
       = ClassFunction.inner (χ - a₀ • η₁) (y - η₁) :=
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade
       (S := ({χ - a₀ • η₁, y - η₁} : Set (ClassFunction ↥L ℂ)))
       (by intro s hs; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
           rcases hs with rfl | rfl; exacts [hsupp, hysupp])

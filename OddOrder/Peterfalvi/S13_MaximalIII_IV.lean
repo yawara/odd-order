@@ -37,14 +37,14 @@ noncomputable def irrFamilyMemberDecomposition [Finite G]
     (s : Finset (ClassFunction ↥M ℂ))
     (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) (↑s) hyp.A0)
+        (hyp.dadeData.dade.fullDadeIsometryData)) (↑s) hyp.A0)
     (hsub : (↑s : Set (ClassFunction ↥M ℂ)) ⊆ OddOrder.Peterfalvi.S12.inducedFamily M)
     (hirr : ∀ x ∈ s, IsIrreducibleCharacter x)
     (hconjS : ∀ x ∈ s, x.conj ∈ s)
     {x : ClassFunction ↥M ℂ} (hx : x ∈ s) :
     OddOrder.Peterfalvi.S07.CharacterPsiDecomposition
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) x 0 := by
+        (hyp.dadeData.dade.fullDadeIsometryData)) x 0 := by
   haveI := hyp.finiteG
   classical
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
@@ -67,7 +67,7 @@ noncomputable def irrFamilyMemberDecomposition [Finite G]
       OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hxIKF
     exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hxIKF hxc
       (fun h => hne h.symm)
-  exact OddOrder.Peterfalvi.S08.memberExtensionDecomposition hyp.dadeData.dade hyp.hconj hS₁
+  exact OddOrder.Peterfalvi.S08.memberExtensionDecomposition hyp.dadeData.dade hS₁
     ⟨x, hirr x hx⟩ hreal hdiffsupp (Finset.mem_coe.mpr hx)
     (Finset.mem_coe.mpr (hconjS x hx)) hνZ hχχbar
 
@@ -107,7 +107,7 @@ theorem tau_apply_eq_zero_of_mem_typePV [Finite G]
     {v : G}
     (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).V) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) α v = 0 := by
+      (hyp.dadeData.dade.fullDadeIsometryData) α v = 0 := by
   haveI := hyp.finiteG
   classical
   -- `v ∈ typePV M` (the `ticVdiff` exceptional set is definitionally `W ∖ (W₁ ∪ W₂)`)
@@ -164,7 +164,7 @@ theorem certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP [Finite G]
     ∀ α ∈ (OddOrder.Peterfalvi.S06.certainTypeR (hyp.toHypothesis46 hG hG.odd)
         hχ₂ hdeg).imageSet,
     ∀ β ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dadeData.dade
-        hyp.hconj χ hrealχ hdiffsuppχ).imageSet,
+      χ hrealχ hdiffsuppχ).imageSet,
       ClassFunction.inner α β = 0 := by
   haveI := hyp.finiteG
   classical
@@ -179,7 +179,7 @@ theorem certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP [Finite G]
       ClassFunction.support_neg]
     exact hdiffsuppχA
   exact OddOrder.Peterfalvi.S08.certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV
-    (hyp.toHypothesis46 hG hG.odd) hχ₂ hdeg hyp.dadeData.dade hyp.hconj χ hrealχ hdiffsuppχ
+    (hyp.toHypothesis46 hG hG.odd) hχ₂ hdeg hyp.dadeData.dade χ hrealχ hdiffsuppχ
     (fun v hv => tau_apply_eq_zero_of_mem_typePV hG hyp hsuppsub hv)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -202,7 +202,7 @@ noncomputable def irrFamilyMemberOrthoDatum [Finite G]
     (S₁ : Set (ClassFunction ↥M ℂ))
     (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) S₁ hyp.A0)
+        (hyp.dadeData.dade.fullDadeIsometryData)) S₁ hyp.A0)
     (s : Finset (ClassFunction ↥M ℂ))
     (hsS₁ : (↑s : Set (ClassFunction ↥M ℂ)) ⊆ S₁)
     (hsub : (↑s : Set (ClassFunction ↥M ℂ)) ⊆ OddOrder.Peterfalvi.S12.inducedFamily M)
@@ -218,7 +218,7 @@ noncomputable def irrFamilyMemberOrthoDatum [Finite G]
     {x : ClassFunction ↥M ℂ} (hx : x ∈ s) :
     { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
-          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) x 0 //
+          (hyp.dadeData.dade.fullDadeIsometryData)) x 0 //
       (∀ α ∈ D.imageFamily.imageSet,
           ∀ β ∈ (OddOrder.Peterfalvi.S06.certainTypeR (hyp.toHypothesis46 hG hG.odd)
             hχ₂b hdegb).imageSet,
@@ -256,7 +256,7 @@ noncomputable def irrFamilyMemberOrthoDatum [Finite G]
       OddOrder.Peterfalvi.S08.inducedKernelFamily_closedUnderConjugate _ hxIKF
     exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal hxIKF hxc
       (fun h => hne h.symm)
-  refine ⟨OddOrder.Peterfalvi.S08.memberExtensionDecomposition hyp.dadeData.dade hyp.hconj hS₁
+  refine ⟨OddOrder.Peterfalvi.S08.memberExtensionDecomposition hyp.dadeData.dade hS₁
     ⟨x, hirr x hx⟩ hreal hdiffsupp0 (hsS₁ (Finset.mem_coe.mpr hx))
     (hsS₁ (Finset.mem_coe.mpr (hconjS x hx))) hνZ hχχbar, ?_, rfl⟩
   -- `R(x) ⊥ R(μ_b)`: the §12 (5.2.e) cross-orthogonality, conjugate-symmetry swap
@@ -475,7 +475,7 @@ noncomputable def caseB_sOf_memberRFamily [Finite G]
     have hdiffsupp := OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
       hyp.base.mderivSharp_subset_A0 hηIKF0
     exact OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-      hyp.base.dadeData.dade hyp.base.hconj ⟨η, hirr⟩ hreal hdiffsupp
+      hyp.base.dadeData.dade ⟨η, hirr⟩ hreal hdiffsupp
   · -- column: rebuild `certainTypeR` at the abstract member `η` (data extracted by choice)
     have hex := (caseB_sOf_member_dichotomy hG hyp d hunif hη).resolve_left
       (fun h => hirr h.2.1)
@@ -523,7 +523,7 @@ theorem caseB_sOf_memberRFamily_imageSet_of_irr [Finite G]
           (OddOrder.GroupTheory.typePA0 M hyp.base.typeP) M),
       (caseB_sOf_memberRFamily hG hyp d hunif hη).imageSet =
         (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-          hyp.base.dadeData.dade hyp.base.hconj ⟨η, hirr⟩ hr hs).imageSet := by
+          hyp.base.dadeData.dade ⟨η, hirr⟩ hr hs).imageSet := by
   haveI := hyp.base.finiteG
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hηIKF0 : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
@@ -591,11 +591,11 @@ theorem dadeOfDiff_orthogonal_dadeOfDiff_typeP [Finite G]
     (hxbarχbar :
       ClassFunction.inner (x : ClassFunction ↥M ℂ).conj (χ : ClassFunction ↥M ℂ).conj = 0) :
     (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dadeData.dade
-        hyp.hconj x hxreal hxdiffsupp).Orthogonal
+      x hxreal hxdiffsupp).Orthogonal
       (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dadeData.dade
-        hyp.hconj χ hχreal hχdiffsupp) :=
+        χ hχreal hχdiffsupp) :=
   OddOrder.Peterfalvi.S08.dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
-    hyp.dadeData.dade hyp.hconj hxreal hxdiffsupp hχreal hχdiffsupp
+    hyp.dadeData.dade hxreal hxdiffsupp hχreal hχdiffsupp
     hxχ hxχbar hxbarχ hxbarχbar
 
 set_option maxHeartbeats 1600000 in

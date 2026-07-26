@@ -353,7 +353,7 @@ theorem caseB_column_htau1_mema
     (h1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) (1 : ↥L) = (a : ℂ) * η₁ (1 : ↥L)) :
     hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁) ∈ ZIrr G := by
   refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-    hyp.dade hyp.hconj (caseB_column_sub_smul_support hyp h46 hHK hη₁ χ₂ a h1) ?_
+    hyp.dade (caseB_column_sub_smul_support hyp h46 hHK hη₁ χ₂ a h1) ?_
   refine Submodule.sub_mem _ ?_
     (nsmul_mem (IsIrreducibleCharacter.mem_ZIrr (hyp.isIrreducibleCharacter_of_mem_Yset hη₁)) a)
   rw [OddOrder.Peterfalvi.S06.columnSum_def]
@@ -485,7 +485,7 @@ theorem caseB_irr_htau1_mema
       ∈ ZIrr G := by
   haveI : Fintype ↥H := Fintype.ofFinite _
   refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-    hyp.dade hyp.hconj (caseB_irr_sub_smul_support hyp hW2H hcen hφ' hweight hη₁) ?_
+    hyp.dade (caseB_irr_sub_smul_support hyp hW2H hcen hφ' hweight hη₁) ?_
   exact Submodule.sub_mem _
     (ClassFunction.induce_mem_ZIrr H (IsIrreducibleCharacter.mem_ZIrr θ.2))
     (nsmul_mem (IsIrreducibleCharacter.mem_ZIrr (hyp.isIrreducibleCharacter_of_mem_Yset hη₁)) _)
@@ -906,7 +906,7 @@ abbrev CaseBColBundle (hyp : SibleyDadeHypothesis G L H)
 /-- The per-`θ` **irreducible-branch bundle** (mixed dispatch).  When no nontrivial column equals
 `Ind^L_H θ`, the structural inputs of `irreducibleDecompositionTau` (=
 `decompositionDaFromDadeOfDiff
-hyp.dade hyp.hconj`): irreducibility, non-realness, the two `H^#`-supports, the `ZIrr`-membership of
+hyp.dade`): irreducibility, non-realness, the two `H^#`-supports, the `ZIrr`-membership of
 `(Ind^L_H θ − a·η₁)^{hyp.tau}`, and the (5.2.c) orthogonality scalars.  Shared with
 `caseB_constituentDecomposition` (definitionally the same `hirr` Prop). -/
 abbrev CaseBIrrBundle (hyp : SibleyDadeHypothesis G L H)

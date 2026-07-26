@@ -527,8 +527,7 @@ theorem Hypothesis.muGrid_apply_eq_columnSign_smul_alignedOmegaSigma_of_mem_type
   haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
   haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
-    ⟨tic.toDadeHypothesis.fullDadeIsometryData
-      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+    ⟨tic.toDadeHypothesis.fullDadeIsometryData⟩
   let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
     (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
       (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)

@@ -57,7 +57,7 @@ theorem tSideDadeMap_eq_full_typeP1DadeMap_of_support [Finite G]
       let full := (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1
         hG hyp.base.T_maximal dataT hP1).some
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
-        (full.dade.fullDadeIsometryData full.hconj) φ := by
+        (full.dade.fullDadeIsometryData) φ := by
   classical
   let side := (tSideDadeSupport_nonempty hG hyp).some
   let full := (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1
@@ -86,12 +86,12 @@ theorem tSideDadeMap_eq_full_typeP1DadeMap_of_support [Finite G]
     hφsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA1A0)
   change tSideDadeMap hyp hG φ =
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap full.dade
-      (full.dade.fullDadeIsometryData full.hconj) φ
+      (full.dade.fullDadeIsometryData) φ
   rw [tSideDadeMap,
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support side.dade
-      (side.dade.fullDadeIsometryData side.hconj) hφsupp,
+      (side.dade.fullDadeIsometryData) hφsupp,
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support full.dade
-      (full.dade.fullDadeIsometryData full.hconj) hfullSupp]
+      (full.dade.fullDadeIsometryData) hfullSupp]
   rw [← hdade]
   exact full.dade.dadeMap_restrict_apply hA1A0 hA1norm
     ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφsupp⟩
@@ -269,7 +269,7 @@ theorem tSideDadeMap_eq_induce_of_full_typeP1_H_eq_bot [Finite G]
     hφsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA1A0)
   rw [tSideDadeMap_eq_full_typeP1DadeMap_of_support hG hyp dataT hP1 hφsupp,
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support full.dade
-      (full.dade.fullDadeIsometryData full.hconj) hfullSupp]
+      (full.dade.fullDadeIsometryData) hfullSupp]
   have hind := OddOrder.Peterfalvi.S14.isDadeMap_induce_of_forall_H_eq_bot full.dade
     (by simpa only [full] using hH)
   have heq := OddOrder.Peterfalvi.S04.IsDadeMap.unique

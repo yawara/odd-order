@@ -599,12 +599,12 @@ theorem witness_L_hzeta0nu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [show hyp.tau φ = hyp.dadeData.dade.dadeMap
         ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩ from
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade
-        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hφ]
+        (hyp.dadeData.dade.fullDadeIsometryData) hφ]
     exact inner_tau_supported_constOne hyp.toHypothesis71
       ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
   have hτ_smul : ∀ (c : ℂ) (x : ClassFunction ↥L ℂ), hyp.tau (c • x) = c • hyp.tau x :=
     dadeIntegralCharacterMap_smul_complex hyp.dadeData.dade
-      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+      (hyp.dadeData.dade.fullDadeIsometryData)
   exact coherence_extension_orthogonal_constOne coh hτ_smul htau1 hmem0 hmem0'
     hnorm0 hnorm0' horth hsupp h1_0 h1_0'
 
@@ -734,7 +734,7 @@ theorem witness_dade_psi_apply_x_eq_chi [Finite G] (hG : OddOrder.BG.IsMinimalSi
             (θ 0 : ClassFunction _ ℂ)) := by
     intro i _ hi_ind
     obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ i)
-    exact coherence_hagree_dadeMap hyp.dadeData.dade hyp.hconj coh
+    exact coherence_hagree_dadeMap hyp.dadeData.dade coh
       (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
       (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
   -- The distinguished member `ζ_0 = Ind θ_0 ∈ S` and its (12.13) Dade calculation.
@@ -772,7 +772,7 @@ theorem witness_dade_psi_apply_x_eq_chi [Finite G] (hG : OddOrder.BG.IsMinimalSi
     witness_chiRho_apply_eq_of_forall_K hG hnoV data hyp dade.psi hconst hxL
   -- The (7.8) input `a`: `(β, ζ_0^ν) + 1 ∈ ℤ`.
   set H78 := hypothesis78OfDade hyp.toHypothesis71
-    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+    (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
     hyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
     hdeg_match coh.extension hnu_isometry hagree with hH78def
   obtain ⟨a, ha⟩ := exists_betaDecomp_a H78
@@ -791,7 +791,7 @@ theorem witness_dade_psi_apply_x_eq_chi [Finite G] (hG : OddOrder.BG.IsMinimalSi
   have hxA : ((⟨data.x, hxL⟩ : ↥data.L) : G) ∈ typeIA data.L hyp.typeI :=
     witness_x_mem_typeIA hG hnoV data hyp
   have heval := chiRho_nu_zeta0_apply_eq_zeta0_ofDade hyp.toHypothesis71
-    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+    (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
     hyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
     hdeg_match coh.extension hnu_isometry hagree
     (witness_L_hzeta0nu hG hyp hC coh hAH (θ 0) hθ0_ne)
@@ -1223,7 +1223,7 @@ theorem witness_L_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr ⟨hx.1, hx.2⟩
   -- Assemble the `Hypothesis78` via `hypothesis78OfDade`.
   refine ⟨hypothesis78OfDade hyp.toHypothesis71
-    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+    (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
     hyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
     coh.extension ?_ ?_⟩
   · -- `nu_isometry`: the coherent extension is isometric on the family members.
@@ -1232,7 +1232,7 @@ theorem witness_L_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   · -- `hagree`: the (7.8.a) coherence agreement `τ ψ_i = ν ζ_i − d_i ν ζ_0`.
     intro i _ hi_ind
     obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ i)
-    exact coherence_hagree_dadeMap hyp.dadeData.dade hyp.hconj coh
+    exact coherence_hagree_dadeMap hyp.dadeData.dade coh
       (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
       (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
 
@@ -1382,12 +1382,12 @@ theorem witness_L_zeta_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
             (θ 0 : ClassFunction _ ℂ)) := by
     intro i _ hi_ind
     obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ i)
-    exact coherence_hagree_dadeMap hyp.dadeData.dade hyp.hconj coh
+    exact coherence_hagree_dadeMap hyp.dadeData.dade coh
       (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
       (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
   -- The concrete witness `Hypothesis78`.
   set H78 := hypothesis78OfDade hyp.toHypothesis71
-    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+    (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
     hyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
     coh.extension hnu_isometry hagree with hH78def
   -- (7.8) input `a`: `(β, ζ_0^ν) + 1 ∈ ℤ`.
@@ -1423,7 +1423,7 @@ theorem witness_L_zeta_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hke, hce]; exact hfrob
   refine ⟨hyp, H78, ?_⟩
   exact zetaNuRhoNormSqGeOfDade hyp.toHypothesis71
-    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+    (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeIsometry
     hyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
     coh.extension hnu_isometry hagree
     (witness_L_hzeta0nu hG hyp hC coh hAH (θ 0) hθ0_ne)

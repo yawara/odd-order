@@ -180,7 +180,7 @@ noncomputable def tauSbetaGrid [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     ClassFunction G ℂ :=
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS0 hG)
-      ((hyp.dadeHypS0 hG).fullDadeIsometryData (hyp.dadeHypS0_hconj hG))
+      ((hyp.dadeHypS0 hG).fullDadeIsometryData)
     (betaGrid hyp ⟨1, by have := hyp.three_le_p; omega⟩)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in

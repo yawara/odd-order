@@ -237,8 +237,7 @@ noncomputable def typeIITau [Finite G]
     (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
     OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥S G :=
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (typeIIDadeHypothesis hG hSmax hSII)
-    ((typeIIDadeHypothesis hG hSmax hSII).fullDadeIsometryData
-      (typeIIDadeHypothesis_hConjInvariant hG hSmax hSII))
+    ((typeIIDadeHypothesis hG hSmax hSII).fullDadeIsometryData)
 
 open OddOrder.Peterfalvi.S11 in
 open scoped Classical FiniteInduce in

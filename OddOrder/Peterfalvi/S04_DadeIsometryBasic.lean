@@ -281,10 +281,11 @@ theorem dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot
 /-- The formal shape of Peterfalvi (2.4.a): the subgroups `H(a)` are
 equivariant under conjugation by `L`.
 
-This predicate is **always satisfied** under Hypothesis (2.2): see `Hypothesis.hConjInvariant`,
-which derives it from `mem_H_iff_coprime_orderOf`.  It is retained as a named predicate only
-because it is threaded as an explicit argument through the (2.6)–(2.10) API; every such
-argument can now be discharged by `hyp.hConjInvariant`.
+This predicate is **always satisfied** under Hypothesis (2.2): `Hypothesis.hConjInvariant`
+derives it from `mem_H_iff_coprime_orderOf`.  It is therefore *not* a hypothesis of anything —
+the (2.6)–(2.10) API used to thread it as an explicit argument, matching the book's own habit of
+citing (2.4.a) at each use, but every one of those arguments is now discharged internally.  The
+predicate survives only as the name of the statement that `hConjInvariant` proves.
 
 (The book proves this via `H(a) = O_{π'}(C_G(a))` for the global prime set
 `π = ⋃_{b ∈ A} π(|C_L(b)|)`; the repo proof uses the equivalent local characterization of
@@ -300,72 +301,6 @@ theorem HConjInvariant.of_forall_H_eq_bot (hyp : Hypothesis G A L)
   intro a l
   rw [hH ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩, hH a,
     Subgroup.smul_bot]
-
-theorem HConjInvariant.restrict {hyp : Hypothesis G A L} (hconj : hyp.HConjInvariant)
-    (hA₁A : A₁ ⊆ A)
-    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
-    (hyp.restrict hA₁A hA₁_norm).HConjInvariant := by
-  intro a l
-  simpa [HConjInvariant] using hconj ⟨a.1, hA₁A a.2⟩ l
-
-theorem hCoset_conj_mem_of_HConjInvariant (hyp : Hypothesis G A L)
-    (hconj : hyp.HConjInvariant) (a : {a : G // a ∈ A}) (l : L) {g : G}
-    (hg : g ∈ hyp.hCoset a) :
-    (l : G) * g * (l : G)⁻¹ ∈
-      hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
-  rcases hg with ⟨h, hh, rfl⟩
-  refine ⟨(l : G) * h * (l : G)⁻¹, ?_, by group⟩
-  have hh_smul :
-      (MulAut.conj (l : G)) h ∈ MulAut.conj (l : G) • hyp.H a :=
-    Subgroup.smul_mem_pointwise_smul h (MulAut.conj (l : G)) (hyp.H a) hh
-  rw [hconj a l]
-  simpa [MulAut.conj_apply] using hh_smul
-
-theorem hCoset_conj_mem_iff_of_HConjInvariant (hyp : Hypothesis G A L)
-    (hconj : hyp.HConjInvariant) (a : {a : G // a ∈ A}) (l : L) {g : G} :
-    (l : G) * g * (l : G)⁻¹ ∈
-        hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ ↔
-      g ∈ hyp.hCoset a := by
-  refine ⟨fun hg => ?_, hyp.hCoset_conj_mem_of_HConjInvariant hconj a l⟩
-  have hg' := hyp.hCoset_conj_mem_of_HConjInvariant hconj
-    ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ l⁻¹ hg
-  obtain ⟨h, hh, heq⟩ := hg'
-  refine ⟨h, ?_, ?_⟩
-  · have idx_val :
-        ((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ = a.1 := by
-      push_cast; group
-    have idx_eq :
-        (⟨((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹,
-          hyp.L_normalizes_A l⁻¹ (hyp.L_normalizes_A l a.2)⟩ : {a : G // a ∈ A}) = a :=
-      Subtype.ext idx_val
-    exact idx_eq ▸ hh
-  · have lhs_eq :
-        ((l⁻¹ : L) : G) * ((l : G) * g * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ = g := by
-      push_cast; group
-    have rhs_eq :
-        ((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ * h = a.1 * h := by
-      push_cast; group
-    calc g = ((l⁻¹ : L) : G) * ((l : G) * g * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ := lhs_eq.symm
-      _ = ((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ * h := heq
-      _ = a.1 * h := rhs_eq
-
-theorem hCoset_conj_eq_of_HConjInvariant (hyp : Hypothesis G A L)
-    (hconj : hyp.HConjInvariant) (a : {a : G // a ∈ A}) (l : L) :
-    (fun g : G => (l : G) * g * (l : G)⁻¹) '' hyp.hCoset a =
-      hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
-  ext g
-  constructor
-  · rintro ⟨x, hx, rfl⟩
-    exact hyp.hCoset_conj_mem_of_HConjInvariant hconj a l hx
-  · intro hg
-    refine ⟨(l : G)⁻¹ * g * (l : G), ?_, by group⟩
-    have hg_eq : (l : G) * ((l : G)⁻¹ * g * (l : G)) * (l : G)⁻¹ = g := by
-      group
-    have hmem :
-        (l : G) * ((l : G)⁻¹ * g * (l : G)) * (l : G)⁻¹ ∈
-          hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
-      simpa [hg_eq] using hg
-    exact (hyp.hCoset_conj_mem_iff_of_HConjInvariant hconj a l).mp hmem
 
 /-- Every element of `H(a)` commutes with `a`, since `H(a) ≤ C_G(a)` by the
 centralizer decomposition `(2.2.b)`. -/
@@ -582,6 +517,65 @@ theorem hConjInvariant (hyp : Hypothesis G A L) : hyp.HConjInvariant := by
         _ = ((l : G) * a.1 * (l : G)⁻¹) * x := by group
   rw [hord, hcard, hcent]
 
+theorem hCoset_conj_mem (hyp : Hypothesis G A L)
+    (a : {a : G // a ∈ A}) (l : L) {g : G}
+    (hg : g ∈ hyp.hCoset a) :
+    (l : G) * g * (l : G)⁻¹ ∈
+      hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
+  rcases hg with ⟨h, hh, rfl⟩
+  refine ⟨(l : G) * h * (l : G)⁻¹, ?_, by group⟩
+  have hh_smul :
+      (MulAut.conj (l : G)) h ∈ MulAut.conj (l : G) • hyp.H a :=
+    Subgroup.smul_mem_pointwise_smul h (MulAut.conj (l : G)) (hyp.H a) hh
+  rw [hyp.hConjInvariant a l]
+  simpa [MulAut.conj_apply] using hh_smul
+
+theorem hCoset_conj_mem_iff (hyp : Hypothesis G A L)
+    (a : {a : G // a ∈ A}) (l : L) {g : G} :
+    (l : G) * g * (l : G)⁻¹ ∈
+        hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ ↔
+      g ∈ hyp.hCoset a := by
+  refine ⟨fun hg => ?_, hyp.hCoset_conj_mem a l⟩
+  have hg' := hyp.hCoset_conj_mem
+    ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ l⁻¹ hg
+  obtain ⟨h, hh, heq⟩ := hg'
+  refine ⟨h, ?_, ?_⟩
+  · have idx_val :
+        ((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ = a.1 := by
+      push_cast; group
+    have idx_eq :
+        (⟨((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹,
+          hyp.L_normalizes_A l⁻¹ (hyp.L_normalizes_A l a.2)⟩ : {a : G // a ∈ A}) = a :=
+      Subtype.ext idx_val
+    exact idx_eq ▸ hh
+  · have lhs_eq :
+        ((l⁻¹ : L) : G) * ((l : G) * g * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ = g := by
+      push_cast; group
+    have rhs_eq :
+        ((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ * h = a.1 * h := by
+      push_cast; group
+    calc g = ((l⁻¹ : L) : G) * ((l : G) * g * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ := lhs_eq.symm
+      _ = ((l⁻¹ : L) : G) * ((l : G) * a.1 * (l : G)⁻¹) * ((l⁻¹ : L) : G)⁻¹ * h := heq
+      _ = a.1 * h := rhs_eq
+
+theorem hCoset_conj_eq (hyp : Hypothesis G A L)
+    (a : {a : G // a ∈ A}) (l : L) :
+    (fun g : G => (l : G) * g * (l : G)⁻¹) '' hyp.hCoset a =
+      hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
+  ext g
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    exact hyp.hCoset_conj_mem a l hx
+  · intro hg
+    refine ⟨(l : G)⁻¹ * g * (l : G), ?_, by group⟩
+    have hg_eq : (l : G) * ((l : G)⁻¹ * g * (l : G)) * (l : G)⁻¹ = g := by
+      group
+    have hmem :
+        (l : G) * ((l : G)⁻¹ * g * (l : G)) * (l : G)⁻¹ ∈
+          hyp.hCoset ⟨(l : G) * a.1 * (l : G)⁻¹, hyp.L_normalizes_A l a.2⟩ := by
+      simpa [hg_eq] using hg
+    exact (hyp.hCoset_conj_mem_iff a l).mp hmem
+
 /-- **Peterfalvi (2.4.c)**: `N_G(a·H(a)) = C_G(a)` for `a ∈ A`.
 
 Stated elementwise: `g` stabilizes the coset `H(a)·a` under conjugation exactly when `g`
@@ -670,7 +664,7 @@ onto it has fibers that are `C_L(a₀)`-cosets (`card_conjugatorIn_L`), and the
 summand `|C_L(a)|` is constant `= |C_L(a₀)|` on the class
 (`card_centralizerIn_conj`); fiberwise counting then gives `|L|`. -/
 theorem sum_card_centralizerIn_eq [Fintype {a : G // a ∈ A}]
-    (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant) {g : G}
+    (hyp : Hypothesis G A L) {g : G}
     (hg : g ∈ hyp.dadeSupport) :
     ∑ a ∈ Finset.univ.filter
         (fun a : {a : G // a ∈ A} => ∃ x ∈ hyp.H a, IsConj (a.1 * x) g),
@@ -688,7 +682,7 @@ theorem sum_card_centralizerIn_eq [Fintype {a : G // a ∈ A}]
     refine ⟨Finset.mem_univ _, (l : G) * x₀ * (l : G)⁻¹, ?_, ?_⟩
     · change (l : G) * x₀ * (l : G)⁻¹ ∈
         hyp.H ⟨(l : G) * a₀.1 * (l : G)⁻¹, hyp.L_normalizes_A l a₀.2⟩
-      rw [hconj a₀ l]
+      rw [hyp.hConjInvariant a₀ l]
       exact Subgroup.smul_mem_pointwise_smul x₀ (MulAut.conj (l : G)) (hyp.H a₀) hx₀
     · have heq : (φ l).1 * ((l : G) * x₀ * (l : G)⁻¹)
           = (l : G) * (a₀.1 * x₀) * (l : G)⁻¹ := by
@@ -911,10 +905,10 @@ theorem mem_nLStabilizerIn (hyp : Hypothesis G A L)
 
 /-- Membership in the conjugated subgroup `H(ℓ·a·ℓ⁻¹)`, via `(2.4.a)` `HConjInvariant`:
 `y ∈ H(conjA l a) ↔ ℓ⁻¹ y ℓ ∈ H(a)`. -/
-theorem mem_H_conjA_iff (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+theorem mem_H_conjA_iff (hyp : Hypothesis G A L)
     (a : {a : G // a ∈ A}) (l : L) {y : G} :
     y ∈ hyp.H (hyp.conjA l a) ↔ (l : G)⁻¹ * y * (l : G) ∈ hyp.H a := by
-  have hHeq : hyp.H (hyp.conjA l a) = MulAut.conj (l : G) • hyp.H a := hconj a l
+  have hHeq : hyp.H (hyp.conjA l a) = MulAut.conj (l : G) • hyp.H a := hyp.hConjInvariant a l
   rw [hHeq, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
   rw [show ((MulAut.conj (l : G))⁻¹ • y) = (MulAut.conj (l : G))⁻¹ y from rfl,
     MulAut.conj_inv_apply]
@@ -924,7 +918,7 @@ theorem mem_H_conjA_iff (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
 By `(2.4.a)`, conjugation by `ℓ ∈ N_L(B)` sends `H(a)` to `H(ℓ·a·ℓ⁻¹)`; since `ℓ` permutes
 `B`, it sends `H(B) = ⋂_{a∈B} H(a)` to itself. -/
 theorem nLStabilizerIn_le_normalizer (hyp : Hypothesis G A L)
-    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     nLStabilizerIn hyp B ≤ Subgroup.normalizer (hIntersection hyp B hB) := by
   intro x hx
   obtain ⟨hxL, hxN⟩ := (mem_nLStabilizerIn hyp).mp hx
@@ -940,13 +934,13 @@ theorem nLStabilizerIn_le_normalizer (hyp : Hypothesis G A L)
     have hpre : hyp.conjA l⁻¹ a ∈ B :=
       ((setLStabilizer hyp B).inv_mem hxN) a ha
     have hmem := hy (hyp.conjA l⁻¹ a) hpre
-    rw [mem_H_conjA_iff hyp hconj, hlinv] at hmem
+    rw [mem_H_conjA_iff hyp, hlinv] at hmem
     -- `hmem : (x⁻¹)⁻¹ * y * x⁻¹ ∈ H(a)`
     rwa [show (x⁻¹)⁻¹ * y * x⁻¹ = x * y * x⁻¹ from by group] at hmem
   · -- `x y x⁻¹ ∈ H(B)` ⇒ `y ∈ H(B)`
     intro hy a ha
     have hmem := hy (hyp.conjA l a) (hxN a ha)
-    rw [mem_H_conjA_iff hyp hconj, hlx] at hmem
+    rw [mem_H_conjA_iff hyp, hlx] at hmem
     -- `hmem : x⁻¹ * (x * y * x⁻¹) * x ∈ H(a)`
     rwa [show x⁻¹ * (x * y * x⁻¹) * x = y from by group] at hmem
 
@@ -976,12 +970,12 @@ noncomputable def mBSubgroup (hyp : Hypothesis G A L)
 
 /-- The underlying set of `M(B) = H(B) ⊔ N_L(B)` is the product `H(B) · N_L(B)`, because
 `N_L(B)` normalizes `H(B)` (`(2.4.a)`). -/
-theorem coe_mBSubgroup (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+theorem coe_mBSubgroup (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     (↑(mBSubgroup hyp B hB) : Set G)
       = (↑(hIntersection hyp B hB) : Set G) * (↑(nLStabilizerIn hyp B) : Set G) :=
   Subgroup.coe_mul_of_right_le_normalizer_left _ _
-    (hyp.nLStabilizerIn_le_normalizer hconj hB)
+    (hyp.nLStabilizerIn_le_normalizer hB)
 
 /-- **Peterfalvi (2.8), the semidirect order identity.**  `|M(B)| = |H(B)| · |N_L(B)|`.
 
@@ -990,14 +984,14 @@ multiplication map `H(B) × N_L(B) → M(B)` is a bijection, because `N_L(B)` no
 `H(B)` (`(2.4.a)`, gives the product is `M(B)`) and `H(B) ∩ N_L(B) = 1`
 (`hIntersection_disjoint_nLStabilizerIn`, gives injectivity).  Same argument as
 `card_centralizer_eq`. -/
-theorem card_mBSubgroup (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+theorem card_mBSubgroup (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     Nat.card (mBSubgroup hyp B hB)
       = Nat.card (hIntersection hyp B hB) * Nat.card (nLStabilizerIn hyp B) := by
   classical
   have hHle : hIntersection hyp B hB ≤ mBSubgroup hyp B hB := le_sup_left
   have hNle : nLStabilizerIn hyp B ≤ mBSubgroup hyp B hB := le_sup_right
-  have hcoe := hyp.coe_mBSubgroup hconj hB
+  have hcoe := hyp.coe_mBSubgroup hB
   let f : (hIntersection hyp B hB) × (nLStabilizerIn hyp B) → mBSubgroup hyp B hB :=
     fun p => ⟨(p.1 : G) * (p.2 : G),
       (mBSubgroup hyp B hB).mul_mem (hHle p.1.2) (hNle p.2.2)⟩
@@ -1029,16 +1023,16 @@ theorem nLStabilizerIn_le_mBSubgroup (hyp : Hypothesis G A L)
 /-- `H(B)` is normal in `M(B)`: `M(B) = H(B) ⊔ N_L(B)` and both factors normalize `H(B)`
 (self-normalization and `(2.4.a)` for `N_L(B)`). -/
 theorem hIntersection_subgroupOf_normal (hyp : Hypothesis G A L)
-    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal := by
   rw [Subgroup.normal_subgroupOf_iff_le_normalizer (hyp.hIntersection_le_mBSubgroup hB)]
   rw [mBSubgroup]
   exact sup_le (hIntersection hyp B hB).le_normalizer
-    (hyp.nLStabilizerIn_le_normalizer hconj hB)
+    (hyp.nLStabilizerIn_le_normalizer hB)
 
 /-- `H(B)` and `N_L(B)` are complementary subgroups inside `M(B)`: this is the internal
 semidirect decomposition `M(B) = H(B) ⋊ N_L(B)` as a `Subgroup.IsComplement'`. -/
-theorem isComplement'_subgroupOf (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+theorem isComplement'_subgroupOf (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     Subgroup.IsComplement'
       ((nLStabilizerIn hyp B).subgroupOf (mBSubgroup hyp B hB))
@@ -1048,7 +1042,7 @@ theorem isComplement'_subgroupOf (hyp : Hypothesis G A L) (hconj : hyp.HConjInva
   · -- `|N_sub| · |H_sub| = |M(B)|`
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hyp.hIntersection_le_mBSubgroup hB)).toEquiv,
-      mul_comm, ← hyp.card_mBSubgroup hconj hB]
+      mul_comm, ← hyp.card_mBSubgroup hB]
   · -- disjointness of the lifted subgroups
     rw [disjoint_iff_inf_le]
     intro x hx
@@ -1066,37 +1060,37 @@ theorem isComplement'_subgroupOf (hyp : Hypothesis G A L) (hconj : hyp.HConjInva
 Concretely `f_B` is the composite `M(B) → M(B)/H(B) ≅ N_L(B) ↪ L`, where the middle
 isomorphism is `IsComplement'.QuotientMulEquiv` (`H(B)` normal, `N_L(B)` a complement) and
 the last map is the inclusion `N_L(B) ≤ L`. -/
-noncomputable def dadeQuotientHom (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+noncomputable def dadeQuotientHom (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     mBSubgroup hyp B hB →* L :=
   haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
-    hyp.hIntersection_subgroupOf_normal hconj hB
+    hyp.hIntersection_subgroupOf_normal hB
   (Subgroup.inclusion (hyp.nLStabilizerIn_le_L B)).comp
     (((Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).toMonoidHom).comp
-      ((hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv.toMonoidHom.comp
+      ((hyp.isComplement'_subgroupOf hB).QuotientMulEquiv.toMonoidHom.comp
         (QuotientGroup.mk' _)))
 
 /-- **`f_B` has kernel `H(B)`.**  Confirms the Peterfalvi (2.9) description of `f_B` as "the
 natural homomorphism `M(B) → L` with kernel `H(B)`": everything after the quotient map
 `mk' : M(B) → M(B)/H(B)` is injective (an isomorphism followed by the inclusion
 `N_L(B) ≤ L`), so `ker f_B = ker mk' = H(B)` (as a subgroup of `M(B)`). -/
-theorem ker_dadeQuotientHom (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+theorem ker_dadeQuotientHom (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
-    (hyp.dadeQuotientHom hconj hB).ker
+    (hyp.dadeQuotientHom hB).ker
       = (hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB) := by
   haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
-    hyp.hIntersection_subgroupOf_normal hconj hB
+    hyp.hIntersection_subgroupOf_normal hB
   -- the post-`mk'` part of `f_B`
   set post :=
       (Subgroup.inclusion (hyp.nLStabilizerIn_le_L B)).comp
         (((Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).toMonoidHom).comp
-          (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv.toMonoidHom) with hpost
+          (hyp.isComplement'_subgroupOf hB).QuotientMulEquiv.toMonoidHom) with hpost
   have hinj : Function.Injective post := by
     rw [hpost]
     refine (Set.inclusion_injective (hyp.nLStabilizerIn_le_L B)).comp ?_
     exact (Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).injective.comp
-      (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv.injective
-  have hfB : hyp.dadeQuotientHom hconj hB = post.comp (QuotientGroup.mk' _) := rfl
+      (hyp.isComplement'_subgroupOf hB).QuotientMulEquiv.injective
+  have hfB : hyp.dadeQuotientHom hB = post.comp (QuotientGroup.mk' _) := rfl
   rw [hfB]
   ext x
   simp only [MonoidHom.mem_ker, MonoidHom.comp_apply]
@@ -1104,10 +1098,10 @@ theorem ker_dadeQuotientHom (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant
 
 /-- **Peterfalvi (2.9), `α_B`.**  For `α ∈ CF(L)` and a nonempty `B ⊆ A`, the class function
 `α_B = α ∘ f_B` on `M(B)`. -/
-noncomputable def alphaB (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+noncomputable def alphaB (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ) :
     ClassFunction (mBSubgroup hyp B hB) ℂ :=
-  ClassFunction.compHom (hyp.dadeQuotientHom hconj hB) α
+  ClassFunction.compHom (hyp.dadeQuotientHom hB) α
 
 /-- **Peterfalvi (2.9), virtual-character preservation.**  If `α` is a virtual character of
 `L`, then `α_B` is a virtual character of `M(B)`.
@@ -1115,12 +1109,12 @@ noncomputable def alphaB (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
 Since `α_B = α ∘ f_B` is the pullback of `α` along the group hom `f_B : M(B) →* L`, this is
 the general `ClassFunction.compHom_mem_ZIrr` (pullback preserves `ℤ[Irr]`), which holds
 because the character of *any* finite-dimensional representation lies in `ℤ[Irr]`. -/
-theorem alphaB_mem_ZIrr (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+theorem alphaB_mem_ZIrr (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {α : ClassFunction L ℂ}
     (hα : α ∈ ZIrr L) :
-    alphaB hyp hconj hB α ∈ ZIrr (mBSubgroup hyp B hB) := by
+    alphaB hyp hB α ∈ ZIrr (mBSubgroup hyp B hB) := by
   haveI : Finite (mBSubgroup hyp B hB) := Subtype.finite
-  exact ClassFunction.compHom_mem_ZIrr (hyp.dadeQuotientHom hconj hB) hα
+  exact ClassFunction.compHom_mem_ZIrr (hyp.dadeQuotientHom hB) hα
 
 /-- `IsComplement'.QuotientMulEquiv` is a retraction onto the complement: on the class of a
 complement element `x : H`, it returns `x` (`QuotientMulEquiv.symm x = mk' ↑x`). -/
@@ -1134,18 +1128,18 @@ theorem _root_.Subgroup.IsComplement'.QuotientMulEquiv_mk'_coe {G' : Type*} [Gro
 `f_B(m) = m` (in `L`).  Together with `ker f_B = H(B)` this pins down `f_B` on the
 semidirect factors. -/
 theorem dadeQuotientHom_coe_of_mem_nLStabilizerIn (hyp : Hypothesis G A L)
-    (hconj : hyp.HConjInvariant) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
+    {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
     (m : mBSubgroup hyp B hB) (hm : (m : G) ∈ nLStabilizerIn hyp B) :
-    ((hyp.dadeQuotientHom hconj hB m : L) : G) = (m : G) := by
+    ((hyp.dadeQuotientHom hB m : L) : G) = (m : G) := by
   haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
-    hyp.hIntersection_subgroupOf_normal hconj hB
+    hyp.hIntersection_subgroupOf_normal hB
   set κ : (nLStabilizerIn hyp B).subgroupOf (mBSubgroup hyp B hB) :=
     ⟨m, (Subgroup.mem_subgroupOf).mpr hm⟩ with hκ
-  have hmk : (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv
+  have hmk : (hyp.isComplement'_subgroupOf hB).QuotientMulEquiv
       (QuotientGroup.mk' _ m) = κ := by
     rw [show (m : mBSubgroup hyp B hB) = ((κ : (nLStabilizerIn hyp B).subgroupOf _) :
         mBSubgroup hyp B hB) from rfl]
-    exact (hyp.isComplement'_subgroupOf hconj hB).QuotientMulEquiv_mk'_coe κ
+    exact (hyp.isComplement'_subgroupOf hB).QuotientMulEquiv_mk'_coe κ
   simp only [dadeQuotientHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, hmk,
     Subgroup.coe_inclusion]
   rfl
@@ -1153,24 +1147,24 @@ theorem dadeQuotientHom_coe_of_mem_nLStabilizerIn (hyp : Hypothesis G A L)
 /-- **Peterfalvi (2.9), defining equation.**  For `h ∈ H(B)`, `b ∈ N_L(B)`, the class
 function `α_B = α ∘ f_B` satisfies `α_B(h·b) = α(b)`.  Indeed `f_B(h·b) = f_B(h)·f_B(b) =
 1·b = b`, since `H(B) = ker f_B` and `f_B` retracts `N_L(B)`. -/
-theorem alphaB_apply_mul (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+theorem alphaB_apply_mul (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ)
     {h b : G} (hh : h ∈ hIntersection hyp B hB) (hb : b ∈ nLStabilizerIn hyp B)
     (hmem : h * b ∈ mBSubgroup hyp B hB) :
-    alphaB hyp hconj hB α ⟨h * b, hmem⟩
+    alphaB hyp hB α ⟨h * b, hmem⟩
       = α ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := by
   have hhM : h ∈ mBSubgroup hyp B hB := hyp.hIntersection_le_mBSubgroup hB hh
   have hbM : b ∈ mBSubgroup hyp B hB := hyp.nLStabilizerIn_le_mBSubgroup hB hb
   have hsplit : (⟨h * b, hmem⟩ : mBSubgroup hyp B hB)
       = (⟨h, hhM⟩ : mBSubgroup hyp B hB) * ⟨b, hbM⟩ := rfl
-  have hfh : hyp.dadeQuotientHom hconj hB ⟨h, hhM⟩ = 1 := by
-    rw [← MonoidHom.mem_ker, hyp.ker_dadeQuotientHom hconj hB, Subgroup.mem_subgroupOf]
+  have hfh : hyp.dadeQuotientHom hB ⟨h, hhM⟩ = 1 := by
+    rw [← MonoidHom.mem_ker, hyp.ker_dadeQuotientHom hB, Subgroup.mem_subgroupOf]
     exact hh
-  have hval : hyp.dadeQuotientHom hconj hB ⟨b, hbM⟩
+  have hval : hyp.dadeQuotientHom hB ⟨b, hbM⟩
       = ⟨b, nLStabilizerIn_le_L hyp B hb⟩ := by
     apply Subtype.ext
-    exact hyp.dadeQuotientHom_coe_of_mem_nLStabilizerIn hconj hB ⟨b, hbM⟩ hb
-  change α (hyp.dadeQuotientHom hconj hB ⟨h * b, hmem⟩) = _
+    exact hyp.dadeQuotientHom_coe_of_mem_nLStabilizerIn hB ⟨b, hbM⟩ hb
+  change α (hyp.dadeQuotientHom hB ⟨h * b, hmem⟩) = _
   rw [hsplit, map_mul, hfh, one_mul, hval]
 
 /- 2.10.1: `L`-conjugacy invariance of `Ind_{M(B)}^G α_B` (Dade-specific form). -/
@@ -1221,7 +1215,7 @@ theorem conjFinset_card (hyp : Hypothesis G A L) (l : L) (B : Finset {a : G // a
 /-- **Peterfalvi (2.10.1), `H(B^x) = H(B)^x`.**  Conjugation by `l ∈ L` carries `H(B)` to
 `H(B^l)`: `H(B^l) = l · H(B) · l⁻¹`.  Uses `(2.4.a)` (`mem_H_conjA_iff`): an element lies in
 `H(l·a·l⁻¹)` iff its `l`-untwist lies in `H(a)`. -/
-theorem hIntersection_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+theorem hIntersection_conjFinset (hyp : Hypothesis G A L)
     (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     hIntersection hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB)
       = MulAut.conj (l : G) • hIntersection hyp B hB := by
@@ -1231,13 +1225,13 @@ theorem hIntersection_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInva
   constructor
   · intro hx a ha
     have hmem : x ∈ hyp.H (hyp.conjA l a) := hx _ ((hyp.mem_conjFinset).mpr ⟨a, ha, rfl⟩)
-    rw [mem_H_conjA_iff hyp hconj] at hmem
+    rw [mem_H_conjA_iff hyp] at hmem
     rwa [show ((MulAut.conj (l : G))⁻¹ • x) = (l : G)⁻¹ * x * (l : G) from by
       rw [show ((MulAut.conj (l : G))⁻¹ • x) = (MulAut.conj (l : G))⁻¹ x from rfl,
         MulAut.conj_inv_apply]]
   · intro hx a ha
     obtain ⟨b, hb, rfl⟩ := (hyp.mem_conjFinset).mp ha
-    rw [mem_H_conjA_iff hyp hconj]
+    rw [mem_H_conjA_iff hyp]
     have := hx b hb
     rwa [show ((MulAut.conj (l : G))⁻¹ • x) = (l : G)⁻¹ * x * (l : G) from by
       rw [show ((MulAut.conj (l : G))⁻¹ • x) = (MulAut.conj (l : G))⁻¹ x from rfl,
@@ -1301,21 +1295,21 @@ theorem nLStabilizerIn_conjFinset (hyp : Hypothesis G A L) (l : L)
 /-- **Peterfalvi (2.10.1), `M(B^x) = M(B)^x`.**  Conjugation by `l ∈ L` carries `M(B)` to
 `M(B^l)`: `M(B^l) = l · M(B) · l⁻¹`.  Since `M(B) = H(B) ⊔ N_L(B)` and conjugation is a
 lattice homomorphism (`smul_sup`), this follows from the conjugation of the two factors. -/
-theorem mBSubgroup_conjFinset (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+theorem mBSubgroup_conjFinset (hyp : Hypothesis G A L)
     (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB)
       = MulAut.conj (l : G) • mBSubgroup hyp B hB := by
-  rw [mBSubgroup, mBSubgroup, hyp.hIntersection_conjFinset hconj l hB,
+  rw [mBSubgroup, mBSubgroup, hyp.hIntersection_conjFinset l hB,
     hyp.nLStabilizerIn_conjFinset l, Subgroup.smul_sup]
 
 /-- `M(B) = H(B)^x ⊔ N_L(B)^x`-conjugation packaged as `Subgroup.map`: `M(B^l) = M(B).map (conj l)`.
 This is the form consumed by the generic `induce_map_conj` (which produces a `.map (conj ℓ)`
 subgroup). -/
-theorem mBSubgroup_conjFinset_eq_map (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+theorem mBSubgroup_conjFinset_eq_map (hyp : Hypothesis G A L)
     (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB)
       = (mBSubgroup hyp B hB).map (MulAut.conj (l : G) : G →* G) := by
-  rw [hyp.mBSubgroup_conjFinset hconj l hB, Subgroup.pointwise_smul_def]; rfl
+  rw [hyp.mBSubgroup_conjFinset l hB, Subgroup.pointwise_smul_def]; rfl
 
 /-- A congruence principle for `induce` along a subgroup equality: if `H₁ = H₂` and the two class
 functions take equal values on the common carrier, the induced class functions agree. -/
@@ -1335,12 +1329,12 @@ Both values are computed via the (2.9) defining equation `alphaB_apply_mul`: wri
 with `m = h·b ∈ M(B)` (`h ∈ H(B)`, `b ∈ N_L(B)`), the left side is `α((lbl⁻¹))` (since
 `y = (lhl⁻¹)(lbl⁻¹)` with `lhl⁻¹ ∈ H(B^l)`, `lbl⁻¹ ∈ N_L(B^l)`) and the right side is `α(b)`;
 they agree because `α` is an `L`-class function and `l, b ∈ L`. -/
-theorem alphaB_conjFinset_eq_transportConj (hyp : Hypothesis G A L) (hconj : hyp.HConjInvariant)
+theorem alphaB_conjFinset_eq_transportConj (hyp : Hypothesis G A L)
     (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) (α : ClassFunction L ℂ)
     (y : G) (hy₁ : y ∈ mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB))
     (hy₂ : y ∈ (mBSubgroup hyp B hB).map (MulAut.conj (l : G) : G →* G)) :
-    alphaB hyp hconj (hyp.conjFinset_nonempty hB) α ⟨y, hy₁⟩
-      = ClassFunction.transportConj (l : G) (alphaB hyp hconj hB α) ⟨y, hy₂⟩ := by
+    alphaB hyp (hyp.conjFinset_nonempty hB) α ⟨y, hy₁⟩
+      = ClassFunction.transportConj (l : G) (alphaB hyp hB α) ⟨y, hy₂⟩ := by
   classical
   -- `m := l⁻¹ y l ∈ M(B)`, so `y = l m l⁻¹`; decompose `m = h * b`, `h ∈ H(B)`, `b ∈ N_L(B)`.
   have hmM : (l : G)⁻¹ * y * (l : G) ∈ mBSubgroup hyp B hB := by
@@ -1348,7 +1342,7 @@ theorem alphaB_conjFinset_eq_transportConj (hyp : Hypothesis G A L) (hconj : hyp
     rwa [MulAut.conj_symm_apply] at this
   have hmem_prod : (l : G)⁻¹ * y * (l : G)
       ∈ (↑(hIntersection hyp B hB) * ↑(nLStabilizerIn hyp B) : Set G) := by
-    rw [← hyp.coe_mBSubgroup hconj hB]; exact hmM
+    rw [← hyp.coe_mBSubgroup hB]; exact hmM
   obtain ⟨h, hh, b, hb, hhb⟩ := hmem_prod
   -- `hhb : h * b = l⁻¹ * y * l`; hence `y = (l h l⁻¹)(l b l⁻¹)`.
   have hyhb : y = ((l : G) * h * (l : G)⁻¹) * ((l : G) * b * (l : G)⁻¹) := by
@@ -1359,7 +1353,7 @@ theorem alphaB_conjFinset_eq_transportConj (hyp : Hypothesis G A L) (hconj : hyp
   have hbM : b ∈ mBSubgroup hyp B hB := hyp.nLStabilizerIn_le_mBSubgroup hB hb
   have hhbM : h * b ∈ mBSubgroup hyp B hB := (mBSubgroup hyp B hB).mul_mem hhM hbM
   -- Right side: `transportConj l α_B ⟨y,_⟩ = α_B ⟨l⁻¹ y l,_⟩ = α(b)`.
-  have hRHS : ClassFunction.transportConj (l : G) (alphaB hyp hconj hB α) ⟨y, hy₂⟩
+  have hRHS : ClassFunction.transportConj (l : G) (alphaB hyp hB α) ⟨y, hy₂⟩
       = α ⟨b, hbL⟩ := by
     rw [ClassFunction.transportConj_apply]
     have harg : ((MulEquiv.subgroupMap (MulAut.conj (l : G)) (mBSubgroup hyp B hB)).symm
@@ -1368,11 +1362,11 @@ theorem alphaB_conjFinset_eq_transportConj (hyp : Hypothesis G A L) (hconj : hyp
       simp only [MulEquiv.subgroupMap_symm_apply, MulAut.conj_symm_apply]
       exact hhb.symm
     rw [harg]
-    exact hyp.alphaB_apply_mul hconj hB α hh hb hhbM
+    exact hyp.alphaB_apply_mul hB α hh hb hhbM
   -- Left side: `lhl⁻¹ ∈ H(B^l)`, `lbl⁻¹ ∈ N_L(B^l)`, so `α_{B^l} ⟨y,_⟩ = α(lbl⁻¹)`.
   have hh'mem : (l : G) * h * (l : G)⁻¹
       ∈ hIntersection hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB) := by
-    rw [hyp.hIntersection_conjFinset hconj l hB,
+    rw [hyp.hIntersection_conjFinset l hB,
       show (l : G) * h * (l : G)⁻¹ = (MulAut.conj (l : G)) h from (MulAut.conj_apply _ _).symm]
     exact Subgroup.smul_mem_pointwise_smul h (MulAut.conj (l : G)) (hIntersection hyp B hB) hh
   have hb'mem : (l : G) * b * (l : G)⁻¹ ∈ nLStabilizerIn hyp (hyp.conjFinset l B) := by
@@ -1380,13 +1374,13 @@ theorem alphaB_conjFinset_eq_transportConj (hyp : Hypothesis G A L) (hconj : hyp
       show (l : G) * b * (l : G)⁻¹ = (MulAut.conj (l : G)) b from (MulAut.conj_apply _ _).symm]
     exact Subgroup.smul_mem_pointwise_smul b (MulAut.conj (l : G)) (nLStabilizerIn hyp B) hb
   have hb'L : (l : G) * b * (l : G)⁻¹ ∈ L := nLStabilizerIn_le_L hyp (hyp.conjFinset l B) hb'mem
-  have hLHS : alphaB hyp hconj (hyp.conjFinset_nonempty hB) α ⟨y, hy₁⟩
+  have hLHS : alphaB hyp (hyp.conjFinset_nonempty hB) α ⟨y, hy₁⟩
       = α ⟨(l : G) * b * (l : G)⁻¹, hb'L⟩ := by
     have hyeq : (⟨y, hy₁⟩ : mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB))
         = ⟨((l : G) * h * (l : G)⁻¹) * ((l : G) * b * (l : G)⁻¹), by rw [← hyhb]; exact hy₁⟩ :=
       Subtype.ext hyhb
     rw [hyeq]
-    exact hyp.alphaB_apply_mul hconj (hyp.conjFinset_nonempty hB) α hh'mem hb'mem
+    exact hyp.alphaB_apply_mul (hyp.conjFinset_nonempty hB) α hh'mem hb'mem
       (by rw [← hyhb]; exact hy₁)
   -- Bridge: `α(lbl⁻¹) = α(b)` by `L`-class invariance (conjugator `l⁻¹`).
   rw [hLHS, hRHS]

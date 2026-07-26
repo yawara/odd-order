@@ -77,16 +77,15 @@ theorem certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV
     (hdeg : (∑ i, ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
       = (∑ i, ((h46.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
     {A : Set G} (dade : OddOrder.Peterfalvi.S04.Hypothesis G A L)
-    (hconj : dade.HConjInvariant)
     (χ : IrreducibleCharacter ↥L)
     (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
     (hdiffsuppχ : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     (htauvanish : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V,
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dade (dade.fullDadeIsometryData hconj)
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dade (dade.fullDadeIsometryData)
         ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj) v = 0) :
     ∀ α ∈ (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ hdeg).imageSet,
-    ∀ β ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff dade hconj χ
+    ∀ β ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff dade χ
         hrealχ hdiffsuppχ).imageSet,
       ClassFunction.inner α β = 0 := by
   classical
@@ -116,13 +115,13 @@ theorem certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV
   obtain ⟨cd, hcd⟩ :
       ∃ cd : OddOrder.Peterfalvi.S07.CharacterDifferenceImage (G := G)
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dade
-          (dade.fullDadeIsometryData hconj)) (χ : ClassFunction ↥L ℂ),
-        OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff dade hconj χ
+          (dade.fullDadeIsometryData)) (χ : ClassFunction ↥L ℂ),
+        OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff dade χ
             hrealχ hdiffsuppχ
           = cd.toOrthonormalImage := ⟨_, rfl⟩
   -- `R(χ).image_eq` rewritten in `ε·μ − ε·ν` form, equal to `(χ − χ̄)^τ`, hence vanishing on `V`.
   have hcdimg : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dade
-      (dade.fullDadeIsometryData hconj)
+      (dade.fullDadeIsometryData)
       ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj)
       = (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction := by
     rw [cd.image_eq, smul_sub, Int.cast_smul_eq_zsmul, Int.cast_smul_eq_zsmul]
@@ -199,21 +198,20 @@ theorem dadeOfDiff_imageSet_orthogonal_certainTypeR_of_vanishOnV
     (hdeg : (∑ i, ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
       = (∑ i, ((h46.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
     {A : Set G} (dade : OddOrder.Peterfalvi.S04.Hypothesis G A L)
-    (hconj : dade.HConjInvariant)
     (χ : IrreducibleCharacter ↥L)
     (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
     (hdiffsuppχ : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     (htauvanish : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V,
-      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dade (dade.fullDadeIsometryData hconj)
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dade (dade.fullDadeIsometryData)
         ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj) v = 0) :
-    ∀ α ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff dade hconj χ
+    ∀ α ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff dade χ
         hrealχ hdiffsuppχ).imageSet,
     ∀ β ∈ (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ hdeg).imageSet,
       ClassFunction.inner α β = 0 := by
   intro α hα β hβ
   rw [OddOrder.RepresentationTheory.inner_conj_symm,
-    certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV h46 hχ₂ hdeg dade hconj χ hrealχ
+    certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV h46 hχ₂ hdeg dade χ hrealχ
       hdiffsuppχ htauvanish β hβ α hα, star_zero]
 
 end

@@ -210,8 +210,8 @@ noncomputable def sOf_memberRFamily [Finite G] {M : Subgroup G} {A : Set G}
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -230,15 +230,15 @@ noncomputable def sOf_memberRFamily [Finite G] {M : Subgroup G} {A : Set G}
     have hdiffsupp := OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support hKsupp hηIKF0
     exact
       { imageSet := (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-          h46.dade0 hconj ⟨η, hirr⟩ hreal hdiffsupp).imageSet
+          h46.dade0 ⟨η, hirr⟩ hreal hdiffsupp).imageSet
         mem_ZIrr := (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-          h46.dade0 hconj ⟨η, hirr⟩ hreal hdiffsupp).mem_ZIrr
+          h46.dade0 ⟨η, hirr⟩ hreal hdiffsupp).mem_ZIrr
         orthonormal := (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-          h46.dade0 hconj ⟨η, hirr⟩ hreal hdiffsupp).orthonormal
+          h46.dade0 ⟨η, hirr⟩ hreal hdiffsupp).orthonormal
         image_eq := by
           rw [htau]
           exact (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-            h46.dade0 hconj ⟨η, hirr⟩ hreal hdiffsupp).image_eq }
+            h46.dade0 ⟨η, hirr⟩ hreal hdiffsupp).image_eq }
   · -- reducible member: (9.9.b) gives the column `χ₂ ≠ 1`, and `certainTypeR` its `2q`-family
     exact columnRFamily h46 (sOf_columnSum_of_not_irreducible data h46 hKeq hη hirr).choose_spec.1
       (sOf_columnSum_of_not_irreducible data h46 hKeq hη hirr).choose_spec.2
@@ -253,8 +253,8 @@ theorem sOf_memberRFamily_imageSet_of_irr [Finite G] {M : Subgroup G} {A : Set G
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -264,9 +264,9 @@ theorem sOf_memberRFamily_imageSet_of_irr [Finite G] {M : Subgroup G} {A : Set G
       (hs : ((η : ClassFunction ↥M ℂ).conj - (η : ClassFunction ↥M ℂ)).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup
           (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M),
-      (sOf_memberRFamily hG hM data h46 hKeq hconj htau hKsupp hη).imageSet =
+      (sOf_memberRFamily hG hM data h46 hKeq htau hKsupp hη).imageSet =
         (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-          h46.dade0 hconj ⟨η, hirr⟩ hr hs).imageSet := by
+          h46.dade0 ⟨η, hirr⟩ hr hs).imageSet := by
   classical
   haveI := derivedInG_subgroupOf_normal M
   have hηIKF0 := sOf_subset_inducedKernelFamily_bot hG hM data Y hη
@@ -286,8 +286,8 @@ theorem sOf_memberRFamily_imageSet_of_col [Finite G] {M : Subgroup G} {A : Set G
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -295,7 +295,7 @@ theorem sOf_memberRFamily_imageSet_of_col [Finite G] {M : Subgroup G} {A : Set G
     (hcol : ¬ IsIrreducibleCharacter η) :
     ∃ (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (hχ₂ : χ₂ ≠ 1),
       η = OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∧
-      (sOf_memberRFamily hG hM data h46 hKeq hconj htau hKsupp hη).imageSet =
+      (sOf_memberRFamily hG hM data h46 hKeq htau hKsupp hη).imageSet =
         (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂
           (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).imageSet := by
   classical
@@ -362,8 +362,8 @@ theorem sOf_memberRFamily_orthogonal [Finite G] {M : Subgroup G} {A : Set G}
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -371,8 +371,8 @@ theorem sOf_memberRFamily_orthogonal [Finite G] {M : Subgroup G} {A : Set G}
     {Y : Subgroup G} {φ ξ : ClassFunction ↥M ℂ}
     (hφ : φ ∈ sOf data Y) (hξ : ξ ∈ sOf data Y)
     (h1 : ClassFunction.inner φ ξ = 0) (h2 : ClassFunction.inner φ ξ.conj = 0) :
-    (sOf_memberRFamily hG hM data h46 hKeq hconj htau hKsupp hφ).Orthogonal
-      (sOf_memberRFamily hG hM data h46 hKeq hconj htau hKsupp hξ) := by
+    (sOf_memberRFamily hG hM data h46 hKeq htau hKsupp hφ).Orthogonal
+      (sOf_memberRFamily hG hM data h46 hKeq htau hKsupp hξ) := by
   classical
   haveI := derivedInG_subgroupOf_normal M
   -- member differences are `M'`-supported (the `A₁` of the anchor), on top of being `A₀`-supported
@@ -399,9 +399,9 @@ theorem sOf_memberRFamily_orthogonal [Finite G] {M : Subgroup G} {A : Set G}
   by_cases hφirr : IsIrreducibleCharacter φ <;> by_cases hξirr : IsIrreducibleCharacter ξ
   · -- irr × irr
     obtain ⟨hrφ, hsφ, hφeq⟩ :=
-      sOf_memberRFamily_imageSet_of_irr hG hM data h46 hKeq hconj htau hKsupp hφ hφirr
+      sOf_memberRFamily_imageSet_of_irr hG hM data h46 hKeq htau hKsupp hφ hφirr
     obtain ⟨hrξ, hsξ, hξeq⟩ :=
-      sOf_memberRFamily_imageSet_of_irr hG hM data h46 hKeq hconj htau hKsupp hξ hξirr
+      sOf_memberRFamily_imageSet_of_irr hG hM data h46 hKeq htau hKsupp hξ hξirr
     rw [hφeq] at hα
     rw [hξeq] at hβ
     have hbarχ : ClassFunction.inner φ.conj ξ = 0 := by
@@ -409,34 +409,34 @@ theorem sOf_memberRFamily_orthogonal [Finite G] {M : Subgroup G} {A : Set G}
     have hbarχbar : ClassFunction.inner φ.conj ξ.conj = 0 := by
       rw [inner_conj_conj, h1, star_zero]
     exact OddOrder.Peterfalvi.S08.dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal
-      h46.dade0 hconj (x := ⟨φ, hφirr⟩) (χ := ⟨ξ, hξirr⟩) hrφ hsφ hrξ hsξ h1 h2 hbarχ hbarχbar
+      h46.dade0 (x := ⟨φ, hφirr⟩) (χ := ⟨ξ, hξirr⟩) hrφ hsφ hrξ hsξ h1 h2 hbarχ hbarχbar
       α hα β hβ
   · -- irr × column
     obtain ⟨hrφ, hsφ, hφeq⟩ :=
-      sOf_memberRFamily_imageSet_of_irr hG hM data h46 hKeq hconj htau hKsupp hφ hφirr
+      sOf_memberRFamily_imageSet_of_irr hG hM data h46 hKeq htau hKsupp hφ hφirr
     obtain ⟨χ₂, hχ₂, -, hξeq⟩ :=
-      sOf_memberRFamily_imageSet_of_col hG hM data h46 hKeq hconj htau hKsupp hξ hξirr
+      sOf_memberRFamily_imageSet_of_col hG hM data h46 hKeq htau hKsupp hξ hξirr
     rw [hφeq] at hα
     rw [hξeq] at hβ
     rw [inner_conj_symm β α]
     rw [OddOrder.Peterfalvi.S08.certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV
       h46 hχ₂ (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
-      h46.dade0 hconj ⟨φ, hφirr⟩ hrφ hsφ (hanchor hφ) β hβ α hα, star_zero]
+      h46.dade0 ⟨φ, hφirr⟩ hrφ hsφ (hanchor hφ) β hβ α hα, star_zero]
   · -- column × irr
     obtain ⟨χ₂, hχ₂, -, hφeq⟩ :=
-      sOf_memberRFamily_imageSet_of_col hG hM data h46 hKeq hconj htau hKsupp hφ hφirr
+      sOf_memberRFamily_imageSet_of_col hG hM data h46 hKeq htau hKsupp hφ hφirr
     obtain ⟨hrξ, hsξ, hξeq⟩ :=
-      sOf_memberRFamily_imageSet_of_irr hG hM data h46 hKeq hconj htau hKsupp hξ hξirr
+      sOf_memberRFamily_imageSet_of_irr hG hM data h46 hKeq htau hKsupp hξ hξirr
     rw [hφeq] at hα
     rw [hξeq] at hβ
     exact OddOrder.Peterfalvi.S08.certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV
       h46 hχ₂ (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
-      h46.dade0 hconj ⟨ξ, hξirr⟩ hrξ hsξ (hanchor hξ) α hα β hβ
+      h46.dade0 ⟨ξ, hξirr⟩ hrξ hsξ (hanchor hξ) α hα β hβ
   · -- column × column
     obtain ⟨χ₂, hχ₂, hφcol, hφeq⟩ :=
-      sOf_memberRFamily_imageSet_of_col hG hM data h46 hKeq hconj htau hKsupp hφ hφirr
+      sOf_memberRFamily_imageSet_of_col hG hM data h46 hKeq htau hKsupp hφ hφirr
     obtain ⟨χ₂', hχ₂', hξcol, hξeq⟩ :=
-      sOf_memberRFamily_imageSet_of_col hG hM data h46 hKeq hconj htau hKsupp hξ hξirr
+      sOf_memberRFamily_imageSet_of_col hG hM data h46 hKeq htau hKsupp hξ hξirr
     rw [hφeq] at hα
     rw [hξeq] at hβ
     -- `χ₂ ≠ χ₂'`: else `φ = ξ` and `⟨φ, φ⟩ = w₁ ≠ 0` contradicts `h1`
@@ -496,8 +496,8 @@ theorem sOf_caseB_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hM : M ∈ maximalSubgroups G)
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -528,14 +528,14 @@ theorem sOf_caseB_coherent [Finite G] {M : Subgroup G} {A : Set G}
   have hnr : ∀ a ∈ sOf data Y, a ≠ (a : ClassFunction ↥M ℂ).conj := fun a ha h =>
     OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hModd _ (hIKF ha) h.symm
   refine OddOrder.Peterfalvi.S07.uniform_degree_coherence_of_families (sOf_finite data Y) hη₁
-    (fun η hη => sOf_memberRFamily hG hM data h46 hKeq hconj htau hKsupp hη)
+    (fun η hη => sOf_memberRFamily hG hM data h46 hKeq htau hKsupp hη)
     (fun a ha b hb hab =>
       OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal (hIKF ha) (hIKF hb) hab)
     (sOf_closedUnderConjugate data Y) hnr
     (sOf_member_inner_self_natCast data h46 hKeq hη₁)
     (fun {φ ψ} hφ hψ => ?_) (fun a ha b hb => ?_) hsuppdiff
     (fun {φ ξ} hφ hξ h1 h2 =>
-      sOf_memberRFamily_orthogonal hG hM data h46 hKeq hconj htau hKsupp hVsub hφ hξ h1 h2)
+      sOf_memberRFamily_orthogonal hG hM data h46 hKeq htau hKsupp hVsub hφ hξ h1 h2)
     (fun a ha => (hunif a ha).trans (hunif _ hη₁).symm)
     (by rw [hunif _ hη₁]; exact Nat.cast_ne_zero.mpr hd0)
     (fun h => absurd (OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp h) (fun hmem =>
@@ -543,12 +543,12 @@ theorem sOf_caseB_coherent [Finite G] {M : Subgroup G} {A : Set G}
     (sOf_closedUnderConjugate data Y hη₁) (Ne.symm (hnr _ hη₁))
   · -- `hiso`: the Dade lift is an isometry on `A₀`-supported functions
     rw [htau]
-    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported h46.dade0 hconj
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported h46.dade0
       (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hφ)
       (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hψ)
   · -- `hZdiff`: supported differences of virtual characters have virtual images
     rw [htau]
-    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported h46.dade0 hconj
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported h46.dade0
       (hsuppdiff a ha b hb)
       (Submodule.sub_mem _ (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hIKF ha))
         (OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr (hIKF hb)))
@@ -571,8 +571,8 @@ theorem caseB_coherent_sOf_cprime [Finite G] {M : Subgroup G} {A : Set G}
     (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars)
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -583,7 +583,7 @@ theorem caseB_coherent_sOf_cprime [Finite G] {M : Subgroup G} {A : Set G}
       (sOf data (chief.H0 ⊔ chars.Cprime))
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) :=
-  sOf_caseB_coherent hG hM data h46 hKeq hconj htau hKsupp hVsub (data.q * chars.u)
+  sOf_caseB_coherent hG hM data h46 hKeq htau hKsupp hVsub (data.q * chars.u)
     (caseB_degree_qu hG chars caseB)
     (mul_ne_zero Nat.card_pos.ne' (u_odd hG chars).pos.ne') hη₁
 
@@ -723,8 +723,8 @@ theorem sOf_coherent_extension_eq_sum_memberRFamily [Finite G] {M : Subgroup G} 
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -734,7 +734,7 @@ theorem sOf_coherent_extension_eq_sum_memberRFamily [Finite G] {M : Subgroup G} 
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M))
     {ψ : ClassFunction ↥M ℂ} (hψT : ψ ∈ T) (hψcT : ψ.conj ∈ T) :
-    ∃ E ⊆ (sOf_memberRFamily hG hM data h46 hKeq hconj htau hKsupp (hTsub hψT)).imageSet,
+    ∃ E ⊆ (sOf_memberRFamily hG hM data h46 hKeq htau hKsupp (hTsub hψT)).imageSet,
       c'.extension ψ = ∑ α ∈ E, α := by
   classical
   haveI := derivedInG_subgroupOf_normal M
@@ -766,7 +766,7 @@ theorem sOf_coherent_extension_eq_sum_memberRFamily [Finite G] {M : Subgroup G} 
   obtain ⟨-, hτ1ψ, E, hEsub, hXsum, -⟩ :=
     OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.eq_sum_of_psi_eq_zero
       (OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
-        (sOf_memberRFamily hG hM data h46 hKeq hconj htau hKsupp hψsOf) c'.extension
+        (sOf_memberRFamily hG hM data h46 hKeq htau hKsupp hψsOf) c'.extension
         (fun φ ζ hφ hζ => c'.extension_inner_eq φ ζ (hle hφ) (hle hζ))
         (c'.extends_on_supported (ψ - ψ.conj)
           ⟨Submodule.sub_mem _ (Submodule.subset_span hψT) (Submodule.subset_span hψcT),
@@ -790,8 +790,8 @@ theorem sOf_coherent_extension_cross_orthogonal [Finite G] {M : Subgroup G} {A :
     (data : TypesIIIIIIVSetup M) (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
     [NeZero (Nat.card h46.W1)]
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    (hKeq : h46.K = huSub data) (hconj : h46.dade0.HConjInvariant)
-    (htau : h46.tau = h46.dade0.fullDadeIsometryData hconj)
+    (hKeq : h46.K = huSub data)
+    (htau : h46.tau = h46.dade0.fullDadeIsometryData)
     (hKsupp : ∀ x : ↥M, x ∈ (derivedInG M).subgroupOf M → x ≠ 1 →
       x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)
@@ -822,10 +822,10 @@ theorem sOf_coherent_extension_cross_orthogonal [Finite G] {M : Subgroup G} {A :
       (sOf_subset_inducedKernelFamily_bot hG hM data Y (hT₁sub hψT))
       (sOf_subset_inducedKernelFamily_bot hG hM data Y (hT₂sub hlamcT)) hne2
   obtain ⟨E₁, hE₁sub, hE₁⟩ := sOf_coherent_extension_eq_sum_memberRFamily hG hM data h46
-    hKeq hconj htau hKsupp hT₁sub c₁ hψT hψcT
+    hKeq htau hKsupp hT₁sub c₁ hψT hψcT
   obtain ⟨E₂, hE₂sub, hE₂⟩ := sOf_coherent_extension_eq_sum_memberRFamily hG hM data h46
-    hKeq hconj htau hKsupp hT₂sub c₂ hlamT hlamcT
-  have horth := sOf_memberRFamily_orthogonal hG hM data h46 hKeq hconj htau hKsupp hVsub
+    hKeq htau hKsupp hT₂sub c₂ hlamT hlamcT
+  have horth := sOf_memberRFamily_orthogonal hG hM data h46 hKeq htau hKsupp hVsub
     (hT₁sub hψT) (hT₂sub hlamT) h1 h2
   rw [hE₁, hE₂, OddOrder.RepresentationTheory.inner_sum_left]
   refine Finset.sum_eq_zero fun α hα => ?_

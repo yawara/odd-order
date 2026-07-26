@@ -258,7 +258,7 @@ for a reducible column constituent `μ_j`, recast from `certainTypeDecomposition
 `χ`-component is `columnSum χ₂`) to the `Ind^L_H`-form `induce H (Res_H μ_{0j})` via the (4.5.a)
 transport `columnSum_eq_induce_H` (`h46.K = H`).  This puts the column decompositions in the same
 `Ind^L_H θ`-indexed shape as the irreducible constituents
-(`decompositionDaFromDadeOfDiff h46.dade0 h46.dade0.hconj`), so a single per-`φ` family
+(`decompositionDaFromDadeOfDiff h46.dade0`), so a single per-`φ` family
 (`{θ : Irr H // 0 < aθ}`) feeds `per_constituent_Y_eq_smul` against the one map
 `τ = dadeIntegralCharacterMap h46.dade0 h46.tau` (which ignores its isometry-data argument). -/
 noncomputable def columnConstituentDecomposition
@@ -301,7 +301,7 @@ fields and transferring the image equation along the `H^#`-agreement `hmapagree`
 (`(μ_j − μ̄_j)^{hyp.tau} = (μ_j − μ̄_j)^{τ_enl}`, valid since `μ_j − μ̄_j` is `H^#`-supported in
 case c2
 `K = H` and both maps coincide there).  This puts the column `R(μ_j)` and the irreducible Dade
-families `dadeOrthonormalCharacterImageFamilyOfDiff hyp.dade hyp.hconj` in the *same* map `hyp.tau`,
+families `dadeOrthonormalCharacterImageFamilyOfDiff hyp.dade` in the *same* map `hyp.tau`,
 the single `τ` of the per-`φ` family.  `hmapagree` is supplied at capstone wiring (as for
 `certainTypeSet_isCoherent_tau`). -/
 noncomputable def columnRFamilyTau
@@ -331,10 +331,10 @@ noncomputable def columnRFamilyTau
 a
 reducible column `μ_j = columnSum χ₂` against the Sibley–Dade map `hyp.tau`, built by `ofProjection`
 from the retargeted family `columnRFamilyTau` and `hyp.tau`'s `H^#`-inner-preservation
-(`dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj`). This is the column
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade`). This is the column
 branch
 of the per-`φ` family living in the *same* `τ = hyp.tau` as the irreducible constituents
-(`decompositionDaFromDadeOfDiff hyp.dade hyp.hconj`).  The column differences `μ_j − μ̄_j`,
+(`decompositionDaFromDadeOfDiff hyp.dade`).  The column differences `μ_j − μ̄_j`,
 `μ_j − a·η₁` are `H^#`-supported (`hSdiff`, case c2 `K = H`); `hmapagree` transfers the family's
 image
 equation; both are discharged at capstone wiring. -/
@@ -374,14 +374,14 @@ noncomputable def columnDecompositionTau
     (columnRFamilyTau hyp h46 hχ₂ hdeg hmapagree) hyp.tau
     (fun _φ _ζ hφ hζ =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-        hyp.dade hyp.hconj hSdiff hφ hζ)
+        hyp.dade hSdiff hφ hζ)
     rfl htau1_mema hχψ hχbarψ hχχbar
 
 /-- **(6.8.2.3) irreducible constituent decomposition for `hyp.tau`.**  The (5.4) decomposition data
 for an irreducible induced constituent `Ind^L_H θ` (non-column `θ`), via
 `decompositionDaFromDadeOfDiff`
 for the Sibley–Dade datum `hyp.dade` (which carries `hyp.hconj : HConjInvariant`).  Since
-`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)`, this lands
+`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData)`, this lands
 directly in `hyp.tau` — the *same* map as the column decompositions (`columnDecompositionTau`), so
 both branches feed one per-`φ` family.  The per-`θ` orthonormality/support/`ZIrr` hypotheses are
 discharged at the family (from the §5 X-member machinery, as in the case-A chain). -/
@@ -405,7 +405,7 @@ noncomputable def irreducibleDecompositionTau
       (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj = 0) :
     OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau
       (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) (a • η₁) :=
-  OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp.dade hyp.hconj
+  OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp.dade
     ⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ hreal hdiffsupp hdiffasupp htau1_mema
     hχaχ1 hχbaraχ1 hχχbar'
 

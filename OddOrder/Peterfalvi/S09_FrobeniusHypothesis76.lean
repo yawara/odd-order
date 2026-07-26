@@ -30,7 +30,7 @@ noncomputable def hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ)]
     Hypothesis76 G (OddOrder.Peterfalvi.S04.sharp (F.H i : Set G)) (F.L i) :=
   Cert.hypothesis76OfDade (F.hypothesis71 i)
     (OddOrder.Peterfalvi.S04.isDadeIsometry_of_isDadeMap (F.hypothesis71 i).hyp
-      (F.hypothesis71 i).τ (F.hypothesis71 i).isDadeMap (F.hypothesis71 i).hConjInvariant)
+      (F.hypothesis71 i).τ (F.hypothesis71 i).isDadeMap)
     (F.H i) (F.kernel_le i)
     (fun l _h hh => (F.mem_kernel_conj_iff_of_mem_L i l.2).mpr hh) rfl
 
