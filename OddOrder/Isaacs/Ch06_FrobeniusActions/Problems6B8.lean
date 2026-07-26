@@ -73,6 +73,20 @@ theorem index_commutator_quotient {P : Type*} [Group P] {Z : Subgroup P} [Z.Norm
   rw [hmap]
   exact Subgroup.index_map_eq _ hsurj (by rwa [QuotientGroup.ker_mk'])
 
+/-- **書籍 hint のステップ 3**: `Z ≤ Z(A)` かつ `A/Z` が巡回なら `A` は可換。
+
+`P/Z` の指数 `2` の巡回部分群の引き戻し `A` に適用する (`Z ≤ Z(P)` なので `Z ≤ Z(A)`)。 -/
+theorem mul_comm_of_center_le_of_isCyclic_quotient {A : Type*} [Group A] {Z : Subgroup A}
+    [Z.Normal] (hZ : Z ≤ Subgroup.center A) (hcyc : IsCyclic (A ⧸ Z)) (x y : A) :
+    x * y = y * x := by
+  haveI : IsCyclic ↥(QuotientGroup.mk' Z).range := by
+    haveI := hcyc
+    rw [MonoidHom.range_eq_top.mpr (QuotientGroup.mk'_surjective Z)]
+    have e : (A ⧸ Z) ≃* ↥(⊤ : Subgroup (A ⧸ Z)) := Subgroup.topEquiv.symm
+    exact isCyclic_of_surjective e.toMonoidHom e.surjective
+  exact commutative_of_cyclic_center_quotient (QuotientGroup.mk' Z)
+    (by rwa [QuotientGroup.ker_mk']) x y
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
