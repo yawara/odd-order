@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Data.ZMod.Basic
 import Mathlib.Tactic.LinearCombination
 import Mathlib.RingTheory.Int.Basic
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # Isaacs Problem 6B.6 — 巡回 2-群の位数 2 の自己同型 (書籍 p. 196)
@@ -220,6 +221,77 @@ theorem sqrtOne_pairwise_ne (hn : 3 ≤ n) :
       intro h
       exact e2 (by linear_combination h)) (Set.toFinite _),
     Set.ncard_singleton]
+
+/-- `n ≥ 3` のとき `ZMod (2^n)` の `1` の平方根はちょうど 4 個。 -/
+theorem ncard_sq_eq_one (hn : 3 ≤ n) : {x : ZMod (2 ^ n) | x ^ 2 = 1}.ncard = 4 := by
+  have hset : {x : ZMod (2 ^ n) | x ^ 2 = 1} =
+      ({1, -1, (2 : ZMod (2 ^ n)) ^ (n - 1) + 1, (2 : ZMod (2 ^ n)) ^ (n - 1) - 1} :
+        Set (ZMod (2 ^ n))) := by
+    ext x
+    simp only [Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff]
+    exact sq_eq_one_iff_two_pow (by omega) x
+  rw [hset]
+  exact sqrtOne_pairwise_ne hn
+
+/-- 単位群でも同じ: `(ZMod (2^n))ˣ` の `1` の平方根はちょうど 4 個 (`n ≥ 3`)。 -/
+theorem ncard_sq_eq_one_units (hn : 3 ≤ n) :
+    {u : (ZMod (2 ^ n))ˣ | u ^ 2 = 1}.ncard = 4 := by
+  have e : {u : (ZMod (2 ^ n))ˣ | u ^ 2 = 1} ≃ {x : ZMod (2 ^ n) | x ^ 2 = 1} :=
+    { toFun := fun u => ⟨((u : (ZMod (2 ^ n))ˣ) : ZMod (2 ^ n)), by
+        have hu : (u : (ZMod (2 ^ n))ˣ) ^ 2 = 1 := u.2
+        have := congrArg Units.val hu
+        simpa using this⟩
+      invFun := fun x =>
+        ⟨⟨(x : ZMod (2 ^ n)), (x : ZMod (2 ^ n)),
+          by have := x.2; rw [Set.mem_setOf_eq, pow_two] at this; exact this,
+          by have := x.2; rw [Set.mem_setOf_eq, pow_two] at this; exact this⟩, by
+          have hx : (x : ZMod (2 ^ n)) ^ 2 = 1 := x.2
+          refine Units.ext ?_
+          simpa using hx⟩
+      left_inv := fun u => Subtype.ext (Units.ext rfl)
+      right_inv := fun x => Subtype.ext rfl }
+  have h1 : Nat.card {u : (ZMod (2 ^ n))ˣ | u ^ 2 = 1} =
+      Nat.card {x : ZMod (2 ^ n) | x ^ 2 = 1} := Nat.card_congr e
+  calc {u : (ZMod (2 ^ n))ˣ | u ^ 2 = 1}.ncard
+      = Nat.card {u : (ZMod (2 ^ n))ˣ | u ^ 2 = 1} := rfl
+    _ = Nat.card {x : ZMod (2 ^ n) | x ^ 2 = 1} := h1
+    _ = {x : ZMod (2 ^ n) | x ^ 2 = 1}.ncard := rfl
+    _ = 4 := ncard_sq_eq_one hn
+
+/-- **Isaacs Problem 6B.6** (p. 196) ⭐: 位数 `2^n` (`n ≥ 3`, すなわち位数 `≥ 8`) の
+巡回群は位数 `2` の自己同型をちょうど **3 個**持つ。 -/
+theorem ncard_orderOf_eq_two_mulAut {C : Type*} [Group C] [Finite C] [IsCyclic C] {n : ℕ}
+    (hn : 3 ≤ n) (hC : Nat.card C = 2 ^ n) :
+    {σ : MulAut C | orderOf σ = 2}.ncard = 3 := by
+  have e : MulAut C ≃* (ZMod (2 ^ n))ˣ := by
+    rw [← hC]
+    exact IsCyclic.mulAutMulEquiv C
+  have h4 : {σ : MulAut C | σ ^ 2 = 1}.ncard = 4 := by
+    have hcong : Nat.card {σ : MulAut C | σ ^ 2 = 1}
+        = Nat.card {u : (ZMod (2 ^ n))ˣ | u ^ 2 = 1} :=
+      Nat.card_congr (Equiv.subtypeEquiv e.toEquiv fun σ => by
+        change σ ^ 2 = 1 ↔ (e σ) ^ 2 = 1
+        constructor
+        · intro h
+          rw [← map_pow, h, map_one]
+        · intro h
+          exact e.injective (by rw [map_pow, h, map_one]))
+    calc {σ : MulAut C | σ ^ 2 = 1}.ncard
+        = Nat.card {σ : MulAut C | σ ^ 2 = 1} := rfl
+      _ = Nat.card {u : (ZMod (2 ^ n))ˣ | u ^ 2 = 1} := hcong
+      _ = {u : (ZMod (2 ^ n))ˣ | u ^ 2 = 1}.ncard := rfl
+      _ = 4 := ncard_sq_eq_one_units hn
+  have hdiff : {σ : MulAut C | orderOf σ = 2} = {σ : MulAut C | σ ^ 2 = 1} \ {1} := by
+    ext σ
+    simp only [Set.mem_setOf_eq, Set.mem_sdiff, Set.mem_singleton_iff]
+    constructor
+    · intro h
+      refine ⟨by rw [← h]; exact pow_orderOf_eq_one σ, fun hσ => ?_⟩
+      rw [hσ, orderOf_one] at h
+      omega
+    · rintro ⟨hsq, hne⟩
+      exact orderOf_eq_prime hsq hne
+  rw [hdiff, Set.ncard_sdiff_singleton_of_mem (by simp : (1 : MulAut C) ∈ {σ | σ ^ 2 = 1}), h4]
 
 end
 
