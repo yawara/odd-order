@@ -1968,7 +1968,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.7 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
 | 6A.8 | ✅ **完了** (`Problems6A8.lean`) | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
 | 6A.9 | ✅ **完了 (a)-(f)** (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
-| 6A.10 | 🔨 (b) 前半 (`G'A = G`) 完了 / (a)(b後半)(c) は残り | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
+| 6A.10 | 🔨 (a) 前半 + (b) 前半 完了 / 残り = (a) fusion 制御・(b) `G'⊓A = A'`・(c) | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
 
 ### 6A.6 完了 / 6A.11 は (⟹) のみ (2026-07-27) — 新 leaf `ProblemsTIHypothesis.lean`
@@ -2034,11 +2034,19 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 
 * **6A.10(b) 前半** `commutator_sup_eq_top_of_TI` (2026-07-27): `A > 1` が TI なら
   `G' A = G`。`G'` を含む部分群は正規なので **6A.7(b)** が直ちに使える (1 行)。
-  残り = (a) 「`p ∣ |A|` なら `A` は `G` の Sylow `p`-部分群を含み `G`-fusion を制御する」/
-  (b) 後半 (`G' ⊓ A = A'` — transfer/focal subgroup が要りそう) /
-  (c) 「`A` 可解なら `X` は部分群」(= 奇数位数側の Frobenius の定理; 6A.9(f) の可解版で
-  本格的な内容)。⚠ (b) 後半の書籍の主張は pdftotext が壊れているので **PDF ページ画像
-  (`references/isaacs/pages/isaacs-p186-199.png`) で確定してから**着手すること。
+* **6A.10(a) 前半** `exists_sylow_coe_eq_of_maximal_pGroup_of_TI` (2026-07-27):
+  TI 仮説の下で `A` に含まれる極大 `p`-部分群 (≠ 1) は **`G` の Sylow `p`-部分群**。
+  6A.11(⟸) の step 2 と同じ論法 (`↥S` の冪零正規化条件 + `N_G(P) ≤ A`) を単独補題に。
+
+  **⚠ 書籍の主張を PDF ページ画像 (`isaacs-p186-199.png`) で確定済 (2026-07-27)**:
+  6A.10 = (a) 「`p ∣ |A|` なら `A` は `G` の Sylow `p`-部分群 `P` を**含み**, `A` は
+  `P` における `G`-fusion を**制御する**」/ (b) 「`A > 1` なら **`G'A = G` かつ
+  `G' ∩ A = A'`**」/ (c) 「`A` 可解なら `X` は部分群」。
+  ⟹ 残り = (a) の fusion 制御 (Ch.5 §5C の fusion 制御 API を使う) /
+  (b) の `G' ⊓ A = A'` (focal subgroup / transfer が要りそう) /
+  (c) = **奇数位数側の Frobenius の定理** (6A.9(f) の可解版、本格的)。
+  書籍 Note: (6A.9 と 6A.10 を合わせると) Frobenius の定理は Feit-Thompson の
+  奇数位数定理の帰結になる。
 
 * **6A.8** `subset_notConjugateSet_or_subset_of_normal` (新 leaf `Problems6A8.lean`):
   `M ⊴ G` なら `M ⊆ X` または `X ⊆ M`。`A ⊓ M = 1` なら前者 (`M` 正規ゆえ共役先も `M` 内)。

@@ -381,6 +381,40 @@ theorem eq_top_of_normal_of_TI [Finite G] {A H : Subgroup G} (hAne : A ≠ ⊥) 
   have hb := congrArg (fun S : Subgroup G => MulAut.conj g⁻¹ • S) h
   rwa [conj_inv_smul_smul, Subgroup.smul_bot] at hb
 
+/-- **Isaacs Problem 6A.10(a) の前半** (p. 186): TI 仮説の下で, `A` に含まれる極大な
+`p`-部分群 `P` (≠ 1) は `G` の Sylow `p`-部分群である。
+
+`P < S ∈ Syl_p(G)` なら `↥S` の冪零正規化条件で `y ∈ N_S(P) ∖ P` が取れ, 6A.11 から
+`y ∈ N_G(P) ≤ A` なので `P ⊔ ⟨y⟩ ≤ A ⊓ S` が `P` より大きい `A` 内の `p`-部分群になり
+極大性に矛盾。 -/
+theorem exists_sylow_coe_eq_of_maximal_pGroup_of_TI [Finite G] {A : Subgroup G}
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥)
+    {p : ℕ} [Fact p.Prime] {P : Subgroup G}
+    (hPmax : Maximal (fun K : Subgroup G => IsPGroup p ↥K ∧ K ≤ A) P) (hPne : P ≠ ⊥) :
+    ∃ S : Sylow p G, (S : Subgroup G) = P := by
+  classical
+  obtain ⟨S, hPS⟩ := hPmax.1.1.exists_le_sylow
+  refine ⟨S, ?_⟩
+  by_contra hne
+  have hlt : P < (S : Subgroup G) := lt_of_le_of_ne hPS (fun h => hne h.symm)
+  haveI : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
+  have hlt2 : P.subgroupOf (S : Subgroup G) < ⊤ := by
+    rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
+    exact fun h => hlt.ne (le_antisymm hPS h)
+  have hgrow := Group.normalizerCondition_of_isNilpotent _ hlt2
+  rw [← Subgroup.subgroupOf_normalizer_eq hPS] at hgrow
+  obtain ⟨y0, hy0mem, hy0notin⟩ := SetLike.exists_of_lt hgrow
+  have hyN : (y0 : G) ∈ Subgroup.normalizer P := Subgroup.mem_subgroupOf.mp hy0mem
+  have hyS : (y0 : G) ∈ (S : Subgroup G) := y0.2
+  have hynotP : (y0 : G) ∉ P := fun h => hy0notin (Subgroup.mem_subgroupOf.mpr h)
+  have hyA : (y0 : G) ∈ A := normalizer_le_of_TI hATI hPne hPmax.1.2 hyN
+  have hP'S : P ⊔ Subgroup.zpowers (y0 : G) ≤ (S : Subgroup G) :=
+    sup_le hPS (Subgroup.zpowers_le.mpr hyS)
+  have hP'le := hPmax.2 ⟨S.isPGroup'.to_le hP'S,
+    sup_le hPmax.1.2 (Subgroup.zpowers_le.mpr hyA)⟩ le_sup_left
+  exact hynotP (hP'le ((le_sup_right : Subgroup.zpowers (y0 : G) ≤ _)
+    (Subgroup.mem_zpowers _)))
+
 /-- **Isaacs Problem 6A.10(b) の前半** (p. 186): `A > 1` が Lemma 6.5 の TI 仮説をみたすなら
 `G' A = G`。
 
