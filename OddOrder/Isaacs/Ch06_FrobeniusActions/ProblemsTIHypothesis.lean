@@ -432,6 +432,14 @@ theorem commutator_sup_eq_top_of_TI [Finite G] {A : Subgroup G} (hAne : A ≠ �
     exact Subgroup.mul_mem _ ((le_sup_left : commutator G ≤ commutator G ⊔ A) hc) hh
   exact eq_top_of_normal_of_TI hAne (le_sup_right : A ≤ commutator G ⊔ A) hATI
 
+/-- **Isaacs Problem 6A.10(b) 後半の易しい向き**: `A' ≤ G' ⊓ A`
+(TI 仮説なしに成り立つ; 逆向き `G' ⊓ A ≤ A'` は fusion 制御 (a) と focal subgroup が要る)。 -/
+theorem commutator_self_le_inf_commutator (A : Subgroup G) :
+    ⁅A, A⁆ ≤ commutator G ⊓ A :=
+  le_inf (Subgroup.commutator_mono le_top le_top)
+    (Subgroup.commutator_le.mpr fun _ ha _ hb =>
+      A.mul_mem (A.mul_mem (A.mul_mem ha hb) (A.inv_mem ha)) (A.inv_mem hb))
+
 end
 
 end OddOrder.Isaacs.Ch06

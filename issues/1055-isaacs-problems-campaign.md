@@ -2042,7 +2042,8 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
   6A.10 = (a) 「`p ∣ |A|` なら `A` は `G` の Sylow `p`-部分群 `P` を**含み**, `A` は
   `P` における `G`-fusion を**制御する**」/ (b) 「`A > 1` なら **`G'A = G` かつ
   `G' ∩ A = A'`**」/ (c) 「`A` 可解なら `X` は部分群」。
-  ⟹ 残り = (a) の fusion 制御 (Ch.5 §5C の fusion 制御 API を使う) /
+  `commutator_self_le_inf_commutator` で (b) 後半の**易しい向き** `A' ≤ G' ⊓ A` は landing
+  (TI 仮説不要)。⟹ 残り = (a) の fusion 制御 (Ch.5 §5C の fusion 制御 API を使う) /
   (b) の `G' ⊓ A = A'` (focal subgroup / transfer が要りそう) /
   (c) = **奇数位数側の Frobenius の定理** (6A.9(f) の可解版、本格的)。
   書籍 Note: (6A.9 と 6A.10 を合わせると) Frobenius の定理は Feit-Thompson の
