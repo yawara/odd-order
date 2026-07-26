@@ -450,6 +450,151 @@ theorem setOf_conj_eq_inv_eq [Finite G] {A : Subgroup G} (hAtop : A ≠ ⊤)
     · have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht2
       rw [hxt, htinv, ht2, one_mul]
 
+/-! ### 6A.9(f): `X` は部分群 -/
+
+/-- TI 仮説は `A` の共役にも遺伝する。 -/
+theorem TI_conj {A : Subgroup G}
+    (hATI : ∀ y : G, y ∉ A → A ⊓ (MulAut.conj y • A) = ⊥) (g : G) :
+    ∀ y : G, y ∉ (MulAut.conj g • A : Subgroup G) →
+      (MulAut.conj g • A : Subgroup G) ⊓ (MulAut.conj y • (MulAut.conj g • A)) = ⊥ := by
+  intro y hy
+  have hy' : g⁻¹ * y * g ∉ A := by
+    intro h
+    refine hy ?_
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    change (MulAut.conj g).symm y ∈ A
+    rwa [MulAut.conj_symm_apply]
+  have hstep : (MulAut.conj g • A : Subgroup G) ⊓ (MulAut.conj y • (MulAut.conj g • A))
+      = MulAut.conj g • (A ⊓ MulAut.conj (g⁻¹ * y * g) • A) := by
+    rw [Subgroup.smul_inf, ← mul_smul, ← mul_smul, ← map_mul, ← map_mul]
+    congr 2
+    group
+  rw [hstep, hATI _ hy', Subgroup.smul_bot]
+
+/-- `A` の共役に対する `X` は同じ集合。 -/
+theorem notConjugateSet_conj (A : Subgroup G) (g : G) :
+    notConjugateSet (MulAut.conj g • A) = notConjugateSet A := by
+  have key : ∀ (B : Subgroup G) (h : G) (x : G), x ∈ notConjugateSet B →
+      x ∈ notConjugateSet (MulAut.conj h • B) := by
+    intro B h x hx a ha hane hconj
+    have haB : h⁻¹ * a * h ∈ B := by
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at ha
+      change (MulAut.conj h).symm a ∈ B at ha
+      rwa [MulAut.conj_symm_apply] at ha
+    refine hx (h⁻¹ * a * h) haB ?_ ?_
+    · intro hone
+      refine hane ?_
+      have h2 := congrArg (fun z : G => h * z * h⁻¹) hone
+      simpa [mul_assoc] using h2
+    · obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+      exact isConj_iff.mpr ⟨c * h, by rw [← hc]; group⟩
+  ext x
+  refine ⟨fun hx => ?_, fun hx => key A g x hx⟩
+  have := key (MulAut.conj g • A) g⁻¹ x hx
+  rwa [conj_inv_smul_smul] at this
+
+/-- **Isaacs Problem 6A.9(f)** (p. 186) ⭐: `X` は積で閉じる (したがって部分群)。
+
+`x, y ∈ X` に対し `s := x t`, `r := t y` はともに involution で `x y = s r`。
+(d) より `X` の元は奇数位数なので `s ∉ X`, ゆえに `s` はある共役 `A^g` の非単位元。
+`A^g` も TI 仮説をみたし `notConjugateSet A^g = X` なので (b)(c) の系
+`setOf_conj_eq_inv_eq` が `Inv(s) = X ∪ {s}` を与える。`s (sr) s = (sr)⁻¹` より
+`x y ∈ Inv(s)`, そして `x y = s` なら `y = t ∈ X ⊓ A = {1}` で `t = 1` となり矛盾。 -/
+theorem mul_mem_notConjugateSet [Finite G] {A : Subgroup G} (hAtop : A ≠ ⊤)
+    (hATI : ∀ y : G, y ∉ A → A ⊓ (MulAut.conj y • A) = ⊥)
+    {t : G} (htA : t ∈ A) (ht2 : t * t = 1) (htne : t ≠ 1)
+    {x y : G} (hx : x ∈ notConjugateSet A) (hy : y ∈ notConjugateSet A) :
+    x * y ∈ notConjugateSet A := by
+  classical
+  have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht2
+  have htx := conj_eq_inv_of_mem_notConjugateSet hATI htA ht2 htne hx
+  have hty := conj_eq_inv_of_mem_notConjugateSet hATI htA ht2 htne hy
+  -- `s := x t` は involution
+  have hs2 : (x * t) * (x * t) = 1 := by
+    calc (x * t) * (x * t) = x * (t * x * t) := by group
+      _ = x * x⁻¹ := by rw [htx]
+      _ = 1 := by group
+  have hsne : x * t ≠ 1 := by
+    intro hone
+    have hxt : x = t := by
+      have hxi : x = t⁻¹ := by
+        have hc := congrArg (fun z : G => z * t⁻¹) hone
+        simpa [mul_assoc] using hc
+      rwa [htinv] at hxi
+    exact htne (by rw [← hxt]; exact eq_one_of_mem_notConjugateSet_of_mem hx (hxt ▸ htA))
+  -- `r := t y` も involution, そして `x y = (x t)(t y)`
+  have hr2 : (t * y) * (t * y) = 1 := by
+    calc (t * y) * (t * y) = (t * y * t) * y := by group
+      _ = y⁻¹ * y := by rw [hty]
+      _ = 1 := by group
+  have hxy : x * y = (x * t) * (t * y) := by rw [← mul_assoc, mul_assoc x t t, ht2, mul_one]
+  -- `s ∉ X` (X の元は奇数位数)
+  have hsX : x * t ∉ notConjugateSet A := by
+    intro hmem
+    have hodd := odd_orderOf_of_mem_notConjugateSet hATI htA ht2 htne hmem
+    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    rw [orderOf_eq_prime (by rw [pow_two]; exact hs2) hsne] at hodd
+    exact (by decide : ¬ Odd 2) hodd
+  -- `s` はある共役 `A^g` の非単位元
+  simp only [notConjugateSet, Set.mem_setOf_eq, not_forall, not_not] at hsX
+  obtain ⟨a, haA, hane, hconj⟩ := hsX
+  obtain ⟨g, hg⟩ := isConj_iff.mp hconj
+  have hsAg : x * t ∈ (MulAut.conj g • A : Subgroup G) := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    change (MulAut.conj g).symm (x * t) ∈ A
+    rw [MulAut.conj_symm_apply, ← hg]
+    simpa [mul_assoc] using haA
+  have hAgtop : (MulAut.conj g • A : Subgroup G) ≠ ⊤ := by
+    intro h
+    refine hAtop (le_antisymm le_top fun z _ => ?_)
+    have hz : (MulAut.conj g) z ∈ (MulAut.conj g • A : Subgroup G) := by
+      rw [h]; exact Subgroup.mem_top _
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hz
+    change (MulAut.conj g).symm ((MulAut.conj g) z) ∈ A at hz
+    rwa [MulEquiv.symm_apply_apply] at hz
+  -- `Inv(s) = X ∪ {s}`
+  have hInvS := setOf_conj_eq_inv_eq hAgtop (TI_conj hATI g) hsAg hs2 hsne
+  rw [notConjugateSet_conj] at hInvS
+  have hxyInv : (x * t) * (x * y) * (x * t) = (x * y)⁻¹ := by
+    rw [hxy]
+    calc (x * t) * ((x * t) * (t * y)) * (x * t)
+        = ((x * t) * (x * t)) * (t * y) * (x * t) := by group
+      _ = (t * y) * (x * t) := by rw [hs2, one_mul]
+      _ = ((x * t) * (t * y))⁻¹ := by
+          rw [mul_inv_rev]
+          have e1 : (t * y)⁻¹ = t * y := inv_eq_of_mul_eq_one_right hr2
+          have e2 : (x * t)⁻¹ = x * t := inv_eq_of_mul_eq_one_right hs2
+          rw [e1, e2]
+  have hmem2 : x * y ∈ notConjugateSet A ∪ {x * t} := by
+    rw [← hInvS]; exact hxyInv
+  rcases hmem2 with h | h
+  · exact h
+  · -- `x y = x t` なら `y = t`, これは `X ⊓ A = {1}` と `t ≠ 1` に矛盾
+    exfalso
+    rw [Set.mem_singleton_iff] at h
+    have hyt : y = t := by
+      have h2 := congrArg (fun z : G => x⁻¹ * z) h
+      simpa [← mul_assoc] using h2
+    exact htne (hyt ▸ eq_one_of_mem_notConjugateSet_of_mem hy (hyt ▸ htA))
+
+/-- **Isaacs Problem 6A.9(f)** (p. 186) ⭐ 仕上げ: `X` を部分群として取り出す。
+
+書籍の Note のとおり, これは **`A` が偶数位数のときの Frobenius の定理** —
+すなわち `X` が Frobenius 核になること — の証明を与える。 -/
+def frobeniusKernelOfInvolution [Finite G] {A : Subgroup G} (hAtop : A ≠ ⊤)
+    (hATI : ∀ y : G, y ∉ A → A ⊓ (MulAut.conj y • A) = ⊥)
+    {t : G} (htA : t ∈ A) (ht2 : t * t = 1) (htne : t ≠ 1) : Subgroup G where
+  carrier := notConjugateSet A
+  mul_mem' hx hy := mul_mem_notConjugateSet hAtop hATI htA ht2 htne hx hy
+  one_mem' := one_mem_notConjugateSet A
+  inv_mem' hx := inv_mem_notConjugateSet hx
+
+@[simp] theorem coe_frobeniusKernelOfInvolution [Finite G] {A : Subgroup G} (hAtop : A ≠ ⊤)
+    (hATI : ∀ y : G, y ∉ A → A ⊓ (MulAut.conj y • A) = ⊥)
+    {t : G} (htA : t ∈ A) (ht2 : t * t = 1) (htne : t ≠ 1) :
+    ((frobeniusKernelOfInvolution hAtop hATI htA ht2 htne : Subgroup G) : Set G)
+      = notConjugateSet A := rfl
+
 end
 
 end OddOrder.Isaacs.Ch06

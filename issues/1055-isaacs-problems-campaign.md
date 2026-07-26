@@ -1967,7 +1967,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.6 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の仮説を満たす `A, B > 1` ⟹ ある `g` で `A ⊓ B^g > 1` |
 | 6A.7 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
 | 6A.8 | ✅ **完了** (`Problems6A8.lean`) | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
-| 6A.9 | 🔨 (a)-(e) 完了 / (f) のみ残り (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
+| 6A.9 | ✅ **完了 (a)-(f)** (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
 | 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
 
@@ -2020,25 +2020,17 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
   (c) の一意性から) / `setOf_conj_eq_inv_eq` = **`Inv(t) = X ∪ {t}`** (したがって
   `|Inv(t)| = |G:A| + 1`)。
 
-  **残り: (f)** `X` が部分群であること。現状分かっていること: `X` は逆元・冪・共役で閉じ,
-  `A` の**右横断系** (かつ逆元閉性から左横断系), 元の位数は奇数, `Inv(t) = X ⊔ {t}`。
-  ⚠ **注意**: `X` が部分群なら `t` が `X` を反転することから **`X` は可換**になる
-  (`τ(xy) = x⁻¹y⁻¹` と `(xy)⁻¹ = y⁻¹x⁻¹` の一致) — これは「位数 2 の
-  fixed-point-free 自己同型をもつ群は可換」という古典的事実と整合。逆に言えば (f) は
-  `t` による反転だけからは出ず, 別の議論が要る。
-
-  **未検証の見通し** (次回検討): `ψ g := g⁻¹ (t g t)` は像が `Inv(t)` に入り fiber が
-  `C_G(t)` の左剰余類なので `|image ψ| = |G : C_G(t)|`, また `t ∉ image ψ` なので
-  `|G:C_G(t)| ≤ |X|`; `C_G(t) ≤ A` と合わせて **`C_G(t) = A`** かつ **`image ψ = X`**、
-  さらに (d) から `G` の involution 全体が `t^G` で **`X = t^G · t`**。ここまで来れば
-  「`u, v` が involution なら `u v t` も involution」に帰着するが, その証明は未確定。
-  旧設計 = `C := C_G(t) ≤ A` として
-  `t` の共役類の大きさは `|G:C|` (`OddOrder.GroupTheory.card_class_eq_index_centralizer`)、
-  `t^G ⊓ A` は `A`-共役類で大きさ `≤ |A:C|`、`|G:C| = |A:C|·|G:A|`
-  (`relIndex_mul_index`) から `|t^G ∖ A| ≥ |A:C|(|G:A|−1) ≥ |G:A|−1`、
-  `s ↦ s·t` が `t^G ∖ A` を `Inv(t) ∖ A` に単射。そのうえで
-  (b) = 上の包含 + 計数で `X ∖ {1} = Inv(t) ∖ A`、(c)(d)(e) は (b) の系
-  (いずれも `centralizer_le_of_TI` で `C_G(·) ≤ A` を使う)、(f) は要検討。
+  **(f) 完了** `mul_mem_notConjugateSet` + `frobeniusKernelOfInvolution` (2026-07-27)。
+  ⭐ **鍵は「別の involution `s` に乗り換える」こと**: `x, y ∈ X` に対し `s := x t`,
+  `r := t y` はともに involution で **`x y = s r`**。(d) より `X` の元は奇数位数なので
+  `s ∉ X`, ゆえに `s` はある共役 `A^g` の非単位元。`A^g` も TI 仮説をみたし
+  (`TI_conj`) `notConjugateSet A^g = X` (`notConjugateSet_conj`) なので, (b)(c) の系
+  `setOf_conj_eq_inv_eq` を **`(A^g, s)` に適用**して `Inv(s) = X ∪ {s}`。
+  `s (s r) s = (s r)⁻¹` より `x y ∈ Inv(s)`, そして `x y = s` なら `y = t ∈ X ⊓ A = {1}`
+  で `t = 1` となり矛盾 ⟹ `x y ∈ X`。
+  ⚠ 前回「`t` による反転だけからは出ない」と書いたとおりで, `t` ではなく **`s = xt`**
+  に対する (b) を使うのが要点だった (`X` は共役不変なので `A` の共役に乗り換えられる)。
+  副産物: `TI_conj` / `notConjugateSet_conj` (TI 仮説と `X` は `A` の共役に不変)。
 
 * **6A.8** `subset_notConjugateSet_or_subset_of_normal` (新 leaf `Problems6A8.lean`):
   `M ⊴ G` なら `M ⊆ X` または `X ⊆ M`。`A ⊓ M = 1` なら前者 (`M` 正規ゆえ共役先も `M` 内)。
