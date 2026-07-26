@@ -1967,7 +1967,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.6 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の仮説を満たす `A, B > 1` ⟹ ある `g` で `A ⊓ B^g > 1` |
 | 6A.7 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
 | 6A.8 | ✅ **完了** (`Problems6A8.lean`) | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
-| 6A.9 | ⬜ | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
+| 6A.9 | 🔨 準備補題 landing / (a)-(f) は次回以降 (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
 | 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
 
@@ -1986,6 +1986,25 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
   — 書籍では Lemma 6.5 の文脈から暗黙)。hint どおり `A` と `A^g` がともに **`↥H` の中で**
   TI 仮説をみたすこと (`TI_subgroupOf_of_TI` / `TI_subgroupOf_conj_of_TI`) を見て **6A.6** を
   `↥H` で使う。副産物: `conj_smul_subgroupOf` (`k ∈ H` なら共役と `subgroupOf` が交換)。
+* **6A.9 の準備** (新 leaf `Problems6A9.lean`、2026-07-27): TI 仮説の下での `X` の構造。
+  `centralizer_le_of_TI` (`1 ≠ a ∈ A` なら `C_G(a) ≤ N_G(⟨a⟩) ≤ A`) /
+  `conj_mem_iff_of_TI` (`g a g⁻¹ ∈ A ⟺ g ∈ A`) / `inv_mem_notConjugateSet` /
+  `zpow_mem_notConjugateSet` (`X` は冪で閉じる — `x^k` が `a` と共役なら
+  `g⁻¹xg ∈ C_G(a) ≤ A` で `x` 自身が `A` の非単位元と共役になる) /
+  `eq_one_of_mem_notConjugateSet_of_mem` (`X ⊓ A = {1}`) /
+  `mem_normalizer_zpowers_of_conj_eq_inv` /
+  ⭐ **`mem_notConjugateSet_of_conj_eq_inv`** = `Inv(t) ∖ A ⊆ X` (6A.9(b) の核心の片側):
+  `x ∉ A` が `t` に反転され `x = g a g⁻¹` (`1 ≠ a ∈ A`) なら `u := g⁻¹ t g` が `a` を反転するので
+  `u ∈ N_G(⟨a⟩) ≤ A`、つまり `t ∈ A ⊓ A^g` で TI から `g ∈ A`、これは `x ∈ A` で矛盾。
+
+  **次回**: (a) の計数 `|Inv(t) ∖ A| ≥ |G:A| − 1`。設計 = `C := C_G(t) ≤ A` として
+  `t` の共役類の大きさは `|G:C|` (`OddOrder.GroupTheory.card_class_eq_index_centralizer`)、
+  `t^G ⊓ A` は `A`-共役類で大きさ `≤ |A:C|`、`|G:C| = |A:C|·|G:A|`
+  (`relIndex_mul_index`) から `|t^G ∖ A| ≥ |A:C|(|G:A|−1) ≥ |G:A|−1`、
+  `s ↦ s·t` が `t^G ∖ A` を `Inv(t) ∖ A` に単射。そのうえで
+  (b) = 上の包含 + 計数で `X ∖ {1} = Inv(t) ∖ A`、(c)(d)(e) は (b) の系
+  (いずれも `centralizer_le_of_TI` で `C_G(·) ≤ A` を使う)、(f) は要検討。
+
 * **6A.8** `subset_notConjugateSet_or_subset_of_normal` (新 leaf `Problems6A8.lean`):
   `M ⊴ G` なら `M ⊆ X` または `X ⊆ M`。`A ⊓ M = 1` なら前者 (`M` 正規ゆえ共役先も `M` 内)。
   `A ⊓ M ≠ 1` なら **6A.7(a)** で `A ⊔ M = ⊤`、そのうえで
