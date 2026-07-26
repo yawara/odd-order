@@ -221,6 +221,7 @@ import OddOrder.Isaacs.Ch05_Transfer.Problems5C12
 import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
 import OddOrder.Isaacs.Ch05_Transfer.Problems5D
 import OddOrder.Isaacs.Ch05_Transfer.Problems5D4
+import OddOrder.Isaacs.Ch05_Transfer.Problems5D3
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsDihedralMultiplier
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsProductMultiplier
 import OddOrder.Isaacs.Ch05_Transfer.ProblemsSchurMultiplier

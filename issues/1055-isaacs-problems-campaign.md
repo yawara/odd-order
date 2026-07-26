@@ -1805,7 +1805,7 @@ Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
 |---|---|---|
 | 5D.1 | ✅ 完了 (`hasNormalPComplement_of_controlsPTransfer`) | `P ∈ Syl_p(G)` 可換, `P ⊆ H ⊆ G`, `H` が `G` の `p`-transfer を制御 (= `A^p(H) = H ∩ A^p(G)`)。`H` が正規 `p`-補群をもつなら `G` も持つ |
 | 5D.2 | ✅ 完了 (`hasNormalPComplement_of_sylow_le_center` + Burnside 導出の `example`) | `P ∈ Syl_p(G)`, `P ⊆ Z(G)` ⇒ (Burnside も transfer 理論も使わずに) `G` は正規 `p`-補群をもつ。これと Cor 5.23 から Burnside を導く |
-| 5D.3 | ⬜ | `G` 非可換単純, `P ⊆ G` が極大な `p`-部分群。(a) `P ∈ Syl_p(G)` (b) `1 < N ⊴ P` で `P/N` 可換なら `P` は `N` を含む唯一の Sylow `p`-部分群 ⇒ `N` は `P` 内で `G` に関し weakly closed (c) `P` の冪零類 ≥ 3 |
+| 5D.3 | (a) ✅ 完了 (`exists_sylow_coe_eq_of_isCoatom_of_isPGroup`) / (b)(c) 🔒 5C.6 待ち | `G` 非可換単純, `P ⊆ G` が極大な `p`-部分群。(a) `P ∈ Syl_p(G)` (b) `1 < N ⊴ P` で `P/N` 可換なら `P` は `N` を含む唯一の Sylow `p`-部分群 ⇒ `N` は `P` 内で `G` に関し weakly closed (c) `P` の冪零類 ≥ 3 |
 | 5D.4 | ✅ 完了 (`pResidualOf_le_inf_pResidual` / `APrime_eq_subgroupOf_APrime_of_pResidualOf_eq`) | `P ∈ Syl_p(G)`, `P ⊆ K ⊆ G` ⇒ `O^p(K) ⊆ K ∩ O^p(G)`、等号なら `A^p(K) = K ∩ A^p(G)` |
 | 5D.5 | ⬜ | `P ∈ Syl_p(G)`, `A ∩ P = P'` (`A = A^p(G)`)。`P' ⊴ A` なら (Tate を使わず) `G` は正規 `p`-補群をもつ。hint: SZ で `A` 内の `P'` の補群 `K` を取り `G = N_G(K)P'`、`P' ⊆ Φ(P)` から `P` が `K` を正規化 |
 | 5D.6 | ⬜ | 同じ設定で `P'` 可換なら `G` は正規 `p`-補群をもつ。hint: `N = N_G(P')` が仮定を満たすことを見て `A` の中で Burnside |
@@ -1878,6 +1878,18 @@ implicit なので `(X := K)` を明示しないと `Subgroup.Normal ?m` で ins
 **kernel で type mismatch** (elaborator は通す) — `subst hrp` を使う。
 商型に対する `rw [← hker]` は motive 不正 ⟹ `QuotientGroup.quotientMulEquivOfEq hker` +
 `IsPGroup.of_equiv` で移送。ゴールを変える `show` は `linter.style.show` が警告 ⟹ `change`。
+
+### 5D.3(a) の実装 (2026-07-27 完了、新 leaf `Problems5D3.lean` 83 行)
+
+`P ≤ S` (Sylow) で `P < S` なら `p`-群の正規化群成長 (Isaacs Thm 1.22
+`Ch01.lt_normalizer_of_isNilpotent_of_lt_top` を `↥S` で使い
+`Subgroup.subgroupOf_normalizer_eq` で `G` に降ろす) から `P < N_G(P)`、coatom 性で
+`N_G(P) = ⊤` ⟹ `P ⊴ G` ⟹ 単純性で `P ∈ {⊥, ⊤}`。`P = ⊤` は `P < S` に矛盾。
+`P = ⊥` なら coatom 性で `S = ⊤` ⟹ `G` が `p`-群 ⟹ `IsPGroup.center_nontrivial` +
+単純性で `Z(G) = ⊤` ⟹ 可換で仮定に矛盾。⟹ `P = S`。
+
+⚠ (b)(c) は **Problem 5C.6 (weak closure)** 依存 — hub レーンの
+`OddOrder/GroupTheory/WeaklyClosed.lean` (issue 9503) が landing してから。
 
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
