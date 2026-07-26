@@ -1167,3 +1167,28 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 
 **未再実測 (この pass では触っていない)**: (7.8) (7.9) (8.15) (9.7) (9.10) (9.11) (10.11)
 (11.8)、App NearFields ×2、App Suzuki2Groups Lem 1。着手前に同じ手順で実測すること。
+
+#### 再実測 第 2 ラウンド (2026-07-26) — 残り 11 件
+
+| 項目 | 07-16 label | 実測 |
+|---|---|---|
+| (1.7) | partial | **本日クローズ** (`d4fe7db62`): 一般 (a) の相異性は `eq_of_induce_eq_induce_of_liesOver_of_inertia_eq` に既存、欠けていた計数 `n = [I_G(θ):H]/e²` を `sq_mul_card_mul_card_eq_card_inertia_of_induce_eq_nsmul_sum` として証明 |
+| App NearFields `F_{r²,2}` | partial「具体 instantiation が無い」 | **stale**: `Peterfalvi.Appendices.ExceptionalNearField` (2026-07-22) に `exceptionalTwistData` (σ = halfFrobenius, χ = squareSignChar) + 乗法則 (book p.138) + 非可換性、AxiomsCheck 登録済 |
+| App NearFields App C Prop 2 | partial「vacuous な classification が sorry」 | **stale**: `cyclic_index_two_nearField_classification` は実際の二分律 (field ∨ `F_{r²,2}`、`|Z(F*)| = r − 1`) を述べて axiom-clean |
+
+**packaging 系 (内容は landed、単一の抽象 statement が無い)**: (5.3)(b) / (5.8) / (7.8) / (7.9) /
+(8.15) / (9.7) / (9.10) / (9.11) / (10.11)。いずれも note が「assembly / re-assembly work」と
+明記している。(5.3)(b) は固定 2 要素 `R` レコードが可変長 `R` を持てないという**設計上の理由**があり、
+consumer は (5.7) engine を使う。
+
+**真に強さが違うもの (packaging でない)**:
+
+1. **(6.2)–(6.6)** — general-(6.1) 形が (5.6) break-member oracle `h56` を仮説に取る (前節参照)。
+2. **(11.8)** — repo は**存在形**で述べている (grid 非直交性を持つ次数 `w₁` の既約 `ζ ∈ S` を 1 本
+   produce) が、本は **`S(HC)` の任意の `ζ`** について主張する。(11.8.1)–(11.8.6) の鎖は
+   ζ-generic な named lemma として全部 landed (`charParam_delta_eq_one` /
+   `exists_coherent_extension_h114_of_orthogonal` /
+   `tau_muColumnSum_sub_dzeta_eq_of_residualData` / `coherent_SOf_H0C_of_column_identities`)
+   なので、普遍形への格上げは re-statement (effort S)。下流は witness 1 本しか要らない。
+3. **App Suzuki2Groups Lemma 1** — (b) は `QuadraticExtensions.lean` で完全形式化済 (2026-07-18)、
+   **(a) (c) (d) が未**。Higman 論文の実内容。
