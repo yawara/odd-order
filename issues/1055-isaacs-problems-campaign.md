@@ -1970,7 +1970,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.9 | ✅ **完了 (a)-(f)** (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
 | 6A.10 | ✅ **(a)(b)(c) 完了** | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
-| 6B.1 | ⬜ | 任意の Frobenius 群は可解 Frobenius 部分群を含む ⟹ Frobenius 補群は Frobenius 群を部分群に持てない |
+| 6B.1 | 🔨 後半 完了 / 前半 (可解 Frobenius 部分群の存在) が残り | 任意の Frobenius 群は可解 Frobenius 部分群を含む ⟹ Frobenius 補群は Frobenius 群を部分群に持てない |
 | 6B.2 | ⬜ | `A` 可換が `N` に忠実作用, `N` の非自明真部分群が `A`-不変でない ⟹ `A` 巡回 |
 | 6B.3 | ⬜ | Thm 6.21 の coprime 仮定を落とすと偽 (反例構成) |
 | 6B.4 | ⬜ | 分割 II で `[X,Y] = 1` ⟹ (a) `G` 可換 (b) 基本可換 |
