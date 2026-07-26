@@ -126,8 +126,7 @@ theorem coherent_quotient_bound_of_noncoherent [Finite G]
     (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf H1) hyp.base.A0))
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
-    (htype : IsTypeIII M ∨ IsTypeIV M) :
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
     H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 := by
   classical
   -- normality instances for the section subgroups and their traces
@@ -158,19 +157,26 @@ theorem coherent_quotient_bound_of_noncoherent [Finite G]
     have h := hnc
     rw [hyp.SOf_eq] at h
     exact h
-  -- the (6.2) bound at `(C, D) = (HC, HC)`-traces
-  have hbound := hyp.base.six_two_dichotomy_bound _hG
+  -- the two proper traces, in the `< M'`-form the oracle-free (6.2) takes (`A.subgroupOf B = ⊤ ↔
+  -- B ≤ A`, so `≠ ⊤` upgrades `≤` to `<`)
+  have hH0CleHC : hyp.H0C ≤ hyp.HC := sup_le (hyp.H0_lt_H.le.trans le_sup_left) le_sup_right
+  have hA'lt : H1.subgroupOf M < (derivedInG M).subgroupOf M :=
+    lt_of_le_not_ge (Subgroup.subgroupOf_mono M hH1_lt.le)
+      (fun hle => Hypothesis.trace_ne_top_of_lt_derived hH1_lt
+        (Subgroup.subgroupOf_eq_top.mpr hle))
+  have hBlt : hyp.H0C.subgroupOf M < (derivedInG M).subgroupOf M :=
+    lt_of_le_not_ge (Subgroup.subgroupOf_mono M (hH0CleHC.trans hyp.HC_le_derived))
+      (fun hle => hyp.H0C_trace_ne_top (Subgroup.subgroupOf_eq_top.mpr hle))
+  -- the (6.2) bound at `(C, D) = (HC, HC)`-traces, through the **oracle-free** (6.2)
+  -- (`S12.Hypothesis.sixTwo_of_hypothesis`, `S13_SixTwoImageData`): the break bound is proved
+  -- from Hypothesis (5.2)'s image families, so the §11 dichotomy producer — and with it the
+  -- `ChiefFactorData` / `TypePNontrivialCore` inputs — is no longer needed (cf. (11.3) above).
+  have hbound := hyp.base.sixTwo_of_hypothesis _hG
     (hyp.params_mu_eq _hG _hG.odd) hyp.params_delta_pm
     (hyp.params_delta_sign _hG _hG.odd) hyp.params_zeta_mem hyp.params_zeta_degree
-    htype
-    (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV
-      htype hyp.base.typeP)
-    (OddOrder.Peterfalvi.S11.exists_chiefFactorData _hG _).choose
     (A' := H1.subgroupOf M) (B := hyp.H0C.subgroupOf M)
     (C := hyp.HC.subgroupOf M) (D := hyp.HC.subgroupOf M)
-    (Hypothesis.trace_ne_top_of_lt_derived hH1_lt) hyp.H0C_trace_ne_top
-    (Subgroup.subgroupOf_mono M
-      (sup_le (hyp.H0_lt_H.le.trans le_sup_left) le_sup_right))
+    hA'lt hBlt (Subgroup.subgroupOf_mono M hH0CleHC)
     (Subgroup.subgroupOf_mono M hyp.HC_le_derived)
     hyp.HC_central_condition hAcoh hBncoh
   -- the square-root factor is `√1 = 1`
@@ -799,7 +805,7 @@ theorem HC_le_secondDerived_of_noncoherent [Finite G] (_hG : OddOrder.BG.IsMinim
   have hM''lt : secondDerivedInAmbient M < derivedInG M :=
     lt_of_le_of_lt hyp.secondDerived_le_HC hHCltM'
   have h114 := coherent_quotient_bound_of_noncoherent _hG hyp le_normalizer_secondDerived hM''lt
-    (hyp.secondDerived_coherent _hG) hnc htype
+    (hyp.secondDerived_coherent _hG) hnc
   -- tower `|M':M''| = X·|U:C|`
   set X := (secondDerivedInAmbient M).relIndex hyp.HC with hX
   set v := hyp.C.relIndex hyp.U with hv
