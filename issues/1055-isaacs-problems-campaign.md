@@ -1968,7 +1968,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.7 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
 | 6A.8 | ✅ **完了** (`Problems6A8.lean`) | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
 | 6A.9 | ✅ **完了 (a)-(f)** (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
-| 6A.10 | 🔨 **(a) 完了** + (b) 前半 完了 / 残り = (b) `G'⊓A ≤ A'`・(c) | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
+| 6A.10 | 🔨 **(a)(b) 完了** / 残り = (c) のみ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
 
 ### 6A.6 完了 / 6A.11 は (⟹) のみ (2026-07-27) — 新 leaf `ProblemsTIHypothesis.lean`
@@ -2032,6 +2032,16 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
   に対する (b) を使うのが要点だった (`X` は共役不変なので `A` の共役に乗り換えられる)。
   副産物: `TI_conj` / `notConjugateSet_conj` (TI 仮説と `X` は `A` の共役に不変)。
 
+* **6A.10(b) 完了** `inf_commutator_eq_commutator_self_of_TI` (2026-07-27): TI 仮説の下で
+  **`G' ⊓ A = A'`**。⊇ は自明 (`commutator_self_le_inf_commutator`)。⊆ は焦点部分群定理経由:
+  `H := G' ⊓ A` の Sylow `p`-部分群 `Q` を含む `↥A` の Sylow `S` を取ると, (a) 前半で
+  `S` は `G` の Sylow でもあり, Isaacs Thm 5.21 (`Subgroup.commutator_inf_eq_focalSubgroup`)
+  で `Q ≤ G' ⊓ S = S.focalSubgroup`。(a) 後半の fusion 制御 + Cor 5.22 core
+  (`Subgroup.focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn`) で `S.focalSubgroup` は
+  `↥A` 内部の焦点部分群 (`= A' ⊓ S ≤ A'`) の像。⟹ 全 Sylow が `A'` に入る。
+  汎用補題 `eq_top_of_forall_sylow_le` (**有限群は Sylow 部分群で生成される**の指数版:
+  `p ∣ |H:K|` なら `p^(n+1) ∣ |H|` で multiplicity の最大性に反する) を新設して束ねた。
+  ⟹ **6A.10(b) 完了**、§6A の残りは (c) のみ。
 * **6A.10(b) 前半** `commutator_sup_eq_top_of_TI` (2026-07-27): `A > 1` が TI なら
   `G' A = G`。`G'` を含む部分群は正規なので **6A.7(b)** が直ちに使える (1 行)。
 * **6A.10(a) 前半** `exists_sylow_coe_eq_of_maximal_pGroup_of_TI` (2026-07-27):
