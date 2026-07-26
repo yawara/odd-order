@@ -258,6 +258,46 @@ theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H)
   rw [Finset.sum_congr rfl fun x _ => hterm x, Finset.sum_boole, ← Fintype.card_subtype,
     Nat.card_eq_fintype_card]
 
+omit [Fintype ↥H] in
+/-- **Peterfalvi (1.7), the constituent count.**  Suppose `Ind_H^G θ` decomposes with a single
+common multiplicity, `Ind_H^G θ = e·∑_{χ ∈ S} χ` over a finite set `S` of (necessarily distinct)
+irreducible characters of `G`.  Then
+
+`e² · |S| · |H| = |I_G(θ)|`,
+
+which is the book's count `n = [T : H] / e²` for `T = I_G(θ)` and `n = |S|`, stated
+multiplicatively so that no division (and no invertibility of `e`) is needed.
+
+Both sides compute `|H|·‖Ind_H^G θ‖²`: the right-hand side by
+`card_mul_inner_self_induce_eq_card_inertia` ([Is] Thm 6.34), the left-hand side by
+orthonormality of `Irr G`, which collapses `‖e·∑_{χ ∈ S} χ‖²` to `e²·|S|`.
+
+Nothing here is special to the (1.7) setting — no abelian quotient, no coprimality, and the
+uniform multiplicity `e` is a hypothesis rather than a conclusion.  The `e`-uniform
+decomposition itself is `induce_inertia_constituents_apply_one_eq` together with
+`inner_induce_constituent_eq_of_apply_one_eq`. -/
+theorem sq_mul_card_mul_card_eq_card_inertia_of_induce_eq_nsmul_sum
+    (θ : IrreducibleCharacter H) {e : ℕ} {S : Finset (IrreducibleCharacter G)}
+    (hdec : induce H (θ : ClassFunction ↥H ℂ)
+      = (e : ℂ) • ∑ χ ∈ S, (χ : ClassFunction G ℂ)) :
+    (e : ℂ) ^ 2 * (S.card : ℂ) * (Nat.card H : ℂ)
+      = (Nat.card ↥(ClassFunction.inertia (θ : ClassFunction ↥H ℂ)) : ℂ) := by
+  classical
+  -- orthonormality collapses the norm of the sum to `|S|`
+  have hortho : ClassFunction.inner (∑ χ ∈ S, (χ : ClassFunction G ℂ))
+      (∑ χ ∈ S, (χ : ClassFunction G ℂ)) = (S.card : ℂ) := by
+    rw [inner_sum_left]
+    have hterm : ∀ χ ∈ S, ClassFunction.inner (χ : ClassFunction G ℂ)
+        (∑ ψ ∈ S, (ψ : ClassFunction G ℂ)) = 1 := by
+      intro χ hχ
+      rw [inner_sum_right,
+        Finset.sum_congr rfl fun ψ _ => irreducibleCharacter_inner_eq_ite χ ψ,
+        Finset.sum_ite_eq S χ (fun _ => (1 : ℂ)), if_pos hχ]
+    rw [Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul, mul_one]
+  rw [← card_mul_inner_self_induce_eq_card_inertia θ, hdec, ClassFunction.inner_smul_left,
+    ClassFunction.inner_smul_right, hortho, star_natCast]
+  ring
+
 open scoped Classical in
 omit [Fintype ↥H] in
 /-- **Peterfalvi (1.5.a) + (1.5.b), normalized form**: `Res_H^G χ = ‖χ‖²·∑_β θ^β`, where `χ =

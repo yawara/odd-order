@@ -3999,6 +3999,11 @@ set_option linter.style.longLine false in
 -- via Frobenius reciprocity + the Mackey sum + orthonormality of irreducibles.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
+-- Peterfalvi (1.7), constituent count: if `Ind_H^G θ = e·∑_{χ ∈ S} χ` with a single common
+-- multiplicity `e`, then `e²·|S|·|H| = |I_G(θ)|` — the book's `n = [I_G(θ):H]/e²`, stated
+-- multiplicatively.  Both sides are `|H|·‖Ind θ‖²` (norm part above + orthonormality of `Irr G`).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sq_mul_card_mul_card_eq_card_inertia_of_induce_eq_nsmul_sum
 -- Cross Mackey inner product + orthogonality of induced characters from non-conjugate irreducibles
 -- (`⟨Ind θ, Ind ψ⟩ = 0`), used to prove the (6.8) `Y = S(H')` family `j ↦ Ind_H^L θ_j` injective.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_induce
