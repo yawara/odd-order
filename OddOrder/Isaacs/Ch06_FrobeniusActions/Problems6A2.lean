@@ -499,7 +499,7 @@ theorem isFrobeniusAction_grpA [Finite F] (hα : orderOf α = 7) (hε : orderOf 
 
 /-! ### 書籍の場合 `F = 𝔽₄₃` -/
 
-instance : Fact (Nat.Prime 43) := ⟨by norm_num⟩
+instance fact_prime_43 : Fact (Nat.Prime 43) := ⟨by norm_num⟩
 
 /-- `𝔽₄₃` の乗法群に位数 7 の元がある (`-2 = 41`; `(-2)⁷ = -128 = 1 - 3·43`)。 -/
 theorem exists_orderOf_eq_seven_zmod_fortyThree : ∃ α : ZMod 43, orderOf α = 7 := by
