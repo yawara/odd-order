@@ -429,3 +429,24 @@ structure FieldNormalizerData (hyp : Hypothesis (G := G)) extends
   `HypothesisBAbstract.toFieldNormalizerData` 経由の抽象利用には現れない)。
 
 ⚠ 試行は revert 済、tree は green。
+
+### ✅ pin 付き structure の前提を Lean で検証済 (2026-07-26)
+
+解法の唯一の未確認点だった「`extends` 越しの dot 記法」を最小例で確認した:
+
+```lean
+structure Parent (n : Nat) where
+  a : Nat
+  h : a = n
+namespace Parent
+theorem lem {n : Nat} (p : Parent n) : p.a = n := p.h
+end Parent
+structure Child (m : Nat) extends Parent m where
+  b : Nat
+  b_eq : a = b            -- ⭕ 親フィールドを裸の名前で参照できる
+example (c : Child 5) : c.a = 5 := c.lem   -- ⭕ 親の *定理* にも dot 記法が届く
+```
+
+⟹ pin 付き structure にしても **chain 側 (6 file) の `data.s` / `data.W2_le_P` /
+`data.card_W2` 等はすべてそのまま動く**。境界 file だけが `data.P_eq` を使う。
+step 2b の設計は全部品が検証済で、残るは 1 パスの実行のみ。
