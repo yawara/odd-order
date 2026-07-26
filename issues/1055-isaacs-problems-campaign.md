@@ -1808,7 +1808,7 @@ Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
 | 5D.3 | (a) ✅ 完了 (`exists_sylow_coe_eq_of_isCoatom_of_isPGroup`) / (b)(c) 🔒 5C.6 待ち | `G` 非可換単純, `P ⊆ G` が極大な `p`-部分群。(a) `P ∈ Syl_p(G)` (b) `1 < N ⊴ P` で `P/N` 可換なら `P` は `N` を含む唯一の Sylow `p`-部分群 ⇒ `N` は `P` 内で `G` に関し weakly closed (c) `P` の冪零類 ≥ 3 |
 | 5D.4 | ✅ 完了 (`pResidualOf_le_inf_pResidual` / `APrime_eq_subgroupOf_APrime_of_pResidualOf_eq`) | `P ∈ Syl_p(G)`, `P ⊆ K ⊆ G` ⇒ `O^p(K) ⊆ K ∩ O^p(G)`、等号なら `A^p(K) = K ∩ A^p(G)` |
 | 5D.5 | ✅ 完了 (`hasNormalPComplement_of_APrime_inf_sylow_eq_commutator`) | `P ∈ Syl_p(G)`, `A ∩ P = P'` (`A = A^p(G)`)。`P' ⊴ A` なら (Tate を使わず) `G` は正規 `p`-補群をもつ。hint: SZ で `A` 内の `P'` の補群 `K` を取り `G = N_G(K)P'`、`P' ⊆ Φ(P)` から `P` が `K` を正規化 |
-| 5D.6 | ⬜ | 同じ設定で `P'` 可換なら `G` は正規 `p`-補群をもつ。hint: `N = N_G(P')` が仮定を満たすことを見て `A` の中で Burnside |
+| 5D.6 | ✅ 完了 (`hasNormalPComplement_of_APrime_inf_sylow_eq_commutator_of_abelian`) | 同じ設定で `P'` 可換なら `G` は正規 `p`-補群をもつ。hint: `N = N_G(P')` が仮定を満たすことを見て `A` の中で Burnside |
 
 ⚠ **5D.3(b)** は **5C.6 (weak closure)** に依存 — 5C.6 は hub レーン (issue 9503
 `OddOrder/GroupTheory/WeaklyClosed.lean`) 担当なので、そこが landing してから着手する。
@@ -1911,7 +1911,7 @@ implicit なので `(X := K)` を明示しないと `Subgroup.Normal ?m` で ins
 
 ⚠ `(K ⊓ H).subgroupOf K = H.subgroupOf K` は **`inf_subgroupOf_left`** (右側版は `_right`)。
 
-### 5D.6 の設計 (2026-07-27 に確定、次 iteration で実装)
+### 5D.6 の実装 (2026-07-27 完了、新 leaf `Problems5D6.lean` 248 行)
 
 **主張**: `P ∈ Syl_p(G)`, `A := A^p(G)`, `A ∩ P = P'` で **`P'` が可換**なら (Tate 抜きで)
 `G` は正規 `p`-補群をもつ。
@@ -1938,8 +1938,17 @@ implicit なので `(X := K)` を明示しないと `Subgroup.Normal ?m` で ins
    (`map_mulAut_of_normal_pcomplement`) から `A` に characteristic ⟹ `A ⊴ G` より `K ⊴ G`。
    `p ∤ |K|` かつ `|G:K| = |G:A|·|A:K| = p`-冪 ⟹ `hasNormalPComplement_of_normal_of_index_eq_pow`。
 
-⚠ 実装コスト: `↥N` と `↥A` の 2 段の transport が要る (5C.13 級の分量)。手順は上記のとおり
-確定しているので、次 iteration はそのまま書き下せばよい。
+**実装の副産物 (いずれも再利用可能)**:
+* `le_centralizer_of_normal_sylow_of_hasNormalPComplement` — 正規 `p`-補群をもつ群で
+  **正規な** Sylow `p`-部分群は全体に中心化される (正規 `p`-補群と正規 Sylow は交わり自明で交換)。
+* `le_normalizer_commutator_self` — `H ≤ N_G(⁅H,H⁆)`。
+* `hasNormalPComplement_of_mulEquiv` / `hasNormalPComplement_of_le` — 同型・部分群への遺伝
+  (`Ch05_Transfer/Main.lean` の `hasNormalPComplement_of_subgroup` を ambient 部分群の形に橋渡し)。
+  ⚠ Ch07 の `S7B2` に同種の MulEquiv 版があるが Ch05 から見て下流なので使えない。
+
+⚠ 実装の罠: `Sylow.coe_subtype` は `rfl` なので `hPNcoe := rfl` で済む。`x : ↥↑S` の `x.2` に
+`rw [hS]` は motive 破綻 ⟹ `hS.le x.2` と項で書く。`Subgroup.relIndex_mul_relIndex` は
+部分群 3 つが explicit。
 
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
