@@ -49,23 +49,36 @@ created: 2026-07-27
 
 AxiomsCheck 5 件登録 (allowlist 3 公理のみ)、フルビルド green、`--strict` 警告ゼロ。
 
-## 残件 1 — `InducedFamilyImageData` の構成可能性を**実際に構成して**示す
+## 完了分 2 — 構成可能性の実証 (commit a0852c6b9)
 
 doneness は「仮説が構成可能か」で測る ([[scaffold-sorry-free-not-done]]) ので、FT の実文脈で
-インスタンスを組むまでが本件の完了。書籍 (5.3.b) は Hypothesis (4.6) の下でこれを discharge する
-(可約な元は certain-type column `μ_j`、`R(μ_j) = {δ_j ω_{ij}^σ, −δ_j ω_{ik}^σ}` は Thm (4.9))。
-repo 側の部品も揃っている:
+インスタンスを組むまでが完了条件。新 leaf **`OddOrder/Peterfalvi/S13_SixTwoImageData.lean`**
+が `S12.Hypothesis M` (kernel `K = M'`) で実際に組んだ:
 
-* 既約 member/break → `S07.dadeOrthonormalCharacterImageFamilyOfDiff`
-* 可約 (column) → `S06.certainTypeR` (§6 版) / `S12.Hypothesis.columnImageFamilyCohFree` (§10 版)
-* 分岐 + 直交性の実例 = `S11.sOf_memberRFamily` / `sOf_memberRFamily_orthogonal` (§9 の族)、
-  `S12.Hypothesis.sixTwoDecompositionData` (§11/§13、~470 行がインライン)
+| 宣言 | 内容 |
+|---|---|
+| `memberColumn` / `memberColumnConj` | 可約 member の正準な列添字対 (書籍 (5.3.b) の (4.4)/(4.5)) |
+| `irrRFamily` | 既約 member の 2 元 Dade 族 |
+| `colRFamily` | 可約 member の μ-grid 列族 `R(μ_j)` (Thm (4.9)、`columnImageFamilyCohFree`) |
+| `memberRFamily` (+`_of_irr`/`_of_red`) | (5.2.d) の分岐 |
+| `memberRFamily_orthogonal` | **(5.2.e) 4 ケース全部** |
+| `inducedFamilyImageData` | 束ね = 構成可能性の証拠 |
+| `sixTwo_of_hypothesis` / `sixThree_of_hypothesis` | §11 での oracle 無し (6.2)/(6.3) |
 
-やること: `S12.Hypothesis.inducedFamilyImageData : S08.InducedFamilyImageData …` を組む。
-鍵は「可約 member の column 添字 `k` を χ から**正準に**取る」こと
-(`reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` は存在しか言わないので、
-`columnSum` の単射性を経由して canonical にする)。組めたら §13 の consumer を
-`six_three_of_imageData` に付け替えて `sixTwoDecompositionData*` のインライン展開を畳める。
+(5.2.e) の col×col で必要な「4 つの列添字が相異なる」は、§13 の `sixTwoDecompositionData` が
+`S₁` 帰属から取っていたのに対し、ここでは (5.2.e) の仮説 `φ ⊥ {χ, χ̄}` から直接出る
+(族のノルムが非零)。`columnSum` の単射性は不要だった。
+
+付随: `S07.OrthonormalCharacterImageFamily.congrChi` (`congrTau` の χ 版)。
+
+AxiomsCheck 8 件登録、フルビルド green (4801 jobs)、`--strict` 警告ゼロ。
+
+## 残件 1 (任意) — §13 consumer の付け替え
+
+`S13_Lemmas113To115.lean:87` は今も `six_three_of_six_two_oracle` + §11 dichotomy 経由。
+`sixThree_of_hypothesis` に付け替えると `chief : ChiefFactorData` / `htype : IsTypeIII ∨ IsTypeIV`
+/ `hnt` が不要になり `coherent_S_of_coherent_SH0C` の仮説が**弱くなる**。既存経路も sorry-free
+なので急務ではないが、`sixTwoDecompositionData*` (~470 行のインライン) を畳める。
 
 ## 残件 2 — 抽象 τ への一般化 (特殊化債務)
 
@@ -81,7 +94,8 @@ helper は 4 つだけ。
 * 書籍: Pf (5.1)–(5.3) p.25 / (6.1)–(6.3) pp.30–31
   (画像: `references/peterfalvi/pages/peterfalvi-p025.png`, `-p030.png` 〜 `-p037.png`。
   §6 の 8 ページは本 issue の作業で新規レンダリング)
-* `OddOrder/Peterfalvi/S08_SixTwoThreeFromImageFamilies.lean` (本件の成果)
+* `OddOrder/Peterfalvi/S08_SixTwoThreeFromImageFamilies.lean` (書籍形の (6.2)/(6.3))
+* `OddOrder/Peterfalvi/S13_SixTwoImageData.lean` (§11 での (5.2.d)/(5.2.e) 実構成)
 * `OddOrder/Peterfalvi/S08_SixTwoGeneral.lean` (`exists_source_index_le_two_psi_of_break`)
 * `OddOrder/Peterfalvi/S08_Theorem62_63_Standalone.lean` (旧 oracle 形、consumer 用に残す)
 * `OddOrder/Peterfalvi/S13_SixTwoBridge.lean` (§11/§13 の `hdatum` 実 discharge)
