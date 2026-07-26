@@ -251,6 +251,26 @@ theorem index_ptStabOfMulAut_smul {A G : Type*} [Group A] [Group G]
   rw [ptStabOfMulAut_smul φ J g σ hσ]
   exact Subgroup.index_map_equiv _ σ
 
+open scoped Pointwise in
+/-- **消費者向けの形**: 作用する群が `MulAut G` の部分群 `Ū` そのもので (`φ = Ū.subtype`)、
+`g` が `Ū` を正規化するとき、`J` と `g • J` の各点固定化群は `Ū` の中で同じ指数を持つ。
+
+`σ` (= `g` による共役) をここで内部的に構成するので、呼び出し側は「`g` が `Ū` を正規化する」
+という群論の事実だけ供給すればよい。Pf (9.7)(a) では `Ū = U` の作用像、`g` = ブロックを移す
+`W₁`-元の作用、正規性は Frobenius `U ⋊ W₁` の `U ⊴ U W₁` から来る (issue 0152)。 -/
+theorem index_ptStabOfMulAut_subtype_smul {G : Type*} [Group G]
+    (Ubar : Subgroup (MulAut G)) (J : Subgroup G) (g : MulAut G)
+    (hg : ∀ u ∈ Ubar, g * u * g⁻¹ ∈ Ubar) (hg' : ∀ u ∈ Ubar, g⁻¹ * u * g ∈ Ubar) :
+    (ptStabOfMulAut Ubar.subtype (g • J)).index
+      = (ptStabOfMulAut Ubar.subtype J).index := by
+  refine index_ptStabOfMulAut_smul Ubar.subtype J g
+    { toFun := fun u => ⟨g * (u : MulAut G) * g⁻¹, hg u u.2⟩
+      invFun := fun u => ⟨g⁻¹ * (u : MulAut G) * g, hg' u u.2⟩
+      left_inv := fun u => Subtype.ext (by group)
+      right_inv := fun u => Subtype.ext (by group)
+      map_mul' := fun u v => Subtype.ext (by push_cast; group) }
+    (fun a => rfl)
+
 /-- **`MulAut` 作用の固定点部分群**: `φ : A →* MulAut G` の下で `∀ a, (φ a) g = g` を
 満たす要素全体. mathlib `MulAction.fixedPoints` は Set だが, MulAut 作用の場合は
 group 構造を持つので Subgroup として bundle.

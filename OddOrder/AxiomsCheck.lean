@@ -9643,6 +9643,7 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Pf (9.7)(a) の「`U/C_U(H_i)` は全ての `i` で位数 `a`」の群論核 (issue 0152)。
 #assert_only_allowed_axioms Subgroup.ptStabOfMulAut_smul
 #assert_only_allowed_axioms Subgroup.index_ptStabOfMulAut_smul
+#assert_only_allowed_axioms Subgroup.index_ptStabOfMulAut_subtype_smul
 #assert_only_allowed_axioms OddOrder.GroupTheory.eq_powMonoidHom_ker_card
 #assert_only_allowed_axioms OddOrder.GroupTheory.Subgroup.eq_of_card_eq_of_isCyclic
 #assert_only_allowed_axioms

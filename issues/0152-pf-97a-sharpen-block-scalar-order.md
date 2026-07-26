@@ -137,3 +137,27 @@ step 1-2 を「ブロックを表現として同型に組む」で進める予�
 
 S11 の `caseA` で `Hpart_orbit` から「指数が等しい」を出し、
 `card_dvd_blockScalarRange_pow_of_blocks_card_eq` に流して `caseA_u_dvd_a_pow` を得る。
+
+## ✅ generic 側 完了 (2026-07-27)
+
+群論の核も揃った (`OddOrder/Mathlib/Subgroup.lean`):
+
+| 定理 | 内容 |
+|---|---|
+| `Subgroup.ptStabOfMulAut φ J` | `MulAut` 作用で `J` を各点固定する**作用側**の部分群 (`fixedPointsOfMulAut` の双対) |
+| `Subgroup.ptStabOfMulAut_smul` | `σ` が `g` 共役を実装 ⟹ `ptStab φ (g • J) = σ (ptStab φ J)` |
+| `Subgroup.index_ptStabOfMulAut_smul` | ⟹ 指数が等しい |
+| `Subgroup.index_ptStabOfMulAut_subtype_smul` | **消費者向け**: `Ū ≤ MulAut G`、`g` が `Ū` を正規化するだけで指数一致 (σ は内部構成) |
+
+⟹ S11 側が供給すべきものは **2 つだけ**:
+
+1. `g_j := quotientMulAutHom chief.N_aInvariant (caseA.orbitRep j)` が
+   `Ū = range (uActionHom data chief)` を正規化すること
+   — `quotientMulAutHom` が準同型ゆえ `g_j * quotientMulAutHom v * g_j⁻¹ =
+   quotientMulAutHom (orbitRep j * v * (orbitRep j)⁻¹)` で、
+   `U ⊴ U ⊔ W₁` (`(typeP_uW1_frobenius data.typeP hU).isNormal`) から従う。
+2. `ker (lineScalarChar (B j)) = ptStabOfMulAut Ū.subtype (Hpart j)` の同一視
+   (`lineScalarChar_ker_eq` + `Hpart` の carrier)。
+
+そこから `card_lineScalarChar_range_eq_index` → 位数一致 →
+`card_dvd_blockScalarRange_pow_of_blocks_card_eq` で `caseA_u_dvd_a_pow` が出る。
