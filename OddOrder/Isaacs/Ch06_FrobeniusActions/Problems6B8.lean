@@ -84,8 +84,10 @@ theorem mul_comm_of_center_le_of_isCyclic_quotient {A : Type*} [Group A] {Z : Su
     rw [MonoidHom.range_eq_top.mpr (QuotientGroup.mk'_surjective Z)]
     have e : (A ⧸ Z) ≃* ↥(⊤ : Subgroup (A ⧸ Z)) := Subgroup.topEquiv.symm
     exact isCyclic_of_surjective e.toMonoidHom e.surjective
-  exact commutative_of_cyclic_center_quotient (QuotientGroup.mk' Z)
-    (by rwa [QuotientGroup.ker_mk']) x y
+  haveI : IsMulCommutative A :=
+    MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center (QuotientGroup.mk' Z)
+      (by rwa [QuotientGroup.ker_mk'])
+  exact (IsMulCommutative.is_comm (M := A)).comm x y
 
 /-- `|P : Z(P)| ≤ 2` なら `P` は可換 (`P/Z(P)` が巡回になるので)。
 
@@ -391,7 +393,7 @@ theorem commutator_le_zpowers_of_index_center_eq_four {P : Type*} [Group P] [Fin
       refine sup_le (sup_le ?_ ?_) ?_
       · intro z hz
         have hz1 : φ z = 1 := hzero z hz y
-        show φ z ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹)
+        change φ z ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹)
         rw [hz1]
         exact Subgroup.one_mem _
       · rw [Subgroup.zpowers_le]; exact hay
@@ -411,7 +413,7 @@ theorem commutator_le_zpowers_of_index_center_eq_four {P : Type*} [Group P] [Fin
       refine sup_le (sup_le ?_ ?_) ?_
       · intro z hz
         have hz1 : ψ z = 1 := hzero' x z hz
-        show ψ z ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹)
+        change ψ z ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹)
         rw [hz1]
         exact Subgroup.one_mem _
       · rw [Subgroup.zpowers_le]; exact hxa
