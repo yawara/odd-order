@@ -663,6 +663,33 @@ theorem mem_thetaHom_ker_iff {P : Type*} [Group P] {A : Subgroup P} {a : P}
     rw [hx]
     group
 
+/-- `θ` の像は `P'` に含まれる (`θ(x) = ⁅x⁻¹, a⁆`)。 -/
+theorem thetaHom_range_le_commutator {P : Type*} [Group P] {A : Subgroup P} {a : P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x)
+    (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A) :
+    (thetaHom A a hab hnorm).range ≤ commutator P := by
+  rintro _ ⟨x, rfl⟩
+  have h1 := Subgroup.commutator_mem_commutator (G := P) (H₁ := ⊤) (H₂ := ⊤)
+    (Subgroup.mem_top ((x : P)⁻¹)) (Subgroup.mem_top a)
+  rw [← commutator_def, commutatorElement_def] at h1
+  show (x : P)⁻¹ * (a * (x : P) * a⁻¹) ∈ commutator P
+  convert h1 using 1
+  group
+
+/-- `thetaHom` 版の反転則: `a · θ(x) · a⁻¹ = θ(x)⁻¹`。 -/
+theorem thetaHom_conj_eq_inv {P : Type*} [Group P] {A : Subgroup P} {a : P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x) (ha2 : a ^ 2 ∈ A)
+    (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A) (x : ↥A) :
+    a * (thetaHom A a hab hnorm x) * a⁻¹ = (thetaHom A a hab hnorm x)⁻¹ :=
+  theta_conj_eq_inv hab ha2 x.2
+
+/-- `A` の元は `θ` の像を中心化する (像は可換な `A` に含まれるから)。 -/
+theorem thetaHom_range_centralized {P : Type*} [Group P] {A : Subgroup P} {a : P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x)
+    (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A) {u : P} (hu : u ∈ A)
+    {w : P} (hw : w ∈ (thetaHom A a hab hnorm).range) : u * w = w * u :=
+  hab _ _ hu (thetaHom_range_le hab hnorm hw)
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
