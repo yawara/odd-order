@@ -69,6 +69,130 @@ theorem hasNormalPComplement_of_normal_of_index_eq_pow [Finite G] {p : ℕ} [Fac
       (Nat.prime_dvd_prime_iff_eq hr hp).mp (hr.dvd_of_dvd_pow (hrdvd.trans h2))
     exact hpX (hrp ▸ hrdvd.trans h1)
 
+/-- **5C.13 / 5D.5 共通のエンジン**: `P ∈ Syl_p(G)`, `L := ⁅P,P⁆` とし, `K ⊴ G` が `L` を含み
+`L` が `K` の**正規 Hall `p`-部分群** (`p ∤ |K : L|`) で `|G : K|` が `p`-冪なら,
+`G` は正規 `p`-補群をもつ。
+
+**証明**: Schur–Zassenhaus で `K` 内の `L` の補群 `X` を取り, **Frattini 論法** (補群の共役性、
+共役元は `L` の中に取れる = Ch.3 の `exists_conj_le_of_isComplement'_of_coprime'`) で
+`G = L · N_G(X)`。**Dedekind** 分解と `L = ⁅P,P⁆ ⊆ Φ(P)` (Problem 1D.8) の非生成性から
+`P ≤ N_G(X)`, よって `N_G(X) = ⊤` すなわち `X ⊴ G`。`|X| = |K : L|` は `p` と素で
+`|G : X| = |L| · |G : K|` は `p`-冪。 -/
+theorem hasNormalPComplement_of_commutator_normalHall_in_normal
+    [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G) {K : Subgroup G} [K.Normal]
+    (hLK : (⁅(P : Subgroup G), (P : Subgroup G)⁆ : Subgroup G) ≤ K)
+    (hMnorm : ((⁅(P : Subgroup G), (P : Subgroup G)⁆ : Subgroup G).subgroupOf K).Normal)
+    (hpM : ¬ p ∣ ((⁅(P : Subgroup G), (P : Subgroup G)⁆ : Subgroup G).subgroupOf K).index)
+    {a : ℕ} (hKidx : K.index = p ^ a) :
+    HasNormalPComplement p G := by
+  classical
+  set L : Subgroup G := ⁅(P : Subgroup G), (P : Subgroup G)⁆ with hLdef
+  have hLP : L ≤ (P : Subgroup G) := by
+    rw [hLdef, ← Subgroup.map_subtype_commutator]
+    exact Subgroup.map_subtype_le _
+  have hLp : IsPGroup p ↥L := by
+    intro g
+    obtain ⟨k, hk⟩ := P.isPGroup' ⟨(g : G), hLP g.2⟩
+    exact ⟨k, Subtype.ext (by simpa using congrArg Subtype.val hk)⟩
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hLp
+  set M : Subgroup ↥K := L.subgroupOf K with hMdef
+  haveI := hMnorm
+  have hMcard : Nat.card ↥M = Nat.card ↥L :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hLK).toEquiv
+  have hcop : Nat.Coprime (Nat.card ↥M) M.index := by
+    rw [hMcard, hn]
+    exact Nat.Coprime.pow_left _ ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hpM)
+  obtain ⟨X', hX'⟩ := Subgroup.exists_right_complement'_of_coprime hcop
+  set X : Subgroup G := X'.map K.subtype with hXdef
+  have hXK : X ≤ K := Subgroup.map_subtype_le _
+  have hXcard : Nat.card ↥X = M.index := by
+    rw [hXdef, Subgroup.card_map_of_injective (Subgroup.subtype_injective K),
+      ← hX'.symm.index_eq_card]
+  have hpX : ¬ p ∣ Nat.card ↥X := fun h => hpM (hXcard ▸ h)
+  have hXsub : X.subgroupOf K = X' := by
+    rw [hXdef, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective
+      (Subgroup.subtype_injective K)]
+  have hXidx : X.index = Nat.card ↥L * K.index := by
+    have e : X.relIndex K * K.index = X.index := Subgroup.relIndex_mul_index hXK
+    have e2 : X.relIndex K = Nat.card ↥L := by
+      rw [Subgroup.relIndex, hXsub, hX'.index_eq_card, hMcard]
+    rw [← e, e2]
+  -- Frattini 論法: `G = L · N_G(X)`
+  haveI hLnil : Group.IsNilpotent ↥L := hLp.isNilpotent
+  haveI hMsolv : IsSolvable ↥M :=
+    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hLK).symm.toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hLK).symm.surjective
+  have hsmulcard : ∀ Y : Subgroup G, ∀ c : G,
+      Nat.card ↥(MulAut.conj c • Y) = Nat.card ↥Y := fun Y c =>
+    Nat.card_congr (Subgroup.equivSMul (MulAut.conj c) Y).toEquiv.symm
+  have hfrat : ∀ g : G, ∃ y ∈ L, MulAut.conj g • X = MulAut.conj y • X := by
+    intro g
+    have hKfix : MulAut.conj g • K = K := by
+      refine Subgroup.mem_normalizer_iff_map_conj_eq.mp ?_
+      rw [Subgroup.normalizer_eq_top]
+      exact Subgroup.mem_top g
+    have hgK : MulAut.conj g • X ≤ K :=
+      hKfix ▸ Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hXK
+    have hUcard : Nat.card ↥((MulAut.conj g • X).subgroupOf K) = Nat.card ↥X := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hgK).toEquiv]
+      exact hsmulcard X g
+    have hcop2 : Nat.Coprime (Nat.card ↥((MulAut.conj g • X).subgroupOf K)) (Nat.card ↥M) := by
+      rw [hUcard, hXcard, hMcard, hn]
+      exact Nat.Coprime.pow_right _ ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hpM).symm
+    obtain ⟨x, hxM, hxle⟩ :=
+      Ch03.exists_conj_le_of_isComplement'_of_coprime' (Or.inl hMsolv) hX' hcop2
+    refine ⟨(x : G), hxM, ?_⟩
+    have hmapU : ((MulAut.conj g • X).subgroupOf K).map K.subtype = MulAut.conj g • X := by
+      rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hgK]
+    have hcoe : Subgroup.map (MulAut.conj x).toMonoidHom X' = MulAut.conj x • X' := rfl
+    have hmapX' : (Subgroup.map (MulAut.conj x).toMonoidHom X').map K.subtype
+        = MulAut.conj (x : G) • X := by
+      rw [hcoe, Ch01.map_conj_smul, hXdef]
+      rfl
+    have hstep := Subgroup.map_mono (f := K.subtype) hxle
+    rw [hmapU, hmapX'] at hstep
+    refine Subgroup.eq_of_le_of_card_ge hstep ?_
+    rw [hsmulcard X (x : G), hsmulcard X g]
+  have hdecomp : ∀ g : G, ∃ y ∈ L, ∃ w ∈ Subgroup.normalizer (X : Set G), g = y * w := by
+    intro g
+    obtain ⟨y, hyL, hy⟩ := hfrat g
+    refine ⟨y, hyL, y⁻¹ * g, ?_, by group⟩
+    have key : MulAut.conj (y⁻¹ * g) • X = X := by
+      rw [map_mul, map_inv, mul_smul, hy, ← mul_smul, inv_mul_cancel, one_smul]
+    exact Subgroup.mem_normalizer_iff_map_conj_eq.mpr key
+  -- Dedekind + Frattini 部分群の非生成性: `P ≤ N_G(X)`
+  haveI : Group.IsNilpotent ↥(P : Subgroup G) := P.isPGroup'.isNilpotent
+  have hLsub : L.subgroupOf (P : Subgroup G) = _root_.commutator ↥(P : Subgroup G) := by
+    rw [hLdef, ← Subgroup.map_subtype_commutator, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective (Subgroup.subtype_injective _)]
+  have hPtop : (Subgroup.normalizer (X : Set G)).subgroupOf (P : Subgroup G)
+      ⊔ frattini ↥(P : Subgroup G) = ⊤ := by
+    refine top_le_iff.mp fun z _ => ?_
+    obtain ⟨y, hyL, w, hw, hz⟩ := hdecomp (z : G)
+    have hyP : y ∈ (P : Subgroup G) := hLP hyL
+    have hwP : w ∈ (P : Subgroup G) := by
+      have hw' : w = y⁻¹ * (z : G) := by rw [hz]; group
+      rw [hw']
+      exact Subgroup.mul_mem _ (Subgroup.inv_mem _ hyP) z.2
+    have hzsplit : z = (⟨y, hyP⟩ : ↥(P : Subgroup G)) * ⟨w, hwP⟩ :=
+      Subtype.ext (by simpa using hz)
+    rw [hzsplit]
+    refine Subgroup.mul_mem _ (Subgroup.mem_sup_right ?_) (Subgroup.mem_sup_left hw)
+    refine Ch01.commutator_le_frattini ?_
+    rw [← hLsub]
+    exact hyL
+  have hPX : (P : Subgroup G) ≤ Subgroup.normalizer (X : Set G) := by
+    rw [← Subgroup.subgroupOf_eq_top]
+    exact frattini_nongenerating hPtop
+  have hXtop : Subgroup.normalizer (X : Set G) = ⊤ := by
+    refine top_le_iff.mp fun g _ => ?_
+    obtain ⟨y, hyL, w, hw, hz⟩ := hdecomp g
+    rw [hz]
+    exact Subgroup.mul_mem _ (hPX (hLP hyL)) hw
+  haveI : X.Normal := Subgroup.normalizer_eq_top_iff.mp hXtop
+  refine hasNormalPComplement_of_normal_of_index_eq_pow (a := n + a) hpX ?_
+  rw [hXidx, hn, hKidx, pow_add]
+
 /-- **5C.13 の還元形**: `P ∈ Syl_p(G)` が自己正規化で `⁅P,P⁆ ⊴ G` なら `G` は正規 `p`-補群をもつ。
 
 書籍 hint の "Without loss of generality, `P' ⊴ G`" に対応する本体。 -/
@@ -161,114 +285,18 @@ theorem hasNormalPComplement_of_selfNormalizing_sylow_of_commutator_normal
       _ = Nat.card ↥L * Nat.card (G ⧸ L) := by rw [← e4]; exact e3.symm
       _ = Nat.card ↥L * (Nat.card ↥Kbar * Kbar.index) := by rw [e2]
       _ = Nat.card ↥Kbar * Nat.card ↥L * Kbar.index := by ring
-  -- `M := L.subgroupOf K` は `K` の正規 Hall `p`-部分群
-  set M : Subgroup ↥K := L.subgroupOf K with hMdef
-  haveI : M.Normal := Subgroup.Normal.subgroupOf inferInstance K
-  have hMcard : Nat.card ↥M = Nat.card ↥L :=
+  have hMcard : Nat.card ↥(L.subgroupOf K) = Nat.card ↥L :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hLK).toEquiv
-  have hMidx : M.index = Nat.card ↥Kbar := by
-    have e : Nat.card ↥M * M.index = Nat.card ↥K := Subgroup.card_mul_index M
+  have hMidx : (L.subgroupOf K).index = Nat.card ↥Kbar := by
+    have e : Nat.card ↥(L.subgroupOf K) * (L.subgroupOf K).index = Nat.card ↥K :=
+      Subgroup.card_mul_index _
     rw [hMcard] at e
     refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥L)) ?_
     rw [e, hKcard, Nat.mul_comm]
-  have hcop : Nat.Coprime (Nat.card ↥M) M.index := by
-    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hLp
-    rw [hMcard, hn, hMidx]
-    exact Nat.Coprime.pow_left _ ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hpKbar)
-  obtain ⟨X', hX'⟩ := Subgroup.exists_right_complement'_of_coprime hcop
-  set X : Subgroup G := X'.map K.subtype with hXdef
-  have hXK : X ≤ K := Subgroup.map_subtype_le _
-  have hXcard : Nat.card ↥X = Nat.card ↥Kbar := by
-    rw [hXdef, Subgroup.card_map_of_injective (Subgroup.subtype_injective K),
-      ← hX'.symm.index_eq_card, hMidx]
-  have hpX : ¬ p ∣ Nat.card ↥X := hXcard ▸ hpKbar
-  have hXsub : X.subgroupOf K = X' := by
-    rw [hXdef, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective
-      (Subgroup.subtype_injective K)]
-  have hXidx : X.index = Nat.card ↥L * Kbar.index := by
-    have e : X.relIndex K * K.index = X.index := Subgroup.relIndex_mul_index hXK
-    have e2 : X.relIndex K = Nat.card ↥L := by
-      rw [Subgroup.relIndex, hXsub, hX'.index_eq_card, hMcard]
-    rw [← e, e2, hKidx]
-  -- (3) Frattini 論法: `G = L · N_G(X)`
-  haveI hLnil : Group.IsNilpotent ↥L := hLp.isNilpotent
-  haveI hMsolv : IsSolvable ↥M :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hLK).symm.toMonoidHom)
-      (Subgroup.subgroupOfEquivOfLe hLK).symm.surjective
-  have hfrat : ∀ g : G, ∃ y ∈ L, MulAut.conj g • X = MulAut.conj y • X := by
-    intro g
-    have hKfix : MulAut.conj g • K = K := by
-      refine Subgroup.mem_normalizer_iff_map_conj_eq.mp ?_
-      rw [Subgroup.normalizer_eq_top]
-      exact Subgroup.mem_top g
-    have hgK : MulAut.conj g • X ≤ K :=
-      hKfix ▸ Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hXK
-    have hsmulcard : ∀ Y : Subgroup G, ∀ a : G,
-        Nat.card ↥(MulAut.conj a • Y) = Nat.card ↥Y := fun Y a =>
-      Nat.card_congr (Subgroup.equivSMul (MulAut.conj a) Y).toEquiv.symm
-    have hUcard : Nat.card ↥((MulAut.conj g • X).subgroupOf K) = Nat.card ↥X := by
-      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hgK).toEquiv]
-      exact hsmulcard X g
-    have hcop2 : Nat.Coprime (Nat.card ↥((MulAut.conj g • X).subgroupOf K)) (Nat.card ↥M) := by
-      obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hLp
-      rw [hUcard, hXcard, hMcard, hn]
-      exact Nat.Coprime.pow_right _ ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hpKbar).symm
-    obtain ⟨x, hxM, hxle⟩ :=
-      Ch03.exists_conj_le_of_isComplement'_of_coprime' (Or.inl hMsolv) hX' hcop2
-    refine ⟨(x : G), hxM, ?_⟩
-    have hmapU : ((MulAut.conj g • X).subgroupOf K).map K.subtype = MulAut.conj g • X := by
-      rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hgK]
-    have hcoe : Subgroup.map (MulAut.conj x).toMonoidHom X' = MulAut.conj x • X' := rfl
-    have hmapX' : (Subgroup.map (MulAut.conj x).toMonoidHom X').map K.subtype
-        = MulAut.conj (x : G) • X := by
-      rw [hcoe, Ch01.map_conj_smul, hXdef]
-      rfl
-    have hstep := Subgroup.map_mono (f := K.subtype) hxle
-    rw [hmapU, hmapX'] at hstep
-    refine Subgroup.eq_of_le_of_card_ge hstep ?_
-    rw [hsmulcard X (x : G), hsmulcard X g]
-  have hdecomp : ∀ g : G, ∃ y ∈ L, ∃ n ∈ Subgroup.normalizer (X : Set G), g = y * n := by
-    intro g
-    obtain ⟨y, hyL, hy⟩ := hfrat g
-    refine ⟨y, hyL, y⁻¹ * g, ?_, by group⟩
-    have key : MulAut.conj (y⁻¹ * g) • X = X := by
-      rw [map_mul, map_inv, mul_smul, hy, ← mul_smul, inv_mul_cancel, one_smul]
-    exact Subgroup.mem_normalizer_iff_map_conj_eq.mpr key
-  -- (4) Dedekind + Frattini 部分群の非生成性: `P ≤ N_G(X)`
-  haveI : Group.IsNilpotent ↥(P : Subgroup G) := P.isPGroup'.isNilpotent
-  have hLsub : L.subgroupOf (P : Subgroup G) = _root_.commutator ↥(P : Subgroup G) := by
-    rw [hLdef, ← Subgroup.map_subtype_commutator, Subgroup.subgroupOf,
-      Subgroup.comap_map_eq_self_of_injective (Subgroup.subtype_injective _)]
-  have hPtop : (Subgroup.normalizer (X : Set G)).subgroupOf (P : Subgroup G)
-      ⊔ frattini ↥(P : Subgroup G) = ⊤ := by
-    refine top_le_iff.mp fun z _ => ?_
-    obtain ⟨y, hyL, n, hn, hz⟩ := hdecomp (z : G)
-    have hyP : y ∈ (P : Subgroup G) := hLP hyL
-    have hnP : n ∈ (P : Subgroup G) := by
-      have hn' : n = y⁻¹ * (z : G) := by rw [hz]; group
-      rw [hn']
-      exact Subgroup.mul_mem _ (Subgroup.inv_mem _ hyP) z.2
-    have hzsplit : z = (⟨y, hyP⟩ : ↥(P : Subgroup G)) * ⟨n, hnP⟩ :=
-      Subtype.ext (by simpa using hz)
-    rw [hzsplit]
-    refine Subgroup.mul_mem _ (Subgroup.mem_sup_right ?_) (Subgroup.mem_sup_left hn)
-    refine Ch01.commutator_le_frattini ?_
-    rw [← hLsub]
-    exact hyL
-  have hPX : (P : Subgroup G) ≤ Subgroup.normalizer (X : Set G) := by
-    rw [← Subgroup.subgroupOf_eq_top]
-    exact frattini_nongenerating hPtop
-  -- (5) `N_G(X) = ⊤`
-  have hXtop : Subgroup.normalizer (X : Set G) = ⊤ := by
-    refine top_le_iff.mp fun g _ => ?_
-    obtain ⟨y, hyL, n, hn, hz⟩ := hdecomp g
-    rw [hz]
-    exact Subgroup.mul_mem _ (hPX (hLP hyL)) hn
-  haveI : X.Normal := Subgroup.normalizer_eq_top_iff.mp hXtop
-  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hLp
   obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp Pbar.isPGroup'
-  refine hasNormalPComplement_of_normal_of_index_eq_pow (a := n + m) hpX ?_
-  rw [hXidx, hn, hKbaridx, hm, pow_add]
+  refine hasNormalPComplement_of_commutator_normalHall_in_normal P (K := K) hLK
+    (Subgroup.Normal.subgroupOf inferInstance K) (fun h => hpKbar (hMidx ▸ h)) (a := m) ?_
+  rw [hKidx, hKbaridx, hm]
 
 /-- **Isaacs Problem 5C.13 (Navarro)** (p. 164) ⭐: `P` が `G` の Sylow `p`-部分群で
 `P = N_G(P)` なら, `N_G(P')` (`P' = ⁅P,P⁆`) は正規 `p`-補群をもつ。 -/

@@ -1807,7 +1807,7 @@ Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
 | 5D.2 | ✅ 完了 (`hasNormalPComplement_of_sylow_le_center` + Burnside 導出の `example`) | `P ∈ Syl_p(G)`, `P ⊆ Z(G)` ⇒ (Burnside も transfer 理論も使わずに) `G` は正規 `p`-補群をもつ。これと Cor 5.23 から Burnside を導く |
 | 5D.3 | (a) ✅ 完了 (`exists_sylow_coe_eq_of_isCoatom_of_isPGroup`) / (b)(c) 🔒 5C.6 待ち | `G` 非可換単純, `P ⊆ G` が極大な `p`-部分群。(a) `P ∈ Syl_p(G)` (b) `1 < N ⊴ P` で `P/N` 可換なら `P` は `N` を含む唯一の Sylow `p`-部分群 ⇒ `N` は `P` 内で `G` に関し weakly closed (c) `P` の冪零類 ≥ 3 |
 | 5D.4 | ✅ 完了 (`pResidualOf_le_inf_pResidual` / `APrime_eq_subgroupOf_APrime_of_pResidualOf_eq`) | `P ∈ Syl_p(G)`, `P ⊆ K ⊆ G` ⇒ `O^p(K) ⊆ K ∩ O^p(G)`、等号なら `A^p(K) = K ∩ A^p(G)` |
-| 5D.5 | ⬜ | `P ∈ Syl_p(G)`, `A ∩ P = P'` (`A = A^p(G)`)。`P' ⊴ A` なら (Tate を使わず) `G` は正規 `p`-補群をもつ。hint: SZ で `A` 内の `P'` の補群 `K` を取り `G = N_G(K)P'`、`P' ⊆ Φ(P)` から `P` が `K` を正規化 |
+| 5D.5 | ✅ 完了 (`hasNormalPComplement_of_APrime_inf_sylow_eq_commutator`) | `P ∈ Syl_p(G)`, `A ∩ P = P'` (`A = A^p(G)`)。`P' ⊴ A` なら (Tate を使わず) `G` は正規 `p`-補群をもつ。hint: SZ で `A` 内の `P'` の補群 `K` を取り `G = N_G(K)P'`、`P' ⊆ Φ(P)` から `P` が `K` を正規化 |
 | 5D.6 | ⬜ | 同じ設定で `P'` 可換なら `G` は正規 `p`-補群をもつ。hint: `N = N_G(P')` が仮定を満たすことを見て `A` の中で Burnside |
 
 ⚠ **5D.3(b)** は **5C.6 (weak closure)** に依存 — 5C.6 は hub レーン (issue 9503
@@ -1890,6 +1890,26 @@ implicit なので `(X := K)` を明示しないと `Subgroup.Normal ?m` で ins
 
 ⚠ (b)(c) は **Problem 5C.6 (weak closure)** 依存 — hub レーンの
 `OddOrder/GroupTheory/WeaklyClosed.lean` (issue 9503) が landing してから。
+
+### 5D.5 の実装 (2026-07-27 完了、新 leaf `Problems5D5.lean` 68 行) + 5C.13 のエンジン切り出し
+
+⭐ **5D.5 の hint は 5C.13 の最終段と完全に同じ論法**だったので、5C.13 の還元形から共通部分を
+`hasNormalPComplement_of_commutator_normalHall_in_normal` として `Problems5C13.lean` に
+**切り出して共有した** (重複を書かない方針):
+
+> `P ∈ Syl_p(G)`, `L := ⁅P,P⁆`, `K ⊴ G` が `L` を含み `L` が `K` の**正規 Hall `p`-部分群**
+> (`p ∤ |K:L|`) で `|G:K|` が `p`-冪 ⟹ `G` は正規 `p`-補群をもつ
+
+(証明 = Schur–Zassenhaus で `K` 内の `L` の補群 `X` → Frattini (共役元は `L` 内) で
+`G = L·N_G(X)` → Dedekind + `⁅P,P⁆ ⊆ Φ(P)` の非生成性で `P ≤ N_G(X)` → `X ⊴ G`)。
+5C.13 の還元形は Burnside で `K = π⁻¹(K̄)` を作ってこのエンジンを呼ぶだけになった。
+
+**5D.5 側**: `A := A^p(G) ⊴ G` なので `A ∩ P` は `A` の Sylow `p`-部分群
+(`Ch03.isHallSubgroup_subgroupOf_of_normal` + `Ch01.sylow_isHallSubgroup_singleton`)、
+仮定でそれが `P'` かつ `A` で正規 ⟹ 正規 Hall `p`-部分群。`|G:A|` は `p`-冪
+(`APrime_index_isPGroup`) ⟹ エンジンをそのまま適用。
+
+⚠ `(K ⊓ H).subgroupOf K = H.subgroupOf K` は **`inf_subgroupOf_left`** (右側版は `_right`)。
 
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
