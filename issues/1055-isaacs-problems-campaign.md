@@ -1974,7 +1974,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6B.2 | ✅ | `A` 可換が `N` に忠実作用, `N` の非自明真部分群が `A`-不変でない ⟹ `A` 巡回 |
 | 6B.3 | ✅ | Thm 6.21 の coprime 仮定を落とすと偽 (反例構成) |
 | 6B.4 | ✅ | 分割 II で `[X,Y] = 1` ⟹ (a) `G` 可換 (b) 基本可換 |
-| 6B.5 | ⬜ | subnormal 部分群からなる分割を持つ ⟹ `G` 冪零 |
+| 6B.5 | 🔍 設計調査済 (下記メモ) | subnormal 部分群からなる分割を持つ ⟹ `G` 冪零 |
 | 6B.6 | ⬜ | 位数 ≥ 8 の巡回 2-群は位数 2 の自己同型をちょうど 3 個持つ |
 | 6B.7 | ⬜ | 非可換 2-群が指数 2 の巡回部分群を持ち `|P:Z(P)| > 4` ⟹ 二面体/半二面体/一般四元数 |
 | 6B.8 | ⬜ | `|P| ≥ 8`, `|P:P'| = 4` ⟹ 二面体/半二面体/一般四元数 (Taussky-Todd) |
@@ -3071,3 +3071,30 @@ Sylow は巡回か一般四元数) / Cor 6.18 / Thm 6.19 / Lemma 6.20 / Thm 6.21
   S13_Corollary132.lean` に在るが **BG は Isaacs の下流**なので import 不可。Isaacs 側では
   `Isaacs.Ch04.exists_aInvariant_sylow` (action 形) か、上記 `FrobeniusGroup.lean` の
   既存ラッパを使う。
+
+
+## 6B.5 着手メモ (2026-07-27) — 「subnormal 部分群からなる分割 ⟹ 冪零」
+
+**調査結果 (実測)**:
+* **mathlib に `Subgroup.IsSubnormal` が在る** (`Mathlib/GroupTheory/IsSubnormal.lean`)。使える API =
+  `Normal.isSubnormal` / `isSubnormal_iff` / `IsSubnormal.trans` / `.trans'` / `.map` / `.comap` /
+  ⭐ **`exists_normal_and_le_and_lt_top_of_ne : H.IsSubnormal → H ≠ ⊤ → ∃ K, K.Normal ∧ H ≤ K ∧ K < ⊤`**
+  (`|G|`-induction の下降ステップに直結)。
+* repo 側: `Ch02_Subnormality/Basic.lean:140` `inf_isSubnormal_subgroupOf` (部分群への制限),
+  同 `:150` `commute_of_disjoint_normal` (**normal 版のみ** — subnormal 版は無い),
+  `Theorem211Wielandt.lean` = Isaacs Thm 2.11 (可換 subnormal ⟹ `≤ F(G)`)。
+
+**最短経路 (6B.4 が効く)**: 欠けているのは 1 本だけ —
+> **Wielandt**: `H`, `K` が subnormal で `H ⊓ K = ⊥` なら `⁅H, K⁆ = ⊥`。
+
+これが在れば, 分割の相異なる部分は `SubgroupPartition.inf_eq_bot_of_ne` で交わりが自明ゆえ
+**互いに可換**になり, **6B.4 (a)(b)** がそのまま適用できて `G` は基本可換 ⟹ 冪零。
+(別経路として Thm 2.11 で「各部分が可換 subnormal ⟹ `≤ F(G)`」から `G = F(G)` も使える。)
+
+**Wielandt 補題の証明の当たり**: `|G|` に関する強帰納法。`H = ⊤` なら `K = ⊥` で自明。
+`H ≠ ⊤` なら `exists_normal_and_le_and_lt_top_of_ne` で `H ≤ M ⊴ G`, `M < ⊤` を取り,
+`H` と `K ⊓ M` を `M` の中で帰納法にかけると `⁅H, K ⊓ M⁆ = ⊥` までは出る。
+⚠ **`K ⊓ M` から `K` 全体へ延ばす所が本体** (素朴には `⟨H,K⟩ = ⊤` に還元して `H^G ≤ M < ⊤` を
+使うが, そこから先がもう一段要る)。書籍の hint (「`H < G` が分割のどの部分にも含まれないなら
+`H` は冪零」→「`F(G)` に含まれない部分は正規で素数指数」) は別経路で, こちらは
+`H` に誘導分割 `{H ⊓ X}` が乗る (全部真部分群になる) ので帰納法が回る形。
