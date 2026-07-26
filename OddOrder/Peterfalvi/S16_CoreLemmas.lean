@@ -646,6 +646,56 @@ structure FieldNormalizerData (hyp : Hypothesis (G := G)) where
 
 namespace FieldNormalizerData
 
+/-- **The Feit--Thompson spine satisfies BG Appendix C, Hypothesis (B)**.
+
+The Peterfalvi Section 16 field-normalizer data is a concrete instance of the book's abstract
+hypothesis (B) (`OddOrder.BG.AppC.HypothesisBAbstract`): `σ : H = P ⋊ U → G` is the same
+monomorphism, `Q = hyp.base.Q` is finite (`G` is), abelian and a `p'`-group (it is elementary
+abelian of exponent `q`, and `q < p` gives `p ≠ q`), `y = data.y ∈ Q`, and the two normalizer
+clauses are `W2_normalizes_Q` / `W2_conj_y_normalizes_U` transported along
+`sigma_P0_eq_W2` / `sigma_U_eq_U`.
+
+This is what certifies that `HypothesisBAbstract` is a faithful abstraction of the configuration
+the spine actually produces, rather than a differently-shaped hypothesis. -/
+noncomputable def toHypothesisBAbstract [Finite G] {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    OddOrder.BG.AppC.HypothesisBAbstract hyp.base.p hyp.base.q G := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  refine
+    { sigma := data.sigma
+      sigma_injective := data.sigma_injective
+      Q := hyp.base.Q
+      Q_finite := inferInstance
+      Q_commutative := IsMulCommutative.of_comm data.Q_elementaryAbelian.comm
+      Q_pPrime := ?_
+      y := data.y
+      y_mem_Q := data.y_mem_Q
+      primeLine_normalizes_Q := ?_
+      primeLine_conj_normalizes_U := ?_ }
+  · -- `|Q| = q ^ n` and `p ≠ q`, so `p ∤ |Q|`.
+    haveI : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
+    obtain ⟨n, hn⟩ := data.Q_elementaryAbelian.isPGroup.exists_card_eq
+    rw [hn]
+    intro hdvd
+    exact hyp.p_ne_q
+      ((Nat.prime_dvd_prime_iff_eq hyp.base.p_prime hyp.base.q_prime).mp
+        (hyp.base.p_prime.dvd_of_dvd_pow hdvd))
+  · -- `σ(P₀) = W₂` normalizes `Q`.
+    have h : (OddOrder.BG.AppC.primeLine hyp.base.p hyp.base.q).map data.sigma = hyp.base.W2 :=
+      data.sigma_P0_eq_W2
+    rw [h]
+    exact data.W2_normalizes_Q
+  · -- `σ(P₀)^y` normalizes `σ(U) = U`.
+    have h : (OddOrder.BG.AppC.primeLine hyp.base.p hyp.base.q).map data.sigma = hyp.base.W2 :=
+      data.sigma_P0_eq_W2
+    have hU :
+        (OddOrder.BG.AppC.NormSet.normOneFrobeniusComplement hyp.base.p hyp.base.q).map
+          data.sigma = hyp.base.U := data.sigma_U_eq_U
+    rw [h, hU]
+    exact data.W2_conj_y_normalizes_U
+
+
 /-- The BG element `s ∈ P₀#`, transported to `G` through the concrete
 field-normalizer monomorphism. -/
 noncomputable def s {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) : G :=

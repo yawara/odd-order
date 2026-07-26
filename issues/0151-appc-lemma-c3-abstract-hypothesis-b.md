@@ -190,3 +190,28 @@ predicates, (8.8) case-B, `q < p`, `p_odd`/`q_odd`, …) は**一切使われて
 | `data.Q_elementaryAbelian.comm` | `data.Q_commutative` |
 | `fieldNormalizerFrobeniusGroup hyp` | `NormSet.normOneFrobeniusGroup p q` |
 | `fieldNormalizerKernel/Complement/PrimeLine hyp` | 上流の同名 (step 1 で差し替え済) |
+
+## ✅ step 2a 完了 — 忠実性ブリッジ (2026-07-26)
+
+`S16.FieldNormalizerData.toHypothesisBAbstract` を追加。**Peterfalvi §16 の field-normalizer
+構成が書籍 p. 145 の抽象仮説 (B) の instance になっている**ことの証明:
+
+| (B) の要求 | S16 側の供給元 |
+|---|---|
+| `σ : H → G` 単射 | `data.sigma` / `data.sigma_injective` |
+| `Q` 有限 | `[Finite G]` |
+| `Q` 可換 | `data.Q_elementaryAbelian.comm` |
+| `Q` は `p'`-群 | `|Q| = q^n` (`IsPGroup.exists_card_eq`) + `q < p` ⟹ `p ≠ q` |
+| `y ∈ Q` | `data.y` / `data.y_mem_Q` |
+| `σ(P₀)` が `Q` を正規化 | `sigma_P0_eq_W2` ▸ `W2_normalizes_Q` |
+| `σ(P₀)^y` が `σ(U)` を正規化 | `sigma_P0_eq_W2` + `sigma_U_eq_U` ▸ `W2_conj_y_normalizes_U` |
+
+⟹ **`HypothesisBAbstract` が「spine が実際に作る配置の忠実な抽象化」であることが機械検証された**
+(別形の仮説にすり替わっていない = [[scaffold-sorry-free-not-done]] の carrier 構成可能性チェック)。
+これで step 2b (chain 本体の再パラメータ化) を進めても、抽象側が空虚でないことが保証される。
+
+### step 2b (次)
+
+chain 本体を `data : FieldNormalizerData hyp` から `data : HypothesisBAbstract p q G`
+(+ `hq : q.Prime` + `hA : conditionA p q`) へ機械置換する。上の置換表に従い、
+`HypothesisBAbstract.{P, U, W2}` を σ の像として def 化してから file 単位で移行する。

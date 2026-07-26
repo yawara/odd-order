@@ -333,7 +333,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 12800
+set_option linter.style.longFile 12900
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -5088,6 +5088,14 @@ set_option linter.style.longLine false in
 -- σ(P) = 上三角ユニポテント / σ(U) = 分裂トーラス / y = [[0,1],[1,1]] / Q = ⟨y⟩ (位数 3) が
 -- 仮説 (B) を満たす。σ は SemidirectProduct.lift で実構成 (単射性も証明済) — carrier は
 -- 全て具体的で、hoist された仮説は無い。
+-- **BG App.C Hypothesis (B) の忠実性証明** (issue 0151 step 2, 2026-07-26): Peterfalvi §16 の
+-- field-normalizer 構成が書籍 p. 145 の抽象仮説 (B) (`HypothesisBAbstract`) の instance に
+-- なっていることの証明。Q の有限性 (G が有限)・可換性 (elementary abelian)・p'-性
+-- (|Q| = q^n かつ q < p) と 2 つの normalizer 条件を `sigma_P0_eq_W2`/`sigma_U_eq_U` で輸送する。
+-- これで `HypothesisBAbstract` が「spine が実際に作る配置の忠実な抽象化」であることが
+-- 機械検証される (別形の仮説にすり替わっていない)。
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.toHypothesisBAbstract
 #assert_only_allowed_axioms OddOrder.BG.AppC.conditionA_two
 #assert_only_allowed_axioms OddOrder.BG.AppC.sigmaSL2_injective
 #assert_only_allowed_axioms OddOrder.BG.AppC.map_kernel_sigmaSL2
