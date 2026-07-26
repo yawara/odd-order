@@ -465,8 +465,20 @@ noncomputable def inducedFamilyImageData (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
     (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
     (hzconj : params.zeta.conj ≠ params.zeta) :
-    OddOrder.Peterfalvi.S08.InducedFamilyImageData hyp.dadeData.dade
+    OddOrder.Peterfalvi.S08.InducedFamilyImageData hyp.A0
       ((derivedInG M).subgroupOf M) where
+  tau := hyp.tau
+  -- (5.2.b): the Dade isometry, and its `ℤ[Irr G]` codomain, on `A₀`-supported elements of `ℤ[𝒮]`
+  -- (`hφ.1 : φ ∈ ℤ[𝒮]`, `hφ.2 : supp φ ⊆ A₀`; `ℤ[𝒮] ≤ ℤ[Irr M]` since every member is a character).
+  tau_isometry := fun _φ _ζ hφ hζ =>
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dadeData.dade
+      (S := OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥M)
+        (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥) hyp.A0)
+      (fun _s hs => hs.2) (Submodule.subset_span hφ) (Submodule.subset_span hζ)
+  tau_mem_ZIrr := fun _φ hφ =>
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp.dadeData.dade hφ.2
+      (Submodule.span_le.mpr
+        (fun _x hx => OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr hx) hφ.1)
   R := fun _χ hχ => hyp.memberRFamily hG hmu hδpm hδj hzS hz1 hzconj hχ
   orthogonal := fun _χ hχ _φ hφ hφχ hφχbar =>
     hyp.memberRFamily_orthogonal hG hmu hδpm hδj hzS hz1 hzconj hχ hφ hφχ hφχbar

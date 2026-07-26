@@ -6,6 +6,30 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-27 早朝 hub 直接作業 tick (「直近の作業から再開」) — 🎯 issue 0154 完済: 加重 (5.6) と
+> (6.2)/(6.3) の Dade 依存を完全除去 + lane a 合流。push →756b18f7a**。
+> ① **加重 (5.6) engine の τ 一般化** (`59defaf9b`, `c00ca1fd7`): 新 leaf `S08_GeneralAdjoinWeighted`。
+> Dade を真に使う helper は実測 **4 つだけ**で、`crux1_of_memberFamilyW` に至っては `hyp`/`_hτ` を
+> 証明本体で一度も使っていなかった。可約 break `xAdjoinStepW_k_general` と既約 break
+> `xAdjoinStepW_general` + 各対偶を新設し、Dade 版 4 本は `Samb = univ` 特殊化に置換
+> (`mem_zSupportedSpan_univ_iff` — Dade は「全 A₀-supported 関数」上の等長なのでこれが正しい)。
+> ② **break chain + (6.2)/(6.3)** (`572b9368a`): `S08_SixTwoGeneral` の Dade 依存も実測 **2 箇所だけ**
+> (加重 engine 呼び出しと `dadeIntegralCharacterMap_mem_ZIrr_of_supported`)。3 本を `_general` 化。
+> `InducedFamilyImageData` は引数を `(hyp) (K)` → `(A₀ : Set ↥L) (K)` に変え **(5.2.b) を 3 フィールド**
+> (`tau`/`tau_isometry`/`tau_mem_ZIrr` = 書籍の値域 `ℤ[Irr G, G^#]` 節) で担う。⟹ Dade は bundle の
+> **witness の一つ**に降りた。§11/§13/§15 consumer は無変更。
+> ③ **付帯: (11.4) 付け替え** (`1565698cd`): `sixTwo_of_hypothesis` 経由に変え、producer 用に担いで
+> いた**型仮説 `IsTypeIII ∨ IsTypeIV` を除去** (`≠ ⊤` → `< M'` は `Subgroup.subgroupOf_eq_top` で変換)。
+> ④ **lane a 合流** (40 commits, Isaacs Problems 5C/5D/5E/6A) — ⚠ **合流固有の破綻を gate が検出**:
+> `Problems6A2`/`Problems6A3` が同 namespace で無名 `instance : Fact (Nat.Prime n)` を宣言し、
+> Lean の自動命名が両方 `instFactPrimeOfNatNat_oddOrder` になって root import が
+> `environment already contains` で失敗。leaf 単体では出ない。明示名を付けて解消 (`756b18f7a`)。
+> **教訓: 兄弟 leaf が同 namespace で同型の無名 instance を宣言してはいけない** (無名 instance の
+> 自動名は型の shape だけで決まり、数値リテラルで区別されない)。
+> gate: フルビルド green (4820 jobs)、AxiomsCheck OK (**一般形 9 本を新規登録**、全て axiom-clean)、
+> `--strict` EXIT=0、sorry census 1 (凍結 Q₈) 非退行、全 push 済。
+> issue: 0154 close。lane b/c/d: 変化なし。
+
 > **▶▶ 2026-07-24 夜 hub tick #6 (区切り) — 🎯 App III Prop 1 完成 + Lemma 1(c)(d) 完成 = Lemma 1 全完了。push →a5d9a44b6**。
 > ① **Prop 1 後半** (`ff4f5d9d5`): conj = `AdjoinRoot.liftAlgHom` + `AlgEquiv.ofAlgHom` 自己合成
 > (有限次元論法・field instance 不要) / `equivProd` (powerBasis' reindex + finTwoArrow) /

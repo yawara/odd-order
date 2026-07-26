@@ -415,7 +415,7 @@ theorem isFrobeniusAction_grpA5 [Finite F] (hα : orderOf α = 11) (hε : orderO
 
 /-! ### 書籍の場合 `p = 331` (`55 ∣ 330`) -/
 
-instance : Fact (Nat.Prime 331) := ⟨by norm_num⟩
+instance fact_prime_331 : Fact (Nat.Prime 331) := ⟨by norm_num⟩
 
 /-- `𝔽₃₃₁` の乗法群に位数 11 の元がある (`74`)。 -/
 theorem exists_orderOf_eq_eleven_zmod_331 : ∃ α : ZMod 331, orderOf α = 11 := by
