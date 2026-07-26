@@ -1793,6 +1793,40 @@ Sylow-`p` `P` は位数 `p^n` (`n ≤ 2`) ゆえ可換なので、Burnside
 ⚠ `Sylow` の極大性フィールドは `P.3 : IsPGroup p Q → ↑P ≤ Q → Q = ↑P` (**向きに注意**)。
 ⚠ `Subgroup.mem_normalizer_fintype` で「片方向の共役閉」から正規化子の元が取れる。
 
+## Ch.5 §5D (書籍 pp. 169-170 の Problems 5D) — 次の frontier (2026-07-27)
+
+statement は **PDF ページ画像で確定済** (書籍 pp. 169-170 = PDF pp. 182-183)。
+`A^p(G)` / `O^p(G)` / focal subgroup / `ControlsFusionIn` は `Ch05_Transfer/Basic.lean` に既存
+(`APrime` / `pResidual` / `Subgroup.focalSubgroup` / `Subgroup.ControlsFusionIn`,
+Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
+`APrime_eq_subgroupOf_APrime_of_controlsFusionIn`)。
+
+| 問題 | 状態 | 主張 (PDF 実測) |
+|---|---|---|
+| 5D.1 | ⬜ | `P ∈ Syl_p(G)` 可換, `P ⊆ H ⊆ G`, `H` が `G` の `p`-transfer を制御 (= `A^p(H) = H ∩ A^p(G)`)。`H` が正規 `p`-補群をもつなら `G` も持つ |
+| 5D.2 | ⬜ | `P ∈ Syl_p(G)`, `P ⊆ Z(G)` ⇒ (Burnside も transfer 理論も使わずに) `G` は正規 `p`-補群をもつ。これと Cor 5.23 から Burnside を導く |
+| 5D.3 | ⬜ | `G` 非可換単純, `P ⊆ G` が極大な `p`-部分群。(a) `P ∈ Syl_p(G)` (b) `1 < N ⊴ P` で `P/N` 可換なら `P` は `N` を含む唯一の Sylow `p`-部分群 ⇒ `N` は `P` 内で `G` に関し weakly closed (c) `P` の冪零類 ≥ 3 |
+| 5D.4 | ⬜ | `P ∈ Syl_p(G)`, `P ⊆ K ⊆ G` ⇒ `O^p(K) ⊆ K ∩ O^p(G)`、等号なら `A^p(K) = K ∩ A^p(G)` |
+| 5D.5 | ⬜ | `P ∈ Syl_p(G)`, `A ∩ P = P'` (`A = A^p(G)`)。`P' ⊴ A` なら (Tate を使わず) `G` は正規 `p`-補群をもつ。hint: SZ で `A` 内の `P'` の補群 `K` を取り `G = N_G(K)P'`、`P' ⊆ Φ(P)` から `P` が `K` を正規化 |
+| 5D.6 | ⬜ | 同じ設定で `P'` 可換なら `G` は正規 `p`-補群をもつ。hint: `N = N_G(P')` が仮定を満たすことを見て `A` の中で Burnside |
+
+⚠ **5D.3(b)** は **5C.6 (weak closure)** に依存 — 5C.6 は hub レーン (issue 9503
+`OddOrder/GroupTheory/WeaklyClosed.lean`) 担当なので、そこが landing してから着手する。
+
+### 5D.1 の設計 (2026-07-27 に確定、次 iteration で実装)
+
+**可換 Sylow に対しては `G` が正規 `p`-補群をもつ ⟺ `A^p(G) ⊓ P = ⊥`**。
+
+* `⟸`: `APrime_inf_sylow_eq_focalSubgroup` + focal subgroup 定理で
+  `commutator G ⊓ P = focalSubgroup P = A^p(G) ⊓ P = ⊥` ⟹ **Problem 5C.1**
+  (`hasNormalPComplement_of_commutator_inf_sylow_eq_bot`)。
+* `⟹` (`H` 側で使う): 正規 `p`-補群 `N ⊴ ↥H` に対し `↥H/N` は `P` の像で**可換**ゆえ
+  `commutator ↥H ≤ N`、また `N.index = |P|` は `p`-冪ゆえ `APrime_le` で `A^p(↥H) ≤ N`、
+  `IsComplement'.disjoint` から `A^p(↥H) ⊓ ↑P_H = ⊥`。
+
+あとは仮説 `A^p(↥H) = (A^p G).subgroupOf H` と `P ≤ H` から
+`(A^p(G) ⊓ ↑P).subgroupOf H = ⊥` ⟹ `A^p(G) ⊓ ↑P = ⊥` (comap は `⊓` を保つ)。
+
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
 | 問題 | 状態 | 実装 |
