@@ -690,6 +690,67 @@ theorem thetaHom_range_centralized {P : Type*} [Group P] {A : Subgroup P} {a : P
     {w : P} (hw : w ∈ (thetaHom A a hab hnorm).range) : u * w = w * u :=
   hab _ _ hu (thetaHom_range_le hab hnorm hw)
 
+/-- `a² ∈ A` (可換) なら `a⁻¹` も `A` を正規化する (`a⁻¹ x a = a x a⁻¹`)。 -/
+theorem inv_conj_mem_of_sq_mem {P : Type*} [Group P] {A : Subgroup P} {a : P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x) (ha2 : a ^ 2 ∈ A)
+    (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A) {x : P} (hx : x ∈ A) : a⁻¹ * x * a ∈ A := by
+  have hfix : a ^ 2 * x * (a ^ 2)⁻¹ = x := by
+    have hc := hab _ _ ha2 hx
+    calc a ^ 2 * x * (a ^ 2)⁻¹ = (x * a ^ 2) * (a ^ 2)⁻¹ := by rw [hc]
+      _ = x := by group
+  have heq : a⁻¹ * x * a = a * x * a⁻¹ := by
+    conv_lhs => rw [← hfix]
+    group
+  rw [heq]
+  exact hnorm x hx
+
+/-- `θ` の像は `P` で正規。
+
+`A` の元は像を中心化し, `a` は像を反転する。`P = ⟨A, a⟩` なのでこれで正規化群が `⊤`。 -/
+theorem thetaHom_range_normal {P : Type*} [Group P] {A : Subgroup P} {a : P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x) (ha2 : a ^ 2 ∈ A)
+    (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A)
+    (hgen : A ⊔ Subgroup.zpowers a = ⊤) :
+    ((thetaHom A a hab hnorm).range).Normal := by
+  rw [← Subgroup.normalizer_eq_top_iff, eq_top_iff, ← hgen]
+  refine sup_le (fun u hu => ?_) (Subgroup.zpowers_le.mpr ?_)
+  · refine Subgroup.mem_normalizer_iff.mpr fun w => ?_
+    constructor
+    · intro hw
+      rwa [thetaHom_range_centralized hab hnorm hu hw, mul_assoc, mul_inv_cancel, mul_one]
+    · intro hw
+      have hwA : w ∈ A := by
+        have hc : u * w * u⁻¹ ∈ A := thetaHom_range_le hab hnorm hw
+        have h2 : w = u⁻¹ * (u * w * u⁻¹) * u := by group
+        rw [h2]
+        exact A.mul_mem (A.mul_mem (A.inv_mem hu) hc) hu
+      rwa [hab _ _ hu hwA, mul_assoc, mul_inv_cancel, mul_one] at hw
+  · refine Subgroup.mem_normalizer_iff.mpr fun w => ?_
+    constructor
+    · rintro ⟨x, rfl⟩
+      rw [thetaHom_conj_eq_inv hab ha2 hnorm x]
+      exact Subgroup.inv_mem _ ⟨x, rfl⟩
+    · intro hw
+      have hyA : a * w * a⁻¹ ∈ A := thetaHom_range_le hab hnorm hw
+      have hwA : w ∈ A := by
+        have h2 : w = a⁻¹ * (a * w * a⁻¹) * a := by group
+        rw [h2]
+        exact inv_conj_mem_of_sq_mem hab ha2 hnorm hyA
+      obtain ⟨x, hx⟩ := hw
+      have hinv := thetaHom_conj_eq_inv hab ha2 hnorm x
+      rw [hx] at hinv
+      have hfix : a ^ 2 * w * (a ^ 2)⁻¹ = w := by
+        have hc := hab _ _ ha2 hwA
+        calc a ^ 2 * w * (a ^ 2)⁻¹ = (w * a ^ 2) * (a ^ 2)⁻¹ := by rw [hc]
+          _ = w := by group
+      have hkey : w = (thetaHom A a hab hnorm x)⁻¹ := by
+        rw [hx, ← hinv]
+        conv_lhs => rw [← hfix]
+        rw [pow_two]
+        group
+      rw [hkey]
+      exact Subgroup.inv_mem _ ⟨x, rfl⟩
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
