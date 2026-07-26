@@ -1803,7 +1803,7 @@ Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
 
 | 問題 | 状態 | 主張 (PDF 実測) |
 |---|---|---|
-| 5D.1 | ⬜ | `P ∈ Syl_p(G)` 可換, `P ⊆ H ⊆ G`, `H` が `G` の `p`-transfer を制御 (= `A^p(H) = H ∩ A^p(G)`)。`H` が正規 `p`-補群をもつなら `G` も持つ |
+| 5D.1 | ✅ 完了 (`hasNormalPComplement_of_controlsPTransfer`) | `P ∈ Syl_p(G)` 可換, `P ⊆ H ⊆ G`, `H` が `G` の `p`-transfer を制御 (= `A^p(H) = H ∩ A^p(G)`)。`H` が正規 `p`-補群をもつなら `G` も持つ |
 | 5D.2 | ⬜ | `P ∈ Syl_p(G)`, `P ⊆ Z(G)` ⇒ (Burnside も transfer 理論も使わずに) `G` は正規 `p`-補群をもつ。これと Cor 5.23 から Burnside を導く |
 | 5D.3 | ⬜ | `G` 非可換単純, `P ⊆ G` が極大な `p`-部分群。(a) `P ∈ Syl_p(G)` (b) `1 < N ⊴ P` で `P/N` 可換なら `P` は `N` を含む唯一の Sylow `p`-部分群 ⇒ `N` は `P` 内で `G` に関し weakly closed (c) `P` の冪零類 ≥ 3 |
 | 5D.4 | ⬜ | `P ∈ Syl_p(G)`, `P ⊆ K ⊆ G` ⇒ `O^p(K) ⊆ K ∩ O^p(G)`、等号なら `A^p(K) = K ∩ A^p(G)` |
@@ -1813,7 +1813,7 @@ Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
 ⚠ **5D.3(b)** は **5C.6 (weak closure)** に依存 — 5C.6 は hub レーン (issue 9503
 `OddOrder/GroupTheory/WeaklyClosed.lean`) 担当なので、そこが landing してから着手する。
 
-### 5D.1 の設計 (2026-07-27 に確定、次 iteration で実装)
+### 5D.1 の実装 (2026-07-27 完了、新 leaf `Problems5D.lean`)
 
 **可換 Sylow に対しては `G` が正規 `p`-補群をもつ ⟺ `A^p(G) ⊓ P = ⊥`**。
 
@@ -1826,6 +1826,17 @@ Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
 
 あとは仮説 `A^p(↥H) = (A^p G).subgroupOf H` と `P ≤ H` から
 `(A^p(G) ⊓ ↑P).subgroupOf H = ⊥` ⟹ `A^p(G) ⊓ ↑P = ⊥` (comap は `⊓` を保つ)。
+
+**実装**: 同値の両向きを独立補題にした —
+`APrime_inf_sylow_eq_bot_of_hasNormalPComplement` (⟹) と
+`hasNormalPComplement_of_APrime_inf_sylow_eq_bot` (⟸)。主定理は
+`hasNormalPComplement_of_controlsPTransfer`。axiom-clean。
+
+⚠ 実装の罠: `IsComplement' A B` の `.index_eq_card` は `B.index = |A|` (逆は `.symm`)。
+`Subtype.ext` の二重適用は `apply` を重ねると 2 段目が不発になることがある — `G` レベルの
+等式を `have` で明示してから `Subtype.ext (Subtype.ext hGeq)` と項で書く。
+`(⊤ : Subgroup G)` の元を `N * P` に分解するには `Subgroup.normal_mul` で
+`↑(N ⊔ P) = ↑N * ↑P` にしてから `rw [← htop]; exact Subgroup.mem_top _`。
 
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
