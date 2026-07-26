@@ -583,33 +583,52 @@ theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
     rw [Subgroup.mem_bot]
     exact SemidirectProduct.ext hleft hright
   -- `σ` carries the abstract kernel / complement / prime line onto `P` / `U` / `W₂`
-  have hP : (fieldNormalizerKernel hyp).map sigma = hyp.base.P := by
-    rw [fieldNormalizerKernel, OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel,
-      MonoidHom.range_eq_map, Subgroup.map_map, hsigma,
+  have hP : (fnKernel hyp).map sigma = hyp.base.P := by
+    dsimp only [fnKernel, OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel]
+    rw [MonoidHom.range_eq_map, Subgroup.map_map, hsigma,
       SemidirectProduct.lift_comp_inl, ← MonoidHom.range_eq_map,
       fieldNormalizerKernelTransport_range]
-  have hU : (fieldNormalizerComplement hyp).map sigma = hyp.base.U := by
-    rw [fieldNormalizerComplement, OddOrder.BG.AppC.NormSet.normOneFrobeniusComplement,
-      MonoidHom.range_eq_map, Subgroup.map_map, hsigma,
+  have hU : (fnComplement hyp).map sigma = hyp.base.U := by
+    dsimp only [fnComplement, OddOrder.BG.AppC.NormSet.normOneFrobeniusComplement]
+    rw [MonoidHom.range_eq_map, Subgroup.map_map, hsigma,
       SemidirectProduct.lift_comp_inr, ← MonoidHom.range_eq_map,
       fieldNormalizerComplementTransport_range]
-  have hP0 : (fieldNormalizerPrimeLine hyp).map sigma = hyp.base.W2 := by
-    rw [fieldNormalizerPrimeLine, OddOrder.BG.AppC.primeLine,
-      OddOrder.BG.AppC.NormSet.normOneFrobeniusSubspaceKernel,
-      Subgroup.map_map, hsigma, SemidirectProduct.lift_comp_inl]
+  have hP0 : (fnPrimeLine hyp).map sigma = hyp.base.W2 := by
+    dsimp only [fnPrimeLine, OddOrder.BG.AppC.primeLine,
+      OddOrder.BG.AppC.NormSet.normOneFrobeniusSubspaceKernel]
+    rw [Subgroup.map_map, hsigma, SemidirectProduct.lift_comp_inl]
     exact hW2
+  haveI : Finite G := hyp.base.finiteG
+  haveI : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
   exact ⟨{
     sigma := sigma
     sigma_injective := hsigma_inj
+    P := hyp.base.P
+    U := hyp.base.U
+    W2 := hyp.base.W2
+    Q := hyp.base.Q
     sigma_P_eq_P := hP
     sigma_P0_eq_W2 := hP0
     sigma_U_eq_U := hU
+    q_prime := hyp.base.q_prime
     cyclotomic_coprime := hcyclotomic
-    Q_elementaryAbelian := hQ_elemAb
-    W2_normalizes_Q := hW2_norm_Q
+    Q_finite := inferInstance
+    Q_commutative := IsMulCommutative.of_comm hQ_elemAb.comm
+    Q_pPrime := by
+      obtain ⟨n, hn⟩ := hQ_elemAb.isPGroup.exists_card_eq
+      rw [hn]
+      intro hdvd
+      exact hyp.p_ne_q
+        ((Nat.prime_dvd_prime_iff_eq hyp.base.p_prime hyp.base.q_prime).mp
+          (hyp.base.p_prime.dvd_of_dvd_pow hdvd))
     y := yQ
     y_mem_Q := hyQ_mem
-    W2_conj_y_normalizes_U := hW2_conj_y }⟩
+    primeLine_normalizes_Q := hP0 ▸ hW2_norm_Q
+    primeLine_conj_normalizes_U := hP0 ▸ hU ▸ hW2_conj_y
+    P_eq := rfl
+    U_eq := rfl
+    W2_eq := rfl
+    Q_eq := rfl }⟩
 
 /-! ### (14.7) standing structural inputs (proved by citing the §13 Frobenius data)
 

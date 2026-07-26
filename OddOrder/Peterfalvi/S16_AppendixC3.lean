@@ -263,23 +263,23 @@ theorem exists_step4_first_k_three_inv_decomposition
         data.sigma (fieldNormalizerPrimeLineElement hyp c) *
           data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) := by
   apply data.exists_sigma_normOne_primeLine_normOne_of_mem_PU
-  have hs : data.s ∈ hyp.base.P ⊔ hyp.base.U := by
+  have hs : data.s ∈ data.P ⊔ data.U := by
     rw [← zpow_one data.s]; exact data.s_zpow_mem_P_sup_U 1
   have hmidU :
       data.sigma
           (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
-            fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.U := by
+            fieldNormalizerFrobeniusGroup hyp) ∈ data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹),
       ⟨(data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹, rfl⟩, rfl⟩
   have hmid :
       data.sigma
           (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
-            fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.P ⊔ hyp.base.U :=
-    (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hmidU
-  have hr : data.s ^ (-2 : ℤ) ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U (-2)
-  exact (hyp.base.P ⊔ hyp.base.U).mul_mem
-    ((hyp.base.P ⊔ hyp.base.U).mul_mem hs hmid) hr
+            fieldNormalizerFrobeniusGroup hyp) ∈ data.P ⊔ data.U :=
+    (le_sup_right : data.U ≤ data.P ⊔ data.U) hmidU
+  have hr : data.s ^ (-2 : ℤ) ∈ data.P ⊔ data.U := data.s_zpow_mem_P_sup_U (-2)
+  exact (data.P ⊔ data.U).mul_mem
+    ((data.P ⊔ data.U).mul_mem hs hmid) hr
 
 /-- BG Appendix C, Lemma C.3 Step 4 `(C.5)` membership bridge in a neutral form:
 any word `s^m · σ(inr w) · s^r`, with the middle term already a concrete
@@ -289,20 +289,20 @@ theorem s_zpow_mul_sigma_inr_mul_s_zpow_mem_P_sup_U
     (m r : ℤ) (w : fieldNormalizerNormOneUnits hyp) :
     data.s ^ m *
           data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) *
-        data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := by
-  have hm : data.s ^ m ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U m
+        data.s ^ r ∈ data.P ⊔ data.U := by
+  have hm : data.s ^ m ∈ data.P ⊔ data.U := data.s_zpow_mem_P_sup_U m
   have hmidU :
       data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) ∈
-        hyp.base.U := by
+        data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr w, ⟨w, rfl⟩, rfl⟩
   have hmid :
       data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) ∈
-        hyp.base.P ⊔ hyp.base.U :=
-    (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hmidU
-  have hr : data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U r
-  exact (hyp.base.P ⊔ hyp.base.U).mul_mem
-    ((hyp.base.P ⊔ hyp.base.U).mul_mem hm hmid) hr
+        data.P ⊔ data.U :=
+    (le_sup_right : data.U ≤ data.P ⊔ data.U) hmidU
+  have hr : data.s ^ r ∈ data.P ⊔ data.U := data.s_zpow_mem_P_sup_U r
+  exact (data.P ⊔ data.U).mul_mem
+    ((data.P ⊔ data.U).mul_mem hm hmid) hr
 
 /-- Neutral Step 4 `(C.5)` decomposition bridge: every word
 `s^m · σ(inr w) · s^r` admits Step 1 normal form
@@ -334,10 +334,10 @@ theorem right_component_of_step4_sigma_inr_decomposition
         data.sigma (fieldNormalizerPrimeLineElement hyp c) *
           data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
     w = u₁ * v₁ := by
-  have hmP : data.s ^ m ∈ hyp.base.P := data.s_zpow_mem_P m
+  have hmP : data.s ^ m ∈ data.P := data.s_zpow_mem_P m
   rw [← data.sigma_P_eq_P] at hmP
   rcases hmP with ⟨pm, hpmP, hpm⟩
-  have hrP : data.s ^ r ∈ hyp.base.P := data.s_zpow_mem_P r
+  have hrP : data.s ^ r ∈ data.P := data.s_zpow_mem_P r
   rw [← data.sigma_P_eq_P] at hrP
   rcases hrP with ⟨pr, hprP, hpr⟩
   have hpm_right : SemidirectProduct.rightHom pm = 1 := by

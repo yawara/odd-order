@@ -47,12 +47,12 @@ theorem relationC9_w3_mem_P_sup_U_and_conj
     let W3pow := data.sigma
       (SemidirectProduct.inr (forms.w3 ^ (hyp.base.p - 1)) :
         fieldNormalizerFrobeniusGroup hyp)
-    S1 * W3pow * S1⁻¹ ∈ hyp.base.P ⊔ hyp.base.U ∧
+    S1 * W3pow * S1⁻¹ ∈ data.P ⊔ data.U ∧
       data.t ^ 2 * (S1 * W3pow * S1⁻¹) * (data.t ^ 2)⁻¹ ∈
-        hyp.base.P ⊔ hyp.base.U := by
+        data.P ⊔ data.U := by
   classical
   dsimp only
-  let PU : Subgroup G := hyp.base.P ⊔ hyp.base.U
+  let PU : Subgroup G := data.P ⊔ data.U
   let S1 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1)
   let S2 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2)
   let S3 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3)
@@ -122,14 +122,14 @@ theorem relationC9_w3_mem_P_sup_U_and_conj
         simp [X]
         group
   have hA_mem : A ∈ PU := by
-    change A ∈ hyp.base.P ⊔ hyp.base.U
+    change A ∈ data.P ⊔ data.U
     rw [data.P_sup_U_eq_sigma_top]
     refine ⟨(SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp) *
         fieldNormalizerPrimeLineElement hyp forms.c3 * SemidirectProduct.inr forms.w2,
       trivial, ?_⟩
     simp [A, W1, W2, S3, map_mul]
   have hAp_mem : Ap ∈ PU := by
-    change Ap ∈ hyp.base.P ⊔ hyp.base.U
+    change Ap ∈ data.P ⊔ data.U
     rw [data.P_sup_U_eq_sigma_top]
     refine ⟨(SemidirectProduct.inr (forms.w1 ^ hyp.base.p) :
           fieldNormalizerFrobeniusGroup hyp) *
@@ -137,7 +137,7 @@ theorem relationC9_w3_mem_P_sup_U_and_conj
           SemidirectProduct.inr (forms.w2 ^ hyp.base.p), trivial, ?_⟩
     simp [Ap, W1p, W2p, S3, map_mul]
   have hX_mem : X ∈ PU := by
-    change X ∈ hyp.base.P ⊔ hyp.base.U
+    change X ∈ data.P ⊔ data.U
     rw [data.P_sup_U_eq_sigma_top]
     refine ⟨fieldNormalizerPrimeLineElement hyp forms.c1 *
         (SemidirectProduct.inr (forms.w3 ^ (hyp.base.p - 1)) :
@@ -308,15 +308,15 @@ theorem relationC9_w1_w2_pow_sub_one_eq_one_of_w3_eq_one
         rw [fieldNormalizerPrimeLineElement_neg]
       _ = S3⁻¹ := by
         simp [S3]
-  have hW2p_mem : W2p ∈ hyp.base.U := by
+  have hW2p_mem : W2p ∈ data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr (forms.w2 ^ hyp.base.p),
       ⟨forms.w2 ^ hyp.base.p, rfl⟩, rfl⟩
-  have hW2_mem : W2 ∈ hyp.base.U := by
+  have hW2_mem : W2 ∈ data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr forms.w2, ⟨forms.w2, rfl⟩, rfl⟩
-  have hW2_ratio_mem : W2p * W2⁻¹ ∈ hyp.base.U :=
-    hyp.base.U.mul_mem hW2p_mem (hyp.base.U.inv_mem hW2_mem)
+  have hW2_ratio_mem : W2p * W2⁻¹ ∈ data.U :=
+    data.U.mul_mem hW2p_mem (data.U.inv_mem hW2_mem)
   have hL' : W2p⁻¹ * (S3⁻¹ * W1p⁻¹ * W1 * S3) * W2 = 1 := by
     simpa [L, mul_assoc] using hL_one
   have hmid_eq : S3⁻¹ * W1p⁻¹ * W1 * S3 = W2p * W2⁻¹ := by
@@ -328,12 +328,12 @@ theorem relationC9_w1_w2_pow_sub_one_eq_one_of_w3_eq_one
         rw [hL']
       _ = W2p * W2⁻¹ := by
         group
-  have hmid_mem : S3⁻¹ * W1p⁻¹ * W1 * S3 ∈ hyp.base.U := by
+  have hmid_mem : S3⁻¹ * W1p⁻¹ * W1 * S3 ∈ data.U := by
     rw [hmid_eq]
     exact hW2_ratio_mem
   have hmem_step : data.sigma (fieldNormalizerPrimeLineElement hyp (-forms.c3)) *
         data.sigma (SemidirectProduct.inr U1 : fieldNormalizerFrobeniusGroup hyp) *
-          data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) ∈ hyp.base.U := by
+          data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) ∈ data.U := by
     simpa [hS3_inv, hU1_sigma, S3, mul_assoc] using hmid_mem
   have hstep := data.generatorRelation_step2_primeLine_of_sigma_mem_U
     (c := -forms.c3) (d := forms.c3) U1 hmem_step
@@ -476,7 +476,7 @@ theorem relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U
           data.sigma
             (SemidirectProduct.inr (forms.w3 ^ (hyp.base.p - 1)) :
               fieldNormalizerFrobeniusGroup hyp) *
-            (data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1))⁻¹ ∈ hyp.base.U) :
+            (data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1))⁻¹ ∈ data.U) :
     forms.w1 = 1 ∧ forms.w2 = 1 ∧ forms.w3 = 1 ∧
       data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
         data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
@@ -502,7 +502,7 @@ theorem relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U
   have hmem_step :
       data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
           data.sigma (SemidirectProduct.inr U3 : fieldNormalizerFrobeniusGroup hyp) *
-            data.sigma (fieldNormalizerPrimeLineElement hyp (-forms.c1)) ∈ hyp.base.U := by
+            data.sigma (fieldNormalizerPrimeLineElement hyp (-forms.c1)) ∈ data.U := by
     simpa [S1, W3pow, U3, hS1_inv, hU3_sigma, mul_assoc] using hw3U
   have hstep := data.generatorRelation_step2_primeLine_of_sigma_mem_U
     (c := forms.c1) (d := -forms.c1) U3 hmem_step
@@ -537,14 +537,14 @@ theorem relationC9_w_eq_one_and_relationC10_of_w3_step3_inf_eq_U
     (forms : Step4C5NormalForms data a b)
     (hc1 : forms.c1 ≠ 0) (hc3 : forms.c3 ≠ 0)
     (hstep3 :
-      (hyp.base.P ⊔ hyp.base.U) ⊓
-          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.U) :
+      (data.P ⊔ data.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (data.P ⊔ data.U)) = data.U) :
     forms.w1 = 1 ∧ forms.w2 = 1 ∧ forms.w3 = 1 ∧
       data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
         data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
           data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) = 1 := by
   classical
-  let PU : Subgroup G := hyp.base.P ⊔ hyp.base.U
+  let PU : Subgroup G := data.P ⊔ data.U
   let S1 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1)
   let W3pow := data.sigma
     (SemidirectProduct.inr (forms.w3 ^ (hyp.base.p - 1)) :
@@ -565,9 +565,9 @@ theorem relationC9_w_eq_one_and_relationC10_of_w3_step3_inf_eq_U
       group
     rwa [hsmul]
   have hX_inf : X ∈ PU ⊓ (MulAut.conj ((data.t ^ 2)⁻¹) • PU) := ⟨hX_PU, hX_smul⟩
-  have hX_U : X ∈ hyp.base.U := by
-    have hX_inf' : X ∈ (hyp.base.P ⊔ hyp.base.U) ⊓
-        (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) := by
+  have hX_U : X ∈ data.U := by
+    have hX_inf' : X ∈ (data.P ⊔ data.U) ⊓
+        (MulAut.conj ((data.t ^ 2)⁻¹) • (data.P ⊔ data.U)) := by
       simpa [PU] using hX_inf
     rwa [hstep3] at hX_inf'
   exact data.relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U
@@ -588,14 +588,14 @@ theorem relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U
       data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
         data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
           data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) = 1) ∨
-      (hyp.base.P ⊔ hyp.base.U) ⊓
-          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) =
-        hyp.base.P ⊔ hyp.base.U := by
+      (data.P ⊔ data.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (data.P ⊔ data.U)) =
+        data.P ⊔ data.U := by
   classical
-  have ht2_norm : data.t ^ 2 ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
+  have ht2_norm : data.t ^ 2 ∈ Subgroup.normalizer (data.U : Set G) :=
     data.t_pow_normalizes_U 2
-  have ht2_inv_norm : (data.t ^ 2)⁻¹ ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
-    (Subgroup.normalizer (hyp.base.U : Set G)).inv_mem ht2_norm
+  have ht2_inv_norm : (data.t ^ 2)⁻¹ ∈ Subgroup.normalizer (data.U : Set G) :=
+    (Subgroup.normalizer (data.U : Set G)).inv_mem ht2_norm
   have hstep3 := data.P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U ht2_inv_norm
   rcases hstep3 with hU | hPU
   · left
@@ -614,13 +614,13 @@ pass from `t²` to `P₁ ≤ N_G(P)` and then derive the `P₀=P₁` contradicti
 theorem step3_badBranch_t_sq_conj_mem_P_sup_U
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
     (hbad :
-      (hyp.base.P ⊔ hyp.base.U) ⊓
-          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) =
-        hyp.base.P ⊔ hyp.base.U) :
-    ∀ ⦃x : G⦄, x ∈ hyp.base.P ⊔ hyp.base.U →
-      data.t ^ 2 * x * (data.t ^ 2)⁻¹ ∈ hyp.base.P ⊔ hyp.base.U := by
+      (data.P ⊔ data.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (data.P ⊔ data.U)) =
+        data.P ⊔ data.U) :
+    ∀ ⦃x : G⦄, x ∈ data.P ⊔ data.U →
+      data.t ^ 2 * x * (data.t ^ 2)⁻¹ ∈ data.P ⊔ data.U := by
   classical
-  let PU : Subgroup G := hyp.base.P ⊔ hyp.base.U
+  let PU : Subgroup G := data.P ⊔ data.U
   intro x hx
   have hx_inf : x ∈ PU ⊓ (MulAut.conj ((data.t ^ 2)⁻¹) • PU) := by
     rw [hbad]
@@ -643,12 +643,12 @@ formal version of BG's line “hence `t₁` normalizes `PU`” for the current
 theorem step3_badBranch_t_sq_normalizes_P_sup_U
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
     (hbad :
-      (hyp.base.P ⊔ hyp.base.U) ⊓
-          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) =
-        hyp.base.P ⊔ hyp.base.U) :
-    data.t ^ 2 ∈ Subgroup.normalizer ((hyp.base.P ⊔ hyp.base.U : Subgroup G) : Set G) := by
+      (data.P ⊔ data.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (data.P ⊔ data.U)) =
+        data.P ⊔ data.U) :
+    data.t ^ 2 ∈ Subgroup.normalizer ((data.P ⊔ data.U : Subgroup G) : Set G) := by
   classical
-  let PU : Subgroup G := hyp.base.P ⊔ hyp.base.U
+  let PU : Subgroup G := data.P ⊔ data.U
   let g : G := data.t ^ 2
   have hinc : ∀ ⦃x : G⦄, x ∈ PU → g * x * g⁻¹ ∈ PU := by
     intro x hx
@@ -700,10 +700,10 @@ theorem step3_badBranch_t_sq_normalizes_P_sup_U
 theorem step3_badBranch_t_sq_normalizes_P
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
     (hbad :
-      (hyp.base.P ⊔ hyp.base.U) ⊓
-          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) =
-        hyp.base.P ⊔ hyp.base.U) :
-    data.t ^ 2 ∈ Subgroup.normalizer (hyp.base.P : Set G) :=
+      (data.P ⊔ data.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (data.P ⊔ data.U)) =
+        data.P ⊔ data.U) :
+    data.t ^ 2 ∈ Subgroup.normalizer (data.P : Set G) :=
   data.normalizer_P_sup_U_le_normalizer_P
     (data.step3_badBranch_t_sq_normalizes_P_sup_U hbad)
 
@@ -713,10 +713,10 @@ theorem step3_badBranch_t_sq_normalizes_P
 theorem step3_badBranch_P1_le_normalizer_P
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
     (hbad :
-      (hyp.base.P ⊔ hyp.base.U) ⊓
-          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) =
-        hyp.base.P ⊔ hyp.base.U) :
-    data.P1 ≤ Subgroup.normalizer (hyp.base.P : Set G) :=
+      (data.P ⊔ data.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (data.P ⊔ data.U)) =
+        data.P ⊔ data.U) :
+    data.P1 ≤ Subgroup.normalizer (data.P : Set G) :=
   data.P1_le_normalizer_P_of_t_sq_mem
     (data.step3_badBranch_t_sq_normalizes_P hbad)
 
@@ -726,10 +726,10 @@ normalization of `P` by `P₁`, together with `P₁ ≤ W₂Q`, forces `P₁` to
 theorem step3_badBranch_P1_le_normalizer_W2
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
     (hbad :
-      (hyp.base.P ⊔ hyp.base.U) ⊓
-          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) =
-        hyp.base.P ⊔ hyp.base.U) :
-    data.P1 ≤ Subgroup.normalizer (hyp.base.W2 : Set G) :=
+      (data.P ⊔ data.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (data.P ⊔ data.U)) =
+        data.P ⊔ data.U) :
+    data.P1 ≤ Subgroup.normalizer (data.W2 : Set G) :=
   data.P1_le_normalizer_W2_of_le_normalizer_P
     (data.step3_badBranch_P1_le_normalizer_P hbad)
 
@@ -738,9 +738,9 @@ theorem step3_badBranch_P1_le_normalizer_W2
 theorem step3_badBranch_false [Finite G]
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
     (hbad :
-      (hyp.base.P ⊔ hyp.base.U) ⊓
-          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) =
-        hyp.base.P ⊔ hyp.base.U) :
+      (data.P ⊔ data.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (data.P ⊔ data.U)) =
+        data.P ⊔ data.U) :
     False :=
   data.P1_ne_W2
     (data.P1_eq_W2_of_le_normalizer_W2

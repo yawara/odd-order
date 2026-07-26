@@ -5095,7 +5095,7 @@ set_option linter.style.longLine false in
 -- これで `HypothesisBAbstract` が「spine が実際に作る配置の忠実な抽象化」であることが
 -- 機械検証される (別形の仮説にすり替わっていない)。
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.toHypothesisBAbstract
+  OddOrder.BG.AppC.HypothesisBAbstract.toFieldNormalizerData
 #assert_only_allowed_axioms OddOrder.BG.AppC.conditionA_two
 #assert_only_allowed_axioms OddOrder.BG.AppC.sigmaSL2_injective
 #assert_only_allowed_axioms OddOrder.BG.AppC.map_kernel_sigmaSL2
@@ -5205,7 +5205,6 @@ set_option linter.style.longLine false in
 -- can be reordered.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.Q_mul_comm
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_pow_p_eq_one
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.Q_pow_q_eq_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_inf_Q_eq_bot
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm

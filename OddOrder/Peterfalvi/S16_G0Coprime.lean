@@ -377,14 +377,15 @@ theorem FieldNormalizerData.derived_inf_centralizer_le_P
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   rintro g' ⟨hg'S', hg'cent⟩
   -- `S' = P ⊔ U` is the image of `kernel ⊔ complement` under `σ`
-  have hg'mem : g' ∈ (fieldNormalizerKernel hyp ⊔ fieldNormalizerComplement hyp).map
+  have hg'mem : g' ∈ (fnKernel hyp ⊔ fnComplement hyp).map
       data.sigma := by
-    rw [Subgroup.map_sup, data.sigma_P_eq_P, data.sigma_U_eq_U, ← hyp.base.S_deriv_eq_PU]
+    rw [Subgroup.map_sup, data.sigma_P_eq_P, data.sigma_U_eq_U, data.P_eq, data.U_eq,
+      ← hyp.base.S_deriv_eq_PU]
     exact hg'S'
   obtain ⟨w, -, rfl⟩ := hg'mem
   -- `x = σ (inl m)` for a nontrivial additive point `m`
-  have hxmem : x ∈ (fieldNormalizerKernel hyp).map data.sigma := by
-    rw [data.sigma_P_eq_P]; exact hx.1
+  have hxmem : x ∈ (fnKernel hyp).map data.sigma := by
+    rw [data.sigma_P_eq_P, data.P_eq]; exact hx.1
   obtain ⟨wx, hwx, hxeq⟩ := hxmem
   have hwx' : wx ∈ (SemidirectProduct.inl :
       OddOrder.BG.AppC.NormSet.additiveFieldGroup hyp.base.p hyp.base.q →*
@@ -404,7 +405,7 @@ theorem FieldNormalizerData.derived_inf_centralizer_le_P
     exact hgx
   -- concrete Frobenius kernel + push forward
   obtain ⟨mw, hmw⟩ := commute_inl_mem_range_inl hmne hcomm
-  rw [← data.sigma_P_eq_P]
+  rw [← data.P_eq, ← data.sigma_P_eq_P]
   exact ⟨w, ⟨mw, hmw⟩, rfl⟩
 
 /-- **Peterfalvi (14.11.3), S-side core**: an element avoiding the conjugates of `W#` and of

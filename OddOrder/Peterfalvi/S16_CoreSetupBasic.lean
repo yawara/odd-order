@@ -551,10 +551,10 @@ theorem sigma_inr_w3 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp
 /-- The three BG `(C.7)` words are elements of `U`, expressed after applying `σ`. -/
 theorem sigma_inr_w_mem_U {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
     {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    data.sigma (SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.U ∧
-      data.sigma (SemidirectProduct.inr forms.w2 : fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.U ∧
+    data.sigma (SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp) ∈ data.U ∧
+      data.sigma (SemidirectProduct.inr forms.w2 : fieldNormalizerFrobeniusGroup hyp) ∈ data.U ∧
         data.sigma (SemidirectProduct.inr forms.w3 : fieldNormalizerFrobeniusGroup hyp) ∈
-          hyp.base.U := by
+          data.U := by
   constructor
   · rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr forms.w1, ⟨forms.w1, rfl⟩, rfl⟩
@@ -575,24 +575,24 @@ theorem c1_ne_zero {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
   intro hc1
   have hu1 :
       data.sigma (SemidirectProduct.inr forms.u1 : fieldNormalizerFrobeniusGroup hyp) ∈
-        hyp.base.U := by
+        data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr forms.u1, ⟨forms.u1, rfl⟩, rfl⟩
   have hv1 :
       data.sigma (SemidirectProduct.inr forms.v1 : fieldNormalizerFrobeniusGroup hyp) ∈
-        hyp.base.U := by
+        data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr forms.v1, ⟨forms.v1, rfl⟩, rfl⟩
-  have hM1U : data.step4M1 a ∈ hyp.base.U := by
+  have hM1U : data.step4M1 a ∈ data.U := by
     rw [forms.hM1, hc1]
-    simpa [fieldNormalizerPrimeLineElement, mul_assoc] using hyp.base.U.mul_mem hu1 hv1
+    simpa [fieldNormalizerPrimeLineElement, mul_assoc] using data.U.mul_mem hu1 hv1
   have hM1_step :
       data.sigma (fieldNormalizerPrimeLineElement hyp (1 : ZMod hyp.base.p)) *
           data.sigma
             (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
               fieldNormalizerFrobeniusGroup hyp) *
         data.sigma (fieldNormalizerPrimeLineElement hyp (-2 : ZMod hyp.base.p)) ∈
-          hyp.base.U := by
+          data.U := by
     have h := hM1U
     rw [data.step4M1_eq_sigma_inr] at h
     have hs_one :
@@ -627,24 +627,24 @@ theorem c3_ne_zero {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
   intro hc3
   have hu3 :
       data.sigma (SemidirectProduct.inr forms.u3 : fieldNormalizerFrobeniusGroup hyp) ∈
-        hyp.base.U := by
+        data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr forms.u3, ⟨forms.u3, rfl⟩, rfl⟩
   have hv3 :
       data.sigma (SemidirectProduct.inr forms.v3 : fieldNormalizerFrobeniusGroup hyp) ∈
-        hyp.base.U := by
+        data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr forms.v3, ⟨forms.v3, rfl⟩, rfl⟩
-  have hM3U : data.step4M3 b ∈ hyp.base.U := by
+  have hM3U : data.step4M3 b ∈ data.U := by
     rw [forms.hM3, hc3]
-    simpa [fieldNormalizerPrimeLineElement, mul_assoc] using hyp.base.U.mul_mem hu3 hv3
+    simpa [fieldNormalizerPrimeLineElement, mul_assoc] using data.U.mul_mem hu3 hv3
   have hM3_step :
       data.sigma (fieldNormalizerPrimeLineElement hyp (2 : ZMod hyp.base.p)) *
           data.sigma
             (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 1)⁻¹ b) :
               fieldNormalizerFrobeniusGroup hyp) *
         data.sigma (fieldNormalizerPrimeLineElement hyp (-3 : ZMod hyp.base.p)) ∈
-          hyp.base.U := by
+          data.U := by
     have h := hM3U
     rw [data.step4M3_eq_sigma_inr] at h
     have hs_two :

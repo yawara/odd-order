@@ -26,7 +26,7 @@ namespace FieldNormalizerData
 `P₁ = P₀`. -/
 theorem W2_not_le_normalizer_U {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) :
-    ¬ hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.U : Set G) := by
+    ¬ data.W2 ≤ Subgroup.normalizer (data.U : Set G) := by
   intro hW2
   exact data.s_not_normalizes_U (hW2 data.s_mem_W2)
 
@@ -72,7 +72,7 @@ theorem sigma_eq_iff_left_right_eq {hyp : Hypothesis (G := G)}
 with Lean left-conjugation convention. -/
 noncomputable def P1 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     Subgroup G :=
-  MulAut.conj data.y • hyp.base.W2
+  MulAut.conj data.y • data.W2
 
 /-- The BG element `t`, the `y`-conjugate of `s` in Lean convention. -/
 noncomputable def t {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) : G :=
@@ -128,17 +128,17 @@ theorem P1_isPGroup {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
 `ysy⁻¹ = (ysy⁻¹s⁻¹)s`, the first factor is in `Q` because `y ∈ Q` and `s`
 normalizes `Q`, and the second factor is in `W₂`. -/
 theorem t_mem_Q_sup_W2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    data.t ∈ hyp.base.Q ⊔ hyp.base.W2 := by
-  have hy_inv : data.y⁻¹ ∈ hyp.base.Q := inv_mem data.y_mem_Q
-  have hsy : data.s * data.y⁻¹ * data.s⁻¹ ∈ hyp.base.Q := by
+    data.t ∈ data.Q ⊔ data.W2 := by
+  have hy_inv : data.y⁻¹ ∈ data.Q := inv_mem data.y_mem_Q
+  have hsy : data.s * data.y⁻¹ * data.s⁻¹ ∈ data.Q := by
     simpa using (Subgroup.mem_normalizer_iff.mp data.s_normalizes_Q data.y⁻¹).mp hy_inv
-  have hq : data.y * data.s * data.y⁻¹ * data.s⁻¹ ∈ hyp.base.Q := by
+  have hq : data.y * data.s * data.y⁻¹ * data.s⁻¹ ∈ data.Q := by
     simpa [mul_assoc] using mul_mem data.y_mem_Q hsy
   have hprod : (data.y * data.s * data.y⁻¹ * data.s⁻¹) * data.s ∈
-      hyp.base.Q ⊔ hyp.base.W2 := by
+      data.Q ⊔ data.W2 := by
     exact mul_mem
-      ((le_sup_left : hyp.base.Q ≤ hyp.base.Q ⊔ hyp.base.W2) hq)
-      ((le_sup_right : hyp.base.W2 ≤ hyp.base.Q ⊔ hyp.base.W2) data.s_mem_W2)
+      ((le_sup_left : data.Q ≤ data.Q ⊔ data.W2) hq)
+      ((le_sup_right : data.W2 ≤ data.Q ⊔ data.W2) data.s_mem_W2)
   convert hprod using 1
   dsimp [t]
   group
@@ -146,14 +146,14 @@ theorem t_mem_Q_sup_W2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData h
 /-- The conjugate prime line `P₁` lies in `QW₂`.  This is the subgroup-level
 form of the preceding semidirect-product decomposition of `t`. -/
 theorem P1_le_Q_sup_W2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    data.P1 ≤ hyp.base.Q ⊔ hyp.base.W2 := by
+    data.P1 ≤ data.Q ⊔ data.W2 := by
   rw [data.P1_eq_zpowers_t]
   exact Subgroup.zpowers_le.mpr data.t_mem_Q_sup_W2
 
 /-- The same containment as `P1_le_Q_sup_W2`, in the `W₂Q` order used by the
 product/Sylow argument in BG Appendix C Step 3. -/
 theorem P1_le_W2_sup_Q {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    data.P1 ≤ hyp.base.W2 ⊔ hyp.base.Q := by
+    data.P1 ≤ data.W2 ⊔ data.Q := by
   intro x hx
   have hx' := data.P1_le_Q_sup_W2 hx
   simpa [sup_comm] using hx'
@@ -178,21 +178,21 @@ theorem t_mem_of_t_sq_mem {hyp : Hypothesis (G := G)} (data : FieldNormalizerDat
 normalizes `P`.  This is the next BG Step 3 consequence after `P char PU`. -/
 theorem P1_le_normalizer_P_of_t_sq_mem
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    (ht2 : data.t ^ 2 ∈ Subgroup.normalizer (hyp.base.P : Set G)) :
-    data.P1 ≤ Subgroup.normalizer (hyp.base.P : Set G) := by
+    (ht2 : data.t ^ 2 ∈ Subgroup.normalizer (data.P : Set G)) :
+    data.P1 ≤ Subgroup.normalizer (data.P : Set G) := by
   rw [data.P1_eq_zpowers_t]
   exact Subgroup.zpowers_le.mpr (data.t_mem_of_t_sq_mem ht2)
 
 /-- `P₁` normalizes Peterfalvi subgroup `U`, as required in BG C.3 Step 3. -/
 theorem P1_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    data.P1 ≤ Subgroup.normalizer (hyp.base.U : Set G) := by
+    data.P1 ≤ Subgroup.normalizer (data.U : Set G) := by
   simpa [P1] using data.W2_conj_y_normalizes_U
 
 /-- BG Appendix C, Lemma C.3 Step 3 contradiction endpoint: the conjugate
 prime line `P₁` cannot equal the original prime line `P₀ = W₂`, because `P₁`
 normalizes `U` while `W₂` cannot be contained in `N_G(U)`. -/
 theorem P1_ne_W2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    data.P1 ≠ hyp.base.W2 := by
+    data.P1 ≠ data.W2 := by
   intro hP1
   exact data.W2_not_le_normalizer_U (by
     intro x hxW2
@@ -200,36 +200,36 @@ theorem P1_ne_W2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
 
 /-- The symmetric form of `P1_ne_W2`, useful when BG has derived `P₀ = P₁`. -/
 theorem W2_ne_P1 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    hyp.base.W2 ≠ data.P1 := by
+    data.W2 ≠ data.P1 := by
   intro hW2
   exact data.P1_ne_W2 hW2.symm
 
 /-- The conjugate generator `t` normalizes `U`. -/
 theorem t_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    data.t ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
+    data.t ∈ Subgroup.normalizer (data.U : Set G) :=
   data.P1_normalizes_U data.t_mem_P1
 
 /-- Powers of the conjugate generator `t` normalize `U`. -/
 theorem t_pow_normalizes_U {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (n : ℕ) :
-    data.t ^ n ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
+    data.t ^ n ∈ Subgroup.normalizer (data.U : Set G) :=
   pow_mem data.t_normalizes_U n
 
 /-- Integer powers of the conjugate generator `t` normalize `U`. -/
 theorem t_zpow_normalizes_U {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (n : ℤ) :
-    data.t ^ n ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
-  (Subgroup.normalizer (hyp.base.U : Set G)).zpow_mem data.t_normalizes_U n
+    data.t ^ n ∈ Subgroup.normalizer (data.U : Set G) :=
+  (Subgroup.normalizer (data.U : Set G)).zpow_mem data.t_normalizes_U n
 
 /-- Conjugating a concrete norm-one complement element by any integer power of
 `t` remains in the transported subgroup `U`. -/
 theorem t_zpow_conj_sigma_inr_mem_U {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (n : ℤ) (u : fieldNormalizerNormOneUnits hyp) :
     data.t ^ n * data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
-        (data.t ^ n)⁻¹ ∈ hyp.base.U := by
+        (data.t ^ n)⁻¹ ∈ data.U := by
   have huU :
       data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) ∈
-        hyp.base.U := by
+        data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr u, ⟨u, rfl⟩, rfl⟩
   exact (Subgroup.mem_normalizer_iff.mp (data.t_zpow_normalizes_U n)
@@ -244,16 +244,16 @@ theorem s_zpow_mul_t_zpow_conj_sigma_inr_mul_s_zpow_mem_P_sup_U
           (data.t ^ n *
             data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
               (data.t ^ n)⁻¹) *
-        data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := by
-  have hm : data.s ^ m ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U m
+        data.s ^ r ∈ data.P ⊔ data.U := by
+  have hm : data.s ^ m ∈ data.P ⊔ data.U := data.s_zpow_mem_P_sup_U m
   have hmid :
       data.t ^ n * data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
-          (data.t ^ n)⁻¹ ∈ hyp.base.P ⊔ hyp.base.U :=
-    (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U)
+          (data.t ^ n)⁻¹ ∈ data.P ⊔ data.U :=
+    (le_sup_right : data.U ≤ data.P ⊔ data.U)
       (data.t_zpow_conj_sigma_inr_mem_U n u)
-  have hr : data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U r
-  exact (hyp.base.P ⊔ hyp.base.U).mul_mem
-    ((hyp.base.P ⊔ hyp.base.U).mul_mem hm hmid) hr
+  have hr : data.s ^ r ∈ data.P ⊔ data.U := data.s_zpow_mem_P_sup_U r
+  exact (data.P ⊔ data.U).mul_mem
+    ((data.P ⊔ data.U).mul_mem hm hmid) hr
 
 /-- BG Appendix C, Lemma C.3 Step 4 `(C.5)` decomposition bridge: expressions
 of the form `s^m (u)^{t^n} s^r` admit the Step 1 `u₁ s₁ v₁` normal form. -/
@@ -278,27 +278,27 @@ contradiction: if `g` normalizes `U`, then `(PU) ∩ (PU)^g` is either `U` or
 all of `PU`. -/
 theorem P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) {g : G}
-    (hgU : g ∈ Subgroup.normalizer (hyp.base.U : Set G)) :
-    (hyp.base.P ⊔ hyp.base.U) ⊓
-        (MulAut.conj g • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.U ∨
-      (hyp.base.P ⊔ hyp.base.U) ⊓
-        (MulAut.conj g • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.P ⊔ hyp.base.U := by
+    (hgU : g ∈ Subgroup.normalizer (data.U : Set G)) :
+    (data.P ⊔ data.U) ⊓
+        (MulAut.conj g • (data.P ⊔ data.U)) = data.U ∨
+      (data.P ⊔ data.U) ⊓
+        (MulAut.conj g • (data.P ⊔ data.U)) = data.P ⊔ data.U := by
   let X : Subgroup G :=
-    (hyp.base.P ⊔ hyp.base.U) ⊓ (MulAut.conj g • (hyp.base.P ⊔ hyp.base.U))
-  have hUle : hyp.base.U ≤ X := by
+    (data.P ⊔ data.U) ⊓ (MulAut.conj g • (data.P ⊔ data.U))
+  have hUle : data.U ≤ X := by
     intro u hu
-    refine ⟨(le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hu, ?_⟩
-    have hU_image : MulAut.conj g '' (hyp.base.U : Set G) = hyp.base.U :=
+    refine ⟨(le_sup_right : data.U ≤ data.P ⊔ data.U) hu, ?_⟩
+    have hU_image : MulAut.conj g '' (data.U : Set G) = data.U :=
       Subgroup.mem_normalizer_iff_conj_image_eq.mp hgU
-    have hu_image : u ∈ MulAut.conj g '' (hyp.base.U : Set G) := by
+    have hu_image : u ∈ MulAut.conj g '' (data.U : Set G) := by
       rw [hU_image]
       exact hu
     rcases hu_image with ⟨u0, hu0, hu0_eq⟩
-    have hu0_PU : u0 ∈ hyp.base.P ⊔ hyp.base.U :=
-      (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hu0
+    have hu0_PU : u0 ∈ data.P ⊔ data.U :=
+      (le_sup_right : data.U ≤ data.P ⊔ data.U) hu0
     rw [← hu0_eq]
     exact Set.smul_mem_smul_set hu0_PU
-  by_cases hX : X = hyp.base.U
+  by_cases hX : X = data.U
   · left
     exact hX
   · right
@@ -308,22 +308,22 @@ theorem P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
 generator `t`. -/
 theorem P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) (n : ℕ) :
-    (hyp.base.P ⊔ hyp.base.U) ⊓
-        (MulAut.conj (data.t ^ n) • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.U ∨
-      (hyp.base.P ⊔ hyp.base.U) ⊓
-        (MulAut.conj (data.t ^ n) • (hyp.base.P ⊔ hyp.base.U)) =
-          hyp.base.P ⊔ hyp.base.U :=
+    (data.P ⊔ data.U) ⊓
+        (MulAut.conj (data.t ^ n) • (data.P ⊔ data.U)) = data.U ∨
+      (data.P ⊔ data.U) ⊓
+        (MulAut.conj (data.t ^ n) • (data.P ⊔ data.U)) =
+          data.P ⊔ data.U :=
   data.P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
     (data.t_pow_normalizes_U n)
 
 /-- Conjugation by `t` as an automorphism of Peterfalvi's subgroup `U`. -/
 noncomputable def tConjUAut {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) : MulAut hyp.base.U :=
-  hyp.base.U.normalizerMonoidHom ⟨data.t, data.t_normalizes_U⟩
+    (data : FieldNormalizerData hyp) : MulAut data.U :=
+  data.U.normalizerMonoidHom ⟨data.t, data.t_normalizes_U⟩
 
 /-- The subgroup automorphism `tConjUAut` is ambient conjugation by `t`. -/
 theorem tConjUAut_apply_coe {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) (u : hyp.base.U) :
+    (data : FieldNormalizerData hyp) (u : data.U) :
     (data.tConjUAut u : G) = data.t * (u : G) * data.t⁻¹ := by
   rfl
 
@@ -331,7 +331,7 @@ theorem tConjUAut_apply_coe {hyp : Hypothesis (G := G)}
 theorem tConjUAut_pow_p_eq_one {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) : data.tConjUAut ^ hyp.base.p = 1 := by
   have ht_norm :
-      (⟨data.t, data.t_normalizes_U⟩ : Subgroup.normalizer (hyp.base.U : Set G)) ^
+      (⟨data.t, data.t_normalizes_U⟩ : Subgroup.normalizer (data.U : Set G)) ^
           hyp.base.p = 1 := by
     ext
     exact data.t_pow_p_eq_one
@@ -445,23 +445,23 @@ theorem s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U
           data.sigma
             (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
               fieldNormalizerFrobeniusGroup hyp) *
-        data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := by
-  have hm : data.s ^ m ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U m
+        data.s ^ r ∈ data.P ⊔ data.U := by
+  have hm : data.s ^ m ∈ data.P ⊔ data.U := data.s_zpow_mem_P_sup_U m
   have hmidU :
       data.sigma
           (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
-            fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.U := by
+            fieldNormalizerFrobeniusGroup hyp) ∈ data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u),
       ⟨(data.tConjNormOneUnitsAut ^ n) u, rfl⟩, rfl⟩
   have hmid :
       data.sigma
           (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
-            fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.P ⊔ hyp.base.U :=
-    (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hmidU
-  have hr : data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U r
-  exact (hyp.base.P ⊔ hyp.base.U).mul_mem
-    ((hyp.base.P ⊔ hyp.base.U).mul_mem hm hmid) hr
+            fieldNormalizerFrobeniusGroup hyp) ∈ data.P ⊔ data.U :=
+    (le_sup_right : data.U ≤ data.P ⊔ data.U) hmidU
+  have hr : data.s ^ r ∈ data.P ⊔ data.U := data.s_zpow_mem_P_sup_U r
+  exact (data.P ⊔ data.U).mul_mem
+    ((data.P ⊔ data.U).mul_mem hm hmid) hr
 
 /-- Natural-power variant of the Step 4 `(C.5)` decomposition bridge: after
 rewriting `(u)^{t^n}` as a concrete iterate of `tConjNormOneUnitsAut`, the term
@@ -498,10 +498,10 @@ theorem right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition
         data.sigma (fieldNormalizerPrimeLineElement hyp c) *
           data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
     (data.tConjNormOneUnitsAut ^ n) u = u₁ * v₁ := by
-  have hmP : data.s ^ m ∈ hyp.base.P := data.s_zpow_mem_P m
+  have hmP : data.s ^ m ∈ data.P := data.s_zpow_mem_P m
   rw [← data.sigma_P_eq_P] at hmP
   rcases hmP with ⟨pm, hpmP, hpm⟩
-  have hrP : data.s ^ r ∈ hyp.base.P := data.s_zpow_mem_P r
+  have hrP : data.s ^ r ∈ data.P := data.s_zpow_mem_P r
   rw [← data.sigma_P_eq_P] at hrP
   rcases hrP with ⟨pr, hprP, hpr⟩
   have hpm_right : SemidirectProduct.rightHom pm = 1 := by
@@ -751,8 +751,8 @@ theorem appC_twisted_normOne_step_of_tConjNormOneUnitsAut
 
 /-- The conjugate generator `t` also normalizes `Q`. -/
 theorem t_normalizes_Q {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    data.t ∈ Subgroup.normalizer (hyp.base.Q : Set G) := by
-  have hyN : data.y ∈ Subgroup.normalizer (hyp.base.Q : Set G) :=
+    data.t ∈ Subgroup.normalizer (data.Q : Set G) := by
+  have hyN : data.y ∈ Subgroup.normalizer (data.Q : Set G) :=
     Subgroup.le_normalizer data.y_mem_Q
   dsimp [t]
   exact mul_mem (mul_mem hyN data.s_normalizes_Q) (inv_mem hyN)
@@ -760,12 +760,12 @@ theorem t_normalizes_Q {hyp : Hypothesis (G := G)} (data : FieldNormalizerData h
 /-- The first BG commutator factor `s⁻¹t` lies in `Q`. -/
 theorem s_inv_mul_t_mem_Q {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) :
-    data.s⁻¹ * data.t ∈ hyp.base.Q := by
-  have hsN_inv : data.s⁻¹ ∈ Subgroup.normalizer (hyp.base.Q : Set G) :=
+    data.s⁻¹ * data.t ∈ data.Q := by
+  have hsN_inv : data.s⁻¹ ∈ Subgroup.normalizer (data.Q : Set G) :=
     inv_mem data.s_normalizes_Q
-  have hconj_y : data.s⁻¹ * data.y * data.s ∈ hyp.base.Q := by
+  have hconj_y : data.s⁻¹ * data.y * data.s ∈ data.Q := by
     simpa using (Subgroup.mem_normalizer_iff.mp hsN_inv data.y).mp data.y_mem_Q
-  have hy_inv : data.y⁻¹ ∈ hyp.base.Q := inv_mem data.y_mem_Q
+  have hy_inv : data.y⁻¹ ∈ data.Q := inv_mem data.y_mem_Q
   dsimp [t]
   simpa [mul_assoc] using mul_mem hconj_y hy_inv
 
@@ -787,22 +787,22 @@ private theorem inv_pow_mul_pow_mem_of_inv_mul_mem {H : Subgroup G} {a b : G}
 /-- The BG commutator factors `(s⁻¹)^n t^n` lie in `Q`. -/
 theorem s_inv_pow_mul_t_pow_mem_Q {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (n : ℕ) :
-    (data.s⁻¹) ^ n * data.t ^ n ∈ hyp.base.Q :=
+    (data.s⁻¹) ^ n * data.t ^ n ∈ data.Q :=
   inv_pow_mul_pow_mem_of_inv_mul_mem data.s_normalizes_Q data.s_inv_mul_t_mem_Q n
 
 /-- Elements of the transported `Q` commute.  This is the S16-facing form of
 BG Appendix C Remark (B)/(X) used in Lemma C.3 Step 4 when rewriting (C.3) to
 (C.4). -/
 theorem Q_mul_comm {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    {x y : G} (hx : x ∈ hyp.base.Q) (hy : y ∈ hyp.base.Q) :
+    {x y : G} (hx : x ∈ data.Q) (hy : y ∈ data.Q) :
     x * y = y * x := by
-  simpa using congrArg Subtype.val
-    (data.Q_elementaryAbelian.comm ⟨x, hx⟩ ⟨y, hy⟩)
+  haveI := data.Q_commutative
+  exact setLike_mul_comm (s := data.Q) hx hy
 
 /-- In `W₂Q`, the `Q` factor is normalized by both `W₂` and `Q`. -/
 theorem W2_sup_Q_le_normalizer_Q {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) :
-    hyp.base.W2 ⊔ hyp.base.Q ≤ Subgroup.normalizer (hyp.base.Q : Set G) :=
+    data.W2 ⊔ data.Q ≤ Subgroup.normalizer (data.Q : Set G) :=
   sup_le data.W2_normalizes_Q Subgroup.le_normalizer
 
 /-- The `Q` factor is normal inside the product subgroup `W₂Q`.  This is the
@@ -810,75 +810,60 @@ structural input needed before applying the standard p-subgroup/Sylow argument
 inside `W₂Q`. -/
 theorem Q_subgroupOf_W2_sup_Q_normal {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) :
-    (hyp.base.Q.subgroupOf (hyp.base.W2 ⊔ hyp.base.Q)).Normal :=
+    (data.Q.subgroupOf (data.W2 ⊔ data.Q)).Normal :=
   Subgroup.normal_subgroupOf_of_le_normalizer data.W2_sup_Q_le_normalizer_Q
 
 /-- Elements of the transported prime line `W₂ = σ(P₀)` have `p`-th power
 `1`.  This is the ambient `G` form needed when reading BG Appendix C Step 4
 modulo `Q`. -/
-theorem W2_pow_p_eq_one {hyp : Hypothesis (G := G)} (_data : FieldNormalizerData hyp)
-    {x : G} (hx : x ∈ hyp.base.W2) :
+theorem W2_pow_p_eq_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {x : G} (hx : x ∈ data.W2) :
     x ^ hyp.base.p = 1 := by
-  haveI : Finite hyp.base.W2 := Nat.finite_of_card_ne_zero (by
-    rw [← hyp.base.p_eq_card_W2]
+  haveI : Finite data.W2 := Nat.finite_of_card_ne_zero (by
+    rw [data.card_W2]
     exact hyp.base.p_prime.ne_zero)
-  have hxpow := pow_card_eq_one' (G := hyp.base.W2) (x := (⟨x, hx⟩ : hyp.base.W2))
+  have hxpow := pow_card_eq_one' (G := data.W2) (x := (⟨x, hx⟩ : data.W2))
   have hxpow_coe := congrArg Subtype.val hxpow
-  simpa [← hyp.base.p_eq_card_W2] using hxpow_coe
-
-/-- Elements of the transported elementary abelian subgroup `Q` have `q`-th
-power `1`, in ambient `G` form. -/
-theorem Q_pow_q_eq_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    {x : G} (hx : x ∈ hyp.base.Q) :
-    x ^ hyp.base.q = 1 := by
-  simpa using congrArg Subtype.val
-    (data.Q_elementaryAbelian.pow_eq_one (⟨x, hx⟩ : hyp.base.Q))
+  simpa [data.card_W2] using hxpow_coe
 
 /-- The transported additive kernel `P` and the transported elementary abelian
 subgroup `Q` meet trivially.  In BG Appendix C Step 3 this is the first input for
 reading `P ∩ QP₀ = P₀`. -/
 theorem P_inf_Q_eq_bot {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    hyp.base.P ⊓ hyp.base.Q = ⊥ := by
+    data.P ⊓ data.Q = ⊥ := by
   apply le_antisymm ?_ bot_le
   intro x hx
   have hxp : x ^ hyp.base.p = 1 := data.P_pow_p_eq_one hx.1
-  have hxq : x ^ hyp.base.q = 1 := data.Q_pow_q_eq_one hx.2
-  have horder_p : orderOf x ∣ hyp.base.p := orderOf_dvd_of_pow_eq_one hxp
-  have horder_q : orderOf x ∣ hyp.base.q := orderOf_dvd_of_pow_eq_one hxq
-  have hpq : Nat.Coprime hyp.base.p hyp.base.q :=
-    (Nat.coprime_primes hyp.base.p_prime hyp.base.q_prime).mpr hyp.p_ne_q
-  have horder_one : orderOf x = 1 :=
-    Nat.eq_one_of_dvd_coprimes hpq horder_p horder_q
-  simpa [Subgroup.mem_bot] using orderOf_eq_one_iff.mp horder_one
+  simpa [Subgroup.mem_bot] using data.eq_one_of_mem_Q_of_pow_p_eq_one hx.2 hxp
 
 /-- BG Appendix C Step 3 product intersection: inside the product subgroup `W₂Q`,
 the transported additive kernel `P` meets `W₂Q` exactly in `W₂`.  This is the
 Lean form of BG's `P ∩ QP₀ = P₀`. -/
 theorem P_inf_W2_sup_Q_eq_W2 {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) :
-    hyp.base.P ⊓ (hyp.base.W2 ⊔ hyp.base.Q) = hyp.base.W2 := by
-  let H : Subgroup G := hyp.base.W2 ⊔ hyp.base.Q
+    data.P ⊓ (data.W2 ⊔ data.Q) = data.W2 := by
+  let H : Subgroup G := data.W2 ⊔ data.Q
   apply le_antisymm
   · intro x hx
-    have hxP : x ∈ hyp.base.P := hx.1
+    have hxP : x ∈ data.P := hx.1
     have hxH : x ∈ H := hx.2
-    haveI : (hyp.base.Q.subgroupOf H).Normal := data.Q_subgroupOf_W2_sup_Q_normal
+    haveI : (data.Q.subgroupOf H).Normal := data.Q_subgroupOf_W2_sup_Q_normal
     have hmem : (⟨x, hxH⟩ : H) ∈
-        hyp.base.W2.subgroupOf H ⊔ hyp.base.Q.subgroupOf H := by
-      rw [← Subgroup.subgroupOf_sup (le_sup_left : hyp.base.W2 ≤ H)
-        (le_sup_right : hyp.base.Q ≤ H), Subgroup.subgroupOf_self]
+        data.W2.subgroupOf H ⊔ data.Q.subgroupOf H := by
+      rw [← Subgroup.subgroupOf_sup (le_sup_left : data.W2 ≤ H)
+        (le_sup_right : data.Q ≤ H), Subgroup.subgroupOf_self]
       exact Subgroup.mem_top _
     rw [Subgroup.mem_sup_of_normal_right] at hmem
     obtain ⟨⟨w, _hwH⟩, hw, ⟨q, _hqH⟩, hq, heq⟩ := hmem
     have hxeq : x = w * q := (congrArg Subtype.val heq).symm
-    have hwW2 : w ∈ hyp.base.W2 := hw
-    have hqQ : q ∈ hyp.base.Q := hq
-    have hqP : q ∈ hyp.base.P := by
-      have : w⁻¹ * x ∈ hyp.base.P :=
-        hyp.base.P.mul_mem (hyp.base.P.inv_mem (data.W2_le_P hwW2)) hxP
+    have hwW2 : w ∈ data.W2 := hw
+    have hqQ : q ∈ data.Q := hq
+    have hqP : q ∈ data.P := by
+      have : w⁻¹ * x ∈ data.P :=
+        data.P.mul_mem (data.P.inv_mem (data.W2_le_P hwW2)) hxP
       rwa [hxeq, ← mul_assoc, inv_mul_cancel, one_mul] at this
     have hq_one : q = 1 := by
-      have : q ∈ hyp.base.P ⊓ hyp.base.Q := ⟨hqP, hqQ⟩
+      have : q ∈ data.P ⊓ data.Q := ⟨hqP, hqQ⟩
       rw [data.P_inf_Q_eq_bot, Subgroup.mem_bot] at this
       exact this
     rw [hxeq, hq_one, mul_one]
@@ -888,7 +873,7 @@ theorem P_inf_W2_sup_Q_eq_W2 {hyp : Hypothesis (G := G)}
 /-- The same product-intersection statement in BG's displayed `QP₀` order. -/
 theorem P_inf_Q_sup_W2_eq_W2 {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) :
-    hyp.base.P ⊓ (hyp.base.Q ⊔ hyp.base.W2) = hyp.base.W2 := by
+    data.P ⊓ (data.Q ⊔ data.W2) = data.W2 := by
   simpa [sup_comm] using data.P_inf_W2_sup_Q_eq_W2
 
 /-- If the conjugate line `P₁` normalizes `P`, then, since `P₁ ≤ W₂Q`, it also
@@ -896,24 +881,24 @@ normalizes `P ∩ W₂Q = W₂`.  This is the formal normalizer step in BG Appen
 Step 3 before the final Sylow/product p-subgroup contradiction. -/
 theorem P1_le_normalizer_W2_of_le_normalizer_P
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    (hP1P : data.P1 ≤ Subgroup.normalizer (hyp.base.P : Set G)) :
-    data.P1 ≤ Subgroup.normalizer (hyp.base.W2 : Set G) := by
-  let H : Subgroup G := hyp.base.W2 ⊔ hyp.base.Q
+    (hP1P : data.P1 ≤ Subgroup.normalizer (data.P : Set G)) :
+    data.P1 ≤ Subgroup.normalizer (data.W2 : Set G) := by
+  let H : Subgroup G := data.W2 ⊔ data.Q
   intro x hxP1
-  have hxNP : x ∈ Subgroup.normalizer (hyp.base.P : Set G) := hP1P hxP1
+  have hxNP : x ∈ Subgroup.normalizer (data.P : Set G) := hP1P hxP1
   have hxH : x ∈ H := data.P1_le_W2_sup_Q hxP1
   have hxNH : x ∈ Subgroup.normalizer (H : Set G) := Subgroup.le_normalizer hxH
   rw [Subgroup.mem_normalizer_iff] at hxNP hxNH ⊢
   intro y
   constructor
   · intro hyW2
-    have hyInf : y ∈ hyp.base.P ⊓ H := by
+    have hyInf : y ∈ data.P ⊓ H := by
       rw [data.P_inf_W2_sup_Q_eq_W2]
       exact hyW2
     rw [← data.P_inf_W2_sup_Q_eq_W2]
     exact ⟨(hxNP y).mp hyInf.1, (hxNH y).mp hyInf.2⟩
   · intro hconjW2
-    have hconjInf : x * y * x⁻¹ ∈ hyp.base.P ⊓ H := by
+    have hconjInf : x * y * x⁻¹ ∈ data.P ⊓ H := by
       rw [data.P_inf_W2_sup_Q_eq_W2]
       exact hconjW2
     rw [← data.P_inf_W2_sup_Q_eq_W2]
@@ -923,20 +908,13 @@ theorem P1_le_normalizer_W2_of_le_normalizer_P
 trivially.  This is the BG Appendix C Step 4 `P₀ ∩ Q = 1` input after
 identifying `P₀` with `W₂ = σ(P₀)`. -/
 theorem W2_inf_Q_eq_bot {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    hyp.base.W2 ⊓ hyp.base.Q = ⊥ := by
+    data.W2 ⊓ data.Q = ⊥ := by
   apply le_antisymm ?_ bot_le
   intro x hx
-  have hxW2 : x ∈ hyp.base.W2 := hx.1
-  have hxQ : x ∈ hyp.base.Q := hx.2
+  have hxW2 : x ∈ data.W2 := hx.1
+  have hxQ : x ∈ data.Q := hx.2
   have hxp : x ^ hyp.base.p = 1 := data.W2_pow_p_eq_one hxW2
-  have hxq : x ^ hyp.base.q = 1 := data.Q_pow_q_eq_one hxQ
-  have horder_p : orderOf x ∣ hyp.base.p := orderOf_dvd_of_pow_eq_one hxp
-  have horder_q : orderOf x ∣ hyp.base.q := orderOf_dvd_of_pow_eq_one hxq
-  have hpq : Nat.Coprime hyp.base.p hyp.base.q :=
-    (Nat.coprime_primes hyp.base.p_prime hyp.base.q_prime).mpr hyp.p_ne_q
-  have horder_one : orderOf x = 1 :=
-    Nat.eq_one_of_dvd_coprimes hpq horder_p horder_q
-  simpa [Subgroup.mem_bot] using orderOf_eq_one_iff.mp horder_one
+  simpa [Subgroup.mem_bot] using data.eq_one_of_mem_Q_of_pow_p_eq_one hxQ hxp
 
 /-- The orders of `W₂ = σ(P₀)` and `Q` are coprime: `|W₂| = p` is prime, `|Q|`
 is a power of `q`, and `p ≠ q`.  This is the coprimality input to BG Appendix C
@@ -944,52 +922,48 @@ Remark (X)'s coprime decomposition `Q = C_Q(P₀) × ⁅Q, P₀⁆` (Isaacs Thm 
 BG Prop 1.6(d)), used in the Lemma C.3 Step 4 kernel argument. -/
 theorem W2_card_coprime_Q_card [Finite G] {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) :
-    Nat.Coprime (Nat.card ↥hyp.base.W2) (Nat.card ↥hyp.base.Q) := by
-  haveI : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
-  have hW2 : Nat.card ↥hyp.base.W2 = hyp.base.p := hyp.base.p_eq_card_W2.symm
-  obtain ⟨k, hQ⟩ : ∃ k, Nat.card ↥hyp.base.Q = hyp.base.q ^ k :=
-    ⟨_, data.Q_elementaryAbelian.card_eq_pow_finrank⟩
-  rw [hW2, hQ]
-  exact ((Nat.coprime_primes hyp.base.p_prime hyp.base.q_prime).mpr hyp.p_ne_q).pow_right k
+    Nat.Coprime (Nat.card ↥data.W2) (Nat.card ↥data.Q) := by
+  rw [data.card_W2]
+  exact (Nat.Prime.coprime_iff_not_dvd hyp.base.p_prime).mpr data.Q_pPrime
 
 /-- If `P₁` normalizes `W₂`, then the product `W₂P₁` is a p-subgroup of `W₂Q`.
 Since `Q` is p-prime and `|W₂| = p`, the p-part of `W₂Q` has order exactly `p`,
 so `P₁ = W₂`.  This is the final product/Sylow argument in BG Appendix C Step 3. -/
 theorem P1_eq_W2_of_le_normalizer_W2 [Finite G]
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    (hP1W2 : data.P1 ≤ Subgroup.normalizer (hyp.base.W2 : Set G)) :
-    data.P1 = hyp.base.W2 := by
-  let R : Subgroup G := hyp.base.W2 ⊔ data.P1
-  let H : Subgroup G := hyp.base.W2 ⊔ hyp.base.Q
+    (hP1W2 : data.P1 ≤ Subgroup.normalizer (data.W2 : Set G)) :
+    data.P1 = data.W2 := by
+  let R : Subgroup G := data.W2 ⊔ data.P1
+  let H : Subgroup G := data.W2 ⊔ data.Q
   haveI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   have hR_p : IsPGroup hyp.base.p R := by
     exact IsPGroup.to_sup_of_normal_left' data.W2_isPGroup data.P1_isPGroup hP1W2
   obtain ⟨k, hR_card⟩ := (IsPGroup.iff_card (p := hyp.base.p) (G := R)).mp hR_p
-  have hW2_le_R : hyp.base.W2 ≤ R := le_sup_left
+  have hW2_le_R : data.W2 ≤ R := le_sup_left
   have hR_le_H : R ≤ H := sup_le le_sup_left data.P1_le_W2_sup_Q
-  have hW2_card_le_R : Nat.card ↥hyp.base.W2 ≤ Nat.card ↥R :=
+  have hW2_card_le_R : Nat.card ↥data.W2 ≤ Nat.card ↥R :=
     Subgroup.card_le_of_le hW2_le_R
   have hk_pos : 0 < k := by
     by_contra hk
     have hk0 : k = 0 := Nat.eq_zero_of_not_pos hk
     have hp_le_one : hyp.base.p ≤ 1 := by
-      simpa [hR_card, hk0, pow_zero, hyp.base.p_eq_card_W2] using hW2_card_le_R
+      simpa [hR_card, hk0, pow_zero, ← data.card_W2] using hW2_card_le_R
     exact (not_lt_of_ge hp_le_one) hyp.base.p_prime.one_lt
   have hR_dvd_H : Nat.card ↥R ∣ Nat.card ↥H := Subgroup.card_dvd_of_le hR_le_H
-  have hH_card : Nat.card ↥H = hyp.base.p * Nat.card ↥hyp.base.Q := by
-    have hcard := Subgroup.card_HK_mul_card_inf_eq_card_mul_card hyp.base.W2 hyp.base.Q
-    have hcarrier : (↑H : Set G) = (↑hyp.base.W2 * ↑hyp.base.Q : Set G) := by
+  have hH_card : Nat.card ↥H = hyp.base.p * Nat.card ↥data.Q := by
+    have hcard := Subgroup.card_HK_mul_card_inf_eq_card_mul_card data.W2 data.Q
+    have hcarrier : (↑H : Set G) = (↑data.W2 * ↑data.Q : Set G) := by
       simpa [H] using
         Subgroup.coe_mul_of_left_le_normalizer_right
-          hyp.base.W2 hyp.base.Q data.W2_normalizes_Q
+          data.W2 data.Q data.W2_normalizes_Q
     rw [data.W2_inf_Q_eq_bot, Subgroup.card_bot, mul_one,
-      ← hyp.base.p_eq_card_W2, ← hcarrier] at hcard
+      data.card_W2, ← hcarrier] at hcard
     simpa [H, Nat.card_coe_set_eq] using hcard
-  have hpk_dvd : hyp.base.p ^ k ∣ hyp.base.p * Nat.card ↥hyp.base.Q := by
+  have hpk_dvd : hyp.base.p ^ k ∣ hyp.base.p * Nat.card ↥data.Q := by
     simpa [hR_card, hH_card] using hR_dvd_H
-  have hQ_coprime_p : Nat.Coprime (Nat.card ↥hyp.base.Q) hyp.base.p := by
-    simpa [hyp.base.p_eq_card_W2] using (data.W2_card_coprime_Q_card).symm
-  have hpk_coprime_Q : Nat.Coprime (hyp.base.p ^ k) (Nat.card ↥hyp.base.Q) :=
+  have hQ_coprime_p : Nat.Coprime (Nat.card ↥data.Q) hyp.base.p := by
+    simpa [← data.card_W2] using (data.W2_card_coprime_Q_card).symm
+  have hpk_coprime_Q : Nat.Coprime (hyp.base.p ^ k) (Nat.card ↥data.Q) :=
     hQ_coprime_p.symm.pow_left k
   have hpk_dvd_p : hyp.base.p ^ k ∣ hyp.base.p :=
     Nat.Coprime.dvd_of_dvd_mul_right hpk_coprime_Q hpk_dvd
@@ -997,18 +971,18 @@ theorem P1_eq_W2_of_le_normalizer_W2 [Finite G]
     exact (Nat.pow_dvd_pow_iff_le_right hyp.base.p_prime.one_lt).mp
       (by simpa [pow_one] using hpk_dvd_p)
   have hk_eq_one : k = 1 := le_antisymm hk_le_one (Nat.succ_le_of_lt hk_pos)
-  have hR_card_eq_W2 : Nat.card ↥R = Nat.card ↥hyp.base.W2 := by
-    rw [hR_card, hk_eq_one, pow_one, hyp.base.p_eq_card_W2]
-  have hW2_eq_R : hyp.base.W2 = R := by
+  have hR_card_eq_W2 : Nat.card ↥R = Nat.card ↥data.W2 := by
+    rw [hR_card, hk_eq_one, pow_one, data.card_W2]
+  have hW2_eq_R : data.W2 = R := by
     exact Subgroup.eq_of_le_of_card_ge hW2_le_R (by rw [hR_card_eq_W2])
-  have hP1_le_W2 : data.P1 ≤ hyp.base.W2 := by
+  have hP1_le_W2 : data.P1 ≤ data.W2 := by
     intro x hx
     have hxR : x ∈ R := (le_sup_right : data.P1 ≤ R) hx
     simpa [hW2_eq_R] using hxR
   have hP1_card : Nat.card ↥data.P1 = hyp.base.p := by
     rw [data.P1_eq_zpowers_t, Nat.card_zpowers, data.t_orderOf_eq_p]
   exact Subgroup.eq_of_le_of_card_ge hP1_le_W2 (by
-    rw [← hyp.base.p_eq_card_W2, hP1_card])
+    rw [data.card_W2, hP1_card])
 
 
 /-- The conjugation action of `W₂ = σ(P₀)` on the normal elementary abelian
@@ -1016,8 +990,8 @@ subgroup `Q`, restricted to `↥Q`.  This is the coprime action used to
 instantiate BG Appendix C Remark (X)'s decomposition `Q = C_Q(P₀) × ⁅Q, P₀⁆`
 (Isaacs Thm 4.34 / BG Prop 1.6(d)) in the Lemma C.3 Step 4 kernel argument. -/
 noncomputable def w2ConjQAut {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    ↥hyp.base.W2 →* MulAut ↥hyp.base.Q :=
-  (Subgroup.normalizerMonoidHom (H := hyp.base.Q)).comp
+    ↥data.W2 →* MulAut ↥data.Q :=
+  (Subgroup.normalizerMonoidHom (H := data.Q)).comp
     (Subgroup.inclusion data.W2_normalizes_Q)
 
 /-- **BG Appendix C, Remark (X)** (Isaacs Thm 4.34 / BG Prop 1.6(d)): under the
@@ -1029,9 +1003,10 @@ theorem w2ConjQAut_fixedPoints_inf_actionCommutator_eq_bot [Finite G]
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     Subgroup.fixedPointsOfMulAut data.w2ConjQAut ⊓
       OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut = ⊥ := by
-  letI : CommGroup ↥hyp.base.Q :=
-    { (inferInstance : Group ↥hyp.base.Q) with
-      mul_comm := data.Q_elementaryAbelian.comm }
+  haveI := data.Q_commutative
+  letI : CommGroup ↥data.Q :=
+    { (inferInstance : Group ↥data.Q) with
+      mul_comm := fun a b => Subtype.ext (setLike_mul_comm (s := data.Q) a.2 b.2) }
   exact OddOrder.Isaacs.Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian
     data.w2ConjQAut data.W2_card_coprime_Q_card
 
@@ -1041,9 +1016,9 @@ action commutator `⁅Q, W₂⁆` fixed by the whole `W₂`-action is trivial.  
 fixed points on `⁅Q, P₀⁆`, the key to inverting `(s⁻¹ - 1)` in the kernel step. -/
 theorem w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed [Finite G]
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    {x : ↥hyp.base.Q}
+    {x : ↥data.Q}
     (hx : x ∈ OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut)
-    (hfix : ∀ w : ↥hyp.base.W2, data.w2ConjQAut w x = x) :
+    (hfix : ∀ w : ↥data.W2, data.w2ConjQAut w x = x) :
     x = 1 := by
   have hmem : x ∈ Subgroup.fixedPointsOfMulAut data.w2ConjQAut ⊓
       OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut :=
@@ -1054,8 +1029,8 @@ theorem w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed [Finite G]
 /-- The `W₂`-conjugation action on `Q`, read in the ambient group `G`: it is
 genuine conjugation `w x w⁻¹`. -/
 theorem w2ConjQAut_apply_coe {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    (w : ↥hyp.base.W2) (x : ↥hyp.base.Q) :
-    ((data.w2ConjQAut w x : ↥hyp.base.Q) : G) = (w : G) * (x : G) * (w : G)⁻¹ := rfl
+    (w : ↥data.W2) (x : ↥data.Q) :
+    ((data.w2ConjQAut w x : ↥data.Q) : G) = (w : G) * (x : G) * (w : G)⁻¹ := rfl
 
 /-- **BG Appendix C, Remark (XI)**: we may assume `y ∈ ⁅Q, P₀⁆`.  Writing the
 coprime decomposition `Q = ⁅Q,W₂⁆ · C_Q(W₂)`, the centralizer component `yC` of
@@ -1063,18 +1038,19 @@ coprime decomposition `Q = ⁅Q,W₂⁆ · C_Q(W₂)`, the centralizer component
 produced by the action-commutator component `yD ∈ ⁅Q, W₂⁆`: `t = yD s yD⁻¹`. -/
 theorem exists_yD_mem_actionCommutator_conj_s_eq_t [Finite G]
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
-    ∃ yD : ↥hyp.base.Q,
+    ∃ yD : ↥data.Q,
       yD ∈ OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut ∧
         MulAut.conj (yD : G) data.s = data.t := by
-  letI : CommGroup ↥hyp.base.Q :=
-    { (inferInstance : Group ↥hyp.base.Q) with
-      mul_comm := data.Q_elementaryAbelian.comm }
+  haveI := data.Q_commutative
+  letI : CommGroup ↥data.Q :=
+    { (inferInstance : Group ↥data.Q) with
+      mul_comm := fun a b => Subtype.ext (setLike_mul_comm (s := data.Q) a.2 b.2) }
   have hsup : OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut ⊔
       Subgroup.fixedPointsOfMulAut data.w2ConjQAut = ⊤ := by
     rw [sup_comm]
     exact OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top
       data.W2_card_coprime_Q_card (Or.inr inferInstance)
-  have hmem : (⟨data.y, data.y_mem_Q⟩ : ↥hyp.base.Q) ∈
+  have hmem : (⟨data.y, data.y_mem_Q⟩ : ↥data.Q) ∈
       OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut ⊔
         Subgroup.fixedPointsOfMulAut data.w2ConjQAut := by
     rw [hsup]; exact Subgroup.mem_top _
@@ -1132,13 +1108,13 @@ theorem s_inv_pow_mul_t_pow_mul_comm {hyp : Hypothesis (G := G)}
 /-- The opposite first commutator factor `t⁻¹s` lies in `Q`. -/
 theorem t_inv_mul_s_mem_Q {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) :
-    data.t⁻¹ * data.s ∈ hyp.base.Q := by
+    data.t⁻¹ * data.s ∈ data.Q := by
   simpa using inv_mem data.s_inv_mul_t_mem_Q
 
 /-- The opposite BG commutator factors `(t⁻¹)^n s^n` lie in `Q`. -/
 theorem t_inv_pow_mul_s_pow_mem_Q {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (n : ℕ) :
-    (data.t⁻¹) ^ n * data.s ^ n ∈ hyp.base.Q :=
+    (data.t⁻¹) ^ n * data.s ^ n ∈ data.Q :=
   inv_pow_mul_pow_mem_of_inv_mul_mem data.t_normalizes_Q data.t_inv_mul_s_mem_Q n
 
 /-- The opposite BG factors `(t⁻¹)^m s^m` and `(t⁻¹)^n s^n` commute because
