@@ -5120,11 +5120,40 @@ set_option linter.style.longLine false in
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.fieldNormalizerKernel_inf_complement_eq_bot
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P_inf_U_eq_bot
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_mem_W2
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_ne_one
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_pow_p_eq_one
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_normalizes_Q
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.P_inf_U_eq_bot
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_mem_W2
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_ne_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_pow_p_eq_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_normalizes_Q
+
+-- **BG App.C の `(p, q)`-レベル基本事実** (issue 0151, 2026-07-26): `H = P ⋊ U` とその素体直線
+-- `P₀` についての初等的事実。以前は Peterfalvi §16 の `hyp` 経由でしか述べられていなかったが、
+-- §16 の設定には一切依存しないので Appendix C 側へ移設した。`P char PU` の半直積的な核
+-- (`p`-torsion が `P` に落ちる) はここで `gcd(p, |U|) = 1` から出る。
+#assert_only_allowed_axioms OddOrder.BG.AppC.primeLineElement_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.normOneUnits_card_coprime_p
+#assert_only_allowed_axioms OddOrder.BG.AppC.normOneFrobeniusKernel_pow_p_eq_one
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.normOneFrobeniusGroup_right_eq_one_of_pow_p_eq_one
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.normOneFrobeniusGroup_mem_kernel_of_pow_p_eq_one
+
+-- **BG App.C Lemma C.3 の輸送された配置** (issue 0151 移設ブロック 1, 2026-07-26):
+-- 仮説 (B) の単射 `σ : H → G` が作る `G` 内の配置 — 区別された元 `s ∈ σ(P₀)`、同型
+-- `U ≅ σ(U)`、分解 `σ(H) = PU` と `P ∩ U = 1`、`P char PU`、`U ≤ X ≤ PU` の既約性ブリッジ。
+-- §16 の `hyp` からではなく書籍の抽象仮説 (A)+(B) から述べられている。
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_zpow_eq_primeLineElement
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_orderOf_eq_p
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.W2_eq_zpowers_s
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.W2_le_P
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.W2_isPGroup
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.normOneUnitsToU_injective
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.normOneUnitsToU_surjective
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.P_pow_p_eq_one
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.FieldNormalizerData.mem_P_of_mem_P_sup_U_of_pow_p_eq_one
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.FieldNormalizerData.normalizer_P_sup_U_le_normalizer_P
 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_one
@@ -5136,22 +5165,22 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_fieldNormalizerNormOneUnit_ne_one
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.fieldNormalizerKernel_sup_complement_eq_top
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P_sup_U_eq_sigma_top
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.P_sup_U_eq_sigma_top
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_normOne_primeLine_normOne
+  OddOrder.BG.AppC.FieldNormalizerData.exists_normOne_primeLine_normOne
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_sigma_normOne_primeLine_normOne_of_mem_PU
+  OddOrder.BG.AppC.FieldNormalizerData.exists_sigma_normOne_primeLine_normOne_of_mem_PU
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.generatorRelation_step2_primeLine
+  OddOrder.BG.AppC.FieldNormalizerData.generatorRelation_step2_primeLine
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.generatorRelation_step2_primeLine_of_sigma_mem_U
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_not_normalizes_U
+  OddOrder.BG.AppC.FieldNormalizerData.generatorRelation_step2_primeLine_of_sigma_mem_U
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_not_normalizes_U
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_not_le_normalizer_U
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_mem_P
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_mem_P
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_mem_P_sup_U
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_mem_P
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_zpow_mem_P
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_zpow_mem_P_sup_U
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U
+  OddOrder.BG.AppC.FieldNormalizerData.subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_pow_normalizes_U
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_zpow_normalizes_U
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_zpow_conj_sigma_inr_mem_U
@@ -5172,7 +5201,7 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.right_component_of_step4_first_k_three_decomposition
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_neg_two_eq_primeLineElement_neg_two
+  OddOrder.BG.AppC.FieldNormalizerData.s_zpow_neg_two_eq_primeLineElement_neg_two
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.normN_two_mul_sub_one_of_sigma_first_k_three_decomposition
 #assert_only_allowed_axioms

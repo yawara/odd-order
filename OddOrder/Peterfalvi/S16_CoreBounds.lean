@@ -620,9 +620,9 @@ theorem normN_two_mul_sub_one_of_sigma_first_k_three_decomposition
         (SemidirectProduct.inl (Multiplicative.ofAdd (-(1 : F))) : H) := by
     simp [fieldNormalizerPrimeLineElement, F]
   have hline_neg_two :
-      fieldNormalizerPrimeLineElement hyp (-2 : ZMod hyp.base.p) =
+      BG.AppC.primeLineElement hyp.base.p hyp.base.q (-2 : ZMod hyp.base.p) =
         (SemidirectProduct.inl (Multiplicative.ofAdd (-(2 : F))) : H) := by
-    simp [fieldNormalizerPrimeLineElement, F, map_neg, map_ofNat]
+    simp [BG.AppC.primeLineElement, F, map_neg, map_ofNat]
   have hσ :
       data.sigma
           ((SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) *
@@ -642,7 +642,7 @@ theorem normN_two_mul_sub_one_of_sigma_first_k_three_decomposition
             data.s =
               data.sigma
                 (SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) := by
-          simp [s, fieldNormalizerPrimeLineGenerator, F]
+          simp [BG.AppC.FieldNormalizerData.s, BG.AppC.primeLineGenerator, F]
         have hsneg_two :
             data.s ^ (-2 : ℤ) =
               data.sigma
@@ -1088,7 +1088,8 @@ theorem sigma_inr_inv_mul_s_mul_sigma_inr {hyp : Hypothesis (G := G)}
             GaloisField hyp.base.p hyp.base.q)) *
           (1 : GaloisField hyp.base.p hyp.base.q)))) := by
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  rw [s, fieldNormalizerPrimeLineGenerator, ← map_inv, ← map_mul, ← map_mul]
+  rw [BG.AppC.FieldNormalizerData.s, BG.AppC.primeLineGenerator, ← map_inv, ← map_mul,
+    ← map_mul]
   congr 1
   rw [← map_inv]
   have h := OddOrder.BG.AppC.NormSet.normOneFrobenius_conj_inl

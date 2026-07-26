@@ -64,7 +64,8 @@ theorem s_commute_sigma_primeLineElement {hyp : Hypothesis (G := G)}
     Commute data.s (data.sigma (fieldNormalizerPrimeLineElement hyp c)) := by
   have h := data.sigma_primeLineElement_commute 1 c
   rwa [show data.sigma (fieldNormalizerPrimeLineElement hyp 1) = data.s by
-    rw [fieldNormalizerPrimeLineElement_one, s, fieldNormalizerPrimeLineGenerator]] at h
+    rw [fieldNormalizerPrimeLineElement_one, BG.AppC.FieldNormalizerData.s,
+      fieldNormalizerPrimeLineGenerator, BG.AppC.primeLineGenerator]] at h
 
 /-- **BG Appendix C, Lemma C.3 Step 4: `(C.10)` modulo `Q`** (mmd L5058).  Since
 `P₀ ∩ Q = 1` (`W2_inf_Q_eq_bot`) and `t ≡ s` modulo `Q`, the displayed relation

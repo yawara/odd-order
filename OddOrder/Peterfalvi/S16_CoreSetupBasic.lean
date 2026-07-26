@@ -587,20 +587,22 @@ theorem c1_ne_zero {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
     rw [forms.hM1, hc1]
     simpa [fieldNormalizerPrimeLineElement, mul_assoc] using data.U.mul_mem hu1 hv1
   have hM1_step :
-      data.sigma (fieldNormalizerPrimeLineElement hyp (1 : ZMod hyp.base.p)) *
+      data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (1 : ZMod hyp.base.p)) *
           data.sigma
             (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
               fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp (-2 : ZMod hyp.base.p)) ∈
+        data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (-2 : ZMod hyp.base.p)) ∈
           data.U := by
     have h := hM1U
     rw [data.step4M1_eq_sigma_inr] at h
     have hs_one :
-        data.s = data.sigma (fieldNormalizerPrimeLineElement hyp (1 : ZMod hyp.base.p)) := by
-      simp [s, fieldNormalizerPrimeLineElement_one]
+        data.s =
+          data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (1 : ZMod hyp.base.p)) := by
+      simp [BG.AppC.FieldNormalizerData.s, BG.AppC.primeLineElement_one]
     have hs_neg_two :
         data.s ^ (-2 : ℤ) =
-          data.sigma (fieldNormalizerPrimeLineElement hyp (-2 : ZMod hyp.base.p)) := by
+          data.sigma
+            (BG.AppC.primeLineElement hyp.base.p hyp.base.q (-2 : ZMod hyp.base.p)) := by
       simpa using data.s_zpow_eq_primeLineElement (-2 : ℤ)
     rw [hs_neg_two] at h
     rw [hs_one] at h
@@ -639,21 +641,22 @@ theorem c3_ne_zero {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
     rw [forms.hM3, hc3]
     simpa [fieldNormalizerPrimeLineElement, mul_assoc] using data.U.mul_mem hu3 hv3
   have hM3_step :
-      data.sigma (fieldNormalizerPrimeLineElement hyp (2 : ZMod hyp.base.p)) *
+      data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (2 : ZMod hyp.base.p)) *
           data.sigma
             (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 1)⁻¹ b) :
               fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp (-3 : ZMod hyp.base.p)) ∈
+        data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (-3 : ZMod hyp.base.p)) ∈
           data.U := by
     have h := hM3U
     rw [data.step4M3_eq_sigma_inr] at h
     have hs_two :
         data.s ^ (2 : ℤ) =
-          data.sigma (fieldNormalizerPrimeLineElement hyp (2 : ZMod hyp.base.p)) := by
+          data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (2 : ZMod hyp.base.p)) := by
       simpa using data.s_zpow_eq_primeLineElement (2 : ℤ)
     have hs_neg_three :
         data.s ^ (-3 : ℤ) =
-          data.sigma (fieldNormalizerPrimeLineElement hyp (-3 : ZMod hyp.base.p)) := by
+          data.sigma
+            (BG.AppC.primeLineElement hyp.base.p hyp.base.q (-3 : ZMod hyp.base.p)) := by
       simpa using data.s_zpow_eq_primeLineElement (-3 : ℤ)
     rw [hs_two, hs_neg_three] at h
     simpa [mul_assoc] using h

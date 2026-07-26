@@ -64,7 +64,7 @@ theorem sScalar_zero {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp
 /-- The distinguished generator is the scalar `s = s^1`. -/
 theorem s_eq_sScalar_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     data.s = data.sScalar 1 := by
-  rw [sScalar, s, fieldNormalizerPrimeLineGenerator]
+  rw [sScalar, BG.AppC.FieldNormalizerData.s, BG.AppC.primeLineGenerator]
 
 /-- The field value `↑a ∈ 𝔽_{p^q}` of a norm-one unit `a ∈ U`. -/
 def unitVal {hyp : Hypothesis (G := G)} (a : fieldNormalizerNormOneUnits hyp) :
