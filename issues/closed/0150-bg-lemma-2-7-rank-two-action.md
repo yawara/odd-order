@@ -161,3 +161,33 @@ isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible :
 `ρ.asModule` (型シノニム) 上の `MonoidAlgebra`-部分加群と `M` 上の `ZMod p`-部分加群の
 往復 (`Representation.asModuleEquiv : ρ.asModule ≃ₗ[ZMod p] M`) と finrank の突き合わせが
 最も fiddly。段 5-7 の指標解析は素直だが行数が出る。**複数 session 規模**の項目。
+
+## ✅ 完了 (2026-07-26)
+
+(a) `prime_dvd_sub_one_of_faithful_rank_two` / (b) `exists_powerMap_of_faithful_rank_two`
+がともに sorry-free で landing (`51f977137` / `86be397b5`)。実体は新 leaf
+`OddOrder/GroupTheory/RepresentationTheory/SingerReducibility.lean` (約 430 行、11 定理)。
+AxiomsCheck 登録済み・axiom-clean。
+
+**採った経路 (計画からの変更点)**
+
+- 段 3 の Maschke: `private` の公開化は**不要**だった。`NeZero (Nat.card Q : ZMod p)` +
+  `Module.Finite` があれば `IsSemisimpleModule … ρ.asModule` が `infer_instance` で通る。
+- (b): `Q ≅ μ_q × μ_q` の同型を作って対角元を取る計画だったが、**商指標
+  `ψ = χ₁ / χ₂ : Q →* 𝔽_p^×` の核**を見るほうが遥かに短い。像は `q` 乗根からなる巡回群の
+  部分群なので位数が `q` を割り、`|Q| = q²` から核が位数 `q ≥ 2` 以上。μ_q の位数計算も
+  全射性も不要になった。
+
+**副産物 (汎用に切り出した補題)**
+
+`Representation.not_isSimpleModule_asModule_of_not_isCyclic` (Singer の対偶) /
+`exists_isCompl_finrank_one_of_not_isSimpleModule` (階数 2 半単純 → 2 直線、任意の体・環) /
+`exists_scalar_of_finrank_eq_one_of_mapsTo` / `exists_monoidHom_scalar_of_finrank_eq_one` /
+`exists_invariant_lines_of_not_isSimpleModule` (`ρ.asModule` ↔ `M` 輸送) /
+`prime_dvd_sub_one_of_pow_eq_one`。
+
+**踏んだ罠**: Singer 定理は `C, M` が同一 universe / `Representation` は `MonoidHom` の def
+なのでドット記法が `MonoidHom.*` へ流れる / `omit … in` と `open … in` は docstring の**前** /
+`Module.finrank_top` は存在せず root の `finrank_top` / mathlib に別命題の同名
+`exists_smul_eq_of_finrank_eq_one` がある / **AxiomsCheck は新 leaf を import しないと
+"constant not found"** (orphan leaf と同種)。
