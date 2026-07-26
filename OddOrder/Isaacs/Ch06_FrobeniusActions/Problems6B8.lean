@@ -87,6 +87,26 @@ theorem mul_comm_of_center_le_of_isCyclic_quotient {A : Type*} [Group A] {Z : Su
   exact commutative_of_cyclic_center_quotient (QuotientGroup.mk' Z)
     (by rwa [QuotientGroup.ker_mk']) x y
 
+/-- **6B.8 の base case**: `|P| = 8` かつ `|P : P'| = 4` なら `P` は `D_8` か `Q_8`。
+
+`|P'| = 2 ≠ 1` から非可換なので repo の Cor 6.14
+(`dihedralOrQuaternion_of_card_eight`) がそのまま使える。 -/
+theorem tausskyTodd_card_eight {P : Type*} [Group P] [Finite P]
+    (hcard : Nat.card P = 8) (hidx : (commutator P).index = 4) :
+    Nonempty (P ≃* DihedralGroup 4) ∨ Nonempty (P ≃* QuaternionGroup 2) := by
+  refine dihedralOrQuaternion_of_card_eight hcard ?_
+  by_contra hcon
+  have hall : ∀ x y : P, x * y = y * x := by
+    intro x y
+    by_contra h
+    exact hcon ⟨x, y, h⟩
+  have hbot : commutator P = ⊥ := by
+    rw [commutator_def, Subgroup.commutator_eq_bot_iff_le_centralizer]
+    intro x _
+    exact Subgroup.mem_centralizer_iff.mpr fun y _ => hall y x
+  rw [hbot, Subgroup.index_bot, hcard] at hidx
+  omega
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
