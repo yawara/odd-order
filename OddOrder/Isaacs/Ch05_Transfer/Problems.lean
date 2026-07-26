@@ -1,0 +1,595 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import Mathlib.GroupTheory.Transfer
+
+/-!
+# Isaacs Chapter 5 — Problems 5A (transfer の基本)
+
+Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 5A (書籍 pp. 152-153)。
+
+mathlib の transfer は `MonoidHom.transfer (ϕ : H →* A) : G →* A` (`A` は可換群) で,
+Isaacs の `v : G → H/H'` は `A = H/H'`, `ϕ = 自然な射影` の場合にあたる。
+
+* **5A.1** `transfer_id_eq_pow_index_of_commGroup` — `G` 可換, `|G : H| = n` なら
+  `G → H` の transfer は `g ↦ g ^ n`。
+* **5A.3(a)** `eq_of_mul_eq_mul_of_isComplement` — `ST` の元の `s * t` 表示は一意。
+* **5A.3(b)** `isComplement_mul_of_transversal` — `ST` は `G` の中で `H` の右 transversal。
+  ⚠ 指数の積 `|G:H| = |G:K|·|K:H|` は mathlib `Subgroup.relIndex_mul_index` が既に
+  与えるのでラッパーは書かない。(c)(d) (pretransfer の合成) は未実装 (issue 1055 参照)。
+* **5A.4(a)** `transfer_eq_pow_index_of_le_center` — `H ≤ Z(G)`, `|G : H| = n` なら
+  transfer は `g ↦ ϕ ⟨g ^ n⟩` (`ϕ : ↥H →* A` は任意)。Isaacs の `v : G → H/H'` は
+  `A = H/H'` の場合で, `H ≤ Z(G)` なら `H` は可換ゆえ `H' = 1`, `H/H' ≅ H` なので
+  「`v(h) = h ^ n`」がそのまま読める。
+  ⚠ 余域を `↥H` に取った版は `CommGroup ↥H` を statement 内 `letI` で供給する必要があり,
+  その instance の `toGroup` が `Subgroup.toGroup` と構文的に一致しないため
+  `MonoidHom.id ↥H` の型が合わない (diamond)。一般 `ϕ` 版で十分なので採らない。
+-/
+
+namespace OddOrder.Isaacs.Ch05
+
+open MonoidHom
+
+open scoped Pointwise
+
+section /- Problems 5A (pp. 152-153) -/
+
+/-- **Isaacs Problem 5A.1**: `G` が可換で `H ≤ G` の指数が `n` なら, `G` から `H` への
+transfer は `g ↦ g ^ n`。
+
+可換なので `transfer_eq_pow` の仮説 `g₀⁻¹ g^k g₀ = g^k` は自明に成り立つ。 -/
+theorem transfer_id_eq_pow_index_of_commGroup {G : Type*} [CommGroup G] {H : Subgroup G}
+    [H.FiniteIndex] (g : G) :
+    transfer (MonoidHom.id H) g = ⟨g ^ H.index, transfer_eq_pow_aux g
+      (fun k g₀ _ => by rw [mul_comm, ← mul_assoc, mul_inv_cancel, one_mul])⟩ :=
+  transfer_eq_pow (MonoidHom.id H) g
+    (fun k g₀ _ => by rw [mul_comm, ← mul_assoc, mul_inv_cancel, one_mul])
+
+/-- **Isaacs Problem 5A.1** (値の形): `G` 可換なら transfer の値は `g ^ |G : H|`。 -/
+theorem coe_transfer_id_of_commGroup {G : Type*} [CommGroup G] {H : Subgroup G}
+    [H.FiniteIndex] (g : G) :
+    ((transfer (MonoidHom.id H) g : H) : G) = g ^ H.index := by
+  rw [transfer_id_eq_pow_index_of_commGroup]
+
+/-- **Isaacs Problem 5A.4(a)** (一般の余域版): `H ≤ Z(G)` で `|G : H| = n` なら, 任意の
+`ϕ : ↥H →* A` (`A` 可換) について transfer は `g ↦ ϕ ⟨g ^ n⟩`。
+
+`transfer_eq_pow` の仮説は `g₀⁻¹ g^k g₀ ∈ H ≤ Z(G)` が中心的で `g₀` と可換なことから従う
+(mathlib `transfer_center_eq_pow` と同じ議論を `H ≤ Z(G)` に一般化したもの)。 -/
+theorem transfer_eq_pow_index_of_le_center {G A : Type*} [Group G] [CommGroup A]
+    {H : Subgroup G} [H.FiniteIndex] (hH : H ≤ Subgroup.center G) (ϕ : H →* A) (g : G) :
+    transfer ϕ g = ϕ ⟨g ^ H.index, transfer_eq_pow_aux g
+      (fun k g₀ hk => by rw [← mul_right_inj, ← (hH hk).comm, mul_inv_cancel_right])⟩ :=
+  transfer_eq_pow ϕ g
+    (fun k g₀ hk => by rw [← mul_right_inj, ← (hH hk).comm, mul_inv_cancel_right])
+
+/-- `H ≤ Z(G)` なら `H ⊴ G`. -/
+theorem normal_of_le_center {G : Type*} [Group G] {H : Subgroup G}
+    (hH : H ≤ Subgroup.center G) : H.Normal :=
+  ⟨fun n hn g => by
+    have hc : g * n = n * g := Subgroup.mem_center_iff.mp (hH hn) g
+    rw [hc, mul_assoc, mul_inv_cancel, mul_one]
+    exact hn⟩
+
+/-- **Isaacs Problem 5A.4(b)**: `H ≤ Z(G)`, `|G : H| = n`, `(|H|, n) = 1` なら
+`G = H × ker v` (`v` = transfer)。ここでは補群条件 `H ⊓ ker v = 1` と `H ⊔ ker v = ⊤` の形で
+述べる (`H ≤ Z(G)` なので直積になる)。
+
+`v(h) = ϕ⟨h^n⟩` (5A.4(a)) と `ϕ` の単射性から `H ⊓ ker v` の元は `h^n = 1` を満たし,
+位数が `|H|` と `n` の両方を割るので `1`。全射性は `H` 上で `h ↦ h^n` が単射 ⟹ 有限性から
+全射なので, 任意の `g` に `h ∈ H` を `h^n = g^n` と取れば `g h⁻¹ ∈ ker v`。 -/
+theorem inf_ker_transfer_eq_bot_of_le_center {G A : Type*} [Group G] [CommGroup A] [Finite G]
+    {H : Subgroup G} [H.FiniteIndex] (hH : H ≤ Subgroup.center G)
+    (ϕ : H →* A) (hϕ : Function.Injective ϕ)
+    (hcop : Nat.Coprime (Nat.card H) H.index) :
+    H ⊓ (transfer ϕ).ker = ⊥ := by
+  haveI := normal_of_le_center hH
+  rw [eq_bot_iff]
+  rintro h ⟨hhH, hker⟩
+  rw [Subgroup.mem_bot]
+  have hpow : h ^ H.index = 1 := by
+    have h1 : ϕ ⟨h ^ H.index, Subgroup.pow_index_mem H h⟩ = 1 := by
+      rw [← transfer_eq_pow_index_of_le_center hH ϕ h]
+      exact hker
+    have h2 : (⟨h ^ H.index, Subgroup.pow_index_mem H h⟩ : H) = 1 := hϕ (by rw [h1, map_one])
+    exact congrArg Subtype.val h2
+  have d1 : orderOf h ∣ H.index := orderOf_dvd_of_pow_eq_one hpow
+  have d2 : orderOf h ∣ Nat.card H := by
+    refine orderOf_dvd_of_pow_eq_one ?_
+    have := pow_card_eq_one' (G := H) (x := (⟨h, hhH⟩ : H))
+    exact congrArg Subtype.val this
+  exact orderOf_eq_one_iff.mp (Nat.eq_one_of_dvd_one (hcop ▸ Nat.dvd_gcd d2 d1))
+
+/-- **Isaacs Problem 5A.4(b)** (生成側): `H ⊔ ker v = ⊤`。⚠ こちら側は `ϕ` の単射性を
+使わない (`h ↦ h ^ n` の全射性だけで足りる)。 -/
+theorem sup_ker_transfer_eq_top_of_le_center {G A : Type*} [Group G] [CommGroup A] [Finite G]
+    {H : Subgroup G} [H.FiniteIndex] (hH : H ≤ Subgroup.center G)
+    (ϕ : H →* A) (hcop : Nat.Coprime (Nat.card H) H.index) :
+    H ⊔ (transfer ϕ).ker = ⊤ := by
+  haveI := normal_of_le_center hH
+  -- `x ↦ x ^ n` は `↥H` 上で単射, したがって全射
+  have hfinj : Function.Injective
+      (fun x : H => (⟨(x : G) ^ H.index, H.pow_mem x.2 _⟩ : H)) := by
+    intro x y hxy
+    have hxy' : (x : G) ^ H.index = (y : G) ^ H.index := congrArg Subtype.val hxy
+    have hxy0 : Commute (x : G) (y : G) := Subgroup.mem_center_iff.mp (hH y.2) (x : G)
+    have hcomm : Commute (x : G) ((y : G)⁻¹) := hxy0.inv_right
+    have hz : ((x : G) * (y : G)⁻¹) ^ H.index = 1 := by
+      rw [hcomm.mul_pow, inv_pow, hxy', mul_inv_cancel]
+    have hzH : (x : G) * (y : G)⁻¹ ∈ H := H.mul_mem x.2 (H.inv_mem y.2)
+    have d1 : orderOf ((x : G) * (y : G)⁻¹) ∣ H.index := orderOf_dvd_of_pow_eq_one hz
+    have d2 : orderOf ((x : G) * (y : G)⁻¹) ∣ Nat.card H := by
+      refine orderOf_dvd_of_pow_eq_one ?_
+      have := pow_card_eq_one' (G := H) (x := (⟨_, hzH⟩ : H))
+      exact congrArg Subtype.val this
+    have h1 : (x : G) * (y : G)⁻¹ = 1 :=
+      orderOf_eq_one_iff.mp (Nat.eq_one_of_dvd_one (hcop ▸ Nat.dvd_gcd d2 d1))
+    exact Subtype.ext (mul_inv_eq_one.mp h1)
+  have hfsurj := Finite.injective_iff_surjective.mp hfinj
+  rw [eq_top_iff]
+  intro g _
+  obtain ⟨h, hh⟩ := hfsurj ⟨g ^ H.index, Subgroup.pow_index_mem H g⟩
+  have hhpow : (h : G) ^ H.index = g ^ H.index := congrArg Subtype.val hh
+  have hker : g * (h : G)⁻¹ ∈ (transfer ϕ).ker := by
+    rw [MonoidHom.mem_ker, map_mul, map_inv,
+      transfer_eq_pow_index_of_le_center hH ϕ g,
+      transfer_eq_pow_index_of_le_center hH ϕ (h : G), ← map_inv, ← map_mul]
+    convert map_one ϕ using 2
+    refine Subtype.ext ?_
+    simp only [Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_one]
+    rw [hhpow, mul_inv_cancel]
+  have : g = (g * (h : G)⁻¹) * (h : G) := by group
+  rw [this]
+  exact Subgroup.mul_mem _ ((le_sup_right : (transfer ϕ).ker ≤ _) hker)
+    ((le_sup_left : H ≤ _) h.2)
+
+
+/-- **Isaacs Problem 5A.2**: `H = ⊤` のときの transfer は `ϕ` そのもの。
+
+Isaacs の `v : G → G/G'` は `A = G/G'`, `ϕ` = 自然な射影の場合なので, これがまさに
+「transfer は自然な射影に他ならない」。
+
+`G ⧸ ⊤` は 1 点なので `diff` の積は 1 項だけで, その項は `g` の**共役**の `ϕ`-像
+(`Subgroup.smul_apply_eq_smul_apply_inv_smul`)。`A` が可換なので `ϕ ⟨g⟩` に等しい。
+⚠ `transfer_eq_pow` は使えない (key 仮説「`g₀⁻¹ g^k g₀ = g^k`」は `H = ⊤` では偽)。 -/
+theorem transfer_top_eq_apply {G A : Type*} [Group G] [CommGroup A]
+    [(⊤ : Subgroup G).FiniteIndex] (ϕ : (⊤ : Subgroup G) →* A) (g : G) :
+    transfer ϕ g = ϕ ⟨g, Subgroup.mem_top g⟩ := by
+  classical
+  haveI hss : Subsingleton (G ⧸ (⊤ : Subgroup G)) := QuotientGroup.subsingleton_quotient_top
+  letI hfin : Fintype (G ⧸ (⊤ : Subgroup G)) := Subgroup.fintypeQuotientOfFiniteIndex
+  have hconj : ∀ x : G,
+      ϕ ⟨x⁻¹ * (g * x), Subgroup.mem_top _⟩ = ϕ ⟨g, Subgroup.mem_top g⟩ := by
+    intro x
+    have hx : (⟨x⁻¹ * (g * x), Subgroup.mem_top _⟩ : (⊤ : Subgroup G))
+        = (⟨x, Subgroup.mem_top x⟩ : (⊤ : Subgroup G))⁻¹ *
+            ⟨g, Subgroup.mem_top g⟩ * ⟨x, Subgroup.mem_top x⟩ :=
+      Subtype.ext (by simp [mul_assoc])
+    rw [hx, map_mul, map_mul, map_inv, mul_right_comm, inv_mul_cancel, one_mul]
+  have hbeta : ∀ q : G ⧸ (⊤ : Subgroup G),
+      (((g • (default : (⊤ : Subgroup G).LeftTransversal)).2.leftQuotientEquiv q : G))
+        = g * ((default : (⊤ : Subgroup G).LeftTransversal).2.leftQuotientEquiv q : G) := by
+    intro q
+    rw [Subgroup.smul_apply_eq_smul_apply_inv_smul g default q,
+      Subsingleton.elim (g⁻¹ • q) q]
+    rfl
+  rw [transfer_def ϕ (default : (⊤ : Subgroup G).LeftTransversal) g]
+  simp only [Subgroup.leftTransversals.diff, hbeta, hconj]
+  rw [Finset.prod_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
+    show Nat.card (G ⧸ (⊤ : Subgroup G)) = 1 from Subgroup.index_top, pow_one]
+
+
+/-- **Isaacs Problem 5A.3(a)**: `S ⊆ K` で `T` が `K` の右 transversal なら, 積 `ST` の元は
+`s * t` (`s ∈ S`, `t ∈ T`) の形に**一意に**書ける。
+
+`IsComplement (K : Set G) T` の単射性を `(s, t)` と `(s', t')` に適用するだけ
+(`s, s' ∈ K` が効く)。 -/
+theorem eq_of_mul_eq_mul_of_isComplement {G : Type*} [Group G] {K : Subgroup G} {S T : Set G}
+    (hS : S ⊆ K) (hT : Subgroup.IsComplement (K : Set G) T)
+    {s s' : S} {t t' : T} (h : (s : G) * (t : G) = (s' : G) * (t' : G)) :
+    (s : G) = (s' : G) ∧ (t : G) = (t' : G) := by
+  have hpair := hT.1 (a₁ := (⟨(s : G), hS s.2⟩, t)) (a₂ := (⟨(s' : G), hS s'.2⟩, t')) h
+  exact ⟨congrArg (fun p => ((p.1 : G))) hpair, congrArg (fun p => ((p.2 : G))) hpair⟩
+
+
+/-- **Isaacs Problem 5A.3(b)**: `S ⊆ K` が `K` の中で `H` の右 transversal, `T` が `G` の中で
+`K` の右 transversal なら, **積 `ST` は `G` の中で `H` の右 transversal**。
+
+単射性: `h·s·t = h'·s'·t'` で `h·s, h'·s' ∈ K` なので `hT` の単射性から `h·s = h'·s'`,
+`t = t'`。`hS` の一意性を `k := h·s` に使って `s = s'`, したがって `h = h'`。
+全射性: `g = k·t` (`hT`) と `k = h·s` (`hS`) を合わせる。
+
+⚠ 指数の積 `|G:H| = |G:K|·|K:H|` は mathlib `Subgroup.relIndex_mul_index` が既に与える。 -/
+theorem isComplement_mul_of_transversal {G : Type*} [Group G] {H K : Subgroup G}
+    (hHK : H ≤ K) {S T : Set G} (hSsub : S ⊆ (K : Set G))
+    (hS : ∀ k ∈ K, ∃! s : ↥S, k * (s : G)⁻¹ ∈ H)
+    (hT : Subgroup.IsComplement (K : Set G) T) :
+    Subgroup.IsComplement (H : Set G) (S * T) := by
+  constructor
+  · rintro ⟨h, x⟩ ⟨h', x'⟩ heq
+    obtain ⟨s, hs, t, ht, hst⟩ := x.2
+    obtain ⟨s', hs', t', ht', hst'⟩ := x'.2
+    simp only at heq
+    rw [← hst, ← hst'] at heq
+    have hk : ((h : G) * s) ∈ K := K.mul_mem (hHK h.2) (hSsub hs)
+    have hk' : ((h' : G) * s') ∈ K := K.mul_mem (hHK h'.2) (hSsub hs')
+    have hpair := hT.1 (a₁ := (⟨(h : G) * s, hk⟩, ⟨t, ht⟩))
+      (a₂ := (⟨(h' : G) * s', hk'⟩, ⟨t', ht'⟩)) (by simpa [mul_assoc] using heq)
+    have hks : (h : G) * s = (h' : G) * s' := congrArg (fun p => (p.1 : G)) hpair
+    have htt : t = t' := congrArg (fun p => (p.2 : G)) hpair
+    obtain ⟨s₀, -, huniq⟩ := hS ((h : G) * s) hk
+    have e1 : (⟨s, hs⟩ : ↥S) = s₀ := huniq _ (by simp)
+    have e2 : (⟨s', hs'⟩ : ↥S) = s₀ := huniq _ (by
+      rw [hks]
+      simp)
+    have hss : s = s' := congrArg (fun z : ↥S => (z : G)) (e1.trans e2.symm)
+    have hhh : (h : G) = (h' : G) := by
+      have := hks
+      rw [hss] at this
+      exact mul_right_cancel this
+    refine Prod.ext (Subtype.ext hhh) (Subtype.ext ?_)
+    rw [← hst, ← hst', hss, htt]
+  · intro g
+    obtain ⟨⟨k, t⟩, hkt⟩ := hT.2 g
+    obtain ⟨s, hsH, -⟩ := hS (k : G) k.2
+    refine ⟨(⟨(k : G) * (s : G)⁻¹, hsH⟩, ⟨(s : G) * (t : G), ⟨(s : G), s.2, (t : G), t.2, rfl⟩⟩),
+      ?_⟩
+    simp only
+    rw [← hkt]
+    group
+
+
+end
+
+
+open scoped Pointwise in
+/-- **Isaacs Problem 5A.3(b), 左 transversal 版**: `H ≤ K ≤ G` で `T` が `G` の中の `K` の
+左 transversal, `S ⊆ K` が `K` の中の `H` の左 transversal なら `T * S` は `G` の中の
+`H` の左 transversal。
+
+書籍は右 transversal で述べるが (上の `isComplement_mul_of_transversal`), mathlib の
+`MonoidHom.transfer` は**左** transversal (`Subgroup.LeftTransversal`) で定義されているので,
+5A.3(c)(d) (transfer の推移律) にはこちらの向きが要る。
+
+**証明**: `g = t·k` (`hT` の一意分解), `k = s·h` (`hS` の一意分解) から `g = (t·s)·h`。
+一意性は逆向きに 2 段の一意性を使う。 -/
+theorem isComplement_mul_of_transversal_left {G : Type*} [Group G] {H K : Subgroup G}
+    (hHK : H ≤ K) {S T : Set G} (hSsub : S ⊆ (K : Set G))
+    (hS : ∀ k ∈ K, ∃! s : ↥S, (s : G)⁻¹ * k ∈ H)
+    (hT : Subgroup.IsComplement T (K : Set G)) :
+    Subgroup.IsComplement (T * S) (H : Set G) := by
+  rw [Subgroup.isComplement_iff_existsUnique]
+  intro g
+  obtain ⟨⟨t, k⟩, htk, huniq⟩ := Subgroup.isComplement_iff_existsUnique.mp hT g
+  obtain ⟨s, hs, hsuniq⟩ := hS (k : G) k.2
+  refine ⟨(⟨(t : G) * (s : G), Set.mul_mem_mul t.2 s.2⟩, ⟨(s : G)⁻¹ * (k : G), hs⟩), ?_, ?_⟩
+  · change (t : G) * (s : G) * ((s : G)⁻¹ * (k : G)) = g
+    calc (t : G) * (s : G) * ((s : G)⁻¹ * (k : G)) = (t : G) * (k : G) := by group
+      _ = g := htk
+  · rintro ⟨⟨x, hx⟩, ⟨h, hh⟩⟩ hxh
+    have hxh' : x * h = g := hxh
+    obtain ⟨t', ht', s', hs', hts'⟩ := Set.mem_mul.mp hx
+    have hsK : s' ∈ K := hSsub hs'
+    have hhK : h ∈ K := hHK hh
+    have hpair := huniq (⟨t', ht'⟩, ⟨s' * h, K.mul_mem hsK hhK⟩) (by
+      change t' * (s' * h) = g
+      rw [← mul_assoc, hts']
+      exact hxh')
+    have ht'eq : t' = (t : G) := congrArg (fun p => ((p.1 : ↥T) : G)) hpair
+    have hkeq : s' * h = (k : G) := congrArg (fun p => ((p.2 : ↥(K : Set G)) : G)) hpair
+    have hs'mem : ((⟨s', hs'⟩ : ↥S) : G)⁻¹ * (k : G) ∈ H := by
+      rw [← hkeq]
+      simpa using hh
+    have hs'eq : (⟨s', hs'⟩ : ↥S) = s := hsuniq _ hs'mem
+    have hs'val : s' = (s : G) := congrArg Subtype.val hs'eq
+    refine Prod.ext (Subtype.ext ?_) (Subtype.ext ?_)
+    · calc x = t' * s' := hts'.symm
+        _ = (t : G) * (s : G) := by rw [ht'eq, hs'val]
+    · change h = (s : G)⁻¹ * (k : G)
+      calc h = s'⁻¹ * (s' * h) := by group
+        _ = (s : G)⁻¹ * (k : G) := by rw [hkeq, hs'val]
+
+
+/-! ### 5A.3(c)(d) 用: 商の分解 -/
+
+/-- `H ≤ K` と `G` 内の `K` の左 transversal `T` から作る全単射
+`G ⧸ H ≃ (G ⧸ K) × (↥K ⧸ H.subgroupOf K)`。
+
+`⟦g⟧_H ↦ (⟦g⟧_K, ⟦τ(⟦g⟧_K)⁻¹ · g⟧)` (`τ` は `T` の代表元取り)。逆は `(q, ⟦k⟧) ↦ ⟦τ(q) · k⟧`。
+
+⚠ mathlib に同等物は無い (`quotientEquivProdOfLE` 不在を確認済)。
+transfer の推移律 (5A.3(d)) で `∏_{G ⧸ H}` を `∏_{G ⧸ K} ∏_{K ⧸ H'}` に分解するのに使う。 -/
+noncomputable def quotientEquivProd {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) : G ⧸ H ≃ (G ⧸ K) × (↥K ⧸ H.subgroupOf K) where
+  toFun q := Quotient.liftOn' q
+    (fun g => (QuotientGroup.mk g,
+      QuotientGroup.mk ⟨(T.2.leftQuotientEquiv (QuotientGroup.mk g) : G)⁻¹ * g,
+        Subgroup.IsComplement.inv_toLeftFun_mul_mem T.2 g⟩))
+    (by
+      intro a b hab
+      have hH : a⁻¹ * b ∈ H := QuotientGroup.leftRel_apply.mp hab
+      have hK : (QuotientGroup.mk a : G ⧸ K) = QuotientGroup.mk b :=
+        QuotientGroup.eq.mpr (hHK hH)
+      refine Prod.ext hK ?_
+      refine QuotientGroup.eq.mpr ?_
+      rw [Subgroup.mem_subgroupOf]
+      simp only [Subgroup.coe_mul, Subgroup.coe_inv, hK]
+      have hgrp : ((T.2.leftQuotientEquiv (QuotientGroup.mk b) : G)⁻¹ * a)⁻¹ *
+          ((T.2.leftQuotientEquiv (QuotientGroup.mk b) : G)⁻¹ * b) = a⁻¹ * b := by group
+      rw [hgrp]
+      exact hH)
+  invFun p := Quotient.liftOn' p.2
+    (fun k => (QuotientGroup.mk ((T.2.leftQuotientEquiv p.1 : G) * (k : G)) : G ⧸ H))
+    (by
+      intro a b hab
+      have hH : (a : G)⁻¹ * (b : G) ∈ H := by
+        have hab' := QuotientGroup.leftRel_apply.mp hab
+        rw [Subgroup.mem_subgroupOf] at hab'
+        simpa using hab'
+      refine QuotientGroup.eq.mpr ?_
+      have hgrp : ((T.2.leftQuotientEquiv p.1 : G) * (a : G))⁻¹ *
+          ((T.2.leftQuotientEquiv p.1 : G) * (b : G)) = (a : G)⁻¹ * (b : G) := by group
+      rw [hgrp]
+      exact hH)
+  left_inv q := by
+    induction q using QuotientGroup.induction_on with
+    | H g =>
+      refine QuotientGroup.eq.mpr ?_
+      change ((T.2.leftQuotientEquiv (QuotientGroup.mk g) : G) *
+          ((T.2.leftQuotientEquiv (QuotientGroup.mk g) : G)⁻¹ * g))⁻¹ * g ∈ H
+      have hgrp : ((T.2.leftQuotientEquiv (QuotientGroup.mk g) : G) *
+          ((T.2.leftQuotientEquiv (QuotientGroup.mk g) : G)⁻¹ * g))⁻¹ * g = 1 := by group
+      rw [hgrp]
+      exact H.one_mem
+  right_inv p := by
+    obtain ⟨q, r⟩ := p
+    induction r using QuotientGroup.induction_on with
+    | H k =>
+      have hmk : (QuotientGroup.mk ((T.2.leftQuotientEquiv q : G) * (k : G)) : G ⧸ K) = q := by
+        have h1 : (QuotientGroup.mk ((T.2.leftQuotientEquiv q : G) * (k : G)) : G ⧸ K)
+            = QuotientGroup.mk (T.2.leftQuotientEquiv q : G) := by
+          refine (QuotientGroup.eq.mpr ?_).symm
+          have hgrp : ((T.2.leftQuotientEquiv q : G))⁻¹ *
+              ((T.2.leftQuotientEquiv q : G) * (k : G)) = (k : G) := by group
+          rw [hgrp]
+          exact k.2
+        rw [h1]
+        exact Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv T.2 q
+      refine Prod.ext hmk ?_
+      refine QuotientGroup.eq.mpr ?_
+      rw [Subgroup.mem_subgroupOf]
+      simp only [Subgroup.coe_mul, Subgroup.coe_inv, hmk]
+      have hgrp : ((T.2.leftQuotientEquiv q : G)⁻¹ *
+          ((T.2.leftQuotientEquiv q : G) * (k : G)))⁻¹ * (k : G) = 1 := by group
+      rw [hgrp]
+      exact H.one_mem
+
+/-- `quotientEquivProd` の逆写像の計算則。 -/
+theorem quotientEquivProd_symm_apply {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (q : G ⧸ K) (k : ↥K) :
+    (quotientEquivProd hHK T).symm (q, QuotientGroup.mk k)
+      = QuotientGroup.mk ((T.2.leftQuotientEquiv q : G) * (k : G)) := rfl
+
+/-- `quotientEquivProd` の第 1 成分は `G ⧸ K` への自然な射影。 -/
+theorem quotientEquivProd_apply_fst {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (g : G) :
+    ((quotientEquivProd hHK T) (QuotientGroup.mk g)).1 = QuotientGroup.mk g := rfl
+
+/-- `quotientEquivProd` の第 2 成分の計算則。 -/
+theorem quotientEquivProd_apply_snd {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (g : G) :
+    ((quotientEquivProd hHK T) (QuotientGroup.mk g)).2 =
+      QuotientGroup.mk ⟨(T.2.leftQuotientEquiv (QuotientGroup.mk g) : G)⁻¹ * g,
+        Subgroup.IsComplement.inv_toLeftFun_mul_mem T.2 g⟩ := rfl
+
+/-! ### 5A.3(c)(d) 用: 積 transversal -/
+
+/-- 積 transversal の代表元関数 `q ↦ τ(q₁) · σ(q₂)`
+(`q₁`, `q₂` は `quotientEquivProd` による `q` の 2 成分)。 -/
+noncomputable def mulTransversalFun {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal) (q : G ⧸ H) : G :=
+  (T.2.leftQuotientEquiv ((quotientEquivProd hHK T) q).1 : G) *
+    ((S.2.leftQuotientEquiv ((quotientEquivProd hHK T) q).2 : ↥K) : G)
+
+/-- `mulTransversalFun` は各剰余類の代表元を与える。 -/
+theorem mulTransversalFun_spec {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal) (q : G ⧸ H) :
+    (QuotientGroup.mk (mulTransversalFun hHK T S q) : G ⧸ H) = q := by
+  induction q using QuotientGroup.induction_on with
+  | H g =>
+    refine QuotientGroup.eq.mpr ?_
+    set k : ↥K := ⟨(T.2.leftQuotientEquiv (QuotientGroup.mk g) : G)⁻¹ * g,
+      Subgroup.IsComplement.inv_toLeftFun_mul_mem T.2 g⟩ with hk
+    have hmem : ((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K))⁻¹ * k ∈ H.subgroupOf K :=
+      Subgroup.IsComplement.inv_toLeftFun_mul_mem S.2 k
+    rw [Subgroup.mem_subgroupOf] at hmem
+    have hval : ((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K) : G)⁻¹ * (k : G) ∈ H := by
+      simpa using hmem
+    change (mulTransversalFun hHK T S (QuotientGroup.mk g))⁻¹ * g ∈ H
+    have hfun : mulTransversalFun hHK T S (QuotientGroup.mk g) =
+        (T.2.leftQuotientEquiv (QuotientGroup.mk g) : G) *
+          ((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K) : G) := rfl
+    rw [hfun]
+    have hgrp : ((T.2.leftQuotientEquiv (QuotientGroup.mk g) : G) *
+        ((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K) : G))⁻¹ * g =
+        ((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K) : G)⁻¹ * (k : G) := by
+      rw [hk]
+      group
+    rw [hgrp]
+    exact hval
+
+/-- `T` と `S` から作る `H` の左 transversal (5A.3(b) の左版の transversal 化)。 -/
+noncomputable def mulTransversal {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal) : H.LeftTransversal :=
+  ⟨Set.range (mulTransversalFun hHK T S),
+    Subgroup.isComplement_range_left (mulTransversalFun_spec hHK T S)⟩
+
+/-- 積 transversal の代表元取りは `mulTransversalFun` そのもの。 -/
+theorem mulTransversal_leftQuotientEquiv {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal) (q : G ⧸ H) :
+    (((mulTransversal hHK T S).2.leftQuotientEquiv q : G)) = mulTransversalFun hHK T S q :=
+  Subgroup.IsComplement.leftQuotientEquiv_apply (mulTransversalFun_spec hHK T S) q
+
+/-! ### 5A.3(d): transfer の推移律 -/
+
+/-- `Subgroup.leftTransversals.diff` の展開形 (定義そのもの)。
+
+`diff` の定義には `let _ := H.fintypeQuotientOfFiniteIndex` が入るので, 展開形でも同じ
+`Fintype` instance を使う。証明項は proof irrelevance で吸収されるので `rfl` で通る。 -/
+theorem diff_eq_prod {G A : Type*} [Group G] [CommGroup A] {H : Subgroup G} [H.FiniteIndex]
+    (ϕ : ↥H →* A) (X Y : H.LeftTransversal) :
+    Subgroup.leftTransversals.diff ϕ X Y =
+      letI := H.fintypeQuotientOfFiniteIndex
+      ∏ q : G ⧸ H, ϕ ⟨(X.2.leftQuotientEquiv q : G)⁻¹ * (Y.2.leftQuotientEquiv q : G),
+        QuotientGroup.eq.mp
+          ((Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv X.2 q).trans
+            (Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv Y.2 q).symm)⟩ :=
+  rfl
+
+/-- 積 transversal の代表元を `quotientEquivProd` の成分で書いた形。 -/
+theorem mulTransversal_apply_symm {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal)
+    (q₁ : G ⧸ K) (r : ↥K ⧸ H.subgroupOf K) :
+    (((mulTransversal hHK T S).2.leftQuotientEquiv
+        ((quotientEquivProd hHK T).symm (q₁, r)) : G))
+      = (T.2.leftQuotientEquiv q₁ : G) * ((S.2.leftQuotientEquiv r : ↥K) : G) := by
+  rw [mulTransversal_leftQuotientEquiv]
+  simp only [mulTransversalFun, Equiv.apply_symm_apply]
+
+/-- transfer の推移律に現れる `K` の元 `m_{q} = τ(q)⁻¹ · g · τ(g⁻¹ • q)`。
+
+`diff` の因子 `(τ q)⁻¹ · ((g • T) q)` そのもの。 -/
+noncomputable def transferCocycle {G : Type*} [Group G] {K : Subgroup G}
+    (T : K.LeftTransversal) (g : G) (q : G ⧸ K) : ↥K :=
+  ⟨(T.2.leftQuotientEquiv q : G)⁻¹ * g * (T.2.leftQuotientEquiv (g⁻¹ • q) : G), by
+    have h2 := Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv T.2 (g⁻¹ • q)
+    have h1 : (QuotientGroup.mk (g⁻¹ * (T.2.leftQuotientEquiv q : G)) : G ⧸ K) = g⁻¹ • q := by
+      have h0 := Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv T.2 q
+      calc (QuotientGroup.mk (g⁻¹ * (T.2.leftQuotientEquiv q : G)) : G ⧸ K)
+          = g⁻¹ • (QuotientGroup.mk (T.2.leftQuotientEquiv q : G) : G ⧸ K) := rfl
+        _ = g⁻¹ • q := congrArg (fun x => g⁻¹ • x) h0
+    have hmem := QuotientGroup.eq.mp (h1.trans h2.symm)
+    have heq : (g⁻¹ * (T.2.leftQuotientEquiv q : G))⁻¹ *
+        (T.2.leftQuotientEquiv (g⁻¹ • q) : G)
+        = (T.2.leftQuotientEquiv q : G)⁻¹ * g * (T.2.leftQuotientEquiv (g⁻¹ • q) : G) := by
+      group
+    rwa [heq] at hmem⟩
+
+/-- `g⁻¹` 作用の下での `quotientEquivProd` 成分の変化。 -/
+theorem quotientEquivProd_smul_symm {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (g : G) (q₁ : G ⧸ K) (k : ↥K) :
+    (quotientEquivProd hHK T) (g⁻¹ • (quotientEquivProd hHK T).symm (q₁, QuotientGroup.mk k))
+      = (g⁻¹ • q₁, QuotientGroup.mk ((transferCocycle T g q₁)⁻¹ * k)) := by
+  rw [quotientEquivProd_symm_apply]
+  have hsm : g⁻¹ • (QuotientGroup.mk ((T.2.leftQuotientEquiv q₁ : G) * (k : G)) : G ⧸ H)
+      = QuotientGroup.mk (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))) := rfl
+  rw [hsm]
+  have hfst : (QuotientGroup.mk (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))) : G ⧸ K)
+      = g⁻¹ • q₁ := by
+    have h0 := Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv T.2 q₁
+    have hk : (QuotientGroup.mk (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))) : G ⧸ K)
+        = QuotientGroup.mk (g⁻¹ * (T.2.leftQuotientEquiv q₁ : G)) := by
+      refine (QuotientGroup.eq.mpr ?_).symm
+      have hgrp : (g⁻¹ * (T.2.leftQuotientEquiv q₁ : G))⁻¹ *
+          (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))) = (k : G) := by group
+      rw [hgrp]
+      exact k.2
+    calc (QuotientGroup.mk (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))) : G ⧸ K)
+        = QuotientGroup.mk (g⁻¹ * (T.2.leftQuotientEquiv q₁ : G)) := hk
+      _ = g⁻¹ • (QuotientGroup.mk (T.2.leftQuotientEquiv q₁ : G) : G ⧸ K) := rfl
+      _ = g⁻¹ • q₁ := congrArg (fun x => g⁻¹ • x) h0
+  refine Prod.ext hfst ?_
+  refine QuotientGroup.eq.mpr ?_
+  rw [Subgroup.mem_subgroupOf]
+  simp only [Subgroup.coe_mul, Subgroup.coe_inv, hfst]
+  have hgrp : ((T.2.leftQuotientEquiv (g⁻¹ • q₁) : G)⁻¹ *
+      (g⁻¹ * ((T.2.leftQuotientEquiv q₁ : G) * (k : G))))⁻¹ *
+      ((((transferCocycle T g q₁) : ↥K) : G)⁻¹ * (k : G)) = 1 := by
+    simp only [transferCocycle]
+    group
+  rw [hgrp]
+  exact H.one_mem
+
+/-- 積 transversal での `diff` の因子を `↥K` の中の `diff` の因子に落とす計算。
+
+`q = e.symm (q₁, ⟦k⟧)` に対し `(P q)⁻¹ · (g • P) q = (σ⟦k⟧)⁻¹ · m · σ(m⁻¹ • ⟦k⟧)`
+(`m = transferCocycle T g q₁`)。右辺は `↥K` の中の `diff ϕ' S (m • S)` の因子そのもの。 -/
+theorem mulTransversal_diff_factor {G : Type*} [Group G] {H K : Subgroup G} (hHK : H ≤ K)
+    (T : K.LeftTransversal) (S : (H.subgroupOf K).LeftTransversal) (g : G) (q₁ : G ⧸ K)
+    (k : ↥K) :
+    (((mulTransversal hHK T S).2.leftQuotientEquiv
+        ((quotientEquivProd hHK T).symm (q₁, QuotientGroup.mk k)) : G))⁻¹ *
+      (((g • mulTransversal hHK T S).2.leftQuotientEquiv
+        ((quotientEquivProd hHK T).symm (q₁, QuotientGroup.mk k)) : G))
+      = (((S.2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K))⁻¹ *
+          ((transferCocycle T g q₁ • S).2.leftQuotientEquiv (QuotientGroup.mk k) : ↥K) : ↥K) := by
+  set m := transferCocycle T g q₁ with hm
+  -- 左側の代表元
+  rw [mulTransversal_apply_symm]
+  -- `g • P` の代表元
+  rw [Subgroup.smul_apply_eq_smul_apply_inv_smul g (mulTransversal hHK T S)]
+  rw [mulTransversal_leftQuotientEquiv]
+  simp only [mulTransversalFun]
+  rw [quotientEquivProd_smul_symm hHK T g q₁ k]
+  -- 右辺の `m • S` の代表元
+  rw [Subgroup.smul_apply_eq_smul_apply_inv_smul m S]
+  -- あとは `↥K` 側の値を `G` 側へ落として群論的に整理
+  have hsmul : (m⁻¹ • (QuotientGroup.mk k : ↥K ⧸ H.subgroupOf K))
+      = QuotientGroup.mk (m⁻¹ * k) := rfl
+  rw [hsmul]
+  simp only [Subgroup.coe_mul, Subgroup.coe_inv, smul_eq_mul, hm, transferCocycle]
+  group
+
+/-- **Isaacs Problem 5A.3(d)** (transfer の推移律): `H ≤ K ≤ G` のとき, `↥K` の中での
+`H.subgroupOf K` への transfer と, `K` への transfer の合成は, `H` への transfer に等しい。
+
+書籍は右 transversal と pretransfer で述べるが (`w(g) = v(V_T(g))`), mathlib の
+`MonoidHom.transfer` は左 transversal の `diff` で定義されているので, その形で述べる。
+
+⚠ mathlib に transfer の推移律は無い (`Mathlib/GroupTheory/Transfer.lean` を確認済)。
+
+**証明**: `K` の左 transversal `T` と `↥K` の中の `H.subgroupOf K` の左 transversal `S` から
+積 transversal `P` を作り, `G ⧸ H ≃ (G ⧸ K) × (↥K ⧸ H.subgroupOf K)`
+(`quotientEquivProd`) で `diff ϕ P (g • P)` の積を二重積に分解する。
+内側の積は `diff ϕ' S (m • S) = transfer ϕ' m` (`m = transferCocycle T g q₁`) に一致し,
+外側は `diff (transfer ϕ') T (g • T)` そのものになる。 -/
+theorem transfer_transfer {G A : Type*} [Group G] [CommGroup A] {H K : Subgroup G}
+    (hHK : H ≤ K) (ϕ : ↥H →* A) [H.FiniteIndex] [K.FiniteIndex]
+    [(H.subgroupOf K).FiniteIndex] :
+    MonoidHom.transfer (MonoidHom.transfer
+        (ϕ.comp (Subgroup.subgroupOfEquivOfLe hHK).toMonoidHom)) = MonoidHom.transfer ϕ := by
+  set ϕ' := ϕ.comp (Subgroup.subgroupOfEquivOfLe hHK).toMonoidHom with hϕ'
+  ext g
+  set T : K.LeftTransversal := default with hT
+  set S : (H.subgroupOf K).LeftTransversal := default with hS
+  letI := H.fintypeQuotientOfFiniteIndex
+  letI := K.fintypeQuotientOfFiniteIndex
+  letI := (H.subgroupOf K).fintypeQuotientOfFiniteIndex
+  rw [MonoidHom.transfer_def (MonoidHom.transfer ϕ') T g,
+    MonoidHom.transfer_def ϕ (mulTransversal hHK T S) g, diff_eq_prod, diff_eq_prod]
+  symm
+  rw [← Equiv.prod_comp (quotientEquivProd hHK T).symm, Fintype.prod_prod_type]
+  refine Finset.prod_congr rfl fun q₁ _ => ?_
+  -- 外側の因子は `transferCocycle T g q₁`
+  have hmem : (T.2.leftQuotientEquiv q₁ : G)⁻¹ * ((g • T).2.leftQuotientEquiv q₁ : G) ∈ K :=
+    QuotientGroup.eq.mp
+      ((Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv T.2 q₁).trans
+        (Subgroup.IsComplement.quotientGroupMk_leftQuotientEquiv (g • T).2 q₁).symm)
+  have houter : (⟨(T.2.leftQuotientEquiv q₁ : G)⁻¹ *
+      ((g • T).2.leftQuotientEquiv q₁ : G), hmem⟩ : ↥K) = transferCocycle T g q₁ := by
+    refine Subtype.ext ?_
+    change (T.2.leftQuotientEquiv q₁ : G)⁻¹ * ((g • T).2.leftQuotientEquiv q₁ : G)
+        = ((transferCocycle T g q₁ : ↥K) : G)
+    rw [Subgroup.smul_apply_eq_smul_apply_inv_smul g T q₁]
+    simp only [transferCocycle, smul_eq_mul]
+    group
+  rw [houter, MonoidHom.transfer_def ϕ' S (transferCocycle T g q₁), diff_eq_prod]
+  refine Finset.prod_congr rfl fun r _ => ?_
+  induction r using QuotientGroup.induction_on with
+  | H k =>
+    refine congrArg ϕ (Subtype.ext ?_)
+    exact mulTransversal_diff_factor hHK T S g q₁ k
+
+end OddOrder.Isaacs.Ch05

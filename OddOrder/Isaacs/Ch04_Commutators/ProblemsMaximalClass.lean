@@ -333,6 +333,17 @@ theorem eq_of_normal_of_card_eq_of_isMaximalClass [Finite P] [Fact p.Prime]
   (eq_lowerCentralSeries_of_isMaximalClass_of_index_eq hP hn h3 hk hN).trans
     (eq_lowerCentralSeries_of_isMaximalClass_of_index_eq hP hn h3 hk hM).symm
 
+/-! ### 部分群の冪零類 -/
+
+/-- 部分群の冪零類は**環境群の中で計算した**下降中心列で判定できる. -/
+theorem nilpotencyClass_le_iff_lowerCentralSeries_eq_bot {G : Type*} [Group G] (S : Subgroup G)
+    [Group.IsNilpotent ↥S] {m : ℕ} :
+    Group.nilpotencyClass ↥S ≤ m ↔ S.lowerCentralSeries m = ⊥ := by
+  rw [← Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le,
+    ← Subgroup.top_subtype_lowerCentralSeries S m,
+    Subgroup.map_eq_bot_iff_of_injective _ (Subgroup.subtype_injective S)]
+
+
 end
 
 end OddOrder.Isaacs.Ch04

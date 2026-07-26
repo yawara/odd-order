@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Subgroup.Center
+import Mathlib.Tactic.Group
+import Mathlib.GroupTheory.Index
 
 /-!
 # Internal central products of subgroups
@@ -185,6 +187,113 @@ theorem of_le_centralizer (hsup : R = R₁ ⊔ R₂)
     (hcent : R₁ ≤ Subgroup.centralizer (R₂ : Set G)) : IsCentralProduct R R₁ R₂ where
   sup_eq := hsup
   commutator_eq_bot := Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hcent
+
+/-- Every element of a central product factors as `x * y` with `x ∈ R₁`, `y ∈ R₂`.
+
+`R = R₁ ⊔ R₂ = closure (R₁ ∪ R₂)` に閉包帰納法を回す。積の場合は
+`(x₁y₁)(x₂y₂) = (x₁x₂)(y₁y₂)` (`y₁` と `x₂` が可換)、逆元の場合は
+`(xy)⁻¹ = x⁻¹y⁻¹` で閉じる。 -/
+theorem exists_mul (h : IsCentralProduct R R₁ R₂) {g : G} (hg : g ∈ R) :
+    ∃ x ∈ R₁, ∃ y ∈ R₂, g = x * y := by
+  rw [h.sup_eq, ← Subgroup.closure_eq R₁, ← Subgroup.closure_eq R₂,
+    ← Subgroup.closure_union] at hg
+  induction hg using Subgroup.closure_induction with
+  | mem z hz =>
+    rcases hz with hz | hz
+    · exact ⟨z, hz, 1, R₂.one_mem, by simp⟩
+    · exact ⟨1, R₁.one_mem, z, hz, by simp⟩
+  | one => exact ⟨1, R₁.one_mem, 1, R₂.one_mem, by simp⟩
+  | mul a b _ _ iha ihb =>
+    obtain ⟨x₁, hx₁, y₁, hy₁, rfl⟩ := iha
+    obtain ⟨x₂, hx₂, y₂, hy₂, rfl⟩ := ihb
+    refine ⟨x₁ * x₂, R₁.mul_mem hx₁ hx₂, y₁ * y₂, R₂.mul_mem hy₁ hy₂, ?_⟩
+    have hc : y₁ * x₂ = x₂ * y₁ := (h.commute_of_mem hx₂ hy₁).symm.eq
+    calc x₁ * y₁ * (x₂ * y₂) = x₁ * (y₁ * x₂) * y₂ := by group
+      _ = x₁ * (x₂ * y₁) * y₂ := by rw [hc]
+      _ = x₁ * x₂ * (y₁ * y₂) := by group
+  | inv a _ ih =>
+    obtain ⟨x, hx, y, hy, rfl⟩ := ih
+    refine ⟨x⁻¹, R₁.inv_mem hx, y⁻¹, R₂.inv_mem hy, ?_⟩
+    rw [mul_inv_rev]
+    exact (h.commute_of_mem (R₁.inv_mem hx) (R₂.inv_mem hy)).eq.symm
+
+/-- The multiplication map `R₁ × R₂ →* G`, `(x, y) ↦ x * y`.
+
+`R₁` と `R₂` の元が可換なので準同型になる。値域は `R₁ ⊔ R₂ = R`。
+交換子計算 (`commutatorElement_mul_mul`) を `map_commutatorElement` 一発で済ませるための API。 -/
+def mulHom (h : IsCentralProduct R R₁ R₂) : ↥R₁ × ↥R₂ →* G where
+  toFun p := (p.1 : G) * (p.2 : G)
+  map_one' := by simp
+  map_mul' p q := by
+    have hc : (q.1 : G) * (p.2 : G) = (p.2 : G) * (q.1 : G) :=
+      (h.commute_of_mem q.1.2 p.2.2).eq
+    change ((p.1 * q.1 : ↥R₁) : G) * ((p.2 * q.2 : ↥R₂) : G)
+        = ((p.1 : G) * (p.2 : G)) * ((q.1 : G) * (q.2 : G))
+    simp only [Subgroup.coe_mul]
+    calc (p.1 : G) * (q.1 : G) * ((p.2 : G) * (q.2 : G))
+        = (p.1 : G) * ((q.1 : G) * (p.2 : G)) * (q.2 : G) := by group
+      _ = (p.1 : G) * ((p.2 : G) * (q.1 : G)) * (q.2 : G) := by rw [hc]
+      _ = (p.1 : G) * (p.2 : G) * ((q.1 : G) * (q.2 : G)) := by group
+
+/-- 交換子は成分ごとに分かれる: `⁅x₁y₁, x₂y₂⁆ = ⁅x₁,x₂⁆ ⁅y₁,y₂⁆`。
+
+`mulHom` による `map_commutatorElement` の像。積群の交換子が成分ごとであること,
+および部分群の coe が積・逆元と可換であることはいずれも定義上等しいので `rfl` で繋がる。 -/
+theorem commutatorElement_mul_mul (h : IsCentralProduct R R₁ R₂) {x₁ x₂ y₁ y₂ : G}
+    (hx₁ : x₁ ∈ R₁) (hx₂ : x₂ ∈ R₁) (hy₁ : y₁ ∈ R₂) (hy₂ : y₂ ∈ R₂) :
+    ⁅x₁ * y₁, x₂ * y₂⁆ = ⁅x₁, x₂⁆ * ⁅y₁, y₂⁆ := by
+  have hmap := map_commutatorElement h.mulHom
+    ((⟨x₁, hx₁⟩ : ↥R₁), (⟨y₁, hy₁⟩ : ↥R₂)) ((⟨x₂, hx₂⟩ : ↥R₁), (⟨y₂, hy₂⟩ : ↥R₂))
+  exact hmap.symm
+
+/-- **中心積の交換子群**: `⁅R, R⁆ = ⁅R₁, R₁⁆ ⊔ ⁅R₂, R₂⁆`。
+
+`≥` は `R₁, R₂ ≤ R` の単調性。`≤` は `exists_mul` で両引数を `x * y` に分解し
+`commutatorElement_mul_mul` で成分ごとの交換子の積に落とす。 -/
+theorem commutator_self (h : IsCentralProduct R R₁ R₂) :
+    ⁅R, R⁆ = ⁅R₁, R₁⁆ ⊔ ⁅R₂, R₂⁆ := by
+  refine le_antisymm ?_ (sup_le (Subgroup.commutator_mono h.le_left h.le_left)
+    (Subgroup.commutator_mono h.le_right h.le_right))
+  rw [Subgroup.commutator_le]
+  intro g₁ hg₁ g₂ hg₂
+  obtain ⟨x₁, hx₁, y₁, hy₁, rfl⟩ := h.exists_mul hg₁
+  obtain ⟨x₂, hx₂, y₂, hy₂, rfl⟩ := h.exists_mul hg₂
+  rw [h.commutatorElement_mul_mul hx₁ hx₂ hy₁ hy₂]
+  exact Subgroup.mul_mem _
+    (Subgroup.mem_sup_left (Subgroup.commutator_mem_commutator hx₁ hx₂))
+    (Subgroup.mem_sup_right (Subgroup.commutator_mem_commutator hy₁ hy₂))
+
+/-- 積準同型の像はちょうど `R`。 -/
+theorem range_mulHom (h : IsCentralProduct R R₁ R₂) : h.mulHom.range = R := by
+  apply le_antisymm
+  · rintro g ⟨⟨x, y⟩, rfl⟩
+    exact h.mul_mem x.2 y.2
+  · intro g hg
+    obtain ⟨x, hx, y, hy, rfl⟩ := h.exists_mul hg
+    exact ⟨(⟨x, hx⟩, ⟨y, hy⟩), rfl⟩
+
+/-- 因子が交わらない中心積 (= 内部直積) の位数は因子の位数の積。
+
+`mulHom` は `R₁ ⊓ R₂ = ⊥` のとき単射で像が `R` なので `R₁ × R₂ ≃* R`。 -/
+theorem card_eq_mul (h : IsCentralProduct R R₁ R₂) (hinf : R₁ ⊓ R₂ = ⊥) :
+    Nat.card R = Nat.card R₁ * Nat.card R₂ := by
+  have hinj : Function.Injective h.mulHom := by
+    rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+    rintro ⟨x, y⟩ hxy
+    rw [MonoidHom.mem_ker] at hxy
+    have hxy' : (x : G) * (y : G) = 1 := hxy
+    have hx : (x : G) = (y : G)⁻¹ := by
+      rw [← mul_eq_one_iff_eq_inv]
+      exact hxy'
+    have hmem : (x : G) ∈ R₁ ⊓ R₂ := ⟨x.2, hx ▸ R₂.inv_mem y.2⟩
+    rw [hinf, Subgroup.mem_bot] at hmem
+    have hy : (y : G) = 1 := by
+      rw [hmem, one_mul] at hxy'
+      exact hxy'
+    exact Subgroup.mem_bot.mpr (Prod.ext (Subtype.ext hmem) (Subtype.ext hy))
+  have hcard := Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv
+  rw [h.range_mulHom] at hcard
+  rw [← hcard, Nat.card_prod]
 
 end IsCentralProduct
 

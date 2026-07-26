@@ -31,7 +31,7 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.2 Subnormality
 - [ ] Ch.3 Split Extensions
 - [ ] Ch.4 Commutators
-- [ ] Ch.5 Transfer
+- [x] Ch.5 Transfer — **着手 (2026-07-26)**、下記 §5A 節参照
 - [ ] Ch.6 Frobenius Actions
 - [ ] Ch.7 Thompson Subgroup
 - [ ] Ch.8 Permutation Groups
@@ -647,12 +647,62 @@ metavariable のままだと `MulAction ?m ?m` で instance 解決が詰まる�
 `p`-群の非自明部分群は一般に中心と交わらない (交わるのは**正規**部分群) ので、
 `V ∩ T` の `T`-正規性を出す構造 (極小交叉の古典補題 or 別の Sylow 対の選び方) が要る。
 
-**次に試すこと**: (i) 極小 Sylow 交叉 `D` に対する古典補題 (`N_S(D) > D`, `N_T(D) > D` と
-`N_Γ(D)` の Sylow 論法; Alperin fusion 系)、(ii) `|V ∩ P^g|` を最小化する `g` を取る別ルート、
-(iii) 冪零作用の数え上げ恒等式 (rank 2 の `|G|·|C_G(V)|^p = ∏ᵢ |C_G(Vᵢ)|`) で
-「`G = ⋃ᵢ Fix_G(Vᵢ)` は不可能」を直接示す、(iv) [[feedback-ask-chatgpt-for-elided-gaps]] に
-従い最強モデルに再構成を依頼。⚠ 「2 つの真部分群の合併にならない」は `V` の階数 ≥ 2 だと
-被覆枚数が `1+p+⋯` になるので効かない (被覆数の下界 = `|G|` の最小素因数 + 1)。
+#### 🎉 2026-07-26: **3A.6 の欠けていた一手が見つかった (数学的には解決)**
+
+**statement** (PDF で確認): `P` が `p`-群で位数が `p` で割れない群 `G` に **faithful** に
+自己同型で作用するなら, ある `P`-軌道 `Δ ⊆ G` 上で `P` は faithful に作用する。
+hint = Thm 1.38 (generalized Brodkey)。
+
+これまでの停滞は `V := Ω₁(Z(P))` を経由する被覆論法 (`G = ⋃ C_G(v)` の否定) に固執した
+ことが原因で, **`V` は不要**。正しい鍵は次の**正規性**:
+
+> **軌道 `Δ_g = {u(g) : u ∈ P}` の各点固定部分群 `N := core_P(P_g)` は `P` だけでなく
+> `P^g` でも正規。**
+
+これで Thm 1.38 が直接効く。証明の全体:
+
+1. `Γ := G ⋊ P`。`p ∤ |G|` ゆえ `P ∈ Syl_p(Γ)`, かつ Sylow `p`-部分群は
+   `{P^g : g ∈ G}` (共役元の `P`-成分は `P` を動かさない)。
+2. `P` の作用が faithful ⟹ **`O_p(Γ) = 1`** (既記録: `O_p(Γ) ⊓ G = 1` (位数) ⟹
+   `⁅O_p(Γ), G⁆ = 1` ⟹ `O_p(Γ) ≤ C_Γ(G) ⊓ P = 1`)。
+3. **`P ∩ P^g = P_g`** (点安定化群)。∵ `g⁻¹ u g = inl(g⁻¹ · u(g)) · u` なので
+   `g⁻¹ u g ∈ P ⟺ u(g) = g`, さらにそのとき `g⁻¹ u g = u`。
+4. `Δ_g` 上の核は `N = ⋂_{u∈P} P_{u(g)} = core_P(P_g)` (`P_{u(g)} = u P_g u⁻¹`)。
+5. **⭐ 核 `N` は `P^g` でも正規** — これが欠けていた一手:
+   `t ∈ P^g` を `t = inl(w) · u` (`w := g⁻¹ · u(g) ∈ G`, `u ∈ P`) と書き, `n ∈ N` に対し
+   `t n t⁻¹ = inl(w) · (u n u⁻¹) · inl(w)⁻¹`。`m := u n u⁻¹ ∈ N` (`N ⊴ P`) で
+   `inl(w) · m · inl(w)⁻¹ = inl(w · m(w)⁻¹) · m`。
+   ここで **`m` は `Δ_g` を各点固定するので `g` と `u(g)` を固定 ⟹ 自己同型ゆえ
+   `w = g⁻¹ · u(g)` も固定** (`m(w) = m(g)⁻¹ · m(u(g)) = w`)。よって `t n t⁻¹ = m ∈ N`。
+6. `|P ∩ P^g|` を最小にする `g` を取る (Sylow が全て `P^g` の形なので **これが Γ での
+   極小 Sylow 交叉**)。`N ≤ P ∩ P^g` は `P` でも `P^g` でも正規だから **Thm 1.38** より
+   `N ≤ O_p(Γ) = 1` ⟹ `P` は `Δ_g` に faithful に作用する ∎
+
+⚠ 被覆論法 (`V` 経由) は**筋が悪い**ので追わない (階数 ≥ 2 で被覆数が増え閉じない)。
+
+#### 🎉 Lean 実装完了 (2026-07-26) — 新 leaf `Ch03_SplitExtensions/ProblemsFaithfulOrbit.lean`
+
+| 部品 | Lean 名 |
+|---|---|
+| `(inl g)⁻¹·inr u·inl g = inl(g⁻¹·(φ u)g)·inr u` | `inl_inv_mul_inr_mul_inl` |
+| Sylow 交叉 = 点安定化群 (元の形) | `conj_inr_mem_inr_range_iff` |
+| `inr(P)` は `Γ` の Sylow | `sylowInrRange` (+ `card_inr_range_eq_pow_factorization`) |
+| `O_p(Γ) = 1` | `opCore_semidirectProduct_eq_bot` (+ `inr_range_inf_centralizer_eq_bot`) |
+| 点安定化群 / 軌道核 (P で正規) | `fixSubgroup` / `orbitKernel` / `orbitKernel_normal` |
+| `inr(P) ⊓ inr(P)^{inl g} = inr(P_g)` | `inr_range_inf_conjInrRange_eq` |
+| ⭐ 軌道核は共役 Sylow でも正規 | `conjInrRange_le_normalizer_orbitKernel_map` |
+| `Γ` の Sylow はすべて `conjInrRange a` | `exists_eq_conjInrRange` |
+| 交叉位数の共役不変性 | `exists_card_inf_eq` |
+| **本体** | `exists_faithful_orbit` |
+
+⚠ 実装知見:
+- `simp` は `φ (v m₀ v⁻¹)` を `(φ v)∘(φ m₀)∘(φ v).symm` に展開するので、軌道核条件を
+  `u = 1` と `u = v⁻¹` で使った 2 式を simp に渡す。
+- `γ.left`/`γ.right` のまま `rw` すると自己参照で潰れる → `obtain ⟨a, b⟩ := γ` で先に分解。
+- `Ch03` は `Ch04` を import できないので `le_normalizer_of_forall_conj_mem` は局所 private 版。
+- 極小性は `Function.argmin` + `Subgroup.eq_of_le_of_card_ge`、
+  共役不変性は `Subgroup.smul_inf` + `Subgroup.equivSMul`。
+
 
 ## Ch.3 (Split Extensions) §3A — 着手 (2026-07-23、§2A hard tail deferred 中の breadth 展開)
 
@@ -744,7 +794,7 @@ import `Mathlib.GroupTheory.SemidirectProduct`+`Tactic.Group`、`OddOrder.lean` 
 | 3A.3 | ✅ (位数 pm, Z(G)=1) |
 | 3A.4 | ✅ (2026-07-25) |
 | 3A.5 | ✅ (`G ⋊ G ≅ G × G`) |
-| 3A.6 | ⏸ **deferred-hard** (2026-07-25 に解析; 下記) |
+| 3A.6 | ✅ **完了** (2026-07-26) `exists_faithful_orbit` (新 leaf `ProblemsFaithfulOrbit.lean`) |
 | 3A.7 | ✅ **完了** (2026-07-25) |
 | 3A.8 | ✅ **完了** ((a)(b)(c) すべて) |
 | 3A.9 | ✅ **完了** ((a)(b)) |
@@ -1045,15 +1095,36 @@ prefix-split 済 (2026-07-25): `Problems3B.lean` (1300 行) → `Problems3BSolva
 **位数側も `n=1` 特殊形を landing**: `card_wreath_of_card_eq_prime`
 (`|C| = |Q| = p` ⟹ `|C ≀ Q| = p^{p+1}`) — maximal class の判定 `class = p` と対になる。
 
-**残りは linchpin 本体 1 本のみ**。ルート A の必要形 (次 iteration の出発点):
-```
-theorem shiftSubHom_iterate_apply (q : Q) (f : Q → D) (k : ℕ) (ω : Q) :
-    (shiftSubHom q)^[k] f ω
-      = ∏ j ∈ Finset.range (k+1), (f ((q ^ j)⁻¹ * ω)) ^ ((-1)^j * (k.choose j) : ℤ)
-```
-帰納段は `Δ(g) ω = g ω * (g (q⁻¹ω))⁻¹` に IH を代入し、
-`g(q⁻¹ω)` 側の添字を `j ↦ j+1` にずらして (`Finset.prod_range_succ'` 系) Pascal
-`(-1)^j C(k,j) - (-1)^{j-1} C(k,j-1) = (-1)^j C(k+1,j)` を使う。
+**二項展開 `shiftSubHom_iterate_apply` は landing 済 (2026-07-25)**:
+`Δ^k f ω = ∏_{j ≤ k} f((q^j)⁻¹ω)^{(-1)^j C(k,j)}`。実装知見:
+- `Function.iterate_succ_apply'` で `Δ^[k+1] = Δ ∘ Δ^[k]` に開く
+- 添字ずらし `(q^j)⁻¹(q⁻¹ω) = (q^{j+1})⁻¹ω` は `group`
+- ⚠ **`rw [Finset.prod_congr …]` / `rw [Finset.prod_range_succ]` は積が 2 つあると
+  どちらに当たるか不定** — 対象を `have` で等式化するか `conv_rhs` で明示する
+- Pascal は `Nat.choose_succ_succ' k i` + `push_cast` + `ring`
+
+**🎉 linchpin 完成 (2026-07-25)**: `shiftSubHom_iterate_prime_sub_one`
+(`Δ_q^{p-1} f = T_p f`、指数 `p` の可換 base `D` に対する作用素等式)。仕上げは
+ルート A (pointwise 二項展開) で、部品 2 本:
+- `zpow_eq_self_of_pow_eq_one` (`d^r = 1` ∧ `(m : ZMod r) = 1` ⟹ `d ^ m = d`。
+  `ZMod.intCast_zmod_eq_zero_iff_dvd` で `m = 1 + r·c` に分解し `zpow_add`/`zpow_mul`)
+- `cast_neg_one_pow_mul_choose_prime_sub_one` (`(-1)^j·C(r-1,j) ≡ 1 (mod r)`
+  = `cast_choose_prime_sub_one` の系、`(-1)^j·(-1)^j = 1`)
+
+**⟹ 4A.8(d) の `P` 側 (`n = 1`) 完了**:
+- `shiftSubHom_iterate_prime_eq_one` (上界 `Δ^p = Δ ∘ T_p = 1`)
+- `mem_shiftSubSeq_iff` (`g ∈ Δ^i(⊤) ⟺ ∃ f, Δ^[i] f = g`) →
+  `shiftSubSeq_prime_eq_bot` / `shiftSubSeq_prime_sub_one_ne_bot`
+  (下界の witness = 指示関数 `δ₁ c`、`Δ^{p-1}(δ₁ c) = T_p(δ₁ c) = const c ≠ 1`)
+- `nilpotencyClass_wreath_eq_of_exponent_prime` (**`class(D ≀ Q) = p`**、
+  `lowerCentralSeries_eq_map_shiftSubSeq` + `lowerCentralSeries_eq_bot_iff_nilpotencyClass_le`;
+  `IsNilpotent` 自体も `Subgroup.nilpotent_iff_lowerCentralSeries` で上界から得る)
+- **`isMaximalClassPGroup_wreath`** (`|C| = |Q| = p` ⟹ `C ≀ Q` は maximal class;
+  `|P| = p^{p+1}` = `card_wreath_of_card_eq_prime`、`class + 1 = p + 1`)。axiom-clean。
+
+⚠ 教訓: `orderOf_eq_card_of_forall_mem_zpowers` の結論は `Nat.card` (`Fintype.card` でない) /
+`Subgroup.map_eq_bot_iff_of_injective` は `H` が**明示引数** (`_ inl_injective`) /
+`⟨(k:ℤ), _⟩ : q^k ∈ zpowers q` の証明義務は β-未簡約 (`rw [zpow_natCast]` 不可、`simp`)。
 
 linchpin の証明ルート 2 つ:
 1. **pointwise 二項展開**: `Δ^k f ω = ∏_{j≤k} f((q^j)⁻¹ω)^{(-1)^j C(k,j)}` を `k` の帰納
@@ -1098,8 +1169,1096 @@ class を決める。⟹ **群環の `(x-1)`-filtration を Lean で立てるの
 `card_ker_powMonoidHom_prime` (位数 `p^n` の巡回群で `x^p = 1` の解は `p` 個 —
 像 `⟨c^p⟩` の位数が `p^{n-1}` であることと Lagrange) と `d ↦ inl (const d)` の全単射。
 
-### 残り (文書順): **4A.8(c)(d)** ((d) `n=1` なら `P` が maximal class、
-一般に `P'U` が maximal class) / 4A.9 / 4A.10 / 4A.11。
+### 🎉 4A.8(d) 完了 (2026-07-25、一般 `n`) — 新 leaf `ProblemsWreathClass.lean`
+
+**主結果** (すべて実証明・axiom-clean):
+- `nilpotencyClass_wreath_eq`: **`class(C ≀ Q) = n(p-1)+1`** (`C` の指数がちょうど `p^n`)
+- `isMaximalClassPGroup_wreath_iff`: **`P` が maximal class ⟺ `n = 1`**
+  (`|P| = p^{np+1}` ゆえ maximal class は `class = np` を要求、一致は `n=1` のみ)
+- `nilpotencyClass_ker_augHom_eq`: **`class(P'U) = n(p-1)`**
+- `isMaximalClassPGroup_ker_augHom`: **`P'U` は常に maximal class** (`|P'U| = p^{n(p-1)+1}`)
+
+**手法 = 群環 `ℤ/p^n[x]/(x^p-1)` の `(1-x)`-filtration を「作用素の言葉だけ」で実行**
+(加群も多項式環も構成しない — ここが実装上の要):
+- **基底** `exists_witness_shiftSubHom_iterate_prime_sub_one`:
+  `Δ^{p-1} f = T_p f · g^p` **かつ** `T_p g = (T_p f)⁻¹`。前者は二項展開の係数を
+  `(-1)^j C(p-1,j) = 1 + p·e_j` と分解 (`e_j = ((-1)^j C(p-1,j) - 1)/p`、割り切れは
+  `cast_choose_prime_sub_one`)、後者は `∑_j e_j = -1` (交代和
+  `Int.alternating_sum_range_choose_of_ne` = `0`) で、群環の `y^{p-1} = N + p·s` と
+  `N·s = s(1)·N = -N` (`s(1) = -1`) にちょうど対応。**`D` の指数に仮定は要らない**。
+- **帰納** `exists_shiftSubHom_iterate_mul_prime_sub_one`:
+  `Δ^{(m+1)(p-1)} f = (T_p f)^{(-1)^m p^m} · g^{p^{m+1}}` かつ
+  `T_p g = (T_p f)^{(-1)^{m+1}}`。段では `Δ^{p-1}(T_p f) = 1` (定数を消す = `y·N = 0`) で
+  第 1 因子が落ち、`(T_p h)^{p^m}` が新しい第 1 因子になる。
+- 指数 `p^n` なら第 2 因子が消えて **`Δ^{n(p-1)} f = (T_p f)^{(-1)^{n-1}p^{n-1}}`**。
+  上界は `Δ ∘ T_p = 1`、下界は `f = δ₁ c` で `T_p f = const c` と `c^{p^{n-1}} ≠ 1`。
+- **`P'U` 側**: `commutator_map_inl_eq` を「`inr q ∈ K` なる任意の `K`」へ一般化 (`⊤` 版は
+  その特殊化) し、基底 `commutator_ker_augHom_self` (`⁅P'U,P'U⁆ = Δ²(A) の像`) を
+  `x = inl x.left · inr x.right` 分解 + `⁅inr a, inr b⁆ = 1` (Q 可換) + 正規性による共役吸収で
+  出す。以降 `lowerCentralSeries_ker_augHom_eq` は同じ帰納。部分群の類は
+  `nilpotencyClass_le_iff_lowerCentralSeries_eq_bot` (`top_subtype_lowerCentralSeries` 経由) で
+  環境群の下降中心列に翻訳。
+
+⚠ **一般版が n=1 版を包含**するので、`ProblemsWreath.lean` 側の n=1 専用系
+(`shiftSubHom_iterate_prime_eq_one` / `shiftSubSeq_prime_eq_bot` /
+`shiftSubSeq_prime_sub_one_ne_bot` / `nilpotencyClass_wreath_eq_of_exponent_prime` /
+`isMaximalClassPGroup_wreath`) は削除した (同事実 2 本立ては証明分裂の元)。
+linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、標数 `p` 限定) と
+多項式版 `one_sub_X_pow_prime_sub_one` は書籍の論法そのものなので残す。
+
+⚠ 教訓: `Subgroup.isNilpotent_iff_lowerCentralSeries` は `S` が**明示引数** (`(… _).mpr`) /
+`Div Int` = `Int.ediv` ゆえ `Int.mul_ediv_cancel'` が使える / `conv_lhs` は `∈` の左辺 =
+**部分群側**を拾う (元側を書換えたいなら `have` で等式化) / `prod_smul_eq` は
+`∏ ω, f (q⁻¹ * ω)` の形にしか rw できない (`f y ^ e j` を噛ませたら `exact` で defeq 渡し)。
+
+#### 🎉 4A.10 完了 (2026-07-25) — 新 leaf `ProblemsCenterIndex.lean`
+
+**主結果** (実証明・axiom-clean): `card_commutator_le_of_index_center_le`
+= 書籍そのままの **`p`-群 `P` で `|P : Z(P)| ≤ p^n` ⟹ `|P'| ≤ p^{n(n-1)/2}`**。
+
+- 中核 `card_commutator_le_of_normal_cyclic_quotient`:
+  **`Q ⊴ G`, `G/Q` cyclic, `Z(G) ≤ Q` ⟹ `|G'| ≤ |⁅Q,Q⁆| · |Q : Z(G)|`**。
+  `Ḡ = G/⁅Q,Q⁆` で `Ā = Q/⁅Q,Q⁆` は可換正規 (`⁅q₁,q₂⁆ ∈ ⁅Q,Q⁆`)、`Ḡ/Ā ≅ G/Q`
+  (`QuotientGroup.quotientQuotientEquivQuotient`) が cyclic なので **repo の Lemma 4.6 位数形**
+  `card_commutator_mul_card_inf_center_eq_card_of_normal_abelian_cyclic_quotient` が
+  `|Ḡ'|·|Ā ⊓ Z(Ḡ)| = |Ā|` を与える。`Z(G)` の像 ⊆ `Ā ⊓ Z(Ḡ)` と像・核の位数関係で
+  `|G'|·|Z(G) の像| ≤ |Z(G) の像|·|⁅Q,Q⁆|·|Q:Z(G)|`、約せば結論。
+- 支持補題 `card_map_mul_card_inf_ker` (`|f(H)|·|H ⊓ ker f| = |H|`; `MonoidHom.restrict` +
+  `Subgroup.index_ker`)。
+- 帰納 `card_commutator_le_pow_choose_two` は **`n.choose 2` で述べる**のが要点
+  (Pascal `(n+1).choose 2 = n.choose 2 + n` がそのまま指数の勘定)。書籍形への変換は
+  `Nat.choose_two_right`。`Z(P)` を含む極大部分群は `IsCoatomic.eq_top_or_exists_le_coatom`
+  + `NormalizerCondition.normal_of_coatom` (冪零) + 1D.6 `isCoatom_iff_index_prime`。
+
+⚠ 教訓: `commutator_eq_bot_iff_center_eq_top` / `NormalizerCondition.normal_of_coatom` /
+`Subgroup.isNilpotent_iff_lowerCentralSeries` はいずれも **section 変数が明示引数**ゆえ
+`X.mpr` 形が「Unknown constant X.mpr」になる (`(X _).mpr` と書く) /
+`by` ブロックを入れ子にした改行継続は parse error になりやすい (`have` に切り出す)。
+
+#### 🎉 4A.12 (a)(b)(c 一般部分) 完了 (2026-07-25) — 新 leaf `ProblemsWreathNonCommutator.lean`
+
+**主結果** (実証明・axiom-clean):
+- `IsAbelianTwoGen T` (可換かつ 2 元生成)、`𝒯(H)` = その性質の極大元 (`Maximal IsAbelianTwoGen`)
+- `commutatorElement_eq_of_right_commute` : `x.right`, `y.right` 可換なら
+  **`⁅x,y⁆ = inl(Δ_{x.right} y.left)⁻¹ · inl(Δ_{y.right} x.left)`**
+- `exists_maximal_commutator_mem` = **(a)** (`⁅x,y⁆ ∈ B` ⟹ ある極大 `T` で `⁅x,y⁆ ∈ ⁅B,T⁆`)
+- `exists_mem_not_isCommutator` = **(b)** (`∑_T |A|^{|H|−|H:T|} < |A|^{|H|−1}` ⟹
+  `⁅B,U⁆` は交換子でない元を含む; 書籍の `1/|A| > ∑(1/|A|)^{|H:T|}` に `|A|^{|H|}` を掛けた形)
+- `sum_lt_of_card_lt` = **(c) 一般部分** (`H` が可換 2 元生成でなければ `|A| > |𝒯(H)|` で成立)
+
+(a) の鍵は `⁅x,y⁆ ∈ B ⟺ x.right, y.right` が可換で、そのとき交換子が base 側の 2 つの `Δ` に
+分解すること (`⁅inr h, inr k⁆ = inr ⁅h,k⁆ = 1` が効く)。可換 2 元生成部分群を含む極大元は
+`Finite.exists_le_maximal`、`⟨u,v⟩` の可換性は中心化群の二段論法。
+(b) は (a) + 4A.11 の位数 + `Finset.card_biUnion_le` の鳩の巣。
+
+⬜ **残: (c) の `H = D₈` で `m = 3` が取れる部分** (= `|𝒯(D₈)| ≤ 3`)。`D₈` の部分群を
+具体的に列挙する計算なので別途。
+
+⬜ **4A.13 も未着手** (pdftotext が切れていて見落としていた; PDF p.138 で確認):
+`G` 冪零で class `m > 1`, `a ∈ G` ⟹ `H = G'⟨a⟩` の冪零類は `m` 未満。
+
+#### 🎉 4A.13 完了 (2026-07-25) — 新 leaf `ProblemsNilpotencyClass.lean`
+
+`nilpotencyClass_commutator_sup_zpowers_lt` : **`G` 冪零・class `m > 1` ⟹
+`class(G'⟨a⟩) < m`** (実証明・axiom-clean、有限性の仮定は不要)。
+
+- `commutatorMemLeft N y` = `{x | ⁅x,y⁆ ∈ N}` (`N ⊴ G` で部分群)
+- `commutator_self_le_lowerCentralSeries_two` = 基底 `⁅H,H⁆ ≤ γ₃(G)`
+  (good-elements 二段: `⁅a, H⁆ ≤ γ₃` を先に出し、それを使って `H ≤ commutatorMemLeft γ₃ y`)
+- `lowerCentralSeries_commutator_sup_zpowers_le` = `γ_i(H) ≤ γ_{i+1}(G)` の帰納
+- 部分群の類への翻訳は `nilpotencyClass_le_iff_lowerCentralSeries_eq_bot`
+  (4A.8(d) で作ったもの。汎用なので `ProblemsWreathClass` → **`ProblemsMaximalClass`** へ移設)
+
+以下は着手前の設計メモ (実装は概ねこの通り):
+
+#### 4A.13 の設計 (2026-07-25、着手前メモ)
+
+書籍 (p.125): `G` 冪零で class `m > 1`, `a ∈ G` ⟹ **`H = G'⟨a⟩` の冪零類は `m` 未満**。
+
+- 添字: mathlib の `lowerCentralSeries X i` = 古典的 `γ_{i+1}(X)`。示すべきは
+  `Subgroup.lowerCentralSeries H (m-1) = ⊥` (⟹ `class(↥H) ≤ m-1 < m`)。
+  部分群の類への翻訳は **`nilpotencyClass_le_iff_lowerCentralSeries_eq_bot`**
+  (4A.10 の `ProblemsCenterIndex.lean` に既設) が使える。
+- **鍵の主張**: `k ≥ 1` で `H.lowerCentralSeries k ≤ (⊤ : Subgroup G).lowerCentralSeries (k+1)`
+  (古典形 `γ_i(H) ≤ γ_{i+1}(G)`, `i ≥ 2`)。`k = m-1` で右辺 `= γ_{m+1}(G) = ⊥`。
+- **帰納段**は易しい: `⁅L, H⁆ ≤ ⁅γ_{k+2}, ⊤⁆ = γ_{k+3}`。
+- **基底 `⁅H,H⁆ ≤ γ_3(G) = ⁅G', ⊤⁆` が本体**。`G/γ_3` で `Ḡ'` は中心的なので
+  `H̄ = Ḡ'⟨ā⟩` は可換、という筋。⁅H ⊔ K, ·⁆ の分配は使えないので **good-elements 二段**で:
+  * `N := γ_3` は正規。`{x | ⁅x,y⁆ ∈ N}` と `{y | ⁅x,y⁆ ∈ N}` はそれぞれ部分群
+    (`⁅x₁x₂,y⁆ = x₁⁅x₂,y⁆x₁⁻¹·⁅x₁,y⁆` と `N` 正規; 逆元は `commutatorElement_inv_left`)。
+  * 第 1 段: `{y | ⁅a,y⁆ ∈ N}` は `G'` (∵ `⁅G,G'⁆ = γ_3`) と `a` を含む ⟹ `H` を含む
+    ⟹ `⁅a, H⁆ ≤ N`。
+  * 第 2 段: `{x | ∀ y ∈ H, ⁅x,y⁆ ∈ N}` は `G'` (∵ `⁅G',G⁆ = γ_3`) と `a` (第 1 段) を含む
+    ⟹ `H` を含む ⟹ `⁅H,H⁆ ≤ N`。
+- `H := commutator G ⊔ Subgroup.zpowers a`。`Subgroup.closure_le` で generator に落とす。
+
+#### 🎉 4A.12(c) の `D₈` 部分 完了 (2026-07-25) — 新 leaf `ProblemsDihedralEight.lean`
+
+`sum_lt_of_three_lt_card_dihedralFour` : **`H = D₈` なら `|A| > 3` で (b) の不等式が成立**
+(= 書籍の「`m = 3` が取れる」)。核は `card_le_three_of_maximal_dihedralFour` (`|𝒯(D₈)| ≤ 3`)。
+
+`D₈ = DihedralGroup 4` の可換部分群は 3 つの指数 2 部分群
+`⟨r⟩ = closure {r 1}` / `closure {r 2, sr 0}` / `closure {r 2, sr 1}` のいずれかに含まれる:
+- 鏡映 `sr i ∈ T` があれば, `r k` との可換性から `2k = 0` (⟹ `k ∈ {0,2}`)、
+  `sr j` との可換性から `2(i-j) = 0` (⟹ `j ∈ {i, i+2}`) ⟹ `T ≤ closure {r 2, sr i}`。
+- 鏡映が無ければ `T ≤ ⟨r⟩` (`r_one_pow`)。
+- `closure {r 2, sr (i+2)} = closure {r 2, sr i}` (`sr (i+2) = r 2 · sr i`) なので候補は 3 つ。
+
+⚠ 教訓: `ZMod 4` の算術は `decide` で済むが、**文脈に自由変数があると `revert; decide` は
+「Expected type must not contain free variables」で落ちる** — `∀ i k : ZMod 4, …` の
+**閉じた補題として切り出してから `decide`** する。
+
+### 🎉 §4A 完済 (4A.1–4A.13 全問)。
+
+## Ch.4 §4B (書籍 p.131 の Problems 4B) — 着手 (2026-07-25)
+
+新 leaf `OddOrder/Isaacs/Ch04_Commutators/ProblemsHallWitt.lean` (`OddOrder.lean` 配線済)。
+§4B は Hall–Witt 恒等式 / three subgroups lemma の節で, repo には既に
+`commutator_commutator_le_of_rotate` (Cor 4.10, mod `N` 版) がある。
+
+- ✅ **4B.1** `exists_characteristic_abelian_not_le_center` (class > 2 ⟹ 中心的でない
+  特性可換部分群が存在)。**答えは `γ_{c-1} = lowerCentralSeries ⊤ (c-2)`**:
+  `⁅γ_{c-1},γ_{c-1}⁆ ≤ γ_{2(c-1)} = 1` (`c ≥ 3` ゆえ `2(c-1) ≥ c+1`; Thm 4.11
+  `commutator_lowerCentralSeries_le`) で可換、`⁅γ_{c-1}, G⁆ = γ_c ≠ 1` で非中心。
+  特性性は mathlib の `lowerCentralSeries_characteristic` instance。
+- ✅ **4B.3** `commutator_lowerCentralSeries_upperCentralSeries_le`
+  (`⁅G^i, Z_j⁆ ≤ Z_{j-i}`) + 系 `…_eq_bot` (`⁅G^i, Z_i⁆ = 1`)。`k` の帰納 + three
+  subgroups lemma。⚠ 添字対応: mathlib の `lowerCentralSeries ⊤ k` = 古典 `G^{k+1}`、
+  `Subgroup.upperCentralSeries G j` = 古典 `Z_j` (`Z_0 = 1`)。
+- ✅ **4B.4(a)(b)** `commutator_le_centralizer_of_centralizes` /
+  `commutator_isCommutative_of_centralizes`。どちらも three subgroups lemma 直接適用。
+  ⚠ **(b) は書籍が `X ⊴ G` を仮定するが不要** — `⁅X,Y⁆` が `X` で正規化されること
+  (`le_normalizer_commutator_left`, 4A.9 で作った) だけで足りる。
+
+⚠ 教訓: root の `upperCentralSeries` は **deprecated** で `Subgroup.upperCentralSeries` と
+**別定数**として扱われ、instance 検索 (Normal) や型が合わない — 新規コードは必ず
+`Subgroup.` 付きで書く。
+
+- ✅ **4B.2** `exists_characteristic_selfCentralizing_class_le_two`
+  (`G` 冪零 ⟹ 特性部分群 `K` で `C_G(K) ⊆ K` かつ class ≤ 2)。
+  `K` を「特性かつ class ≤ 2」の極大元に取り、`C := C_G(K)` として:
+  * **吸収補題**: `A ≤ C` が特性 class ≤2 なら `A ⊔ K` も特性 class ≤2 ⟹ 極大性で `A ≤ K`。
+    join の class ≤ 2 は新補題 `lowerCentralSeries_sup_eq_bot`
+    (`⁅A,K⁆ = 1` + 両方 class ≤2 ⟹ `A ⊔ K` も class ≤2; `commutatorMemLeft` の good-elements
+    二段を 2 回) と `characteristic_sup` (`characteristic_iff_map_eq` + `map_sup`)。
+  * `C` 自身が class ≤2 なら吸収で終わり。そうでなければ **4B.1 と同じ `A := γ_{c-1}(C)`**
+    (`c = class(↥C) ≥ 3`) が特性可換 ⟹ 吸収で `A ≤ K` ⟹ `C = C_G(K) ≤ C_G(A)` から
+    `⁅A,C⁆ = γ_c(C) = 1` で `c` の最小性に矛盾。
+  * 相対下降中心列の交換子評価 `commutator_lowerCentralSeries_le'` (Thm 4.11 の相対版) は
+    `↥S` の ⊤ 版を `S.subtype` で押し出して得た (`top_subtype_lowerCentralSeries` +
+    `map_commutator`)。
+  ⚠ 教訓: `x ∈ commutatorMemLeft N y` は `⁅x,y⁆ ∈ N` と defeq だが**構文的に違う**ので
+  `commutatorElement_mem_comm` に渡すには `show ⁅x,y⁆ ∈ N from …` の型註釈が要る。
+- ✅ **4B.5 完了 (2026-07-25)** — 新 leaf `Ch04_Commutators/ProblemsSupersolvableMann.lean`
+  (167 行、`OddOrder.lean` 配線済、全実証明・axiom-clean)。
+  `exists_normal_centralizer_eq_self_of_isSupersolvable` (超可解群は自己中心化する正規部分群を
+  持つ) + `nilpotencyClass_mannSubgroup_le_of_isSupersolvable` (`class M(G) ≤ 3`) +
+  `isNilpotent_mannSubgroup_of_isSupersolvable`。下記の設計どおり。
+  ⚠ 実装で判明した追加の API 注意:
+  * `isCyclic_of_prime_card` は `[Fact p.Prime]` を要求 → `haveI : Fact (Nat.card ↥M).Prime := ⟨h⟩`
+    を置いてから `isCyclic_of_prime_card (p := Nat.card ↥M) rfl`。
+  * `QuotientGroup.eq_one_iff.mpr ha` は項として書くと "Unknown constant" になる
+    (`rw` の中で使うときは `have h1 : mk' A a = 1 := by rw [...]; exact ha` に分解する)。
+  * 最後の `Mbar = ⊥` からの矛盾は `simp at hprime` では閉じない
+    (`simp only [Subgroup.card_bot]` + `Nat.not_prime_one`)。
+
+  **`M(G)` と Thm 4.15 は repo に既にある** (`Ch04_Commutators/Mann.lean`):
+  `mannSubgroup G` / `nilpotencyClass_mannSubgroup_le_of_centralizer_eq_self [Finite G]
+  {K} [K.Normal] (hself : Subgroup.centralizer ↑K = K) : nilpotencyClass ↥(mannSubgroup G) ≤ 3`。
+  ⟹ **4B.5 は「超可解群は自己中心化する正規部分群を持つ」に完全に帰着する**。
+
+  **証明 (確定)**: `A` を**可換正規**部分群のうち極大に取る (`Finite.exists_le_maximal`,
+  base `⊥`)。`C := C_G(A) ⊇ A`。`A < C` と仮定すると `C/A ≠ 1` なので `G ⧸ A` の中で
+  `C.map (mk' A)` に含まれる minimal normal 部分群 `M̄` が取れ
+  (`Ch02.exists_isMinimalNormal_le_of_normal`)、**超可解性から `|M̄|` は素数**
+  (`Ch03.card_prime_of_isMinimalNormal_of_isSupersolvable` + `IsSupersolvable.quotient`)
+  ゆえ `M̄` は巡回。引き戻し `B := M̄.comap (mk' A)` は `A < B ⊴ G`, `B ≤ C` で、
+  `A ≤ Z(B)` (∵ `B ≤ C_G(A)`) と `B/A` 巡回から
+  `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` で**可換** ⟹ `A` の極大性に矛盾。
+
+  **中断時点の draft** (~150 行、あと数個の名前解決だけ) は
+  `scratchpad/wip/ProblemsSupersolvableMann.lean` に退避。実測した API の注意点:
+  * `Ch03.IsSupersolvable` / `Ch03.card_prime_of_isMinimalNormal_of_isSupersolvable` は
+    `namespace OddOrder.Isaacs.Ch04` の中で `open OddOrder.Isaacs.Ch03` しても解決しなかった。
+    **`Ch03.` 前置で書く** (同じファイルで `Ch02.exists_isMinimalNormal_le_of_normal` は
+    `Ch02.` 前置で解決している)。
+  * centralizer の正規性は `Subgroup.normal_centralizer` (instance、`[H.Normal]` 付き)。
+    `Subgroup.centralizer_normal_of_normal` は**存在しない**。
+  * `isCyclic_of_prime_card` は `Nat.card ↥M = p` の形を要求する
+    (`(Nat.card ↥M).Prime` からは `⟨_, rfl⟩` 等で渡す)。
+
+### 🎉 §4B 完済 (4B.1–4B.5 全 5 問)。
+
+## Ch.4 §4C (書籍 p. 137 の Problems 4C) — 🎉 完済 (2026-07-25)
+
+新 leaf `OddOrder/Isaacs/Ch04_Commutators/ProblemsStabilityGroup.lean` (331 行、
+`OddOrder.lean` 配線済、全実証明・axiom-clean)。§4C は「`A` が `G` に自己同型で作用する」
+節で, Isaacs 自身が「`A` と `G` をともに半直積 `Γ = G ⋊ A` の部分群とみなす」と宣言している
+(p. 131) ので, **周囲群 `Γ` の部分群 `G`, `A`** に対する形で述べた (半直積はその特別な場合)。
+
+「`A` が鎖 `1 = H₀ ⊆ ⋯ ⊆ H_m = G` を stabilize する」(= `H_{i-1}` の `H_i` における各右剰余類が
+`A`-不変) は交換子で `⁅H i, A⁆ ≤ H (i-1)` と同値 ⟹ 構造体 `StabilizesChain` (`base` + `step`)。
+書籍の有限鎖 (条件は `0 < i ≤ m` のみ) との橋渡しは `stabilizesChain_min`
+(`H (min i m)` で上端 `G` に延長; `G ⊴ Γ` ゆえ `⁅G,A⁆ ≤ G` で延長部分は自動)。
+
+| # | 状態 | Lean 名 (`OddOrder.Isaacs.Ch04`) |
+|---|---|---|
+| 4C.1 | ✅ | `exists_stabilizes_isSubnormal_chain` (+ 有限鎖版 `..._of_finite`) |
+| 4C.2 | ✅ | `StabilizesChain.nilpotencyClass_le` / `.isNilpotent` (+ 有限鎖版 `nilpotencyClass_le_of_stabilizes_finite_normal_chain`) |
+| 4C.3 | ✅ | `commutator_commutator_eq_bot_of_trivial_on_normal` (+ `le_centralizer_commutator_of_trivial_on_normal`) |
+
+**設計メモ**:
+
+- **4C.1 の「部分正規部分群の鎖」= 反復交換子列**: `M i := ⁅G, A; m - i⁆` (4A.9 の
+  `commIterate`)。`⁅L, A⁆` が `L` に正規化される (`le_normalizer_commutator_left`, 4A.9) ので
+  各段 `⁅G,A;j+1⁆ ⊴ ⁅G,A;j⁆` が部分正規段になり, `⁅G,A;0⁆ = G ⊴ Γ` からの帰納で
+  `IsSubnormal` (Γ 内)。`↥G` 内の部分正規は `IsSubnormal.comap G.subtype` で即出る
+  (`subgroupOf = comap subtype`)。停止 `M 0 = ⊥` は `⁅G,A;j⁆ ≤ H (m-j)` の帰納。
+  再利用 helper: `commIterate_le_commIterate_of_le` (添字一般の単調減少) /
+  `isSubnormal_commIterate` / `normal_subgroupOf_commIterate_succ` /
+  `commIterate_le_of_stabilizesChain` / `le_normalizer_of_normal`。
+- **4C.2 の核 = `commutator_lowerCentralSeries_le`**: `⁅H i, γ_{j+1}(A)⁆ ≤ H (i - (j+1))` を
+  `j` の帰納で示す。各段は Isaacs **Cor 4.10** (three subgroups lemma の mod `N` 形
+  `commutator_commutator_le_of_rotate`) を `H₁ = γ_{j+1}(A)`, `H₂ = A`, `H₃ = H i`,
+  `N = H (i-(j+2))` に適用: `⁅⁅A, H i⁆, γ⁆ ≤ ⁅H(i-1), γ⁆ ≤ N` と
+  `⁅⁅H i, γ⁆, A⁆ ≤ ⁅H(i-(j+1)), A⁆ ≤ N`。**`H i` の `Γ` 内正規性**が `N.Normal` として
+  ここで要る = 4C.2 が「正規部分群の鎖」を要求する理由。仕上げは `i = m`, `j = m-1` で
+  `⁅H m, γ_m(A)⁆ ≤ H 0 = ⊥` ⟹ `γ_m(A) ≤ A ⊓ C_Γ(G) = ⊥` (faithfulness) ⟹
+  `nilpotencyClass_le_of_lowerCentralSeries_eq_bot` (Mann.lean)。
+  ⚠ ℕ の切り捨て減算のおかげで `i ≤ j` の縮退段も `H 0 = ⊥` に落ちて自動的に正しい
+  (`commutator_le_pred` の `i = 0` 場合が `⁅⊥, A⁆ = ⊥`)。
+  ⚠ **書籍の `m ≥ 1` は不要** (`m = 0` なら `G = H 0 = 1` で faithfulness が `A = 1` を
+  強いる) — 仮定から落として docstring に注記。
+- **4C.3** は three subgroups lemma (`Subgroup.commutator_commutator_eq_bot_of_rotate`) の
+  `(G, A, N)` への直接適用: `⁅⁅A,N⁆,G⁆ = 1` は仮定, `⁅⁅N,G⁆,A⁆ ≤ ⁅N,A⁆ = 1` は `N ⊴ G`。
+
+## Ch.5 §5C (書籍 pp. 162-164 の Problems 5C) — 着手 (2026-07-26)
+
+§5C は 13 問 (5C.1-5C.13)。
+
+| 問題 | 状態 | メモ |
+|---|---|---|
+| 5C.1 | ✅ | `not_dvd_card_commutator_of_inf_sylow_eq_bot` + `hasNormalPComplement_of_commutator_inf_sylow_eq_bot` (`Problems5C.lean`)。方針どおり **鍵の段を独立補題**にした (同一 statement の別証明を避ける) |
+| 5C.2 | ✅ 完了 (`card_eq_two_of_characteristic_relIndex_eq_two`) | PDF 確認済。`U ⊆ V ⊆ P ⊆ G`、`P` abelian Sylow-2、`U, V` が `P` の特性部分群で `\|V:U\| = 2`、`G` 単純 ⇒ `\|G\| = 2` |
+| 5C.3 | ✅ 完了 (`sq_eq_one_of_card_sylow_two_eq_32`) | PDF 確認済: `G` 単純で abelian Sylow-2 `P` の位数が `2^5` ⇒ `P` は初等可換 |
+| 5C.4 | ✅ 完了 (`exists_subgroup_card_eq_of_isZGroup` + `exists_conj_of_card_eq_of_isZGroup`) | すべての Sylow が巡回 ⇒ 任意の約数位数の部分群が存在し互いに共役 (repo に `IsZGroup` 系 Thm 5.16 あり) |
+| 5C.5 | ✅ | `exists_mem_normalizer_conj_eq_of_normal` + `eq_of_characteristic_of_conj` (`Problems5C.lean`) |
+| 5C.6 | 🔒 hub | weak closure。**hub レーンが `OddOrder/GroupTheory/WeaklyClosed.lean` で着手中** (issue 9503) — A レーンは触らない |
+| 5C.7 | ✅ 完了 (`normal_sylow_three_of_card_eq`) | `\|G\| = 3^a·5·11` ⇒ Sylow-3 が正規 |
+| 5C.8 | ✅ 完了 (`hasNormalPComplement_of_minFac_of_not_dvd_pow_three`) | `p` が最小素因数 (`p > 2`) で `p^3 ∤ \|G\|` ⇒ 正規 p-補群 |
+| 5C.9 | ✅ 完了 (`three_dvd_card_of_isSimpleGroup_of_not_dvd_eight`) | 非可換単純で偶数位数、`8 ∤ \|G\|` ⇒ `3 \| \|G\|` |
+| 5C.10 | ⬜ | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
+| 5C.11 | ⬜ | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
+| 5C.12 | ⬜ | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
+| 5C.13 | ⬜ | (Navarro) `P = N_G(P)'` なる Sylow `P` ⇒ `N_G(P)` が正規 p-補群をもつ |
+
+### 5C.2 の証明 (2026-07-26 に導出、PDF p.162 = PDF ページ 175 で主張確認済)
+
+**主張**: `U ⊆ V ⊆ P ⊆ G`、`P` は `G` の abelian Sylow-2、`U`, `V` は `P` の特性部分群で
+`|V : U| = 2`。`G` が単純なら `|G| = 2`。
+
+**証明** (⭐ transfer 評価 + fusion control):
+`P` が abelian なので `N := N_G(P)` は `P` 内の fusion を制御する
+(Burnside; repo の Cor 5.22 = `Basic.lean` の fusion-control 系)。
+`U`, `V` は `P` の特性部分群なので `N` は両方を保ち、`|V/U| = 2` かつ `Aut(C₂) = 1` より
+**`N` は `V/U` に自明に作用する**。
+transfer `v : G →* P` (P abelian) を取ると、transfer 評価の各因子
+`t x^{n_t} t⁻¹` は `x ∈ V` のとき `V` に入り、fusion が `N` 由来なので
+**`≡ x^{n_t} (mod U)`**。`∑ n_t = |G : P|` だから `v(x) ≡ x^{|G:P|} (mod U)`。
+`|G:P|` は奇数なので `x ∈ V \ U` に対し `v(x) ∉ U`、特に `v(x) ≠ 1`。
+一方 `G` が非可換単純なら `G = G'` で `v(G) = v(G') = 1` (`P` 可換) — 矛盾。
+よって `G` は可換単純 = 素数位数。`V/U` が位数 2 を含むので `2 ∣ |G|` ⇒ `|G| = 2`。
+
+### 5C.3 の設計 (2026-07-26)
+
+`|P| = 2^5` で `G` 単純 ⇒ `G` は非可換単純 (可換単純は素数位数で Sylow-2 が位数 32 に
+ならない)。`P` が初等可換でないとすると `P` は巡回因子の直積で、ある因子の位数が `≥ 4`。
+**因子の分割 (5 の分割) のうち「最大部分がただ 1 つ」なら repo の Cor 5.19
+(`SylowTwoDirectFactor.lean`、書籍一般形) が非単純性を与えて矛盾**。
+⚠ **`(2,2,1)` = `C₄ × C₄ × C₂` だけは最大部分が 2 つあり Cor 5.19 で覆えない**。
+この場合は **5C.2** を `U := ℧¹(P) = P²` (位数 4)、`V := Ω₁(P)` (位数 8) に適用する
+(`|V : U| = 2`、どちらも特性部分群) と `|G| = 2` となって矛盾。
+⟹ **5C.3 は 5C.2 に依存する**。実装順は 5C.2 → 5C.3。
+
+✅ **5C.3 landing (2026-07-26)** — ただし**書籍の分割数え上げは採らなかった**。
+⭐ **有限可換群の構造定理を使わずに済む書き換え**を見つけた: `n` 乗写像の核 `Ω_n` と像 `℧_n`
+(新 shared leaf `AbelianPowerSubgroups.lean`, issue 9208) は第一同型定理で
+`|Ω_n| · |℧_n| = |Q|` を満たす。位数 32 では `|℧₂| = |powImage Q 2|` の値
+(`1,2,4,8,16,32`) で場合分けし、鎖 `℧₂ ≥ ℧₄ ≥ ℧₈` の**隣接比が 2 の箇所**を探せばよい:
+
+* 比 2 の隣接対がそのまま 5C.2 に渡す特性部分群対。
+* 比 1 (鎖が止まる) なら不動点補題 `powKernel_two_pow_mul_eq` で `Ω = ⊤` となり位数に矛盾。
+* `℧ = ⊥` に落ちた段は `℧ ≤ Ω₂` (`powImage_le_powKernel`) なので `Ω₂` との対を取る。
+
+分割 `(2,2,1)` (= `C₄×C₄×C₂`, 書籍で Cor 5.19 が効かない唯一の型) はこの枠組では
+`|℧₂| = 4, |Ω₂| = 8` の枝として自動的に処理される。Cor 5.19 (`SylowTwoDirectFactor.lean`)
+は**結局使わなかった**。
+主定理 = `sq_eq_one_of_card_sylow_two_eq_32` / `isElementaryAbelian_of_card_sylow_two_eq_32`、
+核 = `exists_characteristic_relIndex_two_of_card_32`。
+
+⭐ 罠: `hpair _ _ inferInstance ...` のように**存在命題を作る補助の引数をメタ変数のままにすると
+`inferInstance` が無関係な部分群の `Characteristic` を拾って**変な unify をする
+(結論が `∃` なのでゴールから決まらない) — `U`, `W` を明示する。
+`norm_num at h` は `↥(powImage Q 2)` を生の subtype に展開してしまうので
+数値の正規化には `simp only [Nat.reducePow]` を使う。
+
+### 5C.2 の実装状況 (2026-07-26)
+
+**fusion 段は landing 済** (`Problems5C.lean`):
+* `inv_mul_conj_mem_of_index_two` — `|V:U| = 2` かつ `U, V` が `n`-共役不変なら
+  `n` は `V/U` に自明作用 (`x ∉ U` なら `n x n⁻¹ ∉ U` で、`U` 外の 2 元は法 `U` で一致)
+* ⭐ `inv_mul_conj_mem_of_fusion` — `P` 可換 Sylow で `V ≤ P`、`N_G(P)` が `V/U` に自明作用
+  ⇒ **`V` の元の `G`-共役で `P` に入るものは `U` を法として元と一致**
+  (Isaacs Lemma 5.12 `normalizer_controls_centralizer_fusion` で `G`-共役を `N_G(P)`-共役へ)
+
+**残り (transfer 段)**: `ϕ := (QuotientGroup.mk' (U.subgroupOf P)) : ↥P →* ↥P ⧸ U'`
+(`P` 可換なので `U'` 正規・商も可換) の transfer `v' : G →* ↥P ⧸ U'` を取り、
+**5B.1 で使った `MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot`** で
+`v'(x) = ∏_q ϕ⟨w_q⁻¹ x^{n_q} w_q⟩` と展開する。各因子は上の fusion 段で
+`ϕ⟨x^{n_q}⟩` に等しく、`∑ n_q = |G:P|` (5B.1 と同じ `Subgroup.quotientEquivSigmaZMod` +
+`Nat.card_sigma` + `Nat.card_zmod`) なので `v'(x) = ϕ⟨x^{|G:P|}⟩`。
+⚠ **mathlib の `MonoidHom.transfer_eq_pow` は「厳密な固定」を要求するので使えない**
+(法 `U` で十分という弱い仮定では通らない) — 軌道分解版を使うこと。
+
+⭐ **商群 `↥P ⧸ U` を作る必要はない** (2026-07-26 の知見): `↥P` が可換なので、
+軌道分解の各因子が `x^{n_q}` と `U` を法として一致すれば、**積もそのまま**
+`x^{∑ n_q} = x^{|G:P|}` と法 `U` で一致する (`Finset.prod_mul_distrib` +
+`Finset.prod_pow_eq_pow_sum`)。結論は
+`(x ^ |G:P|)⁻¹ * (transfer (MonoidHom.id ↥P) x : G) ∈ U` の形で書ける。
+
+✅ **transfer 段 landing (2026-07-26)**: `transfer_inv_pow_mul_mem_map`
+「`ϕ : ↥P →* A` (`A` 可換) の transfer は `x ∈ V` 上で `ϕ(x)^{|G:P|}` と `ϕ(U)` を法として
+一致する」。⭐ **target を変数 `A` にすると instance diamond が完全に消える**
+(下記の障害はこれで解消)。5C.2 の組み立てでは `A := Abelianization ↥P`,
+`ϕ := Abelianization.of` を取る (`P` 可換なので `commutator ↥P = ⊥` で `ϕ` は単射、
+`ϕ(x^{|G:P|}) ∈ ϕ(U)` から `x^{|G:P|} ∈ U` が戻せる)。
+
+✅ **組み立て landing (2026-07-26) — 5C.2 完了**:
+`not_mem_of_commutator_eq_top` (完全群での矛盾) + `conj_mem_map_subtype_of_characteristic`
+(`Subgroup.normalizerMonoidHom` で「特性部分群は `N_G(P)`-共役不変」) +
+`inv_mul_mem_of_relIndex_eq_two` (`Subgroup.relIndex_eq_two_iff`) を経て主定理
+`card_eq_two_of_characteristic_relIndex_eq_two`。
+⭐ **書籍の `U ⊆ V` は不要**と判明したので落とした (`relIndex` で `|V:U| = 2` を課せば十分)。
+⭐ 罠: `set Pg := (P : Subgroup G)` は `U V : Subgroup ↥(P:Subgroup G)` の**型を書き換えて
+仮説を shadow する** (`U✝`) ので使わない。`IsPGroup` は `∀ g, ∃ k, g ^ p ^ k = 1` であって
+`orderOf g = p ^ k` ではない (後者は `IsPGroup.iff_orderOf`)。
+
+~~**残り (組み立て)**~~: `|G:P|` 奇数 (`Sylow.not_dvd_index`) と `|V:U| = 2` から
+`x ∈ V \ U` に対し `x^{|G:P|} ∉ U` ⇒ `transfer ϕ x ≠ 1`。一方 `G` 非可換単純なら
+`G = G'` かつ `A` 可換なので `transfer ϕ (G') = 1` で矛盾 ⇒ `G` 可換単純 = 素数位数、
+`2 ∣ |G|` で `|G| = 2`。
+
+~~⚠ 未解決の実装障害 (解消済)~~: `↥P` の **`CommGroup` instance diamond**。
+`MonoidHom.transfer` は target に `CommGroup` を要求するが、`↥P` には
+`Subgroup.toGroup` 由来の `Group` があるため、`haveI : CommGroup ↥P` を入れると
+`MonoidHom.id ↥P` の型 (`Subgroup.toGroup` 側) と
+`transfer_eq_prod_quotient_orbitRel_zpowers_quot` が要求する型 (`CommGroup.toGroup` 側) が
+unify しない。`Ch05_Transfer/CentralTransfer.lean` の Thm 5.3 は
+`@MonoidHom.transfer G _ ↑P ↑P ((haveI := hPab; (inferInstance : CommGroup ↥↑P)))
+(MonoidHom.id ↑P) _` の `@` 明示形で回避しているので、**評価補題側も同じ `@` 明示形で
+instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot`
+の implicit/explicit の並びを確認してから書く)。
+`|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
+`G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
+
+### 5C.9 の実装メモ (2026-07-26)
+
+**主張** (PDF 実測): `G` 非可換単純, `|G|` 偶数, `8 ∤ |G|` ⇒ `3 ∣ |G|`。
+
+Sylow-2 `P` は位数 `2^n` (`1 ≤ n ≤ 2`) ゆえ可換。`3 ∤ |G|` と仮定すると
+`|N_G(P) : C_G(P)|` を割る素数 `q` は `q ≠ 2` (`P ≤ C_G(P)`) で、5C.8 の軌道数え上げ補題
+`exists_dvd_pow_sub_one_of_dvd_card_mulAut` より `q ∣ 2^m - 1` (`1 ≤ m ≤ 2`)。
+`m = 1` なら `q = 1`、`m = 2` なら `q = 3` — どちらも矛盾なので `N_G(P) = C_G(P)`。
+Burnside で正規 2-補群 `K` が取れ、単純性から `K = ⊥` (⇒ `P = ⊤` ⇒ `G` 可換、矛盾) か
+`K = ⊤` (⇒ `|P| = 1` ⇒ `2 ∤ |G|`、矛盾)。
+
+⭐ 書籍は `Aut(C₂ × C₂) ≅ S₃` を使うが、**5C.8 の補題を一般形に切り出して共用した**
+(`hp2 : p ≠ 2` を外し `q ≠ p` だけを仮定する形にリファクタ) ので `|Aut P|` の計算は不要。
+
+### 5C.8 の実装メモ (2026-07-26)
+
+**主張** (PDF 実測): `p > 2` が `|G|` の最小素因数で `p^3 ∤ |G|` ⇒ `G` は正規 `p`-補群を持つ。
+
+Sylow-`p` `P` は位数 `p^n` (`n ≤ 2`) ゆえ可換なので、Burnside
+(`Basic.lean` の `hasNormalPComplement_of_sylow_normalizer_le_centralizer`) より
+`N_G(P) ≤ C_G(P)` を示せばよい。`N/C ↪ Aut(P)` なので `|N : C|` は `|Aut P|` と `|G|` の
+両方を割り、`P` 可換ゆえ `p ∤ |N : C|`。素数 `q ∣ |N:C|` があれば最小性から `q > p`。
+
+⭐ **`|Aut P|` を計算せずに済ませた**。書籍の標準証明は
+`|Aut(C_p × C_p)| = |GL_2(F_p)| = p(p-1)^2(p+1)` を使うが、mathlib に `Aut` の同型計算が
+無い。代わりに位数 `q` の自己同型 `σ` を取り、`⟨σ⟩` の `P` への作用で軌道数え上げ
+(`IsPGroup.card_modEq_card_fixedPoints`) すると `p^n ≡ |Fix σ| (mod q)`、
+`Fix σ = σ.toMonoidHom.eqLocus (MonoidHom.id P)` は `σ ≠ 1` ゆえ真部分群なので
+`q ∣ p^n - p^k` (`k < n ≤ 2`) ⟹ `q ∣ p - 1` か `q ∣ p^2 - 1`。前者は `q > p` に反し、
+後者は `q ∣ p + 1` ⟹ `q = p + 1` が偶数で `q` 奇素数に反する。
+定理名 = `not_dvd_card_mulAut_of_card_eq_pow` (`Problems5C8.lean`)。
+⭐ **2026-07-26 に一般形 `exists_dvd_pow_sub_one_of_dvd_card_mulAut` へリファクタ**
+(`p` の奇偶も `q > p` も仮定せず「`q ≠ p` なら `∃ m, 1 ≤ m ≤ n, q ∣ p^m - 1`」)。
+5C.9 が `p = 2` で同じ補題を使う。
+
+⚠ 罠: `MulAction.fixedPoints` の `Nat.card` は `↥(↑S : Set P)` の形で出るので
+`Nat.card ↥S` への `rw` が通らない (`rw [← hkcard]; exact hmod` で defeq を使って渡す)。
+
+### 5C.7 の実装メモ (2026-07-26)
+
+**主張** (PDF 実測): `|G| = 3^a · 5 · 11` ⇒ `G` は正規 Sylow 3-部分群を持つ。
+
+**証明** = Burnside の正規 `p`-補群定理を 2 段: Sylow-5 は位数 5 (巡回) で `φ(5) = 4` が
+`|G|` (奇数) と互いに素 ⇒ 正規 5-補群 `K` (位数 `3^a·11`)。`K` の Sylow-11 は位数 11 で
+`φ(11) = 10` が `|K|` と互いに素 ⇒ 正規 11-補群 `L` (位数 `3^a`)。`L` は `K` の正規 Sylow-3
+ゆえ特性 (`Sylow.characteristic_of_normal`)、`K ⊴ G` なので `L ⊴ G`。位数が `G` の Sylow-3
+と一致するので `L` 自身が Sylow-3 で、正規 Sylow は一意 (`Sylow.unique_of_normal`)。
+
+⭐ **mathlib の `IsCyclic.normalizer_le_centralizer` は `p` が最小素因数のときしか使えない**
+(ここは `p = 5, 11` で最小は 3)。一般形 `normalizer_le_centralizer_of_coprime_totient`
+(`gcd(|G|, φ(|P|)) = 1` 版, issue 9210) を新設して使った。
+
+補助: `card_sylow_eq_self_of_sq_not_dvd` (`q ∣ |G|`, `q² ∤ |G|` ⇒ Sylow-`q` の位数 `q`) /
+`factorization_three_pow_mul` / `sq_not_dvd_mul`。
+
+### 5C.4 の設計と進捗 (2026-07-26)
+
+**主張** (p.163): Sylow がすべて巡回 (= mathlib `IsZGroup`) なら、`|G|` の任意の約数 `m` に
+対し位数 `m` の部分群が存在し、位数 `m` の部分群同士は `G`-共役。
+
+**骨格** = mathlib の Z-群 API (実測で確認、自作不要):
+`IsZGroup.isCyclic_commutator` (`G'` 巡回) / `IsZGroup.isCyclic_abelianization` (`G/G'` 巡回) /
+`IsZGroup.coprime_commutator_index` (`gcd(|G'|, |G:G'|) = 1` ⟹ `G'` は**巡回な正規 Hall**)。
+⟹ `m ∣ |G|` は `m = gcd(m,|G'|) · gcd(m,|G:G'|)` と分解する
+(`Nat.gcd_mul_gcd_eq_iff_dvd_mul_of_coprime`)。
+
+✅ **存在部分 landing (2026-07-26)**: `Problems5C4.lean` (新 leaf, `OddOrder.lean` 配線済)。
+巡回群 `G'` の位数 `m₁` の部分群 `M` (巡回ゆえ特性 ⟹ `G` で正規) と、Schur–Zassenhaus 補群
+`H ≅ G/G'` (巡回) の位数 `m₂` の部分群 `H₂` を取り `K := H₂ ⊔ M`。
+補助: `normal_map_subtype_of_characteristic` / `isCyclic_of_isComplement'_commutator`。
+新 shared infra = `exists_subgroup_card_eq_of_isCyclic` + `characteristic_of_isCyclic`
+(`CyclicSubgroupUniqueness.lean` へ追記) と `CardSupInf.lean` (issue 9209)。
+
+✅ **共役性 landing (2026-07-26)** — ⭐ **商群 `G/M` を経由しない経路**に差し替えた。
+下記の当初設計 (step 3-5 で `G/M` を作る) は不要で、鍵は
+**`m₁ = |K ⊓ G'|` と `m₂ = f` が互いに素**であること (`m₁ ∣ |G'|`, `f ∣ |G:G'|`):
+
+* `K_i` 自身も Z-群なので**存在部分を再利用**して位数 `f` の部分群 `Q_i ≤ K_i` を取れる。
+* `gcd(f, |G'|) = 1` より `Q_i ⊓ G' = ⊥`、かつ `|Q_i| · |G'| = |L|` なので
+  `Q_i` は `↥L` の中で正規 Hall `G'` の**補群**。⟹ Schur–Zassenhaus 共役性を
+  `↥L` を ambient として直接適用できる (`Subgroup.IsComplement'.exists_conj_of_coprime`)。
+* `K_i = Q_i ⊔ (K_i ⊓ G')` で `K_i ⊓ G'` は `G` 正規なので共役で不変 ⟹ `K₁^n = K₂`。
+
+補助定理: `exists_index_factor` (`|K| = |K ⊓ G'| · f`, `|K ⊔ G'| = |G'| · f`, `f ∣ |G:G'|`) /
+`card_inf_commutator` / `inf_commutator_eq_of_card_eq` / `normal_inf_commutator` /
+`sup_commutator_eq_of_card_eq` / `card_map_mk'_mul_card` / `mem_normalizer_of_normal`。
+
+~~**残り (共役性) の設計**~~ (当初案、上記に置換): 位数 `m` の部分群 `K₁, K₂` に対し
+1. `|K_i ∩ G'| = m₁`: `d := |K_i ∩ G'|` は `m₁` を割り、`m/d ∣ |G:G'|` かつ `m₁/d ∣ |G'|` なので
+   `m₁/d ∣ gcd(|G'|,|G:G'|) = 1`。
+2. `G'` 巡回 ⟹ 位数 `m₁` の部分群は一意 (`cyclic_subgroup_eq_of_card_eq`) ⟹
+   `K₁ ∩ G' = K₂ ∩ G' =: M` (`G` で正規)。
+3. `Ḡ := G/M` で `K̄_i` は位数 `m₂`、`K̄_i ∩ Ḡ'` は自明。`L_i := K̄_i · (G'/M)` は
+   `Ḡ/(G'/M) ≅ G/G'` (**巡回**) の位数 `m₂` の部分群に対応 ⟹ **一意** ⟹ `L₁ = L₂ =: L`。
+4. `L` の中で `K̄_i` は正規 Hall `G'/M` の補群 ⟹ Schur–Zassenhaus 共役性
+   (`Subgroup.IsComplement'.exists_conj_of_coprime`, repo の
+   `OddOrder/Mathlib/SchurZassenhausConj.lean`) で共役。
+5. 商の対応で `G` に持ち上げる。
+
+### 5C.1 の実装メモ (2026-07-26)
+
+* `p ∤ |G'|`: `G'` の位数 `p` の元 `x` を取ると `⟨x⟩` はある Sylow `Q` に入り `Q` は `P` に共役、
+  `G'` 正規なので `x^g ∈ G' ⊓ P = ⊥` で矛盾。⭐ **「N 正規なら N ⊓ P ∈ Syl_p(N)」を経由せずに済む**。
+* `Abelianization G` は可換なので Sylow が正規 ⇒ **Schur-Zassenhaus**
+  (`Subgroup.exists_right_complement'_of_coprime`) で `p`-補群 `K` を取り、
+  `N := (Abelianization.of)⁻¹(K)`。`|G : N| = |PA| = |P|` (`Sylow.card_eq_multiplicity` +
+  `p ∤ |G'|` から `p`-指数が一致)、`p ∤ |N|` は `p^{v+1} ∤ |G|` から。
+* 各 Sylow `Q` に対する `IsComplement'` は `Subgroup.isComplement'_of_card_mul_and_disjoint`
+  + `Subgroup.disjoint_of_coprime_natCard`。
+⚠ `Abelianization G := G ⧸ commutator G` なので全射性は `QuotientGroup.induction_on` で出る
+(`Abelianization.of_surjective` / `induction_on` は存在しない)。
+
+### 5C.5 の実装メモ (2026-07-26)
+
+`P` と `P^g` がともに `N_G(B)` の `p`-部分群であることを使い、hub の
+`GroupTheory.exists_mem_conj_le_common` (2 つの `p`-部分群を共通の `p`-部分群へ) で
+`c ∈ N_G(B)` を取る。`P` は Sylow なので共通部分群は `P` 自身、ゆえに `cg ∈ N_G(P)`。
+⚠ `Sylow` の極大性フィールドは `P.3 : IsPGroup p Q → ↑P ≤ Q → Q = ↑P` (**向きに注意**)。
+⚠ `Subgroup.mem_normalizer_fintype` で「片方向の共役閉」から正規化子の元が取れる。
+
+## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
+
+| 問題 | 状態 | 実装 |
+|---|---|---|
+| 5B.1 | ✅ `exists_notMem_conj_mem_of_mem_commutator` | `P ∈ Syl_p(G)`, `g ∈ P` 位数 `p`, `g ∈ G'`, `g ∉ P'` ⇒ `g^t ∈ P` なる `t ∉ P` が存在。transfer-evaluation lemma (Thm 5.5 = mathlib `MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot`) を使う |
+| 5B.2 | ✅ | `card_closure_le_pow_card` (書籍の形) / `card_closure_range_le` (添字形) — `Problems5B.lean` |
+| 5B.3 | ✅ | `exists_finite_normal_iff` (`Problems5B.lean`) + `normal_closure_of_conj_closed` |
+
+### 5B.2: 正しい論法 (2026-07-26 に確定) — 隣接交換によるソート
+
+**⚠ 前回の診断を訂正する。** 「書籍 hint は動かない」と書いたが、それは
+**ブロック収集** (「`x₁` を全部前に出し、次に `x₂` を…」) という読み方に対してであって、
+**隣接交換でソートする**読み方なら hint は正しく、以下で厳密に証明できる。
+
+**書き換え規則**: 語の中の隣接する 2 文字 `x_i x_j` が `i > j` (添字の逆転) なら
+`x_i x_j = x_j · (x_j⁻¹ x_i x_j) = x_j x_k` と書き換える (`X` 共役閉ゆえ `x_k ∈ X`;
+`x_j⁻¹ x_i x_j = x_j ⟺ x_i = x_j` なので `k ≠ j`)。
+
+**停止性 (⭐ ここが要)**: 語の**添字列を辞書式順序で見ると狭義に減少する** —
+書き換えは位置 `p` の添字を `i` から `j < i` に変え、`p` より前は不変だから。
+長さは不変で、添字は `Fin m` の有限集合を動くので、長さ `L` の添字列は有限個 ⟹ 停止。
+Lean 用の具体的な減少測度は **`m` 進数値 `μ(ι) := ∑_p ι_p · m^{L-1-p}`**:
+位置 `p` が `i → j` (`j ≤ i-1`)、位置 `p+1` が任意 (`≤ m-1`) なので
+`Δμ ≤ -m^{L-1-p} + (m-1)·m^{L-2-p} = -m^{L-2-p} < 0`。
+
+**停止時**: 逆転が無い = 添字列が広義単調増加 = `x₁^{a₁} x₂^{a₂} ⋯ x_m^{a_m}` の形。
+最後に `x_i^n = 1` で各指数を `n` 未満に落とす ⟹ `|⟨X⟩| ≤ n^m`。
+(`⟨X⟩` = `X` の元の積全体。`x⁻¹ = x^{n-1}` なので逆元は別途要らない。)
+
+**なぜブロック収集だと壊れるか (参考)**: `x₂` の収集中の共役が `x₁` に戻りうる。
+`G = S₃`, `X` = 3 互換, `w' = (23)(13)` は `(12)` を含まないが `(13)` を前に出すと
+`(13)(12)` になる。隣接交換版ならここからさらに `(13)(12) = (12)((12)(13)(12)) = (12)(23)`
+と進んでソート済になる (添字列 `(3,2) → (2,1) → (1,3)`; 辞書式に減少)。
+
+**得られている部品 (landing 済、`Dietzmann.lean`)**:
+`conj_mem_sdiff_singleton` (`x` による共役は `X \ {x}` を保つ) /
+`closure_le_normalizer_closure_sdiff` (`⟨X \ {x}⟩ ⊴ ⟨X⟩`; `|⟨X⟩| ≤ n·|⟨X\{x}⟩|` を与えるが
+帰納は閉じない — 上の論法とは別筋) / `conj_mem_closure_of_conj_mem` /
+`exists_pow_mul_prod_eq_notMem`。
+
+**実装状況 (2026-07-26)**: **組合せ部分は landing 済** (`Problems5B.lean` の
+`namespace Sort5B2`):
+* `measure` (`m` 進数値) と `measure_lt` / `measure_cons_lt` / `measure_append_lt`
+* `exists_inversion` — ソートされていない添字列には隣接逆転がある
+* ⭐ `exists_chain'_map_prod_eq` — 共役閉な枚挙 `xs : Fin m → G` に対し
+  **任意の添字列は同じ積を与える単調増加な添字列に書き換えられる** (`measure` の強帰納)
+
+⚠ `List.Chain'` は deprecated、`List.IsChain` を使う (`List.isChain_cons` /
+`isChain_nil` / `isChain_singleton`)。
+
+**2026-07-26 に完成**。数え上げは**正規形の一意性**で回した:
+`eq_of_count_eq` (単調増加列は重複度ベクトルで決まる; `List.Perm.eq_of_sortedLE` +
+`List.sortedLE_iff_isChain` + `List.perm_iff_count` で 1 行) から
+`{κ // κ.IsChain (· ≤ ·) ∧ ∀ i, κ.count i < n} ↪ (Fin m → Fin n)` を作り、
+そこからの全射で `Nat.card ⟨X⟩ ≤ n^m` (`Nat.card_le_card_of_surjective`)。
+⭐ **重複度ベクトルから整列列を構成する必要はない** (単射だけで足りる) のが軽量化の要点。
+書籍の形 `card_closure_le_pow_card` は `Finset.equivFin` で枚挙を作って添字形に流すだけ。
+
+⚠ mathlib API: `List.eq_of_perm_of_sorted` は無い — `List.Perm.eq_of_sortedLE` +
+`List.sortedLE_iff_isChain` を使う。
+
+⚠ **`S₃` は「因子がすべて `≤ n` の subnormal 列」では説明できない** (`|S₃| = 6 = 2·3` で
+`3 > 2`) ので、`n^m` は**衝突込みの数え上げ**でしか出ない。鎖による評価を試みても無駄。
+
+### ⚠ 5B.1 の書籍訂正 (2026-07-26)
+
+書籍の印刷は「show that `g^t ∈ P'` for some element `t ∈ G` with `t ∉ P`」だが、
+**巻末 errata の項目 3 (p. 157) が「`P` の dash を削れ」= `g^t ∈ P` に訂正**している。
+PDF ページ画像 (書籍 p.157 = PDF p.170) と errata の両方で確認済。
+数学的にも訂正版が正しい: transfer-evaluation で `V(g) = ∏_{n_t=1} g^{t⁻¹}` (mod `P'`) となり、
+もし全ての `t` で `g^{t⁻¹} ≡ g` (mod `P'`) なら `V(g) ≡ g^N`, `N = #{t : n_t=1} ≢ 0 (mod p)`
+となって `V(g) ∈ P'` に矛盾。`P` の元による共役は `P/P'` に自明に作用するので、
+`g^{t⁻¹} ∉ gP'` なる `t` は `t ∉ P` をみたす。
+
+## Ch.5 §5A (書籍 pp. 152-153 の Problems 5A) — **完了 (2026-07-26)**
+
+新 leaf `OddOrder/Isaacs/Ch05_Transfer/Problems.lean` (namespace `OddOrder.Isaacs.Ch05`、
+`OddOrder.lean` 配線済)。mathlib の transfer は
+`MonoidHom.transfer (ϕ : ↥H →* A) : G →* A` (`A` 可換) で、Isaacs の `v : G → H/H'` は
+`A = H/H'`, `ϕ` = 自然な射影の場合。
+
+| # | 状態 | Lean 名 / メモ |
+|---|---|---|
+| 5A.1 | ✅ | `transfer_id_eq_pow_index_of_commGroup` / `coe_transfer_id_of_commGroup` |
+
+⚠ **余域を `↥H` に取る版は避ける**: `H ≤ Z(G)` の一般形で `CommGroup ↥H` を statement 内
+`letI` で供給すると, その instance の `toGroup` が `Subgroup.toGroup` と構文的に一致せず
+`MonoidHom.id ↥H` の型が合わない (diamond)。**一般の `ϕ : ↥H →* A` 版で述べる**のが正解
+(Isaacs の `v : G → H/H'` はまさにこの形)。
+| 5A.2 | ✅ | `transfer_top_eq_apply` |
+| 5A.3(a)(b) | ✅ | `eq_of_mul_eq_mul_of_isComplement` / `isComplement_mul_of_transversal` (mathlib に `IsComplement` の推移律が無いので自作)。(b) の数値部分は mathlib `relIndex_mul_index` |
+| 5A.3(c)(d) | ✅ | `transfer_transfer` (transfer の推移律、mathlib に無い新規形式化) | **transfer の推移律**。mathlib は pretransfer を持たず `diff` 経由なので、Isaacs の `w = v ∘ V_T` は「`H ≤ K ≤ G`, `ϕ : ↥H →* A` に対し `transfer_{K≤G} (transfer_{(H.subgroupOf K) ≤ K} ϕ') = transfer_{H≤G} ϕ`」の形になる (`ϕ'` は `↥(H.subgroupOf K) ≃* ↥H` を経由した `ϕ`)。`subgroupOf` の同型を挟むのが主な摩擦。5A.3(b) で作った `isComplement_mul_of_transversal` を `LeftTransversal` に持ち上げ、`transfer_def` で両辺の `diff` を `S * T` 上の積として比較するのが素直な経路 | 推移律。**(b) の数値部分 `|G:H| = |G:K||K:H|` は mathlib `Subgroup.relIndex_mul_index` で既済**。transversal の積 `ST` の一意分解 (a) / (b) の transversal 性は **mathlib に既製が無い** (`Subgroup.IsComplement` の推移律は未収載; `IsComplement.mul_eq` のみ)。`↥K` の subtype を跨ぐので定式化に注意 — 「`S ⊆ K` かつ `∀ k ∈ K, ∃! s ∈ S, k·s⁻¹ ∈ H`」+「`IsComplement (K : Set G) T`」⟹「`IsComplement (H : Set G) (S * T)`」の形が素直。(c)(d) の pretransfer 合成は mathlib が `diff` 経由の定義なので、この transversal 推移律を作ってから `transfer_def` で両辺を比較する |
+
+### 5A.3(c)(d) の実装状況 (2026-07-26)
+
+⚠ **書籍は右 transversal、mathlib の `MonoidHom.transfer` は左 transversal**
+(`Subgroup.LeftTransversal` = `{S // IsComplement S H}`) で定義されている。
+そこで (b) の左版 `isComplement_mul_of_transversal_left`
+(`T` が `K` の左 transversal, `S ⊆ K` が `K` 内の `H` の左 transversal ⇒ `T * S` が
+`H` の左 transversal) を landing 済 (`Problems.lean`)。
+
+**5A.3(c) の書籍の主張 (PDF p.152 = PDF ページ 165 で確認)**:
+`(st)·g = s·(t g (t·g)⁻¹) · (t·g)`。`·` は transversal の「代表元へ落とす」作用。
+これは左版では「`T * S` 上の `g` 作用が `T` 成分と `S` 成分に分かれる」ことにあたる。
+
+**5A.3(d) = transfer の推移律**:
+`transfer_{K≤G} (transfer_{(H.subgroupOf K)≤K} ϕ') = transfer_{H≤G} ϕ`
+(`ϕ' = ϕ ∘ (Subgroup.subgroupOfEquivOfLe hHK)`)。
+⚠ **mathlib に transfer の推移律は無い** (`Mathlib/GroupTheory/Transfer.lean` を grep 済)。
+**(ii) の Equiv は landing 済 (2026-07-26)**: `quotientEquivProd hHK T :
+G ⧸ H ≃ (G ⧸ K) × (↥K ⧸ H.subgroupOf K)` (`⟦g⟧_H ↦ (⟦g⟧_K, ⟦τ(⟦g⟧_K)⁻¹ g⟧)`)。
+⭐ **`T * S` を Set として作らなくてよい**のが要点 — 分解 Equiv は `T` だけで決まり、
+`S` は不要。計算則 `quotientEquivProd_symm_apply` / `_apply_fst` / `_apply_snd` はすべて `rfl`。
+⚠ `left_inv` は `Quotient.liftOn'` の beta/iota 簡約が `rw` に効かないので `change` で
+明示的に落とす必要がある。
+
+**積 transversal も landing (2026-07-26)**: `mulTransversalFun` (`q ↦ τ(q₁)·σ(q₂)`) /
+`mulTransversalFun_spec` / `mulTransversal` / `mulTransversal_leftQuotientEquiv`。
+⭐ **`Set` の積を作らず `Set.range F` として構成する**のが要点 —
+mathlib `Subgroup.isComplement_range_left` (「`∀ q, (F q : G ⧸ H) = q` なら
+`Set.range F` は左 transversal」) と `Subgroup.IsComplement.leftQuotientEquiv_apply` で
+**transversal 性と代表元計算則が同時に**手に入り、`isComplement_mul_of_transversal_left`
+(書籍 5A.3(b) の忠実な形式化として保持) を経由する必要すらない。
+
+**残作業 = 最終計算のみ**。因子の計算は次のとおり確認済 (紙の上):
+`q = e.symm (q₁, r)` に対し `(P q)⁻¹ · (g•P) q = (σ r)⁻¹ · m⁻¹ · σ(m•r)`,
+ここで `m := ⟨τ(g⁻¹•q₁)⁻¹ · g⁻¹ · τ(q₁)⟩ ∈ K`。ゆえに
+`∏_r ϕ(…) = diff_{H'} ϕ' S (m⁻¹ • S) = transfer_{H'≤K} ϕ' m⁻¹`,
+`∏_{q₁} が diff_K (transfer ϕ') T (g•T) = transfer_K (transfer ϕ') g`。
+**部品は 2026-07-26 にすべて landing**:
+* `diff_eq_prod` — `Subgroup.leftTransversals.diff` の展開形。⭐ **`rfl` で通る**
+  (`let _ := H.fintypeQuotientOfFiniteIndex` を展開形でも使い、membership 証明項は
+  proof irrelevance で吸収される)。
+* `mulTransversal_apply_symm` — `P (e.symm (q₁, r)) = τ q₁ · σ r`。
+* `transferCocycle T g q := ⟨τ(q)⁻¹ · g · τ(g⁻¹•q)⟩ ∈ K` — 外側 `diff` の因子そのもの。
+* `quotientEquivProd_smul_symm` — `e (g⁻¹ • e.symm (q₁, ⟦k⟧)) = (g⁻¹•q₁, ⟦m⁻¹ · k⟧)`,
+  `m = transferCocycle T g q₁`。
+  ⚠ **`m` と `m⁻¹` の取り違えに注意** (第 2 成分に現れるのは `m⁻¹ = τ(g⁻¹•q₁)⁻¹ g⁻¹ τ(q₁)`、
+  `diff` の因子は `m` 自身)。1 回間違えて `group` が閉じずに発覚した。
+
+**2026-07-26 に完成**: `mulTransversal_diff_factor` (因子 `(P q)⁻¹·(g•P)q =
+(σ⟦k⟧)⁻¹·m·σ(m⁻¹•⟦k⟧)` を `↥K` 側の `diff` 因子に落とす) + `transfer_transfer` (本体)。
+本体は `transfer_def` → `diff_eq_prod` → `Equiv.prod_comp (quotientEquivProd …).symm`
+→ `Fintype.prod_prod_type` → `Finset.prod_congr` 2 段、で 20 行ほど。
+⚠ `Subtype.mk` の中を `rw` すると motive エラーになるので、先に `change` で
+coe を剥がしてから rewrite する。
+
+### 5A.2 の設計 (2026-07-26 に確定、**実装済** `transfer_top_eq_apply`)
+
+⚠ 実装知見: `diff` は **`Subgroup.leftTransversals.diff`** (MonoidHom 名前空間ではない) /
+`Fintype (G ⧸ H)` は **`letI`** で入れる (`haveI` だと `diff` の `let` が展開した
+`Subgroup.fintypeQuotientOfFiniteIndex` と defeq 判定に失敗する) /
+`transfer_eq_pow` は key 仮説が `H = ⊤` で偽なので使えない。
+
+
+**statement**: `A` 可換, `ϕ : ↥(⊤ : Subgroup G) →* A` に対し
+`transfer ϕ g = ϕ ⟨g, Subgroup.mem_top g⟩`。Isaacs の `v : G → G/G'` は
+`A = G/G'`, `ϕ` = 自然な射影の場合で, これがまさに「transfer = 自然な射影」。
+
+**証明**:
+1. `[(⊤ : Subgroup G).FiniteIndex]` (`Subgroup.index_top = 1`)。
+2. `transfer_def ϕ T g : transfer ϕ g = diff ϕ T (g • T)` (`T` は任意の left transversal;
+   `default` でよい)。
+3. `diff ϕ S T = ∏ q : G ⧸ H, ϕ ⟨(α q)⁻¹ * β q, _⟩` (`α = S.2.leftQuotientEquiv`,
+   `β = T.2.leftQuotientEquiv`) を展開。`Subsingleton (G ⧸ ⊤)`
+   (`QuotientGroup.subsingleton_quotient_top`) なので **積は 1 項**
+   (`Fintype.prod_subsingleton`)。
+4. ⭐ **鍵の mathlib 補題** `Subgroup.smul_apply_eq_smul_apply_inv_smul (f) (S) (q) :
+   ((f • S).2.leftQuotientEquiv q : G) = f • (S.2.leftQuotientEquiv (f⁻¹ • q) : G)`。
+   subsingleton なので `g⁻¹ • q = q`, したがって `β q = g * (α q)`。
+5. よって唯一の項は `ϕ ⟨(α q)⁻¹ * g * (α q)⟩` = `g` の**共役**の `ϕ`-像。
+   `↥⊤` では `⟨x⁻¹ g x⟩ = ⟨x⟩⁻¹ * ⟨g⟩ * ⟨x⟩` で **`A` が可換**だから
+   `ϕ ⟨x⁻¹ g x⟩ = ϕ ⟨g⟩` ∎
+
+⚠ `transfer_eq_pow` は使えない (key 仮説「`g₀⁻¹ g^k g₀ = g^k`」は `H = ⊤` では偽)。
+`diff` は `let` を含む noncomputable def なので `simp only [MonoidHom.diff]` で展開する。
+| 5A.4 | ✅ | (a) `transfer_eq_pow_index_of_le_center` / (b) `inf_ker_transfer_eq_bot_of_le_center` + `sup_ker_transfer_eq_top_of_le_center` (+ `normal_of_le_center`) |
+| 5A.5 | ✅ | `card_ker_dvd_relIndex_commutator` (`ProblemsSchurMultiplier.lean`) — **`M(G)` を定義せず stem extension の ∀-形**で述べた (下記) |
+| 5A.7 | ✅ | `card_ker_lt_relIndex_commutator` (同上)。書籍の `G/C` cyclic 仮定は `BC = G` + `B` cyclic から従うので導出に変更 |
+| 5A.6 | ✅ | `card_ker_dvd_two_of_dihedral` (上界) + `isStemExtension_dihedralReduce` (下界) — `ProblemsDihedralMultiplier.lean`。書籍の `2^n` 版より強い**偶数一般形**で証明 |
+| 5A.8(a) | ✅ | `isStemExtension_prodMap` + `card_ker_prodMap` (`ProblemsSchurMultiplier.lean`) |
+| 5A.8(b) | ✅ | `card_ker_eq_mul_card_ker_stem` (`ProblemsProductMultiplier.lean`) | `ProblemsProductMultiplier.lean` に `inf_ker_snd_ker_fst` / `exists_mem_ker_snd_mul_mem_ker_fst` / ⭐`commutator_ker_snd_ker_fst_eq_bot`。残りはステップ 4-6 (下記設計)。準備補題 `not_dvd_card_commutator_of_sylow_le_center` (ステップ 5 用) も landing 済 |
+
+### 5A.8(b) の証明設計 (2026-07-26 確定、実装は次イテレーション)
+
+**∀-形の主張**: `h : Γ →* A × B` が stem extension で `|A|`, `|B|` が互いに素なら,
+`A` の stem extension `f` と `B` の stem extension `g` が存在して
+`|ker h| = |ker f| · |ker g|`。(a) と合わせて `|M(A×B)| = |M(A)||M(B)|` の位数版。
+
+記号: `Z := ker h`, `Γ_A := ker ((snd).comp h)` (= `h⁻¹(A × 1)`),
+`Γ_B := ker ((fst).comp h)`, `n := |A|`, `m := |B|`。
+
+1. `Γ_A ⊓ Γ_B = Z`, かつ `∀ γ, ∃ x ∈ Γ_A, y ∈ Γ_B, γ = x·y` (h の全射性から)。
+2. **`⁅Γ_A, Γ_B⁆ = ⊥`** ⭐ ここが coprime を使う要:
+   `x ∈ Γ_A`, `y ∈ Γ_B` なら `⁅x,y⁆ ∈ Γ_A ⊓ Γ_B = Z ≤ Z(Γ)`。
+   `h (x^n) = (h x)^n = (a^n, 1) = 1` (`pow_card_eq_one`) なので **`x^n ∈ Z`**
+   — 剰余群を作らずに済むのがポイント。`⁅x,y⁆` が中心的なので
+   `⁅x,y⁆^n = ⁅x^n, y⁆ = 1` (帰納法: `⁅ab,y⁆ = a⁅b,y⁆a⁻¹⁅a,y⁆` で中心性から
+   `= ⁅b,y⁆⁅a,y⁆`)。同様に `⁅x,y⁆^m = 1`。coprime ⇒ `⁅x,y⁆ = 1`。
+3. `Γ = Γ_A·Γ_B` かつ `⁅Γ_A,Γ_B⁆ = ⊥` ⇒ `Γ' = ⁅Γ_A,Γ_A⁆ ⊔ ⁅Γ_B,Γ_B⁆`
+   (`Γ_A × Γ_B → Γ` が全射準同型で `(H×K)' = H'×K'`)。
+4. `Z_A := Z ⊓ ⁅Γ_A,Γ_A⁆`, `Z_B := Z ⊓ ⁅Γ_B,Γ_B⁆` とおくと **`Z = Z_A · Z_B`**:
+   `z ∈ Z ≤ Γ'` を `z = u·v` (`u ∈ ⁅Γ_A,Γ_A⁆ ≤ Γ_A`, `v ∈ ⁅Γ_B,Γ_B⁆ ≤ Γ_B`) と書くと
+   `v = u⁻¹z ∈ Γ_A ⊓ Γ_B = Z` ゆえ `v ∈ Z_B`, `u = zv⁻¹ ∈ Z_A`。
+5. **`Z_A ⊓ Z_B = ⊥`**: `p ∤ n` なら `Γ_A` の Sylow-`p` は中心的
+   (`|Γ_A| = n|Z|` で `Z ≤ Z(Γ)` ゆえ `Z` の Sylow-`p` が `Γ_A` の Sylow-`p`) なので
+   **`not_dvd_card_commutator_of_sylow_le_center`** より `p ∤ |⁅Γ_A,Γ_A⁆|`。
+   ⇒ `|Z_A|` の素因数は `n` を割り, `|Z_B|` の素因数は `m` を割る。coprime ⇒ 交わりは自明。
+6. `Γ_A/Z_B ↠ A` は核 `Z/Z_B` の stem extension (`Z = Z_A Z_B ≤ ⁅Γ_A,Γ_A⁆·Z_B`),
+   同様に `Γ_B/Z_A ↠ B`。核の位数の積 = `|Z|²/(|Z_A||Z_B|) = |Z|` (5 で `|Z_A||Z_B| = |Z|`)。
+
+⚠ 実装上の重さ: `⁅H, K⁆` (Γ 内の部分群としての交換子) と `commutator ↥H` の往復,
+`Γ_A × Γ_B → Γ` の準同型構成。~400 行規模の見込み。
+
+**実装メモ (2026-07-26、ステップ 1-3 landing 済)**
+
+- ステップ 2 の `⁅x,y⁆^n = ⁅x^n,y⁆` には**中心的交換子の双線形性**が要るが、repo の既存版は
+  BG (Isaacs の下流) にしかなかったので**上流の共有 leaf**
+  `OddOrder/GroupTheory/CentralCommutatorPower.lean` を新設した (issue 9207、BG 側の
+  重複解消は hub へ申し送り)。
+- `Γ_A`, `Γ_B` は `((MonoidHom.snd A B).comp h).ker` / `((MonoidHom.fst A B).comp h).ker`
+  として持つのが軽い。`(h x).2 = 1` は `MonoidHom.mem_ker` 後に **defeq でそのまま `have`** で
+  取れる (`MonoidHom.snd_apply` という simp 補題は存在しない)。
+- ステップ 3 では `IsStemExtension` の全射性も交換子群条件も不要 — 仮説は
+  `ker h ≤ Z(Γ)` と coprime だけ。
+- **ステップ 4-5 前半も landing (2026-07-26)**。既存述語 `IsCentralProduct` に共通 API を追加:
+  `exists_mul` (中心積の元は `x·y` に分解; `closure_induction`)、`mulHom` (`R₁ × R₂ →* G`)、
+  `commutatorElement_mul_mul` (`⁅x₁y₁, x₂y₂⁆ = ⁅x₁,x₂⁆⁅y₁,y₂⁆`)、
+  `commutator_self` (`⁅R,R⁆ = ⁅R₁,R₁⁆ ⊔ ⁅R₂,R₂⁆`)。
+  ⭐ `commutatorElement_mul_mul` は **`mulHom` の `map_commutatorElement` の像そのもの**で、
+  積群の交換子が成分ごとであることも部分群 coe が積・逆元と可換であることも定義上等しいので
+  `exact hmap.symm` 一行で済む (手で語の並べ替えをする必要はない)。
+  ⚠ ただし `map_commutatorElement` の引数は**明示的に与える** (期待型からの推論に失敗する)。
+- 5A.8(b) 側では `isCentralProduct_top` / `commutator_eq_sup` / `exists_mul_mem_inf_commutator`。
+- **ステップ 5 後半も landing (2026-07-26)**: `inf_inf_commutator_eq_bot` = `Z_A ⊓ Z_B = ⊥`。
+  鍵は**抽象化**した `not_dvd_card_commutator_of_ker_le_center`:
+  「中心的な核をもつ `ψ : K →* A'` があり `p ∤ |A'|` なら `p ∤ |K'|`」。
+  `Syl_p(K)` の元は位数が `p` 冪、その `ψ` 像の位数は `|A'|` を割る ⇒ 互いに素で像 = 1 ⇒
+  `Syl_p(K) ≤ ker ψ ≤ Z(K)` ⇒ `not_dvd_card_commutator_of_sylow_le_center`。
+  ⭐ この抽象形にすると `Γ_A` 側と `Γ_B` 側が**同じ補題の 2 適用**で済む
+  (`ψ` = `fst∘h` / `snd∘h` の制限)。`|Γ_A| = |A||Z|` の位数計算は一切不要だった。
+  `⁅H,H⁆` ↔ `commutator ↥H` の往復は mathlib `Subgroup.map_subtype_commutator` +
+  `Subgroup.equivMapOfInjective` (`card_commutator_subgroup`)。
+- ⚠ `Subgroup.commutator_le_self` は **mathlib に既存** (自作しかけたので削除)。
+- **`|Z| = |Z_A|·|Z_B|` も landing (2026-07-26)** = `card_ker_eq_mul`。
+  `Z = Z_A ⊔ Z_B` は**再び中心積** (`isCentralProduct_ker`; `Z_A ≤ Γ_A`, `Z_B ≤ Γ_B` と
+  `⁅Γ_A,Γ_B⁆ = ⊥`) で、`Z_A ⊓ Z_B = ⊥` と合わせて内部直積。
+  `CentralProduct.lean` に `range_mulHom` と `card_eq_mul`
+  (「交わらない中心積の位数は因子の位数の積」= `mulHom` が単射で像が `R`) を追加。
+- **商への降下の抽象形 `isStemExtension_lift` を landing (2026-07-26)**:
+  「`ψ : K →* A'` が全射・核が中心的、`N ⊴ K` が `N ≤ ker ψ` かつ `ker ψ ≤ K' ⊔ N` ⇒
+  `K ⧸ N →* A'` は stem extension で `|N|·|ker| = |ker ψ|`」。
+  ⭐ **抽象化しておくと `A` 側と `B` 側が同じ補題の 2 適用**になる。
+  位数部分は `(mk' N).restrict ψ.ker` に第一同型 + Lagrange (`Subgroup.index_ker`) を当てるだけ。
+- **5A.8(b) 完成 (2026-07-26)**: `prodStemHomFst h : ↥Γ_A ⧸ Z_B →* A` /
+  `prodStemHomSnd h : ↥Γ_B ⧸ Z_A →* B` を `QuotientGroup.lift` で定義し、
+  `isStemExtension_lift` を 2 回適用 → `card_ker_eq_mul_card_ker_stem`。
+  `Z_B ⊴ Γ` は仮説不要 (`h.ker` 正規 + `⁅Γ_B,Γ_B⁆` 正規 + `inf` 正規) なので
+  `Subgroup.normal_subgroupOf` が instance で効き、商が仮説なしで型付く。
+  ⚠ `Subgroup.subgroupOf_le_subgroupOf` は存在しない — `subgroupOf = comap subtype` なので
+  `Subgroup.comap_mono` を使う。
+  ⚠ `Subgroup.mul_mem_sup` は第 1 因子が左の summand にある形しか取れない。順序が逆のときは
+  `Subgroup.mul_mem _ (mem_sup_right …) (mem_sup_left …)`
+  (誤って `mul_mem_sup (mem_sup_left …)` と書くと whnf timeout になる)。
+
+### ⚠ 5A.6 の書籍読解訂正 (2026-07-26)
+
+`pdftotext` は**上付き文字を落とす**ので 5A.6 が「dihedral of order **2n** where n > 2」と
+読めるが、この読みは**偽** (n 奇数なら `M(D_{2n}) = 1`; `D_6 = S_3` は Sylow が全て巡回で
+Isaacs 自身の Cor 5.4 から `M = 1`)。PDF ページ画像 (書籍 p.153 = PDF p.166) で確認した
+正しい主張は **「dihedral of order `2^n` where `n ≥ 2`」= 二面体 2-群**。
+同じ潰れは書籍 p.76 の semidihedral `SD_{2^n}` でも起きている。
+⟹ **添字に「数字+文字」(`2n`, `pn` …) が現れたら上付き潰れを疑い PDF 画像で確認する。**
+
+実装は書籍の `2^n` 版より強い**偶数一般形**:「`m` 偶数 ⇒ 位数 `2m` の二面体群の
+Schur 乗数は位数 2」(`m` 奇数なら 5A.5 から直ちに `M = 1` なので偶数条件は本質的)。
+下界の witness は `D_{4t} ↠ D_{2t}` (核 `⟨r (2t)⟩`、中心的かつ `⁅r t, sr 0⁆ = r (2t)`
+ゆえ交換子群に入る)。
+
+### 5A.5 / 5A.7 の設計 (2026-07-26 確定・実装済)
+
+Schur 乗数 `M(G)` の universal object (Schur 表現群) は mathlib にも本リポにも無い
+(issue 9206 で 3 案を実測比較) が、**5A.5 / 5A.7 の主張は上界なので
+「`ker f ≤ Γ' ⊓ Z(Γ)` なる全射 `f : Γ →* G` すべてについて」の ∀-形で述べれば
+`M(G)` の定義を一切必要としない** (`|M(G)|` は `Nat.card (ker f)` の最大値)。
+`CentralTransfer.lean` の Thm 5.4 弱形と同じ流儀。
+
+* 述語 `IsStemExtension f` は**部分群 `Z` + 同型 `Γ/Z ≅ G` でなく全射 `f` + `ker f`** で持つ。
+  これにより Noether III の transport が丸ごと不要になり、`|C : G'| = |f⁻¹C : Γ'|` が
+  `Subgroup.relIndex_comap` / `comap_map_eq` / `map_comap_eq_self_of_surjective` の 3 行で出る。
+* `f⁻¹(C)` の可換性は mathlib `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center` を
+  制限 hom `(f.comp A.subtype).codRestrict C _ : ↥A →* ↥C` に適用 (生成元を取る手作業は不要)。
+* 5A.7 の核心は `Γ = f⁻¹(B)·f⁻¹(C)` ⟹ `f⁻¹(B) ∩ f⁻¹(C) ≤ Z(Γ)`。
+  `B ∩ C > 1` の非自明元の持ち上げが `ker f` の外の `f⁻¹(C) ∩ Z(Γ)` の元になり、
+  `ker f ⊊ f⁻¹(C) ∩ Z(Γ)` から厳密不等式。
+* ⚠ `Subgroup.relIndex_comap` の第 1 明示引数は comap される側 `H` (`H f K` の順)。
+
+## Ch.4 §4D (書籍 p. 145 の Problems 4D) — 進行中 (2026-07-25)
+
+7 問 (4D.1–4D.7)。coprime action の節。
+
+| # | 状態 | Lean 名 (`OddOrder.Isaacs.Ch04`) / leaf |
+|---|---|---|
+| 4D.1(a)(b) | ✅ | `commutator_eq_bot_of_centralizer_le_of_coprime` / `inf_centralizer_eq_bot_of_centralizer_le_of_coprime` (`ProblemsCoprimeAction.lean`) |
+| 4D.2 | ✅ | `baerAdd_mul_inv_of_commutator_le_center` / `baerMul_div_eq_commutator` (`ProblemsBaerAddition.lean`) |
+| 4D.3 | ✅ 全 7 小問 | `IsIrreducibleCoprimeAction.*` (`ProblemsIrreducibleAction.lean`): (a) `exists_isPGroup` / (b) `commutator_le_center` / (c) `fixedPoints_eq_commutator` + `eq_commutator_or_eq_top_of_isAInvariant` / (d) `pow_mem_commutator` + `pow_eq_one_quotient_commutator` / (e) `pow_eq_one_of_mem_commutator` / (f) `pow_eq_one_of_ne_two` / (g) `pow_four_eq_one_of_two` |
+| 4D.4 | ✅ | `actionCommutator_eq_bot_of_isPGroup_two_of_fixes_pow_four` (`ProblemsIrreducibleAction.lean`) |
+| 4D.5 主張本体 | ✅ | `derivedSeries_semidirectProduct_eq_bot_and_ne_bot` (上界 `..._eq_bot` / 下界 `..._ne_bot` / Lemma 4.29 部分群版 `commutator_commutator_inl_inr_map_eq`、新 leaf `ProblemsDerivedLength.lean`) |
+| 4D.5 系 | ✅ | `exists_finite_group_derivedSeries_ne_bot` + `regularPermAut` / `regularPermAut_injective` (同 leaf) |
+| 4D.6 | ✅ | `range_fittingProductHom_eq_fixedPoints` / `ker_fittingProductHom_eq_actionCommutator` (新 leaf `ProblemsFittingMap.lean`) |
+| 4D.7 | ✅ | `le_oPiCore_compl_of_sylow_isCyclic` (新 leaf `ProblemsCyclicSylow.lean`) |
+
+### 🎉 §4D 完済 (4D.1–4D.7 全 7 問) ⟹ **Isaacs Ch.4 の章末演習 (§4A–§4D) 全完**
+
+### 4D.1 の設計 (実装済)
+
+周囲群 `Γ` の部分群として述べる。鍵は `mem_of_pow_card_eq_one_of_mem_centralizer`
+(`C_Γ(N)` の元で `|A|` 乗が 1 のものは `A` に入る) — `x = a·g` 分解 + `C_Γ(N) ⊓ G ≤ N` +
+互いに素性。これで `G ≤ N_Γ(A)` が出て `⁅G,A⁆ ≤ G ⊓ A = 1`。(b) は `A₀ := A ⊓ C_Γ(N)` に (a)。
+
+### 4D.4 の設計 (実装済)
+
+`|H|` の強い帰納法。`A`-不変部分群 `H` への制限作用 (`Ch03.IsAInvariant.toMulAutHom`) が
+非自明なら、帰納法の仮定で `H` の真の `A`-不変部分群すべてに自明作用 ⟹
+`IsIrreducibleCoprimeAction` 成立 ⟹ **4D.3(g)** で `H` の全元が `y⁴ = 1` ⟹ 仮定で固定。
+補助 `isAInvariant_map_subtype_of_isAInvariant`。
+⚠ `Ch03.IsAInvariant.toMulAutHom` は `ThreeSubgroups.lean` で `_root_.` 無しに宣言されており
+実名が `OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom` — namespace Ch04 の
+中では `OddOrder.Isaacs.Ch03.…` とフルに書く (`Ch03.…` では解決しない)。
+
+### 4D.5 の設計 (下界 + 系が残り)
+
+**上界 (実装済)**: `rightHom : B ⋊ A ↠ A` で `(B ⋊ A)^{(n)} ≤ ker rightHom = inl(B)`、
+`inl(B)` 可換ゆえ `(B ⋊ A)^{(n+1)} = 1`。coprime も faithful も不要。
+
+**下界 (実装済)**: `V := A^{(n-1)} ≠ 1` (導来長がちょうど `n`)。`(|B|, |V|) = 1` と `B` 可換から
+Lemma 4.29 (`⁅B, V, V⁆ = ⁅B, V⁆`; repo は `actionCommutator` 形) が使える。
+半直積 `Γ = B ⋊ A` の中で `W := ⁅inl(B), inr(V)⁆` とおくと:
+- `inr(V) ≤ Γ^{(k)}` (∀ `k ≤ n-1`; `inr` は導来列を保つ + `V = A^{(n-1)} ≤ A^{(k)}`)
+- `W ≤ Γ^{(k)}` を `k ≤ n-1` について帰納: `k → k+1` は `W = ⁅W, inr V⁆` (4.29) と
+  `W, inr V ≤ Γ^{(k)}` から `W ≤ ⁅Γ^{(k)}, Γ^{(k)}⁆ = Γ^{(k+1)}`。
+- 仕上げ: `k = n-1` で `W = ⁅W, inr V⁆ ≤ Γ^{(n)}`、`W ≠ 1` は faithful から
+  (`⁅B, V⁆ = 1` なら `V` が `B` に自明作用 ⟹ `V = 1` に矛盾)。
+⟹ `Γ^{(n)} ≠ 1` かつ `Γ^{(n+1)} = 1` で導来長ちょうど `n+1`。
+⚠ 実装知見: **BG に同型の subgroup 版 4.29 (`commutator_commutator_right_eq`) があるが
+BG は Isaacs を import するので Ch04 からは使えない** (import cycle)。Ch04 内では
+制限作用の半直積 `Δ = B ⋊[φ∘V.subtype] ↥V` で Γ 形 4.29 を使い、
+`F = SemidirectProduct.map (id B) V.subtype : Δ →* Γ` で `Subgroup.map_commutator` により
+押し出すのが正しい経路 (`commutator_commutator_inl_inr_map_eq`)。
+⚠ `derivedSeries_antitone` は群を**明示引数**で取る (`derivedSeries_antitone A hk`)。
+
+**系 (実装済)**: `C ≀ A` (regular wreath product)。⚠ repo の `WreathProduct` (Ch03,
+`D ≀[Ω] Q`) は独立 structure で `SemidirectProduct` ではないため 4D.5 本体に載らない —
+同型な半直積 `(A → C) ⋊ A` を `regularPermAut` (座標を `f ↦ fun ω => f (a⁻¹ * ω)` で置換)
+として直接構成した。`C` = 位数 `p` 巡回 (`p ∤ |A^{(n-1)}|`, `Nat.exists_infinite_primes`)
+とすると `B := (A → C)` は基本アーベル `p`-群 (各座標の位数が `p` を割る) ゆえ
+`Nat.card B = p^k` で coprime、正則作用は忠実 (1 の指示関数を `a` で評価)。
+⚠ 「導来長」の述語は導入せず `derivedSeries G n ≠ ⊥ ∧ derivedSeries G (n+1) = ⊥` で述べた。
+⚠ `Nat.card (Multiplicative (ZMod p)) = p` を使う `rw` は `Fact p.Prime` が `p` に依存して
+motive 破綻 — 仮説側で `rw [hcardD] at hpow` と書き換える。
+
+### 4D.6 の設計 (実装済)
+
+`θ = fittingProductHom φ` (`ThreeSubgroupsCoprime.lean`)。像は添字付け替え `a ↦ b*a` で
+`A`-固定、逆は `θ(c) = c^{|A|}` と「coprime ⟹ `x ↦ x^{|A|}` が `C_G(A)` 上単射 ⟹
+有限性で全射」。核は Lemma 4.28 の `G = C_G(A)·⁅G,A⁆` で `g = c*x` と分解し
+`1 = θ(g) = c^{|A|}` から `c = 1` — **位数の数え上げを経由しない**。
+
+### 4D.7 の設計 (2026-07-26 に確定、未実装)
+
+**statement** (PDF p.159 = 書籍 p.146 で確認済): `G` `p`-可解, Sylow `p`-部分群が巡回,
+`K ≤ G` が `p'`-部分群で `p ∣ |N_G(K)|` ⟹ `K ⊆ O_{p'}(G)`。
+
+**repo での "p-可解"** = `Ch03.IsPiSeparable ({p} : Set ℕ) G` (π = 単元集合では
+π-separable = p-solvable; S7B2 等の既存用法と同じ)。`O_{p'}(G) = oPiCore {p}ᶜ G`,
+`O_p(G) = oPiCore {p} G`。
+
+**証明 (|G| の帰納法、hint どおり 2 ケース)**:
+
+- **Case 1: `O_{p'}(G) ≠ 1`**。`Ḡ := G/O_{p'}(G)` に帰納法。仮説は全部遺伝する
+  (Sylow の像は巡回、`K̄` は `p'`-群、`p ∣ |N_G(K)|` の位数 `p` の元 `x` は
+  `O_{p'}(G)` に入らないので像も位数 `p` で `N_Ḡ(K̄)` に入る)。結論 `K̄ ≤ O_{p'}(Ḡ) = 1`
+  (**`O_{p'}(G/O_{p'}(G)) = 1`** — 引き戻しが `p'`-群の正規部分群になるから) ⟹ `K ≤ O_{p'}(G)`。
+- **Case 2: `O_{p'}(G) = 1`**。まず **`O_p(G)` が正規 Sylow `p`-部分群**であることを示す:
+  1. **Hall–Higman 1.2.3** (repo `Ch03.hall_higman_1_2_3 {p}`, `O_{p'}(G) = ⊥` を仮定) で
+     `C_G(O_p(G)) ≤ O_p(G)`。`O_p(G)` は巡回 Sylow の部分群ゆえ巡回=可換なので逆包含も成立し
+     **`C_G(O_p(G)) = O_p(G)`**。
+  2. `MulAut ↥(O_p(G))` は**可換** (mathlib `IsCyclic.mulAutMulEquiv : MulAut G ≃* (ZMod |G|)ˣ`
+     を `injective` で引き戻す; ZGroup.lean:169 と同じイディオム)。`MulAut.conjNormal` の核が
+     `C_G(O_p(G)) = O_p(G)` なので **`commutator G ≤ O_p(G)`**。
+  3. `O_p(G)` を含む Sylow `p`-部分群 `Q` は `⁅⊤, Q⁆ ≤ commutator G ≤ Q` から正規
+     (`le_normalizer_of_commutator_le`)、正規 `p`-部分群ゆえ `Q ≤ O_p(G)`
+     (`Subgroup.IsPiGroup.le_oPiCore`) ⟹ `Q = O_p(G)` = 正規 Sylow。
+  4. `p ∣ |N_G(K)|` の位数 `p` の元 `x` は Sylow が唯一なので `x ∈ P := O_p(G)`。
+     `⟨x⟩ = Ω₁(P)` は巡回 `p`-群の唯一の位数 `p` 部分群ゆえ **char `P` ⟹ `⊴ G`**。
+  5. `K` は `⟨x⟩` を正規化 (正規)、`x` は `K` を正規化 ⟹ `⁅K, ⟨x⟩⁆ ≤ K ⊓ ⟨x⟩ = 1`
+     (位数互いに素) ⟹ **`x ∈ C_P(K)`, すなわち `C_P(K) ≠ 1`**。
+  6. `K` の `P` への coprime 作用 + `P` 可換で **Thm 4.34** (`fixedPoints ⊓ actionCommutator = ⊥`)。
+     `P` は巡回 `p`-群なので**非自明な部分群 2 つは必ず非自明に交わる** ⟹ `C_P(K) ≠ 1` から
+     `⁅P, K⁆ = 1` ⟹ `K ≤ C_G(P) = P`。`K` は `p'`-群で `P` は `p`-群 ⟹ **`K = 1 = O_{p'}(G)`** ∎
+
+**実装状況 (2026-07-26)** — 新 leaf `Ch04_Commutators/ProblemsCyclicSylow.lean`:
+
+| 部品 | 状態 |
+|---|---|
+| Hall–Higman 1.2.3 | ✅ 既存 `Ch03.hall_higman_1_2_3` |
+| `IsCyclic.mulAutMulEquiv` | ✅ mathlib |
+| Thm 4.34 | ✅ 既存 `fixedPoints_inf_actionCommutator_eq_bot_of_abelian` |
+| (a) 巡回群の `MulAut` は可換 | ✅ `mulAut_mul_comm_of_isCyclic` |
+| (b) `ker (MulAut.conjNormal) = C_G(N)` | ✅ `ker_conjNormal_eq_centralizer` |
+| `C_G(O_p(G)) = O_p(G)` | ✅ `centralizer_oPiCore_eq` |
+| `G' ≤ O_p(G)` | ✅ `commutator_le_oPiCore_of_isCyclic` |
+| `IsPiGroup {p} ↔ IsPGroup p` | ✅ `Ch03.Subgroup.isPiGroup_singleton_iff_isPGroup` (Theorem315.lean に新設) |
+| **`O_p(G)` は正規 Sylow** | ✅ `exists_sylow_coe_eq_oPiCore_of_isCyclic` |
+| (d) 巡回 `p`-群の非自明部分群は非自明に交わる | ✅ `inf_ne_bot_of_isCyclic_of_isPGroup` (+ `exists_orderOf_eq_prime_of_ne_bot`) |
+| (c) `O_{p'}(G/O_{p'}(G)) = 1` | ✅ 既存 `Ch03.oPiCore_quotient_self_eq_bot` |
+| `Ω₁(P) ⊴ G` (一般形: 正規巡回部分群の部分群は正規) | ✅ `normal_of_le_of_isCyclic` |
+| coprime 作用で `C_P(K) ≠ 1 ⟹ ⁅P,K⁆ = 1` | ✅ `le_centralizer_of_isCyclic_of_exists_fixed` |
+| **Case 2 本体** (`O_{p'}(G) = ⊥` ⟹ `K = ⊥`) | ✅ `eq_bot_of_oPiCore_compl_eq_bot` |
+| **本体** | ✅ `le_oPiCore_compl_of_sylow_isCyclic` |
+
+⭐ **書籍の hint (`|G|` の帰納法) は不要だった**: `O_{p'}(G/O_{p'}(G)) = 1` が常に成り立つ
+(`Ch03.oPiCore_quotient_self_eq_bot`) ので, 商 `G/O_{p'}(G)` に Case 2 を **1 回適用する
+だけ**で済む。商への遺伝に要ったのは `Ch01.exists_sylow_map_eq` (自作 1B.5(b)) +
+`isCyclic_map_of_isCyclic` + `map_normalizer_le_normalizer_map` の 3 点のみ。
+
+**残りの組み立て手順** (次 iteration):
+
+- **Case 2 (`O_{p'}(G) = ⊥`)**: ✅ 実装済 (`eq_bot_of_oPiCore_compl_eq_bot`)。
+- **Case 1 (`O_{p'}(G) ≠ ⊥`)**: `Ḡ = G/O_{p'}(G)` への遺伝に要るもの —
+  `Ch03.quotient_isPiSeparable` ✅ / Sylow の像が Sylow = 自作 **1B.5(b)**
+  `exists_sylow_map_eq` ✅ (+ Sylow 共役性で「商の任意の Sylow は像」) / `K̄` の位数は `|K|` を
+  割る / `mk' x` の位数は `p` (`x ∉ O_{p'}(G)` は位数から) / 結論は
+  `Ch03.oPiCore_quotient_self_eq_bot` ✅ で `K̄ = ⊥` ⟹ `K ≤ ker (mk') = O_{p'}(G)`。
+- **仮説の形 (2026-07-26 に再検討、こちらを推奨)**: 「Sylow `p` が巡回」は帰納法では
+  **`∀ H : Subgroup G, IsPGroup p ↥H → IsCyclic ↥H`** (「すべての `p`-部分群が巡回」) の形で
+  持つのがよい。Sylow 版とは同値 (各 `p`-部分群は Sylow に含まれ, 巡回群の部分群は巡回) で,
+  Case 2 (`eq_bot_of_oPiCore_compl_eq_bot` は `∀ Q : Sylow p G, IsCyclic` を取る) へは即座に
+  渡せる。**商への遺伝**は: `H̄ ≤ G/O` が `p`-群なら `H := comap (mk' O) H̄` の Sylow
+  `p`-部分群 `S` が `mk'` で `H̄` へ**同型に**写る (`S ⊓ O = 1` は位数互いに素から,
+  `|S| = |H| の p-部分 = |H̄|`) ので `H̄ ≅ S` 巡回。これが Case 1 の唯一の非自明な plumbing。
+
+⚠ **BG 側に重複**: `isPiGroup_singleton_of_isPGroup` / `isPGroup_of_isPiGroup_singleton`
+(`BG/Ch1_Preliminary/S04g_Thm418Core.lean`, `PLengthTransfer.lean`) は今回 Isaacs Ch03 に
+新設した iff 版と同内容。BG は Isaacs を import するので **BG 側を上流版へ redirect** できる
+(hub 案件、lane a の territory 外なので今回は触らない)。
+
+### 4D.3 の設計 (残り (c)–(g))
+
+`IsIrreducibleCoprimeAction φ` (coprime + (A or G 可解) + 真の `A`-不変部分群に自明作用 +
+`G` に非自明作用) の下で、既に得ているもの:
+`actionCommutator_eq_top` (`⁅G,A⁆ = G`) / `le_fixedPoints_of_ne_top` + `fixedPoints_ne_top`
+(**`C_G(A)` が唯一の極大 `A`-不変部分群**) / (a) `p`-群 / (b) `G' ≤ Z(G)`。
+
+- **(c)** `G' < H < G` なる `A`-不変 `H` は無い。Thm 4.34 (Fitting,
+  `fixedPoints_inf_actionCommutator_eq_bot_of_abelian`) を `G/G'` (可換) への作用に適用:
+  `⁅G/G', A⁆ = ⁅G,A⁆G'/G' = G/G'` なので `C_{G/G'}(A) = 1`。`H` が真の `A`-不変なら `A` は
+  `H` 上で自明 ⟹ `H/G' ≤ C_{G/G'}(A) = 1` ⟹ `H = G'`。
+  ⚠ 商への作用は `Ch03.IsAInvariant.quotientMulAutHom` (`ThreeSubgroups.lean` に
+  `fixedPointsOfMulAut_quotientMulAutHom_eq_map` あり)。
+- **(d)** `G/G'` は基本アーベル。`℧₁(G/G')` の引き戻しは `G'` を含む `A`-不変部分群ゆえ (c) で
+  `G'` か `G`。`G` なら `G/G' = (G/G')^p` で有限 `p`-群ゆえ `G/G' = 1` = `G = G'`, `G` が
+  非自明 `p`-群であることに矛盾。よって `(G/G')^p = 1`。
+- **(e)** `G'` は基本アーベル。(b) で `G' ≤ Z(G)` ゆえ可換。class ≤2 なので交換子は双線形で
+  `⁅x,y⁆^p = ⁅x^p, y⁆`、(d) より `x^p ∈ G' ≤ Z(G)` ゆえ `= 1`。`G'` は交換子で生成。
+- **(f)** `p > 2` ⟹ `x^p = 1`。class ≤2 + `G'` の exponent `p` (e) + `p` 奇 ⟹
+  `x ↦ x^p` は準同型 `φ_p : G →* G`。像は `G'` に入り (d)、`G'` 上では自明 (e) なので
+  `G/G' →* G'` を誘導し, これは `A`-同変。`A` は `G'` (target) に自明作用するので
+  誘導写像は `⁅G/G', A⁆ = G/G'` 上で自明 ⟹ 恒等的に 1 ⟹ `x^p = 1`。
+- **(g)** `p = 2` ⟹ `x⁴ = 1`。(d) で `x² ∈ G'`、(e) で `G'` の exponent は 2 ⟹ `x⁴ = 1`。
+
+⚠ 実装知見 (2026-07-25、全 7 小問完了):
+- `G ⧸ commutator G` に **`CommGroup` instance は無い** (mathlib は `Abelianization` を別 def に
+  している)。repo 既存パターン `letI : CommGroup X := { (inferInstance : Group X) with
+  mul_comm := … }` で供給する (`Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr le_rfl`
+  から `IsMulCommutative` を得て `.is_comm.comm`)。この letI の下で
+  `fixedPoints_inf_actionCommutator_eq_bot_of_abelian` (Thm 4.34) がそのまま適用できた
+  (Group instance は structure eta で defeq)。
+- 副産物 `frattini_eq_commutator` (`Φ(G) = G'`)。`frattini G ≠ ⊤` は mathlib
+  `frattini_nongenerating` を `K = ⊥` で使う (`⊥ ⊔ Φ = ⊤ → ⊥ = ⊤` の矛盾)。
+- class ≤2 の道具は Ch04 Main に既存: `mul_pow_of_class_le_two` ((x*y)^n の collection 公式) /
+  `commutatorElement_pow_left_of_class_le_two` (⁅x^n,z⁆ = ⁅x,z⁆^n) /
+  `commutatorElement_mem_commutator_top`。
+- `omit [Finite A] [Finite G] in` は **docstring より前**に書く (後ろだと構文エラー)。
+
+#### 🎉 4A.11 完了 (2026-07-25) — `ProblemsWreath.lean` に追加
+
+**主結果** (実証明・axiom-clean):
+- `commutator_range_inl_map_inr_eq` : **`⁅B, K⁆ = (cosetProdKer K).map inl`**
+  (`cosetProdKer K` = 各右剰余類 `Kω` 上で座標積が `1` な tuple 全体)
+- `card_commutator_range_inl_map_inr` : **`|⁅B,K⁆| = |A|^{|H| − |H:K|}`** (書籍の形)
+- 積の形 `card_cosetProdKer_mul` (`|⁅B,K⁆| · |A|^{|H:K|} = |A|^{|H|}`; ℕ の切り捨て減算を避ける)
+
+支持部品: `rightCosetSetoid` / `cosetRep` (`Quotient.out` による代表元) + 3 補題 /
+`filter_mem_cosetRep` / `cosetProdRepHom` (各代表元での剰余類積、核 = `cosetProdKer`、全射) /
+`card_cosetRepFixed` (代表元の個数 = `K.index`; `K × T ≃ Q`, `(k,t) ↦ kt` の全単射から)。
+
+⚠ **4A.8(b) は `K = ⊤` の特殊化**なので従来の独立証明 (~70 行) を削除し
+`cosetProdKer_top` 経由の系に置換した (同事実の二重管理を解消)。
+
+⚠ 教訓: `open scoped Classical in` は **docstring より前**に置く (後ろだと parse error) /
+`Nat.card ⁅A,B⁆` は `(… : Subgroup G)` の型註釈が要る (`Bracket … Type` に取られる) /
+`Fintype ↥K` は `[Fintype Q]` だけでは合成されない (classical か `DecidablePred` が要る)。
+
+以下は着手前の設計メモ (実装は概ねこの通り):
+
+#### 4A.11 の設計 (2026-07-25、着手前メモ)
+
+書籍 (p.125): `G = A ≀ H` 正則 wreath (`A` 可換, `H` 有限), base `B = {f : H → A}`, `K ⊆ H`。
+**`⁅B,K⁆` = 「`H` の各**左**剰余類上で値の積が単位元」な `f` 全体**、したがって
+**`|⁅B,K⁆| = |A|^{|H| − |H:K|}`**。hint の作用は `f^h(x) = f(x h⁻¹)`。
+
+⚠ **repo の wreath は左移動** (`shiftHom q f ω = f (q⁻¹ω)`, `commutatorElement_inl_inr`) なので、
+`Δ_q` が触る位置は `{ω, q⁻¹ω}`、`q ∈ K` を動かすと **右剰余類 `Kω`**。剰余類の**個数**は
+左右で同じなので位数の主張は不変。docstring に convention 差を明記すること。
+
+- 定義: `cosetProdKer K : Subgroup (Q → D)` = `{f | ∀ ω, ∏ k : K, f (k * ω) = 1}`
+  (`∏ k : K` と書けば Finset の剰余類を扱わずに済むのが要点)。
+- **⊆**: `Subgroup.commutator_le` で生成元 `⁅inl f, inr q⁆ = inl (Δ_q f)` (`q ∈ K`) に帰着。
+  `∏_k (Δ_q f)(kω) = ∏_k f(kω) · (∏_k f(q⁻¹kω))⁻¹` で `k ↦ q⁻¹k` は `K` の全単射ゆえ 1。
+- **⊇**: 既存 4A.8(b) (`commutator_range_inl_range_inr_eq`) の証明を一般化。
+  * `hgen`: `⁅inl (δ_x d), inr (y·x⁻¹)⁆ = inl (δ_x d · (δ_y d)⁻¹)` は **`y·x⁻¹ ∈ K`**
+    (⟺ `y ∈ Kx` 同一右剰余類) のときに `⁅B, K.map inr⁆` の元。
+  * 分解: 代表元関数 `ρ` (各右剰余類から 1 点、クラス上定数) を取り
+    `f = ∏_{x:Q} (δ_x (f x) · (δ_{ρ x}(f x))⁻¹)`。評価すると
+    `f ω · (∏_{x : ρ x = ω} f x)⁻¹` で、`ρ ω ≠ ω` なら空積、`ρ ω = ω` なら剰余類上の積 = 1。
+  * `ρ` は `MulAction.orbitRel` (K の左移動作用、軌道 = 右剰余類) の `Quotient.out`、
+    または `QuotientGroup.rightRel K` の `Quotient.out` で作る。
+- **位数**: `cosetProdKer K = ker Φ`, `Φ : (Q→D) →* (剰余類 → D)`, `Φ f C = ∏_{y∈C} f y` は全射
+  ⟹ `|ker| = |D|^{|Q|} / |D|^{|Q:K|} = |D|^{|Q| − |Q:K|}`。
+
+⚠ **4A.8(b) は `K = ⊤` の特殊化**なので、一般版が landing したら
+`ProblemsWreath.lean` の `commutator_range_inl_range_inr_eq` を一般版の系に置換して
+重複を消す (単一右剰余類 `Q` 上の積 = `coordProdHom`)。一般版は ProblemsWreath 内に置くのが
+import 方向的に自然 (現 1033 行 + ~250 行で 1500 上限内)。
+
+#### 🎉 4A.9 完了 (2026-07-25) — 新 leaf `ProblemsIteratedCommutator.lean`
+
+**主結果** (実証明・axiom-clean):
+- `isSubnormal_iff_commIterate_le` = **(a)** (`N ⊴ G`, `N ⊔ A = ⊤`, `M` 安定 ⟹ `A ◁◁ G ⟺ M ≤ A`)
+- `commIterate_le_nilpotentResidual` = **(b)** (`M ≤ A` ⟹ `M ≤ A^∞`; `N` 正規も `G = NA` も不要)
+- `exists_commIterate_stable` (有限群で最終項 `M` が存在 = 系列の安定化)
+
+再利用可能な副産物: `commIterate` (始点と交換相手が別の反復交換子列) と単調性・加法性 /
+`le_normalizer_of_forall_conj_mem` / **`le_normalizer_commutator_left`・`_right`**
+(`⁅H,K⁆` は両因子で正規化される) / `exists_commIterate_top_le_of_isSubnormal`
+(部分正規性の **defect 形** `∃ d, ⁅⊤,A;d⁆ ≤ A`)。
+
+以下は着手前の設計メモ (実装は概ねこの通り):
+
+#### 4A.9 の設計 (2026-07-25、PDF p.137 = 書籍 p.124 で statement 確定)
+
+`G = NA` (`N ⊴ G`, `A ≤ G`)、`M` = 系列 `N ⊇ ⁅N,A⁆ ⊇ ⁅N,A,A⁆ ⊇ ⋯` の最終項。
+**(a) `A ◁◁ G` (⚠ subnormal、PDF 画像で `⊲⊲` を確認) ⟺ `M ⊆ A`** / **(b) `M ⊆ A` なら `M ⊆ A^∞`**。
+
+- 定義: `commIterate N A 0 = N`, `commIterate N A (i+1) = ⁅commIterate N A i, A⁆`
+  (新 leaf `Ch04_Commutators/ProblemsIteratedCommutator.lean`)。
+- **(a) ⟸**: 部分正規鎖は `A = L_k A ≤ ⋯ ≤ L_1 A ≤ L_0 A = N ⊔ A = ⊤` (`L_i := commIterate`)。
+  各段 `W := L_{i+1} ⊔ A ⊴ L_i ⊔ A` は `Subgroup.normal_subgroupOf_iff_le_normalizer` +
+  `sup_le` で 2 本に分ける:
+  * `A ≤ N_G(W)`: `A ≤ W` ゆえ `⁅A,W⁆ ≤ ⁅W,W⁆ ≤ W` (`le_normalizer_of_commutator_le`)。
+  * `L_i ≤ N_G(W)`: 共役 `f = MulAut.conj x` (`x ∈ L_i`) で `W.map f = L_{i+1}.map f ⊔ A.map f`
+    (`Subgroup.map_sup`)。`L_{i+1}.map f = L_{i+1}` は「**`⁅H,K⁆` は `H` で正規化される**」
+    (`⁅hx,y⁆ = h⁅x,y⁆h⁻¹⁅h,y⁆` = `commutatorElement_mul_left_eq_conj_mul` から)、
+    `A.map f ≤ W` は `xax⁻¹ = ⁅x,a⁆·a ∈ L_{i+1}A`。`x⁻¹` にも適用して両包含。
+  ⚠ `⁅H, K ⊔ L⁆` の分配は偽なので使わない (`sup_le` を **normalizer 側**で使うのが要点)。
+- **(a) ⟹**: `IsSubnormal A` の構造帰納で **`∃ d, commIterate ⊤ A d ≤ A`** (defect 版):
+  `top` は `d = 0`、`step (A ≤ K) (K subnormal) (A ⊴ K)` は IH の `d` に対し
+  `commIterate ⊤ A d ≤ commIterate ⊤ K d ≤ K` (第 2 引数単調) から
+  `commIterate ⊤ A (d+1) = ⁅…, A⁆ ≤ ⁅K,A⁆ ≤ A`。あとは `M = ⁅M,A⁆` を `d` 回反復して
+  `M = commIterate M A d ≤ commIterate ⊤ A d ≤ A`。
+- **(b)**: `M = ⁅M,A⁆` と `M ≤ A` から `M = commIterate M A i ≤ Subgroup.lowerCentralSeries A i`
+  (∀ i) ⟹ `M ≤ ⨅ i, … = nilpotentResidual A` (= `A^∞`)。
+  ⚠ `nilpotentResidual` は `Ch09_MoreSubnormality/NilpotentResidual.lean` だが、そこは
+  **Ch01 しか import しない**ので Ch04 から import しても cycle 無し (実測済)。
+- `M` は「最終項」= 有限性で `L k = L (k+1)` となる `k` の値。仮説として
+  `hM : commIterate N A k = commIterate N A (k+1)` を取る形が扱いやすい
+  (存在は減少列の安定性から別途)。
 
 ### §1D の欠落 (2026-07-25 に発見・補充)
 
@@ -1136,7 +2295,8 @@ class を決める。⟹ **群環の `(x-1)`-filtration を Lean で立てるの
 | 1D.19 | ✅ | `Ch01.le_fitting_subgroupOf_of_commutator_le` (+ `center_fitting_map_eq_inf_centralizer`) |
 | 3B.15 | ✅ | `normal_of_index_minimal` (Berkovich) |
 
-⟹ **§3B は 3B.1-3B.15 全完** (3B.12 のみ訂正版)。**Isaacs Ch.3 の章末演習は 3A.6 を除いて全完**。
+⟹ **§3B は 3B.1-3B.15 全完** (3B.12 のみ訂正版)。**2026-07-26 に 3A.6 も完了したので
+Isaacs Ch.3 の章末演習は全問完済** ⟹ あわせて **Isaacs Ch.1–Ch.4 の章末演習が全問完済**。
 
 **設計メモ**:
 

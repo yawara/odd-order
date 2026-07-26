@@ -70,4 +70,23 @@ theorem cyclic_eq_of_orderOf_eq_two {C : Type*} [Group C] [Finite C] [IsCyclic C
   exact congrArg Subtype.val
     (Subsingleton.elim (⟨s, hs⟩ : {x : C // orderOf x = 2}) ⟨t, ht⟩)
 
+/-- In a finite cyclic group, a subgroup of any order dividing `|C|` exists.
+
+Companion to `cyclic_subgroup_eq_of_card_eq`: together they say that a finite cyclic group has
+exactly one subgroup of each order dividing `|C|`.  The witness is `(powMonoidHom d).ker`, whose
+order is `gcd (Nat.card C) d = d`. -/
+theorem exists_subgroup_card_eq_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    {d : ℕ} (hd : d ∣ Nat.card C) : ∃ H : Subgroup C, Nat.card H = d := by
+  letI : CommGroup C := IsCyclic.commGroup
+  refine ⟨(powMonoidHom d : C →* C).ker, ?_⟩
+  rw [IsCyclic.card_powMonoidHom_ker (G := C) d, Nat.gcd_eq_right hd]
+
+/-- Every subgroup of a finite cyclic group is characteristic (it is the unique subgroup of
+its order, by `cyclic_subgroup_eq_of_card_eq`). -/
+theorem characteristic_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    (M : Subgroup C) : M.Characteristic :=
+  Subgroup.characteristic_iff_map_eq.mpr fun ϕ =>
+    cyclic_subgroup_eq_of_card_eq
+      (Nat.card_congr (Subgroup.equivMapOfInjective M ϕ.toMonoidHom ϕ.injective).toEquiv.symm)
+
 end OddOrder.GroupTheory
