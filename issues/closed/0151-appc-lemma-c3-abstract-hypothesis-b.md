@@ -619,3 +619,67 @@ BG へ移す試行を行った。良い知らせ: **このブロックが `hyp` 
    BG のを `extends` しているので **親経由の dot 記法で移設先を拾える** (検証済)。
    ⟹ file 単位で進められる。
 4. 以降 `S16_CoreBounds` → `S16_AppendixC3` → … と同様に移設。
+
+---
+
+# ✅ 完了 (2026-07-26)
+
+## 到達点
+
+```lean
+theorem OddOrder.BG.AppC.theoremC_of_hypothesisBAbstract
+    {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (hb : HypothesisBAbstract p q G) (hq : q.Prime) (hA : conditionA p q) : p ≤ q
+```
+
+**書籍 p. 145 の Theorem C そのもの**。statement に `S16.Hypothesis` も
+`FieldNormalizerData` も現れず、`q < p` の暗黙前提も無い。`p` の奇性も仮定しない
+(Remark (V) で偶の場合は自明; `le_of_conditionA_of_not_odd`)。
+
+本 issue の穴だった **抽象 (B) ⟹ `hrel`** は
+`FieldNormalizerData.normSetGeneratorRelation_of_hypothesisB` として埋まった。
+
+`theoremC_sl2` (`AppC_SL2Example`) が書籍 Remark (II) の `SL(2, 2^q)` 例に
+`theoremC_of_hypothesisBAbstract` を実際に適用しており、**仮説 (B) が空虚でなく、
+Theorem C が §16 のデータを隠れて使っていない**ことが機械検証されている。
+
+## 実施したこと (commit 順)
+
+| commit | 内容 |
+|---|---|
+| `c6089166b` | 移設ブロック 1 の前提層 5 本を `(p, q)` 化 (`AppC_FrobeniusBasics`) |
+| `603c73ae6` | ブロック 1: 輸送された配置 29 宣言 → `AppC_LemmaC3_Setup` |
+| `0550856c5` | Step 4 出力インターフェース 7 宣言 → `AppC_LemmaC3_Setup` |
+| `33e1ff151` | ブロック 2: 共役素体直線 74 宣言 → `AppC_LemmaC3_ConjugateLine` |
+| `4e902da57` | ブロック 3–6 (94 宣言) + Theorem C の閉包 |
+
+### 最終的な file 構成 (BG 側、全 6 leaf / 4,437 行)
+
+| leaf | 行 | 内容 |
+|---|---|---|
+| `AppC_LemmaC3_Setup` | 562 | Step 4 出力インターフェース + 輸送された配置 (`s`, `U ≅ σ(U)`, `PU`, `P char PU`, Step 1–2) |
+| `AppC_LemmaC3_ConjugateLine` | 1131 | 共役直線 `P₁ = W₂^y`、`t`、`tConjNormOneUnitsAut`、`W₂`-`Q` 相互作用 |
+| `AppC_LemmaC3_ScalarCalculus` | 531 | スカラー `s^x`、(C.2)、語 `M₁ M₂ M₃` |
+| `AppC_LemmaC3_NormalForms` | 792 | (C.4) connector、(C.5) 正規形、`c₁ ≠ 0`/`c₃ ≠ 0`、(C.7) |
+| `AppC_LemmaC3_Step4Capstone` | 866 | (C.9)/(C.10)、Step 3 bad branch、`Step4Capstone` |
+| `AppC_LemmaC3_FixedPointFree` | 555 | 不動点自由性 ⟹ `s₁ = s⁻¹` ⟹ `normSetGeneratorRelation` |
+
+削除した S16 file: `S16_CoreBounds` / `S16_AppendixC3` / `S16_CoreSetupBasic` /
+`S16_CoreSetup` / `S16_NonExistenceGCore`。`S16_CoreLemmas` は 1234 → 588 行に縮小し、
+残るのは `S16.Hypothesis` と pin 付き `FieldNormalizerData`、および §16 固有の数値補題のみ。
+
+### 除去できた強化仮説
+
+書籍が要求しないのに repo が使っていた特殊化 3 種:
+
+1. `Q_elementaryAbelian` → 書籍どおり「有限可換 `p'`-部分群」で足りると実証
+   (5 箇所の用途はすべて `Q_commutative` / `Q_pPrime` / `eq_one_of_mem_Q_of_pow_p_eq_one` で代替)
+2. `p_eq_card_W2` (`|W₂| = p` を仮説として持つ) → `card_primeLine` + σ 単射から**導出**
+3. `Q_pow_q_eq_one` → 不要 (consumer は「`Q` の `p`-元は自明」しか使っていなかった)
+
+## 残る特殊化債務 (別 issue 相当、低優先)
+
+* **`[Finite G]`**: `theoremC_of_hypothesisBAbstract` は `G` 全体の有限性を要求するが、
+  書籍の (B) は `Q` の有限性しか言わない。使用箇所は Step 3
+  (`step3_inf_conj_eq_U_of_mem_P1` 等の共役・正規化子の counting) に限られるので、
+  `PU` と `Q` の有限性だけに緩められる可能性が高い。

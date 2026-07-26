@@ -5104,14 +5104,21 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.hypothesisBAbstract_sl2
 #assert_only_allowed_axioms OddOrder.BG.AppC.theoremC
 #assert_only_allowed_axioms OddOrder.BG.AppC.theoremC_of_hypothesisBAbstract
+-- **BG App.C Theorem C が (A)+(B) だけから閉じた** (issue 0151 完了, 2026-07-26):
+-- 欠けていた含意「抽象仮説 (B) ⟹ 生成関係 `∀ a ∈ E, N(2a − 1) = 1`」(= Lemma C.3 の
+-- 群論的内容) が埋まり、Theorem C の statement から Peterfalvi §16 が消えた。
+-- `theoremC_sl2` は書籍 Remark (II) の `SL(2, 2^q)` 例に実際に適用した確認 —
+-- 仮説 (B) が空虚でなく、Theorem C が §16 のデータを隠れて使っていないことの機械検証。
+#assert_only_allowed_axioms OddOrder.BG.AppC.theoremC_of_hypothesisB
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.FieldNormalizerData.normSetGeneratorRelation_of_hypothesisB
+#assert_only_allowed_axioms OddOrder.BG.AppC.theoremC_sl2
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.normSetTwistedUnitStep_of_field_step
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.normSetGeneratorRelation_of_twisted_unit_step
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.normSetGeneratorRelation_of_twisted_normOne_step
-#assert_only_allowed_axioms
-  OddOrder.BG.AppC.FieldNormalizerData.normSetGeneratorRelation_of_hypothesisB
 
 #assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.sigma_eq_left_eq
 #assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.sigma_eq_right_eq

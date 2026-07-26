@@ -511,4 +511,14 @@ noncomputable def hypothesisBAbstract_sl2 (q : ℕ) (hq : q ≠ 0) :
       rw [MulAut.conj_apply, inv_inv, SL2.elemY_inv_conj_upper_one]
       exact elemW_mem_normalizer_complement q hq
 
+/-- **Theorem C runs on Remark (II)**: applying `theoremC_of_hypothesisBAbstract` to the
+`SL(2, 2^q)` witness of hypothesis (B) gives `2 ≤ q`.
+
+The conclusion is of course immediate for a prime `q`; the content is that the route
+*(A) + (B) ⟹ `p ≤ q`* really is closed on a configuration having nothing to do with the
+Feit--Thompson spine.  Hypothesis (B) is therefore not vacuous, and Theorem C is not secretly
+using Section 16 data. -/
+theorem theoremC_sl2 (q : ℕ) (hq : q.Prime) : 2 ≤ q :=
+  theoremC_of_hypothesisBAbstract (hypothesisBAbstract_sl2 q hq.ne_zero) hq (conditionA_two q)
+
 end OddOrder.BG.AppC
