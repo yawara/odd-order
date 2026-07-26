@@ -138,6 +138,33 @@ theorem sq_mem_center_of_index_center_eq_four {P : Type*} [Group P] [Finite P]
   rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff] at this
   exact this
 
+/-- `|P : Z(P)| = 4` なら `P/Z(P)` は可換, すなわち `P' ≤ Z(P)`。
+
+`P/Z(P)` の全元が `g² = 1` をみたす (`sq_mem_center_of_index_center_eq_four`) ので
+`g⁻¹ = g`, したがって `gk = (gk)⁻¹ = k⁻¹g⁻¹ = kg`。 -/
+theorem commutator_le_center_of_index_center_eq_four {P : Type*} [Group P] [Finite P]
+    (h : (Subgroup.center P).index = 4) : commutator P ≤ Subgroup.center P := by
+  have hsq : ∀ g : P ⧸ Subgroup.center P, g ^ 2 = 1 := by
+    intro g
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective g
+    rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+    exact sq_mem_center_of_index_center_eq_four h x
+  have hinv : ∀ w : P ⧸ Subgroup.center P, w⁻¹ = w := fun w => by
+    have hw := hsq w
+    rw [pow_two] at hw
+    exact inv_eq_of_mul_eq_one_right hw
+  have habel : ∀ g k : P ⧸ Subgroup.center P, g * k = k * g := by
+    intro g k
+    calc g * k = (g * k)⁻¹ := (hinv _).symm
+      _ = k⁻¹ * g⁻¹ := mul_inv_rev g k
+      _ = k * g := by rw [hinv, hinv]
+  rw [commutator_def]
+  refine Subgroup.commutator_le.mpr fun a _ b _ => ?_
+  rw [← QuotientGroup.eq_one_iff, commutatorElement_def]
+  simp only [QuotientGroup.mk_mul, QuotientGroup.mk_inv]
+  rw [← commutatorElement_def]
+  exact commutatorElement_eq_one_iff_mul_comm.mpr (habel _ _)
+
 /-- **6B.8 の base case**: `|P| = 8` かつ `|P : P'| = 4` なら `P` は `D_8` か `Q_8`。
 
 `|P'| = 2 ≠ 1` から非可換なので repo の Cor 6.14
