@@ -58,6 +58,21 @@ theorem exists_orderOf_eq_two_mem_commutator_center {P : Type*} [Group P] [Finit
     rw [← pow_succ]; congr 1; omega
   rw [hsplit, Nat.mul_div_cancel_left _ (by positivity)]
 
+/-- **書籍 hint のステップ 2**: `Z ⊴ P` が `Z ≤ P'` をみたすなら剰余群で指数が保たれる:
+`|P/Z : (P/Z)'| = |P : P'|`。
+
+`(P/Z)' = P'/Z` (全射準同型で交換子群は像に写る) と, 核を含む部分群の指数が像で保たれる
+ことから。帰納法が回る鍵。 -/
+theorem index_commutator_quotient {P : Type*} [Group P] {Z : Subgroup P} [Z.Normal]
+    (hZ : Z ≤ commutator P) :
+    (commutator (P ⧸ Z)).index = (commutator P).index := by
+  have hsurj : Function.Surjective (QuotientGroup.mk' Z) := QuotientGroup.mk'_surjective Z
+  have hmap : commutator (P ⧸ Z) = (commutator P).map (QuotientGroup.mk' Z) := by
+    rw [commutator_def, commutator_def, Subgroup.map_commutator,
+      Subgroup.map_top_of_surjective _ hsurj]
+  rw [hmap]
+  exact Subgroup.index_map_eq _ hsurj (by rwa [QuotientGroup.ker_mk'])
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
