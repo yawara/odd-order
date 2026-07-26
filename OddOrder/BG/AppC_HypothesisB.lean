@@ -108,4 +108,73 @@ structure HypothesisBAbstract (p q : ℕ) [Fact p.Prime] (G : Type*) [Group G] w
       Subgroup.normalizer
         (((NormSet.normOneFrobeniusComplement p q).map sigma : Subgroup G) : Set G)
 
+/-! ## Hypothesis (B) with the three images named -/
+
+section Data
+
+variable {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+
+/-- **Field-normalizer data**: hypothesis (B) together with condition (A), with the three
+subgroups `σ(P)`, `σ(U)`, `σ(P₀)` given names.
+
+This is the shape in which the Lemma C.1--C.3 development consumes Theorem C's hypotheses: the
+proofs constantly refer to the ambient subgroups `P = σ(P)`, `U = σ(U)` and `W₂ = σ(P₀)` of `G`,
+so it is convenient to carry them as fields with their defining equations rather than to unfold
+`Subgroup.map` everywhere.
+
+The packaging adds **nothing**: `HypothesisBAbstract.toFieldNormalizerData` builds it from (B)
+and (A) alone, taking the three subgroups to be literally the images (all three equations are
+`rfl`).  So a `FieldNormalizerData` is exactly "(A) and (B)". -/
+structure FieldNormalizerData (p q : ℕ) [Fact p.Prime] (G : Type*) [Group G]
+    extends HypothesisBAbstract p q G where
+  /-- The image `P = σ(P)` of the additive kernel. -/
+  P : Subgroup G
+  /-- The image `U = σ(U)` of the norm-one complement. -/
+  U : Subgroup G
+  /-- The image `W₂ = σ(P₀)` of the prime-field line. -/
+  W2 : Subgroup G
+  /-- `P` is the image of the additive kernel. -/
+  sigma_P_eq_P : (NormSet.normOneFrobeniusKernel p q).map sigma = P
+  /-- `U` is the image of the norm-one complement. -/
+  sigma_U_eq_U : (NormSet.normOneFrobeniusComplement p q).map sigma = U
+  /-- `W₂` is the image of the prime-field line. -/
+  sigma_P0_eq_W2 : (primeLine p q).map sigma = W2
+  /-- `q` is prime (the standing hypothesis of Theorem C). -/
+  q_prime : q.Prime
+  /-- Condition (A). -/
+  cyclotomic_coprime : conditionA p q
+
+namespace FieldNormalizerData
+
+/-- `W₂ = σ(P₀)` normalizes `Q`: clause (B) read through `sigma_P0_eq_W2`. -/
+theorem W2_normalizes_Q (data : FieldNormalizerData p q G) :
+    data.W2 ≤ Subgroup.normalizer (data.Q : Set G) := by
+  rw [← data.sigma_P0_eq_W2]
+  exact data.primeLine_normalizes_Q
+
+/-- `W₂^y` normalizes `U`: clause (B) read through `sigma_P0_eq_W2` and `sigma_U_eq_U`. -/
+theorem W2_conj_y_normalizes_U (data : FieldNormalizerData p q G) :
+    MulAut.conj data.y • data.W2 ≤ Subgroup.normalizer (data.U : Set G) := by
+  rw [← data.sigma_P0_eq_W2, ← data.sigma_U_eq_U]
+  exact data.primeLine_conj_normalizes_U
+
+end FieldNormalizerData
+
+/-- Hypothesis (B) together with condition (A) *is* field-normalizer data: take the three named
+subgroups to be the images themselves.  This is what makes `FieldNormalizerData` a pure
+repackaging rather than a strengthening. -/
+noncomputable def HypothesisBAbstract.toFieldNormalizerData (hb : HypothesisBAbstract p q G)
+    (hq : q.Prime) (hA : conditionA p q) : FieldNormalizerData p q G where
+  toHypothesisBAbstract := hb
+  P := (NormSet.normOneFrobeniusKernel p q).map hb.sigma
+  U := (NormSet.normOneFrobeniusComplement p q).map hb.sigma
+  W2 := (primeLine p q).map hb.sigma
+  sigma_P_eq_P := rfl
+  sigma_U_eq_U := rfl
+  sigma_P0_eq_W2 := rfl
+  q_prime := hq
+  cyclotomic_coprime := hA
+
+end Data
+
 end OddOrder.BG.AppC
