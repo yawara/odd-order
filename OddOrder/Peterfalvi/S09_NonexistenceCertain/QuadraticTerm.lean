@@ -42,9 +42,11 @@ The headline output (Peterfalvi (7.8.c), p. 40) is:
 * (i)  For χ ∈ Irr(G) with `χ ⊥ S^ν`, `χ^ρ(x) = star (β, χ)_G` for every `x ∈ A`.
 * (ii) `‖χ^ρ‖² = (|A|/|L|) · (β, χ)_G · star (β, χ)_G`.
 
-(i) — `chiRho_eq_inner_beta_on_A` — is carried as the structural certificate
-`chiRho_eq_inner_beta` inside `Hypothesis78` (the coherence-based derivation
-from (7.7.a) is the subject of Peterfalvi (7.8.c) and is not yet formalized).
+(i) — `chiRho_eq_inner_beta_on_A` — is a field of `Hypothesis78`, so that consumers can cite it
+directly; it is **not** an assumed certificate.  Every construction of `Hypothesis78` discharges
+it: `hypothesis78OfDade` (`S09_CertificateBasic`) derives it from `(7.1)` plus coherence alone,
+via `chiRho_eq_inner_beta_induced`, which runs the coherence-based derivation from `(7.7.a)`
+(issue 1013).  The Frobenius-family and Section 16 instances go through that construction.
 (ii) — `chiRho_norm_sq_eq_card_ratio_mul` — is then a direct corollary of (i):
 the inner product is `(1/|L|) Σ_{l : L} χ^ρ(l) · star (χ^ρ(l))`; off `A` the
 summands vanish, on `A` each equals `star (β,χ) · (β,χ)`, and the number of
@@ -54,8 +56,9 @@ summands vanish, on `A` each equals `star (β,χ) · (β,χ)`, and the number of
 coherence input for `S = T \ {Ind 1_H}` and a distinguished `ζ ∈ S` of degree
 `e = [L:H] = (Ind 1_H)(1)`.
 
-The (7.8.c) conclusion (the pointwise identity on `A`) is carried as the
-structural certificate `chiRho_eq_inner_beta`. -/
+The (7.8.c) conclusion (the pointwise identity on `A`) is the field
+`chiRho_eq_inner_beta`; `hypothesis78OfDade` discharges it from `(7.1)` plus coherence, so it is
+a *conclusion carried in the record*, not an extra assumption. -/
 structure Hypothesis78 (G : Type*) [Group G] [Fintype G]
     (A : Set G) (L : Subgroup G) [Fintype L]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where

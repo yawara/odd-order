@@ -1221,8 +1221,13 @@ consumer は (5.7) engine を使う。
    Hypothesis (B) の `p, q, G`-抽象形 `HypothesisBAbstract` を立て、書籍どおりの
    `p = 2`, `G = SL(2, 2^q)`, `σ(P)` = 上三角ユニポテント, `σ(U)` = 分裂トーラス,
    `y = [[0,1],[1,1]]`, `Q = ⟨y⟩` (位数 3) が (A)+(B) を満たすことを axiom-clean で構成。
-   **残った穴 = 抽象 (B) ⟹ `hrel` の含意** (= Lemma C.3 の群論的内容; 現状 S16 経由のみ)
-   → [issue 0151](../../issues/0151-appc-lemma-c3-abstract-hypothesis-b.md)。
+   残っていた穴「抽象 (B) ⟹ `hrel`」(= Lemma C.3 の群論的内容) も **2026-07-26 に完了**
+   ([issue 0151 closed](../../issues/closed/0151-appc-lemma-c3-abstract-hypothesis-b.md))。
+   C.3 chain 6 file (~4,400 行 / 197 宣言) を Peterfalvi §16 から BG へ物理移設して
+   `(p, q, G)` 化し、`theoremC_of_hypothesisBAbstract` として書籍 Theorem C を
+   **仮説まで含めて完全一致**させた (奇性も `G` の有限性も仮定しない)。
+   `theoremC_sl2` が Remark (II) の witness に実際に適用されており、(B) が空虚でないことも
+   機械検証済。
 3. ~~**BG §16 tamely imbedded**~~ — **2026-07-26 完了 (issue 8005 closed)**。着手前実測で
    「issue の checklist が stale」と判明: Thm I 復元は済、Thm II (Tii)(a)–(e)+(Tiii) も
    statement-first でなく**実証明**で済んでおり `theoremII_tamelyImbedded` は unconditional
