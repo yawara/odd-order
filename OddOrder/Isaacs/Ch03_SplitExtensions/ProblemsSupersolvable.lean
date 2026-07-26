@@ -62,18 +62,23 @@ theorem IsSupersolvable.isSolvable {G : Type*} [Group G] (h : IsSupersolvable G)
   haveI := hnorm i
   exact commutator_le_of_eq_sup_zpowers hx
 
-/-- 超可解群の商群も超可解. -/
-theorem IsSupersolvable.quotient {G : Type*} [Group G] (h : IsSupersolvable G) (K : Subgroup G)
-    [K.Normal] : IsSupersolvable (G ⧸ K) := by
+/-- 超可解群の**全射像**も超可解 (超可解列を押し出すだけ). -/
+theorem IsSupersolvable.of_surjective {G H : Type*} [Group G] [Group H] (h : IsSupersolvable G)
+    {f : G →* H} (hf : Function.Surjective f) : IsSupersolvable H := by
   obtain ⟨r, N, hnorm, h0, hr, hstep⟩ := h
-  refine ⟨r, fun i => (N i).map (QuotientGroup.mk' K), fun i => ?_, ?_, ?_, fun i hi => ?_⟩
-  · exact (hnorm i).map _ (QuotientGroup.mk'_surjective K)
+  refine ⟨r, fun i => (N i).map f, fun i => ?_, ?_, ?_, fun i hi => ?_⟩
+  · exact (hnorm i).map _ hf
   · simp only [h0, Subgroup.map_bot]
-  · simp only [hr, Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective K)]
+  · simp only [hr, Subgroup.map_top_of_surjective _ hf]
   · obtain ⟨x, hxmem, hx⟩ := hstep i hi
-    refine ⟨(QuotientGroup.mk' K) x, Subgroup.mem_map_of_mem _ hxmem, ?_⟩
+    refine ⟨f x, Subgroup.mem_map_of_mem _ hxmem, ?_⟩
     simp only
     rw [hx, Subgroup.map_sup, MonoidHom.map_zpowers]
+
+/-- 超可解群の商群も超可解 (`IsSupersolvable.of_surjective` の特殊化). -/
+theorem IsSupersolvable.quotient {G : Type*} [Group G] (h : IsSupersolvable G) (K : Subgroup G)
+    [K.Normal] : IsSupersolvable (G ⧸ K) :=
+  h.of_surjective (QuotientGroup.mk'_surjective K)
 
 /-- **Isaacs Problem 3B.7(a)** (書籍 p. 85): 有限**超可解**群の極小正規部分群の位数は**素数**.
 

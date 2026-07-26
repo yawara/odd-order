@@ -31,8 +31,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.2 Subnormality
 - [ ] Ch.3 Split Extensions
 - [ ] Ch.4 Commutators
-- [x] Ch.5 Transfer — **着手 (2026-07-26)**、下記 §5A 節参照
-- [ ] Ch.6 Frobenius Actions
+- [x] Ch.5 Transfer — **🎉 完済 (2026-07-27)**: §5A–§5E 全問
+- [ ] Ch.6 Frobenius Actions — **着手 (2026-07-27)**: §6A 進行中
 - [ ] Ch.7 Thompson Subgroup
 - [ ] Ch.8 Permutation Groups
 - [ ] Ch.9 More Subnormality
@@ -1447,10 +1447,10 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.7 | ✅ 完了 (`normal_sylow_three_of_card_eq`) | `\|G\| = 3^a·5·11` ⇒ Sylow-3 が正規 |
 | 5C.8 | ✅ 完了 (`hasNormalPComplement_of_minFac_of_not_dvd_pow_three`) | `p` が最小素因数 (`p > 2`) で `p^3 ∤ \|G\|` ⇒ 正規 p-補群 |
 | 5C.9 | ✅ 完了 (`three_dvd_card_of_isSimpleGroup_of_not_dvd_eight`) | 非可換単純で偶数位数、`8 ∤ \|G\|` ⇒ `3 \| \|G\|` |
-| 5C.10 | ⬜ | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
-| 5C.11 | ⬜ | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
-| 5C.12 | ⬜ | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
-| 5C.13 | ⬜ | (Navarro) `P = N_G(P)'` なる Sylow `P` ⇒ `N_G(P)` が正規 p-補群をもつ |
+| 5C.10 | ✅ 完了 (`seven_dvd_card_of_isSimpleGroup_of_card_sylow_two_eq_eight`) | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
+| 5C.11 | ✅ 完了 (`hasNormalPComplement_of_hall_le_center_normalizer`) | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
+| 5C.12 | ✅ 完了 (`hasNormalPComplement_of_isCyclic_sylow_of_dvd_index`) | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
+| 5C.13 | ✅ 完了 (`hasNormalPComplement_normalizer_commutator_of_selfNormalizing_sylow`) | (Navarro) **自己正規化** Sylow `P = N_G(P)` ⇒ `N_G(P')` が正規 p-補群をもつ (⚠ 旧記載の `P = N_G(P)'` は誤読、PDF p.164 で確認) |
 
 ### 5C.2 の証明 (2026-07-26 に導出、PDF p.162 = PDF ページ 175 で主張確認済)
 
@@ -1560,6 +1560,118 @@ instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbit
 の implicit/explicit の並びを確認してから書く)。
 `|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
 `G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
+
+### 5C.13 の実装メモ (2026-07-27) — §5C 完済
+
+⚠ **書籍読解の訂正**: この表の旧記載「`P = N_G(P)'` なる Sylow」は**誤読**。PDF ページ画像
+(書籍 p.164 = PDF p.177) で確認した正しい主張は
+
+> (Navarro) `P` が **自己正規化** Sylow (`P = N_G(P)`) ⟹ **`N_G(P')`** が正規 `p`-補群をもつ
+
+(仮定側が `P = N_G(P)`、結論側が `N_G(P')`)。hint 中の「`X` を Hall `p`-部分群」も
+`p'`-部分群の誤植 (そうでないと `G = P' N_G(X)` が成立しない)。
+
+新 leaf `Problems5C13.lean` (316 行)。`H := N_G(P')` に取り替えると `P ≤ H`・`N_H(P) = P`・
+`P' ⊴ H` なので、**還元形** `hasNormalPComplement_of_selfNormalizing_sylow_of_commutator_normal`
+(「`N_G(P) = P` かつ `⁅P,P⁆ ⊴ G` ⟹ `G` が正規 `p`-補群」) に帰着する。還元形の証明:
+
+1. `L := ⁅P,P⁆` として `G/L` の Sylow `P̄ = P/L` は**可換** (`L` は `P` の交換子群) かつ
+   **自己正規化** (`π⁻¹(P̄) = ↑P ⊔ ker π = ↑P` と `N_G(P) = P`) ⟹ **Burnside (Thm 5.13)** で
+   `G/L` に正規 `p`-補群 `K̄`。`K := π⁻¹(K̄)`。
+2. `L` は `K` の正規 Hall `p`-部分群 ⟹ **Schur–Zassenhaus** (`exists_right_complement'_of_coprime`)
+   で補群 `X' ≤ ↥K`、`X := X'.map K.subtype`。
+3. **Frattini**: `Ch03.exists_conj_le_of_isComplement'_of_coprime'` (3B.4 で一般化した D-part、
+   ⭐ **共役元が `M` の中に取れる**強化形がここで効く) を `↥K` で使い `G = L · N_G(X)`。
+4. **Dedekind**: `z ∈ P` を `z = y·n` (`y ∈ L ≤ P`, `n ∈ N_G(X)`) と分解すると `n ∈ P` なので
+   `⊤ = (N_G(X)).subgroupOf P ⊔ Φ(P)` (`L.subgroupOf P = commutator ↥P ≤ Φ(P)` は Problem 1D.8
+   `commutator_le_frattini`)。`frattini_nongenerating` で `P ≤ N_G(X)`。
+5. `L ≤ P ≤ N_G(X)` と 3 から `N_G(X) = ⊤` ⟹ `X ⊴ G`。`|X| = |K̄|` は `p` と素、
+   `|G:X| = |L|·|K̄ の指数|` は `p`-冪 ⟹ 新 helper
+   `hasNormalPComplement_of_normal_of_index_eq_pow` で結論。
+
+⚠ 実装の罠: `MulAut G` の `Subgroup G` への pointwise 作用は、`•` 記法で書いた goal でないと
+`mul_smul` / `pointwise_smul_def` が発火しない (`Subgroup.map ↑(MulAut.conj g) S` の形になった
+goal では不可) ⟹ **`have key : … • … = …` を別立てしてから `mem_normalizer_iff_map_conj_eq` に
+渡す**。Ch03 の D-part 結論 `K.map (MulAut.conj x).toMonoidHom` と `MulAut.conj x • K` は
+defeq だが構文が違うので `have hcoe : … = … := rfl` で橋渡しする。
+`IsComplement' A B` の `.index_eq_card` は **`B.index = |A|`** (向きに注意、逆は `.symm`)。
+
+**🎉 §5C 完済 (5C.1–5C.13 全 13 問)** — 5C.6 のみ hub レーン (issue 9503 WeaklyClosed) 担当。
+
+### 5C.12 の実装メモ (2026-07-27)
+
+新 leaf `Problems5C12.lean` (118 行)。⭐ **`Y := N ⊔ P` (= `NP`) に上げてから Thm 5.17 を当てる**
+のが鍵。`N` 自身に Thm 5.17 を当てるだけでは `N` が完全群のとき (`|N:N'| = 1` ゆえ) 何も出ない
+(実際 `A₅`, `p = 5` は正規 5-補群を持たない — 仮定 `p ∣ |G:N|` が効く場所)。
+
+* `⁅Y,Y⁆ ≤ N`: `Y/N` は可換 `P` の像 (helper `commutator_sup_le_of_normal_of_commutative`、
+  `Subgroup.map_commutator` + `commutator_eq_bot_iff_le_centralizer` で商へ落とす)。
+* `p ∤ |G:Y|` (`P ≤ Y`) と `relIndex_mul_index` から **`p ∣ |Y : N|`**、
+  `commutator ↥Y ≤ N.subgroupOf Y` ゆえ `p ∣ (commutator ↥Y).index`。
+* `↥Y` の Sylow は `P.subtype` (巡回) なので **Thm 5.17** の第 2 選択肢が潰れ
+  **`p ∤ |commutator ↥Y|`**。
+* `⁅N,N⁆ ≤ ⁅Y,Y⁆` (`Subgroup.map_subtype_commutator` で `commutator ↥N` と橋渡し) ゆえ
+  `p ∤ |commutator ↥N|`、位数互いに素で `commutator ↥N ⊓ Q = ⊥`、**Problem 5C.1**
+  (`hasNormalPComplement_of_commutator_inf_sylow_eq_bot`) で結論。
+
+⚠ 実装の罠: `Subgroup.map_eq_bot_iff` は `H` が**明示引数**なので `.mpr` を直接付けられない
+(`(Subgroup.map_eq_bot_iff _).mpr`)。`Sylow.subtype` の coe は `rfl` だが instance 探索は
+unfold しないので `IsCyclic ↥((P.subtype hPY : Sylow p ↥Y) : Subgroup ↥Y)` の形で `haveI` する。
+
+### 5C.11 の実装メモ (2026-07-27)
+
+新 leaf `Problems5C11.lean` (266 行)。⭐ **書籍 hint の「`|G|` に関する帰納法」を、`G` を固定した
+「部分群の位数に関する帰納法」に組み替えた** — 型レベル再帰 (`motive : ℕ → Prop` で全ての群型を
+量化する `S7C_ThompsonPComplementFinal` 型のパターン) も商群への降下も要らなくなる。
+
+**核 = `le_centralizer_aux`**: 「`H ≤ M` かつ `M ≤ N_G(P)` なる任意の部分群 `M` は `C_G(P)` に
+含まれる」。`Nat.card ↥M ≤ n` の `n` で帰納。
+
+* `M ≤ N_G(H)` なら仮定 `H ⊆ Z(N_G(H))` からそのまま `M ≤ C_G(H) ≤ C_G(P)`。
+* そうでなければ `H` が Sylow 部分群たちの join である (`iSup_sylow_eq_top`、下記) ことと
+  `Subgroup.iInf_normalizer_le_normalizer_iSup` (mathlib) から、**`M` が正規化しない `H` の
+  Sylow `q`-部分群 `Q`** が取れる。Hall 性より `Q` は `G` の Sylow `q`-部分群でもある
+  (`exists_sylow_coe_eq_map_subtype`)。`L := M ⊓ N_G(Q)` は `M` の真部分群なので帰納法で
+  `L ≤ C_G(P)`、`C := M ⊓ C_G(P)` は `M ≤ N_G(P)` ゆえ `M`-共役不変で `Q ≤ H ≤ C`。
+  **Frattini 論法** (`C` 内の Sylow `q`-共役性、transport は 1C.1 と同じ `Ch01.map_conj_smul`
+  パターン) が `M = C · L` を与え、両因子が `C_G(P)` に入る。
+
+⟹ `M := N_G(P)` で `N_G(P) ≤ C_G(P)`、Burnside (Thm 5.13
+`hasNormalPComplement_of_sylow_normalizer_le_centralizer`) で結論。書籍 hint の 2 段
+(「`N_G(P) < G` の段」と「`P ⊴ G` かつ `N_G(Q) < G` の段」) はこの形では**同じ 1 本の補題に融合**する。
+
+**再利用可能な副産物**:
+* `iSup_sylow_eq_top` — 有限群は Sylow 部分群たちで生成される
+  (`⨆ (q : (Nat.card K).primeFactors) (Q : Sylow q K), ↑Q = ⊤`)。位数の各素冪が Sylow の位数を
+  割ることから `|K| ∣ |⨆ …|` (`Nat.dvd_iff_prime_pow_dvd_dvd`)。mathlib に無かった。
+* `card_map_subtype_eq_multiplicity` / `exists_sylow_coe_eq_map_subtype` — Hall 部分群の
+  Sylow 部分群は `G` の Sylow 部分群。
+
+⚠ 実装の罠: `inf_eq_left.mpr (…)` を `rw` の引数にメタ変数のまま置くと、パターン `?a ⊓ ?b` が
+**`M ⊓ C_G(P)` (部分群 `C` そのもの)** に先にマッチして motive 破綻 (`C.subtype c` の型が `C` に
+依存する) — `have hinf1/hinf2 :` で**両辺を明示した等式**にしてから `rw` する。
+`Nat.dvd_iff_prime_pow_dvd_dvd` の `intro` が与えるのは `Nat.Prime` (変換不要)。
+`Subgroup.normalizer` は現 mathlib では `Set G → Subgroup G`。
+
+### 5C.10 の実装メモ (2026-07-27)
+
+新 leaf `Problems5C10.lean` (146 行)。⭐ **`P` の同型類 (`C₈` / `C₄×C₂` / `C₂³`) を場合分けしない**
+のが要点で、書籍の hint (5C.9 の議論を真似る) をそのまま一様に通せる。
+
+論法: `7 ∤ |G|` と仮定。`8 ∣ |G|` と単純性から `G` は非可換 ⟹ `commutator G = ⊤`。
+Isaacs Thm 5.18 (`eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer`) は
+`P ∩ Z(N_G(P)) ∩ G' = 1` を与えるが `G' = G` なので **`C_P(N_G(P)) = 1`**。
+`S := N_G(P)/C_G(P) ≅ range (normalizerMonoidHom P)` の位数を割る素数 `q` は
+(i) `q ≠ 2` (`relIndex ∣ |G:P|` が奇数) かつ (ii) `q ∣ 2^m − 1` (`1 ≤ m ≤ 3`,
+5C.8 の `exists_dvd_pow_sub_one_of_dvd_card_mulAut`) ⟹ `q ∈ {3, 7}` ⟹ `q = 3`。
+∴ `S` は 3-群。`S` の `P` への作用の不動点は `C_P(N_G(P)) = 1` ゆえ
+`IsPGroup.card_modEq_card_fixedPoints` で `8 ≡ 1 (mod 3)` ⟹ `3 ∣ 7` で矛盾。
+
+⚠ 実装の罠: 元の交換子 `⁅x, y⁆` は **scoped instance** ゆえ `open scoped commutatorElement` が要る
+(Ch01 §1D 1D.9 と同じ罠)。`Nat.Prime 7` / `¬Nat.Prime 8` は minimal import では `norm_num` が
+落とせない ⟹ `Mathlib.Tactic.NormNum.Prime` を明示 import。現 mathlib の
+`Nat.eq_prime_pow_of_unique_prime_dvd` は指数が `factorization p` でなく
+**`primeFactorsList.length`**、仮説も `n ≠ 1` でなく `n ≠ 0`。
 
 ### 5C.9 の実装メモ (2026-07-26)
 
@@ -1680,6 +1792,489 @@ Sylow-`p` `P` は位数 `p^n` (`n ≤ 2`) ゆえ可換なので、Burnside
 `c ∈ N_G(B)` を取る。`P` は Sylow なので共通部分群は `P` 自身、ゆえに `cg ∈ N_G(P)`。
 ⚠ `Sylow` の極大性フィールドは `P.3 : IsPGroup p Q → ↑P ≤ Q → Q = ↑P` (**向きに注意**)。
 ⚠ `Subgroup.mem_normalizer_fintype` で「片方向の共役閉」から正規化子の元が取れる。
+
+## Ch.5 §5D (書籍 pp. 169-170 の Problems 5D) — 次の frontier (2026-07-27)
+
+statement は **PDF ページ画像で確定済** (書籍 pp. 169-170 = PDF pp. 182-183)。
+`A^p(G)` / `O^p(G)` / focal subgroup / `ControlsFusionIn` は `Ch05_Transfer/Basic.lean` に既存
+(`APrime` / `pResidual` / `Subgroup.focalSubgroup` / `Subgroup.ControlsFusionIn`,
+Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
+`APrime_eq_subgroupOf_APrime_of_controlsFusionIn`)。
+
+| 問題 | 状態 | 主張 (PDF 実測) |
+|---|---|---|
+| 5D.1 | ✅ 完了 (`hasNormalPComplement_of_controlsPTransfer`) | `P ∈ Syl_p(G)` 可換, `P ⊆ H ⊆ G`, `H` が `G` の `p`-transfer を制御 (= `A^p(H) = H ∩ A^p(G)`)。`H` が正規 `p`-補群をもつなら `G` も持つ |
+| 5D.2 | ✅ 完了 (`hasNormalPComplement_of_sylow_le_center` + Burnside 導出の `example`) | `P ∈ Syl_p(G)`, `P ⊆ Z(G)` ⇒ (Burnside も transfer 理論も使わずに) `G` は正規 `p`-補群をもつ。これと Cor 5.23 から Burnside を導く |
+| 5D.3 | (a) ✅ 完了 (`exists_sylow_coe_eq_of_isCoatom_of_isPGroup`) / (b)(c) 🔒 5C.6 待ち | `G` 非可換単純, `P ⊆ G` が極大な `p`-部分群。(a) `P ∈ Syl_p(G)` (b) `1 < N ⊴ P` で `P/N` 可換なら `P` は `N` を含む唯一の Sylow `p`-部分群 ⇒ `N` は `P` 内で `G` に関し weakly closed (c) `P` の冪零類 ≥ 3 |
+| 5D.4 | ✅ 完了 (`pResidualOf_le_inf_pResidual` / `APrime_eq_subgroupOf_APrime_of_pResidualOf_eq`) | `P ∈ Syl_p(G)`, `P ⊆ K ⊆ G` ⇒ `O^p(K) ⊆ K ∩ O^p(G)`、等号なら `A^p(K) = K ∩ A^p(G)` |
+| 5D.5 | ✅ 完了 (`hasNormalPComplement_of_APrime_inf_sylow_eq_commutator`) | `P ∈ Syl_p(G)`, `A ∩ P = P'` (`A = A^p(G)`)。`P' ⊴ A` なら (Tate を使わず) `G` は正規 `p`-補群をもつ。hint: SZ で `A` 内の `P'` の補群 `K` を取り `G = N_G(K)P'`、`P' ⊆ Φ(P)` から `P` が `K` を正規化 |
+| 5D.6 | ✅ 完了 (`hasNormalPComplement_of_APrime_inf_sylow_eq_commutator_of_abelian`) | 同じ設定で `P'` 可換なら `G` は正規 `p`-補群をもつ。hint: `N = N_G(P')` が仮定を満たすことを見て `A` の中で Burnside |
+
+⚠ **5D.3(b)** は **5C.6 (weak closure)** に依存 — 5C.6 は hub レーン (issue 9503
+`OddOrder/GroupTheory/WeaklyClosed.lean`) 担当なので、そこが landing してから着手する。
+
+### 5D.1 の実装 (2026-07-27 完了、新 leaf `Problems5D.lean`)
+
+**可換 Sylow に対しては `G` が正規 `p`-補群をもつ ⟺ `A^p(G) ⊓ P = ⊥`**。
+
+* `⟸`: `APrime_inf_sylow_eq_focalSubgroup` + focal subgroup 定理で
+  `commutator G ⊓ P = focalSubgroup P = A^p(G) ⊓ P = ⊥` ⟹ **Problem 5C.1**
+  (`hasNormalPComplement_of_commutator_inf_sylow_eq_bot`)。
+* `⟹` (`H` 側で使う): 正規 `p`-補群 `N ⊴ ↥H` に対し `↥H/N` は `P` の像で**可換**ゆえ
+  `commutator ↥H ≤ N`、また `N.index = |P|` は `p`-冪ゆえ `APrime_le` で `A^p(↥H) ≤ N`、
+  `IsComplement'.disjoint` から `A^p(↥H) ⊓ ↑P_H = ⊥`。
+
+あとは仮説 `A^p(↥H) = (A^p G).subgroupOf H` と `P ≤ H` から
+`(A^p(G) ⊓ ↑P).subgroupOf H = ⊥` ⟹ `A^p(G) ⊓ ↑P = ⊥` (comap は `⊓` を保つ)。
+
+**実装**: 同値の両向きを独立補題にした —
+`APrime_inf_sylow_eq_bot_of_hasNormalPComplement` (⟹) と
+`hasNormalPComplement_of_APrime_inf_sylow_eq_bot` (⟸)。主定理は
+`hasNormalPComplement_of_controlsPTransfer`。axiom-clean。
+
+⚠ 実装の罠: `IsComplement' A B` の `.index_eq_card` は `B.index = |A|` (逆は `.symm`)。
+`Subtype.ext` の二重適用は `apply` を重ねると 2 段目が不発になることがある — `G` レベルの
+等式を `have` で明示してから `Subtype.ext (Subtype.ext hGeq)` と項で書く。
+`(⊤ : Subgroup G)` の元を `N * P` に分解するには `Subgroup.normal_mul` で
+`↑(N ⊔ P) = ↑N * ↑P` にしてから `rw [← htop]; exact Subgroup.mem_top _`。
+
+### 5D.2 の実装 (2026-07-27 完了)
+
+**前半**: `P ≤ Z(G)` ⟹ `P ⊴ G`、`|P|` と `|G:P|` は互いに素なので **Schur–Zassenhaus**
+(`Subgroup.exists_right_complement'_of_coprime`) が補群 `K` を与える。`g = x·k` (`x ∈ P` は
+中心的) の共役は `k` による共役に一致するので `K ⊴ G`、5C.13 の helper
+`hasNormalPComplement_of_normal_of_index_eq_pow` で結論。**Burnside も transfer も未使用**。
+
+**後半 (Burnside の別証明)**: `N := N_G(P)` の中で `P` は中心的なので前半が `N` の正規
+`p`-補群を与え、`P` 可換ゆえ **Cor 5.23**
+(`APrime_normalizer_eq_subgroupOf_APrime_of_isMulCommutative_sylow`) が `p`-transfer 制御を
+与え、**Problem 5D.1** で `G` に持ち上がる。⚠ statement は既存の
+`hasNormalPComplement_of_sylow_normalizer_le_centralizer` (Thm 5.13) と同一ゆえ、
+ラッパー方針に従い定理として再掲せず **`example` で導出のみ kernel 検証**した
+(5C.1 の「同一 statement の別証明を避ける」方針と同じ扱い)。
+
+⚠ 実装の罠: `hasNormalPComplement_of_normal_of_index_eq_pow` の `X` は結論に現れない
+implicit なので `(X := K)` を明示しないと `Subgroup.Normal ?m` で instance 探索が止まる。
+
+### 5D.4 の実装 (2026-07-27 完了、新 leaf `Problems5D4.lean` 166 行)
+
+`O^p` は Ch09 の `pResidual` / ambient 版 `pResidualOf` を使う (⚠ `Ch09_MoreSubnormality/PResidual.lean`
+は **mathlib しか import しない**ので Ch05 から import しても cycle 無し — 実測済)。
+
+* **前半** `pResidualOf_le_inf_pResidual`: `↥K ⧸ O^p(G).subgroupOf K` は
+  `(mk' O).comp K.subtype` の像と同型で、像は `p`-群 `G ⧸ O^p(G)` の部分群 ⟹ `p`-群 ⟹
+  `O^p` の普遍性。
+* **後半** `APrime_eq_subgroupOf_APrime_of_pResidualOf_eq` (⭐ 本題): `≤` は既存
+  `APrime_le_subgroupOf_APrime_of_sylow_le`。`≥` は `O := O^p(G)`, `B := A^p(K)` の押し出しとして
+  1. `K ⊔ O = ⊤` (`(P ⊔ O).index` は `|G:P|` (p と素) と `|G:O|` (p-冪) の両方を割るので 1),
+  2. `⁅G,G⁆ ≤ ⁅K,K⁆ ⊔ O` (`g = k·u` 分解 + `mk' O` で交換子を比較),
+  3. `A^p(G) ≤ O ⊔ ⁅G,G⁆ ≤ O ⊔ B` (`APrime_le`; ⚠ `O ⊔ B` は `G` で正規と限らないので
+     **正規な `O ⊔ ⁅G,G⁆` を経由**する),
+  4. Dedekind `K ⊓ (O ⊔ B) = (K ⊓ O) ⊔ B = B` (仮定 `K ⊓ O = O^p(K) ≤ B`)。
+  ⭐ 仮定 `O^p(K) = K ∩ O^p(G)` は 4 でだけ効く。
+* 副産物 `pResidual_le_APrime` (`O^p(H) ≤ A^p(H)`)。
+
+⚠ 実装の罠: `hrp : r = p` の `▸` は `P : Sylow p G` の型内の `p` まで巻き込んで
+**kernel で type mismatch** (elaborator は通す) — `subst hrp` を使う。
+商型に対する `rw [← hker]` は motive 不正 ⟹ `QuotientGroup.quotientMulEquivOfEq hker` +
+`IsPGroup.of_equiv` で移送。ゴールを変える `show` は `linter.style.show` が警告 ⟹ `change`。
+
+### 5D.3(a) の実装 (2026-07-27 完了、新 leaf `Problems5D3.lean` 83 行)
+
+`P ≤ S` (Sylow) で `P < S` なら `p`-群の正規化群成長 (Isaacs Thm 1.22
+`Ch01.lt_normalizer_of_isNilpotent_of_lt_top` を `↥S` で使い
+`Subgroup.subgroupOf_normalizer_eq` で `G` に降ろす) から `P < N_G(P)`、coatom 性で
+`N_G(P) = ⊤` ⟹ `P ⊴ G` ⟹ 単純性で `P ∈ {⊥, ⊤}`。`P = ⊤` は `P < S` に矛盾。
+`P = ⊥` なら coatom 性で `S = ⊤` ⟹ `G` が `p`-群 ⟹ `IsPGroup.center_nontrivial` +
+単純性で `Z(G) = ⊤` ⟹ 可換で仮定に矛盾。⟹ `P = S`。
+
+⚠ (b)(c) は **Problem 5C.6 (weak closure)** 依存 — hub レーンの
+`OddOrder/GroupTheory/WeaklyClosed.lean` (issue 9503) が landing してから。
+
+### 5D.5 の実装 (2026-07-27 完了、新 leaf `Problems5D5.lean` 68 行) + 5C.13 のエンジン切り出し
+
+⭐ **5D.5 の hint は 5C.13 の最終段と完全に同じ論法**だったので、5C.13 の還元形から共通部分を
+`hasNormalPComplement_of_commutator_normalHall_in_normal` として `Problems5C13.lean` に
+**切り出して共有した** (重複を書かない方針):
+
+> `P ∈ Syl_p(G)`, `L := ⁅P,P⁆`, `K ⊴ G` が `L` を含み `L` が `K` の**正規 Hall `p`-部分群**
+> (`p ∤ |K:L|`) で `|G:K|` が `p`-冪 ⟹ `G` は正規 `p`-補群をもつ
+
+(証明 = Schur–Zassenhaus で `K` 内の `L` の補群 `X` → Frattini (共役元は `L` 内) で
+`G = L·N_G(X)` → Dedekind + `⁅P,P⁆ ⊆ Φ(P)` の非生成性で `P ≤ N_G(X)` → `X ⊴ G`)。
+5C.13 の還元形は Burnside で `K = π⁻¹(K̄)` を作ってこのエンジンを呼ぶだけになった。
+
+**5D.5 側**: `A := A^p(G) ⊴ G` なので `A ∩ P` は `A` の Sylow `p`-部分群
+(`Ch03.isHallSubgroup_subgroupOf_of_normal` + `Ch01.sylow_isHallSubgroup_singleton`)、
+仮定でそれが `P'` かつ `A` で正規 ⟹ 正規 Hall `p`-部分群。`|G:A|` は `p`-冪
+(`APrime_index_isPGroup`) ⟹ エンジンをそのまま適用。
+
+⚠ `(K ⊓ H).subgroupOf K = H.subgroupOf K` は **`inf_subgroupOf_left`** (右側版は `_right`)。
+
+### 5D.6 の実装 (2026-07-27 完了、新 leaf `Problems5D6.lean` 248 行)
+
+**主張**: `P ∈ Syl_p(G)`, `A := A^p(G)`, `A ∩ P = P'` で **`P'` が可換**なら (Tate 抜きで)
+`G` は正規 `p`-補群をもつ。
+
+**書籍 hint** =「`N := N_G(P')` が仮定を満たすことを見て、`A` の中で Burnside を使う」。
+これを展開すると次の 4 段:
+
+1. **`P ≤ N := N_G(P')`** (`P` は `⁅P,P⁆` を正規化)。ゆえに `P ∈ Syl_p(N)` で `P' ⊴ N`。
+2. **`N` が 5D.5 の仮定を満たす**:
+   * `A^p(N) ⊇ ⁅N,N⁆ ⊇ ⁅P,P⁆ = P'` なので `A^p(N) ∩ P ⊇ P'`、
+   * 逆は既存の `APrime_le_subgroupOf_APrime_of_sylow_le P (P ≤ N)` で
+     `A^p(↥N) ≤ (A^p G).subgroupOf N` ⟹ 押し出して `A^p(N) ∩ P ≤ A ∩ P = P'`。
+   * `P' ⊴ N` かつ `P' ≤ A^p(N)` ⟹ `P' ⊴ A^p(N)`。
+   ⟹ **5D.5 (`hasNormalPComplement_of_APrime_inf_sylow_eq_commutator`) を `↥N` に適用**して
+   `N` が正規 `p`-補群 `M` をもつ。
+3. **`N_A(P') = A ∩ N` は `P'` を中心化する**: `M ⊴ N` は `p'`-群で `N/M` は `p`-群なので
+   `A ∩ N` は正規 `p`-補群 `A ∩ M` をもち、`P' = A ∩ P` はその Sylow `p`-部分群。
+   `P' ⊴ A ∩ N` (1 より) と `A ∩ M ⊴ A ∩ N`、交わり自明・積が全体 ⟹
+   **`A ∩ N = P' × (A ∩ M)`**。`P'` 可換ゆえ `P' ≤ Z(A ∩ N)`, すなわち
+   `N_A(P') ≤ C_A(P')`。
+4. **`A` の中で Burnside** (`hasNormalPComplement_of_sylow_normalizer_le_centralizer` を `↥A` に):
+   `P'` は `A` の Sylow `p`-部分群 (5D.5 と同じ `isHallSubgroup_subgroupOf_of_normal`) なので
+   `A` は正規 `p`-補群 `K` をもつ。`K` は正規 `p`-補群の一意性
+   (`map_mulAut_of_normal_pcomplement`) から `A` に characteristic ⟹ `A ⊴ G` より `K ⊴ G`。
+   `p ∤ |K|` かつ `|G:K| = |G:A|·|A:K| = p`-冪 ⟹ `hasNormalPComplement_of_normal_of_index_eq_pow`。
+
+**実装の副産物 (いずれも再利用可能)**:
+* `le_centralizer_of_normal_sylow_of_hasNormalPComplement` — 正規 `p`-補群をもつ群で
+  **正規な** Sylow `p`-部分群は全体に中心化される (正規 `p`-補群と正規 Sylow は交わり自明で交換)。
+* `le_normalizer_commutator_self` — `H ≤ N_G(⁅H,H⁆)`。
+* `hasNormalPComplement_of_mulEquiv` / `hasNormalPComplement_of_le` — 同型・部分群への遺伝
+  (`Ch05_Transfer/Main.lean` の `hasNormalPComplement_of_subgroup` を ambient 部分群の形に橋渡し)。
+  ⚠ Ch07 の `S7B2` に同種の MulEquiv 版があるが Ch05 から見て下流なので使えない。
+
+⚠ 実装の罠: `Sylow.coe_subtype` は `rfl` なので `hPNcoe := rfl` で済む。`x : ↥↑S` の `x.2` に
+`rw [hS]` は motive 破綻 ⟹ `hS.le x.2` と項で書く。`Subgroup.relIndex_mul_relIndex` は
+部分群 3 つが explicit。
+
+## Ch.6 (Frobenius Actions) §6A (書籍 pp. 184-186 の Problems 6A) — 着手 (2026-07-27)
+
+Isaacs Ch.1–Ch.5 の章末演習が全完したので **Ch.6 が次の frontier** (文書順)。
+§6A は **6A.1–6A.11** の 11 問 (statement は PDF ページ画像で確定; 書籍 p.184-186 =
+PDF p.197-199、`references/isaacs/pages/isaacs-p{184,185,186}-{197,198,199}.png` に保存済)。
+Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActions/` に実装済。
+
+| 問題 | 状態 | 主張 |
+|---|---|---|
+| 6A.1 | ✅ 完了 (`Problems6A.lean`) | `A ≤ SL(2,p)`, `p ∤ \|A\|` ⟹ `A` の `(ZMod p)²` への作用は Frobenius |
+| 6A.2 | ✅ **完了** (`Problems6A2.lean`) | `GL(3,43)` の具体例 `a = diag(α,α⁴,α²)`, `b = [[0,1,0],[0,0,1],[ε,0,0]]` (`α` 位数 7, `ε` 位数 3) で `A = ⟨a,b⟩` は非巡回位数 63, `43³` 次元への作用は Frobenius |
+| 6A.3 | ✅ **完了** (`Problems6A3.lean`) | 位数 `5²·11` の非巡回群で Frobenius 作用をもつものが存在 (hint: `GL(5,p)`) |
+| 6A.4 | ✅ **完了** (`ProblemsFrobeniusGroups.lean`) | Frobenius 群 `G` (核 `N`) の `N` 以外の剰余類は単一の共役類に含まれる |
+| 6A.5 | ✅ **完了** (`ProblemsFrobeniusGroups.lean`) | 非可換可解群で全非単位元の中心化群が可換 ⟹ Frobenius 群 (核 = `F(G)`) |
+| 6A.6 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の仮説を満たす `A, B > 1` ⟹ ある `g` で `A ⊓ B^g > 1` |
+| 6A.7 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
+| 6A.8 | ✅ **完了** (`Problems6A8.lean`) | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
+| 6A.9 | ⬜ | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
+| 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
+| 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
+
+### 6A.6 完了 / 6A.11 は (⟹) のみ (2026-07-27) — 新 leaf `ProblemsTIHypothesis.lean`
+
+⚠ 書籍の Note どおり **Frobenius の定理 (`X` が部分群) は使わない**。
+
+* **6A.6** `exists_inf_conj_ne_bot_of_TI`: `A > 1`, `B > 1` がともに Lemma 6.5 の TI 仮説を
+  みたすなら, ある `g` で `A ⊓ B^g > 1`。論法 (hint の `X`, `Y` の計数): 全ての `g` で
+  `A ⊓ B^g = 1` なら `A` の非単位元は `B` の非単位元と共役になれないので **`X ∪ Y = G`**、
+  一方 `1 ∈ X ⊓ Y` なので `|G| + 1 ≤ |X| + |Y| = |G:A| + |G:B| ≤ |G|/2 + |G|/2 = |G|` で矛盾。
+* **6A.11 (⟹)** `normalizer_le_of_TI`: TI ⟹ 非自明 `T ≤ A` で `N_G(T) ≤ A`。
+
+* **6A.7** `mem_of_conj_inf_ne_bot` (a) / `eq_top_of_normal_of_TI` (b): `A` が TI で
+  `A ≤ H ≤ G` のとき `A^g ⊓ H > 1 ⟹ g ∈ H`, および `H ⊴ G ⟹ H = G` (⚠ (b) は `A > 1` が要る
+  — 書籍では Lemma 6.5 の文脈から暗黙)。hint どおり `A` と `A^g` がともに **`↥H` の中で**
+  TI 仮説をみたすこと (`TI_subgroupOf_of_TI` / `TI_subgroupOf_conj_of_TI`) を見て **6A.6** を
+  `↥H` で使う。副産物: `conj_smul_subgroupOf` (`k ∈ H` なら共役と `subgroupOf` が交換)。
+* **6A.8** `subset_notConjugateSet_or_subset_of_normal` (新 leaf `Problems6A8.lean`):
+  `M ⊴ G` なら `M ⊆ X` または `X ⊆ M`。`A ⊓ M = 1` なら前者 (`M` 正規ゆえ共役先も `M` 内)。
+  `A ⊓ M ≠ 1` なら **6A.7(a)** で `A ⊔ M = ⊤`、そのうえで
+  (i) `A ⊓ M` が `↥M` で TI 仮説をみたす、(ii) Lemma 6.5 を `↥M` で使って
+  `|X_M| = |M : A ⊓ M| = |G : A| = |X|` (第 2 同型定理の指数版
+  `index_eq_relIndex_of_sup_eq_top` を新設)、(iii) `X_M ⊆ X` を elementwise に示し
+  (`g = m a₁` と分解して `y` が `M` 内で `a₁ a a₁⁻¹ ∈ A ⊓ M` と共役)、
+  (iv) 濃度一致 + 包含から `X = X_M ⊆ M`。
+* **6A.11** `TI_iff_forall_normalizer_le`: TI 仮説 ⟺ 任意の非自明 `T ≤ A` で `N_G(T) ≤ A`。
+  (⟸) の論法 (`TI_of_normalizer_le`)。`D := A ⊓ A^g ≠ 1` として:
+1. `1 ≠ T ≤ D` について `N_G(T) ≤ A` かつ (`g⁻¹ • T ≤ A` に仮説) `N_G(T) ≤ A^g`
+   ⟹ **`N_G(T) ≤ D`** (`N(g • T) = g • N(T)` の移送が要る)。
+2. 素数 `p ∣ |D|` を取り, **`D` に含まれる `p`-部分群のうち極大なもの `P`** を
+   `Finite.exists_le_maximal` で取る (Cauchy で非自明なものが存在)。`P` は実は
+   **`G` の Sylow `p`-部分群**: `P < S ∈ Syl_p(G)` なら `↥S` の冪零正規化条件で
+   `y ∈ N_S(P) ∖ P` が取れ, `y ∈ N_G(P) ≤ D` ゆえ `P ⊔ ⟨y⟩ ≤ S ⊓ D` が `P` より大きい
+   `D` 内 `p`-部分群になって極大性に矛盾。
+3. `P ≤ A` と `g⁻¹ • P ≤ A` はともに `G` の Sylow `p`-部分群ゆえ `A` の Sylow `p`-部分群、
+   Sylow C (↥A で取って `map_conj_smul` で `G` に降ろす = 1C.1 のパターン; 汎用形として
+   `exists_mem_smul_sylow_eq` に切り出した) で `k ∈ A` があって `k • P = g⁻¹ • P`
+   ⟹ `g k ∈ N_G(P) ≤ A` ⟹ `g ∈ A`。
+
+  副産物の汎用補題: `normalizer_conj_smul` (`N(g • T) = g • N(T)`) /
+  `conj_smul_eq_map` / `conj_inv_smul_smul` / `conj_smul_inv_smul` /
+  `exists_mem_smul_sylow_eq`。
+
+### 🎉 6A.4 / 6A.5 完了 (2026-07-27) — 新 leaf `ProblemsFrobeniusGroups.lean`
+
+* **6A.4** `isConj_mul_of_notMem_kernel`: Frobenius 群 `G` (核 `N`) で `g ∉ N` なら剰余類
+  `Ng` の元はすべて `g` に共役。論法: Thm 6.4 (4) (`centralizer_kernel_le`) の対偶で
+  **`C_N(g) = 1`** (`eq_one_of_mem_kernel_of_commute`) ⟹ `f : N → N`, `f(m) = m g m⁻¹ g⁻¹`
+  が単射 ⟹ 有限性から全射 ⟹ 任意の `n ∈ N` に `m g m⁻¹ = n g` なる `m`。
+  集合形 `coset_subset_setOf_isConj` も。
+* **6A.5** `exists_isFrobeniusGroup_fitting_of_centralizer_comm`: 非可換可解な **CA 群**
+  (全非単位元の中心化群が可換) は Frobenius 群で核は `F(G)`。論法:
+  (1) `F := F(G)` は非自明冪零ゆえ `Z(F) ≠ 1`, その元 `z` について `F ⊆ C_G(z)` で
+  `C_G(z)` 可換 ⟹ **`F` は可換**。(2) `1 ≠ n ∈ F` について `C_G(n)` の元は `F` の元と可換
+  (両方 `C_G(n)` 内, `C_G(n)` 可換) ⟹ `C_G(n) ⊆ C_G(F) ⊆ F` (**P. Hall**,
+  `OddOrder.GroupTheory.centralizer_fitting_le_fitting`)。(3) **Thm 6.7**
+  (`exists_isComplement'_of_centralizer_le`) が Frobenius 構造を与える。
+
+### 🎉 6A.3 完了 (2026-07-27) — 新 leaf `Problems6A3.lean` 442 行
+
+6A.2 の `n = 3, q = 7` を **`n = 5, q = 11`** にした同型の構成 (書籍 hint「`GL(5,p)` で」):
+`3` は `11` を法として位数 5 (`3ᵏ mod 11 = 1,3,9,5,4`) なので
+
+* `a = diag(α, α³, α⁹, α⁵, α⁴)` (`α` 位数 11) / `b` = 巡回シフト + 隅に `ε` (位数 5)
+* **`b⁵ = ε · 1`** (スカラー、`b²`→`b⁴`→`b⁵` と段階的に計算; 一気に 5 乗すると simp が重い)
+* **`a b = b a⁴`**, すなわち **`b a = a³ b`**
+
+⟹ `card_grpA5` (`|A| = 5²·11 = 275`) / `not_isCyclic_grpA5` / `isFrobeniusAction_grpA5`。
+
+**Frobenius 性は共通土台の `pow_mul_pow_pow` で一撃**: `b a = a³ b` から
+`(aⁱ bᵗ)⁵ = a^{(∑_{k<5} (3ᵗ)ᵏ)·i} b^{5t}` で, 幾何級数の和は
+`t=1: 121 = 11², t=2: 7381, t=3: 551881, t=4: 43584805` がいずれも **11 の倍数**なので
+`aⁱ` の寄与が消えて `x⁵ = b^{5t} = εᵗ·1` (非単位スカラー)。`5 ∣ t` の側は 6A.2 と同じ対角論法。
+
+**書籍の体**: `55 ∣ p−1` が要るので最小の素数は **`p = 331`** (`330 = 2·3·5·11`)、
+`α = 74` (位数 11), `ε = 64` (位数 5)。主張そのものは
+`exists_noncyclic_order_twentyfive_mul_eleven_frobenius`。
+
+### 🎉 6A.2 完了 (2026-07-27) — `Problems6A2.lean` 619 行
+
+新 leaf `Problems6A2.lean` (`OddOrder.lean` 配線済、全て実証明・警告 0)。
+
+⚠ **一般化した**: 書籍は `F = 𝔽₄₃` だが証明は「位数 7 の `α` と位数 3 の `ε` をもつ体」で
+そのまま通るので, 一般の体 `F` で述べている (`ZMod 43` への具体化は次回)。
+
+**行列の関係式** (`matA α = diag(α, α⁴, α²)`, `matB ε = ![[0,1,0],[0,0,1],[ε,0,0]]`):
+* `matA_pow` / `matA_pow_seven` (`a⁷ = 1`)
+* `matB_pow_three`: **`b³ = ε · 1`** (スカラー) ⟹ `matB_pow_nine` (`b⁹ = 1`)
+* `matA_mul_matB`: **`a · b = b · a²`** (⭐ 書籍 hint の「`b` は `⟨a⟩` を正規化」の内容;
+  実際に計算すると `b⁻¹ a b = a²`, `b a b⁻¹ = a⁴`)
+
+**`GL(3,F)` の元と群構造**: `uA` / `uB` (単元版, 逆元は `a⁶` / `b⁸`) / `orderOf_uA = 7` /
+`orderOf_uB = 9` / `uB_inv_mul_uA_mul_uB` (`b⁻¹ a b = a²`) /
+`uB_mul_uA_mul_uB_inv` (`b a b⁻¹ = a⁴`, `a⁸ = a` と `b a² b⁻¹ = a` から) /
+`uB_mem_normalizer` (`b ∈ N(⟨a⟩)`) / `grpA` / `grpA_eq_sup` (`⟨a,b⟩ = ⟨a⟩ ⊔ ⟨b⟩`)。
+
+**主結果 (前半)**:
+* `card_grpA` : **`|A| = 63`**
+* `not_isCyclic_grpA` : **`A` は非巡回** (巡回なら可換, しかし `a b = b a²` で `a = a²`)
+
+再利用可能な helper: `card_sup_of_le_normalizer_of_coprime`
+(`Ch01.card_sup_of_normal_of_coprime` の「`N` が `G` で正規」を「`S ≤ N_G(N)`」に緩めた版;
+`N ⊔ S` の中に降りて `subgroupOf` で適用) / `finiteMatrixUnits` instance。
+
+**Frobenius 性** (`isFrobeniusAction_grpA`, 実証明・axiom-clean):
+
+⭐ **書籍 hint の「素数位数の元に還元」も Sylow も使わずに済んだ**。正規形
+`exists_pow_mul_pow_of_mem_grpA` (`A` の元は `aⁱ bʲ`, `i j : ℕ`) を作ると 2 ケースで終わる:
+
+* **`3 ∣ j`**: `bʲ = εᵐ · 1` (スカラー) ゆえ `x = diag(εᵐαⁱ, εᵐα⁴ⁱ, εᵐα²ⁱ)` は対角。
+  非零ベクトルを固定するならある対角成分が `1`, その成分は 7 乗すると 1 で `εᵐ` は
+  3 乗すると 1 ⟹ `⟨ε⟩ ⊓ ⟨α⟩ = 1` (`eq_one_of_pow_three_pow_seven`) から `εᵐ = 1` かつ
+  `α^{cⁱ} = 1` (`c ∈ {1,4,2}`, 7 と互いに素) ⟹ `αⁱ = 1` ⟹ `x = 1`。
+* **`3 ∤ j`**: `b³ = ε·1` は中心的なので `x³ = (aⁱ bʳ)³` (`r = j mod 3 ∈ {1,2}`)。
+  `cube_uA_pow_mul_uB` / `cube_uA_pow_mul_uB_sq` で **`(aⁱb)³ = b³`, `(aⁱb²)³ = b⁶`**
+  (`aⁱ` の寄与は `1+4+16 = 21`, `1+16+256 = 273` でどちらも `7` の倍数ゆえ消える) ⟹
+  `x³` は非単位スカラー `ε·1` / `ε²·1` ⟹ 非零ベクトルを固定しない。
+
+**書籍の場合 `F = 𝔽₄₃`**: `exists_odd_order_nonabelian_frobenius_complement`
+(`α = -2 = 41` (`(-2)⁷ = 1 - 3·43`), `ε = 6` (`6³ = 1 + 5·43`) を `decide` で確認)。
+⟹ **奇数位数の非可換群が Frobenius complement になりうる** (書籍の Note) が形式化された。
+
+再利用 helper (追加分): `unitsMatrixDistribMulAction` (`GL(n,R)` の `n → R` への作用) /
+`coe_sup_eq_mul_of_le_normalizer` (`K ≤ N_G(H)` なら `↑(H ⊔ K) = ↑H · ↑K`;
+`Subgroup.mul_normal` の正規性を緩めた版) / `scalar_mulVec_ne_of_ne_one` /
+`exists_diagonal_eq_one_of_mulVec_eq` / `diagonal_mul_scalar`。
+
+⚠ 実装の罠: `fin_cases k` の後は `simpa using ...` が別方向に正規化することがある
+(`(α⁴)ⁱ` が `(αⁱ)⁴` になる) — 補題を `∀ c, ((α^c)^i)^7 = 1` の形で用意して
+`exact` (defeq) で当てるのが安全 / `le_sup_left` は項なので `(le_sup_left : H ≤ H ⊔ K) hh` /
+`Ch01.card_sup_of_normal_of_coprime` は `S` を implicit に取るので `(S := …)` を明示。
+
+### 6A.1 の実装 (2026-07-27 完了、新 leaf `Problems6A.lean`)
+
+**主結果** `isFrobeniusAction_specialLinearGroupTwo` (実証明・axiom-clean・警告 0)。
+
+論法 (書籍 hint 無しの標準論法): `1 ≠ a ∈ A` が非零ベクトル `v` を固定したとすると
+`K := a - 1` は `Kv = 0` ゆえ `det K = 0`。2 次の行列式を展開して `det a = 1` と合わせると
+**`tr a = 2`**、これと `det a = 1` から成分計算で **`K² = 0`** (固有値 1 の重根 = 冪単)。
+`K² = 0` なら `(1+K)^n = 1 + n·K` (帰納法) で標数 `p` ゆえ **`a^p = 1`**、
+`p ∤ |A|` から `orderOf a = 1` で矛盾。
+
+支持部品 (いずれも汎用・再利用可):
+* `multiplicativeMulDistribMulAction` — `DistribMulAction M V` ⟹
+  `MulDistribMulAction M (Multiplicative V)`。repo の `IsFrobeniusAction` が乗法的なので
+  ベクトル空間への線形作用を扱うのに必須 (§6A/§6B の他の問題でも使う)。
+* `specialLinearGroupDistribMulAction` — `SL(n,R)` の `n → R` への `mulVec` 作用。
+* `one_add_pow_of_sq_eq_zero` — 環で `K² = 0` ⟹ `(1+K)^n = 1 + n•K`。
+* `specialLinearGroupTwo_pow_eq_one_of_smul_eq` / `..._eq_one_of_smul_eq` (元の形)。
+
+⚠ 実装の罠: `fin_cases i` の後は添字が `⟨0, _⟩` 形になり `simp only [h00]` (`K 0 0` 形) が
+**構文的にマッチしない** — 成分等式を先に `have e00 : (K*K) 0 0 = 0` として証明し、
+`fin_cases` 後は `exact e00` (defeq で通る) にする / `Matrix` は非可換環なので
+`M = 1 + (M - 1)` は `ring` でなく `abel` / `Multiplicative.ofAdd_toAdd` は無く
+`Multiplicative.toAdd.injective` を使う。
+
+## Ch.5 §5E (書籍 p. 175 の Problems 5E) — 🎉 完済 (2026-07-27)
+
+statement は **PDF ページ画像で確定済** (書籍 p.175 = PDF p.188)。§5E は **3 問のみ**。
+§5E 本文 (Thm 5.25 / **Thm 5.26 Frobenius** / Lem 5.27 / Lem 5.28 / Cor 5.29 / Cor 5.30) は
+`Ch05_Transfer/Main.lean` に**完成済**なので、道具は揃っている。
+
+| 問題 | 状態 | 主張 (PDF 実測) |
+|---|---|---|
+| 5E.1 | ✅ **完了** (`Problems5E1.lean`) | `G` 有限で**真部分群がすべて正規 `p`-補群をもつが `G` 自身は持たない** ⇒ `G` は正規 Sylow `p`-部分群をもち、`\|G\|` の `p` 以外の素因数はちょうど 1 個 (= Itô「極小非 `p`-冪零群」) |
+| 5E.2 | ✅ 完了 (`isSolvable_of_forall_proper_isSupersolvable`) | 真部分群がすべて超可解 ⇒ `G` は可解。hint: 極小反例は単純、Problem 3B.10 で最小素因数 `p` に対する正規 `p`-補群 |
+| 5E.3 | ✅ 完了 (`hasNormalPComplement_of_forall_two_generator`) | **2 元生成部分群がすべて正規 `p`-補群をもつ** ⇒ `G` も持つ。hint: `⟨x,y⟩` (`x` は `p`-部分群 `P` の元、`y ∈ N_G(P)` は位数が `p` で割れない) |
+
+### §5E の設計メモ (2026-07-27)
+
+**共通の道具**: **Thm 5.26 Frobenius** (`Main.lean`, 「`G` が正規 `p`-補群をもつ ⟺ 任意の
+`p`-部分群 `X` で `N_G(X)/C_G(X)` が `p`-群」) と、その使いやすい形
+`isPGroup_normalizerQuotientCentralizer_of_prime_subgroups_centralize`
+(「`q ≠ p` の `q`-部分群が `p`-部分群を正規化すれば中心化する」を確かめれば十分)。
+
+* **5E.2 の道筋 (repo 資産が一番揃っている)**: 極小反例 `G` を取る。真部分群は超可解ゆえ可解、
+  `1 < N ◁ G` があれば `N` も `G/N` も可解になり矛盾 ⟹ **`G` は単純**。`p` = `|G|` の最小素因数。
+  非自明 `p`-部分群 `X` について `N_G(X)` は `G` (単純性より `X ◁ G` は不可) ではなく真部分群、
+  よって超可解 ⟹ **3B.7(b)** (`index_prime_of_isCoatom_of_isSupersolvable`) + **3B.8**
+  (`exists_normal_qComplement`) で最小素因数の正規 `p`-補群をもつ ⟹ Frobenius (5.26) で
+  `G` が正規 `p`-補群 `K` をもつ。`K ≠ ⊥, ⊤` で単純性に矛盾。
+  ⚠ 「極小反例」は型レベル帰納 (`motive : ℕ → Prop` で全群型を量化;
+  `S7C_ThompsonPComplementFinal` と同じパターン) が要る。
+* **5E.1**: Itô の「極小非 `p`-冪零群」。Frobenius の対偶で「`N_G(X)` が正規 `p`-補群を
+  持たない非自明 `p`-部分群 `X`」が取れ、仮定から `N_G(X) = G` すなわち `O_p(G) ≠ 1`。
+  そこから `P ◁ G` と `|G| = p^a q^b` を出すのが本体 (商への帰納が要る)。
+* **5E.3**: Frobenius の判定条件を `q`-部分群版で使い、`x ∈ X` (`p`-部分群) と
+  `y ∈ N_G(X)` の `p'`-元に対し `⟨x,y⟩` の正規 `p`-補群から `[x,y] = 1` を出す
+  (`y` は `⟨x,y⟩` の `p`-補群に入る)。`|X|` に関する帰納が要りそう。
+
+### 5E.2 の実装 (2026-07-27 完了、新 leaf `Problems5E.lean` 151 行)
+
+型レベル強帰納 (`motive : ℕ → Prop` で全群型を量化、`S7C_ThompsonPComplementFinal` と同型)。
+
+* **非自明な真の正規部分群 `N` がある場合**: `N` は超可解ゆえ可解。`H ⧸ N` の真部分群 `L` は
+  `comap (mk' N) L ≠ ⊤` の像なので超可解 (新設 `Ch03.IsSupersolvable.of_surjective` を
+  `(mk' N).restrict _ |>.codRestrict L` に適用) ⟹ 帰納法で `H ⧸ N` 可解 ⟹
+  `solvable_of_ker_le_range` で拡大が可解。
+* **無い場合 (単純)**: `H` が `p`-群 (`p := minFac |H|`) なら冪零ゆえ可解。そうでなければ
+  非自明 `p`-部分群 `X` に対し `N_H(X) ≠ ⊤` (⊤ なら `X ◁ H` で単純性から `X ∈ {⊥,⊤}`、
+  どちらも除外)、ゆえに超可解 ⟹ **3B.7(b)** で極大部分群の指数が素数 ⟹ **3B.8**
+  (`exists_normal_qComplement`、`p` 最小素因数) で正規 `p`-補群 ⟹
+  **Frobenius Thm 5.26** で `H` 自身が正規 `p`-補群 `K` をもつ。`p ∣ |H|` で `K ≠ ⊤`、
+  `H` が `p`-群でないので `K ≠ ⊥` ⟹ 単純性に矛盾。
+
+**Ch03 側の追加**: `IsSupersolvable.of_surjective` (超可解列を押し出すだけ) を新設し、
+既存の `IsSupersolvable.quotient` はその特殊化に書き換えた (重複解消)。
+
+⚠ 実装の罠: `rw [hbot] at hmul` は `K.index` の `K` まで書き換えて後続の `hidx` が
+マッチしなくなる — `Nat.card ↥K = 1` だけを別 `have` にして書き換える。
+`push_neg` は deprecated (`push Not`)。
+
+### 5E.3 の実装 (2026-07-27 完了、`Problems5E.lean` に追記)
+
+⭐ **帰納法が要らない**。Frobenius Thm 5.26 の十分条件
+`isPGroup_normalizerQuotientCentralizer_of_prime_subgroups_centralize`
+(「`q ≠ p` の `q`-部分群 `Q` が `p`-部分群 `X` を正規化するなら中心化する」を確かめれば十分)
+に対して、`x ∈ X`, `y ∈ Q` を取り `H := ⟨x,y⟩` (2 元生成) の正規 `p`-補群 `K` を使うと:
+
+* `y` の位数は `q`-冪 (⟹ `p` と素) で `H ⧸ K` は `p`-冪位数 ⟹ **`y ∈ K`**;
+* `y` は `X` を正規化するので `⁅x,y⁆ = x·(y x⁻¹ y⁻¹) ∈ X` (`p`-群);
+* `K ⊴ H` と `y ∈ K` から `⁅x,y⁆ = (x y x⁻¹)·y⁻¹ ∈ K` (`p'`-群)。
+
+`⁅x,y⁆` の位数が `p`-冪かつ `p` と素 ⟹ `⁅x,y⁆ = 1`。
+
+⚠ 実装の罠: `orderOf_injective f hf a` は `a` を**明示的に渡す** (メタ変数のままだと
+`f ?a = x*y*x⁻¹*y⁻¹` を unify できない)。`orderOf_map_dvd` で商への位数の割り切れを取る。
+
+### 5E.1 (Itô) の設計 — **完全に確定** (2026-07-27、前回の未確定部分を解消)
+
+前 iteration で詰まっていた 2 点は**文献を読まずに解消できた**。鍵は
+**「極小非 `p`-冪零群は指数 `p` の正規部分群を持たない」**という補題。⭐ **位数に関する
+帰納法は一切不要** (Lemma 1 を `G` と `G/O_p(G)` の 2 つの群に適用するだけ)。
+
+**補題 1** (`opCore ≠ ⊥`): Frobenius Thm 5.26 の対偶で `N_G(X)` が正規 `p`-補群を持たない
+非自明 `p`-部分群 `X` が取れ、仮定から `N_G(X) = ⊤` すなわち `X ◁ G` ⟹ `O_p(G) ≠ 1`。
+
+**補題 2** (指数 `p` の正規部分群は無い) ⭐**これが前回の欠けていた鍵**: `M ◁ G` で
+`|G:M| = p` とすると `M` は真部分群ゆえ `p`-冪零、その正規 `p`-補群 `C` は一意性から
+`M` に characteristic ⟹ `C ◁ G`。`p ∤ |C|` かつ `|G:C| = p·|M:C|` は `p`-冪 ⟹
+`C` が `G` の正規 `p`-補群になり仮定に矛盾。
+
+**補題 3** (`G/O_p(G)` は `p`-冪零): そうでなければ `G/O_p(G)` も極小非 `p`-冪零 (真部分群は
+全射像ゆえ `p`-冪零 — 新設 `hasNormalPComplement_of_surjective`) なので**補題 1** が使えて
+`O_p(G/O_p(G)) ≠ 1`、その引き戻し `M` は `|M| = |O_p(G)|·(p-冪)` で `p`-群かつ正規、
+`normal_pgroup_le_opCore` で `M ≤ O_p(G)` となり矛盾。
+
+**(a) 正規 Sylow `p`-部分群**: 補題 3 の正規 `p`-補群 `K̄` の引き戻し `K` は `|G:K|` が `p`-冪。
+`K ≠ ⊤` なら `G/K` は非自明 `p`-群ゆえ極大部分群 (1D.6 で指数素数、冪零ゆえ正規) の
+引き戻しが**指数 `p` の正規部分群**になり補題 2 に矛盾 ⟹ `K = ⊤` ⟹ `G/O_p(G)` は
+`p'`-群 ⟹ `O_p(G)` は正規 Sylow `p`-部分群。
+
+**(b) `p` 以外の素因数はちょうど 1 個**: (a) の `P := O_p(G)` に Schur–Zassenhaus で
+Hall `p'`-補群 `H` を取る (`H ≠ 1`、さもないと `G` が `p`-群で `p`-冪零)。`|H|` が 2 個以上の
+素因数をもつなら、各素数 `s` の Sylow `S ≤ H` について `P·S` は**真部分群**ゆえ `p`-冪零、
+その正規 `p`-補群は `S` 自身 (正規 Hall `p'`-部分群は全ての `p'`-部分群を含む) ⟹
+`[P, S] ≤ P ⊓ S = 1`。`H` は Sylow 部分群たちで生成される (**5C.11 の `iSup_sylow_eq_top`**)
+ので `H ≤ C_G(P)` ⟹ `H ◁ G` が正規 `p`-補群になり矛盾。⟹ `|H|` は素数冪。
+
+### 🎉 5E.1 (Itô) 完了 (2026-07-27) — `Problems5E1.lean` 528 行
+
+**全て実証明・axiom-clean (`propext`/`Classical.choice`/`Quot.sound` のみ)・警告 0**。
+設計 (上記「5E.1 (Itô) の設計 — 完全に確定」節) はそのまま通った — **位数に関する帰納法は不要**。
+
+主結果:
+
+* `hasNormalPComplement_quotient_opCore_of_forall_proper` = **補題 3** (`G/O_p(G)` は `p`-冪零)。
+  ⚠ **設計時の想定より仮定が 1 つ落ちた**: `G` 自身が `p`-冪零でないことは**不要**
+  (`G` が `p`-冪零なら商もそう)。証明は「補題 1 を `G ⧸ O_p(G)` に適用 →
+  `O_p(G/O_p(G)) ≠ 1` → 引き戻しが正規 `p`-部分群で `O_p(G)` の最大性に矛盾」。
+* `sylow_eq_opCore_of_minimal_non_pNilpotent` = **(a)** (`Syl_p(G) = O_p(G)`, 一意)
+  + `normal_sylow_of_minimal_non_pNilpotent` (正規 Sylow の存在)。
+* `card_primeFactors_erase_eq_one_of_minimal_non_pNilpotent` = **(b)**
+  (`|G|` の `p` 以外の素因数はちょうど 1 個) + 使いやすい形
+  `exists_prime_card_eq_pow_mul_pow_of_minimal_non_pNilpotent`
+  (`∃ q a b, q.Prime ∧ q ≠ p ∧ 1 ≤ a ∧ 1 ≤ b ∧ |G| = p^a q^b`)。
+* `prime_dvd_card_of_not_hasNormalPComplement` (`p ∤ |G|` なら `⊤` が正規 `p`-補群)。
+
+再利用可能な汎用 helper 5 本 (いずれも 5E.1 専用でない):
+
+* `hasNormalPComplement_of_surjective` — 正規 `p`-補群は**全射像**に遺伝。
+* `isPGroup_comap_mk'_of_isPGroup` — `p`-群 `N` による商の `p`-部分群の引き戻しは `p`-群。
+* `card_map_mk'_of_inf_eq_bot` — `C ⊓ N = ⊥` なら `|C.map (mk' N)| = |C|`
+  (`(mk' N).comp C.subtype` の単射性経由)。
+* `le_of_index_eq_pow_of_not_dvd_card` — 指数が `p`-冪の正規部分群は `p'`-部分群を全て含む
+  (= 正規 `p`-補群が `p'`-部分群を全て含むことの一般形)。
+* `exists_normal_index_eq_prime_of_index_eq_pow` — 指数 `p^a` (`a ≥ 1`) の正規部分群が
+  あれば指数ちょうど `p` の正規部分群がある (1D.6 `isCoatom_iff_index_prime` +
+  冪零の正規化条件 + `IsCoatomic.eq_top_or_exists_le_coatom`)。
+
+**(b) の実装で効いた工夫** — 部分群の積の位数公式 (`|HK|·|H∩K| = |H||K|`, Set 積) を
+**一度も使わずに済ませた**。代わりに商 `G ⧸ O` への像で測る:
+
+* `O ⊔ T ≠ ⊤` は「`(O ⊔ T).map π = T.map π` かつ `|T.map π| = |T| < |H| = |G ⧸ O|`」で出る
+  (`⊤` なら像も `⊤`)。
+* `|O ⊔ T| = |O|·|T|` は `O ≤ O ⊔ T` から `(O⊔T).index = ((O⊔T).map π).index`
+  (`comap_map_eq` + `index_comap_of_surjective`) を作り、3 本の `card_mul_index` を
+  掛け合わせて `(O⊔T).index` で消去。
+* `T ⊴ O ⊔ T` は「`T.subgroupOf (O⊔T) ≤ C`(= `p`-補群) かつ位数一致 ⟹ `= C`」で出す。
+
+⚠ 実装の罠: `Subgroup.map_eq_bot_iff` は `H` が**明示引数**なので `.mpr` のドット記法が
+効かない (`Unknown constant`) — `QuotientGroup.map_mk'_self` (`N.map (mk' N) = ⊥`, simp) を使う /
+`le_sup_left` は項であって関数でないので `x ∈ O ⊔ T` を得るには `(le_sup_left : O ≤ O ⊔ T) hx` /
+`Nat.factorization_prod_pow_eq_self` は deprecated (`Nat.prod_factorization_pow_eq_self`)。
+
+### 🎉 §5E 完済 (5E.1 / 5E.2 / 5E.3 の全 3 問) ⟹ Isaacs Ch.5 の章末演習は §5A–§5E 全完。
 
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
