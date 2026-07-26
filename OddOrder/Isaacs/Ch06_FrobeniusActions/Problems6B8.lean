@@ -103,6 +103,41 @@ theorem mul_comm_of_index_center_le_two {P : Type*} [Group P] [Finite P]
     · exact isCyclic_of_prime_card (p := 2) (by omega)
   exact mul_comm_of_center_le_of_isCyclic_quotient le_rfl hcyc x y
 
+/-- `|P : Z(P)| = 4` なら `P/Z(P)` は `Z₂ × Z₂` — すなわち `∀ x, x² ∈ Z(P)`。
+
+位数 `4` の元があると `P/Z(P)` が巡回になり `P` が可換, すると `|P : Z(P)| = 1` で矛盾。 -/
+theorem sq_mem_center_of_index_center_eq_four {P : Type*} [Group P] [Finite P]
+    (h : (Subgroup.center P).index = 4) (x : P) : x ^ 2 ∈ Subgroup.center P := by
+  classical
+  set Q := P ⧸ Subgroup.center P with hQ
+  have hcard : Nat.card Q = 4 := h
+  have hsq : ∀ g : Q, g ^ 2 = 1 := by
+    intro g
+    have hdvd : orderOf g ∣ 4 := hcard ▸ orderOf_dvd_natCard g
+    have hne4 : orderOf g ≠ 4 := by
+      intro h4
+      haveI : IsCyclic Q := isCyclic_of_orderOf_eq_card g (by rw [h4, hcard])
+      have hcomm := mul_comm_of_center_le_of_isCyclic_quotient
+        (A := P) (Z := Subgroup.center P) le_rfl ‹IsCyclic Q›
+      have htop : Subgroup.center P = ⊤ :=
+        eq_top_iff.mpr fun g _ => Subgroup.mem_center_iff.mpr fun y => hcomm y g
+      rw [htop, Subgroup.index_top] at h
+      omega
+    have hdvd2 : orderOf g ∣ 2 := by
+      obtain ⟨i, hi, hgi⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp
+        ((show (2 : ℕ) ^ 2 = 4 by norm_num) ▸ hdvd)
+      have hine : i ≠ 2 := by
+        intro h2
+        rw [h2] at hgi
+        norm_num at hgi
+        exact hne4 hgi
+      rw [hgi]
+      simpa using pow_dvd_pow 2 (show i ≤ 1 by omega)
+    exact orderOf_dvd_iff_pow_eq_one.mp hdvd2
+  have := hsq (QuotientGroup.mk x)
+  rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff] at this
+  exact this
+
 /-- **6B.8 の base case**: `|P| = 8` かつ `|P : P'| = 4` なら `P` は `D_8` か `Q_8`。
 
 `|P'| = 2 ≠ 1` から非可換なので repo の Cor 6.14
