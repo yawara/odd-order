@@ -632,6 +632,37 @@ theorem theta_conj_eq_inv {P : Type*} [Group P] {A : Subgroup P}
     _ = (a * x⁻¹ * a⁻¹) * x := by rw [hx2]
     _ = (x⁻¹ * (a * x * a⁻¹))⁻¹ := by group
 
+/-- `θ(x) = x⁻¹ · a x a⁻¹` を準同型として束ねたもの (`A` 可換, `a` が `A` を正規化)。 -/
+def thetaHom {P : Type*} [Group P] (A : Subgroup P) (a : P)
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x)
+    (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A) : ↥A →* P where
+  toFun x := (x : P)⁻¹ * (a * (x : P) * a⁻¹)
+  map_one' := by simp
+  map_mul' x y := theta_mul hab a hnorm x.2 y.2
+
+/-- `θ` の像は `A` に含まれる。 -/
+theorem thetaHom_range_le {P : Type*} [Group P] {A : Subgroup P} {a : P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x)
+    (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A) :
+    (thetaHom A a hab hnorm).range ≤ A := by
+  rintro _ ⟨x, rfl⟩
+  exact A.mul_mem (A.inv_mem x.2) (hnorm _ x.2)
+
+/-- `θ` の核は `C_A(a)`。 -/
+theorem mem_thetaHom_ker_iff {P : Type*} [Group P] {A : Subgroup P} {a : P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x)
+    (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A) (x : ↥A) :
+    x ∈ (thetaHom A a hab hnorm).ker ↔ a * (x : P) = (x : P) * a := by
+  constructor
+  · intro hx
+    have hx1 : (x : P)⁻¹ * (a * (x : P) * a⁻¹) = 1 := hx
+    have h2 := congrArg (fun w => (x : P) * w * a) hx1
+    simpa [mul_assoc] using h2
+  · intro hx
+    show (x : P)⁻¹ * (a * (x : P) * a⁻¹) = 1
+    rw [hx]
+    group
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
