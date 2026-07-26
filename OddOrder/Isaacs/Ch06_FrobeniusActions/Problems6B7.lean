@@ -73,9 +73,38 @@ theorem dihedralOrQuaternionOrSemiDihedral_of_index_two_cyclic
     exact absurd (Nat.le_of_dvd (by positivity) hdvd)
       (by exact Nat.not_le.mpr (Nat.pow_lt_pow_right (by norm_num) (by omega)))
   rcases conj_eq_four_cases_of_index_two (a := a) hm hord h_idx with h | h | h | h
-  · -- `a` が `c` を中心化 ⟹ `P` 可換で矛盾
+  · -- `a` が `c` を中心化 ⟹ `⟨c⟩ ≤ Z(P)` となり `|P : Z(P)| ≤ 2` で仮定に反する
     exfalso
-    sorry
+    have hcomm : a * c = c * a := by
+      have h2 := congrArg (fun w => w * a) h
+      simpa [mul_assoc] using h2
+    have hCK : Subgroup.zpowers c ≤ Subgroup.centralizer ({c} : Set P) := by
+      intro x hx
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hx
+      exact Subgroup.mem_centralizer_singleton_iff.mpr ((Commute.refl c).zpow_left k).eq
+    have haK : a ∈ Subgroup.centralizer ({c} : Set P) :=
+      Subgroup.mem_centralizer_singleton_iff.mpr hcomm
+    have hKtop : Subgroup.centralizer ({c} : Set P) = ⊤ := by
+      have hmul := Subgroup.relIndex_mul_index hCK
+      rw [h_idx] at hmul
+      have hKidx : (Subgroup.centralizer ({c} : Set P)).index = 1 := by
+        by_contra hne
+        have hi2 : (Subgroup.centralizer ({c} : Set P)).index ∣ 2 := Dvd.intro_left _ hmul
+        rcases (Nat.dvd_prime Nat.prime_two).mp hi2 with h1 | h2
+        · exact hne h1
+        · rw [h2] at hmul
+          have hrel : (Subgroup.zpowers c).relIndex (Subgroup.centralizer ({c} : Set P)) = 1 := by
+            omega
+          exact h_a_notmem (Subgroup.relIndex_eq_one.mp hrel haK)
+      exact Subgroup.index_eq_one.mp hKidx
+    have hcz : c ∈ Subgroup.center P := by
+      refine Subgroup.mem_center_iff.mpr fun g => ?_
+      have : g ∈ Subgroup.centralizer ({c} : Set P) := by rw [hKtop]; trivial
+      exact Subgroup.mem_centralizer_singleton_iff.mp this
+    have hle : Subgroup.zpowers c ≤ Subgroup.center P := Subgroup.zpowers_le.mpr hcz
+    have hidx := Subgroup.index_dvd_of_le hle
+    rw [h_idx] at hidx
+    exact absurd (Nat.le_of_dvd (by norm_num) hidx) (by omega)
   · exact (dihedralOrQuaternion_of_invertingConjugation hP c a h_idx h_a_notmem h).imp
       id Or.inl
   · -- `a c a⁻¹ = z c` ⟹ `⟨c²⟩ ≤ Z(P)` で `|P : Z(P)| ∣ 4`
