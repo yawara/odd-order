@@ -1966,7 +1966,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.5 | ✅ **完了** (`ProblemsFrobeniusGroups.lean`) | 非可換可解群で全非単位元の中心化群が可換 ⟹ Frobenius 群 (核 = `F(G)`) |
 | 6A.6 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の仮説を満たす `A, B > 1` ⟹ ある `g` で `A ⊓ B^g > 1` |
 | 6A.7 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
-| 6A.8 | ⬜ | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
+| 6A.8 | ✅ **完了** (`Problems6A8.lean`) | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
 | 6A.9 | ⬜ | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
 | 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
@@ -1986,6 +1986,14 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
   — 書籍では Lemma 6.5 の文脈から暗黙)。hint どおり `A` と `A^g` がともに **`↥H` の中で**
   TI 仮説をみたすこと (`TI_subgroupOf_of_TI` / `TI_subgroupOf_conj_of_TI`) を見て **6A.6** を
   `↥H` で使う。副産物: `conj_smul_subgroupOf` (`k ∈ H` なら共役と `subgroupOf` が交換)。
+* **6A.8** `subset_notConjugateSet_or_subset_of_normal` (新 leaf `Problems6A8.lean`):
+  `M ⊴ G` なら `M ⊆ X` または `X ⊆ M`。`A ⊓ M = 1` なら前者 (`M` 正規ゆえ共役先も `M` 内)。
+  `A ⊓ M ≠ 1` なら **6A.7(a)** で `A ⊔ M = ⊤`、そのうえで
+  (i) `A ⊓ M` が `↥M` で TI 仮説をみたす、(ii) Lemma 6.5 を `↥M` で使って
+  `|X_M| = |M : A ⊓ M| = |G : A| = |X|` (第 2 同型定理の指数版
+  `index_eq_relIndex_of_sup_eq_top` を新設)、(iii) `X_M ⊆ X` を elementwise に示し
+  (`g = m a₁` と分解して `y` が `M` 内で `a₁ a a₁⁻¹ ∈ A ⊓ M` と共役)、
+  (iv) 濃度一致 + 包含から `X = X_M ⊆ M`。
 * **6A.11** `TI_iff_forall_normalizer_le`: TI 仮説 ⟺ 任意の非自明 `T ≤ A` で `N_G(T) ≤ A`。
   (⟸) の論法 (`TI_of_normalizer_le`)。`D := A ⊓ A^g ≠ 1` として:
 1. `1 ≠ T ≤ D` について `N_G(T) ≤ A` かつ (`g⁻¹ • T ≤ A` に仮説) `N_G(T) ≤ A^g`
