@@ -1958,7 +1958,7 @@ statement は **PDF ページ画像で確定済** (書籍 p.175 = PDF p.188)。�
 
 | 問題 | 状態 | 主張 (PDF 実測) |
 |---|---|---|
-| 5E.1 | ⬜ | `G` 有限で**真部分群がすべて正規 `p`-補群をもつが `G` 自身は持たない** ⇒ `G` は正規 Sylow `p`-部分群をもち、`\|G\|` の `p` 以外の素因数はちょうど 1 個 (= Itô「極小非 `p`-冪零群」) |
+| 5E.1 | 🔨 補題 3 本 landing 済 / 主定理は次回 (`Problems5E1.lean`) | `G` 有限で**真部分群がすべて正規 `p`-補群をもつが `G` 自身は持たない** ⇒ `G` は正規 Sylow `p`-部分群をもち、`\|G\|` の `p` 以外の素因数はちょうど 1 個 (= Itô「極小非 `p`-冪零群」) |
 | 5E.2 | ✅ 完了 (`isSolvable_of_forall_proper_isSupersolvable`) | 真部分群がすべて超可解 ⇒ `G` は可解。hint: 極小反例は単純、Problem 3B.10 で最小素因数 `p` に対する正規 `p`-補群 |
 | 5E.3 | ✅ 完了 (`hasNormalPComplement_of_forall_two_generator`) | **2 元生成部分群がすべて正規 `p`-補群をもつ** ⇒ `G` も持つ。hint: `⟨x,y⟩` (`x` は `p`-部分群 `P` の元、`y ∈ N_G(P)` は位数が `p` で割れない) |
 
@@ -2052,6 +2052,24 @@ Hall `p'`-補群 `H` を取る (`H ≠ 1`、さもないと `G` が `p`-群で `
 その正規 `p`-補群は `S` 自身 (正規 Hall `p'`-部分群は全ての `p'`-部分群を含む) ⟹
 `[P, S] ≤ P ⊓ S = 1`。`H` は Sylow 部分群たちで生成される (**5C.11 の `iSup_sylow_eq_top`**)
 ので `H ≤ C_G(P)` ⟹ `H ◁ G` が正規 `p`-補群になり矛盾。⟹ `|H|` は素数冪。
+
+### 5E.1 の実装状況 (2026-07-27 時点) — 補題 3 本 landing、主定理は未
+
+新 leaf `Problems5E1.lean` (114 行、`OddOrder.lean` 配線済、いずれも axiom-clean・警告 0):
+
+* `hasNormalPComplement_of_surjective` — 正規 `p`-補群は**全射像**に遺伝
+  (`Subgroup.index_map_dvd` + 位数橋渡し)。汎用。
+* `opCore_ne_bot_of_minimal_non_pNilpotent` — **補題 1** (`O_p(G) ≠ 1`)。
+* `not_exists_normal_index_eq_prime_of_minimal_non_pNilpotent` — **補題 2**
+  (指数 `p` の正規部分群は無い)。⭐ Itô の鍵。
+
+**次回やること** (設計は上記「5E.1 (Itô) の設計 — 完全に確定」節のとおり):
+1. **補題 3** (`G/O_p(G)` が `p`-冪零) — 補題 1 を `G ⧸ opCore p G` に適用。
+   真部分群の `p`-冪零性は `hasNormalPComplement_of_surjective` を
+   `(mk' O).restrict _ |>.codRestrict L` に当てる (5E.2 の同種の段と同じ形)。
+2. **(a)** 正規 Sylow — 補題 3 の `K̄` の引き戻しが `⊤` (補題 2 + 「非自明 `p`-群は指数 `p` の
+   正規部分群をもつ」= 1D.6 `isCoatom_iff_index_prime` + 冪零の正規化条件)。
+3. **(b)** Schur–Zassenhaus + `iSup_sylow_eq_top` (5C.11)。
 
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
