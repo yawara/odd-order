@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch05_Transfer.Basic
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 
 /-!
@@ -431,6 +432,31 @@ theorem commutator_sup_eq_top_of_TI [Finite G] {A : Subgroup G} (hAne : A ≠ �
     rw [heq]
     exact Subgroup.mul_mem _ ((le_sup_left : commutator G ≤ commutator G ⊔ A) hc) hh
   exact eq_top_of_normal_of_TI hAne (le_sup_right : A ≤ commutator G ⊔ A) hATI
+
+/-- **Isaacs Problem 6A.10(a) の後半** (p. 186): TI 仮説の下で `A` は `A` の**任意の**部分群に
+おける `G`-fusion を制御する (とくに (a) の Sylow `p`-部分群 `P` において)。
+
+`1 ≠ x ∈ H ≤ A` が `g x g⁻¹ = y ∈ A` なら `conj_mem_iff_of_TI` から `g ∈ A` 自身が
+共役元として使える。 -/
+theorem controlsFusionIn_of_TI {A : Subgroup G}
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥)
+    {H : Subgroup G} (hHA : H ≤ A) : A.ControlsFusionIn H := by
+  rintro x y hx hy ⟨g, hg⟩
+  rcases eq_or_ne x 1 with rfl | hxne
+  · exact ⟨1, A.one_mem, by simpa using hg⟩
+  refine ⟨g, ?_, hg⟩
+  by_contra hgA
+  have hmem : y ∈ A ⊓ (MulAut.conj g • A) := by
+    refine Subgroup.mem_inf.mpr ⟨hHA hy, ?_⟩
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    change (MulAut.conj g).symm y ∈ A
+    rw [MulAut.conj_symm_apply, ← hg]
+    simpa [mul_assoc] using hHA hx
+  rw [hATI g hgA, Subgroup.mem_bot] at hmem
+  refine hxne ?_
+  rw [hmem] at hg
+  have h2 := congrArg (fun z : G => g⁻¹ * z * g) hg
+  simpa [mul_assoc] using h2
 
 /-- **Isaacs Problem 6A.10(b) 後半の易しい向き**: `A' ≤ G' ⊓ A`
 (TI 仮説なしに成り立つ; 逆向き `G' ⊓ A ≤ A'` は fusion 制御 (a) と focal subgroup が要る)。 -/
