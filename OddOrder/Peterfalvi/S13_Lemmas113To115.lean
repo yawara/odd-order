@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
 import OddOrder.Peterfalvi.S12_TypeVSibley
+import OddOrder.Peterfalvi.S13_SixTwoImageData
 
 /-!
 # S13_Lemmas113To115
@@ -28,10 +29,13 @@ sub-family `S(H₀C)` is coherent, then so is the full family `S`.
 
 This is Peterfalvi's Theorem (6.3) applied with `(L, K, M, H, H₁) = (M, M', 1, HC, H₀C)`; its
 hypotheses hold in the §13 setup ((6.3.a) `HC` nilpotent — `H = M_F` nilpotent and `C = C_U(H)`
-centralizes `H`; (6.3.b) from the coherence of `S(H₀C)`; (6.3.c) from (9.6)/(11.1)).  Left as a
-named obligation: the repo's §6 coherence is packaged through the `SibleyDadeHypothesis`
-filtration machinery (`S08_Theorem63`), not as a standalone "subfamily-coherent ⟹ coherent"
-statement, so discharging this is §6 character theory (lane-b). -/
+centralizes `H`; (6.3.b) from the coherence of `S(H₀C)`; (6.3.c) from (9.6)/(11.1)).
+
+Discharged through the **oracle-free** (6.3) `S12.Hypothesis.sixThree_of_hypothesis`
+(`S13_SixTwoImageData`, issue 0153): the (6.2) break-member bound is *proved* from Hypothesis
+(5.2)'s difference-image families (`inducedFamilyImageData`, i.e. Peterfalvi (5.3.b): the
+two-element Dade family on irreducible members, `R(μ_j)` of Theorem (4.9) on the reducible
+μ-columns), so this cite needs neither the break oracle nor the §11 dichotomy producer. -/
 theorem coherent_S_of_coherent_SH0C [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) (htype : IsTypeIII M ∨ IsTypeIV M)
@@ -83,57 +87,28 @@ theorem coherent_S_of_coherent_SH0C [Finite G]
     rw [hidx, hcardq]
     obtain ⟨hp', hq', hpo, hqo, hne⟩ := hyp.p_q_distinct_odd_primes _hG htype
     exact prime_pow_gt_four_mul_sq_add_one hp' hq' hpo hqo hne
-  -- assemble via the (6.3) oracle
-  have hmain := OddOrder.Peterfalvi.S08.six_three_of_six_two_oracle
-    (L := M) (K := (derivedInG M).subgroupOf M) (H := hyp.HC.subgroupOf M)
-    (M := ⊥) (H₁ := hyp.H0C.subgroupOf M) hHnorm bot_le hH₁H hHK
-    hyp.base.tau hyp.base.A0
-    (fun X => OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) X)
-    ?_ (by
+  -- assemble via the **oracle-free** (6.3) (`S12.Hypothesis.sixThree_of_hypothesis`,
+  -- `S13_SixTwoImageData`): the (6.2) break bound is proved from Hypothesis (5.2)'s image
+  -- families, so neither the break-member oracle nor the §11 dichotomy producer (with its
+  -- `ChiefFactorData` / `TypePNontrivialCore` inputs) is needed here.
+  have hmain := hyp.base.sixThree_of_hypothesis _hG
+    (hyp.params_mu_eq _hG _hG.odd) hyp.params_delta_pm
+    (hyp.params_delta_sign _hG _hG.odd) hyp.params_zeta_mem hyp.params_zeta_degree
+    (H := hyp.HC.subgroupOf M) (N := ⊥) (H₁ := hyp.H0C.subgroupOf M)
+    hHnorm bot_le hH₁H hHK
+    (by
       show Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
         (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
           (hyp.H0C.subgroupOf M)) hyp.base.A0)
       rw [← hyp.SOf_eq]
       exact _hcoh) hbound
-  · have hSset : hyp.base.Sset
-        = OddOrder.Peterfalvi.S08.inducedKernelFamily
-            ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := by
-      unfold OddOrder.Peterfalvi.S12.Hypothesis.Sset
-      exact OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot
-    rw [hSset]
-    exact hmain
-  · -- the (5.6) break-member oracle `h56` = the §11 dichotomy producer
-    intro A B hAnorm hBnorm hBA hAH₁ _hcentral hAcoh hBncoh
-    haveI := hAnorm
-    haveI := hBnorm
-    haveI : (A.subgroupOf ((derivedInG M).subgroupOf M)).Normal := hAnorm.subgroupOf _
-    haveI : (B.subgroupOf ((derivedInG M).subgroupOf M)).Normal := hBnorm.subgroupOf _
-    have hAne : A.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤ := by
-      intro htop
-      exact absurd (hHK.trans ((Subgroup.subgroupOf_eq_top.mp htop).trans hAH₁))
-        (not_le_of_gt hH₁H)
-    have hBne : B.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤ := by
-      intro htop
-      exact absurd (hHK.trans ((Subgroup.subgroupOf_eq_top.mp htop).trans (hBA.trans hAH₁)))
-        (not_le_of_gt hH₁H)
-    have hAcoh' : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.base.dadeData.dade
-          (hyp.base.dadeData.dade.fullDadeIsometryData))
-        (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A)
-        hyp.base.A0) := hAcoh
-    have hBncoh' : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.base.dadeData.dade
-          (hyp.base.dadeData.dade.fullDadeIsometryData))
-        (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
-        hyp.base.A0) := fun h => hBncoh h
-    exact hyp.base.exists_source_of_coherence_dichotomy _hG
-      (hyp.params_mu_eq _hG _hG.odd) hyp.params_delta_pm
-      (hyp.params_delta_sign _hG _hG.odd) hyp.params_zeta_mem hyp.params_zeta_degree
-      htype
-      (OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV
-        htype hyp.base.typeP)
-      (OddOrder.Peterfalvi.S11.exists_chiefFactorData _hG _).choose
-      hAne hBne hAcoh' hBncoh'
+  have hSset : hyp.base.Sset
+      = OddOrder.Peterfalvi.S08.inducedKernelFamily
+          ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := by
+    unfold OddOrder.Peterfalvi.S12.Hypothesis.Sset
+    exact OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot
+  rw [hSset]
+  exact hmain
 
 /-- **Peterfalvi (11.4), parametrized on the (11.3) non-coherence** (issue 1025): if `S(H_1)`
 is coherent for a normal subgroup `H_1 < M'`, then `|M'/H_1| - 1 ≤ 2 q |U/C|` (the quotient
