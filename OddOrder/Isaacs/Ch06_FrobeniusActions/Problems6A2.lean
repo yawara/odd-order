@@ -21,16 +21,28 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A
 本ファイルでは一般の体 `F` で述べる (書籍の `F = 𝔽₄₃` はその特殊化; 43 での存在は
 `exists_orderOf_eq_seven_zmod_fortyThree` / `exists_orderOf_eq_three_zmod_fortyThree`)。
 
-## この節の内容 (第 1 段: 行列の関係式)
+## 内容
 
-* `matA` / `matB` — 書籍の `a`, `b`。
-* `matA_pow` — `a^n = diag(αⁿ, α⁴ⁿ, α²ⁿ)`。
-* `matA_pow_seven` — `a⁷ = 1`。
-* `matB_pow_three` — `b³ = ε • 1` (スカラー), したがって `matB_pow_nine`: `b⁹ = 1`。
-* `matA_mul_matB` — **`a · b = b · a²`** (`b` は `⟨a⟩` を正規化し `b⁻¹ a b = a²`)。
+**行列の関係式**: `matA α = diag(α, α⁴, α²)` / `matB ε = ![[0,1,0],[0,0,1],[ε,0,0]]` /
+`matA_pow_seven` (`a⁷ = 1`) / `matB_pow_three` (**`b³ = ε · 1`** はスカラー) /
+`matB_pow_nine` (`b⁹ = 1`) / `matA_mul_matB` (**`a · b = b · a²`**, 書籍 hint の
+「`b` は `⟨a⟩` を正規化」の実内容 — 実際 `b⁻¹ a b = a²`, `b a b⁻¹ = a⁴`)。
+
+**群構造**: `uA` / `uB` (`GL(3,F)` の元) / `orderOf_uA = 7` / `orderOf_uB = 9` /
+`uB_mem_normalizer` / `grpA` (= `A`) / **`card_grpA` (`|A| = 63`)** /
+**`not_isCyclic_grpA`**。
+
+**Frobenius 性**: 正規形 `exists_pow_mul_pow_of_mem_grpA` (`A` の元は `aⁱ bʲ`) と
+立方計算 `cube_uA_pow_mul_uB` (`(aⁱb)³ = b³`) / `cube_uA_pow_mul_uB_sq`
+(`(aⁱb²)³ = b⁶`) から **`isFrobeniusAction_grpA`**。⭐ 書籍 hint の「素数位数の元に
+還元」も Sylow も要らない (下記 `### Frobenius 性` 節参照)。
+
+**書籍の場合 `F = 𝔽₄₃`**: `exists_odd_order_nonabelian_frobenius_complement`。
 -/
 
 namespace OddOrder.Isaacs.Ch06
+
+open Pointwise
 
 section /- 6A.2: `GL(3,43)` の奇数位数非可換 Frobenius complement (p. 184) -/
 
@@ -288,6 +300,340 @@ theorem not_isCyclic_grpA (hα : orderOf α = 7) (hε : orderOf ε = 3) :
   have hord := orderOf_uA hα
   rw [hone, orderOf_one] at hord
   omega
+
+/-! ### Frobenius 性
+
+書籍 hint は「素数位数の元 `t` について `C_V(t) = 1` を見れば十分」だが, **正規形
+`x = aⁱ bʲ` を使うと素数位数への還元も Sylow も要らない**:
+
+* `3 ∣ j` のとき `bʲ = εᵐ · 1` (スカラー) なので `x = diag(εᵐαⁱ, εᵐα⁴ⁱ, εᵐα²ⁱ)`。
+  非零ベクトルを固定するなら対角成分のどれかが `1`, ところが `⟨ε⟩ ⊓ ⟨α⟩ = 1` ゆえ
+  `εᵐ = 1` かつ `α^{kⁱ} = 1` となり `x = 1`。
+* `3 ∤ j` のとき **`x³` は非単位スカラー** (`aⁱ` の寄与は `1 + 4^j + 4^{2j} ≡ 0 (mod 7)` で
+  消え, `b^{3j} = ε^j · 1` が残る) — スカラーは非零ベクトルを固定しない。
+-/
+
+/-- `GL(n, R)` (= 行列環の単元群) は `n → R` に `mulVec` で線形に作用する。 -/
+instance unitsMatrixDistribMulAction {n : Type*} [Fintype n] [DecidableEq n]
+    {R : Type*} [CommRing R] : DistribMulAction ((Matrix n n R)ˣ) (n → R) where
+  smul a v := (a : Matrix n n R).mulVec v
+  one_smul v := by
+    change ((1 : (Matrix n n R)ˣ) : Matrix n n R).mulVec v = v
+    rw [Units.val_one, Matrix.one_mulVec]
+  mul_smul a b v := by
+    change ((a * b : (Matrix n n R)ˣ) : Matrix n n R).mulVec v
+      = (a : Matrix n n R).mulVec ((b : Matrix n n R).mulVec v)
+    rw [Units.val_mul, Matrix.mulVec_mulVec]
+  smul_zero a := by
+    change (a : Matrix n n R).mulVec 0 = 0
+    exact Matrix.mulVec_zero _
+  smul_add a u v := by
+    change (a : Matrix n n R).mulVec (u + v)
+      = (a : Matrix n n R).mulVec u + (a : Matrix n n R).mulVec v
+    exact Matrix.mulVec_add _ _ _
+
+theorem unitsMatrix_smul_def {n : Type*} [Fintype n] [DecidableEq n] {R : Type*} [CommRing R]
+    (a : (Matrix n n R)ˣ) (v : n → R) : a • v = (a : Matrix n n R).mulVec v := rfl
+
+/-- `K ≤ N_G(H)` なら `H ⊔ K` の台集合は積集合 `H · K`
+(`Subgroup.mul_normal` の「`N` が `G` で正規」を「`K` が `H` を正規化」に緩めた版)。 -/
+theorem coe_sup_eq_mul_of_le_normalizer {G : Type*} [Group G] {H K : Subgroup G}
+    (hK : K ≤ Subgroup.normalizer H) :
+    ((H ⊔ K : Subgroup G) : Set G) = (H : Set G) * (K : Set G) := by
+  refine le_antisymm ?_ ?_
+  · let P : Subgroup G :=
+      { carrier := (H : Set G) * (K : Set G)
+        one_mem' := ⟨1, one_mem _, 1, one_mem _, one_mul 1⟩
+        mul_mem' := by
+          rintro _ _ ⟨h₁, hh₁, k₁, hk₁, rfl⟩ ⟨h₂, hh₂, k₂, hk₂, rfl⟩
+          exact ⟨h₁ * (k₁ * h₂ * k₁⁻¹),
+            Subgroup.mul_mem _ hh₁ (((Subgroup.mem_normalizer_iff.mp (hK hk₁)) h₂).mp hh₂),
+            k₁ * k₂, Subgroup.mul_mem _ hk₁ hk₂, by group⟩
+        inv_mem' := by
+          rintro _ ⟨h, hh, k, hk, rfl⟩
+          exact ⟨k⁻¹ * h⁻¹ * (k⁻¹)⁻¹,
+            ((Subgroup.mem_normalizer_iff.mp (hK (inv_mem hk))) h⁻¹).mp (inv_mem hh),
+            k⁻¹, inv_mem hk, by group⟩ }
+    exact (sup_le (fun h hh => ⟨h, hh, 1, one_mem _, mul_one h⟩)
+      (fun k hk => ⟨1, one_mem _, k, hk, one_mul k⟩) : H ⊔ K ≤ P)
+  · rintro _ ⟨h, hh, k, hk, rfl⟩
+    exact Subgroup.mul_mem _ ((le_sup_left : H ≤ H ⊔ K) hh) ((le_sup_right : K ≤ H ⊔ K) hk)
+
+/-- **正規形**: `A = ⟨a, b⟩` の元はすべて `aⁱ bʲ` (`i j : ℕ`) の形。 -/
+theorem exists_pow_mul_pow_of_mem_grpA [Finite F] (hα : orderOf α = 7) (hε : orderOf ε = 3)
+    {x : (Matrix (Fin 3) (Fin 3) F)ˣ} (hx : x ∈ grpA hα hε) :
+    ∃ i j : ℕ, x = uA hα ^ i * uB hε ^ j := by
+  rw [grpA_eq_sup] at hx
+  have hmem : x ∈ ((Subgroup.zpowers (uA hα) : Set ((Matrix (Fin 3) (Fin 3) F)ˣ))
+      * (Subgroup.zpowers (uB hε) : Set ((Matrix (Fin 3) (Fin 3) F)ˣ))) := by
+    rw [← coe_sup_eq_mul_of_le_normalizer (Subgroup.zpowers_le.mpr (uB_mem_normalizer hα hε))]
+    exact hx
+  obtain ⟨y, hy, z, hz, rfl⟩ := hmem
+  obtain ⟨i, hi⟩ := (Submonoid.mem_powers_iff _ _).mp (mem_powers_iff_mem_zpowers.mpr hy)
+  obtain ⟨j, hj⟩ := (Submonoid.mem_powers_iff _ _).mp (mem_powers_iff_mem_zpowers.mpr hz)
+  exact ⟨i, j, by rw [hi, hj]⟩
+
+/-- `b aⁱ b⁻¹ = a^{4i}`。 -/
+theorem uB_mul_uA_pow_mul_uB_inv (hα : orderOf α = 7) (hε : orderOf ε = 3) (i : ℕ) :
+    uB hε * uA hα ^ i * (uB hε)⁻¹ = uA hα ^ (4 * i) := by
+  rw [← conj_pow, uB_mul_uA_mul_uB_inv hα hε, ← pow_mul]
+
+/-- `b aⁱ = a^{4i} b`。 -/
+theorem uB_mul_uA_pow (hα : orderOf α = 7) (hε : orderOf ε = 3) (i : ℕ) :
+    uB hε * uA hα ^ i = uA hα ^ (4 * i) * uB hε := by
+  rw [← uB_mul_uA_pow_mul_uB_inv hα hε i]
+  group
+
+/-- `b² aⁱ = a^{16i} b²`。 -/
+theorem uB_sq_mul_uA_pow (hα : orderOf α = 7) (hε : orderOf ε = 3) (i : ℕ) :
+    uB hε ^ 2 * uA hα ^ i = uA hα ^ (16 * i) * uB hε ^ 2 := by
+  have h : uB hε ^ 2 * uA hα ^ i = uB hε * (uB hε * uA hα ^ i) := by
+    rw [pow_two, mul_assoc]
+  rw [h, uB_mul_uA_pow hα hε i]
+  have h2 : uB hε * (uA hα ^ (4 * i) * uB hε) = (uB hε * uA hα ^ (4 * i)) * uB hε := by
+    rw [mul_assoc]
+  rw [h2, uB_mul_uA_pow hα hε (4 * i), show 4 * (4 * i) = 16 * i by ring, pow_two, mul_assoc]
+
+theorem uA_pow_mul_seven (hα : orderOf α = 7) (k : ℕ) : uA hα ^ (7 * k) = 1 := by
+  rw [pow_mul, uA_pow_seven hα, one_pow]
+
+/-- `(aⁱ b)³ = b³` — `aⁱ` の寄与 `1 + 4 + 16 = 21 ≡ 0 (mod 7)` が消える。 -/
+theorem cube_uA_pow_mul_uB (hα : orderOf α = 7) (hε : orderOf ε = 3) (i : ℕ) :
+    (uA hα ^ i * uB hε) ^ 3 = uB hε ^ 3 := by
+  have h21 : uA hα ^ (21 * i) = 1 := by
+    rw [show 21 * i = 7 * (3 * i) by ring]
+    exact uA_pow_mul_seven hα _
+  have expand : (uA hα ^ i * uB hε) ^ 3
+      = uA hα ^ i * (uB hε * uA hα ^ i) * (uB hε * uA hα ^ i) * uB hε := by
+    rw [pow_succ, pow_succ, pow_one]
+    simp only [mul_assoc]
+  rw [expand, uB_mul_uA_pow hα hε i]
+  have step : uA hα ^ i * (uA hα ^ (4 * i) * uB hε) * (uA hα ^ (4 * i) * uB hε) * uB hε
+      = uA hα ^ i * uA hα ^ (4 * i) * (uB hε * uA hα ^ (4 * i)) * (uB hε * uB hε) := by
+    simp only [mul_assoc]
+  rw [step, uB_mul_uA_pow hα hε (4 * i)]
+  have final : uA hα ^ i * uA hα ^ (4 * i) * (uA hα ^ (4 * (4 * i)) * uB hε) * (uB hε * uB hε)
+      = uA hα ^ (21 * i) * uB hε ^ 3 := by
+    rw [show (21 : ℕ) * i = i + 4 * i + 4 * (4 * i) by ring, pow_add, pow_add,
+      pow_succ, pow_succ, pow_one]
+    simp only [mul_assoc]
+  rw [final, h21, one_mul]
+
+/-- `(aⁱ b²)³ = b⁶` — `aⁱ` の寄与 `1 + 16 + 256 = 273 = 39·7 ≡ 0 (mod 7)` が消える。 -/
+theorem cube_uA_pow_mul_uB_sq (hα : orderOf α = 7) (hε : orderOf ε = 3) (i : ℕ) :
+    (uA hα ^ i * uB hε ^ 2) ^ 3 = uB hε ^ 6 := by
+  have h273 : uA hα ^ (273 * i) = 1 := by
+    rw [show 273 * i = 7 * (39 * i) by ring]
+    exact uA_pow_mul_seven hα _
+  have expand : (uA hα ^ i * uB hε ^ 2) ^ 3
+      = uA hα ^ i * (uB hε ^ 2 * uA hα ^ i) * (uB hε ^ 2 * uA hα ^ i) * uB hε ^ 2 := by
+    rw [pow_succ, pow_succ, pow_one]
+    simp only [mul_assoc]
+  rw [expand, uB_sq_mul_uA_pow hα hε i]
+  have step : uA hα ^ i * (uA hα ^ (16 * i) * uB hε ^ 2) * (uA hα ^ (16 * i) * uB hε ^ 2)
+        * uB hε ^ 2
+      = uA hα ^ i * uA hα ^ (16 * i) * (uB hε ^ 2 * uA hα ^ (16 * i))
+        * (uB hε ^ 2 * uB hε ^ 2) := by
+    simp only [mul_assoc]
+  rw [step, uB_sq_mul_uA_pow hα hε (16 * i)]
+  have final : uA hα ^ i * uA hα ^ (16 * i) * (uA hα ^ (16 * (16 * i)) * uB hε ^ 2)
+        * (uB hε ^ 2 * uB hε ^ 2)
+      = uA hα ^ (273 * i) * uB hε ^ 6 := by
+    rw [show (273 : ℕ) * i = i + 16 * i + 16 * (16 * i) by ring, pow_add, pow_add,
+      show (6 : ℕ) = 2 + 2 + 2 by norm_num, pow_add, pow_add]
+    simp only [mul_assoc]
+  rw [final, h273, one_mul]
+
+/-! ### 不動点の解析 -/
+
+/-- 非単位スカラー行列は非零ベクトルを固定しない。 -/
+theorem scalar_mulVec_ne_of_ne_one {n : Type*} [Fintype n] [DecidableEq n] {c : F} (hc : c ≠ 1)
+    {v : n → F} (hv : v ≠ 0) : (c • (1 : Matrix n n F)).mulVec v ≠ v := by
+  intro hfix
+  obtain ⟨k, hk⟩ := Function.ne_iff.mp hv
+  simp only [Pi.zero_apply] at hk
+  have h := congrFun hfix k
+  rw [Matrix.smul_mulVec, Matrix.one_mulVec] at h
+  exact hc (mul_right_cancel₀ hk (by simpa using h))
+
+/-- 対角行列が非零ベクトルを固定するなら, ある対角成分が `1`。 -/
+theorem exists_diagonal_eq_one_of_mulVec_eq {n : Type*} [Fintype n] [DecidableEq n]
+    {d v : n → F} (hv : v ≠ 0) (hfix : (Matrix.diagonal d).mulVec v = v) :
+    ∃ k, d k = 1 := by
+  obtain ⟨k, hk⟩ := Function.ne_iff.mp hv
+  simp only [Pi.zero_apply] at hk
+  exact ⟨k, mul_right_cancel₀ hk (by rw [← Matrix.mulVec_diagonal d v k, hfix, one_mul])⟩
+
+/-- `⟨ε⟩ ⊓ ⟨α⟩ = 1` の元形: `c³ = 1` かつ `c⁷ = 1` なら `c = 1`。 -/
+theorem eq_one_of_pow_three_pow_seven {c : F} (h3 : c ^ 3 = 1) (h7 : c ^ 7 = 1) : c = 1 := by
+  have hd : orderOf c ∣ Nat.gcd 3 7 :=
+    Nat.dvd_gcd (orderOf_dvd_of_pow_eq_one h3) (orderOf_dvd_of_pow_eq_one h7)
+  rw [show Nat.gcd 3 7 = 1 by norm_num] at hd
+  exact orderOf_eq_one_iff.mp (Nat.dvd_one.mp hd)
+
+theorem uB_pow_three_val (hε : orderOf ε = 3) :
+    ((uB hε ^ 3 : (Matrix (Fin 3) (Fin 3) F)ˣ) : Matrix (Fin 3) (Fin 3) F)
+      = ε • (1 : Matrix (Fin 3) (Fin 3) F) := by
+  rw [Units.val_pow_eq_pow_val, uB_val, matB_pow_three]
+
+/-- `b³ = ε · 1` はスカラーゆえ `GL(3,F)` の中心に入る。 -/
+theorem uB_pow_three_commute (hε : orderOf ε = 3) (y : (Matrix (Fin 3) (Fin 3) F)ˣ) :
+    Commute (uB hε ^ 3) y := by
+  refine Units.ext ?_
+  rw [Units.val_mul, Units.val_mul, uB_pow_three_val hε, Matrix.smul_mul, Matrix.mul_smul,
+    one_mul, mul_one]
+
+/-- スカラー倍と対角行列: `c • diag(d) = diag(k ↦ d k * c)`。 -/
+theorem diagonal_mul_scalar {n : Type*} [Fintype n] [DecidableEq n] (d : n → F) (c : F) :
+    Matrix.diagonal d * (c • (1 : Matrix n n F)) = Matrix.diagonal (fun k => d k * c) := by
+  have hscal : (c • (1 : Matrix n n F)) = Matrix.diagonal (fun _ => c) := by
+    ext p q
+    by_cases h : p = q <;> simp [h]
+  rw [hscal, Matrix.diagonal_mul_diagonal]
+
+/-- **Isaacs Problem 6A.2 (後半)** ⭐: `A = ⟨a, b⟩` の位数 `|F|³` のベクトル空間 `V = F³` への
+自然な作用は **Frobenius**。 -/
+theorem isFrobeniusAction_grpA [Finite F] (hα : orderOf α = 7) (hε : orderOf ε = 3) :
+    IsFrobeniusAction ↥(grpA hα hε) (Multiplicative (Fin 3 → F)) := by
+  intro x hxne w hwne hfix
+  -- ベクトルと行列に翻訳
+  set v : Fin 3 → F := Multiplicative.toAdd w with hvdef
+  have hvne : v ≠ 0 := by
+    intro h
+    exact hwne (Multiplicative.toAdd.injective (by rw [← hvdef, h]; rfl))
+  set X : (Matrix (Fin 3) (Fin 3) F)ˣ := (x : (Matrix (Fin 3) (Fin 3) F)ˣ) with hXdef
+  have hsmul : X • v = v := congrArg Multiplicative.toAdd hfix
+  have hfixv : (X : Matrix (Fin 3) (Fin 3) F).mulVec v = v := hsmul
+  have hα7 : α ^ 7 = 1 := hα ▸ pow_orderOf_eq_one α
+  have hε3 : ε ^ 3 = 1 := hε ▸ pow_orderOf_eq_one ε
+  have hεne : ε ≠ 1 := by
+    intro h
+    rw [h, orderOf_one] at hε
+    omega
+  -- `7 ∤ c` なら `α^{ci} = 1 ⟹ αⁱ = 1`
+  have key : ∀ c i : ℕ, Nat.Coprime 7 c → α ^ (c * i) = 1 → α ^ i = 1 := by
+    intro c i hc h
+    have h7 : (7 : ℕ) ∣ c * i := hα ▸ orderOf_dvd_of_pow_eq_one h
+    obtain ⟨t, rfl⟩ := hc.dvd_of_dvd_mul_left (by rwa [mul_comm] at h7)
+    rw [pow_mul, hα7, one_pow]
+  -- 正規形 `X = aⁱ bʲ` と `j = 3m + r`
+  obtain ⟨i, j, hij⟩ := exists_pow_mul_pow_of_mem_grpA hα hε x.2
+  obtain ⟨m, r, hr, hjmr⟩ : ∃ m r, r < 3 ∧ j = 3 * m + r :=
+    ⟨j / 3, j % 3, Nat.mod_lt _ (by norm_num), (Nat.div_add_mod j 3).symm⟩
+  set Z : (Matrix (Fin 3) (Fin 3) F)ˣ := uB hε ^ 3 with hZdef
+  have hZ3 : Z ^ 3 = 1 := by
+    rw [hZdef, ← pow_mul]
+    exact uB_pow_nine hε
+  have hZval : ∀ k : ℕ, ((Z ^ k : (Matrix (Fin 3) (Fin 3) F)ˣ) : Matrix (Fin 3) (Fin 3) F)
+      = ε ^ k • (1 : Matrix (Fin 3) (Fin 3) F) := by
+    intro k
+    rw [Units.val_pow_eq_pow_val, hZdef, uB_pow_three_val hε, smul_pow, one_pow]
+  have hcomm : Commute (Z ^ m) (uA hα ^ i) := (uB_pow_three_commute hε (uA hα ^ i)).pow_left m
+  have hXform : X = Z ^ m * (uA hα ^ i * uB hε ^ r) := by
+    rw [hXdef, hij, hjmr, pow_add, pow_mul, ← hZdef, ← mul_assoc, ← hcomm.eq, mul_assoc]
+  -- `3 ∤ r` のときに使う: `X³ = (aⁱ bʳ)³`
+  have hX3 : X ^ 3 = (uA hα ^ i * uB hε ^ r) ^ 3 := by
+    have hc2 : Commute (Z ^ m) (uA hα ^ i * uB hε ^ r) :=
+      (uB_pow_three_commute hε (uA hα ^ i * uB hε ^ r)).pow_left m
+    rw [hXform, hc2.mul_pow, ← pow_mul, mul_comm m 3, pow_mul, hZ3, one_pow, one_mul]
+  -- `X` が `v` を固定するなら `X³` も固定する
+  have hfix3 : (X ^ 3 : (Matrix (Fin 3) (Fin 3) F)ˣ) • v = v := by
+    rw [pow_succ, pow_succ, pow_one, mul_smul, mul_smul, hsmul, hsmul, hsmul]
+  interval_cases r
+  · -- `r = 0`: `X` は対角行列 `diag(εᵐαⁱ, εᵐα⁴ⁱ, εᵐα²ⁱ)`
+    rw [pow_zero, mul_one, hcomm.eq] at hXform
+    have hXval : (X : Matrix (Fin 3) (Fin 3) F)
+        = Matrix.diagonal (fun k => ![α ^ i, (α ^ 4) ^ i, (α ^ 2) ^ i] k * ε ^ m) := by
+      rw [hXform, Units.val_mul, Units.val_pow_eq_pow_val, uA_val, matA_pow, hZval,
+        diagonal_mul_scalar]
+    rw [hXval] at hfixv
+    obtain ⟨k, hk⟩ := exists_diagonal_eq_one_of_mulVec_eq hvne hfixv
+    have hgen : ∀ c : ℕ, ((α ^ c) ^ i) ^ 7 = 1 := fun c => by
+      rw [← pow_mul, ← pow_mul, show c * (i * 7) = 7 * (c * i) by ring, pow_mul, hα7, one_pow]
+    have hgen0 : (α ^ i) ^ 7 = 1 := by
+      rw [← pow_mul, show i * 7 = 7 * i by ring, pow_mul, hα7, one_pow]
+    have hd7 : ![α ^ i, (α ^ 4) ^ i, (α ^ 2) ^ i] k ^ 7 = 1 := by
+      fin_cases k
+      · exact hgen0
+      · exact hgen 4
+      · exact hgen 2
+    -- `εᵐ` は `3` 乗でも `7` 乗でも `1` ⟹ `εᵐ = 1`
+    have hεm : ε ^ m = 1 := by
+      refine eq_one_of_pow_three_pow_seven ?_ ?_
+      · rw [← pow_mul, mul_comm, pow_mul, hε3, one_pow]
+      · have h7 : (![α ^ i, (α ^ 4) ^ i, (α ^ 2) ^ i] k * ε ^ m) ^ 7 = 1 := by
+          rw [hk, one_pow]
+        rw [mul_pow, hd7, one_mul] at h7
+        exact h7
+    have hdk : ![α ^ i, (α ^ 4) ^ i, (α ^ 2) ^ i] k = 1 := by
+      rw [hεm, mul_one] at hk; exact hk
+    have hai7 : α ^ i = 1 := by
+      fin_cases k
+      · exact hdk
+      · exact key 4 i (by norm_num) (by rw [pow_mul]; exact hdk)
+      · exact key 2 i (by norm_num) (by rw [pow_mul]; exact hdk)
+    have hgen2 : ∀ c : ℕ, (α ^ c) ^ i = 1 := fun c => by
+      rw [← pow_mul, mul_comm, pow_mul, hai7, one_pow]
+    have hai : uA hα ^ i = 1 := by
+      refine Units.ext ?_
+      rw [Units.val_pow_eq_pow_val, uA_val, matA_pow, Units.val_one, ← Matrix.diagonal_one]
+      congr 1
+      funext p
+      fin_cases p
+      · exact hai7
+      · exact hgen2 4
+      · exact hgen2 2
+    have hzm : Z ^ m = 1 := by
+      refine Units.ext ?_
+      rw [hZval, hεm, one_smul, Units.val_one]
+    have hXone : X = 1 := by rw [hXform, hzm, hai, mul_one]
+    exact hxne (Subtype.ext hXone)
+  · -- `r = 1`: `X³ = b³ = ε · 1` は非単位スカラー
+    have hZ1 : (Z : Matrix (Fin 3) (Fin 3) F) = ε • 1 := by
+      rw [hZdef, uB_pow_three_val hε]
+    rw [pow_one, cube_uA_pow_mul_uB hα hε, ← hZdef] at hX3
+    rw [hX3] at hfix3
+    exact scalar_mulVec_ne_of_ne_one hεne hvne (by rw [← hZ1]; exact hfix3)
+  · -- `r = 2`: `X³ = b⁶ = ε² · 1` は非単位スカラー
+    have hZ2 : uB hε ^ 6 = Z ^ 2 := by rw [hZdef, ← pow_mul]
+    rw [cube_uA_pow_mul_uB_sq hα hε, hZ2] at hX3
+    rw [hX3] at hfix3
+    have hε2ne : ε ^ 2 ≠ 1 := by
+      intro h
+      have hd : orderOf ε ∣ 2 := orderOf_dvd_of_pow_eq_one h
+      rw [hε] at hd
+      omega
+    exact scalar_mulVec_ne_of_ne_one hε2ne hvne (by rw [← hZval 2]; exact hfix3)
+
+/-! ### 書籍の場合 `F = 𝔽₄₃` -/
+
+instance : Fact (Nat.Prime 43) := ⟨by norm_num⟩
+
+/-- `𝔽₄₃` の乗法群に位数 7 の元がある (`-2 = 41`; `(-2)⁷ = -128 = 1 - 3·43`)。 -/
+theorem exists_orderOf_eq_seven_zmod_fortyThree : ∃ α : ZMod 43, orderOf α = 7 := by
+  haveI : Fact (Nat.Prime 7) := ⟨by norm_num⟩
+  exact ⟨41, orderOf_eq_prime (by decide) (by decide)⟩
+
+/-- `𝔽₄₃` の乗法群に位数 3 の元がある (`6`; `6³ = 216 = 1 + 5·43`)。 -/
+theorem exists_orderOf_eq_three_zmod_fortyThree : ∃ ε : ZMod 43, orderOf ε = 3 := by
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  exact ⟨6, orderOf_eq_prime (by decide) (by decide)⟩
+
+/-- ベクトル空間 `V = 𝔽₄₃³` の位数は `43³` (書籍の「位数 `43³` のベクトル空間」)。 -/
+theorem card_fin_three_zmod_fortyThree : Nat.card (Fin 3 → ZMod 43) = 43 ^ 3 := by
+  simp [Nat.card_eq_fintype_card, ZMod.card]
+
+/-- **Isaacs Problem 6A.2** (p. 184) ⭐ 書籍の主張そのもの: `GL(3, 43)` には**位数 63 の
+非巡回部分群**で, 位数 `43³` のベクトル空間への自然な作用が **Frobenius** なものがある。
+
+書籍の Note: これは**奇数位数の非可換群が Frobenius complement になりうる**ことを示す例。 -/
+theorem exists_odd_order_nonabelian_frobenius_complement :
+    ∃ A : Subgroup ((Matrix (Fin 3) (Fin 3) (ZMod 43))ˣ),
+      Nat.card ↥A = 63 ∧ ¬ IsCyclic ↥A ∧
+        IsFrobeniusAction ↥A (Multiplicative (Fin 3 → ZMod 43)) := by
+  obtain ⟨α, hα⟩ := exists_orderOf_eq_seven_zmod_fortyThree
+  obtain ⟨ε, hε⟩ := exists_orderOf_eq_three_zmod_fortyThree
+  exact ⟨grpA hα hε, card_grpA hα hε, not_isCyclic_grpA hα hε, isFrobeniusAction_grpA hα hε⟩
 
 end
 

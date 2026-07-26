@@ -1960,7 +1960,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 問題 | 状態 | 主張 |
 |---|---|---|
 | 6A.1 | ✅ 完了 (`Problems6A.lean`) | `A ≤ SL(2,p)`, `p ∤ \|A\|` ⟹ `A` の `(ZMod p)²` への作用は Frobenius |
-| 6A.2 | 🔨 前半完了 (`Problems6A2.lean`: 位数 63・非巡回) / Frobenius は次回 | `GL(3,43)` の具体例 `a = diag(α,α⁴,α²)`, `b = [[0,1,0],[0,0,1],[ε,0,0]]` (`α` 位数 7, `ε` 位数 3) で `A = ⟨a,b⟩` は非巡回位数 63, `43³` 次元への作用は Frobenius |
+| 6A.2 | ✅ **完了** (`Problems6A2.lean`) | `GL(3,43)` の具体例 `a = diag(α,α⁴,α²)`, `b = [[0,1,0],[0,0,1],[ε,0,0]]` (`α` 位数 7, `ε` 位数 3) で `A = ⟨a,b⟩` は非巡回位数 63, `43³` 次元への作用は Frobenius |
 | 6A.3 | ⬜ | 位数 `5²·11` の非巡回群で Frobenius 作用をもつものが存在 (hint: `GL(5,p)`) |
 | 6A.4 | ⬜ | Frobenius 群 `G` (核 `N`) の `N` 以外の剰余類は単一の共役類に含まれる |
 | 6A.5 | ⬜ | 非可換可解群で全非単位元の中心化群が可換 ⟹ Frobenius 群 (核 = `F(G)`) |
@@ -1971,7 +1971,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ⬜ | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
 
-### 6A.2 の実装状況 (2026-07-27) — 前半 (位数 63・非巡回) 完了、Frobenius は次回
+### 🎉 6A.2 完了 (2026-07-27) — `Problems6A2.lean` 619 行
 
 新 leaf `Problems6A2.lean` (`OddOrder.lean` 配線済、全て実証明・警告 0)。
 
@@ -1997,10 +1997,33 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 (`Ch01.card_sup_of_normal_of_coprime` の「`N` が `G` で正規」を「`S ≤ N_G(N)`」に緩めた版;
 `N ⊔ S` の中に降りて `subgroupOf` で適用) / `finiteMatrixUnits` instance。
 
-**次回**: Frobenius 性。書籍 hint =「素数位数の元 `t` について `C_V(t) = 1` を見れば十分」。
-位数 7 の元は正規 Sylow 7 = `⟨a⟩` に入り対角成分がすべて `≠ 1`;
-位数 3 の元は Sylow 3 = `⟨b⟩` (巡回位数 9) の唯一の位数 3 部分群 `⟨b³⟩ = ⟨ε·1⟩`
-(スカラーゆえ中心的で共役不変) に入るので, いずれも非零ベクトルを固定しない。
+**Frobenius 性** (`isFrobeniusAction_grpA`, 実証明・axiom-clean):
+
+⭐ **書籍 hint の「素数位数の元に還元」も Sylow も使わずに済んだ**。正規形
+`exists_pow_mul_pow_of_mem_grpA` (`A` の元は `aⁱ bʲ`, `i j : ℕ`) を作ると 2 ケースで終わる:
+
+* **`3 ∣ j`**: `bʲ = εᵐ · 1` (スカラー) ゆえ `x = diag(εᵐαⁱ, εᵐα⁴ⁱ, εᵐα²ⁱ)` は対角。
+  非零ベクトルを固定するならある対角成分が `1`, その成分は 7 乗すると 1 で `εᵐ` は
+  3 乗すると 1 ⟹ `⟨ε⟩ ⊓ ⟨α⟩ = 1` (`eq_one_of_pow_three_pow_seven`) から `εᵐ = 1` かつ
+  `α^{cⁱ} = 1` (`c ∈ {1,4,2}`, 7 と互いに素) ⟹ `αⁱ = 1` ⟹ `x = 1`。
+* **`3 ∤ j`**: `b³ = ε·1` は中心的なので `x³ = (aⁱ bʳ)³` (`r = j mod 3 ∈ {1,2}`)。
+  `cube_uA_pow_mul_uB` / `cube_uA_pow_mul_uB_sq` で **`(aⁱb)³ = b³`, `(aⁱb²)³ = b⁶`**
+  (`aⁱ` の寄与は `1+4+16 = 21`, `1+16+256 = 273` でどちらも `7` の倍数ゆえ消える) ⟹
+  `x³` は非単位スカラー `ε·1` / `ε²·1` ⟹ 非零ベクトルを固定しない。
+
+**書籍の場合 `F = 𝔽₄₃`**: `exists_odd_order_nonabelian_frobenius_complement`
+(`α = -2 = 41` (`(-2)⁷ = 1 - 3·43`), `ε = 6` (`6³ = 1 + 5·43`) を `decide` で確認)。
+⟹ **奇数位数の非可換群が Frobenius complement になりうる** (書籍の Note) が形式化された。
+
+再利用 helper (追加分): `unitsMatrixDistribMulAction` (`GL(n,R)` の `n → R` への作用) /
+`coe_sup_eq_mul_of_le_normalizer` (`K ≤ N_G(H)` なら `↑(H ⊔ K) = ↑H · ↑K`;
+`Subgroup.mul_normal` の正規性を緩めた版) / `scalar_mulVec_ne_of_ne_one` /
+`exists_diagonal_eq_one_of_mulVec_eq` / `diagonal_mul_scalar`。
+
+⚠ 実装の罠: `fin_cases k` の後は `simpa using ...` が別方向に正規化することがある
+(`(α⁴)ⁱ` が `(αⁱ)⁴` になる) — 補題を `∀ c, ((α^c)^i)^7 = 1` の形で用意して
+`exact` (defeq) で当てるのが安全 / `le_sup_left` は項なので `(le_sup_left : H ≤ H ⊔ K) hh` /
+`Ch01.card_sup_of_normal_of_coprime` は `S` を implicit に取るので `(S := …)` を明示。
 
 ### 6A.1 の実装 (2026-07-27 完了、新 leaf `Problems6A.lean`)
 
