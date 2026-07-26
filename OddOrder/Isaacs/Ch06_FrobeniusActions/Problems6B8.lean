@@ -598,6 +598,40 @@ theorem isMulCommutative_comap_zpowers {P : Type*} [Group P] {Z : Subgroup P} [Z
   refine Subgroup.mem_center_iff.mpr fun g => ?_
   exact Subtype.ext (Subgroup.mem_center_iff.mp (hZ hwZ) ((g : P)))
 
+/-! ### 帰納 step の非巡回ケース: `θ(x) = x⁻¹ · a x a⁻¹` の性質 -/
+
+/-- `A` 可換で `a` が `A` を正規化するとき `θ(x) = x⁻¹ · a x a⁻¹` は**準同型**。 -/
+theorem theta_mul {P : Type*} [Group P] {A : Subgroup P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x) (a : P)
+    (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A) {x y : P} (hx : x ∈ A) (hy : y ∈ A) :
+    (x * y)⁻¹ * (a * (x * y) * a⁻¹)
+      = (x⁻¹ * (a * x * a⁻¹)) * (y⁻¹ * (a * y * a⁻¹)) := by
+  have h1 : a * (x * y) * a⁻¹ = (a * x * a⁻¹) * (a * y * a⁻¹) := by group
+  have hc : y⁻¹ * (x⁻¹ * (a * x * a⁻¹)) = (x⁻¹ * (a * x * a⁻¹)) * y⁻¹ :=
+    hab _ _ (A.inv_mem hy) (A.mul_mem (A.inv_mem hx) (hnorm x hx))
+  rw [h1, mul_inv_rev]
+  calc y⁻¹ * x⁻¹ * ((a * x * a⁻¹) * (a * y * a⁻¹))
+      = (y⁻¹ * (x⁻¹ * (a * x * a⁻¹))) * (a * y * a⁻¹) := by group
+    _ = ((x⁻¹ * (a * x * a⁻¹)) * y⁻¹) * (a * y * a⁻¹) := by rw [hc]
+    _ = (x⁻¹ * (a * x * a⁻¹)) * (y⁻¹ * (a * y * a⁻¹)) := by group
+
+/-- **`a` は `θ` の像を反転する**: `a² ∈ A` (可換) なので `θ(x)^a = θ(x)⁻¹`。
+
+これが非巡回ケースの矛盾の鍵 — `P' = im θ` が `a` に反転されるので
+`C_{P'}(a) = Ω₁(P')` となり `P'` は巡回になる。 -/
+theorem theta_conj_eq_inv {P : Type*} [Group P] {A : Subgroup P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x) {a : P} (ha2 : a ^ 2 ∈ A)
+    {x : P} (hx : x ∈ A) :
+    a * (x⁻¹ * (a * x * a⁻¹)) * a⁻¹ = (x⁻¹ * (a * x * a⁻¹))⁻¹ := by
+  have hcomm := hab _ _ ha2 hx
+  have hx2 : a ^ 2 * x * (a ^ 2)⁻¹ = x := by
+    calc a ^ 2 * x * (a ^ 2)⁻¹ = (x * a ^ 2) * (a ^ 2)⁻¹ := by rw [hcomm]
+      _ = x := by group
+  calc a * (x⁻¹ * (a * x * a⁻¹)) * a⁻¹
+      = (a * x⁻¹ * a⁻¹) * (a ^ 2 * x * (a ^ 2)⁻¹) := by rw [pow_two]; group
+    _ = (a * x⁻¹ * a⁻¹) * x := by rw [hx2]
+    _ = (x⁻¹ * (a * x * a⁻¹))⁻¹ := by group
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
