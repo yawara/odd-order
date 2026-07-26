@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
 import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
+import OddOrder.Mathlib.CyclicSubgroupUnique
 import Mathlib.RepresentationTheory.Subrepresentation
 
 /-!
@@ -212,6 +213,36 @@ theorem card_dvd_blockScalarRange_pow_of_blocks {p : ℕ} [Fact p.Prime]
         (finrank_eq_one_of_card_eq_prime (hBcard 0))).range ∣ p - 1 :=
   card_dvd_blockScalarOrder_pow_of_blocks ρ B hBcard _
     (fun i u => hrange i ▸ MonoidHom.mem_range.mpr ⟨u, rfl⟩) hconst
+
+/-- **Peterfalvi (9.7)(a) from equal block-scalar *orders* alone.**  `𝔽_p^×` is cyclic, so two
+subgroups of the same order coincide (`Subgroup.eq_of_card_eq_of_isCyclic`).  Hence it is enough to
+know that every block scalar character has the *same image order* as block `0`'s — which is what
+the `W₁`-conjugacy `H_i = H₁^{w_i}` gives directly, since conjugation by `w_i` is an automorphism
+of `U` carrying `C_U(H₁)` onto `C_U(H_i)`, so the two indices agree.
+
+This is the form the Section 11 case-(a) carrier can discharge without building an equivariant
+isomorphism of the blocks as representations (issue 0152). -/
+theorem card_dvd_blockScalarRange_pow_of_blocks_card_eq {p : ℕ} [Fact p.Prime]
+    {U M : Type u} [CommGroup U] [Finite U] [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    {n : ℕ} (ρ : Representation (ZMod p) U M) (B : Fin (n + 1) → Subrepresentation ρ)
+    (hBcard : ∀ i, Nat.card (B i).toSubmodule = p)
+    (hcard : ∀ i : Fin (n + 1),
+      Nat.card (lineScalarChar (B i).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard i))).range =
+      Nat.card (lineScalarChar (B 0).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard 0))).range)
+    (hconst : ∀ u : U,
+        (∀ i : Fin (n + 1),
+          lineScalarChar (B i).toRepresentation (finrank_eq_one_of_card_eq_prime (hBcard i)) u
+            = lineScalarChar (B 0).toRepresentation
+                (finrank_eq_one_of_card_eq_prime (hBcard 0)) u)
+        → u = 1) :
+    Nat.card U ∣ Nat.card (lineScalarChar (B 0).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard 0))).range ^ n
+      ∧ Nat.card (lineScalarChar (B 0).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard 0))).range ∣ p - 1 :=
+  card_dvd_blockScalarRange_pow_of_blocks ρ B hBcard
+    (fun i => OddOrder.GroupTheory.Subgroup.eq_of_card_eq_of_isCyclic (hcard i)) hconst
 
 /-- **The block-scalar order is the book's index `a = |U : C_U(H₁)|`.**  The kernel of a block
 scalar character is the pointwise stabilizer of that block (`lineScalarChar_eq_one_iff`), so the

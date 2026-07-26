@@ -9635,6 +9635,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.card_lineScalarChar_range_eq_index
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.lineScalarChar_ker_eq
+-- 巡回群では位数が部分群を決めるので、ブロックごとの像の**位数**が一致するだけで像が一致する
+-- (`𝔽_p^×` は巡回)。⟹ S11 側は「共役が `C_U(H₁)` を `C_U(H_i)` に写す ⟹ 指数が等しい」だけ
+-- 示せばよく、ブロックを表現として同型に組む plumbing が要らない (issue 0152)。
+#assert_only_allowed_axioms OddOrder.GroupTheory.eq_powMonoidHom_ker_card
+#assert_only_allowed_axioms OddOrder.GroupTheory.Subgroup.eq_of_card_eq_of_isCyclic
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.card_dvd_blockScalarRange_pow_of_blocks_card_eq
 -- Peterfalvi (9.7)(b): `Coprime |Ū| (p-1)` (fixed-point-free) and the resulting unconditional
 -- divisibility `|Ū| ∣ (p^q-1)/(p-1)`.  The FPF input `C_Ū(w₀) = 1` is supplied from the Frobenius
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).

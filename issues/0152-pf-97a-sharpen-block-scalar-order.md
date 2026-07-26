@@ -104,3 +104,36 @@ refinement」と明記)。⟹ 欠けていたのは**位数の割り切り**の�
    `card_dvd_blockScalarOrder_pow_of_blocks` に流し込む。
 
 これで `caseA_u_dvd_pred_pow` の `a`-鋭化版が出る。
+
+## 🔀 経路変更 (2026-07-27) — 表現論の plumbing が不要になった
+
+step 1-2 を「ブロックを表現として同型に組む」で進める予定だったが、`Subrepresentation` /
+`Additive` / instance 罠の多い領域で重い。**`𝔽_p^×` が巡回**であることを使うと丸ごと回避できる:
+
+* 有限巡回群では**部分群は位数で決まる** (`OddOrder/Mathlib/CyclicSubgroupUnique.lean` 新設:
+  Lagrange で `B ≤ (n-torsion)`、`IsCyclic.card_pow_eq_one_le` で torsion ≤ `|B|` ⟹ 一致。
+  ⟹ `Subgroup.eq_of_card_eq_of_isCyclic`)。
+* ⟹ ブロックごとの像が「一致する」ことを直接示す代わりに、**位数が等しい**ことだけ示せばよい
+  (`card_dvd_blockScalarRange_pow_of_blocks_card_eq`)。
+
+⟹ **S11 側に残るのは純群論だけ**: 共役 `g_j` が `C_Ū(S₀)` を `C_Ū(Hpart j)` に写す
+⟹ 指数が等しい ⟹ `|im φ_j| = |im φ_0|`。`|im φ| = |Ū : ker φ|` と
+`ker φ = C_Ū(block)` は `card_lineScalarChar_range_eq_index` / `lineScalarChar_ker_eq` で済。
+
+### generic 側の完成品 (すべて axiom-clean)
+
+| 定理 | 内容 |
+|---|---|
+| `lineScalarChar_comp_of_equivariant` | 同変同型に沿った scalar character の移送 |
+| `lineScalarChar_range_eq_of_equivariant` | σ 全射なら像一致 (共役ルート) |
+| `GroupTheory.eq_powMonoidHom_ker_card` | 有限巡回群で部分群 = 自分の位数の torsion |
+| `GroupTheory.Subgroup.eq_of_card_eq_of_isCyclic` | 位数一致 ⟹ 部分群一致 |
+| `card_dvd_blockScalarOrder_pow_of_blocks` | 共通像 `A` から `|U| ∣ |A|^n ∧ |A| ∣ p−1` |
+| `card_dvd_blockScalarRange_pow_of_blocks` | 像一致版 |
+| `card_dvd_blockScalarRange_pow_of_blocks_card_eq` | **位数一致版** (S11 が使う入口) |
+| `card_lineScalarChar_range_eq_index` / `lineScalarChar_ker_eq` | `a = |U : C_U(H₁)|` の pin |
+
+### 残り
+
+S11 の `caseA` で `Hpart_orbit` から「指数が等しい」を出し、
+`card_dvd_blockScalarRange_pow_of_blocks_card_eq` に流して `caseA_u_dvd_a_pow` を得る。
