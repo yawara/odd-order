@@ -228,6 +228,7 @@ import OddOrder.Peterfalvi.S15_CharacterDegreeEnginesSSide
 import OddOrder.Peterfalvi.S15_CaseBEndgameSupply
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
+import OddOrder.BG.AppC_SL2Example
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppD_CNGroups
@@ -5082,6 +5083,17 @@ set_option linter.style.longLine false in
 -- gcd(p+1, p−1) = 1 を要求するので奇 p では不可能)。FT spine は奇性が ambient なので不要 —
 -- 書籍完備性のための項目。
 #assert_only_allowed_axioms OddOrder.BG.AppC.le_of_conditionA_of_not_odd
+-- **BG App.C Remark (II)** (T. Peterfalvi の SL(2, 2^q) 例, 2026-07-26): Theorem C の仮説が
+-- 空でないことの証示。p = 2, G = SL(2, 2^q) で条件 (A) は自明 (gcd(2^q−1, 1) = 1) に成立し、
+-- σ(P) = 上三角ユニポテント / σ(U) = 分裂トーラス / y = [[0,1],[1,1]] / Q = ⟨y⟩ (位数 3) が
+-- 仮説 (B) を満たす。σ は SemidirectProduct.lift で実構成 (単射性も証明済) — carrier は
+-- 全て具体的で、hoist された仮説は無い。
+#assert_only_allowed_axioms OddOrder.BG.AppC.conditionA_two
+#assert_only_allowed_axioms OddOrder.BG.AppC.sigmaSL2_injective
+#assert_only_allowed_axioms OddOrder.BG.AppC.map_kernel_sigmaSL2
+#assert_only_allowed_axioms OddOrder.BG.AppC.map_primeLine_sigmaSL2
+#assert_only_allowed_axioms OddOrder.BG.AppC.map_complement_sigmaSL2
+#assert_only_allowed_axioms OddOrder.BG.AppC.hypothesisBAbstract_sl2
 #assert_only_allowed_axioms OddOrder.BG.AppC.theoremC
 #assert_only_allowed_axioms OddOrder.BG.AppC.lemmaC2_card_ge_two_of_conditionA
 #assert_only_allowed_axioms

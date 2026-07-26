@@ -1217,10 +1217,12 @@ consumer は (5.7) engine を使う。
    `six_three_of_six_two_oracle` が **(5.6) break-member oracle `h56`** を明示仮説に取る。
    一般の可解 `K` で induced member が可約になり §10–§12 の muGrid/columnSum と entangle
    (closed issue 2022 の分析どおり)。consumer では sorry-free に discharge 済で FT は閉じている。
-2. **BG App.C Remark (II)** — `p = 2`, `G = SL(2, 2^q)` の明示行列モデルで (A)+(B) が
-   充足可能であることの例示。`theoremC_abstract` ができたので statement のブロッカーは外れたが、
-   `theoremC_abstract` は群論的 (B) でなくその帰結 `hrel` (`∀ a ∈ E, N(2a−1) = 1`) を取るので、
-   **抽象 (B) ⟹ `hrel` の含意** (現状 S16 経由のみ) と `SL(2,2^q)` モデルの両方が要る。効力は例示のみ。
+2. ~~**BG App.C Remark (II)**~~ — **2026-07-26 完了** (`OddOrder/BG/AppC_SL2Example.lean`)。
+   Hypothesis (B) の `p, q, G`-抽象形 `HypothesisBAbstract` を立て、書籍どおりの
+   `p = 2`, `G = SL(2, 2^q)`, `σ(P)` = 上三角ユニポテント, `σ(U)` = 分裂トーラス,
+   `y = [[0,1],[1,1]]`, `Q = ⟨y⟩` (位数 3) が (A)+(B) を満たすことを axiom-clean で構成。
+   **残った穴 = 抽象 (B) ⟹ `hrel` の含意** (= Lemma C.3 の群論的内容; 現状 S16 経由のみ)
+   → [issue 0151](../../issues/0151-appc-lemma-c3-abstract-hypothesis-b.md)。
 3. **BG §16 tamely imbedded** — issue 8005 で意図的 defer (Pf 側の実消費がトリガー)。
 4. **Pf App Suzuki2Groups Lemma 1 (a)(c)(d)** — Higman 論文の実内容 ((b) は 07-18 に完済)。
 5. **packaging 9 件** — (5.3)(b) (5.8) (7.8) (7.9) (8.15) (9.7) (9.10) (9.11) (10.11)。
