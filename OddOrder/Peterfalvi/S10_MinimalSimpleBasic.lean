@@ -1166,6 +1166,39 @@ theorem coprime_FT_signalizer_centralizerIn_typePA0_of_isTypeP1 [Finite G]
     exact escaping_sigmaSharp_disjoint_centralizer hG hM haσ haesc hpb.1 hpb.2 hpp hpσ hpC
   · exact coprime_FT_signalizer_centralizerIn_typePV hG hM data haσ haesc hvb
 
+/-- **Peterfalvi (8.15) claim 1 at `A = A₁(M)`, for every Peterfalvi type.**  The Dade (2.2)
+support hypotheses hold for `A₁(M)`, with `L = M` and the faithful `H(a) = R(a)` of (8.14).
+
+The book states (8.15) for `A = A₀(M)`, `A(M)` **or** `A₁(M)` with no restriction on the type of
+`M`, and for `A₁` that is exactly what this gives: `A₁(M) = M_σ^#` holds for every type
+(`A1_eq_sigmaSharp`), and the `σ`-sharp Dade engine
+(`dadeSupportHypothesisData_of_subset_sigmaSharp`) needs nothing beyond the support sitting inside
+`M_σ^#`, being nonempty, and being `M`-conjugation-invariant (`A1_conj_mem`, again type-uniform).
+
+The `A₀(M)` and `A(M)` clauses genuinely stay type-indexed, since those supports are defined
+differently per type: `dadeSupportHypotheses_typeI` (type I),
+`dadeSupportHypothesisData_typePACore` / `..._typePACore0` (the book's `A(M)` / `A₀(M)`, every type
+`𝒫`), `dadeSupportHypothesisData_typePA0_of_isTypeP1` (the `P₁` specialisation `A = (M')^#`). -/
+theorem dadeSupportHypothesisData_A1 [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (hType : HasPeterfalviType tau M) :
+    Nonempty (DadeSupportHypothesisData M (A1 M tau)) := by
+  refine dadeSupportHypothesisData_of_subset_sigmaSharp hG hM
+    (OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hM hType).subset ?_ ?_
+  · obtain ⟨a, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp
+      (show OddOrder.GroupTheory.mainSubgroup M tau ≠ ⊥ by
+        rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM hType]
+        exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
+    have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
+    exact ⟨a.1, (Set.mem_sdiff _).mpr
+      ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩⟩
+  · intro m x hm
+    refine ⟨fun h => ?_, A1_conj_mem M tau hm⟩
+    have h2 := A1_conj_mem M tau (inv_mem hm) h
+    have h3 : m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x := by group
+    rwa [h3] at h2
+
 /-- **Peterfalvi (8.15) type-`P₁` `A_0(M)` datum**: the Dade (2.2) support hypotheses hold for the
 full type-`P₁` support `A_0(M) = A(M) ∪ V^M`.  Assembles the `σ`-decomposition-generic engine
 (`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`) with the type-`P₁` pins: escaping points
@@ -1260,23 +1293,10 @@ theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
     Nonempty (DadeSupportHypothesisData M (typePA0 M data)) ∧
       Nonempty (DadeSupportHypothesisData M (typePA M data)) ∧
         Nonempty (DadeSupportHypothesisData M (A1 M tau)) := by
-  -- The `A_1(M) = M_σ^#` datum (all types, `A1_eq_sigmaSharp`) via the `σ`-sharp Dade engine.
-  -- Reused for `A_1(M)` and — since `A(M) = M_σ^#` for `P₁` — the type-`P₁` case of `A(M)`.
-  have hA1 : Nonempty (DadeSupportHypothesisData M (A1 M tau)) := by
-    refine dadeSupportHypothesisData_of_subset_sigmaSharp hG hM
-      (OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hM hType).subset ?_ ?_
-    · obtain ⟨a, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp
-        (show OddOrder.GroupTheory.mainSubgroup M tau ≠ ⊥ by
-          rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM hType]
-          exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
-      have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
-      exact ⟨a.1, (Set.mem_sdiff _).mpr
-        ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩⟩
-    · intro m x hm
-      refine ⟨fun h => ?_, A1_conj_mem M tau hm⟩
-      have h2 := A1_conj_mem M tau (inv_mem hm) h
-      have h3 : m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x := by group
-      rwa [h3] at h2
+  -- The `A_1(M) = M_σ^#` datum is type-uniform (`dadeSupportHypothesisData_A1`); reused here for
+  -- `A_1(M)` and — since `A(M) = M_σ^#` for `P₁` — for the type-`P₁` case of `A(M)`.
+  have hA1 : Nonempty (DadeSupportHypothesisData M (A1 M tau)) :=
+    dadeSupportHypothesisData_A1 hG hM hType
   refine ⟨?_, ?_, hA1⟩
   · -- `A_0(M) = A(M) ∪ V^M`, type-`P₁`: the σ-decomposition engine assembles the full datum.
     exact dadeSupportHypothesisData_typePA0_of_isTypeP1 hG hM data hP1

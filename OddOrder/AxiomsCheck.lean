@@ -11701,6 +11701,12 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- `dadeSupportHypothesisData_typePACore` for the isometry `τ`) are both Peterfalvi (8.15) claim 1
 -- and carry no type hypothesis beyond `IsTypeP`.  Types II and V included.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_subcoherent
+-- **(8.15) claim 1 at `A = A₁(M)`, every Peterfalvi type** (2026-07-26): 書籍は
+-- 「`A = A₀(M)`, `A(M)` **or** `A₁(M)`」を型の制限なしに主張する。`A₁` 版はこれまで
+-- `dadeSupportHypotheses_typeP` の中に `IsTypeP1` 仮説付きで埋もれていたが、その証明は
+-- `hP1` も `data` も使っておらず、`A1_eq_sigmaSharp` (全型) + σ-sharp Dade engine +
+-- `A1_conj_mem` (全型) だけで回っていた。独立した型一様な定理として取り出した。
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_A1
 -- **(5.7) on the (8.15.3) family** — a uniform-degree subfamily is coherent, at the same
 -- generality as (5.3.b).  This is the book's route to the (9.11) base coherence, replacing the
 -- §10 μ-grid engine (`inducedFamily_degreeSubfamily_isCoherent`) that tied it to types III/IV.

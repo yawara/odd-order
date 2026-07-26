@@ -1181,6 +1181,24 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 明記している。(5.3)(b) は固定 2 要素 `R` レコードが可変長 `R` を持てないという**設計上の理由**があり、
 consumer は (5.7) engine を使う。
 
+#### (8.15) の実測 (2026-07-26) — **claim 1 の `A₁` 版を型一様化**
+
+書籍 p.49 (8.15): 「`M` を極大部分群、`A = A₀(M)`, `A(M)` **or** `A₁(M)` とする。すると
+`M = N_G(A)` で、`L = M`, `H(a) = R(a)` として仮説 (2.2) が成り立つ」— **型の制限なし**。
+
+repo の claim 1 は `A(M)` / `A₀(M)` については型一様な producer が在る
+(`dadeSupportHypothesisData_typePACore{,0}` は `IsTypeP` 以外の型仮説を持たない = 型 II/V 込み、
+型 I は `dadeSupportHypotheses_typeI`)。しかし **`A₁(M)` 版だけが
+`dadeSupportHypotheses_typeP` の中に `IsTypeP1` 仮説付きで埋もれていた**。
+
+実測すると、その `hA1` ブロックは `hP1` も `data` も使っておらず、
+`A1_eq_sigmaSharp` (全型) + σ-sharp Dade engine + `A1_conj_mem` (全型) だけで回っていた
+⟹ 独立した型一様定理 `dadeSupportHypothesisData_A1` として抽出
+(`S10_MinimalSimpleBasic.lean`)。`dadeSupportHypotheses_typeP` はそれを呼ぶだけに縮小。
+AxiomsCheck 登録済、3 axiom。
+
+`A₀(M)` / `A(M)` は型ごとに集合の定義自体が違うので型指標のままが正しい。
+
 #### (7.8) の実測 (2026-07-26) — **書籍強度、gap なし**
 
 書籍 p.40 の (7.8) を PDF ページ画像 (`references/peterfalvi/pages/peterfalvi-p040.png`) で
