@@ -1125,3 +1125,45 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 ないが、bundle が導出可能な命題を持つのは同じ債務。
 
 ⟹ Pf の残り特殊化債務は上表の順 4 以降 (**最大の塊 = (6.2)–(6.6) の Sibley 特殊化**)。
+
+### ⚠ Pf 特殊化債務リストの再実測 (2026-07-26) — 大半が stale だった
+
+上の「着手順」表は 07-16 の per-item note をそのまま並べたものだが、**1 件ずつ実測したところ
+大半が既に閉じていた**。Isaacs (Ch.8/Ch.10) と BG (26 件中 22 件) で起きたのと同じ現象で、
+07-16 以降の lane 作業が反映されていないだけだった。**この表を着手根拠にしてはいけない**。
+
+**閉じている (直接 Read で確認、07-26)**
+
+| 項目 | 07-16 label | 実物 |
+|---|---|---|
+| (1.5)(d) | partial「verbatim identity never stated」 | `inner_self_inv_smul_apply_one_smul_restrict_induce` (`InducedIrreducible.lean`) — 本の displayed computation そのもの |
+| (1.5)(e) | partial「Frobenius 特殊化のみ」 | `inner_induce_conj_eq_zero_of_odd` (`CliffordDecomposition.lean:433`) — **一般 `H ⊴ L` + `|L|` 奇**で証明済 |
+| (2.4) / (2.6)–(2.10.3) | partial + spec ×6 | 本日の `37171eade` / `4c2e8cd30` で完済 |
+| (7.2)(b) | partial「equality clause は nowhere stated」 | `chiRho_norm_sq_eq_iff_mem_range` (`Hypothesis71.lean:445`) |
+| (7.3) | partial「equality clause 未形式化」 | `chiRho_integral_eq_iff_constant_on_hCoset` (`Hypothesis71.lean:581`) |
+| (7.10)/(7.11) | spec「kernel の冪零性が明示仮説」 | `FrobeniusFamily.isNilpotent_kernel` (`S09_FrobeniusCardG0LowerBound.lean:115`)。**Thompson の定理 (Isaacs Thm 6.24) は `Ch06_FrobeniusActions/KernelNilpotent.lean` に形式化済**なので、本と同じく内部で導出している |
+| (8.11) | partial「Sylow-normalizer conjunct が無い」 | `S10_StructureSetup.lean:645` (first clause) + `:699` (全体) |
+| (8.18) | spec「type-I 対のみ」 | `S10_MinimalSimpleStructure.lean:644/753` — docstring に「**type-uniform**, no type hypothesis, the book's statement verbatim」 |
+| (13.8) | spec「T-side instance のみ」 | S-side の literal statement (issue 1041) が `AxiomsCheck.lean:10858` 群で sorry-free |
+| App Huppert (Prop 1 / Lemma) | partial「単一 sorry」 | `Appendices/Huppert.lean` の sorry は **0** |
+| App FeitSibley Hypotheses | partial「free Prop field」 | 2026-07-18 に de-opacify 済 (ファイル冒頭に経緯) |
+| App Suzuki2Groups Def 1 | partial「opaque field」 | `IsSuzuki2Group` は `∃ x y, x,y ∈ involutions ∧ x ≠ y` と `∃ A, IsCyclic A ∧ ActsRegularlyOnInvolutions A` を明示的に書き下している |
+
+**真に開いている (実測で確認)**
+
+1. **(6.2)–(6.6) の general-(6.1) 形** — 最大かつ唯一の深い残債。`six_two_general`
+   (`S08_Theorem62_63_Standalone.lean:349`) と `six_three_of_six_two_oracle` (:383) は
+   **(5.6) break-member oracle `h56` を明示仮説として取る**。`h56` = 「各 section `B ≤ A ≤ H₁`
+   (`A/B` が `H/B` の中心) で `S(A)` coherent・`S(B)` non-coherent なら、`B` 上自明な
+   `θ ∈ Irr K` で `|K:A| − 1 ≤ 2·(Ind_K^L θ)(1)` を満たす break member が在る」。
+   一般の可解 `K` では induced member が**可約**になるため §10–§12 の muGrid/columnSum 機構と
+   entangle する (closed issue 2022 の分析どおり)。consumer (§11/§13) では sorry-free に
+   discharge 済なので FT は閉じているが、無条件の general 定理は無い。
+2. **(5.3)(b) / (5.8)** — (4.6)/(5.3.b) 一般での単一 statement が無い。ただし解析コアは
+   `S05_SigmaTrichotomy.eq_smul_chiFam_column_of_vanishOnV` として `TICyclicHypothesis`
+   レベルで完全に一般。**意図的な設計判断**でもある (固定 2 要素の `R` レコードは可変長 `R` を
+   保持できず、consumer は general-family (5.7) engine を使う)。
+3. **(1.7)** — 一般 (a) の χᵢ 相異性と `n = |T:H|/e²` の計数のみ (effort S)。
+
+**未再実測 (この pass では触っていない)**: (7.8) (7.9) (8.15) (9.7) (9.10) (9.11) (10.11)
+(11.8)、App NearFields ×2、App Suzuki2Groups Lem 1。着手前に同じ手順で実測すること。
