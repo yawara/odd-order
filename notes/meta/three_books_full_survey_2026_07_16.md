@@ -1192,3 +1192,46 @@ consumer は (5.7) engine を使う。
    なので、普遍形への格上げは re-statement (effort S)。下流は witness 1 本しか要らない。
 3. **App Suzuki2Groups Lemma 1** — (b) は `QuadraticExtensions.lean` で完全形式化済 (2026-07-18)、
    **(a) (c) (d) が未**。Higman 論文の実内容。
+
+---
+
+## 📍 2026-07-26 終了時点の frontier (実測ベース)
+
+本日の一連 (22 commits) で **Isaacs 完済 / BG は残り 2 件 / Pf は残り 1 系統 + packaging** まで
+絞り込まれた。以下が着手前に実測済みの現状。
+
+### 閉じたもの (本日)
+
+| 項目 | commit |
+|---|---|
+| Pf (2.4) + (2.6)–(2.10.3) — (2.4.a) を仮説・フィールドから全除去 | `37171eade` `4c2e8cd30` |
+| Pf (1.7) — 構成要素計数 `e²·|S|·|H| = |I_G(θ)|` | `d4fe7db62` |
+| **BG Lemma 2.7 (a)(b)** — `(ℤ/q)²` の `(ℤ/p)²` への忠実作用 | `51f977137` `86be397b5` (issue 0150 closed) |
+| BG Theorem C の `p, q`-抽象形 | `62e84cf0f` |
+| **BG App.C Remark (V)** — (A) の下で `p, q` は奇と仮定してよい | `c25d14a2e` |
+| Pf の 11 系統が stale と判明 ((7.2)(b)/(7.3)/(7.10)(7.11)/(8.11)/(8.18)/(13.8)/Huppert/FeitSibley/Suzuki2Groups Def 1/NearFields ×2) | `7ce7b600e` `f39d37cfc` |
+
+### 残っているもの
+
+1. **Pf (6.2)–(6.6) の general-(6.1) 形** — 唯一の深い項目。`six_two_general` /
+   `six_three_of_six_two_oracle` が **(5.6) break-member oracle `h56`** を明示仮説に取る。
+   一般の可解 `K` で induced member が可約になり §10–§12 の muGrid/columnSum と entangle
+   (closed issue 2022 の分析どおり)。consumer では sorry-free に discharge 済で FT は閉じている。
+2. **BG App.C Remark (II)** — `p = 2`, `G = SL(2, 2^q)` の明示行列モデルで (A)+(B) が
+   充足可能であることの例示。`theoremC_abstract` ができたので statement のブロッカーは外れたが、
+   `theoremC_abstract` は群論的 (B) でなくその帰結 `hrel` (`∀ a ∈ E, N(2a−1) = 1`) を取るので、
+   **抽象 (B) ⟹ `hrel` の含意** (現状 S16 経由のみ) と `SL(2,2^q)` モデルの両方が要る。効力は例示のみ。
+3. **BG §16 tamely imbedded** — issue 8005 で意図的 defer (Pf 側の実消費がトリガー)。
+4. **Pf App Suzuki2Groups Lemma 1 (a)(c)(d)** — Higman 論文の実内容 ((b) は 07-18 に完済)。
+5. **packaging 9 件** — (5.3)(b) (5.8) (7.8) (7.9) (8.15) (9.7) (9.10) (9.11) (10.11)。
+   内容は landed、単一の抽象 statement が無いだけ。(5.3)(b) は固定 2 要素 `R` レコードの
+   設計上の制約でもある。
+6. **低優先繰延** — BG App.C Rem (IV) / Prob 1 (文献引用・open problem)、
+   Pf App C Prop 1 の Q₈ Brauer–Suzuki (issue 0147、repo 唯一の実 sorry)。
+
+### 見積もりについての教訓
+
+07-16 survey の effort ラベルは実測と大きくずれる。本日の実績:
+**BG Lem 2.7** = "M" 見積もり → 実際に数時間 (妥当) /
+**Theorem C 抽象化** = "M" 見積もり → **実際は 3 行** (step lemma が元から抽象だった) /
+**Rem (V)** = "S" → そのとおり。**着手前の実測が毎回効いている**。
