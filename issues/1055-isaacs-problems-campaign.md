@@ -1959,7 +1959,7 @@ statement は **PDF ページ画像で確定済** (書籍 p.175 = PDF p.188)。�
 | 問題 | 状態 | 主張 (PDF 実測) |
 |---|---|---|
 | 5E.1 | ⬜ | `G` 有限で**真部分群がすべて正規 `p`-補群をもつが `G` 自身は持たない** ⇒ `G` は正規 Sylow `p`-部分群をもち、`\|G\|` の `p` 以外の素因数はちょうど 1 個 (= Itô「極小非 `p`-冪零群」) |
-| 5E.2 | ⬜ | 真部分群がすべて超可解 ⇒ `G` は可解。hint: 極小反例は単純、Problem 3B.10 で最小素因数 `p` に対する正規 `p`-補群 |
+| 5E.2 | ✅ 完了 (`isSolvable_of_forall_proper_isSupersolvable`) | 真部分群がすべて超可解 ⇒ `G` は可解。hint: 極小反例は単純、Problem 3B.10 で最小素因数 `p` に対する正規 `p`-補群 |
 | 5E.3 | ⬜ | **2 元生成部分群がすべて正規 `p`-補群をもつ** ⇒ `G` も持つ。hint: `⟨x,y⟩` (`x` は `p`-部分群 `P` の元、`y ∈ N_G(P)` は位数が `p` で割れない) |
 
 ### §5E の設計メモ (2026-07-27)
@@ -1983,6 +1983,28 @@ statement は **PDF ページ画像で確定済** (書籍 p.175 = PDF p.188)。�
 * **5E.3**: Frobenius の判定条件を `q`-部分群版で使い、`x ∈ X` (`p`-部分群) と
   `y ∈ N_G(X)` の `p'`-元に対し `⟨x,y⟩` の正規 `p`-補群から `[x,y] = 1` を出す
   (`y` は `⟨x,y⟩` の `p`-補群に入る)。`|X|` に関する帰納が要りそう。
+
+### 5E.2 の実装 (2026-07-27 完了、新 leaf `Problems5E.lean` 151 行)
+
+型レベル強帰納 (`motive : ℕ → Prop` で全群型を量化、`S7C_ThompsonPComplementFinal` と同型)。
+
+* **非自明な真の正規部分群 `N` がある場合**: `N` は超可解ゆえ可解。`H ⧸ N` の真部分群 `L` は
+  `comap (mk' N) L ≠ ⊤` の像なので超可解 (新設 `Ch03.IsSupersolvable.of_surjective` を
+  `(mk' N).restrict _ |>.codRestrict L` に適用) ⟹ 帰納法で `H ⧸ N` 可解 ⟹
+  `solvable_of_ker_le_range` で拡大が可解。
+* **無い場合 (単純)**: `H` が `p`-群 (`p := minFac |H|`) なら冪零ゆえ可解。そうでなければ
+  非自明 `p`-部分群 `X` に対し `N_H(X) ≠ ⊤` (⊤ なら `X ◁ H` で単純性から `X ∈ {⊥,⊤}`、
+  どちらも除外)、ゆえに超可解 ⟹ **3B.7(b)** で極大部分群の指数が素数 ⟹ **3B.8**
+  (`exists_normal_qComplement`、`p` 最小素因数) で正規 `p`-補群 ⟹
+  **Frobenius Thm 5.26** で `H` 自身が正規 `p`-補群 `K` をもつ。`p ∣ |H|` で `K ≠ ⊤`、
+  `H` が `p`-群でないので `K ≠ ⊥` ⟹ 単純性に矛盾。
+
+**Ch03 側の追加**: `IsSupersolvable.of_surjective` (超可解列を押し出すだけ) を新設し、
+既存の `IsSupersolvable.quotient` はその特殊化に書き換えた (重複解消)。
+
+⚠ 実装の罠: `rw [hbot] at hmul` は `K.index` の `K` まで書き換えて後続の `hidx` が
+マッチしなくなる — `Nat.card ↥K = 1` だけを別 `have` にして書き換える。
+`push_neg` は deprecated (`push Not`)。
 
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
