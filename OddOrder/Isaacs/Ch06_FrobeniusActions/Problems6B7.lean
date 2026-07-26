@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.IndexNormal
 import OddOrder.Isaacs.Ch06_FrobeniusActions.DQSDRecognition
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B6
 
@@ -43,7 +44,58 @@ theorem conj_eq_four_cases_of_index_two {P : Type*} [Group P] [Finite P]
     (h_idx : (Subgroup.zpowers c).index = 2) :
     a * c * a⁻¹ = c ∨ a * c * a⁻¹ = c⁻¹ ∨
       a * c * a⁻¹ = c ^ (2 ^ (m - 1)) * c ∨ a * c * a⁻¹ = c ^ (2 ^ (m - 1)) * c⁻¹ := by
-  sorry
+  classical
+  haveI hnorm : (Subgroup.zpowers c).Normal := Subgroup.normal_of_index_eq_two h_idx
+  obtain ⟨j, hj⟩ : ∃ j : ℤ, c ^ j = a * c * a⁻¹ :=
+    Subgroup.mem_zpowers_iff.mp (hnorm.conj_mem c (Subgroup.mem_zpowers c) a)
+  have hconj : ∀ k : ℤ, a * c ^ k * a⁻¹ = (a * c * a⁻¹) ^ k := fun k => by
+    have hmap := map_zpow (MulAut.conj a) c k
+    simpa [MulAut.conj_apply, mul_assoc] using hmap
+  have hcomm : a ^ 2 * c = c * a ^ 2 := by
+    obtain ⟨t, ht⟩ := Subgroup.mem_zpowers_iff.mp (Subgroup.sq_mem_of_index_two h_idx a)
+    rw [← ht]
+    exact ((Commute.refl c).zpow_left t).eq
+  have hkey : c ^ (j * j) = c := by
+    have e3 : a * (a * c * a⁻¹) * a⁻¹ = c ^ (j * j) := by
+      rw [← hj, hconj j, ← hj, ← zpow_mul]
+    have e1 : a * (a * c * a⁻¹) * a⁻¹ = a ^ 2 * c * (a ^ 2)⁻¹ := by
+      rw [pow_two]; group
+    have e2 : a ^ 2 * c * (a ^ 2)⁻¹ = c := by rw [hcomm]; group
+    rw [← e3, e1, e2]
+  have hsq : ((j : ℤ) : ZMod (2 ^ m)) ^ 2 = 1 := by
+    have hone : c ^ (j * j - 1) = 1 := by rw [zpow_sub, hkey, zpow_one]; exact mul_inv_cancel c
+    have h2 := orderOf_dvd_iff_zpow_eq_one.mpr hone
+    rw [hord] at h2
+    have h3 : (((j * j - 1 : ℤ)) : ZMod (2 ^ m)) = 0 := by
+      rw [ZMod.intCast_zmod_eq_zero_iff_dvd]
+      exact_mod_cast h2
+    push_cast at h3
+    linear_combination h3
+  have bridge : ∀ k : ℤ, ((j : ℤ) : ZMod (2 ^ m)) = ((k : ℤ) : ZMod (2 ^ m)) →
+      c ^ j = c ^ k := by
+    intro k hk
+    have hsub : (((j - k : ℤ)) : ZMod (2 ^ m)) = 0 := by rw [Int.cast_sub, hk, sub_self]
+    rw [ZMod.intCast_zmod_eq_zero_iff_dvd] at hsub
+    have hz1 : c ^ (j - k) = 1 := by
+      refine orderOf_dvd_iff_zpow_eq_one.mp ?_
+      rw [hord]
+      exact_mod_cast hsub
+    rw [zpow_sub] at hz1
+    exact mul_inv_eq_one.mp hz1
+  have hcpow : c ^ ((2 : ℤ) ^ (m - 1)) = c ^ (2 ^ (m - 1)) := by
+    rw [← zpow_natCast c (2 ^ (m - 1))]
+    norm_cast
+  rcases (sq_eq_one_iff_two_pow (by omega) _).mp hsq with h | h | h | h
+  · refine Or.inl ?_
+    rw [← hj, bridge 1 (by rw [h]; push_cast; ring), zpow_one]
+  · refine Or.inr (Or.inl ?_)
+    rw [← hj, bridge (-1) (by rw [h]; push_cast; ring), zpow_neg_one]
+  · refine Or.inr (Or.inr (Or.inl ?_))
+    rw [← hj, bridge ((2 : ℤ) ^ (m - 1) + 1) (by rw [h]; push_cast; ring), zpow_add,
+      zpow_one, hcpow]
+  · refine Or.inr (Or.inr (Or.inr ?_))
+    rw [← hj, bridge ((2 : ℤ) ^ (m - 1) - 1) (by rw [h]; push_cast; ring), zpow_sub,
+      zpow_one, hcpow]
 
 /-- **Isaacs Problem 6B.7** (p. 196) ⭐: 指数 `2` の巡回部分群を持つ非可換 `2`-群 `P` が
 `|P : Z(P)| > 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
