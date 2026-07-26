@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Tactic.NormNum.Prime
-import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
-import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 
 /-!
 # Isaacs Problem 6A.2 — 奇数位数の非可換 Frobenius complement (書籍 p. 184)
@@ -240,33 +239,6 @@ theorem uB_mem_normalizer (hα : orderOf α = 7) (hε : orderOf ε = 3) :
 
 /-! ### `|A| = 63` と非巡回性 -/
 
-/-- `S ≤ N_G(N)` かつ位数が互いに素なら `|N ⊔ S| = |N| · |S|`。
-
-`Ch01.card_sup_of_normal_of_coprime` (Problem 1C.4 の helper) の「`N` が `G` で正規」という
-仮定を「`S` が `N` を正規化する」に緩めた版 (`N ⊔ S` の中に降りて適用する)。 -/
-theorem card_sup_of_le_normalizer_of_coprime {G : Type*} [Group G] [Finite G]
-    {N S : Subgroup G} (hnorm : S ≤ Subgroup.normalizer N)
-    (h : Nat.Coprime (Nat.card ↥N) (Nat.card ↥S)) :
-    Nat.card ↥(N ⊔ S) = Nat.card ↥N * Nat.card ↥S := by
-  have hNL : N ≤ N ⊔ S := le_sup_left
-  have hSL : S ≤ N ⊔ S := le_sup_right
-  haveI hnormal : (N.subgroupOf (N ⊔ S)).Normal :=
-    (Subgroup.normal_subgroupOf_iff_le_normalizer hNL).mpr (sup_le Subgroup.le_normalizer hnorm)
-  have hcN : Nat.card ↥(N.subgroupOf (N ⊔ S)) = Nat.card ↥N :=
-    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNL).toEquiv
-  have hcS : Nat.card ↥(S.subgroupOf (N ⊔ S)) = Nat.card ↥S :=
-    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hSL).toEquiv
-  have hsup : N.subgroupOf (N ⊔ S) ⊔ S.subgroupOf (N ⊔ S) = ⊤ := by
-    rw [← Subgroup.subgroupOf_sup hNL hSL, Subgroup.subgroupOf_self]
-  have hres := Ch01.card_sup_of_normal_of_coprime (N := N.subgroupOf (N ⊔ S))
-    (S := S.subgroupOf (N ⊔ S)) hnormal (by rw [hcN, hcS]; exact h)
-  rw [hsup, Subgroup.card_top, hcN, hcS] at hres
-  exact hres
-
-instance finiteMatrixUnits {n : Type*} [Fintype n] [DecidableEq n] {R : Type*} [CommRing R]
-    [Finite R] : Finite (Matrix n n R)ˣ :=
-  Finite.of_injective _ Units.val_injective
-
 /-- **Isaacs Problem 6A.2 (前半)**: `A = ⟨a, b⟩` の位数は `63 = 7 · 9`。 -/
 theorem card_grpA [Finite F] (hα : orderOf α = 7) (hε : orderOf ε = 3) :
     Nat.card ↥(grpA hα hε) = 63 := by
@@ -313,65 +285,11 @@ theorem not_isCyclic_grpA (hα : orderOf α = 7) (hε : orderOf ε = 3) :
   消え, `b^{3j} = ε^j · 1` が残る) — スカラーは非零ベクトルを固定しない。
 -/
 
-/-- `GL(n, R)` (= 行列環の単元群) は `n → R` に `mulVec` で線形に作用する。 -/
-instance unitsMatrixDistribMulAction {n : Type*} [Fintype n] [DecidableEq n]
-    {R : Type*} [CommRing R] : DistribMulAction ((Matrix n n R)ˣ) (n → R) where
-  smul a v := (a : Matrix n n R).mulVec v
-  one_smul v := by
-    change ((1 : (Matrix n n R)ˣ) : Matrix n n R).mulVec v = v
-    rw [Units.val_one, Matrix.one_mulVec]
-  mul_smul a b v := by
-    change ((a * b : (Matrix n n R)ˣ) : Matrix n n R).mulVec v
-      = (a : Matrix n n R).mulVec ((b : Matrix n n R).mulVec v)
-    rw [Units.val_mul, Matrix.mulVec_mulVec]
-  smul_zero a := by
-    change (a : Matrix n n R).mulVec 0 = 0
-    exact Matrix.mulVec_zero _
-  smul_add a u v := by
-    change (a : Matrix n n R).mulVec (u + v)
-      = (a : Matrix n n R).mulVec u + (a : Matrix n n R).mulVec v
-    exact Matrix.mulVec_add _ _ _
-
-theorem unitsMatrix_smul_def {n : Type*} [Fintype n] [DecidableEq n] {R : Type*} [CommRing R]
-    (a : (Matrix n n R)ˣ) (v : n → R) : a • v = (a : Matrix n n R).mulVec v := rfl
-
-/-- `K ≤ N_G(H)` なら `H ⊔ K` の台集合は積集合 `H · K`
-(`Subgroup.mul_normal` の「`N` が `G` で正規」を「`K` が `H` を正規化」に緩めた版)。 -/
-theorem coe_sup_eq_mul_of_le_normalizer {G : Type*} [Group G] {H K : Subgroup G}
-    (hK : K ≤ Subgroup.normalizer H) :
-    ((H ⊔ K : Subgroup G) : Set G) = (H : Set G) * (K : Set G) := by
-  refine le_antisymm ?_ ?_
-  · let P : Subgroup G :=
-      { carrier := (H : Set G) * (K : Set G)
-        one_mem' := ⟨1, one_mem _, 1, one_mem _, one_mul 1⟩
-        mul_mem' := by
-          rintro _ _ ⟨h₁, hh₁, k₁, hk₁, rfl⟩ ⟨h₂, hh₂, k₂, hk₂, rfl⟩
-          exact ⟨h₁ * (k₁ * h₂ * k₁⁻¹),
-            Subgroup.mul_mem _ hh₁ (((Subgroup.mem_normalizer_iff.mp (hK hk₁)) h₂).mp hh₂),
-            k₁ * k₂, Subgroup.mul_mem _ hk₁ hk₂, by group⟩
-        inv_mem' := by
-          rintro _ ⟨h, hh, k, hk, rfl⟩
-          exact ⟨k⁻¹ * h⁻¹ * (k⁻¹)⁻¹,
-            ((Subgroup.mem_normalizer_iff.mp (hK (inv_mem hk))) h⁻¹).mp (inv_mem hh),
-            k⁻¹, inv_mem hk, by group⟩ }
-    exact (sup_le (fun h hh => ⟨h, hh, 1, one_mem _, mul_one h⟩)
-      (fun k hk => ⟨1, one_mem _, k, hk, one_mul k⟩) : H ⊔ K ≤ P)
-  · rintro _ ⟨h, hh, k, hk, rfl⟩
-    exact Subgroup.mul_mem _ ((le_sup_left : H ≤ H ⊔ K) hh) ((le_sup_right : K ≤ H ⊔ K) hk)
-
 /-- **正規形**: `A = ⟨a, b⟩` の元はすべて `aⁱ bʲ` (`i j : ℕ`) の形。 -/
 theorem exists_pow_mul_pow_of_mem_grpA [Finite F] (hα : orderOf α = 7) (hε : orderOf ε = 3)
     {x : (Matrix (Fin 3) (Fin 3) F)ˣ} (hx : x ∈ grpA hα hε) :
-    ∃ i j : ℕ, x = uA hα ^ i * uB hε ^ j := by
-  rw [grpA_eq_sup] at hx
-  have hmem : x ∈ ((Subgroup.zpowers (uA hα) : Set ((Matrix (Fin 3) (Fin 3) F)ˣ))
-      * (Subgroup.zpowers (uB hε) : Set ((Matrix (Fin 3) (Fin 3) F)ˣ))) := by
-    rw [← coe_sup_eq_mul_of_le_normalizer (Subgroup.zpowers_le.mpr (uB_mem_normalizer hα hε))]
-    exact hx
-  obtain ⟨y, hy, z, hz, rfl⟩ := hmem
-  obtain ⟨i, hi⟩ := (Submonoid.mem_powers_iff _ _).mp (mem_powers_iff_mem_zpowers.mpr hy)
-  obtain ⟨j, hj⟩ := (Submonoid.mem_powers_iff _ _).mp (mem_powers_iff_mem_zpowers.mpr hz)
-  exact ⟨i, j, by rw [hi, hj]⟩
+    ∃ i j : ℕ, x = uA hα ^ i * uB hε ^ j :=
+  exists_pow_mul_pow_of_mem_closure_pair (uB_mem_normalizer hα hε) hx
 
 /-- `b aⁱ b⁻¹ = a^{4i}`。 -/
 theorem uB_mul_uA_pow_mul_uB_inv (hα : orderOf α = 7) (hε : orderOf ε = 3) (i : ℕ) :
@@ -446,24 +364,6 @@ theorem cube_uA_pow_mul_uB_sq (hα : orderOf α = 7) (hε : orderOf ε = 3) (i :
 
 /-! ### 不動点の解析 -/
 
-/-- 非単位スカラー行列は非零ベクトルを固定しない。 -/
-theorem scalar_mulVec_ne_of_ne_one {n : Type*} [Fintype n] [DecidableEq n] {c : F} (hc : c ≠ 1)
-    {v : n → F} (hv : v ≠ 0) : (c • (1 : Matrix n n F)).mulVec v ≠ v := by
-  intro hfix
-  obtain ⟨k, hk⟩ := Function.ne_iff.mp hv
-  simp only [Pi.zero_apply] at hk
-  have h := congrFun hfix k
-  rw [Matrix.smul_mulVec, Matrix.one_mulVec] at h
-  exact hc (mul_right_cancel₀ hk (by simpa using h))
-
-/-- 対角行列が非零ベクトルを固定するなら, ある対角成分が `1`。 -/
-theorem exists_diagonal_eq_one_of_mulVec_eq {n : Type*} [Fintype n] [DecidableEq n]
-    {d v : n → F} (hv : v ≠ 0) (hfix : (Matrix.diagonal d).mulVec v = v) :
-    ∃ k, d k = 1 := by
-  obtain ⟨k, hk⟩ := Function.ne_iff.mp hv
-  simp only [Pi.zero_apply] at hk
-  exact ⟨k, mul_right_cancel₀ hk (by rw [← Matrix.mulVec_diagonal d v k, hfix, one_mul])⟩
-
 /-- `⟨ε⟩ ⊓ ⟨α⟩ = 1` の元形: `c³ = 1` かつ `c⁷ = 1` なら `c = 1`。 -/
 theorem eq_one_of_pow_three_pow_seven {c : F} (h3 : c ^ 3 = 1) (h7 : c ^ 7 = 1) : c = 1 := by
   have hd : orderOf c ∣ Nat.gcd 3 7 :=
@@ -482,14 +382,6 @@ theorem uB_pow_three_commute (hε : orderOf ε = 3) (y : (Matrix (Fin 3) (Fin 3)
   refine Units.ext ?_
   rw [Units.val_mul, Units.val_mul, uB_pow_three_val hε, Matrix.smul_mul, Matrix.mul_smul,
     one_mul, mul_one]
-
-/-- スカラー倍と対角行列: `c • diag(d) = diag(k ↦ d k * c)`。 -/
-theorem diagonal_mul_scalar {n : Type*} [Fintype n] [DecidableEq n] (d : n → F) (c : F) :
-    Matrix.diagonal d * (c • (1 : Matrix n n F)) = Matrix.diagonal (fun k => d k * c) := by
-  have hscal : (c • (1 : Matrix n n F)) = Matrix.diagonal (fun _ => c) := by
-    ext p q
-    by_cases h : p = q <;> simp [h]
-  rw [hscal, Matrix.diagonal_mul_diagonal]
 
 /-- **Isaacs Problem 6A.2 (後半)** ⭐: `A = ⟨a, b⟩` の位数 `|F|³` のベクトル空間 `V = F³` への
 自然な作用は **Frobenius**。 -/
