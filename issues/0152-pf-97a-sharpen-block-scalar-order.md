@@ -70,3 +70,37 @@ created: 2026-07-26
   (ratio embedding の core), `LineScalarCharacter.lean` (`lineScalarChar`)
 * `OddOrder/Peterfalvi/S11_ImprimitiveUBound.lean` (`caseA_*`)
 * `OddOrder/Peterfalvi/S11_MaximalII_III_IV/CuS0.lean` (`caseA_wOrbit`)
+
+---
+
+## 📐 実測の訂正 (2026-07-26) — `a`-torsion 形は既に在った
+
+起票時に見落としていた: `RepresentationTheory.exists_blockScalarRatioEmbedding_of_blocks_pow_eq_one`
+(`TypePGaloisUBound.lean:65`) が既に **`a`-torsion 形の埋め込み**を与えている
+(`∃ ψ, Injective ψ ∧ ∀ u i, (ψ u i)^a = 1`、docstring も「Peterfalvi (9.7)(a), order-`a`
+refinement」と明記)。⟹ 欠けていたのは**位数の割り切り**の側だけだった。
+
+## ✅ step 3 完了 (2026-07-26)
+
+共通像 `A ≤ 𝔽_p^×` を明示に取る形を追加:
+
+| 新規 | statement |
+|---|---|
+| `RepresentationTheory.card_dvd_pow_card_of_block_scalars_mem` | 全ブロックスカラーが `B ≤ A` に値を取れば `|Ū| ∣ |B|^n` (終域の corestrict) |
+| `RepresentationTheory.card_subgroup_dvd_card` | `|B| ∣ |A|` (Lagrange) — `A = 𝔽_p^×` で書籍の `a ∣ p−1` |
+| `RepresentationTheory.card_dvd_blockScalarOrder_pow_of_blocks` | (9.7)(a) の書籍 `a`-形入口: `|U| ∣ |A|^n ∧ |A| ∣ p−1` |
+
+`A = ⊤` で従来の `card_dvd_pred_pow_of_blocks` に戻るので下流は不変。AxiomsCheck 登録済
+(3 axiom)。フルビルド green (4798 jobs)、`--strict` 警告ゼロ、sorry 非退行。
+
+## 残り (step 1–2)
+
+`A = im φ₁` を **`W₁`-共役から produce する S11 側**の step:
+
+1. `im(φ_w) = im(φ_1)` — `φ_w(u) = φ_1(w⁻¹ u w)` と `U ⋊ W₁` の正規化性から。
+   `caseA_wOrbit` (`CuS0.lean:701`) がブロック族 `w ↦ S₀^w` を持っているので、
+   `lineScalarChar (S₀^w)` と `lineScalarChar S₀ ∘ conj w⁻¹` の一致を示すのが核。
+2. `a := Nat.card (im φ₁) = |U : C_U(H₁)|` を pin し、
+   `card_dvd_blockScalarOrder_pow_of_blocks` に流し込む。
+
+これで `caseA_u_dvd_pred_pow` の `a`-鋭化版が出る。

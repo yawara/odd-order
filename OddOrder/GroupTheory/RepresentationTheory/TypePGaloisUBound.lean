@@ -152,6 +152,35 @@ theorem card_dvd_pred_pow_of_blocks {p : ℕ} [Fact p.Prime]
   have hunits : Nat.card (ZMod p)ˣ = p - 1 := by
     rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime Fact.out]
   rwa [hunits] at hdvd
+/-- **Peterfalvi (9.7)(a), the book's `a`-form**: if all block scalars take values in one subgroup
+`A ≤ 𝔽_p^×`, then `|U|` divides `|A|^n` and `|A|` divides `p − 1`.
+
+The book puts `a = |U : C_U(H₁)|` and concludes that `U` embeds in a direct product of `q − 1`
+cyclic groups of order `a`, with `a ∣ p − 1`.  Here `A` is that common image: for the `W₁`-permuted
+blocks `H_i = H₁^{w_i}` the scalar characters all have the same image (conjugation by `w_i` is an
+automorphism of `U`), so this hypothesis is exactly what the book's `{H_i} = {H₁^w | w ∈ W₁}`
+supplies.  Taking `A = ⊤` recovers `card_dvd_pred_pow_of_blocks` (issue 0152). -/
+theorem card_dvd_blockScalarOrder_pow_of_blocks {p : ℕ} [Fact p.Prime]
+    {U M : Type u} [CommGroup U] [Finite U] [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    {n : ℕ} (ρ : Representation (ZMod p) U M) (B : Fin (n + 1) → Subrepresentation ρ)
+    (hBcard : ∀ i, Nat.card (B i).toSubmodule = p)
+    (A : Subgroup (ZMod p)ˣ)
+    (hmem : ∀ (i : Fin (n + 1)) (u : U),
+      lineScalarChar (B i).toRepresentation (finrank_eq_one_of_card_eq_prime (hBcard i)) u ∈ A)
+    (hconst : ∀ u : U,
+        (∀ i : Fin (n + 1),
+          lineScalarChar (B i).toRepresentation (finrank_eq_one_of_card_eq_prime (hBcard i)) u
+            = lineScalarChar (B 0).toRepresentation
+                (finrank_eq_one_of_card_eq_prime (hBcard 0)) u)
+        → u = 1) :
+    Nat.card U ∣ Nat.card A ^ n ∧ Nat.card A ∣ p - 1 := by
+  refine ⟨card_dvd_pow_card_of_block_scalars_mem
+    (fun i => lineScalarChar (B i).toRepresentation
+      (finrank_eq_one_of_card_eq_prime (hBcard i))) A hmem hconst, ?_⟩
+  have hunits : Nat.card (ZMod p)ˣ = p - 1 := by
+    rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime Fact.out]
+  exact hunits ▸ card_subgroup_dvd_card A
+
 /-- **Non-Galois `u`-bound from an imprimitive block decomposition** (Peterfalvi (9.7)(a),
 module-level entry point): if the abelian `U`-action on `M` restricts to `q = n+1` order-`p`
 subrepresentations `B i` (each an `𝔽_p`-line — the imprimitivity blocks `H1^w`) with **no

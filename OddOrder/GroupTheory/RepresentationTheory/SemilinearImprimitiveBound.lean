@@ -114,6 +114,34 @@ theorem card_dvd_pow_of_block_scalars {Ubar A : Type*} [CommGroup Ubar] [Finite 
     Subgroup.card_dvd_of_injective (blockScalarRatioHom φ)
       (blockScalarRatioHom_injective φ hconst)
 
+/-- **Ratio-embedding divisibility, sharpened to a common target subgroup** (Peterfalvi (9.7)(a),
+the book's `a`-form).  If all `n + 1` block scalars take values in one subgroup `B ≤ A`, the ratio
+embedding lands in `B^n`, so `|Ū|` divides `|B|^n` rather than merely `|A|^n`.
+
+This is what turns the repo's `|Ū| ∣ (p−1)^{q−1}` into the book's statement that `Ū` embeds in a
+direct product of `q − 1` cyclic groups of order `a = |U : C_U(H₁)|`: for the `W₁`-permuted blocks
+`H_i = H_1^{w_i}` the scalar characters `φ_i` all have the *same* image (conjugation by `w_i` is an
+automorphism of `U`), and that common image `B = im φ_1` is cyclic of order `a`, with `a ∣ p − 1`
+by Lagrange in `A = 𝔽_p^×`.
+
+Together with `card_dvd_pow_of_block_scalars` (the `B = ⊤` case) this covers both readings; the
+sharper one keeps the prime-factor information of `a` instead of that of `p − 1` (issue 0152). -/
+theorem card_dvd_pow_card_of_block_scalars_mem {Ubar A : Type*} [CommGroup Ubar] [Finite Ubar]
+    [CommGroup A] [Finite A]
+    {n : ℕ} (φ : Fin (n + 1) → (Ubar →* A)) (B : Subgroup A)
+    (hmem : ∀ (i : Fin (n + 1)) (x : Ubar), φ i x ∈ B)
+    (hconst : ∀ x : Ubar, (∀ i : Fin (n + 1), φ i x = φ 0 x) → x = 1) :
+    Nat.card Ubar ∣ Nat.card B ^ n := by
+  refine card_dvd_pow_of_block_scalars
+    (fun i => (φ i).codRestrict B (hmem i)) (fun x hx => hconst x fun i => ?_)
+  exact congrArg Subtype.val (hx i)
+
+/-- The common block-scalar order `a = |B|` divides `|A|`, by Lagrange.  With `A = 𝔽_p^×` this is
+the book's "`a` divides `p − 1`" in Peterfalvi (9.7)(a). -/
+theorem card_subgroup_dvd_card {A : Type*} [CommGroup A] [Finite A] (B : Subgroup A) :
+    Nat.card B ∣ Nat.card A :=
+  Subgroup.card_subgroup_dvd_card B
+
 /-- **Ratio embedding from block scalars** (the injectivity core of Peterfalvi (9.7)(a)'s `psi`,
 `PFsection9.v:442`): given a finite commutative group `Ū` with `q = n+1` scalar characters
 `φ : Fin (n+1) → (Ū →* A)` (the action of `Ū` on the `n+1` imprimitivity blocks, each `𝔽_p`-line, so

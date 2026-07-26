@@ -9610,6 +9610,17 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_cyclic
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.singerAdapter_coprime_fpf
+-- **(9.7)(a) の書籍 `a`-形** (issue 0152, 2026-07-26): 書籍は `a = |U : C_U(H₁)|` を定義して
+-- 「`a ∣ p−1` かつ `U` は位数 `a` の巡回群 `q−1` 個の直積の部分群」と主張する。repo には
+-- `a`-torsion 形の埋め込み (`exists_blockScalarRatioEmbedding_of_blocks_pow_eq_one`) は在ったが
+-- 位数の割り切りが `p−1` 形だけだったので、共通像 `A ≤ 𝔽_p^×` を明示に取る形を追加した:
+-- `|U| ∣ |A|^n` かつ `|A| ∣ p−1`。`A = ⊤` で従来の `card_dvd_pred_pow_of_blocks` に戻る。
+-- 残り = `A = im φ₁` を `W₁`-共役から produce する S11 側の step (issue 0152)。
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.card_dvd_pow_card_of_block_scalars_mem
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.card_subgroup_dvd_card
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.card_dvd_blockScalarOrder_pow_of_blocks
 -- Peterfalvi (9.7)(b): `Coprime |Ū| (p-1)` (fixed-point-free) and the resulting unconditional
 -- divisibility `|Ū| ∣ (p^q-1)/(p-1)`.  The FPF input `C_Ū(w₀) = 1` is supplied from the Frobenius
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).
