@@ -1960,7 +1960,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 問題 | 状態 | 主張 |
 |---|---|---|
 | 6A.1 | ✅ 完了 (`Problems6A.lean`) | `A ≤ SL(2,p)`, `p ∤ \|A\|` ⟹ `A` の `(ZMod p)²` への作用は Frobenius |
-| 6A.2 | ⬜ | `GL(3,43)` の具体例 `a = diag(α,α⁴,α²)`, `b = [[0,1,0],[0,0,1],[ε,0,0]]` (`α` 位数 7, `ε` 位数 3) で `A = ⟨a,b⟩` は非巡回位数 63, `43³` 次元への作用は Frobenius |
+| 6A.2 | 🔨 前半完了 (`Problems6A2.lean`: 位数 63・非巡回) / Frobenius は次回 | `GL(3,43)` の具体例 `a = diag(α,α⁴,α²)`, `b = [[0,1,0],[0,0,1],[ε,0,0]]` (`α` 位数 7, `ε` 位数 3) で `A = ⟨a,b⟩` は非巡回位数 63, `43³` 次元への作用は Frobenius |
 | 6A.3 | ⬜ | 位数 `5²·11` の非巡回群で Frobenius 作用をもつものが存在 (hint: `GL(5,p)`) |
 | 6A.4 | ⬜ | Frobenius 群 `G` (核 `N`) の `N` 以外の剰余類は単一の共役類に含まれる |
 | 6A.5 | ⬜ | 非可換可解群で全非単位元の中心化群が可換 ⟹ Frobenius 群 (核 = `F(G)`) |
@@ -1970,6 +1970,37 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.9 | ⬜ | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
 | 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ⬜ | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
+
+### 6A.2 の実装状況 (2026-07-27) — 前半 (位数 63・非巡回) 完了、Frobenius は次回
+
+新 leaf `Problems6A2.lean` (`OddOrder.lean` 配線済、全て実証明・警告 0)。
+
+⚠ **一般化した**: 書籍は `F = 𝔽₄₃` だが証明は「位数 7 の `α` と位数 3 の `ε` をもつ体」で
+そのまま通るので, 一般の体 `F` で述べている (`ZMod 43` への具体化は次回)。
+
+**行列の関係式** (`matA α = diag(α, α⁴, α²)`, `matB ε = ![[0,1,0],[0,0,1],[ε,0,0]]`):
+* `matA_pow` / `matA_pow_seven` (`a⁷ = 1`)
+* `matB_pow_three`: **`b³ = ε · 1`** (スカラー) ⟹ `matB_pow_nine` (`b⁹ = 1`)
+* `matA_mul_matB`: **`a · b = b · a²`** (⭐ 書籍 hint の「`b` は `⟨a⟩` を正規化」の内容;
+  実際に計算すると `b⁻¹ a b = a²`, `b a b⁻¹ = a⁴`)
+
+**`GL(3,F)` の元と群構造**: `uA` / `uB` (単元版, 逆元は `a⁶` / `b⁸`) / `orderOf_uA = 7` /
+`orderOf_uB = 9` / `uB_inv_mul_uA_mul_uB` (`b⁻¹ a b = a²`) /
+`uB_mul_uA_mul_uB_inv` (`b a b⁻¹ = a⁴`, `a⁸ = a` と `b a² b⁻¹ = a` から) /
+`uB_mem_normalizer` (`b ∈ N(⟨a⟩)`) / `grpA` / `grpA_eq_sup` (`⟨a,b⟩ = ⟨a⟩ ⊔ ⟨b⟩`)。
+
+**主結果 (前半)**:
+* `card_grpA` : **`|A| = 63`**
+* `not_isCyclic_grpA` : **`A` は非巡回** (巡回なら可換, しかし `a b = b a²` で `a = a²`)
+
+再利用可能な helper: `card_sup_of_le_normalizer_of_coprime`
+(`Ch01.card_sup_of_normal_of_coprime` の「`N` が `G` で正規」を「`S ≤ N_G(N)`」に緩めた版;
+`N ⊔ S` の中に降りて `subgroupOf` で適用) / `finiteMatrixUnits` instance。
+
+**次回**: Frobenius 性。書籍 hint =「素数位数の元 `t` について `C_V(t) = 1` を見れば十分」。
+位数 7 の元は正規 Sylow 7 = `⟨a⟩` に入り対角成分がすべて `≠ 1`;
+位数 3 の元は Sylow 3 = `⟨b⟩` (巡回位数 9) の唯一の位数 3 部分群 `⟨b³⟩ = ⟨ε·1⟩`
+(スカラーゆえ中心的で共役不変) に入るので, いずれも非零ベクトルを固定しない。
 
 ### 6A.1 の実装 (2026-07-27 完了、新 leaf `Problems6A.lean`)
 
