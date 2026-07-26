@@ -63,3 +63,65 @@ created: 2026-07-26
 - `OddOrder/BG/AppC_NormSetBasic.lean` (Step 1–4 の `p, q`-抽象な部品)
 - `OddOrder/Peterfalvi/S16_NonExistenceGCore.lean` (現行の S16 経由の組み立て)
 - survey: `notes/meta/three_books_full_survey_2026_07_16.md` 「2026-07-26 終了時点の frontier」
+
+---
+
+## 📐 2026-07-26 実測 — 依存の全数調査 (着手前)
+
+C.3 chain (`S16_AppendixC3` / `S16_CoreSetupBasic` / `S16_CoreSetup` / `S16_CoreBounds` /
+`S16_NonExistenceGCore`、合計 ~3,900 行) が `hyp : S16.Hypothesis` から**実際に何を使っているか**
+を全数 grep で確定した。結論: **抽象 (B) を超える依存は無い**。
+
+### `hyp.base` の使用フィールド (全数)
+
+| フィールド | 出現数 |
+|---|---|
+| `p` | 233 |
+| `U` | 108 |
+| `P` | 71 |
+| `q` | 52 |
+| `Q` | 22 |
+| `W2` | 17 |
+| `p_prime` | 14 |
+| `q_prime` | 4 |
+
+**これだけ**。`S15.Hypothesis` の他の ~40 フィールド (S, T, W1, W, V, C, D, 極大性, type
+predicates, (8.8) case-B, `q < p`, `p_odd`/`q_odd`, …) は**一切使われていない**。
+`hG : IsMinimalSimpleOdd G` も chain のどの補題も取らない。使う instance は `[Finite G]` のみ。
+
+### `hyp` を丸ごと渡す先 (全数)
+
+`fieldNormalizerFrobeniusGroup` / `fieldNormalizerPrimeLineElement` /
+`fieldNormalizerNormOneUnits` / `fieldNormalizerPrimeLineGenerator` /
+`fieldNormalizerFrobeniusHom` / `exists_fieldNormalizerNormOneUnit_ne_one` /
+`appCNormSetGeneratorRelation` / `appCNormSetTwistedNormOneStep` /
+`FieldNormalizerData` — **すべて `(p, q)` だけの関数**であり、`hyp` は `hyp.base.p`,
+`hyp.base.q` を渡すための syntactic な容器にすぎない。
+
+### `FieldNormalizerData` の非-(B) フィールド
+
+* `sigma_P_eq_P` — 使用 2 箇所 (`S16_AppendixC3:338,341`)。抽象版では `P := σ(P)` を
+  定義にすれば `rfl` になる (同様に `sigma_U_eq_U` / `sigma_P0_eq_W2`)。
+* `Q_elementaryAbelian` — **使用 1 箇所のみ** (`S16_NonExistenceGCore:213`)、しかも
+  `.comm` (可換性) を取り出すだけ。⟹ **書籍の「finite abelian `p'`-subgroup」で足りる**。
+  elementary abelian への強化は不要 = `HypothesisBAbstract.Q_commutative` で置換可能。
+* `cyclotomic_coprime` — 条件 (A)。書籍でも Theorem C の別仮説なので分離して渡す。
+* `P1 := MulAut.conj y • W2` (`S16_CoreBounds:73`)、`t := MulAut.conj y s` — どちらも
+  抽象 (B) の `MulAut.conj y • σ(P₀)` そのもの。
+
+### ⟹ 実施プラン (再パラメータ化、証明の書き直しではない)
+
+1. `p, q, G` で index された slim record を新設 (実質 `HypothesisBAbstract` + 条件 (A))。
+   ambient な `P`/`U`/`W2` は σ の像として**定義**し、現 `sigma_*_eq_*` フィールドを消す。
+2. C.3 chain を `hyp.base.X` → slim record の対応フィールドへ**機械置換**
+   ([[lean-systematic-refactor-script]] の Python 一括方式; 連鎖 Edit は空白を潰すので不可)。
+   `hyp.base.p`/`hyp.base.q` → `p`/`q` (section variable)。
+3. `S16.FieldNormalizerData hyp` → slim record への adapter を書き、既存 S16 経路
+   (`theoremC`, `final_contradiction`) を無変更で通す (statement 不変)。
+4. `hypothesisBAbstract_sl2` (Remark (II)) から `hrel` が出るようになるので、
+   `theoremC_abstract` と繋いで `p ≤ q` を回せることを確認 (p=2 なので結論は自明だが、
+   経路が閉じていることの検証になる)。
+5. AxiomsCheck に追加。フルビルド + `--strict` gate。
+
+⚠ 規模: ~3,900 行の機械置換 + adapter。**multi-session だがコストは着手判断基準でない**
+([[feedback-cost-scope-not-a-criterion]])。分割 commit で進める。
