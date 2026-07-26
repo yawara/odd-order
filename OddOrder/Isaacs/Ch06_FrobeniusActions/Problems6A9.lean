@@ -410,6 +410,46 @@ theorem eq_of_mul_inv_mem [Finite G] {A : Subgroup G}
     have hy1 : y = 1 := by simpa using congrArg (fun z : G => z⁻¹) hyi
     exact hbne (by rw [hx1, hy1]; group)
 
+/-- 6A.9(c) の系: `A` の元で `t` に反転されるのは `1` と `t` だけ
+(`a t` は `A` の involution になるので (c) の一意性から `a t ∈ {1, t}`)。 -/
+theorem eq_one_or_eq_of_mem_of_conj_eq_inv [Finite G] {A : Subgroup G} (hAtop : A ≠ ⊤)
+    (hATI : ∀ y : G, y ∉ A → A ⊓ (MulAut.conj y • A) = ⊥)
+    {t : G} (htA : t ∈ A) (ht2 : t * t = 1) (htne : t ≠ 1)
+    {a : G} (haA : a ∈ A) (hinv : t * a * t = a⁻¹) : a = 1 ∨ a = t := by
+  have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht2
+  have hsq : (a * t) * (a * t) = 1 := by
+    calc (a * t) * (a * t) = a * (t * a * t) := by group
+      _ = a * a⁻¹ := by rw [hinv]
+      _ = 1 := by group
+  by_cases hone : a * t = 1
+  · right
+    have ha : a = t⁻¹ := by
+      have hc := congrArg (fun z : G => z * t⁻¹) hone
+      simpa [mul_assoc] using hc
+    rwa [htinv] at ha
+  · left
+    have heq := eq_of_isInvolution_mem hAtop hATI htA ht2 htne (A.mul_mem haA htA) hsq hone
+    exact mul_right_cancel (b := t) (by rw [heq, one_mul])
+
+/-- `t` に反転される元全体は `X ∪ {t}` (6A.9(b) + 上の系)。 -/
+theorem setOf_conj_eq_inv_eq [Finite G] {A : Subgroup G} (hAtop : A ≠ ⊤)
+    (hATI : ∀ y : G, y ∉ A → A ⊓ (MulAut.conj y • A) = ⊥)
+    {t : G} (htA : t ∈ A) (ht2 : t * t = 1) (htne : t ≠ 1) :
+    {x : G | t * x * t = x⁻¹} = notConjugateSet A ∪ {t} := by
+  ext x
+  simp only [Set.mem_setOf_eq, Set.mem_union, Set.mem_singleton_iff]
+  constructor
+  · intro hinv
+    by_cases hxA : x ∈ A
+    · rcases eq_one_or_eq_of_mem_of_conj_eq_inv hAtop hATI htA ht2 htne hxA hinv with h | h
+      · exact Or.inl (h ▸ one_mem_notConjugateSet A)
+      · exact Or.inr h
+    · exact Or.inl (mem_notConjugateSet_of_conj_eq_inv hATI htA ht2 htne hxA hinv)
+  · rintro (hx | hxt)
+    · exact conj_eq_inv_of_mem_notConjugateSet hATI htA ht2 htne hx
+    · have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht2
+      rw [hxt, htinv, ht2, one_mul]
+
 end
 
 end OddOrder.Isaacs.Ch06
