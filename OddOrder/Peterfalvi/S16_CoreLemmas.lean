@@ -271,90 +271,10 @@ theorem p_pow_sub_two_lt_q_sq_of_pow_lt_mul_sq {p q : ℕ}
   rw [mul_comm (p ^ (q - 2)) (p ^ 2)] at hlt
   exact Nat.lt_of_mul_lt_mul_left hlt
 
-/-- The concrete norm relation produced by the generator-relation argument in
-**BG Appendix C, Lemma C.3**, expressed at the Peterfalvi Section 16 interface.
-For every `a` in the norm set `E`, the relation should give `N(2 * a - 1) = 1`;
-BG then converts this finite-field statement into `a⁻¹ ∈ E`. -/
-def appCNormSetGeneratorRelation (hyp : Hypothesis (G := G)) : Prop :=
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  ∀ a : GaloisField hyp.base.p hyp.base.q,
-    a ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q →
-      OddOrder.BG.AppC.NormSet.normN hyp.base.p hyp.base.q
-        ((2 : GaloisField hyp.base.p hyp.base.q) * a - 1) = 1
-
-/-- The field-element one-step twisted-inverse output of
-**BG Appendix C, Lemma C.3, Step 4**, expressed at the Peterfalvi Section 16
-interface.  This is closest to the line in BG proving `(a⁻¹)^{t^3} ∈ E` for
-`a ∈ E`; the unit-group formulation used for the final odd iteration is derived
-from this. -/
-def appCNormSetTwistedFieldStep (hyp : Hypothesis (G := G)) : Prop :=
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  ∃ φ : MulAut (GaloisField hyp.base.p hyp.base.q)ˣ,
-    φ ^ hyp.base.p = 1 ∧
-      OddOrder.BG.AppC.NormSet.normSetETwistedFieldStep
-        (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos φ
-
-/-- The one-step twisted-inverse output of **BG Appendix C, Lemma C.3, Step 4**,
-expressed at the Peterfalvi Section 16 interface.  This is closer to the group
-calculation in BG: for a field automorphism of `p`-power order, every
-`u ∈ E` is sent to `φ(u⁻¹) ∈ E`. -/
-def appCNormSetTwistedUnitStep (hyp : Hypothesis (G := G)) : Prop :=
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  ∃ φ : MulAut (GaloisField hyp.base.p hyp.base.q)ˣ,
-    φ ^ hyp.base.p = 1 ∧
-      ∀ u : (GaloisField hyp.base.p hyp.base.q)ˣ,
-        ((u : (GaloisField hyp.base.p hyp.base.q)ˣ) :
-            GaloisField hyp.base.p hyp.base.q) ∈
-          OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q →
-          ((OddOrder.BG.AppC.NormSet.twistedInv φ u :
-              (GaloisField hyp.base.p hyp.base.q)ˣ) :
-              GaloisField hyp.base.p hyp.base.q) ∈
-            OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q
-
-/-- The same one-step output, narrowed to the concrete norm-one unit group `U`.
-This matches the actual BG Step 4 action by conjugation with `t`; no extension to
-all of `𝔽_{p^q}ˣ` is required. -/
-def appCNormSetTwistedNormOneStep (hyp : Hypothesis (G := G)) : Prop :=
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  ∃ φ : MulAut (OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q),
-    φ ^ hyp.base.p = 1 ∧
-      OddOrder.BG.AppC.NormSet.normSetETwistedNormOneStep
-        (p := hyp.base.p) (q := hyp.base.q) φ
-
-/-- The field-element Step 4 output implies the unit-group Step 4 output used by
-BG's final odd-iterate argument. -/
-theorem appCNormSetTwistedUnitStep_of_field_step
-    (hyp : Hypothesis (G := G)) :
-    appCNormSetTwistedFieldStep hyp → appCNormSetTwistedUnitStep hyp := by
-  intro htwist
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  rcases htwist with ⟨φ, hφp, hstep⟩
-  exact ⟨φ, hφp,
-    OddOrder.BG.AppC.NormSet.twisted_unit_step_of_twisted_field_step
-      (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos φ hstep⟩
-
-/-- The BG Step 4 twisted-inverse output implies the norm relation currently
-consumed by `FieldNormalizerData`.  This keeps the S16 producer obligation close
-to the group-theoretic calculation while preserving the downstream AppC
-interface. -/
-theorem appCNormSetGeneratorRelation_of_twisted_unit_step
-    (hyp : Hypothesis (G := G)) :
-    appCNormSetTwistedUnitStep hyp → appCNormSetGeneratorRelation hyp := by
-  intro htwist
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  rcases htwist with ⟨φ, hφp, hstep⟩
-  exact OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_unit_step
-    (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos hyp.base.p_odd φ hφp hstep
-
-/-- The norm-one Step 4 output implies the norm relation consumed by AppC. -/
-theorem appCNormSetGeneratorRelation_of_twisted_normOne_step
-    (hyp : Hypothesis (G := G)) :
-    appCNormSetTwistedNormOneStep hyp → appCNormSetGeneratorRelation hyp := by
-  intro htwist
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  rcases htwist with ⟨φ, hφp, hstep⟩
-  exact OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_normOne_step
-    (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos hyp.base.p_odd φ hφp hstep
+/-! The Lemma C.3 Step 4 output interface (`normSetGeneratorRelation`,
+`normSetTwistedFieldStep`, `normSetTwistedUnitStep`, `normSetTwistedNormOneStep` and the
+implications between them) is `(p, q)`-level Appendix C material and now lives in
+`OddOrder.BG.AppC_LemmaC3_Setup` (issue 0151). -/
 
 /-- The concrete Frobenius group `H = P \rtimes U` from BG Appendix C,
 with Peterfalvi Section 16 parameters. -/

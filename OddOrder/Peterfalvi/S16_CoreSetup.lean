@@ -838,7 +838,7 @@ theorem normSetETwistedNormOneStep_tConj_pow_three_inv_of_capstone
 /-- The Step 4 capstone supplies the AppC norm-one twisted-inverse output. -/
 theorem appCNormSetTwistedNormOneStep_of_capstone {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (hcap : data.Step4Capstone) :
-    appCNormSetTwistedNormOneStep hyp := by
+    BG.AppC.normSetTwistedNormOneStep hyp.base.p hyp.base.q := by
   refine ⟨(data.tConjNormOneUnitsAut ^ 3)⁻¹, ?_,
     data.normSetETwistedNormOneStep_tConj_pow_three_inv_of_capstone hcap⟩
   rw [inv_pow, ← pow_mul, mul_comm, pow_mul, data.tConjNormOneUnitsAut_pow_p_eq_one,
@@ -849,9 +849,9 @@ without any carrier field.  This is what `appC_normSet_generator_relation` (prov
 once `step4Capstone` is available) calls. -/
 theorem appC_normSet_generator_relation_of_capstone {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (hcap : data.Step4Capstone) :
-    appCNormSetGeneratorRelation hyp :=
-  appCNormSetGeneratorRelation_of_twisted_normOne_step hyp
-    (data.appCNormSetTwistedNormOneStep_of_capstone hcap)
+    BG.AppC.normSetGeneratorRelation hyp.base.p hyp.base.q :=
+  BG.AppC.normSetGeneratorRelation_of_twisted_normOne_step hyp.base.p hyp.base.q
+    hyp.base.q_prime.pos hyp.base.p_odd (data.appCNormSetTwistedNormOneStep_of_capstone hcap)
 
 end Step4
 end FieldNormalizerData

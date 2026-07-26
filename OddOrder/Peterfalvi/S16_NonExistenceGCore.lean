@@ -534,7 +534,7 @@ theorem step4Capstone [Finite G] {hyp : Hypothesis (G := G)}
 rather than carried as the former `appC_twisted_normOne_step` field. -/
 theorem appC_normSet_generator_relation [Finite G] {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) :
-    appCNormSetGeneratorRelation hyp :=
+    BG.AppC.normSetGeneratorRelation hyp.base.p hyp.base.q :=
   data.appC_normSet_generator_relation_of_capstone data.step4Capstone
 
 end Step4

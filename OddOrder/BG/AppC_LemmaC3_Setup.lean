@@ -27,6 +27,68 @@ namespace OddOrder.BG.AppC
 
 open scoped Pointwise
 
+/-! ## The Step 4 output interface
+
+Lemma C.3 Step 4 produces a norm relation on the norm set `E`.  The book states it in three
+equivalent shapes -- a twisted-inverse step over field elements, the same over units, and the
+resulting relation `N(2a − 1) = 1` -- and BG's final odd-iterate argument only needs the
+narrowest one, on the norm-one group `U`.  These are the obligations the transported
+configuration below discharges. -/
+
+/-- **BG Appendix C, Lemma C.3**: the norm relation produced by the generator-relation argument.
+For every `a` in the norm set `E`, `N(2a − 1) = 1`; BG then converts this finite-field statement
+into `a⁻¹ ∈ E`. -/
+def normSetGeneratorRelation (p q : ℕ) [Fact p.Prime] : Prop :=
+  ∀ a : GaloisField p q, a ∈ NormSet.normSetE p q →
+    NormSet.normN p q ((2 : GaloisField p q) * a - 1) = 1
+
+/-- **BG Appendix C, Lemma C.3, Step 4**, field-element form: there is a field automorphism of
+`p`-power order whose twisted inverse preserves `E`.  This is closest to the line in BG proving
+`(a⁻¹)^{t^3} ∈ E` for `a ∈ E`. -/
+def normSetTwistedFieldStep (p q : ℕ) [Fact p.Prime] (hq : 0 < q) : Prop :=
+  ∃ φ : MulAut (GaloisField p q)ˣ,
+    φ ^ p = 1 ∧ NormSet.normSetETwistedFieldStep p q hq φ
+
+/-- **BG Appendix C, Lemma C.3, Step 4**, unit form: for a field automorphism of `p`-power
+order, every `u ∈ E` is sent to `φ(u⁻¹) ∈ E`. -/
+def normSetTwistedUnitStep (p q : ℕ) [Fact p.Prime] : Prop :=
+  ∃ φ : MulAut (GaloisField p q)ˣ,
+    φ ^ p = 1 ∧
+      ∀ u : (GaloisField p q)ˣ,
+        ((u : (GaloisField p q)ˣ) : GaloisField p q) ∈ NormSet.normSetE p q →
+          ((NormSet.twistedInv φ u : (GaloisField p q)ˣ) : GaloisField p q) ∈
+            NormSet.normSetE p q
+
+/-- **BG Appendix C, Lemma C.3, Step 4**, narrowed to the norm-one unit group `U`.  This matches
+the actual BG Step 4 action by conjugation with `t`; no extension to all of `𝔽_{p^q}ˣ` is
+required. -/
+def normSetTwistedNormOneStep (p q : ℕ) [Fact p.Prime] : Prop :=
+  ∃ φ : MulAut (NormSet.normOneUnits p q),
+    φ ^ p = 1 ∧ NormSet.normSetETwistedNormOneStep p q φ
+
+/-- The field-element Step 4 output implies the unit-group Step 4 output used by BG's final
+odd-iterate argument. -/
+theorem normSetTwistedUnitStep_of_field_step (p q : ℕ) [Fact p.Prime] (hq : 0 < q) :
+    normSetTwistedFieldStep p q hq → normSetTwistedUnitStep p q := by
+  rintro ⟨φ, hφp, hstep⟩
+  exact ⟨φ, hφp, NormSet.twisted_unit_step_of_twisted_field_step p q hq φ hstep⟩
+
+/-- The unit-group Step 4 output implies the norm relation consumed downstream. -/
+theorem normSetGeneratorRelation_of_twisted_unit_step (p q : ℕ) [Fact p.Prime] (hq : 0 < q)
+    (hp_odd : Odd p) :
+    normSetTwistedUnitStep p q → normSetGeneratorRelation p q := by
+  rintro ⟨φ, hφp, hstep⟩
+  exact NormSet.forall_normN_two_mul_sub_one_of_twisted_unit_step p q hq hp_odd φ hφp hstep
+
+/-- The norm-one Step 4 output implies the norm relation consumed downstream. -/
+theorem normSetGeneratorRelation_of_twisted_normOne_step (p q : ℕ) [Fact p.Prime] (hq : 0 < q)
+    (hp_odd : Odd p) :
+    normSetTwistedNormOneStep p q → normSetGeneratorRelation p q := by
+  rintro ⟨φ, hφp, hstep⟩
+  exact NormSet.forall_normN_two_mul_sub_one_of_twisted_normOne_step p q hq hp_odd φ hφp hstep
+
+/-! ## The transported configuration -/
+
 variable {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G]
 
 namespace FieldNormalizerData

@@ -5105,11 +5105,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.theoremC
 #assert_only_allowed_axioms OddOrder.BG.AppC.lemmaC2_card_ge_two_of_conditionA
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.appCNormSetTwistedUnitStep_of_field_step
+  OddOrder.BG.AppC.normSetTwistedUnitStep_of_field_step
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.appCNormSetGeneratorRelation_of_twisted_unit_step
+  OddOrder.BG.AppC.normSetGeneratorRelation_of_twisted_unit_step
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.appCNormSetGeneratorRelation_of_twisted_normOne_step
+  OddOrder.BG.AppC.normSetGeneratorRelation_of_twisted_normOne_step
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation
 

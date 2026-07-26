@@ -709,7 +709,7 @@ theorem appC_normSet_generator_relation_of_first_k_three_coordinate
             data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
               data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
                 data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
-    appCNormSetGeneratorRelation hyp := by
+    BG.AppC.normSetGeneratorRelation hyp.base.p hyp.base.q := by
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   intro a ha
   let w : fieldNormalizerNormOneUnits hyp :=
@@ -744,7 +744,7 @@ theorem appC_twisted_normOne_step_of_tConjNormOneUnitsAut
     letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
     OddOrder.BG.AppC.NormSet.normSetETwistedNormOneStep
         (p := hyp.base.p) (q := hyp.base.q) data.tConjNormOneUnitsAut →
-      appCNormSetTwistedNormOneStep hyp := by
+      BG.AppC.normSetTwistedNormOneStep hyp.base.p hyp.base.q := by
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   intro hstep
   exact ⟨data.tConjNormOneUnitsAut, data.tConjNormOneUnitsAut_pow_p_eq_one, hstep⟩
