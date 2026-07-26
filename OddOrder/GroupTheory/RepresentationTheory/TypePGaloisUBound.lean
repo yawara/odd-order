@@ -181,6 +181,64 @@ theorem card_dvd_blockScalarOrder_pow_of_blocks {p : ℕ} [Fact p.Prime]
     rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime Fact.out]
   exact hunits ▸ card_subgroup_dvd_card A
 
+/-- **Peterfalvi (9.7)(a), the book's statement, from block equivalence.**  If every block scalar
+character has the same range as block `0`'s — which is what the `W₁`-conjugacy `H_i = H₁^{w_i}`
+gives, via `lineScalarChar_range_eq_of_equivariant` — then with
+`a := |im φ_0| = |U : C_U(H₁)|`:
+
+* `|U|` divides `a ^ n` (`n = q − 1`), i.e. `U` embeds in a product of `q − 1` cyclic groups of
+  order `a`, since `im φ_0 ≤ 𝔽_p^×` is cyclic;
+* `a` divides `p − 1`.
+
+This is the sharpening of `card_dvd_pred_pow_of_blocks`, which only sees `p − 1` (issue 0152). -/
+theorem card_dvd_blockScalarRange_pow_of_blocks {p : ℕ} [Fact p.Prime]
+    {U M : Type u} [CommGroup U] [Finite U] [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    {n : ℕ} (ρ : Representation (ZMod p) U M) (B : Fin (n + 1) → Subrepresentation ρ)
+    (hBcard : ∀ i, Nat.card (B i).toSubmodule = p)
+    (hrange : ∀ i : Fin (n + 1),
+      (lineScalarChar (B i).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard i))).range =
+      (lineScalarChar (B 0).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard 0))).range)
+    (hconst : ∀ u : U,
+        (∀ i : Fin (n + 1),
+          lineScalarChar (B i).toRepresentation (finrank_eq_one_of_card_eq_prime (hBcard i)) u
+            = lineScalarChar (B 0).toRepresentation
+                (finrank_eq_one_of_card_eq_prime (hBcard 0)) u)
+        → u = 1) :
+    Nat.card U ∣ Nat.card (lineScalarChar (B 0).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard 0))).range ^ n
+      ∧ Nat.card (lineScalarChar (B 0).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard 0))).range ∣ p - 1 :=
+  card_dvd_blockScalarOrder_pow_of_blocks ρ B hBcard _
+    (fun i u => hrange i ▸ MonoidHom.mem_range.mpr ⟨u, rfl⟩) hconst
+
+/-- **The block-scalar order is the book's index `a = |U : C_U(H₁)|`.**  The kernel of a block
+scalar character is the pointwise stabilizer of that block (`lineScalarChar_eq_one_iff`), so the
+first isomorphism theorem identifies `|im φ_i|` with the index of the centralizer of the block --
+exactly Peterfalvi's `a`. -/
+theorem card_lineScalarChar_range_eq_index {p : ℕ} [Fact p.Prime]
+    {U M : Type u} [CommGroup U] [Finite U] [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    (ρ : Representation (ZMod p) U M) (B : Subrepresentation ρ)
+    (hBcard : Nat.card B.toSubmodule = p) :
+    Nat.card (lineScalarChar B.toRepresentation
+        (finrank_eq_one_of_card_eq_prime hBcard)).range
+      = ((lineScalarChar B.toRepresentation
+        (finrank_eq_one_of_card_eq_prime hBcard)).ker).index := by
+  rw [← Subgroup.index_ker]
+
+/-- The kernel of the block scalar character is the pointwise stabilizer of the block: `u` acts by
+the scalar `1` exactly when it fixes the block elementwise.  Combined with
+`card_lineScalarChar_range_eq_index` this is the book's `a = |U : C_U(H₁)|`. -/
+theorem lineScalarChar_ker_eq {p : ℕ} [Fact p.Prime]
+    {U M : Type u} [CommGroup U] [Finite U] [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    (ρ : Representation (ZMod p) U M) (B : Subrepresentation ρ)
+    (hBcard : Nat.card B.toSubmodule = p) (u : U) :
+    u ∈ (lineScalarChar B.toRepresentation
+        (finrank_eq_one_of_card_eq_prime hBcard)).ker ↔
+      ∀ x : B.toSubmodule, B.toRepresentation u x = x :=
+  lineScalarChar_eq_one_iff B.toRepresentation (finrank_eq_one_of_card_eq_prime hBcard) u
+
 /-- **Non-Galois `u`-bound from an imprimitive block decomposition** (Peterfalvi (9.7)(a),
 module-level entry point): if the abelian `U`-action on `M` restricts to `q = n+1` order-`p`
 subrepresentations `B i` (each an `𝔽_p`-line — the imprimitivity blocks `H1^w`) with **no

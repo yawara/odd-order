@@ -9621,6 +9621,20 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_subgroup_dvd_card
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.card_dvd_blockScalarOrder_pow_of_blocks
+-- ブロック間の一致 (書籍「`U/C_U(H_i)` は**全ての `i` で**位数 `a` の巡回群」) の generic 核:
+-- 線表現の同変同型に沿って scalar character が移り (`lineScalarChar_comp_of_equivariant`)、
+-- 添字の付け替え `σ` が全射なら**像が一致する** (`_range_eq_of_equivariant`)。
+-- `W₁`-共役 `H_i = H₁^{w_i}` はまさにこの形 (σ = `u ↦ w_i⁻¹ u w_i`、`U` の自己同型)。
+-- `a` が書籍の `|U : C_U(H₁)|` であることは ker = ブロックの各点固定化群 + 第一同型定理。
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.lineScalarChar_comp_of_equivariant
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.lineScalarChar_range_eq_of_equivariant
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.card_dvd_blockScalarRange_pow_of_blocks
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.card_lineScalarChar_range_eq_index
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.lineScalarChar_ker_eq
 -- Peterfalvi (9.7)(b): `Coprime |Ū| (p-1)` (fixed-point-free) and the resulting unconditional
 -- divisibility `|Ū| ∣ (p^q-1)/(p-1)`.  The FPF input `C_Ū(w₀) = 1` is supplied from the Frobenius
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).

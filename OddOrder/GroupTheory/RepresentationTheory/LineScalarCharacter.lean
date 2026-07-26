@@ -100,6 +100,55 @@ theorem lineScalarChar_eq_one_iff (ρ : Representation (ZMod p) U V)
       exact Units.ext (by rw [hval, Units.val_one])
     · exact absurd hx0 hx
 
+/-- **Transport of the scalar character along an equivariant isomorphism of lines.**  If a linear
+isomorphism `e : V ≃ₗ W` intertwines `ρ` with `ρ'` up to a reindexing `σ` of the acting group
+(`e (ρ u x) = ρ' (σ u) (e x)`), then the two scalar characters agree: `φ_V u = φ_W (σ u)`.
+
+This is what makes Peterfalvi (9.7)(a)'s constant `a` independent of the block.  The blocks are the
+`W₁`-translates `H_i = H₁^{w_i}`; translation by `w_i` is such an isomorphism, with `σ` the
+conjugation automorphism `u ↦ w_i⁻¹ u w_i` of `U`.  Hence `im φ_{H_i} = im φ_{H₁}` for every `i`,
+and the common order is the book's `a = |U : C_U(H₁)|` (issue 0152). -/
+theorem lineScalarChar_comp_of_equivariant {W : Type*} [AddCommGroup W] [Module (ZMod p) W]
+    (ρ : Representation (ZMod p) U V) (ρ' : Representation (ZMod p) U W)
+    (hdim : Module.finrank (ZMod p) V = 1) (hdim' : Module.finrank (ZMod p) W = 1)
+    (e : V ≃ₗ[ZMod p] W) (σ : U →* U)
+    (he : ∀ (u : U) (x : V), e (ρ u x) = ρ' (σ u) (e x)) (u : U) :
+    lineScalarChar ρ hdim u = lineScalarChar ρ' hdim' (σ u) := by
+  haveI : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hdim
+  obtain ⟨x, hx⟩ := exists_ne (0 : V)
+  have hex : e x ≠ 0 := fun h => hx (e.injective (by simpa using h))
+  have h1 : ρ' (σ u) (e x) = (lineScalarChar ρ hdim u : ZMod p) • e x := by
+    rw [← he u x, lineScalarChar_smul ρ hdim u x, map_smul]
+  have h2 : ρ' (σ u) (e x) = (lineScalarChar ρ' hdim' (σ u) : ZMod p) • e x :=
+    lineScalarChar_smul ρ' hdim' (σ u) (e x)
+  have hsub : ((lineScalarChar ρ hdim u : ZMod p)
+      - (lineScalarChar ρ' hdim' (σ u) : ZMod p)) • e x = 0 := by
+    rw [sub_smul, ← h1, ← h2, sub_self]
+  rcases smul_eq_zero.mp hsub with hc | h0
+  · exact Units.ext (sub_eq_zero.mp hc)
+  · exact absurd h0 hex
+
+/-- **The block-scalar image does not depend on the block.**  Under an equivariant isomorphism of
+lines whose reindexing `σ` is onto (conjugation by a group element is), the two scalar characters
+have the same range.
+
+This is Peterfalvi (9.7)(a)'s "`U/C_U(H_i)` is cyclic of order `a` **for all `i`**": the common
+range is a subgroup of the cyclic group `𝔽_p^×`, so it is cyclic, and its order `a` divides
+`p − 1`.  Feeding this common range to `card_dvd_blockScalarOrder_pow_of_blocks` gives the book's
+`|U| ∣ a^{q−1}` in place of the coarser `|U| ∣ (p−1)^{q−1}` (issue 0152). -/
+theorem lineScalarChar_range_eq_of_equivariant {W : Type*} [AddCommGroup W] [Module (ZMod p) W]
+    (ρ : Representation (ZMod p) U V) (ρ' : Representation (ZMod p) U W)
+    (hdim : Module.finrank (ZMod p) V = 1) (hdim' : Module.finrank (ZMod p) W = 1)
+    (e : V ≃ₗ[ZMod p] W) (σ : U →* U) (hσ : Function.Surjective σ)
+    (he : ∀ (u : U) (x : V), e (ρ u x) = ρ' (σ u) (e x)) :
+    (lineScalarChar ρ hdim).range = (lineScalarChar ρ' hdim').range := by
+  refine le_antisymm ?_ ?_
+  · rintro _ ⟨u, rfl⟩
+    exact ⟨σ u, (lineScalarChar_comp_of_equivariant ρ ρ' hdim hdim' e σ he u).symm⟩
+  · rintro _ ⟨w, rfl⟩
+    obtain ⟨u, rfl⟩ := hσ w
+    exact ⟨u, lineScalarChar_comp_of_equivariant ρ ρ' hdim hdim' e σ he u⟩
+
 /-- The scalar character of a **faithful** line action is injective: distinct group elements act by
 distinct scalars.  (`ρ` injective and `ρ u x = φ u • x` force `φ` injective.) -/
 theorem lineScalarChar_injective (ρ : Representation (ZMod p) U V)
