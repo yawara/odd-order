@@ -293,3 +293,34 @@ chain の import 順に、`{hyp} (data : FieldNormalizerData hyp)` を
 `{p q} [Fact p.Prime] (data : AppC.FieldNormalizerData p q G)` へ機械置換し、
 宣言を BG 側 leaf へ移す。S16 spine は `toHypothesisBAbstract` +
 `HypothesisBAbstract.toFieldNormalizerData` 経由で繋ぎ直す。
+
+## ⚠ step 2b は file 単位で刻めない (2026-07-26、設計上の制約)
+
+先に書いた「chain の import 順に file 単位で移行する」は**実行不能**と判明した。理由:
+
+* `S16.FieldNormalizerData hyp` を `AppC.FieldNormalizerData hyp.base.p hyp.base.q G` の
+  `abbrev` にすれば、下流の `data.s` / `data.W2_le_P` 等の**ドット記法は型の head symbol で
+  解決される**ので、移行済み宣言をそのまま拾える (ここまでは OK)。
+* しかし移行した補題の**statement は `data.P` / `data.U` / `data.W2` / `data.Q` で書かれる**のに、
+  未移行の下流は `hyp.base.P` 等で書かれている。構成サイトで `P := hyp.base.P` と取るので
+  両者は**等しいが定義的には等しくない** (structure field ゆえ opaque)。
+* ⟹ 移行済みと未移行が混在した瞬間、境界で `data.P = hyp.base.P` の書き換えが必要になり、
+  218 箇所 (`P` 71 + `U` 108 + `W2` 17 + `Q` 22) に橋渡しが要る。
+
+⟹ **step 2b は 6 file を 1 パスで置換する all-or-nothing**。~900 行の機械置換 (Python 一括、
+[[lean-systematic-refactor-script]]) を 1 commit で行い、build error で収束させる。
+revert は `git checkout <6 files>` で即座なので、リスクは制御可能。
+
+### 1 パスで行う置換 (最終形)
+
+1. `S16_CoreLemmas` の `structure FieldNormalizerData` を削除し、
+   `abbrev FieldNormalizerData (hyp) := AppC.FieldNormalizerData hyp.base.p hyp.base.q G` に。
+2. 6 file 全体で `hyp.base.P/U/W2/Q` → `data.P/U/W2/Q`、
+   `hyp.base.p/q` → `p`/`q`、`hyp.base.p_prime` → `Fact.out`、`hyp.base.q_prime` → `data.q_prime`。
+3. `fieldNormalizerXxx hyp` → `AppC.xxx p q` (BG 側に全部存在済)。
+4. 宣言ヘッダ `{hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)` →
+   `{p q : ℕ} [Fact p.Prime] {G : Type*} [Group G] (data : AppC.FieldNormalizerData p q G)`。
+5. 構成サイト (`S16_NonExistenceG/SubgroupL.lean`) で `Q_elementaryAbelian` を
+   `Q_finite`/`Q_commutative`/`Q_pPrime` に差し替え (導出は step 2a の
+   `toHypothesisBAbstract` で実証済)。
+6. `data` を取らない `hyp`-only helper (7 件) も `(p, q)` 化。
