@@ -1184,12 +1184,17 @@ consumer は (5.7) engine を使う。
 **真に強さが違うもの (packaging でない)**:
 
 1. **(6.2)–(6.6)** — general-(6.1) 形が (5.6) break-member oracle `h56` を仮説に取る (前節参照)。
-2. **(11.8)** — repo は**存在形**で述べている (grid 非直交性を持つ次数 `w₁` の既約 `ζ ∈ S` を 1 本
-   produce) が、本は **`S(HC)` の任意の `ζ`** について主張する。(11.8.1)–(11.8.6) の鎖は
-   ζ-generic な named lemma として全部 landed (`charParam_delta_eq_one` /
-   `exists_coherent_extension_h114_of_orthogonal` /
-   `tau_muColumnSum_sub_dzeta_eq_of_residualData` / `coherent_SOf_H0C_of_column_identities`)
-   なので、普遍形への格上げは re-statement (effort S)。下流は witness 1 本しか要らない。
+2. ~~**(11.8)**~~ — **stale と判明 (2026-07-26 実測)**。「repo は存在形」は誤りで、普遍形
+   `S13.zeta_residual_not_orthogonal_H0C_of_refuter` (`S13_Orthogonality.lean:1107`) が
+   **`{ζ} (hζS : ζ ∈ inducedFamily M) (hζirr) (hζdeg : ζ 1 = w₁)` を任意に取る**書籍どおりの
+   `∀ ζ` 形で既に在る (docstring も「(10.2)/(10.3) character parameters built around the
+   **given** `ζ` (the `∀ ζ` book form)」と明記)。存在形
+   `exists_zeta_residual_not_orthogonal_H0C_of_refuter` (:1199) はそれを
+   `exists_zeta_in_inducedFamily_degree_w1` で instantiate しただけの**下流向け packaging**で、
+   docstring 自身が「The book statement is the `∀` one … this is only the existential packaging
+   its downstream happens to want」と書いている。⟹ **(11.8) は書籍強度**、特殊化債務なし。
+   (書籍の `ζ ∈ S(HC)` は「`ζ ∈ S` かつ既約かつ次数 `w₁`」を含意するので、repo の仮説は
+   書籍より弱いか同等。)
 3. **App Suzuki2Groups Lemma 1** — (b) は `QuadraticExtensions.lean` で完全形式化済 (2026-07-18)、
    **(a) (c) (d) が未**。Higman 論文の実内容。
 
