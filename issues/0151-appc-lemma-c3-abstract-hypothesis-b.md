@@ -590,3 +590,32 @@ binder 置換自体は本 tick で script 化済み (192 宣言を 1 パスで�
 all-or-nothing ではない。
 
 ⚠ 試行は revert 済、tree green。
+
+## 📦 移設ブロック 1 の実測 (2026-07-26)
+
+`S16_CoreLemmas` の `namespace FieldNormalizerData` ブロック (33 宣言 / 26.6 KB) を抽出して
+BG へ移す試行を行った。良い知らせ: **このブロックが `hyp` から使うのは
+`p` / `q` / `p_prime` / `q_prime` の 4 つだけ** (非 `base` の `hyp.*` はゼロ)。
+
+しかし移設すると、まだ BG に無い `hyp`-only helper が**さらに 5 本**要ると判明:
+
+* `fieldNormalizerNormOneUnits_card_coprime_p` — `gcd(p, |U|) = 1`
+* `fieldNormalizerKernel_pow_p_eq_one`
+* `fieldNormalizerFrobeniusGroup_right_eq_one_of_pow_p_eq_one`
+* `fieldNormalizerFrobeniusGroup_mem_kernel_of_pow_p_eq_one`
+* `fieldNormalizerPrimeLineElement_one`
+
+⚠ これらは `q.Prime` を使う (`hq.ne_zero` / `hq.pos`) ので、`(p q : ℕ) [Fact p.Prime]` に加えて
+**`(hq : q.Prime)` を明示引数で足す**必要がある。今回の一括 script は署名が複数行に割れている
+宣言で置換に失敗した (34 error) ので revert 済。⟹ **この 5 本は署名を 1 本ずつ手で書く**こと。
+
+### 移設の正しい順序 (改訂)
+
+1. 上記 5 本を `(p q) [Fact p.Prime] (hq : q.Prime)` で `AppC_FrobeniusBasics` に手書き追加。
+2. `S16_CoreLemmas` の `FieldNormalizerData` ブロック 33 宣言を BG の新 leaf
+   `AppC_LemmaC3_Setup.lean` へ移設 (script は書けている; `hyp.base.{p,q,p_prime,q_prime}` の
+   4 つだけ処理すればよい)。
+3. 下流の chain file は `data : S16.FieldNormalizerData hyp` のままでも、S16 の structure が
+   BG のを `extends` しているので **親経由の dot 記法で移設先を拾える** (検証済)。
+   ⟹ file 単位で進められる。
+4. 以降 `S16_CoreBounds` → `S16_AppendixC3` → … と同様に移設。
