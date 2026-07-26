@@ -360,3 +360,33 @@ revert は `git checkout <6 files>` で即座なので、リスクは制御可�
 
 ⟹ **次の試行では `instance factHypothesisPPrime` を最初に置き、`|W₂| = p` の小補題を
 先に用意してから 1 パス置換する**。この 2 点で残 error はほぼ消える見込み。
+
+## 🔬 step 2b 第 2 試行 (2026-07-26) — 数学的な障害はゼロと確定
+
+`instance factHypothesisPPrime` を **`Hypothesis` の直後**に置く (ファイル末尾では手遅れ) のが
+正しい足場と判明し、`S16_CoreLemmas` は **error 0** まで到達した (残りは long-line 警告のみ)。
+続く `S16_CoreBounds` で残っていた `Q_elementaryAbelian` 依存 5 箇所を精査した結果:
+
+| 使用箇所 | 必要なもの | 書籍 (B) で足りるか |
+|---|---|---|
+| `Q_mul_comm` | `.comm` | ⭕ `Q_commutative` (mathlib `mul_comm_of_mem_isMulCommutative`) |
+| `W2_card_coprime_Q_card` | `|Q| = q^k` | ⭕ `Q_pPrime` + `|W₂| = p` + p 素数 (`Nat.Prime.coprime_iff_not_dvd`) |
+| `Q_pow_q_eq_one` → `P_inf_Q_eq_bot` | `x^q = 1` | ⭕ **不要**。両 consumer は「`Q` の `p`-元は自明」しか使っておらず、これは `Q_pPrime` から出る |
+| `Q_pow_q_eq_one` → `W2_inf_Q_eq_bot` | 同上 | ⭕ 同上 |
+
+⟹ **`Q` が elementary abelian である必要はどこにも無い**。書籍どおり「有限可換 `p'`-群」で足りる。
+`AppC.FieldNormalizerData.eq_one_of_mem_Q_of_pow_p_eq_one` (Lagrange + `Q_pPrime`) を BG 側に
+追加して commit 済 — これが `Q_pow_q_eq_one` の唯一の役割を代替する。
+
+⟹ **step 2b に残るのは機械作業だけ** (数学的障害はゼロ):
+1. `instance factHypothesisPPrime` を `Hypothesis` 直後に置く。
+2. `hyp.base.{P,U,W2,Q}` → `data.{P,U,W2,Q}` (490 箇所)。
+3. `hyp.base.p_eq_card_W2` → `data.card_W2` (rewrite 方向に注意: `card_W2 : |W₂| = p`)。
+4. `fieldNormalizer{Kernel,Complement,PrimeLine} hyp` → BG の対応名 (`rw` の syntactic 一致に必要)。
+5. `Q_elementaryAbelian` の 5 箇所を上表どおり置換し、`Q_pow_q_eq_one` を削除
+   (AxiomsCheck の同名エントリも削除)。
+6. `(_data : FieldNormalizerData hyp)` の underscore binder を `data` に (2 箇所以上)。
+7. 長すぎる行 (完全修飾名で 100 字超) を折り返す。
+
+⚠ 第 2 試行で 1 つミスした: `Q_pow_q_eq_one` を消すときに範囲を広く取りすぎて
+`W2_pow_p_eq_one` まで削除してしまった。**宣言単位で正確に切ること**。

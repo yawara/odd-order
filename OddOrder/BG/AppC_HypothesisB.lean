@@ -194,6 +194,24 @@ theorem card_W2 (data : FieldNormalizerData p q G) : Nat.card data.W2 = p := by
   rw [← data.sigma_P0_eq_W2, Subgroup.card_map_of_injective data.sigma_injective]
   exact card_primeLine p q
 
+/-- **A `p`-element of `Q` is trivial**, because `Q` is a `p'`-group.  This is all the Lemma C.3
+development ever needs from `Q`'s order — the Section 16 route used to derive it from the
+*stronger* "`Q` is elementary abelian of exponent `q`", but the book only assumes `Q` abelian
+and `p'`. -/
+theorem eq_one_of_mem_Q_of_pow_p_eq_one (data : FieldNormalizerData p q G)
+    {x : G} (hx : x ∈ data.Q) (hxp : x ^ p = 1) : x = 1 := by
+  haveI := data.Q_finite
+  have hord : orderOf x ∣ p := orderOf_dvd_of_pow_eq_one hxp
+  rcases (Nat.Prime.eq_one_or_self_of_dvd (Fact.out : p.Prime) _ hord) with h1 | hp
+  · exact orderOf_eq_one_iff.mp h1
+  · exfalso
+    refine data.Q_pPrime ?_
+    have hsub : orderOf (⟨x, hx⟩ : data.Q) = orderOf x :=
+      (orderOf_injective data.Q.subtype Subtype.val_injective ⟨x, hx⟩).symm
+    have : orderOf (⟨x, hx⟩ : data.Q) ∣ Nat.card data.Q := orderOf_dvd_natCard _
+    rw [hsub, hp] at this
+    exact this
+
 /-- `W₂^y` normalizes `U`: clause (B) read through `sigma_P0_eq_W2` and `sigma_U_eq_U`. -/
 theorem W2_conj_y_normalizes_U (data : FieldNormalizerData p q G) :
     MulAut.conj data.y • data.W2 ≤ Subgroup.normalizer (data.U : Set G) := by
