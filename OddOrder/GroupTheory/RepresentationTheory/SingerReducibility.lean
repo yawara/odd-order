@@ -230,4 +230,48 @@ theorem exists_monoidHom_scalar_of_finrank_eq_one
     rw [← h1, h2, h3, h4, smul_smul, mul_comm]
   exact ⟨⟨⟨c, hone⟩, fun {g h} => hmul g h⟩, hc⟩
 
+/-- **Two line-characters detect the whole action.**  If `W₁ ⊔ W₂ = ⊤` and `ρ g` acts on `Wᵢ` by
+the scalar `χᵢ g`, then `χ₁ g = χ₂ g = 1` forces `ρ g = 1`: every `x` is `y + z` with `y ∈ W₁`,
+`z ∈ W₂`, and both summands are fixed.
+
+Combined with faithfulness this is what makes the pair `(χ₁, χ₂)` injective on `Q` — the step that
+turns BG Lemma 2.7's rank-`2` action into an embedding `Q ↪ μ_q × μ_q` (issue 0150). -/
+theorem eq_one_of_scalars_eq_one_of_sup_eq_top
+    {K N : Type*} [Field K] [AddCommGroup N] [Module K N] {Q : Type*} [Group Q]
+    (ρ : Representation K Q N) {W₁ W₂ : Submodule K N} (hsup : W₁ ⊔ W₂ = ⊤)
+    {χ₁ χ₂ : Q →* K}
+    (h₁ : ∀ (g : Q) (x : N), x ∈ W₁ → ρ g x = χ₁ g • x)
+    (h₂ : ∀ (g : Q) (x : N), x ∈ W₂ → ρ g x = χ₂ g • x)
+    {g : Q} (hg₁ : χ₁ g = 1) (hg₂ : χ₂ g = 1) :
+    ρ g = 1 := by
+  ext x
+  have hx : x ∈ W₁ ⊔ W₂ := hsup ▸ Submodule.mem_top
+  obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.mp hx
+  rw [map_add, h₁ g y hy, h₂ g z hz, hg₁, hg₂, one_smul, one_smul]
+  simp
+
+/-- **A nontrivial `q`-th root of unity in `𝔽_p` forces `q ∣ p - 1`.**  If `c ^ q = 1` with
+`c ≠ 1` and `q` prime, then `c` is a unit of multiplicative order exactly `q` (the order divides
+the prime `q` and is not `1`), so `q` divides `|𝔽_p^×| = p - 1`.
+
+This is conclusion (a) of BG Lemma 2.7 once a nontrivial line-character has been produced: the
+character values are `q`-th roots of unity because `Q` has exponent `q` (issue 0150). -/
+theorem prime_dvd_sub_one_of_pow_eq_one {p q : ℕ} [Fact p.Prime] (hq : q.Prime) {c : ZMod p}
+    (hcq : c ^ q = 1) (hc1 : c ≠ 1) : q ∣ p - 1 := by
+  have hc0 : c ≠ 0 := by
+    intro h
+    rw [h, zero_pow hq.ne_zero] at hcq
+    exact zero_ne_one hcq
+  lift c to (ZMod p)ˣ using isUnit_iff_ne_zero.mpr hc0 with u hu
+  have huq : u ^ q = 1 := by ext; push_cast; exact hcq
+  have hu1 : u ≠ 1 := fun h => hc1 (by rw [h]; rfl)
+  have hord : orderOf u = q := by
+    have hdvd : orderOf u ∣ q := orderOf_dvd_of_pow_eq_one huq
+    rcases hq.eq_one_or_self_of_dvd _ hdvd with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h) hu1
+    · exact h
+  have hdvd := orderOf_dvd_natCard u
+  rwa [hord, Nat.card_eq_fintype_card, ZMod.card_units_eq_totient,
+    Nat.totient_prime (Fact.out : p.Prime)] at hdvd
+
 end OddOrder.RepresentationTheory
