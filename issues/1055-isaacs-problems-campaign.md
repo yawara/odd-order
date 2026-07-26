@@ -1449,7 +1449,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.9 | ✅ 完了 (`three_dvd_card_of_isSimpleGroup_of_not_dvd_eight`) | 非可換単純で偶数位数、`8 ∤ \|G\|` ⇒ `3 \| \|G\|` |
 | 5C.10 | ✅ 完了 (`seven_dvd_card_of_isSimpleGroup_of_card_sylow_two_eq_eight`) | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
 | 5C.11 | ✅ 完了 (`hasNormalPComplement_of_hall_le_center_normalizer`) | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
-| 5C.12 | ⬜ | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
+| 5C.12 | ✅ 完了 (`hasNormalPComplement_of_isCyclic_sylow_of_dvd_index`) | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
 | 5C.13 | ⬜ | (Navarro) `P = N_G(P)'` なる Sylow `P` ⇒ `N_G(P)` が正規 p-補群をもつ |
 
 ### 5C.2 の証明 (2026-07-26 に導出、PDF p.162 = PDF ページ 175 で主張確認済)
@@ -1560,6 +1560,26 @@ instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbit
 の implicit/explicit の並びを確認してから書く)。
 `|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
 `G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
+
+### 5C.12 の実装メモ (2026-07-27)
+
+新 leaf `Problems5C12.lean` (118 行)。⭐ **`Y := N ⊔ P` (= `NP`) に上げてから Thm 5.17 を当てる**
+のが鍵。`N` 自身に Thm 5.17 を当てるだけでは `N` が完全群のとき (`|N:N'| = 1` ゆえ) 何も出ない
+(実際 `A₅`, `p = 5` は正規 5-補群を持たない — 仮定 `p ∣ |G:N|` が効く場所)。
+
+* `⁅Y,Y⁆ ≤ N`: `Y/N` は可換 `P` の像 (helper `commutator_sup_le_of_normal_of_commutative`、
+  `Subgroup.map_commutator` + `commutator_eq_bot_iff_le_centralizer` で商へ落とす)。
+* `p ∤ |G:Y|` (`P ≤ Y`) と `relIndex_mul_index` から **`p ∣ |Y : N|`**、
+  `commutator ↥Y ≤ N.subgroupOf Y` ゆえ `p ∣ (commutator ↥Y).index`。
+* `↥Y` の Sylow は `P.subtype` (巡回) なので **Thm 5.17** の第 2 選択肢が潰れ
+  **`p ∤ |commutator ↥Y|`**。
+* `⁅N,N⁆ ≤ ⁅Y,Y⁆` (`Subgroup.map_subtype_commutator` で `commutator ↥N` と橋渡し) ゆえ
+  `p ∤ |commutator ↥N|`、位数互いに素で `commutator ↥N ⊓ Q = ⊥`、**Problem 5C.1**
+  (`hasNormalPComplement_of_commutator_inf_sylow_eq_bot`) で結論。
+
+⚠ 実装の罠: `Subgroup.map_eq_bot_iff` は `H` が**明示引数**なので `.mpr` を直接付けられない
+(`(Subgroup.map_eq_bot_iff _).mpr`)。`Sylow.subtype` の coe は `rfl` だが instance 探索は
+unfold しないので `IsCyclic ↥((P.subtype hPY : Sylow p ↥Y) : Subgroup ↥Y)` の形で `haveI` する。
 
 ### 5C.11 の実装メモ (2026-07-27)
 
