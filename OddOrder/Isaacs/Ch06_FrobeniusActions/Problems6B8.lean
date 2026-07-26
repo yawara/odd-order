@@ -200,6 +200,26 @@ theorem commutator_mul_left_of_le_center {P : Type*} [Group P]
     _ = (y * w * y⁻¹ * w⁻¹) * (x * w * x⁻¹ * w⁻¹) := by group
     _ = (x * w * x⁻¹ * w⁻¹) * (y * w * y⁻¹ * w⁻¹) := (hcy _).symm
 
+/-- 中心元は交換子に効かない (左): `[xz, y] = [x,y]`。 -/
+theorem commutator_mul_center_left {P : Type*} [Group P]
+    (hc : commutator P ≤ Subgroup.center P) {z : P} (hz : z ∈ Subgroup.center P) (x y : P) :
+    (x * z) * y * (x * z)⁻¹ * y⁻¹ = x * y * x⁻¹ * y⁻¹ := by
+  have hzero : z * y * z⁻¹ * y⁻¹ = 1 := by
+    have hcz := Subgroup.mem_center_iff.mp hz y
+    rw [← hcz]
+    group
+  rw [commutator_mul_left_of_le_center hc x z y, hzero, mul_one]
+
+/-- 中心元は交換子に効かない (右): `[x, yz] = [x,y]`。 -/
+theorem commutator_mul_center_right {P : Type*} [Group P]
+    (hc : commutator P ≤ Subgroup.center P) {z : P} (hz : z ∈ Subgroup.center P) (x y : P) :
+    x * (y * z) * x⁻¹ * (y * z)⁻¹ = x * y * x⁻¹ * y⁻¹ := by
+  have hzero : x * z * x⁻¹ * z⁻¹ = 1 := by
+    have hcz := Subgroup.mem_center_iff.mp hz x
+    rw [hcz]
+    group
+  rw [commutator_mul_right_of_le_center hc x y z, hzero, mul_one]
+
 /-- `|P : Z(P)| = 4` なら交換子はすべて involution: `[x,y]² = 1`。
 
 双線形性で `[x², y] = [x,y]²`, 一方 `x² ∈ Z(P)` なので `[x², y] = 1`。 -/
