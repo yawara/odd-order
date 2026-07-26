@@ -1967,7 +1967,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.6 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の仮説を満たす `A, B > 1` ⟹ ある `g` で `A ⊓ B^g > 1` |
 | 6A.7 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
 | 6A.8 | ✅ **完了** (`Problems6A8.lean`) | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
-| 6A.9 | 🔨 準備補題 landing / (a)-(f) は次回以降 (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
+| 6A.9 | 🔨 (a) + 準備補題 完了 / (b)-(f) は次回以降 (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
 | 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
 
@@ -1997,7 +1997,15 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
   `x ∉ A` が `t` に反転され `x = g a g⁻¹` (`1 ≠ a ∈ A`) なら `u := g⁻¹ t g` が `a` を反転するので
   `u ∈ N_G(⟨a⟩) ≤ A`、つまり `t ∈ A ⊓ A^g` で TI から `g ∈ A`、これは `x ∈ A` で矛盾。
 
-  **次回**: (a) の計数 `|Inv(t) ∖ A| ≥ |G:A| − 1`。設計 = `C := C_G(t) ≤ A` として
+  **(a) 完了** `card_inverted_notMem_ge` (2026-07-27): `t` に反転される `G ∖ A` の元は
+  `|G:A| − 1` 個以上。⭐ 共役類の濃度を持ち出さずに **fiber 計数**で済んだ:
+  `f g := (g t g⁻¹)·t` は `t` に反転される元を与え (`(f g)·t = g t g⁻¹` は involution)、
+  `f g ∉ A ⟺ g ∉ A` (`conj_mem_iff_of_TI`)、`f` の fiber は `C_G(t)` の左剰余類なので
+  大きさ `≤ |A|` (`centralizer_le_of_TI`)。`Finset.card_le_mul_card_image` で
+  `|G| − |A| ≤ |A| · |image|` ⟹ `|image| ≥ |G:A| − 1`、そして `image ⊆ Inv(t) ∖ A`。
+
+  **次回**: (b) = 上の (a) + `mem_notConjugateSet_of_conj_eq_inv` の計数合わせで
+  `X ∖ {1} = Inv(t) ∖ A`。旧設計 = `C := C_G(t) ≤ A` として
   `t` の共役類の大きさは `|G:C|` (`OddOrder.GroupTheory.card_class_eq_index_centralizer`)、
   `t^G ⊓ A` は `A`-共役類で大きさ `≤ |A:C|`、`|G:C| = |A:C|·|G:A|`
   (`relIndex_mul_index`) から `|t^G ∖ A| ≥ |A:C|(|G:A|−1) ≥ |G:A|−1`、
