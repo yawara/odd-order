@@ -85,3 +85,46 @@ Coq 対応物 `regular_abelem2_on_abelem2` (`BGsection2.v:1048`) は Coq 側で�
 - `AxiomsCheck.lean` に登録して axiom-clean を確認。
 - ⚠ **sorried statement を先に置かない** (現在 repo の実 sorry は Q₈ Brauer-Suzuki の 1 件のみ。
   非退行を守る)。
+
+## 目標シグネチャ (2026-07-26 確定 — 加群言語で述べる)
+
+群言語 (`P`, `Q : Type`, `φ : Q →* MulAut P`) で直接述べると `hP.zmodModule` の `letI` 束縛が
+statement に露出して instance 合成が詰まる (PRank の docstring が明記している既知の罠;
+[[lean-instance-defeq-traps]])。よって**本体は加群言語で述べ、群言語版は PRank の
+`mulAutEquivGeneralLinearGroup` / `addAutEquivGL` 経由の packaging 系として別に置く**。
+
+```lean
+theorem <name> {p q : ℕ} [Fact p.Prime] (hq : q.Prime) (hqp : q ≠ p)
+    {M : Type*} [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    (hrank : Module.finrank (ZMod p) M = 2)
+    {Q : Type*} [CommGroup Q] [Finite Q]
+    (hQexp : ∀ x : Q, x ^ q = 1) (hQcard : Nat.card Q = q ^ 2)
+    (ρ : Representation (ZMod p) Q M) (hfaith : Function.Injective ρ) :
+    q ∣ p - 1 ∧ ∃ α : Q, α ≠ 1 ∧ ∃ r : ZMod p, ∀ x : M, ρ α x = r • x
+```
+
+### Singer の正確なシグネチャ (実測)
+
+```
+isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible :
+  ∀ {p : ℕ} [Fact p.Prime] {C M : Type u}
+    [CommGroup C] [AddCommGroup M] [Module (MonoidAlgebra (ZMod p) C) M] [Finite M]
+    [IsSimpleModule (MonoidAlgebra (ZMod p) C) M],
+    (∀ c : C, (∀ x : M, (MonoidAlgebra.of (ZMod p) C) c • x = x) → c = 1) →
+    IsCyclic C ∧ Nat.card C ∣ Nat.card M - 1
+```
+
+⚠ `[IsCyclic C]` も `[Finite C]` も**不要** (どちらも導出される)。`Module (MonoidAlgebra …) M` は
+`Representation.asModule` で作る (`Representation.instModuleMonoidAlgebraAsModule`)。
+
+### ステップ対応表
+
+| 段 | 内容 | 使う物 |
+|---|---|---|
+| 1 | `¬ IsCyclic Q` | 指数 `q` かつ `|Q| = q²` |
+| 2 | 既約でない | 上記 Singer の**対偶** |
+| 3 | 半単純 (Maschke) | `NeZero (Nat.card Q : ZMod p)` (`q ≠ p`) → `IsSemisimpleModule`。手本は `BG/Ch1_Preliminary/S02_RepresentationsBasic.lean` の `exists_simple_submodule_of_neZero_card` (⚠ `private`、公開版が要る) |
+| 4 | 2 直線への分解 | 非既約 + 半単純 + `finrank = 2` |
+| 5 | 各直線のスカラー指標 `χᵢ : Q →* (ZMod p)ˣ` | 1 次元表現 |
+| 6 | (a) `q ∣ p−1` | 少なくとも一方の `χᵢ` が非自明 (両方自明なら忠実性に反する) |
+| 7 | (b) `α` | 両方非自明 (片方自明 ⟹ `Q ↪ μ_q` 巡回で矛盾) ⟹ `(χ₁,χ₂)` は位数 `q²` 同士の単射 = 同型 ⟹ `(ζ,ζ)` の逆像 |
