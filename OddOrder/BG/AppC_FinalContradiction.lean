@@ -147,6 +147,45 @@ theorem lemmaC3_inverse_closed [Finite G]
       (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos
       data.appC_normSet_generator_relation
 
+/-- **BG Appendix C, Remark (V)**: "by (A) one may assume `p` and `q` are odd".
+
+Precisely: for primes `p, q` satisfying condition (A), the conclusion `p ≤ q` of Theorem C already
+holds whenever one of them is even, so the theorem's content is entirely in the odd case.
+
+* `p = 2` gives `p ≤ q` outright, since every prime is at least `2`;
+* `q = 2` cannot happen for odd `p`: condition (A) reads `gcd((p² - 1)/(p - 1), p - 1) = 1`, and
+  `(p² - 1)/(p - 1) = p + 1`, so it says `gcd(p + 1, p - 1) = 1` — impossible for odd `p ≥ 3`,
+  where `p + 1` and `p - 1` are both even.
+
+Stated in the `p, q`-abstract setting of `theoremC_abstract`; the FT spine never needs it (oddness
+of `p, q` is ambient in the Peterfalvi Section 16 configuration), so this closes the remark purely
+for book completeness. -/
+theorem le_of_conditionA_of_not_odd {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
+    (hA : conditionA p q) (hno : ¬ (Odd p ∧ Odd q)) : p ≤ q := by
+  rcases hp.eq_two_or_odd' with rfl | hpodd
+  · exact hq.two_le
+  · exfalso
+    have hq2 : q = 2 := by
+      by_contra h
+      exact hno ⟨hpodd, hq.odd_of_ne_two h⟩
+    subst hq2
+    have hp3 : 3 ≤ p := by
+      rcases hpodd with ⟨k, hk⟩
+      have := hp.two_le
+      omega
+    have hfact : p ^ 2 - 1 = (p - 1) * (p + 1) := by
+      cases p with
+      | zero => omega
+      | succ n => simp [pow_two]; ring_nf; omega
+    have hdiv : (p ^ 2 - 1) / (p - 1) = p + 1 := by
+      rw [hfact, Nat.mul_div_cancel_left _ (by omega : 0 < p - 1)]
+    rw [conditionA, hdiv] at hA
+    have h2a : 2 ∣ p + 1 := by rcases hpodd with ⟨k, hk⟩; omega
+    have h2b : 2 ∣ p - 1 := by rcases hpodd with ⟨k, hk⟩; omega
+    have hgcd : (2 : ℕ) ∣ Nat.gcd (p + 1) (p - 1) := Nat.dvd_gcd h2a h2b
+    rw [hA] at hgcd
+    omega
+
 /-- **BG Theorem C, `p`/`q`-abstract form.**  For odd primes `p, q` satisfying condition (A) and
 the norm-set relation that Hypothesis (B) produces — `N(2a - 1) = 1` for every `a` in the norm set
 `E` — one has `p ≤ q`.

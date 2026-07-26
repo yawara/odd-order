@@ -5077,6 +5077,11 @@ set_option linter.style.longLine false in
 -- statement から外した形。三つの step lemma は元から p, q で抽象だったので、これはその合成。
 -- Hypothesis (B) の寄与は `hrel` (norm set 上の `N(2a−1) = 1`) に集約される。
 #assert_only_allowed_axioms OddOrder.BG.AppC.theoremC_abstract
+-- **BG App.C Remark (V)** ("by (A) one may assume p and q are odd", 2026-07-26): (A) の下では
+-- p か q が偶数なら Theorem C の結論 p ≤ q が自明に出る (p=2 は即座、q=2 は (A) が
+-- gcd(p+1, p−1) = 1 を要求するので奇 p では不可能)。FT spine は奇性が ambient なので不要 —
+-- 書籍完備性のための項目。
+#assert_only_allowed_axioms OddOrder.BG.AppC.le_of_conditionA_of_not_odd
 #assert_only_allowed_axioms OddOrder.BG.AppC.theoremC
 #assert_only_allowed_axioms OddOrder.BG.AppC.lemmaC2_card_ge_two_of_conditionA
 #assert_only_allowed_axioms
