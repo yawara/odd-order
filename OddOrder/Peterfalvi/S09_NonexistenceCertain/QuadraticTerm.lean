@@ -902,13 +902,16 @@ noncomputable def weightedNuSum (H78 : Hypothesis78 G A L) : ClassFunction G ℂ
           ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))) •
       H78.nu (H78.hyp76.zeta i)
 
-/-- **Peterfalvi (7.8.a) target.**  The coherent images `S^ν` are orthogonal to
+/-- **Peterfalvi (7.8.a), the conclusion.**  The coherent images `S^ν` are orthogonal to
 `1_G`, and `β` has the displayed decomposition
 `β = 1_G - ζ^ν + a · Σ_{φ∈S} φ(1)/(e‖φ‖²) φ^ν + Γ`, with `a ∈ ℤ`
 and `Γ` orthogonal to `S^ν ∪ {1_G}`.
 
-This is a standalone target for the future proof of (7.8.a), not a field of
-`Hypothesis78`; hence it does not add a new assumption to already-green results. -/
+Carried as a standalone record rather than a field of `Hypothesis78`, so that it adds no
+assumption to results that do not need it.  It is **proved**, not assumed:
+`Cert.betaDecompOfFacts` builds it at abstract `Hypothesis78` level from the coherence/family
+facts, and `Cert.betaDecompOfDade` discharges every one of those facts for the Dade-family
+construction `hypothesis78OfDade`. -/
 structure BetaDecomp (H78 : Hypothesis78 G A L) where
   /-- `S^ν ⊥ 1_G`. -/
   orth_one : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →

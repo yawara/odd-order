@@ -1181,6 +1181,25 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 明記している。(5.3)(b) は固定 2 要素 `R` レコードが可変長 `R` を持てないという**設計上の理由**があり、
 consumer は (5.7) engine を使う。
 
+#### (7.8) の実測 (2026-07-26) — **書籍強度、gap なし**
+
+書籍 p.40 の (7.8) を PDF ページ画像 (`references/peterfalvi/pages/peterfalvi-p040.png`) で
+確定し、repo と 1 対 1 で照合した (Peterfalvi の pdftotext は当日まで壊れており、数式は今も
+画像でしか読めない)。
+
+| 書籍 | repo |
+|---|---|
+| 仮説: (7.6) + `S = T − {Ind 1_H}` coherent + `ν : Z[S] ≅ Z[Irr G]` + `ζ ∈ S ∩ Irr L`, `ζ(1) = e` | `Hypothesis78` (`QuadraticTerm.lean:59`) |
+| (a) `S^ν ⊥ 1_G`; ∃`a ∈ ℤ`, `Γ ⊥ S^ν ∪ {1_G}` with `β = 1_G − ζ^ν + a Σ_{φ∈S} φ(1)/(e‖φ‖²) φ^ν + Γ` | `BetaDecomp` (:912) の 5 フィールドが逐語一致。`weightedNuSum` (:898) = `Σ_{i≠ind1H} ζ_i(1)/(ζ_0(1)‖ζ_i‖²) ζ_i^ν` で `ζ_0(1) = e` ゆえ書籍の和と同一。**証明済** (`Cert.betaDecompOfFacts` / `betaDecompOfDade`) |
+| (b) `e ≤ (h−1)/2` ⟹ `‖ζ^{νρ}‖² ≥ 1 − e/h` **かつ** `‖Γ‖² ≤ e − 1` | `smallIndex` (:1164) = `2e + 1 ≤ h` (⟺ 書籍の仮定)。前半 = `zetaNuRhoNormSq_ge_of_facts`、**後半も在る** = `gammaNormSq_le_of_normQuadraticCorrection_eq` (`CoherenceFormula.lean:128`) |
+| (c) `χ ⊥ S^ν` ⟹ `χ^ρ(x) = (β,χ)` on `A` かつ `‖χ^ρ‖² = (|A|/|L|)(β,χ)²` | `chiRho_eq_inner_beta` (フィールド、`hypothesis78OfDade` が discharge) + `chiRho_norm_sq_eq_card_ratio_mul` |
+
+⟹ **(a)(b)(c) すべて書籍強度で sorry-free**。残る差は「書籍の 1 番号 = Lean の 1 定理」に
+なっていない (仮説 record + 結論 record + 名前付き定理に分解されている) という**体裁のみ**で、
+数学的な gap ではない。docstring の `**Peterfalvi (7.8.x)**` 記法で追跡可能。
+⚠ この照合で docstring 2 件の陳腐化を訂正した (「(7.8.c) は未形式化」「`BetaDecomp` は
+future proof の target」— どちらも既に証明済)。
+
 **真に強さが違うもの (packaging でない)**:
 
 1. **(6.2)–(6.6)** — general-(6.1) 形が (5.6) break-member oracle `h56` を仮説に取る (前節参照)。
