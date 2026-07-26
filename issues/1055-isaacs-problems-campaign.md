@@ -1960,7 +1960,7 @@ statement は **PDF ページ画像で確定済** (書籍 p.175 = PDF p.188)。�
 |---|---|---|
 | 5E.1 | ⬜ | `G` 有限で**真部分群がすべて正規 `p`-補群をもつが `G` 自身は持たない** ⇒ `G` は正規 Sylow `p`-部分群をもち、`\|G\|` の `p` 以外の素因数はちょうど 1 個 (= Itô「極小非 `p`-冪零群」) |
 | 5E.2 | ✅ 完了 (`isSolvable_of_forall_proper_isSupersolvable`) | 真部分群がすべて超可解 ⇒ `G` は可解。hint: 極小反例は単純、Problem 3B.10 で最小素因数 `p` に対する正規 `p`-補群 |
-| 5E.3 | ⬜ | **2 元生成部分群がすべて正規 `p`-補群をもつ** ⇒ `G` も持つ。hint: `⟨x,y⟩` (`x` は `p`-部分群 `P` の元、`y ∈ N_G(P)` は位数が `p` で割れない) |
+| 5E.3 | ✅ 完了 (`hasNormalPComplement_of_forall_two_generator`) | **2 元生成部分群がすべて正規 `p`-補群をもつ** ⇒ `G` も持つ。hint: `⟨x,y⟩` (`x` は `p`-部分群 `P` の元、`y ∈ N_G(P)` は位数が `p` で割れない) |
 
 ### §5E の設計メモ (2026-07-27)
 
@@ -2005,6 +2005,22 @@ statement は **PDF ページ画像で確定済** (書籍 p.175 = PDF p.188)。�
 ⚠ 実装の罠: `rw [hbot] at hmul` は `K.index` の `K` まで書き換えて後続の `hidx` が
 マッチしなくなる — `Nat.card ↥K = 1` だけを別 `have` にして書き換える。
 `push_neg` は deprecated (`push Not`)。
+
+### 5E.3 の実装 (2026-07-27 完了、`Problems5E.lean` に追記)
+
+⭐ **帰納法が要らない**。Frobenius Thm 5.26 の十分条件
+`isPGroup_normalizerQuotientCentralizer_of_prime_subgroups_centralize`
+(「`q ≠ p` の `q`-部分群 `Q` が `p`-部分群 `X` を正規化するなら中心化する」を確かめれば十分)
+に対して、`x ∈ X`, `y ∈ Q` を取り `H := ⟨x,y⟩` (2 元生成) の正規 `p`-補群 `K` を使うと:
+
+* `y` の位数は `q`-冪 (⟹ `p` と素) で `H ⧸ K` は `p`-冪位数 ⟹ **`y ∈ K`**;
+* `y` は `X` を正規化するので `⁅x,y⁆ = x·(y x⁻¹ y⁻¹) ∈ X` (`p`-群);
+* `K ⊴ H` と `y ∈ K` から `⁅x,y⁆ = (x y x⁻¹)·y⁻¹ ∈ K` (`p'`-群)。
+
+`⁅x,y⁆` の位数が `p`-冪かつ `p` と素 ⟹ `⁅x,y⁆ = 1`。
+
+⚠ 実装の罠: `orderOf_injective f hf a` は `a` を**明示的に渡す** (メタ変数のままだと
+`f ?a = x*y*x⁻¹*y⁻¹` を unify できない)。`orderOf_map_dvd` で商への位数の割り切れを取る。
 
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
