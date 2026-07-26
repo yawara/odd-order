@@ -205,6 +205,19 @@ theorem commutator_sq_eq_one_of_index_center_eq_four {P : Type*} [Group P] [Fini
   rw [pow_two]
   exact hbil.symm
 
+/-- `|P : Z(P)| = 4` かつ `|P : P'| = 4` なら **`P' = Z(P)`** (濃度が一致し `P' ≤ Z(P)`)。 -/
+theorem commutator_eq_center_of_index_center_eq_four {P : Type*} [Group P] [Finite P]
+    (hz : (Subgroup.center P).index = 4) (hd : (commutator P).index = 4) :
+    commutator P = Subgroup.center P := by
+  have hle := commutator_le_center_of_index_center_eq_four hz
+  have h1 := Subgroup.card_mul_index (commutator P)
+  have h2 := Subgroup.card_mul_index (Subgroup.center P)
+  rw [hd] at h1
+  rw [hz] at h2
+  have heq : Nat.card ↥(Subgroup.center P) ≤ Nat.card ↥(commutator P) := by omega
+  refine SetLike.ext' (Set.eq_of_subset_of_ncard_le hle ?_ (Set.toFinite _))
+  exact heq
+
 /-- **6B.8 の base case**: `|P| = 8` かつ `|P : P'| = 4` なら `P` は `D_8` か `Q_8`。
 
 `|P'| = 2 ≠ 1` から非可換なので repo の Cor 6.14
