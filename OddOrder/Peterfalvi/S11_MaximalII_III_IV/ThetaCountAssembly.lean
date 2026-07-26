@@ -1038,6 +1038,7 @@ theorem exceptional_case_frobenius_realization [Finite G]
         uActionHom data chief g ≠ 1 →
           MonoidHom.FixedPointFree (uActionHom data chief g)) ∧
       chars.u = (chief.p ^ data.q - 1) / (chief.p - 1) ∧
+      IsCyclic ↥data.typeP.U ∧
       (IsTypeII M →
         OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(data.H ⊔ data.U)
           (data.H.subgroupOf (data.H ⊔ data.U))
@@ -1045,16 +1046,9 @@ theorem exceptional_case_frobenius_realization [Finite G]
   have hno' : ¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), IsIrreducibleCharacter χ := by
     rintro ⟨χ, hmem, hirr⟩
     exact hno ⟨χ, hmem, hirr, caseB_degree_qu hG chars caseB χ hmem⟩
-  refine ⟨fun g hg => chiefFactor_caseB_action_fpf chief caseB.actsIrreducibly g hg,
-    caseB_no_irreducible_u_formula hG chars caseB hno', ?_⟩
-  -- **Type-II `HU`-Frobenius** (Coq `typeP_reducible_core_cases`, right branch): the exceptional
-  -- case forces `C = ⊥` (`caseB_no_irreducible_forces_C_bot`), so `U ≅ Ū` is cyclic (Singer);
-  -- a cyclic complement collapses the type-F Frobenius `H ⊔ U₀` to the full `H ⊔ U`
-  -- (`typeF_frobenius_of_card_eq_exponent`), transported to the type-`P` complement `U` by
-  -- Schur–Zassenhaus conjugacy.
-  intro hTypeII
-  classical
-  -- `C = ⊥`, hence `uActionHom` is injective and `U ≅ Ū` is cyclic.
+  -- `C = ⊥` in the exceptional case, hence `uActionHom` is injective and `U ≅ Ū` is cyclic
+  -- (Singer).  The book states this cyclicity unconditionally in (9.10), so it is hoisted out
+  -- of the type-II branch (which also consumes it).
   have hCbot : cSub data chief = ⊥ := caseB_no_irreducible_forces_C_bot hG chars caseB hno'
   have hker : (uActionHom data chief).ker = ⊥ := by
     have h1 : ((uActionHom data chief).ker.map
@@ -1074,6 +1068,16 @@ theorem exceptional_case_frobenius_realization [Finite G]
         (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe
         (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)).surjective
+  refine ⟨fun g hg => chiefFactor_caseB_action_fpf chief caseB.actsIrreducibly g hg,
+    caseB_no_irreducible_u_formula hG chars caseB hno', hUcyc, ?_⟩
+  -- **Type-II `HU`-Frobenius** (Coq `typeP_reducible_core_cases`, right branch): the exceptional
+  -- case forces `C = ⊥` (`caseB_no_irreducible_forces_C_bot`), so `U ≅ Ū` is cyclic (Singer);
+  -- a cyclic complement collapses the type-F Frobenius `H ⊔ U₀` to the full `H ⊔ U`
+  -- (`typeF_frobenius_of_card_eq_exponent`), transported to the type-`P` complement `U` by
+  -- Schur–Zassenhaus conjugacy.
+  intro hTypeII
+  classical
+  -- `C = ⊥`, hence `uActionHom` is injective and `U ≅ Ū` is cyclic.
   -- The type-II type-F structure of `M' = [M,M]`, with `tf.H = H` (both the Fitting kernel).
   obtain ⟨td⟩ := hTypeII
   obtain ⟨tf⟩ := td.derived_typeF
@@ -1155,6 +1159,7 @@ theorem exceptional_case_frobenius_realization_of_trigger [Finite G]
         uActionHom data chief g ≠ 1 →
           MonoidHom.FixedPointFree (uActionHom data chief g)) ∧
       chars.u = (chief.p ^ data.q - 1) / (chief.p - 1) ∧
+      IsCyclic ↥data.typeP.U ∧
       (IsTypeII M →
         OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(data.H ⊔ data.U)
           (data.H.subgroupOf (data.H ⊔ data.U))

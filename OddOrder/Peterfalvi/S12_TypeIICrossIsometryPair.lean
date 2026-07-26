@@ -899,7 +899,7 @@ theorem typeII_HU_frobenius_of_coherent_at_pair [Finite G]
         hlam_irr (by rw [hlam_deg, hnu_deg])
   · -- exceptional: (9.10) gives the `H ⊔ U` Frobenius on the `derivedInG mp.S` carrier
     have hfrobHU := (OddOrder.Peterfalvi.S11.exceptional_case_frobenius_realization_of_trigger
-      hG chars hex).2.2 (section16_S_isTypeII hG mp)
+      hG chars hex).2.2.2 (section16_S_isTypeII hG mp)
     have hM'eq : derivedInG mp.S = data.typeP.H ⊔ data.typeP.U := by
       rw [data.typeP.derivedInG_eq_fitting_sup_U, ← data.typeP.H_eq]
     rw [hM'eq]
