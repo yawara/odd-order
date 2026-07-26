@@ -168,10 +168,15 @@ theorem coherent_sOf_H0Cprime [Finite G]
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (9.11), unconditional: `𝒮(H₀C)` is coherent on `A₀(M)`** — the Clifford dichotomy
 `clifford_dichotomy` dispatches to caseB (landed `caseB_coherent_sOf_H0C`, issue 9075 via the (11.7)
-transfer) and caseA (`caseA_coherent_sOf_H0Cprime_of_refuter` + the same transfer).  The caseA
-**refuter** — the (9.11.2) pair-adjoining non-coherence supplied by lane-b's
-`S11_NineElevenCoherence`
-induction — is the sole sorried-cite.  The `𝒮(H₀C)`-restriction witness (shared by the transfer) is
+transfer) and caseA (`caseA_coherent_sOf_H0Cprime_of_refuter` + the same transfer).
+
+The caseA branch is **no longer gated**: the (9.11.1)--(9.11.8) squeeze is complete and
+sorry-free across the twelve `S11_NineEleven*` leaves (~8,700 lines), and its endpoint
+`S11.nineEleven_coherent_A0` takes **no refuter hypothesis** -- only the standard Hypothesis (4.6)
+plumbing.  (The earlier reading of this docstring, "the caseA refuter is the sole sorried-cite",
+predates that landing; re-measured 2026-07-27.)
+
+The `𝒮(H₀C)`-restriction witness (shared by the transfer) is
 the conjugate difference `μ̄ − μ` of a reducible μ-column (`columnSum_muColumnChar_mem_sOf_H0C`,
 `w₂ ≥ 2`), `A₀`-supported and nonzero (odd-order no-real-characters).
 

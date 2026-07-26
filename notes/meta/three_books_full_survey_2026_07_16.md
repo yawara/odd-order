@@ -1181,6 +1181,35 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 明記している。(5.3)(b) は固定 2 要素 `R` レコードが可変長 `R` を持てないという**設計上の理由**があり、
 consumer は (5.7) engine を使う。
 
+#### (10.11) の実測 (2026-07-27) — **両主張とも書籍強度、AxiomsCheck の注記が stale だった**
+
+書籍 p.63: 「(8.8) の場合 (b) が成り立つとする。すると `|W₁|` と `|W₂|` は素数。さらに `M` が
+Type II の極大部分群なら、仮説 (9.2)/(9.5) の記法で `H` は位数 `p^q` の初等アーベル群
+(`p = |W₂|`) で、仮説 (9.5) の集合 `𝒮` は coherent」。
+
+| 主張 | repo | 状態 |
+|---|---|---|
+| 第 1 (`|W₁|`, `|W₂|` 素数) | `S12.theorem88_caseB_prime_orders` | **sorry ゼロ・axiom-clean** |
+| 第 2 (型 II: `H` 初等アーベル `p^q`, `p = |W₂|`, `𝒮` coherent) | `S11.typeII_sSet_coherent` | (a)+(b) を書籍どおり結論に持つ、axiom-clean |
+
+⚠ AxiomsCheck に「`exists_chiefFactorData` は still-`sorry`'d な `theorem88_caseB_prime_orders`
+を cite するので axiom-clean でない」という注記が残っていたが **stale**。実測すると
+`S12_MaximalIII_IV_V.lean` は sorry ゼロで、`theorem88_caseB_prime_orders` は
+`caseB_typeP_prime_W1` から実証明されている。両方を AxiomsCheck に登録し (3 axiom)、注記を訂正。
+
+#### (9.11) の実測 (2026-07-27) — **書籍強度、gap なし (docstring が stale だった)**
+
+書籍 p.54-57 の (9.11) 「`𝒮(H₀C')` は `τ` について coherent」の case (9.7.a) は
+(9.11.1)-(9.11.8) の squeeze (最大 coherent 部分族 `𝒮₂` の maximality 論法) を要する深い証明。
+
+実測: repo の case-(a) 開発 `S11_NineEleven*` は **12 leaf / 約 8,700 行がすべて sorry ゼロ**で、
+その終点 `S11.nineEleven_coherent_A0` は **refuter 仮説を取らない** (標準の Hypothesis (4.6)
+plumbing のみ)。AxiomsCheck 登録済。
+
+⟹ (9.11) は書籍強度で無条件。`S13_Orthogonality.coherent_sOf_H0C` の docstring が
+「caseA の refuter が唯一の sorried-cite」と書いていたのは **landing 前の記述が残っていたもの**
+で、本 tick で訂正した ([[feedback-fix-stale-docstrings-on-sight]])。
+
 #### (9.10) の実測 (2026-07-27) — **`U` の巡回性を結論に露出**
 
 書籍 p.54: 「`𝒮(H₀C')` が `HC` の線型指標から誘導された次数 `qu` の既約指標を含まないなら、

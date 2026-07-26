@@ -333,7 +333,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 12900
+set_option linter.style.longFile 13100
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -9540,10 +9540,14 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
   OddOrder.Peterfalvi.S11.exists_characteristic_complement_to_sylow_of_nilpotent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_seed
 -- The chief-factor kernel and its elementary-abelian + `U W₁`-irreducible + `U`-noncentral
--- structure of `H̄ = H/N` is axiom-clean.  (`exists_chiefFactorData` additionally has to *produce*
--- `typeIII_IV_p_eq_W2`, which cites the still-`sorry`'d §12 prime-order result
--- `theorem88_caseB_prime_orders`, so the producer is not yet axiom-clean.)
+-- structure of `H̄ = H/N` is axiom-clean.
+-- ⚠ 旧注記「`exists_chiefFactorData` は still-`sorry`'d な `theorem88_caseB_prime_orders` を
+-- cite するので axiom-clean でない」は **stale** (2026-07-27 実測): `S12_MaximalIII_IV_V.lean` は
+-- sorry ゼロで、`theorem88_caseB_prime_orders` は `caseB_typeP_prime_W1` から実証明されている。
+-- 下に両方を登録した (= Pf (10.11) 第 1 主張)。
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_kernel
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.theorem88_caseB_prime_orders
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactorData
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_quotient_card
 -- **(9.6) type-uniform** (all of types II, III, IV — the book's own scope): `U ≠ C` for the
 -- chief-factor centralizer `C = C_U(H̄)` (`cSub`), `|W̄₂| = p` for the *image* `W̄₂ = C_{H̄}(W₁)`,
