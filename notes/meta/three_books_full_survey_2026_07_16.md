@@ -1181,6 +1181,35 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 明記している。(5.3)(b) は固定 2 要素 `R` レコードが可変長 `R` を持てないという**設計上の理由**があり、
 consumer は (5.7) engine を使う。
 
+#### (9.10) の実測 (2026-07-27) — **`U` の巡回性を結論に露出**
+
+書籍 p.54: 「`𝒮(H₀C')` が `HC` の線型指標から誘導された次数 `qu` の既約指標を含まないなら、
+場合 (9.7.b) が成り立ち、`H̄U` は核 `H̄` の Frobenius 群で、**`U` は位数 `(p^q−1)/(p−1)` の
+巡回群**。さらに `M` が Type II なら `HU` は核 `H` の Frobenius 群」。
+
+repo の `exceptional_case_frobenius_realization{,_of_trigger}` は位数
+`chars.u = (p^q−1)/(p−1)` は結論に持っていたが、**`IsCyclic U` が露出していなかった**
+(型 II ブランチの中で `hUcyc` として導出はしていた)。`C = ⊥`
+(`caseB_no_irreducible_forces_C_bot`) から来るので型 II に限らず無条件に成り立つ ⟹ hoist して
+結論の第 3 conjunct に追加。下流 (`S12_TypeIICrossIsometryPair`) は射影を `.2.2` → `.2.2.2` に
+更新するだけ。
+
+#### (9.7)(a) の実測 (2026-07-27) — **書籍の `a`-形へ鋭化 (issue 0152 closed)**
+
+書籍 p.51 は `a = |U : C_U(H₁)|` を定義して「`a ∣ p−1`、`U/C_U(H_i)` は全ての `i` で位数 `a` の
+巡回群、`U` は位数 `a` の巡回群 `q−1` 個の直積の部分群」と主張する。repo には `a` が現れず
+`u ∣ (p−1)^{q−1}` という**弱い形**しか無かった。
+
+`S11.caseA_blockScalarFacts` として書籍形を証明:
+`∃ a, a ∣ p − 1 ∧ chars.u ∣ a^{q−1}`。書籍が `a` で済むのはブロックが `W₁`-共役だからで、
+その入力 (`caseA.Hpart_orbit`) は repo に既に在った。筋: `w_j` が `Ū` を正規化 ⟹ 各点固定化群が
+共役 ⟹ 指数一致 ⟹ ブロックスカラー像の位数一致 ⟹ (`𝔽_p^×` が巡回ゆえ) 像一致。
+既存 `caseA_exists_blockScalarRatioEmbedding` は射影として残したので下流不変。
+
+副産物の generic 部品 (12 本、すべて axiom-clean): 有限巡回群の部分群一意性
+(`Subgroup.eq_of_card_eq_of_isCyclic`)、`MulAut` 作用の各点固定化群とその共役性
+(`ptStabOfMulAut` 族)、線表現の scalar character の同変移送。
+
 #### (8.15) の実測 (2026-07-26) — **claim 1 の `A₁` 版を型一様化**
 
 書籍 p.49 (8.15): 「`M` を極大部分群、`A = A₀(M)`, `A(M)` **or** `A₁(M)` とする。すると
