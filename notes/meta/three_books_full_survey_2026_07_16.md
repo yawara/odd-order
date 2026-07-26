@@ -1181,6 +1181,19 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 明記している。(5.3)(b) は固定 2 要素 `R` レコードが可変長 `R` を持てないという**設計上の理由**があり、
 consumer は (5.7) engine を使う。
 
+#### (9.11) の実測 (2026-07-27) — **書籍強度、gap なし (docstring が stale だった)**
+
+書籍 p.54-57 の (9.11) 「`𝒮(H₀C')` は `τ` について coherent」の case (9.7.a) は
+(9.11.1)-(9.11.8) の squeeze (最大 coherent 部分族 `𝒮₂` の maximality 論法) を要する深い証明。
+
+実測: repo の case-(a) 開発 `S11_NineEleven*` は **12 leaf / 約 8,700 行がすべて sorry ゼロ**で、
+その終点 `S11.nineEleven_coherent_A0` は **refuter 仮説を取らない** (標準の Hypothesis (4.6)
+plumbing のみ)。AxiomsCheck 登録済。
+
+⟹ (9.11) は書籍強度で無条件。`S13_Orthogonality.coherent_sOf_H0C` の docstring が
+「caseA の refuter が唯一の sorried-cite」と書いていたのは **landing 前の記述が残っていたもの**
+で、本 tick で訂正した ([[feedback-fix-stale-docstrings-on-sight]])。
+
 #### (9.10) の実測 (2026-07-27) — **`U` の巡回性を結論に露出**
 
 書籍 p.54: 「`𝒮(H₀C')` が `HC` の線型指標から誘導された次数 `qu` の既約指標を含まないなら、
