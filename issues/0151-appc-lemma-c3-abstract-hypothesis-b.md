@@ -450,3 +450,43 @@ example (c : Child 5) : c.a = 5 := c.lem   -- ⭕ 親の *定理* にも dot 記
 ⟹ pin 付き structure にしても **chain 側 (6 file) の `data.s` / `data.W2_le_P` /
 `data.card_W2` 等はすべてそのまま動く**。境界 file だけが `data.P_eq` を使う。
 step 2b の設計は全部品が検証済で、残るは 1 パスの実行のみ。
+
+## ✅ step 2b 完了 + ❗ commit message の訂正 (2026-07-26)
+
+commit `6518e7859` は **「C.3 chain を §16 の設定から切り離し抽象仮説の上で回るようにした」**
+と書いたが、これは**言い過ぎ**。実測 (migration 後):
+
+| 残っている `hyp.base` 依存 | 件数 |
+|---|---|
+| `p` / `q` | 530 / 192 |
+| `p_prime` / `q_prime` | 89 / 24 |
+| `p_odd` / `q_odd` / `three_le_q` / `p_ne_two` | 7 / 4 / 3 / 1 |
+| `m` / `m_gt_49_hundredths_...` | 1 / 1 |
+| `P` / `U` / `W2` / `Q` | 各 1 (= structure の pin 宣言のみ) |
+
+**`{hyp : Hypothesis (G := G)}` を束縛したままの宣言が 203 件**残っている。
+
+### 実際に達成されたこと (これは本物)
+
+* **構造的依存の除去**: chain は `hyp.base.{P,U,W2,Q}` を**もう使わない**
+  (490 箇所 → 0; 残 4 は pin 宣言そのもの)。部分群はすべて `data` から来る。
+* **強化仮説 2 つの除去**: `Q_elementaryAbelian` と `p_eq_card_W2` が chain から消え、
+  書籍どおりの「有限可換 `p'`-部分群」+ 導出された `|W₂| = p` で回る。
+* pin 付き structure という載せ替えの器と、その全部品の検証。
+
+### 残り (step 2c)
+
+`{hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)` を
+`{p q : ℕ} [Fact p.Prime] (data : AppC.FieldNormalizerData p q G)` に置換する (203 宣言)。
+同時に:
+
+* `hyp.base.p`/`q` → `p`/`q` (722 箇所)、`hyp.base.p_prime` → `Fact.out`、
+  `hyp.base.q_prime` → `data.q_prime`。
+* 奇性 4 種 (15 箇所) は書籍 Remark (V) の還元で扱う
+  (`le_of_conditionA_of_not_odd` が既に在る) か、`FieldNormalizerData` に
+  `p_odd`/`q_odd` フィールドを足す (書籍 Theorem C も (V) で奇性を仮定してよいとしているので
+  後者でも faithful)。
+* `m` 系 2 箇所は C.3 chain 外かどうか確認して切り離す。
+
+これが済んで初めて `appC_normSet_generator_relation` が `S16.Hypothesis` 抜きで述べられ、
+`hypothesisBAbstract_sl2` (Remark (II)) から `theoremC_abstract` を回せるようになる。
