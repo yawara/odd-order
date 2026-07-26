@@ -1448,7 +1448,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.8 | ✅ 完了 (`hasNormalPComplement_of_minFac_of_not_dvd_pow_three`) | `p` が最小素因数 (`p > 2`) で `p^3 ∤ \|G\|` ⇒ 正規 p-補群 |
 | 5C.9 | ✅ 完了 (`three_dvd_card_of_isSimpleGroup_of_not_dvd_eight`) | 非可換単純で偶数位数、`8 ∤ \|G\|` ⇒ `3 \| \|G\|` |
 | 5C.10 | ✅ 完了 (`seven_dvd_card_of_isSimpleGroup_of_card_sylow_two_eq_eight`) | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
-| 5C.11 | ⬜ | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
+| 5C.11 | ✅ 完了 (`hasNormalPComplement_of_hall_le_center_normalizer`) | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
 | 5C.12 | ⬜ | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
 | 5C.13 | ⬜ | (Navarro) `P = N_G(P)'` なる Sylow `P` ⇒ `N_G(P)` が正規 p-補群をもつ |
 
@@ -1560,6 +1560,41 @@ instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbit
 の implicit/explicit の並びを確認してから書く)。
 `|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
 `G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
+
+### 5C.11 の実装メモ (2026-07-27)
+
+新 leaf `Problems5C11.lean` (266 行)。⭐ **書籍 hint の「`|G|` に関する帰納法」を、`G` を固定した
+「部分群の位数に関する帰納法」に組み替えた** — 型レベル再帰 (`motive : ℕ → Prop` で全ての群型を
+量化する `S7C_ThompsonPComplementFinal` 型のパターン) も商群への降下も要らなくなる。
+
+**核 = `le_centralizer_aux`**: 「`H ≤ M` かつ `M ≤ N_G(P)` なる任意の部分群 `M` は `C_G(P)` に
+含まれる」。`Nat.card ↥M ≤ n` の `n` で帰納。
+
+* `M ≤ N_G(H)` なら仮定 `H ⊆ Z(N_G(H))` からそのまま `M ≤ C_G(H) ≤ C_G(P)`。
+* そうでなければ `H` が Sylow 部分群たちの join である (`iSup_sylow_eq_top`、下記) ことと
+  `Subgroup.iInf_normalizer_le_normalizer_iSup` (mathlib) から、**`M` が正規化しない `H` の
+  Sylow `q`-部分群 `Q`** が取れる。Hall 性より `Q` は `G` の Sylow `q`-部分群でもある
+  (`exists_sylow_coe_eq_map_subtype`)。`L := M ⊓ N_G(Q)` は `M` の真部分群なので帰納法で
+  `L ≤ C_G(P)`、`C := M ⊓ C_G(P)` は `M ≤ N_G(P)` ゆえ `M`-共役不変で `Q ≤ H ≤ C`。
+  **Frattini 論法** (`C` 内の Sylow `q`-共役性、transport は 1C.1 と同じ `Ch01.map_conj_smul`
+  パターン) が `M = C · L` を与え、両因子が `C_G(P)` に入る。
+
+⟹ `M := N_G(P)` で `N_G(P) ≤ C_G(P)`、Burnside (Thm 5.13
+`hasNormalPComplement_of_sylow_normalizer_le_centralizer`) で結論。書籍 hint の 2 段
+(「`N_G(P) < G` の段」と「`P ⊴ G` かつ `N_G(Q) < G` の段」) はこの形では**同じ 1 本の補題に融合**する。
+
+**再利用可能な副産物**:
+* `iSup_sylow_eq_top` — 有限群は Sylow 部分群たちで生成される
+  (`⨆ (q : (Nat.card K).primeFactors) (Q : Sylow q K), ↑Q = ⊤`)。位数の各素冪が Sylow の位数を
+  割ることから `|K| ∣ |⨆ …|` (`Nat.dvd_iff_prime_pow_dvd_dvd`)。mathlib に無かった。
+* `card_map_subtype_eq_multiplicity` / `exists_sylow_coe_eq_map_subtype` — Hall 部分群の
+  Sylow 部分群は `G` の Sylow 部分群。
+
+⚠ 実装の罠: `inf_eq_left.mpr (…)` を `rw` の引数にメタ変数のまま置くと、パターン `?a ⊓ ?b` が
+**`M ⊓ C_G(P)` (部分群 `C` そのもの)** に先にマッチして motive 破綻 (`C.subtype c` の型が `C` に
+依存する) — `have hinf1/hinf2 :` で**両辺を明示した等式**にしてから `rw` する。
+`Nat.dvd_iff_prime_pow_dvd_dvd` の `intro` が与えるのは `Nat.Prime` (変換不要)。
+`Subgroup.normalizer` は現 mathlib では `Set G → Subgroup G`。
 
 ### 5C.10 の実装メモ (2026-07-27)
 
