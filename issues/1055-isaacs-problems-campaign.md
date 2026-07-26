@@ -1804,7 +1804,7 @@ Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
 | 問題 | 状態 | 主張 (PDF 実測) |
 |---|---|---|
 | 5D.1 | ✅ 完了 (`hasNormalPComplement_of_controlsPTransfer`) | `P ∈ Syl_p(G)` 可換, `P ⊆ H ⊆ G`, `H` が `G` の `p`-transfer を制御 (= `A^p(H) = H ∩ A^p(G)`)。`H` が正規 `p`-補群をもつなら `G` も持つ |
-| 5D.2 | ⬜ | `P ∈ Syl_p(G)`, `P ⊆ Z(G)` ⇒ (Burnside も transfer 理論も使わずに) `G` は正規 `p`-補群をもつ。これと Cor 5.23 から Burnside を導く |
+| 5D.2 | ✅ 完了 (`hasNormalPComplement_of_sylow_le_center` + Burnside 導出の `example`) | `P ∈ Syl_p(G)`, `P ⊆ Z(G)` ⇒ (Burnside も transfer 理論も使わずに) `G` は正規 `p`-補群をもつ。これと Cor 5.23 から Burnside を導く |
 | 5D.3 | ⬜ | `G` 非可換単純, `P ⊆ G` が極大な `p`-部分群。(a) `P ∈ Syl_p(G)` (b) `1 < N ⊴ P` で `P/N` 可換なら `P` は `N` を含む唯一の Sylow `p`-部分群 ⇒ `N` は `P` 内で `G` に関し weakly closed (c) `P` の冪零類 ≥ 3 |
 | 5D.4 | ⬜ | `P ∈ Syl_p(G)`, `P ⊆ K ⊆ G` ⇒ `O^p(K) ⊆ K ∩ O^p(G)`、等号なら `A^p(K) = K ∩ A^p(G)` |
 | 5D.5 | ⬜ | `P ∈ Syl_p(G)`, `A ∩ P = P'` (`A = A^p(G)`)。`P' ⊴ A` なら (Tate を使わず) `G` は正規 `p`-補群をもつ。hint: SZ で `A` 内の `P'` の補群 `K` を取り `G = N_G(K)P'`、`P' ⊆ Φ(P)` から `P` が `K` を正規化 |
@@ -1837,6 +1837,24 @@ Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
 等式を `have` で明示してから `Subtype.ext (Subtype.ext hGeq)` と項で書く。
 `(⊤ : Subgroup G)` の元を `N * P` に分解するには `Subgroup.normal_mul` で
 `↑(N ⊔ P) = ↑N * ↑P` にしてから `rw [← htop]; exact Subgroup.mem_top _`。
+
+### 5D.2 の実装 (2026-07-27 完了)
+
+**前半**: `P ≤ Z(G)` ⟹ `P ⊴ G`、`|P|` と `|G:P|` は互いに素なので **Schur–Zassenhaus**
+(`Subgroup.exists_right_complement'_of_coprime`) が補群 `K` を与える。`g = x·k` (`x ∈ P` は
+中心的) の共役は `k` による共役に一致するので `K ⊴ G`、5C.13 の helper
+`hasNormalPComplement_of_normal_of_index_eq_pow` で結論。**Burnside も transfer も未使用**。
+
+**後半 (Burnside の別証明)**: `N := N_G(P)` の中で `P` は中心的なので前半が `N` の正規
+`p`-補群を与え、`P` 可換ゆえ **Cor 5.23**
+(`APrime_normalizer_eq_subgroupOf_APrime_of_isMulCommutative_sylow`) が `p`-transfer 制御を
+与え、**Problem 5D.1** で `G` に持ち上がる。⚠ statement は既存の
+`hasNormalPComplement_of_sylow_normalizer_le_centralizer` (Thm 5.13) と同一ゆえ、
+ラッパー方針に従い定理として再掲せず **`example` で導出のみ kernel 検証**した
+(5C.1 の「同一 statement の別証明を避ける」方針と同じ扱い)。
+
+⚠ 実装の罠: `hasNormalPComplement_of_normal_of_index_eq_pow` の `X` は結論に現れない
+implicit なので `(X := K)` を明示しないと `Subgroup.Normal ?m` で instance 探索が止まる。
 
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
