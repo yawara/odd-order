@@ -1958,7 +1958,7 @@ statement は **PDF ページ画像で確定済** (書籍 p.175 = PDF p.188)。�
 
 | 問題 | 状態 | 主張 (PDF 実測) |
 |---|---|---|
-| 5E.1 | 🔨 補題 3 本 landing 済 / 主定理は次回 (`Problems5E1.lean`) | `G` 有限で**真部分群がすべて正規 `p`-補群をもつが `G` 自身は持たない** ⇒ `G` は正規 Sylow `p`-部分群をもち、`\|G\|` の `p` 以外の素因数はちょうど 1 個 (= Itô「極小非 `p`-冪零群」) |
+| 5E.1 | ✅ **完了** (`Problems5E1.lean`) | `G` 有限で**真部分群がすべて正規 `p`-補群をもつが `G` 自身は持たない** ⇒ `G` は正規 Sylow `p`-部分群をもち、`\|G\|` の `p` 以外の素因数はちょうど 1 個 (= Itô「極小非 `p`-冪零群」) |
 | 5E.2 | ✅ 完了 (`isSolvable_of_forall_proper_isSupersolvable`) | 真部分群がすべて超可解 ⇒ `G` は可解。hint: 極小反例は単純、Problem 3B.10 で最小素因数 `p` に対する正規 `p`-補群 |
 | 5E.3 | ✅ 完了 (`hasNormalPComplement_of_forall_two_generator`) | **2 元生成部分群がすべて正規 `p`-補群をもつ** ⇒ `G` も持つ。hint: `⟨x,y⟩` (`x` は `p`-部分群 `P` の元、`y ∈ N_G(P)` は位数が `p` で割れない) |
 
@@ -2053,23 +2053,53 @@ Hall `p'`-補群 `H` を取る (`H ≠ 1`、さもないと `G` が `p`-群で `
 `[P, S] ≤ P ⊓ S = 1`。`H` は Sylow 部分群たちで生成される (**5C.11 の `iSup_sylow_eq_top`**)
 ので `H ≤ C_G(P)` ⟹ `H ◁ G` が正規 `p`-補群になり矛盾。⟹ `|H|` は素数冪。
 
-### 5E.1 の実装状況 (2026-07-27 時点) — 補題 3 本 landing、主定理は未
+### 🎉 5E.1 (Itô) 完了 (2026-07-27) — `Problems5E1.lean` 528 行
 
-新 leaf `Problems5E1.lean` (114 行、`OddOrder.lean` 配線済、いずれも axiom-clean・警告 0):
+**全て実証明・axiom-clean (`propext`/`Classical.choice`/`Quot.sound` のみ)・警告 0**。
+設計 (上記「5E.1 (Itô) の設計 — 完全に確定」節) はそのまま通った — **位数に関する帰納法は不要**。
 
-* `hasNormalPComplement_of_surjective` — 正規 `p`-補群は**全射像**に遺伝
-  (`Subgroup.index_map_dvd` + 位数橋渡し)。汎用。
-* `opCore_ne_bot_of_minimal_non_pNilpotent` — **補題 1** (`O_p(G) ≠ 1`)。
-* `not_exists_normal_index_eq_prime_of_minimal_non_pNilpotent` — **補題 2**
-  (指数 `p` の正規部分群は無い)。⭐ Itô の鍵。
+主結果:
 
-**次回やること** (設計は上記「5E.1 (Itô) の設計 — 完全に確定」節のとおり):
-1. **補題 3** (`G/O_p(G)` が `p`-冪零) — 補題 1 を `G ⧸ opCore p G` に適用。
-   真部分群の `p`-冪零性は `hasNormalPComplement_of_surjective` を
-   `(mk' O).restrict _ |>.codRestrict L` に当てる (5E.2 の同種の段と同じ形)。
-2. **(a)** 正規 Sylow — 補題 3 の `K̄` の引き戻しが `⊤` (補題 2 + 「非自明 `p`-群は指数 `p` の
-   正規部分群をもつ」= 1D.6 `isCoatom_iff_index_prime` + 冪零の正規化条件)。
-3. **(b)** Schur–Zassenhaus + `iSup_sylow_eq_top` (5C.11)。
+* `hasNormalPComplement_quotient_opCore_of_forall_proper` = **補題 3** (`G/O_p(G)` は `p`-冪零)。
+  ⚠ **設計時の想定より仮定が 1 つ落ちた**: `G` 自身が `p`-冪零でないことは**不要**
+  (`G` が `p`-冪零なら商もそう)。証明は「補題 1 を `G ⧸ O_p(G)` に適用 →
+  `O_p(G/O_p(G)) ≠ 1` → 引き戻しが正規 `p`-部分群で `O_p(G)` の最大性に矛盾」。
+* `sylow_eq_opCore_of_minimal_non_pNilpotent` = **(a)** (`Syl_p(G) = O_p(G)`, 一意)
+  + `normal_sylow_of_minimal_non_pNilpotent` (正規 Sylow の存在)。
+* `card_primeFactors_erase_eq_one_of_minimal_non_pNilpotent` = **(b)**
+  (`|G|` の `p` 以外の素因数はちょうど 1 個) + 使いやすい形
+  `exists_prime_card_eq_pow_mul_pow_of_minimal_non_pNilpotent`
+  (`∃ q a b, q.Prime ∧ q ≠ p ∧ 1 ≤ a ∧ 1 ≤ b ∧ |G| = p^a q^b`)。
+* `prime_dvd_card_of_not_hasNormalPComplement` (`p ∤ |G|` なら `⊤` が正規 `p`-補群)。
+
+再利用可能な汎用 helper 5 本 (いずれも 5E.1 専用でない):
+
+* `hasNormalPComplement_of_surjective` — 正規 `p`-補群は**全射像**に遺伝。
+* `isPGroup_comap_mk'_of_isPGroup` — `p`-群 `N` による商の `p`-部分群の引き戻しは `p`-群。
+* `card_map_mk'_of_inf_eq_bot` — `C ⊓ N = ⊥` なら `|C.map (mk' N)| = |C|`
+  (`(mk' N).comp C.subtype` の単射性経由)。
+* `le_of_index_eq_pow_of_not_dvd_card` — 指数が `p`-冪の正規部分群は `p'`-部分群を全て含む
+  (= 正規 `p`-補群が `p'`-部分群を全て含むことの一般形)。
+* `exists_normal_index_eq_prime_of_index_eq_pow` — 指数 `p^a` (`a ≥ 1`) の正規部分群が
+  あれば指数ちょうど `p` の正規部分群がある (1D.6 `isCoatom_iff_index_prime` +
+  冪零の正規化条件 + `IsCoatomic.eq_top_or_exists_le_coatom`)。
+
+**(b) の実装で効いた工夫** — 部分群の積の位数公式 (`|HK|·|H∩K| = |H||K|`, Set 積) を
+**一度も使わずに済ませた**。代わりに商 `G ⧸ O` への像で測る:
+
+* `O ⊔ T ≠ ⊤` は「`(O ⊔ T).map π = T.map π` かつ `|T.map π| = |T| < |H| = |G ⧸ O|`」で出る
+  (`⊤` なら像も `⊤`)。
+* `|O ⊔ T| = |O|·|T|` は `O ≤ O ⊔ T` から `(O⊔T).index = ((O⊔T).map π).index`
+  (`comap_map_eq` + `index_comap_of_surjective`) を作り、3 本の `card_mul_index` を
+  掛け合わせて `(O⊔T).index` で消去。
+* `T ⊴ O ⊔ T` は「`T.subgroupOf (O⊔T) ≤ C`(= `p`-補群) かつ位数一致 ⟹ `= C`」で出す。
+
+⚠ 実装の罠: `Subgroup.map_eq_bot_iff` は `H` が**明示引数**なので `.mpr` のドット記法が
+効かない (`Unknown constant`) — `QuotientGroup.map_mk'_self` (`N.map (mk' N) = ⊥`, simp) を使う /
+`le_sup_left` は項であって関数でないので `x ∈ O ⊔ T` を得るには `(le_sup_left : O ≤ O ⊔ T) hx` /
+`Nat.factorization_prod_pow_eq_self` は deprecated (`Nat.prod_factorization_pow_eq_self`)。
+
+### 🎉 §5E 完済 (5E.1 / 5E.2 / 5E.3 の全 3 問) ⟹ Isaacs Ch.5 の章末演習は §5A–§5E 全完。
 
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 

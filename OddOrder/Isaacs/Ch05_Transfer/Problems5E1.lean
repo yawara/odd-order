@@ -293,6 +293,236 @@ theorem normal_sylow_of_minimal_non_pNilpotent [Finite G] {p : ℕ} [Fact p.Prim
   rw [sylow_eq_opCore_of_minimal_non_pNilpotent hproper hG P]
   infer_instance
 
+/-- **Isaacs Problem 5E.1(b)** (p. 175) ⭐: 真部分群がすべて正規 `p`-補群をもつが `G` 自身は
+持たないとき, `|G|` は `p` 以外の素因数を**ちょうど 1 個**もつ (すなわち `|G| = p^a q^b`)。
+
+(a) の正規 Sylow `p`-部分群 `P = O_p(G)` に Schur–Zassenhaus で Hall `p'`-補群 `H` を取る。
+`|H|` が 2 個以上の素因数をもつと仮定すると, `H` の各 Sylow `q`-部分群 `T` について
+`P ⊔ T` は**真部分群** (商 `G ⧸ P` に落として位数で見る) ゆえ `p`-冪零。その正規 `p`-補群は
+位数計算から `T` 自身に一致するので `T ⊴ P ⊔ T`, したがって `⁅P, T⁆ ≤ P ⊓ T = 1`。
+`H` は Sylow たちで生成される (5C.11 `iSup_sylow_eq_top`) ので `H ≤ C_G(P)`, ゆえに
+`G = P·H ≤ N_G(H)` で `H ⊴ G` — これは `G` の正規 `p`-補群になり仮定に矛盾。 -/
+theorem prime_dvd_card_of_not_hasNormalPComplement [Finite G] {p : ℕ} [Fact p.Prime]
+    (hG : ¬ HasNormalPComplement p G) : p ∣ Nat.card G := by
+  by_contra hnd
+  refine hG (hasNormalPComplement_of_normal_of_index_eq_pow
+    (X := (⊤ : Subgroup G)) (a := 0) ?_ (by rw [Subgroup.index_top, pow_zero]))
+  rwa [Subgroup.card_top]
+
+theorem card_primeFactors_erase_eq_one_of_minimal_non_pNilpotent [Finite G] {p : ℕ}
+    [Fact p.Prime] (hproper : ∀ H : Subgroup G, H ≠ ⊤ → HasNormalPComplement p ↥H)
+    (hG : ¬ HasNormalPComplement p G) :
+    ((Nat.card G).primeFactors.erase p).card = 1 := by
+  classical
+  have hp : p.Prime := Fact.out
+  set O : Subgroup G := Ch01.opCore p G with hOdef
+  obtain ⟨P₀⟩ := (inferInstance : Nonempty (Sylow p G))
+  have hPO : (P₀ : Subgroup G) = O := sylow_eq_opCore_of_minimal_non_pNilpotent hproper hG P₀
+  have hpG : p ∣ Nat.card G := prime_dvd_card_of_not_hasNormalPComplement hG
+  set m : ℕ := (Nat.card G).factorization p with hmdef
+  have hm1 : 1 ≤ m := by
+    rw [hmdef]
+    exact (Nat.Prime.pow_dvd_iff_le_factorization hp Nat.card_pos.ne').mp (by simpa using hpG)
+  have hOcard : Nat.card ↥O = p ^ m := by rw [← hPO, P₀.card_eq_multiplicity]
+  -- Schur–Zassenhaus で Hall `p'`-補群 `H`
+  have hcop : Nat.Coprime (Nat.card ↥O) O.index := by rw [← hPO]; exact P₀.card_coprime_index
+  obtain ⟨H, hOH⟩ := Subgroup.exists_right_complement'_of_coprime hcop
+  have hHcard : O.index = Nat.card ↥H := hOH.symm.index_eq_card
+  have hpOidx : ¬ p ∣ O.index := by
+    refine (Nat.Prime.coprime_iff_not_dvd hp).mp ?_
+    exact Nat.Coprime.coprime_dvd_left (hOcard ▸ dvd_pow_self p (by omega)) hcop
+  have hpH : ¬ p ∣ Nat.card ↥H := hHcard ▸ hpOidx
+  -- `H ≠ 1` (さもなければ `G` が `p`-群で `⊥` が正規 `p`-補群)
+  have hHne1 : Nat.card ↥H ≠ 1 := by
+    intro h1
+    have hidx1 : O.index = 1 := by rw [hHcard, h1]
+    have hGcard : Nat.card G = p ^ m := by
+      rw [← Subgroup.card_mul_index O, hidx1, mul_one, hOcard]
+    refine hG (hasNormalPComplement_of_normal_of_index_eq_pow
+      (X := (⊥ : Subgroup G)) (a := m) ?_ (by rw [Subgroup.index_bot, hGcard]))
+    rw [Subgroup.card_bot]
+    exact fun h => hp.one_lt.ne' (Nat.dvd_one.mp h)
+  -- ⭐ 主張: `|H|` は 2 個以上の素因数をもてない
+  have hkey : (Nat.card ↥H).primeFactors.card ≤ 1 := by
+    by_contra hcon
+    push Not at hcon
+    -- 各素因数 `q` の Sylow `q`-部分群 (を `G` に移したもの) は `O` を中心化する
+    have hcent : ∀ q ∈ (Nat.card ↥H).primeFactors, ∀ S : Sylow q ↥H,
+        ((S : Subgroup ↥H).map H.subtype) ≤ Subgroup.centralizer (O : Set G) := by
+      intro q hq S
+      have hqprime : q.Prime := Nat.prime_of_mem_primeFactors hq
+      haveI : Fact q.Prime := ⟨hqprime⟩
+      set T : Subgroup G := (S : Subgroup ↥H).map H.subtype with hTdef
+      have hTle : T ≤ H := Subgroup.map_subtype_le _
+      have hTcard : Nat.card ↥T = Nat.card ↥(S : Subgroup ↥H) := by
+        rw [hTdef, Subgroup.card_map_of_injective (Subgroup.subtype_injective H)]
+      have hHO : H ⊓ O = ⊥ := by rw [inf_comm]; exact disjoint_iff.mp hOH.disjoint
+      have hTO : T ⊓ O = ⊥ := le_bot_iff.mp (hHO ▸ inf_le_inf_right O hTle)
+      have hpT : ¬ p ∣ Nat.card ↥T := fun h => hpH (h.trans (Subgroup.card_dvd_of_le hTle))
+      -- `|H|` は 2 個以上の素因数をもつので `|T| ≠ |H|`
+      obtain ⟨r, hrmem, hrne⟩ : ∃ r ∈ (Nat.card ↥H).primeFactors, r ≠ q := by
+        obtain ⟨a, ha, b, hb, hab⟩ := Finset.one_lt_card.mp hcon
+        by_cases haq : a = q
+        · exact ⟨b, hb, fun h => hab (haq.trans h.symm)⟩
+        · exact ⟨a, ha, haq⟩
+      have hTne : Nat.card ↥T ≠ Nat.card ↥H := by
+        rw [hTcard, S.card_eq_multiplicity]
+        intro heq
+        have hrprime : r.Prime := Nat.prime_of_mem_primeFactors hrmem
+        have hrdvd : r ∣ q ^ (Nat.card ↥H).factorization q := by
+          rw [heq]; exact Nat.dvd_of_mem_primeFactors hrmem
+        exact hrne ((Nat.prime_dvd_prime_iff_eq hrprime hqprime).mp
+          (hrprime.dvd_of_dvd_pow hrdvd))
+      -- `O ⊔ T` は真部分群 (商 `G ⧸ O` で見ると `T` の像しか無い)
+      have hsupmap : (O ⊔ T).map (QuotientGroup.mk' O) = T.map (QuotientGroup.mk' O) := by
+        rw [Subgroup.map_sup, QuotientGroup.map_mk'_self, bot_sup_eq]
+      have hOTne : O ⊔ T ≠ ⊤ := by
+        intro htop
+        have h2 : (O ⊔ T).map (QuotientGroup.mk' O) = ⊤ := by
+          rw [htop, Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective O)]
+        have h3 : Nat.card ↥(T.map (QuotientGroup.mk' O)) = Nat.card ↥T :=
+          card_map_mk'_of_inf_eq_bot hTO
+        rw [← hsupmap, h2, Subgroup.card_top, ← Subgroup.index_eq_card, hHcard] at h3
+        exact hTne h3.symm
+      obtain ⟨C, hCN, hCC⟩ := hproper (O ⊔ T) hOTne
+      haveI := hCN
+      -- `|O ⊔ T| = |O| · |T|`
+      have hKcard : Nat.card ↥(O ⊔ T) = Nat.card ↥O * Nat.card ↥T := by
+        have hcomapK :
+            Subgroup.comap (QuotientGroup.mk' O) ((O ⊔ T).map (QuotientGroup.mk' O)) = O ⊔ T :=
+          Subgroup.comap_map_eq_self (by rw [QuotientGroup.ker_mk']; exact le_sup_left)
+        have hidxK : (Subgroup.comap (QuotientGroup.mk' O)
+            ((O ⊔ T).map (QuotientGroup.mk' O))).index
+            = ((O ⊔ T).map (QuotientGroup.mk' O)).index :=
+          Subgroup.index_comap_of_surjective _ (QuotientGroup.mk'_surjective O)
+        rw [hcomapK] at hidxK
+        have e1 : Nat.card ↥(O ⊔ T) * (O ⊔ T).index = Nat.card G := Subgroup.card_mul_index _
+        have e2 : Nat.card ↥O * O.index = Nat.card G := Subgroup.card_mul_index _
+        have e3 : Nat.card ↥((O ⊔ T).map (QuotientGroup.mk' O))
+            * ((O ⊔ T).map (QuotientGroup.mk' O)).index = Nat.card (G ⧸ O) :=
+          Subgroup.card_mul_index _
+        have e4 : Nat.card ↥((O ⊔ T).map (QuotientGroup.mk' O)) = Nat.card ↥T := by
+          rw [hsupmap]; exact card_map_mk'_of_inf_eq_bot hTO
+        rw [e4, ← hidxK, ← Subgroup.index_eq_card] at e3
+        have hpos : 0 < (O ⊔ T).index := Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+        refine Nat.eq_of_mul_eq_mul_right hpos ?_
+        rw [e1, ← e2, ← e3]
+        ring
+      -- `O ⊔ T` の正規 `p`-補群 `C` は位数計算から `T` に一致
+      obtain ⟨R⟩ := (inferInstance : Nonempty (Sylow p ↥(O ⊔ T)))
+      have hfactK : (Nat.card ↥(O ⊔ T)).factorization p = m := by
+        rw [hKcard, hOcard, Nat.factorization_mul (pow_ne_zero _ hp.pos.ne') Nat.card_pos.ne']
+        simp [Nat.factorization_eq_zero_of_not_dvd hpT, hp.factorization_pow]
+      have hCidx : C.index = p ^ m := by
+        rw [(hCC R).symm.index_eq_card, R.card_eq_multiplicity, hfactK]
+      have hT'card : Nat.card ↥(T.subgroupOf (O ⊔ T)) = Nat.card ↥T :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : T ≤ O ⊔ T)).toEquiv
+      have hT'le : T.subgroupOf (O ⊔ T) ≤ C :=
+        le_of_index_eq_pow_of_not_dvd_card hCidx (by rw [hT'card]; exact hpT)
+      have hCcard : Nat.card ↥C = Nat.card ↥T := by
+        have hCm := Subgroup.card_mul_index C
+        rw [hCidx, hKcard, hOcard, mul_comm (p ^ m) (Nat.card ↥T)] at hCm
+        exact Nat.eq_of_mul_eq_mul_right (pow_pos hp.pos m) hCm
+      have hT'eq : T.subgroupOf (O ⊔ T) = C :=
+        Subgroup.eq_of_le_of_card_ge hT'le (by rw [hCcard, hT'card])
+      -- ⟹ `T ⊴ O ⊔ T` ⟹ `⁅O, T⁆ ≤ O ⊓ T = 1`
+      intro t ht
+      rw [Subgroup.mem_centralizer_iff]
+      intro x hx
+      have hxK : x ∈ O ⊔ T := (le_sup_left : O ≤ O ⊔ T) hx
+      have htK : t ∈ O ⊔ T := (le_sup_right : T ≤ O ⊔ T) ht
+      have hconjT : x * t * x⁻¹ ∈ T := by
+        have htmem : (⟨t, htK⟩ : ↥(O ⊔ T)) ∈ C := by rw [← hT'eq]; exact ht
+        have hmemC : (⟨x, hxK⟩ : ↥(O ⊔ T)) * ⟨t, htK⟩ * (⟨x, hxK⟩ : ↥(O ⊔ T))⁻¹ ∈ C :=
+          hCN.conj_mem _ htmem _
+        rw [← hT'eq] at hmemC
+        simpa [Subgroup.mem_subgroupOf] using hmemC
+      have hone : x * t * x⁻¹ * t⁻¹ = 1 := by
+        have hmemT : x * t * x⁻¹ * t⁻¹ ∈ T := Subgroup.mul_mem _ hconjT (Subgroup.inv_mem _ ht)
+        have hmemO : x * t * x⁻¹ * t⁻¹ ∈ O := by
+          have h1 : t * x⁻¹ * t⁻¹ ∈ O := (Ch01.opCore.normal p G).conj_mem _ (inv_mem hx) t
+          have h2 : x * t * x⁻¹ * t⁻¹ = x * (t * x⁻¹ * t⁻¹) := by group
+          rw [h2]
+          exact Subgroup.mul_mem _ hx h1
+        have hmem : x * t * x⁻¹ * t⁻¹ ∈ T ⊓ O := ⟨hmemT, hmemO⟩
+        rwa [hTO, Subgroup.mem_bot] at hmem
+      calc x * t = x * t * x⁻¹ * t⁻¹ * (t * x) := by group
+        _ = 1 * (t * x) := by rw [hone]
+        _ = t * x := one_mul _
+    -- `H` は Sylow たちで生成されるので `H ≤ C_G(O)`
+    have hHcent : H ≤ Subgroup.centralizer (O : Set G) := by
+      have hsup : H = (⨆ (q : (Nat.card ↥H).primeFactors) (S : Sylow (q : ℕ) ↥H),
+          (S : Subgroup ↥H)).map H.subtype := by
+        rw [iSup_sylow_eq_top, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+      rw [hsup]
+      simp only [Subgroup.map_iSup]
+      exact iSup_le fun q => iSup_le fun S => hcent q q.2 S
+    -- `G = O·H ≤ N_G(H)` ⟹ `H ⊴ G` ⟹ `H` が正規 `p`-補群 — 矛盾
+    have hHnormal : H.Normal := by
+      rw [← Subgroup.normalizer_eq_top_iff]
+      refine top_le_iff.mp ?_
+      rw [← hOH.sup_eq_top]
+      refine sup_le ?_ Subgroup.le_normalizer
+      intro x hx
+      rw [Subgroup.mem_normalizer_iff]
+      intro h
+      constructor
+      · intro hh
+        have hcm := (Subgroup.mem_centralizer_iff.mp (hHcent hh)) x hx
+        have heq : x * h * x⁻¹ = h := by rw [hcm]; group
+        rw [heq]
+        exact hh
+      · intro hh
+        have hcm := (Subgroup.mem_centralizer_iff.mp (hHcent hh)) x⁻¹ (inv_mem hx)
+        have heq : h * x⁻¹ = (x * h * x⁻¹) * x⁻¹ := by rw [← hcm]; group
+        rw [mul_right_cancel heq]
+        exact hh
+    haveI := hHnormal
+    exact hG (hasNormalPComplement_of_normal_of_index_eq_pow (X := H) (a := m) hpH
+      (by rw [hOH.index_eq_card, hOcard]))
+  -- `|H|` の素因数はちょうど 1 個、そして `primeFactors |G| = {p} ∪ primeFactors |H|`
+  have hHone : (Nat.card ↥H).primeFactors.card = 1 := by
+    refine le_antisymm hkey (Finset.card_pos.mpr (Nat.nonempty_primeFactors.mpr ?_))
+    have := Nat.card_pos (α := ↥H)
+    omega
+  have hGcard : Nat.card G = p ^ m * Nat.card ↥H := by
+    rw [← Subgroup.card_mul_index O, hOcard, hHcard]
+  have hpf : (Nat.card G).primeFactors = insert p (Nat.card ↥H).primeFactors := by
+    rw [hGcard, Nat.primeFactors_mul (pow_ne_zero _ hp.pos.ne') Nat.card_pos.ne',
+      Nat.primeFactors_pow p (by omega), hp.primeFactors, ← Finset.insert_eq]
+  rw [hpf, Finset.erase_insert (fun h => hpH (Nat.dvd_of_mem_primeFactors h))]
+  exact hHone
+
+/-- **Isaacs Problem 5E.1** のまとめ (Itô): 真部分群がすべて正規 `p`-補群をもつが `G` 自身は
+持たないとき, `|G| = p^a q^b` (`q ≠ p` は素数, `a, b ≥ 1`)。
+
+正規 Sylow `p`-部分群の存在は `normal_sylow_of_minimal_non_pNilpotent`。 -/
+theorem exists_prime_card_eq_pow_mul_pow_of_minimal_non_pNilpotent [Finite G] {p : ℕ}
+    [Fact p.Prime] (hproper : ∀ H : Subgroup G, H ≠ ⊤ → HasNormalPComplement p ↥H)
+    (hG : ¬ HasNormalPComplement p G) :
+    ∃ q a b : ℕ, q.Prime ∧ q ≠ p ∧ 1 ≤ a ∧ 1 ≤ b ∧ Nat.card G = p ^ a * q ^ b := by
+  classical
+  have hp : p.Prime := Fact.out
+  have hcard0 : Nat.card G ≠ 0 := Nat.card_pos.ne'
+  obtain ⟨q, hqeq⟩ :=
+    Finset.card_eq_one.mp (card_primeFactors_erase_eq_one_of_minimal_non_pNilpotent hproper hG)
+  have hqmem : q ∈ (Nat.card G).primeFactors.erase p := by
+    rw [hqeq]; exact Finset.mem_singleton_self q
+  have hqne : q ≠ p := Finset.ne_of_mem_erase hqmem
+  have hqpf : q ∈ (Nat.card G).primeFactors := Finset.mem_of_mem_erase hqmem
+  have hppf : p ∈ (Nat.card G).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hp, prime_dvd_card_of_not_hasNormalPComplement hG, hcard0⟩
+  have hpair : (Nat.card G).primeFactors = {p, q} := by
+    conv_lhs => rw [← Finset.insert_erase hppf]
+    rw [hqeq]
+  refine ⟨q, (Nat.card G).factorization p, (Nat.card G).factorization q,
+    Nat.prime_of_mem_primeFactors hqpf, hqne,
+    hp.factorization_pos_of_dvd hcard0 (Nat.dvd_of_mem_primeFactors hppf),
+    (Nat.prime_of_mem_primeFactors hqpf).factorization_pos_of_dvd hcard0
+      (Nat.dvd_of_mem_primeFactors hqpf), ?_⟩
+  conv_lhs => rw [← Nat.prod_factorization_pow_eq_self hcard0]
+  rw [Finsupp.prod, Nat.support_factorization, hpair, Finset.prod_pair (Ne.symm hqne)]
+
 end
 
 end OddOrder.Isaacs.Ch05
