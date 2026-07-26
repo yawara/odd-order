@@ -176,6 +176,9 @@ structure FieldNormalizerData (p q : ℕ) [Fact p.Prime] (G : Type*) [Group G]
   sigma_P0_eq_W2 : (primeLine p q).map sigma = W2
   /-- `q` is prime (the standing hypothesis of Theorem C). -/
   q_prime : q.Prime
+  /-- `p` is odd.  By **Remark (V)** ("by (A), we can assume `p` and `q` are odd") this costs
+  nothing: `le_of_conditionA_of_not_odd` disposes of the even case outright. -/
+  p_odd : Odd p
   /-- Condition (A). -/
   cyclotomic_coprime : conditionA p q
 
@@ -186,6 +189,18 @@ theorem W2_normalizes_Q (data : FieldNormalizerData p q G) :
     data.W2 ≤ Subgroup.normalizer (data.Q : Set G) := by
   rw [← data.sigma_P0_eq_W2]
   exact data.primeLine_normalizes_Q
+
+/-- `2 ≠ 0` in `𝔽_p`, since `p` is odd. -/
+theorem zmod_two_ne_zero (data : FieldNormalizerData p q G) : (2 : ZMod p) ≠ 0 := by
+  intro hzero
+  haveI : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
+  have hdvd : (p : ℕ) ∣ 2 := by
+    have h : ((2 : ℕ) : ZMod p) = 0 := by exact_mod_cast hzero
+    exact (ZMod.natCast_eq_zero_iff 2 p).mp h
+  have hple : p ≤ 2 := Nat.le_of_dvd (by norm_num) hdvd
+  have h2 : p = 2 := le_antisymm hple (Fact.out : p.Prime).two_le
+  rcases data.p_odd with ⟨k, hk⟩
+  omega
 
 /-- **`|W₂| = p`**: the transported prime line has order `p`, because `W₂ = σ(P₀)`, `σ` is
 injective and `|P₀| = p` (`card_primeLine`).  The Section 16 development previously took this
@@ -224,7 +239,7 @@ end FieldNormalizerData
 subgroups to be the images themselves.  This is what makes `FieldNormalizerData` a pure
 repackaging rather than a strengthening. -/
 noncomputable def HypothesisBAbstract.toFieldNormalizerData (hb : HypothesisBAbstract p q G)
-    (hq : q.Prime) (hA : conditionA p q) : FieldNormalizerData p q G where
+    (hq : q.Prime) (hp_odd : Odd p) (hA : conditionA p q) : FieldNormalizerData p q G where
   toHypothesisBAbstract := hb
   P := (NormSet.normOneFrobeniusKernel p q).map hb.sigma
   U := (NormSet.normOneFrobeniusComplement p q).map hb.sigma
@@ -233,6 +248,7 @@ noncomputable def HypothesisBAbstract.toFieldNormalizerData (hb : HypothesisBAbs
   sigma_U_eq_U := rfl
   sigma_P0_eq_W2 := rfl
   q_prime := hq
+  p_odd := hp_odd
   cyclotomic_coprime := hA
 
 end Data

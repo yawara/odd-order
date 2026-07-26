@@ -611,6 +611,7 @@ theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
     sigma_P0_eq_W2 := hP0
     sigma_U_eq_U := hU
     q_prime := hyp.base.q_prime
+    p_odd := hyp.base.p_odd
     cyclotomic_coprime := hcyclotomic
     Q_finite := inferInstance
     Q_commutative := IsMulCommutative.of_comm hQ_elemAb.comm
