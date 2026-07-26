@@ -66,6 +66,11 @@ theorem primeLineElement_neg (p q : ℕ) [Fact p.Prime]
       (primeLineElement p q c)⁻¹ := by
   simp [primeLineElement]
 
+/-- The scalar `1` element is the distinguished prime-line generator. -/
+theorem primeLineElement_one (p q : ℕ) [Fact p.Prime] :
+    primeLineElement p q 1 = primeLineGenerator p q := by
+  simp [primeLineElement, primeLineGenerator]
+
 /-- The distinguished generator lies in the concrete prime-field line `P₀`. -/
 theorem primeLineGenerator_mem (p q : ℕ) [Fact p.Prime] :
     primeLineGenerator p q ∈ primeLine p q := by
@@ -103,6 +108,80 @@ theorem exists_normOneUnit_ne_one (p q : ℕ) [Fact p.Prime] (hq : 1 < q) :
   haveI : Nontrivial (NormSet.normOneUnits p q) :=
     Finite.one_lt_card_iff_nontrivial.mp (NormSet.normOneUnits_card_gt_one p q hq)
   exact exists_ne 1
+
+/-- The norm-one complement has order prime to `p`.  In BG Appendix C terms,
+`|U| = 1 + p + ... + p^{q-1}`, so the `U`-coordinate of any `p`-element in
+`P ⋊ U` must be trivial. -/
+theorem normOneUnits_card_coprime_p (p q : ℕ) [Fact p.Prime] (hq : q ≠ 0) :
+    Nat.Coprime p (Nat.card (NormSet.normOneUnits p q)) := by
+  have hp2 : 2 ≤ p := (Fact.out : Nat.Prime p).two_le
+  rw [NormSet.normOneUnits_card p q hq, ← Nat.geomSum_eq hp2 q]
+  have hsum :
+      (∑ k ∈ Finset.range q, p ^ k) =
+        (∑ k ∈ Finset.range (q - 1), p ^ (k + 1)) + 1 := by
+    rw [show q = (q - 1) + 1 by omega]
+    rw [Finset.sum_range_succ']
+    simp
+  rw [hsum, add_comm]
+  have hdiv : p ∣ ∑ k ∈ Finset.range (q - 1), p ^ (k + 1) :=
+    Finset.dvd_sum fun k _ => dvd_pow_self p (Nat.succ_ne_zero k)
+  rw [Nat.coprime_add_iff_left hdiv]
+  exact Nat.coprime_one_right p
+
+/-- Every element of the concrete additive kernel `P ≤ P ⋊ U` has `p`-th power `1`. -/
+theorem normOneFrobeniusKernel_pow_p_eq_one (p q : ℕ) [Fact p.Prime]
+    {x : NormSet.normOneFrobeniusGroup p q} (hx : x ∈ NormSet.normOneFrobeniusKernel p q) :
+    x ^ p = 1 := by
+  haveI : CharP (GaloisField p q) p := by
+    rw [← Algebra.charP_iff (ZMod p) (GaloisField p q) p]
+    exact ZMod.charP p
+  rcases hx with ⟨a, rfl⟩
+  let inlHom :
+      NormSet.additiveFieldGroup p q →* NormSet.normOneFrobeniusGroup p q :=
+    SemidirectProduct.inl
+  rw [← map_pow inlHom, ← map_one inlHom, SemidirectProduct.inl_inj]
+  rw [← ofAdd_toAdd a, ← ofAdd_nsmul]
+  congr
+  simp
+
+/-- In the concrete Frobenius group `P ⋊ U`, a `p`-element has trivial `U`-coordinate. -/
+theorem normOneFrobeniusGroup_right_eq_one_of_pow_p_eq_one (p q : ℕ) [Fact p.Prime]
+    (hq : q ≠ 0) (x : NormSet.normOneFrobeniusGroup p q) (hx : x ^ p = 1) :
+    (SemidirectProduct.rightHom x : NormSet.normOneUnits p q) = 1 := by
+  have hright_pow :
+      (SemidirectProduct.rightHom x : NormSet.normOneUnits p q) ^ p = 1 := by
+    have h := congrArg
+      (SemidirectProduct.rightHom :
+        NormSet.normOneFrobeniusGroup p q →* NormSet.normOneUnits p q) hx
+    rw [map_pow] at h
+    simpa using h
+  have horder_p :
+      orderOf (SemidirectProduct.rightHom x : NormSet.normOneUnits p q) ∣ p :=
+    orderOf_dvd_of_pow_eq_one hright_pow
+  have horder_card :
+      orderOf (SemidirectProduct.rightHom x : NormSet.normOneUnits p q) ∣
+        Nat.card (NormSet.normOneUnits p q) :=
+    orderOf_dvd_natCard (SemidirectProduct.rightHom x : NormSet.normOneUnits p q)
+  have horder_one :
+      orderOf (SemidirectProduct.rightHom x : NormSet.normOneUnits p q) = 1 :=
+    Nat.eq_one_of_dvd_coprimes (normOneUnits_card_coprime_p p q hq) horder_p horder_card
+  exact orderOf_eq_one_iff.mp horder_one
+
+/-- The concrete `p`-torsion in `P ⋊ U` is contained in the additive kernel `P`.
+This is the semidirect-product core of BG's assertion `P char PU`. -/
+theorem normOneFrobeniusGroup_mem_kernel_of_pow_p_eq_one (p q : ℕ) [Fact p.Prime]
+    (hq : q ≠ 0) (x : NormSet.normOneFrobeniusGroup p q) (hx : x ^ p = 1) :
+    x ∈ NormSet.normOneFrobeniusKernel p q := by
+  have hright := normOneFrobeniusGroup_right_eq_one_of_pow_p_eq_one p q hq x hx
+  have hright' : x.right = 1 := by
+    simpa [SemidirectProduct.rightHom_eq_right] using hright
+  refine ⟨x.left, ?_⟩
+  calc
+    SemidirectProduct.inl x.left =
+        (SemidirectProduct.inl x.left : NormSet.normOneFrobeniusGroup p q) * 1 := by simp
+    _ = (SemidirectProduct.inl x.left : NormSet.normOneFrobeniusGroup p q) *
+        SemidirectProduct.inr x.right := by rw [hright']; simp
+    _ = x := SemidirectProduct.inl_left_mul_inr_right x
 
 /-- The concrete `p`-power Frobenius on the additive kernel of BG's model
 `P ⋊ U`, written multiplicatively via `Multiplicative`. -/
