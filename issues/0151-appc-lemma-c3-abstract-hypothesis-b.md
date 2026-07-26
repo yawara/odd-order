@@ -215,3 +215,54 @@ predicates, (8.8) case-B, `q < p`, `p_odd`/`q_odd`, …) は**一切使われて
 chain 本体を `data : FieldNormalizerData hyp` から `data : HypothesisBAbstract p q G`
 (+ `hq : q.Prime` + `hA : conditionA p q`) へ機械置換する。上の置換表に従い、
 `HypothesisBAbstract.{P, U, W2}` を σ の像として def 化してから file 単位で移行する。
+
+## 🏗 step 2b の設計確定 (2026-07-26) — フィールド名を保存する再パラメータ化
+
+当初は「chain を `HypothesisBAbstract` のフィールド名へ書き換える」つもりだったが、それだと
+`data.W2_normalizes_Q` → `data.primeLine_normalizes_Q` のような**証明本体の全書き換え**が要る。
+代わりに **`FieldNormalizerData` 自体を `(p, q, G)` で index し直し、フィールド名を全部保存する**
+方が diff がはるかに小さい:
+
+```lean
+structure FieldNormalizerData (p q : ℕ) [Fact p.Prime] (G : Type*) [Group G]
+    extends OddOrder.BG.AppC.HypothesisBAbstract p q G where
+  P : Subgroup G
+  U : Subgroup G
+  W2 : Subgroup G
+  sigma_P_eq_P  : (NormSet.normOneFrobeniusKernel p q).map sigma = P
+  sigma_U_eq_U  : (NormSet.normOneFrobeniusComplement p q).map sigma = U
+  sigma_P0_eq_W2 : (primeLine p q).map sigma = W2
+  q_prime : q.Prime
+  cyclotomic_coprime : conditionA p q
+```
+
+* `extends` にすることで `data.sigma` / `data.Q` / `data.y` / `data.y_mem_Q` は**そのまま**動く。
+* 追加フィールド `P`/`U`/`W2` は像に名前を付けるだけの packaging で、
+  `HypothesisBAbstract → FieldNormalizerData` は **全域の構成** (P := 像、eq := `rfl`) ゆえ
+  隠れた強化が無いことが型で保証される。
+* `W2_normalizes_Q` / `W2_conj_y_normalizes_U` は `sigma_P0_eq_W2` / `sigma_U_eq_U` 経由で
+  `primeLine_normalizes_Q` / `primeLine_conj_normalizes_U` から**導出**する (フィールドでなく補題に)。
+
+### 残る置換 (証明本体はほぼ無傷)
+
+| 現 | 置換先 | 出現行数 |
+|---|---|---|
+| `{hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)` | `{p q : ℕ} [Fact p.Prime] (data : FieldNormalizerData p q G)` | 208 (宣言) |
+| `hyp.base.p` / `hyp.base.q` | `p` / `q` | — |
+| `hyp.base.P/U/W2/Q` | `data.P/U/W2/Q` | — |
+| `hyp.base.p_prime` / `hyp.base.q_prime` | `Fact.out` / `data.q_prime` | — |
+| `fieldNormalizerXxx hyp` | `xxx p q` (step 1 で上流化済) | — |
+
+`hyp.base.` を含む行数: CoreLemmas 313 / CoreBounds 222 / CoreSetup 148 /
+NonExistenceGCore 75 / AppendixC3 72 / CoreSetupBasic 62 = **計 892 行**。
+`FieldNormalizerData` 参照は 208 箇所。⟹ 当初見積の「3,900 行の書き換え」ではなく
+**~900 行の機械置換**。
+
+### chain の内部 import 順 (migration はこの順)
+
+`S16_CoreLemmas` → `S16_CoreBounds` → `S16_AppendixC3` → `S16_CoreSetupBasic` →
+`S16_CoreSetup` → `S16_NonExistenceGCore`
+
+⚠ 各 file は C.3 以外の §16 材料とも混在しているので、**file 丸ごと移動ではなく
+`FieldNormalizerData` を取る宣言だけを抜き出して BG 側へ移す**。移した分は S16 側から削除し、
+S16 spine は `toHypothesisBAbstract` (step 2a) 経由で繋ぎ直す。
