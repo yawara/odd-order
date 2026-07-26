@@ -1,82 +1,89 @@
 ---
 id: 153
 slug: pf-56-reducible-break
-title: "Pf (5.6) の break 元の既約性は repo 側の制限 — 書籍は可約 break を許す"
+title: "Pf (6.2)/(6.3) の h56 oracle を除去 — 書籍の仮説は (5.2.d)/(5.2.e)"
 created: 2026-07-27
 ---
 
-# Pf (5.6) の break 元の既約性は repo 側の制限 — 書籍は可約 break を許す
+# Pf (6.2)/(6.3) の h56 oracle を除去 — 書籍の仮説は (5.2.d)/(5.2.e)
 
-## 書籍 (p. 26, `references/peterfalvi/pages/peterfalvi-p026.png`)
+## ⚠ 当初の診断は誤りだった (2026-07-27 訂正)
 
-> **(5.6) Theorem.** Assume Hypothesis (5.2).  Let `𝒮₁ = {χ₁, …, χₙ}` be a subset of `𝒮`
-> closed under complex conjugation, where `|𝒮₁| = n`, and let `𝒮₂ = {χ, χ̄}` be a subset of
-> `𝒮` such that `𝒮₁ ∩ 𝒮₂ = ∅`.  Assume that
-> (a) `𝒮₁` is coherent,
-> (b) `χ₁(1)` divides `χ(1)`,
-> (c) `2χ(1)χ₁(1) < Σᵢ χᵢ(1)²/‖χᵢ‖²`.
-> Then `𝒮₁ ∪ 𝒮₂` is coherent.
+初版はこの issue を「`coherentDegreeSqNormBound_of_not_coherentW` が break を
+`χ : IrreducibleCharacter ↥L` で取るのが根本原因」と書いていた。**これは実測ミス**:
 
-**break 元 `χ` に既約性の要求は無い** — `χ ∈ 𝒮` だけ。仮説 (5.2) の `𝒮` の元は既約とは限らず、
-(c) の分母 `‖χᵢ‖²` はまさに可約な元を許すために置かれている。
+* 同ファイルに **`coherentDegreeSqNormBound_of_not_coherentW_k`** が既に在り、break を
+  `χ : ClassFunction ↥L ℂ` + `⟨χ,χ⟩ ≠ 0` で取る (= 可約 break 可)。
+  `S08_SixTwoGeneral` の producer 鎖はそちらを使っている。
+* `S07_RetargetScaled` の scaled Gram–Schmidt も既に消費済み。
 
-## repo の現状 (2026-07-27 実測)
+実際に残っていた oracle は **`hdatum` = Hypothesis (5.2.d)/(5.2.e) の image family データ**
+だった。
 
-`S08_CoherenceWeighted.coherentDegreeSqNormBound_of_not_coherentW` は break を
-**`χ : IrreducibleCharacter ↥L`** で取る。これが (6.2)/(6.3) の一般形が oracle を必要とする
-根本原因:
+## 書籍が実際に仮定していること
 
-* `S08_Theorem62_63_Standalone.six_two_general` / `six_three_of_six_two_oracle` は
-  **(5.6) break-member oracle `h56` を明示仮説**に取る (「`𝒮(A)` coherent かつ `𝒮(B)` not なら
-  `θ ∈ Irr K` で `B ⊆ Ker θ` かつ `|K:A| − 1 ≤ 2·(Ind_K^L θ)(1)` なるものが在る」)。
-* `S08_Theorem65c2` の module docstring が原因を明記している:
-  「The only genuinely new ingredient is **break-irreducibility**: the (5.6) brick demands the
-  break `ψ` be irreducible.」FT spine の 2 インスタンス (c1 Frobenius / c2 certain-type) では
-  可約な元 (certain-type column) が `𝒮(A)` の外に落ちるので既約性が回復するが
-  (`member_isIrreducible_of_W2_le`)、**一般の可解 `K` にはその構造が無い**。
+**(6.1) Hypothesis** (p. 30, `references/peterfalvi/pages/peterfalvi-p030.png`):
 
-⟹ survey が「§10–§12 の muGrid/columnSum と entangle する cross-lane oracle」と書いていたのは
-**repo 側の (5.6) が書籍より狭いことの帰結**であって、書籍側の困難ではない。
+> **Assume that Hypothesis (5.2) holds.**  We assume that `K` is a solvable normal subgroup of
+> `L` and that `𝒮 = {Ind_K^L θ | θ ∈ Irr K, θ ≠ 1_K}`.
 
-## 既に在る部品
+**(5.2)** (p. 25, `peterfalvi-p025.png`) のうち *データ*なのは 2 つだけ:
 
-`S07_RetargetScaled.lean` が**可約 break 用の scaled Gram–Schmidt**を持っている
-(module docstring: 「These feed the reducible-break (5.6) coherence bound needed by the
-case-(c2) (6.2)/(6.3) chain」):
+* **(5.2.d)** `χ ∈ 𝒮` に対し `(χ − χ̄)^τ = ∑_{α ∈ R(χ)} α` なる正規直交 `R(χ) ⊆ ℤ[Irr G]`
+* **(5.2.e)** `φ ⊥ {χ, χ̄}` なら `R(φ) ⊥ R(χ)`
 
-| 定理 | 内容 |
+⟹ `h56` (「`𝒮(A)` coherent かつ `𝒮(B)` not なら `|K:A| − 1 ≤ 2ψ(1)`」) は**書籍の仮説ではない**
+— (6.2) の結論から √ 算術を除いただけのもの。正しい仮説は (5.2.d)/(5.2.e)。
+
+## 完了分 (commit d22c3980c)
+
+新 leaf **`OddOrder/Peterfalvi/S08_SixTwoThreeFromImageFamilies.lean`**:
+
+| 宣言 | 内容 |
 |---|---|
-| `inner_block_expand_gen` | 可変ノルム `‖e‖² = ee` に対する block 内積展開 |
-| `orthoResidualMapS` / `retargetS` | `(⟨χ,χ⟩)⁻¹` 倍を担う scaled 残差・再標的化 |
-| `retargetS_inner_eq_on{,_zSpan_union}` | Gram 条件が `⟨X,X⟩ = ⟨χ,χ⟩` (≠ 1 を許す) の格子等長性 |
+| `InducedFamilyImageData` | `𝒮 = inducedKernelFamily K ⊥` に対する (5.2.d)/(5.2.e) |
+| `InducedFamilyImageData.datum` | → h56 producer の `hdatum` 節 (break・member とも可約可) |
+| `exists_source_index_le_two_psi_of_imageData` | `h56` が**定理**に |
+| `six_two_of_imageData` / `six_three_of_imageData` | 書籍の (6.2)/(6.3)、oracle 無し |
+| `commutator_quotient_ne_top_of_lt` | `K` 可解 + `X < K` ⟹ anchor と `S(X) ≠ ∅` |
 
-整数性の議論も書かれている: `χ ⊥ 𝒮₁`, `χ ⊥ χ̄` の下で `⟨φ, χ⟩ = m‖χ‖²` なので
-`⟨φ,χ⟩/‖χ‖² = m ∈ ℤ`。
+AxiomsCheck 5 件登録 (allowlist 3 公理のみ)、フルビルド green、`--strict` 警告ゼロ。
 
-## やること
+## 残件 1 — `InducedFamilyImageData` の構成可能性を**実際に構成して**示す
 
-1. `coherentDegreeSqNormBound_of_not_coherentW` の `χ : IrreducibleCharacter ↥L` を
-   「`χ ∈ 𝒮`、`⟨χ,χ⟩` は 1 とは限らない」形に緩める。既約性を使っている箇所を全数 grep し、
-   `retargetS` 系で置換できるか / 別の入力が要るかを判定する。
-   ⚠ `hχχ : ⟨χ,χ⟩ = 1` / `hχbarχbar` / `hχχbar = 0` の Gram 仮説がどこで効いているかが鍵。
-2. 緩めた版で `h56` を証明する: 「`𝒮(A)` coherent, `𝒮(B)` not」から maximal coherent
-   conjugation-closed `𝒮₁` (`𝒮(A) ⊆ 𝒮₁ ⊆ 𝒮(B)`) と隣接不能な共役対 `{ψ, ψ̄}` を取り出し
-   (有限性による極大元の存在)、(5.6) の対偶で degree 不等式を得る。書籍 (6.2) の証明冒頭そのまま。
-3. `six_two_general` / `six_three_of_six_two_oracle` から `h56` 仮説を除去し、
-   `six_two` / `six_three` を無条件の書籍形にする。
+doneness は「仮説が構成可能か」で測る ([[scaffold-sorry-free-not-done]]) ので、FT の実文脈で
+インスタンスを組むまでが本件の完了。書籍 (5.3.b) は Hypothesis (4.6) の下でこれを discharge する
+(可約な元は certain-type column `μ_j`、`R(μ_j) = {δ_j ω_{ij}^σ, −δ_j ω_{ik}^σ}` は Thm (4.9))。
+repo 側の部品も揃っている:
 
-## 完了条件
+* 既約 member/break → `S07.dadeOrthonormalCharacterImageFamilyOfDiff`
+* 可約 (column) → `S06.certainTypeR` (§6 版) / `S12.Hypothesis.columnImageFamilyCohFree` (§10 版)
+* 分岐 + 直交性の実例 = `S11.sOf_memberRFamily` / `sOf_memberRFamily_orthogonal` (§9 の族)、
+  `S12.Hypothesis.sixTwoDecompositionData` (§11/§13、~470 行がインライン)
 
-`six_three` が Hypothesis (6.1) だけから (oracle 無しで) sorry-free に出る。AxiomsCheck 登録。
-フルビルド green + `--strict` 警告ゼロ + sorry 非退行。
+やること: `S12.Hypothesis.inducedFamilyImageData : S08.InducedFamilyImageData …` を組む。
+鍵は「可約 member の column 添字 `k` を χ から**正準に**取る」こと
+(`reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` は存在しか言わないので、
+`columnSum` の単射性を経由して canonical にする)。組めたら §13 の consumer を
+`six_three_of_imageData` に付け替えて `sixTwoDecompositionData*` のインライン展開を畳める。
+
+## 残件 2 — 抽象 τ への一般化 (特殊化債務)
+
+書籍 (5.2.b) は「`τ` は `ℤ[𝒮, L^#] → ℤ[Irr G, G^#]` の線形等長」だが、本 leaf の `τ` は FT の
+Dade 写像 (`dadeIntegralCharacterMap`)、supported set も `supportInSubgroup A L` 固定。
+adjoin engine は既に τ 一般 (`S07.adjoinPairCoherent_general`, `S08_GeneralAdjoin`) なので、
+残るのは **norm-weighted engine (`coherentDegreeSqNormBound_of_not_coherentW_k` /
+`xAdjoinStepW_k`) の τ 一般化**。`S08_GeneralAdjoin` の docstring いわく Dade 構造を真に使う
+helper は 4 つだけ。
 
 ## 参照
 
-* 書籍: Pf (5.6) p.26 / (6.1)–(6.3) pp.30–31
-  (画像: `references/peterfalvi/pages/peterfalvi-p026.png` ほか。§6 は未レンダリング)
-* `OddOrder/Peterfalvi/S08_CoherenceWeighted.lean` (`coherentDegreeSqNormBound_of_not_coherentW`)
-* `OddOrder/Peterfalvi/S07_RetargetScaled.lean` (可約 break 用 scaled 再標的化)
-* `OddOrder/Peterfalvi/S08_Theorem62_63_Standalone.lean`
-  (`six_two_general`, `six_three_of_six_two_oracle`)
-* `OddOrder/Peterfalvi/S08_Theorem65c2.lean` (既約性回復の構造的理由)
-* 旧分析: closed issue 2022 (「一般の可解 K で induced member が可約」)
+* 書籍: Pf (5.1)–(5.3) p.25 / (6.1)–(6.3) pp.30–31
+  (画像: `references/peterfalvi/pages/peterfalvi-p025.png`, `-p030.png` 〜 `-p037.png`。
+  §6 の 8 ページは本 issue の作業で新規レンダリング)
+* `OddOrder/Peterfalvi/S08_SixTwoThreeFromImageFamilies.lean` (本件の成果)
+* `OddOrder/Peterfalvi/S08_SixTwoGeneral.lean` (`exists_source_index_le_two_psi_of_break`)
+* `OddOrder/Peterfalvi/S08_Theorem62_63_Standalone.lean` (旧 oracle 形、consumer 用に残す)
+* `OddOrder/Peterfalvi/S13_SixTwoBridge.lean` (§11/§13 の `hdatum` 実 discharge)
+* `OddOrder/Peterfalvi/S06_CertainTypeCoherence.lean` (`certainTypeR` — (5.3.b)/(4.9) の可約 `R`)
+* 旧分析: closed issue 2022

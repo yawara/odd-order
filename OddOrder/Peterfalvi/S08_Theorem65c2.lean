@@ -25,10 +25,16 @@ The c2 chain mirrors c1 with a three-brick swap (Frobenius → `h46`):
 (6.2)
   bound, `S08_Theorem63`).
 
-The only genuinely new ingredient is **break-irreducibility**: the (5.6) brick demands the break `ψ`
-be irreducible.  The reducible members of `S` are exactly the `w₂ − 1` certain-type columns, all of
-which lie *outside* `S(A)` once `W₂ ≤ A` (`columnSum_notMem_SsubFiltration_of_le`); so on any such
-`S(A)` every member is irreducible.  `member_isIrreducible_of_W2_le` packages this.
+The only genuinely new ingredient is **break-irreducibility**: the (5.6) brick used *here*
+(`sSubFiltration_sum_le_two_psi_caseB`) demands the break `ψ` be irreducible.  The reducible members
+of `S` are exactly the `w₂ − 1` certain-type columns, all of which lie *outside* `S(A)` once
+`W₂ ≤ A` (`columnSum_notMem_SsubFiltration_of_le`); so on any such `S(A)` every member is
+irreducible.  `member_isIrreducible_of_W2_le` packages this.
+
+⚠ This is a property of *this* chain, not a limitation of (5.6) in the repo: the norm-weighted
+engine has a reducible-break form (`coherentDegreeSqNormBound_of_not_coherentW_k`,
+`S08_CoherenceWeighted`), which is what the general (6.1) chain of `S08_SixTwoGeneral` /
+`S08_SixTwoThreeFromImageFamilies` runs on.
 
 Reference note: `notes/peterfalvi/s08_6_8_resume_roadmap.md` (cont.¹⁷).
 -/

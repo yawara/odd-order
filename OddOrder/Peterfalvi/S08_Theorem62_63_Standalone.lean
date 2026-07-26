@@ -20,15 +20,18 @@ nilpotent middle group `H = HC`.  Concretely (6.3) is applied there with
 `(L, K, M, H, H₁) = (M, M', 1, HC, H₀C)` and (6.2) with `(A, B, C, D) = (H₁, H₀C, HC, HC)`, so
 `K ≠ H`; the Sibley `six_two`/`six_three` (with `K = H` and `H` nilpotent + Frobenius) do not apply.
 
-This leaf supplies the **assembly that separates `K` (solvable) from `H` (nilpotent)**.  The deep
-character-theoretic core of (6.2) — Peterfalvi's (5.6) quantitative coherence bound for the
-(possibly *reducible*) induced members `Ind_K^L θ` of a general solvable `K` — is the one genuinely
-missing ingredient; in the Sibley case `hF : IsFrobeniusGroup L H W₁` makes every member
-irreducible and discharges it (`sMember_index_le_two_psi`).  Here that core is exposed as the
-explicit **(6.2) index oracle** hypothesis `h62`, and everything *else* in (6.3) — the minimal-`A`
-descent, the maximal-`B` step, nilpotency forcing centrality, and the `√`-arithmetic — is proved
-in full,
+This leaf supplies the **assembly that separates `K` (solvable) from `H` (nilpotent)**, with the
+(6.2) index bound exposed as an explicit hypothesis (`h62` / `h56`) so that consumers can plug in
+whatever discharge their context affords; everything *else* in (6.3) — the minimal-`A` descent, the
+maximal-`B` step, nilpotency forcing centrality, and the `√`-arithmetic — is proved in full,
 reusing the general lattice/arithmetic lemmas of `S08_CoherenceCorePart1`.
+
+⚠ **`h56` is not a hypothesis of the book** (issue 0153): Hypothesis (6.1) opens with "*Assume
+that Hypothesis (5.2) holds*", so what (6.2)/(6.3) really assume are (5.2.d) (a difference-image
+family `R(χ)` per member) and (5.2.e) (`φ ⊥ {χ, χ̄} ⟹ R(φ) ⊥ R(χ)`), from which the break bound
+is *proved*.  That oracle-free book form is
+`S08_SixTwoThreeFromImageFamilies.six_two_of_imageData` / `six_three_of_imageData`; the
+hypothesis-shaped theorems here remain as the plumbing layer they factor through.
 
 ## Contents
 
@@ -40,9 +43,10 @@ reusing the general lattice/arithmetic lemmas of `S08_CoherenceCorePart1`.
   §11/§13 consumer `S13.coherent_S_of_coherent_SH0C` cites.
 
 The (6.2) oracle `h62` packages the Sibley-side chain `six_two_central → six_three_HH1_le`
-(`S08_CoherenceCorePart2`/`S08_CoherenceCorePart1`) in its general form; its character-theoretic
-discharge for reducible induced members of a solvable `K` is the remaining §6 work (entangled with
-the §10–§12 `muGrid` machinery).  See `notes/peterfalvi/s06_standalone_62_63_producer.md`.
+(`S08_CoherenceCorePart2`/`S08_CoherenceCorePart1`) in its general form.  Its discharges: from
+Hypothesis (5.2) data in general (`S08_SixTwoThreeFromImageFamilies`), and in the concrete §11/§13
+context from the `muGrid` columns (`S12.Hypothesis.exists_source_of_coherence_dichotomy`,
+`S13_SixTwoBridge`).  See `notes/peterfalvi/s06_standalone_62_63_producer.md`.
 -/
 
 namespace OddOrder.Peterfalvi.S07
@@ -333,9 +337,10 @@ theorem inducedMember_re_le_general
 omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **Peterfalvi (6.2), general Hypothesis (6.1) form** (`K` solvable, section `B ⊆ D ⊆ C ⊆ K`).
 
-Given the **(5.6) norm-weighted coherence bound** `h56` — the genuinely character-theoretic core,
-which for a general solvable `K` with possibly-*reducible* induced members `Ind_K^L θ` bottoms out
-in the §10–§12 `muGrid`/`columnSum` machinery (the cross-lane oracle, see issue 2022) — this
+Given the **(5.6) norm-weighted coherence bound** `h56` — proved from Hypothesis (5.2)'s image
+families by `S08.exists_source_index_le_two_psi_of_imageData`
+(`S08_SixTwoThreeFromImageFamilies`, issue 0153), and in the concrete §11/§13 context from the
+`muGrid`/`columnSum` columns (`S12.Hypothesis.exists_source_of_coherence_dichotomy`) — this
 produces the (6.2) real-inequality `|K:A| − 1 ≤ 2|L:C|·√|C:D|`.  The §11/§13 consumer instantiates
 it two ways: `(C, D) = (H, A)` feeds `six_three_index_bound_general` (hence (6.3) /
 `S13.coherent_S_of_coherent_SH0C`, Peterfalvi (11.3)); `(C, D) = (HC, HC)` (`√1 = 1`) gives
@@ -375,11 +380,13 @@ six_two_general`: with `K` solvable normal, `H ≤ K` nilpotent (`K ≠ H` allow
 
 `h56` is the only remaining hypothesis with genuine character-theoretic content: for each section
 `B ≤ A ≤ H₁` with `A ⧸ B` central in `H ⧸ B`, `S(A)` coherent and `S(B)` not, it asks for a break
-member `ψ = Ind_K^L θ` (`θ ∈ Irr K` trivial on `B`) with `|K:A| − 1 ≤ 2ψ(1)`.  For a general
-solvable `K` this is the §10–§12 `muGrid`/`columnSum` bound (cross-lane, issue 2022).  Everything
-else — minimal-`A`/maximal-`B` descent, nilpotency-forces-centrality, the θ-degree bound, and the
-`√`-arithmetic — is discharged here.  This is the theorem `S13.coherent_S_of_coherent_SH0C`
-(Peterfalvi (11.3)) cites, applied with `(L,K,M,H,H₁) = (M, M', 1, HC, H₀C)`. -/
+member `ψ = Ind_K^L θ` (`θ ∈ Irr K` trivial on `B`) with `|K:A| − 1 ≤ 2ψ(1)`.  It is *proved* from
+Hypothesis (5.2)'s image families in `S08_SixTwoThreeFromImageFamilies` (giving the oracle-free
+`six_three_of_imageData`), and in the §11/§13 context from the `muGrid` columns
+(`S12.Hypothesis.exists_source_of_coherence_dichotomy`).  Everything else — minimal-`A`/maximal-`B`
+descent, nilpotency-forces-centrality, the θ-degree bound, and the `√`-arithmetic — is discharged
+here.  This is the theorem `S13.coherent_S_of_coherent_SH0C` (Peterfalvi (11.3)) cites, applied
+with `(L,K,M,H,H₁) = (M, M', 1, HC, H₀C)`. -/
 theorem six_three_of_six_two_oracle
     {K H M H₁ : Subgroup ↥L} [Group.IsNilpotent ↥H] [IsSolvable ↥K]
     [Invertible (Nat.card ↥K : ℂ)]
