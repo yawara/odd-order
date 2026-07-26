@@ -490,3 +490,35 @@ commit `6518e7859` は **「C.3 chain を §16 の設定から切り離し抽象
 
 これが済んで初めて `appC_normSet_generator_relation` が `S16.Hypothesis` 抜きで述べられ、
 `hypothesisBAbstract_sl2` (Remark (II)) から `theoremC_abstract` を回せるようになる。
+
+## 📏 step 2c の正確な規模 (2026-07-26) — 宣言単位で測り直した
+
+これまでの census は **file 単位**だったので、同じ file に同居する §16 の材料
+(`q_lt_p` / `five_le_p` / `q_not_modEq_one_mod_p` / `m` 系 / 奇性の大半) を C.3 chain の依存として
+数えてしまっていた。**`data : FieldNormalizerData` を束縛する宣言だけ**に絞って測り直すと:
+
+| `hyp` の使用 | 件数 |
+|---|---|
+| `hyp.base.p` / `hyp.base.q` | 341 / 79 |
+| `hyp.base.p_prime` / `hyp.base.q_prime` | 42 / 8 |
+| **`hyp.base.p_odd`** | **1** |
+| **`hyp.zmod_two_ne_zero`** | **1** |
+
+`data` を束縛する宣言は **192 件** (203 は `data` 無しの §16 helper を含む数)。
+
+⟹ **step 2c の残り依存は実質 2 箇所だけ**。`q_lt_p` / `five_le_p` / `m` 系 / `three_le_q` /
+`p_ne_two` は**すべて C.3 chain の外** (`S16_CoreLemmas` の 75-146 行など、
+`FieldNormalizerData` 定義より前の §16 材料)。
+
+### step 2c 実行手順 (これで全部)
+
+1. `{hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)` →
+   `{p q : ℕ} [Fact p.Prime] (data : BG.AppC.FieldNormalizerData p q G)` (192 宣言)。
+2. `hyp.base.p` → `p`、`hyp.base.q` → `q` (420 箇所)。
+3. `hyp.base.p_prime` → `(Fact.out : Nat.Prime p)`、`hyp.base.q_prime` → `data.q_prime`。
+4. **残り 2 箇所**: `hyp.base.p_odd` と `hyp.zmod_two_ne_zero` を
+   `FieldNormalizerData` のフィールド (`p_odd : Odd p`) にするか、Remark (V) の還元で消す。
+   書籍 Theorem C も Remark (V) で「(A) の下で p, q は奇と仮定してよい」としているので
+   フィールド化しても faithful。
+5. `fnKernel`/`fnComplement`/`fnPrimeLine` は `hyp` を取るので `(p, q)` 版に置換。
+6. S16 側は `FieldNormalizerData hyp` (pin 付き) を構成し、chain へは親を渡すだけになる。
