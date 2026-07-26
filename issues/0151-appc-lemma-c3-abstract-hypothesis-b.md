@@ -125,3 +125,27 @@ predicates, (8.8) case-B, `q < p`, `p_odd`/`q_odd`, …) は**一切使われて
 
 ⚠ 規模: ~3,900 行の機械置換 + adapter。**multi-session だがコストは着手判断基準でない**
 ([[feedback-cost-scope-not-a-criterion]])。分割 commit で進める。
+
+### 配置 (import DAG) の実測 — step 1 の置き場所は確定
+
+* C.3 chain の入口 `S16_CoreLemmas` の BG 側 import は **`OddOrder.BG.AppC_NormSet` だけ**。
+* chain が使う `fieldNormalizer*` は全部そこから作れる:
+  - `fieldNormalizerPrimeLine hyp` = `normOneFrobeniusSubspaceKernel p q (span (ZMod p) {1})`
+    = 今日新設した `AppC.primeLine p q` と**同一式**。
+  - `fieldNormalizerKernel` / `fieldNormalizerComplement` = `inl.range` / `inr.range` を**直書き**
+    (`AppC_NormOneInduce` の `normOneFrobeniusKernel`/`normOneFrobeniusComplement` と同一式の重複)。
+* ⟹ slim record は **`OddOrder.BG.AppC_NormSet` だけを import する新 leaf**
+  (`OddOrder/BG/AppC_HypothesisB.lean`) に置ける。`HypothesisBAbstract` と `primeLine` は
+  現在 `AppC_FinalContradiction.lean` (= chain の**下流**) に在るので、そこへ**移設**する。
+* 同時に `normOneFrobeniusKernel` / `normOneFrobeniusComplement` を
+  `AppC_NormOneInduce` (Peterfalvi S08 を import する下流 leaf) から
+  `AppC_NormSetBasic` へ**上流移動**し、`fieldNormalizerKernel`/`fieldNormalizerComplement` の
+  直書き重複を解消する (3 行 def、依存追加なし)。
+
+### step 1 の作業単位 (次 iteration)
+
+1. `normOneFrobeniusKernel` / `normOneFrobeniusComplement` を `AppC_NormSetBasic` へ移動。
+2. 新 leaf `AppC_HypothesisB.lean` を作り、`primeLine` + `HypothesisBAbstract` を移設
+   (`AppC_FinalContradiction` / `AppC_SL2Example` は import 追加のみ)。`OddOrder.lean` へ配線。
+3. `fieldNormalizerKernel`/`fieldNormalizerComplement`/`fieldNormalizerPrimeLine` を
+   移動先の名前へ差し替え (statement 不変)。
