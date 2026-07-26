@@ -73,21 +73,22 @@ doneness は「仮説が構成可能か」で測る ([[scaffold-sorry-free-not-d
 
 AxiomsCheck 8 件登録、フルビルド green (4801 jobs)、`--strict` 警告ゼロ。
 
-## 残件 1 (任意) — §13 consumer の付け替え
+## 完了分 3 — (11.3) consumer の付け替え (commit e5a1acc29)
 
-`S13_Lemmas113To115.lean:87` は今も `six_three_of_six_two_oracle` + §11 dichotomy 経由。
-`sixThree_of_hypothesis` に付け替えると `chief : ChiefFactorData` / `htype : IsTypeIII ∨ IsTypeIV`
-/ `hnt` が不要になり `coherent_S_of_coherent_SH0C` の仮説が**弱くなる**。既存経路も sorry-free
-なので急務ではないが、`sixTwoDecompositionData*` (~470 行のインライン) を畳める。
+`S13_Lemmas113To115.coherent_S_of_coherent_SH0C` (Peterfalvi (11.3)) の (6.3) cite を
+`sixThree_of_hypothesis` に変更。`h56` 分岐 (~40 行) と `ChiefFactorData` /
+`TypePNontrivialCore` の供給が丸ごと不要に。新 API が実 call site で使えることの検証も兼ねる。
 
-## 残件 2 — 抽象 τ への一般化 (特殊化債務)
+## 完了条件 — 全て満たした (close)
 
-書籍 (5.2.b) は「`τ` は `ℤ[𝒮, L^#] → ℤ[Irr G, G^#]` の線形等長」だが、本 leaf の `τ` は FT の
-Dade 写像 (`dadeIntegralCharacterMap`)、supported set も `supportInSubgroup A L` 固定。
-adjoin engine は既に τ 一般 (`S07.adjoinPairCoherent_general`, `S08_GeneralAdjoin`) なので、
-残るのは **norm-weighted engine (`coherentDegreeSqNormBound_of_not_coherentW_k` /
-`xAdjoinStepW_k`) の τ 一般化**。`S08_GeneralAdjoin` の docstring いわく Dade 構造を真に使う
-helper は 4 つだけ。
+* `six_three` が Hypothesis (6.1) (= (5.2.d)/(5.2.e) + `K` 可解正規) だけから oracle 無しで
+  sorry-free に出る → `six_three_of_imageData`
+* その仮説が FT 文脈で**実際に構成できる** → `S12.Hypothesis.inducedFamilyImageData`
+* AxiomsCheck 13 件登録 (全て allowlist 3 公理のみ)
+* フルビルド green (4801 jobs)、`--strict` 警告ゼロ、sorry 非退行
+
+**繰越 = [issue 0154](0154-pf-weighted-adjoin-abstract-tau.md)**: norm-weighted engine の
+抽象 τ 一般化 (書籍 (5.2.b) に対する特殊化債務) と、(11.4) consumer の付け替え (任意)。
 
 ## 参照
 
