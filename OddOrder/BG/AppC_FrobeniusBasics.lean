@@ -97,4 +97,67 @@ theorem primeLineGenerator_pow_p (p q : ℕ) [Fact p.Prime] :
   congr
   simp
 
+/-- There is a nonidentity norm-one unit, provided `q > 1`. -/
+theorem exists_normOneUnit_ne_one (p q : ℕ) [Fact p.Prime] (hq : 1 < q) :
+    ∃ u : NormSet.normOneUnits p q, u ≠ 1 := by
+  haveI : Nontrivial (NormSet.normOneUnits p q) :=
+    Finite.one_lt_card_iff_nontrivial.mp (NormSet.normOneUnits_card_gt_one p q hq)
+  exact exists_ne 1
+
+/-- The concrete `p`-power Frobenius on the additive kernel of BG's model
+`P ⋊ U`, written multiplicatively via `Multiplicative`. -/
+noncomputable def additiveFrobeniusHom (p q : ℕ) [Fact p.Prime] :
+    NormSet.additiveFieldGroup p q →* NormSet.additiveFieldGroup p q where
+  toFun x := Multiplicative.ofAdd (x.toAdd ^ p)
+  map_one' := by
+    apply Multiplicative.toAdd.injective
+    simp [(Fact.out : Nat.Prime p).ne_zero]
+  map_mul' x y := by
+    apply Multiplicative.toAdd.injective
+    exact (OddOrder.BG.AppC.NormSet.add_pow_p
+      p q x.toAdd y.toAdd).symm
+
+/-- The concrete `p`-power Frobenius on the norm-one complement. -/
+noncomputable def normOneUnitsFrobeniusHom (p q : ℕ) [Fact p.Prime] :
+    NormSet.normOneUnits p q →* NormSet.normOneUnits p q where
+  toFun u := u ^ p
+  map_one' := by simp
+  map_mul' u v := by
+    rw [mul_pow]
+
+/-- The concrete `p`-power Frobenius of BG's semidirect product
+`P ⋊ U`: it sends `(x,u)` to `(x^p,u^p)`. -/
+noncomputable def frobeniusHom (p q : ℕ) [Fact p.Prime] :
+    NormSet.normOneFrobeniusGroup p q →* NormSet.normOneFrobeniusGroup p q :=
+  SemidirectProduct.map
+    (additiveFrobeniusHom p q)
+    (normOneUnitsFrobeniusHom p q)
+    (by
+      intro u
+      ext x
+      apply Multiplicative.toAdd.injective
+      change (((u : (GaloisField p q)ˣ) :
+              GaloisField p q) * x) ^ p =
+            (((u ^ p : NormSet.normOneUnits p q) :
+                  (GaloisField p q)ˣ) :
+                GaloisField p q) * x ^ p
+      simpa [map_pow] using
+        (mul_pow (((u : (GaloisField p q)ˣ) :
+          GaloisField p q)) x p))
+
+@[simp]
+theorem frobeniusHom_inl (p q : ℕ) [Fact p.Prime]
+    (x : NormSet.additiveFieldGroup p q) :
+    frobeniusHom p q (SemidirectProduct.inl x) =
+      SemidirectProduct.inl (Multiplicative.ofAdd (x.toAdd ^ p)) := by
+  simp [frobeniusHom, additiveFrobeniusHom]
+
+@[simp]
+theorem frobeniusHom_inr (p q : ℕ) [Fact p.Prime]
+    (u : NormSet.normOneUnits p q) :
+    frobeniusHom p q
+        (SemidirectProduct.inr u : NormSet.normOneFrobeniusGroup p q) =
+      SemidirectProduct.inr (u ^ p) := by
+  simp [frobeniusHom, normOneUnitsFrobeniusHom]
+
 end OddOrder.BG.AppC
