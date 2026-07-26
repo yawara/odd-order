@@ -513,6 +513,60 @@ theorem tausskyTodd_card_eight {P : Type*} [Group P] [Finite P]
   rw [hbot, Subgroup.index_bot, hcard] at hidx
   omega
 
+/-- 全元が `g² = 1` をみたす群は可換。 -/
+theorem mul_comm_of_forall_sq_eq_one {G : Type*} [Group G] (h : ∀ g : G, g ^ 2 = 1) (x y : G) :
+    x * y = y * x := by
+  have hinv : ∀ w : G, w⁻¹ = w := fun w => by
+    have hw := h w
+    rw [pow_two] at hw
+    exact inv_eq_of_mul_eq_one_right hw
+  calc x * y = (x * y)⁻¹ := (hinv _).symm
+    _ = y⁻¹ * x⁻¹ := mul_inv_rev x y
+    _ = y * x := by rw [hinv, hinv]
+
+/-- **帰納法の base case (指数 2 の巡回部分群版)**: 非可換な位数 `8` の群は位数 `4` の元を
+持ち, その生成する巡回部分群は指数 `2`。
+
+全元が `g² = 1` なら可換, 位数 `8` の元があれば巡回でやはり可換。 -/
+theorem exists_index_two_zpowers_of_card_eight {P : Type*} [Group P] [Finite P]
+    (hcard : Nat.card P = 8) (hnonab : ∃ x y : P, x * y ≠ y * x) :
+    ∃ c : P, (Subgroup.zpowers c).index = 2 := by
+  classical
+  obtain ⟨u, v, huv⟩ := hnonab
+  obtain ⟨x, hx⟩ : ∃ x : P, orderOf x = 4 := by
+    by_contra hcon
+    have hsq : ∀ w : P, w ^ 2 = 1 := by
+      intro w
+      have hdvd : orderOf w ∣ 8 := hcard ▸ orderOf_dvd_natCard w
+      have hne4 : orderOf w ≠ 4 := fun hh => hcon ⟨w, hh⟩
+      have hne8 : orderOf w ≠ 8 := by
+        intro h8
+        haveI : IsCyclic P := isCyclic_of_orderOf_eq_card w (by rw [h8, hcard])
+        obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := P)
+        obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg u)
+        obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg v)
+        exact huv (by rw [← zpow_add, ← zpow_add, add_comm])
+      obtain ⟨i, hi, hgi⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp
+        ((show (2 : ℕ) ^ 3 = 8 by norm_num) ▸ hdvd)
+      have hi2 : i ≠ 2 := by
+        intro h2
+        rw [h2] at hgi
+        norm_num at hgi
+        exact hne4 hgi
+      have hi3 : i ≠ 3 := by
+        intro h3
+        rw [h3] at hgi
+        norm_num at hgi
+        exact hne8 hgi
+      refine orderOf_dvd_iff_pow_eq_one.mp ?_
+      rw [hgi]
+      simpa using pow_dvd_pow 2 (show i ≤ 1 by omega)
+    exact absurd (mul_comm_of_forall_sq_eq_one hsq u v) huv
+  refine ⟨x, ?_⟩
+  have hmul := Subgroup.card_mul_index (Subgroup.zpowers x)
+  rw [Nat.card_zpowers, hx, hcard] at hmul
+  omega
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
