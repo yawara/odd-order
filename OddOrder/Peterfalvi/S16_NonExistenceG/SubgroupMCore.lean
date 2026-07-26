@@ -254,9 +254,7 @@ noncomputable def toFamilyHypothesis71 [Finite G] {hyp : Hypothesis (G := G)}
     { hyp := Mdata.typeIHyp.dadeData.dade
       τ := (Mdata.typeIHyp.dadeData.dade.fullDadeIsometryData).toDadeMap
       isDadeMap :=
-        (Mdata.typeIHyp.dadeData.dade.fullDadeIsometryData
-).toDadeIsometryData.isDadeMap
-      hConjInvariant := Mdata.typeIHyp.hconj }
+        Mdata.typeIHyp.dadeData.dade.fullDadeIsometryData.toDadeIsometryData.isDadeMap }
   isDadeIsometry := fun _ =>
     (Mdata.typeIHyp.dadeData.dade.fullDadeIsometryData
 ).toDadeIsometryData.isDadeIsometry

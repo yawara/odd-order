@@ -974,9 +974,6 @@ structure DadeSupportHypothesisData [Fintype G] (M : Subgroup G) (A : Set G) whe
   faithful `R(a)` from (8.14). -/
   H_eq_ftSupportKernel :
     ∀ a : {a : G // a ∈ A}, dade.H a = ftSupportKernel M A a.1
-  /-- Peterfalvi (8.14)/(8.15): the kernels are `M`-conjugation invariant (`R(x^m) = R(x)^m`,
-  by the uniqueness of the supporting maximal `N[x^m] = N[x]^m`, BG Theorem D). -/
-  hconj : dade.HConjInvariant
 
 /-- **The (8.14) faithful kernel only sees the point, not the ambient support**: for `x` in a
 subset `A₁ ⊆ A`, `R(x)` is computed the same way from either.
@@ -1019,7 +1016,6 @@ noncomputable def restrict [Fintype G] {M : Subgroup G} {A A₁ : Set G}
   H_eq_ftSupportKernel := fun a => by
     rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H, d.H_eq_ftSupportKernel,
       ftSupportKernel_congr_of_subset hA₁A a.2]
-  hconj := OddOrder.Peterfalvi.S04.Hypothesis.hConjInvariant _
 
 /-- The restricted datum's Dade hypothesis is the restriction — the pin `hdd` that the §9 (9.11)
 chain asks for, definitionally. -/

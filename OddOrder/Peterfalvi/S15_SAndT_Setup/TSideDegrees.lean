@@ -1188,13 +1188,6 @@ noncomputable def Hypothesis.dadeHypT [Fintype G] [Finite G]
     OddOrder.Peterfalvi.S04.Hypothesis G (S10.typePACore hyp.T) hyp.T :=
   (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePACore hG hyp.T_maximal hTP).some.dade
 
-/-- **(13.2.e) `T`-instance Dade `H`-conjugation invariance** (mirror of `dadeHypS_hconj`). -/
-theorem Hypothesis.dadeHypT_hconj [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) :
-    (hyp.dadeHypT hG hTP).HConjInvariant :=
-  (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePACore hG hyp.T_maximal hTP).some.hconj
-
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in

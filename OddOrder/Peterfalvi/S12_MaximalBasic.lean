@@ -1127,8 +1127,8 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
     exact inner_tau_supported_constOne
       ({ hyp := hyp.dadeData.dade
          τ := hyp.dadeData.dade.dadeMap (k := ℂ)
-         isDadeMap := hyp.dadeData.dade.isDadeMap_dadeMap
-         hConjInvariant := hyp.hconj } : Hypothesis71 G (typePA0 M hyp.typeP) M)
+         isDadeMap := hyp.dadeData.dade.isDadeMap_dadeMap }
+        : Hypothesis71 G (typePA0 M hyp.typeP) M)
       ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
   have hζ0'mem : ClassFunction.induce K (θ0' : ClassFunction ↥K ℂ) ∈ hyp.Sset :=
     ⟨θ0', hθ0'_ne, rfl⟩

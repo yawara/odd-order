@@ -213,23 +213,13 @@ theorem typeII_centralizer_le_of_mem_centralizerSupport [Finite G]
   rw [hcy]; exact hy
 
 open scoped Classical FiniteInduce in
-/-- The (8.16) Dade hypothesis has every signalizer `H(a) = ⊥` (by construction,
-`of_isTISubset`), so the kernel assignment is trivially `S`-conjugation invariant — the
-`hconj` input of the §4 full Dade isometry (2.6). -/
-theorem typeIIDadeHypothesis_hConjInvariant [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
-    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) :
-    (typeIIDadeHypothesis hG hSmax hSII).HConjInvariant :=
-  OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
-
-open scoped Classical FiniteInduce in
 /-- **The (10.7) `S`-side Dade base map `τ_S`**: the §4 Dade isometry of the (8.16) hypothesis
 `(A(S), S)`, lifted to a total `IntegralCharacterMap ↥S G`.  On `A(S)`-supported class
 functions it is the honest (2.5) Dade map (`S07.dadeIntegralCharacterMap_apply_of_support`);
 its (2.6.a) isometry and (2.6.b) `ℤ[Irr]`-preservation on the supported sublattice are supplied
 by the generic `S07.dadeIntegralCharacterMap_inner_eq_on_supported_span` /
 `S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported` at the hypothesis
-`typeIIDadeHypothesis hG hSmax hSII` with `hconj = typeIIDadeHypothesis_hConjInvariant …`.
+`typeIIDadeHypothesis hG hSmax hSII` ((2.4.a) is the theorem `S04.Hypothesis.hConjInvariant`).
 This is the map the (5.7) engine (`S07.uniform_degree_coherence_of_families`) runs over in the
 (10.7) left branch. -/
 noncomputable def typeIITau [Finite G]

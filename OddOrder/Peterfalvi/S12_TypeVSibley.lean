@@ -264,8 +264,6 @@ noncomputable def typeVSibleyDadeHypothesis [Finite G]
     card_L_odd := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
     H_sharp_ti := hTI_M
     dade := h46.dade
-    hconj := OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot
-      h46.dade (fun a => h46.dade.H_eq_bot_of_isTISubset hTI_M a)
     dade_H_eq_bot := fun a => h46.dade.H_eq_bot_of_isTISubset hTI_M a
     S := inducedFamily M
     S_eq := rfl

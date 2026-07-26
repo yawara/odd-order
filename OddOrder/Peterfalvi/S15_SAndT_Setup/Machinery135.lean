@@ -1055,32 +1055,21 @@ noncomputable def H_sharp_dadeHypothesis [Fintype G] (hG : OddOrder.BG.IsMinimal
   · intro x hx
     exact hHS (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1
 
-/-- The (13.5) Dade datum `(S, H^#)` is `S`-conjugation invariant: for the TI-subset construction
-the
-local subgroups `H(a) = ⊥`, so `HConjInvariant` holds vacuously
-(`HConjInvariant.of_forall_H_eq_bot`). -/
-theorem H_sharp_hconj [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    (H_sharp_dadeHypothesis hG hyp).HConjInvariant :=
-  OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
-
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **Peterfalvi (13.5)/(7.1)**: the (7.1) ρ-hypothesis for `(S, H^#)`.  Mirrors
 `S14.toHypothesis71`:
 the Dade isometry `τ` is the `fullDadeIsometryData` of the (13.5) Dade datum
-`H_sharp_dadeHypothesis`,
-and conjugation invariance is `H_sharp_hconj`.  This is the (7.1) datum on which `chiRho` (the `ρ`
-map) and — once the coherence datum is supplied — the (7.7.a) `chiRho_explicit_formula` of the
-(13.5)
-point formula are evaluated. -/
+`H_sharp_dadeHypothesis` ((2.4.a) is the theorem `S04.Hypothesis.hConjInvariant`).  This is the
+(7.1) datum on which `chiRho` (the `ρ` map) and — once the coherence datum is supplied — the
+(7.7.a) `chiRho_explicit_formula` of the (13.5) point formula are evaluated. -/
 noncomputable def H_sharp_hypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     OddOrder.Peterfalvi.S09.Hypothesis71 G (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S :=
   { hyp := H_sharp_dadeHypothesis hG hyp
     τ := ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData).toDadeIsometryData.toDadeMap
-    isDadeMap := ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData).toDadeIsometryData.isDadeMap
-    hConjInvariant := H_sharp_hconj hG hyp }
+    isDadeMap :=
+      ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData).toDadeIsometryData.isDadeMap }
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **Peterfalvi (13.5)/(7.6)**: the (7.6) coherent-family datum for `(S, H^#)`, with its (7.7.a)

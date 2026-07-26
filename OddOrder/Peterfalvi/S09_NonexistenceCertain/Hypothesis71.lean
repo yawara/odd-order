@@ -117,9 +117,6 @@ structure Hypothesis71 (G : Type*) [Group G] [Fintype G]
   τ : OddOrder.Peterfalvi.S04.DadeMap (G := G) ℂ A L
   /-- `τ` satisfies the Peterfalvi (2.5) Dade-map equations for `hyp`. -/
   isDadeMap : OddOrder.Peterfalvi.S04.IsDadeMap hyp τ
-  /-- `H(-)` is `L`-conjugation equivariant: `H(l·a·l⁻¹) = l·H(a)·l⁻¹`.  This makes
-  the `ρ`-image of a class function on `G` itself a class function on `L`. -/
-  hConjInvariant : hyp.HConjInvariant
 
 namespace Hypothesis71
 
@@ -142,8 +139,6 @@ noncomputable def of_isTISubset
   τ := (OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset hA_sharp hA_L hL_norm hTI).dadeMap
   isDadeMap := (OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset hA_sharp hA_L hL_norm
       hTI).isDadeMap_dadeMap
-  hConjInvariant :=
-    OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
 
 open scoped Classical in
 /-- The **ρ map** of Peterfalvi (7.1).  For `a ∈ A`,
@@ -230,7 +225,7 @@ theorem chiRho_conj_invariant (H71 : Hypothesis71 G A L) (χ : ClassFunction G �
         ⟨(h : G) * (g : G) * (h : G)⁻¹, H71.hyp.L_normalizes_A h hg⟩ :=
       Subtype.ext hcoe_conj
     rw [hsubeq]
-    have hConj := H71.hConjInvariant ⟨(g : G), hg⟩ h
+    have hConj := H71.hyp.hConjInvariant ⟨(g : G), hg⟩ h
     -- `hConj : H ⟨(h:G)*(g:G)*(h:G)⁻¹, _⟩ = MulAut.conj (h:G) • H ⟨(g:G), hg⟩`
     rw [hConj]
     -- Reduce the cardinality coefficient via conjugacy.

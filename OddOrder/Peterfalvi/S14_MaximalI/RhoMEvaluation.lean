@@ -241,8 +241,7 @@ noncomputable def hypothesis71SharpKernel [Finite G]
       (sharpSubgroup_H_subset_typeIA hypM.typeI) (sharpSubgroup_H_conj_mem hypM)).toDadeMap
     isDadeMap := ((hypM.dadeData.dade.fullDadeIsometryData).restrict
       (sharpSubgroup_H_subset_typeIA hypM.typeI)
-      (sharpSubgroup_H_conj_mem hypM)).toDadeIsometryData.isDadeMap
-    hConjInvariant := OddOrder.Peterfalvi.S04.Hypothesis.hConjInvariant _ }
+      (sharpSubgroup_H_conj_mem hypM)).toDadeIsometryData.isDadeMap }
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.15), first claim, `A₁(M)`-form**: the `A₁(M) = K^#`-based `ρ_M`

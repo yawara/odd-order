@@ -707,17 +707,6 @@ noncomputable def Hypothesis.dadeHypS [Fintype G] [Finite G]
     OddOrder.Peterfalvi.S04.Hypothesis G (S10.typePACore hyp.S) hyp.S :=
   (S10.dadeSupportHypothesisData_typePACore hG hyp.S_maximal (hyp.S_isTypeP hG)).some.dade
 
-/-- **(13.2.e) `S`-instance Dade `H`-conjugation invariance** (issue 1017): the `HConjInvariant` of
-`dadeHypS`, carried by the underlying `DadeSupportHypothesisData` (Peterfalvi (8.14)/(8.15), the
-kernels `R(x)` are `S`-conjugation equivariant `R(x^m) = R(x)^m`).  This is the `hconj` input the
-(5.3.a) R-datum constructor `S07.dadeCharacterDifferenceImageOfDiff` consumes to build each family
-member's `CharacterDifferenceImage` `τ(φ − φ̄) = ±(μ − ν)` — the same `.some` witness as `dadeHypS`,
-so the isometry `dadeHypS.fullDadeIsometryData dadeHypS_hconj` is well-defined. -/
-theorem Hypothesis.dadeHypS_hconj [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    (hyp.dadeHypS hG).HConjInvariant :=
-  (S10.dadeSupportHypothesisData_typePACore hG hyp.S_maximal (hyp.S_isTypeP hG)).some.hconj
-
 open scoped FiniteInduce in
 /-- **(13.2.e) `S`-instance `dade = Ind` bridge** (issue 1017): for the honest type-`P₂` maximal
 `S`,

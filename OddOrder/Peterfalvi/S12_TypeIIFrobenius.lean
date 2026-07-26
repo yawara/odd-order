@@ -370,16 +370,6 @@ theorem typeII_reducible_inducedKernelFamily_eq_columnSum [Finite G]
   exact h.induce_restrict_certainType_eq χ₂'
 
 open scoped Classical FiniteInduce in
-/-- The (8.16) `A₀(S)` Dade base has conjugation-invariant (trivial) signalizers: every
-`H(a) = ⊥` by the `of_isTISubset` construction.  The `hconj` input of the §4 full Dade
-isometry (2.6) at `typeIIHypothesis46 … |>.dade0`; since `HConjInvariant` is a proposition,
-this is definitionally interchangeable with the proof baked into `typeIIHypothesis46 … |>.tau`. -/
-theorem typeIIHypothesis46_dade0_hConjInvariant [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
-    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S) :
-    (typeIIHypothesis46 hG hSmax hSII data).dade0.HConjInvariant :=
-  OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
-
 open scoped Classical FiniteInduce in
 /-- **The `S`-side Dade image of an `A(S)`-supported function vanishes on the exceptional set
 `V`** (type-II mirror of the §12 `S13.tau_apply_eq_zero_of_mem_typePV`, over the (8.16)

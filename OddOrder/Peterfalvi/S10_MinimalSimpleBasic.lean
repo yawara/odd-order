@@ -312,7 +312,7 @@ theorem dadeSupportHypothesisData_of_subset [Fintype G]
                   · rw [ftSupportKernel_eq_bot_of_not_escaping hesc]
                     simp }
             H_eq_ftSupportKernel := fun _ => rfl
-            hconj := fun a l => ftSupportKernel_conj_smul hG hM data hXA @hXiff l.2 }⟩
+            }⟩
 
 /-- `A₁(M) = (M_F)^# ⊆ A(M)` for type I (`M_s = M_F = H`, and `x ∈ H^#` centralizes itself). -/
 theorem A1_subset_typeIA (M : Subgroup G) (data : TypeIData M) :
@@ -1039,7 +1039,7 @@ theorem dadeSupportHypothesisData_of_subset_sigmaSharp [Fintype G]
                   · rw [ftSupportKernel_eq_bot_of_not_escaping hesc]
                     simp }
             H_eq_ftSupportKernel := fun _ => rfl
-            hconj := fun a l => ftSupportKernel_conj_smul_sigmaSharp hG hM hXσ @hXiff l.2 }⟩
+            }⟩
 
 /-- The faithful kernel is `M`-conjugation equivariant when `X ⊆ M` has all *escaping* points
 `σ`-sharp (the general form, driven by `escaping ⊆ M_σ^#` instead of `X ⊆ M_σ^#`). -/
@@ -1136,8 +1136,7 @@ theorem dadeSupportHypothesisData_of_subset_escaping_sigmaSharp [Fintype G]
                   · rw [ftSupportKernel_eq_bot_of_not_escaping hesc]
                     simp }
             H_eq_ftSupportKernel := fun _ => rfl
-            hconj := fun a l =>
-              ftSupportKernel_conj_smul_escaping_sigmaSharp hG hM hXesc @hXiff l.2 }⟩
+            }⟩
 
 /-- **(8.13.c2) coprimality for the full type-`P₁` `A_0`-support**: for escaping `a ∈ M_σ^#` and any
 `b ∈ A_0(M)`, `|R(a)|` is coprime to `|C_M(b)|`.  Splits `A_0 = A(M) ∪ V^M`: for `b ∈ A(M) = M_σ^#`

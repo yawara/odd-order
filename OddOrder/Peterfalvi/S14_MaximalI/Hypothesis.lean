@@ -41,7 +41,6 @@ structure Hypothesis (L : Subgroup G) where
   maximal : L ∈ maximalSubgroups G
   typeI : TypeIData L
   dadeData : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData L (typeIA L typeI)
-  hconj : dadeData.dade.HConjInvariant
 
 namespace Hypothesis
 
@@ -151,7 +150,6 @@ noncomputable def toHypothesis71 {L : Subgroup G} [Finite G] (hyp : Hypothesis L
   hyp := hyp.dadeData.dade
   τ := (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.toDadeMap
   isDadeMap := (hyp.dadeData.dade.fullDadeIsometryData).toDadeIsometryData.isDadeMap
-  hConjInvariant := hyp.hconj
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **τ-bridging**: the §9 `Hypothesis71` Dade map `toHypothesis71.τ` (a `DadeMap` on
@@ -214,7 +212,7 @@ theorem hypothesis_of_typeIData [Finite G]
   obtain ⟨dadeData⟩ :=
     (OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeI hG hL data).1
   -- (8.14)/(8.15): the kernel conjugation invariance is carried by the faithful datum.
-  exact ⟨{ maximal := hL, typeI := data, dadeData := dadeData, hconj := dadeData.hconj }, rfl⟩
+  exact ⟨{ maximal := hL, typeI := data, dadeData := dadeData }, rfl⟩
 
 /-- **Peterfalvi (12.1), existence**: every type-I maximal subgroup `L` carries the (12.1)
 Hypothesis.  Forgetful form of `hypothesis_of_typeIData`.  Mirrors

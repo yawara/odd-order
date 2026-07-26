@@ -46,8 +46,7 @@ noncomputable def s12HypothesisOfTypePData [Finite G]
     { maximal := hM
       typeP := data
       type_alt := htype
-      dadeData := dadeData
-      hconj := dadeData.hconj }
+      dadeData := dadeData }
 
 open scoped Classical in
 /-- **Peterfalvi (4.4)--(4.5), the Section 12 zero column is the prime-TI

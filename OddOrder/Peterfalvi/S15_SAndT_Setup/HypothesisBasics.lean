@@ -153,7 +153,7 @@ difference image `(Ind ξ − (Ind ξ)̄)^τ = ±(μ − ν)` under the honest (
 `τ = dadeIntegralCharacterMap (dadeHypS hG) …`.
 
 Assembled entirely from landed inputs:
-* the Dade hypothesis `dadeHypS hG` and its `HConjInvariant` `dadeHypS_hconj hG`;
+* the Dade hypothesis `dadeHypS hG`;
 * the member's non-realness `sSet_hasNoRealCharacters` (needs `oddCardS`);
 * the difference support `sSet_member_diffsupp` (`((Ind ξ)̄ − Ind ξ).support ⊆ A(S)`),
   fed through `dadeCharacterDifferenceImageOfDiff`.

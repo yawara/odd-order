@@ -352,7 +352,6 @@ structure Hypothesis (M : Subgroup G) where
   typeP : TypePData M
   type_alt : IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M
   dadeData : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M (typePA0 M typeP)
-  hconj : dadeData.dade.HConjInvariant
 
 namespace Hypothesis
 
@@ -563,7 +562,7 @@ noncomputable def toHypothesis71 {M : Subgroup G} [Finite G] (hyp : Hypothesis M
       Set.subset_union_left hnorm).toDadeMap
     isDadeMap := ((hyp.dadeData.dade.fullDadeIsometryData).restrict
       Set.subset_union_left hnorm).toDadeIsometryData.isDadeMap
-    hConjInvariant := OddOrder.Peterfalvi.S04.Hypothesis.hConjInvariant _ }
+    }
 
 open scoped FiniteInduce in
 /-- **The Peterfalvi (7.4) one-member family `{(M, A(M))}`** — the direct input to the family
@@ -619,8 +618,7 @@ theorem exists_hypothesis_of_typeIIIorIVorV [Finite G]
     { maximal := hM
       typeP := data
       type_alt := hType
-      dadeData := dadeData
-      hconj := dadeData.hconj }
+      dadeData := dadeData }
 
 /-! ## §10 → §5 ω-grid bridge prerequisites (gate #3)
 

@@ -897,12 +897,6 @@ noncomputable def Q_sharp_dadeHypothesis [Fintype G] (hG : OddOrder.BG.IsMinimal
   · intro x hx
     exact hQT (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1
 
-/-- The `(T, Q^#)` Dade datum is conjugation-invariant (`H(a) = ⊥` for the TI construction). -/
-theorem Q_sharp_hconj [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (hvd : hyp.v * hyp.d ≠ 1) :
-    (Q_sharp_dadeHypothesis hG hyp hvd).HConjInvariant :=
-  OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
-
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- The (7.1) ρ-hypothesis for `(T, Q^#)` — mirror of `H_sharp_hypothesis71`. -/
 noncomputable def Q_sharp_hypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ)]
@@ -912,8 +906,7 @@ noncomputable def Q_sharp_hypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ
   { hyp := Q_sharp_dadeHypothesis hG hyp hvd
     τ := ((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData).toDadeIsometryData.toDadeMap
     isDadeMap := ((Q_sharp_dadeHypothesis hG hyp
-        hvd).fullDadeIsometryData).toDadeIsometryData.isDadeMap
-    hConjInvariant := Q_sharp_hconj hG hyp hvd }
+        hvd).fullDadeIsometryData).toDadeIsometryData.isDadeMap }
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- The (7.6) coherent-family datum for `(T, Q^#)` — mirror of `H_sharp_hypothesis76`; the

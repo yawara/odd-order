@@ -93,7 +93,6 @@ noncomputable def sibleyToHypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ
     |>.fullDadeIsometryData.toDadeIsometryData.toDadeMap
   isDadeMap := (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
     |>.fullDadeIsometryData.toDadeIsometryData.isDadeMap
-  hConjInvariant := (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj
 
 /-- **The distinguished character for the `i`-th Frobenius member** (Peterfalvi (7.8)/(12.13)
 analog).

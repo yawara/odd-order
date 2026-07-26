@@ -191,7 +191,6 @@ noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
           card_L_odd := hoddL
           H_sharp_ti := hTI_L
           dade := hEq ▸ hyp.dadeData.dade
-          hconj := hconj'
           dade_H_eq_bot := fun a =>
             OddOrder.Peterfalvi.S04.Hypothesis.H_eq_bot_of_isTISubset _ hTI_L a
           S := hyp.Sset

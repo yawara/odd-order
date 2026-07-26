@@ -577,7 +577,6 @@ structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Na
   H_sharp_ti : OddOrder.GroupTheory.IsTISubset (sharpImage H) L
   /-- The §4 Dade datum on `A = H^#`; its Dade isometry *is* `tau`. -/
   dade : OddOrder.Peterfalvi.S04.Hypothesis G (sharpImage H) L
-  hconj : dade.HConjInvariant
   /-- In the TI situation ((6.8.a): `H^#` is a TI-subset of `G` with normalizer `L`), the §4 Dade
   datum's local subgroups are trivial, `dade.H a = ⊥` — i.e. `dade` is the Dade map of the
   TI-subset construction (`S04.of_isTISubset`, whose `H a = ⊥`, S04:308).  This faithful (6.8.a)

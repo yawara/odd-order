@@ -79,16 +79,6 @@ noncomputable def Hypothesis.dadeHypS0 [Fintype G] [Finite G]
   (S10.dadeSupportHypothesisData_typePACore0 hG hyp.S_maximal (hyp.S_isTypeP hG)
     hyp.Sdata).some.dade
 
-/-- **(13.18) `S`-instance `'A0`-Dade `H`-conjugation invariance**: the `HConjInvariant` of
-`dadeHypS0`, carried by the underlying `DadeSupportHypothesisData` (Peterfalvi (8.14)/(8.15)).  This
-is the `hconj` input for `dadeHypS0.fullDadeIsometryData`, so the `'A0`-Dade isometry
-`τ_S = dadeIntegralCharacterMap (dadeHypS0 hG) …` is well-defined. -/
-theorem Hypothesis.dadeHypS0_hconj [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    (hyp.dadeHypS0 hG).HConjInvariant :=
-  (S10.dadeSupportHypothesisData_typePACore0 hG hyp.S_maximal (hyp.S_isTypeP hG)
-    hyp.Sdata).some.hconj
-
 /-- **`T`-instance `'A0`-Dade hypothesis** (the S↔T mirror of `dadeHypS0`): the honest
 `A₀(T) = A(T) ∪ (V_T)^T` Dade datum for `T`, from the generic type-`P₂` construction
 `S10.dadeSupportHypothesisData_typePACore0` at `T`.  The constructor itself needs only
@@ -100,13 +90,6 @@ noncomputable def Hypothesis.dadeHypT0 [Fintype G] [Finite G]
     (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) (Tdata : TypePData hyp.T) :
     OddOrder.Peterfalvi.S04.Hypothesis G (S10.typePACore0 hyp.T Tdata) hyp.T :=
   (S10.dadeSupportHypothesisData_typePACore0 hG hyp.T_maximal hTP Tdata).some.dade
-
-/-- **`T`-instance `'A0`-Dade `H`-conjugation invariance** (mirror of `dadeHypS0_hconj`). -/
-theorem Hypothesis.dadeHypT0_hconj [Fintype G] [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hTP : OddOrder.BG.Ch4.S14.IsTypeP hyp.T) (Tdata : TypePData hyp.T) :
-    (hyp.dadeHypT0 hG hTP Tdata).HConjInvariant :=
-  (S10.dadeSupportHypothesisData_typePACore0 hG hyp.T_maximal hTP Tdata).some.hconj
 
 /-- **`dadeHypS0.H a = ftSupportKernel S (A₀(S)) a`** (A₀ analogue of
 `dadeHypS_H_eq_ftSupportKernel`). The `'A0(S)`-instance Dade stabilizer at a support point `a` is
