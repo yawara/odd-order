@@ -292,6 +292,24 @@ theorem index_centralizer_eq_two_of_index_center_eq_four {P : Type*} [Group P] [
   rw [hgi, show i = 1 by omega]
   norm_num
 
+/-- `b ∈ Z(P)⟨a⟩` なら `a` と `b` は可換。
+
+`b = z a^i` (`z` 中心的) と書けるので直接計算。`⟨Z(P), a⟩` に `b` が入らないことを
+示すのに (対偶で) 使う。 -/
+theorem mul_comm_of_mem_sup_center_zpowers {P : Type*} [Group P] {a b : P}
+    (hb : b ∈ Subgroup.center P ⊔ Subgroup.zpowers a) : a * b = b * a := by
+  haveI : (Subgroup.center P).Normal := inferInstance
+  rw [← SetLike.mem_coe, Subgroup.normal_mul] at hb
+  obtain ⟨z, hz, t, ht, rfl⟩ := hb
+  obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp ht
+  have hcz := Subgroup.mem_center_iff.mp hz
+  have hcomm : a * a ^ i = a ^ i * a := ((Commute.refl a).zpow_right i).eq
+  calc a * (z * a ^ i) = (a * z) * a ^ i := by group
+    _ = (z * a) * a ^ i := by rw [hcz a]
+    _ = z * (a * a ^ i) := by group
+    _ = z * (a ^ i * a) := by rw [hcomm]
+    _ = (z * a ^ i) * a := by group
+
 /-- **6B.8 の base case**: `|P| = 8` かつ `|P : P'| = 4` なら `P` は `D_8` か `Q_8`。
 
 `|P'| = 2 ≠ 1` から非可換なので repo の Cor 6.14
