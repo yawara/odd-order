@@ -56,8 +56,28 @@ Coq 対応物 `regular_abelem2_on_abelem2` (`BGsection2.v:1048`) は Coq 側で�
 | `q ∣ p²−1` (rank ≤ 2 への素数位数自己同型) — **本項より弱い** | `GroupTheory/PRank.lean` `prime_dvd_prime_sq_sub_one_of_orderOf_mulAut` |
 | Singer field data / `μ : C →* Kˣ` | 同 `SingerField.lean` (`nonempty_singerFieldData`) |
 
-⚠ 2 と 3 (coprime Maschke + 1 次元表現のスカラー化) に既存部品があるかは未調査。着手時に
-`GroupTheory/**` を grep で確認すること。
+### 2026-07-26 追調査 — Lean 側の橋渡し経路
+
+- **モジュール構造**: `SingerField` 系の定理は `[Module (MonoidAlgebra (ZMod p) C) M]` を
+  **instance 仮説として取る**(自分では作らない)。よって `φ : Q →* MulAut P` から作る必要がある。
+  経路は mathlib 標準の **`Representation.asModule`** で、本 repo 内に使用実績あり:
+  - `BG/Ch1_Preliminary/S02_RepresentationsBasic.lean:776` (Maschke + `Representation.asModule` 橋)
+  - `BG/Ch1_Preliminary/S03d_Thm34.lean:339,353` (`Representation.asModuleEquiv_map_smul` /
+    `asAlgebraHom_single_one` の実使用)
+- **elementary abelian → ZMod p 加群**: `IsElementaryAbelian.zmodModule`
+  (`GroupTheory/PRank.lean:87`) が `Module (ZMod p) (Additive E)` を与える。次元は
+  `hE.card_eq_pow_finrank` で `|E| = p^n`。**setup の書き方の手本は
+  `PRank.prime_dvd_prime_sq_sub_one_of_orderOf_mulAut` (:354)** — 同じ「rank ≤ 2 の
+  elementary abelian に素数位数自己同型」設定を `letI := hE.zmodModule` で回している。
+- **(a) は 1 本の非自明指標だけで出る**: `χ₁, χ₂` の像は `𝔽_p^×` の `q`-捩れなので位数 1 か `q`。
+  両方自明なら `Q` が自明作用 ⟹ 忠実性に反する。よって少なくとも一方が位数 `q` ⟹ `q ∣ p − 1`。
+- **(b) の核勘定**: `χ₂` が自明なら `ker χ₁ ∩ ker χ₂ = ker χ₁ = 1` ⟹ `χ₁` 単射 ⟹ `Q ↪ μ_q` 巡回で
+  `Q ≅ (ℤ/q)²` に矛盾。よって**両方非自明**で `|ker χᵢ| = q`、かつ `(χ₁,χ₂) : Q → μ_q × μ_q` は
+  位数 `q²` 同士の単射 ⟹ 同型。よって `(ζ, ζ)` の逆像 `α` が両直線に同一スカラー `ζ` で作用 =
+  `x ↦ x^r`。
+
+⚠ **Maschke の適用形** (`|Q| = q²` と `p` が互いに素 ⟹ 完全可約) が repo のどの補題で出るかは
+未確定。`S02_RepresentationsBasic.lean` の Maschke 節をまず読むこと。
 
 ## 完了条件
 
