@@ -1223,7 +1223,13 @@ consumer は (5.7) engine を使う。
    `y = [[0,1],[1,1]]`, `Q = ⟨y⟩` (位数 3) が (A)+(B) を満たすことを axiom-clean で構成。
    **残った穴 = 抽象 (B) ⟹ `hrel` の含意** (= Lemma C.3 の群論的内容; 現状 S16 経由のみ)
    → [issue 0151](../../issues/0151-appc-lemma-c3-abstract-hypothesis-b.md)。
-3. **BG §16 tamely imbedded** — issue 8005 で意図的 defer (Pf 側の実消費がトリガー)。
+3. ~~**BG §16 tamely imbedded**~~ — **2026-07-26 完了 (issue 8005 closed)**。着手前実測で
+   「issue の checklist が stale」と判明: Thm I 復元は済、Thm II (Tii)(a)–(e)+(Tiii) も
+   statement-first でなく**実証明**で済んでおり `theoremII_tamelyImbedded` は unconditional
+   だった。**本物の残り gap は「書籍は `X = A(M)` **or** `X = A₀(M)` の両方を主張するのに
+   `A(M)` しか covering していない」**点で、これを本 tick で解消
+   (`escapingSharpSet_a0Set_eq_aSet` + clause (c) の `hatMsigma` 一般化 +
+   `aSet_subset_A0Set` を Peterfalvi から BG へ移設)。書籍括弧書き `Hᵢ ≤ M'ᵢ` も field 化。
 4. **Pf App Suzuki2Groups Lemma 1 (a)(c)(d)** — Higman 論文の実内容 ((b) は 07-18 に完済)。
 5. **packaging 9 件** — (5.3)(b) (5.8) (7.8) (7.9) (8.15) (9.7) (9.10) (9.11) (10.11)。
    内容は landed、単一の抽象 statement が無いだけ。(5.3)(b) は固定 2 要素 `R` レコードの

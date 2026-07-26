@@ -10307,9 +10307,12 @@ placing `M` and its conjugate in `𝓜_σ(x)`; Thm 14.4 sharp transitivity + `N_
 `m ∈ M`.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.signalizer_neighbour_conjugator_in_M
 /-! **BG Theorem II packaging** (`S16_MainResults.TheoremIIPackaging`, `theoremII_tamelyImbedded`):
-`A(M) = ASet M U` is a tamely imbedded subset of `G` (`TamelyImbedded M (ASet M U)`) for an
-arbitrary maximal `M` of a minimal-simple odd `G`, **unconditionally** (hypotheses: only the
-standard `theoremII_tame_embedding` shape `hG, hM, K≤M, U≤M, hK, hU`).  Assembles (Ti)
+**both** `X = A(M) = ASet M U` and `X = A₀(M) = A0Set M K` are tamely imbedded subsets of `G`
+(`TamelyImbedded M X`) for an arbitrary maximal `M` of a minimal-simple odd `G`,
+**unconditionally** (hypotheses: only the standard `theoremII_tame_embedding` shape
+`hG, hM, K≤M, U≤M, hK, hU` plus the book's own `X = A(M) ∨ X = A₀(M)`).  The two choices share
+one family: `escapingSharpSet_a0Set_eq_aSet` shows the escaping set `D` is literally the same set,
+and clause (c) is proved at the level of `\widehat{M_σ} ⊇ X`.  Assembles (Ti)
 (`theoremII_tame_embedding`), the full (Tii) system of supporting subgroups — (a) via Thm E(2)
 σ-disjointness, (b) via Thm D(4) complements, (c) `coprime_centralizer_of_neighbour` via Lemma
 14.13(a), (d) `clause_d_of_neighbour`, (e) via Lemma 14.13(b) + Thm D(3) — and (Tiii)
@@ -10318,6 +10321,8 @@ standard `theoremII_tame_embedding` shape `hG, hM, K≤M, U≤M, hK, hU`).  Asse
 via Thm B(5) + Thm C(9) glued by the order-determined cross-piece exclusion (BG's "distinct
 orders"; Thm C(5) turned out **not** to be needed).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremII_tamelyImbedded
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.escapingSharpSet_a0Set_eq_aSet
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.aSet_subset_A0Set
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_systemOfSupportingSubgroups
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_conj_smul_eq_of_le_of_card_prime
 

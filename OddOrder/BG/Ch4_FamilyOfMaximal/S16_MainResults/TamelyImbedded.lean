@@ -94,6 +94,10 @@ structure SystemOfSupportingSubgroups (M : Subgroup G) (X : Set G) where
   maximal : ∀ i, Mfam i ∈ maximalSubgroups G
   /-- Each `Mᵢ` is of Peterfalvi Type I or Type II. -/
   typeIorII : ∀ i, IsTypeI (Mfam i) ∨ IsTypeII (Mfam i)
+  /-- The book's parenthetical in (Tii): `Hᵢ = M_{iF} ≤ M'ᵢ`, the Fitting kernel lies in the
+  derived subgroup of `Mᵢ`. -/
+  supporting_le_derived : ∀ i,
+    maxNilpotentNormalHall (Mfam i) ≤ OddOrder.GroupTheory.derivedInG (Mfam i)
   /-- **(a)** `(|Hᵢ|, |Hⱼ|) = 1` for `i ≠ j`, where `Hᵢ = M_{iF} = maxNilpotentNormalHall Mᵢ`. -/
   coprime_orders : ∀ i j, i ≠ j →
     Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall (Mfam i)))

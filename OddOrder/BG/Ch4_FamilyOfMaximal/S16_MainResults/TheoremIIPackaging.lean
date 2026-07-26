@@ -10,9 +10,9 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
 
 **Bender–Glauberman, *Local Analysis for the Odd Order Theorem*** (LMS LNS 188), Chapter IV
 §16, **Theorem II (Tii)** (mmd:4571) and the **Remark** after it (mmd:4575): for an arbitrary
-maximal subgroup `M` of a minimal simple group `G` of odd order, the subset `X = A(M) = ASet M U`
-is *tamely imbedded* — when the escaping set `D = escapingSharpSet M X` is nonempty it admits a
-finite `SystemOfSupportingSubgroups`.
+maximal subgroup `M` of a minimal simple group `G` of odd order, each of the subsets
+`X = A(M) = ASet M U` and `X = A₀(M) = A0Set M K` is *tamely imbedded* — when the escaping set
+`D = escapingSharpSet M X` is nonempty it admits a finite `SystemOfSupportingSubgroups`.
 
 This file assembles the family and delivers `TamelyImbedded M (ASet M U)`.
 
@@ -30,9 +30,13 @@ Each `N(x)` is of Type I or II, and `Hᵢ = M_{iF} = M_{iσ} = maxNilpotentNorma
 assembled here from Theorem D(4), Theorem E(2) (`sigma_reps_pairwise_disjoint`), Lemma 14.13(b)
 (`signalizer_neighbour_conjugator_in_M`), and Theorem D(3)
 (`signalizer_centralizer_isComplement`).  The clauses `(c) coprime_centralizer` and
-`(d) a0_ti`, and the universally-quantified `(Tiii)`, enter as named hypotheses of the
-`_of_clauses` packaging theorems (their proofs are the remaining §16 residuals — Lemma 14.13(a)
-plus the `A₀(Mᵢ)` TI structure and the arbitrary-system Frobenius forcing).
+`(d) a0_ti` are proved here as `coprime_centralizer_of_neighbour` (Lemma 14.13(a)) and
+`clause_d_of_neighbour`, and `(Tiii)` as `frobeniusTypeI_of_neighbour_typeII`; the final
+`theoremII_tamelyImbedded` is therefore unconditional.
+
+The book states Theorem II for `X = A(M)` **or** `X = A₀(M)`; both are covered, because the
+escaping set `D` is the same for the two choices (`escapingSharpSet_a0Set_eq_aSet`) and clause
+`(c)` is proved at the level of `\widehat{M_σ}`, which contains both.
 -/
 
 namespace OddOrder.BG.Ch4.S16
@@ -74,6 +78,72 @@ theorem exists_conjugacy_reps [Finite (Subgroup G)] (S : Set (Subgroup G)) :
     have hexact : σ.r ((Quotient.mk σ ⟨N, hN⟩).out) ⟨N, hN⟩ :=
       Quotient.exact (Quotient.out_eq (Quotient.mk σ ⟨N, hN⟩))
     exact IsConjugateSubgroup.symm hexact
+
+/-! ## `A(M)` sits inside `A₀(M)` -/
+
+/-- **`𝒞_G(K₀#)`-points are nonidentity `κ`-elements** (issue 9076 piece 4c; moved here from
+`Peterfalvi.S10_TypePSupportA0` — the statement and proof are entirely BG §14/§16): every
+`G`-conjugate of a nontrivial element of the `κ(M)`-Hall `K₀` is a nonidentity `κ(M)`-element.
+A `k ∈ K₀#` has `orderOf k ∣ |K₀|`, a `κ`-number (`hK`), so `k` is a `κ`-element; conjugation
+preserves this (`isPiElement_conj`) and non-triviality.  This is the exclusion input for both `A(S)`
+(`κ′`-elements) and `V^S` (`σ`-prime carriers) against `A0Set M K₀ = hatMsigma M ∖ 𝒞_G(K₀#)`. -/
+theorem kappaHall_conjClassSet_isPiElement [Finite G] {M K₀ : Subgroup G} (hKM : K₀ ≤ M)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    {w : G} (hw : w ∈ conjClassSet (OddOrder.GroupTheory.sharpSubgroup K₀)) :
+    IsPiElement (OddOrder.BG.Ch4.S14.kappa M) w ∧ w ≠ 1 := by
+  obtain ⟨k, hk, g, hgw⟩ := hw
+  rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_sdiff, SetLike.mem_coe,
+    Set.mem_singleton_iff] at hk
+  obtain ⟨hkK, hk1⟩ := hk
+  subst hgw
+  have hkord : orderOf k ∣ Nat.card ↥K₀ := by
+    have horx : orderOf k = orderOf (⟨k, hkK⟩ : ↥K₀) :=
+      orderOf_injective K₀.subtype K₀.subtype_injective ⟨k, hkK⟩
+    rw [horx]; exact orderOf_dvd_natCard _
+  have hkκ : IsPiElement (OddOrder.BG.Ch4.S14.kappa M) k := by
+    intro p hp
+    have hpp : p.Prime := Nat.prime_of_mem_primeFactors hp
+    have hpdvd : p ∣ orderOf k := Nat.dvd_of_mem_primeFactors hp
+    have hcardeq : Nat.card ↥(K₀.subgroupOf M) = Nat.card ↥K₀ :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv
+    refine hK.1 p ?_
+    rw [hcardeq]
+    exact Nat.mem_primeFactors.mpr ⟨hpp, hpdvd.trans hkord, Nat.card_pos.ne'⟩
+  refine ⟨OddOrder.BG.Ch4.S14.isPiElement_conj g hkκ, fun hcontra => hk1 ?_⟩
+  have hkk : k = g⁻¹ * (g * k * g⁻¹) * g := by group
+  rw [hkk, hcontra]; group
+
+/-- **`ASet M U₀ ⊆ A0Set M K₀`** (issue 9076 piece 4c; moved here from
+`Peterfalvi.S10_TypePSupportA0` — the statement and proof are entirely BG §14/§16): the BG
+Theorem-E `A(M)`-set embeds into the `A_0(M)`-set.  Both are `⊆ hatMsigma M`; and an
+`ASet`-point `x ∈ U₀ ⊔ M_σ` is a `κ′`-element
+(`mem_U_sup_Msigma_iff_isPiElement_kappa_compl`), while a `𝒞_G(K₀#)`-point is a nonidentity
+`κ`-element (`kappaHall_conjClassSet_isPiElement`) — no element is both, so `x ∉ 𝒞_G(K₀#)`. -/
+theorem aSet_subset_A0Set [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K₀ U₀ : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K₀ ≤ M) (hUM : U₀ ≤ M)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M) (K₀.subgroupOf M))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M)) :
+    OddOrder.BG.Ch4.S16.ASet M U₀ ⊆ OddOrder.BG.Ch4.S16.A0Set M K₀ := by
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hnorm : ((U₀ ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (sup_le hUM hMσM)).mpr
+      (OddOrder.BG.Ch4.S16.theoremA_ungated_conjuncts hG hM hKM hUM hK rfl hU).2.2.1
+  intro x hx
+  simp only [OddOrder.BG.Ch4.S16.ASet, Set.mem_inter_iff, SetLike.mem_coe] at hx
+  obtain ⟨hxhat, hxsup⟩ := hx
+  simp only [OddOrder.BG.Ch4.S16.A0Set, Set.mem_sdiff]
+  refine ⟨hxhat, fun hxconj => ?_⟩
+  obtain ⟨hxκ, hx1⟩ := kappaHall_conjClassSet_isPiElement hKM hK hxconj
+  have hxκ' : IsPiElement (OddOrder.BG.Ch4.S14.kappa M)ᶜ x :=
+    (OddOrder.BG.Ch4.S14.mem_U_sup_Msigma_iff_isPiElement_kappa_compl hG hM hUM hU hnorm
+      hxhat.1).mp hxsup
+  have hne1 : orderOf x ≠ 1 := fun h => hx1 (orderOf_eq_one_iff.mp h)
+  obtain ⟨p, hpp, hpdvd⟩ := (orderOf x).exists_prime_and_dvd hne1
+  have hpf : p ∈ (orderOf x).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, (orderOf_pos x).ne'⟩
+  exact (hxκ' p hpf) (hxκ p hpf)
 
 /-! ## Conjugation of centralizers and `A(M)` -/
 
@@ -218,7 +288,11 @@ theorem mem_Msigma_of_commute_frobenius [Finite G] {M : Subgroup G} {A : Subgrou
   exact Subgroup.mem_subgroupOf.mp (hker hacomm)
 
 /-- **BG Theorem II (Tii)(c)** (mmd:4571, proof at mmd:4573): `(|Hᵢ|, |C_M(x)|) = 1` for every
-`x ∈ A(M)#`, where `Hᵢ = M_{iσ}` and `Mᵢ = N(x_i)` is a neighbour maximal.
+`x ∈ X#`, where `Hᵢ = M_{iσ}` and `Mᵢ = N(x_i)` is a neighbour maximal.
+
+Stated for `x ∈ \widehat{M_σ}#`, which covers **both** choices `X = A(M)` and `X = A₀(M)` of
+Theorem II at once (`ASet M U ⊆ hatMsigma M` and `A0Set M K ⊆ hatMsigma M` by definition); the
+book's proof only uses `x ∈ \widehat{M_σ}` as well.
 
 If a prime `q` divides both `|M_{iσ}|` and `|C_M(x)| = |M ∩ C_G(x)|`, then `q ∈ σ(Mᵢ) ∩ π(M)`;
 Lemma 14.13(a) (`non_disjoint_signalizer_frobenius`) makes `M` a Frobenius group with kernel `M_σ`.
@@ -233,7 +307,7 @@ theorem coprime_centralizer_of_neighbour [Finite G] (hG : OddOrder.BG.IsMinimalS
     {Mi : Subgroup G} (hMimax : Mi ∈ maximalSubgroups G)
     (hMinb : ∃ x ∈ escapingSharpSet M (ASet M U),
       maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) = {Mi})
-    (x : G) (hxA : x ∈ ASet M U) (hx1 : x ≠ 1) :
+    (x : G) (hxhat : x ∈ hatMsigma M) (hx1 : x ≠ 1) :
     Nat.Coprime (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma Mi))
       (Nat.card ↥(M ⊓ Subgroup.centralizer ({x} : Set G))) := by
   by_contra hcop
@@ -286,7 +360,7 @@ theorem coprime_centralizer_of_neighbour [Finite G] (hG : OddOrder.BG.IsMinimalS
   have hpσM : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
     S14.isPiElement_sigma_of_mem_Msigma hxiσ.1 p hpord
   -- `x ∈ M_σ` and `C_M(x) ⊆ M_σ` (Frobenius), so `q ∈ σ(M)`
-  obtain ⟨⟨hxM, hxCne⟩, _⟩ := hxA
+  obtain ⟨hxM, hxCne⟩ := hxhat
   rw [Subgroup.ne_bot_iff_exists_ne_one] at hxCne
   obtain ⟨⟨z, hz⟩, hz1⟩ := hxCne
   obtain ⟨hzMσ, hzC⟩ := Subgroup.mem_inf.mp hz
@@ -584,11 +658,13 @@ theorem exists_systemOfSupportingSubgroups [Finite G] (hG : OddOrder.BG.IsMinima
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
-    (_hne : escapingSharpSet M (ASet M U) ≠ ∅)
+    {X : Set G} (hXhat : X ⊆ hatMsigma M)
+    (hDX : escapingSharpSet M X = escapingSharpSet M (ASet M U))
+    (_hne : escapingSharpSet M X ≠ ∅)
     (hc : ∀ Mi ∈ maximalSubgroups G, (IsTypeI Mi ∨ IsTypeII Mi) →
       (∃ x ∈ escapingSharpSet M (ASet M U),
         maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) = {Mi}) →
-      ∀ x ∈ ASet M U, x ≠ 1 →
+      ∀ x ∈ hatMsigma M, x ≠ 1 →
         Nat.Coprime (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma Mi))
           (Nat.card ↥(M ⊓ Subgroup.centralizer ({x} : Set G))))
     (hd : ∀ Mi ∈ maximalSubgroups G, (IsTypeI Mi ∨ IsTypeII Mi) →
@@ -597,7 +673,7 @@ theorem exists_systemOfSupportingSubgroups [Finite G] (hG : OddOrder.BG.IsMinima
       ∃ Ki : Subgroup G, Ch03.IsHallSubgroup (S14.kappa Mi) (Ki.subgroupOf Mi) ∧
         (A0Set Mi Ki \ (OddOrder.BG.Ch3.S10.Msigma Mi : Set G)).Nonempty ∧
         IsTISubset (A0Set Mi Ki \ (OddOrder.BG.Ch3.S10.Msigma Mi : Set G)) Mi) :
-    ∃ sys : SystemOfSupportingSubgroups M (ASet M U),
+    ∃ sys : SystemOfSupportingSubgroups M X,
       ((∃ i, IsTypeII (sys.Mfam i)) → FrobeniusTypeIWithNonTIFitting M) := by
   classical
   haveI : Finite (Subgroup G) := Finite.of_injective _ SetLike.coe_injective
@@ -632,12 +708,17 @@ theorem exists_systemOfSupportingSubgroups [Finite G] (hG : OddOrder.BG.IsMinima
     Mfam := Mfam
     maximal := fun i => (hMfam_data i).1
     typeIorII := fun i => (hMfam_data i).2.1
+    supporting_le_derived := ?_
     coprime_orders := ?_
     factorization := ?_
     inf_M_supporting := ?_
     coprime_centralizer := ?_
     a0_ti := ?_
     escape_centralizer := ?_ }, ?_⟩
+  · -- `Hᵢ = M_{iσ} ≤ M'ᵢ` (the book's parenthetical): BG Theorem 10.2(c).
+    intro i
+    rw [hMfam_hall_eq i]
+    exact OddOrder.BG.Ch3.S10.Msigma_le_derived hG (hMfam_data i).1
   · -- **(a)** `(|Hᵢ|, |Hⱼ|) = 1`: distinct reps are non-conjugate, so `σ(Mᵢ) ∩ σ(Mⱼ) = ∅`.
     intro i j hij
     rw [hMfam_hall_eq i, hMfam_hall_eq j]
@@ -678,17 +759,19 @@ theorem exists_systemOfSupportingSubgroups [Finite G] (hG : OddOrder.BG.IsMinima
         = M ⊓ (Mfam i ⊓ OddOrder.BG.Ch3.S10.Msigma (Mfam i)) := by rw [inf_eq_right.mpr hMσMi]
       _ = (M ⊓ Mfam i) ⊓ OddOrder.BG.Ch3.S10.Msigma (Mfam i) := by rw [inf_assoc]
       _ = ⊥ := h1
-  · -- **(c)** `(|Hᵢ|, |C_M(x)|) = 1`: the hypothesis `hc`.
-    intro i x hxA hx1
+  · -- **(c)** `(|Hᵢ|, |C_M(x)|) = 1`: the hypothesis `hc`, at `x ∈ X ⊆ \widehat{M_σ}`.
+    intro i x hxX hx1
     rw [hMfam_hall_eq i]
-    exact hc (Mfam i) (hMfam_data i).1 (hMfam_data i).2.1 (hMfam_neighbour i) x hxA hx1
+    exact hc (Mfam i) (hMfam_data i).1 (hMfam_data i).2.1 (hMfam_neighbour i) x (hXhat hxX) hx1
   · -- **(d)** `A₀(Mᵢ) − Hᵢ` nonempty `TI`: the hypothesis `hd`.
     intro i
     obtain ⟨Ki, hKihall, hKine, hKiti⟩ :=
       hd (Mfam i) (hMfam_data i).1 (hMfam_data i).2.1 (hMfam_neighbour i)
     rw [hMfam_hall_eq i]
     exact ⟨Ki, hKihall, hKine, hKiti⟩
-  · -- **(e)** the escaping-centralizer decomposition, via Lemma 14.13(b).
+  · -- **(e)** the escaping-centralizer decomposition, via Lemma 14.13(b).  `D` does not depend
+    -- on the choice of `X` (`hDX`), so this is the `A(M)`-statement verbatim.
+    rw [hDX]
     intro x hxD
     obtain ⟨hxA, hx1, hesc⟩ := hxD
     have hxσ : x ∈ S14.sigmaSharp M :=
@@ -759,37 +842,61 @@ theorem exists_systemOfSupportingSubgroups [Finite G] (hG : OddOrder.BG.IsMinima
     rintro ⟨i, hII⟩
     exact frobeniusTypeI_of_neighbour_typeII hG hM hKM hUM hK hU hII (hMfam_neighbour i)
 
-/-! ## Theorem II: `A(M)` is tamely imbedded -/
+/-! ## Theorem II: `A(M)` and `A₀(M)` are tamely imbedded -/
+
+/-- **BG Theorem II: the escaping set `D` is the same for `X = A(M)` and `X = A₀(M)`**
+(mmd:4555; book p. 132, first paragraph of the proof).  One inclusion is `A(M) ⊆ A₀(M)`
+(`aSet_subset_A0Set`); the other is Theorem II's own preamble conclusion `D ⊆ A(M)` — the book's
+"`D = { x ∈ M_σ# | C_G(x) ⊄ M } ⊆ M_σ`", obtained from the fact that the two remaining pieces
+`A(M) − M_σ` and `A₀(M) − A(M)` are `TI`-subsets with normalizer `M` (Theorems B(5), C(9)), so
+their points do not escape `M`. -/
+theorem escapingSharpSet_a0Set_eq_aSet [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    escapingSharpSet M (A0Set M K) = escapingSharpSet M (ASet M U) := by
+  refine Set.Subset.antisymm (fun x hx => ⟨?_, hx.2.1, hx.2.2⟩) (fun x hx => ⟨?_, hx.2.1, hx.2.2⟩)
+  · exact (theoremII_tame_embedding hG hM hKM hUM hK hU (X := A0Set M K) (Or.inr rfl)).2.1 hx
+  · exact aSet_subset_A0Set hG hM hKM hUM hK hU hx.1
 
 /-- **BG Theorem II** (mmd:4571) + **Remark** (mmd:4575): for an arbitrary maximal subgroup `M` of a
-minimal simple group `G` of odd order, `A(M) = ASet M U` is a *tamely imbedded subset* of `G`
-(`TamelyImbedded M (ASet M U)`).
+minimal simple group `G` of odd order, **both** `X = A(M) = ASet M U` and `X = A₀(M) = A0Set M K`
+are *tamely imbedded subsets* of `G` (`TamelyImbedded M X`) — exactly the book's "let `X = A(M)`
+or `X = A₀(M)`".
 
-* **(Ti)** — `G`-conjugate elements of `A(M)` are `M`-conjugate — is the conjunct-1 output of
+* **(Ti)** — `G`-conjugate elements of `X` are `M`-conjugate — is the conjunct-1 output of
   `theoremII_tame_embedding` (BG Theorem D(1) + Theorem B(5)/C(9)).
 * **(Tii)+(Tiii)** — a nonempty escaping set yields a `SystemOfSupportingSubgroups` whose Type-II
   members force `M` Frobenius of Type I with non-`TI` Fitting — is
   `exists_systemOfSupportingSubgroups` (clause (Tiii) discharged internally via Theorem D(4),
   `frobeniusTypeI_of_neighbour_typeII`).
 
-Both remaining §16 residuals are discharged internally: clause `(c)` via
-`coprime_centralizer_of_neighbour` (Lemma 14.13(a)) and clause `(d)` via `clause_d_of_neighbour`
-(Theorem B(5) for Type-I, and B(5) + C(9) + the order-determined cross-piece exclusion for Type-II).
-Theorem II is therefore **unconditional** — no hypothesis beyond the maximal `M` and its Hall data.
--/
+Both §16 residuals are discharged internally: clause `(c)` via `coprime_centralizer_of_neighbour`
+(Lemma 14.13(a)) and clause `(d)` via `clause_d_of_neighbour` (Theorem B(5) for Type-I, and
+B(5) + C(9) + the order-determined cross-piece exclusion for Type-II).  Theorem II is therefore
+**unconditional** — no hypothesis beyond the maximal `M` and its Hall data.
+
+The two choices of `X` share the same family: by `escapingSharpSet_a0Set_eq_aSet` the escaping set
+`D` is literally the same, and clause `(c)` is proved at the level of `\widehat{M_σ} ⊇ X`. -/
 theorem theoremII_tamelyImbedded [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
-    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
-    TamelyImbedded M (ASet M U) := by
-  refine ⟨?_, ?_⟩
-  · -- (Ti)
-    exact (theoremII_tame_embedding hG hM hKM hUM hK hU (Or.inl rfl)).1
-  · -- (Tii)+(Tiii)
-    refine fun hne => exists_systemOfSupportingSubgroups hG hM hKM hUM hK hU hne ?_ ?_
-    · exact fun Mi hMimax _htype hnb x hxA hx1 =>
-        coprime_centralizer_of_neighbour hG hM hKM hUM hK hU hMimax hnb x hxA hx1
-    · exact fun Mi hMimax htype hnb =>
-        clause_d_of_neighbour hG hM hKM hUM hK hU hMimax htype hnb
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {X : Set G} (hX : X = ASet M U ∨ X = A0Set M K) :
+    TamelyImbedded M X := by
+  have hXhat : X ⊆ hatMsigma M := by
+    rcases hX with rfl | rfl
+    · exact fun _ hx => hx.1
+    · exact fun _ hx => hx.1
+  have hDX : escapingSharpSet M X = escapingSharpSet M (ASet M U) := by
+    rcases hX with rfl | rfl
+    · rfl
+    · exact escapingSharpSet_a0Set_eq_aSet hG hM hKM hUM hK hU
+  refine ⟨(theoremII_tame_embedding hG hM hKM hUM hK hU hX).1, fun hne => ?_⟩
+  exact exists_systemOfSupportingSubgroups hG hM hKM hUM hK hU hXhat hDX hne
+    (fun Mi hMimax _htype hnb x hxhat hx1 =>
+      coprime_centralizer_of_neighbour hG hM hKM hUM hK hU hMimax hnb x hxhat hx1)
+    (fun Mi hMimax htype hnb =>
+      clause_d_of_neighbour hG hM hKM hUM hK hU hMimax htype hnb)
 
 end OddOrder.BG.Ch4.S16

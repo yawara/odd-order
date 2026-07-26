@@ -105,3 +105,54 @@ sorry-neutral な結論強化」を前提していたが、現在は **theoremI 
   Pf 側 statement は依然不在。encoding 確定にはこの consumer 形が最良の情報源。
 - 次アクション: (ii) statement-first を §12.3 encoding で書き、(e)/(Tiii) は
   Set-積の honest 形を採る (⊔ over-approx は不可)。その後実証明 campaign を積む。
+
+---
+
+## 🧾 2026-07-26 実測 + Thm II の A₀(M) 拡張 (main/hub session)
+
+着手前の実測で、**この issue の「やること」チェックリストは既に大幅に stale** と判明した。
+
+### 実測結果 (着手時点)
+
+* **Thm I 復元**: 完了済 (commit `0c03444b8`、上記の追記どおり)。
+* **Thm II (Tii)(a)–(e) + (Tiii)**: 上の「次アクション」が想定した (ii) statement-first ではなく、
+  **実証明で完了済**だった:
+  - `SystemOfSupportingSubgroups` (`TamelyImbedded.lean`) が (a)–(e) を book の文言どおり保持
+    ((e) は `⊔` over-approx でなく **Set の積**で honest に encode 済 — §12.3 の留保どおり)。
+  - `TheoremIIPackaging.lean` (795 行) が (c) = `coprime_centralizer_of_neighbour` (Lemma 14.13(a))、
+    (d) = `clause_d_of_neighbour`、(Tiii) = `frobeniusTypeI_of_neighbour_typeII` を**実証明**し、
+    `theoremII_tamelyImbedded` は **unconditional**。
+* repo 全体の実 sorry は **1 件のみ** (Q₈ Brauer–Suzuki、issue 0147) — comment-strip 済 census。
+* ⚠ ただし `theoremII_tame_embedding` の docstring に残っていた「Not axiom-clean: `_of_inputs`
+  skeleton が sorry-bearing な §16 structure theorem を cite」は stale。
+
+### 実測で見つかった本物の gap → 本 tick で解消
+
+書籍 Theorem II (p. 132) は **"let `X = A(M)` or `X = A₀(M)`"** と両方を主張するが、
+`theoremII_tamelyImbedded` は **`X = A(M)` のみ**だった ((Ti) と preamble
+(`D ⊆ A(M)`、`|𝓜(C_G(x))| = 1`) は `theoremII_tame_embedding` が既に両方を covering)。
+これを書籍どおり両方に拡張した:
+
+* `aSet_subset_A0Set` / `kappaHall_conjClassSet_isPiElement` を
+  `Peterfalvi/S10_TypePSupportA0.lean` から BG §16 へ**移設** (statement も証明も完全に
+  BG §14/§16 — Peterfalvi に置かれていたのは配置ミス)。
+* `escapingSharpSet_a0Set_eq_aSet` — 書籍 p. 132 の証明第 1 段
+  (「`A(M) − M_σ` と `A₀(M) − A(M)` は normalizer `M` の TI-subset ⟹ `D ⊆ M_σ`」) に対応:
+  **`D` は `X` の選び方に依らず同一集合**。⟸ は `ASet ⊆ A0Set`、⟹ は
+  `theoremII_tame_embedding` の preamble `D ⊆ A(M)`。
+* `coprime_centralizer_of_neighbour` を `x ∈ ASet M U` から **`x ∈ hatMsigma M`** に一般化
+  (書籍の証明も `x ∈ \widehat{M_σ}` しか使っていない)。両方の `X` を同時に covering。
+* `exists_systemOfSupportingSubgroups` / `theoremII_tamelyImbedded` を
+  `{X} (hX : X = ASet M U ∨ X = A0Set M K)` 形に一般化。
+
+* 書籍 Theorem II の括弧書き **「(and therefore `Hᵢ ≤ M'ᵢ`)」** を
+  `SystemOfSupportingSubgroups.supporting_le_derived` として追加
+  (BG Thm 10.2(c) = `Ch3.S10.Msigma_le_derived` から即出る)。
+
+### 残り
+
+無し。Thm I / Thm II とも書籍 (PDF p. 126 / p. 132) と faithful に一致し、
+`theoremII_tamelyImbedded` は両方の `X` について unconditional・axiom-clean。
+
+⟹ **本 issue は closed**。今後 Pf 側が (Tii) family を消費し始めたときに encoding が
+合わないことが判明したら、その時点で新規 issue を立てる (本 issue の再オープンではなく)。
