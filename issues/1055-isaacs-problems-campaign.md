@@ -1806,7 +1806,7 @@ Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
 | 5D.1 | ✅ 完了 (`hasNormalPComplement_of_controlsPTransfer`) | `P ∈ Syl_p(G)` 可換, `P ⊆ H ⊆ G`, `H` が `G` の `p`-transfer を制御 (= `A^p(H) = H ∩ A^p(G)`)。`H` が正規 `p`-補群をもつなら `G` も持つ |
 | 5D.2 | ✅ 完了 (`hasNormalPComplement_of_sylow_le_center` + Burnside 導出の `example`) | `P ∈ Syl_p(G)`, `P ⊆ Z(G)` ⇒ (Burnside も transfer 理論も使わずに) `G` は正規 `p`-補群をもつ。これと Cor 5.23 から Burnside を導く |
 | 5D.3 | ⬜ | `G` 非可換単純, `P ⊆ G` が極大な `p`-部分群。(a) `P ∈ Syl_p(G)` (b) `1 < N ⊴ P` で `P/N` 可換なら `P` は `N` を含む唯一の Sylow `p`-部分群 ⇒ `N` は `P` 内で `G` に関し weakly closed (c) `P` の冪零類 ≥ 3 |
-| 5D.4 | ⬜ | `P ∈ Syl_p(G)`, `P ⊆ K ⊆ G` ⇒ `O^p(K) ⊆ K ∩ O^p(G)`、等号なら `A^p(K) = K ∩ A^p(G)` |
+| 5D.4 | ✅ 完了 (`pResidualOf_le_inf_pResidual` / `APrime_eq_subgroupOf_APrime_of_pResidualOf_eq`) | `P ∈ Syl_p(G)`, `P ⊆ K ⊆ G` ⇒ `O^p(K) ⊆ K ∩ O^p(G)`、等号なら `A^p(K) = K ∩ A^p(G)` |
 | 5D.5 | ⬜ | `P ∈ Syl_p(G)`, `A ∩ P = P'` (`A = A^p(G)`)。`P' ⊴ A` なら (Tate を使わず) `G` は正規 `p`-補群をもつ。hint: SZ で `A` 内の `P'` の補群 `K` を取り `G = N_G(K)P'`、`P' ⊆ Φ(P)` から `P` が `K` を正規化 |
 | 5D.6 | ⬜ | 同じ設定で `P'` 可換なら `G` は正規 `p`-補群をもつ。hint: `N = N_G(P')` が仮定を満たすことを見て `A` の中で Burnside |
 
@@ -1855,6 +1855,29 @@ Thm 5.20/5.21/5.22 = `APrime_eq_transferFocal_ker` / `focalSubgroupTheorem` /
 
 ⚠ 実装の罠: `hasNormalPComplement_of_normal_of_index_eq_pow` の `X` は結論に現れない
 implicit なので `(X := K)` を明示しないと `Subgroup.Normal ?m` で instance 探索が止まる。
+
+### 5D.4 の実装 (2026-07-27 完了、新 leaf `Problems5D4.lean` 166 行)
+
+`O^p` は Ch09 の `pResidual` / ambient 版 `pResidualOf` を使う (⚠ `Ch09_MoreSubnormality/PResidual.lean`
+は **mathlib しか import しない**ので Ch05 から import しても cycle 無し — 実測済)。
+
+* **前半** `pResidualOf_le_inf_pResidual`: `↥K ⧸ O^p(G).subgroupOf K` は
+  `(mk' O).comp K.subtype` の像と同型で、像は `p`-群 `G ⧸ O^p(G)` の部分群 ⟹ `p`-群 ⟹
+  `O^p` の普遍性。
+* **後半** `APrime_eq_subgroupOf_APrime_of_pResidualOf_eq` (⭐ 本題): `≤` は既存
+  `APrime_le_subgroupOf_APrime_of_sylow_le`。`≥` は `O := O^p(G)`, `B := A^p(K)` の押し出しとして
+  1. `K ⊔ O = ⊤` (`(P ⊔ O).index` は `|G:P|` (p と素) と `|G:O|` (p-冪) の両方を割るので 1),
+  2. `⁅G,G⁆ ≤ ⁅K,K⁆ ⊔ O` (`g = k·u` 分解 + `mk' O` で交換子を比較),
+  3. `A^p(G) ≤ O ⊔ ⁅G,G⁆ ≤ O ⊔ B` (`APrime_le`; ⚠ `O ⊔ B` は `G` で正規と限らないので
+     **正規な `O ⊔ ⁅G,G⁆` を経由**する),
+  4. Dedekind `K ⊓ (O ⊔ B) = (K ⊓ O) ⊔ B = B` (仮定 `K ⊓ O = O^p(K) ≤ B`)。
+  ⭐ 仮定 `O^p(K) = K ∩ O^p(G)` は 4 でだけ効く。
+* 副産物 `pResidual_le_APrime` (`O^p(H) ≤ A^p(H)`)。
+
+⚠ 実装の罠: `hrp : r = p` の `▸` は `P : Sylow p G` の型内の `p` まで巻き込んで
+**kernel で type mismatch** (elaborator は通す) — `subst hrp` を使う。
+商型に対する `rw [← hker]` は motive 不正 ⟹ `QuotientGroup.quotientMulEquivOfEq hker` +
+`IsPGroup.of_equiv` で移送。ゴールを変える `show` は `linter.style.show` が警告 ⟹ `change`。
 
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
