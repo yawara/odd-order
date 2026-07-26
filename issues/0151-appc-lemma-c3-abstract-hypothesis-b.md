@@ -554,3 +554,39 @@ commit `6518e7859` は **「C.3 chain を §16 の設定から切り離し抽象
    (証明は S16 版からほぼそのまま移せる — `hyp.base.p/q` → `p/q` だけ)。
 2. その後で 192 宣言の binder 置換 + helper 呼出の置換を 1 パスで行う。
 3. S16 側に残るのは `FieldNormalizerData` の pin 付き構成と `theoremC` への配線のみ。
+
+## 🎯 step 2c 試行で終着点が確定 (2026-07-26) — chain は BG へ **物理的に移す**しかない
+
+前提層 (helper 12 宣言) を揃えたうえで 192 宣言の binder 置換を実行したところ、
+**62 error** が出て、その支配的な原因が判明した:
+
+```
+Invalid field `s`: The environment does not contain
+`OddOrder.BG.AppC.FieldNormalizerData.s`
+```
+
+`data : BG.AppC.FieldNormalizerData p q G` に対する `data.s` / `data.s_mem_W2` /
+`data.P_pow_p_eq_one` / `data.normOneUnitsToU` … は **`BG.AppC.FieldNormalizerData.*` を探す**が、
+これらは `OddOrder.Peterfalvi.S16.FieldNormalizerData.*` に在るので見つからない。
+
+`namespace` は現在の名前空間の下にネストするので、S16 の file 内から
+`OddOrder.BG.AppC.FieldNormalizerData` に宣言を置くことはできない
+(`end OddOrder.Peterfalvi.S16` → `namespace OddOrder.BG.AppC.FieldNormalizerData` → 再 open、
+という file 手術をすれば可能だが不健全)。
+
+### ⟹ 終着点
+
+**C.3 chain の 192 宣言を BG の leaf へ物理的に移す**。これは回避策でなく**正しい構造**である:
+これらは BG Appendix C Lemma C.3 の内容そのものであって、Peterfalvi §16 の材料ではない。
+S16 側に残るのは
+* `FieldNormalizerData` の pin 付き構成 (`SubgroupL`)、
+* `theoremC` / `final_contradiction` への配線、
+* `hyp` を取る §16 固有の補題 (C.3 chain 外)
+だけになる。
+
+規模: ~4,000 行を 6 file から BG の新 leaf 群へ (`AppC_LemmaC3_*.lean`)。
+binder 置換自体は本 tick で script 化済み (192 宣言を 1 パスで変換できることは実証済) なので、
+**移設 + 置換を同時に行えばよい**。file 単位で分割できる (移した分は BG 側で閉じる) ので
+all-or-nothing ではない。
+
+⚠ 試行は revert 済、tree green。
