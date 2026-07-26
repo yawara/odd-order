@@ -324,3 +324,39 @@ revert は `git checkout <6 files>` で即座なので、リスクは制御可�
    `Q_finite`/`Q_commutative`/`Q_pPrime` に差し替え (導出は step 2a の
    `toHypothesisBAbstract` で実証済)。
 6. `data` を取らない `hyp`-only helper (7 件) も `(p, q)` 化。
+
+## ❗ 実測の訂正 (2026-07-26) — 最初の census は 6 file 中 4 file しか見ていなかった
+
+上の「`hyp.base` の使用フィールドは 8 つだけ」は **`S16_CoreLemmas` と `S16_CoreBounds` を
+含めずに数えていた**。6 file 全部の census:
+
+| フィールド | 出現数 | 抽象 (B) から出るか |
+|---|---|---|
+| `p` / `q` | 541 / 206 | パラメータ |
+| `U` / `P` / `Q` / `W2` | 194 / 146 / 88 / 76 | `data` のフィールド |
+| `p_prime` / `q_prime` | 94 / 30 | instance / フィールド |
+| **`p_eq_card_W2`** | **12** | ⭕ 導出可 — `P₀ ≅ 𝔽_p` かつ σ 単射ゆえ `|σ(P₀)| = p` |
+| **`p_odd` / `q_odd` / `three_le_q` / `p_ne_two`** | **7 / 4 / 3 / 1** | ⭕ 書籍 Remark (V) の還元 (条件 (A) の下で p, q は奇と仮定してよい = `le_of_conditionA_of_not_odd` で形式化済) |
+| `m` / `m_gt_49_hundredths_...` | 1 / 1 | ❓ §14 の数値パラメータ。`S16_CoreLemmas` の C.3 **以外**の部分 (要確認) |
+
+⟹ 「抽象 (B) を超える依存は無い」は**言い過ぎだった**。正しくは:
+**追加依存は 3 種で、いずれも (A)+(B)+「p,q 奇」から導出可能** (= 書籍が実際に使っている仮定):
+1. `|W₂| = p` — σ の単射性から出す小補題を書く。
+2. 奇性 — 書籍 Remark (V) の還元を使う (repo に `le_of_conditionA_of_not_odd` として在る)。
+3. `m` 系 2 箇所 — C.3 chain 外かどうか確認する。
+
+## 🧪 step 2b 試行の結果 (revert 済、知見のみ保持)
+
+1 パス置換を実際に試した:
+* `hyp.base.{P,U,W2,Q}` → `data.{P,U,W2,Q}` は **490 箇所**、
+  「`data` binder を持たない宣言でこれらを使うものはゼロ」を script で確認済ゆえ安全。
+* `S16.FieldNormalizerData` を BG record の `abbrev` にすると
+  **`Fact hyp.base.p.Prime` が statement 側で合成できず 103 error**。
+  `instance factHypothesisPPrime (hyp) : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩` を
+  足すと **12 error まで落ちる** — これが正しい足場。
+* 残 12 の内訳: (a) 孤立 docstring 1、(b) `(_data : ...)` の underscore binder 1、
+  (c) `hyp.base.p_eq_card_W2` を使う rw が `data.W2` と噛み合わない 5〜6 箇所
+  (= 上の追加依存 1 番)、(d) motive not type correct 1。
+
+⟹ **次の試行では `instance factHypothesisPPrime` を最初に置き、`|W₂| = p` の小補題を
+先に用意してから 1 パス置換する**。この 2 点で残 error はほぼ消える見込み。
