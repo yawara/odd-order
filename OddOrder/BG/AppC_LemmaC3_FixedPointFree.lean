@@ -192,7 +192,7 @@ theorem zpow_apply_fixed {M : Type*} [Group M] (f : MulAut M) {z : M} (hf : f z 
 /-- **BG Appendix C, Remark (X), `s`-only form**: if `x ∈ ⁅Q, W₂⁆` is fixed by
 conjugation by the single generator `s`, then `x = 1`.  Since `W₂ = ⟨s⟩`, being
 `s`-fixed is being `W₂`-fixed, and `(X)` (`C_Q(W₂) ∩ ⁅Q,W₂⁆ = 1`) applies. -/
-theorem w2ConjQAut_eq_one_of_mem_actionCommutator_of_s_fixed [Finite G]
+theorem w2ConjQAut_eq_one_of_mem_actionCommutator_of_s_fixed
     (data : FieldNormalizerData p q G) {x : ↥data.Q}
     (hx : x ∈ OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut)
     (hsfix : data.w2ConjQAut ⟨data.s, data.s_mem_W2⟩ x = x) :
@@ -212,7 +212,7 @@ displayed relation `(C.10)`, BG's `y ∈ ⁅Q, W₂⁆` lies in the kernel of
 `(s⁻¹ + 1 - s₁⁻¹s⁻¹ - s₃)(s⁻¹ - 1)`; the fixed-point-free action of `s` (Remark (X))
 removes the factor `(s⁻¹ - 1)`, leaving `Y_B = 1`, i.e. `s₁ t₁⁻¹ t⁻¹ = t⁻¹ t₃⁻¹ s₃`
 where `tᵢ = y⁻¹ sᵢ y`.  We produce this relation with the explicit conjugator `yc`. -/
-theorem step4_relation_5076 [Finite G] (data : FieldNormalizerData p q G) {c1 c2 c3 : ZMod p}
+theorem step4_relation_5076 (data : FieldNormalizerData p q G) {c1 c2 c3 : ZMod p}
     (hC10 : data.t ^ 2 * data.sigma (primeLineElement p q c1) *
         data.t⁻¹ * data.sigma (primeLineElement p q c2) *
           data.t⁻¹ * data.sigma (primeLineElement p q c3) = 1) :
@@ -389,7 +389,7 @@ theorem mem_normalizer_P_sup_U_of_conj_of_pow (data : FieldNormalizerData p q G)
 `(PU) ∩ (PU)^g = U`.  We use the dichotomy `= U ∨ = PU`; the `= PU` branch forces
 `g ∈ N_G(PU) ⊆ N_G(P)`, hence (since `g` generates `P₁`) `P₁ ≤ N_G(P)`, giving the
 `P₀ = P₁` contradiction `P1_ne_W2`. -/
-theorem step3_inf_conj_eq_U_of_mem_P1 [Finite G] (data : FieldNormalizerData p q G) {g : G}
+theorem step3_inf_conj_eq_U_of_mem_P1 (data : FieldNormalizerData p q G) {g : G}
     (hg : g ∈ data.P1) (hg1 : g ≠ 1) :
     (data.P ⊔ data.U) ⊓ (MulAut.conj g⁻¹ • (data.P ⊔ data.U)) =
       data.U := by
@@ -423,7 +423,7 @@ relation `s₁ t₁⁻¹ t⁻¹ = t⁻¹ t₃⁻¹ s₃` (`tᵢ = yc⁻¹ sᵢ y
 `s₁ = s⁻¹`.  Otherwise `g = t₁⁻¹ t⁻¹ ∈ P₁^#`, and for `u ∈ U^#` the common value
 `u^{s₁ t₁⁻¹ t⁻¹} = u^{t⁻¹ t₃⁻¹ s₃}` lies in `(PU) ∩ (PU)^g`, which is `U` by Step 3;
 then `u^{s₁} ∈ U^{t t₁} = U`, so Step 2 gives `s₁ = 1`, contradicting `(C.6)`. -/
-theorem step4_sigma_primeLine_eq_s_inv [Finite G] (data : FieldNormalizerData p q G)
+theorem step4_sigma_primeLine_eq_s_inv (data : FieldNormalizerData p q G)
     {c1 c3 : ZMod p}
     (hc1 : c1 ≠ 0) (_hc3 : c3 ≠ 0) (yc : G) (hty : data.t = yc⁻¹ * data.s * yc)
     (hrel : data.sigma (primeLineElement p q c1) *
@@ -526,7 +526,7 @@ theorem step4_sigma_primeLine_eq_s_inv [Finite G] (data : FieldNormalizerData p 
 factor of the `k = 3` first normal form is `s⁻¹`.  This is the last gap of BG
 Appendix C; combined with the existing finite-field core it discharges
 `appC_normSet_generator_relation` without the carrier field. -/
-theorem step4Capstone [Finite G] (data : FieldNormalizerData p q G) : data.Step4Capstone := by
+theorem step4Capstone (data : FieldNormalizerData p q G) : data.Step4Capstone := by
   intro a ha
   obtain ⟨b, hab, hb⟩ := data.exists_companion_of_unitVal_inv_mem_normSetE ha
   obtain ⟨forms⟩ := data.exists_step4C5NormalForms a b
@@ -544,7 +544,7 @@ theorem step4Capstone [Finite G] (data : FieldNormalizerData p q G) : data.Step4
 This is the conclusion the whole `AppC_LemmaC3_*` development exists to produce, and the last
 input Theorem C needs beyond condition (A).  It is **derived** from the Step 4 capstone
 `s₁ = s⁻¹` rather than carried as a hypothesis. -/
-theorem normSetGeneratorRelation_of_hypothesisB [Finite G] (data : FieldNormalizerData p q G) :
+theorem normSetGeneratorRelation_of_hypothesisB (data : FieldNormalizerData p q G) :
     normSetGeneratorRelation p q :=
   data.normSetGeneratorRelation_of_capstone data.step4Capstone
 

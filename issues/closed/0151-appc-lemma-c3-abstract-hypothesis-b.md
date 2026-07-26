@@ -677,9 +677,20 @@ Theorem C が §16 のデータを隠れて使っていない**ことが機械�
 2. `p_eq_card_W2` (`|W₂| = p` を仮説として持つ) → `card_primeLine` + σ 単射から**導出**
 3. `Q_pow_q_eq_one` → 不要 (consumer は「`Q` の `p`-元は自明」しか使っていなかった)
 
-## 残る特殊化債務 (別 issue 相当、低優先)
+## 追記 (同日): `[Finite G]` の特殊化債務も解消
 
-* **`[Finite G]`**: `theoremC_of_hypothesisBAbstract` は `G` 全体の有限性を要求するが、
-  書籍の (B) は `Q` の有限性しか言わない。使用箇所は Step 3
-  (`step3_inf_conj_eq_U_of_mem_P1` 等の共役・正規化子の counting) に限られるので、
-  `PU` と `Q` の有限性だけに緩められる可能性が高い。
+当初 close 時に「残る特殊化債務」として挙げた `[Finite G]` (書籍の (B) は `Q` の有限性しか
+言わないのに repo は `G` 全体の有限性を要求していた) を **C.3 chain 全体から除去**した。
+必要な有限性は次の 3 つだけで、いずれも (B) と setup から出る:
+
+| instance | 出どころ |
+|---|---|
+| `FieldNormalizerData.finite_Q` | (B) のフィールド `Q_finite` |
+| `FieldNormalizerData.finite_W2` | `card_W2 : |W₂| = p ≠ 0` (= `card_primeLine` + σ 単射) |
+| `FieldNormalizerData.finite_P1` | `P₁ = ⟨t⟩`、`orderOf t = p` |
+
+Step 3 の Sylow 論法が使う `W₂Q` の有限性は、(B) の「`σ(P₀)` が `Q` を正規化する」から
+`(W₂ ⊔ Q : Set G) = W₂ · Q` (2 つの有限集合の積) として出る (`setFinite_W2_sup_Q`)。
+
+⟹ **`theoremC_of_hypothesisBAbstract` は書籍 Theorem C と仮説が完全に一致した**
+(奇性も `G` の有限性も仮定しない)。特殊化債務ゼロ。

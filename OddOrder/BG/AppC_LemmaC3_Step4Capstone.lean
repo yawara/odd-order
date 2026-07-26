@@ -741,7 +741,7 @@ theorem step3_badBranch_P1_le_normalizer_W2
 
 /-- BG Appendix C Step 3 bad branch is impossible: it forces `P₁ = W₂`, while
 `P₁` normalizes `U` and `W₂` does not. -/
-theorem step3_badBranch_false [Finite G]
+theorem step3_badBranch_false
     (data : FieldNormalizerData p q G)
     (hbad :
       (data.P ⊔ data.U) ⊓
@@ -760,7 +760,7 @@ or gives the bad branch, now contradictory by `step3_badBranch_false`.
 
 This is the branch-free Step 3/C.10 producer still waiting only for the global
 `(C.6)` wiring that supplies `forms.c1 ≠ 0` and `forms.c3 ≠ 0`. -/
-theorem relationC9_w_eq_one_and_relationC10_of_c6 [Finite G]
+theorem relationC9_w_eq_one_and_relationC10_of_c6
     (data : FieldNormalizerData p q G)
     {a b : NormSet.normOneUnits p q}
     (ha : unitVal a⁻¹ ∈ NormSet.normSetE p q)
@@ -780,7 +780,7 @@ theorem relationC9_w_eq_one_and_relationC10_of_c6 [Finite G]
 /-- BG Appendix C Step 4 branch-free `(C.10)` producer: exact `(C.9)`, Step 3,
 the bad-branch contradiction, and the `(C.6)` nonzero facts for `c₁` and `c₃`
 together force `w₁=w₂=w₃=1` and the displayed `(C.10)` relation. -/
-theorem relationC9_w_eq_one_and_relationC10 [Finite G]
+theorem relationC9_w_eq_one_and_relationC10
     (data : FieldNormalizerData p q G)
     {a b : NormSet.normOneUnits p q}
     (ha : unitVal a⁻¹ ∈ NormSet.normSetE p q)

@@ -125,7 +125,7 @@ images `σ(P)`, `σ(U)`, `σ(P₀)` named: `p ≤ q`.
 
 Lemma C.3 (`normSetGeneratorRelation_of_hypothesisB`) supplies the norm relation, and Remark (V)
 disposes of the case where `q` is even. -/
-theorem theoremC_of_hypothesisB {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+theorem theoremC_of_hypothesisB {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G]
     (data : FieldNormalizerData p q G) : p ≤ q := by
   by_cases hqodd : Odd q
   · exact theoremC_abstract data.p_odd data.q_prime hqodd data.cyclotomic_coprime
@@ -141,8 +141,10 @@ spine merely supplies one instance of (B) (`theoremC` below).  Another instance 
 Remark (II) example `p = 2`, `G = SL(2, 2^q)` (`hypothesisBAbstract_sl2`).
 
 Oddness of `p` is not assumed: by Remark (V) the even case is immediate
-(`le_of_conditionA_of_not_odd`). -/
-theorem theoremC_of_hypothesisBAbstract {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+(`le_of_conditionA_of_not_odd`).  Neither is finiteness of `G`: hypothesis (B) only asks that
+`Q` be finite, and `|σ(P₀)| = p` is a consequence of the setup, so those two are all the
+finiteness the proof uses (`FieldNormalizerData.finite_Q`, `.finite_W2`). -/
+theorem theoremC_of_hypothesisBAbstract {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G]
     (hb : HypothesisBAbstract p q G) (hq : q.Prime) (hA : conditionA p q) : p ≤ q := by
   by_cases hpodd : Odd p
   · exact theoremC_of_hypothesisB (hb.toFieldNormalizerData hq hpodd hA)
