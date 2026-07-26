@@ -1447,7 +1447,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.7 | ✅ 完了 (`normal_sylow_three_of_card_eq`) | `\|G\| = 3^a·5·11` ⇒ Sylow-3 が正規 |
 | 5C.8 | ✅ 完了 (`hasNormalPComplement_of_minFac_of_not_dvd_pow_three`) | `p` が最小素因数 (`p > 2`) で `p^3 ∤ \|G\|` ⇒ 正規 p-補群 |
 | 5C.9 | ✅ 完了 (`three_dvd_card_of_isSimpleGroup_of_not_dvd_eight`) | 非可換単純で偶数位数、`8 ∤ \|G\|` ⇒ `3 \| \|G\|` |
-| 5C.10 | ⬜ | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
+| 5C.10 | ✅ 完了 (`seven_dvd_card_of_isSimpleGroup_of_card_sylow_two_eq_eight`) | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
 | 5C.11 | ⬜ | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
 | 5C.12 | ⬜ | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
 | 5C.13 | ⬜ | (Navarro) `P = N_G(P)'` なる Sylow `P` ⇒ `N_G(P)` が正規 p-補群をもつ |
@@ -1560,6 +1560,26 @@ instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbit
 の implicit/explicit の並びを確認してから書く)。
 `|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
 `G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
+
+### 5C.10 の実装メモ (2026-07-27)
+
+新 leaf `Problems5C10.lean` (146 行)。⭐ **`P` の同型類 (`C₈` / `C₄×C₂` / `C₂³`) を場合分けしない**
+のが要点で、書籍の hint (5C.9 の議論を真似る) をそのまま一様に通せる。
+
+論法: `7 ∤ |G|` と仮定。`8 ∣ |G|` と単純性から `G` は非可換 ⟹ `commutator G = ⊤`。
+Isaacs Thm 5.18 (`eq_one_of_mem_commutator_of_mem_sylow_of_central_normalizer`) は
+`P ∩ Z(N_G(P)) ∩ G' = 1` を与えるが `G' = G` なので **`C_P(N_G(P)) = 1`**。
+`S := N_G(P)/C_G(P) ≅ range (normalizerMonoidHom P)` の位数を割る素数 `q` は
+(i) `q ≠ 2` (`relIndex ∣ |G:P|` が奇数) かつ (ii) `q ∣ 2^m − 1` (`1 ≤ m ≤ 3`,
+5C.8 の `exists_dvd_pow_sub_one_of_dvd_card_mulAut`) ⟹ `q ∈ {3, 7}` ⟹ `q = 3`。
+∴ `S` は 3-群。`S` の `P` への作用の不動点は `C_P(N_G(P)) = 1` ゆえ
+`IsPGroup.card_modEq_card_fixedPoints` で `8 ≡ 1 (mod 3)` ⟹ `3 ∣ 7` で矛盾。
+
+⚠ 実装の罠: 元の交換子 `⁅x, y⁆` は **scoped instance** ゆえ `open scoped commutatorElement` が要る
+(Ch01 §1D 1D.9 と同じ罠)。`Nat.Prime 7` / `¬Nat.Prime 8` は minimal import では `norm_num` が
+落とせない ⟹ `Mathlib.Tactic.NormNum.Prime` を明示 import。現 mathlib の
+`Nat.eq_prime_pow_of_unique_prime_dvd` は指数が `factorization p` でなく
+**`primeFactorsList.length`**、仮説も `n ≠ 1` でなく `n ≠ 0`。
 
 ### 5C.9 の実装メモ (2026-07-26)
 
