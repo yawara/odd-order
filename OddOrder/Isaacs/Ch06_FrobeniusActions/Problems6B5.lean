@@ -12,21 +12,23 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B4
 
 **主張**: 群 `G` が subnormal 部分群からなる分割を持つなら `G` は冪零。
 
-**本形式化の経路** (書籍の hint とは別ルート; 6B.4 が使える):
+**証明** (書籍 hint の経路; `|G|` に関する強帰納法):
 
-1. **Wielandt**: subnormal 部分群 `H`, `K` が `H ⊓ K = ⊥` をみたせば `⁅H, K⁆ = ⊥`。
-2. 分割の相異なる部分は `SubgroupPartition.inf_eq_bot_of_ne` で交わりが自明なので, 1 から
-   **互いに可換**。
-3. **6B.4(a)** (`mul_comm_of_partition_of_commutator_eq_bot`) で `G` は可換, ゆえに冪零。
-   (6B.4(b) を併せると `G` は基本可換までわかる。)
+1. 分割のどの部分にも含まれない真部分群 `H` には `{Y ⊓ H}` が分割として乗る
+   (`restrictPartition`; `H ⊄ Y` ゆえ各部分が `H` の真部分群) ので帰納法で **`H` は冪零**。
+2. すべての部分が `F(G)` に入るなら, 部分は `G` を被覆するので `G = F(G)` で冪零。
+   よって `X ⊄ F(G)` なる部分 `X` が取れる。
+3. `X` は冪零でない (冪零なら `isSubnormal_le_fitting_of_isNilpotent` で `X ≤ F(G)`)。
+   `X < H < ⊤` なる `H` はどの部分にも含まれない (含まれれば `X` と一致してしまう) ので
+   1 より冪零, すると部分群 `X` も冪零で矛盾。ゆえに **`X` は極大**。
+   `X` は subnormal かつ真なので `X ≤ M ⊴ G`, `M < ⊤` が取れ, 極大性から **`X = M ⊴ G`**。
+4. 他の部分 `Y` は `Y ⊓ X = ⊥` かつ極大性から `Y ⊔ X = ⊤`。`X` が正規なので
+   任意の `1 ≠ y ∈ Y` について `⟨y⟩ ⊔ X = ⊤` となり `Y = ⟨y⟩` — つまり **`Y` は巡回**、
+   ゆえに冪零で `Y ≤ F(G)`。
+5. したがって `G = X ∪ F(G)` (集合として)。**群は二つの真部分群の合併にならない**
+   (`le_or_le_of_forall_mem_or`) ので `X ≤ F(G)` か `F(G) ≤ X`, どちらも矛盾。
 
-書籍の hint (「分割のどの部分にも含まれない `H < G` は冪零」→「`F(G)` に含まれない部分は
-正規で素数指数」) は 1 を経由しない別証明。
-
-⚠ ステップ 1 の Wielandt 補題は古典的だが証明が長い (subnormal 部分群の join の理論)。
-現状は statement のみ (`sorry`) で, 2-3 の還元は実証明済み。
-一般補題なので, 証明が入った時点で `OddOrder/Isaacs/Ch02_Subnormality/` 側へ移設してよい
-(既存の normal 版は `Ch02_Subnormality/Basic.lean` の `commute_of_disjoint_normal`)。
+⭐ 当初考えていた Wielandt 補題 (subnormal + 交わり自明 ⟹ 可換) は**不要**だった。
 -/
 
 namespace OddOrder.Isaacs.Ch06
@@ -140,28 +142,151 @@ theorem isSubnormal_restrictPartition_parts {G : Type*} [Group G] (P : SubgroupP
   obtain ⟨⟨Y, hY, rfl⟩, _⟩ := hZ
   exact Ch02.inf_isSubnormal_subgroupOf (hsub Y hY) H
 
-/-- **Wielandt**: 交わりが自明な二つの subnormal 部分群は元ごとに可換。
+/-- 群は二つの真部分群の合併にならない (どちらかが他方に含まれる)。 -/
+theorem le_or_le_of_forall_mem_or {G : Type*} [Group G] {A B : Subgroup G}
+    (h : ∀ g : G, g ∈ A ∨ g ∈ B) : A ≤ B ∨ B ≤ A := by
+  by_cases hAB : A ≤ B
+  · exact Or.inl hAB
+  refine Or.inr fun b hb => ?_
+  by_contra hbA
+  obtain ⟨a, haA, haB⟩ : ∃ a, a ∈ A ∧ a ∉ B := by
+    by_contra hcon
+    exact hAB fun a ha => by
+      by_contra h'
+      exact hcon ⟨a, ha, h'⟩
+  rcases h (a * b) with hab | hab
+  · refine hbA ?_
+    have hb' : b = a⁻¹ * (a * b) := by group
+    rw [hb']
+    exact A.mul_mem (A.inv_mem haA) hab
+  · refine haB ?_
+    have ha' : a = (a * b) * b⁻¹ := by group
+    rw [ha']
+    exact B.mul_mem hab (B.inv_mem hb)
 
-`H` が正規な場合は `⁅H, K⁆ ≤ H ⊓ K^G` から従うが, subnormal な場合は
-`H^G`, `K^G` が真の正規部分群であることを使う `|G|`-帰納法が要る。 -/
-theorem commutator_eq_bot_of_isSubnormal_of_inf_eq_bot {G : Type*} [Group G] [Finite G]
-    {H K : Subgroup G} (hH : H.IsSubnormal) (hK : K.IsSubnormal) (hHK : H ⊓ K = ⊥) :
-    ⁅H, K⁆ = ⊥ := by
-  sorry
+/-- **Isaacs Problem 6B.5** (p. 196) の帰納版 (`|G| = n` に関する強帰納法)。 -/
+theorem isNilpotent_of_subnormal_partition_aux :
+    ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] (P : SubgroupPartition G),
+      Nat.card G = n → (∀ X ∈ P.parts, X.IsSubnormal) → Group.IsNilpotent G := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+  intro G _ _ P hcard hsub
+  classical
+  subst hcard
+  -- 段 1: どの部分にも含まれない真部分群は冪零
+  have step1 : ∀ H : Subgroup G, H ≠ ⊤ → (∀ Y ∈ P.parts, ¬ H ≤ Y) → Group.IsNilpotent ↥H := by
+    intro H hHtop hH
+    have hlt : Nat.card ↥H < Nat.card G := by
+      have hmul := Subgroup.card_mul_index H
+      have h1 : H.index ≠ 1 := fun h => hHtop (Subgroup.index_eq_one.mp h)
+      have h0 : H.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+      calc Nat.card ↥H < Nat.card ↥H * H.index :=
+            (Nat.lt_mul_iff_one_lt_right Nat.card_pos).mpr (by omega)
+        _ = Nat.card G := hmul
+    exact ih (Nat.card ↥H) hlt (restrictPartition P hH) rfl
+      (isSubnormal_restrictPartition_parts P hH hsub)
+  -- 段 2: `F(G) = ⊤` なら終わり
+  by_cases hftop : Ch01.fitting G = ⊤
+  · haveI hfn : Group.IsNilpotent ↥(Ch01.fitting G) := Ch01.fitting.isNilpotent
+    rw [hftop] at hfn
+    exact Group.nilpotent_of_surjective (G := ↥(⊤ : Subgroup G))
+      Subgroup.topEquiv.toMonoidHom (fun x => ⟨⟨x, Subgroup.mem_top x⟩, rfl⟩)
+  -- 段 3: `F(G)` に含まれない部分 `X` を取る
+  by_cases hall : ∀ Y ∈ P.parts, Y ≤ Ch01.fitting G
+  · exfalso
+    refine hftop (eq_top_iff.mpr fun g _ => ?_)
+    obtain ⟨Y, hY, hgY⟩ := P.cover g
+    exact hall Y hY hgY
+  obtain ⟨X, hX, hXf⟩ : ∃ X ∈ P.parts, ¬ X ≤ Ch01.fitting G := by
+    by_contra hcon
+    exact hall fun Y hY => by
+      by_contra h'
+      exact hcon ⟨Y, hY, h'⟩
+  have hXtop : X ≠ ⊤ := P.proper X hX
+  have hXnil : ¬ Group.IsNilpotent ↥X := fun hnil =>
+    hXf (isSubnormal_le_fitting_of_isNilpotent (Nat.card G) X rfl (hsub X hX) hnil)
+  -- 段 3': `X` は極大
+  have hmax : ∀ H : Subgroup G, X < H → H = ⊤ := by
+    intro H hXH
+    by_contra hHtop
+    have hHY : ∀ Y ∈ P.parts, ¬ H ≤ Y := by
+      intro Y hY hle
+      have hXY : X = Y := by
+        by_contra hne
+        have : X ⊓ Y = ⊥ := P.inf_eq_bot_of_ne hX hY hne
+        have hXle : X ≤ X ⊓ Y := le_inf le_rfl (le_trans hXH.le hle)
+        rw [this, le_bot_iff] at hXle
+        exact P.nontrivial X hX hXle
+      exact absurd (hXY ▸ hle : H ≤ X) (not_le_of_gt hXH)
+    haveI := step1 H hHtop hHY
+    refine hXnil ?_
+    haveI : Group.IsNilpotent ↥(X.subgroupOf H) := inferInstance
+    exact Group.nilpotent_of_surjective (G := ↥(X.subgroupOf H))
+      (Subgroup.subgroupOfEquivOfLe hXH.le).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hXH.le).surjective
+  -- 段 3'': `X ⊴ G` (subnormal + 極大)
+  obtain ⟨M, hMn, hXM, hMlt⟩ := (hsub X hX).exists_normal_and_le_and_lt_top_of_ne hXtop
+  have hXM' : X = M := by
+    rcases lt_or_eq_of_le hXM with hlt | heq
+    · exact absurd (hmax M hlt) (ne_of_lt hMlt)
+    · exact heq
+  haveI : X.Normal := hXM' ▸ hMn
+  -- 段 4: 他の部分は `X` の補群ゆえ `F(G)` に入る
+  have hother : ∀ Y ∈ P.parts, Y ≠ X → Y ≤ Ch01.fitting G := by
+    intro Y hY hYX
+    have hYX' : Y ⊓ X = ⊥ := P.inf_eq_bot_of_ne hY hX hYX
+    obtain ⟨y, hyY, hy1⟩ : ∃ y : G, y ∈ Y ∧ y ≠ 1 := by
+      by_contra hcon
+      refine P.nontrivial Y hY (le_antisymm (fun x hx => ?_) bot_le)
+      by_contra hx1
+      exact hcon ⟨x, hx, hx1⟩
+    have hSY : Subgroup.zpowers y ≤ Y := Subgroup.zpowers_le.mpr hyY
+    have hsupS : Subgroup.zpowers y ⊔ X = ⊤ := by
+      refine hmax (Subgroup.zpowers y ⊔ X) (lt_of_le_of_ne le_sup_right fun h => ?_)
+      have hSle : Subgroup.zpowers y ≤ X := by rw [h]; exact le_sup_left
+      have hyYX : y ∈ Y ⊓ X := ⟨hyY, hSle (Subgroup.mem_zpowers y)⟩
+      rw [hYX', Subgroup.mem_bot] at hyYX
+      exact hy1 hyYX
+    have hYS : Y = Subgroup.zpowers y := by
+      refine le_antisymm (fun w hw => ?_) hSY
+      have hwtop : w ∈ X ⊔ Subgroup.zpowers y := by
+        rw [sup_comm, hsupS]; exact Subgroup.mem_top w
+      rw [← SetLike.mem_coe, Subgroup.normal_mul] at hwtop
+      obtain ⟨x, hx, t, ht, rfl⟩ := hwtop
+      have hxY : x ∈ Y := by
+        have heq : x = (x * t) * t⁻¹ := by group
+        rw [heq]
+        exact Y.mul_mem hw (Y.inv_mem (hSY ht))
+      have hx1 : x ∈ Y ⊓ X := ⟨hxY, hx⟩
+      rw [hYX', Subgroup.mem_bot] at hx1
+      change x * t ∈ Subgroup.zpowers y
+      rw [hx1, one_mul]
+      exact ht
+    haveI : IsCyclic ↥Y := hYS ▸ Subgroup.isCyclic_zpowers y
+    letI : CommGroup ↥Y := IsCyclic.commGroup
+    haveI : Group.IsNilpotent ↥Y := inferInstance
+    exact isSubnormal_le_fitting_of_isNilpotent (Nat.card G) Y rfl (hsub Y hY) inferInstance
+  -- 段 5: `G = X ∪ F(G)` で矛盾
+  exfalso
+  have hunion : ∀ g : G, g ∈ X ∨ g ∈ Ch01.fitting G := by
+    intro g
+    obtain ⟨Y, hY, hgY⟩ := P.cover g
+    rcases eq_or_ne Y X with rfl | hne
+    · exact Or.inl hgY
+    · exact Or.inr (hother Y hY hne hgY)
+  rcases le_or_le_of_forall_mem_or hunion with h | h
+  · exact hXf h
+  · exact hXtop (eq_top_iff.mpr fun g _ => by
+      rcases hunion g with hg | hg
+      · exact hg
+      · exact h hg)
 
-/-- **Isaacs Problem 6B.5** (p. 196) ⭐: subnormal 部分群からなる分割を持つ群は冪零。
-
-実際には (6B.4 経由で) **可換**であることまで従う。 -/
+/-- **Isaacs Problem 6B.5** (p. 196) ⭐: subnormal 部分群からなる分割を持つ群は冪零。 -/
 theorem isNilpotent_of_subnormal_partition {G : Type*} [Group G] [Finite G]
     (P : SubgroupPartition G) (hsub : ∀ X ∈ P.parts, X.IsSubnormal) :
-    Group.IsNilpotent G := by
-  have hcomm : ∀ X ∈ P.parts, ∀ Y ∈ P.parts, X ≠ Y → ⁅X, Y⁆ = ⊥ := fun X hX Y hY hne =>
-    commutator_eq_bot_of_isSubnormal_of_inf_eq_bot (hsub X hX) (hsub Y hY)
-      (P.inf_eq_bot_of_ne hX hY hne)
-  letI : CommGroup G :=
-    { (inferInstance : Group G) with
-      mul_comm := mul_comm_of_partition_of_commutator_eq_bot P hcomm }
-  infer_instance
+    Group.IsNilpotent G :=
+  isNilpotent_of_subnormal_partition_aux (Nat.card G) P rfl hsub
 
 end
 
