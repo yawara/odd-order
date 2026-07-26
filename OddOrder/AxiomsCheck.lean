@@ -9657,6 +9657,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- よく、`refine … ?_ ?_` の目標がすべてこの signature から elaborate されるので
 -- `Semiring (ZMod p)` の instance 経路が割れない (issue 0152 の実測)。
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.blockScalarFacts_of_blocks
+#assert_only_allowed_axioms OddOrder.GroupTheory.ker_lineScalarChar_aInvariantSubrep
+-- **Pf (9.7)(a) の書籍 `a`-形が閉じた** (issue 0152 完了, 2026-07-27):
+-- `caseA_blockScalarFacts` の第 2 結論 `∃ a, a ∣ p−1 ∧ u ∣ a^{q−1}` が書籍 p.51 の
+-- 「`a = |U : C_U(H₁)|` は `p−1` を割り、`U` は位数 `a` の巡回群 `q−1` 個の直積の部分群」。
+-- ブロックが `W₁`-移動 `Hpart j = w_j • S₀` ゆえ各点固定化群が共役 ⟹ 指数一致 ⟹
+-- ブロックスカラー像の位数一致 ⟹ (𝔽_p^× が巡回ゆえ) 像そのものが一致。
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseA_blockScalarFacts
 -- Peterfalvi (9.7)(b): `Coprime |Ū| (p-1)` (fixed-point-free) and the resulting unconditional
 -- divisibility `|Ū| ∣ (p^q-1)/(p-1)`.  The FPF input `C_Ū(w₀) = 1` is supplied from the Frobenius
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).

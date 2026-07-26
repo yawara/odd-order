@@ -198,3 +198,57 @@ theorem blockScalarFacts_of_blocks (ρ) (B) (hBcard)
 `hcard` の目標は `ker (lineScalarChar (B i)) = ptStabOfMulAut Ū.subtype (Hpart i)` を経由して
 `Subgroup.index_ptStabOfMulAut_subtype_smul` + `range_uActionHom_conj_mem` で閉じる
 (すべて landed 済)。
+
+---
+
+# ✅ 完了 (2026-07-27)
+
+## 到達点
+
+```lean
+theorem OddOrder.Peterfalvi.S11.caseA_blockScalarFacts … :
+    (∃ ψ : ↥(MonoidHom.range (uActionHom data chief)) →*
+        (Fin (data.q - 1) → (ZMod chief.p)ˣ), Function.Injective ψ)
+      ∧ ∃ a : ℕ, a ∣ chief.p - 1 ∧ chars.u ∣ a ^ (data.q - 1)
+```
+
+第 2 結論が**書籍 p.51 の (9.7)(a) そのもの** — 「`a = |U : C_U(H₁)|` は `p − 1` を割り、
+`U` は位数 `a` の巡回群 `q − 1` 個の直積の部分群と同型」。repo はこれまで粗い
+`u ∣ (p−1)^{q−1}` 形しか持っていなかった。
+
+既存の `caseA_exists_blockScalarRatioEmbedding` は `.1` の射影として残したので**下流は不変**。
+
+## 証明の筋 (書籍どおり)
+
+1. ブロックは `W₁`-移動 `Hpart j = w_j • S₀` (`caseA.Hpart_orbit`)
+2. `w_j` は `Ū` を正規化する (`range_uActionHom_conj_mem`; `uActionHom` は
+   `quotientMulAutHom` の `U` への制限 + `U ⊴ U W₁`)
+3. ⟹ 各点固定化群 `C_Ū(Hpart j)` が `Ū`-共役 ⟹ **指数一致**
+   (`Subgroup.index_ptStabOfMulAut_subtype_smul`)
+4. `ker (lineScalarChar (block)) = C_Ū(block)` (`ker_lineScalarChar_aInvariantSubrep`) と
+   `|im φ| = |Ū : ker φ|` ⟹ ブロックスカラー像の**位数一致**
+5. `𝔽_p^×` は巡回ゆえ位数一致 ⟹ **像そのものが一致**
+   (`Subgroup.eq_of_card_eq_of_isCyclic`)
+6. ⟹ ratio embedding が `(位数 a の巡回群)^{q−1}` に落ちる
+   (`card_dvd_blockScalarRange_pow_of_blocks_card_eq`)
+
+## 途中で当たった罠と回避
+
+`hconst` (§9 の crux、80 行) を呼び出し側の `have` に hoist すると、`Semiring (ZMod p)` への
+instance 経路が `CommRing` 経由と `Field` 経由に割れて `Representation` の型が食い違う
+([[lean-instance-defeq-traps]])。⟹ **generic 側で 2 結論を束ねる**
+(`blockScalarFacts_of_blocks`) ことで、S11 の証明本体を保ったまま全目標の型を signature から
+降ろす設計にした。
+
+## 新規追加 (すべて axiom-clean)
+
+| 場所 | 定理 |
+|---|---|
+| `Mathlib/CyclicSubgroupUnique.lean` (新設) | `eq_powMonoidHom_ker_card`, `Subgroup.eq_of_card_eq_of_isCyclic` |
+| `Mathlib/Subgroup.lean` | `ptStabOfMulAut`, `ptStabOfMulAut_smul`, `index_ptStabOfMulAut_smul`, `index_ptStabOfMulAut_subtype_smul` |
+| `RepresentationTheory/LineScalarCharacter.lean` | `lineScalarChar_comp_of_equivariant`, `lineScalarChar_range_eq_of_equivariant` |
+| `RepresentationTheory/AInvariantSubrep.lean` | `ker_lineScalarChar_aInvariantSubrep` |
+| `RepresentationTheory/TypePGaloisUBound.lean` | `card_dvd_blockScalarOrder_pow_of_blocks`, `card_dvd_blockScalarRange_pow_of_blocks{,_card_eq}`, `card_lineScalarChar_range_eq_index`, `lineScalarChar_ker_eq`, `blockScalarFacts_of_blocks` |
+| `Peterfalvi/S11_ImprimitiveUBound.lean` | `range_uActionHom_conj_mem{,_inv}`, `caseA_blockScalarFacts` |
+
+フルビルド green (4799 jobs)、AxiomsCheck OK、`--strict` 警告ゼロ、sorry 非退行。
