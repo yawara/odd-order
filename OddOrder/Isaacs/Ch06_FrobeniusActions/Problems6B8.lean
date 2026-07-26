@@ -580,6 +580,24 @@ theorem index_comap_of_surjective {G G' : Type*} [Group G] [Group G'] {f : G →
     (hf : Function.Surjective f) (K : Subgroup G') : (K.comap f).index = K.index := by
   rw [Subgroup.index_comap, MonoidHom.range_eq_top.mpr hf, Subgroup.relIndex_top_right]
 
+/-- **帰納 step の引き戻し**: `Z ≤ Z(P)` (正規) のとき, `P/Z` の巡回部分群 `⟨c⟩` の
+引き戻しは**可換**。
+
+`φ : A → P/Z` の像は `⟨c⟩` に含まれるので巡回, 核は `Z ∩ A ≤ Z(A)`。 -/
+theorem isMulCommutative_comap_zpowers {P : Type*} [Group P] {Z : Subgroup P} [Z.Normal]
+    (hZ : Z ≤ Subgroup.center P) (c : P ⧸ Z) :
+    IsMulCommutative ↥((Subgroup.zpowers c).comap (QuotientGroup.mk' Z)) := by
+  let A : Subgroup P := (Subgroup.zpowers c).comap (QuotientGroup.mk' Z)
+  let φ : ↥A →* ↥(Subgroup.zpowers c) :=
+    ((QuotientGroup.mk' Z).comp A.subtype).codRestrict (Subgroup.zpowers c) (fun w => w.2)
+  refine MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center φ ?_
+  intro w hw
+  have hwZ : (w : P) ∈ Z := by
+    have hw1 : (QuotientGroup.mk' Z) ((w : P)) = 1 := congrArg Subtype.val hw
+    rwa [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hw1
+  refine Subgroup.mem_center_iff.mpr fun g => ?_
+  exact Subtype.ext (Subgroup.mem_center_iff.mp (hZ hwZ) ((g : P)))
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
