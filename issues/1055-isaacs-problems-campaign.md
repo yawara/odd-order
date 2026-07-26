@@ -1970,6 +1970,15 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.9 | ✅ **完了 (a)-(f)** (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
 | 6A.10 | ✅ **(a)(b)(c) 完了** | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
+| 6B.1 | ⬜ | 任意の Frobenius 群は可解 Frobenius 部分群を含む ⟹ Frobenius 補群は Frobenius 群を部分群に持てない |
+| 6B.2 | ⬜ | `A` 可換が `N` に忠実作用, `N` の非自明真部分群が `A`-不変でない ⟹ `A` 巡回 |
+| 6B.3 | ⬜ | Thm 6.21 の coprime 仮定を落とすと偽 (反例構成) |
+| 6B.4 | ⬜ | 分割 II で `[X,Y] = 1` ⟹ (a) `G` 可換 (b) 基本可換 |
+| 6B.5 | ⬜ | subnormal 部分群からなる分割を持つ ⟹ `G` 冪零 |
+| 6B.6 | ⬜ | 位数 ≥ 8 の巡回 2-群は位数 2 の自己同型をちょうど 3 個持つ |
+| 6B.7 | ⬜ | 非可換 2-群が指数 2 の巡回部分群を持ち `|P:Z(P)| > 4` ⟹ 二面体/半二面体/一般四元数 |
+| 6B.8 | ⬜ | `|P| ≥ 8`, `|P:P'| = 4` ⟹ 二面体/半二面体/一般四元数 (Taussky-Todd) |
+| 6B.9 | ⬜ | `G` 可解 + 全元が素数冪位数 ⟹ `|G|` の素因子は高々 2 個 |
 
 ### 6A.6 完了 / 6A.11 は (⟹) のみ (2026-07-27) — 新 leaf `ProblemsTIHypothesis.lean`
 
@@ -3041,3 +3050,24 @@ Isaacs Ch.3 の章末演習は全問完済** ⟹ あわせて **Isaacs Ch.1–Ch
   を新規に証明)。`h₂ := x h x⁻¹` の生成する `⟨h₂⟩` は位数 `o(h)` で `|N|` と互いに素なので
   D-part の **`U` 可解枝** (`⟨h₂⟩` は巡回) が使え、`⟨h₂⟩ ≤ ⟨h⟩^y` (`y ∈ N`) を得る。
   `⟨h⟩ ⊓ N = 1` より `G ⧸ N` での像を比べて `k = h⁻¹`, すなわち `h ~ h⁻¹`。
+
+
+## §6B 着手メモ (2026-07-27)
+
+書籍 p. 195-196 (PDF p. 208-209)。§6B の本文定理は Lemma 6.16 / Cor 6.17 (Frobenius 補群の
+Sylow は巡回か一般四元数) / Cor 6.18 / Thm 6.19 / Lemma 6.20 / Thm 6.21。
+
+**6B.1 の設計 (実装前に確定した分)**:
+* 前半「任意の Frobenius 群は可解 Frobenius 部分群を含む」: `hF : IsFrobeniusGroup G N A` から
+  素数位数 `p` の `x ∈ A` を取り `B := ⟨x⟩`。`B` 不変な非自明可換部分群 `M ≤ N` を
+  `FrobeniusGroup.lean` の既存 API (l.931/977 付近, Isaacs Thm 3.23 経由で不変 Sylow → `Z(R)`)
+  で取る。`M ⊔ B` が可解 Frobenius 部分群 (`isFrobeniusGroup_of_prime_complement_fixedFree`,
+  l.258 が素数位数補群からの構成を与える)。
+* 後半「Frobenius 補群は Frobenius 群を部分群に持てない」: **repo に可解版が既に在る** —
+  `false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup`
+  (`FrobeniusGroup.lean` l.1000, Isaacs Thm 6.9 の可解分岐)。前半と合成すれば可解仮定が外れる。
+  ⟹ **6B.1 = 前半を作って既存の可解版と合成する**のが正しい構成。
+* ⚠ `exists_aInvariant_sylow_subgroup` (部分群形) は `OddOrder/BG/Ch3_MaximalSubgroups/
+  S13_Corollary132.lean` に在るが **BG は Isaacs の下流**なので import 不可。Isaacs 側では
+  `Isaacs.Ch04.exists_aInvariant_sylow` (action 形) か、上記 `FrobeniusGroup.lean` の
+  既存ラッパを使う。
