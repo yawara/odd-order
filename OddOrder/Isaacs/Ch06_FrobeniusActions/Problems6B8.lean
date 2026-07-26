@@ -818,6 +818,57 @@ theorem commutator_le_thetaHom_range {P : Type*} [Group P] {A : Subgroup P} {a :
   exact commutatorElement_eq_one_iff_mul_comm.mpr
     (Subgroup.mem_center_iff.mp (hcentral u) _).symm
 
+/-- `A` が指数 `2` で `a ∉ A` なら `⟨A, a⟩ = P`。 -/
+theorem sup_zpowers_eq_top_of_index_two {P : Type*} [Group P] {A : Subgroup P}
+    (hidxA : A.index = 2) {a : P} (ha : a ∉ A) : A ⊔ Subgroup.zpowers a = ⊤ := by
+  have hle : A ≤ A ⊔ Subgroup.zpowers a := le_sup_left
+  have hmul := Subgroup.relIndex_mul_index hle
+  rw [hidxA] at hmul
+  have hne2 : (A ⊔ Subgroup.zpowers a).index ≠ 2 := by
+    intro h2
+    rw [h2] at hmul
+    have hrel : A.relIndex (A ⊔ Subgroup.zpowers a) = 1 := by omega
+    exact ha (Subgroup.relIndex_eq_one.mp hrel
+      ((le_sup_right : Subgroup.zpowers a ≤ _) (Subgroup.mem_zpowers a)))
+  have hdvd : (A ⊔ Subgroup.zpowers a).index ∣ 2 := Dvd.intro_left _ hmul
+  refine Subgroup.index_eq_one.mp ?_
+  rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h1 | h2
+  · exact h1
+  · exact absurd h2 hne2
+
+/-- **`|C_A(a)| = 2`**: `A` 可換で指数 `2`, `|P : P'| = 4` なら `θ` の核は位数 `2`。
+
+`|im θ| = |P'| = |P|/4 = |A|/2` と `|ker| · |im| = |A|` から。 -/
+theorem card_thetaHom_ker_eq_two {P : Type*} [Group P] [Finite P] {A : Subgroup P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x) (hidxA : A.index = 2)
+    {a : P} (ha : a ∉ A) (ha2 : a ^ 2 ∈ A) (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A)
+    (hidx : (commutator P).index = 4) :
+    Nat.card ↥(thetaHom A a hab hnorm).ker = 2 := by
+  have hgen := sup_zpowers_eq_top_of_index_two hidxA ha
+  have hrange : commutator P = (thetaHom A a hab hnorm).range :=
+    le_antisymm (commutator_le_thetaHom_range hab ha2 hnorm hgen)
+      (thetaHom_range_le_commutator hab hnorm)
+  have hA := Subgroup.card_mul_index A
+  rw [hidxA] at hA
+  have hC := Subgroup.card_mul_index (commutator P)
+  rw [hidx] at hC
+  have hsplit : Nat.card ↥(thetaHom A a hab hnorm).ker
+      * Nat.card ↥(thetaHom A a hab hnorm).range = Nat.card ↥A := by
+    have hq := Subgroup.card_mul_index (thetaHom A a hab hnorm).ker
+    have hiso : Nat.card (↥A ⧸ (thetaHom A a hab hnorm).ker)
+        = Nat.card ↥(thetaHom A a hab hnorm).range :=
+      Nat.card_congr (QuotientGroup.quotientKerEquivRange (thetaHom A a hab hnorm)).toEquiv
+    rw [show (thetaHom A a hab hnorm).ker.index
+      = Nat.card (↥A ⧸ (thetaHom A a hab hnorm).ker) from rfl, hiso] at hq
+    exact hq
+  rw [← hrange] at hsplit
+  have hpos : 0 < Nat.card ↥(commutator P) := Nat.card_pos
+  have heq : Nat.card ↥(thetaHom A a hab hnorm).ker * Nat.card ↥(commutator P)
+      = 2 * Nat.card ↥(commutator P) := by
+    rw [hsplit]
+    omega
+  exact Nat.eq_of_mul_eq_mul_right hpos heq
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
