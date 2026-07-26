@@ -1968,7 +1968,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.7 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
 | 6A.8 | ✅ **完了** (`Problems6A8.lean`) | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
 | 6A.9 | ✅ **完了 (a)-(f)** (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
-| 6A.10 | 🔨 **(a)(b) 完了** / 残り = (c) のみ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
+| 6A.10 | ✅ **(a)(b)(c) 完了** | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
 
 ### 6A.6 完了 / 6A.11 は (⟹) のみ (2026-07-27) — 新 leaf `ProblemsTIHypothesis.lean`
@@ -2032,6 +2032,20 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
   に対する (b) を使うのが要点だった (`X` は共役不変なので `A` の共役に乗り換えられる)。
   副産物: `TI_conj` / `notConjugateSet_conj` (TI 仮説と `X` は `A` の共役に不変)。
 
+* **6A.10(c) 完了** `exists_subgroup_coe_eq_notConjugateSet_of_solvable` (2026-07-27,
+  新 leaf `Problems6A10c.lean`) ⭐ = **可解な場合の Frobenius の定理**: `A` が TI 仮説を
+  みたし**可解**なら `X = notConjugateSet A` は部分群 (の台集合)。`|G|` に関する強帰納法:
+  * `A' < A` (`IsSolvable.commutator_lt_top_of_nontrivial` を `↥A` に適用) と 6A.10(b) の
+    `G' ⊓ A = A'` が両輪。
+  * **`A` 非可換**: `A ⊓ G' = A' ≠ 1` ⟹ 6A.7(a) で `AG' = G`。`G' = G` なら `A = A'` で
+    矛盾ゆえ `G' < G`。6A.8 の `TI_subgroupOf_normal` + `image_notConjugateSet_subgroupOf_eq`
+    で `X` は `X_{G'}(A ⊓ G')` の像 ⟹ 帰納法の仮定を `G'` に適用。
+  * **`A` 可換**: `A ⊓ G' = 1` ⟹ 6A.8 第 1 場合で `G' ⊆ X`。`M := AG'` は正規で `A ≤ M`,
+    `A ≠ 1` ゆえ `M ⊄ X` ⟹ 6A.8 で `X ⊆ M`, さらに `G = X ∪ ⋃A^g ⊆ M` で `AG' = G`。
+    濃度が `|X| = |G:A| = |G':A⊓G'| = |G'|` で一致 ⟹ **`X = G'`**。
+  この過程で `Problems6A8.lean` を refactor し, 埋もれていた 3 本を再利用可能に切り出した
+  (`subset_notConjugateSet_of_inf_eq_bot` / `sup_eq_top_of_inf_ne_bot` /
+  `image_notConjugateSet_subgroupOf_eq`)。⟹ **§6A 完了**。
 * **6A.10(b) 完了** `inf_commutator_eq_commutator_self_of_TI` (2026-07-27): TI 仮説の下で
   **`G' ⊓ A = A'`**。⊇ は自明 (`commutator_self_le_inf_commutator`)。⊆ は焦点部分群定理経由:
   `H := G' ⊓ A` の Sylow `p`-部分群 `Q` を含む `↥A` の Sylow `S` を取ると, (a) 前半で

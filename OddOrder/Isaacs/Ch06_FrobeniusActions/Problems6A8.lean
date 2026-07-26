@@ -104,6 +104,60 @@ theorem image_notConjugateSet_subgroupOf_subset {A M : Subgroup G} [M.Normal]
   rw [← hg]
   group
 
+/-- `A ⊓ M = ⊥` (`M ⊴ G`) なら `M ⊆ X` (`X = notConjugateSet A`)。
+
+`m ∈ M` が `A` の非単位元 `a` と共役なら `M ⊴ G` から `a ∈ M`, ゆえに `a ∈ A ⊓ M = 1`。 -/
+theorem subset_notConjugateSet_of_inf_eq_bot {A M : Subgroup G} [M.Normal]
+    (hAM : A ⊓ M = ⊥) : (M : Set G) ⊆ notConjugateSet A := by
+  intro m hm a ha hane hconj
+  obtain ⟨g, hg⟩ := isConj_iff.mp hconj
+  have haM : a ∈ M := by
+    have hin : g⁻¹ * m * g ∈ M := by simpa using ‹M.Normal›.conj_mem _ hm g⁻¹
+    rwa [← hg, show g⁻¹ * (g * a * g⁻¹) * g = a by group] at hin
+  have hmem : a ∈ A ⊓ M := ⟨ha, haM⟩
+  rw [hAM, Subgroup.mem_bot] at hmem
+  exact hane hmem
+
+/-- `A` が TI 仮説をみたし `M ⊴ G` で `A ⊓ M ≠ ⊥` なら **`AM = G`** (6A.7(a) の帰結)。
+
+任意の `g` について `A^g ⊓ (A ⊔ M) ⊇ (A ⊓ M)^g ≠ 1` なので 6A.7(a) から `g ∈ A ⊔ M`。 -/
+theorem sup_eq_top_of_inf_ne_bot [Finite G] {A M : Subgroup G} [M.Normal]
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) (hAM : A ⊓ M ≠ ⊥) :
+    A ⊔ M = ⊤ := by
+  refine le_antisymm le_top fun g _ => ?_
+  refine mem_of_conj_inf_ne_bot (le_sup_left : A ≤ A ⊔ M) hATI (g := g) ?_
+  intro h
+  refine hAM (le_antisymm (fun x hx => ?_) bot_le)
+  have hxg : MulAut.conj g x ∈ (MulAut.conj g • A) ⊓ (A ⊔ M) := by
+    refine Subgroup.mem_inf.mpr ⟨?_, ?_⟩
+    · rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+      change (MulAut.conj g).symm ((MulAut.conj g) x) ∈ A
+      rw [MulEquiv.symm_apply_apply]
+      exact hx.1
+    · exact (le_sup_right : M ≤ A ⊔ M) (‹M.Normal›.conj_mem _ hx.2 g)
+  rw [h, Subgroup.mem_bot] at hxg
+  have hx1 : x = 1 := by
+    have h2 := congrArg (fun y : G => g⁻¹ * y * g) hxg
+    simpa [MulAut.conj_apply, mul_assoc] using h2
+  simp [hx1]
+
+/-- `AM = G` (`M ⊴ G`, TI) のとき `X` は `M` の中の `X_M(A ⊓ M)` の像に**一致**する。
+
+包含 `⊆` は `image_notConjugateSet_subgroupOf_subset`, 逆向きは Lemma 6.5 の濃度計算
+(`|X| = |G : A| = |M : A ⊓ M| = |X_M(A ⊓ M)|`) から。 -/
+theorem image_notConjugateSet_subgroupOf_eq [Finite G] {A M : Subgroup G} [M.Normal]
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) (hsup : A ⊔ M = ⊤) :
+    M.subtype '' notConjugateSet (A.subgroupOf M) = notConjugateSet A := by
+  have hsubset := image_notConjugateSet_subgroupOf_subset (A := A) (M := M) hsup
+  have hcardX : (notConjugateSet A).ncard = A.index := card_notConjugateSet_eq_index A hATI
+  have hcardXM : (notConjugateSet (A.subgroupOf M)).ncard = (A.subgroupOf M).index :=
+    card_notConjugateSet_eq_index _ (TI_subgroupOf_normal hATI)
+  have hcardimg : (M.subtype '' notConjugateSet (A.subgroupOf M)).ncard
+      = (notConjugateSet (A.subgroupOf M)).ncard :=
+    Set.ncard_image_of_injective _ (Subgroup.subtype_injective M)
+  refine Set.eq_of_subset_of_ncard_le hsubset ?_ (Set.toFinite _)
+  rw [hcardX, hcardimg, hcardXM, ← Subgroup.relIndex, ← index_eq_relIndex_of_sup_eq_top hsup]
+
 /-- **Isaacs Problem 6A.8** (p. 186) ⭐: `A` が `G` で Lemma 6.5 の TI 仮説をみたし `M ⊴ G` なら,
 `M ⊆ X` または `X ⊆ M` (`X = notConjugateSet A`)。 -/
 theorem subset_notConjugateSet_or_subset_of_normal [Finite G] {A M : Subgroup G} [M.Normal]
@@ -111,49 +165,9 @@ theorem subset_notConjugateSet_or_subset_of_normal [Finite G] {A M : Subgroup G}
     (M : Set G) ⊆ notConjugateSet A ∨ notConjugateSet A ⊆ (M : Set G) := by
   classical
   by_cases hAM : A ⊓ M = ⊥
-  · -- `M ⊓ A = 1`: `M ⊆ X`
-    refine Or.inl fun m hm a ha hane hconj => ?_
-    obtain ⟨g, hg⟩ := isConj_iff.mp hconj
-    have haM : a ∈ M := by
-      have hin : g⁻¹ * m * g ∈ M := by simpa using ‹M.Normal›.conj_mem _ hm g⁻¹
-      rwa [← hg, show g⁻¹ * (g * a * g⁻¹) * g = a by group] at hin
-    have : a ∈ A ⊓ M := ⟨ha, haM⟩
-    rw [hAM, Subgroup.mem_bot] at this
-    exact hane this
-  · -- `M ⊓ A ≠ 1`: `AM = G` から `X ⊆ M`
-    refine Or.inr ?_
-    -- 6A.7(a) で `A ⊔ M = ⊤`
-    have hsup : A ⊔ M = ⊤ := by
-      refine le_antisymm le_top fun g _ => ?_
-      refine mem_of_conj_inf_ne_bot (le_sup_left : A ≤ A ⊔ M) hATI (g := g) ?_
-      intro h
-      refine hAM (le_antisymm (fun x hx => ?_) bot_le)
-      -- `(A ⊓ M)^g ≤ A^g ⊓ (A ⊔ M) = ⊥`
-      have hxg : MulAut.conj g x ∈ (MulAut.conj g • A) ⊓ (A ⊔ M) := by
-        refine Subgroup.mem_inf.mpr ⟨?_, ?_⟩
-        · rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
-          change (MulAut.conj g).symm ((MulAut.conj g) x) ∈ A
-          rw [MulEquiv.symm_apply_apply]
-          exact hx.1
-        · exact (le_sup_right : M ≤ A ⊔ M) (‹M.Normal›.conj_mem _ hx.2 g)
-      rw [h, Subgroup.mem_bot] at hxg
-      have : x = 1 := by
-        have h2 := congrArg (fun y : G => g⁻¹ * y * g) hxg
-        simpa [MulAut.conj_apply, mul_assoc] using h2
-      simp [this]
-    -- 濃度計算で `X = M.subtype '' X_M(A ⊓ M)`
-    have hsubset := image_notConjugateSet_subgroupOf_subset (A := A) (M := M) hsup
-    have hcardX : (notConjugateSet A).ncard = A.index := card_notConjugateSet_eq_index A hATI
-    have hcardXM : (notConjugateSet (A.subgroupOf M)).ncard = (A.subgroupOf M).index :=
-      card_notConjugateSet_eq_index _ (TI_subgroupOf_normal hATI)
-    have hcardimg : (M.subtype '' notConjugateSet (A.subgroupOf M)).ncard
-        = (notConjugateSet (A.subgroupOf M)).ncard :=
-      Set.ncard_image_of_injective _ (Subgroup.subtype_injective M)
-    have heq : (M.subtype '' notConjugateSet (A.subgroupOf M)) = notConjugateSet A := by
-      refine Set.eq_of_subset_of_ncard_le hsubset ?_ (Set.toFinite _)
-      rw [hcardX, hcardimg, hcardXM, ← Subgroup.relIndex,
-        ← index_eq_relIndex_of_sup_eq_top hsup]
-    rw [← heq]
+  · exact Or.inl (subset_notConjugateSet_of_inf_eq_bot hAM)
+  · refine Or.inr ?_
+    rw [← image_notConjugateSet_subgroupOf_eq hATI (sup_eq_top_of_inf_ne_bot hATI hAM)]
     rintro _ ⟨y, _, rfl⟩
     exact y.2
 
