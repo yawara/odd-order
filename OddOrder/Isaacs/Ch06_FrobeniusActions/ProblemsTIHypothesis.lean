@@ -381,6 +381,23 @@ theorem eq_top_of_normal_of_TI [Finite G] {A H : Subgroup G} (hAne : A ≠ ⊥) 
   have hb := congrArg (fun S : Subgroup G => MulAut.conj g⁻¹ • S) h
   rwa [conj_inv_smul_smul, Subgroup.smul_bot] at hb
 
+/-- **Isaacs Problem 6A.10(b) の前半** (p. 186): `A > 1` が Lemma 6.5 の TI 仮説をみたすなら
+`G' A = G`。
+
+`G'` を含む部分群は正規なので **6A.7(b)** (`eq_top_of_normal_of_TI`) が直ちに使える。 -/
+theorem commutator_sup_eq_top_of_TI [Finite G] {A : Subgroup G} (hAne : A ≠ ⊥)
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) :
+    commutator G ⊔ A = ⊤ := by
+  haveI hnorm : (commutator G ⊔ A).Normal := by
+    constructor
+    intro h hh g
+    have hc : g * h * g⁻¹ * h⁻¹ ∈ commutator G :=
+      Subgroup.commutator_mem_commutator (Subgroup.mem_top g) (Subgroup.mem_top h)
+    have heq : g * h * g⁻¹ = (g * h * g⁻¹ * h⁻¹) * h := by group
+    rw [heq]
+    exact Subgroup.mul_mem _ ((le_sup_left : commutator G ≤ commutator G ⊔ A) hc) hh
+  exact eq_top_of_normal_of_TI hAne (le_sup_right : A ≤ commutator G ⊔ A) hATI
+
 end
 
 end OddOrder.Isaacs.Ch06
