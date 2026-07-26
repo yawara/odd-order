@@ -135,6 +135,7 @@ import OddOrder.GroupTheory.PrimitivePrimeDivisor
 import OddOrder.GroupTheory.RepresentationTheory.FreeOrbitModuleCount
 import OddOrder.GroupTheory.RepresentationTheory.IdempotentDirectSum
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.RepresentationTheory.SingerReducibility
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationFieldModel
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldModel
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldAut
