@@ -1450,7 +1450,7 @@ linchpin `shiftSubHom_iterate_prime_sub_one` (`Δ^{p-1} = T_p` の**等式**、�
 | 5C.10 | ✅ 完了 (`seven_dvd_card_of_isSimpleGroup_of_card_sylow_two_eq_eight`) | 単純で abelian Sylow-2 が位数 8 ⇒ `7 \| \|G\|` |
 | 5C.11 | ✅ 完了 (`hasNormalPComplement_of_hall_le_center_normalizer`) | Hall 部分群 `H ≤ Z(N_G(H))` ⇒ `\|H\|` の各素因数で正規 p-補群 |
 | 5C.12 | ✅ 完了 (`hasNormalPComplement_of_isCyclic_sylow_of_dvd_index`) | 巡回 Sylow-p、`N ⊴ G` の指数が `p` で割れる ⇒ `N` が正規 p-補群をもつ |
-| 5C.13 | ⬜ | (Navarro) `P = N_G(P)'` なる Sylow `P` ⇒ `N_G(P)` が正規 p-補群をもつ |
+| 5C.13 | ✅ 完了 (`hasNormalPComplement_normalizer_commutator_of_selfNormalizing_sylow`) | (Navarro) **自己正規化** Sylow `P = N_G(P)` ⇒ `N_G(P')` が正規 p-補群をもつ (⚠ 旧記載の `P = N_G(P)'` は誤読、PDF p.164 で確認) |
 
 ### 5C.2 の証明 (2026-07-26 に導出、PDF p.162 = PDF ページ 175 で主張確認済)
 
@@ -1560,6 +1560,43 @@ instance を渡す**必要がある (`@MonoidHom.transfer_eq_prod_quotient_orbit
 の implicit/explicit の並びを確認してから書く)。
 `|G:P|` 奇数 (`Sylow.not_dvd_index`) なので `x ∈ V \ U` で `v'(x) ≠ 1`、
 `G` 非可換単純なら `G = G'` で `v'(G) = 1` に矛盾。
+
+### 5C.13 の実装メモ (2026-07-27) — §5C 完済
+
+⚠ **書籍読解の訂正**: この表の旧記載「`P = N_G(P)'` なる Sylow」は**誤読**。PDF ページ画像
+(書籍 p.164 = PDF p.177) で確認した正しい主張は
+
+> (Navarro) `P` が **自己正規化** Sylow (`P = N_G(P)`) ⟹ **`N_G(P')`** が正規 `p`-補群をもつ
+
+(仮定側が `P = N_G(P)`、結論側が `N_G(P')`)。hint 中の「`X` を Hall `p`-部分群」も
+`p'`-部分群の誤植 (そうでないと `G = P' N_G(X)` が成立しない)。
+
+新 leaf `Problems5C13.lean` (316 行)。`H := N_G(P')` に取り替えると `P ≤ H`・`N_H(P) = P`・
+`P' ⊴ H` なので、**還元形** `hasNormalPComplement_of_selfNormalizing_sylow_of_commutator_normal`
+(「`N_G(P) = P` かつ `⁅P,P⁆ ⊴ G` ⟹ `G` が正規 `p`-補群」) に帰着する。還元形の証明:
+
+1. `L := ⁅P,P⁆` として `G/L` の Sylow `P̄ = P/L` は**可換** (`L` は `P` の交換子群) かつ
+   **自己正規化** (`π⁻¹(P̄) = ↑P ⊔ ker π = ↑P` と `N_G(P) = P`) ⟹ **Burnside (Thm 5.13)** で
+   `G/L` に正規 `p`-補群 `K̄`。`K := π⁻¹(K̄)`。
+2. `L` は `K` の正規 Hall `p`-部分群 ⟹ **Schur–Zassenhaus** (`exists_right_complement'_of_coprime`)
+   で補群 `X' ≤ ↥K`、`X := X'.map K.subtype`。
+3. **Frattini**: `Ch03.exists_conj_le_of_isComplement'_of_coprime'` (3B.4 で一般化した D-part、
+   ⭐ **共役元が `M` の中に取れる**強化形がここで効く) を `↥K` で使い `G = L · N_G(X)`。
+4. **Dedekind**: `z ∈ P` を `z = y·n` (`y ∈ L ≤ P`, `n ∈ N_G(X)`) と分解すると `n ∈ P` なので
+   `⊤ = (N_G(X)).subgroupOf P ⊔ Φ(P)` (`L.subgroupOf P = commutator ↥P ≤ Φ(P)` は Problem 1D.8
+   `commutator_le_frattini`)。`frattini_nongenerating` で `P ≤ N_G(X)`。
+5. `L ≤ P ≤ N_G(X)` と 3 から `N_G(X) = ⊤` ⟹ `X ⊴ G`。`|X| = |K̄|` は `p` と素、
+   `|G:X| = |L|·|K̄ の指数|` は `p`-冪 ⟹ 新 helper
+   `hasNormalPComplement_of_normal_of_index_eq_pow` で結論。
+
+⚠ 実装の罠: `MulAut G` の `Subgroup G` への pointwise 作用は、`•` 記法で書いた goal でないと
+`mul_smul` / `pointwise_smul_def` が発火しない (`Subgroup.map ↑(MulAut.conj g) S` の形になった
+goal では不可) ⟹ **`have key : … • … = …` を別立てしてから `mem_normalizer_iff_map_conj_eq` に
+渡す**。Ch03 の D-part 結論 `K.map (MulAut.conj x).toMonoidHom` と `MulAut.conj x • K` は
+defeq だが構文が違うので `have hcoe : … = … := rfl` で橋渡しする。
+`IsComplement' A B` の `.index_eq_card` は **`B.index = |A|`** (向きに注意、逆は `.symm`)。
+
+**🎉 §5C 完済 (5C.1–5C.13 全 13 問)** — 5C.6 のみ hub レーン (issue 9503 WeaklyClosed) 担当。
 
 ### 5C.12 の実装メモ (2026-07-27)
 
