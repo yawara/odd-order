@@ -936,6 +936,36 @@ theorem isCyclic_commutator {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
         exact hne1 y' hy' (congrArg Subtype.val hcon))
     exact Subtype.ext (congrArg (fun w => ((w : ↥A) : P)) (congrArg Subtype.val hkeq))
 
+/-- 位数 `2^k` (`k ≥ 2`) の巡回群では involution は平方元: `Ω₁ ≤ ℧¹`。 -/
+theorem involution_mem_zpowers_sq {G : Type*} [Group G] {c : G} {k : ℕ} (hk : 2 ≤ k)
+    (hord : orderOf c = 2 ^ k) {y : G} (hy : y ∈ Subgroup.zpowers c) (hy2 : y ^ 2 = 1) :
+    y ∈ Subgroup.zpowers (c ^ 2) := by
+  obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
+  have h1 : c ^ (2 * m) = 1 := by
+    rw [mul_comm, zpow_mul]
+    exact_mod_cast hy2
+  have h2 : ((orderOf c : ℤ)) ∣ 2 * m := orderOf_dvd_iff_zpow_eq_one.mpr h1
+  rw [hord] at h2
+  have h3 : ((2 : ℤ) ^ (k - 1)) ∣ m := by
+    have hsplit : ((2 ^ k : ℕ) : ℤ) = 2 * 2 ^ (k - 1) := by
+      have hk1 : k = (k - 1) + 1 := by omega
+      rw [hk1]
+      push_cast
+      ring
+    rw [hsplit] at h2
+    exact (mul_dvd_mul_iff_left (by norm_num : (2 : ℤ) ≠ 0)).mp h2
+  obtain ⟨s, hs⟩ := h3
+  refine Subgroup.mem_zpowers_iff.mpr ⟨(2 : ℤ) ^ (k - 2) * s, ?_⟩
+  rw [← zpow_natCast c 2, ← zpow_mul, hs]
+  congr 1
+  have hk2 : (2 : ℤ) ^ (k - 1) = 2 * 2 ^ (k - 2) := by
+    have hk1 : k - 1 = (k - 2) + 1 := by omega
+    rw [hk1]
+    ring
+  rw [hk2]
+  push_cast
+  ring
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
