@@ -977,10 +977,13 @@ Given the general induced families `S(A')` (coherent) and `S(B)` (not coherent) 
   Discharged in general by `exists_inducedKernelFamily_member_degree_index` from
   `commutator (K ⧸ A'.subgroupOf K) ≠ ⊤`; the (5.6) engine carries `‖χ₁‖²` symbolically
   (`crux1_of_memberFamilyW`), so no inertia condition on the linear source is needed, and
-* the **(5.2.d) decomposition data** `hdatum` for any intermediate coherent set and break pair —
-  the genuinely grid-backed obligation (§10–§12 muGrid/columnSum, issue 2022): the break's
-  decomposition `Da` over the Dade map and, per member `χ` of the coherent set, an
-  `R(χ)`-decomposition compatible with the coherent extension and orthogonal to `Da`'s family,
+* the **(5.2.d) decomposition data** `hdatum` for any intermediate coherent set and break pair:
+  the break's decomposition `Da` over the Dade map and, per member `χ` of the coherent set, an
+  `R(χ)`-decomposition compatible with the coherent extension and orthogonal to `Da`'s family.
+  Two discharges exist: in general from Hypothesis (5.2)'s image families
+  (`S08.InducedFamilyImageData.datum`, `S08_SixTwoThreeFromImageFamilies`, issue 0153), and in the
+  concrete §11/§13 context from the muGrid columns (`S12.Hypothesis.sixTwoDecompositionData`,
+  `S13_SixTwoBridge`),
 
 the first-obstruction chain (`exists_coherentBreakPair_union`) produces a break `ψ ∈ S(B)`
 with `|K:A'| − 1 ≤ 2·ψ(1)`; unpacking `ψ = Ind_K^L θ` gives exactly the `h56` oracle of
