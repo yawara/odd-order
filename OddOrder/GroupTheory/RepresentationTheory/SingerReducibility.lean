@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import Mathlib.RepresentationTheory.Basic
+import Mathlib.RepresentationTheory.Maschke
 
 /-!
 # Reducibility of a faithful non-cyclic commutative representation over `𝔽_p`
@@ -273,5 +274,62 @@ theorem prime_dvd_sub_one_of_pow_eq_one {p q : ℕ} [Fact p.Prime] (hq : q.Prime
   have hdvd := orderOf_dvd_natCard u
   rwa [hord, Nat.card_eq_fintype_card, ZMod.card_units_eq_totient,
     Nat.totient_prime (Fact.out : p.Prime)] at hdvd
+
+-- `[Finite M]` *is* used (it feeds `Module.Finite.of_finite` for `M` and, through
+-- `inferInstanceAs`, for the type synonym `ρ.asModule`, which is what Maschke's
+-- `IsSemisimpleModule` instance needs); the linter only inspects the statement, so it
+-- reports a false positive here.  Verified: adding `omit [Finite M]` breaks the build.
+set_option linter.unusedSectionVars false in
+open Module in
+/-- **Transport of the two lines from `ρ.asModule` to `M`.**  Under Maschke's hypothesis
+(`NeZero (Nat.card Q : ZMod p)`, i.e. `|Q|` invertible in the coefficient field), a `2`-dimensional
+representation whose group-algebra module is *not* simple decomposes as two `ρ`-invariant lines of
+`M` spanning it.
+
+`exists_isCompl_finrank_one_of_not_isSimpleModule` produces the pair inside the type synonym
+`ρ.asModule`; `Representation.asModuleEquiv` carries them back to `M`, preserving `finrank`
+(`LinearEquiv.finrank_map_eq`) and `⊔` (`Submodule.map_sup` + `Submodule.map_top`).  Invariance
+under `ρ g` is the group-algebra action of `MonoidAlgebra.of _ _ g`, matched via
+`asModuleEquiv_map_smul` and `asAlgebraHom_single_one`.
+
+This is the `M`-side form BG Lemma 2.7 works with: the two lines carry the characters `χ₁, χ₂`
+of `exists_monoidHom_scalar_of_finrank_eq_one` (issue 0150). -/
+theorem exists_invariant_lines_of_not_isSimpleModule
+    (ρ : Representation (ZMod p) Q M) [NeZero (Nat.card Q : ZMod p)]
+    (hrank : finrank (ZMod p) M = 2)
+    (hnot : ¬ IsSimpleModule (MonoidAlgebra (ZMod p) Q) ρ.asModule) :
+    ∃ W₁ W₂ : Submodule (ZMod p) M, W₁ ⊔ W₂ = ⊤ ∧
+      finrank (ZMod p) W₁ = 1 ∧ finrank (ZMod p) W₂ = 1 ∧
+      (∀ g : Q, ∀ x ∈ W₁, ρ g x ∈ W₁) ∧ (∀ g : Q, ∀ x ∈ W₂, ρ g x ∈ W₂) := by
+  haveI : Module.Finite (ZMod p) M := Module.Finite.of_finite
+  haveI : Finite ρ.asModule := inferInstanceAs (Finite M)
+  haveI : Module.Finite (ZMod p) ρ.asModule := Module.Finite.of_finite
+  have hrank' : finrank (ZMod p) ρ.asModule = 2 := by
+    rw [ρ.asModuleEquiv.finrank_eq]; exact hrank
+  obtain ⟨N₁, N₂, hcompl, h1, h2⟩ :=
+    exists_isCompl_finrank_one_of_not_isSimpleModule (K := ZMod p)
+      (R := MonoidAlgebra (ZMod p) Q) (N := ρ.asModule) hrank' hnot
+  refine ⟨Submodule.map (ρ.asModuleEquiv : ρ.asModule →ₗ[ZMod p] M)
+            (N₁.restrictScalars (ZMod p)),
+          Submodule.map (ρ.asModuleEquiv : ρ.asModule →ₗ[ZMod p] M)
+            (N₂.restrictScalars (ZMod p)), ?_, ?_, ?_, ?_, ?_⟩
+  · rw [← Submodule.map_sup]
+    have hsup : N₁.restrictScalars (ZMod p) ⊔ N₂.restrictScalars (ZMod p) = ⊤ := by
+      rw [← Submodule.restrictScalars_sup, hcompl.sup_eq_top]; rfl
+    rw [hsup, Submodule.map_top, LinearEquiv.range]
+  · rw [LinearEquiv.finrank_map_eq]; exact h1
+  · rw [LinearEquiv.finrank_map_eq]; exact h2
+  · intro g x hx
+    obtain ⟨y, hy, rfl⟩ := hx
+    refine ⟨(MonoidAlgebra.of (ZMod p) Q) g • y, N₁.smul_mem _ hy, ?_⟩
+    simp only [LinearEquiv.coe_coe]
+    rw [Representation.asModuleEquiv_map_smul, MonoidAlgebra.of_apply,
+      Representation.asAlgebraHom_single_one]
+  · intro g x hx
+    obtain ⟨y, hy, rfl⟩ := hx
+    refine ⟨(MonoidAlgebra.of (ZMod p) Q) g • y, N₂.smul_mem _ hy, ?_⟩
+    simp only [LinearEquiv.coe_coe]
+    rw [Representation.asModuleEquiv_map_smul, MonoidAlgebra.of_apply,
+      Representation.asAlgebraHom_single_one]
 
 end OddOrder.RepresentationTheory
