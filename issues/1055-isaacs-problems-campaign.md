@@ -1967,7 +1967,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.6 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の仮説を満たす `A, B > 1` ⟹ ある `g` で `A ⊓ B^g > 1` |
 | 6A.7 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
 | 6A.8 | ✅ **完了** (`Problems6A8.lean`) | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
-| 6A.9 | 🔨 (a) + 準備補題 完了 / (b)-(f) は次回以降 (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
+| 6A.9 | 🔨 (a)-(e) 完了 / (f) のみ残り (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
 | 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
 
@@ -2004,8 +2004,19 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
   大きさ `≤ |A|` (`centralizer_le_of_TI`)。`Finset.card_le_mul_card_image` で
   `|G| − |A| ≤ |A| · |image|` ⟹ `|image| ≥ |G:A| − 1`、そして `image ⊆ Inv(t) ∖ A`。
 
-  **次回**: (b) = 上の (a) + `mem_notConjugateSet_of_conj_eq_inv` の計数合わせで
-  `X ∖ {1} = Inv(t) ∖ A`。旧設計 = `C := C_G(t) ≤ A` として
+  **(b)-(e) 完了** (2026-07-27):
+  `conj_eq_inv_of_mem_notConjugateSet` (b) = (a) と `mem_notConjugateSet_of_conj_eq_inv` の
+  濃度合わせで `Inv(t) ∖ A = X ∖ {1}` /
+  `eq_of_isInvolution_mem` (c) = `t` は `A` の唯一の involution (⚠ `A ≠ ⊤` が要る;
+  `s ≠ t` なら `ts ≠ 1` が `1 ≠ x ∈ X` を中心化して `x ∈ C_G(ts) ≤ A` で矛盾) /
+  `odd_orderOf_of_mem_notConjugateSet` (d) = `X` の元は奇数位数 (偶数なら冪の involution `u`
+  が `X` に入り `t` と可換ゆえ `u ∈ A`, `X ⊓ A = {1}` で矛盾) /
+  `eq_of_mul_inv_mem` (e) = `x y⁻¹ ∈ A` なら `x = y` (`b := x⁻¹y = t(xy⁻¹)t ∈ A` で
+  `x b x⁻¹ = (xy⁻¹)⁻¹ ∈ A`, `b ≠ 1` なら `conj_mem_iff_of_TI` で `x ∈ A` となり矛盾)。
+  ⟹ **`X` は `A` の右剰余類とちょうど 1 点ずつ交わる (右横断系)**。
+
+  **残り: (f)** `X` が部分群であること。(e) から `X` は `A` の右横断系 (かつ逆元・冪・共役で
+  閉じる) までは出ているが, 積で閉じることの議論が未確定。旧設計 = `C := C_G(t) ≤ A` として
   `t` の共役類の大きさは `|G:C|` (`OddOrder.GroupTheory.card_class_eq_index_centralizer`)、
   `t^G ⊓ A` は `A`-共役類で大きさ `≤ |A:C|`、`|G:C| = |A:C|·|G:A|`
   (`relIndex_mul_index`) から `|t^G ∖ A| ≥ |A:C|(|G:A|−1) ≥ |G:A|−1`、

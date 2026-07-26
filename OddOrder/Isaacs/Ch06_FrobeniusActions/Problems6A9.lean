@@ -257,6 +257,159 @@ theorem card_inverted_notMem_ge [Finite G] {A : Subgroup G}
   calc (sA.image f).card = (↑(sA.image f) : Set G).ncard := (Set.ncard_coe_finset _).symm
     _ ≤ _ := Set.ncard_le_ncard hsub (Set.toFinite _)
 
+/-! ### 6A.9(b)-(e) -/
+
+/-- **Isaacs Problem 6A.9(b)** (p. 186) ⭐: `t` は `X` の元をすべて反転する。
+
+(a) の `|Inv(t) ∖ A| ≥ |G:A| − 1` と `Inv(t) ∖ A ⊆ X ∖ {1}` (`|X ∖ {1}| = |G:A| − 1`) の
+濃度合わせで `Inv(t) ∖ A = X ∖ {1}`。 -/
+theorem conj_eq_inv_of_mem_notConjugateSet [Finite G] {A : Subgroup G}
+    (hATI : ∀ y : G, y ∉ A → A ⊓ (MulAut.conj y • A) = ⊥)
+    {t : G} (htA : t ∈ A) (ht2 : t * t = 1) (htne : t ≠ 1)
+    {x : G} (hx : x ∈ notConjugateSet A) : t * x * t = x⁻¹ := by
+  classical
+  rcases eq_or_ne x 1 with rfl | hxne
+  · simpa using ht2
+  have hxA : x ∉ A := fun h => hxne (eq_one_of_mem_notConjugateSet_of_mem hx h)
+  have hincl : {y : G | t * y * t = y⁻¹ ∧ y ∉ A} ⊆ notConjugateSet A \ {1} := by
+    rintro y ⟨hyinv, hyA⟩
+    exact ⟨mem_notConjugateSet_of_conj_eq_inv hATI htA ht2 htne hyA hyinv,
+      fun h => hyA (by rw [Set.mem_singleton_iff] at h; rw [h]; exact A.one_mem)⟩
+  have hXcard : (notConjugateSet A).ncard = A.index := card_notConjugateSet_eq_index A hATI
+  have hdiff : (notConjugateSet A \ {1}).ncard = A.index - 1 := by
+    rw [Set.ncard_sdiff_singleton_of_mem (one_mem_notConjugateSet A), hXcard]
+  have heq : {y : G | t * y * t = y⁻¹ ∧ y ∉ A} = notConjugateSet A \ {1} :=
+    Set.eq_of_subset_of_ncard_le hincl
+      (by rw [hdiff]; exact card_inverted_notMem_ge hATI htA ht2 htne) (Set.toFinite _)
+  have hmem : x ∈ {y : G | t * y * t = y⁻¹ ∧ y ∉ A} := by
+    rw [heq]; exact ⟨hx, hxne⟩
+  exact hmem.1
+
+/-- **Isaacs Problem 6A.9(c)** (p. 186): `A < G` のとき `t` は `A` の唯一の involution
+(したがって `t ∈ Z(A)`)。
+
+`s ≠ t` がもう一つの involution なら `s` も `X` を反転するので `t s` は `X` の元を中心化する。
+`1 ≠ x ∈ X` を取ると `x ∈ C_G(ts) ≤ A` となり `X ⊓ A = {1}` に矛盾。 -/
+theorem eq_of_isInvolution_mem [Finite G] {A : Subgroup G} (hAtop : A ≠ ⊤)
+    (hATI : ∀ y : G, y ∉ A → A ⊓ (MulAut.conj y • A) = ⊥)
+    {t s : G} (htA : t ∈ A) (ht2 : t * t = 1) (htne : t ≠ 1)
+    (hsA : s ∈ A) (hs2 : s * s = 1) (hsne : s ≠ 1) : s = t := by
+  classical
+  have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht2
+  have hsinv : s⁻¹ = s := inv_eq_of_mul_eq_one_right hs2
+  -- `1 ≠ x ∈ X` を取る
+  have hXcard : (notConjugateSet A).ncard = A.index := card_notConjugateSet_eq_index A hATI
+  have h2 : 2 ≤ A.index := by
+    have h0 : A.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+    have h1 : A.index ≠ 1 := fun h => hAtop (Subgroup.index_eq_one.mp h)
+    omega
+  obtain ⟨x, hxX, hxne⟩ : ∃ x ∈ notConjugateSet A, x ≠ 1 := by
+    by_contra hcon
+    push Not at hcon
+    have hsub : notConjugateSet A ⊆ {1} := fun y hy => hcon y hy
+    have hle := Set.ncard_le_ncard hsub (Set.toFinite _)
+    rw [hXcard, Set.ncard_singleton] at hle
+    omega
+  by_contra hne
+  -- `t * s ≠ 1` で `x` と可換
+  have htsne : t * s ≠ 1 := by
+    intro h
+    exact hne (by rw [← htinv, ← inv_eq_of_mul_eq_one_right h])
+  have htx := conj_eq_inv_of_mem_notConjugateSet hATI htA ht2 htne hxX
+  have hsx := conj_eq_inv_of_mem_notConjugateSet hATI hsA hs2 hsne hxX
+  have h1 : (t * s) * x * (t * s)⁻¹ = x := by
+      rw [mul_inv_rev, hsinv, htinv]
+      calc t * s * x * (s * t) = t * (s * x * s) * t := by group
+        _ = t * x⁻¹ * t := by rw [hsx]
+        _ = (t * x * t)⁻¹ := by rw [mul_inv_rev, mul_inv_rev, htinv]; group
+        _ = x := by rw [htx, inv_inv]
+  have hcomm : x * (t * s) = (t * s) * x := by
+    conv_lhs => rw [← h1]
+    group
+  have hxmem : x ∈ Subgroup.centralizer ({t * s} : Set G) :=
+    Subgroup.mem_centralizer_singleton_iff.mpr hcomm
+  have hxA : x ∈ A :=
+    centralizer_le_of_TI hATI (A.mul_mem htA hsA) htsne hxmem
+  exact hxne (eq_one_of_mem_notConjugateSet_of_mem hxX hxA)
+
+/-- **Isaacs Problem 6A.9(d)** (p. 186): `X` の元の位数はすべて奇数。
+
+位数が偶数なら `x` の冪に involution `u` があり, `u ∈ X` (X は冪で閉じる) かつ
+`t u t = u⁻¹ = u` から `u ∈ C_G(t) ≤ A`, ゆえに `u ∈ X ⊓ A = {1}` で矛盾。 -/
+theorem odd_orderOf_of_mem_notConjugateSet [Finite G] {A : Subgroup G}
+    (hATI : ∀ y : G, y ∉ A → A ⊓ (MulAut.conj y • A) = ⊥)
+    {t : G} (htA : t ∈ A) (ht2 : t * t = 1) (htne : t ≠ 1)
+    {x : G} (hx : x ∈ notConjugateSet A) : Odd (orderOf x) := by
+  classical
+  rcases Nat.even_or_odd (orderOf x) with heven | hodd
+  · exfalso
+    obtain ⟨m, hm⟩ := heven
+    have hpos : 0 < orderOf x := orderOf_pos x
+    have hmpos : 0 < m := by omega
+    set u : G := x ^ (m : ℕ) with hudef
+    have hu2 : u * u = 1 := by
+      rw [hudef, ← pow_add, ← hm]
+      exact pow_orderOf_eq_one x
+    have hune : u ≠ 1 := by
+      intro h
+      have hdvd : orderOf x ∣ m := orderOf_dvd_iff_pow_eq_one.mpr h
+      have := Nat.le_of_dvd hmpos hdvd
+      omega
+    have huX : u ∈ notConjugateSet A := by
+      have := zpow_mem_notConjugateSet hATI hx (m : ℤ)
+      simpa [hudef] using this
+    -- `t` は `u` を反転するが `u⁻¹ = u` なので `t` と可換 ⟹ `u ∈ C_G(t) ≤ A`
+    have hinv := conj_eq_inv_of_mem_notConjugateSet hATI htA ht2 htne huX
+    have huinv : u⁻¹ = u := inv_eq_of_mul_eq_one_right hu2
+    have hcomm : t * u = u * t := by
+      have h1 : t * u * t = u := by rw [hinv, huinv]
+      have h2 : t * u * (t * t) = u * t := by rw [← mul_assoc, h1]
+      rwa [ht2, mul_one] at h2
+    have huA : u ∈ A := by
+      refine centralizer_le_of_TI hATI htA htne ?_
+      exact Subgroup.mem_centralizer_singleton_iff.mpr hcomm.symm
+    exact hune (eq_one_of_mem_notConjugateSet_of_mem huX huA)
+  · exact hodd
+
+/-- **Isaacs Problem 6A.9(e)** (p. 186): `x, y ∈ X` で `x y⁻¹ ∈ A` なら `x = y`
+(すなわち `X` は `A` の右剰余類とちょうど 1 点ずつ交わる)。 -/
+theorem eq_of_mul_inv_mem [Finite G] {A : Subgroup G}
+    (hATI : ∀ z : G, z ∉ A → A ⊓ (MulAut.conj z • A) = ⊥)
+    {t : G} (htA : t ∈ A) (ht2 : t * t = 1) (htne : t ≠ 1)
+    {x y : G} (hx : x ∈ notConjugateSet A) (hy : y ∈ notConjugateSet A)
+    (hmem : x * y⁻¹ ∈ A) : x = y := by
+  classical
+  have htx := conj_eq_inv_of_mem_notConjugateSet hATI htA ht2 htne hx
+  have hty := conj_eq_inv_of_mem_notConjugateSet hATI htA ht2 htne hy
+  have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht2
+  -- `b := x⁻¹ y = t (x y⁻¹) t ∈ A`
+  have hb : x⁻¹ * y ∈ A := by
+    have hstep : t * (x * y⁻¹) * t = x⁻¹ * y := by
+      calc t * (x * y⁻¹) * t = (t * x * t) * (t * y⁻¹ * t) := by
+            rw [show (t * x * t) * (t * y⁻¹ * t) = t * x * (t * t) * y⁻¹ * t by group, ht2]
+            group
+        _ = x⁻¹ * y := by
+            have hyy : t * y⁻¹ * t = (t * y * t)⁻¹ := by
+              rw [mul_inv_rev, mul_inv_rev, htinv]; group
+            rw [htx, hyy, hty, inv_inv]
+    rw [← hstep]
+    exact A.mul_mem (A.mul_mem htA hmem) htA
+  by_cases hbne : x⁻¹ * y = 1
+  · exact inv_mul_eq_one.mp hbne
+  · exfalso
+    have hconj : x * (x⁻¹ * y) * x⁻¹ ∈ A := by
+      have : x * (x⁻¹ * y) * x⁻¹ = (x * y⁻¹)⁻¹ := by group
+      rw [this]
+      exact A.inv_mem hmem
+    have hxA : x ∈ A := (conj_mem_iff_of_TI hATI hb hbne x).mp hconj
+    have hx1 : x = 1 := eq_one_of_mem_notConjugateSet_of_mem hx hxA
+    -- `x = 1` なら `y⁻¹ ∈ A ⊓ X = {1}` で `y = 1`, これは `b ≠ 1` に矛盾
+    have hyinvX : y⁻¹ ∈ notConjugateSet A := inv_mem_notConjugateSet hy
+    have hyinvA : y⁻¹ ∈ A := by rw [hx1, one_mul] at hmem; exact hmem
+    have hyi : y⁻¹ = 1 := eq_one_of_mem_notConjugateSet_of_mem hyinvX hyinvA
+    have hy1 : y = 1 := by simpa using congrArg (fun z : G => z⁻¹) hyi
+    exact hbne (by rw [hx1, hy1]; group)
+
 end
 
 end OddOrder.Isaacs.Ch06
