@@ -373,6 +373,44 @@ theorem caseA_exists_blockScalarRatioEmbedding [Finite G] {M : Subgroup G}
         (fun x => by simpa [elabRepresentation_apply] using hpoint x) σ).symm)
   exact Subtype.ext (hg ▸ hone)
 
+/-- **The `U W₁`-action normalises the image `Ū` of the `U`-action** on the chief factor.
+
+`uActionHom` is `quotientMulAutHom` restricted to `U ≤ U W₁`, and `U ⊴ U W₁` (the Frobenius
+structure `typeP_uW1_frobenius`), so conjugating an element of `Ū` by the automorphism induced by
+any `w ∈ U W₁` stays in `Ū`.
+
+This is the input that makes Peterfalvi (9.7)(a)'s constant `a` independent of the block: the
+blocks are the `W₁`-translates of `S₀`, and translation by `w` conjugates the pointwise stabiliser
+`C_Ū(S₀)` onto `C_Ū(w • S₀)` inside `Ū`, so the two indices -- hence the two block-scalar orders --
+agree (issue 0152). -/
+theorem range_uActionHom_conj_mem [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) (w : ↥(data.typeP.U ⊔ data.typeP.W1))
+    {u : MulAut (↥data.H ⧸ chief.N)} (hu : u ∈ MonoidHom.range (uActionHom data chief)) :
+    quotientMulAutHom chief.N_aInvariant w * u *
+        (quotientMulAutHom chief.N_aInvariant w)⁻¹
+      ∈ MonoidHom.range (uActionHom data chief) := by
+  haveI : chief.N.Normal := chief.N_normal
+  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
+    (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
+  obtain ⟨v, rfl⟩ := hu
+  refine ⟨⟨w * (v : ↥(data.typeP.U ⊔ data.typeP.W1)) * w⁻¹, ?_⟩, ?_⟩
+  · exact hUnorm.conj_mem _ v.2 w
+  · change quotientMulAutHom chief.N_aInvariant
+        (w * (v : ↥(data.typeP.U ⊔ data.typeP.W1)) * w⁻¹) = _
+    rw [map_mul, map_mul, map_inv]
+    rfl
+
+/-- The inverse form of `range_uActionHom_conj_mem`, as required by
+`Subgroup.index_ptStabOfMulAut_subtype_smul`. -/
+theorem range_uActionHom_conj_inv_mem [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) (w : ↥(data.typeP.U ⊔ data.typeP.W1))
+    {u : MulAut (↥data.H ⧸ chief.N)} (hu : u ∈ MonoidHom.range (uActionHom data chief)) :
+    (quotientMulAutHom chief.N_aInvariant w)⁻¹ * u *
+        quotientMulAutHom chief.N_aInvariant w
+      ∈ MonoidHom.range (uActionHom data chief) := by
+  have h := range_uActionHom_conj_mem data chief w⁻¹ hu
+  rwa [map_inv, inv_inv] at h
+
 open scoped Classical in
 /-- **Peterfalvi (9.7.a): imprimitive block-scalar order divisibility.**  From the case-(a) Clifford
 data, the image `Ū = U/C_U(H̄)` embeds as a subgroup of `((𝔽_p)ˣ)^{q-1}`; hence its order
