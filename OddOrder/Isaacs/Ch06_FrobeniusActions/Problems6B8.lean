@@ -310,6 +310,57 @@ theorem mul_comm_of_mem_sup_center_zpowers {P : Type*} [Group P] {a b : P}
     _ = z * (a ^ i * a) := by rw [hcomm]
     _ = (z * a ^ i) * a := by group
 
+/-- `|P : Z(P)| = 4` かつ `a, b` が非可換なら `⟨Z(P), a, b⟩ = P`。
+
+`L := Z(P)⟨a⟩` の指数は `4` でも `1` でもない (どちらでも `a, b` が可換になる) ので `2`,
+すると `K := ⟨Z(P), a, b⟩` の指数が `2` だと `L = K ∋ b` でやはり可換になり矛盾。
+ゆえに `K` の指数は `1`。 -/
+theorem sup_center_zpowers_eq_top {P : Type*} [Group P] [Finite P]
+    (h : (Subgroup.center P).index = 4) {a b : P} (hab : a * b ≠ b * a) :
+    Subgroup.center P ⊔ Subgroup.zpowers a ⊔ Subgroup.zpowers b = ⊤ := by
+  have hZL : Subgroup.center P ≤ Subgroup.center P ⊔ Subgroup.zpowers a := le_sup_left
+  have haL : a ∈ Subgroup.center P ⊔ Subgroup.zpowers a :=
+    (le_sup_right : Subgroup.zpowers a ≤ _) (Subgroup.mem_zpowers a)
+  have hLK : (Subgroup.center P ⊔ Subgroup.zpowers a)
+      ≤ Subgroup.center P ⊔ Subgroup.zpowers a ⊔ Subgroup.zpowers b := le_sup_left
+  have hbK : b ∈ Subgroup.center P ⊔ Subgroup.zpowers a ⊔ Subgroup.zpowers b :=
+    (le_sup_right : Subgroup.zpowers b ≤ _) (Subgroup.mem_zpowers b)
+  have hmulL := Subgroup.relIndex_mul_index hZL
+  rw [h] at hmulL
+  have hLne4 : (Subgroup.center P ⊔ Subgroup.zpowers a).index ≠ 4 := by
+    intro h4
+    rw [h4] at hmulL
+    have hrel : (Subgroup.center P).relIndex (Subgroup.center P ⊔ Subgroup.zpowers a) = 1 := by
+      omega
+    have haZ : a ∈ Subgroup.center P := Subgroup.relIndex_eq_one.mp hrel haL
+    exact hab (Subgroup.mem_center_iff.mp haZ b).symm
+  have hLne1 : (Subgroup.center P ⊔ Subgroup.zpowers a).index ≠ 1 := by
+    intro h1
+    rw [Subgroup.index_eq_one] at h1
+    exact hab (mul_comm_of_mem_sup_center_zpowers (h1 ▸ Subgroup.mem_top b))
+  have hLdvd : (Subgroup.center P ⊔ Subgroup.zpowers a).index ∣ 4 := Dvd.intro_left _ hmulL
+  have hL2 : (Subgroup.center P ⊔ Subgroup.zpowers a).index = 2 := by
+    obtain ⟨i, hi, hgi⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp
+      ((show (2 : ℕ) ^ 2 = 4 by norm_num) ▸ hLdvd)
+    have hi0 : i ≠ 0 := fun h0 => hLne1 (by rw [hgi, h0, pow_zero])
+    have hi2 : i ≠ 2 := fun h2 => hLne4 (by rw [hgi, h2]; norm_num)
+    rw [hgi, show i = 1 by omega]
+    norm_num
+  have hmulK := Subgroup.relIndex_mul_index hLK
+  rw [hL2] at hmulK
+  have hKne2 : (Subgroup.center P ⊔ Subgroup.zpowers a ⊔ Subgroup.zpowers b).index ≠ 2 := by
+    intro h2
+    rw [h2] at hmulK
+    have hrel : (Subgroup.center P ⊔ Subgroup.zpowers a).relIndex
+        (Subgroup.center P ⊔ Subgroup.zpowers a ⊔ Subgroup.zpowers b) = 1 := by omega
+    exact hab (mul_comm_of_mem_sup_center_zpowers (Subgroup.relIndex_eq_one.mp hrel hbK))
+  have hKdvd : (Subgroup.center P ⊔ Subgroup.zpowers a ⊔ Subgroup.zpowers b).index ∣ 2 :=
+    Dvd.intro_left _ hmulK
+  refine Subgroup.index_eq_one.mp ?_
+  rcases (Nat.dvd_prime Nat.prime_two).mp hKdvd with h1 | h2
+  · exact h1
+  · exact absurd h2 hKne2
+
 /-- **6B.8 の base case**: `|P| = 8` かつ `|P : P'| = 4` なら `P` は `D_8` か `Q_8`。
 
 `|P'| = 2 ≠ 1` から非可換なので repo の Cor 6.14
