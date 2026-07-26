@@ -50,6 +50,37 @@ of what (6.1) actually assumes.
 form of (6.2)/(6.3) waits on generalizing that.  See issue 0153.
 -/
 
+namespace OddOrder.Peterfalvi.S07
+
+open OddOrder.RepresentationTheory
+
+/-- **Transport an image family along an equality of characters.**  Only `image_eq` mentions `χ`,
+so `imageSet`/`mem_ZIrr`/`orthonormal` carry over verbatim and `(R.congrChi h).imageSet` is
+*definitionally* `R.imageSet` — which is what lets orthogonality proved for the source family apply
+to the transported one.
+
+The use is the (5.2.d) dispatch on a general induced family: a **reducible** member is a
+certain-type column `μ_j`, so its `R(·)` is produced for the *column* `∑ᵢ μ_{ij}`, while the family
+datum is indexed by the member `χ` itself; the two are equal but not syntactically so.  (Companion
+of `congrTau`, which transports along an equality of integral character maps.) -/
+def OrthonormalCharacterImageFamily.congrChi {L G : Type*} [Group L] [Group G]
+    [Fintype G] [Invertible (Nat.card G : ℂ)] {τ : IntegralCharacterMap L G}
+    {χ χ' : ClassFunction L ℂ} (h : χ = χ')
+    (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ') :
+    OrthonormalCharacterImageFamily (L := L) (G := G) τ χ where
+  imageSet := R.imageSet
+  mem_ZIrr := R.mem_ZIrr
+  orthonormal := R.orthonormal
+  image_eq := by rw [h]; exact R.image_eq
+
+@[simp] theorem OrthonormalCharacterImageFamily.congrChi_imageSet {L G : Type*} [Group L] [Group G]
+    [Fintype G] [Invertible (Nat.card G : ℂ)] {τ : IntegralCharacterMap L G}
+    {χ χ' : ClassFunction L ℂ} (h : χ = χ')
+    (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ') :
+    (R.congrChi h).imageSet = R.imageSet := rfl
+
+end OddOrder.Peterfalvi.S07
+
 namespace OddOrder.Peterfalvi.S08
 
 open OddOrder.RepresentationTheory

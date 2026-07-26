@@ -202,6 +202,7 @@ import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
+import OddOrder.Peterfalvi.S13_SixTwoImageData
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
@@ -3688,6 +3689,27 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_imageData
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_two_of_imageData
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_of_imageData
+-- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
+-- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
+-- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.
+-- Peterfalvi (5.3.b) verbatim: irreducible members carry the two-element Dade family
+-- (`irrRFamily`), reducible ones the mu-grid column family `R(mu_j)` of Theorem (4.9)
+-- (`colRFamily`, via `columnImageFamilyCohFree`), the canonical column pair being
+-- `memberColumn`/`memberColumnConj`.  `memberRFamily_orthogonal` is (5.2.e) in all four cases
+-- (irr x irr = (4.1); the two mixed cases via `irrRFamily_inner_alignedOmega_eq_zero`, i.e.
+-- Peterfalvi's `NC((phi - conj phi)^tau) <= 2` argument through (3.8); col x col from the four
+-- distinct column indices).  `sixTwo_of_hypothesis`/`sixThree_of_hypothesis` are the resulting
+-- oracle-free (6.2)/(6.3) at `K = M'`, `tau = hyp.tau`, `A0 = hyp.A0`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.eq_columnSum_memberColumn
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.conj_eq_columnSum_memberColumnConj
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.tau_conjDiff_inner_self_eq_two
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.irrRFamily_inner_alignedOmega_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.memberRFamily_orthogonal
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.inducedFamilyImageData
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.sixTwo_of_hypothesis
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.sixThree_of_hypothesis
 -- §11 routine pins for the h56 producer (S13_SixTwoBridge): Peterfalvi's type-P support is
 -- exactly `A(M) = (M')^#` (typePA_eq_sharpSubgroup_derivedInG), so `(M')^# ⊆ A₀(M)` (hKsupp);
 -- `1 ∉ A₀(M)` (h1A, S04.ne_one); `|M|` odd in the minimal-simple-odd ambient (hodd); and the
