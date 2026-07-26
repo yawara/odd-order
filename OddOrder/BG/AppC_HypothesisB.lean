@@ -63,6 +63,29 @@ noncomputable def primeLine (p q : ℕ) [Fact p.Prime] :
   NormSet.normOneFrobeniusSubspaceKernel p q
     (Submodule.span (ZMod p) ({(1 : GaloisField p q)} : Set (GaloisField p q)))
 
+/-- The `𝔽_p`-span of `1` in `𝔽_{p^q}` is the prime field, of cardinality `p`. -/
+theorem card_span_singleton_one (p q : ℕ) [Fact p.Prime] :
+    Nat.card (Submodule.span (ZMod p) ({(1 : GaloisField p q)} : Set (GaloisField p q))) = p := by
+  have hinj : Function.Injective
+      (LinearMap.toSpanSingleton (ZMod p) (GaloisField p q) 1) := by
+    intro a b hab
+    have : (algebraMap (ZMod p) (GaloisField p q)) a =
+        (algebraMap (ZMod p) (GaloisField p q)) b := by
+      simpa [LinearMap.toSpanSingleton_apply, Algebra.smul_def] using hab
+    exact FaithfulSMul.algebraMap_injective (ZMod p) (GaloisField p q) this
+  rw [LinearMap.span_singleton_eq_range]
+  have : Nat.card (LinearMap.range (LinearMap.toSpanSingleton (ZMod p) (GaloisField p q) 1)) =
+      Nat.card (ZMod p) := (Nat.card_congr (Equiv.ofInjective _ hinj)).symm
+  rw [this, Nat.card_eq_fintype_card, ZMod.card]
+
+/-- **`|P₀| = p`**: the prime-field line has order `p`.  This is what the Section 16 development
+used to take from its own hypothesis (`p = |W₂|`); it is in fact a consequence of the setup, since
+`P₀` is the image of the prime field `𝔽_p` inside `P = 𝔽_{p^q}`. -/
+theorem card_primeLine (p q : ℕ) [Fact p.Prime] : Nat.card (primeLine p q) = p := by
+  rw [primeLine, NormSet.normOneFrobeniusSubspaceKernel,
+    Subgroup.card_map_of_injective SemidirectProduct.inl_injective]
+  exact card_span_singleton_one p q
+
 /-- The element of the prime-field line `P₀ ≤ P ≤ H` corresponding to a scalar `c : ZMod p`,
 i.e. `algebraMap c ∈ 𝔽_p ⊆ 𝔽_{p^q}` read inside the additive kernel. -/
 noncomputable def primeLineElement (p q : ℕ) [Fact p.Prime] (c : ZMod p) :
@@ -163,6 +186,13 @@ theorem W2_normalizes_Q (data : FieldNormalizerData p q G) :
     data.W2 ≤ Subgroup.normalizer (data.Q : Set G) := by
   rw [← data.sigma_P0_eq_W2]
   exact data.primeLine_normalizes_Q
+
+/-- **`|W₂| = p`**: the transported prime line has order `p`, because `W₂ = σ(P₀)`, `σ` is
+injective and `|P₀| = p` (`card_primeLine`).  The Section 16 development previously took this
+from its own hypothesis field `p = |W₂|`; it is a consequence of (B). -/
+theorem card_W2 (data : FieldNormalizerData p q G) : Nat.card data.W2 = p := by
+  rw [← data.sigma_P0_eq_W2, Subgroup.card_map_of_injective data.sigma_injective]
+  exact card_primeLine p q
 
 /-- `W₂^y` normalizes `U`: clause (B) read through `sigma_P0_eq_W2` and `sigma_U_eq_U`. -/
 theorem W2_conj_y_normalizes_U (data : FieldNormalizerData p q G) :
