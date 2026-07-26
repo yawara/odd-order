@@ -1964,12 +1964,34 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.3 | ✅ **完了** (`Problems6A3.lean`) | 位数 `5²·11` の非巡回群で Frobenius 作用をもつものが存在 (hint: `GL(5,p)`) |
 | 6A.4 | ✅ **完了** (`ProblemsFrobeniusGroups.lean`) | Frobenius 群 `G` (核 `N`) の `N` 以外の剰余類は単一の共役類に含まれる |
 | 6A.5 | ✅ **完了** (`ProblemsFrobeniusGroups.lean`) | 非可換可解群で全非単位元の中心化群が可換 ⟹ Frobenius 群 (核 = `F(G)`) |
-| 6A.6 | ⬜ | Lemma 6.5 の仮説を満たす `A, B > 1` ⟹ ある `g` で `A ⊓ B^g > 1` |
+| 6A.6 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の仮説を満たす `A, B > 1` ⟹ ある `g` で `A ⊓ B^g > 1` |
 | 6A.7 | ⬜ | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
 | 6A.8 | ⬜ | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
 | 6A.9 | ⬜ | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
 | 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
-| 6A.11 | ⬜ | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
+| 6A.11 | 🔨 (⟹) 完了 / (⟸) は次回 (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
+
+### 6A.6 完了 / 6A.11 は (⟹) のみ (2026-07-27) — 新 leaf `ProblemsTIHypothesis.lean`
+
+⚠ 書籍の Note どおり **Frobenius の定理 (`X` が部分群) は使わない**。
+
+* **6A.6** `exists_inf_conj_ne_bot_of_TI`: `A > 1`, `B > 1` がともに Lemma 6.5 の TI 仮説を
+  みたすなら, ある `g` で `A ⊓ B^g > 1`。論法 (hint の `X`, `Y` の計数): 全ての `g` で
+  `A ⊓ B^g = 1` なら `A` の非単位元は `B` の非単位元と共役になれないので **`X ∪ Y = G`**、
+  一方 `1 ∈ X ⊓ Y` なので `|G| + 1 ≤ |X| + |Y| = |G:A| + |G:B| ≤ |G|/2 + |G|/2 = |G|` で矛盾。
+* **6A.11 (⟹)** `normalizer_le_of_TI`: TI ⟹ 非自明 `T ≤ A` で `N_G(T) ≤ A`。
+
+**次回: 6A.11 (⟸)** の設計 (詰め済み)。`D := A ⊓ A^g ≠ 1` として:
+1. `1 ≠ T ≤ D` について `N_G(T) ≤ A` かつ (`g⁻¹ • T ≤ A` に仮説) `N_G(T) ≤ A^g`
+   ⟹ **`N_G(T) ≤ D`** (`N(g • T) = g • N(T)` の移送が要る)。
+2. 素数 `p ∣ |D|` を取り, **`D` に含まれる `p`-部分群のうち極大なもの `P`** を
+   `Finite.exists_le_maximal` で取る (Cauchy で非自明なものが存在)。`P` は実は
+   **`G` の Sylow `p`-部分群**: `P < S ∈ Syl_p(G)` なら `↥S` の冪零正規化条件で
+   `y ∈ N_S(P) ∖ P` が取れ, `y ∈ N_G(P) ≤ D` ゆえ `P ⊔ ⟨y⟩ ≤ S ⊓ D` が `P` より大きい
+   `D` 内 `p`-部分群になって極大性に矛盾。
+3. `P ≤ A` と `g⁻¹ • P ≤ A` はともに `G` の Sylow `p`-部分群ゆえ `A` の Sylow `p`-部分群、
+   Sylow C (↥A で取って `map_conj_smul` で `G` に降ろす = 1C.1 のパターン) で `a ∈ A` があって
+   `a (g⁻¹ • P) a⁻¹ = P` ⟹ `a g⁻¹ ∈ N_G(P) ≤ A` ⟹ `g ∈ A`。
 
 ### 🎉 6A.4 / 6A.5 完了 (2026-07-27) — 新 leaf `ProblemsFrobeniusGroups.lean`
 

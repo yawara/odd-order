@@ -238,6 +238,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsMonomialSetup
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A2
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A3
 import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsFrobeniusGroups
+import OddOrder.Isaacs.Ch06_FrobeniusActions.ProblemsTIHypothesis
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
