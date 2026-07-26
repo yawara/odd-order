@@ -59,7 +59,7 @@ theorem dihedralOrQuaternionOrSemiDihedral_of_index_two_cyclic
       ∃ k : ℕ, 2 ^ k = orderOf c ∧ Nonempty (P ≃* SemiDihedralGroup k) := by
   classical
   -- `z := c ^ (2 ^ (m-1))` は `C` の唯一の involution
-  set z : P := c ^ (2 ^ (m - 1)) with hz
+  obtain ⟨z, hz⟩ : ∃ z : P, z = c ^ (2 ^ (m - 1)) := ⟨_, rfl⟩
   have hzsq : z ^ 2 = 1 := by
     have hmm : 2 ^ (m - 1) * 2 = 2 ^ m := by
       rw [← pow_succ]; congr 1; omega
@@ -109,8 +109,65 @@ theorem dihedralOrQuaternionOrSemiDihedral_of_index_two_cyclic
       id Or.inl
   · -- `a c a⁻¹ = z c` ⟹ `⟨c²⟩ ≤ Z(P)` で `|P : Z(P)| ∣ 4`
     exfalso
-    sorry
+    have hzc : Commute (c ^ (2 ^ (m - 1))) c := (Commute.refl c).pow_left _
+    have hconj2 : a * c ^ 2 * a⁻¹ = c ^ 2 := by
+      calc a * c ^ 2 * a⁻¹ = (a * c * a⁻¹) ^ 2 := by rw [pow_two, pow_two]; group
+        _ = (c ^ (2 ^ (m - 1)) * c) ^ 2 := congrArg (· ^ 2) h
+        _ = (c ^ (2 ^ (m - 1))) ^ 2 * c ^ 2 := hzc.mul_pow 2
+        _ = c ^ 2 := by rw [← hz, hzsq, one_mul]
+    have hcomm2 : a * c ^ 2 = c ^ 2 * a := by
+      have h2 := congrArg (fun w => w * a) hconj2
+      simpa [mul_assoc] using h2
+    have hCK : Subgroup.zpowers c ≤ Subgroup.centralizer ({c ^ 2} : Set P) := by
+      intro x hx
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hx
+      exact Subgroup.mem_centralizer_singleton_iff.mpr
+        (((Commute.refl c).pow_right 2).zpow_left k).eq
+    have haK : a ∈ Subgroup.centralizer ({c ^ 2} : Set P) :=
+      Subgroup.mem_centralizer_singleton_iff.mpr hcomm2
+    have hKtop : Subgroup.centralizer ({c ^ 2} : Set P) = ⊤ := by
+      have hmul := Subgroup.relIndex_mul_index hCK
+      rw [h_idx] at hmul
+      have hKidx : (Subgroup.centralizer ({c ^ 2} : Set P)).index = 1 := by
+        by_contra hne
+        have hi2 : (Subgroup.centralizer ({c ^ 2} : Set P)).index ∣ 2 := Dvd.intro_left _ hmul
+        rcases (Nat.dvd_prime Nat.prime_two).mp hi2 with h1 | h2
+        · exact hne h1
+        · rw [h2] at hmul
+          have hrel : (Subgroup.zpowers c).relIndex
+              (Subgroup.centralizer ({c ^ 2} : Set P)) = 1 := by omega
+          exact h_a_notmem (Subgroup.relIndex_eq_one.mp hrel haK)
+      exact Subgroup.index_eq_one.mp hKidx
+    have hcz : c ^ 2 ∈ Subgroup.center P := by
+      refine Subgroup.mem_center_iff.mpr fun g => ?_
+      have hg : g ∈ Subgroup.centralizer ({c ^ 2} : Set P) := by rw [hKtop]; trivial
+      exact Subgroup.mem_centralizer_singleton_iff.mp hg
+    -- `|P : ⟨c²⟩| = 4`
+    have hordc2 : orderOf (c ^ 2) = 2 ^ (m - 1) := by
+      rw [orderOf_pow, hord]
+      have hg : Nat.gcd (2 ^ m) 2 = 2 := Nat.gcd_eq_right (dvd_pow_self 2 (by omega))
+      have h2m : (2 : ℕ) ^ m = 2 ^ (m - 1) * 2 := by
+        rw [← pow_succ]; congr 1; omega
+      rw [hg, h2m, Nat.mul_div_cancel _ (by norm_num)]
+    have hcardP : Nat.card P = 2 ^ (m + 1) := by
+      have := Subgroup.card_mul_index (Subgroup.zpowers c)
+      rw [h_idx, Nat.card_zpowers, hord] at this
+      rw [← this, pow_succ]
+    have hidx4 : (Subgroup.zpowers (c ^ 2)).index = 4 := by
+      have hmul := Subgroup.card_mul_index (Subgroup.zpowers (c ^ 2))
+      rw [Nat.card_zpowers, hordc2, hcardP] at hmul
+      have hpos : 0 < (2 : ℕ) ^ (m - 1) := by positivity
+      have hsplit : (2 : ℕ) ^ (m + 1) = 2 ^ (m - 1) * 4 := by
+        rw [show m + 1 = (m - 1) + 2 by omega, pow_add]
+        norm_num
+      rw [hsplit] at hmul
+      exact Nat.eq_of_mul_eq_mul_left hpos hmul
+    have hle : Subgroup.zpowers (c ^ 2) ≤ Subgroup.center P := Subgroup.zpowers_le.mpr hcz
+    have hidx := Subgroup.index_dvd_of_le hle
+    rw [hidx4] at hidx
+    exact absurd (Nat.le_of_dvd (by norm_num) hidx) (by omega)
   · refine Or.inr (Or.inr ?_)
+    rw [← hz] at h
     refine semiDihedral_of_twistConjugation hP h_nonab c a z h_idx h_a_notmem
       (by rw [hz]; exact Subgroup.pow_mem _ (Subgroup.mem_zpowers c) _)
       hzsq hzne ?_ h
