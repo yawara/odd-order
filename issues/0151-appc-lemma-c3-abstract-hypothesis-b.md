@@ -522,3 +522,35 @@ commit `6518e7859` は **「C.3 chain を §16 の設定から切り離し抽象
    フィールド化しても faithful。
 5. `fnKernel`/`fnComplement`/`fnPrimeLine` は `hyp` を取るので `(p, q)` 版に置換。
 6. S16 側は `FieldNormalizerData hyp` (pin 付き) を構成し、chain へは親を渡すだけになる。
+
+## 🧩 step 2c にはもう 1 層あった (2026-07-26) — `hyp`-only helper 層
+
+192 宣言の binder 置換だけでは足りない。migrate 対象の宣言が呼んでいる
+**`hyp` を取るが `data` を取らない helper 層**も `(p, q)` 化が要る。実測 (data 宣言内での呼出):
+
+| helper | 呼出数 | BG 側の対応 |
+|---|---|---|
+| `fieldNormalizerFrobeniusGroup hyp` | 239 | ⭕ `NormSet.normOneFrobeniusGroup p q` |
+| `fieldNormalizerPrimeLineElement hyp` | 167 | ⭕ `AppC.primeLineElement p q` |
+| `fieldNormalizerNormOneUnits hyp` | 109 | ⭕ `NormSet.normOneUnits p q` |
+| `fnComplement` / `fnKernel` | 11 / 4 | ⭕ `NormSet.normOneFrobenius{Complement,Kernel} p q` |
+| `fieldNormalizerPrimeLineGenerator hyp` | 5 | ⭕ `AppC.primeLineGenerator p q` |
+| `additiveFieldGroup hyp` | 3 | ⭕ `NormSet.additiveFieldGroup p q` |
+| `fieldNormalizerFrobeniusHom hyp` | 1 | ❌ **BG 側に無い** |
+| `exists_fieldNormalizerNormOneUnit_ne_one hyp` | 2 | ❌ |
+| `fieldNormalizerPrimeLineGenerator_{mem,ne_one,pow_p} hyp` | 各 1 | ❌ |
+| `fieldNormalizerKernel_{inf,sup}_complement_eq_{bot,top} hyp` | 各 1 | ❌ |
+| `fieldNormalizerPrimeLineElement_{mem,neg} hyp` | 各 1 | ❌ |
+| `tConjUAut hyp` | 1 | ❌ (data 由来に見えるが要確認) |
+
+⟹ **`(p, q)` 版を BG 側に用意すべき helper 補題が ~9 本**ある
+(`frobeniusHom`、`exists_normOneUnit_ne_one`、`primeLineGenerator_{mem,ne_one,pow_p}`、
+`kernel_{inf,sup}_complement`、`primeLineElement_{mem,neg}`)。いずれも `(p, q)` レベルの
+事実で、現在は S16 の `hyp` 経由で述べられているだけ。
+
+### step 2c の正しい手順
+
+1. 上記 ~9 本を `(p, q)` 形で BG (`AppC_HypothesisB` か新 leaf) に用意する
+   (証明は S16 版からほぼそのまま移せる — `hyp.base.p/q` → `p/q` だけ)。
+2. その後で 192 宣言の binder 置換 + helper 呼出の置換を 1 パスで行う。
+3. S16 側に残るのは `FieldNormalizerData` の pin 付き構成と `theoremC` への配線のみ。
