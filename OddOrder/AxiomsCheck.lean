@@ -201,6 +201,7 @@ import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
+import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S09_FrobeniusFamilyOrthogonality
@@ -3670,6 +3671,23 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_anchor_of_linear_of_inertia_eq
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
+-- **(6.2)/(6.3) with the `h56` oracle removed** (issue 0153, `S08_SixTwoThreeFromImageFamilies`).
+-- Peterfalvi's Hypothesis (6.1) reads "assume that Hypothesis (5.2) holds", so the honest
+-- hypotheses are (5.2.d) (a difference-image family `R(χ)` per member) and (5.2.e) (`φ ⊥ {χ,χ̄}`
+-- ⟹ `R(φ) ⊥ R(χ)`) — *not* the conclusion-shaped break oracle.  `InducedFamilyImageData` bundles
+-- those two for `𝒮 = S(⊥)`; `.datum` turns them into the `hdatum` clause of
+-- `exists_source_index_le_two_psi_of_break` (break side `decompositionDaFromDiff_general` with
+-- `tau1 = τ`, member side `memberExtensionDecomposition_general` with `tau1 = ν`, cross-orthogonality
+-- straight from (5.2.e)); both break and members may be **reducible**.  `six_two_of_imageData` /
+-- `six_three_of_imageData` are then the book's (6.2)/(6.3) with no oracle, the solvability of `K`
+-- supplying the degree-`|L:K|` anchor and the `S(B) ≠ ∅` witness through
+-- `commutator_quotient_ne_top_of_lt`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.commutator_quotient_ne_top_of_lt
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.datum
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_imageData
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_two_of_imageData
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_of_imageData
 -- §11 routine pins for the h56 producer (S13_SixTwoBridge): Peterfalvi's type-P support is
 -- exactly `A(M) = (M')^#` (typePA_eq_sharpSubgroup_derivedInG), so `(M')^# ⊆ A₀(M)` (hKsupp);
 -- `1 ∉ A₀(M)` (h1A, S04.ne_one); `|M|` odd in the minimal-simple-odd ambient (hodd); and the

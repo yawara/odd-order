@@ -424,6 +424,7 @@ import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S08_RetargetReducible
 import OddOrder.Peterfalvi.S08_GeneralAdjoin
+import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S09_CertificateDischarge
 import OddOrder.Peterfalvi.S09_FrobeniusEstimate
