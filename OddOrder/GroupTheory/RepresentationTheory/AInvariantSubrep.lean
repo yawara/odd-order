@@ -7,6 +7,8 @@ import Mathlib.RepresentationTheory.Subrepresentation
 import Mathlib.Algebra.Module.ZMod
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # `φ`-invariant subgroups as subrepresentations of `elabRepresentation`
@@ -76,5 +78,41 @@ theorem card_aInvariantSubrep {J : Subgroup K} (hJ : IsAInvariant φ J) :
   exact Nat.card_congr
     (Equiv.subtypeEquiv (Additive.toMul (α := K))
       (fun v => mem_symm_elabSubmoduleSubgroupEquiv J v))
+
+/-- **The kernel of a block's scalar character is the pointwise stabiliser of that block.**
+
+For an order-`p` (hence `𝔽_p`-line) `φ`-invariant subgroup `J`, an element of the acting group `A`
+acts on `J` by the scalar `1` exactly when it fixes `J` elementwise, i.e. when it lies in
+`Subgroup.ptStabOfMulAut φ J`.
+
+This is the bridge that turns Peterfalvi (9.7)(a)'s block-scalar order `|im φ_J| = |A : ker φ_J|`
+into the book's index `a = |U : C_U(H₁)|`, and lets the `W₁`-conjugacy of the blocks be applied
+through `Subgroup.index_ptStabOfMulAut_smul` (issue 0152). -/
+theorem ker_lineScalarChar_aInvariantSubrep [Fact p.Prime] [Finite K] {J : Subgroup K}
+    (hJ : IsAInvariant φ J)
+    (hcard : Nat.card (aInvariantSubrep (p := p) hJ).toSubmodule = p) :
+    (OddOrder.RepresentationTheory.lineScalarChar
+        (aInvariantSubrep (p := p) hJ).toRepresentation
+        (OddOrder.RepresentationTheory.finrank_eq_one_of_card_eq_prime hcard)).ker
+      = Subgroup.ptStabOfMulAut φ J := by
+  ext a
+  rw [MonoidHom.mem_ker, OddOrder.RepresentationTheory.lineScalarChar_eq_one_iff,
+    Subgroup.mem_ptStabOfMulAut]
+  constructor
+  · intro h x hx
+    have hmem : Additive.ofMul x ∈ (aInvariantSubrep (p := p) hJ).toSubmodule :=
+      (mem_symm_elabSubmoduleSubgroupEquiv (p := p) J (Additive.ofMul x)).mpr (by simpa using hx)
+    have := congrArg Subtype.val (h ⟨Additive.ofMul x, hmem⟩)
+    change elabRepresentation p φ a (Additive.ofMul x) = Additive.ofMul x at this
+    rw [elabRepresentation_apply] at this
+    exact Additive.ofMul.injective this
+  · intro h x
+    refine Subtype.ext ?_
+    have hx : Additive.toMul (x : Additive K) ∈ J :=
+      (mem_symm_elabSubmoduleSubgroupEquiv (p := p) J (x : Additive K)).mp x.2
+    change elabRepresentation p φ a (x : Additive K) = (x : Additive K)
+    have := h _ hx
+    change (φ a) (Additive.toMul (x : Additive K)) = Additive.toMul (x : Additive K) at this
+    exact congrArg Additive.ofMul this
 
 end OddOrder.GroupTheory
