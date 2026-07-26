@@ -491,6 +491,7 @@ import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.BG.AppB_Thm62
 import OddOrder.BG.AppC_FinalContradiction
 import OddOrder.BG.AppC_HypothesisB
+import OddOrder.BG.AppC_FrobeniusBasics
 import OddOrder.BG.AppC_SL2Example
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
