@@ -567,6 +567,19 @@ theorem exists_index_two_zpowers_of_card_eight {P : Type*} [Group P] [Finite P]
   rw [Nat.card_zpowers, hx, hcard] at hmul
   omega
 
+/-- 巡回部分群に含まれる部分群は巡回。 -/
+theorem isCyclic_of_le_zpowers {G : Type*} [Group G] {H : Subgroup G} {g : G}
+    (h : H ≤ Subgroup.zpowers g) : IsCyclic ↥H := by
+  haveI : IsCyclic ↥(Subgroup.zpowers g) := Subgroup.isCyclic_zpowers g
+  haveI : IsCyclic ↥(H.subgroupOf (Subgroup.zpowers g)) := inferInstance
+  have e : ↥(H.subgroupOf (Subgroup.zpowers g)) ≃* ↥H := Subgroup.subgroupOfEquivOfLe h
+  exact isCyclic_of_surjective e.toMonoidHom e.surjective
+
+/-- 全射準同型による引き戻しは指数を保つ。 -/
+theorem index_comap_of_surjective {G G' : Type*} [Group G] [Group G'] {f : G →* G'}
+    (hf : Function.Surjective f) (K : Subgroup G') : (K.comap f).index = K.index := by
+  rw [Subgroup.index_comap, MonoidHom.range_eq_top.mpr hf, Subgroup.relIndex_top_right]
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
