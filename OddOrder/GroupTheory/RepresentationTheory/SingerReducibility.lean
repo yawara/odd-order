@@ -94,4 +94,65 @@ theorem not_isCyclic_of_exponent_of_card_sq {q : ℕ} (hq : q.Prime)
   have hle := Nat.le_of_dvd hq.pos hdvd
   nlinarith [hq.two_le]
 
+open Module in
+/-- **A semisimple module of `K`-rank `2` that is not simple splits as two lines.**
+
+`R`-semisimplicity supplies a simple submodule `N₁`; it is neither `⊥` (simple modules are
+nontrivial) nor `⊤` (that would make the whole module simple), so as a `K`-subspace its rank is
+strictly between `0` and `2`, i.e. `1`.  A complement `N₂` exists by semisimplicity
+(`IsSemisimpleModule` *is* `ComplementedLattice (Submodule R _)`), and restricting scalars turns
+`IsCompl` into `⊔ = ⊤`, `⊓ = ⊥` for the `K`-subspaces, so `finrank K N₂ = 2 - 1 = 1`.
+
+Stated for an arbitrary field `K` and ring `R` over a scalar tower; the `BG` Lemma 2.7 instance is
+`K = ZMod p`, `R = MonoidAlgebra (ZMod p) Q` acting on the `2`-dimensional `ρ.asModule`
+(issue 0150). -/
+theorem exists_isCompl_finrank_one_of_not_isSimpleModule
+    {K R N : Type*} [Field K] [Ring R] [AddCommGroup N] [Module K N] [Module R N]
+    [SMul K R] [IsScalarTower K R N] [IsSemisimpleModule R N]
+    (hrank : Module.finrank K N = 2) (hnot : ¬ IsSimpleModule R N) :
+    ∃ N₁ N₂ : Submodule R N, IsCompl N₁ N₂ ∧
+      Module.finrank K (N₁.restrictScalars K) = 1 ∧
+      Module.finrank K (N₂.restrictScalars K) = 1 := by
+  haveI : FiniteDimensional K N :=
+    FiniteDimensional.of_finrank_pos (K := K) (V := N) (by omega)
+  haveI : Nontrivial N := Module.nontrivial_of_finrank_pos (R := K) (M := N) (by omega)
+  obtain ⟨N₁, hN₁simple⟩ := IsSemisimpleModule.exists_simple_submodule R N
+  haveI := hN₁simple
+  have hbot : N₁ ≠ ⊥ := by
+    intro h
+    haveI : Nontrivial ↥N₁ := IsSimpleModule.nontrivial R ↥N₁
+    rw [h] at this
+    exact (not_nontrivial_iff_subsingleton.mpr (by infer_instance)) this
+  have htop : N₁ ≠ ⊤ := fun h => hnot (IsSimpleModule.congr
+    ((Submodule.topEquiv (R := R) (M := N)).symm.trans (LinearEquiv.ofEq _ _ h.symm)))
+  obtain ⟨N₂, hcompl⟩ := exists_isCompl N₁
+  have hsup : N₁.restrictScalars K ⊔ N₂.restrictScalars K = ⊤ := by
+    rw [← Submodule.restrictScalars_sup, hcompl.sup_eq_top]; rfl
+  have hinf : N₁.restrictScalars K ⊓ N₂.restrictScalars K = ⊥ := by
+    rw [← Submodule.restrictScalars_inf, hcompl.inf_eq_bot]; rfl
+  have h1ne : N₁.restrictScalars K ≠ ⊤ := fun h => htop (by
+    ext x; exact ⟨fun _ => trivial, fun _ => by
+      have : x ∈ N₁.restrictScalars K := h ▸ Submodule.mem_top
+      exact this⟩)
+  have h1bot : N₁.restrictScalars K ≠ ⊥ := fun h => hbot (by
+    ext x
+    constructor
+    · intro hx
+      have : x ∈ N₁.restrictScalars K := hx
+      rw [h] at this; exact this
+    · intro hx; rw [Submodule.mem_bot] at hx; exact hx ▸ N₁.zero_mem)
+  have hlt : Module.finrank K (N₁.restrictScalars K) < 2 := by
+    rw [← hrank]; exact Submodule.finrank_lt h1ne
+  have hpos : 0 < Module.finrank K (N₁.restrictScalars K) := by
+    rcases Nat.eq_zero_or_pos (Module.finrank K (N₁.restrictScalars K)) with h | h
+    · exact absurd (Submodule.finrank_eq_zero.mp h) h1bot
+    · exact h
+  have hone : Module.finrank K (N₁.restrictScalars K) = 1 := by omega
+  refine ⟨N₁, N₂, hcompl, hone, ?_⟩
+  have hadd := Submodule.finrank_sup_add_finrank_inf_eq
+    (N₁.restrictScalars K) (N₂.restrictScalars K)
+  rw [hsup, hinf, finrank_top, hrank, hone] at hadd
+  simp only [finrank_bot] at hadd
+  omega
+
 end OddOrder.RepresentationTheory
