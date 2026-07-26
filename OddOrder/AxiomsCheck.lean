@@ -5073,6 +5073,10 @@ set_option linter.style.longLine false in
 
 -- BG App C Theorem C bridge: once Section 16 supplies the field-normalizer data,
 -- C.1/C.2 plus the carried C.3 generator-relation conclusion force `p ≤ q`.
+-- **BG Theorem C, p/q-abstract form** (issue 0150 の隣接調査, 2026-07-26): S16 の設定を
+-- statement から外した形。三つの step lemma は元から p, q で抽象だったので、これはその合成。
+-- Hypothesis (B) の寄与は `hrel` (norm set 上の `N(2a−1) = 1`) に集約される。
+#assert_only_allowed_axioms OddOrder.BG.AppC.theoremC_abstract
 #assert_only_allowed_axioms OddOrder.BG.AppC.theoremC
 #assert_only_allowed_axioms OddOrder.BG.AppC.lemmaC2_card_ge_two_of_conditionA
 #assert_only_allowed_axioms

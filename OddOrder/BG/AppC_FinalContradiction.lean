@@ -147,6 +147,30 @@ theorem lemmaC3_inverse_closed [Finite G]
       (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos
       data.appC_normSet_generator_relation
 
+/-- **BG Theorem C, `p`/`q`-abstract form.**  For odd primes `p, q` satisfying condition (A) and
+the norm-set relation that Hypothesis (B) produces — `N(2a - 1) = 1` for every `a` in the norm set
+`E` — one has `p ≤ q`.
+
+This is the book's Theorem C with the Peterfalvi Section 16 configuration removed from the
+*statement*: no `S16.Hypothesis`, no `FieldNormalizerData`, no ambient `q < p`.  The three step
+lemmas were already abstract in `p, q` (`NormSet.lemmaC1`, `NormSet.lemmaC2`,
+`NormSet.normSetE_eq_inv_of_forall_normN_two_mul_sub_one`); only the wrappers above were tied to
+`S16`, so this is their `p, q`-level composition.
+
+What Hypothesis (B) contributes is exactly `hrel`: the group-theoretic embedding of `H = PU` with
+its two normalizer conditions is what forces the norm set to satisfy `N(2a - 1) = 1`, and any other
+configuration supplying `hrel` — e.g. the `SL(2, 2^q)` example of the book's Remark (II) — feeds
+this form directly.  The FT spine continues to use `theoremC` below, which discharges `hrel` from
+the constructed `FieldNormalizerData`. -/
+theorem theoremC_abstract {p q : ℕ} [Fact p.Prime] (hp_odd : Odd p) (hq : q.Prime) (hq_odd : Odd q)
+    (hA : conditionA p q)
+    (hrel : ∀ a : GaloisField p q, a ∈ NormSet.normSetE p q →
+      NormSet.normN p q ((2 : GaloisField p q) * a - 1) = 1) :
+    p ≤ q :=
+  NormSet.lemmaC1 (p := p) (q := q) hq
+    (NormSet.normSetE_eq_inv_of_forall_normN_two_mul_sub_one (p := p) (q := q) hq.pos hrel)
+    (NormSet.lemmaC2 (p := p) (q := q) hp_odd hq hq_odd hA)
+
 /-! ## Theorem C and the Peterfalvi bridge -/
 
 /-- **BG Theorem C**: the field-normalizer configuration constructed in
