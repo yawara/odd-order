@@ -244,6 +244,39 @@ theorem card_dvd_blockScalarRange_pow_of_blocks_card_eq {p : ℕ} [Fact p.Prime]
   card_dvd_blockScalarRange_pow_of_blocks ρ B hBcard
     (fun i => OddOrder.GroupTheory.Subgroup.eq_of_card_eq_of_isCyclic (hcard i)) hconst
 
+/-- **Peterfalvi (9.7)(a), the two block-scalar conclusions in one call.**  Bundling the ratio
+embedding with the book's `a`-form divisibility lets a caller discharge the (genuinely hard)
+"no global scalar" hypothesis `hconst` **once**, in a `refine ... ?_ ?_` whose goals are elaborated
+from this signature.
+
+That matters in practice: hoisting `hconst` into a `have` on the caller's side makes Lean pick a
+different route to `Semiring (ZMod p)` (via `CommRing` rather than `Field`) and the
+`Representation` types stop matching.  Taking both conclusions here keeps every goal's elaboration
+anchored to one signature (issue 0152). -/
+theorem blockScalarFacts_of_blocks {p : ℕ} [Fact p.Prime]
+    {U M : Type u} [CommGroup U] [Finite U] [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    {n : ℕ} (ρ : Representation (ZMod p) U M) (B : Fin (n + 1) → Subrepresentation ρ)
+    (hBcard : ∀ i, Nat.card (B i).toSubmodule = p)
+    (hcard : ∀ i : Fin (n + 1),
+      Nat.card (lineScalarChar (B i).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard i))).range =
+      Nat.card (lineScalarChar (B 0).toRepresentation
+        (finrank_eq_one_of_card_eq_prime (hBcard 0))).range)
+    (hconst : ∀ u : U,
+        (∀ i : Fin (n + 1),
+          lineScalarChar (B i).toRepresentation (finrank_eq_one_of_card_eq_prime (hBcard i)) u
+            = lineScalarChar (B 0).toRepresentation
+                (finrank_eq_one_of_card_eq_prime (hBcard 0)) u)
+        → u = 1) :
+    (∃ ψ : U →* (Fin n → (ZMod p)ˣ), Function.Injective ψ)
+      ∧ Nat.card U ∣ Nat.card (lineScalarChar (B 0).toRepresentation
+          (finrank_eq_one_of_card_eq_prime (hBcard 0))).range ^ n
+      ∧ Nat.card (lineScalarChar (B 0).toRepresentation
+          (finrank_eq_one_of_card_eq_prime (hBcard 0))).range ∣ p - 1 :=
+  ⟨exists_blockScalarRatioEmbedding_of_blocks ρ B hBcard hconst,
+    (card_dvd_blockScalarRange_pow_of_blocks_card_eq ρ B hBcard hcard hconst).1,
+    (card_dvd_blockScalarRange_pow_of_blocks_card_eq ρ B hBcard hcard hconst).2⟩
+
 /-- **The block-scalar order is the book's index `a = |U : C_U(H₁)|`.**  The kernel of a block
 scalar character is the pointwise stabilizer of that block (`lineScalarChar_eq_one_iff`), so the
 first isomorphism theorem identifies `|im φ_i|` with the index of the centralizer of the block --

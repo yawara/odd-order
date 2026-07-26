@@ -9653,6 +9653,10 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.GroupTheory.Subgroup.eq_of_card_eq_of_isCyclic
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.card_dvd_blockScalarRange_pow_of_blocks_card_eq
+-- 2 結論を 1 呼び出しで返す束ね: 呼び出し側は §9 の crux `hconst` を 1 回だけ discharge すれば
+-- よく、`refine … ?_ ?_` の目標がすべてこの signature から elaborate されるので
+-- `Semiring (ZMod p)` の instance 経路が割れない (issue 0152 の実測)。
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.blockScalarFacts_of_blocks
 -- Peterfalvi (9.7)(b): `Coprime |Ū| (p-1)` (fixed-point-free) and the resulting unconditional
 -- divisibility `|Ū| ∣ (p^q-1)/(p-1)`.  The FPF input `C_Ū(w₀) = 1` is supplied from the Frobenius
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).
