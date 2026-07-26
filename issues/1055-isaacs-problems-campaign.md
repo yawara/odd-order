@@ -3332,3 +3332,23 @@ fold するので, calc の各行で `z` と `c^(2^(m-1))` が混在すると `r
    `P' = (P')²` すなわち `|P'| ≤ |P'|/2` の矛盾に至る。**`|P| ≥ 16` はここで効く**。
 
 ⟹ 形式化の順序: (2) の反転 → (3) の巡回性 → (4) の分解 → (5)(6) の像の計算。
+
+
+### 6B.8 進捗 (2026-07-27 続き): θ の像の正規性まで完了
+
+`Problems6B8.lean` は部品 36 本が実証明 (sorry は主定理 `tausskyTodd` の 1 件のみ)。
+θ 関連で揃ったもの: `theta_mul` / `theta_conj_eq_inv` / `thetaHom` (束ね) /
+`thetaHom_range_le` / `mem_thetaHom_ker_iff` (核 = `C_A(a)`) /
+`thetaHom_range_le_commutator` (`R ≤ P'`) / `thetaHom_conj_eq_inv` /
+`thetaHom_range_centralized` / `inv_conj_mem_of_sq_mem` / `thetaHom_range_normal`。
+
+**次の 1 手 = 逆包含 `P' ≤ R`**。筋は「`R` 正規で `P/R` が可換」:
+* `A` の像どうしは可換 (`A` 可換)
+* `a` の像と `A` の像も可換 — `a x a⁻¹ = x · θ(x) ≡ x (mod R)` だから
+* `A ⊔ ⟨a⟩ = ⊤` なので `P/R` は可換 ⟹ `P' ≤ R`
+⚠ Lean では「可換な生成元集合で生成される群は可換」を出す所が要検討
+(`Subgroup.closure_le_centralizer_centralizer` か `Subgroup.closure_induction₂` を試す)。
+
+そのあと: `|R| = |A|/|C_A(a)|` と `|R| = |P'| = |A|/2` から **`|C_A(a)| = 2`**,
+反転則から `P'` 巡回 (`isCyclic_of_comm_two_group_unique_involution` が使える),
+`A` 非巡回なら `A = P' × ⟨t⟩` で `im θ ⊆ (P')²·Ω₁(A)` の位数評価が破綻 — で完了。
