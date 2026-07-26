@@ -361,6 +361,136 @@ theorem sup_center_zpowers_eq_top {P : Type*} [Group P] [Finite P]
   · exact h1
   · exact absurd h2 hKne2
 
+/-- `|P : Z(P)| = 4` なら `P' ≤ ⟨[a,b]⟩` (`a, b` は任意の非可換な組)。
+
+`x ↦ [x,y]` と `y ↦ [x,y]` がどちらも準同型 (双線形性) なので, `⟨Z(P), a, b⟩ = P` に
+沿った**閉包帰納法**で剰余類代表の場合分けを回避できる。 -/
+theorem commutator_le_zpowers_of_index_center_eq_four {P : Type*} [Group P] [Finite P]
+    (h : (Subgroup.center P).index = 4) {a b : P} (hab : a * b ≠ b * a) :
+    commutator P ≤ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹) := by
+  have hc := commutator_le_center_of_index_center_eq_four h
+  have hzero : ∀ z ∈ Subgroup.center P, ∀ y : P, z * y * z⁻¹ * y⁻¹ = 1 := by
+    intro z hz y
+    have hcz := Subgroup.mem_center_iff.mp hz y
+    rw [← hcz]; group
+  have hzero' : ∀ x : P, ∀ z ∈ Subgroup.center P, x * z * x⁻¹ * z⁻¹ = 1 := by
+    intro x z hz
+    have hcz := Subgroup.mem_center_iff.mp hz x
+    rw [hcz]; group
+  -- 第 1 引数についての閉包帰納法
+  have step1 : ∀ y : P, a * y * a⁻¹ * y⁻¹ ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹) →
+      b * y * b⁻¹ * y⁻¹ ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹) →
+      ∀ x : P, x * y * x⁻¹ * y⁻¹ ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹) := by
+    intro y hay hby x
+    let φ : P →* P :=
+      { toFun := fun w => w * y * w⁻¹ * y⁻¹
+        map_one' := by group
+        map_mul' := fun w₁ w₂ => commutator_mul_left_of_le_center hc w₁ w₂ y }
+    have hsub : (⊤ : Subgroup P) ≤ (Subgroup.zpowers (a * b * a⁻¹ * b⁻¹)).comap φ := by
+      rw [← sup_center_zpowers_eq_top h hab]
+      refine sup_le (sup_le ?_ ?_) ?_
+      · intro z hz
+        have hz1 : φ z = 1 := hzero z hz y
+        show φ z ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹)
+        rw [hz1]
+        exact Subgroup.one_mem _
+      · rw [Subgroup.zpowers_le]; exact hay
+      · rw [Subgroup.zpowers_le]; exact hby
+    exact hsub (Subgroup.mem_top x)
+  -- 第 2 引数についての閉包帰納法
+  have step2 : ∀ x : P, x * a * x⁻¹ * a⁻¹ ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹) →
+      x * b * x⁻¹ * b⁻¹ ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹) →
+      ∀ y : P, x * y * x⁻¹ * y⁻¹ ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹) := by
+    intro x hxa hxb y
+    let ψ : P →* P :=
+      { toFun := fun w => x * w * x⁻¹ * w⁻¹
+        map_one' := by group
+        map_mul' := fun w₁ w₂ => commutator_mul_right_of_le_center hc x w₁ w₂ }
+    have hsub : (⊤ : Subgroup P) ≤ (Subgroup.zpowers (a * b * a⁻¹ * b⁻¹)).comap ψ := by
+      rw [← sup_center_zpowers_eq_top h hab]
+      refine sup_le (sup_le ?_ ?_) ?_
+      · intro z hz
+        have hz1 : ψ z = 1 := hzero' x z hz
+        show ψ z ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹)
+        rw [hz1]
+        exact Subgroup.one_mem _
+      · rw [Subgroup.zpowers_le]; exact hxa
+      · rw [Subgroup.zpowers_le]; exact hxb
+    exact hsub (Subgroup.mem_top y)
+  have hAll : ∀ x y : P, x * y * x⁻¹ * y⁻¹ ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹) := by
+    have hA : ∀ y : P, a * y * a⁻¹ * y⁻¹ ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹) :=
+      step2 a (by rw [show a * a * a⁻¹ * a⁻¹ = 1 by group]; exact Subgroup.one_mem _)
+        (Subgroup.mem_zpowers _)
+    have hB : ∀ y : P, b * y * b⁻¹ * y⁻¹ ∈ Subgroup.zpowers (a * b * a⁻¹ * b⁻¹) :=
+      step2 b (by
+          rw [show b * a * b⁻¹ * a⁻¹ = (a * b * a⁻¹ * b⁻¹)⁻¹ by group]
+          exact Subgroup.inv_mem _ (Subgroup.mem_zpowers _))
+        (by rw [show b * b * b⁻¹ * b⁻¹ = 1 by group]; exact Subgroup.one_mem _)
+    intro x y
+    exact step1 y (hA y) (hB y) x
+  rw [commutator_def]
+  refine Subgroup.commutator_le.mpr fun x _ y _ => ?_
+  rw [commutatorElement_def]
+  exact hAll x y
+
+/-- `|P : Z(P)| = 4` なら `|P'| ≤ 2`。 -/
+theorem card_commutator_le_two_of_index_center_eq_four {P : Type*} [Group P] [Finite P]
+    (h : (Subgroup.center P).index = 4) : Nat.card ↥(commutator P) ≤ 2 := by
+  obtain ⟨a, b, hab⟩ : ∃ a b : P, a * b ≠ b * a := by
+    by_contra hcon
+    have hall : ∀ x y : P, x * y = y * x := by
+      intro x y
+      by_contra hxy
+      exact hcon ⟨x, y, hxy⟩
+    have htop : Subgroup.center P = ⊤ :=
+      eq_top_iff.mpr fun g _ => Subgroup.mem_center_iff.mpr fun y => hall y g
+    rw [htop, Subgroup.index_top] at h
+    omega
+  have hle := commutator_le_zpowers_of_index_center_eq_four h hab
+  have hc2 : (a * b * a⁻¹ * b⁻¹) ^ 2 = 1 := commutator_sq_eq_one_of_index_center_eq_four h a b
+  have hord : orderOf (a * b * a⁻¹ * b⁻¹) ≤ 2 := orderOf_le_of_pow_eq_one (by norm_num) hc2
+  have hdvd := Subgroup.card_dvd_of_le hle
+  rw [Nat.card_zpowers] at hdvd
+  exact le_trans (Nat.le_of_dvd (orderOf_pos _) hdvd) hord
+
+/-- **6B.8 の要**: `|P : P'| = 4` かつ `|P| ≥ 16` なら `|P : Z(P)| > 4`
+(6B.7 を適用するのに必要)。
+
+`|P : Z(P)| ≤ 2` なら `P` 可換で `P' = 1`, `|P : P'| = |P| ≥ 16 ≠ 4`。
+`|P : Z(P)| = 4` なら `|P'| ≤ 2` なので `|P| = |P:P'|·|P'| ≤ 8`。 -/
+theorem four_lt_index_center {P : Type*} [Group P] [Finite P]
+    (hcard : 16 ≤ Nat.card P) (hidx : (commutator P).index = 4) :
+    4 < (Subgroup.center P).index := by
+  by_contra hcon
+  have hle : (Subgroup.center P).index ≤ 4 := by omega
+  have hmul := Subgroup.card_mul_index (commutator P)
+  rw [hidx] at hmul
+  rcases Nat.lt_or_ge (Subgroup.center P).index 4 with hlt | hge
+  · -- `≤ 3`: `P/Z(P)` は巡回ゆえ `P` 可換で `P' = ⊥`
+    have hcyc : IsCyclic (P ⧸ Subgroup.center P) := by
+      have hcard : Nat.card (P ⧸ Subgroup.center P) < 4 := hlt
+      have hpos : 0 < Nat.card (P ⧸ Subgroup.center P) := Nat.card_pos
+      interval_cases hn : (Nat.card (P ⧸ Subgroup.center P))
+      · haveI : Subsingleton (P ⧸ Subgroup.center P) :=
+          (Nat.card_eq_one_iff_unique.mp hn).1
+        exact isCyclic_of_subsingleton
+      · haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+        exact isCyclic_of_prime_card (p := 2) hn
+      · haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+        exact isCyclic_of_prime_card (p := 3) hn
+    have hall := mul_comm_of_center_le_of_isCyclic_quotient (A := P) le_rfl hcyc
+    have hbot : commutator P = ⊥ := by
+      rw [commutator_def, Subgroup.commutator_eq_bot_iff_le_centralizer]
+      intro x _
+      exact Subgroup.mem_centralizer_iff.mpr fun y _ => hall y x
+    rw [hbot, Subgroup.index_bot] at hidx
+    omega
+  · -- `= 4`
+    have h4 : (Subgroup.center P).index = 4 := by omega
+    have hcle := card_commutator_le_two_of_index_center_eq_four h4
+    have hpos : 0 < Nat.card ↥(commutator P) := Nat.card_pos
+    omega
+
 /-- **6B.8 の base case**: `|P| = 8` かつ `|P : P'| = 4` なら `P` は `D_8` か `Q_8`。
 
 `|P'| = 2 ≠ 1` から非可換なので repo の Cor 6.14
