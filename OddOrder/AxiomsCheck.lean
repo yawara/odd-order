@@ -3656,6 +3656,29 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.inducedKernelFamily_degreeSqNormReBound_of_break_k
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedKernelFamily_SA_sum_le_two_psi_k
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_break
+-- **The same chain with an abstract tau** (issue 0154): Peterfalvi Hypothesis (5.2.b) allows *any*
+-- linear isometry `Z[S, L^#] -> Z[Irr G, G^#]`, so the three break-chain theorems above are
+-- specializations of `_general` forms that take an arbitrary `tau` plus the two (5.2.b) clauses
+-- (`hisom` = isometry on the A0-supported sublattice of Z[S], `htauZ` = codomain Z[Irr G]).  The
+-- Feit-Thompson Dade map discharges both by `dadeIntegralCharacterMap_inner_eq_on_supported_span`
+-- and `dadeIntegralCharacterMap_mem_ZIrr_of_supported`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.inducedKernelFamily_degreeSqNormReBound_of_break_k_general
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.inducedKernelFamily_SA_sum_le_two_psi_k_general
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_break_general
+-- The tau-general norm-weighted (5.6) engine those rest on (issue 0154,
+-- `S08_GeneralAdjoinWeighted`): reducible break + reducible members + weighted degree bound
+-- `2a < sum deg^2 / ||chi_i||^2`, with the Dade map replaced by the single lattice-isometry
+-- hypothesis `hisom`.  `S08.xAdjoinStepW_k` / `S08.coherentDegreeSqNormBound_of_not_coherentW_k`
+-- are its instantiations at the ambient family `Samb = univ`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.crux1_of_memberFamilyW_general
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.retarget_isCoherent_of_extensionImage_k_general
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.xAdjoinStepW_k_general
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.coherentDegreeSqNormBound_of_not_coherentW_k_general
 -- h56 hdatum discharge helpers: the per-member (5.2.d) datum for an *irreducible* member
 -- (`memberExtensionDecomposition` with the coherent extension, coupling definitional), the break
 -- decomposition `Da` for an *irreducible* break (`decompositionDaFromDadeOfDiff`, `tau1 = τ`
@@ -3672,7 +3695,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_anchor_of_linear_of_inertia_eq
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
--- **(6.2)/(6.3) with the `h56` oracle removed** (issue 0153, `S08_SixTwoThreeFromImageFamilies`).
+-- **(6.2)/(6.3) with the `h56` oracle removed and no Dade dependence** (issues 0153/0154,
+-- `S08_SixTwoThreeFromImageFamilies`).  `InducedFamilyImageData` now carries the *whole* of the
+-- book's Hypothesis (5.2) data: (5.2.b) as `tau` + `tau_isometry` + `tau_mem_ZIrr`, plus
+-- (5.2.d)/(5.2.e); the supported set is an arbitrary `A0 : Set L`.
 -- Peterfalvi's Hypothesis (6.1) reads "assume that Hypothesis (5.2) holds", so the honest
 -- hypotheses are (5.2.d) (a difference-image family `R(χ)` per member) and (5.2.e) (`φ ⊥ {χ,χ̄}`
 -- ⟹ `R(φ) ⊥ R(χ)`) — *not* the conclusion-shaped break oracle.  `InducedFamilyImageData` bundles

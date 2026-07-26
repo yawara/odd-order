@@ -450,6 +450,182 @@ section MemberFamilyBound
 variable [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
 
 open scoped Classical in
+/-- **The general-kernel norm-weighted member-family degree-square bound, abstract `τ`.**
+
+The `τ`-general form of `inducedKernelFamily_degreeSqNormReBound_of_break_k` (issue 0154): instead
+of the Feit–Thompson Dade map on `supportInSubgroup A L`, it takes an arbitrary integral map `τ`
+together with the two clauses of Peterfalvi **Hypothesis (5.2.b)** on the `A₀`-supported sublattice
+of `ℤ[𝒮]` (`𝒮 = inducedKernelFamily K ⊥`):
+
+* `hisom` — `τ` is an isometry there (the book's "linear isometry"), and
+* `htauZ` — `τ` lands in `ℤ[Irr G]` there (the book's codomain `ℤ[Irr G, G^#]`).
+
+Those are exactly the two places the Dade map was used; everything else is the family-structure
+layer of this file (enumeration, Gram matrix, degree ratios, supports, generation, break fields)
+plus the `τ`-general weighted (5.6) engine
+`S07.coherentDegreeSqNormBound_of_not_coherentW_k_general`. -/
+theorem inducedKernelFamily_degreeSqNormReBound_of_break_k_general
+    {A₀ : Set ↥L}
+    (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
+    (hisom : ∀ ⦃φ ζ : ClassFunction ↥L ℂ⦄,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
+      ζ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
+      ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
+    (htauZ : ∀ ⦃φ : ClassFunction ↥L ℂ⦄,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
+      τ φ ∈ ZIrr G)
+    (hodd : Odd (Nat.card ↥L))
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
+    (h1A : (1 : ↥L) ∉ A₀)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥)
+    (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent τ S₁ A₀)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (K.index : ℂ))
+    {B : Subgroup ↥L} {ψ : ClassFunction ↥L ℂ} (hψB : ψ ∈ inducedKernelFamily K B)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    {a : ℕ} (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
+    (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G) τ ψ (a • χ₁))
+    (hDatau1 : Da.tau1 = τ)
+    (datum : ∀ χ ∈ S₁,
+      { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G) τ χ 0 //
+        D.imageFamily.Orthogonal Da.imageFamily ∧
+        D.tau1 χ = hS₁coh.extension χ })
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (S₁ ∪ {ψ, ψ.conj}) A₀)) :
+    ∃ (k : ℕ) (χmem : Fin k → ClassFunction ↥L ℂ) (mc : Fin k → ℝ),
+      Function.Injective χmem ∧
+      Set.range χmem = S₁ ∧
+      (∀ j, 0 < mc j) ∧
+      (∀ j, ClassFunction.inner (χmem j) (χmem j) = ((mc j : ℝ) : ℂ)) ∧
+      ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j ≤ 2 * (ψ 1).re * (χ₁ 1).re := by
+  classical
+  -- the `T`-indexed shape of (5.2.b) that the general engine consumes
+  have hisomT : ∀ (T : Set (ClassFunction ↥L ℂ)),
+      (∀ s ∈ T, s ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+        (inducedKernelFamily K ⊥) A₀) →
+      ∀ φ ζ : ClassFunction ↥L ℂ, φ ∈ Submodule.span ℤ T → ζ ∈ Submodule.span ℤ T →
+        ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ :=
+    fun _T hT _φ _ζ hφ hζ =>
+      hisom (OddOrder.Peterfalvi.S07.zSpan_subset_zSupportedSpan hT hφ)
+        (OddOrder.Peterfalvi.S07.zSpan_subset_zSupportedSpan hT hζ)
+  -- (1) enumeration of `S₁` and its membership in the full family
+  obtain ⟨k, χmem, hinj, hrange⟩ := exists_finEnum_general hS₁fin
+  have hmemS1set : ∀ j, χmem j ∈ S₁ := fun j => hrange ▸ Set.mem_range_self j
+  have hmemfam : ∀ j, χmem j ∈ inducedKernelFamily K ⊥ := fun j => hS₁sub (hmemS1set j)
+  -- (2) norms `mc` and the weighted Gram matrix
+  set mc : Fin k → ℝ := fun j => (ClassFunction.inner (χmem j) (χmem j)).re with hmc
+  have hmcpos : ∀ j, 0 < mc j := fun j =>
+    (inducedKernelFamily_inner_self_real_pos (hmemfam j)).2
+  have hmcnorm : ∀ j, ClassFunction.inner (χmem j) (χmem j) = ((mc j : ℝ) : ℂ) := fun j =>
+    (inducedKernelFamily_inner_self_real_pos (hmemfam j)).1
+  have hmemortho : ∀ i j, ClassFunction.inner (χmem i) (χmem j)
+      = @ite ℂ (i = j) (Classical.propDecidable (i = j)) ((mc i : ℝ) : ℂ) 0 := by
+    intro i j
+    by_cases hij : i = j
+    · subst hij; rw [if_pos rfl]; exact hmcnorm i
+    · rw [if_neg hij]
+      exact inducedKernelFamily_pairwise_orthogonal (hmemfam i) (hmemfam j)
+        (fun h => hij (hinj h))
+  -- (3) the anchor's index `i₁` in the enumeration (and eliminate `χ₁` in its favour)
+  have hχ₁mem : χ₁ ∈ Set.range χmem := hrange ▸ hχ₁S₁
+  obtain ⟨i₁, hi₁eq⟩ := hχ₁mem
+  subst hi₁eq
+  -- (4) degree ratios `deg` against the index anchor
+  choose deg hdegpos hdegeq using fun j => inducedKernelFamily_degree_ratio (hmemfam j)
+  have hKidx_ne : (K.index : ℂ) ≠ 0 := by
+    rw [Nat.cast_ne_zero, Subgroup.index_eq_card]
+    exact Nat.card_pos.ne'
+  have hdeg_anchor : ∀ j, χmem j 1 = (deg j : ℂ) * χmem i₁ 1 := fun j => by
+    rw [hdegeq j, hχ₁deg]
+  have ha1 : deg i₁ = 1 := by
+    have h : (deg i₁ : ℂ) * (K.index : ℂ) = 1 * (K.index : ℂ) := by
+      rw [one_mul, ← hdegeq i₁, hχ₁deg]
+    have h1 := mul_right_cancel₀ hKidx_ne h
+    exact_mod_cast h1
+  -- (5) break-character fields
+  obtain ⟨hreal, hψψne, hψbψbne, hψbψ, hψψb, hdiffsuppψ, hψ_S1, hψbar_S1⟩ :=
+    inducedKernelFamily_breakChar_fields hodd hKsupp hS₁sub hψB hψnotS1 hψcnotS1
+  -- (6) support conditions for the scaled differences
+  have hmemdegdiffsupp : ∀ (i : Fin k), i ∈ (Finset.univ : Finset (Fin k)) →
+      ((χmem i - deg i • χmem i₁).support ⊆ A₀) := by
+    intro i _
+    exact inducedKernelFamily_scaledDiff_support hKsupp (hmemfam i) (hmemfam i₁)
+      (d := deg i) (hdeg_anchor i)
+  have hdiffasuppψ : (ψ - a • χmem i₁).support ⊆ A₀ :=
+    inducedKernelFamily_scaledDiff_support hKsupp hψB (hmemfam i₁) (d := a) hψdeg
+  -- (7) the supported-lattice memberships that (5.2.b) is stated on
+  have hψfam : ψ ∈ inducedKernelFamily K ⊥ := inducedKernelFamily_subset_bot B hψB
+  have hψcfam : ψ.conj ∈ inducedKernelFamily K ⊥ :=
+    inducedKernelFamily_closedUnderConjugate ⊥ hψfam
+  have hadiffmem : ψ - a • χmem i₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (inducedKernelFamily K ⊥) A₀ :=
+    OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr
+      ⟨Submodule.sub_mem _ (Submodule.subset_span hψfam)
+        (nsmul_mem (Submodule.subset_span (hmemfam i₁)) a), hdiffasuppψ⟩
+  have hdiffmem : ψ - ψ.conj ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (inducedKernelFamily K ⊥) A₀ :=
+    OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr
+      ⟨Submodule.sub_mem _ (Submodule.subset_span hψfam) (Submodule.subset_span hψcfam), by
+        rw [show ψ - ψ.conj = -(ψ.conj - ψ) from by abel, ClassFunction.support_neg]
+        exact hdiffsuppψ⟩
+  have hmemdegdiffmem : ∀ i ∈ (Finset.univ : Finset (Fin k)),
+      χmem i - deg i • χmem i₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁ A₀ :=
+    fun i hi => OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr
+      ⟨Submodule.sub_mem _ (Submodule.subset_span (hmemS1set i))
+        (nsmul_mem (Submodule.subset_span (hmemS1set i₁)) (deg i)), hmemdegdiffsupp i hi⟩
+  -- (8) `(5.2.b)` codomain: the break difference has an integral image
+  have htau1ψ : τ (ψ - a • χmem i₁) ∈ ZIrr G := htauZ hadiffmem
+  -- (9) generation: anchor generation of `ℤ[S₁]` and the adjoined-pair supported span
+  have hcover : ∀ x ∈ S₁, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧ χmem j = x := by
+    intro x hx
+    rw [← hrange] at hx
+    obtain ⟨j, hj⟩ := hx
+    exact ⟨j, Finset.mem_univ j, hj⟩
+  have hSgen := OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
+    (s := (Finset.univ : Finset (Fin k))) (χmem := χmem) (deg := deg) (i₁ := i₁)
+    hcover (Finset.mem_univ i₁) (fun j _ => hmemS1set j) hmemdegdiffsupp
+  have hψ1cast : ψ 1 = ((a * K.index : ℕ) : ℂ) := by
+    rw [hψdeg, hχ₁deg]; push_cast; ring
+  have hbar1 : ψ.conj 1 = ψ 1 := by
+    rw [ClassFunction.conj_apply, hψ1cast]
+    exact star_natCast _
+  have hχ₁ne : χmem i₁ 1 ≠ 0 := by
+    rw [hχ₁deg]; exact hKidx_ne
+  have hgen := OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+    (χ := ψ) (chibar := ψ.conj) (chi1 := χmem i₁) (a := a)
+    hSgen hψdeg hbar1 hχ₁ne h1A
+  -- (10) feed the `τ`-general norm-weighted reducible-break engine
+  have hbound := OddOrder.Peterfalvi.S07.coherentDegreeSqNormBound_of_not_coherentW_k_general
+    (Samb := inducedKernelFamily K ⊥) hS₁coh hS₁sub hisomT
+    ψ hψψne hψbψbne hψψb hψbψ hψ_S1 hψbar_S1
+    (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
+    hmemdegdiffmem (fun j _ => hmemS1set j) mc (fun j _ => hmcpos j)
+    (fun i _ j _ => hmemortho i j)
+    (fun χ hχ => (datum (χmem χ) (hmemS1set χ)).1)
+    Da hDatau1
+    (fun i _ => (datum (χmem i) (hmemS1set i)).2.1)
+    (fun i _ => (datum (χmem i) (hmemS1set i)).2.2)
+    hdiffmem hadiffmem htau1ψ ha1 hSgen hgen hnc
+  -- (11) convert the ratio bound to the real degree-square form
+  refine ⟨k, χmem, mc, hinj, hrange, hmcpos, hmcnorm, ?_⟩
+  have hdegre : ∀ j, (χmem j 1).re = (deg j : ℝ) * (χmem i₁ 1).re := by
+    intro j
+    rw [hdeg_anchor j, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  have hψre : (ψ 1).re = (a : ℝ) * (χmem i₁ 1).re := by
+    rw [hψdeg, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  calc ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j
+      = ∑ j : Fin k, ((deg j : ℝ) * (χmem i₁ 1).re) ^ 2 / mc j := by
+        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hdegre j]
+    _ = (χmem i₁ 1).re ^ 2 * ∑ j : Fin k, (deg j : ℝ) ^ 2 / mc j := by
+        rw [Finset.mul_sum]; refine Finset.sum_congr rfl (fun j _ => ?_); ring
+    _ ≤ (χmem i₁ 1).re ^ 2 * (2 * (a : ℝ)) := mul_le_mul_of_nonneg_left hbound (sq_nonneg _)
+    _ = 2 * ((a : ℝ) * (χmem i₁ 1).re) * (χmem i₁ 1).re := by ring
+    _ = 2 * (ψ 1).re * (χmem i₁ 1).re := by rw [hψre]
+
+open scoped Classical in
 /-- **The general-kernel norm-weighted member-family degree-square bound** (the `h56` plumbing:
 general analogue of `sMember_degreeSqNormReBound_of_not_coherent_columnBreak`).
 
@@ -504,109 +680,89 @@ theorem inducedKernelFamily_degreeSqNormReBound_of_break_k
       Set.range χmem = S₁ ∧
       (∀ j, 0 < mc j) ∧
       (∀ j, ClassFunction.inner (χmem j) (χmem j) = ((mc j : ℝ) : ℂ)) ∧
-      ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j ≤ 2 * (ψ 1).re * (χ₁ 1).re := by
+      ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j ≤ 2 * (ψ 1).re * (χ₁ 1).re :=
+  -- The Feit-Thompson instance of the `τ`-general statement: (5.2.b)'s isometry clause is the
+  -- Dade isometry on supported spans, its codomain clause
+  -- `dadeIntegralCharacterMap_mem_ZIrr_of_supported` (whose `ZIrr ↥L` input comes from
+  -- `ℤ[𝒮] ≤ ℤ[Irr L]`, every member of `𝒮` being a character).
+  inducedKernelFamily_degreeSqNormReBound_of_break_k_general
+    (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
+    (fun _φ _ζ hφ hζ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp
+        (S := OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥)
+          (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+        (fun _s hs => hs.2) (Submodule.subset_span hφ) (Submodule.subset_span hζ))
+    (fun _φ hφ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hφ.2
+        (Submodule.span_le.mpr (fun _x hx => inducedKernelFamily_mem_ZIrr hx) hφ.1))
+    hodd hKsupp h1A hS₁sub hS₁fin hS₁coh hχ₁S₁ hχ₁deg hψB hψnotS1 hψcnotS1 hψdeg Da hDatau1
+    datum hnc
+
+/-- **The (6.2) `S(A)`-sum bound at a break, abstract `τ`.**
+
+The `τ`-general form of `inducedKernelFamily_SA_sum_le_two_psi_k` (issue 0154): the enumerated
+family bound of `inducedKernelFamily_degreeSqNormReBound_of_break_k_general` dominates the
+`S(A')`-sum, and the (B2) identity `∑_{χ ∈ S(A')} χ(1)²/‖χ‖² = |L:K|(|K:A'| − 1)` converts it into
+`|L:K|·(|K:A'| − 1) ≤ 2·ψ(1)·χ₁(1)`.  Everything after the family bound is `τ`-free arithmetic. -/
+theorem inducedKernelFamily_SA_sum_le_two_psi_k_general
+    {A₀ : Set ↥L}
+    (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
+    (hisom : ∀ ⦃φ ζ : ClassFunction ↥L ℂ⦄,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
+      ζ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
+      ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
+    (htauZ : ∀ ⦃φ : ClassFunction ↥L ℂ⦄,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
+      τ φ ∈ ZIrr G)
+    (hodd : Odd (Nat.card ↥L))
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
+    (h1A : (1 : ↥L) ∉ A₀)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥)
+    (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent τ S₁ A₀)
+    {A' : Subgroup ↥L} [A'.Normal] (hSAsub : inducedKernelFamily K A' ⊆ S₁)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (K.index : ℂ))
+    {B : Subgroup ↥L} {ψ : ClassFunction ↥L ℂ} (hψB : ψ ∈ inducedKernelFamily K B)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    {a : ℕ} (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
+    (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G) τ ψ (a • χ₁))
+    (hDatau1 : Da.tau1 = τ)
+    (datum : ∀ χ ∈ S₁,
+      { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G) τ χ 0 //
+        D.imageFamily.Orthogonal Da.imageFamily ∧
+        D.tau1 χ = hS₁coh.extension χ })
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (S₁ ∪ {ψ, ψ.conj}) A₀)) :
+    (K.index : ℝ) * ((Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1)
+      ≤ 2 * (ψ 1).re * (χ₁ 1).re := by
   classical
-  -- (1) enumeration of `S₁` and its membership in the full family
-  obtain ⟨k, χmem, hinj, hrange⟩ := exists_finEnum_general hS₁fin
-  have hmemS1set : ∀ j, χmem j ∈ S₁ := fun j => hrange ▸ Set.mem_range_self j
-  have hmemfam : ∀ j, χmem j ∈ inducedKernelFamily K ⊥ := fun j => hS₁sub (hmemS1set j)
-  -- (2) norms `mc` and the weighted Gram matrix
-  set mc : Fin k → ℝ := fun j => (ClassFunction.inner (χmem j) (χmem j)).re with hmc
-  have hmcpos : ∀ j, 0 < mc j := fun j =>
-    (inducedKernelFamily_inner_self_real_pos (hmemfam j)).2
-  have hmcnorm : ∀ j, ClassFunction.inner (χmem j) (χmem j) = ((mc j : ℝ) : ℂ) := fun j =>
-    (inducedKernelFamily_inner_self_real_pos (hmemfam j)).1
-  have hmemortho : ∀ i j, ClassFunction.inner (χmem i) (χmem j)
-      = @ite ℂ (i = j) (Classical.propDecidable (i = j)) ((mc i : ℝ) : ℂ) 0 := by
-    intro i j
-    by_cases hij : i = j
-    · subst hij; rw [if_pos rfl]; exact hmcnorm i
-    · rw [if_neg hij]
-      exact inducedKernelFamily_pairwise_orthogonal (hmemfam i) (hmemfam j)
-        (fun h => hij (hinj h))
-  -- (3) the anchor's index `i₁` in the enumeration (and eliminate `χ₁` in its favour)
-  have hχ₁mem : χ₁ ∈ Set.range χmem := hrange ▸ hχ₁S₁
-  obtain ⟨i₁, hi₁eq⟩ := hχ₁mem
-  subst hi₁eq
-  -- (4) degree ratios `deg` against the index anchor
-  choose deg hdegpos hdegeq using fun j => inducedKernelFamily_degree_ratio (hmemfam j)
-  have hKidx_ne : (K.index : ℂ) ≠ 0 := by
-    rw [Nat.cast_ne_zero, Subgroup.index_eq_card]
-    exact Nat.card_pos.ne'
-  have hdeg_anchor : ∀ j, χmem j 1 = (deg j : ℂ) * χmem i₁ 1 := fun j => by
-    rw [hdegeq j, hχ₁deg]
-  have ha1 : deg i₁ = 1 := by
-    have h : (deg i₁ : ℂ) * (K.index : ℂ) = 1 * (K.index : ℂ) := by
-      rw [one_mul, ← hdegeq i₁, hχ₁deg]
-    have h1 := mul_right_cancel₀ hKidx_ne h
-    exact_mod_cast h1
-  -- (5) break-character fields
-  obtain ⟨hreal, hψψne, hψbψbne, hψbψ, hψψb, hdiffsuppψ, hψ_S1, hψbar_S1⟩ :=
-    inducedKernelFamily_breakChar_fields hodd hKsupp hS₁sub hψB hψnotS1 hψcnotS1
-  -- (6) support conditions for the scaled differences
-  have hmemdegdiffsupp : ∀ (i : Fin k), i ∈ (Finset.univ : Finset (Fin k)) →
-      ((χmem i - deg i • χmem i₁).support ⊆
-        OddOrder.Peterfalvi.S04.supportInSubgroup A L) := by
-    intro i _
-    exact inducedKernelFamily_scaledDiff_support hKsupp (hmemfam i) (hmemfam i₁)
-      (d := deg i) (hdeg_anchor i)
-  have hdiffasuppψ : (ψ - a • χmem i₁).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup A L :=
-    inducedKernelFamily_scaledDiff_support hKsupp hψB (hmemfam i₁) (d := a) hψdeg
-  -- (7) Dade-image integrality of the break difference
-  have htau1ψ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-      (hyp.fullDadeIsometryData) (ψ - a • χmem i₁) ∈ ZIrr G := by
-    refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp
-      hdiffasuppψ ?_
-    exact Submodule.sub_mem _ (inducedKernelFamily_mem_ZIrr hψB)
-      (nsmul_mem (inducedKernelFamily_mem_ZIrr (hmemfam i₁)) a)
-  -- (8) generation: anchor generation of `ℤ[S₁]` and the adjoined-pair supported span
-  have hcover : ∀ x ∈ S₁, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧ χmem j = x := by
-    intro x hx
-    rw [← hrange] at hx
-    obtain ⟨j, hj⟩ := hx
-    exact ⟨j, Finset.mem_univ j, hj⟩
-  have hSgen := OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
-    (s := (Finset.univ : Finset (Fin k))) (χmem := χmem) (deg := deg) (i₁ := i₁)
-    hcover (Finset.mem_univ i₁) (fun j _ => hmemS1set j) hmemdegdiffsupp
-  have hψ1cast : ψ 1 = ((a * K.index : ℕ) : ℂ) := by
-    rw [hψdeg, hχ₁deg]; push_cast; ring
-  have hbar1 : ψ.conj 1 = ψ 1 := by
-    rw [ClassFunction.conj_apply, hψ1cast]
-    exact star_natCast _
-  have hχ₁ne : χmem i₁ 1 ≠ 0 := by
-    rw [hχ₁deg]; exact hKidx_ne
-  have hgen := OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
-    (χ := ψ) (chibar := ψ.conj) (chi1 := χmem i₁) (a := a)
-    hSgen hψdeg hbar1 hχ₁ne h1A
-  -- (9) feed the norm-weighted reducible-break engine
-  have hbound := coherentDegreeSqNormBound_of_not_coherentW_k hyp hS₁coh
-    ψ hdiffsuppψ hψψne hψbψbne hψψb hψbψ hψ_S1 hψbar_S1
-    (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
-    hmemdegdiffsupp (fun j _ => hmemS1set j) mc (fun j _ => hmcpos j)
-    (fun i _ j _ => hmemortho i j)
-    (fun χ hχ => (datum (χmem χ) (hmemS1set χ)).1)
-    Da hDatau1
-    (fun i _ => (datum (χmem i) (hmemS1set i)).2.1)
-    (fun i _ => (datum (χmem i) (hmemS1set i)).2.2)
-    hdiffasuppψ htau1ψ ha1 hSgen hgen hnc
-  -- (10) convert the ratio bound to the real degree-square form
-  refine ⟨k, χmem, mc, hinj, hrange, hmcpos, hmcnorm, ?_⟩
-  have hdegre : ∀ j, (χmem j 1).re = (deg j : ℝ) * (χmem i₁ 1).re := by
-    intro j
-    rw [hdeg_anchor j, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
-    ring
-  have hψre : (ψ 1).re = (a : ℝ) * (χmem i₁ 1).re := by
-    rw [hψdeg, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
-    ring
-  calc ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j
-      = ∑ j : Fin k, ((deg j : ℝ) * (χmem i₁ 1).re) ^ 2 / mc j := by
-        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hdegre j]
-    _ = (χmem i₁ 1).re ^ 2 * ∑ j : Fin k, (deg j : ℝ) ^ 2 / mc j := by
-        rw [Finset.mul_sum]; refine Finset.sum_congr rfl (fun j _ => ?_); ring
-    _ ≤ (χmem i₁ 1).re ^ 2 * (2 * (a : ℝ)) := mul_le_mul_of_nonneg_left hbound (sq_nonneg _)
-    _ = 2 * ((a : ℝ) * (χmem i₁ 1).re) * (χmem i₁ 1).re := by ring
-    _ = 2 * (ψ 1).re * (χmem i₁ 1).re := by rw [hψre]
+  obtain ⟨k, χmem, mc, hinj, hrange, hmcpos, hmcnorm, hfambound⟩ :=
+    inducedKernelFamily_degreeSqNormReBound_of_break_k_general τ hisom htauZ hodd hKsupp h1A
+      hS₁sub hS₁fin hS₁coh hχ₁S₁ hχ₁deg hψB hψnotS1 hψcnotS1 hψdeg Da hDatau1 datum hnc
+  have hSAsum := sum_re_div_normSq_inducedKernelFamily_eq (K := K) (X := A')
+  set SAfilt := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+          (↑(A'.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥K ℂ) ∧
+            θ ≠ trivialIrreducibleCharacter ↥K)).image
+          (fun θ => ClassFunction.induce K θ.toClassFunction) with hSAdef
+  have hsub : SAfilt ⊆ (Set.range χmem).toFinset := by
+    intro χ hχ
+    rw [Set.mem_toFinset, hrange]
+    rw [hSAdef] at hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
+    obtain ⟨-, hker, hne⟩ := Finset.mem_filter.mp hθ
+    exact hSAsub ⟨θ, hne, hker, rfl⟩
+  rw [← hSAsum]
+  calc ∑ χ ∈ SAfilt, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re
+      ≤ ∑ χ ∈ (Set.range χmem).toFinset, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re :=
+        Finset.sum_le_sum_of_subset_of_nonneg hsub
+          (fun χ _ _ => div_nonneg (sq_nonneg _) (inner_self_re_nonneg χ))
+    _ = ∑ j : Fin k, ((χmem j 1).re) ^ 2 / (ClassFunction.inner (χmem j) (χmem j)).re :=
+        sum_toFinset_range_eq hinj (fun χ => ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re)
+    _ = ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j := by
+        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hmcnorm j, Complex.ofReal_re]
+    _ ≤ 2 * (ψ 1).re * (χ₁ 1).re := hfambound
 
 /-- **The (6.2) `S(A)`-sum bound at a break, general kernel** — the norm-weighted (5.6) family
 bound compared against the `S(A)` degree-square identity (B2).
@@ -650,34 +806,21 @@ theorem inducedKernelFamily_SA_sum_le_two_psi_k
       (S₁ ∪ {ψ, ψ.conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
     (K.index : ℝ) * ((Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1)
-      ≤ 2 * (ψ 1).re * (χ₁ 1).re := by
-  classical
-  obtain ⟨k, χmem, mc, hinj, hrange, hmcpos, hmcnorm, hfambound⟩ :=
-    inducedKernelFamily_degreeSqNormReBound_of_break_k hyp hodd hKsupp h1A hS₁sub hS₁fin
-      hS₁coh hχ₁S₁ hχ₁deg hψB hψnotS1 hψcnotS1 hψdeg Da hDatau1 datum hnc
-  have hSAsum := sum_re_div_normSq_inducedKernelFamily_eq (K := K) (X := A')
-  set SAfilt := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
-          (↑(A'.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
-              (θ : ClassFunction ↥K ℂ) ∧
-            θ ≠ trivialIrreducibleCharacter ↥K)).image
-          (fun θ => ClassFunction.induce K θ.toClassFunction) with hSAdef
-  have hsub : SAfilt ⊆ (Set.range χmem).toFinset := by
-    intro χ hχ
-    rw [Set.mem_toFinset, hrange]
-    rw [hSAdef] at hχ
-    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
-    obtain ⟨-, hker, hne⟩ := Finset.mem_filter.mp hθ
-    exact hSAsub ⟨θ, hne, hker, rfl⟩
-  rw [← hSAsum]
-  calc ∑ χ ∈ SAfilt, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re
-      ≤ ∑ χ ∈ (Set.range χmem).toFinset, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re :=
-        Finset.sum_le_sum_of_subset_of_nonneg hsub
-          (fun χ _ _ => div_nonneg (sq_nonneg _) (inner_self_re_nonneg χ))
-    _ = ∑ j : Fin k, ((χmem j 1).re) ^ 2 / (ClassFunction.inner (χmem j) (χmem j)).re :=
-        sum_toFinset_range_eq hinj (fun χ => ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re)
-    _ = ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j := by
-        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hmcnorm j, Complex.ofReal_re]
-    _ ≤ 2 * (ψ 1).re * (χ₁ 1).re := hfambound
+      ≤ 2 * (ψ 1).re * (χ₁ 1).re :=
+  -- The Feit-Thompson instance of the `τ`-general statement (same (5.2.b) discharges as in
+  -- `inducedKernelFamily_degreeSqNormReBound_of_break_k`).
+  inducedKernelFamily_SA_sum_le_two_psi_k_general
+    (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
+    (fun _φ _ζ hφ hζ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp
+        (S := OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥)
+          (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+        (fun _s hs => hs.2) (Submodule.subset_span hφ) (Submodule.subset_span hζ))
+    (fun _φ hφ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hφ.2
+        (Submodule.span_le.mpr (fun _x hx => inducedKernelFamily_mem_ZIrr hx) hφ.1))
+    hodd hKsupp h1A hS₁sub hS₁fin hS₁coh hSAsub hχ₁S₁ hχ₁deg hψB hψnotS1 hψcnotS1 hψdeg Da
+    hDatau1 datum hnc
 
 end MemberFamilyBound
 
@@ -964,6 +1107,122 @@ section H56Producer
 variable [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
 
 open scoped Classical in
+/-- **The (6.2) break bound `|K:A'| − 1 ≤ 2ψ(1)` from Hypothesis (5.2) data, abstract `τ`.**
+
+The `τ`-general form of `exists_source_index_le_two_psi_of_break` (issue 0154): no Feit–Thompson
+Dade map, only an integral `τ` satisfying the two clauses of Peterfalvi **Hypothesis (5.2.b)** on
+the `A₀`-supported sublattice of `ℤ[𝒮]` (`hisom`, `htauZ`), plus the (5.2.d)/(5.2.e) decomposition
+data `hdatum` at each break.
+
+From the coherence dichotomy `S(A')` coherent / `S(B)` not, the first-obstruction chain
+(`exists_coherentBreakPair_union`, already `τ`-general) produces a break pair `{ψ, ψ̄} ⊆ S(B)` over
+a maximal coherent conjugation-closed `S₁ ⊆ S(A') ∪ S(B)`; the norm-weighted (5.6) contrapositive
+bounds the `S(A')` degree-square sum, and the (B2) identity converts it into the index bound.  The
+Feit–Thompson wrapper is `exists_source_index_le_two_psi_of_break`. -/
+theorem exists_source_index_le_two_psi_of_break_general
+    {A₀ : Set ↥L}
+    (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
+    (hisom : ∀ ⦃φ ζ : ClassFunction ↥L ℂ⦄,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
+      ζ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
+      ClassFunction.inner (τ φ) (τ ζ) = ClassFunction.inner φ ζ)
+    (htauZ : ∀ ⦃φ : ClassFunction ↥L ℂ⦄,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
+      τ φ ∈ ZIrr G)
+    (hodd : Odd (Nat.card ↥L))
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
+    (h1A : (1 : ↥L) ∉ A₀)
+    {A' B : Subgroup ↥L} [A'.Normal]
+    (hanchor : ∃ χ₁ ∈ inducedKernelFamily K A', χ₁ 1 = (K.index : ℂ))
+    (hSBne : (inducedKernelFamily K B).Nonempty)
+    (hdatum : ∀ (S₁ : Set (ClassFunction ↥L ℂ)),
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ →
+      S₁ ⊆ inducedKernelFamily K A' ∪ inducedKernelFamily K B →
+      ∀ (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent τ S₁ A₀),
+      ∀ (ψ : ClassFunction ↥L ℂ), ψ ∈ inducedKernelFamily K B → ψ ∉ S₁ → ψ.conj ∉ S₁ →
+      ∀ (χ₁ : ClassFunction ↥L ℂ), χ₁ ∈ S₁ →
+      ∀ (a : ℕ), ψ 1 = (a : ℂ) * χ₁ 1 →
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (S₁ ∪ {ψ, ψ.conj}) A₀) →
+      ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G) τ ψ (a • χ₁),
+        Da.tau1 = τ ∧
+        ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+            τ χ 0,
+          D.imageFamily.Orthogonal Da.imageFamily ∧
+          D.tau1 χ = hS₁coh.extension χ)
+    (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (inducedKernelFamily K A') A₀))
+    (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (inducedKernelFamily K B) A₀)) :
+    ∃ θ : IrreducibleCharacter ↥K,
+      (↑(B.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥K ℂ) ∧
+      (Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1 ≤
+        2 * (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re := by
+  classical
+  obtain ⟨χ₁, hχ₁A', hχ₁deg⟩ := hanchor
+  -- the nonzero supported witness for `ℤ[S(B)]`: a conjugate difference of any member.
+  obtain ⟨φ₀, hφ₀⟩ := hSBne
+  have hne : ∃ φ : ClassFunction ↥L ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K B) A₀ ∧
+        φ ≠ 0 := by
+    refine ⟨φ₀.conj - φ₀, ?_, ?_⟩
+    · refine OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr ⟨?_, ?_⟩
+      · exact Submodule.sub_mem _
+          (Submodule.subset_span (inducedKernelFamily_closedUnderConjugate B hφ₀))
+          (Submodule.subset_span hφ₀)
+      · exact inducedKernelFamily_conjDiff_support hKsupp hφ₀
+    · intro h
+      exact inducedKernelFamily_hasNoRealCharacters hodd B hφ₀ (sub_eq_zero.mp h)
+  -- the first-obstruction break pair over `S(A') ∪ S(B)`.
+  obtain ⟨S₁, ψ, hS₁conj, hSaS₁, hS₁un, hψB, hψnotS₁, hψcnotS₁, hS₁coh, hbreak⟩ :=
+    exists_coherentBreakPair_union τ
+      (inducedKernelFamily_finite A') (inducedKernelFamily_finite B)
+      (inducedKernelFamily_closedUnderConjugate A')
+      (inducedKernelFamily_closedUnderConjugate B)
+      (inducedKernelFamily_hasNoRealCharacters hodd A')
+      (inducedKernelFamily_hasNoRealCharacters hodd B)
+      hne hAcoh hBncoh
+  -- fixed coherence witness for `S₁` (the datum couples to its extension).
+  obtain ⟨hcoh⟩ := hS₁coh
+  -- `S₁` sits inside the full family and is finite.
+  have hS₁bot : S₁ ⊆ inducedKernelFamily K ⊥ := fun χ hχ => by
+    rcases hS₁un hχ with h | h
+    · exact inducedKernelFamily_subset_bot A' h
+    · exact inducedKernelFamily_subset_bot B h
+  have hS₁fin : S₁.Finite :=
+    ((inducedKernelFamily_finite (K := K) A').union (inducedKernelFamily_finite B)).subset hS₁un
+  -- the break's degree ratio against the anchor.
+  obtain ⟨a, hapos, haeq⟩ := inducedKernelFamily_degree_ratio (inducedKernelFamily_subset_bot B hψB)
+  have hψdeg : ψ 1 = (a : ℂ) * χ₁ 1 := by rw [haeq, hχ₁deg]
+  -- the (5.2.d)/(5.2.e)-backed decomposition data at this break.
+  obtain ⟨Da, hDatau1, hdat⟩ := hdatum S₁ hS₁conj hS₁un hcoh ψ hψB hψnotS₁ hψcnotS₁
+    χ₁ (hSaS₁ hχ₁A') a hψdeg hbreak
+  -- the (6.2) `S(A')`-sum bound at the break.
+  have hbound := inducedKernelFamily_SA_sum_le_two_psi_k_general τ hisom htauZ hodd hKsupp h1A
+    hS₁bot hS₁fin hcoh hSaS₁ (hSaS₁ hχ₁A') hχ₁deg hψB hψnotS₁ hψcnotS₁ hψdeg
+    Da hDatau1
+    (fun χ hχ => ⟨(hdat χ hχ).choose, (hdat χ hχ).choose_spec⟩)
+    hbreak
+  -- divide by the positive anchor degree `χ₁(1) = |L:K|`.
+  have hKidx_pos : (0 : ℝ) < (K.index : ℝ) := by
+    rw [Subgroup.index_eq_card]
+    exact_mod_cast Nat.card_pos
+  have hχ₁re : (χ₁ 1).re = (K.index : ℝ) := by
+    rw [hχ₁deg, Complex.natCast_re]
+  rw [hχ₁re] at hbound
+  have hdiv : (Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1 ≤ 2 * (ψ 1).re := by
+    have h2 : (K.index : ℝ) * ((Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1)
+        ≤ (K.index : ℝ) * (2 * (ψ 1).re) := by
+      calc (K.index : ℝ) * ((Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1)
+          ≤ 2 * (ψ 1).re * (K.index : ℝ) := hbound
+        _ = (K.index : ℝ) * (2 * (ψ 1).re) := by ring
+    exact le_of_mul_le_mul_left h2 hKidx_pos
+  -- unpack the break's source `θ` (trivial on `B`).
+  obtain ⟨θ, -, hθker, hψeq⟩ := hψB
+  refine ⟨θ, hθker, ?_⟩
+  rw [← hψeq]
+  exact hdiv
+
+
 /-- **The (6.2) index bound `|K:A'| − 1 ≤ 2ψ(1)` at a break member — the `h56` producer**
 (issue 2022; Coq `coherent_seqIndD_bound`, contrapositive route).
 
@@ -1033,73 +1292,20 @@ theorem exists_source_index_le_two_psi_of_break
       (↑(B.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
           (θ : ClassFunction ↥K ℂ) ∧
       (Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1 ≤
-        2 * (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re := by
-  classical
-  obtain ⟨χ₁, hχ₁A', hχ₁deg⟩ := hanchor
-  -- the nonzero supported witness for `ℤ[S(B)]`: a conjugate difference of any member.
-  obtain ⟨φ₀, hφ₀⟩ := hSBne
-  have hne : ∃ φ : ClassFunction ↥L ℂ,
-      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K B)
-        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∧ φ ≠ 0 := by
-    refine ⟨φ₀.conj - φ₀, ?_, ?_⟩
-    · refine OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr ⟨?_, ?_⟩
-      · exact Submodule.sub_mem _
-          (Submodule.subset_span (inducedKernelFamily_closedUnderConjugate B hφ₀))
-          (Submodule.subset_span hφ₀)
-      · exact inducedKernelFamily_conjDiff_support hKsupp hφ₀
-    · intro h
-      exact inducedKernelFamily_hasNoRealCharacters hodd B hφ₀
-        (sub_eq_zero.mp h)
-  -- the first-obstruction break pair over `S(A') ∪ S(B)`.
-  obtain ⟨S₁, ψ, hS₁conj, hSaS₁, hS₁un, hψB, hψnotS₁, hψcnotS₁, hS₁coh, hbreak⟩ :=
-    exists_coherentBreakPair_union
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
-      (inducedKernelFamily_finite A') (inducedKernelFamily_finite B)
-      (inducedKernelFamily_closedUnderConjugate A')
-      (inducedKernelFamily_closedUnderConjugate B)
-      (inducedKernelFamily_hasNoRealCharacters hodd A')
-      (inducedKernelFamily_hasNoRealCharacters hodd B)
-      hne hAcoh hBncoh
-  -- fixed coherence witness for `S₁` (the datum couples to its extension).
-  obtain ⟨hcoh⟩ := hS₁coh
-  -- `S₁` sits inside the full family and is finite.
-  have hS₁bot : S₁ ⊆ inducedKernelFamily K ⊥ := fun χ hχ => by
-    rcases hS₁un hχ with h | h
-    · exact inducedKernelFamily_subset_bot A' h
-    · exact inducedKernelFamily_subset_bot B h
-  have hS₁fin : S₁.Finite :=
-    ((inducedKernelFamily_finite (K := K) A').union (inducedKernelFamily_finite B)).subset hS₁un
-  -- the break's degree ratio against the anchor.
-  obtain ⟨a, hapos, haeq⟩ := inducedKernelFamily_degree_ratio (inducedKernelFamily_subset_bot B hψB)
-  have hψdeg : ψ 1 = (a : ℂ) * χ₁ 1 := by rw [haeq, hχ₁deg]
-  -- the grid-backed decomposition data at this break.
-  obtain ⟨Da, hDatau1, hdat⟩ := hdatum S₁ hS₁conj hS₁un hcoh ψ hψB hψnotS₁ hψcnotS₁
-    χ₁ (hSaS₁ hχ₁A') a hψdeg hbreak
-  -- the (6.2) `S(A')`-sum bound at the break.
-  have hbound := inducedKernelFamily_SA_sum_le_two_psi_k hyp hodd hKsupp h1A
-    hS₁bot hS₁fin hcoh hSaS₁ (hSaS₁ hχ₁A') hχ₁deg hψB hψnotS₁ hψcnotS₁ hψdeg
-    Da hDatau1
-    (fun χ hχ => ⟨(hdat χ hχ).choose, (hdat χ hχ).choose_spec⟩)
-    hbreak
-  -- divide by the positive anchor degree `χ₁(1) = |L:K|`.
-  have hKidx_pos : (0 : ℝ) < (K.index : ℝ) := by
-    rw [Subgroup.index_eq_card]
-    exact_mod_cast Nat.card_pos
-  have hχ₁re : (χ₁ 1).re = (K.index : ℝ) := by
-    rw [hχ₁deg, Complex.natCast_re]
-  rw [hχ₁re] at hbound
-  have hdiv : (Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1 ≤ 2 * (ψ 1).re := by
-    have h2 : (K.index : ℝ) * ((Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1)
-        ≤ (K.index : ℝ) * (2 * (ψ 1).re) := by
-      calc (K.index : ℝ) * ((Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1)
-          ≤ 2 * (ψ 1).re * (K.index : ℝ) := hbound
-        _ = (K.index : ℝ) * (2 * (ψ 1).re) := by ring
-    exact le_of_mul_le_mul_left h2 hKidx_pos
-  -- unpack the break's source `θ` (trivial on `B`).
-  obtain ⟨θ, -, hθker, hψeq⟩ := hψB
-  refine ⟨θ, hθker, ?_⟩
-  rw [← hψeq]
-  exact hdiv
+        2 * (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re :=
+  -- The Feit-Thompson instance of the `τ`-general statement: (5.2.b) is the Dade isometry plus
+  -- its `ℤ[Irr G]` codomain on `A₀`-supported elements of `ℤ[𝒮]`.
+  exists_source_index_le_two_psi_of_break_general
+    (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData))
+    (fun _φ _ζ hφ hζ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp
+        (S := OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥)
+          (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+        (fun _s hs => hs.2) (Submodule.subset_span hφ) (Submodule.subset_span hζ))
+    (fun _φ hφ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp hφ.2
+        (Submodule.span_le.mpr (fun _x hx => inducedKernelFamily_mem_ZIrr hx) hφ.1))
+    hodd hKsupp h1A hanchor hSBne hdatum hAcoh hBncoh
 
 end H56Producer
 
