@@ -620,6 +620,16 @@ noncomputable def normOneMulAction [Fact p.Prime] :
 abbrev normOneFrobeniusGroup [Fact p.Prime] :=
   additiveFieldGroup p q ⋊[normOneMulAction p q] normOneUnits p q
 
+/-- The additive kernel `P` in the concrete Frobenius group `H = P ⋊ U`. -/
+noncomputable def normOneFrobeniusKernel [Fact p.Prime] :
+    Subgroup (normOneFrobeniusGroup p q) :=
+  (SemidirectProduct.inl : additiveFieldGroup p q →* normOneFrobeniusGroup p q).range
+
+/-- The norm-one complement `U` in the concrete Frobenius group `H = P ⋊ U`. -/
+noncomputable def normOneFrobeniusComplement [Fact p.Prime] :
+    Subgroup (normOneFrobeniusGroup p q) :=
+  (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range
+
 @[simp] theorem normOneMulAction_apply [Fact p.Prime] (u : normOneUnits p q)
     (s : GaloisField p q) :
     ((normOneMulAction p q u) (Multiplicative.ofAdd s)).toAdd =

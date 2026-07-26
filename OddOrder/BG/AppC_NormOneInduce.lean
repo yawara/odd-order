@@ -33,16 +33,6 @@ open scoped commutatorElement
 
 variable (p q : ℕ)
 
-/-- The additive kernel `P` in the concrete Frobenius group `H = P ⋊ U`. -/
-noncomputable def normOneFrobeniusKernel [Fact p.Prime] :
-    Subgroup (normOneFrobeniusGroup p q) :=
-  (SemidirectProduct.inl : additiveFieldGroup p q →* normOneFrobeniusGroup p q).range
-
-/-- The norm-one complement `U` in the concrete Frobenius group `H = P ⋊ U`. -/
-noncomputable def normOneFrobeniusComplement [Fact p.Prime] :
-    Subgroup (normOneFrobeniusGroup p q) :=
-  (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range
-
 /-- In `H = P ⋊ U`, the additive kernel is normal. -/
 theorem normOneFrobeniusKernel_normal [Fact p.Prime] :
     (normOneFrobeniusKernel p q).Normal := by

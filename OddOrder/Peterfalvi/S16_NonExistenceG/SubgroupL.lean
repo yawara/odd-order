@@ -584,15 +584,18 @@ theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
     exact SemidirectProduct.ext hleft hright
   -- `σ` carries the abstract kernel / complement / prime line onto `P` / `U` / `W₂`
   have hP : (fieldNormalizerKernel hyp).map sigma = hyp.base.P := by
-    rw [fieldNormalizerKernel, MonoidHom.range_eq_map, Subgroup.map_map, hsigma,
+    rw [fieldNormalizerKernel, OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel,
+      MonoidHom.range_eq_map, Subgroup.map_map, hsigma,
       SemidirectProduct.lift_comp_inl, ← MonoidHom.range_eq_map,
       fieldNormalizerKernelTransport_range]
   have hU : (fieldNormalizerComplement hyp).map sigma = hyp.base.U := by
-    rw [fieldNormalizerComplement, MonoidHom.range_eq_map, Subgroup.map_map, hsigma,
+    rw [fieldNormalizerComplement, OddOrder.BG.AppC.NormSet.normOneFrobeniusComplement,
+      MonoidHom.range_eq_map, Subgroup.map_map, hsigma,
       SemidirectProduct.lift_comp_inr, ← MonoidHom.range_eq_map,
       fieldNormalizerComplementTransport_range]
   have hP0 : (fieldNormalizerPrimeLine hyp).map sigma = hyp.base.W2 := by
-    rw [fieldNormalizerPrimeLine, OddOrder.BG.AppC.NormSet.normOneFrobeniusSubspaceKernel,
+    rw [fieldNormalizerPrimeLine, OddOrder.BG.AppC.primeLine,
+      OddOrder.BG.AppC.NormSet.normOneFrobeniusSubspaceKernel,
       Subgroup.map_map, hsigma, SemidirectProduct.lift_comp_inl]
     exact hW2
   exact ⟨{

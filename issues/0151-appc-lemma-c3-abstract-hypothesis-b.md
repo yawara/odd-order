@@ -149,3 +149,44 @@ predicates, (8.8) case-B, `q < p`, `p_odd`/`q_odd`, …) は**一切使われて
    (`AppC_FinalContradiction` / `AppC_SL2Example` は import 追加のみ)。`OddOrder.lean` へ配線。
 3. `fieldNormalizerKernel`/`fieldNormalizerComplement`/`fieldNormalizerPrimeLine` を
    移動先の名前へ差し替え (statement 不変)。
+
+---
+
+## ✅ step 1 完了 (2026-07-26)
+
+1. `NormSet.normOneFrobeniusKernel` / `normOneFrobeniusComplement` を
+   `AppC_NormOneInduce.lean` (Peterfalvi S08 を import する下流 leaf) から
+   `AppC_NormSetBasic.lean` へ**上流移動**。
+2. 新 leaf **`OddOrder/BG/AppC_HypothesisB.lean`** を作成 (`AppC_NormSet` のみ import)。
+   `conditionA` / `primeLine` / `HypothesisBAbstract` を `AppC_FinalContradiction.lean`
+   (= C.3 chain の下流) から移設。`OddOrder.lean` に配線済。
+3. `S16.fieldNormalizer{Kernel,Complement,PrimeLine}` の本体を移動先の名前へ差し替え
+   (`inl.range`/`inr.range`/span 式の直書き重複を解消)。unfold に依存していた 8 箇所
+   (`S16_CoreLemmas` 5、`S16_NonExistenceG/SubgroupL` 3) に新名を simp/rw 引数として追加。
+4. **重複していた第 3 の (B) encoding を削除**: `AppC.HypothesisB` +
+   `hypothesisB{FrobeniusGroup,PrimeLine,Complement}` は consumer ゼロで、
+   フィールドが `S16.FieldNormalizerData` と完全に重複していた (S16 版は `fieldNormalizer*`
+   を使うので、`hypothesisB*` は同じ式の別名にすぎない)。削除して module docstring に
+   「(B) の抽象形 = `HypothesisBAbstract`、S16 instance = `S16.FieldNormalizerData`」を明記。
+
+⟹ **これで C.3 chain の入口 (`S16_CoreLemmas`) から `AppC.primeLine` /
+`NormSet.normOneFrobenius{Kernel,Complement}` が見えており、step 2 の機械置換の
+置き換え先が全部揃った。**
+
+### step 2 の残り (次 iteration)
+
+`FieldNormalizerData` を `(p, q, G)` で index された slim record に置き換える。実測済の
+置換対応:
+
+| 現 | 置換先 |
+|---|---|
+| `hyp.base.p`, `hyp.base.q` | section variable `p`, `q` |
+| `hyp.base.p_prime` | `[Fact p.Prime]` |
+| `hyp.base.q_prime` | `(hq : q.Prime)` |
+| `hyp.base.P` | `(NormSet.normOneFrobeniusKernel p q).map data.sigma` |
+| `hyp.base.U` | `(NormSet.normOneFrobeniusComplement p q).map data.sigma` |
+| `hyp.base.W2` | `(primeLine p q).map data.sigma` |
+| `hyp.base.Q` | `data.Q` |
+| `data.Q_elementaryAbelian.comm` | `data.Q_commutative` |
+| `fieldNormalizerFrobeniusGroup hyp` | `NormSet.normOneFrobeniusGroup p q` |
+| `fieldNormalizerKernel/Complement/PrimeLine hyp` | 上流の同名 (step 1 で差し替え済) |
