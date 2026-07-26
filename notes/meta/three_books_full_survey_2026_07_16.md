@@ -1098,3 +1098,30 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 既に完済していた実績がそのまま当てはまる)。
 
 **全体の実 sorry = 1** (`bin/count-sorry`、Q₈ Brauer–Suzuki = issue 0147)。
+
+### Pf §4 の特殊化債務を解消 (2026-07-26、commit `37171eade`)
+
+上表の順 2–3 (= `(2.4)` partial + `(2.6)`–`(2.10.3)` specialized 6 件) は **1 つの原因**に
+帰着した: **(2.4.a) を仮説として持ち回っていた**こと。
+
+- **(2.4.a) は既に定理だった** — `S04_DadeIsometryBasic.lean` の
+  `Hypothesis.hConjInvariant` が `mem_H_iff_coprime_orderOf` (= `x ∈ H(a)` ⟺
+  `x ∈ C_G(a)` かつ `o(x)` が `|C_L(a)|` と互いに素) から sorry-free で導出している。
+  本は `H(a) = O_{π'}(C_G(a))` 経由で示すが、局所版で `π`-core API 無しに出る。
+  ⟹ survey の `(2.4)` = partial 「(a) is NOT derived」は **stale**。
+- にもかかわらず (2.6)–(2.10.3) の全 statement が `hconj : hyp.HConjInvariant` を
+  **余分な仮説**として取っていた (§4 で 65 binder、下流で 600+ の引数)。本は (2.2) から
+  導出するので、これは repo 側の**特殊化債務**そのもの ([[repo-stronger-hypothesis-is-specialization-not-gap]])。
+
+**やったこと**: binder と引数を全除去。仮説を落とすだけなので定理は一般化される方向のみで、
+証明本体は不変。ついでに結論が `hConjInvariant` に一致して自明化した
+`HConjInvariant.restrict` / `hconj_transport_ambient` を削除 (薄いラッパー禁止)。
+
+**残り (次コミット候補)**: 構造体フィールドとして (2.4.a) を posit している 4 箇所 —
+`S08_CoherenceCorePart1.lean:580` (`SibleyDadeHypothesis.hconj`) /
+`S10_StructureSetup.lean:979` / `S14_MaximalI/Hypothesis.lean:44` /
+`S12_MaximalIII_IV_V_Core/Hypothesis.lean:355`、および `Hypothesis71.hConjInvariant`
+系のフィールド。いずれも構成時に `hConjInvariant` で discharge されるので条件付きでは
+ないが、bundle が導出可能な命題を持つのは同じ債務。
+
+⟹ Pf の残り特殊化債務は上表の順 4 以降 (**最大の塊 = (6.2)–(6.6) の Sibley 特殊化**)。
