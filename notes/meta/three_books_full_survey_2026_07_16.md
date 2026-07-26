@@ -1030,3 +1030,71 @@ Ch8 のラベル無し 18 件を実測した結果、**大半は mathlib 被覆*
 
 ⟹ **Isaacs は実質完済**。残る個別項目は Problems (issue 1055 = lane a 領域) が主。
 次の frontier 探索は **BG / Peterfalvi 本文**の番号付き結果の突き合わせで行う。
+
+### BG の突き合わせ (2026-07-26 実測)
+
+**方法**: 本 note の JSON (`three_books_full_survey_2026_07_16.json`) が列挙した BG 228 件のうち
+**番号を持つ 181 件**と、repo の docstring ラベル (`BG {Theorem|Thm|Lemma|Lem|Corollary|Cor|
+Proposition|Prop|Hypothesis|App} N.M`、太字・部分ラベル `(a)`/`(d)` 付きを含む) を突き合わせ。
+
+| 指標 | 値 |
+|---|---|
+| JSON の番号付き BG 結果 | 181 |
+| repo にラベルがある番号 | 180 |
+| ラベル皆無 | **1** (BG 4.1 — JSON の status が既に `mathlib`) |
+
+⟹ **BG は番号レベルでは全面被覆**。ラベル突き合わせは BG に対して信号を持たない
+(Isaacs と違い、欠番からギャップを推定できない)。そこで **JSON が `missing`/`partial` と
+した 26 件を個別実測**したところ、大半が既に完済していた:
+
+| 項目 | 07-16 の label | 実測 (07-26) |
+|---|---|---|
+| 4.6 / 6.4 | missing | `S04_Lem45c_Prop46.lean` / `S06_Thm64Case2.lean` (+AxiomsCheck) |
+| E.1 / E.2 | missing | `AppE_CollectionFormula.lean` (Hall の収集公式、E.2(a)(b)) |
+| E.3 / E.4 / E.5 | missing | `AppE_CentralizerDecomposition.lean` / `AppE_FurtherResults.lean` / `AppE_E5Counting.lean` (+AxiomsCheck) |
+| D.1 / D.2 | partial | `AppD_CNGroups/SylowTI.lean` |
+| 1.21 / 2.1 / 2.3 / 4.4 / 4.5 / 4.20 / 6.3 | partial | すべて部分ラベル付き (`1.21(d)`, `4.4(a)(b)`, `4.20(a)(c)`, `6.3(a)(b)` …) で存在 |
+
+**BG に真に残るもの (4 件)**:
+1. **Lem 2.7** — repo には核心 (`Gorenstein Thm 3.2.3`, `ElemAbelianAutAction.lean`) だけがあり、
+   BG の番号での statement は無い。実体があるので着手コストは小さい。
+2. **§16 tamely imbedded 構造** — issue [8005](../../issues/8005-s16-tame-embedding-restore.md) で
+   **意図的に defer** (Peterfalvi 側の実消費がトリガー、正本 `notes/bg/s15_16_audit.md` §12.3)。
+3. **App.C Rem (II) / (V)** — 小 (Peterfalvi の例と「p, q は奇と仮定してよい」)。
+4. **App.C Rem (IV) / Prob 1** — 文献引用のみ / open problem ⟹ 低優先繰延 (本 note 該当節の裁定どおり)。
+
+### Peterfalvi の突き合わせ (2026-07-26 実測)
+
+同じ方法 (JSON 238 件 vs repo の `Peterfalvi (N.M)` ラベル):
+
+| 指標 | 値 |
+|---|---|
+| repo にラベルがある番号 | 164 |
+| JSON にあって repo ラベル無し | **5** — (1.4) (1.8) (8.2) (8.5) は JSON 側が既に `formalized` (別名で所在)、残る 1 件が (2.4) `partial` |
+
+⟹ **Peterfalvi も「statement が無い」という意味のギャップはほぼ無い**。07-16 に大量 missing だった
+付録は既に完済している (Suzuki = Theorem B 完成 2026-07-26 / FeitSibley / NearFields 2026-07-23 /
+Suzuki2Groups は lane b が 07-24 まで前進)。
+
+**⟹ Peterfalvi の真の frontier は「特殊化債務」**: `formalized_specialized` 26 件 + `partial` 6 件。
+CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化する」) の対象そのもの。上流優先 +
+文書順で並べた着手順序:
+
+| 順 | 項目 | 特殊化の中身 (07-16 時点の記述、着手前に要再実測) |
+|---|---|---|
+| 1 | (1.5) (1.7) partial | Clifford 系。(a)-(c) は完済、残りは形の違い |
+| 2 | **(2.4)(a) partial** | `H(a^x) = H(a)^x` が導出でなく仮説 (`hconj`) — (2.10.1) が消費 |
+| 3 | (2.6)–(2.10.3) spec ×6 | Dade 等長の一式。本体は sorry-free、狭めているのは carrier 側 |
+| 4 | (5.3) (5.8) spec | coherence の subfamily 側 |
+| 5 | (6.2)–(6.6) spec ×5 | **Sibley 特殊化 (K=H, M=1)** — 一般 (6.3)/(6.5) が残る最大の塊 |
+| 6 | (7.2) (7.3) partial | 等号条件節 (χ が各剰余類上定数) が未形式化 |
+| 7 | (7.8)–(7.11) spec ×4 | FrobeniusFamily に束ねた形 (本の一般形より狭い) |
+| 8 | (8.11) partial / (8.15) (8.18) spec | (8.18) は **type-I 対のみ** — 一般型対が残る |
+| 9 | (9.7) (9.10) (9.11) spec | §11 の carrier |
+| 10 | (10.11) (11.8) (13.8) spec | (13.8) は **T-side instance のみ** |
+| 11 | 付録の partial 4 件 | Huppert (単一 sorry ではなく carrier)、NearFields ×2、Suzuki2Groups Def 1 (opaque field)、FeitSibley Hypotheses (free Prop field) |
+
+⚠ この表も **07-16 の記述に基づく**。各行は着手前に実測すること (BG で 26 件中 22 件が
+既に完済していた実績がそのまま当てはまる)。
+
+**全体の実 sorry = 1** (`bin/count-sorry`、Q₈ Brauer–Suzuki = issue 0147)。
