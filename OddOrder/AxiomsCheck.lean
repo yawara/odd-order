@@ -5113,10 +5113,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation
 
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.sigma_eq_left_eq
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.sigma_eq_right_eq
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.sigma_eq_left_eq
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.sigma_eq_right_eq
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.sigma_eq_iff_left_right_eq
+  OddOrder.BG.AppC.FieldNormalizerData.sigma_eq_iff_left_right_eq
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.fieldNormalizerKernel_inf_complement_eq_bot
@@ -5175,73 +5175,73 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.FieldNormalizerData.generatorRelation_step2_primeLine_of_sigma_mem_U
 #assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_not_normalizes_U
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_not_le_normalizer_U
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.W2_not_le_normalizer_U
 #assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_mem_P
 #assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_zpow_mem_P
 #assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.s_zpow_mem_P_sup_U
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.FieldNormalizerData.subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_pow_normalizes_U
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_zpow_normalizes_U
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_zpow_conj_sigma_inr_mem_U
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.t_pow_normalizes_U
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.t_zpow_normalizes_U
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.t_zpow_conj_sigma_inr_mem_U
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_mul_t_zpow_conj_sigma_inr_mul_s_zpow_mem_P_sup_U
+  OddOrder.BG.AppC.FieldNormalizerData.s_zpow_mul_t_zpow_conj_sigma_inr_mul_s_zpow_mem_P_sup_U
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_step4_decomposition_of_zpow_tConj_normOne
+  OddOrder.BG.AppC.FieldNormalizerData.exists_step4_decomposition_of_zpow_tConj_normOne
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_mul_t_pow_conj_sigma_inr_mul_s_zpow_eq_sigma_inr_tConjNormOneUnitsAut_pow
+  OddOrder.BG.AppC.FieldNormalizerData.s_zpow_mul_t_pow_conj_sigma_inr_mul_s_zpow_eq_sigma_inr_tConjNormOneUnitsAut_pow
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U
+  OddOrder.BG.AppC.FieldNormalizerData.s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow
+  OddOrder.BG.AppC.FieldNormalizerData.exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition
+  OddOrder.BG.AppC.FieldNormalizerData.right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_step4_first_k_three_decomposition
+  OddOrder.BG.AppC.FieldNormalizerData.exists_step4_first_k_three_decomposition
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.right_component_of_step4_first_k_three_decomposition
+  OddOrder.BG.AppC.FieldNormalizerData.right_component_of_step4_first_k_three_decomposition
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.FieldNormalizerData.s_zpow_neg_two_eq_primeLineElement_neg_two
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.normN_two_mul_sub_one_of_sigma_first_k_three_decomposition
+  OddOrder.BG.AppC.FieldNormalizerData.normN_two_mul_sub_one_of_sigma_first_k_three_decomposition
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.normN_two_mul_sub_one_of_step4_first_k_three_decomposition
+  OddOrder.BG.AppC.FieldNormalizerData.normN_two_mul_sub_one_of_step4_first_k_three_decomposition
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation_of_first_k_three_coordinate
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_mem_P1
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_ne_one
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_pow_p_eq_one
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P1_normalizes_U
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_normalizes_U
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P1_ne_W2
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_ne_P1
+  OddOrder.BG.AppC.FieldNormalizerData.appC_normSet_generator_relation_of_first_k_three_coordinate
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.t_mem_P1
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.t_ne_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.t_pow_p_eq_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.P1_normalizes_U
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.t_normalizes_U
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.P1_ne_W2
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.W2_ne_P1
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
+  OddOrder.BG.AppC.FieldNormalizerData.P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U
+  OddOrder.BG.AppC.FieldNormalizerData.P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U
 
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe
+  OddOrder.BG.AppC.FieldNormalizerData.normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.normOneUnitsEquivU_tConjNormOneUnitsAut_pow_apply_coe
+  OddOrder.BG.AppC.FieldNormalizerData.normOneUnitsEquivU_tConjNormOneUnitsAut_pow_apply_coe
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow
+  OddOrder.BG.AppC.FieldNormalizerData.t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_twisted_normOne_step_of_tConjNormOneUnitsAut
+  OddOrder.BG.AppC.FieldNormalizerData.appC_twisted_normOne_step_of_tConjNormOneUnitsAut
 
 -- BG App C Lemma C.3 Step 4: the transported `Q` is commutative, so the
 -- `s^{-n}t^n` commutator factors used to pass from (C.3) to (C.4)
 -- can be reordered.
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.Q_mul_comm
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_pow_p_eq_one
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_inf_Q_eq_bot
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.Q_mul_comm
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.W2_pow_p_eq_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.FieldNormalizerData.W2_inf_Q_eq_bot
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm
+  OddOrder.BG.AppC.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.t_inv_pow_mul_s_pow_mul_comm
+  OddOrder.BG.AppC.FieldNormalizerData.t_inv_pow_mul_s_pow_mul_comm
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm_t_inv_pow_mul_s_pow
+  OddOrder.BG.AppC.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm_t_inv_pow_mul_s_pow
 
 -- Peterfalvi (14.7) σ-bridge (POLE-2): the ungated transport of the (14.2)(a) field
 -- model into `G` and its assembly into `FieldNormalizerData`. Takes the field iso as

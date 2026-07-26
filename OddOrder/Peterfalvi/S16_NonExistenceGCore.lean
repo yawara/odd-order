@@ -94,9 +94,9 @@ theorem step4_sigma_primeLine_prod_eq_one {hyp : Hypothesis (G := G)}
   set σ3 := data.y⁻¹ * s3 * data.y with hσ3def
   -- conjugating `(C.10)` by `y⁻¹` turns each `t` into `s` (since `t = y s y⁻¹`).
   have hyt2 : data.y⁻¹ * data.t ^ 2 * data.y = data.s ^ 2 := by
-    rw [t, MulAut.conj_apply, pow_two, pow_two]; group
+    rw [BG.AppC.FieldNormalizerData.t, MulAut.conj_apply, pow_two, pow_two]; group
   have hyti : data.y⁻¹ * data.t⁻¹ * data.y = data.s⁻¹ := by
-    rw [t, MulAut.conj_apply]; group
+    rw [BG.AppC.FieldNormalizerData.t, MulAut.conj_apply]; group
   have hconj : data.s ^ 2 * σ1 * data.s⁻¹ * σ2 * data.s⁻¹ * σ3 = 1 := by
     rw [← hyt2, ← hyti, hσ1def, hσ2def, hσ3def,
       show data.y⁻¹ * data.t ^ 2 * data.y * (data.y⁻¹ * s1 * data.y) *
