@@ -1950,6 +1950,40 @@ implicit なので `(X := K)` を明示しないと `Subgroup.Normal ?m` で ins
 `rw [hS]` は motive 破綻 ⟹ `hS.le x.2` と項で書く。`Subgroup.relIndex_mul_relIndex` は
 部分群 3 つが explicit。
 
+## Ch.5 §5E (書籍 p. 175 の Problems 5E) — 次の frontier (2026-07-27)
+
+statement は **PDF ページ画像で確定済** (書籍 p.175 = PDF p.188)。§5E は **3 問のみ**。
+§5E 本文 (Thm 5.25 / **Thm 5.26 Frobenius** / Lem 5.27 / Lem 5.28 / Cor 5.29 / Cor 5.30) は
+`Ch05_Transfer/Main.lean` に**完成済**なので、道具は揃っている。
+
+| 問題 | 状態 | 主張 (PDF 実測) |
+|---|---|---|
+| 5E.1 | ⬜ | `G` 有限で**真部分群がすべて正規 `p`-補群をもつが `G` 自身は持たない** ⇒ `G` は正規 Sylow `p`-部分群をもち、`\|G\|` の `p` 以外の素因数はちょうど 1 個 (= Itô「極小非 `p`-冪零群」) |
+| 5E.2 | ⬜ | 真部分群がすべて超可解 ⇒ `G` は可解。hint: 極小反例は単純、Problem 3B.10 で最小素因数 `p` に対する正規 `p`-補群 |
+| 5E.3 | ⬜ | **2 元生成部分群がすべて正規 `p`-補群をもつ** ⇒ `G` も持つ。hint: `⟨x,y⟩` (`x` は `p`-部分群 `P` の元、`y ∈ N_G(P)` は位数が `p` で割れない) |
+
+### §5E の設計メモ (2026-07-27)
+
+**共通の道具**: **Thm 5.26 Frobenius** (`Main.lean`, 「`G` が正規 `p`-補群をもつ ⟺ 任意の
+`p`-部分群 `X` で `N_G(X)/C_G(X)` が `p`-群」) と、その使いやすい形
+`isPGroup_normalizerQuotientCentralizer_of_prime_subgroups_centralize`
+(「`q ≠ p` の `q`-部分群が `p`-部分群を正規化すれば中心化する」を確かめれば十分)。
+
+* **5E.2 の道筋 (repo 資産が一番揃っている)**: 極小反例 `G` を取る。真部分群は超可解ゆえ可解、
+  `1 < N ◁ G` があれば `N` も `G/N` も可解になり矛盾 ⟹ **`G` は単純**。`p` = `|G|` の最小素因数。
+  非自明 `p`-部分群 `X` について `N_G(X)` は `G` (単純性より `X ◁ G` は不可) ではなく真部分群、
+  よって超可解 ⟹ **3B.7(b)** (`index_prime_of_isCoatom_of_isSupersolvable`) + **3B.8**
+  (`exists_normal_qComplement`) で最小素因数の正規 `p`-補群をもつ ⟹ Frobenius (5.26) で
+  `G` が正規 `p`-補群 `K` をもつ。`K ≠ ⊥, ⊤` で単純性に矛盾。
+  ⚠ 「極小反例」は型レベル帰納 (`motive : ℕ → Prop` で全群型を量化;
+  `S7C_ThompsonPComplementFinal` と同じパターン) が要る。
+* **5E.1**: Itô の「極小非 `p`-冪零群」。Frobenius の対偶で「`N_G(X)` が正規 `p`-補群を
+  持たない非自明 `p`-部分群 `X`」が取れ、仮定から `N_G(X) = G` すなわち `O_p(G) ≠ 1`。
+  そこから `P ◁ G` と `|G| = p^a q^b` を出すのが本体 (商への帰納が要る)。
+* **5E.3**: Frobenius の判定条件を `q`-部分群版で使い、`x ∈ X` (`p`-部分群) と
+  `y ∈ N_G(X)` の `p'`-元に対し `⟨x,y⟩` の正規 `p`-補群から `[x,y] = 1` を出す
+  (`y` は `⟨x,y⟩` の `p`-補群に入る)。`|X|` に関する帰納が要りそう。
+
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
 | 問題 | 状態 | 実装 |
