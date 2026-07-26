@@ -165,20 +165,35 @@ theorem commutator_le_center_of_index_center_eq_four {P : Type*} [Group P] [Fini
   rw [← commutatorElement_def]
   exact commutatorElement_eq_one_iff_mul_comm.mpr (habel _ _)
 
+/-- `P' ≤ Z(P)` なら各交換子は中心的。 -/
+theorem commutatorElement_mem_center_of_le_center {P : Type*} [Group P]
+    (hc : commutator P ≤ Subgroup.center P) (u v : P) :
+    u * v * u⁻¹ * v⁻¹ ∈ Subgroup.center P := by
+  have h1 := Subgroup.commutator_mem_commutator (G := P) (H₁ := ⊤) (H₂ := ⊤)
+    (Subgroup.mem_top u) (Subgroup.mem_top v)
+  rw [← commutator_def] at h1
+  rw [← commutatorElement_def]
+  exact hc h1
+
+/-- 第 2 引数についての双線形性: `[x, yw] = [x,y][x,w]`。 -/
+theorem commutator_mul_right_of_le_center {P : Type*} [Group P]
+    (hc : commutator P ≤ Subgroup.center P) (x y w : P) :
+    x * (y * w) * x⁻¹ * (y * w)⁻¹
+      = (x * y * x⁻¹ * y⁻¹) * (x * w * x⁻¹ * w⁻¹) := by
+  have hxw : ∀ g : P, g * (x * w * x⁻¹ * w⁻¹) = (x * w * x⁻¹ * w⁻¹) * g :=
+    Subgroup.mem_center_iff.mp (commutatorElement_mem_center_of_le_center hc x w)
+  calc x * (y * w) * x⁻¹ * (y * w)⁻¹
+      = (x * y * x⁻¹ * y⁻¹) * (y * (x * w * x⁻¹ * w⁻¹) * y⁻¹) := by group
+    _ = (x * y * x⁻¹ * y⁻¹) * ((x * w * x⁻¹ * w⁻¹) * y * y⁻¹) := by rw [hxw y]
+    _ = (x * y * x⁻¹ * y⁻¹) * (x * w * x⁻¹ * w⁻¹) := by group
+
 /-- 交換子が中心的なときの**双線形性**: `[xy, w] = [x,w][y,w]`。 -/
 theorem commutator_mul_left_of_le_center {P : Type*} [Group P]
     (hc : commutator P ≤ Subgroup.center P) (x y w : P) :
     (x * y) * w * (x * y)⁻¹ * w⁻¹
       = (x * w * x⁻¹ * w⁻¹) * (y * w * y⁻¹ * w⁻¹) := by
-  have hmem : ∀ u v : P, u * v * u⁻¹ * v⁻¹ ∈ Subgroup.center P := by
-    intro u v
-    have h1 := Subgroup.commutator_mem_commutator (G := P) (H₁ := ⊤) (H₂ := ⊤)
-      (Subgroup.mem_top u) (Subgroup.mem_top v)
-    rw [← commutator_def] at h1
-    rw [← commutatorElement_def]
-    exact hc h1
   have hcy : ∀ g : P, g * (y * w * y⁻¹ * w⁻¹) = (y * w * y⁻¹ * w⁻¹) * g :=
-    Subgroup.mem_center_iff.mp (hmem y w)
+    Subgroup.mem_center_iff.mp (commutatorElement_mem_center_of_le_center hc y w)
   calc (x * y) * w * (x * y)⁻¹ * w⁻¹
       = x * (y * w * y⁻¹ * w⁻¹) * (w * x⁻¹ * w⁻¹) := by group
     _ = (y * w * y⁻¹ * w⁻¹) * x * (w * x⁻¹ * w⁻¹) := by rw [hcy x]
