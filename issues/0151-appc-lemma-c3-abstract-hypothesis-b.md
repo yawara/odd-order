@@ -390,3 +390,42 @@ revert は `git checkout <6 files>` で即座なので、リスクは制御可�
 
 ⚠ 第 2 試行で 1 つミスした: `Q_pow_q_eq_one` を消すときに範囲を広く取りすぎて
 `W2_pow_p_eq_one` まで削除してしまった。**宣言単位で正確に切ること**。
+
+## 🚧 step 2b 第 3 試行 (2026-07-26) — 境界 file が最後の障害、解法も確定
+
+recipe どおり一括置換したところ、**C.3 chain 6 file は全て error 0 に到達**した
+(`Q_elementaryAbelian` 5 箇所も `Q_commutative`/`Q_pPrime`/`eq_one_of_mem_Q_of_pow_p_eq_one`
+で置換完了、構成サイトも更新済)。mathlib の API 名も確定:
+
+* 可換性は `setLike_mul_comm (s := data.Q) ha hb`
+  (`Subgroup.mul_comm_of_mem_isMulCommutative` は deprecated、`(A := _)` でなく `(s := _)`)。
+* `CommGroup ↥data.Q` を作る箇所は
+  `mul_comm := fun a b => Subtype.ext (setLike_mul_comm (s := data.Q) a.2 b.2)`。
+* `← data.card_W2` の rw は **motive not type correct** になる (`p` が `data` の型に出るため)。
+  常に順方向 `data.card_W2` を使い、goal 側を `p` に寄せること。
+
+**残った唯一の障害 = 境界 file**。`S16_G0Coprime.lean` は `data.P` と、S16 仮説の事実
+`hyp.base.S_deriv_eq_PU : derivedInG S = hyp.base.P ⊔ hyp.base.U` を**同じ証明の中で混ぜる**。
+`data.P` と `hyp.base.P` は構成サイトで等しいが定義的には等しくないので `rw` が噛み合わない。
+(`SubgroupL.lean` も同様で、17 宣言が `data` 無しで `hyp.base.P` を使う。)
+
+### ⟹ 解法 (次回これで通る見込み)
+
+S16 側を `abbrev` でなく **pin 付き structure** にする:
+
+```lean
+structure FieldNormalizerData (hyp : Hypothesis (G := G)) extends
+    OddOrder.BG.AppC.FieldNormalizerData hyp.base.p hyp.base.q G where
+  P_eq : toFieldNormalizerData.P = hyp.base.P
+  U_eq : toFieldNormalizerData.U = hyp.base.U
+  W2_eq : toFieldNormalizerData.W2 = hyp.base.W2
+  Q_eq : toFieldNormalizerData.Q = hyp.base.Q
+```
+
+* chain 側 (6 file) は `data.P` 等で書かれたまま動く (親フィールドへの dot 記法)。
+* 境界 file (`S16_G0Coprime`, `SubgroupL`) は `data.P_eq` 等 4 本で橋渡しできる。
+* 構成サイトは `P_eq := rfl` 等。
+* 抽象側から使うときは親を取り出すだけ (pin は S16 専用の付加情報で、
+  `HypothesisBAbstract.toFieldNormalizerData` 経由の抽象利用には現れない)。
+
+⚠ 試行は revert 済、tree は green。
