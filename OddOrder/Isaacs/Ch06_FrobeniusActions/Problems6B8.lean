@@ -87,6 +87,22 @@ theorem mul_comm_of_center_le_of_isCyclic_quotient {A : Type*} [Group A] {Z : Su
   exact commutative_of_cyclic_center_quotient (QuotientGroup.mk' Z)
     (by rwa [QuotientGroup.ker_mk']) x y
 
+/-- `|P : Z(P)| ≤ 2` なら `P` は可換 (`P/Z(P)` が巡回になるので)。
+
+`|P : Z(P)| ∈ {1, 2}` を排除するのに使う。 -/
+theorem mul_comm_of_index_center_le_two {P : Type*} [Group P] [Finite P]
+    (h : (Subgroup.center P).index ≤ 2) (x y : P) : x * y = y * x := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI hcyc : IsCyclic (P ⧸ Subgroup.center P) := by
+    have hcard : Nat.card (P ⧸ Subgroup.center P) ≤ 2 := h
+    rcases Nat.lt_or_ge (Nat.card (P ⧸ Subgroup.center P)) 2 with hlt | hge
+    · have hpos : 0 < Nat.card (P ⧸ Subgroup.center P) := Nat.card_pos
+      haveI : Subsingleton (P ⧸ Subgroup.center P) :=
+        (Nat.card_eq_one_iff_unique.mp (by omega)).1
+      exact isCyclic_of_subsingleton
+    · exact isCyclic_of_prime_card (p := 2) (by omega)
+  exact mul_comm_of_center_le_of_isCyclic_quotient le_rfl hcyc x y
+
 /-- **6B.8 の base case**: `|P| = 8` かつ `|P : P'| = 4` なら `P` は `D_8` か `Q_8`。
 
 `|P'| = 2 ≠ 1` から非可換なので repo の Cor 6.14
