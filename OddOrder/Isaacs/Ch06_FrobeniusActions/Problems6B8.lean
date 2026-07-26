@@ -218,6 +218,45 @@ theorem commutator_eq_center_of_index_center_eq_four {P : Type*} [Group P] [Fini
   refine SetLike.ext' (Set.eq_of_subset_of_ncard_le hle ?_ (Set.toFinite _))
   exact heq
 
+/-- `|P : Z(P)| = 4` のとき, 中心に無い元の中心化群は指数 `2`。
+
+`Z(P) ≤ C_P(y) ≤ P` で `relIndex * index = 4`; `index = 1` なら `y ∈ Z(P)`,
+`index = 4` なら `relIndex = 1` すなわち `C_P(y) ≤ Z(P)` でやはり `y ∈ Z(P)` に反する。 -/
+theorem index_centralizer_eq_two_of_index_center_eq_four {P : Type*} [Group P] [Finite P]
+    (h : (Subgroup.center P).index = 4) {y : P} (hy : y ∉ Subgroup.center P) :
+    (Subgroup.centralizer ({y} : Set P)).index = 2 := by
+  have hZC : Subgroup.center P ≤ Subgroup.centralizer ({y} : Set P) := fun x hx =>
+    Subgroup.mem_centralizer_singleton_iff.mpr (Subgroup.mem_center_iff.mp hx y).symm
+  have hmul := Subgroup.relIndex_mul_index hZC
+  rw [h] at hmul
+  have hyC : y ∈ Subgroup.centralizer ({y} : Set P) :=
+    Subgroup.mem_centralizer_singleton_iff.mpr rfl
+  have hne1 : (Subgroup.centralizer ({y} : Set P)).index ≠ 1 := by
+    intro h1
+    rw [Subgroup.index_eq_one] at h1
+    refine hy (Subgroup.mem_center_iff.mpr fun g => ?_)
+    have hg : g ∈ Subgroup.centralizer ({y} : Set P) := by rw [h1]; trivial
+    exact Subgroup.mem_centralizer_singleton_iff.mp hg
+  have hne4 : (Subgroup.centralizer ({y} : Set P)).index ≠ 4 := by
+    intro h4
+    rw [h4] at hmul
+    have hrel : (Subgroup.center P).relIndex (Subgroup.centralizer ({y} : Set P)) = 1 := by omega
+    exact hy (Subgroup.relIndex_eq_one.mp hrel hyC)
+  have hdvd : (Subgroup.centralizer ({y} : Set P)).index ∣ 4 := Dvd.intro_left _ hmul
+  obtain ⟨i, hi, hgi⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp
+    ((show (2 : ℕ) ^ 2 = 4 by norm_num) ▸ hdvd)
+  have hi0 : i ≠ 0 := by
+    intro h0
+    rw [h0, pow_zero] at hgi
+    exact hne1 hgi
+  have hi2 : i ≠ 2 := by
+    intro h2
+    rw [h2] at hgi
+    norm_num at hgi
+    exact hne4 hgi
+  rw [hgi, show i = 1 by omega]
+  norm_num
+
 /-- **6B.8 の base case**: `|P| = 8` かつ `|P : P'| = 4` なら `P` は `D_8` か `Q_8`。
 
 `|P'| = 2 ≠ 1` から非可換なので repo の Cor 6.14
