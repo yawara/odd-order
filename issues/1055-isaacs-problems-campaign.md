@@ -31,8 +31,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.2 Subnormality
 - [ ] Ch.3 Split Extensions
 - [ ] Ch.4 Commutators
-- [x] Ch.5 Transfer — **着手 (2026-07-26)**、下記 §5A 節参照
-- [ ] Ch.6 Frobenius Actions
+- [x] Ch.5 Transfer — **🎉 完済 (2026-07-27)**: §5A–§5E 全問
+- [ ] Ch.6 Frobenius Actions — **着手 (2026-07-27)**: §6A 進行中
 - [ ] Ch.7 Thompson Subgroup
 - [ ] Ch.8 Permutation Groups
 - [ ] Ch.9 More Subnormality
@@ -1950,7 +1950,52 @@ implicit なので `(X := K)` を明示しないと `Subgroup.Normal ?m` で ins
 `rw [hS]` は motive 破綻 ⟹ `hS.le x.2` と項で書く。`Subgroup.relIndex_mul_relIndex` は
 部分群 3 つが explicit。
 
-## Ch.5 §5E (書籍 p. 175 の Problems 5E) — 次の frontier (2026-07-27)
+## Ch.6 (Frobenius Actions) §6A (書籍 pp. 184-186 の Problems 6A) — 着手 (2026-07-27)
+
+Isaacs Ch.1–Ch.5 の章末演習が全完したので **Ch.6 が次の frontier** (文書順)。
+§6A は **6A.1–6A.11** の 11 問 (statement は PDF ページ画像で確定; 書籍 p.184-186 =
+PDF p.197-199、`references/isaacs/pages/isaacs-p{184,185,186}-{197,198,199}.png` に保存済)。
+Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActions/` に実装済。
+
+| 問題 | 状態 | 主張 |
+|---|---|---|
+| 6A.1 | ✅ 完了 (`Problems6A.lean`) | `A ≤ SL(2,p)`, `p ∤ \|A\|` ⟹ `A` の `(ZMod p)²` への作用は Frobenius |
+| 6A.2 | ⬜ | `GL(3,43)` の具体例 `a = diag(α,α⁴,α²)`, `b = [[0,1,0],[0,0,1],[ε,0,0]]` (`α` 位数 7, `ε` 位数 3) で `A = ⟨a,b⟩` は非巡回位数 63, `43³` 次元への作用は Frobenius |
+| 6A.3 | ⬜ | 位数 `5²·11` の非巡回群で Frobenius 作用をもつものが存在 (hint: `GL(5,p)`) |
+| 6A.4 | ⬜ | Frobenius 群 `G` (核 `N`) の `N` 以外の剰余類は単一の共役類に含まれる |
+| 6A.5 | ⬜ | 非可換可解群で全非単位元の中心化群が可換 ⟹ Frobenius 群 (核 = `F(G)`) |
+| 6A.6 | ⬜ | Lemma 6.5 の仮説を満たす `A, B > 1` ⟹ ある `g` で `A ⊓ B^g > 1` |
+| 6A.7 | ⬜ | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
+| 6A.8 | ⬜ | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
+| 6A.9 | ⬜ | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
+| 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
+| 6A.11 | ⬜ | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
+
+### 6A.1 の実装 (2026-07-27 完了、新 leaf `Problems6A.lean`)
+
+**主結果** `isFrobeniusAction_specialLinearGroupTwo` (実証明・axiom-clean・警告 0)。
+
+論法 (書籍 hint 無しの標準論法): `1 ≠ a ∈ A` が非零ベクトル `v` を固定したとすると
+`K := a - 1` は `Kv = 0` ゆえ `det K = 0`。2 次の行列式を展開して `det a = 1` と合わせると
+**`tr a = 2`**、これと `det a = 1` から成分計算で **`K² = 0`** (固有値 1 の重根 = 冪単)。
+`K² = 0` なら `(1+K)^n = 1 + n·K` (帰納法) で標数 `p` ゆえ **`a^p = 1`**、
+`p ∤ |A|` から `orderOf a = 1` で矛盾。
+
+支持部品 (いずれも汎用・再利用可):
+* `multiplicativeMulDistribMulAction` — `DistribMulAction M V` ⟹
+  `MulDistribMulAction M (Multiplicative V)`。repo の `IsFrobeniusAction` が乗法的なので
+  ベクトル空間への線形作用を扱うのに必須 (§6A/§6B の他の問題でも使う)。
+* `specialLinearGroupDistribMulAction` — `SL(n,R)` の `n → R` への `mulVec` 作用。
+* `one_add_pow_of_sq_eq_zero` — 環で `K² = 0` ⟹ `(1+K)^n = 1 + n•K`。
+* `specialLinearGroupTwo_pow_eq_one_of_smul_eq` / `..._eq_one_of_smul_eq` (元の形)。
+
+⚠ 実装の罠: `fin_cases i` の後は添字が `⟨0, _⟩` 形になり `simp only [h00]` (`K 0 0` 形) が
+**構文的にマッチしない** — 成分等式を先に `have e00 : (K*K) 0 0 = 0` として証明し、
+`fin_cases` 後は `exact e00` (defeq で通る) にする / `Matrix` は非可換環なので
+`M = 1 + (M - 1)` は `ring` でなく `abel` / `Multiplicative.ofAdd_toAdd` は無く
+`Multiplicative.toAdd.injective` を使う。
+
+## Ch.5 §5E (書籍 p. 175 の Problems 5E) — 🎉 完済 (2026-07-27)
 
 statement は **PDF ページ画像で確定済** (書籍 p.175 = PDF p.188)。§5E は **3 問のみ**。
 §5E 本文 (Thm 5.25 / **Thm 5.26 Frobenius** / Lem 5.27 / Lem 5.28 / Cor 5.29 / Cor 5.30) は
