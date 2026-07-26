@@ -751,6 +751,73 @@ theorem thetaHom_range_normal {P : Type*} [Group P] {A : Subgroup P} {a : P}
       rw [hkey]
       exact Subgroup.inv_mem _ ⟨x, rfl⟩
 
+/-- 逆包含 `P' ≤ im θ`。
+
+`R := im θ` は正規で `P/R` は可換 — `A` の像どうしは可換, `a` の像は
+`a⁻¹ x⁻¹ a x = a⁻¹ · θ(x) · a ∈ R` (正規性) により `A` の像と可換。 -/
+theorem commutator_le_thetaHom_range {P : Type*} [Group P] {A : Subgroup P} {a : P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x) (ha2 : a ^ 2 ∈ A)
+    (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A) (hgen : A ⊔ Subgroup.zpowers a = ⊤) :
+    commutator P ≤ (thetaHom A a hab hnorm).range := by
+  haveI hRn := thetaHom_range_normal hab ha2 hnorm hgen
+  -- `a` の像は `A` の像と可換
+  have hax : ∀ x ∈ A, (QuotientGroup.mk a : P ⧸ (thetaHom A a hab hnorm).range) *
+      QuotientGroup.mk x = QuotientGroup.mk x * QuotientGroup.mk a := by
+    intro x hx
+    rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul, QuotientGroup.eq]
+    have hmem : a⁻¹ * ((thetaHom A a hab hnorm) ⟨x, hx⟩)⁻¹ * a
+        ∈ (thetaHom A a hab hnorm).range := by
+      simpa using hRn.conj_mem _ (Subgroup.inv_mem _ ⟨(⟨x, hx⟩ : ↥A), rfl⟩) a⁻¹
+    have heq : (a * x)⁻¹ * (x * a)
+        = a⁻¹ * ((thetaHom A a hab hnorm) ⟨x, hx⟩)⁻¹ * a := by
+      change (a * x)⁻¹ * (x * a) = a⁻¹ * (x⁻¹ * (a * x * a⁻¹))⁻¹ * a
+      group
+    rw [heq]
+    exact hmem
+  -- `A` の像どうしは可換
+  have haa : ∀ x ∈ A, ∀ y ∈ A, (QuotientGroup.mk x : P ⧸ (thetaHom A a hab hnorm).range) *
+      QuotientGroup.mk y = QuotientGroup.mk y * QuotientGroup.mk x := by
+    intro x hx y hy
+    rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul, hab _ _ hx hy]
+  -- どの元の像も中心的
+  have hcentral : ∀ w : P, (QuotientGroup.mk w : P ⧸ (thetaHom A a hab hnorm).range)
+      ∈ Subgroup.center _ := by
+    have hset : A ⊔ Subgroup.zpowers a ≤
+        (Subgroup.center (P ⧸ (thetaHom A a hab hnorm).range)).comap
+          (QuotientGroup.mk' (thetaHom A a hab hnorm).range) := by
+      refine sup_le (fun x hx => ?_) (Subgroup.zpowers_le.mpr ?_)
+      · refine Subgroup.mem_center_iff.mpr fun q => ?_
+        obtain ⟨v, rfl⟩ := QuotientGroup.mk_surjective q
+        have hv : v ∈ A ⊔ Subgroup.zpowers a := hgen ▸ Subgroup.mem_top v
+        have hcx : A ⊔ Subgroup.zpowers a ≤
+            (Subgroup.centralizer {(QuotientGroup.mk x :
+              P ⧸ (thetaHom A a hab hnorm).range)}).comap
+              (QuotientGroup.mk' (thetaHom A a hab hnorm).range) := by
+          refine sup_le (fun y hy => ?_) (Subgroup.zpowers_le.mpr ?_)
+          · exact Subgroup.mem_centralizer_singleton_iff.mpr (haa y hy x hx)
+          · exact Subgroup.mem_centralizer_singleton_iff.mpr (hax x hx)
+        exact Subgroup.mem_centralizer_singleton_iff.mp (hcx hv)
+      · refine Subgroup.mem_center_iff.mpr fun q => ?_
+        obtain ⟨v, rfl⟩ := QuotientGroup.mk_surjective q
+        have hv : v ∈ A ⊔ Subgroup.zpowers a := hgen ▸ Subgroup.mem_top v
+        have hca : A ⊔ Subgroup.zpowers a ≤
+            (Subgroup.centralizer {(QuotientGroup.mk a :
+              P ⧸ (thetaHom A a hab hnorm).range)}).comap
+              (QuotientGroup.mk' (thetaHom A a hab hnorm).range) := by
+          refine sup_le (fun y hy => ?_) (Subgroup.zpowers_le.mpr ?_)
+          · exact Subgroup.mem_centralizer_singleton_iff.mpr (hax y hy).symm
+          · exact Subgroup.mem_centralizer_singleton_iff.mpr rfl
+        exact Subgroup.mem_centralizer_singleton_iff.mp (hca hv)
+    intro w
+    exact hset (hgen ▸ Subgroup.mem_top w)
+  rw [commutator_def]
+  refine Subgroup.commutator_le.mpr fun u _ v _ => ?_
+  rw [← QuotientGroup.eq_one_iff, commutatorElement_def]
+  simp only [QuotientGroup.mk_mul, QuotientGroup.mk_inv]
+  rw [← commutatorElement_def]
+  exact commutatorElement_eq_one_iff_mul_comm.mpr
+    (Subgroup.mem_center_iff.mp (hcentral u) _).symm
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
