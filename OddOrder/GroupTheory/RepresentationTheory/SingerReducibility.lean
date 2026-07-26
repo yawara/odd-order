@@ -155,4 +155,34 @@ theorem exists_isCompl_finrank_one_of_not_isSimpleModule
   simp only [finrank_bot] at hadd
   omega
 
+open Module in
+/-- **A linear map preserving a line acts on it by a scalar.**  If `W` is a `1`-dimensional
+`K`-subspace and `f` maps `W` into `W`, then `f x = c • x` for a single `c : K` and all `x ∈ W`.
+
+Pick a nonzero `v` spanning `W` (`finrank_eq_one_iff'`); `f v` lies in `W`, hence is `c • v`, and
+every `x ∈ W` is `a • v`, so `f x = a • (c • v) = c • x`.
+
+This is the eigenvalue step of BG Lemma 2.7 (issue 0150): on each of the two lines produced by
+`exists_isCompl_finrank_one_of_not_isSimpleModule` the acting group operates through a scalar,
+which is what turns the rank-`2` action into a pair of characters `Q →* Kˣ`.
+
+(mathlib's `exists_smul_eq_of_finrank_eq_one` is a different statement — that any two vectors of a
+rank-`1` space are proportional; here the point is that the *scalar does not depend on `x`*.) -/
+theorem exists_scalar_of_finrank_eq_one_of_mapsTo
+    {K N : Type*} [Field K] [AddCommGroup N] [Module K N]
+    {W : Submodule K N} (hW : finrank K W = 1)
+    (f : N →ₗ[K] N) (hf : ∀ x ∈ W, f x ∈ W) :
+    ∃ c : K, ∀ x ∈ W, f x = c • x := by
+  obtain ⟨v, hv0, hspan⟩ := finrank_eq_one_iff'.mp hW
+  obtain ⟨c, hc⟩ := hspan ⟨f v, hf v v.2⟩
+  refine ⟨c, fun x hx => ?_⟩
+  obtain ⟨a, ha⟩ := hspan ⟨x, hx⟩
+  have hav : a • (v : N) = x := congrArg Subtype.val ha
+  have hcv : c • (v : N) = f v := congrArg Subtype.val hc
+  calc f x = f (a • (v : N)) := by rw [hav]
+    _ = a • f (v : N) := by rw [map_smul]
+    _ = a • (c • (v : N)) := by rw [hcv]
+    _ = c • (a • (v : N)) := by rw [smul_comm]
+    _ = c • x := by rw [hav]
+
 end OddOrder.RepresentationTheory
