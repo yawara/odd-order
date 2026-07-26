@@ -128,3 +128,36 @@ isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible :
 | 5 | 各直線のスカラー指標 `χᵢ : Q →* (ZMod p)ˣ` | 1 次元表現 |
 | 6 | (a) `q ∣ p−1` | 少なくとも一方の `χᵢ` が非自明 (両方自明なら忠実性に反する) |
 | 7 | (b) `α` | 両方非自明 (片方自明 ⟹ `Q ↪ μ_q` 巡回で矛盾) ⟹ `(χ₁,χ₂)` は位数 `q²` 同士の単射 = 同型 ⟹ `(ζ,ζ)` の逆像 |
+
+## 2026-07-26 probe 結果 — 段 3 の障害は消えた
+
+`lake env lean` で直接確認した (scratch probe):
+
+1. **Maschke の private 版は不要**。`NeZero (Nat.card Q : ZMod p)` と
+   `[Module.Finite (ZMod p) M]` があれば
+   ```lean
+   example (ρ : Representation (ZMod p) Q M) [NeZero (Nat.card Q : ZMod p)]
+       [Module.Finite (ZMod p) M] :
+       IsSemisimpleModule (MonoidAlgebra (ZMod p) Q) ρ.asModule := by infer_instance
+   ```
+   が**そのまま通る** (mathlib の Maschke instance が効く)。よって
+   `S02_RepresentationsBasic` の `private exists_simple_submodule_of_neZero_card` を
+   公開化する必要は**ない**。
+2. **補空間の取り出し**は `exists_isCompl` で足りる (`IsSemisimpleModule R M` は
+   `ComplementedLattice (Submodule R M)` そのものなので):
+   ```lean
+   example (R M : Type) [Ring R] [AddCommGroup M] [Module R M] [IsSemisimpleModule R M]
+       (N : Submodule R M) : ∃ N' : Submodule R M, IsCompl N N' := exists_isCompl N
+   ```
+   ⚠ `IsSemisimpleModule.exists_isCompl` / `IsSemisimpleModule.complementedLattice` /
+   `Submodule.finrank_add_finrank_le_of_isCompl` は**存在しない名前**。
+3. `NeZero (Nat.card Q : ZMod p)` を作る補題 `neZero_nat_card_cast_of_isPGroup_ne_char` は
+   `S02_RepresentationsBasic.lean:687` にあるが **`private`** — ここだけは公開版 (または
+   その場での再証明) が要る。`|Q| = q²` と `q ≠ p` からの直接証明でもよい
+   (`ZMod.natCast_self_eq_zero` 系 + `Nat.Coprime`)。
+
+### 残る実装の重さ
+
+`ρ.asModule` (型シノニム) 上の `MonoidAlgebra`-部分加群と `M` 上の `ZMod p`-部分加群の
+往復 (`Representation.asModuleEquiv : ρ.asModule ≃ₗ[ZMod p] M`) と finrank の突き合わせが
+最も fiddly。段 5-7 の指標解析は素直だが行数が出る。**複数 session 規模**の項目。
