@@ -7,7 +7,7 @@ import OddOrder.Isaacs.Ch01_Sylow.Problems
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 
 /-!
-# Isaacs Problems 6A.6 / 6A.11 — Lemma 6.5 の仮説 (TI 条件) をめぐる演習 (書籍 pp. 185-186)
+# Isaacs Problems 6A.6 / 6A.7 / 6A.11 — Lemma 6.5 の仮説 (TI 条件) の演習 (書籍 pp. 185-186)
 
 Lemma 6.5 の仮説は **TI 条件** `A ⊓ A^g = 1` (`g ∉ A`) であり, そのとき
 `X = notConjugateSet A` (`A` の非単位元に共役でない元全体) は `|X| = |G : A|` をみたす。
@@ -23,6 +23,16 @@ Lemma 6.5 の仮説は **TI 条件** `A ⊓ A^g = 1` (`g ∉ A`) であり, そ�
 **証明** (hint の `X`, `Y` を使う計数): もし全ての `g` で `A ⊓ B^g = 1` なら, `A` の非単位元は
 `B` の非単位元と共役になれないので `X ∪ Y = G`。一方 `1 ∈ X ⊓ Y` なので
 `|G| + 1 ≤ |X| + |Y| = |G:A| + |G:B| ≤ |G|/2 + |G|/2 = |G|` で矛盾。
+
+## 6A.7
+
+**主張**: `A` が `G` で Lemma 6.5 の仮説をみたし `A ⊆ H ⊆ G` のとき, (a) `A^g ⊓ H > 1` なら
+`g ∈ H`; (b) `H ⊴ G` なら `H = G` (⚠ (b) は `A > 1` が要る)。
+
+**証明** (hint どおり): `A` と `A^g ⊓ H` はともに **`H` の中で** TI 仮説をみたす
+(`TI_subgroupOf_of_TI` / `TI_subgroupOf_conj_of_TI`) ので **6A.6** を `↥H` で使うと
+`k ∈ H` で `A ⊓ (A^g)^k > 1`, すなわち `A ⊓ A^{kg} > 1` ⟹ TI から `k g ∈ A ⊆ H` ⟹ `g ∈ H`。
+(b) は `H ⊴ G` なら `A^g ≤ H` なので `A^g ⊓ H = A^g ≠ 1` に (a) を使う。
 
 ## 6A.11
 
@@ -269,6 +279,107 @@ theorem TI_iff_forall_normalizer_le [Finite G] (A : Subgroup G) :
     (∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥) ↔
       ∀ T : Subgroup G, T ≠ ⊥ → T ≤ A → Subgroup.normalizer T ≤ A :=
   ⟨fun hTI _ hT hTA => normalizer_le_of_TI hTI hT hTA, TI_of_normalizer_le⟩
+
+/-! ### 6A.7: `A ≤ H ≤ G` での TI 仮説 -/
+
+/-- 共役は `subgroupOf` と交換する (`k ∈ H` のとき)。 -/
+theorem conj_smul_subgroupOf {H : Subgroup G} (k : ↥H) (A : Subgroup G) :
+    MulAut.conj k • (A.subgroupOf H) = (MulAut.conj (k : G) • A).subgroupOf H := by
+  apply Subgroup.map_injective (Subgroup.subtype_injective H)
+  rw [Ch01.map_conj_smul, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+    show (H.subtype k : G) = (k : G) from rfl, Subgroup.smul_inf,
+    Subgroup.conj_smul_eq_self_of_mem k.2]
+
+/-- TI 仮説は中間群 `H` に遺伝する (`A` そのもの)。 -/
+theorem TI_subgroupOf_of_TI {A H : Subgroup G}
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) (k : ↥H)
+    (hk : k ∉ A.subgroupOf H) :
+    (A.subgroupOf H) ⊓ (MulAut.conj k • (A.subgroupOf H)) = ⊥ := by
+  rw [conj_smul_subgroupOf, Subgroup.subgroupOf, Subgroup.subgroupOf, ← Subgroup.comap_inf,
+    hATI (k : G) (by rwa [Subgroup.mem_subgroupOf] at hk)]
+  simp
+
+/-- TI 仮説は中間群 `H` に遺伝する (`A` の共役 `A^g` の側)。 -/
+theorem TI_subgroupOf_conj_of_TI {A H : Subgroup G} {g : G}
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) (k : ↥H)
+    (hk : k ∉ (MulAut.conj g • A).subgroupOf H) :
+    ((MulAut.conj g • A).subgroupOf H) ⊓
+      (MulAut.conj k • ((MulAut.conj g • A).subgroupOf H)) = ⊥ := by
+  have hkA : g⁻¹ * (k : G) * g ∉ A := by
+    intro h
+    refine hk ?_
+    rw [Subgroup.mem_subgroupOf, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    change (MulAut.conj g).symm (k : G) ∈ A
+    rwa [MulAut.conj_symm_apply]
+  have hstep : (MulAut.conj g • A) ⊓ (MulAut.conj ((k : G) * g) • A)
+      = MulAut.conj g • (A ⊓ MulAut.conj (g⁻¹ * (k : G) * g) • A) := by
+    rw [Subgroup.smul_inf, ← mul_smul, ← map_mul]
+    congr 2
+    group
+  rw [conj_smul_subgroupOf, Subgroup.subgroupOf, Subgroup.subgroupOf, ← Subgroup.comap_inf,
+    ← mul_smul, ← map_mul, hstep, hATI _ hkA, Subgroup.smul_bot]
+  simp
+
+/-- **Isaacs Problem 6A.7(a)** (p. 186) ⭐: `A` が `G` で Lemma 6.5 の TI 仮説をみたし
+`A ≤ H ≤ G` のとき, `A^g ⊓ H > 1` なら `g ∈ H`。
+
+hint どおり `A` と `A^g ⊓ H` がともに `H` の中で TI 仮説をみたすことを見て **6A.6** を `H` で使う。 -/
+theorem mem_of_conj_inf_ne_bot [Finite G] {A H : Subgroup G} (hAH : A ≤ H)
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥)
+    {g : G} (hne : (MulAut.conj g • A) ⊓ H ≠ ⊥) : g ∈ H := by
+  classical
+  -- `A' := A.subgroupOf H`, `B' := (A^g).subgroupOf H` はともに `↥H` で非自明かつ TI
+  have hBne : ((MulAut.conj g • A).subgroupOf H) ≠ ⊥ := by
+    intro h
+    refine hne ?_
+    have := congrArg (Subgroup.map H.subtype) h
+    rwa [Subgroup.subgroupOf_map_subtype, Subgroup.map_bot] at this
+  have hAgne : (MulAut.conj g • A : Subgroup G) ≠ ⊥ := by
+    intro h
+    exact hBne (by rw [h]; simp [Subgroup.subgroupOf])
+  have hAne : A ≠ ⊥ := by
+    intro h
+    exact hAgne (by rw [h, Subgroup.smul_bot])
+  have hA'ne : (A.subgroupOf H) ≠ ⊥ := by
+    intro h
+    refine hAne (le_antisymm (fun x hx => ?_) bot_le)
+    have hxH : x ∈ H := hAH hx
+    have : (⟨x, hxH⟩ : ↥H) ∈ A.subgroupOf H := hx
+    rw [h, Subgroup.mem_bot] at this
+    simpa using congrArg Subtype.val this
+  obtain ⟨k, hk⟩ := exists_inf_conj_ne_bot_of_TI (G := ↥H) hA'ne hBne
+    (fun x hx => TI_subgroupOf_of_TI hATI x hx)
+    (fun x hx => TI_subgroupOf_conj_of_TI hATI x hx)
+  -- `A ⊓ A^{kg} ≠ ⊥` から TI で `k g ∈ A ≤ H`
+  have hkey : A ⊓ (MulAut.conj ((k : G) * g) • A) ≠ ⊥ := by
+    intro h
+    refine hk ?_
+    rw [conj_smul_subgroupOf, Subgroup.subgroupOf, Subgroup.subgroupOf, ← Subgroup.comap_inf,
+      ← mul_smul, ← map_mul, h]
+    simp
+  have hmem : (k : G) * g ∈ A := by
+    by_contra hnotmem
+    exact hkey (hATI _ hnotmem)
+  have : (k : G)⁻¹ * ((k : G) * g) ∈ H := H.mul_mem (H.inv_mem k.2) (hAH hmem)
+  simpa using this
+
+/-- **Isaacs Problem 6A.7(b)** (p. 186): `A > 1` が TI 仮説をみたし `A ≤ H ⊴ G` なら `H = G`。
+
+⚠ `A ≠ ⊥` は書籍では Lemma 6.5 の文脈から暗黙 (`A = 1` なら任意の正規部分群が反例)。 -/
+theorem eq_top_of_normal_of_TI [Finite G] {A H : Subgroup G} (hAne : A ≠ ⊥) (hAH : A ≤ H)
+    [H.Normal] (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) : H = ⊤ := by
+  refine le_antisymm le_top fun g _ => ?_
+  refine mem_of_conj_inf_ne_bot hAH hATI (g := g) ?_
+  -- `A^g ≤ H^g = H` なので `A^g ⊓ H = A^g ≠ ⊥`
+  have hsub : (MulAut.conj g • A : Subgroup G) ≤ H := by
+    have h1 : (MulAut.conj g • A : Subgroup G) ≤ MulAut.conj g • H :=
+      Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hAH
+    rwa [Subgroup.Normal.conj_smul_eq_self g H] at h1
+  rw [inf_eq_left.mpr hsub]
+  intro h
+  refine hAne ?_
+  have hb := congrArg (fun S : Subgroup G => MulAut.conj g⁻¹ • S) h
+  rwa [conj_inv_smul_smul, Subgroup.smul_bot] at hb
 
 end
 
