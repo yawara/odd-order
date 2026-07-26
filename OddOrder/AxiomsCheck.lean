@@ -4007,6 +4007,12 @@ set_option linter.style.longLine false in
 -- `q`-th root of unity.  Issue 0150; part (b) (the power-map `α`) is still open.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.prime_dvd_sub_one_of_faithful_rank_two
+-- **BG Lemma 2.7(b)**: in the same situation some `α ∈ Q^#` acts as a power map `x ↦ r·x` with
+-- `r^q = 1`, `r ≠ 1`.  Route: the quotient character `ψ = χ₁/χ₂ : Q →* 𝔽_p^×` has `q`-th-root
+-- values, so its range (a subgroup of the cyclic `𝔽_p^×`) has order dividing `q`; with `|Q| = q²`
+-- the kernel has order ≥ q ≥ 2, and any `α ≠ 1` in it acts by the common scalar on both lines.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_powerMap_of_faithful_rank_two
 -- Peterfalvi (1.7), constituent count: if `Ind_H^G θ = e·∑_{χ ∈ S} χ` with a single common
 -- multiplicity `e`, then `e²·|S|·|H| = |I_G(θ)|` — the book's `n = [I_G(θ):H]/e²`, stated
 -- multiplicatively.  Both sides are `|H|·‖Ind θ‖²` (norm part above + orthonormality of `Irr G`).

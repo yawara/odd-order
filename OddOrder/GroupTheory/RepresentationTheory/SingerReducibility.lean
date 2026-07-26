@@ -385,4 +385,89 @@ theorem prime_dvd_sub_one_of_faithful_rank_two {q : ℕ}
     · exact prime_dvd_sub_one_of_pow_eq_one hq (hpow χ₂ g) (hg h1')
     · exact prime_dvd_sub_one_of_pow_eq_one hq (hpow χ₁ g) h1'
 
+open Module in
+/-- **BG Lemma 2.7(b)** (Bender–Glauberman, p. 31).  In the situation of
+`prime_dvd_sub_one_of_faithful_rank_two`, some `α ∈ Q^#` acts as a **power map**: there is
+`r : 𝔽_p` with `r ^ q = 1`, `r ≠ 1` and `ρ α x = r • x` for *every* `x` (not just on one line).
+
+Rather than building the isomorphism `Q ≅ μ_q × μ_q` and taking its diagonal, the proof looks at
+the quotient character `ψ = χ₁ / χ₂ : Q →* 𝔽_p^×`.  Its values are `q`-th roots of unity, so its
+range — a subgroup of the cyclic group `𝔽_p^×` — has order dividing `q`; with `|Q| = q²` the
+kernel therefore has order at least `q ≥ 2`.  Any `α ≠ 1` in that kernel has `χ₁ α = χ₂ α =: r`,
+hence acts as `r` on both lines and so on all of `M = W₁ ⊔ W₂`; and `r ≠ 1`, since `r = 1` would
+make `ρ α = 1` and `α = 1` by faithfulness.
+
+Together with part (a) this completes BG Lemma 2.7 (issue 0150). -/
+theorem exists_powerMap_of_faithful_rank_two {q : ℕ}
+    (hq : q.Prime) (hqp : q ≠ p) (hrank : finrank (ZMod p) M = 2)
+    (hQexp : ∀ x : Q, x ^ q = 1) (hQcard : Nat.card Q = q ^ 2)
+    (ρ : Representation (ZMod p) Q M) (hfaith : Function.Injective ρ) :
+    ∃ α : Q, α ≠ 1 ∧ ∃ r : ZMod p, r ^ q = 1 ∧ r ≠ 1 ∧ ∀ x : M, ρ α x = r • x := by
+  have hp := (Fact.out : p.Prime)
+  haveI : NeZero (Nat.card Q : ZMod p) := by
+    refine ⟨?_⟩
+    rw [hQcard, Ne, ZMod.natCast_eq_zero_iff]
+    intro h
+    exact hqp ((Nat.prime_dvd_prime_iff_eq hp hq).mp (hp.dvd_of_dvd_pow h)).symm
+  have hnc := not_isCyclic_of_exponent_of_card_sq hq hQexp hQcard
+  have hnot := Representation.not_isSimpleModule_asModule_of_not_isCyclic ρ hfaith hnc
+  obtain ⟨W₁, W₂, hsup, h1, h2, hinv1, hinv2⟩ :=
+    exists_invariant_lines_of_not_isSimpleModule ρ hrank hnot
+  obtain ⟨χ₁, hχ₁⟩ := exists_monoidHom_scalar_of_finrank_eq_one ρ h1 hinv1
+  obtain ⟨χ₂, hχ₂⟩ := exists_monoidHom_scalar_of_finrank_eq_one ρ h2 hinv2
+  set u₁ := χ₁.toHomUnits with hu₁
+  set u₂ := χ₂.toHomUnits with hu₂
+  set ψ : Q →* (ZMod p)ˣ := u₁ / u₂ with hψ
+  -- every value of `ψ` is a `q`-th root of unity
+  have hψq : ∀ g : Q, (ψ g) ^ q = 1 := by
+    intro g
+    have h1' : (u₁ g) ^ q = 1 := by rw [← map_pow, hQexp g, map_one]
+    have h2' : (u₂ g) ^ q = 1 := by rw [← map_pow, hQexp g, map_one]
+    rw [hψ]
+    simp only [MonoidHom.div_apply, div_pow, h1', h2', div_one]
+  -- so the range has order dividing `q`
+  have hrange : Nat.card ψ.range ∣ q := by
+    obtain ⟨g, hg⟩ := IsCyclic.exists_ofOrder_eq_natCard (α := ψ.range)
+    rw [← hg]
+    refine orderOf_dvd_of_pow_eq_one ?_
+    obtain ⟨x, hx⟩ := g.2
+    ext
+    push_cast
+    rw [← hx]
+    exact congrArg Units.val (hψq x)
+  -- `|ker ψ| · |range ψ| = q²` with `|range ψ| ≤ q`, so `|ker ψ| ≥ q ≥ 2`
+  have hcard : Nat.card ψ.ker * Nat.card ψ.range = q ^ 2 := by
+    rw [← Subgroup.index_ker, Subgroup.card_mul_index, hQcard]
+  have hle : Nat.card ψ.range ≤ q := Nat.le_of_dvd hq.pos hrange
+  have hkerge : q ≤ Nat.card ψ.ker := by
+    by_contra hlt
+    push Not at hlt
+    have : Nat.card ψ.ker * Nat.card ψ.range < q * q := by
+      exact Nat.mul_lt_mul_of_lt_of_le hlt hle hq.pos
+    rw [hcard, pow_two] at this
+    omega
+  have hex : ∃ x : ψ.ker, x ≠ 1 := by
+    by_contra hcon
+    push Not at hcon
+    haveI hss : Subsingleton ψ.ker := ⟨fun a b => by rw [hcon a, hcon b]⟩
+    have h1card : Nat.card ψ.ker = 1 := Nat.card_eq_one_iff_unique.mpr ⟨hss, ⟨1⟩⟩
+    have := hq.two_le
+    omega
+  obtain ⟨⟨α, hαker⟩, hα1⟩ := hex
+  have hαne : α ≠ 1 := fun h => hα1 (Subtype.ext h)
+  -- on the kernel the two characters agree
+  have hagree : χ₁ α = χ₂ α := by
+    have : ψ α = 1 := hαker
+    rw [hψ] at this
+    simp only [MonoidHom.div_apply, div_eq_one] at this
+    exact congrArg Units.val this
+  refine ⟨α, hαne, χ₁ α, by rw [← map_pow, hQexp α, map_one], ?_, ?_⟩
+  · intro hr
+    exact hαne (hfaith (by
+      rw [eq_one_of_scalars_eq_one_of_sup_eq_top ρ hsup hχ₁ hχ₂ hr (hagree ▸ hr), map_one]))
+  · intro x
+    have hx : x ∈ W₁ ⊔ W₂ := hsup ▸ Submodule.mem_top
+    obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.mp hx
+    rw [map_add, hχ₁ α y hy, hχ₂ α z hz, ← hagree, smul_add]
+
 end OddOrder.RepresentationTheory
