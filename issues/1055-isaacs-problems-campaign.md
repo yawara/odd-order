@@ -1911,6 +1911,36 @@ implicit なので `(X := K)` を明示しないと `Subgroup.Normal ?m` で ins
 
 ⚠ `(K ⊓ H).subgroupOf K = H.subgroupOf K` は **`inf_subgroupOf_left`** (右側版は `_right`)。
 
+### 5D.6 の設計 (2026-07-27 に確定、次 iteration で実装)
+
+**主張**: `P ∈ Syl_p(G)`, `A := A^p(G)`, `A ∩ P = P'` で **`P'` が可換**なら (Tate 抜きで)
+`G` は正規 `p`-補群をもつ。
+
+**書籍 hint** =「`N := N_G(P')` が仮定を満たすことを見て、`A` の中で Burnside を使う」。
+これを展開すると次の 4 段:
+
+1. **`P ≤ N := N_G(P')`** (`P` は `⁅P,P⁆` を正規化)。ゆえに `P ∈ Syl_p(N)` で `P' ⊴ N`。
+2. **`N` が 5D.5 の仮定を満たす**:
+   * `A^p(N) ⊇ ⁅N,N⁆ ⊇ ⁅P,P⁆ = P'` なので `A^p(N) ∩ P ⊇ P'`、
+   * 逆は既存の `APrime_le_subgroupOf_APrime_of_sylow_le P (P ≤ N)` で
+     `A^p(↥N) ≤ (A^p G).subgroupOf N` ⟹ 押し出して `A^p(N) ∩ P ≤ A ∩ P = P'`。
+   * `P' ⊴ N` かつ `P' ≤ A^p(N)` ⟹ `P' ⊴ A^p(N)`。
+   ⟹ **5D.5 (`hasNormalPComplement_of_APrime_inf_sylow_eq_commutator`) を `↥N` に適用**して
+   `N` が正規 `p`-補群 `M` をもつ。
+3. **`N_A(P') = A ∩ N` は `P'` を中心化する**: `M ⊴ N` は `p'`-群で `N/M` は `p`-群なので
+   `A ∩ N` は正規 `p`-補群 `A ∩ M` をもち、`P' = A ∩ P` はその Sylow `p`-部分群。
+   `P' ⊴ A ∩ N` (1 より) と `A ∩ M ⊴ A ∩ N`、交わり自明・積が全体 ⟹
+   **`A ∩ N = P' × (A ∩ M)`**。`P'` 可換ゆえ `P' ≤ Z(A ∩ N)`, すなわち
+   `N_A(P') ≤ C_A(P')`。
+4. **`A` の中で Burnside** (`hasNormalPComplement_of_sylow_normalizer_le_centralizer` を `↥A` に):
+   `P'` は `A` の Sylow `p`-部分群 (5D.5 と同じ `isHallSubgroup_subgroupOf_of_normal`) なので
+   `A` は正規 `p`-補群 `K` をもつ。`K` は正規 `p`-補群の一意性
+   (`map_mulAut_of_normal_pcomplement`) から `A` に characteristic ⟹ `A ⊴ G` より `K ⊴ G`。
+   `p ∤ |K|` かつ `|G:K| = |G:A|·|A:K| = p`-冪 ⟹ `hasNormalPComplement_of_normal_of_index_eq_pow`。
+
+⚠ 実装コスト: `↥N` と `↥A` の 2 段の transport が要る (5C.13 級の分量)。手順は上記のとおり
+確定しているので、次 iteration はそのまま書き下せばよい。
+
 ## Ch.5 §5B (書籍 p. 157 の Problems 5B) — 着手 (2026-07-26)
 
 | 問題 | 状態 | 実装 |
