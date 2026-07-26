@@ -869,6 +869,73 @@ theorem card_thetaHom_ker_eq_two {P : Type*} [Group P] [Finite P] {A : Subgroup 
     omega
   exact Nat.eq_of_mul_eq_mul_right hpos heq
 
+/-- 位数 `2` の群では非単位元は一意。 -/
+theorem eq_of_ne_one_of_card_eq_two {G : Type*} [Group G] [Finite G]
+    (hcard : Nat.card G = 2) {u v : G} (hu : u ≠ 1) (hv : v ≠ 1) : u = v := by
+  classical
+  by_contra hne
+  haveI : Fintype G := Fintype.ofFinite _
+  have hc : Fintype.card G = 2 := by rw [← Nat.card_eq_fintype_card]; exact hcard
+  have hsub : ({1, u, v} : Finset G).card ≤ 2 := by
+    rw [← hc]; exact Finset.card_le_univ _
+  rw [Finset.card_insert_of_notMem (by simp [Ne.symm hu, Ne.symm hv]),
+    Finset.card_insert_of_notMem (by simp [hne]), Finset.card_singleton] at hsub
+  omega
+
+/-- **`P'` は巡回**: `a` が `P'` を反転し `C_A(a)` が位数 `2` なので, `P'` の involution は
+`C_A(a)` の非単位元ただ一つ。 -/
+theorem isCyclic_commutator {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    {A : Subgroup P} (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x) (hidxA : A.index = 2)
+    {a : P} (ha : a ∉ A) (ha2 : a ^ 2 ∈ A) (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A)
+    (hidx : (commutator P).index = 4) :
+    IsCyclic ↥(commutator P) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hgen := sup_zpowers_eq_top_of_index_two hidxA ha
+  have hrange : commutator P = (thetaHom A a hab hnorm).range :=
+    le_antisymm (commutator_le_thetaHom_range hab ha2 hnorm hgen)
+      (thetaHom_range_le_commutator hab hnorm)
+  have hPA : commutator P ≤ A := by
+    rw [hrange]; exact thetaHom_range_le hab hnorm
+  have hker2 := card_thetaHom_ker_eq_two hab hidxA ha ha2 hnorm hidx
+  refine isCyclic_of_comm_two_group_unique_involution (hP.to_subgroup _) ?_ ?_
+  · intro u v
+    exact Subtype.ext (hab _ _ (hPA u.2) (hPA v.2))
+  · intro y y' hy hy2 hy' hy'2
+    -- involution は `ker θ` に入る
+    have hmem : ∀ w : ↥(commutator P), w ≠ 1 → w ^ 2 = 1 →
+        (⟨(w : P), hPA w.2⟩ : ↥A) ∈ (thetaHom A a hab hnorm).ker := by
+      intro w _ hw2
+      refine (mem_thetaHom_ker_iff hab hnorm _).mpr ?_
+      obtain ⟨x, hx⟩ : ∃ x : ↥A, thetaHom A a hab hnorm x = (w : P) := by
+        have : (w : P) ∈ (thetaHom A a hab hnorm).range := hrange ▸ w.2
+        exact this
+      have hinvw : a * (w : P) * a⁻¹ = (w : P)⁻¹ := by
+        rw [← hx]; exact thetaHom_conj_eq_inv hab ha2 hnorm x
+      have hwinv : (w : P)⁻¹ = (w : P) := by
+        have h2 : (w : P) * (w : P) = 1 := by
+          have := congrArg Subtype.val hw2
+          rwa [pow_two] at this
+        exact (inv_eq_of_mul_eq_one_right h2)
+      rw [hwinv] at hinvw
+      have := congrArg (fun u => u * a) hinvw
+      simpa [mul_assoc] using this
+    have hne1 : ∀ w : ↥(commutator P), w ≠ 1 →
+        (⟨(w : P), hPA w.2⟩ : ↥A) ≠ 1 := by
+      intro w hw hcon
+      refine hw ?_
+      have hval : (w : P) = 1 := congrArg Subtype.val hcon
+      exact Subtype.ext hval
+    have hkeq := eq_of_ne_one_of_card_eq_two (G := ↥(thetaHom A a hab hnorm).ker) hker2
+      (u := ⟨_, hmem y hy hy2⟩) (v := ⟨_, hmem y' hy' hy'2⟩)
+      (by
+        intro hcon
+        exact hne1 y hy (congrArg Subtype.val hcon))
+      (by
+        intro hcon
+        exact hne1 y' hy' (congrArg Subtype.val hcon))
+    exact Subtype.ext (congrArg (fun w => ((w : ↥A) : P)) (congrArg Subtype.val hkeq))
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
