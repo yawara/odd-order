@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.IsSubnormal
+import OddOrder.Isaacs.Ch02_Subnormality.Basic
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B4
 
 /-!
@@ -31,6 +32,46 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B4
 namespace OddOrder.Isaacs.Ch06
 
 section /- 6B.5: subnormal 分割 (p. 196) -/
+
+/-- **Isaacs Ch.2**: `F(G)` は subnormal な冪零部分群をすべて含む。
+
+`|G|` に関する帰納法: `H ≠ ⊤` なら `H ≤ M ⊴ G`, `M < ⊤` を取り, `M` の中で帰納法を使って
+`H ≤ F(M)`。`F(M)` は `M` の特性部分群ゆえ `G` で正規かつ冪零なので `F(M) ≤ F(G)`
+(`fitting_map_subtype_le_fitting`)。
+
+repo にあった可換版 (Isaacs Thm 2.11, `Ch02_Subnormality/Theorem211Wielandt.lean`) の
+冪零版にあたる汎用補題。 -/
+theorem isSubnormal_le_fitting_of_isNilpotent :
+    ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] (H : Subgroup G),
+      Nat.card G = n → H.IsSubnormal → Group.IsNilpotent ↥H → H ≤ Ch01.fitting G := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+  intro G _ _ H hcard hsub hnil
+  classical
+  rcases eq_or_ne H ⊤ with rfl | hne
+  · haveI := hnil
+    exact Ch01.nilpotent_normal_le_fitting
+  obtain ⟨M, hMnormal, hHM, hMlt⟩ := hsub.exists_normal_and_le_and_lt_top_of_ne hne
+  haveI := hMnormal
+  have hMcard : Nat.card ↥M < n := by
+    subst hcard
+    have hmul := Subgroup.card_mul_index M
+    have h1 : M.index ≠ 1 := fun h => (ne_of_lt hMlt) (Subgroup.index_eq_one.mp h)
+    have h0 : M.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+    calc Nat.card ↥M < Nat.card ↥M * M.index :=
+          (Nat.lt_mul_iff_one_lt_right Nat.card_pos).mpr (by omega)
+      _ = Nat.card G := hmul
+  have hsubM : (H.subgroupOf M).IsSubnormal := hsub.subgroupOf
+  have hnilM : Group.IsNilpotent ↥(H.subgroupOf M) :=
+    Group.nilpotent_of_surjective (G := ↥H)
+      (Subgroup.subgroupOfEquivOfLe hHM).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hHM).symm.surjective
+  have hle := ih (Nat.card ↥M) hMcard (H.subgroupOf M) rfl hsubM hnilM
+  have hmap : H = (H.subgroupOf M).map M.subtype := by
+    rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, M.range_subtype, inf_eq_right.mpr hHM]
+  rw [hmap]
+  exact le_trans (Subgroup.map_mono hle) Ch01.fitting_map_subtype_le_fitting
 
 /-- **Wielandt**: 交わりが自明な二つの subnormal 部分群は元ごとに可換。
 
