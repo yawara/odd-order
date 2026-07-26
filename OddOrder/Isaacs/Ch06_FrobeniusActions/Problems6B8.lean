@@ -966,6 +966,30 @@ theorem involution_mem_zpowers_sq {G : Type*} [Group G] {c : G} {k : ℕ} (hk : 
   push_cast
   ring
 
+/-- `a` は `im θ` を反転するので, `im θ` の元では `θ(y) = y⁻²`。 -/
+theorem thetaHom_apply_of_mem_range {P : Type*} [Group P] {A : Subgroup P} {a : P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x) (ha2 : a ^ 2 ∈ A)
+    (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A) {y : P}
+    (hy : y ∈ (thetaHom A a hab hnorm).range) (hyA : y ∈ A) :
+    thetaHom A a hab hnorm ⟨y, hyA⟩ = (y ^ 2)⁻¹ := by
+  obtain ⟨x, hx⟩ := hy
+  have hinv : a * y * a⁻¹ = y⁻¹ := by
+    rw [← hx]
+    exact thetaHom_conj_eq_inv hab ha2 hnorm x
+  change y⁻¹ * (a * y * a⁻¹) = (y ^ 2)⁻¹
+  rw [hinv, pow_two]
+  group
+
+/-- 巡回な部分群の生成元を取り出す。 -/
+theorem exists_zpowers_eq_of_isCyclic {G : Type*} [Group G] {H : Subgroup G}
+    (h : IsCyclic ↥H) : ∃ c ∈ H, Subgroup.zpowers c = H := by
+  obtain ⟨g, hg⟩ := h.exists_generator
+  refine ⟨(g : G), g.2, le_antisymm (Subgroup.zpowers_le.mpr g.2) fun x hx => ?_⟩
+  obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp (hg ⟨x, hx⟩)
+  refine Subgroup.mem_zpowers_iff.mpr ⟨m, ?_⟩
+  have := congrArg Subtype.val hm
+  simpa using this
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
