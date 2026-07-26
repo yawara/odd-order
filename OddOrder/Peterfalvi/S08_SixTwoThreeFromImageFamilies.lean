@@ -44,10 +44,14 @@ of what (6.1) actually assumes.
 
 `τ` here is the Feit–Thompson Dade map `dadeIntegralCharacterMap` and the supported set is
 `supportInSubgroup A L`, whereas Hypothesis (5.2.b) allows any linear isometry
-`ℤ[𝒮, L^#] → ℤ[Irr G, G^#]`.  The adjoin engine is already `τ`-general
-(`S07.adjoinPairCoherent_general`, `S08_GeneralAdjoin`); the *norm-weighted* engine
-(`coherentDegreeSqNormBound_of_not_coherentW_k`) is still stated for the Dade map, so the abstract
-form of (6.2)/(6.3) waits on generalizing that.  See issue 0153.
+`ℤ[𝒮, L^#] → ℤ[Irr G, G^#]`.  **Both (5.6) engines are now `τ`-general** — the unweighted
+`S07.adjoinPairCoherent_general` (`S08_GeneralAdjoin`, issue 1049) and the norm-weighted
+`S07.xAdjoinStepW_k_general` / `S07.coherentDegreeSqNormBound_of_not_coherentW_k_general`
+(`S08_GeneralAdjoinWeighted`, issue 0154), of which the Dade-named `S08.xAdjoinStepW_k` /
+`S08.coherentDegreeSqNormBound_of_not_coherentW_k` are instantiations at `Samb = univ`.  What
+remains of the debt is this leaf's own plumbing (`InducedFamilyImageData`, the `S08_SixTwoGeneral`
+break chain), which still names the Dade map rather than carrying `τ` plus the (5.2.b) isometry and
+`ℤ[Irr G]`-codomain clauses.  See issue 0154.
 -/
 
 namespace OddOrder.Peterfalvi.S07
@@ -121,27 +125,6 @@ structure InducedFamilyImageData {A : Set G}
 section Datum
 
 variable {A : Set G} {K : Subgroup ↥L} [K.Normal] [Invertible (Nat.card ↥K : ℂ)]
-
-/-- **The Dade map is an isometry on every supported sublattice of `ℤ[𝒮]`** — the `hisom` input
-of `S07.decompositionDaFromDiff_general`, packaged for the ambient family `Samb = S(⊥)`.  Pure
-repackaging of `dadeIntegralCharacterMap_inner_eq_on_supported_span`: membership in
-`zSupportedSpan Samb A₀` gives the `A₀`-support of every generator, which is all that lemma
-needs. -/
-theorem dade_hisom_of_zSupportedSpan (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
-    (Samb : Set (ClassFunction ↥L ℂ)) :
-    ∀ (T : Set (ClassFunction ↥L ℂ)),
-      (∀ s ∈ T, s ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) Samb
-        (OddOrder.Peterfalvi.S04.supportInSubgroup A L)) →
-      ∀ φ ζ : ClassFunction ↥L ℂ, φ ∈ Submodule.span ℤ T → ζ ∈ Submodule.span ℤ T →
-        ClassFunction.inner
-            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-              (hyp.fullDadeIsometryData) φ)
-            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
-              (hyp.fullDadeIsometryData) ζ)
-          = ClassFunction.inner φ ζ :=
-  fun _T hT _φ _ζ hφ hζ =>
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp
-      (fun s hs => (hT s hs).2) hφ hζ
 
 /-- **The break decomposition `Da` from (5.2.d)** — general in the break's norm, so a
 **reducible** break `ψ` is allowed (Peterfalvi (5.6) puts no irreducibility on the adjoined
