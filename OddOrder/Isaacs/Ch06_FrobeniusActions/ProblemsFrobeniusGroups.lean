@@ -3,7 +3,8 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.GroupTheory.FittingSelfCentralizing
+import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelComplement
 
 /-!
 # Isaacs Problems 6A — Frobenius 群そのものの演習 (書籍 p. 185)
@@ -18,6 +19,13 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 `f : N → N`, `f(m) = m g m⁻¹ g⁻¹` は単射 (`f(m₁) = f(m₂)` ⟹ `m₂⁻¹m₁ ∈ C_N(g) = 1`)。
 `N` は有限なので `f` は**全射**でもあり, 任意の `n ∈ N` に対し `m g m⁻¹ = n g` なる
 `m ∈ N` が取れる — すなわち `n g` は `g` に共役。
+
+## 6A.5
+
+**主張**: 非可換**可解**群 `G` で任意の非単位元の中心化群が可換 (**CA 群**) なら, `G` は
+Frobenius 群であり Frobenius 核は `F(G)`。証明は `F(G)` が可換になること
+(`Z(F(G)) ≠ 1` の元の中心化群が可換) と, 可解群での自己中心化性 `C_G(F(G)) ⊆ F(G)`
+(P. Hall) を Thm 6.7 に流し込む。
 -/
 
 namespace OddOrder.Isaacs.Ch06
@@ -77,6 +85,68 @@ theorem coset_subset_setOf_isConj (hF : IsFrobeniusGroup G N A) {g : G} (hg : g 
     (N : Set G) * {g} ⊆ {y | IsConj g y} := by
   rintro _ ⟨n, hn, _, rfl, rfl⟩
   exact isConj_mul_of_notMem_kernel hF hg hn
+
+end
+
+section /- 6A.5: CA 群 (中心化群がすべて可換) は Frobenius 群 (p. 185) -/
+
+/-- **Isaacs Problem 6A.5** (p. 185) ⭐: 非可換**可解**群 `G` で, 任意の非単位元の中心化群が
+可換 (いわゆる **CA 群**) なら, `G` は Frobenius 群であり Frobenius 核は `F(G)`。
+
+**証明**:
+1. `F := F(G)` は非自明 (可解非自明) で冪零ゆえ `Z(F) ≠ 1`。`1 ≠ z ∈ Z(F)` を取ると
+   `F ⊆ C_G(z)` で `C_G(z)` は可換 ⟹ **`F` は可換**。
+2. `1 ≠ n ∈ F` について `F ⊆ C_G(n)` (可換性) で, `C_G(n)` の元は `F` の元と可換
+   (どちらも `C_G(n)` に入り `C_G(n)` は可換) ⟹ `C_G(n) ⊆ C_G(F) ⊆ F`
+   (P. Hall: 可解群では Fitting 部分群は自己中心化的)。
+3. `F ≠ ⊤` (さもないと `G = F` は可換), `F ≠ ⊥` ⟹ **Thm 6.7**
+   (`exists_isComplement'_of_centralizer_le`) が Frobenius 構造を与える。 -/
+theorem exists_isFrobeniusGroup_fitting_of_centralizer_comm
+    {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    (hnonab : ∃ x y : G, x * y ≠ y * x)
+    (hCA : ∀ x : G, x ≠ 1 → ∀ u v : G, u ∈ Subgroup.centralizer ({x} : Set G) →
+      v ∈ Subgroup.centralizer ({x} : Set G) → u * v = v * u) :
+    ∃ A : Subgroup G, IsFrobeniusGroup G (Ch01.fitting G) A := by
+  classical
+  haveI : Nontrivial G := by
+    obtain ⟨x, y, hxy⟩ := hnonab
+    by_contra h
+    rw [not_nontrivial_iff_subsingleton] at h
+    exact hxy (by rw [Subsingleton.elim x (1 : G), Subsingleton.elim y (1 : G)])
+  set F : Subgroup G := Ch01.fitting G with hFdef
+  have hFbot : F ≠ ⊥ := Ch01.fitting_ne_bot_of_solvable_nontrivial G
+  haveI : Nontrivial ↥F := (Subgroup.nontrivial_iff_ne_bot F).mpr hFbot
+  -- (1) `Z(F) ≠ 1` の元を取って `F` が可換であることを出す
+  haveI hZ : Nontrivial (Subgroup.center ↥F) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr (Group.IsNilpotent.center_ne_bot ↥F)
+  obtain ⟨z₀, hz₀ne⟩ := exists_ne (1 : Subgroup.center ↥F)
+  set z : G := ((z₀ : ↥F) : G) with hzdef
+  have hzF : z ∈ F := (z₀ : ↥F).2
+  have hzne : z ≠ 1 := by
+    intro h
+    exact hz₀ne (Subtype.ext (Subtype.ext h))
+  have hFcentz : ∀ w ∈ F, w ∈ Subgroup.centralizer ({z} : Set G) := by
+    intro w hw
+    refine Subgroup.mem_centralizer_singleton_iff.mpr ?_
+    have hcz := (Subgroup.mem_center_iff.mp (z₀ : Subgroup.center ↥F).2) ⟨w, hw⟩
+    simpa [hzdef] using congrArg Subtype.val hcz
+  have hFcomm : ∀ u ∈ F, ∀ v ∈ F, u * v = v * u := fun u hu v hv =>
+    hCA z hzne u v (hFcentz u hu) (hFcentz v hv)
+  -- (2) `1 ≠ n ∈ F` について `C_G(n) ≤ F`
+  have hCF : ∀ n ∈ F, n ≠ 1 → Subgroup.centralizer ({n} : Set G) ≤ F := by
+    intro n hnF hnne c hc
+    refine OddOrder.GroupTheory.centralizer_fitting_le_fitting ?_
+    refine Subgroup.mem_centralizer_iff.mpr ?_
+    intro w hw
+    refine (hCA n hnne c w hc ?_).symm
+    exact Subgroup.mem_centralizer_singleton_iff.mpr (hFcomm w hw n hnF)
+  -- (3) `F ≠ ⊤` (さもないと `G` が可換)
+  have hFtop : F ≠ ⊤ := by
+    intro htop
+    obtain ⟨x, y, hxy⟩ := hnonab
+    exact hxy (hFcomm x (htop ▸ Subgroup.mem_top x) y (htop ▸ Subgroup.mem_top y))
+  obtain ⟨A, _, hfrob⟩ := exists_isComplement'_of_centralizer_le (N := F) hCF
+  exact ⟨A, hfrob hFbot hFtop⟩
 
 end
 

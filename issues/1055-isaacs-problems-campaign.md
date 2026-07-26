@@ -1962,14 +1962,29 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.1 | ✅ 完了 (`Problems6A.lean`) | `A ≤ SL(2,p)`, `p ∤ \|A\|` ⟹ `A` の `(ZMod p)²` への作用は Frobenius |
 | 6A.2 | ✅ **完了** (`Problems6A2.lean`) | `GL(3,43)` の具体例 `a = diag(α,α⁴,α²)`, `b = [[0,1,0],[0,0,1],[ε,0,0]]` (`α` 位数 7, `ε` 位数 3) で `A = ⟨a,b⟩` は非巡回位数 63, `43³` 次元への作用は Frobenius |
 | 6A.3 | ✅ **完了** (`Problems6A3.lean`) | 位数 `5²·11` の非巡回群で Frobenius 作用をもつものが存在 (hint: `GL(5,p)`) |
-| 6A.4 | ⬜ | Frobenius 群 `G` (核 `N`) の `N` 以外の剰余類は単一の共役類に含まれる |
-| 6A.5 | ⬜ | 非可換可解群で全非単位元の中心化群が可換 ⟹ Frobenius 群 (核 = `F(G)`) |
+| 6A.4 | ✅ **完了** (`ProblemsFrobeniusGroups.lean`) | Frobenius 群 `G` (核 `N`) の `N` 以外の剰余類は単一の共役類に含まれる |
+| 6A.5 | ✅ **完了** (`ProblemsFrobeniusGroups.lean`) | 非可換可解群で全非単位元の中心化群が可換 ⟹ Frobenius 群 (核 = `F(G)`) |
 | 6A.6 | ⬜ | Lemma 6.5 の仮説を満たす `A, B > 1` ⟹ ある `g` で `A ⊓ B^g > 1` |
 | 6A.7 | ⬜ | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
 | 6A.8 | ⬜ | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
 | 6A.9 | ⬜ | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
 | 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ⬜ | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
+
+### 🎉 6A.4 / 6A.5 完了 (2026-07-27) — 新 leaf `ProblemsFrobeniusGroups.lean`
+
+* **6A.4** `isConj_mul_of_notMem_kernel`: Frobenius 群 `G` (核 `N`) で `g ∉ N` なら剰余類
+  `Ng` の元はすべて `g` に共役。論法: Thm 6.4 (4) (`centralizer_kernel_le`) の対偶で
+  **`C_N(g) = 1`** (`eq_one_of_mem_kernel_of_commute`) ⟹ `f : N → N`, `f(m) = m g m⁻¹ g⁻¹`
+  が単射 ⟹ 有限性から全射 ⟹ 任意の `n ∈ N` に `m g m⁻¹ = n g` なる `m`。
+  集合形 `coset_subset_setOf_isConj` も。
+* **6A.5** `exists_isFrobeniusGroup_fitting_of_centralizer_comm`: 非可換可解な **CA 群**
+  (全非単位元の中心化群が可換) は Frobenius 群で核は `F(G)`。論法:
+  (1) `F := F(G)` は非自明冪零ゆえ `Z(F) ≠ 1`, その元 `z` について `F ⊆ C_G(z)` で
+  `C_G(z)` 可換 ⟹ **`F` は可換**。(2) `1 ≠ n ∈ F` について `C_G(n)` の元は `F` の元と可換
+  (両方 `C_G(n)` 内, `C_G(n)` 可換) ⟹ `C_G(n) ⊆ C_G(F) ⊆ F` (**P. Hall**,
+  `OddOrder.GroupTheory.centralizer_fitting_le_fitting`)。(3) **Thm 6.7**
+  (`exists_isComplement'_of_centralizer_le`) が Frobenius 構造を与える。
 
 ### 🎉 6A.3 完了 (2026-07-27) — 新 leaf `Problems6A3.lean` 442 行
 
