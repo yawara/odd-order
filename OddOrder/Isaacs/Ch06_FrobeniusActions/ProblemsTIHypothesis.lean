@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 
 /-!
@@ -32,10 +33,13 @@ Lemma 6.5 の仮説は **TI 条件** `A ⊓ A^g = 1` (`g ∉ A`) であり, そ�
 * (⟹) `1 ≠ T ≤ A`, `g ∈ N_G(T)` なら `1 ≠ T ≤ A ⊓ A^g` なので TI から `g ∈ A`。
 * (⟸) `D := A ⊓ A^g ≠ 1` とする。`1 ≠ T ≤ D` について `N_G(T) ≤ A` かつ
   (`g⁻¹Tg ≤ A` に仮説を使って) `N_G(T) ≤ A^g`, ゆえに **`N_G(T) ≤ D`**。
-  素数 `p ∣ |D|` と `P ∈ Syl_p(D)` を取ると, `P` は実は **`G` の Sylow `p`-部分群**
-  (そうでなければ `p`-群の正規化群成長 `P < N_S(P) ≤ N_G(P) ≤ D` が `D` 内でより大きい
-  `p`-部分群を与えて矛盾)。`P ≤ A` と `g⁻¹Pg ≤ A` はともに `A` の Sylow `p`-部分群なので
-  Sylow C で `a ∈ A` があって `a(g⁻¹Pg)a⁻¹ = P`, つまり `a g⁻¹ ∈ N_G(P) ≤ A` ⟹ `g ∈ A`。
+  素数 `p ∣ |D|` を取り, **`D` に含まれる `p`-部分群のうち極大なもの `P`** を取ると
+  (Cauchy で非自明なものが存在), `P` は実は **`G` の Sylow `p`-部分群**: `P < S ∈ Syl_p(G)`
+  なら `↥S` の冪零正規化条件で `y ∈ N_S(P) ∖ P` が取れ, `y ∈ N_G(P) ≤ D` ゆえ
+  `P ⊔ ⟨y⟩ ≤ S ⊓ D` が `P` より大きい `D` 内 `p`-部分群になって極大性に矛盾。
+  `P ≤ A` と `g⁻¹ • P ≤ A` はともに `G` の Sylow ゆえ `A` の Sylow `p`-部分群なので
+  Sylow C (`exists_mem_smul_sylow_eq`) で `k ∈ A` があって `k • P = g⁻¹ • P`,
+  つまり `g k ∈ N_G(P) ≤ A` ⟹ `g ∈ A`。
 -/
 
 namespace OddOrder.Isaacs.Ch06
@@ -129,6 +133,142 @@ theorem normalizer_le_of_TI {A : Subgroup G}
   change (MulAut.conj g).symm x ∈ A
   rw [MulAut.conj_symm_apply]
   exact hTA (((Subgroup.mem_normalizer_iff''.mp hg) x).mp hx)
+
+/-! ### 6A.11 (⟸): TI 仮説の十分性 -/
+
+theorem conj_smul_eq_map (g : G) (K : Subgroup G) :
+    MulAut.conj g • K = K.map (MulAut.conj g).toMonoidHom := by
+  rw [Subgroup.pointwise_smul_def]; rfl
+
+/-- 共役による正規化群の移送: `N(g • T) = g • N(T)`。 -/
+theorem normalizer_conj_smul (g : G) (T : Subgroup G) :
+    Subgroup.normalizer ((MulAut.conj g • T : Subgroup G) : Set G)
+      = MulAut.conj g • Subgroup.normalizer (T : Set G) := by
+  rw [conj_smul_eq_map g T, conj_smul_eq_map g (Subgroup.normalizer T)]
+  exact (Subgroup.map_equiv_normalizer_eq T (MulAut.conj g)).symm
+
+theorem conj_inv_smul_smul (g : G) (K : Subgroup G) :
+    MulAut.conj g⁻¹ • (MulAut.conj g • K) = K := by
+  rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+
+theorem conj_smul_inv_smul (g : G) (K : Subgroup G) :
+    MulAut.conj g • (MulAut.conj g⁻¹ • K) = K := by
+  rw [← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+
+/-- `P` が `G` の Sylow `p`-部分群で `P ≤ H`, `g • P ≤ H` なら, ある `k ∈ H` で `k • P = g • P`
+(`↥H` での Sylow C を `map_conj_smul` で `G` に降ろす — Problem 1C.1 と同じ transport)。 -/
+theorem exists_mem_smul_sylow_eq {p : ℕ} [Fact p.Prime] [Finite G] (P : Sylow p G)
+    {H : Subgroup G} (hPH : (P : Subgroup G) ≤ H) {g : G}
+    (hgPH : (↑(g • P) : Subgroup G) ≤ H) :
+    ∃ k : G, k ∈ H ∧ (k • P : Sylow p G) = g • P := by
+  obtain ⟨k, hk⟩ := MulAction.exists_smul_eq (↥H) (P.subtype hPH) ((g • P).subtype hgPH)
+  refine ⟨(k : G), k.2, ?_⟩
+  have hAB : MulAut.conj (k : ↥H) • ((P : Subgroup G).subgroupOf H)
+      = (MulAut.conj g • (P : Subgroup G)).subgroupOf H := by
+    have h := congrArg (fun S : Sylow p ↥H => (S : Subgroup ↥H)) hk
+    simpa only [Sylow.coe_subgroup_smul, Sylow.coe_subtype] using h
+  apply Sylow.ext
+  rw [Sylow.coe_subgroup_smul, Sylow.coe_subgroup_smul]
+  have h := congrArg (Subgroup.map H.subtype) hAB
+  rwa [Ch01.map_conj_smul, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hPH,
+    Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr
+      (by rw [Sylow.coe_subgroup_smul] at hgPH; exact hgPH),
+    show (H.subtype k : G) = ↑k from rfl] at h
+
+/-- **6A.11 (⟸)**: `A` の非自明部分群の正規化群がすべて `A` に含まれるなら, `A` は Lemma 6.5 の
+TI 仮説をみたす。
+
+`D := A ⊓ A^g ≠ 1` として (1) `1 ≠ T ≤ D` で `N_G(T) ≤ D`, (2) `D` に含まれる極大 `p`-部分群
+`P` は `G` の Sylow `p`-部分群, (3) `P` と `g⁻¹ • P` に `A` の中での Sylow C を使う。 -/
+theorem TI_of_normalizer_le [Finite G] {A : Subgroup G}
+    (hnorm : ∀ T : Subgroup G, T ≠ ⊥ → T ≤ A → Subgroup.normalizer T ≤ A) :
+    ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥ := by
+  classical
+  intro g hgA
+  by_contra hD
+  set D : Subgroup G := A ⊓ (MulAut.conj g • A) with hDdef
+  -- (1) `1 ≠ T ≤ D` について `N_G(T) ≤ D`
+  have hnormD : ∀ T : Subgroup G, T ≠ ⊥ → T ≤ D → Subgroup.normalizer T ≤ D := by
+    intro T hTne hTD
+    refine le_inf (hnorm T hTne (hTD.trans inf_le_left)) ?_
+    have hTgA : T ≤ MulAut.conj g • A := hTD.trans inf_le_right
+    have hT'A : MulAut.conj g⁻¹ • T ≤ A := by
+      have h := (Subgroup.pointwise_smul_le_pointwise_smul_iff
+        (a := MulAut.conj g⁻¹)).mpr hTgA
+      rwa [conj_inv_smul_smul] at h
+    have hT'ne : (MulAut.conj g⁻¹ • T : Subgroup G) ≠ ⊥ := by
+      intro h
+      refine hTne ?_
+      have h2 := congrArg (fun S : Subgroup G => MulAut.conj g • S) h
+      rwa [conj_smul_inv_smul, Subgroup.smul_bot] at h2
+    have h3 := hnorm _ hT'ne hT'A
+    rw [normalizer_conj_smul] at h3
+    have h4 := (Subgroup.pointwise_smul_le_pointwise_smul_iff (a := MulAut.conj g)).mpr h3
+    rwa [conj_smul_inv_smul] at h4
+  -- (2) `D` に含まれる極大 `p`-部分群は `G` の Sylow `p`-部分群
+  have hDcard : Nat.card ↥D ≠ 1 := fun h => hD (Subgroup.card_eq_one.mp h)
+  obtain ⟨p, hp, hpD⟩ := Nat.exists_prime_and_dvd hDcard
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨x₀, hx₀⟩ := exists_prime_orderOf_dvd_card' (G := ↥D) p hpD
+  have hxD : (x₀ : G) ∈ D := x₀.2
+  have hxord : orderOf (x₀ : G) = p := by rw [Subgroup.orderOf_coe]; exact hx₀
+  have hQ₀p : IsPGroup p (Subgroup.zpowers (x₀ : G)) := by
+    refine IsPGroup.of_card (n := 1) ?_
+    rw [Nat.card_zpowers, hxord, pow_one]
+  have hQ₀D : Subgroup.zpowers (x₀ : G) ≤ D := Subgroup.zpowers_le.mpr hxD
+  have hQ₀ne : Subgroup.zpowers (x₀ : G) ≠ ⊥ := by
+    intro h
+    have hx1 : (x₀ : G) ∈ (⊥ : Subgroup G) := h ▸ Subgroup.mem_zpowers _
+    rw [Subgroup.mem_bot] at hx1
+    rw [hx1, orderOf_one] at hxord
+    exact hp.one_lt.ne' hxord.symm
+  obtain ⟨P, hQP, hPmax⟩ := Finite.exists_le_maximal
+    (p := fun K : Subgroup G => IsPGroup p K ∧ K ≤ D) ⟨hQ₀p, hQ₀D⟩
+  have hPp : IsPGroup p P := hPmax.1.1
+  have hPD : P ≤ D := hPmax.1.2
+  have hPne : P ≠ ⊥ := fun h => hQ₀ne (le_bot_iff.mp (h ▸ hQP))
+  obtain ⟨S, hPS⟩ := hPp.exists_le_sylow
+  have hPeq : P = (S : Subgroup G) := by
+    by_contra hne
+    have hlt : P < (S : Subgroup G) := lt_of_le_of_ne hPS hne
+    haveI : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
+    have hlt2 : P.subgroupOf (S : Subgroup G) < ⊤ := by
+      rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
+      exact fun h => hlt.ne (le_antisymm hPS h)
+    have hgrow := Group.normalizerCondition_of_isNilpotent _ hlt2
+    rw [← Subgroup.subgroupOf_normalizer_eq hPS] at hgrow
+    obtain ⟨y0, hy0mem, hy0notin⟩ := SetLike.exists_of_lt hgrow
+    have hyN : (y0 : G) ∈ Subgroup.normalizer P := Subgroup.mem_subgroupOf.mp hy0mem
+    have hyS : (y0 : G) ∈ (S : Subgroup G) := y0.2
+    have hynotP : (y0 : G) ∉ P := fun h => hy0notin (Subgroup.mem_subgroupOf.mpr h)
+    have hyD : (y0 : G) ∈ D := hnormD P hPne hPD hyN
+    have hP'S : P ⊔ Subgroup.zpowers (y0 : G) ≤ (S : Subgroup G) :=
+      sup_le hPS (Subgroup.zpowers_le.mpr hyS)
+    have hP'le := hPmax.2 ⟨S.isPGroup'.to_le hP'S,
+      sup_le hPD (Subgroup.zpowers_le.mpr hyD)⟩ le_sup_left
+    exact hynotP (hP'le ((le_sup_right : Subgroup.zpowers (y0 : G) ≤ _)
+      (Subgroup.mem_zpowers _)))
+  -- (3) `S` と `g⁻¹ • S` はともに `A` に含まれる `G` の Sylow `p`-部分群 ⟹ Sylow C
+  have hSne : (S : Subgroup G) ≠ ⊥ := hPeq ▸ hPne
+  have hSA : (S : Subgroup G) ≤ A := hPeq ▸ (hPD.trans inf_le_left)
+  have hSgA : (↑((g⁻¹ : G) • S) : Subgroup G) ≤ A := by
+    rw [Sylow.coe_subgroup_smul, ← hPeq]
+    have h := (Subgroup.pointwise_smul_le_pointwise_smul_iff (a := MulAut.conj g⁻¹)).mpr
+      (hPD.trans inf_le_right)
+    rwa [conj_inv_smul_smul] at h
+  obtain ⟨k, hkA, hkeq⟩ := exists_mem_smul_sylow_eq S hSA hSgA
+  have hgk : (g * k) • S = S := by rw [mul_smul, hkeq, smul_inv_smul]
+  have hgkN : g * k ∈ Subgroup.normalizer (S : Subgroup G) :=
+    Sylow.smul_eq_iff_mem_normalizer.mp hgk
+  have hgkA : g * k ∈ A := hnorm _ hSne hSA hgkN
+  exact hgA (by simpa using A.mul_mem hgkA (A.inv_mem hkA))
+
+/-- **Isaacs Problem 6A.11** (p. 186) ⭐: `A ≤ G` が Lemma 6.5 の TI 仮説をみたすことと,
+`A` の任意の非自明部分群 `T` について `N_G(T) ⊆ A` となることは同値。 -/
+theorem TI_iff_forall_normalizer_le [Finite G] (A : Subgroup G) :
+    (∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥) ↔
+      ∀ T : Subgroup G, T ≠ ⊥ → T ≤ A → Subgroup.normalizer T ≤ A :=
+  ⟨fun hTI _ hT hTA => normalizer_le_of_TI hTI hT hTA, TI_of_normalizer_le⟩
 
 end
 

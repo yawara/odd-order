@@ -1969,7 +1969,7 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.8 | ⬜ | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
 | 6A.9 | ⬜ | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
 | 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
-| 6A.11 | 🔨 (⟹) 完了 / (⟸) は次回 (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
+| 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
 
 ### 6A.6 完了 / 6A.11 は (⟹) のみ (2026-07-27) — 新 leaf `ProblemsTIHypothesis.lean`
 
@@ -1981,7 +1981,8 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
   一方 `1 ∈ X ⊓ Y` なので `|G| + 1 ≤ |X| + |Y| = |G:A| + |G:B| ≤ |G|/2 + |G|/2 = |G|` で矛盾。
 * **6A.11 (⟹)** `normalizer_le_of_TI`: TI ⟹ 非自明 `T ≤ A` で `N_G(T) ≤ A`。
 
-**次回: 6A.11 (⟸)** の設計 (詰め済み)。`D := A ⊓ A^g ≠ 1` として:
+* **6A.11** `TI_iff_forall_normalizer_le`: TI 仮説 ⟺ 任意の非自明 `T ≤ A` で `N_G(T) ≤ A`。
+  (⟸) の論法 (`TI_of_normalizer_le`)。`D := A ⊓ A^g ≠ 1` として:
 1. `1 ≠ T ≤ D` について `N_G(T) ≤ A` かつ (`g⁻¹ • T ≤ A` に仮説) `N_G(T) ≤ A^g`
    ⟹ **`N_G(T) ≤ D`** (`N(g • T) = g • N(T)` の移送が要る)。
 2. 素数 `p ∣ |D|` を取り, **`D` に含まれる `p`-部分群のうち極大なもの `P`** を
@@ -1990,8 +1991,13 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
    `y ∈ N_S(P) ∖ P` が取れ, `y ∈ N_G(P) ≤ D` ゆえ `P ⊔ ⟨y⟩ ≤ S ⊓ D` が `P` より大きい
    `D` 内 `p`-部分群になって極大性に矛盾。
 3. `P ≤ A` と `g⁻¹ • P ≤ A` はともに `G` の Sylow `p`-部分群ゆえ `A` の Sylow `p`-部分群、
-   Sylow C (↥A で取って `map_conj_smul` で `G` に降ろす = 1C.1 のパターン) で `a ∈ A` があって
-   `a (g⁻¹ • P) a⁻¹ = P` ⟹ `a g⁻¹ ∈ N_G(P) ≤ A` ⟹ `g ∈ A`。
+   Sylow C (↥A で取って `map_conj_smul` で `G` に降ろす = 1C.1 のパターン; 汎用形として
+   `exists_mem_smul_sylow_eq` に切り出した) で `k ∈ A` があって `k • P = g⁻¹ • P`
+   ⟹ `g k ∈ N_G(P) ≤ A` ⟹ `g ∈ A`。
+
+  副産物の汎用補題: `normalizer_conj_smul` (`N(g • T) = g • N(T)`) /
+  `conj_smul_eq_map` / `conj_inv_smul_smul` / `conj_smul_inv_smul` /
+  `exists_mem_smul_sylow_eq`。
 
 ### 🎉 6A.4 / 6A.5 完了 (2026-07-27) — 新 leaf `ProblemsFrobeniusGroups.lean`
 
