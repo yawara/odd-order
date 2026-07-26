@@ -3,30 +3,38 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S16_AppendixC3
+import OddOrder.BG.AppC_LemmaC3_ScalarCalculus
 
 /-!
-# Peterfalvi §16 — core setup: the (C.4) connector layer
+# BG Appendix C, Lemma C.3 Step 4: relations (C.4)--(C.7) and the (C.5) normal forms
 
-Split from the parent file (issue 0149, the longFile-1500 campaign); the parent
-imports this leaf, so downstream imports are unchanged.
+H. Bender and G. Glauberman, *Local Analysis for the Odd Order Theorem*
+(LMS LNS 188, 1994), Appendix C, §3 (pp. 148--152), Step 4.
+
+Relations (C.4)--(C.7).  The three connector words appearing between the conjugated factors of
+BG's relation (C.4) are single commutator swaps `qᵢ qⱼ = qⱼ qᵢ` inside the abelian group `Q`
+(with `qᵢ = (s⁻¹)ⁱ tⁱ ∈ Q`); each rewrites a connector so that the neighbouring `t`-powers
+telescope.  That turns the product `M₁ M₂ M₃` of the Step 4 words into relation (C.4).
+
+Writing each `Mᵢ` in the `U P₀ U` normal form of Step 1 gives the (C.5) normal forms
+`Mᵢ = σ(inr uᵢ) s^{cᵢ} σ(inr vᵢ)`.  Their prime-line coordinates `c₁` and `c₃` are nonzero
+(otherwise Step 2 forces `1 = 0` or `−1 = 0` in `𝔽_p`), and applying the Frobenius produces
+relation (C.7).
+
+Migrated from `OddOrder.Peterfalvi.S16_CoreSetupBasic` (issue 0151).
 -/
 
-namespace OddOrder.Peterfalvi.S16
+namespace OddOrder.BG.AppC
+
 open OddOrder.GroupTheory
-open OddOrder.RepresentationTheory
-open OddOrder.Isaacs
 open scoped Pointwise
 open scoped BigOperators
 
-variable {G : Type*} [Group G]
+variable {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G]
 
 namespace FieldNormalizerData
-section Step4
 
-/-- `local instance` は file 境界を越えないため prefix-split 後に再宣言 (原本 = S16_AppendixC3)。 -/
-local instance factPPrimeStep4' {hyp : Hypothesis (G := G)} : Fact hyp.base.p.Prime :=
-  ⟨hyp.base.p_prime⟩
+section Step4
 
 /-! ### BG Appendix C (C.4) connector `q`-swaps
 
@@ -37,7 +45,7 @@ the neighbouring conjugates. -/
 
 /-- BG (C.4) connector 1: `s⁻³ t² s = t⁻¹ s⁻² t³`, by commuting `(s⁻¹)³t³` and
 `t⁻¹s` inside the abelian `Q`. -/
-theorem connectorC4_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+theorem connectorC4_one (data : FieldNormalizerData p q G) :
     (data.s⁻¹) ^ 3 * data.t ^ 2 * data.s =
       data.t⁻¹ * (data.s⁻¹) ^ 2 * data.t ^ 3 :=
   calc
@@ -49,7 +57,7 @@ theorem connectorC4_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData 
 
 /-- BG (C.4) connector 2: `s⁻² t⁻¹ s³ = t⁻³ s t²`, by commuting `(s⁻¹)²t²` and
 `(t⁻¹)³s³` inside the abelian `Q`. -/
-theorem connectorC4_two {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+theorem connectorC4_two (data : FieldNormalizerData p q G) :
     (data.s⁻¹) ^ 2 * data.t⁻¹ * data.s ^ 3 =
       (data.t⁻¹) ^ 3 * data.s * data.t ^ 2 :=
   calc
@@ -62,7 +70,7 @@ theorem connectorC4_two {hyp : Hypothesis (G := G)} (data : FieldNormalizerData 
 
 /-- BG (C.4) connector 3: `s⁻¹ t⁻¹ s² = t⁻² s t`, by commuting `s⁻¹t` and
 `(t⁻¹)²s²` inside the abelian `Q`. -/
-theorem connectorC4_three {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+theorem connectorC4_three (data : FieldNormalizerData p q G) :
     data.s⁻¹ * data.t⁻¹ * data.s ^ 2 =
       (data.t⁻¹) ^ 2 * data.s * data.t :=
   calc
@@ -79,8 +87,8 @@ backward conjugated `k = 3` relation
 `M₃ = s² · (t⁻¹ σ(inr b) t) · s⁻³` are BG's `s^{k-2}(a⁻¹)^{t^k}s^{-k+1}` etc.  The
 connector words between the conjugated factors `q`-swap (Connectors 1–3) and the
 `t`-powers then telescope to `t⁻¹ · (C.2) · t = 1`. -/
-theorem relationC4 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    (a b : fieldNormalizerNormOneUnits hyp)
+theorem relationC4 (data : FieldNormalizerData p q G)
+    (a b : NormSet.normOneUnits p q)
     (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2) :
     (data.s⁻¹) ^ 3 * data.t ^ 2 *
         (data.s *
@@ -146,13 +154,13 @@ theorem relationC4 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
 /-- The first BG `(C.5)` factor is the neutral `s^m σ(inr w) s^r` word with
 `w = (tConj^3)⁻¹ a⁻¹`. -/
 theorem step4M1_eq_sigma_inr
-    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    (a : fieldNormalizerNormOneUnits hyp) :
+    (data : FieldNormalizerData p q G)
+    (a : NormSet.normOneUnits p q) :
     data.step4M1 a =
       data.s *
           data.sigma
             (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
-              fieldNormalizerFrobeniusGroup hyp) *
+              NormSet.normOneFrobeniusGroup p q) *
         data.s ^ (-2 : ℤ) := by
   unfold step4M1
   rw [← data.t_inv_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow_inv
@@ -163,13 +171,13 @@ theorem step4M1_eq_sigma_inr
 /-- The second BG `(C.5)` factor is the neutral `s^m σ(inr w) s^r` word with
 `w = (tConj^2)⁻¹ (a b⁻¹)`. -/
 theorem step4M2_eq_sigma_inr
-    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    (a b : fieldNormalizerNormOneUnits hyp) :
+    (data : FieldNormalizerData p q G)
+    (a b : NormSet.normOneUnits p q) :
     data.step4M2 a b =
       data.s ^ (3 : ℤ) *
           data.sigma
             (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 2)⁻¹ (a * b⁻¹)) :
-              fieldNormalizerFrobeniusGroup hyp) *
+              NormSet.normOneFrobeniusGroup p q) *
         data.s ^ (-1 : ℤ) := by
   unfold step4M2
   rw [← data.t_inv_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow_inv
@@ -180,21 +188,21 @@ theorem step4M2_eq_sigma_inr
 /-- The third BG `(C.5)` factor is the neutral `s^m σ(inr w) s^r` word with
 `w = tConj⁻¹ b`. -/
 theorem step4M3_eq_sigma_inr
-    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    (b : fieldNormalizerNormOneUnits hyp) :
+    (data : FieldNormalizerData p q G)
+    (b : NormSet.normOneUnits p q) :
     data.step4M3 b =
       data.s ^ (2 : ℤ) *
           data.sigma
             (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 1)⁻¹ b) :
-              fieldNormalizerFrobeniusGroup hyp) *
+              NormSet.normOneFrobeniusGroup p q) *
         data.s ^ (-3 : ℤ) := by
   unfold step4M3
   rw [← data.t_inv_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow_inv 1 b]
   group
 
 /-- Relation `(C.4)` restated using the named BG `(C.5)` factors. -/
-theorem relationC4_step4M {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    (a b : fieldNormalizerNormOneUnits hyp)
+theorem relationC4_step4M (data : FieldNormalizerData p q G)
+    (a b : NormSet.normOneUnits p q)
     (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2) :
     (data.s⁻¹) ^ 3 * data.t ^ 2 * data.step4M1 a *
       data.t⁻¹ * data.step4M2 a b * data.t⁻¹ * data.step4M3 b *
@@ -205,32 +213,32 @@ theorem relationC4_step4M {hyp : Hypothesis (G := G)} (data : FieldNormalizerDat
 terms appearing in the already-proved relation `(C.4)`.  The `hM*` fields state
 the Step 1 normal forms of BG's named factors, and the `right*` fields record the
 corresponding mod-`P` complement readings. -/
-structure Step4C5NormalForms {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) (a b : fieldNormalizerNormOneUnits hyp) where
-  c1 : ZMod hyp.base.p
-  c2 : ZMod hyp.base.p
-  c3 : ZMod hyp.base.p
-  u1 : fieldNormalizerNormOneUnits hyp
-  v1 : fieldNormalizerNormOneUnits hyp
-  u2 : fieldNormalizerNormOneUnits hyp
-  v2 : fieldNormalizerNormOneUnits hyp
-  u3 : fieldNormalizerNormOneUnits hyp
-  v3 : fieldNormalizerNormOneUnits hyp
+structure Step4C5NormalForms (data : FieldNormalizerData p q G)
+    (a b : NormSet.normOneUnits p q) where
+  c1 : ZMod p
+  c2 : ZMod p
+  c3 : ZMod p
+  u1 : NormSet.normOneUnits p q
+  v1 : NormSet.normOneUnits p q
+  u2 : NormSet.normOneUnits p q
+  v2 : NormSet.normOneUnits p q
+  u3 : NormSet.normOneUnits p q
+  v3 : NormSet.normOneUnits p q
   hM1 :
     data.step4M1 a =
-      data.sigma (SemidirectProduct.inr u1 : fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
-          data.sigma (SemidirectProduct.inr v1 : fieldNormalizerFrobeniusGroup hyp)
+      data.sigma (SemidirectProduct.inr u1 : NormSet.normOneFrobeniusGroup p q) *
+        data.sigma (primeLineElement p q c1) *
+          data.sigma (SemidirectProduct.inr v1 : NormSet.normOneFrobeniusGroup p q)
   hM2 :
     data.step4M2 a b =
-      data.sigma (SemidirectProduct.inr u2 : fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp c2) *
-          data.sigma (SemidirectProduct.inr v2 : fieldNormalizerFrobeniusGroup hyp)
+      data.sigma (SemidirectProduct.inr u2 : NormSet.normOneFrobeniusGroup p q) *
+        data.sigma (primeLineElement p q c2) *
+          data.sigma (SemidirectProduct.inr v2 : NormSet.normOneFrobeniusGroup p q)
   hM3 :
     data.step4M3 b =
-      data.sigma (SemidirectProduct.inr u3 : fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp c3) *
-          data.sigma (SemidirectProduct.inr v3 : fieldNormalizerFrobeniusGroup hyp)
+      data.sigma (SemidirectProduct.inr u3 : NormSet.normOneFrobeniusGroup p q) *
+        data.sigma (primeLineElement p q c3) *
+          data.sigma (SemidirectProduct.inr v3 : NormSet.normOneFrobeniusGroup p q)
   right1 : (data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹ = u1 * v1
   right2 : (data.tConjNormOneUnitsAut ^ 2)⁻¹ (a * b⁻¹) = u2 * v2
   right3 : (data.tConjNormOneUnitsAut ^ 1)⁻¹ b = u3 * v3
@@ -238,8 +246,8 @@ structure Step4C5NormalForms {hyp : Hypothesis (G := G)}
 /-- The three BG `(C.5)` factors in relation `(C.4)` admit compatible Step 1
 normal forms and mod-`P` complement readings. -/
 theorem exists_step4C5NormalForms
-    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    (a b : fieldNormalizerNormOneUnits hyp) :
+    (data : FieldNormalizerData p q G)
+    (a b : NormSet.normOneUnits p q) :
     Nonempty (Step4C5NormalForms data a b) := by
   rcases data.exists_step4_sigma_inr_decomposition
       (m := (1 : ℤ)) (r := (-2 : ℤ))
@@ -292,45 +300,45 @@ theorem exists_step4C5NormalForms
 namespace Step4C5NormalForms
 
 /-- The first normal-form factor `u₁ s₁ v₁` from `(C.5)`. -/
-noncomputable def factor1 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) : G :=
-  data.sigma (SemidirectProduct.inr forms.u1 : fieldNormalizerFrobeniusGroup hyp) *
-    data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
-      data.sigma (SemidirectProduct.inr forms.v1 : fieldNormalizerFrobeniusGroup hyp)
+noncomputable def factor1 {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) : G :=
+  data.sigma (SemidirectProduct.inr forms.u1 : NormSet.normOneFrobeniusGroup p q) *
+    data.sigma (primeLineElement p q forms.c1) *
+      data.sigma (SemidirectProduct.inr forms.v1 : NormSet.normOneFrobeniusGroup p q)
 
 /-- The second normal-form factor `u₂ s₂ v₂` from `(C.5)`. -/
-noncomputable def factor2 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) : G :=
-  data.sigma (SemidirectProduct.inr forms.u2 : fieldNormalizerFrobeniusGroup hyp) *
-    data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
-      data.sigma (SemidirectProduct.inr forms.v2 : fieldNormalizerFrobeniusGroup hyp)
+noncomputable def factor2 {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) : G :=
+  data.sigma (SemidirectProduct.inr forms.u2 : NormSet.normOneFrobeniusGroup p q) *
+    data.sigma (primeLineElement p q forms.c2) *
+      data.sigma (SemidirectProduct.inr forms.v2 : NormSet.normOneFrobeniusGroup p q)
 
 /-- The third normal-form factor `u₃ s₃ v₃` from `(C.5)`. -/
-noncomputable def factor3 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) : G :=
-  data.sigma (SemidirectProduct.inr forms.u3 : fieldNormalizerFrobeniusGroup hyp) *
-    data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) *
-      data.sigma (SemidirectProduct.inr forms.v3 : fieldNormalizerFrobeniusGroup hyp)
+noncomputable def factor3 {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) : G :=
+  data.sigma (SemidirectProduct.inr forms.u3 : NormSet.normOneFrobeniusGroup p q) *
+    data.sigma (primeLineElement p q forms.c3) *
+      data.sigma (SemidirectProduct.inr forms.v3 : NormSet.normOneFrobeniusGroup p q)
 
 /-- BG Appendix C `(C.8)` applied to the first `(C.5)` normal form. -/
 theorem hM1_frobenius
-    {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    data.step4M1 (a ^ hyp.base.p) =
-      data.sigma (SemidirectProduct.inr (forms.u1 ^ hyp.base.p) :
-          fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
-          data.sigma (SemidirectProduct.inr (forms.v1 ^ hyp.base.p) :
-            fieldNormalizerFrobeniusGroup hyp) := by
+    {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    data.step4M1 (a ^ p) =
+      data.sigma (SemidirectProduct.inr (forms.u1 ^ p) :
+          NormSet.normOneFrobeniusGroup p q) *
+        data.sigma (primeLineElement p q forms.c1) *
+          data.sigma (SemidirectProduct.inr (forms.v1 ^ p) :
+            NormSet.normOneFrobeniusGroup p q) := by
   have hneutral :
       data.s ^ (1 : ℤ) *
             data.sigma
               (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
-                fieldNormalizerFrobeniusGroup hyp) *
+                NormSet.normOneFrobeniusGroup p q) *
           data.s ^ (-2 : ℤ) =
-        data.sigma (SemidirectProduct.inr forms.u1 : fieldNormalizerFrobeniusGroup hyp) *
-          data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
-            data.sigma (SemidirectProduct.inr forms.v1 : fieldNormalizerFrobeniusGroup hyp) := by
+        data.sigma (SemidirectProduct.inr forms.u1 : NormSet.normOneFrobeniusGroup p q) *
+          data.sigma (primeLineElement p q forms.c1) *
+            data.sigma (SemidirectProduct.inr forms.v1 : NormSet.normOneFrobeniusGroup p q) := by
     have h := forms.hM1
     rw [data.step4M1_eq_sigma_inr] at h
     simpa using h
@@ -343,24 +351,24 @@ theorem hM1_frobenius
 
 /-- BG Appendix C `(C.8)` applied to the second `(C.5)` normal form. -/
 theorem hM2_frobenius
-    {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    data.step4M2 (a ^ hyp.base.p) (b ^ hyp.base.p) =
-      data.sigma (SemidirectProduct.inr (forms.u2 ^ hyp.base.p) :
-          fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
-          data.sigma (SemidirectProduct.inr (forms.v2 ^ hyp.base.p) :
-            fieldNormalizerFrobeniusGroup hyp) := by
+    {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    data.step4M2 (a ^ p) (b ^ p) =
+      data.sigma (SemidirectProduct.inr (forms.u2 ^ p) :
+          NormSet.normOneFrobeniusGroup p q) *
+        data.sigma (primeLineElement p q forms.c2) *
+          data.sigma (SemidirectProduct.inr (forms.v2 ^ p) :
+            NormSet.normOneFrobeniusGroup p q) := by
   have hneutral :
       data.s ^ (3 : ℤ) *
             data.sigma
               (SemidirectProduct.inr
                 ((data.tConjNormOneUnitsAut ^ 2)⁻¹ (a * b⁻¹)) :
-                fieldNormalizerFrobeniusGroup hyp) *
+                NormSet.normOneFrobeniusGroup p q) *
           data.s ^ (-1 : ℤ) =
-        data.sigma (SemidirectProduct.inr forms.u2 : fieldNormalizerFrobeniusGroup hyp) *
-          data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
-            data.sigma (SemidirectProduct.inr forms.v2 : fieldNormalizerFrobeniusGroup hyp) := by
+        data.sigma (SemidirectProduct.inr forms.u2 : NormSet.normOneFrobeniusGroup p q) *
+          data.sigma (primeLineElement p q forms.c2) *
+            data.sigma (SemidirectProduct.inr forms.v2 : NormSet.normOneFrobeniusGroup p q) := by
     have h := forms.hM2
     rw [data.step4M2_eq_sigma_inr] at h
     simpa using h
@@ -373,23 +381,23 @@ theorem hM2_frobenius
 
 /-- BG Appendix C `(C.8)` applied to the third `(C.5)` normal form. -/
 theorem hM3_frobenius
-    {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    data.step4M3 (b ^ hyp.base.p) =
-      data.sigma (SemidirectProduct.inr (forms.u3 ^ hyp.base.p) :
-          fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) *
-          data.sigma (SemidirectProduct.inr (forms.v3 ^ hyp.base.p) :
-            fieldNormalizerFrobeniusGroup hyp) := by
+    {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    data.step4M3 (b ^ p) =
+      data.sigma (SemidirectProduct.inr (forms.u3 ^ p) :
+          NormSet.normOneFrobeniusGroup p q) *
+        data.sigma (primeLineElement p q forms.c3) *
+          data.sigma (SemidirectProduct.inr (forms.v3 ^ p) :
+            NormSet.normOneFrobeniusGroup p q) := by
   have hneutral :
       data.s ^ (2 : ℤ) *
             data.sigma
               (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 1)⁻¹ b) :
-                fieldNormalizerFrobeniusGroup hyp) *
+                NormSet.normOneFrobeniusGroup p q) *
           data.s ^ (-3 : ℤ) =
-        data.sigma (SemidirectProduct.inr forms.u3 : fieldNormalizerFrobeniusGroup hyp) *
-          data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) *
-            data.sigma (SemidirectProduct.inr forms.v3 : fieldNormalizerFrobeniusGroup hyp) := by
+        data.sigma (SemidirectProduct.inr forms.u3 : NormSet.normOneFrobeniusGroup p q) *
+          data.sigma (primeLineElement p q forms.c3) *
+            data.sigma (SemidirectProduct.inr forms.v3 : NormSet.normOneFrobeniusGroup p q) := by
     have h := forms.hM3
     rw [data.step4M3_eq_sigma_inr] at h
     simpa using h
@@ -403,37 +411,37 @@ theorem hM3_frobenius
 /-- BG Appendix C `(C.8)` as closure of the whole `(C.5)` normal-form package
 under the concrete `p`-power Frobenius. -/
 noncomputable def frobenius
-    {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    Step4C5NormalForms data (a ^ hyp.base.p) (b ^ hyp.base.p) where
+    {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    Step4C5NormalForms data (a ^ p) (b ^ p) where
   c1 := forms.c1
   c2 := forms.c2
   c3 := forms.c3
-  u1 := forms.u1 ^ hyp.base.p
-  v1 := forms.v1 ^ hyp.base.p
-  u2 := forms.u2 ^ hyp.base.p
-  v2 := forms.v2 ^ hyp.base.p
-  u3 := forms.u3 ^ hyp.base.p
-  v3 := forms.v3 ^ hyp.base.p
+  u1 := forms.u1 ^ p
+  v1 := forms.v1 ^ p
+  u2 := forms.u2 ^ p
+  v2 := forms.v2 ^ p
+  u3 := forms.u3 ^ p
+  v3 := forms.v3 ^ p
   hM1 := forms.hM1_frobenius
   hM2 := forms.hM2_frobenius
   hM3 := forms.hM3_frobenius
   right1 := by
-    have h := congrArg (fun x => x ^ hyp.base.p) forms.right1
+    have h := congrArg (fun x => x ^ p) forms.right1
     simpa [map_pow, map_inv, mul_pow] using h
   right2 := by
-    have h := congrArg (fun x => x ^ hyp.base.p) forms.right2
+    have h := congrArg (fun x => x ^ p) forms.right2
     simpa [map_pow, map_mul, map_inv, mul_pow] using h
   right3 := by
-    have h := congrArg (fun x => x ^ hyp.base.p) forms.right3
+    have h := congrArg (fun x => x ^ p) forms.right3
     simpa [map_pow, mul_pow] using h
 
 end Step4C5NormalForms
 
 /-- Relation `(C.4)` after substituting the three `(C.5)` normal forms. -/
 theorem relationC4_step4C5NormalForms
-    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    {a b : fieldNormalizerNormOneUnits hyp}
+    (data : FieldNormalizerData p q G)
+    {a b : NormSet.normOneUnits p q}
     (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
     (forms : Step4C5NormalForms data a b) :
     (data.s⁻¹) ^ 3 * data.t ^ 2 * forms.factor1 *
@@ -446,8 +454,8 @@ theorem relationC4_step4C5NormalForms
 /-- The first rearranged relation on the way to BG `(C.7)`: multiply `(C.4)` by
 `s^3` on the left and `s^{-3}` on the right after substituting `(C.5)`. -/
 theorem relationC7_seed
-    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    {a b : fieldNormalizerNormOneUnits hyp}
+    (data : FieldNormalizerData p q G)
+    {a b : NormSet.normOneUnits p q}
     (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
     (forms : Step4C5NormalForms data a b) :
     data.t ^ 2 * forms.factor1 * data.t⁻¹ * forms.factor2 * data.t⁻¹ * forms.factor3 =
@@ -466,70 +474,70 @@ theorem relationC7_seed
 namespace Step4C5NormalForms
 
 /-- BG `w₁ = v₂^{t⁻¹} u₃` from the rearrangement leading to `(C.7)`. -/
-noncomputable def w1 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    fieldNormalizerNormOneUnits hyp :=
+noncomputable def w1 {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    NormSet.normOneUnits p q :=
   data.tConjNormOneUnitsAut forms.v2 * forms.u3
 
 /-- BG `w₂ = v₃ u₁^{t⁻²}` from the rearrangement leading to `(C.7)`. -/
-noncomputable def w2 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    fieldNormalizerNormOneUnits hyp :=
+noncomputable def w2 {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    NormSet.normOneUnits p q :=
   forms.v3 * (data.tConjNormOneUnitsAut ^ 2) forms.u1
 
 /-- BG `w₃ = v₁ u₂^t` from the rearrangement leading to `(C.7)`. -/
-noncomputable def w3 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    fieldNormalizerNormOneUnits hyp :=
+noncomputable def w3 {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    NormSet.normOneUnits p q :=
   forms.v1 * (data.tConjNormOneUnitsAut ^ 1)⁻¹ forms.u2
 
 /-- Under `(C.8)`, the first `(C.7)` word is raised to its `p`-th power. -/
 theorem frobenius_w1
-    {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    forms.frobenius.w1 = forms.w1 ^ hyp.base.p := by
+    {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    forms.frobenius.w1 = forms.w1 ^ p := by
   simp [frobenius, w1, map_pow, mul_pow]
 
 /-- Under `(C.8)`, the second `(C.7)` word is raised to its `p`-th power. -/
 theorem frobenius_w2
-    {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    forms.frobenius.w2 = forms.w2 ^ hyp.base.p := by
+    {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    forms.frobenius.w2 = forms.w2 ^ p := by
   simp [frobenius, w2, map_pow, mul_pow]
 
 /-- Under `(C.8)`, the third `(C.7)` word is raised to its `p`-th power. -/
 theorem frobenius_w3
-    {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    forms.frobenius.w3 = forms.w3 ^ hyp.base.p := by
+    {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    forms.frobenius.w3 = forms.w3 ^ p := by
   simp [frobenius, w3, map_pow, mul_pow]
 
 /-- The ambient reading of `w₁`: `σ(w₁) = t σ(v₂) t⁻¹ σ(u₃)`. -/
-theorem sigma_inr_w1 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    data.sigma (SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp) =
-      data.t * data.sigma (SemidirectProduct.inr forms.v2 : fieldNormalizerFrobeniusGroup hyp) *
+theorem sigma_inr_w1 {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    data.sigma (SemidirectProduct.inr forms.w1 : NormSet.normOneFrobeniusGroup p q) =
+      data.t * data.sigma (SemidirectProduct.inr forms.v2 : NormSet.normOneFrobeniusGroup p q) *
         data.t⁻¹ *
-          data.sigma (SemidirectProduct.inr forms.u3 : fieldNormalizerFrobeniusGroup hyp) := by
+          data.sigma (SemidirectProduct.inr forms.u3 : NormSet.normOneFrobeniusGroup p q) := by
   unfold Step4C5NormalForms.w1
   simp only [map_mul]
   have hφ :
       data.sigma
           (SemidirectProduct.inr (data.tConjNormOneUnitsAut forms.v2) :
-            fieldNormalizerFrobeniusGroup hyp) =
-        data.t * data.sigma (SemidirectProduct.inr forms.v2 : fieldNormalizerFrobeniusGroup hyp) *
+            NormSet.normOneFrobeniusGroup p q) =
+        data.t * data.sigma (SemidirectProduct.inr forms.v2 : NormSet.normOneFrobeniusGroup p q) *
           data.t⁻¹ := by
     simpa using
       (data.t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow 1 forms.v2).symm
   rw [hφ]
 
 /-- The ambient reading of `w₂`: `σ(w₂) = σ(v₃) t² σ(u₁) t⁻²`. -/
-theorem sigma_inr_w2 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    data.sigma (SemidirectProduct.inr forms.w2 : fieldNormalizerFrobeniusGroup hyp) =
-      data.sigma (SemidirectProduct.inr forms.v3 : fieldNormalizerFrobeniusGroup hyp) *
+theorem sigma_inr_w2 {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    data.sigma (SemidirectProduct.inr forms.w2 : NormSet.normOneFrobeniusGroup p q) =
+      data.sigma (SemidirectProduct.inr forms.v3 : NormSet.normOneFrobeniusGroup p q) *
         data.t ^ 2 *
-          data.sigma (SemidirectProduct.inr forms.u1 : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (SemidirectProduct.inr forms.u1 : NormSet.normOneFrobeniusGroup p q) *
             (data.t ^ 2)⁻¹ := by
   unfold Step4C5NormalForms.w2
   simp only [map_mul]
@@ -537,11 +545,11 @@ theorem sigma_inr_w2 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp
   group
 
 /-- The ambient reading of `w₃`: `σ(w₃) = σ(v₁) t⁻¹ σ(u₂) t`. -/
-theorem sigma_inr_w3 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    data.sigma (SemidirectProduct.inr forms.w3 : fieldNormalizerFrobeniusGroup hyp) =
-      data.sigma (SemidirectProduct.inr forms.v1 : fieldNormalizerFrobeniusGroup hyp) *
-        data.t⁻¹ * data.sigma (SemidirectProduct.inr forms.u2 : fieldNormalizerFrobeniusGroup hyp) *
+theorem sigma_inr_w3 {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    data.sigma (SemidirectProduct.inr forms.w3 : NormSet.normOneFrobeniusGroup p q) =
+      data.sigma (SemidirectProduct.inr forms.v1 : NormSet.normOneFrobeniusGroup p q) *
+        data.t⁻¹ * data.sigma (SemidirectProduct.inr forms.u2 : NormSet.normOneFrobeniusGroup p q) *
           data.t := by
   unfold Step4C5NormalForms.w3
   simp only [map_mul]
@@ -549,11 +557,11 @@ theorem sigma_inr_w3 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp
   group
 
 /-- The three BG `(C.7)` words are elements of `U`, expressed after applying `σ`. -/
-theorem sigma_inr_w_mem_U {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
-    data.sigma (SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp) ∈ data.U ∧
-      data.sigma (SemidirectProduct.inr forms.w2 : fieldNormalizerFrobeniusGroup hyp) ∈ data.U ∧
-        data.sigma (SemidirectProduct.inr forms.w3 : fieldNormalizerFrobeniusGroup hyp) ∈
+theorem sigma_inr_w_mem_U {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
+    data.sigma (SemidirectProduct.inr forms.w1 : NormSet.normOneFrobeniusGroup p q) ∈ data.U ∧
+      data.sigma (SemidirectProduct.inr forms.w2 : NormSet.normOneFrobeniusGroup p q) ∈ data.U ∧
+        data.sigma (SemidirectProduct.inr forms.w3 : NormSet.normOneFrobeniusGroup p q) ∈
           data.U := by
   constructor
   · rw [← data.sigma_U_eq_U]
@@ -568,53 +576,52 @@ theorem sigma_inr_w_mem_U {hyp : Hypothesis (G := G)} {data : FieldNormalizerDat
 coordinate cannot be zero.  If `c₁=0`, then the first normal form lies in `U`;
 reading the same element as `s · U · s⁻²` and applying Step 2 with prime-line
 coordinates `(1,-2)` gives either `1=0` or `-1=0` in `ZMod p`, both impossible. -/
-theorem c1_ne_zero {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+theorem c1_ne_zero {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
     forms.c1 ≠ 0 := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   intro hc1
   have hu1 :
-      data.sigma (SemidirectProduct.inr forms.u1 : fieldNormalizerFrobeniusGroup hyp) ∈
+      data.sigma (SemidirectProduct.inr forms.u1 : NormSet.normOneFrobeniusGroup p q) ∈
         data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr forms.u1, ⟨forms.u1, rfl⟩, rfl⟩
   have hv1 :
-      data.sigma (SemidirectProduct.inr forms.v1 : fieldNormalizerFrobeniusGroup hyp) ∈
+      data.sigma (SemidirectProduct.inr forms.v1 : NormSet.normOneFrobeniusGroup p q) ∈
         data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr forms.v1, ⟨forms.v1, rfl⟩, rfl⟩
   have hM1U : data.step4M1 a ∈ data.U := by
     rw [forms.hM1, hc1]
-    simpa [fieldNormalizerPrimeLineElement, mul_assoc] using data.U.mul_mem hu1 hv1
+    simpa [primeLineElement, mul_assoc] using data.U.mul_mem hu1 hv1
   have hM1_step :
-      data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (1 : ZMod hyp.base.p)) *
+      data.sigma (primeLineElement p q (1 : ZMod p)) *
           data.sigma
             (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
-              fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (-2 : ZMod hyp.base.p)) ∈
+              NormSet.normOneFrobeniusGroup p q) *
+        data.sigma (primeLineElement p q (-2 : ZMod p)) ∈
           data.U := by
     have h := hM1U
     rw [data.step4M1_eq_sigma_inr] at h
     have hs_one :
         data.s =
-          data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (1 : ZMod hyp.base.p)) := by
-      simp [BG.AppC.FieldNormalizerData.s, BG.AppC.primeLineElement_one]
+          data.sigma (primeLineElement p q (1 : ZMod p)) := by
+      simp [FieldNormalizerData.s, primeLineElement_one]
     have hs_neg_two :
         data.s ^ (-2 : ℤ) =
           data.sigma
-            (BG.AppC.primeLineElement hyp.base.p hyp.base.q (-2 : ZMod hyp.base.p)) := by
+            (primeLineElement p q (-2 : ZMod p)) := by
       simpa using data.s_zpow_eq_primeLineElement (-2 : ℤ)
     rw [hs_neg_two] at h
     rw [hs_one] at h
     simpa [mul_assoc] using h
   have hstep := data.generatorRelation_step2_primeLine_of_sigma_mem_U
-    (c := (1 : ZMod hyp.base.p)) (d := (-2 : ZMod hyp.base.p))
+    (c := (1 : ZMod p)) (d := (-2 : ZMod p))
     ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) hM1_step
   rcases hstep with hzero | hone
   · exact one_ne_zero hzero.1
-  · have hsum : (1 : ZMod hyp.base.p) + -2 = (-1 : ZMod hyp.base.p) := by
+  · have hsum : (1 : ZMod p) + -2 = (-1 : ZMod p) := by
       ring
-    have hneg : (-1 : ZMod hyp.base.p) = 0 := by
+    have hneg : (-1 : ZMod p) = 0 := by
       simpa [hsum] using hone.2
     exact one_ne_zero (neg_eq_zero.mp hneg)
 
@@ -622,52 +629,51 @@ theorem c1_ne_zero {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
 coordinate cannot be zero.  If `c₃=0`, then the third normal form lies in `U`;
 reading the same element as `s² · U · s⁻³` and applying Step 2 with prime-line
 coordinates `(2,-3)` gives either `2=0` or `-1=0` in `ZMod p`, both impossible. -/
-theorem c3_ne_zero {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
-    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+theorem c3_ne_zero {data : FieldNormalizerData p q G}
+    {a b : NormSet.normOneUnits p q} (forms : Step4C5NormalForms data a b) :
     forms.c3 ≠ 0 := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   intro hc3
   have hu3 :
-      data.sigma (SemidirectProduct.inr forms.u3 : fieldNormalizerFrobeniusGroup hyp) ∈
+      data.sigma (SemidirectProduct.inr forms.u3 : NormSet.normOneFrobeniusGroup p q) ∈
         data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr forms.u3, ⟨forms.u3, rfl⟩, rfl⟩
   have hv3 :
-      data.sigma (SemidirectProduct.inr forms.v3 : fieldNormalizerFrobeniusGroup hyp) ∈
+      data.sigma (SemidirectProduct.inr forms.v3 : NormSet.normOneFrobeniusGroup p q) ∈
         data.U := by
     rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr forms.v3, ⟨forms.v3, rfl⟩, rfl⟩
   have hM3U : data.step4M3 b ∈ data.U := by
     rw [forms.hM3, hc3]
-    simpa [fieldNormalizerPrimeLineElement, mul_assoc] using data.U.mul_mem hu3 hv3
+    simpa [primeLineElement, mul_assoc] using data.U.mul_mem hu3 hv3
   have hM3_step :
-      data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (2 : ZMod hyp.base.p)) *
+      data.sigma (primeLineElement p q (2 : ZMod p)) *
           data.sigma
             (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 1)⁻¹ b) :
-              fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (-3 : ZMod hyp.base.p)) ∈
+              NormSet.normOneFrobeniusGroup p q) *
+        data.sigma (primeLineElement p q (-3 : ZMod p)) ∈
           data.U := by
     have h := hM3U
     rw [data.step4M3_eq_sigma_inr] at h
     have hs_two :
         data.s ^ (2 : ℤ) =
-          data.sigma (BG.AppC.primeLineElement hyp.base.p hyp.base.q (2 : ZMod hyp.base.p)) := by
+          data.sigma (primeLineElement p q (2 : ZMod p)) := by
       simpa using data.s_zpow_eq_primeLineElement (2 : ℤ)
     have hs_neg_three :
         data.s ^ (-3 : ℤ) =
           data.sigma
-            (BG.AppC.primeLineElement hyp.base.p hyp.base.q (-3 : ZMod hyp.base.p)) := by
+            (primeLineElement p q (-3 : ZMod p)) := by
       simpa using data.s_zpow_eq_primeLineElement (-3 : ℤ)
     rw [hs_two, hs_neg_three] at h
     simpa [mul_assoc] using h
   have hstep := data.generatorRelation_step2_primeLine_of_sigma_mem_U
-    (c := (2 : ZMod hyp.base.p)) (d := (-3 : ZMod hyp.base.p))
+    (c := (2 : ZMod p)) (d := (-3 : ZMod p))
     ((data.tConjNormOneUnitsAut ^ 1)⁻¹ b) hM3_step
   rcases hstep with hzero | hone
-  · exact hyp.zmod_two_ne_zero hzero.1
-  · have hsum : (2 : ZMod hyp.base.p) + -3 = (-1 : ZMod hyp.base.p) := by
+  · exact data.zmod_two_ne_zero hzero.1
+  · have hsum : (2 : ZMod p) + -3 = (-1 : ZMod p) := by
       ring
-    have hneg : (-1 : ZMod hyp.base.p) = 0 := by
+    have hneg : (-1 : ZMod p) = 0 := by
       simpa [hsum] using hone.2
     exact one_ne_zero (neg_eq_zero.mp hneg)
 
@@ -676,29 +682,29 @@ end Step4C5NormalForms
 /-- BG Appendix C `(C.7)`, obtained by rearranging the `(C.5)` substitution relation and
 absorbing the conjugated complement terms into `w₁`, `w₂`, and `w₃`. -/
 theorem relationC7
-    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    {a b : fieldNormalizerNormOneUnits hyp}
+    (data : FieldNormalizerData p q G)
+    {a b : NormSet.normOneUnits p q}
     (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
     (forms : Step4C5NormalForms data a b) :
-    data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) * data.t⁻¹ =
-      (data.sigma (SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) *
-          data.sigma (SemidirectProduct.inr forms.w2 : fieldNormalizerFrobeniusGroup hyp) *
-            data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
+    data.t⁻¹ * data.sigma (primeLineElement p q forms.c2) * data.t⁻¹ =
+      (data.sigma (SemidirectProduct.inr forms.w1 : NormSet.normOneFrobeniusGroup p q) *
+        data.sigma (primeLineElement p q forms.c3) *
+          data.sigma (SemidirectProduct.inr forms.w2 : NormSet.normOneFrobeniusGroup p q) *
+            data.t ^ 2 * data.sigma (primeLineElement p q forms.c1) *
               data.sigma
-                (SemidirectProduct.inr forms.w3 : fieldNormalizerFrobeniusGroup hyp))⁻¹ := by
-  let U1 := data.sigma (SemidirectProduct.inr forms.u1 : fieldNormalizerFrobeniusGroup hyp)
-  let V1 := data.sigma (SemidirectProduct.inr forms.v1 : fieldNormalizerFrobeniusGroup hyp)
-  let U2 := data.sigma (SemidirectProduct.inr forms.u2 : fieldNormalizerFrobeniusGroup hyp)
-  let V2 := data.sigma (SemidirectProduct.inr forms.v2 : fieldNormalizerFrobeniusGroup hyp)
-  let U3 := data.sigma (SemidirectProduct.inr forms.u3 : fieldNormalizerFrobeniusGroup hyp)
-  let V3 := data.sigma (SemidirectProduct.inr forms.v3 : fieldNormalizerFrobeniusGroup hyp)
-  let S1 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1)
-  let S2 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2)
-  let S3 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3)
-  let W1 := data.sigma (SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp)
-  let W2 := data.sigma (SemidirectProduct.inr forms.w2 : fieldNormalizerFrobeniusGroup hyp)
-  let W3 := data.sigma (SemidirectProduct.inr forms.w3 : fieldNormalizerFrobeniusGroup hyp)
+                (SemidirectProduct.inr forms.w3 : NormSet.normOneFrobeniusGroup p q))⁻¹ := by
+  let U1 := data.sigma (SemidirectProduct.inr forms.u1 : NormSet.normOneFrobeniusGroup p q)
+  let V1 := data.sigma (SemidirectProduct.inr forms.v1 : NormSet.normOneFrobeniusGroup p q)
+  let U2 := data.sigma (SemidirectProduct.inr forms.u2 : NormSet.normOneFrobeniusGroup p q)
+  let V2 := data.sigma (SemidirectProduct.inr forms.v2 : NormSet.normOneFrobeniusGroup p q)
+  let U3 := data.sigma (SemidirectProduct.inr forms.u3 : NormSet.normOneFrobeniusGroup p q)
+  let V3 := data.sigma (SemidirectProduct.inr forms.v3 : NormSet.normOneFrobeniusGroup p q)
+  let S1 := data.sigma (primeLineElement p q forms.c1)
+  let S2 := data.sigma (primeLineElement p q forms.c2)
+  let S3 := data.sigma (primeLineElement p q forms.c3)
+  let W1 := data.sigma (SemidirectProduct.inr forms.w1 : NormSet.normOneFrobeniusGroup p q)
+  let W2 := data.sigma (SemidirectProduct.inr forms.w2 : NormSet.normOneFrobeniusGroup p q)
+  let W3 := data.sigma (SemidirectProduct.inr forms.w3 : NormSet.normOneFrobeniusGroup p q)
   have hseed :
       data.t ^ 2 * U1 * S1 * V1 * data.t⁻¹ * U2 * S2 * V2 * data.t⁻¹ * U3 * S3 * V3 =
         1 := by
@@ -766,20 +772,21 @@ theorem relationC7
 /-- BG Appendix C `(C.8)` Frobenius entry: if the inverse field values of `a` and
 `b` lie in `E` and satisfy the companion equation, then the inverse field values of
 `a^p` and `b^p` again lie in `E` and satisfy the same companion equation. -/
-theorem unitVal_inv_frobenius_pair
-    {hyp : Hypothesis (G := G)} {a b : fieldNormalizerNormOneUnits hyp}
-    (ha : unitVal a⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
-    (hb : unitVal b⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+theorem unitVal_inv_frobenius_pair (hq : q ≠ 0)
+    {a b : NormSet.normOneUnits p q}
+    (ha : unitVal a⁻¹ ∈ NormSet.normSetE p q)
+    (hb : unitVal b⁻¹ ∈ NormSet.normSetE p q)
     (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2) :
-    unitVal (a ^ hyp.base.p)⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q ∧
-      unitVal (b ^ hyp.base.p)⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q ∧
-        unitVal (a ^ hyp.base.p)⁻¹ + unitVal (b ^ hyp.base.p)⁻¹ = 2 := by
-  have hpair := OddOrder.BG.AppC.NormSet.normSetE_frobenius_pair
-    hyp.base.p hyp.base.q hyp.base.q_prime.ne_zero ha hb hab
+    unitVal (a ^ p)⁻¹ ∈ NormSet.normSetE p q ∧
+      unitVal (b ^ p)⁻¹ ∈ NormSet.normSetE p q ∧
+        unitVal (a ^ p)⁻¹ + unitVal (b ^ p)⁻¹ = 2 := by
+  have hpair := NormSet.normSetE_frobenius_pair
+    p q hq ha hb hab
   simpa [unitVal, map_pow] using hpair
 
 
 end Step4
+
 end FieldNormalizerData
 
-end OddOrder.Peterfalvi.S16
+end OddOrder.BG.AppC

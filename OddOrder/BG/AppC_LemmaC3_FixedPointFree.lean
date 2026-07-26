@@ -3,28 +3,47 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.S16_CoreSetup
+import OddOrder.BG.AppC_LemmaC3_Step4Capstone
 
 /-!
-# TAIL
+# BG Appendix C, Lemma C.3 Step 4: the fixed-point-free argument and `s₁ = s⁻¹`
 
-Prefix-split from `OddOrder.Peterfalvi.S16_NonExistenceGCore` (2000-line limit, issue 0103 第 2 パス).
+H. Bender and G. Glauberman, *Local Analysis for the Odd Order Theorem*
+(LMS LNS 188, 1994), Appendix C, §3 (pp. 148--152), Step 4.
+
+The capstone `s₁ = s⁻¹` itself.  Setting `t = y⁻¹ s y` with `y ∈ ⁅Q, W₂⁆` (Remark (XI)), BG
+rewrites the displayed relation (C.10) modulo the abelian group `⁅Q, P₀⁆` (= `⁅Q, W₂⁆`) as `y`
+lying in the kernel of `(s⁻¹ + 1 − s₁⁻¹s⁻¹ − s₃)(s⁻¹ − 1)`.  Since `s⁻¹` operates
+fixed-point-freely on `⁅Q, P₀⁆` (Remark (X)), the factor `(s⁻¹ − 1)` is injective, so `y` lies
+in the kernel of `(s⁻¹ + 1 − s₁⁻¹s⁻¹ − s₃)`; unwinding gives `s₁ t₁⁻¹ t⁻¹ = t⁻¹ t₃⁻¹ s₃` with
+`tᵢ = y⁻¹ sᵢ y`, and Steps 2--3 then force `t₁ = t⁻¹`, i.e. `s₁ = s⁻¹`.
+
+We avoid building the endomorphism ring `End ⁅Q, P₀⁆`: BG's "`y ∈ ker(BC)`, `C` injective ⟹
+`y ∈ ker B`" is realised concretely as "`β(Y_B)·Y_B⁻¹ = ⋆` and `⋆ = 1` ⟹ `β(Y_B) = Y_B` ⟹
+(fixed-point-free) `Y_B = 1`", where `β` is conjugation by `s` on the abelian `⁅Q, W₂⁆` and
+`Y_B` the four-fold `y`-conjugate of BG's (5074).
+
+This file closes the chain: `normSetGeneratorRelation p q` -- the norm relation that BG's
+Lemma C.3 must produce -- follows from hypotheses (A) and (B) alone.
+
+Migrated from `OddOrder.Peterfalvi.S16_NonExistenceGCore` (issue 0151).
 -/
-namespace OddOrder.Peterfalvi.S16
+
+namespace OddOrder.BG.AppC
+
 open OddOrder.GroupTheory
-open OddOrder.RepresentationTheory
-open OddOrder.Isaacs
 open scoped Pointwise
 open scoped BigOperators
 
-variable {G : Type*} [Group G]
+variable {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G]
 
 namespace FieldNormalizerData
+
 section Step4
 
 /-- `local instance` は file 境界を越えないため prefix-split 後に再宣言 (原本 = S16_AppendixC3)。 -/
-local instance factPPrimeStep4'' {hyp : Hypothesis (G := G)} : Fact hyp.base.p.Prime :=
-  ⟨hyp.base.p_prime⟩
+local instance factPPrimeStep4'' : Fact p.Prime :=
+  ⟨(Fact.out : Nat.Prime p)⟩
 
 /-! #### BG Appendix C, Lemma C.3 Step 4: the kernel/fixed-point-free argument
 
@@ -42,47 +61,42 @@ injective ⟹ `y ∈ ker B`" is realised concretely as "`β(Y_B)·Y_B⁻¹ = ⋆
 on the abelian `⁅Q, W₂⁆` and `Y_B` the four-fold `y`-conjugate of BG's `(5074)`. -/
 
 /-- The transported prime-line element `σ(P₀ c)` lies in `W₂`. -/
-theorem sigma_primeLineElement_mem_W2 {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) (c : ZMod hyp.base.p) :
-    data.sigma (fieldNormalizerPrimeLineElement hyp c) ∈ data.W2 := by
+theorem sigma_primeLineElement_mem_W2 (data : FieldNormalizerData p q G) (c : ZMod p) :
+    data.sigma (primeLineElement p q c) ∈ data.W2 := by
   rw [← data.sigma_P0_eq_W2]
-  exact Subgroup.mem_map_of_mem _ (fieldNormalizerPrimeLineElement_mem hyp c)
+  exact Subgroup.mem_map_of_mem _ (primeLineElement_mem p q c)
 
 /-- Any two transported prime-line elements commute (the prime line `P₀` is
 abelian). -/
-theorem sigma_primeLineElement_commute {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) (c d : ZMod hyp.base.p) :
-    Commute (data.sigma (fieldNormalizerPrimeLineElement hyp c))
-      (data.sigma (fieldNormalizerPrimeLineElement hyp d)) := by
+theorem sigma_primeLineElement_commute (data : FieldNormalizerData p q G) (c d : ZMod p) :
+    Commute (data.sigma (primeLineElement p q c))
+      (data.sigma (primeLineElement p q d)) := by
   rw [Commute, SemiconjBy, sigma_primeLineElement_eq_sScalar,
     sigma_primeLineElement_eq_sScalar, sScalar_mul, sScalar_mul, add_comm]
 
 /-- The distinguished generator `s` commutes with every transported prime-line
 element. -/
-theorem s_commute_sigma_primeLineElement {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) (c : ZMod hyp.base.p) :
-    Commute data.s (data.sigma (fieldNormalizerPrimeLineElement hyp c)) := by
+theorem s_commute_sigma_primeLineElement (data : FieldNormalizerData p q G) (c : ZMod p) :
+    Commute data.s (data.sigma (primeLineElement p q c)) := by
   have h := data.sigma_primeLineElement_commute 1 c
-  rwa [show data.sigma (fieldNormalizerPrimeLineElement hyp 1) = data.s by
-    rw [fieldNormalizerPrimeLineElement_one, BG.AppC.FieldNormalizerData.s,
-      fieldNormalizerPrimeLineGenerator, BG.AppC.primeLineGenerator]] at h
+  rwa [show data.sigma (primeLineElement p q 1) = data.s by
+    rw [primeLineElement_one, FieldNormalizerData.s]] at h
 
 /-- **BG Appendix C, Lemma C.3 Step 4: `(C.10)` modulo `Q`** (mmd L5058).  Since
 `P₀ ∩ Q = 1` (`W2_inf_Q_eq_bot`) and `t ≡ s` modulo `Q`, the displayed relation
 `(C.10)` collapses to `s₁ s₂ s₃ = 1`.  We conjugate `(C.10)` by `y⁻¹` (so each `t`
 becomes `s`), telescope the resulting `Q`-cosets to the left, and use that
 `P₀`-conjugation normalizes `Q`. -/
-theorem step4_sigma_primeLine_prod_eq_one {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) {c1 c2 c3 : ZMod hyp.base.p}
-    (hC10 : data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
-        data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp c2) *
-          data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp c3) = 1) :
-    data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp c2) *
-          data.sigma (fieldNormalizerPrimeLineElement hyp c3) = 1 := by
-  set s1 := data.sigma (fieldNormalizerPrimeLineElement hyp c1) with hs1def
-  set s2 := data.sigma (fieldNormalizerPrimeLineElement hyp c2) with hs2def
-  set s3 := data.sigma (fieldNormalizerPrimeLineElement hyp c3) with hs3def
+theorem step4_sigma_primeLine_prod_eq_one (data : FieldNormalizerData p q G) {c1 c2 c3 : ZMod p}
+    (hC10 : data.t ^ 2 * data.sigma (primeLineElement p q c1) *
+        data.t⁻¹ * data.sigma (primeLineElement p q c2) *
+          data.t⁻¹ * data.sigma (primeLineElement p q c3) = 1) :
+    data.sigma (primeLineElement p q c1) *
+        data.sigma (primeLineElement p q c2) *
+          data.sigma (primeLineElement p q c3) = 1 := by
+  set s1 := data.sigma (primeLineElement p q c1) with hs1def
+  set s2 := data.sigma (primeLineElement p q c2) with hs2def
+  set s3 := data.sigma (primeLineElement p q c3) with hs3def
   -- The three prime-line factors lie in `W₂`.
   have hs1W : s1 ∈ data.W2 := data.sigma_primeLineElement_mem_W2 c1
   have hs2W : s2 ∈ data.W2 := data.sigma_primeLineElement_mem_W2 c2
@@ -94,9 +108,9 @@ theorem step4_sigma_primeLine_prod_eq_one {hyp : Hypothesis (G := G)}
   set σ3 := data.y⁻¹ * s3 * data.y with hσ3def
   -- conjugating `(C.10)` by `y⁻¹` turns each `t` into `s` (since `t = y s y⁻¹`).
   have hyt2 : data.y⁻¹ * data.t ^ 2 * data.y = data.s ^ 2 := by
-    rw [BG.AppC.FieldNormalizerData.t, MulAut.conj_apply, pow_two, pow_two]; group
+    rw [FieldNormalizerData.t, MulAut.conj_apply, pow_two, pow_two]; group
   have hyti : data.y⁻¹ * data.t⁻¹ * data.y = data.s⁻¹ := by
-    rw [BG.AppC.FieldNormalizerData.t, MulAut.conj_apply]; group
+    rw [FieldNormalizerData.t, MulAut.conj_apply]; group
   have hconj : data.s ^ 2 * σ1 * data.s⁻¹ * σ2 * data.s⁻¹ * σ3 = 1 := by
     rw [← hyt2, ← hyti, hσ1def, hσ2def, hσ3def,
       show data.y⁻¹ * data.t ^ 2 * data.y * (data.y⁻¹ * s1 * data.y) *
@@ -179,7 +193,7 @@ theorem zpow_apply_fixed {M : Type*} [Group M] (f : MulAut M) {z : M} (hf : f z 
 conjugation by the single generator `s`, then `x = 1`.  Since `W₂ = ⟨s⟩`, being
 `s`-fixed is being `W₂`-fixed, and `(X)` (`C_Q(W₂) ∩ ⁅Q,W₂⁆ = 1`) applies. -/
 theorem w2ConjQAut_eq_one_of_mem_actionCommutator_of_s_fixed [Finite G]
-    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) {x : ↥data.Q}
+    (data : FieldNormalizerData p q G) {x : ↥data.Q}
     (hx : x ∈ OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut)
     (hsfix : data.w2ConjQAut ⟨data.s, data.s_mem_W2⟩ x = x) :
     x = 1 := by
@@ -198,24 +212,23 @@ displayed relation `(C.10)`, BG's `y ∈ ⁅Q, W₂⁆` lies in the kernel of
 `(s⁻¹ + 1 - s₁⁻¹s⁻¹ - s₃)(s⁻¹ - 1)`; the fixed-point-free action of `s` (Remark (X))
 removes the factor `(s⁻¹ - 1)`, leaving `Y_B = 1`, i.e. `s₁ t₁⁻¹ t⁻¹ = t⁻¹ t₃⁻¹ s₃`
 where `tᵢ = y⁻¹ sᵢ y`.  We produce this relation with the explicit conjugator `yc`. -/
-theorem step4_relation_5076 [Finite G] {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) {c1 c2 c3 : ZMod hyp.base.p}
-    (hC10 : data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
-        data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp c2) *
-          data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp c3) = 1) :
+theorem step4_relation_5076 [Finite G] (data : FieldNormalizerData p q G) {c1 c2 c3 : ZMod p}
+    (hC10 : data.t ^ 2 * data.sigma (primeLineElement p q c1) *
+        data.t⁻¹ * data.sigma (primeLineElement p q c2) *
+          data.t⁻¹ * data.sigma (primeLineElement p q c3) = 1) :
     ∃ yc : G, data.t = yc⁻¹ * data.s * yc ∧
-      data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
-          (yc⁻¹ * (data.sigma (fieldNormalizerPrimeLineElement hyp c1))⁻¹ * yc) * data.t⁻¹ =
-        data.t⁻¹ * (yc⁻¹ * (data.sigma (fieldNormalizerPrimeLineElement hyp c3))⁻¹ * yc) *
-          data.sigma (fieldNormalizerPrimeLineElement hyp c3) := by
+      data.sigma (primeLineElement p q c1) *
+          (yc⁻¹ * (data.sigma (primeLineElement p q c1))⁻¹ * yc) * data.t⁻¹ =
+        data.t⁻¹ * (yc⁻¹ * (data.sigma (primeLineElement p q c3))⁻¹ * yc) *
+          data.sigma (primeLineElement p q c3) := by
   classical
   haveI := data.Q_commutative
   letI : CommGroup ↥data.Q :=
     { (inferInstance : Group ↥data.Q) with
       mul_comm := fun a b => Subtype.ext (setLike_mul_comm (s := data.Q) a.2 b.2) }
-  set s1 := data.sigma (fieldNormalizerPrimeLineElement hyp c1) with hs1def
-  set s2 := data.sigma (fieldNormalizerPrimeLineElement hyp c2) with hs2def
-  set s3 := data.sigma (fieldNormalizerPrimeLineElement hyp c3) with hs3def
+  set s1 := data.sigma (primeLineElement p q c1) with hs1def
+  set s2 := data.sigma (primeLineElement p q c2) with hs2def
+  set s3 := data.sigma (primeLineElement p q c3) with hs3def
   have hs1W : s1 ∈ data.W2 := data.sigma_primeLineElement_mem_W2 c1
   have hs3W : s3 ∈ data.W2 := data.sigma_primeLineElement_mem_W2 c3
   -- `s₁ s₂ s₃ = 1` (mod-Q collapse), hence `s₂ = s₁⁻¹ s₃⁻¹`.
@@ -330,8 +343,7 @@ theorem step4_relation_5076 [Finite G] {hyp : Hypothesis (G := G)}
 
 /-- BG Appendix C, Lemma C.3 Step 3 bad-branch inclusion for a general conjugator
 `g`: if `(PU) ∩ (PU)^g = PU`, then conjugation by `g` preserves `PU`. -/
-theorem conj_mem_P_sup_U_of_inf_conj_eq {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) {g : G}
+theorem conj_mem_P_sup_U_of_inf_conj_eq (data : FieldNormalizerData p q G) {g : G}
     (hbad : (data.P ⊔ data.U) ⊓
         (MulAut.conj g⁻¹ • (data.P ⊔ data.U)) = data.P ⊔ data.U) :
     ∀ ⦃x : G⦄, x ∈ data.P ⊔ data.U → g * x * g⁻¹ ∈ data.P ⊔ data.U := by
@@ -348,10 +360,9 @@ theorem conj_mem_P_sup_U_of_inf_conj_eq {hyp : Hypothesis (G := G)}
 /-- BG Appendix C, Lemma C.3 Step 3 bad-branch normalization for a general
 conjugator `g` of `p`-power order: a one-sided conjugation inclusion of `PU`
 upgrades to `g ∈ N_G(PU)`. -/
-theorem mem_normalizer_P_sup_U_of_conj_of_pow {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) {g : G}
+theorem mem_normalizer_P_sup_U_of_conj_of_pow (data : FieldNormalizerData p q G) {g : G}
     (hconj : ∀ ⦃x : G⦄, x ∈ data.P ⊔ data.U → g * x * g⁻¹ ∈ data.P ⊔ data.U)
-    (hgp : g ^ hyp.base.p = 1) :
+    (hgp : g ^ p = 1) :
     g ∈ Subgroup.normalizer ((data.P ⊔ data.U : Subgroup G) : Set G) := by
   classical
   let PU : Subgroup G := data.P ⊔ data.U
@@ -360,14 +371,14 @@ theorem mem_normalizer_P_sup_U_of_conj_of_pow {hyp : Hypothesis (G := G)}
     induction n with
     | zero => intro x hx; simpa using hx
     | succ n ih => intro x hx; simpa [pow_succ', mul_assoc] using hconj (ih hx)
-  have hp_pos : 0 < hyp.base.p := hyp.base.p_prime.pos
-  have g_inv_eq : g⁻¹ = g ^ (hyp.base.p - 1) := by
-    have hmul : g ^ (hyp.base.p - 1) * g = 1 := by
+  have hp_pos : 0 < p := (Fact.out : Nat.Prime p).pos
+  have g_inv_eq : g⁻¹ = g ^ (p - 1) := by
+    have hmul : g ^ (p - 1) * g = 1 := by
       rw [← pow_succ, Nat.sub_one_add_one_eq_of_pos hp_pos, hgp]
     exact inv_eq_of_mul_eq_one_left hmul
   have hinv_inc : ∀ ⦃x : G⦄, x ∈ PU → g⁻¹ * x * (g⁻¹)⁻¹ ∈ PU := by
     intro x hx
-    simpa [g_inv_eq] using hiter (hyp.base.p - 1) hx
+    simpa [g_inv_eq] using hiter (p - 1) hx
   rw [Subgroup.mem_normalizer_iff]
   intro x
   refine ⟨fun hx => hconj hx, fun hx => ?_⟩
@@ -378,15 +389,15 @@ theorem mem_normalizer_P_sup_U_of_conj_of_pow {hyp : Hypothesis (G := G)}
 `(PU) ∩ (PU)^g = U`.  We use the dichotomy `= U ∨ = PU`; the `= PU` branch forces
 `g ∈ N_G(PU) ⊆ N_G(P)`, hence (since `g` generates `P₁`) `P₁ ≤ N_G(P)`, giving the
 `P₀ = P₁` contradiction `P1_ne_W2`. -/
-theorem step3_inf_conj_eq_U_of_mem_P1 [Finite G] {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) {g : G} (hg : g ∈ data.P1) (hg1 : g ≠ 1) :
+theorem step3_inf_conj_eq_U_of_mem_P1 [Finite G] (data : FieldNormalizerData p q G) {g : G}
+    (hg : g ∈ data.P1) (hg1 : g ≠ 1) :
     (data.P ⊔ data.U) ⊓ (MulAut.conj g⁻¹ • (data.P ⊔ data.U)) =
       data.U := by
   rcases data.P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
       (inv_mem (data.P1_normalizes_U hg)) with hU | hPU
   · exact hU
   · exfalso
-    have hgp : g ^ hyp.base.p = 1 := by
+    have hgp : g ^ p = 1 := by
       obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp (data.P1_eq_zpowers_t ▸ hg)
       rw [← hn, ← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast,
         data.t_pow_p_eq_one, one_zpow]
@@ -394,8 +405,8 @@ theorem step3_inf_conj_eq_U_of_mem_P1 [Finite G] {hyp : Hypothesis (G := G)}
       data.normalizer_P_sup_U_le_normalizer_P
         (data.mem_normalizer_P_sup_U_of_conj_of_pow
           (data.conj_mem_P_sup_U_of_inf_conj_eq hPU) hgp)
-    have horder : orderOf g = hyp.base.p := by
-      rcases (hyp.base.p_prime.eq_one_or_self_of_dvd _ (orderOf_dvd_of_pow_eq_one hgp))
+    have horder : orderOf g = p := by
+      rcases ((Fact.out : Nat.Prime p).eq_one_or_self_of_dvd _ (orderOf_dvd_of_pow_eq_one hgp))
         with h | h
       · exact absurd (orderOf_eq_one_iff.mp h) hg1
       · exact h
@@ -412,18 +423,17 @@ relation `s₁ t₁⁻¹ t⁻¹ = t⁻¹ t₃⁻¹ s₃` (`tᵢ = yc⁻¹ sᵢ y
 `s₁ = s⁻¹`.  Otherwise `g = t₁⁻¹ t⁻¹ ∈ P₁^#`, and for `u ∈ U^#` the common value
 `u^{s₁ t₁⁻¹ t⁻¹} = u^{t⁻¹ t₃⁻¹ s₃}` lies in `(PU) ∩ (PU)^g`, which is `U` by Step 3;
 then `u^{s₁} ∈ U^{t t₁} = U`, so Step 2 gives `s₁ = 1`, contradicting `(C.6)`. -/
-theorem step4_sigma_primeLine_eq_s_inv [Finite G] {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) {c1 c3 : ZMod hyp.base.p}
+theorem step4_sigma_primeLine_eq_s_inv [Finite G] (data : FieldNormalizerData p q G)
+    {c1 c3 : ZMod p}
     (hc1 : c1 ≠ 0) (_hc3 : c3 ≠ 0) (yc : G) (hty : data.t = yc⁻¹ * data.s * yc)
-    (hrel : data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
-        (yc⁻¹ * (data.sigma (fieldNormalizerPrimeLineElement hyp c1))⁻¹ * yc) * data.t⁻¹ =
-      data.t⁻¹ * (yc⁻¹ * (data.sigma (fieldNormalizerPrimeLineElement hyp c3))⁻¹ * yc) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp c3)) :
-    data.sigma (fieldNormalizerPrimeLineElement hyp c1) = data.s⁻¹ := by
+    (hrel : data.sigma (primeLineElement p q c1) *
+        (yc⁻¹ * (data.sigma (primeLineElement p q c1))⁻¹ * yc) * data.t⁻¹ =
+      data.t⁻¹ * (yc⁻¹ * (data.sigma (primeLineElement p q c3))⁻¹ * yc) *
+        data.sigma (primeLineElement p q c3)) :
+    data.sigma (primeLineElement p q c1) = data.s⁻¹ := by
   classical
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  set s1 := data.sigma (fieldNormalizerPrimeLineElement hyp c1) with hs1def
-  set s3 := data.sigma (fieldNormalizerPrimeLineElement hyp c3) with hs3def
+  set s1 := data.sigma (primeLineElement p q c1) with hs1def
+  set s3 := data.sigma (primeLineElement p q c3) with hs3def
   have hs1W : s1 ∈ data.W2 := data.sigma_primeLineElement_mem_W2 c1
   have hs3W : s3 ∈ data.W2 := data.sigma_primeLineElement_mem_W2 c3
   -- conjugation by `yc` sends `⟨s⟩ = W₂` into `⟨t⟩ = P₁`.
@@ -449,8 +459,8 @@ theorem step4_sigma_primeLine_eq_s_inv [Finite G] {hyp : Hypothesis (G := G)}
     have h2 : yc⁻¹ * s1 * yc = yc⁻¹ * data.s⁻¹ * yc := by rw [ht1eq, hty]; group
     exact mul_left_cancel (mul_right_cancel h2)
   -- pick a nontrivial `u ∈ U`.
-  obtain ⟨u, hu_ne⟩ := exists_fieldNormalizerNormOneUnit_ne_one hyp
-  set U_elt := data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp)
+  obtain ⟨u, hu_ne⟩ := exists_normOneUnit_ne_one p q data.q_prime.one_lt
+  set U_elt := data.sigma (SemidirectProduct.inr u : NormSet.normOneFrobeniusGroup p q)
     with hUdef
   have hU_elt : U_elt ∈ data.U := by
     rw [hUdef, ← data.sigma_U_eq_U]
@@ -502,10 +512,10 @@ theorem step4_sigma_primeLine_eq_s_inv [Finite G] {hyp : Hypothesis (G := G)}
     rw [← hconj_v]
     exact hconjU g (data.P1_normalizes_U hg_P1) v hv_U
   -- Step 2 forces `s₁ = 1` or `u = 1`, both contradictions.
-  have hmem_step : data.sigma (fieldNormalizerPrimeLineElement hyp (-c1)) *
-      data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
-        data.sigma (fieldNormalizerPrimeLineElement hyp c1) ∈ data.U := by
-    rw [fieldNormalizerPrimeLineElement_neg, map_inv]
+  have hmem_step : data.sigma (primeLineElement p q (-c1)) *
+      data.sigma (SemidirectProduct.inr u : NormSet.normOneFrobeniusGroup p q) *
+        data.sigma (primeLineElement p q c1) ∈ data.U := by
+    rw [primeLineElement_neg, map_inv]
     exact hu_s1
   rcases data.generatorRelation_step2_primeLine_of_sigma_mem_U
     (c := -c1) (d := c1) u hmem_step with hzero | hone
@@ -516,31 +526,30 @@ theorem step4_sigma_primeLine_eq_s_inv [Finite G] {hyp : Hypothesis (G := G)}
 factor of the `k = 3` first normal form is `s⁻¹`.  This is the last gap of BG
 Appendix C; combined with the existing finite-field core it discharges
 `appC_normSet_generator_relation` without the carrier field. -/
-theorem step4Capstone [Finite G] {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) : data.Step4Capstone := by
+theorem step4Capstone [Finite G] (data : FieldNormalizerData p q G) : data.Step4Capstone := by
   intro a ha
   obtain ⟨b, hab, hb⟩ := data.exists_companion_of_unitVal_inv_mem_normSetE ha
   obtain ⟨forms⟩ := data.exists_step4C5NormalForms a b
   have hC10 := (data.relationC9_w_eq_one_and_relationC10 ha hb hab forms).2.2.2
   obtain ⟨yc, hty, h5076⟩ := data.step4_relation_5076 hC10
-  have hs1 : data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) = data.s⁻¹ :=
+  have hs1 : data.sigma (primeLineElement p q forms.c1) = data.s⁻¹ :=
     data.step4_sigma_primeLine_eq_s_inv forms.c1_ne_zero forms.c3_ne_zero yc hty h5076
   refine ⟨forms.u1, forms.v1, ?_⟩
   rw [← data.step4M1_eq_sigma_inr, forms.hM1, hs1,
     ← data.sScalar_neg_one_eq_sigma_primeLineElement, ← data.s_inv_eq_sScalar_neg_one]
 
-/-- The C.3 generator-relation interface consumed by BG Appendix C
-(`∀ a ∈ E, N(2a-1) = 1`), now **derived** from the Step 4 capstone `s₁ = s⁻¹`
-rather than carried as the former `appC_twisted_normOne_step` field. -/
-theorem appC_normSet_generator_relation [Finite G] {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) :
-    BG.AppC.normSetGeneratorRelation hyp.base.p hyp.base.q :=
-  data.appC_normSet_generator_relation_of_capstone data.step4Capstone
+/-- **BG Appendix C, Lemma C.3** (pp. 148--152): hypotheses (A) and (B) imply the norm relation
+`∀ a ∈ E, N(2a − 1) = 1`.
+
+This is the conclusion the whole `AppC_LemmaC3_*` development exists to produce, and the last
+input Theorem C needs beyond condition (A).  It is **derived** from the Step 4 capstone
+`s₁ = s⁻¹` rather than carried as a hypothesis. -/
+theorem normSetGeneratorRelation_of_hypothesisB [Finite G] (data : FieldNormalizerData p q G) :
+    normSetGeneratorRelation p q :=
+  data.normSetGeneratorRelation_of_capstone data.step4Capstone
 
 end Step4
 
 end FieldNormalizerData
 
-end OddOrder.Peterfalvi.S16
-
-
+end OddOrder.BG.AppC

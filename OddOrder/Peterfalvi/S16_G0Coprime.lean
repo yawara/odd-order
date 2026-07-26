@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S15_SAndT
-import OddOrder.Peterfalvi.S16_NonExistenceGCore
+import OddOrder.BG.AppC_LemmaC3_FixedPointFree
+import OddOrder.Peterfalvi.S16_CoreLemmas
 import OddOrder.GroupTheory.ConjClassSet
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearFieldModel
 

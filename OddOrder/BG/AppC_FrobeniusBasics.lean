@@ -239,4 +239,23 @@ theorem frobeniusHom_inr (p q : ℕ) [Fact p.Prime]
       SemidirectProduct.inr (u ^ p) := by
   simp [frobeniusHom, normOneUnitsFrobeniusHom]
 
+/-- The concrete Frobenius fixes the prime-field line pointwise. -/
+theorem frobeniusHom_primeLineElement (p q : ℕ) [Fact p.Prime] (c : ZMod p) :
+    frobeniusHom p q (primeLineElement p q c) = primeLineElement p q c := by
+  rw [primeLineElement, frobeniusHom_inl, SemidirectProduct.inl_inj]
+  change (algebraMap (ZMod p) (GaloisField p q) c) ^ p =
+    algebraMap (ZMod p) (GaloisField p q) c
+  rw [← map_pow, ZMod.pow_card]
+
+/-- The concrete Frobenius fixes the distinguished prime-line generator. -/
+theorem frobeniusHom_primeLineGenerator (p q : ℕ) [Fact p.Prime] :
+    frobeniusHom p q (primeLineGenerator p q) = primeLineGenerator p q := by
+  simpa [primeLineElement_one] using frobeniusHom_primeLineElement p q 1
+
+/-- The concrete Frobenius fixes every integer power of the distinguished prime-line
+generator. -/
+theorem frobeniusHom_primeLineGenerator_zpow (p q : ℕ) [Fact p.Prime] (n : ℤ) :
+    frobeniusHom p q ((primeLineGenerator p q) ^ n) = (primeLineGenerator p q) ^ n := by
+  rw [map_zpow, frobeniusHom_primeLineGenerator]
+
 end OddOrder.BG.AppC

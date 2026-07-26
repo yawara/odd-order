@@ -494,6 +494,10 @@ import OddOrder.BG.AppC_HypothesisB
 import OddOrder.BG.AppC_FrobeniusBasics
 import OddOrder.BG.AppC_LemmaC3_Setup
 import OddOrder.BG.AppC_LemmaC3_ConjugateLine
+import OddOrder.BG.AppC_LemmaC3_ScalarCalculus
+import OddOrder.BG.AppC_LemmaC3_NormalForms
+import OddOrder.BG.AppC_LemmaC3_Step4Capstone
+import OddOrder.BG.AppC_LemmaC3_FixedPointFree
 import OddOrder.BG.AppC_SL2Example
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum

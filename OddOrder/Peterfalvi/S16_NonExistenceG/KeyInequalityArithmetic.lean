@@ -1,4 +1,5 @@
-import OddOrder.Peterfalvi.S16_NonExistenceGCore
+import OddOrder.BG.AppC_LemmaC3_FixedPointFree
+import OddOrder.Peterfalvi.S16_CoreLemmas
 
 /-!
 # Peterfalvi (14.8): pure key-inequality arithmetic

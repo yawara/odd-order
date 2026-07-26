@@ -4,7 +4,8 @@ import OddOrder.GroupTheory.RepresentationTheory.OrbitOnIrr
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.Peterfalvi.S15_SAndT
 import OddOrder.Peterfalvi.S16_CaseBOrder
-import OddOrder.Peterfalvi.S16_NonExistenceGCore
+import OddOrder.BG.AppC_LemmaC3_FixedPointFree
+import OddOrder.Peterfalvi.S16_CoreLemmas
 import OddOrder.Peterfalvi.S16_G0Coprime
 import OddOrder.Peterfalvi.S16_GridExpansion
 import OddOrder.Peterfalvi.S16_PairingBessel
