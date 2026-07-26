@@ -150,6 +150,77 @@ theorem sq_eq_one_iff_two_pow (hn : 2 ≤ n) (x : ZMod (2 ^ n)) :
       rw [this, ha2, h2a]
       ring
 
+/-- `0 < k < N` なら `(k : ZMod N) ≠ 0`。 -/
+theorem natCast_ne_zero_of_lt {N k : ℕ} (hk : 0 < k) (hkN : k < N) :
+    ((k : ℕ) : ZMod N) ≠ 0 := by
+  haveI : NeZero N := ⟨by omega⟩
+  intro h
+  have hval : ((k : ZMod N)).val = k := ZMod.val_cast_of_lt hkN
+  rw [h, ZMod.val_zero] at hval
+  omega
+
+/-- `n ≥ 3` のとき `1`, `-1`, `2^(n-1)+1`, `2^(n-1)-1` は相異なる。 -/
+theorem sqrtOne_pairwise_ne (hn : 3 ≤ n) :
+    ({1, -1, (2 : ZMod (2 ^ n)) ^ (n - 1) + 1, (2 : ZMod (2 ^ n)) ^ (n - 1) - 1} :
+      Set (ZMod (2 ^ n))).ncard = 4 := by
+  have hpow : ∀ k : ℕ, ((2 ^ k : ℕ) : ZMod (2 ^ n)) = (2 : ZMod (2 ^ n)) ^ k := by
+    intro k; rw [Nat.cast_pow]; norm_num
+  have h2lt : (2 : ℕ) < 2 ^ n := by
+    calc (2 : ℕ) = 2 ^ 1 := by norm_num
+      _ < 2 ^ n := Nat.pow_lt_pow_right (by norm_num) (by omega)
+  have hhalf : (2 : ℕ) ^ (n - 1) < 2 ^ n := Nat.pow_lt_pow_right (by norm_num) (by omega)
+  have hhalf2 : (2 : ℕ) ≤ 2 ^ (n - 1) := by
+    calc (2 : ℕ) = 2 ^ 1 := by norm_num
+      _ ≤ 2 ^ (n - 1) := Nat.pow_le_pow_right (by norm_num) (by omega)
+  have hfour : (4 : ℕ) ≤ 2 ^ (n - 1) := by
+    calc (4 : ℕ) = 2 ^ 2 := by norm_num
+      _ ≤ 2 ^ (n - 1) := Nat.pow_le_pow_right (by norm_num) (by omega)
+  have hsum : (2 : ℕ) ^ (n - 1) + 2 < 2 ^ n := by
+    have : (2 : ℕ) ^ n = 2 ^ (n - 1) * 2 := by
+      rw [← pow_succ]; congr 1; omega
+    omega
+  -- 各 `≠` を `(k : ZMod _) ≠ 0` に落とす
+  have e2 : (2 : ZMod (2 ^ n)) ≠ 0 := by
+    have := natCast_ne_zero_of_lt (N := 2 ^ n) (k := 2) (by norm_num) h2lt
+    simpa using this
+  have ea : (2 : ZMod (2 ^ n)) ^ (n - 1) ≠ 0 := by
+    have := natCast_ne_zero_of_lt (N := 2 ^ n) (k := 2 ^ (n - 1)) (by positivity) hhalf
+    rwa [hpow] at this
+  have easub : (2 : ZMod (2 ^ n)) ^ (n - 1) - 2 ≠ 0 := by
+    have h := natCast_ne_zero_of_lt (N := 2 ^ n) (k := 2 ^ (n - 1) - 2) (by omega) (by omega)
+    intro hcon
+    refine h ?_
+    have : ((2 ^ (n - 1) - 2 : ℕ) : ZMod (2 ^ n))
+        = ((2 ^ (n - 1) : ℕ) : ZMod (2 ^ n)) - ((2 : ℕ) : ZMod (2 ^ n)) := by
+      rw [Nat.cast_sub (by omega)]
+    rw [this, hpow]
+    simpa using hcon
+  have eaadd : (2 : ZMod (2 ^ n)) ^ (n - 1) + 2 ≠ 0 := by
+    have h := natCast_ne_zero_of_lt (N := 2 ^ n) (k := 2 ^ (n - 1) + 2) (by omega) hsum
+    intro hcon
+    refine h ?_
+    have hc : ((2 ^ (n - 1) + 2 : ℕ) : ZMod (2 ^ n))
+        = (2 : ZMod (2 ^ n)) ^ (n - 1) + 2 := by
+      rw [Nat.cast_add, hpow]
+      norm_num
+    rw [hc, hcon]
+  rw [Set.ncard_insert_of_notMem (by
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff]
+      rintro (h | h | h)
+      · exact e2 (by linear_combination h)
+      · exact ea (by linear_combination -h)
+      · exact easub (by linear_combination -h)) (Set.toFinite _),
+    Set.ncard_insert_of_notMem (by
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff]
+      rintro (h | h)
+      · exact eaadd (by linear_combination -h)
+      · exact ea (by linear_combination -h)) (Set.toFinite _),
+    Set.ncard_insert_of_notMem (by
+      simp only [Set.mem_singleton_iff]
+      intro h
+      exact e2 (by linear_combination h)) (Set.toFinite _),
+    Set.ncard_singleton]
+
 end
 
 end OddOrder.Isaacs.Ch06
