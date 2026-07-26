@@ -332,4 +332,57 @@ theorem exists_invariant_lines_of_not_isSimpleModule
     rw [Representation.asModuleEquiv_map_smul, MonoidAlgebra.of_apply,
       Representation.asAlgebraHom_single_one]
 
+open Module in
+/-- **BG Lemma 2.7(a)** (Bender–Glauberman, *Local Analysis for the Odd Order Theorem*, p. 31).
+Let `p ≠ q` be primes and let a group `Q` of order `q²` and exponent `q` — i.e. `Q ≅ (ℤ/q)²` —
+act faithfully and `𝔽_p`-linearly on a `2`-dimensional `𝔽_p`-space `M`.  Then `q ∣ p - 1`.
+
+The book's argument, assembled from the pieces above:
+
+* `Q` is not cyclic (`not_isCyclic_of_exponent_of_card_sq`), so by the Singer order bound the
+  action is *reducible* (`Representation.not_isSimpleModule_asModule_of_not_isCyclic`);
+* `q ≠ p` makes `|Q| = q²` invertible in `𝔽_p`, so Maschke splits `M` into two invariant lines
+  (`exists_invariant_lines_of_not_isSimpleModule`), each carrying a character
+  `χᵢ : Q →* 𝔽_p` (`exists_monoidHom_scalar_of_finrank_eq_one`);
+* the characters cannot both be trivial — that would make the action trivial and `Q` a one-element
+  group (`eq_one_of_scalars_eq_one_of_sup_eq_top` plus faithfulness), contradicting `|Q| = q²`;
+* a nontrivial value is a `q`-th root of unity (`Q` has exponent `q`), so `q ∣ p - 1`
+  (`prime_dvd_sub_one_of_pow_eq_one`).
+
+Part (b) — some `α ∈ Q^#` acts as a power map `x ↦ x^r` — is the diagonal element of the
+resulting isomorphism `Q ≅ μ_q × μ_q` (issue 0150). -/
+theorem prime_dvd_sub_one_of_faithful_rank_two {q : ℕ}
+    (hq : q.Prime) (hqp : q ≠ p) (hrank : finrank (ZMod p) M = 2)
+    (hQexp : ∀ x : Q, x ^ q = 1) (hQcard : Nat.card Q = q ^ 2)
+    (ρ : Representation (ZMod p) Q M) (hfaith : Function.Injective ρ) :
+    q ∣ p - 1 := by
+  have hp := (Fact.out : p.Prime)
+  haveI : NeZero (Nat.card Q : ZMod p) := by
+    refine ⟨?_⟩
+    rw [hQcard, Ne, ZMod.natCast_eq_zero_iff]
+    intro h
+    exact hqp ((Nat.prime_dvd_prime_iff_eq hp hq).mp (hp.dvd_of_dvd_pow h)).symm
+  have hnc := not_isCyclic_of_exponent_of_card_sq hq hQexp hQcard
+  have hnot := Representation.not_isSimpleModule_asModule_of_not_isCyclic ρ hfaith hnc
+  obtain ⟨W₁, W₂, hsup, h1, h2, hinv1, hinv2⟩ :=
+    exists_invariant_lines_of_not_isSimpleModule ρ hrank hnot
+  obtain ⟨χ₁, hχ₁⟩ := exists_monoidHom_scalar_of_finrank_eq_one ρ h1 hinv1
+  obtain ⟨χ₂, hχ₂⟩ := exists_monoidHom_scalar_of_finrank_eq_one ρ h2 hinv2
+  have hpow : ∀ (χ : Q →* ZMod p) (g : Q), (χ g) ^ q = 1 := by
+    intro χ g
+    rw [← map_pow, hQexp g, map_one]
+  by_cases hboth : ∀ g : Q, χ₁ g = 1 ∧ χ₂ g = 1
+  · exfalso
+    have hall : ∀ g : Q, g = 1 := fun g => hfaith (by
+      rw [eq_one_of_scalars_eq_one_of_sup_eq_top ρ hsup hχ₁ hχ₂ (hboth g).1 (hboth g).2, map_one])
+    haveI hss : Subsingleton Q := ⟨fun a b => by rw [hall a, hall b]⟩
+    have hcard1 : Nat.card Q = 1 := Nat.card_eq_one_iff_unique.mpr ⟨hss, ⟨1⟩⟩
+    rw [hQcard] at hcard1
+    nlinarith [hq.two_le]
+  · push Not at hboth
+    obtain ⟨g, hg⟩ := hboth
+    by_cases h1' : χ₁ g = 1
+    · exact prime_dvd_sub_one_of_pow_eq_one hq (hpow χ₂ g) (hg h1')
+    · exact prime_dvd_sub_one_of_pow_eq_one hq (hpow χ₁ g) h1'
+
 end OddOrder.RepresentationTheory

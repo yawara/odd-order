@@ -52,6 +52,7 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.ElemAbelianAutAction
+import OddOrder.GroupTheory.RepresentationTheory.SingerReducibility
 import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
 import OddOrder.GroupTheory.RepresentationTheory.FongSwan
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
@@ -3999,6 +4000,13 @@ set_option linter.style.longLine false in
 -- via Frobenius reciprocity + the Mackey sum + orthonormality of irreducibles.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_mul_inner_self_induce_eq_card_inertia
+-- **BG Lemma 2.7(a)** (p. 31): `p ≠ q` primes, `Q ≅ (ℤ/q)²` acting faithfully and `𝔽_p`-linearly
+-- on a 2-dimensional `𝔽_p`-space ⟹ `q ∣ p − 1`.  Route: `Q` non-cyclic ⟹ the action is reducible
+-- (Singer order bound, contrapositive) ⟹ Maschke splits off two invariant lines, each with a
+-- character `Q →* 𝔽_p`; not both can be trivial (faithfulness), and a nontrivial value is a
+-- `q`-th root of unity.  Issue 0150; part (b) (the power-map `α`) is still open.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.prime_dvd_sub_one_of_faithful_rank_two
 -- Peterfalvi (1.7), constituent count: if `Ind_H^G θ = e·∑_{χ ∈ S} χ` with a single common
 -- multiplicity `e`, then `e²·|S|·|H| = |I_G(θ)|` — the book's `n = [I_G(θ):H]/e²`, stated
 -- multiplicatively.  Both sides are `|H|·‖Ind θ‖²` (norm part above + orthonormality of `Irr G`).
