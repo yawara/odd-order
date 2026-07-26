@@ -165,6 +165,46 @@ theorem commutator_le_center_of_index_center_eq_four {P : Type*} [Group P] [Fini
   rw [← commutatorElement_def]
   exact commutatorElement_eq_one_iff_mul_comm.mpr (habel _ _)
 
+/-- 交換子が中心的なときの**双線形性**: `[xy, w] = [x,w][y,w]`。 -/
+theorem commutator_mul_left_of_le_center {P : Type*} [Group P]
+    (hc : commutator P ≤ Subgroup.center P) (x y w : P) :
+    (x * y) * w * (x * y)⁻¹ * w⁻¹
+      = (x * w * x⁻¹ * w⁻¹) * (y * w * y⁻¹ * w⁻¹) := by
+  have hmem : ∀ u v : P, u * v * u⁻¹ * v⁻¹ ∈ Subgroup.center P := by
+    intro u v
+    have h1 := Subgroup.commutator_mem_commutator (G := P) (H₁ := ⊤) (H₂ := ⊤)
+      (Subgroup.mem_top u) (Subgroup.mem_top v)
+    rw [← commutator_def] at h1
+    rw [← commutatorElement_def]
+    exact hc h1
+  have hcy : ∀ g : P, g * (y * w * y⁻¹ * w⁻¹) = (y * w * y⁻¹ * w⁻¹) * g :=
+    Subgroup.mem_center_iff.mp (hmem y w)
+  calc (x * y) * w * (x * y)⁻¹ * w⁻¹
+      = x * (y * w * y⁻¹ * w⁻¹) * (w * x⁻¹ * w⁻¹) := by group
+    _ = (y * w * y⁻¹ * w⁻¹) * x * (w * x⁻¹ * w⁻¹) := by rw [hcy x]
+    _ = (y * w * y⁻¹ * w⁻¹) * (x * w * x⁻¹ * w⁻¹) := by group
+    _ = (x * w * x⁻¹ * w⁻¹) * (y * w * y⁻¹ * w⁻¹) := (hcy _).symm
+
+/-- `|P : Z(P)| = 4` なら交換子はすべて involution: `[x,y]² = 1`。
+
+双線形性で `[x², y] = [x,y]²`, 一方 `x² ∈ Z(P)` なので `[x², y] = 1`。 -/
+theorem commutator_sq_eq_one_of_index_center_eq_four {P : Type*} [Group P] [Finite P]
+    (h : (Subgroup.center P).index = 4) (x y : P) :
+    (x * y * x⁻¹ * y⁻¹) ^ 2 = 1 := by
+  have hc := commutator_le_center_of_index_center_eq_four h
+  have hbil := commutator_mul_left_of_le_center hc x x y
+  have hx2 : x ^ 2 ∈ Subgroup.center P := sq_mem_center_of_index_center_eq_four h x
+  have hcx : y * (x * x) = (x * x) * y := by
+    have hcc := Subgroup.mem_center_iff.mp hx2 y
+    rwa [pow_two] at hcc
+  have h1 : (x * x) * y * (x * x)⁻¹ * y⁻¹ = 1 := by
+    calc (x * x) * y * (x * x)⁻¹ * y⁻¹ = ((x * x) * y) * (x * x)⁻¹ * y⁻¹ := by group
+      _ = (y * (x * x)) * (x * x)⁻¹ * y⁻¹ := by rw [← hcx]
+      _ = 1 := by group
+  rw [h1] at hbil
+  rw [pow_two]
+  exact hbil.symm
+
 /-- **6B.8 の base case**: `|P| = 8` かつ `|P : P'| = 4` なら `P` は `D_8` か `Q_8`。
 
 `|P'| = 2 ≠ 1` から非可換なので repo の Cor 6.14
