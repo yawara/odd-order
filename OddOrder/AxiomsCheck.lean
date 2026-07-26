@@ -9638,10 +9638,25 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- 巡回群では位数が部分群を決めるので、ブロックごとの像の**位数**が一致するだけで像が一致する
 -- (`𝔽_p^×` は巡回)。⟹ S11 側は「共役が `C_U(H₁)` を `C_U(H_i)` に写す ⟹ 指数が等しい」だけ
 -- 示せばよく、ブロックを表現として同型に組む plumbing が要らない (issue 0152)。
+-- `MulAut` 作用の**各点固定化群** (作用する側で取る) と、部分群を自己同型で移したときの共役性:
+-- `ptStab φ (g • J) = σ (ptStab φ J)` (σ = g による共役)。⟹ 指数が等しい。
+-- Pf (9.7)(a) の「`U/C_U(H_i)` は全ての `i` で位数 `a`」の群論核 (issue 0152)。
+#assert_only_allowed_axioms Subgroup.ptStabOfMulAut_smul
+#assert_only_allowed_axioms Subgroup.index_ptStabOfMulAut_smul
+#assert_only_allowed_axioms Subgroup.index_ptStabOfMulAut_subtype_smul
+-- S11 側の供給: `U W₁` の誘導自己同型は `Ū = range (uActionHom)` を正規化する
+-- (`uActionHom` = `quotientMulAutHom` の `U` への制限 + `U ⊴ U W₁`)。これが Pf (9.7)(a) の
+-- 「ブロックによらない `a`」の群論入力 (issue 0152)。
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.range_uActionHom_conj_mem
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.range_uActionHom_conj_inv_mem
 #assert_only_allowed_axioms OddOrder.GroupTheory.eq_powMonoidHom_ker_card
 #assert_only_allowed_axioms OddOrder.GroupTheory.Subgroup.eq_of_card_eq_of_isCyclic
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.card_dvd_blockScalarRange_pow_of_blocks_card_eq
+-- 2 結論を 1 呼び出しで返す束ね: 呼び出し側は §9 の crux `hconst` を 1 回だけ discharge すれば
+-- よく、`refine … ?_ ?_` の目標がすべてこの signature から elaborate されるので
+-- `Semiring (ZMod p)` の instance 経路が割れない (issue 0152 の実測)。
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.blockScalarFacts_of_blocks
 -- Peterfalvi (9.7)(b): `Coprime |Ū| (p-1)` (fixed-point-free) and the resulting unconditional
 -- divisibility `|Ū| ∣ (p^q-1)/(p-1)`.  The FPF input `C_Ū(w₀) = 1` is supplied from the Frobenius
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).

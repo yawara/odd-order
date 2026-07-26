@@ -137,3 +137,64 @@ step 1-2 を「ブロックを表現として同型に組む」で進める予�
 
 S11 の `caseA` で `Hpart_orbit` から「指数が等しい」を出し、
 `card_dvd_blockScalarRange_pow_of_blocks_card_eq` に流して `caseA_u_dvd_a_pow` を得る。
+
+## ✅ generic 側 完了 (2026-07-27)
+
+群論の核も揃った (`OddOrder/Mathlib/Subgroup.lean`):
+
+| 定理 | 内容 |
+|---|---|
+| `Subgroup.ptStabOfMulAut φ J` | `MulAut` 作用で `J` を各点固定する**作用側**の部分群 (`fixedPointsOfMulAut` の双対) |
+| `Subgroup.ptStabOfMulAut_smul` | `σ` が `g` 共役を実装 ⟹ `ptStab φ (g • J) = σ (ptStab φ J)` |
+| `Subgroup.index_ptStabOfMulAut_smul` | ⟹ 指数が等しい |
+| `Subgroup.index_ptStabOfMulAut_subtype_smul` | **消費者向け**: `Ū ≤ MulAut G`、`g` が `Ū` を正規化するだけで指数一致 (σ は内部構成) |
+
+⟹ S11 側が供給すべきものは **2 つだけ**:
+
+1. `g_j := quotientMulAutHom chief.N_aInvariant (caseA.orbitRep j)` が
+   `Ū = range (uActionHom data chief)` を正規化すること
+   — `quotientMulAutHom` が準同型ゆえ `g_j * quotientMulAutHom v * g_j⁻¹ =
+   quotientMulAutHom (orbitRep j * v * (orbitRep j)⁻¹)` で、
+   `U ⊴ U ⊔ W₁` (`(typeP_uW1_frobenius data.typeP hU).isNormal`) から従う。
+2. `ker (lineScalarChar (B j)) = ptStabOfMulAut Ū.subtype (Hpart j)` の同一視
+   (`lineScalarChar_ker_eq` + `Hpart` の carrier)。
+
+そこから `card_lineScalarChar_range_eq_index` → 位数一致 →
+`card_dvd_blockScalarRange_pow_of_blocks_card_eq` で `caseA_u_dvd_a_pow` が出る。
+
+## ⚠ 最終組み立ての設計 (2026-07-27) — `hconst` を `have` に hoist してはいけない
+
+S11 の `caseA_exists_blockScalarRatioEmbedding` から `hconst` (§9 の crux、80 行) を
+`have` に hoist して 2 箇所で使い回そうとしたが、**instance diamond で失敗**した:
+
+```
+(B 0).toRepresentation :
+  @Representation (ZMod p) _ _ CommRing.toCommSemiring.toSemiring ...
+但し期待される型は
+  @Representation (ZMod p) _ _ Field.toSemifield.toDivisionSemiring.toSemiring ...
+```
+
+原因: 元の証明は `refine exists_blockScalarRatioEmbedding_of_blocks … ?_` の形なので、
+`hBcard` / `hconst` の型が**generic 補題の signature から降りてくる**。`have hBcard := …` と
+自分で書くと `Semiring (ZMod p)` への経路が別になり `finrank_eq_one_of_card_eq_prime` 経由で
+食い違う ([[lean-instance-defeq-traps]])。試行は revert 済、tree green。
+
+### ⟹ 正しい設計: generic 側で束ねる
+
+S11 の証明本体 (`refine … ?_ ?_` + `intro u hscal` + 80 行) を**そのまま保ち**、
+generic 側に 2 つの結論を同時に返す補題を置く:
+
+```lean
+theorem blockScalarFacts_of_blocks (ρ) (B) (hBcard)
+    (hcard : ∀ i, Nat.card (range φ_i) = Nat.card (range φ_0))
+    (hconst : …) :
+    (∃ ψ : U →* (Fin n → (ZMod p)ˣ), Function.Injective ψ)
+      ∧ Nat.card U ∣ Nat.card (range φ_0) ^ n
+      ∧ Nat.card (range φ_0) ∣ p - 1
+```
+
+こうすれば S11 側は `refine blockScalarFacts_of_blocks … ?_ ?_` となり、`hcard` と `hconst`
+の**両方の目標が signature から完全に elaborate された形で降りてくる**ので diamond が起きない。
+`hcard` の目標は `ker (lineScalarChar (B i)) = ptStabOfMulAut Ū.subtype (Hpart i)` を経由して
+`Subgroup.index_ptStabOfMulAut_subtype_smul` + `range_uActionHom_conj_mem` で閉じる
+(すべて landed 済)。

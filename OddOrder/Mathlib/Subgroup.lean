@@ -187,6 +187,90 @@ theorem centralizer_inf_eq_of_le_of_singleton_inf_eq {K R₀ R : Subgroup G}
           hcent (y : G) (hR₀R y.2) (mt OneMemClass.coe_eq_one.mp hy)
   · exact inf_le_inf_right K (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hR₀R))
 
+/-- **`MulAut` 作用の部分群 `J` の各点固定化群** (作用する側 `A` の中で取る): `φ a` が `J` を
+元ごとに固定するような `a ∈ A` 全体.  `fixedPointsOfMulAut` (固定される側 `G` の中で取る) の双対.
+
+下流: Peterfalvi (9.7)(a) — ブロック `H_i` の各点固定化群が `C_U(H_i)`, その指数が書籍の `a`
+(issue 0152). -/
+def ptStabOfMulAut {A G : Type*} [Group A] [Group G] (φ : A →* MulAut G) (J : Subgroup G) :
+    Subgroup A where
+  carrier := {a | ∀ x ∈ J, (φ a) x = x}
+  one_mem' := fun x _ => by rw [map_one]; rfl
+  mul_mem' := fun {a b} ha hb x hx => by
+    rw [map_mul]
+    change (φ a) ((φ b) x) = x
+    rw [hb x hx, ha x hx]
+  inv_mem' := fun {a} ha x hx => by
+    rw [map_inv]
+    change (φ a).symm x = x
+    exact (MulEquiv.symm_apply_eq _).mpr (ha x hx).symm
+
+@[simp]
+theorem mem_ptStabOfMulAut {A G : Type*} [Group A] [Group G]
+    {φ : A →* MulAut G} {J : Subgroup G} {a : A} :
+    a ∈ ptStabOfMulAut φ J ↔ ∀ x ∈ J, (φ a) x = x := Iff.rfl
+
+open scoped Pointwise in
+/-- **Translating a subgroup by an automorphism conjugates its pointwise stabiliser.**  If `σ` is
+an automorphism of the acting group `A` implementing conjugation by `g` (`φ (σ a) = g φ(a) g⁻¹`),
+then `ptStab φ (g • J) = σ (ptStab φ J)`.
+
+This is Peterfalvi (9.7)(a)'s "`U/C_U(H_i)` has the same order for every `i`": the blocks are the
+`W₁`-translates `H_i = g_i • H₁`, and conjugation by `g_i` is an automorphism of `U` (`U` being
+normal in `U W₁`), so the centralisers are conjugate and their indices agree (issue 0152). -/
+theorem ptStabOfMulAut_smul {A G : Type*} [Group A] [Group G]
+    (φ : A →* MulAut G) (J : Subgroup G) (g : MulAut G) (σ : A ≃* A)
+    (hσ : ∀ a : A, φ (σ a) = g * φ a * g⁻¹) :
+    ptStabOfMulAut φ (g • J) = (ptStabOfMulAut φ J).map σ.toMonoidHom := by
+  ext a
+  constructor
+  · intro ha
+    refine ⟨σ.symm a, fun x hx => ?_, by simp⟩
+    have hgx : (g : MulAut G) x ∈ g • J := ⟨x, hx, rfl⟩
+    have h := ha _ hgx
+    have hφ : φ (σ (σ.symm a)) = g * φ (σ.symm a) * g⁻¹ := hσ _
+    rw [σ.apply_symm_apply] at hφ
+    rw [hφ] at h
+    change (g : MulAut G) ((φ (σ.symm a)) ((g⁻¹ : MulAut G) ((g : MulAut G) x))) = _ at h
+    rw [show (g⁻¹ : MulAut G) ((g : MulAut G) x) = x from by simp] at h
+    exact g.injective h
+  · rintro ⟨b, hb, rfl⟩
+    intro y hy
+    obtain ⟨x, hx, rfl⟩ := hy
+    have hφ : φ (σ.toMonoidHom b) = g * φ b * g⁻¹ := hσ b
+    rw [hφ]
+    change (g : MulAut G) ((φ b) ((g⁻¹ : MulAut G) ((g : MulAut G) x))) = _
+    rw [show (g⁻¹ : MulAut G) ((g : MulAut G) x) = x from by simp, hb x hx]
+    rfl
+
+/-- The pointwise stabilisers of translated subgroups have the same index. -/
+theorem index_ptStabOfMulAut_smul {A G : Type*} [Group A] [Group G]
+    (φ : A →* MulAut G) (J : Subgroup G) (g : MulAut G) (σ : A ≃* A)
+    (hσ : ∀ a : A, φ (σ a) = g * φ a * g⁻¹) :
+    (ptStabOfMulAut φ (g • J)).index = (ptStabOfMulAut φ J).index := by
+  rw [ptStabOfMulAut_smul φ J g σ hσ]
+  exact Subgroup.index_map_equiv _ σ
+
+open scoped Pointwise in
+/-- **消費者向けの形**: 作用する群が `MulAut G` の部分群 `Ū` そのもので (`φ = Ū.subtype`)、
+`g` が `Ū` を正規化するとき、`J` と `g • J` の各点固定化群は `Ū` の中で同じ指数を持つ。
+
+`σ` (= `g` による共役) をここで内部的に構成するので、呼び出し側は「`g` が `Ū` を正規化する」
+という群論の事実だけ供給すればよい。Pf (9.7)(a) では `Ū = U` の作用像、`g` = ブロックを移す
+`W₁`-元の作用、正規性は Frobenius `U ⋊ W₁` の `U ⊴ U W₁` から来る (issue 0152)。 -/
+theorem index_ptStabOfMulAut_subtype_smul {G : Type*} [Group G]
+    (Ubar : Subgroup (MulAut G)) (J : Subgroup G) (g : MulAut G)
+    (hg : ∀ u ∈ Ubar, g * u * g⁻¹ ∈ Ubar) (hg' : ∀ u ∈ Ubar, g⁻¹ * u * g ∈ Ubar) :
+    (ptStabOfMulAut Ubar.subtype (g • J)).index
+      = (ptStabOfMulAut Ubar.subtype J).index := by
+  refine index_ptStabOfMulAut_smul Ubar.subtype J g
+    { toFun := fun u => ⟨g * (u : MulAut G) * g⁻¹, hg u u.2⟩
+      invFun := fun u => ⟨g⁻¹ * (u : MulAut G) * g, hg' u u.2⟩
+      left_inv := fun u => Subtype.ext (by group)
+      right_inv := fun u => Subtype.ext (by group)
+      map_mul' := fun u v => Subtype.ext (by push_cast; group) }
+    (fun a => rfl)
+
 /-- **`MulAut` 作用の固定点部分群**: `φ : A →* MulAut G` の下で `∀ a, (φ a) g = g` を
 満たす要素全体. mathlib `MulAction.fixedPoints` は Set だが, MulAut 作用の場合は
 group 構造を持つので Subgroup として bundle.
