@@ -14,6 +14,10 @@
 
 PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (別 private リポ、本リポでは gitignore)。教科書本文を読む必要があるときは、まず該当の `*.pdftotext.txt` (Peterfalvi は `references/peterfalvi/pdftotext/*.txt`) を grep / Read し、記号・式・仮定は PDF ページ画像で確定する。**Nougat は新規抽出に使わない (ユーザー方針 2026-07-18)**。既存 `.mmd` は履歴として保持するが、原文照合の正本にしない。
 
+**⚠ Peterfalvi の text は 2026-07-26 まで全 35 章が壊れていた (修正済)**。テキストレイヤが 1 グリフ = 1 word として書き出される PDF なので、素の `pdftotext` はどのモードでも `H y p o t h e s i s` のように全文字を分解し、しかも**語順まで崩す** (91〜97% が 1 文字トークン)。`references/bin/pdf-glyph-join.py` (`pdftotext -bbox-layout` の XML からグリフ bbox で行を組み直す) を通して再生成済 — **現在の `references/peterfalvi/pdftotext/*.txt` は散文が読めて grep も効く**。他の原典 (isaacs/bg/gorenstein/higman) はこの問題を持たない。再生成手順は `references/EXTRACTION_LOG.md` 2026-07-26 節。⚠ **表示数式は元の OCR レイヤ自体が壊れており復元不能** — 式・記号・添字の確定には必ず PDF ページ画像を読むこと。
+
+**📌 切り出したページ画像は捨てずに残す (ユーザー方針 2026-07-26)**。text が壊れている / 数式を確定したい等で PDF をページ画像に落としたら、その場限りにせず references リポに残す (後続セッションが再レンダリングせずに済み、判断の根拠ページも追える)。置き場 = **`references/<book>/pages/`**、命名 = **`<book>-p<書籍ページ 3 桁>.png`** (章別 PDF でもファイル内番号でなく書籍ページ番号)。部分クロップは `pages/extracts/`。レンダリングは `pdftoppm -png -r 200 -f <first> -l <last> <pdf> <prefix>` (1 ページ ≈ 200-300 KB)。規約の正本は `references/README.md`。
+
 **⚠ ただし normal / subnormal の判定に `.mmd` を使わない (2026-07-19 に監査で確定)**。Nougat は subnormal `⊲⊲` を単一の `⊲` に潰すので、**教科書が subnormal を要求する仮説を normal で形式化してしまう** (実害: Isaacs 9.13/9.21 の取り違え → Thm 9.10 が「書籍に gap がある」と誤診されて frontier 停止 = issue 1037。同型の誤った「書籍 gap」注記が 3 件混入 = issue 0125)。**判定には `pdftotext` 抽出を使う** — `references/{isaacs,bg,gorenstein}/*.pdftotext.txt` と `references/peterfalvi/pdftotext/*.txt` に生成済 (再生成は `pdftotext -layout <book>.pdf <out>.txt`)。ここでは **`⊲⊲` → `«`、`⊲` → `<`** に落ちる。⚠ `«` は数字間だと中黒 `·` の OCR ノイズなので、**両側が大文字の部分群記号**であることを条件に絞る。最終的な決定打は `Read` で **PDF ページ画像**を見ること (Isaacs は PDF ページ = 書籍ページ + 13)。手順と実績は issue 9150 / [[mmd-collapses-subnormal-symbol]]。
 
 **Coq 形式化の併読 (`coq/` submodule)**: [math-comp/odd-order](https://github.com/math-comp/odd-order) (Gonthier et al. の Coq/mathcomp FT 完全形式化, CeCILL-B, 公開) を `coq/` に submodule として取り込んでいる。各 `.v` の**コメントが教科書 (BG / Peterfalvi) の行間を埋めている**。**BG §N / Peterfalvi §N の原文 (`pdftotext`/PDF) を読むタイミングで、対応する `coq/theories/{BG,PF}sectionN.v` のコメントを併読する** (ファイル名が教科書構成と 1:1 対応; 対応表・grep レシピ・コメント規約は [`notes/meta/coq_odd_order_reference.md`](notes/meta/coq_odd_order_reference.md))。形式化対象は 3 冊のまま; Coq は**行間補完の参照専用**で Lean に直訳するソースではない (証明戦略のヒント・前提の所在確認に使う)。Coq ツールチェインは不要 (`.v` を Read/grep するだけ)。fresh clone では `git submodule update --init coq` で取得。
@@ -223,7 +227,9 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 | `bin/` | 雑用スクリプト (`new-issue` 等) |
 | `references/` (gitignored) | PDF + `pdftotext -layout` 抽出 text — 別 private リポ `odd-order-references` |
 | `references/{isaacs,bg,gorenstein}/*.pdf`, `*.pdftotext.txt` | 原典/補助原典と検索用 text (フラット) |
-| `references/peterfalvi/pdf/*.pdf`, `references/peterfalvi/pdftotext/*.txt` | Peterfalvi だけ章別 PDF/text を各ディレクトリに集約 |
+| `references/peterfalvi/pdf/*.pdf`, `references/peterfalvi/pdftotext/*.txt` | Peterfalvi だけ章別 PDF/text を各ディレクトリに集約 (text は `bin/pdf-glyph-join.py` で再構成) |
+| `references/<book>/pages/*.png` | 切り出したページ画像 (捨てずに残す規約, 2026-07-26) |
+| `references/bin/pdf-glyph-join.py` | グリフ bbox から本文を組み直すツール (Peterfalvi 専用) |
 | `references/erdos90/` (references リポ側の submodule) | [plby/Erdos90](https://github.com/plby/Erdos90) — 外部 Lean 4 形式化。**Hall–Petresco (BG Thm E.1) を含む**。⚠ LICENSE 無し ⟹ **参照可・コピペ不可**、ビルドしない。取得 = `cd references && git submodule update --init erdos90` |
 | `references/README.md` | 参照資料の配置・取得 provenance・`pdftotext` 手順 |
 
