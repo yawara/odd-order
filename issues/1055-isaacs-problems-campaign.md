@@ -5565,3 +5565,47 @@ CD 部分群 `M` は特性可換で `|G:M| ≤ |G:A|²` (Thm 1.41)。**厳密な
 
 
 **§1G の実装順**: 1G.2 → 1G.3 (1G.2 に依存) → 1G.4。
+
+
+## Ch.3 §3C (書籍 pp. 90–91) — 着手 (2026-07-28)
+
+### ⚠ 先の scope note の訂正: **3C.1 は既に形式化済だった**
+
+2026-07-28 の scope 発見メモで「repo の `3C.1` grep hit は演習ではなく定理番号
+(Hall D-定理, Wielandt)」と書いたが、**これは誤り**。書籍の Problem 3C.1 は
+
+> 3C.1. Let `U ⊆ G` be a π-subgroup, where `π` is a set of primes and `G` is solvable and
+> finite. Show that `U` is contained in some Hall π-subgroup of `G`.
+> Note. This, of course, is the Hall D-theorem.
+
+であり、`Ch03_SplitExtensions/Basic.lean` の `hall_D`
+(docstring も「**Isaacs 3C.1 (Hall D-定理, Wielandt)**」) が**まさにこの演習**。
+Isaacs の Ch.3 の番号付き定理は `3.x` 形式で `3C.1` は演習ラベルなので、
+docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**。
+
+(教訓: 「番号らしき grep hit は定理番号かもしれない」と疑うのは正しいが、
+**書籍側の番号体系を確認してから断定する**こと。Isaacs は定理 `N.x` / 演習 `NX.y` で
+形式が違うので区別できる。)
+
+### §3C の問題 (pdftotext L4466–, 書籍 pp. 90–91)
+
+* ✅ **3C.1** — `hall_D` (`Ch03_SplitExtensions/Basic.lean`)。Hall D-定理。
+* ⬜ **3C.2** — `π` の各素数 `p` について `p`-補元 `H_p` があるなら
+  `⋂_{p∈π} H_p` は Hall `π'`-部分群。
+* ⬜ **3C.3** — Sylow system (各素数の Sylow を 1 つずつ、互いに置換可能な集合)。
+  (a) Sylow system があれば任意の `π` に Hall `π`-部分群がある。
+  (b) 可解群には Sylow system がある。Hint: 各 `p`-補元を取り、1 つを除く全部の交わりを見る。
+* ⬜ **3C.4** — `M` が可解群 `G` の極小正規部分群で `M = C_G(M)` なら `G` は `M` 上分裂し、
+  `M` の補元は全て共役。Hint: `L/M` を `G/M` の極小正規に取り `q`-群、`q ∤ |M|` を示して
+  `L` の Sylow `q` を見る。
+* ⬜ **3C.5** — `H` が可解 `G` の極大部分群で `core_G(H) = 1` なら、`G` は唯一の極小正規
+  部分群 `M` をもち `H` は `M` の補元で `M = C_G(M)`。さらに核自明な極大部分群同士は共役。
+* ⬜ **3C.6** — 可解 `G` で `x,y,z` の位数が対ごとに互いに素かつ `xyz = 1` なら
+  `x = y = z = 1`。Hint: 導来長に関する帰納。
+* ⬜ **3C.7** — Carter 部分群 (`C` 冪零かつ `C = N_G(C)`) の (a) 存在 (b) 共役性
+  (c) `G/N` 冪零なら `NC = G`。⚠ **書籍自身が「この問題と次はかなり難しい」と注記**。
+* ⬜ **3C.8** — 可解群の nilpotent injector (`F(G)` を含む極大な冪零部分群) は全て共役。
+  ⚠ 同上 (書籍が challenge として提示)。
+
+**着手順は番号順** (3C.2 から)。3C.7 / 3C.8 は書籍自身が難問と明示しているので、
+時間がかかっても正面から進める (CLAUDE.md「難易度は着手判断の基準でない」)。
