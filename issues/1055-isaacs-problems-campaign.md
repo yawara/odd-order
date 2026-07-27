@@ -5400,3 +5400,57 @@ leaf = `Ch01_Sylow/ProblemsSylowCounting.lean` (852 行, 道具立て + 1E.1–1
 
 ⚠ 4 の「`↥(Q ⊔ R)` の中で Sylow を取り直す」plumbing が唯一の面倒どころ。
 `ProblemsOrder120.lean` の位数 30 → 位数 120 の comap 引き戻しに前例がある。
+
+
+## Ch.1 §1F (書籍 pp. 40–41) — 着手 (2026-07-28)
+
+leaf = `Ch01_Sylow/ProblemsBrodkey.lean` (`OddOrder.lean` 配線済)。§1F は Brodkey の定理
+(Thm 1.37) とその一般化 (Thm 1.38) の節で, **本文の定理は repo に landing 済**
+(`Ch01_Sylow/Main.lean` の `opCore_eq_inf_of_minimal_sylow_inter` = Thm 1.38 /
+Thm 1.37 / Cor 1.39 / Cor 1.40)。演習は 3 問。
+
+* ✅ **1F.1** — `M ⊴ G`, `N ⊴ G`, `M ∩ N = 1` ⟹ `M`, `N` は互いに中心化。
+  **mathlib `Subgroup.commute_of_normal_of_disjoint` がそのままこの主張**
+  (証明も Hint どおり `[m,n] = m⁻¹n⁻¹mn ∈ M ∩ N` を見る)。ラッパー方針により
+  leaf の docstring に対応を記録するのみ。
+* ✅ **1F.2** `exists_sylow_pair_inf_center_eq_bot` — `O_p(G) = 1` なら
+  `Z(S) ⊓ Z(T) = ⊥` となる `S, T ∈ Syl_p(G)` が存在。交わりの位数最小 (⟹ 包含極小) な
+  対を取り `K := Z(S) ⊓ Z(T)` に **Thm 1.38** を当てる (`K ≤ S ⊓ T` で `K` の元は
+  `S`,`T` の全元と可換ゆえ `S, T ≤ N_G(K)`)。`Z(S)` は `G` の部分群として
+  `S ⊓ C_G(S)` の形で表す。
+* ✅ **1F.3** `exists_faithful_orbit_of_faithful_conj` (2026-07-28) — 下記の設計どおり landing。
+  ⚠ 実装上の罠: (i) `rintro h (rfl : h = x)` は **`x` の方を消してしまう** (x が section の
+  局所変数なので以降の `x` が全て壊れる) — `intro h hh; have : h = x := hh; rw [this]` と書く。
+  (ii) `Subgroup.commute_of_normal_of_disjoint` は `x y : G` を**明示引数**で先に取る
+  (`... hdis z n hz hn`)。(iii) `omit [..] in` は**docstring より前**に置く。
+  (iv) `MulAut.conj a • (MulAut.conj c • S) = MulAut.conj (a*c) • S` は
+  `smul_smul` + `← map_mul` (`← smul_smul` ではない)。
+
+## 🎉 §1F 完済 (2026-07-28) — 1F.1–1F.3 全問
+
+leaf = `Ch01_Sylow/ProblemsBrodkey.lean` (300 行, `OddOrder.lean` 配線済)、
+実証明・axiom-clean・lint 警告 0・sorry 0。
+
+**次の frontier = Ch.1 §1G** (1G.1–1G.4, Chermak–Delgado 周り)。その後 Ch.3 §3C–§3F、
+最後に Ch.8 §8C.6 (繰延中)。
+
+### 1F.3 の設計 (実装済, 記録として保持)
+
+1. **`P ∩ P^x = C_P(x)`** (`x ∈ N`)。`u ∈ P ∩ P^x` なら `x u x⁻¹ ∈ P` かつ
+   `x u x⁻¹ u⁻¹ ∈ N` (N 正規) なので `N ∩ P = 1` より `x u x⁻¹ = u`。逆も同様。
+   したがって「`|P ∩ P^x|` 最小」= 「`x` の `P`-軌道が最大」。
+2. **`P` の軌道 `{x^g : g ∈ P}` への作用の核は `Core_P(C_P(x))`**
+   (`K ⊴ P` かつ `K ≤ C_P(x)` なら `K = K^g ≤ C_P(x)^g = C_P(x^g)` で自動)。
+3. **`K := Core_P(C_P(x))` は `P^x` でも正規**: `k ∈ K` は `x` と可換なので
+   `(x⁻¹ u x) k (x⁻¹ u x)⁻¹ = x⁻¹ (u k u⁻¹) x = u k u⁻¹ ∈ K` (`ukᵘ⁻¹ ∈ K ≤ C_P(x)`)。
+4. **`O_p(G) = 1`**: `O_p(G) ⊴ G` は `p`-群で `N` の位数は `p` と互いに素だから
+   `O_p(G) ⊓ N = ⊥`, 両方正規なので `[O_p(G), N] = 1` ⟹ `O_p(G)` は作用の核に入り,
+   忠実性から `O_p(G) = 1`。
+5. **Thm 1.38** (`opCore_eq_inf_of_minimal_sylow_inter`) を `(S, T) = (P, P^x)` に当てて
+   `K ≤ O_p(G) = 1`。⟹ 軌道への作用は忠実。
+
+⚠ 実装上の山: Thm 1.38 は**全 Sylow 対**での極小性を要求するので、
+「`x ∈ N` を渡る `|P ∩ P^x|` の最小性」から全体の極小性へ橋渡しする必要がある。
+`G = NP` かつ `N ⊴ G` なら **`G` の Sylow `p`-部分群は全て `P^n` (`n ∈ N`) の形**
+(`g = p'n` と書けば `P^{p'n} = P^n`) なので、任意の対 `(S', T') = (P^{n₁}, P^{n₂})` の交わりは
+`(P ∩ P^{n₂n₁⁻¹})^{n₁}` の共役 = 同位数。これで位数最小性が全体に及ぶ。
