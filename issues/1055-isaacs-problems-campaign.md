@@ -3824,3 +3824,56 @@ Sylow `p` はちょうど `q+1` 個)。
 5. PSL: `Z = Z(SL)` は `p` と互いに素な位数 (標数 2 なら自明, 奇標数なら位数 2) ⟹
    `n_p(SL/Z) = n_p(SL)` (中心的で位数互いに素な正規部分群による商は Sylow 数を保つ:
    `PZ = P × Z` ゆえ `P` char in `PZ` で `N_G(PZ) = N_G(P)`)。
+
+### 🎉 7A.4 完成 (2026-07-27) — `Problems7A4.lean` (436 行, axiom-clean)
+
+`SL(2,q)` / `PSL(2,q)` の Sylow `p` がちょうど `q+1` 個。任意の有限体 `F` (標数 `p`) で成立。
+
+* `transvectionHom` (単射) → `unipotentSL` = 像 (`|U| = q`)。
+* `borelSL = {g | g 1 0 = 0}`, `borelElt a b = [[a,b],[0,a⁻¹]]`,
+  `borelEquiv : Fˣ × F ≃ B` ⟹ `|B| = (q-1)q`。
+* `borelElt_mul` / `borelElt_inv` / `transvection_eq_borelElt` で Borel を `Fˣ ⋉ F` として
+  計算 ⟹ `borelElt_conj_transvection` (`g u g⁻¹ = [[1,a²b],[0,1]]`)。
+* `normalizer_unipotentSL_eq : N_{SL}(U) = B`。`⊆` は **逆行列を経由せず**
+  `T' g = g T` の `(1,1)` 成分比較 (`g₁₀ + g₁₁ = g₁₁`)。
+* `index_borelSL = q+1`, `index_unipotentSL = (q-1)(q+1)` ⟹
+  `card_sylow_specialLinearGroup` (`Sylow.card_eq_index_normalizer`)。
+* PSL: `conj_transvection_lower_left` (`(g T g⁻¹) 1 0 = -(g 1 0)²`, `SL2_inv_expl` 展開) +
+  `center_le_borelSL` ⟹ `normalizer_map_unipotentSL_eq : N_{PSL}(π(U)) = π(B)`
+  (`Subgroup.comap_map_eq` + `QuotientGroup.ker_mk'` で `g T g⁻¹ ∈ U ⊔ Z ≤ B`) ⟹
+  `card_sylow_projectiveSpecialLinearGroup` (`IsPGroup.map` / `Subgroup.index_map_dvd` /
+  `Subgroup.index_map`)。
+
+Lean 実務メモ: `Nat.dvd_sub'` は現存せず **`Nat.dvd_sub`** / `Finite.one_lt_card` ・
+`Nat.card_pos` は `(α := F)` 明示が要る (metavariable) / `Matrix.SpecialLinearGroup` は
+`instance [Finite R] : Finite (SpecialLinearGroup n R)` あり / `Sylow` は
+`IsPGroup.toSylow (hP : IsPGroup p H) (hnd : ¬ p ∣ H.index)` で作る (`toSylow_coe` は `rfl`)。
+
+### 7A.5 の設計 (2026-07-27) — `U ⊴ P` elementary abelian は `E ∈ 𝓔(P)` を正規化
+
+**statement** (PDF 確認済; `U ⊲ P` は **normal**): `P` `p`-群, `U ⊴ P` elementary abelian
+⟹ `∃ E ∈ 𝓔(P)`, `U ≤ N(E)`。`𝓔(P)` = repo の
+`Subgroup.maxElemAbelianIn P p` (`OddOrder/GroupTheory/ThompsonSubgroup.lean:64`,
+Isaacs 本文 p.202 の定義と一致; `maxElemAbelianIn_nonempty` あり)。
+
+**証明** (書籍 hint を詰めたもの; 全ステップ検算済):
+`|U ⊓ E|` が最大の `E ∈ 𝓔(P)` を取る。`U` が `E` を正規化しないとして `u ∈ U`,
+`F := E^u ≠ E`, `H := E ⊔ F`, `Z := E ⊓ F`, `W := H ⊓ U`, `A := Z ⊔ W` とおく。
+
+1. `F ∈ 𝓔(P)` (共役, `u ∈ U ≤ P`)。
+2. **`E ⊓ U = F ⊓ U`**: `U` 可換ゆえ `u` は `E ⊓ U ≤ U` を各元固定 ⟹
+   `(E ⊓ U)^u = E ⊓ U` かつ `= F ⊓ U^u = F ⊓ U`。従って `Z ⊓ U = E ⊓ U`。
+3. **`Z ≤ Z(H)`**: `Z ≤ E` (可換) かつ `Z ≤ F` (可換) ⟹ `Z ≤ C(E) ⊓ C(F) = C(⟨E,F⟩)`。
+   ⟹ `A = Z ⊔ W` は elementary abelian (可換 2 つの積、指数 `p`)。
+4. **`|W| > |E ⊓ U|`**: `E ≠ E^u` ⟹ ∃`e ∈ E`, `e^u ∉ E`;
+   `[e,u] = e⁻¹e^u ∈ H` かつ `∈ U` (`U` 正規) だが `∉ E`。
+5. **`H = E · W`** (集合積): `H ≤ E ⊔ U` ゆえ `h = e v` (`v ∈ U`) と書け `v = e⁻¹h ∈ H ⊓ U`。
+   ⟹ `|H| · |E ⊓ U| = |E| · |W|` (`E ⊓ W = E ⊓ U`, `Ch01.card_mul_card_inf`)。
+6. **`|H| · |Z| ≥ |E|²`**: `|E·F| · |Z| = |E||F| = |E|²` かつ `E·F ⊆ H`。
+7. ⟹ `|A| · |E ⊓ U| = |Z| · |W|` (`Z ⊓ W = Z ⊓ U = E ⊓ U`) と 5,6 で
+   `|A| · |E| ≥ |E|²` ⟹ `|A| ≥ |E|` ⟹ **`A ∈ 𝓔(P)`**。
+8. `W ≤ A ⊓ U` かつ 4 より `|A ⊓ U| > |E ⊓ U|` で `E` の最大性に矛盾。
+
+道具: `Subgroup.coe_mul_of_right_le_normalizer_left (N H) (H ≤ normalizer N) : ↑(N ⊔ H) = ↑N * ↑H`
+(mathlib) / `Ch01.card_mul_card_inf (H K) : |HK| · |H ⊓ K| = |H| · |K|`
+(`OddOrder/Isaacs/Ch01_Sylow/Problems.lean:225`) / `Subgroup.maxElemAbelianIn`。
