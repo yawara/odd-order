@@ -32,6 +32,8 @@ pdftotext は `<` と `≤` を潰すが, **1G.1 と 1G.4 の不等号は厳密 
 - `conj_smul_self_of_mem` — 部分群はその元による共役で不変。
 - `exists_normal_lt_top_of_mem_lattice` — **Problem 1G.2**。
 - `eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card` — **Problem 1G.3**。
+- `sInf_mem_lattice_and_centralizer_eq` — `L(G)` の有限族の交わりは `L(G)` に属し
+  中心化群は各元の中心化群の `sSup` (Thm 1.44 の 2 元版の反復; 1G.4 の準備)。
 -/
 
 namespace OddOrder.Isaacs.Ch01
@@ -323,5 +325,45 @@ theorem eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card [IsSimpleGroup G] {H :
       · exact absurd hM hMlt.ne
 
 end -- Problem 1G.3
+
+section /- 1G: `L(G)` の有限族の交わり (1G.4 の準備) -/
+
+variable {G : Type*} [Group G] [Finite G]
+
+/-- **Thm 1.44 の 2 元版の反復**。`L(G)` の元からなる有限で空でない族 `S` について,
+`sInf S` は `L(G)` に属し, その中心化群は各元の中心化群の `sSup` に等しい。
+
+`chermakDelgadoLattice_inf_mem` と `chermakDelgadoLattice_centralizer_inf_eq_mul`
+(`C_G(H ⊓ K) = C_G(H)·C_G(K)`) を `Set.Finite.induction_on` で回す。積が join になるのは
+`chermakDelgadoLattice_sup_eq_mul` (両者が `L(G)` に属すため)。 -/
+theorem sInf_mem_lattice_and_centralizer_eq (S : Set (Subgroup G)) (hfin : S.Finite) :
+    S.Nonempty → S ⊆ chermakDelgadoLattice G →
+      sInf S ∈ chermakDelgadoLattice G ∧
+        (centralizer ((sInf S : Subgroup G) : Set G) : Subgroup G)
+          = sSup ((fun H : Subgroup G => (centralizer (H : Set G) : Subgroup G)) '' S) := by
+  induction S, hfin using Set.Finite.induction_on with
+  | empty => intro hne _; exact (Set.not_nonempty_empty hne).elim
+  | @insert a t hat ht_fin ih =>
+    intro _hne hsub
+    have ha : a ∈ chermakDelgadoLattice G := hsub (Set.mem_insert _ _)
+    rcases t.eq_empty_or_nonempty with rfl | ht_ne
+    · refine ⟨?_, ?_⟩
+      · rw [Set.insert_eq, Set.union_empty, sInf_singleton]; exact ha
+      · rw [Set.insert_eq, Set.union_empty, sInf_singleton, Set.image_singleton, sSup_singleton]
+    · have hsub_t : t ⊆ chermakDelgadoLattice G :=
+        fun H hH => hsub (Set.mem_insert_of_mem _ hH)
+      obtain ⟨hIt, hCt⟩ := ih ht_ne hsub_t
+      have hCa : (centralizer (a : Set G) : Subgroup G) ∈ chermakDelgadoLattice G :=
+        chermakDelgadoLattice_centralizer_mem ha
+      have hCIt : (centralizer ((sInf t : Subgroup G) : Set G) : Subgroup G)
+          ∈ chermakDelgadoLattice G := chermakDelgadoLattice_centralizer_mem hIt
+      refine ⟨?_, ?_⟩
+      · rw [sInf_insert]; exact chermakDelgadoLattice_inf_mem ha hIt
+      · rw [sInf_insert, Set.image_insert_eq, sSup_insert, ← hCt]
+        refine SetLike.coe_injective ?_
+        rw [chermakDelgadoLattice_centralizer_inf_eq_mul ha hIt,
+          chermakDelgadoLattice_sup_eq_mul hCa hCIt]
+
+end -- `L(G)` の有限族の交わり
 
 end OddOrder.Isaacs.Ch01
