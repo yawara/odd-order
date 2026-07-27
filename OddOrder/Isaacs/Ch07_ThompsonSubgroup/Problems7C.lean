@@ -90,6 +90,55 @@ theorem characteristic_map_of_mulEquiv {A B : Type*} [Group A] [Group B] (e : A 
     simp
   rw [Subgroup.map_map, hcomp, ← Subgroup.map_map, hψ]
 
+/-! ### 局所条件の部分群への遺伝 (Case A で使う) -/
+
+/-- `↥S ≃* ↥(S.map H.subtype)` と包含の合成の一致。 -/
+private theorem subtype_comp_equivMapOfInjective (H : Subgroup G) (S : Subgroup ↥H) :
+    (S.map H.subtype).subtype.comp
+        (Subgroup.equivMapOfInjective S H.subtype H.subtype_injective).toMonoidHom =
+      H.subtype.comp S.subtype := by
+  ext x
+  simp
+
+/-- `X : Subgroup ↥S` の `G` への像は, `↥(S.map H.subtype)` 側へ移してから押し出しても同じ。 -/
+private theorem map_equivMapOfInjective_map_subtype (H : Subgroup G) (S : Subgroup ↥H)
+    (X : Subgroup ↥S) :
+    (X.map (Subgroup.equivMapOfInjective S H.subtype H.subtype_injective).toMonoidHom).map
+        (S.map H.subtype).subtype =
+      (X.map S.subtype).map H.subtype := by
+  rw [Subgroup.map_map, subtype_comp_equivMapOfInjective, ← Subgroup.map_map]
+
+/-- **局所条件は部分群に遺伝する**: `S ≤ H ≤ G` について, ambient `G` での局所条件
+(`S` の `G` への像に対するもの) は `↥H` の中での局所条件を導く。
+
+`N_{↥H}(X) ≤ N_G(X^G)` なので仮説をそのまま当て, 得られた `C_G` の元を `↥H` に落とす。
+`X : Subgroup ↥S` の characteristic 性は `characteristic_map_of_mulEquiv` で
+`↥(S.map H.subtype)` 側へ運ぶ。 -/
+theorem CharLocalPControl.of_subgroup {p : ℕ} (H : Subgroup G) {S : Subgroup ↥H}
+    (hS : CharLocalPControl p (S.map H.subtype)) :
+    CharLocalPControl (G := ↥H) p S := by
+  intro X hX g hg
+  haveI : X.Characteristic := hX
+  set e := Subgroup.equivMapOfInjective S H.subtype H.subtype_injective with he
+  haveI hX' : (X.map e.toMonoidHom).Characteristic := characteristic_map_of_mulEquiv e X
+  have hmapeq := map_equivMapOfInjective_map_subtype H S X
+  -- `g` を `G` に落とすと `N_G` に入る
+  have hgG : (g : G) ∈ Subgroup.normalizer
+      (((X.map S.subtype).map H.subtype : Subgroup G) : Set G) := by
+    have := map_normalizer_le_normalizer_map H.subtype (X.map S.subtype)
+      (Subgroup.mem_map.mpr ⟨g, hg, rfl⟩)
+    exact this
+  obtain ⟨k, hk⟩ := hS (X.map e.toMonoidHom) hX' (g : G) (by rwa [hmapeq])
+  rw [hmapeq] at hk
+  refine ⟨k, ?_⟩
+  rw [Subgroup.mem_centralizer_iff] at hk ⊢
+  intro a ha
+  have haG : ((a : ↥H) : G) ∈ (((X.map S.subtype).map H.subtype : Subgroup G) : Set G) :=
+    Subgroup.mem_map.mpr ⟨a, ha, rfl⟩
+  have hcomm := hk _ haG
+  have hpow : (((g ^ p ^ k : ↥H)) : G) = (g : G) ^ p ^ k := by push_cast; rfl
+  exact Subtype.ext (by rw [Subgroup.coe_mul, Subgroup.coe_mul, hpow]; exact hcomm)
+
 end
 
 end OddOrder.Isaacs.Ch07
