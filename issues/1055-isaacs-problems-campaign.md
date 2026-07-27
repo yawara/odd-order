@@ -4247,3 +4247,20 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 * ✅ `affineLinearPartHom : AGL(1,F) →* Fˣ` (`a = p 1 - p 0` で線形部分を取り出す) +
   核 (平行移動群) の可換性 ⟹ `affineLineGroup_isSolvable`
   (mathlib `solvable_of_ker_le_range` + `isSolvable_of_comm`)。⟹ **8A.11 完了**。
+
+### 8A.12 (2026-07-27): 置換指標の 2 乗平均 — 骨格を landing
+
+* ✅ `fixedByProdEquiv` / `card_fixedBy_prod` — `χ(g)² = |Fix_{Ω×Ω}(g)|`
+  (積作用の固定点は成分ごとの固定点の積; equiv は `congrArg Prod.fst/snd` と `Prod.ext` だけ)。
+* ✅ `sum_sq_card_fixedBy` — `∑_g χ(g)² = |Ω×Ω の軌道数| · |G|`
+  (§1A の `Ch01.sum_card_fixedBy_nat` = Nat.card 版 Burnside をそのまま `Ω × Ω` に適用)。
+
+**残り (8A.12)**: 「`G` 2-transitive ⟺ `Ω × Ω` の `G`-軌道がちょうど 2 個」。
+(⟹) 対角線 `Δ` が 1 軌道 (`G` 推移的), その補集合が 1 軌道 (2-transitivity), 両者は交わらず
+`Ω × Ω` を覆う。(⟸) 2 軌道なら `Δ` が一方で残りが他方ゆえ off-diagonal に推移的。
+実装は `orbitRel.Quotient G (Ω × Ω) ≃ Fin 2` を作るのが素直 (`Nontrivial Ω` が要る)。
+これが済めば「平均 = 2 ⟺ 2-transitive」が `sum_sq_card_fixedBy` から直ちに出る。
+
+**8A.13** は同じ道具立てで `χ³` = `Ω³` の置換指標 ⟹ 3-transitive のとき `Ω³` の軌道数が
+`m` になる, という形 (`m` は「3 点の一致パターン」= Bell 数 `B₃ = 5`; 2-transitive を仮定
+した上での 3-transitivity 判定なので `m = 5`)。

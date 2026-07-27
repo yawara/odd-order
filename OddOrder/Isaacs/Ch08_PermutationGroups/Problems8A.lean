@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Sylow
+import OddOrder.Isaacs.Ch01_Sylow.Problems
 import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 import OddOrder.Isaacs.Ch08_PermutationGroups.HalfTransitive
@@ -55,6 +56,8 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `card_eq_four_of_solvable_of_stabilizer_three_transitive`,
   `nonempty_mulEquiv_perm_fin_four_of_four_transitive` — **Problem 8A.10**:
   可解な 4-transitive 置換群の次数は 4 で, したがって `S₄` に同型。
+- `card_fixedBy_prod`, `sum_sq_card_fixedBy` — **Problem 8A.12** の骨格: 置換指標の
+  2 乗和は `Ω × Ω` 上の軌道数 × `|G|` (`χ²` は積作用の置換指標 + Burnside)。
 - `affineLineGroup`, `existsUnique_affineLineGroup_of_ne`,
   `affineLineGroup_isSolvable` — **Problem 8A.11**: 1 次元アフィン群
   `AGL(1, F) = {x ↦ ax + b}` は `F` 上 sharply 2-transitive で, metabelian ゆえ可解。
@@ -844,6 +847,33 @@ theorem nonempty_mulEquiv_perm_fin_four_of_four_transitive [FaithfulSMul G Ω]
     have hx : x = e (e.symm x) := (e.apply_symm_apply x).symm
     rw [MulAction.toPermHom_apply, MulAction.toPerm_apply, hx, hg (e.symm x)]
   exact ⟨(MulEquiv.ofBijective _ hbij).trans (permCongrMulEquiv e.symm)⟩
+
+/-! ### Problem 8A.12 — 置換指標の 2 乗平均 -/
+
+/-- 積作用の固定点集合は各成分の固定点集合の積。 -/
+def fixedByProdEquiv (g : G) :
+    (MulAction.fixedBy (Ω × Ω) g) ≃ (MulAction.fixedBy Ω g) × (MulAction.fixedBy Ω g) where
+  toFun p := (⟨p.1.1, congrArg Prod.fst p.2⟩, ⟨p.1.2, congrArg Prod.snd p.2⟩)
+  invFun q := ⟨(q.1.1, q.2.1), Prod.ext q.1.2 q.2.2⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+/-- 置換指標の 2 乗は積作用 `Ω × Ω` の置換指標。 -/
+theorem card_fixedBy_prod (g : G) :
+    Nat.card (MulAction.fixedBy (Ω × Ω) g) = Nat.card (MulAction.fixedBy Ω g) ^ 2 := by
+  rw [Nat.card_congr (fixedByProdEquiv g), Nat.card_prod, sq]
+
+/-- **Isaacs Problem 8A.12** (p. 236) の骨格: **置換指標 `χ` の 2 乗和は
+`Ω × Ω` 上の軌道数 × `|G|`**。したがって `χ(g)²` の平均値は `Ω × Ω` 上の軌道数に等しい。
+
+`χ²` は積作用の置換指標 (`card_fixedBy_prod`) なので, Burnside の補題
+(`Ch01.sum_card_fixedBy_nat`) をそのまま `Ω × Ω` に適用すればよい。あとは
+「`G` が 2-transitive ⟺ `Ω × Ω` の軌道がちょうど 2 個 (対角線とその外)」を見ればよい。 -/
+theorem sum_sq_card_fixedBy [Fintype G] [Finite Ω] :
+    ∑ g : G, Nat.card (MulAction.fixedBy Ω g) ^ 2
+      = Nat.card (MulAction.orbitRel.Quotient G (Ω × Ω)) * Nat.card G := by
+  rw [← OddOrder.Isaacs.Ch01.sum_card_fixedBy_nat (M := G) (β := Ω × Ω)]
+  exact (Finset.sum_congr rfl fun g _ => card_fixedBy_prod g).symm
 
 /-! ### Problem 8A.11 — 1 次元アフィン群 `AGL(1, F)` -/
 
