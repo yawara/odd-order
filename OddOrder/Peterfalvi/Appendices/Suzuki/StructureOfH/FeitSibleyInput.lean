@@ -334,6 +334,44 @@ theorem sset_isCoherent [Fintype G] [Invertible (Nat.card G : ℂ)]
       (sc.feitSibleyHypothesis ind hQ1).Q.index := sc.coprime_card_Q_index ind
   exact FeitSibley.feit_sibley_coherence _ hd hQ1odd hnil hHall
 
+/-- **Abelian subgroups of `D` are cyclic** — the standard Frobenius-complement
+property, in the only form Chapter III needs.
+
+The book invokes [H], Kapitel V, Satz 8.15 ("a fixed-point-free group has no
+non-cyclic subgroup of order `p²`").  Here it is cheaper to argue directly: a
+non-cyclic abelian `A ≤ D` acts coprimely on `Q₁` (`coprime_card_Q1_D`), so
+**Isaacs Theorem 6.21** writes `Q₁ = ⟨C_{Q₁}(a) | a ∈ A^#⟩`; but the action of
+`D` on `Q₁` is fixed-point-free (Theorem C, step 1), so every generator is
+trivial and `Q₁ = 1`, contrary to hypothesis. -/
+theorem isCyclic_of_isMulCommutative_le_D (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥) {A : Subgroup G} (hAD : A ≤ sc.toHypothesis.D)
+    [IsMulCommutative ↥A] : IsCyclic ↥A := by
+  classical
+  by_contra hnc
+  letI : MulDistribMulAction ↥A ↥sc.toHypothesis.Q1 :=
+    MulDistribMulAction.compHom _
+      (sc.toHypothesis.conjQ1ByD.comp (Subgroup.inclusion hAD))
+  haveI : Nontrivial ↥sc.toHypothesis.Q1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hQ1
+  have hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥sc.toHypothesis.Q1) :=
+    ((sc.coprime_card_Q1_D ind).symm).coprime_dvd_left (Subgroup.card_dvd_of_le hAD)
+  have htop := OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic
+    (A := ↥A) (N := ↥sc.toHypothesis.Q1) hcop hnc
+  -- fixed-point-freeness makes the generating set trivial
+  have hbot : OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure
+      (MulDistribMulAction.toMulAut ↥A ↥sc.toHypothesis.Q1) = ⊥ := by
+    rw [OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure, Subgroup.closure_eq_bot_iff]
+    rintro u ⟨a, ha1, hfix⟩
+    have haG : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
+    have hfixG : (a : G) * (u : G) * (a : G)⁻¹ = (u : G) :=
+      congrArg (fun y : ↥sc.toHypothesis.Q1 => (y : G)) hfix
+    have := sc.D_fixedPointFree_on_Q1 ind (a : G) (hAD a.2) haG (u : G) u.2 hfixG
+    exact Set.mem_singleton_iff.mpr (Subtype.ext this)
+  rw [hbot] at htop
+  obtain ⟨x, hx⟩ := exists_ne (1 : ↥sc.toHypothesis.Q1)
+  have hmem : x ∈ (⊥ : Subgroup ↥sc.toHypothesis.Q1) := by
+    rw [htop]; exact Subgroup.mem_top x
+  exact hx (Subgroup.mem_bot.mp hmem)
+
 /-! ## The conclusion of Theorem C, from a proper non-trivial normal subgroup -/
 
 /-- `Q` a `2`-group forces `Q₁ = 1`: the odd part of a `2`-group is trivial. -/
