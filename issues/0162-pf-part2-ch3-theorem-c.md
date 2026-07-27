@@ -146,7 +146,12 @@ fpf より `δ² = 1` ⟹ `|D|` 奇より `δ = 1` ⟹ `z = z⁻¹` ⟹ `z² = 1
 - [x] step 1: `(C1)` carrier `SecondCaseHypothesis` + `D` の `Q₁` 上 fpf (2026-07-28、`794473d39`)
 - [x] step 2: `Q ∩ Q^x = 1` (`x ∉ H`) — `Q_inf_map_conj_eq_bot` (2026-07-28)
 - [x] **step 3a: Feit–Sibley の `Odd |G|` を書籍どおり `Odd |Q₁|` へ弱める** (2026-07-28、`d64642791`)
-- [ ] step 3b: Feit–Sibley `Hypothesis` の構成と coherence の取得
+- [x] step 3b: Feit–Sibley `Hypothesis` の構成と coherence の取得 (2026-07-28)
+- [x] **step 4 前半: `QK` 一式 + 線形指標 `λ` の存在** (2026-07-28)
+      — `QK ⊴ H` / `QK ⊓ V = 1` / `QK ≠ H` / `[H:QK]` 奇 →
+      Feit–Thompson で可解 → `commutator (H/QK) ≠ ⊤` →
+      `exists_linearCharacter_leKer_QK`
+- [x] **step 13 (終端): `Q₁ = 1`** (2026-07-28) — `Q1_eq_bot_of_not_isSimpleGroup`
 
 ### step 3b の材料 (2026-07-28 実測)
 
@@ -175,7 +180,48 @@ fpf より `δ² = 1` ⟹ `|D|` 奇より `δ = 1` ⟹ `z = z⁻¹` ⟹ `z² = 1
 
 ⟹ 残るのは **ambient `S` の導入 + `coprime_Q_D`** が主。新 leaf
 `StructureOfH/FeitSibleyInput.lean` に置く。
-- [ ] step 4: 指標側 endgame (λ / `Ind λ = f₁ + f₂` / 次数評価)
+- [ ] step 4 後半 = 書籍 step (5)–(12): `QK` が `H` の Hall → `λ` の共役不変性 →
+      `⟨Ind λ, Ind λ⟩ = 2` → `Ind λ = f₁ + f₂` → coherence 簿記 → 次数評価で
+      `Q₁ ⊆ Ker f_j` → `G` は単純でない
+
+### 書籍 step (5) の論法 (2026-07-28 に再構成、着手前に実測で再確認すること)
+
+**主張**: `(|K|,|V|) = 1`、したがって `QK` は `H` の Hall 部分群。
+
+repo に `Coprime |K| |V|` は**無い** (grep 0 件) ので新規。書籍は 1 行
+「`(|K|,|V|) ≠ 1` なら `D` は位数 `p²` の非巡回部分群を持ち、`D` は `Q₁` に
+fpf に作用できない ([H] Kapitel V, Satz 8.15)」で済ませている。展開すると:
+
+1. `K` は巡回 (`K_isCyclic`) かつ `K ⊴ D` (`K_normal`)。
+2. `p ∣ |K|` かつ `p ∣ |V|` と仮定。`K` の Sylow `p`-部分群 `K_p` は `K` に
+   characteristic ゆえ `D`-不変、その `Ω₁(K_p) ≅ C_p` も `D`-不変。
+3. Cauchy で `y ∈ V` を位数 `p` に取る。`y` の共役作用は `Ω₁(K_p) ≅ C_p` の
+   自己同型で位数は `p` を割るが、`|Aut(C_p)| = p − 1` は `p` と互いに素なので
+   **`y` は `Ω₁(K_p)` を中心化する**。
+4. `x ∈ Ω₁(K_p)` を位数 `p` に取ると `⟨x, y⟩` は指数 `p` の可換群。
+   `K ⊓ V = 1` より `x ∉ ⟨y⟩` なので位数 `p²` の**非巡回**群 (`C_p × C_p`)。
+5. step 1 より `D` は `Q₁` に fpf 作用する。⟹ 矛盾。
+
+⚠ **書籍の [H] V.8.15 は引かなくてよい (2026-07-28 の改良)**。より短い経路が repo に在る:
+
+> **`D` の可換部分群はすべて巡回**である (Frobenius 補群の標準性質)。
+> 証明: 可換非巡回 `A ≤ D` が在るとすると、`A` は `Q₁` に**互いに素に**作用する
+> (`coprime_card_Q1_D`、step 3b で landing 済)。**Isaacs Thm 6.21**
+> (`Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic`,
+> `FrobeniusGroup.lean:1372`) より `Q₁ = ⟨C_{Q₁}(a) : a ∈ A^#⟩`。ところが fpf
+> (step 1) で各 `C_{Q₁}(a) = 1` なので `Q₁ = 1`、`Q₁ ≠ 1` に矛盾。
+
+⟹ Frobenius 補群の構造定理も Huppert の p-群補題も要らず、**既に landing 済の
+step 1 + step 3b の帰結だけ**で済む。`C_p × C_p` を作る (2)-(4) はそのまま使い、
+(5) をこの一般補題に差し替える。
+
+**実装順**: (i) `isCyclic_of_isMulCommutative_le_D` (可換 ⟹ 巡回) を一般補題として
+landing → (ii) `p ∣ |K|` かつ `p ∣ |V|` から `C_p × C_p ≤ D` を作って矛盾。
+
+**Hall 性への接続**: `|D| = |K||V|` (`K ⊓ V = 1` + `exists_mem_V_mul_mem_K`) と
+`Q ⊓ K ≤ Q ⊓ D = 1` より `|QK| = |Q||K|`、`[H:QK] = |V|`。
+`gcd(|Q|,|V|) = 1` は既済 (`coprime_card_Q_D` の帰結) なので、(5) と合わせて
+`gcd(|QK|, [H:QK]) = 1`。
 - [ ] step 5: `Q₁ = ⊥` の結論 + AxiomsCheck 登録
 
 ## 完了条件
