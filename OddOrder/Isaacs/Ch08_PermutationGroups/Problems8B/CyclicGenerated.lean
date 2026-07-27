@@ -8,7 +8,9 @@ import Mathlib.GroupTheory.GroupAction.Blocks
 import Mathlib.GroupTheory.GroupAction.Primitive
 import Mathlib.GroupTheory.GroupAction.Jordan
 import Mathlib.GroupTheory.Perm.Cycle.Type
+import OddOrder.Isaacs.Ch08_PermutationGroups.Bochert
 import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.CosetOrbits
 
 /-!
 # Isaacs Problems 8B (pp. 248–249) — `n`-巡回が生成する原始群
@@ -46,6 +48,11 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
 - `card_le_factorial_mul_factorial_of_invariant`,
   `isPretransitive_of_index_eq_of_ne_stabilizer` — **8B.10 の step 1**: `Sym(α)` の
   指数 `|α|` の部分群で点安定化群でないものは推移的。
+- `exists_perm_apply_eq_apply_eq`, `two_transitive_of_index_eq_of_ne_stabilizer`,
+  `isPreprimitive_of_index_eq_of_ne_stabilizer` — **8B.10 の step 2–3**: 同じ部分群は
+  Problem 8A.16 により 2-transitive、したがって原始的。
+- `two_mul_lt_factorial`, `card_eq_six_of_index_eq_of_ne_stabilizer` — **Problem 8B.10**:
+  `Sym(α)` に指数 `|α|` の部分群で点安定化群でないものがあれば `|α| = 6`。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -784,6 +791,139 @@ theorem isPretransitive_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm �
       _ = Nat.card α * ((S.ncard).factorial * ((Nat.card α - S.ncard)).factorial) := by ring
   exact absurd hle (Nat.not_le.mpr
     (lt_choose_of_two_le_of_le_sub_two hScard (by omega) hn4))
+
+omit [Finite α] in
+/-- `Sym(α)` は 2-transitive (相異なる 2 点の組を相異なる 2 点の組に移す)。 -/
+lemma exists_perm_apply_eq_apply_eq {a b c d : α} (hab : a ≠ b) (hcd : c ≠ d) :
+    ∃ g : Equiv.Perm α, g a = c ∧ g b = d := by
+  classical
+  have hσa : (Equiv.swap a c) a = c := Equiv.swap_apply_left a c
+  have hσb : (Equiv.swap a c) b ≠ c := fun h =>
+    hab (((Equiv.swap a c).injective (h.trans hσa.symm)).symm)
+  refine ⟨Equiv.swap ((Equiv.swap a c) b) d * Equiv.swap a c, ?_, ?_⟩
+  · rw [Equiv.Perm.mul_apply, hσa,
+      Equiv.swap_apply_of_ne_of_ne (Ne.symm hσb) hcd]
+  · rw [Equiv.Perm.mul_apply, Equiv.swap_apply_left]
+
+/-- **Isaacs Problem 8B.10 の step 2**: 指数 `|α|` の非点安定化群は **2-transitive**
+(教科書 Hint どおり Problem 8A.16 を適用)。 -/
+theorem two_transitive_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α)}
+    (hidx : H.index = Nat.card α)
+    (hns : ∀ a : α, H ≠ MulAction.stabilizer (Equiv.Perm α) a) :
+    ∀ a b c d : α, a ≠ b → c ≠ d → ∃ h : ↥H, h • a = c ∧ h • b = d := by
+  haveI := isPretransitive_of_index_eq_of_ne_stabilizer hidx hns
+  refine two_transitive_of_coprime_index
+    (fun a b c d hab hcd => exists_perm_apply_eq_apply_eq hab hcd) ?_
+  rw [hidx]
+  have h1 : 1 ≤ Nat.card α := by
+    by_contra hc
+    have : Nat.card α = 0 := by omega
+    rw [this] at hidx
+    exact absurd hidx H.index_ne_zero_of_finite
+  rcases Nat.exists_eq_add_of_le h1 with ⟨k, hk⟩
+  rw [hk]
+  simp
+
+/-- **Isaacs Problem 8B.10 の step 3**: 指数 `|α|` の非点安定化群は**原始的**
+(2-transitive から)。 -/
+theorem isPreprimitive_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α)}
+    (hidx : H.index = Nat.card α)
+    (hns : ∀ a : α, H ≠ MulAction.stabilizer (Equiv.Perm α) a) :
+    MulAction.IsPreprimitive ↥H α := by
+  haveI := isPretransitive_of_index_eq_of_ne_stabilizer hidx hns
+  haveI : MulAction.IsMultiplyPretransitive ↥H α 2 :=
+    MulAction.is_two_pretransitive_iff.mpr
+      (fun {a b c d} hab hcd =>
+        two_transitive_of_index_eq_of_ne_stabilizer hidx hns a b c d hab hcd)
+  exact MulAction.isPreprimitive_of_is_two_pretransitive inferInstance
+
+/-- `k ≥ 4` なら `2k < k!`。 -/
+lemma two_mul_lt_factorial {k : ℕ} (hk : 4 ≤ k) : 2 * k < k.factorial := by
+  obtain ⟨j, hj⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
+  have h6 : 6 ≤ j.factorial := by
+    calc 6 = Nat.factorial 3 := rfl
+      _ ≤ j.factorial := Nat.factorial_le (by omega)
+  rw [hj, Nat.factorial_succ]
+  calc 2 * (j + 1) < 6 * (j + 1) := by omega
+    _ ≤ (j + 1) * j.factorial := by
+        rw [Nat.mul_comm (j + 1)]
+        exact Nat.mul_le_mul_right _ h6
+
+/-- **Isaacs Problem 8B.10** (p. 249) 🎉: `Sym(α)` に指数 `|α|` の部分群で点安定化群で
+ないものがあれば **`|α| = 6`**。
+
+step 1–3 で `H` は原始的。`A_n ≤ H` なら `[Sym : A_n] = 2` から `|α| ≤ 2`, そうでなければ
+**Bochert** で `⌊(|α|+1)/2⌋! ≤ |α|` となり `|α| ≤ 6`。一方 `H` の推移性から
+`|α| ∣ |H| = (|α|-1)!` で, `|α| = 2,3,4,5` はこれを満たさない。`|α| = 1` は `H` が
+点安定化群になってしまうので除外され, `|α| = 6` だけが残る。 -/
+theorem card_eq_six_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α)}
+    (hidx : H.index = Nat.card α)
+    (hns : ∀ a : α, H ≠ MulAction.stabilizer (Equiv.Perm α) a) :
+    Nat.card α = 6 := by
+  classical
+  haveI : Fintype α := Fintype.ofFinite α
+  have hn1 : 1 ≤ Nat.card α := by
+    by_contra hc
+    have h0 : Nat.card α = 0 := by omega
+    rw [h0] at hidx
+    exact H.index_ne_zero_of_finite hidx
+  haveI := isPretransitive_of_index_eq_of_ne_stabilizer hidx hns
+  have hprim := isPreprimitive_of_index_eq_of_ne_stabilizer hidx hns
+  -- `|H| = (n-1)!`
+  have hHcard : Nat.card ↥H * Nat.card α = (Nat.card α).factorial := by
+    have h1 : Nat.card ↥H * H.index = Nat.card (Equiv.Perm α) := Subgroup.card_mul_index H
+    rw [hidx, Nat.card_perm] at h1
+    exact h1
+  have hfact : (Nat.card α).factorial = Nat.card α * (Nat.card α - 1).factorial := by
+    obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le hn1
+    rw [hk, Nat.add_comm]
+    simp [Nat.factorial_succ]
+  have hHfact : Nat.card ↥H = (Nat.card α - 1).factorial := by
+    have heq : Nat.card ↥H * Nat.card α = (Nat.card α - 1).factorial * Nat.card α := by
+      rw [hHcard, hfact, Nat.mul_comm]
+    exact Nat.eq_of_mul_eq_mul_right (by omega) heq
+  -- 推移性から `n ∣ |H| = (n-1)!`
+  obtain ⟨a⟩ : Nonempty α := (Nat.card_pos_iff.mp (show 0 < Nat.card α from hn1)).1
+  have hdvd : Nat.card α ∣ (Nat.card α - 1).factorial := by
+    rw [← hHfact, ← MulAction.index_stabilizer_of_transitive (↥H) a]
+    exact Subgroup.index_dvd_card _
+  -- `n ≤ 6`
+  have hle6 : Nat.card α ≤ 6 := by
+    by_cases halt : alternatingGroup α ≤ H
+    · rcases Nat.lt_or_ge (Nat.card α) 2 with h | h
+      · omega
+      · haveI : Nontrivial α := by
+          by_contra hcon
+          rw [not_nontrivial_iff_subsingleton] at hcon
+          have hc1 : Nat.card α = 1 := Nat.card_eq_one_iff_unique.mpr ⟨hcon, ⟨a⟩⟩
+          omega
+        have := Subgroup.index_dvd_of_le halt
+        rw [alternatingGroup.index_eq_two, hidx] at this
+        have := Nat.le_of_dvd (by omega) this
+        omega
+    · have hb := factorial_le_index_of_isPreprimitive hprim halt
+      rw [hidx] at hb
+      by_contra hc
+      have hk4 : 4 ≤ (Nat.card α + 1) / 2 := by omega
+      have := two_mul_lt_factorial hk4
+      omega
+  -- 数値で絞る
+  have hcases : Nat.card α = 1 ∨ Nat.card α = 6 := by
+    have h2 : Nat.card α ≠ 2 := fun h => by rw [h] at hdvd; revert hdvd; decide
+    have h3 : Nat.card α ≠ 3 := fun h => by rw [h] at hdvd; revert hdvd; decide
+    have h4 : Nat.card α ≠ 4 := fun h => by rw [h] at hdvd; revert hdvd; decide
+    have h5 : Nat.card α ≠ 5 := fun h => by rw [h] at hdvd; revert hdvd; decide
+    omega
+  rcases hcases with h1 | h6
+  · exfalso
+    haveI : Subsingleton α := (Nat.card_eq_one_iff_unique.mp h1).1
+    refine hns a ?_
+    refine le_antisymm (fun g _ => MulAction.mem_stabilizer_iff.mpr (Subsingleton.elim _ _)) ?_
+    intro g _
+    have hg : g = 1 := Equiv.ext fun x => Subsingleton.elim _ _
+    rw [hg]
+    exact H.one_mem
+  · exact h6
 
 end IndexN
 
