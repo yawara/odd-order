@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S08_SixFiveGeneral
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
+import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
 
 /-!
 # Peterfalvi (6.6) for a general kernel: the `X`-set and its degree data
@@ -322,5 +323,74 @@ theorem exists_xBaseBlock_anchor_index {Z : Subgroup ↥L}
     exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hφ)
   obtain ⟨i₁, hi₁⟩ := hφpair
   exact ⟨i₁, by rw [show (χmem i₁ : ClassFunction ↥L ℂ) = φ from hi₁]; exact hφ⟩
+
+/-! ### The `(6.6)` X-chain fold, `τ`-general -/
+
+open scoped Classical in
+/-- **The Peterfalvi (6.6) X-chain fold for a general kernel, with an arbitrary `τ`.**
+
+The book's proof of the coherence half (p. 32) sorts `𝒳` by degree, starts from the
+equal-minimal-degree block `𝒮₀` and adjoins conjugate pairs of strictly larger degree one at a
+time.  This packages that fold: given base coherence `h0` and a per-step adjoining `hstep`, `𝒳` is
+coherent.
+
+**Every ingredient is already `τ`-generic**, which is why no Dade datum appears:
+
+* the conjugate-pair cover `exists_conjugatePairCover` is a statement about the *sets* `𝒳`, `𝒮₀`
+  in an abstract group — no isometry at all;
+* the accumulator fold `S07.coherentOfPairChainCover` takes `IsCoherent τ` for the ambient `τ`;
+* the `𝒳`/`𝒮₀` side conditions (finite, conjugation-closed, real-free) are the general-kernel
+  lemmas above.
+
+The Sibley `K = H` instance is `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X`,
+whose `τ` is pinned to `dadeIntegralCharacterMap`.  Per-step, the caller supplies the adjoining —
+in the intended application through the `τ`-general (5.6) engine `S07.xAdjoinStepW_general`
+(issue 0154), so the whole chain stays Dade-free (issue 0155). -/
+noncomputable def xSet_isCoherent_of_adjoinSteps
+    {A₀ : Set ↥L} {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G}
+    (hodd : Odd (Nat.card ↥L)) {Z : Subgroup ↥L}
+    (hirr : ∀ φ ∈ xSet K Z, IsIrreducibleCharacter φ) (hXne : (xSet K Z).Nonempty)
+    (h0 : OddOrder.Peterfalvi.S07.IsCoherent τ (xBaseBlock K Z) A₀)
+    (hstep : ∀ (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆ xSet K Z) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      (∀ φ ∈ xSet K Z, φ ∈ xBaseBlock K Z ∨
+        ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j) →
+      ∀ i, i < N → OddOrder.Peterfalvi.S07.IsCoherent τ
+          (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i) A₀ →
+        OddOrder.Peterfalvi.S07.IsCoherent τ
+          (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i ∪
+            {(χs i : ClassFunction ↥L ℂ), (χs i : ClassFunction ↥L ℂ).conj}) A₀) :
+    OddOrder.Peterfalvi.S07.IsCoherent τ (xSet K Z) A₀ := by
+  classical
+  choose e pair N hpairχ hsurj hpairs hcoverIdx hpair0Raw hpair1Raw hdisj hmono using
+    exists_conjugatePairCover (X := xSet K Z) (S₀ := xBaseBlock K Z)
+      (xSet_finite (K := K) Z) (xSet_closedUnderConjugate (K := K) Z)
+      (xSet_hasNoRealCharacters (K := K) hodd Z) hirr
+      (xBaseBlock_closedUnderConjugate (K := K) Z)
+  let χ0 : IrreducibleCharacter ↥L := ⟨Classical.choose hXne, hirr _ (Classical.choose_spec hXne)⟩
+  let χs : ℕ → IrreducibleCharacter ↥L := fun i => if hi : i < N then hpairχ i hi else χ0
+  have hpair0 : ∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ) := by
+    intro i hi; rw [hpair0Raw i hi]; simp [χs, hi]
+  have hpair1 : ∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj := by
+    intro i hi; rw [hpair1Raw i hi]; simp [χs, hi]
+  have hcover : ∀ φ ∈ xSet K Z, φ ∈ xBaseBlock K Z ∨
+      ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j := by
+    intro φ hφ
+    obtain ⟨i, hi⟩ := hsurj φ hφ
+    have hci := hcoverIdx i
+    rw [hi] at hci
+    exact hci
+  refine OddOrder.Peterfalvi.S07.coherentOfPairChainCover pair N
+    (xBaseBlock_subset (K := K) Z) hpairs hcover h0 (fun i hi hcoh => ?_)
+  rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair (hpair0 i hi) (hpair1 i hi)]
+  exact hstep pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi hcoh
 
 end OddOrder.Peterfalvi.S08

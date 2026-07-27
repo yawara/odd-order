@@ -3796,6 +3796,16 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.natDegree_le_of_xBaseBlock_anchor
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.two_le_xBaseBlock_ncard
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_xBaseBlock_anchor_index
+-- **The (6.6) X-chain fold for a general kernel, with an arbitrary `τ`** (issue 0155 step 2):
+-- sort `𝒳` by degree, start from the equal-minimal-degree block `𝒮₀`, adjoin conjugate pairs of
+-- strictly larger degree one at a time.  **No Dade datum appears** — the conjugate-pair cover
+-- `exists_conjugatePairCover` is a statement about the *sets* in an abstract group, the
+-- accumulator fold `S07.coherentOfPairChainCover` is already stated for an arbitrary `τ`, and the
+-- `𝒳`/`𝒮₀` side conditions are the general-kernel lemmas above.  The Sibley
+-- `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X` is this with `τ` pinned to
+-- `dadeIntegralCharacterMap`.  Per-step adjoining is the caller's, intended to route through the
+-- `τ`-general (5.6) engine `S07.xAdjoinStepW_general` (issue 0154).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xSet_isCoherent_of_adjoinSteps
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.
