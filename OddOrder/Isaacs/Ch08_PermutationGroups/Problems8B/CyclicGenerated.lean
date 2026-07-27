@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 import Mathlib.Data.ZMod.Basic
 import Mathlib.GroupTheory.GroupAction.Blocks
 import Mathlib.GroupTheory.GroupAction.Primitive
+import Mathlib.GroupTheory.GroupAction.Jordan
 import Mathlib.GroupTheory.Perm.Cycle.Type
+import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
 
 /-!
 # Isaacs Problems 8B (pp. 248–249) — `n`-巡回が生成する原始群
@@ -26,13 +28,19 @@ import Mathlib.GroupTheory.Perm.Cycle.Type
   `(0, 1, …, m-1)` (残りは固定) と, その冪が先頭区間上で推移的なこと。
 - `isPreprimitive_zpowers_mCycle_sup_zpowers_addRight_one` — **8B.9 の step 1**:
   `m`-巡回と `n`-巡回が生成する群は原始的。
+- `zPerm`, `zPerm_apply_of_lt` / `_of_mem` / `_top`, `zPerm_apply_eq_self_iff`,
+  `mCycle_apply_eq_self_iff` — **8B.9 の step 2**: `z := y⁻¹ x` は巡回
+  `(m-1, m, …, n-1)` で, `y` と `z` の共通可動点は `m-1` ただ一つ。
+- `alternatingGroup_le_zpowers_mCycle_sup_zpowers_addRight_one` — **8B.9 の step 2–4**:
+  `⁅y, z⁆` は 3-cycle (Isaacs Lem 8.25) なので Jordan の定理で交代群を含む。
+  ⚠ `S_n` / `A_n` の判定 (step 5, 符号) は未形式化。
 -/
 
 namespace OddOrder.Isaacs.Ch08
 
 open MulAction
 
-open scoped Pointwise
+open scoped Pointwise commutatorElement
 
 section /- Problems 8B (pp. 248-249) -/
 
@@ -341,6 +349,132 @@ theorem isPreprimitive_zpowers_mCycle_sup_zpowers_addRight_one {n m : ℕ} [NeZe
     exact Equiv.Perm.zpow_apply_eq_self_of_apply_eq_self (mCycle_apply_of_le hmn.le hc) k
   · intro c hc d hd
     exact exists_mem_zpowers_mCycle_smul hmn.le (by omega) hc hd
+
+/-! ### `z := y⁻¹ x` は巡回 `(m-1, m, …, n-1)` -/
+
+lemma add_one_eq_zero_of_val_succ {c : ZMod n} (h : c.val + 1 = n) : c + (1 : ZMod n) = 0 := by
+  have hc : c + 1 = ((c.val + 1 : ℕ) : ZMod n) := by
+    push_cast
+    rw [ZMod.natCast_rightInverse c]
+  rw [hc, h, ZMod.natCast_self]
+
+/-- 8B.9 の補助置換 `z := y⁻¹ x`。 -/
+def zPerm (n m : ℕ) [NeZero n] (hm : m ≤ n) : Equiv.Perm (ZMod n) :=
+  (mCycle n m hm)⁻¹ * Equiv.addRight (1 : ZMod n)
+
+lemma zPerm_apply (hm : m ≤ n) (c : ZMod n) : zPerm n m hm c = mCycleInv n m (c + 1) := rfl
+
+/-- `c.val < m - 1` の点は `z` の固定点。 -/
+lemma zPerm_apply_of_lt (hm : m ≤ n) {c : ZMod n} (h : c.val + 1 < m) :
+    zPerm n m hm c = c := by
+  have hlt : c.val + 1 < n := by omega
+  have hval : (c + 1).val = c.val + 1 := val_add_one_of_lt hlt
+  have hne : c + 1 ≠ 0 := fun hc => by rw [hc, ZMod.val_zero] at hval; omega
+  rw [zPerm_apply]
+  unfold mCycleInv
+  rw [if_neg hne, if_pos (by omega : (c + 1).val < m)]
+  ring
+
+/-- `m - 1 ≤ c.val ≤ n - 2` の点では `z` は `+1`。 -/
+lemma zPerm_apply_of_mem (hm : m ≤ n) {c : ZMod n} (h1 : m ≤ c.val + 1)
+    (h2 : c.val + 1 < n) : zPerm n m hm c = c + 1 := by
+  have hval : (c + 1).val = c.val + 1 := val_add_one_of_lt h2
+  have hne : c + 1 ≠ 0 := fun hc => by rw [hc, ZMod.val_zero] at hval; omega
+  rw [zPerm_apply]
+  unfold mCycleInv
+  rw [if_neg hne, if_neg (by omega : ¬ (c + 1).val < m)]
+
+/-- 最後の点 `n-1` は `m-1` に送られる。 -/
+lemma zPerm_apply_top (hm : m ≤ n) {c : ZMod n} (h : c.val + 1 = n) :
+    zPerm n m hm c = ((m - 1 : ℕ) : ZMod n) := by
+  rw [zPerm_apply, add_one_eq_zero_of_val_succ h]
+  unfold mCycleInv
+  rw [if_pos rfl]
+
+/-- `z` が動かす点はちょうど `{c | m - 1 ≤ c.val}`。 -/
+lemma zPerm_apply_eq_self_iff (hm : 2 ≤ m) (hmn : m < n) {c : ZMod n} :
+    zPerm n m hmn.le c = c ↔ c.val + 1 < m := by
+  have hcv : c.val < n := ZMod.val_lt c
+  constructor
+  · intro hfix
+    by_contra hcon
+    rcases Nat.lt_or_ge (c.val + 1) n with h2 | h2
+    · rw [zPerm_apply_of_mem hmn.le (by omega) h2] at hfix
+      have := val_add_one_of_lt h2
+      rw [hfix] at this
+      omega
+    · have hn : c.val + 1 = n := by omega
+      rw [zPerm_apply_top hmn.le hn] at hfix
+      have hmv : (((m - 1 : ℕ) : ZMod n)).val = m - 1 := ZMod.val_natCast_of_lt (by omega)
+      rw [hfix] at hmv
+      omega
+  · exact zPerm_apply_of_lt hmn.le
+
+/-- `y` が動かす点はちょうど `{c | c.val < m}`。 -/
+lemma mCycle_apply_eq_self_iff (hm : 2 ≤ m) (hmn : m < n) {c : ZMod n} :
+    mCycle n m hmn.le c = c ↔ m ≤ c.val := by
+  have hcv : c.val < n := ZMod.val_lt c
+  constructor
+  · intro hfix
+    by_contra hcon
+    rw [mCycle_apply] at hfix
+    unfold mCycleFun at hfix
+    by_cases h1 : c.val + 1 < m
+    · rw [if_pos h1] at hfix
+      have := val_add_one_of_lt (show c.val + 1 < n by omega)
+      rw [hfix] at this
+      omega
+    · have h2 : c.val + 1 = m := by omega
+      rw [if_neg h1, if_pos h2] at hfix
+      rw [← hfix, ZMod.val_zero] at h2
+      omega
+  · exact mCycle_apply_of_le hmn.le
+
+/-! ### 3-cycle と Jordan の定理 -/
+
+/-- **Isaacs Problem 8B.9 の step 2–4**: `m`-巡回と `n`-巡回が生成する群は
+**交代群を含む**。
+
+`y = m`-巡回, `z = y⁻¹ x` とすると `y` の可動点は `{c | c.val < m}`,
+`z` の可動点は `{c | m - 1 ≤ c.val}` なので **共通可動点は `m-1` ただ一つ**。
+Isaacs Lem 8.25 (`isThreeCycle_commutator_of_unique_common_moved`) で `⁅y, z⁆` は
+3-cycle になり, 原始性 (step 1) と合わせて Jordan の定理が使える。 -/
+theorem alternatingGroup_le_zpowers_mCycle_sup_zpowers_addRight_one {n m : ℕ} [NeZero n]
+    (hm : 2 ≤ m) (hmn : m < n) :
+    alternatingGroup (ZMod n) ≤ Subgroup.zpowers (mCycle n m hmn.le) ⊔
+      Subgroup.zpowers (Equiv.addRight (1 : ZMod n)) := by
+  classical
+  have hav : (((m - 1 : ℕ) : ZMod n)).val = m - 1 := ZMod.val_natCast_of_lt (by omega)
+  have hya : mCycle n m hmn.le ((m - 1 : ℕ) : ZMod n) ≠ ((m - 1 : ℕ) : ZMod n) := by
+    rw [Ne, mCycle_apply_eq_self_iff hm hmn, hav]
+    omega
+  have hza : zPerm n m hmn.le ((m - 1 : ℕ) : ZMod n) ≠ ((m - 1 : ℕ) : ZMod n) := by
+    rw [Ne, zPerm_apply_eq_self_iff hm hmn, hav]
+    omega
+  have huniq : ∀ b : ZMod n, b ≠ ((m - 1 : ℕ) : ZMod n) →
+      mCycle n m hmn.le b = b ∨ zPerm n m hmn.le b = b := by
+    intro b hb
+    rcases Nat.lt_or_ge (b.val + 1) m with h | h
+    · exact Or.inr (zPerm_apply_of_lt hmn.le h)
+    · rcases Nat.lt_or_ge b.val m with h2 | h2
+      · exact absurd (by rw [show m - 1 = b.val by omega, ZMod.natCast_rightInverse b]) hb
+      · exact Or.inl (mCycle_apply_of_le hmn.le h2)
+  have h3 : (⁅mCycle n m hmn.le, zPerm n m hmn.le⁆ : Equiv.Perm (ZMod n)).IsThreeCycle :=
+    isThreeCycle_commutator_of_unique_common_moved hya hza huniq
+  have hyG : mCycle n m hmn.le ∈ Subgroup.zpowers (mCycle n m hmn.le) ⊔
+      Subgroup.zpowers (Equiv.addRight (1 : ZMod n)) :=
+    Subgroup.mem_sup_left (Subgroup.mem_zpowers _)
+  have hxG : Equiv.addRight (1 : ZMod n) ∈ Subgroup.zpowers (mCycle n m hmn.le) ⊔
+      Subgroup.zpowers (Equiv.addRight (1 : ZMod n)) :=
+    Subgroup.mem_sup_right (Subgroup.mem_zpowers _)
+  have hzG : zPerm n m hmn.le ∈ Subgroup.zpowers (mCycle n m hmn.le) ⊔
+      Subgroup.zpowers (Equiv.addRight (1 : ZMod n)) :=
+    Subgroup.mul_mem _ (Subgroup.inv_mem _ hyG) hxG
+  refine Equiv.Perm.alternatingGroup_le_of_isPreprimitive_of_isThreeCycle_mem
+    (isPreprimitive_zpowers_mCycle_sup_zpowers_addRight_one hm hmn) h3 ?_
+  rw [commutatorElement_def]
+  exact Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.mul_mem _ hyG hzG)
+    (Subgroup.inv_mem _ hyG)) (Subgroup.inv_mem _ hzG)
 
 end MCycle
 
