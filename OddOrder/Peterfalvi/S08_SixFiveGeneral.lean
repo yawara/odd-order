@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
+import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 
 /-!
 # Peterfalvi (6.5) for a general kernel: the (6.3.b) coherence input
@@ -339,5 +340,64 @@ theorem inducedKernelFamily_isCoherent_of_isMulCommutative_quotient
     (fun a ha b hb => RD.tau_mem_ZIrr (hmemspan a ha b hb))
     (fun a ha b hb => by rw [hdeg a ha, hdeg b hb])
     (fun a ha => by rw [hdeg a ha]; exact index_ne_zero_cast) h1A hsuppdiff
+
+/-! ### Peterfalvi (6.5)(a) for a general kernel -/
+
+/-- **Peterfalvi (6.5)(a), index bound**: `|K : H₁| ≤ 4|L:K|² + 1`.
+
+*Assume Hypothesis (6.4) and that `S(M)` is not coherent.  Then ... `|K:H₁| ≤ 4|L:K|²+1`.*
+(p. 31.)  The book's proof is one line: *"Hypothesis (a) of Theorem (6.3) holds with `H = K`.
+Since `K/H₁` is abelian and non-trivial, (6.3.b) holds by (5.7).  Therefore, from Theorem (6.3),
+we obtain `|K:H₁| ≤ 4|L:K|²+1`."*  Here that is the contrapositive of `six_three_of_imageData`
+at `H = K`, whose coherence input `(6.3.b)` is
+`inducedKernelFamily_isCoherent_of_isMulCommutative_quotient` — the general-kernel (5.7) step —
+and whose `S(H₁) ≠ ∅` witness comes from the solvability of `K`
+(`commutator_quotient_ne_top_of_lt`).
+
+The abelianness of `K/H₁` is Hypothesis (6.4)(c) (`H₁/M = [K/M, K/M]`), carried here as the
+instance `[IsMulCommutative (↥K ⧸ H₁.subgroupOf K)]`.
+
+⚠ `K` is taken nilpotent where the book takes `K/M` nilpotent — inherited from
+`six_three_of_imageData` (the two agree at `M = 1`, which is the case (6.6) uses). -/
+theorem relIndex_le_of_not_isCoherent
+    [IsSolvable ↥K] [Group.IsNilpotent ↥K] (RD : InducedFamilyImageData A₀ K)
+    (hodd : Odd (Nat.card ↥L))
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
+    {M H₁ : Subgroup ↥L} [M.Normal] [H₁.Normal]
+    [IsMulCommutative (↥K ⧸ H₁.subgroupOf K)]
+    (hMH₁ : M ≤ H₁) (hH₁K : H₁ < K)
+    (hirr : ∀ φ ∈ inducedKernelFamily K H₁, IsIrreducibleCharacter φ)
+    (hncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent RD.tau
+      (inducedKernelFamily K M) A₀)) :
+    H₁.relIndex K ≤ 4 * K.index ^ 2 + 1 := by
+  haveI : (H₁.subgroupOf K).Normal := ‹H₁.Normal›.subgroupOf K
+  by_contra hcon
+  push Not at hcon
+  refine hncoh (six_three_of_imageData RD hodd hKsupp h1A ‹K.Normal› hMH₁ hH₁K le_rfl
+    (inducedKernelFamily_isCoherent_of_isMulCommutative_quotient RD hodd hKsupp h1A
+      (inducedKernelFamily_nonempty_of_commutator_ne_top
+        (commutator_quotient_ne_top_of_lt hH₁K)) hirr) ?_)
+  simpa [Subgroup.relIndex, Subgroup.index] using hcon
+
+/-- **Peterfalvi (6.5)(a), chief-factor clause**: `K/H₁` is a chief factor of `L`.
+
+The group-theoretic half (`isChiefFactor_of_relIndex_le_of_odd_dvd`) needs only the (6.4)(c)
+Frobenius divisibility `hdvd` and the index bound of `relIndex_le_of_not_isCoherent`; the whole
+character-theoretic content of (6.5)(a) is in that bound. -/
+theorem isChiefFactor_of_not_isCoherent
+    [IsSolvable ↥K] [Group.IsNilpotent ↥K] (RD : InducedFamilyImageData A₀ K)
+    (hodd : Odd (Nat.card ↥L))
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
+    {M H₁ : Subgroup ↥L} [M.Normal] [H₁.Normal]
+    [IsMulCommutative (↥K ⧸ H₁.subgroupOf K)]
+    (hMH₁ : M ≤ H₁) (hH₁K : H₁ < K)
+    (hdvd : ∀ W : Subgroup ↥L, W.Normal → H₁ ≤ W → W ≤ K →
+      K.index ∣ W.relIndex K - 1 ∧ K.index ∣ H₁.relIndex W - 1)
+    (hirr : ∀ φ ∈ inducedKernelFamily K H₁, IsIrreducibleCharacter φ)
+    (hncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent RD.tau
+      (inducedKernelFamily K M) A₀)) :
+    OddOrder.GroupTheory.IsChiefFactor K H₁ :=
+  isChiefFactor_of_relIndex_le_of_odd_dvd hodd hH₁K hdvd
+    (relIndex_le_of_not_isCoherent RD hodd hKsupp h1A hMH₁ hH₁K hirr hncoh)
 
 end OddOrder.Peterfalvi.S08

@@ -3743,6 +3743,14 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.inducedKernelFamily_apply_one_eq_index_of_isMulCommutative_quotient
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.inducedKernelFamily_isCoherent_of_isMulCommutative_quotient
+-- **(6.5)(a) for a general kernel** (`S08_SixFiveGeneral`): the index bound
+-- `|K:H₁| ≤ 4|L:K|² + 1` is the contrapositive of `six_three_of_imageData` at `H = K`, fed by the
+-- (6.3.b) coherence above; the chief-factor clause then follows from the already-general
+-- `isChiefFactor_of_relIndex_le_of_odd_dvd` (odd order + the (6.4.c) Frobenius divisibility).
+-- ⚠ `K` nilpotent where the book has `K/M` nilpotent (inherited from `six_three_of_imageData`;
+-- the two agree at `M = 1`, the case (6.6) uses).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.relIndex_le_of_not_isCoherent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isChiefFactor_of_not_isCoherent
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.
