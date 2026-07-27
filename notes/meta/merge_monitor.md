@@ -6,6 +6,32 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-27 昼 hub 自走 tick (`/loop` self-pacing, ユーザー「自走してください」) — 🎯🎯
+> **Peterfalvi (6.5) を一般 kernel で完成** (a)(b)(c) + stale ラベル訂正 + lane a 2 回合流。
+> push →7ab50c06c**。
+> ① **stale だった「最大の残債」ラベルを実測で撤回**: survey の「(6.2)–(6.6) の general-(6.1) 形 =
+> 最大かつ唯一の深い残債」は **issue 0153/0154 (07-27 早朝 landing) で既に解消済**だった —
+> `six_two_of_imageData` / `six_three_of_imageData` が oracle 無しの一般 `K` 版で、`#print axioms`
+> 実測で axiom-clean。AxiomsCheck の「(10.10) は sorried ゆえ登録しない」NOTE も 3 点とも stale
+> ((10.10) は `no_typeV_maximal_unconditional` で landing 済、`S12.Hypothesis.isTypeIIIorIV` は
+> **存在すらしない**) → 撤去して `coprime_card_W1_derived` を登録。
+> ② **新 leaf `S08_SixFiveGeneral.lean` (525 行)** で **(6.5) を一般の可解正規 `K` で完成**:
+> **(5.3.a) を任意 `τ` で** (`nonempty_characterDifferenceImage_of_irreducible`) / **`𝒮(X)` の
+> Hypothesis (5.2)** ((5.2.e) は transport でなく書籍 (5.3.a) の論法で**導出**) / **(6.3.b) via
+> (5.7)** (`K/X` 可換 ⟹ 全 member 次数 `|L:K|`) / **(6.5)(a)** 指数界 (= (6.3) の対偶) + chief
+> factor / **(6.5)(b)** `p` 群 / **(6.5)(c)** `|L:K| ∤ p−1`。新 assert 9 本すべて axiom-clean。
+> ③ **carrier を書籍準拠に修正**: `InducedFamilyImageData` に **`tau_apply_one`** を追加 —
+> 書籍 (5.2.b) の値域は `ℤ[Irr G, G^#]` (**1 で消える**) なのに repo は `ℤ[Irr G]` しか課して
+> おらず carrier が弱かった。§11 Dade witness (唯一の constructor) は
+> `dadeIntegralCharacterMap_apply_one_eq_zero` で discharge。これが無いと (5.3.a) の「2 元の符号が
+> **逆**」が出ない (`τ(χ−χ̄) = μ + ν` を排除できない)。
+> ④ **lane a を 2 回合流** (19 commits, Isaacs 6C.2 完成 → Ch.6 演習 全 22 問 完済 → Ch.7 着手 7A.1)。
+> gate: 各 tick フルビルド green (最終 4838 jobs)、AxiomsCheck OK、`--strict` EXIT=0、
+> `bin/count-sorry` = 1 (凍結 Q₈) 非退行、全 push 済。
+> **残る Pf 特殊化債務 = (6.6) coherence 半分 1 件**(上流は本 tick で全部そろった; 詳細は survey
+> の「(6.5)/(6.6) の general-`K` 化」節)。⚠ 教訓 (2 tick 連続): survey の「最大の残債」ラベルすら
+> **1 日で陳腐化する**。着手前に `#print axioms` / grep で実測すること。
+
 > **▶▶ 2026-07-27 朝 hub 自走 tick (`/loop` self-pacing, ユーザー「自走してください」) — 🎯🎯
 > Peterfalvi 特殊化債務キャンペーンの棚卸し完了: 残 1 件。push →97dccef9e**。
 > ① **実際に一般化した 2 件**: **(6.6) X-characterization** を一般 kernel `K` へ

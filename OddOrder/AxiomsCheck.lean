@@ -202,6 +202,7 @@ import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
+import OddOrder.Peterfalvi.S08_SixFiveGeneral
 import OddOrder.Peterfalvi.S13_SixTwoImageData
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
@@ -3718,6 +3719,49 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_imageData
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_two_of_imageData
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_of_imageData
+-- **(6.3.b) for a general kernel: `𝒮(X)` is coherent when `K/X` is abelian**
+-- (`S08_SixFiveGeneral`) — the one sentence Peterfalvi's proof of (6.5)(a) opens with
+-- ("*Since `K/H₁` is abelian and non-trivial, (6.3.b) holds by (5.7)*", p. 31), now available for
+-- an arbitrary solvable normal `K` instead of only the Sibley `K = H`.
+--   * `nonempty_characterDifferenceImage_of_irreducible` = Peterfalvi (5.3.a) for an arbitrary
+--     `τ`: for an irreducible non-real `χ`, `‖τ(χ − χ̄)‖² = 2`, so `τ(χ − χ̄)` is a signed pair of
+--     distinct irreducibles (`dirr_small_norm`), and evaluating at `1` (the book's (5.2.b)
+--     codomain `ℤ[Irr G, G^#]`, now carried as the `tau_apply_one` field of
+--     `InducedFamilyImageData`, discharged for the §11 Dade witness by
+--     `dadeIntegralCharacterMap_apply_one_eq_zero`) forces the two signs to be **opposite** —
+--     i.e. the two-element `R(χ) = {μ, −ν}` shape this repository's `S07.Hypothesis` takes.
+--   * `InducedFamilyImageData.hypothesis` = Hypothesis (5.2) for the sub-family `𝒮(X)`; (5.2.e)
+--     is *derived* (`tau_conjDiff_inner_eq_zero_of_orthogonal` + Peterfalvi (4.1) at `u = v = 1`)
+--     rather than transported, exactly as in the book's (5.3.a) proof.
+--   * `inducedKernelFamily_apply_one_eq_index_of_isMulCommutative_quotient`: a source trivial on
+--     `X` inflates from the abelian `K/X`, hence is linear, so every member has degree `|L:K|`.
+--   * `inducedKernelFamily_isCoherent_of_isMulCommutative_quotient` = the (5.7) application.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.nonempty_characterDifferenceImage_of_irreducible
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.hypothesis
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.inducedKernelFamily_apply_one_eq_index_of_isMulCommutative_quotient
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.inducedKernelFamily_isCoherent_of_isMulCommutative_quotient
+-- **(6.5)(a) for a general kernel** (`S08_SixFiveGeneral`): the index bound
+-- `|K:H₁| ≤ 4|L:K|² + 1` is the contrapositive of `six_three_of_imageData` at `H = K`, fed by the
+-- (6.3.b) coherence above; the chief-factor clause then follows from the already-general
+-- `isChiefFactor_of_relIndex_le_of_odd_dvd` (odd order + the (6.4.c) Frobenius divisibility).
+-- ⚠ `K` nilpotent where the book has `K/M` nilpotent (inherited from `six_three_of_imageData`;
+-- the two agree at `M = 1`, the case (6.6) uses).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.relIndex_le_of_not_isCoherent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isChiefFactor_of_not_isCoherent
+-- **(6.5)(b),(c) for a general kernel** (at `M = 1`, the case (6.6) uses).  (b) `K` is a
+-- `p`-group: the group-theoretic core `isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization`
+-- was already general, and its one character-theoretic input is the (6.5)(a) bound above; the
+-- fixed-point-free `R`-action on `Abelianization K = K/H₁` (`|R| = |L:K|`) is what Hypothesis
+-- (6.4.c) supplies ("`L/H₁` is a Frobenius group with kernel `K/H₁`").  (c) `|L:K| ∤ p − 1`: a
+-- `p`-group with `|K:K′| < p²` has cyclic abelianization, hence (nilpotent) is abelian
+-- (`commutator_eq_bot_of_isNilpotent_of_isCyclic_quotient`), so `p² ≤ |K:K′|`, and
+-- `six_five_c_arith` contradicts the (6.5)(a) bound.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.card_abelianization_eq_relIndex
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_prime_isPGroup_of_not_isCoherent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.not_dvd_sub_one_of_not_isCoherent
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.
