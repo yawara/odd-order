@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.ArrowKernelIndex
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.DegreeEight
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.PrimeIndexCore
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.RankBound
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.RankThree
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
@@ -23,4 +24,6 @@ topic 別 leaf にある (下流は本 module を import するだけでよい)�
   原始的で `m > 1` なら `k_m > m`。
 * `Problems8D/RankThree.lean` — **8D.5**: rank 3 で subdegree `1 < m < n` が互いに素なら
   `(m+1) ∣ n`。
+* `Problems8D/PrimeIndexCore.lean` — **8D.6 の Hint**: `X ≤ Y`, `|Y : X| = p` (素数) なら
+  `X` の `p`-元は `X` の `Y`-核に入り, したがって `O^{p'}(X) ◁ Y`。
 -/
