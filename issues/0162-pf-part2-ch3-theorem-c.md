@@ -180,7 +180,12 @@ fpf より `δ² = 1` ⟹ `|D|` 奇より `δ = 1` ⟹ `z = z⁻¹` ⟹ `z² = 1
 
 ⟹ 残るのは **ambient `S` の導入 + `coprime_Q_D`** が主。新 leaf
 `StructureOfH/FeitSibleyInput.lean` に置く。
-- [ ] step 4 後半 = 書籍 step (5)–(12): `QK` が `H` の Hall → `λ` の共役不変性 →
+- [x] **step (5) 完結 (2026-07-28)**: `(|K|,|V|) = 1` → `QK` は `H` の Hall
+      — `coprime_card_K_V` / `card_D_eq` / `card_QK_eq` /
+      `index_QK_subgroupOf_eq_card_V` / `coprime_card_QK_index`。
+      ⚠ [H] V.8.15 は不要だった (`isCyclic_of_isMulCommutative_le_D` +
+      Fermat の小定理で代替)。
+- [ ] step 4 後半 = 書籍 step (6)–(12): `QK` が `H` の Hall → `λ` の共役不変性 →
       `⟨Ind λ, Ind λ⟩ = 2` → `Ind λ = f₁ + f₂` → coherence 簿記 → 次数評価で
       `Q₁ ⊆ Ker f_j` → `G` は単純でない
 
@@ -262,3 +267,26 @@ sorry 非退行。
 * 前章 = [issue 2053](pending/2053-pf-suzuki-theorem-b.md) (Ch.II Theorem B、2026-07-26 完成)
 * Appendix IV = issues 1049 / 1053 / 1054 (Feit–Sibley、lane a)
 * survey `notes/meta/three_books_full_survey_2026_07_16.md` L825–L862 (Pf App: Suzuki の表)
+
+## 次 = 書籍 step (6) の分析 (2026-07-28)
+
+**主張**: `x ∈ H`, `g ∈ G`, `x^g ∈ H` なら `λ(x^g) = λ(x)`。
+
+書籍の論法:
+1. `π` = `|QK|` の素因子集合。`x` の `π`-成分は `QK ⊆ Ker λ` に入るので
+   `λ(x) = λ(y)`, `λ(x^g) = λ(y^g)` (`y` = `x` の `π′`-成分) ⟹ `x` は `π′`-元と仮定してよい。
+2. **Hall の定理**で `x` と `x^g` は `H` 内で `V` の元に共役 ⟹ `x, x^g ∈ V` と仮定してよい。
+3. **Ch.I §3 Lemma 2** (`ConjugacyInV.lean`) で `x` と `x^g` は `V` 内で共役 ⟹ `λ(x) = λ(x^g)`。
+
+### 材料の所在 (実測)
+
+| 必要なもの | 状態 |
+|---|---|
+| `π`/`π′` 分解 (`IsPiElement`, `exists_isPiElement_mul`) | ✅ `GroupTheory/PiElementDecomposition.lean` |
+| `QK ⊓ V = ⊥` | ✅ `QK_inf_V_eq_bot` |
+| `QK ⊔ V = H` | 未 — `|QK||V| = |H|` (`card_QK_eq` + `card_D_eq` + `card_H_eq`) と `QK ⊓ V = ⊥` から数え上げ |
+| **`π′`-元は `H` 内で `V` に共役** | ⚠ **要調査**。`QK` は正規 Hall で `H/QK ≅ V` は奇位数 ⟹ 可解 (FT)。Schur–Zassenhaus の共役部分 (mathlib `Subgroup.exists_right_complement'_of_coprime` は存在のみ) + 「任意の `π′`-部分群は補群に含まれる」が要る。repo に既存かどうか未確認 |
+| Ch.I §3 Lemma 2 | ✅ `ConjugacyInV.lean` |
+
+⟹ 着手時はまず「`π′`-部分群が補群に共役で入る」(Schur–Zassenhaus の強い形) が
+mathlib / repo にあるかを実測すること。無ければそこが step (6) の本体になる。
