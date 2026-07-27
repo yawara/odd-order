@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.HigmanSims
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.AbelianAut
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuTwelve
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
@@ -26,4 +27,5 @@ topic 別 leaf にある (下流は本 module を import するだけでよい)�
   推移的な真の正規部分群は regular。
 * `Problems8C/HigmanSims.lean` — **8C.4**: 次数 100, 点安定化群が単純で軌道長 22, 77 なら
   原始的かつ単純 (`HS`)。
+* `Problems8C/AbelianAut.lean` — **8C.6 の一部**: 位数 3 の群の自己同型群は単純。
 -/
