@@ -36,7 +36,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
-      §8B は 8B.1–8B.5 完了 + 8B.6 前半 / §8C §8D 未着手
+      §8B は 8B.1–8B.5 完了 + 8B.6 は「`|G_α|=2`」「`|Ω|` 奇素数」まで /
+      §8C §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4425,8 +4426,12 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   8B.3 ✅ `regular_centralizer_mulEquiv_of_two_isMinimalNormal` /
   8B.4 ✅ `prime_pow_card_and_unique_isMinimalNormal_of_solvable` /
   8B.5 ✅ `stabilizer_eq_bot_and_prime_card_of_fixed_point` /
-  8B.6 🔶 **前半のみ** `card_stabilizer_eq_two_of_suborbit_ncard_eq_two` (`|G_α| = 2`) /
-  **次の frontier = 8B.6 後半 (`G ≅ D₂ₚ`)**。
+  8B.6 🔶 **大部分完了**: `card_stabilizer_eq_two_of_suborbit_ncard_eq_two` (`|G_α| = 2`) +
+  `odd_card_of_card_stabilizer_eq_two` (`|Ω|` 奇数) +
+  `exists_regular_normal_of_card_stabilizer_eq_two` (正則正規部分群 `K`) +
+  `prime_card_of_card_stabilizer_eq_two` (**`|Ω|` は奇素数**)。
+  **残り = `G ≅ DihedralGroup p` の明示同型のみ** /
+  **次の frontier = 8B.7**。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4478,3 +4483,19 @@ Isaacs の block 定義 (「`Δ` の translate は `Δ` 自身か `Δ` と交わ
 
 ⚠ 4 の「block ↔ `K` の部分群」は mathlib `MulAction.block_stabilizerOrderIso`
 (block ↔ `G_α` を含む中間部分群) を経由すると素直かもしれない。要調査。
+
+
+### 8B.6 の残り (`G ≅ D₂ₚ` の明示同型) — 2026-07-27 時点
+
+数学的な内容 (`|G_α| = 2`, `|Ω| = p` 奇素数, `K` は位数 `p` の正則正規部分群, `t` は
+`K` を反転) は**すべて landing 済**。残っているのは `G = K ⋊ ⟨t⟩` から
+mathlib `DihedralGroup p` への**明示同型の構成**だけ:
+
+* `K ≅ ZMod p` (位数 `p` の巡回群; `zpowers y = K` は
+  `prime_card_of_card_stabilizer_eq_two` の証明中で既に得ている — 必要なら生成元を
+  返す形に補題を切り出す)。
+* `DihedralGroup p` の `r`/`sr` 表示に合わせて `r ↦ 生成元`, `sr 0 ↦ t` を送る。
+* 関係式 `t k t⁻¹ = k⁻¹` (= `hinvK`) と `t² = 1` が `DihedralGroup` の定義関係式に対応。
+
+⚠ **優先度は 8B.7 より低い** (数学的中身は済んでおり、残りは表示の橋渡し)。
+文書順の原則からは 8B.7 に進み、後で戻る。
