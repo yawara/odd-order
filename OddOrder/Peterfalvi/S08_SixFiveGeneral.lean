@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+import OddOrder.Peterfalvi.S08_PGroupReduction
+import OddOrder.GroupTheory.NilpotentAbelianization
 
 /-!
 # Peterfalvi (6.5) for a general kernel: the (6.3.b) coherence input
@@ -399,5 +401,125 @@ theorem isChiefFactor_of_not_isCoherent
     OddOrder.GroupTheory.IsChiefFactor K H₁ :=
   isChiefFactor_of_relIndex_le_of_odd_dvd hodd hH₁K hdvd
     (relIndex_le_of_not_isCoherent RD hodd hKsupp h1A hMH₁ hH₁K hirr hncoh)
+
+/-! ### Peterfalvi (6.5)(b),(c) for a general kernel -/
+
+section SixFiveBC
+
+variable [IsSolvable ↥K] [Group.IsNilpotent ↥K]
+variable {H₁ : Subgroup ↥L} [H₁.Normal]
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+  [K.Normal] [Invertible (Nat.card ↥K : ℂ)] [IsSolvable ↥K] [Group.IsNilpotent ↥K]
+  [H₁.Normal] in
+/-- `|K : H₁| = |Abelianization K|` when `H₁` traces out the commutator subgroup of `K` — the
+`M = 1` case of Hypothesis (6.4)(c) (`H₁/M = [K/M, K/M]`). -/
+theorem card_abelianization_eq_relIndex (hH₁comm : H₁.subgroupOf K = _root_.commutator ↥K) :
+    Nat.card (Abelianization ↥K) = H₁.relIndex K := by
+  rw [Subgroup.relIndex, Subgroup.index, hH₁comm]
+  rfl
+
+/-- **Peterfalvi (6.5)(b) for a general kernel**: `K` is a `p`-group for some prime `p`.
+
+*"Since `S(H₁)` is coherent, `M ≠ H₁`, and so `K/M` is not abelian.  Since `K/M` is a nilpotent
+group whose commutator subgroup is `H₁/M` and since `K/H₁` is a chief factor of `L`, `K/M` is a
+`p`-group for some prime number `p`."*  (p. 31, at `M = 1`.)
+
+The group-theoretic content is the already-general
+`isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization`; its single character-theoretic
+input is the (6.5)(a) bound `|K:H₁| ≤ 4|L:K|² + 1` supplied by `relIndex_le_of_not_isCoherent`.
+The fixed-point-free `R`-action on `Abelianization K = K/H₁` with `|R| = |L:K|` is exactly what
+Hypothesis (6.4)(c) provides (`L/H₁` is a Frobenius group with kernel `K/H₁`, so its complement
+acts fixed-point-freely on the kernel). -/
+theorem exists_prime_isPGroup_of_not_isCoherent
+    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
+    [IsMulCommutative (↥K ⧸ H₁.subgroupOf K)]
+    (hH₁comm : H₁.subgroupOf K = _root_.commutator ↥K) (hH₁K : H₁ < K)
+    {R : Type*} [Group R] [Finite R] [MulDistribMulAction R (Abelianization ↥K)]
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusAction R (Abelianization ↥K))
+    (hRcard : Nat.card R = K.index)
+    (hirr : ∀ φ ∈ inducedKernelFamily K H₁, IsIrreducibleCharacter φ)
+    (hncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent RD.tau
+      (inducedKernelFamily K ⊥) A₀)) :
+    ∃ p : ℕ, p.Prime ∧ IsPGroup p ↥K := by
+  have hcard := card_abelianization_eq_relIndex (K := K) hH₁comm
+  have hAodd : Odd (Nat.card (Abelianization ↥K)) := by
+    rw [hcard]
+    exact hodd.of_dvd_nat ((Subgroup.relIndex_dvd_index_of_le hH₁K.le).trans H₁.index_dvd_card)
+  have hRodd : Odd (Nat.card R) := by
+    rw [hRcard]; exact hodd.of_dvd_nat K.index_dvd_card
+  refine isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization hFrob hAodd hRodd ?_
+  rw [hcard, hRcard]
+  exact relIndex_le_of_not_isCoherent RD hodd hKsupp h1A bot_le hH₁K hirr hncoh
+
+/-- **Peterfalvi (6.5)(c) for a general kernel**: `|L:K|` does not divide `p − 1`.
+
+*"If `|L:K|` divides `p − 1`, then `p ≥ 2|L:K| + 1`.  Since `K/M` is a non-abelian `p`-group,
+`|K:H₁| ≥ p² ≥ (2|L:K|+1)² > 4|L:K|² + 1`, which is a contradiction."*  (p. 31, at `M = 1`.)
+
+The non-abelianness enters through `commutator_eq_bot_of_isNilpotent_of_isCyclic_quotient`: a
+`p`-group `K` with `|K : K′| < p²` has cyclic abelianization (order `1` or `p`), hence is abelian
+when nilpotent.  The rest is `six_five_c_arith` against the (6.5)(a) bound. -/
+theorem not_dvd_sub_one_of_not_isCoherent
+    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
+    [IsMulCommutative (↥K ⧸ H₁.subgroupOf K)]
+    (hH₁comm : H₁.subgroupOf K = _root_.commutator ↥K) (hH₁K : H₁ < K)
+    {p : ℕ} (hp : p.Prime) (hPgroup : IsPGroup p ↥K)
+    (hnonab : _root_.commutator ↥K ≠ ⊥)
+    (hirr : ∀ φ ∈ inducedKernelFamily K H₁, IsIrreducibleCharacter φ)
+    (hncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent RD.tau
+      (inducedKernelFamily K ⊥) A₀)) :
+    ¬ (K.index ∣ p - 1) := by
+  intro hdvd
+  have hcard := card_abelianization_eq_relIndex (K := K) hH₁comm
+  have hbound : H₁.relIndex K ≤ 4 * K.index ^ 2 + 1 :=
+    relIndex_le_of_not_isCoherent RD hodd hKsupp h1A bot_le hH₁K hirr hncoh
+  have hAodd : Odd (Nat.card (Abelianization ↥K)) := by
+    rw [hcard]
+    exact hodd.of_dvd_nat ((Subgroup.relIndex_dvd_index_of_le hH₁K.le).trans H₁.index_dvd_card)
+  have hdodd : Odd K.index := hodd.of_dvd_nat K.index_dvd_card
+  haveI : Fact p.Prime := ⟨hp⟩
+  -- `K ≠ 1` (its commutator subgroup is nontrivial), so `p ∣ |K|`, and `|K|` divides the odd `|L|`.
+  have hKnt : Nontrivial ↥K := by
+    rcases subsingleton_or_nontrivial ↥K with hs | hn
+    · exact absurd (Subgroup.eq_bot_of_subsingleton _) hnonab
+    · exact hn
+  obtain ⟨m, hm⟩ := (IsPGroup.iff_card).mp hPgroup
+  have hm1 : 1 ≤ m := by
+    rcases Nat.eq_zero_or_pos m with rfl | h
+    · exact absurd (Nat.card_eq_one_iff_unique.mp (by simpa using hm)).1
+        (not_subsingleton ↥K)
+    · exact h
+  have hpodd : Odd p :=
+    (hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)).of_dvd_nat
+      (hm ▸ dvd_pow_self p (by omega))
+  -- `p² ≤ |K : K′|`, else the abelianization is cyclic and `K` (nilpotent) would be abelian.
+  have hpsq : p ^ 2 ≤ Nat.card (Abelianization ↥K) := by
+    by_contra hlt
+    push Not at hlt
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card).mp
+      (hPgroup.to_quotient (_root_.commutator ↥K))
+    have hn' : Nat.card (Abelianization ↥K) = p ^ n := hn
+    have hn1 : n ≤ 1 := by
+      by_contra hn2
+      push Not at hn2
+      have hle : p ^ 2 ≤ p ^ n := Nat.pow_le_pow_right hp.one_lt.le hn2
+      rw [hn'] at hlt
+      omega
+    haveI : IsCyclic (↥K ⧸ _root_.commutator ↥K) := by
+      interval_cases n
+      · have : Nat.card (↥K ⧸ _root_.commutator ↥K) = 1 := by simpa using hn
+        haveI : Subsingleton (↥K ⧸ _root_.commutator ↥K) :=
+          (Nat.card_eq_one_iff_unique.mp this).1
+        exact isCyclic_of_subsingleton
+      · exact isCyclic_of_prime_card (p := p) (by simpa using hn)
+    exact hnonab
+      (OddOrder.GroupTheory.commutator_eq_bot_of_isNilpotent_of_isCyclic_quotient
+        (G := ↥K) ‹_›)
+  exact six_five_c_arith hp hpodd hdodd hdvd (hcard ▸ hpsq) (hcard ▸ hbound)
+
+end SixFiveBC
 
 end OddOrder.Peterfalvi.S08

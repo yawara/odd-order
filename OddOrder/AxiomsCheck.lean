@@ -3751,6 +3751,17 @@ set_option linter.style.longLine false in
 -- the two agree at `M = 1`, the case (6.6) uses).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.relIndex_le_of_not_isCoherent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isChiefFactor_of_not_isCoherent
+-- **(6.5)(b),(c) for a general kernel** (at `M = 1`, the case (6.6) uses).  (b) `K` is a
+-- `p`-group: the group-theoretic core `isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization`
+-- was already general, and its one character-theoretic input is the (6.5)(a) bound above; the
+-- fixed-point-free `R`-action on `Abelianization K = K/H₁` (`|R| = |L:K|`) is what Hypothesis
+-- (6.4.c) supplies ("`L/H₁` is a Frobenius group with kernel `K/H₁`").  (c) `|L:K| ∤ p − 1`: a
+-- `p`-group with `|K:K′| < p²` has cyclic abelianization, hence (nilpotent) is abelian
+-- (`commutator_eq_bot_of_isNilpotent_of_isCyclic_quotient`), so `p² ≤ |K:K′|`, and
+-- `six_five_c_arith` contradicts the (6.5)(a) bound.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.card_abelianization_eq_relIndex
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_prime_isPGroup_of_not_isCoherent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.not_dvd_sub_one_of_not_isCoherent
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.
