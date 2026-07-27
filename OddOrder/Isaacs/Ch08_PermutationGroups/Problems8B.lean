@@ -8,6 +8,7 @@ import Mathlib.GroupTheory.GroupAction.Primitive
 import OddOrder.Isaacs.Ch02_Subnormality.Basic
 import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
+import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 
 /-!
 # Isaacs, Finite Group Theory — Problems 8B (pp. 248–249)
@@ -33,6 +34,9 @@ Isaacs の定義 (「`Δ` の translate は `Δ` 自身か, `Δ` と交わらな
 - `prime_card_of_isCoatom_bot`, `stabilizer_eq_bot_and_prime_card_of_fixed_point` —
   **Problem 8B.5**: 点安定化群 `G_α` が `Ω ∖ {α}` に固定点をもてば `G_α = 1` で
   `|G|` は素数。
+- `eq_bot_of_normal_le_stabilizer`, `card_stabilizer_eq_two_of_suborbit_ncard_eq_two` —
+  **Problem 8B.6 前半**: 点安定化群が `Ω ∖ {α}` に長さ 2 の軌道をもてば `|G_α| = 2`。
+  ⚠ 後半 (`G ≅ D₂ₚ`, `p > 2` 素数) は未形式化。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -362,6 +366,80 @@ theorem stabilizer_eq_bot_and_prime_card_of_fixed_point [Finite G] [FaithfulSMul
     le_antisymm (fun h hh => Subgroup.mem_bot.mpr
       (FaithfulSMul.eq_of_smul_eq_smul (α := Ω) fun γ => by rw [htriv h hh γ, one_smul])) bot_le
   exact ⟨hbot, prime_card_of_isCoatom_bot (hbot ▸ hcoatom)⟩
+
+/-! ### Problem 8B.6 — 点安定化群が長さ 2 の軌道をもつ場合 -/
+
+/-- 推移的な忠実作用では, 点安定化群に含まれる**正規**部分群は自明。 -/
+lemma eq_bot_of_normal_le_stabilizer [FaithfulSMul G Ω] [IsPretransitive G Ω]
+    {D : Subgroup G} [hD : D.Normal] {α : Ω} (hle : D ≤ stabilizer G α) : D = ⊥ := by
+  refine le_antisymm (fun h hh => Subgroup.mem_bot.mpr ?_) bot_le
+  refine FaithfulSMul.eq_of_smul_eq_smul (α := Ω) fun γ => ?_
+  obtain ⟨k, hk⟩ := exists_smul_eq G α γ
+  have hmem : k⁻¹ * h * k ∈ D := by simpa using hD.conj_mem h hh k⁻¹
+  rw [one_smul, ← hk, ← mul_smul, show h * k = k * (k⁻¹ * h * k) by group, mul_smul,
+    mem_stabilizer_iff.mp (hle hmem)]
+
+/-- **Isaacs Problem 8B.6** (p. 249) 前半 🎉: 原始置換群 `G` の点安定化群 `G_α` が
+`Ω ∖ {α}` 上に**長さ 2 の軌道**をもてば `|G_α| = 2`。
+
+`D := G_α ⊓ G_β` (`β` はその軌道の点) は `G_α` の中で指数 2 なので `G_α ≤ N(D)`;
+推移性から `|G_α| = |G_β|` なので `D` は `G_β` の中でも指数 2 で `G_β ≤ N(D)`。
+`G_β ≰ G_α` (指数の勘定) と `G_α` の極大性から `G_α ⊔ G_β = G`, したがって
+`N(D) = G` すなわち `D ⊴ G`。点安定化群に含まれる正規部分群は自明なので `D = 1`,
+よって `|G_α| = 2 · |D| = 2`。 -/
+theorem card_stabilizer_eq_two_of_suborbit_ncard_eq_two [Finite G] [FaithfulSMul G Ω]
+    [IsPreprimitive G Ω] [Nontrivial Ω] {α β : Ω}
+    (hsub : Set.ncard (orbit ↥(stabilizer G α) β) = 2) :
+    Nat.card ↥(stabilizer G α) = 2 := by
+  have hcoatom : IsCoatom (stabilizer G α) :=
+    IsPreprimitive.isCoatom_stabilizer_of_isPreprimitive (G := G) α
+  have hDα : stabilizer G β ⊓ stabilizer G α ≤ stabilizer G α := inf_le_right
+  have hDβ : stabilizer G β ⊓ stabilizer G α ≤ stabilizer G β := inf_le_left
+  have hDpos : 0 < Nat.card ↥(stabilizer G β ⊓ stabilizer G α) := Nat.card_pos
+  -- `D` は `G_α` の中で指数 2。
+  have hidxα : ((stabilizer G β ⊓ stabilizer G α).subgroupOf (stabilizer G α)).index = 2 := by
+    rw [Subgroup.inf_subgroupOf_right, ← Subgroup.relIndex, ← ncard_suborbit_eq_relIndex]
+    exact hsub
+  have hcardD : ∀ K : Subgroup G, (h : stabilizer G β ⊓ stabilizer G α ≤ K) →
+      ((stabilizer G β ⊓ stabilizer G α).subgroupOf K).index *
+        Nat.card ↥(stabilizer G β ⊓ stabilizer G α) = Nat.card ↥K := by
+    intro K h
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe h).toEquiv]
+    exact Subgroup.index_mul_card _
+  have hcardα : 2 * Nat.card ↥(stabilizer G β ⊓ stabilizer G α) = Nat.card ↥(stabilizer G α) := by
+    rw [← hidxα]; exact hcardD _ hDα
+  have hcardeq : Nat.card ↥(stabilizer G α) = Nat.card ↥(stabilizer G β) :=
+    card_stabilizer_eq α β
+  -- `D` は `G_β` の中でも指数 2。
+  have hidxβ : ((stabilizer G β ⊓ stabilizer G α).subgroupOf (stabilizer G β)).index = 2 := by
+    refine Nat.eq_of_mul_eq_mul_right hDpos ?_
+    rw [hcardD _ hDβ, ← hcardeq, ← hcardα]
+  -- 両方の点安定化群が `N(D)` に含まれる。
+  have hlenα : stabilizer G α ≤ Subgroup.normalizer
+      ((stabilizer G β ⊓ stabilizer G α : Subgroup G) : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hDα).mp
+      (Subgroup.normal_of_index_eq_two hidxα)
+  have hlenβ : stabilizer G β ≤ Subgroup.normalizer
+      ((stabilizer G β ⊓ stabilizer G α : Subgroup G) : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hDβ).mp
+      (Subgroup.normal_of_index_eq_two hidxβ)
+  -- `G_β ≰ G_α` (さもなくば `D = G_β` で位数の勘定が破綻)。
+  have hnotle : ¬ stabilizer G β ≤ stabilizer G α := by
+    intro hle
+    have hDeq : stabilizer G β ⊓ stabilizer G α = stabilizer G β := inf_eq_left.mpr hle
+    have hpos : 0 < Nat.card ↥(stabilizer G β) := Nat.card_pos
+    rw [hDeq, hcardeq] at hcardα
+    omega
+  -- 極大性 ⟹ `G_α ⊔ G_β = ⊤` ⟹ `D ⊴ G`。
+  haveI : (stabilizer G β ⊓ stabilizer G α).Normal := by
+    rw [← Subgroup.normalizer_eq_top_iff]
+    refine eq_top_iff.mpr ?_
+    have hjoin : stabilizer G α ⊔ stabilizer G β = ⊤ :=
+      hcoatom.2 _ (lt_of_le_of_ne le_sup_left fun hc => hnotle (hc ▸ le_sup_right))
+    exact hjoin ▸ sup_le hlenα hlenβ
+  have hDbot : stabilizer G β ⊓ stabilizer G α = ⊥ := eq_bot_of_normal_le_stabilizer hDα
+  rw [← hcardα, hDbot]
+  simp
 
 end
 
