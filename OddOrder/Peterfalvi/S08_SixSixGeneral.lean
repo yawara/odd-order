@@ -324,6 +324,52 @@ theorem exists_xBaseBlock_anchor_index {Z : Subgroup ↥L}
   obtain ⟨i₁, hi₁⟩ := hφpair
   exact ⟨i₁, by rw [show (χmem i₁ : ClassFunction ↥L ℂ) = φ from hi₁]; exact hφ⟩
 
+/-! ### Routine `𝒳`-member facts (the per-step adjoining inputs) -/
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- **Routine `𝒳`-member facts.**  For `χ ∈ 𝒳` — irreducible by the standing `hirr` (the book's
+`𝒳 ⊆ Irr L`) and non-real because `|L|` is odd (Peterfalvi (1.1)) — the conjugate pair `{χ, χ̄}`
+is orthonormal.
+
+These are the per-member `hrealχ`/`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar` inputs of the (5.6) engine
+`S07.xAdjoinStepW_general`, for both the adjoined break and the accumulator members.  The Sibley
+instance is `xMember_characterFacts_of_irreducible_X`. -/
+theorem xMember_characterFacts (hodd : Odd (Nat.card ↥L)) {Z : Subgroup ↥L}
+    (hirr : ∀ φ ∈ xSet K Z, IsIrreducibleCharacter φ)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ xSet K Z) :
+    ¬ ClassFunction.IsReal χ ∧
+      ClassFunction.inner χ χ = 1 ∧
+      ClassFunction.inner χ.conj χ.conj = 1 ∧
+      ClassFunction.inner χ.conj χ = 0 ∧
+      ClassFunction.inner χ χ.conj = 0 := by
+  have hχirr : IsIrreducibleCharacter χ := hirr χ hχ
+  have hconjirr : IsIrreducibleCharacter χ.conj := hχirr.conj
+  have hreal : ¬ ClassFunction.IsReal χ := xSet_hasNoRealCharacters (K := K) hodd Z hχ
+  have hne : (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L) ≠ ⟨χ, hχirr⟩ :=
+    fun h => hreal (congrArg Subtype.val h)
+  refine ⟨hreal, hχirr.inner_self_eq_one, hconjirr.inner_self_eq_one, ?_, ?_⟩
+  · simpa using
+      (irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
+        ⟨χ, hχirr⟩).trans (if_neg hne)
+  · simpa using
+      (irreducibleCharacter_inner_eq_ite (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)
+        ⟨χ.conj, hconjirr⟩).trans (if_neg (Ne.symm hne))
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- **A break `χ ∈ 𝒳` outside an accumulator `S₁ ⊆ 𝒳` is orthogonal to it, as is `χ̄`** — the
+`hχ_S1`/`hχbar_S1` inputs of the (5.6) engine.  Pure (5.2.c) pairwise orthogonality: distinct
+members of `𝒳` are orthogonal. -/
+theorem xMember_inner_eq_zero_of_notMem {Z : Subgroup ↥L}
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁X : S₁ ⊆ xSet K Z)
+    {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ xSet K Z) (hχS₁ : χ ∉ S₁) (hχbarS₁ : χ.conj ∉ S₁) :
+    (∀ x ∈ S₁, ClassFunction.inner χ x = 0) ∧
+      (∀ x ∈ S₁, ClassFunction.inner χ.conj x = 0) := by
+  refine ⟨fun x hx => xSet_pairwise_orthogonal (K := K) Z hχX (hS₁X hx) ?_,
+    fun x hx => xSet_pairwise_orthogonal (K := K) Z
+      (xSet_closedUnderConjugate (K := K) Z hχX) (hS₁X hx) ?_⟩
+  · rintro rfl; exact hχS₁ hx
+  · rintro rfl; exact hχbarS₁ hx
+
 /-! ### Base coherence of `𝒮₀`, general kernel -/
 
 /-- **Base coherence: `𝒮₀` is coherent** (Peterfalvi (6.6), p. 32: *"By (1.1) and (1.4),
@@ -460,5 +506,119 @@ noncomputable def xSet_isCoherent_of_adjoinSteps
     (xBaseBlock_subset (K := K) Z) hpairs hcover h0 (fun i hi hcoh => ?_)
   rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair (hpair0 i hi) (hpair1 i hi)]
   exact hstep pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi hcoh
+
+/-! ### The `(6.6)` per-step adjoining, `τ`-general (issue 0155 step 4) -/
+
+open scoped Classical in
+/-- **Peterfalvi (6.6) per-step adjoining for a general kernel, with an arbitrary `τ`.**
+
+Adjoin the conjugate pair `{χ, χ̄}` of an `𝒳`-member to a coherent accumulator `S₁ ⊆ 𝒳`, given the
+book's degree bookkeeping (p. 32): an anchor `χmem i₁ ∈ S₁` of degree `1` relative to the family,
+member degree ratios `χmem j (1) = deg j · χmem i₁ (1)`, the break ratio `χ(1) = a · χmem i₁ (1)`,
+and the (5.6) inequality `2a < ∑ deg j²`.
+
+This is the general-kernel, `τ`-general analogue of the Sibley
+`xAdjoinStepInput_of_memberFamily_degreeRatios` chain; it feeds
+`S07.xAdjoinStepW_general` (issue 0154) directly, so no `XAdjoinStepInput`/`xAdjoinStep` layer is
+needed.  Everything it supplies to that engine comes from general-kernel facts:
+
+* member/break orthonormality — `xMember_characterFacts`, `xMember_inner_eq_zero_of_notMem`;
+* supported differences — `inducedKernelFamily_scaledDiff_support` (degree ratios make
+  `χmem j − deg j · χmem i₁` and `χ − a · χmem i₁` vanish off `K^#`);
+* the (5.2.d) image families `R(·)` and their (5.2.e) orthogonality — `InducedFamilyImageData`;
+* the per-member decomposition `Dmem` — `S07.memberExtensionDecomposition_general`, whose
+  `imageFamily` is definitionally `R(χmem j)` and whose `tau1` is the accumulator extension. -/
+noncomputable def xAdjoinStep_of_degreeRatios {A₀ : Set ↥L}
+    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
+    {Z : Subgroup ↥L} (hirr : ∀ φ ∈ xSet K Z, IsIrreducibleCharacter φ)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁X : S₁ ⊆ xSet K Z)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent RD.tau S₁ A₀)
+    {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ xSet K Z) (hχS₁ : χ ∉ S₁) (hχbarS₁ : χ.conj ∉ S₁)
+    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction ↥L ℂ) (deg : ι → ℕ) (i₁ : ι)
+    (hi₁ : i₁ ∈ s) (hmemS1 : ∀ j ∈ s, χmem j ∈ S₁)
+    (hmeminj : ∀ j ∈ s, ∀ l ∈ s, χmem j = χmem l → j = l)
+    {a : ℕ} (ha1 : deg i₁ = 1)
+    (hratio : ∀ j ∈ s, χmem j 1 = (deg j : ℂ) * χmem i₁ 1)
+    (hχratio : χ 1 = (a : ℂ) * χmem i₁ 1)
+    (hDeg : 2 * (a : ℝ) < ∑ j ∈ s, ((deg j : ℝ)) ^ 2)
+    (hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
+      (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁ A₀ ∪ {χmem i₁})) :
+    OddOrder.Peterfalvi.S07.IsCoherent RD.tau (S₁ ∪ {χ, χ.conj}) A₀ := by
+  classical
+  have hXsub : xSet K Z ⊆ inducedKernelFamily K ⊥ := xSet_subset (K := K) Z
+  have hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥ := hS₁X.trans hXsub
+  have hχfam : χ ∈ inducedKernelFamily K ⊥ := hXsub hχX
+  obtain ⟨hχreal, hχχ, hχbarχbar, hχbarχ, hχχbar⟩ :=
+    xMember_characterFacts (K := K) hodd hirr hχX
+  obtain ⟨hχ_S1, hχbar_S1⟩ :=
+    xMember_inner_eq_zero_of_notMem (K := K) hS₁X hχX hχS₁ hχbarS₁
+  -- members: orthonormality
+  have hmemX : ∀ j ∈ s, χmem j ∈ xSet K Z := fun j hj => hS₁X (hmemS1 j hj)
+  have hmemortho : ∀ j ∈ s, ∀ l ∈ s,
+      ClassFunction.inner (χmem j) (χmem l) = if j = l then ((1 : ℝ) : ℂ) else 0 := by
+    intro j hj l hl
+    by_cases hjl : j = l
+    · subst hjl
+      simpa using (hirr _ (hmemX j hj)).inner_self_eq_one
+    · rw [if_neg hjl]
+      exact xSet_pairwise_orthogonal (K := K) Z (hmemX j hj) (hmemX l hl)
+        (fun h => hjl (hmeminj j hj l hl h))
+  -- supported differences from the degree ratios
+  have hmemdegdiffmem : ∀ j ∈ s, χmem j - deg j • χmem i₁ ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁ A₀ := by
+    intro j hj
+    refine ⟨Submodule.sub_mem _ (Submodule.subset_span (hmemS1 j hj))
+      (nsmul_mem (Submodule.subset_span (hmemS1 i₁ hi₁)) _), ?_⟩
+    exact inducedKernelFamily_scaledDiff_support hKsupp (hS₁sub (hmemS1 j hj))
+      (hS₁sub (hmemS1 i₁ hi₁)) (hratio j hj)
+  have hadiffmem : χ - a • χmem i₁ ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ := by
+    refine ⟨Submodule.sub_mem _ (Submodule.subset_span hχfam)
+      (nsmul_mem (Submodule.subset_span (hS₁sub (hmemS1 i₁ hi₁))) _), ?_⟩
+    exact inducedKernelFamily_scaledDiff_support hKsupp hχfam
+      (hS₁sub (hmemS1 i₁ hi₁)) hχratio
+  have hdiffmem : χ - χ.conj ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ :=
+    conjDiff_mem_zSupportedSpan hKsupp hχfam
+  -- per-member (5.2.d) decompositions and their (5.2.e) orthogonality to `R(χ)`
+  have hmemconjsupp : ∀ j ∈ s, ((χmem j).conj - χmem j).support ⊆ A₀ := by
+    intro j hj
+    have h := (conjDiff_mem_zSupportedSpan hKsupp (hS₁sub (hmemS1 j hj))).2
+    have hneg : (χmem j).conj - χmem j = -(χmem j - (χmem j).conj) := by abel
+    rw [hneg, ClassFunction.support_neg]
+    exact h
+  refine OddOrder.Peterfalvi.S07.xAdjoinStepW_general (Samb := inducedKernelFamily K ⊥)
+    hS₁ hS₁sub RD.adjoinHisom χ (RD.R χ hχfam) hχχ hχbarχbar hχχbar hχbarχ hχ_S1 hχbar_S1
+    s χmem deg i₁ hi₁ hmemdegdiffmem hmemS1 (fun _ => (1 : ℝ)) (fun _ _ => one_pos)
+    hmemortho (a := a)
+    (fun j hj => OddOrder.Peterfalvi.S07.memberExtensionDecomposition_general hS₁
+      (RD.R (χmem j) (hS₁sub (hmemS1 j hj))) (hmemconjsupp j hj)
+      (hmemS1 j hj) (hS₁conj (hmemS1 j hj))
+      (hS₁.extension_mem_ZIrr _ (Submodule.subset_span (hmemS1 j hj)))
+      ((xMember_characterFacts (K := K) hodd hirr (hmemX j hj)).2.2.2.2))
+    ?_ (fun _ _ => rfl) hdiffmem hadiffmem
+    (RD.tau_mem_ZIrr hadiffmem) ha1 (by simpa using hDeg) hSgen ?_
+  · -- (5.2.e): `χmem j ⊥ {χ, χ̄}` since `χ, χ̄ ∉ S₁` and `𝒳` is pairwise orthogonal
+    intro j hj
+    exact RD.orthogonal χ hχfam (χmem j) (hS₁sub (hmemS1 j hj))
+      (xSet_pairwise_orthogonal (K := K) Z (hmemX j hj) hχX
+        (fun h => hχS₁ (h ▸ hmemS1 j hj)))
+      (xSet_pairwise_orthogonal (K := K) Z (hmemX j hj)
+        (xSet_closedUnderConjugate (K := K) Z hχX)
+        (fun h => hχbarS₁ (h ▸ hmemS1 j hj)))
+  · -- the adjoined pair's supported lattice is generated by the two anchored differences
+    have hchi1_ne : (χmem i₁) 1 ≠ 0 := by
+      obtain ⟨d, hd, hd1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
+        (⟨χmem i₁, hirr _ (hmemX i₁ hi₁)⟩ : IrreducibleCharacter ↥L)
+      simp only [IrreducibleCharacter.coe_mk] at hd1
+      rw [hd1]; exact_mod_cast hd.ne'
+    exact OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+      (L := ↥L) (S₁ := S₁) (A := A₀) (χ := χ) (chibar := χ.conj) (chi1 := χmem i₁) (a := a)
+      hSgen hχratio
+      (OddOrder.Peterfalvi.S07.irreducibleCharacter_conj_apply_one
+        (⟨χ, hirr χ hχX⟩ : IrreducibleCharacter ↥L))
+      hchi1_ne h1A
 
 end OddOrder.Peterfalvi.S08
