@@ -426,6 +426,54 @@ theorem not_dvd_card_of_fixedFree_of_isPGroup {A N : Type*} [Group A] [Finite A]
   refine hmne (Subtype.ext (hfixA ((m : ↥(P : Subgroup N)) : N) fun a => ?_))
   exact congrArg (fun w : ↥(P : Subgroup N) => (w : N)) (hmfix a)
 
+/-- **冪零部分群の最大 `q`-部分群**: `K ≤ N` の `↥K` が冪零なら, `K` の `q`-部分群を
+すべて含む `q`-部分群 `Q ≤ K` がある (= `K` の唯一の Sylow `q`-部分群)。
+
+冪零 ⟹ `NormalizerCondition` ⟹ Sylow は正規 ⟹ Sylow は一意 (`Sylow.unique_of_normal`)。 -/
+theorem exists_max_qSubgroup_le_of_isNilpotent {N : Type*} [Group N] [Finite N]
+    {K : Subgroup N} (hK : Group.IsNilpotent ↥K) {q : ℕ} (hq : q.Prime) :
+    ∃ Q : Subgroup N, Q ≤ K ∧ IsPGroup q ↥Q ∧
+      ∀ R : Subgroup N, R ≤ K → IsPGroup q ↥R → R ≤ Q := by
+  classical
+  haveI : Fact q.Prime := ⟨hq⟩
+  haveI := hK
+  obtain ⟨S⟩ : Nonempty (Sylow q ↥K) := inferInstance
+  have hSnormal : ((S : Subgroup ↥K)).Normal :=
+    Sylow.normal_of_normalizerCondition Group.normalizerCondition_of_isNilpotent S
+  haveI hU : Unique (Sylow q ↥K) := Sylow.unique_of_normal S hSnormal
+  refine ⟨(S : Subgroup ↥K).map K.subtype, ?_, ?_, ?_⟩
+  · rintro _ ⟨u, _, rfl⟩
+    exact u.2
+  · exact S.2.map _
+  · intro R hRK hRq
+    have hRsub : IsPGroup q ↥(R.comap K.subtype) :=
+      hRq.comap_of_injective K.subtype (Subgroup.subtype_injective K)
+    obtain ⟨T, hT⟩ := hRsub.exists_le_sylow
+    have hTS : T = S := Subsingleton.elim _ _
+    intro x hx
+    have hxK : x ∈ K := hRK hx
+    have hmem : (⟨x, hxK⟩ : ↥K) ∈ R.comap K.subtype := hx
+    exact ⟨⟨x, hxK⟩, hTS ▸ hT hmem, rfl⟩
+
+open Pointwise in
+/-- **最大 `q`-部分群は `A`-不変**: `K` が `A`-不変なら, `K` の最大 `q`-部分群 `Q` も
+`A`-不変 (`a • Q` も `K` の `q`-部分群なので最大性から `a • Q ≤ Q`)。 -/
+theorem smul_mem_of_max_qSubgroup {A N : Type*} [Group A] [Group N] [Finite N]
+    [MulDistribMulAction A N] {K Q : Subgroup N} {q : ℕ}
+    (hKinv : ∀ a : A, ∀ m ∈ K, a • m ∈ K) (hQK : Q ≤ K) (hQq : IsPGroup q ↥Q)
+    (hQmax : ∀ R : Subgroup N, R ≤ K → IsPGroup q ↥R → R ≤ Q) :
+    ∀ a : A, ∀ m ∈ Q, a • m ∈ Q := by
+  intro a m hm
+  have hsmul_le : a • Q ≤ K := by
+    intro x hx
+    rw [Subgroup.pointwise_smul_def] at hx
+    obtain ⟨y, hy, rfl⟩ := hx
+    exact hKinv a y (hQK hy)
+  have hsmul_q : IsPGroup q ↥(a • Q) := by
+    rw [Subgroup.pointwise_smul_def]
+    exact hQq.map _
+  exact hQmax _ hsmul_le hsmul_q (Subgroup.smul_mem_pointwise_smul m a Q hm)
+
 end
 
 end OddOrder.Isaacs.Ch06

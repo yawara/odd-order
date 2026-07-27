@@ -3475,3 +3475,14 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
   `Q/Y` 作用が Frobenius ⟹ Thm 6.9 elementary-abelian 分岐
   (`false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target`)
   で矛盾。
+
+* ✅ 6C.2(b) 部品 2 本 (2026-07-27):
+  * `exists_max_qSubgroup_le_of_isNilpotent`: `↥K` 冪零なら `K` の `q`-部分群を全て含む
+    `q`-部分群 `Q ≤ K` がある (冪零 ⟹ `NormalizerCondition` ⟹ Sylow 正規 ⟹
+    `Sylow.unique_of_normal` で一意 ⟹ `IsPGroup.exists_le_sylow` で全部入る)。
+    ⟹ これが書籍の「`K_i` の唯一の Sylow `q`-部分群 `Q_i`」。
+  * `smul_mem_of_max_qSubgroup`: `K` が `A`-不変なら最大 `q`-部分群 `Q` も `A`-不変
+    (`a • Q` も `K` の `q`-部分群なので最大性で `a • Q ≤ Q`; `Subgroup.pointwise_smul_def`
+    で `map` に直して `IsPGroup.map`)。
+  * 次: `X = ⨆ i, Q i` が `A`-不変 q-部分群 ⟹ Cor 3.25 で `A`-不変 Sylow `q` の `Q` に入り、
+    `X < Q` から `Y = X ⊔ Φ(Q)` で矛盾を出す段 (Cor 3.28 + Thm 6.9 elem-abelian 分岐)。
