@@ -1276,5 +1276,23 @@ theorem CharacterDifferenceImage.nu_eq_mu_conj
 
 end DifferenceImageProducer
 
+open scoped Classical in
+/-- Plain-sum inner products over subsets of an orthonormal family count the overlap:
+`⟨∑_{α ∈ E} α, ∑_{β ∈ F} β⟩ = |E ∩ F|` for `E, F ⊆ R` orthonormal. -/
+theorem inner_sum_sum_of_orthonormal {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] {R : Finset (ClassFunction H ℂ)}
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    {E F : Finset (ClassFunction H ℂ)} (hE : E ⊆ R) (hF : F ⊆ R) :
+    ClassFunction.inner (∑ α ∈ E, α) (∑ β ∈ F, β) = ((E ∩ F).card : ℂ) := by
+  classical
+  rw [inner_sum_left]
+  have hterm : ∀ α ∈ E, ClassFunction.inner α (∑ β ∈ F, β)
+      = if α ∈ F then (1 : ℂ) else 0 := by
+    intro α hα
+    rw [inner_sum_right, Finset.sum_congr rfl fun β hβ => horth α (hE hα) β (hF hβ),
+      Finset.sum_ite_eq F α fun _ => (1 : ℂ)]
+  rw [Finset.sum_congr rfl hterm, Finset.sum_ite_mem, Finset.sum_const, nsmul_eq_mul, mul_one]
+
+
 
 end OddOrder.Peterfalvi.S07

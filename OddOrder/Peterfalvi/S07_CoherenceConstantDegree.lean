@@ -90,6 +90,145 @@ theorem pairExtension_diff [Finite G] {τ : IntegralCharacterMap L G} {χ : Clas
   rw [map_sub, pairExtension_chi hχ hχχ hortho, pairExtension_chiConj hχ hχbar hortho',
     hχ.image_eq, smul_sub]
 
+open scoped Classical in
+/-- **Peterfalvi (5.7), base case `|𝒮| = 2`, for an arbitrary member norm.**
+
+The book's "if `|𝒮| = 2`, this follows from (5.2.d)" with no irreducibility assumed.  Write
+`m = ‖χ‖²`.  The (5.2.b) isometry gives `‖τ(χ − χ̄)‖² = ‖χ − χ̄‖² = 2m` (using `χ ⊥ χ̄` and
+`‖χ̄‖² = ‖χ‖²`), while orthonormality of `R(χ)` gives `‖∑_{α ∈ R(χ)} α‖² = |R(χ)|` — so
+**`|R(χ)| = 2m`**.  Splitting off any `E ⊆ R(χ)` with `|E| = m` and setting
+
+* `X₀ = ∑_{α ∈ E} α`,  `X₁ = X₀ − τ(χ − χ̄)  (= −∑_{α ∉ E} α)`
+
+makes the Gram matrix of `(X₀, X₁)` equal to that of `(χ, χ̄)`: `‖X₀‖² = |E| = m = ‖χ‖²`,
+`⟨X₀, X₁⟩ = m − |E| = 0 = ⟨χ, χ̄⟩`, and `‖X₁‖² = |R(χ)| − m = m = ‖χ̄‖²`.  Feeding that to
+`coherentEqualDegreeW` (which asks for Gram agreement, not orthonormality) gives coherence.
+
+At `m = 1` this is `isCoherent_pair_of_differenceImage`, whose two-element `R(χ) = {ε·μ, −ε·ν}`
+is the `|E| = 1` split.  The naturality of `m` is a genuine hypothesis here because
+`GeneralHypothesis` does not record that members are characters; in Peterfalvi's (5.2) they are,
+so `‖χ‖² ∈ ℕ` (issue 0157). -/
+noncomputable def isCoherent_pair_of_orthonormalImage
+    {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ} {A : Set L}
+    (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
+    {m : ℕ} (hm : ClassFunction.inner χ χ = (m : ℂ))
+    (hisom : ClassFunction.inner (τ (χ - χ.conj)) (τ (χ - χ.conj))
+      = ClassFunction.inner (χ - χ.conj) (χ - χ.conj))
+    (hortho : ClassFunction.inner χ χ.conj = 0) (hortho' : ClassFunction.inner χ.conj χ = 0)
+    (hne : χ ≠ χ.conj)
+    (hdeg : (χ.conj : ClassFunction L ℂ) 1 = (χ : ClassFunction L ℂ) 1)
+    (hdeg0 : (χ : ClassFunction L ℂ) 1 ≠ 0)
+    (hdiff_supp : ((χ - χ.conj : ClassFunction L ℂ)).support ⊆ A) (h1A : (1 : L) ∉ A)
+    (hZ : τ (χ - χ.conj) ∈ ZIrr G) :
+    IsCoherent τ ({χ, χ.conj} : Set (ClassFunction L ℂ)) A := by
+  classical
+  -- `‖χ̄‖² = ‖χ‖²`
+  have hconjnorm : ClassFunction.inner χ.conj χ.conj = ClassFunction.inner χ χ := by
+    rw [inner_conj_conj, hm, star_natCast]
+  -- `|R(χ)| = 2m`
+  have hcard : R.imageSet.card = 2 * m := by
+    rw [R.image_eq, inner_sum_sum_of_orthonormal R.orthonormal (Finset.Subset.refl _)
+        (Finset.Subset.refl _), Finset.inter_self,
+      ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hortho, hortho', hconjnorm, hm] at hisom
+    have h2 : ((R.imageSet.card : ℕ) : ℂ) = ((2 * m : ℕ) : ℂ) := by
+      rw [hisom]; push_cast; ring
+    exact_mod_cast h2
+  -- `m > 0`: otherwise `χ = 0`, contradicting `χ(1) ≠ 0`
+  have hmpos : m ≠ 0 := by
+    intro h0
+    have hzero : ClassFunction.inner χ χ = 0 := by rw [hm, h0]; simp
+    have hz : χ = 0 := eq_zero_of_inner_self_re_eq_zero (by rw [hzero]; simp)
+    exact hdeg0 (by rw [hz]; simp)
+  choose E hEsub hEcard using
+    Finset.exists_subset_card_eq (s := R.imageSet) (n := m) (by rw [hcard]; omega)
+  set X₀ : ClassFunction G ℂ := ∑ α ∈ E, α with hX₀
+  set X₁ : ClassFunction G ℂ := X₀ - τ (χ - χ.conj) with hX₁
+  have hsumR : τ (χ - χ.conj) = ∑ α ∈ R.imageSet, α := R.image_eq
+  -- the four Gram entries
+  have hg00 : ClassFunction.inner X₀ X₀ = ClassFunction.inner χ χ := by
+    rw [hX₀, inner_sum_sum_of_orthonormal R.orthonormal hEsub hEsub, Finset.inter_self, hEcard, hm]
+  have hgER : ClassFunction.inner X₀ (τ (χ - χ.conj)) = (m : ℂ) := by
+    rw [hX₀, hsumR, inner_sum_sum_of_orthonormal R.orthonormal hEsub (Finset.Subset.refl _),
+      Finset.inter_eq_left.mpr hEsub, hEcard]
+  have hgRE : ClassFunction.inner (τ (χ - χ.conj)) X₀ = (m : ℂ) := by
+    rw [hX₀, hsumR, inner_sum_sum_of_orthonormal R.orthonormal (Finset.Subset.refl _) hEsub,
+      Finset.inter_eq_right.mpr hEsub, hEcard]
+  have hgRR : ClassFunction.inner (τ (χ - χ.conj)) (τ (χ - χ.conj)) = ((2 * m : ℕ) : ℂ) := by
+    rw [hsumR, inner_sum_sum_of_orthonormal R.orthonormal (Finset.Subset.refl _)
+      (Finset.Subset.refl _), Finset.inter_self, hcard]
+  have hg01 : ClassFunction.inner X₀ X₁ = ClassFunction.inner χ χ.conj := by
+    rw [hX₁, ClassFunction.inner_sub_right, hg00, hgER, hm, hortho]; ring
+  have hg10 : ClassFunction.inner X₁ X₀ = ClassFunction.inner χ.conj χ := by
+    rw [hX₁, ClassFunction.inner_sub_left, hg00, hgRE, hm, hortho']; ring
+  have hg11 : ClassFunction.inner X₁ X₁ = ClassFunction.inner χ.conj χ.conj := by
+    rw [hX₁, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hg00, hgER, hgRE, hgRR, hconjnorm, hm]
+    push_cast; ring
+  -- feed the weighted equal-degree builder at `n = 2`
+  have hrange : Set.range ![χ, χ.conj] = ({χ, χ.conj} : Set (ClassFunction L ℂ)) := by
+    ext z; constructor
+    · rintro ⟨i, rfl⟩; fin_cases i <;> simp
+    · intro hz
+      rcases hz with rfl | rfl
+      · exact ⟨0, rfl⟩
+      · exact ⟨1, rfl⟩
+  have hcoh : IsCoherent τ (Set.range ![χ, χ.conj]) A := by
+    refine coherentEqualDegreeW (χ := ![χ, χ.conj]) (X := ![X₀, X₁]) (by omega) ?_ ?_ ?_ ?_ ?_ ?_
+      (by simpa using hdeg0) h1A ?_
+    · -- pairwise orthogonality
+      intro i j hij
+      fin_cases i <;> fin_cases j
+      · exact absurd rfl hij
+      · exact hortho
+      · exact hortho'
+      · exact absurd rfl hij
+    · -- nonzero norms
+      intro j
+      fin_cases j
+      · change ClassFunction.inner χ χ ≠ 0
+        rw [hm]; exact_mod_cast hmpos
+      · change ClassFunction.inner χ.conj χ.conj ≠ 0
+        rw [hconjnorm, hm]; exact_mod_cast hmpos
+    · -- Gram agreement
+      intro i j
+      fin_cases i <;> fin_cases j
+      · exact hg00
+      · exact hg01
+      · exact hg10
+      · exact hg11
+    · -- `τ (χⱼ − χ₀) = Xⱼ − X₀`
+      intro j
+      fin_cases j
+      · change τ (χ - χ) = X₀ - X₀
+        rw [sub_self, map_zero, sub_self]
+      · change τ (χ.conj - χ) = X₁ - X₀
+        rw [show χ.conj - χ = -(χ - χ.conj) from by abel, map_neg, hX₁]
+        abel
+    · -- `Xⱼ ∈ ℤ[Irr G]`
+      intro j
+      fin_cases j
+      · change X₀ ∈ ZIrr G
+        exact Submodule.sum_mem _ fun α hα => R.mem_ZIrr α (hEsub hα)
+      · change X₁ ∈ ZIrr G
+        exact Submodule.sub_mem _
+          (Submodule.sum_mem _ fun α hα => R.mem_ZIrr α (hEsub hα)) hZ
+    · -- equal degree
+      intro j
+      fin_cases j
+      · rfl
+      · exact hdeg
+    · -- supported differences
+      intro j
+      fin_cases j
+      · change ((χ - χ : ClassFunction L ℂ)).support ⊆ A
+        rw [sub_self]
+        simp
+      · change ((χ.conj - χ : ClassFunction L ℂ)).support ⊆ A
+        rw [show χ.conj - χ = -(χ - χ.conj) from by abel, ClassFunction.support_neg]
+        exact hdiff_supp
+  rwa [hrange] at hcoh
+
 /-- **Peterfalvi (5.7), base case**: a single orthonormal conjugate pair `{χ, χ̄}` is coherent.
 
 `χ` and `χ̄` are orthonormal (`hχχ`/`hχbar`/`hortho`/`hortho'`), distinct (`hne`), the difference
@@ -592,9 +731,9 @@ retargeting, fed to the equal-degree coherence builder `coherentEqualDegree`.
 This is the producer that `S13_MaximalIII_IV.HC_le_secondDerived` (Peterfalvi (11.5)) will cite,
 once
 a `Hypothesis (5.2)` instance for `S(M'')` is constructed on the §13 Dade side. -/
-theorem coherent_of_constant_degree
-    (hyp : Hypothesis (L := L) (G := G) S A) (hSfin : S.Finite) (hcard : 2 ≤ S.ncard)
-    (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
+theorem coherent_of_constant_degree_general
+    (hyp : GeneralHypothesis (L := L) (G := G) S A) (hSfin : S.Finite) (hcard : 2 ≤ S.ncard)
+    (hnat : ∀ ζ ∈ S, ∃ m : ℕ, ClassFunction.inner ζ ζ = (m : ℂ))
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
     (hconst : ∀ a ∈ S, ∀ b ∈ S,
       ((a : ClassFunction L ℂ) : L → ℂ) 1 = ((b : ClassFunction L ℂ) : L → ℂ) 1)
@@ -633,15 +772,15 @@ theorem coherent_of_constant_degree
       · exact hdpab.2 (h1 ▸ h2)
       · exact hdpab.2 (by rw [← ClassFunction.conj_conj a, ← h1, h2])
       · exact hdpab.1 (by rw [← ClassFunction.conj_conj a, ← h1, h2, ClassFunction.conj_conj])
-    set β := commonImage hyp.toGeneralHypothesis hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S with hβdef
+    set β := commonImage hyp hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S with hβdef
     set X : Fin n → ClassFunction G ℂ := fun j => β - hyp.tau (χ 0 - χ j) with hXdef
     -- the uniform form of (B): `⟨β, (χ₀ − χⱼ)^τ⟩ = 1 − ⟨χ₀, χⱼ⟩`.
-    have hB : ∀ j, ClassFunction.inner β (hyp.toGeneralHypothesis.tau (χ 0 - χ j))
+    have hB : ∀ j, ClassFunction.inner β (hyp.tau (χ 0 - χ j))
         = ClassFunction.inner (χ 0) (χ 0) - ClassFunction.inner (χ 0) (χ j) := by
       intro j
       by_cases hj : χ j = χ 0
       · rw [hj, sub_self, map_zero, ClassFunction.inner_zero_right]; ring
-      · rw [hβdef, commonImage_inner hyp.toGeneralHypothesis hZIrr hsuppdiff hdp0
+      · rw [hβdef, commonImage_inner hyp hZIrr hsuppdiff hdp0
             (hmem 0) hζ₀S (hmem j) hj,
           hyp.pairwise_orthogonal (hmem 0) (hmem j) (Ne.symm hj)]; ring
     -- pairwise orthogonality and nonzero norms — **no unit norm needed**: the weighted builder
@@ -661,7 +800,7 @@ theorem coherent_of_constant_degree
         exact xFamily_inner χ β (fun p q =>
             hyp.tau_isometry_memberDiff (hmem 0) (hmem p) (hmem 0) (hmem q)
               (hsuppdiff _ (hmem 0) _ (hmem p)) (hsuppdiff _ (hmem 0) _ (hmem q)))
-          (commonImage_self hyp.toGeneralHypothesis hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S) hB i j
+          (commonImage_self hyp hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S) hB i j
       · -- `himg`: `(χⱼ − χ₀)^τ = Xⱼ − X₀`.
         intro j
         simp only [hXdef, sub_self, map_zero, sub_zero]
@@ -690,15 +829,33 @@ theorem coherent_of_constant_degree
         rcases hz with rfl | rfl
         · exact hχ₀
         · exact hcm
+    obtain ⟨m, hm⟩ := hnat χ₀ hχ₀
     have hbase : IsCoherent hyp.tau ({χ₀, χ₀.conj} : Set (ClassFunction L ℂ)) A :=
-      isCoherent_pair_of_differenceImage (hyp.difference_image hχ₀)
-        (hirr χ₀ hχ₀) (hirr χ₀.conj hcm)
+      isCoherent_pair_of_orthonormalImage (hyp.difference_image hχ₀) hm
+        (hyp.tau_isometry_memberDiff hχ₀ hcm hχ₀ hcm
+          (hsuppdiff χ₀ hχ₀ χ₀.conj hcm) (hsuppdiff χ₀ hχ₀ χ₀.conj hcm))
         (hyp.pairwise_orthogonal hχ₀ hcm (hyp.ne_conj hχ₀))
         (hyp.pairwise_orthogonal hcm hχ₀ (Ne.symm (hyp.ne_conj hχ₀))) (hyp.ne_conj hχ₀)
-        (hsuppdiff χ₀ hχ₀ χ₀.conj hcm)
-        (zSupportedSpan_pair_subset_span (hdeg0 χ₀ hχ₀)
-          (hconst χ₀ hχ₀ χ₀.conj hcm).symm h1A)
+        (hconst χ₀.conj hcm χ₀ hχ₀) (hdeg0 χ₀ hχ₀)
+        (hsuppdiff χ₀ hχ₀ χ₀.conj hcm) h1A (hZIrr χ₀ hχ₀ χ₀.conj hcm)
     rw [← hSeq] at hbase
     exact ⟨hbase⟩
+
+/-- **Peterfalvi (5.7)** for the two-element (5.2.d) carrier — the `‖χ‖² = 1` specialization of
+`coherent_of_constant_degree_general`.
+
+`Hypothesis` stores `R(χ)` as a signed pair, which already forces every member irreducible, so
+`hirr` is discharged by the general statement's integrality hypothesis at `m = 1`. -/
+theorem coherent_of_constant_degree
+    (hyp : Hypothesis (L := L) (G := G) S A) (hSfin : S.Finite) (hcard : 2 ≤ S.ncard)
+    (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
+    (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
+    (hconst : ∀ a ∈ S, ∀ b ∈ S,
+      ((a : ClassFunction L ℂ) : L → ℂ) 1 = ((b : ClassFunction L ℂ) : L → ℂ) 1)
+    (hdeg0 : ∀ a ∈ S, ((a : ClassFunction L ℂ) : L → ℂ) 1 ≠ 0) (h1A : (1 : L) ∉ A)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A) :
+    Nonempty (IsCoherent hyp.tau S A) :=
+  coherent_of_constant_degree_general hyp.toGeneralHypothesis hSfin hcard
+    (fun ζ hζ => ⟨1, by rw [hirr ζ hζ]; norm_num⟩) hZIrr hconst hdeg0 h1A hsuppdiff
 
 end OddOrder.Peterfalvi.S07
