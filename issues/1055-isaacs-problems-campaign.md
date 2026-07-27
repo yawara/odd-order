@@ -3379,3 +3379,28 @@ Quot.sound]` (axiom-clean)。
 
 ⟹ **書籍 hint の「`P/Z` が D/SD/Q だから指数 2 の巡回部分群を引き戻す」段を回避**したので、
 具体群 D/SD/Q の構造 (指数 `2` の巡回部分群を持つこと) を 3 種類とも証明する必要が無くなった。
+
+
+### 🎉 6B.9 完成 (2026-07-27) — §6B 全 9 問 完済
+
+**`card_primeFactors_le_two_of_forall_prime_pow_orderOf`** (`Problems6B9.lean`, 新 leaf,
+`OddOrder.lean` 配線済): 可解群 `G` の全元が素数冪位数なら `|G|` の素因数は高々 2 個。
+axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
+
+証明 (素数 3 個以上を仮定して矛盾):
+1. minimal normal `U ⊴ G` は elementary abelian `p`-群 (Thm 3.11 =
+   `solvable_minimal_normal_isElementaryAbelian`)。
+2. `p` 以外の 2 素数 `q ≠ r` を取り、可解性から Hall `{p}ᶜ`-部分群 `K` (Thm 3.13 =
+   `hall_exists_of_piSeparable`; `isPiSeparable_of_solvable` instance)。`q, r ∣ |K|`,
+   `p ∤ |K|` は Hall 定義 (`|K|` の素因子 ⊆ π、index の素因子 ∩ π = ∅) から。
+3. **EPPO の要 `false_of_commute_of_coprime_orderOf`**: 位数が互いに素な非自明元が可換なら
+   `orderOf (xy) = orderOf x · orderOf y` が相異なる 2 素数で割れて素数冪でない。
+   ⟹ `K` の共役作用は `U` 上 Frobenius (`MulAut.conjNormal` 経由の `MulDistribMulAction`)。
+4. `K` の minimal normal `M` は elementary abelian `s`-群。`{q,r}` から `s` と異なる `t` を
+   選び `y ∈ K` を位数 `t` (Cauchy) に取ると **`M⟨y⟩` は Frobenius 群**
+   (`isFrobeniusGroup_sup_zpowers_of_prime_orderOf` = 6B.1 前半の構成を仮説だけに抽象化。
+   ⚠ `M` 可換性は不要と判明したので仮説から落とした)。
+5. `false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup` (Thm 6.9 可解分岐 =
+   6B.1 の "deduce" 部分) に流して矛盾。
+
+⟹ **§6B 完済 (6B.1〜6B.9 全 9 問)**。次は §6C の Problems。
