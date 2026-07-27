@@ -33,8 +33,9 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.4 Commutators
 - [x] Ch.5 Transfer — **🎉 完済 (2026-07-27)**: §5A–§5E 全問
 - [x] Ch.6 Frobenius Actions — **🎉 完済 (2026-07-27)**: §6A (11 問) / §6B (9 問) / §6C (2 問) 全問
-- [ ] Ch.7 Thompson Subgroup — **次の frontier (2026-07-27)**
-- [ ] Ch.8 Permutation Groups
+- [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
+      (§7B に Problems 節は無い)
+- [ ] Ch.8 Permutation Groups — **次の frontier (2026-07-27)**
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4009,3 +4010,48 @@ Case B step 4 の Burnside はこれで足りる (`X ≤ Z(K)` ⟹ `K` に norma
 
 ⚠ Lean メモ: 現行 mathlib の相対指数は **`Subgroup.relIndex`** (`relindex` は無い),
 `Mathlib.GroupTheory.Index` に在り `relIndex_mul_relIndex` は部分群 3 つが明示引数。
+
+### 🎉 7C.1 完成 (2026-07-27) — §7C 完済 (1/1)
+
+`Problems7C.lean` (**559 行, axiom-clean**, AxiomsCheck 登録済)。**Isaacs Ch.7 は §7A (6/6) +
+§7C (1/1) で Problems 完済** (§7B に Problems 節は無い)。
+
+主定理 `hasNormalPComplement_of_charLocalPControl`:
+`P ∈ Syl_p(G)`, `p ≠ 2`, `CharLocalPControl p P` ⟹ `HasNormalPComplement p G`。
+
+**設計上の要点** (当初計画からの変更):
+
+* **`Ω₁(Z(X₀))` は不要 — `Z(X₀)` で足りる**。指数 `p` は証明のどのステップでも使わない
+  (必要なのは「可換・非自明・`p`-群・`P` で char・`G` に正規」だけ)。しかも `Z(X₀)` は
+  ambient で `X₀ ⊓ C_G(X₀)` と書けるので (`map_center_subtype`), 正規性は
+  `Subgroup.normal_centralizer` + `⊓` で即座に出る。
+* **最小反例でなく `Nat.card G ≤ n` の強帰納法**。universe を `.{u}` で固定すれば
+  Case A の `↥N_G(X)` も Case B の `G ⧸ X` も同じ universe に留まる。
+
+**新規部品** (前回 landing 分に加えて):
+
+| 補題 | 役割 |
+|---|---|
+| `characteristic_comap_of_surjective` | 全射 `f` (核が char) に沿って char を引き戻す。`φ : A ≃* A` を `A ⧸ ker f ≃* B` 経由で `B` の自己同型に降ろす |
+| `CharLocalPControl.apply_of_le` / `.of_ambient` | 局所条件の ambient 形 (`Y ≤ P`) との往復 |
+| `CharLocalPControl.quotient` | **Case B step 2**: `X ⊴ G` char in `P` なら局所条件は `G/X` に遺伝 |
+| `hasNormalPComplement_of_normal_of_isPGroup_quotient` | `K ⊴ G` が complement をもち `G/K` が `p`-群 ⟹ `G` ももつ (`O_{p'}(K)` が char なのを使う) |
+| `map_center_subtype` | `Z(H)` の ambient 記述 `H ⊓ C_G(H)` |
+| `centralizer_subgroupOf_of_le` | `H ≤ P` で `C_G(H).subgroupOf P = C_{↥P}(H.subgroupOf P)` |
+| `characteristic_inf` | char の `⊓` (mathlib は `⊓` 版を持たない) |
+| `hasNormalPComplement_of_normal_abelian_of_quotient` | **Case B の中核** (step 3+4) |
+
+**流用した既存部品**: Thm 6.23 (`Ch06.hasNormalPComplement_of_forall_characteristic_normalizer`) /
+Burnside 代替 (`Ch05.hasNormalPComplement_of_sylow_le_center`, Problem 5D.2 = Schur–Zassenhaus 経由) /
+`Ch05.hasNormalPComplement_of_normal_of_index_eq_pow` / `Ch05.normal_map_subtype_of_characteristic` /
+`Ch03.oPiCore` (char + `IsPiGroup` + `le_oPiCore`)。
+
+**Lean 実務メモ**:
+* `Subgroup.normalizer` は **`Set G` 引数** (`Subgroup` でない)。`normalizer_eq_top_iff` /
+  `le_normalizer_of_normal_subgroupOf` (後者が「`X` char in `P` ⟹ `P ≤ N_G(X)`」の正体)。
+* `Subgroup.index_comap_of_surjective` / `relIndex_dvd_index_of_normal` / `relIndex_mul_index` /
+  `map_eq_bot_iff_of_injective` / `card_le_card_group` はいずれも **部分群が明示引数**。
+* `rw [← QuotientGroup.ker_mk' X]` は `G ⧸ X` の `Normal` インスタンスを巻き込んで motive 不整合
+  → `QuotientGroup.le_comap_mk'` を直接使う。
+* `push_neg` は deprecated (v4.32) → `simp only [not_exists, not_and]`。
+* `show` で goal が変わると `linter.style.show` が鳴る → `change`。

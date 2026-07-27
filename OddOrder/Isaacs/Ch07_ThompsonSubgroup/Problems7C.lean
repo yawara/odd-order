@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Index
 import OddOrder.Isaacs.Ch05_Transfer.Problems5C4
+import OddOrder.Isaacs.Ch05_Transfer.Problems5D
 import OddOrder.Isaacs.Ch05_Transfer.Problems5C13
 import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_SylowMaximal
@@ -16,12 +17,24 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_SylowMaximal
 characteristic 部分群 `X` について `N_G(X)/C_G(X)` が `p`-群なら, `G` は
 normal `p`-complement をもつ。
 
-本ファイルはまず, 証明の締めに使う道具
+局所条件は `CharLocalPControl` として **元ごとの形** (`g ∈ N_G(X)` なら
+`g ^ p ^ k ∈ C_G(X)`) で定義する。証明は `|G|` に関する強帰納法で, 2 つの場合に分かれる:
 
-* `hasNormalPComplement_of_normal_pi'_of_isPGroup_quotient`:
-  `M ⊴ G` が `p'`-群で `G/M` が `p`-群なら `M` は `G` の normal `p`-complement,
+* **Case A** — `P` の非自明 characteristic 部分群 `X` がすべて `N_G(X) < G` を満たす。
+  局所条件は `P ≤ H ≤ G` なる部分群に遺伝する (`CharLocalPControl.of_subgroup`) ので
+  帰納法で各 `N_G(X)` が normal `p`-complement をもち, **Thm 6.23**
+  (`hasNormalPComplement_of_forall_characteristic_normalizer`) で終わる。
+* **Case B** — 非自明 characteristic `X₀ ⊴ G` がある。`X := Z(X₀) = X₀ ⊓ C_G(X₀)` は
+  可換・非自明・`P` で characteristic・`G` に正規。局所条件は `G/X` に遺伝する
+  (`CharLocalPControl.quotient`) ので帰納法が使え, `G/X` の complement の引き戻し `K` が
+  `K ≤ C_G(X)`, `X ∈ Syl_p(K)`, `X ≤ Z(K)` を満たす。Burnside (Problem 5D.2) と
+  `hasNormalPComplement_of_normal_of_isPGroup_quotient` で終わる
+  (`hasNormalPComplement_of_normal_abelian_of_quotient`)。
 
-を用意する。
+## Main results
+
+- `OddOrder.Isaacs.Ch07.hasNormalPComplement_of_charLocalPControl`:
+  **Isaacs Problem 7C.1**。
 -/
 
 namespace OddOrder.Isaacs.Ch07
@@ -323,6 +336,223 @@ theorem le_of_relIndex_eq_pow_of_not_dvd [Finite G] {K C X : Subgroup G}
     exact hcop (dvd_trans (hpow ▸ dvd_pow_self p hk) hdvd)
   rw [hk0, pow_zero] at hpow
   exact Subgroup.relIndex_eq_one.mp hpow
+
+/-! ### `Z(X₀)` の ambient 記述 (Case B の `X` の作り方) -/
+
+/-- 部分群 `H` の中心を ambient の部分群として見ると `H ⊓ C_G(H)`。 -/
+theorem map_center_subtype (H : Subgroup G) :
+    (Subgroup.center ↥H).map H.subtype = H ⊓ Subgroup.centralizer (H : Set G) := by
+  ext x
+  constructor
+  · rintro ⟨y, hy, rfl⟩
+    exact ⟨y.2, Subgroup.mem_centralizer_iff.mpr fun h hh =>
+      congrArg Subtype.val (Subgroup.mem_center_iff.mp hy ⟨h, hh⟩)⟩
+  · rintro ⟨hxH, hxC⟩
+    exact ⟨⟨x, hxH⟩, Subgroup.mem_center_iff.mpr fun y =>
+      Subtype.ext (Subgroup.mem_centralizer_iff.mp hxC y y.2), rfl⟩
+
+/-- `H ≤ P` のとき `C_G(H)` を `↥P` に落としたものは `↥P` の中の `C(H.subgroupOf P)`。 -/
+theorem centralizer_subgroupOf_of_le {H P : Subgroup G} (hHP : H ≤ P) :
+    (Subgroup.centralizer (H : Set G)).subgroupOf P =
+      Subgroup.centralizer ((H.subgroupOf P : Subgroup ↥P) : Set ↥P) := by
+  ext x
+  simp only [Subgroup.mem_subgroupOf, Subgroup.mem_centralizer_iff, SetLike.mem_coe]
+  exact ⟨fun hx y hy => Subtype.ext (hx (y : G) hy),
+    fun hx h hh => congrArg Subtype.val (hx ⟨h, hHP hh⟩ hh)⟩
+
+/-- characteristic 部分群の交わりは characteristic (mathlib は `⊓` 版を持たない)。 -/
+theorem characteristic_inf {A B : Subgroup G} (hA : A.Characteristic) (hB : B.Characteristic) :
+    (A ⊓ B).Characteristic := by
+  rw [Subgroup.characteristic_iff_comap_eq]
+  intro φ
+  rw [Subgroup.comap_inf, Subgroup.characteristic_iff_comap_eq.mp hA φ,
+    Subgroup.characteristic_iff_comap_eq.mp hB φ]
+
+/-! ### Case B の中核 -/
+
+/-- **7C.1 Case B の中核**: `X ⊴ G` が可換な `p`-部分群 (`X ≤ C_G(X)`) で `G/C_G(X)` が
+`p`-群, かつ `G/X` が normal `p`-complement をもつなら, `G` は normal `p`-complement をもつ。
+
+`G/X` の complement `N̄` の引き戻し `K` は `X ≤ K ⊴ G` で `[K:X] = |N̄|` は `p` と素。
+`[K : C ⊓ K] ∣ [G:C]` は `p`-冪なので `le_of_relIndex_eq_pow_of_not_dvd` で `K ≤ C`,
+すなわち `X ≤ Z(K)` かつ `X ∈ Syl_p(K)`。Burnside (Problem 5D.2) で `K` が normal
+`p`-complement をもち, `G/K ≅ (G/X)/N̄` は `p`-群なので
+`hasNormalPComplement_of_normal_of_isPGroup_quotient` で `G` に持ち上がる。 -/
+theorem hasNormalPComplement_of_normal_abelian_of_quotient
+    [Finite G] {p : ℕ} [Fact p.Prime] {X : Subgroup G} [X.Normal]
+    (hXp : IsPGroup p ↥X)
+    (hXC : X ≤ Subgroup.centralizer (X : Set G))
+    (hCp : IsPGroup p (G ⧸ Subgroup.centralizer (X : Set G)))
+    (hQ : OddOrder.Isaacs.Ch05.HasNormalPComplement p (G ⧸ X)) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p G := by
+  classical
+  obtain ⟨Nbar, hNbarNormal, hNbarCompl⟩ := hQ
+  haveI := hNbarNormal
+  set K : Subgroup G := Nbar.comap (QuotientGroup.mk' X) with hK_def
+  haveI hKnormal : K.Normal := hNbarNormal.comap _
+  have hXK : X ≤ K := QuotientGroup.le_comap_mk' X Nbar
+  -- `[K : X] = |N̄|` は `p` と素
+  obtain ⟨Q⟩ := (inferInstance : Nonempty (Sylow p (G ⧸ X)))
+  have hpNbar : ¬ p ∣ Nat.card ↥Nbar := by
+    rw [← (hNbarCompl Q).index_eq_card]; exact Q.not_dvd_index
+  have hKindex : K.index = Nbar.index :=
+    Nbar.index_comap_of_surjective (QuotientGroup.mk'_surjective X)
+  have hrelXK : X.relIndex K = Nat.card ↥Nbar := by
+    have h1 : X.relIndex K * Nbar.index = Nat.card (G ⧸ X) := by
+      rw [← hKindex, Subgroup.relIndex_mul_index hXK, Subgroup.index_eq_card]
+    have h2 : Nat.card ↥Nbar * Nbar.index = Nat.card (G ⧸ X) := Subgroup.card_mul_index Nbar
+    exact Nat.eq_of_mul_eq_mul_right
+      (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite) (h1.trans h2.symm)
+  -- `[K : C ⊓ K]` は `p`-冪, よって `K ≤ C`
+  haveI hCnormal : (Subgroup.centralizer (X : Set G)).Normal := Subgroup.normal_centralizer
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hCp
+  have hKC : K ≤ Subgroup.centralizer (X : Set G) := by
+    have hdvd : (Subgroup.centralizer (X : Set G)).relIndex K ∣ p ^ n := by
+      refine dvd_trans (Subgroup.relIndex_dvd_index_of_normal _ K) ?_
+      rw [Subgroup.index_eq_card, hn]
+    obtain ⟨k, _, hk⟩ := (Nat.dvd_prime_pow Fact.out).mp hdvd
+    exact le_of_relIndex_eq_pow_of_not_dvd (le_inf hXC hXK) hk (by rw [hrelXK]; exact hpNbar)
+  -- `X ≤ Z(K)` かつ `X ∈ Syl_p(K)`
+  have hXcenter : X.subgroupOf K ≤ Subgroup.center ↥K := fun x hx =>
+    Subgroup.mem_center_iff.mpr fun y =>
+      Subtype.ext (Subgroup.mem_centralizer_iff.mp (hKC y.2) (x : G) hx).symm
+  have hXKp : IsPGroup p ↥(X.subgroupOf K) :=
+    hXp.of_injective (Subgroup.subgroupOfEquivOfLe hXK).toMonoidHom (MulEquiv.injective _)
+  have hXKidx : ¬ p ∣ (X.subgroupOf K).index := by
+    change ¬ p ∣ X.relIndex K
+    rw [hrelXK]; exact hpNbar
+  have hKcompl : OddOrder.Isaacs.Ch05.HasNormalPComplement p ↥K :=
+    OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_le_center
+      (hXKp.toSylow hXKidx) hXcenter
+  -- `G/K` は `p`-群
+  have hGK : IsPGroup p (G ⧸ K) := by
+    obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp Q.isPGroup'
+    refine IsPGroup.of_card (n := m) ?_
+    rw [← Subgroup.index_eq_card, hKindex, (hNbarCompl Q).symm.index_eq_card, hm]
+  exact hasNormalPComplement_of_normal_of_isPGroup_quotient hKcompl hGK
+
+/-! ### 7C.1 本体 (`|G|` 上の強帰納法) -/
+
+/-- 7C.1 の帰納の骨組み (`Nat.card G ≤ n` に関する帰納)。 -/
+private theorem hasNormalPComplement_of_charLocalPControl_aux.{u} {p : ℕ} [Fact p.Prime]
+    (hp2 : p ≠ 2) :
+    ∀ (n : ℕ) (G : Type u) [Group G] [Finite G] (P : Sylow p G),
+      Nat.card G ≤ n → CharLocalPControl p (P : Subgroup G) →
+      OddOrder.Isaacs.Ch05.HasNormalPComplement p G := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ _ hcard _
+    have : 0 < Nat.card G := Nat.card_pos
+    omega
+  | succ n ih =>
+    intro G _ _ P hcard h
+    classical
+    rcases eq_or_ne (P : Subgroup G) ⊥ with hP | hP
+    · exact hasNormalPComplement_of_sylow_eq_bot P hP
+    by_cases hB : ∃ X : Subgroup G, X ≤ (P : Subgroup G) ∧ X ≠ ⊥ ∧
+        (X.subgroupOf (P : Subgroup G)).Characteristic ∧ X.Normal
+    · -- **Case B**: `P` の非自明 characteristic 部分群で `G` に正規なものがある
+      obtain ⟨X₀, hX₀P, hX₀ne, hX₀char, hX₀normal⟩ := hB
+      haveI := hX₀normal
+      haveI := hX₀char
+      set X : Subgroup G := X₀ ⊓ Subgroup.centralizer (X₀ : Set G) with hX_def
+      haveI hXnormal : X.Normal := by rw [hX_def]; infer_instance
+      have hXX₀ : X ≤ X₀ := inf_le_left
+      have hXP : X ≤ (P : Subgroup G) := hXX₀.trans hX₀P
+      have hX₀p : IsPGroup p ↥X₀ := P.isPGroup'.to_le hX₀P
+      haveI : Nontrivial ↥X₀ := (Subgroup.nontrivial_iff_ne_bot _).mpr hX₀ne
+      -- `X = Z(X₀)`: 非自明 (`p`-群の中心) で可換
+      have hXeq : (Subgroup.center ↥X₀).map X₀.subtype = X := by
+        rw [hX_def]; exact map_center_subtype X₀
+      have hXne : X ≠ ⊥ := by
+        rw [← hXeq, Ne, Subgroup.map_eq_bot_iff_of_injective _ X₀.subtype_injective]
+        exact (Subgroup.nontrivial_iff_ne_bot _).mp hX₀p.center_nontrivial
+      have hXC : X ≤ Subgroup.centralizer (X : Set G) :=
+        le_trans inf_le_right (Subgroup.centralizer_le (by exact_mod_cast hXX₀))
+      -- `X` は `P` の characteristic 部分群
+      have hXsub : X.subgroupOf (P : Subgroup G) =
+          X₀.subgroupOf (P : Subgroup G) ⊓
+            Subgroup.centralizer
+              ((X₀.subgroupOf (P : Subgroup G) : Subgroup ↥(P : Subgroup G)) :
+                Set ↥(P : Subgroup G)) := by
+        rw [hX_def, Subgroup.subgroupOf, Subgroup.comap_inf,
+          ← centralizer_subgroupOf_of_le hX₀P]
+        rfl
+      have hXchar : (X.subgroupOf (P : Subgroup G)).Characteristic := by
+        rw [hXsub]
+        exact characteristic_inf hX₀char Subgroup.characteristic_centralizer
+      -- 局所条件を `X` に当てると `G/C_G(X)` は `p`-群
+      haveI hCnormal : (Subgroup.centralizer (X : Set G)).Normal := Subgroup.normal_centralizer
+      have hCp : IsPGroup p (G ⧸ Subgroup.centralizer (X : Set G)) := by
+        intro gbar
+        obtain ⟨g, rfl⟩ :=
+          QuotientGroup.mk'_surjective (Subgroup.centralizer (X : Set G)) gbar
+        obtain ⟨k, hk⟩ := h.apply_of_le hXP hXchar
+          (show g ∈ Subgroup.normalizer (X : Set G) by
+            rw [Subgroup.normalizer_eq_top]; exact Subgroup.mem_top g)
+        exact ⟨k, by rw [← map_pow]; exact (QuotientGroup.eq_one_iff _).mpr hk⟩
+      -- `G/X` に帰納法を適用
+      have hcardQ : Nat.card (G ⧸ X) ≤ n := by
+        haveI : Nontrivial ↥X := (Subgroup.nontrivial_iff_ne_bot _).mpr hXne
+        have h2 : 2 ≤ Nat.card ↥X := Finite.one_lt_card (α := ↥X)
+        have hle : 2 * Nat.card (G ⧸ X) ≤ Nat.card G :=
+          le_trans (Nat.mul_le_mul_right _ h2)
+            (le_of_eq (by rw [← Subgroup.index_eq_card]; exact Subgroup.card_mul_index X))
+        have hpos : 0 < Nat.card (G ⧸ X) := Nat.card_pos
+        omega
+      have hQ : OddOrder.Isaacs.Ch05.HasNormalPComplement p (G ⧸ X) :=
+        ih (G ⧸ X) (P.mapSurjective (QuotientGroup.mk'_surjective X)) hcardQ
+          (by rw [Sylow.coe_mapSurjective]; exact CharLocalPControl.quotient hXP hXchar h)
+      exact hasNormalPComplement_of_normal_abelian_of_quotient
+        (P.isPGroup'.to_le hXP) hXC hCp hQ
+    · -- **Case A**: 非自明 characteristic 部分群はすべて真の正規化群をもつ
+      simp only [not_exists, not_and] at hB
+      refine OddOrder.Isaacs.Ch06.hasNormalPComplement_of_forall_characteristic_normalizer
+        P hp2 ?_
+      intro Xs hXschar hXsne
+      haveI := hXschar
+      set X : Subgroup G := Xs.map (P : Subgroup G).subtype with hX_def
+      have hXP : X ≤ (P : Subgroup G) := Subgroup.map_subtype_le Xs
+      have hXchar : (X.subgroupOf (P : Subgroup G)).Characteristic := by
+        rw [hX_def, Subgroup.subgroupOf,
+          Subgroup.comap_map_eq_self_of_injective (P : Subgroup G).subtype_injective]
+        exact hXschar
+      have hXne : X ≠ ⊥ := by
+        rw [hX_def, Ne,
+          Subgroup.map_eq_bot_iff_of_injective _ (P : Subgroup G).subtype_injective]
+        exact hXsne
+      have hNtop : Subgroup.normalizer (X : Set G) ≠ ⊤ := fun htop =>
+        hB X hXP hXne hXchar (Subgroup.normalizer_eq_top_iff.mp htop)
+      haveI hXchar' : (X.subgroupOf (P : Subgroup G)).Characteristic := hXchar
+      have hPN : (P : Subgroup G) ≤ Subgroup.normalizer (X : Set G) :=
+        Subgroup.le_normalizer_of_normal_subgroupOf hXP
+      have hcardN : Nat.card ↥(Subgroup.normalizer (X : Set G)) ≤ n := by
+        have h1 : Nat.card ↥(Subgroup.normalizer (X : Set G)) ≤ Nat.card G :=
+          Subgroup.card_le_card_group _
+        have h2 : Nat.card ↥(Subgroup.normalizer (X : Set G)) ≠ Nat.card G := fun heq =>
+          hNtop (Subgroup.eq_top_of_card_eq _ heq)
+        omega
+      exact ih _ (P.subtype hPN) hcardN
+        (by
+          rw [Sylow.coe_subtype]
+          exact CharLocalPControl.of_subgroup _
+            (by rw [Subgroup.map_subgroupOf_eq_of_le hPN]; exact h))
+
+/-- **Isaacs Problem 7C.1** (Thompson, p. 210) 🎉.
+
+`P ∈ Syl_p(G)`, `p ≠ 2` で, `P` の**任意の** characteristic 部分群 `X` について
+`N_G(X)/C_G(X)` が `p`-群 (= `CharLocalPControl`) なら, `G` は normal `p`-complement をもつ。
+
+`|G|` に関する帰納法。`P` の非自明 characteristic 部分群 `X` がすべて `N_G(X) < G` を
+満たすなら, 帰納法で各 `N_G(X)` が normal `p`-complement をもち **Thm 6.23** で終わる。
+そうでなければ非自明 characteristic `X₀ ⊴ G` があり, `X := Z(X₀)` に取り替えると可換で
+`G/X` にも仮説が遺伝するので帰納法が使え, Case B の中核補題で終わる。 -/
+theorem hasNormalPComplement_of_charLocalPControl.{u} {G : Type u} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) (hp2 : p ≠ 2)
+    (h : CharLocalPControl p (P : Subgroup G)) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement p G :=
+  hasNormalPComplement_of_charLocalPControl_aux hp2 (Nat.card G) G P le_rfl h
 
 end
 
