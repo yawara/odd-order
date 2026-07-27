@@ -4431,7 +4431,8 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   `exists_regular_normal_of_card_stabilizer_eq_two` (正則正規部分群 `K`) +
   `prime_card_of_card_stabilizer_eq_two` (**`|Ω|` は奇素数**)。
   **残り = `G ≅ DihedralGroup p` の明示同型のみ** /
-  **次の frontier = 8B.7**。
+  8B.7 🔶 **道具のみ landing** (`oddCore` = `O²`, 奇位数元の小軌道固定) /
+  **次の frontier = 8B.7 本体**。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4499,3 +4500,39 @@ mathlib `DihedralGroup p` への**明示同型の構成**だけ:
 
 ⚠ **優先度は 8B.7 より低い** (数学的中身は済んでおり、残りは表示の橋渡し)。
 文書順の原則からは 8B.7 に進み、後で戻る。
+
+
+## §8B 残り問題の正確な文言 (2026-07-27, PDF ページ画像で確定)
+
+⚠ pdftotext は**上付きを落とす**ので 8B.7 の hint が `O_2(D)` に見えていたが、
+実際は **`O²(D) ⊲ O²(K)`** (2-**剰余**部分群)。ページ画像を
+`references/isaacs/pages/isaacs-p249-262.png` に保存済。
+
+* **8B.7**: `H = G_α` が `Ω ∖ {α}` に長さ 3 の軌道をもてば `|H| = 3·2^e` (`e ≥ 0`)。
+  Hint: `β` をその軌道の点, `D = H_β`, `K = core_H(D)` として `O²(D) ⊲ O²(K)`。
+  Note: Sims により `e ≤ 4` (=> `|H| ∣ 48`)。
+* **8B.8**: `x = (1,2,…,n)` (n-cycle), `1 < m < n`, `H ⊆ S_n` が `{1,…,m}` に推移的で
+  残りを固定するなら `G = ⟨H, x⟩` は原始的。
+  Hint: block `Δ` (`|Δ| > 1`) の translate が `i ≤ m` と `j > m` を同時に含むことを示し、
+  その translate が `1..m` を全部含むと導く。
+* **8B.9**: `x` = n-cycle, `y` = m-cycle `(1,…,m)` (`1 < m < n`) なら `⟨x,y⟩` は
+  `m` か `n` が偶数のとき `S_n`, そうでなければ `A_n`。
+* **8B.10**: `G ⊆ S_n` が指数 `n` の部分群で点安定化群でないなら `n = 6`。
+  Hint: `G` は推移的 → **8A.16** (landing 済 `two_transitive_of_coprime_index`) で
+  2-transitive → 原始的 → **Bochert の定理** (repo `Ch08/Bochert.lean`) で
+  `n ≥ [(n+1)/2]!` → `n ∈ {1,2,3,4,6}`。
+
+### 8B.7 本体の設計 (2026-07-27)
+
+`Δ` = `H`-軌道 (`|Δ| = 3`), `β ∈ Δ`, `D = G_α ⊓ G_β` (`[H:D] = 3`)。
+
+1. **奇位数元 `x ∈ D` は `Δ` を各点固定**: `x` は `β` を固定し `Δ` を保つので
+   `Δ ∖ {β}` (2 点) を保つ ⟹ `smul_eq_self_of_odd_of_ncard_le_two` で各点固定。
+2. ⟹ **`H ≤ N(oddCore D)`**: `g ∈ H` と生成元 `x` (奇位数 ∈ `D`) について
+   `g x g⁻¹` は `g • Δ = Δ` の各点を固定するので特に `β` を固定 ⟹ `∈ D`、位数も奇。
+   (core `K` を経由せずに直接示せる — hint より簡単。)
+3. 同様に `G_β ≤ N(oddCore D)` (`G_β`-軌道 `Δ'` (= `α` の軌道) も長さ 3;
+   `ncard_suborbit_eq_relIndex` + `card_stabilizer_eq` で `|Δ'| = |Δ| = 3`)。
+4. `G_α ⊔ G_β = ⊤` (極大性; 8B.6 前半と同じ議論) ⟹ **`oddCore D ⊴ G`** ⟹
+   `oddCore D ≤ D ≤ G_α` と `eq_bot_of_normal_le_stabilizer` で `oddCore D = ⊥`。
+5. `isPGroup_two_of_oddCore_eq_bot` で `D` は 2-群 ⟹ `|H| = 3·|D| = 3·2^e`。
