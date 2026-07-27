@@ -3835,6 +3835,17 @@ set_option linter.style.longLine false in
 -- (5.2.d)/(5.2.e) image families from `InducedFamilyImageData`, and the per-member decomposition
 -- from `S07.memberExtensionDecomposition_general` (whose `imageFamily` is definitionally `R(·)`
 -- and whose `tau1` is the accumulator extension — both discharged by `rfl`).
+-- The bridge from the book's common-index `p`-power degrees to the *ratio* form the (5.6) engine
+-- consumes: once `K` is a `p`-group ((6.5)), every `𝒳`-member has degree `|L:K|·p^k`, and a
+-- base-block anchor has the minimal such degree, so `χ(1) = p^(k−k₁)·χ₁(1)`.  Supplies the
+-- `hratio`/`hχratio` inputs below (and `ha1 : deg i₁ = 1` at `χ = χ₁`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.exists_primePow_degree_ratio_of_xBaseBlock_anchor
+-- The `hSgen` anchor-generation condition: if every member of `S₁` has degree a natural multiple
+-- of the anchor's, then `ℤ[S₁] ≤ ℤ⟨ℤ[S₁, A₀] ∪ {χ₁}⟩` — split `φ = (φ − d·χ₁) + d·χ₁`, the
+-- bracket being `K^#`-supported because the degrees match.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.span_le_span_zSupportedSpan_union_anchor
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xAdjoinStep_of_degreeRatios
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the

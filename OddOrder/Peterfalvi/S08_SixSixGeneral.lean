@@ -507,6 +507,72 @@ noncomputable def xSet_isCoherent_of_adjoinSteps
   rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair (hpair0 i hi) (hpair1 i hi)]
   exact hstep pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi hcoh
 
+/-! ### Degree ratios over a base-block anchor -/
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- **The degree ratio of an `𝒳`-member over a base-block anchor is a `p`-power.**
+
+Once `K` is a `p`-group (which (6.5) supplies), every `𝒳`-member has degree `|L:K|·p^k`
+(`exists_index_primePow_degree_of_mem_inducedKernelFamily`).  A base-block anchor `χ₁` has the
+*minimal* degree, so its exponent is minimal too, and `χ(1) = p^(k − k₁)·χ₁(1)`.
+
+This supplies the `hratio`/`hχratio` inputs of `xAdjoinStep_of_degreeRatios` (and, at
+`χ = χ₁`, the `ha1 : deg i₁ = 1` clause), turning the book's common-index `p`-power degree data
+into the ratio form the (5.6) engine consumes. -/
+theorem exists_primePow_degree_ratio_of_xBaseBlock_anchor
+    {p : ℕ} (hp : p.Prime) (hKp : IsPGroup p ↥K) {Z : Subgroup ↥L}
+    {χ₁ χ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ xBaseBlock K Z) (hχ : χ ∈ xSet K Z) :
+    ∃ r : ℕ, χ 1 = ((p ^ r : ℕ) : ℂ) * χ₁ 1 := by
+  obtain ⟨k₁, hk₁⟩ :=
+    exists_index_primePow_degree_of_mem_inducedKernelFamily (K := K) hp hKp
+      (xSet_subset (K := K) Z (xBaseBlock_subset (K := K) Z hχ₁))
+  obtain ⟨k, hk⟩ :=
+    exists_index_primePow_degree_of_mem_inducedKernelFamily (K := K) hp hKp
+      (xSet_subset (K := K) Z hχ)
+  -- minimality of the anchor's degree gives `p^k₁ ≤ p^k`, hence `k₁ ≤ k`
+  have hle : K.index * p ^ k₁ ≤ K.index * p ^ k :=
+    natDegree_le_of_xBaseBlock_anchor (K := K) hχ₁ hχ hk₁ hk
+  have hidx : 0 < K.index := Nat.pos_of_ne_zero K.index_ne_zero_of_finite
+  have hkle : k₁ ≤ k := by
+    have : p ^ k₁ ≤ p ^ k := Nat.le_of_mul_le_mul_left hle hidx
+    exact (Nat.pow_le_pow_iff_right hp.one_lt).mp this
+  refine ⟨k - k₁, ?_⟩
+  rw [hk, hk₁, ← Nat.cast_mul]
+  congr 1
+  rw [← mul_assoc, mul_comm (p ^ (k - k₁)) K.index, mul_assoc, ← pow_add]
+  congr 2
+  omega
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
+/-- **The anchor-generation condition `hSgen`.**  If every member of `S₁` has degree a natural
+multiple of the anchor's, then `ℤ[S₁] ≤ ℤ⟨ℤ[S₁, A₀] ∪ {χ₁}⟩`: write `φ = (φ − d·χ₁) + d·χ₁`,
+where the bracket is `K^#`-supported by `inducedKernelFamily_scaledDiff_support` (matching degrees)
+and hence lies in `ℤ[S₁, A₀]`.
+
+This is the `hSgen` input of `xAdjoinStep_of_degreeRatios`; in the (6.6) application the degree
+multiples are the `p`-powers of `exists_primePow_degree_ratio_of_xBaseBlock_anchor`. -/
+theorem span_le_span_zSupportedSpan_union_anchor {A₀ : Set ↥L}
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ S₁)
+    (hratio : ∀ φ ∈ S₁, ∃ d : ℕ, φ 1 = (d : ℂ) * χ₁ 1) :
+    Submodule.span ℤ S₁ ≤ Submodule.span ℤ
+      (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁ A₀ ∪ {χ₁}) := by
+  rw [Submodule.span_le]
+  intro φ hφ
+  obtain ⟨d, hd⟩ := hratio φ hφ
+  have hdiff : (φ - d • χ₁ : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁ A₀ :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hφ)
+      (nsmul_mem (Submodule.subset_span hχ₁) _),
+     inducedKernelFamily_scaledDiff_support hKsupp (hS₁sub hφ) (hS₁sub hχ₁) hd⟩
+  have hsplit : φ = (φ - d • χ₁ : ClassFunction ↥L ℂ) + d • χ₁ := by abel
+  rw [hsplit]
+  refine Submodule.add_mem _
+    (Submodule.subset_span (Set.mem_union_left _ hdiff))
+    (nsmul_mem (Submodule.subset_span (Set.mem_union_right _ ?_)) _)
+  exact Set.mem_singleton _
+
 /-! ### The `(6.6)` per-step adjoining, `τ`-general (issue 0155 step 4) -/
 
 open scoped Classical in
