@@ -3541,3 +3541,20 @@ Ch.6 の演習は **§6A 6A.1–6A.11 / §6B 6B.1–6B.9 / §6C 6C.1–6C.2 の�
 
 次の frontier = **Ch.7 (Thompson Subgroup) の Problems** (文書順)。着手時は
 問題番号一覧を PDF ページ画像で確定してから (pdftotext は記号が壊れる)。
+
+## Ch.7 (Thompson Subgroup) §7A — 問題一覧 (書籍 pp. 209-210, pdftotext L10024-)
+
+⚠ statement は着手時に PDF ページ画像で再確認する (式・添字が pdftotext で壊れる)。
+
+| # | 主張 (要約) | 見込みの道具 |
+|---|---|---|
+| 7A.1 | 単純群の冪零な極大部分群は `2`-群 | **Thm 7.1** (Thompson の normal `p`-complement) + `Z(P)`/`J(P)` の正規化群が `M` に一致する議論 |
+| 7A.2 | `S = SL(2,3)`, `Z = {±I}` ⟹ `S/Z` (位数 12) は Sylow 3 が 4 個 ⟹ Sylow 2 が一意 ⟹ `S` に位数 8 の正規部分群 | `GL(n,q)` の Sylow `p` が 2 個以上 (本文既知) + Sylow 数え上げ |
+| 7A.3 | `G = GL(n,q)`, `P` = 上三角冪単, `D` = 対角 ⟹ (a) `D ≤ N_G(P)` (b) `DP` = 上三角全体 (c) `P`-不変部分空間は各次元にちょうど 1 つ (d) `N_G(P) = DP` | 行列計算 + `P`-不変部分空間の分類 |
+| 7A.4 | `SL(2,q)` と `PSL(2,q)` の Sylow `p` はちょうど `q + 1` 個 | Sylow 数え上げ (Borel の指数) |
+| 7A.5 | `P` `p`-群, `U ⊴ P` elementary abelian ⟹ `U` はある `E ∈ 𝓔(P)` を正規化 | `\|U ⊓ E\|` 最大の `E` を取る hint (書籍の証明あり) |
+| 7A.6 | 一般四元数 `Q` で `\|Aut(Q)\|` が奇素数 `p` で割れる ⟹ `p = 3` かつ `\|Q\| = 8`; ⟹ Lemma 7.3 / Thm 7.5 の「Sylow 2 が可換」仮説は `p > 3` では不要 | `Aut(Q_{2^n})` の位数 (2 冪 × 小さい因子) の計算 |
+
+文書順で **7A.1 から着手**。7A.1 は Thm 7.1 (repo の Ch07 に既存かを最初に grep で確認) と
+`J(P)`・`Z(P)` の repo API を使う。§7B は Problems 節が無く (次の Problems 見出しは 7C)、
+§7C の一覧は着手前に別途確認する。
