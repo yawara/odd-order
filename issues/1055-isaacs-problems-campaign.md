@@ -3705,3 +3705,52 @@ API メモ: `Sylow.is_maximal'` / `Subgroup.map_subgroupOf_eq_of_le` /
   **`∀ g : SL23, g * (-I) = (-I) * g` を `decide` で判定**できる) で `|Z| = 2`、
   ⟹ `natCard_quotient_centerZ : |SL(2,3)/Z| = 12`。
   ⚠ `Subgroup.mem_center_iff.mp h g : g * a = a * g` (= `Commute g a`; `.symm` 不要)。
+
+### 🎉 7A.2 完成 (2026-07-27) — `exists_normal_card_eight_sl23` (axiom-clean)
+
+`Problems7A2.lean` (274 行):
+* `card_sylow_three_quotient : Nat.card (Sylow 3 (SL(2,3)/Z)) = 4`。
+  `n_3 ∣ 4` (`Sylow.card_dvd_index`) + `n_3 ≡ 1 mod 3` (`card_sylow_modEq_one`) で
+  `n_3 ∈ {1,4}` (`interval_cases` + `decide` で 2, 3 を排除)。`n_3 = 1` の排除は
+  `Subsingleton (Sylow 3 Q)` から `⟨ā⟩ = P1 = P2 = ⟨b̄⟩` (位数 3 = Sylow の位数なので
+  `Subgroup.eq_of_le_of_card_ge`) ⟹ `b̄ ∈ ⟨ā⟩` ⟹ `(a^i)⁻¹ b ∈ Z` の 3×2 = 6 通りが
+  すべて `decide` で偽。
+* `exists_normal_card_eight_sl23`: 位数 12 補題 (Ch01, public 化済) の正規 Sylow 2 を
+  `QuotientGroup.mk'` で引き戻し、`Subgroup.index_comap` で指数 3 を保つので
+  `|N| = 24/3 = 8`。
+* `mem_centerZ_iff : x ∈ Z ↔ x = 1 ∨ x = -I` (zpowers の `m % 2` 展開) が 6 ケース化の鍵。
+  ⚠ `QuotientGroup.eq_one_iff` は**元を明示引数に取る** (`(QuotientGroup.eq_one_iff x).mp`)。
+
+⟹ §7A は 2/6 完了 (7A.1, 7A.2)。次は 7A.3 (`GL(n,q)` の `N_G(P) = DP`)。
+
+### §7A statement を PDF ページ画像で確定 (2026-07-27)
+
+`references/isaacs/pages/isaacs-p209-222.png` を新規レンダリング (書籍 p.209 = PDF p.222、
+`pdftoppm -r 150`; 規約どおり references リポに保存)。pdftotext の崩れを 2 箇所訂正:
+
+* **7A.3(c)**: 「dimension `k` for each integer `k` with **`1 ≤ k ≤ n`**」
+  (pdftotext は `1 < k < n` に見えていた)。また **`G` は行ベクトルへの右からの掛け算で作用**
+  ⟹ 不変部分空間は**後ろの `k` 本**の基底が張るもの (`e_n A = e_n` だが `e_1 A` は第 1 行)。
+* **7A.5**: `U ⊲ P` は **normal** (単一の ⊲; pdftotext の `U <d P` は判別不能だった)。
+  [[mmd-collapses-subnormal-symbol]] の教訓どおり画像で確認した。
+* 7A.2 の hint は `n ≥ 2` (pdftotext は `n > 2`) — 実装済の 7A.2 には影響なし。
+
+7A.3 の設計メモ: (a) 対角共役で上三角冪単は保たれる、(b) `DP` = 可逆上三角全体、
+(c) `P`-不変部分空間は標準旗 `⟨e_{n-k+1},…,e_n⟩` のみ (各次元ちょうど 1 つ)、
+(d) `N` は `P`-不変部分空間を保つので旗を保ち ⟹ 上三角 ⟹ `N = DP`。
+⟹ (a)(b) は初等的。(c) が核心 (有限体上の線型代数)。
+
+### 7A.3 進捗 (2026-07-27): 上三角/冪単の部分群を実証明
+
+新 leaf `Problems7A3.lean` (`OddOrder.lean` 配線済):
+* `blockTriangular_mul_diag`: **上三角行列の積の対角成分は対角成分の積**
+  (`(A*B) i i = ∑ k, A i k * B k i` で `k < i` は `A i k = 0`、`i < k` は `B k i = 0`;
+  `Finset.sum_eq_single`)。これが冪単性の積・逆元での保存の鍵。
+* `upperTriangularGL` (可逆上三角 = Borel) / `unitriangularGL` (上三角冪単 = Sylow p) を
+  `Subgroup (GL (Fin n) F)` として定義。逆元は
+  `Matrix.blockTriangular_inv_of_blockTriangular` + `Matrix.coe_units_inv`、
+  冪単性の逆元側は `(A * A⁻¹) i i = A i i * (A⁻¹) i i = 1` から。
+* `unitriangularGL_le_upperTriangularGL`。
+* ⚠ 「上三角」は `Matrix.BlockTriangular M id` (`∀ i j, j < i → M i j = 0`) で表す。
+  `[DecidableEq F]` は**不要** (行列の逆に要るのは添字型 `Fin n` の DecidableEq)。
+* 次: (a) `D ≤ N(P)` (対角共役)、(b) `DP` = 上三角全体、(c) `P`-不変部分空間の分類、(d) `N = DP`。
