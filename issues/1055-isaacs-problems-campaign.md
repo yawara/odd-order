@@ -4434,8 +4434,8 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
   8B.8 ✅ `isPreprimitive_sup_zpowers_addRight_one` /
   8B.9 ✅ `eq_top_...` (m か n 偶 ⟹ S_n) / `eq_alternatingGroup_...` (ともに奇 ⟹ A_n) /
-  8B.10 🔶 **準備のみ** (`eq_stabilizer_of_index_eq_of_fixed`) —
-  **次の frontier = 8B.10 本体** (§8B 最後)。
+  8B.10 🔶 **準備 2 本** (`eq_stabilizer_of_index_eq_of_fixed`, 二項係数不等式
+  `lt_choose_of_two_le_of_le_sub_two`) — **次の frontier = 8B.10 の step 1 (推移性)**。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4698,3 +4698,22 @@ landing 済 ⟹ **`H` は固定点をもたない**。残りは:
    (`factorial_le_index_of_isPreprimitive`) で `((n+1)/2)! ≤ n` ⟹ `n ∈ {1,2,3,4,6}`。
 5. 2-transitivity から `n(n-1) ∣ |H| = (n-1)!` ⟹ `n ∣ (n-2)!` で `n = 2,3,4` を除外。
    `n = 1` は `H` が自動的に唯一の点安定化群 ⟹ 除外。⟹ `n = 6`。
+
+
+### 8B.10 の進捗 (2026-07-27)
+
+landing 済:
+* `eq_stabilizer_of_index_eq_of_fixed` / `not_fixed_of_index_eq_of_ne_stabilizer`
+  ⟹ `H` は固定点をもたない
+* `lt_choose_of_two_le_of_le_sub_two`: `4 ≤ N`, `2 ≤ k ≤ N-2` ⟹ `N < C(N,k)`
+  (`choose_two_le_choose` = 中央までの単調性つき)
+
+残り step 1 (推移性) に必要なのは **「`H` が `Δ` を保つ ⟹ `[Sym : Stab(Δ)] ∣ [Sym : H]`
+かつ `[Sym : Stab(Δ)] = C(n,k)`」** の部分:
+* `Sym(α)` の `k`-部分集合全体への作用が推移的であること (`Finset.card` が等しい
+  2 つの Finset を移す置換の構成)。
+* `k`-部分集合の個数 = `C(n,k)` — mathlib `Finset.card_powersetCard`。
+* あるいは **代案**: `|H| ≤ k!·(n-k)!` を `H ↪ Perm Δ × Perm Δᶜ`
+  (`Equiv.Perm.subtypePerm` を 2 つ) で示し、`|H| = (n-1)!` と合わせて
+  `C(n,k) ≤ n` に帰着させる。`Nat.card_perm` が `|Perm β| = |β|!` を与える。
+  こちらのほうが「推移性」を作らずに済むので**代案を先に試す**。
