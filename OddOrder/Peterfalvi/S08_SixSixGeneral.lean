@@ -137,17 +137,17 @@ theorem exists_source_primePow_centralBound_of_mem_xSet
 
 /-- **Hypothesis (5.2) for the `(6.6)` set `𝒳 = 𝒮 − 𝒮(Z)`.**  `𝒳` is a conjugation-closed,
 real-free, pairwise-orthogonal subset of `𝒮`, so every clause restricts from
-`InducedFamilyImageData.hypothesis` at `X = ⊥` — with the same (5.3.a) two-element `R(χ)` for the
+`InducedFamilyTauData.hypothesis` at `X = ⊥` — with the same (5.3.a) two-element `R(χ)` for the
 (irreducible) members and the same derived (5.2.e). -/
-noncomputable def InducedFamilyImageData.xSetHypothesis {A₀ : Set ↥L}
-    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+noncomputable def InducedFamilyTauData.xSetHypothesis {A₀ : Set ↥L}
+    (RD : InducedFamilyTauData (G := G) A₀ K) (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
     {Z : Subgroup ↥L} (hirr : ∀ φ ∈ xSet K Z, IsIrreducibleCharacter φ) :
     OddOrder.Peterfalvi.S07.Hypothesis (L := ↥L) (G := G) (xSet K Z) A₀ :=
   RD.hypothesisOfSubfamily hodd hKsupp (xSet_subset Z) (xSet_closedUnderConjugate Z) hirr
 
-@[simp] theorem InducedFamilyImageData.xSetHypothesis_tau {A₀ : Set ↥L}
-    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+@[simp] theorem InducedFamilyTauData.xSetHypothesis_tau {A₀ : Set ↥L}
+    (RD : InducedFamilyTauData (G := G) A₀ K) (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
     {Z : Subgroup ↥L} (hirr : ∀ φ ∈ xSet K Z, IsIrreducibleCharacter φ) :
     (RD.xSetHypothesis hodd hKsupp hirr).tau = RD.tau := rfl
@@ -386,7 +386,7 @@ The Sibley `K = H` instance is `xBaseBlock_isCoherent_of_irreducible_X`, which i
 orthonormal target family from the Dade map (`coherentEqualDegree_fromDade`); routing through
 (5.7) keeps this `τ`-general. -/
 noncomputable def xBaseBlock_isCoherent {A₀ : Set ↥L}
-    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+    (RD : InducedFamilyTauData (G := G) A₀ K) (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
     {Z : Subgroup ↥L} (hirr : ∀ φ ∈ xSet K Z, IsIrreducibleCharacter φ)
     (hXne : (xSet K Z).Nonempty) :
@@ -683,7 +683,7 @@ needed.  Everything it supplies to that engine comes from general-kernel facts:
 * the per-member decomposition `Dmem` — `S07.memberExtensionDecomposition_general`, whose
   `imageFamily` is definitionally `R(χmem j)` and whose `tau1` is the accumulator extension. -/
 noncomputable def xAdjoinStep_of_degreeRatios {A₀ : Set ↥L}
-    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+    (RD : InducedFamilyTauData (G := G) A₀ K) (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
     {Z : Subgroup ↥L} (hirr : ∀ φ ∈ xSet K Z, IsIrreducibleCharacter φ)
     {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁X : S₁ ⊆ xSet K Z)
@@ -737,6 +737,11 @@ noncomputable def xAdjoinStep_of_degreeRatios {A₀ : Set ↥L}
       OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ :=
     conjDiff_mem_zSupportedSpan hKsupp hχfam
   -- per-member (5.2.d) decompositions and their (5.2.e) orthogonality to `R(χ)`
+  -- (5.2.d)/(5.2.e) for the members of `𝒳`: **derived** from the (5.2.b) isometry, since every
+  -- `𝒳`-member is irreducible and non-real (issue 0156).  `hyp.difference_image` is the (5.3.a)
+  -- signed pair `τ(φ − φ̄) = ε·(μ − ν)`; `toOrthonormalFamily` puts it in the `{ε·μ, −ε·ν}` shape
+  -- the (5.6) engine consumes.
+  let hyp := RD.xSetHypothesis hodd hKsupp hirr
   have hmemconjsupp : ∀ j ∈ s, ((χmem j).conj - χmem j).support ⊆ A₀ := by
     intro j hj
     have h := (conjDiff_mem_zSupportedSpan hKsupp (hS₁sub (hmemS1 j hj))).2
@@ -744,11 +749,12 @@ noncomputable def xAdjoinStep_of_degreeRatios {A₀ : Set ↥L}
     rw [hneg, ClassFunction.support_neg]
     exact h
   refine OddOrder.Peterfalvi.S07.xAdjoinStepW_general (Samb := inducedKernelFamily K ⊥)
-    hS₁ hS₁sub RD.adjoinHisom χ (RD.R χ hχfam) hχχ hχbarχbar hχχbar hχbarχ hχ_S1 hχbar_S1
+    hS₁ hS₁sub RD.adjoinHisom χ (hyp.difference_image hχX).toOrthonormalFamily
+    hχχ hχbarχbar hχχbar hχbarχ hχ_S1 hχbar_S1
     s χmem deg i₁ hi₁ hmemdegdiffmem hmemS1 (fun _ => (1 : ℝ)) (fun _ _ => one_pos)
     hmemortho (a := a)
     (fun j hj => OddOrder.Peterfalvi.S07.memberExtensionDecomposition_general hS₁
-      (RD.R (χmem j) (hS₁sub (hmemS1 j hj))) (hmemconjsupp j hj)
+      (hyp.difference_image (hmemX j hj)).toOrthonormalFamily (hmemconjsupp j hj)
       (hmemS1 j hj) (hS₁conj (hmemS1 j hj))
       (hS₁.extension_mem_ZIrr _ (Submodule.subset_span (hmemS1 j hj)))
       ((xMember_characterFacts (K := K) hodd hirr (hmemX j hj)).2.2.2.2))
@@ -756,12 +762,13 @@ noncomputable def xAdjoinStep_of_degreeRatios {A₀ : Set ↥L}
     (RD.tau_mem_ZIrr hadiffmem) ha1 (by simpa using hDeg) hSgen ?_
   · -- (5.2.e): `χmem j ⊥ {χ, χ̄}` since `χ, χ̄ ∉ S₁` and `𝒳` is pairwise orthogonal
     intro j hj
-    exact RD.orthogonal χ hχfam (χmem j) (hS₁sub (hmemS1 j hj))
-      (xSet_pairwise_orthogonal (K := K) Z (hmemX j hj) hχX
-        (fun h => hχS₁ (h ▸ hmemS1 j hj)))
-      (xSet_pairwise_orthogonal (K := K) Z (hmemX j hj)
-        (xSet_closedUnderConjugate (K := K) Z hχX)
-        (fun h => hχbarS₁ (h ▸ hmemS1 j hj)))
+    exact OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalFamily_orthogonal _ _
+      (hyp.difference_images_orthogonal (hmemX j hj) hχX
+        (xSet_pairwise_orthogonal (K := K) Z (hmemX j hj) hχX
+          (fun h => hχS₁ (h ▸ hmemS1 j hj)))
+        (xSet_pairwise_orthogonal (K := K) Z (hmemX j hj)
+          (xSet_closedUnderConjugate (K := K) Z hχX)
+          (fun h => hχbarS₁ (h ▸ hmemS1 j hj))))
   · -- the adjoined pair's supported lattice is generated by the two anchored differences
     have hchi1_ne : (χmem i₁) 1 ≠ 0 := by
       obtain ⟨d, hd, hd1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
@@ -857,7 +864,7 @@ The hypotheses beyond `𝒳 ⊆ Irr L` are exactly the (6.4)/(6.5) context: `K` 
 odd prime `p` coprime to `|L:K|` (which `L = K ⋊ W₁` supplies), and `Z ⊆ Z(K)`.  Centrality is
 essential — the [Is] Cor 2.30 bound, hence the whole divisibility argument, fails at `Z = [K,K]`. -/
 noncomputable def xSet_isCoherent_of_irreducible_X {A₀ : Set ↥L}
-    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+    (RD : InducedFamilyTauData (G := G) A₀ K) (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
     {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hKp : IsPGroup p ↥K)
     (hidx_p : Nat.Coprime K.index p)

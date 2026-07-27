@@ -3743,7 +3743,7 @@ set_option linter.style.longLine false in
 --     `InducedFamilyImageData`, discharged for the §11 Dade witness by
 --     `dadeIntegralCharacterMap_apply_one_eq_zero`) forces the two signs to be **opposite** —
 --     i.e. the two-element `R(χ) = {μ, −ν}` shape this repository's `S07.Hypothesis` takes.
---   * `InducedFamilyImageData.hypothesis` = Hypothesis (5.2) for the sub-family `𝒮(X)`; (5.2.e)
+--   * `InducedFamilyTauData.hypothesis` = Hypothesis (5.2) for the sub-family `𝒮(X)`; (5.2.e)
 --     is *derived* (`tau_conjDiff_inner_eq_zero_of_orthogonal` + Peterfalvi (4.1) at `u = v = 1`)
 --     rather than transported, exactly as in the book's (5.3.a) proof.
 --   * `inducedKernelFamily_apply_one_eq_index_of_isMulCommutative_quotient`: a source trivial on
@@ -3751,7 +3751,7 @@ set_option linter.style.longLine false in
 --   * `inducedKernelFamily_isCoherent_of_isMulCommutative_quotient` = the (5.7) application.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.nonempty_characterDifferenceImage_of_irreducible
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.hypothesis
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyTauData.hypothesis
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.inducedKernelFamily_apply_one_eq_index_of_isMulCommutative_quotient
 #assert_only_allowed_axioms
@@ -3788,8 +3788,8 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.exists_index_primePow_degree_of_mem_inducedKernelFamily
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.exists_source_primePow_centralBound_of_mem_xSet
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.hypothesisOfSubfamily
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.xSetHypothesis
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyTauData.hypothesisOfSubfamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyTauData.xSetHypothesis
 -- The `(6.6)` degree-square sum `∑_{χ∈𝒳} χ(1)² = |L:K|·(|K| − |K:Z|)` for a general kernel
 -- (the `total` of the X-chain step data): `Finset.sum_sdiff` against two instances of the general
 -- weighted identity `sum_re_div_normSq_inducedKernelFamily_eq` (`X = ⊥` and `X = Z`).  The `‖χ‖²`
@@ -3844,7 +3844,10 @@ set_option linter.style.longLine false in
 -- bypassed rather than ported.  Every input is a general-kernel fact: orthonormality from
 -- `xMember_characterFacts`/`xMember_inner_eq_zero_of_notMem`, supported differences from
 -- `inducedKernelFamily_scaledDiff_support` (the degree ratios make them vanish off `K^#`), the
--- (5.2.d)/(5.2.e) image families from `InducedFamilyImageData`, and the per-member decomposition
+-- (5.2.d)/(5.2.e) image families **derived from irreducibility** through
+-- `hypothesisOfSubfamily.difference_image` + `CharacterDifferenceImage.toOrthonormalFamily`
+-- (issue 0156 — the whole (6.6) chain needs only `InducedFamilyTauData`, i.e. (5.2.b)),
+-- and the per-member decomposition
 -- from `S07.memberExtensionDecomposition_general` (whose `imageFamily` is definitionally `R(·)`
 -- and whose `tau1` is the accumulator extension — both discharged by `rfl`).
 -- The running X-chain accumulator `pairUnion 𝒮₀ pair i`: it lies inside `𝒳` (base block plus

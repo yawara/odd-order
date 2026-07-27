@@ -28,7 +28,7 @@ coherent whenever `K/X` is abelian**.  That is what
 
 * `InducedFamilyImageData` — the whole of Hypothesis (5.2) for the (6.1) family
   `𝒮 = inducedKernelFamily K ⊥` (issue 0154), restricted to the subfamily `𝒮(X)` by
-  `InducedFamilyImageData.hypothesis`;
+  `InducedFamilyTauData.hypothesis`;
 * the constant degree `|L:K|` of every member, which is exactly where `K/X` abelian enters: a
   source `θ ∈ Irr K` trivial on `X` inflates from the abelian `K/X`, hence is linear
   (`apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient`), so
@@ -189,7 +189,7 @@ vanish — two by hypothesis and two because `φ̄ ≠ χ`, `φ̄ ≠ χ̄` (els
 Stated for an arbitrary conjugation-closed subfamily `T ⊆ 𝒮` so that both the (6.5) filtrations
 `𝒮(X)` and the (6.6) set `𝒳 = 𝒮 − 𝒮(Z)` can use it. -/
 theorem tau_conjDiff_inner_eq_zero_of_orthogonal
-    (RD : InducedFamilyImageData A₀ K)
+    (RD : InducedFamilyTauData (G := G) A₀ K)
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
     {T : Set (ClassFunction ↥L ℂ)} (hTsub : T ⊆ inducedKernelFamily K ⊥)
     (hTconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate T)
@@ -236,8 +236,8 @@ Every clause is inherited: (5.2.a) from `hTconj` plus non-reality on `𝒮` (`|L
 `characterDifferenceImage_of_irreducible` — which is why the irreducibility `hirr` is required
 here (it is *not* a hypothesis of the book's (5.2); see the module docstring) — and (5.2.e) from
 `tau_conjDiff_inner_eq_zero_of_orthogonal`. -/
-noncomputable def InducedFamilyImageData.hypothesisOfSubfamily
-    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+noncomputable def InducedFamilyTauData.hypothesisOfSubfamily
+    (RD : InducedFamilyTauData (G := G) A₀ K) (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
     {T : Set (ClassFunction ↥L ℂ)} (hTsub : T ⊆ inducedKernelFamily K ⊥)
     (hTconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate T)
@@ -264,16 +264,16 @@ noncomputable def InducedFamilyImageData.hypothesisOfSubfamily
 
 /-- **Hypothesis (5.2) for the filtration `𝒮(X)`** — the `T = inducedKernelFamily K X` instance of
 `hypothesisOfSubfamily`. -/
-noncomputable def InducedFamilyImageData.hypothesis
-    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+noncomputable def InducedFamilyTauData.hypothesis
+    (RD : InducedFamilyTauData (G := G) A₀ K) (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
     {X : Subgroup ↥L} (hirr : ∀ φ ∈ inducedKernelFamily K X, IsIrreducibleCharacter φ) :
     OddOrder.Peterfalvi.S07.Hypothesis (L := ↥L) (G := G) (inducedKernelFamily K X) A₀ :=
   RD.hypothesisOfSubfamily hodd hKsupp (inducedKernelFamily_subset_bot X)
     (inducedKernelFamily_closedUnderConjugate (K := K) X) hirr
 
-@[simp] theorem InducedFamilyImageData.hypothesisOfSubfamily_tau
-    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+@[simp] theorem InducedFamilyTauData.hypothesisOfSubfamily_tau
+    (RD : InducedFamilyTauData (G := G) A₀ K) (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
     {T : Set (ClassFunction ↥L ℂ)} (hTsub : T ⊆ inducedKernelFamily K ⊥)
     (hTconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate T)
@@ -316,7 +316,7 @@ each member is irreducible), then `𝒮(X)` is coherent.
 (`inducedKernelFamily_apply_one_eq_index_of_isMulCommutative_quotient`), so every member
 difference is `K^#`-supported (`inducedKernelFamily_scaledDiff_support` at `d = 1`) and lies in
 `ℤ[𝒮, A₀]`, where the (5.2.b) isometry `τ` applies and lands in `ℤ[Irr G]`.  Hypothesis (5.2)
-holds for `𝒮(X)` (`InducedFamilyImageData.hypothesis`), and `|𝒮(X)| ≥ 2` because `𝒮(X)` is
+holds for `𝒮(X)` (`InducedFamilyTauData.hypothesis`), and `|𝒮(X)| ≥ 2` because `𝒮(X)` is
 conjugation-closed with no real members (Peterfalvi (1.1), `|L|` odd).  Then (5.7)
 (`S07.coherent_of_constant_degree`) applies.
 

@@ -257,7 +257,7 @@ instance is `S12.Hypothesis.inducedFamilyImageData`).  For an **irreducible** me
 then the two-element Dade family (`dadeOrthonormalCharacterImageFamilyOfDiff`); for a reducible
 one it is the certain-type `R(μ_j) = {δ_j ω_{ij}^σ, −δ_j ω_{ik}^σ}` of Peterfalvi (5.3.b)/(4.9)
 (`S06.certainTypeR`). -/
-structure InducedFamilyImageData (A₀ : Set ↥L)
+structure InducedFamilyTauData (A₀ : Set ↥L)
     (K : Subgroup ↥L) [Invertible (Nat.card ↥K : ℂ)] where
   /-- **(5.2.b)**: the linear map `τ`. -/
   tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G
@@ -282,9 +282,25 @@ structure InducedFamilyImageData (A₀ : Set ↥L)
   tau_apply_one : ∀ ⦃φ : ClassFunction ↥L ℂ⦄,
     φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
     tau φ (1 : G) = 0
+
+/-- **Peterfalvi Hypothesis (5.2) data for `𝒮 = S(⊥) = inducedKernelFamily K ⊥`** — the (5.2.b)
+isometry together with the (5.2.d)/(5.2.e) image families for **every** member of `𝒮`.
+
+This is exactly what the book's Hypothesis (6.1) assumes ("Assume that Hypothesis (5.2) holds").
+It is genuinely stronger than the `InducedFamilyTauData` half: for a **reducible** member the
+two-element (5.3.a) shape does not apply, so `R(χ)` must be supplied — in the Feit-Thompson
+consumer by the certain-type column family of (5.3.b)/(4.9)
+(`S12.Hypothesis.inducedFamilyImageData`).  Arguments that only ever touch *irreducible* members
+(e.g. the (6.6) coherence half, whose `𝒳 ⊆ Irr L`) should take `InducedFamilyTauData` instead and
+build `R(χ)` through `characterDifferenceImage_of_irreducible` +
+`CharacterDifferenceImage.toOrthonormalFamily` (issue 0156). -/
+structure InducedFamilyImageData (A₀ : Set ↥L)
+    (K : Subgroup ↥L) [Invertible (Nat.card ↥K : ℂ)]
+    extends InducedFamilyTauData (G := G) A₀ K where
   /-- **(5.2.d)**: the orthonormal difference-image family `R(χ)` of each member `χ ∈ 𝒮`. -/
   R : ∀ χ ∈ inducedKernelFamily K ⊥,
-    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily (L := ↥L) (G := G) tau χ
+    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily (L := ↥L) (G := G)
+      toInducedFamilyTauData.tau χ
   /-- **(5.2.e)**: `φ ⊥ {χ, χ̄}` forces `R(φ) ⊥ R(χ)`. -/
   orthogonal : ∀ (χ : ClassFunction ↥L ℂ) (hχ : χ ∈ inducedKernelFamily K ⊥)
       (φ : ClassFunction ↥L ℂ) (hφ : φ ∈ inducedKernelFamily K ⊥),
@@ -295,8 +311,8 @@ structure InducedFamilyImageData (A₀ : Set ↥L)
 (`S07.decompositionDaFromDiff_general`, `S07.xAdjoinStepW_k_general`).  Pure repackaging of
 `tau_isometry` through `S07.zSpan_subset_zSupportedSpan`: a set `T` whose members are `A₀`-supported
 elements of `ℤ[𝒮]` has its whole `ℤ`-span inside `ℤ[𝒮, A₀]`, where the field applies. -/
-theorem InducedFamilyImageData.adjoinHisom {A₀ : Set ↥L} {K : Subgroup ↥L}
-    [Invertible (Nat.card ↥K : ℂ)] (RD : InducedFamilyImageData A₀ K) :
+theorem InducedFamilyTauData.adjoinHisom {A₀ : Set ↥L} {K : Subgroup ↥L}
+    [Invertible (Nat.card ↥K : ℂ)] (RD : InducedFamilyTauData (G := G) A₀ K) :
     ∀ (T : Set (ClassFunction ↥L ℂ)),
       (∀ s ∈ T, s ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
         (inducedKernelFamily K ⊥) A₀) →
