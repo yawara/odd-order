@@ -36,8 +36,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
-      §8B は 8B.1–8B.5, 8B.7 完了 + 8B.6 は `D₂ₚ` 同型のみ残 /
-      §8C §8D 未着手
+      §8B は 8B.1–8B.5, 8B.7, 8B.8 完了 + 8B.6 は `D₂ₚ` 同型のみ残 /
+      残り 8B.9, 8B.10 / §8C §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4432,8 +4432,8 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   `prime_card_of_card_stabilizer_eq_two` (**`|Ω|` は奇素数**)。
   **残り = `G ≅ DihedralGroup p` の明示同型のみ** /
   8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
-  8B.8 🔶 **道具のみ** (`subset_of_isBlock_of_mem_of_notMem`,
-  `exists_not_mem_iff_add_mem`) — **次の frontier = 8B.8 本体**。
+  8B.8 ✅ `isPreprimitive_sup_zpowers_addRight_one` /
+  **次の frontier = 8B.9**。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4553,8 +4553,9 @@ mathlib `DihedralGroup p` への**明示同型の構成**だけ:
 * `relIndex_stabilizer_comm` (対をなす suborbit の相対指数は等しい)
 * `eq_bot_of_normal_le_stabilizer` (点安定化群に含まれる正規部分群は自明)
 
-⚠ `Problems8B.lean` は 945 行。1500 行に近づいたら topic 別に分割する
-(8B.1–8B.4 = block/primitivity, 8B.5–8B.7 = 点安定化群の小軌道, 8B.8– = 対称群の生成)。
+✅ **分割完了 (2026-07-27)**: `Problems8B.lean` = pure re-export hub、実体は
+`Problems8B/{Blocks,SmallSuborbits,CyclicGenerated}.lean` (279/689/200 行)。
+3 cluster は相互独立。8B.9/8B.10 は `CyclicGenerated.lean` に追加する想定。
 
 
 ### 8B.8 本体の設計 (2026-07-27)
@@ -4577,3 +4578,18 @@ mathlib `DihedralGroup p` への**明示同型の構成**だけ:
   5. `Δ` は `Λ` の translate なので `Δ = univ`。
 * ⚠ 「`Δ` の translate が block」= `IsBlock` の `smul` 版。mathlib に
   `IsBlock.smul` 系があるか要確認 (`IsTrivialBlock.smul` は存在)。
+
+
+### 8B.9 / 8B.10 の設計メモ (2026-07-27)
+
+* **8B.9**: `x` = n-cycle `(1,…,n)`, `y` = m-cycle `(1,…,m)` (`1 < m < n`) について
+  `G = ⟨x,y⟩` は `m` か `n` が偶数なら `S_n`, どちらも奇なら `A_n`。
+  筋: `⟨y⟩` は `{1,…,m}` に推移的で残りを固定するので **8B.8** がそのまま適用でき
+  `G` は原始的。あとは `G` が偶置換だけからなるか否かで `A_n`/`S_n` を判定し、
+  原始群が 3-cycle を含めば `A_n ≤ G` (Jordan 型) — repo の
+  `Ch08/PCycleJordan.lean` / `Bochert.lean` に近いものがあるか要調査。
+* **8B.10**: `G ⊆ S_n` が指数 `n` の部分群で点安定化群でないなら `n = 6`。
+  筋 (教科書 Hint): `G` は `S_n` の `n` 個の剰余類に推移的 →
+  **8A.16** (landing 済 `two_transitive_of_coprime_index`) で 2-transitive → 原始的 →
+  **Bochert の定理** (repo `Ch08/Bochert.lean`) で `n ≥ ⌈(n+1)/2⌉!` →
+  `n ∈ {1,2,3,4,6}` を潰す。⚠ Bochert の repo 側の statement 形を要確認。
