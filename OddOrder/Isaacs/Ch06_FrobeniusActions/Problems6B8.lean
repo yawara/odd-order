@@ -21,7 +21,9 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B7
 4. `A` は巡回か `Z × (巡回)`。前者なら **6B.7** (`|P : Z(P)| > 4` を確認して) で終わり。
    後者で `|P| > 16` なら `Z < Z(P)` が出て矛盾。
 
-現状はステップ 1 を実証明で提供し, 主定理は statement のみ。
+本ファイルは帰納法の**部品**を提供する (ステップ 1-3, base case, `θ` の解析, 非巡回ケースの
+排除)。帰納法本体と主定理 `tausskyTodd` の組み立ては
+[`Problems6B8Induction.lean`](Problems6B8Induction.lean) にある。
 -/
 
 namespace OddOrder.Isaacs.Ch06
@@ -1198,15 +1200,6 @@ theorem isCyclic_of_index_two_of_index_commutator_eq_four
   refine notMem_zpowers_sq_of_even_orderOf (c := c) ?_ (hrange_le (hrange ▸ hcmem))
   rw [hord]
   exact dvd_pow_self 2 (by omega)
-
-/-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
-`|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
-theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
-    (hcard : 8 ≤ Nat.card P) (hidx : (commutator P).index = 4) :
-    (∃ n : ℕ, Nonempty (P ≃* DihedralGroup n)) ∨
-      (∃ n : ℕ, Nonempty (P ≃* QuaternionGroup n)) ∨
-      (∃ k : ℕ, Nonempty (P ≃* SemiDihedralGroup k)) := by
-  sorry
 
 end
 

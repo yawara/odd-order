@@ -3352,3 +3352,30 @@ fold するので, calc の各行で `z` と `c^(2^(m-1))` が混在すると `r
 そのあと: `|R| = |A|/|C_A(a)|` と `|R| = |P'| = |A|/2` から **`|C_A(a)| = 2`**,
 反転則から `P'` 巡回 (`isCyclic_of_comm_two_group_unique_involution` が使える),
 `A` 非巡回なら `A = P' × ⟨t⟩` で `im θ ⊆ (P')²·Ω₁(A)` の位数評価が破綻 — で完了。
+
+
+### 🎉 6B.8 (Taussky-Todd) 完成 (2026-07-27) — §6B 完済
+
+**主定理 `tausskyTodd` が sorry-free**。`#print axioms` = `[propext, Classical.choice,
+Quot.sound]` (axiom-clean)。
+
+最後に残っていた「帰納 step の引き戻し `A` が非巡回」ケースは
+`isCyclic_of_index_two_of_index_commutator_eq_four` (`Problems6B8.lean`) で排除:
+* `im θ = P'` で `P'` は巡回, 生成元 `c` の位数 `2^k` は `|P'| = |P|/4 ≥ 4` から `k ≥ 2`
+  (**`|P| ≥ 16` がここで効く**)。
+* `A` 非巡回なら `⟨c⟩` の外に involution `t` があり `A = P'⟨t⟩` (`Subgroup.normal_mul` で
+  `x = y · t^j` に分解)。
+* `y ∈ P'` では `θ(y) = (y²)⁻¹ ∈ ⟨c²⟩`、`s ∈ ⟨t⟩` では `θ(s)² = θ(s²) = 1` かつ
+  `θ(s) ∈ P' = ⟨c⟩` ゆえ `θ(s) ∈ ⟨c²⟩` (位数 `2^k`, `k ≥ 2` の巡回群の involution は平方元)。
+* ⟹ `P' = im θ ≤ ⟨c²⟩` で `c ∈ ⟨c²⟩`、`orderOf c` が偶数であることに反する。
+
+帰納法本体 + 組み立ては新 leaf **`Problems6B8Induction.lean`** (`OddOrder.lean` 配線済):
+* `exists_index_two_zpowers_of_card_le` = `|P| ≤ n` で括った帰納 engine
+  (base `|P| = 8` / step は `P/Z` に降りる)。
+* `exists_index_two_zpowers_of_index_commutator_eq_four` = 帰納の結論
+  (`2`-群 + `|P| ≥ 8` + `|P : P'| = 4` ⟹ 指数 `2` の巡回部分群が在る)。
+* `tausskyTodd` = `|P| = 8` は Cor 6.14、`|P| ≥ 16` は上記 `⟨c⟩` (位数 `2^m`, `m ≥ 3`) と
+  `four_lt_index_center` を **6B.7** に食わせる。
+
+⟹ **書籍 hint の「`P/Z` が D/SD/Q だから指数 2 の巡回部分群を引き戻す」段を回避**したので、
+具体群 D/SD/Q の構造 (指数 `2` の巡回部分群を持つこと) を 3 種類とも証明する必要が無くなった。
