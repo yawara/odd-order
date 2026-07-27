@@ -142,6 +142,24 @@ theorem inner_smul_right (c : ℂ) (φ ψ : ClassFunction G ℂ) :
   rw [ClassFunction.inner, ClassFunction.inner, h]; ring
 
 omit [Finite G] in
+open scoped Classical in
+/-- Inner product of two **signed** irreducible characters:
+`⟨ε·ξ, ε'·ξ'⟩ = ε·ε'·δ_{ξ,ξ'}` (the `star` on the right scalar is invisible for integer signs).
+
+This is the workhorse for families of the (5.3.a) shape `R(χ) = {ε·μ, −ε·ν}`, where the members
+are signed irreducibles — both the Feit-Sibley endgame and
+`CharacterDifferenceImage.toOrthonormalFamily` (`S08_SixTwoThreeFromImageFamilies`) read
+orthonormality off it. -/
+theorem inner_zsmul_irreducible_eq (ε ε' : ℤ) (ξ ξ' : IrreducibleCharacter G) :
+    ClassFunction.inner (ε • (ξ : ClassFunction G ℂ)) (ε' • (ξ' : ClassFunction G ℂ)) =
+      (ε : ℂ) * (ε' : ℂ) * (if ξ = ξ' then 1 else 0) := by
+  rw [← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ),
+    ← Int.cast_smul_eq_zsmul ℂ ε' (ξ' : ClassFunction G ℂ),
+    ClassFunction.inner_smul_left, inner_smul_right, star_intCast,
+    irreducibleCharacter_inner_eq_ite]
+  ring
+
+omit [Finite G] in
 /-- **Conjugate symmetry of `ClassFunction.inner`:** `⟨ψ, φ⟩ = conj ⟨φ, ψ⟩`.
 The unscaled sum `∑ φ(g) conj(ψ(g))` is conjugate-symmetric, and the normalizing factor
 `⅟|G|` is real. -/
