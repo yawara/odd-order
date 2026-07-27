@@ -97,6 +97,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroupQuotient
 import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7C
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
@@ -13160,3 +13161,15 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.GroupTheory.not_dvd_card_abelianization_normalizer_of_abelian
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.transfer_eq_mul_conj_of_index_two
+-- Isaacs Problem 7C.1 (Thompson): if `N_G(X)/C_G(X)` is a `p`-group for every characteristic
+-- subgroup `X` of `P ∈ Syl_p(G)` (`p` odd), then `G` has a normal `p`-complement.  Induction on
+-- `|G|`: Case A goes through Thm 6.23 after inheriting the local condition to `N_G(X)`;
+-- Case B replaces the normal characteristic `X₀` by `Z(X₀)` and descends to `G/Z(X₀)`.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.hasNormalPComplement_of_charLocalPControl
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.CharLocalPControl.quotient
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.hasNormalPComplement_of_normal_abelian_of_quotient
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch07.hasNormalPComplement_of_normal_of_isPGroup_quotient

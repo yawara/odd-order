@@ -33,8 +33,9 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.4 Commutators
 - [x] Ch.5 Transfer — **🎉 完済 (2026-07-27)**: §5A–§5E 全問
 - [x] Ch.6 Frobenius Actions — **🎉 完済 (2026-07-27)**: §6A (11 問) / §6B (9 問) / §6C (2 問) 全問
-- [ ] Ch.7 Thompson Subgroup — **次の frontier (2026-07-27)**
-- [ ] Ch.8 Permutation Groups
+- [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
+      (§7B に Problems 節は無い)
+- [ ] Ch.8 Permutation Groups — **次の frontier (2026-07-27)**
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4009,3 +4010,202 @@ Case B step 4 の Burnside はこれで足りる (`X ≤ Z(K)` ⟹ `K` に norma
 
 ⚠ Lean メモ: 現行 mathlib の相対指数は **`Subgroup.relIndex`** (`relindex` は無い),
 `Mathlib.GroupTheory.Index` に在り `relIndex_mul_relIndex` は部分群 3 つが明示引数。
+
+### 🎉 7C.1 完成 (2026-07-27) — §7C 完済 (1/1)
+
+`Problems7C.lean` (**559 行, axiom-clean**, AxiomsCheck 登録済)。**Isaacs Ch.7 は §7A (6/6) +
+§7C (1/1) で Problems 完済** (§7B に Problems 節は無い)。
+
+主定理 `hasNormalPComplement_of_charLocalPControl`:
+`P ∈ Syl_p(G)`, `p ≠ 2`, `CharLocalPControl p P` ⟹ `HasNormalPComplement p G`。
+
+**設計上の要点** (当初計画からの変更):
+
+* **`Ω₁(Z(X₀))` は不要 — `Z(X₀)` で足りる**。指数 `p` は証明のどのステップでも使わない
+  (必要なのは「可換・非自明・`p`-群・`P` で char・`G` に正規」だけ)。しかも `Z(X₀)` は
+  ambient で `X₀ ⊓ C_G(X₀)` と書けるので (`map_center_subtype`), 正規性は
+  `Subgroup.normal_centralizer` + `⊓` で即座に出る。
+* **最小反例でなく `Nat.card G ≤ n` の強帰納法**。universe を `.{u}` で固定すれば
+  Case A の `↥N_G(X)` も Case B の `G ⧸ X` も同じ universe に留まる。
+
+**新規部品** (前回 landing 分に加えて):
+
+| 補題 | 役割 |
+|---|---|
+| `characteristic_comap_of_surjective` | 全射 `f` (核が char) に沿って char を引き戻す。`φ : A ≃* A` を `A ⧸ ker f ≃* B` 経由で `B` の自己同型に降ろす |
+| `CharLocalPControl.apply_of_le` / `.of_ambient` | 局所条件の ambient 形 (`Y ≤ P`) との往復 |
+| `CharLocalPControl.quotient` | **Case B step 2**: `X ⊴ G` char in `P` なら局所条件は `G/X` に遺伝 |
+| `hasNormalPComplement_of_normal_of_isPGroup_quotient` | `K ⊴ G` が complement をもち `G/K` が `p`-群 ⟹ `G` ももつ (`O_{p'}(K)` が char なのを使う) |
+| `map_center_subtype` | `Z(H)` の ambient 記述 `H ⊓ C_G(H)` |
+| `centralizer_subgroupOf_of_le` | `H ≤ P` で `C_G(H).subgroupOf P = C_{↥P}(H.subgroupOf P)` |
+| `characteristic_inf` | char の `⊓` (mathlib は `⊓` 版を持たない) |
+| `hasNormalPComplement_of_normal_abelian_of_quotient` | **Case B の中核** (step 3+4) |
+
+**流用した既存部品**: Thm 6.23 (`Ch06.hasNormalPComplement_of_forall_characteristic_normalizer`) /
+Burnside 代替 (`Ch05.hasNormalPComplement_of_sylow_le_center`, Problem 5D.2 = Schur–Zassenhaus 経由) /
+`Ch05.hasNormalPComplement_of_normal_of_index_eq_pow` / `Ch05.normal_map_subtype_of_characteristic` /
+`Ch03.oPiCore` (char + `IsPiGroup` + `le_oPiCore`)。
+
+**Lean 実務メモ**:
+* `Subgroup.normalizer` は **`Set G` 引数** (`Subgroup` でない)。`normalizer_eq_top_iff` /
+  `le_normalizer_of_normal_subgroupOf` (後者が「`X` char in `P` ⟹ `P ≤ N_G(X)`」の正体)。
+* `Subgroup.index_comap_of_surjective` / `relIndex_dvd_index_of_normal` / `relIndex_mul_index` /
+  `map_eq_bot_iff_of_injective` / `card_le_card_group` はいずれも **部分群が明示引数**。
+* `rw [← QuotientGroup.ker_mk' X]` は `G ⧸ X` の `Normal` インスタンスを巻き込んで motive 不整合
+  → `QuotientGroup.le_comap_mk'` を直接使う。
+* `push_neg` は deprecated (v4.32) → `simp only [not_exists, not_and]`。
+* `show` で goal が変わると `linter.style.show` が鳴る → `change`。
+
+## Ch.8 §8A (書籍 pp. 235–236 の Problems 8A) — 着手 (2026-07-27)
+
+既存 `OddOrder/Isaacs/Ch08_PermutationGroups/` は 14 leaf (AffineGroup / Bochert /
+CommonDivisorGraph / CycleCommutators / HalfTransitive / NonzeroVectors / OrbitalGraph /
+Orbitals / PCycleJordan / PSLSimple / RegularNormal / Subdegrees /
+TransitiveAutomorphisms / TransvectionGeneration)。演習は新 leaf `Problems8A.lean` へ。
+
+⚠ 以下は **pdftotext からの一覧** (OCR ノイズあり)。各問の statement は着手時に
+**PDF ページ画像で確定**する (書籍 p. 235–236 = PDF p. 248–249)。
+
+| # | 主張 (要約) |
+|---|---|
+| 8A.1 | `A ≇ B`, `\|A\|=\|B\|` ⟹ 両方に同型な regular 部分群をもつ置換群が存在 (hint: 対称群)。後半は「nonisomorphic regular **normal** 部分群を持てるか」の decide 問題 |
+| 8A.2 | `H ≤ G` が transitive ⟹ `C_G(H)` は semiregular。帰結: 可換 transitive 置換群は regular |
+| 8A.3 | `Z(G)=1` ⟹ `G` に同型な相異なる regular normal 部分群を 2 つもつ置換群が存在 |
+| 8A.4 | `U, V` regular normal で `U ⊓ V = 1` ⟹ `U ≅ V` かつ中心自明 (hint: `G = UV` としてよい) |
+| 8A.5 | `G` が `k`-transitive, `H = G_α`, `Δ = Fix(H)` ⟹ `N_G(H)` は `Δ` に `r`-transitive (`r = min(k, \|Δ\|)`) |
+| 8A.6 | `G` transitive, `H = G_α`, `P ∈ Syl_p(H)`, `Δ = Fix(P)` ⟹ `N_G(P)` は `Δ` に transitive |
+| 8A.7 | 可換 `A` が `N` に忠実に作用し非単位元上 half-transitive ⟹ 作用は Frobenius, `A` は巡回 |
+| 8A.8 | `G` transitive, `N ⊴ G` ⟹ `G` は `N`-軌道を transitive に置換, ゆえに `N` は half-transitive |
+| 8A.9 | `G` が 2-transitive, `N ⊴ G` が非自明作用 ⟹ `N` は transitive (実は primitivity で足りる) |
+| 8A.10 | 可解な 4-transitive 置換群 ⟹ `S₄` に同型 (hint: 極小正規部分群が regular) |
+| 8A.11 | 任意の素数冪 `q > 1` に可解な sharply 2-transitive 置換群 (次数 `q`) が存在 (hint: 位数 `q` の体) |
+| 8A.12 | `χ` を置換指標として `G` が 2-transitive ⟺ `χ(g)²` の平均が 2 |
+| 8A.13 | `G` が 2-transitive のとき, `χ(g)³` の平均が `m` ⟺ 3-transitive となる `m` を求めよ |
+| 8A.14 | `G` transitive, `\|G:H\| = m` ⟹ `H` の軌道数 ≤ `m`; `H` が点安定化群を含まなければ ≤ `m/2` |
+| 8A.15 | `H ≤ G` の両側作用 `g·(x,y) = x⁻¹gy` について, `G` の `H`-右剰余類への作用が 2-transitive ⟺ `H × H` が `G` 上ちょうど 2 軌道 |
+
+⚠ **8A.1 後半は "decide" 問題** — 数学的に決着させてから形式化する (即断しない)。
+まず前半 (対称群内の構成) と 8A.2 以降を文書順で進める。
+
+### 8A.1 後半の "decide" を決着 (2026-07-27) — **答は「できる」**
+
+「置換群が **同型でない regular normal 部分群**をもてるか」— **もてる**。反例:
+
+`Ω = ZMod 4`, `G = {x ↦ εx + a : ε = ±1, a ∈ ZMod 4} ≅ D₈` (= `S₄` の Sylow 2-部分群、
+4 点への自然作用)。
+
+* `T = {x ↦ x + a}` は位数 4・推移的 ⟹ regular。`ε` による共役が `a ↦ εa` なので `T ⊴ G`。
+  `T ≅ Z₄`。
+* `V = {id, x↦x+2, x↦1-x, x↦3-x}` (`S₄` の Klein 群 `{e,(02)(13),(01)(23),(03)(12)}` そのもの)。
+  位数 4・推移的 (`0 ↦ 0,2,1,3`) ⟹ regular。`φ(εx+a) = a + [ε=-1] mod 2` が準同型
+  `G → Z₂` でその核が `V` ⟹ `V ⊴ G` (指数 2)。`V ≅ Z₂ × Z₂`。
+* `Z₄ ≇ Z₂ × Z₂` ⟹ 反例成立。
+
+⚠ 8A.4 (`U ⊓ V = 1` なら `U ≅ V`) と矛盾しない: 上の例では `T ⊓ V = {id, x↦x+2} ≠ 1`。
+
+形式化の方針: `Equiv.Perm (ZMod 4)` 内で 2 つの部分群を明示構成し, regular は
+`bijective_smulBase_iff` (`RegularNormal.lean`), 非同型は「`T` に位数 4 の元があり `V` に無い」
+で出す (`ZMod 4` 上なので `decide` が効く見込み)。
+
+### §8A 進捗 (2026-07-27)
+
+新 leaf `OddOrder/Isaacs/Ch08_PermutationGroups/Problems8A.lean` (`OddOrder.lean` 配線済):
+
+* ✅ **8A.1 前半** 実証明 — `regularRep` (型の同値 `e : Ω ≃ A` に沿って運んだ左正則表現
+  `A →* Equiv.Perm Ω`, `a ↦ (x ↦ e.symm (a * e x))`) + `regularRep_injective` +
+  `bijective_smulBase_regularRep_range` (像は常に regular) ⟹
+  `exists_regular_subgroups_of_equiv` / `exists_regular_subgroups_of_card_eq`
+  (`Sym(A)` が `A` にも `B` にも同型な regular 部分群をもつ)。
+  ⚠ `A ≇ B` は構成に不要 (問題を面白くしているだけ) なので仮説から外した。
+  `regularRep` は 8A.3 / 8A.4 でも使う共通道具。
+* ✅ **8A.3** 実証明 — `regularRepRight` (右正則表現 `a ↦ (x ↦ e.symm (e x * a⁻¹))`;
+  逆元は反準同型を準同型に直すため) + `regularRepRight_range_le_centralizer` (左右は
+  結合律で可換) ⟹ `exists_two_distinct_regular_normal_of_center_eq_bot`。
+  `L ⊔ R` の中で両方正規 (自分の normalizer + 相手の centralizer ≤ normalizer)、
+  `L ≠ R` は「左移動がすべて右移動 ⟹ `A = Z(A) = 1`」で `Nontrivial A` に反する。
+  ⚠ 書籍は `Z(G)=1` のみだが **`G` 非自明が要る** (`G = 1` は `Z(G)=1` を満たすが
+  `L = R = 1` で相異ならない)。
+* ✅ **8A.2** 実証明 — `smul_eq_self_of_mem_centralizer` (推移的 `H` の中心化群の元は
+  1 点固定 ⟹ 全点固定) / `centralizer_inf_stabilizer_eq_bot` (忠実性を足して半正則) /
+  `bijective_smulBase_top_of_comm` (可換推移的置換群は regular)。
+* ✅ **8A.4** 実証明 — `le_centralizer_of_normal_of_inf_eq_bot` (mathlib
+  `Subgroup.commute_of_normal_of_disjoint`) / `centralizer_eq_of_regular_of_inf_eq_bot`
+  (**`C_G(U) = V`**: `⊆` は `V` の推移性で `c•α = v•α` を取り `v⁻¹c` が `C_G(U)` の
+  半正則性 (8A.2) で 1) / `center_eq_bot_of_regular_of_inf_eq_bot` (`Z(U) ≤ U ⊓ C_G(U) =
+  U ⊓ V = ⊥`) / `regularPairHom` (`ψ u = 「u⁻¹ • α を実現する唯一の V の元」`; 準同型性は
+  `V` が `U` を中心化することから) ⟹ `mulEquiv_and_center_eq_bot_of_regular_normal`。
+  ⚠ 書籍 hint の「`G = UV` としてよい」は使わずに済んだ (`C_G(U) = V` を直接出す方が短い)。
+  ファイルは文書順に並べ替え済 (8A.4 が 8A.2 を使うので 8A.2 を先に置く)。
+* ✅ **8A.5** 実証明 — `smul_mem_fixedPoints_of_mem_normalizer` (`Δ = Fix(H)` は
+  `N_G(H)` 不変) / `exists_mem_normalizer_stabilizer_smul_eq` (**主内容**: `H = G_α` なら
+  `N_G(H)` は `Δ` に推移的 — `β = g•α` から `H ≤ G_β = gHg⁻¹`, 有限性で等号, ゆえに
+  `g ∈ N_G(H)`) / `eq_of_mem_fixedPoints_stabilizer_of_transitive_on_compl` (退化部分)。
+  ⚠ **`r = min(k,|Δ|)` の数学的中身は「推移性 (`r ≥ 1`)」でほぼ尽きる**: `H` は `Δ` を
+  各点固定するので `N_G(H)` の `Δ` 上の像は **regular**。よって `|Δ| ≥ 3` なら 2-transitive
+  になり得ず, 実際 `k ≥ 2` かつ `|Δ| ≥ 2` は `|Ω| = 2` を強制する (退化補題)。
+  補助: `eq_of_le_of_card_eq` (有限群で `H ≤ K` + 位数一致 ⟹ `H = K`; mathlib に無い)。
+* ✅ **8A.6** 実証明 — `exists_mem_conj_eq_of_sylow_le` (**再利用可能**: 部分群 `K` の中の
+  2 つの `p`-Sylow は `K` の元で共役、を ambient `Subgroup G` の言葉で述べたもの。
+  `Sylow p ↥K` へ持ち上げて `MulAction.exists_smul_eq` を使い `K.subtype` で押し戻す) ⟹
+  `exists_mem_normalizer_sylow_smul_eq` (`β = g•α` で `G_β = gHg⁻¹`、`Q` と `gQg⁻¹` が
+  ともに `G_β` の `p`-Sylow、共役元 `x ∈ G_β` から `n := x⁻¹g` が `Q` を正規化し
+  `n•α = x⁻¹•β = β`)。
+  補助: `card_mul_relIndex` (`Q ≤ K` で `|Q|·[K:Q] = |K|`) / `isPGroup_subgroupOf` /
+  `mem_normalizer_of_map_conj_eq`。
+  ⚠ Lean メモ: `Problems8A.lean` は `RegularNormal.lean` 経由では `Mathlib.GroupTheory.Sylow`
+  を得られない (`IsPGroup`/`Sylow` が unknown identifier) → 明示 import が要る。
+  `x • S` (`S : Sylow p ↥K`) の coe は `MulDistribMulAction.toMonoidEnd` 経由になり
+  `(MulAut.conj x).toMonoidHom` と**構文的に**一致しない → `rw` でなく `exact` (defeq) で渡す。
+* ✅ **8A.7** 実証明 — `isFrobeniusAction_of_comm_of_half_transitive` /
+  `isFrobeniusAction_and_isCyclic_of_comm_of_half_transitive`。
+  **既存 Thm 8.9** (`isFrobeniusAction_or_isElementaryAbelian_of_half_transitive`,
+  同ディレクトリ `HalfTransitive.lean`) の例外肢を可換性で潰すだけ: `a ≠ 1` が `n ≠ 1` を
+  固定するなら `Fix(a)` は (`A` 可換ゆえ) `A`-不変で `⊥` でない → 例外肢の既約性から `⊤`
+  → `a` が自明作用 → 忠実性に矛盾。「`A` 巡回」は既存
+  `Ch06.isCyclic_of_frobeniusAction_of_isMulCommutative` (Cor 6.17 の可換分岐) を引くだけ。
+  ⚠ **教訓**: 「可換 f.p.f. ⟹ 巡回」を自前で証明しかけたが (rank-2 coprime 生成補題や
+  Schur が要る大仕事)、repo に既に在った。**着手前に repo 全体を grep する**
+  ([[bg-longhand-arguments-may-be-existing-isaacs-lemmas]] と同型の罠)。
+* ✅ **8A.8** 実証明 — `smul_orbit_eq_orbit_smul` (`N ⊴ G` なら `g • orbit N α =
+  orbit N (g • α)`) / `card_orbit_eq_of_normal` (帰結: `N` は half-transitive)。
+
+* ✅ **8A.9** 実証明 — `isPretransitive_of_normal_of_two_transitive`。8A.8 の
+  `smul_orbit_eq_orbit_smul` を使う: 非自明性から `orbit N a` に `a` 以外の点 `γ` があり,
+  `G_a` の推移性で任意の `β ≠ a` を `γ` から得る `g` を取れば
+  `β = g•γ ∈ g • orbit N a = orbit N a`。2-transitivity は「推移的 + 各 `G_α` が `Ω∖{α}` に
+  推移的」の形で仮定 (書籍の note どおり本質は primitivity だが, 演習の仮定は 2-transitive)。
+
+Lean 実務メモ: `[N.Normal]` はインスタンスなので `N.Normal.conj_mem` と書けない
+(`N.Normal : Prop` へのフィールド射影になる) → `Subgroup.Normal.conj_mem ‹N.Normal›`。
+`Nat.card ↑(g • S) = Nat.card ↑S` は `Equiv.Set.image` + `Equiv.setCongr Set.image_smul`。
+
+### 8A.10 の証明設計 (2026-07-27, 全ステップ検算済) と核心補題の landing
+
+**主張**: 可解な 4-transitive 置換群 `G` は `S₄` に同型。
+
+**設計** (書籍 hint「極小正規部分群 `N` が regular であることを示し, `G_α` の `N` への
+共役作用を考えよ」を詰めたもの):
+
+1. `G` は 4-transitive ⟹ 2-transitive。極小正規部分群 `N ≠ 1` を取る。
+2. `N` は非自明に作用する (忠実な置換群ゆえ) ⟹ **8A.9** で `N` は推移的。
+3. `G` 可解 ⟹ **Isaacs Thm 3.11**
+   (`Ch03.solvable_minimal_normal_isElementaryAbelian` 系; `Ch03_SplitExtensions/Basic.lean:194`)
+   で `N` は elementary abelian `p`-群 ⟹ 可換。
+4. 可換 + 推移的 ⟹ **8A.2** (`bijective_smulBase_top_of_comm`) で `N` は **regular**。
+   したがって `|N| = |Ω|` で `Ω ≅ N` (点 `α` を `1` に対応させる)。
+5. **Thm 8.5 第 3 主張** (`RegularNormal.lean` の `ofStabilizerToNonidentity`) により
+   `G_α` の `Ω ∖ {α}` への作用は `G_α` の `N ∖ {1}` への**共役 (=自己同型) 作用**と
+   置換同型。`G` が 4-transitive ⟹ `G_α` は `Ω ∖ {α}` に 3-transitive。
+6. ⟹ `G_α` は `N ∖ {1}` に自己同型として 3-transitive ⟹ **`|N| ≤ 4`**
+   (下記の核心補題)。`|N| = |Ω| ≥ 4` (4-transitive) ⟹ `|Ω| = 4` ⟹ `G ≤ S₄` が
+   4-transitive ⟹ `G = S₄`。
+
+**✅ 核心補題を landing** (`card_le_four_of_three_transitive_on_nonidentity`):
+群 `N` に自己同型として作用する `A` が `N ∖ {1}` に 3-transitive なら `|N| ≤ 4`。
+自己同型は積を保つので `x`, `y` を固定すれば `xy` も固定する。`|N| ≥ 5` なら
+`1, x, y, xy` と異なる `w` が取れ, 3-transitivity は `(x,y,xy) ↦ (x,y,w)` を要求するが
+それは `xy ↦ xy ≠ w` を強いる。⚠ `N` が elementary abelian であることは**不要**
+(積を保つことしか使わない)。
+
+**残り**: 上記 1–5 の結線 (極小正規部分群の存在, Thm 3.11 の適用形, Thm 8.5 第 3 主張の
+`ofStabilizerToNonidentity` から 3-transitivity を移す部分, 最後の `|Ω| = 4 ⟹ G = S₄`)。
