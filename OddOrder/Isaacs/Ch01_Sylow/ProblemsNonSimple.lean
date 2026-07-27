@@ -15,20 +15,25 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 1E の形式化
 
 * **1E.1**: `|G| = p²q²` (`p < q` 素数) なら `n_q = 1`, ただし `|G| = 36` は例外。
 * **1E.2**: `|G| = pqr` (`p < q < r` 素数) なら `n_r = 1`。
+* **1E.3**: 位数 `315 = 3²·5·7` の単純群は存在しない。
 
 ## 共通の道具
 
 `n_q ∣ [G : Q]` (`Sylow.card_dvd_index`) と `n_q ≡ 1 (mod q)` (`card_sylow_modEq_one`)。
 Sylow 部分群の位数・指数を `|G|` の分解から読むために
 `sylow_card_and_index_of_card_eq_mul` を用意する (既存の
-`sylow_card_eq_prime_of_card_eq_mul` の任意指数版)。
+`sylow_card_eq_prime_of_card_eq_mul` の任意指数版)。具体的な位数の非単純性 (1E.3 以降) は
+さらに **Thm 1.16** (`card_sylow_modEq_one_of_max_inter`, 交わり最大の Sylow 対) と
+**Cor 1.3** (`card_dvd_factorial_of_simple_subgroup_index`, 単純群の部分群の指数) を使う。
 
 ## Main results
 
 - `sylow_card_and_index_of_card_eq_mul` — `|G| = m·q^k` (`q ∤ m`) なら
   `|Q| = q^k` かつ `[G : Q] = m`。
 - `card_sylow_eq_one_of_card_eq_sq_mul_sq` — **Problem 1E.1**。
+- `card_sylow_eq_one_of_card_eq_prime_mul_prime` — 位数 `qr` (`q < r`) なら `n_r = 1`。
 - `card_sylow_eq_one_of_card_eq_mul_mul` — **Problem 1E.2**。
+- `not_isSimpleGroup_of_card_eq_threeonefive` — **Problem 1E.3**。
 -/
 
 namespace OddOrder.Isaacs.Ch01
@@ -278,5 +283,181 @@ theorem card_sylow_eq_one_of_card_eq_mul_mul {G : Type*} [Group G] [Finite G] {p
   omega
 
 end -- Problem 1E.2
+
+section /- 1E: Problem 1E.3 (p. 38) -/
+
+/-- 位数 `p²` の部分群の元同士は可換 (`IsPGroup.isMulCommutative_of_card_eq_prime_sq`)。 -/
+private lemma mul_comm_of_card_eq_prime_sq {G : Type*} [Group G] {P : Subgroup G} {p : ℕ}
+    [Fact p.Prime] (hP : Nat.card ↥P = p ^ 2) {a b : G} (ha : a ∈ P) (hb : b ∈ P) :
+    a * b = b * a :=
+  congrArg Subtype.val (isMulCommutative_iff.mp
+    (IsPGroup.isMulCommutative_of_card_eq_prime_sq (G := ↥P) (p := p) hP) ⟨a, ha⟩ ⟨b, hb⟩)
+
+/-- 位数 `p²` の部分群 `P` は, その部分群 `D ≤ P` を正規化する (`P` が可換だから)。 -/
+private lemma le_normalizer_of_card_eq_prime_sq {G : Type*} [Group G] {P D : Subgroup G} {p : ℕ}
+    [Fact p.Prime] (hP : Nat.card ↥P = p ^ 2) (hDP : D ≤ P) :
+    P ≤ Subgroup.normalizer (D : Set G) := by
+  intro s hs
+  rw [Subgroup.mem_normalizer_iff]
+  intro h
+  constructor
+  · intro hh
+    rwa [show s * h * s⁻¹ = h from by rw [mul_comm_of_card_eq_prime_sq hP hs (hDP hh)]; group]
+  · intro hh
+    have hhP : h ∈ P := by
+      rw [show h = s⁻¹ * (s * h * s⁻¹) * s from by group]
+      exact P.mul_mem (P.mul_mem (P.inv_mem hs) (hDP hh)) hs
+    rwa [show s * h * s⁻¹ = h from by rw [mul_comm_of_card_eq_prime_sq hP hs hhP]; group] at hh
+
+/-- 位数 `45 = 3²·5` の群では Sylow `3`-部分群は一意 (`n₃ ∣ 5`, `≡ 1 (mod 3)`, `5 % 3 = 2`)。 -/
+private lemma card_sylow_three_eq_one_of_card_eq_fortyfive {H : Type*} [Group H] [Finite H]
+    (hH : Nat.card H = 45) : Nat.card (Sylow 3 H) = 1 := by
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  obtain ⟨P⟩ : Nonempty (Sylow 3 H) := Sylow.nonempty
+  obtain ⟨-, hindex⟩ := sylow_card_and_index_of_card_eq_mul (q := 3) (m := 5) (k := 2)
+    (by rw [hH]; norm_num) (by norm_num) P
+  have hdvd : Nat.card (Sylow 3 H) ∣ 5 := hindex ▸ Sylow.card_dvd_index P
+  have hmod : Nat.card (Sylow 3 H) % 3 = 1 := by
+    have h := card_sylow_modEq_one 3 H
+    unfold Nat.ModEq at h
+    omega
+  rcases (Nat.dvd_prime (by norm_num)).mp hdvd with h | h
+  · exact h
+  · rw [h] at hmod; norm_num at hmod
+
+/-- **Isaacs Problem 1E.3** (p. 38)。位数 `315 = 3²·5·7` の単純群は存在しない。
+
+`n₃ ∣ [G : S] = 35` かつ `n₃ ≡ 1 (mod 3)` から `n₃ ∈ {1, 7}`。単純性より `n₃ = 7`。
+交わり最大の相異なる Sylow `3` 対 `S ≠ T` をとると **Thm 1.16**
+(`card_sylow_modEq_one_of_max_inter`) が `7 ≡ 1 (mod |S : D|)` (`D := S ⊓ T`) を与え,
+`|S : D| ∣ 6` と `|S : D| ∣ 9`, `≠ 1` から `|S : D| = 3`, つまり `|D| = 3`。
+`|S| = 9 = 3²` は可換なので `S`, `T ≤ N := N_G(D)` で `9 ∣ |N| ∣ 315`, ゆえに
+`|N| ∈ {9, 45, 63, 315}`。どれも矛盾する:
+
+* `|N| = 9`: `S`, `T ≤ N` と位数比較で `S = N = T`, `S ≠ T` に矛盾。
+* `|N| = 45`: 位数 45 の群の Sylow `3` は一意なのに `S ≠ T` が両方入る。
+* `|N| = 63`: 指数 5 で **Cor 1.3** より `315 ∣ 5! = 120`, 偽。
+* `|N| = 315`: `D ⊴ G` で `1 < |D| = 3 < 315`, 単純性に矛盾。 -/
+theorem not_isSimpleGroup_of_card_eq_threeonefive {G : Type*} [Group G] [Finite G]
+    (hG : Nat.card G = 315) : ¬ IsSimpleGroup G := by
+  intro hsimple
+  classical
+  haveI := hsimple
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  haveI : Fintype (Sylow 3 G) := Fintype.ofFinite _
+  have hdec : ∀ P : Sylow 3 G,
+      Nat.card ↥(P : Subgroup G) = 9 ∧ (P : Subgroup G).index = 35 := fun P => by
+    have h := sylow_card_and_index_of_card_eq_mul (q := 3) (m := 35) (k := 2)
+      (by rw [hG]; norm_num) (by norm_num) P
+    exact ⟨h.1.trans (by norm_num), h.2⟩
+  obtain ⟨S₀⟩ : Nonempty (Sylow 3 G) := Sylow.nonempty
+  -- `n₃ = 7`
+  have hn3mod : Nat.card (Sylow 3 G) % 3 = 1 := by
+    have h := card_sylow_modEq_one 3 G
+    unfold Nat.ModEq at h
+    omega
+  have hn3ne1 : Nat.card (Sylow 3 G) ≠ 1 := by
+    intro h1
+    haveI : Subsingleton (Sylow 3 G) := (Nat.card_eq_one_iff_unique.mp h1).1
+    have hS9 := (hdec S₀).1
+    rcases hsimple.eq_bot_or_eq_top_of_normal _ (Sylow.normal_of_subsingleton S₀) with h | h
+    · rw [h, Subgroup.card_bot] at hS9; norm_num at hS9
+    · rw [h, Subgroup.card_top, hG] at hS9; norm_num at hS9
+  have hn3 : Nat.card (Sylow 3 G) = 7 := by
+    rcases eq_of_dvd_prime_mul_prime (p := 5) (q := 7) (by norm_num) (by norm_num)
+      ((hdec S₀).2 ▸ Sylow.card_dvd_index S₀) with h | h | h | h
+    · exact absurd h hn3ne1
+    · rw [h] at hn3mod; norm_num at hn3mod
+    · exact h
+    · rw [h] at hn3mod; norm_num at hn3mod
+  -- 交わり最大の相異なる Sylow `3` 対
+  have hgt : 1 < Nat.card (Sylow 3 G) := by rw [hn3]; norm_num
+  haveI : Nontrivial (Sylow 3 G) := by
+    apply Fintype.one_lt_card_iff_nontrivial.mp
+    rwa [← Nat.card_eq_fintype_card]
+  obtain ⟨S₁, T₁, hST₁⟩ := exists_pair_ne (Sylow 3 G)
+  obtain ⟨STm, hSTm_mem, hSTmax⟩ :=
+    (Finset.univ.filter (fun ST : Sylow 3 G × Sylow 3 G => ST.1 ≠ ST.2)).exists_max_image
+      (fun ST => Nat.card ((ST.1 : Subgroup G) ⊓ (ST.2 : Subgroup G) : Subgroup G))
+      ⟨(S₁, T₁), Finset.mem_filter.mpr ⟨Finset.mem_univ _, hST₁⟩⟩
+  obtain ⟨S, T⟩ := STm
+  have hST : S ≠ T := (Finset.mem_filter.mp hSTm_mem).2
+  have hmax : ∀ S' T' : Sylow 3 G, S' ≠ T' →
+      Nat.card ((S' : Subgroup G) ⊓ (T' : Subgroup G) : Subgroup G) ≤
+      Nat.card ((S : Subgroup G) ⊓ (T : Subgroup G) : Subgroup G) := fun S' T' hne =>
+    hSTmax (S', T') (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hne⟩)
+  have hmod := card_sylow_modEq_one_of_max_inter hgt S T hST hmax
+  rw [hn3] at hmod
+  set D : Subgroup G := (S : Subgroup G) ⊓ (T : Subgroup G) with hDdef
+  -- `|S : D| = 3`, つまり `|D| = 3`
+  have hd_dvd6 : D.relIndex (S : Subgroup G) ∣ 6 := by
+    have h := (Nat.modEq_iff_dvd' (by norm_num : 1 ≤ 7)).mp hmod.symm
+    norm_num at h; exact h
+  have hd_dvd9 : D.relIndex (S : Subgroup G) ∣ 9 := by
+    have hh := Subgroup.index_dvd_card (D.subgroupOf (S : Subgroup G))
+    rw [(hdec S).1] at hh
+    exact hh
+  have hd_ne1 : D.relIndex (S : Subgroup G) ≠ 1 := by
+    intro h1
+    have hle : (S : Subgroup G) ≤ D := Subgroup.relIndex_eq_one.mp h1
+    exact hST (Sylow.ext (Subgroup.eq_of_le_of_card_ge (hle.trans inf_le_right)
+      (((hdec T).1).trans ((hdec S).1).symm).le))
+  have hd3 : D.relIndex (S : Subgroup G) = 3 := by
+    have hg : D.relIndex (S : Subgroup G) ∣ 3 := by
+      have h := Nat.dvd_gcd hd_dvd6 hd_dvd9
+      norm_num at h; exact h
+    rcases (Nat.dvd_prime (by norm_num)).mp hg with h | h
+    · exact absurd h hd_ne1
+    · exact h
+  have hidx3S : (D.subgroupOf (S : Subgroup G)).index = 3 := hd3
+  have hDcard : Nat.card ↥D = 3 := by
+    have heq := Subgroup.card_mul_index (D.subgroupOf (S : Subgroup G))
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (inf_le_left : D ≤ (S : Subgroup G))).toEquiv, hidx3S, (hdec S).1] at heq
+    rw [← hDdef] at heq
+    omega
+  -- `S`, `T ≤ N := N_G(D)` (位数 `9 = 3²` は可換)
+  have hS_le : (S : Subgroup G) ≤ Subgroup.normalizer (D : Set G) :=
+    le_normalizer_of_card_eq_prime_sq (p := 3) (((hdec S).1).trans (by norm_num)) inf_le_left
+  have hT_le : (T : Subgroup G) ≤ Subgroup.normalizer (D : Set G) :=
+    le_normalizer_of_card_eq_prime_sq (p := 3) (((hdec T).1).trans (by norm_num)) inf_le_right
+  set N : Subgroup G := Subgroup.normalizer (D : Set G) with hNdef
+  have hNdvd : Nat.card ↥N ∣ 315 := hG ▸ Subgroup.card_subgroup_dvd_card N
+  obtain ⟨e, he⟩ : (9 : ℕ) ∣ Nat.card ↥N := ((hdec S).1) ▸ Subgroup.card_dvd_of_le hS_le
+  have hedvd : e ∣ 35 :=
+    (mul_dvd_mul_iff_left (by norm_num : (9 : ℕ) ≠ 0)).mp (by rw [← he]; simpa using hNdvd)
+  -- `|N| ∈ {9, 45, 63, 315}` のいずれも矛盾
+  rcases eq_of_dvd_prime_mul_prime (p := 5) (q := 7) (by norm_num) (by norm_num) hedvd with
+    h | h | h | h
+  · -- `|N| = 9`: `S = N = T`
+    rw [h, mul_one] at he
+    exact hST (Sylow.ext ((Subgroup.eq_of_le_of_card_ge hS_le (he ▸ ((hdec S).1).ge)).trans
+      (Subgroup.eq_of_le_of_card_ge hT_le (he ▸ ((hdec T).1).ge)).symm))
+  · -- `|N| = 45`: 位数 45 の群の Sylow `3` は一意
+    rw [h] at he
+    norm_num at he
+    haveI : Subsingleton (Sylow 3 ↥N) :=
+      (Nat.card_eq_one_iff_unique.mp (card_sylow_three_eq_one_of_card_eq_fortyfive he)).1
+    exact hST (Sylow.subtype_injective (hP := hS_le) (hQ := hT_le) (Subsingleton.elim _ _))
+  · -- `|N| = 63`: 指数 5 で Cor 1.3 に矛盾
+    rw [h] at he
+    norm_num at he
+    have hidx : N.index = 5 := by
+      have hmul := Subgroup.card_mul_index N
+      rw [he, hG] at hmul
+      omega
+    have hdvd := card_dvd_factorial_of_simple_subgroup_index N (by rw [hidx]; norm_num)
+    rw [hG, hidx] at hdvd
+    norm_num [Nat.factorial] at hdvd
+  · -- `|N| = 315`: `D ⊴ G` で `1 < |D| < |G|`
+    rw [h] at he
+    norm_num at he
+    have hNtop : N = ⊤ := Subgroup.eq_top_of_card_eq N (by rw [he, hG])
+    have hDnorm : D.Normal := Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)
+    rcases hsimple.eq_bot_or_eq_top_of_normal _ hDnorm with h1 | h1
+    · rw [h1, Subgroup.card_bot] at hDcard; norm_num at hDcard
+    · rw [h1, Subgroup.card_top, hG] at hDcard; norm_num at hDcard
+
+end -- Problem 1E.3
 
 end OddOrder.Isaacs.Ch01

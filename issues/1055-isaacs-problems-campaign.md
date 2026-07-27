@@ -5229,10 +5229,30 @@ leaf = `Ch01_Sylow/ProblemsNonSimple.lean` (`OddOrder.lean` 配線済)。
   `Subgroup.normal_subgroupOf_iff_le_normalizer` が出す `↑↑R` とは syntactic に違う —
   `Sylow.coe_coe` で橋渡しする。
 
-* 次の frontier = **1E.3** (位数 315 の単純群は無い)。以降 1E.4–1E.8 は具体的な位数
-  (144 / 336 / 180 / 240 / 252) の非単純性で、`card_dvd_factorial_of_simple_subgroup_index`
-  (`Ch01_Sylow/Basic.lean`, Isaacs Cor 1.3) と `card_sylow_modEq_one_of_max_inter`
-  (Thm 1.16) が主要道具。1E.5 は Hint どおり **1C.5** (`ProblemsAlternating.lean`) を使う。
+* ✅ **1E.3** `not_isSimpleGroup_of_card_eq_threeonefive` (2026-07-28)。位数 `315 = 3²·5·7`。
+  `n₃ ∈ {1,7}` から単純性で `n₃ = 7`、交わり最大の Sylow 3 対で **Thm 1.16** が
+  `7 ≡ 1 (mod |S:D|)` を与え `|S:D| ∣ gcd(6,9) = 3`, `≠1` ⟹ `|D| = 3`。
+  `|S| = 9 = 3²` は可換なので `S, T ≤ N := N_G(D)` で `9 ∣ |N| ∣ 315`、
+  `|N| ∈ {9,45,63,315}` を全て潰す (9: `S = N = T` / 45: 位数 45 の Sylow 3 は一意 /
+  63: 指数 5 で **Cor 1.3** の `315 ∣ 5!` が偽 / 315: `D ⊴ G` で単純性に矛盾)。
+  再利用部品: `mul_comm_of_card_eq_prime_sq` / `le_normalizer_of_card_eq_prime_sq`
+  (位数 `p²` の部分群はその部分群を正規化する) /
+  `card_sylow_three_eq_one_of_card_eq_fortyfive`。
+
+* 次の frontier = **1E.4** (位数 `144 = 2⁴·3²`)。以降 1E.4–1E.8 は具体的な位数
+  (144 / 336 / 180 / 240 / 252) の非単純性で、道具は 1E.3 と同じ
+  (`card_dvd_factorial_of_simple_subgroup_index` = Cor 1.3 /
+  `card_sylow_modEq_one_of_max_inter` = Thm 1.16 / 計数)。
+  1E.5 は Hint どおり **1C.5** (`ProblemsAlternating.lean`) を使う。
+
+⚠ 実装上の罠 (1E.3 で踏んだもの):
+* `haveI : Fintype (Sylow p G)` を入れた後に `norm_num at h` を Sylow 個数の仮説へ当てると
+  `Nat.card` が `Fintype.card` に書き換わって後続の `rw` が全部外れる。
+  `1 % p = 1` の正規化は `unfold Nat.ModEq at h; omega` で行うこと。
+* `set D := ... with hDdef` した後の `Subgroup.card_mul_index` 経由の位数計算は、
+  `rw [...] at heq` の後に **`rw [← hDdef] at heq` で `D` に畳み戻さないと** `omega` が
+  goal の `Nat.card ↥D` と別 atom と見なして失敗する (1C.4 に同じ手当てが入っている)。
+* `Nat.factorial 5` は `norm_num` だけでは簡約されない — `norm_num [Nat.factorial]`。
 
 ### 1E.2 の設計 (実装済, 記録として保持)
 
