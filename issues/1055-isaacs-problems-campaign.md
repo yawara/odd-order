@@ -36,8 +36,7 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
-      §8B は 8B.1–8B.5, 8B.7–8B.9 完了 + 8B.6 は `D₂ₚ` 同型のみ残 /
-      残り 8B.10 / §8C §8D 未着手
+      §8B は 8B.1–8B.10 完了 (8B.6 の `D₂ₚ` 同型のみ残) / §8C §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4434,8 +4433,9 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
   8B.8 ✅ `isPreprimitive_sup_zpowers_addRight_one` /
   8B.9 ✅ `eq_top_...` (m か n 偶 ⟹ S_n) / `eq_alternatingGroup_...` (ともに奇 ⟹ A_n) /
-  8B.10 🔶 **step 1–3 完了** (推移的 → 2-transitive → 原始的) —
-  **次の frontier = 8B.10 step 4–5** (Bochert → 数値)。
+  8B.10 ✅ `card_eq_six_of_index_eq_of_ne_stabilizer`。
+  ⟹ **§8B は 8B.1–8B.10 完了** (8B.6 の `D₂ₚ` 明示同型のみ残)。
+  **次の frontier = §8C** (8C.1–8C.6)。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4761,3 +4761,26 @@ step 1–3 landing 済 (`isPreprimitive_of_index_eq_of_ne_stabilizer`)。残り:
    ⟹ `n(n-1) ∣ |H| = (n-1)!` ⟹ `n ∣ (n-2)!`。`n = 2,3,4` はこれを満たさない。
    `n = 1` は `Sym(α)` が自明で `H = ⊤ = G_a` (点安定化群) ⟹ 仮定に反する。
    ⟹ **`n = 6`**。
+
+
+## §8B 完了 (2026-07-27) — 次は §8C
+
+8B.1–8B.10 をすべて landing (8B.6 の `G ≅ DihedralGroup p` の明示同型のみ残; 数学的
+内容 = `|G_α| = 2` と `|Ω|` 奇素数はすべて証明済で、残りは表示の橋渡し)。
+
+leaf 構成: `Problems8B/{Blocks, SmallSuborbits, CyclicGenerated}.lean`
+(279 / 689 / 930 行)。⚠ `CyclicGenerated.lean` が 930 行になったので、§8C を
+別 leaf にするか、1500 行に近づいたら 8B.8–8B.10 をさらに分けること。
+
+### §8C の問題 (p. 251, 要 PDF 確認)
+
+* 8C.1: `A₆` は位数 120 の部分群をもたない ⟹ 位数 360 の群は `A₆` 以外にも…
+* 8C.2: 次数 11 位数 7920 = 11·10·9·8 の置換群
+* 8C.3: 次数 12 位数 95040 の推移置換群
+* 8C.4: 次数 100 の推移群
+* 8C.5: 次数 24 の 5-transitive 群
+* 8C.6: 可換群 `A` について `Aut(A)` が単純 ⟺ …
+
+⚠ 上記は pdftotext の断片からの推測。**着手前に PDF ページ画像
+(`references/isaacs/pages/` に p.251 前後を切り出す) で文言を確定すること**
+(8B.7 で上付き `O²` を取り違えかけた前例あり)。
