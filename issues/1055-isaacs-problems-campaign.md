@@ -5590,8 +5590,14 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
 ### §3C の問題 (pdftotext L4466–, 書籍 pp. 90–91)
 
 * ✅ **3C.1** — `hall_D` (`Ch03_SplitExtensions/Basic.lean`)。Hall D-定理。
-* ⬜ **3C.2** — `π` の各素数 `p` について `p`-補元 `H_p` があるなら
-  `⋂_{p∈π} H_p` は Hall `π'`-部分群。
+* ✅ **3C.2** `isHallSubgroup_finset_inf_of_pComplement` (2026-07-28,
+  新 leaf `Ch03_SplitExtensions/ProblemsHallSystems.lean`)。素数の**有限集合** `s` 版で述べる
+  (Hall 性は `|G|` の素因子にしか依らないので十分)。`Finset.induction_on` で、
+  位数側は `X ≤ H p`, `X ≤ t.inf H` から素因子が `p` と `t` を避けること、
+  指数側は `(H p).index` の素因子が `{p}`・`(t.inf H).index` の素因子が `t` で `p ∉ t` ゆえ
+  互いに素、したがって `X.index = (H p).index · (t.inf H).index` となることを使う。
+  再利用部品 `index_inf_eq_mul_of_coprime` (指数が互いに素なら交わりの指数は積 —
+  `index_dvd_of_le` 2 本 + `Nat.Coprime.mul_dvd_of_dvd_of_dvd` と `index_inf_le` の挟み撃ち)。
 * ⬜ **3C.3** — Sylow system (各素数の Sylow を 1 つずつ、互いに置換可能な集合)。
   (a) Sylow system があれば任意の `π` に Hall `π`-部分群がある。
   (b) 可解群には Sylow system がある。Hint: 各 `p`-補元を取り、1 つを除く全部の交わりを見る。
