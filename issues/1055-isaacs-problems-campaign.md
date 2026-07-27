@@ -4118,6 +4118,13 @@ TransitiveAutomorphisms / TransvectionGeneration)。演習は新 leaf `Problems8
   (`Sym(A)` が `A` にも `B` にも同型な regular 部分群をもつ)。
   ⚠ `A ≇ B` は構成に不要 (問題を面白くしているだけ) なので仮説から外した。
   `regularRep` は 8A.3 / 8A.4 でも使う共通道具。
+* ✅ **8A.3** 実証明 — `regularRepRight` (右正則表現 `a ↦ (x ↦ e.symm (e x * a⁻¹))`;
+  逆元は反準同型を準同型に直すため) + `regularRepRight_range_le_centralizer` (左右は
+  結合律で可換) ⟹ `exists_two_distinct_regular_normal_of_center_eq_bot`。
+  `L ⊔ R` の中で両方正規 (自分の normalizer + 相手の centralizer ≤ normalizer)、
+  `L ≠ R` は「左移動がすべて右移動 ⟹ `A = Z(A) = 1`」で `Nontrivial A` に反する。
+  ⚠ 書籍は `Z(G)=1` のみだが **`G` 非自明が要る** (`G = 1` は `Z(G)=1` を満たすが
+  `L = R = 1` で相異ならない)。
 * ✅ **8A.2** 実証明 — `smul_eq_self_of_mem_centralizer` (推移的 `H` の中心化群の元は
   1 点固定 ⟹ 全点固定) / `centralizer_inf_stabilizer_eq_bot` (忠実性を足して半正則) /
   `bijective_smulBase_top_of_comm` (可換推移的置換群は regular)。

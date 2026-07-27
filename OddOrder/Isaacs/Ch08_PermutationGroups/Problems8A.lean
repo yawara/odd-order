@@ -20,6 +20,9 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `exists_regular_subgroups_of_equiv`, `exists_regular_subgroups_of_card_eq` —
   **Problem 8A.1** 前半: `|A| = |B|` なら `Sym(A)` は `A`, `B` に同型な regular 部分群を
   ともにもつ。
+- `regularRepRight`, `exists_two_distinct_regular_normal_of_center_eq_bot` —
+  **Problem 8A.3**: `Z(G) = 1` (かつ非自明) なら `Sym(G)` の中に `G` に同型な相異なる
+  regular normal 部分群が 2 つある (左正則表現の像と右正則表現の像)。
 - `smul_eq_self_of_mem_centralizer`, `centralizer_inf_stabilizer_eq_bot`,
   `bijective_smulBase_top_of_comm` — **Problem 8A.2**: transitive な `H ≤ G` の
   中心化群 `C_G(H)` は半正則。帰結として可換 transitive な置換群は regular。
@@ -98,6 +101,96 @@ theorem exists_regular_subgroups_of_card_eq {A B : Type*} [Group A] [Group B]
       (∀ α : A, Function.Bijective (smulBase M α)) ∧
       Nonempty (N ≃* A) ∧ Nonempty (M ≃* B) :=
   exists_regular_subgroups_of_equiv (Finite.card_eq.mp h.symm).some
+
+/-! ### Problem 8A.3 — 左右の正則表現 -/
+
+/-- 型の同値 `e : Ω ≃ A` に沿って運んだ **`A` の右正則表現** `A →* Equiv.Perm Ω`,
+`a ↦ (x ↦ e.symm (e x * a⁻¹))`。逆元をとるのは反準同型を準同型に直すため。 -/
+def regularRepRight {A Ω : Type*} [Group A] (e : Ω ≃ A) : A →* Equiv.Perm Ω where
+  toFun a := e.trans ((Equiv.mulRight a⁻¹).trans e.symm)
+  map_one' := by ext x; simp
+  map_mul' a b := by ext x; simp [mul_assoc]
+
+@[simp] lemma regularRepRight_apply {A Ω : Type*} [Group A] (e : Ω ≃ A) (a : A) (x : Ω) :
+    regularRepRight e a x = e.symm (e x * a⁻¹) := rfl
+
+lemma regularRepRight_injective {A Ω : Type*} [Group A] [Nonempty Ω] (e : Ω ≃ A) :
+    Function.Injective (regularRepRight e) := by
+  intro a b hab
+  have := congrArg (fun p : Equiv.Perm Ω => e (p (e.symm 1))) hab
+  simpa using this
+
+/-- **右正則表現の像も regular**。 -/
+theorem bijective_smulBase_regularRepRight_range {A Ω : Type*} [Group A] [Nonempty Ω]
+    (e : Ω ≃ A) (α : Ω) :
+    Function.Bijective (smulBase (regularRepRight e).range α) := by
+  constructor
+  · rintro ⟨-, a, rfl⟩ ⟨-, b, rfl⟩ hnm
+    have hab : a = b := by simpa [smulBase] using hnm
+    exact Subtype.ext (congrArg (regularRepRight e) hab)
+  · intro β
+    refine ⟨⟨regularRepRight e ((e β)⁻¹ * e α), ⟨_, rfl⟩⟩, ?_⟩
+    simp only [smulBase_apply, Equiv.Perm.smul_def, regularRepRight_apply, mul_inv_rev,
+      inv_inv, mul_inv_cancel_left, Equiv.symm_apply_apply]
+
+/-- 左正則表現と右正則表現は可換 (結合律そのもの)。 -/
+lemma regularRepRight_range_le_centralizer {A Ω : Type*} [Group A] (e : Ω ≃ A) :
+    (regularRepRight e).range ≤
+      Subgroup.centralizer (((regularRep e).range : Subgroup (Equiv.Perm Ω)) :
+        Set (Equiv.Perm Ω)) := by
+  rintro - ⟨b, rfl⟩
+  refine Subgroup.mem_centralizer_iff.mpr ?_
+  rintro - ⟨a, rfl⟩
+  ext x
+  simp [mul_assoc]
+
+/-- **Isaacs Problem 8A.3** (p. 235): `Z(G) = 1` なる非自明な群 `G` に対し, ある置換群が
+`G` に同型な **相異なる** regular normal 部分群を 2 つもつ。
+
+`Sym(G)` の中の左正則表現の像 `L` と右正則表現の像 `R` を取る。どちらも regular で
+`G` に同型, たがいに可換なので `P = L ⊔ R` の中でどちらも正規。`L = R` なら左移動が
+すべて右移動になり `G = Z(G) = 1` となって非自明性に反する。 -/
+theorem exists_two_distinct_regular_normal_of_center_eq_bot {A : Type*} [Group A]
+    [Nontrivial A] (hZ : Subgroup.center A = ⊥) :
+    ∃ L R : Subgroup (Equiv.Perm A),
+      L ≠ R ∧
+      (∀ α : A, Function.Bijective (smulBase L α)) ∧
+      (∀ α : A, Function.Bijective (smulBase R α)) ∧
+      L ⊔ R ≤ Subgroup.normalizer (L : Set (Equiv.Perm A)) ∧
+      L ⊔ R ≤ Subgroup.normalizer (R : Set (Equiv.Perm A)) ∧
+      Nonempty (L ≃* A) ∧ Nonempty (R ≃* A) := by
+  classical
+  refine ⟨(regularRep (Equiv.refl A)).range, (regularRepRight (Equiv.refl A)).range,
+    ?_, fun α => bijective_smulBase_regularRep_range _ α,
+    fun α => bijective_smulBase_regularRepRight_range _ α, ?_, ?_,
+    ⟨(MonoidHom.ofInjective (regularRep_injective (Equiv.refl A))).symm⟩,
+    ⟨(MonoidHom.ofInjective (regularRepRight_injective (Equiv.refl A))).symm⟩⟩
+  · -- `L = R` なら任意の `a` について左移動 = ある右移動 ⟹ `a ∈ Z(A) = ⊥`
+    intro hLR
+    obtain ⟨a, ha⟩ := exists_ne (1 : A)
+    have hmem : regularRep (Equiv.refl A) a ∈ (regularRepRight (Equiv.refl A)).range := by
+      rw [← hLR]; exact ⟨a, rfl⟩
+    obtain ⟨b, hb⟩ := hmem
+    have hb1 := congrArg (fun p : Equiv.Perm A => p 1) hb
+    simp only [regularRep_apply, regularRepRight_apply, Equiv.refl_apply,
+      Equiv.refl_symm, mul_one, one_mul] at hb1
+    refine ha ?_
+    have hcentral : a ∈ Subgroup.center A := by
+      refine Subgroup.mem_center_iff.mpr fun x => ?_
+      have hx := congrArg (fun p : Equiv.Perm A => p x) hb
+      simp only [regularRep_apply, regularRepRight_apply, Equiv.refl_apply,
+        Equiv.refl_symm] at hx
+      rw [hb1] at hx
+      exact hx
+    rw [hZ, Subgroup.mem_bot] at hcentral
+    exact hcentral
+  · exact sup_le Subgroup.le_normalizer
+      (le_trans (regularRepRight_range_le_centralizer _) (Subgroup.centralizer_le_normalizer _))
+  · refine sup_le (le_trans ?_ (Subgroup.centralizer_le_normalizer _)) Subgroup.le_normalizer
+    intro x hx
+    refine Subgroup.mem_centralizer_iff.mpr fun y hy => ?_
+    exact ((Subgroup.mem_centralizer_iff.mp
+      (regularRepRight_range_le_centralizer (Equiv.refl A) hy) x hx)).symm
 
 /-! ### Problem 8A.2 — 中心化群は半正則 -/
 
