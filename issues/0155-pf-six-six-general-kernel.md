@@ -97,6 +97,10 @@ Sibley 側の入口 `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
       - `S07.sq_dvd_head_of_commonIndex_primePower_sums` (`S07_Coherence/NormInequalities:1056`)
         ← 書籍の「`θᵢ(1)²` は `∑_{j≥i} χⱼ(1)²` を割る」がこれ
       - `S08.natDegreeSquareSum_pos_of_memberFamily` (`S08_CoherenceCorePart1:718`)
+      - **`S08.normalizedDegreeGap_of_natDegreeSumPrimePowerGap`**
+        (`S08_CoherenceCorePart2:221`) ← **`2a < ∑ deg²` そのものの producer**。
+        可除性 `dχ·dχ ∣ D` + `dχ = q·d₁` (`q = p^m`) + `3 ≤ p` + `d₁ < dχ` から出す。
+        これも抽象群 + 素の数値データのみ。
 
       `hyp` を取るのは最後の梱包
       `xAdjoinStepInput_of_memberFamily_degreeDivisibility_commonIndexNatGap`
