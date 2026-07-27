@@ -5205,3 +5205,145 @@ Ch.8 §8C.6 ではない。順序は **§1E → §1F → §1G → §3C → §3D 
 * **1E.6**: `|G| = 180 = 2²·3²·5` なら単純でない。
 * **1E.7**: `|G| = 240 = 2⁴·3·5` なら単純でない。
 * **1E.8**: `|G| = 252 = 2²·3²·7` なら単純でない。
+
+
+## §1E 進捗 (2026-07-28)
+
+leaf = `Ch01_Sylow/ProblemsNonSimple.lean` (`OddOrder.lean` 配線済)。
+
+* ✅ **1E.1** `card_sylow_eq_one_of_card_eq_sq_mul_sq`。`n_q ∣ [G:Q] = p²` と
+  `n_q ≡ 1 (mod q)` から `n_q ∈ {1, p, p²}` を潰す。`n_q = p` は `p < q` ゆえ
+  `p % q = p = 1` で素数性に矛盾。`n_q = p²` は `q ∣ p²−1 = (p−1)(p+1)`,
+  `q > p` から `q ∣ p+1` すなわち `q = p+1`, 連続素数は `2,3` だけ ⟹ `|G| = 36`。
+* 再利用部品 `sylow_card_and_index_of_card_eq_mul` — `|G| = m·q^k` (`q ∤ m`) なら
+  `|Q| = q^k` かつ `[G:Q] = m` (既存 `sylow_card_eq_prime_of_card_eq_mul` の任意指数版)。
+  §1E の残り全問で使う。
+
+* ✅ **1E.2** `card_sylow_eq_one_of_card_eq_mul_mul` (2026-07-28)。下記の設計どおり landing。
+  支持補題 `card_sylow_eq_one_of_card_eq_prime_mul_prime` (位数 `qr`, `q<r` なら `n_r = 1`) と
+  `eq_of_dvd_prime_mul_prime` (相異なる 2 素数の積の約数は `1,p,q,pq`) も再利用可能。
+  ⚠ 実装上の罠 2 件: (i) ℕ の切り捨て減算が絡む計数不等式は `q = u+1`, `r = v+1` に
+  `obtain ⟨u, rfl⟩` して `Nat.add_sub_cancel` で減算を消し、積は `Nat.mul_le_mul_right` で
+  与えてから `omega` に渡す (`ring` は ℕ 減算を扱えない)。
+  (ii) `Sylow.card_eq_index_normalizer` は `↑R : Set G` (Sylow から直接) で述べられており、
+  `Subgroup.normal_subgroupOf_iff_le_normalizer` が出す `↑↑R` とは syntactic に違う —
+  `Sylow.coe_coe` で橋渡しする。
+
+* ✅ **1E.3** `not_isSimpleGroup_of_card_eq_threeonefive` (2026-07-28)。位数 `315 = 3²·5·7`。
+  `n₃ ∈ {1,7}` から単純性で `n₃ = 7`、交わり最大の Sylow 3 対で **Thm 1.16** が
+  `7 ≡ 1 (mod |S:D|)` を与え `|S:D| ∣ gcd(6,9) = 3`, `≠1` ⟹ `|D| = 3`。
+  `|S| = 9 = 3²` は可換なので `S, T ≤ N := N_G(D)` で `9 ∣ |N| ∣ 315`、
+  `|N| ∈ {9,45,63,315}` を全て潰す (9: `S = N = T` / 45: 位数 45 の Sylow 3 は一意 /
+  63: 指数 5 で **Cor 1.3** の `315 ∣ 5!` が偽 / 315: `D ⊴ G` で単純性に矛盾)。
+  再利用部品: `mul_comm_of_card_eq_prime_sq` / `le_normalizer_of_card_eq_prime_sq`
+  (位数 `p²` の部分群はその部分群を正規化する) /
+  `card_sylow_three_eq_one_of_card_eq_fortyfive`。
+
+* ✅ **1E.4** `not_isSimpleGroup_of_card_eq_onefourfour` (2026-07-28)。位数 `144 = 2⁴·3²`。
+  `n₃ ∣ 16`, `≡ 1 (mod 3)` ⟹ `n₃ ∈ {1,4,16}`。単純性で `≠1`、`4` は正規化群の指数 4 で
+  `144 ∣ 4!` が偽。`16` は 1E.3 と同型の議論: `|S:D| ∣ gcd(15,9) = 3` ⟹ `|D| = 3`、
+  `9 ∣ |N| ∣ 144` で `|N| ∈ {9,18,36,72,144}` を全て潰す
+  (9: `S=N=T` / 18: 位数 18 の Sylow 3 は一意 / 36: 指数 4 / 72: 指数 2 / 144: `D ⊴ G`)。
+
+* 1E.3/1E.4 の共通部品を切り出し (1E.3 も載せ替え済):
+  `card_sylow_mod_eq_one` (`n_q % q = 1`) / `card_sylow_eq_one_of_card_eq_prime_mul_pow`
+  (`|H| = ℓ·q^k`, `ℓ % q ≠ 1` ⟹ `n_q = 1`) / `card_sylow_ne_one_of_simple` /
+  `exists_max_inter_sylow_pair` (Thm 1.16 を当てる前段)。1E.5 以降もこれで書ける。
+
+* ✅ **1E.5 の前提インフラ** `exists_injective_hom_alternating_of_simple` (2026-07-28)。
+  単純群 `G` (`2 < |G|`) が指数 `n > 1` の部分群をもてば `G ↪ Aₙ` (`Fin n` 上の交代群)。
+  `G ⧸ H` への作用の核は `core_G(H)` で単純性と `n > 1` から `⊥`、`sign ∘ φ` の核も正規で
+  `⊥` なら `G ↪ ℤˣ` (`Fintype.card_units_int = 2`) が `|G| ≤ 2` を強いるので `⊤`。
+  ⚠ `Equiv.permCongrHom (e : α ≃ β) : Perm α ≃* Perm β` (`Mathlib/Algebra/Group/End.lean`)
+  が `Perm (G ⧸ H) ≃* Perm (Fin n)` の橋渡し (`Equiv.permCongr` は Equiv どまり)。
+
+* ✅ **1E.5** `not_isSimpleGroup_of_card_eq_threethreesix` (2026-07-28)。下記の筋どおり landing。
+  ⚠ 実装上の罠: (i) `norm_num at h` は `Nat.card` を `Fintype.card` に書き換えてしまうので、
+  1C.5 の結論 `= 7*(7-1)/2` の数値化は `rwa [show 7*(7-1)/2 = 21 from by norm_num] at h`。
+  (ii) `Sylow` の Set 係数は `(R : Set X)` (直接) と `((R : Subgroup X) : Set X)` の 2 形が
+  あり、後者を型指定 `: Set _` で書くと `Set ?m` が決まらず elaborate に失敗する
+  (`Sylow.coe_coe` は `rfl` なので `rw` で橋渡しする)。
+  (iii) `f (x⁻¹ * g * x⁻¹⁻¹)` を `group` で潰そうとすると `f` の中の `⁻¹` が残る —
+  `inv_inv` で先に `x⁻¹ * g * x` に直してから `map_mul`/`map_inv` を当てる。
+
+* ✅ **1E.6 の前提インフラ** (2026-07-28) — 2 本とも landing 済:
+  - `two_mul_card_ne_card_alternating_of_simple` — 単純群 `G` (`2 < |G|`) が指数 `n ≥ 5` の
+    部分群をもつとき `2·|G| ≠ |Aₙ|`。半分なら像が `Aₙ` の**指数 2** の部分群 = 正規で、
+    `alternatingGroup.isSimpleGroup` (`Mathlib/.../Alternating/Simple.lean`, 要 import) に反する。
+  - `exists_finset_of_sylow_inter_trivial` — 相異なる Sylow `q` が自明交叉なら、その非単位元
+    全体は `n_q·(|P| − 1)` 個の Finset をなし、各元の位数は `|P|` を割る。他素数の元の個数
+    (`exists_finset_orderOf_eq_card_sylow_mul`) と足して `|G|` を超えさせる用。
+
+### 1E.6 (位数 `180 = 2²·3²·5`) の設計 — 実装待ち
+
+`n₅ ∣ 36`, `≡ 1 (mod 5)` ⟹ `n₅ ∈ {1, 6, 36}`。単純性で `≠ 1`。
+
+* **`n₅ = 6`**: `N_G(P₅)` が指数 6。`|A₆| = 6!/2 = 360 = 2·180` なので
+  `two_mul_card_ne_card_alternating_of_simple` が直接効く。
+* **`n₅ = 36`**: 位数 5 の元が `36·4 = 144` 個
+  (`exists_finset_orderOf_eq_card_sylow_mul`)。Sylow 3 は位数 9・指数 20 で
+  `n₃ ∣ 20`, `≡1 (mod 3)` ⟹ `n₃ ∈ {1, 4, 10}`。`≠1`、`4` は指数 4 で `180 ∣ 4!` が偽。
+  `n₃ = 10` では Thm 1.16 が `10 ≡ 1 (mod |S:D|)` ⟹ `|S:D| ∣ 9` かつ `∣ 9`, `≠1` ⟹
+  `|S:D| ∈ {3, 9}` の 2 枝:
+  - `|S:D| = 9` (⟹ `D = ⊥`, 最大性より**全対**が自明交叉):
+    `exists_finset_of_sylow_inter_trivial` で 3-冪位数の非単位元が `10·8 = 80` 個。
+    位数 5 の 144 個と交わらず (位数が 9 を割る vs 5)、`80 + 144 + 1 = 225 > 180` で矛盾。
+  - `|S:D| = 3` (⟹ `|D| = 3`): 1E.3/1E.4 と同じく `S, T ≤ N := N_G(D)` で
+    `9 ∣ |N| ∣ 180` ⟹ `|N| ∈ {9, 18, 36, 45, 90, 180}`。
+    9: `S = N = T` / 18: 位数 18 の Sylow 3 は一意 / 36: 指数 5 で `180 ∣ 5!` 偽 /
+    45: 位数 45 の Sylow 3 は一意 / 90: 指数 2 で `180 ∣ 2!` 偽 / 180: `D ⊴ G`。
+* 数値補題 `eq_of_dvd_thirtysix` (36 の約数で `≡1 mod 5` は `{1,6,36}`) と
+  `eq_of_dvd_twenty` (20 の約数で `≡1 mod 3` は `{1,4,10}`) を
+  `eq_one_or_eight_of_dvd_fortyeight` と同じ `interval_cases n <;> revert ... <;> decide`
+  の形で足す。
+
+* その後 1E.7 (`240 = 2⁴·3·5`) / 1E.8 (`252 = 2²·3²·7`) で §1E 完済。
+
+### 1E.5 の筋 (実装済, 記録として保持)
+  `n₇ ∣ 48`, `≡ 1 (mod 7)` ⟹ `n₇ ∈ {1, 8}`、単純性で `n₇ = 8` ⟹ `|N_G(P₇)| = 42`。
+  上の埋め込みで `G ↪ A₈ = A_{7+1}`。`P₇` の像 `Q` は `|A₈| = 20160 = 2⁶·3²·5·7` の
+  Sylow 7 (位数 7) で、`N_G(P₇)` の像は `N_{A₈}(Q)` に入るから `42 ≤ |N_{A₈}(Q)|`。
+  しかし **1C.5** (`card_normalizer_sylow_alternating`) は `|N_{A₈}(Q)| = 7·6/2 = 21`。矛盾。
+  ⚠ 要る部品: `|A₈| = 20160` (`two_mul_nat_card_alternatingGroup` から) と
+  `Sylow.ofCard` で `Q` を `Sylow 7 ↥(alternatingGroup (Fin 8))` に持ち上げること。
+  以降 1E.5–1E.8 は具体的な位数
+  (144 / 336 / 180 / 240 / 252) の非単純性で、道具は 1E.3 と同じ
+  (`card_dvd_factorial_of_simple_subgroup_index` = Cor 1.3 /
+  `card_sylow_modEq_one_of_max_inter` = Thm 1.16 / 計数)。
+  1E.5 は Hint どおり **1C.5** (`ProblemsAlternating.lean`) を使う。
+
+⚠ 追加の実装上の罠 (1E.4):
+* `Nat.dvd_prime_pow` は `n ∣ p ^ k` を **syntactic** に要求する — `n ∣ 16` のままでは
+  当たらないので `show n ∣ 2 ^ 4` に直してから使う。
+* `interval_cases i <;> ... <;> ...` は分岐によって前段で goal が閉じ「No goals」になる。
+  Sylow 個数の場合分けは分岐ごとに明示的に書く。
+
+⚠ 実装上の罠 (1E.3 で踏んだもの):
+* `haveI : Fintype (Sylow p G)` を入れた後に `norm_num at h` を Sylow 個数の仮説へ当てると
+  `Nat.card` が `Fintype.card` に書き換わって後続の `rw` が全部外れる。
+  `1 % p = 1` の正規化は `unfold Nat.ModEq at h; omega` で行うこと。
+* `set D := ... with hDdef` した後の `Subgroup.card_mul_index` 経由の位数計算は、
+  `rw [...] at heq` の後に **`rw [← hDdef] at heq` で `D` に畳み戻さないと** `omega` が
+  goal の `Nat.card ↥D` と別 atom と見なして失敗する (1C.4 に同じ手当てが入っている)。
+* `Nat.factorial 5` は `norm_num` だけでは簡約されない — `norm_num [Nat.factorial]`。
+
+### 1E.2 の設計 (実装済, 記録として保持)
+
+**1E.2**: `|G| = pqr` (`p<q<r` 素数) ⟹ `n_r = 1`。
+
+1. `n_r ∣ pq`, `n_r ≡ 1 (mod r)` ⟹ `n_r ∈ {1, p, q, pq}`。`p, q < r` なので
+   `n_r = p`, `n_r = q` は `p = 1` / `q = 1` を強いて不可能 ⟹ `n_r ∈ {1, pq}`。
+2. `n_r = pq` と仮定。位数 `r` の元は `pq(r−1)` 個。
+3. `n_q ∣ pr`, `≡ 1 (mod q)` ⟹ `n_q ∈ {1, p, r, pr}`。`p < q` ゆえ `n_q ≠ p`。
+   `n_q ≠ 1` なら `n_q ≥ r` で位数 `q` の元が `≥ r(q−1)` 個。計数
+   `pq(r−1) + r(q−1) + 1 ≤ pqr` は `r(q−1) ≤ pq − 1` を要求するが
+   `r ≥ q+1`, `p ≤ q−1` より `r(q−1) ≥ q²−1 > q²−q−1 ≥ pq−1` で矛盾
+   ⟹ **`n_q = 1`** (既存 `card_sylow_mul_add_card_sylow_mul_le` が使える)。
+4. `Q ⊴ G` (位数 `q`) と `R ∈ Syl_r(G)` について `Q ⊔ R` は位数 `qr`
+   (`card_sup_of_normal_of_coprime`)。**位数 `qr` (`q<r`) の群では `n_r = 1`**
+   (`n_r ∣ q`, `≡1 mod r`, `q < r` ⟹ `q % r = q ≠ 1`) ゆえ `R ⊴ Q ⊔ R`。
+5. すると `Q ⊔ R ≤ N_G(R)` で `qr ∣ |N_G(R)| = |G| / n_r = r`, `q > 1` に矛盾。
+   ⟹ `n_r = 1`。
+
+⚠ 4 の「`↥(Q ⊔ R)` の中で Sylow を取り直す」plumbing が唯一の面倒どころ。
+`ProblemsOrder120.lean` の位数 30 → 位数 120 の comap 引き戻しに前例がある。
