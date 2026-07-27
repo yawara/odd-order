@@ -41,6 +41,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
 - `eq_stabilizer_of_index_eq_of_fixed`, `not_fixed_of_index_eq_of_ne_stabilizer` —
   **8B.10 への準備**: `S_n` の指数 `n` の部分群が点を固定すればそれは点安定化群
   そのもの (⟹ 点安定化群でなければ固定点をもたない)。
+- `choose_two_le_choose`, `lt_choose_of_two_le_of_le_sub_two` — **8B.10 の counting**:
+  `4 ≤ N` かつ `2 ≤ k ≤ N - 2` なら `N < C(N, k)`。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -607,6 +609,8 @@ theorem eq_alternatingGroup_zpowers_mCycle_sup_zpowers_addRight_one {n m : ℕ} 
     rw [sign_addRight_one (by omega), h1]
     decide
 
+end MCycle
+
 /-! ### Problem 8B.10 への準備 — 指数 `n` の部分群 -/
 
 section IndexN
@@ -641,9 +645,40 @@ lemma not_fixed_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α)}
   push Not at hcon
   exact hns a (eq_stabilizer_of_index_eq_of_fixed hidx hcon)
 
-end IndexN
+/-! ### 二項係数の不等式 (8B.10 の counting) -/
 
-end MCycle
+/-- 二項係数は中央まで単調: `2 ≤ k ≤ n / 2` なら `C(n, 2) ≤ C(n, k)`。 -/
+lemma choose_two_le_choose {N : ℕ} : ∀ k : ℕ, 2 ≤ k → k ≤ N / 2 →
+    N.choose 2 ≤ N.choose k := by
+  intro k
+  induction k with
+  | zero => intro h; omega
+  | succ j ih =>
+    intro h2 hk
+    rcases Nat.lt_or_ge j 2 with hj | hj
+    · rw [show j + 1 = 2 by omega]
+    · exact (ih hj (by omega)).trans (Nat.choose_le_succ_of_lt_half_left (by omega))
+
+/-- `N ≥ 4` かつ `2 ≤ k ≤ N - 2` なら **`N < C(N, k)`**。
+
+対称性 `C(N,k) = C(N,N-k)` で `k ≤ N/2` に帰着し, 単調性で `C(N,2) ≤ C(N,k)`。
+`C(N,2) = N(N-1)/2 > N` は `N ≥ 4` から。 -/
+lemma lt_choose_of_two_le_of_le_sub_two {N k : ℕ} (h2 : 2 ≤ k) (hk : k ≤ N - 2)
+    (hN : 4 ≤ N) : N < N.choose k := by
+  have hchoose2 : N < N.choose 2 := by
+    rw [Nat.choose_two_right]
+    have h1 : N * (N - 1) = N * 2 + N * (N - 3) := by
+      rw [show N - 1 = 2 + (N - 3) by omega, Nat.mul_add]
+    have h3 : 2 ≤ N * (N - 3) := by
+      calc 2 ≤ 4 * 1 := by omega
+        _ ≤ N * (N - 3) := Nat.mul_le_mul (by omega) (by omega)
+    omega
+  rcases Nat.lt_or_ge k (N / 2 + 1) with h | h
+  · exact hchoose2.trans_le (choose_two_le_choose k h2 (by omega))
+  · rw [← Nat.choose_symm (by omega)]
+    exact hchoose2.trans_le (choose_two_le_choose (N - k) (by omega) (by omega))
+
+end IndexN
 
 end
 
