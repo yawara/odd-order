@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleOrder120
 
 /-!
@@ -13,4 +14,6 @@ topic 別 leaf にある (下流は本 module を import するだけでよい)�
 
 * `Problems8C/SimpleOrder120.lean` — **8C.1**: `A₆` は位数 120 の部分群をもたず,
   位数 120 の群は単純でない。
+* `Problems8C/PrimeDegree.lean` — **8C.2 の準備**: 素数次数 `p` の置換群で位数 `p` の
+  部分群の中心化群・正規化群。
 -/
