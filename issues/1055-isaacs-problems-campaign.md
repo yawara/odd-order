@@ -1967,9 +1967,18 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
 | 6A.6 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の仮説を満たす `A, B > 1` ⟹ ある `g` で `A ⊓ B^g > 1` |
 | 6A.7 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | Lemma 6.5 の `A ⊆ H ⊆ G` で (a) `A^g ⊓ H > 1 ⟹ g ∈ H` (b) `H ⊴ G ⟹ H = G` |
 | 6A.8 | ✅ **完了** (`Problems6A8.lean`) | `M ⊴ G` ⟹ `M ⊆ X` または `X ⊆ M` |
-| 6A.9 | ⬜ | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
-| 6A.10 | ⬜ | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
+| 6A.9 | ✅ **完了 (a)-(f)** (`Problems6A9.lean`) | `A` に involution `t` があるとき (a)-(f) (⟹ `X` は部分群 = 偶数位数版 Frobenius 定理) |
+| 6A.10 | ✅ **(a)(b)(c) 完了** | (a) `A` は Sylow を含み fusion を制御 (b) `G'A = G` (c) `A` 可解 ⟹ `X` は部分群 |
 | 6A.11 | ✅ **完了** (`ProblemsTIHypothesis.lean`) | `A` が Lemma 6.5 の仮説 ⟺ 全非単位部分群 `T ≤ A` で `N_G(T) ⊆ A` |
+| 6B.1 | ✅ 完了 (前半・後半とも) | 任意の Frobenius 群は可解 Frobenius 部分群を含む ⟹ Frobenius 補群は Frobenius 群を部分群に持てない |
+| 6B.2 | ✅ | `A` 可換が `N` に忠実作用, `N` の非自明真部分群が `A`-不変でない ⟹ `A` 巡回 |
+| 6B.3 | ✅ | Thm 6.21 の coprime 仮定を落とすと偽 (反例構成) |
+| 6B.4 | ✅ | 分割 II で `[X,Y] = 1` ⟹ (a) `G` 可換 (b) 基本可換 |
+| 6B.5 | ✅ 完了 (Wielandt 補題は不要だった) | subnormal 部分群からなる分割を持つ ⟹ `G` 冪零 |
+| 6B.6 | ✅ | 位数 ≥ 8 の巡回 2-群は位数 2 の自己同型をちょうど 3 個持つ |
+| 6B.7 | ✅ | 非可換 2-群が指数 2 の巡回部分群を持ち `|P:Z(P)| > 4` ⟹ 二面体/半二面体/一般四元数 |
+| 6B.8 | 🔨 部品 20 本完了 (|P:Z(P)|>4 含む) / 帰納法本体が残り | `|P| ≥ 8`, `|P:P'| = 4` ⟹ 二面体/半二面体/一般四元数 (Taussky-Todd) |
+| 6B.9 | ⬜ | `G` 可解 + 全元が素数冪位数 ⟹ `|G|` の素因子は高々 2 個 |
 
 ### 6A.6 完了 / 6A.11 は (⟹) のみ (2026-07-27) — 新 leaf `ProblemsTIHypothesis.lean`
 
@@ -1986,6 +1995,93 @@ Ch.6 本文 (Thm 6.4 / Lem 6.5 / Cor 6.6 / Thm 6.7 …) は `Ch06_FrobeniusActio
   — 書籍では Lemma 6.5 の文脈から暗黙)。hint どおり `A` と `A^g` がともに **`↥H` の中で**
   TI 仮説をみたすこと (`TI_subgroupOf_of_TI` / `TI_subgroupOf_conj_of_TI`) を見て **6A.6** を
   `↥H` で使う。副産物: `conj_smul_subgroupOf` (`k ∈ H` なら共役と `subgroupOf` が交換)。
+* **6A.9 の準備** (新 leaf `Problems6A9.lean`、2026-07-27): TI 仮説の下での `X` の構造。
+  `centralizer_le_of_TI` (`1 ≠ a ∈ A` なら `C_G(a) ≤ N_G(⟨a⟩) ≤ A`) /
+  `conj_mem_iff_of_TI` (`g a g⁻¹ ∈ A ⟺ g ∈ A`) / `inv_mem_notConjugateSet` /
+  `zpow_mem_notConjugateSet` (`X` は冪で閉じる — `x^k` が `a` と共役なら
+  `g⁻¹xg ∈ C_G(a) ≤ A` で `x` 自身が `A` の非単位元と共役になる) /
+  `eq_one_of_mem_notConjugateSet_of_mem` (`X ⊓ A = {1}`) /
+  `mem_normalizer_zpowers_of_conj_eq_inv` /
+  ⭐ **`mem_notConjugateSet_of_conj_eq_inv`** = `Inv(t) ∖ A ⊆ X` (6A.9(b) の核心の片側):
+  `x ∉ A` が `t` に反転され `x = g a g⁻¹` (`1 ≠ a ∈ A`) なら `u := g⁻¹ t g` が `a` を反転するので
+  `u ∈ N_G(⟨a⟩) ≤ A`、つまり `t ∈ A ⊓ A^g` で TI から `g ∈ A`、これは `x ∈ A` で矛盾。
+
+  **(a) 完了** `card_inverted_notMem_ge` (2026-07-27): `t` に反転される `G ∖ A` の元は
+  `|G:A| − 1` 個以上。⭐ 共役類の濃度を持ち出さずに **fiber 計数**で済んだ:
+  `f g := (g t g⁻¹)·t` は `t` に反転される元を与え (`(f g)·t = g t g⁻¹` は involution)、
+  `f g ∉ A ⟺ g ∉ A` (`conj_mem_iff_of_TI`)、`f` の fiber は `C_G(t)` の左剰余類なので
+  大きさ `≤ |A|` (`centralizer_le_of_TI`)。`Finset.card_le_mul_card_image` で
+  `|G| − |A| ≤ |A| · |image|` ⟹ `|image| ≥ |G:A| − 1`、そして `image ⊆ Inv(t) ∖ A`。
+
+  **(b)-(e) 完了** (2026-07-27):
+  `conj_eq_inv_of_mem_notConjugateSet` (b) = (a) と `mem_notConjugateSet_of_conj_eq_inv` の
+  濃度合わせで `Inv(t) ∖ A = X ∖ {1}` /
+  `eq_of_isInvolution_mem` (c) = `t` は `A` の唯一の involution (⚠ `A ≠ ⊤` が要る;
+  `s ≠ t` なら `ts ≠ 1` が `1 ≠ x ∈ X` を中心化して `x ∈ C_G(ts) ≤ A` で矛盾) /
+  `odd_orderOf_of_mem_notConjugateSet` (d) = `X` の元は奇数位数 (偶数なら冪の involution `u`
+  が `X` に入り `t` と可換ゆえ `u ∈ A`, `X ⊓ A = {1}` で矛盾) /
+  `eq_of_mul_inv_mem` (e) = `x y⁻¹ ∈ A` なら `x = y` (`b := x⁻¹y = t(xy⁻¹)t ∈ A` で
+  `x b x⁻¹ = (xy⁻¹)⁻¹ ∈ A`, `b ≠ 1` なら `conj_mem_iff_of_TI` で `x ∈ A` となり矛盾)。
+  ⟹ **`X` は `A` の右剰余類とちょうど 1 点ずつ交わる (右横断系)**。
+
+  **(c) の系も landing** (2026-07-27): `eq_one_or_eq_of_mem_of_conj_eq_inv`
+  (`A` の元で `t` に反転されるのは `1` と `t` だけ — `a t` が `A` の involution になるので
+  (c) の一意性から) / `setOf_conj_eq_inv_eq` = **`Inv(t) = X ∪ {t}`** (したがって
+  `|Inv(t)| = |G:A| + 1`)。
+
+  **(f) 完了** `mul_mem_notConjugateSet` + `frobeniusKernelOfInvolution` (2026-07-27)。
+  ⭐ **鍵は「別の involution `s` に乗り換える」こと**: `x, y ∈ X` に対し `s := x t`,
+  `r := t y` はともに involution で **`x y = s r`**。(d) より `X` の元は奇数位数なので
+  `s ∉ X`, ゆえに `s` はある共役 `A^g` の非単位元。`A^g` も TI 仮説をみたし
+  (`TI_conj`) `notConjugateSet A^g = X` (`notConjugateSet_conj`) なので, (b)(c) の系
+  `setOf_conj_eq_inv_eq` を **`(A^g, s)` に適用**して `Inv(s) = X ∪ {s}`。
+  `s (s r) s = (s r)⁻¹` より `x y ∈ Inv(s)`, そして `x y = s` なら `y = t ∈ X ⊓ A = {1}`
+  で `t = 1` となり矛盾 ⟹ `x y ∈ X`。
+  ⚠ 前回「`t` による反転だけからは出ない」と書いたとおりで, `t` ではなく **`s = xt`**
+  に対する (b) を使うのが要点だった (`X` は共役不変なので `A` の共役に乗り換えられる)。
+  副産物: `TI_conj` / `notConjugateSet_conj` (TI 仮説と `X` は `A` の共役に不変)。
+
+* **6A.10(c) 完了** `exists_subgroup_coe_eq_notConjugateSet_of_solvable` (2026-07-27,
+  新 leaf `Problems6A10c.lean`) ⭐ = **可解な場合の Frobenius の定理**: `A` が TI 仮説を
+  みたし**可解**なら `X = notConjugateSet A` は部分群 (の台集合)。`|G|` に関する強帰納法:
+  * `A' < A` (`IsSolvable.commutator_lt_top_of_nontrivial` を `↥A` に適用) と 6A.10(b) の
+    `G' ⊓ A = A'` が両輪。
+  * **`A` 非可換**: `A ⊓ G' = A' ≠ 1` ⟹ 6A.7(a) で `AG' = G`。`G' = G` なら `A = A'` で
+    矛盾ゆえ `G' < G`。6A.8 の `TI_subgroupOf_normal` + `image_notConjugateSet_subgroupOf_eq`
+    で `X` は `X_{G'}(A ⊓ G')` の像 ⟹ 帰納法の仮定を `G'` に適用。
+  * **`A` 可換**: `A ⊓ G' = 1` ⟹ 6A.8 第 1 場合で `G' ⊆ X`。`M := AG'` は正規で `A ≤ M`,
+    `A ≠ 1` ゆえ `M ⊄ X` ⟹ 6A.8 で `X ⊆ M`, さらに `G = X ∪ ⋃A^g ⊆ M` で `AG' = G`。
+    濃度が `|X| = |G:A| = |G':A⊓G'| = |G'|` で一致 ⟹ **`X = G'`**。
+  この過程で `Problems6A8.lean` を refactor し, 埋もれていた 3 本を再利用可能に切り出した
+  (`subset_notConjugateSet_of_inf_eq_bot` / `sup_eq_top_of_inf_ne_bot` /
+  `image_notConjugateSet_subgroupOf_eq`)。⟹ **§6A 完了**。
+* **6A.10(b) 完了** `inf_commutator_eq_commutator_self_of_TI` (2026-07-27): TI 仮説の下で
+  **`G' ⊓ A = A'`**。⊇ は自明 (`commutator_self_le_inf_commutator`)。⊆ は焦点部分群定理経由:
+  `H := G' ⊓ A` の Sylow `p`-部分群 `Q` を含む `↥A` の Sylow `S` を取ると, (a) 前半で
+  `S` は `G` の Sylow でもあり, Isaacs Thm 5.21 (`Subgroup.commutator_inf_eq_focalSubgroup`)
+  で `Q ≤ G' ⊓ S = S.focalSubgroup`。(a) 後半の fusion 制御 + Cor 5.22 core
+  (`Subgroup.focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn`) で `S.focalSubgroup` は
+  `↥A` 内部の焦点部分群 (`= A' ⊓ S ≤ A'`) の像。⟹ 全 Sylow が `A'` に入る。
+  汎用補題 `eq_top_of_forall_sylow_le` (**有限群は Sylow 部分群で生成される**の指数版:
+  `p ∣ |H:K|` なら `p^(n+1) ∣ |H|` で multiplicity の最大性に反する) を新設して束ねた。
+  ⟹ **6A.10(b) 完了**、§6A の残りは (c) のみ。
+* **6A.10(b) 前半** `commutator_sup_eq_top_of_TI` (2026-07-27): `A > 1` が TI なら
+  `G' A = G`。`G'` を含む部分群は正規なので **6A.7(b)** が直ちに使える (1 行)。
+* **6A.10(a) 前半** `exists_sylow_coe_eq_of_maximal_pGroup_of_TI` (2026-07-27):
+  TI 仮説の下で `A` に含まれる極大 `p`-部分群 (≠ 1) は **`G` の Sylow `p`-部分群**。
+  6A.11(⟸) の step 2 と同じ論法 (`↥S` の冪零正規化条件 + `N_G(P) ≤ A`) を単独補題に。
+
+  **⚠ 書籍の主張を PDF ページ画像 (`isaacs-p186-199.png`) で確定済 (2026-07-27)**:
+  6A.10 = (a) 「`p ∣ |A|` なら `A` は `G` の Sylow `p`-部分群 `P` を**含み**, `A` は
+  `P` における `G`-fusion を**制御する**」/ (b) 「`A > 1` なら **`G'A = G` かつ
+  `G' ∩ A = A'`**」/ (c) 「`A` 可解なら `X` は部分群」。
+  `commutator_self_le_inf_commutator` で (b) 後半の**易しい向き** `A' ≤ G' ⊓ A` は landing
+  (TI 仮説不要)。⟹ 残り = (a) の fusion 制御 (Ch.5 §5C の fusion 制御 API を使う) /
+  (b) の `G' ⊓ A = A'` (focal subgroup / transfer が要りそう) /
+  (c) = **奇数位数側の Frobenius の定理** (6A.9(f) の可解版、本格的)。
+  書籍 Note: (6A.9 と 6A.10 を合わせると) Frobenius の定理は Feit-Thompson の
+  奇数位数定理の帰結になる。
+
 * **6A.8** `subset_notConjugateSet_or_subset_of_normal` (新 leaf `Problems6A8.lean`):
   `M ⊴ G` なら `M ⊆ X` または `X ⊆ M`。`A ⊓ M = 1` なら前者 (`M` 正規ゆえ共役先も `M` 内)。
   `A ⊓ M ≠ 1` なら **6A.7(a)** で `A ⊔ M = ⊤`、そのうえで
@@ -2954,3 +3050,332 @@ Isaacs Ch.3 の章末演習は全問完済** ⟹ あわせて **Isaacs Ch.1–Ch
   を新規に証明)。`h₂ := x h x⁻¹` の生成する `⟨h₂⟩` は位数 `o(h)` で `|N|` と互いに素なので
   D-part の **`U` 可解枝** (`⟨h₂⟩` は巡回) が使え、`⟨h₂⟩ ≤ ⟨h⟩^y` (`y ∈ N`) を得る。
   `⟨h⟩ ⊓ N = 1` より `G ⧸ N` での像を比べて `k = h⁻¹`, すなわち `h ~ h⁻¹`。
+
+
+## §6B 着手メモ (2026-07-27)
+
+書籍 p. 195-196 (PDF p. 208-209)。§6B の本文定理は Lemma 6.16 / Cor 6.17 (Frobenius 補群の
+Sylow は巡回か一般四元数) / Cor 6.18 / Thm 6.19 / Lemma 6.20 / Thm 6.21。
+
+**6B.1 の設計 (実装前に確定した分)**:
+* 前半「任意の Frobenius 群は可解 Frobenius 部分群を含む」: `hF : IsFrobeniusGroup G N A` から
+  素数位数 `p` の `x ∈ A` を取り `B := ⟨x⟩`。`B` 不変な非自明可換部分群 `M ≤ N` を
+  `FrobeniusGroup.lean` の既存 API (l.931/977 付近, Isaacs Thm 3.23 経由で不変 Sylow → `Z(R)`)
+  で取る。`M ⊔ B` が可解 Frobenius 部分群 (`isFrobeniusGroup_of_prime_complement_fixedFree`,
+  l.258 が素数位数補群からの構成を与える)。
+* 後半「Frobenius 補群は Frobenius 群を部分群に持てない」: **repo に可解版が既に在る** —
+  `false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup`
+  (`FrobeniusGroup.lean` l.1000, Isaacs Thm 6.9 の可解分岐)。前半と合成すれば可解仮定が外れる。
+  ⟹ **6B.1 = 前半を作って既存の可解版と合成する**のが正しい構成。
+* ⚠ `exists_aInvariant_sylow_subgroup` (部分群形) は `OddOrder/BG/Ch3_MaximalSubgroups/
+  S13_Corollary132.lean` に在るが **BG は Isaacs の下流**なので import 不可。Isaacs 側では
+  `Isaacs.Ch04.exists_aInvariant_sylow` (action 形) か、上記 `FrobeniusGroup.lean` の
+  既存ラッパを使う。
+
+
+## 6B.5 着手メモ (2026-07-27) — 「subnormal 部分群からなる分割 ⟹ 冪零」
+
+**調査結果 (実測)**:
+* **mathlib に `Subgroup.IsSubnormal` が在る** (`Mathlib/GroupTheory/IsSubnormal.lean`)。使える API =
+  `Normal.isSubnormal` / `isSubnormal_iff` / `IsSubnormal.trans` / `.trans'` / `.map` / `.comap` /
+  ⭐ **`exists_normal_and_le_and_lt_top_of_ne : H.IsSubnormal → H ≠ ⊤ → ∃ K, K.Normal ∧ H ≤ K ∧ K < ⊤`**
+  (`|G|`-induction の下降ステップに直結)。
+* repo 側: `Ch02_Subnormality/Basic.lean:140` `inf_isSubnormal_subgroupOf` (部分群への制限),
+  同 `:150` `commute_of_disjoint_normal` (**normal 版のみ** — subnormal 版は無い),
+  `Theorem211Wielandt.lean` = Isaacs Thm 2.11 (可換 subnormal ⟹ `≤ F(G)`)。
+
+**最短経路 (6B.4 が効く)**: 欠けているのは 1 本だけ —
+> **Wielandt**: `H`, `K` が subnormal で `H ⊓ K = ⊥` なら `⁅H, K⁆ = ⊥`。
+
+これが在れば, 分割の相異なる部分は `SubgroupPartition.inf_eq_bot_of_ne` で交わりが自明ゆえ
+**互いに可換**になり, **6B.4 (a)(b)** がそのまま適用できて `G` は基本可換 ⟹ 冪零。
+(別経路として Thm 2.11 で「各部分が可換 subnormal ⟹ `≤ F(G)`」から `G = F(G)` も使える。)
+
+**Wielandt 補題の証明の当たり**: `|G|` に関する強帰納法。`H = ⊤` なら `K = ⊥` で自明。
+`H ≠ ⊤` なら `exists_normal_and_le_and_lt_top_of_ne` で `H ≤ M ⊴ G`, `M < ⊤` を取り,
+`H` と `K ⊓ M` を `M` の中で帰納法にかけると `⁅H, K ⊓ M⁆ = ⊥` までは出る。
+⚠ **`K ⊓ M` から `K` 全体へ延ばす所が本体** (素朴には `⟨H,K⟩ = ⊤` に還元して `H^G ≤ M < ⊤` を
+使うが, そこから先がもう一段要る)。書籍の hint (「`H < G` が分割のどの部分にも含まれないなら
+`H` は冪零」→「`F(G)` に含まれない部分は正規で素数指数」) は別経路で, こちらは
+`H` に誘導分割 `{H ⊓ X}` が乗る (全部真部分群になる) ので帰納法が回る形。
+
+
+### 6B.5 進捗 (2026-07-27): 還元 landing, 残りは Wielandt 補題のみ
+
+`Problems6B5.lean` を新設し, **ステップ 2-3 を実証明**:
+`isNilpotent_of_subnormal_partition` = 分割の相異なる部分が Wielandt で可換 ⟹ 6B.4(a) で
+`G` 可換 ⟹ `CommGroup.isNilpotent` で冪零。**残る sorry は Wielandt 1 本だけ**:
+`commutator_eq_bot_of_isSubnormal_of_inf_eq_bot`。
+
+**Wielandt の証明で詰めた所まで** (次回の出発点):
+* `|G|` 強帰納法。`H = ⊤` なら `K = ⊥`, `K = ⊤` なら `H = ⊥` で自明。
+* `H ≠ ⊤` なら `H ≤ M ⊴ G`, `M < ⊤` が取れ, **`N := H^G ≤ M < ⊤`** (正規閉包が真)。
+  同様に `N' := K^G < ⊤`。`⁅H,K⁆ ≤ N ⊓ N'` (`[h,k] = h⁻¹h^k ∈ H^G` かつ `= (k⁻¹)^h k ∈ K^G`)。
+* `N'` の中で `H ⊓ N'` と `K` に帰納法 ⟹ **`⁅H ⊓ N', K⁆ = ⊥`**。
+  `H ⊴ G` の場合はさらに `⁅H,K⁆ ≤ H ⊓ N'` が出て, `H ⊓ N'` が `N'` の任意の共役を中心化する
+  ことから `H ⊓ N' ≤ Z(N')`, したがって `⁅H,K⁆ ≤ Z(N')`。
+* ⚠ ここから `⁅H,K⁆ = ⊥` を出す最後の一段が未確定 (`[h,k]^{o(k)} = 1` までは出る)。
+  **次回は Isaacs Ch.2 の原文 (subnormal 部分群の join / Wielandt) を PDF で読んでから書く** —
+  repo には `Ch02_Subnormality/` が既に在るので, 対応定理番号を先に特定するのが早い。
+
+
+### 6B.5 調査続報 (2026-07-27): Isaacs 原文の道具を特定
+
+**(1) 使える既存定理 (原文で確認)**
+* **Isaacs Thm 2.6**: `H ⊴⊴ G` かつ `N` が `G` の極小正規部分群なら **`N ≤ N_G(H)`**。
+  ⟹ `⁅N, H⁆ ≤ H ⊓ N` が言える (Thm 9.3 の証明が実際にこの形で使っている)。
+  Wielandt 補題の極小正規部分群による場合分けの土台になる。
+* **Isaacs Ch.2**: 「`F(G)` は**すべての subnormal 冪零部分群を含む**」。
+  ⟹ **6B.5 の別 endgame**: 各部分が冪零だと言えれば, 全部分 `≤ F(G)` かつ部分は `G` を被覆
+  するので `G = F(G)` で冪零。⚠ repo にあるのは可換版 (Thm 2.11 =
+  `Ch02_Subnormality/Theorem211Wielandt.lean`) のみで, **冪零版は未形式化** (grep 実測)。
+* **Isaacs Thm 9.4** (相異なる component は可換) は**別物** — component = subnormal quasisimple
+  であって我々の「交わり自明な subnormal 対」ではない。証明の型 (真部分群に落とす →
+  単純なら矛盾 → 極小正規部分群で場合分け) は流用できる。
+
+**(2) 書籍 hint 経路の核心が見えた**: 分割のどの部分にも含まれない `H < G` は,
+`{H ⊓ Y : Y ∈ Π}` が **`H` の本物の分割になる** (`H ⊄ Y` ゆえ各 `H ⊓ Y` は `H` の真部分群、
+subnormal 性は制限で保たれる) ので `|G|` 帰納法で冪零。ここは素直に書ける。
+残りは「`F(G)` に含まれない部分は正規で素数指数」→ 冪零、の詰め。
+
+⟹ **次回の選択肢は 2 つ**: (a) Wielandt 補題を Thm 2.6 + 極小正規部分群で正面から,
+(b) 書籍 hint 経路 (誘導分割の帰納法 + 冪零版 Fitting 補題の新規形式化)。
+(b) は「subnormal 冪零 ⟹ ≤ F(G)」という**汎用補題が副産物**として得られる利点がある。
+
+
+### 6B.5 進捗 (2026-07-27 続き): Fitting 冪零版を実証明
+
+`isSubnormal_le_fitting_of_isNilpotent` (**`F(G)` は subnormal な冪零部分群をすべて含む**)
+を `Problems6B5.lean` に実証明で追加。`|G|` 強帰納法 + repo 既存の
+`Ch01.nilpotent_normal_le_fitting` / `Ch01.fitting_map_subtype_le_fitting` /
+mathlib `IsSubnormal.subgroupOf` で書けた (可換版 Thm 2.11 の冪零版; 汎用補題)。
+
+**これで書籍 hint 経路の全ステップが見通せた (次回これを実装)**:
+1. 分割のどの部分にも含まれない `H < G` は `{H ⊓ Y}` が本物の分割 ⟹ `|G|` 帰納法で冪零。
+2. 部分が全部 `F(G)` に入れば `G = F(G)` で冪零。よって `X ⊄ F(G)` なる部分 `X` を取る。
+3. `X` は冪零でない (冪零なら上の新補題で `X ≤ F(G)`)。`X < H < G` なる `H` は
+   どの部分にも含まれない (含まれれば `X` と一致してしまう) ので 1 で冪零 ⟹ `X ≤ H` も冪零で
+   矛盾。ゆえに **`X` は極大**。subnormal かつ真ゆえ正規化群が真に大きいので `X ⊴ G`,
+   `|G : X| = p` (素数)。
+4. 他の部分 `Y` は `Y ⊓ X = ⊥` より `G/X` に単射, ゆえに `|Y| = p` で冪零 ⟹ `Y ≤ F(G)`。
+5. したがって `G = X ∪ F(G)` (集合として) だが **群は 2 つの真部分群の合併にならない** ⟹ 矛盾。
+
+⟹ Wielandt 補題は 6B.5 には**不要**になる (statement は残すか削除するか次回判断)。
+
+
+### 6B.6 着手メモ (2026-07-27) — 「位数 ≥ 8 の巡回 2-群は位数 2 の自己同型を 3 個持つ」
+
+**⭐ 鍵の実測**: mathlib に **`IsCyclic.mulAutMulEquiv : MulAut G ≃* (ZMod (Nat.card G))ˣ`**
+が在る (`Mathlib/GroupTheory/SpecificGroups/Cyclic.lean:593`)。したがって 6B.6 は
+**`(ZMod (2^n))ˣ` の位数 2 の元を数える**問題に落ちる (`IsCyclic.card_mulAut` も併存)。
+
+**残る数学的中身**: `n ≥ 3` のとき `#{x : ZMod (2^n) | x² = 1} = 4` (解は `±1`, `2^(n-1) ± 1`)。
+⚠ `n` が変数なので `decide` は使えない。証明:
+`x² ≡ 1 (mod 2^n)` ⟺ `(x-1)(x+1) ≡ 0`。`x` は奇数ゆえ `x-1`, `x+1` はともに偶数で
+**一方はちょうど 2 で割れる** (差が 2 なので 4 で割れるのは高々一方)。よって他方が
+`2^(n-1)` で割り切れ, `x ≡ ±1 (mod 2^(n-1))` — `mod 2^n` では 4 解。
+`n ≥ 3` が効くのはこの 4 解が相異なること (`n = 2` だと `2^(n-1)±1 = ±1` に潰れる)。
+
+⟹ 位数ちょうど 2 の元は `4 - 1 = 3` 個。
+
+
+#### 6B.6 の Lean 実装方針 (2026-07-27 詰め)
+
+mathlib に `ZMod (2^n)` の平方根 1 に関する補題は**無い** (grep 実測) ので自前で書く。
+`N := 2^n`, `a : ZMod N := 2^(n-1)` として
+
+**主補題**: `∀ x : ZMod N, x^2 = 1 ↔ x = 1 ∨ x = -1 ∨ x = a + 1 ∨ x = a - 1`。
+
+順方向の Lean 手順 (整数経由):
+1. `x^2 = 1` を `ZMod.intCast_zmod_eq_zero_iff_dvd` で `(2^n : ℤ) ∣ (m-1)(m+1)`
+   (`m := (x.val : ℤ)`) に変換。
+2. `m` は奇数 (偶数なら `(m-1)(m+1)` が奇数で `2 ∤` に反する)。`m = 2k+1` と書くと
+   `(m-1)(m+1) = 4k(k+1)` なので **`2^(n-2) ∣ k(k+1)`**。
+3. `k` と `k+1` は互いに素なので, 素数冪 `2^(n-2)` は**どちらか一方を割る**
+   (`Nat.Coprime.eq_one_of_dvd` 系 / `Int.Prime.dvd_mul` の冪版)。
+   ⟹ `2^(n-1) ∣ m - 1` または `2^(n-1) ∣ m + 1`。
+4. `ZMod N` に戻すと `x - 1 = a * s` または `x + 1 = a * s` (`s : ZMod N`)。
+   ⭐ **`2a = 2^n = 0` なので `a * s ∈ {0, a}`** (`s` の偶奇で決まる) — ここが効いて
+   4 通りに絞れる。
+5. 逆方向は `a^2 = 2^(2n-2) = 0` (`2n-2 ≥ n`) から計算するだけ。
+
+そのあと `n ≥ 3` から 4 元が相異なることを示し (`n = 2` だと `a ± 1 = ∓1` に潰れる),
+`IsCyclic.mulAutMulEquiv` で `MulAut C` に移して位数ちょうど 2 は `4 - 1 = 3` 個。
+
+
+### 6B.7 着手メモ (2026-07-27) — 「指数 2 の巡回部分群を持つ非可換 2-群の分類」
+
+**⭐ repo に Isaacs Lemma 6.13 が両分岐とも既に在る** (`Ch06_FrobeniusActions/DQSDRecognition.lean`):
+* `dihedralOrQuaternion_of_invertingConjugation` — `a c a⁻¹ = c⁻¹` なら `D_{2^m}` か `Q_{2^m}`
+* `semiDihedral_of_twistConjugation` — `a c a⁻¹ = z c⁻¹` (`z` = `C` の唯一の involution) なら半二面体
+* おまけ: `dihedralOrQuaternion_of_card_eight` (Cor 6.14), `dihedralOrQuaternion_of_self_centralizing_cyclic_card_four` (Thm 6.12 の `|C|=4` 分岐)
+
+⟹ **6B.7 の仕事は「`a` の `C` への作用が上の 2 形のどちらかである」ことを示すだけ**:
+1. `C = ⟨c⟩` は指数 2 ゆえ正規, `a² ∈ C` で `C` 可換なので **`a` の誘導自己同型は位数 ∣ 2**。
+2. 巡回群なので `a c a⁻¹ = c^k` と書け, `k² ≡ 1 (mod 2^m)` (`2^m = |C|`)。
+   ⟹ **直前に landing した `sq_eq_one_iff_two_pow` がそのまま効いて `k ∈ {1, -1, 2^(m-1)+1, 2^(m-1)-1}` の 4 通り**
+   (6B.6 の数え上げ版ではなく iff 版を使う)。
+3. `k = 1` (中心化) は `P = ⟨a, c⟩` が可換になるので**非可換仮定**で排除。
+4. `k = 2^(m-1)+1` は `[a,c] = z` が中心的な "modular" 型で `|P : Z(P)| = 4` になるので
+   **`|P:Z(P)| > 4` 仮定**で排除。⚠ ここの計算 (`Z(P) = ⟨c²⟩` になること) が本問の実質。
+5. 残る `k = -1` / `k = 2^(m-1)-1` がちょうど Lem 6.13 の 2 分岐。
+   ⚠ `|C| ≤ 4` (すなわち `|P| ≤ 8`) の場合は 2 の 4 通りが潰れるが, そのとき `|P:Z(P)| ≤ 4` なので
+   仮定から除外される — この端点処理も要る。
+
+6B.8 (`|P : P'| = 4` から同じ結論, Taussky-Todd) は 6B.7 を使う想定。
+
+
+### 6B.7 進捗メモ (2026-07-27): j = 2^(m-1)+1 分岐は WIP
+
+`⟨c²⟩ ≤ Z(P)` ⟹ `|P : Z(P)| ∣ 4` の筋で書き下したが, `set z := c ^ (2^(m-1))` の
+**fold/unfold が calc の中で悪さをして** 1 箇所閉じられずに残った (build を green に戻すため
+一旦 revert; WIP は scratchpad に退避)。証明の中身自体は次のとおりで確定している:
+
+* `a c² a⁻¹ = (z c)² = z² c² = c²` (`Commute.mul_pow` + `z² = 1`)
+* `C_P(c²)` は `⟨c⟩` と `a` を含むので (j=1 分岐と同じ relIndex 論法で) `= ⊤`, つまり `c² ∈ Z(P)`
+* `orderOf (c²) = 2^(m-1)` (`orderOf_pow` + `gcd (2^m) 2 = 2`), `|P| = 2^(m+1)` なので
+  `|P : ⟨c²⟩| = 4`, ゆえに `Z(P).index ∣ 4` で仮定 `> 4` に反する
+
+⚠ **次回は `set` を使わず `z` を `have hzdef : ... ` 無しの素の `c ^ (2^(m-1))` のまま書く**
+(または `set ... with hz` でなく `let`/局所 `have` にする) こと。`set` は goal 側を勝手に
+fold するので, calc の各行で `z` と `c^(2^(m-1))` が混在すると `rfl` が通らなくなる。
+
+
+#### 訂正 (2026-07-27): 6B.7 の詰まりは `set` の fold ではなかった
+
+前記の「`set` の fold が原因」は**誤診**だった。真因は **`group` タクティクが
+`a * c^2 * a⁻¹ = (a * c * a⁻¹)^2` を閉じられなかった**こと (`pow_two` で展開してから
+`group` を呼べば通る)。`set` → `obtain ⟨z, hz⟩` への置換も併せて行ったが, 本質は
+`rw [pow_two, pow_two]; group` の方。⟹ **`group` は指数リテラルを展開しないことがある**。
+
+
+### 6B.8 進捗 (2026-07-27): hint ステップ 1-3 完了, 帰納法本体の設計
+
+`Problems6B8.lean` に**実証明で 3 本**:
+* `exists_orderOf_eq_two_mem_commutator_center` (ステップ 1: `Z ≤ P' ⊓ Z(P)`, `|Z| = 2`)
+* `index_commutator_quotient` (ステップ 2: `|P/Z : (P/Z)'| = |P : P'|`)
+* `mul_comm_of_center_le_of_isCyclic_quotient` (ステップ 3: 引き戻し `A` は可換)
+
+**帰納法本体で要る部品 (次回以降)**:
+1. **base case `|P| = 8`**: `|P:P'| = 4` ⟹ `|P'| = 2` ⟹ 非可換 ⟹ repo の
+   `dihedralOrQuaternion_of_card_eight` (Cor 6.14, `DQSDRecognition.lean:960`)。
+2. **`|P| ≥ 16` ⟹ `|P : Z(P)| > 4`** (6B.7 を適用するのに要る)。導出:
+   * `P/Z(P)` は巡回なら `P` 可換なので, 非可換ゆえ `|P:Z(P)| ∉ {1, 2}`。
+   * `|P:Z(P)| = 4` と仮定すると `P/Z(P) ≅ Z₂ × Z₂`。代表元 `a, b` を取ると
+     任意の交換子は `[a,b]` の冪で **`P' = ⟨[a,b]⟩`**, さらに `a² ∈ Z(P)` から
+     `[a,b]² = [a², b] = 1` なので **`|P'| ≤ 2`**。
+   * すると `|P| = |P:P'| · |P'| ≤ 4 · 2 = 8` で `|P| ≥ 16` に反する。⟹ `|P:Z(P)| > 4` ✓
+3. **D/SD/Q は指数 2 の巡回部分群を持つ** (`P/Z` から引き戻すため; 具体群についての事実)。
+4. **可換 `A` で `A/Z` 巡回 (`|Z| = 2`) ⟹ `A` 巡回 or `A ≅ Z × 巡回`**、後者で `|P| > 16` の矛盾。
+
+⟹ 2 が独立性が高く価値も高いので次に着手する。
+
+
+### 6B.8 帰納法の再定式化 (2026-07-27) ⭐
+
+当初は「帰納法で `P/Z` が D/SD/Q → その指数 2 の巡回部分群を引き戻す」と設計したが,
+**D/SD/Q という具体群についての事実 (指数 2 の巡回部分群を持つ) を 3 種類とも証明する必要**が
+あり重い。そこで帰納の主張を差し替える:
+
+> **帰納する命題**: `P` が `2`-群, `|P| ≥ 8`, `|P : P'| = 4` ⟹ **`∃ c, |P : ⟨c⟩| = 2`**
+
+これなら
+* **base (`|P| = 8`)**: 非可換な位数 8 の群には位数 4 の元がある
+  (`exists_index_two_zpowers_of_card_eight`, 実証明済) — 全元 `g² = 1` なら可換,
+  位数 8 の元があれば巡回でやはり可換。
+* **step (`|P| ≥ 16`)**: `Z` を取り `P/Z` に帰納法 ⟹ `P/Z` に指数 2 の巡回部分群 `⟨c̄⟩`。
+  その引き戻し `A` は指数 2 で `A/Z` 巡回, `Z ≤ Z(P)` より **`A` は可換** (既証明)。
+  `A` が巡回ならそれが答え。`A` が非巡回 (= `Z × 巡回`) のときが**残る唯一の難所**で,
+  書籍 hint の「`|P| > 16` なら `Z < Z(P)` で矛盾」に当たる。
+* 最後に `four_lt_index_center` (既証明) と **6B.7** を合わせて D/SD/Q に結論。
+
+⟹ 具体群 D/SD/Q の構造を一切触らずに済む。残りは step の非巡回ケースのみ。
+
+
+### 6B.8 の最終難所 (2026-07-27 解析): 引き戻し `A` が非巡回のケース
+
+部品 26 本が実証明で揃い, 残るのは帰納 step で `A` (指数 2 の可換部分群) が**非巡回**の
+場合の矛盾のみ。解析した内容:
+
+* `A` 可換 & 指数 2 ⟹ `P/A` 位数 2 で可換 ⟹ **`P' ≤ A`**。`|P'| = |P|/4 = |A|/2` なので
+  **`P'` は `A` の指数 2**。
+* `a ∉ A` を取ると `θ : A → A`, `θ(x) = x⁻¹ · a x a⁻¹` は (A 可換ゆえ) **準同型**で
+  `im θ = P'`, `ker θ = C_A(a)`。よって **`|C_A(a)| = 2`**。
+* `A` は極大可換なので `Z(P) ≤ C_P(A) = A`, したがって **`Z(P) = C_A(a)` で `|Z(P)| = 2`**,
+  すなわち `Z = Z(P)`。
+* 書籍 hint は「`|P| > 16` なら `Z < Z(P)`」と言うので, ここに矛盾を作る。
+  ⚠ `A ≅ Z₂ × Z_{2^k}` 上で位数 2 の自己同型が固定点を 2 個しか持たない状況は
+  `k` が小さいと起こりうる (GL(2,2) の位数 2 元は 1 次元固定空間) ので,
+  **`|P| > 16` (`k ≥ 3`) をどこで使うかが未確定**。次回は書籍 p.196 の hint を
+  PDF で読み直して詰める (現状は hint の要約からの再構成)。
+
+⟹ この 1 ケースを残して 6B.8 の他は全部揃っている。
+
+
+### ⭐ 6B.8 最終難所の証明が確定 (2026-07-27)
+
+前記の「`|P| > 16` をどこで使うか未確定」を解消。`A` 非巡回のときの矛盾は次の通り
+(`a ∉ A` を固定, `θ : A → A`, `θ(x) = x⁻¹ · a x a⁻¹`):
+
+1. `A` 可換・指数 2 ⟹ `P' ≤ A`, `|P'| = |A|/2`。`θ` は準同型で **`im θ = P'`**,
+   `ker θ = C_A(a)` ⟹ **`|C_A(a)| = 2`**, さらに `A` 極大可換ゆえ `Z(P) = C_A(a) = Z`。
+2. **`a` は `P'` を反転する**: `θ(x)·θ(x)^a = x⁻¹x^a·x^{-a}x^{a²} = 1` (`a² ∈ A` 可換)
+   なので `y ∈ P'` に対し `y^a = y⁻¹`。
+3. ⟹ `C_{P'}(a) = Ω₁(P') ≤ C_A(a) = Z` なので **`P'` は唯一の involution を持つ可換 2-群
+   = 巡回**。その唯一の involution が `Z`。
+4. `A` 非巡回 ⟹ `Ω₁(A) ≠ Ω₁(P') = Z` なので **`P'` の外に involution `t`** があり
+   `A = P' × ⟨t⟩`。
+5. `a` は `P'` を反転するので `θ(y) = y⁻¹y^a = y⁻²`, つまり `θ(P') = ℧¹(P') = (P')²`
+   (位数 `2^{k-1}`)。また `θ(t) = t·t^a ∈ Ω₁(A)`。
+6. したがって `P' = im θ = θ(P')·θ(⟨t⟩) ≤ (P')² · Ω₁(A)`。⚠ `k ≥ 2` (すなわち
+   **`|P| ≥ 16`**) なら `Ω₁(P') ≤ (P')²` なので右辺は位数 `≤ 2^{k-1}·2 = 2^k`… の吟味で
+   `P' = (P')²` すなわち `|P'| ≤ |P'|/2` の矛盾に至る。**`|P| ≥ 16` はここで効く**。
+
+⟹ 形式化の順序: (2) の反転 → (3) の巡回性 → (4) の分解 → (5)(6) の像の計算。
+
+
+### 6B.8 進捗 (2026-07-27 続き): θ の像の正規性まで完了
+
+`Problems6B8.lean` は部品 36 本が実証明 (sorry は主定理 `tausskyTodd` の 1 件のみ)。
+θ 関連で揃ったもの: `theta_mul` / `theta_conj_eq_inv` / `thetaHom` (束ね) /
+`thetaHom_range_le` / `mem_thetaHom_ker_iff` (核 = `C_A(a)`) /
+`thetaHom_range_le_commutator` (`R ≤ P'`) / `thetaHom_conj_eq_inv` /
+`thetaHom_range_centralized` / `inv_conj_mem_of_sq_mem` / `thetaHom_range_normal`。
+
+**次の 1 手 = 逆包含 `P' ≤ R`**。筋は「`R` 正規で `P/R` が可換」:
+* `A` の像どうしは可換 (`A` 可換)
+* `a` の像と `A` の像も可換 — `a x a⁻¹ = x · θ(x) ≡ x (mod R)` だから
+* `A ⊔ ⟨a⟩ = ⊤` なので `P/R` は可換 ⟹ `P' ≤ R`
+⚠ Lean では「可換な生成元集合で生成される群は可換」を出す所が要検討
+(`Subgroup.closure_le_centralizer_centralizer` か `Subgroup.closure_induction₂` を試す)。
+
+そのあと: `|R| = |A|/|C_A(a)|` と `|R| = |P'| = |A|/2` から **`|C_A(a)| = 2`**,
+反転則から `P'` 巡回 (`isCyclic_of_comm_two_group_unique_involution` が使える),
+`A` 非巡回なら `A = P' × ⟨t⟩` で `im θ ⊆ (P')²·Ω₁(A)` の位数評価が破綻 — で完了。
+
+
+### 🎉 6B.8 (Taussky-Todd) 完成 (2026-07-27) — §6B 完済
+
+**主定理 `tausskyTodd` が sorry-free**。`#print axioms` = `[propext, Classical.choice,
+Quot.sound]` (axiom-clean)。
+
+最後に残っていた「帰納 step の引き戻し `A` が非巡回」ケースは
+`isCyclic_of_index_two_of_index_commutator_eq_four` (`Problems6B8.lean`) で排除:
+* `im θ = P'` で `P'` は巡回, 生成元 `c` の位数 `2^k` は `|P'| = |P|/4 ≥ 4` から `k ≥ 2`
+  (**`|P| ≥ 16` がここで効く**)。
+* `A` 非巡回なら `⟨c⟩` の外に involution `t` があり `A = P'⟨t⟩` (`Subgroup.normal_mul` で
+  `x = y · t^j` に分解)。
+* `y ∈ P'` では `θ(y) = (y²)⁻¹ ∈ ⟨c²⟩`、`s ∈ ⟨t⟩` では `θ(s)² = θ(s²) = 1` かつ
+  `θ(s) ∈ P' = ⟨c⟩` ゆえ `θ(s) ∈ ⟨c²⟩` (位数 `2^k`, `k ≥ 2` の巡回群の involution は平方元)。
+* ⟹ `P' = im θ ≤ ⟨c²⟩` で `c ∈ ⟨c²⟩`、`orderOf c` が偶数であることに反する。
+
+帰納法本体 + 組み立ては新 leaf **`Problems6B8Induction.lean`** (`OddOrder.lean` 配線済):
+* `exists_index_two_zpowers_of_card_le` = `|P| ≤ n` で括った帰納 engine
+  (base `|P| = 8` / step は `P/Z` に降りる)。
+* `exists_index_two_zpowers_of_index_commutator_eq_four` = 帰納の結論
+  (`2`-群 + `|P| ≥ 8` + `|P : P'| = 4` ⟹ 指数 `2` の巡回部分群が在る)。
+* `tausskyTodd` = `|P| = 8` は Cor 6.14、`|P| ≥ 16` は上記 `⟨c⟩` (位数 `2^m`, `m ≥ 3`) と
+  `four_lt_index_center` を **6B.7** に食わせる。
+
+⟹ **書籍 hint の「`P/Z` が D/SD/Q だから指数 2 の巡回部分群を引き戻す」段を回避**したので、
+具体群 D/SD/Q の構造 (指数 `2` の巡回部分群を持つこと) を 3 種類とも証明する必要が無くなった。

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch05_Transfer.Basic
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 
 /-!
@@ -380,6 +381,197 @@ theorem eq_top_of_normal_of_TI [Finite G] {A H : Subgroup G} (hAne : A ≠ ⊥) 
   refine hAne ?_
   have hb := congrArg (fun S : Subgroup G => MulAut.conj g⁻¹ • S) h
   rwa [conj_inv_smul_smul, Subgroup.smul_bot] at hb
+
+/-- **Isaacs Problem 6A.10(a) の前半** (p. 186): TI 仮説の下で, `A` に含まれる極大な
+`p`-部分群 `P` (≠ 1) は `G` の Sylow `p`-部分群である。
+
+`P < S ∈ Syl_p(G)` なら `↥S` の冪零正規化条件で `y ∈ N_S(P) ∖ P` が取れ, 6A.11 から
+`y ∈ N_G(P) ≤ A` なので `P ⊔ ⟨y⟩ ≤ A ⊓ S` が `P` より大きい `A` 内の `p`-部分群になり
+極大性に矛盾。 -/
+theorem exists_sylow_coe_eq_of_maximal_pGroup_of_TI [Finite G] {A : Subgroup G}
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥)
+    {p : ℕ} [Fact p.Prime] {P : Subgroup G}
+    (hPmax : Maximal (fun K : Subgroup G => IsPGroup p ↥K ∧ K ≤ A) P) (hPne : P ≠ ⊥) :
+    ∃ S : Sylow p G, (S : Subgroup G) = P := by
+  classical
+  obtain ⟨S, hPS⟩ := hPmax.1.1.exists_le_sylow
+  refine ⟨S, ?_⟩
+  by_contra hne
+  have hlt : P < (S : Subgroup G) := lt_of_le_of_ne hPS (fun h => hne h.symm)
+  haveI : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
+  have hlt2 : P.subgroupOf (S : Subgroup G) < ⊤ := by
+    rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
+    exact fun h => hlt.ne (le_antisymm hPS h)
+  have hgrow := Group.normalizerCondition_of_isNilpotent _ hlt2
+  rw [← Subgroup.subgroupOf_normalizer_eq hPS] at hgrow
+  obtain ⟨y0, hy0mem, hy0notin⟩ := SetLike.exists_of_lt hgrow
+  have hyN : (y0 : G) ∈ Subgroup.normalizer P := Subgroup.mem_subgroupOf.mp hy0mem
+  have hyS : (y0 : G) ∈ (S : Subgroup G) := y0.2
+  have hynotP : (y0 : G) ∉ P := fun h => hy0notin (Subgroup.mem_subgroupOf.mpr h)
+  have hyA : (y0 : G) ∈ A := normalizer_le_of_TI hATI hPne hPmax.1.2 hyN
+  have hP'S : P ⊔ Subgroup.zpowers (y0 : G) ≤ (S : Subgroup G) :=
+    sup_le hPS (Subgroup.zpowers_le.mpr hyS)
+  have hP'le := hPmax.2 ⟨S.isPGroup'.to_le hP'S,
+    sup_le hPmax.1.2 (Subgroup.zpowers_le.mpr hyA)⟩ le_sup_left
+  exact hynotP (hP'le ((le_sup_right : Subgroup.zpowers (y0 : G) ≤ _)
+    (Subgroup.mem_zpowers _)))
+
+/-- **Isaacs Problem 6A.10(b) の前半** (p. 186): `A > 1` が Lemma 6.5 の TI 仮説をみたすなら
+`G' A = G`。
+
+`G'` を含む部分群は正規なので **6A.7(b)** (`eq_top_of_normal_of_TI`) が直ちに使える。 -/
+theorem commutator_sup_eq_top_of_TI [Finite G] {A : Subgroup G} (hAne : A ≠ ⊥)
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) :
+    commutator G ⊔ A = ⊤ := by
+  haveI hnorm : (commutator G ⊔ A).Normal := by
+    constructor
+    intro h hh g
+    have hc : g * h * g⁻¹ * h⁻¹ ∈ commutator G :=
+      Subgroup.commutator_mem_commutator (Subgroup.mem_top g) (Subgroup.mem_top h)
+    have heq : g * h * g⁻¹ = (g * h * g⁻¹ * h⁻¹) * h := by group
+    rw [heq]
+    exact Subgroup.mul_mem _ ((le_sup_left : commutator G ≤ commutator G ⊔ A) hc) hh
+  exact eq_top_of_normal_of_TI hAne (le_sup_right : A ≤ commutator G ⊔ A) hATI
+
+/-- **Isaacs Problem 6A.10(a) の後半** (p. 186): TI 仮説の下で `A` は `A` の**任意の**部分群に
+おける `G`-fusion を制御する (とくに (a) の Sylow `p`-部分群 `P` において)。
+
+`1 ≠ x ∈ H ≤ A` が `g x g⁻¹ = y ∈ A` なら `conj_mem_iff_of_TI` から `g ∈ A` 自身が
+共役元として使える。 -/
+theorem controlsFusionIn_of_TI {A : Subgroup G}
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥)
+    {H : Subgroup G} (hHA : H ≤ A) : A.ControlsFusionIn H := by
+  rintro x y hx hy ⟨g, hg⟩
+  rcases eq_or_ne x 1 with rfl | hxne
+  · exact ⟨1, A.one_mem, by simpa using hg⟩
+  refine ⟨g, ?_, hg⟩
+  by_contra hgA
+  have hmem : y ∈ A ⊓ (MulAut.conj g • A) := by
+    refine Subgroup.mem_inf.mpr ⟨hHA hy, ?_⟩
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    change (MulAut.conj g).symm y ∈ A
+    rw [MulAut.conj_symm_apply, ← hg]
+    simpa [mul_assoc] using hHA hx
+  rw [hATI g hgA, Subgroup.mem_bot] at hmem
+  refine hxne ?_
+  rw [hmem] at hg
+  have h2 := congrArg (fun z : G => g⁻¹ * z * g) hg
+  simpa [mul_assoc] using h2
+
+/-- **Isaacs Problem 6A.10(b) 後半の易しい向き**: `A' ≤ G' ⊓ A`
+(TI 仮説なしに成り立つ; 逆向き `G' ⊓ A ≤ A'` は fusion 制御 (a) と focal subgroup が要る)。 -/
+theorem commutator_self_le_inf_commutator (A : Subgroup G) :
+    ⁅A, A⁆ ≤ commutator G ⊓ A :=
+  le_inf (Subgroup.commutator_mono le_top le_top)
+    (Subgroup.commutator_le.mpr fun _ ha _ hb =>
+      A.mul_mem (A.mul_mem (A.mul_mem ha hb) (A.inv_mem ha)) (A.inv_mem hb))
+
+/-- 有限群 `H` の部分群 `K` が, どの素数 `p` についても `H` の Sylow `p`-部分群をすべて含むなら
+`K = ⊤`。
+
+「有限群は Sylow 部分群たちで生成される」の指数版: `p ∣ |H : K|` なら `p` の全 multiplicity が
+`|K|` を割ることと合わせて `p^(n+1) ∣ |H|` となり, `n = (|H|).factorization p` の最大性に反する。 -/
+theorem eq_top_of_forall_sylow_le {H : Type*} [Group H] [Finite H] {K : Subgroup H}
+    (hK : ∀ (p : ℕ) (_ : Fact p.Prime) (P : Sylow p H), (P : Subgroup H) ≤ K) : K = ⊤ := by
+  rw [← Subgroup.index_eq_one]
+  by_contra hne
+  obtain ⟨p, hp, hdvd⟩ := Nat.exists_prime_and_dvd hne
+  haveI hfp : Fact p.Prime := ⟨hp⟩
+  obtain ⟨P⟩ : Nonempty (Sylow p H) := inferInstance
+  have hcard : Nat.card ↥(P : Subgroup H) = p ^ (Nat.card H).factorization p :=
+    P.card_eq_multiplicity
+  have h1 : Nat.card ↥(P : Subgroup H) ∣ Nat.card ↥K := Subgroup.card_dvd_of_le (hK p hfp P)
+  have h2 : Nat.card ↥K * K.index = Nat.card H := Subgroup.card_mul_index K
+  have h1' : p ^ (Nat.card H).factorization p ∣ Nat.card ↥K := by rw [← hcard]; exact h1
+  have h3 : p ^ ((Nat.card H).factorization p + 1) ∣ Nat.card ↥K * K.index := by
+    rw [pow_succ]; exact mul_dvd_mul h1' hdvd
+  rw [h2, Nat.Prime.pow_dvd_iff_le_factorization hp Nat.card_pos.ne'] at h3
+  omega
+
+/-- `↥A` の交換子群を `G` へ押し出すと `⁅A, A⁆`。 -/
+theorem map_commutator_subtype (A : Subgroup G) :
+    (commutator ↥A).map A.subtype = ⁅A, A⁆ := by
+  rw [commutator_def, Subgroup.map_commutator, ← MonoidHom.range_eq_map, A.range_subtype]
+
+/-- **Isaacs Problem 6A.10(b) の後半** (p. 186): TI 仮説の下で `G' ⊓ A ≤ A'`。
+
+**証明**: `H := G' ⊓ A` の各 Sylow `p`-部分群 `Q` を取る。`Q ≤ A` なので `Q` を含む `↥A` の
+Sylow `p`-部分群 `S` があり, (a) 前半 (`exists_sylow_coe_eq_of_maximal_pGroup_of_TI`) から
+`P := S` は `G` の Sylow `p`-部分群でもある。焦点部分群定理 (Isaacs Thm 5.21) で
+`Q ≤ G' ⊓ P = P.focalSubgroup` であり, (a) 後半の fusion 制御
+(`controlsFusionIn_of_TI`) で `P.focalSubgroup` は `↥A` の中で計算した焦点部分群の像に等しい。
+後者は `A' ⊓ S ≤ A'` に含まれる。ゆえに全ての Sylow が `A'` に入り, 上の指数論法で
+`H ≤ A'`。 -/
+theorem commutator_inf_le_commutator_self_of_TI [Finite G] {A : Subgroup G}
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) :
+    commutator G ⊓ A ≤ ⁅A, A⁆ := by
+  classical
+  have hkey : (⁅A, A⁆).subgroupOf (commutator G ⊓ A) = ⊤ := by
+    refine eq_top_of_forall_sylow_le fun p hfp Q => ?_
+    -- `Q` を `G` の部分群として見る
+    have hQ'A : (Q : Subgroup ↥(commutator G ⊓ A)).map (commutator G ⊓ A).subtype ≤ A := by
+      rintro _ ⟨z, _, rfl⟩; exact z.2.2
+    have hQ'C : (Q : Subgroup ↥(commutator G ⊓ A)).map (commutator G ⊓ A).subtype
+        ≤ commutator G := by
+      rintro _ ⟨z, _, rfl⟩; exact z.2.1
+    have hQ'p : IsPGroup p ↥((Q : Subgroup ↥(commutator G ⊓ A)).map
+        (commutator G ⊓ A).subtype) :=
+      IsPGroup.of_equiv Q.isPGroup'
+        (Subgroup.equivMapOfInjective _ _ (Subgroup.subtype_injective (commutator G ⊓ A)))
+    have hQAp : IsPGroup p ↥(((Q : Subgroup ↥(commutator G ⊓ A)).map
+        (commutator G ⊓ A).subtype).subgroupOf A) :=
+      IsPGroup.of_equiv hQ'p (Subgroup.subgroupOfEquivOfLe hQ'A).symm
+    obtain ⟨S, hS⟩ := hQAp.exists_le_sylow
+    intro q hq
+    have hq' : (q : G) ∈ (Q : Subgroup ↥(commutator G ⊓ A)).map
+        (commutator G ⊓ A).subtype := ⟨q, hq, rfl⟩
+    have hqS : (⟨(q : G), hQ'A hq'⟩ : ↥A) ∈ (S : Subgroup ↥A) := hS hq'
+    rcases eq_or_ne (S : Subgroup ↥A) ⊥ with hSbot | hSne
+    · rw [hSbot, Subgroup.mem_bot] at hqS
+      have : (q : G) = 1 := congrArg Subtype.val hqS
+      change (q : G) ∈ ⁅A, A⁆
+      rw [this]; exact one_mem _
+    -- `P := S` を `G` の部分群として見ると `G` の Sylow `p`-部分群
+    have hPA : (S : Subgroup ↥A).map A.subtype ≤ A := by
+      rintro _ ⟨z, _, rfl⟩; exact z.2
+    have hPcomap : ((S : Subgroup ↥A).map A.subtype).subgroupOf A = (S : Subgroup ↥A) :=
+      Subgroup.comap_map_eq_self_of_injective (Subgroup.subtype_injective A) _
+    have hPne : (S : Subgroup ↥A).map A.subtype ≠ ⊥ := by
+      intro h
+      exact hSne (by rw [← hPcomap, h]; simp [Subgroup.subgroupOf])
+    have hPmax : Maximal (fun K : Subgroup G => IsPGroup p ↥K ∧ K ≤ A)
+        ((S : Subgroup ↥A).map A.subtype) := by
+      refine ⟨⟨IsPGroup.of_equiv S.isPGroup'
+        (Subgroup.equivMapOfInjective _ _ (Subgroup.subtype_injective A)), hPA⟩, ?_⟩
+      rintro K ⟨hKp, hKA⟩ hPK x hx
+      have hKAp : IsPGroup p ↥(K.subgroupOf A) :=
+        IsPGroup.of_equiv hKp (Subgroup.subgroupOfEquivOfLe hKA).symm
+      have hSK : (S : Subgroup ↥A) ≤ K.subgroupOf A := fun z hz => hPK ⟨z, hz, rfl⟩
+      have heq : K.subgroupOf A = (S : Subgroup ↥A) := S.3 hKAp hSK
+      exact ⟨⟨x, hKA hx⟩, heq ▸ (show (⟨x, hKA hx⟩ : ↥A) ∈ K.subgroupOf A from hx), rfl⟩
+    obtain ⟨T, hT⟩ := exists_sylow_coe_eq_of_maximal_pGroup_of_TI hATI hPmax hPne
+    -- 焦点部分群定理 + fusion 制御
+    have hqfoc : (q : G) ∈ ((S : Subgroup ↥A).map A.subtype).focalSubgroup := by
+      rw [← hT, ← Subgroup.commutator_inf_eq_focalSubgroup T, hT]
+      exact ⟨hQ'C hq', ⟨_, hqS, rfl⟩⟩
+    rw [← Subgroup.focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn hPA
+      (controlsFusionIn_of_TI hATI hPA), hPcomap] at hqfoc
+    obtain ⟨z, hz, hzq⟩ := hqfoc
+    rw [← Subgroup.commutator_inf_eq_focalSubgroup S] at hz
+    change (q : G) ∈ ⁅A, A⁆
+    rw [← hzq, ← map_commutator_subtype A]
+    exact ⟨z, hz.1, rfl⟩
+  intro x hx
+  have hmem : (⟨x, hx⟩ : ↥(commutator G ⊓ A)) ∈ (⁅A, A⁆).subgroupOf (commutator G ⊓ A) := by
+    rw [hkey]; trivial
+  exact hmem
+
+/-- **Isaacs Problem 6A.10(b)** (p. 186) ⭐: TI 仮説の下で `G' ⊓ A = A'`。 -/
+theorem inf_commutator_eq_commutator_self_of_TI [Finite G] {A : Subgroup G}
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) :
+    commutator G ⊓ A = ⁅A, A⁆ :=
+  le_antisymm (commutator_inf_le_commutator_self_of_TI hATI)
+    (commutator_self_le_inf_commutator A)
 
 end
 
