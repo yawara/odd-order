@@ -507,6 +507,42 @@ noncomputable def xSet_isCoherent_of_adjoinSteps
   rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair (hpair0 i hi) (hpair1 i hi)]
   exact hstep pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi hcoh
 
+/-! ### Degree ratios over a base-block anchor -/
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- **The degree ratio of an `𝒳`-member over a base-block anchor is a `p`-power.**
+
+Once `K` is a `p`-group (which (6.5) supplies), every `𝒳`-member has degree `|L:K|·p^k`
+(`exists_index_primePow_degree_of_mem_inducedKernelFamily`).  A base-block anchor `χ₁` has the
+*minimal* degree, so its exponent is minimal too, and `χ(1) = p^(k − k₁)·χ₁(1)`.
+
+This supplies the `hratio`/`hχratio` inputs of `xAdjoinStep_of_degreeRatios` (and, at
+`χ = χ₁`, the `ha1 : deg i₁ = 1` clause), turning the book's common-index `p`-power degree data
+into the ratio form the (5.6) engine consumes. -/
+theorem exists_primePow_degree_ratio_of_xBaseBlock_anchor
+    {p : ℕ} (hp : p.Prime) (hKp : IsPGroup p ↥K) {Z : Subgroup ↥L}
+    {χ₁ χ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ xBaseBlock K Z) (hχ : χ ∈ xSet K Z) :
+    ∃ r : ℕ, χ 1 = ((p ^ r : ℕ) : ℂ) * χ₁ 1 := by
+  obtain ⟨k₁, hk₁⟩ :=
+    exists_index_primePow_degree_of_mem_inducedKernelFamily (K := K) hp hKp
+      (xSet_subset (K := K) Z (xBaseBlock_subset (K := K) Z hχ₁))
+  obtain ⟨k, hk⟩ :=
+    exists_index_primePow_degree_of_mem_inducedKernelFamily (K := K) hp hKp
+      (xSet_subset (K := K) Z hχ)
+  -- minimality of the anchor's degree gives `p^k₁ ≤ p^k`, hence `k₁ ≤ k`
+  have hle : K.index * p ^ k₁ ≤ K.index * p ^ k :=
+    natDegree_le_of_xBaseBlock_anchor (K := K) hχ₁ hχ hk₁ hk
+  have hidx : 0 < K.index := Nat.pos_of_ne_zero K.index_ne_zero_of_finite
+  have hkle : k₁ ≤ k := by
+    have : p ^ k₁ ≤ p ^ k := Nat.le_of_mul_le_mul_left hle hidx
+    exact (Nat.pow_le_pow_iff_right hp.one_lt).mp this
+  refine ⟨k - k₁, ?_⟩
+  rw [hk, hk₁, ← Nat.cast_mul]
+  congr 1
+  rw [← mul_assoc, mul_comm (p ^ (k - k₁)) K.index, mul_assoc, ← pow_add]
+  congr 2
+  omega
+
 /-! ### The `(6.6)` per-step adjoining, `τ`-general (issue 0155 step 4) -/
 
 open scoped Classical in
