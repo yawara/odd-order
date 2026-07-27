@@ -4434,8 +4434,8 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
   8B.8 ✅ `isPreprimitive_sup_zpowers_addRight_one` /
   8B.9 ✅ `eq_top_...` (m か n 偶 ⟹ S_n) / `eq_alternatingGroup_...` (ともに奇 ⟹ A_n) /
-  8B.10 🔶 **step 1 (推移性) 完了** —
-  **次の frontier = 8B.10 step 2–5** (8A.16 → 原始性 → Bochert → 数値)。
+  8B.10 🔶 **step 1–3 完了** (推移的 → 2-transitive → 原始的) —
+  **次の frontier = 8B.10 step 4–5** (Bochert → 数値)。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4740,3 +4740,24 @@ landing 済:
    `((n+1)/2)! ≥ 4! = 24 > n` を階乗の単調性で潰す)。
 5. 2-transitivity から `n(n-1) ∣ |H| = (n-1)!` ⟹ `n ∣ (n-2)!` で `n = 2,3,4` を除外、
    `n = 1` は `H` が自動的に点安定化群になるので除外 ⟹ **`n = 6`**。
+
+
+### 8B.10 step 4–5 の残り (2026-07-27)
+
+step 1–3 landing 済 (`isPreprimitive_of_index_eq_of_ne_stabilizer`)。残り:
+
+4. `alternatingGroup α ≤ H` の場合: `Subgroup.index_dvd_of_le` で
+   `H.index ∣ (alternatingGroup α).index`。`(alternatingGroup α).index = 2`
+   (`Nontrivial α` のとき; mathlib の名前を要確認 —
+   `Equiv.Perm.eq_alternatingGroup_of_index_eq_two` は逆向きなので別を探す) ⟹ `n ∣ 2`。
+   そうでない場合: **Bochert** `factorial_le_index_of_isPreprimitive` で
+   `((n+1)/2)! ≤ H.index = n`。
+5. 数値: `((n+1)/2)! ≤ n` を満たす `n` は `{1,2,3,4,6}`。
+   `n ≥ 7` は `(n+1)/2 ≥ 4` ⟹ `((n+1)/2)! ≥ 4! = 24` と
+   `k! ≥ 2^(k-1) > n` (`Nat.factorial_le_factorial` の単調性 + 指数評価) で潰す。
+   `n = 5` は `3! = 6 > 5` で直接。
+   残る `n = 1,2,3,4` は **2-transitivity の位数条件**で除外:
+   `H` 推移的 ⟹ `n ∣ |H|`、`H_a` が `α ∖ {a}` に推移的 ⟹ `(n-1) ∣ |H_a| = |H|/n`
+   ⟹ `n(n-1) ∣ |H| = (n-1)!` ⟹ `n ∣ (n-2)!`。`n = 2,3,4` はこれを満たさない。
+   `n = 1` は `Sym(α)` が自明で `H = ⊤ = G_a` (点安定化群) ⟹ 仮定に反する。
+   ⟹ **`n = 6`**。
