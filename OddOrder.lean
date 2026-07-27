@@ -296,6 +296,7 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7A1
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7A2
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7A3
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7A4
 import OddOrder.Isaacs.Ch08_PermutationGroups.AffineGroup
 import OddOrder.Isaacs.Ch08_PermutationGroups.TransitiveAutomorphisms
 import OddOrder.Isaacs.Ch08_PermutationGroups.HalfTransitive
