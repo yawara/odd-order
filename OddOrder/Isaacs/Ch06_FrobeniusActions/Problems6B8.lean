@@ -1058,6 +1058,37 @@ theorem exists_involution_notMem_of_not_isCyclic {P : Type*} [Group P] [Finite P
     rw [involution_eq_of_mem_zpowers hk hord humem huP hu2P,
       involution_eq_of_mem_zpowers hk hord hvmem hvP hv2P]
 
+/-- `A` の指数が `2`, `|P : P'| = 4` なら `P'` は `A` の中で指数 `2`。 -/
+theorem relIndex_commutator_eq_two {P : Type*} [Group P] [Finite P] {A : Subgroup P}
+    (hidxA : A.index = 2) (hidx : (commutator P).index = 4) (hPA : commutator P ≤ A) :
+    (commutator P).relIndex A = 2 := by
+  have h := Subgroup.relIndex_mul_index hPA
+  rw [hidxA, hidx] at h
+  omega
+
+/-- `B ≤ A` が相対指数 `2` で `t ∈ A \ B` なら `A = B⟨t⟩`。 -/
+theorem mem_sup_zpowers_of_relIndex_two {P : Type*} [Group P] [Finite P] {A B : Subgroup P}
+    (hBA : B ≤ A) (hrel : B.relIndex A = 2) {t : P} (htA : t ∈ A) (htB : t ∉ B)
+    {x : P} (hx : x ∈ A) : x ∈ B ⊔ Subgroup.zpowers t := by
+  have hidx2 : (B.subgroupOf A).index = 2 := hrel
+  have hnot : (⟨t, htA⟩ : ↥A) ∉ B.subgroupOf A := htB
+  have hsub := sup_zpowers_eq_top_of_index_two hidx2 hnot
+  have hmem : (⟨x, hx⟩ : ↥A) ∈ (B.subgroupOf A) ⊔ Subgroup.zpowers (⟨t, htA⟩ : ↥A) := by
+    rw [hsub]
+    trivial
+  have himg : ((B.subgroupOf A) ⊔ Subgroup.zpowers (⟨t, htA⟩ : ↥A)).map A.subtype
+      ≤ B ⊔ Subgroup.zpowers t := by
+    rw [Subgroup.map_sup]
+    refine sup_le ?_ ?_
+    · rintro _ ⟨w, hw, rfl⟩
+      exact (le_sup_left : B ≤ _) hw
+    · rintro _ ⟨w, hw, rfl⟩
+      obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp hw
+      refine (le_sup_right : Subgroup.zpowers t ≤ _) (Subgroup.mem_zpowers_iff.mpr ⟨m, ?_⟩)
+      have := congrArg Subtype.val hm
+      simpa using this
+  exact himg ⟨⟨x, hx⟩, hmem, rfl⟩
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
