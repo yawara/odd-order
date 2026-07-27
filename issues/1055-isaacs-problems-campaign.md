@@ -3684,3 +3684,24 @@ API メモ: `Sylow.is_maximal'` / `Subgroup.map_subgroupOf_eq_of_le` /
    正規部分群 (`Z ≤` 引き戻し, 位数 `4 * 2 = 8`)。
 
 ⟹ 次 iteration: (4) の public 化 → (2)(3) → (5) の組み上げ。
+
+### 7A.2 進捗 (2026-07-27): 具体計算パート完了
+
+* ✅ `Ch01_Sylow/Theorem131.lean` の `sylow_two_normal_of_card_twelve_of_four_sylow_three`
+  を **public 化** (CLAUDE.md「`private` をファイル跨ぎで使わない」)。
+* ✅ 新 leaf `Problems7A2.lean` (`OddOrder.lean` 配線済) に `SL(2,3)` の具体事実:
+  * `natCard_sl23 : Nat.card SL23 = 24` (9211 で一般化した `|SL(2,F)| = q(q-1)(q+1)`)。
+  * `negOneSL23 = [[2,0],[0,2]]` (= `-I`, 標数 3) と `negOneSL23_sq` / `_ne_one`。
+  * `transvectionA = [[1,1],[0,1]]`, `transvectionB = [[1,0],[1,1]]` の `^3 = 1` / `≠ 1`、
+    および `transvectionB ∉ ⟨transvectionA⟩`。
+  * **行列計算はすべて `decide` で通る** (`SL(2,ZMod 3)` は `Fintype` + `DecidableEq`)。
+    `⟨a⟩ = {1,a,a²}` の場合分けは `m % 3` の 3 ケース + `decide`。
+  ⚠ 長い namespace は `open ... in` で回避 (100 文字制限; `|>.` は namespace には効かない)。
+    `Int.ediv_add_emod` は無いので `m = 3*(m/3) + m%3` は `by omega`。
+* 次: (2) `Z = ⟨negOneSL23⟩` が中心的・位数 2 ⟹ `|S/Z| = 12`、(3) `n_3(S/Z) = 4`
+  (`n_3 = 1` なら `S` に位数 3 の正規部分群 ⟹ 位数 3 の元は全てそこに入り
+  `transvectionA`/`B` に矛盾)、(5) 正規 Sylow 2 の引き戻しで位数 8。
+* ✅ 7A.2 (2) 完了: `centerZ = ⟨negOneSL23⟩` は正規 (`negOneSL23_mem_center` は
+  **`∀ g : SL23, g * (-I) = (-I) * g` を `decide` で判定**できる) で `|Z| = 2`、
+  ⟹ `natCard_quotient_centerZ : |SL(2,3)/Z| = 12`。
+  ⚠ `Subgroup.mem_center_iff.mp h g : g * a = a * g` (= `Commute g a`; `.symm` 不要)。

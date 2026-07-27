@@ -128,15 +128,17 @@ theorem sylow_normal_of_card_eq_sq_mul_prime_lt
     have : q ≤ 1 := by omega
     exact absurd this (not_le.mpr hq.out.one_lt)
 
-/-- Helper: For `|G| = 12` with `n_3 = 4` (i.e., 4 distinct Sylow 3-subgroups),
-any Sylow 2-subgroup is normal.
+/-- **位数 `12` で `n_3 = 4` なら Sylow `2`-部分群は正規**。
+
+(Isaacs Problem 7A.2 でも使うので public。以前は `private` だったが CLAUDE.md
+「`private` をファイル跨ぎで使わない」に従い公開した。)
 
 証明 (数え上げ): Sylow 3 部分群は 4 個, 各位数 3, 互いの共通部分は trivial.
 ゆえに位数 3 の元は 8 個.  非単位元で位数 3 でない元は 12 − 8 − 1 = 3 個.
 Sylow 2-部分群 `S` は位数 4 で 3 個の非単位元を持ち, 全て位数 3 ではない (位数 ∣ 4).
 ゆえに `S \ {1} = {g | g ≠ 1 ∧ orderOf g ≠ 3}` (3 元集合).  任意の Sylow 2 で同様.
 よって全ての Sylow 2 は同じ非単位元集合を持ち, 同一の部分群.  Subsingleton. -/
-private lemma sylow_two_normal_of_card_twelve_of_four_sylow_three
+theorem sylow_two_normal_of_card_twelve_of_four_sylow_three
     [Finite G] (hcard : Nat.card G = 12)
     (hn3 : Nat.card (Sylow 3 G) = 4) :
     ∃ P : Sylow 2 G, (P : Subgroup G).Normal := by
