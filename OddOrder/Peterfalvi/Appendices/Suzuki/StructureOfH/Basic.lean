@@ -82,6 +82,33 @@ theorem Q1_inf_centralizer_eq_bot_of_le_V {X : Subgroup G} (hXV : X ≤ hyp.V)
   obtain ⟨data⟩ := hyp.centralizer_trichotomy_of_induction hXV hX hA3 ind
   exact data.common.q1_inf_centralizer_eq_bot
 
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step 2** (p. 115): `Q ∩ Q^x = 1` for
+`x ∈ G − H`, i.e. `Q` has trivial intersections in `G`.
+
+The book's one-line argument: `Q ∩ Q^x ⊆ Q ∩ (H ∩ H^x) = 1`, because `H ∩ H^x` is
+conjugate to `D` in `H` (Ch. I §1, Proposition 1(a)) and `Q ∩ D = 1`.  Conjugating
+by the element `h ∈ H` that realises `(H^x ∩ H)^h = D` keeps the element inside `Q`
+(`Q ⊴ H`) and lands it in `D`, so it is trivial. -/
+theorem Q_inf_map_conj_eq_bot {x : G} (hx : x ∉ hyp.H) :
+    hyp.Q ⊓ hyp.Q.map (MulAut.conj x).toMonoidHom = ⊥ := by
+  obtain ⟨h, hhH, heq⟩ := hyp.exists_mem_H_conj_inf_eq_D hx
+  refine le_bot_iff.mp fun y hy => ?_
+  obtain ⟨hyQ, hyQx⟩ := Subgroup.mem_inf.mp hy
+  have hyH : y ∈ hyp.H := hyp.Q_le_H hyQ
+  have hyHx : y ∈ hyp.H.map (MulAut.conj x).toMonoidHom := by
+    obtain ⟨z, hz, rfl⟩ := hyQx
+    exact ⟨z, hyp.Q_le_H hz, rfl⟩
+  have hmemD : h * y * h⁻¹ ∈ hyp.D := by
+    rw [← heq]
+    exact ⟨y, Subgroup.mem_inf.mpr ⟨hyHx, hyH⟩, rfl⟩
+  have hmemQ : h * y * h⁻¹ ∈ hyp.Q := hyp.Q_normal_in_H h hhH y hyQ
+  have hmem : h * y * h⁻¹ ∈ hyp.Q ⊓ hyp.D := Subgroup.mem_inf.mpr ⟨hmemQ, hmemD⟩
+  rw [hyp.Q_inf_D_eq_bot, Subgroup.mem_bot] at hmem
+  rw [Subgroup.mem_bot]
+  calc y = h⁻¹ * (h * y * h⁻¹) * h := by group
+    _ = h⁻¹ * 1 * h := by rw [hmem]
+    _ = 1 := by group
+
 end Hypothesis
 
 namespace SecondCaseHypothesis
