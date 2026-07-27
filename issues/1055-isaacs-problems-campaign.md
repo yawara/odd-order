@@ -5274,7 +5274,60 @@ leaf = `Ch01_Sylow/ProblemsNonSimple.lean` (`OddOrder.lean` 配線済)。
     全体は `n_q·(|P| − 1)` 個の Finset をなし、各元の位数は `|P|` を割る。他素数の元の個数
     (`exists_finset_orderOf_eq_card_sylow_mul`) と足して `|G|` を超えさせる用。
 
-### 1E.6 (位数 `180 = 2²·3²·5`) の設計 — 実装待ち
+* ✅ **1E.6** `not_isSimpleGroup_of_card_eq_oneeighty` (2026-07-28)。下記の設計どおり landing。
+  ⚠ 追加で踏んだ罠: (i) `Subgroup.relIndex H K` と `(H.subgroupOf K).index` は defeq だが
+  **syntactic には別物** — `rw [hdi]` で後者の goal を扱えないので、先に `relIndex` の等式を
+  作ってから `:=` の defeq で `index` 版に渡す。(ii) `set D := ...` した後の `hmax` は
+  すでに `D` に畳まれているので `rw [← hDdef] at hle` は失敗する (fresh に作った `heq` の
+  方は畳み戻しが要る、という非対称に注意)。(iii) `Subgroup.eq_bot_of_card_le` は
+  部分群を**明示引数**で取る (`Subgroup.eq_bot_of_card_le _ hle`)。
+  (iv) `rw [he, he1]` が numeral の rfl で goal を閉じてしまう箇所があり、続く
+  `norm_num` が「No goals」で落ちる — 数値が閉じるかは式ごとに違うので個別に確認する。
+
+* ✅ **1E.7** `not_isSimpleGroup_of_card_eq_twofourty` (2026-07-28)。位数 `240 = 2⁴·3·5`。
+  **Sylow 2 で押すのが最短** (Sylow 5 だと `n₅ = 16` の枝が重い)。`n₂ ∣ 15` は奇数ゆえ
+  `n₂ ∈ {1,3,5,15}`、単純性で `≠1`、`3`/`5` は `240 ∣ 3!`/`240 ∣ 5!` が偽。
+  `n₂ = 15` では Thm 1.16 が `|S:D| ∣ gcd(14,16) = 2` ⟹ `|D| = 8`、指数 2 ゆえ `D` は
+  `S`,`T` で正規で `16 ∣ |N_G(D)| ∣ 240` ⟹ `{16, 48, 80, 240}` を全て潰す
+  (1C.4 = 位数 120 と完全に同型の議論)。
+  新部品 `card_dvd_factorial_card_sylow_of_simple` (`n_q > 1` ⟹ `|G| ∣ n_q !`) と
+  `divisors_fifteen`。
+  ⚠ `(n)!` 記法は `open scoped Nat` が要る — statement では `Nat.factorial n` と書く。
+
+* ✅ **1E.8** `not_isSimpleGroup_of_card_eq_twofivetwo` (2026-07-28) — **§1E 完済**。
+  懸案だった `|N_G(D)| = 36` 枝は予想どおり計数で潰せた: 位数 7 の元が 216 個で残りが
+  ちょうど 36 個なので `N` (位数 36) は「位数 7 でない元」全体に一致し
+  (`Finset.eq_univ_of_card` で `N.toFinset ∪ U₇ = univ`)、位数は共役不変ゆえ `N ⊴ G`。
+  `1 < 36 < 252` で単純性に矛盾。
+
+## 🎉 §1E 完済 (2026-07-28) — 1E.1–1E.8 全問
+
+leaf = `Ch01_Sylow/ProblemsSylowCounting.lean` (852 行, 道具立て + 1E.1–1E.5) と
+`Ch01_Sylow/ProblemsNonSimple.lean` (588 行, 1E.6–1E.8)。両方 `OddOrder.lean` 配線済、
+全て実証明・axiom-clean・lint 警告 0。
+
+**次の frontier = Ch.1 §1F** (1F.1–, Brodkey の定理まわり)、その後 §1G (1G.1–1G.4)、
+続いて Ch.3 §3C–§3F、最後に Ch.8 §8C.6 (繰延中)。
+
+### (旧) 1E.8 の筋 — 記録として保持
+  `n₇ ∣ 36`, `≡1 (mod 7)` ⟹ `n₇ ∈ {1, 36}` ⟹ 単純性で `n₇ = 36`, 位数 7 の元が 216 個
+  (残り 36 個)。Sylow 3 は位数 9・指数 28 で `n₃ ∈ {1,4,7,28}`、`≠1`、`4` は指数 4 で
+  `252 ∣ 4!` が偽。`n₃ ∈ {7, 28}` では Thm 1.16 が `|S:D| ∈ {3,9}`:
+  - `|S:D| = 9` (全対自明交叉): 3-冪位数の非単位元が `n₃·8 ∈ {56, 224}` 個で
+    `+216+1 > 252` ⟹ 矛盾 (`exists_finset_of_sylow_inter_trivial`)。
+  - `|S:D| = 3` (`|D| = 3`): `9 ∣ |N_G(D)| ∣ 252` ⟹ `{9, 18, 36, 63, 126, 252}`。
+    9: `S=N=T` / 18: 位数 18 の Sylow 3 は一意 / 63: 指数 4 で `252 ∣ 4!` 偽 /
+    126: 指数 2 / 252: `D ⊴ G`。**`|N| = 36` だけ既存の道具で潰せない** —
+    位数 36 の群の Sylow 3 は一意とは限らず (`n₃ ∣ 4`, `≡1 mod 3` ⟹ `{1,4}`)、
+    指数 7 でも `252 ∣ 7! = 5040` は真。⚠ 要検討: 位数 7 の元が 216 個で残り 36 個
+    ちょうどなので「`N` = 位数 7 でない元の全体」となり、この集合は共役不変ゆえ `N ⊴ G` —
+    これで潰せるはず (Finset の等式を出す必要あり)。
+
+⚠ leaf `ProblemsNonSimple.lean` は 1192 行 — 1E.8 を足すと 1500 行上限に当たる可能性が高い。
+着手前に「共通部品 + 一般問題 (1E.1/1E.2)」と「具体的位数 (1E.3–1E.8)」で prefix-split する
+(module 名不変・下流不変の flat な兄弟分割)。
+
+### 1E.6 (位数 `180 = 2²·3²·5`) の設計 (実装済, 記録として保持)
 
 `n₅ ∣ 36`, `≡ 1 (mod 5)` ⟹ `n₅ ∈ {1, 6, 36}`。単純性で `≠ 1`。
 

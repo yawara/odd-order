@@ -196,6 +196,7 @@ import OddOrder.Isaacs.Ch01_Sylow.ProblemsAlternating
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsNonSimple
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsSylowCounting
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch02_Subnormality.Problems
 import OddOrder.Isaacs.Ch02_Subnormality.ProblemsInvolutions
