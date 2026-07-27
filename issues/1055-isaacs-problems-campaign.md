@@ -4926,18 +4926,29 @@ IsMultiplyPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) n`) で
 8C.5 から使うので `SimpleStabilizer.lean` (または新しい共通 leaf) へ移すのが自然。
 
 
-## ⚠ §8C 残りの担当 (2026-07-27, 暫定 — hub 裁定待ち)
+## 📌 claim 表 — 着手前に必ず 1 行足すこと (hub 裁定 2026-07-27, issue 9212)
 
-並行セッションの重複 (上記) を受けて **issue 9212 で hub に一本化を要請**。
-それまでの暫定分担:
+**§8C 以降の Isaacs Problem は、Lean を書き始める前にこの表へ 1 行追記して commit する。**
+既に claim 行がある番号は取らず、**次の未 claim 番号**へ移ること。
 
-* **8C.5 … もう一方のセッション**が担当 (上の詳細設計メモを書いた側)。
-  こちらのセッションは触らない。
-* **8C.6 … この lane a セッション**が担当。`Aut(A)` 単純 ⟺ `|A| = 3` または
-  `A` が位数 8 以上の初等可換 2-群。8C.5 と独立。
+背景: 2026-07-27 に 2 つのセッションが同一 worktree `a` を共有して §8C を並行駆動し、
+**8C.2 / 8C.3 を二重に解いた** (hub が git graph で確認、[issue 9212](9212-sec8c-duplicate-sessions.md)
+に裁定全文)。成果物は保全済 (意味的な重複宣言は無く、後発側は再factoring していた) だが、
+労力は丸ごと無駄だった。claim 表はその再発防止。
 
-hub の裁定が出たらこの節を更新すること。
+`send_message` は unsupervised session に届かないので、**この表が唯一の同期経路**。
+各セッションは起動時/定期に `git merge main` する規約なので、claim は main 経由で伝播する。
 
+| 問題 | 担当 (セッション識別) | claim 時刻 | 状態 |
+|---|---|---|---|
+| 8C.1 – 8C.4 | — | — | **完了** (二重着手あり、9212 参照) |
+| 8C.5 | 設計メモを書いた側のセッション (= 本セッション) | 2026-07-27 21:5x | **完了 2026-07-27** |
+| 8C.6 | lane a (9212 を起票した側) | 2026-07-27 21:5x | hub 裁定で確定 |
+| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **claim (着手)** |
+
+⚠ **恒久対処は worktree を分けること** — 1 lane = 1 worktree = 1 session が CLAUDE.md の前提。
+2 つ目のセッションは `notes/meta/worktree_setup.md` の手順で自分の worktree/branch を取るのが
+本来の姿で、claim 表はそれまでの緩和策 (9212 §5)。
 
 ## 8C.5 完了 (2026-07-27)
 
@@ -4955,5 +4966,8 @@ hub の裁定が出たらこの節を更新すること。
   `isSimpleGroup_of_two_transitive_of_isSimpleGroup_stabilizer`、
   段 1 (23 = 素数) は `isSimpleGroup_of_two_transitive_of_prime_card`。
 
-全て実証明・axiom-clean。**次は 8C.6** (可換群 `A` について `Aut(A)` 単純 ⟺
-`|A| = 3` または `A` は位数 8 以上の初等可換 2-群) — §8C の最後。
+全て実証明・axiom-clean。
+
+⚠ **8C.6 は hub 裁定 (9212) で他セッションの担当**なので本セッションは触らない。
+本セッションは claim 表に従い **§8D (Isaacs pp. 257–) の演習**へ移る (着手前に
+PDF ページ画像で文言を確定すること)。
