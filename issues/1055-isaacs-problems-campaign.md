@@ -3586,3 +3586,31 @@ Isaacs の**番号付き結果**でありlane a の territory・かつ 7A.1 の�
 次 iteration からこれに着手する。7A.2-7A.6 は Thm 7.1 に依存しない
 (GL(n,q)/SL(2,q) の Sylow 数え上げ・`𝓔(P)`・`Aut(Q_{2^n})`) ので、Thm 7.1 が長引く場合の
 並行候補として残す。
+
+### ✅ 訂正 (2026-07-27): 7A.1 は gated ではない — Thm 6.23 (無条件) で足りる
+
+前項の「7A.1 は Thm 7.1 無条件版に gated」は**過小評価だった**。7A.1 の証明には
+教科書 Thm 7.1 (Z(P) と J(P) の 2 つだけ) は不要で、**Thm 6.23**
+(`OddOrder.Isaacs.Ch06.hasNormalPComplement_of_forall_characteristic_normalizer`,
+`ThompsonPComplement.lean:55`, **無条件・axiom-clean**: `p ≠ 2` と「`P` の非自明
+characteristic 部分群すべての正規化群が normal `p`-complement を持つ」だけ) で足りる。
+理由: 冪零極大 `M` は `P` の**すべての** characteristic 部分群を正規化するから
+(`P ⊴ M` かつ `M` の `p`-complement `H` は `[P, H] ≤ P ⊓ H = ⊥` で `P` を中心化)。
+
+**7A.1 の証明設計** (次 iteration で実装):
+1. `M` 冪零極大、奇素数 `p ∣ |M|` を仮定 (`IsPGroup 2 ↥M` の否定から取る)。
+2. `P` = `M` の Sylow `p` を `G` へ写したもの。`M` 冪零 ⟹ `P ⊴ M`;
+   `N_G(P) ⊇ M` で単純性 (`P ≠ ⊥`, `P ≠ ⊤`) から `N_G(P) ≠ G` ⟹ 極大性で `N_G(P) = M`。
+3. `P ∈ Syl_p(G)`: `P ≤ Q ∈ Syl_p(G)` で `P < Q` なら `NormalizerCondition ↥Q`
+   (p-群は冪零) から `P < N_Q(P) ≤ N_G(P) = M` となり `P` が `M` の Sylow `p` に反する。
+4. 非自明 characteristic `X ≤ ↥P` に対し `M ≤ N_G(X.map)`:
+   `P ≤ N_G(X.map)` (char ⟹ `P`-正規) + `H ≤ C_G(P) ≤ N_G(X.map)` + `M = P ⊔ H`。
+   単純性で `N_G(X.map) ≠ G` (`X.map ≠ ⊥`, `X.map = ⊤` なら `P = ⊤` で `M = ⊤` に矛盾)
+   ⟹ 極大性で `= M`。`M` 冪零ゆえ normal `p`-complement を持つ
+   (`Ch05.hasNormalPComplement_of_isNilpotent`)。
+5. Thm 6.23 ⟹ `G` が normal `p`-complement `K` を持つ。単純性で `K = ⊥` (⟹ `G` は
+   `p`-群で中心が非自明 ⟹ 単純性に反する/位数 `p` なら `M = 1` で `p ∣ |M|` に反する) か
+   `K = ⊤` (⟹ `p ∤ |G|` で `p ∣ |M|` に反する) のどちらでも矛盾。
+
+⟹ Thm 7.1 無条件版 (§7C Steps 1-3 + 組み上げ) は**別枠の上流タスク**として残すが、
+§7A の演習は Thm 6.23 で進められる。
