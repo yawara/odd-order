@@ -102,11 +102,51 @@ survey の「📍 2026-07-26 終了時点の frontier」(L1441 `### 残ってい
 新ディレクトリ `OddOrder/Peterfalvi/Appendices/Suzuki/StructureOfH/`
 (Ch.II の `FirstCase/` と同じ流儀)。**新 leaf は同じ commit で `OddOrder.lean` に配線する。**
 
+## ⚠ step 3 で判明した上流の阻害 — Feit–Sibley が書籍に無い `Odd |G|` を要求している
+
+`feit_sibley_coherence` は `(hoddG : Odd (Nat.card G))` を取るが、**書籍 Appendix IV の
+"Hypotheses and Notation" (p. 144、ページ画像で確定) に `G` の奇性は無い**:
+
+> `G` is a finite group and `H = Q ⋊ D` is a **proper** subgroup of `G`. We assume that
+> `(|D|,|Q|) = 1` and that `Q ∩ Q^x = 1` for `x ∈ G − H`. …
+> `Q = S × Q₁`, `|Q₁|` and `|S|` are relatively prime, `D` acts without fixed points on `Q₁`,
+> `Q₁` is not a 2-group and `S` is nilpotent.
+> **Theorem.** If `d` is odd, then `𝒮` is coherent …
+
+⟹ **Ch.III は `|G|` が偶 (involution `t ∈ G`) なので、現状の repo 版は適用できない。**
+Theorem C は Appendix IV の唯一の consumer なので、これが `feit_sibley_coherence` の
+consumer ゼロだった真因でもある。
+
+### `hoddG` が実際に何に使われているか (trace 済)
+
+1. `Odd (Nat.card Q1)` の導出 (`feit_sibley_coherence` 冒頭)。
+2. `witness_charValue_cong` → **`peterfalvi_67_hall_of_odd`** — ここでは
+   `hreal : ConjClasses.mk z⁻¹ ≠ ConjClasses.mk z` (= `z` が `z⁻¹` と共役でない) を作るためだけ
+   に使われている。一般版 `peterfalvi_67_hall` は `hreal` を直接取る。
+
+### 書籍は (2) を `d` 奇から出している (p. 149、step (7))
+
+> **Since `d` is odd**, we may assume that `𝒦₁ ∩ Z^# ≠ ∅` and `𝒦₂ = (𝒦₁)⁻¹`.
+
+論法 (`Z = [Q₁,Q₁] ∩ Z(Q₁)`、`Z ⊴ H`、`Q` は `Z` を中心化):
+`g z g⁻¹ = z⁻¹` とすると `z⁻¹ ∈ Q ⊓ Q^g` が非自明 ⟹ TI より `g ∈ H = QD` ⟹
+`g = q·δ` と書くと `q` は `Z` を中心化するので `δ` が `z` を反転 ⟹ `δ²` は `z` を中心化 ⟹
+fpf より `δ² = 1` ⟹ `|D|` 奇より `δ = 1` ⟹ `z = z⁻¹` ⟹ `z² = 1`、`|Q₁|` 奇に矛盾。
+
+### やること (step 3 の前段)
+
+**`feit_sibley_coherence` の `Odd (Nat.card G)` を `Odd (Nat.card Q₁)` に弱める** — 書籍が
+実際に使うのはこれだけ (Lemma 2(c) の「odd order group `Q₁D`」も `|Q₁|` 奇 + `d` 奇)。
+`hreal` は上記の書籍論法で `hd` から導出する。影響範囲は `FeitSibleyMain` /
+`FeitSibleyConclusion` の 4 signature + `peterfalvi_67_hall_of_odd` の呼び出し 1 箇所
+(`peterfalvi_67_hall_of_odd` の consumer はこの 1 箇所のみと実測)。
+
 ## やること
 
-- [ ] step 1: `(C1)` carrier `SecondCaseHypothesis` + `D` の `Q₁` 上 fpf
+- [x] step 1: `(C1)` carrier `SecondCaseHypothesis` + `D` の `Q₁` 上 fpf (2026-07-28、commit `794473d39`)
 - [ ] step 2: `Q ∩ Q^x = 1` (`x ∉ H`)
-- [ ] step 3: Feit–Sibley `Hypothesis` の構成と coherence の取得
+- [ ] **step 3a (新): Feit–Sibley の `Odd |G|` を書籍どおり `Odd |Q₁|` へ弱める**
+- [ ] step 3b: Feit–Sibley `Hypothesis` の構成と coherence の取得
 - [ ] step 4: 指標側 endgame (λ / `Ind λ = f₁ + f₂` / 次数評価)
 - [ ] step 5: `Q₁ = ⊥` の結論 + AxiomsCheck 登録
 
