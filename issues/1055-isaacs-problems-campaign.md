@@ -5418,11 +5418,23 @@ Thm 1.37 / Cor 1.39 / Cor 1.40)。演習は 3 問。
   対を取り `K := Z(S) ⊓ Z(T)` に **Thm 1.38** を当てる (`K ≤ S ⊓ T` で `K` の元は
   `S`,`T` の全元と可換ゆえ `S, T ≤ N_G(K)`)。`Z(S)` は `G` の部分群として
   `S ⊓ C_G(S)` の形で表す。
-* ⬜ **1F.3** — `G = NP` (`N ⊴ G`, `P ∈ Syl_p(G)`, `N ∩ P = 1`) で `P` の `N` への共役作用が
-  忠実なら, `P` は少なくとも 1 つの軌道に忠実に作用する。
-  Hint: `|P ∩ P^x|` が最小になる `x ∈ N` を取れば, `x` を含む `P`-軌道で忠実。
+* ✅ **1F.3** `exists_faithful_orbit_of_faithful_conj` (2026-07-28) — 下記の設計どおり landing。
+  ⚠ 実装上の罠: (i) `rintro h (rfl : h = x)` は **`x` の方を消してしまう** (x が section の
+  局所変数なので以降の `x` が全て壊れる) — `intro h hh; have : h = x := hh; rw [this]` と書く。
+  (ii) `Subgroup.commute_of_normal_of_disjoint` は `x y : G` を**明示引数**で先に取る
+  (`... hdis z n hz hn`)。(iii) `omit [..] in` は**docstring より前**に置く。
+  (iv) `MulAut.conj a • (MulAut.conj c • S) = MulAut.conj (a*c) • S` は
+  `smul_smul` + `← map_mul` (`← smul_smul` ではない)。
 
-### 1F.3 の設計 (筋は確定, 実装待ち)
+## 🎉 §1F 完済 (2026-07-28) — 1F.1–1F.3 全問
+
+leaf = `Ch01_Sylow/ProblemsBrodkey.lean` (300 行, `OddOrder.lean` 配線済)、
+実証明・axiom-clean・lint 警告 0・sorry 0。
+
+**次の frontier = Ch.1 §1G** (1G.1–1G.4, Chermak–Delgado 周り)。その後 Ch.3 §3C–§3F、
+最後に Ch.8 §8C.6 (繰延中)。
+
+### 1F.3 の設計 (実装済, 記録として保持)
 
 1. **`P ∩ P^x = C_P(x)`** (`x ∈ N`)。`u ∈ P ∩ P^x` なら `x u x⁻¹ ∈ P` かつ
    `x u x⁻¹ u⁻¹ ∈ N` (N 正規) なので `N ∩ P = 1` より `x u x⁻¹ = u`。逆も同様。
