@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.GroupAction.Blocks
+import Mathlib.GroupTheory.GroupAction.Primitive
 
 /-!
 # Isaacs, Finite Group Theory — Problems 8B (pp. 248–249)
@@ -16,6 +17,8 @@ Isaacs の定義 (「`Δ` の translate は `Δ` 自身か, `Δ` と交わらな
 
 - `blockCore`, `mem_blockCore`, `smul_blockCore_eq_of_mem`, `isBlock_blockCore` —
   **Problem 8B.1**: `α` を含む `X` の translate すべての共通部分は block。
+- `exists_smul_mem_and_smul_notMem` — **Problem 8B.2**: 原始群では, 空でない真部分集合 `X`
+  と相異なる 2 点 `α ≠ β` に対し `g • α ∈ X` かつ `g • β ∉ X` となる `g` がある。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -99,6 +102,44 @@ theorem isBlock_blockCore [Finite G] [IsPretransitive G Ω] (α : Ω) (X : Set �
       exact ⟨⟨k, (Subgroup.inv_mem_iff _).mp hkinv⟩, hk⟩
   rw [← horbit]
   exact IsBlock.of_orbit hstab
+
+/-! ### Problem 8B.2 — 原始群は 2 点を分離する translate をもつ -/
+
+/-- **Isaacs Problem 8B.2** (p. 248) 🎉: `G` が `Ω` に原始的で `α ≠ β`, `X` が空でない
+真部分集合なら, **`g • α ∈ X` かつ `g • β ∉ X`** となる `g ∈ G` が存在する。
+
+対偶を取ると「すべての `g` で `g • α ∈ X → g • β ∈ X`」。このとき 8B.1 の block
+`Δ = ⋂ {g • X : α ∈ g • X}` (`blockCore`) が `α` と `β` を**両方**含む。原始性より
+`Δ` は自明な block だが, `α ≠ β` から subsingleton ではないので `Δ = Ω`。ところが
+推移性と `X ≠ ∅` から `α ∈ g • X` なる `g` が取れて `Δ ⊆ g • X` なので `g • X = Ω`,
+すなわち `X = Ω` となり `X` が真部分集合であることに反する。 -/
+theorem exists_smul_mem_and_smul_notMem [Finite G] [IsPreprimitive G Ω]
+    {α β : Ω} (hαβ : α ≠ β) {X : Set Ω} (hX : X.Nonempty) (hXne : X ≠ Set.univ) :
+    ∃ g : G, g • α ∈ X ∧ g • β ∉ X := by
+  by_contra hcon
+  push Not at hcon
+  -- `hcon : ∀ g, g • α ∈ X → g • β ∈ X` から `β ∈ Δ`。
+  have hβ : β ∈ blockCore G α X := by
+    simp only [blockCore, Set.mem_iInter, Set.mem_setOf_eq]
+    intro g hg
+    rw [Set.mem_smul_set_iff_inv_smul_mem] at hg ⊢
+    exact hcon g⁻¹ hg
+  rcases IsPreprimitive.isTrivialBlock_of_isBlock (isBlock_blockCore (G := G) α X) with
+    hsub | huniv
+  · exact hαβ (hsub (mem_blockCore (G := G) α X) hβ)
+  · -- `Δ = Ω` だが `Δ ⊆ g • X`。
+    obtain ⟨x, hx⟩ := hX
+    obtain ⟨g, hg⟩ := exists_smul_eq G x α
+    have hmem : α ∈ (g • X : Set Ω) := ⟨x, hx, hg⟩
+    have hsub : blockCore G α X ⊆ (g • X : Set Ω) := by
+      simp only [blockCore]
+      exact Set.biInter_subset_of_mem (t := fun g : G => (g • X : Set Ω)) hmem
+    rw [huniv] at hsub
+    refine hXne ?_
+    have hgX : (g • X : Set Ω) = Set.univ := Set.eq_univ_of_univ_subset hsub
+    have : X = g⁻¹ • (g • X : Set Ω) := (inv_smul_smul g X).symm
+    rw [this, hgX]
+    simp
 
 end
 
