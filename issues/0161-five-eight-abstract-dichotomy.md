@@ -81,3 +81,42 @@ sorry 非退行。rider は別 step (未達でも二分律が抽象化できれ�
 * [issue 0160](closed/0160-five-three-b-downstream-rewiring.md) anchor dedup + §13 bridge + columnR 統合
 * 解析コア: `S05_SigmaTrichotomy` / `S05_GridTrichotomy` ((3.7)/(3.8)) は既に
   `TICyclicHypothesis` レベルで完全に一般
+
+## ✅ step 1–2 完了 (2026-07-27) — 二分律が (4.6) 一般で landing
+
+`S12_TypeIIColumnPin.lean` に **`certainTypeR_subsum_dichotomy`** を新設。
+`typeII_nu_tau2_dichotomy` はその特殊化 3 行に縮んだ (証明本体 ~430 行が抽象版へ移動)。
+ファイル行数 1269 → 1324 (ほぼ不変、見積りどおり)。両方 sorry-free / axiom-clean、
+AxiomsCheck 登録済。full build green (4875 jobs)、lint --strict clean、sorry 349 非退行。
+
+抽象版の仮説 (書籍の証明ステップと 1:1):
+
+| 仮説 | 書籍側 |
+|---|---|
+| `hEsub`/`hEsum`/`hEcard` | (5.5): `μ_k^{τ₁}` は `R(μ_k)` の濃度 `w₁` の部分和 |
+| `hψV` | V-消滅。書籍は (5.3.b)+(4.7) から導く ⟹ **issue 0159 で抽象版を landing 済** |
+
+### 移植で踏んだ罠 (記録)
+
+1. **`str.replace(…, 1)` が別定理の同名 `have` に当たった** — `hνT2` が 3 定理に
+   **同一テキスト**で存在し、意図した最後のものでなく最初のものを削除していた。
+   `git diff -U6` で位置を特定して復元。テキスト置換リファクタでは
+   「同一テキストが複数定理に散在する」を先に数えること。
+2. **norm の導出が型-II 依存だった** — 元は coherence 等長 `c.extension_inner_eq` 経由。
+   実は `ψ = ∑E` + E 正規直交 + `|E| = w₁` から直接出る。**既存の
+   `RepresentationTheory.inner_self_sum_orthonormal_eq_card` を grep で発見**して差し替え
+   (新規に書かずに済んだ — [[grep-before-writing-transport-defs]] の実践)。
+3. σ-grid の添字は **2 つの指標群の積**なので Fintype が 2 つ要る。W2 側は型に現れないので
+   linter の指摘どおり `[Finite …]` + 証明冒頭の `Fintype.ofFinite` にした。
+
+## 残り — step 4: 第 2 の場合の一意性 rider
+
+> In the second case, `j` and `k` are the only indices `ℓ` such that `ℓ > 1`, `μ_ℓ ∈ 𝒮` and
+> `μ_ℓ(1) = μ_k(1)`.
+
+survey が「直接の対応物なし (applications derive sign alignment by other proven routes)」と
+している部分。原文の証明は p.29 冒頭 (`04.7_pp_25_29_Coherence.txt` の "Suppose that there is
+an index ℓ > 1 such that ℓ ≠ j, ℓ ≠ k, μ_ℓ ∈ 𝒮 and …" 以降)。
+
+⚠ step 3 (抽象版を上流 leaf へ移設) は任意。現状 `S12_TypeIIColumnPin.lean` 内にあるが、
+型-II 依存はゼロなので S06/S07 側へ移せる。行数に余裕がなくなったら実施する。

@@ -13252,3 +13252,13 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.Peterfalvi.S13.muColumnChar_conj_eq_inv
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S12.Hypothesis.muColumnSign_eq_columnFamily_sign
+
+-- **Peterfalvi (5.8) の μ-column 二分律を Hypothesis (4.6) 一般で** (issue 0161).
+-- `ψ` が (4.9) 列像族 `R(μ_j)` の部分和 (濃度 w₁) で `V` 上消えるなら、`ψ` は符号つきの
+-- 完全な σ-grid 列 (`δ·∑_p χ_{(p,kcol)}` か `−δ·∑_p χ_{(p,jcol)}`)。書籍の (5.5) 入力と
+-- V-消滅ステップを仮説に取った形で、後者は (5.3.b)+(4.7) から出る (issue 0159 で抽象化済)。
+-- `typeII_nu_tau2_dichotomy` はその型-II 特殊化 (~430 行の証明本体が抽象版へ移動)。
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.certainTypeR_subsum_dichotomy
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.typeII_nu_tau2_dichotomy
