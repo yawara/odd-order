@@ -5507,7 +5507,7 @@ Chermak–Delgado (Thm 1.41) と最大測度束 `L(G)` (Thm 1.44) の節で,
 `change g * v * g⁻¹ = ...` を挟む。`Subgroup.mem_smul_pointwise_iff_exists` の
 ∃-形で扱うのが `mem_pointwise_smul_iff_inv_smul_mem` より扱いやすい
 (`(MulAut.conj g)⁻¹` が `MulAut.conj g⁻¹` に syntactic に落ちないため)。
-* ⬜ **1G.3**: `G` 単純, `|H|·|C_G(H)| = |G|` ⟹ `H = 1` or `H = G`。
+* ✅ **1G.3** `eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card` (2026-07-28)。
   **1G.2 から従う**: `G` 非可換なら `m(⊥) = |G| = m(H)` かつ最大測度は `|G|`
   (超えると Cor 1.46 で非単純) なので `H ∈ L(G)`、1G.2 より `H` は真の正規部分群 = `⊥` に
   含まれる。`G` 可換単純なら位数素数で部分群は `⊥`, `⊤` のみ。

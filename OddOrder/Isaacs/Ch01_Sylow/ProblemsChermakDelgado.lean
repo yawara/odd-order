@@ -31,6 +31,7 @@ pdftotext は `<` と `≤` を潰すが, **1G.1 と 1G.4 の不等号は厳密 
   (`L(G)` は共役で閉じる) とその部品。
 - `conj_smul_self_of_mem` — 部分群はその元による共役で不変。
 - `exists_normal_lt_top_of_mem_lattice` — **Problem 1G.2**。
+- `eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card` — **Problem 1G.3**。
 -/
 
 namespace OddOrder.Isaacs.Ch01
@@ -284,5 +285,43 @@ theorem exists_normal_lt_top_of_mem_lattice {H : Subgroup G}
     _ = K := conj_smul_self_of_mem (K.inv_mem hk)
 
 end -- Problem 1G.2
+
+section /- 1G: Problem 1G.3 (p. 43) -/
+
+variable {G : Type*} [Group G] [Finite G]
+
+/-- **Isaacs Problem 1G.3** (p. 43)。`G` が単純で `|H|·|C_G(H)| = |G|` なら
+`H = 1` または `H = G`。
+
+* `G` が可換なら全ての部分群が正規なので単純性から直ちに従う。
+* `G` が非可換なら, **Cor 1.46**
+  (`not_isSimpleGroup_and_nonabelian_of_chermakDelgadoMeasure_gt`) より
+  どの部分群も測度が `|G|` を超えられないので `m_G(H) = |G|` は最大値, つまり
+  `H ∈ L(G)`。**1G.2** より `H` が真の部分群なら真の正規部分群に含まれるが,
+  単純性からそれは `⊥` しかない。 -/
+theorem eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card [IsSimpleGroup G] {H : Subgroup G}
+    (h : H.chermakDelgadoMeasure = Nat.card G) : H = ⊥ ∨ H = ⊤ := by
+  by_cases hab : IsMulCommutative G
+  · -- 可換なら全部分群が正規
+    haveI : H.Normal := ⟨fun n hn g => by
+      rw [show g * n * g⁻¹ = n from by
+        rw [isMulCommutative_iff.mp hab g n]; group]
+      exact hn⟩
+    exact IsSimpleGroup.eq_bot_or_eq_top_of_normal H inferInstance
+  · -- 非可換なら `H ∈ L(G)`
+    have hHL : H ∈ chermakDelgadoLattice G := by
+      intro K
+      rw [h]
+      by_contra hgt
+      push Not at hgt
+      exact not_isSimpleGroup_and_nonabelian_of_chermakDelgadoMeasure_gt hgt ⟨inferInstance, hab⟩
+    rcases eq_or_lt_of_le (le_top : H ≤ ⊤) with htop | hlt
+    · exact Or.inr htop
+    · obtain ⟨M, hMnorm, hHM, hMlt⟩ := exists_normal_lt_top_of_mem_lattice hHL hlt
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal M hMnorm with hM | hM
+      · exact Or.inl (le_bot_iff.mp (hM ▸ hHM))
+      · exact absurd hM hMlt.ne
+
+end -- Problem 1G.3
 
 end OddOrder.Isaacs.Ch01
