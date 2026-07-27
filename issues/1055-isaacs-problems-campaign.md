@@ -37,7 +37,7 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
       §8B は 8B.1–8B.10 完了 (8B.6 の `D₂ₚ` 同型のみ残) /
-      §8C は 8C.1–8C.3 完了, 8C.4–8C.6 未着手 / §8D 未着手
+      §8C は 8C.1–8C.4 完了, 8C.5 / 8C.6 未着手 / §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4856,3 +4856,29 @@ leaf 構成 = `Problems8C/{SimpleOrder120, PrimeDegree, MathieuEleven, MathieuTw
   初等可換 2-群): `Aut(Z₃) = Z₂` / `Aut(F₂^n) = GL(n,2)` (`n ≥ 3` で単純) の両方向。
   `PSL(n,2) = SL(n,2) = GL(n,2)` の単純性は repo の `Ch08/PSLSimple.lean` にある
   (`q = 2` で中心自明) はずなので, 着手前に実測で確認すること。
+
+
+## 8C.4 完了 (2026-07-27)
+
+leaf 追加: `Problems8C/SimpleStabilizer.lean` (67 行, 8C.3/8C.4 共通) と
+`Problems8C/HigmanSims.lean` (222 行)。
+
+* `stabilizer_eq_bot_of_normal_of_isSimpleGroup_stabilizer` /
+  `card_eq_card_of_stabilizer_eq_bot` — 点安定化群が単純な推移作用では推移的な真の
+  正規部分群は regular。8C.3 の同じ議論をこの補題呼び出しに置換済 (重複解消)。
+* `isPreprimitive_of_orbits_eq` — 原始性 (block の濃度が `1, 23, 78, 100` に限られ,
+  `∣ 100` が 23/78 を排除)。
+* `isSimpleGroup_of_orbits_eq` — 単純性 (regular な `N` の Sylow 5 は `n₅ = 1` ゆえ
+  特性的 ⟹ `G` の位数 25 の正規部分群 ⟹ 推移的でなければならず `100 ∤ 25`)。
+* 付随: `card_sylow_eq_pow_of_not_dvd_succ` (`p^k` 版) /
+  `card_normalizer_sylow_eleven_eq_55` (8C.2 のヒントを `PrimeDegree.lean` に切り出し)。
+
+### ⚠ 並行セッションの重複 (2026-07-27, 要調整)
+
+本 issue (§8C) を **lane a セッションと別セッションが同時に駆動していた**形跡がある:
+`main` 側に `b2bc01b00` (21:17, `PrimeDegree.lean`) / `164cc8f17` (21:42,
+`HigmanSims.lean` 222 行 + `SimpleStabilizer.lean` 67 行) / `d343b78b7` (21:42, docs)
+が lane a の commit (`37ae5751e` / `45513ea9e` / `e8893f507` / `753ec12dd` /
+`7f0b2f497`) とほぼ同内容・同時刻で並んでいる。**現状は build green・axiom-clean・
+宣言の重複なし** (`git merge main` で綺麗に合流) だが, 同じ問題を 2 セッションで
+解くのは無駄なので, 続き (8C.5 / 8C.6) に入る前に担当を一本化すること。
