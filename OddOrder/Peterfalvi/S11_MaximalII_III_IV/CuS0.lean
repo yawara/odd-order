@@ -590,8 +590,13 @@ theorem inertia_eq_hcInHu_caseA [Finite G] {M : Subgroup G} (data : TypesIIIIIIV
 `H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
 field-model divisibilities of `CliffordCaseBData` hold: with `chars.u = |Ū|` (pinned in
 `Section11CharacterData.u_eq_card_quotient`), `Coprime |Ū| (p-1)` and `|Ū| ∣ (p^q-1)/(p-1)` are the
-unconditional `chiefFactor_caseB_image_coprime` / `chiefFactor_caseB_image_dvd_norm`. -/
-noncomputable def clifford_caseB_data [Finite G] {M : Subgroup G}
+unconditional `chiefFactor_caseB_image_coprime` / `chiefFactor_caseB_image_dvd_norm`.
+
+⚠ A `theorem`, not a `def`: since the vestigial free `field_model : Prop` field was removed
+(2026-07-27) every field of `CliffordCaseBData` is propositional, so the structure itself lives
+in `Prop` — which is the honest reading, the case-(b) *data* (the `GF(p^q)` model) being
+`S11_GaloisFieldModel.caseB_exists_galoisField_repr_withAut`. -/
+theorem clifford_caseB_data [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief)
     (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
@@ -599,8 +604,6 @@ noncomputable def clifford_caseB_data [Finite G] {M : Subgroup G}
           chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
           chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤) :
     CliffordCaseBData chars where
-  field_model := True
-  field_model_holds := trivial
   Ubar_cyclic := (chiefFactor_caseB_image_cyclic chief hcaseB).1
   u_coprime_p_sub_one := by
     rw [chars.u_eq_card_quotient]; exact chiefFactor_caseB_image_coprime chief hcaseB

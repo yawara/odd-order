@@ -739,8 +739,6 @@ Frobenius action `H̄ ⋊ Ū` by `chiefFactor_caseB_action_fpf` (the structural 
 `u_coprime_p_sub_one`/`u_dvd_norm_quotient` carried here. -/
 structure CliffordCaseBData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} (chars : Section11CharacterData data chief) where
-  field_model : Prop
-  field_model_holds : field_model
   /-- **`Ū` is cyclic** (Singer, non-opaque): the image of the `U`-action on the chief factor `H̄`
   — Peterfalvi's `Ū = U/C_U(H̄)` — is cyclic, as `Ū` embeds in the multiplicative group of the
   field `End_{𝔽ₚ[U]}(H̄)` on which it acts irreducibly (`chiefFactor_caseB_image_cyclic`). -/
