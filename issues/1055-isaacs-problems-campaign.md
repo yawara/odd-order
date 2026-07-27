@@ -3705,3 +3705,20 @@ API メモ: `Sylow.is_maximal'` / `Subgroup.map_subgroupOf_eq_of_le` /
   **`∀ g : SL23, g * (-I) = (-I) * g` を `decide` で判定**できる) で `|Z| = 2`、
   ⟹ `natCard_quotient_centerZ : |SL(2,3)/Z| = 12`。
   ⚠ `Subgroup.mem_center_iff.mp h g : g * a = a * g` (= `Commute g a`; `.symm` 不要)。
+
+### 🎉 7A.2 完成 (2026-07-27) — `exists_normal_card_eight_sl23` (axiom-clean)
+
+`Problems7A2.lean` (274 行):
+* `card_sylow_three_quotient : Nat.card (Sylow 3 (SL(2,3)/Z)) = 4`。
+  `n_3 ∣ 4` (`Sylow.card_dvd_index`) + `n_3 ≡ 1 mod 3` (`card_sylow_modEq_one`) で
+  `n_3 ∈ {1,4}` (`interval_cases` + `decide` で 2, 3 を排除)。`n_3 = 1` の排除は
+  `Subsingleton (Sylow 3 Q)` から `⟨ā⟩ = P1 = P2 = ⟨b̄⟩` (位数 3 = Sylow の位数なので
+  `Subgroup.eq_of_le_of_card_ge`) ⟹ `b̄ ∈ ⟨ā⟩` ⟹ `(a^i)⁻¹ b ∈ Z` の 3×2 = 6 通りが
+  すべて `decide` で偽。
+* `exists_normal_card_eight_sl23`: 位数 12 補題 (Ch01, public 化済) の正規 Sylow 2 を
+  `QuotientGroup.mk'` で引き戻し、`Subgroup.index_comap` で指数 3 を保つので
+  `|N| = 24/3 = 8`。
+* `mem_centerZ_iff : x ∈ Z ↔ x = 1 ∨ x = -I` (zpowers の `m % 2` 展開) が 6 ケース化の鍵。
+  ⚠ `QuotientGroup.eq_one_iff` は**元を明示引数に取る** (`(QuotientGroup.eq_one_iff x).mp`)。
+
+⟹ §7A は 2/6 完了 (7A.1, 7A.2)。次は 7A.3 (`GL(n,q)` の `N_G(P) = DP`)。
