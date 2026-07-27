@@ -5266,9 +5266,38 @@ leaf = `Ch01_Sylow/ProblemsNonSimple.lean` (`OddOrder.lean` 配線済)。
   (iii) `f (x⁻¹ * g * x⁻¹⁻¹)` を `group` で潰そうとすると `f` の中の `⁻¹` が残る —
   `inv_inv` で先に `x⁻¹ * g * x` に直してから `map_mul`/`map_inv` を当てる。
 
-* 次の frontier = **1E.6** (位数 `180 = 2²·3²·5`)、以降 1E.7 (`240 = 2⁴·3·5`) /
-  1E.8 (`252 = 2²·3²·7`)。1E.3/1E.4 と同じ道具立て (Thm 1.16 の交わり最大対 + Cor 1.3 +
-  必要なら A_n 埋め込み) で書けるはず。
+* ✅ **1E.6 の前提インフラ** (2026-07-28) — 2 本とも landing 済:
+  - `two_mul_card_ne_card_alternating_of_simple` — 単純群 `G` (`2 < |G|`) が指数 `n ≥ 5` の
+    部分群をもつとき `2·|G| ≠ |Aₙ|`。半分なら像が `Aₙ` の**指数 2** の部分群 = 正規で、
+    `alternatingGroup.isSimpleGroup` (`Mathlib/.../Alternating/Simple.lean`, 要 import) に反する。
+  - `exists_finset_of_sylow_inter_trivial` — 相異なる Sylow `q` が自明交叉なら、その非単位元
+    全体は `n_q·(|P| − 1)` 個の Finset をなし、各元の位数は `|P|` を割る。他素数の元の個数
+    (`exists_finset_orderOf_eq_card_sylow_mul`) と足して `|G|` を超えさせる用。
+
+### 1E.6 (位数 `180 = 2²·3²·5`) の設計 — 実装待ち
+
+`n₅ ∣ 36`, `≡ 1 (mod 5)` ⟹ `n₅ ∈ {1, 6, 36}`。単純性で `≠ 1`。
+
+* **`n₅ = 6`**: `N_G(P₅)` が指数 6。`|A₆| = 6!/2 = 360 = 2·180` なので
+  `two_mul_card_ne_card_alternating_of_simple` が直接効く。
+* **`n₅ = 36`**: 位数 5 の元が `36·4 = 144` 個
+  (`exists_finset_orderOf_eq_card_sylow_mul`)。Sylow 3 は位数 9・指数 20 で
+  `n₃ ∣ 20`, `≡1 (mod 3)` ⟹ `n₃ ∈ {1, 4, 10}`。`≠1`、`4` は指数 4 で `180 ∣ 4!` が偽。
+  `n₃ = 10` では Thm 1.16 が `10 ≡ 1 (mod |S:D|)` ⟹ `|S:D| ∣ 9` かつ `∣ 9`, `≠1` ⟹
+  `|S:D| ∈ {3, 9}` の 2 枝:
+  - `|S:D| = 9` (⟹ `D = ⊥`, 最大性より**全対**が自明交叉):
+    `exists_finset_of_sylow_inter_trivial` で 3-冪位数の非単位元が `10·8 = 80` 個。
+    位数 5 の 144 個と交わらず (位数が 9 を割る vs 5)、`80 + 144 + 1 = 225 > 180` で矛盾。
+  - `|S:D| = 3` (⟹ `|D| = 3`): 1E.3/1E.4 と同じく `S, T ≤ N := N_G(D)` で
+    `9 ∣ |N| ∣ 180` ⟹ `|N| ∈ {9, 18, 36, 45, 90, 180}`。
+    9: `S = N = T` / 18: 位数 18 の Sylow 3 は一意 / 36: 指数 5 で `180 ∣ 5!` 偽 /
+    45: 位数 45 の Sylow 3 は一意 / 90: 指数 2 で `180 ∣ 2!` 偽 / 180: `D ⊴ G`。
+* 数値補題 `eq_of_dvd_thirtysix` (36 の約数で `≡1 mod 5` は `{1,6,36}`) と
+  `eq_of_dvd_twenty` (20 の約数で `≡1 mod 3` は `{1,4,10}`) を
+  `eq_one_or_eight_of_dvd_fortyeight` と同じ `interval_cases n <;> revert ... <;> decide`
+  の形で足す。
+
+* その後 1E.7 (`240 = 2⁴·3·5`) / 1E.8 (`252 = 2²·3²·7`) で §1E 完済。
 
 ### 1E.5 の筋 (実装済, 記録として保持)
   `n₇ ∣ 48`, `≡ 1 (mod 7)` ⟹ `n₇ ∈ {1, 8}`、単純性で `n₇ = 8` ⟹ `|N_G(P₇)| = 42`。

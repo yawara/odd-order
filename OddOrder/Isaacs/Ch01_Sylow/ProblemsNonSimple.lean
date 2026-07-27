@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.SpecificGroups.Alternating.Simple
 import Mathlib.Tactic.NormNum.Prime
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsAlternating
 
@@ -42,6 +43,10 @@ Sylow 部分群の位数・指数を `|G|` の分解から読むために
 - `exists_injective_hom_alternating_of_simple` — 単純群は指数 `n` の部分群があれば
   `Aₙ` に単射に埋め込める (1E.5 の Hint が要求する道具)。
 - `not_isSimpleGroup_of_card_eq_threethreesix` — **Problem 1E.5**。
+- `two_mul_card_ne_card_alternating_of_simple` — 単純群の位数は `|Aₙ|` の半分になれない
+  (像が指数 2 で正規になり `Aₙ` の単純性に反する)。
+- `exists_finset_of_sylow_inter_trivial` — Sylow が自明交叉なら非単位元は
+  `n_q·(|P| − 1)` 個 (他の素数の計数と足して `|G|` を超えさせる用)。
 -/
 
 namespace OddOrder.Isaacs.Ch01
@@ -767,5 +772,78 @@ theorem not_isSimpleGroup_of_card_eq_threethreesix {G : Type*} [Group G] [Finite
   omega
 
 end -- Problem 1E.5
+
+section /- 1E: 追加の共通部品 (1E.6 以降) -/
+
+/-- 単純群 `G` (`2 < |G|`) が指数 `n` (`5 ≤ n`) の部分群をもつとき, `|G|` は `|Aₙ|` の
+ちょうど半分にはなれない。
+
+半分なら `G ↪ Aₙ` の像は指数 2 の部分群で正規になるが, `Aₙ` (`n ≥ 5`) は単純なので
+像は `⊥` か `⊤`, どちらも位数と矛盾する。 -/
+theorem two_mul_card_ne_card_alternating_of_simple {G : Type*} [Group G] [Finite G]
+    [IsSimpleGroup G] {H : Subgroup G} {n : ℕ} (hidx : H.index = n) (hn : 5 ≤ n)
+    (hG : 2 < Nat.card G) :
+    2 * Nat.card G ≠ Nat.card ↥(alternatingGroup (Fin n)) := by
+  intro heq
+  obtain ⟨f, hfinj⟩ :=
+    exists_injective_hom_alternating_of_simple hidx (by omega) hG
+  haveI : IsSimpleGroup ↥(alternatingGroup (Fin n)) :=
+    alternatingGroup.isSimpleGroup (by simpa using hn)
+  have hrange : Nat.card ↥f.range = Nat.card G := by
+    rw [MonoidHom.range_eq_map, Subgroup.card_map_of_injective hfinj, Subgroup.card_top]
+  have hmul := Subgroup.card_mul_index f.range
+  rw [hrange] at hmul
+  have hidx2 : f.range.index = 2 := by
+    have hpos : 0 < Nat.card G := by omega
+    have h2 : Nat.card G * f.range.index = Nat.card G * 2 := by rw [hmul, ← heq]; ring
+    exact Nat.eq_of_mul_eq_mul_left hpos h2
+  haveI : f.range.Normal := Subgroup.normal_of_index_eq_two hidx2
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal f.range inferInstance with h | h
+  · rw [h, Subgroup.card_bot] at hrange; omega
+  · rw [h, Subgroup.index_top] at hidx2; omega
+
+/-- 相異なる Sylow `q`-部分群が自明にしか交わらないなら, それらの非単位元全体は
+`n_q·(m − 1)` 個の Finset をなす (`m` は Sylow の位数; 各元の位数は `m` を割る)。
+
+他の素数の元の個数と足し合わせて `|G|` を超えさせる, という計数に使う。 -/
+theorem exists_finset_of_sylow_inter_trivial {G : Type*} [Group G] [Finite G] {q : ℕ}
+    [Fact q.Prime] (htriv : ∀ S T : Sylow q G, S ≠ T →
+      (S : Subgroup G) ⊓ (T : Subgroup G) = ⊥)
+    {m : ℕ} (hm : ∀ S : Sylow q G, Nat.card ↥(S : Subgroup G) = m) :
+    ∃ U : Finset G, U.card = Nat.card (Sylow q G) * (m - 1) ∧
+      ∀ x ∈ U, x ≠ 1 ∧ orderOf x ∣ m := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype (Sylow q G) := Fintype.ofFinite _
+  set A : Sylow q G → Finset G := fun S => ((S : Subgroup G) : Set G).toFinset.erase 1 with hA
+  have hcardA : ∀ S : Sylow q G, (A S).card = m - 1 := by
+    intro S
+    have h1 : ((S : Subgroup G) : Set G).toFinset.card = m := by
+      rw [Set.toFinset_card, ← Nat.card_eq_fintype_card, ← hm S]
+      rfl
+    rw [hA, Finset.card_erase_of_mem (Set.mem_toFinset.mpr (one_mem _)), h1]
+  have hdisj : ∀ S ∈ (Finset.univ : Finset (Sylow q G)), ∀ T ∈ (Finset.univ : Finset (Sylow q G)),
+      S ≠ T → Disjoint (A S) (A T) := by
+    intro S _ T _ hne
+    rw [Finset.disjoint_left]
+    intro x hxS hxT
+    have hx1 : x ≠ 1 := (Finset.mem_erase.mp hxS).1
+    have hmem : x ∈ (S : Subgroup G) ⊓ (T : Subgroup G) :=
+      ⟨Set.mem_toFinset.mp (Finset.mem_erase.mp hxS).2,
+        Set.mem_toFinset.mp (Finset.mem_erase.mp hxT).2⟩
+    rw [htriv S T hne, Subgroup.mem_bot] at hmem
+    exact hx1 hmem
+  refine ⟨Finset.univ.biUnion A, ?_, ?_⟩
+  · have hbi := Finset.card_biUnion hdisj
+    rwa [Finset.sum_congr rfl (fun S _ => hcardA S), Finset.sum_const, Finset.card_univ,
+      smul_eq_mul, ← Nat.card_eq_fintype_card] at hbi
+  · intro x hx
+    obtain ⟨S, -, hxS⟩ := Finset.mem_biUnion.mp hx
+    refine ⟨(Finset.mem_erase.mp hxS).1, ?_⟩
+    have hmem : x ∈ (S : Subgroup G) := Set.mem_toFinset.mp (Finset.mem_erase.mp hxS).2
+    rw [← hm S, ← Subgroup.orderOf_mk x hmem]
+    exact orderOf_dvd_natCard _
+
+end -- 追加の共通部品
 
 end OddOrder.Isaacs.Ch01
