@@ -55,18 +55,31 @@ Sibley 側の入口 `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
 で一般化した。同じことを `XAdjoinStepInput` / `xChainCoherent` /
 `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums` に対して行う。
 
-- [ ] **step 1**: `XAdjoinStepInput` / `xChainCoherent` / `xAdjoinStepInput_of_pairUnion_*` の
-      `dade` / `dadeIntegralCharacterMap` **実使用箇所を grep して数える**
-      ([[generalize-by-measuring-which-carrier-fields-are-used]])。0154 の実績では
-      「Dade を真に使う helper は実測で 4 つだけ」だった。
-- [ ] **step 2**: `_general` 版を新設 (抽象 τ + `hisom` + `htauZ`、必要なら
-      `htau1` = 値域 `ℤ[Irr G, G^#]`)。Dade 版は特殊化に置換 (0154 の型どおり)。
-      ⚠ 本 tick で `InducedFamilyImageData` に **`tau_apply_one`** を追加済 — (5.3.a) を
-      使う場面ではこの節が要る (無いと `τ(χ−χ̄) = μ + ν` を排除できない)。
-- [ ] **step 3**: base coherence (3) の一般版 (`coherentEqualDegree` 自体は既に τ-general の
-      はず。要実測)。
-- [ ] **step 4**: 一般 `K` の `xSet_isCoherent_of_irreducible_X` を組み上げ、Sibley 版を
-      その特殊化に置換。
+- [x] **step 1 — 実測 (2026-07-27 完了)**: `dade` はほぼ**型シグネチャ**にしか現れなかった。
+      chain レベルで真に Dade を使うものは**ゼロ**:
+      `exists_conjugatePairCover` は抽象群の**集合**についての補題で τ が出てこず、
+      accumulator fold `S07.coherentOfPairChainCover` は**元から任意の τ**で述べられている。
+      Sibley の `xChainCoherent` はそれを Dade に pin しただけの包装だった。
+- [x] **step 2 — chain fold の τ 一般化 (2026-07-27 完了)**:
+      `xSet_isCoherent_of_adjoinSteps` (`S08_SixSixGeneral`)。一般 `K`・任意の τ で、
+      base coherence と per-step adjoining を与えれば `𝒳` の coherence が出る。axiom-clean。
+- [x] **step 3 — base coherence (2026-07-27 完了)**: `xBaseBlock_isCoherent`。
+      書籍の「By (1.1) and (1.4), `{χ₁,…,χₖ}` is coherent」は一般 `K` では
+      **(5.7) `S07.coherent_of_constant_degree` を部分族 `𝒮₀` に当てるだけ**だった
+      (`𝒮₀` は構成上の等次数族、Hypothesis (5.2) は `hypothesisOfSubfamily`)。
+      Sibley 版は orthonormal 像族を Dade から組んでいた (`coherentEqualDegree_fromDade`) が、
+      (5.7) 経由なら τ-general のまま。axiom-clean。
+- [ ] **step 4 — per-step adjoining の組み立て (残り)**: `xSet_isCoherent_of_adjoinSteps` の
+      `hstep` を実際に供給する。Sibley 側の対応物は
+      `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`
+      (`S08_CoherenceCorePart2/SibleyBounds.lean`) で、書籍 p.32 の次数簿記
+      (共通指数 `p`-冪次数・[Is] Cor 2.30 の中心界・次数平方和 `total` の可除性) を
+      `xAdjoinStepW_general` の仮説へ流し込む部分。
+      **engine 自体は 0154 の `S07.xAdjoinStepW_general` がそのまま使える**
+      (可約 member 対応、破断対の (5.2.d) image family `Rχ` を引数に取る)。
+      本 leaf に既に在る材料: `exists_index_primePow_degree_of_mem_inducedKernelFamily` /
+      `exists_source_primePow_centralBound_of_mem_xSet` / `sum_re_sq_xSet_eq` /
+      `natDegree_le_of_xBaseBlock_anchor` / `exists_xBaseBlock_anchor_index`。
 
 ## 完了条件
 
