@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
 import OddOrder.Peterfalvi.S07_PivotCoherence
 import OddOrder.Peterfalvi.S11_NineElevenBridgeBase
 import OddOrder.Peterfalvi.S10_SubcoherentTypeP
@@ -148,35 +149,6 @@ theorem sOf_columnSum_of_not_irreducible [Finite G] {M : Subgroup G} {A : Set G}
     (induceHU_eq_induce data (χ : ClassFunction ↥(huSub data) ℂ)).trans (hind.symm.trans heq)⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **The certain-type `R`-family transported to a member equal to its column.**  For `η = μ_{χ₂}`
-with `χ₂ ≠ 1`, this is `S06.certainTypeR` restated at `η`.
-
-Only the `image_eq` field mentions the member, so `imageSet`/`mem_ZIrr`/`orthonormal` are reused
-verbatim and `.imageSet` is *definitionally* `certainTypeR`'s — the form the (5.2.e)
-cross-orthogonality lemmas consume.  Keeping `χ₂` and `hηeq` as parameters (rather than choosing
-them inside) is what makes the `η`-rewrite in `image_eq` type-correct: were `χ₂` obtained by
-`Classical.choose` from an existential over `η`, the `imageSet` in the motive would itself depend on
-`η`. -/
-noncomputable def columnRFamily {M : Subgroup G} {A : Set G} [Finite G]
-    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 A M)
-    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
-    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
-    {η : ClassFunction ↥M ℂ} (hηeq : η = OddOrder.Peterfalvi.S06.columnSum h46 χ₂) :
-    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily
-      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau) η where
-  imageSet := (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂
-    (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).imageSet
-  mem_ZIrr := (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂
-    (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).mem_ZIrr
-  orthonormal := (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂
-    (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).orthonormal
-  image_eq := by
-    rw [hηeq]
-    exact (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂
-      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm).image_eq
-
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Per-member orthonormal `R`-family over `𝒮(Y)`, at §9 level** — the raw (5.2.d) datum feeding
 the norm-general (5.7) engine `S07.uniform_degree_coherence_of_families` in case (9.7.b) of (9.11).
 
@@ -240,7 +212,8 @@ noncomputable def sOf_memberRFamily [Finite G] {M : Subgroup G} {A : Set G}
           exact (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
             h46.dade0 ⟨η, hirr⟩ hreal hdiffsupp).image_eq }
   · -- reducible member: (9.9.b) gives the column `χ₂ ≠ 1`, and `certainTypeR` its `2q`-family
-    exact columnRFamily h46 (sOf_columnSum_of_not_irreducible data h46 hKeq hη hirr).choose_spec.1
+    exact OddOrder.Peterfalvi.S06.columnR h46
+      (sOf_columnSum_of_not_irreducible data h46 hKeq hη hirr).choose_spec.1
       (sOf_columnSum_of_not_irreducible data h46 hKeq hη hirr).choose_spec.2
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in

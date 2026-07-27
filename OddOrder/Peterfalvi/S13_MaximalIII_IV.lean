@@ -473,25 +473,8 @@ noncomputable def caseB_sOf_memberRFamily [Finite G]
     have hk0 : k ≠ 0 := hex.choose_spec.1
     have hkeq : η = OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
         (hyp.base.muColumnChar hG hG.odd k) := hex.choose_spec.2
-    exact
-      { imageSet := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar hG hG.odd k)).symm).imageSet
-        mem_ZIrr := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar hG hG.odd k)).symm).mem_ZIrr
-        orthonormal := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar hG hG.odd k)).symm).orthonormal
-        image_eq := by
-          rw [hkeq]
-          exact (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-            (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-              (hyp.base.muColumnChar hG hG.odd k)).symm).image_eq }
+    exact OddOrder.Peterfalvi.S06.columnR (hyp.base.toHypothesis46 hG hG.odd)
+      (hyp.base.muColumnChar_ne_one hG hG.odd hk0) hkeq
 
 /-- **`caseB_sOf_memberRFamily` reduction, irreducible case**: for an irreducible member `η`, the
 dispatched `R`-family *is* `dadeOrthonormalCharacterImageFamilyOfDiff` (imageSet form).  The
@@ -554,6 +537,7 @@ theorem caseB_sOf_memberRFamily_imageSet_of_col [Finite G]
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold caseB_sOf_memberRFamily
   rw [dif_neg hcol]
+  rfl
 
 set_option maxHeartbeats 1600000 in
 -- the `dadeData.dade`-support defeq (`supportInSubgroup A L =?= typePA0`) is feasible but

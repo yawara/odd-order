@@ -12109,7 +12109,6 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 -- **`certainTypeR` restated at a member equal to its column** — the reducible half of the §9
 -- `R`-family dispatch.  `χ₂` stays a parameter so that the `η`-rewrite in `image_eq` is
 -- type-correct; `.imageSet` is definitionally `certainTypeR`'s, as (5.2.e) needs.
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.columnRFamily
 -- **Per-member `R`-family over `𝒮(Y)` at §9 level** (the (5.2.d) datum of the (9.11) caseB engine).
 -- The §9 replacement for `S13.caseB_sOf_memberRFamily`: same two branches (signed Dade family /
 -- certain-type column family), but the column comes from (9.9.b) in its §6 form instead of a §10

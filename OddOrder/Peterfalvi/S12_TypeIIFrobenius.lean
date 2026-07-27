@@ -656,25 +656,8 @@ noncomputable def typeII_T2_memberRFamily [Finite G]
     have hχ₂ne : χ₂ ≠ 1 := hex.choose_spec.1
     have hkeq : η = OddOrder.Peterfalvi.S06.columnSum
         (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂ := hex.choose_spec.2
-    exact
-      { imageSet := (OddOrder.Peterfalvi.S06.certainTypeR
-          (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
-            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂).symm).imageSet
-        mem_ZIrr := (OddOrder.Peterfalvi.S06.certainTypeR
-          (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
-            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂).symm).mem_ZIrr
-        orthonormal := (OddOrder.Peterfalvi.S06.certainTypeR
-          (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
-            (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂).symm).orthonormal
-        image_eq := by
-          rw [hkeq]
-          exact (OddOrder.Peterfalvi.S06.certainTypeR
-            (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne
-            (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one
-              (typeIIHypothesis46 hG hSmax hSII data.typeP) χ₂).symm).image_eq }
+    exact OddOrder.Peterfalvi.S06.columnR
+      (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne hkeq
 
 open scoped Classical FiniteInduce in
 /-- **`typeII_T2_memberRFamily` reduction, irreducible case**: for an irreducible `T2`-member
@@ -757,6 +740,7 @@ theorem typeII_T2_memberRFamily_imageSet_of_col [Finite G]
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold typeII_T2_memberRFamily
   rw [dif_neg hcol]
+  rfl
 
 set_option maxHeartbeats 1600000 in
 -- the `2×2` dichotomy case split repeatedly matches the reduced dispatched families against

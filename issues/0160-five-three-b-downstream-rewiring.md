@@ -106,3 +106,43 @@ proof-irrelevance により自明)。
 ⚠ 組み立ては `S13_SixTwoImageData` (memberRFamily の在処) と `S13_Orthogonality` (上の 3 本) の
 両方が見える新 leaf に置くこと — 現状 `S13_SixTwoImageData` は `S13_Orthogonality` を import
 していない。
+
+## ⚠ (3) 副産物: `columnR` の重複を 5 箇所発見・統合 (2026-07-27)
+
+(2) の組み立て先を探していて、**より実利のある重複**に当たった。
+
+### 私が重複を作っていた
+
+`S11.columnRFamily` (`S11_NineElevenRFamily.lean`) は、issue 0159 で新設した
+`S06.columnR` と**完全に同じ def** だった (docstring の論法まで同じ)。
+着手前に検索していれば作らずに済んだ — CLAUDE.md の
+**claim-before-build「既存を再構築しない」を守れていなかった**。
+
+### さらに同じブロックが手書きで 5 箇所に散在していた
+
+「`certainTypeR` を `hkeq : η = columnSum h χ₂` に沿って member へ移送する」20 行前後の
+record リテラルが:
+
+| 場所 | 関数 |
+|---|---|
+| `S11_NineElevenRFamily` | `columnRFamily` (= `columnR` と同一 def) |
+| `S11_NineElevenAlphaBound` ×2 | `sOf_H0Cprime_memberRFamily` / `SOf_memberRFamily` |
+| `S13_MaximalIII_IV` | `caseB_sOf_memberRFamily` |
+| `S12_TypeIIFrobenius` | `typeII_T2_memberRFamily` |
+
+⟹ **全て `S06.columnR` の呼び出し 1 行に統合** (重複 def は削除し唯一の消費点を再配線、
+AxiomsCheck の `S11.columnRFamily` 項目も除去)。**net −107/+16 行**、真理の所在が 1 箇所に。
+
+⚠ 下流の `imageSet` 簡約補題 4 本が `rw [dif_neg hcol]` の **syntactic rfl** に依存していたので、
+`rfl` を 1 行足して追従させた (`columnR` は def なので projection の簡約に delta 展開が要る)。
+
+### 残した例外
+
+`S08.columnRFamilyTau` (`S08_CaseBCoherence2.lean:307`) は**重複ではない** — Sibley の
+`hyp.tau` へ `hmapagree` 経由で retarget する別物で、`dadeIntegralCharacterMap h46.dade0 h46.tau`
+の上に住む `columnR` とは τ が違う。据え置き。
+
+### 教訓
+
+**新しい def を書く前に、その形の既存を必ず grep する。** 特に「既存の構成を別の対象へ移送する」
+型の薄い def は、同じものが別レイヤに既にある確率が高い。

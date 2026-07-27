@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
 import OddOrder.Peterfalvi.S11_NineElevenCaseA
 
 /-!
@@ -128,25 +129,8 @@ noncomputable def sOf_H0Cprime_memberRFamily
     have hk0 : k ≠ 0 := hex.choose_spec.1
     have hkeq : η = OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
         (hyp.base.muColumnChar hG hG.odd k) := hex.choose_spec.2
-    exact
-      { imageSet := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar hG hG.odd k)).symm).imageSet
-        mem_ZIrr := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar hG hG.odd k)).symm).mem_ZIrr
-        orthonormal := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar hG hG.odd k)).symm).orthonormal
-        image_eq := by
-          rw [hkeq]
-          exact (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-            (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-              (hyp.base.muColumnChar hG hG.odd k)).symm).image_eq }
+    exact OddOrder.Peterfalvi.S06.columnR (hyp.base.toHypothesis46 hG hG.odd)
+      (hyp.base.muColumnChar_ne_one hG hG.odd hk0) hkeq
 
 /-- **`sOf_H0Cprime_memberRFamily` reduction, irreducible case** (mirror of
 `caseB_sOf_memberRFamily_imageSet_of_irr`). -/
@@ -197,6 +181,7 @@ theorem sOf_H0Cprime_memberRFamily_imageSet_of_col
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold sOf_H0Cprime_memberRFamily
   rw [dif_neg hcol]
+  rfl
 
 set_option maxHeartbeats 1600000 in
 -- the `2×2` dichotomy case split repeatedly matches the reduced dispatched families against the
@@ -368,25 +353,8 @@ noncomputable def SOf_memberRFamily
     have hk0 : k ≠ 0 := hex.choose_spec.1
     have hkeq : η = OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
         (hyp.base.muColumnChar hG hG.odd k) := hex.choose_spec.2
-    exact
-      { imageSet := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar hG hG.odd k)).symm).imageSet
-        mem_ZIrr := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar hG hG.odd k)).symm).mem_ZIrr
-        orthonormal := (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-          (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-          (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar hG hG.odd k)).symm).orthonormal
-        image_eq := by
-          rw [hkeq]
-          exact (OddOrder.Peterfalvi.S06.certainTypeR (hyp.base.toHypothesis46 hG hG.odd)
-            (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
-            (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
-              (hyp.base.muColumnChar hG hG.odd k)).symm).image_eq }
+    exact OddOrder.Peterfalvi.S06.columnR (hyp.base.toHypothesis46 hG hG.odd)
+      (hyp.base.muColumnChar_ne_one hG hG.odd hk0) hkeq
 
 /-- **`SOf_memberRFamily` reduction, irreducible case**. -/
 theorem SOf_memberRFamily_imageSet_of_irr
@@ -433,6 +401,7 @@ theorem SOf_memberRFamily_imageSet_of_col
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold SOf_memberRFamily
   rw [dif_neg hcol]
+  rfl
 
 set_option maxHeartbeats 1600000 in
 -- the `2×2` dichotomy case split repeatedly matches the reduced dispatched families against the
