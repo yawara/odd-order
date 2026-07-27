@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.GroupAction.Blocks
 import Mathlib.GroupTheory.GroupAction.Primitive
 import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 
 /-!
@@ -26,6 +27,9 @@ Isaacs の定義 (「`Δ` の translate は `Δ` 自身か, `Δ` と交わらな
   `regular_centralizer_mulEquiv_of_two_isMinimalNormal` — **Problem 8B.3**: 原始置換群の
   相異なる 2 つの極小正規部分群 `M`, `N` は regular で, `C_G(M) = N`, `C_G(N) = M`,
   `M ≅ N`。
+- `bijective_smulBase_of_normal_of_comm`,
+  `prime_pow_card_and_unique_isMinimalNormal_of_solvable` — **Problem 8B.4**: 可解原始
+  置換群の次数は素数冪で, 極小正規部分群はただ一つ。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -226,6 +230,52 @@ theorem regular_centralizer_mulEquiv_of_two_isMinimalNormal [FaithfulSMul G Ω]
     centralizer_eq_of_regular_of_inf_eq_bot hMreg hNreg hinf,
     centralizer_eq_of_regular_of_inf_eq_bot hNreg hMreg hinf',
     (mulEquiv_and_center_eq_bot_of_regular_normal hMreg hNreg hinf).1⟩
+
+/-! ### Problem 8B.4 — 可解原始群の次数は素数冪, 極小正規部分群は一意 -/
+
+/-- 推移的な**可換**正規部分群は regular: `N ≤ C_G(N)` と 8A.2 から半正則。 -/
+lemma bijective_smulBase_of_normal_of_comm [FaithfulSMul G Ω] {N : Subgroup G} [N.Normal]
+    [IsPretransitive ↥N Ω] (hcomm : ∀ x ∈ N, ∀ y ∈ N, x * y = y * x) (α : Ω) :
+    Function.Bijective (smulBase N α) := by
+  refine (bijective_smulBase_iff N α).mpr ⟨inferInstance, le_antisymm ?_ bot_le⟩
+  calc N ⊓ stabilizer G α ≤ Subgroup.centralizer (N : Set G) ⊓ stabilizer G α :=
+        inf_le_inf_right _ fun x hx =>
+          Subgroup.mem_centralizer_iff.mpr fun y hy => hcomm y hy x hx
+    _ = ⊥ := centralizer_inf_stabilizer_eq_bot (H := N) α
+
+/-- **Isaacs Problem 8B.4** (p. 248) 🎉: **可解**な原始置換群 `G` について,
+次数 `|Ω|` は**素数冪**であり, `G` の極小正規部分群は**ただ一つ**。
+
+極小正規部分群 `N` は (可解性より) elementary abelian で, 原始性より推移的。可換なので
+`N ≤ C_G(N)` となり 8A.2 から半正則, したがって **regular** で `|Ω| = |N| = p^n`。
+一意性: もう一つ極小正規 `M ≠ N` があると 8B.3 より `C_G(N) = M` だが, `N` は可換なので
+`N ≤ C_G(N) = M`, 一方 `M ⊓ N = ⊥` だから `N = ⊥` となり極小性に反する。 -/
+theorem prime_pow_card_and_unique_isMinimalNormal_of_solvable [Finite G] [FaithfulSMul G Ω]
+    [IsPreprimitive G Ω] [IsSolvable G] [Nontrivial G] :
+    (∃ p n : ℕ, p.Prime ∧ Nat.card Ω = p ^ n) ∧
+      ∃! N : Subgroup G, Ch02.IsMinimalNormal N := by
+  obtain ⟨N, hN, -⟩ := Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
+  haveI : N.Normal := hN.1
+  haveI : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_isPreprimitive N hN.2.1
+  have habel := Ch03.solvable_minimal_normal_isAbelian hN
+  obtain ⟨p, hp, helem⟩ := Ch03.solvable_minimal_normal_isElementaryAbelian hN
+  haveI : Nonempty Ω := by
+    by_contra hc
+    rw [not_nonempty_iff] at hc
+    obtain ⟨g, hg⟩ := exists_ne (1 : G)
+    exact hg (FaithfulSMul.eq_of_smul_eq_smul (α := Ω) fun β => isEmptyElim β)
+  obtain ⟨α⟩ := ‹Nonempty Ω›
+  have hcard : Nat.card Ω = Nat.card ↥N :=
+    (Nat.card_eq_of_bijective _ (bijective_smulBase_of_normal_of_comm habel α)).symm
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, hn⟩ := helem.isPGroup.exists_card_eq
+  refine ⟨⟨p, n, hp, by rw [hcard, hn]⟩, N, hN, fun M hM => ?_⟩
+  by_contra hMN
+  obtain ⟨-, -, -, hcN, -⟩ := regular_centralizer_mulEquiv_of_two_isMinimalNormal hM hN hMN α
+  have hNle : N ≤ Subgroup.centralizer (N : Set G) := fun x hx =>
+    Subgroup.mem_centralizer_iff.mpr fun y hy => habel y hy x hx
+  have hinf : M ⊓ N = ⊥ := inf_eq_bot_of_isMinimalNormal_of_ne hM hN hMN
+  exact hN.2.1 (le_bot_iff.mp (hinf ▸ le_inf (hcN ▸ hNle) le_rfl))
 
 end
 
