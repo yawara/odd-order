@@ -73,7 +73,7 @@ theorem orderOf_mul_eq_prime_of_pow_mem_odd_kernel
       _ = (g ^ p)⁻¹ * g ^ p := congrArg (· * g ^ p) hinv
       _ = 1 := inv_mul_cancel _
   have hpow : g ^ p = 1 :=
-    eq_one_of_sq_eq_one_of_odd_card hNodd hpowN hsq
+    OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card hNodd hpowN hsq
   letI : Fact p.Prime := ⟨hp⟩
   exact orderOf_eq_prime hpow hne
 

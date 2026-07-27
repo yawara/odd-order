@@ -140,7 +140,7 @@ lemma orderThreeGeneratedSubgroup_ne_top
   have hv2 : v ^ 2 = 1 := by
     rw [pow_two]
     exact (congrArg (fun z : G => z * v) hvInvEq).trans (inv_mul_cancel v)
-  exact hv1 (eq_one_of_sq_eq_one_of_odd_card hyp.D_odd
+  exact hv1 (OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card hyp.D_odd
     (hyp.V_le_D hvV) hv2)
 
 

@@ -106,7 +106,7 @@ theorem quotientTwoRankGeTwo_of_odd_kernel [Finite A]
     have hsq : ((a : A) * (b : A)⁻¹) ^ 2 = 1 :=
       hEsq _ hE
     have hone : (a : A) * (b : A)⁻¹ = 1 :=
-      eq_one_of_sq_eq_one_of_odd_card hNodd hN hsq
+      OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card hNodd hN hsq
     exact Subtype.ext (mul_inv_eq_one.mp hone)
   have hf_surj : Function.Surjective f := by
     intro y

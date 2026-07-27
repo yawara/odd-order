@@ -325,7 +325,8 @@ lemma tau_mk_eq_iff_mem_V (d : ↥hyp.D) :
       nth_rewrite 1 [hw2]
       exact sq_inverted_eq_one hyp.t_mul_t
     have hw1 : w = 1 :=
-      eq_one_of_sq_eq_one_of_odd_card hyp.D_odd (hyp.V_le_D (hyp.W_le_V hwW)) hsq
+      OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card hyp.D_odd
+        (hyp.V_le_D (hyp.W_le_V hwW)) hsq
     -- `w = 1 ⟹ t d t = d ⟹ d ∈ V`.
     have hwe : hyp.t * (d : G)⁻¹ * hyp.t * (d : G) = 1 := hwcoe ▸ hw1
     have htdt : hyp.t * (d : G) * hyp.t = (d : G) := by
@@ -493,7 +494,7 @@ lemma inverted_mem_fitting {x : hyp.Dbar} (hx : hyp.tau x = x⁻¹) :
       rw [inv_mul_cancel]
     have hoddTop : Odd (Nat.card ↥(⊤ : Subgroup Q)) := by simpa using hoddQ
     have hq1 : QuotientGroup.mk' F z = 1 :=
-      eq_one_of_sq_eq_one_of_odd_card hoddTop (Subgroup.mem_top _) hq2
+      OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card hoddTop (Subgroup.mem_top _) hq2
     have hzF : (z : hyp.Dbar) ∈ F :=
       (QuotientGroup.eq_one_iff (N := F) (z : hyp.Dbar)).mp hq1
     exact Subtype.ext (hyp.tau_fixed_fitting_eq_one hzF hzfix)
@@ -843,7 +844,7 @@ lemma K_inf_V_eq_bot : hyp.K ⊓ hyp.V = ⊥ := by
     nth_rewrite 2 [h2]
     exact mul_inv_cancel x
   rw [Subgroup.mem_bot]
-  exact eq_one_of_sq_eq_one_of_odd_card hyp.D_odd (hyp.K_le_D hxK) hsq
+  exact OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card hyp.D_odd (hyp.K_le_D hxK) hsq
 
 include hyp in
 /-- **`D = V·K`** (Ch. I §1, the Lemma (a) for `(D, t)`): every element of `D`

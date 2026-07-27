@@ -61,6 +61,7 @@ import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.GroupTheory.AbelianPowerSubgroups
 import OddOrder.GroupTheory.CardSupInf
 import OddOrder.GroupTheory.CyclicSylowBurnside
+import OddOrder.GroupTheory.OddOrderInvolution
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.PrimeComplementResidual
@@ -609,6 +610,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeen
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeenTransfer
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.TheoremB
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley

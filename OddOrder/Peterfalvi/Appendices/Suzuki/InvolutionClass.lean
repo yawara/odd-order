@@ -198,7 +198,7 @@ lemma bijOn_conj_of_involution_mem_Q {s : G} (hsQ : s ∈ hyp.Q)
       have hred : (u⁻¹)⁻¹ * (u⁻¹ * s * u) * u⁻¹ = s := by group
       rw [hred]
       exact hsH
-    exact hcne (eq_one_of_sq_eq_one_of_odd_card
+    exact hcne (OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card
       (hyp.odd_card_conj_inf huinvH) hKmem hcsq)
   have hsurj : Set.SurjOn (fun u => u⁻¹ * s * u)
       {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H}
@@ -311,7 +311,7 @@ lemma ncard_involutions_map_conj_eq_card_involutions_H :
       {u : G | u ^ 2 = 1 ∧ u ≠ 1 ∧ u ∉ hyp.H} := by
     rintro u ⟨hu2, hu1, huHt⟩
     refine ⟨hu2, hu1, fun huH => ?_⟩
-    exact hu1 (eq_one_of_sq_eq_one_of_odd_card
+    exact hu1 (OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card
       (hyp.odd_card_conj_inf hyp.t_not_mem_H)
       (Subgroup.mem_inf.mpr ⟨huHt, huH⟩) hu2)
   -- on `A`: `u ∈ T ↔ s^u ∈ B`
@@ -349,7 +349,7 @@ lemma ncard_involutions_map_conj_eq_card_involutions_H :
           ← Nat.card_congr (Subgroup.equivMapOfInjective _ _
             (MulEquiv.injective (MulAut.conj hyp.t))).toEquiv]
         exact hodd
-      exact hσ1 (eq_one_of_sq_eq_one_of_odd_card hoddconj
+      exact hσ1 (OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card hoddconj
         (Subgroup.mem_inf.mpr
           ⟨hyp.conj_mem_map_conj_of_sq_eq_one hsH hu2, hσHt⟩) hσ2)
   -- the permutation restricts to a bijection `T ≃ B`

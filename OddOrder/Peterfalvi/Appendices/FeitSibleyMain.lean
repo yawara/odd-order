@@ -28,7 +28,7 @@ branch, where the endgame (steps (3)–(8)) produces `𝒳 ∪ 𝒴` coherent
 * `feit_sibley_coherence`, the main theorem.
 
 The added hypotheses on `feit_sibley_coherence` beyond the `Hypothesis` block are
-`Odd (Nat.card G)` (Peterfalvi's global odd-order hypothesis (E)),
+`Odd (Nat.card Q₁)` (implicit in the book — Lemma 2(c) argues inside the odd-order group `Q₁D`),
 `Group.IsNilpotent Q₁` (the Frobenius-kernel factor is nilpotent) and
 `Nat.Coprime |Q| [G:Q]` (`Q` is a Hall subgroup of `G`); all three are genuine
 standing hypotheses of the Appendix IV configuration.
@@ -212,7 +212,7 @@ conjugates; restricting to `𝒳₁ ∪ 𝒴` (`isCoherent_subset`, `𝒳₁ = �
 adjoining the rest of `𝒮(S')` (`ssetOf_sder_coherent_of_xset_qder_union`) closes it. -/
 theorem ssetOf_sder_coherent_of_nonabelian
     (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
-    (hoddG : Odd (Nat.card G)) (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index)
+    (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index)
     (hnil : Group.IsNilpotent ↥hyp.Q1)
     {p : ℕ} (hp : p.Prime) (hQ1p : IsPGroup p ↥hyp.Q1) (hnonab : ⁅hyp.Q1, hyp.Q1⁆ ≠ ⊥) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsetOf hyp.Sder) hyp.A) := by
@@ -268,7 +268,7 @@ theorem ssetOf_sder_coherent_of_nonabelian
   have hzZ : (z : G) ∈ Z := z₀.2
   have hz1 : z ≠ 1 := fun h => hz₀ne (Subtype.ext (by simpa [hzdef] using congrArg Subtype.val h))
   -- (4)–(8): `𝒳 ∪ 𝒴` is coherent
-  have hcohXY := hyp.xset_qder_union_coherent hZQ1 hZcent hoddG hHallG hcohX hχ₁X ha hχ₁deg
+  have hcohXY := hyp.xset_qder_union_coherent hZQ1 hZcent hd hQ1odd hHallG hcohX hχ₁X ha hχ₁deg
     hXdiff hχ₂X hχ₂ne hYS (fun φ hφ => hyp.xsetOf_bot_disjoint_ssetOf_Qder hZQder hφ)
     hcohY hη₁Y hYdiff hη₂Y hη₂ne hm hsupp hzZ hz1
   -- restrict to `𝒳₁ ∪ 𝒴` (`𝒳₁ = XsetOf S' Z`)
@@ -318,7 +318,7 @@ the Appendix IV configuration (Peterfalvi's global odd-order hypothesis (E), the
 nilpotent Frobenius-kernel factor, and `Q` a Hall subgroup). -/
 theorem feit_sibley_coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis G) [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
-    (hd : Odd hyp.d) (hoddG : Odd (Nat.card G))
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
     (hnil : Group.IsNilpotent ↥hyp.Q1)
     (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
@@ -326,8 +326,6 @@ theorem feit_sibley_coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
   letI : Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- `|Q₁|` is odd (`Q₁ ≤ G`, `|G|` odd) and `≠ 1` (`Q₁` is not a `2`-group)
-  have hQ1odd : Odd (Nat.card ↥hyp.Q1) :=
-    hoddG.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.Q1)
   have hN1 : Nat.card ↥hyp.Q1 ≠ 1 := fun h1 =>
     hyp.Q1_not_two_group (IsPGroup.of_card (p := 2) (n := 0) (by rw [h1, pow_zero]))
   by_cases hab : ⁅hyp.Q1, hyp.Q1⁆ = ⊥
@@ -348,6 +346,6 @@ theorem feit_sibley_coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
           exact htwo d p hd' hp hdp hdvd hpd))
       have hlt : hyp.S ⊔ hyp.Qder < hyp.Q := hyp.sup_S_Qder_lt_Q hnil
       exact hyp.sset_coherent_of_ssetOf_sder_coherent hd hQ1odd hnil hlt
-        (hyp.ssetOf_sder_coherent_of_nonabelian hd hQ1odd hoddG hHallG hnil hp hQ1p hab)
+        (hyp.ssetOf_sder_coherent_of_nonabelian hd hQ1odd hHallG hnil hp hQ1p hab)
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley

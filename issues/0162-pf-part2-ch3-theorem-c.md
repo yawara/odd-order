@@ -143,10 +143,38 @@ fpf より `δ² = 1` ⟹ `|D|` 奇より `δ = 1` ⟹ `z = z⁻¹` ⟹ `z² = 1
 
 ## やること
 
-- [x] step 1: `(C1)` carrier `SecondCaseHypothesis` + `D` の `Q₁` 上 fpf (2026-07-28、commit `794473d39`)
-- [ ] step 2: `Q ∩ Q^x = 1` (`x ∉ H`)
-- [ ] **step 3a (新): Feit–Sibley の `Odd |G|` を書籍どおり `Odd |Q₁|` へ弱める**
+- [x] step 1: `(C1)` carrier `SecondCaseHypothesis` + `D` の `Q₁` 上 fpf (2026-07-28、`794473d39`)
+- [x] step 2: `Q ∩ Q^x = 1` (`x ∉ H`) — `Q_inf_map_conj_eq_bot` (2026-07-28)
+- [x] **step 3a: Feit–Sibley の `Odd |G|` を書籍どおり `Odd |Q₁|` へ弱める** (2026-07-28、`d64642791`)
 - [ ] step 3b: Feit–Sibley `Hypothesis` の構成と coherence の取得
+
+### step 3b の材料 (2026-07-28 実測)
+
+`FeitSibley.Hypothesis G` の各フィールドの供給元:
+
+| フィールド | 供給元 | 状態 |
+|---|---|---|
+| `H_ne_top` | `t ∉ H` | 自明 |
+| `Q_le_H` / `D_le_H` / `Q_normal_in_H` / `Q_inf_D_eq_bot` / `Q_mul_D_eq_H` | Ch.I `Hypothesis` の公理 | ✅ |
+| `Q_trivial_intersection` | **step 2** `Q_inf_map_conj_eq_bot` | ✅ |
+| `D_fixedPointFree_on_Q1` | **step 1** | ✅ |
+| `S_le_Q` / `Q1_le_Q` / `S_inf_Q1_eq_bot` / `S_mul_Q1_eq_Q` / `S_commutes_Q1` | `SylowDecomposition.lean` (`sylowTwo_*_Q1Subgroup`、`sylowTwoProdQ1MulEquiv`) を**ambient `S` へ移送**する必要あり (repo 側は `Sylow 2 ↥Q` の bundled 形) | 要作業 |
+| `coprime_S_Q1` | `S` は 2-群 / `Q₁` は奇 (`two_not_dvd_card_Q1Subgroup`) | 要作業 |
+| `S_nilpotent` | `S` は 2-群 | 要作業 |
+| `Q1_not_two_group` | `Q₁ ≠ 1` (背理法の仮定) + `Q₁` 奇 | 要作業 |
+| **`coprime_Q_D`** | `p` 奇素数が `|Q|` を割れば `|Q₁|` を割る (`Q₁` = 正規 2-補群) + fpf から `Coprime |Q₁| |D|` (`IsFrobeniusAction.coprime_card`, `FrobeniusActionBasics.lean:200`)。`|D|` 奇なので 2 は除外 | 要作業 |
+
+`feit_sibley_coherence` の追加仮説:
+
+| | 供給元 |
+|---|---|
+| `hd : Odd hyp.d` | 公理 `D_odd` ✅ |
+| `hQ1odd : Odd (Nat.card Q₁)` | `two_not_dvd_card_Q1Subgroup` + `card_Q1` ✅ (step 3a で `Odd \|G\|` から置換済) |
+| `hnil : Group.IsNilpotent ↥Q1` | `isNilpotent_Q` の部分群 ✅ |
+| `hHallG : Coprime \|Q\| Q.index` | `card_G_eq` (`\|G\| = \|Q\|\|D\|(\|Q\|+1)`) より `Q.index = \|D\|(\|Q\|+1)`、`gcd(\|Q\|,\|Q\|+1) = 1` と `coprime_Q_D` |
+
+⟹ 残るのは **ambient `S` の導入 + `coprime_Q_D`** が主。新 leaf
+`StructureOfH/FeitSibleyInput.lean` に置く。
 - [ ] step 4: 指標側 endgame (λ / `Ind λ = f₁ + f₂` / 次数評価)
 - [ ] step 5: `Q₁ = ⊥` の結論 + AxiomsCheck 登録
 

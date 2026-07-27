@@ -85,7 +85,7 @@ theorem V_inf_K_eq_bot : hyp.V ⊓ hyp.K = ⊥ := by
     calc
       x * x = x⁻¹ * x := congrArg (fun z : G => z * x) hxeq
       _ = 1 := inv_mul_cancel x
-  exact eq_one_of_sq_eq_one_of_odd_card hyp.D_odd
+  exact OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card hyp.D_odd
     (hyp.V_le_D hxV) hx2
 
 /-- **Peterfalvi Part II, Ch. I §3 Prop 1(b)**, §1 decomposition:

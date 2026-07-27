@@ -16,7 +16,7 @@ Appendix IV, p. 150 (campaign issue 1054, step (8)).  This leaf sits downstream 
 both endgame branches — the coherence machinery (`FeitSibleyUnionCoherence` →
 `FeitSibleyEndgame`) and the `𝒮`/`τ` support (`FeitSibleyTheorem`) — where the
 final assembly of step (8) is built: the central-character congruence
-`peterfalvi_67_hall_of_odd` applied to the `𝒴`-witness `e'₁`, combined with the
+`peterfalvi_67_hall_of_not_isConj_inv` applied to the `𝒴`-witness `e'₁`, combined with the
 regular-character evaluation `∑_{χ ∈ 𝒳} χ(1)·χ(z) = -|H ⧸ Z|`, forces `a ∣ λ`
 (`dvd_of_isIntegral_ratio`), closing (6) and hence the Feit–Sibley Theorem.
 
@@ -322,10 +322,11 @@ open scoped OddOrder.AlgInt in
 /-- **(8) step-(7) applied to a `𝒴`-witness** (Peterfalvi (8), p. 150).  For the `𝒴`-witness
 `e' = ε·ξ` (`ε ≠ 0`, `ξ ∈ Irr G`) — which is constant on `Z^#` by the `(8)` evaluation
 (`restrict_apply_sub_eq_neg_card_mul_inner`) — the central-character congruence (7)
-`peterfalvi_67_hall_of_odd` gives `e'(z) ≡ e'(1) (mod |Q|)`.
+`peterfalvi_67_hall_of_not_isConj_inv` gives `e'(z) ≡ e'(1) (mod |Q|)`.
 
-The structural inputs of `peterfalvi_67_hall_of_odd` are discharged from the `Hypothesis` block
-(`Q ≤ H`, `Q ⊴ H`, `Q^#` is a `TI`-subset of `G`); the remaining inputs — `G` of odd order, `Q`
+The structural inputs of `peterfalvi_67_hall_of_not_isConj_inv` are discharged from the
+`Hypothesis` block (`Q ≤ H`, `Q ⊴ H`, `Q^#` is a `TI`-subset of `G`); the remaining inputs — `z`
+not conjugate to `z⁻¹` (the book's step-(7) opening, from `d` odd), `Q`
 a Hall subgroup of `H` and of `G`, `Z ⊴ H` central with `Q ≤ C_G(z)`, and the constancy of `ρ`
 and of the normalizer–centralizer cardinality on `Z^#` — are supplied by the reduction context.
 Writing `ξ = ρ.character` (`ξ.isIrreducible`), the `e'`-constancy transfers to `ρ.character`
@@ -333,10 +334,9 @@ Writing `ξ = ρ.character` (`ξ.isIrreducible`), the `e'`-constancy transfers t
 (`Cong.smul_left`) returns the congruence for `e'`. -/
 theorem witness_charValue_cong [Fintype G]
     {Z : Subgroup G} (hZQ : Z ≤ hyp.Q) [(Z.subgroupOf hyp.H).Normal]
-    (hoddG : Odd (Nat.card G))
     (hHall : Nat.Coprime (Nat.card ↥hyp.Q) (Nat.card (↥hyp.H ⧸ hyp.Q.subgroupOf hyp.H)))
     (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index)
-    {z : G} (hzZ : z ∈ Z) (hz1 : z ≠ 1)
+    {z : G} (hzZ : z ∈ Z) (hz1 : z ≠ 1) (hnotconj : ¬ IsConj z⁻¹ z)
     (hQz : hyp.Q ≤ Subgroup.centralizer ({z} : Set G))
     {e' : ClassFunction G ℂ} {ε : ℤ} {ξ : IrreducibleCharacter G} (hεne : ε ≠ 0)
     (he' : e' = ε • (ξ : ClassFunction G ℂ))
@@ -365,9 +365,9 @@ theorem witness_charValue_cong [Fintype G]
     apply mul_left_cancel₀ hεceo
     rw [← hsmul w, ← hsmul z]
     exact he'const w hwZ hw1
-  have hcong := OddOrder.RepresentationTheory.peterfalvi_67_hall_of_odd ρ hyp.Q_le_H hZQ
-    hyp.Q_subgroupOf_H_normal inferInstance hyp.isTISubset_Q_sdiff_one hHall hoddG hzZ hz1 hQz
-    hHallG hconst
+  have hcong := OddOrder.RepresentationTheory.peterfalvi_67_hall_of_not_isConj_inv ρ hyp.Q_le_H
+    hZQ hyp.Q_subgroupOf_H_normal inferInstance hyp.isTISubset_Q_sdiff_one hHall hzZ hz1 hnotconj
+    hQz hHallG hconst
   rw [← congrFun hξρ z, ← congrFun hξρ 1] at hcong
   have hcong2 := hcong.smul_left hεint
   rw [← hsmul z, ← hsmul 1] at hcong2
@@ -613,7 +613,7 @@ Assembly of the five `(8)`-core pieces: `restrict_apply_sub_eq_neg_card_mul_inne
 theorem dvd_lam_of_endgame_data [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥hyp.H]
     [Invertible (Nat.card ↥hyp.H : ℂ)]
     {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) [(Z.subgroupOf hyp.H).Normal]
-    (hoddG : Odd (Nat.card G)) (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index)
+    (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index)
     {T : Finset (ClassFunction ↥hyp.H ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.XsetOf ⊥ Z)
     (hcohX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.XsetOf ⊥ Z) hyp.A)
     {χ₁ : ClassFunction ↥hyp.H ℂ} (hχ₁ : χ₁ ∈ hyp.XsetOf ⊥ Z)
@@ -627,6 +627,7 @@ theorem dvd_lam_of_endgame_data [Fintype G] [Invertible (Nat.card G : ℂ)] [Fin
     {η₁ : ClassFunction ↥hyp.H ℂ} (hη₁ZIrr : η₁ ∈ ZIrr ↥hyp.H) {lam : ℤ}
     (hlam1 : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) e' = (lam : ℂ) - a)
     {z : ↥hyp.H} (hzZ : (z : G) ∈ Z) (hz1 : z ≠ 1)
+    (hnotconj : ¬ IsConj (z : G)⁻¹ (z : G))
     (hQz : hyp.Q ≤ Subgroup.centralizer ({(z : G)} : Set G))
     (hcard_const : ∀ w ∈ Z, w ≠ 1 →
       Nat.card ↥(hyp.H ⊓ Subgroup.centralizer ({w} : Set G)) =
@@ -665,7 +666,7 @@ theorem dvd_lam_of_endgame_data [Fintype G] [Invertible (Nat.card G : ℂ)] [Fin
   have hHall : Nat.Coprime (Nat.card ↥hyp.Q) (Nat.card (↥hyp.H ⧸ hyp.Q.subgroupOf hyp.H)) := by
     have hidx : Nat.card (↥hyp.H ⧸ hyp.Q.subgroupOf hyp.H) = hyp.d := hyp.index_Q_subgroupOf_eq_d
     rw [hidx]; exact hyp.coprime_Q_D
-  have halg := hyp.witness_charValue_cong hZQ hoddG hHall hHallG hzZ hz1G hQz hεne he'eq
+  have halg := hyp.witness_charValue_cong hZQ hHall hHallG hzZ hz1G hnotconj hQz hεne he'eq
     he'const hcard_const
   -- keystone: `c₀ = λ + a·μ` with `μ = ⟨Res_H e', η₁⟩ − 1`
   obtain ⟨mu', hmu'⟩ :=
@@ -705,7 +706,8 @@ theorem xset_qder_union_coherent [Fintype G] [Invertible (Nat.card G : ℂ)]
     [Invertible (Nat.card ↥hyp.H : ℂ)] [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
     {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1) [(Z.subgroupOf hyp.H).Normal]
     (hZcent : ∀ w ∈ Z, ∀ y ∈ hyp.Q1, ⁅w, y⁆ = 1)
-    (hoddG : Odd (Nat.card G)) (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index)
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index)
     (hcohX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.XsetOf ⊥ Z) hyp.A)
     {χ₁ : ClassFunction ↥hyp.H ℂ} (hχ₁X : χ₁ ∈ hyp.XsetOf ⊥ Z)
     {a : ℕ} (ha : 2 ≤ a) (hχ₁deg : χ₁ 1 = (a : ℂ) * (hyp.d : ℂ))
@@ -743,11 +745,12 @@ theorem xset_qder_union_coherent [Fintype G] [Invertible (Nat.card G : ℂ)]
   have hη₁ZIrr : η₁ ∈ ZIrr ↥hyp.H := (hYS hη₁Y).1.mem_ZIrr
   have hz1G : (z : G) ≠ 1 := fun h => hz1 (Subtype.ext (by simpa using h))
   have hdvd : (a : ℤ) ∣ lam :=
-    hyp.dvd_lam_of_endgame_data hZQ1 hoddG hHallG
+    hyp.dvd_lam_of_endgame_data hZQ1 hHallG
       (T := (hyp.XsetOf_finite ⊥ Z).toFinset) (fun φ => Set.Finite.mem_toFinset _)
       hcohX hχ₁X (by omega) hχ₁deg
       (fun φ hφ => (hXdiff φ hφ).imp fun b hb => hb.2)
       he'ZIrr hεne hEeq hcross hη₁ZIrr hlam_1 hzZ hz1
+      (hyp.not_isConj_inv_of_mem_central hd hQ1odd hZQ1 hZcent hzZ hz1G)
       (hyp.Q_le_centralizer_of_mem_central hZQ1 hZcent hzZ)
       (fun w hwZ hw1 => hyp.inf_centralizer_card_const_of_central hZQ1 hZcent hwZ hw1 hzZ hz1G)
   -- (6) assembly: `a ∣ λ ⟹ 𝒳 ∪ 𝒴` coherent
