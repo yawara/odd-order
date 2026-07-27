@@ -4144,6 +4144,18 @@ TransitiveAutomorphisms / TransvectionGeneration)。演習は新 leaf `Problems8
   各点固定するので `N_G(H)` の `Δ` 上の像は **regular**。よって `|Δ| ≥ 3` なら 2-transitive
   になり得ず, 実際 `k ≥ 2` かつ `|Δ| ≥ 2` は `|Ω| = 2` を強制する (退化補題)。
   補助: `eq_of_le_of_card_eq` (有限群で `H ≤ K` + 位数一致 ⟹ `H = K`; mathlib に無い)。
+* ✅ **8A.6** 実証明 — `exists_mem_conj_eq_of_sylow_le` (**再利用可能**: 部分群 `K` の中の
+  2 つの `p`-Sylow は `K` の元で共役、を ambient `Subgroup G` の言葉で述べたもの。
+  `Sylow p ↥K` へ持ち上げて `MulAction.exists_smul_eq` を使い `K.subtype` で押し戻す) ⟹
+  `exists_mem_normalizer_sylow_smul_eq` (`β = g•α` で `G_β = gHg⁻¹`、`Q` と `gQg⁻¹` が
+  ともに `G_β` の `p`-Sylow、共役元 `x ∈ G_β` から `n := x⁻¹g` が `Q` を正規化し
+  `n•α = x⁻¹•β = β`)。
+  補助: `card_mul_relIndex` (`Q ≤ K` で `|Q|·[K:Q] = |K|`) / `isPGroup_subgroupOf` /
+  `mem_normalizer_of_map_conj_eq`。
+  ⚠ Lean メモ: `Problems8A.lean` は `RegularNormal.lean` 経由では `Mathlib.GroupTheory.Sylow`
+  を得られない (`IsPGroup`/`Sylow` が unknown identifier) → 明示 import が要る。
+  `x • S` (`S : Sylow p ↥K`) の coe は `MulDistribMulAction.toMonoidEnd` 経由になり
+  `(MulAut.conj x).toMonoidHom` と**構文的に**一致しない → `rw` でなく `exact` (defeq) で渡す。
 * ✅ **8A.8** 実証明 — `smul_orbit_eq_orbit_smul` (`N ⊴ G` なら `g • orbit N α =
   orbit N (g • α)`) / `card_orbit_eq_of_normal` (帰結: `N` は half-transitive)。
 

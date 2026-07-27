@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.Sylow
 import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
 
 /-!
@@ -34,6 +35,8 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
   `eq_of_mem_fixedPoints_stabilizer_of_transitive_on_compl` — **Problem 8A.5**:
   `Δ = Fix(G_α)` は `N_G(G_α)` で保たれ, その上で `N_G(G_α)` は推移的。`k ≥ 2` かつ
   `|Δ| ≥ 2` は `|Ω| = 2` を強制するので, `r = min(k, |Δ|)` の主張はこの推移性に尽きる。
+- `exists_mem_conj_eq_of_sylow_le`, `exists_mem_normalizer_sylow_smul_eq` —
+  **Problem 8A.6**: `Q ∈ Syl_p(G_α)` について `N_G(Q)` は `Fix(Q)` に推移的。
 - `smul_orbit_eq_orbit_smul`, `card_orbit_eq_of_normal` — **Problem 8A.8**:
   transitive な `G` の正規部分群 `N` について `G` は `N`-軌道を推移的に置換し,
   したがって `N` は half-transitive (すべての `N`-軌道が同じ濃度)。
@@ -407,6 +410,112 @@ theorem eq_of_mem_fixedPoints_stabilizer_of_transitive_on_compl {α β : Ω}
   intro γ hγ
   obtain ⟨h, hh⟩ := htwo γ hγ
   exact (hh ▸ hβ h).symm ▸ rfl
+
+/-! ### Problem 8A.6 — Sylow 版 -/
+
+/-- 共役で部分群が保たれれば正規化群の元。 -/
+private theorem mem_normalizer_of_map_conj_eq {Q : Subgroup G} {n : G}
+    (h : Q.map (MulAut.conj n).toMonoidHom = Q) : n ∈ Subgroup.normalizer (Q : Set G) := by
+  rw [Subgroup.mem_normalizer_iff]
+  intro q
+  constructor
+  · intro hq
+    rw [← h]
+    exact ⟨q, hq, rfl⟩
+  · intro hq
+    rw [← h] at hq
+    obtain ⟨y, hy, hyeq⟩ := hq
+    simp only [MulAut.conj_apply, MulEquiv.coe_toMonoidHom] at hyeq
+    exact (mul_left_cancel (mul_right_cancel hyeq)) ▸ hy
+
+/-- `Q ≤ K` のとき `Nat.card Q * [K : Q] = Nat.card K`。 -/
+private theorem card_mul_relIndex [Finite G] {Q K : Subgroup G} (h : Q ≤ K) :
+    Nat.card ↥Q * Q.relIndex K = Nat.card ↥K := by
+  rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe h).toEquiv]
+  exact Subgroup.card_mul_index (Q.subgroupOf K)
+
+/-- `Q ≤ K` のとき `↥K` の中で見た `Q` も `p`-群。 -/
+private theorem isPGroup_subgroupOf {p : ℕ} {Q K : Subgroup G} (hQK : Q ≤ K)
+    (hp : IsPGroup p ↥Q) : IsPGroup p ↥(Q.subgroupOf K) :=
+  hp.of_injective (Subgroup.subgroupOfEquivOfLe hQK).toMonoidHom (MulEquiv.injective _)
+
+/-- **部分群 `K` の中の 2 つの `p`-Sylow は `K` の元で共役** (ambient `Subgroup G` の言葉)。
+
+`Sylow p ↥K` へ持ち上げて mathlib の共役性 (`MulAction.exists_smul_eq`) を使い,
+`K.subtype` で押し出して戻す。 -/
+theorem exists_mem_conj_eq_of_sylow_le [Finite G] {p : ℕ} [Fact p.Prime]
+    {K Q₁ Q₂ : Subgroup G} (h₁ : Q₁ ≤ K) (h₂ : Q₂ ≤ K)
+    (hp₁ : IsPGroup p ↥Q₁) (hp₂ : IsPGroup p ↥Q₂)
+    (hi₁ : ¬ p ∣ Q₁.relIndex K) (hi₂ : ¬ p ∣ Q₂.relIndex K) :
+    ∃ x ∈ K, Q₁.map (MulAut.conj x).toMonoidHom = Q₂ := by
+  classical
+  obtain ⟨x, hx⟩ := MulAction.exists_smul_eq (↥K)
+    ((isPGroup_subgroupOf h₁ hp₁).toSylow hi₁) ((isPGroup_subgroupOf h₂ hp₂).toSylow hi₂)
+  have hcoe : (Q₁.subgroupOf K).map (MulAut.conj x).toMonoidHom = Q₂.subgroupOf K := by
+    have h0 := congrArg (fun S : Sylow p ↥K => (S : Subgroup ↥K)) hx
+    simp only [Sylow.smul_def, Sylow.pointwise_smul_def, Subgroup.pointwise_smul_def] at h0
+    exact h0
+  have hcomp : K.subtype.comp (MulAut.conj x).toMonoidHom
+      = (MulAut.conj (x : G)).toMonoidHom.comp K.subtype := by
+    ext y; simp
+  refine ⟨(x : G), x.2, ?_⟩
+  calc Q₁.map (MulAut.conj (x : G)).toMonoidHom
+      = ((Q₁.subgroupOf K).map K.subtype).map (MulAut.conj (x : G)).toMonoidHom := by
+        rw [Subgroup.map_subgroupOf_eq_of_le h₁]
+    _ = (Q₁.subgroupOf K).map (K.subtype.comp (MulAut.conj x).toMonoidHom) := by
+        rw [Subgroup.map_map, hcomp]
+    _ = ((Q₁.subgroupOf K).map (MulAut.conj x).toMonoidHom).map K.subtype := by
+        rw [Subgroup.map_map]
+    _ = Q₂ := by rw [hcoe, Subgroup.map_subgroupOf_eq_of_le h₂]
+
+/-- **Isaacs Problem 8A.6** (p. 235): `G` が `Ω` に推移的で `H = G_α`, `Q ∈ Syl_p(H)` のとき,
+`N_G(Q)` は `Δ = Fix(Q)` に推移的に作用する。
+
+`β = g • α` と書くと `G_β = gHg⁻¹` で, `Q` と `gQg⁻¹` はともに `G_β` の `p`-Sylow。
+`G_β` の元 `x` で `xQx⁻¹ = gQg⁻¹` を取ると `n := x⁻¹g` が `Q` を正規化し,
+`n • α = x⁻¹ • β = β`。 -/
+theorem exists_mem_normalizer_sylow_smul_eq [Finite G] [IsPretransitive G Ω] {p : ℕ}
+    [Fact p.Prime] {α β : Ω} {Q : Subgroup G} (hQH : Q ≤ stabilizer G α)
+    (hp : IsPGroup p ↥Q) (hi : ¬ p ∣ Q.relIndex (stabilizer G α))
+    (hβ : β ∈ MulAction.fixedPoints ↥Q Ω) :
+    ∃ n ∈ Subgroup.normalizer (Q : Set G), n • α = β := by
+  classical
+  obtain ⟨g, hg⟩ := exists_smul_eq G α β
+  have hKeq : stabilizer G β = (stabilizer G α).map (MulAut.conj g).toMonoidHom := by
+    rw [← hg, MulAction.stabilizer_smul_eq_stabilizer_map_conj]
+  have hQK : Q ≤ stabilizer G β := fun q hq => hβ ⟨q, hq⟩
+  have hQ'K : Q.map (MulAut.conj g).toMonoidHom ≤ stabilizer G β := by
+    rw [hKeq]; exact Subgroup.map_mono hQH
+  have hcardQ' : Nat.card ↥(Q.map (MulAut.conj g).toMonoidHom) = Nat.card ↥Q :=
+    Subgroup.card_map_of_injective (MulAut.conj g).injective
+  have hcardK : Nat.card ↥(stabilizer G β) = Nat.card ↥(stabilizer G α) := by
+    rw [hKeq]; exact Subgroup.card_map_of_injective (MulAut.conj g).injective
+  have hpos : 0 < Nat.card ↥Q := Nat.card_pos
+  have hrel : Q.relIndex (stabilizer G β) = Q.relIndex (stabilizer G α) :=
+    Nat.eq_of_mul_eq_mul_left hpos
+      ((card_mul_relIndex hQK).trans (hcardK.trans (card_mul_relIndex hQH).symm))
+  have hrel' : (Q.map (MulAut.conj g).toMonoidHom).relIndex (stabilizer G β)
+      = Q.relIndex (stabilizer G α) := by
+    refine Nat.eq_of_mul_eq_mul_left
+      (show 0 < Nat.card ↥(Q.map (MulAut.conj g).toMonoidHom) from Nat.card_pos) ?_
+    rw [card_mul_relIndex hQ'K, hcardQ', card_mul_relIndex hQH]
+    exact hcardK
+  have hpQ' : IsPGroup p ↥(Q.map (MulAut.conj g).toMonoidHom) :=
+    hp.of_injective
+      (Subgroup.equivMapOfInjective Q (MulAut.conj g).toMonoidHom
+        (MulAut.conj g).injective).symm.toMonoidHom (MulEquiv.injective _)
+  obtain ⟨x, hxK, hxeq⟩ := exists_mem_conj_eq_of_sylow_le hQK hQ'K hp hpQ'
+    (by rw [hrel]; exact hi) (by rw [hrel']; exact hi)
+  have hsplit : ∀ a b : G, (MulAut.conj (a * b)).toMonoidHom
+      = (MulAut.conj a).toMonoidHom.comp (MulAut.conj b).toMonoidHom := by
+    intro a b; ext y; simp [mul_assoc]
+  refine ⟨x⁻¹ * g, mem_normalizer_of_map_conj_eq ?_, ?_⟩
+  · rw [hsplit, ← Subgroup.map_map, ← hxeq, Subgroup.map_map, ← hsplit]
+    simp only [inv_mul_cancel, map_one]
+    ext y
+    simp
+  · rw [mul_smul, hg, inv_smul_eq_iff]
+    exact (mem_stabilizer_iff.mp hxK).symm
 
 /-! ### Problem 8A.8 — 正規部分群の軌道は推移的に置換される -/
 
