@@ -18,6 +18,7 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 ## Main results
 
 - `isPretransitive_of_card_eq_prime` — 位数 `p` の部分群は `p` 点上推移的 (regular)。
+- `le_centralizer_of_card_eq_prime` — 素数位数の部分群は可換 (自身を中心化)。
 - `centralizer_eq_of_card_eq_prime` — `C_G(H) = H` (**Problem 8A.2** の半正則性から)。
 - `card_normalizer_dvd_of_card_eq_prime` — `|N_G(H)| ∣ p(p-1)` (`N/C ↪ Aut(H)`,
   `|Aut(Z_p)| = p - 1`)。
@@ -66,7 +67,7 @@ theorem isPretransitive_of_card_eq_prime {p : ℕ} (hp : p.Prime) (hΩ : Nat.car
 
 omit [Finite G] in
 /-- 素数位数の部分群は巡回的, したがって自分自身を中心化する。 -/
-private lemma le_centralizer_of_card_eq_prime {p : ℕ} (hp : p.Prime) (H : Subgroup G)
+theorem le_centralizer_of_card_eq_prime {p : ℕ} (hp : p.Prime) (H : Subgroup G)
     (hH : Nat.card H = p) :
     H ≤ Subgroup.centralizer (H : Set G) := by
   haveI : Fact p.Prime := ⟨hp⟩
