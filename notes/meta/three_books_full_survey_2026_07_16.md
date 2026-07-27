@@ -1210,6 +1210,43 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 明記している。(5.3)(b) は固定 2 要素 `R` レコードが可変長 `R` を持てないという**設計上の理由**があり、
 consumer は (5.7) engine を使う。
 
+#### (6.5)/(6.6) の general-`K` 化 (2026-07-27) — **(6.5) は (a)(b)(c) とも完了、残るは (6.6) coherence 半分**
+
+新 leaf [`S08_SixFiveGeneral.lean`](../../OddOrder/Peterfalvi/S08_SixFiveGeneral.lean) (525 行、
+`OddOrder.lean` / `AxiomsCheck.lean` に配線済、新 assert 9 本すべて axiom-clean)。
+
+**完了したもの**
+
+| 書籍 | 一般形 | 備考 |
+|---|---|---|
+| (5.3.a) | `nonempty_characterDifferenceImage_of_irreducible` | 任意の `τ` で。既約非実 `χ` の `τ(χ−χ̄)` が**符号の逆な**既約 2 元差になる |
+| (5.2) for `𝒮(X)` | `InducedFamilyImageData.hypothesis` | (5.2.e) は transport でなく**導出** (書籍 (5.3.a) の論法) |
+| (6.3.b) via (5.7) | `inducedKernelFamily_isCoherent_of_isMulCommutative_quotient` | `K/X` 可換 ⟹ 全 member の次数が `|L:K|` ⟹ (5.7) |
+| (6.5)(a) 指数界 | `relIndex_le_of_not_isCoherent` | `six_three_of_imageData` の対偶 (`H = K`) |
+| (6.5)(a) chief factor | `isChiefFactor_of_not_isCoherent` | 群論側 `isChiefFactor_of_relIndex_le_of_odd_dvd` は元から一般だった |
+| (6.5)(b) | `exists_prime_isPGroup_of_not_isCoherent` | 核 `isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization` も元から一般 |
+| (6.5)(c) | `not_dvd_sub_one_of_not_isCoherent` | `six_five_c_arith` + 「`|K:K′| < p²` ⟹ abelianization 巡回 ⟹ 冪零なら可換」 |
+
+**副産物: carrier を書籍準拠に直した**。`InducedFamilyImageData` に **`tau_apply_one`** を追加 —
+書籍 (5.2.b) の値域は `ℤ[Irr G, G^#]` (**1 で消える**) なのに repo は `ℤ[Irr G]` しか課して
+おらず、carrier が書籍より弱かった。§11 の Dade witness (唯一の constructor) は
+`dadeIntegralCharacterMap_apply_one_eq_zero` でそのまま discharge。この節が無いと (5.3.a) の
+「符号が逆」が出ない (`τ(χ−χ̄) = μ + ν` を排除できない)。
+
+**残っている特殊化 (実測、着手前に再確認すること)**
+
+1. **(6.6) coherence 半分** — 依然として最大。`Xset_isCoherent_of_irreducible_X`
+   (`S08_CoherenceBasic.lean:352`) は `Z` について generic だが `SibleyDadeHypothesis`
+   (= `K = H`) に載っている。一般化には `inducedKernelFamily` 上に §8 の
+   `xBaseBlock` / `AnchoredPairUnionStepData` / 次数平方和 machinery を敷き直す必要がある
+   (X-characterization のように「族の形しか使っていない」case ではない)。上流はこの tick で
+   全部そろった ((6.5) 一般形 + `InducedFamilyImageData.hypothesis`)。
+2. **repo の (5.7) が member の既約性を要求する** — 書籍の (5.7)/(5.2) は要求しない
+   (直交性のみ)。orthonormal な `coherentEqualDegree` builder から継承した債務。
+   (6.4) の応用では (6.4.c) から既約性が出るので実害はないが、(5.7) 自体は書籍より狭い。
+3. **(6.3)/(6.5) が `K` 冪零を取る** (書籍は `K/M` 冪零) — `six_three_descent` から継承。
+   `M = 1` では一致し、(6.6) が使うのはその場合。
+
 #### (10.11) の実測 (2026-07-27) — **両主張とも書籍強度、AxiomsCheck の注記が stale だった**
 
 書籍 p.63: 「(8.8) の場合 (b) が成り立つとする。すると `|W₁|` と `|W₂|` は素数。さらに `M` が
