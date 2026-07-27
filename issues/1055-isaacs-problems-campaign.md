@@ -35,7 +35,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] Ch.6 Frobenius Actions — **🎉 完済 (2026-07-27)**: §6A (11 問) / §6B (9 問) / §6C (2 問) 全問
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
-- [ ] Ch.8 Permutation Groups — **次の frontier (2026-07-27)**
+- [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
+      §8B は 8B.1–8B.5 完了 + 8B.6 前半 / §8C §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4278,8 +4279,19 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
   各 1 軌道**になり, 残る「全相異」部分がひとつの軌道になることが 3-transitivity と同値。
   したがって 3-transitive ⟺ 軌道数 5 ⟺ `χ³` の平均が 5。
 
-**残り (8A.13)**: 「軌道数 = 5 ⟺ 3-transitive」の形式化 (`Nat.card_eq_two_iff` に相当する
-5 元版が無いので, `orbitRel.Quotient G (Ω³) ≃ Fin 5` を明示構成するのが素直; `|Ω| ≥ 3` が要る)。
+**5 パターンの単一軌道性を landing** (2026-07-27): `cube_orbit_diag` (推移性) /
+`cube_orbit_pattern_xxz` `_xzx` `_zxx` (2-transitivity) / `cube_orbit_pattern_distinct`
+(3-transitivity)。いずれも `Quotient.sound' (orbitRel_apply.mpr ⟨g, _⟩)` の 3 行。
+
+**(a) も landing** (`cube_orbit_ne_of_fst_snd` / `_fst_thd` / `_snd_thd`): 一致パターンは
+軌道不変量。5 代表元 `(α,α,α)` / `(α,α,β)` / `(α,β,α)` / `(β,α,α)` / `(α,β,γ)` の
+10 通りの対はいずれかの成分対で一致・不一致が食い違うので, これで互いに別軌道と分かる。
+⚠ `MulAction.injective g` の出す goal は `(fun x ↦ g • x) a = (fun x ↦ g • x) b` の
+**beta-redex** なので `change g • a = g • b` を挟んでから `rw` する。
+
+**残り (8A.13)**: `Nat.card (orbitRel.Quotient G Ω³) = 5` の数え上げのみ
+(`Set.ncard_univ` + `Set.ncard_insert_of_not_mem` を 4 回, または `≃ Fin 5`)。
+`|Ω| ≥ 3` が要る。
 
 ### 8A.14 (2026-07-27): 前半 landing
 
@@ -4357,3 +4369,112 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 **次から: 新 leaf を作った commit と同じ commit で `OddOrder.lean` に import を足すこと。**
 `OddOrder.lean` は全レーン編集可の共有ファイル。上位 leaf 経由で到達する中間 leaf は不要だが、
 到達性が自明でないなら足す。
+
+
+## §8A の実測 全問リスト (2026-07-27 修正)
+
+⚠ **本 issue の旧記述「§8A の残りは 8A.13 の同値のみ」は誤り**だった —
+教科書 §8A の Problems は **8A.1 … 8A.17** まであり (`pdftotext` p.236 で実測)、
+8A.16 / 8A.17 が一度も列挙されていなかった。frontier 判定は必ず教科書側の
+番号列を実測すること。
+
+* 8A.1 – 8A.15 … ✅ 完了 (2026-07-27 までに landing)
+* **8A.13** … ✅ **完了 (2026-07-27)** — `card_orbits_cube_eq_five_iff` /
+  `sum_cube_card_fixedBy_eq_five_mul_iff`。答は `m = 5`。
+* **8A.16** … ✅ **完了 (2026-07-27)** — `two_transitive_of_coprime_index`。
+  `Subgroup.relIndex` の二通り分解で `(n-1) ∣ |Δ|·[G:H]` を出す。
+* **8A.17** … ✅ **完了 (2026-07-27)** —
+  `existsUnique_specialLinearGroup_of_three_distinct` (抽象版) /
+  `existsUnique_matrixSpecialLinearGroup_of_three_distinct` (教科書の `SL(2,q)` 版)。
+  新 leaf `Problems8A/SharplyThreeTransitive.lean`。
+
+⟹ **§8A は 8A.1–8A.17 全問完了 (2026-07-27)**。
+
+### 8A.17 の設計メモ (2026-07-27)
+
+数学的な骨格 (char 2 が効く 2 箇所に注意):
+
+1. **frame 正規化**: `finrank K V = 2` で相異なる 3 点 `P₁,P₂,P₃` があれば、
+   `P₁ = [u]`, `P₂ = [v]`, `P₃ = [u+v]` となる基底 `(u,v)` が取れる
+   (`P₃.rep = a·P₁.rep + b·P₂.rep` で `a,b ≠ 0` ⟸ `P₃ ≠ P₂`, `P₃ ≠ P₁`;
+   `u := a·P₁.rep`, `v := b·P₂.rep`)。
+2. **存在**: 2 つの frame の間の基底変換 `T` は `det T = d ≠ 0`。
+   `λ² = d⁻¹` なる `λ` を取れば `λ·T ∈ SL` (`LinearMap.det_smul` で
+   `det (λ•T) = λ² det T`)。⚠ **`λ` の存在 = 「K の任意の元が平方」**
+   (有限体 char 2 では Frobenius が全単射なので OK)。
+3. **一意性 (sharp)**: 3 点を固定する `A ∈ SL` は frame 上で
+   `A u = a u`, `A v = b v`, `A(u+v) = c(u+v)` ⟹ `a = b = c` ⟹ `A = a·id`、
+   `det = a² = 1` ⟹ **char 2 ゆえ `a = 1`** ⟹ `A = 1`。
+4. `∃!` への組み立ては 8A.11 (`existsUnique_affineLineGroup_of_ne`) と同じ idiom。
+
+Lean 側の型: `SpecialLinearGroup K V` (`= {u : V ≃ₗ[K] V // u.det = 1}`) が
+`ℙ K V` に作用する mathlib インスタンスを使う。行列版 `SL(2,q)` へは
+`Matrix.SpecialLinearGroup.toLin_equiv` (基底つき MulEquiv) で移す。
+mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
+`basisOfLinearIndependentOfCardEqFinrank`, `LinearMap.det_smul`,
+`Projectivization.specialLinearGroup_is_two_pretransitive` (2-transitive まで)。
+
+
+## Ch.8 Problems の全数インベントリ (2026-07-27 実測)
+
+`grep -oE "^8[A-Z]\. ?[0-9]+\."` で教科書から実測した番号列 (39 問):
+
+* **§8A: 8A.1 – 8A.17** … ✅ **全問完了 (2026-07-27)**
+* **§8B: 8B.1 – 8B.10** … 🔶 **進行中** (leaf = `Problems8B.lean`):
+  8B.1 ✅ `isBlock_blockCore` / 8B.2 ✅ `exists_smul_mem_and_smul_notMem` /
+  8B.3 ✅ `regular_centralizer_mulEquiv_of_two_isMinimalNormal` /
+  8B.4 ✅ `prime_pow_card_and_unique_isMinimalNormal_of_solvable` /
+  8B.5 ✅ `stabilizer_eq_bot_and_prime_card_of_fixed_point` /
+  8B.6 🔶 **前半のみ** `card_stabilizer_eq_two_of_suborbit_ncard_eq_two` (`|G_α| = 2`) /
+  **次の frontier = 8B.6 後半 (`G ≅ D₂ₚ`)**。
+  再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
+  非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
+  `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
+* **§8C: 8C.1 – 8C.6** … ⬜
+* **§8D: 8D.1 – 8D.6** … ⬜ (subdegrees / rank)
+
+### §8B の設計メモ (2026-07-27)
+
+mathlib の `MulAction.IsBlock G B` (`Mathlib/GroupTheory/GroupAction/Blocks.lean`) が
+Isaacs の block 定義 (「`Δ` の translate は `Δ` 自身か `Δ` と交わらない」) とそのまま一致
+(`IsBlock G B := ∀ g₁ g₂, g₁ • B ≠ g₂ • B → Disjoint (g₁ • B) (g₂ • B)`)。使える道具:
+
+* `isBlock_iff_smul_eq_of_mem : IsBlock G B ↔ ∀ g a, a ∈ B → g • a ∈ B → g • B = B`
+* `IsBlock.of_orbit (hH : stabilizer G a ≤ H) : IsBlock G (orbit H a)`
+* `IsBlock.orbit_stabilizer_eq` / `stabilizer_orbit_eq` — block ↔ 中間部分群の対応
+* `IsPreprimitive` (primitivity) は `Mathlib/GroupTheory/GroupAction/Primitive.lean`
+
+**8B.1** (`G` 推移的, `α ∈ Ω`, `∅ ≠ X ⊆ Ω`, `Δ := ⋂ {g•X : α ∈ g•X}` は block) の筋:
+`S := {g : α ∈ g•X}` とおくと `h•Δ = ⋂_{g ∈ hS} g•X` で **`α ∈ h•Δ ⟺ hS ⊆ S`**。
+`G` 有限なら `hS ⊆ S ⟺ hS = S` なので `H := {h : hS = S}` は部分群で
+`G_α ≤ H` (∵ `s•α = α` なら `sS ⊆ S`)。さらに **`Δ = orbit H α`**:
+(⊇) `h ∈ H` なら `h•α ∈ h•Δ = Δ`; (⊆) `β = k•α ∈ Δ` なら任意の `g ∈ S` で
+`k•α ∈ g•X` ⟹ `k⁻¹g ∈ S` ⟹ `k⁻¹S ⊆ S` ⟹ `k ∈ H`。
+あとは `IsBlock.of_orbit` を当てるだけ。⚠ `[Finite G]` が要る (`hS ⊆ S ⟹ hS = S`)。
+
+**8B.3** は Hint に「Problem 8A.4 を使え」とあり, 8A.4 は
+`Problems8A/RegularRepresentations.lean` の
+`mulEquiv_and_center_eq_bot_of_regular_normal` として landing 済 — そのまま使える。
+
+
+### 8B.6 後半 (`G ≅ D₂ₚ`) の設計メモ (2026-07-27)
+
+前半 `|G_α| = 2` は landing 済 (`card_stabilizer_eq_two_of_suborbit_ncard_eq_two`)。
+残りは「`G` は位数 `2p` の二面体群 (`p > 2` 素数)」。**Frobenius 経由**が筋:
+
+1. **相異なる 2 点の安定化群の交わりは自明**: `|G_α| = 2` なので `G_α ⊓ G_β` は
+   `1` か `G_α`。後者なら `G_α ≤ G_β` かつ位数一致で `G_α = G_β`, すると `G_α` が
+   `β ≠ α` を固定するので **8B.5** (`stabilizer_eq_bot_and_prime_card_of_fixed_point`)
+   より `G_α = 1` となり `|G_α| = 2` に矛盾。
+2. ⟹ 推移的 + `G_α ≠ 1` + 2 点の安定化群の交わり自明 = **Frobenius 作用**。
+   repo の `OddOrder/Isaacs/Ch06_FrobeniusActions/` (`Ch06.IsFrobeniusAction` 等) を使う。
+3. Frobenius 核 `K` は正則正規部分群 (位数 `n = |Ω|`)。`G_α = ⟨t⟩` (位数 2) は `K` に
+   固定点なく作用 ⟹ `t` は `K` を**反転**し `K` は可換
+   (位数 2 の fixed-point-free 自己同型)。
+4. **原始性**: `K` 正則正規可換なので block ↔ `K` の部分群 (反転は全部分群を保つ) ⟹
+   `K` は真の非自明部分群をもたない ⟹ `|K| = p` 素数 (`prime_card_of_isCoatom_bot`
+   と同じ論法が使える)。
+5. `G = K ⋊ G_α ≅ D₂ₚ`。`p ≠ 2` は忠実性から (`|G| = 4` は 2 点への忠実作用と不整合)。
+
+⚠ 4 の「block ↔ `K` の部分群」は mathlib `MulAction.block_stabilizerOrderIso`
+(block ↔ `G_α` を含む中間部分群) を経由すると素直かもしれない。要調査。
