@@ -426,6 +426,7 @@ import OddOrder.Peterfalvi.S06_CertainTypeIsometry
 import OddOrder.Peterfalvi.S06_CertainTypeConjugation
 import OddOrder.Peterfalvi.S06_CertainTypeCoherence
 import OddOrder.Peterfalvi.S06_CertainTypeFourCorner
+import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
 import OddOrder.Peterfalvi.S07_BridgeCoherent
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree

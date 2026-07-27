@@ -65,6 +65,24 @@ theorem columnSum_def (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     columnSum h χ₂ = ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) :=
   rfl
 
+/-- **Certain-type column sums are injective in the `W₂`-dual**: `μ_j = μ_k → χ₂ = χ₂'`.  If two
+column sums agree, the (4.5) Gram matrix `columnFamily_mu_sum_inner` (`⟨μ_j, μ_k⟩ = w₁·δ_{jk}`)
+evaluates their inner product as `0` (off-diagonal) and, after rewriting by the assumed equality,
+as `w₁ ≠ 0` (diagonal).
+
+This is the Hypothesis (4.6)-level form; `S12.Hypothesis.columnSum_injective` is its §12
+specialization. -/
+theorem columnSum_injective (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] :
+    Function.Injective (columnSum h) := by
+  classical
+  intro χ₂ χ₂' heq
+  by_contra hne
+  have h0 : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂') = 0 := by
+    rw [columnSum_def, columnSum_def, columnFamily_mu_sum_inner, if_neg hne]
+  rw [heq, columnSum_def, columnFamily_mu_sum_inner, if_pos rfl] at h0
+  exact (Nat.cast_ne_zero.mpr (NeZero.ne (Nat.card h.W1))) h0
+
 open scoped Classical in
 /-- **The per-basis rule of the coherent extension.**  On the irreducible `ω`, return the signed
 `σ`-image `δ_j ω_{ij}^σ` if `ω = μ_{ij}` is a certain-type character, and `0` otherwise.  The
