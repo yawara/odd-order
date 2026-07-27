@@ -37,7 +37,8 @@ created: 2026-07-27
 - ✅ `tau_conjDiff_inner_eq_zero_of_orthogonal` + `orthogonal_of_tau_conjDiff_inner_eq_zero`
   (同 leaf) — (5.2.e) も τ だけから出る。実際 `hypothesisOfSubfamily` は現にこの経路で
   `S07.Hypothesis` を組んでおり、`RD.R` / `RD.orthogonal` を**一切使っていない**。
-- ❌ **欠けている部品**: `CharacterDifferenceImage → OrthonormalCharacterImageFamily` の変換。
+- ✅ **`CharacterDifferenceImage → OrthonormalCharacterImageFamily` の変換は既存** —
+  `toOrthonormalImage` / `toOrthonormalImage_orthogonal` (`S07_Coherence/DifferenceImage.lean`)。
   前者は `{μ, ν}` と符号 `ε` を持つ構造、後者は `Finset` `R(χ)` で `τ(χ−χ̄) = ∑_{α ∈ R(χ)} α`
   を要求する。変換は `R(χ) = {ε·μ, −ε·ν}`:
   - 和 = `ε·μ − ε·ν = ε·(μ−ν) = τ(χ−χ̄)` (`image_eq`)
@@ -70,9 +71,15 @@ created: 2026-07-27
 
 ## 進捗 (2026-07-27)
 
-- [x] **step 1 — 変換** `CharacterDifferenceImage.toOrthonormalFamily` (`R(χ) = {ε·μ, −ε·ν}`) と
-      (5.2.e) の移送 `toOrthonormalFamily_orthogonal`。`S08_SixTwoThreeFromImageFamilies`。
-      併せて `inner_zsmul_irreducible_eq` を Appendices から `ZIrrFourier` へ移設。axiom-clean。
+- [x] ~~**step 1 — 変換**~~ ⚠ **不要だった (2026-07-27 訂正)**。新設した
+      `CharacterDifferenceImage.toOrthonormalFamily` は、**既存の
+      `CharacterDifferenceImage.toOrthonormalImage`** (`S07_Coherence/DifferenceImage.lean`) と
+      同一構成だった (`toOrthonormalImage_orthogonal` も同様)。重複は撤去済 (commit dc8d3a5c3)。
+      見落とし原因は grep パターンが宣言の**複数行シグネチャ**を想定していなかったこと
+      (戻り値型が def 行の 2 行下にある) → memory
+      `verify-port-state-by-number-not-coq-name` §I に記録。
+      副産物として `inner_zsmul_irreducible_eq` の Appendices → `ZIrrFourier` 移設は保持
+      (docstring 自身が指定していた upstream 化、Appendices の 9 consumer が使用中)。
 - [x] **step 2 — 構造分割** `InducedFamilyTauData` (τ 部) / `InducedFamilyImageData extends …`。
       τ 部しか使っていなかった `adjoinHisom` / `tau_conjDiff_inner_eq_zero_of_orthogonal` /
       `hypothesisOfSubfamily` / `hypothesis` / `xSetHypothesis` を τ 部の namespace へ移動。
