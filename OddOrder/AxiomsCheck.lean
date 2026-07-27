@@ -3582,6 +3582,23 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMap_inner_eq
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.zSupportedSpan_range_subset_span_sub_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentEqualDegree
+-- **The weighted (non-orthonormal) equal-degree coherence builder** (issue 0157).  Peterfalvi's
+-- Hypothesis (5.2) gives the members of `S` only *pairwise orthogonality*, not unit norm — a
+-- reducible member has `||chi||^2 > 1` — so the book's (5.7) does not assume irreducibility and
+-- neither does this builder.  `IsCoherent` asks for an **isometry** on `Z[S]`, not for orthonormal
+-- images, so the orthonormal normalisation `||chi_j||^2 = 1` can be replaced throughout by a
+-- per-member weight `w_j = <chi_j, chi_j>`: the target family need only match the **Gram matrix**
+-- of the source (`<X_i, X_j> = <chi_i, chi_j>`), and the extension is the rescaled reconstruction
+-- `nu(phi) = sum_j <phi, chi_j> * w_j^{-1} • X_j`, which sends `chi_k` to `X_k` and is an isometry
+-- by weighted Parseval.  `coherentEqualDegree` is the `w = 1` construction, kept because its
+-- `extension` is `coherentImageMap chi X` definitionally (an API several consumers rely on).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.eq_sum_inner_div_norm_smul_of_mem_span
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_sum_inner_mul_conj_div_norm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.coherentImageMapW_inner_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentEqualDegreeW
 -- Dade specialization: equal-degree coherence at the real (5.1) base map `τ = dadeIntegralCharacterMap`.
 -- The (1.4) signed family `{μⱼ, ε}` is constructed by `isometry_difference_pair_structure` applied to
 -- `τ` (its three hypotheses discharged from the Dade isometry), giving `Y = S(H')`/(6.6)-prefix

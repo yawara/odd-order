@@ -1248,6 +1248,103 @@ theorem coherentImageMap_inner_eq [Fintype G] [Invertible (Nat.card G : ℂ)]
       if_neg (fun h => hkj h.symm), mul_zero]
   · intro h; exact absurd (Finset.mem_univ j) h
 
+/-! ### The weighted (non-orthonormal) Fourier reconstruction
+
+Peterfalvi's Hypothesis (5.2) gives the members of `𝒮` only *pairwise orthogonality*, not unit
+norm: a reducible member has `‖χ‖² > 1`.  The three lemmas below are the orthonormal Parseval
+package above with the normalisation `‖χⱼ‖² = 1` replaced by an arbitrary nonzero weight
+`wⱼ = ⟨χⱼ, χⱼ⟩`, which is what the book's (5.7) actually needs (issue 0157).  The orthonormal
+statements are the `w ≡ 1` case. -/
+
+/-- **Weighted Fourier reconstruction**: for a pairwise-orthogonal family of nonzero norm,
+`φ = ∑ⱼ (⟨φ, χⱼ⟩ / ⟨χⱼ, χⱼ⟩) • χⱼ` on `ℤ[range χ]`. -/
+theorem eq_sum_inner_div_norm_smul_of_mem_span {n : ℕ} {χ : Fin n → ClassFunction L ℂ}
+    (horthχ : ∀ i j, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0)
+    (hnorm : ∀ j, ClassFunction.inner (χ j) (χ j) ≠ 0)
+    {φ : ClassFunction L ℂ} (hφ : φ ∈ Submodule.span ℤ (Set.range χ)) :
+    ∑ j : Fin n, ((ClassFunction.inner φ (χ j)) / ClassFunction.inner (χ j) (χ j)) • χ j = φ := by
+  classical
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      obtain ⟨k, rfl⟩ := hx
+      rw [Finset.sum_eq_single k]
+      · rw [div_self (hnorm k), one_smul]
+      · intro j _ hjk
+        rw [horthχ k j fun h => hjk h.symm, zero_div, zero_smul]
+      · intro h; exact absurd (Finset.mem_univ k) h
+  | zero => simp
+  | add x y _ _ ihx ihy =>
+      simp only [ClassFunction.inner_add_left, add_div, add_smul]
+      rw [Finset.sum_add_distrib, ihx, ihy]
+  | smul a x _ ih =>
+      have hcast : ∀ j, ((ClassFunction.inner (a • x) (χ j)) /
+            ClassFunction.inner (χ j) (χ j)) • χ j
+          = (a : ℂ) • ((ClassFunction.inner x (χ j) / ClassFunction.inner (χ j) (χ j)) • χ j) :=
+        fun j => by
+          rw [← Int.cast_smul_eq_zsmul ℂ a x, ClassFunction.inner_smul_left, mul_div_assoc,
+            mul_smul]
+      simp only [hcast]
+      rw [← Finset.smul_sum, ih, Int.cast_smul_eq_zsmul]
+
+/-- **Weighted Parseval**: `⟨φ, ψ⟩ = ∑ⱼ ⟨φ, χⱼ⟩ · conj⟨ψ, χⱼ⟩ / ⟨χⱼ, χⱼ⟩` on `ℤ[range χ]`, for a
+pairwise-orthogonal family of nonzero norm.  (`⟨χⱼ, χⱼ⟩` is real, so it is its own conjugate and
+the single division is unambiguous.) -/
+theorem inner_eq_sum_inner_mul_conj_div_norm {n : ℕ} {χ : Fin n → ClassFunction L ℂ}
+    (horthχ : ∀ i j, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0)
+    (hnorm : ∀ j, ClassFunction.inner (χ j) (χ j) ≠ 0)
+    {φ ψ : ClassFunction L ℂ} (hφ : φ ∈ Submodule.span ℤ (Set.range χ)) :
+    ClassFunction.inner φ ψ =
+      ∑ j : Fin n, ClassFunction.inner φ (χ j) * star (ClassFunction.inner ψ (χ j)) /
+        ClassFunction.inner (χ j) (χ j) := by
+  conv_lhs => rw [← eq_sum_inner_div_norm_smul_of_mem_span horthχ hnorm hφ]
+  rw [inner_sum_left]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  rw [ClassFunction.inner_smul_left, inner_conj_symm ψ (χ j), div_mul_eq_mul_div]
+
+/-- **The weighted Fourier-image map is an isometry on `ℤ[range χ]`.**
+
+For a pairwise-orthogonal source family `χ` of nonzero norm and a target family `X` matching its
+Gram matrix (`⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩` — *not* orthonormality), the rescaled reconstruction
+`ν = coherentImageMap χ (fun j => ⟨χⱼ, χⱼ⟩⁻¹ • Xⱼ)` sends `χₖ ↦ Xₖ`
+(`coherentImageMap_apply_eq_of_orthogonal`) and preserves the inner product on `ℤ[range χ]`.
+
+This is the `IsCoherent.extension_inner_eq` of a *non-orthonormal* equal-degree set — the shape
+Peterfalvi's (5.7) needs once reducible members are allowed (issue 0157).  With `⟨χⱼ, χⱼ⟩ = 1`
+it is `coherentImageMap_inner_eq`. -/
+theorem coherentImageMapW_inner_eq [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {n : ℕ} {χ : Fin n → ClassFunction L ℂ} {X : Fin n → ClassFunction G ℂ}
+    (horthχ : ∀ i j, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0)
+    (hnorm : ∀ j, ClassFunction.inner (χ j) (χ j) ≠ 0)
+    (hgram : ∀ i j, ClassFunction.inner (X i) (X j) = ClassFunction.inner (χ i) (χ j))
+    {φ ψ : ClassFunction L ℂ}
+    (hφ : φ ∈ Submodule.span ℤ (Set.range χ)) (_hψ : ψ ∈ Submodule.span ℤ (Set.range χ)) :
+    ClassFunction.inner
+        (coherentImageMap (L := L) (G := G) χ
+          (fun j => (ClassFunction.inner (χ j) (χ j))⁻¹ • X j) φ)
+        (coherentImageMap (L := L) (G := G) χ
+          (fun j => (ClassFunction.inner (χ j) (χ j))⁻¹ • X j) ψ) =
+      ClassFunction.inner φ ψ := by
+  classical
+  rw [inner_eq_sum_inner_mul_conj_div_norm horthχ hnorm hφ, coherentImageMap_apply,
+    coherentImageMap_apply, inner_sum_left]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  rw [ClassFunction.inner_smul_left, inner_sum_right]
+  rw [Finset.sum_eq_single j]
+  · rw [OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.inner_smul_right, ClassFunction.inner_smul_left,
+      hgram j j]
+    have hstar : star ((ClassFunction.inner (χ j) (χ j))⁻¹) =
+        (ClassFunction.inner (χ j) (χ j))⁻¹ := by
+      rw [star_inv₀, ← inner_conj_symm (χ j) (χ j)]
+    rw [hstar]
+    field_simp
+  · intro k _ hkj
+    rw [OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.inner_smul_right, ClassFunction.inner_smul_left,
+      hgram j k, horthχ j k fun h => hkj h.symm]
+    ring
+  · intro h; exact absurd (Finset.mem_univ j) h
+
 end IntegralCharacterMap
 
 end OddOrder.Peterfalvi.S07

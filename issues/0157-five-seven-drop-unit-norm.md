@@ -79,6 +79,52 @@ issue 0155) はこの (5.7) を経由するので、そこにも同じ制限が�
 retarget) を使っている。書籍の論法とは構成が違うので、**新規に書き下ろす**方が早い可能性が高い。
 着手時に現行証明を通読して判断すること。
 
+## 進捗 (2026-07-27)
+
+- [x] **土台 1 — 加重 Parseval** (`S07_Coherence/PsiDecomposition.lean`)。
+      正規直交 (`⟨χᵢ,χⱼ⟩ = δᵢⱼ`) を「**対直交 + 各自の非零ノルム** `wⱼ = ⟨χⱼ,χⱼ⟩`」に緩めた 3 本:
+      `eq_sum_inner_div_norm_smul_of_mem_span` (`φ = ∑ⱼ (⟨φ,χⱼ⟩/wⱼ)•χⱼ`) /
+      `inner_eq_sum_inner_mul_conj_div_norm` (`⟨φ,ψ⟩ = ∑ⱼ ⟨φ,χⱼ⟩·conj⟨ψ,χⱼ⟩/wⱼ`) /
+      `coherentImageMapW_inner_eq` (rescale した Fourier 写像
+      `ν = coherentImageMap χ (fun j => wⱼ⁻¹ • Xⱼ)` が `ℤ[range χ]` 上で等長)。
+- [x] **土台 2 — 加重 coherence builder** `coherentEqualDegreeW`
+      (`S07_Coherence/CoherenceExtensionTau2.lean`)。
+      `IsCoherent` が要求するのは**等長性であって像の正規直交性ではない** (構造体を実測) ので、
+      target 族には `⟨Xᵢ,Xⱼ⟩ = ⟨χᵢ,χⱼ⟩` (**Gram 行列の一致**) だけを課せばよい。
+      extension は `wⱼ⁻¹` で rescale した再構成 (`coherentImageMap_apply_eq_of_orthogonal` で
+      `ν χₖ = Xₖ`)。
+      ⚠ 旧 `coherentEqualDegree` は**そのまま残す**: その `extension` が
+      `coherentImageMap χ X` と **definitional** (`coherentEqualDegree_extension := rfl`) で、
+      複数の下流がその API に依存している。`1⁻¹ • X j` は `X j` と defeq でないため
+      「旧を新の特殊化に置換」は `rfl` を壊す。両者は別構成として併存させる。
+- [ ] **残り — `commonImage` 連鎖の一般化**
+
+### 残作業の実測 (2026-07-27)
+
+`coherent_of_constant_degree` の本体で `hirr` が効いているのは 4 箇所:
+
+| 箇所 | 用途 | 一般形 |
+|---|---|---|
+| `hB` | `⟨β, (χ₀−χⱼ)^τ⟩ = 1 − ⟨χ₀,χⱼ⟩` | `= ⟨χ₀,χ₀⟩ − ⟨χ₀,χⱼ⟩` |
+| `horthχ` | `⟨χᵢ,χⱼ⟩ = δᵢⱼ` (`coherentEqualDegree` 用) | 対直交 + 非零ノルム (`coherentEqualDegreeW` 用) |
+| `commonImage_self` | `⟨β,β⟩ = 1` | `= ⟨χ₀,χ₀⟩` |
+| 基底ケース `isCoherent_pair_of_differenceImage` | `S = {χ₀,χ̄₀}` | `‖χ₀‖² = c` で `E ⊆ R(χ₀)`, `|E| = c` を選ぶ |
+
+⟹ 具体的な残作業:
+
+1. **`xFamily_inner`** (`S07_CoherenceConstantDegree:562`) の `1` を `⟨χ₀,χ₀⟩` に置換。
+   恒等式は一般 `c` で成立 (手計算で確認済 — `c` が実数であることは
+   `inner_conj_symm (χ 0) (χ 0)` から無料)。呼び出しは (5.7) 本体の 1 箇所のみ。
+2. **`commonImage` 連鎖** (`S07_CoherenceConstantDegree:409-558`) の `hirr` を外す:
+   `commonImage_self` / `_inner_ref` / `_inner_conj` / `_inner_refconj` / `_inner_other` /
+   `_inner` の 6 本と、その土台 `pairDecomp'_two_sided`。いずれも結論の `1` が `⟨χ₀,χ₀⟩` になる。
+   ⚠ (5.4) 側 (`CharacterPsiDecomposition`) は**元から一般ノルム**なので、
+   土台の再証明は不要で「`1` を `c` に置き換えて式を追う」作業のはず — ただし
+   `pairDecomp'_two_sided` が `hirr` を `ψ` 側 (`‖ψ‖²`) にも使っていないか要確認。
+3. **基底ケース** `isCoherent_pair_of_differenceImage` の一般化
+   (`|R(χ₀)| = ‖χ₀−χ̄₀‖² = 2c` から `|E| = c` の部分集合を取る)。
+4. 本体の組み上げ (`coherentEqualDegree` → `coherentEqualDegreeW`)。
+
 ## 完了条件
 
 `coherent_of_constant_degree` が `hirr` 無しで成立し、旧版がその特殊化になること。
