@@ -7,6 +7,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S08_CaseBEnumeration
+import OddOrder.Peterfalvi.S08_InducedKernelFamily
 
 /-!
 # Peterfalvi (6.2), general kernel: the induced family `S(X)`
@@ -40,47 +41,17 @@ open OddOrder.RepresentationTheory
 variable {G : Type*} [Group G]
 variable {L : Subgroup G} [Fintype ↥L]
 
-/-! ### The general (6.1) induced family `S(X)` -/
+/-! ### The general (6.1) induced family `S(X)`
+
+The definition and its elementary API (`mem_inducedKernelFamily`, `_antitone`, `_subset_bot`) plus
+the (6.6) `X`-characterization live upstream in `S08_InducedKernelFamily`, so that the Sibley layer
+(`S08_DegreeSums/CoherenceGlue`, which this file is *downstream* of) can share them. -/
 
 section InducedKernelFamily
 
 variable (K : Subgroup ↥L) [Invertible (Nat.card ↥K : ℂ)]
 
-/-- **Peterfalvi (6.1) filtration `S(X)` for a general kernel `K ≤ L`** (Coq `seqIndD K L K X`):
-the induced characters `Ind_K^L θ` of nontrivial irreducible sources `θ ∈ Irr K` whose kernel
-contains `X`.  `S(⊥) = S` is the full induced family; the §11 consumer instantiates `K = M'`
-(solvable), where members can be *reducible* (the μ-columns), unlike the Sibley `SsubFiltration`
-(`K = H` with a Frobenius action making every member irreducible). -/
-def inducedKernelFamily (X : Subgroup ↥L) : Set (ClassFunction ↥L ℂ) :=
-  {φ : ClassFunction ↥L ℂ | ∃ θ : IrreducibleCharacter ↥K,
-    θ ≠ trivialIrreducibleCharacter ↥K ∧
-    (X.subgroupOf K : Set ↥K) ⊆
-        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ) ∧
-    φ = ClassFunction.induce K (θ : ClassFunction ↥K ℂ)}
-
 variable {K}
-
-theorem mem_inducedKernelFamily {X : Subgroup ↥L} {φ : ClassFunction ↥L ℂ} :
-    φ ∈ inducedKernelFamily K X ↔ ∃ θ : IrreducibleCharacter ↥K,
-      θ ≠ trivialIrreducibleCharacter ↥K ∧
-      (X.subgroupOf K : Set ↥K) ⊆
-          OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ) ∧
-      φ = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) :=
-  Iff.rfl
-
-/-- `S(X)` is antitone in the kernel demand `X`. -/
-theorem inducedKernelFamily_antitone {X Y : Subgroup ↥L} (hXY : X ≤ Y) :
-    inducedKernelFamily K Y ⊆ inducedKernelFamily K X := by
-  intro φ hφ
-  obtain ⟨θ, hθne, hker, hφeq⟩ := hφ
-  refine ⟨θ, hθne, ?_, hφeq⟩
-  intro x hxX
-  exact hker (Subgroup.mem_subgroupOf.mpr (hXY (Subgroup.mem_subgroupOf.mp hxX)))
-
-/-- Every filtration layer lies in the full family `S = S(⊥)`. -/
-theorem inducedKernelFamily_subset_bot (X : Subgroup ↥L) :
-    inducedKernelFamily K X ⊆ inducedKernelFamily K ⊥ :=
-  inducedKernelFamily_antitone bot_le
 
 /-- `S(X)` is finite (image of the finite irreducible-character set of `↥K`). -/
 theorem inducedKernelFamily_finite (X : Subgroup ↥L) :

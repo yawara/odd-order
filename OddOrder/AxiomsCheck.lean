@@ -3775,6 +3775,12 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
+-- **(6.6) `X`-characterization at a general kernel** (2026-07-27): the Sibley `K = H` form above is
+-- now the instance of `inducedKernelFamily_sdiff_eq_irreducible_not_subset_characterKernel`
+-- (`S08_InducedKernelFamily`), which proves `𝒮 − 𝒮(Z) = {χ ∈ Irr L | Z ⊄ Ker χ}` for ANY subgroup
+-- `K ≤ L` (the book's `K ⊴ L` normality is never used) and any normal `Z ≤ K`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.inducedKernelFamily_sdiff_eq_irreducible_not_subset_characterKernel
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_eq_irreducible_not_subset_characterKernel
 -- Peterfalvi S08 (6.2) `S₁`/`S₂` first-obstruction decomposition + its `S` no-real input.
