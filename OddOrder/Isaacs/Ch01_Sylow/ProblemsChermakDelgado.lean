@@ -29,6 +29,11 @@ pdftotext は `<` と `≤` を潰すが, **1G.1 と 1G.4 の不等号は厳密 
 - `card_conj_smul` / `centralizer_conj_smul` / `chermakDelgadoMeasure_conj_smul` /
   `chermakDelgadoLattice_conj_smul_mem` — **1G.2 の Hint 第 1 文**
   (`L(G)` は共役で閉じる) とその部品。
+- `conj_smul_self_of_mem` — 部分群はその元による共役で不変。
+- `exists_normal_lt_top_of_mem_lattice` — **Problem 1G.2**。
+- `eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card` — **Problem 1G.3**。
+- `sInf_mem_lattice_and_centralizer_eq` — `L(G)` の有限族の交わりは `L(G)` に属し
+  中心化群は各元の中心化群の `sSup` (Thm 1.44 の 2 元版の反復; 1G.4 の準備)。
 -/
 
 namespace OddOrder.Isaacs.Ch01
@@ -189,6 +194,176 @@ theorem chermakDelgadoLattice_conj_smul_mem {H : Subgroup G}
   rw [chermakDelgadoMeasure_conj_smul]
   exact hH K
 
+/-- 部分群はその元による共役で不変。 -/
+theorem conj_smul_self_of_mem {H : Subgroup G} {y : G} (hy : y ∈ H) :
+    MulAut.conj y • H = H := by
+  ext u
+  rw [Subgroup.mem_smul_pointwise_iff_exists]
+  constructor
+  · rintro ⟨v, hv, rfl⟩
+    exact H.mul_mem (H.mul_mem hy hv) (H.inv_mem hy)
+  · intro hu
+    exact ⟨y⁻¹ * u * y, H.mul_mem (H.mul_mem (H.inv_mem hy) hu) hy,
+      by change y * (y⁻¹ * u * y) * y⁻¹ = u; group⟩
+
 end -- `L(G)` は共役で閉じる
+
+section /- 1G: Problem 1G.2 (p. 43) -/
+
+open Pointwise
+
+variable {G : Type*} [Group G] [Finite G]
+
+/-- **Isaacs Problem 1G.2** (p. 43)。`H ∈ L(G)` が `G` の真の部分群なら,
+`H ⊆ M < G` を満たす正規部分群 `M` が存在する。
+
+背理法。`H` を含む `L(G)` の真の部分群のうち位数最大のものを `K` とする。
+
+* 全ての共役 `gHg⁻¹` が `K` に含まれるなら, `H` の正規閉包が `K < ⊤` に収まり,
+  それが求める `M` になってしまう (仮定に反する)。
+* そうでない共役 `H' := gHg⁻¹` を取ると `K ⊔ H' ∈ L(G)` は `H` を含み `K` を真に含むので,
+  `K` の最大性から `K ⊔ H' = ⊤`。**Thm 1.44** (`chermakDelgadoLattice_sup_eq_mul`) より
+  `⊤ = K · H'` なので `g⁻¹ = k y` (`k ∈ K`, `y ∈ H'`) と書ける。`y` は `H'` を正規化するから
+  `H = g⁻¹ H' g = k H' k⁻¹`, ゆえに `H' = k⁻¹ H k ≤ K` で `H' ⊄ K` に矛盾。 -/
+theorem exists_normal_lt_top_of_mem_lattice {H : Subgroup G}
+    (hH : H ∈ chermakDelgadoLattice G) (hlt : H < ⊤) :
+    ∃ M : Subgroup G, M.Normal ∧ H ≤ M ∧ M < ⊤ := by
+  classical
+  by_contra hcon
+  push Not at hcon
+  haveI : Fintype (Subgroup G) := Fintype.ofFinite _
+  -- `H` を含む `L(G)` の真の部分群のうち位数最大のもの
+  obtain ⟨K, hKmem, hKmax⟩ :=
+    (Finset.univ.filter (fun X : Subgroup G =>
+        X ∈ chermakDelgadoLattice G ∧ H ≤ X ∧ X < ⊤)).exists_max_image
+      (fun X => Nat.card ↥X)
+      ⟨H, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hH, le_refl _, hlt⟩⟩
+  obtain ⟨hKL, hHK, hKtop⟩ := (Finset.mem_filter.mp hKmem).2
+  -- `K` に含まれない共役が存在する
+  have hex : ∃ g : G, ¬ (MulAut.conj g • H ≤ K) := by
+    by_contra hall
+    push Not at hall
+    have hnc : Subgroup.normalClosure (H : Set G) ≤ K := by
+      rw [Subgroup.normalClosure, Subgroup.closure_le]
+      intro y hy
+      obtain ⟨a, ha, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hy
+      obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+      exact hall c (hc ▸ (Subgroup.mem_smul_pointwise_iff_exists _ (MulAut.conj c) H).mpr
+        ⟨a, ha, rfl⟩)
+    exact hcon (Subgroup.normalClosure (H : Set G)) inferInstance
+      Subgroup.subset_normalClosure (lt_of_le_of_lt hnc hKtop)
+  obtain ⟨g, hg⟩ := hex
+  set H' : Subgroup G := MulAut.conj g • H with hH'def
+  have hH'L : H' ∈ chermakDelgadoLattice G := chermakDelgadoLattice_conj_smul_mem hH g
+  have hsupL : K ⊔ H' ∈ chermakDelgadoLattice G := chermakDelgadoLattice_sup_mem hKL hH'L
+  -- `K < K ⊔ H'` なので最大性から `K ⊔ H' = ⊤`
+  have hKlt : K < K ⊔ H' := lt_of_le_of_ne le_sup_left fun hc => hg (hc ▸ le_sup_right)
+  have hsuptop : K ⊔ H' = ⊤ := by
+    by_contra hne
+    have hmem : K ⊔ H' ∈ Finset.univ.filter (fun X : Subgroup G =>
+        X ∈ chermakDelgadoLattice G ∧ H ≤ X ∧ X < ⊤) :=
+      Finset.mem_filter.mpr ⟨Finset.mem_univ _, hsupL, hHK.trans le_sup_left,
+        lt_of_le_of_ne le_top hne⟩
+    have hcard : Nat.card ↥(K ⊔ H') ≤ Nat.card ↥K := hKmax _ hmem
+    exact absurd (Subgroup.eq_of_le_of_card_ge le_sup_left hcard) hKlt.ne
+  -- `⊤ = K · H'` から `g⁻¹ = k y`
+  have hprod : ((⊤ : Subgroup G) : Set G) = (K : Set G) * (H' : Set G) := by
+    rw [← hsuptop]; exact chermakDelgadoLattice_sup_eq_mul hKL hH'L
+  obtain ⟨k, hk, y, hy, hky0⟩ : g⁻¹ ∈ (K : Set G) * (H' : Set G) := by
+    rw [← hprod]; exact Subgroup.mem_top _
+  have hky : k * y = g⁻¹ := hky0
+  -- `H = k H' k⁻¹`
+  have hHconj : H = MulAut.conj k • H' := by
+    have h1 : MulAut.conj g⁻¹ • H' = H := by
+      rw [hH'def, smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+    rw [← h1, ← hky, map_mul, ← smul_smul, conj_smul_self_of_mem hy]
+  -- したがって `H' ≤ K` で矛盾
+  refine hg ?_
+  have : H' = MulAut.conj k⁻¹ • H := by
+    rw [hHconj, smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  rw [this]
+  calc MulAut.conj k⁻¹ • H ≤ MulAut.conj k⁻¹ • K :=
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hHK
+    _ = K := conj_smul_self_of_mem (K.inv_mem hk)
+
+end -- Problem 1G.2
+
+section /- 1G: Problem 1G.3 (p. 43) -/
+
+variable {G : Type*} [Group G] [Finite G]
+
+/-- **Isaacs Problem 1G.3** (p. 43)。`G` が単純で `|H|·|C_G(H)| = |G|` なら
+`H = 1` または `H = G`。
+
+* `G` が可換なら全ての部分群が正規なので単純性から直ちに従う。
+* `G` が非可換なら, **Cor 1.46**
+  (`not_isSimpleGroup_and_nonabelian_of_chermakDelgadoMeasure_gt`) より
+  どの部分群も測度が `|G|` を超えられないので `m_G(H) = |G|` は最大値, つまり
+  `H ∈ L(G)`。**1G.2** より `H` が真の部分群なら真の正規部分群に含まれるが,
+  単純性からそれは `⊥` しかない。 -/
+theorem eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card [IsSimpleGroup G] {H : Subgroup G}
+    (h : H.chermakDelgadoMeasure = Nat.card G) : H = ⊥ ∨ H = ⊤ := by
+  by_cases hab : IsMulCommutative G
+  · -- 可換なら全部分群が正規
+    haveI : H.Normal := ⟨fun n hn g => by
+      rw [show g * n * g⁻¹ = n from by
+        rw [isMulCommutative_iff.mp hab g n]; group]
+      exact hn⟩
+    exact IsSimpleGroup.eq_bot_or_eq_top_of_normal H inferInstance
+  · -- 非可換なら `H ∈ L(G)`
+    have hHL : H ∈ chermakDelgadoLattice G := by
+      intro K
+      rw [h]
+      by_contra hgt
+      push Not at hgt
+      exact not_isSimpleGroup_and_nonabelian_of_chermakDelgadoMeasure_gt hgt ⟨inferInstance, hab⟩
+    rcases eq_or_lt_of_le (le_top : H ≤ ⊤) with htop | hlt
+    · exact Or.inr htop
+    · obtain ⟨M, hMnorm, hHM, hMlt⟩ := exists_normal_lt_top_of_mem_lattice hHL hlt
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal M hMnorm with hM | hM
+      · exact Or.inl (le_bot_iff.mp (hM ▸ hHM))
+      · exact absurd hM hMlt.ne
+
+end -- Problem 1G.3
+
+section /- 1G: `L(G)` の有限族の交わり (1G.4 の準備) -/
+
+variable {G : Type*} [Group G] [Finite G]
+
+/-- **Thm 1.44 の 2 元版の反復**。`L(G)` の元からなる有限で空でない族 `S` について,
+`sInf S` は `L(G)` に属し, その中心化群は各元の中心化群の `sSup` に等しい。
+
+`chermakDelgadoLattice_inf_mem` と `chermakDelgadoLattice_centralizer_inf_eq_mul`
+(`C_G(H ⊓ K) = C_G(H)·C_G(K)`) を `Set.Finite.induction_on` で回す。積が join になるのは
+`chermakDelgadoLattice_sup_eq_mul` (両者が `L(G)` に属すため)。 -/
+theorem sInf_mem_lattice_and_centralizer_eq (S : Set (Subgroup G)) (hfin : S.Finite) :
+    S.Nonempty → S ⊆ chermakDelgadoLattice G →
+      sInf S ∈ chermakDelgadoLattice G ∧
+        (centralizer ((sInf S : Subgroup G) : Set G) : Subgroup G)
+          = sSup ((fun H : Subgroup G => (centralizer (H : Set G) : Subgroup G)) '' S) := by
+  induction S, hfin using Set.Finite.induction_on with
+  | empty => intro hne _; exact (Set.not_nonempty_empty hne).elim
+  | @insert a t hat ht_fin ih =>
+    intro _hne hsub
+    have ha : a ∈ chermakDelgadoLattice G := hsub (Set.mem_insert _ _)
+    rcases t.eq_empty_or_nonempty with rfl | ht_ne
+    · refine ⟨?_, ?_⟩
+      · rw [Set.insert_eq, Set.union_empty, sInf_singleton]; exact ha
+      · rw [Set.insert_eq, Set.union_empty, sInf_singleton, Set.image_singleton, sSup_singleton]
+    · have hsub_t : t ⊆ chermakDelgadoLattice G :=
+        fun H hH => hsub (Set.mem_insert_of_mem _ hH)
+      obtain ⟨hIt, hCt⟩ := ih ht_ne hsub_t
+      have hCa : (centralizer (a : Set G) : Subgroup G) ∈ chermakDelgadoLattice G :=
+        chermakDelgadoLattice_centralizer_mem ha
+      have hCIt : (centralizer ((sInf t : Subgroup G) : Set G) : Subgroup G)
+          ∈ chermakDelgadoLattice G := chermakDelgadoLattice_centralizer_mem hIt
+      refine ⟨?_, ?_⟩
+      · rw [sInf_insert]; exact chermakDelgadoLattice_inf_mem ha hIt
+      · rw [sInf_insert, Set.image_insert_eq, sSup_insert, ← hCt]
+        refine SetLike.coe_injective ?_
+        rw [chermakDelgadoLattice_centralizer_inf_eq_mul ha hIt,
+          chermakDelgadoLattice_sup_eq_mul hCa hCIt]
+
+end -- `L(G)` の有限族の交わり
 
 end OddOrder.Isaacs.Ch01
