@@ -1026,6 +1026,38 @@ theorem involution_eq_of_mem_zpowers {G : Type*} [Group G] {c : G} {k : ℕ} (hk
       rw [hu, show u + u = 2 * u by ring, zpow_mul, hzsq, one_zpow]) hy1
   · rw [hu, zpow_add, zpow_mul, hzsq, one_zpow, one_mul, zpow_one]
 
+/-- `A` が非巡回なら, 巡回部分群 `⟨c⟩ ≤ A` の**外に** involution がある。
+
+さもないと `A` の involution が高々 1 個になり `A` が巡回になってしまう。 -/
+theorem exists_involution_notMem_of_not_isCyclic {P : Type*} [Group P] [Finite P]
+    (hP : IsPGroup 2 P) {A : Subgroup P}
+    (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x)
+    {c : P} {k : ℕ} (hk : 1 ≤ k) (hord : orderOf c = 2 ^ k)
+    (hnc : ¬ IsCyclic ↥A) :
+    ∃ t ∈ A, t ≠ 1 ∧ t ^ 2 = 1 ∧ t ∉ Subgroup.zpowers c := by
+  by_contra hcon
+  refine hnc (isCyclic_of_comm_two_group_unique_involution (hP.to_subgroup A) ?_ ?_)
+  · intro u v
+    exact Subtype.ext (hab _ _ u.2 v.2)
+  · intro u v hu hu2 hv hv2
+    have huP : (u : P) ≠ 1 := fun h => hu (Subtype.ext h)
+    have hvP : (v : P) ≠ 1 := fun h => hv (Subtype.ext h)
+    have hu2P : (u : P) ^ 2 = 1 := by
+      have h := congrArg Subtype.val hu2
+      simpa using h
+    have hv2P : (v : P) ^ 2 = 1 := by
+      have h := congrArg Subtype.val hv2
+      simpa using h
+    have humem : (u : P) ∈ Subgroup.zpowers c := by
+      by_contra hcm
+      exact hcon ⟨(u : P), u.2, huP, hu2P, hcm⟩
+    have hvmem : (v : P) ∈ Subgroup.zpowers c := by
+      by_contra hcm
+      exact hcon ⟨(v : P), v.2, hvP, hv2P, hcm⟩
+    refine Subtype.ext ?_
+    rw [involution_eq_of_mem_zpowers hk hord humem huP hu2P,
+      involution_eq_of_mem_zpowers hk hord hvmem hvP hv2P]
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
