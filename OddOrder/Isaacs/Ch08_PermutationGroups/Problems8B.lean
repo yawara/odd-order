@@ -48,8 +48,10 @@ Isaacs の定義 (「`Δ` の translate は `Δ` 自身か, `Δ` と交わらな
   が block ⟹ 原始性で `K` は真の非自明部分群をもたない)。
   ⚠ `G ≅ D₂ₚ` の同型そのものは未形式化。
 - `oddCore`, `isPGroup_two_of_oddCore_eq_bot`, `smul_eq_self_of_odd_of_sq_smul_eq`,
-  `smul_eq_self_of_odd_of_ncard_le_two` — **Problem 8B.7 への道具**: 奇位数元が生成する
-  部分群 (`O²`) と, 奇位数元が高々 2 点の不変集合を各点固定すること。
+  `smul_eq_self_of_odd_of_ncard_le_two`, `stabilizer_le_normalizer_oddCore`,
+  `index_subgroupOf_mul_card`, `relIndex_stabilizer_comm`,
+  `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` —
+  **Problem 8B.7**: 点安定化群が `Ω ∖ {α}` に長さ 3 の軌道をもてば `|G_α| = 3 · 2^e`。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -800,6 +802,145 @@ lemma smul_eq_self_of_odd_of_ncard_le_two [Finite Ω] {x : G} (hodd : Odd (order
   · exact hne (smul_eq_self_of_odd_of_sq_smul_eq hodd h)
   · rw [Set.mem_singleton_iff, mul_smul] at h
     exact hne (MulAction.injective x h)
+
+/-- **8B.7 の鍵**: `G_α` の長さ 3 の軌道 `Δ ∋ β` について, `D = G_α ⊓ G_β` の奇位数元は
+`Δ` を各点固定する。ゆえに `G_α` は `oddCore D` を正規化する
+(`g x g⁻¹` は `g • Δ = Δ` を各点固定するので特に `β` を固定し, `D` に入る)。
+
+Isaacs の Hint は `K = core_H(D)` を経由するが, 「奇位数元は 2 点集合を各点固定する」
+を直接使えば core を作らずに済む。 -/
+lemma stabilizer_le_normalizer_oddCore [Finite Ω] {α β : Ω}
+    (h3 : Set.ncard (MulAction.orbit ↥(stabilizer G α) β) = 3) :
+    stabilizer G α ≤ Subgroup.normalizer
+      ((oddCore (stabilizer G α ⊓ stabilizer G β) : Subgroup G) : Set G) := by
+  classical
+  -- 奇位数元は軌道を各点固定する。
+  have hfix : ∀ x ∈ stabilizer G α ⊓ stabilizer G β, Odd (orderOf x) →
+      ∀ γ ∈ MulAction.orbit ↥(stabilizer G α) β, x • γ = γ := by
+    intro x hx hodd γ hγ
+    obtain ⟨hxα, hxβ'⟩ := Subgroup.mem_inf.mp hx
+    have hxβ : x • β = β := mem_stabilizer_iff.mp hxβ'
+    have hpres : ∀ δ ∈ MulAction.orbit ↥(stabilizer G α) β,
+        x • δ ∈ MulAction.orbit ↥(stabilizer G α) β := by
+      rintro δ ⟨k, rfl⟩
+      exact ⟨⟨x, hxα⟩ * k, mul_smul _ _ _⟩
+    rcases eq_or_ne γ β with rfl | hγβ
+    · exact hxβ
+    · have hβΔ : β ∈ MulAction.orbit ↥(stabilizer G α) β := MulAction.mem_orbit_self β
+      have hScard : (MulAction.orbit ↥(stabilizer G α) β \ {β}).ncard = 2 := by
+        rw [Set.ncard_sdiff_singleton_of_mem hβΔ, h3]
+      have hSpres : ∀ δ ∈ MulAction.orbit ↥(stabilizer G α) β \ {β},
+          x • δ ∈ MulAction.orbit ↥(stabilizer G α) β \ {β} := by
+        intro δ hδ
+        refine ⟨hpres δ hδ.1, ?_⟩
+        intro hc
+        rw [Set.mem_singleton_iff] at hc
+        exact hδ.2 (Set.mem_singleton_iff.mpr (MulAction.injective x (hc.trans hxβ.symm)))
+      exact smul_eq_self_of_odd_of_ncard_le_two hodd hSpres (le_of_eq hScard)
+        ⟨hγ, fun hc => hγβ (Set.mem_singleton_iff.mp hc)⟩
+  -- 生成元の共役はふたたび生成元。
+  have hgen : ∀ g ∈ stabilizer G α, ∀ x : G,
+      (x ∈ stabilizer G α ⊓ stabilizer G β ∧ Odd (orderOf x)) →
+      (g * x * g⁻¹ ∈ stabilizer G α ⊓ stabilizer G β ∧ Odd (orderOf (g * x * g⁻¹))) := by
+    intro g hg x hx
+    refine ⟨Subgroup.mem_inf.mpr ⟨?_, ?_⟩, ?_⟩
+    · exact (stabilizer G α).mul_mem
+        ((stabilizer G α).mul_mem hg (Subgroup.mem_inf.mp hx.1).1) ((stabilizer G α).inv_mem hg)
+    · refine mem_stabilizer_iff.mpr ?_
+      have hginv : (g⁻¹ : G) • β ∈ MulAction.orbit ↥(stabilizer G α) β :=
+        ⟨⟨g⁻¹, (stabilizer G α).inv_mem hg⟩, rfl⟩
+      rw [mul_smul, mul_smul, hfix x hx.1 hx.2 _ hginv, ← mul_smul, mul_inv_cancel, one_smul]
+    · have hsc : SemiconjBy g x (g * x * g⁻¹) := by
+        unfold SemiconjBy
+        group
+      rw [← SemiconjBy.orderOf_eq g hsc]
+      exact hx.2
+  have hmapping : ∀ g ∈ stabilizer G α, ∀ y ∈ oddCore (stabilizer G α ⊓ stabilizer G β),
+      g * y * g⁻¹ ∈ oddCore (stabilizer G α ⊓ stabilizer G β) := by
+    intro g hg y hy
+    have hmap : (oddCore (stabilizer G α ⊓ stabilizer G β)).map (MulAut.conj g).toMonoidHom
+        ≤ oddCore (stabilizer G α ⊓ stabilizer G β) := by
+      rw [oddCore, MonoidHom.map_closure]
+      refine (Subgroup.closure_le _).mpr ?_
+      rintro _ ⟨x, hx, rfl⟩
+      exact Subgroup.subset_closure (hgen g hg x hx)
+    exact hmap ⟨y, hy, rfl⟩
+  intro g hg
+  rw [Subgroup.mem_normalizer_iff]
+  intro h
+  refine ⟨fun hh => hmapping g hg h hh, fun hh => ?_⟩
+  have hc := hmapping g⁻¹ ((stabilizer G α).inv_mem hg) _ hh
+  rwa [show g⁻¹ * (g * h * g⁻¹) * g⁻¹⁻¹ = h from by group] at hc
+
+/-- `D ≤ K` のとき `[K : D] · |D| = |K|`。 -/
+lemma index_subgroupOf_mul_card [Finite G] {D K : Subgroup G} (h : D ≤ K) :
+    (D.subgroupOf K).index * Nat.card ↥D = Nat.card ↥K := by
+  rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe h).toEquiv]
+  exact Subgroup.index_mul_card _
+
+/-- 推移作用では対をなす suborbit の相対指数は等しい (`|G_α| = |G_β|` から)。 -/
+lemma relIndex_stabilizer_comm [Finite G] [IsPretransitive G Ω] (α β : Ω) :
+    (stabilizer G β).relIndex (stabilizer G α) = (stabilizer G α).relIndex (stabilizer G β) := by
+  have hcomm : stabilizer G β ⊓ stabilizer G α = stabilizer G α ⊓ stabilizer G β := inf_comm _ _
+  have e1 : (stabilizer G β).relIndex (stabilizer G α) *
+      Nat.card ↥(stabilizer G α ⊓ stabilizer G β) = Nat.card ↥(stabilizer G α) := by
+    rw [Subgroup.relIndex, ← Subgroup.inf_subgroupOf_right, hcomm]
+    exact index_subgroupOf_mul_card inf_le_left
+  have e2 : (stabilizer G α).relIndex (stabilizer G β) *
+      Nat.card ↥(stabilizer G α ⊓ stabilizer G β) = Nat.card ↥(stabilizer G β) := by
+    rw [Subgroup.relIndex, ← Subgroup.inf_subgroupOf_right]
+    exact index_subgroupOf_mul_card inf_le_right
+  exact Nat.eq_of_mul_eq_mul_right Nat.card_pos
+    (by rw [e1, e2]; exact card_stabilizer_eq α β)
+
+/-- **Isaacs Problem 8B.7** (p. 249) 🎉: 原始置換群 `G` の点安定化群 `G_α` が
+`Ω ∖ {α}` 上に**長さ 3 の軌道**をもてば `|G_α| = 3 · 2^e` (`e ≥ 0`)。
+
+`D = G_α ⊓ G_β` (`β` はその軌道の点) は `G_α` の中で指数 3。`D` の奇位数元は軌道
+`Δ` を各点固定するので `G_α` は `oddCore D` (= `O²(D)`) を正規化し
+(`stabilizer_le_normalizer_oddCore`), 対をなす suborbit も長さ 3 なので `G_β` も同様。
+`G_α ⊔ G_β = G` (極大性) だから `oddCore D ⊴ G`, しかも `oddCore D ≤ G_α` なので
+`oddCore D = 1`。したがって `D` は 2-群で `|G_α| = 3 · |D| = 3 · 2^e`。 -/
+theorem card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three [Finite G] [Finite Ω]
+    [FaithfulSMul G Ω] [IsPreprimitive G Ω] [Nontrivial Ω] {α β : Ω}
+    (h3 : Set.ncard (MulAction.orbit ↥(stabilizer G α) β) = 3) :
+    ∃ e : ℕ, Nat.card ↥(stabilizer G α) = 3 * 2 ^ e := by
+  classical
+  have hcomm : stabilizer G β ⊓ stabilizer G α = stabilizer G α ⊓ stabilizer G β := inf_comm _ _
+  have hrel : (stabilizer G β).relIndex (stabilizer G α) = 3 := by
+    rw [← ncard_suborbit_eq_relIndex]; exact h3
+  have hDcard : 3 * Nat.card ↥(stabilizer G α ⊓ stabilizer G β)
+      = Nat.card ↥(stabilizer G α) := by
+    rw [← hrel, Subgroup.relIndex, ← Subgroup.inf_subgroupOf_right, hcomm]
+    exact index_subgroupOf_mul_card inf_le_left
+  -- 対をなす suborbit も長さ 3。
+  have h3' : Set.ncard (MulAction.orbit ↥(stabilizer G β) α) = 3 := by
+    rw [ncard_suborbit_eq_relIndex, ← relIndex_stabilizer_comm, hrel]
+  -- 両方の点安定化群が `oddCore D` を正規化する。
+  have hNα := stabilizer_le_normalizer_oddCore (G := G) h3
+  have hNβ := stabilizer_le_normalizer_oddCore (G := G) h3'
+  rw [hcomm] at hNβ
+  -- `G_β ≰ G_α` (指数 3 の勘定)。
+  have hnotle : ¬ stabilizer G β ≤ stabilizer G α := by
+    intro hle
+    have hDeq : stabilizer G α ⊓ stabilizer G β = stabilizer G β := inf_eq_right.mpr hle
+    rw [hDeq, card_stabilizer_eq (G := G) β α] at hDcard
+    have hpos : 0 < Nat.card ↥(stabilizer G α) := Nat.card_pos
+    omega
+  -- `oddCore D ⊴ G` ⟹ `= ⊥`。
+  haveI : (oddCore (stabilizer G α ⊓ stabilizer G β)).Normal := by
+    rw [← Subgroup.normalizer_eq_top_iff]
+    have hcoatom : IsCoatom (stabilizer G α) :=
+      IsPreprimitive.isCoatom_stabilizer_of_isPreprimitive (G := G) α
+    have hsup : stabilizer G α ⊔ stabilizer G β = ⊤ :=
+      hcoatom.2 _ (lt_of_le_of_ne le_sup_left fun hc => hnotle (hc ▸ le_sup_right))
+    exact eq_top_iff.mpr (hsup ▸ sup_le hNα hNβ)
+  have hbot : oddCore (stabilizer G α ⊓ stabilizer G β) = ⊥ :=
+    eq_bot_of_normal_le_stabilizer ((oddCore_le _).trans inf_le_left)
+  -- `D` は 2-群。
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨e, he⟩ := (isPGroup_two_of_oddCore_eq_bot hbot).exists_card_eq
+  exact ⟨e, by rw [← hDcard, he]⟩
 
 end
 
