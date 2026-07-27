@@ -3754,3 +3754,73 @@ API メモ: `Sylow.is_maximal'` / `Subgroup.map_subgroupOf_eq_of_le` /
 * ⚠ 「上三角」は `Matrix.BlockTriangular M id` (`∀ i j, j < i → M i j = 0`) で表す。
   `[DecidableEq F]` は**不要** (行列の逆に要るのは添字型 `Fin n` の DecidableEq)。
 * 次: (a) `D ≤ N(P)` (対角共役)、(b) `DP` = 上三角全体、(c) `P`-不変部分空間の分類、(d) `N = DP`。
+
+### 🎉 7A.3 完成 (2026-07-27) — `N_G(P) = DP` (`Problems7A3.lean`, 601 行, axiom-clean)
+
+(a)-(d) をすべて実証明。⚠ **主張は任意の体 `F` 上で成立**する (`q` の素数冪性は `P` を
+Sylow `p`-部分群と解釈するときにしか効かない) ので, その一般性で形式化した。
+
+* (a)(b): `blockTriangular_mul_diag` (上三角の積の対角成分 = 対角成分の積) が鍵。
+  `blockTriangular_coe_inv` / `diag_mul_diag_inv` / `isUnit_diag_of_blockTriangular` /
+  `isDiag_mul` (mathlib に `Matrix.IsDiag.mul` は無い) を経由して
+  `upperTriangularGL` (Borel) / `unitriangularGL` (Sylow p) / `diagonalGL` (D) を定義。
+  `conj_mem_unitriangularGL` ⟹ `upperTriangularGL_le_normalizer` (`P ⊴ B`) ⟹
+  **(a)** `diagonalGL_le_normalizer`。**(b)** `diagonalGL_mul_unitriangularGL` (Set 積) /
+  `diagonalGL_sup_unitriangularGL` (部分群 sup): `A ↦ (diagonal (A i i), diagonal(A i i)⁻¹ * A)`。
+* (c): `IsRowInvariant H W` (`∀ A ∈ H, ∀ v ∈ W, v ᵥ* A ∈ W`) と `rowTail n m` =
+  `⟨e_m,…,e_{n-1}⟩` を定義。右作用ゆえ不変なのは**後ろ**の座標側。
+  `transvectionGL` (`1 + c·E_{i,j}`) + `vecMul_transvectionGL` で
+  `single_mem_of_isRowInvariant` (非零成分の最小添字 `i₀` 以降の `e_j` が全部 `W` に入る) →
+  **`exists_eq_rowTail_of_isRowInvariant`** (不変部分空間は `rowTail n m` に限る)。
+  `rowTail_eq_ker` (先頭 `m` 座標への射影の核) + 階数退化次数定理で
+  `finrank_rowTail = n - m` ⟹ **`existsUnique_isRowInvariant_finrank_eq`**
+  (各次元 `k ≤ n` にちょうど 1 つ)。
+* (d): `rowActionEquiv A` (`v ↦ v ᵥ* A` の線型同型) と
+  `rowTail_map_rowActionEquiv` (`W ᵥ* A` はふたたび `P`-不変 + `LinearEquiv.finrank_map_eq`
+  で次元不変 ⟹ (c) の一意性で `= W`) ⟹ **`normalizer_unitriangularGL_eq`** (`N_G(P) = B`)。
+  `e_r ᵥ* A` = `A` の第 `r` 行が `rowTail n r` に入る ⟹ `A r s = 0` (`s < r`)。
+  `_eq_sup` / `_eq_mul` で **`N_G(P) = DP`**。
+
+Lean 実務メモ:
+* ⚠ `Subgroup.normalizer` は **`Set G` を取る**。statement で `Subgroup.normalizer
+  (H : Subgroup (GL (Fin n) F))` と書くと**戻り値型の metavariable が未解決で
+  coercion 挿入に失敗**する (「expected Set (GL (Fin ?m) ?m)」)。
+  `Subgroup.normalizer ((H : Subgroup (GL (Fin n) F)) : Set (GL (Fin n) F))` と
+  **Set まで明示**する。同じ理由で `(H : Set _) * (K : Set _)` も二段ascription が要る。
+* ⚠ `Matrix.transvection_mul_transvection_same` は `i j` が**明示引数**なので
+  `... hij` と書くと `hij` が `i` に食われて rewrite pattern が壊れる (`... i j hij`)。
+* `Matrix.stdBasisMatrix` は現行 mathlib では **`Matrix.single`** (`single_apply` あり)。
+* `le_sup_left` は項 (関数でない) ゆえ metavariable 下で適用不可 →
+  `Subgroup.mem_sup_left` / `mem_sup_right` を使う。
+* `set x := e with h` の後に `rw [lemma]` で `e` が**再導入**されると omega が別 atom
+  として扱う (`finrank_rowTail` で踏んだ) — statement に再登場する項に `set` を使わない。
+* `IsUnit.of_mul_eq_one` (旧 `isUnit_of_mul_eq_one` は現存しない) /
+  `finrank_top` は root namespace / `LinearEquiv.finrank_map_eq` /
+  `LinearMap.finrank_range_add_finrank_ker` は `Mathlib.LinearAlgebra.FiniteDimensional.Lemmas`。
+
+⟹ §7A は 3/6 完了 (7A.1, 7A.2, 7A.3)。次は **7A.4** (`SL(2,q)` と `PSL(2,q)` の
+Sylow `p` はちょうど `q+1` 個)。
+
+### 7A.4 の設計 (2026-07-27 調査)
+
+既存インフラ:
+* `natCard_specialLinearGroup_fin_two`
+  (`OddOrder/GroupTheory/SpecificGroups/ProjectiveSpecialLinear/RootGroupSylow.lean:106`,
+  **任意標数**に一般化済 = issue 9211): `|SL(2,F)| = q(q-1)(q+1)`。
+* mathlib `Matrix.SpecialLinearGroup.transvection` / `transvection_add` / `transvection_coe` /
+  `SL2_inv_expl` / `diag2` (対角 `[[a,0],[0,a⁻¹]]`) / `Sylow.card_eq_index_normalizer`。
+* ⚠ 既存 `rootSubgroup` (`ProjectiveSpecialLinear/RootGroup.lean`) は **PSL 側かつ標数 2 専用**
+  なので 7A.4 (任意標数, SL 側) には流用できない。
+
+証明計画 (新 leaf `Problems7A4.lean`):
+1. `transvectionHom : Multiplicative F →* SL(2,F)` (単射) と
+   `unipotentSL = range` (`|U| = q`)。
+2. `borelSL = {g | g 1 0 = 0}` と `Fˣ × F ≃ borelSL` (`(a,b) ↦ [[a,b],[0,a⁻¹]]`) ⟹
+   `|B| = (q-1)q`。
+3. `N_{SL}(U) = B`: `⊇` は `g u g⁻¹ = transvection (a² b)` (`a = g 0 0`);
+   `⊆` は `g T g⁻¹` の `(1,0)` 成分が `-(g 1 0)²` なので `g 1 0 = 0`。
+4. `U ∈ Syl_p(SL)` (`|U| = q = p^n`, index `(q-1)(q+1)` は `p` と互いに素) ⟹
+   `Sylow.card_eq_index_normalizer` で `n_p = [SL : B] = q+1`。
+5. PSL: `Z = Z(SL)` は `p` と互いに素な位数 (標数 2 なら自明, 奇標数なら位数 2) ⟹
+   `n_p(SL/Z) = n_p(SL)` (中心的で位数互いに素な正規部分群による商は Sylow 数を保つ:
+   `PZ = P × Z` ゆえ `P` char in `PZ` で `N_G(PZ) = N_G(P)`)。
