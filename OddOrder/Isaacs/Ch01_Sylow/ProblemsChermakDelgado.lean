@@ -23,6 +23,8 @@ pdftotext は `<` と `≤` を潰すが, **1G.1 と 1G.4 の不等号は厳密 
 * **1G.4**: `A ≤ G` 可換, `G` 非可換なら `|G : N| < |G : A|²` なる**正規**可換部分群 `N`
   が存在する。
 
+これで **§1G は 1G.1–1G.4 全問完済** (したがって Isaacs Ch.1 の演習は §1A–§1G 全完済)。
+
 ## Main results
 
 - `eq_centralizer_and_mem_lattice_of_no_smaller_characteristic` — **Problem 1G.1**。
@@ -34,6 +36,7 @@ pdftotext は `<` と `≤` を潰すが, **1G.1 と 1G.4 の不等号は厳密 
 - `eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card` — **Problem 1G.3**。
 - `sInf_mem_lattice_and_centralizer_eq` — `L(G)` の有限族の交わりは `L(G)` に属し
   中心化群は各元の中心化群の `sSup` (Thm 1.44 の 2 元版の反復; 1G.4 の準備)。
+- `exists_normal_isMulCommutative_index_lt` — **Problem 1G.4**。
 -/
 
 namespace OddOrder.Isaacs.Ch01
@@ -365,5 +368,128 @@ theorem sInf_mem_lattice_and_centralizer_eq (S : Set (Subgroup G)) (hfin : S.Fin
           chermakDelgadoLattice_sup_eq_mul hCa hCIt]
 
 end -- `L(G)` の有限族の交わり
+
+section /- 1G: Problem 1G.4 (p. 43) -/
+
+open Pointwise
+
+variable {G : Type*} [Group G] [Finite G]
+
+/-- **Isaacs Problem 1G.4** (p. 43)。`G` が非可換で `A ≤ G` が可換なら,
+`|G : N| < |G : A|²` を満たす**正規**可換部分群 `N` が存在する。
+
+背理法。そのような `N` が無いなら特性可換なものも無いので **1G.1** より
+`A = C_G(A) ∈ L(G)`。`G` 非可換ゆえ `A < ⊤` で, **1G.2** から `A ⊆ M' < ⊤` なる正規 `M'`
+が取れる。ここで `N := ⋂_g gAg⁻¹` (共役全体の交わり) を取ると:
+
+* 共役全体 `S` は `L(G)` に含まれる (`chermakDelgadoLattice_conj_smul_mem`) ので
+  `N ∈ L(G)` かつ `C_G(N) = sSup S` (`sInf_mem_lattice_and_centralizer_eq`)。
+  ここで `C_G(gAg⁻¹) = g C_G(A) g⁻¹ = gAg⁻¹` (`centralizer_conj_smul` + `A = C_G(A)`)
+  なので `C_G '' S = S` となるのが鍵。
+* `A ≤ M'` と `M'` の正規性から `sSup S ≤ M' < ⊤`, つまり `|C_G(N)| < |G|`。
+* `N ≤ A` ゆえ可換, `S` が共役で閉じるので `N` は正規。
+* `N ∈ L(G)` の測度等式 `|N|·|C_G(N)| = m(N) = m(A) = |A|²` と `|C_G(N)| < |G|` から
+  `|G:N|·|A|² = |G|·|C_G(N)| < |G|² = |G:A|²·|A|²`, すなわち `|G:N| < |G:A|²`。 -/
+theorem exists_normal_isMulCommutative_index_lt {A : Subgroup G} [hA : IsMulCommutative A]
+    (hG : ¬ IsMulCommutative G) :
+    ∃ N : Subgroup G, N.Normal ∧ IsMulCommutative N ∧ N.index < A.index ^ 2 := by
+  classical
+  by_contra hcon
+  have hno : ∀ N : Subgroup G, N.Normal → IsMulCommutative N → ¬ N.index < A.index ^ 2 :=
+    fun N h1 h2 h3 => hcon ⟨N, h1, h2, h3⟩
+  obtain ⟨hCA, hAL, -⟩ := eq_centralizer_and_mem_lattice_of_no_smaller_characteristic
+    (A := A) (fun N hchar hab => hno N (by haveI := hchar; infer_instance) hab)
+  -- `G` 非可換なので `A < ⊤`
+  have hAlt : A < ⊤ := by
+    refine lt_of_le_of_ne le_top fun hc => hG (isMulCommutative_iff.mpr fun x y => ?_)
+    have hx : x ∈ A := by rw [hc]; exact Subgroup.mem_top x
+    have hy : y ∈ A := by rw [hc]; exact Subgroup.mem_top y
+    exact congrArg Subtype.val (isMulCommutative_iff.mp hA ⟨x, hx⟩ ⟨y, hy⟩)
+  obtain ⟨M', hM'norm, hAM', hM'lt⟩ := exists_normal_lt_top_of_mem_lattice hAL hAlt
+  -- 共役全体 `S` とその交わり `N`
+  set S : Set (Subgroup G) := Set.range (fun g : G => MulAut.conj g • A) with hSdef
+  have hAS : A ∈ S := ⟨1, by simp⟩
+  have hSsub : S ⊆ chermakDelgadoLattice G := by
+    intro H hH
+    rw [hSdef] at hH
+    obtain ⟨g, rfl⟩ := hH
+    exact chermakDelgadoLattice_conj_smul_mem hAL g
+  obtain ⟨hNL, hCN⟩ :=
+    sInf_mem_lattice_and_centralizer_eq S (Set.toFinite _) ⟨A, hAS⟩ hSsub
+  set N : Subgroup G := sInf S with hNdef
+  -- `C_G '' S = S`
+  have hconjC : ∀ g : G, (centralizer ((MulAut.conj g • A : Subgroup G) : Set G) : Subgroup G)
+      = MulAut.conj g • A := by
+    intro g; rw [centralizer_conj_smul, ← hCA]
+  have himg : (fun H : Subgroup G => (centralizer (H : Set G) : Subgroup G)) '' S = S := by
+    refine Set.Subset.antisymm ?_ ?_
+    · rintro X ⟨H, hH, rfl⟩
+      rw [hSdef] at hH ⊢
+      obtain ⟨g, rfl⟩ := hH
+      exact ⟨g, (hconjC g).symm⟩
+    · intro X hX
+      refine ⟨X, hX, ?_⟩
+      rw [hSdef] at hX
+      obtain ⟨g, rfl⟩ := hX
+      exact hconjC g
+  rw [himg] at hCN
+  -- `C_G(N) = sSup S ≤ M' < ⊤`
+  have hSupM : sSup S ≤ M' := by
+    refine sSup_le fun H hH => ?_
+    rw [hSdef] at hH
+    obtain ⟨g, rfl⟩ := hH
+    intro u hu
+    obtain ⟨a, ha, hau⟩ := (Subgroup.mem_smul_pointwise_iff_exists u (MulAut.conj g) A).mp hu
+    rw [← hau]
+    exact hM'norm.conj_mem _ (hAM' ha) g
+  have hCNlt : Nat.card ↥(centralizer ((N : Subgroup G) : Set G)) < Nat.card G := by
+    have hne : (centralizer ((N : Subgroup G) : Set G) : Subgroup G) ≠ ⊤ := by
+      rw [hCN]
+      intro hc
+      exact hM'lt.ne (le_antisymm le_top (hc ▸ hSupM))
+    rcases lt_or_eq_of_le (Nat.le_of_dvd Nat.card_pos
+      (Subgroup.card_subgroup_dvd_card
+        (centralizer ((N : Subgroup G) : Set G) : Subgroup G))) with h | h
+    · exact h
+    · exact absurd (Subgroup.eq_top_of_card_eq _ h) hne
+  -- `N` は可換かつ正規
+  have hNA : N ≤ A := sInf_le hAS
+  haveI hNcomm : IsMulCommutative N := isMulCommutative_iff.mpr fun x y => by
+    have h := isMulCommutative_iff.mp hA ⟨(x : G), hNA x.2⟩ ⟨(y : G), hNA y.2⟩
+    have h' : (x : G) * (y : G) = (y : G) * (x : G) := congrArg Subtype.val h
+    exact Subtype.ext h'
+  have hNnorm : N.Normal := by
+    refine ⟨fun n hn x => ?_⟩
+    rw [hNdef, Subgroup.mem_sInf] at hn ⊢
+    intro H hH
+    rw [hSdef] at hH
+    obtain ⟨g, rfl⟩ := hH
+    have hmem : n ∈ MulAut.conj (x⁻¹ * g) • A :=
+      hn _ (by rw [hSdef]; exact ⟨x⁻¹ * g, rfl⟩)
+    obtain ⟨a, ha, han⟩ :=
+      (Subgroup.mem_smul_pointwise_iff_exists n (MulAut.conj (x⁻¹ * g)) A).mp hmem
+    refine (Subgroup.mem_smul_pointwise_iff_exists _ (MulAut.conj g) A).mpr ⟨a, ha, ?_⟩
+    have han' : (x⁻¹ * g) * a * (x⁻¹ * g)⁻¹ = n := han
+    change g * a * g⁻¹ = x * n * x⁻¹
+    rw [← han']
+    group
+  -- 測度等式から指数の評価
+  have hmA : A.chermakDelgadoMeasure = Nat.card ↥A ^ 2 := by
+    rw [chermakDelgadoMeasure_def, ← hCA, sq]
+  have hmN : N.chermakDelgadoMeasure = Nat.card ↥A ^ 2 := by
+    rw [← hmA]; exact le_antisymm (hAL N) (hNL A)
+  have hGN : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
+  have hGA : Nat.card ↥A * A.index = Nat.card G := Subgroup.card_mul_index A
+  refine hno N hNnorm hNcomm (lt_of_mul_lt_mul_right ?_ (Nat.zero_le (Nat.card ↥A ^ 2)))
+  calc N.index * Nat.card ↥A ^ 2
+      = N.index * N.chermakDelgadoMeasure := by rw [hmN]
+    _ = N.index * (Nat.card ↥N * Nat.card ↥(centralizer ((N : Subgroup G) : Set G))) := by
+        rw [chermakDelgadoMeasure_def]
+    _ = Nat.card G * Nat.card ↥(centralizer ((N : Subgroup G) : Set G)) := by
+        rw [← mul_assoc, mul_comm N.index, hGN]
+    _ < Nat.card G * Nat.card G := mul_lt_mul_of_pos_left hCNlt Nat.card_pos
+    _ = A.index ^ 2 * Nat.card ↥A ^ 2 := by rw [← hGA]; ring
+
+end -- Problem 1G.4
 
 end OddOrder.Isaacs.Ch01

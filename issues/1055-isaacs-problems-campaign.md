@@ -27,7 +27,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 各章の演習を section 順・番号順に形式化。置き場 = `OddOrder/Isaacs/ChNN_.../Problems*.lean`
 (章ディレクトリ内の新 leaf、mathlib 互換記述名、`OddOrder.lean` 配線)。
 
-- [ ] **Ch.1 Sylow** — 1A / 1B / 1C / 1D / 1E / 1F / 1G Problems
+- [x] **Ch.1 Sylow** — **🎉 完済 (2026-07-28)**: §1A–§1G 全問
+      (§1E は Sylow 計数の非単純性 8 問, §1F は Brodkey 周辺 3 問, §1G は Chermak–Delgado 4 問)
 - [ ] Ch.2 Subnormality
 - [ ] Ch.3 Split Extensions
 - [ ] Ch.4 Commutators
@@ -5511,8 +5512,17 @@ Chermak–Delgado (Thm 1.41) と最大測度束 `L(G)` (Thm 1.44) の節で,
   **1G.2 から従う**: `G` 非可換なら `m(⊥) = |G| = m(H)` かつ最大測度は `|G|`
   (超えると Cor 1.46 で非単純) なので `H ∈ L(G)`、1G.2 より `H` は真の正規部分群 = `⊥` に
   含まれる。`G` 可換単純なら位数素数で部分群は `⊥`, `⊤` のみ。
-* ⬜ **1G.4**: `G` 非可換, `A` 可換 ⟹ `|G : N| < |G : A|²` なる**正規**可換 `N` が存在。
-  **✅ 未解決点は解消 (2026-07-28) — 取るべき `N` は `core_G(A)`**。実装のみ残る。
+* ✅ **1G.4** `exists_normal_isMulCommutative_index_lt` (2026-07-28) — 設計どおり landing。
+
+## 🎉 §1G 完済 → **Isaacs Ch.1 の演習が §1A–§1G 全完済** (2026-07-28)
+
+Ch.1 の leaf: `Problems.lean` (1A–1D) / `ProblemsOrder120.lean` / `ProblemsAlternating.lean` /
+`ProblemsFrobeniusFrattini.lean` / `ProblemsSylowCounting.lean` + `ProblemsNonSimple.lean`
+(§1E) / `ProblemsBrodkey.lean` (§1F) / `ProblemsChermakDelgado.lean` (§1G)。
+全て `OddOrder.lean` 配線済・実証明・axiom-clean・lint 警告 0・sorry 0。
+
+**次の frontier = Ch.3 §3C (3C.1–3C.8)**、続いて §3D / §3E / §3F、
+最後に Ch.8 §8C.6 (繰延中)。
 
 ### 1G.4 の設計 (2026-07-28 に確定, 実装待ち)
 
