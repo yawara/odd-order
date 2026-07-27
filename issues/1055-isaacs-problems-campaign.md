@@ -4178,3 +4178,34 @@ TransitiveAutomorphisms / TransvectionGeneration)。演習は新 leaf `Problems8
 Lean 実務メモ: `[N.Normal]` はインスタンスなので `N.Normal.conj_mem` と書けない
 (`N.Normal : Prop` へのフィールド射影になる) → `Subgroup.Normal.conj_mem ‹N.Normal›`。
 `Nat.card ↑(g • S) = Nat.card ↑S` は `Equiv.Set.image` + `Equiv.setCongr Set.image_smul`。
+
+### 8A.10 の証明設計 (2026-07-27, 全ステップ検算済) と核心補題の landing
+
+**主張**: 可解な 4-transitive 置換群 `G` は `S₄` に同型。
+
+**設計** (書籍 hint「極小正規部分群 `N` が regular であることを示し, `G_α` の `N` への
+共役作用を考えよ」を詰めたもの):
+
+1. `G` は 4-transitive ⟹ 2-transitive。極小正規部分群 `N ≠ 1` を取る。
+2. `N` は非自明に作用する (忠実な置換群ゆえ) ⟹ **8A.9** で `N` は推移的。
+3. `G` 可解 ⟹ **Isaacs Thm 3.11**
+   (`Ch03.solvable_minimal_normal_isElementaryAbelian` 系; `Ch03_SplitExtensions/Basic.lean:194`)
+   で `N` は elementary abelian `p`-群 ⟹ 可換。
+4. 可換 + 推移的 ⟹ **8A.2** (`bijective_smulBase_top_of_comm`) で `N` は **regular**。
+   したがって `|N| = |Ω|` で `Ω ≅ N` (点 `α` を `1` に対応させる)。
+5. **Thm 8.5 第 3 主張** (`RegularNormal.lean` の `ofStabilizerToNonidentity`) により
+   `G_α` の `Ω ∖ {α}` への作用は `G_α` の `N ∖ {1}` への**共役 (=自己同型) 作用**と
+   置換同型。`G` が 4-transitive ⟹ `G_α` は `Ω ∖ {α}` に 3-transitive。
+6. ⟹ `G_α` は `N ∖ {1}` に自己同型として 3-transitive ⟹ **`|N| ≤ 4`**
+   (下記の核心補題)。`|N| = |Ω| ≥ 4` (4-transitive) ⟹ `|Ω| = 4` ⟹ `G ≤ S₄` が
+   4-transitive ⟹ `G = S₄`。
+
+**✅ 核心補題を landing** (`card_le_four_of_three_transitive_on_nonidentity`):
+群 `N` に自己同型として作用する `A` が `N ∖ {1}` に 3-transitive なら `|N| ≤ 4`。
+自己同型は積を保つので `x`, `y` を固定すれば `xy` も固定する。`|N| ≥ 5` なら
+`1, x, y, xy` と異なる `w` が取れ, 3-transitivity は `(x,y,xy) ↦ (x,y,w)` を要求するが
+それは `xy ↦ xy ≠ w` を強いる。⚠ `N` が elementary abelian であることは**不要**
+(積を保つことしか使わない)。
+
+**残り**: 上記 1–5 の結線 (極小正規部分群の存在, Thm 3.11 の適用形, Thm 8.5 第 3 主張の
+`ofStabilizerToNonidentity` から 3-transitivity を移す部分, 最後の `|Ω| = 4 ⟹ G = S₄`)。

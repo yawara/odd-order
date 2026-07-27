@@ -47,6 +47,8 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
   したがって `N` は half-transitive (すべての `N`-軌道が同じ濃度)。
 - `isPretransitive_of_normal_of_two_transitive` — **Problem 8A.9**: 2-transitive な `G` の
   非自明に作用する正規部分群は推移的。
+- `card_le_four_of_three_transitive_on_nonidentity` — **Problem 8A.10 の核心**:
+  自己同型群が `N ∖ {1}` に 3-transitive なら `|N| ≤ 4`。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -654,6 +656,61 @@ theorem isPretransitive_of_normal_of_two_transitive [IsPretransitive G Ω]
     exact ⟨_, hγmem, rfl⟩
   obtain ⟨m, hm⟩ := this
   exact ⟨m, hm⟩
+
+/-! ### Problem 8A.10 — 可解 4-transitive 群 -/
+
+/-- **8A.10 の核心**: 群 `N` に自己同型として作用する `A` が非単位元の集合 `N ∖ {1}` に
+**3-transitive** なら `|N| ≤ 4`。
+
+自己同型は積を保つので, `x`, `y` を固定する元は `xy` も固定する。`|N| ≥ 5` なら
+`1, x, y, xy` と異なる `w` が取れ, 3-transitivity で `(x, y, xy) ↦ (x, y, w)` を実現する
+自己同型があるはずだが, それは `xy ↦ xy ≠ w` を強いる — 矛盾。
+
+`N` が elementary abelian であることは不要 (積を保つことだけを使う)。 -/
+theorem card_le_four_of_three_transitive_on_nonidentity
+    {A N : Type*} [Group A] [Group N] [MulDistribMulAction A N]
+    (h3 : ∀ x y z x' y' z' : N, x ≠ 1 → y ≠ 1 → z ≠ 1 → x' ≠ 1 → y' ≠ 1 → z' ≠ 1 →
+      x ≠ y → x ≠ z → y ≠ z → x' ≠ y' → x' ≠ z' → y' ≠ z' →
+      ∃ a : A, a • x = x' ∧ a • y = y' ∧ a • z = z') :
+    Nat.card N ≤ 4 := by
+  classical
+  by_contra hcard
+  have h5 : 5 ≤ Nat.card N := Nat.lt_of_not_le hcard
+  haveI : Finite N := Nat.finite_of_card_ne_zero (by omega)
+  haveI := Fintype.ofFinite N
+  -- 濃度が `Nat.card N` 未満の `Finset` の外に元が取れる
+  have hout : ∀ s : Finset N, s.card < Nat.card N → ∃ z : N, z ∉ s := by
+    intro s hs
+    by_contra hc
+    rw [Finset.eq_univ_iff_forall.mpr (not_exists_not.mp hc), Finset.card_univ,
+      ← Nat.card_eq_fintype_card] at hs
+    exact lt_irrefl _ hs
+  -- `x ≠ 1`
+  obtain ⟨x, hx⟩ := hout {1} (by simp only [Finset.card_singleton]; omega)
+  simp only [Finset.mem_singleton] at hx
+  -- `y ∉ {1, x, x⁻¹}` — これで `x * y ∉ {1, x, y}`
+  obtain ⟨y, hy⟩ := hout {1, x, x⁻¹} (lt_of_le_of_lt (Finset.card_insert_le _ _) (by
+    refine lt_of_le_of_lt (Nat.succ_le_succ (Finset.card_insert_le _ _)) ?_
+    simp only [Finset.card_singleton]
+    omega))
+  simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hy
+  obtain ⟨hy1, hyx, hyxinv⟩ := hy
+  have hxy1 : x * y ≠ 1 := fun hc => hyxinv (inv_eq_of_mul_eq_one_right hc).symm
+  have hxyx : x * y ≠ x := fun hc => hy1 (by simpa using congrArg (x⁻¹ * ·) hc)
+  have hxyy : x * y ≠ y := fun hc => hx (by simpa using congrArg (· * y⁻¹) hc)
+  -- `w ∉ {1, x, y, x * y}`
+  obtain ⟨w, hw⟩ := hout {1, x, y, x * y} (by
+    refine lt_of_le_of_lt (Finset.card_insert_le _ _) ?_
+    refine lt_of_le_of_lt (Nat.succ_le_succ (Finset.card_insert_le _ _)) ?_
+    refine lt_of_le_of_lt (Nat.succ_le_succ (Nat.succ_le_succ (Finset.card_insert_le _ _))) ?_
+    simp only [Finset.card_singleton]
+    omega)
+  simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hw
+  obtain ⟨hw1, hwx, hwy, hwxy⟩ := hw
+  -- 3-transitivity: `(x, y, x*y) ↦ (x, y, w)`
+  obtain ⟨a, hax, hay, haxy⟩ := h3 x y (x * y) x y w hx hy1 hxy1 hx hy1 hw1
+    (Ne.symm hyx) (Ne.symm hxyx) (Ne.symm hxyy) (Ne.symm hyx) (Ne.symm hwx) (Ne.symm hwy)
+  exact hwxy (by rw [← haxy, smul_mul', hax, hay])
 
 end
 
