@@ -204,6 +204,29 @@ repo の carrier は 2 元に固定しており、**全 member の既約性を�
 (`NormInequalities:648-663` 等 8 箇所) は 2 元形に本質的に依存するので `Hypothesis` 側に残す。
 `GeneralHypothesis` 版は別立てにし、`Hypothesis` 版はその特殊化として得る。
 
+## 進捗 (2026-07-27、連鎖の載せ替え)
+
+- [x] `GeneralHypothesis` に派生ヘルパ 3 本 (`conjugate_mem` / `not_isReal` / `ne_conj` /
+      `tau_isometry_memberDiff`) を追加。いずれも `Hypothesis` と**共有フィールドからの導出**
+      (差は (5.2.d)/(5.2.e) だけ)。
+- [x] **(5.7) 連鎖全体を `GeneralHypothesis` に載せ替え** (`S07_CoherenceConstantDegree`):
+      `imageFam` / `DiffPair.inner_eq_zero` / `_inner_conj_eq_zero` / `_imageFam_orthogonal` /
+      `pairDecomp` / `pairDecomp'` / `pairDecomp'_image` / `pairDecomp'_two_sided` /
+      `commonImage` + 6 補題。
+      ⚠ 一般 carrier では `difference_image` が**既に orthonormal 族**なので
+      `imageFam hyp hχ = hyp.difference_image hχ` (変換不要)、
+      `DiffPair.imageFam_orthogonal` も `difference_images_orthogonal` そのものになった
+      (`toOrthonormalImage_orthogonal` の呼び出しが消えた)。
+- [x] 本体 `coherent_of_constant_degree` は `hyp : Hypothesis` のまま、連鎖呼び出しを
+      `hyp.toGeneralHypothesis` 経由に。⚠ `hyp.tau` と `hyp.toGeneralHypothesis.tau` は
+      defeq だが**構文的には別**なので、`rw` の対象になる `have` は一般 carrier 側の
+      射影で書く必要がある (`hB`)。
+
+⟹ **(5.7) の「(5.4) を回して β の独立性を出す」部分は、可約 member を許す carrier の上で
+   完全に動くようになった**。残るのは本体の 2 点だけ:
+   1. `horthχ` (正規直交) → `coherentEqualDegreeW` (landing 済) に差し替えれば不要
+   2. 基底ケース `isCoherent_pair_of_differenceImage` (2 元形に本質依存) の一般版
+
 ## 完了条件
 
 `coherent_of_constant_degree` が `hirr` 無しで成立し、旧版がその特殊化になること。
