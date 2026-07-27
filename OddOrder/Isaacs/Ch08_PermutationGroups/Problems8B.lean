@@ -9,6 +9,7 @@ import OddOrder.Isaacs.Ch02_Subnormality.Basic
 import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
+import OddOrder.GroupTheory.CyclicSylowBurnside
 
 /-!
 # Isaacs, Finite Group Theory — Problems 8B (pp. 248–249)
@@ -36,7 +37,11 @@ Isaacs の定義 (「`Δ` の translate は `Δ` 自身か, `Δ` と交わらな
   `|G|` は素数。
 - `eq_bot_of_normal_le_stabilizer`, `card_stabilizer_eq_two_of_suborbit_ncard_eq_two` —
   **Problem 8B.6 前半**: 点安定化群が `Ω ∖ {α}` に長さ 2 の軌道をもてば `|G_α| = 2`。
-  ⚠ 後半 (`G ≅ D₂ₚ`, `p > 2` 素数) は未形式化。
+  ⚠ 後半 (`G ≅ D₂ₚ`, `p > 2` 素数) は未完。
+- `inf_stabilizer_eq_bot_of_card_stabilizer_eq_two`, `odd_card_of_card_stabilizer_eq_two`,
+  `exists_regular_normal_of_card_stabilizer_eq_two` — **8B.6 後半への構造定理**:
+  `|G_α| = 2` なら相異なる 2 点の安定化群は自明に交わり, `|Ω|` は奇数で, `Ω` に正則に
+  作用する正規部分群 `K` (位数 `|Ω|`) がある (Burnside の正規 `p`-補元定理)。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -440,6 +445,121 @@ theorem card_stabilizer_eq_two_of_suborbit_ncard_eq_two [Finite G] [FaithfulSMul
   have hDbot : stabilizer G β ⊓ stabilizer G α = ⊥ := eq_bot_of_normal_le_stabilizer hDα
   rw [← hcardα, hDbot]
   simp
+
+/-! ### Problem 8B.6 後半への準備 — 正則正規部分群の存在 -/
+
+/-- `|G_α| = 2` の原始置換群では, 相異なる 2 点の安定化群は自明にしか交わらない。 -/
+lemma inf_stabilizer_eq_bot_of_card_stabilizer_eq_two [Finite G] [FaithfulSMul G Ω]
+    [IsPreprimitive G Ω] [Nontrivial Ω] {α β : Ω} (hαβ : α ≠ β)
+    (hcard : Nat.card ↥(stabilizer G α) = 2) :
+    stabilizer G α ⊓ stabilizer G β = ⊥ := by
+  have hnotle : ¬ stabilizer G α ≤ stabilizer G β := by
+    intro hle
+    have hbot := (stabilizer_eq_bot_and_prime_card_of_fixed_point hαβ
+      fun h hh => mem_stabilizer_iff.mp (hle hh)).1
+    rw [hbot] at hcard
+    simp at hcard
+  obtain ⟨t, htα, htβ⟩ := SetLike.not_le_iff_exists.mp hnotle
+  have ht1 : t ≠ 1 := fun hc => htβ (hc ▸ Subgroup.one_mem _)
+  refine le_antisymm (fun s hs => Subgroup.mem_bot.mpr ?_) bot_le
+  obtain ⟨hsα, hsβ⟩ := Subgroup.mem_inf.mp hs
+  by_contra hs1
+  refine htβ ?_
+  have huniq := (Nat.card_eq_two_iff' (1 : ↥(stabilizer G α))).mp hcard
+  have hst : s = t := congrArg Subtype.val
+    (huniq.unique (y₁ := ⟨s, hsα⟩) (y₂ := ⟨t, htα⟩)
+      (fun hc => hs1 (congrArg Subtype.val hc)) fun hc => ht1 (congrArg Subtype.val hc))
+  exact hst ▸ hsβ
+
+/-- `|G_α| = 2` の原始置換群では **`|Ω|` は奇数**。
+
+`G_α` の非自明元は `α` しか固定しないので `Fix(G_α) = {α}`, したがって `2`-群 `G_α` の
+固定点公式 `|Ω| ≡ |Fix(G_α)| = 1 (mod 2)` から従う。 -/
+lemma odd_card_of_card_stabilizer_eq_two [Finite G] [Finite Ω] [FaithfulSMul G Ω]
+    [IsPreprimitive G Ω] [Nontrivial Ω] {α : Ω}
+    (hcard : Nat.card ↥(stabilizer G α) = 2) : Odd (Nat.card Ω) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hpg : IsPGroup 2 ↥(stabilizer G α) := IsPGroup.of_card (n := 1) (by simpa using hcard)
+  have hfix : MulAction.fixedPoints ↥(stabilizer G α) Ω = {α} := by
+    ext γ
+    simp only [Set.mem_singleton_iff, MulAction.mem_fixedPoints]
+    constructor
+    · intro hγ
+      by_contra hne
+      have hbot := (stabilizer_eq_bot_and_prime_card_of_fixed_point (Ne.symm hne)
+        fun h hh => hγ ⟨h, hh⟩).1
+      rw [hbot] at hcard
+      simp at hcard
+    · rintro rfl
+      exact fun s => mem_stabilizer_iff.mp s.2
+  have hmod := hpg.card_modEq_card_fixedPoints (α := Ω)
+  rw [hfix] at hmod
+  simp only [Nat.card_eq_fintype_card, Set.card_singleton] at hmod
+  rcases Nat.even_or_odd (Nat.card Ω) with he | ho
+  · exfalso
+    obtain ⟨k, hk⟩ := he
+    have : Nat.card Ω % 2 = 1 % 2 := hmod
+    omega
+  · exact ho
+
+/-- **8B.6 の構造定理**: `|G_α| = 2` の原始置換群には `Ω` に**正則**に作用する正規部分群
+`K` (位数 `|Ω|`) がある。
+
+`|Ω|` が奇数 (`odd_card_of_card_stabilizer_eq_two`) なので `G_α` (位数 2) は巡回 Sylow
+2-部分群で, Burnside の正規 `p`-補元定理
+(`exists_normal_complement_of_isCyclic_sylow`) が位数 `|Ω|` の正規補元 `K` を与える。
+`|K|` は奇数なので `K ⊓ G_α = 1` で半正則, 位数が `|Ω|` に一致するので正則。 -/
+theorem exists_regular_normal_of_card_stabilizer_eq_two [Finite G] [Finite Ω]
+    [FaithfulSMul G Ω] [IsPreprimitive G Ω] [Nontrivial Ω] {α : Ω}
+    (hcard : Nat.card ↥(stabilizer G α) = 2) :
+    ∃ K : Subgroup G, K.Normal ∧ Nat.card ↥K = Nat.card Ω ∧
+      K ⊓ stabilizer G α = ⊥ ∧ Function.Bijective (smulBase K α) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hodd : Odd (Nat.card Ω) := odd_card_of_card_stabilizer_eq_two hcard
+  have hΩ2 : ¬ (2 ∣ Nat.card Ω) := by
+    obtain ⟨k, hk⟩ := hodd
+    omega
+  have hG : Nat.card Ω * 2 = Nat.card G := by
+    rw [← hcard, ← index_stabilizer_of_transitive G α]
+    exact Subgroup.index_mul_card _
+  -- `G_α` は Sylow 2-部分群。
+  have hfact : Nat.card ↥(stabilizer G α) = 2 ^ (Nat.card G).factorization 2 := by
+    have hΩpos : Nat.card Ω ≠ 0 := Nat.card_pos.ne'
+    have hf1 : (Nat.card G).factorization 2 = 1 := by
+      rw [← hG, Nat.factorization_mul hΩpos two_ne_zero, Finsupp.add_apply,
+        Nat.factorization_eq_zero_of_not_dvd hΩ2, zero_add,
+        Nat.Prime.factorization_self Nat.prime_two]
+    rw [hcard, hf1, pow_one]
+  set P : Sylow 2 G := Sylow.ofCard (stabilizer G α) hfact with hPdef
+  have hPcoe : (P : Subgroup G) = stabilizer G α := Sylow.coe_ofCard _ hfact
+  have hPcyc : IsCyclic ↥(P : Subgroup G) := by
+    rw [hPcoe]
+    exact isCyclic_of_prime_card (p := 2) hcard
+  obtain ⟨K, hKnormal, hKcard, hKodd⟩ :=
+    OddOrder.GroupTheory.exists_normal_complement_of_isCyclic_sylow P hPcyc
+      (by rw [hPcoe, hcard, Nat.totient_two]; exact Nat.coprime_one_right _)
+  rw [hPcoe, hcard] at hKcard
+  haveI := hKnormal
+  have hKΩ : Nat.card ↥K = Nat.card Ω := by omega
+  -- `|K|` は奇数なので `K ⊓ G_α = 1`。
+  have hinf : K ⊓ stabilizer G α = ⊥ := by
+    refine le_antisymm (fun x hx => Subgroup.mem_bot.mpr ?_) bot_le
+    obtain ⟨hxK, hxα⟩ := Subgroup.mem_inf.mp hx
+    by_contra hx1
+    have hdvd2 : orderOf x ∣ 2 := by
+      rw [← hcard, ← Subgroup.orderOf_mk x hxα]
+      exact orderOf_dvd_natCard _
+    have hdvdK : orderOf x ∣ Nat.card ↥K := by
+      rw [← Subgroup.orderOf_mk x hxK]
+      exact orderOf_dvd_natCard _
+    have h2 : orderOf x = 2 := by
+      rcases (Nat.dvd_prime Nat.prime_two).mp hdvd2 with h | h
+      · exact absurd (orderOf_eq_one_iff.mp h) hx1
+      · exact h
+    exact hKodd (h2 ▸ hdvdK)
+  refine ⟨K, hKnormal, hKΩ, hinf, ?_⟩
+  refine (Nat.bijective_iff_injective_and_card _).mpr ⟨?_, hKΩ⟩
+  exact (injective_smulBase_iff_disjoint_stabilizer K α).mpr hinf
 
 end
 
