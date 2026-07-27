@@ -4882,3 +4882,45 @@ leaf 追加: `Problems8C/SimpleStabilizer.lean` (67 行, 8C.3/8C.4 共通) と
 `7f0b2f497`) とほぼ同内容・同時刻で並んでいる。**現状は build green・axiom-clean・
 宣言の重複なし** (`git merge main` で綺麗に合流) だが, 同じ問題を 2 セッションで
 解くのは無駄なので, 続き (8C.5 / 8C.6) に入る前に担当を一本化すること。
+
+
+## 8C.5 の設計 (2026-07-27、共通補題まで landing 済)
+
+### landing 済 (`Problems8C/SimpleStabilizer.lean`)
+
+* `stabilizer_eq_bot_of_normal_of_isSimpleGroup_stabilizer` / `card_eq_card_of_stabilizer_eq_bot`
+* **`isSimpleGroup_of_two_transitive_of_isSimpleGroup_stabilizer`** — 2-transitive
+  (8A.9 の形 `∀ a b c, b ≠ a → c ≠ a → ∃ g, g•a = a ∧ g•b = c`) + 点安定化群が単純 +
+  次数が相異なる 2 素数で割れる ⟹ 単純。**8C.5 の次数 22 と 24 の段はこれで済む**。
+  8C.3 は既にこれに載せ替え済 (189 → 130 行)。
+
+### 残り: 次数 23 の段 (素数次数なので上の補題が効かない)
+
+`N ◁ G` は regular で `|N| = 23` (素数) なので位数一致の議論では潰せない。代わりに:
+`H := G_α` の `N` への共役作用 `MulAut.conjNormal : G →* MulAut ↥N` を `H` に制限すると
+**単射** (核の元は `ω = n • α` の形の全点を固定 ⟹ 忠実性で `1`)。よって
+`|H| ∣ |Aut(Z₂₃)| = 22`。他方 `H` は 2-transitivity から `Ω ∖ {α}` (22 点) に推移的
+なので `22 ∣ |H|` ⟹ `|H| = 22`。しかし `H` は単純で位数 22 の単純群は無い
+(`n₁₁ ∣ 2 ∧ n₁₁ ≡ 1 mod 11 ⟹ n₁₁ = 1` ⟹ Sylow 11 が真の非自明正規部分群)。⟹ 矛盾。
+
+### 組み立て (Wielandt 9.1 で 1 点ずつ剥がす)
+
+mathlib **`SubMulAction.ofStabilizer.isMultiplyPretransitive`**
+(`[IsPretransitive G α] : IsMultiplyPretransitive G α n.succ ↔
+IsMultiplyPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) n`) で
+
+| level | 群 | 台集合 | 濃度 | 可移度 |
+|---|---|---|---|---|
+| 0 | `G` | `Ω` | 24 | 5 |
+| 1 | `stabilizer G α` | `ofStabilizer G α` | 23 | 4 |
+| 2 | `stabilizer _ β` | `ofStabilizer _ β` | 22 | 3 |
+| 3 | `stabilizer _ γ` | `ofStabilizer _ γ` | 21 | 2 (仮説: 単純) |
+
+各段の付帯条件は既に一般形で用意済:
+`faithfulSMul_ofStabilizer` (`MathieuTwelve.lean`; 各段に帰納的に効く) /
+`card_ofStabilizer` (`|Ω ∖ {α}| = |Ω| - 1`) /
+2-transitivity の 8A.9 形は mathlib `MulAction.is_two_pretransitive_iff` +
+`isMultiplyPretransitive_of_le` から取る。
+
+⚠ `faithfulSMul_ofStabilizer` / `card_ofStabilizer` は現在 `MathieuTwelve.lean` にある。
+8C.5 から使うので `SimpleStabilizer.lean` (または新しい共通 leaf) へ移すのが自然。
