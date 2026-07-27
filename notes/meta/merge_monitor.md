@@ -6,6 +6,37 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-27 昼〜午後 hub 自走 tick 続き (`/loop` self-pacing) — 🎯🎯🎯
+> **Peterfalvi (6.5) を一般 kernel で完成 + (6.6) を step 4 直前まで前進**。push →3111f38a5**。
+> (直前 tick の記録は下記。以下はその継続分。)
+> ① **(6.5) 一般形 完成** (`S08_SixFiveGeneral.lean` 542 行): (5.3.a) の τ 一般形 /
+> 部分族の Hypothesis (5.2) ((5.2.e) は**導出**) / (6.3.b) via (5.7) / (6.5)(a) 指数界+chief
+> factor / (6.5)(b) `p` 群 / (6.5)(c) `|L:K| ∤ p−1`。
+> ② **(6.6) 一般化 (issue 0155 新設)** (`S08_SixSixGeneral.lean` 500+ 行、step 1-3 完了):
+> `𝒳 = 𝒮 − 𝒮(Z)` + (5.2) 一式 / 書籍 p.32 の算術 2 本 / 次数平方和恒等式 /
+> 最小次数 base block `𝒮₀` / **τ-general chain fold** / **base coherence** /
+> `𝒳`-member の routine facts。
+> ③ **実測で分かった重要事実 3 つ** (すべて issue 0155 に記録):
+> (i) chain レベルの Dade 依存は**実質ゼロ**だった (`exists_conjugatePairCover` は抽象群の
+> 集合の補題、`coherentOfPairChainCover` は元から τ-general)。Sibley の `xChainCoherent` は
+> Dade に pin しただけの包装。
+> (ii) base coherence 「(1.1)+(1.4)」は一般 `K` では **(5.7) を部分族 `𝒮₀` に当てるだけ**。
+> (iii) **書籍 p.32 の可除性論法の数学的中身は既に全部一般**だった — Sibley の step 組立が
+> 呼ぶ 4 本 (`degreeDivisibilityInputs_of_commonIndex_primePowerData` /
+> `sq_dvd_natDegreeSquareSum_of_commonIndex` /
+> `S07.sq_dvd_head_of_commonIndex_primePower_sums` / `natDegreeSquareSum_pos_of_memberFamily`)
+> はいずれも**抽象群 + 素の数値データ**で、`hyp` を取るのは最後の梱包 1 本だけ。
+> ⟹ **残り step 4 は新規の数学を要さない純粋な再梱包** (`S07.xAdjoinStepW_general` へ)。
+> ④ **carrier を書籍準拠に修正**: `InducedFamilyImageData` に **`tau_apply_one`** 追加
+> (書籍 (5.2.b) の値域は `ℤ[Irr G, G^#]` = 1 で消える。repo は `ℤ[Irr G]` しか課しておらず
+> 弱かった)。§11 Dade witness が `dadeIntegralCharacterMap_apply_one_eq_zero` で discharge。
+> ⑤ **lane a を 8 回合流** (Isaacs 6C.2 → Ch.6 演習全 22 問完済 → Ch.7 7A.1/7A.2/7A.3 +
+> SL2 root-group 補題 (9211 close))。
+> gate: 各 commit でフルビルド green (最終 4842 jobs)、AxiomsCheck **新 assert 計 24 本すべて
+> axiom-clean**、`--strict` EXIT=0、`bin/count-sorry` = 1 (凍結 Q₈) 非退行、全 push 済。
+> ⚠ 運用メモ: フルビルドが 10 分の Bash 上限を超えるようになったので、
+> **`run_in_background` でビルド+lint を 1 本にまとめて回す**運用に切替 (完了通知で gate 判定)。
+
 > **▶▶ 2026-07-27 昼 hub 自走 tick (`/loop` self-pacing, ユーザー「自走してください」) — 🎯🎯
 > **Peterfalvi (6.5) を一般 kernel で完成** (a)(b)(c) + stale ラベル訂正 + lane a 2 回合流。
 > push →7ab50c06c**。
