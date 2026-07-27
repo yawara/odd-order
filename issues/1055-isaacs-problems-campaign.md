@@ -4582,14 +4582,63 @@ mathlib `DihedralGroup p` への**明示同型の構成**だけ:
 
 ### 8B.9 / 8B.10 の設計メモ (2026-07-27)
 
-* **8B.9**: `x` = n-cycle `(1,…,n)`, `y` = m-cycle `(1,…,m)` (`1 < m < n`) について
-  `G = ⟨x,y⟩` は `m` か `n` が偶数なら `S_n`, どちらも奇なら `A_n`。
-  筋: `⟨y⟩` は `{1,…,m}` に推移的で残りを固定するので **8B.8** がそのまま適用でき
-  `G` は原始的。あとは `G` が偶置換だけからなるか否かで `A_n`/`S_n` を判定し、
-  原始群が 3-cycle を含めば `A_n ≤ G` (Jordan 型) — repo の
-  `Ch08/PCycleJordan.lean` / `Bochert.lean` に近いものがあるか要調査。
-* **8B.10**: `G ⊆ S_n` が指数 `n` の部分群で点安定化群でないなら `n = 6`。
-  筋 (教科書 Hint): `G` は `S_n` の `n` 個の剰余類に推移的 →
-  **8A.16** (landing 済 `two_transitive_of_coprime_index`) で 2-transitive → 原始的 →
-  **Bochert の定理** (repo `Ch08/Bochert.lean`) で `n ≥ ⌈(n+1)/2⌉!` →
-  `n ∈ {1,2,3,4,6}` を潰す。⚠ Bochert の repo 側の statement 形を要確認。
+* **8B.9 / 8B.10**: 下の詳細設計を参照。
+
+
+## 8B.9 / 8B.10 の詳細設計 (2026-07-27 調査完了)
+
+### 使える repo/mathlib の定理 (署名を実測済)
+
+* `OddOrder.Isaacs.Ch08.isThreeCycle_commutator_of_unique_common_moved`
+  (`Ch08/CycleCommutators.lean`, **Isaacs Lem 8.25**):
+  `(hxa : x a ≠ a) (hya : y a ≠ a) (huniq : ∀ b ≠ a, x b = b ∨ y b = b) → ⁅x,y⁆.IsThreeCycle`
+* `OddOrder.Isaacs.Ch08.alternatingGroup_le_of_isPreprimitive_of_isCycle_mem`
+  (`Ch08/PCycleJordan.lean`, **Isaacs Thm 8.23** = Jordan):
+  `(hG : IsPreprimitive G α) (hp : p.Prime) (hp' : p + 3 ≤ Nat.card α)
+   (hgc : g.IsCycle) (hgp : g.support.card = p) (hg : g ∈ G) → alternatingGroup α ≤ G`
+  ⚠ 3-cycle 版は mathlib に直接ある:
+  `Equiv.Perm.alternatingGroup_le_of_isPreprimitive_of_isThreeCycle_mem`
+  (次数条件なし) — 8B.9 ではこちらを使う。
+* `OddOrder.Isaacs.Ch08.factorial_le_index_of_isPreprimitive`
+  (`Ch08/Bochert.lean`, **Isaacs Thm 8.26**):
+  `(hG : IsPreprimitive G α) (halt : ¬ alternatingGroup α ≤ G) → ((Nat.card α + 1)/2)! ≤ G.index`
+* 自作: `isPreprimitive_sup_zpowers_addRight_one` (8B.8),
+  `two_transitive_of_coprime_index` (8A.16)。
+
+### 8B.9 の証明構造
+
+`x` = `ZMod n` の `+1`, `y` = `m`-巡回 `(0,1,…,m-1)` (残り固定), `2 ≤ m < n`。
+
+1. `⟨y⟩` は `S = {c | c.val < m}` に推移的で `Sᶜ` を各点固定 ⟹ **8B.8** で
+   `G = zpowers y ⊔ zpowers x` は**原始的**。
+2. `z := y⁻¹ * x` を計算すると **`z` は巡回 `(m-1, m, …, n-1)`** (0-based):
+   `c.val < m-1` ⟹ `z c = y⁻¹(c+1) = c` (固定) / `c.val = m-1` ⟹ `z c = m` /
+   `m ≤ c.val ≤ n-2` ⟹ `z c = c+1` / `c.val = n-1` ⟹ `z c = y⁻¹(0) = m-1`。
+3. `y` の動かす点 = `{0,…,m-1}`, `z` の動かす点 = `{m-1,…,n-1}` ⟹ **共通は `m-1` のみ**
+   ⟹ Lem 8.25 で `⁅y, z⁆` は 3-cycle。`z ∈ G` なので `⁅y,z⁆ ∈ G`。
+4. mathlib の 3-cycle 版 Jordan で `alternatingGroup ≤ G`。
+5. 符号: `sign x = (-1)^(n-1)`, `sign y = (-1)^(m-1)` ⟹
+   `m` か `n` が偶なら `G ⊄ A_n` ⟹ `A_n < G ≤ S_n` かつ `[S_n : A_n] = 2` ⟹ `G = S_n`;
+   どちらも奇なら `G ≤ A_n` ⟹ `G = A_n`。
+
+⚠ **エンコーディングの判断が要る**: 8B.8 は `ZMod n` で書いた。`m`-巡回 `y` を
+`ZMod n` 上で直接 `Equiv.Perm` として定義する (toFun/invFun を val の場合分けで書く)
+か、`Fin n` + `finRotate` + `Equiv.Perm.extendDomain` (mathlib に `IsCycle.extendDomain`,
+`support_extendDomain` あり) を使って 8B.8 側を移送するか。前者のほうが 8B.8 と直結
+するが `IsCycle`/`support` を手で示す必要があり、後者は逆。**まず前者で試す**。
+
+### 8B.10 の証明構造
+
+`H ≤ Perm (Fin n)`, `[S_n : H] = n`, `H` は点安定化群でない ⟹ `n = 6`。
+
+1. **`H` は推移的**: 非推移なら軌道 `Δ` (`0 < |Δ| < n`) があり
+   `|H| ≤ |Δ|!·(n-|Δ|)!`。`|H| = (n-1)!` なので `k!(n-k)! ≥ (n-1)!` は `k ∈ {1, n-1}`
+   のときのみ ⟹ `H` はある点を固定 ⟹ `H ≤ G_pt` で位数が一致 ⟹ `H = G_pt` (矛盾)。
+2. `S_n` は 2-transitive、`gcd(n-1, [S_n:H]) = gcd(n-1, n) = 1` ⟹ **8A.16** で
+   `H` は 2-transitive ⟹ 原始的。
+3. `A_n ≤ H` なら `[S_n:A_n] = 2` から `n ∣ 2`。そうでなければ **Bochert** で
+   `((n+1)/2)! ≤ n` ⟹ `n ∈ {1,2,3,4,6}`。
+4. 2-transitivity から `n(n-1) ∣ |H| = (n-1)!` ⟹ `n ∣ (n-2)!` で `n = 2,3,4` を除外、
+   `n = 1` は `H` が唯一の点安定化群になるので除外 ⟹ `n = 6`。
+
+⚠ step 1 の「非推移群の位数評価」は独立した補題として要実装 (repo に無ければ新規)。
