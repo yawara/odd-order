@@ -5101,3 +5101,28 @@ subdegree は `|G_α|` を割るので `p²` はどれも割らない。
 `oPiResidual_eq_closure_piPrimeElements` / 普遍性, `Subgroup.normalCore` と
 `Subgroup.normalCore_eq_ker`, `IsPGroup.card_modEq_card_fixedPoints`,
 本 §8D の `eq_bot_of_normal_of_le_stabilizer` (本体側)。
+
+## ⚠ 引き継ぎ: 8D.6 の Hint 補題が worktree `a` に未追跡で残っている (2026-07-27 22:4x)
+
+ユーザー指示で worktree `/home/ywr/odd-order-a` の 2 セッションを **kill した** (issue 9212 参照)。
+その時点で in-flight だった作業が**未追跡ファイル**として残っている:
+
+```
+/home/ywr/odd-order-a/OddOrder/Isaacs/Ch08_PermutationGroups/Problems8D/PrimeIndexCore.lean
+（116 行、sorry 0、branch `a` に未追跡）
+```
+
+内容 = **8D.6 の Hint**「指数が素数 `p` の部分群 `X ≤ Y` の `p`-元は核 `core_Y(X)` に入る」
+⟹ `O^{p'}(X) ◁ Y`。宣言 2 本:
+
+* `mem_normalCore_of_orderOf_eq_prime_pow` (`p`-冪位数の元が normalCore に入る)
+* `closure_primePow_normal` (`p`-元の生成する部分群が `Y` で正規)
+
+⚠ **ビルドは通らない** (hub が実測、3 エラー) ので**コミットしていない**:
+
+1. `:68` `omega` が閉じられない (`Fix` の濃度評価 `1 ≤ |Fix| ≤ p` から `|Fix| = p` を出す所)
+2. `:79` 型不一致 — `hq ⟨g, mem_zpowers g⟩ : ⟨g,_⟩ • q = q` を `g • q = q` に繋ぐ coercion
+3. `:104` 型不一致 — `orderOf_injective (MulAut.conj y⁻¹)` の像が `y⁻¹ * x * y` に簡約されない
+
+⟹ **8D.6 を再開する人はこのファイルから拾うこと** (筋は正しく、残りは上記 3 点の技術的詰め)。
+放置すると `git clean` 等で消えるので、直したら早めに commit すること。
