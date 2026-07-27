@@ -1235,18 +1235,22 @@ consumer は (5.7) engine を使う。
 
 **残っている特殊化 (実測、着手前に再確認すること)**
 
-1. **(6.6) coherence 半分** — 依然として最大 (**[issue 0155](../../issues/0155-pf-six-six-general-kernel.md)**)。
-   ただし同日中に**大半が片付いた**: `S08_SixSixGeneral.lean` に `xSet = 𝒮 − 𝒮(Z)` と
-   (5.2) 一式 / 書籍 p.32 の算術 2 本 (次数 `|L:K|·p^k`・[Is] Cor 2.30 の中心界) /
-   次数平方和恒等式 / 最小次数 base block `𝒮₀` の API を一般 `K` で landing。
-   **残りは τ-general な X-chain engine 1 点**: Sibley の入口
-   `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X` が使う 4 つのうち、
-   `exists_conjugatePairCover` は汎用・上記 3 つは一般版完済で、残るのは
-   `xChainCoherent` / `XAdjoinStepInput` が **`S04.Hypothesis` (Dade) でパラメータ化**
-   されている点だけ。実測すると `dade` はほぼ**型シグネチャ**にしか現れず、証明本体で
-   真に Dade を使うのは `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal` (= (5.2.d)(e)) と
-   `inner_dade_extension_of_supported` (= 等長) の **2 つだけ** ⟹
-   **issue 0154 (加重 (5.6) の τ 一般化) とまったく同じ型の作業**。手順は 0155 に記録。
+1. **(6.6) coherence 半分** (**[issue 0155](../../issues/0155-pf-six-six-general-kernel.md)**) —
+   2026-07-27 に**大部分が完了**し、残りは最終結線のみ。`S08_SixSixGeneral.lean` (690 行) に
+   一般 `K` で landing 済:
+   `xSet = 𝒮 − 𝒮(Z)` と (5.2) 一式 / 書籍 p.32 の算術 2 本 (次数 `|L:K|·p^k`・[Is] Cor 2.30 の
+   中心界) / 次数平方和恒等式 / 最小次数 base block `𝒮₀` / **τ-general X-chain fold**
+   (`xSet_isCoherent_of_adjoinSteps`) / **base coherence** (`xBaseBlock_isCoherent`) /
+   **per-step adjoining** (`xAdjoinStep_of_degreeRatios`) / 次数比ブリッジ / `hSgen`。
+   新 assert 計 15 本すべて axiom-clean。
+   **⚠ この項目の教訓**: 「τ-general engine の一般化が本丸」という当初の見立ては**外れ**だった。
+   実測すると (i) chain fold `coherentOfPairChainCover` は**元から τ-general** で Sibley 版は
+   Dade に pin しただけの包装、(ii) base coherence は **(5.7) を部分族に当てるだけ**、
+   (iii) 書籍 p.32 の可除性論法の算術 5 本 (`2a < ∑ deg²` の producer
+   `normalizedDegreeGap_of_natDegreeSumPrimePowerGap` を含む) は**抽象群 + 素の数値データ**で
+   元から一般、(iv) 唯一の真に Dade 依存な `XAdjoinStepInput`/`xAdjoinStep` 層は、
+   0154 の `S07.xAdjoinStepW_general` へ**直結して迂回**できた (移植不要)。
+   ⟹ **残るのは「各 step で accumulator を有限列挙し tail-set を作って可除性を通す」結線のみ**。
 2. **repo の (5.7) が member の既約性を要求する** — 書籍の (5.7)/(5.2) は要求しない
    (直交性のみ)。orthonormal な `coherentEqualDegree` builder から継承した債務。
    (6.4) の応用では (6.4.c) から既約性が出るので実害はないが、(5.7) 自体は書籍より狭い。
