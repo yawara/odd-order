@@ -218,6 +218,33 @@ step 1 + step 3b の帰結だけ**で済む。`C_p × C_p` を作る (2)-(4) は
 **実装順**: (i) `isCyclic_of_isMulCommutative_le_D` (可換 ⟹ 巡回) を一般補題として
 landing → (ii) `p ∣ |K|` かつ `p ∣ |V|` から `C_p × C_p ≤ D` を作って矛盾。
 
+#### (i) は 2026-07-28 に landing 済 (`FeitSibleyInput.lean`)
+
+#### (ii) の完全な手順 (2026-07-28 に道具まで確定、次セッションはこれを書くだけ)
+
+1. **`x`, `y` を取る**: `p ∣ |K|` から Cauchy で `x ∈ K`、`orderOf x = p`;
+   同様に `y ∈ V`、`orderOf y = p`。
+2. **`y` は `zpowers x` を正規化**: `K ⊴ D` (`conj_mem_K_of_mem_D`) で
+   `y (zpowers x) y⁻¹ ≤ K` は位数 `p`、`K` は巡回 (`K_isCyclic`) なので位数 `p` の
+   部分群は一意 (`OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq`,
+   `CyclicSubgroupUniqueness.lean:37`) ⟹ `y x y⁻¹ ∈ zpowers x`。
+3. **`x` と `y` は可換** (書籍の `|Aut(C_p)| = p − 1` を初等化):
+   `y x y⁻¹ = x^j` と書くと `y^p x y^{-p} = x^{j^p}`、`y^p = 1` より `x^{j^p} = x`、
+   `orderOf x = p` から **`j^p ≡ 1 (mod p)`**。Fermat (`ZMod.pow_card`) で
+   `j^p ≡ j (mod p)` なので `j ≡ 1 (mod p)` ⟹ `x^j = x` ⟹ 可換。
+4. **`E := closure {x, y}` は可換**: `Subgroup.isMulCommutative_closure` に 3 を渡す
+   (repo 先例 = `HigmanMaximalNormalAbelian.lean:426`)。`E ≤ D` は `x ∈ K ≤ D`,
+   `y ∈ V ≤ D` から。
+5. **矛盾**: (i) より `IsCyclic ↥E`。`↥E` の中で `zpowers x'` と `zpowers y'` は
+   ともに位数 `p` なので `cyclic_subgroup_eq_of_card_eq` で一致 ⟹ `x ∈ zpowers y ≤ V`。
+   だが `x ∈ K`、`x ≠ 1`、`K ⊓ V = 1` (`K_inf_V_eq_bot`) に矛盾。
+
+#### Hall 性への接続 (再掲、(ii) の後)
+
+`|D| = |K||V|` + `|QK| = |Q||K|` ⟹ `[H:QK] = |V|`;
+`gcd(|Q|,|V|) = 1` は `coprime_card_Q_D` の帰結なので、(5) と合わせて
+`gcd(|QK|, [H:QK]) = 1`。
+
 **Hall 性への接続**: `|D| = |K||V|` (`K ⊓ V = 1` + `exists_mem_V_mul_mem_K`) と
 `Q ⊓ K ≤ Q ⊓ D = 1` より `|QK| = |Q||K|`、`[H:QK] = |V|`。
 `gcd(|Q|,|V|) = 1` は既済 (`coprime_card_Q_D` の帰結) なので、(5) と合わせて
