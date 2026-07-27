@@ -203,6 +203,7 @@ import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
 import OddOrder.Peterfalvi.S08_SixFiveGeneral
+import OddOrder.Peterfalvi.S08_SixSixGeneral
 import OddOrder.Peterfalvi.S13_SixTwoImageData
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
@@ -3762,6 +3763,21 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.card_abelianization_eq_relIndex
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_prime_isPGroup_of_not_isCoherent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.not_dvd_sub_one_of_not_isCoherent
+-- **(6.6) for a general kernel, first layer** (`S08_SixSixGeneral`).  `xSet K Z = 𝒮 − 𝒮(Z)` with
+-- its (5.2.a)/(5.2.c) suite, and the two per-member arithmetic facts the book's coherence proof
+-- (p. 32) runs on once (6.5) has made `K` a `p`-group: every member has degree `|L:K|·p^k`, and
+-- the source obeys [Is] Cor 2.30 against the **central** `Z` (`θ(1)² ≤ |K:Z|` — this is where
+-- `Z ⊆ Z(K)` is used, and what fails at `Z = [K,K]`).  Both Sibley proofs used
+-- `SibleyDadeHypothesis` only through the family shape `S_eq`, so nothing is lost in the port.
+-- Hypothesis (5.2) for `𝒳` is the `T = xSet K Z` instance of `hypothesisOfSubfamily`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xSet_closedUnderConjugate
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xSet_pairwise_orthogonal
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.exists_index_primePow_degree_of_mem_inducedKernelFamily
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.exists_source_primePow_centralBound_of_mem_xSet
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.hypothesisOfSubfamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.xSetHypothesis
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.
