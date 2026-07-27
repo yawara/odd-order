@@ -50,7 +50,9 @@ private lemma notMem_orbit_stabilizer {α δ : Ω} (hδ : δ ≠ α) :
   refine hδ ?_
   have hh' : (h : G) • δ = α := hh
   have h1 : ((h : G))⁻¹ • α = α := mem_stabilizer_iff.mp ((stabilizer G α).inv_mem h.2)
-  rw [← h1, ← hh', inv_smul_smul]
+  calc δ = ((h : G))⁻¹ • ((h : G) • δ) := (inv_smul_smul _ _).symm
+    _ = ((h : G))⁻¹ • α := by rw [hh']
+    _ = α := h1
 
 /-- **Isaacs Problem 8C.4** (p. 257), 前半。`|Ω| = 100` で点安定化群の `Ω ∖ {α}` 上の
 軌道が長さ 22 と 77 のちょうど 2 つなら, `G` は原始的。 -/
@@ -69,8 +71,8 @@ theorem isPreprimitive_of_orbits_eq [Finite Ω] [IsPretransitive G Ω]
       intro h
       rw [isBlock_iff_smul_eq_of_mem] at hB
       refine hB hαB ?_
-      conv_lhs => rw [← mem_stabilizer_iff.mp h.2]
-      exact Set.smul_mem_smul_set hαB
+      rw [mem_stabilizer_iff.mp h.2]
+      exact hαB
     have horb : ∀ δ ∈ B, orbit ↥(stabilizer G α) δ ⊆ B := by
       rintro δ hδ ε ⟨h, rfl⟩
       have hmem : (h : G) • δ ∈ (h : G) • B := Set.smul_mem_smul_set hδ

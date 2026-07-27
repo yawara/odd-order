@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.HigmanSims
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuTwelve
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
@@ -23,4 +24,6 @@ topic 別 leaf にある (下流は本 module を import するだけでよい)�
 * `Problems8C/MathieuTwelve.lean` — **8C.3**: 次数 12 位数 95040 の推移置換群は単純 (`M₁₂`)。
 * `Problems8C/SimpleStabilizer.lean` — **8C.3 / 8C.4 共通**: 点安定化群が単純なら
   推移的な真の正規部分群は regular。
+* `Problems8C/HigmanSims.lean` — **8C.4**: 次数 100, 点安定化群が単純で軌道長 22, 77 なら
+  原始的かつ単純 (`HS`)。
 -/

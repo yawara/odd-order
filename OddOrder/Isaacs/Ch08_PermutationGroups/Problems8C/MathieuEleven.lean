@@ -134,25 +134,10 @@ theorem isSimpleGroup_of_card_eq_7920 (hΩ : Nat.card Ω = 11) (hG : Nat.card G 
     have h := index_stabilizer_of_transitive (G := ↥L) (x := ω)
     rw [hΩ] at h
     exact h ▸ Subgroup.index_dvd_card _
-  -- (2) `|N_G(Q)| = 55`
+  -- (2) `|N_G(Q)| = 55` (Isaacs のヒント; `PrimeDegree.lean`)
   have hNcard : ∀ Q : Sylow 11 G,
-      Nat.card ↥(Subgroup.normalizer ((Q : Subgroup G) : Set G)) = 55 := by
-    intro Q
-    have hdvd : Nat.card ↥(Subgroup.normalizer ((Q : Subgroup G) : Set G)) ∣ 110 := by
-      have h := card_normalizer_dvd_of_card_eq_prime (p := 11) (Ω := Ω) (by norm_num) hΩ
-        (Q : Subgroup G) (hQcard Q)
-      rwa [show (11 : ℕ) * (11 - 1) = 110 from by norm_num] at h
-    have hmul := Subgroup.card_mul_index (Subgroup.normalizer ((Q : Subgroup G) : Set G))
-    rw [hG] at hmul
-    have hmod : Nat.card (Sylow 11 G) ≡ 1 [MOD 11] := card_sylow_modEq_one 11 G
-    rw [Q.card_eq_index_normalizer, ← Sylow.coe_coe] at hmod
-    have hcases : ∀ e ∈ Nat.divisors 110,
-        e = 1 ∨ e = 2 ∨ e = 5 ∨ e = 10 ∨ e = 11 ∨ e = 22 ∨ e = 55 ∨ e = 110 := by decide
-    have hmem : Nat.card ↥(Subgroup.normalizer ((Q : Subgroup G) : Set G)) ∈ Nat.divisors 110 :=
-      Nat.mem_divisors.mpr ⟨hdvd, by norm_num⟩
-    unfold Nat.ModEq at hmod
-    rcases hcases _ hmem with h | h | h | h | h | h | h | h <;>
-      rw [h] at hmul ⊢ <;> omega
+      Nat.card ↥(Subgroup.normalizer ((Q : Subgroup G) : Set G)) = 55 := fun Q =>
+    card_normalizer_sylow_eleven_eq_55 hΩ hG Q
   -- (3) 単純性
   haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp (by omega)
   refine ⟨fun N hN => ?_⟩
