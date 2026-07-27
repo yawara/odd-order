@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuTwelve
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleOrder120
 
 /-!
@@ -20,4 +21,6 @@ topic 別 leaf にある (下流は本 module を import するだけでよい)�
   部分群の中心化群・正規化群。
 * `Problems8C/MathieuEleven.lean` — **8C.2**: 次数 11 位数 7920 の置換群は単純 (`M₁₁`)。
 * `Problems8C/MathieuTwelve.lean` — **8C.3**: 次数 12 位数 95040 の推移置換群は単純 (`M₁₂`)。
+* `Problems8C/SimpleStabilizer.lean` — **8C.3 / 8C.4 共通**: 点安定化群が単純なら
+  推移的な真の正規部分群は regular。
 -/

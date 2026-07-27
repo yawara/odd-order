@@ -44,25 +44,30 @@ section /- Problem 8C.2 の補助 (一般の有限群) -/
 
 variable {G : Type*} [Group G] [Finite G]
 
+/-- `p ^ k ∣ |G|` かつ `p ^ (k+1) ∤ |G|` なら Sylow `p`-部分群の位数は `p ^ k`。 -/
+theorem card_sylow_eq_pow_of_not_dvd_succ {p k : ℕ} [hp : Fact p.Prime] (Q : Sylow p G)
+    (h1 : p ^ k ∣ Nat.card G) (h2 : ¬ p ^ (k + 1) ∣ Nat.card G) :
+    Nat.card (Q : Subgroup G) = p ^ k := by
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p)).mp Q.2
+  have hdvd : Nat.card (Q : Subgroup G) ∣ Nat.card G := Subgroup.card_subgroup_dvd_card _
+  have hnk : n ≤ k := by
+    by_contra hc
+    exact h2 (dvd_trans (pow_dvd_pow p (by omega)) (hn ▸ hdvd))
+  have hkn : k ≤ n := by
+    have hmul := Subgroup.card_mul_index (Q : Subgroup G)
+    rw [hn] at hmul
+    have hcop : Nat.Coprime (p ^ k) (Q : Subgroup G).index :=
+      Nat.Coprime.pow_left k ((hp.out.coprime_iff_not_dvd).mpr Q.not_dvd_index)
+    have : p ^ k ∣ p ^ n := hcop.dvd_of_dvd_mul_right (hmul ▸ h1)
+    exact (Nat.pow_dvd_pow_iff_le_right hp.out.one_lt).mp this
+  rw [hn, show n = k by omega]
+
 /-- `p ∣ |G|` かつ `p² ∤ |G|` なら Sylow `p`-部分群の位数はちょうど `p`。 -/
 theorem card_sylow_eq_prime_of_not_dvd_sq {p : ℕ} [Fact p.Prime] (Q : Sylow p G)
     (h1 : p ∣ Nat.card G) (h2 : ¬ p ^ 2 ∣ Nat.card G) :
     Nat.card (Q : Subgroup G) = p := by
-  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p)).mp Q.2
-  have hdvd : Nat.card (Q : Subgroup G) ∣ Nat.card G := Subgroup.card_subgroup_dvd_card _
-  have hn2 : n ≤ 1 := by
-    by_contra hc
-    exact h2 (dvd_trans (pow_dvd_pow p (by omega)) (hn ▸ hdvd))
-  have hn1 : 1 ≤ n := by
-    by_contra hc
-    have hn0 : n = 0 := by omega
-    rw [hn0, pow_zero] at hn
-    refine Q.not_dvd_index ?_
-    have hmul := Subgroup.card_mul_index (Q : Subgroup G)
-    rw [hn, one_mul] at hmul
-    rw [hmul]
-    exact h1
-  rw [hn, show n = 1 by omega, pow_one]
+  have := card_sylow_eq_pow_of_not_dvd_succ (k := 1) Q (by rwa [pow_one]) (by simpa using h2)
+  rwa [pow_one] at this
 
 omit [Finite G] in
 /-- `H.subgroupOf K` の位数は `|H ⊓ K|`。 -/

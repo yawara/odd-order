@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.GroupAction.SubMulAction.OfStabilizer
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PointStabilizers
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 
 /-!
 # Isaacs Problem 8C.3 (p. 256) — 次数 12, 位数 95040 の推移置換群は単純
@@ -139,73 +140,49 @@ theorem isSimpleGroup_of_card_eq_95040 [IsPretransitive G Ω]
     exact hn1 (Subtype.ext (FaithfulSMul.eq_of_smul_eq_smul (α := Ω) fun β => by
       rw [show ((1 : ↥N) : G) = 1 from rfl, one_smul]; exact hc β))
   haveI hNtrans : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_two_transitive h2 hx
-  -- `N ∩ G_α` は `G_α` の正規部分群なので `1` か `G_α`
-  haveI := hsimple α
-  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (N.subgroupOf (stabilizer G α))
-    inferInstance with hbot | htop
-  · -- `N` は semiregular, 推移性から regular: `|N| = 12`
-    have hstabN : stabilizer ↥N α = ⊥ := by
-      have hdisj : Disjoint N (stabilizer G α) := Subgroup.subgroupOf_eq_bot.mp hbot
-      have : (stabilizer G α).subgroupOf N = ⊥ :=
-        Subgroup.subgroupOf_eq_bot.mpr hdisj.symm
-      rw [← this]
-      ext y
-      rfl
-    have hNcard : Nat.card ↥N = 12 := by
-      have h := index_stabilizer_of_transitive (G := ↥N) (x := α)
-      rw [hΩ, hstabN, Subgroup.index_bot] at h
-      exact h
-    -- `m ↦ m • α` は単射
-    have hinj : ∀ u v : ↥N, (u : G) • α = (v : G) • α → u = v := by
-      intro u v huv
-      have : v⁻¹ * u ∈ stabilizer ↥N α := by
-        rw [mem_stabilizer_iff]
-        change ((v⁻¹ * u : ↥N) : G) • α = α
-        rw [Subgroup.coe_mul, mul_smul, huv, Subgroup.coe_inv, inv_smul_smul]
-      rw [hstabN, Subgroup.mem_bot] at this
-      exact (inv_mul_eq_one.mp this).symm
-    have hne : ∀ u : ↥N, u ≠ 1 → (u : G) • α ≠ α := by
-      intro u hu hc
-      refine hu (hinj u 1 ?_)
-      rw [hc, Subgroup.coe_one, one_smul]
-    -- `N ∖ {1}` の元はすべて `G` で共役
-    have hconj : ∀ u v : ↥N, u ≠ 1 → v ≠ 1 →
-        ∃ g : G, g * (u : G) * g⁻¹ = (v : G) := by
-      intro u v hu hv
-      obtain ⟨g, hgα, hgβ⟩ := h2 α ((u : G) • α) ((v : G) • α) (hne u hu) (hne v hv)
-      refine ⟨g, ?_⟩
-      have hmem : g * (u : G) * g⁻¹ ∈ N := hN.conj_mem (u : G) u.2 g
-      have hact : ((⟨g * (u : G) * g⁻¹, hmem⟩ : ↥N) : G) • α = (v : G) • α := by
-        have hginv : g⁻¹ • α = α := inv_smul_eq_iff.mpr hgα.symm
-        change (g * (u : G) * g⁻¹) • α = (v : G) • α
-        rw [mul_smul, mul_smul, hginv, hgβ]
-      exact congrArg Subtype.val (hinj ⟨g * (u : G) * g⁻¹, hmem⟩ v hact)
-    -- 位数 2 と位数 3 の元がともに存在するので矛盾
-    obtain ⟨a, ha⟩ := exists_prime_orderOf_dvd_card' (G := ↥N) 2 (by rw [hNcard]; norm_num)
-    obtain ⟨b, hb⟩ := exists_prime_orderOf_dvd_card' (G := ↥N) 3 (by rw [hNcard]; norm_num)
-    have ha1 : a ≠ 1 := fun h => by rw [h, orderOf_one] at ha; omega
-    have hb1 : b ≠ 1 := fun h => by rw [h, orderOf_one] at hb; omega
-    obtain ⟨g, hg⟩ := hconj a b ha1 hb1
-    have hoa : orderOf ((a : G)) = 2 := by rw [Subgroup.orderOf_coe, ha]
-    have hob : orderOf ((b : G)) = 3 := by rw [Subgroup.orderOf_coe, hb]
-    have hconjord : orderOf (g * (a : G) * g⁻¹) = orderOf ((a : G)) :=
-      orderOf_injective (MulAut.conj g).toMonoidHom (MulAut.conj g).injective _
-    rw [hg, hob, hoa] at hconjord
-    omega
-  · -- `G_α ≤ N` と `N` の推移性から `N = G`
-    refine hNtop (eq_top_iff.mpr fun g _ => ?_)
-    have hle : stabilizer G α ≤ N := by
-      intro y hy
-      have : (⟨y, hy⟩ : ↥(stabilizer G α)) ∈ N.subgroupOf (stabilizer G α) := by
-        rw [htop]; trivial
-      exact this
-    obtain ⟨m, hm⟩ := exists_smul_eq ↥N α (g • α)
-    have hm' : ((m : ↥N) : G) • α = g • α := hm
-    have hmem : (m : G)⁻¹ * g ∈ stabilizer G α := by
-      rw [mem_stabilizer_iff, mul_smul, ← hm', inv_smul_smul]
-    have : g = (m : G) * ((m : G)⁻¹ * g) := by group
-    rw [this]
-    exact N.mul_mem m.2 (hle hmem)
+  -- `N ∩ G_α` は `G_α` の正規部分群なので `1` か `G_α`; 後者は `N = ⊤` を与える。
+  -- よって `N` は semiregular, 推移性から regular: `|N| = 12` (共通補題)。
+  have hstabN : stabilizer ↥N α = ⊥ :=
+    stabilizer_eq_bot_of_normal_of_isSimpleGroup_stabilizer α (hsimple α) hNtop
+  have hNcard : Nat.card ↥N = 12 := by
+    rw [card_eq_card_of_stabilizer_eq_bot α hstabN, hΩ]
+  -- `m ↦ m • α` は単射
+  have hinj : ∀ u v : ↥N, (u : G) • α = (v : G) • α → u = v := by
+    intro u v huv
+    have : v⁻¹ * u ∈ stabilizer ↥N α := by
+      rw [mem_stabilizer_iff]
+      change ((v⁻¹ * u : ↥N) : G) • α = α
+      rw [Subgroup.coe_mul, mul_smul, huv, Subgroup.coe_inv, inv_smul_smul]
+    rw [hstabN, Subgroup.mem_bot] at this
+    exact (inv_mul_eq_one.mp this).symm
+  have hne : ∀ u : ↥N, u ≠ 1 → (u : G) • α ≠ α := by
+    intro u hu hc
+    refine hu (hinj u 1 ?_)
+    rw [hc, Subgroup.coe_one, one_smul]
+  -- `N ∖ {1}` の元はすべて `G` で共役
+  have hconj : ∀ u v : ↥N, u ≠ 1 → v ≠ 1 →
+      ∃ g : G, g * (u : G) * g⁻¹ = (v : G) := by
+    intro u v hu hv
+    obtain ⟨g, hgα, hgβ⟩ := h2 α ((u : G) • α) ((v : G) • α) (hne u hu) (hne v hv)
+    refine ⟨g, ?_⟩
+    have hmem : g * (u : G) * g⁻¹ ∈ N := hN.conj_mem (u : G) u.2 g
+    have hact : ((⟨g * (u : G) * g⁻¹, hmem⟩ : ↥N) : G) • α = (v : G) • α := by
+      have hginv : g⁻¹ • α = α := inv_smul_eq_iff.mpr hgα.symm
+      change (g * (u : G) * g⁻¹) • α = (v : G) • α
+      rw [mul_smul, mul_smul, hginv, hgβ]
+    exact congrArg Subtype.val (hinj ⟨g * (u : G) * g⁻¹, hmem⟩ v hact)
+  -- 位数 2 と位数 3 の元がともに存在するので矛盾
+  obtain ⟨a, ha⟩ := exists_prime_orderOf_dvd_card' (G := ↥N) 2 (by rw [hNcard]; norm_num)
+  obtain ⟨b, hb⟩ := exists_prime_orderOf_dvd_card' (G := ↥N) 3 (by rw [hNcard]; norm_num)
+  have ha1 : a ≠ 1 := fun h => by rw [h, orderOf_one] at ha; omega
+  have hb1 : b ≠ 1 := fun h => by rw [h, orderOf_one] at hb; omega
+  obtain ⟨g, hg⟩ := hconj a b ha1 hb1
+  have hoa : orderOf ((a : G)) = 2 := by rw [Subgroup.orderOf_coe, ha]
+  have hob : orderOf ((b : G)) = 3 := by rw [Subgroup.orderOf_coe, hb]
+  have hconjord : orderOf (g * (a : G) * g⁻¹) = orderOf ((a : G)) :=
+    orderOf_injective (MulAut.conj g).toMonoidHom (MulAut.conj g).injective _
+  rw [hg, hob, hoa] at hconjord
+  omega
 
 end -- Problem 8C.3
 

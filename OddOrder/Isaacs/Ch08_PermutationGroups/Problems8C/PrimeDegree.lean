@@ -7,6 +7,7 @@ import Mathlib.GroupTheory.GroupAction.Primitive
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.GroupTheory.Sylow
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # 素数次数の置換群 (Isaacs Problems 8C の準備)
@@ -134,6 +135,54 @@ theorem card_normalizer_dvd_of_card_eq_prime {p : ℕ} (hp : p.Prime)
     rw [IsCyclic.card_mulAut ↥H, hH, Nat.totient_prime hp]
   calc Nat.card ↥N = Nat.card ↥K * K.index := (Subgroup.card_mul_index K).symm
     _ ∣ p * (p - 1) := by rw [hKcard]; exact Nat.mul_dvd_mul_left p hKindex
+
+/-- **Isaacs Problem 8C.2 の Hint** 🎉: 11 点への忠実な作用をもつ位数 7920 の群では
+`P ∈ Syl₁₁(G)` について **`|N_G(P)| = 55`**。
+
+`|N_G(P)| ∣ 11·10 = 110` (`card_normalizer_dvd_of_card_eq_prime`) と `11 ∣ |N_G(P)|`
+から `|N_G(P)| = 11m` (`m ∣ 10`)。Sylow の `n₁₁ = [G : N_G(P)] ≡ 1 (mod 11)` が
+`m = 5` だけを残す。 -/
+theorem card_normalizer_sylow_eleven_eq_55 (hΩ : Nat.card Ω = 11)
+    (hG : Nat.card G = 7920) (P : Sylow 11 G) :
+    Nat.card ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)) = 55 := by
+  haveI : Fact (Nat.Prime 11) := ⟨by norm_num⟩
+  have hfact : (7920 : ℕ).factorization 11 = 1 := by
+    rw [show (7920 : ℕ) = 11 * 720 from by norm_num,
+      Nat.factorization_mul (by norm_num) (by norm_num), Finsupp.add_apply,
+      Nat.Prime.factorization_self (by norm_num),
+      Nat.factorization_eq_zero_of_not_dvd (by norm_num)]
+  have hPcard : Nat.card ↥(P : Subgroup G) = 11 := by
+    rw [Sylow.card_eq_multiplicity, hG, hfact, pow_one]
+  have hdvd110 : Nat.card ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)) ∣ 11 * 10 :=
+    card_normalizer_dvd_of_card_eq_prime (by norm_num) hΩ (P : Subgroup G) hPcard
+  have h11 : 11 ∣ Nat.card ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)) := by
+    have hdvd : Nat.card ↥(P : Subgroup G) ∣
+        Nat.card ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)) := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (Subgroup.le_normalizer (H := (P : Subgroup G)))).toEquiv]
+      exact Subgroup.card_subgroup_dvd_card _
+    rwa [hPcard] at hdvd
+  have hidx : Nat.card ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)) *
+      (Subgroup.normalizer ((P : Subgroup G) : Set G)).index = 7920 := by
+    rw [Subgroup.card_mul_index, hG]
+  have hmod : (Subgroup.normalizer ((P : Subgroup G) : Set G)).index % 11 = 1 % 11 := by
+    have hcard := Sylow.card_eq_index_normalizer P
+    have h2 := card_sylow_modEq_one (p := 11) (G := G)
+    rw [hcard] at h2
+    exact h2
+  obtain ⟨m, hm⟩ := h11
+  have hm10 : m ∣ 10 := by
+    have h : 11 * m ∣ 11 * 10 := by rw [← hm]; exact hdvd110
+    exact (mul_dvd_mul_iff_left (by norm_num : (11 : ℕ) ≠ 0)).mp h
+  have hmpos : 0 < m := by
+    rcases Nat.eq_zero_or_pos m with h | h
+    · rw [h, mul_zero] at hm
+      rw [hm] at hidx
+      omega
+    · exact h
+  have hmle : m ≤ 10 := Nat.le_of_dvd (by norm_num) hm10
+  rw [hm] at hidx ⊢
+  interval_cases m <;> omega
 
 end -- 素数次数の置換群
 
