@@ -303,9 +303,13 @@ mathlib / repo にあるかを実測すること。無ければそこが step (6
 
 ### step (6) の残り
 
-1. `π := (Nat.card ↥QK).primeFactors` と置く。
-2. **`V` は `H` の Hall `π′`-部分群** — `coprime_card_QK_index` + `[H:QK] = |V|` から
-   `|V|` は `π′`-数で `[H:V] = |QK|` は `π`-数。`IsHallSubgroup` の形に整える。
-3. `x` が `π′`-元 ⟹ `hall_D` で `⟨x⟩` は Hall `π′`-部分群に含まれ、Hall 共役性で
-   `V` に共役。
-4. Ch.I §3 Lemma 2 (`ConjugacyInV.lean`) で `V` 内共役に落として `λ(x) = λ(x^g)`。
+1. ~~`π := (Nat.card ↥QK).primeFactors` と置く~~ ✅
+2. ~~**`V` は `H` の Hall `π′`-部分群**~~ ✅ **2026-07-28 landing**
+   (`isHallSubgroup_V_subgroupOf`、支えは `card_H_eq_card_QK_mul_card_V` /
+   `index_V_subgroupOf_eq_card_QK` / `coprime_card_QK_V`)。
+3. [ ] `x` が `π′`-元 ⟹ `hall_D` で `⟨x⟩` は Hall `π′`-部分群に含まれ、**Hall 共役性**で
+   `V` に共役。⚠ Hall 共役定理 (Hall C-定理) が repo にあるか要実測
+   (`Ch03_SplitExtensions` に `hall_D` はあるので同ファイル周辺を探す)。
+4. [ ] `π`-成分が `QK ⊆ Ker λ` に入ることで `λ(x) = λ(π′-成分)` へ帰着
+   (`GroupTheory/PiElementDecomposition.lean` の `exists_isPiElement_mul`)。
+5. [ ] Ch.I §3 Lemma 2 (`ConjugacyInV.lean`) で `V` 内共役に落として `λ(x) = λ(x^g)`。
