@@ -3722,3 +3722,20 @@ API メモ: `Sylow.is_maximal'` / `Subgroup.map_subgroupOf_eq_of_le` /
   ⚠ `QuotientGroup.eq_one_iff` は**元を明示引数に取る** (`(QuotientGroup.eq_one_iff x).mp`)。
 
 ⟹ §7A は 2/6 完了 (7A.1, 7A.2)。次は 7A.3 (`GL(n,q)` の `N_G(P) = DP`)。
+
+### §7A statement を PDF ページ画像で確定 (2026-07-27)
+
+`references/isaacs/pages/isaacs-p209-222.png` を新規レンダリング (書籍 p.209 = PDF p.222、
+`pdftoppm -r 150`; 規約どおり references リポに保存)。pdftotext の崩れを 2 箇所訂正:
+
+* **7A.3(c)**: 「dimension `k` for each integer `k` with **`1 ≤ k ≤ n`**」
+  (pdftotext は `1 < k < n` に見えていた)。また **`G` は行ベクトルへの右からの掛け算で作用**
+  ⟹ 不変部分空間は**後ろの `k` 本**の基底が張るもの (`e_n A = e_n` だが `e_1 A` は第 1 行)。
+* **7A.5**: `U ⊲ P` は **normal** (単一の ⊲; pdftotext の `U <d P` は判別不能だった)。
+  [[mmd-collapses-subnormal-symbol]] の教訓どおり画像で確認した。
+* 7A.2 の hint は `n ≥ 2` (pdftotext は `n > 2`) — 実装済の 7A.2 には影響なし。
+
+7A.3 の設計メモ: (a) 対角共役で上三角冪単は保たれる、(b) `DP` = 可逆上三角全体、
+(c) `P`-不変部分空間は標準旗 `⟨e_{n-k+1},…,e_n⟩` のみ (各次元ちょうど 1 つ)、
+(d) `N` は `P`-不変部分空間を保つので旗を保ち ⟹ 上三角 ⟹ `N = DP`。
+⟹ (a)(b) は初等的。(c) が核心 (有限体上の線型代数)。
