@@ -538,6 +538,113 @@ theorem le_sylow_of_aInvariant_qSubgroup {A N : Type*} [Group A] [Finite A] [Gro
   rw [← aInvariant_sylow_unique hCop hfixA (smul_mem_of_isAInvariant hTinv) hS]
   exact hRT
 
+/-! ### (b) 本体の準備 -/
+
+/-- `A` 可換なら `C_N(B)` は `A`-不変。 -/
+theorem smul_mem_fixedSubgroup {A N : Type*} [Group A] [Group N] [MulDistribMulAction A N]
+    (hcomm : ∀ u v : A, u * v = v * u) (B : Subgroup A) :
+    ∀ a : A, ∀ m ∈ (fixedSubgroup B : Subgroup N), a • m ∈ (fixedSubgroup B : Subgroup N) := by
+  intro a m hm b hb
+  rw [← mul_smul, hcomm b a, mul_smul, hm b hb]
+
+/-- exponent `p` の位数 `p²` 群は非巡回 (Thm 6.21 を使うのに要る)。 -/
+theorem not_isCyclic_of_card_prime_sq {A : Type*} [Group A] [Finite A] {p : ℕ} (hp : p.Prime)
+    (hA : ∀ u : A, u ^ p = 1) (hcard : Nat.card A = p ^ 2) : ¬ IsCyclic A := by
+  intro hcyc
+  obtain ⟨g, hg⟩ := hcyc.exists_generator
+  have hzp : Subgroup.zpowers g = ⊤ := eq_top_iff.mpr fun x _ => hg x
+  have hord : orderOf g = p ^ 2 := by
+    rw [← hcard, ← Subgroup.card_top (G := A), ← hzp, Nat.card_zpowers]
+  have hdvd : orderOf g ∣ p := orderOf_dvd_of_pow_eq_one (hA g)
+  rw [hord] at hdvd
+  have h1 : p ^ 2 ≤ p := Nat.le_of_dvd hp.pos hdvd
+  have h2 := hp.one_lt
+  nlinarith
+
+/-- 位数 `p²` の群が固定点自由に作用すれば位数は互いに素。 -/
+theorem coprime_card_of_fixedFree {A N : Type*} [Group A] [Finite A] [Group N] [Finite N]
+    [MulDistribMulAction A N] {p : ℕ} (hp : p.Prime) (hcardA : Nat.card A = p ^ 2)
+    (hfixA : ∀ n : N, (∀ a : A, a • n = n) → n = 1) :
+    Nat.Coprime (Nat.card A) (Nat.card N) := by
+  have hnd := not_dvd_card_of_fixedFree_of_isPGroup hp (IsPGroup.of_card hcardA) hfixA
+  rw [hcardA]
+  exact Nat.Coprime.pow_left 2 ((Nat.Prime.coprime_iff_not_dvd hp).mpr hnd)
+
+/-- **Isaacs Problem 6C.2(b)** (p. 197) ⭐: `A` の位数 `p` の部分群 `D` ごとに
+`K_D = C_N(D)` の最大 `q`-部分群 `Q_D` を取ると, `X = ⨆_D Q_D` は `N` の Sylow
+`q`-部分群になる ((a) より位数 `p` の部分群はちょうど `p + 1` 個なので, これが書籍の
+`X = ⟨Q_1, …, Q_{p+1}⟩`)。
+
+* `X ≤ S`: `A`-不変 Sylow `q`-部分群 `S` は一意で, 各 `Q_D` は `A`-不変な `q`-部分群
+  (`smul_mem_of_max_qSubgroup`) なので `S` に入る。
+* `S ≤ X`: **Isaacs Thm 6.21** (可換非巡回 `A` の coprime 作用では `C_S(a)` (`a ≠ 1`) が
+  `S` を生成) から。`a ≠ 1` なら `S ⊓ C_N(⟨a⟩)` は `C_N(⟨a⟩)` の `q`-部分群なので
+  最大性で `Q_{⟨a⟩}` に入る。 -/
+theorem exists_sylow_eq_iSup_maxQSubgroup {A N : Type*} [Group A] [Finite A] [Group N] [Finite N]
+    [MulDistribMulAction A N] {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
+    (hA : ∀ u : A, u ^ p = 1) (hcomm : ∀ u v : A, u * v = v * u) (hcardA : Nat.card A = p ^ 2)
+    (hfixA : ∀ n : N, (∀ a : A, a • n = n) → n = 1)
+    (Qf : Subgroup A → Subgroup N)
+    (hQle : ∀ D : Subgroup A, Nat.card ↥D = p → Qf D ≤ fixedSubgroup D)
+    (hQq : ∀ D : Subgroup A, Nat.card ↥D = p → IsPGroup q ↥(Qf D))
+    (hQmax : ∀ D : Subgroup A, Nat.card ↥D = p →
+      ∀ R : Subgroup N, R ≤ fixedSubgroup D → IsPGroup q ↥R → R ≤ Qf D) :
+    ∃ S : Sylow q N,
+      (S : Subgroup N) = ⨆ D : {D : Subgroup A // Nat.card ↥D = p}, Qf (D : Subgroup A) := by
+  classical
+  haveI : Fact q.Prime := ⟨hq⟩
+  haveI hsolvA : IsSolvable A := isSolvable_of_comm hcomm
+  haveI hcommA : IsMulCommutative A := ⟨⟨hcomm⟩⟩
+  have hCop := coprime_card_of_fixedFree hp hcardA hfixA
+  have hnc := not_isCyclic_of_card_prime_sq hp hA hcardA
+  obtain ⟨S, hSinvA⟩ :=
+    OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (G := N) (A := A)
+      (φ := MulDistribMulAction.toMulAut A N) hCop (Or.inl hsolvA) q
+  have hS : ∀ a : A, ∀ m ∈ (S : Subgroup N), a • m ∈ (S : Subgroup N) :=
+    smul_mem_of_isAInvariant hSinvA
+  refine ⟨S, le_antisymm ?_ ?_⟩
+  · -- `S ≤ X` (Thm 6.21)
+    letI actS : MulDistribMulAction A ↥(S : Subgroup N) :=
+      IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ hS
+    have hCopS : Nat.Coprime (Nat.card A) (Nat.card ↥(S : Subgroup N)) :=
+      hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card _)
+    have h621 : nontrivialActionFixedByClosure
+        (MulDistribMulAction.toMulAut A ↥(S : Subgroup N)) = ⊤ :=
+      nontrivialActionFixedByClosure_eq_top_of_not_isCyclic hCopS hnc
+    have hgen : nontrivialActionFixedByClosure
+        (MulDistribMulAction.toMulAut A ↥(S : Subgroup N))
+        ≤ (⨆ D : {D : Subgroup A // Nat.card ↥D = p},
+            Qf (D : Subgroup A)).subgroupOf (S : Subgroup N) := by
+      rw [nontrivialActionFixedByClosure]
+      refine Subgroup.closure_le _ |>.mpr ?_
+      rintro u ⟨a, ha, hu⟩
+      -- `a • u = u`, `a ≠ 1` から `D := ⟨a⟩` (位数 `p`) を取る
+      have hsmul : a • (u : N) = (u : N) := congrArg (fun w : ↥(S : Subgroup N) => (w : N)) hu
+      have haord : orderOf a = p := by
+        have hdvd : orderOf a ∣ p := orderOf_dvd_of_pow_eq_one (hA a)
+        rcases (Nat.dvd_prime hp).mp hdvd with h1 | hpp
+        · exact absurd (orderOf_eq_one_iff.mp h1) ha
+        · exact hpp
+      have hDcard : Nat.card ↥(Subgroup.zpowers a) = p := by rw [Nat.card_zpowers, haord]
+      -- `u ∈ S ⊓ C_N(⟨a⟩) ≤ Q_{⟨a⟩}`
+      have hufix : (u : N) ∈ (fixedSubgroup (Subgroup.zpowers a) : Subgroup N) := by
+        intro b hb
+        obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp hb
+        rw [← hm]
+        exact zpow_mem (show a ∈ MulAction.stabilizer A (u : N) from hsmul) m
+      have hle : (S : Subgroup N) ⊓ fixedSubgroup (Subgroup.zpowers a) ≤ Qf (Subgroup.zpowers a) :=
+        hQmax _ hDcard _ inf_le_right (S.2.to_le inf_le_left)
+      have humem : (u : N) ∈ Qf (Subgroup.zpowers a) := hle ⟨u.2, hufix⟩
+      exact le_iSup (fun D : {D : Subgroup A // Nat.card ↥D = p} => Qf (D : Subgroup A))
+        ⟨Subgroup.zpowers a, hDcard⟩ humem
+    rw [h621] at hgen
+    exact Subgroup.subgroupOf_eq_top.mp (top_le_iff.mp hgen)
+  · -- `X ≤ S`
+    refine iSup_le fun D => ?_
+    exact le_sylow_of_aInvariant_qSubgroup hCop hfixA hS (hQq _ D.2)
+      (smul_mem_of_max_qSubgroup (smul_mem_fixedSubgroup hcomm _) (hQle _ D.2) (hQq _ D.2)
+        (hQmax _ D.2))
+
 end
 
 end OddOrder.Isaacs.Ch06

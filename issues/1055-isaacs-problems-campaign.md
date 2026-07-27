@@ -3503,3 +3503,21 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
   残りは **`X < S` からの矛盾** (`Y = X ⊔ Φ(S)` は `S` で正規・A-不変・真、
   Cor 3.28 で `C_{S/Y}(B i) = 1` ⟹ `A` の `S/Y` 作用が Frobenius ⟹ Thm 6.9
   elementary-abelian 分岐) の段のみ。
+
+* ⭐ **6C.2(b) 主定理 `exists_sylow_eq_iSup_maxQSubgroup` 実証明 (2026-07-27, axiom-clean)**:
+  位数 `p` の部分群 `D ≤ A` ごとに `K_D = C_N(D)` の最大 `q`-部分群 `Q_D` を取ると
+  `⨆_D Q_D` はある Sylow `q`-部分群にちょうど一致する。
+  * `X ≤ S`: `A`-不変 Sylow `q` は一意 (`aInvariant_sylow_unique`)、各 `Q_D` は
+    `A`-不変 `q`-部分群 (`smul_mem_of_max_qSubgroup` + `smul_mem_fixedSubgroup`) なので
+    `le_sylow_of_aInvariant_qSubgroup` で `S` に入る。
+  * `S ≤ X`: **書籍 hint の `Y = X ⊔ Φ(Q)` / `Q/Y` の Frobenius 化を経由せず、
+    §6B の Thm 6.21 (`nontrivialActionFixedByClosure_eq_top_of_not_isCyclic`) を直接使う**
+    (文書順は保たれる)。`a ≠ 1` に対し `S ⊓ C_N(⟨a⟩)` は `C_N(⟨a⟩)` の `q`-部分群なので
+    最大性で `Q_{⟨a⟩}` に入り、Thm 6.21 で `C_S(a)` たちが `S` を生成するから `S ≤ X`。
+  * 添字は「位数 `p` の部分群すべて」= subtype `{D // Nat.card D = p}` にした (これで
+    「ちょうど `p+1` 個」の counting を証明せずに書籍の `X = ⟨Q_1,…,Q_{p+1}⟩` を表現できる;
+    (a) が `p+1` 個の相異なるものを構成済み)。
+  * 補助: `smul_mem_fixedSubgroup` / `not_isCyclic_of_card_prime_sq` /
+    `coprime_card_of_fixedFree`。
+  * 残り (次 iteration): `K_D` の冪零性を (a) の証明から独立補題に切り出し、`Qf` を
+    仮説でなく内部で構成する完全自己完結版の corollary を付ける。
