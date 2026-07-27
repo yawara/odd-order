@@ -680,7 +680,15 @@ Dade image, it vanishes off `conjugatesOfSet H^#`
 via `dade_H_eq_bot`); and `V` is disjoint from `conjugatesOfSet H^# ⊆ conjugatesOfSet (K^G)` by
 `ticVdiffV_not_mem_conjugatesOfSet_K` (using `h46.K = H`, so `H^# ⊆ K^G`).  This is the **anchor**
 `hvanish` input of `inner_smul_chiFam_eq_zero_of_diff_vanishOnV`: with `α = η₁ − η̄₁`
-(`Supp ⊆ H^#`, Peterfalvi (4.7)) it gives that `(η₁ − η̄₁)^τ` vanishes on `V`. -/
+(`Supp ⊆ H^#`, Peterfalvi (4.7)) it gives that `(η₁ − η̄₁)^τ` vanishes on `V`.
+
+⚠ **This one is genuinely not an instance of the (4.6)-level anchor**
+`S06.dadeICM_apply_eq_zero_of_mem_ticVdiffV` (issue 0160), unlike its type-P and type-II
+counterparts, which were rewritten as one-line specializations of it.  The general lemma evaluates
+the Dade map at `v` as a **base point** — which needs `V ⊆ A₀`, true for `h46.dade0` (whose set is
+`A ∪ V^L`).  Here the datum is `hyp.dade : S04.Hypothesis G (sharpImage H) L`, supported on `H^#`
+only: `V` is *outside* it, so there is no base point and the image vanishes for the opposite
+reason.  The two routes are complementary, not redundant — keep both. -/
 theorem tau_apply_eq_zero_of_mem_ticVdiffV
     (hyp : SibleyDadeHypothesis G L H)
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)

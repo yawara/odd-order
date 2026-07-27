@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
 import OddOrder.Peterfalvi.S08_CrossOrthogonality
 import OddOrder.Peterfalvi.S13_Lemmas113To115
 
@@ -110,26 +111,15 @@ theorem tau_apply_eq_zero_of_mem_typePV [Finite G]
       (hyp.dadeData.dade.fullDadeIsometryData) α v = 0 := by
   haveI := hyp.finiteG
   classical
-  -- `v ∈ typePV M` (the `ticVdiff` exceptional set is definitionally `W ∖ (W₁ ∪ W₂)`)
-  have hvPV : v ∈ OddOrder.GroupTheory.typePV M hyp.typeP := hv
-  -- `v ∈ A₀(M)` (the `V^M`-part, conjugator `1`)
-  have hvA0 : v ∈ OddOrder.GroupTheory.typePA0 M hyp.typeP :=
-    Or.inr ⟨v, hvPV, 1, M.one_mem, by group⟩
-  -- `α` is `A₀`-supported (monotone from `A(M)`-supported)
-  have hαA0 : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
-      (OddOrder.GroupTheory.typePA0 M hyp.typeP) M :=
-    hαsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
-  -- evaluate the explicit (2.5) Dade map at the base point `a = v`, `h = 1`
-  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade _ hαA0,
-    OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_apply,
-    hyp.dadeData.dade.dadeValue_eq _ (a := ⟨v, hvA0⟩)
-      (Subgroup.one_mem _) (by rw [mul_one])]
-  -- `α(v) = 0`: `v ∉ M'` while `α` is `(M')^#`-supported
-  by_contra hne
-  have hmem := hαsupp (ClassFunction.mem_support.mpr hne)
-  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup,
-    OddOrder.GroupTheory.typePA_eq_sharpSubgroup_derivedInG] at hmem
-  exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hvPV hmem.1
+  refine OddOrder.Peterfalvi.S06.dadeICM_apply_eq_zero_of_mem_ticVdiffV
+    (hyp.toHypothesis46 hG hG.odd) ?_ ?_ hv
+  · exact hαsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+  · intro z hz
+    by_contra hne
+    have hmem := hαsupp (ClassFunction.mem_support.mpr hne)
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup,
+      OddOrder.GroupTheory.typePA_eq_sharpSubgroup_derivedInG] at hmem
+    exact hz (Subgroup.mem_subgroupOf.mpr hmem.1)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **(5.2.e) certain-type column vs irreducible break cross-orthogonality, §12 form**

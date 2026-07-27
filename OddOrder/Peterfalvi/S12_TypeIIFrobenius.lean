@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
 import OddOrder.Peterfalvi.S08_CrossOrthogonality
 import OddOrder.Peterfalvi.S12_Section9Counts
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
@@ -393,28 +394,14 @@ theorem typeII_tau_apply_eq_zero_of_mem_ticVdiffV [Finite G]
       (typeIIHypothesis46 hG hSmax hSII data).dade0
       (typeIIHypothesis46 hG hSmax hSII data).tau α v = 0 := by
   classical
-  -- `v ∈ typePV S` (the `ticVdiff` exceptional set is definitionally `W ∖ (W₁ ∪ W₂)`)
-  have hvPV : v ∈ typePV S data := hv
-  -- `v ∈ A₀(S)` (the `V^S`-part, conjugator `1`)
-  have hvA0 : v ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
-      ∪ conjClassSetIn S (typePV S data) :=
-    Or.inr ⟨v, hvPV, 1, S.one_mem, by group⟩
-  -- `α` is `A₀`-supported (monotone from `A(S)`-supported)
-  have hαA0 : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
-      (centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
-        ∪ conjClassSetIn S (typePV S data)) S :=
-    hαsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
-  -- evaluate the explicit (2.5) Dade map at the base point `a = v`, `h = 1`
-  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
-      (typeIIHypothesis46 hG hSmax hSII data).dade0 _ hαA0,
-    OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_apply,
-    (typeIIHypothesis46 hG hSmax hSII data).dade0.dadeValue_eq _ (a := ⟨v, hvA0⟩)
-      (Subgroup.one_mem _) (by rw [mul_one])]
-  -- `α(v) = 0`: `v ∉ S'` while `α` is `A(S) ⊆ S'`-supported
-  by_contra hne
-  have hmem := hαsupp (ClassFunction.mem_support.mpr hne)
-  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hmem
-  exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived data hvPV hmem.1
+  refine OddOrder.Peterfalvi.S06.dadeICM_apply_eq_zero_of_mem_ticVdiffV
+    (typeIIHypothesis46 hG hSmax hSII data) ?_ ?_ hv
+  · exact hαsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+  · intro z hz
+    by_contra hne
+    have hmem := hαsupp (ClassFunction.mem_support.mpr hne)
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hmem
+    exact hz (Subgroup.mem_subgroupOf.mpr hmem.1)
 
 open scoped Classical FiniteInduce in
 /-- **(5.2.e) certain-type column vs irreducible break cross-orthogonality, type-II `S`-side**
