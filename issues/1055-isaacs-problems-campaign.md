@@ -4944,7 +4944,7 @@ IsMultiplyPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) n`) で
 | 8C.1 – 8C.4 | — | — | **完了** (二重着手あり、9212 参照) |
 | 8C.5 | 設計メモを書いた側のセッション (= 本セッション) | 2026-07-27 21:5x | **完了 2026-07-27** |
 | 8C.6 | lane a (9212 を起票した側) | 2026-07-27 21:5x | hub 裁定で確定 |
-| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **8D.1–8D.4 完了, 8D.5 / 8D.6 進行中** |
+| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **8D.1–8D.5 完了, 8D.6 のみ残** |
 
 ⚠ **恒久対処は worktree を分けること** — 1 lane = 1 worktree = 1 session が CLAUDE.md の前提。
 2 つ目のセッションは `notes/meta/worktree_setup.md` の手順で自分の worktree/branch を取るのが
@@ -5064,5 +5064,40 @@ leaf = `Problems8D/{SubdegreeTwo, DegreeEight}.lean` (188 / 213 行) + hub `Prob
   (原始的で `m > 1` なら `m < k_m`)。鍵は `A·B ⊆ K` と **Problem 1A.3**
   `Ch01.card_mul_card_inf` (`|A·B|·|A∩B| = |A||B|`)、(c) は点安定化群の極大性。
 
-**次は 8D.5** (rank 3, subdegree `1 < m < n` coprime ⟹ `(m+1) ∣ n`; Hint: `k_m ∣ 1+m+n`) →
-**8D.6** (原始群で素数 `p` が subdegree なら `p² ∤ |G_α|`)。
+* ✅ **8D.5** (`RankThree.lean`): `succ_dvd_of_rank_three`。`k_m ∣ |Ω| = 1+m+n` と
+  Thm 8.42(b) の `k_m ∣ n` から `k_m ∣ m+1`, 8D.4(a) の `m ≤ k_m` と合わせて
+  `k_m = m+1` ⟹ `(m+1) ∣ n`。rank 3 は「suborbit 長は `1, m, n` のいずれか」+
+  `|Ω| = 1+m+n` で表現。
+
+### 残り: 8D.6 (§8D 最後) — 未着手, 難所は Hint の補題
+
+**8D.6**: 原始置換群で素数 `p` が subdegree なら `p² ∤ |G_α|`, したがって `p²` は
+どの subdegree も割らない。**Hint**: `X ⊆ Y`, `|Y : X| = p` ⟹ `O^{p'}(X) ◁ Y`。
+
+本体側の筋は 8D.1 と同型で明快:
+`α → β` を `p`-arrow, `X := G_α ⊓ G_β` とすると `|G_α : X| = |G_β : X| = p`。
+Hint から `R := O^{p'}(X)` は `G_α` でも `G_β` でも正規 ⟹ `G_α ⊔ G_β ≤ N_G(R)`。
+原始性 (点安定化群が `IsCoatom`) で `G_α ⊔ G_β` は `G_α` (⟹ `G_α = G_β` ⟹ `p = 1`) か
+`⊤`。後者なら `R ◁ G` かつ `R ≤ G_α` なので `eq_bot_of_normal_of_le_stabilizer` から
+`R = ⊥`, つまり `X` は `p'`-群 ⟹ `|G_α| = p·|X|` の `p`-部分はちょうど `p`。
+subdegree は `|G_α|` を割るので `p²` はどれも割らない。
+
+#### Hint の補題の証明 (2026-07-27 に発見, 実装待ち)
+
+**補題**: `X ≤ Y`, `[Y : X] = p` (素数) ⟹ `O^{p'}(X) ◁ Y`。
+
+1. **`X` の `p`-元はすべて `core_Y(X)` に入る**。`g ∈ X` を `p`-元とすると `⟨g⟩` は
+   `p`-群で, `Y ⧸ X` (`p` 点) に左乗法で作用し, 剰余類 `⟦1⟧` を固定する。`p`-群の
+   固定点数は `|Y⧸X| = p` と mod `p` で合同 (`IsPGroup.card_modEq_card_fixedPoints`)
+   なので固定点数 `≡ 0 (mod p)`; `1 ≤ 固定点数 ≤ p` より **固定点数 = p**, つまり `g` は
+   全剰余類を固定し `g ∈ ⋂_y X^y = X.normalCore`。
+2. `X₀ := X.normalCore ◁ Y` で `X₀ ≤ X`。1 より **`X` の `p`-元 = `X₀` の `p`-元**。
+3. `O^{p'}(X) = ⟨X の p-元⟩` (**Problem 1B.8** `oPiResidual_eq_closure_piPrimeElements`,
+   `π := {p}ᶜ` とすると `π' = {p}`) なので `O^{p'}(X) = O^{p'}(X₀)`。
+4. `O^{p'}(X₀)` は `X₀` の**特性部分群** (`oPiResidual` の普遍性から任意の自己同型で不変)
+   で `X₀ ◁ Y` なので `O^{p'}(X) ◁ Y`。∎
+
+実装時に要る repo 部品: `oPiResidual` (Ch03 `PiResidual.lean`) とその
+`oPiResidual_eq_closure_piPrimeElements` / 普遍性, `Subgroup.normalCore` と
+`Subgroup.normalCore_eq_ker`, `IsPGroup.card_modEq_card_fixedPoints`,
+本 §8D の `eq_bot_of_normal_of_le_stabilizer` (本体側)。
