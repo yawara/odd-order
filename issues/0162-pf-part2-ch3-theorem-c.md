@@ -200,11 +200,23 @@ fpf に作用できない ([H] Kapitel V, Satz 8.15)」で済ませている。�
    **`y` は `Ω₁(K_p)` を中心化する**。
 4. `x ∈ Ω₁(K_p)` を位数 `p` に取ると `⟨x, y⟩` は指数 `p` の可換群。
    `K ⊓ V = 1` より `x ∉ ⟨y⟩` なので位数 `p²` の**非巡回**群 (`C_p × C_p`)。
-5. step 1 より `D` は `Q₁` に fpf 作用する。fpf (= Frobenius 補群) の作用は
-   位数 `p²` の非巡回部分群を許さない ([H] V.8.15)。repo の対応物は
-   `Appendices/Huppert.lean` の `isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian` /
-   `pGroup_cyclic_fixedPointFree` (Ch.II `FirstCase/StepThree.lean:521` が
-   「これが [H] V Satz 8.15 を代替する」と明記)。⟹ 矛盾。
+5. step 1 より `D` は `Q₁` に fpf 作用する。⟹ 矛盾。
+
+⚠ **書籍の [H] V.8.15 は引かなくてよい (2026-07-28 の改良)**。より短い経路が repo に在る:
+
+> **`D` の可換部分群はすべて巡回**である (Frobenius 補群の標準性質)。
+> 証明: 可換非巡回 `A ≤ D` が在るとすると、`A` は `Q₁` に**互いに素に**作用する
+> (`coprime_card_Q1_D`、step 3b で landing 済)。**Isaacs Thm 6.21**
+> (`Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic`,
+> `FrobeniusGroup.lean:1372`) より `Q₁ = ⟨C_{Q₁}(a) : a ∈ A^#⟩`。ところが fpf
+> (step 1) で各 `C_{Q₁}(a) = 1` なので `Q₁ = 1`、`Q₁ ≠ 1` に矛盾。
+
+⟹ Frobenius 補群の構造定理も Huppert の p-群補題も要らず、**既に landing 済の
+step 1 + step 3b の帰結だけ**で済む。`C_p × C_p` を作る (2)-(4) はそのまま使い、
+(5) をこの一般補題に差し替える。
+
+**実装順**: (i) `isCyclic_of_isMulCommutative_le_D` (可換 ⟹ 巡回) を一般補題として
+landing → (ii) `p ∣ |K|` かつ `p ∣ |V|` から `C_p × C_p ≤ D` を作って矛盾。
 
 **Hall 性への接続**: `|D| = |K||V|` (`K ⊓ V = 1` + `exists_mem_V_mul_mem_K`) と
 `Q ⊓ K ≤ Q ⊓ D = 1` より `|QK| = |Q||K|`、`[H:QK] = |V|`。
