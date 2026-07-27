@@ -3835,6 +3835,13 @@ set_option linter.style.longLine false in
 -- (5.2.d)/(5.2.e) image families from `InducedFamilyImageData`, and the per-member decomposition
 -- from `S07.memberExtensionDecomposition_general` (whose `imageFamily` is definitionally `R(·)`
 -- and whose `tau1` is the accumulator extension — both discharged by `rfl`).
+-- The running X-chain accumulator `pairUnion 𝒮₀ pair i`: it lies inside `𝒳` (base block plus
+-- already-adjoined pairs), is therefore finite, and always contains the base block — hence a
+-- degree-minimal anchor.  These feed the per-step enumeration (`exists_finEnum_irreducible`,
+-- already stated for an abstract group).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.pairUnion_subset_xSet
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.pairUnion_finite
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xBaseBlock_subset_pairUnion
 -- The bridge from the book's common-index `p`-power degrees to the *ratio* form the (5.6) engine
 -- consumes: once `K` is a `p`-group ((6.5)), every `𝒳`-member has degree `|L:K|·p^k`, and a
 -- base-block anchor has the minimal such degree, so `χ(1) = p^(k−k₁)·χ₁(1)`.  Supplies the

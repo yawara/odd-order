@@ -507,6 +507,36 @@ noncomputable def xSet_isCoherent_of_adjoinSteps
   rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair (hpair0 i hi) (hpair1 i hi)]
   exact hstep pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi hcoh
 
+/-! ### The running accumulator `pairUnion 𝒮₀ pair i` -/
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- The running accumulator of the X-chain lies inside `𝒳`: it is the base block together with
+the already-adjoined pairs, all of which are `𝒳`-subsets. -/
+theorem pairUnion_subset_xSet {Z : Subgroup ↥L}
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ} (hi : i ≤ N)
+    (hpairs : ∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆ xSet K Z) :
+    OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i ⊆ xSet K Z := by
+  intro φ hφ
+  rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hφ with hbase | ⟨j, hji, hjpair⟩
+  · exact xBaseBlock_subset (K := K) Z hbase
+  · exact hpairs j (lt_of_lt_of_le hji hi) hjpair
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- The running accumulator is finite (a subset of the finite `𝒳`). -/
+theorem pairUnion_finite {Z : Subgroup ↥L}
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ} (hi : i ≤ N)
+    (hpairs : ∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆ xSet K Z) :
+    (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i).Finite :=
+  (xSet_finite (K := K) Z).subset (pairUnion_subset_xSet hi hpairs)
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- The base block sits inside every prefix, so the accumulator always contains a degree-minimal
+anchor. -/
+theorem xBaseBlock_subset_pairUnion {Z : Subgroup ↥L}
+    (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (i : ℕ) :
+    xBaseBlock K Z ⊆ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i :=
+  fun _ hφ => OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hφ)
+
 /-! ### Degree ratios over a base-block anchor -/
 
 omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
