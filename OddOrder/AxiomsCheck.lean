@@ -3806,6 +3806,15 @@ set_option linter.style.longLine false in
 -- `dadeIntegralCharacterMap`.  Per-step adjoining is the caller's, intended to route through the
 -- `τ`-general (5.6) engine `S07.xAdjoinStepW_general` (issue 0154).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xSet_isCoherent_of_adjoinSteps
+-- **Base coherence of `𝒮₀` for a general kernel** (issue 0155 step 3).  Peterfalvi's "By (1.1)
+-- and (1.4), `{χ₁,…,χₖ}` is coherent" (p. 32) is, for a general kernel, just the constant-degree
+-- theorem (5.7) `S07.coherent_of_constant_degree` applied to the subfamily `𝒮₀ ⊆ 𝒮`: Hypothesis
+-- (5.2) from `hypothesisOfSubfamily`, `≥ 2` members, equal degree by construction (real-part
+-- equality upgraded to complex values since irreducible degrees are positive naturals), and
+-- equal degree also makes the member differences `K^#`-supported.  The Sibley instance
+-- `xBaseBlock_isCoherent_of_irreducible_X` instead builds the orthonormal target family from the
+-- Dade map (`coherentEqualDegree_fromDade`); routing through (5.7) keeps this `τ`-general.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xBaseBlock_isCoherent
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.

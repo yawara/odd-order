@@ -324,6 +324,74 @@ theorem exists_xBaseBlock_anchor_index {Z : Subgroup ↥L}
   obtain ⟨i₁, hi₁⟩ := hφpair
   exact ⟨i₁, by rw [show (χmem i₁ : ClassFunction ↥L ℂ) = φ from hi₁]; exact hφ⟩
 
+/-! ### Base coherence of `𝒮₀`, general kernel -/
+
+/-- **Base coherence: `𝒮₀` is coherent** (Peterfalvi (6.6), p. 32: *"By (1.1) and (1.4),
+`{χ₁, …, χₖ}` is coherent"*).
+
+For a general kernel this is just the constant-degree theorem (5.7)
+(`S07.coherent_of_constant_degree`) applied to the subfamily `𝒮₀ ⊆ 𝒮`: `𝒮₀` carries Hypothesis
+(5.2) by `hypothesisOfSubfamily`, has `≥ 2` members (`two_le_xBaseBlock_ncard`), and is by
+construction an *equal*-degree family (`xBaseBlock_degree_re_eq`, upgraded from real parts to
+complex values because irreducible degrees are positive naturals).  Equal degree also makes every
+member difference `K^#`-supported, hence in `ℤ[𝒮, A₀]` where `τ` is an isometry into `ℤ[Irr G]`.
+
+The Sibley `K = H` instance is `xBaseBlock_isCoherent_of_irreducible_X`, which instead builds the
+orthonormal target family from the Dade map (`coherentEqualDegree_fromDade`); routing through
+(5.7) keeps this `τ`-general. -/
+noncomputable def xBaseBlock_isCoherent {A₀ : Set ↥L}
+    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
+    {Z : Subgroup ↥L} (hirr : ∀ φ ∈ xSet K Z, IsIrreducibleCharacter φ)
+    (hXne : (xSet K Z).Nonempty) :
+    OddOrder.Peterfalvi.S07.IsCoherent RD.tau (xBaseBlock K Z) A₀ := by
+  classical
+  have hsub : xBaseBlock K Z ⊆ inducedKernelFamily K ⊥ :=
+    (xBaseBlock_subset (K := K) Z).trans (xSet_subset (K := K) Z)
+  have hirr₀ : ∀ φ ∈ xBaseBlock K Z, IsIrreducibleCharacter φ :=
+    fun φ hφ => hirr φ (xBaseBlock_subset (K := K) Z hφ)
+  -- equal degree, as complex values (irreducible degrees are positive naturals)
+  have hconst : ∀ a ∈ xBaseBlock K Z, ∀ b ∈ xBaseBlock K Z, a 1 = b 1 := by
+    intro a ha b hb
+    obtain ⟨da, -, hda⟩ :=
+      irreducibleCharacter_apply_one_eq_pos_natCast (⟨a, hirr₀ a ha⟩ : IrreducibleCharacter ↥L)
+    obtain ⟨db, -, hdb⟩ :=
+      irreducibleCharacter_apply_one_eq_pos_natCast (⟨b, hirr₀ b hb⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at hda hdb
+    have hre := xBaseBlock_degree_re_eq (K := K) ha hb
+    rw [OddOrder.Peterfalvi.S03.characterDegree_def,
+      OddOrder.Peterfalvi.S03.characterDegree_def, hda, hdb] at hre
+    rw [hda, hdb]
+    exact_mod_cast congrArg (Nat.cast : ℕ → ℂ) (by exact_mod_cast hre : da = db)
+  -- equal degree ⟹ the member differences are `A₀`-supported
+  have hsuppdiff : ∀ a ∈ xBaseBlock K Z, ∀ b ∈ xBaseBlock K Z,
+      ((a - b : ClassFunction ↥L ℂ)).support ⊆ A₀ := by
+    intro a ha b hb
+    have h1 : (a - b : ClassFunction ↥L ℂ) = a - (1 : ℕ) • b := by simp
+    rw [h1]
+    exact inducedKernelFamily_scaledDiff_support hKsupp (hsub ha) (hsub hb)
+      (by rw [hconst a ha b hb]; simp)
+  have hmemspan : ∀ a ∈ xBaseBlock K Z, ∀ b ∈ xBaseBlock K Z,
+      (a - b : ClassFunction ↥L ℂ) ∈
+        OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ :=
+    fun a ha b hb => ⟨Submodule.sub_mem _ (Submodule.subset_span (hsub ha))
+      (Submodule.subset_span (hsub hb)), hsuppdiff a ha b hb⟩
+  have hdeg0 : ∀ a ∈ xBaseBlock K Z, a 1 ≠ 0 := by
+    intro a ha
+    obtain ⟨da, hpos, hda⟩ :=
+      irreducibleCharacter_apply_one_eq_pos_natCast (⟨a, hirr₀ a ha⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at hda
+    rw [hda]
+    exact_mod_cast hpos.ne'
+  exact Classical.choice (OddOrder.Peterfalvi.S07.coherent_of_constant_degree
+    (RD.hypothesisOfSubfamily hodd hKsupp hsub
+      (xBaseBlock_closedUnderConjugate (K := K) Z) hirr₀)
+    (xBaseBlock_finite (K := K) Z)
+    (two_le_xBaseBlock_ncard (K := K) hodd hXne)
+    (fun ζ hζ => (hirr₀ ζ hζ).inner_self_eq_one)
+    (fun a ha b hb => RD.tau_mem_ZIrr (hmemspan a ha b hb))
+    hconst hdeg0 h1A hsuppdiff)
+
 /-! ### The `(6.6)` X-chain fold, `τ`-general -/
 
 open scoped Classical in
