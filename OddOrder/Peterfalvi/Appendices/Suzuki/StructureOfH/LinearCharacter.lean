@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
 import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 import OddOrder.GroupTheory.CardSupInf
+import OddOrder.Peterfalvi.Appendices.Suzuki.ConjugacyInV
 
 /-!
 # Peterfalvi Part II, Ch. III: the subgroup `QK`
@@ -687,6 +688,66 @@ theorem exists_piPrime_apply_eq (ind : Hypothesis.TheoremAInductionBelow G Ω)
     OddOrder.GroupTheory.exists_isPiElement_mul
       ((Nat.card ↥sc.toHypothesis.QK).primeFactors : Set ℕ) x
   exact ⟨b, hb, hbz, sc.apply_eq_of_piFactorization ind hQ1 hθ hdeg hker hab ha⟩
+
+end SecondCaseHypothesis
+
+namespace SecondCaseHypothesis
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (sc : SecondCaseHypothesis G Ω)
+
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step (6), core** (p. 115):
+
+> Therefore `x` and `x^g` are conjugate in `H` to elements of `V` by a theorem of
+> Hall, and we may assume that `x ∈ V` and `x^g ∈ V`.  By Chapter I, §3, Lemma 2,
+> `x` and `x^g` are conjugate in `V`.
+
+Two `π′`-elements of `H` that are conjugate **in `G`** take the same value under
+**every** class function on `H`: Hall's theorems move both into `V`
+(`exists_conj_mem_V_of_piPrime`), and Ch. I §3 Lemma 2
+(`exists_mem_V_conj_image_eq`) turns the `G`-conjugacy of two subsets of `V` into
+`V`-conjugacy, which lies inside `H`. -/
+theorem apply_eq_of_isConj_piPrime (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥) (θ : ClassFunction ↥sc.toHypothesis.H ℂ)
+    {x y : ↥sc.toHypothesis.H}
+    (hx : ∀ q ∈ (orderOf x).primeFactors,
+      q ∉ (Nat.card ↥sc.toHypothesis.QK).primeFactors)
+    (hy : ∀ q ∈ (orderOf y).primeFactors,
+      q ∉ (Nat.card ↥sc.toHypothesis.QK).primeFactors)
+    {g : G} (hconj : g * (x : G) * g⁻¹ = (y : G)) :
+    θ x = θ y := by
+  classical
+  obtain ⟨h₁, hh₁⟩ := sc.exists_conj_mem_V_of_piPrime ind hQ1 hx
+  obtain ⟨h₂, hh₂⟩ := sc.exists_conj_mem_V_of_piPrime ind hQ1 hy
+  set x' : ↥sc.toHypothesis.H := h₁ * x * h₁⁻¹ with hx'def
+  set y' : ↥sc.toHypothesis.H := h₂ * y * h₂⁻¹ with hy'def
+  have hx'V : (x' : G) ∈ sc.toHypothesis.V := Subgroup.mem_subgroupOf.mp hh₁
+  have hy'V : (y' : G) ∈ sc.toHypothesis.V := Subgroup.mem_subgroupOf.mp hh₂
+  -- `x'` and `y'` are conjugate in `G`, by `(h₂ : G) * g * (h₁ : G)⁻¹`
+  have hGconj : ((h₂ : G) * g * (h₁ : G)⁻¹) * (x' : G) * ((h₂ : G) * g * (h₁ : G)⁻¹)⁻¹
+      = (y' : G) := by
+    have hxv : (x' : G) = (h₁ : G) * (x : G) * (h₁ : G)⁻¹ := rfl
+    have hyv : (y' : G) = (h₂ : G) * (y : G) * (h₂ : G)⁻¹ := rfl
+    rw [hxv, hyv, ← hconj]
+    group
+  -- Ch. I §3 Lemma 2 on the singletons `{x'}`, `{y'}`
+  obtain ⟨v, hvV, hveq⟩ := sc.toHypothesis.exists_mem_V_conj_image_eq
+    (X := {(x' : G)}) (Y := {(y' : G)})
+    (by simpa using hx'V) (by simpa using hy'V)
+    ⟨(h₂ : G) * g * (h₁ : G)⁻¹, by
+      simp only [Set.image_singleton, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+      rw [hGconj]⟩
+  have hvH : v ∈ sc.toHypothesis.H :=
+    sc.toHypothesis.D_le_H (sc.toHypothesis.V_le_D hvV)
+  have hvx : v * (x' : G) * v⁻¹ = (y' : G) := by
+    have := hveq
+    simp only [Set.image_singleton, MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at this
+    exact Set.singleton_eq_singleton_iff.mp this
+  have hxy' : (⟨v, hvH⟩ : ↥sc.toHypothesis.H) * x' * (⟨v, hvH⟩ : ↥sc.toHypothesis.H)⁻¹ = y' :=
+    Subtype.ext hvx
+  calc θ x = θ x' := (ClassFunction.conj_eq θ x h₁).symm
+    _ = θ y' := by rw [← hxy']; exact (ClassFunction.conj_eq θ x' ⟨v, hvH⟩).symm
+    _ = θ y := ClassFunction.conj_eq θ y h₂
 
 end SecondCaseHypothesis
 
