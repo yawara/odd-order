@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
+import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
 
 /-!
 # Peterfalvi Part II, Ch. III: the Feit–Sibley configuration
@@ -107,6 +109,88 @@ theorem odd_card_Q1 : Odd (Nat.card ↥hyp.Q1) := by
   · exact absurd h.two_dvd hyp.two_not_dvd_card_Q1Subgroup
   · exact h
 
+/-- Membership in the ambient `S`, in terms of the bundled Sylow subgroup of `Q`. -/
+lemma mem_sylowTwoOfQ_iff {x : G} (hx : x ∈ hyp.Q) :
+    x ∈ hyp.sylowTwoOfQ ↔
+      (⟨x, hx⟩ : ↥hyp.Q) ∈ ((default : Sylow 2 ↥hyp.Q) : Subgroup ↥hyp.Q) := by
+  constructor
+  · rintro ⟨s, hs, hsx⟩
+    have hxs : (⟨x, hx⟩ : ↥hyp.Q) = s := Subtype.ext hsx.symm
+    rw [hxs]; exact hs
+  · intro h
+    exact ⟨⟨x, hx⟩, h, rfl⟩
+
+/-- Membership in the ambient `Q₁`, in terms of the normal `2`-complement of `Q`. -/
+lemma mem_Q1_iff {x : G} (hx : x ∈ hyp.Q) :
+    x ∈ hyp.Q1 ↔ (⟨x, hx⟩ : ↥hyp.Q) ∈ hyp.Q1Subgroup := by
+  constructor
+  · rintro ⟨y, hy, hyx⟩
+    have hxy : (⟨x, hx⟩ : ↥hyp.Q) = y := Subtype.ext hyx.symm
+    rw [hxy]; exact hy
+  · intro h
+    exact ⟨⟨x, hx⟩, h, rfl⟩
+
+/-- `S ∩ Q₁ = 1` (the book's `Q = S × Q₁`, first clause). -/
+theorem sylowTwoOfQ_inf_Q1_eq_bot : hyp.sylowTwoOfQ ⊓ hyp.Q1 = ⊥ := by
+  refine le_bot_iff.mp fun x hx => ?_
+  obtain ⟨hxS, hxQ1⟩ := Subgroup.mem_inf.mp hx
+  have hxQ : x ∈ hyp.Q := hyp.sylowTwoOfQ_le_Q hxS
+  have hmem : (⟨x, hxQ⟩ : ↥hyp.Q) ∈
+      ((default : Sylow 2 ↥hyp.Q) : Subgroup ↥hyp.Q) ⊓ hyp.Q1Subgroup :=
+    Subgroup.mem_inf.mpr ⟨(hyp.mem_sylowTwoOfQ_iff hxQ).mp hxS,
+      (hyp.mem_Q1_iff hxQ).mp hxQ1⟩
+  rw [hyp.sylowTwo_inf_Q1Subgroup_eq_bot (default : Sylow 2 ↥hyp.Q),
+    Subgroup.mem_bot] at hmem
+  rw [Subgroup.mem_bot]
+  exact congrArg Subtype.val hmem
+
+open scoped Pointwise in
+/-- `S · Q₁ = Q` (the book's `Q = S × Q₁`, second clause). -/
+theorem sylowTwoOfQ_mul_Q1_eq_Q :
+    (hyp.sylowTwoOfQ : Set G) * (hyp.Q1 : Set G) = (hyp.Q : Set G) := by
+  apply Set.Subset.antisymm
+  · rintro x ⟨s, hs, y, hy, rfl⟩
+    exact hyp.Q.mul_mem (hyp.sylowTwoOfQ_le_Q hs) (hyp.Q1_le_Q hy)
+  · intro x hx
+    obtain ⟨⟨⟨s, hs⟩, ⟨y, hy⟩⟩, hsy⟩ :=
+      (hyp.sylowTwo_isComplement'_Q1Subgroup (default : Sylow 2 ↥hyp.Q)).2 ⟨x, hx⟩
+    refine ⟨(s : G), ?_, (y : G), ?_, ?_⟩
+    · exact (hyp.mem_sylowTwoOfQ_iff s.2).mpr hs
+    · exact (hyp.mem_Q1_iff y.2).mpr hy
+    · exact congrArg Subtype.val hsy
+
+/-- `S` and `Q₁` commute elementwise (the book's `Q = S × Q₁`, third clause). -/
+theorem sylowTwoOfQ_commutes_Q1 {s : G} (hs : s ∈ hyp.sylowTwoOfQ)
+    {y : G} (hy : y ∈ hyp.Q1) : s * y = y * s := by
+  have hsQ : s ∈ hyp.Q := hyp.sylowTwoOfQ_le_Q hs
+  have hyQ : y ∈ hyp.Q := hyp.Q1_le_Q hy
+  have h := hyp.sylowTwo_commute_Q1Subgroup (default : Sylow 2 ↥hyp.Q)
+    ⟨⟨s, hsQ⟩, (hyp.mem_sylowTwoOfQ_iff hsQ).mp hs⟩
+    ⟨⟨y, hyQ⟩, (hyp.mem_Q1_iff hyQ).mp hy⟩
+  exact congrArg Subtype.val h
+
+/-- `(|S|, |Q₁|) = 1`: `S` is a `2`-group and `|Q₁|` is odd. -/
+theorem coprime_card_sylowTwoOfQ_Q1 :
+    Nat.Coprime (Nat.card ↥hyp.sylowTwoOfQ) (Nat.card ↥hyp.Q1) := by
+  obtain ⟨n, hn⟩ := hyp.isPGroup_sylowTwoOfQ.exists_card_eq
+  rw [hn]
+  exact Nat.Coprime.pow_left n (Nat.coprime_two_left.mpr hyp.odd_card_Q1)
+
+/-- `S` is nilpotent, being a `2`-group. -/
+theorem isNilpotent_sylowTwoOfQ : Group.IsNilpotent ↥hyp.sylowTwoOfQ :=
+  hyp.isPGroup_sylowTwoOfQ.isNilpotent
+
+/-- `H ≠ G`: the involution `t` lies outside `H`. -/
+theorem H_ne_top : hyp.H ≠ ⊤ := fun h => hyp.t_not_mem_H (h ▸ Subgroup.mem_top _)
+
+/-- `Q₁` is nilpotent, being a subgroup of the nilpotent group `Q`
+(Ch. I §2, Proposition 1(b)). -/
+theorem isNilpotent_Q1 : Group.IsNilpotent ↥hyp.Q1 := by
+  letI : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
+  haveI : Group.IsNilpotent ↥hyp.Q1Subgroup := Subgroup.isNilpotent _
+  exact Group.nilpotent_of_mulEquiv
+    (Subgroup.equivMapOfInjective hyp.Q1Subgroup hyp.Q.subtype hyp.Q.subtype_injective)
+
 end Hypothesis
 
 namespace SecondCaseHypothesis
@@ -162,6 +246,119 @@ theorem coprime_card_Q_D (ind : Hypothesis.TheoremAInductionBelow G Ω) :
         (hp.dvd_of_dvd_pow hS)) hp2
     · exact hQ1
   exact hp.one_lt.ne' (Nat.eq_one_of_dvd_coprimes (sc.coprime_card_Q1_D ind) hpQ1 hpD)
+
+/-- `Q₁` is not a `2`-group, given that it is non-trivial: it has odd order. -/
+theorem Q1_not_isPGroup_two (hQ1 : sc.toHypothesis.Q1 ≠ ⊥) :
+    ¬ IsPGroup 2 ↥sc.toHypothesis.Q1 := by
+  intro hp
+  obtain ⟨n, hn⟩ := hp.exists_card_eq
+  rcases Nat.eq_zero_or_pos n with rfl | hpos
+  · exact hQ1 (Subgroup.eq_bot_of_card_eq _ (by simpa using hn))
+  · have h2 : 2 ∣ Nat.card ↥sc.toHypothesis.Q1 := by
+      rw [hn]; exact dvd_pow_self 2 hpos.ne'
+    exact (Nat.not_even_iff_odd.mpr sc.toHypothesis.odd_card_Q1) (even_iff_two_dvd.mpr h2)
+
+/-- `Q` is a Hall subgroup of `G`: `|G| = |Q|·|D|·(|Q|+1)`, so
+`[G : Q] = |D|·(|Q|+1)` is coprime to `|Q|`. -/
+theorem coprime_card_Q_index (ind : Hypothesis.TheoremAInductionBelow G Ω) :
+    Nat.Coprime (Nat.card ↥sc.toHypothesis.Q) sc.toHypothesis.Q.index := by
+  set hyp := sc.toHypothesis with hhyp
+  have hQpos : 0 < Nat.card ↥hyp.Q := Nat.card_pos
+  have hidx : hyp.Q.index = Nat.card ↥hyp.D * (Nat.card ↥hyp.Q + 1) := by
+    have h1 : Nat.card ↥hyp.Q * hyp.Q.index = Nat.card G := hyp.Q.card_mul_index
+    have h2 : Nat.card G = Nat.card ↥hyp.Q * (Nat.card ↥hyp.D * (Nat.card ↥hyp.Q + 1)) := by
+      rw [hyp.card_G_eq]; ring
+    exact Nat.eq_of_mul_eq_mul_left hQpos (h1.trans h2)
+  have hsucc : Nat.Coprime (Nat.card ↥hyp.Q) (Nat.card ↥hyp.Q + 1) := by
+    refine Nat.coprime_of_dvd fun p hp hpn hpn1 => ?_
+    have h1 : p ∣ 1 := by simpa using Nat.dvd_sub hpn1 hpn
+    exact hp.one_lt.ne' (Nat.dvd_one.mp h1)
+  rw [hidx]
+  exact Nat.Coprime.mul_right (sc.coprime_card_Q_D ind) hsucc
+
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step 3** (p. 115): under (C1), if
+`Q₁ ≠ 1` then `H = Q ⋊ D` satisfies the hypotheses of the Feit–Sibley Theorem
+(Appendix IV).
+
+Every field is one of the Chapter I axioms, the trivial-intersection statement
+(step 2), the fixed-point-freeness of `D` on `Q₁` (step 1), or a fact about the
+decomposition `Q = S × Q₁` into its Sylow `2`-subgroup and its odd part. -/
+noncomputable def feitSibleyHypothesis (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥) : FeitSibley.Hypothesis G where
+  H := sc.toHypothesis.H
+  Q := sc.toHypothesis.Q
+  D := sc.toHypothesis.D
+  S := sc.toHypothesis.sylowTwoOfQ
+  Q1 := sc.toHypothesis.Q1
+  H_ne_top := sc.toHypothesis.H_ne_top
+  Q_le_H := sc.toHypothesis.Q_le_H
+  D_le_H := sc.toHypothesis.D_le_H
+  Q_normal_in_H := sc.toHypothesis.Q_normal_in_H
+  Q_inf_D_eq_bot := sc.toHypothesis.Q_inf_D_eq_bot
+  Q_mul_D_eq_H := sc.toHypothesis.Q_mul_D_eq_H
+  coprime_Q_D := sc.coprime_card_Q_D ind
+  Q_trivial_intersection := fun _ hx => sc.toHypothesis.Q_inf_map_conj_eq_bot hx
+  S_le_Q := sc.toHypothesis.sylowTwoOfQ_le_Q
+  Q1_le_Q := sc.toHypothesis.Q1_le_Q
+  S_inf_Q1_eq_bot := sc.toHypothesis.sylowTwoOfQ_inf_Q1_eq_bot
+  S_mul_Q1_eq_Q := sc.toHypothesis.sylowTwoOfQ_mul_Q1_eq_Q
+  S_commutes_Q1 := fun _ hs _ hy => sc.toHypothesis.sylowTwoOfQ_commutes_Q1 hs hy
+  coprime_S_Q1 := sc.toHypothesis.coprime_card_sylowTwoOfQ_Q1
+  S_nilpotent := sc.toHypothesis.isNilpotent_sylowTwoOfQ
+  Q1_not_two_group := sc.Q1_not_isPGroup_two hQ1
+  D_fixedPointFree_on_Q1 := sc.D_fixedPointFree_on_Q1 ind
+
+set_option maxHeartbeats 800000 in
+-- The `FeitSibley.Hypothesis` value is a 22-field structure literal built from `sc`; unfolding it
+-- to check the `tau`/`Sset`/`A` projections in the statement exceeds the default budget.
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step 3** (p. 115): "By this theorem,
+`𝒮 = {χ ∈ Irr(H) | Q₁ ⊄ Ker χ}` is coherent for `Ind_H^G`."
+
+The Feit–Sibley Theorem applies to the configuration built above: `d = |D|` is odd
+by (A2)/(A3), `|Q₁|` is odd (`Q₁` is the normal `2`-complement of `Q`), `Q₁` is
+nilpotent (a subgroup of the nilpotent `Q`), and `Q` is a Hall subgroup of `G`. -/
+theorem sset_isCoherent [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (ind : Hypothesis.TheoremAInductionBelow G Ω) (hQ1 : sc.toHypothesis.Q1 ≠ ⊥)
+    [Fintype ↥(sc.feitSibleyHypothesis ind hQ1).H]
+    [Invertible (Nat.card ↥(sc.feitSibleyHypothesis ind hQ1).H : ℂ)] :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (sc.feitSibleyHypothesis ind hQ1).tau
+      (sc.feitSibleyHypothesis ind hQ1).Sset
+      (sc.feitSibleyHypothesis ind hQ1).A) := by
+  have hd : Odd (sc.feitSibleyHypothesis ind hQ1).d := sc.toHypothesis.D_odd
+  have hQ1odd : Odd (Nat.card ↥(sc.feitSibleyHypothesis ind hQ1).Q1) :=
+    sc.toHypothesis.odd_card_Q1
+  have hnil : Group.IsNilpotent ↥(sc.feitSibleyHypothesis ind hQ1).Q1 :=
+    sc.toHypothesis.isNilpotent_Q1
+  have hHall : Nat.Coprime (Nat.card ↥(sc.feitSibleyHypothesis ind hQ1).Q)
+      (sc.feitSibleyHypothesis ind hQ1).Q.index := sc.coprime_card_Q_index ind
+  exact FeitSibley.feit_sibley_coherence _ hd hQ1odd hnil hHall
+
+/-! ## The conclusion of Theorem C, from a proper non-trivial normal subgroup -/
+
+/-- `Q` a `2`-group forces `Q₁ = 1`: the odd part of a `2`-group is trivial. -/
+theorem Q1_eq_bot_of_isPGroup_two (hQ : IsPGroup 2 ↥sc.toHypothesis.Q) :
+    sc.toHypothesis.Q1 = ⊥ := by
+  have hQ1 : IsPGroup 2 ↥sc.toHypothesis.Q1 :=
+    hQ.to_le sc.toHypothesis.Q1_le_Q
+  obtain ⟨n, hn⟩ := hQ1.exists_card_eq
+  rcases Nat.eq_zero_or_pos n with rfl | hpos
+  · exact Subgroup.eq_bot_of_card_eq _ (by simpa using hn)
+  · exact absurd (even_iff_two_dvd.mpr (hn ▸ dvd_pow_self 2 hpos.ne'))
+      (Nat.not_even_iff_odd.mpr sc.toHypothesis.odd_card_Q1)
+
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step 13** (p. 116): "Therefore
+`N = Ker f_j` is a normal subgroup of `G` such that `1 ≠ N ≠ G`.  By Chapter I,
+§3, Proposition 2, `G` satisfies the conclusion of Theorem A and so `Q₁ = 1`
+(Chapter I, §3, Lemma 1)."
+
+Once `G` is known not to be simple, Ch. I §3 Proposition 2 supplies Theorem A's
+conclusion and Ch. I §3 Lemma 1 (`TheoremAConclusion.Q_and_residual`) makes `Q` a
+`2`-group; its odd part `Q₁` is then trivial. -/
+theorem Q1_eq_bot_of_not_isSimpleGroup (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hG : ¬ IsSimpleGroup G) : sc.toHypothesis.Q1 = ⊥ := by
+  obtain ⟨result⟩ := sc.toHypothesis.theoremAConclusion_of_not_simple hG ind
+  exact sc.Q1_eq_bot_of_isPGroup_two (result.Q_and_residual sc.toHypothesis).1
 
 end SecondCaseHypothesis
 
