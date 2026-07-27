@@ -299,6 +299,7 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7A3
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7A4
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7A5
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7A6
+import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7C
 import OddOrder.Isaacs.Ch08_PermutationGroups.AffineGroup
 import OddOrder.Isaacs.Ch08_PermutationGroups.TransitiveAutomorphisms
 import OddOrder.Isaacs.Ch08_PermutationGroups.HalfTransitive
