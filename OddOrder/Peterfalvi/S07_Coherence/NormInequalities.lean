@@ -586,9 +586,53 @@ def galoisTransport (hτ : IsCoherent τ S A) (σ : ℂ ≃+* ℂ)
 
 end IsCoherent
 
+/-- **Peterfalvi Hypothesis (5.2), verbatim** (p. 25) — the book-faithful carrier.
+
+Identical to `Hypothesis` except in clause **(5.2.d)**, where the difference image `R(χ)` is an
+arbitrary finite orthonormal family (`τ(χ − χ̄) = ∑_{α ∈ R(χ)} α`) rather than the *two-element*
+signed pair `ε·(μ − ν)` of `CharacterDifferenceImage`.
+
+That difference is not cosmetic.  Taking norms in the two-element form gives
+`‖τ(χ − χ̄)‖² = 2`, while the (5.2.b) isometry gives `‖χ − χ̄‖² = 2‖χ‖²` (using `⟨χ, χ̄⟩ = 0` and
+`‖χ̄‖² = ‖χ‖²`) — so `Hypothesis` silently forces **every member to be irreducible**.  The book
+imposes no such thing: a reducible member has `‖χ‖² > 1` and `|R(χ)| = 2‖χ‖²`.  This is exactly
+what stops (5.7) from being provable at book strength over `Hypothesis` (issue 0157).
+
+`Hypothesis.toGeneralHypothesis` exhibits the two-element carrier as the special case, via
+`CharacterDifferenceImage.toOrthonormalFamily` (issue 0156). -/
+structure GeneralHypothesis (S : Set (ClassFunction L ℂ)) (A : Set L)
+    [Fintype L] [Fintype G]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
+  /-- **(5.2.b)**: the linear map `τ`. -/
+  tau : IntegralCharacterMap L G
+  /-- **(5.2.b)**: `τ` is an isometry on the `A`-supported sublattice `ℤ[S, A]`. -/
+  tau_isometry_diff : ∀ ⦃φ ψ : ClassFunction L ℂ⦄,
+    φ ∈ zSupportedSpan (L := L) S A → ψ ∈ zSupportedSpan (L := L) S A →
+    ClassFunction.inner (tau φ) (tau ψ) = ClassFunction.inner φ ψ
+  /-- **(5.2.a)**: `S` is closed under complex conjugation. -/
+  conjugate_closed : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S
+  /-- **(5.2.a)**: no member is real. -/
+  no_real_characters : OddOrder.Peterfalvi.S03.HasNoRealCharacters S
+  /-- **(5.2.c)**: distinct members are orthogonal. -/
+  pairwise_orthogonal : OddOrder.Peterfalvi.S03.PairwiseOrthogonal S
+  /-- **(5.2.d)**: `τ(χ − χ̄) = ∑_{α ∈ R(χ)} α` for an orthonormal `R(χ) ⊆ ℤ[Irr G]` of
+  **arbitrary size** — the book's clause, with no irreducibility of `χ` implied. -/
+  difference_image :
+    ∀ ⦃χ : ClassFunction L ℂ⦄, χ ∈ S → OrthonormalCharacterImageFamily (L := L) (G := G) tau χ
+  /-- **(5.2.e)**: `φ ⊥ {χ, χ̄}` forces `R(φ) ⊥ R(χ)`. -/
+  difference_images_orthogonal :
+    ∀ ⦃φ χ : ClassFunction L ℂ⦄ (hφ : φ ∈ S) (hχ : χ ∈ S),
+      ClassFunction.inner φ χ = 0 → ClassFunction.inner φ χ.conj = 0 →
+        (difference_image hφ).Orthogonal (difference_image hχ)
+
 /-- Peterfalvi (5.2)-style hypotheses for coherence applications.  This is a
 carrier for later theorems, not a proof that the hypotheses hold in any
-particular Dade situation. -/
+particular Dade situation.
+
+⚠ The `difference_image` field is the **two-element** (5.3.a) shape, which forces every member of
+`S` to be irreducible (see `GeneralHypothesis`, the book-faithful carrier, for the derivation).
+Results that do not need that refinement should be stated over `GeneralHypothesis` and reached
+from here through `toGeneralHypothesis`. -/
 structure Hypothesis (S : Set (ClassFunction L ℂ)) (A : Set L)
     [Fintype L] [Fintype G]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
@@ -712,6 +756,37 @@ theorem difference_images_inner_eq_zero_of_inner_pair
     (hyp.difference_images_orthogonal_of_inner_pair hφ hχ hφχ hφχ_conj)
 
 end Hypothesis
+
+/-- **The two-element carrier is the special case of the book's (5.2).**
+
+Every clause of `GeneralHypothesis` is a field of `Hypothesis` except (5.2.d)/(5.2.e), which are
+obtained by putting the signed pair `τ(χ − χ̄) = ε·(μ − ν)` into the orthonormal-family shape
+`R(χ) = {ε·μ, −ε·ν}` (`CharacterDifferenceImage.toOrthonormalFamily`) and transporting the
+disjoint-pair orthogonality along it (`toOrthonormalFamily_orthogonal`).
+
+So results proved over `GeneralHypothesis` apply verbatim to every existing `Hypothesis` consumer,
+while being available for families with reducible members — which the book's (5.2) allows and
+`Hypothesis` silently forbids (issue 0157). -/
+noncomputable def Hypothesis.toGeneralHypothesis {S : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hyp : Hypothesis (L := L) (G := G) S A) :
+    GeneralHypothesis (L := L) (G := G) S A where
+  tau := hyp.tau
+  tau_isometry_diff := hyp.tau_isometry_diff
+  conjugate_closed := hyp.conjugate_closed
+  no_real_characters := hyp.no_real_characters
+  pairwise_orthogonal := hyp.pairwise_orthogonal
+  difference_image := fun _χ hχ => (hyp.difference_image hχ).toOrthonormalFamily
+  difference_images_orthogonal := by
+    intro _φ _χ hφ hχ h1 h2
+    exact CharacterDifferenceImage.toOrthonormalFamily_orthogonal _ _
+      (hyp.difference_images_orthogonal hφ hχ h1 h2)
+
+@[simp] theorem Hypothesis.toGeneralHypothesis_tau {S : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hyp : Hypothesis (L := L) (G := G) S A) :
+    hyp.toGeneralHypothesis.tau = hyp.tau := rfl
+
 
 /-! ### Peterfalvi (5.6): the coherence-union theorem
 

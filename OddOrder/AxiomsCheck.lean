@@ -3746,6 +3746,15 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalFamily
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalFamily_orthogonal
+-- **The book-faithful Hypothesis (5.2) carrier** (issue 0157).  `S07.Hypothesis` stores (5.2.d)
+-- as the *two-element* signed pair `tau(chi - chibar) = eps*(mu - nu)`; taking norms against the
+-- (5.2.b) isometry (`||chi - chibar||^2 = 2*||chi||^2`) that forces `||chi||^2 = 1`, i.e. every
+-- member irreducible — which Peterfalvi's (5.2.d) does **not** require (a reducible member has
+-- `|R(chi)| = 2*||chi||^2`).  `GeneralHypothesis` is the same carrier with `R(chi)` an orthonormal
+-- family of arbitrary size, and `toGeneralHypothesis` exhibits the existing one as its special
+-- case through `CharacterDifferenceImage.toOrthonormalFamily` — so results proved over the
+-- general carrier apply to every current consumer unchanged.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.Hypothesis.toGeneralHypothesis
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_imageData
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_two_of_imageData

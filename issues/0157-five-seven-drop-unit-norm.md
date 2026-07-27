@@ -175,6 +175,35 @@ repo の carrier は 2 元に固定しており、**全 member の既約性を�
       `isCoherent_pair_of_differenceImage` (2 元形に本質的に依存) の 2 箇所だけで、
       どちらも上記の carrier 拡幅が前提。
 
+## 進捗 (2026-07-27、carrier 側)
+
+- [x] **書籍準拠の carrier `S07.GeneralHypothesis` を新設** (`S07_Coherence/NormInequalities.lean`)。
+      `Hypothesis` との違いは (5.2.d) の 1 フィールドだけ:
+      `difference_image : ∀ χ ∈ S, OrthonormalCharacterImageFamily tau χ` (**サイズ自由**)。
+- [x] **`Hypothesis.toGeneralHypothesis`** — 既存 carrier が特殊化であることを示す持ち上げ。
+      (5.2.d) は `CharacterDifferenceImage.toOrthonormalFamily`、(5.2.e) は
+      `toOrthonormalFamily_orthogonal` (どちらも issue 0156 step 1) で移送。
+      **既存 consumer は一切変更不要** (追加のみ)。
+- [x] 変換 `toOrthonormalFamily` 一式を `S08_SixTwoThreeFromImageFamilies` から
+      `S07_Coherence/DifferenceImage.lean` へ移設 (`NormInequalities` の上流にする必要があった)。
+      namespace は `OddOrder.Peterfalvi.S07` のままなので参照側は無変更。
+
+### 次の手順
+
+`Hypothesis` を取る (5.7) 連鎖を `GeneralHypothesis` に載せ替える。実測した touch point:
+
+| 層 | 現状 | 対応 |
+|---|---|---|
+| `pairDecomp` / `pairDecomp'` / `imageFam` | `Hypothesis` を取る | `GeneralHypothesis` へ (どれも `difference_image` を族としてしか使わない見込み — 要実測) |
+| `commonImage` 連鎖 6 本 | 一般ノルム化済 (前 commit) | carrier を差し替えるだけ |
+| `xFamily_inner` | 一般ノルム化済 | carrier 非依存 |
+| 本体 `coherent_of_constant_degree` の `horthχ` | `coherentEqualDegree` 用 | `coherentEqualDegreeW` に差し替え (landing 済) |
+| 基底ケース `isCoherent_pair_of_differenceImage` | 2 元形に本質依存 | **一般版が必要**: `‖χ‖² = c` のとき `R(χ)` (サイズ `2c`) から `\|E\| = c` の部分集合を取り `X = ∑_{α∈E} α` とする |
+
+⚠ 既存の `.sign` / `.muClassFunction` / `.nuClassFunction` / `.toOrthonormalImage` 消費点
+(`NormInequalities:648-663` 等 8 箇所) は 2 元形に本質的に依存するので `Hypothesis` 側に残す。
+`GeneralHypothesis` 版は別立てにし、`Hypothesis` 版はその特殊化として得る。
+
 ## 完了条件
 
 `coherent_of_constant_degree` が `hirr` 無しで成立し、旧版がその特殊化になること。
