@@ -4368,3 +4368,43 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 **次から: 新 leaf を作った commit と同じ commit で `OddOrder.lean` に import を足すこと。**
 `OddOrder.lean` は全レーン編集可の共有ファイル。上位 leaf 経由で到達する中間 leaf は不要だが、
 到達性が自明でないなら足す。
+
+
+## §8A の実測 全問リスト (2026-07-27 修正)
+
+⚠ **本 issue の旧記述「§8A の残りは 8A.13 の同値のみ」は誤り**だった —
+教科書 §8A の Problems は **8A.1 … 8A.17** まであり (`pdftotext` p.236 で実測)、
+8A.16 / 8A.17 が一度も列挙されていなかった。frontier 判定は必ず教科書側の
+番号列を実測すること。
+
+* 8A.1 – 8A.15 … ✅ 完了 (2026-07-27 までに landing)
+* **8A.13** … ✅ **完了 (2026-07-27)** — `card_orbits_cube_eq_five_iff` /
+  `sum_cube_card_fixedBy_eq_five_mul_iff`。答は `m = 5`。
+* **8A.16** … ✅ **完了 (2026-07-27)** — `two_transitive_of_coprime_index`。
+  `Subgroup.relIndex` の二通り分解で `(n-1) ∣ |Δ|·[G:H]` を出す。
+* **8A.17** … ⬜ **次の frontier**: `q` が 2 冪のとき `SL(2,q)` は
+  1 次元部分空間 (`q+1` 個) に **sharply 3-transitive**。
+
+### 8A.17 の設計メモ (2026-07-27)
+
+数学的な骨格 (char 2 が効く 2 箇所に注意):
+
+1. **frame 正規化**: `finrank K V = 2` で相異なる 3 点 `P₁,P₂,P₃` があれば、
+   `P₁ = [u]`, `P₂ = [v]`, `P₃ = [u+v]` となる基底 `(u,v)` が取れる
+   (`P₃.rep = a·P₁.rep + b·P₂.rep` で `a,b ≠ 0` ⟸ `P₃ ≠ P₂`, `P₃ ≠ P₁`;
+   `u := a·P₁.rep`, `v := b·P₂.rep`)。
+2. **存在**: 2 つの frame の間の基底変換 `T` は `det T = d ≠ 0`。
+   `λ² = d⁻¹` なる `λ` を取れば `λ·T ∈ SL` (`LinearMap.det_smul` で
+   `det (λ•T) = λ² det T`)。⚠ **`λ` の存在 = 「K の任意の元が平方」**
+   (有限体 char 2 では Frobenius が全単射なので OK)。
+3. **一意性 (sharp)**: 3 点を固定する `A ∈ SL` は frame 上で
+   `A u = a u`, `A v = b v`, `A(u+v) = c(u+v)` ⟹ `a = b = c` ⟹ `A = a·id`、
+   `det = a² = 1` ⟹ **char 2 ゆえ `a = 1`** ⟹ `A = 1`。
+4. `∃!` への組み立ては 8A.11 (`existsUnique_affineLineGroup_of_ne`) と同じ idiom。
+
+Lean 側の型: `SpecialLinearGroup K V` (`= {u : V ≃ₗ[K] V // u.det = 1}`) が
+`ℙ K V` に作用する mathlib インスタンスを使う。行列版 `SL(2,q)` へは
+`Matrix.SpecialLinearGroup.toLin_equiv` (基底つき MulEquiv) で移す。
+mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
+`basisOfLinearIndependentOfCardEqFinrank`, `LinearMap.det_smul`,
+`Projectivization.specialLinearGroup_is_two_pretransitive` (2-transitive まで)。
