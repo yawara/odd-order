@@ -20,6 +20,8 @@ import Mathlib.GroupTheory.GroupAction.Primitive
 - `isBlock_smul_set` — block の translate は block。
 - `exists_not_mem_iff_add_mem` — `ZMod n` の先頭区間は非自明な平行移動で不変にならない。
 - `addRight_one_pow_apply`, `isPreprimitive_sup_zpowers_addRight_one` — **8B.8**。
+- `mCycleFun`, `mCycleInv`, `mCycle`, `val_add_one_of_lt`, `val_sub_one_of_ne_zero` —
+  **8B.9 への準備**: `ZMod n` 上の `m`-巡回 `(0, 1, …, m-1)` (残りは固定)。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -193,6 +195,88 @@ theorem isPreprimitive_sup_zpowers_addRight_one {n m : ℕ} [NeZero n]
     rw [this, hΛuniv]
     simp
   exact this
+
+/-! ### Problem 8B.9 への準備 — `ZMod n` 上の `m`-巡回 -/
+
+section MCycle
+
+variable {n m : ℕ} [NeZero n]
+
+/-- `ZMod n` 上の `m`-巡回 `(0, 1, …, m-1)`。`c.val ≥ m` の点は固定する。 -/
+def mCycleFun (n m : ℕ) [NeZero n] (c : ZMod n) : ZMod n :=
+  if c.val + 1 < m then c + 1 else if c.val + 1 = m then 0 else c
+
+/-- `mCycleFun` の逆写像。 -/
+def mCycleInv (n m : ℕ) [NeZero n] (c : ZMod n) : ZMod n :=
+  if c = 0 then ((m - 1 : ℕ) : ZMod n) else if c.val < m then c - 1 else c
+
+lemma val_add_one_of_lt {c : ZMod n} (h : c.val + 1 < n) : (c + 1).val = c.val + 1 := by
+  have h1 : ((1 : ℕ) : ZMod n) = 1 := Nat.cast_one
+  have : c + 1 = ((c.val + 1 : ℕ) : ZMod n) := by
+    push_cast
+    rw [ZMod.natCast_rightInverse c]
+  rw [this, ZMod.val_natCast_of_lt h]
+
+lemma val_sub_one_of_ne_zero {c : ZMod n} (h : c ≠ 0) : (c - 1).val = c.val - 1 := by
+  have hv : 1 ≤ c.val := Nat.one_le_iff_ne_zero.mpr fun hc => h ((ZMod.val_eq_zero c).mp hc)
+  have hlt : c.val < n := ZMod.val_lt c
+  have : c - 1 = ((c.val - 1 : ℕ) : ZMod n) := by
+    rw [Nat.cast_sub hv, ZMod.natCast_rightInverse c, Nat.cast_one]
+  rw [this, ZMod.val_natCast_of_lt (by omega)]
+
+lemma mCycleInv_mCycleFun (hm : m ≤ n) (c : ZMod n) :
+    mCycleInv n m (mCycleFun n m c) = c := by
+  have hlt : c.val < n := ZMod.val_lt c
+  unfold mCycleFun mCycleInv
+  by_cases h1 : c.val + 1 < m
+  · have hval : (c + 1).val = c.val + 1 := val_add_one_of_lt (by omega)
+    have hne : c + 1 ≠ 0 := fun hc => by
+      rw [hc] at hval; simp only [ZMod.val_zero] at hval; omega
+    simp only [h1, if_true, hne, if_false, hval]
+    ring
+  · by_cases h2 : c.val + 1 = m
+    · rw [if_neg h1, if_pos h2, if_pos rfl, show m - 1 = c.val by omega,
+        ZMod.natCast_rightInverse c]
+    · rw [if_neg h1, if_neg h2]
+      by_cases h0 : c = 0
+      · subst h0
+        simp only [ZMod.val_zero] at h1 h2
+        rw [if_pos rfl, show m = 0 by omega]
+        simp
+      · rw [if_neg h0, if_neg (by omega)]
+
+lemma mCycleFun_mCycleInv (hm : m ≤ n) (c : ZMod n) :
+    mCycleFun n m (mCycleInv n m c) = c := by
+  have hlt : c.val < n := ZMod.val_lt c
+  unfold mCycleFun mCycleInv
+  by_cases h0 : c = 0
+  · subst h0
+    rcases Nat.eq_zero_or_pos m with rfl | hmpos
+    · simp
+    · have hmv : ((m - 1 : ℕ) : ZMod n).val = m - 1 := ZMod.val_natCast_of_lt (by omega)
+      rw [if_pos rfl, hmv, if_neg (by omega), if_pos (by omega)]
+  · rw [if_neg h0]
+    by_cases h1 : c.val < m
+    · have hval : (c - 1).val = c.val - 1 := val_sub_one_of_ne_zero h0
+      have hv : 1 ≤ c.val := Nat.one_le_iff_ne_zero.mpr fun hc => h0 ((ZMod.val_eq_zero c).mp hc)
+      rw [if_pos h1, hval, if_pos (by omega)]
+      ring
+    · rw [if_neg h1, if_neg (by omega), if_neg (by omega)]
+
+/-- `ZMod n` 上の `m`-巡回 `(0, 1, …, m-1)` (`c.val ≥ m` は固定)。 -/
+def mCycle (n m : ℕ) [NeZero n] (hm : m ≤ n) : Equiv.Perm (ZMod n) where
+  toFun := mCycleFun n m
+  invFun := mCycleInv n m
+  left_inv := mCycleInv_mCycleFun hm
+  right_inv := mCycleFun_mCycleInv hm
+
+@[simp] lemma mCycle_apply (hm : m ≤ n) (c : ZMod n) :
+    mCycle n m hm c = mCycleFun n m c := rfl
+
+@[simp] lemma mCycle_symm_apply (hm : m ≤ n) (c : ZMod n) :
+    (mCycle n m hm).symm c = mCycleInv n m c := rfl
+
+end MCycle
 
 end
 
