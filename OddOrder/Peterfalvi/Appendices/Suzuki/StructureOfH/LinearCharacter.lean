@@ -115,6 +115,58 @@ theorem index_QK_subgroupOf_dvd_card_D :
 theorem odd_index_QK_subgroupOf : Odd (hyp.QK.subgroupOf hyp.H).index :=
   hyp.D_odd.of_dvd_nat hyp.index_QK_subgroupOf_dvd_card_D
 
+/-- `Q ⊴ H`, in `subgroupOf` form. -/
+instance Q_subgroupOf_H_normal : (hyp.Q.subgroupOf hyp.H).Normal := by
+  constructor
+  intro x hx y
+  exact Subgroup.mem_subgroupOf.mpr
+    (hyp.Q_normal_in_H y y.2 x (Subgroup.mem_subgroupOf.mp hx))
+
+open scoped Pointwise in
+/-- **`QK ∩ V = 1`**.  Writing an element of `QK ∩ V` as `q·k` (legitimate inside
+`H`, where `Q` is normal), the factor `q = v·k⁻¹` lies in `Q ∩ D = 1`, so the
+element is in `K ∩ V = 1`. -/
+theorem QK_inf_V_eq_bot : hyp.QK ⊓ hyp.V = ⊥ := by
+  classical
+  refine le_bot_iff.mp fun v hv => ?_
+  obtain ⟨hvQK, hvV⟩ := Subgroup.mem_inf.mp hv
+  have hvH : v ∈ hyp.H := hyp.QK_le_H hvQK
+  have hKH : hyp.K ≤ hyp.H := hyp.K_le_D.trans hyp.D_le_H
+  have hsub : (⟨v, hvH⟩ : ↥hyp.H) ∈
+      hyp.Q.subgroupOf hyp.H ⊔ hyp.K.subgroupOf hyp.H := by
+    rw [← Subgroup.subgroupOf_sup hyp.Q_le_H hKH]
+    exact Subgroup.mem_subgroupOf.mpr hvQK
+  rw [← SetLike.mem_coe, Subgroup.normal_mul, Set.mem_mul] at hsub
+  obtain ⟨a, ha, b, hb, hab⟩ := hsub
+  have haQ : (a : G) ∈ hyp.Q := Subgroup.mem_subgroupOf.mp ha
+  have hbK : (b : G) ∈ hyp.K := Subgroup.mem_subgroupOf.mp hb
+  have hval : (a : G) * (b : G) = v := congrArg (fun y : ↥hyp.H => (y : G)) hab
+  -- `a = v·b⁻¹ ∈ Q ⊓ D = 1`
+  have haD : (a : G) ∈ hyp.D := by
+    have : (a : G) = v * (b : G)⁻¹ := by
+      rw [← hval]; group
+    rw [this]
+    exact hyp.D.mul_mem (hyp.V_le_D hvV) (inv_mem (hyp.K_le_D hbK))
+  have ha1 : (a : G) = 1 := by
+    have hmem : (a : G) ∈ hyp.Q ⊓ hyp.D := Subgroup.mem_inf.mpr ⟨haQ, haD⟩
+    rwa [hyp.Q_inf_D_eq_bot, Subgroup.mem_bot] at hmem
+  -- so `v = b ∈ K ⊓ V = 1`
+  have hvK : v ∈ hyp.K := by
+    have : v = (b : G) := by rw [← hval, ha1, one_mul]
+    rw [this]; exact hbK
+  have hmem : v ∈ hyp.K ⊓ hyp.V := Subgroup.mem_inf.mpr ⟨hvK, hvV⟩
+  rw [hyp.K_inf_V_eq_bot, Subgroup.mem_bot] at hmem
+  rw [Subgroup.mem_bot]
+  exact hmem
+
+/-- **`QK ≠ H`** when `V ≠ 1` (hypothesis (C1)): `V ≤ H` but `QK ∩ V = 1`. -/
+theorem QK_ne_H (hV : hyp.V ≠ ⊥) : hyp.QK ≠ hyp.H := by
+  intro h
+  refine hV (le_bot_iff.mp ?_)
+  have hVQK : hyp.V ≤ hyp.QK := h ▸ (hyp.V_le_D.trans hyp.D_le_H)
+  have hle : hyp.V ≤ hyp.QK ⊓ hyp.V := le_inf hVQK le_rfl
+  rwa [hyp.QK_inf_V_eq_bot] at hle
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
