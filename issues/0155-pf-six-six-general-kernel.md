@@ -97,6 +97,20 @@ Sibley 側の入口 `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
       ⟹ **step 4 は新しい数学を必要とせず、`xAdjoinStepW_general` への再梱包**に尽きる。
       作業量は「多数のパラメータを正しく並べ替える」ことが中心 (routine だが分量あり)。
 
+      **必要な部品はすべて τ-general 形で既に在る (2026-07-27 実測)**:
+      | 役割 | τ-general の実体 |
+      |---|---|
+      | (5.6) engine | `S07.xAdjoinStepW_general` (0154) |
+      | per-member 分解 `Dmem` | `S08.memberExtensionDecomposition_general` (`S08_GeneralAdjoin:515`) — 抽象 τ + `OrthonormalCharacterImageFamily` を取る |
+      | 破断/member の像族 `Rχ` | `InducedFamilyImageData.R` |
+      | (5.2.b) 等長 `hisom` | `InducedFamilyImageData.adjoinHisom` |
+      | 可除性の算術 | 上記 4 本 (元から一般) |
+      | chain fold / base coherence | `xSet_isCoherent_of_adjoinSteps` / `xBaseBlock_isCoherent` (step 2,3) |
+
+      ⚠ Sibley 側の `inducedKernelFamily_memberDatum_of_irreducible`
+      (`S08_SixTwoGeneral:871`) は結論に `dadeOrthonormalCharacterImageFamilyOfDiff` との
+      一致を含むので Dade 固定。一般側は `memberExtensionDecomposition_general` を直接使う。
+
 ## 完了条件
 
 一般 `K` (可解正規・冪零・`p` 群) と中心的 `Z` に対する
