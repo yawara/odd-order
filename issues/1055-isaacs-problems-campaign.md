@@ -4971,3 +4971,29 @@ IsMultiplyPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) n`) で
 ⚠ **8C.6 は hub 裁定 (9212) で他セッションの担当**なので本セッションは触らない。
 本セッションは claim 表に従い **§8D (Isaacs pp. 257–) の演習**へ移る (着手前に
 PDF ページ画像で文言を確定すること)。
+
+
+## §8D の問題 (p. 269, PDF ページ画像で確定 2026-07-27)
+
+画像 = `references/isaacs/pages/isaacs-p269-282.png`。⚠ pdftotext は不等号を崩していた
+(`1 = mi < rri2 < ...` → 正しくは `1 = m₁ ≤ m₂ ≤ ⋯ ≤ m_r`、8D.4(a) は `km> m` ではなく
+**`k_m ≥ m`**)。
+
+* **8D.1**: `1 = m₁ ≤ m₂ ≤ ⋯ ≤ m_r` を rank `r` の**原始的**作用の subdegree とする。
+  `m₂ = 2` なら `i ≥ 2` の全てで `mᵢ = 2`。
+* **8D.2**: 次数 8 の原始置換群は 2-transitive。
+* **8D.3**: rank `r` の推移置換群で最大 subdegree が `n` なら `|G|` は `r` と `n` の
+  ある関数で抑えられる。
+* **8D.4**: `m` を推移作用の subdegree, `k_m` を Thm 8.42 直前で定義される整数とする。
+  (a) `k_m ≥ m`。(b) `k_m = m` かつ `α → β` が `m`-arrow なら `G_α G_β` は部分群。
+  (c) `m > 1` で `G` が原始的なら `k_m > m`。
+* **8D.5**: rank 3 の推移作用で subdegree が `1 < m < n`, `gcd(m, n) = 1` なら
+  `(m + 1) ∣ n`。Hint: `k_m ∣ 1 + m + n`。
+* **8D.6**: 原始置換群で素数 `p` が subdegree なら, 点安定化群の位数は `p²` で割れず,
+  したがってどの subdegree も `p²` で割れない。Hint: `X ⊆ Y`, `|Y : X| = p` なら
+  `O^{p'}(X) ◁ Y`。
+
+⚠ 着手時はまず repo 既存の `OddOrder/Isaacs/Ch08_PermutationGroups/Subdegrees.lean`
+(38k、`subdegree_gap_le` / `subdegree_eq_one_of_coprime_of_max` 等) と
+`OrbitalGraph.lean` / `Orbitals.lean` を実測で確認し, `k_m` (Thm 8.42 直前の定義) と
+`m`-arrow が既に形式化されているかを見ること。
