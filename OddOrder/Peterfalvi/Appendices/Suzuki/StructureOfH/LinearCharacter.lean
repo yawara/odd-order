@@ -544,4 +544,38 @@ theorem isHallSubgroup_V_subgroupOf (ind : Hypothesis.TheoremAInductionBelow G �
 
 end SecondCaseHypothesis
 
+namespace SecondCaseHypothesis
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (sc : SecondCaseHypothesis G Ω)
+
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step (6) core** (p. 115): every
+`π′`-element of `H` is `H`-conjugate into `V` — the book's "`x` and `x^g` are
+conjugate in `H` to elements of `V` **by a theorem of Hall**".
+
+`H` is solvable (`isSolvable_H`) and `V` is a Hall `π′`-subgroup of `H`
+(`isHallSubgroup_V_subgroupOf`), so Hall's **D**-theorem puts `⟨x⟩` inside some
+Hall `π′`-subgroup and Hall's **C**-theorem conjugates that subgroup onto `V`. -/
+theorem exists_conj_mem_V_of_piPrime (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥) {x : ↥sc.toHypothesis.H}
+    (hx : ∀ q ∈ (orderOf x).primeFactors,
+      q ∉ (Nat.card ↥sc.toHypothesis.QK).primeFactors) :
+    ∃ g : ↥sc.toHypothesis.H,
+      g * x * g⁻¹ ∈ sc.toHypothesis.V.subgroupOf sc.toHypothesis.H := by
+  classical
+  have hU : ∀ q ∈ (Nat.card ↥(Subgroup.zpowers x)).primeFactors,
+      q ∈ {p : ℕ | p ∉ (Nat.card ↥sc.toHypothesis.QK).primeFactors} := by
+    intro q hq
+    rw [Nat.card_zpowers] at hq
+    exact hx q hq
+  obtain ⟨W, hW, hUW⟩ := OddOrder.Isaacs.Ch03.hall_D
+    (π := {p : ℕ | p ∉ (Nat.card ↥sc.toHypothesis.QK).primeFactors}) hU
+  obtain ⟨g, hg⟩ := OddOrder.Isaacs.Ch03.hall_C hW
+    (sc.isHallSubgroup_V_subgroupOf ind hQ1)
+  refine ⟨g, ?_⟩
+  rw [← hg]
+  exact ⟨x, hUW (Subgroup.mem_zpowers x), rfl⟩
+
+end SecondCaseHypothesis
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
