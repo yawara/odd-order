@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Tactic.NormNum.Prime
-import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsAlternating
 
 /-!
 # Isaacs Problems 1E (pp. 37–38) — Sylow 計数による非単純性
@@ -38,6 +38,8 @@ Sylow 部分群の位数・指数を `|G|` の分解から読むために
   `card_sylow_ne_one_of_simple` / `exists_max_inter_sylow_pair` — 1E.3 以降の共通部品。
 - `not_isSimpleGroup_of_card_eq_threeonefive` — **Problem 1E.3**。
 - `not_isSimpleGroup_of_card_eq_onefourfour` — **Problem 1E.4**。
+- `exists_injective_hom_alternating_of_simple` — 単純群は指数 `n` の部分群があれば
+  `Aₙ` に単射に埋め込める (1E.5 の Hint が要求する道具)。
 -/
 
 namespace OddOrder.Isaacs.Ch01
@@ -609,5 +611,60 @@ theorem not_isSimpleGroup_of_card_eq_onefourfour {G : Type*} [Group G] [Finite G
     · rw [h1, Subgroup.card_top, hG] at hDcard; norm_num at hDcard
 
 end -- Problem 1E.4
+
+section /- 1E: 単純群の交代群への埋め込み (1E.5 の準備) -/
+
+/-- **単純群の `Aₙ` への埋め込み**。単純群 `G` (`2 < |G|`) が指数 `n > 1` の部分群 `H` を
+もつなら, 剰余類集合 `G ⧸ H` への作用は `G` を `Fin n` 上の交代群に単射に埋め込む。
+
+`G ⧸ H` への作用の核は `core_G(H)` で, 単純性と `n > 1` から `⊥` (**Cor 1.2/1.3** と同じ
+議論)。よって `G ↪ Sym(G ⧸ H) ≃ Sₙ`。さらに `sign` との合成の核も正規なので `⊥` か `⊤`
+だが, `⊥` なら `G ↪ ℤˣ` で `|G| ≤ 2` に反するので `⊤`, すなわち像は `Aₙ` に入る。 -/
+theorem exists_injective_hom_alternating_of_simple {G : Type*} [Group G] [Finite G]
+    [IsSimpleGroup G] {H : Subgroup G} {n : ℕ} (hidx : H.index = n) (hn : 1 < n)
+    (hG : 2 < Nat.card G) :
+    ∃ f : G →* ↥(alternatingGroup (Fin n)), Function.Injective f := by
+  classical
+  haveI : Finite (G ⧸ H) := Subgroup.index_ne_zero_iff_finite.mp (by omega)
+  haveI : Fintype (G ⧸ H) := Fintype.ofFinite _
+  have hcard : Fintype.card (G ⧸ H) = n := by
+    rw [← Nat.card_eq_fintype_card, ← Subgroup.index_eq_card]; exact hidx
+  set e : (G ⧸ H) ≃ Fin n := Fintype.equivFinOfCardEq hcard
+  set φ : G →* Equiv.Perm (Fin n) :=
+    (Equiv.permCongrHom e).toMonoidHom.comp (MulAction.toPermHom G (G ⧸ H)) with hφ
+  -- `φ` は単射 (核は `core_G(H)`, 単純性と `n > 1` から `⊥`)
+  have hkerφ : φ.ker = ⊥ := by
+    rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal φ.ker inferInstance with h | h
+    · exact h
+    · exfalso
+      have htop : (MulAction.toPermHom G (G ⧸ H)).ker = ⊤ := by
+        refine eq_top_iff.mpr fun g _ => ?_
+        have hg : φ g = 1 := by rw [← MonoidHom.mem_ker, h]; trivial
+        rw [MonoidHom.mem_ker]
+        refine (Equiv.permCongrHom e).injective ?_
+        rw [map_one]
+        simpa [hφ] using hg
+      rw [← Subgroup.normalCore_eq_ker] at htop
+      have hHtop : H = ⊤ := le_antisymm le_top (htop ▸ H.normalCore_le)
+      rw [hHtop, Subgroup.index_top] at hidx
+      omega
+  have hinj : Function.Injective φ := (MonoidHom.ker_eq_bot_iff φ).mp hkerφ
+  -- 像は `Aₙ` に入る (`sign ∘ φ` の核が `⊥` なら `G ↪ ℤˣ` で `|G| ≤ 2`)
+  have hmem : ∀ g : G, φ g ∈ alternatingGroup (Fin n) := by
+    set ψ : G →* ℤˣ := (Equiv.Perm.sign).comp φ
+    have hkerψ : ψ.ker = ⊤ := by
+      rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal ψ.ker inferInstance with h | h
+      · exfalso
+        have hle := Nat.card_le_card_of_injective ψ ((MonoidHom.ker_eq_bot_iff ψ).mp h)
+        rw [Nat.card_eq_fintype_card (α := ℤˣ), Fintype.card_units_int] at hle
+        omega
+      · exact h
+    intro g
+    rw [Equiv.Perm.mem_alternatingGroup]
+    have hg : g ∈ ψ.ker := hkerψ ▸ Subgroup.mem_top g
+    rwa [MonoidHom.mem_ker] at hg
+  exact ⟨φ.codRestrict _ hmem, fun a b hab => hinj (congrArg Subtype.val hab)⟩
+
+end -- 単純群の交代群への埋め込み
 
 end OddOrder.Isaacs.Ch01

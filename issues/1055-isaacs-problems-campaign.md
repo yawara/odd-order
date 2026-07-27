@@ -5250,7 +5250,20 @@ leaf = `Ch01_Sylow/ProblemsNonSimple.lean` (`OddOrder.lean` 配線済)。
   (`|H| = ℓ·q^k`, `ℓ % q ≠ 1` ⟹ `n_q = 1`) / `card_sylow_ne_one_of_simple` /
   `exists_max_inter_sylow_pair` (Thm 1.16 を当てる前段)。1E.5 以降もこれで書ける。
 
-* 次の frontier = **1E.5** (位数 `336 = 2⁴·3·7`, Hint = `n₇` を計算して 1C.5)。
+* ✅ **1E.5 の前提インフラ** `exists_injective_hom_alternating_of_simple` (2026-07-28)。
+  単純群 `G` (`2 < |G|`) が指数 `n > 1` の部分群をもてば `G ↪ Aₙ` (`Fin n` 上の交代群)。
+  `G ⧸ H` への作用の核は `core_G(H)` で単純性と `n > 1` から `⊥`、`sign ∘ φ` の核も正規で
+  `⊥` なら `G ↪ ℤˣ` (`Fintype.card_units_int = 2`) が `|G| ≤ 2` を強いるので `⊤`。
+  ⚠ `Equiv.permCongrHom (e : α ≃ β) : Perm α ≃* Perm β` (`Mathlib/Algebra/Group/End.lean`)
+  が `Perm (G ⧸ H) ≃* Perm (Fin n)` の橋渡し (`Equiv.permCongr` は Equiv どまり)。
+
+* 次の frontier = **1E.5 本体** (位数 `336 = 2⁴·3·7`)。筋:
+  `n₇ ∣ 48`, `≡ 1 (mod 7)` ⟹ `n₇ ∈ {1, 8}`、単純性で `n₇ = 8` ⟹ `|N_G(P₇)| = 42`。
+  上の埋め込みで `G ↪ A₈ = A_{7+1}`。`P₇` の像 `Q` は `|A₈| = 20160 = 2⁶·3²·5·7` の
+  Sylow 7 (位数 7) で、`N_G(P₇)` の像は `N_{A₈}(Q)` に入るから `42 ≤ |N_{A₈}(Q)|`。
+  しかし **1C.5** (`card_normalizer_sylow_alternating`) は `|N_{A₈}(Q)| = 7·6/2 = 21`。矛盾。
+  ⚠ 要る部品: `|A₈| = 20160` (`two_mul_nat_card_alternatingGroup` から) と
+  `Sylow.ofCard` で `Q` を `Sylow 7 ↥(alternatingGroup (Fin 8))` に持ち上げること。
   以降 1E.5–1E.8 は具体的な位数
   (144 / 336 / 180 / 240 / 252) の非単純性で、道具は 1E.3 と同じ
   (`card_dvd_factorial_of_simple_subgroup_index` = Cor 1.3 /
