@@ -36,7 +36,7 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
-      §8B は 8B.1 完了, 8B.2 が次 / §8C §8D 未着手
+      §8B は 8B.1–8B.4 完了, 8B.5 が次 / §8C §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4420,8 +4420,15 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
 `grep -oE "^8[A-Z]\. ?[0-9]+\."` で教科書から実測した番号列 (39 問):
 
 * **§8A: 8A.1 – 8A.17** … ✅ **全問完了 (2026-07-27)**
-* **§8B: 8B.1 – 8B.10** … 🔶 **進行中**: 8B.1 ✅ (`isBlock_blockCore`, 新 leaf
-  `Problems8B.lean`) / **8B.2 が次の frontier**
+* **§8B: 8B.1 – 8B.10** … 🔶 **進行中** (leaf = `Problems8B.lean`):
+  8B.1 ✅ `isBlock_blockCore` / 8B.2 ✅ `exists_smul_mem_and_smul_notMem` /
+  8B.3 ✅ `regular_centralizer_mulEquiv_of_two_isMinimalNormal` /
+  8B.4 ✅ `prime_pow_card_and_unique_isMinimalNormal_of_solvable` /
+  **8B.5 が次の frontier** (点安定化群 `H = G_α` が `Ω ∖ {α}` に固定点をもてば
+  `|H| = 1` かつ `|G|` は素数)。
+  再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
+  非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
+  `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
 * **§8C: 8C.1 – 8C.6** … ⬜
 * **§8D: 8D.1 – 8D.6** … ⬜ (subdegrees / rank)
 
