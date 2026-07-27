@@ -5219,7 +5219,22 @@ leaf = `Ch01_Sylow/ProblemsNonSimple.lean` (`OddOrder.lean` 配線済)。
   `|Q| = q^k` かつ `[G:Q] = m` (既存 `sylow_card_eq_prime_of_card_eq_mul` の任意指数版)。
   §1E の残り全問で使う。
 
-### 次: 1E.2 の設計 (筋は確定済, 実装待ち)
+* ✅ **1E.2** `card_sylow_eq_one_of_card_eq_mul_mul` (2026-07-28)。下記の設計どおり landing。
+  支持補題 `card_sylow_eq_one_of_card_eq_prime_mul_prime` (位数 `qr`, `q<r` なら `n_r = 1`) と
+  `eq_of_dvd_prime_mul_prime` (相異なる 2 素数の積の約数は `1,p,q,pq`) も再利用可能。
+  ⚠ 実装上の罠 2 件: (i) ℕ の切り捨て減算が絡む計数不等式は `q = u+1`, `r = v+1` に
+  `obtain ⟨u, rfl⟩` して `Nat.add_sub_cancel` で減算を消し、積は `Nat.mul_le_mul_right` で
+  与えてから `omega` に渡す (`ring` は ℕ 減算を扱えない)。
+  (ii) `Sylow.card_eq_index_normalizer` は `↑R : Set G` (Sylow から直接) で述べられており、
+  `Subgroup.normal_subgroupOf_iff_le_normalizer` が出す `↑↑R` とは syntactic に違う —
+  `Sylow.coe_coe` で橋渡しする。
+
+* 次の frontier = **1E.3** (位数 315 の単純群は無い)。以降 1E.4–1E.8 は具体的な位数
+  (144 / 336 / 180 / 240 / 252) の非単純性で、`card_dvd_factorial_of_simple_subgroup_index`
+  (`Ch01_Sylow/Basic.lean`, Isaacs Cor 1.3) と `card_sylow_modEq_one_of_max_inter`
+  (Thm 1.16) が主要道具。1E.5 は Hint どおり **1C.5** (`ProblemsAlternating.lean`) を使う。
+
+### 1E.2 の設計 (実装済, 記録として保持)
 
 **1E.2**: `|G| = pqr` (`p<q<r` 素数) ⟹ `n_r = 1`。
 

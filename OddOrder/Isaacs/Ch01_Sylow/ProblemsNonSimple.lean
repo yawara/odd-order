@@ -125,4 +125,158 @@ theorem card_sylow_eq_one_of_card_eq_sq_mul_sq {G : Type*} [Group G] [Finite G] 
 
 end -- Problem 1E.1
 
+section /- 1E: Problem 1E.2 (p. 38) -/
+
+/-- 相異なる 2 素数の積の約数は `1, p, q, pq` に限る。 -/
+private lemma eq_of_dvd_prime_mul_prime {p q n : ℕ} (hp : p.Prime) (hq : q.Prime)
+    (h : n ∣ p * q) : n = 1 ∨ n = p ∨ n = q ∨ n = p * q := by
+  rcases hp.eq_one_or_self_of_dvd (Nat.gcd n p) (Nat.gcd_dvd_right n p) with hg | hg
+  · have hdq : n ∣ q := Nat.Coprime.dvd_of_dvd_mul_left hg h
+    rcases (Nat.dvd_prime hq).mp hdq with h1 | h1
+    · exact Or.inl h1
+    · exact Or.inr (Or.inr (Or.inl h1))
+  · obtain ⟨m, rfl⟩ : p ∣ n := hg ▸ Nat.gcd_dvd_left n p
+    have hm : m ∣ q := (mul_dvd_mul_iff_left hp.pos.ne').mp h
+    rcases (Nat.dvd_prime hq).mp hm with h1 | h1
+    · subst h1; exact Or.inr (Or.inl (mul_one p))
+    · subst h1; exact Or.inr (Or.inr (Or.inr rfl))
+
+/-- 位数 `q·r` (`q < r` は素数) の群では Sylow `r`-部分群は一意。
+
+`n_r ∣ [H : R] = q` と `n_r ≡ 1 (mod r)`, そして `q < r` より `q % r = q ≠ 1`。 -/
+theorem card_sylow_eq_one_of_card_eq_prime_mul_prime {H : Type*} [Group H] [Finite H]
+    {q r : ℕ} (hq : q.Prime) (hr : r.Prime) (hqr : q < r) (hH : Nat.card H = q * r) :
+    Nat.card (Sylow r H) = 1 := by
+  haveI : Fact r.Prime := ⟨hr⟩
+  obtain ⟨R⟩ : Nonempty (Sylow r H) := Sylow.nonempty
+  have hnd : ¬ r ∣ q := fun hd => by have := Nat.le_of_dvd hq.pos hd; omega
+  obtain ⟨-, hindex⟩ := sylow_card_and_index_of_card_eq_mul (q := r) (m := q) (k := 1)
+    (by rw [hH, pow_one]) hnd R
+  have hdvd : Nat.card (Sylow r H) ∣ q := hindex ▸ Sylow.card_dvd_index R
+  have hmod : Nat.card (Sylow r H) % r = 1 % r := card_sylow_modEq_one r H
+  rw [Nat.mod_eq_of_lt hr.one_lt] at hmod
+  rcases (Nat.dvd_prime hq).mp hdvd with h | h
+  · exact h
+  · exfalso
+    rw [h, Nat.mod_eq_of_lt hqr] at hmod
+    have := hq.two_le
+    omega
+
+/-- **Isaacs Problem 1E.2** (p. 38)。`|G| = pqr` (`p < q < r` は素数) なら Sylow
+`r`-部分群は一意 (`n_r = 1`)。
+
+`n_r ∣ [G : R] = pq` なので `n_r ∈ {1, p, q, pq}`。`p, q < r` より `n_r = p`, `n_r = q`
+はどちらも `n_r % r = n_r = 1` を強いて素数性に矛盾。残る `n_r = pq` を仮定すると:
+
+* 位数 `r` の元が `pq(r−1)` 個あるので, `n_q ≠ 1` なら `n_q ≥ r` (`n_q ∈ {1, p, r, pr}`
+  で `p < q` ゆえ `n_q ≠ p`) となり計数 `pq(r−1) + r(q−1) ≤ |G| − 1` が
+  `r(q−1) ≤ pq − 1` を要求する。しかし `r ≥ q+1`, `p ≤ q−1` から
+  `r(q−1) ≥ q²−1 > q²−q−1 ≥ pq−1` で矛盾 ⟹ **`n_q = 1`**。
+* すると `Q ⊴ G` (位数 `q`) で `M := Q ⊔ R` は位数 `qr`, その中で Sylow `r` は一意
+  (`card_sylow_eq_one_of_card_eq_prime_mul_prime`) だから `R ⊴ M`, つまり
+  `M ≤ N_G(R)`。しかし `|N_G(R)| = |G| / n_r = r` なので `qr ≤ r`, `q > 1` に矛盾。 -/
+theorem card_sylow_eq_one_of_card_eq_mul_mul {G : Type*} [Group G] [Finite G] {p q r : ℕ}
+    (hp : p.Prime) (hq : q.Prime) (hr : r.Prime) (hpq : p < q) (hqr : q < r)
+    (hG : Nat.card G = p * q * r) : Nat.card (Sylow r G) = 1 := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : Fact q.Prime := ⟨hq⟩
+  haveI : Fact r.Prime := ⟨hr⟩
+  have hp2 := hp.two_le
+  -- Sylow `q`, `r` の位数はちょうど `q`, `r`, 指数は `pr`, `pq`。
+  have hqnd : ¬ q ∣ p * r := by
+    intro hd
+    rcases (Nat.Prime.dvd_mul hq).mp hd with h | h
+    · have := Nat.le_of_dvd hp.pos h; omega
+    · have := (Nat.prime_dvd_prime_iff_eq hq hr).mp h; omega
+  have hrnd : ¬ r ∣ p * q := by
+    intro hd
+    rcases (Nat.Prime.dvd_mul hr).mp hd with h | h
+    · have := Nat.le_of_dvd hp.pos h; omega
+    · have := Nat.le_of_dvd hq.pos h; omega
+  have hqdec : ∀ P : Sylow q G, Nat.card ↥(P : Subgroup G) = q ∧ (P : Subgroup G).index = p * r :=
+    fun P => by
+      have := sylow_card_and_index_of_card_eq_mul (q := q) (m := p * r) (k := 1)
+        (by rw [hG, pow_one]; ring) hqnd P
+      exact ⟨this.1.trans (pow_one q), this.2⟩
+  have hrdec : ∀ P : Sylow r G, Nat.card ↥(P : Subgroup G) = r ∧ (P : Subgroup G).index = p * q :=
+    fun P => by
+      have := sylow_card_and_index_of_card_eq_mul (q := r) (m := p * q) (k := 1)
+        (by rw [hG, pow_one]) hrnd P
+      exact ⟨this.1.trans (pow_one r), this.2⟩
+  obtain ⟨R⟩ : Nonempty (Sylow r G) := Sylow.nonempty
+  have hmodr : Nat.card (Sylow r G) % r = 1 % r := card_sylow_modEq_one r G
+  rw [Nat.mod_eq_of_lt hr.one_lt] at hmodr
+  rcases eq_of_dvd_prime_mul_prime hp hq ((hrdec R).2 ▸ Sylow.card_dvd_index R) with
+    h1 | h1 | h1 | h1
+  · exact h1
+  · rw [h1, Nat.mod_eq_of_lt (by omega : p < r)] at hmodr; omega
+  · rw [h1, Nat.mod_eq_of_lt hqr] at hmodr; omega
+  -- 残るのは `n_r = pq`。計数で `n_q = 1` を出し, `N_G(R)` の位数と矛盾させる。
+  exfalso
+  obtain ⟨Q⟩ : Nonempty (Sylow q G) := Sylow.nonempty
+  have hnq : Nat.card (Sylow q G) = 1 := by
+    by_contra hne
+    -- `n_q ∣ pr` かつ `n_q ≠ p` (∵ `p < q`) なので `n_q ≥ r`
+    have hmodq : Nat.card (Sylow q G) % q = 1 % q := card_sylow_modEq_one q G
+    rw [Nat.mod_eq_of_lt hq.one_lt] at hmodq
+    have hge : r ≤ Nat.card (Sylow q G) := by
+      rcases eq_of_dvd_prime_mul_prime hp hr ((hqdec Q).2 ▸ Sylow.card_dvd_index Q) with
+        h2 | h2 | h2 | h2
+      · exact absurd h2 hne
+      · rw [h2, Nat.mod_eq_of_lt (by omega : p < q)] at hmodq; omega
+      · omega
+      · rw [h2]; exact Nat.le_mul_of_pos_left r hp.pos
+    -- 計数: `n_r(r−1) + n_q(q−1) ≤ |G| − 1`
+    have hcount := card_sylow_mul_add_card_sylow_mul_le (q₁ := r) (q₂ := q)
+      (by omega) (fun P => (hrdec P).1) (fun P => (hqdec P).1)
+    rw [h1, hG] at hcount
+    -- `q = u+1`, `r = v+1` に置換して ℕ の切り捨て減算を消し, 線形不等式に落とす
+    obtain ⟨v, rfl⟩ : ∃ v, r = v + 1 := ⟨r - 1, by have := hr.pos; omega⟩
+    obtain ⟨u, rfl⟩ : ∃ u, q = u + 1 := ⟨q - 1, by have := hq.pos; omega⟩
+    simp only [Nat.add_sub_cancel] at hcount
+    set N := Nat.card (Sylow (u + 1) G) with hN
+    have hple : p ≤ u := by omega
+    have hNge : u + 2 ≤ N := by omega
+    -- `n_q(q−1) ≥ (q+1)(q−1) = q²−1` と `pq ≤ (q−1)q = q²−q` が `n_q(q−1)+1 ≤ pq` と衝突
+    have hA : (u + 2) * u ≤ N * u := Nat.mul_le_mul_right u hNge
+    have hB : p * (u + 1) ≤ u * (u + 1) := Nat.mul_le_mul_right (u + 1) hple
+    have hC : (u + 2) * u = u * u + 2 * u := by ring
+    have hD : u * (u + 1) = u * u + u := by ring
+    have hE : p * (u + 1) * (v + 1) = p * (u + 1) * v + p * (u + 1) := by ring
+    omega
+  -- `Q ⊴ G` かつ `M := Q ⊔ R` は位数 `qr`, その中で `R` は正規
+  haveI : Subsingleton (Sylow q G) := Nat.card_eq_one_iff_unique.mp hnq |>.1
+  haveI hQnorm : (Q : Subgroup G).Normal := Sylow.normal_of_subsingleton Q
+  have hcop : Nat.Coprime (Nat.card ↥(Q : Subgroup G)) (Nat.card ↥(R : Subgroup G)) := by
+    rw [(hqdec Q).1, (hrdec R).1]
+    exact (Nat.coprime_primes hq hr).mpr (by omega)
+  set M : Subgroup G := (Q : Subgroup G) ⊔ (R : Subgroup G) with hM
+  have hMcard : Nat.card ↥M = q * r := by
+    rw [hM, card_sup_of_normal_of_coprime hQnorm hcop, (hqdec Q).1, (hrdec R).1]
+  have hRM : (R : Subgroup G) ≤ M := le_sup_right
+  have hMsyl : Nat.card (Sylow r ↥M) = 1 :=
+    card_sylow_eq_one_of_card_eq_prime_mul_prime hq hr hqr hMcard
+  haveI : Subsingleton (Sylow r ↥M) := Nat.card_eq_one_iff_unique.mp hMsyl |>.1
+  have hRnorm : ((R.subtype hRM : Sylow r ↥M) : Subgroup ↥M).Normal :=
+    Sylow.normal_of_subsingleton _
+  rw [Sylow.coe_subtype] at hRnorm
+  have hMle : M ≤ Subgroup.normalizer ((R : Subgroup G) : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hRM).mp hRnorm
+  -- `|N_G(R)| = |G| / n_r = r` に反する
+  have hnorm_index : (Subgroup.normalizer ((R : Subgroup G) : Set G)).index = p * q := by
+    rw [Sylow.coe_coe, ← Sylow.card_eq_index_normalizer R]; exact h1
+  have hnorm_card := Subgroup.card_mul_index (Subgroup.normalizer ((R : Subgroup G) : Set G))
+  rw [hnorm_index, hG] at hnorm_card
+  have hMdvd : Nat.card ↥M ≤ Nat.card ↥(Subgroup.normalizer ((R : Subgroup G) : Set G)) :=
+    Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hMle)
+  rw [hMcard] at hMdvd
+  have hpq0 : 0 < p * q := Nat.mul_pos hp.pos hq.pos
+  have hNR : Nat.card ↥(Subgroup.normalizer ((R : Subgroup G) : Set G)) = r :=
+    Nat.eq_of_mul_eq_mul_right hpq0 (by rw [hnorm_card]; ring)
+  have hlow : 2 * r ≤ q * r := Nat.mul_le_mul_right r hq.two_le
+  have hrpos := hr.pos
+  omega
+
+end -- Problem 1E.2
+
 end OddOrder.Isaacs.Ch01
