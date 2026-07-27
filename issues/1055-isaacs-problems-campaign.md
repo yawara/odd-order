@@ -3937,3 +3937,20 @@ Lean 実務メモ: `2^1` と `2` は defeq だが `rw` は syntactic → `Q₈` 
 連鎖, (c) normal `p`-complement の「正規部分群から持ち上げ」補題
 (`M ⊴ G`, `|M|` が `p'`, `[G:M]` が `p`-冪 ⟹ `HasNormalPComplement p G`),
 (d) 最小反例の帰納の骨組み。規模は数百行〜1000 行規模の見込み。
+
+#### 7C.1 に使える既存部品 (2026-07-27 実測)
+
+| 部品 | 場所 | 用途 |
+|---|---|---|
+| `hasNormalPComplement_of_forall_characteristic_normalizer` | `Ch06_FrobeniusActions/ThompsonPComplement.lean:55` | Case A の締め (Thm 6.23, 無条件) |
+| `hasNormalPComplement_of_sylow_normalizer_le_centralizer` | `Ch05_Transfer/Basic.lean:491` | Case B step 4 (Thm 5.13 Burnside) |
+| `hasNormalPComplement_of_quotient_of_isPiGroup_compl` | `Ch07/S7C_ThompsonPComplement.lean:1003` | `N ⊴ G` が `p'`-群 + `G/N` が complement をもつ ⟹ `G` が持つ |
+| `hasNormalPComplement_of_sylow_eq_top` | `Ch07/S7C_SylowMaximal.lean:25` | `G` が `p`-群のとき自明に complement |
+| `hasNormalPComplement_of_le` | `Ch07/S7C_ThompsonPComplement.lean:157` | 部分群への降下 |
+| `hasNormalPComplement_of_mulEquiv` / `hasNormalPComplement_quotient` | `Ch07/S7B2_NormalJ_PComplement.lean:171,233` | 同型・商への輸送 |
+
+⟹ **Case B step 4 の締めは**: `M := K` の normal `p`-complement (Burnside) は `K` の
+characteristic ゆえ `M ⊴ G`; `M` は `p'`-群で `G/M` は `p`-群 (`[G:K]`, `[K:M]` とも `p`-冪)
+⟹ `hasNormalPComplement_of_sylow_eq_top` で `G/M` が complement を持ち,
+`hasNormalPComplement_of_quotient_of_isPiGroup_compl` で `G` に持ち上がる。
+新規に要るのは主に **(a) 仮説の `N_G(X)` / `G/X` への遺伝** と **(d) 最小反例の帰納の骨組み**。
