@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.ArrowKernelIndex
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.DegreeEight
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.PrimeIndexCore
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.PrimeSubdegree
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.RankBound
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.RankThree
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
@@ -26,4 +27,6 @@ topic 別 leaf にある (下流は本 module を import するだけでよい)�
   `(m+1) ∣ n`。
 * `Problems8D/PrimeIndexCore.lean` — **8D.6 の Hint**: `X ≤ Y`, `|Y : X| = p` (素数) なら
   `X` の `p`-元は `X` の `Y`-核に入り, したがって `O^{p'}(X) ◁ Y`。
+* `Problems8D/PrimeSubdegree.lean` — **8D.6**: 原始置換群で素数 `p` が subdegree なら
+  `p² ∤ |G_α|`, したがってどの subdegree も `p²` で割れない。
 -/
