@@ -5239,11 +5239,29 @@ leaf = `Ch01_Sylow/ProblemsNonSimple.lean` (`OddOrder.lean` 配線済)。
   (位数 `p²` の部分群はその部分群を正規化する) /
   `card_sylow_three_eq_one_of_card_eq_fortyfive`。
 
-* 次の frontier = **1E.4** (位数 `144 = 2⁴·3²`)。以降 1E.4–1E.8 は具体的な位数
+* ✅ **1E.4** `not_isSimpleGroup_of_card_eq_onefourfour` (2026-07-28)。位数 `144 = 2⁴·3²`。
+  `n₃ ∣ 16`, `≡ 1 (mod 3)` ⟹ `n₃ ∈ {1,4,16}`。単純性で `≠1`、`4` は正規化群の指数 4 で
+  `144 ∣ 4!` が偽。`16` は 1E.3 と同型の議論: `|S:D| ∣ gcd(15,9) = 3` ⟹ `|D| = 3`、
+  `9 ∣ |N| ∣ 144` で `|N| ∈ {9,18,36,72,144}` を全て潰す
+  (9: `S=N=T` / 18: 位数 18 の Sylow 3 は一意 / 36: 指数 4 / 72: 指数 2 / 144: `D ⊴ G`)。
+
+* 1E.3/1E.4 の共通部品を切り出し (1E.3 も載せ替え済):
+  `card_sylow_mod_eq_one` (`n_q % q = 1`) / `card_sylow_eq_one_of_card_eq_prime_mul_pow`
+  (`|H| = ℓ·q^k`, `ℓ % q ≠ 1` ⟹ `n_q = 1`) / `card_sylow_ne_one_of_simple` /
+  `exists_max_inter_sylow_pair` (Thm 1.16 を当てる前段)。1E.5 以降もこれで書ける。
+
+* 次の frontier = **1E.5** (位数 `336 = 2⁴·3·7`, Hint = `n₇` を計算して 1C.5)。
+  以降 1E.5–1E.8 は具体的な位数
   (144 / 336 / 180 / 240 / 252) の非単純性で、道具は 1E.3 と同じ
   (`card_dvd_factorial_of_simple_subgroup_index` = Cor 1.3 /
   `card_sylow_modEq_one_of_max_inter` = Thm 1.16 / 計数)。
   1E.5 は Hint どおり **1C.5** (`ProblemsAlternating.lean`) を使う。
+
+⚠ 追加の実装上の罠 (1E.4):
+* `Nat.dvd_prime_pow` は `n ∣ p ^ k` を **syntactic** に要求する — `n ∣ 16` のままでは
+  当たらないので `show n ∣ 2 ^ 4` に直してから使う。
+* `interval_cases i <;> ... <;> ...` は分岐によって前段で goal が閉じ「No goals」になる。
+  Sylow 個数の場合分けは分岐ごとに明示的に書く。
 
 ⚠ 実装上の罠 (1E.3 で踏んだもの):
 * `haveI : Fintype (Sylow p G)` を入れた後に `norm_num at h` を Sylow 個数の仮説へ当てると
