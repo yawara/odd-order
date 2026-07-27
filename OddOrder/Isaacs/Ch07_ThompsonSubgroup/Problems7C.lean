@@ -72,6 +72,24 @@ theorem CharLocalPControl.trivial_on_centralizer {p : ℕ} {P : Subgroup G}
     ∃ k : ℕ, g ^ p ^ k ∈ Subgroup.centralizer ((X.map P.subtype : Subgroup G) : Set G) :=
   ⟨0, by simpa using hg⟩
 
+/-! ### characteristic 部分群の同型による輸送 -/
+
+/-- **群同型に沿って characteristic 部分群は characteristic に移る**。
+
+`ϕ : B ≃* B` に対し `ψ := e.trans (ϕ.trans e.symm) : A ≃* A` を取ると
+`X.map ψ = X` (characteristic) で, これを `e` で押し出すと `(X.map e).map ϕ = X.map e`。 -/
+theorem characteristic_map_of_mulEquiv {A B : Type*} [Group A] [Group B] (e : A ≃* B)
+    (X : Subgroup A) [hX : X.Characteristic] : (X.map e.toMonoidHom).Characteristic := by
+  rw [Subgroup.characteristic_iff_map_eq]
+  intro ϕ
+  have hψ : X.map (e.trans (ϕ.trans e.symm)).toMonoidHom = X :=
+    Subgroup.characteristic_iff_map_eq.mp hX (e.trans (ϕ.trans e.symm))
+  have hcomp : (ϕ.toMonoidHom.comp e.toMonoidHom) =
+      e.toMonoidHom.comp (e.trans (ϕ.trans e.symm)).toMonoidHom := by
+    ext x
+    simp
+  rw [Subgroup.map_map, hcomp, ← Subgroup.map_map, hψ]
+
 end
 
 end OddOrder.Isaacs.Ch07
