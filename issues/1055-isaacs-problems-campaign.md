@@ -5294,7 +5294,22 @@ leaf = `Ch01_Sylow/ProblemsNonSimple.lean` (`OddOrder.lean` 配線済)。
   `divisors_fifteen`。
   ⚠ `(n)!` 記法は `open scoped Nat` が要る — statement では `Nat.factorial n` と書く。
 
-* **§1E 残り = 1E.8 (`252 = 2²·3²·7`) のみ**。筋:
+* ✅ **1E.8** `not_isSimpleGroup_of_card_eq_twofivetwo` (2026-07-28) — **§1E 完済**。
+  懸案だった `|N_G(D)| = 36` 枝は予想どおり計数で潰せた: 位数 7 の元が 216 個で残りが
+  ちょうど 36 個なので `N` (位数 36) は「位数 7 でない元」全体に一致し
+  (`Finset.eq_univ_of_card` で `N.toFinset ∪ U₇ = univ`)、位数は共役不変ゆえ `N ⊴ G`。
+  `1 < 36 < 252` で単純性に矛盾。
+
+## 🎉 §1E 完済 (2026-07-28) — 1E.1–1E.8 全問
+
+leaf = `Ch01_Sylow/ProblemsSylowCounting.lean` (852 行, 道具立て + 1E.1–1E.5) と
+`Ch01_Sylow/ProblemsNonSimple.lean` (588 行, 1E.6–1E.8)。両方 `OddOrder.lean` 配線済、
+全て実証明・axiom-clean・lint 警告 0。
+
+**次の frontier = Ch.1 §1F** (1F.1–, Brodkey の定理まわり)、その後 §1G (1G.1–1G.4)、
+続いて Ch.3 §3C–§3F、最後に Ch.8 §8C.6 (繰延中)。
+
+### (旧) 1E.8 の筋 — 記録として保持
   `n₇ ∣ 36`, `≡1 (mod 7)` ⟹ `n₇ ∈ {1, 36}` ⟹ 単純性で `n₇ = 36`, 位数 7 の元が 216 個
   (残り 36 個)。Sylow 3 は位数 9・指数 28 で `n₃ ∈ {1,4,7,28}`、`≠1`、`4` は指数 4 で
   `252 ∣ 4!` が偽。`n₃ ∈ {7, 28}` では Thm 1.16 が `|S:D| ∈ {3,9}`:
