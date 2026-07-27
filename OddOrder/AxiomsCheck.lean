@@ -3842,6 +3842,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.pairUnion_subset_xSet
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.pairUnion_finite
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xBaseBlock_subset_pairUnion
+-- Tail-degree lower bound (`htail_le`): an `𝒳`-member outside the running prefix has degree at
+-- least the current pair head's.  Cover completeness puts it in some pair `j`, and `j ≥ i` because
+-- pairs below `i` lie in the prefix; degree-monotonicity of the enumeration finishes.  Pure
+-- combinatorics on the pair structure — the Sibley version used no `SibleyDadeHypothesis` field.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.characterDegree_re_le_of_notMem_pairUnion
 -- The bridge from the book's common-index `p`-power degrees to the *ratio* form the (5.6) engine
 -- consumes: once `K` is a `p`-group ((6.5)), every `𝒳`-member has degree `|L:K|·p^k`, and a
 -- base-block anchor has the minimal such degree, so `χ(1) = p^(k−k₁)·χ₁(1)`.  Supplies the

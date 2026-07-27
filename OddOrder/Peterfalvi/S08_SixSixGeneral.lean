@@ -537,6 +537,64 @@ theorem xBaseBlock_subset_pairUnion {Z : Subgroup ↥L}
     xBaseBlock K Z ⊆ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i :=
   fun _ hφ => OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hφ)
 
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- **Tail-degree lower bound.**  An `𝒳`-member `φ` outside the running prefix has degree at least
+that of the current pair head `(pair i).1`.
+
+By the cover, `φ` lies in the base block or in some pair `j < N`; it is not in the base block
+(which is contained in every prefix), so `φ ∈ pairSet pair j`, and `φ ∉ prefix` forces `j ≥ i`
+(pairs below `i` lie in the prefix).  Degree-monotonicity of the enumeration then gives
+`(pair i).1(1) ≤ (pair j).1(1) = φ(1)`.
+
+This is the `htail_le` input of the book's degree bookkeeping — the step where cover completeness
+is genuinely used.  The Sibley instance is `characterDegree_re_le_of_not_mem_pairUnion`; the proof
+is pure combinatorics on the pair structure, so nothing is lost in the port. -/
+theorem characterDegree_re_le_of_notMem_pairUnion {Z : Subgroup ↥L}
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L}
+    (hpair0 : ∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj)
+    (hmono : ∀ j, j + 1 < N →
+      (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+        (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re)
+    (hcover : ∀ φ ∈ xSet K Z, φ ∈ xBaseBlock K Z ∨
+      ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+    {i : ℕ} {φ : ClassFunction ↥L ℂ} (hφX : φ ∈ xSet K Z)
+    (hφnot : φ ∉ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i) :
+    (OddOrder.Peterfalvi.S03.characterDegree (pair i).1).re ≤
+      (OddOrder.Peterfalvi.S03.characterDegree φ).re := by
+  have hchain : ∀ d a : ℕ, a + d < N →
+      (OddOrder.Peterfalvi.S03.characterDegree (pair a).1).re ≤
+        (OddOrder.Peterfalvi.S03.characterDegree (pair (a + d)).1).re := by
+    intro d
+    induction d with
+    | zero => intro a _; simp
+    | succ d ih =>
+      intro a haN
+      have h1 := ih a (by omega)
+      have h2 := hmono (a + d) (by omega)
+      have heq : a + (d + 1) = (a + d) + 1 := by omega
+      rw [heq]
+      exact le_trans h1 h2
+  rcases hcover φ hφX with hbase | ⟨j, hjN, hjpair⟩
+  · exact absurd (OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hbase)) hφnot
+  · have hij : i ≤ j := by
+      by_contra hlt
+      push Not at hlt
+      exact hφnot (OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inr ⟨j, hlt, hjpair⟩))
+    have hdeg_ij : (OddOrder.Peterfalvi.S03.characterDegree (pair i).1).re ≤
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re := by
+      have h := hchain (j - i) i (by omega)
+      rwa [Nat.add_sub_cancel' hij] at h
+    have hφdeg : (OddOrder.Peterfalvi.S03.characterDegree φ).re =
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re := by
+      simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff,
+        Set.mem_singleton_iff] at hjpair
+      rcases hjpair with h | h
+      · rw [h]
+      · rw [h, hpair1 j hjN, hpair0 j hjN]; simp
+    rw [hφdeg]; exact hdeg_ij
+
 /-! ### Degree ratios over a base-block anchor -/
 
 omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
