@@ -5476,7 +5476,14 @@ Chermak–Delgado (Thm 1.41) と最大測度束 `L(G)` (Thm 1.44) の節で,
   Thm 1.41 の不等式連鎖
   `|G:M|·|A|² ≤ |G:M|·m(A) ≤ |G:M|·m(M) = |G|·|C_G(M)| ≤ |G|² = |G:A|²·|A|²`
   が仮定より全て等号になることを追跡する。
-* 🔶 **1G.2** — Hint 第 1 文 (`L(G)` は共役で閉じる) は landing 済
+* ✅ **1G.2** `exists_normal_lt_top_of_mem_lattice` (2026-07-28) — 下記の設計どおり landing。
+  ⚠ 実装上の罠: (i) `conjugatesOfSet` / `mem_conjugatesOfSet_iff` は **`Group` 名前空間**,
+  `normalClosure` / `subset_normalClosure` は **`Subgroup` 名前空間** (同じファイル内で
+  namespace が切り替わっている)。(ii) `MulAut.conj (k*y)` を割るのは `map_mul` (**forward**)、
+  `MulAut.conj g⁻¹ • (MulAut.conj g • H)` を畳むのは `smul_smul` + `← map_mul`。
+  (iii) `push_neg` は deprecated (`push Not` を使う)。
+
+  (旧) Hint 第 1 文 (`L(G)` は共役で閉じる) は landing 済
   (`chermakDelgadoLattice_conj_smul_mem` + 部品 `card_conj_smul` /
   `centralizer_conj_smul` (`C_G(gHg⁻¹) = g C_G(H) g⁻¹`) /
   `chermakDelgadoMeasure_conj_smul`)。**本体は実装待ち**。
