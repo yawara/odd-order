@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.DegreeEight
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D.SubdegreeTwo
 
 /-!
@@ -13,4 +14,5 @@ topic 別 leaf にある (下流は本 module を import するだけでよい)�
 
 * `Problems8D/SubdegreeTwo.lean` — **8D.1**: 原始的作用で長さ 2 の suborbit が
   現れるなら, `α` 以外の suborbit はすべて長さ 2。
+* `Problems8D/DegreeEight.lean` — **8D.2**: 次数 8 の原始置換群は 2-transitive。
 -/

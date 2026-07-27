@@ -150,6 +150,38 @@ theorem card_stabilizer_eq_two_of_subdegree_eq_two [Nontrivial Ω] [IsPreprimiti
   rw [hidxα, hsub] at hmul
   simpa using hmul.symm
 
+/-- 原始的な忠実作用で `γ ≠ α` の suborbit が長さ 1 なら, `G_α = ⊥` (作用は regular)。
+
+長さ 1 は `G_α ≤ G_γ`, 位数比較で `G_α = G_γ` を与える。block `{δ | G_δ = G_α}` は
+`α` と `γ` を含むので原始性から `Ω` 全体, つまり全点安定化群が一致して `G_α ◁ G`。 -/
+theorem stabilizer_eq_bot_of_ncard_orbit_eq_one [Nontrivial Ω] [IsPreprimitive G Ω]
+    {α γ : Ω} (hγ : γ ≠ α) (h1 : Set.ncard (orbit ↥(stabilizer G α) γ) = 1) :
+    stabilizer G α = ⊥ := by
+  have hle : stabilizer G α ≤ stabilizer G γ := by
+    have htop : (stabilizer G γ).subgroupOf (stabilizer G α) = ⊤ := by
+      rw [← Subgroup.index_eq_one, ← Subgroup.relIndex, ← ncard_suborbit_eq_relIndex]
+      exact h1
+    intro x hx
+    have hmem : (⟨x, hx⟩ : ↥(stabilizer G α)) ∈
+        (stabilizer G γ).subgroupOf (stabilizer G α) := by rw [htop]; trivial
+    exact hmem
+  have heq : stabilizer G α = stabilizer G γ :=
+    Subgroup.eq_of_le_of_card_ge hle (le_of_eq (card_stabilizer_eq γ α))
+  rcases IsPreprimitive.isTrivialBlock_of_isBlock (isBlock_stabilizer_eq (G := G) α) with
+    hsub | huniv
+  · exact absurd (hsub (Set.mem_setOf_eq ▸ heq.symm) rfl) hγ
+  · have hall : ∀ δ : Ω, stabilizer G δ = stabilizer G α := by
+      intro δ
+      have hmem : δ ∈ {δ : Ω | stabilizer G δ = stabilizer G α} := huniv ▸ Set.mem_univ δ
+      exact hmem
+    haveI : (stabilizer G α).Normal := by
+      refine ⟨fun x hx g => ?_⟩
+      have h2 : g * x * g⁻¹ ∈ stabilizer G (g • α) := by
+        rw [mem_stabilizer_smul_iff]
+        simpa [show g⁻¹ * (g * x * g⁻¹) * g = x by group] using hx
+      rwa [hall (g • α)] at h2
+    exact eq_bot_of_normal_of_le_stabilizer (N := stabilizer G α) (α := α) le_rfl
+
 /-- **Isaacs Problem 8D.1** (p. 269)。原始的作用で長さ 2 の suborbit が現れるなら,
 `α` 以外の点の suborbit はすべて長さ 2。 -/
 theorem ncard_orbit_eq_two_of_subdegree_eq_two [Nontrivial Ω] [IsPreprimitive G Ω]
@@ -163,36 +195,10 @@ theorem ncard_orbit_eq_two_of_subdegree_eq_two [Nontrivial Ω] [IsPreprimitive G
     rw [ncard_suborbit_eq_relIndex, Subgroup.relIndex, ← hcard]
     exact Subgroup.index_dvd_card _
   rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h1 | h2
-  · -- 長さ 1 なら `G_α ≤ G_γ`, 位数比較で `G_α = G_γ` となり block が `Ω` 全体に
+  · -- 長さ 1 なら `G_α = ⊥` だが位数は 2
     exfalso
-    have hle : stabilizer G α ≤ stabilizer G γ := by
-      have : (stabilizer G γ).subgroupOf (stabilizer G α) = ⊤ := by
-        rw [← Subgroup.index_eq_one, ← Subgroup.relIndex, ← ncard_suborbit_eq_relIndex]
-        exact h1
-      intro x hx
-      have := (Subgroup.mem_subgroupOf (H := stabilizer G γ)
-        (K := stabilizer G α) (h := ⟨x, hx⟩)).mp (by rw [this]; trivial)
-      exact this
-    have heq : stabilizer G α = stabilizer G γ :=
-      Subgroup.eq_of_le_of_card_ge hle (le_of_eq (card_stabilizer_eq γ α))
-    -- block `{δ | G_δ = G_α}` は `α` と `γ` を含むので `Ω` 全体
-    have hblock := IsPreprimitive.isTrivialBlock_of_isBlock (isBlock_stabilizer_eq (G := G) α)
-    rcases hblock with hsub | huniv
-    · exact hγ (hsub (Set.mem_setOf_eq ▸ heq.symm) rfl)
-    · -- すべての点安定化群が一致 ⟹ `G_α ◁ G` ⟹ `G_α = ⊥`, しかし位数は 2
-      have hall : ∀ δ : Ω, stabilizer G δ = stabilizer G α := by
-        intro δ
-        have : δ ∈ {δ : Ω | stabilizer G δ = stabilizer G α} := huniv ▸ Set.mem_univ δ
-        exact this
-      haveI : (stabilizer G α).Normal := by
-        refine ⟨fun x hx g => ?_⟩
-        have h1 : g * x * g⁻¹ ∈ stabilizer G (g • α) := by
-          rw [mem_stabilizer_smul_iff]
-          simpa [show g⁻¹ * (g * x * g⁻¹) * g = x by group] using hx
-        rwa [hall (g • α)] at h1
-      have := eq_bot_of_normal_of_le_stabilizer (N := stabilizer G α) (α := α) le_rfl
-      rw [this] at hcard
-      simp at hcard
+    rw [stabilizer_eq_bot_of_ncard_orbit_eq_one hγ h1] at hcard
+    simp at hcard
   · exact h2
 
 end -- Problem 8D.1

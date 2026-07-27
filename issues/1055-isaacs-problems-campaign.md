@@ -4944,7 +4944,7 @@ IsMultiplyPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) n`) で
 | 8C.1 – 8C.4 | — | — | **完了** (二重着手あり、9212 参照) |
 | 8C.5 | 設計メモを書いた側のセッション (= 本セッション) | 2026-07-27 21:5x | **完了 2026-07-27** |
 | 8C.6 | lane a (9212 を起票した側) | 2026-07-27 21:5x | hub 裁定で確定 |
-| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **claim (着手)** |
+| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **8D.1 / 8D.2 完了, 8D.3– 進行中** |
 
 ⚠ **恒久対処は worktree を分けること** — 1 lane = 1 worktree = 1 session が CLAUDE.md の前提。
 2 つ目のセッションは `notes/meta/worktree_setup.md` の手順で自分の worktree/branch を取るのが
@@ -5034,3 +5034,25 @@ PDF ページ画像で文言を確定すること)。
 `A` を素冪成分に分解し、成分が 2 つ以上あれば `Aut(A)` は直積を含んで単純でない、
 `A` が巡回で `|A| = m` なら `Aut(A) ≅ (Z/m)ˣ` が可換で単純 ⟺ 素数位数 ⟹ `φ(m)` が素数
 … という場合分けになる。**未着手**。
+
+
+## §8D 進捗 (2026-07-27)
+
+leaf = `Problems8D/{SubdegreeTwo, DegreeEight}.lean` (188 / 213 行) + hub `Problems8D.lean`
+(`OddOrder.lean` 配線済)。
+
+* ✅ **8D.1** (`SubdegreeTwo.lean`): 原始的作用で長さ 2 の suborbit があれば
+  `α` 以外の suborbit はすべて長さ 2 (`ncard_orbit_eq_two_of_subdegree_eq_two`)。
+  再利用可能な部品: `mem_stabilizer_smul_iff` / **`isBlock_stabilizer_eq`**
+  (`{δ | G_δ = G_α}` は block) / `eq_bot_of_normal_of_le_stabilizer` /
+  `card_stabilizer_eq_two_of_subdegree_eq_two` (`|G_α| = 2`) /
+  **`stabilizer_eq_bot_of_ncard_orbit_eq_one`** (長さ 1 の suborbit ⟹ `G_α = ⊥`)。
+* ✅ **8D.2** (`DegreeEight.lean`): 次数 8 の原始置換群は 2-transitive
+  (`ncard_orbit_stabilizer_eq_of_card_eq_eight`, 各 suborbit の長さ = 7)。
+  長さ 1 → `G_α = ⊥` かつ極大で Cauchy と矛盾 / 長さ 2 → 8D.1 で `|G_α| = 2` かつ
+  固定点は `α` のみ ⟹ `8 ≡ 1 (mod 2)` (`IsPGroup.card_modEq_card_fixedPoints`) /
+  それ以外は長さ `≥ 3` が 2 つで `{3, 4}` に限られ, 互いに素なので **Thm 8.38**
+  (Weiss, `subdegree_eq_one_of_coprime_of_max`) が `3 = 1` を強いる。
+
+**次は 8D.3** (rank `r`, 最大 subdegree `n` なら `|G|` は `r`, `n` の関数で抑えられる) →
+8D.4/8D.5 (既存 `CommonDivisorGraph.lean` の `arrowKernel` / `k_m` を使う) → 8D.6。
