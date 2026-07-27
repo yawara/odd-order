@@ -29,6 +29,11 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `centralizer_eq_of_regular_of_inf_eq_bot`, `regularPairHom`,
   `mulEquiv_and_center_eq_bot_of_regular_normal` — **Problem 8A.4**: regular normal な
   `U`, `V` が `U ⊓ V = 1` を満たすと `C_G(U) = V` となり, `U ≅ V` で中心はともに自明。
+- `smul_mem_fixedPoints_of_mem_normalizer`,
+  `exists_mem_normalizer_stabilizer_smul_eq`,
+  `eq_of_mem_fixedPoints_stabilizer_of_transitive_on_compl` — **Problem 8A.5**:
+  `Δ = Fix(G_α)` は `N_G(G_α)` で保たれ, その上で `N_G(G_α)` は推移的。`k ≥ 2` かつ
+  `|Δ| ≥ 2` は `|Ω| = 2` を強制するので, `r = min(k, |Δ|)` の主張はこの推移性に尽きる。
 - `smul_orbit_eq_orbit_smul`, `card_orbit_eq_of_normal` — **Problem 8A.8**:
   transitive な `G` の正規部分群 `N` について `G` は `N`-軌道を推移的に置換し,
   したがって `N` は half-transitive (すべての `N`-軌道が同じ濃度)。
@@ -339,6 +344,69 @@ theorem mulEquiv_and_center_eq_bot_of_regular_normal [FaithfulSMul G Ω]
     simp
 
 end RegularPair
+
+/-! ### Problem 8A.5 — 点安定化群の固定点集合 -/
+
+/-- 有限群では `H ≤ K` と位数の一致から `H = K`。 -/
+private theorem eq_of_le_of_card_eq [Finite G] {H K : Subgroup G} (hle : H ≤ K)
+    (hcard : Nat.card ↥K = Nat.card ↥H) : H = K := by
+  refine le_antisymm hle (Subgroup.subgroupOf_eq_top.mp (Subgroup.eq_top_of_card_eq _ ?_))
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv, hcard]
+
+/-- `Δ = Fix(H)` は `N_G(H)` で保たれる: `h • (n • β) = n • ((n⁻¹hn) • β) = n • β`。 -/
+theorem smul_mem_fixedPoints_of_mem_normalizer {H : Subgroup G} {n : G}
+    (hn : n ∈ Subgroup.normalizer (H : Set G)) {β : Ω}
+    (hβ : β ∈ MulAction.fixedPoints ↥H Ω) : n • β ∈ MulAction.fixedPoints ↥H Ω := by
+  intro h
+  have hmem : n⁻¹ * (h : G) * n ∈ H := (Subgroup.mem_normalizer_iff''.mp hn (h : G)).mp h.2
+  have := hβ ⟨n⁻¹ * (h : G) * n, hmem⟩
+  rw [subgroup_smul_def] at this
+  calc (h : G) • (n • β) = (n * (n⁻¹ * (h : G) * n)) • β := by rw [← mul_smul]; group
+    _ = n • ((n⁻¹ * (h : G) * n) • β) := mul_smul _ _ _
+    _ = n • β := by rw [this]
+
+/-- **Isaacs Problem 8A.5** (p. 235) の主内容: `G` が `Ω` に推移的で `H = G_α` のとき,
+`N_G(H)` は `Δ = Fix(H)` に**推移的**に作用する。
+
+`β ∈ Δ` は `H ≤ G_β` を意味する。`G` の推移性で `β = g • α` と書くと
+`G_β = gHg⁻¹` なので `H ≤ gHg⁻¹`, 有限性から `H = gHg⁻¹`, すなわち `g ∈ N_G(H)`。 -/
+theorem exists_mem_normalizer_stabilizer_smul_eq [Finite G] [IsPretransitive G Ω] {α β : Ω}
+    (hβ : β ∈ MulAction.fixedPoints ↥(stabilizer G α) Ω) :
+    ∃ n ∈ Subgroup.normalizer ((stabilizer G α : Subgroup G) : Set G), n • α = β := by
+  obtain ⟨g, hg⟩ := exists_smul_eq G α β
+  refine ⟨g, ?_, hg⟩
+  have hle : stabilizer G α ≤ (stabilizer G α).map (MulAut.conj g).toMonoidHom := by
+    rw [← MulAction.stabilizer_smul_eq_stabilizer_map_conj, hg]
+    exact fun h hh => hβ ⟨h, hh⟩
+  have hcard : Nat.card ↥((stabilizer G α).map (MulAut.conj g).toMonoidHom) =
+      Nat.card ↥(stabilizer G α) :=
+    Subgroup.card_map_of_injective (MulAut.conj g).injective
+  have heq := eq_of_le_of_card_eq hle hcard
+  rw [Subgroup.mem_normalizer_iff]
+  intro h
+  constructor
+  · intro hh
+    rw [heq]
+    exact ⟨h, hh, rfl⟩
+  · intro hh
+    rw [heq] at hh
+    obtain ⟨y, hy, hyeq⟩ := hh
+    simp only [MulAut.conj_apply, MulEquiv.coe_toMonoidHom] at hyeq
+    exact (mul_left_cancel (mul_right_cancel hyeq)) ▸ hy
+
+/-- **Isaacs Problem 8A.5** の退化部分: `G` が 2-transitive (= `G_α` が `Ω ∖ {α}` に推移的)
+で `Δ = Fix(G_α)` が `α` 以外の点 `β` をもつなら, `Ω` は 2 点しかもたない。
+
+したがって `r = min(k, |Δ|)` は `k ≥ 2` かつ `|Δ| ≥ 2` のとき `Ω` が 2 点集合の場合に限られ,
+そこでは `N_G(H) = G` が `Δ = Ω` に `k`-transitive に作用する。一般には `|Δ| ≥ 3` なら
+`k ≤ 1` で `r = 1`, すなわち上の推移性が主張のすべて。 -/
+theorem eq_of_mem_fixedPoints_stabilizer_of_transitive_on_compl {α β : Ω}
+    (hβ : β ∈ MulAction.fixedPoints ↥(stabilizer G α) Ω)
+    (htwo : ∀ γ : Ω, γ ≠ α → ∃ h : ↥(stabilizer G α), h • β = γ) :
+    ∀ γ : Ω, γ ≠ α → γ = β := by
+  intro γ hγ
+  obtain ⟨h, hh⟩ := htwo γ hγ
+  exact (hh ▸ hβ h).symm ▸ rfl
 
 /-! ### Problem 8A.8 — 正規部分群の軌道は推移的に置換される -/
 
