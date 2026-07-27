@@ -4434,8 +4434,8 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
   8B.8 ✅ `isPreprimitive_sup_zpowers_addRight_one` /
   8B.9 ✅ `eq_top_...` (m か n 偶 ⟹ S_n) / `eq_alternatingGroup_...` (ともに奇 ⟹ A_n) /
-  8B.10 🔶 **準備 2 本** (`eq_stabilizer_of_index_eq_of_fixed`, 二項係数不等式
-  `lt_choose_of_two_le_of_le_sub_two`) — **次の frontier = 8B.10 の step 1 (推移性)**。
+  8B.10 🔶 **step 1 (推移性) 完了** —
+  **次の frontier = 8B.10 step 2–5** (8A.16 → 原始性 → Bochert → 数値)。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4717,3 +4717,26 @@ landing 済:
   (`Equiv.Perm.subtypePerm` を 2 つ) で示し、`|H| = (n-1)!` と合わせて
   `C(n,k) ≤ n` に帰着させる。`Nat.card_perm` が `|Perm β| = |β|!` を与える。
   こちらのほうが「推移性」を作らずに済むので**代案を先に試す**。
+
+
+### 8B.10 step 1 完了 (2026-07-27) / 残り step 2–5
+
+`isPretransitive_of_index_eq_of_ne_stabilizer` で landing。位数評価の案
+(`H ↪ Perm S × Perm Sᶜ`) が正解で、`k`-部分集合への推移性は不要だった。
+
+残り:
+2. `Sym(α)` は 2-transitive、`Coprime (n-1) n` ⟹ **8A.16**
+   (`two_transitive_of_coprime_index`) で `H` は 2-transitive。
+   ⚠ 8A.16 の signature: `[Finite Ω] [IsPretransitive G Ω] (h2 : ∀ a b c d, …)`
+   `{H : Subgroup G} [IsPretransitive ↥H Ω] (hcop : Nat.Coprime (Nat.card Ω - 1) H.index)`。
+   `G := Equiv.Perm α`、`h2` は `Sym(α)` の 2-transitivity (mathlib に
+   `Equiv.Perm.isMultiplyPretransitive` 系があるか要確認、無ければ手で構成 —
+   相異なる 2 点の組を移す置換は `Equiv.swap` の合成で作れる)。
+3. 2-transitive ⟹ `IsPreprimitive`: mathlib `isPreprimitive_of_is_two_pretransitive`
+   (`IsMultiplyPretransitive ↥H α 2` が要るので `is_two_pretransitive_iff` で橋渡し)。
+4. `alternatingGroup ≤ H` なら `[Sym : A_n] = 2` から `n ∣ 2`;
+   そうでなければ **Bochert** (`factorial_le_index_of_isPreprimitive`) で
+   `((n+1)/2)! ≤ n` ⟹ `n ∈ {1,2,3,4,6}` (数値評価は `n ≥ 7` で
+   `((n+1)/2)! ≥ 4! = 24 > n` を階乗の単調性で潰す)。
+5. 2-transitivity から `n(n-1) ∣ |H| = (n-1)!` ⟹ `n ∣ (n-2)!` で `n = 2,3,4` を除外、
+   `n = 1` は `H` が自動的に点安定化群になるので除外 ⟹ **`n = 6`**。
