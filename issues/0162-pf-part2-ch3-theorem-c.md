@@ -313,6 +313,10 @@ mathlib / repo にあるかを実測すること。無ければそこが step (6
 4. ~~`π`-元は `QK` に入る~~ ✅ **2026-07-28 landing** (`mem_QK_of_piElement`,
    `isHallSubgroup_QK_subgroupOf`)。`QK` は**正規**な Hall `π`-部分群なので
    Hall D + Hall C の共役先が `QK` 自身になる。
-   [ ] 残り: `exists_isPiElement_mul` で実際に `x = x_π · x_{π′}` と分解し、
-   `λ(x) = λ(x_{π′})` を出す部分。
-5. [ ] Ch.I §3 Lemma 2 (`ConjugacyInV.lean`) で `V` 内共役に落として `λ(x) = λ(x^g)`。
+   ~~残り: `x = x_π · x_{π′}` と分解して `λ(x) = λ(x_{π′})`~~ ✅ **2026-07-28 landing**
+   (`exists_piPrime_apply_eq`)。次数 1 の既約指標の乗法性
+   (`IsIrreducibleCharacter.map_mul_of_apply_one_eq_one`) を使う。
+5. [ ] **残り**: `exists_conj_mem_V_of_piPrime` で `x`, `x^g` を `V` に落とし、
+   Ch.I §3 Lemma 2 (`ConjugacyInV.lean`) で `V` 内共役にして `λ(x) = λ(x^g)`。
+   ⚠ `λ` は類関数なので `H`-共役では不変。問題は `g ∈ G − H` の場合で、
+   そこで Ch.I §3 Lemma 2 (「`V` の部分集合が `G` で共役なら `V` で共役」) が効く。
