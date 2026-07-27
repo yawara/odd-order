@@ -1235,12 +1235,18 @@ consumer は (5.7) engine を使う。
 
 **残っている特殊化 (実測、着手前に再確認すること)**
 
-1. **(6.6) coherence 半分** — 依然として最大。`Xset_isCoherent_of_irreducible_X`
-   (`S08_CoherenceBasic.lean:352`) は `Z` について generic だが `SibleyDadeHypothesis`
-   (= `K = H`) に載っている。一般化には `inducedKernelFamily` 上に §8 の
-   `xBaseBlock` / `AnchoredPairUnionStepData` / 次数平方和 machinery を敷き直す必要がある
-   (X-characterization のように「族の形しか使っていない」case ではない)。上流はこの tick で
-   全部そろった ((6.5) 一般形 + `InducedFamilyImageData.hypothesis`)。
+1. **(6.6) coherence 半分** — 依然として最大 (**[issue 0155](../../issues/0155-pf-six-six-general-kernel.md)**)。
+   ただし同日中に**大半が片付いた**: `S08_SixSixGeneral.lean` に `xSet = 𝒮 − 𝒮(Z)` と
+   (5.2) 一式 / 書籍 p.32 の算術 2 本 (次数 `|L:K|·p^k`・[Is] Cor 2.30 の中心界) /
+   次数平方和恒等式 / 最小次数 base block `𝒮₀` の API を一般 `K` で landing。
+   **残りは τ-general な X-chain engine 1 点**: Sibley の入口
+   `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X` が使う 4 つのうち、
+   `exists_conjugatePairCover` は汎用・上記 3 つは一般版完済で、残るのは
+   `xChainCoherent` / `XAdjoinStepInput` が **`S04.Hypothesis` (Dade) でパラメータ化**
+   されている点だけ。実測すると `dade` はほぼ**型シグネチャ**にしか現れず、証明本体で
+   真に Dade を使うのは `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal` (= (5.2.d)(e)) と
+   `inner_dade_extension_of_supported` (= 等長) の **2 つだけ** ⟹
+   **issue 0154 (加重 (5.6) の τ 一般化) とまったく同じ型の作業**。手順は 0155 に記録。
 2. **repo の (5.7) が member の既約性を要求する** — 書籍の (5.7)/(5.2) は要求しない
    (直交性のみ)。orthonormal な `coherentEqualDegree` builder から継承した債務。
    (6.4) の応用では (6.4.c) から既約性が出るので実害はないが、(5.7) 自体は書籍より狭い。
