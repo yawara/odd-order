@@ -320,3 +320,44 @@ mathlib / repo にあるかを実測すること。無ければそこが step (6
    Ch.I §3 Lemma 2 (`ConjugacyInV.lean`) で `V` 内共役にして `λ(x) = λ(x^g)`。
    ⚠ `λ` は類関数なので `H`-共役では不変。問題は `g ∈ G − H` の場合で、
    そこで Ch.I §3 Lemma 2 (「`V` の部分集合が `G` で共役なら `V` で共役」) が効く。
+
+## step (6) 最終結線の完全レシピ (2026-07-28 確定、次セッションはこれを書くだけ)
+
+landing 済の部品:
+* `apply_eq_of_piFactorization` — **任意の**分解 `x = a·b` (`a` は π-元) で `λ(x) = λ(b)`
+* `exists_conj_mem_V_of_piPrime` — π′-元は `H` 内で `V` に共役
+* `Hypothesis.exists_mem_V_conj_image_eq` (`ConjugacyInV.lean:181`) — Ch.I §3 Lemma 2
+
+### 推奨: まず「核」だけを定理にする
+
+```
+theorem apply_eq_of_isConj_piPrime (ind) (hQ1) {θ} (hθ) (hdeg) (hker)
+    {x y : ↥H} (hx : x は π′-元) (hy : y は π′-元)
+    (hconj : ∃ g : G, g * (x : G) * g⁻¹ = (y : G)) :
+    θ x = θ y
+```
+
+証明:
+1. `exists_conj_mem_V_of_piPrime` で `h₁, h₂ ∈ H` を取り `x^{h₁}, y^{h₂} ∈ V`。
+2. `θ` は `↥H` 上の類関数なので `θ x = θ (x^{h₁})`, `θ y = θ (y^{h₂})`。
+3. `x^{h₁}` と `y^{h₂}` は `G` で共役 (`hconj` の両側に `h₁, h₂` を合成)。
+4. 単集合 `X = {x^{h₁}}`, `Y = {y^{h₂}}` に **Ch.I §3 Lemma 2** を当てて
+   `v ∈ V` で共役に落とす。`V ≤ H` なので `H`-共役。
+5. 再び類関数性で `θ (x^{h₁}) = θ (y^{h₂})`。
+
+⚠ `θ` の類関数性 (`θ (h * x * h⁻¹) = θ x`) の API 名は要実測
+(`ClassFunction` の定義側にあるはず)。
+
+### そのあと一般の `x` へ
+
+`x ∈ H`, `g ∈ G`, `x^g ∈ H` に対し:
+* `exists_isPiElement_mul` で `⟨x,_⟩ = a·b` (`a` π-元、`b` π′-元、ともに `⟨x⟩` の冪)。
+* `a = ⟨x,_⟩^m`, `b = ⟨x,_⟩^n` なので、`G` の中では `a = x^m`, `b = x^n`。
+  共役して `g x^m g⁻¹ · g x^n g⁻¹ = g x g⁻¹` は `⟨x^g,_⟩` の分解であり、
+  `g x^m g⁻¹` は `x^m` と同位数ゆえ π-元。
+* `apply_eq_of_piFactorization` を両側に当てて
+  `λ(x) = λ(b)`, `λ(x^g) = λ(b^g)` へ帰着。
+* `b`, `b^g` は π′-元で `G`-共役なので上の「核」で一致。
+
+⚠ ここは `↥H` と `G` の座標変換が重いので、**核を先に landing** してから
+一般形を組む順が良い。
