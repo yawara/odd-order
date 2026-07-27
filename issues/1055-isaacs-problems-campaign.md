@@ -4944,7 +4944,7 @@ IsMultiplyPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) n`) で
 | 8C.1 – 8C.4 | — | — | **完了** (二重着手あり、9212 参照) |
 | 8C.5 | 設計メモを書いた側のセッション (= 本セッション) | 2026-07-27 21:5x | **完了 2026-07-27** |
 | 8C.6 | lane a (9212 を起票した側) | 2026-07-27 21:5x | hub 裁定で確定 |
-| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **8D.1–8D.4 完了, 8D.5 / 8D.6 進行中** |
+| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **8D.1–8D.5 完了, 8D.6 のみ残** |
 
 ⚠ **恒久対処は worktree を分けること** — 1 lane = 1 worktree = 1 session が CLAUDE.md の前提。
 2 つ目のセッションは `notes/meta/worktree_setup.md` の手順で自分の worktree/branch を取るのが
@@ -5064,5 +5064,28 @@ leaf = `Problems8D/{SubdegreeTwo, DegreeEight}.lean` (188 / 213 行) + hub `Prob
   (原始的で `m > 1` なら `m < k_m`)。鍵は `A·B ⊆ K` と **Problem 1A.3**
   `Ch01.card_mul_card_inf` (`|A·B|·|A∩B| = |A||B|`)、(c) は点安定化群の極大性。
 
-**次は 8D.5** (rank 3, subdegree `1 < m < n` coprime ⟹ `(m+1) ∣ n`; Hint: `k_m ∣ 1+m+n`) →
-**8D.6** (原始群で素数 `p` が subdegree なら `p² ∤ |G_α|`)。
+* ✅ **8D.5** (`RankThree.lean`): `succ_dvd_of_rank_three`。`k_m ∣ |Ω| = 1+m+n` と
+  Thm 8.42(b) の `k_m ∣ n` から `k_m ∣ m+1`, 8D.4(a) の `m ≤ k_m` と合わせて
+  `k_m = m+1` ⟹ `(m+1) ∣ n`。rank 3 は「suborbit 長は `1, m, n` のいずれか」+
+  `|Ω| = 1+m+n` で表現。
+
+### 残り: 8D.6 (§8D 最後) — 未着手, 難所は Hint の補題
+
+**8D.6**: 原始置換群で素数 `p` が subdegree なら `p² ∤ |G_α|`, したがって `p²` は
+どの subdegree も割らない。**Hint**: `X ⊆ Y`, `|Y : X| = p` ⟹ `O^{p'}(X) ◁ Y`。
+
+本体側の筋は 8D.1 と同型で明快:
+`α → β` を `p`-arrow, `X := G_α ⊓ G_β` とすると `|G_α : X| = |G_β : X| = p`。
+Hint から `R := O^{p'}(X)` は `G_α` でも `G_β` でも正規 ⟹ `G_α ⊔ G_β ≤ N_G(R)`。
+原始性 (点安定化群が `IsCoatom`) で `G_α ⊔ G_β` は `G_α` (⟹ `G_α = G_β` ⟹ `p = 1`) か
+`⊤`。後者なら `R ◁ G` かつ `R ≤ G_α` なので `eq_bot_of_normal_of_le_stabilizer` から
+`R = ⊥`, つまり `X` は `p'`-群 ⟹ `|G_α| = p·|X|` の `p`-部分はちょうど `p`。
+subdegree は `|G_α|` を割るので `p²` はどれも割らない。
+
+⚠ **Hint の補題 (`|Y : X| = p` ⟹ `O^{p'}(X) ◁ Y`) が本命の未解決部分**。
+`O^{p'}(X) = ⟨Syl_p(X)⟩` (= `X` の `p`-元で生成) で `R ⊴ X` は自明だが, `Y` での正規性は
+非自明。`X ≤ N_Y(R)` と `|Y:X| = p` から `N_Y(R)` は `X` か `Y` なので, `N_Y(R) = X`
+(⟹ `R` の共役が `p` 個) の場合を潰す議論が要る。`Y = X·Q` (`Q ∈ Syl_p(Y)`),
+`P := Q ⊓ X ∈ Syl_p(X)`, `[Q : P] = p` ゆえ `P ⊴ Q` — ここまでは確認済だが結論には未到達。
+着手時は repo の `oPiResidual` (Ch03 `PiResidual.lean`, issue 1B.8) / `OpResidual` と
+Isaacs 本文の該当箇所 (Thm 8.43 周辺) / `coq/theories/` を当たること。
