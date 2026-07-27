@@ -134,6 +134,35 @@ theorem induce_not_isIrreducible_iff [NeZero (Nat.card h.W1)] (χ : IrreducibleC
 `S06_CertainTypeCoherence` 内に同型の等式が複数ある (`:132` / `:283` / `:472`) ので、
 そこから (4.6) レベルで供給できる見込み。**着手時にまずここを確認すること。**
 
+## `hdeg` の供給元 (2026-07-27 実測、最後の未確認点も解消)
+
+`certainTypeR` の `hdeg : ∑ (columnFamily χ₂).mu i (1) = ∑ (columnFamily χ₂⁻¹).mu i (1)` は、
+`columnSum_apply_one` (`S06_CertainTypeCoherence:279`)
+
+```lean
+    (columnSum h χ₂ : ClassFunction ↥L ℂ) 1 = ∑ i, ((h.columnFamily χ₂).mu i) 1
+```
+
+により **`μ_j(1) = μ̄_j(1)`** と同値。`columnSum h χ₂⁻¹` が `(columnSum h χ₂).conj` である
+ことは `certainTypeR` の docstring が `columnSum_conj_eq` として言及しているので、
+共役が次数を保つことから discharge できる。⟹ **(4.6) レベルで供給可能**。
+
+## ⟹ 部品は全て特定済 (着手可能)
+
+| (5.2.d) の分岐 | 使う部品 |
+|---|---|
+| 既約 member | `characterDifferenceImage_of_irreducible` → `.toOrthonormalImage`。τ 側の入力 ((5.2.b) の等長・`ℤ[Irr G]` 値域・`τφ(1) = 0`) は `dadeIntegralCharacterMap_{inner_eq_on_supported_span, mem_ZIrr_of_supported, apply_one_eq_zero}` |
+| 可約 member | `induce_not_isIrreducible_iff` (`S06_CertainTypeClifford:1099`) で `χ₂'` を取る → `certainTypeR` (`S06_CertainTypeCoherence:648`)、`hdeg` は上記 |
+| (5.2.e) 既約×既約 | `orthogonal_of_tau_conjDiff_inner_eq_zero` + `tau_conjDiff_inner_eq_zero_of_orthogonal` |
+| (5.2.e) 可約×可約 | `certainTypeR_imageSet_orthogonal_certainTypeR` |
+| (5.2.e) 混合 | 書籍は `NC((φ−φ̄)^τ) ≤ 2` + (3.8)。§11 dispatch は `S11.sOf_memberRFamily` |
+
+⚠ **実装上の注意**: `certainTypeR` は instance 引数が多い
+(`NeZero (Nat.card h.W1)` / `Invertible (Nat.card ↥h.K : ℂ)` /
+`Fintype ↥(h.W1 ⊔ h.W2)` / `Invertible …` / `Fintype (ticVdiff h).W` / `Invertible …`)。
+`toGeneralHypothesis` の signature にそのまま並べる必要があり、build-fix が数ラウンド要る。
+**まず可約分岐だけを独立した def として landing させ、その後で全体を組む**のが安全。
+
 ## やること
 
 1. `S06.Hypothesis46` (+ 必要な補助データ) から `S07.GeneralHypothesis` を構成する
