@@ -87,3 +87,22 @@ proof-irrelevance により自明に一致する。
 重複が実際に減る (個別証明が一般版の呼び出しに置換される) こと。build green +
 AxiomsCheck OK + lint --strict clean。置換が数学的に不可能と判明した箇所は、
 **理由を docstring に書いて残す** (「一般化できない」で終わらせない)。
+
+## 進捗 (2026-07-27) — bridge の部品を 3 本 landing、残るは組み立てのみ
+
+| # | 部品 | 場所 | 状態 |
+|---|---|---|---|
+| 符号 | `S12.Hypothesis.muColumnSign_eq_columnFamily_sign` | `S12_Section9Counts.lean` | ✅ `rfl` |
+| 像 (点ごと) | `S13.columnRImage_eq_certainTypeRImage` | `S13_Orthogonality.lean` | ✅ |
+| 像 (集合) | `S13.columnRImage_image_eq_certainTypeRImage_image` | `S13_Orthogonality.lean` | ✅ |
+| 共役列 | `S13.muColumnChar_conj_eq_inv` | `S13_Orthogonality.lean` | ✅ |
+
+⟹ **`colRFamily` と `certainTypeR` の `imageSet` 一致に必要な同定は全て揃った**。
+残りは `colRFamily` (= `columnImageFamilyCohFree` 経由) の `imageSet` フィールドを開いて
+上の 3 本を当てる組み立てと、`memberRFamily` / `memberR` の dispatch を既約・可約で
+突き合わせる部分 (既約側は両者とも `dadeOrthonormalCharacterImageFamilyOfDiff` で
+proof-irrelevance により自明)。
+
+⚠ 組み立ては `S13_SixTwoImageData` (memberRFamily の在処) と `S13_Orthogonality` (上の 3 本) の
+両方が見える新 leaf に置くこと — 現状 `S13_SixTwoImageData` は `S13_Orthogonality` を import
+していない。

@@ -352,6 +352,93 @@ theorem certainTypeOmegaSigma_muColumnChar_eq_aligned [Finite G]
   rw [h1]
   rfl
 
+/-! ### §10 column `R`-image ↔ §6 `certainTypeR`-image (issue 0160) -/
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The §10 aligned column image is the §6 certain-type column image**, pointwise on the
+index `Bool × Fin w₁`.
+
+Both are the same signed pair of `σ`-images — `(false, i) ↦ δ·ω_{ij}^σ`,
+`(true, i) ↦ −δ·ω_{ij'}^σ` — written in two different worlds: `columnRImage` over the §10
+`alignedOmegaSigmaGrid` with the sign `params.delta`, `certainTypeRImage` over the §6
+`certainTypeOmegaSigma` with the sign `(columnFamily χ₂).sign`.  The two identifications are
+`certainTypeOmegaSigma_muColumnChar_eq_aligned` (the grids) and
+`muColumnSign_eq_columnFamily_sign` (the signs, definitional).
+
+Note the sign hypothesis is only needed at the column `j`: `certainTypeRImage` carries
+`χ₂`'s sign in *both* components, exactly as `columnRImage` carries `δ` in both. -/
+theorem columnRImage_eq_certainTypeRImage [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    [NeZero (Nat.card ↥(hyp.toHypothesis46 hG hG.odd).W1)]
+    (hcw1 : Nat.card ↥(hyp.toHypothesis46 hG hG.odd).W1 = hyp.w1)
+    {δ : ℤ} {j j' : Fin hyp.w2} (hδ : hyp.muColumnSign hG hG.odd j = δ)
+    (b : Bool) (i : Fin hyp.w1) :
+    hyp.columnRImage hG hG.odd δ j j' (b, i)
+      = OddOrder.Peterfalvi.S06.certainTypeRImage (hyp.toHypothesis46 hG hG.odd)
+          (hyp.muColumnChar hG hG.odd j) (hyp.muColumnChar hG hG.odd j')
+          (b, finCongr hcw1.symm i) := by
+  have hsign : ((hyp.toHypothesis46 hG hG.odd).columnFamily
+      (hyp.muColumnChar hG hG.odd j)).sign = δ := by
+    rw [← hyp.muColumnSign_eq_columnFamily_sign hG hG.odd j]; exact hδ
+  cases b <;>
+    simp only [OddOrder.Peterfalvi.S12.Hypothesis.columnRImage,
+      OddOrder.Peterfalvi.S06.certainTypeRImage, hsign,
+      certainTypeOmegaSigma_muColumnChar_eq_aligned hG hyp hcw1]
+
+open scoped Classical in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The two column `R`-families have the same underlying set.**  The `Bool × Fin`-index
+reindexing `finCongr hcw1` is a bijection, so the pointwise identity
+`columnRImage_eq_certainTypeRImage` upgrades to equality of the images over `univ` — which is
+exactly the `imageSet` field of the two `OrthonormalCharacterImageFamily` records
+(`S12.columnImageFamilyCohFree` and `S06.certainTypeR`).
+
+This is the geometric half of the §13 ↔ (5.3)(b) bridge (issue 0160); what remains is the
+identification of the conjugate column `j' ↔ χ₂⁻¹`. -/
+theorem columnRImage_image_eq_certainTypeRImage_image [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    [NeZero (Nat.card ↥(hyp.toHypothesis46 hG hG.odd).W1)]
+    (hcw1 : Nat.card ↥(hyp.toHypothesis46 hG hG.odd).W1 = hyp.w1)
+    {δ : ℤ} {j j' : Fin hyp.w2} (hδ : hyp.muColumnSign hG hG.odd j = δ) :
+    Finset.univ.image (hyp.columnRImage hG hG.odd δ j j')
+      = Finset.univ.image (OddOrder.Peterfalvi.S06.certainTypeRImage
+          (hyp.toHypothesis46 hG hG.odd)
+          (hyp.muColumnChar hG hG.odd j) (hyp.muColumnChar hG hG.odd j')) := by
+  ext α
+  simp only [Finset.mem_image, Finset.mem_univ, true_and]
+  constructor
+  · rintro ⟨⟨b, i⟩, rfl⟩
+    exact ⟨(b, finCongr hcw1.symm i),
+      (columnRImage_eq_certainTypeRImage hG hyp hcw1 hδ b i).symm⟩
+  · rintro ⟨⟨b, i'⟩, rfl⟩
+    refine ⟨(b, finCongr hcw1 i'), ?_⟩
+    rw [columnRImage_eq_certainTypeRImage hG hyp hcw1 hδ b (finCongr hcw1 i')]
+    congr 2
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The conjugate column is the inverse dual**: if column `j'` carries the complex conjugate of
+column `j` (`(∑ᵢ μ_{ij})‾ = ∑ᵢ μ_{ij'}`, the `hconj` datum the §13 column families carry), then
+`muColumnChar j' = (muColumnChar j)⁻¹`.
+
+`columnSum_conj_eq` ((4.9)(a)) says the conjugate of a column character is the column at the
+*inverse* dual; `columnSum_injective` (the (4.5) Gram matrix) then forces the two duals to agree.
+This is the index half of the §13 ↔ (5.3)(b) bridge — `certainTypeR` builds `R(μ_j)` from the pair
+`(χ₂, χ₂⁻¹)`, while the §13 families use `(j, j')`. -/
+theorem muColumnChar_conj_eq_inv [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    [NeZero (Nat.card ↥(hyp.toHypothesis46 hG hG.odd).W1)]
+    {j j' : Fin hyp.w2}
+    (hconj : (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j).conj
+      = ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j') :
+    hyp.muColumnChar hG hG.odd j' = (hyp.muColumnChar hG hG.odd j)⁻¹ := by
+  refine (OddOrder.Peterfalvi.S06.columnSum_injective (hyp.toHypothesis46 hG hG.odd) ?_).symm
+  rw [← OddOrder.Peterfalvi.S06.columnSum_conj_eq,
+    ← hyp.muGrid_columnSum_eq_columnSum hG hG.odd j,
+    ← hyp.muGrid_columnSum_eq_columnSum hG hG.odd j', hconj]
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The (5.8) `μ`-column pin for a narrow `𝒮(H₀C)`-coherence, irreducible case** (the Coq
 `FTtypeP_coherent_TIred`-side of the (11.8.6) `tau2muj` WLOG, issue 1023 tick¹³): if `𝒮(H₀C)`

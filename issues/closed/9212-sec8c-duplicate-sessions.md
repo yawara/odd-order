@@ -215,8 +215,9 @@ kill 前に確認: **未マージ commit 0 / 子プロセス無し / 未追跡�
 (`Problems8D/PrimeIndexCore.lean` — ディスクに残存、引き継ぎは issue 1055 に記録)。
 ⟹ **成果の消失は無い**。
 
-worktree `/home/ywr/odd-order-a2` (branch `a2`) は**作成済のまま残してある**。
-今後 §8C/§8D を 2 セッションで進めるなら、片方をそこに向けて起動すればよい
-(1 lane = 1 worktree = 1 session)。不要になれば `git worktree remove /home/ywr/odd-order-a2` で撤去可。
+worktree `/home/ywr/odd-order-a2` (branch `a2`) は**ユーザー指示により撤去済** (2026-07-27)。
+撤去前確認: 未マージ commit 0 / 未コミット変更 0 / プロセス無し ⟹ 消失なし。
+今後 §8C/§8D を 2 セッションで進めるなら、`notes/meta/worktree_setup.md` の手順で
+改めて worktree を切ること (1 lane = 1 worktree = 1 session)。
 
 ⟹ 本 issue は完全決着。claim 表 (issue 1055) は 2 セッション体制を再開したときの規約として存続。
