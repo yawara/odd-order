@@ -57,20 +57,32 @@ survey「残っている特殊化」項目 3 の実体。
 
 1. `normal_central_of_maximal_normal_below` の仮説を
    `[Group.IsNilpotent ↥H]` → `[Group.IsNilpotent (↥H ⧸ B.subgroupOf H)]` に弱める。
-   ⚠ **binder の障害**: 商型 `↥H ⧸ B.subgroupOf H` の `Group` instance を binder 位置で
-   合成するには `(B.subgroupOf H).Normal` が要るが、**`Subgroup.Normal.subgroupOf` は
-   instance でなく theorem** (`Mathlib/Algebra/Group/Subgroup/Basic.lean:901`) なので
-   `[B.Normal]` からは自動で出ない。
-   ⟹ 明示の instance binder `[(B.subgroupOf H).Normal]` を先に置く必要がある。
-   呼び出し側 3 箇所 (`S08_Theorem62_63_Standalone:163` / `S08_Theorem65c2:258` /
-   `S08_CoherenceCorePart2/SibleyBounds:761`) は `haveI := (‹B.Normal›).subgroupOf H` を
-   前置すればよい (どこも `B.Normal` は在る)。
+   ⚠ **binder の障害は「順序」だけだった (2026-07-27 訂正)**: 商型 `↥H ⧸ B.subgroupOf H` の
+   `Group` instance には `(B.subgroupOf H).Normal` が要るが、これは
+   **`Subgroup.normal_subgroupOf` という instance が mathlib に在る**
+   (`Mathlib/Algebra/Group/Subgroup/Basic.lean:906`, `[N.Normal] → (N.subgroupOf H).Normal`)。
+   最初の試行が失敗したのは、冪零性 binder を `[B.Normal]` より**前**に置いていたため
+   (その時点では `B.Normal` がまだ scope に無い)。`[A.Normal] [B.Normal]` の**後ろ**に
+   置けば通る。明示の instance binder も呼び出し側の `haveI` も不要で、
+   **3 つの呼び出し箇所は無変更**。
+   (当初 `Subgroup.Normal.subgroupOf` が theorem だから不可、と書いたのは誤り —
+   同名の theorem 版と instance 版が両方ある。)
 2. `six_three_descent` (と `:391` の bundled 版) の `[Group.IsNilpotent ↥H]` を
    `(hHM : Group.IsNilpotent (↥H ⧸ M.subgroupOf H))` に置換し、call 直前で
    `Group.nilpotent_of_surjective` により `H/B` の冪零性を作る
    (`H/M ↠ H/B` は `M ≤ B` から)。
 3. 旧版は `H` 冪零からの 1 行特殊化として残す (下流 consumer 無変更)。
 4. AxiomsCheck 更新 + survey の「残っている特殊化」項目 3 を更新。
+
+## ✅ 完了 (2026-07-27)
+
+`six_three_descent` / `six_three_of_six_two_oracle` がともに
+`[Group.IsNilpotent (↥H ⧸ M.subgroupOf H)]` (書籍 (6.3)(a) そのもの) で成立。
+`normal_central_of_maximal_normal_below` も `[Group.IsNilpotent (↥H ⧸ B.subgroupOf H)]` へ弱化。
+`M ≤ B` から `H/M ↠ H/B` を作り `Group.nilpotent_of_surjective` で `H/B` の冪零性を供給する。
+
+**下流 consumer は全て無変更** — `H` 冪零を持つ呼び出し側では、商の冪零性も
+`(M.subgroupOf H).Normal` も instance 合成で自動的に得られるため。
 
 ## 完了条件
 

@@ -108,8 +108,9 @@ by maximality of `B`, `C = A`, i.e. `A/B ⊆ Z(H/B)`.
 This discharges the `hcentral` hypothesis of `six_three_index_bound` in the minimal-`A`/maximal-`B`
 induction of Peterfalvi (6.3). -/
 theorem normal_central_of_maximal_normal_below {Γ : Type*} [Group Γ] [Finite Γ]
-    {H A B : Subgroup Γ} (hH : H.Normal) [Group.IsNilpotent ↥H]
-    [A.Normal] [B.Normal] (hAH : A ≤ H) (hBA : B < A)
+    {H A B : Subgroup Γ} (hH : H.Normal)
+    [A.Normal] [B.Normal]
+    [Group.IsNilpotent (↥H ⧸ B.subgroupOf H)] (hAH : A ≤ H) (hBA : B < A)
     (hmax : ∀ C : Subgroup Γ, C.Normal → B ≤ C → C < A → C = B) :
     (A.subgroupOf H).map (QuotientGroup.mk' (B.subgroupOf H)) ≤
       Subgroup.center (↥H ⧸ B.subgroupOf H) := by
