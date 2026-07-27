@@ -4382,8 +4382,12 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
   `sum_cube_card_fixedBy_eq_five_mul_iff`。答は `m = 5`。
 * **8A.16** … ✅ **完了 (2026-07-27)** — `two_transitive_of_coprime_index`。
   `Subgroup.relIndex` の二通り分解で `(n-1) ∣ |Δ|·[G:H]` を出す。
-* **8A.17** … ⬜ **次の frontier**: `q` が 2 冪のとき `SL(2,q)` は
-  1 次元部分空間 (`q+1` 個) に **sharply 3-transitive**。
+* **8A.17** … ✅ **完了 (2026-07-27)** —
+  `existsUnique_specialLinearGroup_of_three_distinct` (抽象版) /
+  `existsUnique_matrixSpecialLinearGroup_of_three_distinct` (教科書の `SL(2,q)` 版)。
+  新 leaf `Problems8A/SharplyThreeTransitive.lean`。
+
+⟹ **§8A は 8A.1–8A.17 全問完了 (2026-07-27)**。
 
 ### 8A.17 の設計メモ (2026-07-27)
 
@@ -4408,3 +4412,36 @@ Lean 側の型: `SpecialLinearGroup K V` (`= {u : V ≃ₗ[K] V // u.det = 1}`) 
 mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
 `basisOfLinearIndependentOfCardEqFinrank`, `LinearMap.det_smul`,
 `Projectivization.specialLinearGroup_is_two_pretransitive` (2-transitive まで)。
+
+
+## Ch.8 Problems の全数インベントリ (2026-07-27 実測)
+
+`grep -oE "^8[A-Z]\. ?[0-9]+\."` で教科書から実測した番号列 (39 問):
+
+* **§8A: 8A.1 – 8A.17** … ✅ **全問完了 (2026-07-27)**
+* **§8B: 8B.1 – 8B.10** … ⬜ **次の frontier** (block / primitivity)
+* **§8C: 8C.1 – 8C.6** … ⬜
+* **§8D: 8D.1 – 8D.6** … ⬜ (subdegrees / rank)
+
+### §8B の設計メモ (2026-07-27)
+
+mathlib の `MulAction.IsBlock G B` (`Mathlib/GroupTheory/GroupAction/Blocks.lean`) が
+Isaacs の block 定義 (「`Δ` の translate は `Δ` 自身か `Δ` と交わらない」) とそのまま一致
+(`IsBlock G B := ∀ g₁ g₂, g₁ • B ≠ g₂ • B → Disjoint (g₁ • B) (g₂ • B)`)。使える道具:
+
+* `isBlock_iff_smul_eq_of_mem : IsBlock G B ↔ ∀ g a, a ∈ B → g • a ∈ B → g • B = B`
+* `IsBlock.of_orbit (hH : stabilizer G a ≤ H) : IsBlock G (orbit H a)`
+* `IsBlock.orbit_stabilizer_eq` / `stabilizer_orbit_eq` — block ↔ 中間部分群の対応
+* `IsPreprimitive` (primitivity) は `Mathlib/GroupTheory/GroupAction/Primitive.lean`
+
+**8B.1** (`G` 推移的, `α ∈ Ω`, `∅ ≠ X ⊆ Ω`, `Δ := ⋂ {g•X : α ∈ g•X}` は block) の筋:
+`S := {g : α ∈ g•X}` とおくと `h•Δ = ⋂_{g ∈ hS} g•X` で **`α ∈ h•Δ ⟺ hS ⊆ S`**。
+`G` 有限なら `hS ⊆ S ⟺ hS = S` なので `H := {h : hS = S}` は部分群で
+`G_α ≤ H` (∵ `s•α = α` なら `sS ⊆ S`)。さらに **`Δ = orbit H α`**:
+(⊇) `h ∈ H` なら `h•α ∈ h•Δ = Δ`; (⊆) `β = k•α ∈ Δ` なら任意の `g ∈ S` で
+`k•α ∈ g•X` ⟹ `k⁻¹g ∈ S` ⟹ `k⁻¹S ⊆ S` ⟹ `k ∈ H`。
+あとは `IsBlock.of_orbit` を当てるだけ。⚠ `[Finite G]` が要る (`hS ⊆ S ⟹ hS = S`)。
+
+**8B.3** は Hint に「Problem 8A.4 を使え」とあり, 8A.4 は
+`Problems8A/RegularRepresentations.lean` の
+`mulEquiv_and_center_eq_bot_of_regular_normal` として landing 済 — そのまま使える。
