@@ -253,6 +253,23 @@ repo の carrier は 2 元に固定しており、**全 member の既約性を�
    `himg` は `τ(χ̄₀−χ₀) = X₁ − X₀ = −τ(χ₀−χ̄₀)`、
    `hXZ` は `R.mem_ZIrr` と `hZIrr`、`hdeg` は既存の `hconst`。
 
+### ⚠ 必要な道具は既に repo に在る (2026-07-27 実測)
+
+**`S07_PivotCoherence.lean:597-632` の「degenerate case `S ⊆ {χ₁, χ̄₁}`」分岐が、上記手順 1-2 を
+逐語で実行している**。基底ケースはこれを写すだけでよい:
+
+- `inner_sum_sum_of_orthonormal R.orthonormal hsub₁ hsub₂` — 部分集合上の和どうしの内積
+  (`Finset.inter` の濃度になる)。`Finset.inter_self` / `Finset.inter_eq_right.mpr` と併用。
+- `|R| = 2N` の導出 (`S07_PivotCoherence:602-613`):
+  `R.image_eq` → `inner_sum_sum_of_orthonormal` → `inner_sub_left/right` 展開 →
+  `⟨χ₁,χ̄₁⟩ = 0`・`‖χ̄₁‖² = ‖χ₁‖²` を代入 → `exact_mod_cast`。
+- `hconjnorm : ⟨χ̄,χ̄⟩ = ⟨χ,χ⟩` は `rw [inner_conj_conj, hNval, star_natCast]` の 1 行
+  (`S07_PivotCoherence:599`)。
+- `E` の取り出しは `Finset.exists_subset_card_eq (s := R.imageSet) (n := N) (by rw [hcard]; omega)`。
+
+⟹ 残りは「4 通りの Gram 計算 + `coherentEqualDegreeW (n := 2)` への流し込み +
+`Set.range ![χ, χ.conj] = {χ, χ.conj}`」のみ。新しい数学は無い。
+
 ⚠ **要追加仮説**: 手順 2 で `c` が**自然数**である必要がある (`|E| = c` を取るため)。
 `GeneralHypothesis` は member が指標であることを記録していないので、
 基底ケース補題に `(hc : ∃ m : ℕ, ⟨χ₀,χ₀⟩ = (m : ℂ))` を持たせるのが素直
