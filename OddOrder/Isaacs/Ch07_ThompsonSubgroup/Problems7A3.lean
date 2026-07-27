@@ -21,10 +21,15 @@ import Mathlib.Algebra.Group.Subgroup.Pointwise
   `⟨e_{n-k+1}, …, e_n⟩` (各次元 `k` (`1 ≤ k ≤ n`) にちょうど 1 つ)
 * (d) `P`-不変部分空間は `N = N_G(P)`-不変でもあり, (c) から `N = DP`
 
-鍵は「上三角行列の積の対角成分は対角成分の積」(`blockTriangular_mul_diag`) で,
-これから冪単性が積・逆元・共役で保たれることが従う。
+(a)(b) の鍵は「上三角行列の積の対角成分は対角成分の積」(`blockTriangular_mul_diag`) で,
+これから冪単性が積・逆元・共役で保たれることが従う。(c) は transvection `1 + c·E_{i,j}` を
+`P` の元として使い「非零成分をもつ最小添字」で不変部分空間を捕まえる。(d) は `W ᵥ* A` が
+ふたたび `P`-不変で次元が変わらないことと (c) の一意性から従う。
 
 `Matrix.BlockTriangular M id` (`∀ i j, j < i → M i j = 0`) を「上三角」の定義に使う。
+
+⚠ `q` が素数冪であることも `P` が Sylow `p`-部分群であることも使わない — 主張は
+**任意の体 `F`** 上で成立する (`|F| = q` は Sylow としての解釈にのみ効く)。
 -/
 
 namespace OddOrder.Isaacs.Ch07
@@ -503,6 +508,98 @@ theorem existsUnique_isRowInvariant_finrank_eq {k : ℕ} (hk : k ≤ n) :
     rw [finrank_rowTail hmn] at hWrank
     have hm : m = n - k := by omega
     rw [hm]
+
+/-! ### 7A.3(d): `N_G(P) = DP` -/
+
+/-- `GL(n,q)` の元 `A` による行ベクトルへの右作用 `v ↦ v ᵥ* A` (線型同型)。 -/
+def rowActionEquiv (A : GL (Fin n) F) : (Fin n → F) ≃ₗ[F] (Fin n → F) :=
+  LinearEquiv.ofLinear (A : Matrix (Fin n) (Fin n) F).vecMulLinear
+    ((A⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).vecMulLinear
+    (by
+      refine LinearMap.ext fun w => ?_
+      simp only [LinearMap.coe_comp, Function.comp_apply, Matrix.vecMulLinear_apply,
+        LinearMap.id_coe, id_eq]
+      rw [Matrix.vecMul_vecMul, A.inv_mul, Matrix.vecMul_one])
+    (by
+      refine LinearMap.ext fun w => ?_
+      simp only [LinearMap.coe_comp, Function.comp_apply, Matrix.vecMulLinear_apply,
+        LinearMap.id_coe, id_eq]
+      rw [Matrix.vecMul_vecMul, A.mul_inv, Matrix.vecMul_one])
+
+@[simp]
+theorem rowActionEquiv_apply (A : GL (Fin n) F) (v : Fin n → F) :
+    rowActionEquiv A v = Matrix.vecMul v (A : Matrix (Fin n) (Fin n) F) := rfl
+
+@[simp]
+theorem rowActionEquiv_coe_apply (A : GL (Fin n) F) (v : Fin n → F) :
+    ((rowActionEquiv A : (Fin n → F) ≃ₗ[F] (Fin n → F)) :
+      (Fin n → F) →ₗ[F] (Fin n → F)) v = Matrix.vecMul v (A : Matrix (Fin n) (Fin n) F) := rfl
+
+/-- **`P`-不変部分空間は `N_G(P)`-不変** (Isaacs 7A.3(d) 前半)。
+
+`W` が `P`-不変で `A ∈ N_G(P)` なら, `W ᵥ* A` も `P`-不変 (`(W A) B = (W (A B A⁻¹)) A`) で
+次元が等しいので, (c) の一意性から `W ᵥ* A = W`。 -/
+theorem rowTail_map_rowActionEquiv (A : GL (Fin n) F)
+    (hA : A ∈ Subgroup.normalizer (unitriangularGL : Subgroup (GL (Fin n) F)))
+    {m : ℕ} (hm : m ≤ n) :
+    (rowTail (F := F) n m).map ((rowActionEquiv A : (Fin n → F) ≃ₗ[F] (Fin n → F)) :
+      (Fin n → F) →ₗ[F] (Fin n → F)) = rowTail n m := by
+  have hinv : IsRowInvariant (unitriangularGL : Subgroup (GL (Fin n) F))
+      ((rowTail (F := F) n m).map
+        ((rowActionEquiv A : (Fin n → F) ≃ₗ[F] (Fin n → F)) :
+          (Fin n → F) →ₗ[F] (Fin n → F))) := by
+    rintro B hB w ⟨v, hv, rfl⟩
+    have hconj : A * B * A⁻¹ ∈ (unitriangularGL : Subgroup (GL (Fin n) F)) :=
+      (Subgroup.mem_normalizer_iff.mp hA B).mp hB
+    refine ⟨Matrix.vecMul v ((A * B * A⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F),
+      isRowInvariant_rowTail m _ (unitriangularGL_le_upperTriangularGL hconj) v hv, ?_⟩
+    have hmat : ((A * B * A⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) *
+        (A : Matrix (Fin n) (Fin n) F) =
+        (A : Matrix (Fin n) (Fin n) F) * (B : Matrix (Fin n) (Fin n) F) := by
+      simp
+    simp only [rowActionEquiv_coe_apply]
+    rw [Matrix.vecMul_vecMul, Matrix.vecMul_vecMul, hmat]
+  obtain ⟨m', hm'n, heq⟩ := exists_eq_rowTail_of_isRowInvariant _ hinv
+  have hrank : Module.finrank F
+      ((rowTail (F := F) n m).map
+        ((rowActionEquiv A : (Fin n → F) ≃ₗ[F] (Fin n → F)) :
+          (Fin n → F) →ₗ[F] (Fin n → F))) = n - m := by
+    rw [LinearEquiv.finrank_map_eq, finrank_rowTail hm]
+  rw [heq, finrank_rowTail hm'n] at hrank
+  have hmm : m' = m := by omega
+  rw [heq, hmm]
+
+/-- **Isaacs 7A.3(d)** — `N_G(P)` は可逆上三角行列全体 (Borel 部分群) に一致する。
+
+`A ∈ N_G(P)` は各標準旗 `rowTail n r` を保つので, `e_r ᵥ* A = A` の第 `r` 行も
+`rowTail n r` に入る, すなわち `A r s = 0` (`s < r`)。 -/
+theorem normalizer_unitriangularGL_eq :
+    Subgroup.normalizer ((unitriangularGL : Subgroup (GL (Fin n) F)) : Set (GL (Fin n) F)) =
+      upperTriangularGL := by
+  refine le_antisymm (fun A hA r s hsr => ?_) upperTriangularGL_le_normalizer
+  have hrow : Pi.single r (1 : F) ∈ rowTail (F := F) n (r : ℕ) := by
+    intro k hk
+    exact Pi.single_eq_of_ne (fun h => by rw [h] at hk; omega) 1
+  have hmem : Matrix.vecMul (Pi.single r (1 : F)) (A : Matrix (Fin n) (Fin n) F) ∈
+      rowTail (F := F) n (r : ℕ) := by
+    rw [← rowTail_map_rowActionEquiv A hA (le_of_lt r.isLt)]
+    exact ⟨Pi.single r (1 : F), hrow, rfl⟩
+  have hzero := hmem s (by rw [Fin.lt_def] at hsr; exact hsr)
+  rwa [Matrix.single_one_vecMul, Matrix.row_apply] at hzero
+
+/-- **Isaacs 7A.3(d)** (`DP` 形) — `N_G(P) = D ⊔ P`。 -/
+theorem normalizer_unitriangularGL_eq_sup :
+    Subgroup.normalizer ((unitriangularGL : Subgroup (GL (Fin n) F)) : Set (GL (Fin n) F)) =
+      diagonalGL ⊔ unitriangularGL := by
+  rw [normalizer_unitriangularGL_eq, diagonalGL_sup_unitriangularGL]
+
+/-- **Isaacs 7A.3(d)** (集合の積の形) — `N_G(P) = DP`。 -/
+theorem normalizer_unitriangularGL_eq_mul :
+    ((Subgroup.normalizer ((unitriangularGL : Subgroup (GL (Fin n) F)) :
+        Set (GL (Fin n) F))) : Set (GL (Fin n) F)) =
+      ((diagonalGL : Subgroup (GL (Fin n) F)) : Set (GL (Fin n) F)) *
+        ((unitriangularGL : Subgroup (GL (Fin n) F)) : Set (GL (Fin n) F)) := by
+  rw [normalizer_unitriangularGL_eq, diagonalGL_mul_unitriangularGL]
 
 end
 
