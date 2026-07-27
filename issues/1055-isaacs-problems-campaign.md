@@ -37,7 +37,7 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
       §8B は 8B.1–8B.10 完了 (8B.6 の `D₂ₚ` 同型のみ残) /
-      §8C は 8C.1–8C.4 完了, 8C.5 / 8C.6 未着手 / §8D 未着手
+      §8C は 8C.1–8C.5 完了, 8C.6 未着手 / §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4937,3 +4937,23 @@ IsMultiplyPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) n`) で
   `A` が位数 8 以上の初等可換 2-群。8C.5 と独立。
 
 hub の裁定が出たらこの節を更新すること。
+
+
+## 8C.5 完了 (2026-07-27)
+
+新 leaf `Problems8C/MathieuTwentyFour.lean` (150 行)。設計どおり Wielandt 9.1
+(`SubMulAction.ofStabilizer.isMultiplyPretransitive`) で 24 → 23 → 22 → 21 と
+1 点ずつ剥がし, 各段の `FaithfulSMul` / 濃度 / 推移性は共通補題
+(`faithfulSMul_ofStabilizer` / `card_ofStabilizer` / `is_one_pretransitive_iff` +
+`isMultiplyPretransitive_of_le`) で自動的に揃う。
+
+* `not_isSimpleGroup_of_card_eq_twentytwo` — 位数 22 の単純群は無い (Sylow 11 が正規)。
+* `two_transitive_of_isMultiplyPretransitive` — mathlib の
+  `IsMultiplyPretransitive _ _ 2` を 8A.9 系が要求する形に橋渡し。
+* `isSimpleGroup_of_five_transitive_degree_twentyfour` — **8C.5 本体**。
+  段 2 (22 = 2·11) と段 0 (24 = 2³·3) は
+  `isSimpleGroup_of_two_transitive_of_isSimpleGroup_stabilizer`、
+  段 1 (23 = 素数) は `isSimpleGroup_of_two_transitive_of_prime_card`。
+
+全て実証明・axiom-clean。**次は 8C.6** (可換群 `A` について `Aut(A)` 単純 ⟺
+`|A| = 3` または `A` は位数 8 以上の初等可換 2-群) — §8C の最後。
