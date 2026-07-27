@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6C1
+import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
 # Isaacs Problem 6C.2(a) — 位数 `p²` の elementary abelian 作用と `p + 1` 個の冪零部分群
@@ -473,6 +474,36 @@ theorem smul_mem_of_max_qSubgroup {A N : Type*} [Group A] [Group N] [Finite N]
     rw [Subgroup.pointwise_smul_def]
     exact hQq.map _
   exact hQmax _ hsmul_le hsmul_q (Subgroup.smul_mem_pointwise_smul m a Q hm)
+
+/-! ### `MulDistribMulAction` と Ch.3/Ch.4 の `IsAInvariant` の橋渡し -/
+
+open Pointwise in
+/-- 元ごとの不変性から `IsAInvariant` (Ch.3/Ch.4 の A-不変性) へ。 -/
+theorem isAInvariant_of_smul_mem {A N : Type*} [Group A] [Group N]
+    [MulDistribMulAction A N] {H : Subgroup N} (h : ∀ a : A, ∀ m ∈ H, a • m ∈ H) :
+    OddOrder.Isaacs.Ch03.IsAInvariant (MulDistribMulAction.toMulAut A N) H := by
+  have hle : ∀ b : A, (MulDistribMulAction.toMulAut A N b : MulAut N) • H ≤ H := by
+    intro b x hx
+    rw [Subgroup.pointwise_smul_def, Subgroup.mem_map] at hx
+    obtain ⟨y, hy, rfl⟩ := hx
+    exact h b y hy
+  intro a
+  refine le_antisymm (hle a) fun x hx => ?_
+  rw [Subgroup.pointwise_smul_def, Subgroup.mem_map]
+  refine ⟨a⁻¹ • x, h a⁻¹ x hx, ?_⟩
+  change a • (a⁻¹ • x) = x
+  rw [smul_smul, mul_inv_cancel, one_smul]
+
+open Pointwise in
+/-- `IsAInvariant` から元ごとの不変性へ。 -/
+theorem smul_mem_of_isAInvariant {A N : Type*} [Group A] [Group N]
+    [MulDistribMulAction A N] {H : Subgroup N}
+    (h : OddOrder.Isaacs.Ch03.IsAInvariant (MulDistribMulAction.toMulAut A N) H) :
+    ∀ a : A, ∀ m ∈ H, a • m ∈ H := by
+  intro a m hm
+  have hEq := h a
+  rw [← hEq, Subgroup.pointwise_smul_def, Subgroup.mem_map]
+  exact ⟨m, hm, rfl⟩
 
 end
 

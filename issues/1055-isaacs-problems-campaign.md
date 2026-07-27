@@ -3486,3 +3486,11 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
     で `map` に直して `IsPGroup.map`)。
   * 次: `X = ⨆ i, Q i` が `A`-不変 q-部分群 ⟹ Cor 3.25 で `A`-不変 Sylow `q` の `Q` に入り、
     `X < Q` から `Y = X ⊔ Φ(Q)` で矛盾を出す段 (Cor 3.28 + Thm 6.9 elem-abelian 分岐)。
+
+* ✅ 6C.2(b) 橋渡し 2 本: `isAInvariant_of_smul_mem` / `smul_mem_of_isAInvariant`
+  (`MulDistribMulAction` の元ごとの不変性 ⟺ Ch.3/Ch.4 の `IsAInvariant φ H`
+  (`φ = MulDistribMulAction.toMulAut A N`); 逆向きは `a⁻¹ • x` を取るだけ)。
+  `Problems6C2.lean` は `OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03` を import。
+  ⟹ 次 iteration で Cor 3.25 (`aInvariant_pSubgroup_le_aInvariant_sylow`) と
+  3.23(b) (`aInvariant_sylow_conj` + `C_N(A) = 1` ⟹ A-不変 Sylow q は一意) を使って
+  各 `Q i ≤ Q`、したがって `X = ⨆ Q i ≤ Q` を出す。
