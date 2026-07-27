@@ -5512,8 +5512,33 @@ Chermak–Delgado (Thm 1.41) と最大測度束 `L(G)` (Thm 1.44) の節で,
   (超えると Cor 1.46 で非単純) なので `H ∈ L(G)`、1G.2 より `H` は真の正規部分群 = `⊥` に
   含まれる。`G` 可換単純なら位数素数で部分群は `⊥`, `⊤` のみ。
 * ⬜ **1G.4**: `G` 非可換, `A` 可換 ⟹ `|G : N| < |G : A|²` なる**正規**可換 `N` が存在。
-  ⚠ 未解決点: 1G.1 の等号ケース (`A = C_G(A) ∈ L(G)`, `M = Z(G)`) で、
-  `Z(G)` は等号しか与えないので**別の正規可換部分群**を作る必要がある。
-  1G.2 で `A ⊆ M' < G` (正規) は取れるが `M'` は可換とは限らない。要検討。
+  **✅ 未解決点は解消 (2026-07-28) — 取るべき `N` は `core_G(A)`**。実装のみ残る。
+
+### 1G.4 の設計 (2026-07-28 に確定, 実装待ち)
+
+CD 部分群 `M` は特性可換で `|G:M| ≤ |G:A|²` (Thm 1.41)。**厳密なら `N := M` で終わり**。
+等号のときは 1G.1 より `A = C_G(A) ∈ L(G)` かつ `M = Z(G)`, `|G:Z(G)| = |G:A|²`。
+このとき **`N := core_G(A) = ⋂_g A^g`** が効く:
+
+1. `N` は正規で, `N ≤ A` ゆえ可換。また `Z(G) ≤ N`。
+2. `A ∈ L(G)` なら全共役 `A^g ∈ L(G)` (`chermakDelgadoLattice_conj_smul_mem`) で、
+   `L(G)` は `⊓` で閉じる (`chermakDelgadoLattice_inf_mem`) から **`N ∈ L(G)`**
+   (有限個の交わり; `chermakDelgadoSubgroup_mem_lattice` が使う
+   `_sInf_mem_of_finite_subset` と同じ形)。
+3. `C_G(A) = A` と `centralizer_conj_smul` から `C_G(A^g) = A^g`。
+   **`chermakDelgadoLattice_centralizer_inf_eq_mul`** (`H,K ∈ L(G)` ⟹
+   `C_G(H ⊓ K) = C_G(H)·C_G(K)`) を全共役にわたって繰り返すと
+   **`C_G(N) = ⟨A^g : g⟩ = A^G`** (`A` の正規閉包)。
+4. `A ∈ L(G)` かつ `A < ⊤` (`G` 非可換, `A` 可換) なので **1G.2** より `A ⊆ M' < ⊤` なる
+   正規 `M'` が取れる。よって `A^G ≤ M' < ⊤`, つまり **`C_G(N) ≠ ⊤`**。
+5. `N ∈ L(G)` より `|N|·|C_G(N)| = m(N) = m(A) = |A|²` (最大値)。したがって
+   `|G:N| = |G|/|N| = |G|·|C_G(N)|/|A|² < |G|²/|A|² = |G:A|²` — **`C_G(N) ≠ ⊤` すなわち
+   `|C_G(N)| < |G|` がちょうど厳密不等号を生む**。∎
+
+⚠ 実装上の山は 3 の「全共役にわたる繰り返し」。`Finset` 上の帰納で
+`C_G(⨅ i ∈ s, A^{g_i}) = ⨆ i ∈ s, A^{g_i}` を回すのが素直
+(`chermakDelgadoLattice_centralizer_inf_eq_mul` は 2 元版なので、
+`chermakDelgadoSubgroup_mem_lattice` の証明 (L.405-420) の Finset 帰納パターンを流用する)。
+
 
 **§1G の実装順**: 1G.2 → 1G.3 (1G.2 に依存) → 1G.4。
