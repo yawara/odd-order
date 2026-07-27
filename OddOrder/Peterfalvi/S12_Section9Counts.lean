@@ -805,6 +805,24 @@ noncomputable def Hypothesis.muColumnChar [Finite G] (hG : OddOrder.BG.IsMinimal
   exact finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
 
 open scoped FiniteInduce in
+/-- **The §10 column sign is the §6 column-family sign** at the corresponding `W₂`-dual:
+`δ_j = (columnFamily (muColumnChar j)).sign`.
+
+Definitional — `muColumnSign` and `muColumnChar` are the two halves of the same
+`finCardEquivCharacterGroup`-reindex of `j` (both materialize over
+`(hyp.toCertainTypeHypothesis hG hodd).toHypothesis`, which is literally the `toHypothesis` field
+of `toHypothesis46`).  Stating it lets the `params.delta` alignment hypothesis `hδj` of the §13
+column families be converted into the §6 sign that `certainTypeRImage` carries — the sign half of
+the §13 ↔ (5.3)(b) bridge (issue 0160). -/
+theorem Hypothesis.muColumnSign_eq_columnFamily_sign [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) [NeZero (Nat.card ↥(hyp.toHypothesis46 hG hodd).W1)]
+    (j : Fin hyp.w2) :
+    hyp.muColumnSign hG hodd j
+      = ((hyp.toHypothesis46 hG hodd).columnFamily (hyp.muColumnChar hG hodd j)).sign :=
+  rfl
+
+open scoped FiniteInduce in
 /-- The §10→§6 bridge's `Hypothesis46` carries the very (4.4) hypothesis of
 `toCertainTypeHypothesis` (definitional, structure-literal projection). -/
 theorem toHypothesis46_toHypothesis [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
