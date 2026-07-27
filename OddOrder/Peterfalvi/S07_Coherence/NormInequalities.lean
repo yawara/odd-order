@@ -782,6 +782,46 @@ noncomputable def Hypothesis.toGeneralHypothesis {S : Set (ClassFunction L ℂ)}
     exact CharacterDifferenceImage.toOrthonormalImage_orthogonal _ _
       (hyp.difference_images_orthogonal hφ hχ h1 h2)
 
+namespace GeneralHypothesis
+
+variable {S : Set (ClassFunction L ℂ)} {A : Set L}
+variable [Fintype L] [Fintype G]
+variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+
+/-- (5.2.a): `S` contains the conjugate of each member. -/
+theorem conjugate_mem {hyp : GeneralHypothesis (L := L) (G := G) S A}
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    χ.conj ∈ S :=
+  hyp.conjugate_closed hχ
+
+/-- (5.2.a): no member is real. -/
+theorem not_isReal {hyp : GeneralHypothesis (L := L) (G := G) S A}
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    ¬ χ.IsReal :=
+  hyp.no_real_characters hχ
+
+/-- (5.2.a): a member differs from its conjugate. -/
+theorem ne_conj {hyp : GeneralHypothesis (L := L) (G := G) S A}
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    χ ≠ χ.conj := by
+  intro hχ_eq
+  exact hyp.not_isReal hχ hχ_eq.symm
+
+/-- **Member-difference form of the (5.2.b) lattice isometry** — the `GeneralHypothesis` copy of
+`Hypothesis.tau_isometry_memberDiff`.  Both read off `tau_isometry_diff`, which is a shared
+field; only (5.2.d)/(5.2.e) differ between the two carriers. -/
+theorem tau_isometry_memberDiff (hyp : GeneralHypothesis (L := L) (G := G) S A)
+    ⦃a b c d : ClassFunction L ℂ⦄ (ha : a ∈ S) (hb : b ∈ S) (hc : c ∈ S) (hd : d ∈ S)
+    (hab : ((a - b : ClassFunction L ℂ)).support ⊆ A)
+    (hcd : ((c - d : ClassFunction L ℂ)).support ⊆ A) :
+    ClassFunction.inner (hyp.tau (a - b)) (hyp.tau (c - d))
+      = ClassFunction.inner (a - b) (c - d) :=
+  hyp.tau_isometry_diff
+    ⟨Submodule.sub_mem _ (Submodule.subset_span ha) (Submodule.subset_span hb), hab⟩
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hc) (Submodule.subset_span hd), hcd⟩
+
+end GeneralHypothesis
+
 @[simp] theorem Hypothesis.toGeneralHypothesis_tau {S : Set (ClassFunction L ℂ)} {A : Set L}
     [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis (L := L) (G := G) S A) :

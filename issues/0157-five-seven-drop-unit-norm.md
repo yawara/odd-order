@@ -204,6 +204,78 @@ repo の carrier は 2 元に固定しており、**全 member の既約性を�
 (`NormInequalities:648-663` 等 8 箇所) は 2 元形に本質的に依存するので `Hypothesis` 側に残す。
 `GeneralHypothesis` 版は別立てにし、`Hypothesis` 版はその特殊化として得る。
 
+## 進捗 (2026-07-27、連鎖の載せ替え)
+
+- [x] `GeneralHypothesis` に派生ヘルパ 3 本 (`conjugate_mem` / `not_isReal` / `ne_conj` /
+      `tau_isometry_memberDiff`) を追加。いずれも `Hypothesis` と**共有フィールドからの導出**
+      (差は (5.2.d)/(5.2.e) だけ)。
+- [x] **(5.7) 連鎖全体を `GeneralHypothesis` に載せ替え** (`S07_CoherenceConstantDegree`):
+      `imageFam` / `DiffPair.inner_eq_zero` / `_inner_conj_eq_zero` / `_imageFam_orthogonal` /
+      `pairDecomp` / `pairDecomp'` / `pairDecomp'_image` / `pairDecomp'_two_sided` /
+      `commonImage` + 6 補題。
+      ⚠ 一般 carrier では `difference_image` が**既に orthonormal 族**なので
+      `imageFam hyp hχ = hyp.difference_image hχ` (変換不要)、
+      `DiffPair.imageFam_orthogonal` も `difference_images_orthogonal` そのものになった
+      (`toOrthonormalImage_orthogonal` の呼び出しが消えた)。
+- [x] 本体 `coherent_of_constant_degree` は `hyp : Hypothesis` のまま、連鎖呼び出しを
+      `hyp.toGeneralHypothesis` 経由に。⚠ `hyp.tau` と `hyp.toGeneralHypothesis.tau` は
+      defeq だが**構文的には別**なので、`rw` の対象になる `have` は一般 carrier 側の
+      射影で書く必要がある (`hB`)。
+
+⟹ **(5.7) の「(5.4) を回して β の独立性を出す」部分は、可約 member を許す carrier の上で
+   完全に動くようになった**。残るのは本体の 2 点だけ:
+   1. `horthχ` (正規直交) → `coherentEqualDegreeW` (landing 済) に差し替えれば不要
+   2. 基底ケース `isCoherent_pair_of_differenceImage` (2 元形に本質依存) の一般版
+
+## 進捗 (2026-07-27、残り 2 点のうち 1 点完了)
+
+- [x] **`horthχ` → `coherentEqualDegreeW` 差し替え完了**。本体は正規直交 `⟨χᵢ,χⱼ⟩ = δᵢⱼ` を
+      作らず、対直交 (`hyp.pairwise_orthogonal`) + 非零ノルム (`hdeg0` から
+      `eq_zero_of_inner_self_re_eq_zero` 経由) を渡すだけになった。
+      `hgram` は **`xFamily_inner` そのもの** (前 commit で一般ノルム化済) で、
+      以前あった `exact horthχ i j` の後段が不要になった。
+- [ ] **基底ケース `|S| = 2` の一般版** — `hirr` の**最後の使用箇所**
+
+### 基底ケースの設計 (実測済、次セッション向け)
+
+`S = {χ₀, χ̄₀}`、`c := ⟨χ₀,χ₀⟩`、`R := hyp.difference_image hχ₀` (orthonormal, サイズ自由)。
+
+書籍「If `|𝒮| = 2`, this follows from (5.2.d)」の中身は、**`R(χ₀)` を半分に割る**こと:
+
+1. 等長性から `⟨τ(χ₀−χ̄₀), τ(χ₀−χ̄₀)⟩ = ⟨χ₀−χ̄₀, χ₀−χ̄₀⟩ = 2c`
+   (`⟨χ₀,χ̄₀⟩ = 0`・`‖χ̄₀‖² = ‖χ₀‖²` を使う)。
+   一方 `R` の正規直交性から `⟨∑_{α∈R} α, ∑_{α∈R} α⟩ = |R|` ⟹ **`|R| = 2c`**。
+2. `E ⊆ R.imageSet` を `|E| = c` に取り (`Finset.exists_subset_card_eq`)、
+   `X₀ := ∑_{α∈E} α`、`X₁ := X₀ − τ(χ₀−χ̄₀)` (`= −∑_{α∉E} α`)。
+3. Gram 行列が一致する: `⟨X₀,X₀⟩ = |E| = c = ⟨χ₀,χ₀⟩` /
+   `⟨X₀,X₁⟩ = c − |E| = 0 = ⟨χ₀,χ̄₀⟩` / `⟨X₁,X₁⟩ = |R| − c = c = ⟨χ̄₀,χ̄₀⟩`。
+4. ⟹ **`coherentEqualDegreeW` に `n = 2`, `χ = ![χ₀, χ̄₀]`, `X = ![X₀, X₁]` で流す**。
+   `himg` は `τ(χ̄₀−χ₀) = X₁ − X₀ = −τ(χ₀−χ̄₀)`、
+   `hXZ` は `R.mem_ZIrr` と `hZIrr`、`hdeg` は既存の `hconst`。
+
+### ⚠ 必要な道具は既に repo に在る (2026-07-27 実測)
+
+**`S07_PivotCoherence.lean:597-632` の「degenerate case `S ⊆ {χ₁, χ̄₁}`」分岐が、上記手順 1-2 を
+逐語で実行している**。基底ケースはこれを写すだけでよい:
+
+- `inner_sum_sum_of_orthonormal R.orthonormal hsub₁ hsub₂` — 部分集合上の和どうしの内積
+  (`Finset.inter` の濃度になる)。`Finset.inter_self` / `Finset.inter_eq_right.mpr` と併用。
+- `|R| = 2N` の導出 (`S07_PivotCoherence:602-613`):
+  `R.image_eq` → `inner_sum_sum_of_orthonormal` → `inner_sub_left/right` 展開 →
+  `⟨χ₁,χ̄₁⟩ = 0`・`‖χ̄₁‖² = ‖χ₁‖²` を代入 → `exact_mod_cast`。
+- `hconjnorm : ⟨χ̄,χ̄⟩ = ⟨χ,χ⟩` は `rw [inner_conj_conj, hNval, star_natCast]` の 1 行
+  (`S07_PivotCoherence:599`)。
+- `E` の取り出しは `Finset.exists_subset_card_eq (s := R.imageSet) (n := N) (by rw [hcard]; omega)`。
+
+⟹ 残りは「4 通りの Gram 計算 + `coherentEqualDegreeW (n := 2)` への流し込み +
+`Set.range ![χ, χ.conj] = {χ, χ.conj}`」のみ。新しい数学は無い。
+
+⚠ **要追加仮説**: 手順 2 で `c` が**自然数**である必要がある (`|E| = c` を取るため)。
+`GeneralHypothesis` は member が指標であることを記録していないので、
+基底ケース補題に `(hc : ∃ m : ℕ, ⟨χ₀,χ₀⟩ = (m : ℂ))` を持たせるのが素直
+(書籍の 𝒮 ⊆ 指標 から従う正当な仮説で、consumer 側で容易に discharge できる)。
+既存 `isCoherent_pair_of_differenceImage` (2 元形) はそのまま残し、一般版を別立てにする。
+
 ## 完了条件
 
 `coherent_of_constant_degree` が `hirr` 無しで成立し、旧版がその特殊化になること。
