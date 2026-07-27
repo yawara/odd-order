@@ -480,4 +480,68 @@ theorem coprime_card_QK_index (ind : Hypothesis.TheoremAInductionBelow G Ω)
 
 end SecondCaseHypothesis
 
+namespace Hypothesis
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (hyp : Hypothesis G Ω)
+
+/-- `|H| = |QK|·|V|`. -/
+theorem card_H_eq_card_QK_mul_card_V :
+    Nat.card ↥hyp.H = Nat.card ↥hyp.QK * Nat.card ↥hyp.V := by
+  rw [hyp.card_H_eq, hyp.card_D_eq, hyp.card_QK_eq]; ring
+
+/-- `[H : V] = |QK|`. -/
+theorem index_V_subgroupOf_eq_card_QK :
+    (hyp.V.subgroupOf hyp.H).index = Nat.card ↥hyp.QK := by
+  have hmul := (hyp.V.subgroupOf hyp.H).card_mul_index
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (hyp.V_le_D.trans hyp.D_le_H)).toEquiv,
+    hyp.card_H_eq_card_QK_mul_card_V] at hmul
+  refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥hyp.V)) ?_
+  rw [hmul]; ring
+
+end Hypothesis
+
+namespace SecondCaseHypothesis
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (sc : SecondCaseHypothesis G Ω)
+
+/-- `(|QK|, |V|) = 1` — the Hall property in the form used below. -/
+theorem coprime_card_QK_V (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥) :
+    Nat.Coprime (Nat.card ↥sc.toHypothesis.QK) (Nat.card ↥sc.toHypothesis.V) := by
+  have h := sc.coprime_card_QK_index ind hQ1
+  rwa [sc.toHypothesis.index_QK_subgroupOf_eq_card_V] at h
+
+/-- **`V` is a Hall `π′`-subgroup of `H`**, where `π` is the set of prime divisors
+of `|QK|` — the book's implicit setup for step (6) ("`x` and `x^g` are conjugate in
+`H` to elements of `V` by a theorem of Hall").
+
+`|V|` is coprime to `|QK|`, and `[H : V] = |QK|`. -/
+theorem isHallSubgroup_V_subgroupOf (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup
+      {p : ℕ | p ∉ (Nat.card ↥sc.toHypothesis.QK).primeFactors}
+      (sc.toHypothesis.V.subgroupOf sc.toHypothesis.H) := by
+  have hVcard : Nat.card ↥(sc.toHypothesis.V.subgroupOf sc.toHypothesis.H)
+      = Nat.card ↥sc.toHypothesis.V :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (sc.toHypothesis.V_le_D.trans sc.toHypothesis.D_le_H)).toEquiv
+  constructor
+  · intro p hp
+    rw [hVcard] at hp
+    simp only [Set.mem_setOf_eq]
+    intro hmem
+    have hpV : p ∣ Nat.card ↥sc.toHypothesis.V := Nat.dvd_of_mem_primeFactors hp
+    have hpQK : p ∣ Nat.card ↥sc.toHypothesis.QK := Nat.dvd_of_mem_primeFactors hmem
+    have hprime : p.Prime := Nat.prime_of_mem_primeFactors hp
+    exact hprime.one_lt.ne'
+      (Nat.eq_one_of_dvd_coprimes (sc.coprime_card_QK_V ind hQ1) hpQK hpV)
+  · intro p hp
+    simp only [Set.mem_setOf_eq, not_not]
+    rwa [sc.toHypothesis.index_V_subgroupOf_eq_card_QK] at hp
+
+end SecondCaseHypothesis
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
