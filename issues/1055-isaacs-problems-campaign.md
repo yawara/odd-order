@@ -5454,3 +5454,59 @@ leaf = `Ch01_Sylow/ProblemsBrodkey.lean` (300 行, `OddOrder.lean` 配線済)、
 `G = NP` かつ `N ⊴ G` なら **`G` の Sylow `p`-部分群は全て `P^n` (`n ∈ N`) の形**
 (`g = p'n` と書けば `P^{p'n} = P^n`) なので、任意の対 `(S', T') = (P^{n₁}, P^{n₂})` の交わりは
 `(P ∩ P^{n₂n₁⁻¹})^{n₁}` の共役 = 同位数。これで位数最小性が全体に及ぶ。
+
+
+## Ch.1 §1G (書籍 p. 43) — 着手 (2026-07-28)
+
+leaf = `Ch01_Sylow/ProblemsChermakDelgado.lean` (`OddOrder.lean` 配線済)。§1G は
+Chermak–Delgado (Thm 1.41) と最大測度束 `L(G)` (Thm 1.44) の節で,
+**本文の定理は `OddOrder/GroupTheory/ChermakDelgado.lean` に landing 済**
+(`chermakDelgadoMeasure` / `chermakDelgadoLattice` / `chermakDelgadoSubgroup` /
+`chermakDelgado` = Thm 1.41 / `not_isSimpleGroup_and_nonabelian_of_chermakDelgadoMeasure_gt`
+= Cor 1.46)。
+
+⚠ **文言は PDF ページ画像で確定** — `references/isaacs/pages/isaacs-p043-056.png`
+(書籍 p. 43 = PDF p. 56) に保存。pdftotext は `<` と `≤` を潰すが、
+**1G.1 と 1G.4 の不等号は厳密 `<`**。`≤` だと Thm 1.41 そのもので自明になってしまうので、
+ここは読み違えると問題が消える。
+
+* ✅ **1G.1** `eq_centralizer_and_mem_lattice_of_no_smaller_characteristic` (2026-07-28)。
+  `|G : N| < |G : A|²` なる特性可換 `N` が存在しないなら
+  `A = C_G(A)`, `A ∈ L(G)`, `|G : Z(G)| = |G : A|²`。
+  Thm 1.41 の不等式連鎖
+  `|G:M|·|A|² ≤ |G:M|·m(A) ≤ |G:M|·m(M) = |G|·|C_G(M)| ≤ |G|² = |G:A|²·|A|²`
+  が仮定より全て等号になることを追跡する。
+* 🔶 **1G.2** — Hint 第 1 文 (`L(G)` は共役で閉じる) は landing 済
+  (`chermakDelgadoLattice_conj_smul_mem` + 部品 `card_conj_smul` /
+  `centralizer_conj_smul` (`C_G(gHg⁻¹) = g C_G(H) g⁻¹`) /
+  `chermakDelgadoMeasure_conj_smul`)。**本体は実装待ち**。
+
+### 1G.2 の設計 (筋は確定, 実装待ち)
+
+背理法。`H ∈ L(G)`, `H < ⊤` で「`H` を含む真の正規部分群が無い」と仮定する。
+
+1. `H` を含み `L(G)` に属する**真の**部分群のうち包含で極大なものを `K` とする
+   (`H` 自身が候補なので非空)。
+2. `H` の正規閉包は `⊤` (仮定) なので、`K` に含まれない共役 `H' := gHg⁻¹` が存在する
+   (全共役が `K` に入るなら正規閉包 `≤ K < ⊤` で矛盾)。
+3. `K ⊔ H' ∈ L(G)` (共役閉性 + `chermakDelgadoLattice_sup_mem`) で `H` を含み `K` を真に含む
+   ので、`K` の極大性から `K ⊔ H' = ⊤`。
+4. `chermakDelgadoLattice_sup_eq_mul` より `⊤ = K · H'` (集合として)。よって
+   `g⁻¹ = k · y` (`k ∈ K`, `y ∈ H'`) と書ける。
+5. `H = (g⁻¹) H' (g⁻¹)⁻¹ = k (y H' y⁻¹) k⁻¹ = k H' k⁻¹` (`y ∈ H'` は `H'` を正規化)。
+   ゆえに `H' = k⁻¹ H k ≤ k⁻¹ K k = K` (`H ≤ K`, `k ∈ K`) で 2 に矛盾。∎
+
+⚠ 実装上の注意: `MulAut.conj g • v` は `group` タクティクが unfold できないので
+`change g * v * g⁻¹ = ...` を挟む。`Subgroup.mem_smul_pointwise_iff_exists` の
+∃-形で扱うのが `mem_pointwise_smul_iff_inv_smul_mem` より扱いやすい
+(`(MulAut.conj g)⁻¹` が `MulAut.conj g⁻¹` に syntactic に落ちないため)。
+* ⬜ **1G.3**: `G` 単純, `|H|·|C_G(H)| = |G|` ⟹ `H = 1` or `H = G`。
+  **1G.2 から従う**: `G` 非可換なら `m(⊥) = |G| = m(H)` かつ最大測度は `|G|`
+  (超えると Cor 1.46 で非単純) なので `H ∈ L(G)`、1G.2 より `H` は真の正規部分群 = `⊥` に
+  含まれる。`G` 可換単純なら位数素数で部分群は `⊥`, `⊤` のみ。
+* ⬜ **1G.4**: `G` 非可換, `A` 可換 ⟹ `|G : N| < |G : A|²` なる**正規**可換 `N` が存在。
+  ⚠ 未解決点: 1G.1 の等号ケース (`A = C_G(A) ∈ L(G)`, `M = Z(G)`) で、
+  `Z(G)` は等号しか与えないので**別の正規可換部分群**を作る必要がある。
+  1G.2 で `A ⊆ M' < G` (正規) は取れるが `M'` は可換とは限らない。要検討。
+
+**§1G の実装順**: 1G.2 → 1G.3 (1G.2 に依存) → 1G.4。

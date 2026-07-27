@@ -194,6 +194,7 @@ import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch01_Sylow.Problems
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsAlternating
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsBrodkey
+import OddOrder.Isaacs.Ch01_Sylow.ProblemsChermakDelgado
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsFrobeniusFrattini
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsNonSimple
 import OddOrder.Isaacs.Ch01_Sylow.ProblemsOrder120
