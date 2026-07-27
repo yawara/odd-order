@@ -26,6 +26,9 @@ pdftotext は `<` と `≤` を潰すが, **1G.1 と 1G.4 の不等号は厳密 
 ## Main results
 
 - `eq_centralizer_and_mem_lattice_of_no_smaller_characteristic` — **Problem 1G.1**。
+- `card_conj_smul` / `centralizer_conj_smul` / `chermakDelgadoMeasure_conj_smul` /
+  `chermakDelgadoLattice_conj_smul_mem` — **1G.2 の Hint 第 1 文**
+  (`L(G)` は共役で閉じる) とその部品。
 -/
 
 namespace OddOrder.Isaacs.Ch01
@@ -132,5 +135,60 @@ theorem eq_centralizer_and_mem_lattice_of_no_smaller_characteristic {A : Subgrou
     rw [← hZM]; exact heq
 
 end -- Problem 1G.1
+
+section /- 1G: `L(G)` は共役で閉じる (1G.2 の Hint 第 1 文) -/
+
+open Pointwise
+
+variable {G : Type*} [Group G]
+
+/-- 共役は部分群の位数を変えない。 -/
+theorem card_conj_smul (g : G) (S : Subgroup G) :
+    Nat.card ↥(MulAut.conj g • S) = Nat.card ↥S :=
+  Subgroup.card_map_of_injective (f := (MulAut.conj g).toMonoidHom) (MulAut.conj g).injective
+
+/-- 共役部分群の中心化群は中心化群の共役: `C_G(gHg⁻¹) = g C_G(H) g⁻¹`。 -/
+theorem centralizer_conj_smul (g : G) (H : Subgroup G) :
+    (centralizer ((MulAut.conj g • H : Subgroup G) : Set G) : Subgroup G)
+      = MulAut.conj g • (centralizer (H : Set G) : Subgroup G) := by
+  ext u
+  rw [Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hu
+    refine (Subgroup.mem_smul_pointwise_iff_exists u (MulAut.conj g) _).mpr
+      ⟨g⁻¹ * u * g, Subgroup.mem_centralizer_iff.mpr fun w hw => ?_,
+        by change g * (g⁻¹ * u * g) * g⁻¹ = u; group⟩
+    have hmem : g * w * g⁻¹ ∈ (MulAut.conj g • H : Subgroup G) :=
+      (Subgroup.mem_smul_pointwise_iff_exists _ (MulAut.conj g) H).mpr ⟨w, hw, rfl⟩
+    have hc := hu _ hmem
+    calc w * (g⁻¹ * u * g) = g⁻¹ * ((g * w * g⁻¹) * u) * g := by group
+      _ = g⁻¹ * (u * (g * w * g⁻¹)) * g := by rw [hc]
+      _ = (g⁻¹ * u * g) * w := by group
+  · intro hu h hh
+    obtain ⟨v, hv, hvu⟩ := (Subgroup.mem_smul_pointwise_iff_exists u (MulAut.conj g) _).mp hu
+    obtain ⟨w, hw, hwh⟩ := (Subgroup.mem_smul_pointwise_iff_exists h (MulAut.conj g) H).mp hh
+    have hc : w * v = v * w := Subgroup.mem_centralizer_iff.mp hv w hw
+    have hu' : u = g * v * g⁻¹ := hvu.symm
+    have hh' : h = g * w * g⁻¹ := hwh.symm
+    rw [hu', hh']
+    calc (g * w * g⁻¹) * (g * v * g⁻¹) = g * (w * v) * g⁻¹ := by group
+      _ = g * (v * w) * g⁻¹ := by rw [hc]
+      _ = (g * v * g⁻¹) * (g * w * g⁻¹) := by group
+
+/-- 共役は Chermak–Delgado 測度を変えない。 -/
+theorem chermakDelgadoMeasure_conj_smul (g : G) (H : Subgroup G) :
+    (MulAut.conj g • H).chermakDelgadoMeasure = H.chermakDelgadoMeasure := by
+  rw [chermakDelgadoMeasure_def, chermakDelgadoMeasure_def, centralizer_conj_smul,
+    card_conj_smul, card_conj_smul]
+
+/-- **1G.2 の Hint 第 1 文**: 最大測度束 `L(G)` は共役で閉じている。 -/
+theorem chermakDelgadoLattice_conj_smul_mem {H : Subgroup G}
+    (hH : H ∈ chermakDelgadoLattice G) (g : G) :
+    MulAut.conj g • H ∈ chermakDelgadoLattice G := by
+  intro K
+  rw [chermakDelgadoMeasure_conj_smul]
+  exact hH K
+
+end -- `L(G)` は共役で閉じる
 
 end OddOrder.Isaacs.Ch01

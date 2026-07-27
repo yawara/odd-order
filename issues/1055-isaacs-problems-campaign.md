@@ -5476,10 +5476,30 @@ Chermak–Delgado (Thm 1.41) と最大測度束 `L(G)` (Thm 1.44) の節で,
   Thm 1.41 の不等式連鎖
   `|G:M|·|A|² ≤ |G:M|·m(A) ≤ |G:M|·m(M) = |G|·|C_G(M)| ≤ |G|² = |G:A|²·|A|²`
   が仮定より全て等号になることを追跡する。
-* ⬜ **1G.2**: `H ∈ L(G)`, `H < G` なら `H ⊆ M < G` なる正規 `M` が存在。
-  Hint: `H` の共役は全て `L(G)` に属し、`L(G)` の 2 元の積は部分群
-  (`chermakDelgadoLattice_sup_eq_mul`)。`H` が真の正規部分群に含まれないなら
-  `G = HK` (`K < G`, `K` は `H` の共役を含む) と書けることを示して矛盾を導く。
+* 🔶 **1G.2** — Hint 第 1 文 (`L(G)` は共役で閉じる) は landing 済
+  (`chermakDelgadoLattice_conj_smul_mem` + 部品 `card_conj_smul` /
+  `centralizer_conj_smul` (`C_G(gHg⁻¹) = g C_G(H) g⁻¹`) /
+  `chermakDelgadoMeasure_conj_smul`)。**本体は実装待ち**。
+
+### 1G.2 の設計 (筋は確定, 実装待ち)
+
+背理法。`H ∈ L(G)`, `H < ⊤` で「`H` を含む真の正規部分群が無い」と仮定する。
+
+1. `H` を含み `L(G)` に属する**真の**部分群のうち包含で極大なものを `K` とする
+   (`H` 自身が候補なので非空)。
+2. `H` の正規閉包は `⊤` (仮定) なので、`K` に含まれない共役 `H' := gHg⁻¹` が存在する
+   (全共役が `K` に入るなら正規閉包 `≤ K < ⊤` で矛盾)。
+3. `K ⊔ H' ∈ L(G)` (共役閉性 + `chermakDelgadoLattice_sup_mem`) で `H` を含み `K` を真に含む
+   ので、`K` の極大性から `K ⊔ H' = ⊤`。
+4. `chermakDelgadoLattice_sup_eq_mul` より `⊤ = K · H'` (集合として)。よって
+   `g⁻¹ = k · y` (`k ∈ K`, `y ∈ H'`) と書ける。
+5. `H = (g⁻¹) H' (g⁻¹)⁻¹ = k (y H' y⁻¹) k⁻¹ = k H' k⁻¹` (`y ∈ H'` は `H'` を正規化)。
+   ゆえに `H' = k⁻¹ H k ≤ k⁻¹ K k = K` (`H ≤ K`, `k ∈ K`) で 2 に矛盾。∎
+
+⚠ 実装上の注意: `MulAut.conj g • v` は `group` タクティクが unfold できないので
+`change g * v * g⁻¹ = ...` を挟む。`Subgroup.mem_smul_pointwise_iff_exists` の
+∃-形で扱うのが `mem_pointwise_smul_iff_inv_smul_mem` より扱いやすい
+(`(MulAut.conj g)⁻¹` が `MulAut.conj g⁻¹` に syntactic に落ちないため)。
 * ⬜ **1G.3**: `G` 単純, `|H|·|C_G(H)| = |G|` ⟹ `H = 1` or `H = G`。
   **1G.2 から従う**: `G` 非可換なら `m(⊥) = |G| = m(H)` かつ最大測度は `|G|`
   (超えると Cor 1.46 で非単純) なので `H ∈ L(G)`、1G.2 より `H` は真の正規部分群 = `⊥` に
