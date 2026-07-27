@@ -227,6 +227,38 @@ repo の carrier は 2 元に固定しており、**全 member の既約性を�
    1. `horthχ` (正規直交) → `coherentEqualDegreeW` (landing 済) に差し替えれば不要
    2. 基底ケース `isCoherent_pair_of_differenceImage` (2 元形に本質依存) の一般版
 
+## 進捗 (2026-07-27、残り 2 点のうち 1 点完了)
+
+- [x] **`horthχ` → `coherentEqualDegreeW` 差し替え完了**。本体は正規直交 `⟨χᵢ,χⱼ⟩ = δᵢⱼ` を
+      作らず、対直交 (`hyp.pairwise_orthogonal`) + 非零ノルム (`hdeg0` から
+      `eq_zero_of_inner_self_re_eq_zero` 経由) を渡すだけになった。
+      `hgram` は **`xFamily_inner` そのもの** (前 commit で一般ノルム化済) で、
+      以前あった `exact horthχ i j` の後段が不要になった。
+- [ ] **基底ケース `|S| = 2` の一般版** — `hirr` の**最後の使用箇所**
+
+### 基底ケースの設計 (実測済、次セッション向け)
+
+`S = {χ₀, χ̄₀}`、`c := ⟨χ₀,χ₀⟩`、`R := hyp.difference_image hχ₀` (orthonormal, サイズ自由)。
+
+書籍「If `|𝒮| = 2`, this follows from (5.2.d)」の中身は、**`R(χ₀)` を半分に割る**こと:
+
+1. 等長性から `⟨τ(χ₀−χ̄₀), τ(χ₀−χ̄₀)⟩ = ⟨χ₀−χ̄₀, χ₀−χ̄₀⟩ = 2c`
+   (`⟨χ₀,χ̄₀⟩ = 0`・`‖χ̄₀‖² = ‖χ₀‖²` を使う)。
+   一方 `R` の正規直交性から `⟨∑_{α∈R} α, ∑_{α∈R} α⟩ = |R|` ⟹ **`|R| = 2c`**。
+2. `E ⊆ R.imageSet` を `|E| = c` に取り (`Finset.exists_subset_card_eq`)、
+   `X₀ := ∑_{α∈E} α`、`X₁ := X₀ − τ(χ₀−χ̄₀)` (`= −∑_{α∉E} α`)。
+3. Gram 行列が一致する: `⟨X₀,X₀⟩ = |E| = c = ⟨χ₀,χ₀⟩` /
+   `⟨X₀,X₁⟩ = c − |E| = 0 = ⟨χ₀,χ̄₀⟩` / `⟨X₁,X₁⟩ = |R| − c = c = ⟨χ̄₀,χ̄₀⟩`。
+4. ⟹ **`coherentEqualDegreeW` に `n = 2`, `χ = ![χ₀, χ̄₀]`, `X = ![X₀, X₁]` で流す**。
+   `himg` は `τ(χ̄₀−χ₀) = X₁ − X₀ = −τ(χ₀−χ̄₀)`、
+   `hXZ` は `R.mem_ZIrr` と `hZIrr`、`hdeg` は既存の `hconst`。
+
+⚠ **要追加仮説**: 手順 2 で `c` が**自然数**である必要がある (`|E| = c` を取るため)。
+`GeneralHypothesis` は member が指標であることを記録していないので、
+基底ケース補題に `(hc : ∃ m : ℕ, ⟨χ₀,χ₀⟩ = (m : ℂ))` を持たせるのが素直
+(書籍の 𝒮 ⊆ 指標 から従う正当な仮説で、consumer 側で容易に discharge できる)。
+既存 `isCoherent_pair_of_differenceImage` (2 元形) はそのまま残し、一般版を別立てにする。
+
 ## 完了条件
 
 `coherent_of_constant_degree` が `hirr` 無しで成立し、旧版がその特殊化になること。

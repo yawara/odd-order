@@ -644,22 +644,24 @@ theorem coherent_of_constant_degree
       · rw [hβdef, commonImage_inner hyp.toGeneralHypothesis hZIrr hsuppdiff hdp0
             (hmem 0) hζ₀S (hmem j) hj,
           hyp.pairwise_orthogonal (hmem 0) (hmem j) (Ne.symm hj)]; ring
-    have horthχ : ∀ i j, ClassFunction.inner (χ i) (χ j) = if i = j then (1 : ℂ) else 0 := by
-      intro i j
-      by_cases hij : i = j
-      · rw [if_pos hij, hij]; exact hirr (χ j) (hmem j)
-      · rw [if_neg hij]; exact hyp.pairwise_orthogonal (hmem i) (hmem j) (fun h => hij (hinj h))
+    -- pairwise orthogonality and nonzero norms — **no unit norm needed**: the weighted builder
+    -- `coherentEqualDegreeW` asks only that the target family match the Gram matrix of `χ`.
+    have horthχ : ∀ i j, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0 :=
+      fun i j hij => hyp.pairwise_orthogonal (hmem i) (hmem j) (fun h => hij (hinj h))
+    have hnorm : ∀ j, ClassFunction.inner (χ j) (χ j) ≠ 0 := by
+      intro j hzero
+      have hz : χ j = 0 := eq_zero_of_inner_self_re_eq_zero (by rw [hzero]; simp)
+      exact hdeg0 (χ j) (hmem j) (by rw [hz]; simp)
     have hcoh : IsCoherent hyp.tau (Set.range χ) A := by
-      refine coherentEqualDegree (χ := χ) (X := X) hn2 horthχ ?_ ?_ ?_ ?_
+      refine coherentEqualDegreeW (χ := χ) (X := X) hn2 horthχ hnorm ?_ ?_ ?_ ?_
         (hdeg0 (χ 0) (hmem 0)) h1A ?_
-      · -- `horthX`: `⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩` (`xFamily_inner`), then `horthχ`.
+      · -- `hgram`: `⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩` — exactly `xFamily_inner`.
         intro i j
-        rw [hXdef,
-          xFamily_inner χ β (fun p q =>
-              hyp.tau_isometry_memberDiff (hmem 0) (hmem p) (hmem 0) (hmem q)
-                (hsuppdiff _ (hmem 0) _ (hmem p)) (hsuppdiff _ (hmem 0) _ (hmem q)))
-            (commonImage_self hyp.toGeneralHypothesis hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S) hB i j]
-        exact horthχ i j
+        rw [hXdef]
+        exact xFamily_inner χ β (fun p q =>
+            hyp.tau_isometry_memberDiff (hmem 0) (hmem p) (hmem 0) (hmem q)
+              (hsuppdiff _ (hmem 0) _ (hmem p)) (hsuppdiff _ (hmem 0) _ (hmem q)))
+          (commonImage_self hyp.toGeneralHypothesis hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S) hB i j
       · -- `himg`: `(χⱼ − χ₀)^τ = Xⱼ − X₀`.
         intro j
         simp only [hXdef, sub_self, map_zero, sub_zero]
