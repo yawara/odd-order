@@ -6,7 +6,6 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
-import OddOrder.Peterfalvi.S08_PGroupReduction
 import OddOrder.GroupTheory.NilpotentAbelianization
 
 /-!

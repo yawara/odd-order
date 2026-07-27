@@ -714,6 +714,40 @@ theorem coprime_commonIndex_primePower
   rw [hθ]
   exact hidx_p.pow_right m
 
+/-- **Peterfalvi (6.5)(c) — the arithmetic contradiction.**  The numeric heart of (6.5)(c): a
+non-abelian `p`-group kernel is incompatible with `|L:H| ∣ p − 1` under the (6.5)(a) index bound.
+
+Given a prime `p` that is odd, an odd `d` (playing `|L:H|`) with `d ∣ p − 1`, and naturals with
+`p² ≤ HH'` (the non-abelian `p`-group bound `p² ≤ |H:H′|`) and `HH' ≤ 4·d² + 1` (the (6.5)(a) index
+bound `|H:H′| ≤ 4|L:H|² + 1`), we derive `False`.
+
+Peterfalvi's argument (mmd 04.8 L72): `d ∣ p − 1` with `d` odd and `p − 1` even forces the quotient
+`(p−1)/d` to be even, hence `≥ 2`, so `p − 1 ≥ 2d`, `p ≥ 2d + 1`, and
+`p² ≥ (2d+1)² = 4d² + 4d + 1 > 4d² + 1 ≥ p²`.  This is exactly (6.5)(c): if `|L:K| ∣ p − 1` then the
+(6.5)(a) bound `|K:H₁| ≤ 4|L:K|² + 1` fails for the non-abelian `p`-group `K/M`. -/
+theorem six_five_c_arith {d p HH' : ℕ} (hp : p.Prime) (hpodd : Odd p)
+    (hdodd : Odd d) (hdvd : d ∣ p - 1) (hpsq : p ^ 2 ≤ HH')
+    (hbound : HH' ≤ 4 * d ^ 2 + 1) : False := by
+  have hp2 : 2 ≤ p := hp.two_le
+  have hdpos : 0 < d := hdodd.pos
+  obtain ⟨k, hk⟩ := hdvd
+  -- `p − 1` is even; `d` odd with `d·k = p − 1` even forces `k` even, hence `k ≥ 2`.
+  have hp1even : Even (p - 1) := Nat.Odd.sub_odd hpodd odd_one
+  have hkeven : Even k :=
+    (Nat.even_mul.mp (hk ▸ hp1even)).resolve_left (Nat.not_even_iff_odd.mpr hdodd)
+  have hk0 : k ≠ 0 := by rintro rfl; simp only [mul_zero] at hk; omega
+  have hk2 : 2 ≤ k := by obtain ⟨m, rfl⟩ := hkeven; omega
+  -- `p ≥ 2d + 1`.
+  have hpk : p = d * k + 1 := by omega
+  have hdk : 2 * d ≤ d * k := by
+    calc 2 * d = d * 2 := by ring
+      _ ≤ d * k := by gcongr
+  have hpge : 2 * d + 1 ≤ p := by omega
+  -- square it against the (6.5)(a) bound.
+  have hsq : (2 * d + 1) ^ 2 ≤ p ^ 2 := Nat.pow_le_pow_left hpge 2
+  have hexp : (2 * d + 1) ^ 2 = 4 * d ^ 2 + 4 * d + 1 := by ring
+  omega
+
 /-- A member-family square sum is positive once it contains one irreducible character. -/
 theorem natDegreeSquareSum_pos_of_memberFamily
     {G : Type*} [Group G] {ι : Type*} {s : Finset ι}
