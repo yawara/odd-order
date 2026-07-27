@@ -749,7 +749,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **(7.8)** Coherent case: (a) β = 1_G − ζ^ν + a·Σ φ(1)/(e‖φ‖²) φ^ν + Γ with a ∈ ℤ — All three parts have genuine sorry-free proofs, but factored differently from the book. (c) is at full book strength: chiRho_eq_inner_beta_induced proves the po…
+- **(7.8)** 【**2026-07-26 実測: 書籍強度・gap なし**】 書籍 p.40 をページ画像で確定し 1 対 1 照合済 — 同 unit の「#### (7.8) の実測 (2026-07-26)」表を参照。残る差は「書籍 1 番号 = Lean 1 定理」の体裁のみ。 以下は旧記述: Coherent case: (a) β = 1_G − ζ^ν + a·Σ φ(1)/(e‖φ‖²) φ^ν + Γ with a ∈ ℤ — All three parts have genuine sorry-free proofs, but factored differently from the book. (c) is at full book strength: chiRho_eq_inner_beta_induced proves the po…
 - **(7.9)** ✅ **2026-07-19 lane a が一般化完了** — 唯一 Frobenius 専用だった parity step を `Hypothesis79.delta_even` (S09_TwoFamiliesParity.lean) として Hypothesis (7.9) 一般形で証明し、`FrobeniusFamily.hypothesis79_delta_even` はその instantiation に縮小。以下は旧記述: Two coherent families over odd-order G with disjoint A_i^{τ_i}: (β₁,ζ₂ — TwoFamilies.lean + S09_ParityPrimitive.lean + S09_FrobeniusParity.lean. The full book proof is assembled sorry-free for pairs of members of a FrobeniusFamily (h…
 - **(7.10)** k ≥ 2 Frobenius subgroups with pairwise-coprime TI kernels force (|G₀| — S09_FrobeniusCardG0LowerBound.lean, sorry-free, exact displayed inequality over ℚ, hypotheses (a)-(d) faithfully bundled in FrobeniusFamily. ONE genuine special… **[2026-07-18: hnilp CLOSED ⟹ 特殊化債務解消]** `card_G0_lower_bound` が担いでいた `hnilp : ∀ j, IsNilpotent ↥((H j).subgroupOf (L j))` を除去。教科書は (7.10) の証明中で "By a theorem of Thompson" として**導出**しており仮説ではない。Isaacs Thm 6.24 = `Isaacs.Ch06.IsFrobeniusGroup.isNilpotent_kernel` (KernelNilpotent.lean:382, 2026-07-17 landed) を条件 (7.10)(a) の `F.isFrobenius` に適用する `FrobeniusFamily.isNilpotent_kernel` を新設して内部供給。axiom-clean。
 - **(7.11)** Main theorem: no group satisfying the hypothesis of (7.10) has G₀ = {1 — S09_FrobeniusCardG0LowerBound.lean (unconditional form) + FrobeniusFamily.lean (8 conditional consumer forms). not_trivial_G0 is sorry-free and consumed on the … **[2026-07-18: hnilp CLOSED ⟹ 特殊化債務解消]** (7.10) と同じく `not_trivial_G0` から `hnilp` を除去 (Thompson 経由で内部導出)。唯一の consumer `S14_MaximalI/TypeICovering.not_all_maximal_typeI` の局所 `have hnilp` 10 行も不要になり削除 (full build green, axiom-clean)。
@@ -783,7 +783,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **(10.11)** In case (b) of (8.8): |W1|, |W2| prime; for Type II maximal M: H eleme — First assertion at full book strength (theorem88_caseB_prime_orders, S12_MaximalIII_IV_V.lean; Coq FTtypeP_pair_primes). The Type-II remainder (Coq FTtypeII_pri…
+- **(10.11)** 【**2026-07-27 実測: 両主張とも書籍強度**】 commit 3a8b3f282 参照 (AxiomsCheck の注記が stale だった)。 以下は旧記述: In case (b) of (8.8): |W1|, |W2| prime; for Type II maximal M: H eleme — First assertion at full book strength (theorem88_caseB_prime_orders, S12_MaximalIII_IV_V.lean; Coq FTtypeP_pair_primes). The Type-II remainder (Coq FTtypeII_pri…
 
 ### Pf §13 — Peterfalvi §13 Maximal Subgroups of Types III and IV, results
 
@@ -791,7 +791,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **(11.8)** For ζ ∈ S(HC): (μ0 − ζ)^τ − Σ_{i<q} ω_{i0}^σ is not orthogonal to (Irr — S13_Orthogonality.lean (+ S13_Lemmas113To115.lean). Stated EXISTENTIALLY — produces one canonical degree-w1 irreducible ζ ∈ S (∈ S(HC) via (11.5)) with the grid…
+- **(11.8)** 【**2026-07-27 実測: 既に書籍の `∀ ζ` 形**】 commit b5e3b00be 参照 (「存在形しかない」は誤り)。 以下は旧記述: For ζ ∈ S(HC): (μ0 − ζ)^τ − Σ_{i<q} ω_{i0}^σ is not orthogonal to (Irr — S13_Orthogonality.lean (+ S13_Lemmas113To115.lean). Stated EXISTENTIALLY — produces one canonical degree-w1 irreducible ζ ∈ S (∈ S(HC) via (11.5)) with the grid…
 
 ### Pf §15 — Peterfalvi §15 "The Subgroups S and T", results
 
