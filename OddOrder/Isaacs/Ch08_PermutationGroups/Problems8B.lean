@@ -47,6 +47,9 @@ Isaacs の定義 (「`Δ` の translate は `Δ` 自身か, `Δ` と交わらな
   の次数 `|Ω|` は奇素数 (`t` が `K` を反転 ⟹ `K` の部分群はすべて `G` に正規 ⟹ その軌道
   が block ⟹ 原始性で `K` は真の非自明部分群をもたない)。
   ⚠ `G ≅ D₂ₚ` の同型そのものは未形式化。
+- `oddCore`, `isPGroup_two_of_oddCore_eq_bot`, `smul_eq_self_of_odd_of_sq_smul_eq`,
+  `smul_eq_self_of_odd_of_ncard_le_two` — **Problem 8B.7 への道具**: 奇位数元が生成する
+  部分群 (`O²`) と, 奇位数元が高々 2 点の不変集合を各点固定すること。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -716,6 +719,87 @@ theorem prime_card_of_card_stabilizer_eq_two [Finite G] [Finite Ω] [FaithfulSMu
   · exact absurd (Subgroup.mem_bot.mp (h ▸ Subgroup.mem_zpowers (y : G))) hy1
   · rw [← hKΩ, ← h, Nat.card_zpowers, hyord]
     exact hp
+
+/-! ### Problem 8B.7 — 点安定化群が長さ 3 の軌道をもつ場合 -/
+
+/-- 部分群 `D` の**奇位数元が生成する部分群**。有限群では Isaacs の `O²(D)`
+(2-剰余部分群 = `D / N` が 2-群となる最小の正規部分群 `N`) と一致する。 -/
+def oddCore (D : Subgroup G) : Subgroup G :=
+  Subgroup.closure {x : G | x ∈ D ∧ Odd (orderOf x)}
+
+lemma oddCore_le (D : Subgroup G) : oddCore D ≤ D :=
+  (Subgroup.closure_le _).mpr fun _ hx => hx.1
+
+lemma mem_oddCore {D : Subgroup G} {x : G} (hx : x ∈ D) (hodd : Odd (orderOf x)) :
+    x ∈ oddCore D :=
+  Subgroup.subset_closure ⟨hx, hodd⟩
+
+/-- `D` の奇位数元がすべて自明なら `D` は 2-群。
+
+`g` の位数を `2^a · m` (`m` 奇) と分解すると `g^(2^a)` は奇位数なので
+`oddCore D = ⊥` から `1`, したがって `g` の位数は `2` 冪。 -/
+lemma isPGroup_two_of_oddCore_eq_bot [Finite G] {D : Subgroup G} (h : oddCore D = ⊥) :
+    IsPGroup 2 ↥D := by
+  intro g
+  have hgne : orderOf (g : G) ≠ 0 := (orderOf_pos (g : G)).ne'
+  refine ⟨(orderOf (g : G)).factorization 2, ?_⟩
+  have hdvd : 2 ^ (orderOf (g : G)).factorization 2 ∣ orderOf (g : G) :=
+    Nat.ordProj_dvd _ 2
+  have hord : orderOf ((g : G) ^ (2 ^ (orderOf (g : G)).factorization 2))
+      = orderOf (g : G) / 2 ^ (orderOf (g : G)).factorization 2 := by
+    rw [orderOf_pow, Nat.gcd_eq_right hdvd]
+  have hodd : Odd (orderOf ((g : G) ^ (2 ^ (orderOf (g : G)).factorization 2))) := by
+    rw [hord]
+    exact Nat.odd_iff.mpr (Nat.two_dvd_ne_zero.mp (Nat.not_dvd_ordCompl Nat.prime_two hgne))
+  have hmem : ((g : G) ^ (2 ^ (orderOf (g : G)).factorization 2)) ∈ oddCore D :=
+    mem_oddCore (D.pow_mem g.2 _) hodd
+  rw [h, Subgroup.mem_bot] at hmem
+  exact Subtype.ext (by push_cast; exact hmem)
+
+/-- 奇位数の元が `γ` を `x²` で固定するなら `x` 自身でも固定する
+(`x` は `⟨x²⟩` に属するから)。 -/
+lemma smul_eq_self_of_odd_of_sq_smul_eq {x : G} (hodd : Odd (orderOf x)) {γ : Ω}
+    (h2 : (x * x) • γ = γ) : x • γ = γ := by
+  obtain ⟨m, hm⟩ := hodd
+  have hpow : ∀ k : ℕ, ((x * x) ^ k) • γ = γ := by
+    intro k
+    induction k with
+    | zero => simp
+    | succ n ih => rw [pow_succ, mul_smul, h2, ih]
+  have hx : (x * x) ^ (m + 1) = x := by
+    rw [← sq, ← pow_mul, show 2 * (m + 1) = orderOf x + 1 by omega, pow_succ,
+      pow_orderOf_eq_one, one_mul]
+  calc x • γ = ((x * x) ^ (m + 1)) • γ := by rw [hx]
+    _ = γ := hpow _
+
+/-- **8B.7 の鍵**: 奇位数の元 `x` が高々 2 点の集合 `S` を保つなら `S` を各点固定する。
+
+`x • γ ≠ γ` なら `S = {γ, x • γ}` (2 点) で `x² • γ ∈ S` は `γ` でしかありえず,
+奇位数から `x • γ = γ` (`smul_eq_self_of_odd_of_sq_smul_eq`) となって矛盾。 -/
+lemma smul_eq_self_of_odd_of_ncard_le_two [Finite Ω] {x : G} (hodd : Odd (orderOf x))
+    {S : Set Ω}
+    (hS : ∀ δ ∈ S, x • δ ∈ S) (hcard : S.ncard ≤ 2) {γ : Ω} (hγ : γ ∈ S) :
+    x • γ = γ := by
+  classical
+  by_contra hne
+  have hxγ : x • γ ∈ S := hS γ hγ
+  have hsq : (x * x) • γ ∈ S := by rw [mul_smul]; exact hS _ hxγ
+  -- `{γ, x • γ} ⊆ S` は 2 点なので `S = {γ, x • γ}`。
+  have hsub : ({γ, x • γ} : Set Ω) ⊆ S := by
+    intro z hz
+    rcases hz with rfl | hz
+    · exact hγ
+    · rw [Set.mem_singleton_iff] at hz; exact hz ▸ hxγ
+  have hpair : ({γ, x • γ} : Set Ω).ncard = 2 := by
+    rw [Set.ncard_pair (Ne.symm hne)]
+  have hSeq : S = {γ, x • γ} :=
+    (Set.eq_of_subset_of_ncard_le hsub (by rw [hpair]; exact hcard) (Set.toFinite _)).symm
+  -- `x² • γ` は `γ` か `x • γ`; 後者なら `x • γ = γ`。
+  rw [hSeq] at hsq
+  rcases hsq with h | h
+  · exact hne (smul_eq_self_of_odd_of_sq_smul_eq hodd h)
+  · rw [Set.mem_singleton_iff, mul_smul] at h
+    exact hne (MulAction.injective x h)
 
 end
 
