@@ -578,4 +578,57 @@ theorem exists_conj_mem_V_of_piPrime (ind : Hypothesis.TheoremAInductionBelow G 
 
 end SecondCaseHypothesis
 
+namespace SecondCaseHypothesis
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (sc : SecondCaseHypothesis G Ω)
+
+/-- **`QK` is a Hall `π`-subgroup of `H`**, `π` = the prime divisors of `|QK|`. -/
+theorem isHallSubgroup_QK_subgroupOf (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup
+      {p : ℕ | p ∈ (Nat.card ↥sc.toHypothesis.QK).primeFactors}
+      (sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H) := by
+  have hcard : Nat.card ↥(sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H)
+      = Nat.card ↥sc.toHypothesis.QK :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe sc.toHypothesis.QK_le_H).toEquiv
+  refine ⟨fun p hp => ?_, fun p hp => ?_⟩
+  · rw [hcard] at hp; exact hp
+  · rw [sc.toHypothesis.index_QK_subgroupOf_eq_card_V] at hp
+    simp only [Set.mem_setOf_eq]
+    intro hmem
+    have hprime : p.Prime := Nat.prime_of_mem_primeFactors hp
+    exact hprime.one_lt.ne'
+      (Nat.eq_one_of_dvd_coprimes (sc.coprime_card_QK_V ind hQ1)
+        (Nat.dvd_of_mem_primeFactors hmem) (Nat.dvd_of_mem_primeFactors hp))
+
+/-- **Every `π`-element of `H` lies in `QK`** (`π` = prime divisors of `|QK|`) —
+the book's "since the `π`-component of `x` is in `QK`" in step (6).
+
+`QK` is a **normal** Hall `π`-subgroup, so Hall's D- and C-theorems put every
+`π`-subgroup inside a conjugate of `QK`, which is `QK` itself. -/
+theorem mem_QK_of_piElement (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥) {x : ↥sc.toHypothesis.H}
+    (hx : ∀ q ∈ (orderOf x).primeFactors,
+      q ∈ (Nat.card ↥sc.toHypothesis.QK).primeFactors) :
+    x ∈ sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H := by
+  classical
+  have hU : ∀ q ∈ (Nat.card ↥(Subgroup.zpowers x)).primeFactors,
+      q ∈ {p : ℕ | p ∈ (Nat.card ↥sc.toHypothesis.QK).primeFactors} := by
+    intro q hq
+    rw [Nat.card_zpowers] at hq
+    exact hx q hq
+  obtain ⟨W, hW, hUW⟩ := OddOrder.Isaacs.Ch03.hall_D
+    (π := {p : ℕ | p ∈ (Nat.card ↥sc.toHypothesis.QK).primeFactors}) hU
+  obtain ⟨g, hg⟩ := OddOrder.Isaacs.Ch03.hall_C hW
+    (sc.isHallSubgroup_QK_subgroupOf ind hQ1)
+  -- `g x g⁻¹ ∈ QK`, and `QK ⊴ H`, so `x ∈ QK`
+  have hconj : g * x * g⁻¹ ∈ sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H := by
+    rw [← hg]
+    exact ⟨x, hUW (Subgroup.mem_zpowers x), rfl⟩
+  have := (sc.toHypothesis.QK_subgroupOf_H_normal).conj_mem _ hconj g⁻¹
+  simpa [mul_assoc] using this
+
+end SecondCaseHypothesis
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
