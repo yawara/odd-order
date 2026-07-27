@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.OddOrderInvolution
 import OddOrder.Peterfalvi.Appendices.FeitSibleyXsetInduction
 
 /-!
@@ -86,7 +87,8 @@ evaluation `χ₁(1)·(e'(z) − e'(1)) = −|H|·c₀` (`restrict_apply_sub_eq_
 with `χ₁(1) = a·d`, `|H| = d·|Q|` and the keystone `c₀ = λ + a·μ`, reads
 `(a·d)·Δ = −(d·|Q|)·(λ + a·μ)` with `Δ = e'(z) − e'(1)`.  Cancelling the nonzero `d` gives
 `a·Δ = −|Q|·(λ + a·μ)`, so `λ/a + μ = −(Δ/|Q|)`.  The central-character congruence (7)
-`e'(z) ≡ e'(1) (mod |Q|)` (`peterfalvi_67_hall_of_odd`) says `Δ/|Q|` is an algebraic integer, hence
+`e'(z) ≡ e'(1) (mod |Q|)` (`peterfalvi_67_hall_of_not_isConj_inv`) says `Δ/|Q|` is an algebraic
+integer, hence
 so is `λ/a + μ`, forcing `a ∣ λ` (`dvd_of_isIntegral_ratio`) — the last step of (6). -/
 theorem dvd_lam_of_evaluation_cong {a : ℕ} (ha : 0 < a) {lam mu : ℤ}
     {dc Qc Δ : ℂ} (hd0 : dc ≠ 0) (hQ0 : Qc ≠ 0)
@@ -592,6 +594,84 @@ theorem Q_le_centralizer_of_mem_central {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
     (hZcent : ∀ w ∈ Z, ∀ y ∈ hyp.Q1, ⁅w, y⁆ = 1) {z : G} (hzZ : z ∈ Z) :
     hyp.Q ≤ Subgroup.centralizer ({z} : Set G) :=
   hyp.Q_le_centralizer_of_centralizes_Q1 (hZQ1 hzZ) (hZcent z hzZ)
+
+open scoped Pointwise in
+/-- **Peterfalvi Appendix IV, step (7), opening line** (p. 149: "Since `d` is odd, we may assume
+that `𝒦₁ ∩ Z^# ≠ ∅` and `𝒦₂ = (𝒦₁)⁻¹`"): an element of `Z^#`, for a central `Z ≤ Z(Q₁)`, is
+**not** conjugate to its inverse in `G`.
+
+This is the non-reality input of `peterfalvi_67_hall`.  The book derives it from `d = |D|` being
+odd — the appendix makes **no** odd-order assumption on `G`, so this must not be routed through
+one (Ch. III applies the appendix to a group of even order).
+
+Proof, following the book.  If `g z⁻¹ g⁻¹ = z` then `z` is a non-trivial element of
+`Q ⊓ Q^g`, so `g ∈ H` by the trivial-intersection hypothesis.  Write `g = q·δ` with `q ∈ Q`,
+`δ ∈ D`.  Since `q` centralises `Z` and `δ z⁻¹ δ⁻¹` again lies in `Z` (`Z ⊴ H`), the factor `q`
+cancels and `δ` already inverts `z`.  Then `δ²` centralises `z ∈ Q₁^#`, so `δ² = 1` by
+fixed-point-freeness, and `δ = 1` because `|D| = d` is odd.  Hence `z = z⁻¹`, i.e. `z² = 1`,
+which forces `z = 1` in the odd-order group `Q₁`. -/
+theorem not_isConj_inv_of_mem_central [Finite G] (hd : Odd hyp.d)
+    (hQ1odd : Odd (Nat.card ↥hyp.Q1)) {Z : Subgroup G} (hZQ1 : Z ≤ hyp.Q1)
+    [(Z.subgroupOf hyp.H).Normal]
+    (hZcent : ∀ w ∈ Z, ∀ y ∈ hyp.Q1, ⁅w, y⁆ = 1) {z : G} (hzZ : z ∈ Z) (hz1 : z ≠ 1) :
+    ¬ IsConj z⁻¹ z := by
+  intro hconj
+  obtain ⟨g, hg⟩ := isConj_iff.mp hconj
+  have hzQ1 : z ∈ hyp.Q1 := hZQ1 hzZ
+  have hzQ : z ∈ hyp.Q := hyp.Q1_le_Q hzQ1
+  have hZH : Z ≤ hyp.H := hZQ1.trans (hyp.Q1_le_Q.trans hyp.Q_le_H)
+  -- `Z ⊴ H`, elementwise
+  have hZconj : ∀ h ∈ hyp.H, ∀ w ∈ Z, h * w * h⁻¹ ∈ Z := by
+    intro h hh w hw
+    have := (‹(Z.subgroupOf hyp.H).Normal›).conj_mem ⟨w, hZH hw⟩
+      (Subgroup.mem_subgroupOf.mpr hw) ⟨h, hh⟩
+    exact Subgroup.mem_subgroupOf.mp this
+  -- (i) `g ∈ H`, by the trivial-intersection hypothesis
+  have hgH : g ∈ hyp.H := by
+    by_contra hgH
+    have hmem : z ∈ hyp.Q ⊓ hyp.Q.map (MulAut.conj g).toMonoidHom :=
+      Subgroup.mem_inf.mpr ⟨hzQ, ⟨z⁻¹, inv_mem hzQ, hg⟩⟩
+    rw [hyp.Q_trivial_intersection g hgH, Subgroup.mem_bot] at hmem
+    exact hz1 hmem
+  -- (ii) split `g = q·δ` and cancel `q`, which centralises `Z`
+  have hgset : g ∈ (hyp.Q : Set G) * (hyp.D : Set G) := by rw [hyp.Q_mul_D_eq_H]; exact hgH
+  obtain ⟨q, hq, δ, hδ, rfl⟩ := Set.mem_mul.mp hgset
+  have hδH : δ ∈ hyp.H := hyp.D_le_H hδ
+  have hconjZ : δ * z⁻¹ * δ⁻¹ ∈ Z := hZconj δ hδH z⁻¹ (inv_mem hzZ)
+  have hqc : q * (δ * z⁻¹ * δ⁻¹) = (δ * z⁻¹ * δ⁻¹) * q :=
+    ((Subgroup.mem_centralizer_iff).mp
+      (hyp.Q_le_centralizer_of_mem_central hZQ1 hZcent hconjZ hq)
+        (δ * z⁻¹ * δ⁻¹) (Set.mem_singleton _)).symm
+  have hδinv : δ * z⁻¹ * δ⁻¹ = z := by
+    have hcancel : q * (δ * z⁻¹ * δ⁻¹) * q⁻¹ = δ * z⁻¹ * δ⁻¹ := by rw [hqc]; group
+    calc δ * z⁻¹ * δ⁻¹ = q * (δ * z⁻¹ * δ⁻¹) * q⁻¹ := hcancel.symm
+      _ = q * δ * z⁻¹ * (q * δ)⁻¹ := by group
+      _ = z := hg
+  -- (iii) `δ` inverts `z`, so `δ²` centralises it; fixed-point-freeness gives `δ² = 1`
+  have hδz : δ * z * δ⁻¹ = z⁻¹ := by
+    have h : (δ * z⁻¹ * δ⁻¹)⁻¹ = z⁻¹ := congrArg (fun x => x⁻¹) hδinv
+    calc δ * z * δ⁻¹ = (δ * z⁻¹ * δ⁻¹)⁻¹ := by group
+      _ = z⁻¹ := h
+  have hδsq : δ ^ 2 * z * (δ ^ 2)⁻¹ = z := by
+    calc δ ^ 2 * z * (δ ^ 2)⁻¹ = δ * (δ * z * δ⁻¹) * δ⁻¹ := by rw [sq]; group
+      _ = δ * z⁻¹ * δ⁻¹ := by rw [hδz]
+      _ = z := hδinv
+  have hδ2 : δ ^ 2 = 1 := by
+    by_contra hne
+    exact hz1 (hyp.D_fixedPointFree_on_Q1 (δ ^ 2) (pow_mem hδ 2) hne z hzQ1 hδsq)
+  -- (iv) `|D|` odd kills `δ`, and then `z² = 1` kills `z` in the odd-order `Q₁`
+  have hδ1 : δ = 1 :=
+    OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card (K := hyp.D) hd hδ hδ2
+  have hzinv : z⁻¹ = z := by
+    have h := hδz
+    rw [hδ1, one_mul, inv_one, mul_one] at h
+    exact h.symm
+  have hzsq : z ^ 2 = 1 := by
+    calc z ^ 2 = z * z := sq z
+      _ = z * z⁻¹ := by rw [hzinv]
+      _ = 1 := mul_inv_cancel z
+  exact hz1 (OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card
+    (K := hyp.Q1) hQ1odd hzQ1 hzsq)
 
 
 

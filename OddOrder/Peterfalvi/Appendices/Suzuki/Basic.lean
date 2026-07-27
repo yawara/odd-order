@@ -9,6 +9,7 @@ import Mathlib.GroupTheory.Sylow
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch2_Uniqueness.S07_Theorem74
 import OddOrder.Isaacs.Ch02_Subnormality.Theorem211Wielandt
+import OddOrder.GroupTheory.OddOrderInvolution
 
 /-!
 # Peterfalvi Part II: hypotheses (A1)–(A3) and Ch. I §1 Proposition 1
@@ -86,17 +87,6 @@ theorem exists_involution_conj_of_odd_orderOf {G : Type*} [Group G]
     _ = s * (s * v) := by rw [pow_orderOf_eq_one, one_mul]
     _ = v := by rw [← mul_assoc, hs, one_mul]
 
-/-- A subgroup of odd order contains no involution. -/
-theorem eq_one_of_sq_eq_one_of_odd_card {G : Type*} [Group G] [Finite G]
-    {K : Subgroup G} (hodd : Odd (Nat.card K)) {x : G} (hx : x ∈ K)
-    (hx2 : x ^ 2 = 1) : x = 1 := by
-  have hd2 : orderOf (⟨x, hx⟩ : K) ∣ 2 :=
-    orderOf_dvd_of_pow_eq_one (Subtype.ext (by push_cast; exact hx2))
-  have hdK : orderOf (⟨x, hx⟩ : K) ∣ Nat.card K := orderOf_dvd_natCard _
-  have hg := Nat.dvd_gcd hd2 hdK
-  have hc : Nat.gcd 2 (Nat.card K) = 1 := Nat.coprime_two_left.mpr hodd
-  rw [hc, Nat.dvd_one, orderOf_eq_one_iff] at hg
-  exact congrArg Subtype.val hg
 
 /-- A subgroup containing an involution has even order. -/
 theorem even_card_of_sq_eq_one_mem {G : Type*} [Group G] [Finite G]

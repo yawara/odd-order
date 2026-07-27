@@ -61,6 +61,7 @@ import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.GroupTheory.AbelianPowerSubgroups
 import OddOrder.GroupTheory.CardSupInf
 import OddOrder.GroupTheory.CyclicSylowBurnside
+import OddOrder.GroupTheory.OddOrderInvolution
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.PrimeComplementResidual

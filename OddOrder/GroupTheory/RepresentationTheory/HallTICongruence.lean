@@ -370,13 +370,12 @@ and an irreducible `ρ` constant on `Z^#` (with the normalizer–centralizer car
 `ψ(z) ≡ ψ(1) (mod |Q|)`.  The two non-hypothesis inputs of `peterfalvi_67_hall` are discharged:
 `⟦z⁻¹⟧ ≠ ⟦z⟧` from oddness of `|G|` (`eq_one_of_isConj_inv_of_odd_card`), and the
 structure-constant congruence from the trivial character (`nonidentityZClassCoeffSum_cong_hall`). -/
-theorem peterfalvi_67_hall_of_odd [Finite G] (ρ : Representation ℂ G V) [ρ.IsIrreducible]
+theorem peterfalvi_67_hall_of_not_isConj_inv [Finite G] (ρ : Representation ℂ G V) [ρ.IsIrreducible]
     {H Q Z : Subgroup G} (hQH : Q ≤ H) (hZQ : Z ≤ Q)
     (hQnormal : (Q.subgroupOf H).Normal) (hZnormal : (Z.subgroupOf H).Normal)
     (hti : IsTISubset ((Q : Set G) \ {1}) H)
     (hHall : Nat.Coprime (Nat.card ↥Q) (Nat.card (↥H ⧸ Q.subgroupOf H)))
-    (hoddG : Odd (Nat.card G))
-    {z : G} (hzZ : z ∈ Z) (hz1 : z ≠ 1)
+    {z : G} (hzZ : z ∈ Z) (hz1 : z ≠ 1) (hnotconj : ¬ IsConj z⁻¹ z)
     (hQz : Q ≤ Subgroup.centralizer ({z} : Set G))
     (hHallG : Nat.Coprime (Nat.card ↥Q) Q.index)
     (hconst : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 →
@@ -386,8 +385,7 @@ theorem peterfalvi_67_hall_of_odd [Finite G] (ρ : Representation ℂ G V) [ρ.I
     ρ.character z ≡ ρ.character 1 [ALGMOD (Nat.card ↥Q : ℤ)] := by
   have hreal : ConjClasses.mk z⁻¹ ≠ ConjClasses.mk z := by
     rw [Ne, ConjClasses.mk_eq_mk_iff_isConj]
-    intro h
-    exact hz1 (ConjClasses.eq_one_of_isConj_inv_of_odd_card hoddG h)
+    exact hnotconj
   exact peterfalvi_67_hall ρ hQH hZQ hQnormal hZnormal hti hHall hzZ hz1
     (coprime_card_class_card_hall hQz hHallG) hreal hconst
     (nonidentityZClassCoeffSum_cong_hall hQH hZQ hQnormal hZnormal hti hHall hzZ hz1 hQz hHallG
