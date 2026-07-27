@@ -3558,3 +3558,31 @@ Ch.6 の演習は **§6A 6A.1–6A.11 / §6B 6B.1–6B.9 / §6C 6C.1–6C.2 の�
 文書順で **7A.1 から着手**。7A.1 は Thm 7.1 (repo の Ch07 に既存かを最初に grep で確認) と
 `J(P)`・`Z(P)` の repo API を使う。§7B は Problems 節が無く (次の Problems 見出しは 7C)、
 §7C の一覧は着手前に別途確認する。
+
+### ⚠ 7A.1 は Thm 7.1 の**無条件版**に gated (2026-07-27 実測)
+
+`OddOrder/Isaacs/Ch07_ThompsonSubgroup/S7B2_NormalJ_PComplement.lean:436`
+`thompson_normal_p_complement` は **条件付き** — 教科書 Thm 7.1 の仮説
+(「`C_G(Z(P))` と `N_G(J(P))` が normal `p`-complement を持つ」) に加えて
+
+* `IsPiSeparable {p} G`
+* 全 `2`-部分群が可換
+* `O_{p'}(G) = ⊥`
+* `C_G(Z(P)) = P`
+
+を要求する (docstring 自身が「残りは §7C Steps 1-6」と明記)。Steps 4-6 は
+`S7C_SylowMaximal` / `S7C_CentralizerCenter` / `S7C_AbelianQuotientComplement` に
+`hG : ¬ HasNormalPComplement p G` 付きの最小反例補題として在るが、**最小反例の帰納で
+これらを組み上げて無条件版にする段が無い**。Ch07 に sorry は 0 (= scaffold ではなく
+「まだ書かれていない」)。
+
+⟹ **7A.1 (単純群の冪零極大部分群は 2-群) は Thm 7.1 無条件版が前提**
+(証明: `M` 冪零極大 ⟹ 各 Sylow は `G` の Sylow で `M = N_G(P)`、`M ≤ C_G(Z(P))` と
+`M ≤ N_G(J(P))` がともに `M` に一致し `M = P × H` は normal `p`-complement を持つ ⟹
+Thm 7.1 で `G` が normal `p`-complement をもち単純性に矛盾)。
+
+**方針 (上流優先)**: Thm 7.1 の無条件版 (= §7C Steps 1-3 + 最小反例の組み上げ) は
+Isaacs の**番号付き結果**でありlane a の territory・かつ 7A.1 の上流なので、
+次 iteration からこれに着手する。7A.2-7A.6 は Thm 7.1 に依存しない
+(GL(n,q)/SL(2,q) の Sylow 数え上げ・`𝓔(P)`・`Aut(Q_{2^n})`) ので、Thm 7.1 が長引く場合の
+並行候補として残す。
