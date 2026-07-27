@@ -19,6 +19,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 1E の形式化
 * **1E.3**: 位数 `315 = 3²·5·7` の単純群は存在しない。
 * **1E.4**: 位数 `144 = 2⁴·3²` の単純群は存在しない。
 * **1E.5**: 位数 `336 = 2⁴·3·7` の単純群は存在しない (Hint = `n₇` を計算して 1C.5)。
+* **1E.6**: 位数 `180 = 2²·3²·5` の単純群は存在しない。
 
 ## 共通の道具
 
@@ -47,6 +48,7 @@ Sylow 部分群の位数・指数を `|G|` の分解から読むために
   (像が指数 2 で正規になり `Aₙ` の単純性に反する)。
 - `exists_finset_of_sylow_inter_trivial` — Sylow が自明交叉なら非単位元は
   `n_q·(|P| − 1)` 個 (他の素数の計数と足して `|G|` を超えさせる用)。
+- `not_isSimpleGroup_of_card_eq_oneeighty` — **Problem 1E.6**。
 -/
 
 namespace OddOrder.Isaacs.Ch01
@@ -845,5 +847,204 @@ theorem exists_finset_of_sylow_inter_trivial {G : Type*} [Group G] [Finite G] {q
     exact orderOf_dvd_natCard _
 
 end -- 追加の共通部品
+
+section /- 1E: Problem 1E.6 (p. 38) -/
+
+/-- `n ∣ 36` かつ `n ≡ 1 (mod 5)` なら `n ∈ {1, 6, 36}`。 -/
+private lemma eq_of_dvd_thirtysix {n : ℕ} (h : n ∣ 36) (hm : n % 5 = 1) :
+    n = 1 ∨ n = 6 ∨ n = 36 := by
+  have h0 : 0 < n := Nat.pos_of_dvd_of_pos h (by norm_num)
+  have hle : n ≤ 36 := Nat.le_of_dvd (by norm_num) h
+  interval_cases n <;> revert h hm <;> decide
+
+/-- `n ∣ 20` かつ `n ≡ 1 (mod 3)` なら `n ∈ {1, 4, 10}`。 -/
+private lemma eq_of_dvd_twenty {n : ℕ} (h : n ∣ 20) (hm : n % 3 = 1) :
+    n = 1 ∨ n = 4 ∨ n = 10 := by
+  have h0 : 0 < n := Nat.pos_of_dvd_of_pos h (by norm_num)
+  have hle : n ≤ 20 := Nat.le_of_dvd (by norm_num) h
+  interval_cases n <;> revert h hm <;> decide
+
+/-- `20` の約数は `1, 2, 4, 5, 10, 20`。 -/
+private lemma divisors_twenty {n : ℕ} (h : n ∣ 20) :
+    n = 1 ∨ n = 2 ∨ n = 4 ∨ n = 5 ∨ n = 10 ∨ n = 20 := by
+  have h0 : 0 < n := Nat.pos_of_dvd_of_pos h (by norm_num)
+  have hle : n ≤ 20 := Nat.le_of_dvd (by norm_num) h
+  interval_cases n <;> revert h <;> decide
+
+/-- **Isaacs Problem 1E.6** (p. 38)。位数 `180 = 2²·3²·5` の単純群は存在しない。
+
+`n₅ ∣ [G : P₅] = 36` と `n₅ ≡ 1 (mod 5)` から `n₅ ∈ {1, 6, 36}`。単純性で `n₅ ≠ 1`。
+
+* `n₅ = 6`: `N_G(P₅)` は指数 6 で `|A₆| = 6!/2 = 360 = 2·180`, つまり像が `A₆` の
+  指数 2 の部分群になり `A₆` の単純性に反する
+  (`two_mul_card_ne_card_alternating_of_simple`)。
+* `n₅ = 36`: 位数 5 の元が `36·4 = 144` 個。Sylow `3` は位数 9・指数 20 で
+  `n₃ ∈ {1, 4, 10}`。`n₃ = 4` は指数 4 で `180 ∣ 4! = 24` が偽。`n₃ = 10` では
+  **Thm 1.16** が `|S : D| ∈ {3, 9}` を与え,
+  - `|S : D| = 9` (`D = ⊥`, 最大性より全対が自明交叉): 3-冪位数の非単位元が `10·8 = 80` 個で
+    位数 5 の 144 個と交わらず `80 + 144 + 1 = 225 > 180` で矛盾。
+  - `|S : D| = 3` (`|D| = 3`): `S`, `T ≤ N := N_G(D)` で `9 ∣ |N| ∣ 180`,
+    `|N| ∈ {9, 18, 36, 45, 90, 180}` を全て潰す。 -/
+theorem not_isSimpleGroup_of_card_eq_oneeighty {G : Type*} [Group G] [Finite G]
+    (hG : Nat.card G = 180) : ¬ IsSimpleGroup G := by
+  intro hsimple
+  classical
+  haveI := hsimple
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fact (Nat.Prime 5) := ⟨by norm_num⟩
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have h5dec : ∀ P : Sylow 5 G,
+      Nat.card ↥(P : Subgroup G) = 5 ∧ (P : Subgroup G).index = 36 := fun P => by
+    have hh := sylow_card_and_index_of_card_eq_mul (q := 5) (m := 36) (k := 1)
+      (by rw [hG]; norm_num) (by norm_num) P
+    exact ⟨hh.1.trans (by norm_num), hh.2⟩
+  obtain ⟨P₅⟩ : Nonempty (Sylow 5 G) := Sylow.nonempty
+  have hn5ne1 : Nat.card (Sylow 5 G) ≠ 1 :=
+    card_sylow_ne_one_of_simple P₅ (by rw [(h5dec P₅).1]; norm_num)
+      (by rw [(h5dec P₅).1, hG]; norm_num)
+  rcases eq_of_dvd_thirtysix ((h5dec P₅).2 ▸ Sylow.card_dvd_index P₅)
+    (card_sylow_mod_eq_one 5) with h | h | h
+  · exact hn5ne1 h
+  · -- `n₅ = 6`: `|A₆| = 360 = 2 · 180`
+    refine two_mul_card_ne_card_alternating_of_simple
+      (H := Subgroup.normalizer ((P₅ : Subgroup G) : Set G)) (n := 6)
+      (by rw [Sylow.coe_coe, ← Sylow.card_eq_index_normalizer P₅]; exact h)
+      (by norm_num) (by rw [hG]; norm_num) ?_
+    rw [hG, nat_card_alternatingGroup, Nat.card_eq_fintype_card, Fintype.card_fin]
+    norm_num [Nat.factorial]
+  -- `n₅ = 36`: 位数 5 の元が 144 個
+  obtain ⟨U₅, hU₅card, hU₅⟩ :=
+    exists_finset_orderOf_eq_card_sylow_mul (q := 5) (fun P => (h5dec P).1)
+  rw [h] at hU₅card
+  norm_num at hU₅card
+  have h3dec : ∀ P : Sylow 3 G,
+      Nat.card ↥(P : Subgroup G) = 9 ∧ (P : Subgroup G).index = 20 := fun P => by
+    have hh := sylow_card_and_index_of_card_eq_mul (q := 3) (m := 20) (k := 2)
+      (by rw [hG]; norm_num) (by norm_num) P
+    exact ⟨hh.1.trans (by norm_num), hh.2⟩
+  obtain ⟨P₃⟩ : Nonempty (Sylow 3 G) := Sylow.nonempty
+  have hn3ne1 : Nat.card (Sylow 3 G) ≠ 1 :=
+    card_sylow_ne_one_of_simple P₃ (by rw [(h3dec P₃).1]; norm_num)
+      (by rw [(h3dec P₃).1, hG]; norm_num)
+  rcases eq_of_dvd_twenty ((h3dec P₃).2 ▸ Sylow.card_dvd_index P₃)
+    (card_sylow_mod_eq_one 3) with h3 | h3 | h3
+  · exact hn3ne1 h3
+  · -- `n₃ = 4`: 指数 4 で `180 ∣ 4! = 24` が偽
+    have hidx : (Subgroup.normalizer ((P₃ : Subgroup G) : Set G)).index = 4 := by
+      rw [Sylow.coe_coe, ← Sylow.card_eq_index_normalizer P₃]; exact h3
+    have hdvd := card_dvd_factorial_of_simple_subgroup_index
+      (Subgroup.normalizer ((P₃ : Subgroup G) : Set G)) (by rw [hidx]; norm_num)
+    rw [hG, hidx] at hdvd
+    norm_num [Nat.factorial] at hdvd
+  -- `n₃ = 10`: 交わり最大対
+  have hgt : 1 < Nat.card (Sylow 3 G) := by rw [h3]; norm_num
+  obtain ⟨S, T, hST, hmax⟩ := exists_max_inter_sylow_pair (q := 3) hgt
+  have hmodT := card_sylow_modEq_one_of_max_inter hgt S T hST hmax
+  rw [h3] at hmodT
+  set D : Subgroup G := (S : Subgroup G) ⊓ (T : Subgroup G) with hDdef
+  have hd_dvd9 : D.relIndex (S : Subgroup G) ∣ 3 ^ 2 := by
+    rw [show (3 : ℕ) ^ 2 = 9 by norm_num]
+    have hh := Subgroup.index_dvd_card (D.subgroupOf (S : Subgroup G))
+    rw [(h3dec S).1] at hh
+    exact hh
+  have hd_ne1 : D.relIndex (S : Subgroup G) ≠ 1 := by
+    intro h1
+    exact hST (Sylow.ext (Subgroup.eq_of_le_of_card_ge
+      ((Subgroup.relIndex_eq_one.mp h1).trans inf_le_right)
+      (((h3dec T).1).trans ((h3dec S).1).symm).le))
+  obtain ⟨i, hi, hdi⟩ := (Nat.dvd_prime_pow (by norm_num : Nat.Prime 3)).mp hd_dvd9
+  interval_cases i
+  · exact hd_ne1 (by simpa using hdi)
+  · -- `|S : D| = 3` ⟹ `|D| = 3`, `N := N_G(D)` の位数で場合分け
+    have hd3 : D.relIndex (S : Subgroup G) = 3 := by rw [hdi]; norm_num
+    have hidx3S : (D.subgroupOf (S : Subgroup G)).index = 3 := hd3
+    have hDcard : Nat.card ↥D = 3 := by
+      have heq := Subgroup.card_mul_index (D.subgroupOf (S : Subgroup G))
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (inf_le_left : D ≤ (S : Subgroup G))).toEquiv, hidx3S, (h3dec S).1] at heq
+      rw [← hDdef] at heq
+      omega
+    have hS_le : (S : Subgroup G) ≤ Subgroup.normalizer (D : Set G) :=
+      le_normalizer_of_card_eq_prime_sq (p := 3) (((h3dec S).1).trans (by norm_num)) inf_le_left
+    have hT_le : (T : Subgroup G) ≤ Subgroup.normalizer (D : Set G) :=
+      le_normalizer_of_card_eq_prime_sq (p := 3) (((h3dec T).1).trans (by norm_num)) inf_le_right
+    set N : Subgroup G := Subgroup.normalizer (D : Set G) with hNdef
+    have hNdvd : Nat.card ↥N ∣ 180 := hG ▸ Subgroup.card_subgroup_dvd_card N
+    obtain ⟨e, he⟩ : (9 : ℕ) ∣ Nat.card ↥N := ((h3dec S).1) ▸ Subgroup.card_dvd_of_le hS_le
+    have hedvd : e ∣ 20 :=
+      (mul_dvd_mul_iff_left (by norm_num : (9 : ℕ) ≠ 0)).mp (by rw [← he]; simpa using hNdvd)
+    -- 指数から Cor 1.3 を当てる共通形
+    have hindex_absurd : ∀ n : ℕ, Nat.card ↥N * n = 180 → 1 < n → n < 6 → False := by
+      intro n hmul hn1 hn6
+      have hidx : N.index = n := by
+        have hh := Subgroup.card_mul_index N
+        rw [hG] at hh
+        exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (hh.trans hmul.symm)
+      have hdvd := card_dvd_factorial_of_simple_subgroup_index N (by rw [hidx]; omega)
+      rw [hG, hidx] at hdvd
+      interval_cases n <;> norm_num [Nat.factorial] at hdvd
+    -- `N` の Sylow `3` が一意なら `S = T` で矛盾
+    have hSylowUnique : ∀ ℓ : ℕ, ℓ.Prime → Nat.card ↥N = ℓ * 3 ^ 2 → ¬ 3 ∣ ℓ →
+        ℓ % 3 ≠ 1 → False := by
+      intro ℓ hℓ hNc hnd hmod
+      haveI : Subsingleton (Sylow 3 ↥N) :=
+        (Nat.card_eq_one_iff_unique.mp (card_sylow_eq_one_of_card_eq_prime_mul_pow
+          (q := 3) (ℓ := ℓ) (k := 2) hℓ hNc hnd hmod)).1
+      exact hST (Sylow.subtype_injective (hP := hS_le) (hQ := hT_le) (Subsingleton.elim _ _))
+    rcases divisors_twenty hedvd with he1 | he1 | he1 | he1 | he1 | he1
+    · -- `|N| = 9`: `S = N = T`
+      have heN : Nat.card ↥N = 9 := by rw [he, he1, mul_one]
+      exact hST (Sylow.ext
+        ((Subgroup.eq_of_le_of_card_ge hS_le (le_of_eq (by rw [heN, (h3dec S).1]))).trans
+          (Subgroup.eq_of_le_of_card_ge hT_le (le_of_eq (by rw [heN, (h3dec T).1]))).symm))
+    · exact hSylowUnique 2 (by norm_num) (by rw [he, he1]; norm_num) (by norm_num) (by norm_num)
+    · exact hindex_absurd 5 (by rw [he, he1]) (by norm_num) (by norm_num)
+    · exact hSylowUnique 5 (by norm_num) (by rw [he, he1]; norm_num) (by norm_num) (by norm_num)
+    · exact hindex_absurd 2 (by rw [he, he1]) (by norm_num) (by norm_num)
+    · -- `|N| = 180`: `D ⊴ G`
+      have hNtop : N = ⊤ := Subgroup.eq_top_of_card_eq N (by rw [he, he1, hG])
+      rcases hsimple.eq_bot_or_eq_top_of_normal _
+        (Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)) with h1 | h1
+      · rw [h1, Subgroup.card_bot] at hDcard; norm_num at hDcard
+      · rw [h1, Subgroup.card_top, hG] at hDcard; norm_num at hDcard
+  · -- `|S : D| = 9` ⟹ `D = ⊥`, 最大性より全対が自明交叉 ⟹ 計数矛盾
+    have hd9 : D.relIndex (S : Subgroup G) = 9 := by rw [hdi]; norm_num
+    have hidx9S : (D.subgroupOf (S : Subgroup G)).index = 9 := hd9
+    have hDcard1 : Nat.card ↥D = 1 := by
+      have heq := Subgroup.card_mul_index (D.subgroupOf (S : Subgroup G))
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (inf_le_left : D ≤ (S : Subgroup G))).toEquiv, hidx9S, (h3dec S).1] at heq
+      rw [← hDdef] at heq
+      omega
+    have htriv : ∀ S' T' : Sylow 3 G, S' ≠ T' →
+        (S' : Subgroup G) ⊓ (T' : Subgroup G) = ⊥ := by
+      intro S' T' hne
+      have hle := hmax S' T' hne
+      rw [hDcard1] at hle
+      exact Subgroup.eq_bot_of_card_le _ hle
+    obtain ⟨U₃, hU₃card, hU₃⟩ :=
+      exists_finset_of_sylow_inter_trivial (q := 3) htriv (fun S' => (h3dec S').1)
+    rw [h3] at hU₃card
+    norm_num at hU₃card
+    have hdisj : Disjoint U₃ U₅ := by
+      rw [Finset.disjoint_left]
+      intro x hx3 hx5
+      have hd9 := (hU₃ x hx3).2
+      rw [(hU₅ x).mp hx5] at hd9
+      norm_num at hd9
+    have hnotin : (1 : G) ∉ U₃ ∪ U₅ := by
+      simp only [Finset.mem_union, not_or]
+      refine ⟨fun hc => (hU₃ 1 hc).1 rfl, fun hc => ?_⟩
+      have h1 := (hU₅ 1).mp hc
+      rw [orderOf_one] at h1
+      norm_num at h1
+    have hle : (insert (1 : G) (U₃ ∪ U₅)).card ≤ Nat.card G := by
+      rw [Nat.card_eq_fintype_card, ← Finset.card_univ]
+      exact Finset.card_le_card (Finset.subset_univ _)
+    rw [Finset.card_insert_of_notMem hnotin, Finset.card_union_of_disjoint hdisj,
+      hU₃card, hU₅card, hG] at hle
+    omega
+
+end -- Problem 1E.6
 
 end OddOrder.Isaacs.Ch01

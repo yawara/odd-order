@@ -5274,7 +5274,22 @@ leaf = `Ch01_Sylow/ProblemsNonSimple.lean` (`OddOrder.lean` 配線済)。
     全体は `n_q·(|P| − 1)` 個の Finset をなし、各元の位数は `|P|` を割る。他素数の元の個数
     (`exists_finset_orderOf_eq_card_sylow_mul`) と足して `|G|` を超えさせる用。
 
-### 1E.6 (位数 `180 = 2²·3²·5`) の設計 — 実装待ち
+* ✅ **1E.6** `not_isSimpleGroup_of_card_eq_oneeighty` (2026-07-28)。下記の設計どおり landing。
+  ⚠ 追加で踏んだ罠: (i) `Subgroup.relIndex H K` と `(H.subgroupOf K).index` は defeq だが
+  **syntactic には別物** — `rw [hdi]` で後者の goal を扱えないので、先に `relIndex` の等式を
+  作ってから `:=` の defeq で `index` 版に渡す。(ii) `set D := ...` した後の `hmax` は
+  すでに `D` に畳まれているので `rw [← hDdef] at hle` は失敗する (fresh に作った `heq` の
+  方は畳み戻しが要る、という非対称に注意)。(iii) `Subgroup.eq_bot_of_card_le` は
+  部分群を**明示引数**で取る (`Subgroup.eq_bot_of_card_le _ hle`)。
+  (iv) `rw [he, he1]` が numeral の rfl で goal を閉じてしまう箇所があり、続く
+  `norm_num` が「No goals」で落ちる — 数値が閉じるかは式ごとに違うので個別に確認する。
+
+* **§1E 残り = 1E.7 (`240 = 2⁴·3·5`) / 1E.8 (`252 = 2²·3²·7`)**。道具は全て揃った。
+  ⚠ leaf `ProblemsNonSimple.lean` は 1050 行 — 1E.7/1E.8 を足すと 1300〜1400 行になるので、
+  1500 行上限に当たる前に「共通部品 + 一般問題 (1E.1/1E.2)」と「具体的位数 (1E.3–1E.8)」で
+  prefix-split するのが良い。
+
+### 1E.6 (位数 `180 = 2²·3²·5`) の設計 (実装済, 記録として保持)
 
 `n₅ ∣ 36`, `≡ 1 (mod 5)` ⟹ `n₅ ∈ {1, 6, 36}`。単純性で `≠ 1`。
 
