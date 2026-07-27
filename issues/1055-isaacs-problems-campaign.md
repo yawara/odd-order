@@ -3614,3 +3614,16 @@ characteristic 部分群すべての正規化群が normal `p`-complement を持
 
 ⟹ Thm 7.1 無条件版 (§7C Steps 1-3 + 組み上げ) は**別枠の上流タスク**として残すが、
 §7A の演習は Thm 6.23 で進められる。
+
+### 7A.1 進捗 (2026-07-27): 再利用可能な Sylow 補題を実証明
+
+新 leaf `OddOrder/Isaacs/Ch07_ThompsonSubgroup/Problems7A1.lean` (`OddOrder.lean` 配線済):
+
+* ✅ `exists_sylow_eq_of_maximal_pSubgroup_in_normalizer`: **`N_G(P)` の中で極大な
+  `p`-部分群 `P` は `G` の Sylow `p`-部分群**。`P ≤ S ∈ Syl_p(G)` を取り `P < S` なら
+  `S` は `p`-群ゆえ冪零 ⟹ `NormalizerCondition ↥S` から `P.subgroupOf S` を正規化する
+  `x ∈ S \ P` が在り、`P ⊔ ⟨x⟩` は `N_G(P)` 内の `p`-部分群で `P` を真に含むので極大性に反する
+  (`IsPGroup.to_sup_of_normal_left'` を使用)。
+  ⚠ この mathlib 版の `NormalizerCondition` は `H < ⊤` を取る (`H ≠ ⊤` ではない)。
+  ⟹ 7A.1 の step 3 (`P ∈ Syl_p(G)`) がこれ 1 本で済む。汎用なので他の演習でも使える見込み。
+* 次: 7A.1 本体 (`N_G(P) = M` の確立 → characteristic 部分群の正規化 → Thm 6.23 で矛盾)。
