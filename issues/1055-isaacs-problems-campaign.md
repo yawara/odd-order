@@ -5535,7 +5535,20 @@ CD 部分群 `M` は特性可換で `|G:M| ≤ |G:A|²` (Thm 1.41)。**厳密な
    `|G:N| = |G|/|N| = |G|·|C_G(N)|/|A|² < |G|²/|A|² = |G:A|²` — **`C_G(N) ≠ ⊤` すなわち
    `|C_G(N)| < |G|` がちょうど厳密不等号を生む**。∎
 
-⚠ 実装上の山は 3 の「全共役にわたる繰り返し」。`Finset` 上の帰納で
+✅ **crux は landing 済 (2026-07-28)**: `sInf_mem_lattice_and_centralizer_eq`
+(`L(G)` の有限族 `S` について `sInf S ∈ L(G)` かつ `C_G(sInf S) = sSup (C_G '' S)`)。
+残るのは**組み立てのみ**:
+
+1. `S := {gAg⁻¹ : g ∈ G}` (`Set.range`, 有限) は `L(G)` に含まれる
+   (`chermakDelgadoLattice_conj_smul_mem`)。`N := sInf S`。
+2. `C_G '' S = S` — `C_G(gAg⁻¹) = g C_G(A) g⁻¹ = gAg⁻¹` (`centralizer_conj_smul` +
+   1G.1 の `A = C_G(A)`)。よって `C_G(N) = sSup S`。
+3. `A ≤ M'` (1G.2) と `M'` 正規から各 `gAg⁻¹ ≤ M'`、ゆえに `C_G(N) = sSup S ≤ M' < ⊤`。
+4. `N ≤ A` ゆえ可換、`S` が共役で閉じるので `N` は正規。
+5. `N ∈ L(G)` の測度等式 `|N|·|C_G(N)| = |A|²` と `|C_G(N)| < |G|` から
+   `N.index * |A|² < |G|² = A.index² * |A|²`、すなわち `N.index < A.index²`。
+
+(旧メモ) 実装上の山は 3 の「全共役にわたる繰り返し」。`Finset` 上の帰納で
 `C_G(⨅ i ∈ s, A^{g_i}) = ⨆ i ∈ s, A^{g_i}` を回すのが素直
 (`chermakDelgadoLattice_centralizer_inf_eq_mul` は 2 元版なので、
 `chermakDelgadoSubgroup_mem_lattice` の証明 (L.405-420) の Finset 帰納パターンを流用する)。
