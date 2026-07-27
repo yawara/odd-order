@@ -17,13 +17,16 @@ import OddOrder.Isaacs.Ch01_Sylow.Problems
   `sum_sq_card_fixedBy_eq_two_mul_iff` — **Problem 8A.12**: 推移的な `G` について
   `G` が 2-transitive ⟺ 置換指標の 2 乗の平均が 2。
 - `card_fixedBy_prod_three`, `sum_cube_card_fixedBy` — **Problem 8A.13** の骨格:
-  置換指標の 3 乗和は `Ω³` 上の軌道数 × `|G|`。求める `m` は **5**
-  (3 点の一致パターン `xxx` / `xxy` / `xyx` / `yxx` / 全相異)。
+  置換指標の 3 乗和は `Ω³` 上の軌道数 × `|G|`。
 - `cube_orbit_diag`, `cube_orbit_pattern_xxz` / `_xzx` / `_zxx`,
   `cube_orbit_pattern_distinct` — **Problem 8A.13**: `Ω³` の 5 つの一致パターンが
   (2-transitive / 3-transitive の下で) それぞれ単一軌道であること。
 - `cube_orbit_ne_of_fst_snd` / `_fst_thd` / `_snd_thd` — 一致パターンは軌道不変量
   なので, 上の 5 つの代表元は互いに別軌道。
+- `card_orbits_cube_eq_five_iff`, `sum_cube_card_fixedBy_eq_five_mul_iff` —
+  **Problem 8A.13**: 2-transitive な `G` と `|Ω| ≥ 3` について
+  `G` が 3-transitive ⟺ 置換指標の 3 乗の平均が **5**。すなわち求める `m` は **5**
+  (3 点の一致パターン `xxx` / `xxz` / `xzx` / `zxx` / 全相異)。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -240,6 +243,133 @@ theorem sum_sq_card_fixedBy_eq_two_mul_iff [Fintype G] [Finite Ω] [IsPretransit
     (∑ g : G, Nat.card (MulAction.fixedBy Ω g) ^ 2) = 2 * Nat.card G ↔
       ∀ β₁ β₂ γ₁ γ₂ : Ω, β₁ ≠ β₂ → γ₁ ≠ γ₂ → ∃ g : G, g • β₁ = γ₁ ∧ g • β₂ = γ₂ := by
   rw [sum_sq_card_fixedBy, ← card_orbits_prod_eq_two_iff]
+  exact ⟨fun h => Nat.eq_of_mul_eq_mul_right Nat.card_pos h, fun h => by rw [h]⟩
+
+/-! #### `Ω³` の軌道数はちょうど 5 (8A.13 の答 `m = 5`) -/
+
+/-- **Isaacs Problem 8A.13** (p. 236) の組合せ部分: 2-transitive な `G` と 3 点以上の `Ω`
+について **`Ω³` の `G`-軌道がちょうど 5 個 ⟺ `G` は 3-transitive**。
+
+`Ω³` の点は 3 成分の一致パターン `xxx` / `xxz` / `xzx` / `zxx` / 全相異 の 5 種に分かれ,
+一致パターンは軌道不変量なので (`cube_orbit_ne_of_fst_snd` 等) 異なるパターンは異なる軌道。
+退化した 4 パターンは 2-transitivity だけで各々ひとつの軌道になる
+(`cube_orbit_diag`, `cube_orbit_pattern_xxz` / `_xzx` / `_zxx`) ので, 5 軌道であることの
+実質的な内容は「全相異のパターンがひとつの軌道」= 3-transitivity に尽きる。
+
+⚠ `|Ω| ≥ 3` は必須: `|Ω| = 2` なら全相異の三つ組が存在せず軌道数は 4 になる。 -/
+theorem card_orbits_cube_eq_five_iff [IsPretransitive G Ω]
+    (h2 : ∀ a b c d : Ω, a ≠ b → c ≠ d → ∃ g : G, g • a = c ∧ g • b = d)
+    {α β γ : Ω} (hαβ : α ≠ β) (hαγ : α ≠ γ) (hβγ : β ≠ γ) :
+    Nat.card (MulAction.orbitRel.Quotient G (Ω × Ω × Ω)) = 5 ↔
+      ∀ a b c x y z : Ω, a ≠ b → a ≠ c → b ≠ c → x ≠ y → x ≠ z → y ≠ z →
+        ∃ g : G, g • a = x ∧ g • b = y ∧ g • c = z := by
+  classical
+  -- 5 つの代表元は互いに別軌道 (10 通りすべて一致パターンで区別できる)。
+  have h01 : (Quotient.mk'' (α, α, α) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      ≠ Quotient.mk'' (α, α, β) := cube_orbit_ne_of_snd_thd rfl hαβ
+  have h02 : (Quotient.mk'' (α, α, α) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      ≠ Quotient.mk'' (α, β, α) := cube_orbit_ne_of_fst_snd rfl hαβ
+  have h03 : (Quotient.mk'' (α, α, α) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      ≠ Quotient.mk'' (β, α, α) := cube_orbit_ne_of_fst_snd rfl hαβ.symm
+  have h04 : (Quotient.mk'' (α, α, α) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      ≠ Quotient.mk'' (α, β, γ) := cube_orbit_ne_of_fst_snd rfl hαβ
+  have h12 : (Quotient.mk'' (α, α, β) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      ≠ Quotient.mk'' (α, β, α) := cube_orbit_ne_of_fst_snd rfl hαβ
+  have h13 : (Quotient.mk'' (α, α, β) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      ≠ Quotient.mk'' (β, α, α) := cube_orbit_ne_of_fst_snd rfl hαβ.symm
+  have h14 : (Quotient.mk'' (α, α, β) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      ≠ Quotient.mk'' (α, β, γ) := cube_orbit_ne_of_fst_snd rfl hαβ
+  have h23 : (Quotient.mk'' (α, β, α) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      ≠ Quotient.mk'' (β, α, α) := cube_orbit_ne_of_fst_thd rfl hαβ.symm
+  have h24 : (Quotient.mk'' (α, β, α) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      ≠ Quotient.mk'' (α, β, γ) := cube_orbit_ne_of_fst_thd rfl hαγ
+  have h34 : (Quotient.mk'' (β, α, α) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      ≠ Quotient.mk'' (α, β, γ) := cube_orbit_ne_of_snd_thd rfl hβγ
+  have hncard : ({Quotient.mk'' (α, α, α), Quotient.mk'' (α, α, β), Quotient.mk'' (α, β, α),
+      Quotient.mk'' (β, α, α), Quotient.mk'' (α, β, γ)} :
+      Set (MulAction.orbitRel.Quotient G (Ω × Ω × Ω))).ncard = 5 := by
+    rw [Set.ncard_insert_of_notMem (by simp [h01, h02, h03, h04]),
+      Set.ncard_insert_of_notMem (by simp [h12, h13, h14]),
+      Set.ncard_insert_of_notMem (by simp [h23, h24]),
+      Set.ncard_insert_of_notMem (by simp [h34]), Set.ncard_singleton]
+  constructor
+  · -- 5 軌道 ⟹ 3-transitive: 5 つの代表元が全体を尽くすので, 全相異の三つ組は
+    -- 退化パターンのどの代表元とも別軌道 ⟹ 第 5 の軌道にしか行けない。
+    intro hcard a b c x y z hab hac hbc hxy hxz hyz
+    haveI : Finite (MulAction.orbitRel.Quotient G (Ω × Ω × Ω)) :=
+      Nat.finite_of_card_ne_zero (by omega)
+    have huniv : ({Quotient.mk'' (α, α, α), Quotient.mk'' (α, α, β), Quotient.mk'' (α, β, α),
+        Quotient.mk'' (β, α, α), Quotient.mk'' (α, β, γ)} :
+        Set (MulAction.orbitRel.Quotient G (Ω × Ω × Ω))) = Set.univ :=
+      Set.eq_of_subset_of_ncard_le (Set.subset_univ _)
+        (by rw [Set.ncard_univ, hcard, hncard]) Set.finite_univ
+    have hlast : ∀ u v w : Ω, u ≠ v → u ≠ w → v ≠ w →
+        (Quotient.mk'' (u, v, w) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+          = Quotient.mk'' (α, β, γ) := by
+      intro u v w huv huw hvw
+      have hmem : (Quotient.mk'' (u, v, w) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+          ∈ ({Quotient.mk'' (α, α, α), Quotient.mk'' (α, α, β), Quotient.mk'' (α, β, α),
+            Quotient.mk'' (β, α, α), Quotient.mk'' (α, β, γ)} :
+            Set (MulAction.orbitRel.Quotient G (Ω × Ω × Ω))) := huniv ▸ Set.mem_univ _
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hmem
+      rcases hmem with h | h | h | h | h
+      · exact absurd h.symm (cube_orbit_ne_of_fst_snd rfl huv)
+      · exact absurd h.symm (cube_orbit_ne_of_fst_snd rfl huv)
+      · exact absurd h.symm (cube_orbit_ne_of_fst_thd rfl huw)
+      · exact absurd h.symm (cube_orbit_ne_of_snd_thd rfl hvw)
+      · exact h
+    have hsame : (Quotient.mk'' (x, y, z) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+        = Quotient.mk'' (a, b, c) :=
+      (hlast x y z hxy hxz hyz).trans (hlast a b c hab hac hbc).symm
+    rw [Quotient.eq''] at hsame
+    obtain ⟨g, hg⟩ := MulAction.orbitRel_apply.mp hsame
+    have hg' : g • ((a, b, c) : Ω × Ω × Ω) = (x, y, z) := hg
+    exact ⟨g, congrArg Prod.fst hg', congrArg (fun r => (Prod.snd r).1) hg',
+      congrArg (fun r => (Prod.snd r).2) hg'⟩
+  · -- 3-transitive ⟹ 5 軌道: 5 つの代表元が全体を尽くす。
+    intro h3
+    have huniv : (Set.univ : Set (MulAction.orbitRel.Quotient G (Ω × Ω × Ω)))
+        = {Quotient.mk'' (α, α, α), Quotient.mk'' (α, α, β), Quotient.mk'' (α, β, α),
+          Quotient.mk'' (β, α, α), Quotient.mk'' (α, β, γ)} := by
+      refine (Set.eq_univ_iff_forall.mpr ?_).symm
+      refine Quotient.ind' fun p => ?_
+      obtain ⟨x, y, z⟩ := p
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff]
+      rcases eq_or_ne x y with hxy | hxy
+      · subst hxy
+        rcases eq_or_ne x z with hxz | hxz
+        · subst hxz
+          exact Or.inl (cube_orbit_diag α x)
+        · exact Or.inr (Or.inl (cube_orbit_pattern_xxz h2 hαβ hxz))
+      · rcases eq_or_ne x z with hxz | hxz
+        · subst hxz
+          exact Or.inr (Or.inr (Or.inl (cube_orbit_pattern_xzx h2 hαβ hxy)))
+        · rcases eq_or_ne y z with hyz | hyz
+          · subst hyz
+            exact Or.inr (Or.inr (Or.inr (Or.inl
+              (cube_orbit_pattern_zxx h2 hαβ hxy.symm))))
+          · exact Or.inr (Or.inr (Or.inr (Or.inr
+              (cube_orbit_pattern_distinct h3 hαβ hαγ hβγ hxy hxz hyz))))
+    rw [← Set.ncard_univ, huniv]
+    exact hncard
+
+/-- **Isaacs Problem 8A.13** (p. 236) 🎉: 2-transitive な `G` と `|Ω| ≥ 3` について
+**`G` が 3-transitive ⟺ 置換指標 `χ` の 3 乗の平均値が 5** (`∑_{g} χ(g)³ = 5 |G|`)。
+すなわち求める正整数は **`m = 5`**。
+
+`χ³` は積作用 `Ω × Ω × Ω` の置換指標なので, Burnside より `∑ χ³ = (Ω³ の軌道数)·|G|`;
+軌道数が 5 であることが 3-transitivity と同値 (`card_orbits_cube_eq_five_iff`)。 -/
+theorem sum_cube_card_fixedBy_eq_five_mul_iff [Fintype G] [Finite Ω] [IsPretransitive G Ω]
+    (h2 : ∀ a b c d : Ω, a ≠ b → c ≠ d → ∃ g : G, g • a = c ∧ g • b = d)
+    (hΩ : 2 < Nat.card Ω) :
+    (∑ g : G, Nat.card (MulAction.fixedBy Ω g) ^ 3) = 5 * Nat.card G ↔
+      ∀ a b c x y z : Ω, a ≠ b → a ≠ c → b ≠ c → x ≠ y → x ≠ z → y ≠ z →
+        ∃ g : G, g • a = x ∧ g • b = y ∧ g • c = z := by
+  classical
+  have := Fintype.ofFinite Ω
+  obtain ⟨α, β, γ, hαβ, hαγ, hβγ⟩ :=
+    Fintype.two_lt_card_iff (α := Ω) |>.mp (by rwa [← Nat.card_eq_fintype_card])
+  rw [sum_cube_card_fixedBy, ← card_orbits_cube_eq_five_iff h2 hαβ hαγ hβγ]
   exact ⟨fun h => Nat.eq_of_mul_eq_mul_right Nat.card_pos h, fun h => by rw [h]⟩
 
 end
