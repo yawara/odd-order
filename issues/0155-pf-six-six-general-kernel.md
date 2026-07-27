@@ -81,6 +81,22 @@ Sibley 側の入口 `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
       `exists_source_primePow_centralBound_of_mem_xSet` / `sum_re_sq_xSet_eq` /
       `natDegree_le_of_xBaseBlock_anchor` / `exists_xBaseBlock_anchor_index`。
 
+      **⚠ 実測 (2026-07-27): 書籍 p.32 の可除性論法の数学的中身は既に全部一般だった。**
+      Sibley 側 `xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums`
+      (`S08_SibleyHypothesisBasic.lean:343`) の本体が呼ぶ 4 本は、いずれも
+      **抽象群 + 素の数値データ**で述べられており `SibleyDadeHypothesis` も Dade も τ も取らない:
+      - `S08.degreeDivisibilityInputs_of_commonIndex_primePowerData` (`S08_CoherenceCorePart2:301`)
+      - `S08.sq_dvd_natDegreeSquareSum_of_commonIndex` (`S08_CoherenceCorePart1:734`)
+      - `S07.sq_dvd_head_of_commonIndex_primePower_sums` (`S07_Coherence/NormInequalities:1056`)
+        ← 書籍の「`θᵢ(1)²` は `∑_{j≥i} χⱼ(1)²` を割る」がこれ
+      - `S08.natDegreeSquareSum_pos_of_memberFamily` (`S08_CoherenceCorePart1:718`)
+
+      `hyp` を取るのは最後の梱包
+      `xAdjoinStepInput_of_memberFamily_degreeDivisibility_commonIndexNatGap`
+      (`XAdjoinStepInput hyp.dade hcoh …` を返す) **だけ**。
+      ⟹ **step 4 は新しい数学を必要とせず、`xAdjoinStepW_general` への再梱包**に尽きる。
+      作業量は「多数のパラメータを正しく並べ替える」ことが中心 (routine だが分量あり)。
+
 ## 完了条件
 
 一般 `K` (可解正規・冪零・`p` 群) と中心的 `Z` に対する
