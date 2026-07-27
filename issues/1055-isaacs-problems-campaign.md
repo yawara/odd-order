@@ -4924,3 +4924,16 @@ IsMultiplyPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) n`) で
 
 ⚠ `faithfulSMul_ofStabilizer` / `card_ofStabilizer` は現在 `MathieuTwelve.lean` にある。
 8C.5 から使うので `SimpleStabilizer.lean` (または新しい共通 leaf) へ移すのが自然。
+
+
+## ⚠ §8C 残りの担当 (2026-07-27, 暫定 — hub 裁定待ち)
+
+並行セッションの重複 (上記) を受けて **issue 9212 で hub に一本化を要請**。
+それまでの暫定分担:
+
+* **8C.5 … もう一方のセッション**が担当 (上の詳細設計メモを書いた側)。
+  こちらのセッションは触らない。
+* **8C.6 … この lane a セッション**が担当。`Aut(A)` 単純 ⟺ `|A| = 3` または
+  `A` が位数 8 以上の初等可換 2-群。8C.5 と独立。
+
+hub の裁定が出たらこの節を更新すること。
