@@ -631,4 +631,46 @@ theorem mem_QK_of_piElement (ind : Hypothesis.TheoremAInductionBelow G Ω)
 
 end SecondCaseHypothesis
 
+namespace SecondCaseHypothesis
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (sc : SecondCaseHypothesis G Ω)
+
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step (6), first reduction** (p. 115):
+
+> If `π` is the set of prime divisors of `|QK|` and `y` is the `π′`-component of
+> `x`, then `λ(x) = λ(y)` … since the `π`-component of `x` is in `QK`.
+
+A degree-one character is multiplicative
+(`IsIrreducibleCharacter.map_mul_of_apply_one_eq_one`), the `π`-component lies in
+`QK ⊆ Ker λ` (`mem_QK_of_piElement`), and `λ` is `1` there. -/
+theorem exists_piPrime_apply_eq (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥)
+    {θ : ClassFunction ↥sc.toHypothesis.H ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hdeg : (θ : ↥sc.toHypothesis.H → ℂ) 1 = 1)
+    (hker : ((sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H :
+      Subgroup ↥sc.toHypothesis.H) : Set ↥sc.toHypothesis.H) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ)
+    (x : ↥sc.toHypothesis.H) :
+    ∃ y : ↥sc.toHypothesis.H,
+      (∀ q ∈ (orderOf y).primeFactors,
+        q ∉ (Nat.card ↥sc.toHypothesis.QK).primeFactors) ∧
+      y ∈ Subgroup.zpowers x ∧
+      (θ : ↥sc.toHypothesis.H → ℂ) x = (θ : ↥sc.toHypothesis.H → ℂ) y := by
+  classical
+  obtain ⟨a, b, hab, _, ha, hb, _, hbz⟩ :=
+    OddOrder.GroupTheory.exists_isPiElement_mul
+      ((Nat.card ↥sc.toHypothesis.QK).primeFactors : Set ℕ) x
+  refine ⟨b, hb, hbz, ?_⟩
+  -- `a` lies in `QK`, hence in `Ker θ`, so `θ a = 1`
+  have haQK : a ∈ sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H :=
+    sc.mem_QK_of_piElement ind hQ1 ha
+  have hθa : (θ : ↥sc.toHypothesis.H → ℂ) a = 1 := by
+    have := hker haQK
+    rw [OddOrder.Peterfalvi.S03.characterKernel, Set.mem_setOf_eq] at this
+    rw [this, OddOrder.Peterfalvi.S03.characterDegree, hdeg]
+  rw [← hab, hθ.map_mul_of_apply_one_eq_one hdeg, hθa, one_mul]
+
+end SecondCaseHypothesis
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
