@@ -216,4 +216,141 @@ theorem exists_linearCharacter_leKer_QK (hV : hyp.V ≠ ⊥) :
 
 end Hypothesis
 
+namespace SecondCaseHypothesis
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (sc : SecondCaseHypothesis G Ω)
+
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step (5)** (p. 115): `(|K|, |V|) = 1`.
+
+The book: "If `(|K|,|V|) ≠ 1`, then `D` has a non-cyclic subgroup of order `p²`,
+`p` prime, and so `D` cannot act fixed-point-freely on `Q₁` ([H], Kapitel V, Satz
+8.15)."
+
+Here the Frobenius-complement structure theorem is not needed: a non-cyclic
+abelian subgroup of `D` is already impossible
+(`isCyclic_of_isMulCommutative_le_D`).  The `p²` subgroup is built from elements
+`x ∈ K`, `y ∈ V` of order `p`; they commute because `K` is cyclic and normal in
+`D`, so `y` acts on `⟨x⟩ ≅ C_p` by `x ↦ x^j`, and `y^p = 1` forces
+`j^p ≡ 1 (mod p)`, while Fermat gives `j^p ≡ j`, so `j ≡ 1`.  (This replaces the
+book's appeal to `|Aut(C_p)| = p − 1`.) -/
+theorem coprime_card_K_V (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥) :
+    Nat.Coprime (Nat.card ↥sc.toHypothesis.K) (Nat.card ↥sc.toHypothesis.V) := by
+  classical
+  by_contra hcop
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcop
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : Fintype ↥sc.toHypothesis.K := Fintype.ofFinite _
+  haveI : Fintype ↥sc.toHypothesis.V := Fintype.ofFinite _
+  obtain ⟨xK, hxord⟩ := exists_prime_orderOf_dvd_card (G := ↥sc.toHypothesis.K) p
+    (by rw [← Nat.card_eq_fintype_card]; exact hpdvd.trans (Nat.gcd_dvd_left _ _))
+  obtain ⟨yV, hyord⟩ := exists_prime_orderOf_dvd_card (G := ↥sc.toHypothesis.V) p
+    (by rw [← Nat.card_eq_fintype_card]; exact hpdvd.trans (Nat.gcd_dvd_right _ _))
+  set x : G := (xK : G) with hxdef
+  set y : G := (yV : G) with hydef
+  have hxK : x ∈ sc.toHypothesis.K := xK.2
+  have hyV : y ∈ sc.toHypothesis.V := yV.2
+  have hxo : orderOf x = p := by rw [hxdef, Subgroup.orderOf_coe]; exact hxord
+  have hyo : orderOf y = p := by rw [hydef, Subgroup.orderOf_coe]; exact hyord
+  have hyD : y ∈ sc.toHypothesis.D := sc.toHypothesis.V_le_D hyV
+  -- (2) `y` normalises the unique order-`p` subgroup `⟨x⟩` of the cyclic `K`
+  have hconjK : y * x * y⁻¹ ∈ sc.toHypothesis.K :=
+    sc.toHypothesis.conj_mem_K_of_mem_D hyD hxK
+  have hconjord : orderOf (y * x * y⁻¹) = p := by
+    have h := orderOf_injective (MulAut.conj y).toMonoidHom
+      (MulAut.conj y).injective x
+    simpa [MulAut.conj_apply, hxo] using h
+  have hmemzp : y * x * y⁻¹ ∈ Subgroup.zpowers x := by
+    have hcard : Nat.card ↥((Subgroup.zpowers (y * x * y⁻¹)).subgroupOf sc.toHypothesis.K)
+        = Nat.card ↥((Subgroup.zpowers x).subgroupOf sc.toHypothesis.K) := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+          (Subgroup.zpowers_le.mpr hconjK)).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+          (Subgroup.zpowers_le.mpr hxK)).toEquiv,
+        Nat.card_zpowers, Nat.card_zpowers, hconjord, hxo]
+    have heq := OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq
+      (C := ↥sc.toHypothesis.K) hcard
+    have hmem : (⟨y * x * y⁻¹, hconjK⟩ : ↥sc.toHypothesis.K) ∈
+        (Subgroup.zpowers (y * x * y⁻¹)).subgroupOf sc.toHypothesis.K :=
+      Subgroup.mem_subgroupOf.mpr (Subgroup.mem_zpowers _)
+    rw [heq] at hmem
+    exact Subgroup.mem_subgroupOf.mp hmem
+  -- (3) `x` and `y` commute, by Fermat
+  obtain ⟨j, hj0⟩ := hmemzp
+  have hj : x ^ j = y * x * y⁻¹ := hj0
+  have hconjx : (MulAut.conj y) x = x ^ j := by
+    simpa [MulAut.conj_apply] using hj.symm
+  have hpow : ∀ n : ℕ, ((MulAut.conj y ^ n : MulAut G)) x = x ^ (j ^ n) := by
+    intro n
+    induction n with
+    | zero => simp
+    | succ k ih =>
+        have hstep : ((MulAut.conj y ^ (k + 1) : MulAut G)) x
+            = ((MulAut.conj y ^ k : MulAut G)) ((MulAut.conj y) x) := by
+          rw [pow_succ]; rfl
+        rw [hstep, hconjx, map_zpow, ih, ← zpow_mul, pow_succ]
+  have hfix : x ^ (j ^ p) = x := by
+    have hyp1 : y ^ p = 1 := by rw [← hyo]; exact pow_orderOf_eq_one y
+    have h1 : ((MulAut.conj y ^ p : MulAut G)) x = x := by
+      rw [← map_pow, hyp1]
+      simp
+    rw [← hpow p, h1]
+  have hmod : (j ^ p : ℤ) ≡ 1 [ZMOD (p : ℤ)] := by
+    have := (zpow_eq_zpow_iff_modEq (x := x) (m := j ^ p) (n := 1)).mp (by
+      rw [zpow_one]; exact hfix)
+    rwa [hxo] at this
+  have hj1 : (j : ℤ) ≡ 1 [ZMOD (p : ℤ)] := by
+    have hferm : ((j ^ p : ℤ) : ZMod p) = ((j : ℤ) : ZMod p) := by
+      push_cast; exact ZMod.pow_card _
+    have h1 : ((j ^ p : ℤ) : ZMod p) = ((1 : ℤ) : ZMod p) :=
+      (ZMod.intCast_eq_intCast_iff' _ _ _).mpr (by exact_mod_cast hmod)
+    exact (ZMod.intCast_eq_intCast_iff' _ _ _).mp (by rw [← hferm, h1])
+  have hcomm : x * y = y * x := by
+    have hxj : x ^ j = x := by
+      have := (zpow_eq_zpow_iff_modEq (x := x) (m := j) (n := 1)).mpr (by
+        rw [hxo]; exact_mod_cast hj1)
+      rwa [zpow_one] at this
+    have : y * x * y⁻¹ = x := by rw [← hj, hxj]
+    calc x * y = (y * x * y⁻¹) * y := by rw [this]
+      _ = y * x := by group
+  -- (4) `E = ⟨x, y⟩` is abelian and contained in `D`
+  set E : Subgroup G := Subgroup.closure ({x, y} : Set G) with hEdef
+  haveI : IsMulCommutative ↥E := by
+    refine Subgroup.isMulCommutative_closure ?_
+    rintro a (rfl | rfl) b (rfl | rfl)
+    · rfl
+    · exact hcomm
+    · exact hcomm.symm
+    · rfl
+  have hED : E ≤ sc.toHypothesis.D := by
+    rw [hEdef, Subgroup.closure_le]
+    rintro a (rfl | rfl)
+    · exact sc.toHypothesis.K_le_D hxK
+    · exact hyD
+  haveI : IsCyclic ↥E := sc.isCyclic_of_isMulCommutative_le_D ind hQ1 hED
+  -- (5) inside the cyclic `E`, `⟨x⟩` and `⟨y⟩` both have order `p`, so `x ∈ V`
+  have hxE : x ∈ E := Subgroup.subset_closure (by simp)
+  have hyE : y ∈ E := Subgroup.subset_closure (by simp)
+  have hcard : Nat.card ↥(Subgroup.zpowers (⟨x, hxE⟩ : ↥E))
+      = Nat.card ↥(Subgroup.zpowers (⟨y, hyE⟩ : ↥E)) := by
+    rw [Nat.card_zpowers, Nat.card_zpowers, Subgroup.orderOf_mk, Subgroup.orderOf_mk,
+      hxo, hyo]
+  have heq := OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq (C := ↥E) hcard
+  have hxmem : (⟨x, hxE⟩ : ↥E) ∈ Subgroup.zpowers (⟨y, hyE⟩ : ↥E) := by
+    rw [← heq]; exact Subgroup.mem_zpowers _
+  obtain ⟨n, hn⟩ := hxmem
+  have hxV : x ∈ sc.toHypothesis.V := by
+    have : y ^ n = x := congrArg (fun z : ↥E => (z : G)) hn
+    rw [← this]
+    exact zpow_mem hyV n
+  have hmemKV : x ∈ sc.toHypothesis.K ⊓ sc.toHypothesis.V :=
+    Subgroup.mem_inf.mpr ⟨hxK, hxV⟩
+  rw [sc.toHypothesis.K_inf_V_eq_bot, Subgroup.mem_bot] at hmemKV
+  rw [hmemKV] at hxo
+  simp only [orderOf_one] at hxo
+  exact hp.one_lt.ne hxo
+
+end SecondCaseHypothesis
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
