@@ -122,6 +122,44 @@ Sibley 側の入口 `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
       (`S08_SixTwoGeneral:871`) は結論に `dadeOrthonormalCharacterImageFamilyOfDiff` との
       一致を含むので Dade 固定。一般側は `memberExtensionDecomposition_general` を直接使う。
 
+## 最終結線の部品表 (2026-07-27 時点、すべて landing 済・axiom-clean)
+
+`S08_SixSixGeneral.lean` (778 行) に一般 `K` 版が、それ以外は元から一般。
+**残作業 = これらを 1 本の定理に結線するだけ**。
+
+| 書籍 p.32 の要素 | 一般 `K` での実体 | 所在 |
+|---|---|---|
+| 各 member の次数 `\|L:K\|·p^k` | `exists_index_primePow_degree_of_mem_inducedKernelFamily` | 本 leaf |
+| [Is] Cor 2.30 の中心界 `θ(1)² ≤ \|K:Z\|` | `exists_source_primePow_centralBound_of_mem_xSet` | 本 leaf |
+| 次数平方和 `total` | `sum_re_sq_xSet_eq` (+`xSetFinset`/`coe_xSetFinset`/`mem_xSetFinset`) | 本 leaf |
+| anchor 上の次数比 (`p`-冪) | `exists_primePow_degree_ratio_of_xBaseBlock_anchor` | 本 leaf |
+| tail 側の次数下界 `htail_le` | `characterDegree_re_le_of_notMem_pairUnion` | 本 leaf |
+| accumulator の性質 | `pairUnion_subset_xSet` / `pairUnion_finite` / `xBaseBlock_subset_pairUnion` | 本 leaf |
+| accumulator の有限列挙 | `exists_finEnum_irreducible` | 元から一般 (抽象群) |
+| 和の member/tail 分割 | `natSum_partition_of_realSum` | 元から一般 (抽象型 α) |
+| 可除性 `dχ·dχ ∣ D` | `S07.sq_dvd_head_of_commonIndex_primePower_sums` + `S08.sq_dvd_natDegreeSquareSum_of_commonIndex` + `S08.degreeDivisibilityInputs_of_commonIndex_primePowerData` | 元から一般 (抽象群+数値) |
+| `2a < ∑ deg²` | `S08.normalizedDegreeGap_of_natDegreeSumPrimePowerGap` | 元から一般 (抽象群+数値) |
+| member/break の orthonormality | `xMember_characterFacts` / `xMember_inner_eq_zero_of_notMem` | 本 leaf |
+| `hSgen` | `span_le_span_zSupportedSpan_union_anchor` | 本 leaf |
+| **per-step 継ぎ足し** | **`xAdjoinStep_of_degreeRatios`** | 本 leaf |
+| **X-chain fold** | **`xSet_isCoherent_of_adjoinSteps`** | 本 leaf |
+| **base coherence** | **`xBaseBlock_isCoherent`** | 本 leaf |
+
+### 結線の手順 (次セッション向け)
+
+1. `xSet_isCoherent_of_adjoinSteps` を呼び、`h0 := xBaseBlock_isCoherent`。
+2. `hstep` の中で: accumulator を `exists_finEnum_irreducible` で `Fin k` 列挙 →
+   anchor は `exists_xBaseBlock_anchor_index` (基底ブロックは常に prefix 内)。
+3. 次数データ: 各 member と break に `exists_primePow_degree_ratio_of_xBaseBlock_anchor`
+   → `deg`/`a`、`exists_index_primePow_degree_of_mem_inducedKernelFamily` → 共通指数形。
+4. tail-set = `xSetFinset K Z \ (列挙の像)`、`natSum_partition_of_realSum` で
+   `sum_re_sq_xSet_eq` を member 側 `D` と tail 側に分割、`htail_le` は
+   `characterDegree_re_le_of_notMem_pairUnion`。
+5. `sq_dvd_head_of_commonIndex_primePower_sums` → `dχ·dχ ∣ D` →
+   `normalizedDegreeGap_of_natDegreeSumPrimePowerGap` → `2a < ∑ deg²`。
+6. `xAdjoinStep_of_degreeRatios` に流し込む (`hSgen` は
+   `span_le_span_zSupportedSpan_union_anchor`)。
+
 ## 完了条件
 
 一般 `K` (可解正規・冪零・`p` 群) と中心的 `Z` に対する
