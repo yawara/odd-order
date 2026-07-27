@@ -3815,6 +3815,13 @@ set_option linter.style.longLine false in
 -- `xBaseBlock_isCoherent_of_irreducible_X` instead builds the orthonormal target family from the
 -- Dade map (`coherentEqualDegree_fromDade`); routing through (5.7) keeps this `τ`-general.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xBaseBlock_isCoherent
+-- Routine `𝒳`-member facts for the per-step adjoining (issue 0155 step 4): the conjugate pair
+-- `{χ, χ̄}` of an `𝒳`-member is orthonormal (irreducible by the standing `𝒳 ⊆ Irr L`, non-real
+-- because `|L|` is odd — Peterfalvi (1.1)), and a break outside an accumulator `S₁ ⊆ 𝒳` is
+-- orthogonal to it.  These are the `hrealχ`/`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar`/`hχ_S1`/`hχbar_S1`
+-- inputs of the `τ`-general (5.6) engine `S07.xAdjoinStepW_general`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xMember_characterFacts
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xMember_inner_eq_zero_of_notMem
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.

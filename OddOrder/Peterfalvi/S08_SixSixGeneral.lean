@@ -324,6 +324,52 @@ theorem exists_xBaseBlock_anchor_index {Z : Subgroup ↥L}
   obtain ⟨i₁, hi₁⟩ := hφpair
   exact ⟨i₁, by rw [show (χmem i₁ : ClassFunction ↥L ℂ) = φ from hi₁]; exact hφ⟩
 
+/-! ### Routine `𝒳`-member facts (the per-step adjoining inputs) -/
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- **Routine `𝒳`-member facts.**  For `χ ∈ 𝒳` — irreducible by the standing `hirr` (the book's
+`𝒳 ⊆ Irr L`) and non-real because `|L|` is odd (Peterfalvi (1.1)) — the conjugate pair `{χ, χ̄}`
+is orthonormal.
+
+These are the per-member `hrealχ`/`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar` inputs of the (5.6) engine
+`S07.xAdjoinStepW_general`, for both the adjoined break and the accumulator members.  The Sibley
+instance is `xMember_characterFacts_of_irreducible_X`. -/
+theorem xMember_characterFacts (hodd : Odd (Nat.card ↥L)) {Z : Subgroup ↥L}
+    (hirr : ∀ φ ∈ xSet K Z, IsIrreducibleCharacter φ)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ xSet K Z) :
+    ¬ ClassFunction.IsReal χ ∧
+      ClassFunction.inner χ χ = 1 ∧
+      ClassFunction.inner χ.conj χ.conj = 1 ∧
+      ClassFunction.inner χ.conj χ = 0 ∧
+      ClassFunction.inner χ χ.conj = 0 := by
+  have hχirr : IsIrreducibleCharacter χ := hirr χ hχ
+  have hconjirr : IsIrreducibleCharacter χ.conj := hχirr.conj
+  have hreal : ¬ ClassFunction.IsReal χ := xSet_hasNoRealCharacters (K := K) hodd Z hχ
+  have hne : (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L) ≠ ⟨χ, hχirr⟩ :=
+    fun h => hreal (congrArg Subtype.val h)
+  refine ⟨hreal, hχirr.inner_self_eq_one, hconjirr.inner_self_eq_one, ?_, ?_⟩
+  · simpa using
+      (irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
+        ⟨χ, hχirr⟩).trans (if_neg hne)
+  · simpa using
+      (irreducibleCharacter_inner_eq_ite (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)
+        ⟨χ.conj, hconjirr⟩).trans (if_neg (Ne.symm hne))
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- **A break `χ ∈ 𝒳` outside an accumulator `S₁ ⊆ 𝒳` is orthogonal to it, as is `χ̄`** — the
+`hχ_S1`/`hχbar_S1` inputs of the (5.6) engine.  Pure (5.2.c) pairwise orthogonality: distinct
+members of `𝒳` are orthogonal. -/
+theorem xMember_inner_eq_zero_of_notMem {Z : Subgroup ↥L}
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁X : S₁ ⊆ xSet K Z)
+    {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ xSet K Z) (hχS₁ : χ ∉ S₁) (hχbarS₁ : χ.conj ∉ S₁) :
+    (∀ x ∈ S₁, ClassFunction.inner χ x = 0) ∧
+      (∀ x ∈ S₁, ClassFunction.inner χ.conj x = 0) := by
+  refine ⟨fun x hx => xSet_pairwise_orthogonal (K := K) Z hχX (hS₁X hx) ?_,
+    fun x hx => xSet_pairwise_orthogonal (K := K) Z
+      (xSet_closedUnderConjugate (K := K) Z hχX) (hS₁X hx) ?_⟩
+  · rintro rfl; exact hχS₁ hx
+  · rintro rfl; exact hχbarS₁ hx
+
 /-! ### Base coherence of `𝒮₀`, general kernel -/
 
 /-- **Base coherence: `𝒮₀` is coherent** (Peterfalvi (6.6), p. 32: *"By (1.1) and (1.4),
