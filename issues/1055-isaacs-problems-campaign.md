@@ -4944,7 +4944,7 @@ IsMultiplyPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) n`) で
 | 8C.1 – 8C.4 | — | — | **完了** (二重着手あり、9212 参照) |
 | 8C.5 | 設計メモを書いた側のセッション (= 本セッション) | 2026-07-27 21:5x | **完了 2026-07-27** |
 | 8C.6 | lane a (9212 を起票した側) | 2026-07-27 21:5x | hub 裁定で確定 |
-| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **8D.1 / 8D.2 完了, 8D.3– 進行中** |
+| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **8D.1–8D.4 完了, 8D.5 / 8D.6 進行中** |
 
 ⚠ **恒久対処は worktree を分けること** — 1 lane = 1 worktree = 1 session が CLAUDE.md の前提。
 2 つ目のセッションは `notes/meta/worktree_setup.md` の手順で自分の worktree/branch を取るのが
@@ -5054,5 +5054,15 @@ leaf = `Problems8D/{SubdegreeTwo, DegreeEight}.lean` (188 / 213 行) + hub `Prob
   それ以外は長さ `≥ 3` が 2 つで `{3, 4}` に限られ, 互いに素なので **Thm 8.38**
   (Weiss, `subdegree_eq_one_of_coprime_of_max`) が `3 = 1` を強いる。
 
-**次は 8D.3** (rank `r`, 最大 subdegree `n` なら `|G|` は `r`, `n` の関数で抑えられる) →
-8D.4/8D.5 (既存 `CommonDivisorGraph.lean` の `arrowKernel` / `k_m` を使う) → 8D.6。
+* ✅ **8D.3** (`RankBound.lean`): `|Ω| ≤ r · n` (`selfEquivSigmaOrbits` + `Nat.card_sigma` +
+  `Finset.sum_le_card_nsmul`) と忠実性 `G ↪ Sym(Ω)` から **`|G| ≤ (r·n)!`**
+  (`card_le_factorial_rank_mul_max_subdegree`)。rank は
+  `Nat.card (orbitRel.Quotient ↥(stabilizer G α) Ω)` で扱う。
+* ✅ **8D.4** (`ArrowKernelIndex.lean`): `k_m = (stabilizer G α).relIndex (arrowKernel G m α)`
+  について (a) `le_relIndex_arrowKernel` (`m ≤ k_m`) / (b) `mul_stabilizer_eq_arrowKernel`
+  (`k_m = m` なら集合積 `G_α G_β = K_m(α)`) / (c) `lt_relIndex_arrowKernel`
+  (原始的で `m > 1` なら `m < k_m`)。鍵は `A·B ⊆ K` と **Problem 1A.3**
+  `Ch01.card_mul_card_inf` (`|A·B|·|A∩B| = |A||B|`)、(c) は点安定化群の極大性。
+
+**次は 8D.5** (rank 3, subdegree `1 < m < n` coprime ⟹ `(m+1) ∣ n`; Hint: `k_m ∣ 1+m+n`) →
+**8D.6** (原始群で素数 `p` が subdegree なら `p² ∤ |G_α|`)。
