@@ -312,6 +312,7 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Orbitals
 import OddOrder.Isaacs.Ch08_PermutationGroups.OrbitalGraph
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C
 import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
