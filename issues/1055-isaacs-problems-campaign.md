@@ -3453,3 +3453,25 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
 * ⏳ **6C.2(b)** 残り: `Q_i = K_i` の Sylow `q`-部分群、`X = ⟨Q_i⟩` が `Syl_q(N)` に入る。
   hint = `A`-不変 Sylow `q`-部分群 `Q` を取り `X ≤ Q`; `X < Q` なら `A`-不変な
   `X ≤ Y < Q` を作り `A` の `Q/Y` への作用が Frobenius になることを示す。
+
+#### 6C.2(b) 進捗 (2026-07-27): 互いに素性の補題を実証明 + 使うインフラの所在確定
+
+* ✅ `not_dvd_card_of_fixedFree_of_isPGroup` (`Problems6C2.lean`): **`p`-群 `A` が `C_N(A) = 1`
+  で作用すれば `p ∤ |N|`**。`p ∣ |N|` なら `|Syl_p(N)| ≡ 1 (mod p)` + `A` が `p`-群 ⟹
+  `A`-不変 Sylow `p`-部分群 `P` があり (`IsPGroup.card_modEq_card_fixedPoints` を
+  `Sylow p N` に適用)、`A` の `↥P` への作用でも固定点の個数 ≡ `|P|` ≡ 0 (mod p) なので
+  単位元以外の固定点が出て矛盾。⟹ **(b) で要る coprime 仮説は (a) の仮説から導ける**
+  (書籍が言わない仮説を足す必要がない = 特殊化債務なし)。
+* 使うインフラ (所在確定済、いずれも `OddOrder.Isaacs.Ch04.*` = 書籍順で上流):
+  * `exists_aInvariant_sylow` (Thm 3.23(a))、`aInvariant_sylow_conj` (3.23(b)) —
+    仮説は `Coprime (card A) (card G)` + `IsSolvable A ∨ IsSolvable G` (A は elementary
+    abelian ゆえ可解で OK、`N` の可解性は不要)。
+  * `aInvariant_pSubgroup_le_aInvariant_sylow` (Cor 3.25) = A-不変 q-部分群は A-不変 Sylow に入る。
+  * `coprime_fixedPoints_quotient_of_coprime_normal` (Cor 3.28) = 商の固定点は底の固定点像。
+* 残りの筋: `Q_i` = 冪零 `K_i` の唯一の Sylow `q` (⟹ `K_i` で characteristic ⟹ A-不変)、
+  `X = ⨆ Q_i` は A-不変 q-部分群なので A-不変 Sylow `q` の `Q` に入る (Cor 3.25)。
+  `X < Q` なら `Y := X ⊔ Φ(Q)` が `Q` で正規・A-不変・真 (Frattini) で、
+  Cor 3.28 から `C_{Q/Y}(A_i) = C_Q(A_i)Y/Y = 1` (∵ `C_Q(A_i) ≤ Q_i ≤ X`) ⟹ `A` の
+  `Q/Y` 作用が Frobenius ⟹ Thm 6.9 elementary-abelian 分岐
+  (`false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target`)
+  で矛盾。

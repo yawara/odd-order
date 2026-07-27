@@ -346,6 +346,86 @@ theorem exists_family_nilpotent_subgroups_of_card_prime_sq
     intro n hn
     exact Subgroup.mem_bot.mpr (hfix_two i j hij n hn.1 hn.2)
 
+/-! ### (b) の準備: 固定点自由な `p`-群作用は位数を互いに素にする -/
+
+open Pointwise in
+/-- **`p`-群が固定点自由に作用すれば `p ∤ |N|`**: `p`-群 `A` が `N` に作用して
+`C_N(A) = 1` なら `p` は `|N|` を割らない。
+
+`p ∣ |N|` とすると `|Syl_p(N)| ≡ 1 (mod p)` と `A` が `p`-群であることから `A`-不変な
+Sylow `p`-部分群 `P` が取れる。`A` の `P` への作用の固定点の個数は `|P| ≡ 0 (mod p)` に
+合同なので `p` 個以上あり, 単位元以外の固定点が存在してしまう。 -/
+theorem not_dvd_card_of_fixedFree_of_isPGroup {A N : Type*} [Group A] [Finite A] [Group N]
+    [Finite N] [MulDistribMulAction A N] {p : ℕ} (hp : p.Prime) (hA : IsPGroup p A)
+    (hfixA : ∀ n : N, (∀ a : A, a • n = n) → n = 1) : ¬ p ∣ Nat.card N := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  intro hdvd
+  -- `A`-不変 Sylow `p`-部分群を取る
+  obtain ⟨P, hPfix⟩ : ∃ P : Sylow p N, ∀ a : A, a • P = P := by
+    have h1 : Nat.card (Sylow p N) ≡ 1 [MOD p] := card_sylow_modEq_one p N
+    have h2 : Nat.card (Sylow p N) ≡ Nat.card (MulAction.fixedPoints A (Sylow p N)) [MOD p] :=
+      hA.card_modEq_card_fixedPoints (Sylow p N)
+    have h3 : Nat.card (MulAction.fixedPoints A (Sylow p N)) ≡ 1 [MOD p] := h2.symm.trans h1
+    have hne : Nat.card (MulAction.fixedPoints A (Sylow p N)) ≠ 0 := by
+      intro h0
+      rw [h0] at h3
+      have hd : p ∣ 1 := (Nat.modEq_iff_dvd' (by norm_num)).mp h3
+      exact hp.ne_one (Nat.dvd_one.mp hd)
+    obtain ⟨⟨Q, hQ⟩⟩ := (Nat.card_pos_iff.mp (Nat.pos_of_ne_zero hne)).1
+    exact ⟨Q, fun a => hQ a⟩
+  -- 部分群としての `A`-不変性
+  have hPinv : ∀ a : A, ∀ m ∈ (P : Subgroup N), a • m ∈ (P : Subgroup N) := by
+    intro a m hm
+    have hs : a • ((P : Sylow p N) : Subgroup N) = ((P : Sylow p N) : Subgroup N) := by
+      have h := congrArg (fun S : Sylow p N => (S : Subgroup N)) (hPfix a)
+      rwa [Sylow.pointwise_smul_def] at h
+    rw [← hs]
+    exact Subgroup.smul_mem_pointwise_smul m a _ hm
+  -- `P` は非自明な `p`-群
+  have hPbot : (P : Subgroup N) ≠ ⊥ := P.ne_bot_of_dvd_card hdvd
+  haveI hPnt : Nontrivial ↥(P : Subgroup N) := (Subgroup.nontrivial_iff_ne_bot _).mpr hPbot
+  have hPcard : p ∣ Nat.card ↥(P : Subgroup N) := by
+    obtain ⟨k, hk⟩ := P.2.exists_card_eq
+    rcases Nat.eq_zero_or_pos k with rfl | hk1
+    · rw [pow_zero] at hk
+      exact absurd hk (Finite.one_lt_card_iff_nontrivial.mpr hPnt).ne'
+    · rw [hk]
+      exact dvd_pow_self p (by omega)
+  -- `A` の `↥P` への作用 (不変部分群への制限)
+  letI actP : MulDistribMulAction A ↥(P : Subgroup N) :=
+    IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ hPinv
+  have hmod : Nat.card ↥(P : Subgroup N)
+      ≡ Nat.card (MulAction.fixedPoints A ↥(P : Subgroup N)) [MOD p] :=
+    hA.card_modEq_card_fixedPoints _
+  have hfp : p ∣ Nat.card (MulAction.fixedPoints A ↥(P : Subgroup N)) :=
+    (Nat.modEq_zero_iff_dvd.mp ((Nat.modEq_zero_iff_dvd.mpr hPcard).symm.trans hmod).symm)
+  -- 単位元は固定点なので個数は正, `p ∣` なので `2` 以上
+  have hone : (1 : ↥(P : Subgroup N)) ∈ MulAction.fixedPoints A ↥(P : Subgroup N) :=
+    fun a => smul_one a
+  have hpos : 0 < Nat.card (MulAction.fixedPoints A ↥(P : Subgroup N)) :=
+    Nat.card_pos_iff.mpr ⟨⟨⟨1, hone⟩⟩, inferInstance⟩
+  have hge : 2 ≤ Nat.card (MulAction.fixedPoints A ↥(P : Subgroup N)) := by
+    obtain ⟨t, ht⟩ := hfp
+    have h2 := hp.two_le
+    rcases Nat.eq_zero_or_pos t with rfl | htpos
+    · rw [mul_zero] at ht
+      omega
+    · exact le_trans h2 (by rw [ht]; exact Nat.le_mul_of_pos_right p htpos)
+  haveI : Nontrivial ↥(MulAction.fixedPoints A ↥(P : Subgroup N)) :=
+    Finite.one_lt_card_iff_nontrivial.mp (by omega)
+  obtain ⟨u, v, huv⟩ := ‹Nontrivial ↥(MulAction.fixedPoints A ↥(P : Subgroup N))›
+  -- `u`, `v` のどちらかは単位元でない
+  obtain ⟨m, hmfix, hmne⟩ : ∃ m : ↥(P : Subgroup N),
+      (∀ a : A, a • m = m) ∧ m ≠ 1 := by
+    rcases eq_or_ne (u : ↥(P : Subgroup N)) 1 with hu | hu
+    · refine ⟨(v : ↥(P : Subgroup N)), fun a => v.2 a, ?_⟩
+      intro hv
+      exact huv (Subtype.ext (by rw [hu, hv]))
+    · exact ⟨(u : ↥(P : Subgroup N)), fun a => u.2 a, hu⟩
+  refine hmne (Subtype.ext (hfixA ((m : ↥(P : Subgroup N)) : N) fun a => ?_))
+  exact congrArg (fun w : ↥(P : Subgroup N) => (w : N)) (hmfix a)
+
 end
 
 end OddOrder.Isaacs.Ch06
