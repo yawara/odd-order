@@ -38,6 +38,9 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
   `eq_top_zpowers_mCycle_sup_zpowers_addRight_one`,
   `eq_alternatingGroup_zpowers_mCycle_sup_zpowers_addRight_one` — **8B.9**:
   `m` か `n` が偶なら `S_n`, ともに奇なら `A_n`。
+- `eq_stabilizer_of_index_eq_of_fixed`, `not_fixed_of_index_eq_of_ne_stabilizer` —
+  **8B.10 への準備**: `S_n` の指数 `n` の部分群が点を固定すればそれは点安定化群
+  そのもの (⟹ 点安定化群でなければ固定点をもたない)。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -603,6 +606,42 @@ theorem eq_alternatingGroup_zpowers_mCycle_sup_zpowers_addRight_one {n m : ℕ} 
     have h1 : ((-1 : ℤˣ)) ^ n = -1 := hno.neg_one_pow
     rw [sign_addRight_one (by omega), h1]
     decide
+
+/-! ### Problem 8B.10 への準備 — 指数 `n` の部分群 -/
+
+section IndexN
+
+variable {α : Type*} [Finite α]
+
+/-- `S_n` の指数 `n` の部分群が点 `a` を固定すれば, それは `a` の点安定化群そのもの。
+
+`H ≤ G_a` かつ `[S_n : G_a] = n = [S_n : H]` なので相対指数が `1` になる。 -/
+lemma eq_stabilizer_of_index_eq_of_fixed {H : Subgroup (Equiv.Perm α)}
+    (hidx : H.index = Nat.card α) {a : α} (hfix : ∀ h ∈ H, h a = a) :
+    H = MulAction.stabilizer (Equiv.Perm α) a := by
+  have hle : H ≤ MulAction.stabilizer (Equiv.Perm α) a := fun h hh =>
+    MulAction.mem_stabilizer_iff.mpr (hfix h hh)
+  have hstab : (MulAction.stabilizer (Equiv.Perm α) a).index = Nat.card α :=
+    MulAction.index_stabilizer_of_transitive _ a
+  have hmul := Subgroup.relIndex_mul_index hle
+  rw [hstab, hidx] at hmul
+  haveI : Nonempty α := ⟨a⟩
+  have hpos : 0 < Nat.card α := Nat.card_pos
+  have hrel : H.relIndex (MulAction.stabilizer (Equiv.Perm α) a) = 1 :=
+    Nat.eq_of_mul_eq_mul_right hpos (by rw [hmul, one_mul])
+  exact le_antisymm hle (Subgroup.relIndex_eq_one.mp hrel)
+
+/-- `S_n` の指数 `n` の部分群が点安定化群でなければ, **固定点をもたない**
+(したがってすべての軌道は 2 点以上)。 -/
+lemma not_fixed_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α)}
+    (hidx : H.index = Nat.card α)
+    (hns : ∀ a : α, H ≠ MulAction.stabilizer (Equiv.Perm α) a) (a : α) :
+    ∃ h ∈ H, h a ≠ a := by
+  by_contra hcon
+  push Not at hcon
+  exact hns a (eq_stabilizer_of_index_eq_of_fixed hidx hcon)
+
+end IndexN
 
 end MCycle
 
