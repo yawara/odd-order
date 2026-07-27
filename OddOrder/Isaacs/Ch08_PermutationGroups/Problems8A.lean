@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Sylow
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.Isaacs.Ch08_PermutationGroups.HalfTransitive
 import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
 
 /-!
@@ -37,6 +39,9 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
   `|Δ| ≥ 2` は `|Ω| = 2` を強制するので, `r = min(k, |Δ|)` の主張はこの推移性に尽きる。
 - `exists_mem_conj_eq_of_sylow_le`, `exists_mem_normalizer_sylow_smul_eq` —
   **Problem 8A.6**: `Q ∈ Syl_p(G_α)` について `N_G(Q)` は `Fix(Q)` に推移的。
+- `isFrobeniusAction_of_comm_of_half_transitive`,
+  `isFrobeniusAction_and_isCyclic_of_comm_of_half_transitive` — **Problem 8A.7**:
+  可換群の忠実 half-transitive 作用は Frobenius で, その群は巡回。
 - `smul_orbit_eq_orbit_smul`, `card_orbit_eq_of_normal` — **Problem 8A.8**:
   transitive な `G` の正規部分群 `N` について `G` は `N`-軌道を推移的に置換し,
   したがって `N` は half-transitive (すべての `N`-軌道が同じ濃度)。
@@ -516,6 +521,71 @@ theorem exists_mem_normalizer_sylow_smul_eq [Finite G] [IsPretransitive G Ω] {p
     simp
   · rw [mul_smul, hg, inv_smul_eq_iff]
     exact (mem_stabilizer_iff.mp hxK).symm
+
+/-! ### Problem 8A.7 — 可換群の half-transitive 作用は Frobenius -/
+
+section AbelianHalfTransitive
+
+variable {A N : Type*} [Group A] [Group N] [MulDistribMulAction A N]
+
+/-- 可換な `A` が作用するとき, 一つの元 `a` の固定部分群は `A`-不変。 -/
+theorem smul_mem_fixedBy_of_comm (hcomm : ∀ x y : A, x * y = y * x) (a b : A) {n : N}
+    (hn : a • n = n) : a • (b • n) = b • n := by
+  rw [smul_smul, hcomm, ← smul_smul, hn]
+
+/-- **Isaacs Problem 8A.7** (p. 235), 前半: **可換群 `A` が `N` に忠実に作用し, 非単位元上の
+作用が half-transitive なら, その作用は Frobenius**。
+
+Thm 8.9 (`isFrobeniusAction_or_isElementaryAbelian_of_half_transitive`) の例外肢を
+可換性で潰す: `a ≠ 1` が `n ≠ 1` を固定するなら, `a` の固定部分群 `Fix(a)` は
+(`A` が可換なので) `A`-不変で `⊥` でない。例外肢は「`⊥` 以外の真の `A`-不変部分群は無い」
+と言うので `Fix(a) = ⊤`, すなわち `a` は自明に作用し忠実性に反する。 -/
+theorem isFrobeniusAction_of_comm_of_half_transitive [Finite A] [Finite N] [FaithfulSMul A N]
+    (hcomm : ∀ x y : A, x * y = y * x)
+    (hhalf : ∀ x y : N, x ≠ 1 → y ≠ 1 →
+      Nat.card (MulAction.orbit A x) = Nat.card (MulAction.orbit A y)) :
+    Ch06.IsFrobeniusAction A N := by
+  rcases isFrobeniusAction_or_isElementaryAbelian_of_half_transitive A N hhalf with h | ⟨-, hirr⟩
+  · exact h
+  intro a ha n hn hfix
+  -- `Fix(a)` は `A`-不変な非自明部分群
+  let F : Subgroup N :=
+    { carrier := {x : N | a • x = x}
+      one_mem' := smul_one a
+      mul_mem' := fun {u v} hu hv => by
+        simp only [Set.mem_setOf_eq] at hu hv ⊢
+        rw [smul_mul', hu, hv]
+      inv_mem' := fun {u} hu => by
+        simp only [Set.mem_setOf_eq] at hu ⊢
+        rw [smul_inv', hu] }
+  have hFinv : ∀ b : A, ∀ x ∈ F, b • x ∈ F := fun b x hx =>
+    smul_mem_fixedBy_of_comm hcomm a b hx
+  have hFtop : F = ⊤ := by
+    by_contra hne
+    have := hirr F hne hFinv
+    have hnF : n ∈ F := hfix
+    rw [this, Subgroup.mem_bot] at hnF
+    exact hn hnF
+  refine ha (FaithfulSMul.eq_of_smul_eq_smul (α := N) fun x => ?_)
+  have : x ∈ F := hFtop ▸ Subgroup.mem_top x
+  rw [one_smul]
+  exact this
+
+/-- **Isaacs Problem 8A.7** (p. 235): 可換群 `A` が非自明な `N` に忠実に作用し, 非単位元上の
+作用が half-transitive なら, その作用は Frobenius で **`A` は巡回群**。
+
+`A` が巡回であることは前半 (Frobenius) と Isaacs Cor 6.17 の可換分岐
+(`Ch06.isCyclic_of_frobeniusAction_of_isMulCommutative`, 可換な Frobenius 補群は巡回) から。 -/
+theorem isFrobeniusAction_and_isCyclic_of_comm_of_half_transitive [Finite A] [Finite N]
+    [Nontrivial N] [FaithfulSMul A N] [IsMulCommutative A]
+    (hhalf : ∀ x y : N, x ≠ 1 → y ≠ 1 →
+      Nat.card (MulAction.orbit A x) = Nat.card (MulAction.orbit A y)) :
+    Ch06.IsFrobeniusAction A N ∧ IsCyclic A := by
+  have hfrob := isFrobeniusAction_of_comm_of_half_transitive
+    (fun x y => (IsMulCommutative.is_comm (M := A)).comm x y) hhalf
+  exact ⟨hfrob, Ch06.isCyclic_of_frobeniusAction_of_isMulCommutative hfrob⟩
+
+end AbelianHalfTransitive
 
 /-! ### Problem 8A.8 — 正規部分群の軌道は推移的に置換される -/
 

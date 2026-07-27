@@ -4156,6 +4156,16 @@ TransitiveAutomorphisms / TransvectionGeneration)。演習は新 leaf `Problems8
   を得られない (`IsPGroup`/`Sylow` が unknown identifier) → 明示 import が要る。
   `x • S` (`S : Sylow p ↥K`) の coe は `MulDistribMulAction.toMonoidEnd` 経由になり
   `(MulAut.conj x).toMonoidHom` と**構文的に**一致しない → `rw` でなく `exact` (defeq) で渡す。
+* ✅ **8A.7** 実証明 — `isFrobeniusAction_of_comm_of_half_transitive` /
+  `isFrobeniusAction_and_isCyclic_of_comm_of_half_transitive`。
+  **既存 Thm 8.9** (`isFrobeniusAction_or_isElementaryAbelian_of_half_transitive`,
+  同ディレクトリ `HalfTransitive.lean`) の例外肢を可換性で潰すだけ: `a ≠ 1` が `n ≠ 1` を
+  固定するなら `Fix(a)` は (`A` 可換ゆえ) `A`-不変で `⊥` でない → 例外肢の既約性から `⊤`
+  → `a` が自明作用 → 忠実性に矛盾。「`A` 巡回」は既存
+  `Ch06.isCyclic_of_frobeniusAction_of_isMulCommutative` (Cor 6.17 の可換分岐) を引くだけ。
+  ⚠ **教訓**: 「可換 f.p.f. ⟹ 巡回」を自前で証明しかけたが (rank-2 coprime 生成補題や
+  Schur が要る大仕事)、repo に既に在った。**着手前に repo 全体を grep する**
+  ([[bg-longhand-arguments-may-be-existing-isaacs-lemmas]] と同型の罠)。
 * ✅ **8A.8** 実証明 — `smul_orbit_eq_orbit_smul` (`N ⊴ G` なら `g • orbit N α =
   orbit N (g • α)`) / `card_orbit_eq_of_normal` (帰結: `N` は half-transitive)。
 
