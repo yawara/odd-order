@@ -3982,3 +3982,30 @@ def CharLocalPControl (p : ℕ) (P : Subgroup G) : Prop :=
 `H = N_G(X₀)` への遺伝は「`g ∈ N_H(Y) ⊆ N_G(Y)` に仮説を適用し `g^{p^k} ∈ C_G(Y) ⊓ H`」で
 自明。⚠ ただし Case B で `[G : C_G(X)]` が `p`-冪であることが要る箇所では
 `IsPGroup` ↔ 位数の変換を別途噛ませる (有限群なので `IsPGroup.exists_card_eq` 相当)。
+
+### 7C.1 進捗 (2026-07-27 その2): 部品 4 本が landing
+
+`Problems7C.lean` (axiom-clean, lint clean):
+
+1. `hasNormalPComplement_of_normal_pi'_of_isPGroup_quotient` — Case B の締め。
+2. `CharLocalPControl` (定義) + `trivial_on_centralizer`。
+3. `characteristic_map_of_mulEquiv` — `e : A ≃* B` に沿った characteristic の輸送
+   (mathlib は同一群の `MulAut` 版しか持たない)。
+4. `CharLocalPControl.of_subgroup` — **Case A の遺伝** (`S : Subgroup ↥H` について
+   ambient 版から `↥H` 内版を導く)。補助 `subtype_comp_equivMapOfInjective` /
+   `map_equivMapOfInjective_map_subtype`。
+5. `le_of_relIndex_eq_pow_of_not_dvd` — **Case B step 3** (`[K:C⊓K]` が `p` 冪 かつ
+   `p ∤ [K:X]` ⟹ `K ≤ C`; `p` の素数性不要)。
+
+**追加で見つかった既存部品**: `hasNormalPComplement_of_sylow_le_center`
+(`Ch05_Transfer/Problems5D.lean:133`, Schur–Zassenhaus 経由で transfer 不要) —
+Case B step 4 の Burnside はこれで足りる (`X ≤ Z(K)` ⟹ `K` に normal `p`-complement)。
+
+**残り**: (i) Case B step 2 の**商への遺伝** (`X ⊴ G` char in `P` のとき `G/X` が
+局所条件を満たす — `P/X` の char 部分群と `P` の char 部分群の対応が要る),
+(ii) `X := Ω₁(Z(X₀))` の characteristic 連鎖, (iii) `|G|` 上の強帰納法の骨組み
+(`hasNormalPComplement_of_forall_characteristic_normalizer.{u}` と同じ universe 注釈が要る),
+(iv) Case B step 4 の packaging (`X ⊴ K` が `p`-群 + `K/X` が `p'`-群 ⟹ `X ∈ Syl_p(K)`)。
+
+⚠ Lean メモ: 現行 mathlib の相対指数は **`Subgroup.relIndex`** (`relindex` は無い),
+`Mathlib.GroupTheory.Index` に在り `relIndex_mul_relIndex` は部分群 3 つが明示引数。
