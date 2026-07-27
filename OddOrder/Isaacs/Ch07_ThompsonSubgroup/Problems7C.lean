@@ -49,6 +49,29 @@ theorem hasNormalPComplement_of_normal_pi'_of_isPGroup_quotient
   refine hasNormalPComplement_of_sylow_eq_top Q ?_
   exact (Q.is_maximal' (isPGroup_subgroup hQ ⊤) le_top).symm
 
+/-! ### 7C.1 の局所条件 -/
+
+/-- **Isaacs 7C.1 の局所条件**: `P` の characteristic 部分群 `X` すべてについて
+`N_G(X)/C_G(X)` が `p`-群。
+
+既存の `HasThompsonLocalPComplements` と同じく **ambient `G` の任意の部分群 `P`** に対して
+定義する (Sylow に限定しない) — そうしないと部分群・同型への輸送補題が書けないため。
+
+⚠ 商群 `↥N_G(X) ⧸ C_G(X).subgroupOf N_G(X)` ではなく**元ごとの形**
+(`g ∈ N_G(X)` なら `g ^ p ^ k ∈ C_G(X)`) を採る: `Normal` インスタンスの証明を避けられ,
+部分群への遺伝が「`N_H(X) ≤ N_G(X)` に仮説を当てるだけ」で済む。有限群では両者は同値。 -/
+def CharLocalPControl (p : ℕ) (P : Subgroup G) : Prop :=
+  ∀ X : Subgroup ↥P, X.Characteristic →
+    ∀ g ∈ Subgroup.normalizer ((X.map P.subtype : Subgroup G) : Set G),
+      ∃ k : ℕ, g ^ p ^ k ∈ Subgroup.centralizer ((X.map P.subtype : Subgroup G) : Set G)
+
+/-- 局所条件は `C_G(X) ≤ N_G(X)` の元については自明 (`k = 0`)。 -/
+theorem CharLocalPControl.trivial_on_centralizer {p : ℕ} {P : Subgroup G}
+    {X : Subgroup ↥P} {g : G}
+    (hg : g ∈ Subgroup.centralizer ((X.map P.subtype : Subgroup G) : Set G)) :
+    ∃ k : ℕ, g ^ p ^ k ∈ Subgroup.centralizer ((X.map P.subtype : Subgroup G) : Set G) :=
+  ⟨0, by simpa using hg⟩
+
 end
 
 end OddOrder.Isaacs.Ch07
