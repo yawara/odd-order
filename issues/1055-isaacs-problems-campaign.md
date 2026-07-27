@@ -4229,3 +4229,20 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 
 **旧記載の残り**: 上記 1–4 の結線 (極小正規部分群の存在, Thm 3.11 の適用形, Thm 8.5 第 3 主張の
 `ofStabilizerToNonidentity` から 3-transitivity を移す部分, 最後の `|Ω| = 4 ⟹ G = S₄`)。
+
+### 8A.11 (2026-07-27): `AGL(1,F)` の構成と sharply 2-transitivity
+
+⚠ 既存 `AffineGroup.lean` は **𝔽₂ 専用** (`V ⋊ GL(V)`, Cor 8.7) なので 8A.11 (任意の
+素数冪 `q`) には流用できない → `Equiv.Perm F` の部分群として `AGL(1,F)` を直接構成した。
+
+* `affineLinePerm a b = (x ↦ a x + b)` (`Equiv.mulLeft₀` + `Equiv.addRight`)。
+* `affineLineGroup F : Subgroup (Equiv.Perm F)` — 積・逆は `ring` / `inv_eq_of_mul_eq_one_right`。
+* ✅ `existsUnique_affineLineGroup_of_ne` — **sharply 2-transitive**
+  (`a = (y₁-y₂)/(x₁-x₂)`, `b = y₁ - a x₁` が唯一解)。
+
+⚠ Lean メモ: `Subgroup` を `where carrier := {p | ∃ ...}` で作ると, 会員判定が
+`toSubsemigroup.1` 経由になって **`Iff.rfl` も anonymous constructor も通らない**。
+`⟨fun h => h, fun h => h⟩` で `mem_..._iff` を作り, 以後それを経由する。
+
+**残り (8A.11)**: 可解性 (metabelian — 線形部分 `p ↦ a` が `Fˣ` への準同型で核は平行移動群
+`≅ F⁺`)。

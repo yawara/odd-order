@@ -55,6 +55,8 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `card_eq_four_of_solvable_of_stabilizer_three_transitive`,
   `nonempty_mulEquiv_perm_fin_four_of_four_transitive` — **Problem 8A.10**:
   可解な 4-transitive 置換群の次数は 4 で, したがって `S₄` に同型。
+- `affineLineGroup`, `existsUnique_affineLineGroup_of_ne` — **Problem 8A.11**:
+  1 次元アフィン群 `AGL(1, F) = {x ↦ ax + b}` は `F` 上 sharply 2-transitive。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -840,6 +842,74 @@ theorem nonempty_mulEquiv_perm_fin_four_of_four_transitive [FaithfulSMul G Ω]
     have hx : x = e (e.symm x) := (e.apply_symm_apply x).symm
     rw [MulAction.toPermHom_apply, MulAction.toPerm_apply, hx, hg (e.symm x)]
   exact ⟨(MulEquiv.ofBijective _ hbij).trans (permCongrMulEquiv e.symm)⟩
+
+/-! ### Problem 8A.11 — 1 次元アフィン群 `AGL(1, F)` -/
+
+section AffineLine
+
+variable {F : Type*} [Field F]
+
+/-- `x ↦ a * x + b` (`a` は単元) が定める `F` の置換。 -/
+def affineLinePerm (a : Fˣ) (b : F) : Equiv.Perm F :=
+  (Equiv.mulLeft₀ (a : F) a.ne_zero).trans (Equiv.addRight b)
+
+@[simp] lemma affineLinePerm_apply (a : Fˣ) (b x : F) :
+    affineLinePerm a b x = (a : F) * x + b := rfl
+
+/-- **1 次元アフィン群** `AGL(1, F) = {x ↦ a x + b : a ∈ Fˣ, b ∈ F}` — `Sym(F)` の部分群。
+
+`q = |F|` のとき位数は `q(q - 1)` で, `F` 上 sharply 2-transitive
+(`existsUnique_affineLineGroup_of_ne`)。 -/
+def affineLineGroup (F : Type*) [Field F] : Subgroup (Equiv.Perm F) where
+  carrier := {p | ∃ (a : Fˣ) (b : F), p = affineLinePerm a b}
+  one_mem' := ⟨1, 0, by ext x; simp⟩
+  mul_mem' := by
+    rintro - - ⟨a, b, rfl⟩ ⟨a', b', rfl⟩
+    refine ⟨a * a', (a : F) * b' + b, Equiv.ext fun x => ?_⟩
+    simp only [Equiv.Perm.mul_apply, affineLinePerm_apply, Units.val_mul]
+    ring
+  inv_mem' := by
+    rintro - ⟨a, b, rfl⟩
+    refine ⟨a⁻¹, -(((a⁻¹ : Fˣ) : F) * b), inv_eq_of_mul_eq_one_right (Equiv.ext fun x => ?_)⟩
+    simp only [Equiv.Perm.mul_apply, affineLinePerm_apply, Equiv.Perm.one_apply, mul_add,
+      mul_neg, ← mul_assoc, Units.mul_inv, one_mul]
+    ring
+
+lemma mem_affineLineGroup_iff {p : Equiv.Perm F} :
+    p ∈ affineLineGroup F ↔ ∃ (a : Fˣ) (b : F), p = affineLinePerm a b :=
+  ⟨fun h => h, fun h => h⟩
+
+/-- **Isaacs Problem 8A.11** (p. 236): `AGL(1, F)` は `F` 上 **sharply 2-transitive** —
+相異なる 2 点の任意の組を相異なる 2 点の任意の組へ移す元がちょうど 1 つある。
+
+`a = (y₁ - y₂)/(x₁ - x₂)`, `b = y₁ - a x₁` が唯一の解 (アフィン写像は 2 点での値で決まる)。
+有限体は各素数冪 `q > 1` について存在するので, これで次数 `q` の可解 sharply 2-transitive
+置換群の存在が言える (可解性 = metabelian は次の課題)。 -/
+theorem existsUnique_affineLineGroup_of_ne {x₁ x₂ y₁ y₂ : F} (hx : x₁ ≠ x₂) (hy : y₁ ≠ y₂) :
+    ∃! p : ↥(affineLineGroup F),
+      (p : Equiv.Perm F) x₁ = y₁ ∧ (p : Equiv.Perm F) x₂ = y₂ := by
+  have hxsub : x₁ - x₂ ≠ 0 := sub_ne_zero.mpr hx
+  have hysub : y₁ - y₂ ≠ 0 := sub_ne_zero.mpr hy
+  set a : Fˣ := Units.mk0 ((y₁ - y₂) / (x₁ - x₂)) (div_ne_zero hysub hxsub) with ha
+  have hacoe : (a : F) = (y₁ - y₂) / (x₁ - x₂) := rfl
+  have hax : (a : F) * (x₁ - x₂) = y₁ - y₂ := by
+    rw [hacoe, div_mul_cancel₀ _ hxsub]
+  refine ⟨⟨affineLinePerm a (y₁ - (a : F) * x₁),
+    mem_affineLineGroup_iff.mpr ⟨a, _, rfl⟩⟩, ⟨by simp, ?_⟩, ?_⟩
+  · simp only [affineLinePerm_apply]
+    linear_combination -hax
+  · rintro ⟨q, hq⟩ ⟨h1, h2⟩
+    obtain ⟨a', b', rfl⟩ := mem_affineLineGroup_iff.mp hq
+    simp only [affineLinePerm_apply] at h1 h2
+    have hA : (a' : F) = (a : F) := by
+      have hthis : (a' : F) * (x₁ - x₂) = y₁ - y₂ := by linear_combination h1 - h2
+      rw [hacoe, eq_div_iff hxsub]
+      exact hthis
+    have hB : b' = y₁ - (a : F) * x₁ := by rw [← hA]; linear_combination h1
+    refine Subtype.ext (Equiv.ext fun x => ?_)
+    simp only [affineLinePerm_apply, hA, hB]
+
+end AffineLine
 
 end
 
