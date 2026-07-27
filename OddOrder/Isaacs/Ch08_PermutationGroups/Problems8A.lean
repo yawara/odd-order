@@ -55,8 +55,10 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `card_eq_four_of_solvable_of_stabilizer_three_transitive`,
   `nonempty_mulEquiv_perm_fin_four_of_four_transitive` — **Problem 8A.10**:
   可解な 4-transitive 置換群の次数は 4 で, したがって `S₄` に同型。
-- `affineLineGroup`, `existsUnique_affineLineGroup_of_ne` — **Problem 8A.11**:
-  1 次元アフィン群 `AGL(1, F) = {x ↦ ax + b}` は `F` 上 sharply 2-transitive。
+- `affineLineGroup`, `existsUnique_affineLineGroup_of_ne`,
+  `affineLineGroup_isSolvable` — **Problem 8A.11**: 1 次元アフィン群
+  `AGL(1, F) = {x ↦ ax + b}` は `F` 上 sharply 2-transitive で, metabelian ゆえ可解。
+  有限体は各素数冪について存在するので, 次数 `q` の可解 sharply 2-transitive 群が得られる。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -884,7 +886,7 @@ lemma mem_affineLineGroup_iff {p : Equiv.Perm F} :
 
 `a = (y₁ - y₂)/(x₁ - x₂)`, `b = y₁ - a x₁` が唯一の解 (アフィン写像は 2 点での値で決まる)。
 有限体は各素数冪 `q > 1` について存在するので, これで次数 `q` の可解 sharply 2-transitive
-置換群の存在が言える (可解性 = metabelian は次の課題)。 -/
+置換群の存在が言える (可解性は `affineLineGroup_isSolvable`)。 -/
 theorem existsUnique_affineLineGroup_of_ne {x₁ x₂ y₁ y₂ : F} (hx : x₁ ≠ x₂) (hy : y₁ ≠ y₂) :
     ∃! p : ↥(affineLineGroup F),
       (p : Equiv.Perm F) x₁ = y₁ ∧ (p : Equiv.Perm F) x₂ = y₂ := by
@@ -908,6 +910,60 @@ theorem existsUnique_affineLineGroup_of_ne {x₁ x₂ y₁ y₂ : F} (hx : x₁ 
     have hB : b' = y₁ - (a : F) * x₁ := by rw [← hA]; linear_combination h1
     refine Subtype.ext (Equiv.ext fun x => ?_)
     simp only [affineLinePerm_apply, hA, hB]
+
+/-- `AGL(1,F)` の元の**線形部分** `a`。`p x = a x + b` から `a = p 1 - p 0` として取り出す。 -/
+def affineLinearPart (p : ↥(affineLineGroup F)) : Fˣ :=
+  Units.mk0 ((p : Equiv.Perm F) 1 - (p : Equiv.Perm F) 0) <| by
+    obtain ⟨a, b, hab⟩ := mem_affineLineGroup_iff.mp p.2
+    rw [show ((p : Equiv.Perm F)) = affineLinePerm a b from hab]
+    simp
+
+lemma affineLinearPart_affineLinePerm (a : Fˣ) (b : F)
+    (h : affineLinePerm a b ∈ affineLineGroup F) :
+    affineLinearPart ⟨affineLinePerm a b, h⟩ = a := by
+  refine Units.ext ?_
+  simp [affineLinearPart]
+
+/-- 線形部分は準同型 `AGL(1,F) →* Fˣ`。 -/
+def affineLinearPartHom : ↥(affineLineGroup F) →* Fˣ where
+  toFun := affineLinearPart
+  map_one' := by
+    refine Units.ext ?_
+    simp [affineLinearPart]
+  map_mul' p q := by
+    obtain ⟨a, b, hab⟩ := mem_affineLineGroup_iff.mp p.2
+    obtain ⟨a', b', hab'⟩ := mem_affineLineGroup_iff.mp q.2
+    refine Units.ext ?_
+    simp only [affineLinearPart, Units.val_mk0, Units.val_mul, Subgroup.coe_mul,
+      Equiv.Perm.mul_apply, hab, hab', affineLinePerm_apply]
+    ring
+
+/-- 平行移動群 (= 線形部分が `1`) は可換。 -/
+instance affineLinearPartHom_ker_isSolvable :
+    IsSolvable ↥(MonoidHom.ker (affineLinearPartHom (F := F))) := by
+  refine isSolvable_of_comm fun p q => ?_
+  obtain ⟨a, b, hab⟩ := mem_affineLineGroup_iff.mp (p : ↥(affineLineGroup F)).2
+  obtain ⟨a', b', hab'⟩ := mem_affineLineGroup_iff.mp (q : ↥(affineLineGroup F)).2
+  have hlin : ∀ (r : ↥(MonoidHom.ker (affineLinearPartHom (F := F)))) (c : Fˣ) (d : F),
+      ((r : ↥(affineLineGroup F)) : Equiv.Perm F) = affineLinePerm c d → c = 1 := by
+    intro r c d hr
+    have hk : affineLinearPart (r : ↥(affineLineGroup F)) = 1 := MonoidHom.mem_ker.mp r.2
+    rw [show (r : ↥(affineLineGroup F)) = ⟨affineLinePerm c d, hr ▸ (r : ↥(affineLineGroup F)).2⟩
+      from Subtype.ext hr, affineLinearPart_affineLinePerm] at hk
+    exact hk
+  have ha : a = 1 := hlin p a b hab
+  have ha' : a' = 1 := hlin q a' b' hab'
+  refine Subtype.ext (Subtype.ext (Equiv.ext fun x => ?_))
+  simp only [Subgroup.coe_mul, Equiv.Perm.mul_apply, hab, hab', ha, ha',
+    affineLinePerm_apply, Units.val_one, one_mul]
+  ring
+
+/-- **Isaacs Problem 8A.11** (p. 236) の可解性: `AGL(1,F)` は metabelian ゆえ**可解**。
+
+線形部分 `p ↦ a` は `Fˣ` への準同型で, その核は平行移動群 `≅ F⁺` (可換)。 -/
+instance affineLineGroup_isSolvable : IsSolvable ↥(affineLineGroup F) :=
+  solvable_of_ker_le_range (MonoidHom.ker (affineLinearPartHom (F := F))).subtype
+    affineLinearPartHom (le_of_eq (Subgroup.range_subtype _).symm)
 
 end AffineLine
 

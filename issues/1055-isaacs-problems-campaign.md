@@ -4244,5 +4244,6 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 `toSubsemigroup.1` 経由になって **`Iff.rfl` も anonymous constructor も通らない**。
 `⟨fun h => h, fun h => h⟩` で `mem_..._iff` を作り, 以後それを経由する。
 
-**残り (8A.11)**: 可解性 (metabelian — 線形部分 `p ↦ a` が `Fˣ` への準同型で核は平行移動群
-`≅ F⁺`)。
+* ✅ `affineLinearPartHom : AGL(1,F) →* Fˣ` (`a = p 1 - p 0` で線形部分を取り出す) +
+  核 (平行移動群) の可換性 ⟹ `affineLineGroup_isSolvable`
+  (mathlib `solvable_of_ker_le_range` + `isSolvable_of_comm`)。⟹ **8A.11 完了**。
