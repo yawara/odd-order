@@ -1284,6 +1284,13 @@ consumer は (5.7) engine を使う。
    `toGeneralHypothesis` でその特殊化として接続。旧 (5.7) は `m = 1` の 1 行特殊化。
 3. **(6.3)/(6.5) が `K` 冪零を取る** (書籍は `K/M` 冪零) — `six_three_descent` から継承。
    `M = 1` では一致し、(6.6) が使うのはその場合。
+   【**2026-07-27 実測**: 実体は `six_three_descent` の `[Group.IsNilpotent ↥H]`
+   (`S08_Theorem62_63_Standalone:120`)。冪零性の使用は
+   `normal_central_of_maximal_normal_below` 1 箇所のみで、そこも内部では **`H/B` の冪零性**
+   しか使っていない (`M ≤ B` なので書籍の `H/M` 冪零から出る)。
+   ⟹ 数学的な障害は無く、binder で商型の `Group` instance を作るのに
+   `(B.subgroupOf H).Normal` を明示 binder で渡す必要がある点だけが手当て箇所。
+   **[issue 0158](../../issues/0158-six-three-quotient-nilpotent.md)** に手順を記録。】
 
 #### (10.11) の実測 (2026-07-27) — **両主張とも書籍強度、AxiomsCheck の注記が stale だった**
 
