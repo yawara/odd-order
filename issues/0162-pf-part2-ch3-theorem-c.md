@@ -146,7 +146,12 @@ fpf より `δ² = 1` ⟹ `|D|` 奇より `δ = 1` ⟹ `z = z⁻¹` ⟹ `z² = 1
 - [x] step 1: `(C1)` carrier `SecondCaseHypothesis` + `D` の `Q₁` 上 fpf (2026-07-28、`794473d39`)
 - [x] step 2: `Q ∩ Q^x = 1` (`x ∉ H`) — `Q_inf_map_conj_eq_bot` (2026-07-28)
 - [x] **step 3a: Feit–Sibley の `Odd |G|` を書籍どおり `Odd |Q₁|` へ弱める** (2026-07-28、`d64642791`)
-- [ ] step 3b: Feit–Sibley `Hypothesis` の構成と coherence の取得
+- [x] step 3b: Feit–Sibley `Hypothesis` の構成と coherence の取得 (2026-07-28)
+- [x] **step 4 前半: `QK` 一式 + 線形指標 `λ` の存在** (2026-07-28)
+      — `QK ⊴ H` / `QK ⊓ V = 1` / `QK ≠ H` / `[H:QK]` 奇 →
+      Feit–Thompson で可解 → `commutator (H/QK) ≠ ⊤` →
+      `exists_linearCharacter_leKer_QK`
+- [x] **step 13 (終端): `Q₁ = 1`** (2026-07-28) — `Q1_eq_bot_of_not_isSimpleGroup`
 
 ### step 3b の材料 (2026-07-28 実測)
 
@@ -175,7 +180,9 @@ fpf より `δ² = 1` ⟹ `|D|` 奇より `δ = 1` ⟹ `z = z⁻¹` ⟹ `z² = 1
 
 ⟹ 残るのは **ambient `S` の導入 + `coprime_Q_D`** が主。新 leaf
 `StructureOfH/FeitSibleyInput.lean` に置く。
-- [ ] step 4: 指標側 endgame (λ / `Ind λ = f₁ + f₂` / 次数評価)
+- [ ] step 4 後半 = 書籍 step (5)–(12): `QK` が `H` の Hall → `λ` の共役不変性 →
+      `⟨Ind λ, Ind λ⟩ = 2` → `Ind λ = f₁ + f₂` → coherence 簿記 → 次数評価で
+      `Q₁ ⊆ Ker f_j` → `G` は単純でない
 - [ ] step 5: `Q₁ = ⊥` の結論 + AxiomsCheck 登録
 
 ## 完了条件
