@@ -4055,3 +4055,34 @@ Burnside 代替 (`Ch05.hasNormalPComplement_of_sylow_le_center`, Problem 5D.2 = 
   → `QuotientGroup.le_comap_mk'` を直接使う。
 * `push_neg` は deprecated (v4.32) → `simp only [not_exists, not_and]`。
 * `show` で goal が変わると `linter.style.show` が鳴る → `change`。
+
+## Ch.8 §8A (書籍 pp. 235–236 の Problems 8A) — 着手 (2026-07-27)
+
+既存 `OddOrder/Isaacs/Ch08_PermutationGroups/` は 14 leaf (AffineGroup / Bochert /
+CommonDivisorGraph / CycleCommutators / HalfTransitive / NonzeroVectors / OrbitalGraph /
+Orbitals / PCycleJordan / PSLSimple / RegularNormal / Subdegrees /
+TransitiveAutomorphisms / TransvectionGeneration)。演習は新 leaf `Problems8A.lean` へ。
+
+⚠ 以下は **pdftotext からの一覧** (OCR ノイズあり)。各問の statement は着手時に
+**PDF ページ画像で確定**する (書籍 p. 235–236 = PDF p. 248–249)。
+
+| # | 主張 (要約) |
+|---|---|
+| 8A.1 | `A ≇ B`, `\|A\|=\|B\|` ⟹ 両方に同型な regular 部分群をもつ置換群が存在 (hint: 対称群)。後半は「nonisomorphic regular **normal** 部分群を持てるか」の decide 問題 |
+| 8A.2 | `H ≤ G` が transitive ⟹ `C_G(H)` は semiregular。帰結: 可換 transitive 置換群は regular |
+| 8A.3 | `Z(G)=1` ⟹ `G` に同型な相異なる regular normal 部分群を 2 つもつ置換群が存在 |
+| 8A.4 | `U, V` regular normal で `U ⊓ V = 1` ⟹ `U ≅ V` かつ中心自明 (hint: `G = UV` としてよい) |
+| 8A.5 | `G` が `k`-transitive, `H = G_α`, `Δ = Fix(H)` ⟹ `N_G(H)` は `Δ` に `r`-transitive (`r = min(k, \|Δ\|)`) |
+| 8A.6 | `G` transitive, `H = G_α`, `P ∈ Syl_p(H)`, `Δ = Fix(P)` ⟹ `N_G(P)` は `Δ` に transitive |
+| 8A.7 | 可換 `A` が `N` に忠実に作用し非単位元上 half-transitive ⟹ 作用は Frobenius, `A` は巡回 |
+| 8A.8 | `G` transitive, `N ⊴ G` ⟹ `G` は `N`-軌道を transitive に置換, ゆえに `N` は half-transitive |
+| 8A.9 | `G` が 2-transitive, `N ⊴ G` が非自明作用 ⟹ `N` は transitive (実は primitivity で足りる) |
+| 8A.10 | 可解な 4-transitive 置換群 ⟹ `S₄` に同型 (hint: 極小正規部分群が regular) |
+| 8A.11 | 任意の素数冪 `q > 1` に可解な sharply 2-transitive 置換群 (次数 `q`) が存在 (hint: 位数 `q` の体) |
+| 8A.12 | `χ` を置換指標として `G` が 2-transitive ⟺ `χ(g)²` の平均が 2 |
+| 8A.13 | `G` が 2-transitive のとき, `χ(g)³` の平均が `m` ⟺ 3-transitive となる `m` を求めよ |
+| 8A.14 | `G` transitive, `\|G:H\| = m` ⟹ `H` の軌道数 ≤ `m`; `H` が点安定化群を含まなければ ≤ `m/2` |
+| 8A.15 | `H ≤ G` の両側作用 `g·(x,y) = x⁻¹gy` について, `G` の `H`-右剰余類への作用が 2-transitive ⟺ `H × H` が `G` 上ちょうど 2 軌道 |
+
+⚠ **8A.1 後半は "decide" 問題** — 数学的に決着させてから形式化する (即断しない)。
+まず前半 (対称群内の構成) と 8A.2 以降を文書順で進める。
