@@ -4278,8 +4278,15 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
   各 1 軌道**になり, 残る「全相異」部分がひとつの軌道になることが 3-transitivity と同値。
   したがって 3-transitive ⟺ 軌道数 5 ⟺ `χ³` の平均が 5。
 
-**残り (8A.13)**: 「軌道数 = 5 ⟺ 3-transitive」の形式化 (`Nat.card_eq_two_iff` に相当する
-5 元版が無いので, `orbitRel.Quotient G (Ω³) ≃ Fin 5` を明示構成するのが素直; `|Ω| ≥ 3` が要る)。
+**5 パターンの単一軌道性を landing** (2026-07-27): `cube_orbit_diag` (推移性) /
+`cube_orbit_pattern_xxz` `_xzx` `_zxx` (2-transitivity) / `cube_orbit_pattern_distinct`
+(3-transitivity)。いずれも `Quotient.sound' (orbitRel_apply.mpr ⟨g, _⟩)` の 3 行。
+
+**残り (8A.13)**: 「軌道数 = 5 ⟺ 3-transitive」の数え上げのみ。上の 5 本で
+「各パターンが単一軌道」は済んでいるので, 残るのは (a) 5 つの代表元が互いに別軌道
+(パターンは軌道不変量なので `G` の作用が一致パターンを保つことから), (b) `Nat.card = 5`
+の結論 (`Nat.card_eq_two_iff` の 5 元版が無いので `Set.ncard {q₁..q₅} = 5` を
+`Set.ncard_insert_of_not_mem` で積むか `≃ Fin 5` を構成)。`|Ω| ≥ 3` が要る。
 
 ### 8A.14 (2026-07-27): 前半 landing
 

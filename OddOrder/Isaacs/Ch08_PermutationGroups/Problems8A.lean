@@ -70,6 +70,9 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `cosetToOrbit`, `card_orbits_le_index`, `two_mul_card_orbits_le_index` —
   **Problem 8A.14** (後半込み): `G` 推移的で `[G:H] = m` なら
   `H` の軌道は高々 `m` 個 (`gH ↦ ⟦g⁻¹ • α⟧` が `G ⧸ H` からの全射)。
+- `cube_orbit_diag`, `cube_orbit_pattern_xxz` / `_xzx` / `_zxx`,
+  `cube_orbit_pattern_distinct` — **Problem 8A.13**: `Ω³` の 5 つの一致パターンが
+  (2-transitive / 3-transitive の下で) それぞれ単一軌道であること。
 - `card_fixedBy_prod_three`, `sum_cube_card_fixedBy` — **Problem 8A.13** の骨格:
   置換指標の 3 乗和は `Ω³` 上の軌道数 × `|G|`。求める `m` は **5**
   (3 点の一致パターン `xxx` / `xxy` / `xyx` / `yxx` / 全相異)。
@@ -1064,6 +1067,58 @@ theorem sum_cube_card_fixedBy [Fintype G] [Finite Ω] :
       = Nat.card (MulAction.orbitRel.Quotient G (Ω × Ω × Ω)) * Nat.card G := by
   rw [← OddOrder.Isaacs.Ch01.sum_card_fixedBy_nat (M := G) (β := Ω × Ω × Ω)]
   exact (Finset.sum_congr rfl fun g _ => card_fixedBy_prod_three g).symm
+
+/-! #### `Ω³` の 5 つの一致パターン (8A.13) -/
+
+section CubeOrbits
+
+/-- 推移性: 対角線の点 `(x,x,x)` はすべて同一軌道。 -/
+lemma cube_orbit_diag [IsPretransitive G Ω] (α x : Ω) :
+    (Quotient.mk'' (x, x, x) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      = Quotient.mk'' (α, α, α) := by
+  obtain ⟨g, hg⟩ := exists_smul_eq G α x
+  exact Quotient.sound' (MulAction.orbitRel_apply.mpr ⟨g, by simp [hg]⟩)
+
+/-- 2-transitivity: パターン `(x,x,z)` (`x ≠ z`) はすべて同一軌道。 -/
+lemma cube_orbit_pattern_xxz
+    (h2 : ∀ a b c d : Ω, a ≠ b → c ≠ d → ∃ g : G, g • a = c ∧ g • b = d)
+    {α β : Ω} (hαβ : α ≠ β) {x z : Ω} (hxz : x ≠ z) :
+    (Quotient.mk'' (x, x, z) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      = Quotient.mk'' (α, α, β) := by
+  obtain ⟨g, hg1, hg2⟩ := h2 α β x z hαβ hxz
+  exact Quotient.sound' (MulAction.orbitRel_apply.mpr ⟨g, by simp [hg1, hg2]⟩)
+
+/-- 2-transitivity: パターン `(x,z,x)` (`x ≠ z`) はすべて同一軌道。 -/
+lemma cube_orbit_pattern_xzx
+    (h2 : ∀ a b c d : Ω, a ≠ b → c ≠ d → ∃ g : G, g • a = c ∧ g • b = d)
+    {α β : Ω} (hαβ : α ≠ β) {x z : Ω} (hxz : x ≠ z) :
+    (Quotient.mk'' (x, z, x) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      = Quotient.mk'' (α, β, α) := by
+  obtain ⟨g, hg1, hg2⟩ := h2 α β x z hαβ hxz
+  exact Quotient.sound' (MulAction.orbitRel_apply.mpr ⟨g, by simp [hg1, hg2]⟩)
+
+/-- 2-transitivity: パターン `(z,x,x)` (`x ≠ z`) はすべて同一軌道。 -/
+lemma cube_orbit_pattern_zxx
+    (h2 : ∀ a b c d : Ω, a ≠ b → c ≠ d → ∃ g : G, g • a = c ∧ g • b = d)
+    {α β : Ω} (hαβ : α ≠ β) {x z : Ω} (hxz : x ≠ z) :
+    (Quotient.mk'' (z, x, x) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      = Quotient.mk'' (β, α, α) := by
+  obtain ⟨g, hg1, hg2⟩ := h2 α β x z hαβ hxz
+  exact Quotient.sound' (MulAction.orbitRel_apply.mpr ⟨g, by simp [hg1, hg2]⟩)
+
+/-- 3-transitivity: 相異なる 3 点の三つ組はすべて同一軌道。 -/
+lemma cube_orbit_pattern_distinct
+    (h3 : ∀ a b c x y z : Ω, a ≠ b → a ≠ c → b ≠ c → x ≠ y → x ≠ z → y ≠ z →
+      ∃ g : G, g • a = x ∧ g • b = y ∧ g • c = z)
+    {α β γ : Ω} (h1 : α ≠ β) (h2' : α ≠ γ) (h3' : β ≠ γ)
+    {x y z : Ω} (hxy : x ≠ y) (hxz : x ≠ z) (hyz : y ≠ z) :
+    (Quotient.mk'' (x, y, z) : MulAction.orbitRel.Quotient G (Ω × Ω × Ω))
+      = Quotient.mk'' (α, β, γ) := by
+  obtain ⟨g, hg1, hg2, hg3⟩ := h3 α β γ x y z h1 h2' h3' hxy hxz hyz
+  exact Quotient.sound'
+    (MulAction.orbitRel_apply.mpr ⟨g, by simp [hg1, hg2, hg3]⟩)
+
+end CubeOrbits
 
 /-- **Isaacs Problem 8A.12** (p. 236) の組合せ部分: 推移的な `G` について
 **`Ω × Ω` の `G`-軌道がちょうど 2 個 ⟺ `G` は 2-transitive**。
