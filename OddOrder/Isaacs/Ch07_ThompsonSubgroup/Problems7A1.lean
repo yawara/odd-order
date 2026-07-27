@@ -187,7 +187,68 @@ theorem isPGroup_two_of_isNilpotent_of_isCoatom {G : Type*} [Group G] [Finite G]
       · exact hM.1 (top_le_iff.mp ((ht ▸ hYP).trans hPM))
     have hnlt : ¬ M < Subgroup.normalizer (Y : Set G) := fun hlt => hne (hM.2 _ hlt)
     exact (eq_of_le_of_not_lt hle hnlt).symm
-  sorry
+  -- (6) `N_G(P) = M`, したがって `P ∈ Syl_p(G)`
+  have hNP : Subgroup.normalizer
+      (((Pm : Subgroup ↥M).map M.subtype : Subgroup G) : Set G) = M :=
+    hnormeq _ le_rfl hPne fun u hu y hy =>
+      Subgroup.mul_mem _ (Subgroup.mul_mem _ hu hy) (Subgroup.inv_mem _ hu)
+  have hmax : ∀ R : Subgroup G, IsPGroup p ↥R → (Pm : Subgroup ↥M).map M.subtype ≤ R →
+      R ≤ Subgroup.normalizer (((Pm : Subgroup ↥M).map M.subtype : Subgroup G) : Set G) →
+      R = (Pm : Subgroup ↥M).map M.subtype := by
+    intro R hRp hPR hRnorm
+    have hRM : R ≤ M := hNP ▸ hRnorm
+    have hRsub : IsPGroup p ↥(R.subgroupOf M) :=
+      hRp.comap_of_injective M.subtype (Subgroup.subtype_injective M)
+    have hPmle : (Pm : Subgroup ↥M) ≤ R.subgroupOf M := fun u hu => hPR ⟨u, hu, rfl⟩
+    have heq := Pm.is_maximal' hRsub hPmle
+    calc R = (R.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hRM).symm
+      _ = (Pm : Subgroup ↥M).map M.subtype := by rw [← heq]
+  obtain ⟨S, hSeq⟩ := exists_sylow_eq_of_maximal_pSubgroup_in_normalizer hPp hmax
+  -- (7) 各非自明 characteristic 部分群の正規化群は `M` で, `M` 冪零ゆえ normal `p`-complement
+  have hchar : ∀ X : Subgroup ↥(S : Subgroup G), X.Characteristic → X ≠ ⊥ →
+      OddOrder.Isaacs.Ch05.HasNormalPComplement p
+        ↥(Subgroup.normalizer ((X.map (S : Subgroup G).subtype : Subgroup G) : Set G)) := by
+    intro X hXchar hXne
+    haveI := hXchar
+    have hYP : X.map (S : Subgroup G).subtype ≤ (Pm : Subgroup ↥M).map M.subtype := by
+      rw [← hSeq]
+      rintro _ ⟨u, _, rfl⟩
+      exact u.2
+    have hYne : X.map (S : Subgroup G).subtype ≠ ⊥ := by
+      intro hbot
+      exact hXne ((Subgroup.map_eq_bot_iff_of_injective _
+        (Subgroup.subtype_injective _)).mp hbot)
+    have hYnorm : ∀ u ∈ (Pm : Subgroup ↥M).map M.subtype,
+        ∀ y ∈ X.map (S : Subgroup G).subtype,
+        u * y * u⁻¹ ∈ X.map (S : Subgroup G).subtype := by
+      intro u hu y hy
+      have huS : u ∈ (S : Subgroup G) := by rw [hSeq]; exact hu
+      obtain ⟨y', hy', rfl⟩ := hy
+      refine ⟨(⟨u, huS⟩ : ↥(S : Subgroup G)) * y' * (⟨u, huS⟩ : ↥(S : Subgroup G))⁻¹,
+        Subgroup.Normal.conj_mem inferInstance y' hy' ⟨u, huS⟩, ?_⟩
+      simp
+    have hNY := hnormeq _ hYP hYne hYnorm
+    exact hasNormalPComplement_of_mulEquiv (MulEquiv.subgroupCongr hNY.symm)
+      (OddOrder.Isaacs.Ch05.hasNormalPComplement_of_isNilpotent (H := ↥M) (p := p))
+  -- (8) Isaacs Thm 6.23
+  obtain ⟨N, hNnormal, hNcompl⟩ :=
+    OddOrder.Isaacs.Ch06.hasNormalPComplement_of_forall_characteristic_normalizer S hp2 hchar
+  -- (9) 単純性からどちらの分岐でも矛盾
+  rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal N hNnormal with hb | ht
+  · have hStop : (S : Subgroup G) = ⊤ := by
+      have h := hNcompl S
+      rw [hb] at h
+      exact Subgroup.isComplement'_bot_left.mp h
+    refine hM.1 (top_le_iff.mp ?_)
+    rw [← hStop, hSeq]
+    exact hPM
+  · have hSbot : (S : Subgroup G) = ⊥ := by
+      have h := hNcompl S
+      rw [ht] at h
+      exact Subgroup.isComplement'_top_left.mp h
+    refine hPne ?_
+    rw [← hSeq]
+    exact hSbot
 
 end
 

@@ -3548,7 +3548,7 @@ Ch.6 の演習は **§6A 6A.1–6A.11 / §6B 6B.1–6B.9 / §6C 6C.1–6C.2 の�
 
 | # | 主張 (要約) | 見込みの道具 |
 |---|---|---|
-| 7A.1 | 単純群の冪零な極大部分群は `2`-群 | **Thm 7.1** (Thompson の normal `p`-complement) + `Z(P)`/`J(P)` の正規化群が `M` に一致する議論 |
+| 7A.1 | ✅ **完了** (`Problems7A1.lean`, axiom-clean) 単純群の冪零な極大部分群は `2`-群 | **Thm 7.1** (Thompson の normal `p`-complement) + `Z(P)`/`J(P)` の正規化群が `M` に一致する議論 |
 | 7A.2 | `S = SL(2,3)`, `Z = {±I}` ⟹ `S/Z` (位数 12) は Sylow 3 が 4 個 ⟹ Sylow 2 が一意 ⟹ `S` に位数 8 の正規部分群 | `GL(n,q)` の Sylow `p` が 2 個以上 (本文既知) + Sylow 数え上げ |
 | 7A.3 | `G = GL(n,q)`, `P` = 上三角冪単, `D` = 対角 ⟹ (a) `D ≤ N_G(P)` (b) `DP` = 上三角全体 (c) `P`-不変部分空間は各次元にちょうど 1 つ (d) `N_G(P) = DP` | 行列計算 + `P`-不変部分空間の分類 |
 | 7A.4 | `SL(2,q)` と `PSL(2,q)` の Sylow `p` はちょうど `q + 1` 個 | Sylow 数え上げ (Borel の指数) |
@@ -3642,3 +3642,23 @@ characteristic 部分群すべての正規化群が normal `p`-complement を持
   ⚠ この mathlib では `Subgroup.normalizer` は **`Set G` を取る** (`(Y : Set G)` と明示が必要)。
   単純性は `IsSimpleGroup.eq_bot_or_eq_top_of_normal`、`Subgroup G` は linear order でないので
   `not_lt` でなく `eq_of_le_of_not_lt` を使う。
+
+### 🎉 7A.1 完成 (2026-07-27) — `isPGroup_two_of_isNilpotent_of_isCoatom` (axiom-clean)
+
+`Problems7A1.lean` (`OddOrder.lean` 配線済) に 4 本:
+* `exists_sylow_eq_of_maximal_pSubgroup_in_normalizer` (汎用): `N_G(P)` 内で極大な
+  `p`-部分群は `G` の Sylow。
+* `exists_mul_centralizing_of_isNilpotent`: 冪零 `M` の元は「Sylow の元」×「中心化元」の積。
+* `le_normalizer_of_isNilpotent`: 冪零 `M` は Sylow `P` 内の `P`-正規部分群を正規化する。
+* **`isPGroup_two_of_isNilpotent_of_isCoatom`** (主定理): 単純群の冪零な極大部分群は `2`-群。
+  奇素数 `p ∣ |M|` を仮定 ⟹ `N_G(P) = M` (極大性 + 単純性) ⟹ `P ∈ Syl_p(G)` ⟹
+  `P` の非自明 characteristic 部分群 `X` すべてで `N_G(X.map) = M` かつ `M` 冪零ゆえ
+  normal `p`-complement ⟹ **Thm 6.23** で `G` に normal `p`-complement `N` ⟹
+  単純性で `N = ⊥` (⟹ `S = ⊤ ≤ M` で `M ≠ ⊤` に矛盾) / `N = ⊤` (⟹ `S = ⊥` で `P ≠ ⊥` に矛盾)。
+
+API メモ: `Sylow.is_maximal'` / `Subgroup.map_subgroupOf_eq_of_le` /
+`Subgroup.normal_of_characteristic` (instance) / `Subgroup.isComplement'_bot_left` ·
+`isComplement'_top_left`。⚠ `X.map f ≠ ⊥` は `rw [map_eq_bot_iff_of_injective]` が
+`Ne` の下では効かないので `intro hbot` してから使う。
+
+次: 7A.2 (`SL(2,3)/Z` の Sylow 数え上げ ⟹ 位数 8 の正規部分群)。
