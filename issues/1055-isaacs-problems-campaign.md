@@ -4111,6 +4111,13 @@ TransitiveAutomorphisms / TransvectionGeneration)。演習は新 leaf `Problems8
 
 新 leaf `OddOrder/Isaacs/Ch08_PermutationGroups/Problems8A.lean` (`OddOrder.lean` 配線済):
 
+* ✅ **8A.1 前半** 実証明 — `regularRep` (型の同値 `e : Ω ≃ A` に沿って運んだ左正則表現
+  `A →* Equiv.Perm Ω`, `a ↦ (x ↦ e.symm (a * e x))`) + `regularRep_injective` +
+  `bijective_smulBase_regularRep_range` (像は常に regular) ⟹
+  `exists_regular_subgroups_of_equiv` / `exists_regular_subgroups_of_card_eq`
+  (`Sym(A)` が `A` にも `B` にも同型な regular 部分群をもつ)。
+  ⚠ `A ≇ B` は構成に不要 (問題を面白くしているだけ) なので仮説から外した。
+  `regularRep` は 8A.3 / 8A.4 でも使う共通道具。
 * ✅ **8A.2** 実証明 — `smul_eq_self_of_mem_centralizer` (推移的 `H` の中心化群の元は
   1 点固定 ⟹ 全点固定) / `centralizer_inf_stabilizer_eq_bot` (忠実性を足して半正則) /
   `bijective_smulBase_top_of_comm` (可換推移的置換群は regular)。

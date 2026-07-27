@@ -15,6 +15,11 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 
 ## Main results
 
+- `regularRep`, `bijective_smulBase_regularRep_range` — 型の同値に沿って運んだ
+  左正則表現とその像の regular 性 (8A.1 / 8A.3 / 8A.4 の共通道具)。
+- `exists_regular_subgroups_of_equiv`, `exists_regular_subgroups_of_card_eq` —
+  **Problem 8A.1** 前半: `|A| = |B|` なら `Sym(A)` は `A`, `B` に同型な regular 部分群を
+  ともにもつ。
 - `smul_eq_self_of_mem_centralizer`, `centralizer_inf_stabilizer_eq_bot`,
   `bijective_smulBase_top_of_comm` — **Problem 8A.2**: transitive な `H ≤ G` の
   中心化群 `C_G(H)` は半正則。帰結として可換 transitive な置換群は regular。
@@ -32,6 +37,67 @@ open scoped Pointwise
 section /- Problems 8A (pp. 235-236) -/
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω]
+
+/-! ### 左正則表現 (8A.1 / 8A.3 / 8A.4 の共通道具) -/
+
+/-- 型の同値 `e : Ω ≃ A` に沿って運んだ **`A` の左正則表現** `A →* Equiv.Perm Ω`,
+`a ↦ (x ↦ e.symm (a * e x))`。
+
+`Ω = A`, `e = Equiv.refl` のときが通常の Cayley 埋め込み。像は常に regular
+(`bijective_smulBase_regularRep_range`)。 -/
+def regularRep {A Ω : Type*} [Group A] (e : Ω ≃ A) : A →* Equiv.Perm Ω where
+  toFun a := e.trans ((Equiv.mulLeft a).trans e.symm)
+  map_one' := by ext x; simp
+  map_mul' a b := by ext x; simp
+
+@[simp] lemma regularRep_apply {A Ω : Type*} [Group A] (e : Ω ≃ A) (a : A) (x : Ω) :
+    regularRep e a x = e.symm (a * e x) := rfl
+
+lemma regularRep_injective {A Ω : Type*} [Group A] [Nonempty Ω] (e : Ω ≃ A) :
+    Function.Injective (regularRep e) := by
+  intro a b hab
+  have := congrArg (fun p : Equiv.Perm Ω => e (p (e.symm 1))) hab
+  simpa using this
+
+/-- **左正則表現の像は regular**: 軌道写像 `a ↦ e.symm (a * e α)` は全単射。 -/
+theorem bijective_smulBase_regularRep_range {A Ω : Type*} [Group A] [Nonempty Ω]
+    (e : Ω ≃ A) (α : Ω) :
+    Function.Bijective (smulBase (regularRep e).range α) := by
+  constructor
+  · rintro ⟨-, a, rfl⟩ ⟨-, b, rfl⟩ hnm
+    have hab : a = b := by simpa [smulBase] using hnm
+    exact Subtype.ext (congrArg (regularRep e) hab)
+  · intro β
+    refine ⟨⟨regularRep e (e β * (e α)⁻¹), ⟨_, rfl⟩⟩, ?_⟩
+    simp only [smulBase_apply, Equiv.Perm.smul_def, regularRep_apply, inv_mul_cancel_right,
+      Equiv.symm_apply_apply]
+
+/-- **Isaacs Problem 8A.1** (p. 235), 前半: 位数の等しい二群 `A`, `B` に対し, ある置換群が
+`A` に同型な regular 部分群と `B` に同型な regular 部分群をともにもつ。
+
+構成は書籍の hint どおり対称群 `Sym(A)`: `A` 自身は Cayley 埋め込みで, `B` は型の同値
+`B ≃ A` で運んだ左正則表現で入る。`A ≇ B` は構成には不要 (それが問題を面白くしているだけ)。 -/
+theorem exists_regular_subgroups_of_equiv {A B : Type*} [Group A] [Group B] [Nonempty A]
+    (e : B ≃ A) :
+    ∃ N M : Subgroup (Equiv.Perm A),
+      (∀ α : A, Function.Bijective (smulBase N α)) ∧
+      (∀ α : A, Function.Bijective (smulBase M α)) ∧
+      Nonempty (N ≃* A) ∧ Nonempty (M ≃* B) :=
+  ⟨(regularRep (Equiv.refl A)).range, (regularRep e.symm).range,
+    fun α => bijective_smulBase_regularRep_range _ α,
+    fun α => bijective_smulBase_regularRep_range _ α,
+    ⟨(MonoidHom.ofInjective (regularRep_injective (Equiv.refl A))).symm⟩,
+    ⟨(MonoidHom.ofInjective (regularRep_injective (A := B) e.symm)).symm⟩⟩
+
+/-- **Isaacs Problem 8A.1** (p. 235), 前半 (書籍の形): `|A| = |B|` なる有限群 `A`, `B` に対し
+`Sym(A)` は `A` に同型な regular 部分群と `B` に同型な regular 部分群をともにもつ。 -/
+theorem exists_regular_subgroups_of_card_eq {A B : Type*} [Group A] [Group B]
+    [Finite A] [Finite B] (h : Nat.card A = Nat.card B) :
+    ∃ N M : Subgroup (Equiv.Perm A),
+      (∀ α : A, Function.Bijective (smulBase N α)) ∧
+      (∀ α : A, Function.Bijective (smulBase M α)) ∧
+      Nonempty (N ≃* A) ∧ Nonempty (M ≃* B) :=
+  exists_regular_subgroups_of_equiv (Finite.card_eq.mp h.symm).some
 
 /-! ### Problem 8A.2 — 中心化群は半正則 -/
 
