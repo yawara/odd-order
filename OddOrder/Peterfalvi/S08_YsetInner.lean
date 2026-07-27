@@ -374,15 +374,11 @@ theorem filtration_zSupportedSpan_mono
 
 end DescentHypothesis
 
-/-- Peterfalvi (6.4): the odd-order specialization used before (6.5)-(6.6). -/
-structure OddOrderSpecialization (S : Set (ClassFunction L ℂ)) (A : Set L)
-    [Fintype L] [Fintype G]
-    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] : Type _ extends
-    DescentHypothesis (L := L) (G := G) S A where
-  card_L_odd : Odd (Nat.card L)
-  M : Subgroup L
-  M_le_K : M ≤ K
-  quotient_nilpotent : Prop
+-- **Removed 2026-07-27**: the `OddOrderSpecialization` structure (nominally Peterfalvi (6.4),
+-- "the odd-order specialization used before (6.5)-(6.6)") had **zero consumers** and reduced the
+-- book's "`K/M` nilpotent" clause to a free `quotient_nilpotent : Prop` field — an opaque scaffold
+-- that made the carrier look like it held (6.4)'s content.  The live (6.4) encoding is
+-- `SibleyDadeHypothesis` (`S08_CoherenceCorePart1`), whose every clause is genuine.
 
 -- The legacy `SibleySetup`/`CoherenceTarget` (which carried an opaque `coherence.tau` with a
 -- *global* `IsIntegralIsometry`, nonexistent in Feit–Thompson) is replaced by the Dade-based
