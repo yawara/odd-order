@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuTwelve
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleOrder120
 
@@ -18,4 +19,5 @@ topic 別 leaf にある (下流は本 module を import するだけでよい)�
 * `Problems8C/PrimeDegree.lean` — **8C.2 の準備**: 素数次数 `p` の置換群で位数 `p` の
   部分群の中心化群・正規化群。
 * `Problems8C/MathieuEleven.lean` — **8C.2**: 次数 11 位数 7920 の置換群は単純 (`M₁₁`)。
+* `Problems8C/MathieuTwelve.lean` — **8C.3**: 次数 12 位数 95040 の推移置換群は単純 (`M₁₂`)。
 -/
