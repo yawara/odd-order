@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.GroupAction.Blocks
 import Mathlib.GroupTheory.GroupAction.Primitive
+import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 
 /-!
 # Isaacs, Finite Group Theory — Problems 8B (pp. 248–249)
@@ -19,6 +21,11 @@ Isaacs の定義 (「`Δ` の translate は `Δ` 自身か, `Δ` と交わらな
   **Problem 8B.1**: `α` を含む `X` の translate すべての共通部分は block。
 - `exists_smul_mem_and_smul_notMem` — **Problem 8B.2**: 原始群では, 空でない真部分集合 `X`
   と相異なる 2 点 `α ≠ β` に対し `g • α ∈ X` かつ `g • β ∉ X` となる `g` がある。
+- `isPretransitive_of_normal_of_isPreprimitive`, `inf_eq_bot_of_isMinimalNormal_of_ne`,
+  `inf_stabilizer_eq_bot_of_normal_of_inf_eq_bot`,
+  `regular_centralizer_mulEquiv_of_two_isMinimalNormal` — **Problem 8B.3**: 原始置換群の
+  相異なる 2 つの極小正規部分群 `M`, `N` は regular で, `C_G(M) = N`, `C_G(N) = M`,
+  `M ≅ N`。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -140,6 +147,85 @@ theorem exists_smul_mem_and_smul_notMem [Finite G] [IsPreprimitive G Ω]
     have : X = g⁻¹ • (g • X : Set Ω) := (inv_smul_smul g X).symm
     rw [this, hgX]
     simp
+
+/-! ### Problem 8B.3 — 原始群の相異なる 2 つの極小正規部分群 -/
+
+/-- **原始群の自明でない正規部分群は推移的**。
+
+正規部分群の軌道は block (`MulAction.IsBlock.orbit_of_normal`) なので, 原始性より
+subsingleton か `Ω` 全体。忠実性から `N ≠ ⊥` は動かす点をもつので前者ではありえない。 -/
+theorem isPretransitive_of_normal_of_isPreprimitive [FaithfulSMul G Ω] [IsPreprimitive G Ω]
+    (N : Subgroup G) [N.Normal] (hN : N ≠ ⊥) : IsPretransitive ↥N Ω := by
+  obtain ⟨n, hnN, hn1⟩ : ∃ n : G, n ∈ N ∧ n ≠ 1 := by
+    by_contra hc
+    push Not at hc
+    exact hN (le_antisymm (fun x hx => Subgroup.mem_bot.mpr (hc x hx)) bot_le)
+  obtain ⟨α, hα⟩ : ∃ α : Ω, n • α ≠ α := by
+    by_contra hc
+    push Not at hc
+    exact hn1 (FaithfulSMul.eq_of_smul_eq_smul (α := Ω) fun β => by rw [hc β, one_smul])
+  have hnotsub : ¬ (orbit ↥N α).Subsingleton := fun hsub =>
+    hα (hsub (mem_orbit α (⟨n, hnN⟩ : ↥N)) (mem_orbit_self α))
+  rcases IsPreprimitive.isTrivialBlock_of_isBlock
+    (IsBlock.orbit_of_normal (N := N) α) with h | h
+  · exact absurd h hnotsub
+  · exact (isPretransitive_iff_orbit_eq_univ α).mpr h
+
+/-- 相異なる 2 つの極小正規部分群は交わらない。 -/
+lemma inf_eq_bot_of_isMinimalNormal_of_ne {M N : Subgroup G}
+    (hM : Ch02.IsMinimalNormal M) (hN : Ch02.IsMinimalNormal N) (hMN : M ≠ N) :
+    M ⊓ N = ⊥ := by
+  haveI : M.Normal := hM.1
+  haveI : N.Normal := hN.1
+  rcases hM.2.2 (M ⊓ N) inferInstance inf_le_left with h | h
+  · exact h
+  · exact absurd ((hN.2.2 M inferInstance (h ▸ inf_le_right)).resolve_left hM.2.1) hMN
+
+/-- 交わらない正規部分群の一方が推移的なら, もう一方は**半正則** (8A.2 の帰結)。 -/
+lemma inf_stabilizer_eq_bot_of_normal_of_inf_eq_bot [FaithfulSMul G Ω] {U V : Subgroup G}
+    [U.Normal] [V.Normal] [IsPretransitive ↥U Ω] (h : U ⊓ V = ⊥) (α : Ω) :
+    V ⊓ stabilizer G α = ⊥ := by
+  refine le_antisymm ?_ bot_le
+  calc V ⊓ stabilizer G α ≤ Subgroup.centralizer (U : Set G) ⊓ stabilizer G α :=
+        inf_le_inf_right _ (le_centralizer_of_normal_of_inf_eq_bot h)
+    _ = ⊥ := centralizer_inf_stabilizer_eq_bot (H := U) α
+
+/-- **Isaacs Problem 8B.3** (p. 248) 🎉: 原始置換群 `G` が相異なる極小正規部分群
+`M`, `N` をもてば,
+
+* (a) `M`, `N` はともに **regular**,
+* (b) `C_G(M) = N` かつ `C_G(N) = M`,
+* (c) `M ≅ N`。
+
+`M ⊓ N = ⊥` (極小性) と「原始群の非自明正規部分群は推移的」から `M`, `N` は推移的。
+交わらない正規部分群は可換なので `M ≤ C_G(N)` で, `N` が推移的だから 8A.2
+(`centralizer_inf_stabilizer_eq_bot`) より `C_G(N)` は半正則, したがって `M` も半正則
+= 推移的かつ半正則 = **regular**。あとは 8A.4
+(`centralizer_eq_of_regular_of_inf_eq_bot`, `mulEquiv_and_center_eq_bot_of_regular_normal`)
+をそのまま当てるだけ (教科書の Hint どおり)。 -/
+theorem regular_centralizer_mulEquiv_of_two_isMinimalNormal [FaithfulSMul G Ω]
+    [IsPreprimitive G Ω] {M N : Subgroup G} (hM : Ch02.IsMinimalNormal M)
+    (hN : Ch02.IsMinimalNormal N) (hMN : M ≠ N) (α : Ω) :
+    Function.Bijective (smulBase M α) ∧ Function.Bijective (smulBase N α) ∧
+      Subgroup.centralizer (M : Set G) = N ∧ Subgroup.centralizer (N : Set G) = M ∧
+      Nonempty (↥M ≃* ↥N) := by
+  haveI : M.Normal := hM.1
+  haveI : N.Normal := hN.1
+  have hinf : M ⊓ N = ⊥ := inf_eq_bot_of_isMinimalNormal_of_ne hM hN hMN
+  have hinf' : N ⊓ M = ⊥ := by rw [inf_comm]; exact hinf
+  haveI : IsPretransitive ↥M Ω := isPretransitive_of_normal_of_isPreprimitive M hM.2.1
+  haveI : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_isPreprimitive N hN.2.1
+  -- 半正則性: `M ≤ C_G(N)` と 8A.2。
+  have hMreg : Function.Bijective (smulBase M α) :=
+    (bijective_smulBase_iff M α).mpr ⟨inferInstance,
+      inf_stabilizer_eq_bot_of_normal_of_inf_eq_bot (U := N) (V := M) hinf' α⟩
+  have hNreg : Function.Bijective (smulBase N α) :=
+    (bijective_smulBase_iff N α).mpr ⟨inferInstance,
+      inf_stabilizer_eq_bot_of_normal_of_inf_eq_bot (U := M) (V := N) hinf α⟩
+  exact ⟨hMreg, hNreg,
+    centralizer_eq_of_regular_of_inf_eq_bot hMreg hNreg hinf,
+    centralizer_eq_of_regular_of_inf_eq_bot hNreg hMreg hinf',
+    (mulEquiv_and_center_eq_bot_of_regular_normal hMreg hNreg hinf).1⟩
 
 end
 
