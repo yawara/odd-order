@@ -1235,9 +1235,17 @@ consumer は (5.7) engine を使う。
 
 **残っている特殊化 (実測、着手前に再確認すること)**
 
-1. **(6.6) coherence 半分** (**[issue 0155](../../issues/0155-pf-six-six-general-kernel.md)**) —
-   2026-07-27 に**大部分が完了**し、残りは最終結線のみ。`S08_SixSixGeneral.lean` (690 行) に
-   一般 `K` で landing 済:
+1. ~~**(6.6) coherence 半分**~~ — **2026-07-27 完済**
+   (**[issue 0155](../../issues/0155-pf-six-six-general-kernel.md)**)。
+   `S08_SixSixGeneral.xSet_isCoherent_of_irreducible_X` が一般 `K`・**任意の τ** (Dade 非依存) で
+   landing、axiom-clean・AxiomsCheck 登録済:
+
+   > `K` が `p` 群 (`p` 奇素数, `|L:K|` と互いに素) かつ `Z ⊆ Z(K)` 正規なら
+   > `𝒳 = 𝒮 − 𝒮(Z) ⊆ Irr L` は coherent
+
+   仮説は書籍 (6.4)/(6.5) の文脈そのもの (Hypothesis (5.2) は `InducedFamilyImageData` が担う =
+   書籍が (6.1) で仮定するもの)。以下は完成に至る途中経過の記録:
+   `S08_SixSixGeneral.lean` (1026 行) に一般 `K` で landing 済:
    `xSet = 𝒮 − 𝒮(Z)` と (5.2) 一式 / 書籍 p.32 の算術 2 本 (次数 `|L:K|·p^k`・[Is] Cor 2.30 の
    中心界) / 次数平方和恒等式 / 最小次数 base block `𝒮₀` / **τ-general X-chain fold**
    (`xSet_isCoherent_of_adjoinSteps`) / **base coherence** (`xBaseBlock_isCoherent`) /
@@ -1250,7 +1258,23 @@ consumer は (5.7) engine を使う。
    `normalizedDegreeGap_of_natDegreeSumPrimePowerGap` を含む) は**抽象群 + 素の数値データ**で
    元から一般、(iv) 唯一の真に Dade 依存な `XAdjoinStepInput`/`xAdjoinStep` 層は、
    0154 の `S07.xAdjoinStepW_general` へ**直結して迂回**できた (移植不要)。
-   ⟹ **残るのは「各 step で accumulator を有限列挙し tail-set を作って可除性を通す」結線のみ**。
+   ⟹ **残っていた「各 step で accumulator を有限列挙し tail-set を作って可除性を通す」結線**も
+   2026-07-27 に完了 (`pairUnion_closedUnderConjugate` / `xBaseBlock_nonempty` /
+   `natDegree_lt_of_xBaseBlock_anchor_of_notMem` の 3 構造補題 + 本体)。
+
+   **⚠ Sibley 版 (`S08_CoherenceBasic.Xset_isCoherent_of_irreducible_X`) は「その特殊化」に
+   置き換えられない** (2026-07-27 実測、当初の完了条件は誤り)。理由: 一般版は Hypothesis (5.2) を
+   `InducedFamilyImageData` (= (5.2.b) の τ + **𝒮 の全 member** に対する (5.2.d)/(5.2.e) の像族)
+   として取るが、`SibleyDadeHypothesis` はこれを**持っていない** — Sibley 側は Dade 写像から
+   **既約 member についてのみ**その場で (5.2.d) を作る (`dadeOrthonormalCharacterImageFamilyOfDiff`)。
+   𝒮 の可約 member 用の像族 (μ-grid 列族) は §12/§13 でしか構成されない。
+   ⟹ Sibley 版は書籍 (6.6) より**弱い仮説**を持つ別定理であって、一般版の instantiation ではない。
+   両者を 1 本にまとめるには「既約な部分族については (5.2.d)/(5.2.e) を (5.2.b) から**導出**する」
+   経路が要る — 材料は `characterDifferenceImage_of_irreducible` (τ だけから (5.3.a) の符号付き
+   2 元対を作る、`S08_SixFiveGeneral`) で、欠けているのは
+   **`CharacterDifferenceImage → OrthonormalCharacterImageFamily` の変換**
+   (`R(χ) = {ε·μ, −ε·ν}`)。これは重複解消 (アーキテクチャ) の課題であって書籍被覆のギャップでは
+   ないので、別 issue に切り出す。
 2. **repo の (5.7) が member の既約性を要求する** — 書籍の (5.7)/(5.2) は要求しない
    (直交性のみ)。orthonormal な `coherentEqualDegree` builder から継承した債務。
    (6.4) の応用では (6.4.c) から既約性が出るので実害はないが、(5.7) 自体は書籍より狭い。

@@ -160,12 +160,51 @@ Sibley 側の入口 `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
 6. `xAdjoinStep_of_degreeRatios` に流し込む (`hSgen` は
    `span_le_span_zSupportedSpan_union_anchor`)。
 
-## 完了条件
+## 完了 (2026-07-27)
 
-一般 `K` (可解正規・冪零・`p` 群) と中心的 `Z` に対する
-`xSet_isCoherent_of_irreducible_X` が sorry-free・axiom-clean で landing し、
-`S08_CoherenceBasic.Xset_isCoherent_of_irreducible_X` (Sibley 版) が
-その特殊化に置き換わること。AxiomsCheck 登録 + survey の該当行を更新。
+**`xSet_isCoherent_of_irreducible_X` が landing・sorry-free・axiom-clean・AxiomsCheck 登録済**
+(`S08_SixSixGeneral.lean`, 1026 行):
+
+> `RD : InducedFamilyImageData A₀ K` (= 書籍が (6.1) で仮定する Hypothesis (5.2))、
+> `K` が `p` 群 (`p` 奇素数、`|L:K|` と互いに素)、`Z ⊆ Z(K)` 正規、`𝒳 = 𝒮 − 𝒮(Z) ⊆ Irr L` 非空
+> ⟹ `𝒳` は `RD.tau` について coherent
+
+最終結線で追加した構造補題 3 本: `pairUnion_closedUnderConjugate` (accumulator の共役閉性) /
+`xBaseBlock_nonempty` / `natDegree_lt_of_xBaseBlock_anchor_of_notMem` (base block 外の member の
+狭義次数ギャップ)。純 Finset 補題 `natSum_partition_of_realSum` は Sibley 側と共有するため
+`S08_CoherenceBasic` → `S08_YsetInner/CharacterBreaks` へ移設。
+
+### ⚠ 当初の完了条件の後半は誤りだった (実測 2026-07-27)
+
+「`S08_CoherenceBasic.Xset_isCoherent_of_irreducible_X` (Sibley 版) がその特殊化に置き換わる」は
+**そのままでは達成不能**。Sibley 版は一般版の instantiation ではなく、**より弱い仮説を持つ別定理**:
+
+| | 一般版 (本 issue) | Sibley 版 |
+|---|---|---|
+| (5.2.d)/(5.2.e) | `InducedFamilyImageData.R` = **𝒮 の全 member** の像族 (書籍 (6.1) の仮定) | 持たない。Dade 写像から**既約 member についてのみ**その場で構成 (`dadeOrthonormalCharacterImageFamilyOfDiff`) |
+| 可約 member の像族 | 呼び出し側が供給 (§13 の μ-grid 列族) | 不要 (𝒳 ⊆ Irr L しか使わない) |
+
+`SibleyDadeHypothesis` は像族フィールドを持たないので `InducedFamilyImageData` を作れない。
+⟹ 統合するには「**既約な部分族については (5.2.d)/(5.2.e) を (5.2.b) から導出する**」経路が要る。
+これは書籍 (6.6) より**強い**定理になる (仮説がより弱い) ので、やる価値はある。
+
+材料と欠けている部品 (実測):
+
+- `characterDifferenceImage_of_irreducible` (`S08_SixFiveGeneral:137`) — τ の等長性だけから
+  既約非実 `χ` の (5.3.a) 符号付き 2 元対 `τ(χ−χ̄) = ε·(μ−ν)` を作る。**既にある**。
+- `orthogonal_of_tau_conjDiff_inner_eq_zero` + `tau_conjDiff_inner_eq_zero_of_orthogonal`
+  (同 leaf) — (5.2.e) も τ だけから出る。**既にある**
+  (`hypothesisOfSubfamily` が現にこの経路で `S07.Hypothesis` を組んでいる)。
+- **欠けているのは変換 `CharacterDifferenceImage → OrthonormalCharacterImageFamily`**
+  (`R(χ) = {ε·μ, −ε·ν}`; 和が `ε·(μ−ν) = τ(χ−χ̄)`、`μ ≠ ν` 既約 + `ε² = 1` で正規直交)。
+  adjoining engine (`S07.xAdjoinStepW_general`) が消費するのは後者の形。
+- 加えて `InducedFamilyImageData` を **τ 部 (`tau`/`tau_isometry`/`tau_mem_ZIrr`/`tau_apply_one`)**
+  と像族部に分け、(6.6) の chain を τ 部だけで述べ直す必要がある
+  (`hypothesisOfSubfamily` / `tau_conjDiff_inner_eq_zero_of_orthogonal` / `adjoinHisom` は
+  実測で **τ 部しか使っていない**)。
+
+⟹ **重複解消として [issue 0156](0156-five-two-d-from-irreducibility.md) に切り出す**
+(書籍被覆のギャップではなくアーキテクチャ課題)。本 issue は上記の完了をもって close。
 
 ## 参照
 
