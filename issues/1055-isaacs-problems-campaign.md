@@ -4432,7 +4432,8 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   `prime_card_of_card_stabilizer_eq_two` (**`|Ω|` は奇素数**)。
   **残り = `G ≅ DihedralGroup p` の明示同型のみ** /
   8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
-  **次の frontier = 8B.8**。
+  8B.8 🔶 **道具のみ** (`subset_of_isBlock_of_mem_of_notMem`,
+  `exists_not_mem_iff_add_mem`) — **次の frontier = 8B.8 本体**。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4554,3 +4555,25 @@ mathlib `DihedralGroup p` への**明示同型の構成**だけ:
 
 ⚠ `Problems8B.lean` は 945 行。1500 行に近づいたら topic 別に分割する
 (8B.1–8B.4 = block/primitivity, 8B.5–8B.7 = 点安定化群の小軌道, 8B.8– = 対称群の生成)。
+
+
+### 8B.8 本体の設計 (2026-07-27)
+
+道具 (`subset_of_isBlock_of_mem_of_notMem`, `exists_not_mem_iff_add_mem`) は landing 済。
+残りは `ZMod n` 上の置換群としての設定と組み立て:
+
+* **設定**: `Ω := ZMod n`, `x := Equiv.addRight (1 : ZMod n)` (= `n`-巡回),
+  `S := {c : ZMod n | c.val < m}` (= 教科書の `{1,…,m}` を 0-based に),
+  `H ≤ Equiv.Perm (ZMod n)` は `S` 上推移的で `Sᶜ` を各点固定, `G := H ⊔ zpowers x`。
+  仮定は `2 ≤ m` と `m < n`。
+* **`G` は推移的**: `zpowers x ≤ G` が既に推移的 (`x^k • c = c + k`)。
+* **原始性**: block `Δ` で `1 < |Δ|` とすると `Δ = univ` を示す。
+  1. `u ≠ v ∈ Δ` を取り `d := v - u ≠ 0`。`Λ₀ := x^(-u) • Δ` は `0` と `d` を含む block。
+  2. `exists_not_mem_iff_add_mem` で `c ∈ S ↮ c + d ∈ S` なる `c` を得る。
+     `Λ := x^c • Λ₀` は `c` と `c + d` を含むので **`S` の内外を跨ぐ**。
+  3. `subset_of_isBlock_of_mem_of_notMem` で `S ⊆ Λ`。
+  4. `2 ≤ m` なので `0, 1 ∈ S ⊆ Λ`。`x • Λ ∋ x • 0 = 1 ∈ Λ` なので block ゆえ
+     `x • Λ = Λ` ⟹ `Λ` は `x`-不変 ⟹ `Λ = univ` (`x` の軌道が全体)。
+  5. `Δ` は `Λ` の translate なので `Δ = univ`。
+* ⚠ 「`Δ` の translate が block」= `IsBlock` の `smul` 版。mathlib に
+  `IsBlock.smul` 系があるか要確認 (`IsTrivialBlock.smul` は存在)。
