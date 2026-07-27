@@ -59,6 +59,8 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `card_fixedBy_prod`, `sum_sq_card_fixedBy`, `card_orbits_prod_eq_two_iff`,
   `sum_sq_card_fixedBy_eq_two_mul_iff` — **Problem 8A.12**: 推移的な `G` について
   `G` が 2-transitive ⟺ 置換指標の 2 乗の平均が 2。
+- `card_orbits_le_index` — **Problem 8A.14** 前半: `G` 推移的で `[G:H] = m` なら
+  `H` の軌道は高々 `m` 個 (`gH ↦ ⟦g⁻¹ • α⟧` が `G ⧸ H` からの全射)。
 - `card_fixedBy_prod_three`, `sum_cube_card_fixedBy` — **Problem 8A.13** の骨格:
   置換指標の 3 乗和は `Ω³` 上の軌道数 × `|G|`。求める `m` は **5**
   (3 点の一致パターン `xxx` / `xxy` / `xyx` / `yxx` / 全相異)。
@@ -967,6 +969,35 @@ theorem sum_sq_card_fixedBy_eq_two_mul_iff [Fintype G] [Finite Ω] [IsPretransit
       ∀ β₁ β₂ γ₁ γ₂ : Ω, β₁ ≠ β₂ → γ₁ ≠ γ₂ → ∃ g : G, g • β₁ = γ₁ ∧ g • β₂ = γ₂ := by
   rw [sum_sq_card_fixedBy, ← card_orbits_prod_eq_two_iff]
   exact ⟨fun h => Nat.eq_of_mul_eq_mul_right Nat.card_pos h, fun h => by rw [h]⟩
+
+/-! ### Problem 8A.14 — 部分群の軌道数は指数以下 -/
+
+/-- **Isaacs Problem 8A.14** (p. 236) 前半: `G` が `Ω` に推移的で `[G : H] = m` なら,
+`H` の `Ω` 上の軌道は高々 `m` 個。
+
+`gH ↦ ⟦g⁻¹ • α⟧` が `G ⧸ H` から `H`-軌道の集合への**全射**になる:
+`b = a h` (`h ∈ H`) なら `b⁻¹ • α = h⁻¹ • (a⁻¹ • α)` で同じ `H`-軌道, また `G` の推移性から
+任意の `ω = g • α` は `g⁻¹H` の像。 -/
+theorem card_orbits_le_index [Finite G] [Finite Ω] [IsPretransitive G Ω]
+    (H : Subgroup G) (α : Ω) :
+    Nat.card (MulAction.orbitRel.Quotient H Ω) ≤ H.index := by
+  classical
+  rw [Subgroup.index_eq_card]
+  refine Nat.card_le_card_of_surjective
+    (Quotient.lift (fun g : G => (Quotient.mk'' ((g : G)⁻¹ • α) :
+        MulAction.orbitRel.Quotient H Ω)) ?_) ?_
+  · intro a b hab
+    have hmem : a⁻¹ * b ∈ H := QuotientGroup.leftRel_apply.mp hab
+    refine Quotient.sound' (MulAction.orbitRel_apply.mpr ⟨⟨a⁻¹ * b, hmem⟩, ?_⟩)
+    change ((a⁻¹ * b : G)) • ((b : G)⁻¹ • α) = (a : G)⁻¹ • α
+    rw [← mul_smul]
+    group
+  · refine Quotient.ind' fun ω => ?_
+    obtain ⟨g, hg⟩ := exists_smul_eq G α ω
+    refine ⟨Quotient.mk'' g⁻¹, ?_⟩
+    change (Quotient.mk'' ((g⁻¹ : G)⁻¹ • α) : MulAction.orbitRel.Quotient H Ω)
+      = Quotient.mk'' ω
+    rw [inv_inv, hg]
 
 /-! ### Problem 8A.11 — 1 次元アフィン群 `AGL(1, F)` -/
 
