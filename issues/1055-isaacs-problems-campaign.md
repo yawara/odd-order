@@ -4207,8 +4207,145 @@ Lean 実務メモ: `[N.Normal]` はインスタンスなので `N.Normal.conj_me
 それは `xy ↦ xy ≠ w` を強いる。⚠ `N` が elementary abelian であることは**不要**
 (積を保つことしか使わない)。
 
-**残り**: 上記 1–5 の結線 (極小正規部分群の存在, Thm 3.11 の適用形, Thm 8.5 第 3 主張の
+**✅ step 5 も landing** (`card_le_four_of_regular_normal_of_stabilizer_three_transitive`):
+`N` regular normal + `G_α` が `Ω ∖ {α}` に 3-transitive ⟹ `|N| ≤ 4`。
+⚠ `RegularNormal.lean` の `ofStabilizerToNonidentity` (Thm 8.5 第 3 主張の bundled 版) を
+**経由せず**, 軌道写像 `n ↦ n • α` で直接翻訳した方が短い: `g • α = α` のとき
+`(g n g⁻¹) • α = g • (n • α)` (計算 2 行) なので, `MulAut.conjNormal g` がそのまま
+求める自己同型になる。作用先の型は `MulAut ↥N` を使えば新しい instance が要らない。
+
+**✅ 主定理も landing** (`card_eq_four_of_solvable_of_stabilizer_three_transitive`):
+**可解な 4-transitive 置換群の次数は 4**。step 1–6 の結線は既存部品だけで済んだ —
+`Ch02.exists_isMinimalNormal_le_of_normal` (極小正規部分群) /
+`Ch03.solvable_minimal_normal_isAbelian` (Thm 3.11 の前半で十分; elementary abelian までは不要) /
+8A.9 / 8A.2 の `centralizer_inf_stabilizer_eq_bot` (`N ≤ C_G(N)` から `N ⊓ G_α = ⊥`) /
+上の step 5 補題。
+
+**✅ packaging も landing** (`nonempty_mulEquiv_perm_fin_four_of_four_transitive`):
+`MulAction.toPermHom` が単射 (`MulAction.toPerm_injective`) かつ全射 (4-transitivity を
+「単射な 4-tuple どうしを移す元がある」形で仮定し, `Fin 4 ≃ Ω` を取って各置換を実現) ⟹
+`G ≃* Sym(Ω) ≃* S₄`。補助 `permCongrMulEquiv` (`Equiv.permCongr` の乗法版; mathlib は
+Equiv 版しか持たない)。⟹ **8A.10 完了**。
+
+**旧記載の残り**: 上記 1–4 の結線 (極小正規部分群の存在, Thm 3.11 の適用形, Thm 8.5 第 3 主張の
 `ofStabilizerToNonidentity` から 3-transitivity を移す部分, 最後の `|Ω| = 4 ⟹ G = S₄`)。
+
+### 8A.11 (2026-07-27): `AGL(1,F)` の構成と sharply 2-transitivity
+
+⚠ 既存 `AffineGroup.lean` は **𝔽₂ 専用** (`V ⋊ GL(V)`, Cor 8.7) なので 8A.11 (任意の
+素数冪 `q`) には流用できない → `Equiv.Perm F` の部分群として `AGL(1,F)` を直接構成した。
+
+* `affineLinePerm a b = (x ↦ a x + b)` (`Equiv.mulLeft₀` + `Equiv.addRight`)。
+* `affineLineGroup F : Subgroup (Equiv.Perm F)` — 積・逆は `ring` / `inv_eq_of_mul_eq_one_right`。
+* ✅ `existsUnique_affineLineGroup_of_ne` — **sharply 2-transitive**
+  (`a = (y₁-y₂)/(x₁-x₂)`, `b = y₁ - a x₁` が唯一解)。
+
+⚠ Lean メモ: `Subgroup` を `where carrier := {p | ∃ ...}` で作ると, 会員判定が
+`toSubsemigroup.1` 経由になって **`Iff.rfl` も anonymous constructor も通らない**。
+`⟨fun h => h, fun h => h⟩` で `mem_..._iff` を作り, 以後それを経由する。
+
+* ✅ `affineLinearPartHom : AGL(1,F) →* Fˣ` (`a = p 1 - p 0` で線形部分を取り出す) +
+  核 (平行移動群) の可換性 ⟹ `affineLineGroup_isSolvable`
+  (mathlib `solvable_of_ker_le_range` + `isSolvable_of_comm`)。⟹ **8A.11 完了**。
+
+### 8A.12 (2026-07-27): 置換指標の 2 乗平均 — 骨格を landing
+
+* ✅ `fixedByProdEquiv` / `card_fixedBy_prod` — `χ(g)² = |Fix_{Ω×Ω}(g)|`
+  (積作用の固定点は成分ごとの固定点の積; equiv は `congrArg Prod.fst/snd` と `Prod.ext` だけ)。
+* ✅ `sum_sq_card_fixedBy` — `∑_g χ(g)² = |Ω×Ω の軌道数| · |G|`
+  (§1A の `Ch01.sum_card_fixedBy_nat` = Nat.card 版 Burnside をそのまま `Ω × Ω` に適用)。
+
+* ✅ `card_orbits_prod_eq_two_iff` / `sum_sq_card_fixedBy_eq_two_mul_iff` ⟹ **8A.12 完了**。
+  軌道数 2 の同値は `Nat.card_eq_two_iff` (`{x,y} = univ` 形) で扱い, 「対角線の類には
+  対角線上の点しか入らない」(`hdiag`) を軸に 3 つの類の場合分けを `rcases <;> first | ...`
+  で潰す。⚠ `MulAction.orbitRel_apply` から出る witness は `(fun m => m • p) g = q` という
+  **beta-redex** なので, `congrArg Prod.fst` に渡す前に `have hg' : g • p = q := hg` で
+  型を張り替える (そうしないと `rw`/`congrArg` の結果が噛み合わない)。
+
+**旧記載の残り (8A.12)**: 「`G` 2-transitive ⟺ `Ω × Ω` の `G`-軌道がちょうど 2 個」。
+(⟹) 対角線 `Δ` が 1 軌道 (`G` 推移的), その補集合が 1 軌道 (2-transitivity), 両者は交わらず
+`Ω × Ω` を覆う。(⟸) 2 軌道なら `Δ` が一方で残りが他方ゆえ off-diagonal に推移的。
+実装は `orbitRel.Quotient G (Ω × Ω) ≃ Fin 2` を作るのが素直 (`Nontrivial Ω` が要る)。
+これが済めば「平均 = 2 ⟺ 2-transitive」が `sum_sq_card_fixedBy` から直ちに出る。
+
+### 8A.13 (2026-07-27): 答は **m = 5**、骨格を landing
+
+* ✅ `fixedByProdEquiv` を `A × B` へ一般化 ⟹ `card_fixedBy_prod_three`
+  (`χ(g)³ = |Fix_{Ω³}(g)|`) / `sum_cube_card_fixedBy`
+  (`∑_g χ(g)³ = |Ω³ の軌道数| · |G|`)。
+* **答 `m = 5`** (検算済): `G` が 2-transitive のとき `Ω³` の軌道は 3 点の一致パターンで
+  分類される — `xxx` / `xxy` / `xyx` / `yxx` の 4 つの退化パターンは **2-transitivity だけで
+  各 1 軌道**になり, 残る「全相異」部分がひとつの軌道になることが 3-transitivity と同値。
+  したがって 3-transitive ⟺ 軌道数 5 ⟺ `χ³` の平均が 5。
+
+**残り (8A.13)**: 「軌道数 = 5 ⟺ 3-transitive」の形式化 (`Nat.card_eq_two_iff` に相当する
+5 元版が無いので, `orbitRel.Quotient G (Ω³) ≃ Fin 5` を明示構成するのが素直; `|Ω| ≥ 3` が要る)。
+
+### 8A.14 (2026-07-27): 前半 landing
+
+* ✅ `card_orbits_le_index` — `G` 推移的, `[G:H] = m` ⟹ `H` の `Ω` 上の軌道は高々 `m` 個。
+  証明は **`gH ↦ ⟦g⁻¹ • α⟧` が `G ⧸ H` から `H`-軌道の集合への全射**であること
+  (左剰余類で well-defined にするために `g⁻¹` を取るのが要点: `b = a h` なら
+  `b⁻¹ • α = h⁻¹ • (a⁻¹ • α)` で同じ `H`-軌道)。二重剰余類の言葉を経由しないで済む。
+
+**8A.14 後半の核を landing** (`exists_ne_coset_same_orbit`): `H` が点安定化群
+`G_{a⁻¹ • α}` を含まないなら, `u ∈ a⁻¹ G_α a ∖ H` を取って `b := a u⁻¹` とすれば
+`b⁻¹ • α = a⁻¹ • α` (同じ点!) かつ `bH ≠ aH`。つまり **全射
+`gH ↦ ⟦g⁻¹ • α⟧` のファイバーは常に 2 元以上**。
+
+✅ `two_mul_card_orbits_le_index` で数え上げも完了 ⟹ **8A.14 完了**
+(`cosetToOrbit` を def に切り出し, `Finset.card_eq_sum_card_fiberwise` +
+`Finset.one_lt_card` + `Finset.sum_le_sum`)。
+
+### 8A.15 (2026-07-27): 二重剰余類と剰余類への 2-transitivity — landing
+
+✅ `doubleCoset_transitive_iff`:
+`(∀ a b ∉ H, ∃ x y ∈ H, x a y = b)` ⟺ `(点安定化群 H が (G ⧸ H) ∖ {H} に推移的)`。
+
+* 左辺 = 「`H` の外がひとつの二重剰余類」= `H × H` の両側作用 `g·(x,y) = x⁻¹ g y` が
+  `G` 上ちょうど 2 軌道 (`H × H`-軌道 = 二重剰余類 `H g H`, その一つが `H` 自身)。
+* 右辺 = `G` の `G ⧸ H` への作用の 2-transitivity。
+* ⚠ **`G ⧸ H` は `H` が正規でないと群でない**ので `(a : G ⧸ H) ≠ 1` とは書けない
+  (`OfNat (G ⧸ H) 1` が無い)。基点は `((1 : G) : G ⧸ H)` と書き, `a ∉ H` との対応は
+  `QuotientGroup.eq` + `Subgroup.inv_mem_iff` で作る (`QuotientGroup.eq_one_iff` は
+  正規部分群専用なので使えない)。
+
+⟹ **§8A の残りは 8A.1 後半 / 8A.13 の同値 (軌道数 5) / 8A.14 後半 (≤ m/2) の 3 つ**。
+
+### §8A 一巡後の残り 3 件 (2026-07-27 時点)
+
+1. ~~**8A.1 後半**~~ ✅ **完了 (2026-07-27)** — `exists_two_nonisomorphic_regular_normal`。
+   計算核 (2026-07-27): `transZFour` (`x ↦ x+1`) /
+   `flipZFour` (`x ↦ 1-x`) と関係式 `s t s⁻¹ = t⁻¹` / `t s t⁻¹ = s t²` /
+   `V` の各元の位数 ≤ 2 / `t² ≠ 1` を **`decide` で確認済** (`Equiv.Perm (ZMod 4)` 上の
+   `decide` は実用速度で通ることを probe で確認)。残りは 2 つの部分群を明示 carrier で
+   組んで regular 性・正規性・非同型を結線するだけの機械的作業。設計: `Ω := ZMod 4`,
+   `t := Equiv.addRight 1` (`x ↦ x+1`), `s := x ↦ 1 - x`,
+   `T := Subgroup.zpowers t` (`≅ Z₄`, translations, regular),
+   `V := Subgroup.closure {t², s}` (`= {1, t², s, s t²} ≅ Z₂×Z₂`, regular),
+   `G := Subgroup.closure {t, s}` (`= D₈`)。正規性は生成元で確認:
+   `s t s⁻¹ = t⁻¹ ∈ T`, `t s t⁻¹ = s t² ∈ V`, `t t² t⁻¹ = t² ∈ V`。非同型は
+   「`T` に位数 4 の元, `V` は指数 2」。⚠ `ZMod 4` は `DecidableEq` + `Fintype` なので
+   各等式は `Equiv.ext` + `decide` で潰せる見込み。
+2. **8A.13 の同値** — 「`Ω³` の軌道数 = 5 ⟺ 3-transitive」(`m = 5` は確定済)。
+   `Nat.card_eq_two_iff` の 5 元版が無いので `orbitRel.Quotient G Ω³ ≃ Fin 5` の
+   明示構成が素直 (`|Ω| ≥ 3` が要る)。
+3. ~~**8A.14 後半**~~ ✅ 完了 (2026-07-27)。
+
+### 8A.1 後半 完了 (2026-07-27)
+
+`cyclicFourSub` (`= {1,t,t²,t³} ≅ Z₄`) と `kleinFourSub` (`= {1,t²,s,st²} ≅ Z₂×Z₂`) を
+**明示 carrier の `Subgroup`** として組み, regular 性 (軌道写像の全単射) / 相互の正規化
+(`V ≤ N(T)`, `T ≤ N(V)`) / 非同型 (`V` は指数 2, `T` は位数 4 の元をもつ) をすべて
+`decide` + 4 元の場合分けで証明 ⟹ `exists_two_nonisomorphic_regular_normal`。
+
+⚠ Lean メモ: `⟨v, hv⟩ ^ 2` のように **subtype の証明成分が式に残ると `decide` が
+「Expected type must not contain free variables」で落ちる** → `Subtype.ext` の後に
+`push_cast` で coe を外し, 台の等式にしてから `rcases`/`decide` する。
+正規化群の判定は `∀ x : Equiv.Perm (ZMod 4), x ∈ T ↔ v x v⁻¹ ∈ T` を
+`simp only [mem_normalizer_iff, mem_...]` で素の論理式に開いてから `decide` (24 元の全数)。
+
+⟹ **§8A の残りは 8A.13 の同値 (軌道数 5 ⟺ 3-transitive) のみ**。
 
 ## ⚠ hub からの指摘 (2026-07-27): 新 leaf の `OddOrder.lean` 配線漏れ
 

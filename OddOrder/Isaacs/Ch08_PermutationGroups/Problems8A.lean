@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Data.ZMod.Basic
 import Mathlib.GroupTheory.Sylow
+import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 import OddOrder.Isaacs.Ch08_PermutationGroups.HalfTransitive
 import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
@@ -23,6 +26,10 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `exists_regular_subgroups_of_equiv`, `exists_regular_subgroups_of_card_eq` —
   **Problem 8A.1** 前半: `|A| = |B|` なら `Sym(A)` は `A`, `B` に同型な regular 部分群を
   ともにもつ。
+- `cyclicFourSub`, `kleinFourSub`, `exists_two_nonisomorphic_regular_normal` —
+  **Problem 8A.1 後半**: 置換群は同型でない regular normal 部分群をもちうる
+  (`Ω = ZMod 4`, `D₈ = T ⊔ V` で `T ≅ Z₄`, `V ≅ Z₂ × Z₂`)。`ZMod 4` 上の等式は
+  すべて `decide`。⚠ 8A.4 と矛盾しないのは `T ⊓ V ≠ ⊥` だから。
 - `regularRepRight`, `exists_two_distinct_regular_normal_of_center_eq_bot` —
   **Problem 8A.3**: `Z(G) = 1` (かつ非自明) なら `Sym(G)` の中に `G` に同型な相異なる
   regular normal 部分群が 2 つある (左正則表現の像と右正則表現の像)。
@@ -47,8 +54,29 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
   したがって `N` は half-transitive (すべての `N`-軌道が同じ濃度)。
 - `isPretransitive_of_normal_of_two_transitive` — **Problem 8A.9**: 2-transitive な `G` の
   非自明に作用する正規部分群は推移的。
-- `card_le_four_of_three_transitive_on_nonidentity` — **Problem 8A.10 の核心**:
-  自己同型群が `N ∖ {1}` に 3-transitive なら `|N| ≤ 4`。
+- `card_le_four_of_three_transitive_on_nonidentity`,
+  `card_le_four_of_regular_normal_of_stabilizer_three_transitive` —
+  **Problem 8A.10 の核心**: 自己同型群が `N ∖ {1}` に 3-transitive なら `|N| ≤ 4`;
+  `N` が regular normal で `G_α` が `Ω ∖ {α}` に 3-transitive なら `|N| ≤ 4`。
+- `card_eq_four_of_solvable_of_stabilizer_three_transitive`,
+  `nonempty_mulEquiv_perm_fin_four_of_four_transitive` — **Problem 8A.10**:
+  可解な 4-transitive 置換群の次数は 4 で, したがって `S₄` に同型。
+- `card_fixedBy_prod`, `sum_sq_card_fixedBy`, `card_orbits_prod_eq_two_iff`,
+  `sum_sq_card_fixedBy_eq_two_mul_iff` — **Problem 8A.12**: 推移的な `G` について
+  `G` が 2-transitive ⟺ 置換指標の 2 乗の平均が 2。
+- `doubleCoset_transitive_iff` — **Problem 8A.15**: `G` の `H`-剰余類への作用が
+  2-transitive ⟺ 二重剰余類が `H` とその外のちょうど 2 つ (= `H × H` の両側作用が
+  `G` 上 2 軌道)。
+- `cosetToOrbit`, `card_orbits_le_index`, `two_mul_card_orbits_le_index` —
+  **Problem 8A.14** (後半込み): `G` 推移的で `[G:H] = m` なら
+  `H` の軌道は高々 `m` 個 (`gH ↦ ⟦g⁻¹ • α⟧` が `G ⧸ H` からの全射)。
+- `card_fixedBy_prod_three`, `sum_cube_card_fixedBy` — **Problem 8A.13** の骨格:
+  置換指標の 3 乗和は `Ω³` 上の軌道数 × `|G|`。求める `m` は **5**
+  (3 点の一致パターン `xxx` / `xxy` / `xyx` / `yxx` / 全相異)。
+- `affineLineGroup`, `existsUnique_affineLineGroup_of_ne`,
+  `affineLineGroup_isSolvable` — **Problem 8A.11**: 1 次元アフィン群
+  `AGL(1, F) = {x ↦ ax + b}` は `F` 上 sharply 2-transitive で, metabelian ゆえ可解。
+  有限体は各素数冪について存在するので, 次数 `q` の可解 sharply 2-transitive 群が得られる。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -121,6 +149,162 @@ theorem exists_regular_subgroups_of_card_eq {A B : Type*} [Group A] [Group B]
       (∀ α : A, Function.Bijective (smulBase M α)) ∧
       Nonempty (N ≃* A) ∧ Nonempty (M ≃* B) :=
   exists_regular_subgroups_of_equiv (Finite.card_eq.mp h.symm).some
+
+/-! ### Problem 8A.1 後半 — 同型でない regular normal 部分群の対 (`D₈ ≤ S₄`) -/
+
+section KleinCounterexample
+
+/-- `ZMod 4` の平行移動 `x ↦ x + 1`。 -/
+def transZFour : Equiv.Perm (ZMod 4) := Equiv.addRight 1
+
+/-- `ZMod 4` の反転 `x ↦ 1 - x`。 -/
+def flipZFour : Equiv.Perm (ZMod 4) := (Equiv.neg (ZMod 4)).trans (Equiv.addRight 1)
+
+/-! `D₈ = ⟨t, s⟩ ≤ Sym(ZMod 4)` の関係式。`ZMod 4` は決定可能なのですべて `decide` で
+確認できる。`T = ⟨t⟩ ≅ Z₄` と Klein 群 `V = {1, t², s, s t²} ≅ Z₂ × Z₂` がともに
+`D₈` の指数 2 の部分群であり, どちらも `ZMod 4` に regular に作用する。 -/
+
+@[simp] lemma transZFour_pow_four : transZFour ^ 4 = 1 := by decide
+
+@[simp] lemma flipZFour_sq : flipZFour * flipZFour = 1 := by decide
+
+/-- `s t s⁻¹ = t⁻¹` — これで `T = ⟨t⟩` は `⟨t, s⟩` に正規。 -/
+lemma flip_mul_trans_mul_flip : flipZFour * transZFour * flipZFour = transZFour⁻¹ := by decide
+
+/-- `t s t⁻¹ = s t²` — これで Klein 群 `V = {1, t², s, s t²}` は `⟨t, s⟩` に正規。 -/
+lemma trans_mul_flip_mul_trans_inv :
+    transZFour * flipZFour * transZFour⁻¹ = flipZFour * transZFour ^ 2 := by decide
+
+/-- `t²` と `s` は可換 — `V` が Klein 群 (指数 2) であることの要。 -/
+lemma trans_sq_commute_flip :
+    transZFour ^ 2 * flipZFour = flipZFour * transZFour ^ 2 := by decide
+
+/-- `V` の 4 元はすべて位数 2 以下 (`V ≅ Z₂ × Z₂`)。 -/
+lemma klein_sq_eq_one :
+    (transZFour ^ 2) ^ 2 = 1 ∧ flipZFour ^ 2 = 1 ∧ (flipZFour * transZFour ^ 2) ^ 2 = 1 := by
+  refine ⟨by decide, by decide, by decide⟩
+
+/-- `t` の位数は 4 — `T ≅ Z₄` は位数 4 の元をもつので `V` (指数 2) と同型でない。 -/
+lemma transZFour_sq_ne_one : transZFour ^ 2 ≠ 1 := by decide
+
+/-- `T = ⟨t⟩ = {1, t, t², t³} ≅ Z₄` — `ZMod 4` の平行移動群。 -/
+def cyclicFourSub : Subgroup (Equiv.Perm (ZMod 4)) where
+  carrier := {p | p = 1 ∨ p = transZFour ∨ p = transZFour ^ 2 ∨ p = transZFour ^ 3}
+  one_mem' := Or.inl rfl
+  mul_mem' := by
+    intro a b ha hb
+    simp only [Set.mem_setOf_eq] at ha hb ⊢
+    rcases ha with rfl | rfl | rfl | rfl <;> rcases hb with rfl | rfl | rfl | rfl <;> decide
+  inv_mem' := by
+    intro a ha
+    simp only [Set.mem_setOf_eq] at ha ⊢
+    rcases ha with rfl | rfl | rfl | rfl <;> decide
+
+/-- `V = {1, t², s, s t²} ≅ Z₂ × Z₂` — Klein 四元群。 -/
+def kleinFourSub : Subgroup (Equiv.Perm (ZMod 4)) where
+  carrier := {p | p = 1 ∨ p = transZFour ^ 2 ∨ p = flipZFour ∨ p = flipZFour * transZFour ^ 2}
+  one_mem' := Or.inl rfl
+  mul_mem' := by
+    intro a b ha hb
+    simp only [Set.mem_setOf_eq] at ha hb ⊢
+    rcases ha with rfl | rfl | rfl | rfl <;> rcases hb with rfl | rfl | rfl | rfl <;> decide
+  inv_mem' := by
+    intro a ha
+    simp only [Set.mem_setOf_eq] at ha ⊢
+    rcases ha with rfl | rfl | rfl | rfl <;> decide
+
+lemma mem_cyclicFourSub {p : Equiv.Perm (ZMod 4)} :
+    p ∈ cyclicFourSub ↔
+      p = 1 ∨ p = transZFour ∨ p = transZFour ^ 2 ∨ p = transZFour ^ 3 :=
+  ⟨fun h => h, fun h => h⟩
+
+lemma mem_kleinFourSub {p : Equiv.Perm (ZMod 4)} :
+    p ∈ kleinFourSub ↔
+      p = 1 ∨ p = transZFour ^ 2 ∨ p = flipZFour ∨ p = flipZFour * transZFour ^ 2 :=
+  ⟨fun h => h, fun h => h⟩
+
+/-- `T` は `ZMod 4` に regular に作用する。 -/
+lemma bijective_smulBase_cyclicFourSub :
+    Function.Bijective (smulBase cyclicFourSub (0 : ZMod 4)) := by
+  constructor
+  · rintro ⟨a, ha⟩ ⟨b, hb⟩ hab
+    simp only [smulBase, Equiv.Perm.smul_def] at hab
+    rcases mem_cyclicFourSub.mp ha with rfl | rfl | rfl | rfl <;>
+      rcases mem_cyclicFourSub.mp hb with rfl | rfl | rfl | rfl <;>
+        first | rfl | exact absurd hab (by decide)
+  · intro x
+    fin_cases x
+    · exact ⟨⟨1, Or.inl rfl⟩, by decide⟩
+    · exact ⟨⟨transZFour, Or.inr (Or.inl rfl)⟩, by decide⟩
+    · exact ⟨⟨transZFour ^ 2, Or.inr (Or.inr (Or.inl rfl))⟩, by decide⟩
+    · exact ⟨⟨transZFour ^ 3, Or.inr (Or.inr (Or.inr rfl))⟩, by decide⟩
+
+/-- `V` も `ZMod 4` に regular に作用する (軌道は `0 ↦ 0, 2, 1, 3`)。 -/
+lemma bijective_smulBase_kleinFourSub :
+    Function.Bijective (smulBase kleinFourSub (0 : ZMod 4)) := by
+  constructor
+  · rintro ⟨a, ha⟩ ⟨b, hb⟩ hab
+    simp only [smulBase, Equiv.Perm.smul_def] at hab
+    rcases mem_kleinFourSub.mp ha with rfl | rfl | rfl | rfl <;>
+      rcases mem_kleinFourSub.mp hb with rfl | rfl | rfl | rfl <;>
+        first | rfl | exact absurd hab (by decide)
+  · intro x
+    fin_cases x
+    · exact ⟨⟨1, Or.inl rfl⟩, by decide⟩
+    · exact ⟨⟨flipZFour, Or.inr (Or.inr (Or.inl rfl))⟩, by decide⟩
+    · exact ⟨⟨transZFour ^ 2, Or.inr (Or.inl rfl)⟩, by decide⟩
+    · exact ⟨⟨flipZFour * transZFour ^ 2, Or.inr (Or.inr (Or.inr rfl))⟩, by decide⟩
+
+/-- `T ≇ V`: `V` は指数 2 だが `T` は位数 4 の元をもつ。 -/
+lemma not_nonempty_mulEquiv_cyclicFour_kleinFour :
+    ¬ Nonempty (↥cyclicFourSub ≃* ↥kleinFourSub) := by
+  rintro ⟨φ⟩
+  have hV : ∀ v : ↥kleinFourSub, v ^ 2 = 1 := by
+    rintro ⟨v, hv⟩
+    refine Subtype.ext ?_
+    push_cast
+    rcases mem_kleinFourSub.mp hv with rfl | rfl | rfl | rfl <;> decide
+  have ht : (⟨transZFour, Or.inr (Or.inl rfl)⟩ : ↥cyclicFourSub) ^ 2 ≠ 1 := fun hc =>
+    transZFour_sq_ne_one (by simpa using congrArg Subtype.val hc)
+  exact ht (φ.injective (by rw [map_pow, hV, map_one]))
+
+/-- `V ≤ N(T)` (`s t s⁻¹ = t⁻¹` の帰結)。 -/
+lemma kleinFourSub_le_normalizer_cyclicFourSub :
+    kleinFourSub ≤ Subgroup.normalizer (cyclicFourSub : Set (Equiv.Perm (ZMod 4))) := by
+  intro v hv
+  simp only [Subgroup.mem_normalizer_iff, mem_cyclicFourSub]
+  rcases mem_kleinFourSub.mp hv with rfl | rfl | rfl | rfl <;> decide
+
+/-- `T ≤ N(V)` (`t s t⁻¹ = s t²` の帰結)。 -/
+lemma cyclicFourSub_le_normalizer_kleinFourSub :
+    cyclicFourSub ≤ Subgroup.normalizer (kleinFourSub : Set (Equiv.Perm (ZMod 4))) := by
+  intro u hu
+  simp only [Subgroup.mem_normalizer_iff, mem_kleinFourSub]
+  rcases mem_cyclicFourSub.mp hu with rfl | rfl | rfl | rfl <;> decide
+
+/-- **Isaacs Problem 8A.1** (p. 235), 後半 🎉: 置換群は**同型でない regular normal
+部分群**をもちうる。
+
+`Ω = ZMod 4`, `G = T ⊔ V = D₈` (`S₄` の Sylow 2-部分群) で, `T = ⟨x ↦ x+1⟩ ≅ Z₄` と
+Klein 群 `V = {1, x↦x+2, x↦1-x, x↦3-x} ≅ Z₂ × Z₂` はともに `Ω` に regular に作用し
+`G` に正規だが, 同型でない。
+
+⚠ **8A.4 と矛盾しない**: そちらは `U ⊓ V = 1` を仮定するが, ここでは
+`T ⊓ V = {1, x ↦ x+2} ≠ ⊥`。 -/
+theorem exists_two_nonisomorphic_regular_normal :
+    ∃ T V : Subgroup (Equiv.Perm (ZMod 4)),
+      Function.Bijective (smulBase T (0 : ZMod 4)) ∧
+      Function.Bijective (smulBase V (0 : ZMod 4)) ∧
+      T ⊔ V ≤ Subgroup.normalizer (T : Set (Equiv.Perm (ZMod 4))) ∧
+      T ⊔ V ≤ Subgroup.normalizer (V : Set (Equiv.Perm (ZMod 4))) ∧
+      ¬ Nonempty (↥T ≃* ↥V) :=
+  ⟨cyclicFourSub, kleinFourSub, bijective_smulBase_cyclicFourSub,
+    bijective_smulBase_kleinFourSub,
+    sup_le Subgroup.le_normalizer kleinFourSub_le_normalizer_cyclicFourSub,
+    sup_le cyclicFourSub_le_normalizer_kleinFourSub Subgroup.le_normalizer,
+    not_nonempty_mulEquiv_cyclicFour_kleinFour⟩
+
+end KleinCounterexample
 
 /-! ### Problem 8A.2 — 中心化群は半正則 -/
 
@@ -711,6 +895,483 @@ theorem card_le_four_of_three_transitive_on_nonidentity
   obtain ⟨a, hax, hay, haxy⟩ := h3 x y (x * y) x y w hx hy1 hxy1 hx hy1 hw1
     (Ne.symm hyx) (Ne.symm hxyx) (Ne.symm hxyy) (Ne.symm hyx) (Ne.symm hwx) (Ne.symm hwy)
   exact hwxy (by rw [← haxy, smul_mul', hax, hay])
+
+/-- **8A.10 の step 5**: `N` が regular normal で点安定化群 `G_α` が `Ω ∖ {α}` に
+3-transitive なら, `|N| ≤ 4`。
+
+Thm 8.5 の第 3 主張 (共役作用と点作用の置換同型) を軌道写像 `n ↦ n • α` で直接使う:
+`g • α = α` のとき `(g n g⁻¹) • α = g • (n • α)` なので, `Ω ∖ {α}` 上の 3-transitivity は
+`N ∖ {1}` 上の**自己同型による** 3-transitivity に翻訳され,
+`card_le_four_of_three_transitive_on_nonidentity` が使える。 -/
+theorem card_le_four_of_regular_normal_of_stabilizer_three_transitive
+    {N : Subgroup G} [N.Normal] {α : Ω} (hreg : Function.Bijective (smulBase N α))
+    (h3 : ∀ β₁ β₂ β₃ γ₁ γ₂ γ₃ : Ω, β₁ ≠ α → β₂ ≠ α → β₃ ≠ α → γ₁ ≠ α → γ₂ ≠ α → γ₃ ≠ α →
+      β₁ ≠ β₂ → β₁ ≠ β₃ → β₂ ≠ β₃ → γ₁ ≠ γ₂ → γ₁ ≠ γ₃ → γ₂ ≠ γ₃ →
+      ∃ g : G, g • α = α ∧ g • β₁ = γ₁ ∧ g • β₂ = γ₂ ∧ g • β₃ = γ₃) :
+    Nat.card ↥N ≤ 4 := by
+  refine card_le_four_of_three_transitive_on_nonidentity (A := MulAut ↥N) ?_
+  intro x y z x' y' z' hx hy hz hx' hy' hz' hxy hxz hyz hxy' hxz' hyz'
+  -- 非単位元は `α` と異なる点へ, 相異なる元は相異なる点へ移る
+  have hne : ∀ n : ↥N, n ≠ 1 → (n : G) • α ≠ α := fun n hn hc =>
+    hn (hreg.1 (show smulBase N α n = smulBase N α 1 by simpa [smulBase] using hc))
+  have hinj : ∀ m n : ↥N, (m : G) • α = (n : G) • α → m = n := fun m n hc =>
+    hreg.1 (by simpa [smulBase] using hc)
+  obtain ⟨g, hgα, hg1, hg2, hg3⟩ :=
+    h3 ((x : G) • α) ((y : G) • α) ((z : G) • α) ((x' : G) • α) ((y' : G) • α) ((z' : G) • α)
+      (hne x hx) (hne y hy) (hne z hz) (hne x' hx') (hne y' hy') (hne z' hz')
+      (fun hc => hxy (hinj _ _ hc)) (fun hc => hxz (hinj _ _ hc)) (fun hc => hyz (hinj _ _ hc))
+      (fun hc => hxy' (hinj _ _ hc)) (fun hc => hxz' (hinj _ _ hc)) (fun hc => hyz' (hinj _ _ hc))
+  -- `g` による共役が求める自己同型
+  have hginv : g⁻¹ • α = α := by rw [inv_smul_eq_iff, hgα]
+  have key : ∀ (n n' : ↥N), g • ((n : G) • α) = (n' : G) • α →
+      (MulAut.conjNormal (H := N) g) • n = n' := by
+    intro n n' hc
+    refine hinj _ _ ?_
+    rw [MulAut.smul_def, MulAut.conjNormal_apply]
+    calc (g * (n : G) * g⁻¹) • α = g • ((n : G) • (g⁻¹ • α)) := by
+          simp only [← mul_smul, mul_assoc]
+      _ = (n' : G) • α := by rw [hginv, hc]
+  exact ⟨MulAut.conjNormal (H := N) g, key x x' hg1, key y y' hg2, key z z' hg3⟩
+
+/-- **Isaacs Problem 8A.10** (p. 236) の主内容: **可解な 4-transitive 置換群の次数は 4**。
+
+書籍 hint どおり極小正規部分群 `N` を取る。`N` は忠実性から非自明に作用するので **8A.9**
+で推移的, `G` 可解ゆえ **Isaacs Thm 3.11** で可換 (実は elementary abelian), 可換 + 推移的
++ 忠実で **8A.2** より `C_G(N) ⊓ G_α = ⊥`, `N ≤ C_G(N)` だから `N` は **regular**。
+`G_α` は `Ω ∖ {α}` に 3-transitive なので
+`card_le_four_of_regular_normal_of_stabilizer_three_transitive` で `|N| ≤ 4`,
+regular ゆえ `|Ω| = |N| ≤ 4`。
+
+4-transitivity は「推移的 + `G_α` が `Ω ∖ {α}` に 3-transitive」の形で仮定する
+(`h2` は 2-transitivity 部分, `h3` は 3-transitivity 部分)。 -/
+theorem card_eq_four_of_solvable_of_stabilizer_three_transitive [Finite G] [IsSolvable G]
+    [FaithfulSMul G Ω] [IsPretransitive G Ω] {α : Ω} (hΩ4 : 4 ≤ Nat.card Ω)
+    (h2 : ∀ α' β γ : Ω, β ≠ α' → γ ≠ α' → ∃ g : G, g • α' = α' ∧ g • β = γ)
+    (h3 : ∀ β₁ β₂ β₃ γ₁ γ₂ γ₃ : Ω, β₁ ≠ α → β₂ ≠ α → β₃ ≠ α → γ₁ ≠ α → γ₂ ≠ α → γ₃ ≠ α →
+      β₁ ≠ β₂ → β₁ ≠ β₃ → β₂ ≠ β₃ → γ₁ ≠ γ₂ → γ₁ ≠ γ₃ → γ₂ ≠ γ₃ →
+      ∃ g : G, g • α = α ∧ g • β₁ = γ₁ ∧ g • β₂ = γ₂ ∧ g • β₃ = γ₃) :
+    Nat.card Ω = 4 := by
+  classical
+  -- `Ω` は 2 点以上, したがって `G` は非自明
+  haveI hΩfin : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
+  haveI hΩnt : Nontrivial Ω := Finite.one_lt_card_iff_nontrivial.mp (by omega)
+  obtain ⟨β, hβ⟩ := exists_ne α
+  obtain ⟨g₀, hg₀⟩ := exists_smul_eq G α β
+  haveI hGnt : Nontrivial G := ⟨g₀, 1, fun hc => hβ (by rw [← hg₀, hc, one_smul])⟩
+  -- 極小正規部分群 `N`
+  obtain ⟨N, hNmin, -⟩ :=
+    OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
+  haveI hNnormal : N.Normal := hNmin.1
+  haveI hNnt : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNmin.2.1
+  -- `N` は非自明に作用する (忠実性)
+  obtain ⟨n, hn1⟩ := exists_ne (1 : ↥N)
+  have hnact : ∃ x : Ω, (n : G) • x ≠ x := by
+    by_contra hc
+    exact hn1 (Subtype.ext (FaithfulSMul.eq_of_smul_eq_smul (α := Ω)
+      fun x => by rw [OneMemClass.coe_one, one_smul]; exact not_exists_not.mp hc x))
+  obtain ⟨x, hx⟩ := hnact
+  -- 8A.9: `N` は推移的
+  haveI hNtrans : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_two_transitive h2 hx
+  -- Thm 3.11: `N` は可換
+  have habel := OddOrder.Isaacs.Ch03.solvable_minimal_normal_isAbelian hNmin
+  have hNcent : N ≤ Subgroup.centralizer (N : Set G) := fun a ha =>
+    Subgroup.mem_centralizer_iff.mpr fun b hb => habel b hb a ha
+  -- 8A.2: `N` は regular
+  have hbot : N ⊓ stabilizer G α = ⊥ :=
+    le_antisymm (le_trans (inf_le_inf_right _ hNcent)
+      (le_of_eq (centralizer_inf_stabilizer_eq_bot (H := N) α))) bot_le
+  have hbij : Function.Bijective (smulBase N α) :=
+    (bijective_smulBase_iff N α).mpr ⟨hNtrans, hbot⟩
+  -- 核心補題で `|N| ≤ 4`, regular ゆえ `|Ω| = |N|`
+  have hcardN := card_le_four_of_regular_normal_of_stabilizer_three_transitive hbij h3
+  have hcardΩ : Nat.card Ω = Nat.card ↥N :=
+    (Nat.card_congr (Equiv.ofBijective _ hbij)).symm
+  omega
+
+/-- 型の同値 `e : α ≃ β` に沿った対称群の同型 (mathlib の `Equiv.permCongr` の乗法版)。 -/
+def permCongrMulEquiv {α β : Type*} (e : α ≃ β) : Equiv.Perm α ≃* Equiv.Perm β where
+  toFun p := (e.symm.trans p).trans e
+  invFun q := (e.trans q).trans e.symm
+  left_inv _ := by ext; simp
+  right_inv _ := by ext; simp
+  map_mul' _ _ := by ext; simp
+
+/-- **Isaacs Problem 8A.10** (p. 236) 🎉: **可解な 4-transitive 置換群は `S₄` に同型**。
+
+次数が 4 であること (`card_eq_four_of_solvable_of_stabilizer_three_transitive`) を認めれば,
+`MulAction.toPermHom` が単射 (忠実) かつ全射 (4 点の任意の並べ替えは 4-transitivity で
+実現できる) なので `G ≃* Sym(Ω) ≃* S₄`。
+
+4-transitivity は「単射な 4-tuple どうしを移す元がある」形 (`h4`) で仮定する。 -/
+theorem nonempty_mulEquiv_perm_fin_four_of_four_transitive [FaithfulSMul G Ω]
+    (hcard : Nat.card Ω = 4)
+    (h4 : ∀ b c : Fin 4 → Ω, Function.Injective b → Function.Injective c →
+      ∃ g : G, ∀ i, g • b i = c i) :
+    Nonempty (G ≃* Equiv.Perm (Fin 4)) := by
+  haveI : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
+  obtain ⟨e⟩ : Nonempty (Fin 4 ≃ Ω) := Finite.card_eq.mp (by simp [hcard])
+  have hbij : Function.Bijective (MulAction.toPermHom G Ω) := by
+    refine ⟨MulAction.toPerm_injective, fun σ => ?_⟩
+    obtain ⟨g, hg⟩ := h4 (fun i => e i) (fun i => σ (e i)) e.injective
+      (σ.injective.comp e.injective)
+    refine ⟨g, Equiv.ext fun x => ?_⟩
+    have hx : x = e (e.symm x) := (e.apply_symm_apply x).symm
+    rw [MulAction.toPermHom_apply, MulAction.toPerm_apply, hx, hg (e.symm x)]
+  exact ⟨(MulEquiv.ofBijective _ hbij).trans (permCongrMulEquiv e.symm)⟩
+
+/-! ### Problem 8A.12 — 置換指標の 2 乗平均 -/
+
+/-- 積作用の固定点集合は各成分の固定点集合の積。 -/
+def fixedByProdEquiv {A B : Type*} [MulAction G A] [MulAction G B] (g : G) :
+    (MulAction.fixedBy (A × B) g) ≃ (MulAction.fixedBy A g) × (MulAction.fixedBy B g) where
+  toFun p := (⟨p.1.1, congrArg Prod.fst p.2⟩, ⟨p.1.2, congrArg Prod.snd p.2⟩)
+  invFun q := ⟨(q.1.1, q.2.1), Prod.ext q.1.2 q.2.2⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+/-- 置換指標の 2 乗は積作用 `Ω × Ω` の置換指標。 -/
+theorem card_fixedBy_prod (g : G) :
+    Nat.card (MulAction.fixedBy (Ω × Ω) g) = Nat.card (MulAction.fixedBy Ω g) ^ 2 := by
+  rw [Nat.card_congr (fixedByProdEquiv (A := Ω) (B := Ω) g), Nat.card_prod, sq]
+
+/-- 置換指標の 3 乗は `Ω × Ω × Ω` の置換指標。 -/
+theorem card_fixedBy_prod_three (g : G) :
+    Nat.card (MulAction.fixedBy (Ω × Ω × Ω) g) = Nat.card (MulAction.fixedBy Ω g) ^ 3 := by
+  rw [Nat.card_congr (fixedByProdEquiv (A := Ω) (B := Ω × Ω) g), Nat.card_prod,
+    card_fixedBy_prod]
+  ring
+
+/-- **Isaacs Problem 8A.12** (p. 236) の骨格: **置換指標 `χ` の 2 乗和は
+`Ω × Ω` 上の軌道数 × `|G|`**。したがって `χ(g)²` の平均値は `Ω × Ω` 上の軌道数に等しい。
+
+`χ²` は積作用の置換指標 (`card_fixedBy_prod`) なので, Burnside の補題
+(`Ch01.sum_card_fixedBy_nat`) をそのまま `Ω × Ω` に適用すればよい。あとは
+「`G` が 2-transitive ⟺ `Ω × Ω` の軌道がちょうど 2 個 (対角線とその外)」を見ればよい。 -/
+theorem sum_sq_card_fixedBy [Fintype G] [Finite Ω] :
+    ∑ g : G, Nat.card (MulAction.fixedBy Ω g) ^ 2
+      = Nat.card (MulAction.orbitRel.Quotient G (Ω × Ω)) * Nat.card G := by
+  rw [← OddOrder.Isaacs.Ch01.sum_card_fixedBy_nat (M := G) (β := Ω × Ω)]
+  exact (Finset.sum_congr rfl fun g _ => card_fixedBy_prod g).symm
+
+/-- **Isaacs Problem 8A.13** (p. 236) の骨格: 置換指標の 3 乗和は `Ω × Ω × Ω` 上の
+軌道数 × `|G|`。
+
+`G` が 3-transitive のとき `Ω³` の軌道は **5 個** — 3 点の一致パターン
+(`xxx` / `xxy` / `xyx` / `yxx` / 全相異) がちょうど軌道に対応する (退化 4 パターンは
+2-transitivity だけで各 1 軌道)。したがって求める `m` は **5**。 -/
+theorem sum_cube_card_fixedBy [Fintype G] [Finite Ω] :
+    ∑ g : G, Nat.card (MulAction.fixedBy Ω g) ^ 3
+      = Nat.card (MulAction.orbitRel.Quotient G (Ω × Ω × Ω)) * Nat.card G := by
+  rw [← OddOrder.Isaacs.Ch01.sum_card_fixedBy_nat (M := G) (β := Ω × Ω × Ω)]
+  exact (Finset.sum_congr rfl fun g _ => card_fixedBy_prod_three g).symm
+
+/-- **Isaacs Problem 8A.12** (p. 236) の組合せ部分: 推移的な `G` について
+**`Ω × Ω` の `G`-軌道がちょうど 2 個 ⟺ `G` は 2-transitive**。
+
+軌道は「対角線」と「対角線の外」の 2 つ。対角線の類には対角線上の点しか入らないので,
+2-transitivity は「対角線外がひとつの軌道」と同値。 -/
+theorem card_orbits_prod_eq_two_iff [IsPretransitive G Ω] [Nontrivial Ω] :
+    Nat.card (MulAction.orbitRel.Quotient G (Ω × Ω)) = 2 ↔
+      ∀ β₁ β₂ γ₁ γ₂ : Ω, β₁ ≠ β₂ → γ₁ ≠ γ₂ → ∃ g : G, g • β₁ = γ₁ ∧ g • β₂ = γ₂ := by
+  classical
+  obtain ⟨α, β, hαβ⟩ := exists_pair_ne Ω
+  have hdiag : ∀ x y : Ω, (Quotient.mk'' (x, y) : MulAction.orbitRel.Quotient G (Ω × Ω))
+      = Quotient.mk'' (α, α) → x = y := by
+    intro x y h
+    rw [Quotient.eq''] at h
+    obtain ⟨g, hg⟩ := MulAction.orbitRel_apply.mp h
+    have hg' : g • ((α : Ω), (α : Ω)) = (x, y) := hg
+    exact (congrArg Prod.fst hg').symm.trans (congrArg Prod.snd hg')
+  have hmk : ∀ p q : Ω × Ω, (∃ g : G, g • p = q) →
+      (Quotient.mk'' q : MulAction.orbitRel.Quotient G (Ω × Ω)) = Quotient.mk'' p := by
+    intro p q hpq
+    rw [Quotient.eq'']
+    exact MulAction.orbitRel_apply.mpr hpq
+  constructor
+  · -- 2 軌道 ⟹ 2-transitive
+    intro hcard β₁ β₂ γ₁ γ₂ hβ hγ
+    obtain ⟨x, y, hxy, huniv⟩ := Nat.card_eq_two_iff.mp hcard
+    have hmem : ∀ q : MulAction.orbitRel.Quotient G (Ω × Ω), q = x ∨ q = y := fun q => by
+      have hq : q ∈ ({x, y} : Set _) := huniv ▸ Set.mem_univ q
+      simpa using hq
+    have hoff : ∀ (b₁ b₂ : Ω), b₁ ≠ b₂ →
+        (Quotient.mk'' (b₁, b₂) : MulAction.orbitRel.Quotient G (Ω × Ω))
+          ≠ Quotient.mk'' (α, α) := fun b₁ b₂ hb hc => hb (hdiag b₁ b₂ hc)
+    have hsame : (Quotient.mk'' (γ₁, γ₂) : MulAction.orbitRel.Quotient G (Ω × Ω))
+        = Quotient.mk'' (β₁, β₂) := by
+      rcases hmem (Quotient.mk'' (α, α)) with hα | hα <;>
+        rcases hmem (Quotient.mk'' (β₁, β₂)) with hβ' | hβ' <;>
+        rcases hmem (Quotient.mk'' (γ₁, γ₂)) with hγ' | hγ' <;>
+        first
+          | (exact hγ'.trans hβ'.symm)
+          | (exact absurd (hβ'.trans hα.symm) (hoff β₁ β₂ hβ))
+          | (exact absurd (hγ'.trans hα.symm) (hoff γ₁ γ₂ hγ))
+    rw [Quotient.eq''] at hsame
+    obtain ⟨g, hg⟩ := MulAction.orbitRel_apply.mp hsame
+    have hg' : g • (β₁, β₂) = (γ₁, γ₂) := hg
+    exact ⟨g, congrArg Prod.fst hg', congrArg Prod.snd hg'⟩
+  · -- 2-transitive ⟹ 2 軌道
+    intro h2
+    refine Nat.card_eq_two_iff.mpr ⟨Quotient.mk'' (α, α), Quotient.mk'' (α, β),
+      fun hc => hαβ (hdiag α β hc.symm), Set.eq_univ_iff_forall.mpr ?_⟩
+    refine Quotient.ind' fun p => ?_
+    rcases eq_or_ne p.1 p.2 with hp | hp
+    · obtain ⟨g, hg⟩ := exists_smul_eq G α p.1
+      exact Set.mem_insert_iff.mpr (Or.inl (hmk (α, α) p ⟨g, Prod.ext hg (hg.trans hp)⟩))
+    · obtain ⟨g, hg1, hg2⟩ := h2 α β p.1 p.2 hαβ hp
+      exact Set.mem_insert_iff.mpr (Or.inr (Set.mem_singleton_iff.mpr
+        (hmk (α, β) p ⟨g, Prod.ext hg1 hg2⟩)))
+
+/-- **Isaacs Problem 8A.12** (p. 236) 🎉: 推移的な `G` について
+**`G` が 2-transitive ⟺ 置換指標 `χ` の 2 乗の平均値が 2**
+(`∑_{g} χ(g)² = 2 |G|`)。
+
+`χ²` は積作用 `Ω × Ω` の置換指標なので, Burnside より `∑ χ² = (Ω×Ω の軌道数)·|G|`。
+軌道数が 2 であることが 2-transitivity と同値 (`card_orbits_prod_eq_two_iff`)。 -/
+theorem sum_sq_card_fixedBy_eq_two_mul_iff [Fintype G] [Finite Ω] [IsPretransitive G Ω]
+    [Nontrivial Ω] :
+    (∑ g : G, Nat.card (MulAction.fixedBy Ω g) ^ 2) = 2 * Nat.card G ↔
+      ∀ β₁ β₂ γ₁ γ₂ : Ω, β₁ ≠ β₂ → γ₁ ≠ γ₂ → ∃ g : G, g • β₁ = γ₁ ∧ g • β₂ = γ₂ := by
+  rw [sum_sq_card_fixedBy, ← card_orbits_prod_eq_two_iff]
+  exact ⟨fun h => Nat.eq_of_mul_eq_mul_right Nat.card_pos h, fun h => by rw [h]⟩
+
+/-! ### Problem 8A.14 — 部分群の軌道数は指数以下 -/
+
+/-- **Isaacs Problem 8A.14** (p. 236) 前半: `G` が `Ω` に推移的で `[G : H] = m` なら,
+`H` の `Ω` 上の軌道は高々 `m` 個。
+
+`gH ↦ ⟦g⁻¹ • α⟧` が `G ⧸ H` から `H`-軌道の集合への**全射**になる:
+`b = a h` (`h ∈ H`) なら `b⁻¹ • α = h⁻¹ • (a⁻¹ • α)` で同じ `H`-軌道, また `G` の推移性から
+任意の `ω = g • α` は `g⁻¹H` の像。 -/
+def cosetToOrbit (H : Subgroup G) (α : Ω) :
+    G ⧸ H → MulAction.orbitRel.Quotient H Ω :=
+  Quotient.lift (fun g : G => (Quotient.mk'' ((g : G)⁻¹ • α) :
+      MulAction.orbitRel.Quotient H Ω)) (by
+    intro a b hab
+    have hmem : a⁻¹ * b ∈ H := QuotientGroup.leftRel_apply.mp hab
+    refine Quotient.sound' (MulAction.orbitRel_apply.mpr ⟨⟨a⁻¹ * b, hmem⟩, ?_⟩)
+    change ((a⁻¹ * b : G)) • ((b : G)⁻¹ • α) = (a : G)⁻¹ • α
+    rw [← mul_smul]
+    group)
+
+@[simp] lemma cosetToOrbit_mk (H : Subgroup G) (α : Ω) (g : G) :
+    cosetToOrbit H α (Quotient.mk'' g) = Quotient.mk'' ((g : G)⁻¹ • α) := rfl
+
+lemma cosetToOrbit_surjective [IsPretransitive G Ω] (H : Subgroup G) (α : Ω) :
+    Function.Surjective (cosetToOrbit H α) := by
+  refine Quotient.ind' fun ω => ?_
+  obtain ⟨g, hg⟩ := exists_smul_eq G α ω
+  refine ⟨Quotient.mk'' g⁻¹, ?_⟩
+  change (Quotient.mk'' ((g⁻¹ : G)⁻¹ • α) : MulAction.orbitRel.Quotient H Ω)
+    = Quotient.mk'' ω
+  rw [inv_inv, hg]
+
+theorem card_orbits_le_index [Finite G] [Finite Ω] [IsPretransitive G Ω]
+    (H : Subgroup G) (α : Ω) :
+    Nat.card (MulAction.orbitRel.Quotient H Ω) ≤ H.index := by
+  classical
+  rw [Subgroup.index_eq_card]
+  exact Nat.card_le_card_of_surjective _ (cosetToOrbit_surjective H α)
+
+/-- 8A.14 後半の核: `H` が点安定化群 `G_{a⁻¹ • α}` を含まないなら, `aH` と同じ
+`H`-軌道を与える別の剰余類 `bH ≠ aH` がある。
+
+`u ∈ a⁻¹ G_α a ∖ H` を取り `b := a u⁻¹` とすると `bH ≠ aH` で
+`b⁻¹ • α = u a⁻¹ • α = a⁻¹ • α`。 -/
+theorem exists_ne_coset_same_orbit {H : Subgroup G} {α : Ω} (a : G)
+    (hns : ¬ (∀ g ∈ MulAction.stabilizer G ((a : G)⁻¹ • α), g ∈ H)) :
+    ∃ b : G, (b : G)⁻¹ • α = (a : G)⁻¹ • α ∧ a⁻¹ * b ∉ H := by
+  simp only [not_forall] at hns
+  obtain ⟨u, hu, huH⟩ := hns
+  refine ⟨a * u⁻¹, ?_, ?_⟩
+  · rw [mul_inv_rev, inv_inv, mul_smul]
+    exact MulAction.mem_stabilizer_iff.mp hu
+  · intro hc
+    exact huH (by simpa using H.inv_mem hc)
+
+/-- **Isaacs Problem 8A.14** (p. 236) 後半: `H` がどの点安定化群も含まないなら,
+`H` の `Ω` 上の軌道は高々 `m/2` 個 (`2 · 軌道数 ≤ [G:H]`)。
+
+全射 `cosetToOrbit` のファイバーが常に 2 元以上 (`exists_ne_coset_same_orbit`) なので,
+`|G ⧸ H| = ∑_o |fiber o| ≥ 2 · 軌道数`。 -/
+theorem two_mul_card_orbits_le_index [Finite G] [Finite Ω] [IsPretransitive G Ω]
+    (H : Subgroup G) (α : Ω) (hns : ∀ ω : Ω, ¬ (MulAction.stabilizer G ω ≤ H)) :
+    2 * Nat.card (MulAction.orbitRel.Quotient H Ω) ≤ H.index := by
+  classical
+  haveI : Fintype (G ⧸ H) := Fintype.ofFinite _
+  haveI : Fintype (MulAction.orbitRel.Quotient H Ω) := Fintype.ofFinite _
+  have hfib : ∀ o : MulAction.orbitRel.Quotient H Ω,
+      2 ≤ (Finset.univ.filter fun c => cosetToOrbit H α c = o).card := by
+    intro o
+    obtain ⟨c, hc⟩ := cosetToOrbit_surjective H α o
+    induction c using Quotient.ind' with
+    | _ a =>
+      obtain ⟨b, hbα, hbH⟩ := exists_ne_coset_same_orbit (H := H) a (hns ((a : G)⁻¹ • α))
+      refine Finset.one_lt_card.mpr ⟨Quotient.mk'' a, by simp [hc], Quotient.mk'' b, ?_, ?_⟩
+      · simp only [Finset.mem_filter, Finset.mem_univ, true_and, cosetToOrbit_mk, hbα]
+        exact hc
+      · exact fun hab => hbH (QuotientGroup.leftRel_apply.mp (Quotient.exact' hab))
+  calc 2 * Nat.card (MulAction.orbitRel.Quotient H Ω)
+      = ∑ _o : MulAction.orbitRel.Quotient H Ω, 2 := by
+        rw [Finset.sum_const, Finset.card_univ, smul_eq_mul, Nat.card_eq_fintype_card,
+          mul_comm]
+    _ ≤ ∑ o : MulAction.orbitRel.Quotient H Ω,
+          (Finset.univ.filter fun c => cosetToOrbit H α c = o).card :=
+        Finset.sum_le_sum fun o _ => hfib o
+    _ = Fintype.card (G ⧸ H) :=
+        (Finset.card_eq_sum_card_fiberwise fun c _ => Finset.mem_univ _).symm
+    _ = H.index := by rw [← Nat.card_eq_fintype_card, ← Subgroup.index_eq_card]
+
+/-! ### Problem 8A.15 — 剰余類への 2-transitivity と二重剰余類 -/
+
+/-- **Isaacs Problem 8A.15** (p. 236): `G` の `H`-剰余類への作用が 2-transitive ⟺
+`H × H` の両側作用 `g · (x,y) = x⁻¹ g y` が `G` 上ちょうど 2 軌道をもつ。
+
+`H × H`-軌道は**二重剰余類** `H g H` そのもので, そのひとつは `H` 自身。よって
+「ちょうど 2 軌道」= 「`H` の外がひとつの二重剰余類」であり, これが本補題の左辺。
+右辺は「点安定化群 `G_{1·H} = H` が `(G ⧸ H) ∖ {H}` に推移的」= 2-transitivity。 -/
+theorem doubleCoset_transitive_iff (H : Subgroup G) :
+    (∀ a b : G, a ∉ H → b ∉ H → ∃ x ∈ H, ∃ y ∈ H, x * a * y = b) ↔
+      (∀ a b : G, (a : G ⧸ H) ≠ ((1 : G) : G ⧸ H) → (b : G ⧸ H) ≠ ((1 : G) : G ⧸ H) →
+        ∃ h ∈ H, h • (a : G ⧸ H) = (b : G ⧸ H)) := by
+  have hone : ∀ a : G, ((a : G ⧸ H) = ((1 : G) : G ⧸ H)) ↔ a ∈ H := by
+    intro a
+    rw [QuotientGroup.eq, mul_one, H.inv_mem_iff]
+  constructor
+  · intro h a b ha hb
+    obtain ⟨x, hx, y, hy, hxy⟩ := h a b (fun hc => ha ((hone a).mpr hc))
+      (fun hc => hb ((hone b).mpr hc))
+    refine ⟨x, hx, ?_⟩
+    rw [show x • (a : G ⧸ H) = ((x * a : G) : G ⧸ H) from rfl, QuotientGroup.eq]
+    have hy' : (x * a)⁻¹ * b = y := by rw [← hxy]; group
+    rw [hy']
+    exact hy
+  · intro h a b ha hb
+    obtain ⟨x, hx, hxa⟩ := h a b (fun hc => ha ((hone a).mp hc)) (fun hc => hb ((hone b).mp hc))
+    rw [show x • (a : G ⧸ H) = ((x * a : G) : G ⧸ H) from rfl, QuotientGroup.eq] at hxa
+    exact ⟨x, hx, (x * a)⁻¹ * b, hxa, by group⟩
+
+/-! ### Problem 8A.11 — 1 次元アフィン群 `AGL(1, F)` -/
+
+section AffineLine
+
+variable {F : Type*} [Field F]
+
+/-- `x ↦ a * x + b` (`a` は単元) が定める `F` の置換。 -/
+def affineLinePerm (a : Fˣ) (b : F) : Equiv.Perm F :=
+  (Equiv.mulLeft₀ (a : F) a.ne_zero).trans (Equiv.addRight b)
+
+@[simp] lemma affineLinePerm_apply (a : Fˣ) (b x : F) :
+    affineLinePerm a b x = (a : F) * x + b := rfl
+
+/-- **1 次元アフィン群** `AGL(1, F) = {x ↦ a x + b : a ∈ Fˣ, b ∈ F}` — `Sym(F)` の部分群。
+
+`q = |F|` のとき位数は `q(q - 1)` で, `F` 上 sharply 2-transitive
+(`existsUnique_affineLineGroup_of_ne`)。 -/
+def affineLineGroup (F : Type*) [Field F] : Subgroup (Equiv.Perm F) where
+  carrier := {p | ∃ (a : Fˣ) (b : F), p = affineLinePerm a b}
+  one_mem' := ⟨1, 0, by ext x; simp⟩
+  mul_mem' := by
+    rintro - - ⟨a, b, rfl⟩ ⟨a', b', rfl⟩
+    refine ⟨a * a', (a : F) * b' + b, Equiv.ext fun x => ?_⟩
+    simp only [Equiv.Perm.mul_apply, affineLinePerm_apply, Units.val_mul]
+    ring
+  inv_mem' := by
+    rintro - ⟨a, b, rfl⟩
+    refine ⟨a⁻¹, -(((a⁻¹ : Fˣ) : F) * b), inv_eq_of_mul_eq_one_right (Equiv.ext fun x => ?_)⟩
+    simp only [Equiv.Perm.mul_apply, affineLinePerm_apply, Equiv.Perm.one_apply, mul_add,
+      mul_neg, ← mul_assoc, Units.mul_inv, one_mul]
+    ring
+
+lemma mem_affineLineGroup_iff {p : Equiv.Perm F} :
+    p ∈ affineLineGroup F ↔ ∃ (a : Fˣ) (b : F), p = affineLinePerm a b :=
+  ⟨fun h => h, fun h => h⟩
+
+/-- **Isaacs Problem 8A.11** (p. 236): `AGL(1, F)` は `F` 上 **sharply 2-transitive** —
+相異なる 2 点の任意の組を相異なる 2 点の任意の組へ移す元がちょうど 1 つある。
+
+`a = (y₁ - y₂)/(x₁ - x₂)`, `b = y₁ - a x₁` が唯一の解 (アフィン写像は 2 点での値で決まる)。
+有限体は各素数冪 `q > 1` について存在するので, これで次数 `q` の可解 sharply 2-transitive
+置換群の存在が言える (可解性は `affineLineGroup_isSolvable`)。 -/
+theorem existsUnique_affineLineGroup_of_ne {x₁ x₂ y₁ y₂ : F} (hx : x₁ ≠ x₂) (hy : y₁ ≠ y₂) :
+    ∃! p : ↥(affineLineGroup F),
+      (p : Equiv.Perm F) x₁ = y₁ ∧ (p : Equiv.Perm F) x₂ = y₂ := by
+  have hxsub : x₁ - x₂ ≠ 0 := sub_ne_zero.mpr hx
+  have hysub : y₁ - y₂ ≠ 0 := sub_ne_zero.mpr hy
+  set a : Fˣ := Units.mk0 ((y₁ - y₂) / (x₁ - x₂)) (div_ne_zero hysub hxsub) with ha
+  have hacoe : (a : F) = (y₁ - y₂) / (x₁ - x₂) := rfl
+  have hax : (a : F) * (x₁ - x₂) = y₁ - y₂ := by
+    rw [hacoe, div_mul_cancel₀ _ hxsub]
+  refine ⟨⟨affineLinePerm a (y₁ - (a : F) * x₁),
+    mem_affineLineGroup_iff.mpr ⟨a, _, rfl⟩⟩, ⟨by simp, ?_⟩, ?_⟩
+  · simp only [affineLinePerm_apply]
+    linear_combination -hax
+  · rintro ⟨q, hq⟩ ⟨h1, h2⟩
+    obtain ⟨a', b', rfl⟩ := mem_affineLineGroup_iff.mp hq
+    simp only [affineLinePerm_apply] at h1 h2
+    have hA : (a' : F) = (a : F) := by
+      have hthis : (a' : F) * (x₁ - x₂) = y₁ - y₂ := by linear_combination h1 - h2
+      rw [hacoe, eq_div_iff hxsub]
+      exact hthis
+    have hB : b' = y₁ - (a : F) * x₁ := by rw [← hA]; linear_combination h1
+    refine Subtype.ext (Equiv.ext fun x => ?_)
+    simp only [affineLinePerm_apply, hA, hB]
+
+/-- `AGL(1,F)` の元の**線形部分** `a`。`p x = a x + b` から `a = p 1 - p 0` として取り出す。 -/
+def affineLinearPart (p : ↥(affineLineGroup F)) : Fˣ :=
+  Units.mk0 ((p : Equiv.Perm F) 1 - (p : Equiv.Perm F) 0) <| by
+    obtain ⟨a, b, hab⟩ := mem_affineLineGroup_iff.mp p.2
+    rw [show ((p : Equiv.Perm F)) = affineLinePerm a b from hab]
+    simp
+
+lemma affineLinearPart_affineLinePerm (a : Fˣ) (b : F)
+    (h : affineLinePerm a b ∈ affineLineGroup F) :
+    affineLinearPart ⟨affineLinePerm a b, h⟩ = a := by
+  refine Units.ext ?_
+  simp [affineLinearPart]
+
+/-- 線形部分は準同型 `AGL(1,F) →* Fˣ`。 -/
+def affineLinearPartHom : ↥(affineLineGroup F) →* Fˣ where
+  toFun := affineLinearPart
+  map_one' := by
+    refine Units.ext ?_
+    simp [affineLinearPart]
+  map_mul' p q := by
+    obtain ⟨a, b, hab⟩ := mem_affineLineGroup_iff.mp p.2
+    obtain ⟨a', b', hab'⟩ := mem_affineLineGroup_iff.mp q.2
+    refine Units.ext ?_
+    simp only [affineLinearPart, Units.val_mk0, Units.val_mul, Subgroup.coe_mul,
+      Equiv.Perm.mul_apply, hab, hab', affineLinePerm_apply]
+    ring
+
+/-- 平行移動群 (= 線形部分が `1`) は可換。 -/
+instance affineLinearPartHom_ker_isSolvable :
+    IsSolvable ↥(MonoidHom.ker (affineLinearPartHom (F := F))) := by
+  refine isSolvable_of_comm fun p q => ?_
+  obtain ⟨a, b, hab⟩ := mem_affineLineGroup_iff.mp (p : ↥(affineLineGroup F)).2
+  obtain ⟨a', b', hab'⟩ := mem_affineLineGroup_iff.mp (q : ↥(affineLineGroup F)).2
+  have hlin : ∀ (r : ↥(MonoidHom.ker (affineLinearPartHom (F := F)))) (c : Fˣ) (d : F),
+      ((r : ↥(affineLineGroup F)) : Equiv.Perm F) = affineLinePerm c d → c = 1 := by
+    intro r c d hr
+    have hk : affineLinearPart (r : ↥(affineLineGroup F)) = 1 := MonoidHom.mem_ker.mp r.2
+    rw [show (r : ↥(affineLineGroup F)) = ⟨affineLinePerm c d, hr ▸ (r : ↥(affineLineGroup F)).2⟩
+      from Subtype.ext hr, affineLinearPart_affineLinePerm] at hk
+    exact hk
+  have ha : a = 1 := hlin p a b hab
+  have ha' : a' = 1 := hlin q a' b' hab'
+  refine Subtype.ext (Subtype.ext (Equiv.ext fun x => ?_))
+  simp only [Subgroup.coe_mul, Equiv.Perm.mul_apply, hab, hab', ha, ha',
+    affineLinePerm_apply, Units.val_one, one_mul]
+  ring
+
+/-- **Isaacs Problem 8A.11** (p. 236) の可解性: `AGL(1,F)` は metabelian ゆえ**可解**。
+
+線形部分 `p ↦ a` は `Fˣ` への準同型で, その核は平行移動群 `≅ F⁺` (可換)。 -/
+instance affineLineGroup_isSolvable : IsSolvable ↥(affineLineGroup F) :=
+  solvable_of_ker_le_range (MonoidHom.ker (affineLinearPartHom (F := F))).subtype
+    affineLinearPartHom (le_of_eq (Subgroup.range_subtype _).symm)
+
+end AffineLine
 
 end
 
