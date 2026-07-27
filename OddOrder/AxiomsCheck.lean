@@ -3751,9 +3751,13 @@ set_option linter.style.longLine false in
 -- the grid-backed (5.2.d) decomposition data.  Conclusion = the h56 oracle shape.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S12.Hypothesis.exists_source_index_le_two_psi
--- NOTE: `S12.Hypothesis.isTypeIIIorIV` / `coprime_card_W1_derived` (anchor prerequisites,
--- S13_SixTwoBridge) cite `no_typeV_maximal` ((10.10), currently sorried upstream) — honest
--- sorried-cites, NOT registered here until the (10.10) chain is axiom-clean.
+-- The anchor prerequisite `coprime_card_W1_derived` (S13_SixTwoBridge).  ⚠ The former NOTE here
+-- ("cites `no_typeV_maximal` ((10.10), currently sorried upstream), NOT registered until that
+-- chain is axiom-clean") is **stale** (2026-07-27): (10.10) landed as the axiom-clean
+-- `S12.no_typeV_maximal_unconditional` (registered below), the bare-sorry legacy
+-- `no_typeV_maximal` was deleted, and the type-III/IV side is the registered
+-- `S12.isTypeIIIorIV_unconditional` (`S12.Hypothesis.isTypeIIIorIV` no longer exists).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.coprime_card_W1_derived
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
