@@ -609,6 +609,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeen
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeventeenTransfer
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.TheoremB
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
