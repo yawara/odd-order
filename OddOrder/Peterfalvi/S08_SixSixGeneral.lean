@@ -233,4 +233,94 @@ theorem sum_re_sq_xSet_eq (Z : Subgroup ↥L) [Z.Normal]
   rw [xSetFinset, ← hA, ← hB, ← Finset.sum_congr rfl hconv, eq_sub_of_add_eq hsd, h0, hZ]
   ring
 
+/-! ### The minimal-degree base block `𝒮₀ ⊆ 𝒳`, general kernel -/
+
+/-- **The base block `𝒮₀`**: the minimal-degree members of `𝒳`.  This is the equal-minimal-degree
+prefix `{χ₁,…,χₖ}` of Peterfalvi (6.6) (p. 32), on which (1.1)+(1.4) supplies the base coherence
+before the (5.6) adjoining of the strictly-higher-degree conjugate pairs.
+
+`𝒮₀` must contain **all** minimal-degree members, not just one pair: the first (5.6) adjoining of
+a pair of degree ratio `a` needs `2a < ∑_{𝒮₀} aⱼ²`, which fails at equal degree.
+
+The Sibley `K = H` instance is `SibleyDadeHypothesis.xBaseBlock`. -/
+def xBaseBlock (K : Subgroup ↥L) [Invertible (Nat.card ↥K : ℂ)] (Z : Subgroup ↥L) :
+    Set (ClassFunction ↥L ℂ) :=
+  {χ ∈ xSet K Z | ∀ ψ ∈ xSet K Z,
+    (OddOrder.Peterfalvi.S03.characterDegree χ).re ≤
+      (OddOrder.Peterfalvi.S03.characterDegree ψ).re}
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+theorem xBaseBlock_subset (Z : Subgroup ↥L) : xBaseBlock K Z ⊆ xSet K Z :=
+  fun _ hχ => hχ.1
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+theorem xBaseBlock_finite (Z : Subgroup ↥L) : (xBaseBlock K Z).Finite :=
+  (xSet_finite (K := K) Z).subset (xBaseBlock_subset Z)
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- The minimal-degree base block is closed under conjugation: `𝒳` is, and conjugation preserves
+the (real) degree. -/
+theorem xBaseBlock_closedUnderConjugate (Z : Subgroup ↥L) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (xBaseBlock K Z) := by
+  intro χ hχ
+  refine ⟨xSet_closedUnderConjugate (K := K) Z hχ.1, fun ψ hψ => ?_⟩
+  have hre : (OddOrder.Peterfalvi.S03.characterDegree χ.conj).re =
+      (OddOrder.Peterfalvi.S03.characterDegree χ).re := by simp
+  rw [hre]
+  exact hχ.2 ψ hψ
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- Any two base-block members have the same degree — the *equal*-degree family shape that the
+§7 base engine `coherentEqualDegree` consumes. -/
+theorem xBaseBlock_degree_re_eq {Z : Subgroup ↥L} {χ χ' : ClassFunction ↥L ℂ}
+    (hχ : χ ∈ xBaseBlock K Z) (hχ' : χ' ∈ xBaseBlock K Z) :
+    (OddOrder.Peterfalvi.S03.characterDegree χ).re =
+      (OddOrder.Peterfalvi.S03.characterDegree χ').re :=
+  le_antisymm (hχ.2 χ' hχ'.1) (hχ'.2 χ hχ.1)
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- A base-block anchor has natural degree no larger than any `𝒳`-member's. -/
+theorem natDegree_le_of_xBaseBlock_anchor {Z : Subgroup ↥L}
+    {χ₁ χ : ClassFunction ↥L ℂ} {d₁ d : ℕ}
+    (hχ₁base : χ₁ ∈ xBaseBlock K Z) (hχX : χ ∈ xSet K Z)
+    (hχ₁one : χ₁ 1 = (d₁ : ℂ)) (hχone : χ 1 = (d : ℂ)) :
+    d₁ ≤ d := by
+  have hre := hχ₁base.2 χ hχX
+  rw [OddOrder.Peterfalvi.S03.characterDegree_def,
+    OddOrder.Peterfalvi.S03.characterDegree_def, hχ₁one, hχone] at hre
+  simpa using hre
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- **`2 ≤ |𝒮₀|`.**  A minimal-degree member `χ` of the nonempty finite `𝒳` lies in `𝒮₀`, and so
+does `χ̄ ≠ χ` (conjugation closure plus Peterfalvi (1.1): `|L|` odd forbids real members). -/
+theorem two_le_xBaseBlock_ncard (hodd : Odd (Nat.card ↥L)) {Z : Subgroup ↥L}
+    (hXne : (xSet K Z).Nonempty) :
+    2 ≤ (xBaseBlock K Z).ncard := by
+  obtain ⟨χ, hχX, hχmin⟩ := Set.exists_min_image (xSet K Z)
+    (fun ψ => (OddOrder.Peterfalvi.S03.characterDegree ψ).re) (xSet_finite (K := K) Z) hXne
+  have hχS₀ : χ ∈ xBaseBlock K Z := ⟨hχX, hχmin⟩
+  have h1 : 1 < (xBaseBlock K Z).ncard :=
+    (Set.one_lt_ncard (xBaseBlock_finite (K := K) Z)).mpr
+      ⟨χ.conj, xBaseBlock_closedUnderConjugate (K := K) Z hχS₀, χ, hχS₀,
+        xSet_hasNoRealCharacters (K := K) hodd Z hχX⟩
+  omega
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- **Base-anchor index existence** (the X-chain step-data `i₁`/`hanchor`).  If `χmem` enumerates
+the running prefix `pairUnion 𝒮₀ pair i` and `𝒮₀` is nonempty, some index `i₁` lands in `𝒮₀`
+(the base block is contained in every prefix). -/
+theorem exists_xBaseBlock_anchor_index {Z : Subgroup ↥L}
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {i k : ℕ}
+    {χmem : Fin k → IrreducibleCharacter ↥L}
+    (hrange : Set.range (fun j : Fin k => (χmem j : ClassFunction ↥L ℂ)) =
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i)
+    (hne : (xBaseBlock K Z).Nonempty) :
+    ∃ i₁ : Fin k, (χmem i₁ : ClassFunction ↥L ℂ) ∈ xBaseBlock K Z := by
+  obtain ⟨φ, hφ⟩ := hne
+  have hφpair : φ ∈ Set.range (fun j : Fin k => (χmem j : ClassFunction ↥L ℂ)) := by
+    rw [hrange]
+    exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hφ)
+  obtain ⟨i₁, hi₁⟩ := hφpair
+  exact ⟨i₁, by rw [show (χmem i₁ : ClassFunction ↥L ℂ) = φ from hi₁]; exact hφ⟩
+
 end OddOrder.Peterfalvi.S08

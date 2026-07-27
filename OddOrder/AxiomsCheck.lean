@@ -3785,6 +3785,17 @@ set_option linter.style.longLine false in
 -- `𝒮` are allowed as long as they lie in `𝒮(Z)` (the Sibley case-B situation).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.coe_xSetFinset
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.sum_re_sq_xSet_eq
+-- The minimal-degree base block `𝒮₀ ⊆ 𝒳` for a general kernel: the equal-degree prefix of
+-- Peterfalvi (6.6) (p. 32) on which (1.1)+(1.4) gives the base coherence before the (5.6)
+-- adjoining of the higher-degree conjugate pairs.  `2 ≤ |𝒮₀|` comes from a minimal-degree member
+-- together with its conjugate (`|L|` odd forbids real members, Peterfalvi (1.1)); the anchor-index
+-- lemma is the X-chain step-data `i₁`/`hanchor`.  All of this is pure set/degree reasoning —
+-- the Sibley versions used no `SibleyDadeHypothesis` field beyond the family itself.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xBaseBlock_closedUnderConjugate
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xBaseBlock_degree_re_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.natDegree_le_of_xBaseBlock_anchor
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.two_le_xBaseBlock_ncard
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_xBaseBlock_anchor_index
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.
