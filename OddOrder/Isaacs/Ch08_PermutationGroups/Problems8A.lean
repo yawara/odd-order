@@ -52,8 +52,9 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
   `card_le_four_of_regular_normal_of_stabilizer_three_transitive` —
   **Problem 8A.10 の核心**: 自己同型群が `N ∖ {1}` に 3-transitive なら `|N| ≤ 4`;
   `N` が regular normal で `G_α` が `Ω ∖ {α}` に 3-transitive なら `|N| ≤ 4`。
-- `card_eq_four_of_solvable_of_stabilizer_three_transitive` — **Problem 8A.10**:
-  可解な 4-transitive 置換群の次数は 4。
+- `card_eq_four_of_solvable_of_stabilizer_three_transitive`,
+  `nonempty_mulEquiv_perm_fin_four_of_four_transitive` — **Problem 8A.10**:
+  可解な 4-transitive 置換群の次数は 4 で, したがって `S₄` に同型。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -808,6 +809,37 @@ theorem card_eq_four_of_solvable_of_stabilizer_three_transitive [Finite G] [IsSo
   have hcardΩ : Nat.card Ω = Nat.card ↥N :=
     (Nat.card_congr (Equiv.ofBijective _ hbij)).symm
   omega
+
+/-- 型の同値 `e : α ≃ β` に沿った対称群の同型 (mathlib の `Equiv.permCongr` の乗法版)。 -/
+def permCongrMulEquiv {α β : Type*} (e : α ≃ β) : Equiv.Perm α ≃* Equiv.Perm β where
+  toFun p := (e.symm.trans p).trans e
+  invFun q := (e.trans q).trans e.symm
+  left_inv _ := by ext; simp
+  right_inv _ := by ext; simp
+  map_mul' _ _ := by ext; simp
+
+/-- **Isaacs Problem 8A.10** (p. 236) 🎉: **可解な 4-transitive 置換群は `S₄` に同型**。
+
+次数が 4 であること (`card_eq_four_of_solvable_of_stabilizer_three_transitive`) を認めれば,
+`MulAction.toPermHom` が単射 (忠実) かつ全射 (4 点の任意の並べ替えは 4-transitivity で
+実現できる) なので `G ≃* Sym(Ω) ≃* S₄`。
+
+4-transitivity は「単射な 4-tuple どうしを移す元がある」形 (`h4`) で仮定する。 -/
+theorem nonempty_mulEquiv_perm_fin_four_of_four_transitive [FaithfulSMul G Ω]
+    (hcard : Nat.card Ω = 4)
+    (h4 : ∀ b c : Fin 4 → Ω, Function.Injective b → Function.Injective c →
+      ∃ g : G, ∀ i, g • b i = c i) :
+    Nonempty (G ≃* Equiv.Perm (Fin 4)) := by
+  haveI : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
+  obtain ⟨e⟩ : Nonempty (Fin 4 ≃ Ω) := Finite.card_eq.mp (by simp [hcard])
+  have hbij : Function.Bijective (MulAction.toPermHom G Ω) := by
+    refine ⟨MulAction.toPerm_injective, fun σ => ?_⟩
+    obtain ⟨g, hg⟩ := h4 (fun i => e i) (fun i => σ (e i)) e.injective
+      (σ.injective.comp e.injective)
+    refine ⟨g, Equiv.ext fun x => ?_⟩
+    have hx : x = e (e.symm x) := (e.apply_symm_apply x).symm
+    rw [MulAction.toPermHom_apply, MulAction.toPerm_apply, hx, hg (e.symm x)]
+  exact ⟨(MulEquiv.ofBijective _ hbij).trans (permCongrMulEquiv e.symm)⟩
 
 end
 

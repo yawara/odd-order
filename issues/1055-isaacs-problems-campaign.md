@@ -4221,9 +4221,11 @@ Lean 実務メモ: `[N.Normal]` はインスタンスなので `N.Normal.conj_me
 8A.9 / 8A.2 の `centralizer_inf_stabilizer_eq_bot` (`N ≤ C_G(N)` から `N ⊓ G_α = ⊥`) /
 上の step 5 補題。
 
-**残り (8A.10)**: `|Ω| = 4` から **`G ≅ S₄`** への packaging のみ
-(`MulAction.toPermHom` が単射 (忠実) かつ全射 (4 点上の 4-transitivity) を示す;
-`Fin 4 ≃ Ω` を取って各置換を 4-tuple の移動として実現する)。
+**✅ packaging も landing** (`nonempty_mulEquiv_perm_fin_four_of_four_transitive`):
+`MulAction.toPermHom` が単射 (`MulAction.toPerm_injective`) かつ全射 (4-transitivity を
+「単射な 4-tuple どうしを移す元がある」形で仮定し, `Fin 4 ≃ Ω` を取って各置換を実現) ⟹
+`G ≃* Sym(Ω) ≃* S₄`。補助 `permCongrMulEquiv` (`Equiv.permCongr` の乗法版; mathlib は
+Equiv 版しか持たない)。⟹ **8A.10 完了**。
 
 **旧記載の残り**: 上記 1–4 の結線 (極小正規部分群の存在, Thm 3.11 の適用形, Thm 8.5 第 3 主張の
 `ofStabilizerToNonidentity` から 3-transitivity を移す部分, 最後の `|Ω| = 4 ⟹ G = S₄`)。
