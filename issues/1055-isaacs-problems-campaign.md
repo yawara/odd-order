@@ -35,9 +35,10 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] Ch.6 Frobenius Actions — **🎉 完済 (2026-07-27)**: §6A (11 問) / §6B (9 問) / §6C (2 問) 全問
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
-- [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
+- [ ] Ch.8 Permutation Groups — **進行中 (2026-07-28)**: §8A (8A.1–8A.17) 完済 /
       §8B は 8B.1–8B.10 完了 (8B.6 の `D₂ₚ` 同型のみ残) /
-      §8C は 8C.1–8C.5 完了, 8C.6 未着手 / §8D 未着手
+      §8C は 8C.1–8C.5 完了, 8C.6 は「⟸」の `|A| = 3` のみ /
+      §8D は **🎉 8D.1–8D.6 全問完済 (2026-07-28)**
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4944,7 +4945,15 @@ IsMultiplyPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) n`) で
 | 8C.1 – 8C.4 | — | — | **完了** (二重着手あり、9212 参照) |
 | 8C.5 | 設計メモを書いた側のセッション (= 本セッション) | 2026-07-27 21:5x | **完了 2026-07-27** |
 | 8C.6 | lane a (9212 を起票した側) | 2026-07-27 21:5x | hub 裁定で確定 |
-| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **8D.1–8D.5 完了, 8D.6 のみ残** |
+| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **🎉 8D.1–8D.6 全問完了 2026-07-28** |
+| 8B.6 (残: `D₂ₚ` 明示同型) | lane a 単独セッション (2026-07-28 再開) | 2026-07-28 00:0x | 着手 |
+| 8C.6 (残: 初等可換 2-群 + 「⟹」) | lane a 単独セッション (2026-07-28 再開) | 2026-07-28 00:0x | 8B.6 の次 |
+
+⚠ **2026-07-28 の状況**: worktree `a` の 2 セッションは 2026-07-27 にユーザー指示で
+**両方 kill された**。現在 lane a を駆動しているのは単独セッション 1 本のみ
+(`ps` で `/home/ywr/odd-order-a` を cwd に持つ claude プロセスが 1 本だけであることを確認済)。
+よって 8C.6 の「hub 裁定で他セッション担当」は失効し、残る Ch.8 の 2 件
+(8B.6 残り / 8C.6 残り) は本セッションが文書順で引き取る。
 
 ⚠ **恒久対処は worktree を分けること** — 1 lane = 1 worktree = 1 session が CLAUDE.md の前提。
 2 つ目のセッションは `notes/meta/worktree_setup.md` の手順で自分の worktree/branch を取るのが
@@ -5069,7 +5078,32 @@ leaf = `Problems8D/{SubdegreeTwo, DegreeEight}.lean` (188 / 213 行) + hub `Prob
   `k_m = m+1` ⟹ `(m+1) ∣ n`。rank 3 は「suborbit 長は `1, m, n` のいずれか」+
   `|Ω| = 1+m+n` で表現。
 
-### 残り: 8D.6 (§8D 最後) — 未着手, 難所は Hint の補題
+* ✅ **8D.6** (`PrimeIndexCore.lean` + `PrimeSubdegree.lean`, 2026-07-28) — 下記参照。
+
+### 🎉 §8D 完済 (2026-07-28)
+
+`not_dvd_sq_card_stabilizer_of_prime_subdegree` (前半) /
+`not_dvd_sq_ncard_suborbit_of_prime_subdegree` (後半) が landing し **§8D は 8D.1–8D.6
+全問完了**。Hint は書籍の文言どおり `map_oPiResidual_normal` (`O^{p'}(X) ◁ Y`) として
+形式化し、本体は ambient 版 `le_normalizer_closure_primePow` を使う。全て axiom-clean。
+
+未追跡で残っていた `PrimeIndexCore.lean` のビルドエラー 3 点の実際の原因:
+
+1. `omega` は**変数**による整除 (`p ∣ n`, `p` が変数) を扱えない
+   → `Nat.modEq_zero_iff_dvd` で `p ≡ |Fix| [MOD p]` から直接 `p ∣ |Fix|` を出す。
+2. 部分群作用の coercion `(⟨g,_⟩ : zpowers g) • q` は `simpa` では潰れない
+   → `change g • q = q` で defeq に落とす (`show` は linter が `change` を要求)。
+3. `MulAut.conj y⁻¹` の像は `y⁻¹ * x * (y⁻¹)⁻¹` で `inv_inv` は rfl でない
+   → 共役安定性を単一の `hconj` に括り出して `simpa` で吸収。
+
+⚠ 追加で判明した API 事実 (次に使う人向け):
+
+* `Subgroup.normalizer` は **`Set G` を取る** (`Subgroup G` ではない) ので
+  `R.normalizer` と書けない — `Subgroup.normalizer (R : Set G)`。
+* `Nat.eq_prime_pow_of_unique_prime_dvd` の仮説は `n ≠ 0` で、結論の指数は
+  `n.primeFactorsList.length` (`n.factorization p` ではない)。
+
+### 8D.6 の設計メモ (実装前の記録, 参考)
 
 **8D.6**: 原始置換群で素数 `p` が subdegree なら `p² ∤ |G_α|`, したがって `p²` は
 どの subdegree も割らない。**Hint**: `X ⊆ Y`, `|Y : X| = p` ⟹ `O^{p'}(X) ◁ Y`。
