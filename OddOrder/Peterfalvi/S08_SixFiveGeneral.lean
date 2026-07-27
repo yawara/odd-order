@@ -184,19 +184,21 @@ theorem conjDiff_mem_zSupportedSpan
 /-- **Peterfalvi (5.2.e) for irreducible members, derived** (the book's (5.3.a) argument): if
 `φ ⊥ {χ, χ̄}` then `⟨(φ − φ̄)^τ, (χ − χ̄)^τ⟩ = ⟨φ − φ̄, χ − χ̄⟩ = 0`, because all four cross terms
 vanish — two by hypothesis and two because `φ̄ ≠ χ`, `φ̄ ≠ χ̄` (else the hypothesis would read
-`⟨φ, φ⟩ = 0` or `⟨φ, χ⟩ = ⟨χ, χ⟩ = 0`), so `inducedKernelFamily_pairwise_orthogonal` applies. -/
+`⟨φ, φ⟩ = 0` or `⟨φ, χ⟩ = ⟨χ, χ⟩ = 0`), so `inducedKernelFamily_pairwise_orthogonal` applies.
+
+Stated for an arbitrary conjugation-closed subfamily `T ⊆ 𝒮` so that both the (6.5) filtrations
+`𝒮(X)` and the (6.6) set `𝒳 = 𝒮 − 𝒮(Z)` can use it. -/
 theorem tau_conjDiff_inner_eq_zero_of_orthogonal
     (RD : InducedFamilyImageData A₀ K)
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
-    {X : Subgroup ↥L} (hirr : ∀ φ ∈ inducedKernelFamily K X, IsIrreducibleCharacter φ)
-    {φ χ : ClassFunction ↥L ℂ}
-    (hφ : φ ∈ inducedKernelFamily K X) (hχ : χ ∈ inducedKernelFamily K X)
+    {T : Set (ClassFunction ↥L ℂ)} (hTsub : T ⊆ inducedKernelFamily K ⊥)
+    (hTconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate T)
+    (hirr : ∀ φ ∈ T, IsIrreducibleCharacter φ)
+    {φ χ : ClassFunction ↥L ℂ} (hφ : φ ∈ T) (hχ : χ ∈ T)
     (h1 : ClassFunction.inner φ χ = 0) (h2 : ClassFunction.inner φ χ.conj = 0) :
     ClassFunction.inner (RD.tau (φ - φ.conj)) (RD.tau (χ - χ.conj)) = 0 := by
-  have hφc : φ.conj ∈ inducedKernelFamily K X :=
-    inducedKernelFamily_closedUnderConjugate (K := K) X hφ
-  have hχc : χ.conj ∈ inducedKernelFamily K X :=
-    inducedKernelFamily_closedUnderConjugate (K := K) X hχ
+  have hφc : φ.conj ∈ T := hTconj hφ
+  have hχc : χ.conj ∈ T := hTconj hχ
   -- `φ ≠ χ` and `φ̄ ≠ χ`, else the two hypotheses would read `⟨φ, φ⟩ = 0`.
   have hne : φ ≠ χ := fun h => by
     rw [h, (hirr χ hχ).inner_self_eq_one] at h1; exact one_ne_zero h1
@@ -205,12 +207,12 @@ theorem tau_conjDiff_inner_eq_zero_of_orthogonal
     exact one_ne_zero h2
   have hccne : φ.conj ≠ χ.conj := fun h => hne (by
     rw [← ClassFunction.conj_conj φ, h, ClassFunction.conj_conj])
-  rw [RD.tau_isometry (conjDiff_mem_zSupportedSpan hKsupp hφ)
-      (conjDiff_mem_zSupportedSpan hKsupp hχ),
+  rw [RD.tau_isometry (conjDiff_mem_zSupportedSpan hKsupp (hTsub hφ))
+      (conjDiff_mem_zSupportedSpan hKsupp (hTsub hχ)),
     ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     ClassFunction.inner_sub_right, h1, h2,
-    inducedKernelFamily_pairwise_orthogonal hφc hχ hcne,
-    inducedKernelFamily_pairwise_orthogonal hφc hχc hccne]
+    inducedKernelFamily_pairwise_orthogonal (hTsub hφc) (hTsub hχ) hcne,
+    inducedKernelFamily_pairwise_orthogonal (hTsub hφc) (hTsub hχc) hccne]
   ring
 
 omit [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] [K.Normal]
@@ -227,41 +229,56 @@ theorem orthogonal_of_tau_conjDiff_inner_eq_zero
   S07.CharacterDifferenceImage.inner_eq_zero_of_signedDifference_inner_zero_of_mem Rφ Rχ
     (by rw [signedDifference_eq, signedDifference_eq]; exact h) ha hb
 
-/-- **Hypothesis (5.2) for `𝒮(X)`.**  Every clause is inherited: (5.2.a) conjugation closure and
-non-reality from `inducedKernelFamily_closedUnderConjugate` / `..._hasNoRealCharacters` (`|L|` odd
-— Peterfalvi (1.1)), (5.2.b) from the `InducedFamilyImageData` isometry restricted along
-`zSupportedSpan_inducedKernelFamily_subset`, (5.2.c) from
-`inducedKernelFamily_pairwise_orthogonal`, and (5.2.d)/(5.2.e) from the (5.3.a) two-element shape
-`characterDifferenceImage_of_irreducible` — which is why the irreducibility `hirr` of the members
-is required here (it is *not* a hypothesis of the book's (5.2); see the module docstring). -/
+/-- **Hypothesis (5.2) for a conjugation-closed subfamily `T ⊆ 𝒮` with irreducible members.**
+Every clause is inherited: (5.2.a) from `hTconj` plus non-reality on `𝒮` (`|L|` odd — Peterfalvi
+(1.1)), (5.2.b) from the `InducedFamilyImageData` isometry restricted along `T ⊆ 𝒮`, (5.2.c) from
+`inducedKernelFamily_pairwise_orthogonal`, (5.2.d) from the (5.3.a) two-element shape
+`characterDifferenceImage_of_irreducible` — which is why the irreducibility `hirr` is required
+here (it is *not* a hypothesis of the book's (5.2); see the module docstring) — and (5.2.e) from
+`tau_conjDiff_inner_eq_zero_of_orthogonal`. -/
+noncomputable def InducedFamilyImageData.hypothesisOfSubfamily
+    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
+    {T : Set (ClassFunction ↥L ℂ)} (hTsub : T ⊆ inducedKernelFamily K ⊥)
+    (hTconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate T)
+    (hirr : ∀ φ ∈ T, IsIrreducibleCharacter φ) :
+    OddOrder.Peterfalvi.S07.Hypothesis (L := ↥L) (G := G) T A₀ where
+  tau := RD.tau
+  tau_isometry_diff _ _ hφ hζ :=
+    RD.tau_isometry ⟨Submodule.span_mono hTsub hφ.1, hφ.2⟩
+      ⟨Submodule.span_mono hTsub hζ.1, hζ.2⟩
+  conjugate_closed := hTconj
+  no_real_characters := (inducedKernelFamily_hasNoRealCharacters (K := K) hodd ⊥).mono hTsub
+  pairwise_orthogonal _ _ hφ hφ' hne :=
+    inducedKernelFamily_pairwise_orthogonal (hTsub hφ) (hTsub hφ') hne
+  difference_image χ hχ :=
+    characterDifferenceImage_of_irreducible (hirr χ hχ)
+      ((inducedKernelFamily_hasNoRealCharacters (K := K) hodd ⊥).mono hTsub hχ)
+      (RD.tau_isometry (conjDiff_mem_zSupportedSpan hKsupp (hTsub hχ))
+        (conjDiff_mem_zSupportedSpan hKsupp (hTsub hχ)))
+      (RD.tau_mem_ZIrr (conjDiff_mem_zSupportedSpan hKsupp (hTsub hχ)))
+      (RD.tau_apply_one (conjDiff_mem_zSupportedSpan hKsupp (hTsub hχ)))
+  difference_images_orthogonal _φ _χ hφ hχ h1 h2 :=
+    orthogonal_of_tau_conjDiff_inner_eq_zero _ _
+      (tau_conjDiff_inner_eq_zero_of_orthogonal RD hKsupp hTsub hTconj hirr hφ hχ h1 h2)
+
+/-- **Hypothesis (5.2) for the filtration `𝒮(X)`** — the `T = inducedKernelFamily K X` instance of
+`hypothesisOfSubfamily`. -/
 noncomputable def InducedFamilyImageData.hypothesis
     (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
     {X : Subgroup ↥L} (hirr : ∀ φ ∈ inducedKernelFamily K X, IsIrreducibleCharacter φ) :
-    OddOrder.Peterfalvi.S07.Hypothesis (L := ↥L) (G := G) (inducedKernelFamily K X) A₀ where
-  tau := RD.tau
-  tau_isometry_diff _ _ hφ hζ :=
-    RD.tau_isometry (zSupportedSpan_inducedKernelFamily_subset X hφ)
-      (zSupportedSpan_inducedKernelFamily_subset X hζ)
-  conjugate_closed := inducedKernelFamily_closedUnderConjugate (K := K) X
-  no_real_characters := inducedKernelFamily_hasNoRealCharacters (K := K) hodd X
-  pairwise_orthogonal _ _ hφ hφ' hne := inducedKernelFamily_pairwise_orthogonal hφ hφ' hne
-  difference_image χ hχ :=
-    characterDifferenceImage_of_irreducible (hirr χ hχ)
-      (inducedKernelFamily_hasNoRealCharacters (K := K) hodd X hχ)
-      (RD.tau_isometry (conjDiff_mem_zSupportedSpan hKsupp hχ)
-        (conjDiff_mem_zSupportedSpan hKsupp hχ))
-      (RD.tau_mem_ZIrr (conjDiff_mem_zSupportedSpan hKsupp hχ))
-      (RD.tau_apply_one (conjDiff_mem_zSupportedSpan hKsupp hχ))
-  difference_images_orthogonal _φ _χ hφ hχ h1 h2 :=
-    orthogonal_of_tau_conjDiff_inner_eq_zero _ _
-      (tau_conjDiff_inner_eq_zero_of_orthogonal RD hKsupp hirr hφ hχ h1 h2)
+    OddOrder.Peterfalvi.S07.Hypothesis (L := ↥L) (G := G) (inducedKernelFamily K X) A₀ :=
+  RD.hypothesisOfSubfamily hodd hKsupp (inducedKernelFamily_subset_bot X)
+    (inducedKernelFamily_closedUnderConjugate (K := K) X) hirr
 
-@[simp] theorem InducedFamilyImageData.hypothesis_tau
+@[simp] theorem InducedFamilyImageData.hypothesisOfSubfamily_tau
     (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
-    {X : Subgroup ↥L} (hirr : ∀ φ ∈ inducedKernelFamily K X, IsIrreducibleCharacter φ) :
-    (RD.hypothesis hodd hKsupp hirr).tau = RD.tau := rfl
+    {T : Set (ClassFunction ↥L ℂ)} (hTsub : T ⊆ inducedKernelFamily K ⊥)
+    (hTconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate T)
+    (hirr : ∀ φ ∈ T, IsIrreducibleCharacter φ) :
+    (RD.hypothesisOfSubfamily hodd hKsupp hTsub hTconj hirr).tau = RD.tau := rfl
 
 /-! ### Constant degree over an abelian section -/
 

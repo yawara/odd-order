@@ -203,6 +203,7 @@ import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
 import OddOrder.Peterfalvi.S08_SixFiveGeneral
+import OddOrder.Peterfalvi.S08_SixSixGeneral
 import OddOrder.Peterfalvi.S13_SixTwoImageData
 import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
@@ -3762,6 +3763,58 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.card_abelianization_eq_relIndex
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_prime_isPGroup_of_not_isCoherent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.not_dvd_sub_one_of_not_isCoherent
+-- **(6.6) for a general kernel, first layer** (`S08_SixSixGeneral`).  `xSet K Z = 𝒮 − 𝒮(Z)` with
+-- its (5.2.a)/(5.2.c) suite, and the two per-member arithmetic facts the book's coherence proof
+-- (p. 32) runs on once (6.5) has made `K` a `p`-group: every member has degree `|L:K|·p^k`, and
+-- the source obeys [Is] Cor 2.30 against the **central** `Z` (`θ(1)² ≤ |K:Z|` — this is where
+-- `Z ⊆ Z(K)` is used, and what fails at `Z = [K,K]`).  Both Sibley proofs used
+-- `SibleyDadeHypothesis` only through the family shape `S_eq`, so nothing is lost in the port.
+-- Hypothesis (5.2) for `𝒳` is the `T = xSet K Z` instance of `hypothesisOfSubfamily`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xSet_closedUnderConjugate
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xSet_pairwise_orthogonal
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.exists_index_primePow_degree_of_mem_inducedKernelFamily
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.exists_source_primePow_centralBound_of_mem_xSet
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.hypothesisOfSubfamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.xSetHypothesis
+-- The `(6.6)` degree-square sum `∑_{χ∈𝒳} χ(1)² = |L:K|·(|K| − |K:Z|)` for a general kernel
+-- (the `total` of the X-chain step data): `Finset.sum_sdiff` against two instances of the general
+-- weighted identity `sum_re_div_normSq_inducedKernelFamily_eq` (`X = ⊥` and `X = Z`).  The `‖χ‖²`
+-- weights cancel only on the `𝒳` side, where the members are irreducible — reducible members of
+-- `𝒮` are allowed as long as they lie in `𝒮(Z)` (the Sibley case-B situation).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.coe_xSetFinset
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.sum_re_sq_xSet_eq
+-- The minimal-degree base block `𝒮₀ ⊆ 𝒳` for a general kernel: the equal-degree prefix of
+-- Peterfalvi (6.6) (p. 32) on which (1.1)+(1.4) gives the base coherence before the (5.6)
+-- adjoining of the higher-degree conjugate pairs.  `2 ≤ |𝒮₀|` comes from a minimal-degree member
+-- together with its conjugate (`|L|` odd forbids real members, Peterfalvi (1.1)); the anchor-index
+-- lemma is the X-chain step-data `i₁`/`hanchor`.  All of this is pure set/degree reasoning —
+-- the Sibley versions used no `SibleyDadeHypothesis` field beyond the family itself.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xBaseBlock_closedUnderConjugate
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xBaseBlock_degree_re_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.natDegree_le_of_xBaseBlock_anchor
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.two_le_xBaseBlock_ncard
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_xBaseBlock_anchor_index
+-- **The (6.6) X-chain fold for a general kernel, with an arbitrary `τ`** (issue 0155 step 2):
+-- sort `𝒳` by degree, start from the equal-minimal-degree block `𝒮₀`, adjoin conjugate pairs of
+-- strictly larger degree one at a time.  **No Dade datum appears** — the conjugate-pair cover
+-- `exists_conjugatePairCover` is a statement about the *sets* in an abstract group, the
+-- accumulator fold `S07.coherentOfPairChainCover` is already stated for an arbitrary `τ`, and the
+-- `𝒳`/`𝒮₀` side conditions are the general-kernel lemmas above.  The Sibley
+-- `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X` is this with `τ` pinned to
+-- `dadeIntegralCharacterMap`.  Per-step adjoining is the caller's, intended to route through the
+-- `τ`-general (5.6) engine `S07.xAdjoinStepW_general` (issue 0154).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xSet_isCoherent_of_adjoinSteps
+-- **Base coherence of `𝒮₀` for a general kernel** (issue 0155 step 3).  Peterfalvi's "By (1.1)
+-- and (1.4), `{χ₁,…,χₖ}` is coherent" (p. 32) is, for a general kernel, just the constant-degree
+-- theorem (5.7) `S07.coherent_of_constant_degree` applied to the subfamily `𝒮₀ ⊆ 𝒮`: Hypothesis
+-- (5.2) from `hypothesisOfSubfamily`, `≥ 2` members, equal degree by construction (real-part
+-- equality upgraded to complex values since irreducible degrees are positive naturals), and
+-- equal degree also makes the member differences `K^#`-supported.  The Sibley instance
+-- `xBaseBlock_isCoherent_of_irreducible_X` instead builds the orthonormal target family from the
+-- Dade map (`coherentEqualDegree_fromDade`); routing through (5.7) keeps this `τ`-general.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xBaseBlock_isCoherent
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.
