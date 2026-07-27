@@ -36,8 +36,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
-      §8B は 8B.1–8B.5 完了 + 8B.6 は「`|G_α|=2`」「`|Ω|` 奇素数」まで /
-      §8C §8D 未着手
+      §8B は 8B.1–8B.5, 8B.7, 8B.8 完了 + 8B.6 は `D₂ₚ` 同型のみ残 /
+      残り 8B.9, 8B.10 / §8C §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4431,7 +4431,10 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   `exists_regular_normal_of_card_stabilizer_eq_two` (正則正規部分群 `K`) +
   `prime_card_of_card_stabilizer_eq_two` (**`|Ω|` は奇素数**)。
   **残り = `G ≅ DihedralGroup p` の明示同型のみ** /
-  **次の frontier = 8B.7**。
+  8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
+  8B.8 ✅ `isPreprimitive_sup_zpowers_addRight_one` /
+  8B.9 🔶 **step 1–4 完了** (交代群を含むところまで) —
+  **次の frontier = 8B.9 step 5 (符号で S_n / A_n を判定)**。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4499,3 +4502,173 @@ mathlib `DihedralGroup p` への**明示同型の構成**だけ:
 
 ⚠ **優先度は 8B.7 より低い** (数学的中身は済んでおり、残りは表示の橋渡し)。
 文書順の原則からは 8B.7 に進み、後で戻る。
+
+
+## §8B 残り問題の正確な文言 (2026-07-27, PDF ページ画像で確定)
+
+⚠ pdftotext は**上付きを落とす**ので 8B.7 の hint が `O_2(D)` に見えていたが、
+実際は **`O²(D) ⊲ O²(K)`** (2-**剰余**部分群)。ページ画像を
+`references/isaacs/pages/isaacs-p249-262.png` に保存済。
+
+* **8B.7**: `H = G_α` が `Ω ∖ {α}` に長さ 3 の軌道をもてば `|H| = 3·2^e` (`e ≥ 0`)。
+  Hint: `β` をその軌道の点, `D = H_β`, `K = core_H(D)` として `O²(D) ⊲ O²(K)`。
+  Note: Sims により `e ≤ 4` (=> `|H| ∣ 48`)。
+* **8B.8**: `x = (1,2,…,n)` (n-cycle), `1 < m < n`, `H ⊆ S_n` が `{1,…,m}` に推移的で
+  残りを固定するなら `G = ⟨H, x⟩` は原始的。
+  Hint: block `Δ` (`|Δ| > 1`) の translate が `i ≤ m` と `j > m` を同時に含むことを示し、
+  その translate が `1..m` を全部含むと導く。
+* **8B.9**: `x` = n-cycle, `y` = m-cycle `(1,…,m)` (`1 < m < n`) なら `⟨x,y⟩` は
+  `m` か `n` が偶数のとき `S_n`, そうでなければ `A_n`。
+* **8B.10**: `G ⊆ S_n` が指数 `n` の部分群で点安定化群でないなら `n = 6`。
+  Hint: `G` は推移的 → **8A.16** (landing 済 `two_transitive_of_coprime_index`) で
+  2-transitive → 原始的 → **Bochert の定理** (repo `Ch08/Bochert.lean`) で
+  `n ≥ [(n+1)/2]!` → `n ∈ {1,2,3,4,6}`。
+
+### 8B.7 本体の設計 (2026-07-27)
+
+`Δ` = `H`-軌道 (`|Δ| = 3`), `β ∈ Δ`, `D = G_α ⊓ G_β` (`[H:D] = 3`)。
+
+1. **奇位数元 `x ∈ D` は `Δ` を各点固定**: `x` は `β` を固定し `Δ` を保つので
+   `Δ ∖ {β}` (2 点) を保つ ⟹ `smul_eq_self_of_odd_of_ncard_le_two` で各点固定。
+2. ⟹ **`H ≤ N(oddCore D)`**: `g ∈ H` と生成元 `x` (奇位数 ∈ `D`) について
+   `g x g⁻¹` は `g • Δ = Δ` の各点を固定するので特に `β` を固定 ⟹ `∈ D`、位数も奇。
+   (core `K` を経由せずに直接示せる — hint より簡単。)
+3. 同様に `G_β ≤ N(oddCore D)` (`G_β`-軌道 `Δ'` (= `α` の軌道) も長さ 3;
+   `ncard_suborbit_eq_relIndex` + `card_stabilizer_eq` で `|Δ'| = |Δ| = 3`)。
+4. `G_α ⊔ G_β = ⊤` (極大性; 8B.6 前半と同じ議論) ⟹ **`oddCore D ⊴ G`** ⟹
+   `oddCore D ≤ D ≤ G_α` と `eq_bot_of_normal_le_stabilizer` で `oddCore D = ⊥`。
+5. `isPGroup_two_of_oddCore_eq_bot` で `D` は 2-群 ⟹ `|H| = 3·|D| = 3·2^e`。
+
+
+### 8B.7 完了メモ (2026-07-27)
+
+`card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` で landing。
+**教科書 Hint より簡単な経路が見つかった**: Hint は `K = core_H(D)` を作って
+`O²(D) ⊲ O²(K)` を示すが、「奇位数元は高々 2 点の不変集合を各点固定する」
+(`smul_eq_self_of_odd_of_ncard_le_two`) を直接使うと、`core` も `[H:K] ∣ 6` も
+`S₃` への埋め込みも要らずに `G_α ≤ N(oddCore D)` が出る。
+
+再利用可能になった道具:
+* `oddCore D` (= `O²(D)`), `isPGroup_two_of_oddCore_eq_bot`
+* `index_subgroupOf_mul_card` (`[K:D]·|D| = |K|`)
+* `relIndex_stabilizer_comm` (対をなす suborbit の相対指数は等しい)
+* `eq_bot_of_normal_le_stabilizer` (点安定化群に含まれる正規部分群は自明)
+
+✅ **分割完了 (2026-07-27)**: `Problems8B.lean` = pure re-export hub、実体は
+`Problems8B/{Blocks,SmallSuborbits,CyclicGenerated}.lean` (279/689/200 行)。
+3 cluster は相互独立。8B.9/8B.10 は `CyclicGenerated.lean` に追加する想定。
+
+
+### 8B.8 本体の設計 (2026-07-27)
+
+道具 (`subset_of_isBlock_of_mem_of_notMem`, `exists_not_mem_iff_add_mem`) は landing 済。
+残りは `ZMod n` 上の置換群としての設定と組み立て:
+
+* **設定**: `Ω := ZMod n`, `x := Equiv.addRight (1 : ZMod n)` (= `n`-巡回),
+  `S := {c : ZMod n | c.val < m}` (= 教科書の `{1,…,m}` を 0-based に),
+  `H ≤ Equiv.Perm (ZMod n)` は `S` 上推移的で `Sᶜ` を各点固定, `G := H ⊔ zpowers x`。
+  仮定は `2 ≤ m` と `m < n`。
+* **`G` は推移的**: `zpowers x ≤ G` が既に推移的 (`x^k • c = c + k`)。
+* **原始性**: block `Δ` で `1 < |Δ|` とすると `Δ = univ` を示す。
+  1. `u ≠ v ∈ Δ` を取り `d := v - u ≠ 0`。`Λ₀ := x^(-u) • Δ` は `0` と `d` を含む block。
+  2. `exists_not_mem_iff_add_mem` で `c ∈ S ↮ c + d ∈ S` なる `c` を得る。
+     `Λ := x^c • Λ₀` は `c` と `c + d` を含むので **`S` の内外を跨ぐ**。
+  3. `subset_of_isBlock_of_mem_of_notMem` で `S ⊆ Λ`。
+  4. `2 ≤ m` なので `0, 1 ∈ S ⊆ Λ`。`x • Λ ∋ x • 0 = 1 ∈ Λ` なので block ゆえ
+     `x • Λ = Λ` ⟹ `Λ` は `x`-不変 ⟹ `Λ = univ` (`x` の軌道が全体)。
+  5. `Δ` は `Λ` の translate なので `Δ = univ`。
+* ⚠ 「`Δ` の translate が block」= `IsBlock` の `smul` 版。mathlib に
+  `IsBlock.smul` 系があるか要確認 (`IsTrivialBlock.smul` は存在)。
+
+
+### 8B.9 / 8B.10 の設計メモ (2026-07-27)
+
+* **8B.9 / 8B.10**: 下の詳細設計を参照。
+
+
+## 8B.9 / 8B.10 の詳細設計 (2026-07-27 調査完了)
+
+### 使える repo/mathlib の定理 (署名を実測済)
+
+* `OddOrder.Isaacs.Ch08.isThreeCycle_commutator_of_unique_common_moved`
+  (`Ch08/CycleCommutators.lean`, **Isaacs Lem 8.25**):
+  `(hxa : x a ≠ a) (hya : y a ≠ a) (huniq : ∀ b ≠ a, x b = b ∨ y b = b) → ⁅x,y⁆.IsThreeCycle`
+* `OddOrder.Isaacs.Ch08.alternatingGroup_le_of_isPreprimitive_of_isCycle_mem`
+  (`Ch08/PCycleJordan.lean`, **Isaacs Thm 8.23** = Jordan):
+  `(hG : IsPreprimitive G α) (hp : p.Prime) (hp' : p + 3 ≤ Nat.card α)
+   (hgc : g.IsCycle) (hgp : g.support.card = p) (hg : g ∈ G) → alternatingGroup α ≤ G`
+  ⚠ 3-cycle 版は mathlib に直接ある:
+  `Equiv.Perm.alternatingGroup_le_of_isPreprimitive_of_isThreeCycle_mem`
+  (次数条件なし) — 8B.9 ではこちらを使う。
+* `OddOrder.Isaacs.Ch08.factorial_le_index_of_isPreprimitive`
+  (`Ch08/Bochert.lean`, **Isaacs Thm 8.26**):
+  `(hG : IsPreprimitive G α) (halt : ¬ alternatingGroup α ≤ G) → ((Nat.card α + 1)/2)! ≤ G.index`
+* 自作: `isPreprimitive_sup_zpowers_addRight_one` (8B.8),
+  `two_transitive_of_coprime_index` (8A.16)。
+
+### 8B.9 の証明構造
+
+`x` = `ZMod n` の `+1`, `y` = `m`-巡回 `(0,1,…,m-1)` (残り固定), `2 ≤ m < n`。
+
+1. `⟨y⟩` は `S = {c | c.val < m}` に推移的で `Sᶜ` を各点固定 ⟹ **8B.8** で
+   `G = zpowers y ⊔ zpowers x` は**原始的**。
+2. `z := y⁻¹ * x` を計算すると **`z` は巡回 `(m-1, m, …, n-1)`** (0-based):
+   `c.val < m-1` ⟹ `z c = y⁻¹(c+1) = c` (固定) / `c.val = m-1` ⟹ `z c = m` /
+   `m ≤ c.val ≤ n-2` ⟹ `z c = c+1` / `c.val = n-1` ⟹ `z c = y⁻¹(0) = m-1`。
+3. `y` の動かす点 = `{0,…,m-1}`, `z` の動かす点 = `{m-1,…,n-1}` ⟹ **共通は `m-1` のみ**
+   ⟹ Lem 8.25 で `⁅y, z⁆` は 3-cycle。`z ∈ G` なので `⁅y,z⁆ ∈ G`。
+4. mathlib の 3-cycle 版 Jordan で `alternatingGroup ≤ G`。
+5. 符号: `sign x = (-1)^(n-1)`, `sign y = (-1)^(m-1)` ⟹
+   `m` か `n` が偶なら `G ⊄ A_n` ⟹ `A_n < G ≤ S_n` かつ `[S_n : A_n] = 2` ⟹ `G = S_n`;
+   どちらも奇なら `G ≤ A_n` ⟹ `G = A_n`。
+
+✅ **エンコーディング決着 (2026-07-27)**: `ZMod n` 上に直接 `mCycle n m hm : Equiv.Perm`
+を構成した (toFun/invFun を val の場合分け)。**step 1 (原始性) は landing 済**
+(`isPreprimitive_zpowers_mCycle_sup_zpowers_addRight_one`)。
+使える補助: `mCycle_apply_of_le` (外を固定), `mCycle_pow_apply`
+(`(mCycle^k) c = ((c.val+k) % m : ℕ)`), `exists_mem_zpowers_mCycle_smul` (S 上推移的),
+`val_add_one_of_lt`, `val_sub_one_of_ne_zero`。
+
+**残り = step 2–5**。step 2 (`z := y⁻¹ * x` の計算) では
+`z c = mCycleInv n m (c + 1)` を val の場合分けで開けばよい:
+`c.val < m-1 → z c = c` / `c.val = m-1 → z c = c+1` / `m ≤ c.val ≤ n-2 → z c = c+1` /
+`c.val = n-1 → z c = ((m-1 : ℕ) : ZMod n)`。
+step 3 では `y` の可動点 = `{c | c.val < m}`, `z` の可動点 = `{c | m-1 ≤ c.val}` を示し
+共通が `m-1` のみであることを使う (`IsCycle`/`support` は step 5 の符号計算まで不要)。
+
+### 8B.10 の証明構造
+
+`H ≤ Perm (Fin n)`, `[S_n : H] = n`, `H` は点安定化群でない ⟹ `n = 6`。
+
+1. **`H` は推移的**: 非推移なら軌道 `Δ` (`0 < |Δ| < n`) があり
+   `|H| ≤ |Δ|!·(n-|Δ|)!`。`|H| = (n-1)!` なので `k!(n-k)! ≥ (n-1)!` は `k ∈ {1, n-1}`
+   のときのみ ⟹ `H` はある点を固定 ⟹ `H ≤ G_pt` で位数が一致 ⟹ `H = G_pt` (矛盾)。
+2. `S_n` は 2-transitive、`gcd(n-1, [S_n:H]) = gcd(n-1, n) = 1` ⟹ **8A.16** で
+   `H` は 2-transitive ⟹ 原始的。
+3. `A_n ≤ H` なら `[S_n:A_n] = 2` から `n ∣ 2`。そうでなければ **Bochert** で
+   `((n+1)/2)! ≤ n` ⟹ `n ∈ {1,2,3,4,6}`。
+4. 2-transitivity から `n(n-1) ∣ |H| = (n-1)!` ⟹ `n ∣ (n-2)!` で `n = 2,3,4` を除外、
+   `n = 1` は `H` が唯一の点安定化群になるので除外 ⟹ `n = 6`。
+
+⚠ step 1 の「非推移群の位数評価」は独立した補題として要実装 (repo に無ければ新規)。
+
+
+### 8B.9 step 5 (符号判定) の残り — 2026-07-27
+
+step 1–4 は landing 済 (`alternatingGroup_le_zpowers_mCycle_sup_zpowers_addRight_one`)。
+残りは `G = A_n` か `S_n` かの判定:
+
+* `Equiv.Perm.sign (mCycle n m hm) = (-1)^(m-1)`,
+  `Equiv.Perm.sign (Equiv.addRight (1 : ZMod n)) = (-1)^(n-1)` を出す。
+  そのために **`IsCycle` と `support` の計算**が要る:
+  - `(mCycle n m hm).support = {c | c.val < m}` (`mCycle_apply_eq_self_iff` から直に出る:
+    `support` の定義は `{x | f x ≠ x}`)。`Finset.card` は `m`。
+  - `(Equiv.addRight (1 : ZMod n)).support = univ` (n ≥ 2)、card は `n`。
+  - `IsCycle` は `mCycle_pow_apply` (`(mCycle^k) c = ((c.val+k)%m)`) から
+    「`0` から先頭区間の全点に届く」ことで出る。
+  - `Equiv.Perm.IsCycle.sign : f.IsCycle → sign f = -(-1)^f.support.card` を使う。
+* `A_n ≤ G` かつ `[S_n : A_n] = 2` なので `G = A_n` または `G = ⊤`。
+  `m` か `n` が偶 ⟹ どちらかの生成元が奇置換 ⟹ `G ⊄ A_n` ⟹ `G = ⊤`;
+  どちらも奇 ⟹ 両生成元が偶置換 ⟹ `G ≤ A_n` ⟹ `G = A_n`。
+  (`Subgroup.eq_top_of_...` / `alternatingGroup` の指数 2 は mathlib
+  `Equiv.Perm.alternatingGroup_index` 等を要確認。)
