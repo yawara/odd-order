@@ -73,6 +73,8 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `cube_orbit_diag`, `cube_orbit_pattern_xxz` / `_xzx` / `_zxx`,
   `cube_orbit_pattern_distinct` — **Problem 8A.13**: `Ω³` の 5 つの一致パターンが
   (2-transitive / 3-transitive の下で) それぞれ単一軌道であること。
+- `cube_orbit_ne_of_fst_snd` / `_fst_thd` / `_snd_thd` — 一致パターンは軌道不変量
+  なので, 上の 5 つの代表元は互いに別軌道。
 - `card_fixedBy_prod_three`, `sum_cube_card_fixedBy` — **Problem 8A.13** の骨格:
   置換指標の 3 乗和は `Ω³` 上の軌道数 × `|G|`。求める `m` は **5**
   (3 点の一致パターン `xxx` / `xxy` / `xyx` / `yxx` / 全相異)。
@@ -1117,6 +1119,44 @@ lemma cube_orbit_pattern_distinct
   obtain ⟨g, hg1, hg2, hg3⟩ := h3 α β γ x y z h1 h2' h3' hxy hxz hyz
   exact Quotient.sound'
     (MulAction.orbitRel_apply.mpr ⟨g, by simp [hg1, hg2, hg3]⟩)
+
+/-! 一致パターンは軌道不変量 — 以下の 3 本で 5 つの代表元が互いに別軌道だと分かる。 -/
+
+/-- 第 1・第 2 成分の一致は軌道不変。 -/
+lemma cube_orbit_ne_of_fst_snd {p q : Ω × Ω × Ω} (hp : p.1 = p.2.1) (hq : q.1 ≠ q.2.1) :
+    (Quotient.mk'' p : MulAction.orbitRel.Quotient G (Ω × Ω × Ω)) ≠ Quotient.mk'' q := by
+  intro hc
+  rw [Quotient.eq''] at hc
+  obtain ⟨g, hg⟩ := MulAction.orbitRel_apply.mp hc
+  have hg' : g • q = p := hg
+  refine hq (MulAction.injective g ?_)
+  change g • q.1 = g • q.2.1
+  rw [show g • q.1 = p.1 from congrArg Prod.fst hg',
+    show g • q.2.1 = p.2.1 from congrArg (fun r => (Prod.snd r).1) hg', hp]
+
+/-- 第 1・第 3 成分の一致は軌道不変。 -/
+lemma cube_orbit_ne_of_fst_thd {p q : Ω × Ω × Ω} (hp : p.1 = p.2.2) (hq : q.1 ≠ q.2.2) :
+    (Quotient.mk'' p : MulAction.orbitRel.Quotient G (Ω × Ω × Ω)) ≠ Quotient.mk'' q := by
+  intro hc
+  rw [Quotient.eq''] at hc
+  obtain ⟨g, hg⟩ := MulAction.orbitRel_apply.mp hc
+  have hg' : g • q = p := hg
+  refine hq (MulAction.injective g ?_)
+  change g • q.1 = g • q.2.2
+  rw [show g • q.1 = p.1 from congrArg Prod.fst hg',
+    show g • q.2.2 = p.2.2 from congrArg (fun r => (Prod.snd r).2) hg', hp]
+
+/-- 第 2・第 3 成分の一致は軌道不変。 -/
+lemma cube_orbit_ne_of_snd_thd {p q : Ω × Ω × Ω} (hp : p.2.1 = p.2.2) (hq : q.2.1 ≠ q.2.2) :
+    (Quotient.mk'' p : MulAction.orbitRel.Quotient G (Ω × Ω × Ω)) ≠ Quotient.mk'' q := by
+  intro hc
+  rw [Quotient.eq''] at hc
+  obtain ⟨g, hg⟩ := MulAction.orbitRel_apply.mp hc
+  have hg' : g • q = p := hg
+  refine hq (MulAction.injective g ?_)
+  change g • q.2.1 = g • q.2.2
+  rw [show g • q.2.1 = p.2.1 from congrArg (fun r => (Prod.snd r).1) hg',
+    show g • q.2.2 = p.2.2 from congrArg (fun r => (Prod.snd r).2) hg', hp]
 
 end CubeOrbits
 

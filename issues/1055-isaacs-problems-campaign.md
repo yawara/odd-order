@@ -4282,11 +4282,15 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 `cube_orbit_pattern_xxz` `_xzx` `_zxx` (2-transitivity) / `cube_orbit_pattern_distinct`
 (3-transitivity)。いずれも `Quotient.sound' (orbitRel_apply.mpr ⟨g, _⟩)` の 3 行。
 
-**残り (8A.13)**: 「軌道数 = 5 ⟺ 3-transitive」の数え上げのみ。上の 5 本で
-「各パターンが単一軌道」は済んでいるので, 残るのは (a) 5 つの代表元が互いに別軌道
-(パターンは軌道不変量なので `G` の作用が一致パターンを保つことから), (b) `Nat.card = 5`
-の結論 (`Nat.card_eq_two_iff` の 5 元版が無いので `Set.ncard {q₁..q₅} = 5` を
-`Set.ncard_insert_of_not_mem` で積むか `≃ Fin 5` を構成)。`|Ω| ≥ 3` が要る。
+**(a) も landing** (`cube_orbit_ne_of_fst_snd` / `_fst_thd` / `_snd_thd`): 一致パターンは
+軌道不変量。5 代表元 `(α,α,α)` / `(α,α,β)` / `(α,β,α)` / `(β,α,α)` / `(α,β,γ)` の
+10 通りの対はいずれかの成分対で一致・不一致が食い違うので, これで互いに別軌道と分かる。
+⚠ `MulAction.injective g` の出す goal は `(fun x ↦ g • x) a = (fun x ↦ g • x) b` の
+**beta-redex** なので `change g • a = g • b` を挟んでから `rw` する。
+
+**残り (8A.13)**: `Nat.card (orbitRel.Quotient G Ω³) = 5` の数え上げのみ
+(`Set.ncard_univ` + `Set.ncard_insert_of_not_mem` を 4 回, または `≃ Fin 5`)。
+`|Ω| ≥ 3` が要る。
 
 ### 8A.14 (2026-07-27): 前半 landing
 
