@@ -337,7 +337,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 13100
+set_option linter.style.longFile 13200
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -3822,6 +3822,20 @@ set_option linter.style.longLine false in
 -- inputs of the `τ`-general (5.6) engine `S07.xAdjoinStepW_general`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xMember_characterFacts
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xMember_inner_eq_zero_of_notMem
+-- **The (6.6) per-step adjoining for a general kernel, with an arbitrary `τ`** (issue 0155
+-- step 4, the last Dade-parameterized layer).  Adjoins a conjugate pair `{χ, χ̄}` of an
+-- `𝒳`-member to a coherent accumulator `S₁ ⊆ 𝒳` from the book's degree bookkeeping (p. 32):
+-- an anchor `χmem i₁` of relative degree `1`, member ratios `χmem j (1) = deg j · χmem i₁ (1)`,
+-- the break ratio `χ(1) = a · χmem i₁ (1)`, and the (5.6) inequality `2a < ∑ deg j²`.
+-- Feeds `S07.xAdjoinStepW_general` (issue 0154) **directly**, so the Sibley
+-- `XAdjoinStepInput`/`xAdjoinStep` layer — the only genuinely Dade-parameterized one — is
+-- bypassed rather than ported.  Every input is a general-kernel fact: orthonormality from
+-- `xMember_characterFacts`/`xMember_inner_eq_zero_of_notMem`, supported differences from
+-- `inducedKernelFamily_scaledDiff_support` (the degree ratios make them vanish off `K^#`), the
+-- (5.2.d)/(5.2.e) image families from `InducedFamilyImageData`, and the per-member decomposition
+-- from `S07.memberExtensionDecomposition_general` (whose `imageFamily` is definitionally `R(·)`
+-- and whose `tau1` is the accumulator extension — both discharged by `rfl`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xAdjoinStep_of_degreeRatios
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.
