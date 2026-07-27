@@ -10,6 +10,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 import OddOrder.GroupTheory.CyclicSylowBurnside
+import OddOrder.GroupTheory.FixedPointFreeConjugation
 
 /-!
 # Isaacs, Finite Group Theory — Problems 8B (pp. 248–249)
@@ -42,6 +43,10 @@ Isaacs の定義 (「`Δ` の translate は `Δ` 自身か, `Δ` と交わらな
   `exists_regular_normal_of_card_stabilizer_eq_two` — **8B.6 後半への構造定理**:
   `|G_α| = 2` なら相異なる 2 点の安定化群は自明に交わり, `|Ω|` は奇数で, `Ω` に正則に
   作用する正規部分群 `K` (位数 `|Ω|`) がある (Burnside の正規 `p`-補元定理)。
+- `prime_card_of_card_stabilizer_eq_two` — **8B.6 の次数部分**: `|G_α| = 2` の原始置換群
+  の次数 `|Ω|` は奇素数 (`t` が `K` を反転 ⟹ `K` の部分群はすべて `G` に正規 ⟹ その軌道
+  が block ⟹ 原始性で `K` は真の非自明部分群をもたない)。
+  ⚠ `G ≅ D₂ₚ` の同型そのものは未形式化。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -560,6 +565,157 @@ theorem exists_regular_normal_of_card_stabilizer_eq_two [Finite G] [Finite Ω]
   refine ⟨K, hKnormal, hKΩ, hinf, ?_⟩
   refine (Nat.bijective_iff_injective_and_card _).mpr ⟨?_, hKΩ⟩
   exact (injective_smulBase_iff_disjoint_stabilizer K α).mpr hinf
+
+/-- **Isaacs Problem 8B.6** (p. 249) の次数部分 🎉: `|G_α| = 2` の原始置換群の次数
+`|Ω|` は**素数** (`odd_card_of_card_stabilizer_eq_two` と合わせて奇素数)。
+
+正則正規部分群 `K` (位数 `|Ω|`) を取る。`G_α` の非自明元 `t` は `α` しか固定しないので
+`K` に共役で**固定点なく**作用し, したがって `K` を反転する
+(`conj_eq_inv_of_orderTwo_of_fixedPointFree`)。特に `K` は可換で, `K` の任意の部分群
+`L` は `K` からも `t` からも正規化される。`K ⊔ G_α = G` (極大性) なので `L ⊴ G`,
+すると `L`-軌道は block になり原始性から `L = 1` または `L = K`。よって `K` は真の非自明
+部分群をもたず `|K| = |Ω|` は素数。 -/
+theorem prime_card_of_card_stabilizer_eq_two [Finite G] [Finite Ω] [FaithfulSMul G Ω]
+    [IsPreprimitive G Ω] [Nontrivial Ω] {α : Ω}
+    (hcard : Nat.card ↥(stabilizer G α) = 2) : (Nat.card Ω).Prime := by
+  classical
+  obtain ⟨K, hKnormal, hKΩ, hKinf, -⟩ :=
+    exists_regular_normal_of_card_stabilizer_eq_two hcard
+  haveI := hKnormal
+  have hΩ2 : 2 ≤ Nat.card Ω := by
+    have h0 : Nat.card Ω ≠ 0 := Nat.card_pos.ne'
+    have h1 : Nat.card Ω ≠ 1 := fun hc =>
+      absurd (Nat.card_eq_one_iff_unique.mp hc).1 (not_subsingleton Ω)
+    omega
+  -- `G_α = {1, t}` と `t² = 1`。
+  obtain ⟨⟨t, htα⟩, ht1, htuniq⟩ := (Nat.card_eq_two_iff' (1 : ↥(stabilizer G α))).mp hcard
+  have ht1' : t ≠ 1 := fun hc => ht1 (Subtype.ext hc)
+  have htt : t * t = 1 := by
+    have hinvmem : (⟨t, htα⟩ : ↥(stabilizer G α))⁻¹ = ⟨t, htα⟩ := by
+      refine htuniq _ fun hc => ht1' ?_
+      have hv : t⁻¹ = 1 := congrArg Subtype.val hc
+      simpa using hv
+    have hinv : t⁻¹ = t := congrArg Subtype.val hinvmem
+    nth_rewrite 1 [← hinv]
+    rw [inv_mul_cancel]
+  have htα' : t • α = α := mem_stabilizer_iff.mp htα
+  -- `t` は `α` しか固定しない。
+  have htfix : ∀ γ : Ω, t • γ = γ → γ = α := by
+    intro γ hγ
+    by_contra hne
+    have hbot := inf_stabilizer_eq_bot_of_card_stabilizer_eq_two (Ne.symm hne) hcard
+    exact ht1' (Subgroup.mem_bot.mp
+      (hbot ▸ Subgroup.mem_inf.mpr ⟨htα, mem_stabilizer_iff.mpr hγ⟩))
+  -- `t` は `K` に固定点なく作用する。
+  have hfpf : ∀ k ∈ K, t * k * t⁻¹ = k → k = 1 := by
+    intro k hk hconj
+    have hcm : t * k = k * t := by
+      conv_rhs => rw [← hconj]
+      group
+    have hfix : t • (k • α) = k • α := by
+      rw [← mul_smul, hcm, mul_smul, htα']
+    have hkα : k • α = α := htfix _ hfix
+    exact Subgroup.mem_bot.mp
+      (hKinf ▸ Subgroup.mem_inf.mpr ⟨hk, mem_stabilizer_iff.mpr hkα⟩)
+  -- `t` は `K` を反転し, `K` は可換。
+  have htK : ∀ k ∈ K, t * k * t⁻¹ ∈ K := fun k hk => hKnormal.conj_mem k hk t
+  have hinvK : ∀ k ∈ K, t * k * t⁻¹ = k⁻¹ := fun k hk =>
+    OddOrder.GroupTheory.conj_eq_inv_of_orderTwo_of_fixedPointFree htt htK hfpf hk
+  have hcomm : ∀ x ∈ K, ∀ y ∈ K, x * y = y * x := by
+    intro x hx y hy
+    have h1 : t * (x * y) * t⁻¹ = (x * y)⁻¹ := hinvK _ (K.mul_mem hx hy)
+    have h2 : t * (x * y) * t⁻¹ = x⁻¹ * y⁻¹ := by
+      rw [show t * (x * y) * t⁻¹ = (t * x * t⁻¹) * (t * y * t⁻¹) from by group,
+        hinvK x hx, hinvK y hy]
+    rw [h1, mul_inv_rev] at h2
+    have h3 : (y⁻¹ * x⁻¹)⁻¹ = (x⁻¹ * y⁻¹)⁻¹ := congrArg (fun z : G => z⁻¹) h2
+    simp only [mul_inv_rev, inv_inv] at h3
+    exact h3
+  -- `K ⊔ G_α = ⊤`。
+  have hcoatom : IsCoatom (stabilizer G α) :=
+    IsPreprimitive.isCoatom_stabilizer_of_isPreprimitive (G := G) α
+  have hsup : K ⊔ stabilizer G α = ⊤ := by
+    refine hcoatom.2 _ (lt_of_le_of_ne le_sup_right fun hc => ?_)
+    have hKle : K ≤ stabilizer G α := hc ▸ le_sup_left
+    have hKbot : K = ⊥ := le_bot_iff.mp (hKinf ▸ le_inf le_rfl hKle)
+    rw [hKbot] at hKΩ
+    simp only [Subgroup.card_bot] at hKΩ
+    omega
+  -- `K` の部分群は `⊥` か `K` のみ。
+  have hsubgroup : ∀ L : Subgroup G, L ≤ K → L = ⊥ ∨ L = K := by
+    intro L hLK
+    haveI : L.Normal := by
+      rw [← Subgroup.normalizer_eq_top_iff]
+      refine eq_top_iff.mpr (hsup ▸ sup_le (fun x hx => ?_) fun s hs => ?_)
+      · rw [Subgroup.mem_normalizer_iff]
+        intro h
+        constructor
+        · intro hh
+          rwa [show x * h * x⁻¹ = h from by rw [hcomm x hx h (hLK hh)]; group]
+        · intro hh
+          have hhK : h ∈ K := by
+            rw [show h = x⁻¹ * (x * h * x⁻¹) * x from by group]
+            exact K.mul_mem (K.mul_mem (K.inv_mem hx) (hLK hh)) hx
+          rwa [show x * h * x⁻¹ = h from by rw [hcomm x hx h hhK]; group] at hh
+      · have htnorm : t ∈ Subgroup.normalizer (L : Set G) := by
+          rw [Subgroup.mem_normalizer_iff]
+          intro h
+          constructor
+          · intro hh
+            rw [hinvK h (hLK hh)]
+            exact L.inv_mem hh
+          · intro hh
+            have hhK : h ∈ K := by
+              have hx : t * h * t⁻¹ ∈ K := hLK hh
+              have hc := hKnormal.conj_mem _ hx t⁻¹
+              rwa [show t⁻¹ * (t * h * t⁻¹) * t⁻¹⁻¹ = h from by group] at hc
+            rw [hinvK h hhK] at hh
+            exact (L.inv_mem_iff).mp hh
+        rcases eq_or_ne s 1 with rfl | hs1
+        · exact Subgroup.one_mem _
+        · have hst : s = t := congrArg Subtype.val
+            (htuniq ⟨s, hs⟩ fun hc => hs1 (congrArg Subtype.val hc))
+          exact hst ▸ htnorm
+    rcases IsPreprimitive.isTrivialBlock_of_isBlock (IsBlock.orbit_of_normal (N := L) α) with
+      hsubs | huniv
+    · left
+      refine le_bot_iff.mp (hKinf ▸ le_inf hLK fun x hx => mem_stabilizer_iff.mpr ?_)
+      exact hsubs (mem_orbit α (⟨x, hx⟩ : ↥L)) (mem_orbit_self α)
+    · right
+      have hLinf : L ⊓ stabilizer G α = ⊥ :=
+        le_bot_iff.mp (hKinf ▸ inf_le_inf_right _ hLK)
+      have hLinj : Function.Injective (smulBase L α) :=
+        (injective_smulBase_iff_disjoint_stabilizer L α).mpr hLinf
+      have hLsurj : Function.Surjective (smulBase L α) := by
+        intro γ
+        have : γ ∈ orbit ↥L α := huniv ▸ Set.mem_univ γ
+        obtain ⟨l, hl⟩ := this
+        exact ⟨l, hl⟩
+      have hLcard : Nat.card ↥L = Nat.card Ω :=
+        Nat.card_eq_of_bijective _ ⟨hLinj, hLsurj⟩
+      refine SetLike.coe_injective (Set.eq_of_subset_of_ncard_le hLK ?_ (Set.toFinite _))
+      have h1 : ((K : Set G)).ncard = Nat.card Ω := by
+        rw [← Nat.card_coe_set_eq]; exact hKΩ
+      have h2 : ((L : Set G)).ncard = Nat.card Ω := by
+        rw [← Nat.card_coe_set_eq]; exact hLcard
+      omega
+  -- 素因数を取り Cauchy。
+  have hKne1 : Nat.card ↥K ≠ 1 := by rw [hKΩ]; omega
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hKne1
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI := Fintype.ofFinite ↥K
+  obtain ⟨y, hy⟩ := exists_prime_orderOf_dvd_card (G := ↥K) p
+    (by rwa [← Nat.card_eq_fintype_card])
+  have hyord : orderOf (y : G) = p := by rw [← hy, Subgroup.orderOf_coe]
+  have hy1 : (y : G) ≠ 1 := by
+    intro hc
+    rw [hc, orderOf_one] at hyord
+    exact hp.ne_one hyord.symm
+  have hzple : Subgroup.zpowers (y : G) ≤ K := (Subgroup.zpowers_le).mpr y.2
+  rcases hsubgroup _ hzple with h | h
+  · exact absurd (Subgroup.mem_bot.mp (h ▸ Subgroup.mem_zpowers (y : G))) hy1
+  · rw [← hKΩ, ← h, Nat.card_zpowers, hyord]
+    exact hp
 
 end
 
