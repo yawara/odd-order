@@ -139,20 +139,6 @@ section SignedIrr
 
 variable {Γ : Type*} [Group Γ] [Fintype Γ] [Invertible (Nat.card Γ : ℂ)]
 
-open scoped Classical in
-/-- Inner product of two signed irreducible characters:
-`⟨ε•ξ, ε'•ξ'⟩ = ε·ε'·δ_{ξ,ξ'}` (the `star` on the right scalar is invisible for
-integer signs).  Upstream candidate for `ZIrrFourier.lean` next to
-`irreducibleCharacter_inner_eq_ite`. -/
-theorem inner_zsmul_irreducible_eq (ε ε' : ℤ) (ξ ξ' : IrreducibleCharacter Γ) :
-    ClassFunction.inner (ε • (ξ : ClassFunction Γ ℂ)) (ε' • (ξ' : ClassFunction Γ ℂ)) =
-      (ε : ℂ) * (ε' : ℂ) * (if ξ = ξ' then 1 else 0) := by
-  rw [← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction Γ ℂ),
-    ← Int.cast_smul_eq_zsmul ℂ ε' (ξ' : ClassFunction Γ ℂ),
-    ClassFunction.inner_smul_left, ClassFunction.inner_smul_right, star_intCast,
-    irreducibleCharacter_inner_eq_ite]
-  ring
-
 /-- **Residual orthogonality** (Peterfalvi (6), p. 148): subtracting the Fourier
 components of `u` along a finite orthonormal family `w` leaves a residual
 orthogonal to every member: `(u − ∑ⱼ (u,wⱼ)·wⱼ, wₖ) = 0`.  Upstream candidate

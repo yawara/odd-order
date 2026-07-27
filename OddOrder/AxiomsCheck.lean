@@ -3716,6 +3716,18 @@ set_option linter.style.longLine false in
 -- `commutator_quotient_ne_top_of_lt`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.commutator_quotient_ne_top_of_lt
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.datum
+-- **The (5.3.a) signed pair as an orthonormal image family** (issue 0156): `R(χ) = {ε·μ, −ε·ν}`
+-- converts the two-element `CharacterDifferenceImage` shape (`τ(χ − χ̄) = ε·(μ − ν)`, `μ ≠ ν`
+-- irreducible, `ε = ±1`) into the `OrthonormalCharacterImageFamily` shape the adjoining engines
+-- consume.  Orthonormality is `inner_zsmul_irreducible_eq` with `μ ≠ ν` and `ε² = 1`; the sum
+-- telescopes by `image_eq`; and (5.2.e) transports because the members are `±ε` multiples of the
+-- `μ`, `ν`.  This is what makes (5.2.d)/(5.2.e) *derivable* from the (5.2.b) isometry alone on a
+-- subfamily of **irreducible** members (the source of the pair being
+-- `characterDifferenceImage_of_irreducible`), rather than assumed as in the book's (6.1).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalFamily
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalFamily_orthogonal
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_imageData
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_two_of_imageData
