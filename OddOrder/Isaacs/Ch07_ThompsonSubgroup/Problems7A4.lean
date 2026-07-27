@@ -19,9 +19,15 @@ import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylo
 * `N_{SL}(U) = B` = 上三角部分群 `{[[a,b],[0,a⁻¹]]}` (位数 `q(q-1)`),
 * `|SL(2,q)| = q(q-1)(q+1)` (`natCard_specialLinearGroup_fin_two`)
 
-に適用して得る。
+に適用して得る。`PSL(2,q) = SL(2,q)/Z` 側も, 商写像 `π` で
 
-本ファイルはまず `U`, `B` を定義して位数を計算する。
+* `π(U)` は Sylow `p` (`p`-群の像で, 指数は `U` の指数を割る),
+* `N_{PSL}(π(U)) = π(B)` (`g T g⁻¹` の左下成分 `-(g 1 0)²` が `U ⊔ Z ≤ B` の中で `0`),
+* `[PSL : π(B)] = [SL : B] = q+1` (`Subgroup.index_map` と `Z ≤ B`)
+
+で同じ `q + 1` を得る。
+
+⚠ 標数 `p` は `|U| = q = p^n` と「指数 `(q-1)(q+1)` が `p` と互いに素」にのみ効く。
 -/
 
 namespace OddOrder.Isaacs.Ch07
@@ -319,6 +325,117 @@ theorem card_sylow_specialLinearGroup :
   rw [hcard, hnorm, index_borelSL]
 
 end SylowCount
+
+/-! ### `PSL(2,q)` 側 -/
+
+section PSL
+
+/-- `g` による `[[1,1],[0,1]]` の共役の左下成分は `-(g 1 0)²`。
+
+`g T g⁻¹` の `(1,0)` 成分 = `g₁₀ g₁₁ + (g₁₀ + g₁₁)(-g₁₀) = -g₁₀²`。 -/
+theorem conj_transvection_lower_left (g : SL(2, F)) :
+    ((g * Matrix.SpecialLinearGroup.transvection
+        (zero_ne_one : (0 : Fin 2) ≠ 1) (1 : F) * g⁻¹ : SL(2, F)) :
+      Matrix (Fin 2) (Fin 2) F) 1 0 = -((g : Matrix (Fin 2) (Fin 2) F) 1 0) ^ 2 := by
+  have hinv : ((g⁻¹ : SL(2, F)) : Matrix (Fin 2) (Fin 2) F) =
+      !![(g : Matrix (Fin 2) (Fin 2) F) 1 1, -(g : Matrix (Fin 2) (Fin 2) F) 0 1;
+        -(g : Matrix (Fin 2) (Fin 2) F) 1 0, (g : Matrix (Fin 2) (Fin 2) F) 0 0] := by
+    rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
+    rfl
+  rw [Matrix.SpecialLinearGroup.coe_mul, Matrix.SpecialLinearGroup.coe_mul, hinv,
+    transvection_eq_borelElt, borelElt_coe]
+  simp only [Matrix.mul_apply, Fin.sum_univ_two, Matrix.cons_val', Matrix.cons_val_zero,
+    Matrix.cons_val_one, Matrix.empty_val', Matrix.cons_val_fin_one,
+    Matrix.of_apply, Units.val_one, inv_one]
+  ring
+
+/-- 中心 (スカラー行列) は Borel に含まれる。 -/
+theorem center_le_borelSL : Subgroup.center (SL(2, F)) ≤ borelSL := by
+  intro z hz
+  obtain ⟨r, -, hr⟩ := Matrix.SpecialLinearGroup.mem_center_iff.mp hz
+  refine mem_borelSL.mpr ?_
+  rw [← hr]
+  simp
+
+theorem unipotentSL_sup_center_le_borelSL :
+    (unipotentSL : Subgroup (SL(2, F))) ⊔ Subgroup.center (SL(2, F)) ≤ borelSL :=
+  sup_le unipotentSL_le_borelSL center_le_borelSL
+
+/-- `B` の像は `π(U)` を正規化する。 -/
+theorem conj_mem_map_unipotentSL {g : SL(2, F)}
+    (hg : g ∈ (borelSL : Subgroup (SL(2, F)))) {y : PSL(2, F)}
+    (hy : y ∈ (unipotentSL : Subgroup (SL(2, F))).map
+      (QuotientGroup.mk' (Subgroup.center (SL(2, F))))) :
+    QuotientGroup.mk' (Subgroup.center (SL(2, F))) g * y *
+        (QuotientGroup.mk' (Subgroup.center (SL(2, F))) g)⁻¹ ∈
+      (unipotentSL : Subgroup (SL(2, F))).map
+        (QuotientGroup.mk' (Subgroup.center (SL(2, F)))) := by
+  obtain ⟨u, hu, rfl⟩ := hy
+  exact ⟨g * u * g⁻¹, conj_mem_unipotentSL hg hu, by simp⟩
+
+/-- **`N_{PSL(2,q)}(π(U)) = π(B)`**。 -/
+theorem normalizer_map_unipotentSL_eq :
+    Subgroup.normalizer
+        (((unipotentSL : Subgroup (SL(2, F))).map
+          (QuotientGroup.mk' (Subgroup.center (SL(2, F))))) : Set (PSL(2, F))) =
+      (borelSL : Subgroup (SL(2, F))).map
+        (QuotientGroup.mk' (Subgroup.center (SL(2, F)))) := by
+  refine le_antisymm (fun x hx => ?_) (fun x hx => ?_)
+  · -- `N ≤ π(B)`
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective (Subgroup.center (SL(2, F))) x
+    refine ⟨g, ?_, rfl⟩
+    have hT : Matrix.SpecialLinearGroup.transvection
+        (zero_ne_one : (0 : Fin 2) ≠ 1) (1 : F) ∈ (unipotentSL : Subgroup (SL(2, F))) :=
+      ⟨Multiplicative.ofAdd (1 : F), rfl⟩
+    have hconj := (Subgroup.mem_normalizer_iff.mp hx _).mp
+      (Subgroup.mem_map_of_mem _ hT)
+    have hcomap : g * Matrix.SpecialLinearGroup.transvection
+        (zero_ne_one : (0 : Fin 2) ≠ 1) (1 : F) * g⁻¹ ∈
+        Subgroup.comap (QuotientGroup.mk' (Subgroup.center (SL(2, F))))
+          ((unipotentSL : Subgroup (SL(2, F))).map
+            (QuotientGroup.mk' (Subgroup.center (SL(2, F))))) := by
+      rw [Subgroup.mem_comap, map_mul, map_mul, map_inv]
+      exact hconj
+    rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk'] at hcomap
+    have h10 := mem_borelSL.mp (unipotentSL_sup_center_le_borelSL hcomap)
+    rw [conj_transvection_lower_left, neg_eq_zero, pow_eq_zero_iff two_ne_zero] at h10
+    exact mem_borelSL.mpr h10
+  · -- `π(B) ≤ N`
+    obtain ⟨g, hg, rfl⟩ := hx
+    rw [Subgroup.mem_normalizer_iff]
+    refine fun y => ⟨fun hy => conj_mem_map_unipotentSL hg hy, fun hy => ?_⟩
+    have h := conj_mem_map_unipotentSL (inv_mem hg) hy
+    rw [map_inv] at h
+    have heq : ∀ z w : PSL(2, F), z⁻¹ * (z * w * z⁻¹) * z⁻¹⁻¹ = w := by
+      intro z w; group
+    rwa [heq] at h
+
+variable [Finite F] {p : ℕ} [Fact p.Prime] [CharP F p]
+
+/-- **Isaacs 7A.4** (`PSL` 側) — `PSL(2,q)` の Sylow `p`-部分群もちょうど `q + 1` 個。 -/
+theorem card_sylow_projectiveSpecialLinearGroup :
+    Nat.card (Sylow p (PSL(2, F))) = Nat.card F + 1 := by
+  have hsurj : Function.Surjective
+      (QuotientGroup.mk' (Subgroup.center (SL(2, F)))) :=
+    QuotientGroup.mk'_surjective _
+  have hP : IsPGroup p ((unipotentSL : Subgroup (SL(2, F))).map
+      (QuotientGroup.mk' (Subgroup.center (SL(2, F))))) :=
+    (isPGroup_unipotentSL (F := F) (p := p)).map _
+  have hnd : ¬ p ∣ ((unipotentSL : Subgroup (SL(2, F))).map
+      (QuotientGroup.mk' (Subgroup.center (SL(2, F))))).index := fun h =>
+    not_dvd_index_unipotentSL (F := F) (p := p)
+      (h.trans (Subgroup.index_map_dvd (H := (unipotentSL : Subgroup (SL(2, F)))) hsurj))
+  set P : Sylow p (PSL(2, F)) := hP.toSylow hnd with hPdef
+  have hcard := Sylow.card_eq_index_normalizer P
+  have hnorm : Subgroup.normalizer ((P : Set (PSL(2, F)))) =
+      (borelSL : Subgroup (SL(2, F))).map
+        (QuotientGroup.mk' (Subgroup.center (SL(2, F)))) := normalizer_map_unipotentSL_eq
+  rw [hcard, hnorm, Subgroup.index_map, QuotientGroup.ker_mk',
+    sup_eq_left.mpr center_le_borelSL,
+    MonoidHom.range_eq_top_of_surjective _ hsurj, Subgroup.index_top, mul_one,
+    index_borelSL]
+
+end PSL
 
 end
 
