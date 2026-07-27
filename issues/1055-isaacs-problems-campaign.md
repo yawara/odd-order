@@ -4293,9 +4293,9 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 `b⁻¹ • α = a⁻¹ • α` (同じ点!) かつ `bH ≠ aH`。つまり **全射
 `gH ↦ ⟦g⁻¹ • α⟧` のファイバーは常に 2 元以上**。
 
-**残り (8A.14)**: 上のファイバー評価から `2 · 軌道数 ≤ [G:H]` を出す数え上げ
-(`Finset.card_eq_sum_card_fiberwise` で `|G ⧸ H| = ∑_o |fiber o|`, 各項 ≥ 2 を
-`Finset.one_lt_card` で示し `Finset.sum_le_sum`)。
+✅ `two_mul_card_orbits_le_index` で数え上げも完了 ⟹ **8A.14 完了**
+(`cosetToOrbit` を def に切り出し, `Finset.card_eq_sum_card_fiberwise` +
+`Finset.one_lt_card` + `Finset.sum_le_sum`)。
 
 ### 8A.15 (2026-07-27): 二重剰余類と剰余類への 2-transitivity — landing
 
@@ -4325,4 +4325,4 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 2. **8A.13 の同値** — 「`Ω³` の軌道数 = 5 ⟺ 3-transitive」(`m = 5` は確定済)。
    `Nat.card_eq_two_iff` の 5 元版が無いので `orbitRel.Quotient G Ω³ ≃ Fin 5` の
    明示構成が素直 (`|Ω| ≥ 3` が要る)。
-3. **8A.14 後半** — 上記のファイバー数え上げ。
+3. ~~**8A.14 後半**~~ ✅ 完了 (2026-07-27)。
