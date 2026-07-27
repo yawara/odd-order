@@ -310,6 +310,9 @@ mathlib / repo にあるかを実測すること。無ければそこが step (6
 3. ~~`x` が `π′`-元 ⟹ Hall D + Hall C で `V` に共役~~ ✅ **2026-07-28 landing**
    (`exists_conj_mem_V_of_piPrime`)。`Isaacs.Ch03.hall_D` (`Basic.lean:1329`) と
    `Isaacs.Ch03.hall_C` (`Basic.lean:1010`) がそのまま使えた。
-4. [ ] `π`-成分が `QK ⊆ Ker λ` に入ることで `λ(x) = λ(π′-成分)` へ帰着
-   (`GroupTheory/PiElementDecomposition.lean` の `exists_isPiElement_mul`)。
+4. ~~`π`-元は `QK` に入る~~ ✅ **2026-07-28 landing** (`mem_QK_of_piElement`,
+   `isHallSubgroup_QK_subgroupOf`)。`QK` は**正規**な Hall `π`-部分群なので
+   Hall D + Hall C の共役先が `QK` 自身になる。
+   [ ] 残り: `exists_isPiElement_mul` で実際に `x = x_π · x_{π′}` と分解し、
+   `λ(x) = λ(x_{π′})` を出す部分。
 5. [ ] Ch.I §3 Lemma 2 (`ConjugacyInV.lean`) で `V` 内共役に落として `λ(x) = λ(x^g)`。
