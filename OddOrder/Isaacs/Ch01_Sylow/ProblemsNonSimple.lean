@@ -20,6 +20,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 1E の形式化
 * **1E.4**: 位数 `144 = 2⁴·3²` の単純群は存在しない。
 * **1E.5**: 位数 `336 = 2⁴·3·7` の単純群は存在しない (Hint = `n₇` を計算して 1C.5)。
 * **1E.6**: 位数 `180 = 2²·3²·5` の単純群は存在しない。
+* **1E.7**: 位数 `240 = 2⁴·3·5` の単純群は存在しない。
 
 ## 共通の道具
 
@@ -49,6 +50,8 @@ Sylow 部分群の位数・指数を `|G|` の分解から読むために
 - `exists_finset_of_sylow_inter_trivial` — Sylow が自明交叉なら非単位元は
   `n_q·(|P| − 1)` 個 (他の素数の計数と足して `|G|` を超えさせる用)。
 - `not_isSimpleGroup_of_card_eq_oneeighty` — **Problem 1E.6**。
+- `card_dvd_factorial_card_sylow_of_simple` — 単純群で `n_q > 1` なら `|G| ∣ n_q !`。
+- `not_isSimpleGroup_of_card_eq_twofourty` — **Problem 1E.7**。
 -/
 
 namespace OddOrder.Isaacs.Ch01
@@ -1046,5 +1049,144 @@ theorem not_isSimpleGroup_of_card_eq_oneeighty {G : Type*} [Group G] [Finite G]
     omega
 
 end -- Problem 1E.6
+
+section /- 1E: Problem 1E.7 (p. 38) -/
+
+/-- `15` の約数は `1, 3, 5, 15`。 -/
+private lemma divisors_fifteen {n : ℕ} (h : n ∣ 15) :
+    n = 1 ∨ n = 3 ∨ n = 5 ∨ n = 15 := by
+  have h0 : 0 < n := Nat.pos_of_dvd_of_pos h (by norm_num)
+  have hle : n ≤ 15 := Nat.le_of_dvd (by norm_num) h
+  interval_cases n <;> revert h <;> decide
+
+/-- 単純群では Sylow `q`-部分群が複数あれば `|G| ∣ n_q !` (**Cor 1.3** を正規化群に当てる)。 -/
+theorem card_dvd_factorial_card_sylow_of_simple {G : Type*} [Group G] [Finite G]
+    [IsSimpleGroup G] {q : ℕ} [Fact q.Prime] (P : Sylow q G)
+    (hgt : 1 < Nat.card (Sylow q G)) :
+    Nat.card G ∣ Nat.factorial (Nat.card (Sylow q G)) := by
+  have hidx : (Subgroup.normalizer ((P : Subgroup G) : Set G)).index
+      = Nat.card (Sylow q G) := by
+    rw [Sylow.coe_coe, ← Sylow.card_eq_index_normalizer P]
+  have h := card_dvd_factorial_of_simple_subgroup_index
+    (Subgroup.normalizer ((P : Subgroup G) : Set G)) (by rw [hidx]; exact hgt)
+  rwa [hidx] at h
+
+/-- **Isaacs Problem 1E.7** (p. 38)。位数 `240 = 2⁴·3·5` の単純群は存在しない。
+
+Sylow `2` で押す。`n₂ ∣ [G : S] = 15` は奇数なので `n₂ ∈ {1, 3, 5, 15}`。単純性で `n₂ ≠ 1`,
+`n₂ = 3` は `240 ∣ 3! = 6`, `n₂ = 5` は `240 ∣ 5! = 120` がどちらも偽 (**Cor 1.3**)。
+残る `n₂ = 15` では交わり最大の Sylow `2` 対 `S ≠ T` に **Thm 1.16** を当てて
+`15 ≡ 1 (mod |S : D|)`, つまり `|S : D| ∣ gcd(14, 16) = 2` と `≠ 1` から `|S : D| = 2`,
+`|D| = 8`。指数 2 ゆえ `D` は `S`, `T` の双方で正規で `S`, `T ≤ N := N_G(D)`,
+`16 ∣ |N| ∣ 240` から `|N| ∈ {16, 48, 80, 240}`:
+
+* `16`: `S = N = T` で `S ≠ T` に矛盾。
+* `48`: 指数 5 で `240 ∣ 5! = 120` が偽。
+* `80`: 指数 3 で `240 ∣ 3! = 6` が偽。
+* `240`: `D ⊴ G` で `1 < |D| = 8 < 240`, 単純性に矛盾。 -/
+theorem not_isSimpleGroup_of_card_eq_twofourty {G : Type*} [Group G] [Finite G]
+    (hG : Nat.card G = 240) : ¬ IsSimpleGroup G := by
+  intro hsimple
+  classical
+  haveI := hsimple
+  haveI : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  have hdec : ∀ P : Sylow 2 G,
+      Nat.card ↥(P : Subgroup G) = 16 ∧ (P : Subgroup G).index = 15 := fun P => by
+    have hh := sylow_card_and_index_of_card_eq_mul (q := 2) (m := 15) (k := 4)
+      (by rw [hG]; norm_num) (by norm_num) P
+    exact ⟨hh.1.trans (by norm_num), hh.2⟩
+  obtain ⟨P₂⟩ : Nonempty (Sylow 2 G) := Sylow.nonempty
+  have hne1 : Nat.card (Sylow 2 G) ≠ 1 :=
+    card_sylow_ne_one_of_simple P₂ (by rw [(hdec P₂).1]; norm_num)
+      (by rw [(hdec P₂).1, hG]; norm_num)
+  -- `n₂ = 15`
+  have hn2 : Nat.card (Sylow 2 G) = 15 := by
+    rcases divisors_fifteen ((hdec P₂).2 ▸ Sylow.card_dvd_index P₂) with h | h | h | h
+    · exact absurd h hne1
+    · exfalso
+      have hd := card_dvd_factorial_card_sylow_of_simple P₂ (by rw [h]; norm_num)
+      rw [hG, h] at hd
+      norm_num [Nat.factorial] at hd
+    · exfalso
+      have hd := card_dvd_factorial_card_sylow_of_simple P₂ (by rw [h]; norm_num)
+      rw [hG, h] at hd
+      norm_num [Nat.factorial] at hd
+    · exact h
+  -- 交わり最大の対から `|D| = 8`
+  have hgt : 1 < Nat.card (Sylow 2 G) := by rw [hn2]; norm_num
+  obtain ⟨S, T, hST, hmax⟩ := exists_max_inter_sylow_pair (q := 2) hgt
+  have hmodT := card_sylow_modEq_one_of_max_inter hgt S T hST hmax
+  rw [hn2] at hmodT
+  set D : Subgroup G := (S : Subgroup G) ⊓ (T : Subgroup G) with hDdef
+  have hd_dvd14 : D.relIndex (S : Subgroup G) ∣ 14 := by
+    have hh := (Nat.modEq_iff_dvd' (by norm_num : 1 ≤ 15)).mp hmodT.symm
+    norm_num at hh; exact hh
+  have hd_dvd16 : D.relIndex (S : Subgroup G) ∣ 16 := by
+    have hh := Subgroup.index_dvd_card (D.subgroupOf (S : Subgroup G))
+    rw [(hdec S).1] at hh
+    exact hh
+  have hd_ne1 : D.relIndex (S : Subgroup G) ≠ 1 := by
+    intro h1
+    exact hST (Sylow.ext (Subgroup.eq_of_le_of_card_ge
+      ((Subgroup.relIndex_eq_one.mp h1).trans inf_le_right)
+      (((hdec T).1).trans ((hdec S).1).symm).le))
+  have hd2 : D.relIndex (S : Subgroup G) = 2 := by
+    have hg : D.relIndex (S : Subgroup G) ∣ 2 := by
+      have hh := Nat.dvd_gcd hd_dvd14 hd_dvd16
+      norm_num at hh; exact hh
+    rcases (Nat.dvd_prime (by norm_num)).mp hg with h | h
+    · exact absurd h hd_ne1
+    · exact h
+  have hidx2S : (D.subgroupOf (S : Subgroup G)).index = 2 := hd2
+  have hDcard : Nat.card ↥D = 8 := by
+    have heq := Subgroup.card_mul_index (D.subgroupOf (S : Subgroup G))
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (inf_le_left : D ≤ (S : Subgroup G))).toEquiv, hidx2S, (hdec S).1] at heq
+    rw [← hDdef] at heq
+    omega
+  have hidx2T : (D.subgroupOf (T : Subgroup G)).index = 2 := by
+    have heq := Subgroup.card_mul_index (D.subgroupOf (T : Subgroup G))
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (inf_le_right : D ≤ (T : Subgroup G))).toEquiv, hDcard, (hdec T).1] at heq
+    omega
+  -- 指数 2 ゆえ `D` は `S`, `T` で正規, したがって `S`, `T ≤ N_G(D)`
+  have hS_le : (S : Subgroup G) ≤ Subgroup.normalizer (D : Set G) := by
+    have htop := Subgroup.normalizer_eq_top_iff.mpr (Subgroup.normal_of_index_eq_two hidx2S)
+    rw [← Subgroup.subgroupOf_normalizer_eq (inf_le_left : D ≤ (S : Subgroup G))] at htop
+    exact Subgroup.subgroupOf_eq_top.mp htop
+  have hT_le : (T : Subgroup G) ≤ Subgroup.normalizer (D : Set G) := by
+    have htop := Subgroup.normalizer_eq_top_iff.mpr (Subgroup.normal_of_index_eq_two hidx2T)
+    rw [← Subgroup.subgroupOf_normalizer_eq (inf_le_right : D ≤ (T : Subgroup G))] at htop
+    exact Subgroup.subgroupOf_eq_top.mp htop
+  set N : Subgroup G := Subgroup.normalizer (D : Set G) with hNdef
+  have hNdvd : Nat.card ↥N ∣ 240 := hG ▸ Subgroup.card_subgroup_dvd_card N
+  obtain ⟨e, he⟩ : (16 : ℕ) ∣ Nat.card ↥N := ((hdec S).1) ▸ Subgroup.card_dvd_of_le hS_le
+  have hedvd : e ∣ 15 :=
+    (mul_dvd_mul_iff_left (by norm_num : (16 : ℕ) ≠ 0)).mp (by rw [← he]; simpa using hNdvd)
+  have hindex_absurd : ∀ n : ℕ, Nat.card ↥N * n = 240 → 1 < n → n < 6 → False := by
+    intro n hmul hn1 hn6
+    have hidx : N.index = n := by
+      have hh := Subgroup.card_mul_index N
+      rw [hG] at hh
+      exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (hh.trans hmul.symm)
+    have hdvd := card_dvd_factorial_of_simple_subgroup_index N (by rw [hidx]; omega)
+    rw [hG, hidx] at hdvd
+    interval_cases n <;> norm_num [Nat.factorial] at hdvd
+  rcases divisors_fifteen hedvd with he1 | he1 | he1 | he1
+  · -- `|N| = 16`: `S = N = T`
+    have heN : Nat.card ↥N = 16 := by rw [he, he1, mul_one]
+    exact hST (Sylow.ext
+      ((Subgroup.eq_of_le_of_card_ge hS_le (le_of_eq (by rw [heN, (hdec S).1]))).trans
+        (Subgroup.eq_of_le_of_card_ge hT_le (le_of_eq (by rw [heN, (hdec T).1]))).symm))
+  · exact hindex_absurd 5 (by rw [he, he1]) (by norm_num) (by norm_num)
+  · exact hindex_absurd 3 (by rw [he, he1]) (by norm_num) (by norm_num)
+  · -- `|N| = 240`: `D ⊴ G`
+    have hNtop : N = ⊤ := Subgroup.eq_top_of_card_eq N (by rw [he, he1, hG])
+    rcases hsimple.eq_bot_or_eq_top_of_normal _
+      (Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)) with h1 | h1
+    · rw [h1, Subgroup.card_bot] at hDcard; norm_num at hDcard
+    · rw [h1, Subgroup.card_top, hG] at hDcard; norm_num at hDcard
+
+end -- Problem 1E.7
 
 end OddOrder.Isaacs.Ch01
