@@ -5205,3 +5205,37 @@ Ch.8 §8C.6 ではない。順序は **§1E → §1F → §1G → §3C → §3D 
 * **1E.6**: `|G| = 180 = 2²·3²·5` なら単純でない。
 * **1E.7**: `|G| = 240 = 2⁴·3·5` なら単純でない。
 * **1E.8**: `|G| = 252 = 2²·3²·7` なら単純でない。
+
+
+## §1E 進捗 (2026-07-28)
+
+leaf = `Ch01_Sylow/ProblemsNonSimple.lean` (`OddOrder.lean` 配線済)。
+
+* ✅ **1E.1** `card_sylow_eq_one_of_card_eq_sq_mul_sq`。`n_q ∣ [G:Q] = p²` と
+  `n_q ≡ 1 (mod q)` から `n_q ∈ {1, p, p²}` を潰す。`n_q = p` は `p < q` ゆえ
+  `p % q = p = 1` で素数性に矛盾。`n_q = p²` は `q ∣ p²−1 = (p−1)(p+1)`,
+  `q > p` から `q ∣ p+1` すなわち `q = p+1`, 連続素数は `2,3` だけ ⟹ `|G| = 36`。
+* 再利用部品 `sylow_card_and_index_of_card_eq_mul` — `|G| = m·q^k` (`q ∤ m`) なら
+  `|Q| = q^k` かつ `[G:Q] = m` (既存 `sylow_card_eq_prime_of_card_eq_mul` の任意指数版)。
+  §1E の残り全問で使う。
+
+### 次: 1E.2 の設計 (筋は確定済, 実装待ち)
+
+**1E.2**: `|G| = pqr` (`p<q<r` 素数) ⟹ `n_r = 1`。
+
+1. `n_r ∣ pq`, `n_r ≡ 1 (mod r)` ⟹ `n_r ∈ {1, p, q, pq}`。`p, q < r` なので
+   `n_r = p`, `n_r = q` は `p = 1` / `q = 1` を強いて不可能 ⟹ `n_r ∈ {1, pq}`。
+2. `n_r = pq` と仮定。位数 `r` の元は `pq(r−1)` 個。
+3. `n_q ∣ pr`, `≡ 1 (mod q)` ⟹ `n_q ∈ {1, p, r, pr}`。`p < q` ゆえ `n_q ≠ p`。
+   `n_q ≠ 1` なら `n_q ≥ r` で位数 `q` の元が `≥ r(q−1)` 個。計数
+   `pq(r−1) + r(q−1) + 1 ≤ pqr` は `r(q−1) ≤ pq − 1` を要求するが
+   `r ≥ q+1`, `p ≤ q−1` より `r(q−1) ≥ q²−1 > q²−q−1 ≥ pq−1` で矛盾
+   ⟹ **`n_q = 1`** (既存 `card_sylow_mul_add_card_sylow_mul_le` が使える)。
+4. `Q ⊴ G` (位数 `q`) と `R ∈ Syl_r(G)` について `Q ⊔ R` は位数 `qr`
+   (`card_sup_of_normal_of_coprime`)。**位数 `qr` (`q<r`) の群では `n_r = 1`**
+   (`n_r ∣ q`, `≡1 mod r`, `q < r` ⟹ `q % r = q ≠ 1`) ゆえ `R ⊴ Q ⊔ R`。
+5. すると `Q ⊔ R ≤ N_G(R)` で `qr ∣ |N_G(R)| = |G| / n_r = r`, `q > 1` に矛盾。
+   ⟹ `n_r = 1`。
+
+⚠ 4 の「`↥(Q ⊔ R)` の中で Sylow を取り直す」plumbing が唯一の面倒どころ。
+`ProblemsOrder120.lean` の位数 30 → 位数 120 の comap 引き戻しに前例がある。
