@@ -3739,3 +3739,18 @@ API メモ: `Sylow.is_maximal'` / `Subgroup.map_subgroupOf_eq_of_le` /
 (c) `P`-不変部分空間は標準旗 `⟨e_{n-k+1},…,e_n⟩` のみ (各次元ちょうど 1 つ)、
 (d) `N` は `P`-不変部分空間を保つので旗を保ち ⟹ 上三角 ⟹ `N = DP`。
 ⟹ (a)(b) は初等的。(c) が核心 (有限体上の線型代数)。
+
+### 7A.3 進捗 (2026-07-27): 上三角/冪単の部分群を実証明
+
+新 leaf `Problems7A3.lean` (`OddOrder.lean` 配線済):
+* `blockTriangular_mul_diag`: **上三角行列の積の対角成分は対角成分の積**
+  (`(A*B) i i = ∑ k, A i k * B k i` で `k < i` は `A i k = 0`、`i < k` は `B k i = 0`;
+  `Finset.sum_eq_single`)。これが冪単性の積・逆元での保存の鍵。
+* `upperTriangularGL` (可逆上三角 = Borel) / `unitriangularGL` (上三角冪単 = Sylow p) を
+  `Subgroup (GL (Fin n) F)` として定義。逆元は
+  `Matrix.blockTriangular_inv_of_blockTriangular` + `Matrix.coe_units_inv`、
+  冪単性の逆元側は `(A * A⁻¹) i i = A i i * (A⁻¹) i i = 1` から。
+* `unitriangularGL_le_upperTriangularGL`。
+* ⚠ 「上三角」は `Matrix.BlockTriangular M id` (`∀ i j, j < i → M i j = 0`) で表す。
+  `[DecidableEq F]` は**不要** (行列の逆に要るのは添字型 `Fin n` の DecidableEq)。
+* 次: (a) `D ≤ N(P)` (対角共役)、(b) `DP` = 上三角全体、(c) `P`-不変部分空間の分類、(d) `N = DP`。
