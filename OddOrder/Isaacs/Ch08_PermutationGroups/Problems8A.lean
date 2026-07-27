@@ -47,8 +47,10 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
   したがって `N` は half-transitive (すべての `N`-軌道が同じ濃度)。
 - `isPretransitive_of_normal_of_two_transitive` — **Problem 8A.9**: 2-transitive な `G` の
   非自明に作用する正規部分群は推移的。
-- `card_le_four_of_three_transitive_on_nonidentity` — **Problem 8A.10 の核心**:
-  自己同型群が `N ∖ {1}` に 3-transitive なら `|N| ≤ 4`。
+- `card_le_four_of_three_transitive_on_nonidentity`,
+  `card_le_four_of_regular_normal_of_stabilizer_three_transitive` —
+  **Problem 8A.10 の核心**: 自己同型群が `N ∖ {1}` に 3-transitive なら `|N| ≤ 4`;
+  `N` が regular normal で `G_α` が `Ω ∖ {α}` に 3-transitive なら `|N| ≤ 4`。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -711,6 +713,43 @@ theorem card_le_four_of_three_transitive_on_nonidentity
   obtain ⟨a, hax, hay, haxy⟩ := h3 x y (x * y) x y w hx hy1 hxy1 hx hy1 hw1
     (Ne.symm hyx) (Ne.symm hxyx) (Ne.symm hxyy) (Ne.symm hyx) (Ne.symm hwx) (Ne.symm hwy)
   exact hwxy (by rw [← haxy, smul_mul', hax, hay])
+
+/-- **8A.10 の step 5**: `N` が regular normal で点安定化群 `G_α` が `Ω ∖ {α}` に
+3-transitive なら, `|N| ≤ 4`。
+
+Thm 8.5 の第 3 主張 (共役作用と点作用の置換同型) を軌道写像 `n ↦ n • α` で直接使う:
+`g • α = α` のとき `(g n g⁻¹) • α = g • (n • α)` なので, `Ω ∖ {α}` 上の 3-transitivity は
+`N ∖ {1}` 上の**自己同型による** 3-transitivity に翻訳され,
+`card_le_four_of_three_transitive_on_nonidentity` が使える。 -/
+theorem card_le_four_of_regular_normal_of_stabilizer_three_transitive
+    {N : Subgroup G} [N.Normal] {α : Ω} (hreg : Function.Bijective (smulBase N α))
+    (h3 : ∀ β₁ β₂ β₃ γ₁ γ₂ γ₃ : Ω, β₁ ≠ α → β₂ ≠ α → β₃ ≠ α → γ₁ ≠ α → γ₂ ≠ α → γ₃ ≠ α →
+      β₁ ≠ β₂ → β₁ ≠ β₃ → β₂ ≠ β₃ → γ₁ ≠ γ₂ → γ₁ ≠ γ₃ → γ₂ ≠ γ₃ →
+      ∃ g : G, g • α = α ∧ g • β₁ = γ₁ ∧ g • β₂ = γ₂ ∧ g • β₃ = γ₃) :
+    Nat.card ↥N ≤ 4 := by
+  refine card_le_four_of_three_transitive_on_nonidentity (A := MulAut ↥N) ?_
+  intro x y z x' y' z' hx hy hz hx' hy' hz' hxy hxz hyz hxy' hxz' hyz'
+  -- 非単位元は `α` と異なる点へ, 相異なる元は相異なる点へ移る
+  have hne : ∀ n : ↥N, n ≠ 1 → (n : G) • α ≠ α := fun n hn hc =>
+    hn (hreg.1 (show smulBase N α n = smulBase N α 1 by simpa [smulBase] using hc))
+  have hinj : ∀ m n : ↥N, (m : G) • α = (n : G) • α → m = n := fun m n hc =>
+    hreg.1 (by simpa [smulBase] using hc)
+  obtain ⟨g, hgα, hg1, hg2, hg3⟩ :=
+    h3 ((x : G) • α) ((y : G) • α) ((z : G) • α) ((x' : G) • α) ((y' : G) • α) ((z' : G) • α)
+      (hne x hx) (hne y hy) (hne z hz) (hne x' hx') (hne y' hy') (hne z' hz')
+      (fun hc => hxy (hinj _ _ hc)) (fun hc => hxz (hinj _ _ hc)) (fun hc => hyz (hinj _ _ hc))
+      (fun hc => hxy' (hinj _ _ hc)) (fun hc => hxz' (hinj _ _ hc)) (fun hc => hyz' (hinj _ _ hc))
+  -- `g` による共役が求める自己同型
+  have hginv : g⁻¹ • α = α := by rw [inv_smul_eq_iff, hgα]
+  have key : ∀ (n n' : ↥N), g • ((n : G) • α) = (n' : G) • α →
+      (MulAut.conjNormal (H := N) g) • n = n' := by
+    intro n n' hc
+    refine hinj _ _ ?_
+    rw [MulAut.smul_def, MulAut.conjNormal_apply]
+    calc (g * (n : G) * g⁻¹) • α = g • ((n : G) • (g⁻¹ • α)) := by
+          simp only [← mul_smul, mul_assoc]
+      _ = (n' : G) • α := by rw [hginv, hc]
+  exact ⟨MulAut.conjNormal (H := N) g, key x x' hg1, key y y' hg2, key z z' hg3⟩
 
 end
 

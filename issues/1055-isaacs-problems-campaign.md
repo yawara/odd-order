@@ -4207,5 +4207,12 @@ Lean 実務メモ: `[N.Normal]` はインスタンスなので `N.Normal.conj_me
 それは `xy ↦ xy ≠ w` を強いる。⚠ `N` が elementary abelian であることは**不要**
 (積を保つことしか使わない)。
 
-**残り**: 上記 1–5 の結線 (極小正規部分群の存在, Thm 3.11 の適用形, Thm 8.5 第 3 主張の
+**✅ step 5 も landing** (`card_le_four_of_regular_normal_of_stabilizer_three_transitive`):
+`N` regular normal + `G_α` が `Ω ∖ {α}` に 3-transitive ⟹ `|N| ≤ 4`。
+⚠ `RegularNormal.lean` の `ofStabilizerToNonidentity` (Thm 8.5 第 3 主張の bundled 版) を
+**経由せず**, 軌道写像 `n ↦ n • α` で直接翻訳した方が短い: `g • α = α` のとき
+`(g n g⁻¹) • α = g • (n • α)` (計算 2 行) なので, `MulAut.conjNormal g` がそのまま
+求める自己同型になる。作用先の型は `MulAut ↥N` を使えば新しい instance が要らない。
+
+**残り**: 上記 1–4 の結線 (極小正規部分群の存在, Thm 3.11 の適用形, Thm 8.5 第 3 主張の
 `ofStabilizerToNonidentity` から 3-transitivity を移す部分, 最後の `|Ω| = 4 ⟹ G = S₄`)。
