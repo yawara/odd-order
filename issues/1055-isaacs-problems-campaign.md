@@ -4434,7 +4434,8 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
   8B.8 ✅ `isPreprimitive_sup_zpowers_addRight_one` /
   8B.9 ✅ `eq_top_...` (m か n 偶 ⟹ S_n) / `eq_alternatingGroup_...` (ともに奇 ⟹ A_n) /
-  **次の frontier = 8B.10** (§8B 最後)。
+  8B.10 🔶 **準備のみ** (`eq_stabilizer_of_index_eq_of_fixed`) —
+  **次の frontier = 8B.10 本体** (§8B 最後)。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4672,3 +4673,28 @@ step 1–4 は landing 済 (`alternatingGroup_le_zpowers_mCycle_sup_zpowers_addR
   どちらも奇 ⟹ 両生成元が偶置換 ⟹ `G ≤ A_n` ⟹ `G = A_n`。
   (`Subgroup.eq_top_of_...` / `alternatingGroup` の指数 2 は mathlib
   `Equiv.Perm.alternatingGroup_index` 等を要確認。)
+
+
+### 8B.10 の残り (2026-07-27, 設計を精密化)
+
+`eq_stabilizer_of_index_eq_of_fixed` / `not_fixed_of_index_eq_of_ne_stabilizer` は
+landing 済 ⟹ **`H` は固定点をもたない**。残りは:
+
+1. **`H` は推移的**: 非推移なら軌道 `Δ` (`|Δ| = k`) があり, 固定点なしから `2 ≤ k`。
+   補集合も `H`-不変なので `2 ≤ n - k`、すなわち `2 ≤ k ≤ n-2` (⟹ `n ≥ 4`)。
+   `H ≤ Stab(Δ) := {g | g • Δ = Δ}` なので `[Sym : Stab(Δ)] ∣ [Sym : H] = n`。
+   `[Sym : Stab(Δ)]` = `k`-部分集合の個数 = `C(n,k) ≥ C(n,2) = n(n-1)/2 > n` (`n ≥ 4`)
+   で矛盾。
+   ⚠ 要る補助: (i) `Sym(α)` は `k`-部分集合全体に推移的、
+   (ii) `k`-部分集合の個数 = `C(n,k)` (mathlib `Finset.card_powersetCard`)、
+   (iii) 二項係数の単峰性 `C(n,2) ≤ C(n,k)` (`2 ≤ k ≤ n-2`)。
+   **代案**: `|H| ≤ k!(n-k)!` (H は `Δ` と `Δᶜ` を保つ) と `|H| = (n-1)!` から
+   `(n-1)! ≤ k!(n-k)!` を出し、同じ二項不等式に帰着してもよい。
+2. `S_n` は 2-transitive、`Coprime (n-1) n` ⟹ **8A.16**
+   (`two_transitive_of_coprime_index`) で `H` は 2-transitive。
+3. 2-transitive ⟹ `IsPreprimitive` (mathlib
+   `isPreprimitive_of_is_two_pretransitive` + `is_two_pretransitive_iff`)。
+4. `A_n ≤ H` なら `[S_n : A_n] = 2` から `n ∣ 2`; そうでなければ **Bochert**
+   (`factorial_le_index_of_isPreprimitive`) で `((n+1)/2)! ≤ n` ⟹ `n ∈ {1,2,3,4,6}`。
+5. 2-transitivity から `n(n-1) ∣ |H| = (n-1)!` ⟹ `n ∣ (n-2)!` で `n = 2,3,4` を除外。
+   `n = 1` は `H` が自動的に唯一の点安定化群 ⟹ 除外。⟹ `n = 6`。
