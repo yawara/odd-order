@@ -125,6 +125,56 @@ retarget) を使っている。書籍の論法とは構成が違うので、**�
    (`|R(χ₀)| = ‖χ₀−χ̄₀‖² = 2c` から `|E| = c` の部分集合を取る)。
 4. 本体の組み上げ (`coherentEqualDegree` → `coherentEqualDegreeW`)。
 
+## ⚠ 根本原因の発見 (2026-07-27) — repo の `S07.Hypothesis` 自体が書籍 (5.2) より狭い
+
+`commonImage` 連鎖を一般化した後に基底ケースを見て判明。**`hirr` は (5.7) の制限ではなく、
+carrier `S07.Hypothesis` が既に強制している帰結**だった:
+
+```lean
+  difference_image :
+    ∀ ⦃χ⦄, χ ∈ S → CharacterDifferenceImage (L := L) (G := G) tau χ
+```
+
+`CharacterDifferenceImage` は **2 元の符号付き対** `τ(χ−χ̄) = ε·(μ−ν)` (`μ ≠ ν` 既約) を持つ構造。
+ゆえに `‖τ(χ−χ̄)‖² = 2`。一方 (5.2.b) の等長性と `⟨χ,χ̄⟩ = 0`・`‖χ̄‖² = ‖χ‖²` から
+`‖χ−χ̄‖² = 2‖χ‖²`。差が `A`-supported なら等長性が効いて **`‖χ‖² = 1`**。
+
+⟹ **書籍の (5.2.d) は `R(χ)` のサイズを縛らない** (`‖χ−χ̄‖² = 2‖χ‖²` 個の元を持ちうる) のに、
+repo の carrier は 2 元に固定しており、**全 member の既約性を暗に課している**。
+(5.7) の `hirr` を外しても carrier がそれを再導入するので、**単独では意味がない**。
+
+なお (5.4) 層は既に一般: `CharacterPsiDecomposition.imageFamily` は
+`OrthonormalCharacterImageFamily` (任意サイズ) を持つ。狭いのは `Hypothesis.difference_image`
+の 1 フィールドだけ。
+
+### 本当にやるべきこと (issue の再定義)
+
+`S07.Hypothesis.difference_image` の型を
+`CharacterDifferenceImage` → `OrthonormalCharacterImageFamily` に**広げる**。
+
+- 既存の witness (Dade 側・§12 μ-grid 側) は 2 元形しか作れない場所があるので、
+  [issue 0156 step 1](pending/0156-five-two-d-from-irreducibility.md) の
+  `CharacterDifferenceImage.toOrthonormalFamily` で持ち上げる (既に landing 済)。
+- `difference_images_orthogonal` も同様に
+  `toOrthonormalFamily_orthogonal` 経由で移送できる (これも landing 済)。
+- ⚠ `Hypothesis` は §5-§8 の中核 carrier で consumer が多い。フィールド型変更は
+  広範囲に波及するので、**edge ごとに build 検証**すること。
+
+## 進捗 (2026-07-27、続き)
+
+- [x] **`pairDecomp_two_sided` の一般化**: `hχχ`/`hζζ` (unit norm) を削除し、結論を
+      `⟨D.X, D.X⟩ = ⟨χ, χ⟩ ∧ D.Y = D'.X` に。証明は「`1` を代入しない」だけで通った
+      ((5.4.a)/(5.4.b) が元から一般ノルムなので)。
+- [x] **`commonImage` 連鎖 6 本の一般化**: `commonImage_self` / `_inner_ref` / `_inner_conj` /
+      `_inner_refconj` / `_inner_other` / `_inner` から `hirr` を削除し、結論の `1` を
+      `⟨χ₀, χ₀⟩` に。
+- [x] **`xFamily_inner` の一般化**: `1` → `⟨χ 0, χ 0⟩` (`star c = c` は
+      `inner_conj_symm (χ 0) (χ 0)` から無料)。
+- [ ] `coherent_of_constant_degree` 本体の `hirr` は**残したまま**。残っている用途は
+      `horthχ` (→ `coherentEqualDegreeW` に差し替えれば不要) と**基底ケース**
+      `isCoherent_pair_of_differenceImage` (2 元形に本質的に依存) の 2 箇所だけで、
+      どちらも上記の carrier 拡幅が前提。
+
 ## 完了条件
 
 `coherent_of_constant_degree` が `hirr` 無しで成立し、旧版がその特殊化になること。

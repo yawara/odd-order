@@ -275,10 +275,9 @@ theorem pairDecomp_two_sided
     {τ : IntegralCharacterMap L G} {χ ζ : ClassFunction L ℂ}
     (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ζ)
     (D' : CharacterPsiDecomposition (L := L) (G := G) τ ζ χ)
-    (hχχ : ClassFunction.inner χ χ = 1) (hζζ : ClassFunction.inner ζ ζ = 1)
     (hortho : D.imageFamily.Orthogonal D'.imageFamily)
     (himgD : τ (χ - ζ) = D.X - D.Y) (himgD' : τ (ζ - χ) = D'.X - D'.Y) :
-    ClassFunction.inner D.X D.X = 1 ∧ D.Y = D'.X := by
+    ClassFunction.inner D.X D.X = ClassFunction.inner χ χ ∧ D.Y = D'.X := by
   -- `⟨D.X, D'.X⟩ = 0` (cross-family) and `⟨D'.Y, D'.X⟩ = 0` (image ⊥ residual).
   have hXX' : ClassFunction.inner D.X D'.X = 0 := inner_X_X'_eq_zero D D' hortho
   have hYX' : ClassFunction.inner D'.Y D'.X = 0 := by
@@ -292,10 +291,9 @@ theorem pairDecomp_two_sided
   have hYX'_eq : ClassFunction.inner D.Y D'.X = ClassFunction.inner D'.X D'.X := by
     rw [hDYval, ClassFunction.inner_sub_left, hXX', hτχζ, ClassFunction.inner_sub_left, hYX']
     ring
-  -- `‖D'.X‖².re ≥ ‖ζ‖².re = 1` from (5.4.a) on `D'`.
-  have hD'Xge : (1 : ℝ) ≤ (ClassFunction.inner D'.X D'.X).re := by
-    have h := D'.inner_self_chi_re_le_inner_self_X
-    rw [hζζ] at h; simpa using h
+  -- `‖D'.X‖².re ≥ ‖ζ‖².re` from (5.4.a) on `D'`.
+  have hD'Xge : (ClassFunction.inner ζ ζ).re ≤ (ClassFunction.inner D'.X D'.X).re :=
+    D'.inner_self_chi_re_le_inner_self_X
   -- `‖D.Y − D'.X‖².re = ‖D.Y‖².re − ‖D'.X‖².re`.
   have hdiffre : (ClassFunction.inner (D.Y - D'.X) (D.Y - D'.X)).re
       = (ClassFunction.inner D.Y D.Y).re - (ClassFunction.inner D'.X D'.X).re := by
@@ -306,25 +304,22 @@ theorem pairDecomp_two_sided
         ClassFunction.inner_sub_right]; ring
     rw [hexp, hYX'_eq, OddOrder.RepresentationTheory.inner_conj_symm D.Y D'.X, hYX'_eq]
     simp only [Complex.add_re, Complex.sub_re, Complex.star_def, Complex.conj_re]; ring
-  have hDYge : (1 : ℝ) ≤ (ClassFunction.inner D.Y D.Y).re := by
+  have hDXle : (ClassFunction.inner D'.X D'.X).re ≤ (ClassFunction.inner D.Y D.Y).re := by
     have hnn := inner_self_re_nonneg (D.Y - D'.X)
     rw [hdiffre] at hnn; linarith
-  -- (5.4.b) on `D` with `‖ζ‖².re ≤ ‖D.Y‖².re`.
+  -- (5.4.b) on `D` with `‖ζ‖².re ≤ ‖D'.X‖².re ≤ ‖D.Y‖².re`.
   have hY : (ClassFunction.inner ζ ζ).re ≤ (ClassFunction.inner D.Y D.Y).re := by
-    rw [hζζ]; simpa using hDYge
+    linarith
   obtain ⟨hXnorm, hYnorm, _⟩ := D.norm_eq_and_X_eq_sum_of_norm_Y_ge hY
   refine ⟨?_, ?_⟩
-  · -- `‖D.X‖² = 1` (ℂ): `‖χ‖².re = ‖D.X‖².re` and `‖χ‖² = 1`.
-    have hXre : (ClassFunction.inner D.X D.X).re = 1 := by rw [← hXnorm, hχχ]; simp
-    rw [inner_self_re_cast D.X, hXre]; exact Complex.ofReal_one
-  · -- `D.Y = D'.X`: both norm `1`, and `‖D.Y − D'.X‖².re = 0`.
-    have hDY1 : (ClassFunction.inner D.Y D.Y).re = 1 := by rw [← hYnorm, hζζ]; simp
-    have hDX'1 : (ClassFunction.inner D'.X D'.X).re = 1 := by
-      have hnn := inner_self_re_nonneg (D.Y - D'.X)
-      rw [hdiffre] at hnn; linarith
+  · -- `‖D.X‖² = ‖χ‖²` (ℂ): the real parts agree and both inner products are real.
+    rw [inner_self_re_cast D.X, ← hXnorm]
+    exact (inner_self_re_cast χ).symm
+  · -- `D.Y = D'.X`: `‖ζ‖².re = ‖D.Y‖².re` and `‖ζ‖².re ≤ ‖D'.X‖².re ≤ ‖D.Y‖².re` pin all three
+    -- equal, so `‖D.Y − D'.X‖².re = 0`.
     have hdz : D.Y - D'.X = 0 := by
       apply eq_zero_of_inner_self_re_eq_zero
-      rw [hdiffre, hDY1, hDX'1]; ring
+      rw [hdiffre]; linarith
     exact sub_eq_zero.mp hdz
 
 /-- `⟨D.X, w⟩ = 0` when `w ⊥ R(χ)` (`w` orthogonal to every member of the image family).  The
@@ -416,69 +411,65 @@ noncomputable def commonImage (hyp : Hypothesis (L := L) (G := G) S A)
 /-- The two-sided norm facts for `pairDecomp'`: `‖D.X‖² = 1` and `D.Y = D'.X` (the symmetric
 decomposition), from `pairDecomp_two_sided`. -/
 theorem pairDecomp'_two_sided (hyp : Hypothesis (L := L) (G := G) S A)
-    (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
     (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ ζ : ClassFunction L ℂ} (h : DiffPair χ ζ) (hχ : χ ∈ S) (hζ : ζ ∈ S) :
     ClassFunction.inner (pairDecomp' hyp hsuppdiff h hχ hζ (hZIrr χ hχ ζ hζ)).X
-        (pairDecomp' hyp hsuppdiff h hχ hζ (hZIrr χ hχ ζ hζ)).X = 1 ∧
+        (pairDecomp' hyp hsuppdiff h hχ hζ (hZIrr χ hχ ζ hζ)).X = ClassFunction.inner χ χ ∧
       (pairDecomp' hyp hsuppdiff h hχ hζ (hZIrr χ hχ ζ hζ)).Y =
         (pairDecomp' hyp hsuppdiff h.symm hζ hχ (hZIrr ζ hζ χ hχ)).X :=
   pairDecomp_two_sided (pairDecomp' hyp hsuppdiff h hχ hζ (hZIrr χ hχ ζ hζ))
     (pairDecomp' hyp hsuppdiff h.symm hζ hχ (hZIrr ζ hζ χ hχ))
-    (hirr χ hχ) (hirr ζ hζ) (h.imageFam_orthogonal hyp hχ hζ)
+    (h.imageFam_orthogonal hyp hχ hζ)
     (pairDecomp'_image hyp hsuppdiff h hχ hζ (hZIrr χ hχ ζ hζ))
     (pairDecomp'_image hyp hsuppdiff h.symm hζ hχ (hZIrr ζ hζ χ hχ))
 
 /-- **(5.7) fact (A): `‖β‖² = 1`.** -/
 theorem commonImage_self (hyp : Hypothesis (L := L) (G := G) S A)
-    (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
     (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S) :
     ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀)
-      (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀) = 1 :=
-  (pairDecomp'_two_sided hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀).1
+      (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀) = ClassFunction.inner χ₀ χ₀ :=
+  (pairDecomp'_two_sided hyp hZIrr hsuppdiff hdp hχ₀ hζ₀).1
 
 /-- **(5.7) fact (B) at the reference `ζ₀`: `⟨β, (χ₀ − ζ₀)^τ⟩ = 1`.**  `= ⟨D₀.X, D₀.X − D₀.Y⟩ =
 ‖D₀.X‖² − 0`. -/
 theorem commonImage_inner_ref (hyp : Hypothesis (L := L) (G := G) S A)
-    (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
     (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S) :
-    ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀) (hyp.tau (χ₀ - ζ₀)) = 1 := by
+    ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀) (hyp.tau (χ₀ - ζ₀)) =
+      ClassFunction.inner χ₀ χ₀ := by
   rw [commonImage, pairDecomp'_image hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀),
     ClassFunction.inner_sub_right,
     (pairDecomp' hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀)).inner_X_Y,
-    sub_zero, (pairDecomp'_two_sided hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀).1]
+    sub_zero, (pairDecomp'_two_sided hyp hZIrr hsuppdiff hdp hχ₀ hζ₀).1]
 
 /-- **(5.7) fact (B) at `χ̄₀`: `⟨β, (χ₀ − χ̄₀)^τ⟩ = 1`.**  `(χ₀ − χ̄₀)^τ = ∑_{R(χ₀)} α`, and
 `⟨β, ∑ α⟩ = ∑ coeff = ‖χ₀‖² = 1` (the keystone). -/
 theorem commonImage_inner_conj (hyp : Hypothesis (L := L) (G := G) S A)
-    (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
     (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S) :
     ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀)
-      (hyp.tau (χ₀ - χ₀.conj)) = 1 := by
+      (hyp.tau (χ₀ - χ₀.conj)) = ClassFunction.inner χ₀ χ₀ := by
   rw [commonImage]
   set D₀ := pairDecomp' hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀) with hD₀
-  rw [D₀.imageFamily.image_eq, D₀.inner_X_sum, ← D₀.inner_self_chi_eq_sum_coeff, hirr χ₀ hχ₀]
+  rw [D₀.imageFamily.image_eq, D₀.inner_X_sum, ← D₀.inner_self_chi_eq_sum_coeff]
 
 /-- **(5.7) fact (B) at `ζ̄₀`: `⟨β, (χ₀ − ζ̄₀)^τ⟩ = 1`.**
 `(χ₀ − ζ̄₀)^τ = (χ₀ − ζ₀)^τ + (ζ₀ − ζ̄₀)^τ`;
 the first gives `1` (reference), the second is `∑_{R(ζ₀)} α ⊥ R(χ₀)`. -/
 theorem commonImage_inner_refconj (hyp : Hypothesis (L := L) (G := G) S A)
-    (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
     (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S) :
     ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀)
-      (hyp.tau (χ₀ - ζ₀.conj)) = 1 := by
+      (hyp.tau (χ₀ - ζ₀.conj)) = ClassFunction.inner χ₀ χ₀ := by
   have hsplit : χ₀ - ζ₀.conj = (χ₀ - ζ₀) + (ζ₀ - ζ₀.conj) := by abel
   rw [hsplit, map_add, ClassFunction.inner_add_right,
-    commonImage_inner_ref hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀, commonImage,
+    commonImage_inner_ref hyp hZIrr hsuppdiff hdp hχ₀ hζ₀, commonImage,
     (imageFam hyp hζ₀).image_eq,
     inner_X_sum_imageFam_eq_zero (pairDecomp' hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀))
       (imageFam hyp hζ₀) (hdp.imageFam_orthogonal hyp hχ₀ hζ₀), add_zero]
@@ -489,13 +480,12 @@ terms
 vanishing because `R(χ₀) ⊥ R(ζ)`, `R(χ₀) ⊥ R(ζ₀)` and `D₀.Y, Dζ.Y` lie in `R(ζ₀)`, `R(ζ)` (different
 pairs, `pairDecomp_two_sided`). -/
 theorem commonImage_inner_other (hyp : Hypothesis (L := L) (G := G) S A)
-    (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
     (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ ζ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S)
     (hζ : ζ ∈ S) (hdpχ : DiffPair χ₀ ζ) (hdpζ : DiffPair ζ₀ ζ) :
     ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀)
-      (hyp.tau (χ₀ - ζ)) = 1 := by
+      (hyp.tau (χ₀ - ζ)) = ClassFunction.inner χ₀ χ₀ := by
   rw [commonImage, pairDecomp'_image hyp hsuppdiff hdpχ hχ₀ hζ (hZIrr χ₀ hχ₀ ζ hζ),
     ClassFunction.inner_sub_right]
   set D₀ := pairDecomp' hyp hsuppdiff hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀) with hD₀
@@ -514,13 +504,13 @@ theorem commonImage_inner_other (hyp : Hypothesis (L := L) (G := G) S A)
   have hYX : ClassFunction.inner D₀.Y Dζ.X = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, inner_X_perp Dζ D₀.Y_orthogonal, star_zero]
   have hYY : ClassFunction.inner D₀.Y Dζ.Y = 0 := by
-    rw [(pairDecomp'_two_sided hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀).2,
-      (pairDecomp'_two_sided hyp hirr hZIrr hsuppdiff hdpχ hχ₀ hζ).2]
+    rw [(pairDecomp'_two_sided hyp hZIrr hsuppdiff hdp hχ₀ hζ₀).2,
+      (pairDecomp'_two_sided hyp hZIrr hsuppdiff hdpχ hχ₀ hζ).2]
     exact inner_X_X'_eq_zero _ _ (hdpζ.imageFam_orthogonal hyp hζ₀ hζ)
   -- the right-hand side `⟨χ₀−ζ₀, χ₀−ζ⟩ = 1`.
-  have hLHS : ClassFunction.inner (χ₀ - ζ₀) (χ₀ - ζ) = 1 := by
+  have hLHS : ClassFunction.inner (χ₀ - ζ₀) (χ₀ - ζ) = ClassFunction.inner χ₀ χ₀ := by
     rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
-      hirr χ₀ hχ₀, hdpχ.inner_eq_zero hyp hχ₀ hζ, hdp.symm.inner_eq_zero hyp hζ₀ hχ₀,
+      hdpχ.inner_eq_zero hyp hχ₀ hζ, hdp.symm.inner_eq_zero hyp hζ₀ hχ₀,
       hdpζ.inner_eq_zero hyp hζ₀ hζ]
     ring
   rw [hLHS, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
@@ -529,24 +519,23 @@ theorem commonImage_inner_other (hyp : Hypothesis (L := L) (G := G) S A)
 
 /-- **Peterfalvi (5.7) fact (B), dispatcher: `⟨β, (χ₀ − ζ)^τ⟩ = 1` for every member `ζ ≠ χ₀`.** -/
 theorem commonImage_inner (hyp : Hypothesis (L := L) (G := G) S A)
-    (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
     (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
     (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A)
     {χ₀ ζ₀ : ClassFunction L ℂ} (hdp : DiffPair χ₀ ζ₀) (hχ₀ : χ₀ ∈ S) (hζ₀ : ζ₀ ∈ S)
     {ζ : ClassFunction L ℂ} (hζ : ζ ∈ S) (hζne : ζ ≠ χ₀) :
     ClassFunction.inner (commonImage hyp hZIrr hsuppdiff hdp hχ₀ hζ₀)
-      (hyp.tau (χ₀ - ζ)) = 1 := by
+      (hyp.tau (χ₀ - ζ)) = ClassFunction.inner χ₀ χ₀ := by
   by_cases hc1 : ζ = χ₀.conj
-  · rw [hc1]; exact commonImage_inner_conj hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀
+  · rw [hc1]; exact commonImage_inner_conj hyp hZIrr hsuppdiff hdp hχ₀ hζ₀
   have hdpχ : DiffPair χ₀ ζ :=
     ⟨hζne.symm, fun h => hc1 (by rw [← ClassFunction.conj_conj ζ, ← h])⟩
   by_cases hc2 : ζ = ζ₀
-  · rw [hc2]; exact commonImage_inner_ref hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀
+  · rw [hc2]; exact commonImage_inner_ref hyp hZIrr hsuppdiff hdp hχ₀ hζ₀
   by_cases hc3 : ζ = ζ₀.conj
-  · rw [hc3]; exact commonImage_inner_refconj hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀
+  · rw [hc3]; exact commonImage_inner_refconj hyp hZIrr hsuppdiff hdp hχ₀ hζ₀
   have hdpζ : DiffPair ζ₀ ζ :=
     ⟨fun h => hc2 h.symm, fun h => hc3 (by rw [h, ClassFunction.conj_conj] : ζ₀.conj = ζ).symm⟩
-  exact commonImage_inner_other hyp hirr hZIrr hsuppdiff hdp hχ₀ hζ₀ hζ hdpχ hdpζ
+  exact commonImage_inner_other hyp hZIrr hsuppdiff hdp hχ₀ hζ₀ hζ hdpχ hdpζ
 
 /-- **(5.7) the retargeted family is an isometric image of the source.**  For the auxiliary isometry
 `τ₁` of (5.7) given by `χⱼ^{τ₁} = X j := β − (χ₀ − χⱼ)^τ` (`χ₀ := χ 0`, `β = χ₀^{τ₁}`), one has
@@ -564,20 +553,21 @@ theorem xFamily_inner {τ : IntegralCharacterMap L G} {n : ℕ} [NeZero n]
     (β : ClassFunction G ℂ)
     (hdiff : ∀ i j, ClassFunction.inner (τ (χ 0 - χ i)) (τ (χ 0 - χ j))
       = ClassFunction.inner (χ 0 - χ i) (χ 0 - χ j))
-    (hββ : ClassFunction.inner β β = 1)
-    (hB : ∀ j, ClassFunction.inner β (τ (χ 0 - χ j)) = 1 - ClassFunction.inner (χ 0) (χ j))
+    (hββ : ClassFunction.inner β β = ClassFunction.inner (χ 0) (χ 0))
+    (hB : ∀ j, ClassFunction.inner β (τ (χ 0 - χ j))
+      = ClassFunction.inner (χ 0) (χ 0) - ClassFunction.inner (χ 0) (χ j))
     (i j : Fin n) :
     ClassFunction.inner (β - τ (χ 0 - χ i)) (β - τ (χ 0 - χ j))
       = ClassFunction.inner (χ i) (χ j) := by
-  have hχ00 : ClassFunction.inner (χ 0) (χ 0) = 1 := by
-    have h := hB 0; rw [sub_self, map_zero, ClassFunction.inner_zero_right] at h
-    linear_combination h
-  have hai : ClassFunction.inner (τ (χ 0 - χ i)) β = 1 - ClassFunction.inner (χ i) (χ 0) := by
-    rw [OddOrder.RepresentationTheory.inner_conj_symm, hB i, star_sub, star_one,
+  have hcstar : star (ClassFunction.inner (χ 0) (χ 0)) = ClassFunction.inner (χ 0) (χ 0) :=
+    (OddOrder.RepresentationTheory.inner_conj_symm (χ 0) (χ 0)).symm
+  have hai : ClassFunction.inner (τ (χ 0 - χ i)) β
+      = ClassFunction.inner (χ 0) (χ 0) - ClassFunction.inner (χ i) (χ 0) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hB i, star_sub, hcstar,
       ← OddOrder.RepresentationTheory.inner_conj_symm]
   rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
     hββ, hB j, hai, hdiff i j, ClassFunction.inner_sub_left,
-    ClassFunction.inner_sub_right, ClassFunction.inner_sub_right, hχ00]
+    ClassFunction.inner_sub_right, ClassFunction.inner_sub_right]
   ring
 
 /-- `D.X ∈ ℤ[Irr G]` (`X = ∑_{R(χ)} coeff α • α`, each `α ∈ ℤ[Irr G]`). -/
@@ -649,11 +639,11 @@ theorem coherent_of_constant_degree
     set X : Fin n → ClassFunction G ℂ := fun j => β - hyp.tau (χ 0 - χ j) with hXdef
     -- the uniform form of (B): `⟨β, (χ₀ − χⱼ)^τ⟩ = 1 − ⟨χ₀, χⱼ⟩`.
     have hB : ∀ j, ClassFunction.inner β (hyp.tau (χ 0 - χ j))
-        = 1 - ClassFunction.inner (χ 0) (χ j) := by
+        = ClassFunction.inner (χ 0) (χ 0) - ClassFunction.inner (χ 0) (χ j) := by
       intro j
       by_cases hj : χ j = χ 0
-      · rw [hj, sub_self, map_zero, ClassFunction.inner_zero_right, hirr (χ 0) (hmem 0)]; ring
-      · rw [hβdef, commonImage_inner hyp hirr hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S (hmem j) hj,
+      · rw [hj, sub_self, map_zero, ClassFunction.inner_zero_right]; ring
+      · rw [hβdef, commonImage_inner hyp hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S (hmem j) hj,
           hyp.pairwise_orthogonal (hmem 0) (hmem j) (Ne.symm hj)]; ring
     have horthχ : ∀ i j, ClassFunction.inner (χ i) (χ j) = if i = j then (1 : ℂ) else 0 := by
       intro i j
@@ -669,7 +659,7 @@ theorem coherent_of_constant_degree
           xFamily_inner χ β (fun p q =>
               hyp.tau_isometry_memberDiff (hmem 0) (hmem p) (hmem 0) (hmem q)
                 (hsuppdiff _ (hmem 0) _ (hmem p)) (hsuppdiff _ (hmem 0) _ (hmem q)))
-            (commonImage_self hyp hirr hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S) hB i j]
+            (commonImage_self hyp hZIrr hsuppdiff hdp0 (hmem 0) hζ₀S) hB i j]
         exact horthχ i j
       · -- `himg`: `(χⱼ − χ₀)^τ = Xⱼ − X₀`.
         intro j
