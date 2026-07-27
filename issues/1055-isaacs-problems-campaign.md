@@ -3877,3 +3877,63 @@ Isaacs 本文 p.202 の定義と一致; `maxElemAbelianIn_nonempty` あり)。
 道具: `Subgroup.coe_mul_of_right_le_normalizer_left (N H) (H ≤ normalizer N) : ↑(N ⊔ H) = ↑N * ↑H`
 (mathlib) / `Ch01.card_mul_card_inf (H K) : |HK| · |H ⊓ K| = |H| · |K|`
 (`OddOrder/Isaacs/Ch01_Sylow/Problems.lean:225`) / `Subgroup.maxElemAbelianIn`。
+
+### 🎉 7A.6 完成 (2026-07-27) — §7A 完済 (6/6)
+
+`Problems7A6.lean` (221 行, axiom-clean)。書籍の「極大部分群の分類」を経由せず,
+**元の位数だけ**で `⟨a⟩` の保存を出す短い証明:
+
+* `mulAut_eq_one_of_pow_prime_eq_one` (`m ≥ 2`, すなわち `|Q| ≥ 16`):
+  `orderOf (xa i) = 4 < 2^{m+1} = orderOf (a 1)` ⟹ `σ (a 1) = a j` ⟹
+  `σ^k (a i) = a (i j^k)` ⟹ `j^p = 1`; `(ZMod 2^{m+1})ˣ` は位数 `2^m` ゆえ `j = 1`;
+  つづいて `σ (xa i) = xa (t+i)`, `p t = 0`, `p` は単元 ⟹ `t = 0` ⟹ `σ = 1`。
+* `eq_three_and_card_eq_eight_of_odd_prime_dvd_card_mulAut`: Cauchy + 上 ⟹ `m = 1`;
+  `Q₈` は既存 `OddOrder.GroupTheory.card_dvd_three_of_odd_mulAutQuaternion` で `p = 3`。
+
+Lean 実務メモ: `2^1` と `2` は defeq だが `rw` は syntactic → `Q₈` 側補題に渡す前に
+`∃ τ : MulAut (QuaternionGroup 2), orderOf τ = p := ⟨σ, hσ⟩` で型を張り替える。
+`rw [← hcard]` は `u : (ZMod (2*2^m))ˣ` の型に `2^m` が出るので motive 不整合
+(`rw [hcard] at h` 方向にする)。`isUnit_of_mul_eq_one` は現存せず `IsUnit.of_mul_eq_one`。
+
+## Ch.7 §7C — 問題一覧 (書籍 p. 210)
+
+§7B には Problems 節が無い (実測: `Problems 7A` の次の見出しは `Problems 7C`)。
+§7C は **7C.1 の 1 問のみ**。
+
+| # | 主張 | 見込みの道具 |
+|---|---|---|
+| 7C.1 | (Thompson) `P ∈ Syl_p(G)`, `p ≠ 2` で **`P` の任意の characteristic 部分群 `X` について `N_G(X)/C_G(X)` が `p`-群** なら `G` は normal `p`-complement をもつ | Thm 6.23 (repo 済) + Thm 5.13 Burnside (repo 済) + `|G|` の帰納法 |
+
+### 7C.1 の証明設計 (2026-07-27、全ステップ検算済)
+
+**最小反例** `G` (`p` 奇, 仮説成立, normal `p`-complement 無し) を取る。`P ≠ ⊥` (でなければ
+`G` 自身が complement)。
+
+* **Case A**: `P` の非自明 characteristic 部分群で `G` に正規なものが**無い**とき。
+  すべての非自明 char `X ≤ P` で `N_G(X) < G`。`N := N_G(X)` は `P ≤ N` ゆえ
+  `P ∈ Syl_p(N)` で, 任意の char `Y ≤ P` について
+  `N_N(Y)/C_N(Y) ↪ N_G(Y)/C_G(Y)` (`N_N(Y) = N_G(Y) ⊓ N`, `C_N(Y) = C_G(Y) ⊓ N`) は
+  `p`-群 ⟹ 仮説が遺伝 ⟹ 最小性で `N` は normal `p`-complement をもつ。
+  **Thm 6.23** (`hasNormalPComplement_of_forall_characteristic_normalizer`,
+  `Ch06_FrobeniusActions/ThompsonPComplement.lean:55`, 無条件) で `G` も持つ — 矛盾。
+* **Case B**: 非自明 char `X₀ ≤ P` で `X₀ ⊴ G` があるとき。`X := Ω₁(Z(X₀))` に取り替える
+  (char in `X₀` char in `P` ⟹ char in `P`; `X₀ ⊴ G` ゆえ `X ⊴ G`; **可換**で非自明)。
+  1. `X` 可換 ⟹ `X ≤ C := C_G(X)` かつ `X ≤ Z(C)`。仮説より `G/C` は `p`-群。
+  2. **`Ḡ := G/X` に仮説が遺伝**する: `X` char in `P` ゆえ `P/X` の char 部分群 `Ȳ` の
+     引き戻し `Y` は `P` の char 部分群 (`P` の自己同型は `X` を保つので `P/X` に降りる);
+     `N_{Ḡ}(Ȳ) = N_G(Y)/X` (`X ≤ Y` と `X ⊴ G` から `gYg⁻¹X = Y ⟺ gYg⁻¹ = Y`);
+     `N_{Ḡ}(Ȳ)/C_{Ḡ}(Ȳ)` は `N_G(Y)/C_G(Y)` (= `p`-群) の商 ⟹ `p`-群。
+     ⟹ 最小性で `Ḡ` は normal `p`-complement `K/X` をもつ (`X ≤ K ⊴ G`, `K/X` は `p'`-群)。
+  3. **`K ≤ C`**: `K/(K ⊓ C) ≅ KC/C ≤ G/C` は `p`-群, 同時に `X ≤ K ⊓ C` ゆえ
+     `K/(K ⊓ C)` は `K/X` (`p'`-群) の商で `p'`-群 ⟹ 自明 ⟹ `K ≤ C`。
+  4. ⟹ `X ≤ Z(K)` かつ `X ∈ Syl_p(K)` ⟹ **Thm 5.13 Burnside**
+     (`hasNormalPComplement_of_sylow_normalizer_le_centralizer`,
+     `Ch05_Transfer/Basic.lean:492`) で `K` は normal `p`-complement `M` をもつ。
+     `M` は `K` の characteristic (一意な `O_{p'}(K)`) で `K ⊴ G` ⟹ `M ⊴ G`;
+     `|M|` は `p'`, `[G:M] = [G:K][K:M]` は `p`-冪 ⟹ `M` は `G` の normal `p`-complement
+     — 矛盾。
+
+⟹ 必要な新規部品: (a) 仮説の部分群/商への遺伝補題 2 本, (b) `Ω₁(Z(·))` の characteristic
+連鎖, (c) normal `p`-complement の「正規部分群から持ち上げ」補題
+(`M ⊴ G`, `|M|` が `p'`, `[G:M]` が `p`-冪 ⟹ `HasNormalPComplement p G`),
+(d) 最小反例の帰納の骨組み。規模は数百行〜1000 行規模の見込み。
