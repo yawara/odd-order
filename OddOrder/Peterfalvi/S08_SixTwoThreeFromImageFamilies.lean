@@ -153,7 +153,7 @@ consumer by the certain-type column family of (5.3.b)/(4.9)
 (`S12.Hypothesis.inducedFamilyImageData`).  Arguments that only ever touch *irreducible* members
 (e.g. the (6.6) coherence half, whose `𝒳 ⊆ Irr L`) should take `InducedFamilyTauData` instead and
 build `R(χ)` through `characterDifferenceImage_of_irreducible` +
-`CharacterDifferenceImage.toOrthonormalFamily` (issue 0156). -/
+`CharacterDifferenceImage.toOrthonormalImage` (`S07_Coherence/DifferenceImage`). -/
 structure InducedFamilyImageData (A₀ : Set ↥L)
     (K : Subgroup ↥L) [Invertible (Nat.card ↥K : ℂ)]
     extends InducedFamilyTauData (G := G) A₀ K where
