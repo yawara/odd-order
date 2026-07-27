@@ -32,8 +32,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.3 Split Extensions
 - [ ] Ch.4 Commutators
 - [x] Ch.5 Transfer — **🎉 完済 (2026-07-27)**: §5A–§5E 全問
-- [ ] Ch.6 Frobenius Actions — **着手 (2026-07-27)**: §6A 進行中
-- [ ] Ch.7 Thompson Subgroup
+- [x] Ch.6 Frobenius Actions — **🎉 完済 (2026-07-27)**: §6A (11 問) / §6B (9 問) / §6C (2 問) 全問
+- [ ] Ch.7 Thompson Subgroup — **次の frontier (2026-07-27)**
 - [ ] Ch.8 Permutation Groups
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
@@ -3435,3 +3435,154 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
   * 非冪零は `Z(G) = ⊥` + mathlib `Group.IsNilpotent.center_ne_bot`。
     `Z(G) = ⊥` は「`x.right` が `V` を固定 ⟹ 作用の固定点自由性で `x.right = 1`、
     その後 `bAut x.left = x.left` ⟹ `x.left = 1`」。
+
+* ✅ **6C.2(a)** 完了 (`Problems6C2.lean`, 新 leaf, `OddOrder.lean` 配線済, axiom-clean):
+  `exists_family_nilpotent_subgroups_of_card_prime_sq` = 位数 `p²` の elementary abelian
+  `A` が非冪零 `N` に作用し `C_N(A) = 1` なら、非自明冪零部分群が `p + 1` 個あり
+  どの 2 つの交わりも自明。
+  * 支持: `exists_family_subgroups_card_prime` = elementary abelian `p²` の位数 `p` の
+    部分群を `p + 1` 個構成 (`⟨x y^k⟩` (k < p) と `⟨y⟩`; 相異性は
+    `zpow_mul_zpow_eq_one_of_eq` + `eq_zero_of_zpow_mul_zpow_eq_one` の指数一意性から、
+    「相異なる位数 `p` の 2 部分群は `⊔` で全体」は位数の割り切りで)。
+  * `fixedSubgroup B` (= `C_N(B)`) を定義。素数位数 `B` では「非自明元 1 つが固定 =
+    `B` 全体が固定」(`mem_fixedSubgroup_of_smul_eq`)。
+  * `K i = C_N(B i)`: 非自明 (さもなくば `B i` の作用が Frobenius で Thm 6.24 から `N`
+    冪零)、冪零 (`j ≠ i` で `B j` が `K i` に Frobenius 作用 —
+    `IsFrobeniusAction.invariantSubgroupMulDistribMulAction` で target 制限)、
+    交わり自明 (`B i ⊔ B j = ⊤` と `C_N(A) = 1`)。
+* ⏳ **6C.2(b)** 残り: `Q_i = K_i` の Sylow `q`-部分群、`X = ⟨Q_i⟩` が `Syl_q(N)` に入る。
+  hint = `A`-不変 Sylow `q`-部分群 `Q` を取り `X ≤ Q`; `X < Q` なら `A`-不変な
+  `X ≤ Y < Q` を作り `A` の `Q/Y` への作用が Frobenius になることを示す。
+
+#### 6C.2(b) 進捗 (2026-07-27): 互いに素性の補題を実証明 + 使うインフラの所在確定
+
+* ✅ `not_dvd_card_of_fixedFree_of_isPGroup` (`Problems6C2.lean`): **`p`-群 `A` が `C_N(A) = 1`
+  で作用すれば `p ∤ |N|`**。`p ∣ |N|` なら `|Syl_p(N)| ≡ 1 (mod p)` + `A` が `p`-群 ⟹
+  `A`-不変 Sylow `p`-部分群 `P` があり (`IsPGroup.card_modEq_card_fixedPoints` を
+  `Sylow p N` に適用)、`A` の `↥P` への作用でも固定点の個数 ≡ `|P|` ≡ 0 (mod p) なので
+  単位元以外の固定点が出て矛盾。⟹ **(b) で要る coprime 仮説は (a) の仮説から導ける**
+  (書籍が言わない仮説を足す必要がない = 特殊化債務なし)。
+* 使うインフラ (所在確定済、いずれも `OddOrder.Isaacs.Ch04.*` = 書籍順で上流):
+  * `exists_aInvariant_sylow` (Thm 3.23(a))、`aInvariant_sylow_conj` (3.23(b)) —
+    仮説は `Coprime (card A) (card G)` + `IsSolvable A ∨ IsSolvable G` (A は elementary
+    abelian ゆえ可解で OK、`N` の可解性は不要)。
+  * `aInvariant_pSubgroup_le_aInvariant_sylow` (Cor 3.25) = A-不変 q-部分群は A-不変 Sylow に入る。
+  * `coprime_fixedPoints_quotient_of_coprime_normal` (Cor 3.28) = 商の固定点は底の固定点像。
+* 残りの筋: `Q_i` = 冪零 `K_i` の唯一の Sylow `q` (⟹ `K_i` で characteristic ⟹ A-不変)、
+  `X = ⨆ Q_i` は A-不変 q-部分群なので A-不変 Sylow `q` の `Q` に入る (Cor 3.25)。
+  `X < Q` なら `Y := X ⊔ Φ(Q)` が `Q` で正規・A-不変・真 (Frattini) で、
+  Cor 3.28 から `C_{Q/Y}(A_i) = C_Q(A_i)Y/Y = 1` (∵ `C_Q(A_i) ≤ Q_i ≤ X`) ⟹ `A` の
+  `Q/Y` 作用が Frobenius ⟹ Thm 6.9 elementary-abelian 分岐
+  (`false_of_frobeniusAction_actorSubgroup_isElementaryAbelian_card_prime_sq_of_finite_target`)
+  で矛盾。
+
+* ✅ 6C.2(b) 部品 2 本 (2026-07-27):
+  * `exists_max_qSubgroup_le_of_isNilpotent`: `↥K` 冪零なら `K` の `q`-部分群を全て含む
+    `q`-部分群 `Q ≤ K` がある (冪零 ⟹ `NormalizerCondition` ⟹ Sylow 正規 ⟹
+    `Sylow.unique_of_normal` で一意 ⟹ `IsPGroup.exists_le_sylow` で全部入る)。
+    ⟹ これが書籍の「`K_i` の唯一の Sylow `q`-部分群 `Q_i`」。
+  * `smul_mem_of_max_qSubgroup`: `K` が `A`-不変なら最大 `q`-部分群 `Q` も `A`-不変
+    (`a • Q` も `K` の `q`-部分群なので最大性で `a • Q ≤ Q`; `Subgroup.pointwise_smul_def`
+    で `map` に直して `IsPGroup.map`)。
+  * 次: `X = ⨆ i, Q i` が `A`-不変 q-部分群 ⟹ Cor 3.25 で `A`-不変 Sylow `q` の `Q` に入り、
+    `X < Q` から `Y = X ⊔ Φ(Q)` で矛盾を出す段 (Cor 3.28 + Thm 6.9 elem-abelian 分岐)。
+
+* ✅ 6C.2(b) 橋渡し 2 本: `isAInvariant_of_smul_mem` / `smul_mem_of_isAInvariant`
+  (`MulDistribMulAction` の元ごとの不変性 ⟺ Ch.3/Ch.4 の `IsAInvariant φ H`
+  (`φ = MulDistribMulAction.toMulAut A N`); 逆向きは `a⁻¹ • x` を取るだけ)。
+  `Problems6C2.lean` は `OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03` を import。
+  ⟹ 次 iteration で Cor 3.25 (`aInvariant_pSubgroup_le_aInvariant_sylow`) と
+  3.23(b) (`aInvariant_sylow_conj` + `C_N(A) = 1` ⟹ A-不変 Sylow q は一意) を使って
+  各 `Q i ≤ Q`、したがって `X = ⨆ Q i ≤ Q` を出す。
+
+* ✅ 6C.2(b) 一意性 2 本: `aInvariant_sylow_unique` (`C_N(A) = 1` なら A-不変 Sylow `q` は
+  一意 — 3.23(b) の共役元 `c` が `C_N(A)` に入るので `c = 1`) /
+  `le_sylow_of_aInvariant_qSubgroup` (A-不変 `q`-部分群は Cor 3.25 で A-不変 Sylow に入り、
+  一意性でその Sylow は目的の `S` に一致)。
+  ⟹ これで各 `Q i ≤ S` が出るので `X = ⨆ Q i ≤ S` は `iSup_le` で即。
+  残りは **`X < S` からの矛盾** (`Y = X ⊔ Φ(S)` は `S` で正規・A-不変・真、
+  Cor 3.28 で `C_{S/Y}(B i) = 1` ⟹ `A` の `S/Y` 作用が Frobenius ⟹ Thm 6.9
+  elementary-abelian 分岐) の段のみ。
+
+* ⭐ **6C.2(b) 主定理 `exists_sylow_eq_iSup_maxQSubgroup` 実証明 (2026-07-27, axiom-clean)**:
+  位数 `p` の部分群 `D ≤ A` ごとに `K_D = C_N(D)` の最大 `q`-部分群 `Q_D` を取ると
+  `⨆_D Q_D` はある Sylow `q`-部分群にちょうど一致する。
+  * `X ≤ S`: `A`-不変 Sylow `q` は一意 (`aInvariant_sylow_unique`)、各 `Q_D` は
+    `A`-不変 `q`-部分群 (`smul_mem_of_max_qSubgroup` + `smul_mem_fixedSubgroup`) なので
+    `le_sylow_of_aInvariant_qSubgroup` で `S` に入る。
+  * `S ≤ X`: **書籍 hint の `Y = X ⊔ Φ(Q)` / `Q/Y` の Frobenius 化を経由せず、
+    §6B の Thm 6.21 (`nontrivialActionFixedByClosure_eq_top_of_not_isCyclic`) を直接使う**
+    (文書順は保たれる)。`a ≠ 1` に対し `S ⊓ C_N(⟨a⟩)` は `C_N(⟨a⟩)` の `q`-部分群なので
+    最大性で `Q_{⟨a⟩}` に入り、Thm 6.21 で `C_S(a)` たちが `S` を生成するから `S ≤ X`。
+  * 添字は「位数 `p` の部分群すべて」= subtype `{D // Nat.card D = p}` にした (これで
+    「ちょうど `p+1` 個」の counting を証明せずに書籍の `X = ⟨Q_1,…,Q_{p+1}⟩` を表現できる;
+    (a) が `p+1` 個の相異なるものを構成済み)。
+  * 補助: `smul_mem_fixedSubgroup` / `not_isCyclic_of_card_prime_sq` /
+    `coprime_card_of_fixedFree`。
+  * 残り (次 iteration): `K_D` の冪零性を (a) の証明から独立補題に切り出し、`Qf` を
+    仮説でなく内部で構成する完全自己完結版の corollary を付ける。
+
+* ⭐ **6C.2 完成 (2026-07-27)**: 自己完結版 `exists_maxQSubgroup_family_sylow_eq_iSup`
+  (axiom-clean) — 仮説は (a) と同じ (`A` elementary abelian `p²`・`C_N(A) = 1`) だけで、
+  `Q_D` の族は内部で構成する (`choose!`)。
+  * `isNilpotent_fixedSubgroup_of_card_prime` = (a) の核心 (位数 `p` の `D` に対し
+    `C_N(D)` は冪零) を単独補題に切り出し。`D` の外の `y` で `E = ⟨y⟩` を作り
+    `D ⊔ E = ⊤` から `E` の `C_N(D)` 作用が Frobenius ⟹ Thompson。
+    ⚠ `N` の非冪零性は不要 (それは (a) の `K_i ≠ 1` にだけ要る)。
+  * `sup_eq_top_of_card_prime` を独立補題として切り出し、(a) の族構成の局所 `have` も
+    これを呼ぶよう refactor (重複解消)。
+  * `Problems6C2.lean` = 727 行 (上限 1500 に余裕)。
+
+## 🎉 Ch.6 完済 (2026-07-27) — 次は Ch.7 Problems
+
+Ch.6 の演習は **§6A 6A.1–6A.11 / §6B 6B.1–6B.9 / §6C 6C.1–6C.2 の全 22 問**が実証明
+(すべて axiom-clean、各 leaf は `OddOrder.lean` 配線済)。本日追加した分:
+6B.8 (Taussky-Todd 主定理) / 6B.9 / 6C.1(a)(b) / 6C.2(a)(b)。
+
+次の frontier = **Ch.7 (Thompson Subgroup) の Problems** (文書順)。着手時は
+問題番号一覧を PDF ページ画像で確定してから (pdftotext は記号が壊れる)。
+
+## Ch.7 (Thompson Subgroup) §7A — 問題一覧 (書籍 pp. 209-210, pdftotext L10024-)
+
+⚠ statement は着手時に PDF ページ画像で再確認する (式・添字が pdftotext で壊れる)。
+
+| # | 主張 (要約) | 見込みの道具 |
+|---|---|---|
+| 7A.1 | 単純群の冪零な極大部分群は `2`-群 | **Thm 7.1** (Thompson の normal `p`-complement) + `Z(P)`/`J(P)` の正規化群が `M` に一致する議論 |
+| 7A.2 | `S = SL(2,3)`, `Z = {±I}` ⟹ `S/Z` (位数 12) は Sylow 3 が 4 個 ⟹ Sylow 2 が一意 ⟹ `S` に位数 8 の正規部分群 | `GL(n,q)` の Sylow `p` が 2 個以上 (本文既知) + Sylow 数え上げ |
+| 7A.3 | `G = GL(n,q)`, `P` = 上三角冪単, `D` = 対角 ⟹ (a) `D ≤ N_G(P)` (b) `DP` = 上三角全体 (c) `P`-不変部分空間は各次元にちょうど 1 つ (d) `N_G(P) = DP` | 行列計算 + `P`-不変部分空間の分類 |
+| 7A.4 | `SL(2,q)` と `PSL(2,q)` の Sylow `p` はちょうど `q + 1` 個 | Sylow 数え上げ (Borel の指数) |
+| 7A.5 | `P` `p`-群, `U ⊴ P` elementary abelian ⟹ `U` はある `E ∈ 𝓔(P)` を正規化 | `\|U ⊓ E\|` 最大の `E` を取る hint (書籍の証明あり) |
+| 7A.6 | 一般四元数 `Q` で `\|Aut(Q)\|` が奇素数 `p` で割れる ⟹ `p = 3` かつ `\|Q\| = 8`; ⟹ Lemma 7.3 / Thm 7.5 の「Sylow 2 が可換」仮説は `p > 3` では不要 | `Aut(Q_{2^n})` の位数 (2 冪 × 小さい因子) の計算 |
+
+文書順で **7A.1 から着手**。7A.1 は Thm 7.1 (repo の Ch07 に既存かを最初に grep で確認) と
+`J(P)`・`Z(P)` の repo API を使う。§7B は Problems 節が無く (次の Problems 見出しは 7C)、
+§7C の一覧は着手前に別途確認する。
+
+### ⚠ 7A.1 は Thm 7.1 の**無条件版**に gated (2026-07-27 実測)
+
+`OddOrder/Isaacs/Ch07_ThompsonSubgroup/S7B2_NormalJ_PComplement.lean:436`
+`thompson_normal_p_complement` は **条件付き** — 教科書 Thm 7.1 の仮説
+(「`C_G(Z(P))` と `N_G(J(P))` が normal `p`-complement を持つ」) に加えて
+
+* `IsPiSeparable {p} G`
+* 全 `2`-部分群が可換
+* `O_{p'}(G) = ⊥`
+* `C_G(Z(P)) = P`
+
+を要求する (docstring 自身が「残りは §7C Steps 1-6」と明記)。Steps 4-6 は
+`S7C_SylowMaximal` / `S7C_CentralizerCenter` / `S7C_AbelianQuotientComplement` に
+`hG : ¬ HasNormalPComplement p G` 付きの最小反例補題として在るが、**最小反例の帰納で
+これらを組み上げて無条件版にする段が無い**。Ch07 に sorry は 0 (= scaffold ではなく
+「まだ書かれていない」)。
+
+⟹ **7A.1 (単純群の冪零極大部分群は 2-群) は Thm 7.1 無条件版が前提**
+(証明: `M` 冪零極大 ⟹ 各 Sylow は `G` の Sylow で `M = N_G(P)`、`M ≤ C_G(Z(P))` と
+`M ≤ N_G(J(P))` がともに `M` に一致し `M = P × H` は normal `p`-complement を持つ ⟹
+Thm 7.1 で `G` が normal `p`-complement をもち単純性に矛盾)。
+
+**方針 (上流優先)**: Thm 7.1 の無条件版 (= §7C Steps 1-3 + 最小反例の組み上げ) は
+Isaacs の**番号付き結果**でありlane a の territory・かつ 7A.1 の上流なので、
+次 iteration からこれに着手する。7A.2-7A.6 は Thm 7.1 に依存しない
+(GL(n,q)/SL(2,q) の Sylow 数え上げ・`𝓔(P)`・`Aut(Q_{2^n})`) ので、Thm 7.1 が長引く場合の
+並行候補として残す。

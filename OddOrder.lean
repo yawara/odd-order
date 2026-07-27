@@ -254,6 +254,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B8Induction
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6B9
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6C1
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6C1Example
+import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6C2
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
