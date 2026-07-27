@@ -3420,3 +3420,18 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
   `α(v, c) = (A v, c⁻¹)` が自己同型になる条件は `A B A⁻¹ = B⁻¹` で、`A = 2σ`
   (`σ` = Frobenius `x ↦ x⁵` の行列 `[[1,-1],[0,-1]]`) が `A² = -I` (位数 4)・固有値 1 なし
   (⟹ 固定点は単位元のみ) を満たす。非冪零は「冪零なら Sylow 3 が正規 ⟹ 作用自明」で出る。
+
+* ✅ **6C.1(b)** 完了 (`Problems6C1Example.lean`, 新 leaf, `OddOrder.lean` 配線済,
+  axiom-clean): `exists_orderOf_four_mulAut_fixedFree_not_isNilpotent` =
+  `|G| = 75` ∧ `orderOf α = 4` ∧ `α` の固定点は単位元のみ ∧ `¬ IsNilpotent G`。
+  * `Kernel = Multiplicative ((ZMod 5)²)`, `bAut (x,y) = (-y, x-y)` (位数 3),
+    `aAut (x,y) = (2x-2y, -2y)` (`= 2σ`, `aAut² = -1`)。**関係式・固定点自由性・
+    位数はすべて `decide`** (25 元の有限計算) で確定 — `aAut * bAut = bAut⁻¹ * aAut`,
+    `aAut^4 = 1`, `(aAut*aAut) v = v⁻¹`, `bAut/aAut` の固定点は単位元のみ。
+  * `Group75 = Kernel ⋊[Complement.subtype] ⟨bAut⟩` (`SemidirectProduct`;
+    φ に部分群の包含をそのまま使うと「巡回群からの hom」を作らずに済む)。
+  * `α = SemidirectProduct.congr aAut complementInv _` (両側の compatibility は
+    `MulAut.conj aAut (bAut^m) = (bAut^m)⁻¹` を `map_zpow` で出す)。
+  * 非冪零は `Z(G) = ⊥` + mathlib `Group.IsNilpotent.center_ne_bot`。
+    `Z(G) = ⊥` は「`x.right` が `V` を固定 ⟹ 作用の固定点自由性で `x.right = 1`、
+    その後 `bAut x.left = x.left` ⟹ `x.left = 1`」。
