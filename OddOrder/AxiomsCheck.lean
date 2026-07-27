@@ -198,6 +198,7 @@ import OddOrder.Peterfalvi.S06_CertainTypeConjugation
 import OddOrder.Peterfalvi.S06_MuColumnBridge
 import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
 import OddOrder.Peterfalvi.S13_ColumnFamilyBridge
+import OddOrder.Peterfalvi.S06_CertainTypeColumnUniqueness
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S07_CoherenceGalois
@@ -13262,3 +13263,12 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.Peterfalvi.S12.certainTypeR_subsum_dichotomy
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S12.typeII_nu_tau2_dichotomy
+
+-- **Peterfalvi (5.8) の一意性 rider** (issue 0161, p.29): 列 `χ_ℓ` が `χ_k` とも `χ_k⁻¹` とも
+-- 異なり同次数の族 member を担うなら、`μ_k^{τ₁}` は正符号の完全 σ-grid 列 `δ_k ∑_i ω_{ik}^σ`
+-- (= 二分律の第 1 の場合)。書籍の rider はその対偶。
+-- 論法: R(μ_k) の元は `{k, j}` 列の符号つき σ-像ゆえ `χ_ℓ` 列と直交 ⟹ (4.9) の差分等式を
+-- `ω_{iℓ}^σ` と組むと `⟨ψ_ℓ, ω_{iℓ}^σ⟩ = δ` ⟹ `E_ℓ` が `w₁` 個の `δ·ω_{iℓ}^σ` を全部含み
+-- 濃度から一致 ⟹ 差分を戻すと `χ_ℓ` 列が相殺する。
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.subsum_eq_column_of_third_column

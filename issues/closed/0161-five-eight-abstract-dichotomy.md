@@ -161,3 +161,33 @@ pdftotext の壊れた行 (`ft - tf = 4£,(^ -«£)` 等) から復元を書い�
 
 ⚠ step 3 (抽象版を上流 leaf へ移設) は任意。現状 `S12_TypeIIColumnPin.lean` 内にあるが、
 型-II 依存はゼロなので S06/S07 側へ移せる。行数に余裕がなくなったら実施する。
+
+## ✅ step 4 完了 (2026-07-28) — 一意性 rider も landing、issue クローズ
+
+新 leaf [`S06_CertainTypeColumnUniqueness.lean`](../OddOrder/Peterfalvi/S06_CertainTypeColumnUniqueness.lean)
+に **`subsum_eq_column_of_third_column`**。survey が「直接の対応物なし」としていた部分。
+
+書籍の対偶形をそのまま述べる: 列 `χ_ℓ` が `χ_k` とも `χ_k⁻¹` とも異なり同次数の族 member を
+担うなら、`μ_k^{τ₁}` は**第 1 の場合** `δ_k ∑_i ω_{ik}^σ` になる。
+
+証明 (書籍 4 行の展開):
+
+1. `R(μ_k)` の元は `{k, j}` 列の符号つき σ-像ゆえ `χ_ℓ` 列全体と直交 ⟹ `⟨ψ_k, ω_{iℓ}^σ⟩ = 0`
+2. (4.9) の差分等式 (`dadeICM_columnDiff_eq_sum`) を `ω_{iℓ}^σ` と組んで `⟨ψ_ℓ, ω_{iℓ}^σ⟩ = δ`
+3. `ψ_ℓ` は `R(μ_ℓ)` の部分和で `ω_{iℓ}^σ` と当たるのは `δ·ω_{iℓ}^σ` だけ ⟹ `E_ℓ` は `w₁` 個の
+   `δ·ω_{iℓ}^σ` を全部含み、`|E_ℓ| = w₁` から一致 ⟹ `ψ_ℓ = δ ∑_i ω_{iℓ}^σ`
+4. 差分を戻すと `χ_ℓ` 列が相殺して `ψ_k = δ ∑_i ω_{ik}^σ`
+
+2 列の符号が一致するのは次数が一致するから (`certainType_columnSign_eq`)。
+
+⚠ 配置: rider は **S06 の部品しか使わない**ので、二分律 (S12_TypeIIColumnPin 内) より上流の
+新 leaf に置いた。187 行、sorry-free / axiom-clean、AxiomsCheck 登録済。
+
+## ⟹ issue 0161 クローズ
+
+書籍 (5.8) の**本体 (二分律) と rider の両方**が Hypothesis (4.6) 一般で landing した。
+survey の packaging gap から (5.8) が外れる。full build green (4878 jobs)、
+lint --strict clean、sorry 349 で非退行。
+
+残る任意タスク: `certainTypeR_subsum_dichotomy` を `S12_TypeIIColumnPin.lean` から上流 leaf へ
+移設 (型-II 依存はゼロなので機械的。ファイル行数に余裕がなくなったら実施)。
