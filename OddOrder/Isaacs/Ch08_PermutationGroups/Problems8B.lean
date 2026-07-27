@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Data.ZMod.Basic
 import Mathlib.GroupTheory.GroupAction.Blocks
 import Mathlib.GroupTheory.GroupAction.Primitive
 import OddOrder.Isaacs.Ch02_Subnormality.Basic
@@ -52,6 +53,9 @@ Isaacs の定義 (「`Δ` の translate は `Δ` 自身か, `Δ` と交わらな
   `index_subgroupOf_mul_card`, `relIndex_stabilizer_comm`,
   `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` —
   **Problem 8B.7**: 点安定化群が `Ω ∖ {α}` に長さ 3 の軌道をもてば `|G_α| = 3 · 2^e`。
+- `subset_of_isBlock_of_mem_of_notMem`, `exists_not_mem_iff_add_mem` —
+  **Problem 8B.8 への道具**: block が `S` の内外の点を同時に含めば `S` を丸ごと含むこと,
+  および `ZMod n` の先頭区間は非自明な平行移動で不変にならないこと。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -941,6 +945,54 @@ theorem card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three [Finite 
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨e, he⟩ := (isPGroup_two_of_oddCore_eq_bot hbot).exists_card_eq
   exact ⟨e, by rw [← hDcard, he]⟩
+
+/-! ### Problem 8B.8 — `n`-巡回と部分推移群が生成する群は原始的 -/
+
+/-- **8B.8 の Hint 後半**: block `Λ` が `S` の点と `S` 外の点を同時に含み, `H ≤ G` が
+`S` の外を各点固定して `S` 上に推移的なら, **`S ⊆ Λ`**。
+
+`H` の元は `Λ` の外側の点 `j` を固定するので `h • Λ` は `Λ` と交わり, block ゆえ
+`h • Λ = Λ`。したがって `Λ` は `H`-不変で, `S` 上の推移性から `S = H • i ⊆ Λ`。 -/
+lemma subset_of_isBlock_of_mem_of_notMem {Λ S : Set Ω} (hΛ : IsBlock G Λ) {H : Subgroup G}
+    (hfix : ∀ h ∈ H, ∀ γ ∉ S, h • γ = γ)
+    (htrans : ∀ γ ∈ S, ∀ δ ∈ S, ∃ h ∈ H, h • γ = δ)
+    {i j : Ω} (hi : i ∈ S) (hiΛ : i ∈ Λ) (hj : j ∉ S) (hjΛ : j ∈ Λ) : S ⊆ Λ := by
+  intro δ hδ
+  obtain ⟨h, hh, hhi⟩ := htrans i hi δ hδ
+  have hsm : h • Λ = Λ := hΛ.smul_eq_of_mem hjΛ (by rw [hfix h hh j hj]; exact hjΛ)
+  rw [← hhi, ← hsm]
+  exact Set.smul_mem_smul_set hiΛ
+
+/-- **8B.8 の Hint 前半の核**: `ZMod n` の「先頭区間」`{c | c.val < m}` (`1 ≤ m < n`) は
+`0` でない平行移動 `+d` で不変にならない。
+
+不変とすると `0` から `d.val < m`, `-1 ∉ S` から `(d-1).val ≥ m` が出るが,
+`d ≠ 0` なので `(d-1).val = d.val - 1 < m` で矛盾。 -/
+lemma exists_not_mem_iff_add_mem {n m : ℕ} [NeZero n] (hm : 1 ≤ m) (hmn : m < n)
+    {d : ZMod n} (hd : d ≠ 0) :
+    ¬ (∀ c : ZMod n, (c.val < m ↔ (c + d).val < m)) := by
+  intro hcon
+  have hn1 : 1 ≤ n := NeZero.one_le
+  have hdv : 1 ≤ d.val :=
+    Nat.one_le_iff_ne_zero.mpr fun h => hd ((ZMod.val_eq_zero d).mp h)
+  have hdlt : d.val < n := ZMod.val_lt d
+  have hcast : ((d.val : ℕ) : ZMod n) = d := ZMod.natCast_rightInverse d
+  -- `0 ∈ S` から `d ∈ S`。
+  have hd0 : d.val < m := by
+    have h0 : ((0 : ZMod n)).val < m := by rw [ZMod.val_zero]; omega
+    simpa using (hcon 0).mp h0
+  -- `-1 ∉ S` から `d - 1 ∉ S`。
+  have hnegval : ((-1 : ZMod n)).val = n - 1 := by
+    have heq : (-1 : ZMod n) = ((n - 1 : ℕ) : ZMod n) := by
+      rw [Nat.cast_sub hn1, ZMod.natCast_self, Nat.cast_one, zero_sub]
+    rw [heq, ZMod.val_natCast_of_lt (by omega)]
+  have hneg : ¬ (((-1 : ZMod n)).val < m) := by rw [hnegval]; omega
+  refine (fun h => hneg ((hcon (-1)).mpr h)) ?_
+  have hval : ((-1 : ZMod n) + d) = ((d.val - 1 : ℕ) : ZMod n) := by
+    rw [Nat.cast_sub hdv, hcast, Nat.cast_one]
+    ring
+  rw [hval, ZMod.val_natCast_of_lt (by omega)]
+  omega
 
 end
 
