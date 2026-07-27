@@ -33,6 +33,8 @@ set_option autoImplicit false
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
+open OddOrder.RepresentationTheory
+
 universe uG uΩ
 
 namespace Hypothesis
@@ -166,6 +168,51 @@ theorem QK_ne_H (hV : hyp.V ≠ ⊥) : hyp.QK ≠ hyp.H := by
   have hVQK : hyp.V ≤ hyp.QK := h ▸ (hyp.V_le_D.trans hyp.D_le_H)
   have hle : hyp.V ≤ hyp.QK ⊓ hyp.V := le_inf hVQK le_rfl
   rwa [hyp.QK_inf_V_eq_bot] at hle
+
+/-- `QK ⊴ H`, in `subgroupOf` form. -/
+instance QK_subgroupOf_H_normal : (hyp.QK.subgroupOf hyp.H).Normal := by
+  constructor
+  intro x hx y
+  exact Subgroup.mem_subgroupOf.mpr
+    (hyp.QK_normal_in_H y.2 (Subgroup.mem_subgroupOf.mp hx))
+
+/-- The quotient `H/QK` has odd order (`[H : QK]` divides `|D|`). -/
+theorem odd_card_quotient_QK :
+    Odd (Nat.card (↥hyp.H ⧸ hyp.QK.subgroupOf hyp.H)) :=
+  hyp.odd_index_QK_subgroupOf
+
+/-- `QK.subgroupOf H ≠ ⊤`, i.e. `QK` is a proper subgroup of `H`. -/
+theorem QK_subgroupOf_ne_top (hV : hyp.V ≠ ⊥) : hyp.QK.subgroupOf hyp.H ≠ ⊤ := by
+  intro h
+  exact hyp.QK_ne_H hV (le_antisymm hyp.QK_le_H (Subgroup.subgroupOf_eq_top.mp h))
+
+/-- **`H/QK` has a proper derived subgroup** — the input of the linear-character
+construction.  The book's route: `H/QK ≅ V` is solvable and non-trivial.  Here the
+quotient has odd order, hence is solvable by the **Feit–Thompson theorem**, and it
+is non-trivial because `QK ≠ H` (hypothesis (C1): `V ≠ 1`). -/
+theorem commutator_quotient_QK_ne_top (hV : hyp.V ≠ ⊥) :
+    _root_.commutator (↥hyp.H ⧸ hyp.QK.subgroupOf hyp.H) ≠ ⊤ := by
+  haveI : IsSolvable (↥hyp.H ⧸ hyp.QK.subgroupOf hyp.H) :=
+    OddOrder.feitThompson hyp.odd_card_quotient_QK
+  haveI : Nontrivial (↥hyp.H ⧸ hyp.QK.subgroupOf hyp.H) := by
+    have h1 : (hyp.QK.subgroupOf hyp.H).index ≠ 1 := fun h =>
+      hyp.QK_subgroupOf_ne_top hV (Subgroup.index_eq_one.mp h)
+    rcases subsingleton_or_nontrivial (↥hyp.H ⧸ hyp.QK.subgroupOf hyp.H) with hs | hn
+    · exact absurd (Nat.card_eq_one_iff_unique.mpr ⟨hs, ⟨1⟩⟩ : _root_.Nat.card _ = 1) h1
+    · exact hn
+  exact (IsSolvable.commutator_lt_top_of_nontrivial _).ne
+
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step (4)** (p. 115): "Let `λ` be a
+linear character of `H`, `λ ≠ 1_H`, such that `QK ⊂ Ker λ`.  There is such a
+character since `H/QK ≅ V` is solvable and non-trivial." -/
+theorem exists_linearCharacter_leKer_QK (hV : hyp.V ≠ ⊥) :
+    ∃ θ : IrreducibleCharacter ↥hyp.H,
+      θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥hyp.H ∧
+      ((hyp.QK.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥hyp.H ℂ) ∧
+      (θ : ClassFunction ↥hyp.H ℂ) (1 : ↥hyp.H) = 1 :=
+  OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
+    _ (hyp.commutator_quotient_QK_ne_top hV)
 
 end Hypothesis
 
