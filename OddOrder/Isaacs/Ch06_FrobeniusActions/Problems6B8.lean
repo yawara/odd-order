@@ -990,6 +990,42 @@ theorem exists_zpowers_eq_of_isCyclic {G : Type*} [Group G] {H : Subgroup G}
   have := congrArg Subtype.val hm
   simpa using this
 
+/-- 位数 `2^k` の巡回群の involution は `c ^ (2^(k-1))` ただ一つ。 -/
+theorem involution_eq_of_mem_zpowers {G : Type*} [Group G] {c : G} {k : ℕ} (hk : 1 ≤ k)
+    (hord : orderOf c = 2 ^ k) {y : G} (hy : y ∈ Subgroup.zpowers c) (hy1 : y ≠ 1)
+    (hy2 : y ^ 2 = 1) : y = c ^ (2 ^ (k - 1)) := by
+  obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
+  have h1 : c ^ (2 * m) = 1 := by
+    rw [mul_comm, zpow_mul]
+    exact_mod_cast hy2
+  have h2 : ((orderOf c : ℤ)) ∣ 2 * m := orderOf_dvd_iff_zpow_eq_one.mpr h1
+  rw [hord] at h2
+  have h3 : ((2 : ℤ) ^ (k - 1)) ∣ m := by
+    have hsplit : ((2 ^ k : ℕ) : ℤ) = 2 * 2 ^ (k - 1) := by
+      have hk1 : k = (k - 1) + 1 := by omega
+      rw [hk1]
+      push_cast
+      ring
+    rw [hsplit] at h2
+    exact (mul_dvd_mul_iff_left (by norm_num : (2 : ℤ) ≠ 0)).mp h2
+  obtain ⟨t, rfl⟩ := h3
+  have hzsq : (c ^ (2 ^ (k - 1))) ^ (2 : ℤ) = 1 := by
+    rw [zpow_two, ← pow_two, ← pow_mul]
+    have hmm : 2 ^ (k - 1) * 2 = 2 ^ k := by
+      rw [← pow_succ]
+      congr 1
+      omega
+    rw [hmm, ← hord]
+    exact pow_orderOf_eq_one c
+  have hzt : c ^ ((2 : ℤ) ^ (k - 1) * t) = (c ^ (2 ^ (k - 1))) ^ t := by
+    rw [← zpow_natCast c (2 ^ (k - 1)), ← zpow_mul]
+    norm_cast
+  rw [hzt] at hy1 ⊢
+  rcases Int.even_or_odd t with ⟨u, hu⟩ | ⟨u, hu⟩
+  · exact absurd (by
+      rw [hu, show u + u = 2 * u by ring, zpow_mul, hzsq, one_zpow]) hy1
+  · rw [hu, zpow_add, zpow_mul, hzsq, one_zpow, one_mul, zpow_one]
+
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
 theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
