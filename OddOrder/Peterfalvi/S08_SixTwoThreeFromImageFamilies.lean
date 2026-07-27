@@ -129,6 +129,18 @@ structure InducedFamilyImageData (A₀ : Set ↥L)
   tau_mem_ZIrr : ∀ ⦃φ : ClassFunction ↥L ℂ⦄,
     φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
     tau φ ∈ ZIrr G
+  /-- **(5.2.b), codomain sharpness**: the book's target lattice is `ℤ[Irr G, G^#]`, i.e. virtual
+  characters *supported off `1`* — so `τ φ` vanishes at `1`.  Together with `tau_mem_ZIrr` this is
+  the literal "linear isometry from `ℤ[𝒮, L^#]` to `ℤ[Irr G, G^#]`" of Hypothesis (5.2.b)
+  (p. 25).  The Dade witness supplies it by
+  `S07.dadeIntegralCharacterMap_apply_one_eq_zero` (the Dade image vanishes off the support set,
+  and `1 ∉ A₀`).  It is what forces the two constituents of `τ(χ − χ̄)` to carry *opposite* signs
+  for an irreducible member `χ` — i.e. the (5.3.a) two-element `R(χ) = {μ, −ν}` shape
+  (`characterDifferenceImage_of_irreducible`, `S08_SixFiveGeneral`) that Hypothesis (5.2) takes in
+  this repository. -/
+  tau_apply_one : ∀ ⦃φ : ClassFunction ↥L ℂ⦄,
+    φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (inducedKernelFamily K ⊥) A₀ →
+    tau φ (1 : G) = 0
   /-- **(5.2.d)**: the orthonormal difference-image family `R(χ)` of each member `χ ∈ 𝒮`. -/
   R : ∀ χ ∈ inducedKernelFamily K ⊥,
     OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily (L := ↥L) (G := G) tau χ

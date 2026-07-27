@@ -450,6 +450,7 @@ import OddOrder.Peterfalvi.S08_InducedKernelFamily
 import OddOrder.Peterfalvi.S08_GeneralAdjoin
 import OddOrder.Peterfalvi.S08_GeneralAdjoinWeighted
 import OddOrder.Peterfalvi.S08_SixTwoThreeFromImageFamilies
+import OddOrder.Peterfalvi.S08_SixFiveGeneral
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S09_CertificateDischarge
 import OddOrder.Peterfalvi.S09_FrobeniusEstimate

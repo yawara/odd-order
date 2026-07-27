@@ -479,6 +479,9 @@ noncomputable def inducedFamilyImageData (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp.dadeData.dade hφ.2
       (Submodule.span_le.mpr
         (fun _x hx => OddOrder.Peterfalvi.S08.inducedKernelFamily_mem_ZIrr hx) hφ.1)
+  -- (5.2.b) codomain sharpness: the Dade image vanishes off the Dade support, in particular at `1`.
+  tau_apply_one := fun _φ hφ =>
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero hyp.dadeData.dade hφ.2
   R := fun _χ hχ => hyp.memberRFamily hG hmu hδpm hδj hzS hz1 hzconj hχ
   orthogonal := fun _χ hχ _φ hφ hφχ hφχbar =>
     hyp.memberRFamily_orthogonal hG hmu hδpm hδj hzS hz1 hzconj hχ hφ hφχ hφχbar
