@@ -4357,3 +4357,14 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 `simp only [mem_normalizer_iff, mem_...]` で素の論理式に開いてから `decide` (24 元の全数)。
 
 ⟹ **§8A の残りは 8A.13 の同値 (軌道数 5 ⟺ 3-transitive) のみ**。
+
+## ⚠ hub からの指摘 (2026-07-27): 新 leaf の `OddOrder.lean` 配線漏れ
+
+`OddOrder/Isaacs/Ch08_PermutationGroups/Problems8A.lean` (717 行) が root aggregator に
+配線されておらず、`lake build OddOrder` の import 閉包外に落ちていた。**合流フルビルドが
+一度も elaborate しないまま gate を通過**する (CLAUDE.md「ファイル粒度」節の既知の失敗モード、
+本リポジトリで 3 件目)。hub 側で配線済 (commit 1e0dfac04、配線後 4846 → 4847 jobs で green)。
+
+**次から: 新 leaf を作った commit と同じ commit で `OddOrder.lean` に import を足すこと。**
+`OddOrder.lean` は全レーン編集可の共有ファイル。上位 leaf 経由で到達する中間 leaf は不要だが、
+到達性が自明でないなら足す。

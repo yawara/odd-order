@@ -68,11 +68,59 @@ created: 2026-07-27
    と `hyp.xBaseBlock Z = xBaseBlock H Z` (要確認) で橋渡しする。
    `A₀ = S04.supportInSubgroup (sharpImage H) L` に対する `hKsupp` / `h1A` も要確認。
 
+## 進捗 (2026-07-27)
+
+- [x] **step 1 — 変換** `CharacterDifferenceImage.toOrthonormalFamily` (`R(χ) = {ε·μ, −ε·ν}`) と
+      (5.2.e) の移送 `toOrthonormalFamily_orthogonal`。`S08_SixTwoThreeFromImageFamilies`。
+      併せて `inner_zsmul_irreducible_eq` を Appendices から `ZIrrFourier` へ移設。axiom-clean。
+- [x] **step 2 — 構造分割** `InducedFamilyTauData` (τ 部) / `InducedFamilyImageData extends …`。
+      τ 部しか使っていなかった `adjoinHisom` / `tau_conjDiff_inner_eq_zero_of_orthogonal` /
+      `hypothesisOfSubfamily` / `hypothesis` / `xSetHypothesis` を τ 部の namespace へ移動。
+      ⚠ **dot-notation は親構造を辿るので既存 caller は無変更で通った** (実測)。
+- [x] **step 3 — (6.6) chain を τ 部だけで述べ直す**。`xBaseBlock_isCoherent` /
+      `xAdjoinStep_of_degreeRatios` / `xSet_isCoherent_of_irreducible_X` が
+      `InducedFamilyTauData` を取るようになり、(5.2.d)/(5.2.e) は
+      `hypothesisOfSubfamily.difference_image` + step 1 の変換で**導出**される。
+      ⟹ **一般 (6.6) は書籍 (6.1) より弱い仮説で成立する**。AxiomsCheck 更新済。
+- [ ] **step 4 — Sibley 版の置換: ⛔ import DAG に阻まれる (2026-07-27 実測)**
+
+### step 4 の障害 — 数学ではなく §8 の import 階層
+
+`S08_SixSixGeneral` は **`S08_CoherenceBasic` の下流**なので、`S08_CoherenceBasic` 側から
+一般版を呼ぶことができない (循環)。当初 1 本と見えた阻害 edge
+`S08_SixFiveGeneral → S08_PGroupReduction` は解消済 (下記) だが、**まだ長い経路が残る**:
+
+```
+S08_SixSixGeneral → S08_SixFiveGeneral → S08_SixTwoThreeFromImageFamilies
+  → S08_SixTwoGeneral → S08_CaseBEnumeration → S08_CaseBAssembly
+  → …(case-B 一式)… → S08_CoherenceCore → S08_RestrictExtensionDvd
+  → S08_XBlockCounting → S08_CoherenceBasic
+```
+
+すなわち **一般 (6.2) leaf (`S08_SixTwoGeneral`) が Sibley の case-B 機構に依存している**のが
+根本。逆向き (Sibley 側を下流へ移す) も不可 —
+`Xset_centralCommutator_isCoherent_of_{frobenius,c2_caseA}` の consumer が
+`S08_XBlockCounting` / `S08_RestrictExtensionDvd` で、これらは上記経路の途中にある。
+
+⟹ step 4 は **§8 DAG の再層化** (一般 leaf 群を Sibley 機構から独立させる) を伴う。
+数学は既に揃っている (step 1-3) ので、残るのはファイル手術のみ。
+⚠ 再層化は BFS で cycle 消滅を見るだけでは不十分 (transitive な instance/open scoped 依存は
+import 名に出ない) — **edge ごとに build 検証**すること。
+
+### 副産物 (2026-07-27 実施済)
+
+`six_five_c_arith` (純 ℕ 算術、群論を一切使わない) が `S08_PGroupReduction` に置かれていたため、
+一般 (6.5)/(6.6) leaf が Sibley 側 p 群 reduction ファイル一式を import 閉包に引き込んでいた。
+`S08_CoherenceCorePart1` (同種の算術補題が集まる上流 leaf) へ移設し、
+`S08_SixFiveGeneral → S08_PGroupReduction` の edge を削除
+(`S08_SixSixGeneral` の閉包 197 → 189 module)。
+
 ## 完了条件
 
 `S08_CoherenceBasic.Xset_isCoherent_of_irreducible_X` の証明本体が一般版の呼び出し 1 本になり、
 `S08_CoherenceCorePart2/SibleyBounds` 側の X-chain 次数簿記 (`XAdjoinStepInput` 系) が
 (6.6) 経路から不要になること。build green + AxiomsCheck OK + sorry 非退行。
 
-⚠ これは**書籍被覆のギャップではなくアーキテクチャ課題** (重複解消)。ただし (1)(3) の成果物は
-「既約族に対する (5.2.d)/(5.2.e) の導出」という書籍より強い主張なので、数学的にも意味がある。
+⚠ これは**書籍被覆のギャップではなくアーキテクチャ課題** (重複解消)。step 1-3 の成果物
+「既約族に対する (5.2.d)/(5.2.e) の導出」は書籍より強い主張なので数学的にも意味があり、
+そこは landing 済。残る step 4 は純粋にファイル階層の問題なので、書籍被覆を優先して繰延する。

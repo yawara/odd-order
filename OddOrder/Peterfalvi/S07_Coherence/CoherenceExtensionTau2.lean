@@ -365,6 +365,76 @@ noncomputable def coherentEqualDegree
     | smul c y _ ih => rw [map_zsmul]; exact Submodule.smul_mem _ c ih
 
 open IntegralCharacterMap in
+/-- **Peterfalvi (5.7) core: an equal-degree set with *arbitrary* member norms is coherent.**
+
+The weighted form of `coherentEqualDegree`.  Hypothesis (5.2) gives the members of `𝒮` only
+*pairwise orthogonality* — a reducible member has `‖χ‖² > 1` — so the book's (5.7) may not assume
+unit norm, and neither does this builder (issue 0157).
+
+Inputs: `χ : Fin n → CF(L)` (`n ≥ 2`) pairwise orthogonal with nonzero norms, all of equal degree
+`d ≠ 0`, differences supported in `A` (`1 ∉ A`); and a target family `X : Fin n → CF(G)` of virtual
+characters matching the **Gram matrix** of `χ` (`⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩` — the orthonormal builder's
+`horthX` is the `⟨χᵢ, χⱼ⟩ = δᵢⱼ` case), with `τ (χⱼ − χ₀) = Xⱼ − X₀`.
+
+The extension is the **norm-rescaled** reconstruction `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ · ‖χⱼ‖⁻² • Xⱼ`, which
+sends `χₖ ↦ Xₖ` (`coherentImageMap_apply_eq_of_orthogonal`) and is an isometry on `ℤ[range χ]` by
+weighted Parseval (`coherentImageMapW_inner_eq`).  `IsCoherent` asks for an isometry, not for
+orthonormal images, so nothing else changes.
+
+`coherentEqualDegree` is kept as the unit-norm construction because its `extension` is
+`coherentImageMap χ X` *definitionally* (`coherentEqualDegree_extension`), an API several
+downstream consumers rely on; here the extension carries the `‖χⱼ‖⁻²` rescaling. -/
+noncomputable def coherentEqualDegreeW
+    {τ : IntegralCharacterMap L G} {A : Set L} {n : ℕ} [NeZero n]
+    {χ : Fin n → ClassFunction L ℂ} {X : Fin n → ClassFunction G ℂ}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hn : 2 ≤ n)
+    (horthχ : ∀ i j, i ≠ j → ClassFunction.inner (χ i) (χ j) = 0)
+    (hnorm : ∀ j, ClassFunction.inner (χ j) (χ j) ≠ 0)
+    (hgram : ∀ i j, ClassFunction.inner (X i) (X j) = ClassFunction.inner (χ i) (χ j))
+    (himg : ∀ j, τ (χ j - χ 0) = X j - X 0)
+    (hXZ : ∀ j, X j ∈ ZIrr G)
+    (hdeg : ∀ j, ((χ j : ClassFunction L ℂ) : L → ℂ) 1 = ((χ 0 : ClassFunction L ℂ) : L → ℂ) 1)
+    (hdeg0 : ((χ 0 : ClassFunction L ℂ) : L → ℂ) 1 ≠ 0)
+    (h1A : (1 : L) ∉ A)
+    (hsuppdiff : ∀ j, (χ j - χ 0).support ⊆ A) :
+    IsCoherent τ (Set.range χ) A := by
+  classical
+  have h1n : 1 < n := by omega
+  have hi1 : (⟨1, h1n⟩ : Fin n) ≠ 0 := by
+    intro h; exact absurd (congrArg Fin.val h) (by simp)
+  refine ⟨⟨χ ⟨1, h1n⟩ - χ 0,
+      ⟨Submodule.sub_mem _ (Submodule.subset_span (Set.mem_range_self _))
+        (Submodule.subset_span (Set.mem_range_self _)), hsuppdiff ⟨1, h1n⟩⟩, ?_⟩,
+    coherentImageMap (L := L) (G := G) χ
+      (fun j => (ClassFunction.inner (χ j) (χ j))⁻¹ • X j), ?_, ?_, ?_⟩
+  · -- nonzero: `χ₁ = χ₀` would make the nonzero norm `⟨χ₀, χ₀⟩` an off-diagonal `0`.
+    rw [sub_ne_zero]
+    intro h
+    have hoff := horthχ ⟨1, h1n⟩ 0 hi1
+    rw [h] at hoff
+    exact hnorm 0 hoff
+  · -- extension_inner_eq: weighted Parseval on `ℤ[range χ]`.
+    intro φ ψ hφ hψ
+    exact coherentImageMapW_inner_eq horthχ hnorm hgram hφ hψ
+  · -- extends_on_supported: agreement on the difference generators of `ℤ[range χ, A]`.
+    intro φ hφ
+    refine eq_on_zSpan_of_eq_on (T := Set.range (fun j => χ j - χ 0)) ?_
+      (zSupportedSpan_range_subset_span_sub_zero hdeg hdeg0 h1A hφ)
+    rintro x ⟨j, rfl⟩
+    rw [map_sub, coherentImageMap_apply_eq_of_orthogonal horthχ hnorm j,
+      coherentImageMap_apply_eq_of_orthogonal horthχ hnorm 0, himg j]
+  · -- extension_mem_ZIrr: each member maps to `Xⱼ ∈ ℤ[Irr G]`.
+    intro φ hφ
+    induction hφ using Submodule.span_induction with
+    | mem y hy =>
+        obtain ⟨j, rfl⟩ := hy
+        rw [coherentImageMap_apply_eq_of_orthogonal horthχ hnorm j]; exact hXZ j
+    | zero => rw [map_zero]; exact Submodule.zero_mem _
+    | add y z _ _ ihy ihz => rw [map_add]; exact Submodule.add_mem _ ihy ihz
+    | smul c y _ ih => rw [map_zsmul]; exact Submodule.smul_mem _ c ih
+
+open IntegralCharacterMap in
 /-- The `extension` field of `coherentEqualDegree` is the Fourier image map `coherentImageMap χ X`.
 -/
 theorem coherentEqualDegree_extension
