@@ -1282,8 +1282,13 @@ consumer は (5.7) engine を使う。
    (2 元 ⟹ `‖τ(χ−χ̄)‖² = 2` ⟹ 等長性から `‖χ‖² = 1` が全 member に強制される)。
    書籍準拠の `S07.GeneralHypothesis` (R(χ) のサイズ自由) を新設し、旧 carrier は
    `toGeneralHypothesis` でその特殊化として接続。旧 (5.7) は `m = 1` の 1 行特殊化。
-3. **(6.3)/(6.5) が `K` 冪零を取る** (書籍は `K/M` 冪零) — `six_three_descent` から継承。
-   `M = 1` では一致し、(6.6) が使うのはその場合。
+3. ~~**(6.3)/(6.5) が `K` 冪零を取る**~~ — **2026-07-27 完済**
+   ([issue 0158](../../issues/closed/0158-six-three-quotient-nilpotent.md))。
+   `six_three_descent` / `six_three_of_six_two_oracle` /
+   `normal_central_of_maximal_normal_below` がいずれも**商の冪零性**
+   (`Group.IsNilpotent (↥H ⧸ M.subgroupOf H)` = 書籍 (6.3)(a)) で成立するようになった。
+   冪零性の使用は 1 箇所だけで、そこも `H/B` の冪零性しか使っていなかった
+   (`M ≤ B` ゆえ `H/M ↠ H/B`)。下流 consumer は全て無変更。
    【**2026-07-27 実測**: 実体は `six_three_descent` の `[Group.IsNilpotent ↥H]`
    (`S08_Theorem62_63_Standalone:120`)。冪零性の使用は
    `normal_central_of_maximal_normal_below` 1 箇所のみで、そこも内部では **`H/B` の冪零性**

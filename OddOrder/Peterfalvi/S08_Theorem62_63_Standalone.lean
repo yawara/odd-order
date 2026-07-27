@@ -117,8 +117,9 @@ proved here, mirroring `S08.six_three` but with `K` and `H` separated:
 This is the producer cited by `S13.coherent_S_of_coherent_SH0C` (Peterfalvi (11.3), `(6.3)` applied
 with `(L,K,M,H,H₁) = (M, M', 1, HC, H₀C)`). -/
 theorem six_three_descent
-    {K H M H₁ : Subgroup ↥L} [Group.IsNilpotent ↥H] [IsSolvable ↥K]
-    [M.Normal] [H₁.Normal] (hHnorm : H.Normal)
+    {K H M H₁ : Subgroup ↥L} [IsSolvable ↥K]
+    [M.Normal] [H₁.Normal]
+    [Group.IsNilpotent (↥H ⧸ M.subgroupOf H)] (hHnorm : H.Normal)
     (hMH₁ : M ≤ H₁) (hH₁H : H₁ < H) (hHK : H ≤ K)
     (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G) (A0 : Set ↥L)
     (SOf : Subgroup ↥L → Set (ClassFunction ↥L ℂ))
@@ -159,7 +160,16 @@ theorem six_three_descent
         intro htop
         exact hAltK.ne' (le_antisymm (Subgroup.subgroupOf_eq_top.mp htop) hAltK.le)
       exact (IsSolvable.commutator_lt_top_of_nontrivial (↥K ⧸ A.subgroupOf K)).ne
-    -- `A/B ⊆ Z(H/B)`: `H` nilpotent, `B` maximal below `A`.
+    -- `A/B ⊆ Z(H/B)`: `H/B` nilpotent (a quotient of the nilpotent `H/M`, as `M ≤ B`), and
+    -- `B` is maximal below `A`.
+    haveI hnilB : Group.IsNilpotent (↥H ⧸ B.subgroupOf H) :=
+      Group.nilpotent_of_surjective
+        (QuotientGroup.map (M.subgroupOf H) (B.subgroupOf H) (MonoidHom.id ↥H)
+          (by simpa using Subgroup.subgroupOf_mono H hMB))
+        (by
+          intro q
+          obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective (s := B.subgroupOf H) q
+          exact ⟨QuotientGroup.mk x, by simp⟩)
     have hcentral := normal_central_of_maximal_normal_below (H := H) (A := A) (B := B)
       hHnorm hAltH.le hBltA hBmaxl
     -- `S(B)` not coherent: else `B` beats the minimality of `A`.
@@ -388,9 +398,10 @@ descent, nilpotency-forces-centrality, the θ-degree bound, and the `√`-arithm
 here.  This is the theorem `S13.coherent_S_of_coherent_SH0C` (Peterfalvi (11.3)) cites, applied
 with `(L,K,M,H,H₁) = (M, M', 1, HC, H₀C)`. -/
 theorem six_three_of_six_two_oracle
-    {K H M H₁ : Subgroup ↥L} [Group.IsNilpotent ↥H] [IsSolvable ↥K]
+    {K H M H₁ : Subgroup ↥L} [IsSolvable ↥K]
     [Invertible (Nat.card ↥K : ℂ)]
-    [M.Normal] [H₁.Normal] (hHnorm : H.Normal)
+    [M.Normal] [H₁.Normal]
+    [Group.IsNilpotent (↥H ⧸ M.subgroupOf H)] (hHnorm : H.Normal)
     (hMH₁ : M ≤ H₁) (hH₁H : H₁ < H) (hHK : H ≤ K)
     (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G) (A0 : Set ↥L)
     (SOf : Subgroup ↥L → Set (ClassFunction ↥L ℂ))
