@@ -4268,6 +4268,15 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 実装は `orbitRel.Quotient G (Ω × Ω) ≃ Fin 2` を作るのが素直 (`Nontrivial Ω` が要る)。
 これが済めば「平均 = 2 ⟺ 2-transitive」が `sum_sq_card_fixedBy` から直ちに出る。
 
-**8A.13** は同じ道具立てで `χ³` = `Ω³` の置換指標 ⟹ 3-transitive のとき `Ω³` の軌道数が
-`m` になる, という形 (`m` は「3 点の一致パターン」= Bell 数 `B₃ = 5`; 2-transitive を仮定
-した上での 3-transitivity 判定なので `m = 5`)。
+### 8A.13 (2026-07-27): 答は **m = 5**、骨格を landing
+
+* ✅ `fixedByProdEquiv` を `A × B` へ一般化 ⟹ `card_fixedBy_prod_three`
+  (`χ(g)³ = |Fix_{Ω³}(g)|`) / `sum_cube_card_fixedBy`
+  (`∑_g χ(g)³ = |Ω³ の軌道数| · |G|`)。
+* **答 `m = 5`** (検算済): `G` が 2-transitive のとき `Ω³` の軌道は 3 点の一致パターンで
+  分類される — `xxx` / `xxy` / `xyx` / `yxx` の 4 つの退化パターンは **2-transitivity だけで
+  各 1 軌道**になり, 残る「全相異」部分がひとつの軌道になることが 3-transitivity と同値。
+  したがって 3-transitive ⟺ 軌道数 5 ⟺ `χ³` の平均が 5。
+
+**残り (8A.13)**: 「軌道数 = 5 ⟺ 3-transitive」の形式化 (`Nat.card_eq_two_iff` に相当する
+5 元版が無いので, `orbitRel.Quotient G (Ω³) ≃ Fin 5` を明示構成するのが素直; `|Ω| ≥ 3` が要る)。

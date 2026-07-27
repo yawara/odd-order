@@ -59,6 +59,9 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `card_fixedBy_prod`, `sum_sq_card_fixedBy`, `card_orbits_prod_eq_two_iff`,
   `sum_sq_card_fixedBy_eq_two_mul_iff` — **Problem 8A.12**: 推移的な `G` について
   `G` が 2-transitive ⟺ 置換指標の 2 乗の平均が 2。
+- `card_fixedBy_prod_three`, `sum_cube_card_fixedBy` — **Problem 8A.13** の骨格:
+  置換指標の 3 乗和は `Ω³` 上の軌道数 × `|G|`。求める `m` は **5**
+  (3 点の一致パターン `xxx` / `xxy` / `xyx` / `yxx` / 全相異)。
 - `affineLineGroup`, `existsUnique_affineLineGroup_of_ne`,
   `affineLineGroup_isSolvable` — **Problem 8A.11**: 1 次元アフィン群
   `AGL(1, F) = {x ↦ ax + b}` は `F` 上 sharply 2-transitive で, metabelian ゆえ可解。
@@ -852,8 +855,8 @@ theorem nonempty_mulEquiv_perm_fin_four_of_four_transitive [FaithfulSMul G Ω]
 /-! ### Problem 8A.12 — 置換指標の 2 乗平均 -/
 
 /-- 積作用の固定点集合は各成分の固定点集合の積。 -/
-def fixedByProdEquiv (g : G) :
-    (MulAction.fixedBy (Ω × Ω) g) ≃ (MulAction.fixedBy Ω g) × (MulAction.fixedBy Ω g) where
+def fixedByProdEquiv {A B : Type*} [MulAction G A] [MulAction G B] (g : G) :
+    (MulAction.fixedBy (A × B) g) ≃ (MulAction.fixedBy A g) × (MulAction.fixedBy B g) where
   toFun p := (⟨p.1.1, congrArg Prod.fst p.2⟩, ⟨p.1.2, congrArg Prod.snd p.2⟩)
   invFun q := ⟨(q.1.1, q.2.1), Prod.ext q.1.2 q.2.2⟩
   left_inv _ := rfl
@@ -862,7 +865,14 @@ def fixedByProdEquiv (g : G) :
 /-- 置換指標の 2 乗は積作用 `Ω × Ω` の置換指標。 -/
 theorem card_fixedBy_prod (g : G) :
     Nat.card (MulAction.fixedBy (Ω × Ω) g) = Nat.card (MulAction.fixedBy Ω g) ^ 2 := by
-  rw [Nat.card_congr (fixedByProdEquiv g), Nat.card_prod, sq]
+  rw [Nat.card_congr (fixedByProdEquiv (A := Ω) (B := Ω) g), Nat.card_prod, sq]
+
+/-- 置換指標の 3 乗は `Ω × Ω × Ω` の置換指標。 -/
+theorem card_fixedBy_prod_three (g : G) :
+    Nat.card (MulAction.fixedBy (Ω × Ω × Ω) g) = Nat.card (MulAction.fixedBy Ω g) ^ 3 := by
+  rw [Nat.card_congr (fixedByProdEquiv (A := Ω) (B := Ω × Ω) g), Nat.card_prod,
+    card_fixedBy_prod]
+  ring
 
 /-- **Isaacs Problem 8A.12** (p. 236) の骨格: **置換指標 `χ` の 2 乗和は
 `Ω × Ω` 上の軌道数 × `|G|`**。したがって `χ(g)²` の平均値は `Ω × Ω` 上の軌道数に等しい。
@@ -875,6 +885,18 @@ theorem sum_sq_card_fixedBy [Fintype G] [Finite Ω] :
       = Nat.card (MulAction.orbitRel.Quotient G (Ω × Ω)) * Nat.card G := by
   rw [← OddOrder.Isaacs.Ch01.sum_card_fixedBy_nat (M := G) (β := Ω × Ω)]
   exact (Finset.sum_congr rfl fun g _ => card_fixedBy_prod g).symm
+
+/-- **Isaacs Problem 8A.13** (p. 236) の骨格: 置換指標の 3 乗和は `Ω × Ω × Ω` 上の
+軌道数 × `|G|`。
+
+`G` が 3-transitive のとき `Ω³` の軌道は **5 個** — 3 点の一致パターン
+(`xxx` / `xxy` / `xyx` / `yxx` / 全相異) がちょうど軌道に対応する (退化 4 パターンは
+2-transitivity だけで各 1 軌道)。したがって求める `m` は **5**。 -/
+theorem sum_cube_card_fixedBy [Fintype G] [Finite Ω] :
+    ∑ g : G, Nat.card (MulAction.fixedBy Ω g) ^ 3
+      = Nat.card (MulAction.orbitRel.Quotient G (Ω × Ω × Ω)) * Nat.card G := by
+  rw [← OddOrder.Isaacs.Ch01.sum_card_fixedBy_nat (M := G) (β := Ω × Ω × Ω)]
+  exact (Finset.sum_congr rfl fun g _ => card_fixedBy_prod_three g).symm
 
 /-- **Isaacs Problem 8A.12** (p. 236) の組合せ部分: 推移的な `G` について
 **`Ω × Ω` の `G`-軌道がちょうど 2 個 ⟺ `G` は 2-transitive**。
