@@ -5082,10 +5082,22 @@ Hint から `R := O^{p'}(X)` は `G_α` でも `G_β` でも正規 ⟹ `G_α ⊔
 `R = ⊥`, つまり `X` は `p'`-群 ⟹ `|G_α| = p·|X|` の `p`-部分はちょうど `p`。
 subdegree は `|G_α|` を割るので `p²` はどれも割らない。
 
-⚠ **Hint の補題 (`|Y : X| = p` ⟹ `O^{p'}(X) ◁ Y`) が本命の未解決部分**。
-`O^{p'}(X) = ⟨Syl_p(X)⟩` (= `X` の `p`-元で生成) で `R ⊴ X` は自明だが, `Y` での正規性は
-非自明。`X ≤ N_Y(R)` と `|Y:X| = p` から `N_Y(R)` は `X` か `Y` なので, `N_Y(R) = X`
-(⟹ `R` の共役が `p` 個) の場合を潰す議論が要る。`Y = X·Q` (`Q ∈ Syl_p(Y)`),
-`P := Q ⊓ X ∈ Syl_p(X)`, `[Q : P] = p` ゆえ `P ⊴ Q` — ここまでは確認済だが結論には未到達。
-着手時は repo の `oPiResidual` (Ch03 `PiResidual.lean`, issue 1B.8) / `OpResidual` と
-Isaacs 本文の該当箇所 (Thm 8.43 周辺) / `coq/theories/` を当たること。
+#### Hint の補題の証明 (2026-07-27 に発見, 実装待ち)
+
+**補題**: `X ≤ Y`, `[Y : X] = p` (素数) ⟹ `O^{p'}(X) ◁ Y`。
+
+1. **`X` の `p`-元はすべて `core_Y(X)` に入る**。`g ∈ X` を `p`-元とすると `⟨g⟩` は
+   `p`-群で, `Y ⧸ X` (`p` 点) に左乗法で作用し, 剰余類 `⟦1⟧` を固定する。`p`-群の
+   固定点数は `|Y⧸X| = p` と mod `p` で合同 (`IsPGroup.card_modEq_card_fixedPoints`)
+   なので固定点数 `≡ 0 (mod p)`; `1 ≤ 固定点数 ≤ p` より **固定点数 = p**, つまり `g` は
+   全剰余類を固定し `g ∈ ⋂_y X^y = X.normalCore`。
+2. `X₀ := X.normalCore ◁ Y` で `X₀ ≤ X`。1 より **`X` の `p`-元 = `X₀` の `p`-元**。
+3. `O^{p'}(X) = ⟨X の p-元⟩` (**Problem 1B.8** `oPiResidual_eq_closure_piPrimeElements`,
+   `π := {p}ᶜ` とすると `π' = {p}`) なので `O^{p'}(X) = O^{p'}(X₀)`。
+4. `O^{p'}(X₀)` は `X₀` の**特性部分群** (`oPiResidual` の普遍性から任意の自己同型で不変)
+   で `X₀ ◁ Y` なので `O^{p'}(X) ◁ Y`。∎
+
+実装時に要る repo 部品: `oPiResidual` (Ch03 `PiResidual.lean`) とその
+`oPiResidual_eq_closure_piPrimeElements` / 普遍性, `Subgroup.normalCore` と
+`Subgroup.normalCore_eq_ker`, `IsPGroup.card_modEq_card_fixedPoints`,
+本 §8D の `eq_bot_of_normal_of_le_stabilizer` (本体側)。
