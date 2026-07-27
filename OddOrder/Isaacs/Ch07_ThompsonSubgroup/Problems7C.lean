@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.Index
 import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.S7C_SylowMaximal
 
@@ -138,6 +139,28 @@ theorem CharLocalPControl.of_subgroup {p : ℕ} (H : Subgroup G) {S : Subgroup �
   have hcomm := hk _ haG
   have hpow : (((g ^ p ^ k : ↥H)) : G) = (g : G) ^ p ^ k := by push_cast; rfl
   exact Subtype.ext (by rw [Subgroup.coe_mul, Subgroup.coe_mul, hpow]; exact hcomm)
+
+/-! ### 指数の議論 (Case B step 3) -/
+
+/-- **`[K : C ⊓ K]` が `p` 冪で, かつ `p ∤ [K : X]` なる `X ≤ C ⊓ K` があれば `K ≤ C`**。
+
+`[K : C ⊓ K]` は `[K : X]` を割る (`X ≤ C ⊓ K ≤ K`) ので, `p` 冪でありながら `p` と
+互いに素 ⟹ `1` ⟹ `K ≤ C`。7C.1 Case B で「`K/(K ⊓ C)` は `p`-群かつ `K/X` の商ゆえ
+`p'`-群 ⟹ 自明」に使う。`p` の素数性は不要。 -/
+theorem le_of_relIndex_eq_pow_of_not_dvd [Finite G] {K C X : Subgroup G}
+    {p k : ℕ} (hXCK : X ≤ C ⊓ K)
+    (hpow : C.relIndex K = p ^ k) (hcop : ¬ p ∣ X.relIndex K) :
+    K ≤ C := by
+  have hmul : X.relIndex (C ⊓ K) * (C ⊓ K).relIndex K = X.relIndex K :=
+    Subgroup.relIndex_mul_relIndex X (C ⊓ K) K hXCK inf_le_right
+  have hdvd : C.relIndex K ∣ X.relIndex K := by
+    rw [← Subgroup.inf_relIndex_right C K, ← hmul]
+    exact Dvd.intro_left _ rfl
+  have hk0 : k = 0 := by
+    by_contra hk
+    exact hcop (dvd_trans (hpow ▸ dvd_pow_self p hk) hdvd)
+  rw [hk0, pow_zero] at hpow
+  exact Subgroup.relIndex_eq_one.mp hpow
 
 end
 
