@@ -52,6 +52,29 @@ survey は (5.3)(b)/(5.8) を「真に開いている」に分類しつつ、こ
 | 混合の (5.2.e) | (3.8) 経由。§11 dispatch は `S11.sOf_memberRFamily`、§11/§13 discharge は `S12.Hypothesis.sixTwoDecompositionData` |
 | 既存の類似構成 | **`S13_SixTwoImageData.inducedFamilyImageData`** — §12 hypothesis から `InducedFamilyImageData` を組む。実質 (5.3)(b) の §11 instance。⟹ **これを (4.6) レベルへ持ち上げるのが本 issue** |
 
+## `certainTypeR` の実測 (2026-07-27) — 呼び出しに必要なもの
+
+```lean
+noncomputable def certainTypeR (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i) 1) = (∑ i, ((h.columnFamily χ₂⁻¹).mu i) 1)) :
+    S07.OrthonormalCharacterImageFamily
+      (S07.dadeIntegralCharacterMap h.dade0 h.tau) (columnSum h χ₂)
+```
+
+⟹ **member ごとに `χ₂` を復元する必要がある**。可約 member `χ` に対し
+「`χ = columnSum h χ₂` となる `χ₂ ≠ 1` が存在する」を与えるのが (4.4)+(4.5) の分類部分で、
+`difference_image` の dispatch はそこを経由する。degree 条件 `hdeg` も member ごとに要る。
+
+⟹ 本 issue の主作業は「(4.4)/(4.5) の分類を `Hypothesis46` レベルで member → `χ₂` の
+関数として取り出し、`certainTypeR` を適用できる形に整えること」。
+`S13_SixTwoImageData.inducedFamilyImageData` は §12 側で**この復元を既に済ませた**データ
+(`params.mu = hyp.muGrid …`, `memberColumn`) を使って組んでいるので、
+そこがどう `χ₂` を供給しているかを読むのが最短。
+
 ## やること
 
 1. `S06.Hypothesis46` (+ 必要な補助データ) から `S07.GeneralHypothesis` を構成する
