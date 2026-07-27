@@ -3404,3 +3404,19 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
    6B.1 の "deduce" 部分) に流して矛盾。
 
 ⟹ **§6B 完済 (6B.1〜6B.9 全 9 問)**。次は §6C の Problems。
+
+
+### §6C 着手 (2026-07-27): 6C.1(a) 完了
+
+§6C は 2 問のみ (6C.1 (a)(b) / 6C.2 (a)(b))。
+
+* ✅ **6C.1(a)** `isNilpotent_of_prime_orderOf_mulAut_of_fixedFree` (`Problems6C1.lean`):
+  素数位数の自己同型 `α` が単位元しか固定しないなら `G` 冪零。`A = ⟨α⟩ ≤ Aut(G)` の作用が
+  Frobenius (非自明 `a ∈ A` は素数位数ゆえ `⟨a⟩ = A ∋ α`、安定化群が部分群なので `a` の
+  固定点は `α` の固定点) ⟹ Isaacs Thm 6.24 (`isNilpotent_of_isFrobeniusAction`)。
+  ⚠ `Finite (MulAut G)` は mathlib が既に導出できる (自作 instance は削除)。
+* ⏳ **6C.1(b)** 「位数 4 の自己同型では冪零でない例 (`|G| = 75`)」= **具体例の構成**。
+  設計: `G = (ZMod 5)² ⋊ ZMod 3` (作用は `x²+x+1` の companion 行列 `B`、mod 5 で既約)。
+  `α(v, c) = (A v, c⁻¹)` が自己同型になる条件は `A B A⁻¹ = B⁻¹` で、`A = 2σ`
+  (`σ` = Frobenius `x ↦ x⁵` の行列 `[[1,-1],[0,-1]]`) が `A² = -I` (位数 4)・固有値 1 なし
+  (⟹ 固定点は単位元のみ) を満たす。非冪零は「冪零なら Sylow 3 が正規 ⟹ 作用自明」で出る。
