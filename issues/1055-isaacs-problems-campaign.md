@@ -4433,7 +4433,7 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   **残り = `G ≅ DihedralGroup p` の明示同型のみ** /
   8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
   8B.8 ✅ `isPreprimitive_sup_zpowers_addRight_one` /
-  **次の frontier = 8B.9**。
+  8B.9 🔶 **step 1 (原始性) まで** — **次の frontier = 8B.9 step 2–5**。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4621,11 +4621,19 @@ mathlib `DihedralGroup p` への**明示同型の構成**だけ:
    `m` か `n` が偶なら `G ⊄ A_n` ⟹ `A_n < G ≤ S_n` かつ `[S_n : A_n] = 2` ⟹ `G = S_n`;
    どちらも奇なら `G ≤ A_n` ⟹ `G = A_n`。
 
-⚠ **エンコーディングの判断が要る**: 8B.8 は `ZMod n` で書いた。`m`-巡回 `y` を
-`ZMod n` 上で直接 `Equiv.Perm` として定義する (toFun/invFun を val の場合分けで書く)
-か、`Fin n` + `finRotate` + `Equiv.Perm.extendDomain` (mathlib に `IsCycle.extendDomain`,
-`support_extendDomain` あり) を使って 8B.8 側を移送するか。前者のほうが 8B.8 と直結
-するが `IsCycle`/`support` を手で示す必要があり、後者は逆。**まず前者で試す**。
+✅ **エンコーディング決着 (2026-07-27)**: `ZMod n` 上に直接 `mCycle n m hm : Equiv.Perm`
+を構成した (toFun/invFun を val の場合分け)。**step 1 (原始性) は landing 済**
+(`isPreprimitive_zpowers_mCycle_sup_zpowers_addRight_one`)。
+使える補助: `mCycle_apply_of_le` (外を固定), `mCycle_pow_apply`
+(`(mCycle^k) c = ((c.val+k) % m : ℕ)`), `exists_mem_zpowers_mCycle_smul` (S 上推移的),
+`val_add_one_of_lt`, `val_sub_one_of_ne_zero`。
+
+**残り = step 2–5**。step 2 (`z := y⁻¹ * x` の計算) では
+`z c = mCycleInv n m (c + 1)` を val の場合分けで開けばよい:
+`c.val < m-1 → z c = c` / `c.val = m-1 → z c = c+1` / `m ≤ c.val ≤ n-2 → z c = c+1` /
+`c.val = n-1 → z c = ((m-1 : ℕ) : ZMod n)`。
+step 3 では `y` の可動点 = `{c | c.val < m}`, `z` の可動点 = `{c | m-1 ≤ c.val}` を示し
+共通が `m-1` のみであることを使う (`IsCycle`/`support` は step 5 の符号計算まで不要)。
 
 ### 8B.10 の証明構造
 
