@@ -4086,3 +4086,37 @@ TransitiveAutomorphisms / TransvectionGeneration)。演習は新 leaf `Problems8
 
 ⚠ **8A.1 後半は "decide" 問題** — 数学的に決着させてから形式化する (即断しない)。
 まず前半 (対称群内の構成) と 8A.2 以降を文書順で進める。
+
+### 8A.1 後半の "decide" を決着 (2026-07-27) — **答は「できる」**
+
+「置換群が **同型でない regular normal 部分群**をもてるか」— **もてる**。反例:
+
+`Ω = ZMod 4`, `G = {x ↦ εx + a : ε = ±1, a ∈ ZMod 4} ≅ D₈` (= `S₄` の Sylow 2-部分群、
+4 点への自然作用)。
+
+* `T = {x ↦ x + a}` は位数 4・推移的 ⟹ regular。`ε` による共役が `a ↦ εa` なので `T ⊴ G`。
+  `T ≅ Z₄`。
+* `V = {id, x↦x+2, x↦1-x, x↦3-x}` (`S₄` の Klein 群 `{e,(02)(13),(01)(23),(03)(12)}` そのもの)。
+  位数 4・推移的 (`0 ↦ 0,2,1,3`) ⟹ regular。`φ(εx+a) = a + [ε=-1] mod 2` が準同型
+  `G → Z₂` でその核が `V` ⟹ `V ⊴ G` (指数 2)。`V ≅ Z₂ × Z₂`。
+* `Z₄ ≇ Z₂ × Z₂` ⟹ 反例成立。
+
+⚠ 8A.4 (`U ⊓ V = 1` なら `U ≅ V`) と矛盾しない: 上の例では `T ⊓ V = {id, x↦x+2} ≠ 1`。
+
+形式化の方針: `Equiv.Perm (ZMod 4)` 内で 2 つの部分群を明示構成し, regular は
+`bijective_smulBase_iff` (`RegularNormal.lean`), 非同型は「`T` に位数 4 の元があり `V` に無い」
+で出す (`ZMod 4` 上なので `decide` が効く見込み)。
+
+### §8A 進捗 (2026-07-27)
+
+新 leaf `OddOrder/Isaacs/Ch08_PermutationGroups/Problems8A.lean` (`OddOrder.lean` 配線済):
+
+* ✅ **8A.2** 実証明 — `smul_eq_self_of_mem_centralizer` (推移的 `H` の中心化群の元は
+  1 点固定 ⟹ 全点固定) / `centralizer_inf_stabilizer_eq_bot` (忠実性を足して半正則) /
+  `bijective_smulBase_top_of_comm` (可換推移的置換群は regular)。
+* ✅ **8A.8** 実証明 — `smul_orbit_eq_orbit_smul` (`N ⊴ G` なら `g • orbit N α =
+  orbit N (g • α)`) / `card_orbit_eq_of_normal` (帰結: `N` は half-transitive)。
+
+Lean 実務メモ: `[N.Normal]` はインスタンスなので `N.Normal.conj_mem` と書けない
+(`N.Normal : Prop` へのフィールド射影になる) → `Subgroup.Normal.conj_mem ‹N.Normal›`。
+`Nat.card ↑(g • S) = Nat.card ↑S` は `Equiv.Set.image` + `Equiv.setCongr Set.image_smul`。
