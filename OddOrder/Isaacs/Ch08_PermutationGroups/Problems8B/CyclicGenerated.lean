@@ -43,6 +43,9 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
   そのもの (⟹ 点安定化群でなければ固定点をもたない)。
 - `choose_two_le_choose`, `lt_choose_of_two_le_of_le_sub_two` — **8B.10 の counting**:
   `4 ≤ N` かつ `2 ≤ k ≤ N - 2` なら `N < C(N, k)`。
+- `card_le_factorial_mul_factorial_of_invariant`,
+  `isPretransitive_of_index_eq_of_ne_stabilizer` — **8B.10 の step 1**: `Sym(α)` の
+  指数 `|α|` の部分群で点安定化群でないものは推移的。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -677,6 +680,110 @@ lemma lt_choose_of_two_le_of_le_sub_two {N k : ℕ} (h2 : 2 ≤ k) (hk : k ≤ N
   · exact hchoose2.trans_le (choose_two_le_choose k h2 (by omega))
   · rw [← Nat.choose_symm (by omega)]
     exact hchoose2.trans_le (choose_two_le_choose (N - k) (by omega) (by omega))
+
+/-- `H ≤ Sym(α)` が集合 `S` を保つなら `|H| ≤ |S|! · |Sᶜ|!`
+(`h ↦ (h|_S, h|_{Sᶜ})` が単射)。 -/
+lemma card_le_factorial_mul_factorial_of_invariant {H : Subgroup (Equiv.Perm α)} {S : Set α}
+    (hinv : ∀ h ∈ H, ∀ x : α, x ∈ S ↔ (h : Equiv.Perm α) x ∈ S) :
+    Nat.card ↥H ≤ (Nat.card ↥S).factorial * (Nat.card ↥(Sᶜ)).factorial := by
+  classical
+  have hcompl : ∀ h ∈ H, ∀ x : α, x ∈ Sᶜ ↔ (h : Equiv.Perm α) x ∈ Sᶜ := by
+    intro h hh x
+    simp only [Set.mem_compl_iff, not_iff_not]
+    exact hinv h hh x
+  have hinj : Function.Injective (fun h : ↥H =>
+      (((h : Equiv.Perm α).subtypePerm (fun x => (hinv (h : Equiv.Perm α) h.2 x).symm),
+        (h : Equiv.Perm α).subtypePerm (fun x => (hcompl (h : Equiv.Perm α) h.2 x).symm)) :
+          Equiv.Perm ↥S × Equiv.Perm ↥(Sᶜ))) := by
+    intro h₁ h₂ heq
+    refine Subtype.ext (Equiv.ext fun x => ?_)
+    by_cases hx : x ∈ S
+    · have h := congrArg (fun p : Equiv.Perm ↥S × Equiv.Perm ↥(Sᶜ) =>
+        ((p.1 ⟨x, hx⟩ : ↥S) : α)) heq
+      simpa using h
+    · have h := congrArg (fun p : Equiv.Perm ↥S × Equiv.Perm ↥(Sᶜ) =>
+        ((p.2 ⟨x, hx⟩ : ↥(Sᶜ)) : α)) heq
+      simpa using h
+  calc Nat.card ↥H ≤ Nat.card (Equiv.Perm ↥S × Equiv.Perm ↥(Sᶜ)) :=
+        Nat.card_le_card_of_injective _ hinj
+    _ = (Nat.card ↥S).factorial * (Nat.card ↥(Sᶜ)).factorial := by
+        rw [Nat.card_prod, Nat.card_perm, Nat.card_perm]
+
+/-- **Isaacs Problem 8B.10 の step 1**: `Sym(α)` の指数 `|α|` の部分群で点安定化群で
+ないものは `α` に**推移的**。
+
+非推移なら軌道 `S` は `H`-不変な真部分集合で, 固定点をもたないことから `S` も `Sᶜ` も
+2 点以上。すると `|H| ≤ |S|!·|Sᶜ|!` と `|H|·n = n!` から `C(n,|S|) ≤ n` となり,
+`lt_choose_of_two_le_of_le_sub_two` に矛盾。 -/
+theorem isPretransitive_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α)}
+    (hidx : H.index = Nat.card α)
+    (hns : ∀ a : α, H ≠ MulAction.stabilizer (Equiv.Perm α) a) :
+    MulAction.IsPretransitive ↥H α := by
+  classical
+  by_contra hcon
+  have hnot : ¬ (∀ a b : α, ∃ h : ↥H, h • a = b) := fun h => hcon ⟨fun a b => h a b⟩
+  push Not at hnot
+  obtain ⟨a, b, hab⟩ := hnot
+  set S : Set α := MulAction.orbit ↥H a with hS
+  have hbS : b ∉ S := fun ⟨h, hh⟩ => hab h hh
+  have haS : a ∈ S := MulAction.mem_orbit_self a
+  have hinv : ∀ h ∈ H, ∀ x : α, x ∈ S ↔ (h : Equiv.Perm α) x ∈ S := by
+    intro h hh x
+    constructor
+    · rintro ⟨k, rfl⟩
+      exact ⟨⟨h, hh⟩ * k, mul_smul _ _ _⟩
+    · rintro ⟨k, hk⟩
+      refine ⟨(⟨h, hh⟩ : ↥H)⁻¹ * k, ?_⟩
+      change ((⟨h, hh⟩ : ↥H)⁻¹ * k) • a = x
+      rw [mul_smul, show (k : ↥H) • a = (⟨h, hh⟩ : ↥H) • x from hk,
+        inv_smul_smul]
+  -- `S`, `Sᶜ` はともに 2 点以上。
+  have htwo : ∀ (T : Set α), (∀ h ∈ H, ∀ x : α, x ∈ T ↔ (h : Equiv.Perm α) x ∈ T) →
+      ∀ c ∈ T, 2 ≤ T.ncard := by
+    intro T hT c hc
+    obtain ⟨h, hh, hne⟩ := not_fixed_of_index_eq_of_ne_stabilizer hidx hns c
+    have hsub : ({c, (h : Equiv.Perm α) c} : Set α) ⊆ T := by
+      rintro z (rfl | hz)
+      · exact hc
+      · rw [Set.mem_singleton_iff] at hz
+        exact hz ▸ (hT h hh c).mp hc
+    calc 2 = ({c, (h : Equiv.Perm α) c} : Set α).ncard := (Set.ncard_pair (Ne.symm hne)).symm
+      _ ≤ T.ncard := Set.ncard_le_ncard hsub (Set.toFinite T)
+  have hScard : 2 ≤ S.ncard := htwo S hinv a haS
+  have hCcard : 2 ≤ (Sᶜ : Set α).ncard := by
+    refine htwo Sᶜ (fun h hh x => ?_) b hbS
+    simp only [Set.mem_compl_iff, not_iff_not]
+    exact hinv h hh x
+  have hsum : S.ncard + (Sᶜ : Set α).ncard = Nat.card α := Set.ncard_add_ncard_compl S
+  have hn4 : 4 ≤ Nat.card α := by omega
+  -- 位数評価
+  have hSc : Nat.card ↥S = S.ncard := Nat.card_coe_set_eq S
+  have hCc : Nat.card ↥(Sᶜ : Set α) = (Sᶜ : Set α).ncard := Nat.card_coe_set_eq _
+  have hbound : Nat.card ↥H ≤ (S.ncard).factorial * ((Sᶜ : Set α).ncard).factorial := by
+    rw [← hSc, ← hCc]
+    exact card_le_factorial_mul_factorial_of_invariant hinv
+  have hHcard : Nat.card ↥H * Nat.card α = (Nat.card α).factorial := by
+    have h1 : Nat.card ↥H * H.index = Nat.card (Equiv.Perm α) := Subgroup.card_mul_index H
+    rw [hidx, Nat.card_perm] at h1
+    exact h1
+  have hchoose : (Nat.card α).choose S.ncard * ((S.ncard).factorial *
+      ((Nat.card α - S.ncard)).factorial) = (Nat.card α).factorial := by
+    rw [← mul_assoc]
+    exact Nat.choose_mul_factorial_mul_factorial (by omega)
+  have hcompl_eq : (Sᶜ : Set α).ncard = Nat.card α - S.ncard := by omega
+  rw [hcompl_eq] at hbound
+  have hpos : 0 < (S.ncard).factorial * ((Nat.card α - S.ncard)).factorial :=
+    Nat.mul_pos (Nat.factorial_pos _) (Nat.factorial_pos _)
+  have hle : (Nat.card α).choose S.ncard ≤ Nat.card α := by
+    refine Nat.le_of_mul_le_mul_right ?_ hpos
+    calc (Nat.card α).choose S.ncard *
+          ((S.ncard).factorial * ((Nat.card α - S.ncard)).factorial)
+        = Nat.card ↥H * Nat.card α := by rw [hchoose, ← hHcard]
+      _ ≤ ((S.ncard).factorial * ((Nat.card α - S.ncard)).factorial) * Nat.card α :=
+          Nat.mul_le_mul_right _ hbound
+      _ = Nat.card α * ((S.ncard).factorial * ((Nat.card α - S.ncard)).factorial) := by ring
+  exact absurd hle (Nat.not_le.mpr
+    (lt_choose_of_two_le_of_le_sub_two hScard (by omega) hn4))
 
 end IndexN
 
