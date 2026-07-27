@@ -17,6 +17,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 1E の形式化
 * **1E.2**: `|G| = pqr` (`p < q < r` 素数) なら `n_r = 1`。
 * **1E.3**: 位数 `315 = 3²·5·7` の単純群は存在しない。
 * **1E.4**: 位数 `144 = 2⁴·3²` の単純群は存在しない。
+* **1E.5**: 位数 `336 = 2⁴·3·7` の単純群は存在しない (Hint = `n₇` を計算して 1C.5)。
 
 ## 共通の道具
 
@@ -40,11 +41,20 @@ Sylow 部分群の位数・指数を `|G|` の分解から読むために
 - `not_isSimpleGroup_of_card_eq_onefourfour` — **Problem 1E.4**。
 - `exists_injective_hom_alternating_of_simple` — 単純群は指数 `n` の部分群があれば
   `Aₙ` に単射に埋め込める (1E.5 の Hint が要求する道具)。
+- `not_isSimpleGroup_of_card_eq_threethreesix` — **Problem 1E.5**。
 -/
 
 namespace OddOrder.Isaacs.Ch01
 
 section /- 1E: Sylow 部分群の位数と指数 (p. 37) -/
+
+/-- `N = m·q^k` (`q` 素数, `q ∤ m`) なら `N` の `q`-指数はちょうど `k`。 -/
+theorem factorization_of_eq_mul_pow {N m q k : ℕ} (hq : q.Prime) (hm : ¬ q ∣ m)
+    (h : N = m * q ^ k) : N.factorization q = k := by
+  have hm0 : m ≠ 0 := by rintro rfl; exact hm (dvd_zero q)
+  rw [h, Nat.factorization_mul hm0 (pow_ne_zero k hq.pos.ne'), Finsupp.add_apply,
+    Nat.factorization_eq_zero_of_not_dvd hm, zero_add, hq.factorization_pow]
+  simp
 
 /-- `|G| = m·q^k` (`q` 素数, `q ∤ m`) のとき Sylow `q`-部分群の位数は `q^k`,
 指数は `m` ちょうど。 -/
@@ -52,11 +62,7 @@ theorem sylow_card_and_index_of_card_eq_mul {G : Type*} [Group G] [Finite G] {q 
     [Fact q.Prime] (h : Nat.card G = m * q ^ k) (hm : ¬ q ∣ m) (P : Sylow q G) :
     Nat.card ↥(P : Subgroup G) = q ^ k ∧ (P : Subgroup G).index = m := by
   have hq : q.Prime := Fact.out
-  have hm0 : m ≠ 0 := by rintro rfl; exact hm (dvd_zero q)
-  have hfact : (Nat.card G).factorization q = k := by
-    rw [h, Nat.factorization_mul hm0 (pow_ne_zero k hq.pos.ne'), Finsupp.add_apply,
-      Nat.factorization_eq_zero_of_not_dvd hm, zero_add, hq.factorization_pow]
-    simp
+  have hfact : (Nat.card G).factorization q = k := factorization_of_eq_mul_pow hq hm h
   have hcard : Nat.card ↥(P : Subgroup G) = q ^ k := by
     rw [Sylow.card_eq_multiplicity, hfact]
   refine ⟨hcard, ?_⟩
@@ -666,5 +672,100 @@ theorem exists_injective_hom_alternating_of_simple {G : Type*} [Group G] [Finite
   exact ⟨φ.codRestrict _ hmem, fun a b hab => hinj (congrArg Subtype.val hab)⟩
 
 end -- 単純群の交代群への埋め込み
+
+section /- 1E: Problem 1E.5 (p. 38) -/
+
+/-- `n ∣ 48` かつ `n ≡ 1 (mod 7)` なら `n = 1` または `n = 8`。 -/
+private lemma eq_one_or_eight_of_dvd_fortyeight {n : ℕ} (h : n ∣ 48) (hm : n % 7 = 1) :
+    n = 1 ∨ n = 8 := by
+  have h0 : 0 < n := Nat.pos_of_dvd_of_pos h (by norm_num)
+  have hle : n ≤ 48 := Nat.le_of_dvd (by norm_num) h
+  interval_cases n <;> revert h hm <;> decide
+
+/-- **Isaacs Problem 1E.5** (p. 38)。位数 `336 = 2⁴·3·7` の単純群は存在しない。
+
+書籍の Hint どおり `n₇` を計算して **Problem 1C.5** を使う。`n₇ ∣ [G : P] = 48` と
+`n₇ ≡ 1 (mod 7)` から `n₇ ∈ {1, 8}` で, 単純性より `n₇ = 8`。すると
+`N := N_G(P)` は指数 8, 位数 `336 / 8 = 42`。単純群は指数 8 の部分群をもつので
+`G ↪ A₈` (`exists_injective_hom_alternating_of_simple`)。`P` の像 `Q` は位数 7 で,
+`|A₈| = 8!/2 = 20160 = 2880·7` だから `Q` は `A₈` の Sylow `7`-部分群。`N` の像は
+`N_{A₈}(Q)` に入るので `42 ≤ |N_{A₈}(Q)|` だが, **1C.5**
+(`card_normalizer_sylow_alternating`) は `|N_{A₈}(Q)| = 7·6/2 = 21` を与える。矛盾。 -/
+theorem not_isSimpleGroup_of_card_eq_threethreesix {G : Type*} [Group G] [Finite G]
+    (hG : Nat.card G = 336) : ¬ IsSimpleGroup G := by
+  intro hsimple
+  classical
+  haveI := hsimple
+  haveI : Fact (Nat.Prime 7) := ⟨by norm_num⟩
+  obtain ⟨P⟩ : Nonempty (Sylow 7 G) := Sylow.nonempty
+  obtain ⟨hPcard, hPindex⟩ := sylow_card_and_index_of_card_eq_mul (q := 7) (m := 48) (k := 1)
+    (by rw [hG]; norm_num) (by norm_num) P
+  rw [pow_one] at hPcard
+  -- `n₇ = 8`
+  have hn7 : Nat.card (Sylow 7 G) = 8 := by
+    rcases eq_one_or_eight_of_dvd_fortyeight (hPindex ▸ Sylow.card_dvd_index P)
+      (card_sylow_mod_eq_one 7) with h | h
+    · exact absurd h (card_sylow_ne_one_of_simple P (by rw [hPcard]; norm_num)
+        (by rw [hPcard, hG]; norm_num))
+    · exact h
+  -- `N := N_G(P)` は指数 8, 位数 42
+  set N : Subgroup G := Subgroup.normalizer ((P : Subgroup G) : Set G) with hNdef
+  have hNindex : N.index = 7 + 1 := by
+    rw [hNdef, Sylow.coe_coe, ← Sylow.card_eq_index_normalizer P, hn7]
+  have hNcard : Nat.card ↥N = 42 := by
+    have h := Subgroup.card_mul_index N
+    rw [hNindex, hG] at h
+    omega
+  -- `G ↪ A₈`
+  obtain ⟨f, hfinj⟩ := exists_injective_hom_alternating_of_simple (H := N) (n := 7 + 1)
+    hNindex (by norm_num) (by rw [hG]; norm_num)
+  -- `|A₈| = 20160`
+  have hAcard : Nat.card ↥(alternatingGroup (Fin (7 + 1))) = 20160 := by
+    rw [nat_card_alternatingGroup, Nat.card_eq_fintype_card, Fintype.card_fin]
+    norm_num [Nat.factorial]
+  -- `Q := f(P)` は `A₈` の Sylow `7`-部分群
+  set Q : Subgroup ↥(alternatingGroup (Fin (7 + 1))) := (P : Subgroup G).map f with hQdef
+  have hQcard : Nat.card ↥Q = 7 := by
+    rw [hQdef, Subgroup.card_map_of_injective hfinj, hPcard]
+  have hQsylow : Nat.card ↥Q
+      = 7 ^ (Nat.card ↥(alternatingGroup (Fin (7 + 1)))).factorization 7 := by
+    rw [hQcard, hAcard, factorization_of_eq_mul_pow (q := 7) (m := 2880) (k := 1)
+      (by norm_num) (by norm_num) (by norm_num), pow_one]
+  set R : Sylow 7 ↥(alternatingGroup (Fin (7 + 1))) := Sylow.ofCard Q hQsylow with hRdef
+  have hRcoe : (R : Subgroup ↥(alternatingGroup (Fin (7 + 1)))) = Q :=
+    Sylow.coe_ofCard Q hQsylow
+  -- **1C.5**: `|N_{A₈}(Q)| = 21`
+  have h21 : Nat.card
+      ↥(Subgroup.normalizer (R : Set ↥(alternatingGroup (Fin (7 + 1))))) = 21 := by
+    have h := card_normalizer_sylow_alternating (p := 7) (by norm_num) R
+    rwa [show 7 * (7 - 1) / 2 = 21 from by norm_num] at h
+  -- `f(N) ≤ N_{A₈}(Q)`
+  have hmapN : N.map f ≤ Subgroup.normalizer ((Q : Subgroup _) : Set _) := by
+    rintro y ⟨x, hx, rfl⟩
+    rw [Subgroup.mem_normalizer_iff]
+    have hxn := Subgroup.mem_normalizer_iff.mp hx
+    have hxin := Subgroup.mem_normalizer_iff.mp (N.inv_mem hx)
+    intro h
+    constructor
+    · intro hh
+      obtain ⟨g, hg, rfl⟩ := Subgroup.mem_map.mp hh
+      refine Subgroup.mem_map.mpr ⟨x * g * x⁻¹, (hxn g).mp hg, ?_⟩
+      rw [map_mul, map_mul, map_inv]
+    · intro hh
+      obtain ⟨g, hg, hgeq⟩ := Subgroup.mem_map.mp hh
+      have hmem : x⁻¹ * g * x ∈ (P : Subgroup G) := by
+        have hc := (hxin g).mp hg
+        rwa [inv_inv] at hc
+      refine Subgroup.mem_map.mpr ⟨x⁻¹ * g * x, hmem, ?_⟩
+      rw [map_mul, map_mul, map_inv, hgeq]
+      group
+  -- `42 ≤ 21` は偽
+  have hle : Nat.card ↥(N.map f) ≤
+      Nat.card ↥(Subgroup.normalizer ((Q : Subgroup _) : Set _)) :=
+    Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hmapN)
+  rw [Subgroup.card_map_of_injective hfinj, hNcard, ← hRcoe, Sylow.coe_coe] at hle
+  omega
+
+end -- Problem 1E.5
 
 end OddOrder.Isaacs.Ch01

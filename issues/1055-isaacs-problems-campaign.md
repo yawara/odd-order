@@ -5257,7 +5257,20 @@ leaf = `Ch01_Sylow/ProblemsNonSimple.lean` (`OddOrder.lean` 配線済)。
   ⚠ `Equiv.permCongrHom (e : α ≃ β) : Perm α ≃* Perm β` (`Mathlib/Algebra/Group/End.lean`)
   が `Perm (G ⧸ H) ≃* Perm (Fin n)` の橋渡し (`Equiv.permCongr` は Equiv どまり)。
 
-* 次の frontier = **1E.5 本体** (位数 `336 = 2⁴·3·7`)。筋:
+* ✅ **1E.5** `not_isSimpleGroup_of_card_eq_threethreesix` (2026-07-28)。下記の筋どおり landing。
+  ⚠ 実装上の罠: (i) `norm_num at h` は `Nat.card` を `Fintype.card` に書き換えてしまうので、
+  1C.5 の結論 `= 7*(7-1)/2` の数値化は `rwa [show 7*(7-1)/2 = 21 from by norm_num] at h`。
+  (ii) `Sylow` の Set 係数は `(R : Set X)` (直接) と `((R : Subgroup X) : Set X)` の 2 形が
+  あり、後者を型指定 `: Set _` で書くと `Set ?m` が決まらず elaborate に失敗する
+  (`Sylow.coe_coe` は `rfl` なので `rw` で橋渡しする)。
+  (iii) `f (x⁻¹ * g * x⁻¹⁻¹)` を `group` で潰そうとすると `f` の中の `⁻¹` が残る —
+  `inv_inv` で先に `x⁻¹ * g * x` に直してから `map_mul`/`map_inv` を当てる。
+
+* 次の frontier = **1E.6** (位数 `180 = 2²·3²·5`)、以降 1E.7 (`240 = 2⁴·3·5`) /
+  1E.8 (`252 = 2²·3²·7`)。1E.3/1E.4 と同じ道具立て (Thm 1.16 の交わり最大対 + Cor 1.3 +
+  必要なら A_n 埋め込み) で書けるはず。
+
+### 1E.5 の筋 (実装済, 記録として保持)
   `n₇ ∣ 48`, `≡ 1 (mod 7)` ⟹ `n₇ ∈ {1, 8}`、単純性で `n₇ = 8` ⟹ `|N_G(P₇)| = 42`。
   上の埋め込みで `G ↪ A₈ = A_{7+1}`。`P₇` の像 `Q` は `|A₈| = 20160 = 2⁶·3²·5·7` の
   Sylow 7 (位数 7) で、`N_G(P₇)` の像は `N_{A₈}(Q)` に入るから `42 ≤ |N_{A₈}(Q)|`。
