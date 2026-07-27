@@ -75,6 +75,31 @@ noncomputable def certainTypeR (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
 (`params.mu = hyp.muGrid …`, `memberColumn`) を使って組んでいるので、
 そこがどう `χ₂` を供給しているかを読むのが最短。
 
+## ⟹ 経路が確定した (2026-07-27 実測)
+
+§12 側の可約-member 分類
+
+```lean
+theorem Hypothesis.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
+    (hG : IsMinimalSimpleOdd G) (hyp : Hypothesis M) … (hred : ¬ IsIrreducibleCharacter ψ) :
+    ∃ k : Fin hyp.w2, k ≠ 0 ∧ ψ = ∑ i, hyp.muGrid hG hG.odd i k
+```
+(`S12_HcBound.lean:587`) は、証明の 3 行目で
+
+```lean
+  let h := (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis   -- :597
+```
+
+として **(4.6) レベルの certain-type hypothesis に落としている**。
+⟹ **分類の中身は既に (4.6) レベル**で、§12 は `Hypothesis46` の instance を供給しているだけ。
+
+⟹ 本 issue の作業は「`S12_HcBound:597` 以降の本体を `Hypothesis46` レベルの補題として
+切り出し、それを使って `Hypothesis46.toGeneralHypothesis` の `difference_image` を
+dispatch する」。§12 版はその特殊化になる。
+
+⚠ 前 tick に書いた「§13 の `inducedFamilyImageData` を読むのが最短」は**外れ** —
+§13 は分類済みデータ (`memberColumn`) の消費側で、分類そのものは §12 → S06 に在る。
+
 ## やること
 
 1. `S06.Hypothesis46` (+ 必要な補助データ) から `S07.GeneralHypothesis` を構成する
