@@ -3548,7 +3548,7 @@ Ch.6 の演習は **§6A 6A.1–6A.11 / §6B 6B.1–6B.9 / §6C 6C.1–6C.2 の�
 
 | # | 主張 (要約) | 見込みの道具 |
 |---|---|---|
-| 7A.1 | 単純群の冪零な極大部分群は `2`-群 | **Thm 7.1** (Thompson の normal `p`-complement) + `Z(P)`/`J(P)` の正規化群が `M` に一致する議論 |
+| 7A.1 | ✅ **完了** (`Problems7A1.lean`, axiom-clean) 単純群の冪零な極大部分群は `2`-群 | **Thm 7.1** (Thompson の normal `p`-complement) + `Z(P)`/`J(P)` の正規化群が `M` に一致する議論 |
 | 7A.2 | `S = SL(2,3)`, `Z = {±I}` ⟹ `S/Z` (位数 12) は Sylow 3 が 4 個 ⟹ Sylow 2 が一意 ⟹ `S` に位数 8 の正規部分群 | `GL(n,q)` の Sylow `p` が 2 個以上 (本文既知) + Sylow 数え上げ |
 | 7A.3 | `G = GL(n,q)`, `P` = 上三角冪単, `D` = 対角 ⟹ (a) `D ≤ N_G(P)` (b) `DP` = 上三角全体 (c) `P`-不変部分空間は各次元にちょうど 1 つ (d) `N_G(P) = DP` | 行列計算 + `P`-不変部分空間の分類 |
 | 7A.4 | `SL(2,q)` と `PSL(2,q)` の Sylow `p` はちょうど `q + 1` 個 | Sylow 数え上げ (Borel の指数) |
@@ -3586,3 +3586,79 @@ Isaacs の**番号付き結果**でありlane a の territory・かつ 7A.1 の�
 次 iteration からこれに着手する。7A.2-7A.6 は Thm 7.1 に依存しない
 (GL(n,q)/SL(2,q) の Sylow 数え上げ・`𝓔(P)`・`Aut(Q_{2^n})`) ので、Thm 7.1 が長引く場合の
 並行候補として残す。
+
+### ✅ 訂正 (2026-07-27): 7A.1 は gated ではない — Thm 6.23 (無条件) で足りる
+
+前項の「7A.1 は Thm 7.1 無条件版に gated」は**過小評価だった**。7A.1 の証明には
+教科書 Thm 7.1 (Z(P) と J(P) の 2 つだけ) は不要で、**Thm 6.23**
+(`OddOrder.Isaacs.Ch06.hasNormalPComplement_of_forall_characteristic_normalizer`,
+`ThompsonPComplement.lean:55`, **無条件・axiom-clean**: `p ≠ 2` と「`P` の非自明
+characteristic 部分群すべての正規化群が normal `p`-complement を持つ」だけ) で足りる。
+理由: 冪零極大 `M` は `P` の**すべての** characteristic 部分群を正規化するから
+(`P ⊴ M` かつ `M` の `p`-complement `H` は `[P, H] ≤ P ⊓ H = ⊥` で `P` を中心化)。
+
+**7A.1 の証明設計** (次 iteration で実装):
+1. `M` 冪零極大、奇素数 `p ∣ |M|` を仮定 (`IsPGroup 2 ↥M` の否定から取る)。
+2. `P` = `M` の Sylow `p` を `G` へ写したもの。`M` 冪零 ⟹ `P ⊴ M`;
+   `N_G(P) ⊇ M` で単純性 (`P ≠ ⊥`, `P ≠ ⊤`) から `N_G(P) ≠ G` ⟹ 極大性で `N_G(P) = M`。
+3. `P ∈ Syl_p(G)`: `P ≤ Q ∈ Syl_p(G)` で `P < Q` なら `NormalizerCondition ↥Q`
+   (p-群は冪零) から `P < N_Q(P) ≤ N_G(P) = M` となり `P` が `M` の Sylow `p` に反する。
+4. 非自明 characteristic `X ≤ ↥P` に対し `M ≤ N_G(X.map)`:
+   `P ≤ N_G(X.map)` (char ⟹ `P`-正規) + `H ≤ C_G(P) ≤ N_G(X.map)` + `M = P ⊔ H`。
+   単純性で `N_G(X.map) ≠ G` (`X.map ≠ ⊥`, `X.map = ⊤` なら `P = ⊤` で `M = ⊤` に矛盾)
+   ⟹ 極大性で `= M`。`M` 冪零ゆえ normal `p`-complement を持つ
+   (`Ch05.hasNormalPComplement_of_isNilpotent`)。
+5. Thm 6.23 ⟹ `G` が normal `p`-complement `K` を持つ。単純性で `K = ⊥` (⟹ `G` は
+   `p`-群で中心が非自明 ⟹ 単純性に反する/位数 `p` なら `M = 1` で `p ∣ |M|` に反する) か
+   `K = ⊤` (⟹ `p ∤ |G|` で `p ∣ |M|` に反する) のどちらでも矛盾。
+
+⟹ Thm 7.1 無条件版 (§7C Steps 1-3 + 組み上げ) は**別枠の上流タスク**として残すが、
+§7A の演習は Thm 6.23 で進められる。
+
+### 7A.1 進捗 (2026-07-27): 再利用可能な Sylow 補題を実証明
+
+新 leaf `OddOrder/Isaacs/Ch07_ThompsonSubgroup/Problems7A1.lean` (`OddOrder.lean` 配線済):
+
+* ✅ `exists_sylow_eq_of_maximal_pSubgroup_in_normalizer`: **`N_G(P)` の中で極大な
+  `p`-部分群 `P` は `G` の Sylow `p`-部分群**。`P ≤ S ∈ Syl_p(G)` を取り `P < S` なら
+  `S` は `p`-群ゆえ冪零 ⟹ `NormalizerCondition ↥S` から `P.subgroupOf S` を正規化する
+  `x ∈ S \ P` が在り、`P ⊔ ⟨x⟩` は `N_G(P)` 内の `p`-部分群で `P` を真に含むので極大性に反する
+  (`IsPGroup.to_sup_of_normal_left'` を使用)。
+  ⚠ この mathlib 版の `NormalizerCondition` は `H < ⊤` を取る (`H ≠ ⊤` ではない)。
+  ⟹ 7A.1 の step 3 (`P ∈ Syl_p(G)`) がこれ 1 本で済む。汎用なので他の演習でも使える見込み。
+* 次: 7A.1 本体 (`N_G(P) = M` の確立 → characteristic 部分群の正規化 → Thm 6.23 で矛盾)。
+* ✅ `exists_mul_centralizing_of_isNilpotent` (2026-07-27): 冪零な `M ≤ G` の Sylow
+  `p`-部分群 `Pm` について、`M` の元はすべて「`Pm` の元」×「`Pm` を中心化する元」の積。
+  `M` 冪零 ⟹ `Pm ⊴ M` + normal `p`-complement `N ⊴ M` があり `N ⊓ Pm = ⊥` なので
+  `Subgroup.commute_of_normal_of_disjoint` で `N` が `Pm` を元ごとに中心化する。
+  ⚠ mathlib の `commute_of_normal_of_disjoint` は `(x y : G) (hx) (hy)` の順 (元 2 つが先)。
+  ⟹ これで `M ≤ N_G(X)` (X は `P` で正規な部分群) が **layer 変換なしで**出せる:
+  `m = u * h` と書けば `m y m⁻¹ = u (h y h⁻¹) u⁻¹ = u y u⁻¹ ∈ X`。
+* ✅ `le_normalizer_of_isNilpotent` (2026-07-27): 冪零 `M` は Sylow `P` 内の `P`-正規部分群
+  `X` を正規化する (`m = u*h` 分解 ⟹ `m y m⁻¹ = u y u⁻¹ ∈ X`; 逆包含は `m⁻¹ ∈ M` から)。
+* ✅ 7A.1 主定理の骨組み + `hnormeq` (極大性 + 単純性から `N_G(Y) = M`) を実証明。
+  残り = step 6-9 (`P ∈ Syl_p(G)` の適用 / characteristic `X` ごとの
+  `HasNormalPComplement p ↥(N_G(X.map))` / Thm 6.23 / `N = ⊥ ∨ ⊤` の矛盾) — sorry 1 件。
+  ⚠ この mathlib では `Subgroup.normalizer` は **`Set G` を取る** (`(Y : Set G)` と明示が必要)。
+  単純性は `IsSimpleGroup.eq_bot_or_eq_top_of_normal`、`Subgroup G` は linear order でないので
+  `not_lt` でなく `eq_of_le_of_not_lt` を使う。
+
+### 🎉 7A.1 完成 (2026-07-27) — `isPGroup_two_of_isNilpotent_of_isCoatom` (axiom-clean)
+
+`Problems7A1.lean` (`OddOrder.lean` 配線済) に 4 本:
+* `exists_sylow_eq_of_maximal_pSubgroup_in_normalizer` (汎用): `N_G(P)` 内で極大な
+  `p`-部分群は `G` の Sylow。
+* `exists_mul_centralizing_of_isNilpotent`: 冪零 `M` の元は「Sylow の元」×「中心化元」の積。
+* `le_normalizer_of_isNilpotent`: 冪零 `M` は Sylow `P` 内の `P`-正規部分群を正規化する。
+* **`isPGroup_two_of_isNilpotent_of_isCoatom`** (主定理): 単純群の冪零な極大部分群は `2`-群。
+  奇素数 `p ∣ |M|` を仮定 ⟹ `N_G(P) = M` (極大性 + 単純性) ⟹ `P ∈ Syl_p(G)` ⟹
+  `P` の非自明 characteristic 部分群 `X` すべてで `N_G(X.map) = M` かつ `M` 冪零ゆえ
+  normal `p`-complement ⟹ **Thm 6.23** で `G` に normal `p`-complement `N` ⟹
+  単純性で `N = ⊥` (⟹ `S = ⊤ ≤ M` で `M ≠ ⊤` に矛盾) / `N = ⊤` (⟹ `S = ⊥` で `P ≠ ⊥` に矛盾)。
+
+API メモ: `Sylow.is_maximal'` / `Subgroup.map_subgroupOf_eq_of_le` /
+`Subgroup.normal_of_characteristic` (instance) / `Subgroup.isComplement'_bot_left` ·
+`isComplement'_top_left`。⚠ `X.map f ≠ ⊥` は `rw [map_eq_bot_iff_of_injective]` が
+`Ne` の下では効かないので `intro hbot` してから使う。
+
+次: 7A.2 (`SL(2,3)/Z` の Sylow 数え上げ ⟹ 位数 8 の正規部分群)。
