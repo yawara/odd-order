@@ -151,4 +151,86 @@ noncomputable def InducedFamilyImageData.xSetHypothesis {A₀ : Set ↥L}
     {Z : Subgroup ↥L} (hirr : ∀ φ ∈ xSet K Z, IsIrreducibleCharacter φ) :
     (RD.xSetHypothesis hodd hKsupp hirr).tau = RD.tau := rfl
 
+/-! ### The `(6.6)` degree-square sum over `𝒳`, general kernel -/
+
+open scoped Classical in
+/-- The `Finset` enumerating `𝒳 = 𝒮 − 𝒮(Z)` — the difference of the two kernel-filter images that
+`sum_re_div_normSq_inducedKernelFamily_eq` sums over. -/
+noncomputable def xSetFinset (K : Subgroup ↥L) [Invertible (Nat.card ↥K : ℂ)]
+    (Z : Subgroup ↥L) : Finset (ClassFunction ↥L ℂ) :=
+  (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+        (↑((⊥ : Subgroup ↥L).subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥K ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥K)).image
+      (fun θ => ClassFunction.induce K θ.toClassFunction) \
+    (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+        (↑(Z.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥K ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥K)).image
+      (fun θ => ClassFunction.induce K θ.toClassFunction)
+
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+open scoped Classical in
+theorem coe_xSetFinset (Z : Subgroup ↥L) : ↑(xSetFinset K Z) = xSet K Z := by
+  rw [xSetFinset, Finset.coe_sdiff, coe_kernelFilter_image_eq_inducedKernelFamily,
+    coe_kernelFilter_image_eq_inducedKernelFamily]
+  rfl
+
+omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+open scoped Classical in
+theorem mem_xSetFinset {Z : Subgroup ↥L} {φ : ClassFunction ↥L ℂ} :
+    φ ∈ xSetFinset K Z ↔ φ ∈ xSet K Z := by
+  rw [← Finset.mem_coe, coe_xSetFinset]
+
+omit [Invertible (Nat.card G : ℂ)] in
+open scoped Classical in
+/-- **Peterfalvi (6.6) degree-square sum, general kernel**:
+`∑_{χ ∈ 𝒳} χ(1)² = |L:K| · (|K| − |K:Z|)`.
+
+Since `𝒮(Z) ⊆ 𝒮` and `𝒳 = 𝒮 − 𝒮(Z)`, this is the difference of two instances of the general
+`S(X)` weighted identity `sum_re_div_normSq_inducedKernelFamily_eq` (at `X = ⊥`, using
+`|K ⧸ ⊥| = |K|`, and at `X = Z`), extracted by `Finset.sum_sdiff`.  The weights `‖χ‖²` cancel on
+the `𝒳` side because its members are irreducible (`hX` — the book's `𝒳 ⊆ Irr L`), which is exactly
+the case-B situation of the Sibley `sum_re_sq_Xset_eq_of_irreducible_X`: reducible members of `𝒮`
+are allowed, as long as they lie in `𝒮(Z)`.
+
+This is the `total` of the `X`-chain step data; the book's divisibility argument (p. 32) shows the
+source degree `θ(1)²` divides it. -/
+theorem sum_re_sq_xSet_eq (Z : Subgroup ↥L) [Z.Normal]
+    (hX : ∀ χ ∈ xSet K Z, IsIrreducibleCharacter χ) :
+    ∑ χ ∈ xSetFinset K Z, ((χ 1).re) ^ 2
+      = (K.index : ℝ) * ((Nat.card ↥K : ℝ) - (Nat.card (↥K ⧸ Z.subgroupOf K) : ℝ)) := by
+  set f : ClassFunction ↥L ℂ → ℝ :=
+    fun χ => ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re with hf
+  set A := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+        (↑((⊥ : Subgroup ↥L).subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥K ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥K)).image
+      (fun θ => ClassFunction.induce K θ.toClassFunction) with hA
+  set B := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+        (↑(Z.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥K ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥K)).image
+      (fun θ => ClassFunction.induce K θ.toClassFunction) with hB
+  -- `𝒮(Z) ⊆ 𝒮` at the `Finset` level: `⊥ ≤ ker θ` always.
+  have hsub : B ⊆ A := by
+    refine Finset.image_subset_image ?_
+    intro θ hθ
+    rw [Finset.mem_filter] at hθ ⊢
+    refine ⟨hθ.1, ?_, hθ.2.2⟩
+    intro x hx
+    rw [Subgroup.bot_subgroupOf, Subgroup.coe_bot, Set.mem_singleton_iff] at hx
+    subst hx
+    exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+  have hsd := Finset.sum_sdiff (f := f) hsub
+  have h0 := sum_re_div_normSq_inducedKernelFamily_eq (K := K) (⊥ : Subgroup ↥L)
+  have hZ := sum_re_div_normSq_inducedKernelFamily_eq (K := K) Z
+  have hbotcard : Nat.card (↥K ⧸ (⊥ : Subgroup ↥L).subgroupOf K) = Nat.card ↥K := by
+    rw [Subgroup.bot_subgroupOf]
+    exact Nat.card_congr (QuotientGroup.quotientBot (G := ↥K)).toEquiv
+  rw [hbotcard] at h0
+  -- on `𝒳` the weight is `1`, so `f` is the plain degree square there
+  have hconv : ∀ χ ∈ A \ B, f χ = ((χ 1).re) ^ 2 := by
+    intro χ hχ
+    have hirr : IsIrreducibleCharacter χ := hX χ (mem_xSetFinset.mp hχ)
+    simp only [hf, hirr.inner_self_eq_one, Complex.one_re, div_one]
+  rw [xSetFinset, ← hA, ← hB, ← Finset.sum_congr rfl hconv, eq_sub_of_add_eq hsd, h0, hZ]
+  ring
+
 end OddOrder.Peterfalvi.S08

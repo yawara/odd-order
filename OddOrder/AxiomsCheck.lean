@@ -3778,6 +3778,13 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.exists_source_primePow_centralBound_of_mem_xSet
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.hypothesisOfSubfamily
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.xSetHypothesis
+-- The `(6.6)` degree-square sum `∑_{χ∈𝒳} χ(1)² = |L:K|·(|K| − |K:Z|)` for a general kernel
+-- (the `total` of the X-chain step data): `Finset.sum_sdiff` against two instances of the general
+-- weighted identity `sum_re_div_normSq_inducedKernelFamily_eq` (`X = ⊥` and `X = Z`).  The `‖χ‖²`
+-- weights cancel only on the `𝒳` side, where the members are irreducible — reducible members of
+-- `𝒮` are allowed as long as they lie in `𝒮(Z)` (the Sibley case-B situation).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.coe_xSetFinset
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.sum_re_sq_xSet_eq
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.
