@@ -414,6 +414,34 @@ theorem card_QK_eq : Nat.card ↥hyp.QK = Nat.card ↥hyp.K * Nat.card ↥hyp.Q 
   rw [QK, sup_comm]
   exact hcard
 
+/-- `H/Q ≅ D` has odd order, so `|↥H ⧸ Q.subgroupOf H| = |D|`. -/
+theorem card_quotient_Q_eq_card_D :
+    Nat.card (↥hyp.H ⧸ hyp.Q.subgroupOf hyp.H) = Nat.card ↥hyp.D := by
+  have hmul : Nat.card ↥(hyp.Q.subgroupOf hyp.H) * (hyp.Q.subgroupOf hyp.H).index
+      = Nat.card ↥hyp.H := (hyp.Q.subgroupOf hyp.H).card_mul_index
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q_le_H).toEquiv,
+    hyp.card_H_eq] at hmul
+  exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hmul
+
+/-- **`H` is solvable**: `Q` is nilpotent (Ch. I §2, Proposition 1(b)) and
+`H/Q ≅ D` has odd order, hence is solvable by the Feit–Thompson theorem.
+
+This is what lets Chapter III apply Hall's theorems inside `H` (the book's "by a
+theorem of Hall" in step (6)). -/
+instance isSolvable_H : IsSolvable ↥hyp.H := by
+  haveI : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
+  haveI : IsSolvable ↥(hyp.Q.subgroupOf hyp.H) := by
+    haveI : IsSolvable ↥hyp.Q := inferInstance
+    exact solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hyp.Q_le_H).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hyp.Q_le_H).injective
+  haveI : IsSolvable (↥hyp.H ⧸ hyp.Q.subgroupOf hyp.H) :=
+    OddOrder.feitThompson (by
+      rw [hyp.card_quotient_Q_eq_card_D]; exact hyp.D_odd)
+  exact solvable_of_ker_le_range
+    (hyp.Q.subgroupOf hyp.H).subtype (QuotientGroup.mk' (hyp.Q.subgroupOf hyp.H))
+    (by rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
+
 /-- **`[H : QK] = |V|`** — the index computation behind the book's `H/QK ≅ V`. -/
 theorem index_QK_subgroupOf_eq_card_V :
     (hyp.QK.subgroupOf hyp.H).index = Nat.card ↥hyp.V := by
