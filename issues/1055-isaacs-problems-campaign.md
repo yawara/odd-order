@@ -4169,6 +4169,12 @@ TransitiveAutomorphisms / TransvectionGeneration)。演習は新 leaf `Problems8
 * ✅ **8A.8** 実証明 — `smul_orbit_eq_orbit_smul` (`N ⊴ G` なら `g • orbit N α =
   orbit N (g • α)`) / `card_orbit_eq_of_normal` (帰結: `N` は half-transitive)。
 
+* ✅ **8A.9** 実証明 — `isPretransitive_of_normal_of_two_transitive`。8A.8 の
+  `smul_orbit_eq_orbit_smul` を使う: 非自明性から `orbit N a` に `a` 以外の点 `γ` があり,
+  `G_a` の推移性で任意の `β ≠ a` を `γ` から得る `g` を取れば
+  `β = g•γ ∈ g • orbit N a = orbit N a`。2-transitivity は「推移的 + 各 `G_α` が `Ω∖{α}` に
+  推移的」の形で仮定 (書籍の note どおり本質は primitivity だが, 演習の仮定は 2-transitive)。
+
 Lean 実務メモ: `[N.Normal]` はインスタンスなので `N.Normal.conj_mem` と書けない
 (`N.Normal : Prop` へのフィールド射影になる) → `Subgroup.Normal.conj_mem ‹N.Normal›`。
 `Nat.card ↑(g • S) = Nat.card ↑S` は `Equiv.Set.image` + `Equiv.setCongr Set.image_smul`。

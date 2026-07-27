@@ -45,6 +45,8 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `smul_orbit_eq_orbit_smul`, `card_orbit_eq_of_normal` — **Problem 8A.8**:
   transitive な `G` の正規部分群 `N` について `G` は `N`-軌道を推移的に置換し,
   したがって `N` は half-transitive (すべての `N`-軌道が同じ濃度)。
+- `isPretransitive_of_normal_of_two_transitive` — **Problem 8A.9**: 2-transitive な `G` の
+  非自明に作用する正規部分群は推移的。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -617,6 +619,41 @@ theorem card_orbit_eq_of_normal [IsPretransitive G Ω] {N : Subgroup G} [N.Norma
   rw [← smul_orbit_eq_orbit_smul g α]
   exact Nat.card_congr ((Equiv.Set.image (fun x : Ω => g • x) (orbit N α)
     (MulAction.injective g)).trans (Equiv.setCongr Set.image_smul))
+
+/-! ### Problem 8A.9 — 2-transitive 群の非自明な正規部分群は推移的 -/
+
+/-- **Isaacs Problem 8A.9** (p. 236): `G` が `Ω` に 2-transitive で `N ⊴ G` が非自明に
+作用するなら, `N` は推移的。
+
+2-transitivity は「推移的 (`IsPretransitive G Ω`) かつ各点安定化群 `G_α` が `Ω ∖ {α}` に
+推移的」の形で仮定する (`h2`)。
+
+`N ⊴ G` なので `g • orbit N α = orbit N (g • α)` (8A.8)。非自明性から `orbit N α` には
+`α` 以外の点 `γ` があり, `G_α` の推移性で任意の `β ≠ α` を `γ` から得る `g` を取れば
+`β = g • γ ∈ g • orbit N α = orbit N α`。 -/
+theorem isPretransitive_of_normal_of_two_transitive [IsPretransitive G Ω]
+    (h2 : ∀ α β γ : Ω, β ≠ α → γ ≠ α → ∃ g : G, g • α = α ∧ g • β = γ)
+    {N : Subgroup G} [N.Normal] {x : Ω} {n : ↥N} (hn : (n : G) • x ≠ x) :
+    IsPretransitive N Ω := by
+  refine ⟨fun a b => ?_⟩
+  -- `orbit N a` には `a` 以外の点 `γ` がある
+  obtain ⟨g₀, hg₀⟩ := exists_smul_eq G x a
+  have horb : g₀ • orbit N x = orbit N a := by rw [smul_orbit_eq_orbit_smul, hg₀]
+  have hγmem : g₀ • ((n : G) • x) ∈ orbit N a := by
+    rw [← horb]
+    exact ⟨(n : G) • x, ⟨n, rfl⟩, rfl⟩
+  have hγne : g₀ • ((n : G) • x) ≠ a := by
+    rw [← hg₀]
+    exact fun hc => hn (MulAction.injective g₀ hc)
+  -- `b = a` なら自明, そうでなければ `G_a` の推移性で移す
+  rcases eq_or_ne b a with rfl | hba
+  · exact ⟨1, one_smul _ _⟩
+  obtain ⟨g, hga, hgγ⟩ := h2 a (g₀ • ((n : G) • x)) b hγne hba
+  have : b ∈ orbit N a := by
+    rw [← hgγ, ← hga, ← smul_orbit_eq_orbit_smul]
+    exact ⟨_, hγmem, rfl⟩
+  obtain ⟨m, hm⟩ := this
+  exact ⟨m, hm⟩
 
 end
 
