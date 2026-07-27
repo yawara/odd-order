@@ -148,7 +148,7 @@ open scoped Classical in
 
 This is the workhorse for families of the (5.3.a) shape `R(χ) = {ε·μ, −ε·ν}`, where the members
 are signed irreducibles — both the Feit-Sibley endgame and
-`CharacterDifferenceImage.toOrthonormalFamily` (`S08_SixTwoThreeFromImageFamilies`) read
+`CharacterDifferenceImage.toOrthonormalImage` (`S07_Coherence/DifferenceImage`) read
 orthonormality off it. -/
 theorem inner_zsmul_irreducible_eq (ε ε' : ℤ) (ξ ξ' : IrreducibleCharacter G) :
     ClassFunction.inner (ε • (ξ : ClassFunction G ℂ)) (ε' • (ξ' : ClassFunction G ℂ)) =

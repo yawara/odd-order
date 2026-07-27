@@ -3734,25 +3734,13 @@ set_option linter.style.longLine false in
 -- `commutator_quotient_ne_top_of_lt`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.commutator_quotient_ne_top_of_lt
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.InducedFamilyImageData.datum
--- **The (5.3.a) signed pair as an orthonormal image family** (issue 0156): `R(χ) = {ε·μ, −ε·ν}`
--- converts the two-element `CharacterDifferenceImage` shape (`τ(χ − χ̄) = ε·(μ − ν)`, `μ ≠ ν`
--- irreducible, `ε = ±1`) into the `OrthonormalCharacterImageFamily` shape the adjoining engines
--- consume.  Orthonormality is `inner_zsmul_irreducible_eq` with `μ ≠ ν` and `ε² = 1`; the sum
--- telescopes by `image_eq`; and (5.2.e) transports because the members are `±ε` multiples of the
--- `μ`, `ν`.  This is what makes (5.2.d)/(5.2.e) *derivable* from the (5.2.b) isometry alone on a
--- subfamily of **irreducible** members (the source of the pair being
--- `characterDifferenceImage_of_irreducible`), rather than assumed as in the book's (6.1).
-#assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalFamily
-#assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalFamily_orthogonal
 -- **The book-faithful Hypothesis (5.2) carrier** (issue 0157).  `S07.Hypothesis` stores (5.2.d)
 -- as the *two-element* signed pair `tau(chi - chibar) = eps*(mu - nu)`; taking norms against the
 -- (5.2.b) isometry (`||chi - chibar||^2 = 2*||chi||^2`) that forces `||chi||^2 = 1`, i.e. every
 -- member irreducible — which Peterfalvi's (5.2.d) does **not** require (a reducible member has
 -- `|R(chi)| = 2*||chi||^2`).  `GeneralHypothesis` is the same carrier with `R(chi)` an orthonormal
 -- family of arbitrary size, and `toGeneralHypothesis` exhibits the existing one as its special
--- case through `CharacterDifferenceImage.toOrthonormalFamily` — so results proved over the
+-- case through `CharacterDifferenceImage.toOrthonormalImage` — so results proved over the
 -- general carrier apply to every current consumer unchanged.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.Hypothesis.toGeneralHypothesis
 #assert_only_allowed_axioms
@@ -3872,7 +3860,7 @@ set_option linter.style.longLine false in
 -- `xMember_characterFacts`/`xMember_inner_eq_zero_of_notMem`, supported differences from
 -- `inducedKernelFamily_scaledDiff_support` (the degree ratios make them vanish off `K^#`), the
 -- (5.2.d)/(5.2.e) image families **derived from irreducibility** through
--- `hypothesisOfSubfamily.difference_image` + `CharacterDifferenceImage.toOrthonormalFamily`
+-- `hypothesisOfSubfamily.difference_image` + `CharacterDifferenceImage.toOrthonormalImage`
 -- (issue 0156 — the whole (6.6) chain needs only `InducedFamilyTauData`, i.e. (5.2.b)),
 -- and the per-member decomposition
 -- from `S07.memberExtensionDecomposition_general` (whose `imageFamily` is definitionally `R(·)`

@@ -599,7 +599,7 @@ imposes no such thing: a reducible member has `‖χ‖² > 1` and `|R(χ)| = 2�
 what stops (5.7) from being provable at book strength over `Hypothesis` (issue 0157).
 
 `Hypothesis.toGeneralHypothesis` exhibits the two-element carrier as the special case, via
-`CharacterDifferenceImage.toOrthonormalFamily` (issue 0156). -/
+`CharacterDifferenceImage.toOrthonormalImage`. -/
 structure GeneralHypothesis (S : Set (ClassFunction L ℂ)) (A : Set L)
     [Fintype L] [Fintype G]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
@@ -761,8 +761,8 @@ end Hypothesis
 
 Every clause of `GeneralHypothesis` is a field of `Hypothesis` except (5.2.d)/(5.2.e), which are
 obtained by putting the signed pair `τ(χ − χ̄) = ε·(μ − ν)` into the orthonormal-family shape
-`R(χ) = {ε·μ, −ε·ν}` (`CharacterDifferenceImage.toOrthonormalFamily`) and transporting the
-disjoint-pair orthogonality along it (`toOrthonormalFamily_orthogonal`).
+`R(χ) = {ε·μ, −ε·ν}` (`CharacterDifferenceImage.toOrthonormalImage`) and transporting the
+disjoint-pair orthogonality along it (`toOrthonormalImage_orthogonal`).
 
 So results proved over `GeneralHypothesis` apply verbatim to every existing `Hypothesis` consumer,
 while being available for families with reducible members — which the book's (5.2) allows and
@@ -776,10 +776,10 @@ noncomputable def Hypothesis.toGeneralHypothesis {S : Set (ClassFunction L ℂ)}
   conjugate_closed := hyp.conjugate_closed
   no_real_characters := hyp.no_real_characters
   pairwise_orthogonal := hyp.pairwise_orthogonal
-  difference_image := fun _χ hχ => (hyp.difference_image hχ).toOrthonormalFamily
+  difference_image := fun _χ hχ => (hyp.difference_image hχ).toOrthonormalImage
   difference_images_orthogonal := by
     intro _φ _χ hφ hχ h1 h2
-    exact CharacterDifferenceImage.toOrthonormalFamily_orthogonal _ _
+    exact CharacterDifferenceImage.toOrthonormalImage_orthogonal _ _
       (hyp.difference_images_orthogonal hφ hχ h1 h2)
 
 @[simp] theorem Hypothesis.toGeneralHypothesis_tau {S : Set (ClassFunction L ℂ)} {A : Set L}

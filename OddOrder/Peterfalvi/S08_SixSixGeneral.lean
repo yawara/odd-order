@@ -739,7 +739,7 @@ noncomputable def xAdjoinStep_of_degreeRatios {A₀ : Set ↥L}
   -- per-member (5.2.d) decompositions and their (5.2.e) orthogonality to `R(χ)`
   -- (5.2.d)/(5.2.e) for the members of `𝒳`: **derived** from the (5.2.b) isometry, since every
   -- `𝒳`-member is irreducible and non-real (issue 0156).  `hyp.difference_image` is the (5.3.a)
-  -- signed pair `τ(φ − φ̄) = ε·(μ − ν)`; `toOrthonormalFamily` puts it in the `{ε·μ, −ε·ν}` shape
+  -- signed pair `τ(φ − φ̄) = ε·(μ − ν)`; `toOrthonormalImage` puts it in the `{ε·μ, −ε·ν}` shape
   -- the (5.6) engine consumes.
   let hyp := RD.xSetHypothesis hodd hKsupp hirr
   have hmemconjsupp : ∀ j ∈ s, ((χmem j).conj - χmem j).support ⊆ A₀ := by
@@ -749,12 +749,12 @@ noncomputable def xAdjoinStep_of_degreeRatios {A₀ : Set ↥L}
     rw [hneg, ClassFunction.support_neg]
     exact h
   refine OddOrder.Peterfalvi.S07.xAdjoinStepW_general (Samb := inducedKernelFamily K ⊥)
-    hS₁ hS₁sub RD.adjoinHisom χ (hyp.difference_image hχX).toOrthonormalFamily
+    hS₁ hS₁sub RD.adjoinHisom χ (hyp.difference_image hχX).toOrthonormalImage
     hχχ hχbarχbar hχχbar hχbarχ hχ_S1 hχbar_S1
     s χmem deg i₁ hi₁ hmemdegdiffmem hmemS1 (fun _ => (1 : ℝ)) (fun _ _ => one_pos)
     hmemortho (a := a)
     (fun j hj => OddOrder.Peterfalvi.S07.memberExtensionDecomposition_general hS₁
-      (hyp.difference_image (hmemX j hj)).toOrthonormalFamily (hmemconjsupp j hj)
+      (hyp.difference_image (hmemX j hj)).toOrthonormalImage (hmemconjsupp j hj)
       (hmemS1 j hj) (hS₁conj (hmemS1 j hj))
       (hS₁.extension_mem_ZIrr _ (Submodule.subset_span (hmemS1 j hj)))
       ((xMember_characterFacts (K := K) hodd hirr (hmemX j hj)).2.2.2.2))
@@ -762,7 +762,7 @@ noncomputable def xAdjoinStep_of_degreeRatios {A₀ : Set ↥L}
     (RD.tau_mem_ZIrr hadiffmem) ha1 (by simpa using hDeg) hSgen ?_
   · -- (5.2.e): `χmem j ⊥ {χ, χ̄}` since `χ, χ̄ ∉ S₁` and `𝒳` is pairwise orthogonal
     intro j hj
-    exact OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalFamily_orthogonal _ _
+    exact OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage_orthogonal _ _
       (hyp.difference_images_orthogonal (hmemX j hj) hχX
         (xSet_pairwise_orthogonal (K := K) Z (hmemX j hj) hχX
           (fun h => hχS₁ (h ▸ hmemS1 j hj)))
