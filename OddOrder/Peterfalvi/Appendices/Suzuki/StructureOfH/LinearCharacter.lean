@@ -641,9 +641,34 @@ variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
 > If `π` is the set of prime divisors of `|QK|` and `y` is the `π′`-component of
 > `x`, then `λ(x) = λ(y)` … since the `π`-component of `x` is in `QK`.
 
+Stated for **any** factorisation `x = a·b` with `a` a `π`-element (not just the
+canonical one), which is what the conjugation step needs: conjugating a
+factorisation gives a factorisation.
+
 A degree-one character is multiplicative
-(`IsIrreducibleCharacter.map_mul_of_apply_one_eq_one`), the `π`-component lies in
+(`IsIrreducibleCharacter.map_mul_of_apply_one_eq_one`), the `π`-factor lies in
 `QK ⊆ Ker λ` (`mem_QK_of_piElement`), and `λ` is `1` there. -/
+theorem apply_eq_of_piFactorization (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥)
+    {θ : ClassFunction ↥sc.toHypothesis.H ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hdeg : (θ : ↥sc.toHypothesis.H → ℂ) 1 = 1)
+    (hker : ((sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H :
+      Subgroup ↥sc.toHypothesis.H) : Set ↥sc.toHypothesis.H) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ)
+    {x a b : ↥sc.toHypothesis.H} (hab : a * b = x)
+    (ha : ∀ q ∈ (orderOf a).primeFactors,
+      q ∈ (Nat.card ↥sc.toHypothesis.QK).primeFactors) :
+    (θ : ↥sc.toHypothesis.H → ℂ) x = (θ : ↥sc.toHypothesis.H → ℂ) b := by
+  have haQK : a ∈ sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H :=
+    sc.mem_QK_of_piElement ind hQ1 ha
+  have hθa : (θ : ↥sc.toHypothesis.H → ℂ) a = 1 := by
+    have hmem := hker haQK
+    rw [OddOrder.Peterfalvi.S03.characterKernel, Set.mem_setOf_eq] at hmem
+    rw [hmem, OddOrder.Peterfalvi.S03.characterDegree, hdeg]
+  rw [← hab, hθ.map_mul_of_apply_one_eq_one hdeg, hθa, one_mul]
+
+/-- The canonical-decomposition corollary: `λ(x) = λ(y)` for a `π′`-element
+`y ∈ ⟨x⟩`. -/
 theorem exists_piPrime_apply_eq (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hQ1 : sc.toHypothesis.Q1 ≠ ⊥)
     {θ : ClassFunction ↥sc.toHypothesis.H ℂ} (hθ : IsIrreducibleCharacter θ)
@@ -661,15 +686,7 @@ theorem exists_piPrime_apply_eq (ind : Hypothesis.TheoremAInductionBelow G Ω)
   obtain ⟨a, b, hab, _, ha, hb, _, hbz⟩ :=
     OddOrder.GroupTheory.exists_isPiElement_mul
       ((Nat.card ↥sc.toHypothesis.QK).primeFactors : Set ℕ) x
-  refine ⟨b, hb, hbz, ?_⟩
-  -- `a` lies in `QK`, hence in `Ker θ`, so `θ a = 1`
-  have haQK : a ∈ sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H :=
-    sc.mem_QK_of_piElement ind hQ1 ha
-  have hθa : (θ : ↥sc.toHypothesis.H → ℂ) a = 1 := by
-    have := hker haQK
-    rw [OddOrder.Peterfalvi.S03.characterKernel, Set.mem_setOf_eq] at this
-    rw [this, OddOrder.Peterfalvi.S03.characterDegree, hdeg]
-  rw [← hab, hθ.map_mul_of_apply_one_eq_one hdeg, hθa, one_mul]
+  exact ⟨b, hb, hbz, sc.apply_eq_of_piFactorization ind hQ1 hθ hdeg hker hab ha⟩
 
 end SecondCaseHypothesis
 
