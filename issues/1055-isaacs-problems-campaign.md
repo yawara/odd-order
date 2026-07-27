@@ -3379,3 +3379,59 @@ Quot.sound]` (axiom-clean)。
 
 ⟹ **書籍 hint の「`P/Z` が D/SD/Q だから指数 2 の巡回部分群を引き戻す」段を回避**したので、
 具体群 D/SD/Q の構造 (指数 `2` の巡回部分群を持つこと) を 3 種類とも証明する必要が無くなった。
+
+
+### 🎉 6B.9 完成 (2026-07-27) — §6B 全 9 問 完済
+
+**`card_primeFactors_le_two_of_forall_prime_pow_orderOf`** (`Problems6B9.lean`, 新 leaf,
+`OddOrder.lean` 配線済): 可解群 `G` の全元が素数冪位数なら `|G|` の素因数は高々 2 個。
+axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
+
+証明 (素数 3 個以上を仮定して矛盾):
+1. minimal normal `U ⊴ G` は elementary abelian `p`-群 (Thm 3.11 =
+   `solvable_minimal_normal_isElementaryAbelian`)。
+2. `p` 以外の 2 素数 `q ≠ r` を取り、可解性から Hall `{p}ᶜ`-部分群 `K` (Thm 3.13 =
+   `hall_exists_of_piSeparable`; `isPiSeparable_of_solvable` instance)。`q, r ∣ |K|`,
+   `p ∤ |K|` は Hall 定義 (`|K|` の素因子 ⊆ π、index の素因子 ∩ π = ∅) から。
+3. **EPPO の要 `false_of_commute_of_coprime_orderOf`**: 位数が互いに素な非自明元が可換なら
+   `orderOf (xy) = orderOf x · orderOf y` が相異なる 2 素数で割れて素数冪でない。
+   ⟹ `K` の共役作用は `U` 上 Frobenius (`MulAut.conjNormal` 経由の `MulDistribMulAction`)。
+4. `K` の minimal normal `M` は elementary abelian `s`-群。`{q,r}` から `s` と異なる `t` を
+   選び `y ∈ K` を位数 `t` (Cauchy) に取ると **`M⟨y⟩` は Frobenius 群**
+   (`isFrobeniusGroup_sup_zpowers_of_prime_orderOf` = 6B.1 前半の構成を仮説だけに抽象化。
+   ⚠ `M` 可換性は不要と判明したので仮説から落とした)。
+5. `false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup` (Thm 6.9 可解分岐 =
+   6B.1 の "deduce" 部分) に流して矛盾。
+
+⟹ **§6B 完済 (6B.1〜6B.9 全 9 問)**。次は §6C の Problems。
+
+
+### §6C 着手 (2026-07-27): 6C.1(a) 完了
+
+§6C は 2 問のみ (6C.1 (a)(b) / 6C.2 (a)(b))。
+
+* ✅ **6C.1(a)** `isNilpotent_of_prime_orderOf_mulAut_of_fixedFree` (`Problems6C1.lean`):
+  素数位数の自己同型 `α` が単位元しか固定しないなら `G` 冪零。`A = ⟨α⟩ ≤ Aut(G)` の作用が
+  Frobenius (非自明 `a ∈ A` は素数位数ゆえ `⟨a⟩ = A ∋ α`、安定化群が部分群なので `a` の
+  固定点は `α` の固定点) ⟹ Isaacs Thm 6.24 (`isNilpotent_of_isFrobeniusAction`)。
+  ⚠ `Finite (MulAut G)` は mathlib が既に導出できる (自作 instance は削除)。
+* ⏳ **6C.1(b)** 「位数 4 の自己同型では冪零でない例 (`|G| = 75`)」= **具体例の構成**。
+  設計: `G = (ZMod 5)² ⋊ ZMod 3` (作用は `x²+x+1` の companion 行列 `B`、mod 5 で既約)。
+  `α(v, c) = (A v, c⁻¹)` が自己同型になる条件は `A B A⁻¹ = B⁻¹` で、`A = 2σ`
+  (`σ` = Frobenius `x ↦ x⁵` の行列 `[[1,-1],[0,-1]]`) が `A² = -I` (位数 4)・固有値 1 なし
+  (⟹ 固定点は単位元のみ) を満たす。非冪零は「冪零なら Sylow 3 が正規 ⟹ 作用自明」で出る。
+
+* ✅ **6C.1(b)** 完了 (`Problems6C1Example.lean`, 新 leaf, `OddOrder.lean` 配線済,
+  axiom-clean): `exists_orderOf_four_mulAut_fixedFree_not_isNilpotent` =
+  `|G| = 75` ∧ `orderOf α = 4` ∧ `α` の固定点は単位元のみ ∧ `¬ IsNilpotent G`。
+  * `Kernel = Multiplicative ((ZMod 5)²)`, `bAut (x,y) = (-y, x-y)` (位数 3),
+    `aAut (x,y) = (2x-2y, -2y)` (`= 2σ`, `aAut² = -1`)。**関係式・固定点自由性・
+    位数はすべて `decide`** (25 元の有限計算) で確定 — `aAut * bAut = bAut⁻¹ * aAut`,
+    `aAut^4 = 1`, `(aAut*aAut) v = v⁻¹`, `bAut/aAut` の固定点は単位元のみ。
+  * `Group75 = Kernel ⋊[Complement.subtype] ⟨bAut⟩` (`SemidirectProduct`;
+    φ に部分群の包含をそのまま使うと「巡回群からの hom」を作らずに済む)。
+  * `α = SemidirectProduct.congr aAut complementInv _` (両側の compatibility は
+    `MulAut.conj aAut (bAut^m) = (bAut^m)⁻¹` を `map_zpow` で出す)。
+  * 非冪零は `Z(G) = ⊥` + mathlib `Group.IsNilpotent.center_ne_bot`。
+    `Z(G) = ⊥` は「`x.right` が `V` を固定 ⟹ 作用の固定点自由性で `x.right = 1`、
+    その後 `bAut x.left = x.left` ⟹ `x.left = 1`」。
