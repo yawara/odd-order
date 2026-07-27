@@ -6,6 +6,31 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-07-27 朝 hub 自走 tick (`/loop` self-pacing, ユーザー「自走してください」) — 🎯🎯
+> Peterfalvi 特殊化債務キャンペーンの棚卸し完了: 残 1 件。push →97dccef9e**。
+> ① **実際に一般化した 2 件**: **(6.6) X-characterization** を一般 kernel `K` へ
+> (`S08_InducedKernelFamily`, 新 leaf) — Sibley の `SsubFiltration` が `inducedKernelFamily H` と
+> 逐語同一なのを使い Sibley 版を特殊化に。⚠ import 方向が逆だったので上流へ prefix-split。
+> **`K` の正規性が不要**と判明し書籍 (6.1) より強い。/ **(8.18.c)** を型 I-or-II ペアへ — 型 I 限定
+> だったのは `A₁(S)` 非空性を `TypeFData.H_nontrivial` から取っていた **1 箇所だけ**で、任意の極大
+> 部分群で成立する `Msigma_ne_bot` に置換すれば型 II も通る。
+> ② **stale ラベル 9 件を実測で訂正**: (2.6)-(2.10.3) の `hconj` threading (**binder ゼロ**、名指しの
+> `S04_InduceConjFinset.lean` には出現すらしない) / (8.15) (claim 1 の `A₁` 節と claim 3 が既に型
+> uniform、`A₀`/`A` が型ごとなのは**台集合の定義がそうだから**で債務でない) / (8.18)(a)(b) (元から型
+> generic) / (9.7)(b) (`caseB_exists_galoisField_repr_withAut` が**書籍の三層同型そのもの**) /
+> (9.11) (`S11.nineEleven_coherent_A0` が Hypothesis (9.2) 上の generic 宣言、型仮説なし) /
+> (13.8) (書籍逐語の **S 側** `eta01_Hsharp_norm_lower_core` が在る) + (7.8)/(10.11)/(11.8) の
+> 相互参照張り。⟹ **残る Pf 特殊化債務は (6.4)/(6.6) coherence 半分 1 件だけ** (規模 L で繰延)。
+> ③ **見せかけ opaque scaffold を 2 件除去**: `CliffordCaseBData.field_model` (唯一の producer が
+> `True`、消費者ゼロ; 削除で構造体が `Prop` に落ち linter が `def`→`theorem` を要求 = その Prop
+> フィールドだけが「データ」を装っていた証拠) / `OddOrderSpecialization` (消費者ゼロ、書籍の
+> 「K/M nilpotent」を自由 Prop に潰していた)。
+> ④ **lane a を 2 回合流** (計 79 commits, Isaacs Problems 5C/5D/5E/6A/6B/6C)。
+> gate: 各 tick でフルビルド green (最終 4835 jobs)、AxiomsCheck OK (新 assert 計 12 本)、
+> `--strict` 警告ゼロ、sorry census 1 (凍結 Q₈) 非退行、全 push 済。
+> ⚠ 教訓: survey の未/部分/特殊化ラベルは **2026-07-16 の一度きりのスナップショット**で、
+> 実測 25 件中 **9 件が陳腐化**していた。着手前の実測が必須。
+
 > **▶▶ 2026-07-27 早朝 hub 直接作業 tick (「直近の作業から再開」) — 🎯 issue 0154 完済: 加重 (5.6) と
 > (6.2)/(6.3) の Dade 依存を完全除去 + lane a 合流。push →756b18f7a**。
 > ① **加重 (5.6) engine の τ 一般化** (`59defaf9b`, `c00ca1fd7`): 新 leaf `S08_GeneralAdjoinWeighted`。
