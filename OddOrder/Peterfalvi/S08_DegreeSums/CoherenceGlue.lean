@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S08_YsetConjugation
+import OddOrder.Peterfalvi.S08_InducedKernelFamily
 
 /-!
 # Peterfalvi §8: X/Y coherence glue
@@ -479,98 +480,38 @@ theorem isIrreducibleCharacter_of_mem_Xset_c2_caseA (hyp : SibleyDadeHypothesis 
     (fun w hw hw1 => hyp.centralizer_inf_centralCommutator_eq_bot_of_c2_caseA hK hW1 hA hw hw1)
     hχX
 
+/-- **The Sibley filtration is the general induced family at `K = H`.**  `SsubFiltration A` and
+`inducedKernelFamily H A` (`S08_InducedKernelFamily`) unfold to the same set of induced characters,
+so the identification is definitional.  This is what lets the Sibley layer read the (6.6)
+`X`-characterization off the general-kernel theorem instead of carrying a `K = H` copy. -/
+theorem SsubFiltration_eq_inducedKernelFamily (hyp : SibleyDadeHypothesis G L H)
+    (A : Subgroup ↥L) :
+    hyp.SsubFiltration A = inducedKernelFamily H A :=
+  rfl
+
+/-- **`X = S − S(Z)` is the general `𝒮 − 𝒮(Z)`** — `S = S(⊥)` (`SsubFiltration_bot`) turns the
+Sibley `Xset` into the set difference the general (6.6) theorem is stated on. -/
+theorem Xset_eq_inducedKernelFamily_sdiff (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
+    hyp.Xset Z = inducedKernelFamily H ⊥ \ inducedKernelFamily H Z := by
+  rw [Xset, ← hyp.SsubFiltration_bot, hyp.SsubFiltration_eq_inducedKernelFamily,
+    hyp.SsubFiltration_eq_inducedKernelFamily]
+
 /-- **Peterfalvi (6.6) `X`-characterization** (mmd 04.8 L74-76).  For a normal `Z ≤ H` such that
 every member of `X = S − S(Z)` is irreducible (the (6.8) Frobenius/case-A input `hX`), `X` is
 exactly the set of irreducible characters of `L` whose kernel does not contain `Z`:
 `X = {χ ∈ Irr L | Z ⊄ Ker χ}`.
 
-Both inclusions route the kernel comparison through a *genuine* character — `Res_H φ` for `⊆`
-(via `characterKernel_subset_of_isCharacter_of_inner_ne_zero`) and `Ind_H^L θ` for `⊇` (via
-`characterKernel_subset_of_inner_induce_ne_zero`) — together with the (1.6.a) forward bridge
-`subsetCharacterKernel_induce_of_subgroupOf`; no use of [Is] Lemma 2.21 is needed. -/
+The Sibley (`K = H`) instance of the general-kernel
+`inducedKernelFamily_sdiff_eq_irreducible_not_subset_characterKernel`
+(`S08_InducedKernelFamily`), transported along `Xset_eq_inducedKernelFamily_sdiff`. -/
 theorem Xset_eq_irreducible_not_subset_characterKernel (hyp : SibleyDadeHypothesis G L H)
     {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
     (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
     hyp.Xset Z = {χ : ClassFunction ↥L ℂ | IsIrreducibleCharacter χ ∧
       ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel χ)} := by
   letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  ext φ
-  constructor
-  · -- (⊆): φ ∈ X is irreducible (hX); if `Z ⊆ Ker φ` then `φ = Ind θ ∈ S(Z)`, contradiction.
-    intro hφX
-    have hφirr : IsIrreducibleCharacter φ := hX φ hφX
-    refine ⟨hφirr, ?_⟩
-    obtain ⟨hφS, hφnotSZ⟩ := hyp.mem_Xset.mp hφX
-    rw [hyp.S_eq] at hφS
-    obtain ⟨θ, hθ_ne, hφeq⟩ := hφS
-    intro hZker
-    apply hφnotSZ
-    rw [hyp.mem_SsubFiltration]
-    refine ⟨θ, hθ_ne, ?_, hφeq⟩
-    -- `Z.subgroupOf H ⊆ Ker θ`: read off from `Res_H φ` (a genuine constituent of `θ`).
-    have hRes : IsCharacter (ClassFunction.restrict H φ) := isCharacter_restrict hφirr.isCharacter H
-    have hθirr : IsIrreducibleCharacter (θ : ClassFunction ↥H ℂ) := θ.property
-    have hnorm : ClassFunction.inner φ φ = 1 := by
-      have h := irreducibleCharacter_inner_eq_ite (⟨φ, hφirr⟩ : IrreducibleCharacter ↥L)
-        (⟨φ, hφirr⟩ : IrreducibleCharacter ↥L)
-      simpa using h
-    have hinner_ne : ClassFunction.inner (ClassFunction.restrict H φ)
-        (θ : ClassFunction ↥H ℂ) ≠ 0 := by
-      have hfrob := ClassFunction.inner_induce_eq_inner_restrict H (θ : ClassFunction ↥H ℂ) φ
-      rw [← hφeq, hnorm] at hfrob
-      rw [inner_conj_symm θ (ClassFunction.restrict H φ), ← hfrob]
-      simp
-    intro n hn
-    refine characterKernel_subset_of_isCharacter_of_inner_ne_zero hRes hθirr hinner_ne ?_
-    rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def]
-    simp only [ClassFunction.restrict_apply]
-    have hnZ : ((n : ↥L)) ∈ Z := Subgroup.mem_subgroupOf.mp hn
-    have hker := hZker hnZ
-    rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
-      OddOrder.Peterfalvi.S03.characterDegree_def] at hker
-    rw [hker, OneMemClass.coe_one]
-  · -- (⊇): χ irreducible with `Z ⊄ Ker χ`.  Take a source `θ` of `χ`; show `Ind θ ∈ X`, hence
-    -- irreducible (hX), hence `= χ` by orthonormality.
-    rintro ⟨hχirr, hχZ⟩
-    obtain ⟨θ, hθinner⟩ := OddOrder.Peterfalvi.S03.exists_inner_induce_ne_zero (H := H)
-      (⟨φ, hχirr⟩ : IrreducibleCharacter ↥L)
-    -- A source `θ'` of `χ` with `Z.subgroupOf H ⊆ Ker θ'` would force `Z ⊆ Ker χ` (contradiction).
-    have hkey : ∀ θ' : IrreducibleCharacter ↥H,
-        ClassFunction.inner (ClassFunction.induce H (θ' : ClassFunction ↥H ℂ)) φ ≠ 0 →
-        ((Z.subgroupOf H : Set ↥H) ⊆
-          OddOrder.Peterfalvi.S03.characterKernel (θ' : ClassFunction ↥H ℂ)) → False := by
-      intro θ' hθ'inner hθ'ker
-      apply hχZ
-      have hZind := OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
-        (G := ↥L) hZH (θ' : ClassFunction ↥H ℂ) hθ'ker
-      intro z hz
-      exact characterKernel_subset_of_inner_induce_ne_zero θ'.property.isCharacter hχirr
-        hθ'inner (hZind hz)
-    have hθ_ne : θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥H := by
-      intro hθtriv
-      refine hkey θ hθinner (fun n _ => ?_)
-      rw [hθtriv]
-      simp [OddOrder.Peterfalvi.S03.characterKernel_trivialClassFunction]
-    have hIndnotSZ : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ∉ hyp.SsubFiltration Z := by
-      intro hmem
-      rw [hyp.mem_SsubFiltration] at hmem
-      obtain ⟨θ', _, hθ'ker, hθ'eq⟩ := hmem
-      exact hkey θ' (by rw [← hθ'eq]; exact hθinner) hθ'ker
-    have hIndX : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ∈ hyp.Xset Z :=
-      hyp.mem_Xset.mpr ⟨by rw [hyp.S_eq]; exact ⟨θ, hθ_ne, rfl⟩, hIndnotSZ⟩
-    have hIndirr : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) :=
-      hX _ hIndX
-    have heq : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) = φ := by
-      have hite := irreducibleCharacter_inner_eq_ite
-        (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hIndirr⟩ : IrreducibleCharacter ↥L)
-        (⟨φ, hχirr⟩ : IrreducibleCharacter ↥L)
-      by_cases hAB : (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hIndirr⟩ :
-          IrreducibleCharacter ↥L) = (⟨φ, hχirr⟩ : IrreducibleCharacter ↥L)
-      · exact congrArg Subtype.val hAB
-      · rw [if_neg hAB] at hite
-        exact absurd hite hθinner
-    rw [← heq]; exact hIndX
+  rw [hyp.Xset_eq_inducedKernelFamily_sdiff Z] at hX ⊢
+  exact inducedKernelFamily_sdiff_eq_irreducible_not_subset_characterKernel hZH hX
 
 /-- **(T8 leaf 1) `X`-member character facts**, from the abstract input `X ⊆ Irr L`.
 

@@ -1345,39 +1345,40 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG D
         (hrepsMax _ (e.symm j.down).2) (hrepsMax _ (e.symm k.down).2) hnc
 
-/-- **Peterfalvi (8.18.c)**: the final support-exclusion relation in Section 10.  For
-**non-conjugate
-type-I** maximal subgroups `S, T`, the sharp sets `A₁(S) = (S_F)^#` and `A₁(T) = (T_F)^#` cannot
-mutually support each other.
+/-- **Peterfalvi (8.18.c), type-I-or-II pairs**: the final support-exclusion relation of §10, for
+**non-conjugate** maximal subgroups `S, T` each of type I **or II** (with independent type tags):
+the sharp sets `A₁(S)` and `A₁(T)` cannot mutually support each other.
 
-Proof.  Both are type I, so `A₁(S) = M_σ(S)^#` and `A₁(T) = M_σ(T)^#`
-(`A1_eq_sigmaSharp_of_typeI_or_II`).  Pick `y ∈ A₁(S)` (nonempty: `S_F ≠ ⊥` for type I).  Then
-`y ∈ M_σ(S)^# ⊆ M̃(S) ⊆ 𝒞_G(M̃(S))` (`sigmaSharp_subset_Mtilde`, `subset_conjClassSet`); and the
-support hypothesis `A₁(S) ⊆ 𝒞_G(A₁(T)) = 𝒞_G(M_σ(T)^#) ⊆ 𝒞_G(M̃(T))` (`conjClassSet_mono`).  But
-`𝒞_G(M̃(S)) ∩ 𝒞_G(M̃(T)) = ∅` for non-conjugate `S, T` (`conjClassSet_Mtilde_disjoint`, BG Lemma
-14.5(b)) — contradiction.  Only one support direction is needed. -/
-theorem support_mutual_exclusion [Finite G]
+Proof.  For type I or II, `A₁(M) = M_σ(M)^#` (`A1_eq_sigmaSharp_of_typeI_or_II`).  Pick
+`y ∈ A₁(S)` — nonempty because `M_σ(S) ≠ ⊥` for **any** maximal subgroup of a minimal simple group
+of odd order (`BG.Ch3.S10.Msigma_ne_bot`), which is where the earlier type-I-only version used
+`TypeFData.H_nontrivial`.  Then `y ∈ M_σ(S)^# ⊆ M̃(S) ⊆ 𝒞_G(M̃(S))`
+(`sigmaSharp_subset_Mtilde`, `subset_conjClassSet`); and the support hypothesis
+`A₁(S) ⊆ 𝒞_G(A₁(T)) = 𝒞_G(M_σ(T)^#) ⊆ 𝒞_G(M̃(T))` (`conjClassSet_mono`).  But
+`𝒞_G(M̃(S)) ∩ 𝒞_G(M̃(T)) = ∅` for non-conjugate `S, T` (`conjClassSet_Mtilde_disjoint`,
+BG Lemma 14.5(b)) — contradiction.  Only one support direction is needed. -/
+theorem support_mutual_exclusion_of_typeI_or_II [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S T : Subgroup G}
     (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G)
-    (hSI : IsTypeI S) (hTI : IsTypeI T)
+    (hSType : IsTypeI S ∨ IsTypeII S) (hTType : IsTypeI T ∨ IsTypeII T)
+    {tauS tauT : PeterfalviType}
+    (htauS : tauS = PeterfalviType.I ∨ tauS = PeterfalviType.II)
+    (htauT : tauT = PeterfalviType.I ∨ tauT = PeterfalviType.II)
     (hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup S T) :
-    ¬ (Supports (A1 S PeterfalviType.I) (A1 T PeterfalviType.I) ∧
-        Supports (A1 T PeterfalviType.I) (A1 S PeterfalviType.I)) := by
+    ¬ (Supports (A1 S tauS) (A1 T tauT) ∧ Supports (A1 T tauT) (A1 S tauS)) := by
   rintro ⟨hsup, -⟩
   set D := OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG with hD
-  have hA1S : A1 S PeterfalviType.I = OddOrder.BG.Ch4.S14.sigmaSharp S :=
-    OddOrder.Peterfalvi.S10Interface.A1_eq_sigmaSharp_of_typeI_or_II hG hS (Or.inl hSI) (Or.inl rfl)
-  have hA1T : A1 T PeterfalviType.I = OddOrder.BG.Ch4.S14.sigmaSharp T :=
-    OddOrder.Peterfalvi.S10Interface.A1_eq_sigmaSharp_of_typeI_or_II hG hT (Or.inl hTI) (Or.inl rfl)
-  -- `A₁(S)` is nonempty: `S_F ≠ ⊥` for type I.
-  obtain ⟨data⟩ := hSI
-  have hHne : maxNilpotentNormalHall S ≠ ⊥ := by
-    rw [← data.typeF.H_eq]; exact data.typeF.H_nontrivial
-  haveI : Nontrivial ↥(maxNilpotentNormalHall S) :=
-    (Subgroup.nontrivial_iff_ne_bot _).mpr hHne
-  obtain ⟨y, hyne⟩ := exists_ne (1 : ↥(maxNilpotentNormalHall S))
-  have hxA1 : (y : G) ∈ A1 S PeterfalviType.I := by
-    change (y : G) ∈ (maxNilpotentNormalHall S : Set G) \ {1}
+  have hA1S : A1 S tauS = OddOrder.BG.Ch4.S14.sigmaSharp S :=
+    OddOrder.Peterfalvi.S10Interface.A1_eq_sigmaSharp_of_typeI_or_II hG hS hSType htauS
+  have hA1T : A1 T tauT = OddOrder.BG.Ch4.S14.sigmaSharp T :=
+    OddOrder.Peterfalvi.S10Interface.A1_eq_sigmaSharp_of_typeI_or_II hG hT hTType htauT
+  -- `A₁(S) = M_σ(S)^#` is nonempty: `M_σ ≠ ⊥` holds for *every* maximal subgroup (BG §10).
+  haveI : Nontrivial ↥(OddOrder.BG.Ch3.S10.Msigma S) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hS)
+  obtain ⟨y, hyne⟩ := exists_ne (1 : ↥(OddOrder.BG.Ch3.S10.Msigma S))
+  have hxA1 : (y : G) ∈ A1 S tauS := by
+    rw [hA1S]
+    change (y : G) ∈ (OddOrder.BG.Ch3.S10.Msigma S : Set G) \ {1}
     exact ⟨y.2, fun h => hyne (Subtype.ext h)⟩
   have h1 : (y : G) ∈ conjClassSet (OddOrder.BG.Ch4.S14.Mtilde hG D S) :=
     subset_conjClassSet (OddOrder.BG.Ch4.S14.sigmaSharp_subset_Mtilde hG D (hA1S ▸ hxA1))
@@ -1387,11 +1388,18 @@ theorem support_mutual_exclusion [Finite G]
   exact Set.disjoint_left.mp
     (OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG D hS hT hnc) h1 h2
 
--- TODO (Peterfalvi (8.15), higher Dade specializations): add the recovered
--- Hypothesis (4.6)/(5.2) statements with `K=M_prime` and `H=M_F` or `M_s`
--- once those section-level carriers expose the needed `L=M` specialization
--- without opaque placeholder propositions.
---
+/-- **Peterfalvi (8.18.c) for a type-I pair** — the both-type-I instance of
+`support_mutual_exclusion_of_typeI_or_II` (the form the all-type-I contradiction (12.17)
+consumes). -/
+theorem support_mutual_exclusion [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S T : Subgroup G}
+    (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G)
+    (hSI : IsTypeI S) (hTI : IsTypeI T)
+    (hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup S T) :
+    ¬ (Supports (A1 S PeterfalviType.I) (A1 T PeterfalviType.I) ∧
+        Supports (A1 T PeterfalviType.I) (A1 S PeterfalviType.I)) :=
+  support_mutual_exclusion_of_typeI_or_II hG hS hT (Or.inl hSI) (Or.inl hTI)
+    (Or.inl rfl) (Or.inl rfl) hnc
 
 /-! ### Route-B (M̃-cover) `G₀ = {1}` reduction for the (7.4) Dade-support family
 

@@ -3775,6 +3775,12 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
+-- **(6.6) `X`-characterization at a general kernel** (2026-07-27): the Sibley `K = H` form above is
+-- now the instance of `inducedKernelFamily_sdiff_eq_irreducible_not_subset_characterKernel`
+-- (`S08_InducedKernelFamily`), which proves `𝒮 − 𝒮(Z) = {χ ∈ Irr L | Z ⊄ Ker χ}` for ANY subgroup
+-- `K ≤ L` (the book's `K ⊴ L` normality is never used) and any normal `Z ≤ K`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.inducedKernelFamily_sdiff_eq_irreducible_not_subset_characterKernel
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_eq_irreducible_not_subset_characterKernel
 -- Peterfalvi S08 (6.2) `S₁`/`S₂` first-obstruction decomposition + its `S` no-real input.
@@ -11800,6 +11806,13 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.escaping_sigma_disjoint_centralizer_typeA
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.supported_sigma_coprime_typeA
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftThickenedSupport_mixed_disjoint_of_nonconjugate_typeA
+-- **(8.18.c) at type-I-or-II pairs** (2026-07-27): `support_mutual_exclusion` (both type I) is now
+-- the instance of `support_mutual_exclusion_of_typeI_or_II`, which allows each of `S`, `T` to be
+-- of type I *or* II with independent type tags.  The type-I-only step of the old proof was the
+-- nonemptiness of `A₁(S)`, drawn from `TypeFData.H_nontrivial`; it is replaced by
+-- `BG.Ch3.S10.Msigma_ne_bot`, valid for EVERY maximal subgroup of a minimal simple odd group.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.support_mutual_exclusion_of_typeI_or_II
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.support_mutual_exclusion
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_conj_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_subset_hatMsigma
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_one_not_mem
