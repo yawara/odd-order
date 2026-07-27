@@ -182,3 +182,69 @@ theorem induce_not_isIrreducible_iff [NeZero (Nat.card h.W1)] (χ : IrreducibleC
 
 `Hypothesis46` から `GeneralHypothesis` が構成でき、(5.3)(b) の書籍 statement が
 sorry-free・axiom-clean で landing すること。build green + lint --strict clean。
+
+## ✅ landing (2026-07-27) — `Hypothesis46.toGeneralHypothesis` が sorry-free・axiom-clean で成立
+
+新 leaf [`OddOrder/Peterfalvi/S06_CertainTypeSubcoherent.lean`](../OddOrder/Peterfalvi/S06_CertainTypeSubcoherent.lean)。
+
+| 実装 | 内容 |
+|---|---|
+| `exists_ne_one_induce_eq_columnSum` | (4.4)+(4.5) の分類。θ ≠ 1_K の induction が可約 ⟹ 源は非自明 column χ₂ ≠ 1 で `Ind θ = columnSum χ₂` |
+| `columnR` | 可約分岐の `R(μ_j)`。`certainTypeR` を `φ = columnSum χ₂` に沿って移送 |
+| `inducedR` | (5.2.d) の dispatcher (既約 → 2 元 Dade 像 / 可約 → `columnR`) + `imageSet` 読み出し補題 2 本 |
+| `memberR` | 族 `𝒮` の member 版 (membership が持つ presentation を `inducedR` に流す) |
+| **`toGeneralHypothesis`** | **(5.3)(b) 本体** — `S07.GeneralHypothesis 𝒮 (supportSet h)` を構成 |
+
+### 判明した事実 (着手前の見積りより易しかった点)
+
+1. **`hdeg` は無条件** — `columnSum_inv_apply_one` (共役 column は同次数) がそのまま `certainTypeR`
+   の次数条件。⟹ `certainTypeR` の `hdeg` 引数は**元から冗長** (instance 文脈だけで導出可能)。
+2. **(5.2.b) 等長も無条件** — `dadeIntegralCharacterMap_inner_eq_of_supported` は 2 つの
+   `A₀`-supported 関数に対して無条件に等長。`zSupportedSpan` の membership が supportedness を
+   含むので `hφ.2 hψ.2` を渡すだけ。仮説不要。
+3. **(5.2.e) の 4 層は全て (4.6) レベルで既存**。特に混合層
+   `S08.certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV` (+ swap) は
+   `S08_CrossOrthogonality` が既に一般形にしてあった。
+4. 可約×可約の副条件 (`χ₂ ≠ χ₂'`, `χ₂ ≠ χ₂'⁻¹`) は Gram 行列から読める
+   ⟹ `S06.columnSum_inner_columnSum` / `ne_of_columnSum_inner_eq_zero` を新設。
+5. 付随して **`S06.columnSum_injective` を (4.6) レベルで新設**し、既存の
+   `S12.Hypothesis.columnSum_injective` を**その特殊化に置換**した (特殊化債務の解消)。
+
+### ⚠ 残る 1 点 — anchor `hvanish` は書籍の statement に無い追加仮説
+
+`toGeneralHypothesis` は次を仮説として取る:
+
+```lean
+(hvanish : ∀ ⦃χ⦄, χ ∈ S → IsIrreducibleCharacter χ →
+  ∀ v ∈ (ticVdiff h).V, dadeIntegralCharacterMap h.dade0 h.tau (χ - χ.conj) v = 0)
+```
+
+書籍 (5.3)(b) の証明では混合ケースを `NC((φ−φ̄)^τ) ≤ 2` + (3.8) で片づけており、この V-消滅は
+**(4.6) の帰結であって追加仮説ではない**。本リポでは `S08_CrossOrthogonality` が
+「anchor が唯一の ambient 入力」と明示したうえで、3 つの呼び出し元 (Sibley §8 / type-P §13 /
+type-II §12) が**それぞれ別ルートで**discharge している。⟹ [[repo-stronger-hypothesis-is-specialization-not-gap]]
+の意味で**本リポ側の特殊化債務**であり、書籍の gap ではない。
+
+### 次の作業 (0159 の残り) — anchor を (4.6) レベルで導出する
+
+材料は揃っている:
+
+* **Sibley ルート** (`S08_CaseBCoherence2/ConstituentPinning.lean:684`
+  `tau_apply_eq_zero_of_mem_ticVdiffV`): α が `K^#`-supported (= Peterfalvi (4.7)) ⟹ Dade 像は
+  `conjugatesOfSet K^G` の外で 0 (`map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot`)、
+  かつ `V` は `conjugatesOfSet K^G` と交わらない (**`ticVdiffV_not_mem_conjugatesOfSet_K` は
+  既に (4.6) レベル**)。⚠ ただし `hH : ∀ a ∈ A, hyp.H a = ⊥` を要求するので、
+  `Hypothesis46` 単体からは出ない (Sibley の `dade_H_eq_bot` に依存)。
+* **type-II ルート** (`S12_TypeIIFrobenius.lean:374 付近`): `V ⊆ A₀` なので `dadeValue_eq`
+  (witness `a = v`, `h = 1`) で `α^τ(v) = α(v)`、α は `A`-supported で `v ∉ A` ⟹ 0。
+  こちらは `H a = ⊥` を要求しない ⟹ **(4.6) レベルで一般化できる見込みが高い**。
+
+⟹ 着手順: type-II ルートを `Hypothesis46` レベルの補題に持ち上げ ((4.7) の `K^#`-supportedness
+と `V ⊆ A₀` から)、`toGeneralHypothesis` の `hvanish` を落とす。落ちれば書籍 (5.3)(b) の
+statement と完全一致になる。3 つの既存 discharge 元もその特殊化に置換できる。
+
+### 残りの step (元の「やること」から)
+
+3. 書籍後半「`φ ∈ 𝒮 ∩ Irr L` なら `R(φ) ⊥ ω^σ`」— 未着手
+4. `S13_SixTwoImageData.inducedFamilyImageData` を本構成の特殊化に置換 — 未着手
+5. survey の「(5.3)(b) は設計上の理由で繰延」注記の撤回 — 未着手

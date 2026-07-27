@@ -65,8 +65,31 @@ theorem columnSum_def (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     columnSum h χ₂ = ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) :=
   rfl
 
+open scoped Classical in
+/-- **The Gram matrix of the certain-type column characters**: `⟨μ_j, μ_k⟩ = w₁·δ_{jk}`.  The
+`columnSum` phrasing of `columnFamily_mu_sum_inner`. -/
+theorem columnSum_inner_columnSum (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂')
+      = if χ₂ = χ₂' then (Nat.card h.W1 : ℂ) else 0 := by
+  rw [columnSum_def, columnSum_def, columnFamily_mu_sum_inner]
+
+/-- Two certain-type column characters are orthogonal exactly when their columns differ: the
+contrapositive reading of `columnSum_inner_columnSum` used to turn the (5.2.e) orthogonality
+hypotheses `⟨μ_j, μ_k⟩ = 0`, `⟨μ_j, μ̄_k⟩ = 0` into the column disjointness `χ₂ ≠ χ₂'`,
+`χ₂ ≠ χ₂'⁻¹` that `certainTypeR_imageSet_orthogonal_certainTypeR` consumes. -/
+theorem ne_of_columnSum_inner_eq_zero (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ}
+    (h0 : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂') = 0) :
+    χ₂ ≠ χ₂' := by
+  rintro rfl
+  rw [columnSum_inner_columnSum, if_pos rfl] at h0
+  exact (Nat.cast_ne_zero.mpr (NeZero.ne (Nat.card h.W1))) h0
+
 /-- **Certain-type column sums are injective in the `W₂`-dual**: `μ_j = μ_k → χ₂ = χ₂'`.  If two
-column sums agree, the (4.5) Gram matrix `columnFamily_mu_sum_inner` (`⟨μ_j, μ_k⟩ = w₁·δ_{jk}`)
+column sums agree, the (4.5) Gram matrix `columnSum_inner_columnSum` (`⟨μ_j, μ_k⟩ = w₁·δ_{jk}`)
 evaluates their inner product as `0` (off-diagonal) and, after rewriting by the assumed equality,
 as `w₁ ≠ 0` (diagonal).
 
@@ -79,8 +102,8 @@ theorem columnSum_injective (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   intro χ₂ χ₂' heq
   by_contra hne
   have h0 : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂') = 0 := by
-    rw [columnSum_def, columnSum_def, columnFamily_mu_sum_inner, if_neg hne]
-  rw [heq, columnSum_def, columnFamily_mu_sum_inner, if_pos rfl] at h0
+    rw [columnSum_inner_columnSum, if_neg hne]
+  rw [heq, columnSum_inner_columnSum, if_pos rfl] at h0
   exact (Nat.cast_ne_zero.mpr (NeZero.ne (Nat.card h.W1))) h0
 
 open scoped Classical in

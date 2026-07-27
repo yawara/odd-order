@@ -196,6 +196,7 @@ import OddOrder.Peterfalvi.S06_CertainTypeStructure
 import OddOrder.Peterfalvi.S06_CertainTypeIsometry
 import OddOrder.Peterfalvi.S06_CertainTypeConjugation
 import OddOrder.Peterfalvi.S06_MuColumnBridge
+import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S07_CoherenceGalois
@@ -13199,3 +13200,21 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.Isaacs.Ch07.hasNormalPComplement_of_normal_abelian_of_quotient
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch07.hasNormalPComplement_of_normal_of_isPGroup_quotient
+
+-- **Peterfalvi (5.3)(b)** (issue 0159): Hypothesis (5.2) holds for a family of induced characters
+-- `𝒮 ⊆ {Ind_K^L θ | θ ∈ Irr K, θ ≠ 1_K}` over Hypothesis (4.6).  Clause (5.2.d) is the book's case
+-- split on reducibility of the member — the two-element (5.3)(a) Dade image for irreducible ones,
+-- the `2w₁`-element column family `R(μ_j)` of (4.9) for reducible ones (whence `GeneralHypothesis`
+-- rather than the two-element `S07.Hypothesis`); clause (5.2.e) dispatches over the four strata.
+-- The `hvanish` anchor (`(χ − χ̄)^τ` vanishes on `V` for irreducible members) is the book's
+-- `NC ≤ 2` + (3.8) step, isolated as the sole ambient input by `S08_CrossOrthogonality`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.toGeneralHypothesis
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.inducedR
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.columnR
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.exists_ne_one_induce_eq_columnSum
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.columnSum_injective
