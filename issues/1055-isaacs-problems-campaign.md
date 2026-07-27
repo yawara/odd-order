@@ -3634,3 +3634,11 @@ characteristic 部分群すべての正規化群が normal `p`-complement を持
   ⚠ mathlib の `commute_of_normal_of_disjoint` は `(x y : G) (hx) (hy)` の順 (元 2 つが先)。
   ⟹ これで `M ≤ N_G(X)` (X は `P` で正規な部分群) が **layer 変換なしで**出せる:
   `m = u * h` と書けば `m y m⁻¹ = u (h y h⁻¹) u⁻¹ = u y u⁻¹ ∈ X`。
+* ✅ `le_normalizer_of_isNilpotent` (2026-07-27): 冪零 `M` は Sylow `P` 内の `P`-正規部分群
+  `X` を正規化する (`m = u*h` 分解 ⟹ `m y m⁻¹ = u y u⁻¹ ∈ X`; 逆包含は `m⁻¹ ∈ M` から)。
+* ✅ 7A.1 主定理の骨組み + `hnormeq` (極大性 + 単純性から `N_G(Y) = M`) を実証明。
+  残り = step 6-9 (`P ∈ Syl_p(G)` の適用 / characteristic `X` ごとの
+  `HasNormalPComplement p ↥(N_G(X.map))` / Thm 6.23 / `N = ⊥ ∨ ⊤` の矛盾) — sorry 1 件。
+  ⚠ この mathlib では `Subgroup.normalizer` は **`Set G` を取る** (`(Y : Set G)` と明示が必要)。
+  単純性は `IsSimpleGroup.eq_bot_or_eq_top_of_normal`、`Subgroup G` は linear order でないので
+  `not_lt` でなく `eq_of_le_of_not_lt` を使う。
