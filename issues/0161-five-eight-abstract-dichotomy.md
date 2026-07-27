@@ -117,36 +117,40 @@ AxiomsCheck 登録済。full build green (4875 jobs)、lint --strict clean、sor
 survey が「直接の対応物なし (applications derive sign alignment by other proven routes)」と
 している部分。
 
-### 原文の証明 (p.29 冒頭) — OCR が崩れているので復元した読み
+### ✅ 原文を PDF ページ画像で確定 (2026-07-27) — ⚠ pdftotext からの復元は**誤りだった**
 
-生テキスト (`04.7_pp_25_29_Coherence.txt` L185–187):
+画像は `references/peterfalvi/pages/peterfalvi-p028.png` / `-p029.png` に保存済。
 
-```
-Suppose that there is an index £ > 1 such that £ ^ j,£ ^ k, fit £ S and
-^(1) = /ik(l). By Theorem (4.9), ft - tf = 4£,(^ -«£). Since ff is a
-sum of elements of R(fJ>i), it follows that //£ = £*.£» ^ - a
-```
+**(5.8) の正確な statement (p.28 下)**:
 
-復元:
+> Suppose that the hypothesis of (5.3.b) holds, that `𝒮 ∩ Irr(L) ≠ ∅` and that `μ_k ∈ 𝒮` for
+> some **`k ≥ 1`**. Let `μ_j = μ̄_k`, and let `τ₁` be an isometry from `ℤ[𝒮]` to `ℤ[Irr G]`
+> which coincides with `τ` on `ℤ[𝒮, L^#]`. Then `μ_k^{τ₁} = δ_k ∑_{0≤i<w₁} ω_{ik}^σ` or
+> `μ_k^{τ₁} = −δ_k ∑_{0≤i<w₁} ω_{ij}^σ`. In the second case, `j` and `k` are the only indices
+> `ℓ` such that **`ℓ ≥ 1`**, `μ_ℓ ∈ 𝒮` and `μ_ℓ(1) = μ_k(1)`.
 
-> `ℓ > 1`, `ℓ ≠ j`, `ℓ ≠ k`, `μ_ℓ ∈ 𝒮`, `μ_ℓ(1) = μ_k(1)` なる `ℓ` があるとせよ。
-> **Theorem (4.9)** より `μ_ℓ^{τ₁} − μ_k^{τ₁} = δ_k ∑_i (ω_{iℓ} − ω_{ik})^σ`。
-> `μ_ℓ^{τ₁}` は `R(μ_ℓ)` の元の和だから `μ_ℓ^{τ₁} = δ_k ∑_i ω_{iℓ}^σ`。
+**rider の証明 (p.29 冒頭、全文)**:
 
-⚠ **式は必ず PDF ページ画像で確定してから形式化すること** (p.29 = Peterfalvi の書籍ページ 29)。
-`pdftotext` は上付き・添字を落とすので `ω_{iℓ}` / `ω_{ik}` / `δ_k` の位置が信用できない
-([[pdftotext-drops-superscripts]] [[keep-cropped-pdf-page-images]])。
-切り出したら `references/peterfalvi/pages/peterfalvi-p029.png` に残すこと。
+> Suppose that there is an index `ℓ ≥ 1` such that `ℓ ≠ j`, `ℓ ≠ k`, `μ_ℓ ∈ 𝒮` and
+> `μ_ℓ(1) = μ_k(1)`. By Theorem (4.9), **`μ_k^{τ₁} − μ_ℓ^{τ₁} = δ_k ∑_i (ω_{ik}^σ − ω_{iℓ}^σ)`**.
+> Since `μ_ℓ^{τ₁}` is a sum of elements of `R(μ_ℓ)`, it follows that
+> **`μ_k^{τ₁} = δ_k ∑_i ω_{ik}^σ`**.
 
-### 論法の骨格 (第 2 の場合との矛盾)
+⟹ 論法は「そのような `ℓ` が在れば**第 1 の場合になる**」。rider はその対偶。
 
-第 2 の場合は `μ_k^{τ₁} = −δ ∑_i ω_{ij}^σ`。上の (4.9) 差分等式と合わせると
+### ⚠ 前 tick の復元がどう間違っていたか (記録)
 
-`μ_ℓ^{τ₁} = δ ∑_i ω_{iℓ}^σ − δ ∑_i ω_{ik}^σ − δ ∑_i ω_{ij}^σ`
+pdftotext の壊れた行 (`ft - tf = 4£,(^ -«£)` 等) から復元を書いたが、**4 点とも誤り**だった:
 
-となり、これは **`3w₁` 個の正規直交元の符号つき和** ⟹ `‖μ_ℓ^{τ₁}‖² = 3w₁`。
-一方 `μ_ℓ^{τ₁}` は `R(μ_ℓ)` の部分和ゆえ `‖·‖² ≤ 2w₁` (というより `= w₁`)。矛盾。
-⟹ そのような `ℓ` は存在しない。
+| 前 tick の記述 | 実際 |
+|---|---|
+| `μ_ℓ^{τ₁} − μ_k^{τ₁} = δ ∑(ω_{iℓ} − ω_{ik})^σ` | **差の向きが逆**: `μ_k^{τ₁} − μ_ℓ^{τ₁} = δ_k ∑(ω_{ik}^σ − ω_{iℓ}^σ)` |
+| 結論 `μ_ℓ^{τ₁} = δ ∑ ω_{iℓ}^σ` | 結論は **`μ_k^{τ₁} = δ_k ∑ ω_{ik}^σ`** (= 第 1 の場合) |
+| 「`3w₁` 個の正規直交元の符号つき和で矛盾」 | **そんな議論は書籍に無い** (私の創作) |
+| `k > 1` / `ℓ > 1` | **`k ≥ 1` / `ℓ ≥ 1`** |
+
+⟹ **崩れた OCR から「もっともらしい復元」を書いて issue に残すのは、書かないより悪い** —
+次のセッションが既成事実として引き継ぐ。読めないなら「読めない、画像を見よ」とだけ書くこと。
 
 ### 材料 (着手前に実測で再確認すること)
 
