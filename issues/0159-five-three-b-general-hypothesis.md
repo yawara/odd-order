@@ -100,6 +100,40 @@ dispatch する」。§12 版はその特殊化になる。
 ⚠ 前 tick に書いた「§13 の `inducedFamilyImageData` を読むのが最短」は**外れ** —
 §13 は分類済みデータ (`memberColumn`) の消費側で、分類そのものは §12 → S06 に在る。
 
+## ⟹ (4.6) レベルの原始概念は既に揃っている (2026-07-27 実測、決定版)
+
+§12 の分類補題の**中身**は次の 1 行に尽きる (`S12_HcBound:620`):
+
+```lean
+  obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff θ).mp hred
+```
+
+そして
+
+```lean
+theorem induce_not_isIrreducible_iff [NeZero (Nat.card h.W1)] (χ : IrreducibleCharacter ↥h.K) :
+    ¬ IsIrreducibleCharacter (ClassFunction.induce h.K χ) ↔ ∃ χ₂, h.chiRestrict χ₂ = χ
+```
+(`S06_CertainTypeClifford.lean:1099`) は **`Hypothesis46` レベルの定理**。
+
+⟹ **切り出すべき (4.6) レベルの補題は存在しない — 既に在る**。
+§12 の `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` の残りは、
+§12 の `Fin w₁ / Fin w₂` 添字と §6 の指標群添字の間の**再添字づけ**
+(`finCongr hcardW1` / `hcardW2sub` / `finCardEquivCharacterGroup`) にすぎない。
+
+### 従って `Hypothesis46.toGeneralHypothesis` の構成は
+
+`difference_image χ hχ` を `χ = Ind_K^L θ` について:
+- `IsIrreducibleCharacter χ` なら `characterDifferenceImage_of_irreducible` → `toOrthonormalImage`
+- そうでなければ `induce_not_isIrreducible_iff` で `χ₂'` を取り (`θ = h.chiRestrict χ₂'`)、
+  `induce_restrict_certainType_eq` / `coe_chiRestrict` で `χ = columnSum h χ₂'` を出し、
+  **`certainTypeR h hχ₂'ne hdeg`** を当てる。
+
+⚠ 残る唯一の未確認点は `certainTypeR` の **degree 条件 `hdeg`**
+(`∑ (columnFamily χ₂).mu i (1) = ∑ (columnFamily χ₂⁻¹).mu i (1)`)。
+`S06_CertainTypeCoherence` 内に同型の等式が複数ある (`:132` / `:283` / `:472`) ので、
+そこから (4.6) レベルで供給できる見込み。**着手時にまずここを確認すること。**
+
 ## やること
 
 1. `S06.Hypothesis46` (+ 必要な補助データ) から `S07.GeneralHypothesis` を構成する
