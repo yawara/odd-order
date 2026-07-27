@@ -26,6 +26,9 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `smul_eq_self_of_mem_centralizer`, `centralizer_inf_stabilizer_eq_bot`,
   `bijective_smulBase_top_of_comm` — **Problem 8A.2**: transitive な `H ≤ G` の
   中心化群 `C_G(H)` は半正則。帰結として可換 transitive な置換群は regular。
+- `centralizer_eq_of_regular_of_inf_eq_bot`, `regularPairHom`,
+  `mulEquiv_and_center_eq_bot_of_regular_normal` — **Problem 8A.4**: regular normal な
+  `U`, `V` が `U ⊓ V = 1` を満たすと `C_G(U) = V` となり, `U ≅ V` で中心はともに自明。
 - `smul_orbit_eq_orbit_smul`, `card_orbit_eq_of_normal` — **Problem 8A.8**:
   transitive な `G` の正規部分群 `N` について `G` は `N`-軌道を推移的に置換し,
   したがって `N` は half-transitive (すべての `N`-軌道が同じ濃度)。
@@ -101,6 +104,52 @@ theorem exists_regular_subgroups_of_card_eq {A B : Type*} [Group A] [Group B]
       (∀ α : A, Function.Bijective (smulBase M α)) ∧
       Nonempty (N ≃* A) ∧ Nonempty (M ≃* B) :=
   exists_regular_subgroups_of_equiv (Finite.card_eq.mp h.symm).some
+
+/-! ### Problem 8A.2 — 中心化群は半正則 -/
+
+/-- **Isaacs Problem 8A.2** (p. 235) の核心: `H ≤ G` が `Ω` に推移的なら, `C_G(H)` の元は
+1 点を固定するだけで全点を固定する。
+
+`β = h • α` (`h ∈ H`) と書き, `c` が `h` と可換なことから
+`c • β = c • h • α = h • c • α = h • α = β`。 -/
+theorem smul_eq_self_of_mem_centralizer {H : Subgroup G} [IsPretransitive H Ω]
+    {c : G} (hc : c ∈ Subgroup.centralizer (H : Set G)) {α : Ω} (hα : c • α = α) (β : Ω) :
+    c • β = β := by
+  obtain ⟨h, rfl⟩ := exists_smul_eq H α β
+  rw [subgroup_smul_def, ← mul_smul,
+    ← Subgroup.mem_centralizer_iff.mp hc (h : G) h.2, mul_smul, hα]
+
+/-- **Isaacs Problem 8A.2** (p. 235), 前半: `H ≤ G` が `Ω` に推移的なら `C_G(H)` は
+**半正則** — どの点安定化群とも自明にしか交わらない。
+
+置換群 (= 忠実な作用) であることが要る: `smul_eq_self_of_mem_centralizer` は
+「全点を固定する」までしか言わず, そこから `c = 1` を出すのに忠実性を使う。 -/
+theorem centralizer_inf_stabilizer_eq_bot [FaithfulSMul G Ω] {H : Subgroup G}
+    [IsPretransitive H Ω] (α : Ω) :
+    Subgroup.centralizer (H : Set G) ⊓ stabilizer G α = ⊥ := by
+  rw [eq_bot_iff]
+  rintro c ⟨hc, hα⟩
+  rw [Subgroup.mem_bot]
+  refine FaithfulSMul.eq_of_smul_eq_smul (α := Ω) fun β => ?_
+  rw [one_smul]
+  exact smul_eq_self_of_mem_centralizer hc (mem_stabilizer_iff.mp hα) β
+
+/-- **Isaacs Problem 8A.2** (p. 235), 後半: **可換な推移的置換群は regular**。
+
+可換なので `G = C_G(G)` が半正則 (前半), 推移性と合わせて軌道写像は全単射。 -/
+theorem bijective_smulBase_top_of_comm [FaithfulSMul G Ω] [IsPretransitive G Ω]
+    (hcomm : ∀ x y : G, x * y = y * x) (α : Ω) :
+    Function.Bijective (smulBase (⊤ : Subgroup G) α) := by
+  haveI : IsPretransitive (⊤ : Subgroup G) Ω := by
+    refine ⟨fun x y => ?_⟩
+    obtain ⟨g, hg⟩ := exists_smul_eq G x y
+    exact ⟨⟨g, Subgroup.mem_top g⟩, hg⟩
+  rw [bijective_smulBase_iff]
+  refine ⟨inferInstance, ?_⟩
+  have hcentral : (⊤ : Subgroup G) ≤ Subgroup.centralizer ((⊤ : Subgroup G) : Set G) :=
+    fun x _ => Subgroup.mem_centralizer_iff.mpr fun y _ => hcomm y x
+  refine le_antisymm (le_trans (inf_le_inf_right _ hcentral) ?_) bot_le
+  exact le_of_eq (centralizer_inf_stabilizer_eq_bot (H := (⊤ : Subgroup G)) α)
 
 /-! ### Problem 8A.3 — 左右の正則表現 -/
 
@@ -192,51 +241,104 @@ theorem exists_two_distinct_regular_normal_of_center_eq_bot {A : Type*} [Group A
     exact ((Subgroup.mem_centralizer_iff.mp
       (regularRepRight_range_le_centralizer (Equiv.refl A) hy) x hx)).symm
 
-/-! ### Problem 8A.2 — 中心化群は半正則 -/
+/-! ### Problem 8A.4 — 交わらない 2 つの regular normal 部分群 -/
 
-/-- **Isaacs Problem 8A.2** (p. 235) の核心: `H ≤ G` が `Ω` に推移的なら, `C_G(H)` の元は
-1 点を固定するだけで全点を固定する。
+section RegularPair
 
-`β = h • α` (`h ∈ H`) と書き, `c` が `h` と可換なことから
-`c • β = c • h • α = h • c • α = h • α = β`。 -/
-theorem smul_eq_self_of_mem_centralizer {H : Subgroup G} [IsPretransitive H Ω]
-    {c : G} (hc : c ∈ Subgroup.centralizer (H : Set G)) {α : Ω} (hα : c • α = α) (β : Ω) :
-    c • β = β := by
-  obtain ⟨h, rfl⟩ := exists_smul_eq H α β
-  rw [subgroup_smul_def, ← mul_smul,
-    ← Subgroup.mem_centralizer_iff.mp hc (h : G) h.2, mul_smul, hα]
+variable {U V : Subgroup G}
 
-/-- **Isaacs Problem 8A.2** (p. 235), 前半: `H ≤ G` が `Ω` に推移的なら `C_G(H)` は
-**半正則** — どの点安定化群とも自明にしか交わらない。
+/-- 交わらない正規部分群は元ごとに可換なので `V ≤ C_G(U)` (8A.4 の step 1)。 -/
+lemma le_centralizer_of_normal_of_inf_eq_bot [U.Normal] [V.Normal] (h : U ⊓ V = ⊥) :
+    V ≤ Subgroup.centralizer (U : Set G) := fun v hv =>
+  Subgroup.mem_centralizer_iff.mpr fun u hu =>
+    Subgroup.commute_of_normal_of_disjoint U V inferInstance inferInstance
+      (disjoint_iff.mpr h) u v hu hv
 
-置換群 (= 忠実な作用) であることが要る: `smul_eq_self_of_mem_centralizer` は
-「全点を固定する」までしか言わず, そこから `c = 1` を出すのに忠実性を使う。 -/
-theorem centralizer_inf_stabilizer_eq_bot [FaithfulSMul G Ω] {H : Subgroup G}
-    [IsPretransitive H Ω] (α : Ω) :
-    Subgroup.centralizer (H : Set G) ⊓ stabilizer G α = ⊥ := by
+/-- **8A.4 の step 2**: `U`, `V` がともに regular normal で `U ⊓ V = ⊥` なら `C_G(U) = V`。
+
+`⊇` は step 1。`⊆` は `V` の推移性で `c • α = v • α` なる `v ∈ V` を取り, `v⁻¹c` が
+`C_G(U)` に属して `α` を固定することと `C_G(U)` の半正則性 (8A.2) から `v⁻¹c = 1`。 -/
+theorem centralizer_eq_of_regular_of_inf_eq_bot [FaithfulSMul G Ω] [U.Normal] [V.Normal]
+    {α : Ω} (hU : Function.Bijective (smulBase U α)) (hV : Function.Bijective (smulBase V α))
+    (h : U ⊓ V = ⊥) :
+    Subgroup.centralizer (U : Set G) = V := by
+  haveI : IsPretransitive U Ω := (surjective_smulBase_iff U α).mp hU.2
+  haveI : IsPretransitive V Ω := (surjective_smulBase_iff V α).mp hV.2
+  refine le_antisymm (fun c hc => ?_) (le_centralizer_of_normal_of_inf_eq_bot h)
+  obtain ⟨v, hv⟩ := exists_smul_eq V α (c • α)
+  rw [subgroup_smul_def] at hv
+  have hstab : ((v : G)⁻¹ * c) ∈ stabilizer G α := by
+    rw [mem_stabilizer_iff, mul_smul, ← hv, inv_smul_smul]
+  have hmem : ((v : G)⁻¹ * c) ∈ Subgroup.centralizer (U : Set G) ⊓ stabilizer G α :=
+    ⟨Subgroup.mul_mem _ (Subgroup.inv_mem _
+      (le_centralizer_of_normal_of_inf_eq_bot h v.2)) hc, hstab⟩
+  rw [centralizer_inf_stabilizer_eq_bot (H := U) α, Subgroup.mem_bot,
+    inv_mul_eq_one] at hmem
+  exact hmem ▸ v.2
+
+/-- **8A.4 の後半**: そのような `U` の中心は自明。
+
+`z ∈ Z(U)` は `U` を中心化するので `z ∈ C_G(U) = V`, かつ `z ∈ U` なので `z ∈ U ⊓ V = ⊥`。 -/
+theorem center_eq_bot_of_regular_of_inf_eq_bot [FaithfulSMul G Ω] [U.Normal] [V.Normal]
+    {α : Ω} (hU : Function.Bijective (smulBase U α)) (hV : Function.Bijective (smulBase V α))
+    (h : U ⊓ V = ⊥) :
+    Subgroup.center ↥U = ⊥ := by
   rw [eq_bot_iff]
-  rintro c ⟨hc, hα⟩
+  intro z hz
   rw [Subgroup.mem_bot]
-  refine FaithfulSMul.eq_of_smul_eq_smul (α := Ω) fun β => ?_
-  rw [one_smul]
-  exact smul_eq_self_of_mem_centralizer hc (mem_stabilizer_iff.mp hα) β
+  have hzV : (z : G) ∈ V := by
+    rw [← centralizer_eq_of_regular_of_inf_eq_bot hU hV h]
+    exact Subgroup.mem_centralizer_iff.mpr fun u hu =>
+      congrArg Subtype.val (Subgroup.mem_center_iff.mp hz ⟨u, hu⟩)
+  have : (z : G) ∈ U ⊓ V := ⟨z.2, hzV⟩
+  rw [h, Subgroup.mem_bot] at this
+  exact Subtype.ext this
 
-/-- **Isaacs Problem 8A.2** (p. 235), 後半: **可換な推移的置換群は regular**。
+/-- **8A.4 の step 4** (準同型): `u ↦ (u⁻¹ • α を実現する唯一の `V` の元)`。
 
-可換なので `G = C_G(G)` が半正則 (前半), 推移性と合わせて軌道写像は全単射。 -/
-theorem bijective_smulBase_top_of_comm [FaithfulSMul G Ω] [IsPretransitive G Ω]
-    (hcomm : ∀ x y : G, x * y = y * x) (α : Ω) :
-    Function.Bijective (smulBase (⊤ : Subgroup G) α) := by
-  haveI : IsPretransitive (⊤ : Subgroup G) Ω := by
-    refine ⟨fun x y => ?_⟩
-    obtain ⟨g, hg⟩ := exists_smul_eq G x y
-    exact ⟨⟨g, Subgroup.mem_top g⟩, hg⟩
-  rw [bijective_smulBase_iff]
-  refine ⟨inferInstance, ?_⟩
-  have hcentral : (⊤ : Subgroup G) ≤ Subgroup.centralizer ((⊤ : Subgroup G) : Set G) :=
-    fun x _ => Subgroup.mem_centralizer_iff.mpr fun y _ => hcomm y x
-  refine le_antisymm (le_trans (inf_le_inf_right _ hcentral) ?_) bot_le
-  exact le_of_eq (centralizer_inf_stabilizer_eq_bot (H := (⊤ : Subgroup G)) α)
+`V` の元は `U` の元と可換なので (`step 1`) これは準同型になる:
+`ψ(u₁)ψ(u₂) • α = ψ(u₁) • (u₂⁻¹ • α) = u₂⁻¹ • (u₁⁻¹ • α) = (u₁u₂)⁻¹ • α`。 -/
+noncomputable def regularPairHom [U.Normal] [V.Normal] {α : Ω}
+    (hV : Function.Bijective (smulBase V α)) (h : U ⊓ V = ⊥) : ↥U →* ↥V where
+  toFun u := preSmulBase hV ((u : G)⁻¹ • α)
+  map_one' := by rw [preSmulBase_eq_iff]; simp
+  map_mul' u₁ u₂ := by
+    rw [preSmulBase_eq_iff, Subgroup.coe_mul, mul_smul,
+      smulBase_preSmulBase hV ((u₂ : G)⁻¹ • α)]
+    have hcomm := (Subgroup.mem_centralizer_iff.mp
+      (le_centralizer_of_normal_of_inf_eq_bot (U := U) h
+        (preSmulBase hV ((u₁ : G)⁻¹ • α)).2) ((u₂ : G)⁻¹) (Subgroup.inv_mem _ u₂.2)).symm
+    rw [← mul_smul, hcomm, mul_smul, smulBase_preSmulBase hV ((u₁ : G)⁻¹ • α),
+      ← mul_smul, Subgroup.coe_mul, mul_inv_rev]
+
+@[simp] lemma regularPairHom_apply [U.Normal] [V.Normal] {α : Ω}
+    (hV : Function.Bijective (smulBase V α)) (h : U ⊓ V = ⊥) (u : ↥U) :
+    regularPairHom hV h u = preSmulBase hV ((u : G)⁻¹ • α) := rfl
+
+/-- **Isaacs Problem 8A.4** (p. 235): 置換群 `G` の regular normal 部分群 `U`, `V` が
+`U ⊓ V = 1` を満たすなら `U ≅ V` で, どちらも中心が自明。 -/
+theorem mulEquiv_and_center_eq_bot_of_regular_normal [FaithfulSMul G Ω]
+    [U.Normal] [V.Normal] {α : Ω}
+    (hU : Function.Bijective (smulBase U α)) (hV : Function.Bijective (smulBase V α))
+    (h : U ⊓ V = ⊥) :
+    Nonempty (↥U ≃* ↥V) ∧ Subgroup.center ↥U = ⊥ ∧ Subgroup.center ↥V = ⊥ := by
+  refine ⟨⟨MulEquiv.ofBijective (regularPairHom hV h) ⟨?_, ?_⟩⟩,
+    center_eq_bot_of_regular_of_inf_eq_bot hU hV h,
+    center_eq_bot_of_regular_of_inf_eq_bot hV hU (by rwa [inf_comm])⟩
+  · intro u₁ u₂ huu
+    have h1 := smulBase_preSmulBase hV ((u₁ : G)⁻¹ • α)
+    have h2 := smulBase_preSmulBase hV ((u₂ : G)⁻¹ • α)
+    rw [show preSmulBase hV ((u₁ : G)⁻¹ • α) = preSmulBase hV ((u₂ : G)⁻¹ • α) from huu,
+      h2] at h1
+    have : smulBase U α u₁⁻¹ = smulBase U α u₂⁻¹ := by
+      simpa [smulBase] using h1.symm
+    simpa using congrArg (fun x : ↥U => x⁻¹) (hU.1 this)
+  · intro v
+    refine ⟨(preSmulBase hU ((v : G) • α))⁻¹, ?_⟩
+    rw [regularPairHom_apply, preSmulBase_eq_iff]
+    simp
+
+end RegularPair
 
 /-! ### Problem 8A.8 — 正規部分群の軌道は推移的に置換される -/
 

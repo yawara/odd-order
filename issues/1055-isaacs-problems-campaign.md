@@ -4128,6 +4128,14 @@ TransitiveAutomorphisms / TransvectionGeneration)。演習は新 leaf `Problems8
 * ✅ **8A.2** 実証明 — `smul_eq_self_of_mem_centralizer` (推移的 `H` の中心化群の元は
   1 点固定 ⟹ 全点固定) / `centralizer_inf_stabilizer_eq_bot` (忠実性を足して半正則) /
   `bijective_smulBase_top_of_comm` (可換推移的置換群は regular)。
+* ✅ **8A.4** 実証明 — `le_centralizer_of_normal_of_inf_eq_bot` (mathlib
+  `Subgroup.commute_of_normal_of_disjoint`) / `centralizer_eq_of_regular_of_inf_eq_bot`
+  (**`C_G(U) = V`**: `⊆` は `V` の推移性で `c•α = v•α` を取り `v⁻¹c` が `C_G(U)` の
+  半正則性 (8A.2) で 1) / `center_eq_bot_of_regular_of_inf_eq_bot` (`Z(U) ≤ U ⊓ C_G(U) =
+  U ⊓ V = ⊥`) / `regularPairHom` (`ψ u = 「u⁻¹ • α を実現する唯一の V の元」`; 準同型性は
+  `V` が `U` を中心化することから) ⟹ `mulEquiv_and_center_eq_bot_of_regular_normal`。
+  ⚠ 書籍 hint の「`G = UV` としてよい」は使わずに済んだ (`C_G(U) = V` を直接出す方が短い)。
+  ファイルは文書順に並べ替え済 (8A.4 が 8A.2 を使うので 8A.2 を先に置く)。
 * ✅ **8A.8** 実証明 — `smul_orbit_eq_orbit_smul` (`N ⊴ G` なら `g • orbit N α =
   orbit N (g • α)`) / `card_orbit_eq_of_normal` (帰結: `N` は half-transitive)。
 
