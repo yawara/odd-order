@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.Blocks
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.CyclicGenerated
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.DihedralStructure
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8B.SmallSuborbits
 
 /-!
@@ -18,4 +19,6 @@ topic 別 leaf にある (下流は本 module を import するだけでよい)�
 * `Problems8B/SmallSuborbits.lean` — **8B.5–8B.7**: 点安定化群が `Ω ∖ {α}` 上に
   長さ 1 / 2 / 3 の軌道をもつ場合の構造。
 * `Problems8B/CyclicGenerated.lean` — **8B.8**: `n`-巡回と部分推移群が生成する群の原始性。
+* `Problems8B/DihedralStructure.lean` — **8B.6 の結論**: 長さ 2 の軌道をもつ原始置換群は
+  `DihedralGroup p` (`p = |Ω|` は奇素数) に同型。二面体群の認識補題 `dihedralEquiv` 込み。
 -/
