@@ -30,6 +30,9 @@ Isaacs の定義 (「`Δ` の translate は `Δ` 自身か, `Δ` と交わらな
 - `bijective_smulBase_of_normal_of_comm`,
   `prime_pow_card_and_unique_isMinimalNormal_of_solvable` — **Problem 8B.4**: 可解原始
   置換群の次数は素数冪で, 極小正規部分群はただ一つ。
+- `prime_card_of_isCoatom_bot`, `stabilizer_eq_bot_and_prime_card_of_fixed_point` —
+  **Problem 8B.5**: 点安定化群 `G_α` が `Ω ∖ {α}` に固定点をもてば `G_α = 1` で
+  `|G|` は素数。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -276,6 +279,89 @@ theorem prime_pow_card_and_unique_isMinimalNormal_of_solvable [Finite G] [Faithf
     Subgroup.mem_centralizer_iff.mpr fun y hy => habel y hy x hx
   have hinf : M ⊓ N = ⊥ := inf_eq_bot_of_isMinimalNormal_of_ne hM hN hMN
   exact hN.2.1 (le_bot_iff.mp (hinf ▸ le_inf (hcN ▸ hNle) le_rfl))
+
+/-! ### Problem 8B.5 — 点安定化群が他の点を固定すれば自明で `|G|` は素数 -/
+
+/-- 部分群が `⊥` と `⊤` しかない有限群は**素数位数**。
+
+`Nat.card G` の素因数 `p` を取り Cauchy で位数 `p` の元 `y` を作ると
+`⊥ < ⟨y⟩` なので `⟨y⟩ = ⊤`, すなわち `|G| = orderOf y = p`。 -/
+lemma prime_card_of_isCoatom_bot [Finite G] (h : IsCoatom (⊥ : Subgroup G)) :
+    (Nat.card G).Prime := by
+  classical
+  haveI := Fintype.ofFinite G
+  have hnt : Nontrivial G := by
+    by_contra hc
+    rw [not_nontrivial_iff_subsingleton] at hc
+    exact h.1 (le_antisymm bot_le fun x _ =>
+      Subgroup.mem_bot.mpr (Subsingleton.elim x 1))
+  have hcard1 : Nat.card G ≠ 1 := fun hc =>
+    (not_nontrivial_iff_subsingleton.mpr (Nat.card_eq_one_iff_unique.mp hc).1) hnt
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcard1
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨y, hy⟩ := exists_prime_orderOf_dvd_card (G := G) p
+    (by rwa [← Nat.card_eq_fintype_card])
+  have hy1 : y ≠ 1 := fun hc => hp.ne_one (by rw [hc, orderOf_one] at hy; exact hy.symm)
+  have htop : Subgroup.zpowers y = ⊤ :=
+    h.2 _ (bot_lt_iff_ne_bot.mpr (Subgroup.zpowers_ne_bot.mpr hy1))
+  have hcard : Nat.card G = p := by
+    rw [← hy, ← Nat.card_zpowers y, htop]
+    simp
+  rw [hcard]
+  exact hp
+
+/-- **Isaacs Problem 8B.5** (p. 249) 🎉: 原始置換群 `G` の点安定化群 `H = G_α` が
+`Ω ∖ {α}` に固定点をもてば, **`H = 1` かつ `|G|` は素数**。
+
+原始性より `H` は極大部分群 (`IsCoatom`)。`H ≤ G_β` で `G_β ≠ G` (推移性 + `|Ω| ≥ 2`)
+だから `H = G_β`。`g • α = β` なる `g` は `g ∉ H` かつ `g ∈ N_G(H)` なので
+`H < N_G(H)`, 極大性から `N_G(H) = G`, すなわち **`H ⊴ G`**。正規かつ `H ≤ G_α` なら
+`H` はすべての点を固定するので, 忠実性から `H = 1`。すると `⊥` が極大部分群になり
+`|G|` は素数。 -/
+theorem stabilizer_eq_bot_and_prime_card_of_fixed_point [Finite G] [FaithfulSMul G Ω]
+    [IsPreprimitive G Ω] [Nontrivial Ω] {α β : Ω} (hαβ : α ≠ β)
+    (hfix : ∀ h ∈ stabilizer G α, h • β = β) :
+    stabilizer G α = ⊥ ∧ (Nat.card G).Prime := by
+  have hcoatom : IsCoatom (stabilizer G α) :=
+    IsPreprimitive.isCoatom_stabilizer_of_isPreprimitive (G := G) α
+  -- `G_β ≠ G` (さもなくば推移性から `Ω` が 1 点)。
+  have hβtop : stabilizer G β ≠ ⊤ := by
+    intro hc
+    obtain ⟨x, y, hxy⟩ := exists_pair_ne Ω
+    have hall : ∀ γ : Ω, γ = β := fun γ => by
+      obtain ⟨g, hg⟩ := exists_smul_eq G β γ
+      rw [← hg]
+      exact mem_stabilizer_iff.mp (hc ▸ Subgroup.mem_top g)
+    exact hxy ((hall x).trans (hall y).symm)
+  -- 極大性から `G_α = G_β`。
+  have hle : stabilizer G α ≤ stabilizer G β := fun h hh => mem_stabilizer_iff.mpr (hfix h hh)
+  have heq : stabilizer G α = stabilizer G β :=
+    (lt_or_eq_of_le hle).resolve_left fun hlt => hβtop (hcoatom.2 _ hlt)
+  -- `g • α = β` なる `g` は `N_G(G_α)` に入るが `G_α` には入らない。
+  obtain ⟨g, hg⟩ := exists_smul_eq G α β
+  have hgnot : g ∉ stabilizer G α := fun hc => hαβ (by rw [← hg, mem_stabilizer_iff.mp hc])
+  have hconj : ∀ h : G, h ∈ stabilizer G α ↔ g⁻¹ * h * g ∈ stabilizer G α := by
+    intro h
+    refine (Iff.of_eq (by rw [heq])).trans ?_
+    rw [← hg]
+    simp only [mem_stabilizer_iff, mul_smul, inv_smul_eq_iff]
+  have hgnorm : g ∈ Subgroup.normalizer (stabilizer G α) :=
+    Subgroup.mem_normalizer_iff''.mpr hconj
+  haveI hnormal : (stabilizer G α).Normal := by
+    rw [← Subgroup.normalizer_eq_top_iff]
+    exact hcoatom.2 _ (lt_of_le_of_ne Subgroup.le_normalizer fun hc => hgnot (hc ▸ hgnorm))
+  -- 正規な点安定化群はすべての点を固定 ⟹ 忠実性から自明。
+  have htriv : ∀ h ∈ stabilizer G α, ∀ γ : Ω, h • γ = γ := by
+    intro h hh γ
+    obtain ⟨k, hk⟩ := exists_smul_eq G α γ
+    have hmem : k⁻¹ * h * k ∈ stabilizer G α := by
+      simpa using hnormal.conj_mem h hh k⁻¹
+    rw [← hk, ← mul_smul, show h * k = k * (k⁻¹ * h * k) by group, mul_smul,
+      mem_stabilizer_iff.mp hmem]
+  have hbot : stabilizer G α = ⊥ :=
+    le_antisymm (fun h hh => Subgroup.mem_bot.mpr
+      (FaithfulSMul.eq_of_smul_eq_smul (α := Ω) fun γ => by rw [htriv h hh γ, one_smul])) bot_le
+  exact ⟨hbot, prime_card_of_isCoatom_bot (hbot ▸ hcoatom)⟩
 
 end
 
