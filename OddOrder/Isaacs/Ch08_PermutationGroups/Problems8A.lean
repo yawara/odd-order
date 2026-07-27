@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Sylow
+import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 import OddOrder.Isaacs.Ch08_PermutationGroups.HalfTransitive
 import OddOrder.Isaacs.Ch08_PermutationGroups.RegularNormal
@@ -51,6 +52,8 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
   `card_le_four_of_regular_normal_of_stabilizer_three_transitive` —
   **Problem 8A.10 の核心**: 自己同型群が `N ∖ {1}` に 3-transitive なら `|N| ≤ 4`;
   `N` が regular normal で `G_α` が `Ω ∖ {α}` に 3-transitive なら `|N| ≤ 4`。
+- `card_eq_four_of_solvable_of_stabilizer_three_transitive` — **Problem 8A.10**:
+  可解な 4-transitive 置換群の次数は 4。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -750,6 +753,61 @@ theorem card_le_four_of_regular_normal_of_stabilizer_three_transitive
           simp only [← mul_smul, mul_assoc]
       _ = (n' : G) • α := by rw [hginv, hc]
   exact ⟨MulAut.conjNormal (H := N) g, key x x' hg1, key y y' hg2, key z z' hg3⟩
+
+/-- **Isaacs Problem 8A.10** (p. 236) の主内容: **可解な 4-transitive 置換群の次数は 4**。
+
+書籍 hint どおり極小正規部分群 `N` を取る。`N` は忠実性から非自明に作用するので **8A.9**
+で推移的, `G` 可解ゆえ **Isaacs Thm 3.11** で可換 (実は elementary abelian), 可換 + 推移的
++ 忠実で **8A.2** より `C_G(N) ⊓ G_α = ⊥`, `N ≤ C_G(N)` だから `N` は **regular**。
+`G_α` は `Ω ∖ {α}` に 3-transitive なので
+`card_le_four_of_regular_normal_of_stabilizer_three_transitive` で `|N| ≤ 4`,
+regular ゆえ `|Ω| = |N| ≤ 4`。
+
+4-transitivity は「推移的 + `G_α` が `Ω ∖ {α}` に 3-transitive」の形で仮定する
+(`h2` は 2-transitivity 部分, `h3` は 3-transitivity 部分)。 -/
+theorem card_eq_four_of_solvable_of_stabilizer_three_transitive [Finite G] [IsSolvable G]
+    [FaithfulSMul G Ω] [IsPretransitive G Ω] {α : Ω} (hΩ4 : 4 ≤ Nat.card Ω)
+    (h2 : ∀ α' β γ : Ω, β ≠ α' → γ ≠ α' → ∃ g : G, g • α' = α' ∧ g • β = γ)
+    (h3 : ∀ β₁ β₂ β₃ γ₁ γ₂ γ₃ : Ω, β₁ ≠ α → β₂ ≠ α → β₃ ≠ α → γ₁ ≠ α → γ₂ ≠ α → γ₃ ≠ α →
+      β₁ ≠ β₂ → β₁ ≠ β₃ → β₂ ≠ β₃ → γ₁ ≠ γ₂ → γ₁ ≠ γ₃ → γ₂ ≠ γ₃ →
+      ∃ g : G, g • α = α ∧ g • β₁ = γ₁ ∧ g • β₂ = γ₂ ∧ g • β₃ = γ₃) :
+    Nat.card Ω = 4 := by
+  classical
+  -- `Ω` は 2 点以上, したがって `G` は非自明
+  haveI hΩfin : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
+  haveI hΩnt : Nontrivial Ω := Finite.one_lt_card_iff_nontrivial.mp (by omega)
+  obtain ⟨β, hβ⟩ := exists_ne α
+  obtain ⟨g₀, hg₀⟩ := exists_smul_eq G α β
+  haveI hGnt : Nontrivial G := ⟨g₀, 1, fun hc => hβ (by rw [← hg₀, hc, one_smul])⟩
+  -- 極小正規部分群 `N`
+  obtain ⟨N, hNmin, -⟩ :=
+    OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
+  haveI hNnormal : N.Normal := hNmin.1
+  haveI hNnt : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNmin.2.1
+  -- `N` は非自明に作用する (忠実性)
+  obtain ⟨n, hn1⟩ := exists_ne (1 : ↥N)
+  have hnact : ∃ x : Ω, (n : G) • x ≠ x := by
+    by_contra hc
+    exact hn1 (Subtype.ext (FaithfulSMul.eq_of_smul_eq_smul (α := Ω)
+      fun x => by rw [OneMemClass.coe_one, one_smul]; exact not_exists_not.mp hc x))
+  obtain ⟨x, hx⟩ := hnact
+  -- 8A.9: `N` は推移的
+  haveI hNtrans : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_two_transitive h2 hx
+  -- Thm 3.11: `N` は可換
+  have habel := OddOrder.Isaacs.Ch03.solvable_minimal_normal_isAbelian hNmin
+  have hNcent : N ≤ Subgroup.centralizer (N : Set G) := fun a ha =>
+    Subgroup.mem_centralizer_iff.mpr fun b hb => habel b hb a ha
+  -- 8A.2: `N` は regular
+  have hbot : N ⊓ stabilizer G α = ⊥ :=
+    le_antisymm (le_trans (inf_le_inf_right _ hNcent)
+      (le_of_eq (centralizer_inf_stabilizer_eq_bot (H := N) α))) bot_le
+  have hbij : Function.Bijective (smulBase N α) :=
+    (bijective_smulBase_iff N α).mpr ⟨hNtrans, hbot⟩
+  -- 核心補題で `|N| ≤ 4`, regular ゆえ `|Ω| = |N|`
+  have hcardN := card_le_four_of_regular_normal_of_stabilizer_three_transitive hbij h3
+  have hcardΩ : Nat.card Ω = Nat.card ↥N :=
+    (Nat.card_congr (Equiv.ofBijective _ hbij)).symm
+  omega
 
 end
 

@@ -4214,5 +4214,16 @@ Lean 実務メモ: `[N.Normal]` はインスタンスなので `N.Normal.conj_me
 `(g n g⁻¹) • α = g • (n • α)` (計算 2 行) なので, `MulAut.conjNormal g` がそのまま
 求める自己同型になる。作用先の型は `MulAut ↥N` を使えば新しい instance が要らない。
 
-**残り**: 上記 1–4 の結線 (極小正規部分群の存在, Thm 3.11 の適用形, Thm 8.5 第 3 主張の
+**✅ 主定理も landing** (`card_eq_four_of_solvable_of_stabilizer_three_transitive`):
+**可解な 4-transitive 置換群の次数は 4**。step 1–6 の結線は既存部品だけで済んだ —
+`Ch02.exists_isMinimalNormal_le_of_normal` (極小正規部分群) /
+`Ch03.solvable_minimal_normal_isAbelian` (Thm 3.11 の前半で十分; elementary abelian までは不要) /
+8A.9 / 8A.2 の `centralizer_inf_stabilizer_eq_bot` (`N ≤ C_G(N)` から `N ⊓ G_α = ⊥`) /
+上の step 5 補題。
+
+**残り (8A.10)**: `|Ω| = 4` から **`G ≅ S₄`** への packaging のみ
+(`MulAction.toPermHom` が単射 (忠実) かつ全射 (4 点上の 4-transitivity) を示す;
+`Fin 4 ≃ Ω` を取って各置換を 4-tuple の移動として実現する)。
+
+**旧記載の残り**: 上記 1–4 の結線 (極小正規部分群の存在, Thm 3.11 の適用形, Thm 8.5 第 3 主張の
 `ofStabilizerToNonidentity` から 3-transitivity を移す部分, 最後の `|Ω| = 4 ⟹ G = S₄`)。
