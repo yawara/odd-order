@@ -3521,3 +3521,14 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
     `coprime_card_of_fixedFree`。
   * 残り (次 iteration): `K_D` の冪零性を (a) の証明から独立補題に切り出し、`Qf` を
     仮説でなく内部で構成する完全自己完結版の corollary を付ける。
+
+* ⭐ **6C.2 完成 (2026-07-27)**: 自己完結版 `exists_maxQSubgroup_family_sylow_eq_iSup`
+  (axiom-clean) — 仮説は (a) と同じ (`A` elementary abelian `p²`・`C_N(A) = 1`) だけで、
+  `Q_D` の族は内部で構成する (`choose!`)。
+  * `isNilpotent_fixedSubgroup_of_card_prime` = (a) の核心 (位数 `p` の `D` に対し
+    `C_N(D)` は冪零) を単独補題に切り出し。`D` の外の `y` で `E = ⟨y⟩` を作り
+    `D ⊔ E = ⊤` から `E` の `C_N(D)` 作用が Frobenius ⟹ Thompson。
+    ⚠ `N` の非冪零性は不要 (それは (a) の `K_i ≠ 1` にだけ要る)。
+  * `sup_eq_top_of_card_prime` を独立補題として切り出し、(a) の族構成の局所 `have` も
+    これを呼ぶよう refactor (重複解消)。
+  * `Problems6C2.lean` = 727 行 (上限 1500 に余裕)。

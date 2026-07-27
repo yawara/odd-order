@@ -63,6 +63,37 @@ theorem eq_zero_of_zpow_mul_zpow_eq_one {A : Type*} [Group A] [Finite A] {p : �
   · have := orderOf_dvd_iff_zpow_eq_one.mpr hb
     rwa [hy] at this
 
+/-- **位数 `p²` の群では相異なる位数 `p` の部分群 2 つが全体を生成する**
+(`p ∣ |B ⊔ C|`, `|B ⊔ C| ∣ p²`, `|B ⊔ C| ≠ p` から)。 -/
+theorem sup_eq_top_of_card_prime {A : Type*} [Group A] [Finite A] {p : ℕ} (hp : p.Prime)
+    (hcard : Nat.card A = p ^ 2) {B C : Subgroup A} (hB : Nat.card ↥B = p)
+    (hC : Nat.card ↥C = p) (hBC : B ≠ C) : B ⊔ C = ⊤ := by
+  have hBle : B ≤ B ⊔ C := le_sup_left
+  have hCle : C ≤ B ⊔ C := le_sup_right
+  have hdvd : Nat.card ↥(B ⊔ C) ∣ p ^ 2 := by
+    rw [← hcard]
+    exact Subgroup.card_subgroup_dvd_card _
+  have hpdvd : p ∣ Nat.card ↥(B ⊔ C) := by
+    rw [← hB]
+    exact Subgroup.card_dvd_of_le hBle
+  have hne : Nat.card ↥(B ⊔ C) ≠ p := by
+    intro heq
+    refine hBC ?_
+    have h1 : B = B ⊔ C := Subgroup.eq_of_le_of_card_ge hBle (by rw [heq, hB])
+    have h2 : C = B ⊔ C := Subgroup.eq_of_le_of_card_ge hCle (by rw [heq, hC])
+    exact h1.trans h2.symm
+  obtain ⟨i, hi, hpow⟩ := (Nat.dvd_prime_pow hp).mp hdvd
+  have hi2 : i = 2 := by
+    rcases Nat.lt_or_ge i 2 with hlt | hge
+    · interval_cases i
+      · rw [hpow] at hpdvd
+        simp only [pow_zero] at hpdvd
+        exact absurd (Nat.dvd_one.mp hpdvd) hp.ne_one
+      · exact absurd (by rw [hpow, pow_one]) hne
+    · omega
+  refine Subgroup.eq_top_of_card_eq _ ?_
+  rw [hpow, hi2, hcard]
+
 /-- **位数 `p` の部分群 `p + 1` 個**: elementary abelian `p²` 群には位数 `p` の部分群が
 `p + 1` 個あり, 相異なる 2 つは全体を生成する。 -/
 theorem exists_family_subgroups_card_prime {A : Type*} [Group A] [Finite A] {p : ℕ}
@@ -111,33 +142,8 @@ theorem exists_family_subgroups_card_prime {A : Type*} [Group A] [Finite A] {p :
       Subgroup.zpowers_eq_of_prime_card (by rw [Nat.card_zpowers, hyord]; exact hp) hz.2 hzne1
     exact hy (hzx ▸ hzy ▸ Subgroup.mem_zpowers y)
   -- 相異なる位数 `p` の部分群は全体を生成する
-  have hsup : ∀ B C : Subgroup A, Nat.card ↥B = p → Nat.card ↥C = p → B ≠ C → B ⊔ C = ⊤ := by
-    intro B C hB hC hBC
-    have hBle : B ≤ B ⊔ C := le_sup_left
-    have hCle : C ≤ B ⊔ C := le_sup_right
-    have hdvd : Nat.card ↥(B ⊔ C) ∣ p ^ 2 := by
-      rw [← hcard]
-      exact Subgroup.card_subgroup_dvd_card _
-    have hpdvd : p ∣ Nat.card ↥(B ⊔ C) := by
-      rw [← hB]
-      exact Subgroup.card_dvd_of_le hBle
-    have hne : Nat.card ↥(B ⊔ C) ≠ p := by
-      intro heq
-      refine hBC ?_
-      have h1 : B = B ⊔ C := Subgroup.eq_of_le_of_card_ge hBle (by rw [heq, hB])
-      have h2 : C = B ⊔ C := Subgroup.eq_of_le_of_card_ge hCle (by rw [heq, hC])
-      exact h1.trans h2.symm
-    obtain ⟨i, hi, hpow⟩ := (Nat.dvd_prime_pow hp).mp hdvd
-    have hi2 : i = 2 := by
-      rcases Nat.lt_or_ge i 2 with hlt | hge
-      · interval_cases i
-        · rw [hpow] at hpdvd
-          simp only [pow_zero] at hpdvd
-          exact absurd (Nat.dvd_one.mp hpdvd) hp.ne_one
-        · exact absurd (by rw [hpow, pow_one]) hne
-      · omega
-    refine Subgroup.eq_top_of_card_eq _ ?_
-    rw [hpow, hi2, hcard]
+  have hsup : ∀ B C : Subgroup A, Nat.card ↥B = p → Nat.card ↥C = p → B ≠ C → B ⊔ C = ⊤ :=
+    fun B C hB hC hBC => sup_eq_top_of_card_prime hp hcard hB hC hBC
   -- 族の構成: `i < p` では `⟨x y^i⟩`, `i = p` では `⟨y⟩`
   refine ⟨fun i => if (i : ℕ) < p then Subgroup.zpowers (x * y ^ (i : ℕ))
     else Subgroup.zpowers y, ?_, ?_⟩
@@ -644,6 +650,77 @@ theorem exists_sylow_eq_iSup_maxQSubgroup {A N : Type*} [Group A] [Finite A] [Gr
     exact le_sylow_of_aInvariant_qSubgroup hCop hfixA hS (hQq _ D.2)
       (smul_mem_of_max_qSubgroup (smul_mem_fixedSubgroup hcomm _) (hQle _ D.2) (hQq _ D.2)
         (hQmax _ D.2))
+
+/-- **6C.2(a) の核心 (単独版)**: 位数 `p` の `D ≤ A` に対し `C_N(D)` は冪零。
+
+`D` の外の元 `y` を取り `E := ⟨y⟩` とすると `D ⊔ E = ⊤` なので, `E` (位数 `p`) の
+`C_N(D)` への作用は Frobenius (固定点は `C_N(D ⊔ E) = C_N(A) = 1`)。Thompson
+(`isNilpotent_of_isFrobeniusAction`) より冪零。 -/
+theorem isNilpotent_fixedSubgroup_of_card_prime {A N : Type*} [Group A] [Finite A] [Group N]
+    [Finite N] [MulDistribMulAction A N] {p : ℕ} (hp : p.Prime) (hA : ∀ u : A, u ^ p = 1)
+    (hcomm : ∀ u v : A, u * v = v * u) (hcardA : Nat.card A = p ^ 2)
+    (hfixA : ∀ n : N, (∀ a : A, a • n = n) → n = 1)
+    {D : Subgroup A} (hD : Nat.card ↥D = p) :
+    Group.IsNilpotent ↥(fixedSubgroup D : Subgroup N) := by
+  classical
+  -- `D` の外の元 `y` から `E := ⟨y⟩`
+  obtain ⟨y, hy⟩ : ∃ y : A, y ∉ D := by
+    by_contra hcon
+    have htop : D = ⊤ := eq_top_iff.mpr fun x _ => not_not.mp fun h => hcon ⟨x, h⟩
+    rw [htop, Subgroup.card_top, hcardA] at hD
+    rw [pow_two] at hD
+    have h2 := hp.one_lt
+    nlinarith
+  have hy1 : y ≠ 1 := fun h => hy (h ▸ Subgroup.one_mem D)
+  have hyord : orderOf y = p := by
+    have hdvd : orderOf y ∣ p := orderOf_dvd_of_pow_eq_one (hA y)
+    rcases (Nat.dvd_prime hp).mp hdvd with h1 | hpp
+    · exact absurd (orderOf_eq_one_iff.mp h1) hy1
+    · exact hpp
+  have hEcard : Nat.card ↥(Subgroup.zpowers y) = p := by rw [Nat.card_zpowers, hyord]
+  have hDE : D ≠ Subgroup.zpowers y := by
+    intro h
+    exact hy (h ▸ Subgroup.mem_zpowers y)
+  have hsup : D ⊔ Subgroup.zpowers y = ⊤ := sup_eq_top_of_card_prime hp hcardA hD hEcard hDE
+  haveI hEnt : Nontrivial ↥(Subgroup.zpowers y) := by
+    refine Finite.one_lt_card_iff_nontrivial.mp ?_
+    rw [hEcard]
+    exact hp.one_lt
+  letI actK : MulDistribMulAction A ↥(fixedSubgroup D : Subgroup N) :=
+    IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ (smul_mem_fixedSubgroup hcomm D)
+  have hFrob : IsFrobeniusAction ↥(Subgroup.zpowers y) ↥(fixedSubgroup D : Subgroup N) := by
+    intro b hb m hm hsmul
+    refine hm ?_
+    have hb1 : (b : A) ≠ 1 := fun h => hb (Subtype.ext h)
+    have hsmulN : (b : A) • ((m : N)) = (m : N) :=
+      congrArg (fun w : ↥(fixedSubgroup D : Subgroup N) => (w : N))
+        ((Subgroup.smul_def b m).symm.trans hsmul)
+    have hmE := mem_fixedSubgroup_of_smul_eq hp hEcard b.2 hb1 hsmulN
+    refine Subtype.ext (hfixA (m : N) fun a => ?_)
+    have hle : D ⊔ Subgroup.zpowers y ≤ MulAction.stabilizer A ((m : N)) :=
+      sup_le (fun c hc => m.2 c hc) (fun c hc => hmE c hc)
+    rw [hsup] at hle
+    exact hle (Subgroup.mem_top a)
+  exact isNilpotent_of_isFrobeniusAction hFrob
+
+/-- **Isaacs Problem 6C.2(b) (自己完結版)** ⭐: 位数 `p` の部分群 `D ≤ A` ごとに
+`K_D = C_N(D)` の最大 `q`-部分群 `Q_D` を取れて (`K_D` は冪零), その join は `N` の
+Sylow `q`-部分群になる。 -/
+theorem exists_maxQSubgroup_family_sylow_eq_iSup {A N : Type*} [Group A] [Finite A] [Group N]
+    [Finite N] [MulDistribMulAction A N] {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
+    (hA : ∀ u : A, u ^ p = 1) (hcomm : ∀ u v : A, u * v = v * u) (hcardA : Nat.card A = p ^ 2)
+    (hfixA : ∀ n : N, (∀ a : A, a • n = n) → n = 1) :
+    ∃ (Qf : Subgroup A → Subgroup N) (S : Sylow q N),
+      (∀ D : Subgroup A, Nat.card ↥D = p →
+        Qf D ≤ fixedSubgroup D ∧ IsPGroup q ↥(Qf D) ∧
+          ∀ R : Subgroup N, R ≤ fixedSubgroup D → IsPGroup q ↥R → R ≤ Qf D) ∧
+      (S : Subgroup N) = ⨆ D : {D : Subgroup A // Nat.card ↥D = p}, Qf (D : Subgroup A) := by
+  classical
+  choose! Qf hQle hQq hQmax using fun (D : Subgroup A) (hD : Nat.card ↥D = p) =>
+    exists_max_qSubgroup_le_of_isNilpotent
+      (isNilpotent_fixedSubgroup_of_card_prime hp hA hcomm hcardA hfixA hD) hq
+  obtain ⟨S, hS⟩ := exists_sylow_eq_iSup_maxQSubgroup hp hq hA hcomm hcardA hfixA Qf hQle hQq hQmax
+  exact ⟨Qf, S, fun D hD => ⟨hQle D hD, hQq D hD, hQmax D hD⟩, hS⟩
 
 end
 
