@@ -3494,3 +3494,12 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
   ⟹ 次 iteration で Cor 3.25 (`aInvariant_pSubgroup_le_aInvariant_sylow`) と
   3.23(b) (`aInvariant_sylow_conj` + `C_N(A) = 1` ⟹ A-不変 Sylow q は一意) を使って
   各 `Q i ≤ Q`、したがって `X = ⨆ Q i ≤ Q` を出す。
+
+* ✅ 6C.2(b) 一意性 2 本: `aInvariant_sylow_unique` (`C_N(A) = 1` なら A-不変 Sylow `q` は
+  一意 — 3.23(b) の共役元 `c` が `C_N(A)` に入るので `c = 1`) /
+  `le_sylow_of_aInvariant_qSubgroup` (A-不変 `q`-部分群は Cor 3.25 で A-不変 Sylow に入り、
+  一意性でその Sylow は目的の `S` に一致)。
+  ⟹ これで各 `Q i ≤ S` が出るので `X = ⨆ Q i ≤ S` は `iSup_le` で即。
+  残りは **`X < S` からの矛盾** (`Y = X ⊔ Φ(S)` は `S` で正規・A-不変・真、
+  Cor 3.28 で `C_{S/Y}(B i) = 1` ⟹ `A` の `S/Y` 作用が Frobenius ⟹ Thm 6.9
+  elementary-abelian 分岐) の段のみ。

@@ -505,6 +505,39 @@ theorem smul_mem_of_isAInvariant {A N : Type*} [Group A] [Group N]
   rw [← hEq, Subgroup.pointwise_smul_def, Subgroup.mem_map]
   exact ⟨m, hm, rfl⟩
 
+/-! ### `A`-不変 Sylow `q`-部分群の一意性 -/
+
+/-- **`C_N(A) = 1` なら `A`-不変 Sylow `q`-部分群は一意**: Isaacs Thm 3.23(b) の共役元は
+`C_N(A)` に入るので自明。 -/
+theorem aInvariant_sylow_unique {A N : Type*} [Group A] [Finite A] [Group N] [Finite N]
+    [MulDistribMulAction A N] [IsSolvable A] {q : ℕ} [Fact q.Prime]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N))
+    (hfixA : ∀ n : N, (∀ a : A, a • n = n) → n = 1) {S T : Sylow q N}
+    (hS : ∀ a : A, ∀ m ∈ (S : Subgroup N), a • m ∈ (S : Subgroup N))
+    (hT : ∀ a : A, ∀ m ∈ (T : Subgroup N), a • m ∈ (T : Subgroup N)) :
+    (S : Subgroup N) = (T : Subgroup N) := by
+  obtain ⟨c, hcfix, hconj⟩ :=
+    OddOrder.Isaacs.Ch04.aInvariant_sylow_conj hCop (Or.inl ‹IsSolvable A›)
+      (isAInvariant_of_smul_mem hS) (isAInvariant_of_smul_mem hT)
+  have hc1 : c = 1 := hfixA c fun a => hcfix a
+  rw [hc1] at hconj
+  simpa using hconj
+
+/-- **`A`-不変 `q`-部分群は (唯一の) `A`-不変 Sylow `q`-部分群に含まれる**:
+Cor 3.25 で `A`-不変 Sylow に入れ, 一意性で目的の `S` に一致させる。 -/
+theorem le_sylow_of_aInvariant_qSubgroup {A N : Type*} [Group A] [Finite A] [Group N] [Finite N]
+    [MulDistribMulAction A N] [IsSolvable A] {q : ℕ} [Fact q.Prime]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N))
+    (hfixA : ∀ n : N, (∀ a : A, a • n = n) → n = 1) {S : Sylow q N}
+    (hS : ∀ a : A, ∀ m ∈ (S : Subgroup N), a • m ∈ (S : Subgroup N))
+    {R : Subgroup N} (hRq : IsPGroup q ↥R) (hRinv : ∀ a : A, ∀ m ∈ R, a • m ∈ R) :
+    R ≤ (S : Subgroup N) := by
+  obtain ⟨T, hTinv, hRT⟩ :=
+    OddOrder.Isaacs.Ch04.aInvariant_pSubgroup_le_aInvariant_sylow hCop
+      (Or.inl ‹IsSolvable A›) hRq (isAInvariant_of_smul_mem hRinv)
+  rw [← aInvariant_sylow_unique hCop hfixA (smul_mem_of_isAInvariant hTinv) hS]
+  exact hRT
+
 end
 
 end OddOrder.Isaacs.Ch06
