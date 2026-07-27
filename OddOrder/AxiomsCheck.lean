@@ -3743,6 +3743,18 @@ set_option linter.style.longLine false in
 -- case through `CharacterDifferenceImage.toOrthonormalImage` — so results proved over the
 -- general carrier apply to every current consumer unchanged.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.Hypothesis.toGeneralHypothesis
+-- **Peterfalvi (5.7) at book strength** (issue 0157): "Assume Hypothesis (5.2) and that `chi(1)`
+-- is independent of `chi`.  Then `S` is coherent." — with **no irreducibility of the members**,
+-- which the book does not assume and which the two-element (5.2.d) carrier had been silently
+-- forcing.  Over `GeneralHypothesis` the only extra input is that each `||chi||^2` is a natural
+-- number (true for characters; not recorded by the carrier).
+-- The base case `|S| = 2` is the split of `R(chi)` into halves: the isometry gives
+-- `|R(chi)| = 2m` for `m = ||chi||^2`, and any `E` with `|E| = m` makes `(sum_E, sum_E - tau(chi -
+-- chibar))` match the Gram matrix of `(chi, chibar)` — fed to the weighted builder
+-- `coherentEqualDegreeW`, which asks for Gram agreement rather than orthonormality.
+-- `coherent_of_constant_degree` (the two-element carrier) is now the `m = 1` specialization.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.isCoherent_pair_of_orthonormalImage
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherent_of_constant_degree_general
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_imageData
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_two_of_imageData

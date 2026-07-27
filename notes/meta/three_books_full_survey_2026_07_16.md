@@ -1275,9 +1275,13 @@ consumer は (5.7) engine を使う。
    **`CharacterDifferenceImage → OrthonormalCharacterImageFamily` の変換**
    (`R(χ) = {ε·μ, −ε·ν}`)。これは重複解消 (アーキテクチャ) の課題であって書籍被覆のギャップでは
    ないので、別 issue に切り出す。
-2. **repo の (5.7) が member の既約性を要求する** — 書籍の (5.7)/(5.2) は要求しない
-   (直交性のみ)。orthonormal な `coherentEqualDegree` builder から継承した債務。
-   (6.4) の応用では (6.4.c) から既約性が出るので実害はないが、(5.7) 自体は書籍より狭い。
+2. ~~**repo の (5.7) が member の既約性を要求する**~~ — **2026-07-27 完済**
+   ([issue 0157](../../issues/closed/0157-five-seven-drop-unit-norm.md))。
+   `S07.coherent_of_constant_degree_general` が書籍強度 (Hypothesis (5.2) + 等次数のみ) で landing。
+   ⚠ 根本原因は (5.7) でなく **carrier `S07.Hypothesis` の (5.2.d) が 2 元固定**だったこと
+   (2 元 ⟹ `‖τ(χ−χ̄)‖² = 2` ⟹ 等長性から `‖χ‖² = 1` が全 member に強制される)。
+   書籍準拠の `S07.GeneralHypothesis` (R(χ) のサイズ自由) を新設し、旧 carrier は
+   `toGeneralHypothesis` でその特殊化として接続。旧 (5.7) は `m = 1` の 1 行特殊化。
 3. **(6.3)/(6.5) が `K` 冪零を取る** (書籍は `K/M` 冪零) — `six_three_descent` から継承。
    `M = 1` では一致し、(6.6) が使うのはその場合。
 

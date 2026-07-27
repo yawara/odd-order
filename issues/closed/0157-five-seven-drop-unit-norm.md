@@ -276,6 +276,28 @@ repo の carrier は 2 元に固定しており、**全 member の既約性を�
 (書籍の 𝒮 ⊆ 指標 から従う正当な仮説で、consumer 側で容易に discharge できる)。
 既存 `isCoherent_pair_of_differenceImage` (2 元形) はそのまま残し、一般版を別立てにする。
 
+## ✅ 完了 (2026-07-27)
+
+**`coherent_of_constant_degree_general` が landing・sorry-free・axiom-clean・AxiomsCheck 登録済**:
+
+> `GeneralHypothesis` (書籍 (5.2) verbatim) + 等次数 + 各 `‖ζ‖² ∈ ℕ` ⟹ `𝒮` は coherent
+
+**member の既約性 (`‖χ‖² = 1`) はもう要らない** = 書籍 (5.7) の強度。
+旧 `coherent_of_constant_degree` (2 元 carrier + `hirr`) は **`m = 1` の 1 行特殊化**に置換され、
+外部 3 consumer (`S08_SixSixGeneral` / `FeitSibleySsetCoherence` / `FeitSibleyReductionThree`)
+は無変更。
+
+基底ケース `isCoherent_pair_of_orthonormalImage` も landing:
+`|R(χ)| = 2m` (等長性 + `R` の正規直交性) → サイズ `m` の `E ⊆ R(χ)` を取り
+`(∑_E α, ∑_E α − τ(χ−χ̄))` が `(χ, χ̄)` の Gram 行列に一致 → `coherentEqualDegreeW`。
+
+⚠ 唯一の追加仮説 `hnat : ∀ ζ ∈ S, ∃ m : ℕ, ⟨ζ,ζ⟩ = m` は、`GeneralHypothesis` が
+「member が指標であること」を記録していないため必要 (書籍の 𝒮 ⊆ 指標 から従う)。
+consumer 側では `hirr` から `m = 1` で即座に discharge できる。
+
+⚠ Lean メモ: `fin_cases i` の後、`![a, b] ⟨0, _⟩` は `simp only [Matrix.cons_val_zero]` では
+落ちない。`change` で defeq に潰すのが確実 (`show` は style linter が `change` を要求する)。
+
 ## 完了条件
 
 `coherent_of_constant_degree` が `hirr` 無しで成立し、旧版がその特殊化になること。
