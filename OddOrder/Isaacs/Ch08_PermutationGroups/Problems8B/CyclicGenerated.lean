@@ -9,6 +9,7 @@ import Mathlib.GroupTheory.GroupAction.Primitive
 import Mathlib.GroupTheory.GroupAction.Jordan
 import Mathlib.GroupTheory.Perm.Cycle.Type
 import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.CosetOrbits
 
 /-!
 # Isaacs Problems 8B (pp. 248–249) — `n`-巡回が生成する原始群
@@ -46,6 +47,9 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
 - `card_le_factorial_mul_factorial_of_invariant`,
   `isPretransitive_of_index_eq_of_ne_stabilizer` — **8B.10 の step 1**: `Sym(α)` の
   指数 `|α|` の部分群で点安定化群でないものは推移的。
+- `exists_perm_apply_eq_apply_eq`, `two_transitive_of_index_eq_of_ne_stabilizer`,
+  `isPreprimitive_of_index_eq_of_ne_stabilizer` — **8B.10 の step 2–3**: 同じ部分群は
+  Problem 8A.16 により 2-transitive、したがって原始的。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -784,6 +788,51 @@ theorem isPretransitive_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm �
       _ = Nat.card α * ((S.ncard).factorial * ((Nat.card α - S.ncard)).factorial) := by ring
   exact absurd hle (Nat.not_le.mpr
     (lt_choose_of_two_le_of_le_sub_two hScard (by omega) hn4))
+
+omit [Finite α] in
+/-- `Sym(α)` は 2-transitive (相異なる 2 点の組を相異なる 2 点の組に移す)。 -/
+lemma exists_perm_apply_eq_apply_eq {a b c d : α} (hab : a ≠ b) (hcd : c ≠ d) :
+    ∃ g : Equiv.Perm α, g a = c ∧ g b = d := by
+  classical
+  have hσa : (Equiv.swap a c) a = c := Equiv.swap_apply_left a c
+  have hσb : (Equiv.swap a c) b ≠ c := fun h =>
+    hab (((Equiv.swap a c).injective (h.trans hσa.symm)).symm)
+  refine ⟨Equiv.swap ((Equiv.swap a c) b) d * Equiv.swap a c, ?_, ?_⟩
+  · rw [Equiv.Perm.mul_apply, hσa,
+      Equiv.swap_apply_of_ne_of_ne (Ne.symm hσb) hcd]
+  · rw [Equiv.Perm.mul_apply, Equiv.swap_apply_left]
+
+/-- **Isaacs Problem 8B.10 の step 2**: 指数 `|α|` の非点安定化群は **2-transitive**
+(教科書 Hint どおり Problem 8A.16 を適用)。 -/
+theorem two_transitive_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α)}
+    (hidx : H.index = Nat.card α)
+    (hns : ∀ a : α, H ≠ MulAction.stabilizer (Equiv.Perm α) a) :
+    ∀ a b c d : α, a ≠ b → c ≠ d → ∃ h : ↥H, h • a = c ∧ h • b = d := by
+  haveI := isPretransitive_of_index_eq_of_ne_stabilizer hidx hns
+  refine two_transitive_of_coprime_index
+    (fun a b c d hab hcd => exists_perm_apply_eq_apply_eq hab hcd) ?_
+  rw [hidx]
+  have h1 : 1 ≤ Nat.card α := by
+    by_contra hc
+    have : Nat.card α = 0 := by omega
+    rw [this] at hidx
+    exact absurd hidx H.index_ne_zero_of_finite
+  rcases Nat.exists_eq_add_of_le h1 with ⟨k, hk⟩
+  rw [hk]
+  simp
+
+/-- **Isaacs Problem 8B.10 の step 3**: 指数 `|α|` の非点安定化群は**原始的**
+(2-transitive から)。 -/
+theorem isPreprimitive_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α)}
+    (hidx : H.index = Nat.card α)
+    (hns : ∀ a : α, H ≠ MulAction.stabilizer (Equiv.Perm α) a) :
+    MulAction.IsPreprimitive ↥H α := by
+  haveI := isPretransitive_of_index_eq_of_ne_stabilizer hidx hns
+  haveI : MulAction.IsMultiplyPretransitive ↥H α 2 :=
+    MulAction.is_two_pretransitive_iff.mpr
+      (fun {a b c d} hab hcd =>
+        two_transitive_of_index_eq_of_ne_stabilizer hidx hns a b c d hab hcd)
+  exact MulAction.isPreprimitive_of_is_two_pretransitive inferInstance
 
 end IndexN
 
