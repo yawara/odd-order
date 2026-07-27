@@ -90,6 +90,35 @@ theorem exists_sylow_eq_of_maximal_pSubgroup_in_normalizer {G : Type*} [Group G]
     exact (le_sup_right : Subgroup.zpowers _ ≤ _) (Subgroup.mem_zpowers _)
   exact hxP
 
+/-- **冪零群の Sylow 分解 (片側)**: `M ≤ G` が冪零で `Pm` がその Sylow `p`-部分群なら,
+`M` の元はすべて「`Pm` の元」×「`Pm` を中心化する元」の積に書ける。
+
+`M` 冪零 ⟹ `Pm ⊴ M` かつ normal `p`-complement `N ⊴ M` が在り, `N ⊓ Pm = ⊥` から
+`N` は `Pm` を元ごとに中心化する (`Subgroup.commute_of_normal_of_disjoint`)。 -/
+theorem exists_mul_centralizing_of_isNilpotent {G : Type*} [Group G] [Finite G] {p : ℕ}
+    [Fact p.Prime] {M : Subgroup G} (hMnil : Group.IsNilpotent ↥M) (Pm : Sylow p ↥M)
+    {m : G} (hm : m ∈ M) :
+    ∃ u ∈ (Pm : Subgroup ↥M).map M.subtype, ∃ h : G,
+      (∀ v ∈ (Pm : Subgroup ↥M).map M.subtype, h * v = v * h) ∧ m = u * h := by
+  classical
+  haveI := hMnil
+  haveI hPnormal : (Pm : Subgroup ↥M).Normal :=
+    Sylow.normal_of_normalizerCondition Group.normalizerCondition_of_isNilpotent Pm
+  obtain ⟨N, hNnormal, hNcompl⟩ :=
+    OddOrder.Isaacs.Ch05.hasNormalPComplement_of_isNilpotent (H := ↥M) (p := p)
+  haveI := hNnormal
+  have hcompl := hNcompl Pm
+  have hcomm := Subgroup.commute_of_normal_of_disjoint N (Pm : Subgroup ↥M) hNnormal hPnormal
+    hcompl.disjoint
+  obtain ⟨⟨n, u⟩, hnu⟩ := hcompl.2 (⟨m, hm⟩ : ↥M)
+  refine ⟨((u : ↥M) : G), ⟨(u : ↥M), u.2, rfl⟩, ((n : ↥M) : G), ?_, ?_⟩
+  · rintro v ⟨v', hv', rfl⟩
+    exact congrArg (fun w : ↥M => (w : G)) (hcomm (n : ↥M) v' n.2 hv')
+  · have h2 : ((u : ↥M)) * ((n : ↥M)) = (⟨m, hm⟩ : ↥M) :=
+      ((hcomm (n : ↥M) (u : ↥M) n.2 u.2).eq).symm.trans hnu
+    have h3 := congrArg (fun w : ↥M => (w : G)) h2
+    simpa using h3.symm
+
 end
 
 end OddOrder.Isaacs.Ch07

@@ -3627,3 +3627,10 @@ characteristic 部分群すべての正規化群が normal `p`-complement を持
   ⚠ この mathlib 版の `NormalizerCondition` は `H < ⊤` を取る (`H ≠ ⊤` ではない)。
   ⟹ 7A.1 の step 3 (`P ∈ Syl_p(G)`) がこれ 1 本で済む。汎用なので他の演習でも使える見込み。
 * 次: 7A.1 本体 (`N_G(P) = M` の確立 → characteristic 部分群の正規化 → Thm 6.23 で矛盾)。
+* ✅ `exists_mul_centralizing_of_isNilpotent` (2026-07-27): 冪零な `M ≤ G` の Sylow
+  `p`-部分群 `Pm` について、`M` の元はすべて「`Pm` の元」×「`Pm` を中心化する元」の積。
+  `M` 冪零 ⟹ `Pm ⊴ M` + normal `p`-complement `N ⊴ M` があり `N ⊓ Pm = ⊥` なので
+  `Subgroup.commute_of_normal_of_disjoint` で `N` が `Pm` を元ごとに中心化する。
+  ⚠ mathlib の `commute_of_normal_of_disjoint` は `(x y : G) (hx) (hy)` の順 (元 2 つが先)。
+  ⟹ これで `M ≤ N_G(X)` (X は `P` で正規な部分群) が **layer 変換なしで**出せる:
+  `m = u * h` と書けば `m y m⁻¹ = u (h y h⁻¹) u⁻¹ = u y u⁻¹ ∈ X`。
