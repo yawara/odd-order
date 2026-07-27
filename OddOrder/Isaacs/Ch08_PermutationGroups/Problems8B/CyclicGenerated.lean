@@ -33,7 +33,11 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.CycleCommutators
   `(m-1, m, …, n-1)` で, `y` と `z` の共通可動点は `m-1` ただ一つ。
 - `alternatingGroup_le_zpowers_mCycle_sup_zpowers_addRight_one` — **8B.9 の step 2–4**:
   `⁅y, z⁆` は 3-cycle (Isaacs Lem 8.25) なので Jordan の定理で交代群を含む。
-  ⚠ `S_n` / `A_n` の判定 (step 5, 符号) は未形式化。
+- `support_mCycle`, `isCycle_mCycle`, `sign_mCycle`, `support_addRight_one`,
+  `isCycle_addRight_one`, `sign_addRight_one`,
+  `eq_top_zpowers_mCycle_sup_zpowers_addRight_one`,
+  `eq_alternatingGroup_zpowers_mCycle_sup_zpowers_addRight_one` — **8B.9**:
+  `m` か `n` が偶なら `S_n`, ともに奇なら `A_n`。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -475,6 +479,130 @@ theorem alternatingGroup_le_zpowers_mCycle_sup_zpowers_addRight_one {n m : ℕ} 
   rw [commutatorElement_def]
   exact Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.mul_mem _ hyG hzG)
     (Subgroup.inv_mem _ hyG)) (Subgroup.inv_mem _ hzG)
+
+/-! ### 符号による `S_n` / `A_n` の判定 -/
+
+lemma card_filter_val_lt (hmn : m < n) :
+    (Finset.univ.filter (fun c : ZMod n => c.val < m)).card = m := by
+  have himg : Finset.univ.filter (fun c : ZMod n => c.val < m)
+      = (Finset.range m).image (fun i : ℕ => (i : ZMod n)) := by
+    ext c
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_image,
+      Finset.mem_range]
+    constructor
+    · exact fun h => ⟨c.val, h, ZMod.natCast_rightInverse c⟩
+    · rintro ⟨i, hi, rfl⟩
+      rw [ZMod.val_natCast_of_lt (by omega)]
+      exact hi
+  rw [himg, Finset.card_image_of_injOn, Finset.card_range]
+  intro a ha b hb hab
+  simp only [Finset.coe_range, Set.mem_Iio] at ha hb
+  have h := congrArg ZMod.val hab
+  rwa [ZMod.val_natCast_of_lt (by omega), ZMod.val_natCast_of_lt (by omega)] at h
+
+lemma support_mCycle (hm : 2 ≤ m) (hmn : m < n) :
+    (mCycle n m hmn.le).support = Finset.univ.filter (fun c : ZMod n => c.val < m) := by
+  ext c
+  rw [Equiv.Perm.mem_support, Finset.mem_filter]
+  simp only [Finset.mem_univ, true_and, Ne, mCycle_apply_eq_self_iff hm hmn]
+  omega
+
+lemma isCycle_mCycle (hm : 2 ≤ m) (hmn : m < n) : (mCycle n m hmn.le).IsCycle := by
+  refine ⟨0, ?_, fun y hy => ?_⟩
+  · rw [Ne, mCycle_apply_eq_self_iff hm hmn, ZMod.val_zero]
+    omega
+  · rw [Ne, mCycle_apply_eq_self_iff hm hmn] at hy
+    refine ⟨(y.val : ℤ), ?_⟩
+    rw [zpow_natCast]
+    exact exists_mCycle_pow_smul (d := y) hmn.le (by omega) (by omega)
+
+lemma sign_mCycle (hm : 2 ≤ m) (hmn : m < n) :
+    Equiv.Perm.sign (mCycle n m hmn.le) = -(-1 : ℤˣ) ^ m := by
+  rw [(isCycle_mCycle hm hmn).sign, support_mCycle hm hmn, card_filter_val_lt hmn]
+  rfl
+
+lemma support_addRight_one (hn : 2 ≤ n) :
+    (Equiv.addRight (1 : ZMod n)).support = Finset.univ := by
+  ext c
+  simp only [Equiv.Perm.mem_support, Finset.mem_univ, iff_true, Ne,
+    Equiv.coe_addRight]
+  intro hc
+  have : (1 : ZMod n) = 0 := by
+    have := congrArg (fun z => z - c) hc
+    simpa using this
+  have h1 : ((1 : ZMod n)).val = 1 := by
+    haveI : Fact (1 < n) := ⟨by omega⟩
+    exact ZMod.val_one n
+  rw [this, ZMod.val_zero] at h1
+  omega
+
+lemma isCycle_addRight_one (hn : 2 ≤ n) : (Equiv.addRight (1 : ZMod n)).IsCycle := by
+  refine ⟨0, ?_, fun y _ => ⟨(y.val : ℤ), ?_⟩⟩
+  · simp only [Ne, Equiv.coe_addRight, zero_add]
+    intro hc
+    have h1 : ((1 : ZMod n)).val = 1 := by
+      haveI : Fact (1 < n) := ⟨by omega⟩
+      exact ZMod.val_one n
+    rw [hc, ZMod.val_zero] at h1
+    omega
+  · rw [zpow_natCast, addRight_one_pow_apply, zero_add]
+    exact ZMod.natCast_rightInverse y
+
+lemma sign_addRight_one (hn : 2 ≤ n) :
+    Equiv.Perm.sign (Equiv.addRight (1 : ZMod n)) = -(-1 : ℤˣ) ^ n := by
+  rw [(isCycle_addRight_one hn).sign, support_addRight_one hn, Finset.card_univ,
+    ZMod.card n]
+  rfl
+
+/-- 交代群を含み奇置換をもつ部分群は `S_n` 全体。 -/
+lemma eq_top_of_alternatingGroup_le_of_sign_ne_one {α : Type*} [DecidableEq α] [Fintype α]
+    {K : Subgroup (Equiv.Perm α)} (hA : alternatingGroup α ≤ K) {g : Equiv.Perm α}
+    (hg : g ∈ K) (hsg : Equiv.Perm.sign g ≠ 1) : K = ⊤ := by
+  refine eq_top_iff.mpr fun h _ => ?_
+  rcases Int.units_eq_one_or (Equiv.Perm.sign h) with hh | hh
+  · exact hA (Equiv.Perm.mem_alternatingGroup.mpr hh)
+  · have hsg' : Equiv.Perm.sign g = -1 :=
+      (Int.units_eq_one_or (Equiv.Perm.sign g)).resolve_left hsg
+    have : g⁻¹ * h ∈ K := hA (Equiv.Perm.mem_alternatingGroup.mpr (by
+      rw [map_mul, map_inv, hsg', hh]
+      decide))
+    simpa using Subgroup.mul_mem _ hg this
+
+/-- **Isaacs Problem 8B.9** (p. 249) 🎉 前半: `m` か `n` が**偶**なら
+`⟨m`-巡回, `n`-巡回`⟩` は対称群全体。 -/
+theorem eq_top_zpowers_mCycle_sup_zpowers_addRight_one {n m : ℕ} [NeZero n]
+    (hm : 2 ≤ m) (hmn : m < n) (heven : Even m ∨ Even n) :
+    Subgroup.zpowers (mCycle n m hmn.le) ⊔
+      Subgroup.zpowers (Equiv.addRight (1 : ZMod n)) = ⊤ := by
+  have hA := alternatingGroup_le_zpowers_mCycle_sup_zpowers_addRight_one hm hmn
+  rcases heven with he | he
+  · refine eq_top_of_alternatingGroup_le_of_sign_ne_one hA
+      (Subgroup.mem_sup_left (Subgroup.mem_zpowers _)) ?_
+    have h1 : ((-1 : ℤˣ)) ^ m = 1 := he.neg_one_pow
+    rw [sign_mCycle hm hmn, h1]
+    decide
+  · refine eq_top_of_alternatingGroup_le_of_sign_ne_one hA
+      (Subgroup.mem_sup_right (Subgroup.mem_zpowers _)) ?_
+    have h1 : ((-1 : ℤˣ)) ^ n = 1 := he.neg_one_pow
+    rw [sign_addRight_one (by omega), h1]
+    decide
+
+/-- **Isaacs Problem 8B.9** (p. 249) 🎉 後半: `m`, `n` がともに**奇**なら
+`⟨m`-巡回, `n`-巡回`⟩` は交代群。 -/
+theorem eq_alternatingGroup_zpowers_mCycle_sup_zpowers_addRight_one {n m : ℕ} [NeZero n]
+    (hm : 2 ≤ m) (hmn : m < n) (hmo : Odd m) (hno : Odd n) :
+    Subgroup.zpowers (mCycle n m hmn.le) ⊔
+      Subgroup.zpowers (Equiv.addRight (1 : ZMod n)) = alternatingGroup (ZMod n) := by
+  refine le_antisymm (sup_le ?_ ?_)
+    (alternatingGroup_le_zpowers_mCycle_sup_zpowers_addRight_one hm hmn)
+  · refine Subgroup.zpowers_le.mpr (Equiv.Perm.mem_alternatingGroup.mpr ?_)
+    have h1 : ((-1 : ℤˣ)) ^ m = -1 := hmo.neg_one_pow
+    rw [sign_mCycle hm hmn, h1]
+    decide
+  · refine Subgroup.zpowers_le.mpr (Equiv.Perm.mem_alternatingGroup.mpr ?_)
+    have h1 : ((-1 : ℤˣ)) ^ n = -1 := hno.neg_one_pow
+    rw [sign_addRight_one (by omega), h1]
+    decide
 
 end MCycle
 
