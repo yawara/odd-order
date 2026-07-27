@@ -1,0 +1,73 @@
+---
+id: 159
+slug: five-three-b-general-hypothesis
+title: "Pf (5.3)(b) を GeneralHypothesis で述べる — 可変長 R の制約が解けた"
+created: 2026-07-27
+---
+
+# Pf (5.3)(b) を `GeneralHypothesis` で述べる
+
+## なぜ今なのか — 繰延の理由が消えた
+
+survey は (5.3)(b)/(5.8) を「真に開いている」に分類しつつ、こう注記していた:
+
+> **意図的な設計判断**でもある (固定 2 要素の `R` レコードは可変長 `R` を保持できず、
+> consumer は general-family (5.7) engine を使う)
+
+この制約は **[issue 0157](closed/0157-five-seven-drop-unit-norm.md) で解消済**。
+`S07.GeneralHypothesis` (2026-07-27) の (5.2.d) フィールドは
+
+```lean
+  difference_image :
+    ∀ ⦃χ⦄, χ ∈ S → OrthonormalCharacterImageFamily (L := L) (G := G) tau χ
+```
+
+で **サイズ自由**。⟹ (5.3)(b) が扱えるようになった。
+
+## 書籍 (p. 26、`04.7_pp_25_29_Coherence.txt` L22)
+
+> **(5.3)(b)** Assume Hypothesis (4.6), (5.2.a) and that
+> `𝒮 ⊆ {Ind_H^L θ | θ ∈ Irr H, H ⊄ Ker θ}`.
+> Then **Hypothesis (5.2) holds**, with the isometry `τ` of (5.2) being the restriction to
+> `ℤ[𝒮, L^#]` of the isometry `τ` of Hypothesis (4.6).  If `φ ∈ 𝒮 ∩ Irr L`, then `R(φ)` is
+> orthogonal to `ω^σ` for all `ω ∈ Irr(W)`.
+
+証明 (p. 26) の構造:
+- `ℤ[𝒮, L^#] = ℤ[𝒮, A]` by (4.7) ⟹ `τ` が定義される。
+- (5.2.c) は (1.5.c) から。
+- (5.2.d): `χ` 既約なら (a) と同じ (2 元)。可約なら (4.4)+(4.5) より `χ = μ_j` の形で、
+  **(4.9) より `R(μ_j) = {δ_j ω_{ij}^σ, −δ_j ω_{ik}^σ | 0 ≤ i < w₁}`** (= `2w₁` 元)。
+- (5.2.e): 既約×既約は (4.1)、可約×可約は `R(μ_j)` の形から、混合は
+  `NC((φ − φ̄)^τ) ≤ 2` + (3.8)。
+
+## 材料 (実測 2026-07-27) — すべて在る
+
+| 役割 | 実体 |
+|---|---|
+| (4.6) carrier | `S06.Hypothesis46` (`S06_CertainHypothesis46.lean`) |
+| 可約 member の `R(μ_j)` | **`S06.certainTypeR`** (`S06_CertainTypeCoherence.lean:648`) — 戻り値が既に `OrthonormalCharacterImageFamily`、`imageSet := Finset.univ.image (certainTypeRImage …)` で**可変長** |
+| 可約×可約の (5.2.e) | `S06.certainTypeR_imageSet_orthogonal_certainTypeR` |
+| 既約 member の `R(χ)` | `characterDifferenceImage_of_irreducible` → `toOrthonormalImage` |
+| 既約×既約の (5.2.e) | `orthogonal_of_tau_conjDiff_inner_eq_zero` + `tau_conjDiff_inner_eq_zero_of_orthogonal` |
+| 混合の (5.2.e) | (3.8) 経由。§11 dispatch は `S11.sOf_memberRFamily`、§11/§13 discharge は `S12.Hypothesis.sixTwoDecompositionData` |
+| 既存の類似構成 | **`S13_SixTwoImageData.inducedFamilyImageData`** — §12 hypothesis から `InducedFamilyImageData` を組む。実質 (5.3)(b) の §11 instance。⟹ **これを (4.6) レベルへ持ち上げるのが本 issue** |
+
+## やること
+
+1. `S06.Hypothesis46` (+ 必要な補助データ) から `S07.GeneralHypothesis` を構成する
+   `Hypothesis46.toGeneralHypothesis` を書く。
+   member の既約/可約で `difference_image` を dispatch (既約 → `toOrthonormalImage`、
+   可約 → `certainTypeR`)。
+2. (5.2.e) の 4 ケース分岐を `difference_images_orthogonal` に詰める。
+3. 書籍の後半「`φ ∈ 𝒮 ∩ Irr L` なら `R(φ) ⊥ ω^σ`」も別 statement で出す。
+4. 既存の `S13_SixTwoImageData.inducedFamilyImageData` を、可能なら本構成の特殊化に置換
+   (§13 側は `InducedFamilyImageData` = 2 元固定でなく一般族を持つので、そのまま載る見込み)。
+5. AxiomsCheck 登録 + survey の「(5.3)(b) は設計上の理由で繰延」注記を撤回。
+
+⚠ **survey の該当注記は本 issue の landing 時に必ず書き換える** — 「固定 2 要素の R レコード」
+という前提が既に偽になっている。
+
+## 完了条件
+
+`Hypothesis46` から `GeneralHypothesis` が構成でき、(5.3)(b) の書籍 statement が
+sorry-free・axiom-clean で landing すること。build green + lint --strict clean。

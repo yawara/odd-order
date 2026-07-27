@@ -1188,10 +1188,17 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
    ⚠ 残る (6.3) の特殊化は「repo が `H` 冪零を取る (書籍は `H/M` 冪零)」の 1 点のみ
    (`six_three_of_imageData` の docstring に注記; §11 consumer は `M = 1` ゆえ一致)。
    **残るのは (6.5)/(6.6) の general-`K` 形** (下記 §「(6.5)/(6.6)」節)。
-2. **(5.3)(b) / (5.8)** — (4.6)/(5.3.b) 一般での単一 statement が無い。ただし解析コアは
+2. **(5.3)(b) / (5.8)** — (4.6)/(5.3.b) 一般での単一 statement が無い。解析コアは
    `S05_SigmaTrichotomy.eq_smul_chiFam_column_of_vanishOnV` として `TICyclicHypothesis`
-   レベルで完全に一般。**意図的な設計判断**でもある (固定 2 要素の `R` レコードは可変長 `R` を
-   保持できず、consumer は general-family (5.7) engine を使う)。
+   レベルで完全に一般。
+   【**⚠ 2026-07-27: 繰延理由が無効化された**】旧注記は「固定 2 要素の `R` レコードは
+   可変長 `R` を保持できないので**意図的な設計判断**」としていたが、
+   [issue 0157](../../issues/closed/0157-five-seven-drop-unit-norm.md) で新設した
+   **`S07.GeneralHypothesis` の (5.2.d) はサイズ自由な `OrthonormalCharacterImageFamily`**。
+   書籍 (5.3)(b) が要求する `R(μ_j)` (`2w₁` 元) は `S06.certainTypeR`
+   (`S06_CertainTypeCoherence:648`) が**既にその型で**持っている。
+   ⟹ 設計上の障害は無くなった。手順は
+   **[issue 0159](../../issues/0159-five-three-b-general-hypothesis.md)** に記録。
 3. **(1.7)** — 一般 (a) の χᵢ 相異性と `n = |T:H|/e²` の計数のみ (effort S)。
 
 **未再実測 (この pass では触っていない)**: (7.8) (7.9) (8.15) (9.7) (9.10) (9.11) (10.11)
@@ -1207,8 +1214,8 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 
 **packaging 系 (内容は landed、単一の抽象 statement が無い)**: (5.3)(b) / (5.8) / (7.8) / (7.9) /
 (8.15) / (9.7) / (9.10) / (9.11) / (10.11)。いずれも note が「assembly / re-assembly work」と
-明記している。(5.3)(b) は固定 2 要素 `R` レコードが可変長 `R` を持てないという**設計上の理由**があり、
-consumer は (5.7) engine を使う。
+明記している。(5.3)(b) の「固定 2 要素 `R` レコードが可変長 `R` を持てない」という理由は
+**2026-07-27 に無効化** (`S07.GeneralHypothesis`、issue 0157/0159)。
 
 #### (6.5)/(6.6) の general-`K` 化 (2026-07-27) — **(6.5) は (a)(b)(c) とも完了、残るは (6.6) coherence 半分**
 
