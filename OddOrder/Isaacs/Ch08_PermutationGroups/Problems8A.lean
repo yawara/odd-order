@@ -59,6 +59,9 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `card_fixedBy_prod`, `sum_sq_card_fixedBy`, `card_orbits_prod_eq_two_iff`,
   `sum_sq_card_fixedBy_eq_two_mul_iff` — **Problem 8A.12**: 推移的な `G` について
   `G` が 2-transitive ⟺ 置換指標の 2 乗の平均が 2。
+- `doubleCoset_transitive_iff` — **Problem 8A.15**: `G` の `H`-剰余類への作用が
+  2-transitive ⟺ 二重剰余類が `H` とその外のちょうど 2 つ (= `H × H` の両側作用が
+  `G` 上 2 軌道)。
 - `card_orbits_le_index` — **Problem 8A.14** 前半: `G` 推移的で `[G:H] = m` なら
   `H` の軌道は高々 `m` 個 (`gH ↦ ⟦g⁻¹ • α⟧` が `G ⧸ H` からの全射)。
 - `card_fixedBy_prod_three`, `sum_cube_card_fixedBy` — **Problem 8A.13** の骨格:
@@ -998,6 +1001,35 @@ theorem card_orbits_le_index [Finite G] [Finite Ω] [IsPretransitive G Ω]
     change (Quotient.mk'' ((g⁻¹ : G)⁻¹ • α) : MulAction.orbitRel.Quotient H Ω)
       = Quotient.mk'' ω
     rw [inv_inv, hg]
+
+/-! ### Problem 8A.15 — 剰余類への 2-transitivity と二重剰余類 -/
+
+/-- **Isaacs Problem 8A.15** (p. 236): `G` の `H`-剰余類への作用が 2-transitive ⟺
+`H × H` の両側作用 `g · (x,y) = x⁻¹ g y` が `G` 上ちょうど 2 軌道をもつ。
+
+`H × H`-軌道は**二重剰余類** `H g H` そのもので, そのひとつは `H` 自身。よって
+「ちょうど 2 軌道」= 「`H` の外がひとつの二重剰余類」であり, これが本補題の左辺。
+右辺は「点安定化群 `G_{1·H} = H` が `(G ⧸ H) ∖ {H}` に推移的」= 2-transitivity。 -/
+theorem doubleCoset_transitive_iff (H : Subgroup G) :
+    (∀ a b : G, a ∉ H → b ∉ H → ∃ x ∈ H, ∃ y ∈ H, x * a * y = b) ↔
+      (∀ a b : G, (a : G ⧸ H) ≠ ((1 : G) : G ⧸ H) → (b : G ⧸ H) ≠ ((1 : G) : G ⧸ H) →
+        ∃ h ∈ H, h • (a : G ⧸ H) = (b : G ⧸ H)) := by
+  have hone : ∀ a : G, ((a : G ⧸ H) = ((1 : G) : G ⧸ H)) ↔ a ∈ H := by
+    intro a
+    rw [QuotientGroup.eq, mul_one, H.inv_mem_iff]
+  constructor
+  · intro h a b ha hb
+    obtain ⟨x, hx, y, hy, hxy⟩ := h a b (fun hc => ha ((hone a).mpr hc))
+      (fun hc => hb ((hone b).mpr hc))
+    refine ⟨x, hx, ?_⟩
+    rw [show x • (a : G ⧸ H) = ((x * a : G) : G ⧸ H) from rfl, QuotientGroup.eq]
+    have hy' : (x * a)⁻¹ * b = y := by rw [← hxy]; group
+    rw [hy']
+    exact hy
+  · intro h a b ha hb
+    obtain ⟨x, hx, hxa⟩ := h a b (fun hc => ha ((hone a).mp hc)) (fun hc => hb ((hone b).mp hc))
+    rw [show x • (a : G ⧸ H) = ((x * a : G) : G ⧸ H) from rfl, QuotientGroup.eq] at hxa
+    exact ⟨x, hx, (x * a)⁻¹ * b, hxa, by group⟩
 
 /-! ### Problem 8A.11 — 1 次元アフィン群 `AGL(1, F)` -/
 
