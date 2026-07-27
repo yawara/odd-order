@@ -119,70 +119,11 @@ theorem isSimpleGroup_of_card_eq_95040 [IsPretransitive G Ω]
         ↥(SubMulAction.ofStabilizer G α))
       ⟨γ, (SubMulAction.mem_ofStabilizer_iff G α).mpr hγ⟩
     exact ⟨(g : G), mem_stabilizer_iff.mp g.2, congrArg Subtype.val hg⟩
-  -- (3) 単純性
-  haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp (by omega)
-  haveI hneΩ : Nonempty Ω := (Nat.card_pos_iff.mp (by omega)).1
-  refine ⟨fun N hN => ?_⟩
-  by_contra hcon
-  push Not at hcon
-  obtain ⟨hNbot, hNtop⟩ := hcon
-  haveI := hN
-  obtain ⟨α⟩ := hneΩ
-  -- `N` は非自明に作用するので推移的 (Problem 8A.9)
-  obtain ⟨n, hn1⟩ : ∃ n : ↥N, n ≠ 1 := by
-    by_contra hc
-    push Not at hc
-    exact hNbot (le_antisymm (fun x hx => Subgroup.mem_bot.mpr
-      (congrArg Subtype.val (hc ⟨x, hx⟩))) bot_le)
-  obtain ⟨x, hx⟩ : ∃ x : Ω, (n : G) • x ≠ x := by
-    by_contra hc
-    push Not at hc
-    exact hn1 (Subtype.ext (FaithfulSMul.eq_of_smul_eq_smul (α := Ω) fun β => by
-      rw [show ((1 : ↥N) : G) = 1 from rfl, one_smul]; exact hc β))
-  haveI hNtrans : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_two_transitive h2 hx
-  -- `N ∩ G_α` は `G_α` の正規部分群なので `1` か `G_α`; 後者は `N = ⊤` を与える。
-  -- よって `N` は semiregular, 推移性から regular: `|N| = 12` (共通補題)。
-  have hstabN : stabilizer ↥N α = ⊥ :=
-    stabilizer_eq_bot_of_normal_of_isSimpleGroup_stabilizer α (hsimple α) hNtop
-  have hNcard : Nat.card ↥N = 12 := by
-    rw [card_eq_card_of_stabilizer_eq_bot α hstabN, hΩ]
-  -- `m ↦ m • α` は単射
-  have hinj : ∀ u v : ↥N, (u : G) • α = (v : G) • α → u = v := by
-    intro u v huv
-    have : v⁻¹ * u ∈ stabilizer ↥N α := by
-      rw [mem_stabilizer_iff]
-      change ((v⁻¹ * u : ↥N) : G) • α = α
-      rw [Subgroup.coe_mul, mul_smul, huv, Subgroup.coe_inv, inv_smul_smul]
-    rw [hstabN, Subgroup.mem_bot] at this
-    exact (inv_mul_eq_one.mp this).symm
-  have hne : ∀ u : ↥N, u ≠ 1 → (u : G) • α ≠ α := by
-    intro u hu hc
-    refine hu (hinj u 1 ?_)
-    rw [hc, Subgroup.coe_one, one_smul]
-  -- `N ∖ {1}` の元はすべて `G` で共役
-  have hconj : ∀ u v : ↥N, u ≠ 1 → v ≠ 1 →
-      ∃ g : G, g * (u : G) * g⁻¹ = (v : G) := by
-    intro u v hu hv
-    obtain ⟨g, hgα, hgβ⟩ := h2 α ((u : G) • α) ((v : G) • α) (hne u hu) (hne v hv)
-    refine ⟨g, ?_⟩
-    have hmem : g * (u : G) * g⁻¹ ∈ N := hN.conj_mem (u : G) u.2 g
-    have hact : ((⟨g * (u : G) * g⁻¹, hmem⟩ : ↥N) : G) • α = (v : G) • α := by
-      have hginv : g⁻¹ • α = α := inv_smul_eq_iff.mpr hgα.symm
-      change (g * (u : G) * g⁻¹) • α = (v : G) • α
-      rw [mul_smul, mul_smul, hginv, hgβ]
-    exact congrArg Subtype.val (hinj ⟨g * (u : G) * g⁻¹, hmem⟩ v hact)
-  -- 位数 2 と位数 3 の元がともに存在するので矛盾
-  obtain ⟨a, ha⟩ := exists_prime_orderOf_dvd_card' (G := ↥N) 2 (by rw [hNcard]; norm_num)
-  obtain ⟨b, hb⟩ := exists_prime_orderOf_dvd_card' (G := ↥N) 3 (by rw [hNcard]; norm_num)
-  have ha1 : a ≠ 1 := fun h => by rw [h, orderOf_one] at ha; omega
-  have hb1 : b ≠ 1 := fun h => by rw [h, orderOf_one] at hb; omega
-  obtain ⟨g, hg⟩ := hconj a b ha1 hb1
-  have hoa : orderOf ((a : G)) = 2 := by rw [Subgroup.orderOf_coe, ha]
-  have hob : orderOf ((b : G)) = 3 := by rw [Subgroup.orderOf_coe, hb]
-  have hconjord : orderOf (g * (a : G) * g⁻¹) = orderOf ((a : G)) :=
-    orderOf_injective (MulAut.conj g).toMonoidHom (MulAut.conj g).injective _
-  rw [hg, hob, hoa] at hconjord
-  omega
+  -- (3) 単純性 (共通補題: 2-transitive + 点安定化群が単純 + `12 = 2^2·3`)
+  obtain ⟨α⟩ : Nonempty Ω := (Nat.card_pos_iff.mp (by omega)).1
+  exact isSimpleGroup_of_two_transitive_of_isSimpleGroup_stabilizer α h2 (hsimple α)
+    Nat.prime_two Nat.prime_three (by norm_num) (by rw [hΩ]; norm_num)
+    (by rw [hΩ]; norm_num)
 
 end -- Problem 8C.3
 
