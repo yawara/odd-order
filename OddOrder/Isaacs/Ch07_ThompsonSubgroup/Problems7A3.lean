@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.LinearAlgebra.Matrix.Block
 import Mathlib.LinearAlgebra.Matrix.IsDiag
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
@@ -250,6 +251,258 @@ theorem diagonalGL_sup_unitriangularGL :
   rw [Set.mem_mul] at hmem
   obtain ⟨D, hD, U, hU, rfl⟩ := hmem
   exact mul_mem (Subgroup.mem_sup_left hD) (Subgroup.mem_sup_right hU)
+
+/-! ### 7A.3(c): `P`-不変部分空間の分類 -/
+
+/-- 部分群 `H ≤ GL(n,q)` の**行ベクトルへの右からの作用** `v ↦ v ᵥ* A` で不変な部分空間。 -/
+def IsRowInvariant (H : Subgroup (GL (Fin n) F)) (W : Submodule F (Fin n → F)) : Prop :=
+  ∀ A ∈ H, ∀ v ∈ W, Matrix.vecMul v (A : Matrix (Fin n) (Fin n) F) ∈ W
+
+/-- 標準旗の第 `m` 段 `⟨e_m, e_{m+1}, …, e_{n-1}⟩` (0-indexed, 次元 `n - m`)。
+
+`G` は行ベクトルに**右から**作用するので, 上三角行列で不変なのは「**後ろ**の座標が張る」
+部分空間の方 (`e_i ᵥ* A` は `A` の第 `i` 行 = `e_i, …, e_{n-1}` の一次結合)。 -/
+def rowTail (n : ℕ) (m : ℕ) : Submodule F (Fin n → F) where
+  carrier := {v | ∀ i : Fin n, (i : ℕ) < m → v i = 0}
+  zero_mem' := fun _ _ => rfl
+  add_mem' := by
+    intro u v hu hv i hi
+    simp [hu i hi, hv i hi]
+  smul_mem' := by
+    intro c v hv i hi
+    simp [hv i hi]
+
+@[simp]
+theorem mem_rowTail {m : ℕ} {v : Fin n → F} :
+    v ∈ rowTail (F := F) n m ↔ ∀ i : Fin n, (i : ℕ) < m → v i = 0 := Iff.rfl
+
+@[simp]
+theorem rowTail_zero : rowTail (F := F) n 0 = ⊤ := by
+  ext v; simp
+
+@[simp]
+theorem rowTail_self : rowTail (F := F) n n = ⊥ := by
+  ext v
+  simp only [mem_rowTail, Submodule.mem_bot]
+  exact ⟨fun h => funext fun i => h i i.isLt, fun h i _ => by rw [h]; rfl⟩
+
+theorem rowTail_antitone {m₁ m₂ : ℕ} (h : m₁ ≤ m₂) :
+    rowTail (F := F) n m₂ ≤ rowTail (F := F) n m₁ :=
+  fun _ hv i hi => hv i (lt_of_lt_of_le hi h)
+
+/-- **標準旗は `P`-不変** (実際は Borel `B` の作用でも不変)。
+
+`(v ᵥ* A) i = ∑ k, v k * A k i` で, `k < m` なら `v k = 0`, `k ≥ m > i` なら `A k i = 0`。 -/
+theorem isRowInvariant_rowTail (m : ℕ) :
+    IsRowInvariant (upperTriangularGL : Subgroup (GL (Fin n) F)) (rowTail n m) := by
+  intro A hA v hv i hi
+  have hsum : Matrix.vecMul v (A : Matrix (Fin n) (Fin n) F) i
+      = ∑ k, v k * (A : Matrix (Fin n) (Fin n) F) k i := rfl
+  rw [hsum]
+  refine Finset.sum_eq_zero fun k _ => ?_
+  rcases lt_or_ge (k : ℕ) m with hk | hk
+  · rw [hv k hk, zero_mul]
+  · have hik : i < k := by rw [Fin.lt_def]; omega
+    rw [hA hik, mul_zero]
+
+/-! #### transvection (`1 + c·E_{i,j}`) -/
+
+/-- transvection `1 + c·E_{i,j}` (`i ≠ j`) を `GL(n,q)` の元として。逆元は `c ↦ -c`。 -/
+def transvectionGL {i j : Fin n} (hij : i ≠ j) (c : F) : GL (Fin n) F where
+  val := Matrix.transvection i j c
+  inv := Matrix.transvection i j (-c)
+  val_inv := by
+    rw [Matrix.transvection_mul_transvection_same i j hij, add_neg_cancel,
+      Matrix.transvection_zero]
+  inv_val := by
+    rw [Matrix.transvection_mul_transvection_same i j hij, neg_add_cancel,
+      Matrix.transvection_zero]
+
+@[simp]
+theorem coe_transvectionGL {i j : Fin n} (hij : i ≠ j) (c : F) :
+    ((transvectionGL hij c : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) =
+      Matrix.transvection i j c := rfl
+
+/-- `i < j` なら transvection は上三角冪単。 -/
+theorem transvectionGL_mem_unitriangularGL {i j : Fin n} (hij : i < j) (c : F) :
+    transvectionGL hij.ne c ∈ (unitriangularGL : Subgroup (GL (Fin n) F)) := by
+  refine ⟨fun r s hsr => ?_, fun a => ?_⟩
+  · have hrs : s ≠ r := (ne_of_lt hsr)
+    have hne : ¬(i = r ∧ j = s) := by
+      rintro ⟨rfl, rfl⟩
+      exact absurd hij (not_lt_of_gt hsr)
+    simp [coe_transvectionGL, Matrix.transvection, Ne.symm hrs, hne]
+  · have hne : ¬(i = a ∧ j = a) := by
+      rintro ⟨rfl, h⟩
+      exact hij.ne' h
+    simp [coe_transvectionGL, Matrix.transvection, hne]
+
+/-- `v ᵥ* E_{i,j}(c) = (v i * c) · e_j`。 -/
+theorem vecMul_single (v : Fin n → F) (i j : Fin n) (c : F) :
+    Matrix.vecMul v (Matrix.single i j c) = Pi.single j (v i * c) := by
+  ext k
+  have hsum : Matrix.vecMul v (Matrix.single i j c) k
+      = ∑ l, v l * Matrix.single i j c l k := rfl
+  rw [hsum, Pi.single_apply]
+  by_cases hk : k = j
+  · subst hk
+    rw [if_pos rfl, Finset.sum_eq_single i
+      (fun l _ hl => by rw [Matrix.single_apply, if_neg (by rintro ⟨rfl, -⟩; exact hl rfl),
+        mul_zero])
+      (fun h => absurd (Finset.mem_univ i) h), Matrix.single_apply_same]
+  · rw [if_neg hk]
+    refine Finset.sum_eq_zero fun l _ => ?_
+    rw [Matrix.single_apply, if_neg (by rintro ⟨-, rfl⟩; exact hk rfl), mul_zero]
+
+/-- transvection の行ベクトルへの右作用: `v ᵥ* (1 + c·E_{i,j}) = v + (v i * c) · e_j`。 -/
+theorem vecMul_transvectionGL {i j : Fin n} (hij : i ≠ j) (c : F) (v : Fin n → F) :
+    Matrix.vecMul v ((transvectionGL hij c : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)
+      = v + Pi.single j (v i * c) := by
+  rw [coe_transvectionGL, Matrix.transvection, Matrix.vecMul_add, Matrix.vecMul_one,
+    vecMul_single]
+
+/-! #### 分類定理 -/
+
+/-- `P`-不変部分空間 `W` が `e_{i₀}` 方向に非零成分をもち, かつ `i₀` より前の成分がすべて
+消えているなら, `W` は `i₀` 以降の標準基底ベクトルをすべて含む。 -/
+theorem single_mem_of_isRowInvariant {W : Submodule F (Fin n → F)}
+    (hW : IsRowInvariant (unitriangularGL : Subgroup (GL (Fin n) F)) W)
+    {v : Fin n → F} (hv : v ∈ W) {i₀ : Fin n} (hv0 : v i₀ ≠ 0)
+    (hlow : ∀ k : Fin n, k < i₀ → v k = 0) :
+    ∀ j : Fin n, i₀ ≤ j → ∀ c : F, Pi.single j c ∈ W := by
+  classical
+  -- Step 1: `i₀ < j` のとき (transvection で `v` を動かして差をとる)
+  have hgt : ∀ j : Fin n, i₀ < j → ∀ c : F, Pi.single j c ∈ W := by
+    intro j hij c
+    have hmem := hW _ (transvectionGL_mem_unitriangularGL hij (1 : F)) v hv
+    rw [vecMul_transvectionGL, mul_one] at hmem
+    have hsub : Pi.single j (v i₀) ∈ W := by
+      simpa using W.sub_mem hmem hv
+    have hscale := W.smul_mem (c / v i₀) hsub
+    rwa [← Pi.single_smul, smul_eq_mul, div_mul_cancel₀ _ hv0] at hscale
+  -- Step 2: `j = i₀` (`v` から `i₀` より後の成分を引き去る)
+  have heq0 : ∀ c : F, Pi.single i₀ c ∈ W := by
+    have hu : (∑ j ∈ Finset.univ.filter (fun j : Fin n => i₀ < j), Pi.single j (v j)) ∈ W :=
+      Submodule.sum_mem _ fun j hj => hgt j (Finset.mem_filter.mp hj).2 _
+    have hdiff : v - (∑ j ∈ Finset.univ.filter (fun j : Fin n => i₀ < j), Pi.single j (v j))
+        = Pi.single i₀ (v i₀) := by
+      funext k
+      have hsum : (∑ j ∈ Finset.univ.filter (fun j : Fin n => i₀ < j), Pi.single j (v j)) k
+          = if i₀ < k then v k else 0 := by
+        simp only [Finset.sum_apply, Pi.single_apply]
+        rw [Finset.sum_ite_eq (Finset.univ.filter (fun j : Fin n => i₀ < j)) k v]
+        simp
+      rw [Pi.sub_apply, hsum, Pi.single_apply]
+      rcases lt_trichotomy k i₀ with hk | rfl | hk
+      · rw [hlow k hk, if_neg (asymm hk), if_neg (ne_of_lt hk), sub_zero]
+      · rw [if_neg (lt_irrefl _), if_pos rfl, sub_zero]
+      · rw [if_pos hk, if_neg (ne_of_gt hk), sub_self]
+    have hmem : Pi.single i₀ (v i₀) ∈ W := hdiff ▸ W.sub_mem hv hu
+    intro c
+    have hscale := W.smul_mem (c / v i₀) hmem
+    rwa [← Pi.single_smul, smul_eq_mul, div_mul_cancel₀ _ hv0] at hscale
+  intro j hij c
+  rcases eq_or_lt_of_le hij with rfl | hlt
+  · exact heq0 c
+  · exact hgt j hlt c
+
+/-- **Isaacs 7A.3(c)** — `P`-不変部分空間は標準旗 `rowTail n m` (`m ≤ n`) に限る。 -/
+theorem exists_eq_rowTail_of_isRowInvariant (W : Submodule F (Fin n → F))
+    (hW : IsRowInvariant (unitriangularGL : Subgroup (GL (Fin n) F)) W) :
+    ∃ m ≤ n, W = rowTail n m := by
+  classical
+  set Q : ℕ → Prop := fun k => ∀ v ∈ W, ∀ i : Fin n, (i : ℕ) < k → v i = 0 with hQdef
+  have hQ0 : Q 0 := fun _ _ i hi => absurd hi (Nat.not_lt_zero _)
+  by_cases hQn : Q n
+  · refine ⟨n, le_rfl, ?_⟩
+    rw [rowTail_self]
+    refine le_antisymm (fun v hv => ?_) bot_le
+    exact Submodule.mem_bot F |>.mpr (funext fun i => hQn v hv i i.isLt)
+  · -- `Q` が破れる最小の段を取る
+    have hex : ∃ k, ¬ Q k := ⟨n, hQn⟩
+    have hm0 : ¬ Q (Nat.find hex) := Nat.find_spec hex
+    have hm0ne : Nat.find hex ≠ 0 := fun h => hm0 (h ▸ hQ0)
+    set m := Nat.find hex - 1 with hmdef
+    have hmsucc : m + 1 = Nat.find hex := by omega
+    have hQm : Q m := not_not.mp (Nat.find_min hex (by omega))
+    have hnotQ : ¬ Q (m + 1) := hmsucc ▸ hm0
+    -- `¬ Q (m+1)` から `(i₀ : ℕ) = m` なる非零成分をもつ `v ∈ W` を得る
+    obtain ⟨v, hv, i₀, hi₀lt, hv0⟩ : ∃ v ∈ W, ∃ i₀ : Fin n, (i₀ : ℕ) < m + 1 ∧ v i₀ ≠ 0 := by
+      simp only [hQdef, not_forall] at hnotQ
+      obtain ⟨v, hv, i, hi, hvi⟩ := hnotQ
+      exact ⟨v, hv, i, hi, hvi⟩
+    have hi₀ : (i₀ : ℕ) = m := by
+      by_contra hne
+      exact hv0 (hQm v hv i₀ (by omega))
+    have hmn : m ≤ n := le_of_lt (hi₀ ▸ i₀.isLt)
+    have hlow : ∀ k : Fin n, k < i₀ → v k = 0 := by
+      intro k hk
+      exact hQm v hv k (by rw [Fin.lt_def] at hk; omega)
+    have hsingle := single_mem_of_isRowInvariant hW hv hv0 hlow
+    refine ⟨m, hmn, le_antisymm (fun w hw i hi => hQm w hw i hi) fun w hw => ?_⟩
+    -- `w ∈ rowTail n m` を標準基底で分解
+    have hdecomp : w = ∑ j, Pi.single j (w j) := (Finset.univ_sum_single w).symm
+    rw [hdecomp]
+    refine Submodule.sum_mem _ fun j _ => ?_
+    rcases lt_or_ge (j : ℕ) m with hj | hj
+    · rw [hw j hj]
+      simp
+    · exact hsingle j (by rw [Fin.le_def]; omega) _
+
+/-! #### 次元と一意性 -/
+
+/-- `H ≤ K` なら `K`-不変部分空間は `H`-不変。 -/
+theorem IsRowInvariant.mono {H K : Subgroup (GL (Fin n) F)} (hHK : H ≤ K)
+    {W : Submodule F (Fin n → F)} (hW : IsRowInvariant K W) : IsRowInvariant H W :=
+  fun A hA => hW A (hHK hA)
+
+/-- `m ≤ n` のとき `{i : Fin n // (i : ℕ) < m} ≃ Fin m`。 -/
+def finLtEquiv {m : ℕ} (hm : m ≤ n) : {i : Fin n // (i : ℕ) < m} ≃ Fin m where
+  toFun i := ⟨i.1, i.2⟩
+  invFun j := ⟨⟨j, lt_of_lt_of_le j.2 hm⟩, j.2⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+/-- `rowTail n m` は「最初の `m` 座標への射影」の核。 -/
+theorem rowTail_eq_ker (m : ℕ) :
+    rowTail (F := F) n m =
+      LinearMap.ker (LinearMap.funLeft F F
+        (Subtype.val : {i : Fin n // (i : ℕ) < m} → Fin n)) := by
+  ext v
+  simp only [mem_rowTail, LinearMap.mem_ker, funext_iff, LinearMap.funLeft_apply,
+    Pi.zero_apply, Subtype.forall]
+
+/-- `rowTail n m` の次元は `n - m` (階数・退化次数定理)。 -/
+theorem finrank_rowTail {m : ℕ} (hm : m ≤ n) :
+    Module.finrank F (rowTail (F := F) n m) = n - m := by
+  have hsurj : Function.Surjective
+      (LinearMap.funLeft F F (Subtype.val : {i : Fin n // (i : ℕ) < m} → Fin n)) :=
+    LinearMap.funLeft_surjective_of_injective F F _ Subtype.val_injective
+  have hcard : Fintype.card {i : Fin n // (i : ℕ) < m} = m := by
+    rw [Fintype.card_congr (finLtEquiv hm), Fintype.card_fin]
+  have hrn := LinearMap.finrank_range_add_finrank_ker
+    (LinearMap.funLeft F F (Subtype.val : {i : Fin n // (i : ℕ) < m} → Fin n))
+  rw [LinearMap.range_eq_top.mpr hsurj, finrank_top,
+    Module.finrank_fintype_fun_eq_card, hcard, Module.finrank_fintype_fun_eq_card,
+    Fintype.card_fin] at hrn
+  rw [rowTail_eq_ker]
+  omega
+
+/-- **Isaacs 7A.3(c)** — 各次元 `k ≤ n` に対し `P`-不変部分空間はちょうど 1 つ存在する
+(すなわち標準旗 `rowTail n (n - k)`)。 -/
+theorem existsUnique_isRowInvariant_finrank_eq {k : ℕ} (hk : k ≤ n) :
+    ∃! W : Submodule F (Fin n → F),
+      IsRowInvariant (unitriangularGL : Subgroup (GL (Fin n) F)) W ∧
+        Module.finrank F W = k := by
+  refine ⟨rowTail n (n - k), ⟨(isRowInvariant_rowTail (F := F) (n - k)).mono
+    unitriangularGL_le_upperTriangularGL, ?_⟩, ?_⟩
+  · rw [finrank_rowTail (Nat.sub_le _ _)]
+    omega
+  · rintro W ⟨hWinv, hWrank⟩
+    obtain ⟨m, hmn, rfl⟩ := exists_eq_rowTail_of_isRowInvariant W hWinv
+    rw [finrank_rowTail hmn] at hWrank
+    have hm : m = n - k := by omega
+    rw [hm]
 
 end
 
