@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Data.ZMod.Basic
 import Mathlib.GroupTheory.GroupAction.Blocks
 import Mathlib.GroupTheory.GroupAction.Primitive
+import Mathlib.GroupTheory.Perm.Cycle.Type
 
 /-!
 # Isaacs Problems 8B (pp. 248–249) — `n`-巡回が生成する原始群
@@ -20,8 +21,11 @@ import Mathlib.GroupTheory.GroupAction.Primitive
 - `isBlock_smul_set` — block の translate は block。
 - `exists_not_mem_iff_add_mem` — `ZMod n` の先頭区間は非自明な平行移動で不変にならない。
 - `addRight_one_pow_apply`, `isPreprimitive_sup_zpowers_addRight_one` — **8B.8**。
-- `mCycleFun`, `mCycleInv`, `mCycle`, `val_add_one_of_lt`, `val_sub_one_of_ne_zero` —
-  **8B.9 への準備**: `ZMod n` 上の `m`-巡回 `(0, 1, …, m-1)` (残りは固定)。
+- `mCycleFun`, `mCycleInv`, `mCycle`, `mCycle_apply_of_le`, `mCycle_pow_apply`,
+  `exists_mem_zpowers_mCycle_smul` — **8B.9 への準備**: `ZMod n` 上の `m`-巡回
+  `(0, 1, …, m-1)` (残りは固定) と, その冪が先頭区間上で推移的なこと。
+- `isPreprimitive_zpowers_mCycle_sup_zpowers_addRight_one` — **8B.9 の step 1**:
+  `m`-巡回と `n`-巡回が生成する群は原始的。
 -/
 
 namespace OddOrder.Isaacs.Ch08
@@ -275,6 +279,68 @@ def mCycle (n m : ℕ) [NeZero n] (hm : m ≤ n) : Equiv.Perm (ZMod n) where
 
 @[simp] lemma mCycle_symm_apply (hm : m ≤ n) (c : ZMod n) :
     (mCycle n m hm).symm c = mCycleInv n m c := rfl
+
+lemma mCycleFun_of_le {c : ZMod n} (h : m ≤ c.val) : mCycleFun n m c = c := by
+  unfold mCycleFun
+  rw [if_neg (by omega), if_neg (by omega)]
+
+lemma mCycle_apply_of_le (hm : m ≤ n) {c : ZMod n} (h : m ≤ c.val) : mCycle n m hm c = c :=
+  mCycleFun_of_le h
+
+/-- `m`-巡回の冪の作用: 先頭区間の上では `val` を `mod m` で `+k` する。 -/
+lemma mCycle_pow_apply (hm : m ≤ n) (hm1 : 1 ≤ m) (k : ℕ) {c : ZMod n} (hc : c.val < m) :
+    ((mCycle n m hm) ^ k) c = (((c.val + k) % m : ℕ) : ZMod n) := by
+  induction k with
+  | zero =>
+    simp only [pow_zero, Equiv.Perm.one_apply, Nat.add_zero, Nat.mod_eq_of_lt hc]
+    exact (ZMod.natCast_rightInverse c).symm
+  | succ j ih =>
+    have hmod : (c.val + j) % m < m := Nat.mod_lt _ (by omega)
+    have hval : ((((c.val + j) % m : ℕ) : ZMod n)).val = (c.val + j) % m :=
+      ZMod.val_natCast_of_lt (by omega)
+    have hstep : (c.val + (j + 1)) % m = ((c.val + j) % m + 1) % m := by
+      rw [Nat.mod_add_mod, Nat.add_assoc]
+    rw [pow_succ', Equiv.Perm.mul_apply, ih, mCycle_apply]
+    unfold mCycleFun
+    rw [hval]
+    by_cases h : (c.val + j) % m + 1 < m
+    · rw [if_pos h, hstep, Nat.mod_eq_of_lt h]
+      push_cast
+      ring
+    · have hm' : (c.val + j) % m + 1 = m := by omega
+      rw [if_neg h, if_pos hm', hstep, hm', Nat.mod_self]
+      simp
+
+/-- 先頭区間の点は `m`-巡回の冪で `0` から到達できる。 -/
+lemma exists_mCycle_pow_smul (hm : m ≤ n) (hm1 : 1 ≤ m) {d : ZMod n} (hd : d.val < m) :
+    ((mCycle n m hm) ^ d.val) 0 = d := by
+  have h0 : ((0 : ZMod n)).val = 0 := ZMod.val_zero
+  rw [mCycle_pow_apply hm hm1 _ (by rw [h0]; omega), h0, Nat.zero_add,
+    Nat.mod_eq_of_lt hd]
+  exact ZMod.natCast_rightInverse d
+
+/-- `⟨m`-巡回`⟩` は先頭区間 `S = {c | c.val < m}` 上で推移的。 -/
+lemma exists_mem_zpowers_mCycle_smul (hm : m ≤ n) (hm1 : 1 ≤ m) {c d : ZMod n}
+    (hc : c.val < m) (hd : d.val < m) :
+    ∃ h ∈ Subgroup.zpowers (mCycle n m hm), h c = d := by
+  refine ⟨(mCycle n m hm) ^ d.val * ((mCycle n m hm) ^ c.val)⁻¹, ?_, ?_⟩
+  · exact Subgroup.mul_mem _ (Subgroup.pow_mem _ (Subgroup.mem_zpowers _) _)
+      (Subgroup.inv_mem _ (Subgroup.pow_mem _ (Subgroup.mem_zpowers _) _))
+  · have hinv : ((mCycle n m hm) ^ c.val)⁻¹ c = 0 :=
+      Equiv.Perm.inv_eq_iff_eq.mpr (exists_mCycle_pow_smul hm hm1 hc).symm
+    rw [Equiv.Perm.mul_apply, hinv, exists_mCycle_pow_smul hm hm1 hd]
+
+/-- **Isaacs Problem 8B.9 の step 1**: `m`-巡回 `(0,…,m-1)` と `n`-巡回 `(+1)` が生成する
+群は **原始的** (8B.8 をそのまま適用)。 -/
+theorem isPreprimitive_zpowers_mCycle_sup_zpowers_addRight_one {n m : ℕ} [NeZero n]
+    (hm : 2 ≤ m) (hmn : m < n) :
+    IsPreprimitive ↥(Subgroup.zpowers (mCycle n m hmn.le) ⊔
+      Subgroup.zpowers (Equiv.addRight (1 : ZMod n))) (ZMod n) := by
+  refine isPreprimitive_sup_zpowers_addRight_one hm hmn _ ?_ ?_
+  · rintro h ⟨k, rfl⟩ c hc
+    exact Equiv.Perm.zpow_apply_eq_self_of_apply_eq_self (mCycle_apply_of_le hmn.le hc) k
+  · intro c hc d hd
+    exact exists_mem_zpowers_mCycle_smul hmn.le (by omega) hc hd
 
 end MCycle
 
