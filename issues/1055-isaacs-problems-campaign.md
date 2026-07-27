@@ -3435,3 +3435,21 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
   * 非冪零は `Z(G) = ⊥` + mathlib `Group.IsNilpotent.center_ne_bot`。
     `Z(G) = ⊥` は「`x.right` が `V` を固定 ⟹ 作用の固定点自由性で `x.right = 1`、
     その後 `bAut x.left = x.left` ⟹ `x.left = 1`」。
+
+* ✅ **6C.2(a)** 完了 (`Problems6C2.lean`, 新 leaf, `OddOrder.lean` 配線済, axiom-clean):
+  `exists_family_nilpotent_subgroups_of_card_prime_sq` = 位数 `p²` の elementary abelian
+  `A` が非冪零 `N` に作用し `C_N(A) = 1` なら、非自明冪零部分群が `p + 1` 個あり
+  どの 2 つの交わりも自明。
+  * 支持: `exists_family_subgroups_card_prime` = elementary abelian `p²` の位数 `p` の
+    部分群を `p + 1` 個構成 (`⟨x y^k⟩` (k < p) と `⟨y⟩`; 相異性は
+    `zpow_mul_zpow_eq_one_of_eq` + `eq_zero_of_zpow_mul_zpow_eq_one` の指数一意性から、
+    「相異なる位数 `p` の 2 部分群は `⊔` で全体」は位数の割り切りで)。
+  * `fixedSubgroup B` (= `C_N(B)`) を定義。素数位数 `B` では「非自明元 1 つが固定 =
+    `B` 全体が固定」(`mem_fixedSubgroup_of_smul_eq`)。
+  * `K i = C_N(B i)`: 非自明 (さもなくば `B i` の作用が Frobenius で Thm 6.24 から `N`
+    冪零)、冪零 (`j ≠ i` で `B j` が `K i` に Frobenius 作用 —
+    `IsFrobeniusAction.invariantSubgroupMulDistribMulAction` で target 制限)、
+    交わり自明 (`B i ⊔ B j = ⊤` と `C_N(A) = 1`)。
+* ⏳ **6C.2(b)** 残り: `Q_i = K_i` の Sylow `q`-部分群、`X = ⟨Q_i⟩` が `Syl_q(N)` に入る。
+  hint = `A`-不変 Sylow `q`-部分群 `Q` を取り `X ≤ Q`; `X < Q` なら `A`-不変な
+  `X ≤ Y < Q` を作り `A` の `Q/Y` への作用が Frobenius になることを示す。
