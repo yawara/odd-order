@@ -36,7 +36,7 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
-      §8B は 8B.1–8B.5 完了 + 8B.6 は「`|G_α|=2`」「`|Ω|` 奇素数」まで /
+      §8B は 8B.1–8B.5, 8B.7 完了 + 8B.6 は `D₂ₚ` 同型のみ残 /
       §8C §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
@@ -4431,8 +4431,8 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   `exists_regular_normal_of_card_stabilizer_eq_two` (正則正規部分群 `K`) +
   `prime_card_of_card_stabilizer_eq_two` (**`|Ω|` は奇素数**)。
   **残り = `G ≅ DihedralGroup p` の明示同型のみ** /
-  8B.7 🔶 **道具のみ landing** (`oddCore` = `O²`, 奇位数元の小軌道固定) /
-  **次の frontier = 8B.7 本体**。
+  8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
+  **次の frontier = 8B.8**。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4536,3 +4536,21 @@ mathlib `DihedralGroup p` への**明示同型の構成**だけ:
 4. `G_α ⊔ G_β = ⊤` (極大性; 8B.6 前半と同じ議論) ⟹ **`oddCore D ⊴ G`** ⟹
    `oddCore D ≤ D ≤ G_α` と `eq_bot_of_normal_le_stabilizer` で `oddCore D = ⊥`。
 5. `isPGroup_two_of_oddCore_eq_bot` で `D` は 2-群 ⟹ `|H| = 3·|D| = 3·2^e`。
+
+
+### 8B.7 完了メモ (2026-07-27)
+
+`card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` で landing。
+**教科書 Hint より簡単な経路が見つかった**: Hint は `K = core_H(D)` を作って
+`O²(D) ⊲ O²(K)` を示すが、「奇位数元は高々 2 点の不変集合を各点固定する」
+(`smul_eq_self_of_odd_of_ncard_le_two`) を直接使うと、`core` も `[H:K] ∣ 6` も
+`S₃` への埋め込みも要らずに `G_α ≤ N(oddCore D)` が出る。
+
+再利用可能になった道具:
+* `oddCore D` (= `O²(D)`), `isPGroup_two_of_oddCore_eq_bot`
+* `index_subgroupOf_mul_card` (`[K:D]·|D| = |K|`)
+* `relIndex_stabilizer_comm` (対をなす suborbit の相対指数は等しい)
+* `eq_bot_of_normal_le_stabilizer` (点安定化群に含まれる正規部分群は自明)
+
+⚠ `Problems8B.lean` は 945 行。1500 行に近づいたら topic 別に分割する
+(8B.1–8B.4 = block/primitivity, 8B.5–8B.7 = 点安定化群の小軌道, 8B.8– = 対称群の生成)。
