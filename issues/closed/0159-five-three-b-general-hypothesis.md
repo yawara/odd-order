@@ -268,6 +268,20 @@ statement と完全一致になる。3 つの既存 discharge 元もその特殊
 
 ### 残りの step (元の「やること」から)
 
-3. 書籍後半「`φ ∈ 𝒮 ∩ Irr L` なら `R(φ) ⊥ ω^σ`」— 未着手
-4. `S13_SixTwoImageData.inducedFamilyImageData` を本構成の特殊化に置換 — 未着手
-5. survey の「(5.3)(b) は設計上の理由で繰延」注記の撤回 — 未着手
+3. 書籍後半「`φ ∈ 𝒮 ∩ Irr L` なら `R(φ) ⊥ ω^σ` (∀ ω ∈ Irr W)」— **完了**
+   (`dadeOfDiff_imageSet_orthogonal_chiFam`)。`Supp(φ − φ̄) ⊆ A` ⟹ anchor ⟹
+   `NC((φ − φ̄)^τ) ≤ ‖φ − φ̄‖² = 2 < 2·min(w₁,w₂)` ⟹ (3.8)
+   (`inner_smul_chiFam_eq_zero_of_diff_vanishOnV`)。これは書籍が混合 (5.2.e) を導く経路そのもの
+   (可約 `R(μ_j)` の `2w₁` 元は全て符号つき `ω^σ` なので、この rider から直ちに従う)。
+4. `S13_SixTwoImageData.inducedFamilyImageData` を本構成の特殊化に置換 — **未着手**
+   (§13 側は §12 hypothesis から `InducedFamilyImageData` を組む消費点。本構成に載る見込みだが
+   3 サイトの再配線を伴うので別 tick)。
+5. survey の「(5.3)(b) は設計上の理由で繰延」注記の撤回 — **完了**
+   (`notes/meta/three_books_full_survey_2026_07_16.md` の 3 箇所を書き換え)。
+
+### ⟹ issue の完了条件は満たした
+
+書籍 (5.3)(b) の statement (本体 + rider) が (4.6) 一般で sorry-free・axiom-clean で landing。
+残るのは下流の再配線 (step 4) と、既存 3 サイトの anchor を
+`dadeICM_apply_eq_zero_of_mem_ticVdiffV` の特殊化へ寄せる dedup — どちらも本 issue の
+完了条件外の follow-up。

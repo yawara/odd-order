@@ -1188,17 +1188,21 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
    ⚠ 残る (6.3) の特殊化は「repo が `H` 冪零を取る (書籍は `H/M` 冪零)」の 1 点のみ
    (`six_three_of_imageData` の docstring に注記; §11 consumer は `M = 1` ゆえ一致)。
    **残るのは (6.5)/(6.6) の general-`K` 形** (下記 §「(6.5)/(6.6)」節)。
-2. **(5.3)(b) / (5.8)** — (4.6)/(5.3.b) 一般での単一 statement が無い。解析コアは
+2. **~~(5.3)(b)~~ / (5.8)** — **(5.3)(b) は 2026-07-27 にクローズ** (issue 0159)。
+   `S06.toGeneralHypothesisOfInducedFamily` (`S06_CertainTypeSubcoherent.lean`) が
+   **書籍 statement そのもの**を (4.6) 一般で述べる: 族 `𝒮 ⊆ {Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}`
+   に対し `S07.GeneralHypothesis` を構成し、追加仮説は (5.2.a)/(5.2.c) のみ。sorry-free /
+   axiom-clean (AxiomsCheck 登録済)。
+   経緯: 旧注記は「固定 2 要素の `R` レコードは可変長 `R` を保持できないので**意図的な設計判断**」
+   としていたが、[issue 0157](../../issues/closed/0157-five-seven-drop-unit-norm.md) の
+   `S07.GeneralHypothesis` がサイズ自由な `OrthonormalCharacterImageFamily` を (5.2.d) に持つので
+   障害は消えた。実装で追加になった鍵は **anchor の (4.6) 一般化**
+   (`dadeICM_apply_eq_zero_of_mem_ticVdiffV` — 書籍の「by the definition of τ, `(φ − φ̄)^τ`
+   vanishes on `V`」を `V ⊆ A₀` の Dade base-point 評価 + `ticVdiffV_not_mem_conjugatesOfSet_K`
+   で証明) で、これが Sibley §8 / type-P §13 / type-II §12 の 3 個別証明の一般形にあたる。
+   **残るのは (5.8)** のみ (μ-column 像の二分律/pin が FT 極大部分群 instance 止まり)。解析コアは
    `S05_SigmaTrichotomy.eq_smul_chiFam_column_of_vanishOnV` として `TICyclicHypothesis`
    レベルで完全に一般。
-   【**⚠ 2026-07-27: 繰延理由が無効化された**】旧注記は「固定 2 要素の `R` レコードは
-   可変長 `R` を保持できないので**意図的な設計判断**」としていたが、
-   [issue 0157](../../issues/closed/0157-five-seven-drop-unit-norm.md) で新設した
-   **`S07.GeneralHypothesis` の (5.2.d) はサイズ自由な `OrthonormalCharacterImageFamily`**。
-   書籍 (5.3)(b) が要求する `R(μ_j)` (`2w₁` 元) は `S06.certainTypeR`
-   (`S06_CertainTypeCoherence:648`) が**既にその型で**持っている。
-   ⟹ 設計上の障害は無くなった。手順は
-   **[issue 0159](../../issues/0159-five-three-b-general-hypothesis.md)** に記録。
 3. **(1.7)** — 一般 (a) の χᵢ 相異性と `n = |T:H|/e²` の計数のみ (effort S)。
 
 **未再実測 (この pass では触っていない)**: (7.8) (7.9) (8.15) (9.7) (9.10) (9.11) (10.11)
@@ -1212,10 +1216,10 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 | App NearFields `F_{r²,2}` | partial「具体 instantiation が無い」 | **stale**: `Peterfalvi.Appendices.ExceptionalNearField` (2026-07-22) に `exceptionalTwistData` (σ = halfFrobenius, χ = squareSignChar) + 乗法則 (book p.138) + 非可換性、AxiomsCheck 登録済 |
 | App NearFields App C Prop 2 | partial「vacuous な classification が sorry」 | **stale**: `cyclic_index_two_nearField_classification` は実際の二分律 (field ∨ `F_{r²,2}`、`|Z(F*)| = r − 1`) を述べて axiom-clean |
 
-**packaging 系 (内容は landed、単一の抽象 statement が無い)**: (5.3)(b) / (5.8) / (7.8) / (7.9) /
-(8.15) / (9.7) / (9.10) / (9.11) / (10.11)。いずれも note が「assembly / re-assembly work」と
-明記している。(5.3)(b) の「固定 2 要素 `R` レコードが可変長 `R` を持てない」という理由は
-**2026-07-27 に無効化** (`S07.GeneralHypothesis`、issue 0157/0159)。
+**packaging 系 (内容は landed、単一の抽象 statement が無い)**: ~~(5.3)(b)~~ / (5.8) / (7.8) /
+(7.9) / (8.15) / (9.7) / (9.10) / (9.11) / (10.11)。いずれも note が「assembly / re-assembly
+work」と明記している。**(5.3)(b) は 2026-07-27 にクローズ済** — 書籍 statement を (4.6) 一般で
+述べる `S06.toGeneralHypothesisOfInducedFamily` が landing した (issue 0159)。
 
 #### (6.5)/(6.6) の general-`K` 化 (2026-07-27) — **(6.5) は (a)(b)(c) とも完了、残るは (6.6) coherence 半分**
 
@@ -1459,9 +1463,11 @@ future proof の target」— どちらも既に証明済)。
    (`escapingSharpSet_a0Set_eq_aSet` + clause (c) の `hatMsigma` 一般化 +
    `aSet_subset_A0Set` を Peterfalvi から BG へ移設)。書籍括弧書き `Hᵢ ≤ M'ᵢ` も field 化。
 4. **Pf App Suzuki2Groups Lemma 1 (a)(c)(d)** — Higman 論文の実内容 ((b) は 07-18 に完済)。
-5. **packaging 9 件** — (5.3)(b) (5.8) (7.8) (7.9) (8.15) (9.7) (9.10) (9.11) (10.11)。
-   内容は landed、単一の抽象 statement が無いだけ。(5.3)(b) は固定 2 要素 `R` レコードの
-   設計上の制約でもある。
+5. **packaging 8 件** — (5.8) (7.8) (7.9) (8.15) (9.7) (9.10) (9.11) (10.11)。
+   内容は landed、単一の抽象 statement が無いだけ。⚠ **(5.3)(b) は 2026-07-27 に本項から外れた**
+   — `S06.toGeneralHypothesisOfInducedFamily` が書籍 statement を (4.6) 一般で述べる
+   (issue 0159)。「固定 2 要素 `R` レコードの設計上の制約」という旧理由は
+   `S07.GeneralHypothesis` (issue 0157) で無効化済。
 6. **低優先繰延** — BG App.C Rem (IV) / Prob 1 (文献引用・open problem)、
    Pf App C Prop 1 の Q₈ Brauer–Suzuki (issue 0147、repo 唯一の実 sorry)。
 

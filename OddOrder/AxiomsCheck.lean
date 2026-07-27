@@ -13231,3 +13231,7 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.Peterfalvi.S06.dadeICM_apply_eq_zero_of_mem_ticVdiffV
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S06.inducedNonKernelFamily_conjDiff_support_subset
+-- The (5.3)(b) **rider** ("if φ ∈ 𝒮 ∩ Irr(L) then R(φ) ⊥ ω^σ for all ω ∈ Irr(W)"), the book's own
+-- route to the mixed stratum of (5.2.e): NC((φ − φ̄)^τ) ≤ ‖φ − φ̄‖² = 2 < 2·min(w₁,w₂) and (3.8).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.dadeOfDiff_imageSet_orthogonal_chiFam

@@ -528,6 +528,92 @@ noncomputable def toGeneralHypothesisOfInducedFamily [NeZero (Nat.card h.W1)]
       · intro z hz
         rw [ClassFunction.sub_apply, ClassFunction.conj_apply,
           inducedNonKernelFamily_apply_eq_zero_of_not_mem h (hSsub hχ) hz, star_zero, sub_zero])
+/-! ### The (5.3)(b) rider: `R(φ) ⊥ ω^σ` for irreducible members -/
+
+/-- **Peterfalvi (5.3)(b), the rider** (p. 26, last sentence): *if `φ ∈ 𝒮 ∩ Irr(L)` then `R(φ)` is
+orthogonal to `ω^σ` for all `ω ∈ Irr(W)`.*
+
+This is the book's own route to the mixed stratum of (5.2.e): the `2w₁` members of a reducible
+`R(μ_j)` are all signed `ω^σ`'s, so `R(φ) ⊥ ω^σ` implies `R(φ) ⊥ R(μ_j)` at once.
+
+The proof is the book's: `Supp(φ − φ̄) ⊆ A` by (4.7), so `(φ − φ̄)^τ` vanishes on `V`
+(`dadeICM_apply_eq_zero_of_mem_ticVdiffV`); writing the two-element image as
+`(φ − φ̄)^τ = ε·μ − ε·ν` gives `NC((φ − φ̄)^τ) ≤ ‖φ − φ̄‖² = 2 < 2·min(w₁, w₂)`, whence (3.8)
+kills every `σ`-coefficient — packaged as `inner_smul_chiFam_eq_zero_of_diff_vanishOnV`. -/
+theorem dadeOfDiff_imageSet_orthogonal_chiFam
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ inducedNonKernelFamily h)
+    (hirr : IsIrreducibleCharacter φ) (hnoreal : ¬ ClassFunction.IsReal φ)
+    (hdiffsupp : (φ.conj - φ).support ⊆ supportSet h)
+    {α : ClassFunction G ℂ}
+    (hα : α ∈ (S07.dadeOrthonormalCharacterImageFamilyOfDiff h.dade0
+      (⟨φ, hirr⟩ : IrreducibleCharacter ↥L) hnoreal hdiffsupp).imageSet)
+    (pq : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+      ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) :
+    ClassFunction.inner α
+      ((ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h) pq) = 0 := by
+  classical
+  -- `2 < min(w₁, w₂)` for the `ticVdiff` exceptional structure
+  have hmin : 2 < min (Nat.card (ticVdiff h).W1) (Nat.card (ticVdiff h).W2) := by
+    have h1 := (ticVdiff h).three_le_card_W1
+    have h2 := (ticVdiff h).three_le_card_W2
+    omega
+  -- capture the underlying two-element `R(φ) = {ε·μ, −ε·ν}`
+  obtain ⟨cd, hcd⟩ :
+      ∃ cd : S07.CharacterDifferenceImage (G := G)
+        (S07.dadeIntegralCharacterMap h.dade0 (h.dade0.fullDadeIsometryData)) φ,
+        S07.dadeOrthonormalCharacterImageFamilyOfDiff h.dade0
+            (⟨φ, hirr⟩ : IrreducibleCharacter ↥L) hnoreal hdiffsupp
+          = cd.toOrthonormalImage := ⟨_, rfl⟩
+  have hcdimg : S07.dadeIntegralCharacterMap h.dade0 (h.dade0.fullDadeIsometryData)
+      (φ - φ.conj)
+      = (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction := by
+    rw [cd.image_eq, smul_sub, Int.cast_smul_eq_zsmul, Int.cast_smul_eq_zsmul]
+  -- the `ZIrr`/orthonormality facts for the pair `μ, ν`
+  have hμZ : cd.muClassFunction ∈ ZIrr G := cd.mu.mem_ZIrr
+  have hνZ : cd.nuClassFunction ∈ ZIrr G := cd.nu.mem_ZIrr
+  have hμ1 : ClassFunction.inner cd.muClassFunction cd.muClassFunction = 1 := by
+    have hx := irreducibleCharacter_inner_eq_ite cd.mu cd.mu; rwa [if_pos rfl] at hx
+  have hν1 : ClassFunction.inner cd.nuClassFunction cd.nuClassFunction = 1 := by
+    have hx := irreducibleCharacter_inner_eq_ite cd.nu cd.nu; rwa [if_pos rfl] at hx
+  have hμν : ClassFunction.inner cd.muClassFunction cd.nuClassFunction = 0 := by
+    have hx := irreducibleCharacter_inner_eq_ite cd.mu cd.nu; rwa [if_neg cd.distinct] at hx
+  have hνμ : ClassFunction.inner cd.nuClassFunction cd.muClassFunction = 0 := by
+    have hx := irreducibleCharacter_inner_eq_ite cd.nu cd.mu
+    rwa [if_neg (Ne.symm cd.distinct)] at hx
+  have hsignC : (cd.sign : ℂ) ≠ 0 := by rcases cd.sign_eq with hs | hs <;> simp [hs]
+  have hnsignC : (-(cd.sign : ℂ)) ≠ 0 := by rcases cd.sign_eq with hs | hs <;> simp [hs]
+  -- the anchor, in the two signed orientations
+  have hvanishμν : ∀ v ∈ (ticVdiff h).V,
+      ((cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction) v = 0 := by
+    intro v hv
+    rw [← hcdimg]
+    refine dadeICM_apply_eq_zero_of_mem_ticVdiffV h ?_ ?_ hv
+    · rw [show φ - φ.conj = -(φ.conj - φ) by abel, ClassFunction.support_neg]
+      exact hdiffsupp
+    · intro z hz
+      rw [ClassFunction.sub_apply, ClassFunction.conj_apply,
+        inducedNonKernelFamily_apply_eq_zero_of_not_mem h hφ hz, star_zero, sub_zero]
+  have hvanishνμ : ∀ v ∈ (ticVdiff h).V,
+      ((-(cd.sign : ℂ)) • cd.nuClassFunction - (-(cd.sign : ℂ)) • cd.muClassFunction) v = 0 := by
+    intro v hv
+    rw [show (-(cd.sign : ℂ)) • cd.nuClassFunction - (-(cd.sign : ℂ)) • cd.muClassFunction
+        = (cd.sign : ℂ) • cd.muClassFunction - (cd.sign : ℂ) • cd.nuClassFunction by
+      rw [neg_smul, neg_smul]; abel]
+    exact hvanishμν v hv
+  -- normalize the `ℤ`-smul members to `ℂ`-smul and fire (3.8)
+  rw [hcd] at hα
+  simp only [S07.CharacterDifferenceImage.toOrthonormalImage,
+    Finset.mem_insert, Finset.mem_singleton] at hα
+  rcases hα with rfl | rfl
+  · rw [show cd.sign • cd.muClassFunction = (cd.sign : ℂ) • cd.muClassFunction from
+      (Int.cast_smul_eq_zsmul ℂ cd.sign cd.muClassFunction).symm]
+    exact OddOrder.Peterfalvi.S08.inner_smul_chiFam_eq_zero_of_diff_vanishOnV (ticVdiff h) rfl
+      (ticVdiffFullDadeApplication h) hμZ hμ1 hνZ hν1 hμν hsignC hvanishμν hmin pq
+  · rw [show (-cd.sign) • cd.nuClassFunction = (-(cd.sign : ℂ)) • cd.nuClassFunction by
+      rw [← Int.cast_smul_eq_zsmul ℂ (-cd.sign) cd.nuClassFunction, Int.cast_neg]]
+    exact OddOrder.Peterfalvi.S08.inner_smul_chiFam_eq_zero_of_diff_vanishOnV (ticVdiff h) rfl
+      (ticVdiffFullDadeApplication h) hνZ hν1 hμZ hμ1 hνμ hnsignC hvanishνμ hmin pq
 
 end
 
