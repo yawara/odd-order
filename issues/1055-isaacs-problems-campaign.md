@@ -36,7 +36,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
-      §8B は 8B.1–8B.10 完了 (8B.6 の `D₂ₚ` 同型のみ残) / §8C §8D 未着手
+      §8B は 8B.1–8B.10 完了 (8B.6 の `D₂ₚ` 同型のみ残) /
+      §8C は 8C.1–8C.3 完了, 8C.4–8C.6 未着手 / §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4803,3 +4804,52 @@ PDF ページ画像による文言確定ができないため、§8C 以降は `
 `references/isaacs/pages/isaacs-p256-269.png` / `isaacs-p257-270.png` は
 レンダリング済なので、**ツールが復旧したら 8C.3 以降の着手前に必ず読んで文言を確定する
 こと** (8B.7 で上付き `O²` を取り違えかけた前例あり)。
+
+
+## §8C 進捗 (2026-07-27)
+
+**statement は PDF ページ画像で確定済** (`references/isaacs/pages/isaacs-p256-269.png`
+= 書籍 p.256, `isaacs-p257-270.png` = p.257)。pdftotext は `A₆`→`AQ`,
+`11·10·9·8`→`1M0-9-8`, `SL(2,5)`→`SX(2,5)`, `Ω`→`fi`/`ft` と崩れていた。
+
+leaf 構成 = `Problems8C/{SimpleOrder120, PrimeDegree, MathieuEleven, MathieuTwelve}.lean`
+(165 / 149 / 216 / 204 行) + hub `Problems8C.lean` (`OddOrder.lean` 配線済)。
+
+* ✅ **8C.1** (`SimpleOrder120.lean`): `card_ne_onetwenty_of_subgroup_alternating`
+  (`A₆` に位数 120 の部分群無し — 指数 3 + Isaacs Cor 1.3 で `360 ∣ 3!`) /
+  `not_isSimpleGroup_of_card_eq_onetwenty` (位数 120 の群は単純でない — `n₅ = 6` ⟹
+  `G ↪ S₆`, 符号写像の核が単純性から `⊤` ⟹ `G ↪ A₆`)。
+* ✅ **8C.2** (`PrimeDegree.lean` + `MathieuEleven.lean`): 次数 11 位数 7920 ⟹ 単純
+  (`isSimpleGroup_of_card_eq_7920`)。`|N_G(P)| = 55` (Isaacs のヒント) を経由。
+  再利用可能な一般補題: `isPretransitive_of_card_eq_prime` (素数次数で位数 `p` の
+  部分群は regular) / `centralizer_eq_of_card_eq_prime` / `card_normalizer_dvd_of_card_eq_prime`
+  (`|N_G(H)| ∣ p(p-1)`) / `card_sylow_eq_prime_of_not_dvd_sq` /
+  `index_subgroupOf_eq_index_of_sup_eq_top` (Frattini 帳尻)。
+* ✅ **8C.3** (`MathieuTwelve.lean`): 次数 12 位数 95040 の推移群 ⟹ 単純
+  (`isSimpleGroup_of_card_eq_95040`)。点安定化群が 8C.2 の仮説を満たすので単純,
+  そこから 2-transitive ⟹ 正規部分群は regular ⟹ 位数 12 の元がすべて共役になり
+  位数 2 と 3 の元が両立しない, という筋。補助: `faithfulSMul_ofStabilizer` /
+  `card_ofStabilizer` (`SubMulAction.ofStabilizer`)。
+
+### 残り §8C の設計メモ (着手時の出発点)
+
+* **8C.4** (次数 100, `G_α` 単純, `Ω∖{α}` 上の軌道が 22 と 77 ⟹ 原始的かつ単純):
+  - 仮説の形式化は「`Ω∖{α}` = orbit(β) ⊔ orbit(γ), `|orbit β| = 22`, `|orbit γ| = 77`」
+    (= 軌道がちょうど 2 つ) が扱いやすい。`G_α`-不変集合は `∅ / orbit β / orbit γ / 全体`
+    の 4 通りしかない (軌道は極小不変集合) ので, block `Δ ∋ α` の濃度は `1, 23, 78, 100`。
+    `|Δ| ∣ 100` (`IsBlock.ncard_dvd_card`) と合わせて `1` か `100` ⟹ **原始的**。
+  - 単純性: `1 ≠ N ◁ G` は原始性で推移的, `N ∩ G_α ◁ G_α` 単純 ⟹ `1` か `G_α`。
+    後者は `N = G`。前者なら `N` regular で `|N| = 100`。`N` の Sylow 5-部分群は
+    `n₅ ∣ 4`, `≡ 1 (mod 5)` ⟹ `n₅ = 1` ⟹ 特性的 ⟹ `P.map N.subtype ◁ G` が
+    位数 25 の非自明正規部分群だが, 原始性から推移的でなければならず `100 ∣ 25` は偽。
+    (mathlib `Sylow.characteristic_of_subsingleton` +
+    `ConjAct.normal_of_characteristic_of_normal`。8C.3 と同じ道具立て。)
+  - `card_sylow_eq_prime_of_not_dvd_sq` を `p^k` 版に一般化しておくと `|P| = 25` が出る。
+* **8C.5** (次数 24 の 5-transitive 群, 3 点安定化群が単純 ⟹ 2 点/1 点安定化群と `G` が単純):
+  多重可移性の帰納。mathlib `MulAction.IsMultiplyPretransitive` +
+  `SubMulAction.ofStabilizer` の反復。8C.4 の「点安定化群が単純 + 原始的 ⟹ 単純」を
+  一般補題に切り出して 3 回使う形になる見込み。
+* **8C.6** (可換群 `A` について `Aut(A)` 単純 ⟺ `|A| = 3` または `A` は位数 8 以上の
+  初等可換 2-群): `Aut(Z₃) = Z₂` / `Aut(F₂^n) = GL(n,2)` (`n ≥ 3` で単純) の両方向。
+  `PSL(n,2) = SL(n,2) = GL(n,2)` の単純性は repo の `Ch08/PSLSimple.lean` にある
+  (`q = 2` で中心自明) はずなので, 着手前に実測で確認すること。
