@@ -3662,3 +3662,25 @@ API メモ: `Sylow.is_maximal'` / `Subgroup.map_subgroupOf_eq_of_le` /
 `Ne` の下では効かないので `intro hbot` してから使う。
 
 次: 7A.2 (`SL(2,3)/Z` の Sylow 数え上げ ⟹ 位数 8 の正規部分群)。
+
+### 7A.2 の設計 (2026-07-27 調査)
+
+必要な部品の所在が確定:
+1. `|SL(2,3)| = 24`: `natCard_specialLinearGroup_fin_two` (issue 9211 で char 任意に
+   一般化済) に `|ZMod 3| = 3` を入れて `3 * 2 * 4 = 24`。
+2. `Z := ⟨-I⟩` は中心的で位数 2 (`-I ≠ I` は char 3 ゆえ、`(-I)² = I`)。
+   ⚠ 「`Z` = 中心」までは示さなくてよい (書籍も `Z = {±I}` と定義しているだけ)。
+   ⟹ `S/Z` の位数は 12。
+3. **`n_3(S/Z) = 4`**: ここが本体。`n_3 ∣ 4` かつ `≡ 1 (mod 3)` ⟹ `n_3 ∈ {1, 4}`。
+   非自明性は「相異なる Sylow 3 が 2 つある」ことから: `[[1,1],[0,1]]` と `[[1,0],[1,1]]`
+   の生成する位数 3 の部分群が相異なる (書籍 hint の `GL(n,q)` の Sylow `p` が 2 個以上、を
+   具体行列で直接出す)。`S` の Sylow 3 と `S/Z` の Sylow 3 は `Z` が 2-群なので対応。
+4. **`sylow_two_normal_of_card_twelve_of_four_sylow_three`** =
+   `OddOrder/Isaacs/Ch01_Sylow/Theorem131.lean:139` に**既存** (位数 12 + `n_3 = 4` ⟹
+   Sylow 2 が正規; 数え上げ証明つき)。⚠ ただし **`private`** なので
+   Ch07 から呼べない ⟹ CLAUDE.md「`private` をファイル跨ぎで使わない」に沿って
+   **public 化する** (Ch01 は Ch07 の上流なので依存方向は問題なし)。
+5. `S/Z` の正規 Sylow 2 (位数 4) の `QuotientGroup.mk'` による引き戻しが `S` の位数 8 の
+   正規部分群 (`Z ≤` 引き戻し, 位数 `4 * 2 = 8`)。
+
+⟹ 次 iteration: (4) の public 化 → (2)(3) → (5) の組み上げ。

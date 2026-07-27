@@ -31,7 +31,7 @@ open scoped CharTwo MatrixGroups
 
 universe u
 
-variable {F : Type u} [Field F] [Finite F] [CharP F 2]
+variable {F : Type u} [Field F] [Finite F]
 
 omit [Finite F] in
 private theorem card_specialLinearGroup_mul_units :
@@ -144,6 +144,10 @@ theorem natCard_specialLinearGroup_fin_two :
     _ = (Nat.card F * (Nat.card F - 1) * (Nat.card F + 1)) *
         (Nat.card F - 1) := by ring
 
+section CharTwo
+
+variable [CharP F 2]
+
 omit [Finite F] in
 /-- In characteristic two, `SL(2,F)` has trivial center. -/
 theorem center_specialLinearGroup_fin_two_eq_bot :
@@ -216,5 +220,7 @@ set_option linter.unusedSectionVars false in
     (rootSylow (F := F) :
       Subgroup (Matrix.ProjectiveSpecialLinearGroup (Fin 2) F)) =
       rootSubgroup (F := F) := rfl
+
+end CharTwo
 
 end OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear
