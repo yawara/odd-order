@@ -69,7 +69,14 @@ Sibley 側の入口 `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
       (`𝒮₀` は構成上の等次数族、Hypothesis (5.2) は `hypothesisOfSubfamily`)。
       Sibley 版は orthonormal 像族を Dade から組んでいた (`coherentEqualDegree_fromDade`) が、
       (5.7) 経由なら τ-general のまま。axiom-clean。
-- [ ] **step 4 — per-step adjoining の組み立て (残り)**: `xSet_isCoherent_of_adjoinSteps` の
+- [x] **step 4 — per-step adjoining (2026-07-27 本体完了)**: `xAdjoinStep_of_degreeRatios`。
+      **Sibley の `XAdjoinStepInput`/`xAdjoinStep` 層は移植せず迂回**し、`S07.xAdjoinStepW_general`
+      に直結した (その層が唯一の真に Dade 依存な部分だったので、迂回が最短だった)。axiom-clean。
+      **残るのは最終組み上げのみ**: `xSet_isCoherent_of_adjoinSteps` の `hstep` に
+      `xAdjoinStep_of_degreeRatios` を流し込み、書籍 p.32 の次数データ (共通指数 `p`-冪次数・
+      [Is] Cor 2.30 の中心界・次数平方和 `total` の可除性 → `2a < ∑ deg²`) を各 step で構成する。
+      算術 4 本は元から一般 (下記)。
+- [x] ~~**step 4 — per-step adjoining の組み立て (残り)**~~ (旧記述、上に置換): `xSet_isCoherent_of_adjoinSteps` の
       `hstep` を実際に供給する。Sibley 側の対応物は
       `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`
       (`S08_CoherenceCorePart2/SibleyBounds.lean`) で、書籍 p.32 の次数簿記
