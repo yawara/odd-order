@@ -37,7 +37,7 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
       §8B は 8B.1–8B.10 完了 (8B.6 の `D₂ₚ` 同型のみ残) /
-      §8C は 8C.1–8C.4 完了, 8C.5 / 8C.6 未着手 / §8D 未着手
+      §8C は 8C.1–8C.5 完了, 8C.6 未着手 / §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4942,9 +4942,117 @@ IsMultiplyPretransitive (stabilizer G a) (SubMulAction.ofStabilizer G a) n`) で
 | 問題 | 担当 (セッション識別) | claim 時刻 | 状態 |
 |---|---|---|---|
 | 8C.1 – 8C.4 | — | — | **完了** (二重着手あり、9212 参照) |
-| 8C.5 | 設計メモを書いた側のセッション | 2026-07-27 21:5x | hub 裁定で確定 |
+| 8C.5 | 設計メモを書いた側のセッション (= 本セッション) | 2026-07-27 21:5x | **完了 2026-07-27** |
 | 8C.6 | lane a (9212 を起票した側) | 2026-07-27 21:5x | hub 裁定で確定 |
+| 8D.1 – 8D.n (§8D 全問) | 8C.5 を実装した側のセッション | 2026-07-27 22:0x | **8D.1 / 8D.2 完了, 8D.3– 進行中** |
 
 ⚠ **恒久対処は worktree を分けること** — 1 lane = 1 worktree = 1 session が CLAUDE.md の前提。
 2 つ目のセッションは `notes/meta/worktree_setup.md` の手順で自分の worktree/branch を取るのが
 本来の姿で、claim 表はそれまでの緩和策 (9212 §5)。
+
+## 8C.5 完了 (2026-07-27)
+
+新 leaf `Problems8C/MathieuTwentyFour.lean` (150 行)。設計どおり Wielandt 9.1
+(`SubMulAction.ofStabilizer.isMultiplyPretransitive`) で 24 → 23 → 22 → 21 と
+1 点ずつ剥がし, 各段の `FaithfulSMul` / 濃度 / 推移性は共通補題
+(`faithfulSMul_ofStabilizer` / `card_ofStabilizer` / `is_one_pretransitive_iff` +
+`isMultiplyPretransitive_of_le`) で自動的に揃う。
+
+* `not_isSimpleGroup_of_card_eq_twentytwo` — 位数 22 の単純群は無い (Sylow 11 が正規)。
+* `two_transitive_of_isMultiplyPretransitive` — mathlib の
+  `IsMultiplyPretransitive _ _ 2` を 8A.9 系が要求する形に橋渡し。
+* `isSimpleGroup_of_five_transitive_degree_twentyfour` — **8C.5 本体**。
+  段 2 (22 = 2·11) と段 0 (24 = 2³·3) は
+  `isSimpleGroup_of_two_transitive_of_isSimpleGroup_stabilizer`、
+  段 1 (23 = 素数) は `isSimpleGroup_of_two_transitive_of_prime_card`。
+
+全て実証明・axiom-clean。
+
+⚠ **8C.6 は hub 裁定 (9212) で他セッションの担当**なので本セッションは触らない。
+本セッションは claim 表に従い **§8D (Isaacs pp. 257–) の演習**へ移る (着手前に
+PDF ページ画像で文言を確定すること)。
+
+
+## §8D の問題 (p. 269, PDF ページ画像で確定 2026-07-27)
+
+画像 = `references/isaacs/pages/isaacs-p269-282.png`。⚠ pdftotext は不等号を崩していた
+(`1 = mi < rri2 < ...` → 正しくは `1 = m₁ ≤ m₂ ≤ ⋯ ≤ m_r`、8D.4(a) は `km> m` ではなく
+**`k_m ≥ m`**)。
+
+* **8D.1**: `1 = m₁ ≤ m₂ ≤ ⋯ ≤ m_r` を rank `r` の**原始的**作用の subdegree とする。
+  `m₂ = 2` なら `i ≥ 2` の全てで `mᵢ = 2`。
+* **8D.2**: 次数 8 の原始置換群は 2-transitive。
+* **8D.3**: rank `r` の推移置換群で最大 subdegree が `n` なら `|G|` は `r` と `n` の
+  ある関数で抑えられる。
+* **8D.4**: `m` を推移作用の subdegree, `k_m` を Thm 8.42 直前で定義される整数とする。
+  (a) `k_m ≥ m`。(b) `k_m = m` かつ `α → β` が `m`-arrow なら `G_α G_β` は部分群。
+  (c) `m > 1` で `G` が原始的なら `k_m > m`。
+* **8D.5**: rank 3 の推移作用で subdegree が `1 < m < n`, `gcd(m, n) = 1` なら
+  `(m + 1) ∣ n`。Hint: `k_m ∣ 1 + m + n`。
+* **8D.6**: 原始置換群で素数 `p` が subdegree なら, 点安定化群の位数は `p²` で割れず,
+  したがってどの subdegree も `p²` で割れない。Hint: `X ⊆ Y`, `|Y : X| = p` なら
+  `O^{p'}(X) ◁ Y`。
+
+⚠ 着手時はまず repo 既存の `OddOrder/Isaacs/Ch08_PermutationGroups/Subdegrees.lean`
+(38k、`subdegree_gap_le` / `subdegree_eq_one_of_coprime_of_max` 等) と
+`OrbitalGraph.lean` / `Orbitals.lean` を実測で確認し, `k_m` (Thm 8.42 直前の定義) と
+`m`-arrow が既に形式化されているかを見ること。
+
+
+## 8C.6 の設計 (2026-07-27, 部品の所在まで確定)
+
+`Aut(A)` 単純 ⟺ `|A| = 3` または `A` が位数 8 以上の初等可換 2-群。
+
+### landing 済
+
+* `isSimpleGroup_mulAut_of_card_eq_three` (`Problems8C/AbelianAut.lean`):
+  「⟸」の第 1 ケース (`|A| = 3` ⟹ `|Aut(A)| = φ(3) = 2` で素数位数)。
+
+### 残り (1) 「⟸」初等可換 2-群のケース
+
+`A` が位数 `2^n` (`n ≥ 3`) の初等可換 2-群 ⟹ `Aut(A) ≅ GL(n,2)` が単純。連鎖:
+
+1. **`Module (ZMod 2) A`**: mathlib に `AddCommGroup.zmodModule`
+   (`∀ x, n • x = 0` から `Module (ZMod n) G` を作る; `Mathlib/Data/ZMod/Basic.lean`
+   の Module 節、`QuotientAddGroup.zmodModule` が `LinearAlgebra/FreeModule/ModN.lean`
+   で使われている) がある。⚠ instance にはできない設計なので `letI` で入れる。
+   ⚠ Isaacs の `A` は乗法群なので、`Additive A` を経由するか最初から加法で書くか要判断。
+2. **群自己同型 = `F₂`-線形自己同型**: 係数が `0, 1` だけなので加法性から線形性が自動。
+   `MulAut (Additive A) ≃* (A ≃ₗ[ZMod 2] A)` を手で作る。
+3. **基底で `GL(n,2)` へ**: `Module.Basis` を取り `(A ≃ₗ A) ≃* GL (Fin n) (ZMod 2)`。
+4. **`GL(n,2) = SL(n,2) = PSL(n,2)`**: `(ZMod 2)ˣ` が自明なので `det = 1` は自動、
+   スカラーも自明なので中心自明。
+5. repo の `isSimpleGroup_projectiveSpecialLinearGroup`
+   (`Ch08/PSLSimple.lean`、`[Nontrivial ι] (h : 3 ≤ Nat.card ι ∨ ∃ β ≠ 0, β² ≠ 1)`)
+   に `ι := Fin n`, `K := ZMod 2`, `Or.inl (3 ≤ n)` で載る。
+
+⚠ 見積り: 手順 2–4 の同型の連鎖が本体で、300 行規模になりうる。
+
+### 残り (2) 「⟹」方向
+
+`Aut(A)` 単純 ⟹ `|A| = 3` または初等可換 2-群 (位数 ≥ 8)。
+`A` を素冪成分に分解し、成分が 2 つ以上あれば `Aut(A)` は直積を含んで単純でない、
+`A` が巡回で `|A| = m` なら `Aut(A) ≅ (Z/m)ˣ` が可換で単純 ⟺ 素数位数 ⟹ `φ(m)` が素数
+… という場合分けになる。**未着手**。
+
+
+## §8D 進捗 (2026-07-27)
+
+leaf = `Problems8D/{SubdegreeTwo, DegreeEight}.lean` (188 / 213 行) + hub `Problems8D.lean`
+(`OddOrder.lean` 配線済)。
+
+* ✅ **8D.1** (`SubdegreeTwo.lean`): 原始的作用で長さ 2 の suborbit があれば
+  `α` 以外の suborbit はすべて長さ 2 (`ncard_orbit_eq_two_of_subdegree_eq_two`)。
+  再利用可能な部品: `mem_stabilizer_smul_iff` / **`isBlock_stabilizer_eq`**
+  (`{δ | G_δ = G_α}` は block) / `eq_bot_of_normal_of_le_stabilizer` /
+  `card_stabilizer_eq_two_of_subdegree_eq_two` (`|G_α| = 2`) /
+  **`stabilizer_eq_bot_of_ncard_orbit_eq_one`** (長さ 1 の suborbit ⟹ `G_α = ⊥`)。
+* ✅ **8D.2** (`DegreeEight.lean`): 次数 8 の原始置換群は 2-transitive
+  (`ncard_orbit_stabilizer_eq_of_card_eq_eight`, 各 suborbit の長さ = 7)。
+  長さ 1 → `G_α = ⊥` かつ極大で Cauchy と矛盾 / 長さ 2 → 8D.1 で `|G_α| = 2` かつ
+  固定点は `α` のみ ⟹ `8 ≡ 1 (mod 2)` (`IsPGroup.card_modEq_card_fixedPoints`) /
+  それ以外は長さ `≥ 3` が 2 つで `{3, 4}` に限られ, 互いに素なので **Thm 8.38**
+  (Weiss, `subdegree_eq_one_of_coprime_of_max`) が `3 = 1` を強いる。
+
+**次は 8D.3** (rank `r`, 最大 subdegree `n` なら `|G|` は `r`, `n` の関数で抑えられる) →
+8D.4/8D.5 (既存 `CommonDivisorGraph.lean` の `arrowKernel` / `k_m` を使う) → 8D.6。

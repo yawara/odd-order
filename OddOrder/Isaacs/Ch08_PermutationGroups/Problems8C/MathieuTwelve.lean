@@ -3,8 +3,6 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.GroupTheory.GroupAction.SubMulAction.OfStabilizer
-import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.PointStabilizers
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 
@@ -37,34 +35,6 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 namespace OddOrder.Isaacs.Ch08
 
 open MulAction
-
-section /- 点安定化群の補集合への作用 -/
-
-variable {G Ω : Type*} [Group G] [MulAction G Ω] [FaithfulSMul G Ω]
-
-/-- 点安定化群 `G_α` の `Ω ∖ {α}` への作用は忠実。 -/
-theorem faithfulSMul_ofStabilizer (α : Ω) :
-    FaithfulSMul ↥(stabilizer G α) ↥(SubMulAction.ofStabilizer G α) := by
-  refine ⟨fun {g h} hgh => ?_⟩
-  refine Subtype.ext (FaithfulSMul.eq_of_smul_eq_smul (α := Ω) fun β => ?_)
-  rcases eq_or_ne β α with rfl | hβ
-  · rw [mem_stabilizer_iff.mp g.2, mem_stabilizer_iff.mp h.2]
-  · exact congrArg Subtype.val
-      (hgh ⟨β, (SubMulAction.mem_ofStabilizer_iff G α).mpr hβ⟩)
-
-omit [FaithfulSMul G Ω] in
-/-- `Ω ∖ {α}` の濃度は `|Ω| - 1`。 -/
-theorem card_ofStabilizer [Finite Ω] (α : Ω) :
-    Nat.card ↥(SubMulAction.ofStabilizer G α) = Nat.card Ω - 1 := by
-  have h1 : Nat.card ↥(SubMulAction.ofStabilizer G α) = ({α}ᶜ : Set Ω).ncard := by
-    rw [← Nat.card_coe_set_eq]
-    exact Nat.card_congr (Equiv.subtypeEquivRight fun x => by
-      simp [SubMulAction.mem_ofStabilizer_iff])
-  have h2 := Set.ncard_add_ncard_compl ({α} : Set Ω)
-  rw [Set.ncard_singleton] at h2
-  omega
-
-end -- 点安定化群の補集合への作用
 
 section /- Problem 8C.3 本体 -/
 

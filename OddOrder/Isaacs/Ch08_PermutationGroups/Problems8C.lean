@@ -4,8 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.HigmanSims
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.AbelianAut
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuEleven
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuTwelve
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.MathieuTwentyFour
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.PrimeDegree
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleStabilizer
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.SimpleOrder120
@@ -24,6 +26,9 @@ topic 別 leaf にある (下流は本 module を import するだけでよい)�
 * `Problems8C/MathieuTwelve.lean` — **8C.3**: 次数 12 位数 95040 の推移置換群は単純 (`M₁₂`)。
 * `Problems8C/SimpleStabilizer.lean` — **8C.3 / 8C.4 共通**: 点安定化群が単純なら
   推移的な真の正規部分群は regular。
+* `Problems8C/MathieuTwentyFour.lean` — **8C.5**: 次数 24 の 5-transitive 群で
+  3 点安定化群が単純なら 2 点/1 点安定化群と `G` も単純 (`M₂₂`/`M₂₃`/`M₂₄`)。
 * `Problems8C/HigmanSims.lean` — **8C.4**: 次数 100, 点安定化群が単純で軌道長 22, 77 なら
   原始的かつ単純 (`HS`)。
+* `Problems8C/AbelianAut.lean` — **8C.6 の一部**: 位数 3 の群の自己同型群は単純。
 -/
