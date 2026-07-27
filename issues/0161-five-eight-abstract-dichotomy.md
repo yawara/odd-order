@@ -115,8 +115,45 @@ AxiomsCheck 登録済。full build green (4875 jobs)、lint --strict clean、sor
 > `μ_ℓ(1) = μ_k(1)`.
 
 survey が「直接の対応物なし (applications derive sign alignment by other proven routes)」と
-している部分。原文の証明は p.29 冒頭 (`04.7_pp_25_29_Coherence.txt` の "Suppose that there is
-an index ℓ > 1 such that ℓ ≠ j, ℓ ≠ k, μ_ℓ ∈ 𝒮 and …" 以降)。
+している部分。
+
+### 原文の証明 (p.29 冒頭) — OCR が崩れているので復元した読み
+
+生テキスト (`04.7_pp_25_29_Coherence.txt` L185–187):
+
+```
+Suppose that there is an index £ > 1 such that £ ^ j,£ ^ k, fit £ S and
+^(1) = /ik(l). By Theorem (4.9), ft - tf = 4£,(^ -«£). Since ff is a
+sum of elements of R(fJ>i), it follows that //£ = £*.£» ^ - a
+```
+
+復元:
+
+> `ℓ > 1`, `ℓ ≠ j`, `ℓ ≠ k`, `μ_ℓ ∈ 𝒮`, `μ_ℓ(1) = μ_k(1)` なる `ℓ` があるとせよ。
+> **Theorem (4.9)** より `μ_ℓ^{τ₁} − μ_k^{τ₁} = δ_k ∑_i (ω_{iℓ} − ω_{ik})^σ`。
+> `μ_ℓ^{τ₁}` は `R(μ_ℓ)` の元の和だから `μ_ℓ^{τ₁} = δ_k ∑_i ω_{iℓ}^σ`。
+
+⚠ **式は必ず PDF ページ画像で確定してから形式化すること** (p.29 = Peterfalvi の書籍ページ 29)。
+`pdftotext` は上付き・添字を落とすので `ω_{iℓ}` / `ω_{ik}` / `δ_k` の位置が信用できない
+([[pdftotext-drops-superscripts]] [[keep-cropped-pdf-page-images]])。
+切り出したら `references/peterfalvi/pages/peterfalvi-p029.png` に残すこと。
+
+### 論法の骨格 (第 2 の場合との矛盾)
+
+第 2 の場合は `μ_k^{τ₁} = −δ ∑_i ω_{ij}^σ`。上の (4.9) 差分等式と合わせると
+
+`μ_ℓ^{τ₁} = δ ∑_i ω_{iℓ}^σ − δ ∑_i ω_{ik}^σ − δ ∑_i ω_{ij}^σ`
+
+となり、これは **`3w₁` 個の正規直交元の符号つき和** ⟹ `‖μ_ℓ^{τ₁}‖² = 3w₁`。
+一方 `μ_ℓ^{τ₁}` は `R(μ_ℓ)` の部分和ゆえ `‖·‖² ≤ 2w₁` (というより `= w₁`)。矛盾。
+⟹ そのような `ℓ` は存在しない。
+
+### 材料 (着手前に実測で再確認すること)
+
+* (4.9) の列差分等長: `S06.dadeICM_columnDiff_eq_sum` (`S06_CertainTypeCoherence:613`) が
+  `τ(μ_j − μ_k) = ∑_p R-image` を与える。等次数条件は `hdeg` (= `μ_ℓ(1) = μ_k(1)`)。
+* 正規直交性: `certainTypeR ... |>.orthonormal` と `inner_self_sum_orthonormal_eq_card`。
+* 第 2 の場合の形: 本 issue で landing した `certainTypeR_subsum_dichotomy` の右分岐。
 
 ⚠ step 3 (抽象版を上流 leaf へ移設) は任意。現状 `S12_TypeIIColumnPin.lean` 内にあるが、
 型-II 依存はゼロなので S06/S07 側へ移せる。行数に余裕がなくなったら実施する。
