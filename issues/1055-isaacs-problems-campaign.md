@@ -3701,3 +3701,7 @@ API メモ: `Sylow.is_maximal'` / `Subgroup.map_subgroupOf_eq_of_le` /
 * 次: (2) `Z = ⟨negOneSL23⟩` が中心的・位数 2 ⟹ `|S/Z| = 12`、(3) `n_3(S/Z) = 4`
   (`n_3 = 1` なら `S` に位数 3 の正規部分群 ⟹ 位数 3 の元は全てそこに入り
   `transvectionA`/`B` に矛盾)、(5) 正規 Sylow 2 の引き戻しで位数 8。
+* ✅ 7A.2 (2) 完了: `centerZ = ⟨negOneSL23⟩` は正規 (`negOneSL23_mem_center` は
+  **`∀ g : SL23, g * (-I) = (-I) * g` を `decide` で判定**できる) で `|Z| = 2`、
+  ⟹ `natCard_quotient_centerZ : |SL(2,3)/Z| = 12`。
+  ⚠ `Subgroup.mem_center_iff.mp h g : g * a = a * g` (= `Commute g a`; `.symm` 不要)。

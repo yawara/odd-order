@@ -77,6 +77,46 @@ theorem transvectionB_notMem_zpowers_transvectionA :
   have hlt : m % 3 = 0 ∨ m % 3 = 1 ∨ m % 3 = 2 := by omega
   rcases hlt with h | h | h <;> rw [h] at hm <;> revert hm <;> decide
 
+/-! ### `Z = ⟨-I⟩` と商群 `S/Z` (位数 `12`) -/
+
+/-- `Z := ⟨-I⟩ ≤ SL(2,3)`。 -/
+abbrev centerZ : Subgroup SL23 := Subgroup.zpowers negOneSL23
+
+theorem orderOf_negOneSL23 : orderOf negOneSL23 = 2 := by
+  have hdvd : orderOf negOneSL23 ∣ 2 := orderOf_dvd_of_pow_eq_one negOneSL23_sq
+  rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h1 | h2
+  · exact absurd (orderOf_eq_one_iff.mp h1) negOneSL23_ne_one
+  · exact h2
+
+theorem natCard_centerZ : Nat.card ↥centerZ = 2 := by
+  rw [Nat.card_zpowers, orderOf_negOneSL23]
+
+/-- `-I` は `SL(2,3)` の中心元 (スカラー行列)。 -/
+theorem negOneSL23_mem_center : negOneSL23 ∈ Subgroup.center SL23 := by
+  refine Subgroup.mem_center_iff.mpr ?_
+  decide
+
+instance centerZ_normal : centerZ.Normal where
+  conj_mem n hn g := by
+    have hfix : ∀ x ∈ centerZ, g * x * g⁻¹ = x := by
+      intro x hx
+      obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp hx
+      have hcomm : Commute g negOneSL23 :=
+        Subgroup.mem_center_iff.mp negOneSL23_mem_center g
+      have hcx : Commute g x := by rw [← hm]; exact hcomm.zpow_right m
+      calc g * x * g⁻¹ = x * g * g⁻¹ := by rw [hcx.eq]
+        _ = x := by group
+    rw [hfix n hn]
+    exact hn
+
+/-- `|SL(2,3)/Z| = 12`。 -/
+theorem natCard_quotient_centerZ : Nat.card (SL23 ⧸ centerZ) = 12 := by
+  have h := Subgroup.card_mul_index centerZ
+  rw [natCard_centerZ, natCard_sl23] at h
+  have hidx : centerZ.index = 12 := by omega
+  have : Nat.card (SL23 ⧸ centerZ) = centerZ.index := rfl
+  rw [this, hidx]
+
 end
 
 end OddOrder.Isaacs.Ch07
