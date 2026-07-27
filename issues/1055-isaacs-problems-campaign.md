@@ -4997,3 +4997,40 @@ PDF ページ画像で文言を確定すること)。
 (38k、`subdegree_gap_le` / `subdegree_eq_one_of_coprime_of_max` 等) と
 `OrbitalGraph.lean` / `Orbitals.lean` を実測で確認し, `k_m` (Thm 8.42 直前の定義) と
 `m`-arrow が既に形式化されているかを見ること。
+
+
+## 8C.6 の設計 (2026-07-27, 部品の所在まで確定)
+
+`Aut(A)` 単純 ⟺ `|A| = 3` または `A` が位数 8 以上の初等可換 2-群。
+
+### landing 済
+
+* `isSimpleGroup_mulAut_of_card_eq_three` (`Problems8C/AbelianAut.lean`):
+  「⟸」の第 1 ケース (`|A| = 3` ⟹ `|Aut(A)| = φ(3) = 2` で素数位数)。
+
+### 残り (1) 「⟸」初等可換 2-群のケース
+
+`A` が位数 `2^n` (`n ≥ 3`) の初等可換 2-群 ⟹ `Aut(A) ≅ GL(n,2)` が単純。連鎖:
+
+1. **`Module (ZMod 2) A`**: mathlib に `AddCommGroup.zmodModule`
+   (`∀ x, n • x = 0` から `Module (ZMod n) G` を作る; `Mathlib/Data/ZMod/Basic.lean`
+   の Module 節、`QuotientAddGroup.zmodModule` が `LinearAlgebra/FreeModule/ModN.lean`
+   で使われている) がある。⚠ instance にはできない設計なので `letI` で入れる。
+   ⚠ Isaacs の `A` は乗法群なので、`Additive A` を経由するか最初から加法で書くか要判断。
+2. **群自己同型 = `F₂`-線形自己同型**: 係数が `0, 1` だけなので加法性から線形性が自動。
+   `MulAut (Additive A) ≃* (A ≃ₗ[ZMod 2] A)` を手で作る。
+3. **基底で `GL(n,2)` へ**: `Module.Basis` を取り `(A ≃ₗ A) ≃* GL (Fin n) (ZMod 2)`。
+4. **`GL(n,2) = SL(n,2) = PSL(n,2)`**: `(ZMod 2)ˣ` が自明なので `det = 1` は自動、
+   スカラーも自明なので中心自明。
+5. repo の `isSimpleGroup_projectiveSpecialLinearGroup`
+   (`Ch08/PSLSimple.lean`、`[Nontrivial ι] (h : 3 ≤ Nat.card ι ∨ ∃ β ≠ 0, β² ≠ 1)`)
+   に `ι := Fin n`, `K := ZMod 2`, `Or.inl (3 ≤ n)` で載る。
+
+⚠ 見積り: 手順 2–4 の同型の連鎖が本体で、300 行規模になりうる。
+
+### 残り (2) 「⟹」方向
+
+`Aut(A)` 単純 ⟹ `|A| = 3` または初等可換 2-群 (位数 ≥ 8)。
+`A` を素冪成分に分解し、成分が 2 つ以上あれば `Aut(A)` は直積を含んで単純でない、
+`A` が巡回で `|A| = m` なら `Aut(A) ≅ (Z/m)ˣ` が可換で単純 ⟺ 素数位数 ⟹ `φ(m)` が素数
+… という場合分けになる。**未着手**。
