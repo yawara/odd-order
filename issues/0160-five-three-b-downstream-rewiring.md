@@ -67,6 +67,21 @@ S13.memberRFamily … hχ |>.imageSet = (S06.memberR … hχ).imageSet
 
 ⚠ 下流は**書き換えない** — bridge は関係の記録であって、置換ではない。
 
+### bridge の部品表 (2026-07-27 実測、全て所在確認済)
+
+| 同定すべきもの | 部品 | 状態 |
+|---|---|---|
+| **符号** `params.delta` ↔ `(columnFamily χ₂).sign` | `S12.Hypothesis.muColumnSign_eq_columnFamily_sign` (`S12_Section9Counts.lean`) — `muColumnSign j = (toHypothesis46.columnFamily (muColumnChar j)).sign` | ✅ **本日 landing、`rfl` で通った** (両者が同じ `finCardEquivCharacterGroup` reindex の二つ半分ゆえ定義的)。あとは `hδj` を噛ませるだけ |
+| **σ-grid** `alignedOmegaSigmaGrid i j` ↔ `certainTypeOmegaSigma h46 (muColumnChar j) i` | `S13.certainTypeOmegaSigma_muColumnChar_eq_aligned` (`S13_Orthogonality.lean:298`) | ✅ 既存 |
+| **行添字** `Fin hyp.w1` ↔ `Fin (Nat.card h46.W1)` | `finCongr hcw1` (上記 bridge が既にこの形) | ✅ |
+| **列添字** `j` ↔ `χ₂` | `S12.Hypothesis.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum` (`S12_HcBound.lean:587`) + `S06.columnSum_injective` (0159 で新設) | ✅ |
+| **共役列** `j'` ↔ `χ₂⁻¹` | `colRFamily` の `hconj : (∑ᵢ μ_{ij}).conj = ∑ᵢ μ_{ij'}` に `S06.columnSum_conj_eq` + `columnSum_injective` を当てる | ✅ 材料あり |
+| 二つの `Bool × Fin` 像の一致 | `S12.Hypothesis.columnRImage` (`Isometry106.lean:1204`) と `S06.certainTypeRImage` (`S06_CertainTypeCoherence.lean:581`) は**同じ形** (`(false,i) ↦ δ•ω_{ij}`, `(true,i) ↦ −δ•ω_{ij'}`) | ✅ 上 4 つを入れれば一致 |
+
+⟹ **残りは `imageSet` (= `Finset.univ.image …`) の一致を、`Fin` の再添字づけ全単射に沿って
+示す組み立てだけ**。既約分岐は両者とも `dadeOrthonormalCharacterImageFamilyOfDiff` で
+proof-irrelevance により自明に一致する。
+
 ## 完了条件
 
 重複が実際に減る (個別証明が一般版の呼び出しに置換される) こと。build green +
