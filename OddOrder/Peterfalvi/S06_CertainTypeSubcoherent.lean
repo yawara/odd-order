@@ -283,6 +283,43 @@ theorem memberR_imageSet_of_not_irreducible [NeZero (Nat.card h.W1)]
       = (certainTypeR h hχ₂ (columnSum_inv_apply_one h χ₂).symm).imageSet :=
   inducedR_imageSet_of_not_irreducible h _ _ _ _ hirr hχ₂ hcol
 
+/-! ### The anchor: `(χ − χ̄)^τ` vanishes on the exceptional set `V` -/
+
+/-- **Peterfalvi (5.3)(b), the anchor** (p. 26: "By the definition of `τ`, `(φ − φ̄)^τ` vanishes
+on `V`").
+
+For a class function `α` of `L` that is `A₀`-supported and vanishes off `K`, the (4.6) Dade image
+`α^τ` vanishes at every `v ∈ V = W ∖ (W₁ ∪ W₂)`.
+
+Proof, exactly the book's one line: `V ⊆ A₀` (the `V^L` half of `A₀`, conjugator `1`), so `v` is a
+Dade **base point** and the explicit (2.5) evaluation `dadeValue_eq` (witness `a = v`, `h = 1`)
+gives `α^τ(v) = α(v)`; and `α(v) = 0` because `v` is not even `G`-conjugate into `K`
+(`ticVdiffV_not_mem_conjugatesOfSet_K`, a Hypothesis (4.6)-level fact).
+
+This replaces, at (4.6) generality, the three separately proved instances of the anchor — Sibley
+`S08.tau_apply_eq_zero_of_mem_ticVdiffV`, type-P `S13.tau_apply_eq_zero_of_mem_typePV` and type-II
+`S12.typeII_tau_apply_eq_zero_of_mem_ticVdiffV`. -/
+theorem dadeICM_apply_eq_zero_of_mem_ticVdiffV (h : Hypothesis46 A L)
+    {α : ClassFunction ↥L ℂ}
+    (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L)
+    (hαK : ∀ z : ↥L, z ∉ h.K → α z = 0)
+    {v : G} (hv : v ∈ (ticVdiff h).V) :
+    S07.dadeIntegralCharacterMap h.dade0 h.tau α v = 0 := by
+  classical
+  -- `V = W ∖ (W₁ ∪ W₂)` is the ambient `(3.1)` exceptional set, hence sits in `A₀`
+  have hvV : v ∈ h.tic.V := by rw [h.tic_V]; exact hv
+  have hvA0 : v ∈ A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V :=
+    Or.inr ⟨v, hvV, 1, L.one_mem, by group⟩
+  -- base-point evaluation of the explicit (2.5) Dade map
+  rw [S07.dadeIntegralCharacterMap_apply_of_support h.dade0 _ hαsupp,
+    OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_apply,
+    h.dade0.dadeValue_eq _ (a := ⟨v, hvA0⟩) (Subgroup.one_mem _) (by rw [mul_one])]
+  -- `α(v) = 0`: `v` is not `G`-conjugate into `K`, a fortiori not in `K`
+  refine hαK _ fun hmem => ?_
+  exact OddOrder.Peterfalvi.S08.ticVdiffV_not_mem_conjugatesOfSet_K h hv
+    (Group.subset_conjugatesOfSet (Subgroup.mem_map_of_mem _ hmem))
+
 open scoped Classical in
 /-- **Peterfalvi (5.3)(b)** (p. 26): Hypothesis (5.2) holds for a family of induced characters.
 
@@ -381,6 +418,116 @@ noncomputable def toGeneralHypothesis [NeZero (Nat.card h.W1)]
         exact certainTypeR_imageSet_orthogonal_certainTypeR h hne hne'
           (columnSum_inv_apply_one h χ₂).symm (columnSum_inv_apply_one h χ₂').symm
           hd1 hd2 α hα β hβ
+/-! ### The book's family, and (5.3)(b) with no side hypotheses -/
+
+variable [Invertible (Nat.card ↥h.K : ℂ)]
+
+/-- **The (4.7)/(5.3)(b) induction family** `{Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}` (Peterfalvi
+p. 26).  This is the family Theorem (4.7) is stated for, and the one (5.3)(b) assumes `𝒮` sits
+inside.
+
+It differs from `S08.inducedKernelFamily h.K ⊥` — which only asks `θ ≠ 1_K` — by demanding the
+*stronger* nontriviality `H ⊄ Ker θ` on the (4.6.c) normal subgroup `H`.  That is exactly what
+buys the (4.7) support conclusion `Supp(Ind_K^L θ) ⊆ A ∪ {1}`, hence both the `A`-supportedness
+of `χ − χ̄` and the anchor. -/
+def inducedNonKernelFamily : Set (ClassFunction ↥L ℂ) :=
+  {φ | ∃ θ : IrreducibleCharacter ↥h.K,
+    ¬ ((h.subH.subgroupOf h.K : Set ↥h.K) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥h.K ℂ)) ∧
+    φ = ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ)}
+
+/-- The book's family sits inside the `θ ≠ 1_K` family: the trivial character has kernel all of
+`K ⊇ H`, so `H ⊄ Ker θ` forces `θ ≠ 1_K`. -/
+theorem inducedNonKernelFamily_subset_inducedKernelFamily :
+    inducedNonKernelFamily h ⊆ OddOrder.Peterfalvi.S08.inducedKernelFamily h.K ⊥ := by
+  rintro φ ⟨θ, hker, rfl⟩
+  refine ⟨θ, ?_, ?_, rfl⟩
+  · rintro rfl
+    refine hker ?_
+    rw [IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+      OddOrder.Peterfalvi.S03.characterKernel_trivialClassFunction]
+    exact Set.subset_univ _
+  · intro x hx
+    rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_bot] at hx
+    rw [show x = 1 from Subtype.ext hx]
+    exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+
+/-- Members of the book's family vanish off `K`: they are induced from the *normal* subgroup
+`K ⊴ L` (`induce_apply_eq_zero_of_not_mem_normal`). -/
+theorem inducedNonKernelFamily_apply_eq_zero_of_not_mem
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ inducedNonKernelFamily h)
+    {z : ↥L} (hz : z ∉ h.K) : φ z = 0 := by
+  obtain ⟨θ, -, rfl⟩ := hφ
+  haveI := h.K_normal
+  exact ClassFunction.induce_apply_eq_zero_of_not_mem_normal h.K _ hz
+
+/-- **Peterfalvi (4.7), difference form**: for a member `φ` of the book's family the conjugate
+difference `φ̄ − φ` is `A`-supported.
+
+(4.7) gives `Supp φ ⊆ A ∪ {1}`
+(`induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel`), and conjugation does not
+move supports; the point `1` drops out because `φ(1) = [L:K]·θ(1)` is a
+positive rational integer (`induce_apply_one`), hence fixed by conjugation. -/
+theorem inducedNonKernelFamily_conjDiff_support_subset
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ inducedNonKernelFamily h) :
+    (φ.conj - φ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L := by
+  obtain ⟨θ, hker, rfl⟩ := hφ
+  intro z hz
+  rw [ClassFunction.mem_support] at hz
+  by_contra hzA
+  refine hz ?_
+  rcases eq_or_ne z 1 with rfl | hz1
+  · -- at `1` the difference vanishes: the degree is a positive integer
+    obtain ⟨d, -, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    rw [ClassFunction.sub_apply, ClassFunction.conj_apply,
+      ClassFunction.induce_apply_one, hd]
+    simp
+  · -- off `1`, (4.7) makes both `φ` and `φ̄` vanish
+    have hzero : ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ) z = 0 :=
+      induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel h.toCore θ hker
+        (by
+          rw [Set.mem_union, Set.mem_singleton_iff, not_or]
+          exact ⟨by rwa [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hzA,
+            fun hcon => hz1 (Subtype.ext hcon)⟩)
+    rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hzero, star_zero, sub_zero]
+
+open scoped Classical in
+/-- **Peterfalvi (5.3)(b), book statement** (p. 26): under Hypothesis (4.6) and (5.2.a)/(5.2.c),
+a family `𝒮 ⊆ {Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}` satisfies Hypothesis (5.2), with `τ` the
+Hypothesis (4.6) Dade isometry.
+
+No side hypotheses beyond the book's: the two inputs that `toGeneralHypothesis` takes explicitly
+are supplied here from (4.7) —
+
+* `hdiffsupp` is `inducedNonKernelFamily_conjDiff_support_subset` (the `Supp(χ − χ̄) ⊆ A` of the
+  book's proof, widened to `A₀`);
+* the anchor `hvanish` is `dadeICM_apply_eq_zero_of_mem_ticVdiffV` fed that supportedness together
+  with the vanishing of the members off `K` — the book's "by the definition of `τ`,
+  `(φ − φ̄)^τ` vanishes on `V`".
+
+`toGeneralHypothesis` remains the parametrized engine: it works for the larger `θ ≠ 1_K` family
+whenever a caller can supply those two inputs by another route. -/
+noncomputable def toGeneralHypothesisOfInducedFamily [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (hSsub : S ⊆ inducedNonKernelFamily h)
+    (hconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S)
+    (hnoreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters S)
+    (hortho : OddOrder.Peterfalvi.S03.PairwiseOrthogonal S) :
+    S07.GeneralHypothesis (L := ↥L) (G := G) S (supportSet h) :=
+  toGeneralHypothesis h
+    (fun _ hχ => inducedNonKernelFamily_subset_inducedKernelFamily h (hSsub hχ))
+    hconj hnoreal hortho
+    (fun _ hχ => (inducedNonKernelFamily_conjDiff_support_subset h (hSsub hχ)).trans
+      (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left))
+    (fun χ hχ _ v hv => by
+      refine dadeICM_apply_eq_zero_of_mem_ticVdiffV h ?_ ?_ hv
+      · rw [show χ - χ.conj = -(χ.conj - χ) by abel, ClassFunction.support_neg]
+        exact (inducedNonKernelFamily_conjDiff_support_subset h (hSsub hχ)).trans
+          (OddOrder.Peterfalvi.S04.supportInSubgroup_mono Set.subset_union_left)
+      · intro z hz
+        rw [ClassFunction.sub_apply, ClassFunction.conj_apply,
+          inducedNonKernelFamily_apply_eq_zero_of_not_mem h (hSsub hχ) hz, star_zero, sub_zero])
 
 end
 

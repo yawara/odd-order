@@ -210,7 +210,30 @@ sorry-free・axiom-clean で landing すること。build green + lint --strict 
 5. 付随して **`S06.columnSum_injective` を (4.6) レベルで新設**し、既存の
    `S12.Hypothesis.columnSum_injective` を**その特殊化に置換**した (特殊化債務の解消)。
 
-### ⚠ 残る 1 点 — anchor `hvanish` は書籍の statement に無い追加仮説
+### ✅ 追記 (同日): anchor も (4.6) レベルで導出でき、書籍強度版が landing した
+
+⚠ 下記「残る 1 点」は**同じ tick 内で解消**した。原文 (p. 26) を PDF text で読み直したところ、
+族の条件は `𝒮 ⊆ {Ind_K^L θ | θ ∈ Irr K, **H ⊄ Ker θ**}` = **(4.7) の族**であり
+(`inducedKernelFamily h.K ⊥` の `θ ≠ 1_K` より強い)、証明本文も
+
+> By (4.7), Supp((φ − φ̄)) ⊆ A. By the definition of τ, (φ − φ̄)^τ vanishes on V.
+
+と、anchor を (4.7) から**導いて**いた。⟹ 実装:
+
+* `inducedNonKernelFamily` — 書籍の族 `{Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}`
+* `inducedNonKernelFamily_conjDiff_support_subset` — (4.7) の差分形 `Supp(χ̄ − χ) ⊆ A`
+  (1 での消滅は `induce_apply_one` で次数が正整数だから)
+* **`dadeICM_apply_eq_zero_of_mem_ticVdiffV`** — **anchor を (4.6) レベルで証明**。
+  `V ⊆ A₀` ゆえ `v` は Dade base point ⟹ (2.5) 評価 `dadeValue_eq` (witness `a = v`, `h = 1`) で
+  `α^τ(v) = α(v)`、そして `v` は `K` に共役でない (`ticVdiffV_not_mem_conjugatesOfSet_K`) ので
+  `α(v) = 0`。⟹ 既存 3 サイト (Sibley §8 / type-P §13 / type-II §12) の個別証明の一般化。
+* **`toGeneralHypothesisOfInducedFamily`** — **書籍 statement そのもの**。追加仮説は無く
+  (5.2.a)/(5.2.c) のみ。`toGeneralHypothesis` は「2 入力を別ルートで供給できる呼び出し元」向けの
+  parametrized engine として残す。
+
+以下は解消前の記録 (経緯として保持):
+
+### ⚠ (解消済) anchor `hvanish` は書籍の statement に無い追加仮説
 
 `toGeneralHypothesis` は次を仮説として取る:
 

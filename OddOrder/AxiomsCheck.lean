@@ -13218,3 +13218,16 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   OddOrder.Peterfalvi.S06.exists_ne_one_induce_eq_columnSum
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S06.columnSum_injective
+-- **(5.3)(b) at book strength** (issue 0159, second pass): over the book's own family
+-- `{Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}` the two inputs of `toGeneralHypothesis` are *derived*, so
+-- the statement carries no hypothesis beyond (5.2.a)/(5.2.c).  `Supp(χ − χ̄) ⊆ A` is Peterfalvi
+-- (4.7); the anchor is `dadeICM_apply_eq_zero_of_mem_ticVdiffV`, the book's "by the definition of
+-- τ, (φ − φ̄)^τ vanishes on V" — `V ⊆ A₀` makes `v` a Dade base point, so the (2.5) evaluation
+-- gives `α^τ(v) = α(v) = 0` since `v` is not `G`-conjugate into `K`.  That anchor is the (4.6)-level
+-- generalization of the three per-site instances (Sibley §8 / type-P §13 / type-II §12).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.toGeneralHypothesisOfInducedFamily
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.dadeICM_apply_eq_zero_of_mem_ticVdiffV
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.inducedNonKernelFamily_conjDiff_support_subset
