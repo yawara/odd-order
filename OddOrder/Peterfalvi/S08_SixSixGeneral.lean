@@ -543,6 +543,36 @@ theorem exists_primePow_degree_ratio_of_xBaseBlock_anchor
   congr 2
   omega
 
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
+/-- **The anchor-generation condition `hSgen`.**  If every member of `S₁` has degree a natural
+multiple of the anchor's, then `ℤ[S₁] ≤ ℤ⟨ℤ[S₁, A₀] ∪ {χ₁}⟩`: write `φ = (φ − d·χ₁) + d·χ₁`,
+where the bracket is `K^#`-supported by `inducedKernelFamily_scaledDiff_support` (matching degrees)
+and hence lies in `ℤ[S₁, A₀]`.
+
+This is the `hSgen` input of `xAdjoinStep_of_degreeRatios`; in the (6.6) application the degree
+multiples are the `p`-powers of `exists_primePow_degree_ratio_of_xBaseBlock_anchor`. -/
+theorem span_le_span_zSupportedSpan_union_anchor {A₀ : Set ↥L}
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ inducedKernelFamily K ⊥)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ S₁)
+    (hratio : ∀ φ ∈ S₁, ∃ d : ℕ, φ 1 = (d : ℂ) * χ₁ 1) :
+    Submodule.span ℤ S₁ ≤ Submodule.span ℤ
+      (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁ A₀ ∪ {χ₁}) := by
+  rw [Submodule.span_le]
+  intro φ hφ
+  obtain ⟨d, hd⟩ := hratio φ hφ
+  have hdiff : (φ - d • χ₁ : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁ A₀ :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hφ)
+      (nsmul_mem (Submodule.subset_span hχ₁) _),
+     inducedKernelFamily_scaledDiff_support hKsupp (hS₁sub hφ) (hS₁sub hχ₁) hd⟩
+  have hsplit : φ = (φ - d • χ₁ : ClassFunction ↥L ℂ) + d • χ₁ := by abel
+  rw [hsplit]
+  refine Submodule.add_mem _
+    (Submodule.subset_span (Set.mem_union_left _ hdiff))
+    (nsmul_mem (Submodule.subset_span (Set.mem_union_right _ ?_)) _)
+  exact Set.mem_singleton _
+
 /-! ### The `(6.6)` per-step adjoining, `τ`-general (issue 0155 step 4) -/
 
 open scoped Classical in

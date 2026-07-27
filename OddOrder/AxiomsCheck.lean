@@ -3841,6 +3841,11 @@ set_option linter.style.longLine false in
 -- `hratio`/`hχratio` inputs below (and `ha1 : deg i₁ = 1` at `χ = χ₁`).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.exists_primePow_degree_ratio_of_xBaseBlock_anchor
+-- The `hSgen` anchor-generation condition: if every member of `S₁` has degree a natural multiple
+-- of the anchor's, then `ℤ[S₁] ≤ ℤ⟨ℤ[S₁, A₀] ∪ {χ₁}⟩` — split `φ = (φ − d·χ₁) + d·χ₁`, the
+-- bracket being `K^#`-supported because the degrees match.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.span_le_span_zSupportedSpan_union_anchor
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xAdjoinStep_of_degreeRatios
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
