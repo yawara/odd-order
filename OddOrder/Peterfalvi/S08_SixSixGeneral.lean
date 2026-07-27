@@ -775,4 +775,253 @@ noncomputable def xAdjoinStep_of_degreeRatios {A₀ : Set ↥L}
         (⟨χ, hirr χ hχX⟩ : IrreducibleCharacter ↥L))
       hchi1_ne h1A
 
+/-! ### Structural helpers for one X-chain step -/
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- The running accumulator is closed under conjugation: the base block is
+(`xBaseBlock_closedUnderConjugate`), and every adjoined `pairSet pair j = {χⱼ, χ̄ⱼ}` is by
+construction a conjugate pair.  This is the `hS₁conj` input of `xAdjoinStep_of_degreeRatios`. -/
+theorem pairUnion_closedUnderConjugate {Z : Subgroup ↥L}
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L} (hi : i ≤ N)
+    (hpair0 : ∀ j, j < N → (pair j).1 = (χs j : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ j, j < N → (pair j).2 = (χs j : ClassFunction ↥L ℂ).conj) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i) := by
+  intro φ hφ
+  rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hφ with hbase | ⟨j, hji, hjpair⟩
+  · exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr
+      (Or.inl (xBaseBlock_closedUnderConjugate (K := K) Z hbase))
+  · have hjN : j < N := lt_of_lt_of_le hji hi
+    refine OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inr ⟨j, hji, ?_⟩)
+    simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff, Set.mem_singleton_iff]
+      at hjpair ⊢
+    rcases hjpair with h | h
+    · exact Or.inr (by rw [h, hpair0 j hjN, hpair1 j hjN])
+    · exact Or.inl (by rw [h, hpair1 j hjN, hpair0 j hjN]; simp)
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- The minimal-degree base block of a nonempty `𝒳` is nonempty. -/
+theorem xBaseBlock_nonempty {Z : Subgroup ↥L} (hXne : (xSet K Z).Nonempty) :
+    (xBaseBlock K Z).Nonempty := by
+  obtain ⟨χ, hχX, hχmin⟩ := Set.exists_min_image (xSet K Z)
+    (fun ψ => (OddOrder.Peterfalvi.S03.characterDegree ψ).re) (xSet_finite (K := K) Z) hXne
+  exact ⟨χ, hχX, hχmin⟩
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] [K.Normal] in
+/-- An `𝒳`-member *outside* the minimal-degree base block has degree **strictly** larger than a
+base-block anchor's: it is `≥` by minimality, and equality would put it in the base block.  This is
+the `hlt` input of the (5.6) degree bookkeeping. -/
+theorem natDegree_lt_of_xBaseBlock_anchor_of_notMem {Z : Subgroup ↥L}
+    {χ₁ χ : ClassFunction ↥L ℂ} {d₁ d : ℕ}
+    (hχ₁base : χ₁ ∈ xBaseBlock K Z) (hχX : χ ∈ xSet K Z) (hχnotbase : χ ∉ xBaseBlock K Z)
+    (hχ₁one : χ₁ 1 = (d₁ : ℂ)) (hχone : χ 1 = (d : ℂ)) :
+    d₁ < d := by
+  have hle : d₁ ≤ d := natDegree_le_of_xBaseBlock_anchor (K := K) hχ₁base hχX hχ₁one hχone
+  have hne : d₁ ≠ d := by
+    intro hEq
+    refine hχnotbase ⟨hχX, fun ψ hψ => ?_⟩
+    have h1 : (OddOrder.Peterfalvi.S03.characterDegree χ).re = (d : ℝ) := by
+      rw [OddOrder.Peterfalvi.S03.characterDegree_def, hχone]; simp
+    have h2 : (OddOrder.Peterfalvi.S03.characterDegree χ₁).re = (d₁ : ℝ) := by
+      rw [OddOrder.Peterfalvi.S03.characterDegree_def, hχ₁one]; simp
+    have hmin := hχ₁base.2 ψ hψ
+    rw [h2, hEq, ← h1] at hmin
+    exact hmin
+  omega
+
+/-! ### Peterfalvi (6.6), coherence half, for a general kernel -/
+
+open scoped Classical in
+/-- **Peterfalvi (6.6), coherence half, for a general kernel `K`** (pp. 31–32):
+
+> Let `Z` be a normal subgroup of `L` with `1 ≠ Z ⊆ Z(K)` and `𝒳 = 𝒮 − 𝒮(Z) ⊆ Irr L`.
+> Then `𝒳` is coherent.
+
+This is the general-kernel, `τ`-general form of the Sibley `K = H` instance
+`S08_CoherenceBasic.Xset_isCoherent_of_irreducible_X`, whose `τ` is pinned to the Dade map.  The
+proof is the book's:
+
+* the base block `𝒮₀` of minimal-degree members is coherent by (5.7) (`xBaseBlock_isCoherent`);
+* conjugate pairs of strictly larger degree are adjoined one at a time along the degree-sorted
+  cover (`xSet_isCoherent_of_adjoinSteps`), each step by (5.6)
+  (`xAdjoinStep_of_degreeRatios`);
+* the (5.6) hypothesis `2a < ∑ deg²` at each step comes from the p. 32 divisibility argument:
+  every member has degree `|L:K|·p^k`, so all degree ratios over the anchor are `p`-powers; the
+  degree-square sum over `𝒳` is `|L:K|·(|K| − |K:Z|)` (`sum_re_sq_xSet_eq`), the tail members have
+  degree at least the adjoined one (`characterDegree_re_le_of_notMem_pairUnion`), and [Is] Cor 2.30
+  against the **central** `Z` bounds the source degree by `θ(1)² ≤ |K:Z|`
+  (`exists_source_primePow_centralBound_of_mem_xSet`) — whence `χ(1)² ∣ D` and the gap.
+
+The hypotheses beyond `𝒳 ⊆ Irr L` are exactly the (6.4)/(6.5) context: `K` is a `p`-group for an
+odd prime `p` coprime to `|L:K|` (which `L = K ⋊ W₁` supplies), and `Z ⊆ Z(K)`.  Centrality is
+essential — the [Is] Cor 2.30 bound, hence the whole divisibility argument, fails at `Z = [K,K]`. -/
+noncomputable def xSet_isCoherent_of_irreducible_X {A₀ : Set ↥L}
+    (RD : InducedFamilyImageData A₀ K) (hodd : Odd (Nat.card ↥L))
+    (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hKp : IsPGroup p ↥K)
+    (hidx_p : Nat.Coprime K.index p)
+    {Z : Subgroup ↥L} [Z.Normal] (hZcentral : Z.subgroupOf K ≤ Subgroup.center ↥K)
+    (hirr : ∀ φ ∈ xSet K Z, IsIrreducibleCharacter φ) (hXne : (xSet K Z).Nonempty) :
+    OddOrder.Peterfalvi.S07.IsCoherent RD.tau (xSet K Z) A₀ := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : Fintype ↥K := Fintype.ofFinite _
+  have hidxpos : 0 < K.index := Nat.pos_of_ne_zero K.index_ne_zero_of_finite
+  have hp1 : 1 < p := hp.one_lt
+  -- (1) the `p`-power exponent of every `𝒳`-degree
+  have hdegtot : ∀ φ : ClassFunction ↥L ℂ, ∃ k : ℕ,
+      φ ∈ xSet K Z → φ 1 = ((K.index * p ^ k : ℕ) : ℂ) := by
+    intro φ
+    by_cases hφ : φ ∈ xSet K Z
+    · obtain ⟨k, hk⟩ := exists_index_primePow_degree_of_mem_inducedKernelFamily (K := K) hp hKp
+        (xSet_subset (K := K) Z hφ)
+      exact ⟨k, fun _ => hk⟩
+    · exact ⟨0, fun h => absurd h hφ⟩
+  choose e he using hdegtot
+  -- (2) a base-block anchor minimises the exponent, so all degree ratios over it are `p`-powers
+  have hexp_anchor : ∀ χ₁ ∈ xBaseBlock K Z, ∀ φ ∈ xSet K Z, e χ₁ ≤ e φ := by
+    intro χ₁ h1 φ hφ
+    have hle := natDegree_le_of_xBaseBlock_anchor (K := K) h1 hφ
+      (he χ₁ (xBaseBlock_subset (K := K) Z h1)) (he φ hφ)
+    exact (Nat.pow_le_pow_iff_right hp1).mp (Nat.le_of_mul_le_mul_left hle hidxpos)
+  have hratio_gen : ∀ χ₁ ∈ xBaseBlock K Z, ∀ φ ∈ xSet K Z,
+      φ 1 = ((p ^ (e φ - e χ₁) : ℕ) : ℂ) * χ₁ 1 := by
+    intro χ₁ h1 φ hφ
+    have hle := hexp_anchor χ₁ h1 φ hφ
+    rw [he φ hφ, he χ₁ (xBaseBlock_subset (K := K) Z h1), ← Nat.cast_mul]
+    congr 1
+    rw [← mul_assoc, mul_comm (p ^ (e φ - e χ₁)) K.index, mul_assoc, ← pow_add]
+    congr 2
+    omega
+  -- (3) the degree-square sum `total = |L:K|·(|K| − |K:Z|)` and its `p`-power divisor `|K:Z|`
+  have hqdvdK : Nat.card (↥K ⧸ Z.subgroupOf K) ∣ Nat.card ↥K := by
+    rw [← (Z.subgroupOf K).index_eq_card]
+    exact (Z.subgroupOf K).index_dvd_card
+  choose nK hcardK using hKp.exists_card_eq
+  choose mq hmqle hqpow using (Nat.dvd_prime_pow hp).mp (hcardK ▸ hqdvdK)
+  have hqle : Nat.card (↥K ⧸ Z.subgroupOf K) ≤ Nat.card ↥K := Nat.le_of_dvd Nat.card_pos hqdvdK
+  have hqdvdtot : Nat.card (↥K ⧸ Z.subgroupOf K) ∣
+      K.index * (Nat.card ↥K - Nat.card (↥K ⧸ Z.subgroupOf K)) :=
+    (Nat.dvd_sub hqdvdK dvd_rfl).mul_left K.index
+  have hcq : K.index * (Nat.card ↥K - Nat.card (↥K ⧸ Z.subgroupOf K)) =
+      Nat.card (↥K ⧸ Z.subgroupOf K) *
+        (K.index * (Nat.card ↥K - Nat.card (↥K ⧸ Z.subgroupOf K)) /
+          Nat.card (↥K ⧸ Z.subgroupOf K)) :=
+    (Nat.mul_div_cancel' hqdvdtot).symm
+  have hXsumReal : ∑ φ ∈ xSetFinset K Z, ((K.index * p ^ e φ : ℕ) : ℝ) ^ 2 =
+      ((K.index * (Nat.card ↥K - Nat.card (↥K ⧸ Z.subgroupOf K)) : ℕ) : ℝ) := by
+    have hcast : ((K.index * (Nat.card ↥K - Nat.card (↥K ⧸ Z.subgroupOf K)) : ℕ) : ℝ) =
+        (K.index : ℝ) * ((Nat.card ↥K : ℝ) - (Nat.card (↥K ⧸ Z.subgroupOf K) : ℝ)) := by
+      push_cast [Nat.cast_sub hqle]; ring
+    rw [hcast, ← sum_re_sq_xSet_eq (K := K) Z hirr]
+    refine Finset.sum_congr rfl fun φ hφ => ?_
+    rw [he φ (mem_xSetFinset.mp hφ), Complex.natCast_re]
+  -- (4) fold the X-chain: base coherence plus one (5.6) adjoining per step
+  refine xSet_isCoherent_of_adjoinSteps (K := K) hodd hirr hXne
+    (xBaseBlock_isCoherent RD hodd hKsupp h1A hirr hXne) ?_
+  intro pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi hcoh
+  have hS₁X : OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i ⊆ xSet K Z :=
+    pairUnion_subset_xSet (K := K) hi.le hpairs
+  have hS₁sub : OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i ⊆
+      inducedKernelFamily K ⊥ := hS₁X.trans (xSet_subset (K := K) Z)
+  -- the adjoined pair `{χ, χ̄}`
+  have hχpair : (χs i : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair i := by
+    simp [OddOrder.Peterfalvi.S07.pairSet, hpair0 i hi]
+  have hχbarpair : (χs i : ClassFunction ↥L ℂ).conj ∈
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair i := by
+    simp [OddOrder.Peterfalvi.S07.pairSet, hpair1 i hi]
+  have hχX : (χs i : ClassFunction ↥L ℂ) ∈ xSet K Z := hpairs i hi hχpair
+  have hχS₁ : (χs i : ClassFunction ↥L ℂ) ∉
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i :=
+    fun h => (Set.disjoint_left.mp (hdisj i hi)) hχpair h
+  have hχbarS₁ : (χs i : ClassFunction ↥L ℂ).conj ∉
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i :=
+    fun h => (Set.disjoint_left.mp (hdisj i hi)) hχbarpair h
+  have hχnotbase : (χs i : ClassFunction ↥L ℂ) ∉ xBaseBlock K Z :=
+    fun hb => hχS₁ (OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hb))
+  -- (5) enumerate the accumulator and pick a base-block anchor inside it
+  choose k χmem hχinj hrange using exists_finEnum_irreducible
+    (pairUnion_finite (K := K) hi.le hpairs) (fun φ hφ => hirr φ (hS₁X hφ))
+  have hmemS1 : ∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i := by
+    intro j; rw [← hrange]; exact Set.mem_range_self j
+  have hmemX : ∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ) ∈ xSet K Z :=
+    fun j => hS₁X (hmemS1 j)
+  choose i₁ hi₁base using
+    exists_xBaseBlock_anchor_index (K := K) hrange (xBaseBlock_nonempty (K := K) hXne)
+  have hanchorX : (χmem i₁ : ClassFunction ↥L ℂ) ∈ xSet K Z :=
+    xBaseBlock_subset (K := K) Z hi₁base
+  -- (6) degree data over the anchor
+  have hχone : (χs i : ClassFunction ↥L ℂ) 1 =
+      ((K.index * p ^ e (χs i : ClassFunction ↥L ℂ) : ℕ) : ℂ) := he _ hχX
+  have hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 =
+      ((K.index * p ^ e (χmem i₁ : ClassFunction ↥L ℂ) : ℕ) : ℂ) := he _ hanchorX
+  have hmemone : ∀ j ∈ (Finset.univ : Finset (Fin k)), (χmem j : ClassFunction ↥L ℂ) 1 =
+      ((K.index * p ^ e (χmem j : ClassFunction ↥L ℂ) : ℕ) : ℂ) := fun j _ => he _ (hmemX j)
+  have hratio : ∀ j ∈ (Finset.univ : Finset (Fin k)), (χmem j : ClassFunction ↥L ℂ) 1 =
+      ((p ^ (e (χmem j : ClassFunction ↥L ℂ) - e (χmem i₁ : ClassFunction ↥L ℂ)) : ℕ) : ℂ) *
+        (χmem i₁ : ClassFunction ↥L ℂ) 1 := fun j _ => hratio_gen _ hi₁base _ (hmemX j)
+  have hχratio : (χs i : ClassFunction ↥L ℂ) 1 =
+      ((p ^ (e (χs i : ClassFunction ↥L ℂ) - e (χmem i₁ : ClassFunction ↥L ℂ)) : ℕ) : ℂ) *
+        (χmem i₁ : ClassFunction ↥L ℂ) 1 := hratio_gen _ hi₁base _ hχX
+  -- (7) the tail of `𝒳` beyond the accumulator, and the head/tail split of the degree-square sum
+  have hcoeinj : Function.Injective fun j : Fin k => (χmem j : ClassFunction ↥L ℂ) :=
+    Subtype.val_injective.comp hχinj
+  have hsum := natSum_partition_of_realSum (xSetFinset K Z) (fun φ => K.index * p ^ e φ)
+    (K.index * (Nat.card ↥K - Nat.card (↥K ⧸ Z.subgroupOf K))) hXsumReal hcoeinj
+    (fun j => mem_xSetFinset.mpr (hmemX j))
+  have htail_le : ∀ φ ∈ xSetFinset K Z \
+      Finset.univ.image fun j : Fin k => (χmem j : ClassFunction ↥L ℂ),
+      K.index * p ^ e (χs i : ClassFunction ↥L ℂ) ≤ K.index * p ^ e φ := by
+    intro φ hφ
+    rw [Finset.mem_sdiff] at hφ
+    have hφX : φ ∈ xSet K Z := mem_xSetFinset.mp hφ.1
+    have hφnot : φ ∉ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (xBaseBlock K Z) pair i := by
+      rw [← hrange]
+      rintro ⟨j, rfl⟩
+      exact hφ.2 (Finset.mem_image.mpr ⟨j, Finset.mem_univ j, rfl⟩)
+    have hdeg := characterDegree_re_le_of_notMem_pairUnion (K := K) hpair0 hpair1 hmono
+      hcover hφX hφnot
+    rw [hpair0 i hi, OddOrder.Peterfalvi.S03.characterDegree_def,
+      OddOrder.Peterfalvi.S03.characterDegree_def, hχone, he φ hφX,
+      Complex.natCast_re, Complex.natCast_re] at hdeg
+    exact_mod_cast hdeg
+  -- (8) the p. 32 divisibility: `χ(1)² ∣ D`, hence the (5.6) gap `2a < ∑ deg²`
+  choose kχ hkχ hkχsq using
+    exists_source_primePow_centralBound_of_mem_xSet (K := K) hp hKp hZcentral hχX
+  have hkχe : kχ = e (χs i : ClassFunction ↥L ℂ) := by
+    have hnat : K.index * p ^ kχ = K.index * p ^ e (χs i : ClassFunction ↥L ℂ) := by
+      exact_mod_cast hkχ.symm.trans hχone
+    exact Nat.pow_right_injective hp.two_le (Nat.eq_of_mul_eq_mul_left hidxpos hnat)
+  rw [hkχe] at hkχsq
+  have hidx_head : K.index * K.index ∣
+      ∑ j : Fin k, (K.index * p ^ e (χmem j : ClassFunction ↥L ℂ)) *
+        (K.index * p ^ e (χmem j : ClassFunction ↥L ℂ)) :=
+    sq_dvd_natDegreeSquareSum_of_commonIndex rfl fun _ _ => rfl
+  have hdvd := OddOrder.Peterfalvi.S07.sq_dvd_head_of_commonIndex_primePower_sums
+    (xSetFinset K Z \ Finset.univ.image fun j : Fin k => (χmem j : ClassFunction ↥L ℂ))
+    (show 2 ≤ p by omega) hidxpos (θ := p ^ e (χs i : ClassFunction ↥L ℂ)) rfl
+    (θdeg := fun φ => p ^ e φ) (fun _ _ => rfl) htail_le hsum hqpow
+    (by simpa [pow_two] using hkχsq) hcq hidx_head rfl
+    (coprime_commonIndex_primePower hidx_p rfl)
+  have hDpos := natDegreeSquareSum_pos_of_memberFamily (χmem := χmem) (i₁ := i₁)
+    (Finset.mem_univ i₁) hmemone rfl
+  have hlt := natDegree_lt_of_xBaseBlock_anchor_of_notMem (K := K) hi₁base hχX hχnotbase
+    hχ₁one hχone
+  have hDeg := normalizedDegreeGap_of_natDegreeSumCommonIndexPrimePowerGap
+    (χ := χs i) (χ₁ := χmem i₁) (χmem := χmem) hχratio hratio hχone hχ₁one hmemone rfl
+    hp3 hlt rfl rfl rfl rfl hdvd hDpos
+  -- (9) one (5.6) adjoining step
+  exact xAdjoinStep_of_degreeRatios RD hodd hKsupp h1A hirr hS₁X
+    (pairUnion_closedUnderConjugate (K := K) hi.le hpair0 hpair1) hcoh hχX hχS₁ hχbarS₁
+    Finset.univ (fun j => (χmem j : ClassFunction ↥L ℂ))
+    (fun j => p ^ (e (χmem j : ClassFunction ↥L ℂ) - e (χmem i₁ : ClassFunction ↥L ℂ))) i₁
+    (Finset.mem_univ i₁) (fun j _ => hmemS1 j)
+    (fun j _ l _ h => hcoeinj h) (by simp) hratio hχratio hDeg
+    (span_le_span_zSupportedSpan_union_anchor (K := K) hKsupp hS₁sub (hmemS1 i₁)
+      fun φ hφ => ⟨p ^ (e φ - e (χmem i₁ : ClassFunction ↥L ℂ)),
+        hratio_gen _ hi₁base φ (hS₁X hφ)⟩)
+
 end OddOrder.Peterfalvi.S08

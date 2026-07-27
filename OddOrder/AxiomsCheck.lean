@@ -3860,6 +3860,24 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.span_le_span_zSupportedSpan_union_anchor
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xAdjoinStep_of_degreeRatios
+-- **Peterfalvi (6.6), coherence half, for a general kernel** (issue 0155, final assembly):
+-- `𝒳 = 𝒮 − 𝒮(Z) ⊆ Irr L` is coherent whenever `K` is a `p`-group for an odd prime `p` coprime to
+-- `|L:K|` and `Z ⊆ Z(K)` — the (6.4)/(6.5) context, with an **arbitrary** `τ` (no Dade datum).
+-- The proof is the book's (p. 32): base coherence of the minimal-degree block by (5.7), then one
+-- (5.6) adjoining per degree-sorted conjugate pair.  The per-step gap `2a < ∑ deg²` comes from
+-- the divisibility argument — member degrees `|L:K|·p^k` make every ratio over the anchor a
+-- `p`-power, the degree-square sum over `𝒳` is `|L:K|·(|K| − |K:Z|)` with `p`-power divisor
+-- `|K:Z|`, tail members have degree at least the adjoined one, and [Is] Cor 2.30 against the
+-- **central** `Z` bounds the source by `θ(1)² ≤ |K:Z|`, whence `χ(1)² ∣ D`.  The three structural
+-- helpers are the accumulator's conjugation closure, nonemptiness of the base block, and the
+-- strict degree gap for an `𝒳`-member outside it.  Sibley's `K = H` version
+-- (`Xset_isCoherent_of_irreducible_X` in `S08_CoherenceBasic`) is this with `τ` pinned to the
+-- Dade map, and takes the per-step degree data as a hypothesis instead of deriving it.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.pairUnion_closedUnderConjugate
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xBaseBlock_nonempty
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.natDegree_lt_of_xBaseBlock_anchor_of_notMem
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xSet_isCoherent_of_irreducible_X
 -- **The `InducedFamilyImageData` instance for the §11 family** (issue 0153, `S13_SixTwoImageData`):
 -- the concrete witness that Hypothesis (6.1) — i.e. (5.2.d)/(5.2.e) — is satisfiable in the
 -- Feit-Thompson setting, so `six_two_of_imageData`/`six_three_of_imageData` are not scaffolds.
