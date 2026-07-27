@@ -307,9 +307,9 @@ mathlib / repo にあるかを実測すること。無ければそこが step (6
 2. ~~**`V` は `H` の Hall `π′`-部分群**~~ ✅ **2026-07-28 landing**
    (`isHallSubgroup_V_subgroupOf`、支えは `card_H_eq_card_QK_mul_card_V` /
    `index_V_subgroupOf_eq_card_QK` / `coprime_card_QK_V`)。
-3. [ ] `x` が `π′`-元 ⟹ `hall_D` で `⟨x⟩` は Hall `π′`-部分群に含まれ、**Hall 共役性**で
-   `V` に共役。⚠ Hall 共役定理 (Hall C-定理) が repo にあるか要実測
-   (`Ch03_SplitExtensions` に `hall_D` はあるので同ファイル周辺を探す)。
+3. ~~`x` が `π′`-元 ⟹ Hall D + Hall C で `V` に共役~~ ✅ **2026-07-28 landing**
+   (`exists_conj_mem_V_of_piPrime`)。`Isaacs.Ch03.hall_D` (`Basic.lean:1329`) と
+   `Isaacs.Ch03.hall_C` (`Basic.lean:1010`) がそのまま使えた。
 4. [ ] `π`-成分が `QK ⊆ Ker λ` に入ることで `λ(x) = λ(π′-成分)` へ帰着
    (`GroupTheory/PiElementDecomposition.lean` の `exists_isPiElement_mul`)。
 5. [ ] Ch.I §3 Lemma 2 (`ConjugacyInV.lean`) で `V` 内共役に落として `λ(x) = λ(x^g)`。
