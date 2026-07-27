@@ -285,8 +285,27 @@ sorry 非退行。
 | `π`/`π′` 分解 (`IsPiElement`, `exists_isPiElement_mul`) | ✅ `GroupTheory/PiElementDecomposition.lean` |
 | `QK ⊓ V = ⊥` | ✅ `QK_inf_V_eq_bot` |
 | `QK ⊔ V = H` | 未 — `|QK||V| = |H|` (`card_QK_eq` + `card_D_eq` + `card_H_eq`) と `QK ⊓ V = ⊥` から数え上げ |
-| **`π′`-元は `H` 内で `V` に共役** | ⚠ **要調査**。`QK` は正規 Hall で `H/QK ≅ V` は奇位数 ⟹ 可解 (FT)。Schur–Zassenhaus の共役部分 (mathlib `Subgroup.exists_right_complement'_of_coprime` は存在のみ) + 「任意の `π′`-部分群は補群に含まれる」が要る。repo に既存かどうか未確認 |
+| **`π′`-元は `H` 内で `V` に共役** | ✅ **道筋確定 (2026-07-28)**。`H` は**可解**なので Hall の定理がそのまま使える (下記) |
 | Ch.I §3 Lemma 2 | ✅ `ConjugacyInV.lean` |
 
 ⟹ 着手時はまず「`π′`-部分群が補群に共役で入る」(Schur–Zassenhaus の強い形) が
 mathlib / repo にあるかを実測すること。無ければそこが step (6) の本体になる。
+
+### 🔑 step (6) の unlock: `H` は可解 (2026-07-28 landing)
+
+`isSolvable_H` (instance, `LinearCharacter.lean`): `Q` は冪零 (Ch.I §2 Prop 1(b))
+ゆえ可解、`|H/Q| = |D|` は奇ゆえ **Feit–Thompson** で可解、`solvable_of_ker_le_range`
+で拡大が可解。**Ch.I / Ch.II では明示されていなかった事実**。
+
+⟹ 書籍の「by a theorem of Hall」は repo 既存の **`Isaacs.Ch03.hall_D`**
+(`Ch03_SplitExtensions/Basic.lean:1329`: 可解群では任意の π-部分群が Hall π-部分群に
+含まれる) で直接使える。Schur–Zassenhaus の共役部分を自前で用意する必要は無い。
+
+### step (6) の残り
+
+1. `π := (Nat.card ↥QK).primeFactors` と置く。
+2. **`V` は `H` の Hall `π′`-部分群** — `coprime_card_QK_index` + `[H:QK] = |V|` から
+   `|V|` は `π′`-数で `[H:V] = |QK|` は `π`-数。`IsHallSubgroup` の形に整える。
+3. `x` が `π′`-元 ⟹ `hall_D` で `⟨x⟩` は Hall `π′`-部分群に含まれ、Hall 共役性で
+   `V` に共役。
+4. Ch.I §3 Lemma 2 (`ConjugacyInV.lean`) で `V` 内共役に落として `λ(x) = λ(x^g)`。
