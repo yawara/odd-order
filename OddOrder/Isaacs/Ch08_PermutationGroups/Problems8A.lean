@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Data.ZMod.Basic
 import Mathlib.GroupTheory.Sylow
 import OddOrder.Isaacs.Ch01_Sylow.Problems
 import OddOrder.Isaacs.Ch03_SplitExtensions.Basic
@@ -25,6 +26,9 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `exists_regular_subgroups_of_equiv`, `exists_regular_subgroups_of_card_eq` —
   **Problem 8A.1** 前半: `|A| = |B|` なら `Sym(A)` は `A`, `B` に同型な regular 部分群を
   ともにもつ。
+- `transZFour`, `flipZFour` と `D₈` の関係式群 — **Problem 8A.1 後半**の計算核:
+  `ZMod 4` 上で `s t s⁻¹ = t⁻¹`, `t s t⁻¹ = s t²`, `V` の各元が位数 ≤ 2, `t² ≠ 1`。
+  すべて `decide` で確認 (答は「同型でない regular normal 部分群はもてる」)。
 - `regularRepRight`, `exists_two_distinct_regular_normal_of_center_eq_bot` —
   **Problem 8A.3**: `Z(G) = 1` (かつ非自明) なら `Sym(G)` の中に `G` に同型な相異なる
   regular normal 部分群が 2 つある (左正則表現の像と右正則表現の像)。
@@ -144,6 +148,45 @@ theorem exists_regular_subgroups_of_card_eq {A B : Type*} [Group A] [Group B]
       (∀ α : A, Function.Bijective (smulBase M α)) ∧
       Nonempty (N ≃* A) ∧ Nonempty (M ≃* B) :=
   exists_regular_subgroups_of_equiv (Finite.card_eq.mp h.symm).some
+
+/-! ### Problem 8A.1 後半 — 同型でない regular normal 部分群の対 (`D₈ ≤ S₄`) -/
+
+section KleinCounterexample
+
+/-- `ZMod 4` の平行移動 `x ↦ x + 1`。 -/
+def transZFour : Equiv.Perm (ZMod 4) := Equiv.addRight 1
+
+/-- `ZMod 4` の反転 `x ↦ 1 - x`。 -/
+def flipZFour : Equiv.Perm (ZMod 4) := (Equiv.neg (ZMod 4)).trans (Equiv.addRight 1)
+
+/-! `D₈ = ⟨t, s⟩ ≤ Sym(ZMod 4)` の関係式。`ZMod 4` は決定可能なのですべて `decide` で
+確認できる。`T = ⟨t⟩ ≅ Z₄` と Klein 群 `V = {1, t², s, s t²} ≅ Z₂ × Z₂` がともに
+`D₈` の指数 2 の部分群であり, どちらも `ZMod 4` に regular に作用する。 -/
+
+@[simp] lemma transZFour_pow_four : transZFour ^ 4 = 1 := by decide
+
+@[simp] lemma flipZFour_sq : flipZFour * flipZFour = 1 := by decide
+
+/-- `s t s⁻¹ = t⁻¹` — これで `T = ⟨t⟩` は `⟨t, s⟩` に正規。 -/
+lemma flip_mul_trans_mul_flip : flipZFour * transZFour * flipZFour = transZFour⁻¹ := by decide
+
+/-- `t s t⁻¹ = s t²` — これで Klein 群 `V = {1, t², s, s t²}` は `⟨t, s⟩` に正規。 -/
+lemma trans_mul_flip_mul_trans_inv :
+    transZFour * flipZFour * transZFour⁻¹ = flipZFour * transZFour ^ 2 := by decide
+
+/-- `t²` と `s` は可換 — `V` が Klein 群 (指数 2) であることの要。 -/
+lemma trans_sq_commute_flip :
+    transZFour ^ 2 * flipZFour = flipZFour * transZFour ^ 2 := by decide
+
+/-- `V` の 4 元はすべて位数 2 以下 (`V ≅ Z₂ × Z₂`)。 -/
+lemma klein_sq_eq_one :
+    (transZFour ^ 2) ^ 2 = 1 ∧ flipZFour ^ 2 = 1 ∧ (flipZFour * transZFour ^ 2) ^ 2 = 1 := by
+  refine ⟨by decide, by decide, by decide⟩
+
+/-- `t` の位数は 4 — `T ≅ Z₄` は位数 4 の元をもつので `V` (指数 2) と同型でない。 -/
+lemma transZFour_sq_ne_one : transZFour ^ 2 ≠ 1 := by decide
+
+end KleinCounterexample
 
 /-! ### Problem 8A.2 — 中心化群は半正則 -/
 

@@ -4314,7 +4314,11 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 
 ### §8A 一巡後の残り 3 件 (2026-07-27 時点)
 
-1. **8A.1 後半** — `D₈ ≤ S₄` の形式化。設計: `Ω := ZMod 4`,
+1. **8A.1 後半** — 計算核を landing (2026-07-27): `transZFour` (`x ↦ x+1`) /
+   `flipZFour` (`x ↦ 1-x`) と関係式 `s t s⁻¹ = t⁻¹` / `t s t⁻¹ = s t²` /
+   `V` の各元の位数 ≤ 2 / `t² ≠ 1` を **`decide` で確認済** (`Equiv.Perm (ZMod 4)` 上の
+   `decide` は実用速度で通ることを probe で確認)。残りは 2 つの部分群を明示 carrier で
+   組んで regular 性・正規性・非同型を結線するだけの機械的作業。設計: `Ω := ZMod 4`,
    `t := Equiv.addRight 1` (`x ↦ x+1`), `s := x ↦ 1 - x`,
    `T := Subgroup.zpowers t` (`≅ Z₄`, translations, regular),
    `V := Subgroup.closure {t², s}` (`= {1, t², s, s t²} ≅ Z₂×Z₂`, regular),
