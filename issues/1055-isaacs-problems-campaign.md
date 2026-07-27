@@ -36,8 +36,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
-      §8B は 8B.1–8B.5, 8B.7, 8B.8 完了 + 8B.6 は `D₂ₚ` 同型のみ残 /
-      残り 8B.9, 8B.10 / §8C §8D 未着手
+      §8B は 8B.1–8B.5, 8B.7–8B.9 完了 + 8B.6 は `D₂ₚ` 同型のみ残 /
+      残り 8B.10 / §8C §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4433,8 +4433,8 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   **残り = `G ≅ DihedralGroup p` の明示同型のみ** /
   8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
   8B.8 ✅ `isPreprimitive_sup_zpowers_addRight_one` /
-  8B.9 🔶 **step 1–4 完了** (交代群を含むところまで) —
-  **次の frontier = 8B.9 step 5 (符号で S_n / A_n を判定)**。
+  8B.9 ✅ `eq_top_...` (m か n 偶 ⟹ S_n) / `eq_alternatingGroup_...` (ともに奇 ⟹ A_n) /
+  **次の frontier = 8B.10** (§8B 最後)。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4653,7 +4653,7 @@ step 3 では `y` の可動点 = `{c | c.val < m}`, `z` の可動点 = `{c | m-1
 ⚠ step 1 の「非推移群の位数評価」は独立した補題として要実装 (repo に無ければ新規)。
 
 
-### 8B.9 step 5 (符号判定) の残り — 2026-07-27
+### 8B.9 完了 (2026-07-27) — 以下は実施記録
 
 step 1–4 は landing 済 (`alternatingGroup_le_zpowers_mCycle_sup_zpowers_addRight_one`)。
 残りは `G = A_n` か `S_n` かの判定:
