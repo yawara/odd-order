@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
 import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import OddOrder.GroupTheory.CardSupInf
 
 /-!
 # Peterfalvi Part II, Ch. III: the subgroup `QK`
@@ -350,6 +351,104 @@ theorem coprime_card_K_V (ind : Hypothesis.TheoremAInductionBelow G Ω)
   rw [hmemKV] at hxo
   simp only [orderOf_one] at hxo
   exact hp.one_lt.ne hxo
+
+end SecondCaseHypothesis
+
+namespace Hypothesis
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (hyp : Hypothesis G Ω)
+
+/-- `D` normalises `K` (`K ⊴ D`), in `Subgroup.normalizer` form. -/
+theorem D_le_normalizer_K : hyp.D ≤ Subgroup.normalizer (hyp.K : Set G) := by
+  intro d hd
+  rw [Subgroup.mem_normalizer_iff]
+  intro z
+  constructor
+  · exact fun hz => hyp.conj_mem_K_of_mem_D hd hz
+  · intro hz
+    have h2 := hyp.conj_mem_K_of_mem_D (inv_mem hd) hz
+    simpa [mul_assoc] using h2
+
+/-- `D = V ∨ K` — the book's `D = KV` (`K ⊴ D`, `K ∩ V = 1`). -/
+theorem V_sup_K_eq_D : hyp.V ⊔ hyp.K = hyp.D := by
+  refine le_antisymm (sup_le hyp.V_le_D hyp.K_le_D) fun d hd => ?_
+  obtain ⟨v, hv, z, hz, rfl⟩ := hyp.exists_mem_V_mul_mem_K hd
+  exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hv) (Subgroup.mem_sup_right hz)
+
+/-- `|D| = |V|·|K|`.  Computed inside `↥D`, where `K` is normal. -/
+theorem card_D_eq : Nat.card ↥hyp.D = Nat.card ↥hyp.V * Nat.card ↥hyp.K := by
+  have hdisj : hyp.V.subgroupOf hyp.D ⊓ hyp.K.subgroupOf hyp.D = ⊥ := by
+    refine le_bot_iff.mp fun z hz => ?_
+    obtain ⟨hzV, hzK⟩ := Subgroup.mem_inf.mp hz
+    have hmem : (z : G) ∈ hyp.K ⊓ hyp.V :=
+      Subgroup.mem_inf.mpr ⟨Subgroup.mem_subgroupOf.mp hzK, Subgroup.mem_subgroupOf.mp hzV⟩
+    rw [hyp.K_inf_V_eq_bot, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]; exact Subtype.ext hmem
+  have hcard := OddOrder.GroupTheory.card_sup_eq_mul_of_disjoint_normal
+    (G := ↥hyp.D) (H := hyp.V.subgroupOf hyp.D) (N := hyp.K.subgroupOf hyp.D) hdisj
+  rw [← Subgroup.subgroupOf_sup hyp.V_le_D hyp.K_le_D, hyp.V_sup_K_eq_D,
+    Subgroup.subgroupOf_self, Nat.card_congr (Subgroup.topEquiv (G := ↥hyp.D)).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.V_le_D).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.K_le_D).toEquiv] at hcard
+  exact hcard
+
+/-- `|QK| = |K|·|Q|`.  Computed inside `↥H`, where `Q` is normal. -/
+theorem card_QK_eq : Nat.card ↥hyp.QK = Nat.card ↥hyp.K * Nat.card ↥hyp.Q := by
+  have hKH : hyp.K ≤ hyp.H := hyp.K_le_D.trans hyp.D_le_H
+  have hdisj : hyp.K.subgroupOf hyp.H ⊓ hyp.Q.subgroupOf hyp.H = ⊥ := by
+    refine le_bot_iff.mp fun z hz => ?_
+    obtain ⟨hzK', hzQ'⟩ := Subgroup.mem_inf.mp hz
+    have hzK : (z : G) ∈ hyp.K := Subgroup.mem_subgroupOf.mp hzK'
+    have hzQ : (z : G) ∈ hyp.Q := Subgroup.mem_subgroupOf.mp hzQ'
+    have : (z : G) ∈ hyp.Q ⊓ hyp.D := Subgroup.mem_inf.mpr ⟨hzQ, hyp.K_le_D hzK⟩
+    rw [hyp.Q_inf_D_eq_bot, Subgroup.mem_bot] at this
+    rw [Subgroup.mem_bot]; exact Subtype.ext this
+  have hcard := OddOrder.GroupTheory.card_sup_eq_mul_of_disjoint_normal
+    (G := ↥hyp.H) (H := hyp.K.subgroupOf hyp.H) (N := hyp.Q.subgroupOf hyp.H) hdisj
+  rw [← Subgroup.subgroupOf_sup hKH hyp.Q_le_H,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKH).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q_le_H).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (show hyp.K ⊔ hyp.Q ≤ hyp.H from sup_le hKH hyp.Q_le_H)).toEquiv] at hcard
+  rw [QK, sup_comm]
+  exact hcard
+
+/-- **`[H : QK] = |V|`** — the index computation behind the book's `H/QK ≅ V`. -/
+theorem index_QK_subgroupOf_eq_card_V :
+    (hyp.QK.subgroupOf hyp.H).index = Nat.card ↥hyp.V := by
+  have hQK : Nat.card ↥(hyp.QK.subgroupOf hyp.H) = Nat.card ↥hyp.QK :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.QK_le_H).toEquiv
+  have hmul : Nat.card ↥(hyp.QK.subgroupOf hyp.H) * (hyp.QK.subgroupOf hyp.H).index
+      = Nat.card ↥hyp.H := (hyp.QK.subgroupOf hyp.H).card_mul_index
+  rw [hQK, hyp.card_QK_eq] at hmul
+  have hH : Nat.card ↥hyp.H = Nat.card ↥hyp.Q * (Nat.card ↥hyp.V * Nat.card ↥hyp.K) := by
+    rw [← hyp.card_D_eq]; exact hyp.card_H_eq
+  rw [hH] at hmul
+  have hpos : 0 < Nat.card ↥hyp.K * Nat.card ↥hyp.Q := Nat.mul_pos Nat.card_pos Nat.card_pos
+  refine Nat.eq_of_mul_eq_mul_left hpos ?_
+  rw [hmul]; ring
+
+end Hypothesis
+
+namespace SecondCaseHypothesis
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (sc : SecondCaseHypothesis G Ω)
+
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step (5) conclusion** (p. 115):
+"Thus `QK` is a Hall subgroup of `H`."
+
+`|QK| = |K|·|Q|` and `[H : QK] = |V|`; `(|K|,|V|) = 1` is step (5) and
+`(|Q|,|V|) = 1` follows from `(|Q|,|D|) = 1`. -/
+theorem coprime_card_QK_index (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥) :
+    Nat.Coprime (Nat.card ↥sc.toHypothesis.QK)
+      (sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H).index := by
+  rw [sc.toHypothesis.card_QK_eq, sc.toHypothesis.index_QK_subgroupOf_eq_card_V]
+  refine Nat.coprime_mul_iff_left.mpr ⟨sc.coprime_card_K_V ind hQ1, ?_⟩
+  exact (sc.coprime_card_Q_D ind).coprime_dvd_right
+    (Subgroup.card_dvd_of_le sc.toHypothesis.V_le_D)
 
 end SecondCaseHypothesis
 
