@@ -659,7 +659,7 @@ theorem mem_thetaHom_ker_iff {P : Type*} [Group P] {A : Subgroup P} {a : P}
     have h2 := congrArg (fun w => (x : P) * w * a) hx1
     simpa [mul_assoc] using h2
   · intro hx
-    show (x : P)⁻¹ * (a * (x : P) * a⁻¹) = 1
+    change (x : P)⁻¹ * (a * (x : P) * a⁻¹) = 1
     rw [hx]
     group
 
@@ -672,7 +672,7 @@ theorem thetaHom_range_le_commutator {P : Type*} [Group P] {A : Subgroup P} {a :
   have h1 := Subgroup.commutator_mem_commutator (G := P) (H₁ := ⊤) (H₂ := ⊤)
     (Subgroup.mem_top ((x : P)⁻¹)) (Subgroup.mem_top a)
   rw [← commutator_def, commutatorElement_def] at h1
-  show (x : P)⁻¹ * (a * (x : P) * a⁻¹) ∈ commutator P
+  change (x : P)⁻¹ * (a * (x : P) * a⁻¹) ∈ commutator P
   convert h1 using 1
   group
 
@@ -1066,9 +1066,9 @@ theorem relIndex_commutator_eq_two {P : Type*} [Group P] [Finite P] {A : Subgrou
   rw [hidxA, hidx] at h
   omega
 
-/-- `B ≤ A` が相対指数 `2` で `t ∈ A \ B` なら `A = B⟨t⟩`。 -/
+/-- `B` が `A` の中で相対指数 `2` で `t ∈ A \ B` なら `A = B⟨t⟩`。 -/
 theorem mem_sup_zpowers_of_relIndex_two {P : Type*} [Group P] [Finite P] {A B : Subgroup P}
-    (hBA : B ≤ A) (hrel : B.relIndex A = 2) {t : P} (htA : t ∈ A) (htB : t ∉ B)
+    (hrel : B.relIndex A = 2) {t : P} (htA : t ∈ A) (htB : t ∉ B)
     {x : P} (hx : x ∈ A) : x ∈ B ⊔ Subgroup.zpowers t := by
   have hidx2 : (B.subgroupOf A).index = 2 := hrel
   have hnot : (⟨t, htA⟩ : ↥A) ∉ B.subgroupOf A := htB
@@ -1088,6 +1088,116 @@ theorem mem_sup_zpowers_of_relIndex_two {P : Type*} [Group P] [Finite P] {A B : 
       have := congrArg Subtype.val hm
       simpa using this
   exact himg ⟨⟨x, hx⟩, hmem, rfl⟩
+
+/-- `orderOf c` が偶数なら `c ∉ ⟨c²⟩` (`⟨c²⟩` は `⟨c⟩` の真部分群)。 -/
+theorem notMem_zpowers_sq_of_even_orderOf {G : Type*} [Group G] {c : G}
+    (h2 : 2 ∣ orderOf c) : c ∉ Subgroup.zpowers (c ^ 2) := by
+  intro hc
+  obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp hc
+  have h2m : c ^ ((2 : ℤ) * m) = c := by
+    rw [zpow_mul, show (2 : ℤ) = ((2 : ℕ) : ℤ) by norm_num, zpow_natCast]
+    exact hm
+  have hkey : c ^ ((2 : ℤ) * m - 1) = 1 := by
+    rw [zpow_sub, h2m, zpow_one, mul_inv_cancel]
+  have hdvd : ((orderOf c : ℤ)) ∣ (2 : ℤ) * m - 1 := orderOf_dvd_iff_zpow_eq_one.mpr hkey
+  have h2i : (2 : ℤ) ∣ ((orderOf c : ℕ) : ℤ) := by exact_mod_cast h2
+  have hfin := dvd_trans h2i hdvd
+  omega
+
+/-- `y ∈ ⟨c⟩` なら `y² ∈ ⟨c²⟩`。 -/
+theorem sq_mem_zpowers_sq {G : Type*} [Group G] {c y : G} (hy : y ∈ Subgroup.zpowers c) :
+    y ^ 2 ∈ Subgroup.zpowers (c ^ 2) := by
+  obtain ⟨j, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
+  refine Subgroup.mem_zpowers_iff.mpr ⟨j, ?_⟩
+  rw [← zpow_natCast (c ^ j) 2, ← zpow_mul, ← zpow_natCast c 2, ← zpow_mul, mul_comm]
+
+open Pointwise in
+/-- **指数 `2` の可換部分群は巡回** (帰納 step の非巡回ケースの排除) ⭐:
+`|P| ≥ 16` の `2`-群 `P` が `|P : P'| = 4` をみたすとき, 可換で指数 `2` の `A ≤ P` は巡回。
+
+証明: `a ∉ A` を取り `θ(x) = x⁻¹ · a x a⁻¹` を考えると `im θ = P'` で `P'` は巡回
+(`isCyclic_commutator`), 生成元 `c` の位数は `2^k` (`k ≥ 2`, ここで `|P| ≥ 16` を使う)。
+`A` が非巡回なら `⟨c⟩ = P'` の外に involution `t` があり `A = P'⟨t⟩`。すると
+* `y ∈ P'` では `θ(y) = (y²)⁻¹ ∈ ⟨c²⟩`,
+* `s ∈ ⟨t⟩` では `θ(s)² = θ(s²) = 1` で `θ(s) ∈ P' = ⟨c⟩` なので `θ(s) ∈ ⟨c²⟩`
+  (位数 `2^k`, `k ≥ 2` の巡回群の involution は平方元)
+
+なので `P' = im θ ≤ ⟨c²⟩`, とくに `c ∈ ⟨c²⟩` となり `orderOf c` が偶数であることに反する。 -/
+theorem isCyclic_of_index_two_of_index_commutator_eq_four
+    {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
+    {A : Subgroup P} (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x)
+    (hidxA : A.index = 2) (hidx : (commutator P).index = 4) (hcard : 16 ≤ Nat.card P) :
+    IsCyclic ↥A := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  by_contra hnc
+  obtain ⟨a, ha⟩ : ∃ a : P, a ∉ A := by
+    by_contra hcon
+    have htop : A = ⊤ := eq_top_iff.mpr fun x _ => not_not.mp fun h => hcon ⟨x, h⟩
+    rw [htop, Subgroup.index_top] at hidxA
+    omega
+  haveI hAn : A.Normal := Subgroup.normal_of_index_eq_two hidxA
+  have ha2 : a ^ 2 ∈ A := by
+    have h := A.pow_index_mem a
+    rwa [hidxA] at h
+  have hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A := fun x hx => hAn.conj_mem x hx a
+  have hgen := sup_zpowers_eq_top_of_index_two hidxA ha
+  have hrange : commutator P = (thetaHom A a hab hnorm).range :=
+    le_antisymm (commutator_le_thetaHom_range hab ha2 hnorm hgen)
+      (thetaHom_range_le_commutator hab hnorm)
+  have hPA : commutator P ≤ A := by rw [hrange]; exact thetaHom_range_le hab hnorm
+  -- `P'` は巡回。生成元 `c` の位数は `2 ^ k` で `|P| ≥ 16` から `k ≥ 2`
+  obtain ⟨c, hcmem, hczp⟩ :=
+    exists_zpowers_eq_of_isCyclic (isCyclic_commutator hP hab hidxA ha ha2 hnorm hidx)
+  obtain ⟨k, hk⟩ := (hP.to_subgroup (commutator P)).exists_card_eq
+  have hcardP' : Nat.card ↥(commutator P) * 4 = Nat.card P := by
+    have h := Subgroup.card_mul_index (commutator P)
+    rwa [hidx] at h
+  have hord : orderOf c = 2 ^ k := by rw [← Nat.card_zpowers c, hczp, hk]
+  have hk2 : 2 ≤ k := by
+    by_contra hcon
+    have hle : 2 ^ k ≤ 2 ^ 1 := Nat.pow_le_pow_right (by norm_num) (by omega)
+    rw [← hk] at hle
+    omega
+  -- `A` 非巡回 ⟹ `⟨c⟩ = P'` の外に involution `t` があり `A = P'⟨t⟩`
+  obtain ⟨t, htA, htne, ht2, htnm⟩ :=
+    exists_involution_notMem_of_not_isCyclic hP hab (k := k) (by omega) hord hnc
+  have htB : t ∉ commutator P := by rw [← hczp]; exact htnm
+  have hrel := relIndex_commutator_eq_two hidxA hidx hPA
+  -- `im θ ≤ ⟨c²⟩`
+  have hrange_le : (thetaHom A a hab hnorm).range ≤ Subgroup.zpowers (c ^ 2) := by
+    rintro _ ⟨x, rfl⟩
+    have hxsup : (x : P) ∈ commutator P ⊔ Subgroup.zpowers t :=
+      mem_sup_zpowers_of_relIndex_two hrel htA htB x.2
+    have hxmul : (x : P) ∈ (commutator P : Set P) * (Subgroup.zpowers t : Set P) := by
+      rw [← Subgroup.normal_mul (commutator P) (Subgroup.zpowers t)]
+      exact hxsup
+    obtain ⟨y, hy, s, hs, hxeq⟩ := Set.mem_mul.mp hxmul
+    have hyA : y ∈ A := hPA hy
+    have hsA : s ∈ A := (Subgroup.zpowers_le.mpr htA) hs
+    have hxx : x = (⟨y, hyA⟩ : ↥A) * ⟨s, hsA⟩ := Subtype.ext (by simpa using hxeq.symm)
+    rw [hxx, map_mul]
+    refine Subgroup.mul_mem _ ?_ ?_
+    · -- `θ(y) = (y²)⁻¹` で `y ∈ ⟨c⟩` なので `y² ∈ ⟨c²⟩`
+      rw [thetaHom_apply_of_mem_range hab ha2 hnorm (hrange ▸ hy) hyA]
+      exact Subgroup.inv_mem _ (sq_mem_zpowers_sq (hczp ▸ hy))
+    · -- `θ(s)` は `P' = ⟨c⟩` の involution なので平方元
+      have hs2 : s ^ 2 = 1 := by
+        obtain ⟨j, rfl⟩ := Subgroup.mem_zpowers_iff.mp hs
+        have htz : t ^ (2 : ℤ) = 1 := by rw [zpow_two, ← pow_two, ht2]
+        rw [← zpow_natCast (t ^ j) 2, ← zpow_mul, mul_comm, zpow_mul,
+          show ((2 : ℕ) : ℤ) = (2 : ℤ) from by norm_num, htz, one_zpow]
+      have hths : thetaHom A a hab hnorm ⟨s, hsA⟩ ∈ Subgroup.zpowers c :=
+        hczp ▸ hrange ▸ (⟨⟨s, hsA⟩, rfl⟩ : _ ∈ (thetaHom A a hab hnorm).range)
+      have hths2 : (thetaHom A a hab hnorm ⟨s, hsA⟩) ^ 2 = 1 := by
+        rw [← map_pow]
+        convert map_one (thetaHom A a hab hnorm) using 2
+        exact Subtype.ext (by simpa using hs2)
+      exact involution_mem_zpowers_sq hk2 hord hths hths2
+  -- `c ∈ P' = im θ ≤ ⟨c²⟩` は `orderOf c = 2 ^ k` (偶数) に反する
+  refine notMem_zpowers_sq_of_even_orderOf (c := c) ?_ (hrange_le (hrange ▸ hcmem))
+  rw [hord]
+  exact dvd_pow_self 2 (by omega)
 
 /-- **Isaacs Problem 6B.8** (p. 196, O. Taussky-Todd) ⭐: `|P| ≥ 8` の `2`-群 `P` が
 `|P : P'| = 4` をみたすなら, `P` は二面体・半二面体・一般四元数のいずれか。 -/
