@@ -36,7 +36,7 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
 - [ ] Ch.8 Permutation Groups — **進行中 (2026-07-27)**: §8A (8A.1–8A.17) 完済 /
-      §8B は 8B.1–8B.4 完了, 8B.5 が次 / §8C §8D 未着手
+      §8B は 8B.1–8B.5 完了 + 8B.6 前半 / §8C §8D 未着手
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
 
@@ -4424,8 +4424,9 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   8B.1 ✅ `isBlock_blockCore` / 8B.2 ✅ `exists_smul_mem_and_smul_notMem` /
   8B.3 ✅ `regular_centralizer_mulEquiv_of_two_isMinimalNormal` /
   8B.4 ✅ `prime_pow_card_and_unique_isMinimalNormal_of_solvable` /
-  **8B.5 が次の frontier** (点安定化群 `H = G_α` が `Ω ∖ {α}` に固定点をもてば
-  `|H| = 1` かつ `|G|` は素数)。
+  8B.5 ✅ `stabilizer_eq_bot_and_prime_card_of_fixed_point` /
+  8B.6 🔶 **前半のみ** `card_stabilizer_eq_two_of_suborbit_ncard_eq_two` (`|G_α| = 2`) /
+  **次の frontier = 8B.6 後半 (`G ≅ D₂ₚ`)**。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4454,3 +4455,26 @@ Isaacs の block 定義 (「`Δ` の translate は `Δ` 自身か `Δ` と交わ
 **8B.3** は Hint に「Problem 8A.4 を使え」とあり, 8A.4 は
 `Problems8A/RegularRepresentations.lean` の
 `mulEquiv_and_center_eq_bot_of_regular_normal` として landing 済 — そのまま使える。
+
+
+### 8B.6 後半 (`G ≅ D₂ₚ`) の設計メモ (2026-07-27)
+
+前半 `|G_α| = 2` は landing 済 (`card_stabilizer_eq_two_of_suborbit_ncard_eq_two`)。
+残りは「`G` は位数 `2p` の二面体群 (`p > 2` 素数)」。**Frobenius 経由**が筋:
+
+1. **相異なる 2 点の安定化群の交わりは自明**: `|G_α| = 2` なので `G_α ⊓ G_β` は
+   `1` か `G_α`。後者なら `G_α ≤ G_β` かつ位数一致で `G_α = G_β`, すると `G_α` が
+   `β ≠ α` を固定するので **8B.5** (`stabilizer_eq_bot_and_prime_card_of_fixed_point`)
+   より `G_α = 1` となり `|G_α| = 2` に矛盾。
+2. ⟹ 推移的 + `G_α ≠ 1` + 2 点の安定化群の交わり自明 = **Frobenius 作用**。
+   repo の `OddOrder/Isaacs/Ch06_FrobeniusActions/` (`Ch06.IsFrobeniusAction` 等) を使う。
+3. Frobenius 核 `K` は正則正規部分群 (位数 `n = |Ω|`)。`G_α = ⟨t⟩` (位数 2) は `K` に
+   固定点なく作用 ⟹ `t` は `K` を**反転**し `K` は可換
+   (位数 2 の fixed-point-free 自己同型)。
+4. **原始性**: `K` 正則正規可換なので block ↔ `K` の部分群 (反転は全部分群を保つ) ⟹
+   `K` は真の非自明部分群をもたない ⟹ `|K| = p` 素数 (`prime_card_of_isCoatom_bot`
+   と同じ論法が使える)。
+5. `G = K ⋊ G_α ≅ D₂ₚ`。`p ≠ 2` は忠実性から (`|G| = 4` は 2 点への忠実作用と不整合)。
+
+⚠ 4 の「block ↔ `K` の部分群」は mathlib `MulAction.block_stabilizerOrderIso`
+(block ↔ `G_α` を含む中間部分群) を経由すると素直かもしれない。要調査。
