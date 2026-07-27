@@ -3954,3 +3954,31 @@ characteristic ゆえ `M ⊴ G`; `M` は `p'`-群で `G/M` は `p`-群 (`[G:K]`,
 ⟹ `hasNormalPComplement_of_sylow_eq_top` で `G/M` が complement を持ち,
 `hasNormalPComplement_of_quotient_of_isPiGroup_compl` で `G` に持ち上がる。
 新規に要るのは主に **(a) 仮説の `N_G(X)` / `G/X` への遺伝** と **(d) 最小反例の帰納の骨組み**。
+
+### 7C.1 進捗 (2026-07-27): 締めの道具を実証明
+
+新 leaf `Problems7C.lean` (`OddOrder.lean` 配線済, axiom-clean):
+
+* `hasNormalPComplement_of_normal_pi'_of_isPGroup_quotient`:
+  **`M ⊴ G` が `p'`-群で `G/M` が `p`-群なら `M` は `G` の normal `p`-complement**。
+  (`G/M` の Sylow `p` は `⊤` ⟹ `hasNormalPComplement_of_sylow_eq_top` ⟹
+  `hasNormalPComplement_of_quotient_of_isPiGroup_compl` で持ち上げ。)
+  これが Case B step 4 の締め。
+
+**設計判断 (次 iteration への申し送り)**: 7C.1 の局所条件は, 既存の
+`HasThompsonLocalPComplements` (`S7C_ThompsonPComplement.lean:99`) と**同じ流儀**で
+「**ambient `G` の任意の部分群 `P`**」に対して定義する (Sylow に限定しない) のが正しい —
+`.of_subgroup` / `.map_mulEquiv` 型の輸送補題 (同ファイル 108/192 行) が書けるため。
+
+```
+def CharLocalPControl (p : ℕ) (P : Subgroup G) : Prop :=
+  ∀ X : Subgroup ↥P, X.Characteristic →
+    ∀ g ∈ Subgroup.normalizer ((X.map P.subtype : Subgroup G) : Set G),
+      ∃ k : ℕ, g ^ p ^ k ∈ Subgroup.centralizer ((X.map P.subtype : Subgroup G) : Set G)
+```
+
+⚠ **元ごとの形 (`g ^ p ^ k ∈ C`) を採る**: 商群型 `↥N ⧸ C.subgroupOf N` を使うと
+`Normal` インスタンスの証明が要り, 部分群への遺伝 (Case A) が重くなる。元ごとの形なら
+`H = N_G(X₀)` への遺伝は「`g ∈ N_H(Y) ⊆ N_G(Y)` に仮説を適用し `g^{p^k} ∈ C_G(Y) ⊓ H`」で
+自明。⚠ ただし Case B で `[G : C_G(X)]` が `p`-冪であることが要る箇所では
+`IsPGroup` ↔ 位数の変換を別途噛ませる (有限群なので `IsPGroup.exists_card_eq` 相当)。
