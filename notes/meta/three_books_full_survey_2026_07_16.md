@@ -1172,14 +1172,22 @@ CLAUDE.md の裁定 (2026-07-16「特殊化債務はできる限り一般化す�
 
 **真に開いている (実測で確認)**
 
-1. **(6.2)–(6.6) の general-(6.1) 形** — 最大かつ唯一の深い残債。`six_two_general`
-   (`S08_Theorem62_63_Standalone.lean:349`) と `six_three_of_six_two_oracle` (:383) は
-   **(5.6) break-member oracle `h56` を明示仮説として取る**。`h56` = 「各 section `B ≤ A ≤ H₁`
-   (`A/B` が `H/B` の中心) で `S(A)` coherent・`S(B)` non-coherent なら、`B` 上自明な
-   `θ ∈ Irr K` で `|K:A| − 1 ≤ 2·(Ind_K^L θ)(1)` を満たす break member が在る」。
-   一般の可解 `K` では induced member が**可約**になるため §10–§12 の muGrid/columnSum 機構と
-   entangle する (closed issue 2022 の分析どおり)。consumer (§11/§13) では sorry-free に
-   discharge 済なので FT は閉じているが、無条件の general 定理は無い。
+1. ~~**(6.2)–(6.6) の general-(6.1) 形** — 最大かつ唯一の深い残債~~ 【**2026-07-27 実測: (6.2)/(6.3)
+   については stale**】。この項目は 07-26 時点で `six_two_general`
+   (`S08_Theorem62_63_Standalone.lean:349`) と `six_three_of_six_two_oracle` (:383) が
+   **(5.6) break-member oracle `h56` を明示仮説として取る**ことを根拠にしていた。しかし
+   **issue 0153/0154 (2026-07-27 早朝に landing) が `h56` を除去済**: `six_two_of_imageData` /
+   `six_three_of_imageData` (`S08_SixTwoThreeFromImageFamilies.lean:382/413`) が
+   **oracle 無しの一般 `K` 版 (6.2)/(6.3)** で、両者とも `#print axioms` で
+   `[propext, Classical.choice, Quot.sound]` = axiom-clean (本 tick で実測)。honest な仮説は
+   書籍 Hypothesis (6.1) が要求する Hypothesis (5.2) そのもの — `InducedFamilyImageData` が
+   (5.2.b) の τ と (5.2.d)/(5.2.e) の image family を担う。可約 break/member は
+   `S07.xAdjoinStepW_k_general` (0154) が扱うので、旧記述の「一般の可解 `K` では induced member
+   が可約になるため §10–§12 の muGrid/columnSum 機構と entangle する」はもはや当たらない
+   (muGrid は §11 instance が (5.2.d) を供給する**一つの witness**に降りた)。
+   ⚠ 残る (6.3) の特殊化は「repo が `H` 冪零を取る (書籍は `H/M` 冪零)」の 1 点のみ
+   (`six_three_of_imageData` の docstring に注記; §11 consumer は `M = 1` ゆえ一致)。
+   **残るのは (6.5)/(6.6) の general-`K` 形** (下記 §「(6.5)/(6.6)」節)。
 2. **(5.3)(b) / (5.8)** — (4.6)/(5.3.b) 一般での単一 statement が無い。ただし解析コアは
    `S05_SigmaTrichotomy.eq_smul_chiFam_column_of_vanishOnV` として `TICyclicHypothesis`
    レベルで完全に一般。**意図的な設計判断**でもある (固定 2 要素の `R` レコードは可変長 `R` を
