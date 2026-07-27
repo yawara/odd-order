@@ -667,6 +667,27 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 ## Peterfalvi
 
+> 🎯 **2026-07-27: Peterfalvi 特殊化債務キャンペーンの棚卸し完了**。全 bullet を実測し直した結果、
+> **残るのは (6.4)/(6.6) の coherence 半分 1 件だけ**になった (規模 L で繰延、下記 §8 の注記参照)。
+> 内訳:
+> * **本キャンペーンで実際に一般化したもの** — (6.2)/(6.3) を一般 solvable kernel + oracle 無し +
+>   Dade 非依存へ (issues 0153/0154)、(6.6) X-characterization を一般 kernel へ (しかも `K` の
+>   正規性が不要と判明し書籍より強い)、(8.18.c) を型 I-or-II ペアへ、加重 (5.6) engine の両 break を
+>   抽象 τ へ、(11.4) から不要な型仮説を除去。
+> * **実測で stale と判明したもの (作業不要)** — (2.6)-(2.10.3) の `hconj` threading (binder ゼロ)、
+>   (7.8) (書籍ページ画像と 1 対 1 照合済)、(8.15) (claim 1 の `A₁` 節と claim 3 が既に型 uniform、
+>   `A₀`/`A` が型ごとなのは台集合の定義がそうだから)、(8.18)(a)(b) (元から型 generic)、
+>   (9.7)(b) (`caseB_exists_galoisField_repr_withAut` が書籍の三層同型そのもの)、
+>   (9.11) (`S11.nineEleven_coherent_A0` が Hypothesis (9.2) 上の generic 宣言)、
+>   (10.11)、(11.8)、(13.8) (書籍逐語の S 側が在る)。
+> * **副産物: 見せかけの opaque scaffold を 2 件除去** — `CliffordCaseBData.field_model`
+>   (唯一の producer が `True`、消費者ゼロ) と `OddOrderSpecialization` (消費者ゼロ、書籍の
+>   「K/M nilpotent」を自由 Prop に潰していた)。
+>
+> ⚠ 教訓: 本 note の未/部分/特殊化ラベルは **2026-07-16 の一度きりのスナップショット**で、
+> その後の実装で大半が陳腐化している。**着手前に必ず実測する** (CLAUDE.md「スコープ」節)。
+
+
 | unit | n | 済 | 特殊化 | 部分 | 未 | mathlib |
 |---|---|---|---|---|---|---|
 | Pf §1-2 | 4 | 4 | 0 | 0 | 0 | 0 |
@@ -799,7 +820,7 @@ status 定義: **済** = 教科書強度の Lean statement が sorry-free / **�
 
 特殊化債務 (教科書より狭い形で証明済 — 一般化要否は着手時に判定):
 
-- **(13.8)** Σ_{x∈H^#}|η₀₁(x)|² ≥ |S′| − u² (used in (13.10) in its T-instance Σ_{Q — Only the T-side instance (the one the (13.10) proof actually invokes: '(13.8) applied to T') is instantiated, in S15_CaseBEndgameSupply/Eta10Correction.lean, un…
+- **(13.8)** 【**2026-07-27 実測: 「T 側しかない」は stale**】 書籍逐語の **S 側**が在る: `Hypothesis.eta01_Hsharp_norm_lower_core` (S15_CaseBEndgameSupply/Eta01Correction.lean:790) が `|S′| − u² ≤ ∑_{x∈H^#}|η₀₁(x)|²` (`H = PC`, 書籍 p.79) を結論し、docstring も「the book's literal `S`-side statement (issue 1041)」と明記。AxiomsCheck 登録済。T 側 `eta10_Qsharp_norm_lower_core` は (13.10) が使う「(13.8) applied to T」の instance で、両者とも side-independent engine `caseB_eta01_norm_bound` (S15_SAndT_Setup/Machinery135.lean:937) を通す。⟹ 債務なし。以下は旧記述: Σ_{x∈H^#}|η₀₁(x)|² ≥ |S′| − u² (used in (13.10) in its T-instance Σ_{Q — Only the T-side instance (the one the (13.10) proof actually invokes: '(13.8) applied to T') is instantiated, in S15_CaseBEndgameSupply/Eta10Correction.lean, un…
 
 ### Pf App: Suzuki — Peterfalvi Part II Appendix: A Theorem of Suzuki
 
