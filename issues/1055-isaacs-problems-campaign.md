@@ -4433,7 +4433,8 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   **残り = `G ≅ DihedralGroup p` の明示同型のみ** /
   8B.7 ✅ `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` /
   8B.8 ✅ `isPreprimitive_sup_zpowers_addRight_one` /
-  8B.9 🔶 **step 1 (原始性) まで** — **次の frontier = 8B.9 step 2–5**。
+  8B.9 🔶 **step 1–4 完了** (交代群を含むところまで) —
+  **次の frontier = 8B.9 step 5 (符号で S_n / A_n を判定)**。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4650,3 +4651,24 @@ step 3 では `y` の可動点 = `{c | c.val < m}`, `z` の可動点 = `{c | m-1
    `n = 1` は `H` が唯一の点安定化群になるので除外 ⟹ `n = 6`。
 
 ⚠ step 1 の「非推移群の位数評価」は独立した補題として要実装 (repo に無ければ新規)。
+
+
+### 8B.9 step 5 (符号判定) の残り — 2026-07-27
+
+step 1–4 は landing 済 (`alternatingGroup_le_zpowers_mCycle_sup_zpowers_addRight_one`)。
+残りは `G = A_n` か `S_n` かの判定:
+
+* `Equiv.Perm.sign (mCycle n m hm) = (-1)^(m-1)`,
+  `Equiv.Perm.sign (Equiv.addRight (1 : ZMod n)) = (-1)^(n-1)` を出す。
+  そのために **`IsCycle` と `support` の計算**が要る:
+  - `(mCycle n m hm).support = {c | c.val < m}` (`mCycle_apply_eq_self_iff` から直に出る:
+    `support` の定義は `{x | f x ≠ x}`)。`Finset.card` は `m`。
+  - `(Equiv.addRight (1 : ZMod n)).support = univ` (n ≥ 2)、card は `n`。
+  - `IsCycle` は `mCycle_pow_apply` (`(mCycle^k) c = ((c.val+k)%m)`) から
+    「`0` から先頭区間の全点に届く」ことで出る。
+  - `Equiv.Perm.IsCycle.sign : f.IsCycle → sign f = -(-1)^f.support.card` を使う。
+* `A_n ≤ G` かつ `[S_n : A_n] = 2` なので `G = A_n` または `G = ⊤`。
+  `m` か `n` が偶 ⟹ どちらかの生成元が奇置換 ⟹ `G ⊄ A_n` ⟹ `G = ⊤`;
+  どちらも奇 ⟹ 両生成元が偶置換 ⟹ `G ≤ A_n` ⟹ `G = A_n`。
+  (`Subgroup.eq_top_of_...` / `alternatingGroup` の指数 2 は mathlib
+  `Equiv.Perm.alternatingGroup_index` 等を要確認。)
