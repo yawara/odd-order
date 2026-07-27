@@ -62,7 +62,7 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `doubleCoset_transitive_iff` — **Problem 8A.15**: `G` の `H`-剰余類への作用が
   2-transitive ⟺ 二重剰余類が `H` とその外のちょうど 2 つ (= `H × H` の両側作用が
   `G` 上 2 軌道)。
-- `card_orbits_le_index` — **Problem 8A.14** 前半: `G` 推移的で `[G:H] = m` なら
+- `card_orbits_le_index`, `exists_ne_coset_same_orbit` — **Problem 8A.14**: `G` 推移的で `[G:H] = m` なら
   `H` の軌道は高々 `m` 個 (`gH ↦ ⟦g⁻¹ • α⟧` が `G ⧸ H` からの全射)。
 - `card_fixedBy_prod_three`, `sum_cube_card_fixedBy` — **Problem 8A.13** の骨格:
   置換指標の 3 乗和は `Ω³` 上の軌道数 × `|G|`。求める `m` は **5**
@@ -1001,6 +1001,22 @@ theorem card_orbits_le_index [Finite G] [Finite Ω] [IsPretransitive G Ω]
     change (Quotient.mk'' ((g⁻¹ : G)⁻¹ • α) : MulAction.orbitRel.Quotient H Ω)
       = Quotient.mk'' ω
     rw [inv_inv, hg]
+
+/-- 8A.14 後半の核: `H` が点安定化群 `G_{a⁻¹ • α}` を含まないなら, `aH` と同じ
+`H`-軌道を与える別の剰余類 `bH ≠ aH` がある。
+
+`u ∈ a⁻¹ G_α a ∖ H` を取り `b := a u⁻¹` とすると `bH ≠ aH` で
+`b⁻¹ • α = u a⁻¹ • α = a⁻¹ • α`。 -/
+theorem exists_ne_coset_same_orbit {H : Subgroup G} {α : Ω} (a : G)
+    (hns : ¬ (∀ g ∈ MulAction.stabilizer G ((a : G)⁻¹ • α), g ∈ H)) :
+    ∃ b : G, (b : G)⁻¹ • α = (a : G)⁻¹ • α ∧ a⁻¹ * b ∉ H := by
+  simp only [not_forall] at hns
+  obtain ⟨u, hu, huH⟩ := hns
+  refine ⟨a * u⁻¹, ?_, ?_⟩
+  · rw [mul_inv_rev, inv_inv, mul_smul]
+    exact MulAction.mem_stabilizer_iff.mp hu
+  · intro hc
+    exact huH (by simpa using H.inv_mem hc)
 
 /-! ### Problem 8A.15 — 剰余類への 2-transitivity と二重剰余類 -/
 
