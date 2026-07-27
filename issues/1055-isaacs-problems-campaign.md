@@ -4255,7 +4255,14 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 * ✅ `sum_sq_card_fixedBy` — `∑_g χ(g)² = |Ω×Ω の軌道数| · |G|`
   (§1A の `Ch01.sum_card_fixedBy_nat` = Nat.card 版 Burnside をそのまま `Ω × Ω` に適用)。
 
-**残り (8A.12)**: 「`G` 2-transitive ⟺ `Ω × Ω` の `G`-軌道がちょうど 2 個」。
+* ✅ `card_orbits_prod_eq_two_iff` / `sum_sq_card_fixedBy_eq_two_mul_iff` ⟹ **8A.12 完了**。
+  軌道数 2 の同値は `Nat.card_eq_two_iff` (`{x,y} = univ` 形) で扱い, 「対角線の類には
+  対角線上の点しか入らない」(`hdiag`) を軸に 3 つの類の場合分けを `rcases <;> first | ...`
+  で潰す。⚠ `MulAction.orbitRel_apply` から出る witness は `(fun m => m • p) g = q` という
+  **beta-redex** なので, `congrArg Prod.fst` に渡す前に `have hg' : g • p = q := hg` で
+  型を張り替える (そうしないと `rw`/`congrArg` の結果が噛み合わない)。
+
+**旧記載の残り (8A.12)**: 「`G` 2-transitive ⟺ `Ω × Ω` の `G`-軌道がちょうど 2 個」。
 (⟹) 対角線 `Δ` が 1 軌道 (`G` 推移的), その補集合が 1 軌道 (2-transitivity), 両者は交わらず
 `Ω × Ω` を覆う。(⟸) 2 軌道なら `Δ` が一方で残りが他方ゆえ off-diagonal に推移的。
 実装は `orbitRel.Quotient G (Ω × Ω) ≃ Fin 2` を作るのが素直 (`Nontrivial Ω` が要る)。

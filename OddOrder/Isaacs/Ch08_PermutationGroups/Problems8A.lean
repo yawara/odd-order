@@ -56,8 +56,9 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `card_eq_four_of_solvable_of_stabilizer_three_transitive`,
   `nonempty_mulEquiv_perm_fin_four_of_four_transitive` — **Problem 8A.10**:
   可解な 4-transitive 置換群の次数は 4 で, したがって `S₄` に同型。
-- `card_fixedBy_prod`, `sum_sq_card_fixedBy` — **Problem 8A.12** の骨格: 置換指標の
-  2 乗和は `Ω × Ω` 上の軌道数 × `|G|` (`χ²` は積作用の置換指標 + Burnside)。
+- `card_fixedBy_prod`, `sum_sq_card_fixedBy`, `card_orbits_prod_eq_two_iff`,
+  `sum_sq_card_fixedBy_eq_two_mul_iff` — **Problem 8A.12**: 推移的な `G` について
+  `G` が 2-transitive ⟺ 置換指標の 2 乗の平均が 2。
 - `affineLineGroup`, `existsUnique_affineLineGroup_of_ne`,
   `affineLineGroup_isSolvable` — **Problem 8A.11**: 1 次元アフィン群
   `AGL(1, F) = {x ↦ ax + b}` は `F` 上 sharply 2-transitive で, metabelian ゆえ可解。
@@ -874,6 +875,76 @@ theorem sum_sq_card_fixedBy [Fintype G] [Finite Ω] :
       = Nat.card (MulAction.orbitRel.Quotient G (Ω × Ω)) * Nat.card G := by
   rw [← OddOrder.Isaacs.Ch01.sum_card_fixedBy_nat (M := G) (β := Ω × Ω)]
   exact (Finset.sum_congr rfl fun g _ => card_fixedBy_prod g).symm
+
+/-- **Isaacs Problem 8A.12** (p. 236) の組合せ部分: 推移的な `G` について
+**`Ω × Ω` の `G`-軌道がちょうど 2 個 ⟺ `G` は 2-transitive**。
+
+軌道は「対角線」と「対角線の外」の 2 つ。対角線の類には対角線上の点しか入らないので,
+2-transitivity は「対角線外がひとつの軌道」と同値。 -/
+theorem card_orbits_prod_eq_two_iff [IsPretransitive G Ω] [Nontrivial Ω] :
+    Nat.card (MulAction.orbitRel.Quotient G (Ω × Ω)) = 2 ↔
+      ∀ β₁ β₂ γ₁ γ₂ : Ω, β₁ ≠ β₂ → γ₁ ≠ γ₂ → ∃ g : G, g • β₁ = γ₁ ∧ g • β₂ = γ₂ := by
+  classical
+  obtain ⟨α, β, hαβ⟩ := exists_pair_ne Ω
+  have hdiag : ∀ x y : Ω, (Quotient.mk'' (x, y) : MulAction.orbitRel.Quotient G (Ω × Ω))
+      = Quotient.mk'' (α, α) → x = y := by
+    intro x y h
+    rw [Quotient.eq''] at h
+    obtain ⟨g, hg⟩ := MulAction.orbitRel_apply.mp h
+    have hg' : g • ((α : Ω), (α : Ω)) = (x, y) := hg
+    exact (congrArg Prod.fst hg').symm.trans (congrArg Prod.snd hg')
+  have hmk : ∀ p q : Ω × Ω, (∃ g : G, g • p = q) →
+      (Quotient.mk'' q : MulAction.orbitRel.Quotient G (Ω × Ω)) = Quotient.mk'' p := by
+    intro p q hpq
+    rw [Quotient.eq'']
+    exact MulAction.orbitRel_apply.mpr hpq
+  constructor
+  · -- 2 軌道 ⟹ 2-transitive
+    intro hcard β₁ β₂ γ₁ γ₂ hβ hγ
+    obtain ⟨x, y, hxy, huniv⟩ := Nat.card_eq_two_iff.mp hcard
+    have hmem : ∀ q : MulAction.orbitRel.Quotient G (Ω × Ω), q = x ∨ q = y := fun q => by
+      have hq : q ∈ ({x, y} : Set _) := huniv ▸ Set.mem_univ q
+      simpa using hq
+    have hoff : ∀ (b₁ b₂ : Ω), b₁ ≠ b₂ →
+        (Quotient.mk'' (b₁, b₂) : MulAction.orbitRel.Quotient G (Ω × Ω))
+          ≠ Quotient.mk'' (α, α) := fun b₁ b₂ hb hc => hb (hdiag b₁ b₂ hc)
+    have hsame : (Quotient.mk'' (γ₁, γ₂) : MulAction.orbitRel.Quotient G (Ω × Ω))
+        = Quotient.mk'' (β₁, β₂) := by
+      rcases hmem (Quotient.mk'' (α, α)) with hα | hα <;>
+        rcases hmem (Quotient.mk'' (β₁, β₂)) with hβ' | hβ' <;>
+        rcases hmem (Quotient.mk'' (γ₁, γ₂)) with hγ' | hγ' <;>
+        first
+          | (exact hγ'.trans hβ'.symm)
+          | (exact absurd (hβ'.trans hα.symm) (hoff β₁ β₂ hβ))
+          | (exact absurd (hγ'.trans hα.symm) (hoff γ₁ γ₂ hγ))
+    rw [Quotient.eq''] at hsame
+    obtain ⟨g, hg⟩ := MulAction.orbitRel_apply.mp hsame
+    have hg' : g • (β₁, β₂) = (γ₁, γ₂) := hg
+    exact ⟨g, congrArg Prod.fst hg', congrArg Prod.snd hg'⟩
+  · -- 2-transitive ⟹ 2 軌道
+    intro h2
+    refine Nat.card_eq_two_iff.mpr ⟨Quotient.mk'' (α, α), Quotient.mk'' (α, β),
+      fun hc => hαβ (hdiag α β hc.symm), Set.eq_univ_iff_forall.mpr ?_⟩
+    refine Quotient.ind' fun p => ?_
+    rcases eq_or_ne p.1 p.2 with hp | hp
+    · obtain ⟨g, hg⟩ := exists_smul_eq G α p.1
+      exact Set.mem_insert_iff.mpr (Or.inl (hmk (α, α) p ⟨g, Prod.ext hg (hg.trans hp)⟩))
+    · obtain ⟨g, hg1, hg2⟩ := h2 α β p.1 p.2 hαβ hp
+      exact Set.mem_insert_iff.mpr (Or.inr (Set.mem_singleton_iff.mpr
+        (hmk (α, β) p ⟨g, Prod.ext hg1 hg2⟩)))
+
+/-- **Isaacs Problem 8A.12** (p. 236) 🎉: 推移的な `G` について
+**`G` が 2-transitive ⟺ 置換指標 `χ` の 2 乗の平均値が 2**
+(`∑_{g} χ(g)² = 2 |G|`)。
+
+`χ²` は積作用 `Ω × Ω` の置換指標なので, Burnside より `∑ χ² = (Ω×Ω の軌道数)·|G|`。
+軌道数が 2 であることが 2-transitivity と同値 (`card_orbits_prod_eq_two_iff`)。 -/
+theorem sum_sq_card_fixedBy_eq_two_mul_iff [Fintype G] [Finite Ω] [IsPretransitive G Ω]
+    [Nontrivial Ω] :
+    (∑ g : G, Nat.card (MulAction.fixedBy Ω g) ^ 2) = 2 * Nat.card G ↔
+      ∀ β₁ β₂ γ₁ γ₂ : Ω, β₁ ≠ β₂ → γ₁ ≠ γ₂ → ∃ g : G, g • β₁ = γ₁ ∧ g • β₂ = γ₂ := by
+  rw [sum_sq_card_fixedBy, ← card_orbits_prod_eq_two_iff]
+  exact ⟨fun h => Nat.eq_of_mul_eq_mul_right Nat.card_pos h, fun h => by rw [h]⟩
 
 /-! ### Problem 8A.11 — 1 次元アフィン群 `AGL(1, F)` -/
 
