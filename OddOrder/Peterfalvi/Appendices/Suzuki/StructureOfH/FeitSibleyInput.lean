@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Basic
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
 
 /-!
@@ -332,6 +333,32 @@ theorem sset_isCoherent [Fintype G] [Invertible (Nat.card G : ℂ)]
   have hHall : Nat.Coprime (Nat.card ↥(sc.feitSibleyHypothesis ind hQ1).Q)
       (sc.feitSibleyHypothesis ind hQ1).Q.index := sc.coprime_card_Q_index ind
   exact FeitSibley.feit_sibley_coherence _ hd hQ1odd hnil hHall
+
+/-! ## The conclusion of Theorem C, from a proper non-trivial normal subgroup -/
+
+/-- `Q` a `2`-group forces `Q₁ = 1`: the odd part of a `2`-group is trivial. -/
+theorem Q1_eq_bot_of_isPGroup_two (hQ : IsPGroup 2 ↥sc.toHypothesis.Q) :
+    sc.toHypothesis.Q1 = ⊥ := by
+  have hQ1 : IsPGroup 2 ↥sc.toHypothesis.Q1 :=
+    hQ.to_le sc.toHypothesis.Q1_le_Q
+  obtain ⟨n, hn⟩ := hQ1.exists_card_eq
+  rcases Nat.eq_zero_or_pos n with rfl | hpos
+  · exact Subgroup.eq_bot_of_card_eq _ (by simpa using hn)
+  · exact absurd (even_iff_two_dvd.mpr (hn ▸ dvd_pow_self 2 hpos.ne'))
+      (Nat.not_even_iff_odd.mpr sc.toHypothesis.odd_card_Q1)
+
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step 13** (p. 116): "Therefore
+`N = Ker f_j` is a normal subgroup of `G` such that `1 ≠ N ≠ G`.  By Chapter I,
+§3, Proposition 2, `G` satisfies the conclusion of Theorem A and so `Q₁ = 1`
+(Chapter I, §3, Lemma 1)."
+
+Once `G` is known not to be simple, Ch. I §3 Proposition 2 supplies Theorem A's
+conclusion and Ch. I §3 Lemma 1 (`TheoremAConclusion.Q_and_residual`) makes `Q` a
+`2`-group; its odd part `Q₁` is then trivial. -/
+theorem Q1_eq_bot_of_not_isSimpleGroup (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hG : ¬ IsSimpleGroup G) : sc.toHypothesis.Q1 = ⊥ := by
+  obtain ⟨result⟩ := sc.toHypothesis.theoremAConclusion_of_not_simple hG ind
+  exact sc.Q1_eq_bot_of_isPGroup_two (result.Q_and_residual sc.toHypothesis).1
 
 end SecondCaseHypothesis
 
