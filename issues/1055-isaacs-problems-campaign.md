@@ -4435,7 +4435,8 @@ mathlib 既存: `Projectivization.linearIndependent_pair_iff_ne`,
   8B.9 ✅ `eq_top_...` (m か n 偶 ⟹ S_n) / `eq_alternatingGroup_...` (ともに奇 ⟹ A_n) /
   8B.10 ✅ `card_eq_six_of_index_eq_of_ne_stabilizer`。
   ⟹ **§8B は 8B.1–8B.10 完了** (8B.6 の `D₂ₚ` 明示同型のみ残)。
-  **次の frontier = §8C** (8C.1–8C.6)。
+  §8C 🔶 **進行中**: 8C.1 ✅ (`Problems8C/SimpleOrder120.lean`) /
+  8C.2 は準備 3 本 (`Problems8C/PrimeDegree.lean`) — **次の frontier = 8C.2 本体**。
   再利用可能な支持補題: `isPretransitive_of_normal_of_isPreprimitive` (原始群の
   非自明正規部分群は推移的) / `inf_eq_bot_of_isMinimalNormal_of_ne` /
   `bijective_smulBase_of_normal_of_comm` (推移的可換正規部分群は regular)。
@@ -4784,3 +4785,21 @@ leaf 構成: `Problems8B/{Blocks, SmallSuborbits, CyclicGenerated}.lean`
 ⚠ 上記は pdftotext の断片からの推測。**着手前に PDF ページ画像
 (`references/isaacs/pages/` に p.251 前後を切り出す) で文言を確定すること**
 (8B.7 で上付き `O²` を取り違えかけた前例あり)。
+
+
+## §8C 進捗 (2026-07-27)
+
+* **8C.1 ✅** — `Problems8C/SimpleOrder120.lean`: `A₆` は位数 120 の部分群をもたず,
+  位数 120 の群は単純でない。
+* **8C.2 🔶** — `Problems8C/PrimeDegree.lean` に部品 3 本:
+  `isPretransitive_of_card_eq_prime` / `centralizer_eq_of_card_eq_prime` (`C(H) = H`) /
+  `card_normalizer_dvd_of_card_eq_prime` (`|N(H)| ∣ p(p-1)`)。
+  残りは Hint の `|N_G(P)| = 55` (`P ∈ Syl₁₁(G)`, `|G| = 7920`) を出して単純性へ。
+* 8C.3–8C.6 未着手。
+
+⚠ **環境メモ (2026-07-27)**: この session の途中から `Read` ツールが
+PreToolUse hook のタイムアウトで**全く使えなくなった** (画像・テキスト問わず)。
+PDF ページ画像による文言確定ができないため、§8C 以降は `pdftotext` の断片に頼っている。
+`references/isaacs/pages/isaacs-p256-269.png` / `isaacs-p257-270.png` は
+レンダリング済なので、**ツールが復旧したら 8C.3 以降の着手前に必ず読んで文言を確定する
+こと** (8B.7 で上付き `O²` を取り違えかけた前例あり)。
