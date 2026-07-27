@@ -11806,6 +11806,13 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.escaping_sigma_disjoint_centralizer_typeA
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.supported_sigma_coprime_typeA
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftThickenedSupport_mixed_disjoint_of_nonconjugate_typeA
+-- **(8.18.c) at type-I-or-II pairs** (2026-07-27): `support_mutual_exclusion` (both type I) is now
+-- the instance of `support_mutual_exclusion_of_typeI_or_II`, which allows each of `S`, `T` to be
+-- of type I *or* II with independent type tags.  The type-I-only step of the old proof was the
+-- nonemptiness of `A₁(S)`, drawn from `TypeFData.H_nontrivial`; it is replaced by
+-- `BG.Ch3.S10.Msigma_ne_bot`, valid for EVERY maximal subgroup of a minimal simple odd group.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.support_mutual_exclusion_of_typeI_or_II
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.support_mutual_exclusion
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_conj_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_subset_hatMsigma
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePACore_one_not_mem
