@@ -197,6 +197,7 @@ import OddOrder.Peterfalvi.S06_CertainTypeIsometry
 import OddOrder.Peterfalvi.S06_CertainTypeConjugation
 import OddOrder.Peterfalvi.S06_MuColumnBridge
 import OddOrder.Peterfalvi.S06_CertainTypeSubcoherent
+import OddOrder.Peterfalvi.S13_ColumnFamilyBridge
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S07_CoherenceGalois
@@ -13234,3 +13235,20 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 -- route to the mixed stratum of (5.2.e): NC((φ − φ̄)^τ) ≤ ‖φ − φ̄‖² = 2 < 2·min(w₁,w₂) and (3.8).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S06.dadeOfDiff_imageSet_orthogonal_chiFam
+
+-- **§13 の列 R-族 = (5.3)(b) の certain-type 族** (issue 0160).  §13 は `alignedOmegaSigmaGrid` +
+-- `params.delta` の符号 pin 済、抽象版は生の `certainTypeOmegaSigma` + `(columnFamily χ₂).sign`。
+-- 別物ではなく §13 が追加内容 (整列) を持つので「置換」でなく `imageSet` 一致の bridge にした。
+-- (5.2.e) は `imageSet` しか見ないので、下流を一切触らずに抽象 (5.3)(b) の直交性が §13 に効く。
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.colRFamily_imageSet_eq_certainTypeR_imageSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.memberRFamily_imageSet_eq_certainTypeR_imageSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S13.columnRImage_eq_certainTypeRImage
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S13.columnRImage_image_eq_certainTypeRImage_image
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S13.muColumnChar_conj_eq_inv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.muColumnSign_eq_columnFamily_sign

@@ -514,6 +514,7 @@ import OddOrder.Peterfalvi.S13_CoreStructure
 import OddOrder.Peterfalvi.S13_PrimeTIResidueBridge
 import OddOrder.Peterfalvi.S11_NineElevenCaseA
 import OddOrder.Peterfalvi.S13_Orthogonality
+import OddOrder.Peterfalvi.S13_ColumnFamilyBridge
 import OddOrder.Peterfalvi.S13_TypeDetermination
 import OddOrder.Peterfalvi.S13_TypeIIIGalois
 import OddOrder.Peterfalvi.S14_MaximalI

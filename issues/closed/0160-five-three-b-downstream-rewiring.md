@@ -146,3 +146,34 @@ AxiomsCheck の `S11.columnRFamily` 項目も除去)。**net −107/+16 行**、
 
 **新しい def を書く前に、その形の既存を必ず grep する。** 特に「既存の構成を別の対象へ移送する」
 型の薄い def は、同じものが別レイヤに既にある確率が高い。
+
+## ✅ 完了 (2026-07-27)
+
+3 項目すべて決着:
+
+| # | 内容 | 結果 |
+|---|---|---|
+| (1) | anchor dedup | type-P / type-II を `S06.dadeICM_apply_eq_zero_of_mem_ticVdiffV` の特殊化に置換。Sibley は**数学的に別物**ゆえ据え置き + 理由を docstring 化 |
+| (2) | §13 ↔ 抽象 (5.3)(b) | **「置換」でなく bridge が正しい**と判明し、`S13_ColumnFamilyBridge.lean` に `imageSet` 一致を 2 本 landing |
+| (3) | (副産物) `columnR` 重複 | 手書き転送 5 箇所を `S06.columnR` に統合、net −107/+16 行 |
+
+### (2) の最終形
+
+新 leaf [`S13_ColumnFamilyBridge.lean`](../OddOrder/Peterfalvi/S13_ColumnFamilyBridge.lean):
+
+* `colRFamily_imageSet_eq_certainTypeR_imageSet`
+* `memberRFamily_imageSet_eq_certainTypeR_imageSet` (dispatch 版; 既約分岐は両者とも
+  `dadeOrthonormalCharacterImageFamilyOfDiff` ゆえ proof-irrelevance で自明)
+
+4 つの同定 (符号 / σ-grid / 行添字 / 共役列) が全部かみ合った。**下流は一行も触っていない** —
+(5.2.e) は `imageSet` しか見ないので、この等式だけで抽象 (5.3)(b) の直交性が §13 に効く。
+
+⚠ **なぜ置換しなかったか**を docstring に明記した: §13 側は重複でなく `params.delta` 整列という
+追加内容を持ち、下流 ((5.5)/(9.11)) がそれを読む。置換すれば情報が落ちる。
+
+### 完了条件の判定
+
+「重複が実際に減る」= (3) で −107 行 + (1) で −50 行。
+「置換が数学的に不可能な箇所は理由を docstring に残す」= Sibley anchor と §13 aligned grid の
+2 箇所で実施。⟹ **close**。全て sorry-free / axiom-clean (AxiomsCheck 登録済)、
+full build green (4875 jobs)、lint --strict clean、sorry 349 で非退行。
