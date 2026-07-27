@@ -1462,7 +1462,9 @@ future proof の target」— どちらも既に証明済)。
    `A(M)` しか covering していない」**点で、これを本 tick で解消
    (`escapingSharpSet_a0Set_eq_aSet` + clause (c) の `hatMsigma` 一般化 +
    `aSet_subset_A0Set` を Peterfalvi から BG へ移設)。書籍括弧書き `Hᵢ ≤ M'ᵢ` も field 化。
-4. **Pf App Suzuki2Groups Lemma 1 (a)(c)(d)** — Higman 論文の実内容 ((b) は 07-18 に完済)。
+4. ~~**Pf App Suzuki2Groups Lemma 1 (a)(c)(d)**~~ — **2026-07-24 完済** (issue 0148 campaign)。
+   `Appendices/Suzuki2Groups.lean` は宣言ゼロの re-export hub になり、Lemma 1(a)(c)(d) /
+   Lemma 2(a)-(c) / Prop 1 / Prop 2 / Theorem (e) 順方向まで全て実形式化済 (2026-07-28 実測)。
 5. **packaging 8 件** — (5.8) (7.8) (7.9) (8.15) (9.7) (9.10) (9.11) (10.11)。
    内容は landed、単一の抽象 statement が無いだけ。⚠ **(5.3)(b) は 2026-07-27 に本項から外れた**
    — `S06.toGeneralHypothesisOfInducedFamily` が書籍 statement を (4.6) 一般で述べる
@@ -1470,6 +1472,31 @@ future proof の target」— どちらも既に証明済)。
    `S07.GeneralHypothesis` (issue 0157) で無効化済。
 6. **低優先繰延** — BG App.C Rem (IV) / Prob 1 (文献引用・open problem)、
    Pf App C Prop 1 の Q₈ Brauer–Suzuki (issue 0147、repo 唯一の実 sorry)。
+
+### ⚠ 2026-07-28 訂正 — 上の 1–6 は Part II を丸ごと落としていた
+
+**この frontier 節は Part I 側の表からしか項目を拾っておらず、`### Pf App: Suzuki`
+(L825–L862) に並ぶ Part II の「未」12 行が 1 つも入っていなかった。** そのため
+「残りは packaging とごく少数」という誤った全体像になり、実際 2026-07-26 に Ch.II
+(Theorem B) が完結した直後、**文書順の次である Ch.III に入らないまま** Part I の
+一般化トラック (issues 0151–0161) へ pivot している (`git log`:
+`OddOrder/Peterfalvi/Appendices/Suzuki/` への commit は 07-26 05:30 `55ec6f681` が最後、
+その 9 分後 `25521c85c` から別トラック)。
+
+**Part II の実際の frontier (2026-07-28 実測)** — Ch.I / Ch.II は完済、以下が未着手:
+
+| 書籍 | 内容 | 状態 |
+|---|---|---|
+| **Ch.III §1 Thm C** | `Q` は 2-群 (`Q₁ = 1`) | **未** — [issue 0162](../../issues/0162-pf-part2-ch3-theorem-c.md)。前提 (Feit–Sibley / Ch.I 一式) は全て landed |
+| Ch.III §1 Prop | 三分律 (a) `S = Q₀` / (b) type A / (c) type B | 未 |
+| Ch.III §2 Prop | `st` 位数 5 の場合 `(SK) ∪ (SKtS)` が部分群 | 未 |
+| Ch.III §3 Prop | (C2) の下での明示モデル | 未 |
+| Ch.IV §1 (H1)–(H6) + Lemma | `f, g, h` の BN-pair 形式と一意性 | 未 |
+| Ch.IV §2 Prop | `D` が `(Q/Q₀)^#` に不動点なく作用する場合 | 未。⚠ OCR 欠落ページ (`[MISSING_PAGE_EMPTY:136]`) — PDF 必須 |
+| Ch.IV §3 Prop + Cor 1, 2 | `PSU(3,q)` の特徴付け | 未。`PSU(3,q)` の構成が要る (mathlib に無し) |
+| Ch.IV §4 | `V ≠ W` の場合 = Theorem A の最終組立 | 未 |
+
+⟹ **Part II の残りが Peterfalvi 側の主 frontier**。上の 1–6 と並ぶ独立項目として扱う。
 
 ### 見積もりについての教訓
 
