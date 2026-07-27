@@ -32,8 +32,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.3 Split Extensions
 - [ ] Ch.4 Commutators
 - [x] Ch.5 Transfer — **🎉 完済 (2026-07-27)**: §5A–§5E 全問
-- [ ] Ch.6 Frobenius Actions — **着手 (2026-07-27)**: §6A 進行中
-- [ ] Ch.7 Thompson Subgroup
+- [x] Ch.6 Frobenius Actions — **🎉 完済 (2026-07-27)**: §6A (11 問) / §6B (9 問) / §6C (2 問) 全問
+- [ ] Ch.7 Thompson Subgroup — **次の frontier (2026-07-27)**
 - [ ] Ch.8 Permutation Groups
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
@@ -3532,3 +3532,12 @@ axiom-clean (`[propext, Classical.choice, Quot.sound]`)。
   * `sup_eq_top_of_card_prime` を独立補題として切り出し、(a) の族構成の局所 `have` も
     これを呼ぶよう refactor (重複解消)。
   * `Problems6C2.lean` = 727 行 (上限 1500 に余裕)。
+
+## 🎉 Ch.6 完済 (2026-07-27) — 次は Ch.7 Problems
+
+Ch.6 の演習は **§6A 6A.1–6A.11 / §6B 6B.1–6B.9 / §6C 6C.1–6C.2 の全 22 問**が実証明
+(すべて axiom-clean、各 leaf は `OddOrder.lean` 配線済)。本日追加した分:
+6B.8 (Taussky-Todd 主定理) / 6B.9 / 6C.1(a)(b) / 6C.2(a)(b)。
+
+次の frontier = **Ch.7 (Thompson Subgroup) の Problems** (文書順)。着手時は
+問題番号一覧を PDF ページ画像で確定してから (pdftotext は記号が壊れる)。
