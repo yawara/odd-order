@@ -4314,7 +4314,8 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
 
 ### §8A 一巡後の残り 3 件 (2026-07-27 時点)
 
-1. **8A.1 後半** — 計算核を landing (2026-07-27): `transZFour` (`x ↦ x+1`) /
+1. ~~**8A.1 後半**~~ ✅ **完了 (2026-07-27)** — `exists_two_nonisomorphic_regular_normal`。
+   計算核 (2026-07-27): `transZFour` (`x ↦ x+1`) /
    `flipZFour` (`x ↦ 1-x`) と関係式 `s t s⁻¹ = t⁻¹` / `t s t⁻¹ = s t²` /
    `V` の各元の位数 ≤ 2 / `t² ≠ 1` を **`decide` で確認済** (`Equiv.Perm (ZMod 4)` 上の
    `decide` は実用速度で通ることを probe で確認)。残りは 2 つの部分群を明示 carrier で
@@ -4330,3 +4331,18 @@ Equiv 版しか持たない)。⟹ **8A.10 完了**。
    `Nat.card_eq_two_iff` の 5 元版が無いので `orbitRel.Quotient G Ω³ ≃ Fin 5` の
    明示構成が素直 (`|Ω| ≥ 3` が要る)。
 3. ~~**8A.14 後半**~~ ✅ 完了 (2026-07-27)。
+
+### 8A.1 後半 完了 (2026-07-27)
+
+`cyclicFourSub` (`= {1,t,t²,t³} ≅ Z₄`) と `kleinFourSub` (`= {1,t²,s,st²} ≅ Z₂×Z₂`) を
+**明示 carrier の `Subgroup`** として組み, regular 性 (軌道写像の全単射) / 相互の正規化
+(`V ≤ N(T)`, `T ≤ N(V)`) / 非同型 (`V` は指数 2, `T` は位数 4 の元をもつ) をすべて
+`decide` + 4 元の場合分けで証明 ⟹ `exists_two_nonisomorphic_regular_normal`。
+
+⚠ Lean メモ: `⟨v, hv⟩ ^ 2` のように **subtype の証明成分が式に残ると `decide` が
+「Expected type must not contain free variables」で落ちる** → `Subtype.ext` の後に
+`push_cast` で coe を外し, 台の等式にしてから `rcases`/`decide` する。
+正規化群の判定は `∀ x : Equiv.Perm (ZMod 4), x ∈ T ↔ v x v⁻¹ ∈ T` を
+`simp only [mem_normalizer_iff, mem_...]` で素の論理式に開いてから `decide` (24 元の全数)。
+
+⟹ **§8A の残りは 8A.13 の同値 (軌道数 5 ⟺ 3-transitive) のみ**。

@@ -26,9 +26,10 @@ Isaacs §8A の章末演習。「regular 部分群」は `RegularNormal.lean` �
 - `exists_regular_subgroups_of_equiv`, `exists_regular_subgroups_of_card_eq` —
   **Problem 8A.1** 前半: `|A| = |B|` なら `Sym(A)` は `A`, `B` に同型な regular 部分群を
   ともにもつ。
-- `transZFour`, `flipZFour` と `D₈` の関係式群 — **Problem 8A.1 後半**の計算核:
-  `ZMod 4` 上で `s t s⁻¹ = t⁻¹`, `t s t⁻¹ = s t²`, `V` の各元が位数 ≤ 2, `t² ≠ 1`。
-  すべて `decide` で確認 (答は「同型でない regular normal 部分群はもてる」)。
+- `cyclicFourSub`, `kleinFourSub`, `exists_two_nonisomorphic_regular_normal` —
+  **Problem 8A.1 後半**: 置換群は同型でない regular normal 部分群をもちうる
+  (`Ω = ZMod 4`, `D₈ = T ⊔ V` で `T ≅ Z₄`, `V ≅ Z₂ × Z₂`)。`ZMod 4` 上の等式は
+  すべて `decide`。⚠ 8A.4 と矛盾しないのは `T ⊓ V ≠ ⊥` だから。
 - `regularRepRight`, `exists_two_distinct_regular_normal_of_center_eq_bot` —
   **Problem 8A.3**: `Z(G) = 1` (かつ非自明) なら `Sym(G)` の中に `G` に同型な相異なる
   regular normal 部分群が 2 つある (左正則表現の像と右正則表現の像)。
@@ -185,6 +186,123 @@ lemma klein_sq_eq_one :
 
 /-- `t` の位数は 4 — `T ≅ Z₄` は位数 4 の元をもつので `V` (指数 2) と同型でない。 -/
 lemma transZFour_sq_ne_one : transZFour ^ 2 ≠ 1 := by decide
+
+/-- `T = ⟨t⟩ = {1, t, t², t³} ≅ Z₄` — `ZMod 4` の平行移動群。 -/
+def cyclicFourSub : Subgroup (Equiv.Perm (ZMod 4)) where
+  carrier := {p | p = 1 ∨ p = transZFour ∨ p = transZFour ^ 2 ∨ p = transZFour ^ 3}
+  one_mem' := Or.inl rfl
+  mul_mem' := by
+    intro a b ha hb
+    simp only [Set.mem_setOf_eq] at ha hb ⊢
+    rcases ha with rfl | rfl | rfl | rfl <;> rcases hb with rfl | rfl | rfl | rfl <;> decide
+  inv_mem' := by
+    intro a ha
+    simp only [Set.mem_setOf_eq] at ha ⊢
+    rcases ha with rfl | rfl | rfl | rfl <;> decide
+
+/-- `V = {1, t², s, s t²} ≅ Z₂ × Z₂` — Klein 四元群。 -/
+def kleinFourSub : Subgroup (Equiv.Perm (ZMod 4)) where
+  carrier := {p | p = 1 ∨ p = transZFour ^ 2 ∨ p = flipZFour ∨ p = flipZFour * transZFour ^ 2}
+  one_mem' := Or.inl rfl
+  mul_mem' := by
+    intro a b ha hb
+    simp only [Set.mem_setOf_eq] at ha hb ⊢
+    rcases ha with rfl | rfl | rfl | rfl <;> rcases hb with rfl | rfl | rfl | rfl <;> decide
+  inv_mem' := by
+    intro a ha
+    simp only [Set.mem_setOf_eq] at ha ⊢
+    rcases ha with rfl | rfl | rfl | rfl <;> decide
+
+lemma mem_cyclicFourSub {p : Equiv.Perm (ZMod 4)} :
+    p ∈ cyclicFourSub ↔
+      p = 1 ∨ p = transZFour ∨ p = transZFour ^ 2 ∨ p = transZFour ^ 3 :=
+  ⟨fun h => h, fun h => h⟩
+
+lemma mem_kleinFourSub {p : Equiv.Perm (ZMod 4)} :
+    p ∈ kleinFourSub ↔
+      p = 1 ∨ p = transZFour ^ 2 ∨ p = flipZFour ∨ p = flipZFour * transZFour ^ 2 :=
+  ⟨fun h => h, fun h => h⟩
+
+/-- `T` は `ZMod 4` に regular に作用する。 -/
+lemma bijective_smulBase_cyclicFourSub :
+    Function.Bijective (smulBase cyclicFourSub (0 : ZMod 4)) := by
+  constructor
+  · rintro ⟨a, ha⟩ ⟨b, hb⟩ hab
+    simp only [smulBase, Equiv.Perm.smul_def] at hab
+    rcases mem_cyclicFourSub.mp ha with rfl | rfl | rfl | rfl <;>
+      rcases mem_cyclicFourSub.mp hb with rfl | rfl | rfl | rfl <;>
+        first | rfl | exact absurd hab (by decide)
+  · intro x
+    fin_cases x
+    · exact ⟨⟨1, Or.inl rfl⟩, by decide⟩
+    · exact ⟨⟨transZFour, Or.inr (Or.inl rfl)⟩, by decide⟩
+    · exact ⟨⟨transZFour ^ 2, Or.inr (Or.inr (Or.inl rfl))⟩, by decide⟩
+    · exact ⟨⟨transZFour ^ 3, Or.inr (Or.inr (Or.inr rfl))⟩, by decide⟩
+
+/-- `V` も `ZMod 4` に regular に作用する (軌道は `0 ↦ 0, 2, 1, 3`)。 -/
+lemma bijective_smulBase_kleinFourSub :
+    Function.Bijective (smulBase kleinFourSub (0 : ZMod 4)) := by
+  constructor
+  · rintro ⟨a, ha⟩ ⟨b, hb⟩ hab
+    simp only [smulBase, Equiv.Perm.smul_def] at hab
+    rcases mem_kleinFourSub.mp ha with rfl | rfl | rfl | rfl <;>
+      rcases mem_kleinFourSub.mp hb with rfl | rfl | rfl | rfl <;>
+        first | rfl | exact absurd hab (by decide)
+  · intro x
+    fin_cases x
+    · exact ⟨⟨1, Or.inl rfl⟩, by decide⟩
+    · exact ⟨⟨flipZFour, Or.inr (Or.inr (Or.inl rfl))⟩, by decide⟩
+    · exact ⟨⟨transZFour ^ 2, Or.inr (Or.inl rfl)⟩, by decide⟩
+    · exact ⟨⟨flipZFour * transZFour ^ 2, Or.inr (Or.inr (Or.inr rfl))⟩, by decide⟩
+
+/-- `T ≇ V`: `V` は指数 2 だが `T` は位数 4 の元をもつ。 -/
+lemma not_nonempty_mulEquiv_cyclicFour_kleinFour :
+    ¬ Nonempty (↥cyclicFourSub ≃* ↥kleinFourSub) := by
+  rintro ⟨φ⟩
+  have hV : ∀ v : ↥kleinFourSub, v ^ 2 = 1 := by
+    rintro ⟨v, hv⟩
+    refine Subtype.ext ?_
+    push_cast
+    rcases mem_kleinFourSub.mp hv with rfl | rfl | rfl | rfl <;> decide
+  have ht : (⟨transZFour, Or.inr (Or.inl rfl)⟩ : ↥cyclicFourSub) ^ 2 ≠ 1 := fun hc =>
+    transZFour_sq_ne_one (by simpa using congrArg Subtype.val hc)
+  exact ht (φ.injective (by rw [map_pow, hV, map_one]))
+
+/-- `V ≤ N(T)` (`s t s⁻¹ = t⁻¹` の帰結)。 -/
+lemma kleinFourSub_le_normalizer_cyclicFourSub :
+    kleinFourSub ≤ Subgroup.normalizer (cyclicFourSub : Set (Equiv.Perm (ZMod 4))) := by
+  intro v hv
+  simp only [Subgroup.mem_normalizer_iff, mem_cyclicFourSub]
+  rcases mem_kleinFourSub.mp hv with rfl | rfl | rfl | rfl <;> decide
+
+/-- `T ≤ N(V)` (`t s t⁻¹ = s t²` の帰結)。 -/
+lemma cyclicFourSub_le_normalizer_kleinFourSub :
+    cyclicFourSub ≤ Subgroup.normalizer (kleinFourSub : Set (Equiv.Perm (ZMod 4))) := by
+  intro u hu
+  simp only [Subgroup.mem_normalizer_iff, mem_kleinFourSub]
+  rcases mem_cyclicFourSub.mp hu with rfl | rfl | rfl | rfl <;> decide
+
+/-- **Isaacs Problem 8A.1** (p. 235), 後半 🎉: 置換群は**同型でない regular normal
+部分群**をもちうる。
+
+`Ω = ZMod 4`, `G = T ⊔ V = D₈` (`S₄` の Sylow 2-部分群) で, `T = ⟨x ↦ x+1⟩ ≅ Z₄` と
+Klein 群 `V = {1, x↦x+2, x↦1-x, x↦3-x} ≅ Z₂ × Z₂` はともに `Ω` に regular に作用し
+`G` に正規だが, 同型でない。
+
+⚠ **8A.4 と矛盾しない**: そちらは `U ⊓ V = 1` を仮定するが, ここでは
+`T ⊓ V = {1, x ↦ x+2} ≠ ⊥`。 -/
+theorem exists_two_nonisomorphic_regular_normal :
+    ∃ T V : Subgroup (Equiv.Perm (ZMod 4)),
+      Function.Bijective (smulBase T (0 : ZMod 4)) ∧
+      Function.Bijective (smulBase V (0 : ZMod 4)) ∧
+      T ⊔ V ≤ Subgroup.normalizer (T : Set (Equiv.Perm (ZMod 4))) ∧
+      T ⊔ V ≤ Subgroup.normalizer (V : Set (Equiv.Perm (ZMod 4))) ∧
+      ¬ Nonempty (↥T ≃* ↥V) :=
+  ⟨cyclicFourSub, kleinFourSub, bijective_smulBase_cyclicFourSub,
+    bijective_smulBase_kleinFourSub,
+    sup_le Subgroup.le_normalizer kleinFourSub_le_normalizer_cyclicFourSub,
+    sup_le cyclicFourSub_le_normalizer_kleinFourSub Subgroup.le_normalizer,
+    not_nonempty_mulEquiv_cyclicFour_kleinFour⟩
 
 end KleinCounterexample
 
