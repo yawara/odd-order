@@ -5616,9 +5616,28 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   型エラー (`(X.inf Hc : Subgroup G) : Set G` と 2 段で書く); `obtain` した `Set.mem_mul` の
   等式は beta 未簡約 (`(fun x1 x2 ↦ x1*x2) h k = …`) で `rw` 不能 — defeq な `have` で
   詰め替えてから使う。
-* ⬜ **3C.4** — `M` が可解群 `G` の極小正規部分群で `M = C_G(M)` なら `G` は `M` 上分裂し、
-  `M` の補元は全て共役。Hint: `L/M` を `G/M` の極小正規に取り `q`-群、`q ∤ |M|` を示して
-  `L` の Sylow `q` を見る。
+* ✅ **3C.4** — (2026-07-28, 新 leaf `Ch03_SplitExtensions/ProblemsMinimalNormal.lean`,
+  `OddOrder.lean` 配線済, axiom-clean 確認済)。
+  `exists_isComplement'_of_isMinimalNormal_centralizer_eq` (分裂) +
+  `isComplement'_conj_of_isMinimalNormal_centralizer_eq` (補元は全て共役)。
+  書籍 Hint どおりの構成: `L/M` = `G/M` の極小正規 (`q`-elementary abelian, Thm 3.11)。
+  部品: (i) `inf_centralizer_eq_bot_of_isMinimalNormal_lt` — `M < L ⊴ G` なら
+  `M ⊓ C_G(L) = ⊥` (極小性 + `le_centralizer_iff` の対称性)。
+  (ii) `not_isPGroup_of_isMinimalNormal_centralizer_lt` — `L` は `p`-群になれない
+  (Isaacs Lem 4.32 `fixedPoints_ne_bot_of_pgroup_action_pgroup` を
+  `MulAut.conjNormal.comp L.subtype` に適用 → 固定点が (i) に矛盾)。⟹ `q ∤ |M|`。
+  (iii) setup `exists_sylow_frattini_setup` — `Q ∈ Syl_q(L)` で `|Q^G| = q`-part,
+  `|Q^G|·|M| = |L|`, `M ⊔ Q^G = L` (`L` 内で `Msub ⊔ Q = ⊤` を card で示して
+  `map L.subtype`; `|L| = |Lbar|·|M|` は repo 補題 `card_comap_eq_card_mul_card_ker`)。
+  (iv) 分裂: Frattini (`Sylow.normalizer_sup_eq_top`) で `G = M ⊔ H` (`H = N_G(Q)`),
+  `M ⊓ H` は `Q` と `M` を中心化 (commutator が `M ⊓ Q = ⊥` に落ちる) → `≤ C_G(L)` →
+  (i) で `⊥`。(v) 共役: Dedekind `↑M * ↑(L ⊓ K) = ↑L` (補元分解 + 濃度) →
+  `|L ⊓ K| = |Q|` → `Sylow.ofCard` + `MulAction.exists_smul_eq` (Sylow 共役 in `↥L`) →
+  `K^x = H` (包含 + 濃度一致)。
+  ⚠ 実装の罠: mathlib 現行の `Subgroup.normalizer` は **`Set G` を取る**;
+  `Subgroup.pointwise_smul_def` は hom を `MulDistribMulAction.toMonoidEnd` spelling で
+  吐くので `(MulAut.conj g).toMonoidHom` と繋ぐには rfl 橋 `toMonoidHom_mulAut_conj` が要る;
+  `↥L` 内 Sylow の ambient 移送は `map_conj_map_subtype` (map_map 2 回 + congr) で。
 * ⬜ **3C.5** — `H` が可解 `G` の極大部分群で `core_G(H) = 1` なら、`G` は唯一の極小正規
   部分群 `M` をもち `H` は `M` の補元で `M = C_G(M)`。さらに核自明な極大部分群同士は共役。
 * ⬜ **3C.6** — 可解 `G` で `x,y,z` の位数が対ごとに互いに素かつ `xyz = 1` なら
