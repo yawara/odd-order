@@ -243,6 +243,28 @@ theorem inner_induce_extension_conj_sub [Finite G] [Invertible (Nat.card G : ℂ
     hyp.restrict_induce_eq_of_support_subset_A
       (hyp.conj_diff_support_subset_A_of_mem_Sset hχ)]
 
+/-- **The conjugate-pair image difference has degree zero**:
+`(e_{χ̄} − e_χ)(1) = 0`, being `Ind_H^G` of the degree-zero difference `χ̄ − χ`
+(Theorem C, step (10): the input to "`|Q| + 1 = ±2eᵢ(1)`"). -/
+theorem extension_conj_sub_apply_one [Finite G] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    (hcoh.extension χ.conj - hcoh.extension χ) (1 : G) = 0 := by
+  rw [← hyp.induce_conj_sub_extension hcoh hχ, ClassFunction.induce_apply_one,
+    hyp.conj_diff_apply_one_of_mem_Sset hχ, mul_zero]
+
+/-- **Distinct members have orthogonal images**: for `χ ≠ χ'` in `𝒮`,
+`⟨e_χ, e_{χ'}⟩ = 0` — the coherent extension transports the orthogonality of
+distinct irreducible characters. -/
+theorem extension_inner_eq_zero_of_ne [Finite G] [Invertible (Nat.card G : ℂ)]
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {χ χ' : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) (hχ' : χ' ∈ hyp.Sset)
+    (hne : χ ≠ χ') :
+    ClassFunction.inner (hcoh.extension χ) (hcoh.extension χ') = 0 := by
+  rw [hyp.extension_inner_member hcoh hχ hχ']
+  exact hyp.Sset_pairwiseOrthogonal hχ hχ' hne
+
 end RestrictInduce
 
 end Hypothesis
