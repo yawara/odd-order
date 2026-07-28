@@ -199,6 +199,65 @@ fpf より `δ² = 1` ⟹ `|D|` 奇より `δ = 1` ⟹ `z = z⁻¹` ⟹ `z² = 1
       `Res f_j = b_j(∑ aᵢχᵢ) + ψ_j` → 次数評価で `b_j = 0` → `Q₁ ⊆ Ker f_j`
       → `G` は単純でない
 
+## step (9)–(12) の部品マップ (2026-07-28 実測、全て在る)
+
+p. 116 全文はページ画像で確認済。実装は次の設計で:
+
+**step (9)** — `eᵢ := hcoh.extension χᵢ` と**定義**する (書籍の「coherence of 𝒮
+makes this possible」の中身):
+* `S07.IsCoherent` (`S07_Coherence/NormInequalities.lean:484`) のフィールド:
+  `extension` (τ₁, ℤ-linear)・`extension_inner_eq` (ℤ[𝒮] 上 isometry)・
+  `extends_on_supported` (ℤ[𝒮,A] 上 τ に一致)・`extension_mem_ZIrr`。
+* `eᵢ ∈ ±Irr(G)`: isometry で `⟨eᵢ,eᵢ⟩ = 1` →
+  **`exists_zsmul_irreducibleCharacter_of_inner_self_one`**
+  (`InducedIrreducible.lean:791`)。
+* `Ind(χᵢ − aᵢχ₁) = eᵢ − aᵢe₁`: `χᵢ − aᵢχ₁ ∈ ℤ[𝒮,A]`
+  (次数 `χᵢ(1) = aᵢ·d` は **`exists_apply_one_eq_d_mul`**
+  (`FeitSibleyTheorem.lean:440`)、support は
+  `scaled_diff_support_subset_A_of_mem_Sset` (`FeitSibleyConclusion.lean:436` 参照)) +
+  `extends_on_supported` + extension の ℤ-linearity。
+* `χ₁` (a₁ = 1) の witness: `𝒮(Q′)` の元は次数ちょうど `d`
+  (`apply_one_eq_d_of_mem_SsetOf_Qder`) + `two_le_ncard_SsetOf_Qder` (非空)。
+
+**step (10)** — `f₁ = ±eᵢ` の排除:
+* Lemma 2(c): **`conj_mem_Sset`** (`FeitSibleyTheorem.lean:556`) +
+  `conj_diff_support_subset_A_of_mem_Sset` (:571) + no-real
+  (`hnoreal`/`conj_ne` 系、FeitSibleyMain 冒頭と同型)。
+* [Is] CTFG Lemma 7.7 = **TI induction**: `A = Q^#` は TI (step 2
+  `Q_inf_map_conj_eq_bot`) →
+  `induce_apply_coe_of_isTISubset` / `inner_induce_eq_of_isTISubset`
+  (`InducedCharacter.lean` TIInduction 節)。`Res(eᵢ−e′ᵢ) = χᵢ−χ̄ᵢ` は
+  値等式 (A 上) + `H∖Q^#` での両辺消滅 (Q Hall ⟹ H の π(Q)-元は Q 内、
+  `mem_QK_of_piElement` と同型の論法; または内積レベルで済ませて回避)。
+* 矛盾: `Ind λ = ±(eᵢ + e′ᵢ)` → `(Ind λ)(1) = |Q|+1` 奇 vs `±2eᵢ(1)` 偶。
+  `(Ind λ)(1) = [G:H]·1 = |Q|+1`: `ClassFunction.induce_apply_one` +
+  `card_Omega`/`index_H`。
+
+**step (11)** — `⟨f_j, eᵢ − aᵢe₁⟩ = 0` (f_j ∉ {±eᵢ} + 既約直交) → reciprocity で
+`⟨Res f_j, χᵢ⟩ = aᵢ·b_j` (`b_j := ⟨Res f_j, χ₁⟩ ∈ ℕ`:
+`S08.isCharacter_restrict` + `exists_natCast_inner_irreducible`)。
+`ψ_j := Res f_j − b_j ∑ aᵢχᵢ` が genuine
+(**`isCharacter_of_natFinsupp_eq_sum`** `Clifford.lean:1175` へ Fourier 係数を
+組む — 𝒮 上 0 / 𝒮 外 = Res f_j の係数 ≥ 0) + `Q₁ ⊆ Ker ψ_j`
+(成分が全て 𝒮 外 = Q₁-kernel)。
+
+**step (12)** — 次数評価:
+* **`sum_degreeSq_SsetOf`** (`FeitSibleyTheorem.lean:404`、R = ⊥):
+  `∑_{χ∈𝒮} χ(1)² = |H| − |H/Q₁|` が**そのまま在る** (哲学: χᵢ(1) = aᵢd で
+  `∑ aᵢχᵢ(1) = (∑χᵢ(1)²)/d`)。
+* `|H| − |H/Q₁| = |D||S|(|Q₁|−1)`: `card_H_eq` + `card_Q_eq_card_S_mul_card_Q1`
+  (SylowDecomposition) + `card_quotient`。
+* `f₁(1)+f₂(1) = |Q|+1` (step 8 の等式を 1 で評価) と
+  `f_j(1) ≥ b_j·∑aᵢχᵢ(1)` (ψ_j genuine ⟹ ψ_j(1) ≥ 0) で
+  `(b₁+b₂)(|Q₁|−1) ≤ |Q₁|` → `b₁+b₂ < 2` → ある j で `b_j = 0` →
+  `Res f_j = ψ_j` → `Q₁ ⊆ Ker f_j` (kernel の Res 経由の判定が要る:
+  `characterKernel` と restriction の両立)。
+
+**接続 (step 13、済)**: `Q₁ ⊆ Ker f_j`、`f_j ≠ 1_G` 既約 ⟹ `Ker f_j ≠ G`;
+`Q₁ ≠ 1` ⟹ `Ker ≠ 1` ⟹ `¬IsSimpleGroup G` ⟹ 既 landing の
+`Q1_eq_bot_of_not_isSimpleGroup` へ。⚠ ここは「G 単純なら矛盾」の背理法枠を
+どう組むか (`theoremAConclusion_of_not_simple` の消費形) を実装時に確認。
+
 ### 書籍 step (5) の論法 (2026-07-28 に再構成、着手前に実測で再確認すること)
 
 **主張**: `(|K|,|V|) = 1`、したがって `QK` は `H` の Hall 部分群。
