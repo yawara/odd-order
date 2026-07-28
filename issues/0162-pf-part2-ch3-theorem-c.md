@@ -195,9 +195,32 @@ fpf より `δ² = 1` ⟹ `|D|` 奇より `δ = 1` ⟹ `z = z⁻¹` ⟹ `z² = 1
       Burnside で `⟨π,π⟩ = #orbits(Ω²)`、2-可移で `= 2`)
 - [x] **step (8)** (2026-07-28、同): `exists_induce_eq_add_irreducible` —
       `Ind λ = f₁ + f₂`、`f₁ ≠ f₂ ∈ Irr G`、`fᵢ ≠ 1_G`
-- [ ] step (9)–(12): coherence 簿記 → `f₁ = ±eᵢ` の排除 ([Is] 7.7 + `|Q|` 偶) →
-      `Res f_j = b_j(∑ aᵢχᵢ) + ψ_j` → 次数評価で `b_j = 0` → `Q₁ ⊆ Ker f_j`
-      → `G` は単純でない
+- [x] **step (9)** (2026-07-28、`8728fc4ba`): `FeitSibleyCoherentImage.lean` —
+      `exists_anchor` / `extension_zsmul_irr` (±Irr) / `extension_inner_member` /
+      `induce_sub_nsmul_extension`
+- [x] **step (10)** (2026-07-28、`31f942dca`): 同 leaf の
+      `inner_constituent_extension_eq_zero` — **⟨f_j, e_χ⟩ = 0 (∀χ ∈ 𝒮)**。
+      一般形 (仮定 = [G:H] 奇 + θ ∉ 𝒮) で FeitSibley 側に置き、Suzuki 側は
+      `odd_index_H` / `notMem_fs_Sset_of_leKer_QK` を供給するだけ
+      (`CoherenceContradiction.lean`)。支持: `mem_Q_of_orderOf_dvd_card_Q`
+      (正規 Hall) / `restrict_induce_eq_of_support_subset_A` ([Is] 7.7) /
+      `induce_conj_sub_extension` / `inner_induce_extension_conj_sub` /
+      `extension_conj_sub_apply_one` / `extension_inner_eq_zero_of_ne` /
+      `inner_conj_sub_eq_zero_of_notMem`
+- [ ] step (11)–(12): **ψ_j を作らない設計で直接進む** (2026-07-28 確定):
+      1. (11a) `⟨χ, Res f_j⟩ = a_χ · b_j` (b_j := ⟨χ₁, Res f_j⟩):
+         reciprocity ⟨Ind(χ − a·χ₁), f_j⟩ = ⟨χ − a·χ₁, Res f_j⟩、LHS は
+         step (9) の等式 + step (10) で 0。
+      2. (12) 次数評価: genuine φ の `φ(1) = Σ_χ ⟨φ,χ⟩·χ(1) ≥ 𝒮-部分和
+         = b_j·(∑_{χ∈𝒮} χ(1)²)/d = b_j·(|H|−|H/Q₁|)/d` — 既存
+         `sum_degreeSq_SsetOf` (R = ⊥) を使う。要調査: 「genuine の次数 =
+         多重度×次数の和」API (`IsCharacter.exists_natFinsupp_eq_sum` 系)。
+      3. `b₁ + b₂ < 2` → ∃j, b_j = 0 → ∀χ∈𝒮 ⟨Res f_j, χ⟩ = 0 →
+         **Res f_j の全既約成分が Q₁-kernel** → Q₁ ⊆ Ker f_j。
+         要調査: 「全成分が N-kernel ⟹ N ⊆ characterKernel」API。
+      4. Ker f_j ≠ ⊥ (Q₁ ≤)、≠ ⊤ (f_j ≠ 1_G 既約 faithful?…f_j ≠ 1 ⟹
+         Ker ≠ G は既約の kernel 性質) → ¬IsSimpleGroup → 既 landing の
+         `Q1_eq_bot_of_not_isSimpleGroup`。
 
 ## step (9)–(12) の部品マップ (2026-07-28 実測、全て在る)
 
