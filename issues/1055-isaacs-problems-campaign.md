@@ -5735,3 +5735,53 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
 
 **3C.8 (nilpotent injector)** は 3C.7 の後。`F(G)` を含む極大冪零部分群の共役性で、
 同型の帰納 (極小正規 + Hall/Sylow 分解) が効くはず。3C.7 の部品を再利用する。
+
+### 3C.7 実装進捗 (2026-07-28)
+
+`Ch03_SplitExtensions/Carter/` に段階的に構築中 (全て `OddOrder.lean` 配線済・axiom-clean)。
+
+* ✅ **`Carter/Defs.lean`** — `IsCarterSubgroup` の定義 +
+  `eq_top_of_isNilpotent` (冪零群の Carter は `⊤` のみ) /
+  `isCarterSubgroup_top_of_isNilpotent` / `map_conj` (共役不変) /
+  `subgroupOf` (`C ≤ K` なら `↥K` の Carter) /
+  `map_conj_subgroupOf` + `map_conj_eq_iff_subgroupOf` (`↥K` 内共役 ⟷ `G` 内共役)。
+  ⚠ 計画にあった `N_G(C) ≤ N_G(C ⊔ N)` は mathlib
+  `Subgroup.normalizer_le_normalizer_sup_normal` に既存 (自作しない)。
+* ✅ **`Carter/QuotientTransfer.lean`** — `normalizer_map_mk'` (対応定理
+  `N_{G/N}(K/N) = N_G(K)/N`) / `normalizer_eq_iff_map_mk'` /
+  `sup_map_mk'_eq_map_mk'` / `isNilpotent_map_of_isNilpotent` /
+  `exists_conj_of_map_mk'_conj` / `card_quotient_lt`。
+* ⬜ **`Carter/Conjugacy.lean`** — (b)。次の実装対象。
+* ⬜ **`Carter/NilpotentQuotient.lean`** — (c)。
+* ⬜ **`Carter/Existence.lean`** — (a)。
+
+#### (b) の Lean 構造 (確定)
+
+`∀ n, ∀ {G : Type u} [Group G] [Finite G] [IsSolvable G] (C D : Subgroup G),
+Nat.card G ≤ n → IsCarterSubgroup C → IsCarterSubgroup D →
+∃ g, C.map (MulAut.conj g).toMonoidHom = D` の型量化強帰納 (3C.6 と同じ形)。
+
+step 1 (`N_G(C ⊔ N) = C ⊔ N`) は **IH を仮説に取る独立補題**に切り出せる:
+`(IH : ∀ {H : Type u} [Group H] [Finite H] [IsSolvable H], Nat.card H < Nat.card G → …)`。
+`C ⊔ N = ⊤` なら自明、`< ⊤` なら `|↥(C⊔N)| < |G|` で IH を当て
+`g⁻¹y ∈ N_G(C) = C ≤ C⊔N` から `g ∈ C⊔N`。
+
+#### ⚠ step 4b で要る未整備インフラ (2026-07-28 に判明)
+
+step 4b (`C ⊔ N = D ⊔ N = ⊤`, `C ⊓ N = D ⊓ N = ⊥`) の crux は
+**`C_p = C_P(Q) = D_p`** だが、これに `[C_p, Q] = 1` (`C = C_p × Q`) が要る。
+repo/mathlib に「有限冪零群の Sylow と Hall `p'` が元ごとに可換」は**無い**。
+
+* `C_p := C ⊓ P` (`P ⊴ G` は `G` の Sylow `p`) は `C` の Sylow `p` かつ `C_p ⊴ C`
+  — `P ⊴ G` から直ちに出る (冪零性不要)。
+* `C = C_p·Q` (`Q` = `C` の Hall `p'`) も位数と `C_p ⊴ C` から出る。
+* 残るのは **`Q ⊴ C`**。証明経路 (確定):
+  `M := N_C(Q)` とおくと `Q ⊴ M` で `Q` は `M` の Hall `p'`。
+  **正規 Hall 部分群は一意** (別の Hall `p'` `Q'` は `Q'Q/Q ≅ Q'/(Q'⊓Q)` が
+  `M/Q` = `p`-群 の中の `p'`-群 ⟹ `Q' ≤ Q`, 位数で等号)。
+  よって `g ∈ N_C(M)` なら `Q^g` も `M` の Hall `p'` で `Q^g = Q`, `g ∈ M`
+  ⟹ `N_C(M) = M`。`C` 冪零の**正規化条件**より `M = C`。∎
+  そのうえで `C_p ⊴ C`, `Q ⊴ C`, `C_p ⊓ Q = ⊥` から
+  `Subgroup.commute_of_normal_of_disjoint` で `[C_p, Q] = 1`。
+* この `Q ⊴ C` (= 「冪零群の Hall 部分群は正規」) は汎用なので
+  `Carter/` でなく `OddOrder/GroupTheory/` 側の leaf に置くのが妥当。
