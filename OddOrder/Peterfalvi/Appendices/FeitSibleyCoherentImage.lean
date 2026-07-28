@@ -265,6 +265,143 @@ theorem extension_inner_eq_zero_of_ne [Finite G] [Invertible (Nat.card G : ℂ)]
   rw [hyp.extension_inner_member hcoh hχ hχ']
   exact hyp.Sset_pairwiseOrthogonal hχ hχ' hne
 
+omit [Fintype G] in
+/-- **A non-member is orthogonal to the conjugate difference of a member**:
+for an irreducible `θ ∉ 𝒮` and `χ ∈ 𝒮`, `⟨θ, χ̄ − χ⟩ = 0` — both `χ` and `χ̄`
+are members, hence distinct from `θ` (Theorem C, step (10):
+"`(λ, χᵢ − χ̄ᵢ) = 0`"). -/
+theorem inner_conj_sub_eq_zero_of_notMem [Finite G]
+    {θ : ClassFunction ↥hyp.H ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hθS : θ ∉ hyp.Sset)
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    ClassFunction.inner θ (χ.conj - χ) = 0 := by
+  have hχc : χ.conj ∈ hyp.Sset := hyp.conj_mem_Sset hχ
+  have h1 : ClassFunction.inner θ χ = 0 := by
+    have h := OddOrder.RepresentationTheory.irr_cf_inner
+      (mem_irreducibleCharacters.mpr hθ) (mem_irreducibleCharacters.mpr hχ.1)
+    rwa [if_neg (fun h : θ = χ => hθS (h.symm ▸ hχ))] at h
+  have h2 : ClassFunction.inner θ χ.conj = 0 := by
+    have h := OddOrder.RepresentationTheory.irr_cf_inner
+      (mem_irreducibleCharacters.mpr hθ) (mem_irreducibleCharacters.mpr hχc.1)
+    rwa [if_neg (fun h : θ = χ.conj => hθS (h.symm ▸ hχc))] at h
+  rw [ClassFunction.inner_sub_right, h1, h2, sub_zero]
+
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step (10)** (p. 116): if
+`Ind_H^G θ = f + f'` splits a degree-one induced character into two distinct
+irreducible constituents and `[G : H]` is odd, then each constituent is
+orthogonal to every member image `e_χ` of the coherent extension.
+
+By contradiction: `⟨f, e_χ⟩ ≠ 0` forces `f = ξ` (the irreducible carrier of
+`e_χ = ε·ξ`).  The conjugate member gives `e_{χ̄} = ε'·ξ'` with `ξ' ≠ ξ`
+(orthogonality of distinct member images), and
+`⟨Ind θ, e_{χ̄} − e_χ⟩ = ⟨θ, χ̄ − χ⟩ = 0` transfers the nonzero coefficient to
+`ξ'`, forcing `f' = ξ'`.  The degree-zero identity `(e_{χ̄} − e_χ)(1) = 0`
+gives `ξ(1) = ξ'(1)`, so `[G : H] = (Ind θ)(1) = 2·ξ(1)` is even —
+contradiction. -/
+theorem inner_constituent_extension_eq_zero [Finite G]
+    [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    [Invertible (Nat.card G : ℂ)]
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (hd : Odd hyp.d) (hQ1odd : Odd (Nat.card ↥hyp.Q1))
+    (hidx : Odd hyp.H.index)
+    {θ : ClassFunction ↥hyp.H ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hdeg : (θ : ↥hyp.H → ℂ) 1 = 1) (hθS : θ ∉ hyp.Sset)
+    {f f' : ClassFunction G ℂ} (hf : IsIrreducibleCharacter f)
+    (hf' : IsIrreducibleCharacter f') (hff' : f ≠ f')
+    (hsum : ClassFunction.induce hyp.H θ = f + f')
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    ClassFunction.inner f (hcoh.extension χ) = 0 := by
+  classical
+  by_contra hne0
+  -- `e_χ = ε·ξ` and `⟨f, e_χ⟩ ≠ 0` force `f = ξ`
+  obtain ⟨ε, ξ, hε, hεξ⟩ := hyp.extension_zsmul_irr hcoh hχ
+  have hfξ : f = (ξ : ClassFunction G ℂ) := by
+    by_contra hne
+    apply hne0
+    rw [hεξ, ← Int.cast_smul_eq_zsmul ℂ, ClassFunction.inner_smul_right,
+      OddOrder.RepresentationTheory.irr_cf_inner
+        (mem_irreducibleCharacters.mpr hf)
+        (mem_irreducibleCharacters.mpr ξ.isIrreducible),
+      if_neg hne, mul_zero]
+  -- the conjugate member and its image `e_{χ̄} = ε'·ξ'`
+  have hχc : χ.conj ∈ hyp.Sset := hyp.conj_mem_Sset hχ
+  obtain ⟨ε', ξ', hε', hεξ'⟩ := hyp.extension_zsmul_irr hcoh hχc
+  have hχne : χ ≠ χ.conj := fun h =>
+    hasNoRealCharacters_Sset hyp hd hQ1odd hχ h.symm
+  -- distinct members have orthogonal images, so `ξ ≠ ξ'`
+  have hξξ' : (ξ : ClassFunction G ℂ) ≠ (ξ' : ClassFunction G ℂ) := by
+    intro heq
+    have horth := hyp.extension_inner_eq_zero_of_ne hcoh hχ hχc hχne
+    rw [hεξ, hεξ', ← Int.cast_smul_eq_zsmul ℂ, ← Int.cast_smul_eq_zsmul ℂ,
+      ClassFunction.inner_smul_left, ClassFunction.inner_smul_right, ← heq,
+      OddOrder.RepresentationTheory.irr_cf_inner
+        (mem_irreducibleCharacters.mpr ξ.isIrreducible)
+        (mem_irreducibleCharacters.mpr ξ.isIrreducible),
+      if_pos rfl, mul_one, star_intCast] at horth
+    rcases hε with rfl | rfl <;> rcases hε' with rfl | rfl <;> norm_num at horth
+  -- `⟨Ind θ, e_{χ̄} − e_χ⟩ = ⟨θ, χ̄ − χ⟩ = 0`
+  have hdagger : ClassFunction.inner (ClassFunction.induce hyp.H θ)
+      (hcoh.extension χ.conj - hcoh.extension χ) = 0 := by
+    rw [hyp.inner_induce_extension_conj_sub hcoh hχ θ]
+    exact hyp.inner_conj_sub_eq_zero_of_notMem hθ hθS hχ
+  -- `⟨Ind θ, e_χ⟩ = ε`
+  have hIθχ : ClassFunction.inner (ClassFunction.induce hyp.H θ)
+      (hcoh.extension χ) = (ε : ℂ) := by
+    rw [hsum, hεξ, ← Int.cast_smul_eq_zsmul ℂ, ClassFunction.inner_add_left,
+      ClassFunction.inner_smul_right, ClassFunction.inner_smul_right,
+      OddOrder.RepresentationTheory.irr_cf_inner
+        (mem_irreducibleCharacters.mpr hf)
+        (mem_irreducibleCharacters.mpr ξ.isIrreducible),
+      OddOrder.RepresentationTheory.irr_cf_inner
+        (mem_irreducibleCharacters.mpr hf')
+        (mem_irreducibleCharacters.mpr ξ.isIrreducible),
+      if_pos hfξ, if_neg (fun h => hff' (hfξ.trans h.symm)), mul_one, mul_zero,
+      add_zero, star_intCast]
+  -- hence `⟨Ind θ, e_{χ̄}⟩ = ε ≠ 0`, forcing `f' = ξ'`
+  have hIθχc : ClassFunction.inner (ClassFunction.induce hyp.H θ)
+      (hcoh.extension χ.conj) = (ε : ℂ) := by
+    have h := hdagger
+    rw [ClassFunction.inner_sub_right, sub_eq_zero] at h
+    rw [h, hIθχ]
+  have hf'ξ' : f' = (ξ' : ClassFunction G ℂ) := by
+    by_contra hne
+    have h := hIθχc
+    rw [hsum, hεξ', ← Int.cast_smul_eq_zsmul ℂ, ClassFunction.inner_add_left,
+      ClassFunction.inner_smul_right, ClassFunction.inner_smul_right,
+      OddOrder.RepresentationTheory.irr_cf_inner
+        (mem_irreducibleCharacters.mpr hf)
+        (mem_irreducibleCharacters.mpr ξ'.isIrreducible),
+      OddOrder.RepresentationTheory.irr_cf_inner
+        (mem_irreducibleCharacters.mpr hf')
+        (mem_irreducibleCharacters.mpr ξ'.isIrreducible),
+      if_neg (fun h' => hξξ' (hfξ ▸ h')), if_neg hne, mul_zero, add_zero] at h
+    rcases hε with rfl | rfl <;> norm_num at h
+  -- degrees: `ε'·ξ'(1) = ε·ξ(1)`, both positive naturals, so `ξ(1) = ξ'(1)`
+  obtain ⟨a, ha, haval⟩ := ξ.isIrreducible.exists_apply_one_eq_pos_natCast
+  obtain ⟨b, hb, hbval⟩ := ξ'.isIrreducible.exists_apply_one_eq_pos_natCast
+  have hd0 := hyp.extension_conj_sub_apply_one hcoh hχ
+  rw [hεξ, hεξ', ← Int.cast_smul_eq_zsmul ℂ, ← Int.cast_smul_eq_zsmul ℂ,
+    ClassFunction.sub_apply, ClassFunction.smul_apply, ClassFunction.smul_apply,
+    sub_eq_zero, haval, hbval] at hd0
+  have hZ : (ε' * b : ℤ) = ε * a := by
+    have h : ((ε' * b : ℤ) : ℂ) = ((ε * a : ℤ) : ℂ) := by push_cast; exact hd0
+    exact_mod_cast h
+  have haeqb : a = b := by
+    rcases hε with rfl | rfl <;> rcases hε' with rfl | rfl <;> omega
+  -- the degree count: `[G : H] = a + b = 2a`, contradicting `[G : H]` odd
+  have hval : ClassFunction.induce hyp.H θ (1 : G)
+      = (hyp.H.index : ℂ) := by
+    rw [ClassFunction.induce_apply_one,
+      show θ (1 : ↥hyp.H) = 1 from hdeg, mul_one]
+  rw [hsum, ClassFunction.add_apply, hfξ, hf'ξ', haval, hbval] at hval
+  have hN : a + b = hyp.H.index := by
+    have h : ((a + b : ℕ) : ℂ) = ((hyp.H.index : ℕ) : ℂ) := by
+      push_cast
+      rw [← hval]
+    exact_mod_cast h
+  obtain ⟨k, hk⟩ := hidx
+  omega
+
 end RestrictInduce
 
 end Hypothesis

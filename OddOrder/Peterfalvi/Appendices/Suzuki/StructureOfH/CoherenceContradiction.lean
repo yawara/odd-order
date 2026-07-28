@@ -48,6 +48,13 @@ theorem index_H_eq :
     MulAction.index_stabilizer_of_transitive G sc.toHypothesis.basept,
     sc.toHypothesis.card_Omega]
 
+/-- **`[G : H]` is odd** (`= |Q| + 1` with `|Q|` even) — the parity that step
+(10) plays against the even `±2eᵢ(1)`. -/
+theorem odd_index_H : Odd sc.toHypothesis.H.index := by
+  rw [sc.index_H_eq]
+  obtain ⟨k, hk⟩ := sc.toHypothesis.Q_even
+  exact ⟨k, by omega⟩
+
 /-- **`(Ind_H^G θ)(1) = |Q| + 1` for a degree-one `θ`** — the book's
 "`|Q| + 1 = (Ind_H^G λ)(1)`" (p. 116). -/
 theorem induce_apply_one_eq [Fintype G]
@@ -79,36 +86,6 @@ theorem notMem_fs_Sset_of_leKer_QK
   have hmem := hker (Subgroup.mem_subgroupOf.mpr hxQK)
   rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at hmem
   exact hmem
-
-/-- **`⟨λ, χ̄ − χ⟩ = 0`** (p. 116, "`(λ, χᵢ − χ̄ᵢ) = 0`", in the `χ̄ − χ`
-orientation): `λ` is irreducible but not a member of `𝒮`, while `χ` and `χ̄`
-are members, so both inner products vanish by orthogonality of distinct
-irreducible characters. -/
-theorem inner_conj_sub_eq_zero
-    [Fintype ↥sc.toHypothesis.H]
-    [Invertible (Nat.card ↥sc.toHypothesis.H : ℂ)]
-    (ind : Hypothesis.TheoremAInductionBelow G Ω)
-    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥)
-    {θ : ClassFunction ↥sc.toHypothesis.H ℂ} (hθ : IsIrreducibleCharacter θ)
-    (hker : ((sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H :
-      Subgroup ↥sc.toHypothesis.H) : Set ↥sc.toHypothesis.H) ⊆
-        OddOrder.Peterfalvi.S03.characterKernel θ)
-    {χ : ClassFunction ↥sc.toHypothesis.H ℂ}
-    (hχ : χ ∈ (sc.feitSibleyHypothesis ind hQ1).Sset) :
-    ClassFunction.inner θ (χ.conj - χ) = 0 := by
-  have hθS : θ ∉ (sc.feitSibleyHypothesis ind hQ1).Sset :=
-    sc.notMem_fs_Sset_of_leKer_QK ind hQ1 hker
-  have hχc : χ.conj ∈ (sc.feitSibleyHypothesis ind hQ1).Sset :=
-    (sc.feitSibleyHypothesis ind hQ1).conj_mem_Sset hχ
-  have h1 : ClassFunction.inner θ χ = 0 := by
-    have h := OddOrder.RepresentationTheory.irr_cf_inner
-      (mem_irreducibleCharacters.mpr hθ) (mem_irreducibleCharacters.mpr hχ.1)
-    rwa [if_neg (fun h : θ = χ => hθS (h.symm ▸ hχ))] at h
-  have h2 : ClassFunction.inner θ χ.conj = 0 := by
-    have h := OddOrder.RepresentationTheory.irr_cf_inner
-      (mem_irreducibleCharacters.mpr hθ) (mem_irreducibleCharacters.mpr hχc.1)
-    rwa [if_neg (fun h : θ = χ.conj => hθS (h.symm ▸ hχc))] at h
-  rw [ClassFunction.inner_sub_right, h1, h2, sub_zero]
 
 end SecondCaseHypothesis
 
