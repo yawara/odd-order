@@ -5638,8 +5638,24 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   `Subgroup.pointwise_smul_def` は hom を `MulDistribMulAction.toMonoidEnd` spelling で
   吐くので `(MulAut.conj g).toMonoidHom` と繋ぐには rfl 橋 `toMonoidHom_mulAut_conj` が要る;
   `↥L` 内 Sylow の ambient 移送は `map_conj_map_subtype` (map_map 2 回 + congr) で。
-* ⬜ **3C.5** — `H` が可解 `G` の極大部分群で `core_G(H) = 1` なら、`G` は唯一の極小正規
-  部分群 `M` をもち `H` は `M` の補元で `M = C_G(M)`。さらに核自明な極大部分群同士は共役。
+* ✅ **3C.5** — (2026-07-28, 新 leaf `Ch03_SplitExtensions/ProblemsCoreFreeMaximal.lean`,
+  `OddOrder.lean` 配線済, axiom-clean 確認済)。
+  `exists_isMinimalNormal_isComplement'_of_isCoatom_normalCore_eq_bot` (前半: 極小正規 `M` の
+  存在・一意性 + `IsComplement' M H` + `C_G(M) = M`) /
+  `existsUnique_isMinimalNormal_of_isCoatom_normalCore_eq_bot` (∃! 版) /
+  `conj_of_isCoatom_normalCore_eq_bot` (後半: 核自明な極大部分群は共役)。
+  共通部品 `normal_of_sup_eq_top`: **`M ⊔ H = ⊤` で `M` の各元に中心化され `H` に正規化される
+  `X` は `G`-正規** (`M` 正規ゆえ `G = MH`, `mhx(mh)⁻¹ = m(hxh⁻¹)m⁻¹ = hxh⁻¹`)。
+  これを `X = M ⊓ H` (`M` 可換) と `X = C_G(M) ⊓ H` (`C_G(M)` の元は `M` と可換) の 2 か所で
+  使い、どちらも `≤ core_G(H) = ⊥` に落とす。
+  `C_G(M) = M` は **Dedekind を手で書く**: `c ∈ C_G(M)` を `c = mh` と分解すると
+  `h = m⁻¹c ∈ C_G(M) ⊓ H = ⊥`, ゆえに `c = m ∈ M`。
+  一意性は `N ⊓ M = ⊥ ⟹ ⁅N,M⁆ = ⊥ ⟹ N ≤ C_G(M) = M ⟹ N = ⊥` の矛盾。
+  共役性は同じ `M` の 2 補元に **3C.4** を適用するだけ。
+  ⚠ 実装の罠: **`IsModularLattice (Subgroup G)` は mathlib に無い** — インスタンスは
+  `CommGroup` 版のみ (`Mathlib/Algebra/Group/Subgroup/Order.lean:32`)。一般の群の部分群束は
+  modular でないので `sup_inf_assoc_of_le` は使えず、Dedekind は「`M` 正規ゆえ `M ⊔ H = MH`
+  (集合積)」を経由して手で書く。
 * ⬜ **3C.6** — 可解 `G` で `x,y,z` の位数が対ごとに互いに素かつ `xyz = 1` なら
   `x = y = z = 1`。Hint: 導来長に関する帰納。
 * ⬜ **3C.7** — Carter 部分群 (`C` 冪零かつ `C = N_G(C)`) の (a) 存在 (b) 共役性
