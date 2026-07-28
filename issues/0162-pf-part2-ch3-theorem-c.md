@@ -185,9 +185,19 @@ fpf より `δ² = 1` ⟹ `|D|` 奇より `δ = 1` ⟹ `z = z⁻¹` ⟹ `z² = 1
       `index_QK_subgroupOf_eq_card_V` / `coprime_card_QK_index`。
       ⚠ [H] V.8.15 は不要だった (`isCyclic_of_isMulCommutative_le_D` +
       Fermat の小定理で代替)。
-- [ ] step 4 後半 = 書籍 step (6)–(12): `QK` が `H` の Hall → `λ` の共役不変性 →
-      `⟨Ind λ, Ind λ⟩ = 2` → `Ind λ = f₁ + f₂` → coherence 簿記 → 次数評価で
-      `Q₁ ⊆ Ker f_j` → `G` は単純でない
+- [x] **step (6) 完結** (2026-07-28、`7a1814298`): `apply_eq_of_isConj` —
+      `x, x^g ∈ H` なら任意の QK-kernel 線形指標で `λ(x^g) = λ(x)`
+- [x] **step (7)** (2026-07-28、`d89301928`): `inner_induce_self_eq_two` —
+      `⟨Ind λ, Ind λ⟩ = 2` (`StructureOfH/InducedLambda.lean`)。
+      値公式 `induce_apply_coe` + Frobenius 相互律 ×2 + unimodularity
+      (`IsIrreducibleCharacter.apply_mul_star_self_eq_one`, CharacterProduct) +
+      **置換指標の一般論** (`PermutationCharacter.lean` 新設: `Ind 1_H = #Fix`、
+      Burnside で `⟨π,π⟩ = #orbits(Ω²)`、2-可移で `= 2`)
+- [x] **step (8)** (2026-07-28、同): `exists_induce_eq_add_irreducible` —
+      `Ind λ = f₁ + f₂`、`f₁ ≠ f₂ ∈ Irr G`、`fᵢ ≠ 1_G`
+- [ ] step (9)–(12): coherence 簿記 → `f₁ = ±eᵢ` の排除 ([Is] 7.7 + `|Q|` 偶) →
+      `Res f_j = b_j(∑ aᵢχᵢ) + ψ_j` → 次数評価で `b_j = 0` → `Q₁ ⊆ Ker f_j`
+      → `G` は単純でない
 
 ### 書籍 step (5) の論法 (2026-07-28 に再構成、着手前に実測で再確認すること)
 
