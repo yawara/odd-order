@@ -129,6 +129,122 @@ theorem induce_sub_nsmul_extension [Finite G]
 
 end CoherentImage
 
+/-- **Elements of `H` of order dividing `|Q|` lie in `Q`** — the normal-Hall
+property behind the book's "since `Q` is a Hall subgroup of `H`" (Theorem C,
+step (10), p. 116).  The image of `x` in `H/Q` has order dividing both `|Q|`
+and `[H : Q] = d`, which are coprime. -/
+theorem mem_Q_of_orderOf_dvd_card_Q [Finite G] {x : G} (hx : x ∈ hyp.H)
+    (hord : orderOf x ∣ Nat.card ↥hyp.Q) : x ∈ hyp.Q := by
+  haveI : (hyp.Q.subgroupOf hyp.H).Normal := hyp.Q_subgroupOf_H_normal
+  have h1 : orderOf (QuotientGroup.mk' (hyp.Q.subgroupOf hyp.H) ⟨x, hx⟩)
+      ∣ Nat.card ↥hyp.Q :=
+    dvd_trans (orderOf_map_dvd _ _) (by rw [Subgroup.orderOf_mk]; exact hord)
+  have h2 : orderOf (QuotientGroup.mk' (hyp.Q.subgroupOf hyp.H) ⟨x, hx⟩)
+      ∣ hyp.d := by
+    rw [← hyp.index_Q_subgroupOf_eq_d, Subgroup.index_eq_card]
+    exact orderOf_dvd_natCard _
+  have hone : QuotientGroup.mk' (hyp.Q.subgroupOf hyp.H) ⟨x, hx⟩ = 1 :=
+    orderOf_eq_one_iff.mp (Nat.eq_one_of_dvd_coprimes hyp.coprime_Q_D h1 h2)
+  have hmem : (⟨x, hx⟩ : ↥hyp.H) ∈ hyp.Q.subgroupOf hyp.H :=
+    (QuotientGroup.eq_one_iff _).mp hone
+  exact Subgroup.mem_subgroupOf.mp hmem
+
+section RestrictInduce
+
+variable [Fintype G] [Fintype ↥hyp.H] [Invertible (Nat.card ↥hyp.H : ℂ)]
+
+omit [Fintype ↥hyp.H] in
+/-- **[Is] CTFG Lemma 7.7, value form** (Theorem C, step (10), p. 116: "By
+[Is], Lemma 7.7, `Res_H^G(eᵢ − e′ᵢ) = χᵢ − χ̄ᵢ` since `Q` is a Hall subgroup of
+`H` and `χᵢ − χ̄ᵢ` vanishes on `H − Q`"): a class function supported on
+`A = Q^#` is recovered by inducing to `G` and restricting back to `H`.
+
+On `Q^#` this is the TI value identity (`induce_apply_coe_of_isTISubset`, with
+`isTISubset_Q_sdiff_one`); at `1` both sides vanish (`φ(1) = 0`); and on
+`H − Q` the induced function vanishes because no `G`-conjugate of such an
+element lands in `Q^#` — its order does not divide `|Q|`
+(`mem_Q_of_orderOf_dvd_card_Q`). -/
+theorem restrict_induce_eq_of_support_subset_A [Finite G]
+    {φ : ClassFunction ↥hyp.H ℂ} (hφ : φ.support ⊆ hyp.A) :
+    ClassFunction.restrict hyp.H (ClassFunction.induce hyp.H φ) = φ := by
+  classical
+  have hvanish : ∀ x : ↥hyp.H, (x : G) ∉ ((hyp.Q : Set G) \ {1}) → φ x = 0 := by
+    intro x hxA
+    by_contra hne
+    have hmem := hφ (ClassFunction.mem_support.mpr hne)
+    refine hxA ⟨hmem.1, ?_⟩
+    simp only [Set.mem_singleton_iff]
+    intro h1
+    exact hmem.2 (Subtype.ext h1)
+  ext x
+  rw [ClassFunction.restrict_apply]
+  by_cases hxA : (x : G) ∈ ((hyp.Q : Set G) \ {1})
+  · exact ClassFunction.induce_apply_coe_of_isTISubset hyp.H
+      hyp.isTISubset_Q_sdiff_one hvanish hxA
+  · rw [hvanish x hxA]
+    by_cases hx1 : x = (1 : ↥hyp.H)
+    · subst hx1
+      rw [show ((1 : ↥hyp.H) : G) = (1 : G) from rfl,
+        ClassFunction.induce_apply_one, hvanish 1 (fun h => h.2 rfl), mul_zero]
+    · refine ClassFunction.induce_eq_zero_of_not_conjugatesIntoSet
+        (A := hyp.A) hφ ?_
+      rintro ⟨g, hgH, hgA⟩
+      have hordeq : orderOf (x : G) = orderOf (g⁻¹ * (x : G) * g) := by
+        have h := orderOf_injective (MulAut.conj g⁻¹).toMonoidHom
+          (MulAut.conj g⁻¹).injective (x : G)
+        simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at h
+        rw [← h]
+        congr 1
+        group
+      have hxQ : (x : G) ∈ hyp.Q := by
+        refine hyp.mem_Q_of_orderOf_dvd_card_Q x.2 ?_
+        rw [hordeq]
+        exact Subgroup.orderOf_dvd_natCard hyp.Q hgA.1
+      by_cases hone : (x : G) = 1
+      · exact hx1 (Subtype.ext hone)
+      · exact hxA ⟨hxQ, hone⟩
+
+/-- **Theorem C, step (10), conjugate-pair identity** (p. 116): for `χ ∈ 𝒮`,
+`Ind_H^G(χ̄ − χ) = e_{χ̄} − e_χ` — the `a = 1` case of the coherence identity
+applied to the conjugate pair (`χ̄ ∈ 𝒮`, same degree). -/
+theorem induce_conj_sub_extension [Finite G] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
+    ClassFunction.induce hyp.H (χ.conj - χ)
+      = hcoh.extension χ.conj - hcoh.extension χ := by
+  have hdeg : χ.conj (1 : ↥hyp.H) = ((1 : ℕ) : ℂ) * χ (1 : ↥hyp.H) := by
+    have h0 := hyp.conj_diff_apply_one_of_mem_Sset hχ
+    rw [ClassFunction.sub_apply, sub_eq_zero] at h0
+    rw [Nat.cast_one, one_mul]
+    exact h0
+  have h := hyp.induce_sub_nsmul_extension hcoh (hyp.conj_mem_Sset hχ) hχ
+    (a := 1) hdeg
+  simpa using h
+
+/-- **Theorem C, step (10), inner-product transport** (p. 116:
+"`(Ind_H^G λ, eᵢ − e′ᵢ) = (λ, χᵢ − χ̄ᵢ)`", stated for the conjugate pair in the
+`χ̄ − χ` orientation): for every class function `θ` on `H`,
+`⟨Ind_H^G θ, e_{χ̄} − e_χ⟩ = ⟨θ, χ̄ − χ⟩`.
+
+Frobenius reciprocity followed by the Lemma 7.7 value identity
+(`restrict_induce_eq_of_support_subset_A`, applicable since `χ̄ − χ` is
+supported on `A = Q^#`). -/
+theorem inner_induce_extension_conj_sub [Finite G] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset)
+    (θ : ClassFunction ↥hyp.H ℂ) :
+    ClassFunction.inner (ClassFunction.induce hyp.H θ)
+        (hcoh.extension χ.conj - hcoh.extension χ)
+      = ClassFunction.inner θ (χ.conj - χ) := by
+  rw [← hyp.induce_conj_sub_extension hcoh hχ,
+    ClassFunction.inner_induce_eq_inner_restrict,
+    hyp.restrict_induce_eq_of_support_subset_A
+      (hyp.conj_diff_support_subset_A_of_mem_Sset hχ)]
+
+end RestrictInduce
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.FeitSibley
