@@ -348,16 +348,48 @@ theorem apply_eq_of_isConj_piPrime (ind) (hQ1) {θ} (hθ) (hdeg) (hker)
 ⚠ `θ` の類関数性 (`θ (h * x * h⁻¹) = θ x`) の API 名は要実測
 (`ClassFunction` の定義側にあるはず)。
 
-### そのあと一般の `x` へ
+### そのあと一般の `x` へ — ✅ 2026-07-28 完結 (`7a1814298`)
 
-`x ∈ H`, `g ∈ G`, `x^g ∈ H` に対し:
-* `exists_isPiElement_mul` で `⟨x,_⟩ = a·b` (`a` π-元、`b` π′-元、ともに `⟨x⟩` の冪)。
-* `a = ⟨x,_⟩^m`, `b = ⟨x,_⟩^n` なので、`G` の中では `a = x^m`, `b = x^n`。
-  共役して `g x^m g⁻¹ · g x^n g⁻¹ = g x g⁻¹` は `⟨x^g,_⟩` の分解であり、
-  `g x^m g⁻¹` は `x^m` と同位数ゆえ π-元。
-* `apply_eq_of_piFactorization` を両側に当てて
-  `λ(x) = λ(b)`, `λ(x^g) = λ(b^g)` へ帰着。
-* `b`, `b^g` は π′-元で `G`-共役なので上の「核」で一致。
+`apply_eq_of_isConj` (`LinearCharacter.lean`): `x, y ∈ H` が `G`-共役
+(`g * x * g⁻¹ = y`) なら `θ(x) = θ(y)`。π-分解 `x = a·b` を `conj_zpow` で
+`y` の分解に移送 (両因子とも `x` の zpow ゆえ)、order profile 保存、
+`apply_eq_of_piFactorization` ×2 + 核で連結。**step (6) はこれで全て landing**。
 
-⚠ ここは `↥H` と `G` の座標変換が重いので、**核を先に landing** してから
-一般形を組む順が良い。
+## step (7) の計画 (2026-07-28 分析、p. 115 下部の連鎖)
+
+**主張**: `⟨Ind λ, Ind λ⟩ = 2`。書籍の連鎖:
+
+```
+⟨Ind λ, Ind λ⟩ = ⟨Res Ind λ, λ⟩          (Frobenius reciprocity ✅ inner_induce_eq_inner_restrict)
+             = ⟨λ·Res Ind 1_H, λ⟩        (step (6): (Ind λ)(x) = λ(x)·(Ind 1_H)(x) — 要新規)
+             = ⟨Res Ind 1_H, 1_H⟩        (λ 線形 ⟹ |λ(x)|² = 1 — 要新規、内積計算)
+             = ⟨Ind 1_H, Ind 1_H⟩        (reciprocity ✅)
+             = 2                          (permutation character + Burnside — 要新規)
+```
+
+### 実測済の部品状況
+
+| 部品 | 状態 |
+|---|---|
+| `inner_induce_eq_inner_restrict` (reciprocity) | ✅ `InducedCharacter.lean:628` |
+| `induce_trivial_inner_self` | ⚠ **`[H.Normal]` 限定で使えない** (`:838`)。Suzuki の H は非正規 |
+| Burnside | ✅ mathlib `MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group` |
+| `hyp.H_def : H = stabilizer G basept` / `hyp.doubly_transitive` | ✅ `Suzuki/Basic.lean:138` |
+
+### 新規に要る一般補題 (新 leaf `GroupTheory/RepresentationTheory/PermutationCharacter.lean`)
+
+1. **`(Ind_H^G 1_H)(g) = #Fix_Ω(g)`** (H = stabilizer, 作用 transitive):
+   `induceTerm` の和 = `#{x : x⁻¹gx ∈ Stab(pt)}` = `#{x : g • (x•pt) = x•pt}`、
+   fiber `x ↦ x•pt` は各点 `|H|` 個 (coset) ⟹ `|H|·#Fix(g)`、`⅟|H|` 倍で落ちる。
+2. **`⟨π, π⟩ = #orbits(Ω × Ω)`**: `π(g)² = #Fix_{Ω×Ω}(g)` (diagonal 作用の Fix = Fix²) +
+   Burnside。π は ℕ-値ゆえ `star π = π`。
+3. **doubly transitive ⟹ `#orbits(Ω × Ω) = 2`** (対角線 + 補集合; `|Ω| ≥ 2` は
+   `|Ω| = |Q|+1`, `Q_even` + `Nat.card_pos` から)。
+
+### Suzuki 側 (`StructureOfH/InducedLambda.lean` 等)
+
+4. `(Ind λ)(x) = λ(x)·(Ind 1_H)(x)` for `x ∈ H` — `induceTerm` ごとに step (6)
+   `apply_eq_of_isConj` (witness `x⁻¹`) で `λ(x⁻¹gx) = λ(g)`… 正確には項ごと
+   `λ((x')⁻¹ x x') = λ(x)` として括り出す。
+5. `⟨λ·φ, λ⟩ = ⟨φ, 1_H⟩` 型の内積計算 (λ 線形指標)。
+6. 連鎖の組み立てで `⟨Ind λ, Ind λ⟩ = 2`。
