@@ -486,6 +486,163 @@ theorem mem_characterKernel_of_forall_inner_restrict_eq_zero [Finite G]
   refine Finset.sum_congr rfl fun a ha => ?_
   rw [ClassFunction.smul_apply, ClassFunction.smul_apply, hker a ha]
 
+/-- **Theorem C, step (12), degree estimate** (p. 116,
+"`|Q| + 1 = f₁(1) + f₂(1) ≥ (b₁+b₂)∑aᵢχᵢ(1) = (b₁+b₂)(|H| − |H/Q₁|)/|D|`",
+here stated for a single constituent and cleared of the denominator):
+if `f` is an irreducible character of `G` orthogonal to all member images,
+with degree `n` and anchor multiplicity `b = ⟨Res f, χ₁⟩`, then
+`b·(|H| − |H/Q₁|) ≤ n·d`.
+
+The `𝒮`-part of the constituent sum of `Res_H^G f` evaluates at `1` to
+`∑_{χ∈𝒮} (a_χ·b)(a_χ·d) = b·(∑_{χ∈𝒮} χ(1)²)/d`, and is dominated by the full
+degree `n`; the member degree-square sum is `|H| − |H/Q₁]`
+(`sum_degreeSq_SsetOf_toFinset` at `R = ⊥`). -/
+theorem mul_card_sub_le_of_inner_restrict [Finite G]
+    [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {f : ClassFunction G ℂ} (hf : IsIrreducibleCharacter f)
+    (hforth : ∀ ψ ∈ hyp.Sset, ClassFunction.inner f (hcoh.extension ψ) = 0)
+    {n : ℕ} (hn : f (1 : G) = (n : ℂ))
+    {χ₁ : ClassFunction ↥hyp.H ℂ} (hχ₁ : χ₁ ∈ hyp.Sset)
+    (hχ₁d : χ₁ (1 : ↥hyp.H) = (hyp.d : ℂ))
+    {b : ℕ} (hb : ClassFunction.inner (ClassFunction.restrict hyp.H f) χ₁ = (b : ℂ)) :
+    b * (Nat.card ↥hyp.H - Nat.card (↥hyp.H ⧸ hyp.Q1.subgroupOf hyp.H))
+      ≤ n * hyp.d := by
+  classical
+  haveI : (hyp.Q1.subgroupOf hyp.H).Normal := hyp.Q1_subgroupOf_H_normal
+  -- the anchor ratio for each member
+  have haOf : ∀ χ ∈ hyp.Sset, ∃ a : ℕ, 0 < a ∧
+      χ (1 : ↥hyp.H) = (a : ℂ) * χ₁ (1 : ↥hyp.H) := by
+    intro χ hχ
+    obtain ⟨mm, hmm, hval⟩ := hyp.exists_apply_one_eq_d_mul hχ
+    exact ⟨mm, hmm, by rw [hval, hχ₁d]; ring⟩
+  -- constituent multiplicities of `Res f`
+  have hres : IsCharacter (ClassFunction.restrict hyp.H f) :=
+    isCharacter_restrict hyp.H hf.isCharacter
+  obtain ⟨m, hsupp, hrepr, hcoeff⟩ := hres.exists_natFinsupp_eq_sum
+  -- `𝒮` as a Finset via `𝒮(⊥) = 𝒮`
+  have hbot : hyp.SsetOf (⊥ : Subgroup G) = hyp.Sset := by
+    ext χ
+    exact ⟨fun hχ => hχ.1, fun hχ => ⟨hχ, fun x hx => by
+      rw [show x = 1 from Subtype.ext (Subgroup.mem_bot.mp hx)]⟩⟩
+  have hfinB : (hyp.SsetOf (⊥ : Subgroup G)).Finite := by
+    rw [hbot]; exact hyp.Sset_finite
+  have hmemB : ∀ {χ : ClassFunction ↥hyp.H ℂ},
+      χ ∈ hfinB.toFinset ↔ χ ∈ hyp.Sset := by
+    intro χ
+    rw [Set.Finite.mem_toFinset, hbot]
+  -- the member degree-square sum
+  haveI hn1 : ((⊥ : Subgroup G).subgroupOf hyp.H).Normal := by
+    rw [Subgroup.bot_subgroupOf]; infer_instance
+  haveI hn2 : (((⊥ : Subgroup G).subgroupOf hyp.H)
+      ⊔ (hyp.Q1.subgroupOf hyp.H)).Normal := by
+    rw [Subgroup.bot_subgroupOf, bot_sup_eq]
+    exact hyp.Q1_subgroupOf_H_normal
+  have hsq := hyp.sum_degreeSq_SsetOf_toFinset (⊥ : Subgroup G) hfinB
+  have hcardbot : Nat.card (↥hyp.H ⧸ ((⊥ : Subgroup G)).subgroupOf hyp.H)
+      = Nat.card ↥hyp.H := by
+    rw [Subgroup.bot_subgroupOf]
+    exact Nat.card_congr (QuotientGroup.quotientBot (G := ↥hyp.H)).toEquiv
+  have hcardsup : Nat.card (↥hyp.H ⧸ (((⊥ : Subgroup G)).subgroupOf hyp.H
+      ⊔ hyp.Q1.subgroupOf hyp.H)) = Nat.card (↥hyp.H ⧸ hyp.Q1.subgroupOf hyp.H) := by
+    congr 1
+    rw [Subgroup.bot_subgroupOf, bot_sup_eq]
+  rw [hcardbot, hcardsup] at hsq
+  -- (B): the `𝒮`-part of the constituent sum is at most the degree `n` (real parts)
+  have hval1 : ClassFunction.restrict hyp.H f (1 : ↥hyp.H) = (n : ℂ) := by
+    rw [ClassFunction.restrict_apply]
+    norm_num [hn]
+  have hRe : ∑ a ∈ m.support, (m a : ℝ) * ((a : ClassFunction ↥hyp.H ℂ) 1).re
+      = (n : ℝ) := by
+    have h := congrArg Complex.re (hval1.symm.trans (by
+      rw [hrepr, ClassFunction.sum_apply]))
+    rw [Complex.natCast_re, Complex.re_sum] at h
+    simp only [ClassFunction.smul_apply, Complex.mul_re, Complex.natCast_re,
+      Complex.natCast_im, zero_mul, sub_zero] at h
+    exact h.symm
+  have hnonneg : ∀ a ∈ m.support, 0 ≤ (m a : ℝ) * ((a : ClassFunction ↥hyp.H ℂ) 1).re := by
+    intro a ha
+    have hairr : IsIrreducibleCharacter a := mem_irreducibleCharacters.mp (hsupp ha)
+    obtain ⟨da, -, hda⟩ := hairr.exists_apply_one_eq_pos_natCast
+    rw [show (a : ClassFunction ↥hyp.H ℂ) 1 = ((da : ℕ) : ℂ) from hda,
+      Complex.natCast_re]
+    positivity
+  have hB : ∑ χ ∈ hfinB.toFinset, (m χ : ℝ) * ((χ : ClassFunction ↥hyp.H ℂ) 1).re
+      ≤ (n : ℝ) := by
+    rw [← hRe]
+    rw [show (∑ χ ∈ hfinB.toFinset,
+        (m χ : ℝ) * ((χ : ClassFunction ↥hyp.H ℂ) 1).re)
+        = ∑ χ ∈ hfinB.toFinset ∩ m.support,
+          (m χ : ℝ) * ((χ : ClassFunction ↥hyp.H ℂ) 1).re from ?_]
+    · refine Finset.sum_le_sum_of_subset_of_nonneg
+        Finset.inter_subset_right (fun a ha _ => hnonneg a ha)
+    · refine (Finset.sum_subset Finset.inter_subset_left fun χ hχ hne => ?_).symm
+      have : m χ = 0 := by
+        by_contra hme
+        exact hne (Finset.mem_inter.mpr ⟨hχ, Finsupp.mem_support_iff.mpr hme⟩)
+      rw [this]
+      norm_num
+  -- (A): each `𝒮`-term times `d` equals `b·χ(1)²` (real parts)
+  have hA : ∀ χ ∈ hfinB.toFinset,
+      ((m χ : ℝ) * ((χ : ClassFunction ↥hyp.H ℂ) 1).re) * (hyp.d : ℝ)
+        = (b : ℝ) * (((χ : ClassFunction ↥hyp.H ℂ) 1).re) ^ 2 := by
+    intro χ hχ
+    have hχS : χ ∈ hyp.Sset := hmemB.mp hχ
+    obtain ⟨aχ, -, haχ⟩ := haOf χ hχS
+    have hmχ : (m χ : ℂ) = (aχ : ℂ) * (b : ℂ) := by
+      rw [hcoeff χ hχS.1, hyp.inner_restrict_eq_mul hcoh hforth hχ₁ hχS haχ, hb]
+    have hmχR : (m χ : ℝ) = (aχ : ℝ) * (b : ℝ) := by exact_mod_cast hmχ
+    have hdegR : ((χ : ClassFunction ↥hyp.H ℂ) 1).re = (aχ : ℝ) * (hyp.d : ℝ) := by
+      rw [haχ, hχ₁d]
+      simp [Complex.mul_re]
+    rw [hmχR, hdegR]
+    ring
+  -- combine: `b·∑χ(1)² = (∑ 𝒮-part)·d ≤ n·d` (real parts)
+  have hsqRe : ∑ χ ∈ hfinB.toFinset, (((χ : ClassFunction ↥hyp.H ℂ) 1).re) ^ 2
+      = (Nat.card ↥hyp.H : ℝ)
+        - (Nat.card (↥hyp.H ⧸ hyp.Q1.subgroupOf hyp.H) : ℝ) := by
+    have h := congrArg Complex.re hsq
+    rw [Complex.re_sum, Complex.sub_re, Complex.natCast_re, Complex.natCast_re] at h
+    rw [← h]
+    refine Finset.sum_congr rfl fun χ hχ => ?_
+    have hχS : χ ∈ hyp.Sset := hmemB.mp hχ
+    obtain ⟨aχ, -, haχ⟩ := haOf χ hχS
+    have heq : (χ : ClassFunction ↥hyp.H ℂ) 1 = ((aχ * hyp.d : ℕ) : ℂ) := by
+      rw [haχ, hχ₁d]; push_cast; ring
+    rw [heq,
+      show (((aχ * hyp.d : ℕ) : ℂ)) ^ 2 = (((aχ * hyp.d) ^ 2 : ℕ) : ℂ) by
+        push_cast; ring,
+      Complex.natCast_re, Complex.natCast_re]
+    push_cast
+    ring
+  have hmain : (b : ℝ) * ((Nat.card ↥hyp.H : ℝ)
+      - (Nat.card (↥hyp.H ⧸ hyp.Q1.subgroupOf hyp.H) : ℝ)) ≤ (n : ℝ) * (hyp.d : ℝ) := by
+    calc (b : ℝ) * ((Nat.card ↥hyp.H : ℝ)
+        - (Nat.card (↥hyp.H ⧸ hyp.Q1.subgroupOf hyp.H) : ℝ))
+        = (b : ℝ) * ∑ χ ∈ hfinB.toFinset,
+            (((χ : ClassFunction ↥hyp.H ℂ) 1).re) ^ 2 := by rw [hsqRe]
+      _ = ∑ χ ∈ hfinB.toFinset,
+            ((m χ : ℝ) * ((χ : ClassFunction ↥hyp.H ℂ) 1).re) * (hyp.d : ℝ) := by
+          rw [Finset.mul_sum]
+          exact Finset.sum_congr rfl fun χ hχ => (hA χ hχ).symm
+      _ = (∑ χ ∈ hfinB.toFinset,
+            (m χ : ℝ) * ((χ : ClassFunction ↥hyp.H ℂ) 1).re) * (hyp.d : ℝ) := by
+          rw [Finset.sum_mul]
+      _ ≤ (n : ℝ) * (hyp.d : ℝ) := by
+          have hd0 : (0 : ℝ) ≤ (hyp.d : ℝ) := Nat.cast_nonneg _
+          exact mul_le_mul_of_nonneg_right hB hd0
+  -- back to ℕ
+  have hle : Nat.card (↥hyp.H ⧸ hyp.Q1.subgroupOf hyp.H) ≤ Nat.card ↥hyp.H :=
+    Nat.le_of_dvd Nat.card_pos
+      (Subgroup.card_quotient_dvd_card (hyp.Q1.subgroupOf hyp.H))
+  have : ((b * (Nat.card ↥hyp.H
+      - Nat.card (↥hyp.H ⧸ hyp.Q1.subgroupOf hyp.H)) : ℕ) : ℝ)
+      ≤ ((n * hyp.d : ℕ) : ℝ) := by
+    push_cast [Nat.cast_sub hle]
+    exact hmain
+  exact_mod_cast this
+
 end RestrictInduce
 
 end Hypothesis
