@@ -213,4 +213,16 @@ theorem inner_induce_trivial_stabilizer_of_two_pretransitive (ω₀ : Ω)
     OddOrder.GroupTheory.card_orbits_prod_eq_two h2]
   norm_num
 
+/-- Restatement of `inner_induce_trivial_stabilizer_of_two_pretransitive` through
+an equality `H = stabilizer G ω₀`, as point stabilizers arise in concrete
+configurations (Peterfalvi Part II: `H_def : H = stabilizer G basept`). -/
+theorem inner_induce_trivial_of_eq_stabilizer {H : Subgroup G} {ω₀ : Ω}
+    (hH : H = stabilizer G ω₀) [Nontrivial Ω]
+    (h2 : IsMultiplyPretransitive G Ω 2) [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥H : ℂ)] :
+    ClassFunction.inner (induce H (trivialClassFunction ↥H))
+      (induce H (trivialClassFunction ↥H)) = 2 := by
+  subst hH
+  exact inner_induce_trivial_stabilizer_of_two_pretransitive ω₀ h2
+
 end OddOrder.RepresentationTheory.ClassFunction
