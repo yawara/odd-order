@@ -5598,9 +5598,24 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   互いに素、したがって `X.index = (H p).index · (t.inf H).index` となることを使う。
   再利用部品 `index_inf_eq_mul_of_coprime` (指数が互いに素なら交わりの指数は積 —
   `index_dvd_of_le` 2 本 + `Nat.Coprime.mul_dvd_of_dvd_of_dvd` と `index_inf_le` の挟み撃ち)。
-* ⬜ **3C.3** — Sylow system (各素数の Sylow を 1 つずつ、互いに置換可能な集合)。
-  (a) Sylow system があれば任意の `π` に Hall `π`-部分群がある。
-  (b) 可解群には Sylow system がある。Hint: 各 `p`-補元を取り、1 つを除く全部の交わりを見る。
+* ✅ **3C.3** — Sylow system (2026-07-28, `ProblemsHallSystems.lean` に追記, axiom-clean 確認済)。
+  定義 `IsSylowSystem P` = 各素因子 `p` で `IsHallSubgroup {p} (P p)` (= Sylow) + 対ごとの
+  集合積可換。
+  (a) `IsSylowSystem.exists_isHallSubgroup`。部品 `mulSubgroupOfComm` (集合積が可換な
+  2 部分群の積部分群; carrier が `↑H * ↑K` に defeq) + 帰納エンジン `sylowSystem_prod_aux`
+  (部分族 `t` の積部分群 `K` で「`t` のメンバーを含む・`|K|` の素因子 ⊆ `t`・族の他メンバーと
+  可換」を同時帰納)。Hall 性の指数側は **数値計算なし**: `r ∈ π` が `K.index` を割るなら
+  `P r ≤ K` から `K.index ∣ (P r).index`, Sylow 性 (`(P r).index` は `r` を避ける) に矛盾。
+  (b) `exists_isSylowSystem` (書籍 Hint どおり)。`hall_E_exists` で `q`-補元 `Hc q` を取り
+  `P p := (pf.erase p).inf Hc`。Sylow 性 = 3C.2 の Hall 性を `{p}` へ狭める
+  (`isHallSingleton_inf_erase`)。可換性 = `inf_erase_mul_inf_erase`: `Pp·Pq ⊆ K :=`
+  (2 つを除く交わり) と `|K| = |Pp|·|Pq|` (付値比較 `Nat.eq_of_factorization_eq`; 汎用部品
+  `IsHallSubgroup.factorization_card_of_mem`/`_of_notMem` を新設) から
+  `Set.eq_of_subset_of_ncard_le` で `Pp·Pq = K = Pq·Pp`。
+  ⚠ 実装の罠 2 つ: `(X.inf Hc : Set G)` と書くと `Finset.inf` が `Set G` の格子に解決されて
+  型エラー (`(X.inf Hc : Subgroup G) : Set G` と 2 段で書く); `obtain` した `Set.mem_mul` の
+  等式は beta 未簡約 (`(fun x1 x2 ↦ x1*x2) h k = …`) で `rw` 不能 — defeq な `have` で
+  詰め替えてから使う。
 * ⬜ **3C.4** — `M` が可解群 `G` の極小正規部分群で `M = C_G(M)` なら `G` は `M` 上分裂し、
   `M` の補元は全て共役。Hint: `L/M` を `G/M` の極小正規に取り `q`-群、`q ∤ |M|` を示して
   `L` の Sylow `q` を見る。
