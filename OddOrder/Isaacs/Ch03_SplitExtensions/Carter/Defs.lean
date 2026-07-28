@@ -23,6 +23,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.7 の形式化
 - `isCarterSubgroup_top_of_isNilpotent` — 冪零群では `⊤` が Carter 部分群。
 - `IsCarterSubgroup.map_conj` — Carter 性は共役で保たれる。
 - `IsCarterSubgroup.subgroupOf` — `C ≤ K` なら `C` は `↥K` の Carter 部分群。
+- `map_conj_eq_iff_subgroupOf` — `↥K` 内の共役と `G` 内の共役の翻訳。
 
 ⚠ 「`N ⊴ G` なら `N_G(C) ≤ N_G(C ⊔ N)`」(3C.7 の帰納全体が使う土台) は mathlib に
 `Subgroup.normalizer_le_normalizer_sup_normal` として既にあるので, ここでは重複させない
@@ -83,6 +84,33 @@ theorem IsCarterSubgroup.subgroupOf {C K : Subgroup G} (h : IsCarterSubgroup C) 
   haveI := h.1
   exact ⟨Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hCK).symm,
     by rw [← Subgroup.subgroupOf_normalizer_eq hCK, h.2]⟩
+
+/-- `C ≤ K` のとき, `↥K` の中の共役は `G` の中の共役の `subgroupOf` に一致する。 -/
+theorem map_conj_subgroupOf {C K : Subgroup G} (hC : C ≤ K) (y : ↥K) :
+    (C.map (MulAut.conj (y : G)).toMonoidHom).subgroupOf K
+      = (C.subgroupOf K).map (MulAut.conj y).toMonoidHom := by
+  ext x
+  simp only [Subgroup.mem_subgroupOf, Subgroup.mem_map, MulEquiv.coe_toMonoidHom,
+    MulAut.conj_apply]
+  constructor
+  · rintro ⟨c, hc, hcx⟩
+    exact ⟨⟨c, hC hc⟩, by simpa [Subgroup.mem_subgroupOf] using hc,
+      Subtype.ext (by simpa using hcx)⟩
+  · rintro ⟨c, hc, hcx⟩
+    exact ⟨(c : G), by simpa [Subgroup.mem_subgroupOf] using hc,
+      by simpa using congrArg Subtype.val hcx⟩
+
+/-- `C, C' ≤ K` のとき, `↥K` 内での共役 `C^y = C'` と `G` 内での共役 `C^{↑y} = C'` は同値。
+
+3C.7 の帰納が部分群 `↥K` へ降りて戻るときの翻訳。 -/
+theorem map_conj_eq_iff_subgroupOf {C C' K : Subgroup G} (hC : C ≤ K) (hC' : C' ≤ K) (y : ↥K) :
+    (C.subgroupOf K).map (MulAut.conj y).toMonoidHom = C'.subgroupOf K ↔
+      C.map (MulAut.conj (y : G)).toMonoidHom = C' := by
+  have hle : C.map (MulAut.conj (y : G)).toMonoidHom ≤ K := by
+    rintro - ⟨c, hc, rfl⟩
+    exact K.mul_mem (K.mul_mem y.2 (hC hc)) (K.inv_mem y.2)
+  rw [← map_conj_subgroupOf hC y, Subgroup.subgroupOf_inj, inf_of_le_left hle,
+    inf_of_le_left hC']
 
 end -- Problem 3C.7 定義
 
