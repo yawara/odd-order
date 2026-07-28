@@ -751,4 +751,82 @@ theorem apply_eq_of_isConj_piPrime (ind : Hypothesis.TheoremAInductionBelow G Ω
 
 end SecondCaseHypothesis
 
+namespace SecondCaseHypothesis
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (sc : SecondCaseHypothesis G Ω)
+
+/-- **Peterfalvi Part II, Ch. III, Theorem C, step (6)** (p. 115): "if `x ∈ H`,
+`g ∈ G` and `x^g ∈ H`, then `λ(x^g) = λ(x)`."
+
+Decompose `x = a·b` with `a` a `π`-element and `b` a `π′`-element, both powers of
+`x` (`exists_isPiElement_mul`).  Conjugating by `g` carries this to a
+factorisation of `y` with the same order profile, so both values collapse to the
+`π′`-factors (`apply_eq_of_piFactorization`); those are `G`-conjugate
+`π′`-elements of `H`, hence equal under `θ` by the core
+(`apply_eq_of_isConj_piPrime`). -/
+theorem apply_eq_of_isConj (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ1 : sc.toHypothesis.Q1 ≠ ⊥)
+    {θ : ClassFunction ↥sc.toHypothesis.H ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hdeg : (θ : ↥sc.toHypothesis.H → ℂ) 1 = 1)
+    (hker : ((sc.toHypothesis.QK.subgroupOf sc.toHypothesis.H :
+      Subgroup ↥sc.toHypothesis.H) : Set ↥sc.toHypothesis.H) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel θ)
+    {x y : ↥sc.toHypothesis.H} {g : G}
+    (hconj : g * (x : G) * g⁻¹ = (y : G)) :
+    (θ : ↥sc.toHypothesis.H → ℂ) x = (θ : ↥sc.toHypothesis.H → ℂ) y := by
+  classical
+  obtain ⟨a, b, hab, -, ha, hb, haz, hbz⟩ :=
+    OddOrder.GroupTheory.exists_isPiElement_mul
+      ((Nat.card ↥sc.toHypothesis.QK).primeFactors : Set ℕ) x
+  obtain ⟨m, hm₀⟩ := haz
+  obtain ⟨n, hn₀⟩ := hbz
+  have hm : x ^ m = a := hm₀
+  have hn : x ^ n = b := hn₀
+  -- conjugation preserves the order profile of the two factors
+  have hordm : orderOf (y ^ m) = orderOf a := by
+    rw [← hm, ← Subgroup.orderOf_coe (y ^ m), ← Subgroup.orderOf_coe (x ^ m)]
+    push_cast
+    rw [← hconj, conj_zpow]
+    have h := orderOf_injective (MulAut.conj g).toMonoidHom
+      (MulAut.conj g).injective ((x : G) ^ m)
+    simpa [MulAut.conj_apply] using h
+  have hordn : orderOf (y ^ n) = orderOf b := by
+    rw [← hn, ← Subgroup.orderOf_coe (y ^ n), ← Subgroup.orderOf_coe (x ^ n)]
+    push_cast
+    rw [← hconj, conj_zpow]
+    have h := orderOf_injective (MulAut.conj g).toMonoidHom
+      (MulAut.conj g).injective ((x : G) ^ n)
+    simpa [MulAut.conj_apply] using h
+  -- the conjugated factorisation of `y`
+  have hab' : y ^ m * y ^ n = y := by
+    have hx : x ^ (m + n) = x := by rw [zpow_add, hm, hn, hab]
+    have hxG : (x : G) ^ (m + n) = (x : G) := by
+      have h := congrArg (fun z : ↥sc.toHypothesis.H => (z : G)) hx
+      push_cast at h
+      exact h
+    apply Subtype.ext
+    push_cast
+    rw [← zpow_add, ← hconj, conj_zpow, hxG]
+  have ha' : ∀ q ∈ (orderOf (y ^ m)).primeFactors,
+      q ∈ (Nat.card ↥sc.toHypothesis.QK).primeFactors := by
+    rw [hordm]; exact ha
+  have hb' : ∀ q ∈ (orderOf (y ^ n)).primeFactors,
+      q ∉ (Nat.card ↥sc.toHypothesis.QK).primeFactors := by
+    rw [hordn]; exact hb
+  -- the `π′`-factors are conjugate in `G`
+  have hbconj : g * (b : G) * g⁻¹ = ((y ^ n : ↥sc.toHypothesis.H) : G) := by
+    rw [← hn]
+    push_cast
+    rw [← hconj, conj_zpow]
+  calc (θ : ↥sc.toHypothesis.H → ℂ) x
+      = (θ : ↥sc.toHypothesis.H → ℂ) b :=
+        sc.apply_eq_of_piFactorization ind hQ1 hθ hdeg hker hab ha
+    _ = (θ : ↥sc.toHypothesis.H → ℂ) (y ^ n) :=
+        sc.apply_eq_of_isConj_piPrime ind hQ1 θ hb hb' hbconj
+    _ = (θ : ↥sc.toHypothesis.H → ℂ) y :=
+        (sc.apply_eq_of_piFactorization ind hQ1 hθ hdeg hker hab' ha').symm
+
+end SecondCaseHypothesis
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
