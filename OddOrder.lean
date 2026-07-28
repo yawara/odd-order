@@ -213,6 +213,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3BSolvability
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsHallSystems
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsMinimalNormal
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsCoreFreeMaximal
+import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsCoprimeOrders
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsFaithfulOrbit

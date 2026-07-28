@@ -5656,8 +5656,20 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   `CommGroup` 版のみ (`Mathlib/Algebra/Group/Subgroup/Order.lean:32`)。一般の群の部分群束は
   modular でないので `sup_inf_assoc_of_le` は使えず、Dedekind は「`M` 正規ゆえ `M ⊔ H = MH`
   (集合積)」を経由して手で書く。
-* ⬜ **3C.6** — 可解 `G` で `x,y,z` の位数が対ごとに互いに素かつ `xyz = 1` なら
-  `x = y = z = 1`。Hint: 導来長に関する帰納。
+* ✅ **3C.6** — (2026-07-28, 新 leaf `Ch03_SplitExtensions/ProblemsCoprimeOrders.lean`,
+  `OddOrder.lean` 配線済, axiom-clean 確認済)。
+  `eq_one_of_mul_eq_one_of_coprime_orders`。帰納 1 段 =
+  `mem_commutator_of_mul_eq_one_of_coprime_orders` (**有限性不要**):
+  可換化 `Abelianization G` へ落とすと `x̄ = (ȳz̄)⁻¹` で, 可換ゆえ
+  `o(ȳz̄) = o(ȳ)·o(z̄)` (`Commute.orderOf_mul_eq_mul_orderOf_of_coprime`)。
+  `o(x̄) ∣ o(x)` (`orderOf_map_dvd`) から `o(x̄)` は `o(ȳ)·o(z̄) = o(x̄)` と互いに素、
+  `Nat.gcd_self` で `o(x̄) = 1` ⟹ `x ∈ ⁅G,G⁆` (`Abelianization.ker_of`)。
+  すると `ȳz̄ = 1` で `o(ȳ) = o(z̄)`, 同じ trick で両方 1。
+  本体は書籍 Hint の「導来長に関する帰納」を **`|G|` の強帰納**で実装
+  (`∀ n, ∀ {G} [Group G] [Finite G] [IsSolvable G], Nat.card G ≤ n → …` の形で
+  型を量化し、1 段ごとに `↥(commutator G)` へ降りる)。
+  `commutator G < ⊤` = `IsSolvable.commutator_lt_top_of_nontrivial`、
+  位数減少は `Finite.card_subtype_lt`、部分群の元の位数は `Subgroup.orderOf_mk`。
 * ⬜ **3C.7** — Carter 部分群 (`C` 冪零かつ `C = N_G(C)`) の (a) 存在 (b) 共役性
   (c) `G/N` 冪零なら `NC = G`。⚠ **書籍自身が「この問題と次はかなり難しい」と注記**。
 * ⬜ **3C.8** — 可解群の nilpotent injector (`F(G)` を含む極大な冪零部分群) は全て共役。
