@@ -245,6 +245,19 @@ theorem linearClassFunction_mul_star_self_eq_one {H : Type*} [Group H] [Finite H
   rw [linearClassFunction_apply, hstar]
   exact mul_inv_cancel₀ (Units.ne_zero (χ h))
 
+/-- **A degree-one irreducible character has unit-norm values**:
+`θ(g)·star(θ(g)) = 1`.  By
+`exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one`, `θ` is the class
+function of a linear character `G →* ℂˣ`, and those have unit norm
+(`linearClassFunction_mul_star_self_eq_one`). -/
+theorem IsIrreducibleCharacter.apply_mul_star_self_eq_one {G : Type*} [Group G]
+    [Finite G] {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ)
+    (h1 : (φ : G → ℂ) 1 = 1) (g : G) :
+    (φ : G → ℂ) g * star ((φ : G → ℂ) g) = 1 := by
+  obtain ⟨χ, hχ⟩ := hφ.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one h1
+  rw [← hχ]
+  simpa using linearClassFunction_mul_star_self_eq_one χ g
+
 /-- **Twisting an irreducible character by a linear character preserves irreducibility.**
 Specialization of `isIrreducibleCharacter_mul_of_unit_norm` to `lam = linearClassFunction χlin`
 (`χlin : G →* ℂˣ`): the linear character is a genuine character of unit norm
