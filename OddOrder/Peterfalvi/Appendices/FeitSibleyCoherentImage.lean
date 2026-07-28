@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.FeitSibleyTheorem
 import OddOrder.Peterfalvi.Appendices.FeitSibleySsetCoherence
 import OddOrder.Peterfalvi.Appendices.FeitSibleyInduction
+import OddOrder.Peterfalvi.Appendices.FeitSibleyQ1Component
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
 
@@ -401,6 +402,89 @@ theorem inner_constituent_extension_eq_zero [Finite G]
     exact_mod_cast h
   obtain ⟨k, hk⟩ := hidx
   omega
+
+/-- **Theorem C, step (11), member multiplicities** (p. 116,
+"`(Res_H^G f_j, χᵢ − aᵢχ₁) = 0`"): if `f` is orthogonal to every member image
+(step (10)), then the multiplicity of a member `χ` in `Res_H^G f` is
+proportional to its degree: `⟨Res f, χ⟩ = a·⟨Res f, χ₁⟩` when
+`χ(1) = a·χ₁(1)`.
+
+Frobenius reciprocity turns `⟨e_χ − a·e_{χ₁}, f⟩ = 0` (step (9) plus the
+orthogonality hypothesis) into `⟨χ − a·χ₁, Res f⟩ = 0`. -/
+theorem inner_restrict_eq_mul [Finite G] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ)]
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {f : ClassFunction G ℂ}
+    (hforth : ∀ ψ ∈ hyp.Sset, ClassFunction.inner f (hcoh.extension ψ) = 0)
+    {χ₁ χ : ClassFunction ↥hyp.H ℂ} (hχ₁ : χ₁ ∈ hyp.Sset) (hχ : χ ∈ hyp.Sset)
+    {a : ℕ} (hdeg : χ (1 : ↥hyp.H) = (a : ℂ) * χ₁ (1 : ↥hyp.H)) :
+    ClassFunction.inner (ClassFunction.restrict hyp.H f) χ
+      = (a : ℂ) * ClassFunction.inner (ClassFunction.restrict hyp.H f) χ₁ := by
+  have h9 := hyp.induce_sub_nsmul_extension hcoh hχ hχ₁ hdeg
+  have hrec := ClassFunction.inner_induce_eq_inner_restrict hyp.H (χ - a • χ₁) f
+  rw [h9, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
+    ← Nat.cast_smul_eq_nsmul ℂ a (hcoh.extension χ₁),
+    ← Nat.cast_smul_eq_nsmul ℂ a χ₁,
+    ClassFunction.inner_smul_left, ClassFunction.inner_smul_left] at hrec
+  have hzχ : ClassFunction.inner (hcoh.extension χ) f = 0 := by
+    rw [ClassFunction.inner_star_comm, hforth χ hχ, star_zero]
+  have hzχ₁ : ClassFunction.inner (hcoh.extension χ₁) f = 0 := by
+    rw [ClassFunction.inner_star_comm, hforth χ₁ hχ₁, star_zero]
+  rw [hzχ, hzχ₁, mul_zero, sub_zero] at hrec
+  -- hrec : 0 = ⟨χ, Res f⟩ − a·⟨χ₁, Res f⟩
+  have h := sub_eq_zero.mp hrec.symm
+  -- transpose through `star`
+  calc ClassFunction.inner (ClassFunction.restrict hyp.H f) χ
+      = star (ClassFunction.inner χ (ClassFunction.restrict hyp.H f)) := by
+        rw [ClassFunction.inner_star_comm]
+    _ = star ((a : ℂ) * ClassFunction.inner χ₁ (ClassFunction.restrict hyp.H f)) := by
+        rw [h]
+    _ = (a : ℂ) * ClassFunction.inner (ClassFunction.restrict hyp.H f) χ₁ := by
+        rw [star_mul', star_natCast, ClassFunction.inner_star_comm, star_star]
+
+omit [Fintype G] in
+/-- **Theorem C, step (12), kernel conclusion** (p. 116, "`b_j = 0` and so
+`Q₁ ⊂ Ker f_j`"): if no member of `𝒮` occurs in `Res_H^G f` (`f` a genuine
+character of `G`), then `Q₁` lies in the kernel of `f`.
+
+Every irreducible constituent of `Res f` is then outside `𝒮`, i.e. has `Q₁`
+in its kernel, so the constituent sum takes its degree value on `Q₁`. -/
+theorem mem_characterKernel_of_forall_inner_restrict_eq_zero [Finite G]
+    {f : ClassFunction G ℂ} (hfchar : IsCharacter f)
+    (hzero : ∀ χ ∈ hyp.Sset,
+      ClassFunction.inner (ClassFunction.restrict hyp.H f) χ = 0)
+    {x : G} (hx : x ∈ hyp.Q1) :
+    x ∈ OddOrder.Peterfalvi.S03.characterKernel f := by
+  classical
+  have hres : IsCharacter (ClassFunction.restrict hyp.H f) :=
+    isCharacter_restrict hyp.H hfchar
+  obtain ⟨m, hsupp, hrepr, hcoeff⟩ := hres.exists_natFinsupp_eq_sum
+  have hxH : x ∈ hyp.H := hyp.Q_le_H (hyp.Q1_le_Q hx)
+  -- every constituent lies outside `𝒮`, hence kills `Q₁`
+  have hker : ∀ a ∈ m.support,
+      (a : ClassFunction ↥hyp.H ℂ) ⟨x, hxH⟩ = a (1 : ↥hyp.H) := by
+    intro a ha
+    have hairr : IsIrreducibleCharacter a := mem_irreducibleCharacters.mp (hsupp ha)
+    have haS : a ∉ hyp.Sset := by
+      intro haS
+      have h0 := hzero a haS
+      rw [← hcoeff a hairr] at h0
+      exact Finsupp.mem_support_iff.mp ha (by exact_mod_cast h0)
+    have hLK : hyp.LeKer a hyp.Q1 := by
+      by_contra hnk
+      exact haS ⟨hairr, hnk⟩
+    exact hLK ⟨x, hxH⟩ hx
+  -- evaluate the constituent sum at `x` and at `1`
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+    OddOrder.Peterfalvi.S03.characterDegree_def]
+  have hres_x : f x = ClassFunction.restrict hyp.H f ⟨x, hxH⟩ :=
+    (ClassFunction.restrict_apply hyp.H f ⟨x, hxH⟩).symm
+  have hres_1 : f 1 = ClassFunction.restrict hyp.H f (1 : ↥hyp.H) := by
+    rw [ClassFunction.restrict_apply]
+    norm_num
+  rw [hres_x, hres_1, hrepr, ClassFunction.sum_apply, ClassFunction.sum_apply]
+  refine Finset.sum_congr rfl fun a ha => ?_
+  rw [ClassFunction.smul_apply, ClassFunction.smul_apply, hker a ha]
 
 end RestrictInduce
 
