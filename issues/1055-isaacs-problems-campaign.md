@@ -5677,3 +5677,61 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
 
 **着手順は番号順** (3C.2 から)。3C.7 / 3C.8 は書籍自身が難問と明示しているので、
 時間がかかっても正面から進める (CLAUDE.md「難易度は着手判断の基準でない」)。
+
+### 3C.7 (Carter 部分群) の設計 — 2026-07-28 に確定, 実装中
+
+書籍は証明を与えない (challenge)。以下は自前で組んだ完全な証明計画。
+**(a) 存在 / (b) 共役 / (c) `G/N` 冪零 ⟹ `NC = G`** は相互に絡むので **`|G|` の強帰納で
+(b) → (c) → (a) の順に積む** (各段で「より小さい群での (b)」だけを使う形に整理済)。
+
+置き場 = 新ディレクトリ `Ch03_SplitExtensions/Carter/`
+(`Defs.lean` / `Conjugacy.lean` / `Existence.lean` / `NilpotentQuotient.lean`)。
+
+**定義**: `IsCarterSubgroup C := Group.IsNilpotent ↥C ∧ Subgroup.normalizer (C : Set G) = C`。
+
+**共通部品** (先に作る):
+* `N_G(C) ≤ N_G(N ⊔ C)` (`N ⊴ G`): `C^g = C` なら `(NC)^g = N^g C^g = NC`。
+  → 「`N_G(C)` を `N_G(K)` に押し込む」全ステップの土台。
+* 商への持ち上げ: `N ≤ K` のとき `N_{G/N}(K/N) = N_G(K)/N` (対応定理)。
+* `C` が `G` の Carter で `C ≤ H ≤ G` なら `C` は `H` の Carter (`N_H(C) ≤ N_G(C) = C`)。
+
+**(b) 共役** — `|G|` 強帰納。`N` = 極小正規 (可換, 素数 `p` の elementary abelian)。
+1. `N_G(CN) = CN`: `g ∈ N_G(CN)` なら `C, C^g` はともに `CN` の Carter。
+   `CN < G` なら帰納で `∃y ∈ CN, C^{gy} = C` ⟹ `gy ∈ N_G(C) = C` ⟹ `g ∈ CN`。
+   `CN = G` なら自明。⟹ `CN/N`, `DN/N` は `G/N` の Carter。
+2. `G/N` で帰納 ⟹ WLOG `CN = DN =: K`。
+3. `K < G` なら `K` で帰納して終わり。
+4. `K = G` の場合。`C ⊓ N ⊴ G` (`N` 可換 + `C` が正規化) で極小性より `⊥` か `N`。
+   `N ≤ C` なら `C = G` で `G` 冪零 ⟹ 冪零群の自己正規化部分群は `G` のみゆえ `D = G`。
+   以下 `C ⊓ N = D ⊓ N = ⊥` (ともに `N` の補元)。
+   * `[N,C] ⊴ G` (`≤ N`, `N` 可換 + `C` で不変) なので `⊥` か `N`。`⊥` なら
+     `N ≤ N_G(C) = C` で `N = ⊥` に矛盾 ⟹ `[N,C] = N`。(実装では使わなくてよいが健全性の確認)
+   * `P := ` `G` の Sylow `p`。`G/N ≅ C` 冪零 + `N` は `p`-群 ⟹ `P ⊴ G` かつ `P = N C_p`
+     (`C_p` = 冪零 `C` の Sylow `p`)。`Q := C_{p'}` は **`G` の Hall `p'`-部分群**
+     (`|G| = |N||C|`, `|N|` は `p`-冪)。
+   * `D_{p'}` も Hall `p'` ⟹ **`hall_C`** (Isaacs Thm 3.14, repo 既存) で共役。
+     `D` を取り替えて `C_{p'} = D_{p'} = Q` としてよい。
+   * **`C_p = C_P(Q)`**: `C_p ≤ C_P(Q)` は `C = C_p × Q`。逆は `C_p < C_P(Q)` とすると
+     `p`-群の正規化条件で `x ∈ N_{C_P(Q)}(C_p) \ C_p` が取れ、`x` は `C_p` を正規化し `Q` を
+     中心化するので `C = C_p Q` を正規化 ⟹ `x ∈ N_G(C) = C`, かつ `x ∈ P` ゆえ
+     `x ∈ C ⊓ P = C_p` で矛盾。同様に `D_p = C_P(Q)`。⟹ **`C = C_p Q = D_p Q = D`**。
+
+**(c) `NC = G`** — `NC < G` と仮定。`G/N` 冪零ゆえ正規化条件で `NC < N_G(NC) =: X`。
+`x ∈ X \ NC` を取ると `C, C^x` はともに `NC` の Carter で `NC < G` だから (b) が使え
+`∃y ∈ NC, C^{xy} = C` ⟹ `xy ∈ N_G(C) = C ≤ NC` ⟹ `x ∈ NC` で矛盾。
+
+**(a) 存在** — `|G|` 強帰納。`G = 1` なら `⊥`。`N` = 極小正規。
+帰納で `G/N` の Carter `K/N` (`N ≤ K ≤ G`, `N_G(K) = K`) を取る。
+* `K < G`: 帰納で `K` の Carter `C`。(c) を `K` に適用して `NC = K`
+  (`K/N` 冪零)、よって `N_G(C) ≤ N_G(NC) = N_G(K) = K` かつ `N_G(C) ⊓ K = N_K(C) = C`。⟹ `C` は `G` の Carter。
+* `K = G` (= `G/N` 冪零):
+  - `G` 冪零なら `C = G`。
+  - そうでないとき `N ⊄ Φ(G)` (∵ `N ≤ Φ(G)` かつ `G/N` 冪零 ⟹ `G/Φ(G)` 冪零 ⟹ `G` 冪零)。
+    極大 `M` で `N ⊄ M` を取ると `G = NM`, `N ⊓ M ⊴ G` (`N` 可換) で極小性より `⊥`。
+    `M ≅ G/N` は冪零。`N_G(M)` は `M` の極大性から `M` か `G`。`G` なら `G = N × M` で
+    `N ≤ Z(G)` ⟹ `G` 冪零で矛盾。⟹ `N_G(M) = M` で `M` が Carter。
+  - ⚠ **要 upstream**: 「`G/Φ(G)` 冪零 ⟹ `G` 冪零」。repo/mathlib に無ければ
+    Frattini 論法 (`P ∈ Syl_p(G)`, `PΦ(G) ⊴ G` ⟹ `G = N_G(P)Φ(G) = N_G(P)`) で自作する。
+
+**3C.8 (nilpotent injector)** は 3C.7 の後。`F(G)` を含む極大冪零部分群の共役性で、
+同型の帰納 (極小正規 + Hall/Sylow 分解) が効くはず。3C.7 の部品を再利用する。
