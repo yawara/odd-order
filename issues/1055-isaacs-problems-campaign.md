@@ -6360,3 +6360,32 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
 3. `Z(↥V) = 1` (`↥V` も semisimple)。`U ⊔ V = sSup 𝒳 = ⊤` と `Subgroup.mul_normal` で
    `n ∈ N` を `n = u v` (`u ∈ U`, `v ∈ V`) と書くと, `U ≤ C_G(V)` かつ `n ∈ C_G(V)` から
    `v ∈ C_G(V) ⊓ V = Z(V) = 1`。⟹ `N ≤ U`, 逆は自明で `N = U`。
+
+### §9A 進捗 (2026-07-29, 続き) — 9A.3 / 9A.4 / 9A.5 / 9A.6 完了
+
+* **9A.3 ✅** `eq_iSup_isMinimalNormal_le_of_isSemisimpleGroup` + 新補題
+  `inf_centralizer_eq_bot_of_isSemisimpleGroup` (semisimple 群で `W ⊓ C_G(W) = 1`)。
+* **9A.4 ✅** `eq_iSup_component_sup_inf_center`。⚠ **書籍の誤植**: `Y = M ∩ Z(E)` は
+  `N ∩ Z(E)` が正しい (`E` quasisimple・`N = Z(E)` で反例)。
+  付随して `Layer.lean` の Thm 9.7(b) の semisimple 族を `componentImageFamily` +
+  `componentImageFamily_spec` + `sSup_componentImageFamily` として切り出した
+  (「`E/Z(E)` の極小正規は component の像に限る」を出すのに族の同一性が要る)。
+* **9A.5 ✅** `commutator_eq_bot_of_isComponent_notLe`。⚠ **書籍 hint の誤植**:
+  `E = E(H)` は `E = E(G)` (`H ∩ E` と書いているので `E ⊄ H`)。
+* **9A.6 ✅** `layer_le_of_centralizer_le` (9A.5 の直接の帰結)。
+
+**次 = 9A.7** (非可換極小正規 `N` の単純直積因子の族に `G` が共役で推移的に作用)。設計:
+
+1. 「`N` の単純直積因子」= `T ≤ N` かつ `N ≤ N_G(T)` かつ `↥T` 単純非可換
+   (`exists_simpleFamily_of_isMinimalNormal` の出力述語そのもの — 述語 `IsSimpleFactorOf`
+   として名前を付けると 9A.7 が書きやすい)。
+2. `S` が単純直積因子なら `S^g` もそう (`N ⊴ G` ゆえ)。
+   `U := ⨆ g, S^g` は `G`-normal・`≤ N`・`≠ 1` なので `N` の極小性で `U = N`。
+3. `T` が `S^g` のどれとも異なるとすると: `S^g ⊓ T` は `N` で正規かつ `T` に含まれるので
+   `T` の単純性から `⊥` か `T`, 後者だと `T ≤ S^g` → `S^g` の単純性で `T = S^g` で矛盾。
+   ⟹ disjoint かつ両方 `N`-normal ⟹ 可換。よって `T ≤ C_N(U) = C_N(N)`,
+   すなわち `T.subgroupOf N ≤ center ↥N = ⊥` (`↥N` semisimple は centerless) で `T = ⊥`,
+   単純群は非自明だから矛盾。
+
+**次々 = 9A.8** (characteristically simple ⟹ 同型な単純群の直積)。書籍 hint は
+`G ⋊ Aut(G)` を考えて `G` をその極小正規部分群にし 9A.7 を当てる。
