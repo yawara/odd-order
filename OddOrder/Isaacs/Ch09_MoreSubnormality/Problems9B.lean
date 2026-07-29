@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.GroupAction.ConjAct
+import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.Isaacs.Ch09_MoreSubnormality.InnerAutomorphisms
 
@@ -23,6 +25,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9B
 namespace OddOrder.Isaacs.Ch09
 
 open Subgroup
+
+open scoped commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -82,5 +86,56 @@ theorem exists_normal_isComplement_of_isCompleteGroup {S : Subgroup G} [S.Normal
   exact Subgroup.mul_mem _ (Subgroup.mem_sup_left s.2) (Subgroup.mem_sup_right hcent)
 
 end -- 9B.1
+
+section /- 9B.2 の駆動補題 (p. 285) -/
+
+/-- **`C_K(A) = 1` の押し上げ**: `A`, `B` がともに `K` で正規で `C_K(A) ⊓ B = 1`,
+`C_K(B) = 1` なら `C_K(A) = 1`。
+
+`C_K(A)` も `B` も `K`-正規なので `⁅C_K(A), B⁆ ≤ C_K(A) ⊓ B = 1`,
+すなわち `C_K(A) ≤ C_K(B) = 1`。
+
+9B.2 で `A` = `G` の像, `B` = `Aut(G)` の像, `K = Aut(Aut(G))` として使う。 -/
+theorem centralizer_eq_bot_of_inf_eq_bot_of_centralizer_eq_bot {K : Type*} [Group K]
+    {A B : Subgroup K} [A.Normal] [B.Normal]
+    (hinf : Subgroup.centralizer (A : Set K) ⊓ B = ⊥)
+    (hCB : Subgroup.centralizer (B : Set K) = ⊥) :
+    Subgroup.centralizer (A : Set K) = ⊥ := by
+  have hcomm : ⁅Subgroup.centralizer (A : Set K), B⁆ = ⊥ := by
+    refine le_bot_iff.mp ?_
+    rw [← hinf]
+    exact le_inf (Subgroup.commutator_le_left _ _) (Subgroup.commutator_le_right _ _)
+  refine le_bot_iff.mp ?_
+  rw [← hCB]
+  exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm
+
+/-- `A ⊴ K` への共役作用の核は `C_K(A)`。 -/
+theorem ker_conjNormal {K : Type*} [Group K] (A : Subgroup K) [A.Normal] :
+    (MulAut.conjNormal (H := A)).ker = Subgroup.centralizer (A : Set K) := by
+  ext x
+  simp only [MonoidHom.mem_ker, Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hx a ha
+    have h1 : ((MulAut.conjNormal (H := A) x ⟨a, ha⟩ : ↥A) : K)
+        = ((1 : MulAut ↥A) ⟨a, ha⟩ : K) := by rw [hx]
+    rw [MulAut.conjNormal_apply] at h1
+    simp only [MulAut.one_apply] at h1
+    calc a * x = (x * a * x⁻¹) * x := by rw [h1]
+      _ = x * a := by group
+  · intro hx
+    refine MulEquiv.ext fun a => Subtype.ext ?_
+    rw [MulAut.conjNormal_apply]
+    simp only [MulAut.one_apply]
+    calc x * (a : K) * x⁻¹ = ((a : K) * x) * x⁻¹ := by rw [hx (a : K) a.2]
+      _ = (a : K) := by group
+
+/-- **忠実な共役作用は `K ↪ Aut(A)`**: `A ⊴ K` で `C_K(A) = 1` なら `|K| ≤ |Aut(A)|`。 -/
+theorem card_le_card_mulAut_of_centralizer_eq_bot {K : Type*} [Group K] [Finite K]
+    {A : Subgroup K} [A.Normal] (h : Subgroup.centralizer (A : Set K) = ⊥) :
+    Nat.card K ≤ Nat.card (MulAut ↥A) := by
+  refine Nat.card_le_card_of_injective (MulAut.conjNormal (H := A)) ?_
+  rw [← MonoidHom.ker_eq_bot_iff, ker_conjNormal, h]
+
+end -- 9B.2 の駆動補題
 
 end OddOrder.Isaacs.Ch09
