@@ -506,6 +506,78 @@ theorem exists_aInvariant_sylow_card_inf {φ : A →* MulAut G}
         H ⊓ OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A) ≤ H)).toEquiv
     rw [hmap, Subgroup.card_map_of_injective H.subtype_injective, h32, hcard]
 
+/-- **Isaacs Problem 3E.4** (書籍 p. 106): 互いに素な作用で `C := C_G(A)` とし `H` が
+`A`-不変なら `[H : H ⊓ C] ∣ [G : C]` かつ `[C : H ⊓ C] ∣ [G : H]`。
+
+素数ごとに `p`-部分を比べる。`H` の `A`-不変 Sylow `p` `P` を `G` の `A`-不変 Sylow `p` `Q`
+に埋め込む (`Cor 3.25`) と, Lemma 3.32 が `|P ⊓ C| = |H ⊓ C|_p`, `|Q ⊓ C| = |C|_p` を与え,
+核の不等式 `card_mul_card_inf_le_of_le` が
+`|H|_p + |C|_p ≤ |G|_p + |H ⊓ C|_p` を与える。 -/
+theorem relIndex_dvd_index_of_aInvariant {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {H : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) :
+    (H ⊓ OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A)).relIndex H
+        ∣ (OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A)).index ∧
+      (H ⊓ OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A)).relIndex
+        (OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A)) ∣ H.index := by
+  set C : Subgroup G := OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A) with hCdef
+  -- 素数ごとの鍵不等式
+  have hkey : ∀ p : ℕ, p.Prime →
+      (Nat.card ↥H).factorization p + (Nat.card ↥C).factorization p
+        ≤ (Nat.card G).factorization p + (Nat.card ↥(H ⊓ C)).factorization p := by
+    intro p hp
+    haveI : Fact p.Prime := ⟨hp⟩
+    obtain ⟨P, hPH, hPinv, hPcard, hPCcard⟩ :=
+      exists_aInvariant_sylow_card_inf hCop hSolv hH (p := p)
+    have hPp : IsPGroup p ↥P := IsPGroup.of_card hPcard
+    obtain ⟨Q, hQinv, hPQ⟩ := aInvariant_pSubgroup_le_aInvariant_sylow hCop hSolv hPp hPinv
+    have hQcard : Nat.card ↥(Q : Subgroup G) = p ^ (Nat.card G).factorization p :=
+      Q.card_eq_multiplicity
+    have hQCcard : Nat.card ↥((Q : Subgroup G) ⊓ C) = p ^ (Nat.card ↥C).factorization p :=
+      card_inf_fixedSubgroup_of_aInvariant_sylow hCop hSolv hQinv
+    have hineq := card_mul_card_inf_le_of_le (C := C) hPQ
+    rw [hPcard, hQcard, hQCcard, hPCcard, ← pow_add, ← pow_add] at hineq
+    exact (Nat.pow_le_pow_iff_right hp.one_lt).mp hineq
+  -- 位数の積の関係
+  have hrel1 : Nat.card ↥(H ⊓ C) * (H ⊓ C).relIndex H = Nat.card ↥H := by
+    have h := Subgroup.card_mul_index ((H ⊓ C).subgroupOf H)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left : H ⊓ C ≤ H)).toEquiv] at h
+  have hrel2 : Nat.card ↥(H ⊓ C) * (H ⊓ C).relIndex C = Nat.card ↥C := by
+    have h := Subgroup.card_mul_index ((H ⊓ C).subgroupOf C)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_right : H ⊓ C ≤ C)).toEquiv] at h
+  have hC : Nat.card ↥C * C.index = Nat.card G := Subgroup.card_mul_index C
+  have hHidx : Nat.card ↥H * H.index = Nat.card G := Subgroup.card_mul_index H
+  have hne : ∀ K : Subgroup G, Nat.card ↥K ≠ 0 := fun K => Nat.card_pos.ne'
+  have hrel1ne : (H ⊓ C).relIndex H ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hrel2ne : (H ⊓ C).relIndex C ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hfac : ∀ (m n : ℕ), m ≠ 0 → n ≠ 0 → ∀ p : ℕ,
+      (m * n).factorization p = m.factorization p + n.factorization p := by
+    intro m n hm hn p
+    rw [Nat.factorization_mul hm hn]
+    rfl
+  constructor
+  · rw [← Nat.factorization_le_iff_dvd hrel1ne Subgroup.index_ne_zero_of_finite, Finsupp.le_def]
+    intro p
+    by_cases hp : p.Prime
+    · have e1 := congrArg (fun m => m.factorization p) hrel1
+      have e2 := congrArg (fun m => m.factorization p) hC
+      simp only [hfac _ _ (hne _) hrel1ne,
+        hfac _ _ (hne _) Subgroup.index_ne_zero_of_finite] at e1 e2
+      have := hkey p hp
+      omega
+    · simp [hp]
+  · rw [← Nat.factorization_le_iff_dvd hrel2ne Subgroup.index_ne_zero_of_finite, Finsupp.le_def]
+    intro p
+    by_cases hp : p.Prime
+    · have e1 := congrArg (fun m => m.factorization p) hrel2
+      have e2 := congrArg (fun m => m.factorization p) hHidx
+      simp only [hfac _ _ (hne _) hrel2ne,
+        hfac _ _ (hne _) Subgroup.index_ne_zero_of_finite] at e1 e2
+      have := hkey p hp
+      omega
+    · simp [hp]
+
 end -- 3E
 
 end OddOrder.Isaacs.Ch04
