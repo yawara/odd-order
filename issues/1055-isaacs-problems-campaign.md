@@ -6499,3 +6499,25 @@ repo には `AutTower.lean` / `AutTowerBounds.lean` / `Schenkman.lean` /
 `InnerAutomorphisms.lean` (Lemma 9.11 一式: `innAut` / `conj_ker` / `centralizer_innAut_eq_bot`
 / `center_mulAut_eq_bot`)。9B.2-9B.4 はこの tower インフラの上に書ける見込み。
 9B.5 は `nilpotentResidual` (`Ch09/NilpotentResidual.lean` の `G^∞`) を使う。
+
+### ⚠ 9B.2 の書籍 statement は要再解釈 (2026-07-29)
+
+書籍 9B.2: 「`Z(G) = 1`, `G = G₁ ⊲ G₂ ⊲ ⋯` が automorphism tower のとき `G ⊲ Gᵢ` なら
+`i ≤ 2`」。**そのままでは偽** — `G` が complete なら tower は最初から定常
+(`G = G₂ = G₃ = ⋯`) で `G ⊲ Gᵢ` が全ての `i` で成り立つ。書籍は tower の項が
+相異なることを暗黙に仮定している (9B.3 / 9B.4 の "contains at most two different groups"
+と同じ言い回し)。**形式化する内容**:
+
+  `Z(G) = 1` かつ `G ⊴ G₃` ⟹ **`G₂ = G₃`** (tower が `G₂` で止まる = 相異なる群は高々 2 個)
+
+証明の筋:
+1. `C_{G₃}(G) ⊓ G₂ = C_{G₂}(G) = 1` (Lemma 9.11(c) `centralizer_innAut_eq_bot`)。
+2. `C_{G₃}(G)` と `G₂` はともに `G₃`-正規なので `⁅C_{G₃}(G), G₂⁆ ≤ C_{G₃}(G) ⊓ G₂ = 1`,
+   すなわち `C_{G₃}(G) ≤ C_{G₃}(G₂) = 1` (`Z(G₂) = 1` は `center_autTowerType_eq_bot`)。
+3. `G ⊴ G₃` への共役作用は忠実 ⟹ `G₃ ↪ Aut(G) = G₂`, 有限性 + `G₂ ≤ G₃` で `G₂ = G₃`。
+
+**step 2 / 3 の一般形は landing 済** (`Problems9B.lean`):
+`centralizer_eq_bot_of_inf_eq_bot_of_centralizer_eq_bot` / `ker_conjNormal` /
+`card_le_card_mulAut_of_centralizer_eq_bot`。
+⏳ 残り = `AutTower.lean` の `autTowerType` / `autTowerEmbLe` 上での組み立て
+(`G` の `G₃` 内の像を `A`, `G₂` の像を `B` として上の 3 本を当てる)。
