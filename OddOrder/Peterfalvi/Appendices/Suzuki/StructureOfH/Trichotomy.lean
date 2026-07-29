@@ -434,6 +434,137 @@ theorem sqFibre_eq_coset_of_card
   rw [hxy]
   exact hc
 
+/-- **`K` is transitive on `Q₀^#`** in the elementwise form used below: any two
+non-trivial elements of `Q₀` are `K`-conjugate.
+
+Restatement of §1 Proposition 3 (`image_conj_KSet_eq_involutions_H`) — the
+involutions of `H` are exactly `Q₀^#`, and `K` permutes them transitively. -/
+theorem exists_mem_K_conj_eq_of_mem_Q0 {u v : G} (hu : u ∈ hyp.Q0) (hu1 : u ≠ 1)
+    (hv : v ∈ hyp.Q0) (hv1 : v ≠ 1) :
+    ∃ k ∈ hyp.K, k * u * k⁻¹ = v := by
+  have himgu := hyp.image_conj_KSet_eq_involutions_H hu.2
+    (hyp.sq_eq_one_of_mem_Q0 hu) hu1
+  have hvmem : v ∈ {y : G | y ^ 2 = 1 ∧ y ≠ 1 ∧ y ∈ hyp.H} :=
+    ⟨hyp.sq_eq_one_of_mem_Q0 hv, hv1, hv.2⟩
+  rw [← himgu] at hvmem
+  obtain ⟨k, hkK, hk⟩ := hvmem
+  refine ⟨k⁻¹, Subgroup.inv_mem _ (Subgroup.subset_closure hkK), ?_⟩
+  have hk' : k⁻¹ * u * k = v := hk
+  rw [inv_inv]
+  exact hk'
+
+/-- **`K`-invariant subgroups of `Q₀` are trivial or all of `Q₀`** — step (1) of
+the "`C_S(P)` is a `K`-subgroup, hence `= S`" argument (p. 117).
+
+Immediate from transitivity of `K` on `Q₀^#`: a non-trivial `K`-invariant subset
+of `Q₀` swallows every non-trivial element. -/
+theorem eq_bot_or_Q0_le_of_kInvariant {X : Subgroup G} (hXQ0 : X ≤ hyp.Q0)
+    (hXinv : ∀ k ∈ hyp.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X) :
+    X = ⊥ ∨ hyp.Q0 ≤ X := by
+  rcases eq_or_ne X ⊥ with h | h
+  · exact Or.inl h
+  refine Or.inr ?_
+  obtain ⟨u, huX, hu1⟩ : ∃ u ∈ X, u ≠ 1 := by
+    by_contra hall
+    push Not at hall
+    exact h (le_bot_iff.mp fun z hz => Subgroup.mem_bot.mpr (hall z hz))
+  intro v hv
+  rcases eq_or_ne v 1 with rfl | hv1
+  · exact X.one_mem
+  obtain ⟨k, hkK, hk⟩ :=
+    hyp.exists_mem_K_conj_eq_of_mem_Q0 (hXQ0 huX) hu1 hv hv1
+  rw [← hk]
+  exact hXinv k hkK u huX
+
+/-- **Every fibre of squaring over `Q₀^#` is a single `Q₀`-coset**, given that the
+one over `s` is (`sqFibre_eq_coset_of_card`).
+
+Transitivity of `K` on `Q₀^#` moves any fibre onto the `s`-fibre, and `Q₀` is
+`D`-invariant, so the coset statement transports back. -/
+theorem inv_mul_mem_Q0_of_sq_eq
+    (hcard : Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0)
+    {y w : G} (hyQ : y ∈ hyp.Q) (hwQ : w ∈ hyp.Q) (hsq : y ^ 2 = w ^ 2)
+    (hne : y ^ 2 ≠ 1) (hsqQ0 : y ^ 2 ∈ hyp.Q0) :
+    y⁻¹ * w ∈ hyp.Q0 := by
+  obtain ⟨k, hkK, hk⟩ := hyp.exists_mem_K_conj_eq_of_mem_Q0 hsqQ0 hne
+    ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
+    hyp.distinguishedInvolution_ne_one
+  have hkD : k ∈ hyp.D := hyp.K_le_D hkK
+  have hkH : k ∈ hyp.H := hyp.D_le_H hkD
+  have hconjsq : ∀ v : G, (k * v * k⁻¹) ^ 2 = k * v ^ 2 * k⁻¹ := by
+    intro v; rw [sq, sq]; group
+  have hy' : k * y * k⁻¹ ∈ hyp.sqFibre :=
+    ⟨hyp.Q_normal_in_H k hkH y hyQ, by rw [hconjsq]; exact hk⟩
+  have hw' : k * w * k⁻¹ ∈ hyp.sqFibre :=
+    ⟨hyp.Q_normal_in_H k hkH w hwQ, by rw [hconjsq, ← hsq]; exact hk⟩
+  have hmem := hyp.sqFibre_eq_coset_of_card hcard hy' hw'
+  have hrw : (k * y * k⁻¹)⁻¹ * (k * w * k⁻¹) = k * (y⁻¹ * w) * k⁻¹ := by group
+  rw [hrw] at hmem
+  have hback := hyp.conj_mem_Q0_of_mem_D (Subgroup.inv_mem _ hkD) hmem
+  rw [show k⁻¹ * (k * (y⁻¹ * w) * k⁻¹) * (k⁻¹)⁻¹ = y⁻¹ * w from by group] at hback
+  exact hback
+
+/-- **`K` is transitive on `(Q/Q₀)^#`** in elementwise form — step (2) of the
+"`C_S(P)` is a `K`-subgroup, hence `= S`" argument (p. 117).
+
+Squaring induces a `K`-equivariant map `Q/Q₀ → Q₀` (well defined because
+`Q₀ ≤ Z(Q)` has exponent `2`) whose fibres over `Q₀^#` are single cosets
+(`inv_mul_mem_Q0_of_sq_eq`).  So transitivity on `Q₀^#` lifts: given `y, z ∈ Q`
+outside `Q₀`, some `k ∈ K` carries `y` into the coset `zQ₀`. -/
+theorem exists_mem_K_conj_mem_coset
+    (hcard : Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0)
+    {y z : G} (hyQ : y ∈ hyp.Q) (hzQ : z ∈ hyp.Q)
+    (hy2 : y ^ 2 ≠ 1) (hz2 : z ^ 2 ≠ 1)
+    (hyQ0 : y ^ 2 ∈ hyp.Q0) (hzQ0 : z ^ 2 ∈ hyp.Q0) :
+    ∃ k ∈ hyp.K, z⁻¹ * (k * y * k⁻¹) ∈ hyp.Q0 := by
+  obtain ⟨k, hkK, hk⟩ :=
+    hyp.exists_mem_K_conj_eq_of_mem_Q0 hyQ0 hy2 hzQ0 hz2
+  have hkH : k ∈ hyp.H := hyp.D_le_H (hyp.K_le_D hkK)
+  have hyQ' : k * y * k⁻¹ ∈ hyp.Q := hyp.Q_normal_in_H k hkH y hyQ
+  have hsq' : (k * y * k⁻¹) ^ 2 = z ^ 2 := by
+    rw [show (k * y * k⁻¹) ^ 2 = k * y ^ 2 * k⁻¹ from by rw [sq, sq]; group]
+    exact hk
+  exact ⟨k, hkK, hyp.inv_mul_mem_Q0_of_sq_eq hcard hzQ hyQ' hsq'.symm hz2 hzQ0⟩
+
+/-- **A `K`-invariant subgroup of `Q` containing an element of order `4` is `Q`**
+— the book's "`C_S(P)` is a `K`-subgroup of `S` which has exponent `4` and so
+`C_S(P) = S`" (p. 117).
+
+Its square is a non-trivial element of `X ⊓ Q₀`, so `Q₀ ≤ X`
+(`eq_bot_or_Q0_le_of_kInvariant`); transitivity on `(Q/Q₀)^#`
+(`exists_mem_K_conj_mem_coset`) then reaches every element of `Q` outside `Q₀`. -/
+theorem Q_le_of_kInvariant_of_sq_ne_one
+    (hcard : Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0)
+    (hsqQ0 : ∀ v ∈ hyp.Q, v ^ 2 ∈ hyp.Q0)
+    {X : Subgroup G} (hXQ : X ≤ hyp.Q)
+    (hXinv : ∀ k ∈ hyp.K, ∀ v ∈ X, k * v * k⁻¹ ∈ X)
+    {y : G} (hyX : y ∈ X) (hy2 : y ^ 2 ≠ 1) :
+    hyp.Q ≤ X := by
+  -- `Q₀ ≤ X`
+  have hQ0le : hyp.Q0 ≤ X := by
+    have hinter : X ⊓ hyp.Q0 ≤ hyp.Q0 := inf_le_right
+    have hintinv : ∀ k ∈ hyp.K, ∀ v ∈ X ⊓ hyp.Q0, k * v * k⁻¹ ∈ X ⊓ hyp.Q0 := by
+      intro k hk v hv
+      exact ⟨hXinv k hk v hv.1,
+        hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D hk) hv.2⟩
+    rcases hyp.eq_bot_or_Q0_le_of_kInvariant hinter hintinv with h | h
+    · exfalso
+      have hmem : y ^ 2 ∈ X ⊓ hyp.Q0 :=
+        ⟨X.pow_mem hyX 2, hsqQ0 _ (hXQ hyX)⟩
+      rw [h, Subgroup.mem_bot] at hmem
+      exact hy2 hmem
+    · exact le_trans h inf_le_left
+  -- reach every element of `Q`
+  intro z hzQ
+  rcases eq_or_ne (z ^ 2) 1 with hz2 | hz2
+  · exact hQ0le (hyp.mem_Q0_of_mem_Q_of_sq_eq_one hzQ hz2)
+  obtain ⟨k, hkK, hc⟩ := hyp.exists_mem_K_conj_mem_coset hcard (hXQ hyX) hzQ
+    hy2 hz2 (hsqQ0 _ (hXQ hyX)) (hsqQ0 _ hzQ)
+  have hyk : k * y * k⁻¹ ∈ X := hXinv k hkK y hyX
+  have hzeq : z = (k * y * k⁻¹) * (z⁻¹ * (k * y * k⁻¹))⁻¹ := by group
+  rw [hzeq]
+  exact X.mul_mem hyk (X.inv_mem (hQ0le hc))
+
 /-- **`[K, W] = 1`** — a Chapter I fact the Ch. III §1 Proposition needs but that
 Chapters I and II never state.
 
