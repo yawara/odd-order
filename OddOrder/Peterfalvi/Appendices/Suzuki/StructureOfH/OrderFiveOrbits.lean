@@ -111,6 +111,102 @@ lemma card_orbitReprIndex_mul_card_K_succ
   have hprod : (d + 3) * (d + 1) = d * d + 4 * d + 3 := by ring
   rw [hidx', hK, hQcard, hd, hsq, hprod]
 
+@[simp] lemma orbitRepVal_inl_zero :
+    hyp.orbitRepVal (Sum.inl 0) = hyp.distinguishedInvolution := rfl
+
+@[simp] lemma orbitRepVal_inl_one :
+    hyp.orbitRepVal (Sum.inl 1) = hyp.structureConjugator := rfl
+
+@[simp] lemma orbitRepVal_inl_two :
+    hyp.orbitRepVal (Sum.inl 2) = hyp.structureConjugator⁻¹ := rfl
+
+@[simp] lemma orbitRepVal_inr (k : {k : ↥hyp.K // k ≠ 1}) :
+    hyp.orbitRepVal (Sum.inr k)
+      = hyp.structureConjugator *
+          ((k : G)⁻¹ * hyp.structureConjugator⁻¹ * (k : G)) := rfl
+
+lemma structureConjugator_inv_notMem_Q0 (hr2 : hyp.structureConjugator ^ 2 ≠ 1) :
+    hyp.structureConjugator⁻¹ ∉ hyp.Q0 := by
+  intro h
+  refine hr2 ?_
+  have h2 : (hyp.structureConjugator⁻¹) ^ 2 = 1 := h.1
+  rw [inv_pow, inv_eq_one] at h2
+  exact h2
+
+/-- Conjugates of `s` stay in `Q₀`, so `s` is not `K`-conjugate to anything
+outside `Q₀`. -/
+lemma not_conj_distinguishedInvolution_of_notMem_Q0 {y a : G} (ha : a ∈ hyp.KSet)
+    (hy : y ∉ hyp.Q0) : a⁻¹ * hyp.distinguishedInvolution * a ≠ y := fun h =>
+  hy (h ▸ hyp.conj_distinguishedInvolution_mem_Q0 ha)
+
+/-- …and conversely. -/
+lemma not_conj_of_notMem_Q0_distinguishedInvolution {y a : G} (ha : a ∈ hyp.KSet)
+    (hy : y ∉ hyp.Q0) : a⁻¹ * y * a ≠ hyp.distinguishedInvolution := by
+  intro h
+  refine hy ?_
+  have h2 : y = a * hyp.distinguishedInvolution * a⁻¹ := by rw [← h]; group
+  rw [h2]
+  have := hyp.conj_mem_Q0_of_mem_KSet (hyp.inv_mem_KSet ha)
+    hyp.distinguishedInvolution_mem_Q0
+  rwa [inv_inv] at this
+
+/-- **The representatives are pairwise non-conjugate under `K`** (Peterfalvi
+Part II, Ch. III §2, p. 118), granted the last pair (the `r r^{-k}` among
+themselves, which is the field computation of p. 119).
+
+The four families are told apart by three `K`-orbit invariants — membership of
+`y`, of `g(y)` and of `f(y)` in `Q₀` — whose values are `(T, F, F)` at `s`,
+`(F, F, T)` at `r`, `(F, T, F)` at `r⁻¹` and `(F, F, F)` at `r r^{-k}`. -/
+theorem orbitRepVal_pairwise (hr2 : hyp.structureConjugator ^ 2 ≠ 1)
+    (hpair : ∀ k₁ k₂ a : G, k₁ ∈ hyp.KSet → k₁ ≠ 1 → k₂ ∈ hyp.KSet → k₂ ≠ 1 →
+      a ∈ hyp.KSet →
+      a⁻¹ * (hyp.structureConjugator * (k₁⁻¹ * hyp.structureConjugator⁻¹ * k₁)) * a
+        = hyp.structureConjugator * (k₂⁻¹ * hyp.structureConjugator⁻¹ * k₂) →
+      k₁ = k₂)
+    (i j : hyp.OrbitReprIndex) {a : G} (ha : a ∈ hyp.KSet)
+    (hij : a⁻¹ * hyp.orbitRepVal i * a = hyp.orbitRepVal j) : i = j := by
+  have hai : a⁻¹ ∈ hyp.KSet := hyp.inv_mem_KSet ha
+  have hji' : (a⁻¹)⁻¹ * hyp.orbitRepVal j * a⁻¹ = hyp.orbitRepVal i := by
+    rw [inv_inv, ← hij]; group
+  have hrQ0 := hyp.structureConjugator_notMem_Q0 hr2
+  have hriQ0 := hyp.structureConjugator_inv_notMem_Q0 hr2
+  have hkQ0 : ∀ k : {k : ↥hyp.K // k ≠ 1},
+      hyp.orbitRepVal (Sum.inr k) ∉ hyp.Q0 := fun k =>
+    hyp.structureConjugator_mul_conj_inv_notMem_Q0 hr2
+      (by rw [← hyp.coe_K]; exact k.1.2) (fun h => k.2 (Subtype.ext h))
+  rcases i with i | k <;> rcases j with j | l
+  · fin_cases i <;> fin_cases j
+    · rfl
+    · exact absurd hij (hyp.not_conj_distinguishedInvolution_of_notMem_Q0 ha hrQ0)
+    · exact absurd hij (hyp.not_conj_distinguishedInvolution_of_notMem_Q0 ha hriQ0)
+    · exact absurd hij (hyp.not_conj_of_notMem_Q0_distinguishedInvolution ha hrQ0)
+    · rfl
+    · exact absurd hij (hyp.structureConjugator_not_conj_inv hr2 ha)
+    · exact absurd hij (hyp.not_conj_of_notMem_Q0_distinguishedInvolution ha hriQ0)
+    · exact absurd hji' (hyp.structureConjugator_not_conj_inv hr2 hai)
+    · rfl
+  · exfalso
+    have hlK : (l : G) ∈ hyp.KSet := by rw [← hyp.coe_K]; exact l.1.2
+    have hl1 : (l : G) ≠ 1 := fun h => l.2 (Subtype.ext h)
+    fin_cases i
+    · exact hyp.conj_distinguishedInvolution_ne_structureConjugator_mul_conj_inv
+        hr2 hlK hl1 ha hij
+    · exact hyp.conj_structureConjugator_ne_mul_conj_inv hr2 hlK hl1 ha hij
+    · exact hyp.conj_structureConjugator_inv_ne_mul_conj_inv hr2 hlK hl1 ha hij
+  · exfalso
+    have hkK : (k : G) ∈ hyp.KSet := by rw [← hyp.coe_K]; exact k.1.2
+    have hk1 : (k : G) ≠ 1 := fun h => k.2 (Subtype.ext h)
+    fin_cases j
+    · exact hyp.not_conj_of_notMem_Q0_distinguishedInvolution ha (hkQ0 k) hij
+    · exact hyp.conj_structureConjugator_ne_mul_conj_inv hr2 hkK hk1 hai hji'
+    · exact hyp.conj_structureConjugator_inv_ne_mul_conj_inv hr2 hkK hk1 hai hji'
+  · have hkK : (k : G) ∈ hyp.KSet := by rw [← hyp.coe_K]; exact k.1.2
+    have hk1 : (k : G) ≠ 1 := fun h => k.2 (Subtype.ext h)
+    have hlK : (l : G) ∈ hyp.KSet := by rw [← hyp.coe_K]; exact l.1.2
+    have hl1 : (l : G) ≠ 1 := fun h => l.2 (Subtype.ext h)
+    exact congrArg Sum.inr (Subtype.ext (Subtype.ext
+      (hpair (k : G) (l : G) a hkK hk1 hlK hl1 ha hij)))
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
