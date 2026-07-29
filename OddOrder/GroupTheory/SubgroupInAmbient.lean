@@ -260,6 +260,44 @@ theorem opiCoreInG_normal (π : Set ℕ) {H : Subgroup G} [H.Normal] :
     rw [Subgroup.normalizer_eq_top]
   exact le_normalizer_opiCoreInG_of_le_normalizer π htop_le_norm_H
 
+/-- **A `π`-subgroup that is normal in a subnormal subgroup lies in `O_π(G)`.**
+
+This is the induction-friendly (strengthened) form of
+`le_oPiCore_of_isSubnormal`: we induct on the subnormal chain of `K`, not on `S`.
+A naive induction on `S` fails because the inductive step would need the intermediate
+subgroup `K` to be a `π`-group, which it need not be. Passing through `O_π(K)` — which
+*is* a `π`-group, and is normal in the next term of the chain because it is characteristic
+in `K` — closes the induction. -/
+theorem le_oPiCore_of_normal_in_isSubnormal [Finite G] {π : Set ℕ} {K : Subgroup G}
+    (hK : K.IsSubnormal) : ∀ {S : Subgroup G}, S ≤ K → (S.subgroupOf K).Normal →
+      Subgroup.IsPiSubgroup π S → S ≤ Ch03.oPiCore π G := by
+  induction hK with
+  | top =>
+    intro S hSK hSn hSpi
+    haveI : S.Normal := by
+      rw [← Subgroup.normalizer_eq_top_iff, eq_top_iff]
+      exact (Subgroup.normal_subgroupOf_iff_le_normalizer hSK).mp hSn
+    exact Ch03.Subgroup.IsPiGroup.le_oPiCore hSpi
+  | step K L hKL hLsn hKn ih =>
+    intro S hSK hSn hSpi
+    have hcore_le : opiCoreInG π K ≤ L := (opiCoreInG_le π K).trans hKL
+    refine (le_opiCoreInG_of_normal_of_isPiSubgroup hSK hSn hSpi).trans
+      (ih hcore_le ?_ (isPiSubgroup_opiCoreInG π K))
+    exact (Subgroup.normal_subgroupOf_iff_le_normalizer hcore_le).mpr
+      (le_normalizer_opiCoreInG_of_le_normalizer π
+        ((Subgroup.normal_subgroupOf_iff_le_normalizer hKL).mp hKn))
+
+/-- **A subnormal `π`-subgroup lies in `O_π(G)`.**
+
+Specialising `le_oPiCore_of_normal_in_isSubnormal` to `K = S`. The normal case
+(`le_opiCoreInG_of_normal_of_isPiSubgroup`) is the maximality of `O_π`; this is the
+subnormal upgrade, used by Isaacs Problem 9C.1 to produce `O_p(G) > 1` from a nontrivial
+subnormal `p`-subgroup. -/
+theorem le_oPiCore_of_isSubnormal [Finite G] {π : Set ℕ} {S : Subgroup G}
+    (hS : S.IsSubnormal) (hSpi : Subgroup.IsPiSubgroup π S) : S ≤ Ch03.oPiCore π G :=
+  le_oPiCore_of_normal_in_isSubnormal hS le_rfl
+    (by rw [Subgroup.subgroupOf_self]; infer_instance) hSpi
+
 /-- **A self-normalizing `p`-subgroup of a Sylow overgroup is the whole Sylow.**
 If a subgroup `P ≤ Q` of a Sylow `p`-subgroup `Q` of `G` has the property that every element of `Q`
 normalizing `P` already lies in `P` (`P.normalizer ⊓ Q ≤ P`), then `P = Q`.
