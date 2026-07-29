@@ -386,6 +386,112 @@ theorem TypeDData.sq_eq_one_of_mem_center {P : Type uP} [Group P]
   apply data.equivModel.injective
   rw [map_pow, hsq, map_one]
 
+
+/-! ## The type-A model
+
+Type A is the case `q(a) = a·φ(a)` of Appendix III, Definition 2.  Its polar
+form is `B(w, v) = w·φ(v) + v·φ(w)`, whose radical is trivial exactly because
+`φ ≠ 1`; so the center of a type-A group has exponent `2`, and — the quotient
+coordinate being an additive homomorphism onto a `ZMod 2`-space whose kernel is
+central — the central quotient is elementary abelian.
+-/
+
+section TypeA
+
+variable {F : Type uF} [Field F]
+
+/-- **Trivial radical of the type-A polarization.**
+
+Taking `v = 1` in `w·φ(v) + v·φ(w) = 0` gives `φ(w) = w`, and then
+`w·(φ(v) + v) = 0` for every `v`; as `φ ≠ 1` some `φ(v) + v` is non-zero. -/
+theorem typeAQuadraticMap_radical_eq_zero [CharP F 2]
+    (phi : RingAut F) (hphi : phi ≠ 1) (w : F)
+    (hadd : ∀ v : F, typeAQuadraticMap phi (w + v)
+      = typeAQuadraticMap phi w + typeAQuadraticMap phi v) :
+    w = 0 := by
+  have h2 : (2 : F) = 0 := CharTwo.two_eq_zero
+  have key : ∀ v : F, w * phi v + v * phi w = 0 := by
+    intro v
+    have h := hadd v
+    rw [typeAQuadraticMap_apply, typeAQuadraticMap_apply,
+      typeAQuadraticMap_apply, map_add] at h
+    linear_combination h
+  have h1 := key 1
+  rw [map_one, mul_one, one_mul] at h1
+  have hfix : phi w = w := by linear_combination h1 - w * h2
+  obtain ⟨v0, hv0⟩ : ∃ v, phi v ≠ v := by
+    by_contra hall
+    push Not at hall
+    exact hphi (RingEquiv.ext hall)
+  have hprod : w * (phi v0 - v0) = 0 := by
+    have h := key v0
+    rw [hfix] at h
+    linear_combination h - w * v0 * h2
+  rcases mul_eq_zero.mp hprod with h | h
+  · exact h
+  · exact absurd (sub_eq_zero.mp h) hv0
+
+/-- An element of a twisted product whose quotient coordinate vanishes is
+central. -/
+theorem BilinearTwistedProduct.mem_center_of_quotient_eq_zero
+    {R : Type uF} {V : Type uV} {W : Type uW}
+    [CommRing R] [AddCommGroup V] [AddCommGroup W] [Module R V] [Module R W]
+    {B : BilinMap R V W} {x : BilinearTwistedProduct B} (hx : x.quotient = 0) :
+    x ∈ Subgroup.center (BilinearTwistedProduct B) := by
+  rw [BilinearTwistedProduct.mem_center_iff, hx]
+  intro v
+  simp
+
+/-- **The center of a type-A group has exponent two.** -/
+theorem TypeAData.sq_eq_one_of_mem_center {P : Type uP} [Group P]
+    (data : TypeAData.{uP, uF} P) {z : P}
+    (hz : z ∈ Subgroup.center P) : z ^ 2 = 1 := by
+  letI := data.fieldF
+  letI := data.finiteF
+  letI := data.charTwoF
+  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  have hsq : data.equivModel z ^ 2 = 1 :=
+    QuadraticExtension.sq_eq_one_of_mem_center _ _
+      (typeAQuadraticMap_radical_eq_zero data.phi data.phi_ne_one)
+      (data.equivModel z) (mem_center_map data.equivModel hz)
+  apply data.equivModel.injective
+  rw [map_pow, hsq, map_one]
+
+/-- **The central quotient of a type-A group is elementary abelian.**
+
+Commutators and squares both have zero quotient coordinate in the model — the
+quotient coordinate is additive and the field has characteristic `2` — and
+`mem_center_of_quotient_eq_zero` puts them in the center. -/
+theorem TypeAData.isElementaryAbelian_quotient_center {P : Type uP} [Group P]
+    (data : TypeAData.{uP, uF} P) :
+    OddOrder.GroupTheory.IsElementaryAbelian 2 (P ⧸ Subgroup.center P) := by
+  letI := data.fieldF
+  letI := data.finiteF
+  letI := data.charTwoF
+  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  have hcen : ∀ z : P, (data.equivModel z).quotient = 0 →
+      z ∈ Subgroup.center P := by
+    intro z hz
+    have h := BilinearTwistedProduct.mem_center_of_quotient_eq_zero hz
+    have h2 := mem_center_map data.equivModel.symm h
+    rwa [MulEquiv.symm_apply_apply] at h2
+  refine ⟨fun A B => ?_, fun A => ?_⟩
+  · obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective A
+    obtain ⟨y, rfl⟩ := QuotientGroup.mk_surjective B
+    rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul, QuotientGroup.eq]
+    refine hcen _ ?_
+    simp only [map_mul, map_inv, BilinearTwistedProduct.quotient_mul,
+      BilinearTwistedProduct.quotient_inv]
+    abel
+  · obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective A
+    rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+    refine hcen _ ?_
+    rw [map_pow, sq]
+    simp only [BilinearTwistedProduct.quotient_mul]
+    exact CharTwo.add_self_eq_zero _
+
+end TypeA
+
 end
 
 end OddOrder.Peterfalvi.Appendices.Suzuki2Groups
