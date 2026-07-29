@@ -622,6 +622,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.QuotientFieldCoordinat
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFivePairing
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
 import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.SemilinearField

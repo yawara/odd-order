@@ -154,6 +154,9 @@ theorem W_ne_bot_of_card_cube
 (`isMulCommutative_or_isSuzuki2Group_Q`) refined by Appendix III's two possible
 orders `|Q₀|²` and `|Q₀|³` (`natCard_Q_eq_sq_or_cube`).
 
+Case (b) also carries `|S| = |Q₀|²`, which is exactly the branch condition of
+`natCard_Q_eq_sq_or_cube` that produced it; §2's Proposition needs it.
+
 The `W ≠ 1` clause of case (c) is `W_ne_bot_of_card_cube`; it subsumes both the
 book's deferred `PSU(3, ℓ)` computation ("as can be checked") and the repair of
 its `PSL(2, ℓ)` argument (issue 0164). -/
@@ -161,6 +164,7 @@ theorem trichotomy (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     (sc.toHypothesis.Q = sc.toHypothesis.Q0 ∧
         orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3)
       ∨ (Suzuki2Groups.IsTypeA.{uG, 0} ↥sc.toHypothesis.Q ∧
+        Nat.card ↥sc.toHypothesis.Q = Nat.card ↥sc.toHypothesis.Q0 ^ 2 ∧
         orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 5 ∧
         sc.toHypothesis.W = ⊥)
       ∨ (Suzuki2Groups.IsTypeB.{uG, 0} ↥sc.toHypothesis.Q ∧
@@ -184,7 +188,7 @@ theorem trichotomy (ind : Hypothesis.TheoremAInductionBelow G Ω) :
   · obtain ⟨P, p, hp, hPcard, hPV⟩ := exists_le_card_eq_prime sc.V_ne_bot
     rcases sc.toHypothesis.natCard_Q_eq_sq_or_cube hQsuz with hsq | hcube
     · -- (2) `S` non-abelian of order `q²`
-      exact Or.inr (Or.inl ⟨sc.toHypothesis.isTypeA_of_natCard_eq_sq hQsuz hsq,
+      exact Or.inr (Or.inl ⟨sc.toHypothesis.isTypeA_of_natCard_eq_sq hQsuz hsq, hsq,
         sc.orderOf_st_eq_five_of_isSuzuki2Group ind hQsuz hsq hp hPcard hPV,
         sc.W_eq_bot_of_isSuzuki2Group hQsuz hsq⟩)
     · -- (3) `S` non-abelian of order `q³`

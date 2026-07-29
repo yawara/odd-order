@@ -38,7 +38,12 @@ variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
   (hyp : Hypothesis G Ω)
 
 /-- The set `(SK) ∪ (SKtS)` of Peterfalvi Part II, Ch. III §2, p. 118, with
-`S = Q`. -/
+`S = Q`.
+
+Despite the name it is the carrier of *both* cases of §3's opening paragraph:
+in case (b) of the Proposition of §1 it is `typeASubgroup` (this section), and
+in case (a), where `S = Q₀`, it is `⟨Q₀, K, t⟩` of Ch. I §3 Lemma 4
+(`coe_orderThreeGeneratedSubgroup_eq_orderFiveCarrier`). -/
 def orderFiveCarrier : Set G :=
   {g | ∃ q ∈ hyp.Q, ∃ k ∈ hyp.K, g = q * k} ∪
     {g | ∃ q ∈ hyp.Q, ∃ k ∈ hyp.K, ∃ q' ∈ hyp.Q, g = q * k * hyp.t * q'}

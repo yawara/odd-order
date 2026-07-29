@@ -291,6 +291,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.QuotientFieldCoordinat
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFivePairing
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
@@ -14338,3 +14339,38 @@ abelian.  Freeness of `K` follows from `Z(S) = Q₀` by `kfree_mod_Q0_of_center_
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K_of_isTypeA
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.typeASubgroup
+
+/-! **Cases (a) and (b) give the conclusion of Theorem A** (issue 0166, 2026-07-29).
+`StructureOfH/CaseABConclusion.lean`, Peterfalvi Part II Ch. III §3, p. 119:
+
+> Assume that case (a) or (b) of the proposition in §1 holds.  Then `G₀ = (SK) ∪ (SKtS)` is a
+> subgroup of `G` (§2 and Chapter I, §3, Lemma 4).  Also, `G = H ∪ (HtS) = ⟨G₀, V⟩` and `V`
+> normalizes `S`, `K` and `t` whence `G₀ ⊴ G` and `|G/G₀| = |V|`.  The conclusion of Theorem A
+> now follows from Chapter I, §3, Proposition 2.
+
+Both cases enter through the same carrier `(SK) ∪ (SKtS)` — case (b) by §2 (`typeASubgroup`)
+and case (a), where `S = Q₀`, by Ch. I §3 Lemma 4 (`orderThreeGeneratedSubgroup`) — so the
+argument is done once for an arbitrary subgroup with that carrier.  `H = Q·D` and `D = V ⊔ K`
+put `H` inside `⟨G₀, V⟩`, and `exists_canonicalForm` (`G = H ∪ HtQ`) finishes `⟨G₀, V⟩ = G`;
+`V` normalizes the carrier because it normalizes `Q` and `K` and centralizes `t`.  The
+intersection `G₀ ∩ V` is trivial (`Q ∩ D = 1`, `K ∩ V = 1`, and the big cell misses `H`
+because `t ∉ H`), so `V ≠ 1` makes `G₀` proper: `G` is not simple, and Ch. I §3 Proposition 2
+applies. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_orderFiveCarrier_of_mem_V
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderFiveCarrier_sup_V_eq_top
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normal_of_orderFiveCarrier
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.eq_one_of_mem_V_of_mem_orderFiveCarrier
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.theoremAConclusion_of_orderFiveCarrier_subgroup
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.theoremAConclusion_of_caseB
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coe_orderThreeGeneratedSubgroup_eq_orderFiveCarrier
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.theoremAConclusion_of_caseA
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.theoremAConclusion_or_caseC2
