@@ -608,6 +608,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FieldRealizationK
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
 import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.NearFieldClass

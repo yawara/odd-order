@@ -292,6 +292,86 @@ Peterfalvi Part II, Ch. III §2 (p. 118): `K` acts freely by conjugation on
 `S ∖ {1}`, and the book exhibits `q + 1 = |S ∖ {1}| / |K|` pairwise
 non-conjugate elements. -/
 
+/-- **A counting criterion for orbit representatives, with one fixed point.**
+
+`Γ` fixes `e` and acts freely off it; `rep : ι → S` avoids `e`, its members lie
+in pairwise distinct orbits, and `|ι| · |Γ| + 1 = |S|`.  Then every `x ≠ e` is
+in the orbit of some `rep i`: the map `Option (ι × Γ) → S` sending `none` to `e`
+and `some (i, a)` to `a • rep i` is injective, hence bijective.
+
+This is the shape of Peterfalvi Part II, Ch. III §2 (p. 118): `K` acts on `S` by
+conjugation, fixing only `1`, and the book lists `q + 1 = (|S| − 1)/|K|`
+pairwise non-conjugate elements. -/
+theorem exists_mem_orbit_of_card_mul_succ_eq {ι : Type*} [Finite ι] (rep : ι → S)
+    (e : S) (hone : ∀ a : Γ, a • e = e)
+    (hfree : ∀ (a : Γ) (x : S), x ≠ e → a • x = x → a = 1)
+    (hrepne : ∀ i, rep i ≠ e)
+    (hrep : ∀ (i j : ι) (a : Γ), a • rep i = rep j → i = j)
+    (hcard : Nat.card ι * Nat.card Γ + 1 = Nat.card S) {x : S} (hx : x ≠ e) :
+    ∃ (i : ι) (a : Γ), a • rep i = x := by
+  classical
+  set Φ : Option (ι × Γ) → S := fun o => o.rec e (fun p => p.2 • rep p.1) with hΦ
+  have hne : ∀ (i : ι) (a : Γ), a • rep i ≠ e := by
+    intro i a hb
+    refine hrepne i ?_
+    have := congrArg (fun y : S => a⁻¹ • y) hb
+    rwa [inv_smul_smul, hone a⁻¹] at this
+  have hinj : Function.Injective Φ := by
+    rintro (_ | ⟨i, a⟩) (_ | ⟨j, b⟩) h
+    · rfl
+    · exact absurd (h.symm : b • rep j = e) (hne j b)
+    · exact absurd (h : a • rep i = e) (hne i a)
+    · have h' : a • rep i = b • rep j := h
+      have hij : i = j := by
+        refine hrep i j (b⁻¹ * a) ?_
+        rw [mul_smul, h', inv_smul_smul]
+      subst hij
+      have hab : (b⁻¹ * a) • rep i = rep i := by rw [mul_smul, h', inv_smul_smul]
+      have hba : a = b := by
+        have h1 : b⁻¹ * a = 1 := hfree _ _ (hrepne i) hab
+        have := congrArg (fun g : Γ => b * g) h1
+        simpa using this
+      simp [hba]
+  have hcards : Nat.card (Option (ι × Γ)) = Nat.card S := by
+    rw [Finite.card_option, Nat.card_prod, hcard]
+  have hsurj : Function.Surjective Φ :=
+    (Nat.bijective_iff_injective_and_card _).mpr ⟨hinj, hcards⟩ |>.2
+  obtain ⟨o, ho⟩ := hsurj x
+  cases o with
+  | none => exact absurd ho.symm hx
+  | some p => exact ⟨p.1, p.2, ho⟩
+
+omit [Finite Γ] in
+/-- **A counting criterion for a system of orbit representatives, indexed form.**
+
+For a free action of `Γ` on a finite type `S`, a family `rep : ι → S` whose
+members lie in pairwise distinct orbits and satisfies `|ι| · |Γ| = |S|` meets
+every orbit: `ι × Γ → S`, `(i, a) ↦ a • rep i`, is injective, hence bijective. -/
+theorem exists_mem_orbit_of_card_mul_eq_index {ι : Type*} [Finite ι] (rep : ι → S)
+    (hfree : ∀ (a : Γ) (x : S), a • x = x → a = 1)
+    (hrep : ∀ (i j : ι) (a : Γ), a • rep i = rep j → i = j)
+    (hcard : Nat.card ι * Nat.card Γ = Nat.card S) (x : S) :
+    ∃ (i : ι) (a : Γ), a • rep i = x := by
+  classical
+  have hinj : Function.Injective (fun p : ι × Γ => p.2 • rep p.1) := by
+    rintro ⟨i, a⟩ ⟨j, b⟩ h
+    have h' : a • rep i = b • rep j := h
+    have hij : i = j := by
+      refine hrep i j (b⁻¹ * a) ?_
+      rw [mul_smul, h', inv_smul_smul]
+    subst hij
+    have hab : (b⁻¹ * a) • rep i = rep i := by rw [mul_smul, h', inv_smul_smul]
+    have hba : a = b := by
+      have h1 : b⁻¹ * a = 1 := hfree _ _ hab
+      have := congrArg (fun g : Γ => b * g) h1
+      simpa using this
+    simp [hba]
+  have hcards : Nat.card (ι × Γ) = Nat.card S := by rw [Nat.card_prod, hcard]
+  have hsurj : Function.Surjective (fun p : ι × Γ => p.2 • rep p.1) :=
+    (Nat.bijective_iff_injective_and_card _).mpr ⟨hinj, hcards⟩ |>.2
+  obtain ⟨⟨i, a⟩, hxa⟩ := hsurj x
+  exact ⟨i, a, hxa⟩
+
 omit [Finite Γ] in
 /-- **A counting criterion for a system of orbit representatives.**
 
