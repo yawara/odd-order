@@ -9,6 +9,7 @@ import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
+import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 
 /-!
@@ -301,5 +302,40 @@ theorem isCompleteGroup_mulAut_of_isSemisimpleGroup [Finite G] (hss : IsSemisimp
   exact isCompleteGroup_autTowerType_one_of_normal_range hZ hnormal
 
 end -- 9B.3
+
+section /- 9B.5 (base case): A, B ともに正規のとき (p. 285) -/
+
+/-- **9B.5 の base case** (書籍 hint の第 1 段): `A, B ⊴ G` で `G = AB` なら
+`G^∞ = A^∞ B^∞`。
+
+`N := A^∞ ⊔ B^∞` は正規で, `G/N` は正規冪零部分群 2 つ (`A`, `B` の像) の積なので
+どちらも `F(G/N)` に入り `F(G/N) = ⊤`, すなわち `G/N` は冪零。ゆえに `G^∞ ≤ N`。
+逆の包含は `nilpotentResidual_mono`。 -/
+theorem nilpotentResidual_top_eq_sup_of_normal [Finite G] {A B : Subgroup G}
+    [A.Normal] [B.Normal] (hAB : A ⊔ B = ⊤) :
+    nilpotentResidual (⊤ : Subgroup G) = nilpotentResidual A ⊔ nilpotentResidual B := by
+  refine le_antisymm ?_
+    (sup_le (nilpotentResidual_mono le_top) (nilpotentResidual_mono le_top))
+  set N := nilpotentResidual A ⊔ nilpotentResidual B with hNdef
+  rw [nilpotentResidual_le_iff_isNilpotent_map,
+    Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)]
+  -- `A`, `B` の像は正規冪零。
+  haveI hAnil : Group.IsNilpotent ↥(A.map (QuotientGroup.mk' N)) :=
+    nilpotentResidual_le_iff_isNilpotent_map.mp le_sup_left
+  haveI hBnil : Group.IsNilpotent ↥(B.map (QuotientGroup.mk' N)) :=
+    nilpotentResidual_le_iff_isNilpotent_map.mp le_sup_right
+  haveI : (A.map (QuotientGroup.mk' N)).Normal :=
+    Subgroup.Normal.map inferInstance _ (QuotientGroup.mk'_surjective N)
+  haveI : (B.map (QuotientGroup.mk' N)).Normal :=
+    Subgroup.Normal.map inferInstance _ (QuotientGroup.mk'_surjective N)
+  -- 両方 `F(G/N)` に入り, 生成するので `F(G/N) = ⊤`。
+  have htop : (⊤ : Subgroup (G ⧸ N)) ≤ Ch01.fitting (G ⧸ N) := by
+    rw [← Subgroup.map_top_of_surjective (QuotientGroup.mk' N)
+        (QuotientGroup.mk'_surjective N), ← hAB, Subgroup.map_sup]
+    exact sup_le Ch01.nilpotent_normal_le_fitting Ch01.nilpotent_normal_le_fitting
+  haveI := Ch01.fitting.isNilpotent (G := G ⧸ N)
+  exact Group.nilpotent_of_mulEquiv (MulEquiv.subgroupCongr (top_le_iff.mp htop))
+
+end -- 9B.5 (base case)
 
 end OddOrder.Isaacs.Ch09
