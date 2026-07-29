@@ -3,6 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.Perm.Cycle.Concrete
+import Mathlib.GroupTheory.Perm.Fin
+import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
 
 /-!
@@ -17,6 +20,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9D
 * **9D.2** `isSubnormal_strongCore` / `normal_strongCore_subgroupOf` — `X` の強共役すべての
   交わり `L` (= `strongCore X`) は `X` に normal かつ `G` に **subnormal**。
   書籍 hint の `L^{(G)} ⊆ X` は `strongClosure_strongCore_le`。
+* **9D.3** `subnormalCore_ne_sInf_conj` — `G = S₄`, `X = ⟨(0 1 2 3)⟩` では subnormal core
+  (`= ⟨(0 2)(1 3)⟩`, 位数 2) は `X` の共役たちのどんな交わりでも書けない。
 
 ## 9D.1 について
 
@@ -192,5 +197,225 @@ theorem normal_strongCore_subgroupOf (X : Subgroup G) :
     (le_normalizer_strongCore X)
 
 end -- 9D.2
+
+section /- 9D.3: subnormal core は共役の交わりでは書けない (S₄ の反例, p. 294) -/
+
+open scoped Pointwise
+
+-- `S₄` (24 元) 上の `decide` は既定の再帰深さを超えるので引き上げる。
+set_option maxRecDepth 40000
+
+/-- `S₄` の 4-サイクル `σ = (0 1 2 3)` (書籍 hint の `X` の生成元)。 -/
+def sigma4 : Equiv.Perm (Fin 4) := c[(0 : Fin 4), 1, 2, 3]
+
+/-- `τ = σ² = (0 2)(1 3)`。 -/
+def tau4 : Equiv.Perm (Fin 4) := c[(0 : Fin 4), 2] * c[(1 : Fin 4), 3]
+
+/-- 共役に使う互換 `(0 1)`。 -/
+def swap4 : Equiv.Perm (Fin 4) := c[(0 : Fin 4), 1]
+
+/-- `σ · (0 1)σ(0 1)⁻¹` — 位数 3 の元 (実際は 3-サイクル)。 -/
+def order3elt4 : Equiv.Perm (Fin 4) := sigma4 * (swap4 * sigma4 * swap4⁻¹)
+
+/-- `S₄` の Klein 四元群 `V₄` (恒等写像と 3 つの二重互換)。 -/
+def kleinFour4 : Subgroup (Equiv.Perm (Fin 4)) where
+  carrier := {g | g = 1 ∨ g = c[(0 : Fin 4), 1] * c[(2 : Fin 4), 3] ∨
+    g = c[(0 : Fin 4), 2] * c[(1 : Fin 4), 3] ∨ g = c[(0 : Fin 4), 3] * c[(1 : Fin 4), 2]}
+  mul_mem' := by decide
+  one_mem' := by decide
+  inv_mem' := by decide
+
+instance : DecidablePred (· ∈ kleinFour4) := fun g =>
+  decidable_of_iff (g = 1 ∨ g = c[(0 : Fin 4), 1] * c[(2 : Fin 4), 3] ∨
+    g = c[(0 : Fin 4), 2] * c[(1 : Fin 4), 3] ∨ g = c[(0 : Fin 4), 3] * c[(1 : Fin 4), 2]) Iff.rfl
+
+instance : kleinFour4.Normal := ⟨by decide⟩
+
+/-- 書籍 hint の `X`: `S₄` の位数 4 の巡回部分群 `⟨σ⟩`。 -/
+def cyclicFour4 : Subgroup (Equiv.Perm (Fin 4)) := Subgroup.zpowers sigma4
+
+theorem sigma4_sq : sigma4 ^ 2 = tau4 := by decide
+
+theorem tau4_ne_one : tau4 ≠ 1 := by decide
+
+theorem tau4_sq : tau4 ^ 2 = 1 := by decide
+
+theorem tau4_mem_kleinFour4 : tau4 ∈ kleinFour4 := by decide
+
+theorem order3elt4_cube : order3elt4 ^ 3 = 1 := by decide
+
+theorem order3elt4_ne_one : order3elt4 ≠ 1 := by decide
+
+theorem orderOf_tau4 : orderOf tau4 = 2 := orderOf_eq_prime tau4_sq tau4_ne_one
+
+theorem orderOf_sigma4 : orderOf sigma4 = 4 := by
+  have h1 : ¬ sigma4 ^ (2 ^ 1) = 1 := by rw [pow_one, sigma4_sq]; exact tau4_ne_one
+  have h2 : sigma4 ^ (2 ^ (1 + 1)) = 1 := by decide
+  simpa using orderOf_eq_prime_pow h1 h2
+
+theorem card_cyclicFour4 : Nat.card ↥cyclicFour4 = 4 := by
+  rw [cyclicFour4, Nat.card_zpowers, orderOf_sigma4]
+
+theorem card_zpowers_tau4 : Nat.card ↥(Subgroup.zpowers tau4) = 2 := by
+  rw [Nat.card_zpowers, orderOf_tau4]
+
+theorem zpowers_tau4_le_cyclicFour4 : Subgroup.zpowers tau4 ≤ cyclicFour4 :=
+  Subgroup.zpowers_le.mpr (by rw [← sigma4_sq]; exact pow_mem (Subgroup.mem_zpowers _) 2)
+
+/-- `V₄` は `⟨τ⟩` を正規化する (`V₄` は可換)。 -/
+theorem kleinFour4_le_normalizer_zpowers_tau4 :
+    kleinFour4 ≤ Subgroup.normalizer (Subgroup.zpowers tau4) := by
+  have hc : ∀ h : Equiv.Perm (Fin 4), h ∈ kleinFour4 → tau4 * h = h * tau4 := by decide
+  intro g hg
+  refine Subgroup.centralizer_le_normalizer _ ?_
+  rw [Subgroup.mem_centralizer_iff]
+  rintro _ ⟨n, rfl⟩
+  exact Commute.zpow_left (hc g hg) n
+
+/-- `⟨τ⟩ ◁◁ S₄` (`⟨τ⟩ ◁ V₄ ◁ S₄`)。 -/
+theorem isSubnormal_zpowers_tau4 : (Subgroup.zpowers tau4).IsSubnormal := by
+  have hle : Subgroup.zpowers tau4 ≤ kleinFour4 :=
+    Subgroup.zpowers_le.mpr tau4_mem_kleinFour4
+  exact Subgroup.IsSubnormal.step _ kleinFour4 hle
+    (Subgroup.Normal.isSubnormal inferInstance)
+    ((Subgroup.normal_subgroupOf_iff_le_normalizer hle).mpr
+      kleinFour4_le_normalizer_zpowers_tau4)
+
+/-- **`X = ⟨σ⟩` は `S₄` で subnormal でない**。
+
+subnormal なら `X` は 2-群ゆえ `X ≤ O_2(S₄)` (`le_oPiCore_of_isSubnormal`)。`O_2(S₄)` は
+正規なので `σ` の共役も含み, `σ · (0 1)σ(0 1)⁻¹` は **位数 3**。2-群に位数 3 の元は無い。 -/
+theorem not_isSubnormal_cyclicFour4 : ¬ cyclicFour4.IsSubnormal := by
+  intro hsn
+  have hpg4 : IsPGroup 2 ↥cyclicFour4 :=
+    IsPGroup.of_card (n := 2) (by rw [card_cyclicFour4]; norm_num)
+  have hpi : Subgroup.IsPiSubgroup ({2} : Set ℕ) cyclicFour4 :=
+    Subgroup.isPiSubgroup_of_isPGroup_of_mem hpg4 rfl
+  have hle := OddOrder.GroupTheory.le_oPiCore_of_isSubnormal hsn hpi
+  have hσ : sigma4 ∈ Ch03.oPiCore ({2} : Set ℕ) (Equiv.Perm (Fin 4)) :=
+    hle (Subgroup.mem_zpowers _)
+  have hconj : swap4 * sigma4 * swap4⁻¹ ∈ Ch03.oPiCore ({2} : Set ℕ) (Equiv.Perm (Fin 4)) :=
+    (Ch03.oPiCore.normal _ _).conj_mem _ hσ swap4
+  have hz : order3elt4 ∈ Ch03.oPiCore ({2} : Set ℕ) (Equiv.Perm (Fin 4)) :=
+    Subgroup.mul_mem _ hσ hconj
+  have hpg : IsPGroup 2 ↥(Ch03.oPiCore ({2} : Set ℕ) (Equiv.Perm (Fin 4))) :=
+    OddOrder.GroupTheory.isPGroup_of_isPiSubgroup_singleton (Ch03.oPiCore.isPiGroup _)
+  obtain ⟨k, hk⟩ := IsPGroup.iff_orderOf.mp hpg ⟨order3elt4, hz⟩
+  have hord : orderOf (⟨order3elt4, hz⟩ :
+      ↥(Ch03.oPiCore ({2} : Set ℕ) (Equiv.Perm (Fin 4)))) = 3 := by
+    rw [← Subgroup.orderOf_coe]
+    exact orderOf_eq_prime order3elt4_cube order3elt4_ne_one
+  rw [hord] at hk
+  have h3 : (3 : ℕ) ∣ 2 ^ k := hk ▸ dvd_rfl
+  have := Nat.Prime.dvd_of_dvd_pow Nat.prime_three h3
+  omega
+
+/-- **subnormal core の計算**: `subnormalCore ⟨σ⟩ = ⟨τ⟩` (位数 2)。 -/
+theorem subnormalCore_cyclicFour4 : subnormalCore cyclicFour4 = Subgroup.zpowers tau4 := by
+  have hle : Subgroup.zpowers tau4 ≤ subnormalCore cyclicFour4 :=
+    le_subnormalCore zpowers_tau4_le_cyclicFour4 isSubnormal_zpowers_tau4
+  have hdvd1 : (2 : ℕ) ∣ Nat.card ↥(subnormalCore cyclicFour4) := by
+    have := Subgroup.card_dvd_of_le hle
+    rwa [card_zpowers_tau4] at this
+  have hdvd2 : Nat.card ↥(subnormalCore cyclicFour4) ∣ 4 := by
+    have := Subgroup.card_dvd_of_le (subnormalCore_le cyclicFour4)
+    rwa [card_cyclicFour4] at this
+  have hne4 : Nat.card ↥(subnormalCore cyclicFour4) ≠ 4 := by
+    intro h4
+    refine not_isSubnormal_cyclicFour4 ?_
+    have heq : subnormalCore cyclicFour4 = cyclicFour4 :=
+      Subgroup.eq_of_le_of_card_ge (subnormalCore_le _) (by rw [h4, card_cyclicFour4])
+    rw [← heq]
+    exact isSubnormal_subnormalCore _
+  have hmem : Nat.card ↥(subnormalCore cyclicFour4) ∈ Nat.divisors 4 :=
+    Nat.mem_divisors.mpr ⟨hdvd2, by norm_num⟩
+  have hdiv4 : Nat.divisors 4 = {1, 2, 4} := by rfl
+  rw [hdiv4] at hmem
+  simp only [Finset.mem_insert, Finset.mem_singleton] at hmem
+  have hcard2 : Nat.card ↥(subnormalCore cyclicFour4) = 2 := by
+    rcases hmem with h | h | h
+    · rw [h] at hdvd1; omega
+    · exact h
+    · exact absurd h hne4
+  exact (Subgroup.eq_of_le_of_card_ge hle (by rw [hcard2, card_zpowers_tau4])).symm
+
+/-- `X` の共役は `⟨gσg⁻¹⟩`。 -/
+theorem conjAct_smul_cyclicFour4 (g : Equiv.Perm (Fin 4)) :
+    ConjAct.toConjAct g • cyclicFour4 = Subgroup.zpowers (g * sigma4 * g⁻¹) := by
+  rw [conjAct_smul_eq_map, cyclicFour4, MonoidHom.map_zpowers]
+  rfl
+
+/-- `σ` と可換な位数 `≤ 2` の元は `1` か `τ` (`C_{S₄}(σ) = ⟨σ⟩` の帰結)。 -/
+theorem eq_one_or_tau4_of_commute_sigma4 (x : Equiv.Perm (Fin 4))
+    (hc : x * sigma4 = sigma4 * x) (h2 : x ^ 2 = 1) : x = 1 ∨ x = tau4 := by
+  revert hc h2; revert x; decide
+
+/-- `τ` と可換な元は `σ` を `σ` か `σ⁻¹` に写す (`C_{S₄}(τ) = N_{S₄}(⟨σ⟩)`)。 -/
+theorem conj_sigma4_of_commute_tau4 (g : Equiv.Perm (Fin 4)) (hc : g * tau4 = tau4 * g) :
+    g * sigma4 * g⁻¹ = sigma4 ∨ g * sigma4 * g⁻¹ = sigma4⁻¹ := by
+  revert hc; revert g; decide
+
+/-- **`⟨τ⟩` を含む `X` の共役は `X` 自身だけ** — 9D.3 の要。 -/
+theorem conjAct_smul_cyclicFour4_eq (g : Equiv.Perm (Fin 4))
+    (h : Subgroup.zpowers tau4 ≤ ConjAct.toConjAct g • cyclicFour4) :
+    ConjAct.toConjAct g • cyclicFour4 = cyclicFour4 := by
+  rw [conjAct_smul_cyclicFour4] at h ⊢
+  -- `τ ∈ ⟨ρ⟩` なので `τ` は `ρ = gσg⁻¹` と可換
+  obtain ⟨n, hn⟩ := Subgroup.zpowers_le.mp h
+  have hcomm : tau4 * (g * sigma4 * g⁻¹) = (g * sigma4 * g⁻¹) * tau4 := by
+    rw [← hn]; exact (Commute.refl _).zpow_left n
+  -- `y = g⁻¹τg` は `σ` と可換で位数 2 ⟹ `y = τ` ⟹ `g` は `τ` と可換
+  have hy : (g⁻¹ * tau4 * g) * sigma4 = sigma4 * (g⁻¹ * tau4 * g) := by
+    have := congrArg (fun z => g⁻¹ * z * g) hcomm
+    simpa [mul_assoc] using this
+  have hy2 : (g⁻¹ * tau4 * g) ^ 2 = 1 := by
+    rw [pow_two]
+    calc g⁻¹ * tau4 * g * (g⁻¹ * tau4 * g) = g⁻¹ * (tau4 * tau4) * g := by group
+      _ = 1 := by rw [← pow_two, tau4_sq]; group
+  have hy1 : g⁻¹ * tau4 * g ≠ 1 := fun hcon => tau4_ne_one (by
+    have : tau4 = g * (g⁻¹ * tau4 * g) * g⁻¹ := by group
+    rw [this, hcon]; group)
+  have hyτ : g⁻¹ * tau4 * g = tau4 :=
+    (eq_one_or_tau4_of_commute_sigma4 _ hy hy2).resolve_left hy1
+  have hgτ : g * tau4 = tau4 * g := by
+    have hstep : g * (g⁻¹ * tau4 * g) = g * tau4 := by rw [hyτ]
+    rw [show g * (g⁻¹ * tau4 * g) = tau4 * g by group] at hstep
+    exact hstep.symm
+  rcases conj_sigma4_of_commute_tau4 g hgτ with h' | h'
+  · rw [h']; rfl
+  · rw [h', Subgroup.zpowers_inv]; rfl
+
+/-- **Isaacs Problem 9D.3** (書籍 p. 294) ⭐: `G = S₄`, `X = ⟨(0 1 2 3)⟩` (位数 4 の巡回群)
+のとき, `X` の **subnormal core は `X` の共役たちのどんな交わりでも書けない**。
+
+`subnormalCore X = ⟨τ⟩` (位数 2, `subnormalCore_cyclicFour4`) である一方,
+共役の交わりは「空族なら `⊤`」「そうでなければ `⟨τ⟩` を含む共役はすべて `X` に等しい
+(`conjAct_smul_cyclicFour4_eq`) ので `X` そのもの」しかありえず, どちらも位数 2 ではない。 -/
+theorem subnormalCore_ne_sInf_conj (𝒞 : Set (Subgroup (Equiv.Perm (Fin 4))))
+    (h𝒞 : ∀ Y ∈ 𝒞, ∃ g : Equiv.Perm (Fin 4), Y = ConjAct.toConjAct g • cyclicFour4) :
+    sInf 𝒞 ≠ subnormalCore cyclicFour4 := by
+  rw [subnormalCore_cyclicFour4]
+  intro hcon
+  rcases Set.eq_empty_or_nonempty 𝒞 with rfl | ⟨Y₀, hY₀⟩
+  · -- 空族: `sInf ∅ = ⊤` は位数 24
+    rw [sInf_empty] at hcon
+    have h1 : sigma4 ∈ Subgroup.zpowers tau4 := hcon ▸ Subgroup.mem_top sigma4
+    have h2 : Subgroup.zpowers sigma4 ≤ Subgroup.zpowers tau4 := Subgroup.zpowers_le.mpr h1
+    have := Subgroup.card_dvd_of_le h2
+    rw [← cyclicFour4, card_cyclicFour4, card_zpowers_tau4] at this
+    omega
+  · -- 非空: すべての元が `⟨τ⟩` を含むので `X` に等しく, `sInf = X` (位数 4)
+    have hall : ∀ Y ∈ 𝒞, Y = cyclicFour4 := by
+      intro Y hY
+      obtain ⟨g, rfl⟩ := h𝒞 Y hY
+      exact conjAct_smul_cyclicFour4_eq g (hcon ▸ sInf_le hY)
+    have hX : sInf 𝒞 = cyclicFour4 :=
+      le_antisymm (hall Y₀ hY₀ ▸ sInf_le hY₀) (le_sInf fun Y hY => (hall Y hY).ge)
+    rw [hX] at hcon
+    have hc2 : Nat.card ↥cyclicFour4 = Nat.card ↥(Subgroup.zpowers tau4) := by rw [hcon]
+    rw [card_cyclicFour4, card_zpowers_tau4] at hc2
+    omega
+
+end -- 9D.3
 
 end OddOrder.Isaacs.Ch09
