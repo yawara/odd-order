@@ -13369,3 +13369,26 @@ The book's second case ("`S` is non-abelian of order `q²`") up to the one step 
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_sqFibre_eq_card_Q0_of_isSuzuki2Group
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.isSuzuki2Group_centralizer_of_card_sq
+
+/-! **`[K, W] = 1`** — a Chapter I fact that Chapters I and II never state, needed by the
+Ch. III §1 Proposition (issue 0163, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/Trichotomy.lean`.
+
+The book's case (2) says "`C_S(P)` is a `K`-subgroup of `S`", which relies on the choice made at
+the start of that proof ("if `W ≠ 1`, assume that `P ⊂ W`").  For that to give `K`-invariance,
+`K` must centralize `W`, and the repository had no such statement.  It follows from three facts
+already present: `W = C_D(Q₀)` is the kernel of the `D`-action on `Q₀` (`ker_conjQ0`), `K` is
+normal in `D` (`K_normal`, Ch. I §2 Prop 2), and `K ⊓ V = 1` (`K_inf_V_eq_bot`) with `W ≤ V`.
+The commutator `wkw⁻¹k⁻¹` is in `K` by normality and acts trivially on `Q₀` because `w` does, so
+it lies in `K ⊓ W ≤ K ⊓ V = 1`.
+
+* `commute_of_mem_K_of_mem_W` — `[K, W] = 1`.
+* `conj_mem_centralizer_of_mem_K_of_le_W` — hence `C_Q(P)` is `K`-invariant for `P ≤ W`.
+* `sqFibre_eq_coset_of_card` — "`{y ∈ S | y² = s} = xQ₀`" in the form both cases use: the
+  inclusion `xQ₀ ⊆ fibre` is unconditional, so equal cardinalities force equal sets. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.commute_of_mem_K_of_mem_W
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_centralizer_of_mem_K_of_le_W
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sqFibre_eq_coset_of_card

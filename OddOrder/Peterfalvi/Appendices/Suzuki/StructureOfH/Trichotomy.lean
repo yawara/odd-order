@@ -407,6 +407,98 @@ theorem card_sqFibre_eq_card_Q0_of_isSuzuki2Group
     rw [this]
   exact (Nat.eq_of_mul_eq_mul_left (by omega) hkey).symm
 
+/-- **The fibre is a single `Q₀`-coset once its size is `|Q₀|`** — the book's
+"`{y ∈ S | y² = s} = xQ₀`" (p. 117), in the form used by both case (1) and
+case (2).
+
+`xQ₀ ⊆ {y ∈ Q | y² = s}` always (`mul_mem_sqFibre`), so equality of sizes
+forces equality of sets. -/
+theorem sqFibre_eq_coset_of_card
+    (hcard : Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0)
+    {x y : G} (hx : x ∈ hyp.sqFibre) (hy : y ∈ hyp.sqFibre) :
+    x⁻¹ * y ∈ hyp.Q0 := by
+  classical
+  have hsub : (fun c => x * c) '' (hyp.Q0 : Set G) ⊆ hyp.sqFibre := by
+    rintro z ⟨c, hc, rfl⟩
+    exact hyp.mul_mem_sqFibre hx hc
+  have hinj : Function.Injective (fun c : G => x * c) := fun a b h =>
+    mul_left_cancel h
+  have heq : (fun c => x * c) '' (hyp.Q0 : Set G) = hyp.sqFibre := by
+    refine Set.eq_of_subset_of_ncard_le hsub ?_ (Set.toFinite _)
+    rw [Set.ncard_image_of_injective _ hinj,
+      ← Nat.card_coe_set_eq, ← Nat.card_coe_set_eq, hcard]
+    exact le_rfl
+  rw [← heq] at hy
+  obtain ⟨c, hc, hcy⟩ := hy
+  have hxy : x⁻¹ * y = c := by rw [← hcy]; group
+  rw [hxy]
+  exact hc
+
+/-- **`[K, W] = 1`** — a Chapter I fact the Ch. III §1 Proposition needs but that
+Chapters I and II never state.
+
+`W = C_D(Q₀)` is the kernel of the conjugation action of `D` on `Q₀`
+(`ker_conjQ0`), `K` is normal in `D` (`K_normal`, Ch. I §2 Proposition 2) and
+`K ⊓ V = 1` (`K_inf_V_eq_bot`) with `W ≤ V`.  For `k ∈ K` and `w ∈ W` the
+commutator `wkw⁻¹k⁻¹` lies in `K` by normality and acts trivially on `Q₀`
+because `w` does, so it lies in `K ⊓ W ≤ K ⊓ V = 1`. -/
+theorem commute_of_mem_K_of_mem_W {k w : G} (hk : k ∈ hyp.K) (hw : w ∈ hyp.W) :
+    Commute k w := by
+  have hkD : k ∈ hyp.D := hyp.K_le_D hk
+  have hwD : w ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hw)
+  set e : ↥hyp.D := ⟨k, hkD⟩ with hedef
+  set d : ↥hyp.D := ⟨w, hwD⟩ with hddef
+  have hkK : e ∈ hyp.K.subgroupOf hyp.D := Subgroup.mem_subgroupOf.mpr hk
+  have hd1 : hyp.conjQ0 d = 1 := by
+    rw [← MonoidHom.mem_ker, hyp.ker_conjQ0]
+    exact Subgroup.mem_subgroupOf.mpr hw
+  have hcomm : d * e * d⁻¹ * e⁻¹ = 1 := by
+    have h1 : d * e * d⁻¹ * e⁻¹ ∈ hyp.K.subgroupOf hyp.D :=
+      Subgroup.mul_mem _ (hyp.K_normal.conj_mem e hkK d) (Subgroup.inv_mem _ hkK)
+    have h2 : d * e * d⁻¹ * e⁻¹ ∈ hyp.W.subgroupOf hyp.D := by
+      rw [← hyp.ker_conjQ0, MonoidHom.mem_ker]
+      simp [map_mul, map_inv, hd1]
+    have h3 : ((d * e * d⁻¹ * e⁻¹ : ↥hyp.D) : G) ∈ hyp.K ⊓ hyp.V :=
+      ⟨Subgroup.mem_subgroupOf.mp h1, hyp.W_le_V (Subgroup.mem_subgroupOf.mp h2)⟩
+    rw [hyp.K_inf_V_eq_bot, Subgroup.mem_bot] at h3
+    exact Subtype.ext h3
+  have hcd : Commute d e := by
+    have hconj : d * e * d⁻¹ = e :=
+      calc d * e * d⁻¹ = (d * e * d⁻¹ * e⁻¹) * e := by group
+        _ = e := by rw [hcomm, one_mul]
+    calc d * e = (d * e * d⁻¹) * d := by group
+      _ = e * d := by rw [hconj]
+  have hval : w * k = k * w := by
+    simpa [hedef, hddef] using
+      congrArg (Subtype.val (p := fun x => x ∈ hyp.D)) hcd.eq
+  exact hval.symm
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (2)**: "`C_S(P)` is a
+`K`-subgroup of `S`" (p. 117).
+
+This is where the book's choice at the start of the proof — "if `W ≠ 1`, assume
+that `P ⊂ W`" — is used: `K` centralizes `W` (`commute_of_mem_K_of_mem_W`), hence
+centralizes `P`, hence normalizes `C_Q(P)`.  Together with `K ≤ D ≤ H` and
+`Q ⊴ H` this makes `C_Q(P)` a `K`-invariant subgroup of `Q`. -/
+theorem conj_mem_centralizer_of_mem_K_of_le_W {P : Subgroup G} (hPW : P ≤ hyp.W)
+    {k : G} (hk : k ∈ hyp.K) {y : G}
+    (hy : y ∈ hyp.Q ⊓ Subgroup.centralizer (P : Set G)) :
+    k * y * k⁻¹ ∈ hyp.Q ⊓ Subgroup.centralizer (P : Set G) := by
+  refine ⟨hyp.Q_normal_in_H k (hyp.D_le_H (hyp.K_le_D hk)) y hy.1,
+    Subgroup.mem_centralizer_iff.mpr ?_⟩
+  intro g hg
+  have hkg : Commute k g := hyp.commute_of_mem_K_of_mem_W hk (hPW hg)
+  have hgk : g * k = k * g := hkg.symm.eq
+  have hgki : g * k⁻¹ = k⁻¹ * g := hkg.symm.inv_right.eq
+  have hyg : g * y = y * g := Subgroup.mem_centralizer_iff.mp hy.2 g hg
+  calc g * (k * y * k⁻¹) = (g * k) * y * k⁻¹ := by group
+    _ = (k * g) * y * k⁻¹ := by rw [hgk]
+    _ = k * (g * y) * k⁻¹ := by group
+    _ = k * (y * g) * k⁻¹ := by rw [hyg]
+    _ = k * y * (g * k⁻¹) := by group
+    _ = k * y * (k⁻¹ * g) := by rw [hgki]
+    _ = (k * y * k⁻¹) * g := by group
+
 /-- **Peterfalvi Part II, Ch. III §1, Proposition, case (1) core** (p. 117):
 if `Q` is abelian and `C_Q(P) ≤ Q₀` for some prime-order `P ≤ V`, then
 `Q = Q₀`.

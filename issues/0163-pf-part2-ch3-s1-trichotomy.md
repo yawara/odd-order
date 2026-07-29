@@ -220,3 +220,46 @@ Higman Thm 1(a) (`pow_four_eq_one_of_isSuzuki2Group`) で指数 ∣ 4 ⟹ 平方
 ⚠ この論点を仮定で埋めない。確定できないうちは「`K` が `C_Q(P)` を正規化する」を
 **明示仮説に取った形**で `W = 1` を証明し、仮説の供給は別 landing にする
 (sorried-cite でなく仮説パラメータ化なので sorry は増えない)。
+
+## ✅ `[K, W] = 1` を解決 (2026-07-29) — 前セッションで flag した論点
+
+前節で「未確定」とした「`K` が `C_S(P)` を正規化する根拠」は **repo の既存事実 3 つから導けた**
+(書籍 pp.100-107 を読む必要は無かった):
+
+| 使った事実 | 所在 |
+|---|---|
+| `W = C_D(Q₀)` = `D` の `Q₀` 上の作用の核 | `ker_conjQ0` (`KCyclic.lean:96`) |
+| `K ⊴ D` (Ch.I §2 Prop 2) | `K_normal` (`KCyclic.lean:800`) |
+| `K ⊓ V = ⊥` | `K_inf_V_eq_bot` (`KCyclic.lean:830`)、`W_le_V` (`Basic.lean:202`) |
+
+`w ∈ W`, `k ∈ K` に対し `wkw⁻¹k⁻¹` は正規性で `K` に入り、`w` が `Q₀` 上自明ゆえ
+`Q₀` 上自明 ⟹ `K ⊓ W ≤ K ⊓ V = ⊥` ⟹ `= 1`。
+
+landing した定理:
+
+| 定理 | 内容 |
+|---|---|
+| `Hypothesis.commute_of_mem_K_of_mem_W` | **`[K, W] = 1`** |
+| `Hypothesis.conj_mem_centralizer_of_mem_K_of_le_W` | ⟹ `P ≤ W` なら `C_Q(P)` は `K`-不変 (= 書籍の「`C_S(P)` は `K`-部分群」) |
+| `Hypothesis.sqFibre_eq_coset_of_card` | 「`{y ∈ S \| y² = s} = xQ₀`」(サイズ一致から集合一致) |
+
+## 次 = `W = 1` の組み立て (設計確定済、2026-07-29)
+
+残るのは「`K`-不変で位数 4 の元を含む `Q` の部分群は `Q` 自身」。**engine は要らない** —
+`invariant_eq_bot_or_top_of_fixedPointFree_card` の仮説 (`\|K\| = \|U\|−1` + 不動点自由) を
+揃えるより、次の 2 段が直接的:
+
+1. **`Q₀` 側**: `X ≤ Q₀` が `K`-不変で `≠ ⊥` なら `X = Q₀`。
+   `image_conj_KSet_eq_involutions_H` (`K` が `Q₀^#` 上推移的) から**直接**。
+2. **`Q/Q₀` 側**: `K` は `(Q/Q₀)^#` 上推移的。
+   **`card_sqFibre_eq_card_Q0_of_isSuzuki2Group` + `sqFibre_eq_coset_of_card` が鍵**:
+   平方写像は `Q/Q₀ → Q₀` を誘導し (`c ∈ Q₀ ≤ Z(Q)`, `c² = 1` ゆえ well-defined)、
+   fibre が単一 `Q₀`-剰余類なので**単射**、`\|Q/Q₀\| = \|Q₀\| = q` (case 2) ゆえ**全単射**。
+   `K`-同変なので `Q₀^#` 上の推移性が `(Q/Q₀)^#` に移る。
+   具体的には `y, z ∈ Q ∖ Q₀` に対し `a, b ∈ KSet` で `a⁻¹ s a = y²`, `b⁻¹ s b = z²` を取り
+   `k := b⁻¹a ∈ K` とすると `k y² k⁻¹ = z²`、`b` 共役で fibre を `s` 側に移して
+   `sqFibre_eq_coset_of_card` を当てると `k y k⁻¹ ∈ z Q₀`。
+3. ⟹ `X` が `K`-不変で位数 4 の元 `y` を含めば `y² ∈ Q₀^#` から (1) で `Q₀ ≤ X`、
+   `ȳ ≠ 1` から (2) で `X Q₀ = Q` ⟹ `X = Q`。
+4. `C_Q(P) = Q` は `C_D(Q) = 1` (`centralizer_Q_inf_D_eq_bot`) に矛盾
+   (`P ≤ W ≤ V ≤ D`、`P ≠ ⊥`) ⟹ **`W = 1`**。
