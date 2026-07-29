@@ -14122,3 +14122,25 @@ orders (`4` versus `2`), which would need the exponent of a Suzuki `2`-group. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjLeft_structureConjugator_mul_conj_inv_notMem_Q0
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjRight_structureConjugator_mul_conj_inv_notMem_Q0
+
+/-! **Pairwise non-conjugacy of the representatives, all but the last pair**
+(issue 0165, 2026-07-29).  `Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`,
+Peterfalvi Part II, Ch. III §2, p. 118.
+
+* `s` versus everything else: its `K`-conjugates stay in `Q₀`, and `r`, `r⁻¹`, `r r^{-k}` do not.
+* `r` versus `r⁻¹`: `|K|` is odd, so iterating a conjugation that inverts `r` an odd number of
+  times gives `r = r⁻¹`.
+* `r` (resp. `r⁻¹`) versus `r r^{-k}`: apply `f` (resp. `g`) and compare with `Q₀`, using the
+  equivariance (1) on one side and the computation (4) on the other.
+
+The one pair left is `r r^{-k₁}` versus `r r^{-k₂}`, which is the field computation of p. 119. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_distinguishedInvolution_mem_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_not_conj_inv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_distinguishedInvolution_ne_structureConjugator_mul_conj_inv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_structureConjugator_ne_mul_conj_inv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_structureConjugator_inv_ne_mul_conj_inv

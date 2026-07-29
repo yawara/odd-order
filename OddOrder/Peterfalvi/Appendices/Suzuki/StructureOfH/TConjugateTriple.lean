@@ -897,6 +897,99 @@ lemma tConjRight_structureConjugator_mul_conj_inv_notMem_Q0
   rw [inv_inv] at this
   rwa [show (w⁻¹)⁻¹ * r⁻¹ * w⁻¹ = w * r⁻¹ * w⁻¹ by rw [inv_inv]]
 
+/-! ## Pairwise non-conjugacy of the representatives (all but the last pair) -/
+
+/-- No `K`-conjugate of `s` leaves `Q₀`. -/
+lemma conj_distinguishedInvolution_mem_Q0 {a : G} (ha : a ∈ hyp.KSet) :
+    a⁻¹ * hyp.distinguishedInvolution * a ∈ hyp.Q0 :=
+  hyp.conj_mem_Q0_of_mem_KSet ha hyp.distinguishedInvolution_mem_Q0
+
+/-- **`r` and `r⁻¹` lie in distinct `K`-orbits** (Peterfalvi Part II, Ch. III §2,
+p. 118): `|K|` is odd, so conjugation by `a ∈ K` cannot invert `r` — iterating
+`|a|` times, which is odd, would give `r = r⁻¹`. -/
+lemma structureConjugator_not_conj_inv (hr2 : hyp.structureConjugator ^ 2 ≠ 1)
+    {a : G} (ha : a ∈ hyp.KSet) :
+    a⁻¹ * hyp.structureConjugator * a ≠ hyp.structureConjugator⁻¹ := by
+  intro heq
+  refine hr2 ?_
+  set r : G := hyp.structureConjugator with hr
+  -- conjugating twice by `a` returns `r`
+  have hsq : (a ^ 2)⁻¹ * r * a ^ 2 = r := by
+    calc (a ^ 2)⁻¹ * r * a ^ 2 = a⁻¹ * (a⁻¹ * r * a) * a := by rw [pow_two]; group
+      _ = a⁻¹ * r⁻¹ * a := by rw [heq]
+      _ = (a⁻¹ * r * a)⁻¹ := by group
+      _ = r := by rw [heq, inv_inv]
+  have heven : ∀ n : ℕ, (a ^ (2 * n))⁻¹ * r * a ^ (2 * n) = r := by
+    intro n
+    induction n with
+    | zero => simp
+    | succ n ih =>
+      have hpow : a ^ (2 * (n + 1)) = a ^ 2 * a ^ (2 * n) := by
+        rw [← pow_add]; ring_nf
+      rw [hpow]
+      calc (a ^ 2 * a ^ (2 * n))⁻¹ * r * (a ^ 2 * a ^ (2 * n))
+          = (a ^ (2 * n))⁻¹ * ((a ^ 2)⁻¹ * r * a ^ 2) * a ^ (2 * n) := by group
+        _ = (a ^ (2 * n))⁻¹ * r * a ^ (2 * n) := by rw [hsq]
+        _ = r := ih
+  -- `|a|` is odd
+  obtain ⟨j, hj⟩ : Odd (orderOf a) :=
+    hyp.odd_orderOf_of_mem_D (hyp.mem_D_of_mem_KSet ha)
+  have hone : a ^ orderOf a = 1 := pow_orderOf_eq_one a
+  have hsplit : a ^ orderOf a = a ^ (2 * j) * a := by rw [hj, pow_succ]
+  have hfin : r = r⁻¹ := by
+    have h1 : (a ^ orderOf a)⁻¹ * r * a ^ orderOf a = r := by
+      rw [hone]; group
+    rw [hsplit] at h1
+    have h2 : (a ^ (2 * j) * a)⁻¹ * r * (a ^ (2 * j) * a)
+        = a⁻¹ * ((a ^ (2 * j))⁻¹ * r * a ^ (2 * j)) * a := by group
+    rw [h2, heven j, heq] at h1
+    exact h1.symm
+  have : r * r = 1 := by
+    calc r * r = r * (r⁻¹)⁻¹ := by rw [inv_inv]
+      _ = r * r⁻¹⁻¹ := rfl
+      _ = 1 := by rw [← hfin]; group
+  rw [pow_two]; exact this
+
+/-- `r r^{-k}` is not `K`-conjugate to `s` (Peterfalvi Part II, Ch. III §2,
+p. 118): the conjugates of `s` stay in `Q₀` and `r r^{-k}` does not. -/
+lemma conj_distinguishedInvolution_ne_structureConjugator_mul_conj_inv
+    (hr2 : hyp.structureConjugator ^ 2 ≠ 1) {k a : G} (hk : k ∈ hyp.KSet)
+    (hk1 : k ≠ 1) (ha : a ∈ hyp.KSet) :
+    a⁻¹ * hyp.distinguishedInvolution * a
+      ≠ hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k) := fun h =>
+  hyp.structureConjugator_mul_conj_inv_notMem_Q0 hr2 hk hk1
+    (h ▸ hyp.conj_distinguishedInvolution_mem_Q0 ha)
+
+/-- `r r^{-k}` is not `K`-conjugate to `r`: apply `f` and compare with `Q₀`. -/
+lemma conj_structureConjugator_ne_mul_conj_inv
+    (hr2 : hyp.structureConjugator ^ 2 ≠ 1) {k a : G} (hk : k ∈ hyp.KSet)
+    (hk1 : k ≠ 1) (ha : a ∈ hyp.KSet) :
+    a⁻¹ * hyp.structureConjugator * a
+      ≠ hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k) := by
+  intro h
+  refine hyp.tConjRight_structureConjugator_mul_conj_inv_notMem_Q0 hr2 hk hk1 ?_
+  rw [← h, (hyp.tConjTriple_conj hyp.structureConjugator_mem_Q
+    hyp.structureConjugator_ne_one ha).2.2,
+    hyp.tConjTriple_structureConjugator.2.2]
+  have := hyp.conj_mem_Q0_of_mem_KSet (hyp.inv_mem_KSet ha)
+    hyp.distinguishedInvolution_mem_Q0
+  rwa [inv_inv] at this
+
+/-- `r r^{-k}` is not `K`-conjugate to `r⁻¹`: apply `g` and compare with `Q₀`. -/
+lemma conj_structureConjugator_inv_ne_mul_conj_inv
+    (hr2 : hyp.structureConjugator ^ 2 ≠ 1) {k a : G} (hk : k ∈ hyp.KSet)
+    (hk1 : k ≠ 1) (ha : a ∈ hyp.KSet) :
+    a⁻¹ * hyp.structureConjugator⁻¹ * a
+      ≠ hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k) := by
+  intro h
+  refine hyp.tConjLeft_structureConjugator_mul_conj_inv_notMem_Q0 hr2 hk hk1 ?_
+  rw [← h, (hyp.tConjTriple_conj (hyp.Q.inv_mem hyp.structureConjugator_mem_Q)
+    (inv_ne_one.mpr hyp.structureConjugator_ne_one) ha).1,
+    hyp.tConjTriple_structureConjugator_inv.1]
+  have := hyp.conj_mem_Q0_of_mem_KSet (hyp.inv_mem_KSet ha)
+    hyp.distinguishedInvolution_mem_Q0
+  rwa [inv_inv] at this
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
