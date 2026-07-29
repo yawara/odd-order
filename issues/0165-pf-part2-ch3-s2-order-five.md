@@ -427,3 +427,58 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 2. `α(r) = 1` の正規化 (α は全単射なので `α(r) ≠ 0` を単位に取り直す、
    あるいは `α` を `α(r)⁻¹` 倍する)。
 3. (5)(6)(7) の導出 → 体の代数 → `x ≠ 1` の involution 論法。
+
+## 🎯 §2 Proposition が landing — `hpair` 解消 (2026-07-29 第 3 セッション)
+
+新 leaf 2 本で p.119 を完走した。
+
+### `StructureOfH/QuotientFieldCoordinate.lean`
+
+* `exists_quotient_field_coordinate` — case (b) の `|Q| = |Q₀|²` と `Z(Q) = Q₀` から
+  中心商 `M = Q/Z(Q)` は `|Q₀|` 個の元をもち `|K| = |M| − 1`。`K` の自由作用と合わせて
+  `Huppert.exists_field_coordinate_realization` が適用でき、p.119 の `α` が
+  **`β : G → F`** (`Q` 上加法的・核は `Q₀`・`β(a⁻¹ y a) = γ a · β y`・`(2:F) = 0`) として得られる。
+  `γ : K ≃* Fˣ` は `μ` の逆 (書籍の作用 `x ↦ a⁻¹ x a` に合わせた向き)。
+
+### `StructureOfH/OrderFivePairing.lean`
+
+| 定理 | 内容 |
+|---|---|
+| `eq_of_charTwo_pairing` | (5)(6)(7) + `x ≠ 1` ⟹ `k₁ = k₂` (体の代数) |
+| `eq_of_sq_eq_sq_of_charTwo` / `charTwo_pairing_degenerate` | 2 乗の単射性 / `x = 1` ⟹ `α(fg) = 0` |
+| `sq_mem_Q0_of_mem_Q` / `mul_comm_of_mem_K` / `eq_one_of_sq_eq_one_of_mem_K` | 補助 |
+| **`tConjRight_mul_tConjLeft_notMem_Q0`** | `f g ∉ Q₀` (= 書籍の `x ≠ 1`) |
+| `coord_one` / `coord_inv` / `coord_conj{,_inv}` / `coord_tConjTriple_values` | 座標の基本性質と 3 因子の値 |
+| **`structureConjugator_mul_conj_inv_pairwise`** | **`hpair` (p.119)** |
+| **`tConjMiddle_mem_K_of_case_b`** | `∀ x ∈ S^#, h(x) ∈ K` |
+| **`caseBSubgroup`** + `coe_caseBSubgroup` | **`(SK) ∪ (SKtS) ≤ G`** |
+
+⚠ 書籍 p.119 の `x ≠ 1` は「`H` の involution と `G−H` の involution の積」で議論するが、
+実際には**標準形の一意性 1 本**で済んだ:
+`t w² t = (t w t)² = g · (t (fg)^h t) · f` の両辺を標準形の一意性で比べると `h(w²) = h(z)`
+(`z = (fg)^h`)。`H` の involution は全て `K`-共役なので `z = (w²)^c`、よって
+`h(z) = c h(w²) c`、`h(w²) ∈ K` と `K` の奇位数可換性から `c = 1`、つまり `z = w²`。
+すると左因子が `g(w²) = g · g(w²)` で `g = 1` となり矛盾。
+
+⚠ 座標の正規化 `α(r) = 1` は**不要**だった (`α(r)` が全式で約分される)。
+
+フルビルド green (4928 jobs)、AxiomsCheck OK、lint --strict 0 件。
+
+## 残り = case (b) から仮説を供給する配線だけ
+
+`caseBSubgroup` は `hZQ0` / `hQEA` / `hKfree` / `hQcard` / `h5` を仮説に取る。
+`WNeBot.lean` の `SecondCaseHypothesis.trichotomy` の case (b) は
+**`IsTypeA ↥Q ∧ orderOf (st) = 5 ∧ W = ⊥`** なので、供給すべきは
+
+| 仮説 | 供給元 | 状態 |
+|---|---|---|
+| `h5` | trichotomy case (b) | ✅ |
+| `hQcard : \|Q\| = \|Q₀\|²` | `natCard_Q_eq_sq_or_cube` の sq 側 (case (b) の分岐条件そのもの) | ✅ |
+| `hKfree` | `kfree_mod_Q0_of_center_eq hZQ0` | ✅ (`hZQ0` から) |
+| **`hZQ0 : Z(Q) = Q₀`** | `center_Q_eq_Q0_subgroupOf_of_sq_eq_one` + **`TypeAData.sq_eq_one_of_mem_center`** | ❌ 未 (type B/C/D はある) |
+| **`hQEA : Q/Z(Q)` 基本可換** | type A モデル (`x² = inl(q(…))`, `[Q,Q] ≤ ker rightHom = inl.range ≤ Z`) | ❌ 未 |
+
+`TypeAData.sq_eq_one_of_mem_center` は `ModelCenters.lean` の type B/C/D と同じ形で、
+必要な `typeAQuadraticMap_radical_eq_zero` は
+`q(a) = a·φ(a)` の極形式 `B(w,v) = wφ(v) + vφ(w)` について
+`v = 1` から `φ(w) = w`、次に `w(φ(v)+v) = 0` と `φ ≠ 1` から `w = 0`。
