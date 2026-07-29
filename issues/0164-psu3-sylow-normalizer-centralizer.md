@@ -405,3 +405,31 @@ Frobenius 群 `[K,P] ⋊ P` + kernel fpf ⟹ `C_M(P) ≠ 1` という定理 (Wie
 ⟹ 新規インフラは「`𝔽₂[K]`-加群の斉次分解 + 半線形固定点」。
 `SemilinearRealization.lean` が `Q₀` について同型のことをやっているので、
 そこの部品 (`exists_semilinear_field_model` 等) が流用できる可能性が高い。**次はここを実測**。
+
+
+## 実装への申し送り: mathlib の該当 API (2026-07-29 実測)
+
+Hilbert 90 の部分を実装するときの候補:
+
+* `Mathlib/RepresentationTheory/Homological/GroupCohomology/Hilbert90.lean`
+  - `exists_div_of_norm_eq_one (hg : ∀ x, x ∈ Subgroup.zpowers g) {x : L}
+    (hx : Algebra.norm K x = 1) : ∃ β : Lˣ, x = β / g β` — **古典形そのもの**。
+    ただし `L/K` を Galois 拡大として据える必要があり、`Algebra.norm` 経由。
+* `Mathlib/FieldTheory/Finite/GaloisField.lean`
+  - `FiniteField.norm_surjective` / `FiniteField.unitsMap_norm_surjective`
+    — 有限体のノルムは全射。初等ルートを採るならこれが鍵。
+  - `FiniteField.frobeniusAlgEquivOfAlgebraic` +
+    `bijective_frobeniusAlgEquivOfAlgebraic_pow` — Gal が Frobenius で生成される。
+
+**初等ルート (基礎体を据えずに済む)**: `φ : Fˣ →* Fˣ`, `b ↦ b · (σ b)⁻¹` の像は
+巡回群 `Fˣ` の位数 `(q−1)/(s−1)` の唯一の部分群 (`s = |F₀|`,
+`q = s^n`, `n = orderOf σ`; `q = s^n` は既存の `finrank_fixedSet` = Artin から)。
+`T v = c · σ v` が非零固定点を持つ ⟺ `c ∈ Im φ`。
+`T^n = id ⟺ N(c) = 1` で、`Im φ ≤ ker N` は自明。残るのは `|ker N| = |Im φ|`
+すなわち **ノルムの全射性**だけ ⟹ `FiniteField.norm_surjective` を使うか、
+`σ = Frobenius^k` から `N(c) = c^{(q−1)/(s−1)}` を出す。
+
+⟹ 新 leaf `OddOrder/Algebra/SemilinearFixedPoint.lean` の想定サイズは 80–150 行。
+その後に `Q/Q₀` の `𝔽₂[K]`-加群構造 (斉次分解 + `End(既約) = 体`) が要る
+— これは `SemilinearRealization.lean` (Q₀ について同じことをしている, 400 行) の
+規模感。**次セッションはここから**。

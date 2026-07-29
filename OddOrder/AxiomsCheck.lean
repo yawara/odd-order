@@ -8,6 +8,7 @@ import Lean.Util.CollectAxioms
 import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.Algebra.FixedPointsGalois
+import OddOrder.Algebra.SemilinearFixedPoint
 import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.GroupTheory.HallWielandt
 import OddOrder.GroupTheory.TransferIndexTwo
@@ -13766,6 +13767,19 @@ counting argument (`FixedPoints.finrank_eq_card`) directly in `RingAut F`: `fixe
 #assert_only_allowed_axioms OddOrder.RingAut.fixer_fixedSet
 #assert_only_allowed_axioms OddOrder.RingAut.mem_of_fixes_fixedPoints
 #assert_only_allowed_axioms OddOrder.RingAut.eq_of_fixedSet_eq
+
+/-! **有限体の自己同型は Frobenius の冪** (issue 0164, 2026-07-29).
+`Algebra/SemilinearFixedPoint.lean` — Ch. III §1 p. 117 の書籍の穴を埋める半線形ルートの土台。
+
+素体上では任意の環自己同型が自動的に代数自己同型になり (`RingHom.ext_zmod` で
+`ZMod p` からの環準同型が一意)、`Gal(F/𝔽_p)` は Frobenius で生成される
+(`FiniteField.bijective_frobeniusAlgEquivOfAlgebraic_pow`)。その `n` 乗は
+`x ↦ x^(p^n)`。
+
+用途: `K` を正規化する奇位数群は `𝔽₂[K]`-加群の斉次成分の上に**半線形**に作用する。
+その固定点が非零であること (Hilbert 90) が、書籍の誤った
+「`[K,P] ⋊ P` は Frobenius 群」の正しい代替になる。 -/
+#assert_only_allowed_axioms OddOrder.RingAut.exists_pow_eq
 
 /-! **`C_V(C_{Q₀}(P)) = PW`** (issue 0164, 2026-07-29).
 `Peterfalvi/Appendices/Suzuki/GaloisCentralizer.lean`, Part II, Ch. III §1 Proposition p. 117
