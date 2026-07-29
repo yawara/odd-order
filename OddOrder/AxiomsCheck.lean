@@ -288,6 +288,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
@@ -14202,3 +14203,21 @@ the only step of §2 still open. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K_of_orderOf_st_eq_five
+
+/-! **`(SK) ∪ (SKtS)` is a subgroup** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/OrderFiveSubgroup.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+The book says "it suffices to show that `tSt ⊆ SKtS`", i.e. `h(x) ∈ K` for `x ∈ S#`; this file
+turns that into the closure of `(SK) ∪ (SKtS)`.  Four products and the inverse:
+`(SK)(SK) ⊆ SK`; `(SK)(SKtS) ⊆ SKtS`; `(SKtS)(SK) ⊆ SKtS` by `t k = k⁻¹ t`; and
+`(SKtS)(SKtS)`, whose middle is `t u k t` — equal to `k⁻¹` when `u = 1` (giving `SK`) and
+otherwise to `g(u) h(u) t f(u) k⁻¹`, which `t f k⁻¹ = k t (k f k⁻¹)` puts back in `S K t S`
+because `h(u) ∈ K`.  Inverses: `(q k t q')⁻¹ = q'⁻¹ k t q⁻¹`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_Q_of_mem_K
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_inv_mem_Q_of_mem_K
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderFiveSubgroup
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coe_orderFiveSubgroup
