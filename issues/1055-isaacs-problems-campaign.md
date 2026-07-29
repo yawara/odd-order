@@ -6304,8 +6304,8 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
 | Ch.6 | 6A(10) 6B(9) 6C(2) | ✅ 全問 |
 | Ch.7 | 7A(6) 7C(1) | ✅ 全問 |
 | Ch.8 | 8A(13) 8B(10) 8C(6) 8D(6) | ✅ 全問 |
-| **Ch.9** | **9A(8) 9B(5) 9C(3) 9D(4)** | **§9A ✅ / §9B ✅ 完済 (2026-07-29) / 9C・9D 未** |
-| **Ch.10** | **10A(7) 10B(2) 10C(1)** | **❌ 0 問** |
+| **Ch.9** | **9A(8) 9B(5) 9C(3) 9D(4)** | **§9A ✅ / §9B ✅ / 9C.1-2 ✅ (9C.3 保留) / 9D.1-3 ✅ (9D.4 土台のみ)** |
+| **Ch.10** | **10A(7) 10B(2) 10C(1)** | **10A.1 ✅ (2026-07-29 着手)** |
 
 * 素の差分では 1F.1 / 3C.1 も欠落に見えたが **誤検出**: どちらも実装済みで、docstring が
   `**1F.1**` / `**Isaacs 3C.1 (Hall D-定理, Wielandt)**` と `Problem ` 前置なしで書かれて
@@ -6840,3 +6840,39 @@ statement 確定 (`references/isaacs/pages/isaacs-p294-307.png`): Lemma 9.31 の
 ⟹ **9D.4 も 9C.3 と同じく「設計の最後の 1 ケースが未解決」の状態で記録**。
 どちらも CLAUDE.md の [[feedback-ask-chatgpt-for-elided-gaps]] 手順 (最強モデルに
 自己完結プロンプト) を使う回をまとめて設ける。文書順では次は **Ch.10 (10 問)**。
+
+## Ch.10 (More Transfer Theory) — 着手 (2026-07-29)
+
+書籍 pp. 307-308 (`Problems 10A`), p. 312 (`Problems 10B`), p. 31x (`Problems 10C`)。
+ページ画像は `references/isaacs/pages/isaacs-p29[7]-*.png` / `isaacs-p30[789]-*.png` に保存済。
+
+Ch.10 の**本文側は repo にほぼ揃っている**: Yoshida (Thm 10.1) / Lem 10.3 / Thm 10.4
+(`C_p ≀ C_p` recognition) / Lem 10.6-10.7 / Thm 10.9 / Lem 10.11 / Thm 10.12 (Huppert) /
+Lem 10.14 / Thm 10.15 / Thm 10.18 (principal ideal theorem)。演習はこの上に書ける。
+
+### ⚠ regular `p`-群の定義の所在
+
+本文に定義環境は無く、**p. 297 の地の文の括弧書き**にある:
+「任意の `x, y ∈ P` に対し `⟨x, y⟩` の導来部分群の元 `c` があって `(xy)^p = x^p y^p c^p`
+となる `p`-群を **regular** という」。`C_p ≀ C_p` が準同型像にならない十分条件として
+導入されている。索引の "regular p-group, 297, 307" で所在を特定した。
+
+### 進捗
+
+* **10A.1 ✅** `isRegularPGroup_two_iff_commute` (新設 `Ch10_MoreTransfer/Problems10A.lean`)。
+  `IsRegularPGroup` の定義 + 商への遺伝 (`IsRegularPGroup.quotient`) + 極小反例。
+  ⚠ 書籍 hint は「極小反例で `|P'| = 2`」だが、`|P'|` を計算せず
+  「`P'` の元は中心的で 2 乗が 1」だけ出せば足りる (そちらが短い)。
+
+### 残り (10A.2-10A.7 / 10B.1-2 / 10C.1)
+
+* **10A.2** regular `p`-群で `{x | x^p = 1}` が部分群。hint = 部分群への遺伝 + 極小反例。
+* **10A.3 / 10A.5 / 10A.7** はいずれも `C_p ≀ C_p` への埋め込み/準同型像。
+  repo の `WreathRecognition.lean` (Thm 10.4 = `C_p ≀ C_p` recognition, 1308 行) が土台。
+* **10A.4** `P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G`。Yoshida を使う。
+* **10A.6** `G` 推移的, `H` = 点安定化群 ⟹ 2-推移的 ⟺ `G = H ∪ HgH`。
+  二重剰余類と `H`-軌道の対応。repo/mathlib の `IsMultiplyPretransitive` を使う。
+* **10B.1** `C = ⟨x⟩` 位数 `p^n`, `a ∈ Aut(C)` が `x ↦ x^{p+1}`, `P = C ⋊ ⟨a⟩` は
+  冪零類 `n` の metacyclic `p`-群 (hint = Thm 4.7)。
+* **10B.2** `E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)` (Maschke)。
+* **10C.1** 未確認 (ページ画像を切り出していない)。
