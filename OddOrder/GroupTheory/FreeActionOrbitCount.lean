@@ -284,6 +284,47 @@ theorem dvd_card_sub_one_of_free_off_unique_fixed
   rw [hsplit, Nat.add_sub_cancel_left]
   exact dvd_mul_left d _
 
+/-! ## A counting criterion for a system of orbit representatives
+
+If the action is free and a set `R` of pairwise inequivalent points has
+`|R| · |Γ| = |S|`, then `R` meets every orbit.  This is the shape needed by
+Peterfalvi Part II, Ch. III §2 (p. 118): `K` acts freely by conjugation on
+`S ∖ {1}`, and the book exhibits `q + 1 = |S ∖ {1}| / |K|` pairwise
+non-conjugate elements. -/
+
+omit [Finite Γ] in
+/-- **A counting criterion for a system of orbit representatives.**
+
+For a free action of a finite group `Γ` on a finite type `S`, a set `R` of
+pairwise inequivalent points with `|R| · |Γ| = |S|` meets every orbit: the map
+`R × Γ → S`, `(y, a) ↦ a • y`, is injective, hence bijective. -/
+theorem exists_mem_orbit_of_card_mul_eq {R : Set S}
+    (hfree : ∀ (a : Γ) (x : S), a • x = x → a = 1)
+    (hR : ∀ x ∈ R, ∀ y ∈ R, ∀ a : Γ, a • x = y → x = y)
+    (hcard : Nat.card R * Nat.card Γ = Nat.card S) (x : S) :
+    ∃ y ∈ R, ∃ a : Γ, a • y = x := by
+  classical
+  have hinj : Function.Injective (fun p : R × Γ => p.2 • (p.1 : S)) := by
+    rintro ⟨⟨y, hy⟩, a⟩ ⟨⟨z, hz⟩, b⟩ h
+    have h' : a • y = b • z := h
+    have hyz : y = z := by
+      refine hR y hy z hz (b⁻¹ * a) ?_
+      rw [mul_smul, h', inv_smul_smul]
+    subst hyz
+    have hab : (b⁻¹ * a) • y = y := by rw [mul_smul, h', inv_smul_smul]
+    have : b⁻¹ * a = 1 := hfree _ _ hab
+    have hba : a = b := by
+      have := congrArg (fun g : Γ => b * g) this
+      simpa using this
+    simp [hba]
+  have hcards : Nat.card (R × Γ) = Nat.card S := by
+    rw [Nat.card_prod, hcard]
+  have hsurj : Function.Surjective (fun p : R × Γ => p.2 • (p.1 : S)) := by
+    haveI : Finite R := Subtype.finite
+    exact (Nat.bijective_iff_injective_and_card _).mpr ⟨hinj, hcards⟩ |>.2
+  obtain ⟨⟨⟨y, hy⟩, a⟩, hxa⟩ := hsurj x
+  exact ⟨y, hy, a, hxa⟩
+
 end OddOrder.GroupTheory.FreeActionOrbitCount
 
 /-!

@@ -129,3 +129,53 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 * 上流 = [0163](closed/0163-pf-part2-ch3-s1-trichotomy.md) / [0164](closed/0164-psu3-sylow-normalizer-centralizer.md)
 * 下流 = Ch. III §3 (p. 119–121, `KW` の `S` への作用) — case (a)/(b) が
   片付くと (C2) が残り、そこから PSU(3,q) の特徴付け (Ch. IV) へ
+
+
+## 追加進捗 + 残作業の設計 (2026-07-29 第 2 セッション)
+
+### landing 済 (追加分)
+
+| 定理 | 内容 |
+|---|---|
+| `eq_of_mul_eq_mul_of_mem_Q_mem_D` | `H = Q ⋊ D` 分解の一意性 |
+| `structureConjugator_mul_conj_inv_{mem,ne_one}` | `rr^{-k} ∈ Q ∖ {1}` |
+| `exists_mem_KSet_conj_distinguishedInvolution` | `ℓ` の存在 (`ℓ ≠ 1` 込み) |
+| `exists_tConjMiddle_eq` | `h(rr^{-k}) = ℓ²k²` |
+| `tConjMiddle_conj_mem_K` | `h(x) ∈ K` が `K`-軌道に沿って伝播 |
+| `tConjMiddle_*_mem_K` (4 種) | 代表系の各元で `h ∈ K` |
+| `orbitReprSet` + `tConjMiddle_mem_K_of_orbitReprSet_covers` | 代表系を集合化し、**「覆う」ことだけを残ギャップに切り出した** |
+| `FreeActionOrbitCount.exists_mem_orbit_of_card_mul_eq` | 自由作用 + `\|R\|·\|Γ\| = \|S\|` ⟹ `R` は全軌道に当たる (汎用) |
+
+⚠ 書籍が `rr^{-k} ≠ 1` に使う議論は不要だった — `C_Q(k) = 1` で直接。
+
+### 残ギャップ = `hcover` (`orbitReprSet` が全 `K`-軌道に当たる) だけ
+
+`exists_mem_orbit_of_card_mul_eq` に流すには **(A) `\|orbitReprSet\| = q+1`** と
+**(B) 互いに非共役** が要る。実際に必要な補題を書き下すと:
+
+**(A) 濃度** (`\|K\| = q−1` なので `3 + (q−2) = q+1`)
+* `k ↦ r r^{-k}` は `K` 上単射 — `r r^{-k₁} = r r^{-k₂}` ⟹ `k₂k₁⁻¹` が `r` を中心化
+  ⟹ `C_Q(·) = 1` で `k₁ = k₂`。**自由作用だけで済む**。
+* `r r^{-k} ∉ Q₀` (`k ≠ 1`) — 書籍どおり: `r r^{-k} = z ∈ Q₀` なら `z` は `Q` の中心元で
+  `z² = 1` ゆえ `(r^k)² = (zr)² = r²`、すなわち `k` が `r² ≠ 1` を中心化 ⟹ `k = 1`。
+  ⟹ `≠ s`。(`r² ≠ 1` は landing 済)
+* `r r^{-k} ≠ r` は `r ≠ 1` から即。`r r^{-k} ≠ r⁻¹` は位数 (4 vs 2) で、**`r⁴ = 1` が要る**。
+* `s ≠ r`, `s ≠ r⁻¹`, `r ≠ r⁻¹` はすべて `r² ≠ 1` から。
+
+**(B) 非共役**
+* `r`, `r⁻¹`: `r⁻¹ = r^a` (`a ∈ K`) なら `a` の位数 `n` は奇で
+  `r = r^{aⁿ} = r^{(−1)ⁿ} = r⁻¹` ⟹ `r² = 1`。**書籍の「`\|K\|` は奇」がここ**。
+* `s` と `r r^{-k}`: `Q₀` は `K`-不変で `s ∈ Q₀`, `r r^{-k} ∉ Q₀`。
+* `r`/`r⁻¹` と `r r^{-k}`: (1) より `f(r^a) = a f(r) a⁻¹ = a s a⁻¹ ∈ Q₀`、一方
+  `f(rr^{-k})` は書籍によれば `(r r^{-kℓ})^{ℓ⁻¹k⁻²}` で位数 4 ⟹ `∉ Q₀`。
+  ⚠ この同一視には `K` の可換性 (cyclic) が要る。
+* **`r r^{-k₁}` 同士** — p.119 の体同一視 (5)(6)(7)。ここが最大の残作業。
+
+### 先に要る補助事実
+
+* **`r⁴ = 1`**: case (b) は type A の Suzuki 2-群で `Z(Q) = Ω₁(Q) = Q₀`,
+  `Q/Z(Q)` 基本可換 ⟹ `r² ∈ Q₀` ⟹ `r⁴ = 1`。repo で type A についてこれが
+  出ているか要実測 (`ActualCenter.lean` / `TypeBFromW.lean` / `Higman` 側)。
+* **`|Q| = |Q₀|²`**: case (b) は `natCard_Q_eq_sq_or_cube` の sq 側。
+* **`K` の `Q^#` への自由な共役作用を `MulAction` として据える** (
+  `exists_mem_orbit_of_card_mul_eq` の適用形)。

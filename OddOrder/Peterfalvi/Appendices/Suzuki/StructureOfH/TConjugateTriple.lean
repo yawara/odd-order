@@ -674,6 +674,58 @@ theorem tConjMiddle_structureConjugator_mul_conj_inv_mem_K {k : G} (hk : k ∈ h
   rw [hval]
   exact hyp.K.mul_mem (hyp.K.pow_mem hlK 2) (hyp.K.pow_mem hk 2)
 
+/-- **The book's system of representatives** for the `K`-orbits of `S#`
+(Peterfalvi Part II, Ch. III §2, p. 118): `s`, `r`, `r⁻¹` and the `q − 2`
+elements `r r^{-k}` for `1 ≠ k ∈ K`. -/
+def orbitReprSet : Set G :=
+  {hyp.distinguishedInvolution, hyp.structureConjugator, hyp.structureConjugator⁻¹} ∪
+    {x | ∃ k ∈ hyp.K, k ≠ 1 ∧
+      x = hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k)}
+
+lemma orbitReprSet_subset_Q : hyp.orbitReprSet ⊆ (hyp.Q : Set G) := by
+  rintro x (hx | ⟨k, hk, -, rfl⟩)
+  · rcases hx with rfl | rfl | rfl
+    · exact hyp.distinguishedInvolution_mem_Q
+    · exact hyp.structureConjugator_mem_Q
+    · exact hyp.Q.inv_mem hyp.structureConjugator_mem_Q
+  · exact hyp.structureConjugator_mul_conj_inv_mem
+      (by rw [← hyp.coe_K]; exact hk)
+
+lemma one_notMem_orbitReprSet : (1 : G) ∉ hyp.orbitReprSet := by
+  rintro (hx | ⟨k, hk, hk1, hx⟩)
+  · rcases hx with h | h | h
+    · exact hyp.distinguishedInvolution_ne_one h.symm
+    · exact hyp.structureConjugator_ne_one h.symm
+    · exact hyp.structureConjugator_ne_one (inv_eq_one.mp h.symm)
+  · exact hyp.structureConjugator_mul_conj_inv_ne_one
+      (by rw [← hyp.coe_K]; exact hk) hk1 hx.symm
+
+/-- `h(y) ∈ K` at every representative. -/
+theorem tConjMiddle_mem_K_of_mem_orbitReprSet {y : G} (hy : y ∈ hyp.orbitReprSet) :
+    hyp.tConjMiddle y ∈ hyp.K := by
+  rcases hy with hy | ⟨k, hk, hk1, rfl⟩
+  · rcases hy with rfl | rfl | rfl
+    · exact hyp.tConjMiddle_distinguishedInvolution_mem_K
+    · exact hyp.tConjMiddle_structureConjugator_mem_K
+    · exact hyp.tConjMiddle_structureConjugator_inv_mem_K
+  · exact hyp.tConjMiddle_structureConjugator_mul_conj_inv_mem_K hk hk1
+
+/-- **`h(x) ∈ K` for every `x ∈ Q ∖ {1}`** (Peterfalvi Part II, Ch. III §2,
+p. 118), granted that `orbitReprSet` meets every `K`-orbit.
+
+This is the whole content of the Proposition of §2: `t x t = g(x) h(x) t f(x)`
+with `h(x) ∈ K` says `t S t ⊆ S K t S`. -/
+theorem tConjMiddle_mem_K_of_orbitReprSet_covers
+    (hcover : ∀ x ∈ hyp.Q, x ≠ 1 →
+      ∃ a ∈ hyp.K, ∃ y ∈ hyp.orbitReprSet, x = a⁻¹ * y * a)
+    {x : G} (hx : x ∈ hyp.Q) (hx1 : x ≠ 1) :
+    hyp.tConjMiddle x ∈ hyp.K := by
+  obtain ⟨a, ha, y, hy, rfl⟩ := hcover x hx hx1
+  have hyQ : y ∈ hyp.Q := hyp.orbitReprSet_subset_Q hy
+  have hy1 : y ≠ 1 := fun h => hyp.one_notMem_orbitReprSet (h ▸ hy)
+  exact hyp.tConjMiddle_conj_mem_K hyQ hy1 ha
+    (hyp.tConjMiddle_mem_K_of_mem_orbitReprSet hy)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
