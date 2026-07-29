@@ -6305,7 +6305,7 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
 | Ch.7 | 7A(6) 7C(1) | ✅ 全問 |
 | Ch.8 | 8A(13) 8B(10) 8C(6) 8D(6) | ✅ 全問 |
 | **Ch.9** | **9A(8) 9B(5) 9C(3) 9D(4)** | **§9A ✅ / §9B ✅ / 9C.1-2 ✅ (9C.3 保留) / 9D.1-3 ✅ (9D.4 土台のみ)** |
-| **Ch.10** | **10A(7) 10B(2) 10C(1)** | **10A.1 / 10A.2 / 10A.3前半 / 10A.5 / 10A.6 ✅** |
+| **Ch.10** | **10A(7) 10B(2) 10C(1)** | **§10A は 10A.4 と 10A.3 後半を除き ✅ (1/2/3前半/5/6/7)** |
 
 * 素の差分では 1F.1 / 3C.1 も欠落に見えたが **誤検出**: どちらも実装済みで、docstring が
   `**1F.1**` / `**Isaacs 3C.1 (Hall D-定理, Wielandt)**` と `Problem ` 前置なしで書かれて
@@ -6930,8 +6930,30 @@ repo の `WreathRecognition.lean` の私有補題 `nonempty_mulEquiv_wreath_of_c
 
 * **10A.3 後半** `A` は基本可換 (未解決)。
 * **10A.4** `P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G` (Yoshida を使う)。
-* **10A.7** `A ◁ P` 基本可換で指数 `p`, `P − A` に位数 `p` と `p²` の元 ⟹
-  `C_p ≀ C_p` は `P` の準同型像 (repo の Thm 10.4 = `WreathRecognition.lean` が土台)。
+* **10B.1** `C = ⟨x⟩` 位数 `p^n`, `a : x ↦ x^{p+1}`, `P = C ⋊ ⟨a⟩` は冪零類 `n` の
+  metacyclic `p`-群 (hint = Thm 4.7)。
+* **10B.2** `E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)` (Maschke)。
+* **10C.1** 未確認 (ページ画像未切り出し)。
+
+### 10A.7 完了 (2026-07-29)
+
+`exists_surjective_wreath_of_mem_compl_orders`。repo の **Cor 10.5**
+(`exists_surjective_wreath_of_conj_list_prod_ne_one`, `WreathRecognition.lean:1041`) が
+「共役類積 ≠ 1」から直接 surjection を出すので、そこに帰着させるだけだった:
+
+* `v ≡ u^j (mod A)` として `w := u^j` (`w ∉ A`, `w^p = 1`), `a := v w⁻¹ ∈ A`。
+* 新規補題 `mul_pow_eq_conj_list_prod` (一般の群で `(aw)^n = (∏_{i<n} w^i a w^{-i})·w^n`)
+  と `w^p = 1` から **`v^p = 共役類積`** ⟹ `orderOf v = p²` で ≠ 1。
+* `a ∈ Z(P)` だと積が `a^p = 1` になるので `a ∉ Z(P)`。
+
+書籍の「位数 `p` の元」の役割は **`w^p = 1`** を保証すること (これがないと `(aw)^p` が
+共役積そのものにならない)。「位数 `p²` の元」が共役積 ≠ 1 を与える。
+
+### Ch.10 の残り (5 問)
+
+* **10A.3 後半** `A` は基本可換 (未解決)。
+* **10A.4** `P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G`。hint = `C₂ ≀ C₂ ≅ D₈`、
+  `N = N_G(P)` として `N/P` が `P/Φ(P)` 上に非自明な固定点をもつことを示す。Yoshida を使う。
 * **10B.1** `C = ⟨x⟩` 位数 `p^n`, `a : x ↦ x^{p+1}`, `P = C ⋊ ⟨a⟩` は冪零類 `n` の
   metacyclic `p`-群 (hint = Thm 4.7)。
 * **10B.2** `E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)` (Maschke)。
