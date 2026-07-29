@@ -6958,3 +6958,38 @@ repo の `WreathRecognition.lean` の私有補題 `nonempty_mulEquiv_wreath_of_c
   metacyclic `p`-群 (hint = Thm 4.7)。
 * **10B.2** `E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)` (Maschke)。
 * **10C.1** 未確認 (ページ画像未切り出し)。
+
+### Ch.10 の残り 5 問の見積り (2026-07-29 調査)
+
+§10A は 10A.1 / 10A.2 / 10A.3前半 / 10A.5 / 10A.6 / 10A.7 が完了。
+**残りはいずれも「新しいインフラを 1 枚必要とする」問題**なので、1 問あたりの所要が
+これまでより大きい。着手順の見通し:
+
+* **10B.2** (`E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)`) — **Maschke が本質**。
+  * 群論的な迂回は無い: `E ≤ Soc(G)` は「`E` が極小正規部分群たちの積」= `E` の
+    完全可約性そのもの。repo の `AInvariantComplement.lean` は **Hall** 型 (互いに素な位数)
+    なので使えない (ここでは `N` も `E/N` も `p`-群)。
+  * 必要な橋: `Additive ↥E` を `ZMod p`-加群にし (`IsElementaryAbelian.zmodModule`,
+    `BG/Ch1_Preliminary/S03g_Thm310Module.lean` に前例あり)、共役作用を
+    `Representation (ZMod p) (G ⧸ C_G(E)) (Additive ↥E)` にして
+    mathlib の `MonoidAlgebra.Submodule.exists_isCompl` (`Invertible (card : ZMod p)`) を当てる。
+    そのうえで「`G`-部分加群 ↔ `E` に含まれる `G`-正規部分群」の対応を作る。
+  * 有用な副産物: この橋は BG/Pf 側でも使い回せる。
+  * ⚠ 途中で使う事実: `p ∤ [G : C_G(E)]` ⟹ **Sylow `p` は `C_G(E)` に含まれる**
+    (`E ≤ Z(P)`)。
+* **10A.4** (`P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G`) — Yoshida (repo に有り) を使う。
+  * 紙の筋: `D₈ = C₂ ≀ C₂` は `Q₈ × C₂` の準同型像ではない (位数 8 の商は `Q₈` か
+    `C₂³` のみ — 位数 2 の部分群 3 つを全部潰して確認済) ので Yoshida が適用でき、
+    `N_G(P)` が 2-transfer を制御する。
+  * hint「`N/P` が `P/Φ(P)` に非自明な固定点をもつ」: `Ω₁(P) = ⟨-1, c⟩` は characteristic
+    で `Φ(P) = ⟨-1⟩` なので `Ω₁(P)` の像が `P/Φ(P)` の 1 次元 `N`-不変部分空間になる。
+* **10B.1** (`P = C_{p^n} ⋊ ⟨x ↦ x^{p+1}⟩` は冪零類 `n` の metacyclic `p`-群) —
+  半直積の構成 + `orderOf` の計算 (`(1+p)` の `(ℤ/p^n)ˣ` での位数) + 下降中心列。
+  ⚠ `p = 2` に例外があるので statement の確認が要る。
+* **10A.3 後半** (`A` は基本可換) — 未解決。`A = Z(P) × K` だけからは出ない。
+* **10C.1** — 未確認 (ページ画像未切り出し)。
+
+## ⚠ 運用メモ (2026-07-29)
+
+lane a は main より **88 commits 先行**した状態が続いている (hub の合流待ち)。
+レーン側は規約どおり leaf build のみで検証しフルビルドは打っていない。
