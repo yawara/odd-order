@@ -687,9 +687,11 @@ Wielandt (9.1) の ambient 版 `natCard_eq_pow_natCard_inf_centralizer_of_kernel
 
 ### β の実装手順 (確定版)
 
-1. `exists_frobenius_generator`: `W = 1`, `X ≤ V` 位数 `p` のとき、
-   `X` の生成元 `x'` で `Q₀` 上の作用が `a ↦ a^{q₀}` (`q₀ = |C_{Q₀}(X)|`) に
-   なるものの存在。⟸ `fixer_fixedSet` + `τ ∈ B` + 素数位数。
+1. ~~`exists_frobenius_generator`~~ ✅ **`RingAut.exists_generator_pow_natCard_fixedSet`**
+   (`SemilinearFixedPoint.lean`): `B ≤ RingAut F` が素数位数 `p` なら
+   `a ↦ a^{|F^B|}` が `B` の生成元で `|F| = |F^B|^p`。
+   ⟸ `s ∣ |F|` から `s` は標数の冪 → Frobenius の冪 → `fixer_fixedSet` で `B` に属する
+   → 非自明 (さもなくば `Fˣ` の生成元の位数が `s−1` 以下) → 素数位数。
 2. `K` の `(N/Q₀) ∖ {1}` 上の正則性 (fpf + 位数一致)。
 3. 基点を取って `Ω ≅ K` とし、`x'` の作用を `k ↦ α(k)·c` の形にする。
 4. `x'^p = 1` から `N(c) = 1`、`exists_ne_zero_mul_pow_eq` で固定点を得る。
