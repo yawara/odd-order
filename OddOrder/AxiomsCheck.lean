@@ -14200,3 +14200,5 @@ the only step of §2 still open. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orbitReprSet_covers
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K_of_orderOf_st_eq_five
