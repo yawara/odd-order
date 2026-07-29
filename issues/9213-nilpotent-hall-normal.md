@@ -15,10 +15,41 @@ created: 2026-07-28
 
 ## やること
 
-- [ ] `C` 有限冪零, `Q` が `C` の Hall `π`-部分群 ⟹ `Q ⊴ C`。
-- [ ] 系: `C` 冪零, `S` = Sylow `p`, `Q` = Hall `p'` ⟹ `[S, Q] = 1`
+- [x] `C` 有限冪零, `Q` が `C` の Hall `π`-部分群 ⟹ `Q ⊴ C`。
+- [x] 系: `C` 冪零, `S` = Sylow `p`, `Q` = Hall `p'` ⟹ `[S, Q] = 1`
       (`Q ⊴ C` + `S ⊴ C` + `S ⊓ Q = ⊥` に `Subgroup.commute_of_normal_of_disjoint`
       = mathlib `Mathlib/Algebra/Group/Subgroup/Basic.lean:1002`)。
+
+## ✅ 完了 (2026-07-29)
+
+置き場は **`OddOrder/Isaacs/Ch03_SplitExtensions/HallNilpotent.lean`** (下記「完了条件」で
+予定した `GroupTheory/NilpotentHall.lean` から変更)。理由: `IsHallSubgroup` /
+`Subgroup.IsPiGroup` / `IsHallSubgroup.card_dvd_of_isPiGroup` はすべて
+`OddOrder.Isaacs.Ch03` 名前空間にあり、(i) `GroupTheory/` に置くと Ch03 → GroupTheory の
+逆向き import になる、(ii) 主定理は `hH.normal_of_isNilpotent` と dot-notation で呼びたいので
+宣言が `OddOrder.Isaacs.Ch03` 名前空間に居る必要がある。`OddOrder.lean` 配線済・
+build green・4 定理すべて axiom-clean (`propext`/`Classical.choice`/`Quot.sound` のみ)。
+
+内容 (4 定理):
+
+* `isPiSubgroup_le_of_isHallSubgroup_of_le_normalizer` — **`π`-Hall `H` を正規化する
+  `π`-部分群 `N` は `H` に含まれる** (冪零性不要)。`N ≤ N_G(H)` から
+  `↑(N ⊔ H) = ↑N · ↑H` (mathlib `Subgroup.coe_mul_of_left_le_normalizer_right`)、
+  `|N ⊔ H| · |N ⊓ H| = |N| · |H|` で `N ⊔ H` が `π`-群、Hall の極大性
+  (`IsHallSubgroup.card_dvd_of_isPiGroup`) で `N ⊔ H = H`。
+  ⟹ 既存の `OddOrder.BG.Ch3.S12.isPiSubgroup_le_of_normal_isHall` (`[H.Normal]` 版) の
+  **一般化** (仮説を `N ≤ N_G(H)` に弱めた)。
+* `IsHallSubgroup.normalizer_normalizer` — `N_G(N_G(H)) = N_G(H)` (冪零性不要)。
+  mathlib `Sylow.normalizer_normalizer` の Hall 版。
+* `IsHallSubgroup.normal_of_isNilpotent` — **本題**。`Group.normalizerCondition_of_isNilpotent`
+  + `normalizerCondition_iff_only_full_group_self_normalizing` で `N_G(H) = ⊤`。
+* `commute_of_isHallSubgroup_of_isHallSubgroup_compl` — `π`-Hall と `π'`-Hall は
+  元ごとに可換 (両方正規 + 位数互いに素 + `Subgroup.commute_of_normal_of_disjoint`)。
+
+⚠ 実装の罠: `H.map (MulAut.conj g)` は `Subgroup.map` が `G →* N` を取るため、
+**codomain が期待型から決まらない位置では coercion が挿入されない** (`Nat.card ↥(H.map …)` や
+`Subgroup.IsPiGroup π (H.map …)` の中)。`(H.map (MulAut.conj g) : Subgroup G)` と
+型注釈を付けて `N := G` を強制する。
 
 ## 実測した既存状況 (2026-07-28)
 
