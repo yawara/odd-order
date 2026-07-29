@@ -49,10 +49,22 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 `q`-群が `p`-群に入って矛盾。ゆえに `K` は正規 `p`-群で `K ≤ O_p(G) = P`。
 ⚠ 実装コスト = `⟨x⟩ ≤ N_G(P)` の共役作用 `MulDistribMulAction ↥⟨x⟩ ↥P` の plumbing。
 
-**3E.4 の未確認事項**: 書籍 Hint の「Lemma 3.32」の内容を原文で確認していない
-(`|H : H ∩ C| ∣ |G : C|` と `|C : C ∩ H| ∣ |G : H|` の 2 主張)。
-`A`-固定点の集合が `G/H` 上で `C`-軌道 1 個 (サイズ `[C : C∩H]`) になることまでは
-確認済だが、そこから整除性を出す一手が未確定。着手前に p.104 付近を読むこと。
+**3E.4 の証明経路 (2026-07-29 に原文確認して確定)**:
+書籍 **Lemma 3.32** (p.105) = 「互いに素な作用で `P ∈ Syl_p(G)` が `A`-不変なら
+`P ∩ C ∈ Syl_p(C)`」。**repo に既にある**:
+`Ch04.card_inf_fixedSubgroup_of_aInvariant_sylow` (cardinality 形)。
+これを使って**素数ごとに `p`-部分を比較**する:
+`H` の `A`-不変 Sylow `p` を `P`, `Cor 3.25` (`aInvariant_pSubgroup_le_aInvariant_sylow`)
+で `P ≤ Q` (`Q` は `G` の `A`-不変 Sylow `p`) を取ると
+`[H : H∩C]_p = [P : P∩C]`, `[G : C]_p = [Q : Q∩C]` で,
+`P(Q∩C) ⊆ Q` から `[P:P∩C] ≤ [Q:Q∩C]`。両辺 `p`-冪なので整除。
+全素数で合わせて `[H:H∩C] ∣ [G:C]`。もう一方も同様。
+
+⚠ **重複定義の解消 (2026-07-29)**: 一時 `actionFixedSubgroup φ` を新設したが、
+これは既存の `OddOrder.GroupTheory.fixedSubgroup φ K` (`GroupTheory/FixedSubgroup.lean`) の
+`K = ⊤` の場合の重複だったので撤去し、全面的に `fixedSubgroup` へ移行した
+(ラッパー方針)。`isAInvariant_fixedSubgroup_normal` (`B ⊴ A` なら `C_G(B)` は `A`-不変) は
+`fixedSubgroup φ B` の形で残す。
 
 ### §3E の置き場と統制情報 (2026-07-29)
 

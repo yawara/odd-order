@@ -16,6 +16,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 3E (coprime action)�
 Glauberman, Thm 3.27-3.30) は Ch.4 の交換子機構を要するため
 `Ch04_Commutators/ForwardFromCh03.lean` に置かれている。演習も同じ層に置く。
 
+⚠ 固定部分群は既存の `OddOrder.GroupTheory.fixedSubgroup φ K` を使う (重複定義しない)。
+
 * **3E.1 の Hint 前半** `exists_ne_one_fixed_of_isPGroup_of_dvd` —
   `p`-群 `P` が `G` に作用し `p ∣ |G|` なら `C_G(P) ≠ 1`。
   (対偶が書籍の Hint「`C_G(P) = 1` なら `p ∤ |G|`」。)
@@ -179,17 +181,6 @@ theorem exists_isAInvariant_isPGroup_of_isSolvable [IsSolvable G] [Nontrivial G]
 
 /-! ### 3E.1 (`A` 可解の場合) の部品 -/
 
-/-- 作用の固定部分群 `C_G(A)`。 -/
-def actionFixedSubgroup (φ : A →* MulAut G) : Subgroup G where
-  carrier := {g : G | ∀ a : A, (φ a) g = g}
-  one_mem' := fun a => map_one (φ a)
-  mul_mem' := fun {x y} hx hy a => by rw [map_mul, hx a, hy a]
-  inv_mem' := fun {x} hx a => by rw [map_inv, hx a]
-
-omit [Finite A] [Finite G] in
-theorem mem_actionFixedSubgroup {φ : A →* MulAut G} {g : G} :
-    g ∈ actionFixedSubgroup φ ↔ ∀ a : A, (φ a) g = g := Iff.rfl
-
 /-- **3E.1 (`A` 可解) の case (iii)**: `B ⊴ A` が `G` に互いに素に作用し
 `C_G(B) = 1` なら, 各素数 `q` について `A`-不変な Sylow `q`-部分群がある。
 
@@ -232,21 +223,20 @@ theorem exists_isAInvariant_sylow_of_normal_of_trivial_fixed (φ : A →* MulAut
 
 omit [Finite A] [Finite G] in
 /-- 固定部分群は `B ⊴ A` について `A`-不変。 -/
-theorem isAInvariant_actionFixedSubgroup_comp (φ : A →* MulAut G) {B : Subgroup A} [B.Normal] :
-    OddOrder.Isaacs.Ch03.IsAInvariant φ (actionFixedSubgroup (φ.comp B.subtype)) := by
-  refine OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem.mpr fun a g hg b => ?_
-  have hmem : a⁻¹ * (b : A) * a ∈ B := by
-    simpa using (‹B.Normal›.conj_mem (b : A) b.2 a⁻¹)
-  have hfix : (φ (a⁻¹ * (b : A) * a)) g = g := hg ⟨a⁻¹ * (b : A) * a, hmem⟩
-  have hstep : (φ (b : A)) ((φ a) g) = (φ a) ((φ (a⁻¹ * (b : A) * a)) g) := by
-    have h1 : (φ (b : A)) * (φ a) = (φ a) * (φ (a⁻¹ * (b : A) * a)) := by
+theorem isAInvariant_fixedSubgroup_normal (φ : A →* MulAut G) {B : Subgroup A} [B.Normal] :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (OddOrder.GroupTheory.fixedSubgroup φ B) := by
+  refine OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem.mpr fun a g hg b hb => ?_
+  have hmem : a⁻¹ * b * a ∈ B := by
+    simpa using (‹B.Normal›.conj_mem b hb a⁻¹)
+  have hfix : (φ (a⁻¹ * b * a)) g = g := hg _ hmem
+  have hstep : (φ b) ((φ a) g) = (φ a) ((φ (a⁻¹ * b * a)) g) := by
+    have h1 : (φ b) * (φ a) = (φ a) * (φ (a⁻¹ * b * a)) := by
       rw [← map_mul, ← map_mul]
       congr 1
       group
-    calc (φ (b : A)) ((φ a) g) = ((φ (b : A)) * (φ a)) g := rfl
-      _ = ((φ a) * (φ (a⁻¹ * (b : A) * a))) g := by rw [h1]
-      _ = (φ a) ((φ (a⁻¹ * (b : A) * a)) g) := rfl
-  change (φ (b : A)) ((φ a) g) = (φ a) g
+    calc (φ b) ((φ a) g) = ((φ b) * (φ a)) g := rfl
+      _ = ((φ a) * (φ (a⁻¹ * b * a))) g := by rw [h1]
+      _ = (φ a) ((φ (a⁻¹ * b * a)) g) := rfl
   rw [hstep, hfix]
 
 universe u
@@ -307,9 +297,9 @@ private theorem exists_isAInvariant_isPGroup_solvableA_aux :
     obtain ⟨p₀, hp₀, hBel⟩ := OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hB
     haveI : Fact p₀.Prime := ⟨hp₀⟩
     have hBp : IsPGroup p₀ ↥B := fun g => ⟨1, by simpa using hBel.2 g⟩
-    set C : Subgroup G := actionFixedSubgroup (ψ.comp B.subtype) with hC
+    set C : Subgroup G := OddOrder.GroupTheory.fixedSubgroup ψ B with hC
     have hCinv : OddOrder.Isaacs.Ch03.IsAInvariant ψ C :=
-      isAInvariant_actionFixedSubgroup_comp ψ
+      isAInvariant_fixedSubgroup_normal ψ
     -- `C ≠ ⊤` (`ψ` 単射 + `B ≠ ⊥`)
     have hCne : C ≠ ⊤ := by
       intro htop
@@ -319,7 +309,7 @@ private theorem exists_isAInvariant_isPGroup_solvableA_aux :
       have hfix : ∀ g : G, (ψ (b : Abar)) g = g := by
         intro g
         have hgC : g ∈ C := by rw [htop]; trivial
-        exact hgC b
+        exact hgC (b : Abar) b.2
       have : ψ (b : Abar) = 1 := MulEquiv.ext hfix
       have hb1 : (b : Abar) = 1 := hψinj (by rw [this, map_one])
       exact Subtype.ext hb1
@@ -329,9 +319,9 @@ private theorem exists_isAInvariant_isPGroup_solvableA_aux :
         intro hdvd
         obtain ⟨g, hg1, hgfix⟩ :=
           exists_ne_one_fixed_of_isPGroup_of_dvd hBp (ψ.comp B.subtype) hdvd
-        have : g ∈ C := hgfix
-        rw [hCbot, Subgroup.mem_bot] at this
-        exact hg1 this
+        have hgC : g ∈ C := fun l hl => hgfix ⟨l, hl⟩
+        rw [hCbot, Subgroup.mem_bot] at hgC
+        exact hg1 hgC
       have hcop : Nat.Coprime (Nat.card ↥B) (Nat.card G) := by
         obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hBp
         rw [hk]
@@ -340,8 +330,8 @@ private theorem exists_isAInvariant_isPGroup_solvableA_aux :
       haveI : Fact q.Prime := ⟨hq⟩
       obtain ⟨S, hS⟩ := exists_isAInvariant_sylow_of_normal_of_trivial_fixed ψ hcop
         (Or.inl inferInstance) (fun g hg => by
-          have : g ∈ C := hg
-          rwa [hCbot, Subgroup.mem_bot] at this) q
+          have hgC : g ∈ C := fun l hl => hg ⟨l, hl⟩
+          rwa [hCbot, Subgroup.mem_bot] at hgC) q
       refine ⟨q, (S : Subgroup G), hq, ?_, S.isPGroup', htransfer _ hS⟩
       intro hbot
       have hcardS := S.card_eq_multiplicity
@@ -387,19 +377,19 @@ theorem exists_isAInvariant_isPGroup_of_isSolvable_aut {G : Type u} [Group G] [F
 `c ∈ C_G(A)` を `c = h₀k₀` と書くと `H ∩ c K` は `A`-不変な `H ∩ K` の剰余類なので,
 Thm 3.27 (`aInvariant_coset_mem_centralizer`) により `A`-固定点 `c'` を含む。
 `c'` は `C ∩ H` に入り `c'⁻¹c ∈ C ∩ K`。 -/
-theorem actionFixedSubgroup_eq_mul (φ : A →* MulAut G)
+theorem fixedSubgroup_top_eq_mul (φ : A →* MulAut G)
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
     (hSolv : IsSolvable A ∨ IsSolvable G)
     {H K : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H)
     (hK : OddOrder.Isaacs.Ch03.IsAInvariant φ K)
     (hHK : ∀ g : G, ∃ h ∈ H, ∃ k ∈ K, g = h * k) :
-    ((actionFixedSubgroup φ : Subgroup G) : Set G)
-      = ((actionFixedSubgroup φ ⊓ H : Subgroup G) : Set G) *
-        ((actionFixedSubgroup φ ⊓ K : Subgroup G) : Set G) := by
+    ((OddOrder.GroupTheory.fixedSubgroup φ ⊤ : Subgroup G) : Set G)
+      = ((OddOrder.GroupTheory.fixedSubgroup φ ⊤ ⊓ H : Subgroup G) : Set G) *
+        ((OddOrder.GroupTheory.fixedSubgroup φ ⊤ ⊓ K : Subgroup G) : Set G) := by
   ext c
   constructor
   · intro hc
-    have hcfix : ∀ a : A, (φ a) c = c := hc
+    have hcfix : ∀ a : A, (φ a) c = c := fun a => hc a trivial
     obtain ⟨h₀, hh₀, k₀, hk₀, hceq⟩ := hHK c
     have hcoset : ∀ a : A, ∃ n ∈ H ⊓ K, (φ a) h₀ = h₀ * n := by
       intro a
@@ -419,9 +409,10 @@ theorem actionFixedSubgroup_eq_mul (φ : A →* MulAut G)
       aInvariant_coset_mem_centralizer hCop hSolv (hH.inf hK) hcoset
     have hnH : n ∈ H := (Subgroup.mem_inf.mp hn).1
     have hnK : n ∈ K := (Subgroup.mem_inf.mp hn).2
-    refine ⟨c', Subgroup.mem_inf.mpr ⟨hc'fix, by rw [hc'eq]; exact mul_mem hh₀ hnH⟩,
+    refine ⟨c', Subgroup.mem_inf.mpr ⟨fun a _ => hc'fix a,
+        by rw [hc'eq]; exact mul_mem hh₀ hnH⟩,
       c'⁻¹ * c, Subgroup.mem_inf.mpr ⟨?_, ?_⟩, by group⟩
-    · intro a
+    · intro a _
       rw [map_mul, map_inv, hc'fix a, hcfix a]
     · have : c'⁻¹ * c = n⁻¹ * k₀ := by
         rw [hc'eq, hceq]
@@ -429,8 +420,8 @@ theorem actionFixedSubgroup_eq_mul (φ : A →* MulAut G)
       rw [this]
       exact mul_mem (inv_mem hnK) hk₀
   · rintro ⟨x, hx, y, hy, rfl⟩
-    intro a
-    rw [map_mul, (Subgroup.mem_inf.mp hx).1 a, (Subgroup.mem_inf.mp hy).1 a]
+    intro a ha
+    rw [map_mul, (Subgroup.mem_inf.mp hx).1 a ha, (Subgroup.mem_inf.mp hy).1 a ha]
 
 end -- 3E
 
