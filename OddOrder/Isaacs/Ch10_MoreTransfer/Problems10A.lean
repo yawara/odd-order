@@ -18,6 +18,11 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 10A。
   部分群** (`omegaOneOfIsRegularPGroup` がその部分群)。
 * **10A.5** `exists_injective_hom_regularWreath_of_index_sq` — `|P : Q| = p²` かつ
   `Q ∩ Z(P) = 1` なら `P` は `C_p ≀ C_p` の部分群と同型。
+* **10A.3 (前半)** `exists_injective_hom_regularWreath_of_center_isComplement` — `|Z(P)| = p`,
+  `A` 可換で指数 `p`, `Z(P)` が `A` の直積因子なら `P ↪ C_p ≀ C_p` (10A.5 に帰着)。
+  ⏳ 後半「`A` は基本可換」は未着手 (issue 1055 参照)。
+* **10A.6** `isTwoTransitive_iff_exists_doubleCoset` — 推移的作用の点安定化群 `H` について
+  **2-推移的 ⟺ ある `g` で `G = H ∪ HgH`**。
 
 ## regular `p`-群の定義について
 
@@ -459,5 +464,125 @@ theorem exists_injective_hom_regularWreath_of_index_sq [Finite P] {p : ℕ} [Fac
   exact hf_inj h4
 
 end -- 10A.5
+
+section /- 10A.3 (前半): Z(P) が A の直積因子なら C_p ≀ C_p に埋め込める (p. 308) -/
+
+/-- **Isaacs Problem 10A.3 の前半** (書籍 p. 308) ⭐: `P` を `p`-群, `|Z(P)| = p`,
+`A ≤ P` を指数 `p` の可換部分群とし, `Z(P)` が `A` の直積因子 (= `↥A` の中で補元 `K` を
+もつ) とすると, `P` は `C_p ≀ C_p` の部分群と同型。
+
+`Q := K` を `P` に押し出すと `|P : Q| = |P : A| · |A : K| = p · |Z(P)| = p²` かつ
+`Q ∩ Z(P) = 1` なので **10A.5** (`exists_injective_hom_regularWreath_of_index_sq`)
+がそのまま使える。
+
+⏳ 書籍の後半「`A` は基本可換」は別の議論が要るため未形式化 (issue 1055 に記録)。 -/
+theorem exists_injective_hom_regularWreath_of_center_isComplement [Finite P] {p : ℕ}
+    [Fact p.Prime] (hP : IsPGroup p P) {A : Subgroup P} (hidx : A.index = p)
+    (hZ : Nat.card (Subgroup.center P) = p) (hZle : Subgroup.center P ≤ A)
+    {K : Subgroup ↥A} (hK : Subgroup.IsComplement' ((Subgroup.center P).subgroupOf A) K) :
+    ∃ f : P →* (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)), Function.Injective f := by
+  refine exists_injective_hom_regularWreath_of_index_sq hP
+    (Q := K.map A.subtype) ?_ ?_
+  · -- 指数の計算: `|A| = p · |K|`, `|P| = p · |A|`, `|Q| = |K|`
+    have hcardZA : Nat.card ((Subgroup.center P).subgroupOf A) = p := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZle).toEquiv, hZ]
+    have hmulA : p * Nat.card K = Nat.card ↥A := by
+      have h := hK.card_mul
+      rwa [hcardZA] at h
+    have hQK : Nat.card ↥(K.map A.subtype) = Nat.card K :=
+      (Nat.card_congr (Subgroup.equivMapOfInjective K A.subtype A.subtype_injective).toEquiv).symm
+    have hPA : Nat.card ↥A * p = Nat.card P := by
+      have h := Subgroup.card_mul_index A
+      rwa [hidx] at h
+    have hPQ := Subgroup.card_mul_index (K.map A.subtype)
+    rw [hQK] at hPQ
+    have hKpos : 0 < Nat.card K := Nat.card_pos
+    have hcalc : Nat.card K * (K.map A.subtype).index = Nat.card K * p ^ 2 := by
+      rw [hPQ, ← hPA, ← hmulA]; ring
+    exact Nat.eq_of_mul_eq_mul_left hKpos hcalc
+  · -- `Q ∩ Z(P) = 1`
+    rw [eq_bot_iff]
+    rintro x ⟨hxQ, hxZ⟩
+    obtain ⟨y, hyK, hyx⟩ := Subgroup.mem_map.mp hxQ
+    have hyZA : y ∈ (Subgroup.center P).subgroupOf A := by
+      rw [Subgroup.mem_subgroupOf]
+      show (y : P) ∈ Subgroup.center P
+      rw [show ((y : P)) = x from hyx]
+      exact hxZ
+    have hy_bot : y ∈ ((Subgroup.center P).subgroupOf A) ⊓ K := ⟨hyZA, hyK⟩
+    rw [disjoint_iff.mp hK.disjoint, Subgroup.mem_bot] at hy_bot
+    rw [Subgroup.mem_bot, ← hyx, hy_bot]
+    rfl
+
+end -- 10A.3 (前半)
+
+section /- 10A.6: 2-推移性 ⟺ G = H ∪ HgH (p. 308) -/
+
+variable {G Ω : Type*} [Group G] [MulAction G Ω]
+
+/-- **Isaacs Problem 10A.6** (書籍 p. 308) ⭐: `G` が `Ω` に推移的に作用し `H` を点
+`α` の安定化群とすると, **`G` が `Ω` に 2-推移的 ⟺ ある `g ∈ G` で `G = H ∪ HgH`**。
+
+`H`-軌道と `(H, H)`-両側剰余類の対応がそのまま中身: 「両側剰余類が高々 2 個」は
+「`H` が `Ω ∖ {α}` に推移的」と同じこと。 -/
+theorem isTwoTransitive_iff_exists_doubleCoset [MulAction.IsPretransitive G Ω] (α : Ω) :
+    (∀ a b c d : Ω, a ≠ b → c ≠ d → ∃ g : G, g • a = c ∧ g • b = d) ↔
+      ∃ g : G, ∀ x : G, x ∈ MulAction.stabilizer G α ∨
+        ∃ h₁ ∈ MulAction.stabilizer G α, ∃ h₂ ∈ MulAction.stabilizer G α,
+          x = h₁ * g * h₂ := by
+  constructor
+  · intro h2t
+    by_cases hβ : ∃ β : Ω, β ≠ α
+    · obtain ⟨β, hβα⟩ := hβ
+      obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G α β
+      refine ⟨g, fun x => ?_⟩
+      by_cases hx : x ∈ MulAction.stabilizer G α
+      · exact Or.inl hx
+      · refine Or.inr ?_
+        -- `x • α ≠ α` なので 2-推移性で `h • (g • α) = x • α` なる `h ∈ H` がある
+        have hxα : x • α ≠ α := hx
+        obtain ⟨h, hh1, hh2⟩ := h2t α (g • α) α (x • α) (fun hc => hβα (hg ▸ hc.symm))
+          (fun hc => hxα hc.symm)
+        have hhH : h ∈ MulAction.stabilizer G α := hh1
+        refine ⟨h, hhH, (h * g)⁻¹ * x, ?_, by group⟩
+        change ((h * g)⁻¹ * x) • α = α
+        rw [mul_smul, inv_smul_eq_iff, mul_smul]
+        exact hh2.symm
+    · -- `Ω` が 1 点なら `H = G`
+      refine ⟨1, fun x => Or.inl (show x • α = α from ?_)⟩
+      by_contra hc
+      exact hβ ⟨x • α, hc⟩
+  · rintro ⟨g, hg⟩ a b c d hab hcd
+    -- まず `H` が `Ω ∖ {α}` に推移的であること
+    have hHtrans : ∀ β γ : Ω, β ≠ α → γ ≠ α →
+        ∃ h : G, h ∈ MulAction.stabilizer G α ∧ h • β = γ := by
+      intro β γ hβ hγ
+      obtain ⟨u, hu⟩ := MulAction.exists_smul_eq G α β
+      obtain ⟨v, hv⟩ := MulAction.exists_smul_eq G α γ
+      have hunotH : u ∉ MulAction.stabilizer G α := fun h => hβ (hu ▸ h)
+      have hvnotH : v ∉ MulAction.stabilizer G α := fun h => hγ (hv ▸ h)
+      obtain ⟨h₁, hh₁, h₂, hh₂, hueq⟩ := (hg u).resolve_left hunotH
+      obtain ⟨k₁, hk₁, k₂, hk₂, hveq⟩ := (hg v).resolve_left hvnotH
+      refine ⟨k₁ * h₁⁻¹, Subgroup.mul_mem _ hk₁ (Subgroup.inv_mem _ hh₁), ?_⟩
+      have hβ' : β = h₁ • (g • α) := by
+        rw [← hu, hueq, mul_smul, mul_smul, show h₂ • α = α from hh₂]
+      have hγ' : γ = k₁ • (g • α) := by
+        rw [← hv, hveq, mul_smul, mul_smul, show k₂ • α = α from hk₂]
+      rw [hβ', hγ', mul_smul, inv_smul_smul]
+    -- `a`, `c` を `α` に移してから `H`-推移性を使う
+    obtain ⟨u, hu⟩ := MulAction.exists_smul_eq G a α
+    obtain ⟨v, hv⟩ := MulAction.exists_smul_eq G c α
+    have hub : u • b ≠ α := by
+      intro hc
+      exact hab (MulAction.injective u (hc.trans hu.symm)).symm
+    have hvd : v • d ≠ α := by
+      intro hc
+      exact hcd (MulAction.injective v (hc.trans hv.symm)).symm
+    obtain ⟨h, hh, hhb⟩ := hHtrans (u • b) (v • d) hub hvd
+    refine ⟨v⁻¹ * h * u, ?_, ?_⟩
+    · rw [mul_smul, mul_smul, hu, show h • α = α from hh, inv_smul_eq_iff, hv]
+    · rw [mul_smul, mul_smul, hhb, inv_smul_eq_iff]
+
+end -- 10A.6
 
 end OddOrder.Isaacs.Ch10
