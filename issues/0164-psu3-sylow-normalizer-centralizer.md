@@ -83,9 +83,21 @@ repo の PSU モデル (`GroupTheory/SpecificGroups/ProjectiveUnitary/**`) を�
 (`standardRootTorus_actsRegularlyOnInvolutions`) = 中心化群が自明。
 PSU 側では norm の核 (位数 `ℓ+1`) が効いて非自明になる — これが分岐を分ける本質。
 
+## ✅ PSU の計算は完了 (2026-07-29)
+
+新 leaf `GroupTheory/SpecificGroups/ProjectiveUnitary/TorusCentralizer.lean`:
+
+| 定理 | 内容 |
+|---|---|
+| `natCard_units_field` | `\|𝔽_{ℓ²}^×\| = 2^{2n} − 1` |
+| `exists_ne_one_mem_psuTorus_torusWeight_eq_one` | 行列式 1 のトーラスに norm 1 の非自明な元 |
+| `exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one` | **その元は `Ω₁(S₀)` を各点固定 = `C_{D₀}(Ω₁(S₀)) ≠ 1`** |
+
+AxiomsCheck 登録済、sorry ゼロ。
+
 ## 残る作業 = 橋渡し
 
-上の計算 (ungated、~100 行) に加えて:
+上の計算に加えて:
 
 1. **Ch.I §2 Prop 3 + Galois**: `W = 1` ⟹ `V` は `Q₀ ≅ 𝔽_q` 上の体自己同型群として作用し、
    `C_V(C_{Q₀}(P)) = P` (`C_{Q₀}(P)` は `P` の固定体)。
@@ -95,3 +107,23 @@ PSU 側では norm の核 (位数 `ℓ+1`) が効いて非自明になる — �
    上の非自明な `c` を `V ∖ P` の元に引き戻して (1) と矛盾させる。
 
 ⟹ **(2) が本 issue の主要な形式化コスト**。(1) と PSU の計算はいずれも見通しが立っている。
+
+
+## 橋渡しの入口を特定 (2026-07-29)
+
+`C_{D₀}(Ω₁(S₀))` の非自明元 `d` を repo の言葉に引き戻す道筋:
+
+1. `d` は `G₀ = F/Z(F)` の元で `Ω₁(S₀)` を中心化する。
+   `CentralizerPSUData.cQEquivRoot : ↥(Q.subgroupOf C_G(P)) ≃* RootGroup data.n`
+   が **`C_Q(P) ↔ S₀`** を与えるので、`Ω₁(S₀) ↔ C_{Q₀}(P)`。
+2. `d` を `F ≤ C_G(P)` の元 `x` に持ち上げると `x` は `C_{Q₀}(P) ∋ s` を中心化する。
+3. ⟹ **`x ∈ C_G(s) ≤ H`** — repo に `centralizer_le_H_of_mem_Q`
+   (`Basic.lean:557`, Ch.I §3 Prop 1(b)) が在る。**これが入口**。
+4. `d ∈ D₀` は奇位数 (Sylow 2 の補群)、`Theorem C` より `Q` は 2-群なので
+   `H = Q ⋊ D` で `D` は Hall 2'-部分群 ⟹ `x` は `D` の共役に入る。
+   `x` は `s` を中心化するので `V = C_D(s)` 側に落とす議論が要る。
+5. すると `x ∈ V ∖ P` が `C_{Q₀}(P)` を中心化し、Galois の
+   `C_V(C_{Q₀}(P)) = P` に矛盾 ⟹ PSU 分岐は起きない。
+
+⟹ 残るのは **(a) Galois の `C_V(C_{Q₀}(P)) = P`** (`W = 1` + Ch.I §2 Prop 3
+`exists_semilinear_equiv`) と **(b) 上の 4 = `C_H(s)` の Hall 分解**。
