@@ -107,9 +107,9 @@ type C / type D なら `S/Q₀` は `𝐅₂[K]`-加群で `S/Q₀ = X ⊕ Y` (`
 - [x] case (3) の `st` 位数 3 パート — **type C/D 側 2026-07-29 完了**
 - [x] case (3) の `st` 位数 3 パート — **type B 側も 2026-07-29 完了 (無条件)**
 - [x] case (3) の PSL 分岐排除 — **2026-07-29 完了** (Frobenius 論法は不要になった)
-- [ ] case (3) の `W ≠ 1` パート — **[issue 0164](0164-psu3-sylow-normalizer-centralizer.md) に gate**
-- [ ] Suzuki 2-群の位数二分法 `|P| = |Z(P)|²` (type A) / `|Z(P)|³` (type B/C/D) — 3 分岐の組み立ての前提
-- [ ] 3 分岐の組み立て (Proposition 本体)
+- [ ] case (3) の `W ≠ 1` パート — **[issue 0164](../0164-psu3-sylow-normalizer-centralizer.md) に gate**
+- [x] Suzuki 2-群の位数二分法 — **2026-07-29 完了** (`natCard_eq_sq_or_cube_of_isSuzuki2Group`)
+- [x] 3 分岐の組み立て (Proposition 本体) — **2026-07-29 完了** (`W ≠ 1` のみ仮説)
 
 ⚠ 上流優先 + 文書順に従い、**gated な部分 (PSU 計算) が出ても止まらない**:
 sorried-cite skeleton で前倒しし、ungated な genuine math を先に全部埋める
@@ -441,3 +441,38 @@ Proposition 本体 (3 分岐の disjunction) の組み立てには、書籍が
 ⚠ 部分的な代替: `K` が `Q₀^#` 上推移的なので平方写像の fibre 数え上げから
 `(|Q₀|−1) ∣ (|Q|/|Q₀| − 1)` が出て `|Q| = |Q₀|^{k+1}` (`k ≥ 1`) までは言える。
 上限 `k ≤ 2` が Higman (ξ-length ≤ 3) の内容で、そこが未 export。
+
+
+## ✅ Proposition 本体 landing (2026-07-29)
+
+`SecondCaseHypothesis.trichotomy`:
+
+```
+(Q = Q₀ ∧ orderOf (st) = 3)
+∨ (IsTypeA ↥Q ∧ orderOf (st) = 5 ∧ W = ⊥)
+∨ (IsTypeB ↥Q ∧ orderOf (st) = 3 ∧ W ≠ ⊥)
+```
+
+仮説は `ind` (Theorem A 帰納法) と **case (c) の `W ≠ 1` のみ**
+(`IsPGroup 2 Q` と `|Q₀| = 2^m` は Theorem C と `Q₀` の 2-群性から内部導出)。
+
+### 位数二分法 (Appendix III) の形式化
+
+書籍が「Appendix III の定理」として使う `|P| = |Ω₁(P)|²` / `|Ω₁(P)|³` は repo に
+無かったので新規に landing。鍵は**モデルの異方性**:
+
+| 定理 | 所在 |
+|---|---|
+| `BilinearTwistedProduct.natCard` | `QuadraticExtensions.lean` |
+| `QuadraticExtension.sq_eq_one_iff` / `natCard_sq_eq_one` / `natCard_and_natCard_sq_eq_one_of_mulEquiv` | 同上 |
+| `typeAQuadraticMap_anisotropic` | `Types.lean` (B/C/D は既存) |
+| `Type{A,B,C,D}Data.natCard_and_natCard_sq_eq_one` | `Types.lean` / `HigmanTypesCD.lean` |
+| `natCard_eq_sq_or_cube_of_isSuzuki2Group` | `Classification.lean` |
+| `natCard_sq_eq_one_eq_natCard_Q0` / `natCard_Q_eq_sq_or_cube` / `isTypeA_of_natCard_eq_sq` | `TwoKSubgroups.lean` |
+| `isMulCommutative_or_isSuzuki2Group_Q` | `Trichotomy.lean` |
+
+### 状態
+
+**残るのは [issue 0164](../0164-psu3-sylow-normalizer-centralizer.md) だけ**なので、
+本 issue は pending に移す。0164 が閉じたら `trichotomy` から `hWcube` 仮説を外して
+close する。
