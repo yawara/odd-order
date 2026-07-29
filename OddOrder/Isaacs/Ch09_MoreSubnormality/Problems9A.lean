@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.NoncommCoprod
+import OddOrder.GroupTheory.Holomorph
 import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
 
 /-!
@@ -25,6 +26,11 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9A
 * **9A.6** `layer_le_of_centralizer_le` — `H ⊴ G` で `C_G(H) ≤ H` なら `E(G) ≤ H`。
 * **9A.7** `exists_conj_map_eq_of_isSimpleFactorOf` — 非可換な極小正規部分群 `N` の
   単純直積因子 (`IsSimpleFactorOf`) たちに `G` は共役で推移的に作用する。
+* **9A.8 (骨格)** `isMulCommutative_or_isSemisimpleGroup_of_isCharacteristicallySimple` —
+  characteristically simple な有限群は abelian か semisimple。書籍 hint の
+  holomorph `Hol(G) = G ⋊ Aut(G)` (`OddOrder/GroupTheory/Holomorph.lean`) で
+  `G` の像が極小正規部分群になることから Lemma 9.6 を当てる。
+  ⏳ 残り = 各枝から「同型な単純群の直積」を組み立てる部分。
 
 ## 実装ノート (9A.1)
 
@@ -787,5 +793,36 @@ theorem exists_conj_map_eq_of_isSimpleFactorOf [Finite G] {N : Subgroup G}
   exact hT.ne_bot (le_bot_iff.mp hTle)
 
 end -- 9A.7
+
+section /- 9A.8: characteristically simple 群 (p. 277) -/
+
+open OddOrder.GroupTheory
+
+/-- `G` が characteristically simple なら, holomorph `Hol(G) = G ⋊ Aut(G)` の中で
+`G` の像は**極小正規部分群**になる (`Holomorph.normal_iff_characteristic` の帰結)。 -/
+theorem isMinimalNormal_range_inl_of_isCharacteristicallySimple
+    (h : IsCharacteristicallySimple G) :
+    Ch02.IsMinimalNormal ((SemidirectProduct.inl : G →* Holomorph G)).range := by
+  haveI := h.1
+  exact ⟨Holomorph.normal_range_inl, Holomorph.range_inl_ne_bot,
+    fun _ hKnormal hKle => Holomorph.eq_bot_or_eq_range_inl_of_normal h hKnormal hKle⟩
+
+/-- **Isaacs Problem 9A.8 の骨格** (書籍 p. 277): characteristically simple な有限群は
+abelian か semisimple のいずれか。
+
+書籍 hint の `G ⋊ Aut(G)` を使う: `G` の像は `Hol(G)` の極小正規部分群なので
+Lemma 9.6 (`isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal`) が二分を与える。 -/
+theorem isMulCommutative_or_isSemisimpleGroup_of_isCharacteristicallySimple [Finite G]
+    (h : IsCharacteristicallySimple G) :
+    IsMulCommutative G ∨ IsSemisimpleGroup G := by
+  have hmin := isMinimalNormal_range_inl_of_isCharacteristicallySimple h
+  have e : G ≃* ↥((SemidirectProduct.inl : G →* Holomorph G)).range :=
+    MonoidHom.ofInjective SemidirectProduct.inl_injective
+  rcases isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal hmin with hab | hss
+  · haveI := hab
+    exact Or.inl (isMulCommutative_of_surjective e.symm.toMonoidHom e.symm.surjective)
+  · exact Or.inr (hss.of_mulEquiv e.symm)
+
+end -- 9A.8
 
 end OddOrder.Isaacs.Ch09
