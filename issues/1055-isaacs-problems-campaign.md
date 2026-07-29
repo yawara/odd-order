@@ -6481,3 +6481,21 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
 repo には `AutTower.lean` / `AutTowerBounds.lean` / `Schenkman.lean` /
 `InnerAutomorphisms.lean` が既にあるので, まず原文 (ページ画像) で statement を確定してから
 既存資産と突き合わせる。
+
+### §9B 着手 (2026-07-29) — statement 確定 + 9B.1 完了
+
+書籍 pp. 284-285 (ページ画像 `isaacs-p284-297.png` / `isaacs-p285-298.png` で確定):
+
+* **9B.1 ✅** `S ⊴ G`, `S` complete ⟹ `G = S × T`。
+  新 leaf `Ch09_MoreSubnormality/Problems9B.lean`, `IsCompleteGroup` を定義。
+* **9B.2** `Z(G) = 1`, automorphism tower `G = G₁ ⊲ G₂ ⊲ ⋯`。`G ⊲ Gᵢ` なら `i ≤ 2`。
+* **9B.3** `G` semisimple ⟹ `Aut(G)` は complete, ゆえに tower は高々 2 種類。
+* **9B.4** `G` = 位数 `2n` の二面体群 (`n` 奇数)。`Z(G) = 1` で tower は高々 2 種類。
+* **9B.5** `G = AB` (`A, B` ⊲⊲ **subnormal**) ⟹ `G^∞ = A^∞ B^∞`。
+  hint: まず両方 normal の場合、次に `|G|` の帰納法。
+
+**既存資産**: `AutTower.lean` (`autTowerType` / `autTowerStep` / `autTowerEmb` /
+`center_autTowerType_eq_bot` / `chainAux`) / `AutTowerBounds.lean` / `Schenkman.lean` /
+`InnerAutomorphisms.lean` (Lemma 9.11 一式: `innAut` / `conj_ker` / `centralizer_innAut_eq_bot`
+/ `center_mulAut_eq_bot`)。9B.2-9B.4 はこの tower インフラの上に書ける見込み。
+9B.5 は `nilpotentResidual` (`Ch09/NilpotentResidual.lean` の `G^∞`) を使う。
