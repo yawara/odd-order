@@ -6422,3 +6422,38 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
   (`iSupIndep_of_semisimpleFamily` が非可換枝の独立性を与える)。
 * 規模的に 2-3 iteration 想定。holomorph + characteristic 対応を先に別 leaf
   (`OddOrder/GroupTheory/Holomorph.lean` 相当) に切り出すのが素直。
+
+### 9A.8 の進捗 (2026-07-29) — 骨格 + semisimple 枝が landing、残りは abelian 枝
+
+* **holomorph 新設** `OddOrder/GroupTheory/Holomorph.lean` (issue 9214 claim 済):
+  `Holomorph G = G ⋊[id] MulAut G` / `conj_inl` (`inr σ` の共役 = `σ` の作用) /
+  `conj_inl_general` (`y (inl x) y⁻¹ = inl (y.left · y.right x · y.left⁻¹)`) /
+  **`normal_iff_characteristic`** / `IsCharacteristicallySimple` /
+  `eq_bot_or_eq_range_inl_of_normal` / `Finite (Holomorph G)`。
+* **骨格 ✅** `isMulCommutative_or_isSemisimpleGroup_of_isCharacteristicallySimple`
+  (`inl.range` が極小正規 ⟹ Lemma 9.6)。
+* **semisimple 枝 ✅** `exists_simpleFamily_of_isSemisimpleGroup_of_isCharacteristicallySimple`
+  (同型性は 9A.7 を `Hol(G)` で当てる; 橋は `isSimpleFactorOf_map_inl`)。
+* `Semisimple.lean` に `IsSemisimpleGroup.of_mulEquiv` を追加。
+
+**残り = abelian 枝**。設計:
+
+1. **characteristically simple + abelian ⟹ elementary abelian**:
+   `p` を `|G|` の素因数に取り (`Nat.exists_prime_and_dvd`, `|G| > 1`),
+   `K := {x | x^p = 1}` は `G` 可換ゆえ部分群で **characteristic** (自己同型が `x^p=1` を保つ)。
+   Cauchy (`exists_prime_orderOf_dvd_card`) で `K ≠ ⊥` なので `K = ⊤`,
+   すなわち `IsElementaryAbelian p G`。
+   ⚠ `{x | x^p = 1}` を `Subgroup` にするには `IsMulCommutative G` から `CommGroup G` を
+   `letI` で作る (`IsMulCommutative.of_comm` の逆向き; `PRank.lean` の `zmodModule` が
+   `letI : CommGroup G := inferInstance` でやっている形が参考になる)。
+2. **elementary abelian ⟹ 位数 p の部分群の直積**:
+   `IsElementaryAbelian.zmodModule` (`PRank.lean`) で `Module (ZMod p) (Additive G)`,
+   `ZMod p` は体 (p 素数) なので `Module.Basis.ofVectorSpace` で基底を取る。
+   族 = 各基底ベクトルの張る `Submodule` を
+   `AddSubgroup.toZModSubmodule p` (order iso, `PRank.lean` で使用実績) と
+   `Subgroup.toAddSubgroup` で `Subgroup G` に戻したもの。
+   * 各因子は位数 `p` ⟹ `isSimpleGroup_of_prime_card` で単純, 互いに同型 (どれも `ZMod p`)。
+   * `iSupIndep` は基底の線形独立性を order iso で移す。
+   * `sSup = ⊤` は `Basis.span_eq`。
+3. 最後に骨格の 2 分岐を合流させて 9A.8 本体
+   (`exists_simpleFamily_of_isCharacteristicallySimple`) を組む。
