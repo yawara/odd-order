@@ -75,14 +75,49 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 
 ## やること
 
-- [ ] `txt ∉ H ∪ Ht ∪ tH` (`x ∈ Q^#`) — `H ⊓ H^t = D` 相当が要る
-- [ ] `f, g : Q^# → Q^#`, `h : Q^# → D` の定義と一意性 (canonical form + `H = Q ⋊ D`)
-- [ ] (1) の `K`-同変性
-- [ ] `r` の位数 4 (`st` 位数 5 から) と (3)
-- [ ] (4) の主計算 ⟹ `h(rr^{-k}) = ℓ²k² ∈ K`
+- [x] `txt ∉ H ∪ Ht` (`x ∈ Q^#`)
+- [x] `f, g : Q^# → Q^#`, `h : Q^# → D` の定義と一意性 (canonical form + `H = Q ⋊ D`)
+- [x] (1) の `K`-同変性
+- [x] (3) `trt = rts` / `tr⁻¹t = str⁻¹` と `h(s)=h(r)=h(r⁻¹)=1`
+- [x] `r² ≠ 1` (`st` 位数 5 から)
+- [x] (4) の主計算 ⟹ `h(rr^{-k}) = ℓ²k² ∈ K`
+- [ ] `ℓ` の存在 (`K` は `Q₀^#` 上正則) と `rr^{-k} ∈ Q^#`
+- [ ] `r` の位数がちょうど 4 (Suzuki 2-群は指数 4)
 - [ ] 軌道代表系の非共役性 (前半 3 件)
 - [ ] p.119 の `rr^{-k₁}` 同士の非共役性 (体同一視 + involution の矛盾)
 - [ ] `(SK) ∪ (SKtS)` が部分群
+
+## 進捗 (2026-07-29)
+
+新 leaf **`StructureOfH/TConjugateTriple.lean`** (sorry ゼロ、AxiomsCheck 登録済):
+
+| 定理 | 内容 |
+|---|---|
+| `t_conj_notMem_H_of_mem_Q` / `t_conj_notMem_mul_t` | `txt ∉ H`, `txt ∉ Ht` |
+| `existsUnique_tConjTriple` | `txt = g·h·t·f` の存在・一意 |
+| `tConjLeft` / `tConjMiddle` / `tConjRight` (+ `tConjTriple_spec`, `tConjTriple_eq_of`) | 書籍の `g` / `h` / `f` |
+| `tConjTriple_conj` | **(1)** `f(xᵃ)=f(x)^{a⁻¹}`, `g(xᵃ)=g(x)^{a⁻¹}`, `h(xᵃ)=a h(x) a` |
+| `t_conj_mul` | `t` 共役の乗法性 (汎用) |
+| `structureConjugator_ne_one` | `r ≠ 1` |
+| `t_conj_structureConjugator{,_inv}` | **(3)** `trt = rts`, `tr⁻¹t = str⁻¹` |
+| `tConjTriple_{distinguishedInvolution,structureConjugator,structureConjugator_inv}` | `h(s)=h(r)=h(r⁻¹)=1` |
+| `sq_st_eq_conj_structureConjugator` | `(st)² = (st)^r` |
+| `structureConjugator_sq_ne_one` | `orderOf (st) = 5 ⟹ r² ≠ 1` |
+| **`t_conj_structureConjugator_mul_conj_inv`** | **(4)** 主計算 (`h(rr^{-k}) = ℓ²k²`) |
+
+⚠ (4) の証明で `k`, `ℓ` の可換性は**不要**だった (両辺とも
+`r ℓ r⁻¹ · t · r ℓ⁻¹ k⁻¹ r⁻¹ k⁻¹` に正規化される)。
+
+### 次の一手
+
+1. **`ℓ` の存在**: `k ∈ K^#` に対し `s·(ksk⁻¹) ∈ Q₀^#` なので `K` の `Q₀^#` 上の正則性
+   (`KCyclic.lean` `conjQ0bar_transitive` / `ActualKActor.lean`) から一意な `ℓ ∈ K` で
+   `sksk⁻¹ = ℓ⁻¹ s ℓ`。`K` (部分群) を使うので `KCyclic` の import が要る。
+2. **`rr^{-k} ∈ Q ∖ {1}`**: `r ∈ Q`, `K ≤ D` は `Q` を正規化。`≠ 1` は
+   「`r r^{-k} = z ∈ Q₀` なら `(r²)^k = (rz)² = r²` で `K` の自由作用に矛盾」(p.118)。
+3. **`orderOf r = 4`**: `r² ≠ 1` + Suzuki 2-群の指数 4 (`Z(Q) = Ω₁(Q) = Q₀`,
+   `Q/Z(Q)` 基本可換)。
+4. 軌道代表系の非共役性 → 体同一視 (p.119) → 部分群。
 
 ## 完了条件
 
