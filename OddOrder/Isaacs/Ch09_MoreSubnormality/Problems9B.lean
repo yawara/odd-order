@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Commutator.Basic
-import Mathlib.GroupTheory.SpecificGroups.Dihedral
 import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
@@ -436,33 +435,5 @@ theorem nilpotentResidual_top_eq_sup_of_isSubnormal [Finite G] {A B : Subgroup G
     (sup_le (nilpotentResidual_mono le_top) (nilpotentResidual_mono le_top))
 
 end -- 9B.5
-
-section /- 9B.4 の部品: D_{2n} (n 奇数) の回転部分群 (p. 285) -/
-
-/-- **`n` 奇数なら `D_{2n}` で `x ^ n = 1` ⟺ `x` は回転** (`r i` の形)。
-
-回転は `(r i)^n = r (n • i) = r 0 = 1`、鏡映は位数 2 で `n` が奇数なので
-`(sr i)^n = sr i ≠ 1`。これで「回転全体」= `{x | x ^ n = 1}` は自己同型で保たれる
-(= characteristic) ことが分かり、`Aut(D_{2n}) → Aut(Z/n)` を作る足場になる。 -/
-theorem dihedral_pow_eq_one_iff_exists_r {n : ℕ} (hodd : Odd n) (x : DihedralGroup n) :
-    x ^ n = 1 ↔ ∃ i : ZMod n, x = DihedralGroup.r i := by
-  cases x with
-  | r i =>
-    refine ⟨fun _ => ⟨i, rfl⟩, fun _ => ?_⟩
-    rw [DihedralGroup.r_pow]
-    simp
-  | sr i =>
-    constructor
-    · intro hx
-      exfalso
-      have h2 : (2 : ℕ) ∣ n := by
-        have hdvd := orderOf_dvd_of_pow_eq_one hx
-        rwa [DihedralGroup.orderOf_sr] at hdvd
-      obtain ⟨k, hk⟩ := hodd
-      omega
-    · rintro ⟨j, hj⟩
-      simp at hj
-
-end -- 9B.4 の部品
 
 end OddOrder.Isaacs.Ch09
