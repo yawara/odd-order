@@ -287,6 +287,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
@@ -14144,3 +14145,27 @@ The one pair left is `r r^{-k₁}` versus `r r^{-k₂}`, which is the field comp
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_structureConjugator_ne_mul_conj_inv
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_structureConjugator_inv_ne_mul_conj_inv
+
+/-! **The counting set-up for the `K`-orbits of `S#`** (issue 0165, 2026-07-29).
+`GroupTheory/FreeActionOrbitCount.lean` and
+`Appendices/Suzuki/StructureOfH/OrderFiveOrbits.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+`exists_mem_orbit_of_card_mul_succ_eq` is the counting criterion in the exact shape the book
+uses: `K` acts on `S` by conjugation fixing only `1`, freely elsewhere, and the list of
+representatives has `|ι| · |K| + 1 = |S|`.  `orbitRepVal` names the book's list over the index
+type `Fin 3 ⊕ K#`, and `card_orbitReprIndex_mul_card_K_succ` is the identity
+`(q + 1)(q − 1) + 1 = q²` that case (b) supplies through `|Q| = |Q₀|²` and `|K| = |Q₀| − 1`. -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.FreeActionOrbitCount.exists_mem_orbit_of_card_mul_succ_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.FreeActionOrbitCount.exists_mem_orbit_of_card_mul_eq_index
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orbitRepVal_mem_Q
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orbitRepVal_ne_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orbitRepVal_mem_orbitReprSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_K_ne_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_orbitReprIndex_mul_card_K_succ

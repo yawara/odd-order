@@ -240,3 +240,36 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
    `x_i ≠ 1` は「`α(fg) = 0` ⟹ `fg ∈ Q₀` かつ `(t rr^{-k} t)² = g t (fg)^h t f`、
    `t(fg)^h t ∈ I ∩ (G−H)` と `fg ∈ I ∩ H` の involution 積が involution」で矛盾。
 4. `exists_mem_orbit_of_card_mul_eq` に流して `hcover` ⟹ §2 Proposition 完成。
+
+
+## 数え上げの足場が landing + 不変量による一括分離のアイデア (2026-07-29)
+
+新 leaf **`StructureOfH/OrderFiveOrbits.lean`**:
+
+* `OrbitReprIndex := Fin 3 ⊕ {k : ↥K // k ≠ 1}` / `orbitRepVal` (書籍の代表族)
+* `orbitRepVal_{mem_Q, ne_one, mem_orbitReprSet}` / `card_K_ne_one`
+* **`card_orbitReprIndex_mul_card_K_succ`** — `|ι|·|K| + 1 = |Q|`
+  (case (b) の `|Q| = q²` と `|K| = q−1` から `(q+1)(q−1)+1 = q²`)
+
+`GroupTheory/FreeActionOrbitCount.lean` に汎用判定を 2 本:
+* `exists_mem_orbit_of_card_mul_succ_eq` — **不動点 1 個 + それ以外自由**版
+  (`Option (ι × Γ) → S` が単射 ⟹ 全射)。`K` の `Q` への共役作用そのものの形。
+* `exists_mem_orbit_of_card_mul_eq_index` — 添字版 (不動点なし)
+
+### 残る `hrep` (代表が互いに非共役) を**不変量 1 本**で処理する設計
+
+`y ∈ Q^#` に対し 3 つの `K`-軌道不変量 `(y ∈ Q₀, g(y) ∈ Q₀, f(y) ∈ Q₀)` を取る
+(`Q₀` は `K`-不変、`f`,`g` は (1) で同変)。値は
+
+| 代表 | `y ∈ Q₀` | `g(y) ∈ Q₀` | `f(y) ∈ Q₀` |
+|---|---|---|---|
+| `s` | ✓ | — | — |
+| `r` | ✗ | ✗ (`g(r) = r`) | ✓ (`f(r) = s`) |
+| `r⁻¹` | ✗ | ✓ (`g(r⁻¹) = s`) | ✗ (`f(r⁻¹) = r⁻¹`) |
+| `rr^{-k}` | ✗ | ✗ | ✗ |
+
+**4 つの値がすべて異なる** ので、族間の非共役は 16 通りの場合分けでなく
+この不変量の比較 1 本で済む。族内 (`rr^{-k₁}` vs `rr^{-k₂}`) だけが p.119。
+
+⟹ 次の一手: `orbitReprSet_covers` を
+`exists_mem_orbit_of_card_mul_succ_eq` + 上の不変量 + p.119 を仮説にして組む。
