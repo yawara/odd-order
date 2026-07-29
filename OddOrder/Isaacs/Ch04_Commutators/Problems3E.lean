@@ -381,6 +381,57 @@ theorem exists_isAInvariant_isPGroup_of_isSolvable_aut {G : Type u} [Group G] [F
       OddOrder.Isaacs.Ch03.IsAInvariant φ H :=
   exists_isAInvariant_isPGroup_solvableA_aux (Nat.card G) φ le_rfl
 
+/-- **Isaacs Problem 3E.2** (書籍 p. 106): 互いに素な作用で `G = HK` (`H`, `K` は `A`-不変)
+なら `C_G(A) = (C_G(A) ∩ H)(C_G(A) ∩ K)`。
+
+`c ∈ C_G(A)` を `c = h₀k₀` と書くと `H ∩ c K` は `A`-不変な `H ∩ K` の剰余類なので,
+Thm 3.27 (`aInvariant_coset_mem_centralizer`) により `A`-固定点 `c'` を含む。
+`c'` は `C ∩ H` に入り `c'⁻¹c ∈ C ∩ K`。 -/
+theorem actionFixedSubgroup_eq_mul (φ : A →* MulAut G)
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {H K : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H)
+    (hK : OddOrder.Isaacs.Ch03.IsAInvariant φ K)
+    (hHK : ∀ g : G, ∃ h ∈ H, ∃ k ∈ K, g = h * k) :
+    ((actionFixedSubgroup φ : Subgroup G) : Set G)
+      = ((actionFixedSubgroup φ ⊓ H : Subgroup G) : Set G) *
+        ((actionFixedSubgroup φ ⊓ K : Subgroup G) : Set G) := by
+  ext c
+  constructor
+  · intro hc
+    have hcfix : ∀ a : A, (φ a) c = c := hc
+    obtain ⟨h₀, hh₀, k₀, hk₀, hceq⟩ := hHK c
+    have hcoset : ∀ a : A, ∃ n ∈ H ⊓ K, (φ a) h₀ = h₀ * n := by
+      intro a
+      refine ⟨h₀⁻¹ * (φ a) h₀,
+        Subgroup.mem_inf.mpr ⟨mul_mem (inv_mem hh₀) (hH.smul_mem a hh₀), ?_⟩, by group⟩
+      have hsplit : (φ a) h₀ * (φ a) k₀ = c := by
+        rw [← map_mul, ← hceq, hcfix a]
+      have hval : h₀⁻¹ * (φ a) h₀ = k₀ * ((φ a) k₀)⁻¹ := by
+        have h1 : (φ a) h₀ = c * ((φ a) k₀)⁻¹ := by
+          rw [← hsplit]
+          group
+        rw [h1, hceq]
+        group
+      rw [hval]
+      exact mul_mem hk₀ (inv_mem (hK.smul_mem a hk₀))
+    obtain ⟨c', ⟨n, hn, hc'eq⟩, hc'fix⟩ :=
+      aInvariant_coset_mem_centralizer hCop hSolv (hH.inf hK) hcoset
+    have hnH : n ∈ H := (Subgroup.mem_inf.mp hn).1
+    have hnK : n ∈ K := (Subgroup.mem_inf.mp hn).2
+    refine ⟨c', Subgroup.mem_inf.mpr ⟨hc'fix, by rw [hc'eq]; exact mul_mem hh₀ hnH⟩,
+      c'⁻¹ * c, Subgroup.mem_inf.mpr ⟨?_, ?_⟩, by group⟩
+    · intro a
+      rw [map_mul, map_inv, hc'fix a, hcfix a]
+    · have : c'⁻¹ * c = n⁻¹ * k₀ := by
+        rw [hc'eq, hceq]
+        group
+      rw [this]
+      exact mul_mem (inv_mem hnK) hk₀
+  · rintro ⟨x, hx, y, hy, rfl⟩
+    intro a
+    rw [map_mul, (Subgroup.mem_inf.mp hx).1 a, (Subgroup.mem_inf.mp hy).1 a]
+
 end -- 3E
 
 end OddOrder.Isaacs.Ch04

@@ -34,7 +34,25 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       **§3D 🎉 完済 (2026-07-29)**: 3D.1(a)(b) / 3D.2 / 3D.3 / 3D.4 / 3D.5 全問
       (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
       **§3E 進行中 (2026-07-29)**: **3E.1 ✅ (両ケース)** / 3E.3 ✅
-      (新 leaf **`Ch04_Commutators/Problems3E.lean`** 386 行)。残り = 3E.2 / 3E.4 / 3E.5。
+      (新 leaf **`Ch04_Commutators/Problems3E.lean`**)。残り = **3E.4 / 3E.5**。
+
+* ✅ **3E.2** `actionFixedSubgroup_eq_mul` (2026-07-29): `c ∈ C` を `c = h₀k₀` と書くと
+  `H ∩ cK` は `A`-不変な `H ∩ K` の剰余類なので Thm 3.27
+  (`aInvariant_coset_mem_centralizer`) が `A`-固定点 `c'` を与える。
+  `c' ∈ C ∩ H` かつ `c'⁻¹c ∈ C ∩ K`。一発 green。
+
+**3E.5 の証明経路 (確定済)**: `K` を `G` の `P/Φ(P)` への作用の核とすると `P ≤ K`。
+逆は「`K` は `p`-群」を示す: `q ≠ p` 素数と `K` の位数 `q` の元 `x` について
+`⟨x⟩` は `P` に互いに素に作用し `P/Φ(P)` 上自明なので **3D.4**
+(`smul_eq_self_of_trivial_mod_frattini`) で `P` に自明に作用、すなわち
+`⟨x⟩ ≤ C_G(P) = C_G(O_p(G)) ≤ O_p(G) = P` (Hall–Higman, `O_{p'}(G) = 1`) となり
+`q`-群が `p`-群に入って矛盾。ゆえに `K` は正規 `p`-群で `K ≤ O_p(G) = P`。
+⚠ 実装コスト = `⟨x⟩ ≤ N_G(P)` の共役作用 `MulDistribMulAction ↥⟨x⟩ ↥P` の plumbing。
+
+**3E.4 の未確認事項**: 書籍 Hint の「Lemma 3.32」の内容を原文で確認していない
+(`|H : H ∩ C| ∣ |G : C|` と `|C : C ∩ H| ∣ |G : H|` の 2 主張)。
+`A`-固定点の集合が `G/H` 上で `C`-軌道 1 個 (サイズ `[C : C∩H]`) になることまでは
+確認済だが、そこから整除性を出す一手が未確定。着手前に p.104 付近を読むこと。
 
 ### §3E の置き場と統制情報 (2026-07-29)
 
