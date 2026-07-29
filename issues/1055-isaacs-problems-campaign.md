@@ -6731,3 +6731,42 @@ statement (ページ画像 `isaacs-p289-302.png`): `G = ⟨A, B⟩`, `A, B ⊲�
 **repo の材料**: `Ch02.IsMinimalNormal` / `exists_isMinimalNormal_le_of_normal` は在る。
 「極小正規は characteristically simple」「characteristically simple の subnormal 部分群は
 normal」に相当する補題が repo にあるかは未確認 (次 iteration で実測)。
+
+## Ch.9 §9D — 着手 (2026-07-29)
+
+書籍 p. 294 (`Problems 9D`)。§9D の infra (`SubnormalClosure.lean` = Thm 9.28 Bartels /
+`StrongConjugacy.lean` = Lem 9.29-9.30 / `SylowSubnormal.lean` = Lem 9.31) は
+すべて repo に sorry-free で在るので、演習は既存 API の上で書ける。
+
+* **9D.1 ✅** `exists_unique_greatest_isSubnormal_le` (新設 `Problems9D.lean`)。
+  `subnormalCore X := sSup {S | S ≤ X ∧ S.IsSubnormal}`。**Wielandt 結合定理の族版**
+  (`Ch02.isSubnormal_sSup_of_isSubnormal`) が直接効くので極大元を取る議論は不要。
+  `X`-正規性は「共役も `X` 内の subnormal 部分群 ⟹ 最大性で戻る」+ 位数一致で等号。
+* **9D.2 ✅** `isSubnormal_strongCore` / `normal_strongCore_subgroupOf`。
+  `strongCore X := sInf {Y | IsStronglyConjugate X Y}`。
+  * `X`-正規性: `x ∈ X` の共役は強共役全体を**置換**する (`Y ~ X ⟹ x•Y ~ x•X = X`)。
+  * 書籍 hint `L^{(G)} ⊆ X` (`strongClosure_strongCore_le`) ⭐: `M = g•L` が `L` の強共役
+    (`g ∈ L ⊔ M`) のとき、その所属関係を `g⁻¹` で共役すると `g ∈ L ⊔ (g⁻¹•L)`。
+    `L ≤ X` から `g⁻¹ ∈ X ⊔ (g⁻¹•X)` = **`g⁻¹•X` は `X` の強共役** ⟹ `L ≤ g⁻¹•X` ⟹ `M ≤ X`。
+  * subnormal 性は書籍が導出を書いていないが、hint から `L ≤ L^{(G)} ≤ X` と `L ◁ X` で
+    `L ◁ L^{(G)}`、`L^{(G)} ◁◁ G` (Thm 9.28) と合わせて `IsSubnormal.step` 一発。
+    ⚠ `L = L^{(G)}` を示す必要は無い (`G = S₄`, `X` = 位数 4 巡回群で `L = 1` だが
+    `subnormalCore X` は位数 2 — 両者は一致しない)。
+
+### 残り
+
+* **9D.3** subnormal core は `X` の共役たちの交わりでは書けない (`G = S₄`, `X` = 位数 4 巡回群)。
+  紙の計算は済み: `S₄` の subnormal 部分群は `1`/`V₄` の部分群/`V₄`/`A₄`/`S₄` なので
+  `subnormalCore ⟨(1234)⟩ = ⟨(13)(24)⟩` (位数 2)。一方 `X` の共役は 3 個で、相異なる 2 つの
+  交わりは `1`、1 個だけなら位数 4 ⟹ 位数 2 は作れない。**具体群の計算なので `Equiv.Perm (Fin 4)`
+  での decide/計算量が主な課題**。
+* **9D.4** Kegel 予想 (Lem 9.31 の逆) の極小反例で `G`, `S` が非可換単純であることを示す。
+  極小正規部分群を取る hint。
+
+## ⏸ 9C.3 は deferred (2026-07-29)
+
+step (b) の未解決点 (前節に記録) が残るため、文書順を一時外して §9D を先行させた
+(issue 1055 の方針「1 問で堂々巡りせず、genuine に blocked なら記録して先へ進み後で戻る」)。
+Web 検索 (Wielandt の該当定理の証明) では該当文献に当たらなかった。次に戻るときは
+CLAUDE.md の [[feedback-ask-chatgpt-for-elided-gaps]] 手順 (最強モデルに自己完結プロンプト)
+を使う。
