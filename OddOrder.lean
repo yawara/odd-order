@@ -233,6 +233,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Conjugacy
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiLength
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3F
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3FSpecialLinear
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsFaithfulOrbit

@@ -36,7 +36,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       **§3E 🎉 完済 (2026-07-29)**: 3E.1 (両ケース) / 3E.2 / 3E.3 / 3E.4 / 3E.5 全問
       (`Ch04_Commutators/Problems3E.lean` 748 行, axiom-clean)。
       **§3F 進行中 (2026-07-29)**: **3F.1 ✅ / 3F.2 ✅ / 3F.3 ✅**
-      (新 leaf `Ch03_SplitExtensions/Problems3F.lean`)。残り = 3F.4 / 3F.5。
+      **3F.4 ✅** (新 leaf `Problems3F.lean` / `Problems3FSpecialLinear.lean`)。
+      **残り = 3F.5 のみ**。
 
 * ✅ **3E.2** `actionFixedSubgroup_eq_mul` (2026-07-29): `c ∈ C` を `c = h₀k₀` と書くと
   `H ∩ cK` は `A`-不変な `H ∩ K` の剰余類なので Thm 3.27
@@ -6208,3 +6209,27 @@ repo/mathlib に「有限冪零群の Sylow と Hall `p'` が元ごとに可換�
   `Subgroup.map_map` + `MonoidHom.ext` で `(φ.symm.trans ψ) ∘ φ = ψ`。
 
 **⟹ 残り = 3F.4 (`SL(2,3)`) と 3F.5**。
+
+### 3F.4 完了 (2026-07-29) — `SL(2,3)` は `decide` で全部片付く
+
+新 leaf `Ch03_SplitExtensions/Problems3FSpecialLinear.lean` (行列群の import と
+具体計算をここに隔離)。⚠ **前 iteration の見積り「decide の重さは未計測」は外れで、
+全部 kernel `decide` が通る (leaf build 5.8s)**:
+
+* `card_specialLinearTwoThree : Nat.card SL(2,3) = 24` — `Nat.card_eq_fintype_card` +
+  `decide` (81 行列の det 判定)。
+* `slQuaternionI = [[0,-1],[1,0]]`, `slQuaternionJ = [[1,1],[1,-1]]` —
+  `⟨!![…], by decide⟩` で det = 1。
+* `quaternionToSL23 : Q_8 →* SL(2,3)` — 台写像を `a k ↦ i^k`, `xa k ↦ j * i^k` と
+  `i.val` 経由で定義し `MonoidHom.mk' _ (by decide)` (64 通り)。単射性も `decide`。
+* `sylowTwoSL23 := quaternionToSL23.range`、正規性も `decide` (24×8 通り)。
+  ⚠ `Subgroup.Normal` を直接 `⟨by decide⟩` にすると `sylowTwoSL23` が `def` で
+  unfold されず `Decidable` instance 合成に失敗する → **`quaternionToSL23.range` と
+  書いた別 theorem にして `⟨thm⟩` で渡す**。
+* `exists_normal_sylow_two_mulEquiv_quaternion` — `Sylow.ofCard` で `Sylow 2` に
+  仕立てる。⚠ `(24:ℕ).factorization 2 = 3` は `decide` 不可 (Finsupp) →
+  `Nat.Prime.pow_dvd_iff_le_factorization` を上下から当てて `omega`。
+
+⚠ `native_decide` は使っていない (axiom-clean 維持)。
+
+**⟹ §3F の残りは 3F.5 のみ** (`G = GL(2,3) ⊃ S` 指数 2 と、`Thm 3.36` で作る `H`)。
