@@ -6993,3 +6993,44 @@ repo の `WreathRecognition.lean` の私有補題 `nonempty_mulEquiv_wreath_of_c
 
 lane a は main より **88 commits 先行**した状態が続いている (hub の合流待ち)。
 レーン側は規約どおり leaf build のみで検証しフルビルドは打っていない。
+
+### 10B.2 の骨格 landing (2026-07-29)
+
+`le_socle_of_exists_normal_complement`: `E` の中で `Soc(G) ⊓ E` が `G`-不変な補元 `M` を
+もてば `E ≤ Soc(G)`。
+
+⚠ 当初「`|E|` の帰納 + 補元の部分群への降下 (要 modularity)」を想定していたが**不要**だった:
+補元 `M` が非自明なら `M ⊇ M₀` (極小正規) で `M₀ ≤ Soc(G) ⊓ E ⊓ M = ⊥` と即矛盾するので
+`M = ⊥`。帰納法も modularity も要らない。
+
+⟹ **10B.2 の残りは Maschke だけ**: `p′`-群 `G/C_G(E)` の `p`-群 `E` への作用が完全可約
+であること。実装経路 (`Additive ↥E` の `ZMod p`-加群化 → `Representation` →
+`MonoidAlgebra.Submodule.exists_isCompl`) は前節に記録済。
+
+## 2026-07-29 セッションの成果まとめ (lane a)
+
+**Isaacs §9B 完済 / §9C 2/3 / §9D 3/4 / §10A 5/7 + 10B.2 骨格**。landing 一覧:
+
+| 問題 | 定理名 | 備考 |
+|---|---|---|
+| 9B.4 | `isCompleteGroup_mulAut_dihedralGroup` | 新設 `GroupTheory/DihedralAut.lean` (issue 9215) |
+| 9C.1 | `relCore_thompsonWielandtCore_eq_bot_or_of_isSubnormal` | 新設 `Problems9C.lean` + issue 9216 |
+| 9C.2 | `pResidualOf_top_eq_sup_of_isSubnormal` | 9B.5 との重複を共有補題に切り出し |
+| 9D.1 | `exists_unique_greatest_isSubnormal_le` | 新設 `Problems9D.lean` |
+| 9D.2 | `isSubnormal_strongCore` | |
+| 9D.3 | `subnormalCore_ne_sInf_conj` | `S₄` の具体計算 (`decide` の罠 5 点を記録) |
+| 9D.4 | `KegelHypothesis` + 降下 2 本 | 本体は未了 |
+| 10A.1 | `isRegularPGroup_two_iff_commute` | 新設 `Problems10A.lean` |
+| 10A.2 | `pow_mul_eq_one_of_isRegularPGroup` | |
+| 10A.3前半 | `exists_injective_hom_regularWreath_of_center_isComplement` | 10A.5 に帰着 |
+| 10A.5 | `exists_injective_hom_regularWreath_of_index_sq` | |
+| 10A.6 | `isTwoTransitive_iff_exists_doubleCoset` | |
+| 10A.7 | `exists_surjective_wreath_of_mem_compl_orders` | repo の Cor 10.5 に帰着 |
+| 10B.2骨格 | `le_socle_of_exists_normal_complement` | 残りは Maschke |
+
+共有インフラ: `le_oPiCore_of_isSubnormal` (9216) / `pResidualOf_mono` /
+`card_le_of_lt_top`・`mul_eq_univ_comm`・`subgroupOf_mul_inf_subgroupOf_eq_univ`・
+`sup_eq_top_of_mul_eq_univ` (`SubgroupInAmbient.lean`) / `mulEquivMulAutOfIsCompleteGroup`。
+
+**未解決として明示記録したもの**: 9C.3 step (b) / 9D.4 の `N` 非可換ケースと「`S` も単純」/
+10A.3 後半 (`A` 基本可換) / 10B.2 の Maschke。
