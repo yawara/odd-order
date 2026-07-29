@@ -36,6 +36,11 @@ This leaf carries the **case (1)** branch, the book's
   `x ∈ S` such that `x² = s` (since `K` is transitive on `Q₀^#`)".
 * `Q_eq_Q0_of_commute_of_centralizer_le` — the case-(1) core: an abelian `Q`
   whose `P`-centralizer lies in `Q₀` equals `Q₀`.
+* `centralizer_le_Q0_and_orderOf_st_of_commute` — the branch selection: an
+  abelian `Q` forces the `PSL(2, ℓ)` alternative of Ch. I §3 Proposition 1(c),
+  giving `orderOf (st) = 3` and `C_Q(P) ≤ Q₀`.
+* `Q_eq_Q0_and_orderOf_st_of_commute` — **case (1)**: if `Q` is abelian then
+  `Q = Q₀` and `st` has order `3`.
 -/
 
 set_option autoImplicit false
@@ -225,6 +230,96 @@ namespace SecondCaseHypothesis
 
 variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
   (sc : SecondCaseHypothesis G Ω)
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (1), branch selection**
+(p. 117): "Suppose that `S` is abelian.  Then `C_S(P)` is abelian and so `st`
+has order `3` and `C_S(P) ⊂ Q₀`."
+
+An abelian `Q` makes `C_Q(P)` abelian, which rules out the two branches of
+Ch. I §3 Proposition 1(c) whose payload is a Suzuki `2`-group (those are
+non-abelian by definition).  The remaining `PSL(2, ℓ)` branch carries
+`orderOf (st) = 3` and gives `|C_{Q₀}(P)| = |F| = |C_Q(P)|`, which upgrades the
+inclusion `C_{Q₀}(P) ≤ C_Q(P)` to an equality. -/
+theorem centralizer_le_Q0_and_orderOf_st_of_commute
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hcomm : ∀ a ∈ sc.toHypothesis.Q, ∀ b ∈ sc.toHypothesis.Q, Commute a b)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ sc.toHypothesis.V) :
+    sc.toHypothesis.Q ⊓ Subgroup.centralizer (P : Set G) ≤ sc.toHypothesis.Q0 ∧
+      orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t)
+        = 3 := by
+  classical
+  set C : Subgroup G := Subgroup.centralizer (P : Set G) with hCdef
+  -- `C_Q(P)` inherits commutativity from `Q`
+  haveI habel : IsMulCommutative ↥(sc.toHypothesis.Q.subgroupOf C) :=
+    ⟨⟨fun a b => Subtype.ext (Subtype.ext
+      (hcomm _ (Subgroup.mem_subgroupOf.mp a.2) _
+        (Subgroup.mem_subgroupOf.mp b.2)))⟩⟩
+  -- `P ≠ 1`, since it has prime order
+  have hPne : P ≠ ⊥ := by
+    intro h
+    rw [h, Subgroup.card_bot] at hPcard
+    exact hp.one_lt.ne hPcard
+  letI := sc.toHypothesis.centralizerQuotientMulAction hPV
+  obtain ⟨data⟩ := sc.toHypothesis.centralizer_trichotomy_of_induction hPV hPne
+    (sc.twoRank_centralizer_ge_two P hPV p hp hPcard) ind
+  -- the `C_Q(P) ≤ Q₀` half, given the two matching cardinalities
+  have hle : ∀ n : ℕ,
+      Nat.card ↥(sc.toHypothesis.Q0.subgroupOf C) = n →
+      Nat.card ↥(sc.toHypothesis.Q.subgroupOf C) = n →
+      sc.toHypothesis.Q ⊓ C ≤ sc.toHypothesis.Q0 := by
+    intro n h0 hQ
+    have hsub : sc.toHypothesis.Q0.subgroupOf C ≤ sc.toHypothesis.Q.subgroupOf C :=
+      fun x hx => Subgroup.mem_subgroupOf.mpr
+        (sc.toHypothesis.Q0_le_Q (Subgroup.mem_subgroupOf.mp hx))
+    have heq : sc.toHypothesis.Q0.subgroupOf C = sc.toHypothesis.Q.subgroupOf C :=
+      Subgroup.eq_of_le_of_card_ge hsub (by rw [h0, hQ])
+    intro x hx
+    have hxC : x ∈ C := hx.2
+    have hmem : (⟨x, hxC⟩ : ↥C) ∈ sc.toHypothesis.Q.subgroupOf C :=
+      Subgroup.mem_subgroupOf.mpr hx.1
+    rw [← heq] at hmem
+    exact Subgroup.mem_subgroupOf.mp hmem
+  rcases data.branch with ⟨d, -, det⟩ | ⟨d, -, det⟩ | ⟨d, -, det⟩
+  · exact ⟨hle _ det.natCard_cQ0_eq_field det.natCard_cQ_eq_field,
+      det.distinguishedProduct_order⟩
+  · exact absurd habel det.cQ_isSuzuki2Group.2.1
+  · exact absurd habel det.cQ_isSuzuki2Group.2.1
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (1)** (p. 117):
+if `Q` (`= S`, by Theorem C) is abelian then `S = Q₀` and `st` has order `3`.
+
+Combines the branch selection with the coset/fixed-point argument
+`Q_eq_Q0_of_commute_of_centralizer_le`.  The prime-order `P ≤ V` the book fixes
+at the start of the proof exists because (C1) gives `V ≠ 1`. -/
+theorem Q_eq_Q0_and_orderOf_st_of_commute
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQ2 : IsPGroup 2 ↥sc.toHypothesis.Q)
+    (hcomm : ∀ a ∈ sc.toHypothesis.Q, ∀ b ∈ sc.toHypothesis.Q, Commute a b) :
+    sc.toHypothesis.Q = sc.toHypothesis.Q0 ∧
+      orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t)
+        = 3 := by
+  classical
+  -- a prime-order subgroup of `V ≠ 1`
+  obtain ⟨g, hgV, hg1⟩ : ∃ g ∈ sc.toHypothesis.V, g ≠ 1 := by
+    by_contra hall
+    push Not at hall
+    exact sc.V_ne_bot (le_bot_iff.mp fun x hx => Subgroup.mem_bot.mpr (hall x hx))
+  have hord : orderOf g ≠ 1 := fun h => hg1 (orderOf_eq_one_iff.mp h)
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hord
+  have hpos : 0 < orderOf g := orderOf_pos g
+  have hmpos : 0 < orderOf g / p := Nat.div_pos (Nat.le_of_dvd hpos hpdvd) hp.pos
+  have hyord : orderOf (g ^ (orderOf g / p)) = p := by
+    rw [orderOf_pow_of_dvd hmpos.ne' (Nat.div_dvd_of_dvd hpdvd)]
+    exact Nat.div_div_self hpdvd hpos.ne'
+  have hcardP : Nat.card ↥(Subgroup.zpowers (g ^ (orderOf g / p))) = p := by
+    rw [Nat.card_zpowers, hyord]
+  have hPV : Subgroup.zpowers (g ^ (orderOf g / p)) ≤ sc.toHypothesis.V :=
+    Subgroup.zpowers_le.mpr (pow_mem hgV _)
+  obtain ⟨hCle, hst⟩ :=
+    sc.centralizer_le_Q0_and_orderOf_st_of_commute ind hcomm hp hcardP hPV
+  exact ⟨sc.toHypothesis.Q_eq_Q0_of_commute_of_centralizer_le hQ2 hcomm hp
+    hcardP hPV hCle, hst⟩
 
 /-- **After Theorem C, the book's `S` is `Q`**: `Q₁ = 1` (`Q1_eq_bot`) makes the
 Sylow `2`-subgroup `S` of `Q` equal to `Q`, so Ch. III §1's Proposition — stated

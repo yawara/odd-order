@@ -278,6 +278,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.ExceptionalNearField
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
@@ -13307,3 +13308,35 @@ produces (`Q₁` is the odd normal `2`-complement of the nilpotent `Q`). -/
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.Q1_eq_bot
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.isPGroup_two_Q
+
+/-! **Peterfalvi Part II, Ch. III §1, Proposition, case (1)** (issue 0163, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/Trichotomy.lean`, p. 117.
+
+The first of the Proposition's three cases: **if `Q` is abelian then `Q = Q₀` and `st` has
+order `3`** — the book's alternative (a).  By Theorem C, `Q₁ = 1`, so the book's Sylow
+`2`-subgroup `S` of `Q` is `Q` itself (`sylowTwoOfQ_eq_Q`).
+
+* `centralizer_le_Q0_and_orderOf_st_of_commute` — the branch selection.  An abelian `Q` makes
+  `C_Q(P)` abelian, which kills the two alternatives of Ch. I §3 Prop 1(c) whose payload is a
+  Suzuki `2`-group (non-abelian by definition, `IsSuzuki2Group.2.1`).  The surviving `PSL(2, ℓ)`
+  branch carries `orderOf (st) = 3` and `|C_{Q₀}(P)| = |F| = |C_Q(P)|`, upgrading
+  `C_{Q₀}(P) ≤ C_Q(P)` to equality.
+* `exists_sq_eq_distinguishedInvolution` — the book's parenthetical "there is then an element
+  `x ∈ S` such that `x² = s` (since `K` is transitive on `Q₀^#`)": an element of `Q ∖ Q₀` has
+  order `2^m` with `m ≥ 2`, and `image_conj_KSet_eq_involutions_H` (§1 Prop 3) moves the
+  resulting involution to `s`.
+* `Q_eq_Q0_of_commute_of_centralizer_le` — the coset/fixed-point core.  Commutativity turns
+  `{y ∈ Q | y² = s}` into `xQ₀`, of `2`-power cardinality; `P ≤ V = C_D(s)` (Ch. I §1 Prop 5)
+  acts on it, and a fixed point would lie in `C_Q(P) ≤ Q₀` while squaring to `s ≠ 1`.
+* `Q_eq_Q0_and_orderOf_st_of_commute` — case (1) assembled, with the prime-order `P ≤ V`
+  produced from (C1)'s `V ≠ 1`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.sylowTwoOfQ_eq_Q
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sq_eq_distinguishedInvolution
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_eq_Q0_of_commute_of_centralizer_le
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.centralizer_le_Q0_and_orderOf_st_of_commute
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.Q_eq_Q0_and_orderOf_st_of_commute

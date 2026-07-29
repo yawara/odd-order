@@ -99,7 +99,7 @@ type C / type D なら `S/Q₀` は `𝐅₂[K]`-加群で `S/Q₀ = X ⊕ Y` (`
 
 ## やること
 
-- [ ] **case (1)** (`S` アーベル ⟹ `S = Q₀` かつ `st` 位数 3) — **完全に ungated、ここから着手**
+- [x] **case (1)** (`S` アーベル ⟹ `S = Q₀` かつ `st` 位数 3) — **2026-07-29 完了** (下記)
 - [ ] case (2) の `W = 1` パート (`C_S(P)` の指数 4 + `D` の忠実性)
 - [ ] case (2) の PSU 排除 (`C_{D₀}(Ω₁(S₀)) ≠ 1`) — gated なら 9500 番台で hub issue 化
 - [ ] case (3) の `st` 位数 3 パート
@@ -121,3 +121,37 @@ AxiomsCheck に登録されて axiom-clean。フルビルド green + `--strict` 
 * Ch.II Theorem B = [issue 2053](pending/2053-pf-suzuki-theorem-b.md) (2026-07-26 完成)
 * 書籍 pp. 116–117 = `references/peterfalvi/pages/peterfalvi-p116.png` / `-p117.png`
 * 章 PDF = `references/peterfalvi/pdf/05.5_pp_115_121_The_Structure_of_H.pdf`
+
+## case (1) 完了記録 (2026-07-29)
+
+新 leaf `StructureOfH/Trichotomy.lean` (`OddOrder.lean` 配線済、AxiomsCheck 登録済、
+5 定理すべて `[propext, Classical.choice, Quot.sound]` のみ):
+
+| 定理 | 内容 |
+|---|---|
+| `SecondCaseHypothesis.sylowTwoOfQ_eq_Q` | Theorem C (`Q₁ = ⊥`) より **書籍の `S` は `Q`** |
+| `Hypothesis.mem_Q0_of_mem_Q_of_sq_eq_one` | `Ω₁(Q) = Q₀` (repo の `Q₀ = {x \| x²=1 ∧ x∈H}` から即座) |
+| `Hypothesis.exists_sq_eq_distinguishedInvolution` | 「`x² = s` なる `x ∈ S` が在る (`K` が `Q₀^#` 上推移的)」 |
+| `SecondCaseHypothesis.centralizer_le_Q0_and_orderOf_st_of_commute` | 分岐選択: `Q` 可換 ⟹ PSL 分岐 ⟹ `orderOf (st) = 3` かつ `C_Q(P) ≤ Q₀` |
+| `SecondCaseHypothesis.Q_eq_Q0_of_commute_of_centralizer_le` | coset + 不動点の核 |
+| `SecondCaseHypothesis.Q_eq_Q0_and_orderOf_st_of_commute` | **case (1) 本体**: `Q` 可換 ⟹ `Q = Q₀` かつ `orderOf (st) = 3` |
+
+### 分岐選択が思ったより軽かった (実測)
+
+`centralizer_trichotomy_of_induction` の `CentralizerSuzukiData` / `CentralizerPSUData` が
+両方 **`cQ_isSuzuki2Group : IsSuzuki2Group ↥(Q.subgroupOf C_G(P))`** を持ち、
+`IsSuzuki2Group` の定義 (`GroupTheory/SpecificGroups/Suzuki2Group/Basic.lean:355`) は
+第 2 連言子に **`¬ IsMulCommutative P`** を含む。⟹ `Q` 可換なら `C_Q(P)` も可換なので
+2 分岐が即座に落ちる (`det.cQ_isSuzuki2Group.2.1` に `absurd`)。
+書籍の「`C_S(P)` はアーベルゆえ `st` は位数 3」がそのまま 1 行になった。
+
+`C_S(P) ⊂ Q₀` も PSL 分岐の 2 フィールド
+`natCard_cQ0_eq_field` / `natCard_cQ_eq_field` (どちらも `= |F|`) から
+`Subgroup.eq_of_le_of_card_ge` で出る。
+
+### 次 = case (2) (`S` 非アーベルで位数 `q²`)
+
+書籍 p.117 の (2)。`W = 1` パートまでは ungated に見える
+(`C_S(P)` の指数 4 + `D` の `S` 上の忠実性)。PSU 排除の
+`C_{D₀}(Ω₁(S₀)) ≠ 1` が gated 候補 — 着手時に `CentralizerPSU*.lean` /
+`GroupTheory/SpecificGroups/ProjectiveUnitary/**` が何を構成済かを実測する。
