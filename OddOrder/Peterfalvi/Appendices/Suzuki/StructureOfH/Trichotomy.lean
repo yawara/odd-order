@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
+import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 
 /-!
 # Peterfalvi Part II, Ch. III §1, Proposition: the three cases for `S`
@@ -60,6 +61,9 @@ Ch. I §3 Proposition 1(c) carries in that branch; see
 * `orderOf_st_eq_three_of_card_cube_of_not_isTypeB`,
   `orderOf_st_eq_three_of_card_cube` — **case (3)**: `S` of order `q³` forces
   `st` to have order `3`, with no hypothesis on the type of `S`.
+* `isMulCommutative_or_isSuzuki2Group_Q` — the case split of Ch. I §2, for `Q`.
+* `trichotomy` — **the Proposition**, with the `W ≠ 1` clause of case (c) taken
+  as a hypothesis (issue 0164).
 -/
 
 set_option autoImplicit false
@@ -612,6 +616,62 @@ theorem isMulCommutative_or_isSuzuki2Group_Q
     simpa using h2
   · exact Or.inr
       (OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv h e)
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition** (pp. 116–117).
+
+> One of the following three cases holds.
+> (a) `S = Q₀` and `st` has order `3`.
+> (b) `S` is a Suzuki `2`-group of type A, `st` has order `5` and `W = 1`.
+> (c) `S` is a Suzuki `2`-group of type B, `st` has order `3` and `W ≠ 1`.
+
+`S = Q` after Theorem C (`sylowTwoOfQ_eq_Q`).  The case split is Ch. I §2's
+"either `S` is abelian or `S` is a Suzuki `2`-group"
+(`isMulCommutative_or_isSuzuki2Group_Q`) refined by Appendix III's two possible
+orders `|Q₀|²` and `|Q₀|³` (`natCard_Q_eq_sq_or_cube`).
+
+The `W ≠ 1` clause of case (c) is the book's one deferred computation — the
+`PSU(3, ℓ)` Sylow-normalizer fact it states "as can be checked" (issue 0164) —
+and is taken as a hypothesis here. -/
+theorem trichotomy
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hWcube : Nat.card ↥sc.toHypothesis.Q = Nat.card ↥sc.toHypothesis.Q0 ^ 3 →
+      sc.toHypothesis.W ≠ ⊥) :
+    (sc.toHypothesis.Q = sc.toHypothesis.Q0 ∧
+        orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3)
+      ∨ (Suzuki2Groups.IsTypeA.{uG, 0} ↥sc.toHypothesis.Q ∧
+        orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 5 ∧
+        sc.toHypothesis.W = ⊥)
+      ∨ (Suzuki2Groups.IsTypeB.{uG, 0} ↥sc.toHypothesis.Q ∧
+        orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3 ∧
+        sc.toHypothesis.W ≠ ⊥) := by
+  classical
+  have hQ2 : IsPGroup 2 ↥sc.toHypothesis.Q := sc.isPGroup_two_Q ind
+  obtain ⟨m, hQ0card⟩ := (hQ2.to_le sc.toHypothesis.Q0_le_Q).exists_card_eq
+  have hm : m ≠ 0 := by
+    intro h
+    have h2 := sc.toHypothesis.two_le_card_Q0
+    rw [hQ0card, h, pow_zero] at h2
+    omega
+  rcases sc.isMulCommutative_or_isSuzuki2Group_Q ind with hcomm | hQsuz
+  · -- (1) `S` abelian
+    have hc : ∀ a ∈ sc.toHypothesis.Q, ∀ b ∈ sc.toHypothesis.Q, Commute a b := by
+      intro a ha b hb
+      exact congrArg (Subtype.val (p := fun z => z ∈ sc.toHypothesis.Q))
+        (hcomm.1.comm (⟨a, ha⟩ : ↥sc.toHypothesis.Q) ⟨b, hb⟩)
+    exact Or.inl (sc.Q_eq_Q0_and_orderOf_st_of_commute ind hQ2 hc)
+  · obtain ⟨P, p, hp, hPcard, hPV⟩ := exists_le_card_eq_prime sc.V_ne_bot
+    rcases sc.toHypothesis.natCard_Q_eq_sq_or_cube hQsuz with hsq | hcube
+    · -- (2) `S` non-abelian of order `q²`
+      exact Or.inr (Or.inl ⟨sc.toHypothesis.isTypeA_of_natCard_eq_sq hQsuz hsq,
+        sc.orderOf_st_eq_five_of_isSuzuki2Group ind hQsuz hsq hp hPcard hPV,
+        sc.W_eq_bot_of_isSuzuki2Group hQsuz hsq⟩)
+    · -- (3) `S` non-abelian of order `q³`
+      have hst := sc.orderOf_st_eq_three_of_card_cube ind hQsuz hm hQ0card hcube
+        hp hPcard hPV
+      have hW := hWcube hcube
+      obtain ⟨-, -, hB⟩ := sc.toHypothesis.lemmaFive_of_orderThree hst hQsuz hm
+        hQ0card hcube ind
+      exact Or.inr (Or.inr ⟨hB hW, hst, hW⟩)
 
 end SecondCaseHypothesis
 

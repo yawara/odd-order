@@ -13689,5 +13689,28 @@ so `x² = 1` says exactly that the quotient coordinate vanishes.
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isTypeA_of_natCard_eq_sq
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.isMulCommutative_or_isSuzuki2Group_Q
+
+/-! **Peterfalvi Part II, Ch. III §1, Proposition** (issue 0163, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/Trichotomy.lean`, pp. 116–117.
+
+> One of the following three cases holds.
+> (a) `S = Q₀` and `st` has order `3`.
+> (b) `S` is a Suzuki `2`-group of type A, `st` has order `5` and `W = 1`.
+> (c) `S` is a Suzuki `2`-group of type B, `st` has order `3` and `W ≠ 1`.
+
+`S = Q` after Theorem C.  The case split is Ch. I §2's "either `S` is abelian or `S` is a Suzuki
+`2`-group", refined by Appendix III's two possible orders `|Q₀|²` and `|Q₀|³`
+(`natCard_Q_eq_sq_or_cube`).  Case (a) is `Q_eq_Q0_and_orderOf_st_of_commute`; case (b) is
+`isTypeA_of_natCard_eq_sq` with `orderOf_st_eq_five_of_isSuzuki2Group` and
+`W_eq_bot_of_isSuzuki2Group`; case (c) is `orderOf_st_eq_three_of_card_cube` followed by
+Ch. I §3 Lemma 5 (`lemmaFive_of_orderThree`).
+
+**One hypothesis remains**: the `W ≠ 1` clause of case (c).  It is the book's own deferred
+`PSU(3, ℓ)` Sylow-normalizer computation ("as can be checked", p. 117), tracked as issue 0164;
+in case (2) the same computation was replaced by a cardinality count
+(`natCard_inf_centralizer_le_sq`), but in case (3) the surviving branch really is
+`PSU(3, ℓ)`, so no count can replace it. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.trichotomy
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB
