@@ -13686,4 +13686,8 @@ so `x² = 1` says exactly that the quotient coordinate vanishes.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_Q_eq_sq_or_cube
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isTypeA_of_natCard_eq_sq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.isMulCommutative_or_isSuzuki2Group_Q
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB

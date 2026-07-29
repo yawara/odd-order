@@ -587,6 +587,32 @@ theorem sylowTwoOfQ_eq_Q (ind : Hypothesis.TheoremAInductionBelow G Ω) :
   rw [sc.Q1_eq_bot ind, Subgroup.card_bot, mul_one] at h
   exact h.ge
 
+/-- **Ch. I §2: `S` is abelian or a Suzuki `2`-group** (p. 117), stated for `Q`.
+
+After Theorem C the Sylow `2`-subgroup of `Q` is all of `Q`
+(`sylowTwoOfQ_eq_Q`), so the dichotomy of `SylowTwo.lean` transports. -/
+theorem isMulCommutative_or_isSuzuki2Group_Q
+    (ind : Hypothesis.TheoremAInductionBelow G Ω) :
+    IsMulCommutative ↥sc.toHypothesis.Q ∨
+      OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q := by
+  have hcard : Nat.card ↥((default : Sylow 2 ↥sc.toHypothesis.Q) :
+      Subgroup ↥sc.toHypothesis.Q) = Nat.card ↥sc.toHypothesis.Q := by
+    have h1 := sc.toHypothesis.card_sylowTwoOfQ
+    rw [sc.sylowTwoOfQ_eq_Q ind] at h1
+    exact h1.symm
+  have hS : ((default : Sylow 2 ↥sc.toHypothesis.Q) :
+      Subgroup ↥sc.toHypothesis.Q) = ⊤ := Subgroup.eq_top_of_card_eq _ hcard
+  have e : ↥((default : Sylow 2 ↥sc.toHypothesis.Q) :
+      Subgroup ↥sc.toHypothesis.Q) ≃* ↥sc.toHypothesis.Q := by
+    rw [hS]; exact Subgroup.topEquiv
+  rcases sc.toHypothesis.sylowTwo_isMulCommutative_or_isSuzuki2Group default with h | h
+  · refine Or.inl ⟨⟨fun a b => ?_⟩⟩
+    have hc := h.1.comm (e.symm a) (e.symm b)
+    have h2 := congrArg e hc
+    simpa using h2
+  · exact Or.inr
+      (OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv h e)
+
 end SecondCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

@@ -313,6 +313,48 @@ theorem natCard_Q_eq_sq_or_cube {G : Type uG} {Ω : Type uΩ} [Group G]
   have h := natCard_eq_sq_or_cube_of_isSuzuki2Group hQsuz
   rwa [natCard_sq_eq_one_eq_natCard_Q0] at h
 
+/-- **A Suzuki `2`-group `Q` of order `|Q₀|²` is of type A** — the book's "in
+this case `S` is a Suzuki `2`-group of type A" (p. 117, case (2)).
+
+Types B, C and D have order `|Ω₁|³`, which for `|Q₀| ≥ 2` is bigger. -/
+theorem isTypeA_of_natCard_eq_sq {G : Type uG} {Ω : Type uΩ} [Group G]
+    [MulAction G Ω] [Finite G] (hyp : Hypothesis G Ω)
+    (hQsuz : IsSuzuki2Group ↥hyp.Q)
+    (hcard : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 2) :
+    Suzuki2Groups.IsTypeA.{uG, 0} ↥hyp.Q := by
+  have hΩ := hyp.natCard_sq_eq_one_eq_natCard_Q0
+  have h2 := hyp.two_le_card_Q0
+  have hcube : Nat.card ↥hyp.Q ≠ Nat.card ↥hyp.Q0 ^ 3 := by
+    rw [hcard]
+    intro h
+    have hpos : 0 < Nat.card ↥hyp.Q0 ^ 2 := pow_pos (by omega) 2
+    have h3 : Nat.card ↥hyp.Q0 ^ 2 * 1 = Nat.card ↥hyp.Q0 ^ 2 * Nat.card ↥hyp.Q0 := by
+      rw [mul_one]
+      calc Nat.card ↥hyp.Q0 ^ 2 = Nat.card ↥hyp.Q0 ^ 3 := h
+        _ = Nat.card ↥hyp.Q0 ^ 2 * Nat.card ↥hyp.Q0 := by ring
+    have := Nat.eq_of_mul_eq_mul_left hpos h3
+    omega
+  rcases higmanClassification_of_isSuzuki2Group hQsuz with hA | hB | hC | hD
+  · exact hA
+  · exact absurd (by
+      obtain ⟨data⟩ := hB
+      obtain ⟨hc, hs⟩ := data.natCard_and_natCard_sq_eq_one
+      rw [hΩ] at hs
+      rw [hc, Nat.card_prod, hs]
+      ring) hcube
+  · exact absurd (by
+      obtain ⟨data⟩ := hC
+      obtain ⟨hc, hs⟩ := data.natCard_and_natCard_sq_eq_one
+      rw [hΩ] at hs
+      rw [hc, Nat.card_prod, hs]
+      ring) hcube
+  · exact absurd (by
+      obtain ⟨data⟩ := hD
+      obtain ⟨hc, hs⟩ := data.natCard_and_natCard_sq_eq_one
+      rw [hΩ] at hs
+      rw [hc, Nat.card_prod, hs]
+      ring) hcube
+
 /-- Invariance under two operator subgroups gives invariance under their join. -/
 theorem conj_mem_sup {G : Type uG} [Group G] {A B N : Subgroup G}
     (hA : ∀ a ∈ A, ∀ y ∈ N, a * y * a⁻¹ ∈ N)
