@@ -221,6 +221,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
 import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
 import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.MinimalNormal
 import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Conjugacy
+import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.NilpotentQuotient
+import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Existence
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsFaithfulOrbit

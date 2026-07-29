@@ -5670,9 +5670,11 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   型を量化し、1 段ごとに `↥(commutator G)` へ降りる)。
   `commutator G < ⊤` = `IsSolvable.commutator_lt_top_of_nontrivial`、
   位数減少は `Finite.card_subtype_lt`、部分群の元の位数は `Subgroup.orderOf_mk`。
-* 🔄 **3C.7** — Carter 部分群 (`C` 冪零かつ `C = N_G(C)`) の (a) 存在 (b) 共役性
-  (c) `G/N` 冪零なら `NC = G`。⚠ **書籍自身が「この問題と次はかなり難しい」と注記**。
-  **(b) 共役性は 2026-07-29 に完成** (`exists_conj_of_isCarterSubgroup`)。残り (a)(c)。
+* ✅ **3C.7** — **🎉 (a)(b)(c) 全完成 (2026-07-29)**。Carter 部分群
+  (`C` 冪零かつ `C = N_G(C)`) の (a) 存在 `exists_isCarterSubgroup` /
+  (b) 共役性 `exists_conj_of_isCarterSubgroup` /
+  (c) `G/N` 冪零なら `NC = G` `sup_eq_top_of_isNilpotent_quotient`。
+  ⚠ **書籍自身が「この問題と次はかなり難しい」と注記**しており証明は与えていない (自前)。
 * ⬜ **3C.8** — 可解群の nilpotent injector (`F(G)` を含む極大な冪零部分群) は全て共役。
   ⚠ 同上 (書籍が challenge として提示)。
 
@@ -5737,7 +5739,7 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
 **3C.8 (nilpotent injector)** は 3C.7 の後。`F(G)` を含む極大冪零部分群の共役性で、
 同型の帰納 (極小正規 + Hall/Sylow 分解) が効くはず。3C.7 の部品を再利用する。
 
-### 3C.7 実装進捗 (2026-07-28)
+### 3C.7 実装進捗 (2026-07-28 開始 → 2026-07-29 完成)
 
 `Ch03_SplitExtensions/Carter/` に段階的に構築中 (全て `OddOrder.lean` 配線済・axiom-clean)。
 
@@ -5764,8 +5766,15 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   step 1–3 は帰納法の仮説を引数に取る独立補題 (`normalizer_sup_eq_self_of_ih` /
   `isCarterSubgroup_map_mk'_of_ih` / `exists_conj_sup_eq_sup_of_ih`)、本体は
   `exists_conj_aux` の `|G|` 強帰納。axiom-clean。
-* ⬜ **`Carter/NilpotentQuotient.lean`** — (c)。次の実装対象。
-* ⬜ **`Carter/Existence.lean`** — (a)。
+* ✅ **`Carter/NilpotentQuotient.lean`** — **🎉 (c) 完成 (2026-07-29)**:
+  `normalizer_eq_self_of_isCarterSubgroup_le` (**Carter 部分群を含む部分群はすべて
+  自己正規化** — (b) から直ちに従う) + `sup_eq_top_of_isNilpotent_quotient` (= (c) 本体)。
+* ✅ **`Carter/Existence.lean`** — **🎉 (a) 完成 (2026-07-29)**:
+  `exists_isCarterSubgroup`。`|G|` 強帰納で、極小正規 `N` を取り `G ⧸ N` の Carter `K̄` の
+  引き戻し `K` を見る。`K < ⊤` なら `↥K` の Carter が (c) 経由でそのまま `G` の Carter;
+  `K = ⊤` (= `G ⧸ N` 冪零) なら**正規でない極大部分群が Carter**
+  (`isCarterSubgroup_of_isCoatom_not_normal`; `↥M ≅ G ⧸ N` が冪零 + 極大性で自己正規化)。
+  補助: `normal_of_isCoatom_of_le_of_isNilpotent_quotient`。
 
 #### (b) step 4 で実際に使った経路 (2026-07-29 に確定・実装済)
 
