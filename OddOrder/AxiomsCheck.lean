@@ -13392,3 +13392,44 @@ it lies in `K ⊓ W ≤ K ⊓ V = 1`.
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_centralizer_of_mem_K_of_le_W
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sqFibre_eq_coset_of_card
+
+/-! **Peterfalvi Part II, Ch. III §1, Proposition, case (2): `W = 1`** (issue 0163,
+2026-07-29).  `Appendices/Suzuki/StructureOfH/Trichotomy.lean`, p. 117.
+
+> If `W ≠ 1`, `C_S(P)` is a `K`-subgroup of `S` which has exponent `4` and so `C_S(P) = S`,
+> contrary to the fact that `D` acts faithfully on `S`.
+
+The book's one sentence needs the fact that a `K`-invariant subgroup of `S` containing an
+element of order `4` is all of `S`, which is a two-layer transitivity statement:
+
+* `exists_mem_K_conj_eq_of_mem_Q0` — §1 Proposition 3 in elementwise form: `K` is transitive
+  on `Q₀^#`.
+* `eq_bot_or_Q0_le_of_kInvariant` — hence a `K`-invariant subgroup of `Q₀` is `1` or `Q₀`.
+* `sq_mem_Q0_of_isSuzuki2Group` — exponent `4` (Higman Thm 1(a)) puts every square in
+  `Q₀ = Ω₁(Q)`, so squaring induces `Q/Q₀ → Q₀`.
+* `inv_mul_mem_Q0_of_sq_eq` — every fibre of that map is a single `Q₀`-coset: the fibre over
+  `s` is (`sqFibre_eq_coset_of_card`), and `K`-conjugation moves any other fibre onto it.
+* `exists_mem_K_conj_mem_coset` — the induced map is therefore injective, and in case (2)
+  `|Q/Q₀| = |Q₀|` makes it bijective, so transitivity on `Q₀^#` lifts to `(Q/Q₀)^#`.
+* `Q_le_of_kInvariant_of_sq_ne_one` — combining the two layers: `X` swallows `Q₀` and then
+  meets every coset of `Q₀`.
+* `W_eq_bot_of_isSuzuki2Group` — **case (2)'s `W = 1`**.  With `P ≤ W` of prime order
+  (`exists_le_card_eq_prime`), `C_Q(P)` is `K`-invariant and contains a `P`-fixed square root
+  of `s`, hence equals `Q`; then `P ≤ D` centralizes `Q`, and `C_D(Q) = 1`
+  (Ch. I Proposition 4(c)) contradicts `|P| = p`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.exists_le_card_eq_prime
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sq_mem_Q0_of_isSuzuki2Group
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_K_conj_eq_of_mem_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.eq_bot_or_Q0_le_of_kInvariant
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inv_mul_mem_Q0_of_sq_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_K_conj_mem_coset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_le_of_kInvariant_of_sq_ne_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.W_eq_bot_of_isSuzuki2Group

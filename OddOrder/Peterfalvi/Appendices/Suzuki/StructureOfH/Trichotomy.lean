@@ -20,7 +20,7 @@ By Theorem C (`CoherenceContradiction.lean`) the group `Q` is a `2`-group, so
 `S = Q` (`sylowTwoOfQ_eq_Q`) and the Proposition is a statement about `Q`
 itself.
 
-This leaf carries the **case (1)** branch, the book's
+This leaf carries **case (1)** — the book's
 
 > Suppose that `S` is abelian.  Then `C_S(P)` is abelian and so `st` has order
 > `3` and `C_S(P) ⊂ Q₀`.  Suppose that `S ≠ Q₀`.  There is then an element
@@ -29,18 +29,33 @@ This leaf carries the **case (1)** branch, the book's
 > Proposition 5) and so normalizes `xQ₀` which is of cardinality prime to `p`,
 > whence `C_S(P) ⊄ Q₀`, which is a contradiction.  Thus `S = Q₀`.
 
+— and, of **case (2)** (`S` non-abelian of order `q²`), everything up to the
+`PSU(3, ℓ)` computation the book defers to "as can be checked": the exponent-`4`
+step, the branch selection `C_Q(P)` is a Suzuki `2`-group, and `W = 1`.
+
 ## Main results
 
 * `sylowTwoOfQ_eq_Q` — after Theorem C, the book's `S` is `Q`.
 * `exists_sq_eq_distinguishedInvolution` — the book's "there is an element
   `x ∈ S` such that `x² = s` (since `K` is transitive on `Q₀^#`)".
-* `Q_eq_Q0_of_commute_of_centralizer_le` — the case-(1) core: an abelian `Q`
-  whose `P`-centralizer lies in `Q₀` equals `Q₀`.
-* `centralizer_le_Q0_and_orderOf_st_of_commute` — the branch selection: an
-  abelian `Q` forces the `PSL(2, ℓ)` alternative of Ch. I §3 Proposition 1(c),
-  giving `orderOf (st) = 3` and `C_Q(P) ≤ Q₀`.
-* `Q_eq_Q0_and_orderOf_st_of_commute` — **case (1)**: if `Q` is abelian then
+* `sqFibre`, `mul_mem_sqFibre`, `sqFibre_eq_coset_of_card` — the book's
+  `{y ∈ S | y² = s}` and its identification with a coset `xQ₀`.
+* `exists_mem_centralizer_mem_sqFibre` — the fixed-point step, "`P` … normalizes
+  `xQ₀` which is of cardinality prime to `p`".
+* `Q_eq_Q0_of_commute_of_centralizer_le`,
+  `centralizer_le_Q0_and_orderOf_st_of_commute`,
+  `Q_eq_Q0_and_orderOf_st_of_commute` — **case (1)**: if `Q` is abelian then
   `Q = Q₀` and `st` has order `3`.
+* `card_sqFibre_eq_card_Q0_of_isSuzuki2Group`,
+  `isSuzuki2Group_centralizer_of_card_sq` — **case (2)**: the count
+  `(q² − q)/(q − 1) = q` and the resulting branch selection (`C_Q(P)` is a
+  Suzuki `2`-group, so the `PSL(2, ℓ)` alternative is out).
+* `commute_of_mem_K_of_mem_W`, `conj_mem_centralizer_of_mem_K_of_le_W` —
+  `[K, W] = 1`, hence the book's "`C_S(P)` is a `K`-subgroup of `S`".
+* `Q_le_of_kInvariant_of_sq_ne_one` — a `K`-invariant subgroup of `Q`
+  containing an element of order `4` is `Q`, via transitivity of `K` on `Q₀^#`
+  and on `(Q/Q₀)^#`.
+* `W_eq_bot_of_isSuzuki2Group` — **case (2)'s `W = 1`**.
 -/
 
 set_option autoImplicit false
@@ -48,6 +63,29 @@ set_option autoImplicit false
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 universe uG uΩ
+
+/-- **"Let `P` be a subgroup of prime order `p`"** (Peterfalvi Part II, Ch. III
+§1, p. 116) — a non-trivial subgroup of a finite group has a subgroup of prime
+order.
+
+The Proposition's proof opens by choosing such a `P` inside `V`, and — when
+`W ≠ 1` — inside `W`; both choices are instances of this. -/
+theorem exists_le_card_eq_prime {G : Type uG} [Group G] [Finite G]
+    {Y : Subgroup G} (hY : Y ≠ ⊥) :
+    ∃ (P : Subgroup G) (p : ℕ), p.Prime ∧ Nat.card ↥P = p ∧ P ≤ Y := by
+  obtain ⟨g, hgY, hg1⟩ : ∃ g ∈ Y, g ≠ 1 := by
+    by_contra hall
+    push Not at hall
+    exact hY (le_bot_iff.mp fun x hx => Subgroup.mem_bot.mpr (hall x hx))
+  have hord : orderOf g ≠ 1 := fun h => hg1 (orderOf_eq_one_iff.mp h)
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hord
+  have hpos : 0 < orderOf g := orderOf_pos g
+  have hmpos : 0 < orderOf g / p := Nat.div_pos (Nat.le_of_dvd hpos hpdvd) hp.pos
+  have hyord : orderOf (g ^ (orderOf g / p)) = p := by
+    rw [orderOf_pow_of_dvd hmpos.ne' (Nat.div_dvd_of_dvd hpdvd)]
+    exact Nat.div_div_self hpdvd hpos.ne'
+  exact ⟨Subgroup.zpowers (g ^ (orderOf g / p)), p, hp,
+    by rw [Nat.card_zpowers, hyord], Subgroup.zpowers_le.mpr (Y.pow_mem hgY _)⟩
 
 namespace Hypothesis
 
@@ -256,6 +294,23 @@ theorem two_le_card_Q0 : 2 ≤ Nat.card ↥hyp.Q0 := by
     exact hyp.distinguishedInvolution_ne_one hs
   · exact hge
 
+/-- **Squares of a Suzuki `2`-group `Q` lie in `Q₀`** — Higman Theorem 1(a)
+(`pow_four_eq_one_of_isSuzuki2Group`) gives `Q` exponent dividing `4`, and
+`Q₀ = Ω₁(Q)` (`mem_Q0_of_mem_Q_of_sq_eq_one`).
+
+Used by cases (2) and (3) of the Ch. III §1 Proposition, where the induced map
+`Q/Q₀ → Q₀` carries the `K`-action across. -/
+theorem sq_mem_Q0_of_isSuzuki2Group
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    {y : G} (hy : y ∈ hyp.Q) : y ^ 2 ∈ hyp.Q0 := by
+  refine hyp.mem_Q0_of_mem_Q_of_sq_eq_one (hyp.Q.pow_mem hy 2) ?_
+  have h4 : (⟨y, hy⟩ : ↥hyp.Q) ^ 4 = 1 :=
+    OddOrder.Higman.Suzuki2Groups.pow_four_eq_one_of_isSuzuki2Group hQsuz _
+  have hy4 : y ^ 4 = 1 := by
+    simpa using congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) h4
+  calc (y ^ 2) ^ 2 = y ^ 4 := by group
+    _ = 1 := hy4
+
 /-- **Peterfalvi Part II, Ch. III §1, Proposition, case (2), the coset count**
 (p. 117): "Let `x ∈ S` be such that `x² = s`.  Since
 `|{y ∈ S | y² = s}| = (q² − q)/(q − 1) = q`, we again find that
@@ -274,15 +329,8 @@ theorem card_sqFibre_eq_card_Q0_of_isSuzuki2Group
   classical
   haveI : Fintype G := Fintype.ofFinite G
   -- exponent `4`: squares land in `Q₀`
-  have hsq : ∀ y ∈ hyp.Q, y ^ 2 ∈ hyp.Q0 := by
-    intro y hy
-    refine hyp.mem_Q0_of_mem_Q_of_sq_eq_one (hyp.Q.pow_mem hy 2) ?_
-    have h4 : (⟨y, hy⟩ : ↥hyp.Q) ^ 4 = 1 :=
-      OddOrder.Higman.Suzuki2Groups.pow_four_eq_one_of_isSuzuki2Group hQsuz _
-    have hy4 : y ^ 4 = 1 := by
-      simpa using congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) h4
-    calc (y ^ 2) ^ 2 = y ^ 4 := by group
-      _ = 1 := hy4
+  have hsq : ∀ y ∈ hyp.Q, y ^ 2 ∈ hyp.Q0 := fun _ hy =>
+    hyp.sq_mem_Q0_of_isSuzuki2Group hQsuz hy
   -- the relevant finsets
   set QS : Finset G := (hyp.Q : Set G).toFinset with hQS
   set Q0S : Finset G := (hyp.Q0 : Set G).toFinset with hQ0S
@@ -736,21 +784,7 @@ theorem Q_eq_Q0_and_orderOf_st_of_commute
         = 3 := by
   classical
   -- a prime-order subgroup of `V ≠ 1`
-  obtain ⟨g, hgV, hg1⟩ : ∃ g ∈ sc.toHypothesis.V, g ≠ 1 := by
-    by_contra hall
-    push Not at hall
-    exact sc.V_ne_bot (le_bot_iff.mp fun x hx => Subgroup.mem_bot.mpr (hall x hx))
-  have hord : orderOf g ≠ 1 := fun h => hg1 (orderOf_eq_one_iff.mp h)
-  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hord
-  have hpos : 0 < orderOf g := orderOf_pos g
-  have hmpos : 0 < orderOf g / p := Nat.div_pos (Nat.le_of_dvd hpos hpdvd) hp.pos
-  have hyord : orderOf (g ^ (orderOf g / p)) = p := by
-    rw [orderOf_pow_of_dvd hmpos.ne' (Nat.div_dvd_of_dvd hpdvd)]
-    exact Nat.div_div_self hpdvd hpos.ne'
-  have hcardP : Nat.card ↥(Subgroup.zpowers (g ^ (orderOf g / p))) = p := by
-    rw [Nat.card_zpowers, hyord]
-  have hPV : Subgroup.zpowers (g ^ (orderOf g / p)) ≤ sc.toHypothesis.V :=
-    Subgroup.zpowers_le.mpr (pow_mem hgV _)
+  obtain ⟨P, p, hp, hcardP, hPV⟩ := exists_le_card_eq_prime sc.V_ne_bot
   obtain ⟨hCle, hst⟩ :=
     sc.centralizer_le_Q0_and_orderOf_st_of_commute ind hcomm hp hcardP hPV
   exact ⟨sc.toHypothesis.Q_eq_Q0_of_commute_of_centralizer_le hQ2 hcomm hp
@@ -818,6 +852,58 @@ theorem isSuzuki2Group_centralizer_of_card_sq
     exact sc.toHypothesis.distinguishedInvolution_ne_one h1
   · exact det.cQ_isSuzuki2Group
   · exact det.cQ_isSuzuki2Group
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (2): `W = 1`** (p. 117).
+
+> If `W ≠ 1`, `C_S(P)` is a `K`-subgroup of `S` which has exponent `4` and so
+> `C_S(P) = S`, contrary to the fact that `D` acts faithfully on `S`.
+
+Assume `W ≠ 1` and take `P ≤ W` of prime order — this is the book's opening
+choice "if `W ≠ 1`, assume that `P ⊂ W`".  Then
+
+* `C_Q(P)` is `K`-invariant, because `K` centralizes `W`
+  (`conj_mem_centralizer_of_mem_K_of_le_W`, resting on `commute_of_mem_K_of_mem_W`);
+* `C_Q(P)` contains an element of order `4`, namely a `P`-fixed square root of
+  `s` (`exists_mem_centralizer_mem_sqFibre_of_isSuzuki2Group`);
+
+so `C_Q(P) = Q` (`Q_le_of_kInvariant_of_sq_ne_one`).  That makes `P` centralize
+`Q` while `P ≤ W ≤ V ≤ D`, and `C_D(Q) = 1` (Ch. I Proposition 4(c),
+`centralizer_Q_inf_D_eq_bot`) forces `P = 1`, contradicting `|P| = p`. -/
+theorem W_eq_bot_of_isSuzuki2Group
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q)
+    (hcard : Nat.card ↥sc.toHypothesis.Q = Nat.card ↥sc.toHypothesis.Q0 ^ 2) :
+    sc.toHypothesis.W = ⊥ := by
+  classical
+  by_contra hW
+  obtain ⟨P, p, hp, hPcard, hPW⟩ := exists_le_card_eq_prime hW
+  have hPV : P ≤ sc.toHypothesis.V := le_trans hPW sc.toHypothesis.W_le_V
+  -- a `P`-fixed square root of `s`, i.e. an element of order `4` in `C_Q(P)`
+  obtain ⟨y, hyT, hyC⟩ := sc.exists_mem_centralizer_mem_sqFibre_of_isSuzuki2Group
+    hQsuz hcard hp hPcard hPV
+  have hy2 : y ^ 2 ≠ 1 := by
+    rw [hyT.2]; exact sc.toHypothesis.distinguishedInvolution_ne_one
+  -- the `K`-invariant subgroup `C_Q(P)` is therefore all of `Q`
+  have hQle : sc.toHypothesis.Q ≤
+      sc.toHypothesis.Q ⊓ Subgroup.centralizer (P : Set G) :=
+    sc.toHypothesis.Q_le_of_kInvariant_of_sq_ne_one
+      (sc.toHypothesis.card_sqFibre_eq_card_Q0_of_isSuzuki2Group hQsuz hcard)
+      (fun _ hv => sc.toHypothesis.sq_mem_Q0_of_isSuzuki2Group hQsuz hv)
+      inf_le_left
+      (fun _ hk _ hv =>
+        sc.toHypothesis.conj_mem_centralizer_of_mem_K_of_le_W hPW hk hv)
+      ⟨hyT.1, hyC⟩ hy2
+  -- so `P ≤ C_D(Q) = 1`
+  have hPbot : P = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    have hmem : x ∈ sc.toHypothesis.D ⊓
+        Subgroup.centralizer (sc.toHypothesis.Q : Set G) := by
+      refine ⟨sc.toHypothesis.V_le_D (hPV hx), Subgroup.mem_centralizer_iff.mpr ?_⟩
+      intro q hq
+      exact (Subgroup.mem_centralizer_iff.mp (hQle hq).2 x hx).symm
+    rwa [sc.toHypothesis.centralizer_Q_inf_D_eq_bot] at hmem
+  rw [hPbot, Subgroup.card_bot] at hPcard
+  exact hp.one_lt.ne hPcard
 
 /-- **After Theorem C, the book's `S` is `Q`**: `Q₁ = 1` (`Q1_eq_bot`) makes the
 Sylow `2`-subgroup `S` of `Q` equal to `Q`, so Ch. III §1's Proposition — stated
