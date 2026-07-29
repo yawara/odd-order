@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
+import OddOrder.Algebra.SemilinearFixedPoint
 import Mathlib.RepresentationTheory.Irreducible
 import Mathlib.RingTheory.SimpleModule.Rank
 import Mathlib.RingTheory.LittleWedderburn
@@ -549,5 +550,107 @@ theorem exists_injective_semilinear_companion
   simpa using hrho_one
 
 end Prop2Companion
+
+section Prop2FixedPoint
+
+open OddOrder.GroupTheory OddOrder.Isaacs.Ch03
+
+/-- **An operator of prime order that moves the acting group has a non-trivial
+fixed point.**
+
+Peterfalvi, Part II, Ch. III §1, Proposition, p. 117: the conclusion
+`C_{S/Q₀}(P) ≠ 1` that the book extracts from "`[K, P] ⋊ P` is a Frobenius
+group".  That route needs `|P|` prime to `|K|`, which Chapter III does not
+supply (and which genuinely fails there); the present statement replaces it and
+needs no coprimality at all.
+
+`T` acts irreducibly on the elementary abelian `E`, so by Proposition 2(a)+(b)
+(`exists_field_semilinear_with_scalar`) `E` is a line over a finite field `F`
+with `T` acting through scalars `μ : T →* Fˣ`, and the normalizing operator `g`
+is `σ`-semilinear for a `σ ∈ Aut F` with `μ ∘ c = σ ∘ μ`.  The hypothesis
+`ψ (c t₀) ≠ ψ t₀` says exactly `σ ≠ 1` — without it the statement is false, `g`
+being multiplication by a scalar `≠ 1`.  Hilbert's Theorem 90
+(`OddOrder.exists_ne_zero_fixed_of_semilinear`) then supplies the fixed
+vector. -/
+theorem exists_ne_one_fixed_of_prime_pow_eq_one {p₀ : ℕ} [Fact p₀.Prime]
+    {E : Type u} [CommGroup E] [Finite E] [Nontrivial E]
+    (hE : IsElementaryAbelian p₀ E) {T : Type*} [CommGroup T] [Finite T]
+    (ψ : T →* MulAut E)
+    (hirr : ∀ U : Subgroup E, IsAInvariant ψ U → U = ⊥ ∨ U = ⊤)
+    {g : MulAut E} {c : T ≃* T} (hc : ∀ t, ψ (c t) = g * ψ t * g⁻¹)
+    {t₀ : T} (ht₀ : ψ (c t₀) ≠ ψ t₀)
+    {p : ℕ} (hp : p.Prime) (hgp : g ^ p = 1) :
+    ∃ e : E, e ≠ 1 ∧ g e = e := by
+  classical
+  obtain ⟨F, instF, instMod, instFin, hdim, -, ⟨μ, hμ⟩, hsemi⟩ :=
+    exists_field_semilinear_with_scalar hE ψ hirr
+  letI : Field F := instF
+  letI : Module F (Additive E) := instMod
+  letI : Finite F := instFin
+  obtain ⟨σ, hσ⟩ := hsemi g c hc
+  set g' : Additive E ≃+ Additive E := MulEquiv.toAdditive g with hg'
+  have hg'apply : ∀ x : Additive E, g' x = Additive.ofMul (g (Additive.toMul x)) :=
+    fun _ => rfl
+  have hg'symm : ∀ x : Additive E,
+      g'.symm x = Additive.ofMul (g⁻¹ (Additive.toMul x)) := fun _ => rfl
+  -- a non-zero vector
+  obtain ⟨e₁, he₁⟩ := exists_ne (1 : E)
+  have he₀ : (Additive.ofMul e₁ : Additive E) ≠ 0 := fun h =>
+    he₁ (by simpa using congrArg Additive.toMul h)
+  have hinj : Function.Injective (fun a : F => a • (Additive.ofMul e₁ : Additive E)) :=
+    smul_left_injective F he₀
+  have hμ' : ∀ (t : T) (e : E), ((μ t : F)) • (Additive.ofMul e : Additive E)
+      = Additive.ofMul ((ψ t) e) := fun t e => hμ t (Additive.ofMul e)
+  -- the twist on `F` matches the twist `c` on `T`: `μ ∘ c = σ ∘ μ`
+  have hμc : ∀ t : T, (μ (c t) : F) = σ (μ t) := by
+    intro t
+    refine hinj ?_
+    have hlhs : ((μ (c t) : F)) • (Additive.ofMul e₁ : Additive E)
+        = Additive.ofMul (g ((ψ t) (g⁻¹ e₁))) := by
+      rw [hμ' (c t) e₁, hc t]
+      rfl
+    have hrhs : (σ (μ t)) • (Additive.ofMul e₁ : Additive E)
+        = Additive.ofMul (g ((ψ t) (g⁻¹ e₁))) := by
+      have h1 := hσ (μ t) (Additive.ofMul (g⁻¹ e₁))
+      have h2 : g' (Additive.ofMul (g⁻¹ e₁)) = (Additive.ofMul e₁ : Additive E) := by
+        rw [hg'apply]
+        exact congrArg Additive.ofMul (by simp)
+      rw [hμ' t (g⁻¹ e₁), h2] at h1
+      exact h1.symm
+    exact hlhs.trans hrhs.symm
+  -- hence `σ ≠ 1`
+  have hσne : σ ≠ 1 := by
+    intro h1
+    refine ht₀ (MulEquiv.ext fun e => ?_)
+    have hunit : μ (c t₀) = μ t₀ := Units.ext (by rw [hμc t₀, h1]; rfl)
+    have h2 := hμ' (c t₀) e
+    rw [hunit, hμ' t₀ e] at h2
+    exact Additive.ofMul.injective h2.symm
+  -- the line is spanned by `e₁`
+  have hspan : ∀ x : Additive E, ∃ a : F, a • (Additive.ofMul e₁ : Additive E) = x :=
+    fun x => exists_smul_eq_of_finrank_eq_one hdim he₀ x
+  -- `g' ^ p = id`
+  have hiter : ∀ (n : ℕ) (x : Additive E),
+      (g' : Additive E → Additive E)^[n] x = Additive.ofMul ((g ^ n) (Additive.toMul x)) := by
+    intro n
+    induction n with
+    | zero => intro x; simp
+    | succ n ih =>
+      intro x
+      rw [Function.iterate_succ_apply', ih, hg'apply, pow_succ']
+      rfl
+  have hg'p : ∀ x : Additive E, (g' : Additive E → Additive E)^[p] x = x := by
+    intro x
+    rw [hiter, hgp]
+    rfl
+  obtain ⟨x, hx0, hxfix⟩ :=
+    OddOrder.exists_ne_zero_fixed_of_semilinear he₀ hspan g' σ hσ hp hg'p hσne
+  refine ⟨Additive.toMul x, fun h => hx0 ?_, ?_⟩
+  · exact Additive.toMul.injective (by simpa using h)
+  · have := hxfix
+    rw [hg'apply] at this
+    exact congrArg Additive.toMul this
+
+end Prop2FixedPoint
 
 end OddOrder.Peterfalvi.Appendices.Huppert
