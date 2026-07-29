@@ -270,6 +270,20 @@ theorem tConjMiddle_mem_K (hr2 : hyp.structureConjugator ^ 2 ≠ 1)
   hyp.tConjMiddle_mem_K_of_orbitReprSet_covers
     (fun _ hy hy1 => hyp.orbitReprSet_covers hr2 hQcard hpair hy hy1) hx hx1
 
+/-- **The Proposition of §2 in the book's hypotheses** (Peterfalvi Part II,
+Ch. III §2, p. 118): case (b) of §1 gives `orderOf (st) = 5`, whence `r² ≠ 1`,
+and `|Q| = |Q₀|²` (`S` of type A). -/
+theorem tConjMiddle_mem_K_of_orderOf_st_eq_five
+    (h5 : orderOf (hyp.distinguishedInvolution * hyp.t) = 5)
+    (hQcard : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 2)
+    (hpair : ∀ k₁ k₂ a : G, k₁ ∈ hyp.KSet → k₁ ≠ 1 → k₂ ∈ hyp.KSet → k₂ ≠ 1 →
+      a ∈ hyp.KSet →
+      a⁻¹ * (hyp.structureConjugator * (k₁⁻¹ * hyp.structureConjugator⁻¹ * k₁)) * a
+        = hyp.structureConjugator * (k₂⁻¹ * hyp.structureConjugator⁻¹ * k₂) →
+      k₁ = k₂)
+    {x : G} (hx : x ∈ hyp.Q) (hx1 : x ≠ 1) : hyp.tConjMiddle x ∈ hyp.K :=
+  hyp.tConjMiddle_mem_K (hyp.structureConjugator_sq_ne_one h5) hQcard hpair hx hx1
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
