@@ -13778,8 +13778,16 @@ counting argument (`FixedPoints.finrank_eq_card`) directly in `RingAut F`: `fixe
 
 用途: `K` を正規化する奇位数群は `𝔽₂[K]`-加群の斉次成分の上に**半線形**に作用する。
 その固定点が非零であること (Hilbert 90) が、書籍の誤った
-「`[K,P] ⋊ P` は Frobenius 群」の正しい代替になる。 -/
+「`[K,P] ⋊ P` は Frobenius 群」の正しい代替になる。
+
+`exists_ne_zero_mul_pow_eq` がその Hilbert 90 本体: `|F| = s^n` かつ
+`c^((|F|−1)/(s−1)) = 1` (= `c` の `s`-ノルムが 1) なら半線形写像 `v ↦ c·v^s` は
+非零固定点を持つ。`v` が固定点 ⟺ `v^{s−1} = c⁻¹` なので、巡回群 `Fˣ` で
+「`x^(N/d) = 1` なら `x` は `d` 乗」(`exists_pow_eq_of_pow_natCard_div_eq_one`)
+に帰着する — 生成元 `g` で `x = g^a` と書けば仮説は `d ∣ a` と同値。 -/
 #assert_only_allowed_axioms OddOrder.RingAut.exists_pow_eq
+#assert_only_allowed_axioms OddOrder.exists_pow_eq_of_pow_natCard_div_eq_one
+#assert_only_allowed_axioms OddOrder.RingAut.exists_ne_zero_mul_pow_eq
 
 /-! **`C_V(C_{Q₀}(P)) = PW`** (issue 0164, 2026-07-29).
 `Peterfalvi/Appendices/Suzuki/GaloisCentralizer.lean`, Part II, Ch. III §1 Proposition p. 117

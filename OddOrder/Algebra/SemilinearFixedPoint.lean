@@ -23,6 +23,11 @@ not in Ch. III).  The semilinear route replaces it and needs no coprimality.
 ## Main results
 
 * `OddOrder.RingAut.exists_pow_eq` — `σ x = x ^ s` for some `s`.
+* `OddOrder.exists_pow_eq_of_pow_natCard_div_eq_one` — in a finite cyclic group,
+  `x ^ (N / d) = 1` makes `x` a `d`-th power.
+* `OddOrder.RingAut.exists_ne_zero_mul_pow_eq` — **Hilbert 90**, semilinear form:
+  if `|F| = s ^ n` and `c ^ ((|F| - 1) / (s - 1)) = 1` then `c * v ^ s = v` for
+  some `v ≠ 0`.
 -/
 
 namespace OddOrder.RingAut
@@ -58,5 +63,77 @@ theorem exists_pow_eq (σ : _root_.RingAut F) :
     simp only [← hn]
   rw [show σ x = σA x from rfl, hx, AlgEquiv.coe_pow,
     FiniteField.coe_frobeniusAlgEquivOfAlgebraic_iterate]
+
+/-- In a finite cyclic group of order `N`, an element killed by `N / d` (for `d ∣ N`)
+is a `d`-th power.
+
+Writing `x = g ^ a` for a generator `g`, the hypothesis says `N ∣ a * (N / d)`, i.e.
+`d ∣ a`. -/
+theorem _root_.OddOrder.exists_pow_eq_of_pow_natCard_div_eq_one {C : Type*} [CommGroup C]
+    [Finite C] [IsCyclic C] {d : ℕ} (hd : d ∣ Nat.card C) {x : C}
+    (hx : x ^ (Nat.card C / d) = 1) : ∃ b : C, b ^ d = x := by
+  classical
+  obtain ⟨m, hm⟩ := hd
+  have hNpos : 0 < Nat.card C := Nat.card_pos
+  have hdpos : 0 < d := by
+    rcases Nat.eq_zero_or_pos d with rfl | h
+    · rw [zero_mul] at hm; omega
+    · exact h
+  have hmpos : 0 < m := by
+    rcases Nat.eq_zero_or_pos m with rfl | h
+    · rw [mul_zero] at hm; omega
+    · exact h
+  have hdiv : Nat.card C / d = m := by rw [hm]; exact Nat.mul_div_cancel_left m hdpos
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := C)
+  have hgord : orderOf g = Nat.card C := orderOf_eq_card_of_forall_mem_zpowers hg
+  obtain ⟨a, ha⟩ := mem_powers_iff_mem_zpowers.mpr (hg x)
+  have ha' : g ^ a = x := ha
+  rw [← ha', ← pow_mul, hdiv] at hx
+  have hdvd : orderOf g ∣ a * m := orderOf_dvd_of_pow_eq_one hx
+  rw [hgord, hm] at hdvd
+  obtain ⟨t, ht⟩ := hdvd
+  have hda : a = d * t := by
+    have h2 : (d * t) * m = a * m := by
+      calc (d * t) * m = (d * m) * t := by ring
+        _ = a * m := ht.symm
+    exact (Nat.eq_of_mul_eq_mul_right hmpos h2).symm
+  refine ⟨g ^ t, ?_⟩
+  rw [← pow_mul, mul_comm t d, ← hda, ha']
+
+/-- **Hilbert's Theorem 90 for a finite field, semilinear form.**
+
+If `|F| = s ^ n` and `c ≠ 0` has trivial `s`-norm — i.e. `c ^ ((|F| - 1)/(s - 1)) = 1`,
+which is `∏_{i < n} c^{s^i} = 1` — then the semilinear map `v ↦ c * v ^ s` has a
+non-trivial fixed point.
+
+`v ↦ c * v ^ s` fixes `v ≠ 0` exactly when `v ^ (s - 1) = c⁻¹`, so this says `c⁻¹`
+is an `(s-1)`-st power in the cyclic group `Fˣ`, which is
+`OddOrder.exists_pow_eq_of_pow_natCard_div_eq_one` once one knows
+`(s - 1) ∣ (|F| - 1)`. -/
+theorem exists_ne_zero_mul_pow_eq {s n : ℕ} (hs : 1 < s)
+    (hcard : Nat.card F = s ^ n) {c : F} (hc : c ≠ 0)
+    (hnorm : c ^ ((Nat.card F - 1) / (s - 1)) = 1) :
+    ∃ v : F, v ≠ 0 ∧ c * v ^ s = v := by
+  classical
+  haveI : Fintype F := Fintype.ofFinite F
+  have hunits : Nat.card Fˣ = Nat.card F - 1 := Nat.card_units F
+  have hdvd : (s - 1) ∣ Nat.card F - 1 := by
+    rw [hcard]
+    exact Nat.sub_one_dvd_pow_sub_one s n
+  have hdvd' : (s - 1) ∣ Nat.card Fˣ := by rw [hunits]; exact hdvd
+  set cu : Fˣ := Units.mk0 c hc with hcu
+  have hnorm' : cu ^ (Nat.card Fˣ / (s - 1)) = 1 := by
+    apply Units.ext
+    rw [hunits]
+    simpa [hcu] using hnorm
+  obtain ⟨b, hb⟩ := OddOrder.exists_pow_eq_of_pow_natCard_div_eq_one hdvd' hnorm'
+  have hval : ((b : Fˣ) : F) ^ (s - 1) = c := by
+    simpa [hcu] using congrArg (Units.val (α := F)) hb
+  have hb0 : ((b : Fˣ) : F) ≠ 0 := b.ne_zero
+  refine ⟨(((b : Fˣ) : F))⁻¹, inv_ne_zero hb0, ?_⟩
+  have hs1 : s = (s - 1) + 1 := by omega
+  rw [← hval, inv_pow, hs1, pow_succ]
+  field_simp
+  congr 1
 
 end OddOrder.RingAut

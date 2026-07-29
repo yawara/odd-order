@@ -433,3 +433,73 @@ Hilbert 90 の部分を実装するときの候補:
 その後に `Q/Q₀` の `𝔽₂[K]`-加群構造 (斉次分解 + `End(既約) = 体`) が要る
 — これは `SemilinearRealization.lean` (Q₀ について同じことをしている, 400 行) の
 規模感。**次セッションはここから**。
+
+
+## ✅ 代数的な核が完成 (2026-07-29)
+
+`Algebra/SemilinearFixedPoint.lean` (新 leaf, sorry ゼロ, AxiomsCheck 登録済):
+
+| 定理 | 内容 |
+|---|---|
+| `RingAut.exists_pow_eq` | 有限体の自己同型は `x ↦ x^s` (素体上で自動的に代数同型 + Gal は Frobenius 生成) |
+| `exists_pow_eq_of_pow_natCard_div_eq_one` | 有限巡回群で `d ∣ N`, `x^(N/d) = 1` ⟹ `x` は `d` 乗 |
+| `RingAut.exists_ne_zero_mul_pow_eq` | **Hilbert 90**: `\|F\| = s^n` + `c` の `s`-ノルム 1 ⟹ `v ↦ c·v^s` は非零固定点を持つ |
+
+⟹ 書籍の誤った Frobenius 主張を置き換える**代数側は完済**。
+`p ∤ q₀−1` はどこにも要らない。
+
+### 残り (群論側の配線)
+
+1. `Q/Q₀` に `𝔽₂[K]`-加群構造を入れる (`K` の共役作用)。
+2. `K` が `Q/Q₀` 上 fpf であること: `C_Q(k) = 1` (`conjQByK_fixed_eq_one`) +
+   coprime 作用の `C_{G/N}(a) = C_G(a)N/N`。
+3. 斉次分解: `K` 巡回 + fpf ⟹ 既約成分は忠実で次元 `m`、`dim = 2m` ゆえ成分は高々 2。
+   `X` は奇位数なので各成分を保つ。
+4. 成分上で `X` が半線形 (`x k x⁻¹ = k^{q₀}`) — ここで `exists_pow_eq` を使い
+   `End(既約) ≅ 𝔽_{2^m}` 上の `q₀`-半線形写像として `exists_ne_zero_mul_pow_eq` を適用。
+5. ⟹ `C_{Q/Q₀}(X) ≠ 1`。PSL 分岐の `C_Q(X) ≤ Q₀` と矛盾。
+6. Sz 分岐は `st` 位数 5 vs 3 で即死。PSU 分岐は完済。
+7. 3 分岐が揃えば `W_ne_bot_of_card_cube` → `trichotomy` の `hWcube` 除去 → 0163 完了。
+
+⚠ 3 の「`End(既約) ≅ 体`」と 1 の加群構造が最大の残作業。
+`SemilinearRealization.lean` が `Q₀` について同じ構成 (`exists_semilinear_field_model`)
+をしているので、そこから流用できるか実測するのが次の一手。
+
+
+## 群論側の実測: repo に既に在るもの / 残る難所 (2026-07-29)
+
+`StructureOfH/TwoKSubgroups.lean` (959 行) が case (3) 用に既に持っている:
+
+* `IsKSubgroupSquare X` — `Q₀ ≤ X ≤ Q`, `K`-不変, `|X| = q²`
+  (= `S/Q₀` の位数 `q` の `𝔽₂[K]`-部分加群を引き戻したもの)
+* `exists_kSubgroupSquare_complement` — **operator Maschke**: `A ≤ D` 不変な `N` から
+  同じく `A` 不変な補元 `N'` (`N ≠ N'`) を作る
+* `exists_two_kSubgroups_unique_of_card_cube` — **非 type B なら K-部分群はちょうど 2 つ**
+  (3 つ目があると Higman Thm (e) で type B になる)
+* `conj_mem_of_unique_of_le_V` — 一意なら「`P` が `X`, `Y` を正規化する」
+
+⟹ **非 type B の PSL 分岐は書籍の経路がそのまま通る**: 2 つの `K`-部分群は `X` 不変で、
+その `N/Q₀` (位数 `q`, `K`-既約) の上で `X` は半線形に作用するので
+`exists_ne_zero_mul_pow_eq` (Hilbert 90, 1 次元版) が `C_{N/Q₀}(X) ≠ 1` を与える。
+
+### ⚠ 残る難所: **type B + PSL 分岐**
+
+type B では `S/Q₀` は isotypic で **`K`-部分群が `q+1` 個**ある (書籍 p.117 が
+そう書いている; `ℙ¹(𝔽_q)` の点の数)。すると:
+
+* `X` (位数 `p`) は `q+1` 個を置換し、固定点の個数 ≡ `q+1 (mod p)`。
+  `p ∤ q+1` なら固定される `K`-部分群があり 1 次元 Hilbert 90 が使える。
+  **`p ∣ q+1` のときが問題** (Fermat で `p ∣ q₀+1` と同値)。
+* このとき `M = Q/Q₀` は `E = 𝔽_{2^m}` 上 2 次元で `X` は半線形。固定点非零は
+  **Lang / Speiser (GL₂ の Hilbert 90)** が要る — 1 次元版では足りない。
+* 書籍の type B 用の逃げ道「`P` centralizes an element of order 4 in `S`」は
+  **PSL 分岐では使えない**: PSL 分岐は `C_S(P)` が基本可換 (位数 4 の元が無い)。
+
+### 次の一手の候補
+
+(a) 非 type B の PSL 分岐だけ先に閉じる (書籍経路 + 1 次元 Hilbert 90)。
+(b) type B かつ `p ∣ q₀+1` の場合を潰す: `X` は `M` 上 fpf で
+    `F₀`-線形 (`σ` は `F₀` 上恒等) なので `M` は `F₀[ℤ/p]`-加群、
+    `dim_{F₀} M = 2p`、非自明既約の次元は `d₀ = ord_p(q₀)`。
+    `d₀ ∣ 2p` かつ `d₀ ∣ p−1` ⟹ `d₀ ∣ 2`。ここから先を詰める。
+(c) Lang/Speiser (GL_n 版 Hilbert 90) を形式化する。
