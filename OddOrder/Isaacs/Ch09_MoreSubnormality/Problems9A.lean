@@ -30,7 +30,9 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9A
   characteristically simple な有限群は abelian か semisimple。書籍 hint の
   holomorph `Hol(G) = G ⋊ Aut(G)` (`OddOrder/GroupTheory/Holomorph.lean`) で
   `G` の像が極小正規部分群になることから Lemma 9.6 を当てる。
-  ⏳ 残り = 各枝から「同型な単純群の直積」を組み立てる部分。
+  さらに `exists_simpleFamily_of_isSemisimpleGroup_of_isCharacteristicallySimple` で
+  **semisimple 枝は完結** (同型性は 9A.7 を `Hol(G)` で当てて出す)。
+  ⏳ 残り = abelian 枝 (elementary abelian ⟹ `ZMod p` の直積)。
 
 ## 実装ノート (9A.1)
 
@@ -822,6 +824,82 @@ theorem isMulCommutative_or_isSemisimpleGroup_of_isCharacteristicallySimple [Fin
   · haveI := hab
     exact Or.inl (isMulCommutative_of_surjective e.symm.toMonoidHom e.symm.surjective)
   · exact Or.inr (hss.of_mulEquiv e.symm)
+
+/-- 正規部分群は共役自己同型で不変。 -/
+theorem map_conj_eq_self_of_normal {T : Subgroup G} [hT : T.Normal] (a : G) :
+    T.map (MulAut.conj a).toMonoidHom = T := by
+  have ha : a ∈ Subgroup.normalizer T := by
+    rw [Subgroup.normalizer_eq_top_iff.mpr hT]
+    trivial
+  exact Subgroup.mem_normalizer_iff_map_conj_eq.mp ha
+
+/-- `G` の正規部分群 `T` の像は `Hol(G)` の中で `inl.range` の**単純直積因子**
+(`T` が非可換単純なら)。9A.8 の semisimple 枝で 9A.7 を当てるための橋。 -/
+theorem isSimpleFactorOf_map_inl {T : Subgroup G} [T.Normal] (hsimple : IsSimpleGroup ↥T)
+    (hnab : ¬IsMulCommutative ↥T) :
+    IsSimpleFactorOf ((SemidirectProduct.inl : G →* Holomorph G)).range
+      (T.map (SemidirectProduct.inl : G →* Holomorph G)) := by
+  have ee : ↥T ≃* ↥(T.map (SemidirectProduct.inl : G →* Holomorph G)) :=
+    Subgroup.equivMapOfInjective T _ SemidirectProduct.inl_injective
+  refine ⟨Subgroup.map_le_range _ _, ?_, ?_, ?_⟩
+  · rintro _ ⟨a, rfl⟩
+    rw [Subgroup.mem_normalizer_iff_map_conj_eq, Subgroup.map_map]
+    have hcomp : ((MulAut.conj (SemidirectProduct.inl a : Holomorph G)).toMonoidHom.comp
+        (SemidirectProduct.inl : G →* Holomorph G))
+        = (SemidirectProduct.inl : G →* Holomorph G).comp (MulAut.conj a).toMonoidHom := by
+      refine MonoidHom.ext fun x => ?_
+      exact Holomorph.conj_inl_general (SemidirectProduct.inl a) x
+    rw [show ((MulAut.conj (SemidirectProduct.inl a : Holomorph G)) :
+        Holomorph G →* Holomorph G) = (MulAut.conj
+          (SemidirectProduct.inl a : Holomorph G)).toMonoidHom from rfl, hcomp,
+      ← Subgroup.map_map, map_conj_eq_self_of_normal]
+  · haveI := hsimple
+    exact ee.symm.isSimpleGroup
+  · exact fun _ => hnab (isMulCommutative_of_surjective ee.symm.toMonoidHom ee.symm.surjective)
+
+/-- **Isaacs Problem 9A.8 (semisimple 枝)** (書籍 p. 277): characteristically simple かつ
+semisimple な有限群は, 互いに同型な非可換単純正規部分群の直積。
+
+同型性が 9A.7 の帰結: 各因子を `Hol(G)` の中で `inl.range` の単純直積因子と見ると,
+`inl.range` は極小正規部分群なので `Hol(G)` の共役で互いに移り合う。 -/
+theorem exists_simpleFamily_of_isSemisimpleGroup_of_isCharacteristicallySimple [Finite G]
+    (h : IsCharacteristicallySimple G) (hss : IsSemisimpleGroup G) :
+    ∃ 𝒵 : Set (Subgroup G), 𝒵.Nonempty ∧
+      (∀ T ∈ 𝒵, T.Normal ∧ IsSimpleGroup ↥T) ∧
+      (∀ T ∈ 𝒵, ∀ U ∈ 𝒵, Nonempty (↥T ≃* ↥U)) ∧
+      iSupIndep (fun T : ↥𝒵 => (T : Subgroup G)) ∧ sSup 𝒵 = ⊤ := by
+  haveI := h.1
+  obtain ⟨𝒳, h𝒳, hsup⟩ := hss
+  -- 族は空でない (空なら `sSup ∅ = ⊥ = ⊤`)。
+  have hne : 𝒳.Nonempty := by
+    rcases Set.eq_empty_or_nonempty 𝒳 with rfl | hne
+    · rw [sSup_empty] at hsup
+      exact absurd hsup bot_ne_top
+    · exact hne
+  refine ⟨𝒳, hne, fun T hT => ⟨(h𝒳 T hT).1, (h𝒳 T hT).2.1⟩, ?_,
+    iSupIndep_of_semisimpleFamily h𝒳, hsup⟩
+  -- `G` は非可換 (族のメンバーが非可換だから), したがって `inl.range` も非可換。
+  obtain ⟨S₀, hS₀⟩ := hne
+  have hnabG : ¬IsMulCommutative G := by
+    intro hc
+    haveI := hc
+    exact (h𝒳 S₀ hS₀).2.2 (Subgroup.le_centralizer_iff_isMulCommutative.mp
+      fun x _ => Subgroup.mem_centralizer_iff.mpr fun y _ => mul_comm' y x)
+  have e : G ≃* ↥((SemidirectProduct.inl : G →* Holomorph G)).range :=
+    MonoidHom.ofInjective SemidirectProduct.inl_injective
+  have hnabN : ¬IsMulCommutative ↥((SemidirectProduct.inl : G →* Holomorph G)).range :=
+    fun hc => hnabG (isMulCommutative_of_surjective e.symm.toMonoidHom e.symm.surjective)
+  have hmin := isMinimalNormal_range_inl_of_isCharacteristicallySimple h
+  intro T hT U hU
+  haveI := (h𝒳 T hT).1
+  haveI := (h𝒳 U hU).1
+  obtain ⟨γ, hγ⟩ := exists_conj_map_eq_of_isSimpleFactorOf hmin hnabN
+    (isSimpleFactorOf_map_inl (h𝒳 T hT).2.1 (h𝒳 T hT).2.2)
+    (isSimpleFactorOf_map_inl (h𝒳 U hU).2.1 (h𝒳 U hU).2.2)
+  exact ⟨(Subgroup.equivMapOfInjective T _ SemidirectProduct.inl_injective).trans
+    (((Subgroup.equivMapOfInjective _ _ (MulAut.conj γ).injective).trans
+      (MulEquiv.subgroupCongr hγ)).trans
+      (Subgroup.equivMapOfInjective U _ SemidirectProduct.inl_injective).symm)⟩
 
 end -- 9A.8
 
