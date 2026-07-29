@@ -559,3 +559,33 @@ Wielandt (9.1) の ambient 版 `natCard_eq_pow_natCard_inf_centralizer_of_kernel
    `conj_mem_of_unique_of_le_V` が土台。
 3. Artin から `q = q₀^p` (= `|Q₀| = |C_{Q₀}(X)|^p`) を出す配線
    (`finrank_fixedSet` + `GaloisCentralizer.lean` の半線形モデル)。
+
+
+## 進捗: PSL 分岐 case 1 が完済 (2026-07-29)
+
+`StructureOfH/WielandtOnQ.lean` に landing (sorry ゼロ, AxiomsCheck 登録済):
+
+* `isFrobeniusGroup_commutator_K_sup` — `p ∤ |K|` のとき `⁅K,X⁆ ⋊ X` は Frobenius
+* `natCard_eq_pow_natCard_inf_centralizer` — Wielandt `|N| = |C_N(X)|^{|X|}`
+  (H-不変な 2-部分群 `N ≤ Q` すべて)
+
+⟹ **case 1 (`p ∤ q₀−1`) の数学は完済**。残るのは:
+
+* (α) `p ∤ q₀−1 ⟹ p ∤ |K|` の配線 (`|K| = q−1` = `card_K_eq_card_Q0_sub_one`,
+  `q = q₀^p` + Fermat)
+* (β) case 2 (`p ∣ q₀−1`): `X` が固定する `K`-部分加群の存在 + その上の半線形性
+  + `exists_ne_zero_mul_pow_eq`
+* (γ) Artin から `q = q₀^p` (= `|Q₀| = |C_{Q₀}(X)|^p`) を出す配線
+* (δ) 3 分岐の組み立てと `hWcube` の除去
+
+### 全体の進捗表
+
+| 部品 | 状態 |
+|---|---|
+| PSU 分岐 (書籍の "as can be checked") | ✅ `CentralizerPSUData.false_of_W_eq_bot` |
+| Sz 分岐 | 未 (`st` 位数 5 vs 3 で即死、易) |
+| PSL 分岐 case 1 (`p ∤ q₀−1`) | ✅ 数学完済 (配線 α 残) |
+| PSL 分岐 case 2 (`p ∣ q₀−1`) | 代数側 ✅ (Hilbert 90) / 群論側 β 残 |
+| Galois `C_V(C_{Q₀}(P)) = P ⊔ W` | ✅ |
+| Artin `q = q₀^p` | 配線 γ 残 |
+| 組み立て | δ 残 |
