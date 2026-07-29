@@ -675,7 +675,7 @@ theorem exists_field_scalar_realization {p : ℕ} [Fact p.Prime]
     (hfree : ∀ (t : T) (e : E), e ≠ 1 → ψ t e = e → t = 1)
     (hcard : Nat.card T = Nat.card E - 1) :
     ∃ (F : Type u) (_ : Field F) (_ : Module F (Additive E)) (_ : Finite F),
-      Nat.card F = Nat.card E ∧
+      Module.finrank F (Additive E) = 1 ∧ Nat.card F = Nat.card E ∧
       ∃ μ : T ≃* Fˣ, ∀ (t : T) (x : Additive E),
         ((μ t : Fˣ) : F) • x = Additive.ofMul ((ψ t) (Additive.toMul x)) := by
   classical
@@ -715,7 +715,7 @@ theorem exists_field_scalar_realization {p : ℕ} [Fact p.Prime]
     have hBle : Nat.card ↥B ≤ Nat.card E := Subgroup.card_le_card_group B
     refine Subgroup.eq_top_of_card_eq B ?_
     omega
-  obtain ⟨F, instF, instMod, instFin, -, hcardF, ⟨μ₀, hμ₀⟩, -⟩ :=
+  obtain ⟨F, instF, instMod, instFin, hdim, hcardF, ⟨μ₀, hμ₀⟩, -⟩ :=
     exists_field_semilinear_with_scalar hE ψ hirr
   letI : Field F := instF
   letI : Module F (Additive E) := instMod
@@ -736,8 +736,39 @@ theorem exists_field_scalar_realization {p : ℕ} [Fact p.Prime]
   have hμbij : Function.Bijective μ₀ := by
     refine (Fintype.bijective_iff_injective_and_card μ₀).mpr ⟨hμinj, ?_⟩
     rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card, hunits, hcard]
-  exact ⟨F, instF, instMod, instFin, hcardF, MulEquiv.ofBijective μ₀ hμbij,
+  exact ⟨F, instF, instMod, instFin, hdim, hcardF, MulEquiv.ofBijective μ₀ hμbij,
     fun t y => hμ₀' t (Additive.toMul y)⟩
+
+/-- **Coordinates for the scalar realization.**  With `E` a line over `F`, a
+choice of basis vector turns `E` into `F` itself: an additive isomorphism
+`α : E → F` under which the action of `t ∈ T` is multiplication by `μ t`.
+
+This is the map `α` of Peterfalvi Part II, Ch. III §2, p. 119. -/
+theorem exists_field_coordinate_realization {p : ℕ} [Fact p.Prime]
+    {E : Type u} [CommGroup E] [Finite E] [Nontrivial E]
+    (hE : IsElementaryAbelian p E) {T : Type*} [CommGroup T] [Finite T]
+    (ψ : T →* MulAut E)
+    (hfree : ∀ (t : T) (e : E), e ≠ 1 → ψ t e = e → t = 1)
+    (hcard : Nat.card T = Nat.card E - 1) :
+    ∃ (F : Type u) (_ : Field F) (_ : Finite F) (μ : T ≃* Fˣ) (α : Additive E ≃+ F),
+      Nat.card F = Nat.card E ∧
+      ∀ (t : T) (y : E), α (Additive.ofMul ((ψ t) y))
+        = ((μ t : Fˣ) : F) * α (Additive.ofMul y) := by
+  obtain ⟨F, instF, instMod, instFin, hdim, hcardF, μ, hμ⟩ :=
+    exists_field_scalar_realization hE ψ hfree hcard
+  letI : Field F := instF
+  letI : Module F (Additive E) := instMod
+  letI : Finite F := instFin
+  obtain ⟨e⟩ := Module.nonempty_linearEquiv_of_finrank_eq_one (R := F) (M := Additive E) hdim
+  refine ⟨F, instF, instFin, μ, e.symm.toAddEquiv, hcardF, fun t y => ?_⟩
+  have hlin : ∀ (a : F) (x : Additive E), e.symm (a • x) = a * e.symm x := by
+    intro a x
+    simp [smul_eq_mul]
+  have hval : ((μ t : Fˣ) : F) • (Additive.ofMul y)
+      = Additive.ofMul ((ψ t) y) := hμ t y
+  change e.symm (Additive.ofMul ((ψ t) y))
+      = ((μ t : Fˣ) : F) * e.symm (Additive.ofMul y)
+  rw [← hval, hlin]
 
 end Prop2Regular
 

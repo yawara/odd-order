@@ -405,3 +405,25 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 3. (5)(6)(7) の導出 (`tConjTriple_conj` (1) と `exists_tConjTriple_eq` (4) を `α`/`μ` で送る)。
 4. 体の代数 (上の 3 段、`field_simp` + `ring` で行けるはず)。
 5. `x ≠ 1` の involution 論法 (`t_mul_mul_t_notMem_H` 系が土台)。
+
+## p.119 の第 1・2 段が landing (2026-07-29 セッション末)
+
+`Appendices/SemilinearField.lean` (抽象・再利用可能):
+
+* **`Huppert.exists_field_scalar_realization`** — 自由作用 + `|T| = |E| − 1` ⟹
+  `E` は体 `F` (`|F| = |E|`) 上の直線、`T` はスカラー、`μ : T ≃* Fˣ` は全単射
+* **`Huppert.exists_field_coordinate_realization`** — さらに基底を選んで
+  **`α : Additive E ≃+ F`** を取り、`α (ψ t y) = μ t · α y` を得る
+  (= p.119 の `α`)
+
+### 次セッションの入口
+
+1. `M := ↥Q ⧸ Z(↥Q)` に `exists_field_coordinate_realization` を適用する配線。
+   入力は `hQEA` (基本可換; `HilbertNinetyOnQ.lean` の `hQEA` と同型)、
+   `K` の自由性 (`hKfree` 経由、`exists_mem_inf_centralizer_not_mem_Q0_of_orbit` の
+   `hfree` がそのまま使える)、および `|K| = |M| − 1`
+   (`|M| = |Q|/|Z(Q)| = q²/q = q`, `|K| = q−1`)。
+   `CommGroup M` は `hQEA.comm` から `letI`。
+2. `α(r) = 1` の正規化 (α は全単射なので `α(r) ≠ 0` を単位に取り直す、
+   あるいは `α` を `α(r)⁻¹` 倍する)。
+3. (5)(6)(7) の導出 → 体の代数 → `x ≠ 1` の involution 論法。

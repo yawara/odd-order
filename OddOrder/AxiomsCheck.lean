@@ -14236,3 +14236,5 @@ This is the common core of the identification of `Q₀` with `𝐅_q` (`exists_f
 and of the identification of `S/Q₀` with `𝐅_q` that p. 119 needs. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Huppert.exists_field_scalar_realization
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.exists_field_coordinate_realization
