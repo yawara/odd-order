@@ -219,39 +219,56 @@ noncomputable def componentImageEquiv [Finite G] {H : Subgroup G} (hH : IsCompon
     QuotientGroup.congr (center ↥Ĥ) (center ↥H) e0 (map_center_mulEquiv e0)
   exact e2.symm.trans e3
 
+variable (G) in
+/-- **Thm 9.7(b) の semisimple 族**: `E/Z(E)` の中の component の像たち
+`{ C̄ = (C ∩ E)Z(E)/Z(E) | C は `G` の component }`。
+
+Thm 9.7(b) の証明で使う族をそのまま名前付きで切り出したもの。9A.4 では
+「`E/Z(E)` の極小正規部分群は component の像に限る」
+(`mem_semisimpleFamily_of_isMinimalNormal` を本族に当てる) の形で使う。 -/
+def componentImageFamily : Set (Subgroup (↥(layer G) ⧸ center ↥(layer G))) :=
+  Set.range fun H : {H : Subgroup G // IsComponent H} =>
+    ((H : Subgroup G).subgroupOf (layer G)).map (QuotientGroup.mk' (center ↥(layer G)))
+
+/-- 族の各メンバーは nonabelian simple normal (`componentImageEquiv` で
+`↥C ⧸ Z(C)` と同型ゆえ)。 -/
+theorem componentImageFamily_spec [Finite G] :
+    ∀ S ∈ componentImageFamily G, S.Normal ∧ IsSimpleGroup ↥S ∧ ¬IsMulCommutative ↥S := by
+  rintro _ ⟨H, rfl⟩
+  have hnormal : (((H : Subgroup G).subgroupOf (layer G)).map
+      (QuotientGroup.mk' (center ↥(layer G)))).Normal :=
+    Subgroup.Normal.map H.2.normal_subgroupOf_layer _ (QuotientGroup.mk'_surjective _)
+  have e := componentImageEquiv H.2
+  haveI := H.2.isQuasisimple.isSimpleGroup_quotient
+  refine ⟨hnormal, e.isSimpleGroup, fun hcomm => ?_⟩
+  haveI := hcomm
+  exact not_isMulCommutative_of_isSimpleGroup_quotient_center
+    H.2.isQuasisimple.isSimpleGroup_quotient
+    (isMulCommutative_of_surjective e.toMonoidHom e.surjective)
+
+/-- 族は `E/Z(E)` を生成 (component が `E` を生成するから)。 -/
+theorem sSup_componentImageFamily [Finite G] : sSup (componentImageFamily G) = ⊤ := by
+  have hgen : ⨆ H : {H : Subgroup G // IsComponent H},
+      ((H : Subgroup G).subgroupOf (layer G)) = ⊤ := by
+    apply Subgroup.map_injective (layer G).subtype_injective
+    rw [Subgroup.map_iSup, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    have hcongr : (⨆ H : {H : Subgroup G // IsComponent H},
+        ((H : Subgroup G).subgroupOf (layer G)).map (layer G).subtype)
+        = ⨆ H : {H : Subgroup G // IsComponent H}, (H : Subgroup G) := by
+      apply iSup_congr
+      intro H
+      rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr H.2.le_layer]
+    rw [hcongr, show layer G = sSup {H : Subgroup G | IsComponent H} from rfl]
+    exact (sSup_eq_iSup' _).symm
+  apply le_antisymm le_top
+  rw [← Subgroup.map_top_of_surjective (QuotientGroup.mk' (center ↥(layer G)))
+      (QuotientGroup.mk'_surjective _), ← hgen, Subgroup.map_iSup]
+  exact iSup_le fun H => le_sSup ⟨H, rfl⟩
+
 /-- **Isaacs Theorem 9.7(b)**: `E/Z(E)` は semisimple. -/
 theorem isSemisimpleGroup_layer_quotient_center [Finite G] :
-    IsSemisimpleGroup (↥(layer G) ⧸ center ↥(layer G)) := by
-  set E := layer G
-  set π := QuotientGroup.mk' (center ↥E)
-  refine ⟨Set.range (fun H : {H : Subgroup G // IsComponent H} =>
-    ((H : Subgroup G).subgroupOf E).map π), ?_, ?_⟩
-  · rintro _ ⟨H, rfl⟩
-    have hnormal : (((H : Subgroup G).subgroupOf E).map π).Normal :=
-      Subgroup.Normal.map H.2.normal_subgroupOf_layer π (QuotientGroup.mk'_surjective _)
-    have e := componentImageEquiv H.2
-    haveI := H.2.isQuasisimple.isSimpleGroup_quotient
-    refine ⟨hnormal, e.isSimpleGroup, fun hcomm => ?_⟩
-    haveI := hcomm
-    exact not_isMulCommutative_of_isSimpleGroup_quotient_center
-      H.2.isQuasisimple.isSimpleGroup_quotient
-      (isMulCommutative_of_surjective e.toMonoidHom e.surjective)
-  · -- 族が生成: component が `E` を生成 ⇒ 像が `⊤`
-    have hgen : ⨆ H : {H : Subgroup G // IsComponent H}, ((H : Subgroup G).subgroupOf E) = ⊤ := by
-      apply Subgroup.map_injective E.subtype_injective
-      rw [Subgroup.map_iSup, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
-      have hcongr : (⨆ H : {H : Subgroup G // IsComponent H},
-          ((H : Subgroup G).subgroupOf E).map E.subtype)
-          = ⨆ H : {H : Subgroup G // IsComponent H}, (H : Subgroup G) := by
-        apply iSup_congr
-        intro H
-        rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr H.2.le_layer]
-      rw [hcongr, show E = sSup {H : Subgroup G | IsComponent H} from rfl]
-      exact (sSup_eq_iSup' _).symm
-    apply le_antisymm le_top
-    rw [← Subgroup.map_top_of_surjective π (QuotientGroup.mk'_surjective _), ← hgen,
-      Subgroup.map_iSup]
-    refine iSup_le fun H => le_sSup ⟨H, rfl⟩
+    IsSemisimpleGroup (↥(layer G) ⧸ center ↥(layer G)) :=
+  ⟨componentImageFamily G, componentImageFamily_spec, sSup_componentImageFamily⟩
 
 end
 

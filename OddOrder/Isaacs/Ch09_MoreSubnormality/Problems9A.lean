@@ -18,6 +18,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9A
   「abelian 群」と「semisimple 群」の直積 (`abelianSocle` × `semisimpleSocle`)。
 * **9A.3** `eq_iSup_isMinimalNormal_le_of_isSemisimpleGroup` — `G` semisimple, `N ⊴ G` なら
   `N` は `N` に含まれる極小正規部分群の join。
+* **9A.4** `eq_iSup_component_sup_inf_center` — `N ⊴ E(G)` なら `N = M Y`
+  (`M` = `N` に含まれる component の積, `Y = N ∩ Z(E)`)。⚠ 書籍の `Y = M ∩ Z(E)` は誤植。
 
 ## 実装ノート (9A.1)
 
@@ -448,5 +450,96 @@ theorem eq_iSup_isMinimalNormal_le_of_isSemisimpleGroup [Finite G] (hss : IsSemi
   simpa using hu
 
 end -- 9A.3
+
+section /- 9A.4: E の正規部分群は component の積と N ∩ Z(E) の積 (p. 277) -/
+
+/-- **`E/Z(E)` の極小正規部分群は component の像に限る** (Lemma 9.5 後半を Thm 9.7(b) の
+族 `componentImageFamily` に当てたもの)。 -/
+theorem exists_isComponent_map_eq_of_isMinimalNormal [Finite G]
+    {K : Subgroup (↥(layer G) ⧸ center ↥(layer G))} (hK : Ch02.IsMinimalNormal K) :
+    ∃ C : Subgroup G, IsComponent C ∧
+      (C.subgroupOf (layer G)).map (QuotientGroup.mk' (center ↥(layer G))) = K := by
+  obtain ⟨C, hC⟩ :=
+    mem_semisimpleFamily_of_isMinimalNormal componentImageFamily_spec sSup_componentImageFamily hK
+  exact ⟨C, C.2, hC⟩
+
+/-- **perfect な部分群は「`N` と中心の join」に入るなら `N` に入る**:
+`E/N` の中で像が中心的かつ perfect ⟹ 像は自明。9A.4 で `C̄ ≤ N̄` から `C ≤ N` を出す step。 -/
+theorem le_of_le_sup_center_of_isPerfect {E : Type*} [Group E] {C N : Subgroup E} [N.Normal]
+    [Group.IsPerfect ↥C] (h : C ≤ N ⊔ center E) : C ≤ N := by
+  have hcent : C.map (QuotientGroup.mk' N) ≤ center (E ⧸ N) := by
+    calc C.map (QuotientGroup.mk' N) ≤ (N ⊔ center E).map (QuotientGroup.mk' N) :=
+          Subgroup.map_mono h
+      _ = N.map (QuotientGroup.mk' N) ⊔ (center E).map (QuotientGroup.mk' N) :=
+          Subgroup.map_sup _ _ _
+      _ ≤ center (E ⧸ N) := by
+          rw [(Subgroup.map_eq_bot_iff _).mpr (by rw [QuotientGroup.ker_mk']), bot_sup_eq]
+          exact map_center_le_center_of_surjective (QuotientGroup.mk'_surjective N)
+  have hperf : ⁅C.map (QuotientGroup.mk' N), C.map (QuotientGroup.mk' N)⁆
+      = C.map (QuotientGroup.mk' N) := by
+    rw [← Subgroup.map_commutator, Subgroup.commutator_eq_self]
+  have hbot : C.map (QuotientGroup.mk' N) = ⊥ := by
+    rw [← hperf]
+    exact Subgroup.commutator_eq_bot_iff_le_centralizer.mpr
+      (hcent.trans (Subgroup.center_le_centralizer _))
+  have := (Subgroup.map_eq_bot_iff _).mp hbot
+  rwa [QuotientGroup.ker_mk'] at this
+
+/-- **Isaacs Problem 9A.4** (書籍 p. 277) ⭐: `E = E(G)` で `N ⊴ E` なら `N = M Y`,
+ここで `M` は `N` に含まれる `G` の component たちの積, `Y = N ∩ Z(E)`。
+
+⚠ 書籍は `Y = M ∩ Z(E)` と書いているが**誤植** (それだと `Y ≤ M` で `M Y = M` となり,
+`E` が quasisimple で `N = Z(E)` の場合に `M = 1 ≠ N` で偽になる)。正しくは `N ∩ Z(E)`。
+
+**証明**: `π : E → E/Z(E)` とすると `E/Z(E)` は semisimple (Thm 9.7(b))。9A.3 を
+`N̄ = π(N) ⊴ E/Z(E)` に適用すると `N̄` は含まれる極小正規部分群の join, そして
+`E/Z(E)` の極小正規部分群は component の像 `C̄` に限る
+(`exists_isComponent_map_eq_of_isMinimalNormal`)。`C̄ ≤ N̄` から `C ≤ N Z(E)`,
+`C` は perfect なので `C ≤ N` (`le_of_le_sup_center_of_isPerfect`)。
+よって `N̄ ≤ π(M)`, したがって `n ∈ N` に対し `π n = π m` なる `m ∈ M ≤ N` が取れて
+`m⁻¹ n ∈ N ∩ ker π = N ∩ Z(E) = Y`, すなわち `n ∈ M Y`。 -/
+theorem eq_iSup_component_sup_inf_center [Finite G] (N : Subgroup ↥(layer G)) [N.Normal] :
+    N = (⨆ C : {C : Subgroup G // IsComponent C ∧ C.subgroupOf (layer G) ≤ N},
+          ((C : Subgroup G).subgroupOf (layer G))) ⊔ (N ⊓ center ↥(layer G)) := by
+  set π := QuotientGroup.mk' (center ↥(layer G)) with hπ
+  set M := ⨆ C : {C : Subgroup G // IsComponent C ∧ C.subgroupOf (layer G) ≤ N},
+    ((C : Subgroup G).subgroupOf (layer G)) with hM
+  have hMN : M ≤ N := iSup_le fun C => C.2.2
+  refine le_antisymm ?_ (sup_le hMN inf_le_left)
+  -- `π(N) ≤ π(M)`
+  haveI : (N.map π).Normal := Subgroup.Normal.map inferInstance π (QuotientGroup.mk'_surjective _)
+  have hNM : N.map π ≤ M.map π := by
+    rw [eq_iSup_isMinimalNormal_le_of_isSemisimpleGroup isSemisimpleGroup_layer_quotient_center
+      (N.map π)]
+    refine iSup_le fun K => ?_
+    obtain ⟨C, hCcomp, hCeq⟩ := exists_isComponent_map_eq_of_isMinimalNormal K.2.1
+    -- `C̄ ≤ N̄` ⟹ `C ≤ N ⊔ Z(E)` ⟹ (perfect) `C ≤ N`
+    have hCle : C.subgroupOf (layer G) ≤ N ⊔ center ↥(layer G) := by
+      have h1 : (C.subgroupOf (layer G)).map π ≤ N.map π := hCeq ▸ K.2.2
+      have h2 := Subgroup.map_le_iff_le_comap.mp h1
+      rwa [Subgroup.comap_map_eq, hπ, QuotientGroup.ker_mk'] at h2
+    haveI := hCcomp.isQuasisimple.isPerfect
+    haveI : Group.IsPerfect ↥(C.subgroupOf (layer G)) :=
+      Group.IsPerfect.ofSurjective
+        (f := (Subgroup.subgroupOfEquivOfLe hCcomp.le_layer).symm.toMonoidHom)
+        (Subgroup.subgroupOfEquivOfLe hCcomp.le_layer).symm.surjective
+    have hCN : C.subgroupOf (layer G) ≤ N := le_of_le_sup_center_of_isPerfect hCle
+    rw [← hCeq, hM]
+    exact Subgroup.map_mono
+      (le_iSup (fun C : {C : Subgroup G // IsComponent C ∧ C.subgroupOf (layer G) ≤ N} =>
+        ((C : Subgroup G).subgroupOf (layer G))) ⟨C, hCcomp, hCN⟩)
+  -- `n ∈ N` を `m y` (`m ∈ M`, `y ∈ N ⊓ Z(E)`) に分解
+  intro n hn
+  obtain ⟨m, hm, hmn⟩ := hNM ⟨n, hn, rfl⟩
+  have hy : m⁻¹ * n ∈ N ⊓ center ↥(layer G) := by
+    refine ⟨Subgroup.mul_mem _ (Subgroup.inv_mem _ (hMN hm)) hn, ?_⟩
+    have : π (m⁻¹ * n) = 1 := by rw [map_mul, map_inv, hmn, inv_mul_cancel]
+    rw [← QuotientGroup.ker_mk' (center ↥(layer G))]
+    exact this
+  have hne : n = m * (m⁻¹ * n) := by group
+  rw [hne]
+  exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hm) (Subgroup.mem_sup_right hy)
+
+end -- 9A.4
 
 end OddOrder.Isaacs.Ch09
