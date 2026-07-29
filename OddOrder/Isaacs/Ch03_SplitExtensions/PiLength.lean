@@ -127,6 +127,74 @@ theorem hasPiLengthLE_zero_of_isPiGroup [Finite G] {π : Set ℕ}
     rwa [Nat.card_congr (Subgroup.topEquiv (G := G)).toEquiv] at hq
   exact Subgroup.IsPiGroup.le_oPiCore htop
 
+/-! ### 商への shift (`π`-length の帰納の要) -/
+
+/-- **`oPiCoreOver` は商と可換**: `M ≤ N` (ともに `G` に正規) のとき
+`O_π(G/N)` の逆像は `G/M` の中で `O_π((G/M)/(N/M))` の逆像に一致する。
+
+Noether 第三同型 (`QuotientGroup.quotientQuotientEquivQuotient`) と
+`oPiCore.map_eq_of_mulEquiv` による。 -/
+theorem oPiCoreOver_eq_comap_map (π : Set ℕ) {M N : Subgroup G} [M.Normal] [N.Normal]
+    (hMN : M ≤ N) :
+    oPiCoreOver π N
+      = (oPiCoreOver π (N.map (QuotientGroup.mk' M))).comap (QuotientGroup.mk' M) := by
+  haveI hNbar : (N.map (QuotientGroup.mk' M)).Normal :=
+    (inferInstance : N.Normal).map _ (QuotientGroup.mk'_surjective M)
+  set e := QuotientGroup.quotientQuotientEquivQuotient M N hMN with he
+  have hoPi : (oPiCore π (G ⧸ N)).comap
+      (e : ((G ⧸ M) ⧸ N.map (QuotientGroup.mk' M)) →* G ⧸ N)
+      = oPiCore π ((G ⧸ M) ⧸ N.map (QuotientGroup.mk' M)) := by
+    rw [← oPiCore.map_eq_of_mulEquiv π e]
+    exact Subgroup.comap_map_eq_self_of_injective e.injective _
+  have hcomp : (e : ((G ⧸ M) ⧸ N.map (QuotientGroup.mk' M)) →* G ⧸ N).comp
+      ((QuotientGroup.mk' (N.map (QuotientGroup.mk' M))).comp (QuotientGroup.mk' M))
+      = QuotientGroup.mk' N := by
+    ext x
+    exact QuotientGroup.quotientQuotientEquivQuotientAux_mk_mk M N hMN x
+  rw [oPiCoreOver_of_normal, oPiCoreOver_of_normal, ← hoPi, Subgroup.comap_comap,
+    Subgroup.comap_comap, hcomp]
+
+/-- `O_{π',π}(G)` は upper `π`-series の第 `k+1` 段に含まれる。 -/
+theorem oPiPrimePiCore_le_piUpperSeries_succ (π : Set ℕ) (G : Type*) [Group G] (k : ℕ) :
+    oPiPrimePiCore π G ≤ piUpperSeries π G (k + 1) := by
+  refine le_trans ?_ (piUpperSeries_monotone π G (Nat.succ_le_succ (Nat.zero_le k)))
+  rw [piUpperSeries_one]
+  exact le_oPiCoreOver _ _
+
+/-- **upper `π`-series の shift**: `M := O_{π',π}(G)` とおくと
+`piUpperSeries π G (k+1)` は `G/M` の第 `k` 段の逆像。
+
+これが「`π`-length は `G/O_{π',π}(G)` に移ると 1 減る」の形式化。 -/
+theorem piUpperSeries_succ_eq_comap (π : Set ℕ) (G : Type*) [Group G] (k : ℕ) :
+    piUpperSeries π G (k + 1)
+      = (piUpperSeries π (G ⧸ oPiPrimePiCore π G) k).comap
+          (QuotientGroup.mk' (oPiPrimePiCore π G)) := by
+  induction k with
+  | zero =>
+    rw [piUpperSeries_succ, piUpperSeries_zero, piUpperSeries_zero, oPiCoreOver_oPiCore_compl,
+      oPiCoreOver_of_normal]
+  | succ n ih =>
+    have hMle : oPiPrimePiCore π G ≤ piUpperSeries π G (n + 1) :=
+      oPiPrimePiCore_le_piUpperSeries_succ π G n
+    have hmap : (piUpperSeries π G (n + 1)).map
+        (QuotientGroup.mk' (oPiPrimePiCore π G)) = piUpperSeries π (G ⧸ oPiPrimePiCore π G) n := by
+      rw [ih]
+      exact Subgroup.map_comap_eq_self_of_surjective
+        (QuotientGroup.mk'_surjective _) _
+    have hinner : oPiCoreOver π (piUpperSeries π G (n + 1))
+        = (oPiCoreOver π (piUpperSeries π (G ⧸ oPiPrimePiCore π G) n)).comap
+            (QuotientGroup.mk' (oPiPrimePiCore π G)) := by
+      rw [oPiCoreOver_eq_comap_map π hMle, hmap]
+    have hMle' : oPiPrimePiCore π G ≤ oPiCoreOver π (piUpperSeries π G (n + 1)) :=
+      hMle.trans (le_oPiCoreOver π _)
+    have hmap' : (oPiCoreOver π (piUpperSeries π G (n + 1))).map
+        (QuotientGroup.mk' (oPiPrimePiCore π G))
+        = oPiCoreOver π (piUpperSeries π (G ⧸ oPiPrimePiCore π G) n) := by
+      rw [hinner]
+      exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective _) _
+    rw [piUpperSeries_succ π G (n + 1), piUpperSeries_succ π (G ⧸ oPiPrimePiCore π G) n,
+      oPiCoreOver_eq_comap_map {q | q ∉ π} hMle', hmap']
+
 end -- 3D: π-length
 
 end OddOrder.Isaacs.Ch03

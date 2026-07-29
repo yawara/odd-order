@@ -51,15 +51,25 @@ repo に `p`-length の定義が無かったので新設。
 * `HasPiLengthLE π G k` (= `piUpperSeries π G k = ⊤`) + `.mono` +
   `hasPiLengthLE_zero_of_isPiGroup` (`π'`-群は length 0 = 帰納の base case)。
 
-**次の一手 (3D.1(b) 本体)**: 帰納の骨格は
-`c := nilpotencyClass ↥P` に関する帰納で、`M := O_{π',π}(G)` として
-`piUpperSeries π G (k+1) = comap (mk' M) (piUpperSeries π (G ⧸ M) k)` (**shift 補題**) を使う。
-shift 補題の要は
-`oPiCoreOver π (comap (mk' M) N̄) = comap (mk' M) (oPiCoreOver π N̄)` で、
-`(G/M)/N̄ ≅ G/N` (`QuotientGroup.quotientQuotientEquivQuotient`) と
-`oPiCore.map_eq_of_mulEquiv` で示す。
-クラス降下は 3D.1(a) から `Z(P) ≤ M` を出し、`PM/M ≅ P/(P ⊓ M)` が `P/Z(P)` の商ゆえ
-class ≤ c−1。
+* ✅ **shift 補題** (2026-07-29): `oPiCoreOver_eq_comap_map`
+  (`M ≤ N` なら `oPiCoreOver π N = comap (mk' M) (oPiCoreOver π (N/M))`;
+  Noether 第三同型 `QuotientGroup.quotientQuotientEquivQuotient` +
+  `oPiCore.map_eq_of_mulEquiv`) と、それを繰り返した
+  **`piUpperSeries_succ_eq_comap`**:
+  `piUpperSeries π G (k+1) = comap (mk' (O_{π',π}(G))) (piUpperSeries π (G/O_{π',π}(G)) k)`。
+  = 「`π`-length は `G/O_{π',π}(G)` に移ると 1 減る」の形式化。
+  補助 = `oPiPrimePiCore_le_piUpperSeries_succ`。
+
+**次の一手 (3D.1(b) 本体)**: `c := nilpotencyClass ↥P` に関する帰納。
+* base `c = 0`: `P` 自明 ⟹ `p ∤ |G|` ⟹ `hasPiLengthLE_zero_of_isPiGroup`。
+* step: `M := O_{p',p}(G)`。`Z(P) ≤ M` を出す (下記) と `↥P/(M.subgroupOf P)` は
+  `↥P/Z(↥P)` の商ゆえ class ≤ c (`Group.nilpotencyClass_quotient_center` +
+  `Group.nilpotencyClass_le_of_surjective`)。これが `G/M` の Sylow `p` と同型なので
+  帰納法の仮説 + `piUpperSeries_succ_eq_comap` で閉じる。
+* **`Z(P) ≤ M` の出し方 (iso を経由しない筋を確定済)**: `N := O_{p'}(G)`, `Ḡ := G/N` で
+  `z ∈ Z(P)` の像は `P̄ = PN/N` を中心化し (`[z̄, p̄n̄] = [z̄, p̄] = 1`)、かつ `z̄ ∈ P̄` なので
+  `z̄ ∈ Z(P̄) ≤ O_p(Ḡ)` (3D.1(a))。ゆえに `z ∈ comap (mk' N) (O_p(Ḡ)) = M`。
+  ⚠ `P ≅ P̄` の同型を作る必要は無い。
 
 ### §3D の統制情報 (2026-07-29)
 
