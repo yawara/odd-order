@@ -8,6 +8,7 @@ import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
 
 /-!
 # Isaacs §9B の演習 (書籍 pp. 284-285)
@@ -146,6 +147,14 @@ theorem card_mulAut_congr {H K : Type*} [Group H] [Group K] (e : H ≃* K) :
     ⟨fun φ => e.symm.trans (φ.trans e), fun ψ => e.trans (ψ.trans e.symm),
       fun φ => MulEquiv.ext fun x => by simp, fun ψ => MulEquiv.ext fun x => by simp⟩
 
+/-- `G` の `G₃ = Aut(Aut(G))` での像は `Inn(G)` の `autTowerStep G 1` による像。 -/
+theorem range_autTowerEmb_two.{u} (G : Type u) [Group G] :
+    (autTowerEmb G 0 2).range = (innAut G).map (autTowerStep G 1) := by
+  rw [autTowerEmb_succ, MonoidHom.range_comp, autTowerEmb_succ, MonoidHom.range_comp,
+    autTowerEmb_zero, MonoidHom.range_eq_top.mpr Function.surjective_id,
+    ← MonoidHom.range_eq_map, range_autTowerStep]
+  rfl
+
 /-- **Isaacs Problem 9B.2** (書籍 p. 285) ⭐ — **再解釈版** (issue 1055 参照):
 `Z(G) = 1` で `G` の像が `G₃ = Aut(Aut(G))` で正規なら, `Aut(G)` は **complete**。
 すなわち automorphism tower は `G₂ = Aut(G)` で止まり, 相異なる群は高々 2 個。
@@ -169,13 +178,8 @@ theorem isCompleteGroup_autTowerType_one_of_normal_range.{u} {G : Type u} [Group
     rw [range_autTowerStep]
     exact centralizer_innAut_eq_bot (center_autTowerType_eq_bot hZ 1)
   -- `A = (Inn G).map (autTowerStep G 1)`。
-  have hA : (autTowerEmb G 0 2).range
-      = (innAut G).map (autTowerStep G 1) := by
-    rw [autTowerEmb_succ, MonoidHom.range_comp, autTowerEmb_succ, MonoidHom.range_comp,
-      autTowerEmb_zero,
-      MonoidHom.range_eq_top.mpr Function.surjective_id, ← MonoidHom.range_eq_map,
-      range_autTowerStep]
-    rfl
+  have hA : (autTowerEmb G 0 2).range = (innAut G).map (autTowerStep G 1) :=
+    range_autTowerEmb_two G
   -- `C_{G₃}(A) ⊓ B = 1` (Lemma 9.11(c) を `autTowerStep G 1` で押し出す)。
   have hinf : Subgroup.centralizer (((autTowerEmb G 0 2).range :
         Subgroup (autTowerType G 2)) : Set (autTowerType G 2))
@@ -211,5 +215,28 @@ theorem isCompleteGroup_autTowerType_one_of_normal_range.{u} {G : Type u} [Group
   rwa [range_autTowerStep] at hBtop
 
 end -- 9B.2
+
+section /- 9B.3 の部品: E(Aut G) と Inn(G) (p. 285) -/
+
+/-- `K` が `H` のすべての自己同型で保たれる (= characteristic) なら, `K` の `Aut(H)` での像
+`{τ_k | k ∈ K}` は `Aut(H)` で**正規**。`α τ_k α⁻¹ = τ_{α k}` (Lemma 9.11 の計算) から。
+
+9B.3 で `K = Inn(G) = E(Aut G)` に使う (layer は characteristic)。 -/
+theorem normal_map_conj_of_map_le {H : Type*} [Group H] {K : Subgroup H}
+    (hK : ∀ α : MulAut H, K.map (α : H →* H) ≤ K) :
+    (K.map (MulAut.conj : H →* MulAut H)).Normal := by
+  refine ⟨fun n hn α => ?_⟩
+  obtain ⟨k, hk, rfl⟩ := hn
+  exact ⟨α k, hK α ⟨k, hk, rfl⟩, (mulAut_conj_conj α k).symm⟩
+
+/-- **`Z(G) = 1` なら `E(Aut G) ≤ Inn(G)`** — 9A.6 (`C_H(H') ≤ H'` ⟹ `E(H) ≤ H'`) を
+`H' = Inn(G)` に当てるだけ (`C_{Aut G}(Inn G) = 1` は Lemma 9.11(c))。 -/
+theorem layer_mulAut_le_innAut [Finite G] (hZ : Subgroup.center G = ⊥) :
+    layer (MulAut G) ≤ innAut G := by
+  refine layer_le_of_centralizer_le ?_
+  rw [centralizer_innAut_eq_bot hZ]
+  exact bot_le
+
+end -- 9B.3 の部品
 
 end OddOrder.Isaacs.Ch09
