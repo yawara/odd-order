@@ -31,9 +31,9 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       (§1E は Sylow 計数の非単純性 8 問, §1F は Brodkey 周辺 3 問, §1G は Chermak–Delgado 4 問)
 - [ ] Ch.2 Subnormality
 - [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
-      **§3D 進行中 (2026-07-29)**: 3D.1(a) ✅ / 3D.2 ✅ / 3D.3 ✅ / 3D.5 ✅
-      (`Problems3D.lean`)。残り = **3D.4** (`Φ(G)` 上自明な互いに素な作用は自明) と
-      **3D.1(b)** (`p`-length ≤ `P` の冪零類; `p`-length の定義から要)。その後 §3E。
+      **§3D 進行中 (2026-07-29)**: 3D.1(a) ✅ / 3D.2 ✅ / 3D.3 ✅ / 3D.4 ✅ / 3D.5 ✅
+      (`Problems3D.lean`, 495 行)。残り = **3D.1(b) のみ**
+      (`p`-length ≤ `P` の冪零類; `p`-length の定義から要)。その後 §3E。
 
 ### §3D の統制情報 (2026-07-29)
 
@@ -62,12 +62,17 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   `O_{π'}(Ḡ) = 1` ゆえ Hall–Higman が効き, 3D.2 より `O_π(Ḡ)` は `O_π(G)` の像。
   `O_π(G) ≤ Z(G)` なのでこの像は `Ḡ` 全体に中心化され `O_π(Ḡ) = ⊤`,
   引き戻して `O_π(G) ⊔ N = ⊤ ≤ Z(G)`。
-* ⬜ **3D.4** の証明経路 (次の実装対象): 書籍 Hint どおり `H` が `q`-群の場合に帰着
-  (各素数 `q` の Sylow `Q ≤ H` が自明に作用 ⟹ `|H|_q ∣ |ker|` ⟹ `[H:ker] = 1`)。
-  `q`-群の場合は `Φ(G)` の各剰余類 `gΦ` が `Q`-不変で
-  `|gΦ| = |Φ| ≢ 0 (mod q)` なので `IsPGroup.card_modEq_card_fixedPoints` から
-  不動点が存在 ⟹ `C_G(Q)Φ(G) = G` ⟹ Frattini 性 (`Φ` は非生成元) で `C_G(Q) = G`。
-  ⚠ 実装コスト = 剰余類 `↥(gΦ)` 上の `MulAction Q` を `letI` で手作りする plumbing。
+* ✅ **3D.4** `smul_eq_self_of_trivial_mod_frattini` (+ `q`-群版
+  `smul_eq_self_of_isPGroup_of_trivial_mod_frattini`)。書籍 Hint どおり `H` が `q`-群の
+  場合に帰着 (各素数 `q` の Sylow `S ≤ H` が自明に作用 ⟹ `|H|_q ∣ |ker|` かつ
+  `q ∣ [H:ker]` から `q^{a+1} ∣ |H|` で矛盾 ⟹ `[H:ker] = 1`)。
+  `q`-群の場合は `Φ(G)` の各剰余類 `X = gΦ` が `Q`-不変で `|X| = |Φ| ≢ 0 (mod q)` ゆえ
+  `IsPGroup.card_modEq_card_fixedPoints` から不動点が存在 ⟹ 固定部分群 `C` が
+  `C ⊔ Φ(G) = ⊤` を満たし `frattini_nongenerating` で `C = ⊤`。
+  補助 = `actionKernel` (作用の核) / `smul_mem_of_characteristic`。
+  ⚠ 剰余類 `↥X` (`X : Set G`) 上の `MulAction Q` は `letI` で手作りした
+  (既存 instance と衝突しない)。Sylow への作用制限は
+  `MulDistribMulAction.compHom G (S : Subgroup H).subtype`。
 
 ⚠ `NilpotentInjector/PiParts.lean` の `exists_isHallPart` / `isHallPart_nilPiPart` /
 `le_nilPiPart_of_isPiGroup` は環境の `[IsSolvable G]` から **`[IsSolvable ↥N]` に緩和**

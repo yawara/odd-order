@@ -359,6 +359,137 @@ theorem center_eq_top_of_oPiCore_sup_le_center [Finite G] (π : Set ℕ) [IsPiSe
   rw [← hsup]
   exact h
 
+/-! ### Problem 3D.4 — `Φ(G)` 上自明な互いに素な作用は自明 -/
+
+/-- 作用の核 (すべての `g` を固定する `h` の集合)。 -/
+def actionKernel (H G : Type*) [Group H] [Group G] [MulDistribMulAction H G] : Subgroup H where
+  carrier := {h : H | ∀ g : G, h • g = g}
+  one_mem' := fun g => one_smul H g
+  mul_mem' := fun {a b} ha hb g => by rw [mul_smul, hb g, ha g]
+  inv_mem' := fun {a} ha g => by
+    have h1 : a • (a⁻¹ • g) = g := by rw [← mul_smul, mul_inv_cancel, one_smul]
+    rw [← ha (a⁻¹ • g), h1]
+
+/-- 特性部分群は作用で不変。 -/
+theorem smul_mem_of_characteristic {H G : Type*} [Group H] [Group G] [MulDistribMulAction H G]
+    (N : Subgroup G) [N.Characteristic] (x : H) {z : G} (hz : z ∈ N) : x • z ∈ N := by
+  have hchar := Subgroup.characteristic_iff_comap_eq.mp
+    (inferInstance : N.Characteristic) (MulDistribMulAction.toMulAut H G x)
+  have : z ∈ N.comap (MulDistribMulAction.toMulAut H G x).toMonoidHom := by rw [hchar]; exact hz
+  exact this
+
+/-- **Isaacs Problem 3D.4** (`q`-群の場合): `Q` が `q`-群として `G` に自己同型で作用し,
+`q ∤ |Φ(G)|` で `G/Φ(G)` 上の作用が自明なら, `G` 上の作用も自明。
+
+`Φ(G)` の各剰余類 `gΦ` は `Q`-不変で位数 `|Φ|` は `q` で割れないから,
+`IsPGroup.card_modEq_card_fixedPoints` より `gΦ` に `Q`-不動点がある。ゆえに固定部分群 `C` は
+`C ⊔ Φ(G) = ⊤` を満たし, `Φ(G)` の非生成性 (`frattini_nongenerating`) から `C = ⊤`。 -/
+theorem smul_eq_self_of_isPGroup_of_trivial_mod_frattini {G Q : Type*} [Group G] [Finite G]
+    [Group Q] [Finite Q] [MulDistribMulAction Q G] {q : ℕ} [Fact q.Prime]
+    (hQ : IsPGroup q Q) (hq : ¬ q ∣ Nat.card ↥(frattini G))
+    (htriv : ∀ (x : Q) (g : G), g⁻¹ * (x • g) ∈ frattini G) :
+    ∀ (x : Q) (g : G), x • g = g := by
+  classical
+  have hinv : ∀ (x : Q) (z : G), z ∈ frattini G → x • z ∈ frattini G := fun x z hz =>
+    smul_mem_of_characteristic (frattini G) x hz
+  set C : Subgroup G :=
+    { carrier := {g : G | ∀ x : Q, x • g = g}
+      one_mem' := fun x => smul_one x
+      mul_mem' := fun {a b} ha hb x => by rw [smul_mul', ha x, hb x]
+      inv_mem' := fun {a} ha x => by rw [smul_inv', ha x] } with hCdef
+  -- 各剰余類に不動点がある
+  have hcoset : ∀ g : G, ∃ c : G, (∀ x : Q, x • c = c) ∧ c⁻¹ * g ∈ frattini G := by
+    intro g
+    set X : Set G := {y : G | g⁻¹ * y ∈ frattini G} with hXdef
+    letI : MulAction Q ↥X :=
+      { smul := fun x y => ⟨x • (y : G), by
+          have h1 : g⁻¹ * (x • (y : G)) = (g⁻¹ * (x • g)) * (x • (g⁻¹ * (y : G))) := by
+            rw [smul_mul', smul_inv']
+            group
+          change g⁻¹ * (x • (y : G)) ∈ frattini G
+          rw [h1]
+          exact mul_mem (htriv x g) (hinv x _ y.2)⟩
+        one_smul := fun y => Subtype.ext (one_smul Q (y : G))
+        mul_smul := fun x₁ x₂ y => Subtype.ext (mul_smul x₁ x₂ (y : G)) }
+    have hcardX : Nat.card ↥X = Nat.card ↥(frattini G) := by
+      refine Nat.card_congr ⟨fun y => ⟨g⁻¹ * (y : G), y.2⟩, fun z => ⟨g * (z : G), ?_⟩, ?_, ?_⟩
+      · change g⁻¹ * (g * (z : G)) ∈ frattini G
+        rw [← mul_assoc, inv_mul_cancel, one_mul]
+        exact z.2
+      · intro y; exact Subtype.ext (by simp)
+      · intro z; exact Subtype.ext (by simp)
+    have hmod := hQ.card_modEq_card_fixedPoints (α := ↥X)
+    have hne : Nat.card (MulAction.fixedPoints Q ↥X) ≠ 0 := by
+      intro h0
+      refine hq ?_
+      rw [← hcardX]
+      have : Nat.card ↥X ≡ 0 [MOD q] := by rw [← h0]; exact hmod
+      exact (Nat.modEq_zero_iff_dvd).mp this
+    obtain ⟨c⟩ := (Nat.card_pos_iff.mp (Nat.pos_of_ne_zero hne)).1
+    refine ⟨((c : ↥X) : G), fun x => ?_, ?_⟩
+    · exact congrArg (Subtype.val : ↥X → G) (c.2 x)
+    · have hmem : g⁻¹ * ((c : ↥X) : G) ∈ frattini G := (c : ↥X).2
+      simpa using inv_mem hmem
+  -- `C ⊔ Φ(G) = ⊤`
+  have hsup : C ⊔ frattini G = ⊤ := by
+    rw [eq_top_iff]
+    intro g _
+    obtain ⟨c, hcfix, hcg⟩ := hcoset g
+    have h1 : c ∈ C := hcfix
+    have h2 : g = c * (c⁻¹ * g) := by group
+    rw [h2]
+    exact mul_mem (Subgroup.mem_sup_left h1) (Subgroup.mem_sup_right hcg)
+  have hCtop : C = ⊤ := frattini_nongenerating hsup
+  intro x g
+  have : g ∈ C := by rw [hCtop]; trivial
+  exact this x
+
+/-- **Isaacs Problem 3D.4** (書籍 p. 95): `H` が `G` に自己同型で作用し, `|H|` と `|Φ(G)|` が
+互いに素で `G/Φ(G)` 上の作用が自明なら, `G` 上の作用も自明。
+
+書籍 Hint どおり `H` の各 Sylow `q`-部分群に `q`-群の場合を適用する。すべての Sylow が
+作用の核に入るので, 核の指数はどの素数でも割れず `1`。 -/
+theorem smul_eq_self_of_trivial_mod_frattini {G H : Type*} [Group G] [Finite G] [Group H]
+    [Finite H] [MulDistribMulAction H G]
+    (hcop : Nat.Coprime (Nat.card H) (Nat.card ↥(frattini G)))
+    (htriv : ∀ (h : H) (g : G), g⁻¹ * (h • g) ∈ frattini G) :
+    ∀ (h : H) (g : G), h • g = g := by
+  classical
+  set K : Subgroup H := actionKernel H G with hKdef
+  have hKtop : K = ⊤ := by
+    rw [← Subgroup.index_eq_one]
+    by_contra hne
+    obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hne
+    haveI : Fact q.Prime := ⟨hq⟩
+    have hqH : q ∣ Nat.card H := hqdvd.trans (Subgroup.index_dvd_card K)
+    obtain ⟨S⟩ : Nonempty (Sylow q H) := inferInstance
+    -- `S` は作用の核に入る
+    have hSK : (S : Subgroup H) ≤ K := by
+      letI : MulDistribMulAction ↥(S : Subgroup H) G :=
+        MulDistribMulAction.compHom G (S : Subgroup H).subtype
+      have hqPhi : ¬ q ∣ Nat.card ↥(frattini G) := fun hdvd =>
+        Nat.Prime.one_lt hq |>.ne' (Nat.eq_one_of_dvd_one (hcop ▸ Nat.dvd_gcd hqH hdvd))
+      have := smul_eq_self_of_isPGroup_of_trivial_mod_frattini (Q := ↥(S : Subgroup H))
+        S.isPGroup' hqPhi (fun x g => htriv (x : H) g)
+      intro s hs
+      exact fun g => this ⟨s, hs⟩ g
+    -- 位数の矛盾
+    have hcardS : Nat.card ↥(S : Subgroup H) = q ^ (Nat.card H).factorization q :=
+      S.card_eq_multiplicity
+    have h1 : q ^ ((Nat.card H).factorization q + 1) ∣ Nat.card H := by
+      have hSdvd : q ^ (Nat.card H).factorization q ∣ Nat.card ↥K :=
+        hcardS ▸ Subgroup.card_dvd_of_le hSK
+      have hmul : Nat.card ↥K * K.index = Nat.card H := Subgroup.card_mul_index K
+      calc q ^ ((Nat.card H).factorization q + 1)
+          = q ^ (Nat.card H).factorization q * q := pow_succ q _
+        _ ∣ Nat.card ↥K * K.index := Nat.mul_dvd_mul hSdvd hqdvd
+        _ = Nat.card H := hmul
+    have := (Nat.Prime.pow_dvd_iff_le_factorization hq (Nat.card_pos (α := H)).ne').mp h1
+    omega
+  intro h g
+  have : h ∈ K := by rw [hKtop]; trivial
+  exact this g
+
 end -- 3D
 
 end OddOrder.Isaacs.Ch03
