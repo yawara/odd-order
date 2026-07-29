@@ -6305,7 +6305,7 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
 | Ch.7 | 7A(6) 7C(1) | ✅ 全問 |
 | Ch.8 | 8A(13) 8B(10) 8C(6) 8D(6) | ✅ 全問 |
 | **Ch.9** | **9A(8) 9B(5) 9C(3) 9D(4)** | **§9A ✅ / §9B ✅ / 9C.1-2 ✅ (9C.3 保留) / 9D.1-3 ✅ (9D.4 土台のみ)** |
-| **Ch.10** | **10A(7) 10B(2) 10C(1)** | **10A.1 / 10A.2 / 10A.5 ✅ (2026-07-29 着手)** |
+| **Ch.10** | **10A(7) 10B(2) 10C(1)** | **10A.1 / 10A.2 / 10A.3前半 / 10A.5 / 10A.6 ✅** |
 
 * 素の差分では 1F.1 / 3C.1 も欠落に見えたが **誤検出**: どちらも実装済みで、docstring が
   `**1F.1**` / `**Isaacs 3C.1 (Hall D-定理, Wielandt)**` と `Problem ` 前置なしで書かれて
@@ -6869,8 +6869,6 @@ Lem 10.14 / Thm 10.15 / Thm 10.18 (principal ideal theorem)。演習はこの上
 * **10A.3 / 10A.7** は `C_p ≀ C_p` への埋め込み/準同型像。
   repo の `WreathRecognition.lean` (Thm 10.4 = `C_p ≀ C_p` recognition, 1308 行) が土台。
 * **10A.4** `P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G`。Yoshida を使う。
-* **10A.6** `G` 推移的, `H` = 点安定化群 ⟹ 2-推移的 ⟺ `G = H ∪ HgH`。
-  二重剰余類と `H`-軌道の対応。repo/mathlib の `IsMultiplyPretransitive` を使う。
 * **10B.1** `C = ⟨x⟩` 位数 `p^n`, `a ∈ Aut(C)` が `x ↦ x^{p+1}`, `P = C ⋊ ⟨a⟩` は
   冪零類 `n` の metacyclic `p`-群 (hint = Thm 4.7)。
 * **10B.2** `E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)` (Maschke)。
@@ -6914,3 +6912,27 @@ repo の `WreathRecognition.lean` の私有補題 `nonempty_mulEquiv_wreath_of_c
   基本可換になる理由が出ない (`K ≅ C_{p²}` を排除する議論が要る)。
   `φ : A → A`, `a ↦ a⁻¹ u a u⁻¹` (`u ∉ A`) が準同型で `ker φ = Z(P)`,
   `im φ = P'` になるところまでは紙で出たが、そこから先が未特定。
+
+### 10A.3 (前半) / 10A.6 完了 (2026-07-29)
+
+* **10A.3 前半 ✅** `exists_injective_hom_regularWreath_of_center_isComplement`。
+  `Q := K` (=`Z(P)` の `A` 内補元) を `P` に押し出せば `|P:Q| = p²`, `Q ∩ Z(P) = 1` で
+  **10A.5 に帰着**。指数計算だけ。
+  ⏳ **後半「`A` は基本可換」は未解決** (前掲のとおり `A = Z(P) × K` だけでは出ない)。
+* **10A.6 ✅** `isTwoTransitive_iff_exists_doubleCoset`。2-推移性を
+  「`∀ a b c d, a ≠ b → c ≠ d → ∃ g, g•a = c ∧ g•b = d`」の初等形で述べ、
+  `H ∪ HgH` を「`∀ x, x ∈ H ∨ ∃ h₁ h₂ ∈ H, x = h₁ g h₂`」で述べた。
+  `mathlib` の `IsMultiplyPretransitive` (= `IsPretransitive G (Fin n ↪ α)`) は
+  `Fin 2 ↪ Ω` の取り回しが煩雑なので使わなかった。
+  ⚠ `Ω` が 1 点の場合 (`H = G`, `g = 1`) を別扱いする必要がある。
+
+### Ch.10 の残り
+
+* **10A.3 後半** `A` は基本可換 (未解決)。
+* **10A.4** `P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G` (Yoshida を使う)。
+* **10A.7** `A ◁ P` 基本可換で指数 `p`, `P − A` に位数 `p` と `p²` の元 ⟹
+  `C_p ≀ C_p` は `P` の準同型像 (repo の Thm 10.4 = `WreathRecognition.lean` が土台)。
+* **10B.1** `C = ⟨x⟩` 位数 `p^n`, `a : x ↦ x^{p+1}`, `P = C ⋊ ⟨a⟩` は冪零類 `n` の
+  metacyclic `p`-群 (hint = Thm 4.7)。
+* **10B.2** `E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)` (Maschke)。
+* **10C.1** 未確認 (ページ画像未切り出し)。
