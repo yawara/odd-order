@@ -653,4 +653,92 @@ theorem exists_ne_one_fixed_of_prime_pow_eq_one {p₀ : ℕ} [Fact p₀.Prime]
 
 end Prop2FixedPoint
 
+section Prop2Regular
+
+open OddOrder.GroupTheory OddOrder.Isaacs.Ch03
+
+/-- **A free action of the right size is a scalar action of the full unit group.**
+
+If a finite abelian `T` acts on an elementary abelian `E` freely off the
+identity and `|T| = |E| − 1`, then `T` is transitive on `E ∖ {1}`, so the action
+is irreducible, and Appendix I Proposition 2 makes `E` a line over a field `F`
+with `|F| = |E|` on which `T` acts by scalars.  The resulting `μ : T → Fˣ` is
+then a bijection, both sides having `|E| − 1` elements.
+
+This is the common core of Peterfalvi Part II, Ch. I §2 Proposition 3 (for `K`
+on `Q₀`) and of the identification `S/Q₀ ≅ 𝐅_q`, `K ≅ 𝐅_q^×` used in Ch. III §2,
+p. 119. -/
+theorem exists_field_scalar_realization {p : ℕ} [Fact p.Prime]
+    {E : Type u} [CommGroup E] [Finite E] [Nontrivial E]
+    (hE : IsElementaryAbelian p E) {T : Type*} [CommGroup T] [Finite T]
+    (ψ : T →* MulAut E)
+    (hfree : ∀ (t : T) (e : E), e ≠ 1 → ψ t e = e → t = 1)
+    (hcard : Nat.card T = Nat.card E - 1) :
+    ∃ (F : Type u) (_ : Field F) (_ : Module F (Additive E)) (_ : Finite F),
+      Nat.card F = Nat.card E ∧
+      ∃ μ : T ≃* Fˣ, ∀ (t : T) (x : Additive E),
+        ((μ t : Fˣ) : F) • x = Additive.ofMul ((ψ t) (Additive.toMul x)) := by
+  classical
+  have hEtwo : 2 ≤ Nat.card E := by
+    have : 1 < Nat.card E := Finite.one_lt_card
+    omega
+  -- freeness plus the count makes the action transitive on `E ∖ {1}`
+  have hirr : ∀ U : Subgroup E, IsAInvariant ψ U → U = ⊥ ∨ U = ⊤ := by
+    intro B hB
+    by_cases hBbot : B = ⊥
+    · exact Or.inl hBbot
+    right
+    obtain ⟨b, hbB, hb1⟩ : ∃ b : E, b ∈ B ∧ b ≠ 1 := by
+      by_contra hcon
+      push Not at hcon
+      exact hBbot (le_bot_iff.mp fun y hy => Subgroup.mem_bot.mpr (hcon y hy))
+    have hbne : ∀ t : T, ψ t b ≠ 1 := by
+      intro t h
+      exact hb1 (by simpa using congrArg (ψ t)⁻¹ h)
+    set f : Option T → ↥B := fun o =>
+      o.rec (⟨1, B.one_mem⟩) (fun t => ⟨ψ t b, hB.smul_mem t hbB⟩) with hfdef
+    have hfinj : Function.Injective f := by
+      rintro (_ | t) (_ | u) h
+      · rfl
+      · exact absurd (congrArg (Subtype.val (p := fun z => z ∈ B)) h).symm (hbne u)
+      · exact absurd (congrArg (Subtype.val (p := fun z => z ∈ B)) h) (hbne t)
+      · have hval : ψ t b = ψ u b := congrArg (Subtype.val (p := fun z => z ∈ B)) h
+        have hfix : ψ (u⁻¹ * t) b = b := by
+          rw [map_mul, map_inv]
+          change (ψ u)⁻¹ ((ψ t) b) = b
+          rw [hval]
+          simp
+        exact congrArg some (inv_mul_eq_one.mp (hfree _ b hb1 hfix)).symm
+    have hcard' : Nat.card T + 1 ≤ Nat.card ↥B := by
+      have := Nat.card_le_card_of_injective f hfinj
+      rwa [Finite.card_option] at this
+    have hBle : Nat.card ↥B ≤ Nat.card E := Subgroup.card_le_card_group B
+    refine Subgroup.eq_top_of_card_eq B ?_
+    omega
+  obtain ⟨F, instF, instMod, instFin, -, hcardF, ⟨μ₀, hμ₀⟩, -⟩ :=
+    exists_field_semilinear_with_scalar hE ψ hirr
+  letI : Field F := instF
+  letI : Module F (Additive E) := instMod
+  letI : Finite F := instFin
+  have hμ₀' : ∀ (t : T) (y : E), ((μ₀ t : Fˣ) : F) • (Additive.ofMul y)
+      = Additive.ofMul (ψ t y) := fun t y => hμ₀ t (Additive.ofMul y)
+  have hμinj : Function.Injective μ₀ := by
+    refine (injective_iff_map_eq_one μ₀).mpr fun t ht1 => ?_
+    obtain ⟨y, hy⟩ := exists_ne (1 : E)
+    refine hfree t y hy ?_
+    have h := hμ₀' t y
+    rw [ht1, Units.val_one, one_smul] at h
+    exact (Additive.ofMul.injective h).symm
+  haveI : Fintype F := Fintype.ofFinite F
+  haveI : Fintype T := Fintype.ofFinite _
+  have hunits : Nat.card Fˣ = Nat.card E - 1 := by
+    rw [Nat.card_eq_fintype_card, Fintype.card_units, ← Nat.card_eq_fintype_card, hcardF]
+  have hμbij : Function.Bijective μ₀ := by
+    refine (Fintype.bijective_iff_injective_and_card μ₀).mpr ⟨hμinj, ?_⟩
+    rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card, hunits, hcard]
+  exact ⟨F, instF, instMod, instFin, hcardF, MulEquiv.ofBijective μ₀ hμbij,
+    fun t y => hμ₀' t (Additive.toMul y)⟩
+
+end Prop2Regular
+
 end OddOrder.Peterfalvi.Appendices.Huppert
