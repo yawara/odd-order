@@ -5764,12 +5764,46 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
    claim は成立する (検算済)。
    さらに **共役元の同時性** (全素数で同じ `g` を取る) も要処理。
 
-**次の一手**: 経路 2 の `I_p ∈ Syl_p(D_p)` を詰めるか、経路 1 の injector 定義を
-正面から導入するかを決める。文献 (Doerk–Hawkes *Finite Soluble Groups* Ch. IX) の
-参照も検討する。
+**経路確定 (2026-07-29, 文献確認済)**: **経路 2 = Mann の構造定理**を採る。
+arXiv:2408.15622 "Counting in nilpotent injectors and Carter subgroups" の Remark 1
+(Mann, *J. Algebra* 1971, Theorem 1 の証明中) が経路 2 そのものを述べている:
 
-`F(N) = F(G) ⊓ N` (`N ⊴ G`) と `C_G(F(G)) ≤ F(G)`
-(`OddOrder.GroupTheory.centralizer_fitting_le_fitting`) はどちらの経路でも必要。
+> Let `G` be `N`-constrained, `F = F(G)` and `F_{p'} = O_{p'}(F(G))`. If `C(p) := C_G(F_{p'})`
+> and `S_q ∈ Syl_q(C(q))` for `q, p` distinct primes in `ϖ(G)`, then `C(p)` is a normal
+> subgroup of `G` **that also normalises `S_q`**. Furthermore, `S_p` is the unique Sylow
+> `p`-subgroup of a nilpotent injector of `G` and `S_p` centralises `S_q`. Finally, for any
+> nilpotent subgroup `K` of `G` containing `F`, its Sylow `p`-subgroup `K_p` centralises
+> `F_{p'}` and thus `K_p ⩽ C(p)`.
+
+⚠ 前回「難所」とした `[x, I_q] = 1` は **`C(p)` が `S_q` を正規化する**という形に置き換えると
+解ける (自前で再構成した論法):
+`[C(p), C(q)] ≤ C(p) ⊓ C(q) ≤ C_G(F) = Z(F)` なので `x ∈ C(p)` について `S_q^x ≤ S_q·Z(F)`。
+`Z(F)` の `{q}`-部分 `Z_q` は `C(q)` の正規 `q`-部分群ゆえ `Z_q ≤ S_q`, `{q}ᶜ`-部分 `Z_{q'}`
+は `F_{q'}` に入るので `S_q ≤ C(q) = C_G(F_{q'})` が中心化する。よって
+`S_q·Z(F) = S_q × Z_{q'}` は直積で、`S_q` はその唯一の Sylow `q`。`S_q^x` は同位数の
+`q`-部分群なので `S_q^x = S_q`。
+**共役の同時性**も同じ事実で解ける: `c ∈ C(p)` による共役は `q ≠ p` の `S_q` を動かさないので、
+素数を 1 つずつ処理してよい (`Finset` 上の帰納)。
+
+### 3C.8 実装進捗 (2026-07-29)
+
+* ✅ **`NilpotentInjector/PiParts.lean`** — 冪零部分群 `N ≤ G` の `π`-部分
+  (`IsNilpotentPiPart` / 関数版 `nilPiPart`)。存在 (`hall_E_exists`)・一意性・
+  `N` への正規性 (issue 9213)・`N = N_π ⊔ N_{π'}`・元ごとの可換性・共役同変・
+  `le_nilPiPart_of_isPiGroup` (極大性)。**`↥N` の部分群でなく `G` の部分群として**
+  扱うのが要点 (共役の追跡が楽)。
+* ✅ **`NilpotentInjector/Defs.lean`** — `IsNilpotentInjector` の定義 +
+  `fittingPPrimePart` (= Mann の `F_{p'}`) / `pCentralizer` (= `C(p)`) と
+  両者の `G`-正規性、`F(G) ≤ F_{p'} ⊔ F_{q'}` (`p ≠ q`)、
+  `C(p) ⊓ C(q) ≤ C_G(F(G))`、および
+  **`nilPiPart_singleton_le_pCentralizer`** (`F` を含む冪零部分群の `{p}`-部分は `C(p)` 内)。
+  補助として `normal_centralizer` (正規部分群の中心化群は正規) と
+  `centralizer_inf_le_centralizer_sup`。
+* ⬜ **`NilpotentInjector/Structure.lean`** — 次: `C(p)` が `S_q` を正規化 /
+  injector の `{p}`-部分は `C(p)` の Sylow `p` / 逆向き。
+* ⬜ **`NilpotentInjector/Conjugacy.lean`** — 素数ごとの帰納で共役性。
+
+`C_G(F(G)) ≤ F(G)` は `OddOrder.GroupTheory.centralizer_fitting_le_fitting` を使う。
 
 ### 3C.7 実装進捗 (2026-07-28 開始 → 2026-07-29 完成)
 
