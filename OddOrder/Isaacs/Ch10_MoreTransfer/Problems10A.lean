@@ -23,6 +23,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 10A。
   ⏳ 後半「`A` は基本可換」は未着手 (issue 1055 参照)。
 * **10A.6** `isTwoTransitive_iff_exists_doubleCoset` — 推移的作用の点安定化群 `H` について
   **2-推移的 ⟺ ある `g` で `G = H ∪ HgH`**。
+* **10A.7** `exists_surjective_wreath_of_mem_compl_orders` — `A ◁ P` が基本可換で指数 `p`,
+  `P ∖ A` に位数 `p` の元と位数 `p²` の元があれば `C_p ≀ C_p` は `P` の準同型像。
 
 ## regular `p`-群の定義について
 
@@ -584,5 +586,92 @@ theorem isTwoTransitive_iff_exists_doubleCoset [MulAction.IsPretransitive G Ω] 
     · rw [mul_smul, mul_smul, hhb, inv_smul_eq_iff]
 
 end -- 10A.6
+
+section /- 10A.7: P − A に位数 p と p² の元があれば C_p ≀ C_p は準同型像 (p. 308) -/
+
+/-- `(a w)^n = (∏_{i<n} w^i a w^{-i}) · w^n` (`w` による共役の積への展開)。 -/
+private theorem mul_pow_eq_conj_list_prod {H : Type*} [Group H] (a w : H) : ∀ n : ℕ,
+    (a * w) ^ n = ((List.range n).map (fun i => w ^ i * a * (w ^ i)⁻¹)).prod * w ^ n
+  | 0 => by simp
+  | (n + 1) => by
+    rw [pow_succ, mul_pow_eq_conj_list_prod a w n, List.range_succ, List.map_append,
+      List.prod_append]
+    simp only [List.map_cons, List.map_nil, List.prod_cons, List.prod_nil, mul_one]
+    group
+
+/-- **Isaacs Problem 10A.7** (書籍 p. 308) ⭐: `A ◁ P` が基本可換 `p`-群で `|P : A| = p`,
+`P ∖ A` が位数 `p` の元と位数 `p²` の元をともに含むなら, `C_p ≀ C_p` は `P` の準同型像。
+
+位数 `p²` の元 `v` を `v = a w` (`a ∈ A`, `w = u^j ∉ A`, `w^p = 1`) と書くと
+`v^p = ∏_{i<p} w^i a w^{-i}` なので **共役類積 ≠ 1** が出る。`a` が中心的なら
+その積は `a^p = 1` になってしまうので `a ∉ Z(P)`。あとは repo の Cor 10.5
+(`exists_surjective_wreath_of_conj_list_prod_ne_one`) がそのまま使える。 -/
+theorem exists_surjective_wreath_of_mem_compl_orders [Finite P] {p : ℕ} [Fact p.Prime]
+    (hP : IsPGroup p P) {A : Subgroup P} [A.Normal] (hidx : A.index = p)
+    (hEA : A.IsElementaryAbelian p) {u : P} (huA : u ∉ A) (hup : u ^ p = 1)
+    {v : P} (hv : orderOf v = p ^ 2) :
+    ∃ φ : P →* (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)), Function.Surjective φ := by
+  have hp_prime : p.Prime := Fact.out
+  have hEA' : OddOrder.GroupTheory.IsElementaryAbelian p ↥A := hEA
+  -- `v ^ p ≠ 1`, したがって `v ∉ A`
+  have hvp : v ^ p ≠ 1 := by
+    intro h
+    have hdvd : orderOf v ∣ p := orderOf_dvd_of_pow_eq_one h
+    rw [hv] at hdvd
+    have hle := Nat.le_of_dvd hp_prime.pos hdvd
+    nlinarith [hp_prime.two_le]
+  have hvA : v ∉ A := by
+    intro hmem
+    refine hvp ?_
+    simpa using congrArg Subtype.val (hEA'.pow_eq_one (⟨v, hmem⟩ : ↥A))
+  -- `P ⧸ A` は位数 `p` の巡回群で `u` の像が生成元
+  have hcardQ : Nat.card (P ⧸ A) = p := by rw [← Subgroup.index_eq_card, hidx]
+  have hune : (QuotientGroup.mk u : P ⧸ A) ≠ 1 := fun h => huA ((QuotientGroup.eq_one_iff u).mp h)
+  have hgen : Subgroup.zpowers (QuotientGroup.mk u : P ⧸ A) = ⊤ := by
+    refine Subgroup.eq_top_of_card_eq _ ?_
+    rw [Nat.card_zpowers, hcardQ]
+    have hdvd : orderOf (QuotientGroup.mk u : P ⧸ A) ∣ p := by
+      rw [← hcardQ]; exact orderOf_dvd_natCard _
+    rcases hp_prime.eq_one_or_self_of_dvd _ hdvd with h1 | h1
+    · exact absurd (orderOf_eq_one_iff.mp h1) hune
+    · exact h1
+  obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp (hgen ▸ Subgroup.mem_top
+    (QuotientGroup.mk v : P ⧸ A))
+  -- `w := u ^ j`, `a := v * w⁻¹ ∈ A`
+  set w : P := u ^ j with hw_def
+  have hwq : (QuotientGroup.mk w : P ⧸ A) = QuotientGroup.mk v := by
+    rw [hw_def, ← hj]
+    exact map_zpow (QuotientGroup.mk' A) u j
+  have haA : v * w⁻¹ ∈ A := by
+    rw [← QuotientGroup.eq_one_iff]
+    change (QuotientGroup.mk v : P ⧸ A) * (QuotientGroup.mk w)⁻¹ = 1
+    rw [hwq, mul_inv_cancel]
+  have hwp : w ^ p = 1 := by
+    rw [hw_def, ← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hup, one_zpow]
+  have hwA : w ∉ A := by
+    intro hmem
+    exact hvA ((QuotientGroup.eq_one_iff v).mp (hwq ▸ (QuotientGroup.eq_one_iff w).mpr hmem))
+  -- 共役類積 = `v ^ p ≠ 1`
+  have hlist : ((List.range p).map (fun i => w ^ i * (v * w⁻¹) * (w ^ i)⁻¹)).prod ≠ 1 := by
+    intro h
+    refine hvp ?_
+    have hva : v = (v * w⁻¹) * w := by group
+    rw [hva, mul_pow_eq_conj_list_prod, h, hwp, one_mul]
+  -- `a ∉ Z(P)` (中心的なら積は `a ^ p = 1` になってしまう)
+  have haZ : v * w⁻¹ ∉ Subgroup.center P := by
+    intro hcent
+    refine hlist ?_
+    have hconst : ((List.range p).map (fun i => w ^ i * (v * w⁻¹) * (w ^ i)⁻¹))
+        = List.replicate p (v * w⁻¹) := by
+      rw [show List.replicate p (v * w⁻¹) = (List.range p).map (fun _ => v * w⁻¹) by
+        rw [List.map_const', List.length_range]]
+      refine List.map_congr_left fun i _ => ?_
+      rw [Subgroup.mem_center_iff.mp hcent (w ^ i)]
+      group
+    rw [hconst, List.prod_replicate]
+    simpa using congrArg Subtype.val (hEA'.pow_eq_one (⟨v * w⁻¹, haA⟩ : ↥A))
+  exact exists_surjective_wreath_of_conj_list_prod_ne_one hP hidx hEA haA haZ hwA hlist
+
+end -- 10A.7
 
 end OddOrder.Isaacs.Ch10
