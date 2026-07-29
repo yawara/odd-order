@@ -30,6 +30,7 @@ import OddOrder.GroupTheory.CoprimeAction
 import OddOrder.GroupTheory.CyclicSubgroupUniqueness
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
 import OddOrder.GroupTheory.GroupAction.PerfectQuasiprimitive
 import OddOrder.GroupTheory.CoprimeAbelianPGroup
 import OddOrder.GroupTheory.CoprimeFrobeniusKernel

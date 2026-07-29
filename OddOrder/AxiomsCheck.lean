@@ -9,6 +9,7 @@ import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.Algebra.FixedPointsGalois
 import OddOrder.Algebra.SemilinearFixedPoint
+import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
 import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.GroupTheory.HallWielandt
 import OddOrder.GroupTheory.TransferIndexTwo
@@ -13908,5 +13909,9 @@ Ch. III §1 Proposition が `F/Z(F)` 側から持ち上げた元 `x` を `Q`-成
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.false_of_natCard_cQ_eq_cQ0_of_card_cube
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Huppert.exists_ne_one_fixed_of_prime_pow_eq_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_mem_orbit_of_not_dvd_orbitCount
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_ne_one_fixed_of_free_orbit_semilinear
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_inf_centralizer_not_mem_Q0
