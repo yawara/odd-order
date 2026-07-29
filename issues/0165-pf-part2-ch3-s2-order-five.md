@@ -317,3 +317,28 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 * `(SK) ∪ (SKtS)` が実際に部分群であることの組み立て (`tSt ⊆ SKtS` からの一般論)
 * case (b) から `r² ≠ 1` (= `structureConjugator_sq_ne_one` + `orderOf_st_eq_five_of_isSuzuki2Group`)
   と `|Q| = |Q₀|²` (= `natCard_Q_eq_sq_or_cube` の sq 側) を供給する配線
+
+## 部分群性 `(SK) ∪ (SKtS) ≤ G` の閉包計算 (2026-07-29 に手で確認、未形式化)
+
+`tConjMiddle_mem_K` (`txt = g·h·t·f`, `h ∈ K`) から `G₀ = SK ∪ SKtS` の閉包が出る。
+`S = Q` (Theorem C)、`K ≤ D` は `Q` を正規化、`t` は `K` を反転 (`tkt = k⁻¹`)。
+以下 `q, q', q₃ ∈ Q`, `k, k' ∈ K`。
+
+* `(SK)(SK) ⊆ SK` — `SK` は部分群 (`K` が `Q` を正規化)。
+* `(SK)(SKtS) ⊆ SKtS` — `q k q' k' = q (k q' k⁻¹)(k k') ∈ SK`。
+* `(SKtS)(SK) ⊆ SKtS` — `q k t q₀ k' = q k (t k' t) t (k'⁻¹ q₀ k') = q (k k'⁻¹) t (k'⁻¹ q₀ k')`。
+* `(SKtS)(SKtS) ⊆ SK ∪ SKtS` — 中央が `t q₂ k' t`。
+  - `q₂ = 1`: `t k' t = k'⁻¹` ⟹ 全体は `q (k k'⁻¹) q₃ ∈ SK`。
+  - `q₂ ≠ 1`: `t q₂ t = g h t f` (`h ∈ K`) ⟹ `t q₂ k' t = g h t f k'⁻¹`、
+    かつ `t f k'⁻¹ q₃ = k' t (k' f k'⁻¹ q₃)` ⟹
+    全体は `(q (k g k⁻¹) k) · (h k') · t · (k' f k'⁻¹ q₃) ∈ S K t S`。
+* 逆元: `(q k t q')⁻¹ = q'⁻¹ (t k⁻¹ t) t q⁻¹ = q'⁻¹ k t q⁻¹ ∈ SKtS`。
+
+⟹ 形式化は `Set` の積で書くか、`Subgroup.closure` で作って両包含を示す。~200 行の見込み。
+
+## 現状まとめ (2026-07-29 セッション末)
+
+`tConjMiddle_mem_K_of_orderOf_st_eq_five` まで landing。**§2 の残りは 2 点だけ**:
+
+1. **`hpair` = p.119 の体計算** (本 issue の唯一の実質的数学的残作業)
+2. `(SK) ∪ (SKtS)` が部分群であることの組み立て (上の閉包計算、機械的)
