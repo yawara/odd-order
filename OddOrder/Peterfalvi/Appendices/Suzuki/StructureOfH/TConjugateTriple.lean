@@ -606,13 +606,20 @@ theorem exists_mem_KSet_conj_distinguishedInvolution {k : G} (hk : k ∈ hyp.KSe
 /-- **`h(r r^{-k}) = ℓ² k² ∈ K`** (Peterfalvi Part II, Ch. III §2, p. 118,
 identity (4)): the middle factor of the canonical decomposition of
 `t r r^{-k} t` lies in `K`. -/
-theorem exists_tConjMiddle_eq {k : G} (hk : k ∈ hyp.KSet) (hk1 : k ≠ 1) :
-    ∃ l ∈ hyp.KSet,
+theorem exists_tConjTriple_eq {k : G} (hk : k ∈ hyp.KSet) (hk1 : k ≠ 1) :
+    ∃ l ∈ hyp.KSet, l ≠ 1 ∧
+      hyp.tConjLeft
+          (hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k))
+        = hyp.structureConjugator * (l * hyp.structureConjugator⁻¹ * l⁻¹) ∧
       hyp.tConjMiddle
           (hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k))
-        = l ^ 2 * k ^ 2 := by
-  obtain ⟨l, hl, -, hskl⟩ := hyp.exists_mem_KSet_conj_distinguishedInvolution hk hk1
-  refine ⟨l, hl, ?_⟩
+        = l ^ 2 * k ^ 2 ∧
+      hyp.tConjRight
+          (hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k))
+        = (k ^ 2 * (l * hyp.structureConjugator * l⁻¹) * (k ^ 2)⁻¹) *
+            (k * hyp.structureConjugator⁻¹ * k⁻¹) := by
+  obtain ⟨l, hl, hl1, hskl⟩ := hyp.exists_mem_KSet_conj_distinguishedInvolution hk hk1
+  refine ⟨l, hl, hl1, ?_⟩
   have hkD : k ∈ hyp.D := hyp.mem_D_of_mem_KSet hk
   have hlD : l ∈ hyp.D := hyp.mem_D_of_mem_KSet hl
   have hkH : k ∈ hyp.H := hyp.D_le_H hkD
@@ -629,9 +636,11 @@ theorem exists_tConjMiddle_eq {k : G} (hk : k ∈ hyp.KSet) (hk1 : k ≠ 1) :
       (k * hyp.structureConjugator⁻¹ * k⁻¹) ∈ hyp.Q :=
     hyp.Q.mul_mem (hyp.Q_normal_in_H (k ^ 2) hk2H _ (hyp.Q_normal_in_H l hlH _ hrQ))
       (hyp.Q_normal_in_H k hkH _ hrQi)
-  exact (hyp.tConjTriple_eq_of (hyp.structureConjugator_mul_conj_inv_mem hk)
+  obtain ⟨h1, h2, h3⟩ := hyp.tConjTriple_eq_of
+    (hyp.structureConjugator_mul_conj_inv_mem hk)
     (hyp.structureConjugator_mul_conj_inv_ne_one hk hk1) hgQ hdD hfQ
-    (hyp.t_conj_structureConjugator_mul_conj_inv hk hl hskl)).2.1
+    (hyp.t_conj_structureConjugator_mul_conj_inv hk hl hskl)
+  exact ⟨h1, h2, h3⟩
 
 /-! ## `h(x) ∈ K` on the book's system of representatives
 
@@ -669,7 +678,7 @@ theorem tConjMiddle_structureConjugator_mul_conj_inv_mem_K {k : G} (hk : k ∈ h
     hyp.tConjMiddle
         (hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k)) ∈ hyp.K := by
   have hkK : k ∈ hyp.KSet := by rw [← hyp.coe_K]; exact hk
-  obtain ⟨l, hl, hval⟩ := hyp.exists_tConjMiddle_eq hkK hk1
+  obtain ⟨l, hl, -, -, hval, -⟩ := hyp.exists_tConjTriple_eq hkK hk1
   have hlK : l ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact hl
   rw [hval]
   exact hyp.K.mul_mem (hyp.K.pow_mem hlK 2) (hyp.K.pow_mem hk 2)
@@ -816,6 +825,77 @@ lemma structureConjugator_mul_conj_inv_injective {k₁ k₂ : G} (hk₁ : k₁ �
         Subgroup.mem_centralizer_singleton_iff.mpr hcomm⟩
     rw [hyp.Q_inf_centralizer_eq_bot_of_mem_KSet hmK hm1, Subgroup.mem_bot] at hmem
     exact inv_eq_one.mp hmem
+
+/-- `Q₀` is `K`-invariant, so membership in `Q₀` is constant on `K`-orbits. -/
+lemma conj_mem_Q0_of_mem_KSet {a x : G} (ha : a ∈ hyp.KSet) (hx : x ∈ hyp.Q0) :
+    a⁻¹ * x * a ∈ hyp.Q0 := by
+  have haH : a ∈ hyp.H := hyp.D_le_H (hyp.mem_D_of_mem_KSet ha)
+  refine ⟨?_, hyp.H.mul_mem (hyp.H.mul_mem (hyp.H.inv_mem haH) hx.2) haH⟩
+  calc (a⁻¹ * x * a) ^ 2 = a⁻¹ * x ^ 2 * a := by rw [pow_two, pow_two]; group
+    _ = 1 := by rw [hx.1, mul_one, inv_mul_cancel]
+
+/-- **`g(r r^{-k}) ∉ Q₀`** (Peterfalvi Part II, Ch. III §2, p. 118): it is
+`r r^{-ℓ⁻¹}` with `ℓ ≠ 1`. -/
+lemma tConjLeft_structureConjugator_mul_conj_inv_notMem_Q0
+    (hr2 : hyp.structureConjugator ^ 2 ≠ 1) {k : G} (hk : k ∈ hyp.KSet)
+    (hk1 : k ≠ 1) :
+    hyp.tConjLeft (hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k))
+      ∉ hyp.Q0 := by
+  obtain ⟨l, hl, hl1, hg, -, -⟩ := hyp.exists_tConjTriple_eq hk hk1
+  rw [hg]
+  have hli : l⁻¹ ∈ hyp.KSet := hyp.inv_mem_KSet hl
+  have hli1 : l⁻¹ ≠ 1 := fun h => hl1 (inv_eq_one.mp h)
+  have := hyp.structureConjugator_mul_conj_inv_notMem_Q0 hr2 hli hli1
+  rwa [show (l⁻¹)⁻¹ * hyp.structureConjugator⁻¹ * l⁻¹
+      = l * hyp.structureConjugator⁻¹ * l⁻¹ by rw [inv_inv]] at this
+
+/-- **`f(r r^{-k}) ∉ Q₀`** (Peterfalvi Part II, Ch. III §2, p. 118): conjugating
+by `k` turns it into `(r r^{-(kℓ)⁻¹})⁻¹`, and `kℓ ≠ 1` because `f ≠ 1`. -/
+lemma tConjRight_structureConjugator_mul_conj_inv_notMem_Q0
+    (hr2 : hyp.structureConjugator ^ 2 ≠ 1) {k : G} (hk : k ∈ hyp.KSet)
+    (hk1 : k ≠ 1) :
+    hyp.tConjRight (hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k))
+      ∉ hyp.Q0 := by
+  set r : G := hyp.structureConjugator with hr
+  obtain ⟨l, hl, -, -, -, hf⟩ := hyp.exists_tConjTriple_eq hk hk1
+  set w : G := k * l with hw
+  have hwK : w ∈ hyp.KSet := by
+    rw [hw, ← hyp.coe_K]
+    refine hyp.K.mul_mem ?_ ?_
+    · rw [← SetLike.mem_coe, hyp.coe_K]; exact hk
+    · rw [← SetLike.mem_coe, hyp.coe_K]; exact hl
+  -- `k⁻¹ f k = (r r^{-w⁻¹})⁻¹`
+  have hkey : k⁻¹ * ((k ^ 2 * (l * r * l⁻¹) * (k ^ 2)⁻¹) * (k * r⁻¹ * k⁻¹)) * k
+      = (r * (w * r⁻¹ * w⁻¹))⁻¹ := by
+    rw [hw]
+    calc k⁻¹ * ((k ^ 2 * (l * r * l⁻¹) * (k ^ 2)⁻¹) * (k * r⁻¹ * k⁻¹)) * k
+        = (k * l) * r * (k * l)⁻¹ * r⁻¹ := by rw [pow_two]; group
+      _ = (r * ((k * l) * r⁻¹ * (k * l)⁻¹))⁻¹ := by group
+  -- `w ≠ 1`, since `f ≠ 1`
+  have hfne : hyp.tConjRight (r * (k⁻¹ * r⁻¹ * k)) ≠ 1 :=
+    hyp.tConjRight_ne_one (hyp.structureConjugator_mul_conj_inv_mem hk)
+      (hyp.structureConjugator_mul_conj_inv_ne_one hk hk1)
+  have hw1 : w ≠ 1 := by
+    intro h1
+    refine hfne ?_
+    rw [hf]
+    have := hkey
+    rw [h1] at this
+    simp only [one_mul, inv_one, mul_one] at this
+    have hone : k⁻¹ * ((k ^ 2 * (l * r * l⁻¹) * (k ^ 2)⁻¹) * (k * r⁻¹ * k⁻¹)) * k = 1 := by
+      rw [this]; group
+    have := congrArg (fun z : G => k * z * k⁻¹) hone
+    simpa [mul_assoc] using this
+  -- transport
+  intro hmem
+  refine hyp.structureConjugator_mul_conj_inv_notMem_Q0 hr2
+    (hyp.inv_mem_KSet hwK) (fun h => hw1 (inv_eq_one.mp h)) ?_
+  rw [hf] at hmem
+  have hconj := hyp.conj_mem_Q0_of_mem_KSet hk hmem
+  rw [hkey] at hconj
+  have := hyp.Q0.inv_mem hconj
+  rw [inv_inv] at this
+  rwa [show (w⁻¹)⁻¹ * r⁻¹ * w⁻¹ = w * r⁻¹ * w⁻¹ by rw [inv_inv]]
 
 end Hypothesis
 

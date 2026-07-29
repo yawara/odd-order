@@ -14050,7 +14050,7 @@ defined; the identity (4) identifies its middle factor as `ℓ²k² ∈ K`. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_KSet_conj_distinguishedInvolution
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_tConjMiddle_eq
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_tConjTriple_eq
 
 /-! **`h(x) ∈ K` on the book's system of representatives** (issue 0165, 2026-07-29).
 `Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
@@ -14107,3 +14107,18 @@ The same `C_Q(k) = 1` makes `k ↦ r r^{-k}` injective. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_mul_conj_inv_notMem_Q0
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_mul_conj_inv_injective
+
+/-! **`f` and `g` at `r r^{-k}` avoid `Q₀`** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+`g(r r^{-k}) = r r^{-ℓ⁻¹}` outright, and conjugating `f(r r^{-k})` by `k` gives
+`(r r^{-(kℓ)⁻¹})⁻¹` — with `kℓ ≠ 1` because `f ≠ 1`.  Since `Q₀` is `K`-invariant and closed
+under inversion, both avoid `Q₀`.  Against `f(rᵃ) = a s a⁻¹ ∈ Q₀` and `g((r⁻¹)ᵃ) = a s a⁻¹`
+this separates `r r^{-k}` from the `K`-orbits of `r` and of `r⁻¹` — the book instead compares
+orders (`4` versus `2`), which would need the exponent of a Suzuki `2`-group. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_Q0_of_mem_KSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjLeft_structureConjugator_mul_conj_inv_notMem_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjRight_structureConjugator_mul_conj_inv_notMem_Q0
