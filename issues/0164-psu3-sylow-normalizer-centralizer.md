@@ -762,3 +762,23 @@ Wielandt (9.1) の ambient 版 `natCard_eq_pow_natCard_inf_centralizer_of_kernel
 4. `g^{j'}` は `τ`-半線形。基底座標で `a ↦ c·τ(a) = c·a^s`。
    `(g^{j'})^p = 1` から `N(c) = c^{(|F|−1)/(s−1)} = 1`。
 5. `exists_ne_zero_mul_pow_eq` で非零固定点 ⟹ 非自明な `e ∈ E` で `g e = e`。
+
+
+## 実装メモ: `AddAut M` の群構造は自動で入らない (2026-07-29)
+
+抽象補題を `T : AddAut M`, `T ^ p = 1` で書こうとしたが、
+`[AddCommGroup M]` だけでは `HPow (AddAut M) ℕ` / `OfNat (AddAut M) 1` が
+合成できなかった (`Mathlib.Algebra.Group.End` を import しても同じ)。
+
+⟹ **`Function.iterate` で書く**のが確実:
+
+* 仮説を `hTp : ∀ x, T^[p] x = x` (`T : M ≃+ M`) にする。
+* 生成元の取り替えも iterate で済む: `T' := T^[j']` の固定点 `x` は
+  `T = (T')^[j'']` (`j' j'' ≡ 1 mod p`) だから `T` の固定点でもある
+  — 群構造は不要で、必要なのはこの一方向だけ。
+* 半線形性 `T (a • x) = σ a • T x` から
+  `T^[n] (a • x) = (σ^[n] a) • T^[n] x` を帰納で出す。
+
+この形なら `exists_generator_pow_natCard_fixedSet` +
+`exists_ne_zero_mul_pow_eq` に繋がる。**次セッションはこの形で書き直す。**
+(今回の draft は sorry を残さないよう撤収済み。)
