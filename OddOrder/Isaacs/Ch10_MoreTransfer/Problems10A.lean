@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 
 /-!
@@ -11,6 +12,8 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 10A。
 
 * **10A.1** `isRegularPGroup_two_iff_commute` — **2-群は regular ⟺ 可換**。
+* **10A.2** `pow_mul_eq_one_of_isRegularPGroup` — **regular `p`-群では `{x | x^p = 1}` が
+  部分群** (`omegaOneOfIsRegularPGroup` がその部分群)。
 
 ## regular `p`-群の定義について
 
@@ -213,5 +216,198 @@ theorem isRegularPGroup_two_iff_commute [Finite P] (hp : IsPGroup 2 P) :
     isRegularPGroup_of_commute 2⟩
 
 end -- 10A.1
+
+section /- 10A.2: regular p-群では p-乗して 1 の元が部分群をなす (p. 308) -/
+
+/-- **regular 性は部分群に遺伝する** (書籍 hint の第 1 段)。 -/
+theorem IsRegularPGroup.subgroup {p : ℕ} (hP : IsRegularPGroup p P) (H : Subgroup P) :
+    IsRegularPGroup p ↥H := by
+  intro x y
+  obtain ⟨c, hc, hcpow⟩ := hP (x : P) (y : P)
+  have hmapclose : (Subgroup.closure ({x, y} : Set ↥H)).map H.subtype
+      = Subgroup.closure ({(x : P), (y : P)} : Set P) := by
+    rw [MonoidHom.map_closure]
+    congr 1
+    ext z
+    simp [Set.mem_image, eq_comm]
+  have hmapc := Subgroup.map_commutator (H₁ := Subgroup.closure ({x, y} : Set ↥H))
+    (H₂ := Subgroup.closure ({x, y} : Set ↥H)) H.subtype
+  rw [hmapclose] at hmapc
+  rw [← hmapc] at hc
+  obtain ⟨c', hc', hceq⟩ := hc
+  refine ⟨c', hc', Subtype.ext ?_⟩
+  simp only [Subgroup.coe_mul, Subgroup.coe_pow]
+  rw [show ((c' : ↥H) : P) = c from hceq]
+  exact hcpow
+
+/-- 可換な 2 元で生成される群は可換。 -/
+private theorem commute_of_closure_pair {H : Type*} [Group H] {a b : H}
+    (htop : Subgroup.closure ({a, b} : Set H) = ⊤) (hab : a * b = b * a) (u v : H) :
+    u * v = v * u := by
+  -- まず `a` と `b` はそれぞれ `closure {a, b}` の全ての元と可換
+  have key : ∀ w ∈ ({a, b} : Set H),
+      Subgroup.closure ({a, b} : Set H) ≤ Subgroup.centralizer ({w} : Set H) := by
+    intro w hw
+    refine (Subgroup.closure_le _).mpr ?_
+    intro t ht
+    refine Subgroup.mem_centralizer_iff.mpr ?_
+    intro h hh
+    rw [Set.mem_singleton_iff] at hh
+    subst hh
+    rcases hw with rfl | rfl <;> rcases ht with rfl | rfl
+    · rfl
+    · exact hab
+    · exact hab.symm
+    · rfl
+  -- ゆえに `closure {a, b}` は自分自身の中心化群に含まれる
+  have hsub : Subgroup.closure ({a, b} : Set H)
+      ≤ Subgroup.centralizer (Subgroup.closure ({a, b} : Set H) : Set H) := by
+    refine (Subgroup.closure_le _).mpr ?_
+    intro w hw
+    refine Subgroup.mem_centralizer_iff.mpr ?_
+    intro t ht
+    exact (Subgroup.mem_centralizer_iff.mp (key w hw ht) w rfl).symm
+  have hu := hsub (htop ▸ Subgroup.mem_top u)
+  exact (Subgroup.mem_centralizer_iff.mp hu v (htop ▸ Subgroup.mem_top v)).symm
+
+/-- 10A.2 の帰納核。 -/
+private theorem pow_mul_eq_one_of_isRegularPGroup_aux.{u} (p : ℕ) [Fact p.Prime] (n : ℕ) :
+    ∀ (P : Type u) [Group P] [Finite P], Nat.card P ≤ n → IsPGroup p P →
+      IsRegularPGroup p P → ∀ x y : P, x ^ p = 1 → y ^ p = 1 → (x * y) ^ p = 1 := by
+  induction n with
+  | zero =>
+    intro P _ _ hcard
+    exact absurd (Nat.le_zero.mp hcard) Nat.card_pos.ne'
+  | succ n IH =>
+    intro P _ _ hcard hp hreg x y hx hy
+    -- 真部分群へ降りる道具
+    have hsub : ∀ H : Subgroup P, H ≠ ⊤ → ∀ u v : P, u ∈ H → v ∈ H →
+        u ^ p = 1 → v ^ p = 1 → (u * v) ^ p = 1 := by
+      intro H hH u v hu hv hu1 hv1
+      have hcardH : Nat.card ↥H ≤ n := by
+        have hne : Nat.card ↥H ≠ Nat.card P := fun h => hH (Subgroup.eq_top_of_card_eq _ h)
+        have hle := Subgroup.card_le_card_group H
+        omega
+      have hkey := IH ↥H hcardH (hp.to_subgroup H) (hreg.subgroup H) ⟨u, hu⟩ ⟨v, hv⟩
+        (Subtype.ext (by simpa using hu1)) (Subtype.ext (by simpa using hv1))
+      simpa using congrArg Subtype.val hkey
+    by_cases htop : Subgroup.closure ({x, y} : Set P) = ⊤
+    swap
+    · exact hsub _ htop x y (Subgroup.subset_closure (by simp))
+        (Subgroup.subset_closure (by simp)) hx hy
+    by_cases hab : ∀ a b : P, a * b = b * a
+    · rw [Commute.mul_pow (hab x y), hx, hy, one_mul]
+    -- 以下 `P` は非可換で `P = ⟨x, y⟩`
+    have hab : ∃ a b : P, a * b ≠ b * a := by
+      by_contra hcon
+      exact ‹¬ ∀ a b : P, a * b = b * a› fun a b => not_not.mp fun h => hcon ⟨a, b, h⟩
+    -- `Φ(P) ≠ ⊤`
+    have hfr : frattini P ≠ ⊤ := by
+      intro h
+      obtain ⟨a, b, hne⟩ := hab
+      have hbot : (⊥ : Subgroup P) = ⊤ := frattini_nongenerating (by rw [h, bot_sup_eq])
+      refine hne ?_
+      have ha : a = 1 := Subgroup.mem_bot.mp (hbot ▸ Subgroup.mem_top a)
+      have hb : b = 1 := Subgroup.mem_bot.mp (hbot ▸ Subgroup.mem_top b)
+      rw [ha, hb]
+    have hcommne : commutator P ≠ ⊤ := by
+      intro h
+      refine hfr (eq_top_iff.mpr ?_)
+      rw [← h]
+      exact Subgroup.commutator_le.mpr fun g₁ _ g₂ _ =>
+        OddOrder.GroupTheory.IsPGroup.commutator_mem_frattini hp g₁ g₂
+    -- **Step A**: `a^p = 1` なら `⁅a, g⁆^p = 1`
+    have hstepA : ∀ a g : P, a ^ p = 1 → ⁅a, g⁆ ^ p = 1 := by
+      intro a g ha
+      have hb1 : (g * a * g⁻¹) ^ p = 1 := by
+        rw [conj_pow, ha]; group
+      have hcomm : ⁅a, g⁆ = a * (g * a * g⁻¹)⁻¹ := by rw [commutatorElement_def]; group
+      by_cases hK : Subgroup.closure ({a, g * a * g⁻¹} : Set P) = ⊤
+      · exfalso
+        -- `g a g⁻¹ ∈ ⟨a⟩ ⊔ Φ(P)` なので `⟨a⟩ ⊔ Φ(P) = ⊤`, つまり `P = ⟨a⟩` は可換
+        have hmem : g * a * g⁻¹ ∈ Subgroup.zpowers a ⊔ frattini P := by
+          have hsplit : g * a * g⁻¹ = a * ⁅a⁻¹, g⁆ := by rw [commutatorElement_def]; group
+          rw [hsplit]
+          refine Subgroup.mul_mem _ (Subgroup.mem_sup_left (Subgroup.mem_zpowers a))
+            (Subgroup.mem_sup_right ?_)
+          exact OddOrder.GroupTheory.IsPGroup.commutator_mem_frattini hp a⁻¹ g
+        have hsup : Subgroup.zpowers a ⊔ frattini P = ⊤ := by
+          rw [eq_top_iff, ← hK]
+          refine Subgroup.closure_le _ |>.mpr ?_
+          intro w hw
+          simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hw
+          rcases hw with hw | hw
+          · rw [hw]; exact Subgroup.mem_sup_left (Subgroup.mem_zpowers a)
+          · rw [hw]; exact hmem
+        have hz : Subgroup.zpowers a = ⊤ := frattini_nongenerating hsup
+        obtain ⟨u, v, huv⟩ := hab
+        refine huv ?_
+        obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp (hz ▸ Subgroup.mem_top u)
+        obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp (hz ▸ Subgroup.mem_top v)
+        rw [← hm, ← hk, zpow_mul_comm]
+      · rw [hcomm]
+        exact hsub _ hK a (g * a * g⁻¹)⁻¹ (Subgroup.subset_closure (by simp))
+          (Subgroup.inv_mem _ (Subgroup.subset_closure (by simp))) ha
+          (by rw [inv_pow, hb1, inv_one])
+    -- **Step B**: `P'` の元はすべて `p` 乗で `1`
+    -- ⚠ `let` で定義すると elaborator が本体を展開し続けて heartbeat 超過するので
+    -- `obtain` で不透明に取り出す。
+    obtain ⟨Ω, hΩ⟩ : ∃ Ω : Subgroup P, ∀ c : P, c ∈ Ω ↔ (c ∈ commutator P ∧ c ^ p = 1) :=
+      ⟨{ carrier := {c | c ∈ commutator P ∧ c ^ p = 1}
+         one_mem' := ⟨one_mem _, one_pow p⟩
+         mul_mem' := fun {u v} hu hv =>
+           ⟨mul_mem hu.1 hv.1, hsub (commutator P) hcommne u v hu.1 hv.1 hu.2 hv.2⟩
+         inv_mem' := fun {u} hu => ⟨inv_mem hu.1, by rw [inv_pow, hu.2, inv_one]⟩ },
+       fun _ => Iff.rfl⟩
+    haveI hΩnorm : Ω.Normal := by
+      refine ⟨fun m hm gg => (hΩ _).mpr ⟨?_, ?_⟩⟩
+      · exact (inferInstance : (commutator P).Normal).conj_mem m ((hΩ m).mp hm).1 gg
+      · rw [conj_pow, ((hΩ m).mp hm).2]; group
+    have hxyΩ : ⁅x, y⁆ ∈ Ω := (hΩ _).mpr
+      ⟨Subgroup.commutator_mem_commutator (Subgroup.mem_top x) (Subgroup.mem_top y),
+        hstepA x y hx⟩
+    have hP'Ω : commutator P ≤ Ω := by
+      refine Subgroup.Normal.quotient_commutative_iff_commutator_le.mp ⟨⟨fun u v => ?_⟩⟩
+      have htopQ : Subgroup.closure
+          ({(x : P ⧸ Ω), (y : P ⧸ Ω)} : Set (P ⧸ Ω)) = ⊤ := by
+        rw [eq_top_iff]
+        rintro w -
+        obtain ⟨w', rfl⟩ := QuotientGroup.mk_surjective w
+        have hmap : (Subgroup.closure ({x, y} : Set P)).map (QuotientGroup.mk' Ω)
+            = Subgroup.closure ({(x : P ⧸ Ω), (y : P ⧸ Ω)} : Set (P ⧸ Ω)) := by
+          rw [MonoidHom.map_closure]
+          congr 1
+          ext z
+          simp [Set.mem_image, eq_comm]
+        rw [← hmap]
+        exact ⟨w', htop ▸ Subgroup.mem_top w', rfl⟩
+      have hcomm : (x : P ⧸ Ω) * (y : P ⧸ Ω) = (y : P ⧸ Ω) * (x : P ⧸ Ω) := by
+        refine commutatorElement_eq_one_iff_commute.mp ?_
+        have hone : ((⁅x, y⁆ : P) : P ⧸ Ω) = 1 := (QuotientGroup.eq_one_iff _).mpr hxyΩ
+        simpa [commutatorElement_def] using hone
+      exact commute_of_closure_pair htopQ hcomm u v
+    -- 仕上げ: regular 性の `c` は `P'` にあるので `c^p = 1`
+    obtain ⟨c, hc, hcpow⟩ := hreg x y
+    have hcP : c ∈ commutator P := Subgroup.commutator_mono le_top le_top hc
+    rw [hcpow, hx, hy, ((hΩ c).mp (hP'Ω hcP)).2, one_mul, one_mul]
+
+/-- **Isaacs Problem 10A.2** (書籍 p. 308) ⭐: regular `p`-群では `p` 乗して `1` になる元の
+集合は積で閉じている (したがって部分群をなす)。 -/
+theorem pow_mul_eq_one_of_isRegularPGroup [Finite P] {p : ℕ} [Fact p.Prime] (hp : IsPGroup p P)
+    (hreg : IsRegularPGroup p P) {x y : P} (hx : x ^ p = 1) (hy : y ^ p = 1) :
+    (x * y) ^ p = 1 :=
+  pow_mul_eq_one_of_isRegularPGroup_aux p (Nat.card P) P le_rfl hp hreg x y hx hy
+
+/-- **Isaacs Problem 10A.2** (部分群版): regular `p`-群の `p` 捩れ元は部分群をなす。 -/
+def omegaOneOfIsRegularPGroup [Finite P] {p : ℕ} [Fact p.Prime] (hp : IsPGroup p P)
+    (hreg : IsRegularPGroup p P) : Subgroup P where
+  carrier := {x | x ^ p = 1}
+  one_mem' := one_pow p
+  mul_mem' hu hv := pow_mul_eq_one_of_isRegularPGroup hp hreg hu hv
+  inv_mem' {u} hu := by
+    simp only [Set.mem_setOf_eq] at hu ⊢
+    rw [inv_pow, hu, inv_one]
+
+end -- 10A.2
 
 end OddOrder.Isaacs.Ch10
