@@ -36,6 +36,8 @@ centralized `K` it would lie in `W = C_V(K)`.
   `|N| = |C_N(X)|^{|X|}` for every `H`-invariant `2`-subgroup `N ≤ Q`.
 * `Hypothesis.coprime_natCard_K_of_not_dvd` — the coprimality hypothesis, in the
   form Ch. III supplies it: `p ∤ q₀ − 1` where `|Q₀| = q₀ ^ p`.
+* `Hypothesis.false_of_natCard_cQ_eq_cQ0_of_card_cube` — the contradiction the
+  `PSL(2, ℓ)` branch runs into, in the case `p ∤ q₀ − 1`.
 -/
 
 set_option autoImplicit false
@@ -292,6 +294,61 @@ theorem coprime_natCard_K_of_not_dvd {p q₀ : ℕ} (hp : p.Prime) (hq₀ : 1 �
   refine (Nat.Prime.coprime_iff_not_dvd hp).mpr ?_
   rw [OddOrder.Nat.prime_dvd_pow_self_sub_one_iff hp hq₀]
   exact hnd
+
+
+/-! ## The `PSL(2, ℓ)` branch cannot occur (case `p ∤ q₀ − 1`) -/
+
+/-- `Q₀` is invariant under conjugation by `H`: it is cut out inside `H` by
+`x ^ 2 = 1`. -/
+theorem conj_mem_Q0_of_mem_H {h : G} (hh : h ∈ hyp.H) {y : G} (hy : y ∈ hyp.Q0) :
+    h * y * h⁻¹ ∈ hyp.Q0 := by
+  refine ⟨?_, hyp.H.mul_mem (hyp.H.mul_mem hh hy.2) (hyp.H.inv_mem hh)⟩
+  have hy2 : y ^ 2 = 1 := hy.1
+  calc (h * y * h⁻¹) ^ 2 = h * y ^ 2 * h⁻¹ := by
+        rw [pow_two, pow_two]; group
+    _ = 1 := by rw [hy2, mul_one, mul_inv_cancel]
+
+theorem isPGroup_two_Q0 : IsPGroup 2 ↥hyp.Q0 := by
+  intro g
+  exact ⟨1, by
+    apply Subtype.ext
+    simpa using (g.2.1 : (g : G) ^ 2 = 1)⟩
+
+/-- **The `PSL(2, ℓ)` branch of Ch. I §3 Proposition 1(c) is incompatible with
+case (3)**, in the case `p ∤ q₀ − 1` where Wielandt's formula is available.
+
+The branch gives `|C_Q(X)| = |C_{Q₀}(X)|`.  Wielandt
+(`natCard_eq_pow_natCard_inf_centralizer`) applied to `Q` and to `Q₀` turns that
+into `|Q| = |Q₀|`, which contradicts `|Q| = |Q₀|³` because `|Q₀| ≥ 2`. -/
+theorem false_of_natCard_cQ_eq_cQ0_of_card_cube (hW : hyp.W = ⊥) {X : Subgroup G}
+    (hXV : X ≤ hyp.V) (hXne : X ≠ ⊥) (hp : (Nat.card ↥X).Prime)
+    (hcop : Nat.Coprime (Nat.card ↥X) (Nat.card ↥hyp.K))
+    (hQ2 : IsPGroup 2 ↥hyp.Q)
+    (hcube : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
+    (heq : Nat.card ↥(hyp.Q ⊓ Subgroup.centralizer (X : Set G)) =
+      Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer (X : Set G))) : False := by
+  have hQ := hyp.natCard_eq_pow_natCard_inf_centralizer hW hXV hXne hp hcop
+    (le_refl hyp.Q) hQ2 (fun h hh y hy => hyp.Q_normal_in_H h hh y hy)
+  have hQ0 := hyp.natCard_eq_pow_natCard_inf_centralizer hW hXV hXne hp hcop
+    hyp.Q0_le_Q hyp.isPGroup_two_Q0 (fun h hh y hy => hyp.conj_mem_Q0_of_mem_H hh hy)
+  rw [heq] at hQ
+  rw [← hQ0] at hQ
+  -- `|Q| = |Q₀|` against `|Q| = |Q₀|³`
+  have h2 : 2 ≤ Nat.card ↥hyp.Q0 := by
+    have hs : hyp.distinguishedInvolution ∈ hyp.Q0 :=
+      ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
+    rcases Nat.lt_or_ge (Nat.card ↥hyp.Q0) 2 with hlt | hge
+    · exfalso
+      have h1 : Nat.card ↥hyp.Q0 = 1 := by
+        have := Nat.card_pos (α := ↥hyp.Q0); omega
+      rw [Subgroup.eq_bot_of_card_eq _ h1, Subgroup.mem_bot] at hs
+      exact hyp.distinguishedInvolution_ne_one hs
+    · exact hge
+  rw [hcube] at hQ
+  have hpow : Nat.card ↥hyp.Q0 ^ 3 = Nat.card ↥hyp.Q0 * Nat.card ↥hyp.Q0 ^ 2 := by ring
+  rw [hpow] at hQ
+  have hsq : 2 ≤ Nat.card ↥hyp.Q0 ^ 2 := by nlinarith
+  nlinarith [Nat.card_pos (α := ↥hyp.Q0)]
 
 
 end Hypothesis

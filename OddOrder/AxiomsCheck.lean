@@ -13897,3 +13897,9 @@ Ch. III §1 Proposition が `F/Z(F)` 側から持ち上げた元 `x` を `Q`-成
 #assert_only_allowed_axioms OddOrder.Nat.prime_dvd_pow_self_sub_one_iff
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coprime_natCard_K_of_not_dvd
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_Q0_of_mem_H
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isPGroup_two_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.false_of_natCard_cQ_eq_cQ0_of_card_cube
