@@ -289,6 +289,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.QuotientFieldCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFivePairing
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
@@ -14253,3 +14254,21 @@ while `|K| = q − 1`; `K` acts freely on it (`kfree_mod_Q0_of_center_eq`), so
 `β (a⁻¹ y a) = γ a · β y`. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_quotient_field_coordinate
+
+/-! **The obstruction behind p. 119's `x ≠ 1`** (issue 0165, 2026-07-29).
+`StructureOfH/OrderFivePairing.lean`, Peterfalvi Part II Ch. III §2, p. 119.
+
+For `w ∈ Q ∖ Q₀` with `h(w) ∈ K`, writing `t w t = g h t f` one has `f g ∉ Q₀`.  Since `t`
+inverts `K`, `t w² t = (t w t)² = g · t (fg)^h t · f`; if `fg` were in `Q₀` then so would be
+`z = (fg)^h`, and comparing canonical decompositions of `t w² t` forces `h(w²) = h(z)`.  All
+involutions of `H` are `K`-conjugate (§1 Prop 3), say `z = (w²)^c`, so `h(z) = c h(w²) c` with
+`h(w²) ∈ K`; `K` abelian of odd order gives `c = 1`, i.e. `z = w²`, and then the left factors
+give `g = 1` — contradicting `g ≠ 1`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sq_mem_Q0_of_mem_Q
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mul_comm_of_mem_K
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.eq_one_of_sq_eq_one_of_mem_K
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjRight_mul_tConjLeft_notMem_Q0
