@@ -6335,3 +6335,28 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
 とくに **`LayerRestriction.lean` の Lemma 9.25 (`F(G) = 1` の場合の `E(G) = E(H)`)** が
 9A.1 の特殊ケースで、証明の型がそのまま使える (component ごとに「`G` の component と
 一致する」か「全部を中心化して `C_G(F*) ≤ F*` に落ちる」かの二分)。
+
+### §9A 進捗 (2026-07-29)
+
+* **9A.1 ✅** `map_layer_eq_layer_of_genFitting_le` (+ ambient 版
+  `layerInG_eq_layer_of_genFitting_le`)。Lemma 9.25 の一般化。
+* **9A.2 ✅** `exists_socle_mulEquiv_prod_abelian_semisimple`。
+  `abelianSocle` / `semisimpleSocle` を定義し, 新補題
+  `exists_simpleFamily_of_isMinimalNormal` (非可換極小正規を ambient の単純正規因子の
+  join に分解) で `IsSemisimpleGroup ↥(semisimpleSocle G)` を出す。
+* ⚠ **`OddOrder.lean` の配線を `git add -A OddOrder/` で拾い損ねた** (それは
+  `OddOrder/` ディレクトリしか見ない — `OddOrder.lean` は**ファイル**)。9A.1 の commit で
+  orphan leaf になりかけ, 9A.2 の commit で amend して回収。以後 `git add -A OddOrder/`
+  ではなく `git add -A OddOrder/ OddOrder.lean` を使う。
+
+**次 = 9A.3** (`N ⊴ G`, `G` semisimple ⟹ `N` は含まれる極小正規部分群の積)。設計:
+`𝒳` = `G` の極小正規部分群の全体 (= semisimple 族, `mem_semisimpleFamily_of_isMinimalNormal`),
+`U := ⨆ {S ∈ 𝒳 | S ≤ N}`, `V := ⨆ {S ∈ 𝒳 | S ≰ N}` とおく。
+
+1. `S ∈ 𝒳`, `S ≰ N` ⟹ `S ⊓ N ⊴ S` かつ `S` 単純ゆえ `S ⊓ N = 1` ⟹ `⁅S,N⁆ = 1`。
+   よって `V ≤ C_G(N)`, 対称に `N ≤ C_G(V)`。
+2. `Z(N) = 1`: `Z(N)` は `N` で characteristic ⟹ `G`-normal, かつ abelian (solvable) なので
+   `IsSemisimpleGroup.eq_bot_of_normal_of_isSolvable` で自明。⟹ `N ⊓ V ≤ Z(N) = 1`。
+3. `Z(↥V) = 1` (`↥V` も semisimple)。`U ⊔ V = sSup 𝒳 = ⊤` と `Subgroup.mul_normal` で
+   `n ∈ N` を `n = u v` (`u ∈ U`, `v ∈ V`) と書くと, `U ≤ C_G(V)` かつ `n ∈ C_G(V)` から
+   `v ∈ C_G(V) ⊓ V = Z(V) = 1`。⟹ `N ≤ U`, 逆は自明で `N = U`。
