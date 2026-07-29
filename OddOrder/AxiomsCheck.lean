@@ -13543,8 +13543,15 @@ Ch. III §1 Proposition needs the same content as plain subgroups of `G`.
   and `Y`"** when they are the only two: `P` has odd order (`prime_ne_two_of_le_V`) and an
   odd-order element cannot swap a two-element set, since it has a square root in its own
   cyclic group and `X^{h²} = X` however `h` acts.  What case (3) still needs on top of this is
-  the uniqueness itself — from non-isomorphic summands (types C, D) or from the count `q + 1`
-  (type B). -/
+  the uniqueness itself.
+* `exists_eq_liftCentralQuotient_of_isKSubgroupSquare` — the converse of the bridge: every such
+  subgroup comes from an invariant subgroup of order `q` of the central quotient.
+* `exists_two_kSubgroups_unique_of_card_cube` — **types C and D: there are exactly two**
+  ("`X` and `Y` are the only `𝐅₂[K]`-submodules of order `q` in `S/Q₀`", p. 117).  A third one
+  would make the summands `K`-equivariantly isomorphic
+  (`nonempty_kEquivariantMulEquiv_of_third_invariant`) and Appendix III Theorem (e)
+  (`isTypeB_of_isomorphicOrderQModuleSplit_of_card_eq_cube`) would put `S` in type B.  The
+  type-B case still needs the book's count `q + 1`. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_liftCentralQuotient
 #assert_only_allowed_axioms
@@ -13559,3 +13566,7 @@ Ch. III §1 Proposition needs the same content as plain subgroups of `G`.
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_of_unique_of_le_V
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_two_kSubgroups_of_card_cube
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_eq_liftCentralQuotient_of_isKSubgroupSquare
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_two_kSubgroups_unique_of_card_cube

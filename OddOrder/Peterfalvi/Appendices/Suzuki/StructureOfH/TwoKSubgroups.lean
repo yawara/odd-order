@@ -286,6 +286,165 @@ theorem conj_mem_of_unique_of_le_V {P : Subgroup G} {p : ℕ} (hp : p.Prime)
 
 /-! ## Higman clause (d) in `G`-language -/
 
+/-- Every `K`-subgroup of `S` of order `q²` comes from a `K`-invariant subgroup
+of order `q` of the central quotient — the converse direction of the bridge. -/
+theorem exists_eq_liftCentralQuotient_of_isKSubgroupSquare
+    (hZQ0 : Subgroup.center ↥hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {Z : Subgroup G} (hZ : hyp.IsKSubgroupSquare Z) :
+    ∃ U : Subgroup (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q),
+      IsAInvariant (IsAInvariant.quotientMulAutHom
+        (IsAInvariant.of_characteristic hyp.actualKActor.subtype)) U ∧
+      Nat.card ↥U = Nat.card ↥hyp.Q0 ∧
+      hyp.liftCentralQuotient U = Z := by
+  classical
+  obtain ⟨hZQ, hQ0Z, hZinv, hZcard⟩ := hZ
+  have hCle : Subgroup.center ↥hyp.Q ≤ Z.subgroupOf hyp.Q := by
+    intro x hx
+    rw [hZQ0] at hx
+    exact Subgroup.mem_subgroupOf.mpr (hQ0Z (Subgroup.mem_subgroupOf.mp hx))
+  refine ⟨(Z.subgroupOf hyp.Q).map
+    (QuotientGroup.mk' (Subgroup.center ↥hyp.Q)), ?_, ?_, ?_⟩
+  · -- invariance
+    rw [isAInvariant_iff_smul_mem]
+    rintro a x hx
+    obtain ⟨y, hy, rfl⟩ := hx
+    obtain ⟨⟨k, hk⟩, hkeq⟩ := a.2
+    have hsub : hyp.actualKActor.subtype a = hyp.conjQByK ⟨k, hk⟩ := hkeq.symm
+    refine ⟨(hyp.actualKActor.subtype a) y, ?_, rfl⟩
+    refine Subgroup.mem_subgroupOf.mpr ?_
+    have hyZ : (y : G) ∈ Z := Subgroup.mem_subgroupOf.mp hy
+    have hval : (((hyp.actualKActor.subtype a) y : ↥hyp.Q) : G)
+        = k * (y : G) * k⁻¹ := by rw [hsub]; rfl
+    rw [hval]
+    exact hZinv k hk _ hyZ
+  · -- cardinality
+    have hcomap : ((Z.subgroupOf hyp.Q).map
+        (QuotientGroup.mk' (Subgroup.center ↥hyp.Q))).comap
+        (QuotientGroup.mk' (Subgroup.center ↥hyp.Q)) = Z.subgroupOf hyp.Q := by
+      rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk', sup_eq_left.mpr hCle]
+    have hlift : hyp.liftCentralQuotient ((Z.subgroupOf hyp.Q).map
+        (QuotientGroup.mk' (Subgroup.center ↥hyp.Q))) = Z := by
+      rw [liftCentralQuotient, hcomap, Subgroup.subgroupOf_map_subtype,
+        inf_eq_left.mpr hZQ]
+    have hZcentre : Nat.card ↥(Subgroup.center ↥hyp.Q) = Nat.card ↥hyp.Q0 := by
+      rw [hZQ0, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv]
+    have h := card_liftCentralQuotient (hyp := hyp) ((Z.subgroupOf hyp.Q).map
+      (QuotientGroup.mk' (Subgroup.center ↥hyp.Q)))
+    rw [hlift, hZcard, hZcentre, sq] at h
+    exact (Nat.eq_of_mul_eq_mul_right Nat.card_pos h).symm
+  · -- the lift is `Z` again
+    have hcomap : ((Z.subgroupOf hyp.Q).map
+        (QuotientGroup.mk' (Subgroup.center ↥hyp.Q))).comap
+        (QuotientGroup.mk' (Subgroup.center ↥hyp.Q)) = Z.subgroupOf hyp.Q := by
+      rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk', sup_eq_left.mpr hCle]
+    rw [liftCentralQuotient, hcomap, Subgroup.subgroupOf_map_subtype,
+      inf_eq_left.mpr hZQ]
+
+/-- **Types C and D: there are exactly two `K`-subgroups of `S` of order `q²`**
+(Peterfalvi Part II, Ch. III §1, p. 117: "It follows that `X` and `Y` are the
+only `𝐅₂[K]`-submodules of order `q` in `S/Q₀`").
+
+A third `K`-invariant subgroup of order `q` in `S ⧸ Z(S)` would make the two
+summands of Higman's split `K`-equivariantly isomorphic
+(`nonempty_kEquivariantMulEquiv_of_third_invariant`), and Appendix III,
+Theorem (e) then says `S` is of type B
+(`isTypeB_of_isomorphicOrderQModuleSplit_of_card_eq_cube`). -/
+theorem exists_two_kSubgroups_unique_of_card_cube
+    (hQsuz : IsSuzuki2Group ↥hyp.Q) {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
+    (hnotB : ¬ Suzuki2Groups.IsTypeB.{uG, 0} ↥hyp.Q) :
+    ∃ X Y : Subgroup G, hyp.IsKSubgroupSquare X ∧ hyp.IsKSubgroupSquare Y ∧
+      X ≠ Y ∧ ∀ Z : Subgroup G, hyp.IsKSubgroupSquare Z → Z = X ∨ Z = Y := by
+  classical
+  have hKcyc : IsCyclic ↥hyp.actualKActor := hyp.actualKActor_isCyclic
+  have hreg : ActsRegularlyOnInvolutions hyp.actualKActor :=
+    hyp.actualKActor_actsRegularlyOnInvolutions
+  have hKKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1 := by
+    have h1 : Nat.card ↥hyp.actualKActor = Nat.card ↥hyp.K :=
+      Nat.card_congr (MonoidHom.ofInjective hyp.conjQByK_injective).toEquiv.symm
+    rw [h1, hyp.card_K_eq_card_Q0_sub_one, hQ0card]
+  have hcard : Nat.card ↥hyp.Q = (2 ^ m) ^ 3 := by rw [hcardQ, hQ0card]
+  obtain ⟨-, hZsq, ⟨csplit⟩⟩ :=
+    center_payload_of_card_eq_cube hQsuz hKcyc hreg hm hKKcard hcard
+  have hZQ0 : Subgroup.center ↥hyp.Q = hyp.Q0.subgroupOf hyp.Q :=
+    hyp.center_Q_eq_Q0_subgroupOf_of_sq_eq_one hZsq
+  have hZcard : Nat.card ↥(Subgroup.center ↥hyp.Q) = Nat.card ↥hyp.Q0 := by
+    rw [hZQ0, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv]
+  have hcardK' : Nat.card ↥hyp.actualKActor =
+      Nat.card ↥(Subgroup.center ↥hyp.Q) - 1 := by
+    rw [hZcard, hQ0card, hKKcard]
+  have hcardlift : ∀ U : Subgroup (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q),
+      Nat.card ↥U = Nat.card ↥(Subgroup.center ↥hyp.Q) →
+      Nat.card ↥(hyp.liftCentralQuotient U) = Nat.card ↥hyp.Q0 ^ 2 := by
+    intro U hU
+    rw [card_liftCentralQuotient, hU, hZcard, sq]
+  -- fixed-point-freeness on the central quotient
+  obtain ⟨hP2, -, -, -⟩ := id hQsuz
+  have hfreeP := fixedPointFree_of_actsRegularlyOnInvolutions hP2 hreg
+  have hfree : ∀ k : ↥hyp.actualKActor, k ≠ 1 →
+      ∀ q : ↥hyp.Q ⧸ Subgroup.center ↥hyp.Q,
+        IsAInvariant.quotientMulAutHom
+          (IsAInvariant.of_characteristic hyp.actualKActor.subtype) k q = q →
+          q = 1 := by
+    apply Suzuki2Groups.quotient_fixedPointFree_of_fixedPoints_le
+      hyp.actualKActor.subtype (Subgroup.center ↥hyp.Q)
+      (IsAInvariant.of_characteristic hyp.actualKActor.subtype)
+    · exact Suzuki2Groups.card_coprime_of_card_eq_sub_one
+        (Subgroup.center ↥hyp.Q) hcardK'
+    · intro k hk x hx
+      rw [hfreeP k hk x hx]
+      exact Subgroup.one_mem _
+  -- all subgroups of the (elementary abelian) central quotient are normal
+  have hqcomm : ∀ a b : (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q), a * b = b * a :=
+    fun a b => csplit.quotientEA.1 a b
+  have hnormal : ∀ U : Subgroup (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q), U.Normal := by
+    intro U
+    refine ⟨fun n hn g => ?_⟩
+    rw [hqcomm g n, mul_assoc, mul_inv_cancel, mul_one]
+    exact hn
+  haveI := hnormal csplit.left
+  haveI := hnormal csplit.right
+  refine ⟨hyp.liftCentralQuotient csplit.left, hyp.liftCentralQuotient csplit.right,
+    ⟨liftCentralQuotient_le_Q _, Q0_le_liftCentralQuotient hZQ0 _,
+      kInvariant_liftCentralQuotient csplit.leftInvariant,
+      hcardlift _ csplit.leftCard⟩,
+    ⟨liftCentralQuotient_le_Q _, Q0_le_liftCentralQuotient hZQ0 _,
+      kInvariant_liftCentralQuotient csplit.rightInvariant,
+      hcardlift _ csplit.rightCard⟩, ?_, ?_⟩
+  · -- the two lifts are distinct
+    intro heq
+    have hLR : csplit.left = csplit.right := liftCentralQuotient_injective heq
+    have hdisj := csplit.complementary.disjoint
+    rw [hLR, disjoint_self] at hdisj
+    have hcardR : Nat.card ↥csplit.right = Nat.card ↥(Subgroup.center ↥hyp.Q) :=
+      csplit.rightCard
+    rw [hdisj, Subgroup.card_bot, hZcard, hQ0card] at hcardR
+    rcases Nat.pow_eq_one.mp hcardR.symm with h | h
+    · omega
+    · exact hm h
+  · -- uniqueness
+    intro Z hZ
+    obtain ⟨U, hUinv, hUcard, hUlift⟩ :=
+      exists_eq_liftCentralQuotient_of_isKSubgroupSquare hZQ0 hZ
+    have hUcard' : Nat.card ↥U = Nat.card ↥(Subgroup.center ↥hyp.Q) := by
+      rw [hUcard, hZcard]
+    by_cases hU1 : U = csplit.left
+    · exact Or.inl (by rw [← hUlift, hU1])
+    by_cases hU2 : U = csplit.right
+    · exact Or.inr (by rw [← hUlift, hU2])
+    exfalso
+    obtain ⟨e⟩ := Suzuki2Groups.nonempty_kEquivariantMulEquiv_of_third_invariant
+      (IsAInvariant.quotientMulAutHom
+        (IsAInvariant.of_characteristic hyp.actualKActor.subtype))
+      hfree csplit.leftInvariant csplit.rightInvariant hUinv csplit.complementary
+      (by rw [hUcard']; exact hcardK')
+      (by rw [hUcard']; exact csplit.leftCard)
+      (by rw [hUcard']; exact csplit.rightCard)
+      hU1 hU2
+    exact hnotB (isTypeB_of_isomorphicOrderQModuleSplit_of_card_eq_cube hQsuz
+      hKcyc hreg hm hKKcard hcard ⟨csplit, e⟩)
+
 /-- **Peterfalvi Appendix III, Higman theorem (d), in the ambient group**
 (p. 141), as case (3) of the Ch. III §1 Proposition uses it (p. 117): if `S = Q`
 is a Suzuki `2`-group of order `q³` then `S` has two distinct `K`-subgroups of
