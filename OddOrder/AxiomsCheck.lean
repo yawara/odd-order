@@ -287,6 +287,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
@@ -13954,3 +13955,32 @@ the projective line over `End_K(irreducible) ≅ 𝔽_q`, which the text does no
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_inf_centralizer_not_mem_Q0_of_card_cube
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.W_ne_bot_of_card_cube
+
+/-! **The canonical decomposition of `t x t`** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+> Let `f, g : S# → S#` and `h : S# → D` be the mappings such that, for `x ∈ S#`,
+> `txt = g(x)h(x)tf(x)`.
+
+`S = Q` after Theorem C.  Existence and uniqueness come from Ch. I §1 Proposition 4(a)
+(`existsUnique_canonicalForm`) once `t x t ∉ H` is known — which is `Q ⊓ D = 1`, since
+`t x t ∈ H` would put `x` in the stabilizer of both `basept` and `t • basept`.  The `H`-part
+splits as `Q ⋊ D`; `f(x) ≠ 1` because `t x t ∈ H t` would give `t ∈ H`, and `g(x) ≠ 1` because
+the same applied to `x⁻¹` would (using that `t` normalizes `D`).
+
+`tConjTriple_conj` is the book's identity (1): `t` inverts `K`, so conjugating by `a ∈ K` sends
+the decomposition of `t x t` to that of `t xᵃ t` with `g, f` conjugated by `a⁻¹` and
+`h(xᵃ) = a h(x) a`.  This is what reduces the Proposition of §2 to a system of representatives
+for the `K`-orbits of `S#`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_notMem_H_of_mem_Q
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_notMem_mul_t
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.existsUnique_tConjTriple
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_spec
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_eq_of
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_conj
