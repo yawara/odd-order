@@ -6541,3 +6541,34 @@ repo には `AutTower.lean` / `AutTowerBounds.lean` / `Schenkman.lean` /
 
 これで `Inn G = E(Aut G)` が characteristic (`map_layer_mulEquiv`) になり、
 `normal_map_conj_of_map_le` で `G` の像が `G₃` で正規 ⟹ **9B.2 を適用して 9B.3 完成**。
+
+### 9B.3 完了 / 9B.4 の実状調査 (2026-07-29)
+
+* **9B.3 ✅** `isCompleteGroup_mulAut_of_isSemisimpleGroup`。`E(Aut G) = Inn(G)`
+  (`≤` = 9A.6 の直接適用 / `≥` = 各単純正規因子の像が component) から
+  `Inn(G)` characteristic ⟹ 9B.2 適用。新補助 = `innAut_le_normalizer_map_conj` /
+  `innAut_le_layer_mulAut`。
+
+**9B.4 は大物** (`G` = 位数 `2n` の二面体群, `n` 奇数; tower は高々 2 種類):
+
+* 「`Z(G) = 1`」の部分は **mathlib に既存** —
+  `DihedralGroup.center_eq_bot_of_odd_ne_one (hodd : Odd n) (hne1 : n ≠ 1)`。
+  形式化すべき新規内容ではない。
+* 本体は「`Aut(D_{2n})` が complete」。**9B.2 経由の近道は使えない**:
+  9B.2 は `Inn(G)` が `Aut(G)` で characteristic であることを要求するが、
+  `n` 奇数のとき `Aut(D_{2n}) ≅ Hol(Z/n) = Z/n ⋊ (Z/n)ˣ` で
+  `Inn(D_{2n}) = Z/n ⋊ {±1}`。`(Z/n)ˣ` は一般に involution を複数持つ
+  (例: `n = 15` で `(Z/15)ˣ ≅ Z/2 × Z/4` は involution 3 個) ので
+  `{±1}` は characteristic に決まらず、`Inn(D_{2n})` は characteristic でない。
+* したがって必要なのは **(a) `Aut(D_{2n}) ≅ Hol(Z/n)` (`n` 奇数)** と
+  **(b) `Hol(Z/n)` が complete (`n` 奇数)** の 2 本。どちらも mathlib に無く、
+  (a) は `D_{2n}` の巡回部分群 `C` が characteristic (奇位数元全体) であることから
+  `Aut(D_{2n}) → Aut(C)` を作る筋、(b) は古典的定理で独立の議論が要る。
+  **`OddOrder/GroupTheory/Holomorph.lean` (9214 で新設済) が (b) の置き場になる**。
+* 見積り: 2-3 iteration。9B.5 とは独立なので、着手順は入れ替えてよい。
+
+**9B.5 の材料は揃っている**: `NilpotentResidual.lean` に `nilpotentResidual` /
+Lemma 9.15 (`nilpotentResidual_top_eq_of_isSubnormal_sup_nilpotent`) /
+相対形 (`nilpotentResidual_sup_eq_of_isSubnormal`) / `map_nilpotentResidual` /
+`nilpotentResidual_le_iff_isNilpotent_map` などが既にある。
+書籍 hint は「まず `A`, `B` ともに normal の場合、次に `|G|` の帰納法」。
