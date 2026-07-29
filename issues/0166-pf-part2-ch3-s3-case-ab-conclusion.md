@@ -110,10 +110,16 @@ theorem theoremAConclusion_of_orderFiveCarrier_subgroup
 
 ⚠ `|G/G₀| = |V|` は結論に不要なので未形式化 (`G₀ ⊓ V = ⊥` と `G₀ ⊔ V = ⊤` から出る)。
 
-### 残り
+### ✅ trichotomy 配線も完了
 
-`SecondCaseHypothesis.trichotomy` から直接流す配線が未。**障害は 1 点だけ**:
-trichotomy の case (b) 枝は `IsTypeA ∧ orderOf (st) = 5 ∧ W = ⊥` を返すが
-`|Q| = |Q₀|²` を返さない (分岐条件 `natCard_Q_eq_sq_or_cube` の sq 側そのものなので、
-`WNeBot.lean` の当該枝に連言を 1 本足せば済む)。あるいは `IsTypeA` から
-`|Q| = |F|²`, `|Q₀| = |Z(Q)| = |F|` を導いて仮説を落とす。
+`WNeBot.lean` の `trichotomy` の case (b) 枝に `Nat.card ↥Q = Nat.card ↥Q0 ^ 2` を
+1 本足した (分岐条件 `natCard_Q_eq_sq_or_cube` の sq 側そのもので、証明側は `hsq` を渡すだけ)。
+`trichotomy` にはまだコード上の消費者が無かったので影響なし。
+
+**`SecondCaseHypothesis.theoremAConclusion_or_caseC2`** —
+
+```
+Nonempty (TheoremAConclusion G Ω) ∨ (IsTypeB ↥S ∧ orderOf (st) = 3 ∧ W ≠ ⊥)
+```
+
+⟹ **§3 本体以降は (C2) だけを仮定してよい**ことが形式化された。

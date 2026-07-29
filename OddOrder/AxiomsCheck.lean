@@ -14372,3 +14372,5 @@ applies. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coe_orderThreeGeneratedSubgroup_eq_orderFiveCarrier
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.theoremAConclusion_of_caseA
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.theoremAConclusion_or_caseC2

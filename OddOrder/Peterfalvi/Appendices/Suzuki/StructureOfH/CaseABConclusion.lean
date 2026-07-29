@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionNonSimple
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
 
 /-!
 # Cases (a) and (b) of Ch. III §1 give the conclusion of Theorem A
@@ -43,9 +44,9 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 open scoped Pointwise
 
-namespace Hypothesis
-
 universe u v
+
+namespace Hypothesis
 
 variable {G : Type u} {Ω : Type v} [Group G] [MulAction G Ω] [Finite G]
   (hyp : Hypothesis G Ω)
@@ -237,5 +238,32 @@ theorem theoremAConclusion_of_caseA
     (hyp.coe_orderThreeGeneratedSubgroup_eq_orderFiveCarrier h3 hQ) hV ind
 
 end Hypothesis
+
+namespace SecondCaseHypothesis
+
+variable {G : Type u} {Ω : Type v} [Group G] [MulAction G Ω] [Finite G]
+  (sc : SecondCaseHypothesis G Ω)
+
+/-- **Cases (a) and (b) are disposed of** (Peterfalvi Part II, Ch. III §3,
+p. 119): either the conclusion of Theorem A already holds, or the remaining
+case (C2) of §3 does —
+
+> `S` is a Suzuki `2`-group of type B, `st` has order `3` and `W ≠ 1`.
+
+In cases (a) and (b) the set `(SK) ∪ (SKtS)` is a subgroup (Ch. I §3 Lemma 4
+and §2), and it is a proper non-trivial normal subgroup of `G` because `V ≠ 1`;
+Ch. I §3 Proposition 2 then gives Theorem A's conclusion. -/
+theorem theoremAConclusion_or_caseC2 (ind : Hypothesis.TheoremAInductionBelow G Ω) :
+    Nonempty (Hypothesis.TheoremAConclusion G Ω) ∨
+      (Suzuki2Groups.IsTypeB.{u, 0} ↥sc.toHypothesis.Q ∧
+        orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3 ∧
+        sc.toHypothesis.W ≠ ⊥) := by
+  rcases sc.trichotomy ind with ⟨hQ, h3⟩ | ⟨hA, hQcard, h5, -⟩ | hC2
+  · exact Or.inl (sc.toHypothesis.theoremAConclusion_of_caseA hQ h3 sc.V_ne_bot ind)
+  · exact Or.inl
+      (sc.toHypothesis.theoremAConclusion_of_caseB hA hQcard h5 sc.V_ne_bot ind)
+  · exact Or.inr hC2
+
+end SecondCaseHypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
