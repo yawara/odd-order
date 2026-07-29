@@ -207,6 +207,69 @@ theorem orbitRepVal_pairwise (hr2 : hyp.structureConjugator ^ 2 ≠ 1)
     exact congrArg Sum.inr (Subtype.ext (Subtype.ext
       (hpair (k : G) (l : G) a hkK hk1 hlK hl1 ha hij)))
 
+/-- **The book's list meets every `K`-orbit of `S#`** (Peterfalvi Part II,
+Ch. III §2, p. 118), granted the last non-conjugacy `hpair` of p. 119.
+
+`K` acts on `Q` by conjugation, fixing only `1` (Ch. I §2 Proposition 1(a)), and
+the list has `|ι| · |K| + 1 = |Q|` members in pairwise distinct orbits, so
+`exists_mem_orbit_of_card_mul_succ_eq` applies. -/
+theorem orbitReprSet_covers (hr2 : hyp.structureConjugator ^ 2 ≠ 1)
+    (hQcard : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 2)
+    (hpair : ∀ k₁ k₂ a : G, k₁ ∈ hyp.KSet → k₁ ≠ 1 → k₂ ∈ hyp.KSet → k₂ ≠ 1 →
+      a ∈ hyp.KSet →
+      a⁻¹ * (hyp.structureConjugator * (k₁⁻¹ * hyp.structureConjugator⁻¹ * k₁)) * a
+        = hyp.structureConjugator * (k₂⁻¹ * hyp.structureConjugator⁻¹ * k₂) →
+      k₁ = k₂)
+    {x : G} (hx : x ∈ hyp.Q) (hx1 : x ≠ 1) :
+    ∃ a ∈ hyp.K, ∃ y ∈ hyp.orbitReprSet, x = a⁻¹ * y * a := by
+  letI : MulAction ↥hyp.K ↥hyp.Q := MulAction.compHom _ hyp.conjQByK
+  have hsmul : ∀ (a : ↥hyp.K) (y : ↥hyp.Q),
+      ((a • y : ↥hyp.Q) : G) = (a : G) * (y : G) * (a : G)⁻¹ := fun _ _ => rfl
+  set rep : hyp.OrbitReprIndex → ↥hyp.Q :=
+    fun i => ⟨hyp.orbitRepVal i, hyp.orbitRepVal_mem_Q i⟩ with hrepdef
+  have hmemKSet : ∀ a : ↥hyp.K, (a : G) ∈ hyp.KSet := fun a => by
+    rw [← hyp.coe_K]; exact a.2
+  have hone : ∀ a : ↥hyp.K, a • (1 : ↥hyp.Q) = 1 := fun a => map_one (hyp.conjQByK a)
+  have hfree : ∀ (a : ↥hyp.K) (y : ↥hyp.Q), y ≠ 1 → a • y = y → a = 1 := by
+    intro a y hy hfix
+    by_contra hane
+    exact hy (hyp.conjQByK_fixed_eq_one hane hfix)
+  have hrepne : ∀ i, rep i ≠ 1 := fun i h =>
+    hyp.orbitRepVal_ne_one i (congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) h)
+  have hrep : ∀ (i j : hyp.OrbitReprIndex) (a : ↥hyp.K), a • rep i = rep j → i = j := by
+    intro i j a h
+    refine hyp.orbitRepVal_pairwise hr2 hpair i j (hyp.inv_mem_KSet (hmemKSet a)) ?_
+    have hval := congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) h
+    rw [hsmul a (rep i)] at hval
+    rw [inv_inv]
+    exact hval
+  obtain ⟨i, a, hia⟩ :=
+    OddOrder.GroupTheory.FreeActionOrbitCount.exists_mem_orbit_of_card_mul_succ_eq
+    rep 1 hone hfree hrepne hrep
+    (hyp.card_orbitReprIndex_mul_card_K_succ hQcard)
+    (x := (⟨x, hx⟩ : ↥hyp.Q)) (fun h => hx1 (congrArg
+      (Subtype.val (p := fun z => z ∈ hyp.Q)) h))
+  refine ⟨(a : G)⁻¹, hyp.K.inv_mem a.2, hyp.orbitRepVal i,
+    hyp.orbitRepVal_mem_orbitReprSet i, ?_⟩
+  have hval := congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) hia
+  rw [hsmul a (rep i)] at hval
+  rw [inv_inv]
+  exact hval.symm
+
+/-- **`h(x) ∈ K` for every `x ∈ Q ∖ {1}`** (Peterfalvi Part II, Ch. III §2,
+p. 118), granted the last non-conjugacy of p. 119.  This *is* the Proposition of
+§2: `t x t = g(x) h(x) t f(x)` with `h(x) ∈ K` says `t S t ⊆ S K t S`. -/
+theorem tConjMiddle_mem_K (hr2 : hyp.structureConjugator ^ 2 ≠ 1)
+    (hQcard : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 2)
+    (hpair : ∀ k₁ k₂ a : G, k₁ ∈ hyp.KSet → k₁ ≠ 1 → k₂ ∈ hyp.KSet → k₂ ≠ 1 →
+      a ∈ hyp.KSet →
+      a⁻¹ * (hyp.structureConjugator * (k₁⁻¹ * hyp.structureConjugator⁻¹ * k₁)) * a
+        = hyp.structureConjugator * (k₂⁻¹ * hyp.structureConjugator⁻¹ * k₂) →
+      k₁ = k₂)
+    {x : G} (hx : x ∈ hyp.Q) (hx1 : x ≠ 1) : hyp.tConjMiddle x ∈ hyp.K :=
+  hyp.tConjMiddle_mem_K_of_orbitReprSet_covers
+    (fun _ hy hy1 => hyp.orbitReprSet_covers hr2 hQcard hpair hy hy1) hx hx1
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

@@ -356,7 +356,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 14200
+set_option linter.style.longFile 14400
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -14185,3 +14185,18 @@ three `K`-orbit invariants: membership of `y`, of `g(y)` and of `f(y)` in `Q₀`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.not_conj_of_notMem_Q0_distinguishedInvolution
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orbitRepVal_pairwise
+
+/-! **The Proposition of §2, reduced to the one computation of p. 119** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/OrderFiveOrbits.lean`, Peterfalvi Part II, Ch. III §2.
+
+> **Proposition.** If case (b) of the proposition of §1 holds, then `(SK) ∪ (SKtS)` is a
+> subgroup of `G`.
+
+Its content is `h(x) ∈ K` for every `x ∈ S#`, which `tConjMiddle_mem_K` now proves from
+`r² ≠ 1`, `|Q| = |Q₀|²` and the single remaining non-conjugacy `hpair`: that
+`a⁻¹ (r r^{-k₁}) a = r r^{-k₂}` forces `k₁ = k₂`.  That is the field computation of p. 119,
+the only step of §2 still open. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orbitReprSet_covers
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K
