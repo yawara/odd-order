@@ -22,8 +22,10 @@ mathlib の `QuaternionGroup M` (位数 `4M`) が同じ群なので, `Q_n = Quat
   逆に「指数 2 の巡回部分群 `C` があって `G ∖ C` の元がすべて位数 4」なら `G ≅ Q_n`。
 * **3F.2** `isCyclicExtensionTower_top` — 有限可解群は `⊥` から Thm 3.36 (巡回拡大) を
   繰り返して構成できる。
-* **3F.3 (前半)** `quaternionTwo_zpowers_of_orderOf_eq_four` — `Q_8` の位数 4 の巡回
-  部分群は `⟨a 1⟩`, `⟨xa 0⟩`, `⟨xa 1⟩` の 3 個のみ。
+* **3F.3** `quaternionTwo_zpowers_of_orderOf_eq_four` +
+  `quaternionTwo_zpowers_pairwise_ne` (`Q_8` の位数 4 の巡回部分群は
+  `⟨a 1⟩`, `⟨xa 0⟩`, `⟨xa 1⟩` のちょうど 3 個) と
+  `quaternionTwo_exists_mulAut_map_zpowers` (`Aut(Q_8)` が推移的)。
 -/
 
 namespace OddOrder.Isaacs.Ch03
@@ -230,6 +232,79 @@ theorem quaternionTwo_zpowers_of_orderOf_eq_four {x : QuaternionGroup 2} (hx : o
     · exact Or.inr (Or.inr rfl)
     · exact Or.inr (Or.inl (hpow (xa 0) (xa 2) (by decide) (by decide)))
     · exact Or.inr (Or.inr (hpow (xa 1) (xa 3) (by decide) (by decide)))
+
+open QuaternionGroup in
+/-- `Q_8` の位数 4 の 3 つの巡回部分群は相異なる (`⟨a 1⟩` の元は `a _` の形,
+`xa 1 ∉ ⟨xa 0⟩`)。 -/
+theorem quaternionTwo_zpowers_pairwise_ne :
+    Subgroup.zpowers (a 1 : QuaternionGroup 2) ≠ Subgroup.zpowers (xa 0) ∧
+      Subgroup.zpowers (a 1 : QuaternionGroup 2) ≠ Subgroup.zpowers (xa 1) ∧
+      Subgroup.zpowers (xa 0 : QuaternionGroup 2) ≠ Subgroup.zpowers (xa 1) := by
+  have hmem : ∀ u v : QuaternionGroup 2, orderOf u = 4 →
+      (v ∈ (Finset.range 4).image (fun k => u ^ k) → False) →
+      Subgroup.zpowers u ≠ Subgroup.zpowers v := by
+    intro u v hu hv hcon
+    exact hv (by
+      rw [← hu]
+      exact (mem_zpowers_iff_mem_range_orderOf).mp (hcon ▸ Subgroup.mem_zpowers v))
+  have h1 : orderOf (a 1 : QuaternionGroup 2) = 4 :=
+    (quaternionTwo_orderOf_eq_four_iff _).mpr ⟨by decide, by decide⟩
+  have h2 : orderOf (xa 0 : QuaternionGroup 2) = 4 := orderOf_xa 0
+  exact ⟨hmem _ _ h1 (by decide), hmem _ _ h1 (by decide), hmem _ _ h2 (by decide)⟩
+
+open QuaternionGroup in
+/-- `Q_8` の自己同型 `a 1 ↦ xa 0` (四元数 `i ↦ j`, `j ↦ i`)。
+
+`a k ↦ (xa 0)^k`, `xa k ↦ (a 1) * (xa 0)^k` (= `xa 0 ↦ a 1` の伸長)。 -/
+def quaternionSwapIJ : QuaternionGroup 2 → QuaternionGroup 2
+  | .a i => (xa 0 : QuaternionGroup 2) ^ i.val
+  | .xa i => (a 1 : QuaternionGroup 2) * (xa 0 : QuaternionGroup 2) ^ i.val
+
+open QuaternionGroup in
+/-- `Q_8` の自己同型 `a 1 ↦ xa 1` (四元数 `i ↦ k`)。 -/
+def quaternionSwapIK : QuaternionGroup 2 → QuaternionGroup 2
+  | .a i => (xa 1 : QuaternionGroup 2) ^ i.val
+  | .xa i => (a 1 : QuaternionGroup 2) * (xa 1 : QuaternionGroup 2) ^ i.val
+
+/-- `quaternionSwapIJ` を自己同型に仕立てたもの。`map_mul` も全単射性も `decide`
+(`QuaternionGroup 2` は 8 元で `DecidableEq` 付き)。 -/
+noncomputable def quaternionSwapIJAut : MulAut (QuaternionGroup 2) :=
+  MulEquiv.ofBijective (MonoidHom.mk' quaternionSwapIJ (by decide)) (by decide)
+
+/-- `quaternionSwapIK` を自己同型に仕立てたもの。 -/
+noncomputable def quaternionSwapIKAut : MulAut (QuaternionGroup 2) :=
+  MulEquiv.ofBijective (MonoidHom.mk' quaternionSwapIK (by decide)) (by decide)
+
+open QuaternionGroup in
+/-- 位数 4 の巡回部分群はどれも `⟨a 1⟩` の `Aut(Q_8)`-像。 -/
+theorem quaternionTwo_exists_mulAut_map_zpowers_a_one {S : Subgroup (QuaternionGroup 2)}
+    (hS : S = Subgroup.zpowers (a 1) ∨ S = Subgroup.zpowers (xa 0) ∨
+      S = Subgroup.zpowers (xa 1)) :
+    ∃ φ : MulAut (QuaternionGroup 2),
+      (Subgroup.zpowers (a 1 : QuaternionGroup 2)).map φ.toMonoidHom = S := by
+  rcases hS with rfl | rfl | rfl
+  · exact ⟨1, by simp⟩
+  · exact ⟨quaternionSwapIJAut, by rw [MonoidHom.map_zpowers]; rfl⟩
+  · exact ⟨quaternionSwapIKAut, by rw [MonoidHom.map_zpowers]; rfl⟩
+
+/-- **Isaacs Problem 3F.3 (後半)**: `Q_8` の位数 4 の巡回部分群は `Aut(Q_8)` によって
+推移的に置換される。
+
+書籍の Hint は Thm 3.35 (巡回拡大の一意性) 経由だが, `Q_8` は 8 元なので
+**明示の自己同型 2 本 (`i ↦ j`, `i ↦ k`) を `decide` で検証**する方が短い。
+一般の `x`, `y` に対しては両方を `⟨a 1⟩` に戻して合成する。 -/
+theorem quaternionTwo_exists_mulAut_map_zpowers {x y : QuaternionGroup 2}
+    (hx : orderOf x = 4) (hy : orderOf y = 4) :
+    ∃ φ : MulAut (QuaternionGroup 2),
+      (Subgroup.zpowers x).map φ.toMonoidHom = Subgroup.zpowers y := by
+  obtain ⟨φ, hφ⟩ :=
+    quaternionTwo_exists_mulAut_map_zpowers_a_one (quaternionTwo_zpowers_of_orderOf_eq_four hx)
+  obtain ⟨ψ, hψ⟩ :=
+    quaternionTwo_exists_mulAut_map_zpowers_a_one (quaternionTwo_zpowers_of_orderOf_eq_four hy)
+  refine ⟨φ.symm.trans ψ, ?_⟩
+  rw [← hφ, Subgroup.map_map, ← hψ]
+  congr 1
+  exact MonoidHom.ext fun z => by simp
 
 end -- 3F
 

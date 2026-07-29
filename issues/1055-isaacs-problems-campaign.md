@@ -35,8 +35,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
       **§3E 🎉 完済 (2026-07-29)**: 3E.1 (両ケース) / 3E.2 / 3E.3 / 3E.4 / 3E.5 全問
       (`Ch04_Commutators/Problems3E.lean` 748 行, axiom-clean)。
-      **§3F 進行中 (2026-07-29)**: **3F.1 ✅**
-      (新 leaf `Ch03_SplitExtensions/Problems3F.lean`)。残り = 3F.2–3F.5。
+      **§3F 進行中 (2026-07-29)**: **3F.1 ✅ / 3F.2 ✅ / 3F.3 ✅**
+      (新 leaf `Ch03_SplitExtensions/Problems3F.lean`)。残り = 3F.4 / 3F.5。
 
 * ✅ **3E.2** `actionFixedSubgroup_eq_mul` (2026-07-29): `c ∈ C` を `c = h₀k₀` と書くと
   `H ∩ cK` は `A`-不変な `H ∩ K` の剰余類なので Thm 3.27
@@ -6188,3 +6188,23 @@ repo/mathlib に「有限冪零群の Sylow と Hall `p'` が元ごとに可換�
   入り axiom-clean が壊れる)。
 * 3F.5 は §3F 最難 (`H` の構成に Thm 3.36 を実際に使う)。3F.4 の `Q_8 ⊴ SL(2,3)` を
   土台にするので、3F.4 → 3F.5 の順。
+
+### 3F.3 完了 (2026-07-29) — 後半 (Aut の推移性) も landing
+
+* `quaternionTwo_zpowers_pairwise_ne` — 3 個が相異なる。
+  `mem_zpowers_iff_mem_range_orderOf` で `⟨u⟩` の元を `(Finset.range (orderOf u)).image (u ^ ·)`
+  に落とすと **決定可能**になるので `decide` 一発。
+* `quaternionSwapIJ` / `quaternionSwapIK` — 明示の自己同型 (関数)。
+  `a k ↦ (xa j)^k`, `xa k ↦ (a 1) * (xa j)^k` (`j = 0` / `j = 1`) と定義。
+  ⚠ `ZMod 4` の数値パターンマッチは書けないので **`i.val` (ℕ) 経由の冪**で定義するのがコツ
+  (こう書くと全体が決定可能式になる)。
+* `quaternionSwapIJAut` / `quaternionSwapIKAut` —
+  `MulEquiv.ofBijective (MonoidHom.mk' f (by decide)) (by decide)`。
+  **`map_mul` (64 通り) も全単射性も `decide` が通る** (`QuaternionGroup 2` は 8 元 +
+  `deriving DecidableEq`, `Fintype.decidableBijectiveFintype` があるため)。
+  ⚠ `MulEquiv.ofBijective` は noncomputable なので `noncomputable def` が要る。
+* `quaternionTwo_exists_mulAut_map_zpowers` — 一般の位数 4 の `x`, `y` に対し
+  `φ.symm.trans ψ` (両方を `⟨a 1⟩` に戻して合成) で推移性。
+  `Subgroup.map_map` + `MonoidHom.ext` で `(φ.symm.trans ψ) ∘ φ = ψ`。
+
+**⟹ 残り = 3F.4 (`SL(2,3)`) と 3F.5**。
