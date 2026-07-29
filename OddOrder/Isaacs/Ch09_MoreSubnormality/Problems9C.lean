@@ -14,6 +14,12 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9C
 
 * **9C.1** `relCore_thompsonWielandtCore_eq_bot_or_of_isSubnormal` — Thm 9.24 の設定で
   `H`, `K` がともに `G` で **subnormal** なら `U = 1` または `V = 1`。
+* **9C.2** `pResidualOf_top_eq_sup_of_isSubnormal` — `G = AB` で `A, B ⊲⊲ G` なら
+  `O^p(G) = O^p(A) O^p(B)`。9B.5 (`G^∞ = A^∞B^∞`) と同型の帰納法。
+  ⚠ 仮説は join でなく**積** `(A : Set G) * B = Set.univ`。
+
+⚠ `pdftotext` は上付きを落とすので 9C.2 は一見 `O_p` に見えるが、ページ画像で
+**`O^p` (p-residual)** であることを確認済 ([[pdftotext-drops-superscripts]])。
 
 ## 9C.1 の証明 (書籍 hint に沿う)
 
@@ -162,5 +168,132 @@ theorem relCore_thompsonWielandtCore_eq_bot_or_of_isSubnormal [Finite G] {H K : 
   rw [Subgroup.normalizer_eq_top]
 
 end -- 9C.1
+
+section /- 9C.2: G = AB (A, B subnormal) なら O^p(G) = O^p(A) O^p(B) (p. 288) -/
+
+open scoped Pointwise
+
+/-- `O^p(G) ≤ N ◁ G` なら `G/N` は `p`-群 (`G/O^p(G)` の商だから)。
+
+`pResidual_le_of_isPGroup_quotient` の逆向き (`O^p` の普遍性の非自明な側)。 -/
+theorem isPGroup_quotient_of_pResidual_le [Finite G] {p : ℕ} [Fact p.Prime] {N : Subgroup G}
+    [N.Normal] (h : pResidual p G ≤ N) : IsPGroup p (G ⧸ N) := by
+  refine (isPGroup_quotient_pResidual (p := p) (G := G)).of_surjective
+    (QuotientGroup.map _ _ (MonoidHom.id G) h) fun x => ?_
+  obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective x
+  exact ⟨QuotientGroup.mk g, rfl⟩
+
+/-- `O^p(A) ≤ N ◁ G` なら `A` の `G/N` での像は `p`-群。
+
+`A.map (mk' N) ≅ ↥A / N.subgroupOf A` で, 後者は `↥A / O^p(↥A)` の商。 -/
+theorem isPGroup_map_of_pResidualOf_le [Finite G] {p : ℕ} [Fact p.Prime] {A N : Subgroup G}
+    [N.Normal] (h : pResidualOf p A ≤ N) : IsPGroup p ↥(A.map (QuotientGroup.mk' N)) := by
+  have hker : ((QuotientGroup.mk' N).comp A.subtype).ker = N.subgroupOf A := by
+    rw [← MonoidHom.comap_ker, QuotientGroup.ker_mk']
+    rfl
+  have hrange : ((QuotientGroup.mk' N).comp A.subtype).range = A.map (QuotientGroup.mk' N) := by
+    rw [MonoidHom.range_comp, Subgroup.range_subtype]
+  have hle : pResidual p ↥A ≤ N.subgroupOf A :=
+    Subgroup.map_le_iff_le_comap.mp h
+  have hq : IsPGroup p (↥A ⧸ N.subgroupOf A) := isPGroup_quotient_of_pResidual_le hle
+  refine hq.of_equiv ?_
+  exact ((QuotientGroup.quotientMulEquivOfEq hker.symm).trans
+    (QuotientGroup.quotientKerEquivRange _)).trans (MulEquiv.subgroupCongr hrange)
+
+/-- **9C.2 の base case** (書籍 hint の第 1 段): `A, B ⊴ G` で `G = AB` なら
+`O^p(G) = O^p(A) O^p(B)`。
+
+`N := O^p(A) ⊔ O^p(B)` は正規で, `G/N` は正規 `p`-部分群 2 つ (`A`, `B` の像) の積なので
+どちらも `O_p(G/N)` に入り `O_p(G/N) = ⊤`, すなわち `G/N` は `p`-群。ゆえに `O^p(G) ≤ N`。
+逆の包含は `pResidualOf_mono`。9B.5 の base case (`F(G/N) = ⊤` 論法) の `O_p` 版。 -/
+theorem pResidualOf_top_eq_sup_of_normal [Finite G] {p : ℕ} [Fact p.Prime] {A B : Subgroup G}
+    [A.Normal] [B.Normal] (hAB : A ⊔ B = ⊤) :
+    pResidualOf p (⊤ : Subgroup G) = pResidualOf p A ⊔ pResidualOf p B := by
+  refine le_antisymm ?_ (sup_le (pResidualOf_mono le_top) (pResidualOf_mono le_top))
+  set N := pResidualOf p A ⊔ pResidualOf p B with hNdef
+  haveI : N.Normal := Subgroup.sup_normal _ _
+  rw [pResidualOf_top]
+  refine pResidual_le_of_isPGroup_quotient ?_
+  -- `A`, `B` の像は正規 `p`-群
+  have hA : IsPGroup p ↥(A.map (QuotientGroup.mk' N)) :=
+    isPGroup_map_of_pResidualOf_le le_sup_left
+  have hB : IsPGroup p ↥(B.map (QuotientGroup.mk' N)) :=
+    isPGroup_map_of_pResidualOf_le le_sup_right
+  haveI : (A.map (QuotientGroup.mk' N)).Normal :=
+    Subgroup.Normal.map inferInstance _ (QuotientGroup.mk'_surjective N)
+  haveI : (B.map (QuotientGroup.mk' N)).Normal :=
+    Subgroup.Normal.map inferInstance _ (QuotientGroup.mk'_surjective N)
+  -- 両方 `O_p(G/N)` に入り, 生成するので `O_p(G/N) = ⊤`
+  have htop : (⊤ : Subgroup (G ⧸ N)) ≤ Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N) := by
+    rw [← Subgroup.map_top_of_surjective (QuotientGroup.mk' N)
+        (QuotientGroup.mk'_surjective N), ← hAB, Subgroup.map_sup]
+    exact sup_le
+      (Ch03.Subgroup.IsPiGroup.le_oPiCore (Subgroup.isPiSubgroup_of_isPGroup_of_mem hA rfl))
+      (Ch03.Subgroup.IsPiGroup.le_oPiCore (Subgroup.isPiSubgroup_of_isPGroup_of_mem hB rfl))
+  exact (isPGroup_oPiCore (p := p) (G := G ⧸ N)).of_equiv
+    ((MulEquiv.subgroupCongr (top_le_iff.mp htop)).trans Subgroup.topEquiv)
+
+/-- 9C.2 の帰納核: `Nat.card G ≤ n` の有限群で `A, B ◁◁ G`, `G = AB` ⟹
+`O^p(G) ≤ O^p(A) ⊔ O^p(B)`。`∀ G` を内側に量化して `n` で帰納 (9B.5 の核と同型)。 -/
+private theorem pResidualOf_sup_aux.{u} (p : ℕ) [Fact p.Prime] (n : ℕ) :
+    ∀ (G : Type u) [Group G] [Finite G], Nat.card G ≤ n →
+      ∀ {A B : Subgroup G}, A.IsSubnormal → B.IsSubnormal →
+        (A : Set G) * (B : Set G) = Set.univ →
+        pResidualOf p (⊤ : Subgroup G) ≤ pResidualOf p A ⊔ pResidualOf p B := by
+  induction n with
+  | zero =>
+    intro G _ _ hcard
+    exact absurd (Nat.le_zero.mp hcard) Nat.card_pos.ne'
+  | succ n IH =>
+    intro G _ _ hcard A B hA hB hprod
+    have hjoin : A ⊔ B = ⊤ := GroupTheory.sup_eq_top_of_mul_eq_univ hprod
+    rcases hA.lt_normal with rfl | ⟨A₁, hA₁norm, hAA₁, hA₁lt⟩
+    · exact le_sup_of_le_left (pResidualOf_mono le_top)
+    rcases hB.lt_normal with rfl | ⟨B₁, hB₁norm, hBB₁, hB₁lt⟩
+    · exact le_sup_of_le_right (pResidualOf_mono le_top)
+    haveI := hA₁norm
+    haveI := hB₁norm
+    have hA₁B₁ : A₁ ⊔ B₁ = ⊤ := by
+      refine top_le_iff.mp ?_
+      rw [← hjoin]
+      exact sup_le_sup hAA₁ hBB₁
+    rw [pResidualOf_top_eq_sup_of_normal hA₁B₁]
+    refine sup_le ?_ ?_
+    · -- `O^p(A₁) ≤ O^p(A) ⊔ O^p(B ⊓ A₁) ≤ O^p(A) ⊔ O^p(B)`
+      have hIHA := IH ↥A₁ (GroupTheory.card_le_of_lt_top hcard hA₁lt) hA.subgroupOf
+        (hB.inf hA₁norm.isSubnormal).subgroupOf
+        (GroupTheory.subgroupOf_mul_inf_subgroupOf_eq_univ hAA₁ hprod)
+      have hm := Subgroup.map_mono (f := A₁.subtype) hIHA
+      rw [map_subtype_pResidualOf_top, Subgroup.map_sup,
+        map_subtype_pResidualOf_subgroupOf hAA₁,
+        map_subtype_pResidualOf_subgroupOf (inf_le_right : B ⊓ A₁ ≤ A₁)] at hm
+      exact hm.trans (sup_le le_sup_left ((pResidualOf_mono inf_le_left).trans le_sup_right))
+    · -- 対称
+      have hIHB := IH ↥B₁ (GroupTheory.card_le_of_lt_top hcard hB₁lt) hB.subgroupOf
+        (hA.inf hB₁norm.isSubnormal).subgroupOf
+        (GroupTheory.subgroupOf_mul_inf_subgroupOf_eq_univ hBB₁
+          (GroupTheory.mul_eq_univ_comm hprod))
+      have hm := Subgroup.map_mono (f := B₁.subtype) hIHB
+      rw [map_subtype_pResidualOf_top, Subgroup.map_sup,
+        map_subtype_pResidualOf_subgroupOf hBB₁,
+        map_subtype_pResidualOf_subgroupOf (inf_le_right : A ⊓ B₁ ≤ B₁)] at hm
+      exact hm.trans (sup_le le_sup_right ((pResidualOf_mono inf_le_left).trans le_sup_left))
+
+/-- **Isaacs Problem 9C.2** (書籍 p. 288) ⭐: `G = AB` で `A, B ⊲⊲ G` (**subnormal**)
+なら `O^p(G) = O^p(A) O^p(B)`。
+
+書籍 hint どおり「9B.5 と同様に、まず両方 normal の場合
+(`pResidualOf_top_eq_sup_of_normal`)、次に `|G|` の帰納法」。帰納段は
+`A ≤ A₁ ◁ G`, `A₁ < ⊤` を取って base case で `O^p(G) = O^p(A₁) ⊔ O^p(B₁)` とし、
+Dedekind (`A₁ = A (B ⊓ A₁)`) で `↥A₁` に帰納法を当てる。⚠ 仮説は join でなく**積**
+`(A : Set G) * B = Set.univ` (9B.5 と同じ理由 — 部分群束は modular でない)。 -/
+theorem pResidualOf_top_eq_sup_of_isSubnormal [Finite G] {p : ℕ} [Fact p.Prime]
+    {A B : Subgroup G} (hA : A.IsSubnormal) (hB : B.IsSubnormal)
+    (hprod : (A : Set G) * (B : Set G) = Set.univ) :
+    pResidualOf p (⊤ : Subgroup G) = pResidualOf p A ⊔ pResidualOf p B :=
+  le_antisymm (pResidualOf_sup_aux p (Nat.card G) G le_rfl hA hB hprod)
+    (sup_le (pResidualOf_mono le_top) (pResidualOf_mono le_top))
+
+end -- 9C.2
 
 end OddOrder.Isaacs.Ch09

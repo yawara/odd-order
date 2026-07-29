@@ -375,6 +375,13 @@ theorem map_subtype_pResidualOf_subgroupOf {S R : Subgroup G} (h : S ≤ R) :
     map_pResidual_mulEquiv (Subgroup.subgroupOfEquivOfLe h)]
   rfl
 
+/-- `↥R` の中で計算した `O^p(⊤)` を落とすと ambient の `O^p(R)`
+(`map_subtype_nilpotentResidual_top` の `O^p` 版). -/
+theorem map_subtype_pResidualOf_top {R : Subgroup G} :
+    (pResidualOf p (⊤ : Subgroup ↥R)).map R.subtype = pResidualOf p R := by
+  rw [← Subgroup.subgroupOf_self R]
+  exact map_subtype_pResidualOf_subgroupOf (le_refl R)
+
 /-- **`O^p` の単調性**: `S ≤ T` なら `O^p(S) ≤ O^p(T)` (`nilpotentResidual_mono` の `O^p` 版).
 
 `↥T` の中で絶対形 (`pResidualOf_le_pResidual`) を使い

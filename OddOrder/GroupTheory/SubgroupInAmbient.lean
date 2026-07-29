@@ -424,4 +424,61 @@ theorem normal_map_subtype_of_characteristic {W : Type*} [Group W] {N : Subgroup
     rw [← hmap]; exact Subgroup.mem_map_of_mem _ ha'L
   exact ⟨(MulAut.conjNormal w) ⟨a', ha'N⟩, hmem, MulAut.conjNormal_apply w ⟨a', ha'N⟩⟩
 
+section /- 積分解 `G = XY` に沿った帰納法の道具 -/
+
+open scoped Pointwise
+
+/-- **真部分群の位数評価**: `|G| ≤ n + 1` かつ `X < ⊤` なら `|X| ≤ n`.
+
+`Nat.card G` についての強帰納法で真部分群に降りるときの定型 (Isaacs Problems 9B.5 / 9C.2). -/
+theorem card_le_of_lt_top [Finite G] {n : ℕ} (hcard : Nat.card G ≤ n + 1) {X : Subgroup G}
+    (hX : X < ⊤) : Nat.card ↥X ≤ n := by
+  have hne : Nat.card ↥X ≠ Nat.card G := fun h => hX.ne (Subgroup.eq_top_of_card_eq _ h)
+  have hle := Subgroup.card_le_card_group X
+  omega
+
+/-- **積分解は左右対称**: `A · B = G` なら `B · A = G` (両辺の逆元を取るだけ). -/
+theorem mul_eq_univ_comm {A B : Subgroup G} (h : (A : Set G) * (B : Set G) = Set.univ) :
+    (B : Set G) * (A : Set G) = Set.univ := by
+  ext g
+  simp only [Set.mem_univ, iff_true]
+  have hg : g⁻¹ ∈ (A : Set G) * (B : Set G) := by rw [h]; trivial
+  obtain ⟨a, ha, b, hb, hab⟩ := hg
+  have hab' : a * b = g⁻¹ := hab
+  refine ⟨b⁻¹, Subgroup.inv_mem _ hb, a⁻¹, Subgroup.inv_mem _ ha, ?_⟩
+  change b⁻¹ * a⁻¹ = g
+  rw [← mul_inv_rev, hab', inv_inv]
+
+/-- **積分解の Dedekind 降下**: `X ≤ X₁` かつ `X · Y = G` なら `↥X₁` の中で
+`(X ∩ X₁) · (Y ∩ X₁) = X₁`, すなわち `X₁ = X (Y ∩ X₁)`.
+
+Isaacs Problem 9B.5 (`G^∞ = A^∞B^∞`) と 9C.2 (`O^p(G) = O^p(A)O^p(B)`) は
+どちらもこの段で帰納法を `↥X₁` に降ろす。⚠ 仮説が join `X ⊔ Y = ⊤` でなく**積**
+`X · Y = G` でなければならない: 部分群束は一般に modular でないので、Dedekind の恒等式
+`X (Y ∩ X₁) = (XY) ∩ X₁` は積についてしか使えない。 -/
+theorem subgroupOf_mul_inf_subgroupOf_eq_univ {X Y X₁ : Subgroup G} (hXX₁ : X ≤ X₁)
+    (hXY : (X : Set G) * (Y : Set G) = Set.univ) :
+    ((X.subgroupOf X₁ : Subgroup ↥X₁) : Set ↥X₁) *
+      (((Y ⊓ X₁).subgroupOf X₁ : Subgroup ↥X₁) : Set ↥X₁) = Set.univ := by
+  ext x
+  simp only [Set.mem_univ, iff_true]
+  have hx : (x : G) ∈ (X : Set G) * (Y : Set G) := by rw [hXY]; trivial
+  obtain ⟨a, ha, b, hb, hab⟩ := hx
+  have haX₁ : a ∈ X₁ := hXX₁ ha
+  have hbX₁ : b ∈ X₁ := by
+    have hbe : b = a⁻¹ * (x : G) := by rw [← hab]; group
+    rw [hbe]
+    exact Subgroup.mul_mem _ (Subgroup.inv_mem _ haX₁) x.2
+  exact ⟨⟨a, haX₁⟩, ha, ⟨b, hbX₁⟩, ⟨hb, hbX₁⟩, Subtype.ext hab⟩
+
+/-- 積分解 `X · Y = G` は join `X ⊔ Y = ⊤` を含意する (逆は一般に偽). -/
+theorem sup_eq_top_of_mul_eq_univ {X Y : Subgroup G}
+    (hXY : (X : Set G) * (Y : Set G) = Set.univ) : X ⊔ Y = ⊤ := by
+  refine top_le_iff.mp fun g _ => ?_
+  have hg : g ∈ (X : Set G) * (Y : Set G) := by rw [hXY]; trivial
+  obtain ⟨a, ha, b, hb, rfl⟩ := hg
+  exact Subgroup.mul_mem _ (Subgroup.mem_sup_left ha) (Subgroup.mem_sup_right hb)
+
+end
+
 end OddOrder.GroupTheory

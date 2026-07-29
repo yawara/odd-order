@@ -12,6 +12,7 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
 import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 import OddOrder.GroupTheory.DihedralAut
+import OddOrder.GroupTheory.SubgroupInAmbient
 
 /-!
 # Isaacs §9B の演習 (書籍 pp. 284-285)
@@ -366,11 +367,7 @@ private theorem nilpotentResidual_sup_aux.{u} (n : ℕ) :
     exact absurd (Nat.le_zero.mp hcard) Nat.card_pos.ne'
   | succ n IH =>
     intro G _ _ hcard A B hA hB hprod
-    have hjoin : A ⊔ B = ⊤ := by
-      refine top_le_iff.mp fun g _ => ?_
-      have hg : g ∈ (A : Set G) * (B : Set G) := by rw [hprod]; trivial
-      obtain ⟨a, ha, b, hb, rfl⟩ := hg
-      exact Subgroup.mul_mem _ (Subgroup.mem_sup_left ha) (Subgroup.mem_sup_right hb)
+    have hjoin : A ⊔ B = ⊤ := GroupTheory.sup_eq_top_of_mul_eq_univ hprod
     rcases hA.lt_normal with rfl | ⟨A₁, hA₁norm, hAA₁, hA₁lt⟩
     · exact le_sup_of_le_left (nilpotentResidual_mono le_top)
     rcases hB.lt_normal with rfl | ⟨B₁, hB₁norm, hBB₁, hB₁lt⟩
@@ -382,32 +379,11 @@ private theorem nilpotentResidual_sup_aux.{u} (n : ℕ) :
       rw [← hjoin]
       exact sup_le_sup hAA₁ hBB₁
     rw [nilpotentResidual_top_eq_sup_of_normal hA₁B₁]
-    -- `X₁ < ⊤` なら `|X₁| ≤ n`。
-    have hcard_lt : ∀ {X : Subgroup G}, X < ⊤ → Nat.card ↥X ≤ n := by
-      intro X hX
-      have hne : Nat.card ↥X ≠ Nat.card G := fun h => hX.ne (Subgroup.eq_top_of_card_eq _ h)
-      have hle := Subgroup.card_le_card_group X
-      omega
-    -- `X ≤ X₁` のとき `X₁ = X (Y ⊓ X₁)` (Dedekind) を `↥X₁` の積として持ち上げる。
-    have hprod_sub : ∀ {X Y X₁ : Subgroup G}, X ≤ X₁ →
-        (X : Set G) * (Y : Set G) = Set.univ →
-        ((X.subgroupOf X₁ : Subgroup ↥X₁) : Set ↥X₁) *
-          (((Y ⊓ X₁).subgroupOf X₁ : Subgroup ↥X₁) : Set ↥X₁) = Set.univ := by
-      intro X Y X₁ hXX₁ hXY
-      ext x
-      simp only [Set.mem_univ, iff_true]
-      have hx : (x : G) ∈ (X : Set G) * (Y : Set G) := by rw [hXY]; trivial
-      obtain ⟨a, ha, b, hb, hab⟩ := hx
-      have haX₁ : a ∈ X₁ := hXX₁ ha
-      have hbX₁ : b ∈ X₁ := by
-        have hbe : b = a⁻¹ * (x : G) := by rw [← hab]; group
-        rw [hbe]
-        exact Subgroup.mul_mem _ (Subgroup.inv_mem _ haX₁) x.2
-      exact ⟨⟨a, haX₁⟩, ha, ⟨b, hbX₁⟩, ⟨hb, hbX₁⟩, Subtype.ext hab⟩
     refine sup_le ?_ ?_
     · -- `A₁^∞ ≤ A^∞ ⊔ (B ⊓ A₁)^∞ ≤ A^∞ ⊔ B^∞`
-      have hIHA := IH ↥A₁ (hcard_lt hA₁lt) hA.subgroupOf
-        (hB.inf hA₁norm.isSubnormal).subgroupOf (hprod_sub hAA₁ hprod)
+      have hIHA := IH ↥A₁ (GroupTheory.card_le_of_lt_top hcard hA₁lt) hA.subgroupOf
+        (hB.inf hA₁norm.isSubnormal).subgroupOf
+        (GroupTheory.subgroupOf_mul_inf_subgroupOf_eq_univ hAA₁ hprod)
       have hm := Subgroup.map_mono (f := A₁.subtype) hIHA
       rw [map_subtype_nilpotentResidual_top, Subgroup.map_sup,
         map_subtype_nilpotentResidual_subgroupOf hAA₁,
@@ -415,17 +391,10 @@ private theorem nilpotentResidual_sup_aux.{u} (n : ℕ) :
       exact hm.trans (sup_le le_sup_left
         ((nilpotentResidual_mono inf_le_left).trans le_sup_right))
     · -- 対称
-      have hprodBA : (B : Set G) * (A : Set G) = Set.univ := by
-        ext g
-        simp only [Set.mem_univ, iff_true]
-        have hg : g⁻¹ ∈ (A : Set G) * (B : Set G) := by rw [hprod]; trivial
-        obtain ⟨a, ha, b, hb, hab⟩ := hg
-        have hab' : a * b = g⁻¹ := hab
-        refine ⟨b⁻¹, Subgroup.inv_mem _ hb, a⁻¹, Subgroup.inv_mem _ ha, ?_⟩
-        change b⁻¹ * a⁻¹ = g
-        rw [← mul_inv_rev, hab', inv_inv]
-      have hIHB := IH ↥B₁ (hcard_lt hB₁lt) hB.subgroupOf
-        (hA.inf hB₁norm.isSubnormal).subgroupOf (hprod_sub hBB₁ hprodBA)
+      have hIHB := IH ↥B₁ (GroupTheory.card_le_of_lt_top hcard hB₁lt) hB.subgroupOf
+        (hA.inf hB₁norm.isSubnormal).subgroupOf
+        (GroupTheory.subgroupOf_mul_inf_subgroupOf_eq_univ hBB₁
+          (GroupTheory.mul_eq_univ_comm hprod))
       have hm := Subgroup.map_mono (f := B₁.subtype) hIHB
       rw [map_subtype_nilpotentResidual_top, Subgroup.map_sup,
         map_subtype_nilpotentResidual_subgroupOf hBB₁,
