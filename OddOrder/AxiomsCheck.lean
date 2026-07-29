@@ -258,6 +258,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
 import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
@@ -13844,3 +13845,17 @@ Ch. III §1 Proposition が `F/Z(F)` 側から持ち上げた元 `x` を `Q`-成
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.CentralizerPSUData.exists_mem_residual_commute_Q0
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.CentralizerPSUData.false_of_W_eq_bot
+
+/-! **`⁅K, X⁆` の基本性質** (issue 0164, 2026-07-29).
+`StructureOfH/WielandtOnQ.lean` — Ch. III §1 Proposition p. 117 の
+「`[K, P] ⋊ P` は Frobenius 群」を組むための groundwork。
+
+`K ⊴ D` (`K_normal`, Ch. I §2 Prop 2) から `X ≤ D` に対し `⁅K, X⁆ ≤ K` かつ
+`X` は `⁅K, X⁆` を正規化する。`⁅K, X⁆ ≠ 1` は `W = 1` から: さもなくば `X` は
+`K` を中心化し `X ≤ C_V(K) = W = 1` となる。 -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.commutator_K_le_K
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.commutator_K_ne_bot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_commutator_K_of_mem
