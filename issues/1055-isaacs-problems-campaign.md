@@ -5598,16 +5598,78 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   互いに素、したがって `X.index = (H p).index · (t.inf H).index` となることを使う。
   再利用部品 `index_inf_eq_mul_of_coprime` (指数が互いに素なら交わりの指数は積 —
   `index_dvd_of_le` 2 本 + `Nat.Coprime.mul_dvd_of_dvd_of_dvd` と `index_inf_le` の挟み撃ち)。
-* ⬜ **3C.3** — Sylow system (各素数の Sylow を 1 つずつ、互いに置換可能な集合)。
-  (a) Sylow system があれば任意の `π` に Hall `π`-部分群がある。
-  (b) 可解群には Sylow system がある。Hint: 各 `p`-補元を取り、1 つを除く全部の交わりを見る。
-* ⬜ **3C.4** — `M` が可解群 `G` の極小正規部分群で `M = C_G(M)` なら `G` は `M` 上分裂し、
-  `M` の補元は全て共役。Hint: `L/M` を `G/M` の極小正規に取り `q`-群、`q ∤ |M|` を示して
-  `L` の Sylow `q` を見る。
-* ⬜ **3C.5** — `H` が可解 `G` の極大部分群で `core_G(H) = 1` なら、`G` は唯一の極小正規
-  部分群 `M` をもち `H` は `M` の補元で `M = C_G(M)`。さらに核自明な極大部分群同士は共役。
-* ⬜ **3C.6** — 可解 `G` で `x,y,z` の位数が対ごとに互いに素かつ `xyz = 1` なら
-  `x = y = z = 1`。Hint: 導来長に関する帰納。
+* ✅ **3C.3** — Sylow system (2026-07-28, `ProblemsHallSystems.lean` に追記, axiom-clean 確認済)。
+  定義 `IsSylowSystem P` = 各素因子 `p` で `IsHallSubgroup {p} (P p)` (= Sylow) + 対ごとの
+  集合積可換。
+  (a) `IsSylowSystem.exists_isHallSubgroup`。部品 `mulSubgroupOfComm` (集合積が可換な
+  2 部分群の積部分群; carrier が `↑H * ↑K` に defeq) + 帰納エンジン `sylowSystem_prod_aux`
+  (部分族 `t` の積部分群 `K` で「`t` のメンバーを含む・`|K|` の素因子 ⊆ `t`・族の他メンバーと
+  可換」を同時帰納)。Hall 性の指数側は **数値計算なし**: `r ∈ π` が `K.index` を割るなら
+  `P r ≤ K` から `K.index ∣ (P r).index`, Sylow 性 (`(P r).index` は `r` を避ける) に矛盾。
+  (b) `exists_isSylowSystem` (書籍 Hint どおり)。`hall_E_exists` で `q`-補元 `Hc q` を取り
+  `P p := (pf.erase p).inf Hc`。Sylow 性 = 3C.2 の Hall 性を `{p}` へ狭める
+  (`isHallSingleton_inf_erase`)。可換性 = `inf_erase_mul_inf_erase`: `Pp·Pq ⊆ K :=`
+  (2 つを除く交わり) と `|K| = |Pp|·|Pq|` (付値比較 `Nat.eq_of_factorization_eq`; 汎用部品
+  `IsHallSubgroup.factorization_card_of_mem`/`_of_notMem` を新設) から
+  `Set.eq_of_subset_of_ncard_le` で `Pp·Pq = K = Pq·Pp`。
+  ⚠ 実装の罠 2 つ: `(X.inf Hc : Set G)` と書くと `Finset.inf` が `Set G` の格子に解決されて
+  型エラー (`(X.inf Hc : Subgroup G) : Set G` と 2 段で書く); `obtain` した `Set.mem_mul` の
+  等式は beta 未簡約 (`(fun x1 x2 ↦ x1*x2) h k = …`) で `rw` 不能 — defeq な `have` で
+  詰め替えてから使う。
+* ✅ **3C.4** — (2026-07-28, 新 leaf `Ch03_SplitExtensions/ProblemsMinimalNormal.lean`,
+  `OddOrder.lean` 配線済, axiom-clean 確認済)。
+  `exists_isComplement'_of_isMinimalNormal_centralizer_eq` (分裂) +
+  `isComplement'_conj_of_isMinimalNormal_centralizer_eq` (補元は全て共役)。
+  書籍 Hint どおりの構成: `L/M` = `G/M` の極小正規 (`q`-elementary abelian, Thm 3.11)。
+  部品: (i) `inf_centralizer_eq_bot_of_isMinimalNormal_lt` — `M < L ⊴ G` なら
+  `M ⊓ C_G(L) = ⊥` (極小性 + `le_centralizer_iff` の対称性)。
+  (ii) `not_isPGroup_of_isMinimalNormal_centralizer_lt` — `L` は `p`-群になれない
+  (Isaacs Lem 4.32 `fixedPoints_ne_bot_of_pgroup_action_pgroup` を
+  `MulAut.conjNormal.comp L.subtype` に適用 → 固定点が (i) に矛盾)。⟹ `q ∤ |M|`。
+  (iii) setup `exists_sylow_frattini_setup` — `Q ∈ Syl_q(L)` で `|Q^G| = q`-part,
+  `|Q^G|·|M| = |L|`, `M ⊔ Q^G = L` (`L` 内で `Msub ⊔ Q = ⊤` を card で示して
+  `map L.subtype`; `|L| = |Lbar|·|M|` は repo 補題 `card_comap_eq_card_mul_card_ker`)。
+  (iv) 分裂: Frattini (`Sylow.normalizer_sup_eq_top`) で `G = M ⊔ H` (`H = N_G(Q)`),
+  `M ⊓ H` は `Q` と `M` を中心化 (commutator が `M ⊓ Q = ⊥` に落ちる) → `≤ C_G(L)` →
+  (i) で `⊥`。(v) 共役: Dedekind `↑M * ↑(L ⊓ K) = ↑L` (補元分解 + 濃度) →
+  `|L ⊓ K| = |Q|` → `Sylow.ofCard` + `MulAction.exists_smul_eq` (Sylow 共役 in `↥L`) →
+  `K^x = H` (包含 + 濃度一致)。
+  ⚠ 実装の罠: mathlib 現行の `Subgroup.normalizer` は **`Set G` を取る**;
+  `Subgroup.pointwise_smul_def` は hom を `MulDistribMulAction.toMonoidEnd` spelling で
+  吐くので `(MulAut.conj g).toMonoidHom` と繋ぐには rfl 橋 `toMonoidHom_mulAut_conj` が要る;
+  `↥L` 内 Sylow の ambient 移送は `map_conj_map_subtype` (map_map 2 回 + congr) で。
+* ✅ **3C.5** — (2026-07-28, 新 leaf `Ch03_SplitExtensions/ProblemsCoreFreeMaximal.lean`,
+  `OddOrder.lean` 配線済, axiom-clean 確認済)。
+  `exists_isMinimalNormal_isComplement'_of_isCoatom_normalCore_eq_bot` (前半: 極小正規 `M` の
+  存在・一意性 + `IsComplement' M H` + `C_G(M) = M`) /
+  `existsUnique_isMinimalNormal_of_isCoatom_normalCore_eq_bot` (∃! 版) /
+  `conj_of_isCoatom_normalCore_eq_bot` (後半: 核自明な極大部分群は共役)。
+  共通部品 `normal_of_sup_eq_top`: **`M ⊔ H = ⊤` で `M` の各元に中心化され `H` に正規化される
+  `X` は `G`-正規** (`M` 正規ゆえ `G = MH`, `mhx(mh)⁻¹ = m(hxh⁻¹)m⁻¹ = hxh⁻¹`)。
+  これを `X = M ⊓ H` (`M` 可換) と `X = C_G(M) ⊓ H` (`C_G(M)` の元は `M` と可換) の 2 か所で
+  使い、どちらも `≤ core_G(H) = ⊥` に落とす。
+  `C_G(M) = M` は **Dedekind を手で書く**: `c ∈ C_G(M)` を `c = mh` と分解すると
+  `h = m⁻¹c ∈ C_G(M) ⊓ H = ⊥`, ゆえに `c = m ∈ M`。
+  一意性は `N ⊓ M = ⊥ ⟹ ⁅N,M⁆ = ⊥ ⟹ N ≤ C_G(M) = M ⟹ N = ⊥` の矛盾。
+  共役性は同じ `M` の 2 補元に **3C.4** を適用するだけ。
+  ⚠ 実装の罠: **`IsModularLattice (Subgroup G)` は mathlib に無い** — インスタンスは
+  `CommGroup` 版のみ (`Mathlib/Algebra/Group/Subgroup/Order.lean:32`)。一般の群の部分群束は
+  modular でないので `sup_inf_assoc_of_le` は使えず、Dedekind は「`M` 正規ゆえ `M ⊔ H = MH`
+  (集合積)」を経由して手で書く。
+* ✅ **3C.6** — (2026-07-28, 新 leaf `Ch03_SplitExtensions/ProblemsCoprimeOrders.lean`,
+  `OddOrder.lean` 配線済, axiom-clean 確認済)。
+  `eq_one_of_mul_eq_one_of_coprime_orders`。帰納 1 段 =
+  `mem_commutator_of_mul_eq_one_of_coprime_orders` (**有限性不要**):
+  可換化 `Abelianization G` へ落とすと `x̄ = (ȳz̄)⁻¹` で, 可換ゆえ
+  `o(ȳz̄) = o(ȳ)·o(z̄)` (`Commute.orderOf_mul_eq_mul_orderOf_of_coprime`)。
+  `o(x̄) ∣ o(x)` (`orderOf_map_dvd`) から `o(x̄)` は `o(ȳ)·o(z̄) = o(x̄)` と互いに素、
+  `Nat.gcd_self` で `o(x̄) = 1` ⟹ `x ∈ ⁅G,G⁆` (`Abelianization.ker_of`)。
+  すると `ȳz̄ = 1` で `o(ȳ) = o(z̄)`, 同じ trick で両方 1。
+  本体は書籍 Hint の「導来長に関する帰納」を **`|G|` の強帰納**で実装
+  (`∀ n, ∀ {G} [Group G] [Finite G] [IsSolvable G], Nat.card G ≤ n → …` の形で
+  型を量化し、1 段ごとに `↥(commutator G)` へ降りる)。
+  `commutator G < ⊤` = `IsSolvable.commutator_lt_top_of_nontrivial`、
+  位数減少は `Finite.card_subtype_lt`、部分群の元の位数は `Subgroup.orderOf_mk`。
 * ⬜ **3C.7** — Carter 部分群 (`C` 冪零かつ `C = N_G(C)`) の (a) 存在 (b) 共役性
   (c) `G/N` 冪零なら `NC = G`。⚠ **書籍自身が「この問題と次はかなり難しい」と注記**。
 * ⬜ **3C.8** — 可解群の nilpotent injector (`F(G)` を含む極大な冪零部分群) は全て共役。
@@ -5615,3 +5677,111 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
 
 **着手順は番号順** (3C.2 から)。3C.7 / 3C.8 は書籍自身が難問と明示しているので、
 時間がかかっても正面から進める (CLAUDE.md「難易度は着手判断の基準でない」)。
+
+### 3C.7 (Carter 部分群) の設計 — 2026-07-28 に確定, 実装中
+
+書籍は証明を与えない (challenge)。以下は自前で組んだ完全な証明計画。
+**(a) 存在 / (b) 共役 / (c) `G/N` 冪零 ⟹ `NC = G`** は相互に絡むので **`|G|` の強帰納で
+(b) → (c) → (a) の順に積む** (各段で「より小さい群での (b)」だけを使う形に整理済)。
+
+置き場 = 新ディレクトリ `Ch03_SplitExtensions/Carter/`
+(`Defs.lean` / `Conjugacy.lean` / `Existence.lean` / `NilpotentQuotient.lean`)。
+
+**定義**: `IsCarterSubgroup C := Group.IsNilpotent ↥C ∧ Subgroup.normalizer (C : Set G) = C`。
+
+**共通部品** (先に作る):
+* `N_G(C) ≤ N_G(N ⊔ C)` (`N ⊴ G`): `C^g = C` なら `(NC)^g = N^g C^g = NC`。
+  → 「`N_G(C)` を `N_G(K)` に押し込む」全ステップの土台。
+* 商への持ち上げ: `N ≤ K` のとき `N_{G/N}(K/N) = N_G(K)/N` (対応定理)。
+* `C` が `G` の Carter で `C ≤ H ≤ G` なら `C` は `H` の Carter (`N_H(C) ≤ N_G(C) = C`)。
+
+**(b) 共役** — `|G|` 強帰納。`N` = 極小正規 (可換, 素数 `p` の elementary abelian)。
+1. `N_G(CN) = CN`: `g ∈ N_G(CN)` なら `C, C^g` はともに `CN` の Carter。
+   `CN < G` なら帰納で `∃y ∈ CN, C^{gy} = C` ⟹ `gy ∈ N_G(C) = C` ⟹ `g ∈ CN`。
+   `CN = G` なら自明。⟹ `CN/N`, `DN/N` は `G/N` の Carter。
+2. `G/N` で帰納 ⟹ WLOG `CN = DN =: K`。
+3. `K < G` なら `K` で帰納して終わり。
+4. `K = G` の場合。`C ⊓ N ⊴ G` (`N` 可換 + `C` が正規化) で極小性より `⊥` か `N`。
+   `N ≤ C` なら `C = G` で `G` 冪零 ⟹ 冪零群の自己正規化部分群は `G` のみゆえ `D = G`。
+   以下 `C ⊓ N = D ⊓ N = ⊥` (ともに `N` の補元)。
+   * `[N,C] ⊴ G` (`≤ N`, `N` 可換 + `C` で不変) なので `⊥` か `N`。`⊥` なら
+     `N ≤ N_G(C) = C` で `N = ⊥` に矛盾 ⟹ `[N,C] = N`。(実装では使わなくてよいが健全性の確認)
+   * `P := ` `G` の Sylow `p`。`G/N ≅ C` 冪零 + `N` は `p`-群 ⟹ `P ⊴ G` かつ `P = N C_p`
+     (`C_p` = 冪零 `C` の Sylow `p`)。`Q := C_{p'}` は **`G` の Hall `p'`-部分群**
+     (`|G| = |N||C|`, `|N|` は `p`-冪)。
+   * `D_{p'}` も Hall `p'` ⟹ **`hall_C`** (Isaacs Thm 3.14, repo 既存) で共役。
+     `D` を取り替えて `C_{p'} = D_{p'} = Q` としてよい。
+   * **`C_p = C_P(Q)`**: `C_p ≤ C_P(Q)` は `C = C_p × Q`。逆は `C_p < C_P(Q)` とすると
+     `p`-群の正規化条件で `x ∈ N_{C_P(Q)}(C_p) \ C_p` が取れ、`x` は `C_p` を正規化し `Q` を
+     中心化するので `C = C_p Q` を正規化 ⟹ `x ∈ N_G(C) = C`, かつ `x ∈ P` ゆえ
+     `x ∈ C ⊓ P = C_p` で矛盾。同様に `D_p = C_P(Q)`。⟹ **`C = C_p Q = D_p Q = D`**。
+
+**(c) `NC = G`** — `NC < G` と仮定。`G/N` 冪零ゆえ正規化条件で `NC < N_G(NC) =: X`。
+`x ∈ X \ NC` を取ると `C, C^x` はともに `NC` の Carter で `NC < G` だから (b) が使え
+`∃y ∈ NC, C^{xy} = C` ⟹ `xy ∈ N_G(C) = C ≤ NC` ⟹ `x ∈ NC` で矛盾。
+
+**(a) 存在** — `|G|` 強帰納。`G = 1` なら `⊥`。`N` = 極小正規。
+帰納で `G/N` の Carter `K/N` (`N ≤ K ≤ G`, `N_G(K) = K`) を取る。
+* `K < G`: 帰納で `K` の Carter `C`。(c) を `K` に適用して `NC = K`
+  (`K/N` 冪零)、よって `N_G(C) ≤ N_G(NC) = N_G(K) = K` かつ `N_G(C) ⊓ K = N_K(C) = C`。⟹ `C` は `G` の Carter。
+* `K = G` (= `G/N` 冪零):
+  - `G` 冪零なら `C = G`。
+  - そうでないとき `N ⊄ Φ(G)` (∵ `N ≤ Φ(G)` かつ `G/N` 冪零 ⟹ `G/Φ(G)` 冪零 ⟹ `G` 冪零)。
+    極大 `M` で `N ⊄ M` を取ると `G = NM`, `N ⊓ M ⊴ G` (`N` 可換) で極小性より `⊥`。
+    `M ≅ G/N` は冪零。`N_G(M)` は `M` の極大性から `M` か `G`。`G` なら `G = N × M` で
+    `N ≤ Z(G)` ⟹ `G` 冪零で矛盾。⟹ `N_G(M) = M` で `M` が Carter。
+  - ⚠ **要 upstream**: 「`G/Φ(G)` 冪零 ⟹ `G` 冪零」。repo/mathlib に無ければ
+    Frattini 論法 (`P ∈ Syl_p(G)`, `PΦ(G) ⊴ G` ⟹ `G = N_G(P)Φ(G) = N_G(P)`) で自作する。
+
+**3C.8 (nilpotent injector)** は 3C.7 の後。`F(G)` を含む極大冪零部分群の共役性で、
+同型の帰納 (極小正規 + Hall/Sylow 分解) が効くはず。3C.7 の部品を再利用する。
+
+### 3C.7 実装進捗 (2026-07-28)
+
+`Ch03_SplitExtensions/Carter/` に段階的に構築中 (全て `OddOrder.lean` 配線済・axiom-clean)。
+
+* ✅ **`Carter/Defs.lean`** — `IsCarterSubgroup` の定義 +
+  `eq_top_of_isNilpotent` (冪零群の Carter は `⊤` のみ) /
+  `isCarterSubgroup_top_of_isNilpotent` / `map_conj` (共役不変) /
+  `subgroupOf` (`C ≤ K` なら `↥K` の Carter) /
+  `map_conj_subgroupOf` + `map_conj_eq_iff_subgroupOf` (`↥K` 内共役 ⟷ `G` 内共役)。
+  ⚠ 計画にあった `N_G(C) ≤ N_G(C ⊔ N)` は mathlib
+  `Subgroup.normalizer_le_normalizer_sup_normal` に既存 (自作しない)。
+* ✅ **`Carter/QuotientTransfer.lean`** — `normalizer_map_mk'` (対応定理
+  `N_{G/N}(K/N) = N_G(K)/N`) / `normalizer_eq_iff_map_mk'` /
+  `sup_map_mk'_eq_map_mk'` / `isNilpotent_map_of_isNilpotent` /
+  `exists_conj_of_map_mk'_conj` / `card_quotient_lt`。
+* ⬜ **`Carter/Conjugacy.lean`** — (b)。次の実装対象。
+* ⬜ **`Carter/NilpotentQuotient.lean`** — (c)。
+* ⬜ **`Carter/Existence.lean`** — (a)。
+
+#### (b) の Lean 構造 (確定)
+
+`∀ n, ∀ {G : Type u} [Group G] [Finite G] [IsSolvable G] (C D : Subgroup G),
+Nat.card G ≤ n → IsCarterSubgroup C → IsCarterSubgroup D →
+∃ g, C.map (MulAut.conj g).toMonoidHom = D` の型量化強帰納 (3C.6 と同じ形)。
+
+step 1 (`N_G(C ⊔ N) = C ⊔ N`) は **IH を仮説に取る独立補題**に切り出せる:
+`(IH : ∀ {H : Type u} [Group H] [Finite H] [IsSolvable H], Nat.card H < Nat.card G → …)`。
+`C ⊔ N = ⊤` なら自明、`< ⊤` なら `|↥(C⊔N)| < |G|` で IH を当て
+`g⁻¹y ∈ N_G(C) = C ≤ C⊔N` から `g ∈ C⊔N`。
+
+#### ⚠ step 4b で要る未整備インフラ (2026-07-28 に判明)
+
+step 4b (`C ⊔ N = D ⊔ N = ⊤`, `C ⊓ N = D ⊓ N = ⊥`) の crux は
+**`C_p = C_P(Q) = D_p`** だが、これに `[C_p, Q] = 1` (`C = C_p × Q`) が要る。
+repo/mathlib に「有限冪零群の Sylow と Hall `p'` が元ごとに可換」は**無い**。
+
+* `C_p := C ⊓ P` (`P ⊴ G` は `G` の Sylow `p`) は `C` の Sylow `p` かつ `C_p ⊴ C`
+  — `P ⊴ G` から直ちに出る (冪零性不要)。
+* `C = C_p·Q` (`Q` = `C` の Hall `p'`) も位数と `C_p ⊴ C` から出る。
+* 残るのは **`Q ⊴ C`**。証明経路 (確定):
+  `M := N_C(Q)` とおくと `Q ⊴ M` で `Q` は `M` の Hall `p'`。
+  **正規 Hall 部分群は一意** (別の Hall `p'` `Q'` は `Q'Q/Q ≅ Q'/(Q'⊓Q)` が
+  `M/Q` = `p`-群 の中の `p'`-群 ⟹ `Q' ≤ Q`, 位数で等号)。
+  よって `g ∈ N_C(M)` なら `Q^g` も `M` の Hall `p'` で `Q^g = Q`, `g ∈ M`
+  ⟹ `N_C(M) = M`。`C` 冪零の**正規化条件**より `M = C`。∎
+  そのうえで `C_p ⊴ C`, `Q ⊴ C`, `C_p ⊓ Q = ⊥` から
+  `Subgroup.commute_of_normal_of_disjoint` で `[C_p, Q] = 1`。
+* この `Q ⊴ C` (= 「冪零群の Hall 部分群は正規」) は汎用なので
+  `Carter/` でなく `OddOrder/GroupTheory/` 側の leaf に置くのが妥当。
