@@ -24,6 +24,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.7 の形式化
 - `IsCarterSubgroup.map_conj` — Carter 性は共役で保たれる。
 - `IsCarterSubgroup.subgroupOf` — `C ≤ K` なら `C` は `↥K` の Carter 部分群。
 - `map_conj_eq_iff_subgroupOf` — `↥K` 内の共役と `G` 内の共役の翻訳。
+- `map_conj_trans` / `map_conj_one` / `map_conj_eq_self_iff_mem_normalizer` /
+  `map_conj_le_of_mem_normalizer` — 共役操作そのものの基本補題。
 
 ⚠ 「`N ⊴ G` なら `N_G(C) ≤ N_G(C ⊔ N)`」(3C.7 の帰納全体が使う土台) は mathlib に
 `Subgroup.normalizer_le_normalizer_sup_normal` として既にあるので, ここでは重複させない
@@ -84,6 +86,34 @@ theorem IsCarterSubgroup.subgroupOf {C K : Subgroup G} (h : IsCarterSubgroup C) 
   haveI := h.1
   exact ⟨Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hCK).symm,
     by rw [← Subgroup.subgroupOf_normalizer_eq hCK, h.2]⟩
+
+/-- 共役の合成: `(C^a)^b = C^(b * a)`。 -/
+theorem map_conj_trans (C : Subgroup G) (a b : G) :
+    (C.map (MulAut.conj a).toMonoidHom).map (MulAut.conj b).toMonoidHom
+      = C.map (MulAut.conj (b * a)).toMonoidHom := by
+  rw [Subgroup.map_map]
+  congr 1
+  ext x
+  simp [MulAut.conj_apply, mul_assoc]
+
+@[simp]
+theorem map_conj_one (C : Subgroup G) :
+    C.map (MulAut.conj (1 : G)).toMonoidHom = C := by
+  ext x
+  simp
+
+/-- `C^a = C` ⟺ `a ∈ N_G(C)` (`.toMonoidHom` 綴り版)。 -/
+theorem map_conj_eq_self_iff_mem_normalizer {C : Subgroup G} {a : G} :
+    C.map (MulAut.conj a).toMonoidHom = C ↔ a ∈ Subgroup.normalizer (C : Set G) :=
+  Subgroup.mem_normalizer_iff_map_conj_eq.symm
+
+/-- 共役部分群は元の部分群を含む部分群に写る: `C ≤ K`, `g ∈ N_G(K)` なら `C^g ≤ K`。 -/
+theorem map_conj_le_of_mem_normalizer {C K : Subgroup G} (hCK : C ≤ K) {g : G}
+    (hg : g ∈ Subgroup.normalizer (K : Set G)) :
+    C.map (MulAut.conj g).toMonoidHom ≤ K := by
+  calc C.map (MulAut.conj g).toMonoidHom
+      ≤ K.map (MulAut.conj g).toMonoidHom := Subgroup.map_mono hCK
+    _ = K := map_conj_eq_self_iff_mem_normalizer.mpr hg
 
 /-- `C ≤ K` のとき, `↥K` の中の共役は `G` の中の共役の `subgroupOf` に一致する。 -/
 theorem map_conj_subgroupOf {C K : Subgroup G} (hC : C ≤ K) (y : ↥K) :

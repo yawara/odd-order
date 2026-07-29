@@ -30,7 +30,9 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] **Ch.1 Sylow** — **🎉 完済 (2026-07-28)**: §1A–§1G 全問
       (§1E は Sylow 計数の非単純性 8 問, §1F は Brodkey 周辺 3 問, §1G は Chermak–Delgado 4 問)
 - [ ] Ch.2 Subnormality
-- [ ] Ch.3 Split Extensions
+- [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
+      **次の frontier = §3D (3D.1-3D.5)**, その後 §3E (3E.1-3E.x)。書籍の該当ページは
+      §3D = π-separable / Hall-Higman 1.2.3, §3E = coprime action。
 - [ ] Ch.4 Commutators
 - [x] Ch.5 Transfer — **🎉 完済 (2026-07-27)**: §5A–§5E 全問
 - [x] Ch.6 Frobenius Actions — **🎉 完済 (2026-07-27)**: §6A (11 問) / §6B (9 問) / §6C (2 問) 全問
@@ -5670,10 +5672,14 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   型を量化し、1 段ごとに `↥(commutator G)` へ降りる)。
   `commutator G < ⊤` = `IsSolvable.commutator_lt_top_of_nontrivial`、
   位数減少は `Finite.card_subtype_lt`、部分群の元の位数は `Subgroup.orderOf_mk`。
-* ⬜ **3C.7** — Carter 部分群 (`C` 冪零かつ `C = N_G(C)`) の (a) 存在 (b) 共役性
-  (c) `G/N` 冪零なら `NC = G`。⚠ **書籍自身が「この問題と次はかなり難しい」と注記**。
-* ⬜ **3C.8** — 可解群の nilpotent injector (`F(G)` を含む極大な冪零部分群) は全て共役。
-  ⚠ 同上 (書籍が challenge として提示)。
+* ✅ **3C.7** — **🎉 (a)(b)(c) 全完成 (2026-07-29)**。Carter 部分群
+  (`C` 冪零かつ `C = N_G(C)`) の (a) 存在 `exists_isCarterSubgroup` /
+  (b) 共役性 `exists_conj_of_isCarterSubgroup` /
+  (c) `G/N` 冪零なら `NC = G` `sup_eq_top_of_isNilpotent_quotient`。
+  ⚠ **書籍自身が「この問題と次はかなり難しい」と注記**しており証明は与えていない (自前)。
+* ✅ **3C.8** — **🎉 完成 (2026-07-29)**: 可解群の nilpotent injector
+  (`F(G)` を含む極大な冪零部分群) は全て共役 (`exists_conj_of_isNilpotentInjector`)。
+  ⚠ 同上 (書籍が challenge として提示、証明なし)。Mann の構造定理経由。
 
 **着手順は番号順** (3C.2 から)。3C.7 / 3C.8 は書籍自身が難問と明示しているので、
 時間がかかっても正面から進める (CLAUDE.md「難易度は着手判断の基準でない」)。
@@ -5733,10 +5739,88 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   - ⚠ **要 upstream**: 「`G/Φ(G)` 冪零 ⟹ `G` 冪零」。repo/mathlib に無ければ
     Frattini 論法 (`P ∈ Syl_p(G)`, `PΦ(G) ⊴ G` ⟹ `G = N_G(P)Φ(G) = N_G(P)`) で自作する。
 
-**3C.8 (nilpotent injector)** は 3C.7 の後。`F(G)` を含む極大冪零部分群の共役性で、
-同型の帰納 (極小正規 + Hall/Sylow 分解) が効くはず。3C.7 の部品を再利用する。
+### 3C.8 (nilpotent injector) — 2026-07-29 に着手, 証明経路を選定中
 
-### 3C.7 実装進捗 (2026-07-28)
+書籍の文言 (p. 91, 実測):
+> Let `G` be solvable. A nilpotent injector of `G` is a nilpotent subgroup `I` containing
+> the Fitting subgroup `F(G)`, and maximal with this property. Prove that all nilpotent
+> injectors of `G` are conjugate in `G`.
+
+これは **Fischer の定理** (Fitting class `𝔑` の injector の共役性) の特別な場合で、
+3C.7 と同様に書籍は証明を与えない。
+
+**検討した 2 経路 (2026-07-29)**:
+
+1. **FGH (Fischer–Gaschütz–Hartley) 型の帰納**: `N ⊴ G` に対し `I ⊓ N` が `N` の
+   injector であることを使い、`N` 内共役 + Frattini で `G = N·N_G(I ⊓ N)` に落とす。
+   ⚠ **難所**: 「極大冪零 ⊇ `F(G)`」という**特徴づけ**から出発すると、`H := N_G(I ⊓ N) < G`
+   に落としたとき `F(H) ≤ I` が自明でない。本来の injector の定義
+   (「全ての subnormal `M` に対し `I ⊓ M` が `M` の極大冪零部分群」) を別途導入して
+   同値性を示す必要がありそう。
+2. **`D_p := C_G(O_{p'}(G))` による直接的な特徴づけ**: `I ⊇ F` 冪零なら Sylow 分解
+   `I = ∏ I_p` について `I_p ≤ D_p` が容易に出る (`I_q ⊇ O_q(G)` と `[I_p, I_q] = 1`)。
+   **`I_p ∈ Syl_p(D_p)`** が言えれば Sylow 共役性に帰着できる。
+   ⚠ **難所**: `I_p < S ∈ Syl_p(D_p)` から `x ∈ N_S(I_p) \ I_p` を取っても
+   `[x, I_q] = 1` (`q ≠ p`) が出ない。`[D_p, D_q] ≤ D_p ⊓ D_q ≤ C_G(F) = Z(F)`
+   までは押さえたが、そこから先が未詰め。`F(G) = O_p(G)` の場合 (= `O_{p'}(G) = 1`) は
+   `I_q ≤ C_G(F) ≤ F` が `q`-群かつ `p`-群を強いて `I_q = 1`, `D_p = G` となり
+   claim は成立する (検算済)。
+   さらに **共役元の同時性** (全素数で同じ `g` を取る) も要処理。
+
+**経路確定 (2026-07-29, 文献確認済)**: **経路 2 = Mann の構造定理**を採る。
+arXiv:2408.15622 "Counting in nilpotent injectors and Carter subgroups" の Remark 1
+(Mann, *J. Algebra* 1971, Theorem 1 の証明中) が経路 2 そのものを述べている:
+
+> Let `G` be `N`-constrained, `F = F(G)` and `F_{p'} = O_{p'}(F(G))`. If `C(p) := C_G(F_{p'})`
+> and `S_q ∈ Syl_q(C(q))` for `q, p` distinct primes in `ϖ(G)`, then `C(p)` is a normal
+> subgroup of `G` **that also normalises `S_q`**. Furthermore, `S_p` is the unique Sylow
+> `p`-subgroup of a nilpotent injector of `G` and `S_p` centralises `S_q`. Finally, for any
+> nilpotent subgroup `K` of `G` containing `F`, its Sylow `p`-subgroup `K_p` centralises
+> `F_{p'}` and thus `K_p ⩽ C(p)`.
+
+⚠ 前回「難所」とした `[x, I_q] = 1` は **`C(p)` が `S_q` を正規化する**という形に置き換えると
+解ける (自前で再構成した論法):
+`[C(p), C(q)] ≤ C(p) ⊓ C(q) ≤ C_G(F) = Z(F)` なので `x ∈ C(p)` について `S_q^x ≤ S_q·Z(F)`。
+`Z(F)` の `{q}`-部分 `Z_q` は `C(q)` の正規 `q`-部分群ゆえ `Z_q ≤ S_q`, `{q}ᶜ`-部分 `Z_{q'}`
+は `F_{q'}` に入るので `S_q ≤ C(q) = C_G(F_{q'})` が中心化する。よって
+`S_q·Z(F) = S_q × Z_{q'}` は直積で、`S_q` はその唯一の Sylow `q`。`S_q^x` は同位数の
+`q`-部分群なので `S_q^x = S_q`。
+**共役の同時性**も同じ事実で解ける: `c ∈ C(p)` による共役は `q ≠ p` の `S_q` を動かさないので、
+素数を 1 つずつ処理してよい (`Finset` 上の帰納)。
+
+### 3C.8 実装進捗 (2026-07-29)
+
+* ✅ **`NilpotentInjector/PiParts.lean`** — 冪零部分群 `N ≤ G` の `π`-部分
+  (`IsNilpotentPiPart` / 関数版 `nilPiPart`)。存在 (`hall_E_exists`)・一意性・
+  `N` への正規性 (issue 9213)・`N = N_π ⊔ N_{π'}`・元ごとの可換性・共役同変・
+  `le_nilPiPart_of_isPiGroup` (極大性)。**`↥N` の部分群でなく `G` の部分群として**
+  扱うのが要点 (共役の追跡が楽)。
+* ✅ **`NilpotentInjector/Defs.lean`** — `IsNilpotentInjector` の定義 +
+  `fittingPPrimePart` (= Mann の `F_{p'}`) / `pCentralizer` (= `C(p)`) と
+  両者の `G`-正規性、`F(G) ≤ F_{p'} ⊔ F_{q'}` (`p ≠ q`)、
+  `C(p) ⊓ C(q) ≤ C_G(F(G))`、および
+  **`nilPiPart_singleton_le_pCentralizer`** (`F` を含む冪零部分群の `{p}`-部分は `C(p)` 内)。
+  補助として `normal_centralizer` (正規部分群の中心化群は正規) と
+  `centralizer_inf_le_centralizer_sup`。
+* ✅ **`NilpotentInjector/Structure.lean`** — **Mann の核心補題**
+  `map_conj_eq_self_of_mem_pCentralizer`: `p ≠ q` なら `C(p)` の元は `C(q)` の
+  Sylow `q`-部分群 `S` を正規化する。補助 = `commutator_mem_centralizer_fitting`
+  (`C(p)`, `C(q)` の元の交換子は `C_G(F)` 内) / `isNilpotent_centralizer_fitting` /
+  `centralizer_fitting_le_pCentralizer`。
+  ⚠ 述語は `IsNilpotentPiPart` → **`IsHallPart` に改名** (定義自体は `N` の冪零性を
+  要求せず、3C.8 では `N = C(q)` (非冪零) にも使うため)。
+* ✅ **`NilpotentInjector/Injector.lean`** — **Mann の構造定理 (主要部分)**
+  `isHallPart_pCentralizer_of_isNilpotentInjector`: injector の `{p}`-部分は `C(p)` の
+  Sylow `p`-部分群。汎用補助 = `isNilpotent_sup_of_commute` (元ごとに可換な 2 つの
+  冪零部分群の join は冪零 — Fitting 部分群経由) / `eq_one_of_conj_mul_inv_mem_of_coprime`
+  (交換子消去の位数論法) / `exists_isHallPart_singleton_ge` / `isPGroup_of_isPiGroup_singleton`。
+* ✅ **`NilpotentInjector/Conjugacy.lean`** — **🎉 3C.8 完成 (2026-07-29)**:
+  `exists_conj_of_isNilpotentInjector`。素数ごとの `Finset` 帰納 +
+  `eq_of_nilPiPart_eq` (全素数で `{p}`-部分が一致 ⟹ 位数比較で `I = J`)。
+
+`C_G(F(G)) ≤ F(G)` は `OddOrder.GroupTheory.centralizer_fitting_le_fitting` を使う。
+
+### 3C.7 実装進捗 (2026-07-28 開始 → 2026-07-29 完成)
 
 `Ch03_SplitExtensions/Carter/` に段階的に構築中 (全て `OddOrder.lean` 配線済・axiom-clean)。
 
@@ -5751,9 +5835,41 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   `N_{G/N}(K/N) = N_G(K)/N`) / `normalizer_eq_iff_map_mk'` /
   `sup_map_mk'_eq_map_mk'` / `isNilpotent_map_of_isNilpotent` /
   `exists_conj_of_map_mk'_conj` / `card_quotient_lt`。
-* ⬜ **`Carter/Conjugacy.lean`** — (b)。次の実装対象。
-* ⬜ **`Carter/NilpotentQuotient.lean`** — (c)。
-* ⬜ **`Carter/Existence.lean`** — (a)。
+* ✅ **`Carter/MinimalNormal.lean`** — (b) step 4 (帰納が閉じない `C ⊔ N = D ⊔ N = ⊤` の場合)。
+  `isNilpotent_of_isCarterSubgroup_eq_top` / `normal_inf_of_comm_of_sup_eq_top` /
+  `exists_mem_normalizer_notMem_of_isNilpotent` (正規化条件の部分群版) /
+  `sylow_normal_of_isPGroup_of_isNilpotent_quotient` /
+  `sup_inf_eq_and_commute_of_isNilpotent` / `inf_eq_centralizer_inf_of_isCarterSubgroup` /
+  `eq_of_isCarterSubgroup_of_hall_eq` / `exists_conj_of_isCarterSubgroup_of_isComplement` /
+  `exists_conj_of_isCarterSubgroup_of_isMinimalNormal`。
+* ✅ **`Carter/Conjugacy.lean`** — **🎉 (b) 完成 (2026-07-29)**:
+  `exists_conj_of_isCarterSubgroup` (有限可解群の 2 つの Carter 部分群は共役)。
+  step 1–3 は帰納法の仮説を引数に取る独立補題 (`normalizer_sup_eq_self_of_ih` /
+  `isCarterSubgroup_map_mk'_of_ih` / `exists_conj_sup_eq_sup_of_ih`)、本体は
+  `exists_conj_aux` の `|G|` 強帰納。axiom-clean。
+* ✅ **`Carter/NilpotentQuotient.lean`** — **🎉 (c) 完成 (2026-07-29)**:
+  `normalizer_eq_self_of_isCarterSubgroup_le` (**Carter 部分群を含む部分群はすべて
+  自己正規化** — (b) から直ちに従う) + `sup_eq_top_of_isNilpotent_quotient` (= (c) 本体)。
+* ✅ **`Carter/Existence.lean`** — **🎉 (a) 完成 (2026-07-29)**:
+  `exists_isCarterSubgroup`。`|G|` 強帰納で、極小正規 `N` を取り `G ⧸ N` の Carter `K̄` の
+  引き戻し `K` を見る。`K < ⊤` なら `↥K` の Carter が (c) 経由でそのまま `G` の Carter;
+  `K = ⊤` (= `G ⧸ N` 冪零) なら**正規でない極大部分群が Carter**
+  (`isCarterSubgroup_of_isCoatom_not_normal`; `↥M ≅ G ⧸ N` が冪零 + 極大性で自己正規化)。
+  補助: `normal_of_isCoatom_of_le_of_isNilpotent_quotient`。
+
+#### (b) step 4 で実際に使った経路 (2026-07-29 に確定・実装済)
+
+計画どおり: `N` 極小正規 (可換) ⟹ `C ⊓ N ⊴ G` ⟹ 極小性で `⊥` か `N`。
+`N ≤ C` なら `C = ⊤` で `G` 冪零ゆえ `D = ⊤`。ともに補元の場合は
+
+1. `G ⧸ N` 冪零 ⟹ **`G` の Sylow `p` は正規** (`Sylow.comapOfKerIsPGroup` で `G/N` の
+   Sylow を引き戻し、`Sylow.unique_of_normal` で任意の Sylow と同一視)。
+2. `[G:C] = |N|` は `p`-冪 ⟹ `C` の Hall `p'` は **`G` の** Hall `p'`
+   (`IsHallSubgroup.map_subtype_of_index_no_pi`)。
+3. `hall_C` で `Q_C^x = Q_D` に揃える。
+4. `C^x` と `D` はどちらも `(· ⊓ P) ⊔ Q_D` に分解し (issue 9213 の
+   `commute_of_isHallSubgroup_of_isHallSubgroup_compl` + `sup_eq_top_of_isHallSubgroup_compl`)、
+   `p`-部分はどちらも `C_G(Q_D) ⊓ P` に等しい (正規化条件による背理法) ⟹ `C^x = D`。
 
 #### (b) の Lean 構造 (確定)
 
