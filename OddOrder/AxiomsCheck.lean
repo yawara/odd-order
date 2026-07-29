@@ -256,6 +256,8 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
+import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
@@ -347,7 +349,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 13800
+set_option linter.style.longFile 14000
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -13739,6 +13741,12 @@ order `ℓ + 1`. -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one
 #assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.odd_orderOf_psuTorusParameter
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_ne_one_odd_centralizing_involutions_standardRoot
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_ne_one_odd_centralizing_involutions_of_sylowTwo
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB
 
 /-! **The theorem of Galois for `RingAut F`** (issue 0164, 2026-07-29).
@@ -13755,3 +13763,62 @@ counting argument (`FixedPoints.finrank_eq_card`) directly in `RingAut F`: `fixe
 #assert_only_allowed_axioms OddOrder.RingAut.fixer_fixedSet
 #assert_only_allowed_axioms OddOrder.RingAut.mem_of_fixes_fixedPoints
 #assert_only_allowed_axioms OddOrder.RingAut.eq_of_fixedSet_eq
+
+/-! **`C_V(C_{Q₀}(P)) = PW`** (issue 0164, 2026-07-29).
+`Peterfalvi/Appendices/Suzuki/GaloisCentralizer.lean`, Part II, Ch. III §1 Proposition p. 117
+("By Chapter I, §2, Proposition 3, `V` then acts as a group of field automorphisms on `Q₀`
+and, by the theorem of Galois, `C_V(C_{Q₀}(P)) = P`").
+
+Ch. I §2 Proposition 3 (`exists_semilinear_equiv`) turns `Q₀` into the additive group of a
+finite field `F` on which `V̄ = V/W` acts through `A ≤ RingAut F`.  Under that dictionary
+`C_{Q₀}(P)` is the fixed set `F^B` of the image `B` of `P`, and the Galois correspondence
+(`OddOrder.RingAut.fixer_fixedSet`) says the automorphisms fixing `F^B` are exactly `B`.
+Pulling back along `V → A`, whose kernel is `W`, gives `P ⊔ W`; the book's `= P` is the
+`W = 1` specialisation it is about to be in. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.W_centralizes_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_V_centralizer_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_V_centralizer_Q0_of_W_eq_bot
+
+/-! **`Z(F)` は奇位数** (issue 0164, 2026-07-29).
+`Peterfalvi/Appendices/Suzuki/StructureOfH/PSUCentre.lean`, Ch. I §3 Prop 1(c) の PSU 分岐.
+
+`C_Q(P)` は `C = C_G(P)` の Sylow 2 であり (`exists_sylow_two_eq_cQ_of_isPGroup`)、
+`F = O^{2'}(C)` はその正規閉包 (`residual_eq_normalClosure`) なので `C_Q(P) ≤ F`、
+したがって `F` の Sylow 2 でもある。その位数は `|RootGroup n|` (`cQEquivRoot`) で、
+これは `F/Z(F) ≅ PSU(3,ℓ)` の Sylow 2 (`standardRootSylow`) の位数と一致する。
+中心拡大の上下で Sylow 2 の位数が等しい ⟹ `2 ∤ |Z(F)|`
+(`Sylow.not_dvd_natCard_of_natCard_eq`)。
+
+Ch. III §1 Proposition が `C_{G₀}(Ω₁(S₀))` の元を `F` に持ち上げるとき、交換子は
+`Z(F)` にしか落ちないが、この奇位数性と
+`commute_of_commutatorElement_mem_of_coprime_natCard` で真の中心化に格上げできる。 -/
+#assert_only_allowed_axioms Sylow.not_dvd_natCard_of_natCard_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.CentralizerPSUData.odd_natCard_center_residual
+
+/-! **`C_H(s) = QV` と `W = 1 ⟹ V 可換`** (issue 0164, 2026-07-29).
+Ch. III §1 Proposition が `F/Z(F)` 側から持ち上げた元 `x` を `Q`-成分と `V`-成分に
+分解するための 2 点。
+
+`s ∈ Q₀ ≤ Z(Q)` (`Q0_le_centralizer_Q`) より `Q` は `s` を丸ごと中心化するので、
+`H = QD` の分解 `x = q d` で `d` も `s` を中心化し、`V = C_D(s)` (Ch. I Prop 5) から
+`d ∈ V`。逆向きは自明なので `C_H(s) = Q ⊔ V`。
+
+`V` の可換性は Ch. I §2 Prop 3 の「`V̄` は巡回」(`isCyclic_Vbar`) と、`W = 1` のとき
+`V → V̄` が単射であること (`VtoVbar_eq_one_iff`) から出る。これにより
+`x = q v` の `v` 側が自動的に `C_G(P)` に入り、`q ∈ C_Q(P)` が従う。 -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_le_centralizer_distinguishedInvolution
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_Q_mem_V_of_mem_H_of_commute_distinguishedInvolution
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inf_centralizer_distinguishedInvolution_eq_sup
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isCyclic_Vbar
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isMulCommutative_V_of_W_eq_bot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.V_le_centralizer_of_le_V_of_W_eq_bot

@@ -117,6 +117,25 @@ lemma ker_conjQ0 : hyp.conjQ0.ker = hyp.W.subgroupOf hyp.D := by
             rw [← this]
         _ = (x : G) := by rw [mul_assoc, mul_inv_cancel, mul_one]
 
+/-- Elements of `W` centralize `Q₀` elementwise: `W` is exactly the kernel of
+the conjugation action of `D` on `Q₀` (`ker_conjQ0`). -/
+theorem W_centralizes_Q0 {w : G} (hw : w ∈ hyp.W) {x : G} (hx : x ∈ hyp.Q0) :
+    w * x = x * w := by
+  have hwD : w ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hw)
+  have hker : (⟨w, hwD⟩ : ↥hyp.D) ∈ hyp.conjQ0.ker := by
+    rw [hyp.ker_conjQ0]
+    exact hw
+  rw [MonoidHom.mem_ker] at hker
+  have happ : hyp.conjQ0 ⟨w, hwD⟩ ⟨x, hx⟩ = ⟨x, hx⟩ := by
+    rw [hker]; rfl
+  have hconj : w * x * w⁻¹ = x := congrArg (fun y : ↥hyp.Q0 => (y : G)) happ
+  calc w * x = (w * x * w⁻¹) * w := by group
+    _ = x * w := by rw [hconj]
+
+theorem W_le_centralizer_Q0 :
+    hyp.W ≤ Subgroup.centralizer (hyp.Q0 : Set G) := fun _ hw =>
+  Subgroup.mem_centralizer_iff.mpr fun _ hx => (hyp.W_centralizes_Q0 hw hx).symm
+
 /-! ## The quotient `D̄ = D/W` and Appendix I, Proposition 1 -/
 
 instance : (hyp.W.subgroupOf hyp.D).Normal := by

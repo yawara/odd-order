@@ -70,23 +70,6 @@ theorem p_ne_two : fc.p ≠ 2 := by
   rw [h] at this
   exact (Nat.not_odd_iff_even.mpr even_two) this
 
-/-- Elements of `W` centralize `Q₀` elementwise. -/
-theorem W_mem_centralizes_Q0 {w : G} (hw : w ∈ fc.toHypothesis.W)
-    {x : G} (hx : x ∈ fc.toHypothesis.Q0) : w * x = x * w := by
-  set hyp := fc.toHypothesis
-  have hwD : w ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hw)
-  have hker : (⟨w, hwD⟩ : ↥hyp.D) ∈ hyp.conjQ0.ker := by
-    rw [hyp.ker_conjQ0]
-    exact hw
-  rw [MonoidHom.mem_ker] at hker
-  have happ : hyp.conjQ0 ⟨w, hwD⟩ ⟨x, hx⟩ = ⟨x, hx⟩ := by
-    rw [hker]
-    rfl
-  have hval := congrArg (fun y : ↥hyp.Q0 => (y : G)) happ
-  have hconj : w * x * w⁻¹ = x := hval
-  calc w * x = (w * x * w⁻¹) * w := by group
-    _ = x * w := by rw [hconj]
-
 /-- **Peterfalvi Part II, Ch. II, step (1) opening** (p. 108): `P ∩ W = 1`.
 If `P ≤ W` then `P` would centralize `Q₀`, so the four-subgroup of `Q₀`
 would land in `C_G(P)`, contradicting (B1). -/
@@ -110,7 +93,7 @@ theorem P_inf_W_eq_bot : fc.P ⊓ fc.toHypothesis.W = ⊥ := by
       intro x hx
       rw [Subgroup.mem_centralizer_iff]
       intro g hg
-      exact fc.W_mem_centralizes_Q0 (hPW hg) hx
+      exact fc.toHypothesis.W_centralizes_Q0 (hPW hg) hx
     obtain ⟨E, hEQ0, hE4, hEsq⟩ := hyp.exists_four_subgroup_le_Q0
     have hcard := fc.twoRank_centralizer_le_one E (hEQ0.trans hQ0C) hEsq
     rw [hE4] at hcard

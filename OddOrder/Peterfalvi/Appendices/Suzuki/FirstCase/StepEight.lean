@@ -396,7 +396,7 @@ theorem st_mem_and_cQ_isPGroup_of_mem_centralizer_W
     rw [Subgroup.mem_centralizer_iff]
     intro z hz
     obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
-    have hcw : Commute w e := fc.W_mem_centralizes_Q0 hwW (hE0Q0 he)
+    have hcw : Commute w e := fc.toHypothesis.W_centralizes_Q0 hwW (hE0Q0 he)
     exact (hcw.zpow_left n).eq
   have hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
       Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1 := by

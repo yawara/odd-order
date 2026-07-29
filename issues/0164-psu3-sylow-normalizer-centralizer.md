@@ -147,3 +147,95 @@ AxiomsCheck 登録済、sorry ゼロ。
 ⟹ Galois パートは **API が揃っている**。残る実装コストは
 `exists_semilinear_equiv` の出力 (`νe : Vbar ≃* A`) を上の形に繋ぐ配線と、
 `W = 1 ⟹ V ≃ Vbar` (忠実性)。
+
+## ✅ 2026-07-29 セッション: 4 部品が landing + 閉じ方が確定
+
+### landing した部品 (すべて sorry ゼロ・AxiomsCheck 登録済)
+
+| 部品 | 場所 | 内容 |
+|---|---|---|
+| RingAut 版 Galois 対応 | `Algebra/FixedPointsGalois.lean` (新) | `fixer (F^B) = B` (Artin の数え上げ)、`mem_of_fixes_fixedPoints` |
+| `C_V(C_{Q₀}(P)) = P ⊔ W` | `Peterfalvi/Appendices/Suzuki/GaloisCentralizer.lean` (新) | 書籍の `= P` は `W = ⊥` の系 |
+| PSU の Sylow 一般版 | `.../ProjectiveUnitary/TorusCentralizer.lean` | `exists_ne_one_odd_centralizing_involutions_of_sylowTwo` |
+| 中心的交換子の位数 | `GroupTheory/CentralCommutatorPower.lean` | `⁅x,y⁆ ∈ Z`, `gcd(|Z|, orderOf y) = 1` ⟹ `Commute x y` |
+
+⚠ 併せて `FirstCaseHypothesis.W_mem_centralizes_Q0` を `Hypothesis.W_centralizes_Q0`
+として `KCyclic.lean` に上げ、重複を解消した。
+
+### 閉じ方が確定した (書籍の行間を全部埋めた)
+
+`hWcube : |Q| = |Q₀|³ → W ≠ ⊥` を `W = ⊥` の背理法で示す。`P ≤ V` を素数位数に取り
+Ch. I §3 Prop 1(c) の三分岐 (`centralizer_trichotomy_of_induction`) を回す:
+
+* **Sz 分岐** — `distinguishedProduct_order = 5` だが case (3) は `st` 位数 3
+  (`orderOf_st_eq_three_of_card_cube`) ⟹ 矛盾。**易**
+* **PSL(2,ℓ) 分岐** — `natCard_cQ_eq_field = natCard_cQ0_eq_field` ⟹
+  `C_Q(P) = C_{Q₀}(P) ≤ Q₀`。一方 Wielandt (9.1) の
+  `wielandt_fixedPoint_trivial_U_fixed` (`GroupTheory/WielandtFixedPoint.lean`,
+  **既に repo にある**) を Frobenius 群 `[K,P] ⋊ P` の `Q/Q₀` への作用に当てると
+  `|Q/Q₀| = |C_{Q/Q₀}(P)|^{|P|}` で `Q/Q₀ ≠ 1` ゆえ `C_{Q/Q₀}(P) ≠ 1`。
+  coprime 作用で `C_{Q/Q₀}(P) = C_Q(P)Q₀/Q₀ = 1` ⟹ 矛盾。
+  **要るもの**: (i) `[K,P] ⋊ P` が Frobenius、(ii) `[K,P]` が `Q/Q₀` 上 fixed-point-free。
+* **PSU(3,ℓ) 分岐** — 下記の連鎖。
+
+### PSU 分岐の連鎖 (`cQEquivRoot` との整合性は**不要**だと判明)
+
+当初は `cQEquivRoot` と `residualQuotientEquiv` の compatibility field が要ると考えたが、
+**`RootGroup n` が `standardPermGroup n` の Sylow 2 (`standardRootSylow`, 既存)** なので
+「任意の Sylow 2 版」(今回 landing) を使えば整合性を経由せずに済む:
+
+1. `F := primeComplementResidual 2 (C_G(P))`、`G₀ := F/Z(F) ≅ standardPermGroup n`
+   (`residualQuotientEquiv`)。
+2. **`Z(F)` は奇位数** — `C_Q(P)` が `C_G(P)` の Sylow 2 で、その像が `G₀` の Sylow 2 と
+   同位数だから。⟸ **未形式化、次の部品**
+3. `C_Q(P)` の像 `S₀` は `G₀` の Sylow 2 ⟹
+   `exists_ne_one_odd_centralizing_involutions_of_sylowTwo` が
+   `d ≠ 1`, 奇位数, `Ω₁(S₀)` を中心化、を与える。
+4. `d` を `F` の**奇位数**の元 `x` に持ち上げる (`Z(F)` 奇 + `d` 奇)。`x ∉ Z(F)`。
+5. `y ∈ C_{Q₀}(P)` に対し `⁅x, y⁆ ∈ Z(F)` かつ `y` は 2-元 ⟹
+   `commute_of_commutatorElement_mem_of_coprime_natCard` で **`x` は `C_{Q₀}(P)` を中心化**。
+6. 特に `x ∈ C_G(s) ≤ H` (`centralizer_le_H_of_mem_Q`, Ch. I §3 Prop 1(b))。
+   `Q₀ ≤ C_G(Q)` (`Q0_le_centralizer_Q`) より `C_H(s) = Q·V`、
+   さらに coprime 作用で `C_{QV}(P) = C_Q(P)·V`。⟹ `x = y₀ v` (`y₀ ∈ C_Q(P)`, `v ∈ V`)。
+7. `y₀ ∈ Q₀ ≤ C_G(Q)`… は `C_{Q₀}(P)` を中心化するので、`x` が中心化する ⟺ `v` が中心化する。
+   ⟹ `v ∈ C_V(C_{Q₀}(P)) = P` (**今回 landing した Galois**、`W = ⊥`)。
+8. すると `G₀` での `x` の像 = `y₀` の像 (∵ `v ∈ P ∩ F ≤ Z(F)`) で、これは `S₀` の元 = **2-元**。
+   しかし `d = x` の像は**奇位数で ≠ 1**。⟹ 矛盾。∎
+
+### 次の部品 (この順)
+
+1. ~~`Z(F)` が奇位数~~ ✅ `CentralizerPSUData.odd_natCard_center_residual`
+   (`StructureOfH/PSUCentre.lean`) + 一般補題 `Sylow.not_dvd_natCard_of_natCard_eq`
+2. ~~`C_H(s) = Q·V`~~ ✅ `inf_centralizer_distinguishedInvolution_eq_sup` /
+   `exists_mem_Q_mem_V_of_mem_H_of_commute_distinguishedInvolution` (`QStructure.lean`)、
+   および `W = 1 ⟹ V 可換` = `isMulCommutative_V_of_W_eq_bot` /
+   `V_le_centralizer_of_le_V_of_W_eq_bot` (`GaloisCentralizer.lean`)。
+   ⚠ 当初想定した coprime 分解 `C_{QV}(P) = C_Q(P)·V` は**不要だった** —
+   `V ≤ C_G(P)` から `q = x v⁻¹ ∈ C_G(P)` が直ちに出る。
+3. **PSU 分岐の組み立て** ← 現在地
+4. PSL 分岐の Frobenius/Wielandt
+5. `W_ne_bot_of_card_cube` を組んで `trichotomy` の `hWcube` 仮説を除去 → 0163 を閉じる
+
+### ⚠ 組み立ての簡略化: 持ち上げは**任意の逆像でよい** (2026-07-29)
+
+当初「`d` を奇位数の元 `x ∈ F` に持ち上げる」と書いたが、**`x` の位数は使わない**。
+矛盾は最後に `d = image(q)` (`q` は 2-元) と「`d` は奇位数 ≠ 1」の衝突で出るので、
+`d` の位数だけが効く。⟹ 中心拡大での奇位数持ち上げ補題は不要。
+
+確定した組み立て (`X` が書籍の `P`):
+
+1. `S := C_Q(X)` は `C = C_G(X)` の Sylow 2 かつ `F` の Sylow 2、その像 `T` は
+   `F/Z(F) ≅ standardPermGroup n` の Sylow 2。
+2. `exists_ne_one_odd_centralizing_involutions_of_sylowTwo` を `T` に当てて
+   `d ≠ 1`, 奇位数, `T` の involution を全部中心化、を得る。
+3. `d` の**任意の**逆像 `x ∈ F` を取る (`d ≠ 1` ⟹ `x ∉ Z(F)`)。
+4. `y ∈ C_{Q₀}(X)` は 2-元でその像は `T` の involution ⟹ `⁅x, y⁆ ∈ Z(F)`。
+   `Z(F)` 奇 (部品 1) + `commute_of_commutatorElement_mem_of_coprime_natCard`
+   ⟹ **`x` は `C_{Q₀}(X)` を中心化**。
+5. 特に `Commute x s` ⟹ `x ∈ C_G(s) ≤ H` (`centralizer_le_H_of_mem_Q`) ⟹
+   `x = q v` (`q ∈ Q`, `v ∈ V`; 部品 2)。
+6. `V ≤ C_G(X)` (部品 2) ⟹ `q = x v⁻¹ ∈ Q ⊓ C = C_Q(X) ≤ F`、また `v ∈ F`。
+7. `q ∈ Q` は `Q₀ ⊇ C_{Q₀}(X)` を中心化する (`Q0_le_centralizer_Q`) ので、
+   `v` も `C_{Q₀}(X)` を中心化 ⟹ `v ∈ C_V(C_{Q₀}(X)) = X ⊔ W = X` (Galois, `W = ⊥`)。
+8. `X ≤ Z(C)` かつ `F ≤ C` ⟹ `X ⊓ F ≤ Z(F)` ⟹ `image(v) = 1` ⟹ `d = image(q)`。
+   `q` は 2-群 `C_Q(X)` の元だから `d` の位数は 2 冪。`d` は奇位数 ≠ 1 ⟹ 矛盾。∎
