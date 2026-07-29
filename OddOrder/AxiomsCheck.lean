@@ -14092,3 +14092,18 @@ the equivariance that spreads it over an orbit) is proved. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K_of_mem_orbitReprSet
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K_of_orbitReprSet_covers
+
+/-! **Separating the representatives by `Q₀`-membership** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+The book separates `s`, `r`, `r⁻¹` and the `r r^{-k}` by the orders of `r` and of `f(r r^{-k})`.
+Testing membership in `Q₀` is shorter and needs only `r² ≠ 1`: elements of `Q₀` square to `1`,
+so `r ∉ Q₀`, and if `r r^{-k} = z ∈ Q₀` then `z` is a *central* involution of `Q`
+(`Q₀ ≤ Z(Q)`), whence `(r²)^k = (r^k)² = (zr)² = r²` and `C_Q(k) = 1` forces `r² = 1`.
+The same `C_Q(k) = 1` makes `k ↦ r r^{-k}` injective. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_notMem_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_mul_conj_inv_notMem_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_mul_conj_inv_injective

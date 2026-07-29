@@ -179,3 +179,34 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 * **`|Q| = |Q₀|²`**: case (b) は `natCard_Q_eq_sq_or_cube` の sq 側。
 * **`K` の `Q^#` への自由な共役作用を `MulAction` として据える** (
   `exists_mem_orbit_of_card_mul_eq` の適用形)。
+
+
+## 🎯 非共役性の設計が確定 — 書籍の位数論法を `Q₀`-所属テストで置換 (2026-07-29)
+
+書籍 p.118 は `r` と `f(rr^{-k})` の**位数 4** で代表系を分離するが、
+**「`Q₀` に属すか」で判定する方が短く、必要な入力は `r² ≠ 1` だけ**
+(`r⁴ = 1` = Suzuki 2-群の指数 4 は**要らない**)。
+
+### landing 済 (この設計の基礎)
+
+| 定理 | 内容 |
+|---|---|
+| `structureConjugator_notMem_Q0` | `r ∉ Q₀` (`Q₀` の元は 2 乗 1) |
+| `structureConjugator_mul_conj_inv_notMem_Q0` | **`rr^{-k} ∉ Q₀`** (`k ≠ 1`) — `z ∈ Q₀` は `Q` の中心的 involution ゆえ `(r²)^k = (zr)² = r²`、`C_Q(k) = 1` で `r² = 1` に矛盾 |
+| `structureConjugator_mul_conj_inv_injective` | `k ↦ rr^{-k}` は単射 (自由作用のみ) |
+
+### 残る分離 (すべて設計済)
+
+| 対 | 方法 | 状態 |
+|---|---|---|
+| `s` vs `r` / `r⁻¹` / `rr^{-k}` | `Q₀` は `K`-不変、`s ∈ Q₀`、他は `∉ Q₀` | 補題 `conj_mem_Q0_of_mem_KSet` を書くだけ |
+| `r` vs `r⁻¹` | `r⁻¹ = r^a` なら `a` の位数 `n` が奇 ⟹ `r = r^{aⁿ} = r^{(−1)ⁿ} = r⁻¹` ⟹ `r² = 1` | 反復の帰納 (~25 行) |
+| `r` vs `rr^{-k}` | (1) より `f(r^a) = a s a⁻¹ ∈ Q₀`、一方 **`f(rr^{-k}) = k (r r^{-(kℓ)⁻¹})⁻¹ k⁻¹ ∉ Q₀`** | (4) の `f` 成分を export すれば従う |
+| `r⁻¹` vs `rr^{-k}` | 同様に `g(r⁻¹) = s ∈ Q₀`、`g(rr^{-k}) = r r^{-ℓ⁻¹} ∉ Q₀` (`ℓ ≠ 1` は landing 済) | `g` 成分を export すれば従う |
+| `rr^{-k₁}` vs `rr^{-k₂}` | **p.119 の体同一視 (5)(6)(7)** | ← 唯一の実質的残作業 |
+| `rr^{-k} ≠ r⁻¹` (濃度用) | `k⁻¹r⁻¹k = r⁻²` は位数を保たない (`orderOf r` は 2 冪、`r² ≠ 1`) | 短い |
+
+⚠ `f(rr^{-k}) = k (r r^{-(kℓ)⁻¹})⁻¹ k⁻¹` の導出 (可換性不要):
+(4) の `f = (k²ℓ) r (k²ℓ)⁻¹ · k r⁻¹ k⁻¹` を `k` で戻すと `w r w⁻¹ · r⁻¹` (`w = kℓ`)、
+これは `(r · w r⁻¹ w⁻¹)⁻¹ = (r r^{-w⁻¹})⁻¹`。`kℓ ≠ 1` は `f ≠ 1` から。
+⟹ **(4) の三成分すべてを export する補題**を足すのが次の一手。
