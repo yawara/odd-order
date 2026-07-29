@@ -225,6 +225,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.NilpotentQuotient
 import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Existence
 import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
 import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Defs
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Structure
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsFaithfulOrbit

@@ -74,12 +74,12 @@ def fittingPPrimePart (G : Type*) [Group G] (p : ℕ) : Subgroup G :=
 def pCentralizer (G : Type*) [Group G] (p : ℕ) : Subgroup G :=
   Subgroup.centralizer ((fittingPPrimePart G p : Subgroup G) : Set G)
 
-theorem isNilpotentPiPart_fittingPPrimePart [Finite G] [IsSolvable G] (p : ℕ) :
-    IsNilpotentPiPart (Ch01.fitting G) (fittingPPrimePart G p) ({p}ᶜ) :=
-  isNilpotentPiPart_nilPiPart _ inferInstance
+theorem isHallPart_fittingPPrimePart [Finite G] [IsSolvable G] (p : ℕ) :
+    IsHallPart (Ch01.fitting G) (fittingPPrimePart G p) ({p}ᶜ) :=
+  isHallPart_nilPiPart _ inferInstance
 
 theorem fittingPPrimePart_le [Finite G] [IsSolvable G] (p : ℕ) :
-    fittingPPrimePart G p ≤ Ch01.fitting G := (isNilpotentPiPart_fittingPPrimePart p).le
+    fittingPPrimePart G p ≤ Ch01.fitting G := (isHallPart_fittingPPrimePart p).le
 
 /-- `F_{p'}` は共役で不変 (`F(G)` が正規で `π`-部分が一意だから)。 -/
 theorem fittingPPrimePart_map_conj [Finite G] [IsSolvable G] (p : ℕ) (g : G) :
@@ -92,7 +92,7 @@ theorem fittingPPrimePart_map_conj [Finite G] [IsSolvable G] (p : ℕ) (g : G) :
 
 instance fittingPPrimePart_normal [Finite G] [IsSolvable G] (p : ℕ) :
     (fittingPPrimePart G p).Normal :=
-  Subgroup.normal_iff_map_conj_eq.mpr fun g => fittingPPrimePart_map_conj p g
+  nilPiPart_normal inferInstance _
 
 /-- 正規部分群の中心化群は正規。 -/
 theorem normal_centralizer {N : Subgroup G} (hN : N.Normal) :
@@ -112,40 +112,40 @@ instance pCentralizer_normal [Finite G] [IsSolvable G] (p : ℕ) : (pCentralizer
 /-- `p ≠ q` なら `F(G)` の `{p}`-部分は `F_{q'}` に入る (`{p}`-群は `{q}ᶜ`-群)。 -/
 theorem nilPiPart_singleton_le_fittingPPrimePart [Finite G] [IsSolvable G] {p q : ℕ}
     (hpq : p ≠ q) : nilPiPart (Ch01.fitting G) ({p} : Set ℕ) ≤ fittingPPrimePart G q := by
-  have hp := isNilpotentPiPart_nilPiPart (N := Ch01.fitting G) ({p} : Set ℕ) inferInstance
+  have hp := isHallPart_nilPiPart (N := Ch01.fitting G) ({p} : Set ℕ) inferInstance
   refine le_nilPiPart_of_isPiGroup inferInstance hp.1 (fun r hr => ?_)
   have hrp : r = p := by simpa using hp.isPiGroup r hr
   simpa [hrp] using hpq
 
 /-- `p ≠ q` なら `F(G) ≤ F_{p'} ⊔ F_{q'}`。
 
-`F(G) = F_p ⊔ F_{p'}` (`IsNilpotentPiPart.sup_eq`) で `F_p ≤ F_{q'}`。 -/
+`F(G) = F_p ⊔ F_{p'}` (`IsHallPart.sup_eq`) で `F_p ≤ F_{q'}`。 -/
 theorem fitting_le_sup_fittingPPrimePart [Finite G] [IsSolvable G] {p q : ℕ} (hpq : p ≠ q) :
     Ch01.fitting G ≤ fittingPPrimePart G p ⊔ fittingPPrimePart G q := by
   have hsup : nilPiPart (Ch01.fitting G) ({p} : Set ℕ) ⊔ fittingPPrimePart G p
       = Ch01.fitting G :=
-    IsNilpotentPiPart.sup_eq (isNilpotentPiPart_nilPiPart _ inferInstance)
-      (isNilpotentPiPart_fittingPPrimePart p)
+    IsHallPart.sup_eq (isHallPart_nilPiPart _ inferInstance)
+      (isHallPart_fittingPPrimePart p)
   rw [← hsup]
   exact sup_le ((nilPiPart_singleton_le_fittingPPrimePart hpq).trans le_sup_right) le_sup_left
 
 /-- **Mann**: `F(G)` を含む冪零部分群 `K` の `{p}`-部分は `C(p)` に入る。
 
 `F_{p'}` は `K` の `{p}ᶜ`-部分 `B` に含まれ (`le_nilPiPart_of_isPiGroup`)、`K` が冪零なので
-`{p}`-部分は `B` と元ごとに可換 (`IsNilpotentPiPart.commute`)。よって `{p}`-部分は
+`{p}`-部分は `B` と元ごとに可換 (`IsHallPart.commute`)。よって `{p}`-部分は
 `F_{p'}` を中心化する。 -/
 theorem nilPiPart_singleton_le_pCentralizer [Finite G] [IsSolvable G] {K : Subgroup G}
     (hK : Group.IsNilpotent ↥K) (hFK : Ch01.fitting G ≤ K) (p : ℕ) :
     nilPiPart K ({p} : Set ℕ) ≤ pCentralizer G p := by
-  have hA := isNilpotentPiPart_nilPiPart (N := K) ({p} : Set ℕ) hK
-  have hB := isNilpotentPiPart_nilPiPart (N := K) (({p} : Set ℕ)ᶜ) hK
+  have hA := isHallPart_nilPiPart (N := K) ({p} : Set ℕ) hK
+  have hB := isHallPart_nilPiPart (N := K) (({p} : Set ℕ)ᶜ) hK
   have hFB : fittingPPrimePart G p ≤ nilPiPart K (({p} : Set ℕ)ᶜ) :=
     le_nilPiPart_of_isPiGroup hK ((fittingPPrimePart_le p).trans hFK)
-      (isNilpotentPiPart_fittingPPrimePart p).isPiGroup
+      (isHallPart_fittingPPrimePart p).isPiGroup
   intro x hx
   rw [pCentralizer, Subgroup.mem_centralizer_iff]
   intro h hh
-  exact (IsNilpotentPiPart.commute hK hA hB x hx h (hFB hh)).symm
+  exact (IsHallPart.commute hK hA hB x hx h (hFB hh)).symm
 
 /-- 2 つの部分群の中心化群の交わりは、それらの生成する部分群の中心化群。 -/
 theorem centralizer_inf_le_centralizer_sup (A B : Subgroup G) :

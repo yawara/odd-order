@@ -5799,9 +5799,17 @@ arXiv:2408.15622 "Counting in nilpotent injectors and Carter subgroups" の Rema
   **`nilPiPart_singleton_le_pCentralizer`** (`F` を含む冪零部分群の `{p}`-部分は `C(p)` 内)。
   補助として `normal_centralizer` (正規部分群の中心化群は正規) と
   `centralizer_inf_le_centralizer_sup`。
-* ⬜ **`NilpotentInjector/Structure.lean`** — 次: `C(p)` が `S_q` を正規化 /
-  injector の `{p}`-部分は `C(p)` の Sylow `p` / 逆向き。
-* ⬜ **`NilpotentInjector/Conjugacy.lean`** — 素数ごとの帰納で共役性。
+* ✅ **`NilpotentInjector/Structure.lean`** — **Mann の核心補題**
+  `map_conj_eq_self_of_mem_pCentralizer`: `p ≠ q` なら `C(p)` の元は `C(q)` の
+  Sylow `q`-部分群 `S` を正規化する。補助 = `commutator_mem_centralizer_fitting`
+  (`C(p)`, `C(q)` の元の交換子は `C_G(F)` 内) / `isNilpotent_centralizer_fitting` /
+  `centralizer_fitting_le_pCentralizer`。
+  ⚠ 述語は `IsNilpotentPiPart` → **`IsHallPart` に改名** (定義自体は `N` の冪零性を
+  要求せず、3C.8 では `N = C(q)` (非冪零) にも使うため)。
+* ⬜ **`NilpotentInjector/Injector.lean`** — 次: injector の `{p}`-部分が `C(p)` の
+  Sylow `p` であること (と逆)。`I = ⨆_p I_p` の代わりに
+  「`∀ p, |I|_p ∣ |I ⊓ J|` ⟹ `|I| ∣ |I ⊓ J|`」で押す予定。
+* ⬜ **`NilpotentInjector/Conjugacy.lean`** — 素数ごとの帰納 (`Finset` 上) で共役性。
 
 `C_G(F(G)) ≤ F(G)` は `OddOrder.GroupTheory.centralizer_fitting_le_fitting` を使う。
 
