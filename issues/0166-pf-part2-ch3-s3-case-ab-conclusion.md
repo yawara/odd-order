@@ -90,3 +90,30 @@ theorem theoremAConclusion_of_orderFiveCarrier_subgroup
 * pp. 119–121 = `references/peterfalvi/pages/peterfalvi-p{119,120,121}.png`
 * 上流 = [0165](closed/0165-pf-part2-ch3-s2-order-five.md)
 * 下流 = §3 本体 (`S₁ ⋊ K₁W₁` モデル, pp. 119–121) → Ch. IV (PSU(3,q) の特徴付け)
+
+## 進捗 (2026-07-29)
+
+新 leaf **`StructureOfH/CaseABConclusion.lean`** (sorry ゼロ):
+
+| 定理 | 内容 |
+|---|---|
+| `mem_orderFiveCarrier_of_mem_{Q,K}` / `t_mem_orderFiveCarrier` | `Q`, `K`, `t` は担体に入る |
+| `conj_mem_orderFiveCarrier_of_mem_V` | `V` が担体を正規化 |
+| `H_le_orderFiveCarrier_sup_V` | `H = Q·D`, `D = V ⊔ K` から `H ≤ ⟨G₀, V⟩` |
+| **`orderFiveCarrier_sup_V_eq_top`** | `G = ⟨G₀, V⟩` (`exists_canonicalForm`) |
+| **`normal_of_orderFiveCarrier`** | `G₀ ⊴ G` |
+| **`eq_one_of_mem_V_of_mem_orderFiveCarrier`** | `G₀ ∩ V = 1` |
+| **`theoremAConclusion_of_orderFiveCarrier_subgroup`** | `V ≠ 1` ⟹ `¬ IsSimpleGroup G` ⟹ Theorem A の結論 |
+| `theoremAConclusion_of_caseB` | case (b) 版 (`coe_typeASubgroup` 経由) |
+| `coe_orderThreeGeneratedSubgroup_eq_orderFiveCarrier` | case (a) (`S = Q₀`) で Ch. I §3 Lemma 4 の担体が一致 |
+| `theoremAConclusion_of_caseA` | case (a) 版 |
+
+⚠ `|G/G₀| = |V|` は結論に不要なので未形式化 (`G₀ ⊓ V = ⊥` と `G₀ ⊔ V = ⊤` から出る)。
+
+### 残り
+
+`SecondCaseHypothesis.trichotomy` から直接流す配線が未。**障害は 1 点だけ**:
+trichotomy の case (b) 枝は `IsTypeA ∧ orderOf (st) = 5 ∧ W = ⊥` を返すが
+`|Q| = |Q₀|²` を返さない (分岐条件 `natCard_Q_eq_sq_or_cube` の sq 側そのものなので、
+`WNeBot.lean` の当該枝に連言を 1 本足せば済む)。あるいは `IsTypeA` から
+`|Q| = |F|²`, `|Q₀| = |Z(Q)| = |F|` を導いて仮説を落とす。
