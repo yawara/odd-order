@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.NoncommCoprod
+import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.Holomorph
 import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
 
@@ -900,6 +901,56 @@ theorem exists_simpleFamily_of_isSemisimpleGroup_of_isCharacteristicallySimple [
     (((Subgroup.equivMapOfInjective _ _ (MulAut.conj γ).injective).trans
       (MulEquiv.subgroupCongr hγ)).trans
       (Subgroup.equivMapOfInjective U _ SemidirectProduct.inl_injective).symm)⟩
+
+/-- **9A.8 の abelian 枝 (step 1)**: characteristically simple な可換有限群は
+elementary abelian。
+
+`p` を `|G|` の素因数とすると `K = {x | x ^ p = 1}` は (可換ゆえ) 部分群で,
+自己同型が `x ^ p = 1` を保つので **characteristic**。Cauchy で `K ≠ 1` なので `K = ⊤`,
+すなわち `∀ x, x ^ p = 1`。 -/
+theorem exists_isElementaryAbelian_of_isCharacteristicallySimple [Finite G]
+    (h : IsCharacteristicallySimple G) (hcomm : IsMulCommutative G) :
+    ∃ p : ℕ, p.Prime ∧ IsElementaryAbelian p G := by
+  haveI := h.1
+  haveI := hcomm
+  have hcard : Nat.card G ≠ 1 := fun hc =>
+    (not_subsingleton G) (Nat.card_eq_one_iff_unique.mp hc).1
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcard
+  haveI : Fact p.Prime := ⟨hp⟩
+  refine ⟨p, hp, fun x y => mul_comm' x y, ?_⟩
+  -- `K = {x | x ^ p = 1}` は characteristic な部分群。
+  let K : Subgroup G :=
+    { carrier := {x : G | x ^ p = 1}
+      one_mem' := one_pow p
+      mul_mem' := fun {a b} ha hb => by
+        change (a * b) ^ p = 1
+        rw [Commute.mul_pow (mul_comm' a b), ha, hb, one_mul]
+      inv_mem' := fun {a} ha => by
+        change (a⁻¹) ^ p = 1
+        rw [inv_pow, show a ^ p = 1 from ha, inv_one] }
+  have hKchar : K.Characteristic := by
+    rw [Subgroup.characteristic_iff_comap_le]
+    intro σ x hx
+    have hσ : σ (x ^ p) = 1 := by
+      rw [map_pow]
+      exact hx
+    change x ^ p = 1
+    exact σ.injective (by rw [hσ, map_one])
+  have hKne : K ≠ ⊥ := by
+    obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' p hpdvd
+    intro hbot
+    have hmem : g ∈ K := by
+      change g ^ p = 1
+      rw [← hg]
+      exact pow_orderOf_eq_one g
+    rw [hbot, Subgroup.mem_bot] at hmem
+    rw [hmem, orderOf_one] at hg
+    exact hp.one_lt.ne hg
+  rcases h.2 K hKchar with hbot | htop
+  · exact absurd hbot hKne
+  · intro x
+    have : x ∈ K := htop ▸ Subgroup.mem_top x
+    exact this
 
 end -- 9A.8
 
