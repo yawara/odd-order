@@ -210,3 +210,33 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 (4) の `f = (k²ℓ) r (k²ℓ)⁻¹ · k r⁻¹ k⁻¹` を `k` で戻すと `w r w⁻¹ · r⁻¹` (`w = kℓ`)、
 これは `(r · w r⁻¹ w⁻¹)⁻¹ = (r r^{-w⁻¹})⁻¹`。`kℓ ≠ 1` は `f ≠ 1` から。
 ⟹ **(4) の三成分すべてを export する補題**を足すのが次の一手。
+
+
+## 進捗 (2026-07-29 第 2 セッション末)
+
+**非共役性は 1 対を残して全部 landing**:
+
+| 対 | 定理 | 状態 |
+|---|---|---|
+| `s` vs `r` / `r⁻¹` / `rr^{-k}` | `conj_distinguishedInvolution_mem_Q0` + `..._ne_structureConjugator_mul_conj_inv` | ✅ |
+| `r` vs `r⁻¹` | `structureConjugator_not_conj_inv` (`|K|` 奇の反復) | ✅ |
+| `r` vs `rr^{-k}` | `conj_structureConjugator_ne_mul_conj_inv` (`f` + `Q₀`) | ✅ |
+| `r⁻¹` vs `rr^{-k}` | `conj_structureConjugator_inv_ne_mul_conj_inv` (`g` + `Q₀`) | ✅ |
+| **`rr^{-k₁}` vs `rr^{-k₂}`** | p.119 の体同一視 (5)(6)(7) | ❌ **唯一の残り** |
+
+補助として `exists_tConjTriple_eq` (三成分の export)、`conj_mem_Q0_of_mem_KSet`、
+`tConjLeft/tConjRight_..._notMem_Q0` も landing 済。
+
+### 次セッションの入口 (順に)
+
+1. **`rr^{-k} ≠ r⁻¹`** (濃度用): `k⁻¹r⁻¹k = r⁻²` は位数を保たない
+   (`orderOf r` は 2 冪で `r² ≠ 1` ⟹ `orderOf (r²) = orderOf r / 2`)。
+2. **`|orbitReprSet| = q + 1`**: 上の distinctness 群 + `structureConjugator_mul_conj_inv_injective`。
+3. **p.119**: `S/Q₀ ≅ 𝔽_q`, `K ≅ 𝔽_q^×` の同一視 (`exists_field_realization_K` が使える) の下で
+   `α : S → 𝔽_q` を通し、(1)+(4) から (5) `1+k₂ = a(1+k₁)`, (6) `ℓ₂k₂ = aℓ₁k₁`,
+   (7) `ℓ₂⁻¹k₂⁻² + k₂⁻¹ = a⁻¹(ℓ₁⁻¹k₁⁻² + k₁⁻¹)` を得る。
+   `x_i = ℓ_i⁻¹(k_i⁻¹+1)`, `y_i = k_i⁻¹+ℓ_i` として (5)/(6) と (6)·(7) から
+   `x₁ = x₂`, `y₁ = y₂`、`(x_i+1)k_i⁻¹ = x_i y_i + 1` で `x_i ≠ 1` なら `k₁ = k₂`。
+   `x_i ≠ 1` は「`α(fg) = 0` ⟹ `fg ∈ Q₀` かつ `(t rr^{-k} t)² = g t (fg)^h t f`、
+   `t(fg)^h t ∈ I ∩ (G−H)` と `fg ∈ I ∩ H` の involution 積が involution」で矛盾。
+4. `exists_mem_orbit_of_card_mul_eq` に流して `hcover` ⟹ §2 Proposition 完成。
