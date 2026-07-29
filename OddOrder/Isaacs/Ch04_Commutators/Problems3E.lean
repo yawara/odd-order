@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Conjugacy
+import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 
 /-!
 # Isaacs §3E の演習 (書籍 pp. 106-107)
@@ -14,6 +15,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 3E (coprime action)�
 ⚠ **置き場が Ch.4 なのは意図的**: §3E の主定理群 (Thm 3.23 A-不変 Sylow, Thm 3.24
 Glauberman, Thm 3.27-3.30) は Ch.4 の交換子機構を要するため
 `Ch04_Commutators/ForwardFromCh03.lean` に置かれている。演習も同じ層に置く。
+
+⚠ 固定部分群は既存の `OddOrder.GroupTheory.fixedSubgroup φ K` を使う (重複定義しない)。
 
 * **3E.1 の Hint 前半** `exists_ne_one_fixed_of_isPGroup_of_dvd` —
   `p`-群 `P` が `G` に作用し `p ∣ |G|` なら `C_G(P) ≠ 1`。
@@ -175,6 +178,272 @@ theorem exists_isAInvariant_isPGroup_of_isSolvable [IsSolvable G] [Nontrivial G]
     rw [hKinv] at hmap
     rw [Subgroup.pointwise_smul_def]
     exact hmap.symm
+
+/-! ### 3E.1 (`A` 可解の場合) の部品 -/
+
+/-- **3E.1 (`A` 可解) の case (iii)**: `B ⊴ A` が `G` に互いに素に作用し
+`C_G(B) = 1` なら, 各素数 `q` について `A`-不変な Sylow `q`-部分群がある。
+
+Thm 3.23(a) で `B`-不変 Sylow `S` を取る。`a ∈ A` について `(φ a) • S` も `B`-不変
+(`B ⊴ A`) な Sylow なので, Thm 3.23(b) より `C_G(B) = 1` の元で共役, すなわち一致する。 -/
+theorem exists_isAInvariant_sylow_of_normal_of_trivial_fixed (φ : A →* MulAut G)
+    {B : Subgroup A} [B.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥B) (Nat.card G))
+    (hsolv : IsSolvable ↥B ∨ IsSolvable G)
+    (hfix : ∀ g : G, (∀ b : ↥B, (φ (b : A)) g = g) → g = 1)
+    (q : ℕ) [Fact q.Prime] :
+    ∃ S : Sylow q G, OddOrder.Isaacs.Ch03.IsAInvariant φ (S : Subgroup G) := by
+  set ψ : ↥B →* MulAut G := φ.comp B.subtype with hψ
+  obtain ⟨S, hS⟩ := exists_aInvariant_sylow (φ := ψ) hcop hsolv q
+  refine ⟨S, fun a => ?_⟩
+  have hcoe : (((φ a : MulAut G) • S : Sylow q G) : Subgroup G)
+      = (φ a : MulAut G) • (S : Subgroup G) := rfl
+  -- `(φ a) • S` も `B`-不変
+  have hconj : OddOrder.Isaacs.Ch03.IsAInvariant ψ
+      ((((φ a : MulAut G) • S : Sylow q G)) : Subgroup G) := by
+    rw [hcoe]
+    intro b
+    have hb : (b : A) ∈ B := b.2
+    have hmem : a⁻¹ * (b : A) * a ∈ B := by
+      simpa using (‹B.Normal›.conj_mem (b : A) hb a⁻¹)
+    have hkey : ψ b • ((φ a : MulAut G) • (S : Subgroup G))
+        = (φ a : MulAut G) • (ψ ⟨a⁻¹ * (b : A) * a, hmem⟩ • (S : Subgroup G)) := by
+      rw [smul_smul, smul_smul]
+      congr 1
+      change φ (b : A) * φ a = φ a * φ (a⁻¹ * (b : A) * a)
+      rw [← map_mul, ← map_mul]
+      congr 1
+      group
+    rw [hkey, hS _]
+  -- Thm 3.23(b) で共役, しかし `C_G(B) = 1`
+  obtain ⟨c, hcfix, hceq⟩ := aInvariant_sylow_conj (φ := ψ) hcop hsolv hS hconj
+  have h1 : MulAut.conj (1 : G) • (S : Subgroup G) = (S : Subgroup G) := by simp
+  rw [hfix c hcfix, h1, hcoe] at hceq
+  exact hceq.symm
+
+omit [Finite A] [Finite G] in
+/-- 固定部分群は `B ⊴ A` について `A`-不変。 -/
+theorem isAInvariant_fixedSubgroup_normal (φ : A →* MulAut G) {B : Subgroup A} [B.Normal] :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (OddOrder.GroupTheory.fixedSubgroup φ B) := by
+  refine OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem.mpr fun a g hg b hb => ?_
+  have hmem : a⁻¹ * b * a ∈ B := by
+    simpa using (‹B.Normal›.conj_mem b hb a⁻¹)
+  have hfix : (φ (a⁻¹ * b * a)) g = g := hg _ hmem
+  have hstep : (φ b) ((φ a) g) = (φ a) ((φ (a⁻¹ * b * a)) g) := by
+    have h1 : (φ b) * (φ a) = (φ a) * (φ (a⁻¹ * b * a)) := by
+      rw [← map_mul, ← map_mul]
+      congr 1
+      group
+    calc (φ b) ((φ a) g) = ((φ b) * (φ a)) g := rfl
+      _ = ((φ a) * (φ (a⁻¹ * b * a))) g := by rw [h1]
+      _ = (φ a) ((φ (a⁻¹ * b * a)) g) := rfl
+  rw [hstep, hfix]
+
+universe u
+
+/-- 3E.1 (`A` 可解の場合) の帰納本体 (`|G|` に関する帰納)。 -/
+private theorem exists_isAInvariant_isPGroup_solvableA_aux :
+    ∀ (n : ℕ) {G : Type u} [Group G] [Finite G] [Nontrivial G]
+      {A : Type*} [Group A] [Finite A] [IsSolvable A] (φ : A →* MulAut G),
+      Nat.card G ≤ n →
+      ∃ (p : ℕ) (H : Subgroup G), p.Prime ∧ H ≠ ⊥ ∧ IsPGroup p ↥H ∧
+        OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+  intro G _ _ _ A _ _ _ φ hcard
+  classical
+  -- `p ∣ |G|` を取れる
+  have hGcard : 1 < Nat.card G := Finite.one_lt_card
+  -- 作用を単射にする
+  set Abar := A ⧸ φ.ker with hAbar
+  set ψ : Abar →* MulAut G := QuotientGroup.kerLift φ with hψ
+  have hψinj : Function.Injective ψ := QuotientGroup.kerLift_injective φ
+  have hψφ : ∀ a : A, ψ (QuotientGroup.mk' φ.ker a) = φ a := fun a => rfl
+  have htransfer : ∀ H : Subgroup G, OddOrder.Isaacs.Ch03.IsAInvariant ψ H →
+      OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
+    intro H hH a
+    have := hH (QuotientGroup.mk' φ.ker a)
+    rwa [hψφ a] at this
+  by_cases hAtriv : Subsingleton Abar
+  · -- 作用は自明: 任意の Sylow でよい
+    obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hGcard.ne'
+    haveI : Fact q.Prime := ⟨hq⟩
+    obtain ⟨S⟩ : Nonempty (Sylow q G) := inferInstance
+    refine ⟨q, (S : Subgroup G), hq, ?_, S.isPGroup', ?_⟩
+    · intro hbot
+      have hcardS := S.card_eq_multiplicity
+      rw [hbot] at hcardS
+      have h1 : Nat.card ↥(⊥ : Subgroup G) = 1 := by simp
+      rw [h1] at hcardS
+      have hfac : 0 < (Nat.card G).factorization q :=
+        Nat.Prime.factorization_pos_of_dvd hq (by omega) hqdvd
+      have hlt : 1 < q ^ (Nat.card G).factorization q := Nat.one_lt_pow hfac.ne' hq.one_lt
+      omega
+    · refine htransfer _ fun a => ?_
+      rw [Subsingleton.elim a 1, map_one]
+      exact one_smul _ _
+  · -- `Ā` は非自明: 極小正規部分群 `B` を取る
+    haveI : Nontrivial Abar := not_subsingleton_iff_nontrivial.mp hAtriv
+    have hBtop : (⊤ : Subgroup Abar) ≠ ⊥ := by
+      intro h
+      obtain ⟨x, hx⟩ := exists_ne (1 : Abar)
+      have hxt : x ∈ (⊤ : Subgroup Abar) := trivial
+      rw [h, Subgroup.mem_bot] at hxt
+      exact hx hxt
+    obtain ⟨B, hB, -⟩ := OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal
+      (⊤ : Subgroup Abar) hBtop
+    haveI hBnormal : B.Normal := hB.1
+    obtain ⟨p₀, hp₀, hBel⟩ := OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hB
+    haveI : Fact p₀.Prime := ⟨hp₀⟩
+    have hBp : IsPGroup p₀ ↥B := fun g => ⟨1, by simpa using hBel.2 g⟩
+    set C : Subgroup G := OddOrder.GroupTheory.fixedSubgroup ψ B with hC
+    have hCinv : OddOrder.Isaacs.Ch03.IsAInvariant ψ C :=
+      isAInvariant_fixedSubgroup_normal ψ
+    -- `C ≠ ⊤` (`ψ` 単射 + `B ≠ ⊥`)
+    have hCne : C ≠ ⊤ := by
+      intro htop
+      haveI : Nontrivial ↥B := (Subgroup.nontrivial_iff_ne_bot B).mpr hB.2.1
+      obtain ⟨b, hb⟩ := exists_ne (1 : ↥B)
+      refine hb ?_
+      have hfix : ∀ g : G, (ψ (b : Abar)) g = g := by
+        intro g
+        have hgC : g ∈ C := by rw [htop]; trivial
+        exact hgC (b : Abar) b.2
+      have : ψ (b : Abar) = 1 := MulEquiv.ext hfix
+      have hb1 : (b : Abar) = 1 := hψinj (by rw [this, map_one])
+      exact Subtype.ext hb1
+    by_cases hCbot : C = ⊥
+    · -- case (iii)
+      have hnotdvd : ¬ p₀ ∣ Nat.card G := by
+        intro hdvd
+        obtain ⟨g, hg1, hgfix⟩ :=
+          exists_ne_one_fixed_of_isPGroup_of_dvd hBp (ψ.comp B.subtype) hdvd
+        have hgC : g ∈ C := fun l hl => hgfix ⟨l, hl⟩
+        rw [hCbot, Subgroup.mem_bot] at hgC
+        exact hg1 hgC
+      have hcop : Nat.Coprime (Nat.card ↥B) (Nat.card G) := by
+        obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hBp
+        rw [hk]
+        exact Nat.Coprime.pow_left _ ((Nat.Prime.coprime_iff_not_dvd hp₀).mpr hnotdvd)
+      obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hGcard.ne'
+      haveI : Fact q.Prime := ⟨hq⟩
+      obtain ⟨S, hS⟩ := exists_isAInvariant_sylow_of_normal_of_trivial_fixed ψ hcop
+        (Or.inl inferInstance) (fun g hg => by
+          have hgC : g ∈ C := fun l hl => hg ⟨l, hl⟩
+          rwa [hCbot, Subgroup.mem_bot] at hgC) q
+      refine ⟨q, (S : Subgroup G), hq, ?_, S.isPGroup', htransfer _ hS⟩
+      intro hbot
+      have hcardS := S.card_eq_multiplicity
+      rw [hbot] at hcardS
+      have h1 : Nat.card ↥(⊥ : Subgroup G) = 1 := by simp
+      rw [h1] at hcardS
+      have hfac : 0 < (Nat.card G).factorization q :=
+        Nat.Prime.factorization_pos_of_dvd hq (by omega) hqdvd
+      have hlt : 1 < q ^ (Nat.card G).factorization q := Nat.one_lt_pow hfac.ne' hq.one_lt
+      omega
+    · -- case (ii): `↥C` に降りる
+      haveI : Nontrivial ↥C := (Subgroup.nontrivial_iff_ne_bot C).mpr hCbot
+      have hClt : Nat.card ↥C < Nat.card G := by
+        obtain ⟨x, hx⟩ : ∃ x : G, x ∉ C := by
+          simpa [Subgroup.eq_top_iff'] using hCne
+        exact Finite.card_subtype_lt (x := x) hx
+      obtain ⟨p, H', hp, hH'ne, hH'p, hH'inv⟩ :=
+        ih (Nat.card ↥C) (lt_of_lt_of_le hClt hcard) (G := ↥C)
+          (A := Abar) (OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hCinv) le_rfl
+      refine ⟨p, H'.map C.subtype, hp, ?_, ?_, htransfer _ ?_⟩
+      · intro hbot
+        refine hH'ne ?_
+        rw [← Subgroup.comap_map_eq_self_of_injective C.subtype_injective H', hbot]
+        simp
+      · exact hH'p.of_injective (Subgroup.equivMapOfInjective H' C.subtype
+          C.subtype_injective).symm.toMonoidHom
+          (Subgroup.equivMapOfInjective H' C.subtype C.subtype_injective).symm.injective
+      · refine OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem.mpr ?_
+        rintro a - ⟨y, hy, rfl⟩
+        exact ⟨(OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hCinv a) y,
+          hH'inv.smul_mem a hy, rfl⟩
+
+/-- **Isaacs Problem 3E.1** (`A` が可解な場合, 書籍 p. 106)。 -/
+theorem exists_isAInvariant_isPGroup_of_isSolvable_aut {G : Type u} [Group G] [Finite G]
+    [Nontrivial G] {A : Type*} [Group A] [Finite A] [IsSolvable A] (φ : A →* MulAut G) :
+    ∃ (p : ℕ) (H : Subgroup G), p.Prime ∧ H ≠ ⊥ ∧ IsPGroup p ↥H ∧
+      OddOrder.Isaacs.Ch03.IsAInvariant φ H :=
+  exists_isAInvariant_isPGroup_solvableA_aux (Nat.card G) φ le_rfl
+
+/-- **Isaacs Problem 3E.2** (書籍 p. 106): 互いに素な作用で `G = HK` (`H`, `K` は `A`-不変)
+なら `C_G(A) = (C_G(A) ∩ H)(C_G(A) ∩ K)`。
+
+`c ∈ C_G(A)` を `c = h₀k₀` と書くと `H ∩ c K` は `A`-不変な `H ∩ K` の剰余類なので,
+Thm 3.27 (`aInvariant_coset_mem_centralizer`) により `A`-固定点 `c'` を含む。
+`c'` は `C ∩ H` に入り `c'⁻¹c ∈ C ∩ K`。 -/
+theorem fixedSubgroup_top_eq_mul (φ : A →* MulAut G)
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {H K : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H)
+    (hK : OddOrder.Isaacs.Ch03.IsAInvariant φ K)
+    (hHK : ∀ g : G, ∃ h ∈ H, ∃ k ∈ K, g = h * k) :
+    ((OddOrder.GroupTheory.fixedSubgroup φ ⊤ : Subgroup G) : Set G)
+      = ((OddOrder.GroupTheory.fixedSubgroup φ ⊤ ⊓ H : Subgroup G) : Set G) *
+        ((OddOrder.GroupTheory.fixedSubgroup φ ⊤ ⊓ K : Subgroup G) : Set G) := by
+  ext c
+  constructor
+  · intro hc
+    have hcfix : ∀ a : A, (φ a) c = c := fun a => hc a trivial
+    obtain ⟨h₀, hh₀, k₀, hk₀, hceq⟩ := hHK c
+    have hcoset : ∀ a : A, ∃ n ∈ H ⊓ K, (φ a) h₀ = h₀ * n := by
+      intro a
+      refine ⟨h₀⁻¹ * (φ a) h₀,
+        Subgroup.mem_inf.mpr ⟨mul_mem (inv_mem hh₀) (hH.smul_mem a hh₀), ?_⟩, by group⟩
+      have hsplit : (φ a) h₀ * (φ a) k₀ = c := by
+        rw [← map_mul, ← hceq, hcfix a]
+      have hval : h₀⁻¹ * (φ a) h₀ = k₀ * ((φ a) k₀)⁻¹ := by
+        have h1 : (φ a) h₀ = c * ((φ a) k₀)⁻¹ := by
+          rw [← hsplit]
+          group
+        rw [h1, hceq]
+        group
+      rw [hval]
+      exact mul_mem hk₀ (inv_mem (hK.smul_mem a hk₀))
+    obtain ⟨c', ⟨n, hn, hc'eq⟩, hc'fix⟩ :=
+      aInvariant_coset_mem_centralizer hCop hSolv (hH.inf hK) hcoset
+    have hnH : n ∈ H := (Subgroup.mem_inf.mp hn).1
+    have hnK : n ∈ K := (Subgroup.mem_inf.mp hn).2
+    refine ⟨c', Subgroup.mem_inf.mpr ⟨fun a _ => hc'fix a,
+        by rw [hc'eq]; exact mul_mem hh₀ hnH⟩,
+      c'⁻¹ * c, Subgroup.mem_inf.mpr ⟨?_, ?_⟩, by group⟩
+    · intro a _
+      rw [map_mul, map_inv, hc'fix a, hcfix a]
+    · have : c'⁻¹ * c = n⁻¹ * k₀ := by
+        rw [hc'eq, hceq]
+        group
+      rw [this]
+      exact mul_mem (inv_mem hnK) hk₀
+  · rintro ⟨x, hx, y, hy, rfl⟩
+    intro a ha
+    rw [map_mul, (Subgroup.mem_inf.mp hx).1 a ha, (Subgroup.mem_inf.mp hy).1 a ha]
+
+/-! ### 3E.4 の核となる不等式 -/
+
+omit [Finite A] in
+/-- **`P ≤ Q` なら `[P : P ⊓ C] ≤ [Q : Q ⊓ C]`** (積の形): `P·(Q ⊓ C) ⊆ Q` と
+`|P·(Q ⊓ C)|·|P ⊓ C| = |P|·|Q ⊓ C|` から。
+
+3E.4 の `p`-部分比較の核 (`P`, `Q` を `A`-不変 Sylow に取る)。 -/
+theorem card_mul_card_inf_le_of_le {P Q C : Subgroup G} (hPQ : P ≤ Q) :
+    Nat.card ↥P * Nat.card ↥(Q ⊓ C) ≤ Nat.card ↥Q * Nat.card ↥(P ⊓ C) := by
+  have hkey := Subgroup.card_HK_mul_card_inf_eq_card_mul_card P (Q ⊓ C)
+  have hinf : P ⊓ (Q ⊓ C) = P ⊓ C := by
+    rw [← inf_assoc, inf_eq_left.mpr hPQ]
+  rw [hinf] at hkey
+  have hsub : ((P : Set G) * ((Q ⊓ C : Subgroup G) : Set G)) ⊆ (Q : Set G) := by
+    rintro - ⟨a, ha, b, hb, rfl⟩
+    exact Q.mul_mem (hPQ ha) (Subgroup.mem_inf.mp hb).1
+  have hle : Nat.card ((P : Set G) * ((Q ⊓ C : Subgroup G) : Set G)) ≤ Nat.card ↥Q :=
+    Nat.card_le_card_of_injective (Set.inclusion hsub) (Set.inclusion_injective hsub)
+  calc Nat.card ↥P * Nat.card ↥(Q ⊓ C)
+      = Nat.card ((P : Set G) * ((Q ⊓ C : Subgroup G) : Set G)) * Nat.card ↥(P ⊓ C) := hkey.symm
+    _ ≤ Nat.card ↥Q * Nat.card ↥(P ⊓ C) := Nat.mul_le_mul_right _ hle
 
 end -- 3E
 

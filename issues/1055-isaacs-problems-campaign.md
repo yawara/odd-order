@@ -33,9 +33,45 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
       **§3D 🎉 完済 (2026-07-29)**: 3D.1(a)(b) / 3D.2 / 3D.3 / 3D.4 / 3D.5 全問
       (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
-      **§3E 進行中 (2026-07-29)**: 3E.1 の Hint 前半 ✅ / **3E.1 (`G` 可解の場合) ✅** /
-      3E.3 ✅ (新 leaf **`Ch04_Commutators/Problems3E.lean`**)。
-      残り = 3E.1 (`A` 可解の場合) / 3E.2 / 3E.4 / 3E.5。
+      **§3E 進行中 (2026-07-29)**: **3E.1 ✅ (両ケース)** / 3E.3 ✅
+      (新 leaf **`Ch04_Commutators/Problems3E.lean`**)。残り = **3E.4 / 3E.5**。
+
+* ✅ **3E.2** `actionFixedSubgroup_eq_mul` (2026-07-29): `c ∈ C` を `c = h₀k₀` と書くと
+  `H ∩ cK` は `A`-不変な `H ∩ K` の剰余類なので Thm 3.27
+  (`aInvariant_coset_mem_centralizer`) が `A`-固定点 `c'` を与える。
+  `c' ∈ C ∩ H` かつ `c'⁻¹c ∈ C ∩ K`。一発 green。
+
+**3E.5 の証明経路 (確定済)**: `K` を `G` の `P/Φ(P)` への作用の核とすると `P ≤ K`。
+逆は「`K` は `p`-群」を示す: `q ≠ p` 素数と `K` の位数 `q` の元 `x` について
+`⟨x⟩` は `P` に互いに素に作用し `P/Φ(P)` 上自明なので **3D.4**
+(`smul_eq_self_of_trivial_mod_frattini`) で `P` に自明に作用、すなわち
+`⟨x⟩ ≤ C_G(P) = C_G(O_p(G)) ≤ O_p(G) = P` (Hall–Higman, `O_{p'}(G) = 1`) となり
+`q`-群が `p`-群に入って矛盾。ゆえに `K` は正規 `p`-群で `K ≤ O_p(G) = P`。
+⚠ 実装コスト = `⟨x⟩ ≤ N_G(P)` の共役作用 `MulDistribMulAction ↥⟨x⟩ ↥P` の plumbing。
+
+**3E.4 の証明経路 (2026-07-29 に原文確認して確定)**:
+書籍 **Lemma 3.32** (p.105) = 「互いに素な作用で `P ∈ Syl_p(G)` が `A`-不変なら
+`P ∩ C ∈ Syl_p(C)`」。**repo に既にある**:
+`Ch04.card_inf_fixedSubgroup_of_aInvariant_sylow` (cardinality 形)。
+これを使って**素数ごとに `p`-部分を比較**する:
+`H` の `A`-不変 Sylow `p` を `P`, `Cor 3.25` (`aInvariant_pSubgroup_le_aInvariant_sylow`)
+で `P ≤ Q` (`Q` は `G` の `A`-不変 Sylow `p`) を取ると
+`[H : H∩C]_p = [P : P∩C]`, `[G : C]_p = [Q : Q∩C]` で,
+`P(Q∩C) ⊆ Q` から `[P:P∩C] ≤ [Q:Q∩C]`。両辺 `p`-冪なので整除。
+全素数で合わせて `[H:H∩C] ∣ [G:C]`。もう一方も同様
+(`|Q∩C|·|P| ≤ |Q|·|P∩C|` は両主張に共通の核)。
+
+* ✅ 核の不等式 `card_mul_card_inf_le_of_le` (2026-07-29 landing):
+  `P ≤ Q` なら `|P|·|Q ⊓ C| ≤ |Q|·|P ⊓ C|` (`P·(Q⊓C) ⊆ Q` と
+  `card_HK_mul_card_inf_eq_card_mul_card` から)。
+* ⬜ 残り = `p`-部分の突き合わせ (`Lemma 3.32` で `|H∩C|_p = |P∩C|` 等) と
+  `Nat.factorization_le_iff_dvd` による組み立て。
+
+⚠ **重複定義の解消 (2026-07-29)**: 一時 `actionFixedSubgroup φ` を新設したが、
+これは既存の `OddOrder.GroupTheory.fixedSubgroup φ K` (`GroupTheory/FixedSubgroup.lean`) の
+`K = ⊤` の場合の重複だったので撤去し、全面的に `fixedSubgroup` へ移行した
+(ラッパー方針)。`isAInvariant_fixedSubgroup_normal` (`B ⊴ A` なら `C_G(B)` は `A`-不変) は
+`fixedSubgroup φ B` の形で残す。
 
 ### §3E の置き場と統制情報 (2026-07-29)
 
@@ -61,12 +97,23 @@ import できない (Ch03 → Ch04 は逆向き)。
   `nilPiPart_map_mulAut` で `A`-不変。**半直積を作る必要は無い**。
   そのために `PiParts.lean` に `IsHallPart.map_mulAut` / `isNilpotent_map_mulAut` /
   `nilPiPart_map_mulAut` (自己同型同変版) を追加した。
-* `A` 可解の場合: `|A|` + `|G|` の帰納。`B ⊴ A` 極小正規 (elementary abelian `p`-群) を取る。
-  * `B` が `G` に自明に作用 ⟹ `A/B` の作用に帰着 (`|A|` 減少)。
-  * `C_G(B) ≠ 1` かつ `C_G(B) < G` ⟹ `A` は `C_G(B)` に作用 (`B ⊴ A`) ので `|G|` 減少。
-  * `C_G(B) = 1` ⟹ 上の Hint 前半の対偶で `p ∤ |G|`, すなわち `(|B|,|G|) = 1`。
-    Thm 3.23 で `B`-不変 Sylow `q` が存在し、Thm 3.23(b) より `C_G(B) = 1` から**一意**。
-    一意なので `A` (が `B` を正規化する) で不変 ⟹ 求めるもの。
+* ✅ `A` 可解の場合 `exists_isAInvariant_isPGroup_of_isSolvable_aut` (2026-07-29 完成)。
+  **`|G|` のみの帰納**に整理した。各段でまず `A` を
+  `A/ker φ` に置き換えて `φ` を単射にすれば「`B` が自明に作用する」分岐が消えるため。
+  `B̄ ⊴ Ā` 極小正規 (elementary abelian `p₀`-群) を取ると `C := C_G(B̄) ≠ ⊤`:
+  * ✅ **case (iii) `C = ⊥`** — `exists_isAInvariant_sylow_of_normal_of_trivial_fixed`
+    (2026-07-29 landing): Hint 前半の対偶で `p₀ ∤ |G|` すなわち `(|B|,|G|) = 1`。
+    Thm 3.23(a) で `B`-不変 Sylow `S` を取ると `(φ a) • S` も `B`-不変 (`B ⊴ A`) なので
+    Thm 3.23(b) が `C_G(B) = ⊥` の元での共役を与え、一致する ⟹ `A`-不変。
+  * ✅ **case (ii) `⊥ ≠ C < ⊤`** — `IsAInvariant.toMulAutHom` (既存, ThreeSubgroups.lean)
+    で `Ā` を `↥C` に作用させ `|C| < |G|` の帰納法の仮説。像を `C.subtype` で `G` へ戻す。
+  * ✅ 前処理は `QuotientGroup.kerLift φ` (単射) + `htransfer`
+    (`IsAInvariant ψ H → IsAInvariant φ H`)。
+  補助 = `actionFixedSubgroup` (固定部分群) / `isAInvariant_actionFixedSubgroup_comp`
+  (`B ⊴ A` なら `C_G(B)` は `A`-不変)。
+  ⚠ **実装の罠**: `IsAInvariant` を `Subgroup.pointwise_smul_def` 経由で展開すると
+  `MulDistribMulAction.toMonoidEnd` が挟まって `rw` が効かない。
+  **`Ch03.isAInvariant_iff_smul_mem` (要素版の特徴付け) を使う**のが正解。
 
 ### 3D.1(b) の基盤 `Ch03_SplitExtensions/PiLength.lean` (2026-07-29 landing)
 
