@@ -822,3 +822,63 @@ Wielandt (9.1) の ambient 版 `natCard_eq_pow_natCard_inf_centralizer_of_kernel
 `exists_two_kSubgroups_unique_of_card_cube` + `conj_mem_of_unique_of_le_V`;
 isotypic 側は `p ∤ q+1` からの固定点数え上げ) と、
 Sz 分岐 (`st` 位数 5 vs 3) を含む 3 分岐の組み立て。
+
+
+## ✅ 2026-07-29 (第 2 セッション): β 完済 + 3 分岐の組み立て完了、残るギャップは 1 点
+
+### landing した部品
+
+| 部品 | 場所 | 状態 |
+|---|---|---|
+| 抽象 Hilbert 90 (半線形固定点、群レベル) | `Appendices/SemilinearField.lean` `Huppert.exists_ne_one_fixed_of_prime_pow_eq_one` | ✅ sorry ゼロ |
+| **β-wire** `C_Q(X) ⊄ Q₀` | `StructureOfH/HilbertNinetyOnQ.lean` `exists_mem_inf_centralizer_not_mem_Q0` | ✅ sorry ゼロ |
+| **3 分岐の組み立て** `W ≠ ⊥` | `StructureOfH/WNeBot.lean` `SecondCaseHypothesis.W_ne_bot_of_card_cube` | sorry 1 (下記) |
+
+`exists_ne_one_fixed_of_prime_pow_eq_one`: 可換 `T` が基本可換 `E` 上既約に作用、
+`g` が `c : T ≃* T` で作用を正規化、`g^p = 1`、`ψ (c t₀) ≠ ψ t₀` ⟹ `g` は非自明固定点を持つ。
+Appendix I Prop 2(a)+(b) で `E` を体上の直線にし、`μ ∘ c = σ ∘ μ` から `σ ≠ 1`、
+`exists_ne_zero_fixed_of_semilinear` を適用するだけ。⚠ `σ ≠ 1` は落とせない。
+
+### `W_ne_bot_of_card_cube` の中身 (3 分岐)
+
+`W = ⊥` を仮定し、素数位数 `P ≤ V` で Ch. I §3 Prop 1(c) を回す:
+
+* **Sz 分岐** — `distinguishedProduct_order = 5` vs `orderOf_st_eq_three_of_card_cube` = 3 ✅
+* **PSU 分岐** — `CentralizerPSUData.false_of_W_eq_bot` ✅
+* **PSL 分岐** — `q₀ := |C_{Q₀}(P)|`、Artin で `|Q₀| = q₀^p`。
+  - `p ∤ q₀−1`: 書籍の Frobenius ルートが有効 ⟹ Wielandt で `|Q| = |Q₀|` に矛盾 ✅
+  - `p ∣ q₀−1`: `p ∣ |Q₀|−1` かつ `p` 奇 ⟹ **`p ∤ |Q₀|+1`** ⟹ `P` が位数 `q²` の
+    `K`-部分群を正規化 ⟹ `not_cQ_isElementaryAbelian_of_kSubgroup` ✅
+
+### ⚠ 残る唯一のギャップ
+
+`Hypothesis.exists_kSubgroupSquare_invariant_of_card_cube` の **type B 分岐**
+(`WNeBot.lean:79` の sorry):
+
+> **type B のとき、位数 `q²` の `K`-部分群はちょうど `q+1` 個ある** (書籍 p.117 の
+> "the number of `K`-subgroups of `S` of order `q²` is `q + 1`")。
+
+⟹ `p ∤ q+1` から `P` が固定するものが存在する。
+非 type B 側は `exists_two_kSubgroups_unique_of_card_cube` + `conj_mem_of_unique_of_le_V`
+で既に証明済 (`p ∤ q+1` すら不要 — 2 個を奇位数が入れ替えられないだけ)。
+
+**内容**: type B では `S/Q₀` が `𝔽₂[K]`-加群として isotypic (2 つの既約成分が同型)。
+`End_K(既約) ≅ 𝔽_q` 上 2 次元となり、位数 `q` の部分加群 = 射影直線の点 = `q+1` 個。
+`TwoKSubgroups.lean` の `nonempty_kEquivariantMulEquiv_of_third_invariant` /
+`isTypeB_of_isomorphicOrderQModuleSplit_of_card_eq_cube` が逆向き
+(3 つ目の不変部分群 ⟹ type B) を持つので、その順方向。
+
+### 代替ルート (β 経由) も可能だが同じ入力を要する
+
+`HilbertNinetyOnQ.lean` の β (`C_{N/Q₀}(X) ≠ 1`) も **`X`-不変な `K`-部分群 `N`**
+を入力に取るので、上のギャップを迂回しない。迂回するには
+「`K`-軌道 (`q+1` 個) のうち `X`-不変なものを取り、その上で torsor 版 Hilbert 90」
+が必要 (部分加群でなく軌道でよい) — こちらは `Q₀` の体モデル
+(`exists_semilinear_equiv`) と自由作用の軌道数え上げを要する。
+**type B の数え上げの方が書籍に忠実かつ局所的**なので、そちらを先に試す。
+
+### `trichotomy` の `hWcube` は据え置き
+
+`SecondCaseHypothesis.trichotomy` は現在 AxiomsCheck 登録済 (sorry-free) なので、
+`W_ne_bot_of_card_cube` (sorry 1) を今配線すると axioms が退行する。
+**ギャップが閉じたら `hWcube` を除去して配線する**。
