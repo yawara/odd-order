@@ -5736,8 +5736,40 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   - ⚠ **要 upstream**: 「`G/Φ(G)` 冪零 ⟹ `G` 冪零」。repo/mathlib に無ければ
     Frattini 論法 (`P ∈ Syl_p(G)`, `PΦ(G) ⊴ G` ⟹ `G = N_G(P)Φ(G) = N_G(P)`) で自作する。
 
-**3C.8 (nilpotent injector)** は 3C.7 の後。`F(G)` を含む極大冪零部分群の共役性で、
-同型の帰納 (極小正規 + Hall/Sylow 分解) が効くはず。3C.7 の部品を再利用する。
+### 3C.8 (nilpotent injector) — 2026-07-29 に着手, 証明経路を選定中
+
+書籍の文言 (p. 91, 実測):
+> Let `G` be solvable. A nilpotent injector of `G` is a nilpotent subgroup `I` containing
+> the Fitting subgroup `F(G)`, and maximal with this property. Prove that all nilpotent
+> injectors of `G` are conjugate in `G`.
+
+これは **Fischer の定理** (Fitting class `𝔑` の injector の共役性) の特別な場合で、
+3C.7 と同様に書籍は証明を与えない。
+
+**検討した 2 経路 (2026-07-29)**:
+
+1. **FGH (Fischer–Gaschütz–Hartley) 型の帰納**: `N ⊴ G` に対し `I ⊓ N` が `N` の
+   injector であることを使い、`N` 内共役 + Frattini で `G = N·N_G(I ⊓ N)` に落とす。
+   ⚠ **難所**: 「極大冪零 ⊇ `F(G)`」という**特徴づけ**から出発すると、`H := N_G(I ⊓ N) < G`
+   に落としたとき `F(H) ≤ I` が自明でない。本来の injector の定義
+   (「全ての subnormal `M` に対し `I ⊓ M` が `M` の極大冪零部分群」) を別途導入して
+   同値性を示す必要がありそう。
+2. **`D_p := C_G(O_{p'}(G))` による直接的な特徴づけ**: `I ⊇ F` 冪零なら Sylow 分解
+   `I = ∏ I_p` について `I_p ≤ D_p` が容易に出る (`I_q ⊇ O_q(G)` と `[I_p, I_q] = 1`)。
+   **`I_p ∈ Syl_p(D_p)`** が言えれば Sylow 共役性に帰着できる。
+   ⚠ **難所**: `I_p < S ∈ Syl_p(D_p)` から `x ∈ N_S(I_p) \ I_p` を取っても
+   `[x, I_q] = 1` (`q ≠ p`) が出ない。`[D_p, D_q] ≤ D_p ⊓ D_q ≤ C_G(F) = Z(F)`
+   までは押さえたが、そこから先が未詰め。`F(G) = O_p(G)` の場合 (= `O_{p'}(G) = 1`) は
+   `I_q ≤ C_G(F) ≤ F` が `q`-群かつ `p`-群を強いて `I_q = 1`, `D_p = G` となり
+   claim は成立する (検算済)。
+   さらに **共役元の同時性** (全素数で同じ `g` を取る) も要処理。
+
+**次の一手**: 経路 2 の `I_p ∈ Syl_p(D_p)` を詰めるか、経路 1 の injector 定義を
+正面から導入するかを決める。文献 (Doerk–Hawkes *Finite Soluble Groups* Ch. IX) の
+参照も検討する。
+
+`F(N) = F(G) ⊓ N` (`N ⊴ G`) と `C_G(F(G)) ≤ F(G)`
+(`OddOrder.GroupTheory.centralizer_fitting_le_fitting`) はどちらの経路でも必要。
 
 ### 3C.7 実装進捗 (2026-07-28 開始 → 2026-07-29 完成)
 
