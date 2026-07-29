@@ -277,6 +277,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StronglyReal
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.ExceptionalNearField
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
@@ -341,7 +342,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 13300
+set_option linter.style.longFile 13400
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -13272,3 +13273,37 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 -- 濃度から一致 ⟹ 差分を戻すと `χ_ℓ` 列が相殺する。
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S06.subsum_eq_column_of_third_column
+
+/-! **Peterfalvi Part II, Ch. III, Theorem C — COMPLETE** (issue 0162, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/CoherenceContradiction.lean`, pp. 115–116.
+
+Under (C1) (`V ≠ 1`, and `C_G(P)` has 2-rank ≥ 2 for every prime-order `P ≤ V`)
+the Suzuki-appendix group `Q` is a `2`-group.  This closes the last structural
+gap of Ch. III §1 and supplies the `Q₁ = 1` that Ch. II's first case takes as a
+hypothesis (`card_Q_eq_two_pow_of_Q1_eq_bot`).
+
+The book's steps (1)–(13), all landed and sorry-free:
+
+* (1)(2) `D` acts fixed-point-freely on `Q₁`, and `Q ∩ Q^x = 1` for `x ∈ G − H`
+  (`StructureOfH/Basic.lean`) — the Appendix IV hypotheses.
+* (3) Feit–Sibley ⟹ `𝒮 = {χ ∈ Irr(H) | Q₁ ⊄ Ker χ}` is coherent for `Ind_H^G`.
+* (4)–(6) the linear `λ ≠ 1_H` with `QK ⊆ Ker λ`; `QK` is a Hall subgroup of the
+  **solvable** `H`, so Hall's theorem + Ch. I §3 Lemma 2 give `λ(x^g) = λ(x)`
+  (`StructureOfH/LinearCharacter.lean`).
+* (7)(8) `⟨Ind λ, Ind λ⟩ = 2` via the permutation character, so
+  `Ind λ = f₁ + f₂` with `f_j ∈ Irr(G) ∖ {1_G}`
+  (`StructureOfH/InducedLambda.lean`).
+* (9)(10) each `f_j` is orthogonal to every coherent member image
+  (`Appendices/FeitSibleyCoherentImage.lean`).
+* (11)(12) `Res f_j = b_j(∑ aᵢχᵢ) + ψ_j` and `b_j(|H| − |H/Q₁|) ≤ n_j·d`, whence
+  `(b₁+b₂)·|S|·d·(|Q₁|−1) ≤ (|Q|+1)·d` forces some `b_j = 0`, i.e.
+  `Q₁ ⊆ Ker f_j`.
+* (13) `Ker f_j` is a proper non-trivial normal subgroup ⟹ `G` is not simple ⟹
+  Ch. I §3 Prop 2 + Lemma 1 give `Q₁ = 1`, contradicting `Q₁ ≠ 1`.
+
+`isPGroup_two_Q` is the book's phrasing; `Q1_eq_bot` is the form the proof
+produces (`Q₁` is the odd normal `2`-complement of the nilpotent `Q`). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.Q1_eq_bot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.isPGroup_two_Q

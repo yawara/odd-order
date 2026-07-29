@@ -152,6 +152,18 @@ fpf より `δ² = 1` ⟹ `|D|` 奇より `δ = 1` ⟹ `z = z⁻¹` ⟹ `z² = 1
       Feit–Thompson で可解 → `commutator (H/QK) ≠ ⊤` →
       `exists_linearCharacter_leKer_QK`
 - [x] **step 13 (終端): `Q₁ = 1`** (2026-07-28) — `Q1_eq_bot_of_not_isSimpleGroup`
+- [x] step 5: `QK` は `H` の Hall 部分群 (2026-07-28)
+- [x] step 6: `λ(x^g) = λ(x)` (`x, x^g ∈ H`) — `apply_eq_of_isConj` (2026-07-28、`7a1814298`)
+- [x] step 7: `⟨Ind λ, Ind λ⟩ = 2` (置換指標 + Burnside、新 leaf
+      `GroupTheory/RepresentationTheory/PermutationCharacter.lean`) (2026-07-28)
+- [x] step 8: `Ind λ = f₁ + f₂` (`f_j ∈ Irr(G) ∖ {1_G}`) — `exists_induce_eq_add_irreducible`
+- [x] step 9: anchor `χ₁ ∈ 𝒮` (2026-07-28、`841b99119`) — `exists_anchor`
+- [x] step 10: `f_j` は全メンバー像と直交 (2026-07-28、`31f942dca`)
+      — `inner_constituent_extension_eq_zero`
+- [x] step 11: `Res f_j` の多重度が比例 (2026-07-28、`79b2ca365`) — `inner_restrict_eq_mul`
+- [x] step 12: 次数評価 `b·(|H| − |H/Q₁|) ≤ n·d` (2026-07-28、`07e54377a`)
+      — `mul_card_sub_le_of_inner_restrict`
+- [x] **🎉 最終結線: `Q1_eq_bot` + `isPGroup_two_Q`** (2026-07-29) — 下記
 
 ### step 3b の材料 (2026-07-28 実測)
 
@@ -485,3 +497,59 @@ theorem apply_eq_of_isConj_piPrime (ind) (hQ1) {θ} (hθ) (hdeg) (hker)
    `λ((x')⁻¹ x x') = λ(x)` として括り出す。
 5. `⟨λ·φ, λ⟩ = ⟨φ, 1_H⟩` 型の内積計算 (λ 線形指標)。
 6. 連鎖の組み立てで `⟨Ind λ, Ind λ⟩ = 2`。
+
+## 🎉 完了 (2026-07-29) — Theorem C が axiom-clean で landing
+
+`StructureOfH/CoherenceContradiction.lean` (334 → 366 行):
+
+| 定理 | 内容 |
+|---|---|
+| `SecondCaseHypothesis.Q1_eq_bot` | `(C1)` + Theorem A の帰納法仮説の下で `Q₁ = ⊥` |
+| `SecondCaseHypothesis.isPGroup_two_Q` | **Theorem C の書籍表記**: `IsPGroup 2 Q` |
+
+両方 `[propext, Classical.choice, Quot.sound]` のみ (AxiomsCheck 13306/13308 で機械検証)。
+フルビルド green (4892 jobs)、`bin/check-warnings --strict` 警告ゼロ、sorry 非退行。
+
+### 最終結線でやったこと (step (11)–(13) の算術と終端)
+
+step (12) の単成分不等式 `b_j·(|H| − |H/Q₁|) ≤ n_j·d` を書籍の全体評価に組み直す部分:
+
+1. **`|H| − |H/Q₁| = |S|·d·(|Q₁|−1)`** — `card_H_eq` (`|H| = |Q|·|D|`) と
+   `card_sylowTwoOfQ_mul_card_Q1` (`|Q| = |S|·|Q₁|`) に加え、
+   商の位数 `|H/Q₁| = |S|·d` を `card_mul_index` + `subgroupOfEquivOfLe` で出す。
+2. **`n₁ + n₂ = |Q| + 1`** — `induce_apply_one_eq` (`(Ind λ)(1) = [G:H] = |Q|+1`) を
+   `hsum : Ind λ = f₁ + f₂` で分けて `exact_mod_cast`。
+3. **`b₁ + b₂ ≤ 1`** — 背理法。`2 ≤ b₁+b₂` と 1.+2. から
+   `2·|S|·d·(|Q₁|−1) ≤ (|S|·|Q₁| + 1)·d`。`|S| ≥ 2` (`Q_even` + `|Q₁|` 奇で
+   2 が `|S|` 側に落ちる)、`|Q₁| ≥ 3` (奇 + `≠ 1`)、`d ≥ 1` を入れて `nlinarith` で矛盾。
+   ⚠ ℕ 減算なので `|Q₁| = k + 3` に置いてから `q1 - 1 = k + 2` を潰しておく。
+4. **`b_j = 0` ⟹ `Q₁ ⊆ Ker f_j`** — step (11) の `inner_restrict_eq_mul`
+   (`⟨Res f, χ⟩ = a_χ · b`) で全 `χ ∈ 𝒮` について内積 0 にし、
+   `mem_characterKernel_of_forall_inner_restrict_eq_zero` へ。
+5. **`Ker f_j` が真の非自明正規部分群** — 正規性は `f.conj_eq`、`≠ ⊥` は 4.、
+   `≠ ⊤` は「全域で `f = f(1)`」⟹ `⟨f,f⟩ = f(1)²  = 1` ⟹ `f(1) = 1` ⟹ `f = 1_G`
+   (`hf₁t`/`hf₂t` に矛盾)。
+6. `Q1_eq_bot_of_not_isSimpleGroup` (Ch.I §3 Prop 2 + Lemma 1) で `Q₁ = ⊥`、
+   背理法の仮定 `Q₁ ≠ ⊥` に矛盾。
+
+### `isPGroup_two_Q` (書籍表記への変換)
+
+`card_sylowTwoOfQ_mul_card_Q1` + `Q1_eq_bot` で `|Q| = |S|`、`isPGroup_sylowTwoOfQ` の
+`|S| = 2^n` を経由して `IsPGroup.of_card`。Ch.II の `card_Q_eq_two_pow_of_Q1_eq_bot`
+(`FirstCase/StepSix.lean:270`) と同じ内容だが、そちらは `StructureOfH` から import
+到達しないので同じ 2 行を書いた (`sylowTwoOfQ` 経由なのでラッパーではない)。
+
+### 副産物 (Ch.III のために新設した汎用インフラ)
+
+* `GroupTheory/RepresentationTheory/PermutationCharacter.lean` — `(Ind_H^G 1_H)(g) = #Fix_Ω(g)`、
+  `⟨π, π⟩ = #orbits(Ω × Ω)`、2-transitive ⟹ 2。
+* `Appendices/FeitSibleyCoherentImage.lean` — coherent 族の像に対する step (10)–(12) の
+  内積簿記 (`ψ_j` を導入せずに済む形)。
+* `isSolvable_H` (`StructureOfH/LinearCharacter.lean`) — `H = Q ⋊ D` は可解。
+  Ch.I / Ch.II では明示されていなかった事実で、step (5)(6) の Hall 定理適用を解錠した。
+
+### 次 = Ch.III の残り (pp. 116–121)
+
+Theorem C の後、書籍 Ch.III は `Q` が 2-群であることを使って構造をさらに詰める
+(Ch.III §2 以降)。survey 表 (`three_books_full_survey_2026_07_16.md` L825–L862) の
+「Pf App: Suzuki」12 行の残りを実測し直して次を決めること (ラベルは stale)。
