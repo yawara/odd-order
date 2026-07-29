@@ -13892,3 +13892,6 @@ Ch. III §1 Proposition が `F/Z(F)` 側から持ち上げた元 `x` を `Q`-成
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isFrobeniusGroup_commutator_K_sup
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_eq_pow_natCard_inf_centralizer
+#assert_only_allowed_axioms OddOrder.Nat.prime_dvd_pow_self_sub_one_iff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coprime_natCard_K_of_not_dvd

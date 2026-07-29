@@ -34,6 +34,8 @@ centralized `K` it would lie in `W = C_V(K)`.
   group when `|X|` is prime to `|K|`.
 * `Hypothesis.natCard_eq_pow_natCard_inf_centralizer` — Wielandt's formula
   `|N| = |C_N(X)|^{|X|}` for every `H`-invariant `2`-subgroup `N ≤ Q`.
+* `Hypothesis.coprime_natCard_K_of_not_dvd` — the coprimality hypothesis, in the
+  form Ch. III supplies it: `p ∤ q₀ − 1` where `|Q₀| = q₀ ^ p`.
 -/
 
 set_option autoImplicit false
@@ -262,6 +264,34 @@ theorem natCard_eq_pow_natCard_inf_centralizer (hW : hyp.W = ⊥) {X : Subgroup 
     exact this
   exact OddOrder.GroupTheory.natCard_eq_pow_natCard_inf_centralizer_of_kernel_fpf
     hnorm (hyp.isFrobeniusGroup_commutator_K_sup hW hXV hXne hp hcop) hsolv hcop2 hUfpf
+
+
+/-! ## Turning `p ∤ q₀ − 1` into the coprimality hypothesis -/
+
+/-- **Fermat**: for a prime `p` and `1 ≤ a`, `p ∣ a ^ p − 1` iff `p ∣ a − 1`.
+
+`a ^ p = a` in `ZMod p` (`ZMod.pow_card`), so the two natural numbers have the
+same residue. -/
+theorem _root_.OddOrder.Nat.prime_dvd_pow_self_sub_one_iff {p a : ℕ} (hp : p.Prime)
+    (ha : 1 ≤ a) : p ∣ a ^ p - 1 ↔ p ∣ a - 1 := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hap : (1 : ℕ) ≤ a ^ p := Nat.one_le_pow _ _ (by omega)
+  have key : ((a ^ p - 1 : ℕ) : ZMod p) = ((a - 1 : ℕ) : ZMod p) := by
+    rw [Nat.cast_sub hap, Nat.cast_sub ha, Nat.cast_pow, Nat.cast_one, ZMod.pow_card]
+  rw [← ZMod.natCast_eq_zero_iff (a ^ p - 1) p, ← ZMod.natCast_eq_zero_iff (a - 1) p, key]
+
+/-- **The coprimality hypothesis of `isFrobeniusGroup_commutator_K_sup`, in the
+form Chapter III supplies it.**
+
+`|K| = |Q₀| − 1` (`card_K_eq_card_Q0_sub_one`) and `|Q₀| = q₀ ^ p` (Artin, from
+the semilinear model), so Fermat turns `p ∤ q₀ − 1` into `p ∤ |K|`. -/
+theorem coprime_natCard_K_of_not_dvd {p q₀ : ℕ} (hp : p.Prime) (hq₀ : 1 ≤ q₀)
+    (hQ0 : Nat.card ↥hyp.Q0 = q₀ ^ p) (hnd : ¬ p ∣ q₀ - 1) :
+    Nat.Coprime p (Nat.card ↥hyp.K) := by
+  rw [hyp.card_K_eq_card_Q0_sub_one, hQ0]
+  refine (Nat.Prime.coprime_iff_not_dvd hp).mpr ?_
+  rw [OddOrder.Nat.prime_dvd_pow_self_sub_one_iff hp hq₀]
+  exact hnd
 
 
 end Hypothesis
