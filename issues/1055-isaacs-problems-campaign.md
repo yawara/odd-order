@@ -29,15 +29,13 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 
 - [x] **Ch.1 Sylow** — **🎉 完済 (2026-07-28)**: §1A–§1G 全問
       (§1E は Sylow 計数の非単純性 8 問, §1F は Brodkey 周辺 3 問, §1G は Chermak–Delgado 4 問)
-- [ ] Ch.2 Subnormality
-- [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
-      **§3D 🎉 完済 (2026-07-29)**: 3D.1(a)(b) / 3D.2 / 3D.3 / 3D.4 / 3D.5 全問
-      (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
-      **§3E 🎉 完済 (2026-07-29)**: 3E.1 (両ケース) / 3E.2 / 3E.3 / 3E.4 / 3E.5 全問
-      (`Ch04_Commutators/Problems3E.lean` 748 行, axiom-clean)。
-      **§3F 進行中 (2026-07-29)**: **3F.1 ✅ / 3F.2 ✅ / 3F.3 ✅**
-      **3F.4 ✅** (新 leaf `Problems3F.lean` / `Problems3FSpecialLinear.lean`)。
-      **残り = 3F.5 のみ**。
+- [x] **Ch.2 Subnormality** — **🎉 完済 (2026-07-25)**: §2A/§2B/§2C/§2D 全問
+      (`Problems.lean` / `ProblemsInvolutions.lean` / `ProblemsNGroups.lean` / `Problems2D.lean`)。
+- [x] **Ch.3 Split Extensions** — **🎉 完済 (2026-07-29)**。§3A ✅ / §3B ✅ (3B.1-3B.15) /
+      §3C ✅ (3C.1-3C.8) / §3D ✅ (3D.1-3D.5, `Problems3D.lean` + `PiLength.lean`) /
+      §3E ✅ (3E.1-3E.5, `Ch04_Commutators/Problems3E.lean`) /
+      **§3F ✅ (3F.1-3F.5, `Problems3F.lean` + `Problems3FSpecialLinear.lean`)**。
+      Ch.3 の section は §3A-§3F の 6 つで全部 (原文 grep で確認)。
 
 * ✅ **3E.2** `actionFixedSubgroup_eq_mul` (2026-07-29): `c ∈ C` を `c = h₀k₀` と書くと
   `H ∩ cK` は `A`-不変な `H ∩ K` の剰余類なので Thm 3.27
@@ -6233,3 +6231,54 @@ repo/mathlib に「有限冪零群の Sylow と Hall `p'` が元ごとに可換�
 ⚠ `native_decide` は使っていない (axiom-clean 維持)。
 
 **⟹ §3F の残りは 3F.5 のみ** (`G = GL(2,3) ⊃ S` 指数 2 と、`Thm 3.36` で作る `H`)。
+
+### 3F.5 完了 (2026-07-29) — 🎉 §3F 完済 = Isaacs Ch.3 章末演習 全問完済
+
+書籍の statement (ページ画像 `isaacs-p110-123.png` / `isaacs-p110-124.png` で確定):
+`S = SL(2,3) ⊴ G = GL(2,3)` (指数 2)。`G ∖ S` に位数 2 の元 `g` はあるが位数 4 の元は
+無い。`S` を指数 2 で含む群 `H` で `H ∖ S` が「`g` と同じ `S` の自己同型を誘導する」
+位数 4 の元 `h` をもつものが存在する。`H ∖ S` に位数 2 の元は無く、`G ∖ S` と `H ∖ S`
+はどちらも位数 8 の元をもつ。
+
+**設計の要**: 全部が「`S` の外の元の 2 乗が `SL(2,3)` のどの元か」に帰着する。
+`g = diag(1,-1)` (`g² = 1`) が誘導する `σ = slConjReflection : MulAut SL(2,3)` を使って
+```
+  (g x)²    = σ(x) x           (x ∈ SL(2,3))
+  (h ι(x))² = σ(x) (-I) x      (h² = ι(-I))
+```
+なので、必要な核心事実は **24 元の全数検査 2 本だけ**:
+* `slConjReflection_mul_ne_slNegOne` : `σ(x) x ≠ -I` ⟹ `G ∖ S` に位数 4 の元が無い
+* `slConjReflection_mul_slNegOne_mul_ne_one` : `σ(x) (-I) x ≠ 1` ⟹ `H ∖ S` に位数 2 の元が無い
+
+(手計算: `x = !![a,b;c,d]` に対し `σ(x) x = !![a²-bc, b(a-d); c(d-a), d²-bc]`。これが
+`-I` なら `a(a-d) = 1` ゆえ `a ≠ 0`, `a ≠ d`、したがって `b = c = 0`、よって `a² = -1`
+だが `ZMod 3` の平方は `0, 1` のみで矛盾。書籍が 2 つの主張として書くものは同じ計算。)
+
+位数 8 は両側とも `j = !![1,1;1,-1]` が証人: `σ(j) j = i` (位数 4)、`σ(j)(-I) j = -i` (位数 4)。
+
+**新規の一般補題** (`Problems3F.lean`、Thm 3.36 を `m = 2` で使った出力の解析部品):
+`notMem_of_zpowers_quotientMk_eq_top` / `exists_eq_mul_of_notMem_of_card_quotient_eq_two` /
+`sq_mul_coe_of_conj` / `coe_mulEquiv_eq_one_iff`。
+
+**新規の具体計算** (`Problems3FSpecialLinear.lean`): `glReflection` / `slConjReflection` /
+`specialLinearTwoThreeSubgroup_index = 2` (= `ker det` + `det` 全射 + `|(ZMod 3)ˣ| = 2`) /
+`exists_eq_glReflection_mul` (`G ∖ S = g S`, 判別式で剰余類を決める) /
+`glReflection_conj` (`σ` が本当に `g` の誘導する自己同型: `Units.ext rfl` 一発) /
+`orderOf_glReflection` / `orderOf_ne_four_of_notMem_specialLinear` /
+`exists_orderOf_eq_eight_notMem_specialLinear` / `exists_index_two_extension_orderOf_four` ⭐。
+
+**⚠ 罠 2 つ (次に存在型から群を取り出すときに必ず踏む)**:
+1. **存在型 `∃ (H : Type) (_ : Group H), …` から取り出した instance は `haveI` でなく
+   `letI` で入れる**。`haveI` は本体を忘れるので、`hgen`/`hhsq` など既に `hHgrp` で
+   elaborate 済みの仮説と defeq でない別インスタンス (`this✝ : Group H`) が立ち、
+   "synthesized type class instance is not definitionally equal" でほぼ全ステップが落ちる。
+2. **商群の議論を `SpecialLinearTwoThree` が context にある巨大証明の中で直接書くと
+   `whnf`/`isDefEq` が heartbeat 爆発する** (`decide` 可能な具体型が context にあると
+   unifier が行列計算に潜る)。抽象型 `{H : Type*} [Group H] {N : Subgroup H} [N.Normal]`
+   の一般補題に切り出すと即座に通る (上の 4 本がそれ)。
+
+⚠ `decide` は `GL(2,3)` (48 元, `Units` 型) でも `(ZMod 3)ˣ` でも通る。`native_decide` 不使用。
+leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
+
+**⟹ Isaacs Ch.1 / Ch.2 / Ch.3 の章末演習は全問完済。次の frontier = Ch.4 §4A**
+(`Problems 4A` は 4A.1–4A.13 の 13 問。Ch.4 の section は §4A–§4D の 4 つ)。
