@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
 
 /-!
 # The canonical decomposition of `t x t` for `x ∈ Q ∖ {1}`
@@ -230,6 +231,166 @@ theorem tConjTriple_conj {x a : G} (hx : x ∈ hyp.Q) (hx1 : x ≠ 1)
         hyp.tConjRight x * a⁻¹ := by group
   rw [hkey, heq, hexp, hata]
   group
+
+/-! ## The values at `s`, `r` and `r⁻¹`
+
+Peterfalvi Part II, Ch. III §2, p. 118: from the structure equation
+`tst = r⁻¹tr` one reads off `trt = rts` and `tr⁻¹t = str⁻¹`, whence
+`h(s) = h(r) = h(r⁻¹) = 1`. -/
+
+/-- The distinguished involution lies in `Q₀`. -/
+lemma distinguishedInvolution_mem_Q0 : hyp.distinguishedInvolution ∈ hyp.Q0 :=
+  ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
+
+lemma distinguishedInvolution_mem_Q : hyp.distinguishedInvolution ∈ hyp.Q :=
+  hyp.Q0_le_Q hyp.distinguishedInvolution_mem_Q0
+
+/-- `s` centralizes `Q` (`Q₀ ≤ Z(Q)`), in particular it commutes with `r`. -/
+lemma commute_distinguishedInvolution_of_mem_Q {y : G} (hy : y ∈ hyp.Q) :
+    hyp.distinguishedInvolution * y = y * hyp.distinguishedInvolution :=
+  (Subgroup.mem_centralizer_iff.mp
+    (hyp.Q0_le_centralizer_Q hyp.distinguishedInvolution_mem_Q0) y hy).symm
+
+/-- `r ≠ 1`: otherwise the structure equation gives `s = t ∉ H`. -/
+lemma structureConjugator_ne_one : hyp.structureConjugator ≠ 1 := by
+  intro h1
+  refine hyp.t_not_mem_H ?_
+  have heq := hyp.structure_equation
+  rw [h1, inv_one, one_mul, mul_one] at heq
+  have hs : hyp.distinguishedInvolution = hyp.t := by
+    have := congrArg (fun z : G => hyp.t * z * hyp.t) heq
+    have htt : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+    calc hyp.distinguishedInvolution
+        = (hyp.t * hyp.t) * hyp.distinguishedInvolution * (hyp.t * hyp.t) := by
+          rw [htt, one_mul, mul_one]
+      _ = hyp.t * (hyp.t * hyp.distinguishedInvolution * hyp.t) * hyp.t := by group
+      _ = hyp.t * hyp.t * hyp.t := by rw [heq]
+      _ = hyp.t := by rw [htt, one_mul]
+  rw [← hs]
+  exact hyp.distinguishedInvolution_mem_H
+
+/-- **(3a)** `t r t = r t s` (Peterfalvi Part II, Ch. III §2, p. 118). -/
+lemma t_conj_structureConjugator :
+    hyp.t * hyp.structureConjugator * hyp.t
+      = hyp.structureConjugator * hyp.t * hyp.distinguishedInvolution := by
+  have heq := hyp.structure_equation
+  have htt : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+  calc hyp.t * hyp.structureConjugator * hyp.t
+      = hyp.structureConjugator *
+          (hyp.structureConjugator⁻¹ * hyp.t * hyp.structureConjugator) * hyp.t := by
+        group
+    _ = hyp.structureConjugator *
+          (hyp.t * hyp.distinguishedInvolution * hyp.t) * hyp.t := by rw [← heq]
+    _ = hyp.structureConjugator * hyp.t * hyp.distinguishedInvolution *
+          (hyp.t * hyp.t) := by group
+    _ = hyp.structureConjugator * hyp.t * hyp.distinguishedInvolution := by
+        rw [htt, mul_one]
+
+/-- **(3b)** `t r⁻¹ t = s t r⁻¹` (Peterfalvi Part II, Ch. III §2, p. 118). -/
+lemma t_conj_structureConjugator_inv :
+    hyp.t * hyp.structureConjugator⁻¹ * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.structureConjugator⁻¹ := by
+  have h := congrArg (fun z : G => z⁻¹) hyp.t_conj_structureConjugator
+  simp only [mul_inv_rev, hyp.t_inv_eq] at h
+  have hs : hyp.distinguishedInvolution⁻¹ = hyp.distinguishedInvolution := by
+    have h2 := hyp.distinguishedInvolution_sq
+    rw [pow_two] at h2
+    exact inv_eq_of_mul_eq_one_left h2
+  rw [hs] at h
+  calc hyp.t * hyp.structureConjugator⁻¹ * hyp.t
+      = hyp.t * (hyp.structureConjugator⁻¹ * hyp.t) := by group
+    _ = hyp.distinguishedInvolution * (hyp.t * hyp.structureConjugator⁻¹) := h
+    _ = hyp.distinguishedInvolution * hyp.t * hyp.structureConjugator⁻¹ := by group
+
+/-- `h(s) = 1` (Peterfalvi Part II, Ch. III §2, p. 118): the structure equation
+`tst = r⁻¹ · 1 · t · r` *is* the canonical decomposition of `t s t`. -/
+lemma tConjTriple_distinguishedInvolution :
+    hyp.tConjLeft hyp.distinguishedInvolution = hyp.structureConjugator⁻¹ ∧
+      hyp.tConjMiddle hyp.distinguishedInvolution = 1 ∧
+      hyp.tConjRight hyp.distinguishedInvolution = hyp.structureConjugator := by
+  refine hyp.tConjTriple_eq_of hyp.distinguishedInvolution_mem_Q
+    hyp.distinguishedInvolution_ne_one
+    (hyp.Q.inv_mem hyp.structureConjugator_mem_Q)
+    (inv_ne_one.mpr hyp.structureConjugator_ne_one) (one_mem _)
+    hyp.structureConjugator_mem_Q hyp.structureConjugator_ne_one ?_
+  rw [hyp.structure_equation, mul_one]
+
+/-- `h(r) = 1` (Peterfalvi Part II, Ch. III §2, p. 118), from `t r t = r t s`. -/
+lemma tConjTriple_structureConjugator :
+    hyp.tConjLeft hyp.structureConjugator = hyp.structureConjugator ∧
+      hyp.tConjMiddle hyp.structureConjugator = 1 ∧
+      hyp.tConjRight hyp.structureConjugator = hyp.distinguishedInvolution := by
+  refine hyp.tConjTriple_eq_of hyp.structureConjugator_mem_Q
+    hyp.structureConjugator_ne_one hyp.structureConjugator_mem_Q
+    hyp.structureConjugator_ne_one (one_mem _) hyp.distinguishedInvolution_mem_Q
+    hyp.distinguishedInvolution_ne_one ?_
+  rw [hyp.t_conj_structureConjugator, mul_one]
+
+/-- `h(r⁻¹) = 1` (Peterfalvi Part II, Ch. III §2, p. 118), from
+`t r⁻¹ t = s t r⁻¹`. -/
+lemma tConjTriple_structureConjugator_inv :
+    hyp.tConjLeft hyp.structureConjugator⁻¹ = hyp.distinguishedInvolution ∧
+      hyp.tConjMiddle hyp.structureConjugator⁻¹ = 1 ∧
+      hyp.tConjRight hyp.structureConjugator⁻¹ = hyp.structureConjugator⁻¹ := by
+  refine hyp.tConjTriple_eq_of (hyp.Q.inv_mem hyp.structureConjugator_mem_Q)
+    (inv_ne_one.mpr hyp.structureConjugator_ne_one)
+    hyp.distinguishedInvolution_mem_Q hyp.distinguishedInvolution_ne_one
+    (one_mem _) (hyp.Q.inv_mem hyp.structureConjugator_mem_Q)
+    (inv_ne_one.mpr hyp.structureConjugator_ne_one) ?_
+  rw [hyp.t_conj_structureConjugator_inv, mul_one]
+
+/-- `(st)² = (st)^r` (Peterfalvi Part II, Ch. III §2, p. 118): the structure
+equation rewrites `tst`, and `s` centralizes `Q ∋ r`. -/
+lemma sq_st_eq_conj_structureConjugator :
+    (hyp.distinguishedInvolution * hyp.t) ^ 2
+      = hyp.structureConjugator⁻¹ * (hyp.distinguishedInvolution * hyp.t) *
+          hyp.structureConjugator := by
+  have hcomm := hyp.commute_distinguishedInvolution_of_mem_Q
+    (hyp.Q.inv_mem hyp.structureConjugator_mem_Q)
+  calc (hyp.distinguishedInvolution * hyp.t) ^ 2
+      = hyp.distinguishedInvolution *
+          (hyp.t * hyp.distinguishedInvolution * hyp.t) := by rw [pow_two]; group
+    _ = hyp.distinguishedInvolution *
+          (hyp.structureConjugator⁻¹ * hyp.t * hyp.structureConjugator) := by
+        rw [hyp.structure_equation]
+    _ = (hyp.distinguishedInvolution * hyp.structureConjugator⁻¹) * hyp.t *
+          hyp.structureConjugator := by group
+    _ = (hyp.structureConjugator⁻¹ * hyp.distinguishedInvolution) * hyp.t *
+          hyp.structureConjugator := by rw [hcomm]
+    _ = hyp.structureConjugator⁻¹ * (hyp.distinguishedInvolution * hyp.t) *
+          hyp.structureConjugator := by group
+
+/-- **`r² ≠ 1` when `st` has order `5`** (Peterfalvi Part II, Ch. III §2,
+p. 118): iterating `(st)^r = (st)²` gives `(st)^{r²} = (st)⁴`, so `r² = 1`
+would force `(st)³ = 1`. -/
+lemma structureConjugator_sq_ne_one
+    (h5 : orderOf (hyp.distinguishedInvolution * hyp.t) = 5) :
+    hyp.structureConjugator ^ 2 ≠ 1 := by
+  intro hr2
+  set u : G := hyp.distinguishedInvolution * hyp.t with hu
+  set r : G := hyp.structureConjugator with hr
+  have hstep : u ^ 2 = r⁻¹ * u * r := hyp.sq_st_eq_conj_structureConjugator
+  have hstep2 : u ^ 4 = r⁻¹ * (u ^ 2) * r := by
+    have : (r⁻¹ * u * r) ^ 2 = r⁻¹ * u ^ 2 * r := by
+      rw [pow_two, pow_two]; group
+    calc u ^ 4 = (u ^ 2) ^ 2 := by rw [← pow_mul]
+      _ = (r⁻¹ * u * r) ^ 2 := by rw [hstep]
+      _ = r⁻¹ * u ^ 2 * r := this
+  have hcancel : r⁻¹ * (u ^ 2) * r = u := by
+    rw [hstep]
+    have hrr : r * r = 1 := by rw [← pow_two]; exact hr2
+    calc r⁻¹ * (r⁻¹ * u * r) * r = (r * r)⁻¹ * u * (r * r) := by group
+      _ = u := by rw [hrr, inv_one, one_mul, mul_one]
+  have h4 : u ^ 4 = u := hstep2.trans hcancel
+  have h3 : u ^ 3 = 1 := by
+    have h' : u ^ 3 * u = 1 * u := by
+      rw [one_mul, ← pow_succ]
+      exact h4
+    exact mul_right_cancel h'
+  have hdvd : orderOf u ∣ 3 := orderOf_dvd_of_pow_eq_one h3
+  rw [hu] at h5
+  rw [h5] at hdvd
+  omega
 
 end Hypothesis
 

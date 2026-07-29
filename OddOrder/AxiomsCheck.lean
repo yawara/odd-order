@@ -355,7 +355,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 14000
+set_option linter.style.longFile 14200
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -13984,3 +13984,28 @@ for the `K`-orbits of `S#`. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_eq_of
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_conj
+
+/-! **`h(s) = h(r) = h(r⁻¹) = 1` and `r² ≠ 1`** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+The structure equation `tst = r⁻¹tr` (Ch. I §1 Proposition 4(b)) *is* the canonical
+decomposition of `t s t`, with middle factor `1`; inverting `trt = rts` gives `tr⁻¹t = str⁻¹`,
+so the same holds at `r` and `r⁻¹`.  Since `s ∈ Q₀ ≤ Z(Q)` commutes with `r ∈ Q`, the equation
+also reads `(st)² = (st)^r`, and iterating gives `(st)^{r²} = (st)⁴`; with `st` of order `5`
+this forces `r² ≠ 1` (else `(st)³ = 1`). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_ne_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_structureConjugator
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_structureConjugator_inv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_distinguishedInvolution
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_structureConjugator
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_structureConjugator_inv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sq_st_eq_conj_structureConjugator
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_sq_ne_one
