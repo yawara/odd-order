@@ -257,6 +257,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
 import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
@@ -13780,3 +13781,20 @@ Pulling back along `V → A`, whose kernel is `W`, gives `P ⊔ W`; the book's `
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_V_centralizer_Q0
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_V_centralizer_Q0_of_W_eq_bot
+
+/-! **`Z(F)` は奇位数** (issue 0164, 2026-07-29).
+`Peterfalvi/Appendices/Suzuki/StructureOfH/PSUCentre.lean`, Ch. I §3 Prop 1(c) の PSU 分岐.
+
+`C_Q(P)` は `C = C_G(P)` の Sylow 2 であり (`exists_sylow_two_eq_cQ_of_isPGroup`)、
+`F = O^{2'}(C)` はその正規閉包 (`residual_eq_normalClosure`) なので `C_Q(P) ≤ F`、
+したがって `F` の Sylow 2 でもある。その位数は `|RootGroup n|` (`cQEquivRoot`) で、
+これは `F/Z(F) ≅ PSU(3,ℓ)` の Sylow 2 (`standardRootSylow`) の位数と一致する。
+中心拡大の上下で Sylow 2 の位数が等しい ⟹ `2 ∤ |Z(F)|`
+(`Sylow.not_dvd_natCard_of_natCard_eq`)。
+
+Ch. III §1 Proposition が `C_{G₀}(Ω₁(S₀))` の元を `F` に持ち上げるとき、交換子は
+`Z(F)` にしか落ちないが、この奇位数性と
+`commute_of_commutatorElement_mem_of_coprime_natCard` で真の中心化に格上げできる。 -/
+#assert_only_allowed_axioms Sylow.not_dvd_natCard_of_natCard_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.CentralizerPSUData.odd_natCard_center_residual
