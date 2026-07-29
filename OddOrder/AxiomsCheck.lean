@@ -13646,4 +13646,6 @@ isomorphic? — and the type-B count is replaced by a construction plus operator
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.not_cQ_isElementaryAbelian_of_kSubgroup
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB

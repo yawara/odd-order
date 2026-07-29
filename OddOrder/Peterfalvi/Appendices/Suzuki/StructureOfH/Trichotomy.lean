@@ -541,6 +541,42 @@ theorem orderOf_st_eq_three_of_card_cube
       hPV hXP hYP det.standardTypeAData
   · exact det.distinguishedProduct_order
 
+/-- **Case (3): the `PSL(2, ℓ)` alternative is out** (p. 117).
+
+Once `P` normalizes a `K`-subgroup `X` of `S` of order `q²`, the fibre
+`{y ∈ X | y² = s}` has `|Q₀|` elements — a power of `2`, prime to the odd `p` —
+so `P` fixes one of them (`exists_mem_centralizer_mem_sqFibreIn`).  That fixed
+point is an element of order `4` in `C_Q(P)`, which the `PSL(2, ℓ)` branch of
+Ch. I §3 Proposition 1(c) forbids: its payload makes `C_Q(P)` elementary
+abelian.
+
+This is what the book's case (3) obtains at the end from the Frobenius group
+`[K, P] ⋊ P` ("whence `C_{S/Q₀}(P) ≠ 1`"); the `K`-subgroup gives it directly. -/
+theorem not_cQ_isElementaryAbelian_of_kSubgroup
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q)
+    {X : Subgroup G} (hXQ : X ≤ sc.toHypothesis.Q)
+    (hQ0X : sc.toHypothesis.Q0 ≤ X)
+    (hXinv : ∀ k ∈ sc.toHypothesis.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X)
+    (hXcard : Nat.card ↥X = Nat.card ↥sc.toHypothesis.Q0 ^ 2)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ sc.toHypothesis.V)
+    (hPX : ∀ g ∈ P, ∀ y ∈ X, g * y * g⁻¹ ∈ X) :
+    ¬ OddOrder.GroupTheory.IsElementaryAbelian 2
+      ↥(sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G))) := by
+  intro hEA
+  obtain ⟨y, hyT, hyC⟩ := sc.toHypothesis.exists_mem_centralizer_mem_sqFibreIn
+    hQsuz hXQ hQ0X hXinv hXcard hp hPcard hPV hPX
+  have hmem : (⟨⟨y, hyC⟩, Subgroup.mem_subgroupOf.mpr (hXQ hyT.1)⟩ :
+      ↥(sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G))))
+      ^ 2 = 1 := hEA.2 _
+  have h1 : y ^ 2 = 1 := by
+    simpa using congrArg (fun z => ((z : ↥(Subgroup.centralizer (P : Set G))) : G))
+      (congrArg (Subtype.val (p := fun z =>
+        z ∈ sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G))))
+        hmem)
+  rw [hyT.2] at h1
+  exact sc.toHypothesis.distinguishedInvolution_ne_one h1
+
 /-- **After Theorem C, the book's `S` is `Q`**: `Q₁ = 1` (`Q1_eq_bot`) makes the
 Sylow `2`-subgroup `S` of `Q` equal to `Q`, so Ch. III §1's Proposition — stated
 for `S` — is a statement about `Q`. -/

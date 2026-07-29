@@ -105,7 +105,7 @@ type C / type D なら `S/Q₀` は `𝐅₂[K]`-加群で `S/Q₀ = X ⊕ Y` (`
 - [x] case (2) の `W = 1` パート — **2026-07-29 完了**
 - [x] case (2) の PSU 排除 — **2026-07-29 完了 (書籍と別経路: 位数の数え上げ)**
 - [x] case (3) の `st` 位数 3 パート — **type C/D 側 2026-07-29 完了**
-- [ ] case (3) の `st` 位数 3 パート — type B 側 (下記の設計で実装中)
+- [x] case (3) の `st` 位数 3 パート — **type B 側も 2026-07-29 完了 (無条件)**
 - [ ] case (3) の `W ≠ 1` パート (Frobenius `[K,P] ⋊ P`)
 - [ ] 3 分岐の組み立て (Proposition 本体)
 
@@ -377,3 +377,41 @@ Frobenius 群で `[K,P]` は不動点自由 ⟹ `C_{S/Q₀}(P) ≠ 1` で矛盾�
 
 `lemmaFive_of_orderThree` (`WCyclicDivides.lean:352`) が
 `st` 位数 3 + `W ≠ 1` から **type B** を出す。これは**完成形で repo に在る**。
+
+
+## case (3) の `st` 位数 3 が無条件で完結 (2026-07-29)
+
+書籍の型分け (type C/D は「K-部分群は 2 つだけ」/ type B は「q+1 個」) を、
+**「Higman split の和因子が K-同変同型か」**という二分法に書き換えて統一した。
+
+| 定理 | 所在 | 内容 |
+|---|---|---|
+| `exists_invariant_mem_of_kEquivariantMulEquiv` | `Suzuki2Groups/SplitUniqueness.lean` | 和因子が同型なら任意の元が位数 q の K-不変部分群に入る (graph 構成) |
+| `conjQBy` / `conjQuotientBy` / `conj_mem_liftCentralQuotient` / `aInvariant_map_of_conj_mem` | `TwoKSubgroups.lean` | 任意の作用素部分群 `A ≤ H` 版の作用と橋 |
+| `exists_kSubgroupSquare_complement` | `TwoKSubgroups.lean` | **operator Maschke** (`\|D\|` 奇 + `Q ⧸ Z(Q)` 基本アーベル 2-群) で相棒を作る |
+| `conj_mem_sup` / `conj_mem_of_mem_centralizer` | `TwoKSubgroups.lean` | P が中心化する元を含む K-部分群は P-不変 |
+| `exists_two_kSubgroups_invariant_of_card_cube` | `TwoKSubgroups.lean` | **P が正規化する 2 つの K-部分群 (無条件)** |
+| `orderOf_st_eq_three_of_card_cube` | `Trichotomy.lean` | **case (3) の `orderOf (st) = 3` (無条件)** |
+| `not_cQ_isElementaryAbelian_of_kSubgroup` | `Trichotomy.lean` | P-不変な K-部分群が在れば **PSL(2,ℓ) 分岐は排除される** |
+
+## 残り: `W ≠ 1` の分析 (2026-07-29)
+
+書籍 p.117 の最後の段落を実測して分解した:
+
+1. `W = 1` ⟹ Ch.I §2 Prop 3 で `V` は `Q₀` 上の体自己同型群、Galois で
+   `C_V(C_{Q₀}(P)) = P`。
+2. それと **`PSU(3,ℓ)` の `C_{D₀}(Ω₁(S₀)) ≠ 1`** から `F/Z(F) ≇ PSU(3,ℓ)`。
+3. `st` 位数 3 ゆえ残るのは PSL 分岐 (`C_S(P)` 基本アーベル)。
+4. `[K,P] ⋊ P` が `S/Q₀` 上 Frobenius ⟹ `C_{S/Q₀}(P) ≠ 1` で矛盾。
+
+**(4) は不要になった**: `not_cQ_isElementaryAbelian_of_kSubgroup` が、P-不変な
+K-部分群の平方根 fibre から位数 4 の元を直接出して PSL 分岐を潰す
+(Frobenius 群の議論も `\|V\| = \|C_V(B)\|^{\|F\|}` 型の定理も不要)。
+
+**残る gate は (1)+(2) のみ** = 書籍自身が "as can be checked" で省略する
+`PSU(3,ℓ)` の Sylow 2-正規化群の計算。⚠ case (2) では位数の数え上げで代替できたが、
+**case (3) では代替できない** — 実際 case (3) の分岐は PSU そのものだから
+(`\|C_Q(P)\| = \|C_{Q₀}(P)\|³` が成り立つ)。`W = 1` の仮定が本質的に効く箇所である。
+
+⟹ **`W ≠ 1` は `PSU(3,ℓ)` の構造計算 (issue 0164) を待つ**。それまでは
+case (3) の残りを仮説パラメータ化して前倒しする。
