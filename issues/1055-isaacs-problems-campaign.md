@@ -6692,3 +6692,42 @@ tower が相異なる群を高々 2 個しか含まないことを示せ」。�
 base case + Dedekind `A₁ = A (B ⊓ A₁)` で `↥A₁` に IH)。⚠ 仮説は join でなく**積**
 `(A : Set G) * B = Set.univ`。`hprod_sub` / `hcard_lt` は 9B.5 のものが再利用できる形
 (現在 `nilpotentResidual_sup_aux` の中の `have` なので、共用するなら切り出す)。
+
+### §9C 進捗 (2026-07-29, 続き) — 9C.2 完了、残り 9C.3
+
+* **9C.2 ✅** `pResidualOf_top_eq_sup_of_isSubnormal`。設計どおり 9B.5 の証明を
+  `nilpotentResidual` → `pResidualOf p` に写して完了。base case の `F(G/N) = ⊤` 論法は
+  `Ch03.oPiCore {p}` にそのまま読み替わる。
+  * 補った橋渡し 2 本: `isPGroup_quotient_of_pResidual_le` / `isPGroup_map_of_pResidualOf_le`
+    (9B.5 側の `nilpotentResidual_le_iff_isNilpotent_map` に当たる ⟺ が `O^p` に無かった)。
+  * `PResidual.lean` に `map_subtype_pResidualOf_top` を追加。
+* **重複解消**: 9B.5 の証明内 inline `have` 3 つ (真部分群の位数評価 / 積の左右対称性 /
+  積の Dedekind 降下) を `GroupTheory/SubgroupInAmbient.lean` の名前付き補題に切り出し、
+  9B.5 と 9C.2 の両方から呼ぶようにした (`card_le_of_lt_top` / `mul_eq_univ_comm` /
+  `subgroupOf_mul_inf_subgroupOf_eq_univ` / `sup_eq_top_of_mul_eq_univ`)。
+
+### 9C.3 の分析と ⚠ 未解決点 (2026-07-29)
+
+statement (ページ画像 `isaacs-p289-302.png`): `G = ⟨A, B⟩`, `A, B ⊲⊲ G`,
+`|A:A'|` と `|B:B'|` が互いに素 ⟹ `G = AB`。極小反例 `G` を取り 5 段:
+
+* **(a)** `N` を極小正規とすると `ANB = G`。
+  ⟹ `G/N` で像 `Ā`, `B̄` は subnormal・生成し、`|Ā:Ā'| ∣ |A:A'|` なので互いに素性が遺伝。
+  `|G/N| < |G|` で極小性 ⟹ `G/N = Ā B̄` ⟹ `G = ANBN = ANB` (`N ◁ G`)。**筋は明快**。
+* **(b)** `(N∩A)(N∩B)` は `A` にも `B` にも正規化される。
+  ⚠ **ここが未解決**。`N∩A ⊴ N` と `N∩B ⊴ N` は言える
+  (極小正規 `N` は characteristically simple = 同型単純群の直積で、その subnormal 部分群は
+  常に normal — 非可換なら部分積、可換なら自明)。よって積は部分群で `N` に正規。
+  `A` が `N∩A` を、`B` が `N∩B` を正規化するのも自明。**しかし `A` が `N∩B` を
+  (あるいは積を) 正規化する理由が未特定**。`A ◁◁ G` の鎖 `A = A₀ ◁ ⋯ ◁ Aₙ = G` からは
+  `[N ∩ Aᵢ, A] ≤ N ∩ A_{i-1}` (= `A` は `N` に冪零に作用) までは出るが、
+  `[N∩B, A] ≤ (N∩A)(N∩B)` に直結しない。次 iteration の主題。
+* **(c)** (b) が出れば `⟨A, N, B⟩ = G` (∵ (a)) が積を正規化 ⟹ 極小性で `= 1` か `= N`。
+  `= N` なら `G = ANB = A(N∩A)(N∩B)B = AB` で反例に矛盾 ⟹ `N∩A = 1 = N∩B`。
+  そのあと「`N` は素数位数」を出す部分は未検討。
+* **(d)** `p ∤ |B:B'|` として **9C.2** で `O^p(G) = O^p(A)B`。
+* **(e)** `A·O^p(G)` が群であることから矛盾。
+
+**repo の材料**: `Ch02.IsMinimalNormal` / `exists_isMinimalNormal_le_of_normal` は在る。
+「極小正規は characteristically simple」「characteristically simple の subnormal 部分群は
+normal」に相当する補題が repo にあるかは未確認 (次 iteration で実測)。
