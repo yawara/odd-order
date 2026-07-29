@@ -102,8 +102,8 @@ type C / type D なら `S/Q₀` は `𝐅₂[K]`-加群で `S/Q₀ = X ⊕ Y` (`
 
 - [x] **case (1)** (`S` アーベル ⟹ `S = Q₀` かつ `st` 位数 3) — **2026-07-29 完了** (下記)
 - [x] **case (2) の指数 4 パート** — **2026-07-29 完了** (`C_Q(P)` が Suzuki 2-群 = PSL 分岐排除)
-- [ ] case (2) の `W = 1` パート (`C_S(P)` は指数 4 の `K`-部分群 ⟹ `C_S(P) = S` ⟹ `D` の忠実性に矛盾)
-- [ ] case (2) の PSU 排除 (`C_{D₀}(Ω₁(S₀)) ≠ 1`) — gated なら 9500 番台で hub issue 化
+- [x] case (2) の `W = 1` パート — **2026-07-29 完了**
+- [x] case (2) の PSU 排除 — **2026-07-29 完了 (書籍と別経路: 位数の数え上げ)**
 - [ ] case (3) の `st` 位数 3 パート
 - [ ] case (3) の `W ≠ 1` パート (Frobenius `[K,P] ⋊ P`)
 - [ ] 3 分岐の組み立て (Proposition 本体)
@@ -263,3 +263,55 @@ landing した定理:
    `ȳ ≠ 1` から (2) で `X Q₀ = Q` ⟹ `X = Q`。
 4. `C_Q(P) = Q` は `C_D(Q) = 1` (`centralizer_Q_inf_D_eq_bot`) に矛盾
    (`P ≤ W ≤ V ≤ D`、`P ≠ ⊥`) ⟹ **`W = 1`**。
+
+
+## case (2) 完結記録 (2026-07-29)
+
+case (2) = 書籍の (b) のうち **`W = 1`** と **`orderOf (st) = 5`** の両方が landing。
+
+### `W = 1`
+
+| 定理 | 内容 |
+|---|---|
+| `exists_le_card_eq_prime` | 「素数位数の部分群 `P` を取る」(`V` 側・`W` 側で共用) |
+| `Hypothesis.exists_mem_K_conj_eq_of_mem_Q0` | `K` は `Q₀^#` 上推移的 (§1 Prop 3 の要素形) |
+| `Hypothesis.eq_bot_or_Q0_le_of_kInvariant` | `Q₀` 内の `K`-不変部分群は `⊥` か `Q₀` |
+| `Hypothesis.sq_mem_Q0_of_isSuzuki2Group` | 指数 4 (Higman Thm 1(a)) ⟹ 平方は `Q₀ = Ω₁(Q)` |
+| `Hypothesis.inv_mul_mem_Q0_of_sq_eq` | 平方の fibre はどれも単一 `Q₀`-剰余類 |
+| `Hypothesis.exists_mem_K_conj_mem_coset` | `K` は `(Q/Q₀)^#` 上推移的 |
+| `Hypothesis.Q_le_of_kInvariant_of_sq_ne_one` | `K`-不変で位数 4 の元を含む `X ≤ Q` は `Q` |
+| `SecondCaseHypothesis.W_eq_bot_of_isSuzuki2Group` | **`W = 1`** |
+
+`P ≤ W` を素数位数に取ると `[K,W] = 1` から `C_Q(P)` は `K`-不変、そこに `s` の平方根
+(位数 4) が在るので `C_Q(P) = Q`。すると `P ≤ W ≤ V ≤ D` が `Q` を中心化して
+`C_D(Q) = 1` (Ch.I Prop 4(c)) に反する。
+
+### `orderOf (st) = 5` — ⚠ 書籍から意図的に逸脱
+
+書籍は PSU(3,ℓ) 分岐を **「`G₀ = PSU(3,ℓ)`、`S₀ ∈ Syl₂(G₀)`、`N_{G₀}(S₀) = S₀ ⋊ D₀` とすると、
+確かめられるように `C_{D₀}(Ω₁(S₀)) ≠ 1`」** で排除するが、**本文はこの計算を実行していない**。
+repo の `CentralizerPSUData` が同分岐の**位数関係 `|C_Q(P)| = |C_{Q₀}(P)|³`**
+(`natCard_cQ_eq_cQ0_cube`) を既に持っているので、数え上げで正面から矛盾させた:
+
+| 定理 | 内容 |
+|---|---|
+| `Hypothesis.two_le_natCard_inf_Q0_centralizer` | `P ≤ V = C_D(s)` ゆえ `s ∈ C_{Q₀}(P)` ⟹ `|C_{Q₀}(P)| ≥ 2` |
+| `Hypothesis.natCard_inf_centralizer_le_sq` | **`|C_Q(P)| ≤ |C_{Q₀}(P)|²`** |
+| `SecondCaseHypothesis.orderOf_st_eq_five_of_isSuzuki2Group` | **`orderOf (st) = 5`** |
+
+平方写像 `C_Q(P) → C_{Q₀}(P)` の fibre はどれも `C_{Q₀}(P)` の剰余類に含まれる
+(`sq_mem_Q0_of_isSuzuki2Group` + `inv_mul_mem_Q0_of_sq_eq`) ⟹ fibre 数 ≤ `|C_{Q₀}(P)|`、
+各 fibre ≤ `|C_{Q₀}(P)|`。`|C_{Q₀}(P)| ≥ 2` なら `|C_{Q₀}(P)|³ > |C_{Q₀}(P)|²` で PSU 分岐は不可能。
+PSL 分岐は位数 4 の元で既に排除済 ⟹ 残るのは `Sz(ℓ)` 分岐。
+
+⟹ **gated 候補だった PSU 計算は不要になった**。9500 番台の hub issue は起票せず。
+
+### ファイル分割 (2026-07-29)
+
+case (2) 完結時点で `Trichotomy.lean` が 1090 行 ⟹ mathlib 粒度に沿って 2 分割:
+
+* `StructureOfH/SquareRootFibres.lean` (781 行) — 3 ケース共通の機構
+  (fibre・数え上げ・不動点ステップ・`K`-推移性・`[K,W] = 1`・case (1) の核)
+* `StructureOfH/Trichotomy.lean` (367 行) — `exists_le_card_eq_prime` と 3 ケースの組み立て
+
+module 名不変ゆえ下流 import は無変更。`OddOrder.lean` / `AxiomsCheck.lean` 配線済。
