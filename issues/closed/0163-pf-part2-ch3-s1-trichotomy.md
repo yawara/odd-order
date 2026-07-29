@@ -476,3 +476,15 @@ Proposition 本体 (3 分岐の disjunction) の組み立てには、書籍が
 **残るのは [issue 0164](../0164-psu3-sylow-normalizer-centralizer.md) だけ**なので、
 本 issue は pending に移す。0164 が閉じたら `trichotomy` から `hWcube` 仮説を外して
 close する。
+
+## ✅ CLOSED (2026-07-29): `hWcube` を除去して仮説ゼロで landing
+
+[issue 0164](0164-psu3-sylow-normalizer-centralizer.md) が閉じたので、
+`SecondCaseHypothesis.trichotomy` から `hWcube` を除去した。現在の仮説は
+**`ind` (Theorem A 帰納法) のみ**。
+
+* `trichotomy` は `StructureOfH/Trichotomy.lean` から
+  **`StructureOfH/WNeBot.lean` へ移設** (`W_ne_bot_of_card_cube` を直接呼ぶため。
+  `WNeBot.lean` が `Trichotomy.lean` を import しているので逆向きには置けない)。
+  完全修飾名 `…SecondCaseHypothesis.trichotomy` は不変。
+* AxiomsCheck OK (`propext`/`Classical.choice`/`Quot.sound` のみ)。

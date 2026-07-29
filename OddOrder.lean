@@ -607,6 +607,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki
 import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FieldRealizationK
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
 import OddOrder.Peterfalvi.Appendices.Huppert
