@@ -14029,3 +14029,25 @@ representatives for the `K`-orbits of `S#`. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_mul
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_structureConjugator_mul_conj_inv
+
+/-! **`ℓ`, the elements `r r^{-k}`, and `h(r r^{-k}) ∈ K`** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+For `1 ≠ k ∈ K` the product `s k s k⁻¹` is again an involution of `H`: both `s` and `k s k⁻¹`
+lie in the elementary abelian `Q₀`, and it is non-trivial because `C_Q(k) = 1` (Ch. I §2
+Proposition 1(a)) keeps `k` from centralizing `s`.  Ch. I §1 Proposition 3 — the involutions of
+`H` form a single `K`-orbit (`image_conj_KSet_eq_involutions_H`) — then supplies `ℓ ∈ K` with
+`s k s k⁻¹ = s^ℓ`, and `ℓ ≠ 1` since `ℓ = 1` would force `s = 1`.
+
+The same `C_Q(k) = 1` shows `r r^{-k} ≠ 1`, so the canonical triple of `t r r^{-k} t` is
+defined; the identity (4) identifies its middle factor as `ℓ²k² ∈ K`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.eq_of_mul_eq_mul_of_mem_Q_mem_D
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_mul_conj_inv_mem
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_mul_conj_inv_ne_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_KSet_conj_distinguishedInvolution
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_tConjMiddle_eq
