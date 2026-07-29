@@ -280,6 +280,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.ExceptionalNearField
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
@@ -13518,3 +13519,30 @@ the `X = S` instances):
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.false_of_typeA_centralizer_of_two_kSubgroups
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_two_kSubgroups
+
+/-! **Higman theorem (d) in `G`-language: the two `K`-subgroups of `S` of order `q²`**
+(issue 0163, 2026-07-29).  `Appendices/Suzuki/StructureOfH/TwoKSubgroups.lean`, Appendix III
+p. 141 / Ch. III §1 p. 117.
+
+Higman's clause (d) — already available as `center_payload_of_card_eq_cube` — splits
+`S ⧸ Z(S)` into two complementary invariant summands of order `q`, but states it in the
+quotient `↥Q ⧸ Z(↥Q)` with the `IsAInvariant` vocabulary of Isaacs Ch. 3.  Case (3) of the
+Ch. III §1 Proposition needs the same content as plain subgroups of `G`.
+
+* `card_liftCentralQuotient`, `liftCentralQuotient_injective`,
+  `kInvariant_liftCentralQuotient` — the bridge: a subgroup of `↥Q ⧸ Z(↥Q)` lifts to a
+  subgroup of `G` between `Q₀` and `Q` whose order is multiplied by `|Z(Q)|`, whose
+  `K`-invariance is the elementwise conjugation statement the Proposition uses, and which
+  determines the original.
+* `exists_two_kSubgroups_of_card_cube` — the packaged conclusion: a Suzuki `2`-group `Q` with
+  `|Q| = |Q₀|³` has two distinct `K`-invariant subgroups `X ≠ Y` with `Q₀ ≤ X, Y ≤ Q` and
+  `|X| = |Y| = |Q₀|²`.  (What case (3) still needs on top of this is that `P` normalizes two
+  of them.) -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_liftCentralQuotient
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.liftCentralQuotient_injective
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.kInvariant_liftCentralQuotient
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_two_kSubgroups_of_card_cube

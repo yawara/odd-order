@@ -618,6 +618,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.FeitSibleyInput
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.InducedLambda
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
 import OddOrder.Higman.Suzuki2Groups
