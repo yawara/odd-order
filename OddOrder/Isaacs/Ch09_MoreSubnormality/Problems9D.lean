@@ -22,6 +22,9 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9D
   書籍 hint の `L^{(G)} ⊆ X` は `strongClosure_strongCore_le`。
 * **9D.3** `subnormalCore_ne_sInf_conj` — `G = S₄`, `X = ⟨(0 1 2 3)⟩` では subnormal core
   (`= ⟨(0 2)(1 3)⟩`, 位数 2) は `X` の共役たちのどんな交わりでも書けない。
+* **9D.4 (進行中)** `KegelHypothesis` (Lemma 9.31 の逆 = Kegel 予想の仮説) と, その
+  部分群・正規部分群への降下 (`KegelHypothesis.subgroupOf` / `KegelHypothesis.infNormal`)。
+  極小反例の解析本体は未了。
 
 ## 9D.1 について
 
@@ -417,5 +420,113 @@ theorem subnormalCore_ne_sInf_conj (𝒞 : Set (Subgroup (Equiv.Perm (Fin 4))))
     omega
 
 end -- 9D.3
+
+section /- 9D.4: Kegel 予想 (Lemma 9.31 の逆) の極小反例 (p. 294) -/
+
+/-- **Kegel の仮説** (Isaacs Problem 9D.4, p. 294): すべての素数 `p` とすべての
+`P ∈ Syl_p(G)` について `P ∩ S` が `S` の Sylow `p`-部分群であること
+(`Sylow` は「指数が `p` と互いに素な `p`-部分群」なので指数の形で書く)。
+
+**Lemma 9.31** はこの条件が `S ◁◁ G` から従うことを言う
+(`KegelHypothesis.of_isSubnormal`)。9D.4 の主題はその**逆** (Kegel 予想, Kleidman が
+単純群の分類を使って証明) の極小反例の構造。 -/
+def KegelHypothesis (S : Subgroup G) : Prop :=
+  ∀ (p : ℕ), Fact p.Prime → ∀ P : Sylow p G, ¬ p ∣ ((P : Subgroup G) ⊓ S).relIndex S
+
+/-- **Lemma 9.31** の言い換え: subnormal なら Kegel の仮説をみたす。 -/
+theorem KegelHypothesis.of_isSubnormal [Finite G] {S : Subgroup G} (hS : S.IsSubnormal) :
+    KegelHypothesis S := fun p hp P => by
+  haveI := hp
+  exact not_dvd_relIndex_inf_of_isSubnormal hS P
+
+/-- `↥H` の Sylow `p`-部分群は `G` の Sylow `p`-部分群 `P` を使って `(P ⊓ H).subgroupOf H`
+と書ける (極大性から)。 -/
+theorem exists_sylow_inf_eq [Finite G] {p : ℕ} [Fact p.Prime] (H : Subgroup G)
+    (Q : Sylow p ↥H) :
+    ∃ P : Sylow p G, (Q : Subgroup ↥H) = ((P : Subgroup G) ⊓ H).subgroupOf H := by
+  -- `Q` の `G` での像は `p`-部分群なので Sylow に伸びる
+  have himg : IsPGroup p ↥((Q : Subgroup ↥H).map H.subtype) :=
+    Q.isPGroup'.map H.subtype
+  obtain ⟨P, hP⟩ := himg.exists_le_sylow
+  -- `(P ⊓ H).subgroupOf H` は `Q` を含む `p`-部分群なので, `Q` の極大性で一致
+  have hpg : IsPGroup p ↥(((P : Subgroup G) ⊓ H).subgroupOf H) :=
+    (P.isPGroup'.of_injective (Subgroup.inclusion inf_le_left)
+      (Subgroup.inclusion_injective _)).comap_subtype
+  have hle : (Q : Subgroup ↥H) ≤ ((P : Subgroup G) ⊓ H).subgroupOf H := by
+    intro x hx
+    exact ⟨hP ⟨x, hx, rfl⟩, x.2⟩
+  exact ⟨P, (Q.3 hpg hle).symm⟩
+
+/-- **(F1) 中間部分群への降下**: `S ≤ H ≤ G` なら Kegel の仮説は `↥H` の中でも成り立つ。
+
+`↥H` の Sylow `Q` は `G` の Sylow `P` で `Q = (P ⊓ H).subgroupOf H` と書け, `S ≤ H` なので
+`Q ⊓ S.subgroupOf H = (P ⊓ S).subgroupOf H`。 -/
+theorem KegelHypothesis.subgroupOf [Finite G] {S H : Subgroup G} (hK : KegelHypothesis S)
+    (hSH : S ≤ H) : KegelHypothesis (S.subgroupOf H) := by
+  intro p hp Q
+  haveI := hp
+  obtain ⟨P, hPQ⟩ := exists_sylow_inf_eq H Q
+  have hmeet : (Q : Subgroup ↥H) ⊓ S.subgroupOf H = ((P : Subgroup G) ⊓ S).subgroupOf H := by
+    rw [hPQ]
+    ext x
+    simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf]
+    exact ⟨fun h => ⟨h.1.1, h.2⟩, fun h => ⟨⟨h.1, hSH h.2⟩, h.2⟩⟩
+  rw [hmeet, Subgroup.relIndex_subgroupOf hSH]
+  exact hK p hp P
+
+/-- **(F3) 正規部分群への降下**: `N ◁ G` なら Kegel の仮説は `(N, S ⊓ N)` にも降りる。
+
+`↥N` の Sylow は `(P ⊓ N).subgroupOf N` の形で, `Q ⊓ (S⊓N).subgroupOf N =
+(P ⊓ S ⊓ N).subgroupOf N`。`P ⊓ S ∈ Syl_p(S)` と `S ⊓ N ◁ S` に Lemma 9.31 の normal 段
+(`not_dvd_relIndex_inf_of_normal`) を `↥S` の中で当てる。 -/
+theorem KegelHypothesis.infNormal [Finite G] {S : Subgroup G} (hK : KegelHypothesis S)
+    (N : Subgroup G) [N.Normal] : KegelHypothesis ((S ⊓ N).subgroupOf N) := by
+  intro p hp Q
+  haveI := hp
+  obtain ⟨P, hPQ⟩ := exists_sylow_inf_eq N Q
+  -- `↥S` の中で `(P ⊓ S).subgroupOf S` は Sylow
+  have hPS_pg : IsPGroup p ↥(((P : Subgroup G) ⊓ S).subgroupOf S) :=
+    (P.isPGroup'.of_injective (Subgroup.inclusion inf_le_left)
+      (Subgroup.inclusion_injective _)).comap_subtype
+  have hPS_idx : ¬ p ∣ (((P : Subgroup G) ⊓ S).subgroupOf S).index := by
+    have := hK p hp P
+    rwa [Subgroup.relIndex] at this
+  haveI : ((S ⊓ N).subgroupOf S).Normal := by
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_left).mpr ?_
+    intro s hs
+    rw [Subgroup.mem_normalizer_iff]
+    intro y
+    constructor
+    · rintro ⟨hyS, hyN⟩
+      exact ⟨S.mul_mem (S.mul_mem hs hyS) (S.inv_mem hs), ‹N.Normal›.conj_mem y hyN s⟩
+    · rintro ⟨hyS, hyN⟩
+      refine ⟨?_, ?_⟩
+      · have : y = s⁻¹ * (s * y * s⁻¹) * s := by group
+        rw [this]
+        exact S.mul_mem (S.mul_mem (S.inv_mem hs) hyS) hs
+      · have : y = s⁻¹ * (s * y * s⁻¹) * s⁻¹⁻¹ := by group
+        rw [this]
+        exact ‹N.Normal›.conj_mem _ hyN s⁻¹
+  have hnorm := not_dvd_relIndex_inf_of_normal ((S ⊓ N).subgroupOf S)
+    (hPS_pg.toSylow hPS_idx)
+  rw [IsPGroup.toSylow_coe] at hnorm
+  -- `↥S` での交わりを ambient に戻す
+  have hmeet1 : ((P : Subgroup G) ⊓ S).subgroupOf S ⊓ (S ⊓ N).subgroupOf S
+      = ((P : Subgroup G) ⊓ S ⊓ N).subgroupOf S := by
+    ext x
+    simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf]
+    tauto
+  rw [hmeet1, Subgroup.relIndex_subgroupOf inf_le_left] at hnorm
+  -- `↥N` 側の交わりも同じ ambient 部分群
+  have hmeet2 : (Q : Subgroup ↥N) ⊓ (S ⊓ N).subgroupOf N
+      = ((P : Subgroup G) ⊓ S ⊓ N).subgroupOf N := by
+    rw [hPQ]
+    ext x
+    simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf]
+    exact ⟨fun h => ⟨⟨h.1.1, h.2.1⟩, h.2.2⟩, fun h => ⟨⟨h.1.1, x.2⟩, h.1.2, h.2⟩⟩
+  rw [hmeet2, Subgroup.relIndex_subgroupOf inf_le_right]
+  exact hnorm
+
+end -- 9D.4
 
 end OddOrder.Isaacs.Ch09
