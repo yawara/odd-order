@@ -696,3 +696,30 @@ Wielandt (9.1) の ambient 版 `natCard_eq_pow_natCard_inf_centralizer_of_kernel
 3. 基点を取って `Ω ≅ K` とし、`x'` の作用を `k ↦ α(k)·c` の形にする。
 4. `x'^p = 1` から `N(c) = 1`、`exists_ne_zero_mul_pow_eq` で固定点を得る。
 5. `C_{Q/Q₀}(X) ≠ 1` ⟹ PSL 分岐の `C_Q(X) ≤ Q₀` と矛盾。
+
+
+## ✅ β step 2-3 は既存の `exists_field_semilinear` で済む (2026-07-29)
+
+`Peterfalvi/Appendices/SemilinearField.lean` の
+**`exists_field_semilinear`** (Appendix I Prop 2(a)+(b)) が丸ごと使える:
+
+```
+(hE : IsElementaryAbelian p E) (ψ : T →* MulAut E)   -- T は可換有限群
+(hirr : ∀ U, IsAInvariant ψ U → U = ⊥ ∨ U = ⊤)
+⟹ ∃ F 体, Module F (Additive E), finrank F (Additive E) = 1, |F| = |E| ∧
+   ∀ g : MulAut E, (g が T-作用を正規化) → ∃ σ : F ≃+* F, g が σ-半線形
+```
+
+`E := N/Q₀`, `T := K`, `ψ` = 共役作用 とすればよい:
+
+* `hirr`: `K` は `E` 上 fpf で `|K| = q−1 = |E ∖ {1}|` ⟹ 軌道は 1 個 ⟹
+  非自明な不変部分群は `E∖{1}` を丸ごと含む ⟹ `⊤`。
+* `g` := `x'` の `E` 上の作用。`x` が `K` を正規化するので条件を満たす。
+* `finrank F E = 1` なので基底 `e₀` を取ると `x'(a • e₀) = σ(a)·c • e₀`
+  (`c` は `x'(e₀) = c • e₀` で決まる) ⟹ 座標で `a ↦ c · σ(a)`
+  = **`exists_ne_zero_mul_pow_eq` の形そのもの**。
+
+⟹ β の残りは「`X` 不変な `K`-部分群 `N` の取得」(`TwoKSubgroups.lean` の
+`exists_two_kSubgroups_unique_of_card_cube` + `conj_mem_of_unique_of_le_V`、
+および isotypic 側は `p ∤ q+1` からの固定点数え上げ) と、上の配線だけ。
+**新規の重い代数はもう無い。**
