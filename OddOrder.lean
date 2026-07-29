@@ -603,6 +603,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki
 import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
 import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.NearFieldClass
