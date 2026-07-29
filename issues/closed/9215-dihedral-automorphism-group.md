@@ -59,14 +59,41 @@ completeness の残り:
 
 ## 完了条件
 
-- [ ] `dihedralAut` とその API (合成則・単射・全射) が landing
-- [ ] `commutator_eq_translations` (`n` 奇数)
-- [ ] `IsCompleteGroup (MulAut (DihedralGroup n))` (`n` 奇数)
-- [ ] Problems9B.lean 側で 9B.4 の statement が閉じる
-- [ ] `OddOrder.lean` に import 配線
+- [x] `dihedralAut` とその API (合成則・単射・全射) が landing
+- [x] `commutator_eq_transSubgroup` (`n` 奇数)
+- [x] `IsCompleteGroup (MulAut (DihedralGroup n))` (`n` 奇数)
+- [x] Problems9B.lean 側で 9B.4 の statement が閉じる
+- [x] `OddOrder.lean` に import 配線
+
+## 完了記録 (2026-07-29)
+
+全項目 landing。`#print axioms` は 4 本とも `[propext, Classical.choice, Quot.sound]`
+(`exists_dihedralAut` / `commutator_eq_transSubgroup` / `center_mulAut_dihedral_eq_bot` /
+`mulAut_conj_surjective`)。`DihedralAut.lean` = 516 行, lint --strict clean。
+
+設計どおりに回ったが、実装で分かった追加の注意点:
+
+* **`n ≠ 1` は不要**だった。`n = 1` では `D₂ ≅ ℤ/2` で `Aut` が自明群になり
+  `center = ⊥` / `innAut = ⊤` が両方自明に成立する。書籍が `n ≠ 1` を要するのは
+  "Observe that `Z(G) = 1`" の側だけ (mathlib
+  `DihedralGroup.center_eq_bot_of_odd_ne_one`)。
+* `2` の可逆性は `ZMod.unitOfCoprime` を経由せず **`n = 2k+1` から `2(k+1) = n+1 ≡ 1`**
+  で初等的に取れる (`exists_two_mul_eq_one`)。⚠ `rw [hk]` で `n` 自体を書き換えると
+  `ZMod n` の依存で motive が壊れるので、ℕ の等式を `omega` で作りキャスト内だけ
+  書き換える。
+* 座標抽出 (`rCoord` / `srCoord`) を素の `match` で作れば **choice 不要**で
+  `rotAddHom` / `transAddHom` を `def` にできる (`Classical.choice` を実際に使うのは
+  `choose A hA using hunit` の 1 箇所だけ)。
+* 副産物として `mulEquivMulAutOfIsCompleteGroup` (complete ⟹ `H ≃* Aut(H)`) を
+  Problems9B.lean に追加 — 9B.2 / 9B.3 / 9B.4 に共通の
+  "contains at most two different groups" の内容を取り出す形。
 
 ## 参照
 
 * [issues/1055-isaacs-problems-campaign.md](1055-isaacs-problems-campaign.md) — 9B.4 の実状調査
-* `OddOrder/Isaacs/Ch09_MoreSubnormality/Problems9B.lean` — `dihedral_pow_eq_one_iff_exists_r`
+* `OddOrder/GroupTheory/DihedralAut.lean` — 本体 (`dihedral_pow_eq_one_iff_exists_r` は
+  Problems9B.lean から移設)
+* `OddOrder/Isaacs/Ch09_MoreSubnormality/Problems9B.lean` —
+  `isCompleteGroup_mulAut_dihedralGroup` (9B.4 の statement)
 * mathlib `Mathlib/Data/ZMod/Aut.lean` — `ZMod.AddAutEquivUnits`
+* 書籍ページ画像 `references/isaacs/pages/isaacs-p285-298.png` — 9B.4 の原文

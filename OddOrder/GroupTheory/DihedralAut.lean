@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.SpecificGroups.Dihedral
 import Mathlib.Data.ZMod.Aut
 import Mathlib.Algebra.Group.End
+import Mathlib.GroupTheory.Commutator.Basic
+import Mathlib.Tactic.LinearCombination
 
 /-!
 # 二面体群の自己同型群 `Aut(D_{2n})` (`n` 奇数)
@@ -335,5 +337,180 @@ theorem commutator_eq_transSubgroup (hodd : Odd n) :
     exact hmem
 
 end /- 平行移動部分群 = 交換子部分群 -/
+
+section /- `Aut(D_{2n})` は complete (`n` 奇数) -/
+
+/-- `Aut(D_{2n})` の中心は自明 (`n` 奇数)。
+
+`(a,u)` が `(b,1)` 全部と可換 ⟹ `u b = b` ⟹ `u = 1`; さらに `(0,v)` 全部と可換 ⟹
+`a = v a`, `v = -1` と `2` の可逆性で `a = 0`。 -/
+theorem center_mulAut_dihedral_eq_bot (hodd : Odd n) :
+    Subgroup.center (MulAut (DihedralGroup n)) = ⊥ := by
+  rw [eq_bot_iff]
+  intro α hα
+  rw [Subgroup.mem_center_iff] at hα
+  obtain ⟨a, u, rfl⟩ := exists_dihedralAut hodd α
+  have hu : u = 1 := by
+    have h := hα (dihedralAut 1 1)
+    rw [dihedralAut_mul, dihedralAut_mul] at h
+    have h1 := (dihedralAut_eq_iff.mp h).1
+    simp only [Units.val_one, one_mul, mul_one] at h1
+    have hval : (u : ZMod n) = 1 := by linear_combination -h1
+    exact Units.ext (by simpa using hval)
+  subst hu
+  have ha : a = 0 := by
+    have h := hα (dihedralAut 0 (-1))
+    rw [dihedralAut_mul, dihedralAut_mul] at h
+    have h1 := (dihedralAut_eq_iff.mp h).1
+    simp only [Units.val_neg, Units.val_one, zero_add, mul_zero, add_zero, neg_mul,
+      one_mul] at h1
+    obtain ⟨h2, hh2⟩ := exists_two_mul_eq_one (n := n) hodd
+    have h2a : 2 * a = 0 := by linear_combination -h1
+    calc a = (2 * h2) * a := by rw [hh2, one_mul]
+      _ = h2 * (2 * a) := by ring
+      _ = 0 := by rw [h2a, mul_zero]
+  subst ha
+  exact Subgroup.mem_bot.mpr dihedralAut_zero_one
+
+/-- 平行移動部分群は `Aut(D_{2n})` の交換子部分群なので **characteristic**: 任意の
+`Φ ∈ Aut(Aut(D_{2n}))` で保たれる。 -/
+theorem map_mem_transSubgroup (hodd : Odd n) (Φ : MulAut (MulAut (DihedralGroup n)))
+    {α : MulAut (DihedralGroup n)} (hα : α ∈ transSubgroup n) : Φ α ∈ transSubgroup n := by
+  have hchar : Subgroup.Characteristic
+      ⁅(⊤ : Subgroup (MulAut (DihedralGroup n))), (⊤ : Subgroup (MulAut (DihedralGroup n)))⁆ :=
+    inferInstance
+  rw [← commutator_eq_transSubgroup hodd] at hα ⊢
+  exact Subgroup.characteristic_iff_map_le.mp hchar Φ ⟨α, hα, rfl⟩
+
+/-- `Φ ∈ Aut(Aut(D_{2n}))` が平行移動部分群 `≅ ℤ/n` に誘導する加法自己準同型。 -/
+def transAddHom (hodd : Odd n) (Φ : MulAut (MulAut (DihedralGroup n))) : ZMod n →+ ZMod n where
+  toFun a := srCoord (Φ (dihedralAut a 1) (sr 0))
+  map_zero' := by
+    change srCoord (Φ (dihedralAut 0 1) (sr 0)) = 0
+    rw [dihedralAut_zero_one, map_one]
+    simp [srCoord]
+  map_add' a b := by
+    obtain ⟨ca, hca⟩ := mem_transSubgroup_iff.mp
+      (map_mem_transSubgroup hodd Φ (dihedralAut_one_mem_transSubgroup a))
+    obtain ⟨cb, hcb⟩ := mem_transSubgroup_iff.mp
+      (map_mem_transSubgroup hodd Φ (dihedralAut_one_mem_transSubgroup b))
+    have hsum : Φ (dihedralAut (a + b) 1) = dihedralAut (ca + cb) 1 := by
+      have hprod : (dihedralAut (a + b) 1 : MulAut (DihedralGroup n))
+          = dihedralAut a 1 * dihedralAut b 1 := by rw [dihedralAut_mul]; simp
+      rw [hprod, map_mul, hca, hcb, dihedralAut_mul]
+      simp
+    have e1 : srCoord (Φ (dihedralAut a 1) (sr 0)) = ca := by rw [hca]; simp
+    have e2 : srCoord (Φ (dihedralAut b 1) (sr 0)) = cb := by rw [hcb]; simp
+    have e3 : srCoord (Φ (dihedralAut (a + b) 1) (sr 0)) = ca + cb := by rw [hsum]; simp
+    simp only [e1, e2, e3]
+
+theorem transAddHom_coe (hodd : Odd n) (Φ : MulAut (MulAut (DihedralGroup n))) (a : ZMod n) :
+    transAddHom hodd Φ a = srCoord (Φ (dihedralAut a 1) (sr 0)) := rfl
+
+theorem transAddHom_apply (hodd : Odd n) (Φ : MulAut (MulAut (DihedralGroup n))) (a : ZMod n) :
+    Φ (dihedralAut a 1) = dihedralAut (transAddHom hodd Φ a) 1 := by
+  obtain ⟨c, hc⟩ := mem_transSubgroup_iff.mp
+    (map_mem_transSubgroup hodd Φ (dihedralAut_one_mem_transSubgroup a))
+  rw [hc]
+  refine dihedralAut_eq_iff.mpr ⟨?_, rfl⟩
+  rw [transAddHom_coe, hc]
+  simp
+
+/-- `Φ` の平行移動部分群への制限は**単元倍**。 -/
+theorem exists_unit_map_trans (hodd : Odd n) (Φ : MulAut (MulAut (DihedralGroup n))) :
+    ∃ w : (ZMod n)ˣ, ∀ a : ZMod n, Φ (dihedralAut a 1) = dihedralAut ((w : ZMod n) * a) 1 := by
+  have hsurj : Function.Surjective (transAddHom hodd Φ) := by
+    intro c
+    obtain ⟨b, hb⟩ := mem_transSubgroup_iff.mp
+      (map_mem_transSubgroup hodd Φ⁻¹ (dihedralAut_one_mem_transSubgroup c))
+    refine ⟨b, ?_⟩
+    have hΦb : Φ (dihedralAut b 1) = dihedralAut c 1 := by rw [← hb]; simp
+    rw [transAddHom_apply hodd Φ b] at hΦb
+    exact (dihedralAut_eq_iff.mp hΦb).1
+  obtain ⟨w, hw⟩ := exists_unit_of_surjective_addHom hsurj
+  exact ⟨w, fun a => by rw [transAddHom_apply hodd Φ a, hw a]⟩
+
+/-- **1-cocycle の消滅** ⭐: 平行移動部分群を各点固定する `Ψ ∈ Aut(Aut(D_{2n}))` は
+`(c,1)` による共役。
+
+`Ψ (0,u) = (A u, u)` の `A` は 1-cocycle `A(uv) = A u + u · A v`。`u = -1` を
+`(ℤ/n)ˣ` の可換性で両側から使うと `2 A u = (1 - u) A(-1)`, `n` 奇数なので `2` を割って
+`A u = (1 - u) c` (`c = A(-1)/2`) — これはちょうど `(c,1)` 共役の形。 -/
+theorem eq_conj_of_fixes_trans (hodd : Odd n) (Ψ : MulAut (MulAut (DihedralGroup n)))
+    (hΨ : ∀ a : ZMod n, Ψ (dihedralAut a 1) = dihedralAut a 1) :
+    ∃ c : ZMod n, Ψ = MulAut.conj (dihedralAut c 1) := by
+  -- (1) `Ψ` は `(0,u)` の unit 成分を保つ
+  have hunit : ∀ u : (ZMod n)ˣ, ∃ A : ZMod n, Ψ (dihedralAut 0 u) = dihedralAut A u := by
+    intro u
+    obtain ⟨A, B, hAB⟩ := exists_dihedralAut hodd (Ψ (dihedralAut 0 u))
+    refine ⟨A, ?_⟩
+    rw [hAB]
+    have hB : B = u := by
+      have h1 : ∀ a : ZMod n,
+          dihedralAut ((B : ZMod n) * a) 1 = dihedralAut ((u : ZMod n) * a) 1 := by
+        intro a
+        have hcj := congrArg Ψ (conj_dihedralAut_one (0 : ZMod n) a u)
+        rw [map_mul, map_mul, map_inv, hΨ a, hAB, hΨ ((u : ZMod n) * a),
+          conj_dihedralAut_one] at hcj
+        exact hcj
+      have h2 := h1 1
+      rw [mul_one, mul_one] at h2
+      exact Units.ext (dihedralAut_eq_iff.mp h2).1
+    rw [hB]
+  choose A hA using hunit
+  -- (2) `A` は 1-cocycle
+  have hcocycle : ∀ u v : (ZMod n)ˣ, A (u * v) = A u + (u : ZMod n) * A v := by
+    intro u v
+    have hprod : (dihedralAut (0 : ZMod n) u * dihedralAut (0 : ZMod n) v
+        : MulAut (DihedralGroup n)) = dihedralAut 0 (u * v) := by rw [dihedralAut_mul]; simp
+    have h := congrArg Ψ hprod
+    rw [map_mul, hA u, hA v, hA (u * v), dihedralAut_mul] at h
+    exact (dihedralAut_eq_iff.mp h).1.symm
+  -- (3) `u = -1` を使って cocycle を coboundary にする
+  obtain ⟨h2, hh2⟩ := exists_two_mul_eq_one (n := n) hodd
+  refine ⟨h2 * A (-1), ?_⟩
+  have hAu : ∀ u : (ZMod n)ˣ, A u = (1 - (u : ZMod n)) * (h2 * A (-1)) := by
+    intro u
+    have e1 := hcocycle u (-1)
+    have e2 := hcocycle (-1) u
+    rw [mul_comm u (-1 : (ZMod n)ˣ)] at e1
+    have hneg : ((-1 : (ZMod n)ˣ) : ZMod n) = -1 := by simp
+    rw [hneg] at e2
+    have key : 2 * A u = (1 - (u : ZMod n)) * A (-1) := by
+      rw [e1] at e2; linear_combination e2
+    calc A u = (2 * h2) * A u := by rw [hh2, one_mul]
+      _ = h2 * (2 * A u) := by ring
+      _ = h2 * ((1 - (u : ZMod n)) * A (-1)) := by rw [key]
+      _ = (1 - (u : ZMod n)) * (h2 * A (-1)) := by ring
+  -- (4) 両者は生成元 `(a,1)`, `(0,u)` で一致
+  refine MulEquiv.ext fun α => ?_
+  obtain ⟨a, u, rfl⟩ := exists_dihedralAut hodd α
+  have hlhs : Ψ (dihedralAut a u)
+      = dihedralAut (a + (1 - (u : ZMod n)) * (h2 * A (-1))) u := by
+    rw [← dihedralAut_decomp a u, map_mul, hΨ a, hA u, hAu u, dihedralAut_mul]
+    refine dihedralAut_eq_iff.mpr ⟨?_, ?_⟩ <;> simp
+  rw [hlhs, conj_dihedralAut]
+
+/-- **`Aut(D_{2n})` の自己同型はすべて内部** (`n` 奇数) ⭐。 -/
+theorem mulAut_conj_surjective (hodd : Odd n) :
+    Function.Surjective (MulAut.conj (G := MulAut (DihedralGroup n))) := by
+  intro Φ
+  obtain ⟨w, hw⟩ := exists_unit_map_trans hodd Φ
+  -- `conj ((0,w)⁻¹)` を掛けると平行移動部分群を各点固定する `Ψ` になる
+  have hΨ : ∀ a : ZMod n,
+      (MulAut.conj ((dihedralAut (0 : ZMod n) w)⁻¹) * Φ) (dihedralAut a 1)
+        = dihedralAut a 1 := by
+    intro a
+    change MulAut.conj ((dihedralAut (0 : ZMod n) w)⁻¹) (Φ (dihedralAut a 1)) = _
+    rw [hw a, MulAut.conj_apply, dihedralAut_inv, conj_dihedralAut_one]
+    refine dihedralAut_eq_iff.mpr ⟨?_, rfl⟩
+    rw [← mul_assoc, ← Units.val_mul]
+    simp
+  obtain ⟨c, hc⟩ := eq_conj_of_fixes_trans hodd _ hΨ
+  refine ⟨dihedralAut (0 : ZMod n) w * dihedralAut c 1, ?_⟩
+  rw [map_mul, ← hc, ← mul_assoc, ← map_mul]
+  simp
+
+end /- `Aut(D_{2n})` は complete (`n` 奇数) -/
 
 end OddOrder.GroupTheory

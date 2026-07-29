@@ -11,6 +11,7 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
 import OddOrder.Isaacs.Ch09_MoreSubnormality.NilpotentResidual
 import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
+import OddOrder.GroupTheory.DihedralAut
 
 /-!
 # Isaacs §9B の演習 (書籍 pp. 284-285)
@@ -25,6 +26,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9B
   ⚠ 書籍の「`i ≤ 2`」はこの形に**再解釈**して形式化した (issue 1055 参照)。
 * **9B.3** `isCompleteGroup_mulAut_of_isSemisimpleGroup` — `G` semisimple なら `Aut(G)` は
   complete (`E(Aut G) = Inn(G)` が characteristic なので 9B.2 が使える)。
+* **9B.4** `isCompleteGroup_mulAut_dihedralGroup` — `G = D_{2n}` (`n` 奇数) なら `Aut(G)` は
+  complete。`Aut(D_{2n}) ≅ Hol(ℤ/n)` の構造は `OddOrder/GroupTheory/DihedralAut.lean`。
 * **9B.5** `nilpotentResidual_top_eq_sup_of_isSubnormal` — `G = AB` で `A, B ⊲⊲ G` なら
   `G^∞ = A^∞ B^∞`。⚠ 仮説は join でなく**積** (`(A : Set G) * B = Set.univ`);
   帰納段の Dedekind が積の恒等式なので join では回らない。
@@ -46,6 +49,17 @@ section /- 9B.1: complete な正規部分群は直積因子 (p. 284) -/
 /-- **Complete group** (Isaacs p. 278): 中心が自明で, 自己同型がすべて内部。 -/
 def IsCompleteGroup (G : Type*) [Group G] : Prop :=
   center G = ⊥ ∧ innAut G = ⊤
+
+/-- **complete な群は自分の自己同型群と同型** (`g ↦ τ_g` が全単射)。
+
+「automorphism tower がそこで止まる」の内容そのもの: `H` が complete なら
+`H ≃* Aut(H) ≃* Aut(Aut(H)) ≃* ⋯`。9B.2 / 9B.3 / 9B.4 の
+"contains at most two different groups" はこの形で読む。 -/
+noncomputable def mulEquivMulAutOfIsCompleteGroup {H : Type*} [Group H] (h : IsCompleteGroup H) :
+    H ≃* MulAut H :=
+  MulEquiv.ofBijective (MulAut.conj (G := H))
+    ⟨(MonoidHom.ker_eq_bot_iff _).mp (by rw [conj_ker]; exact h.1),
+      MonoidHom.range_eq_top.mp h.2⟩
 
 /-- `Z(↥N) = 1` なら `N ⊓ C_G(N) = 1` (`N ⊓ C_G(N)` の元は `↥N` の中心元)。 -/
 theorem inf_centralizer_eq_bot_of_center_eq_bot {N : Subgroup G} (h : center ↥N = ⊥) :
@@ -435,5 +449,31 @@ theorem nilpotentResidual_top_eq_sup_of_isSubnormal [Finite G] {A B : Subgroup G
     (sup_le (nilpotentResidual_mono le_top) (nilpotentResidual_mono le_top))
 
 end -- 9B.5
+
+section /- 9B.4: D_{2n} (n 奇数) の automorphism tower (p. 285) -/
+
+/-- **Isaacs Problem 9B.4** (書籍 p. 285) ⭐: `G` が位数 `2n` の二面体群で `n` が奇数なら,
+automorphism tower は `G₂ = Aut(G)` で止まる (= 相異なる群は高々 2 個)。
+
+書籍の "Observe that `Z(G) = 1`" の部分は mathlib の
+`DihedralGroup.center_eq_bot_of_odd_ne_one (hodd : Odd n) (hne1 : n ≠ 1)` そのもので,
+新たに形式化する内容ではない (`n = 1` は `D₂ ≅ ℤ/2` が可換なので除外される)。
+
+本体は **`Aut(D_{2n})` が complete** であること。9B.2 (`Inn(G)` が `Aut(G)` で
+characteristic なら tower が止まる) は**使えない** — 代わりに
+[`OddOrder/GroupTheory/DihedralAut.lean`](OddOrder/GroupTheory/DihedralAut.lean) で
+`Aut(D_{2n}) ≅ Hol(ℤ/n) = ℤ/n ⋊ (ℤ/n)ˣ` を座標で構成し, 平行移動部分群が
+**交換子部分群**に一致する (`n` 奇数) ことから characteristic 性を得て,
+1-cocycle の消滅で「自己同型はすべて内部」を出す。
+
+`n = 1` (`D₂ ≅ ℤ/2`, `Aut` は自明群) でも成り立つので `n ≠ 1` は不要。
+tower が止まることは `mulEquivMulAutOfIsCompleteGroup` で
+`Aut(D_{2n}) ≃* Aut(Aut(D_{2n}))` として取り出せる。 -/
+theorem isCompleteGroup_mulAut_dihedralGroup {n : ℕ} (hodd : Odd n) :
+    IsCompleteGroup (MulAut (DihedralGroup n)) :=
+  ⟨OddOrder.GroupTheory.center_mulAut_dihedral_eq_bot hodd,
+    MonoidHom.range_eq_top.mpr (OddOrder.GroupTheory.mulAut_conj_surjective hodd)⟩
+
+end -- 9B.4
 
 end OddOrder.Isaacs.Ch09
