@@ -216,6 +216,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsHallSystems
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsMinimalNormal
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsCoreFreeMaximal
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsCoprimeOrders
+import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
 import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Defs
 import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.QuotientTransfer
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
