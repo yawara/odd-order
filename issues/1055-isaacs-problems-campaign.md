@@ -31,10 +31,9 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       (§1E は Sylow 計数の非単純性 8 問, §1F は Brodkey 周辺 3 問, §1G は Chermak–Delgado 4 問)
 - [ ] Ch.2 Subnormality
 - [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
-      **§3D 進行中 (2026-07-29)**: 3D.1(a) ✅ / 3D.2 ✅ / 3D.3 ✅ / 3D.4 ✅ / 3D.5 ✅
-      (`Problems3D.lean`, 495 行)。残り = **3D.1(b) のみ**
-      (`p`-length ≤ `P` の冪零類)。`π`-length の基盤 `PiLength.lean` は landing 済。
-      その後 §3E。
+      **§3D 🎉 完済 (2026-07-29)**: 3D.1(a)(b) / 3D.2 / 3D.3 / 3D.4 / 3D.5 全問
+      (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。**次の frontier = §3E**
+      (3E.1-3E.x, coprime action)。
 
 ### 3D.1(b) の基盤 `Ch03_SplitExtensions/PiLength.lean` (2026-07-29 landing)
 
@@ -60,16 +59,19 @@ repo に `p`-length の定義が無かったので新設。
   = 「`π`-length は `G/O_{π',π}(G)` に移ると 1 減る」の形式化。
   補助 = `oPiPrimePiCore_le_piUpperSeries_succ`。
 
-**次の一手 (3D.1(b) 本体)**: `c := nilpotencyClass ↥P` に関する帰納。
-* base `c = 0`: `P` 自明 ⟹ `p ∤ |G|` ⟹ `hasPiLengthLE_zero_of_isPiGroup`。
-* step: `M := O_{p',p}(G)`。`Z(P) ≤ M` を出す (下記) と `↥P/(M.subgroupOf P)` は
-  `↥P/Z(↥P)` の商ゆえ class ≤ c (`Group.nilpotencyClass_quotient_center` +
-  `Group.nilpotencyClass_le_of_surjective`)。これが `G/M` の Sylow `p` と同型なので
-  帰納法の仮説 + `piUpperSeries_succ_eq_comap` で閉じる。
-* **`Z(P) ≤ M` の出し方 (iso を経由しない筋を確定済)**: `N := O_{p'}(G)`, `Ḡ := G/N` で
-  `z ∈ Z(P)` の像は `P̄ = PN/N` を中心化し (`[z̄, p̄n̄] = [z̄, p̄] = 1`)、かつ `z̄ ∈ P̄` なので
-  `z̄ ∈ Z(P̄) ≤ O_p(Ḡ)` (3D.1(a))。ゆえに `z ∈ comap (mk' N) (O_p(Ḡ)) = M`。
-  ⚠ `P ≅ P̄` の同型を作る必要は無い。
+* ✅ **3D.1(b)** `hasPiLengthLE_nilpotencyClass` (2026-07-29 完成)。
+  `c := nilpotencyClass ↥P` に関する帰納:
+  * base `c = 0`: `P` 自明 ⟹ `p ∤ |G|` ⟹ `hasPiLengthLE_zero_of_isPiGroup`。
+  * step: `M := O_{p',p}(G)`。`center_sylow_le_oPiPrimePiCore` で `Z(P) ≤ M` を出すと
+    `↥P → ↥(P.map (mk' M))` が `Z(↥P)` を殺すので `QuotientGroup.lift` で
+    `↥P/Z(↥P) ↠ ↥(P.map (mk' M))`、`Group.nilpotencyClass_quotient_center` +
+    `Group.nilpotencyClass_le_of_surjective` で class ≤ c。
+    `P.map (mk' M)` は `G/M` の Sylow `p` (`exists_sylow_coe_eq_of_isHallSubgroup_singleton`)
+    なので帰納法の仮説 + `piUpperSeries_succ_eq_comap` で閉じる。
+  * **`Z(P) ≤ M` (`center_sylow_le_oPiPrimePiCore`)**: `N := O_{p'}(G)`, `Ḡ := G/N` で
+    `z ∈ Z(P)` の像は `P̄ = PN/N` を中心化し (`[z̄, x̄] = 1`)、かつ `z̄ ∈ P̄` なので
+    `z̄ ∈ Z(P̄) ≤ O_p(Ḡ)` (3D.1(a))。ゆえに `z ∈ comap (mk' N) (O_p(Ḡ)) = M`。
+    ⚠ `P ≅ P̄` の同型を作る必要は無い (当初の見立てより軽かった)。
 
 ### §3D の統制情報 (2026-07-29)
 
