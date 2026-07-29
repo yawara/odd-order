@@ -13905,3 +13905,5 @@ Ch. III §1 Proposition が `F/Z(F)` 側から持ち上げた元 `x` を `Q`-成
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isPGroup_two_Q0
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.false_of_natCard_cQ_eq_cQ0_of_card_cube
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.exists_ne_one_fixed_of_prime_pow_eq_one
