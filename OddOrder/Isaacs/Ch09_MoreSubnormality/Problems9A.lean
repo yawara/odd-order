@@ -20,6 +20,9 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9A
   `N` は `N` に含まれる極小正規部分群の join。
 * **9A.4** `eq_iSup_component_sup_inf_center` — `N ⊴ E(G)` なら `N = M Y`
   (`M` = `N` に含まれる component の積, `Y = N ∩ Z(E)`)。⚠ 書籍の `Y = M ∩ Z(E)` は誤植。
+* **9A.5** `commutator_eq_bot_of_isComponent_notLe` — `H ⊴ G` で component `C ⊄ H` なら
+  `⁅H, C⁆ = 1`。⚠ 書籍 hint の `E = E(H)` は `E = E(G)` の誤植。
+* **9A.6** `layer_le_of_centralizer_le` — `H ⊴ G` で `C_G(H) ≤ H` なら `E(G) ≤ H`。
 
 ## 実装ノート (9A.1)
 
@@ -541,5 +544,91 @@ theorem eq_iSup_component_sup_inf_center [Finite G] (N : Subgroup ↥(layer G)) 
   exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hm) (Subgroup.mem_sup_right hy)
 
 end -- 9A.4
+
+section /- 9A.5: H ⊴ G, C ⊄ H component なら ⁅H,C⁆ = 1 (p. 277) -/
+
+/-- `Z(K)` を ambient に落としたものは `K` を中心化する。 -/
+theorem map_center_le_centralizer (K : Subgroup G) :
+    (center ↥K).map K.subtype ≤ Subgroup.centralizer (K : Set G) := by
+  rintro _ ⟨z, hz, rfl⟩
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hx
+  exact congrArg Subtype.val (Subgroup.mem_center_iff.mp hz ⟨x, hx⟩)
+
+/-- **9A.5 の核** (書籍 hint): `⁅H ∩ E, C⁆ = 1` (`E = E(G)`)。
+
+9A.4 で `H ∩ E = M Y` (`M` = `H` に含まれる component の積, `Y ≤ Z(E)`) と書けるので,
+`C` と `M` の各因子は**相異なる** component (`C ⊄ H`) ゆえ Thm 9.4 で可換, `Y ≤ Z(E)` は
+`C ≤ E` を中心化する。
+
+⚠ 書籍の hint は "where `E = E(H)`" と書いているが, `H ∩ E` という書き方から
+`E = E(G)` の誤植 (`E(H) ≤ H` なら `H ∩ E(H) = E(H)` で `H ∩` が無意味)。 -/
+theorem commutator_inf_layer_isComponent_eq_bot [Finite G] {H C : Subgroup G} [H.Normal]
+    (hC : IsComponent C) (hCH : ¬C ≤ H) : ⁅H ⊓ layer G, C⁆ = ⊥ := by
+  haveI : (H.subgroupOf (layer G)).Normal := Subgroup.Normal.subgroupOf inferInstance _
+  rw [Subgroup.commutator_eq_bot_iff_le_centralizer,
+    ← Subgroup.subgroupOf_map_subtype H (layer G),
+    eq_iSup_component_sup_inf_center (H.subgroupOf (layer G)), Subgroup.map_sup]
+  refine sup_le ?_ ?_
+  · -- `M` の各 component は `H` に入るので `C` と異なる ⟹ Thm 9.4
+    rw [Subgroup.map_iSup]
+    refine iSup_le fun C' => ?_
+    have hC'E : (C' : Subgroup G) ≤ layer G := C'.2.1.le_layer
+    have hC'H : (C' : Subgroup G) ≤ H := by
+      have := Subgroup.map_mono (f := (layer G).subtype) C'.2.2
+      rw [Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+        inf_eq_left.mpr hC'E] at this
+      exact this.trans inf_le_left
+    have hne : (C' : Subgroup G) ≠ C := fun h => hCH (h ▸ hC'H)
+    rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hC'E,
+      ← Subgroup.commutator_eq_bot_iff_le_centralizer]
+    exact C'.2.1.commutator_eq_bot_of_ne hC hne
+  · -- `Y ≤ Z(E)` は `C ≤ E` を中心化する
+    refine (Subgroup.map_mono inf_le_right).trans ?_
+    exact (map_center_le_centralizer (layer G)).trans
+      (Subgroup.centralizer_le (by exact_mod_cast hC.le_layer))
+
+/-- **Isaacs Problem 9A.5** (書籍 p. 277) ⭐: `H ⊴ G` で `C` が `H` に含まれない `G` の
+component なら `⁅H, C⁆ = 1`。
+
+**証明**: `⁅H,C⁆ ≤ H ∩ E` (`H ◁ G`, `E = E(G) ◁ G`, `C ≤ E`) なので前補題から
+`⁅⁅H,C⁆, C⁆ = 1`。三部分群補題 (`commutator_commutator_eq_bot_of_rotate`) で
+`⁅⁅C,C⁆, H⁆ = 1`, `C` は perfect (`⁅C,C⁆ = C`) なので `⁅C,H⁆ = 1`。 -/
+theorem commutator_eq_bot_of_isComponent_notLe [Finite G] {H C : Subgroup G} [H.Normal]
+    (hC : IsComponent C) (hCH : ¬C ≤ H) : ⁅H, C⁆ = ⊥ := by
+  have hHC : ⁅H, C⁆ ≤ H ⊓ layer G :=
+    le_inf (Subgroup.commutator_le_left H C)
+      ((Subgroup.commutator_mono le_rfl hC.le_layer).trans
+        (Subgroup.commutator_le_right H (layer G)))
+  have h3 : ⁅⁅H, C⁆, C⁆ = ⊥ := by
+    refine le_bot_iff.mp ?_
+    rw [← commutator_inf_layer_isComponent_eq_bot hC hCH]
+    exact Subgroup.commutator_mono hHC le_rfl
+  haveI := hC.isQuasisimple.isPerfect
+  have h4 : ⁅⁅C, C⁆, H⁆ = ⊥ :=
+    Subgroup.commutator_commutator_eq_bot_of_rotate
+      (by rw [Subgroup.commutator_comm C H]; exact h3) h3
+  rw [Subgroup.commutator_eq_self] at h4
+  rw [Subgroup.commutator_comm]
+  exact h4
+
+end -- 9A.5
+
+section /- 9A.6: C_G(H) ≤ H なら E(G) ≤ H (p. 277) -/
+
+/-- **Isaacs Problem 9A.6** (書籍 p. 277): `H ⊴ G` で `C_G(H) ⊆ H` なら `E(G) ⊆ H`。
+
+component `C` が `H` に入らないとすると 9A.5 で `⁅H, C⁆ = 1`, すなわち
+`C ≤ C_G(H) ≤ H` となって矛盾。 -/
+theorem layer_le_of_centralizer_le [Finite G] {H : Subgroup G} [H.Normal]
+    (h : Subgroup.centralizer (H : Set G) ≤ H) : layer G ≤ H := by
+  refine sSup_le fun C hC => ?_
+  by_contra hCH
+  have h1 : H ≤ Subgroup.centralizer (C : Set G) :=
+    Subgroup.commutator_eq_bot_iff_le_centralizer.mp
+      (commutator_eq_bot_of_isComponent_notLe hC hCH)
+  exact hCH ((Subgroup.le_centralizer_iff.mp h1).trans h)
+
+end -- 9A.6
 
 end OddOrder.Isaacs.Ch09
