@@ -135,6 +135,31 @@ theorem relIndex_map_conj [Finite G] {A N : Subgroup G} (hAN : A ≤ N) (g : G) 
   exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite)
     (h1.trans h2.symm)
 
+/-- **自己同型同変**: `π`-部分は `G` の自己同型で写る。 -/
+theorem IsHallPart.map_mulAut [Finite G] {N A : Subgroup G} {π : Set ℕ}
+    (h : IsHallPart N A π) (ψ : MulAut G) :
+    IsHallPart (N.map ψ.toMonoidHom) (A.map ψ.toMonoidHom) π := by
+  refine isHallPart_of_card_of_relIndex (Subgroup.map_mono h.1) ?_ ?_
+  · intro p hp
+    refine h.isPiGroup p ?_
+    rwa [Subgroup.card_map_of_injective ψ.injective] at hp
+  · intro p hp
+    refine h.relIndex_no_pi p ?_
+    have hle : A.map ψ.toMonoidHom ≤ N.map ψ.toMonoidHom := Subgroup.map_mono h.1
+    have hA : (A.map ψ.toMonoidHom).index = A.index := Subgroup.index_map_equiv A ψ
+    have hN : (N.map ψ.toMonoidHom).index = N.index := Subgroup.index_map_equiv N ψ
+    have h1 := Subgroup.relIndex_mul_index hle
+    have h2 := Subgroup.relIndex_mul_index h.1
+    rw [hA, hN] at h1
+    rwa [Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite)
+      (h1.trans h2.symm)] at hp
+
+/-- 自己同型による像の冪零性。 -/
+theorem isNilpotent_map_mulAut {N : Subgroup G} (hN : Group.IsNilpotent ↥N) (ψ : MulAut G) :
+    Group.IsNilpotent ↥(N.map ψ.toMonoidHom) :=
+  haveI := hN
+  Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective N ψ.toMonoidHom ψ.injective)
+
 /-- **共役同変**: `π`-部分の共役は共役の `π`-部分。 -/
 theorem IsHallPart.map_conj [Finite G] {N A : Subgroup G} {π : Set ℕ}
     (h : IsHallPart N A π) (g : G) :
@@ -207,6 +232,12 @@ theorem nilPiPart_map_conj [Finite G] [IsSolvable G] {N : Subgroup G} [IsSolvabl
     nilPiPart (N.map (MulAut.conj g).toMonoidHom) π
       = (nilPiPart N π).map (MulAut.conj g).toMonoidHom :=
   nilPiPart_eq (isNilpotent_map_conj hN g) ((isHallPart_nilPiPart π hN).map_conj g)
+
+/-- `π`-部分は自己同型同変 (関数版)。 -/
+theorem nilPiPart_map_mulAut [Finite G] {N : Subgroup G} [IsSolvable ↥N] (π : Set ℕ)
+    (hN : Group.IsNilpotent ↥N) (ψ : MulAut G) :
+    nilPiPart (N.map ψ.toMonoidHom) π = (nilPiPart N π).map ψ.toMonoidHom :=
+  nilPiPart_eq (isNilpotent_map_mulAut hN ψ) ((isHallPart_nilPiPart π hN).map_mulAut ψ)
 
 /-- 正規な冪零部分群の `π`-部分は正規 (一意性から共役不変)。 -/
 theorem nilPiPart_normal [Finite G] [IsSolvable G] {N : Subgroup G} [IsSolvable ↥N]

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Conjugacy
 
 /-!
 # Isaacs §3E の演習 (書籍 pp. 106-107)
@@ -105,6 +106,75 @@ theorem smul_eq_self_of_trivial_on_normal_and_quotient (φ : A →* MulAut G) {N
   have : g⁻¹ * (φ a) g = 1 := congrArg (Subtype.val : ↥N → G) hψa
   have h2 := mul_eq_one_iff_eq_inv.mp this
   simpa using h2.symm
+
+omit [Finite A] in
+/-- **Isaacs Problem 3E.1** (`G` が可解な場合, 書籍 p. 106): `A` が `G` に自己同型で作用し
+`G` が非自明な可解群なら, ある素数 `p` について非自明な `A`-不変 `p`-部分群がある。
+
+導来列の最後の非自明な項 `K` は可換で `A`-不変 (`IsAInvariant.derivedSeries`)。
+`p ∣ |K|` を取ると `K` の Sylow `p`-部分群 (`nilPiPart K {p}`) は一意なので
+`A`-不変 (`nilPiPart_map_mulAut`)。⚠ 半直積 `G ⋊ A` を作る必要はない。 -/
+theorem exists_isAInvariant_isPGroup_of_isSolvable [IsSolvable G] [Nontrivial G]
+    (φ : A →* MulAut G) :
+    ∃ (p : ℕ) (H : Subgroup G), p.Prime ∧ H ≠ ⊥ ∧ IsPGroup p ↥H ∧
+      OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
+  classical
+  -- 導来列の最後の非自明な項 `K`
+  have hex : ∃ n, derivedSeries G n = ⊥ := IsSolvable.solvable
+  have hn : derivedSeries G (Nat.find hex) = ⊥ := Nat.find_spec hex
+  have hn0 : Nat.find hex ≠ 0 := by
+    intro h0
+    rw [h0, derivedSeries_zero] at hn
+    obtain ⟨x, hx⟩ := exists_ne (1 : G)
+    have hxtop : x ∈ (⊤ : Subgroup G) := trivial
+    rw [hn, Subgroup.mem_bot] at hxtop
+    exact hx hxtop
+  obtain ⟨m, hm⟩ : ∃ m, Nat.find hex = m + 1 := ⟨Nat.find hex - 1, by omega⟩
+  set K : Subgroup G := derivedSeries G m with hKdef
+  have hKne : K ≠ ⊥ := Nat.find_min hex (by omega)
+  have hKcomm : ∀ x ∈ K, ∀ y ∈ K, x * y = y * x := by
+    have hbot : ⁅K, K⁆ = ⊥ := by
+      rw [hKdef, ← derivedSeries_succ, ← hm]
+      exact hn
+    have hle := Subgroup.commutator_eq_bot_iff_le_centralizer.mp hbot
+    intro x hx y hy
+    exact (Subgroup.mem_centralizer_iff.mp (hle hy) x hx)
+  haveI hKnil : Group.IsNilpotent ↥K := by
+    refine ⟨⟨1, ?_⟩⟩
+    rw [Subgroup.upperCentralSeries_one, eq_top_iff]
+    intro a _
+    refine Subgroup.mem_center_iff.mpr fun b => ?_
+    exact Subtype.ext (hKcomm b b.2 a a.2)
+  -- `p ∣ |K|`
+  have hKcard : 1 < Nat.card ↥K := by
+    haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
+    exact Finite.one_lt_card
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hKcard.ne'
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hpart := OddOrder.Isaacs.Ch03.isHallPart_nilPiPart (N := K) ({p} : Set ℕ) hKnil
+  refine ⟨p, OddOrder.Isaacs.Ch03.nilPiPart K ({p} : Set ℕ), hp, ?_, ?_, ?_⟩
+  · -- 非自明
+    intro hbot
+    have hcard := OddOrder.Isaacs.Ch03.card_isHallPart_singleton hpart
+    rw [hbot] at hcard
+    have h1 : Nat.card ↥(⊥ : Subgroup G) = 1 := by simp
+    rw [h1] at hcard
+    have hfac : 0 < (Nat.card ↥K).factorization p :=
+      Nat.Prime.factorization_pos_of_dvd hp Nat.card_pos.ne' hpdvd
+    have hlt : 1 < p ^ (Nat.card ↥K).factorization p :=
+      Nat.one_lt_pow hfac.ne' hp.one_lt
+    omega
+  · exact OddOrder.Isaacs.Ch03.isPGroup_of_isPiGroup_singleton hpart.isPiGroup
+  · -- `A`-不変
+    intro a
+    have hKinv : K.map (φ a).toMonoidHom = K := by
+      have h := OddOrder.Isaacs.Ch03.IsAInvariant.derivedSeries φ m a
+      rw [Subgroup.pointwise_smul_def] at h
+      exact h
+    have hmap := OddOrder.Isaacs.Ch03.nilPiPart_map_mulAut (N := K) ({p} : Set ℕ) hKnil (φ a)
+    rw [hKinv] at hmap
+    rw [Subgroup.pointwise_smul_def]
+    exact hmap.symm
 
 end -- 3E
 

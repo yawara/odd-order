@@ -33,8 +33,9 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
       **§3D 🎉 完済 (2026-07-29)**: 3D.1(a)(b) / 3D.2 / 3D.3 / 3D.4 / 3D.5 全問
       (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
-      **§3E 進行中 (2026-07-29)**: 3E.1 の Hint 前半 ✅ / 3E.3 ✅
-      (新 leaf **`Ch04_Commutators/Problems3E.lean`**)。残り = 3E.1 本体 / 3E.2 / 3E.4 / 3E.5。
+      **§3E 進行中 (2026-07-29)**: 3E.1 の Hint 前半 ✅ / **3E.1 (`G` 可解の場合) ✅** /
+      3E.3 ✅ (新 leaf **`Ch04_Commutators/Problems3E.lean`**)。
+      残り = 3E.1 (`A` 可解の場合) / 3E.2 / 3E.4 / 3E.5。
 
 ### §3E の置き場と統制情報 (2026-07-29)
 
@@ -52,11 +53,14 @@ import できない (Ch03 → Ch04 は逆向き)。
   (`A` が `N` に自明に作用するので cocycle 条件が積になる)。像の位数は `|A|` と `|N|` の
   両方を割るので自明。⚠ 書籍 Hint の「`A` を巡回群としてよい」は**不要**だった。
 
-**3E.1 本体の証明経路 (確定済、次の実装対象)**:
-* `G` 可解の場合: `Γ := G ⋊ A` の中で `G` に含まれる極小正規部分群 `M` を取る
-  (`Ch02.exists_isMinimalNormal_le_of_normal`)。`M ≤ G` は可解なので
-  `solvable_minimal_normal_isElementaryAbelian` で elementary abelian、
-  `Γ`-正規だから `A`-不変。
+**3E.1 本体の証明経路**:
+* ✅ `G` 可解の場合 `exists_isAInvariant_isPGroup_of_isSolvable` (2026-07-29):
+  ⚠ 当初計画の「`Γ := G ⋊ A` の極小正規部分群」より**ずっと軽い筋**が見つかった —
+  **導来列の最後の非自明な項 `K`** は可換かつ `A`-不変 (`IsAInvariant.derivedSeries`)。
+  `p ∣ |K|` を取れば `K` の Sylow `p` (= `nilPiPart K {p}`) は一意なので
+  `nilPiPart_map_mulAut` で `A`-不変。**半直積を作る必要は無い**。
+  そのために `PiParts.lean` に `IsHallPart.map_mulAut` / `isNilpotent_map_mulAut` /
+  `nilPiPart_map_mulAut` (自己同型同変版) を追加した。
 * `A` 可解の場合: `|A|` + `|G|` の帰納。`B ⊴ A` 極小正規 (elementary abelian `p`-群) を取る。
   * `B` が `G` に自明に作用 ⟹ `A/B` の作用に帰着 (`|A|` 減少)。
   * `C_G(B) ≠ 1` かつ `C_G(B) < G` ⟹ `A` は `C_G(B)` に作用 (`B ⊴ A`) ので `|G|` 減少。
