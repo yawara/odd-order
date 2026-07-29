@@ -6304,7 +6304,7 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
 | Ch.6 | 6A(10) 6B(9) 6C(2) | ✅ 全問 |
 | Ch.7 | 7A(6) 7C(1) | ✅ 全問 |
 | Ch.8 | 8A(13) 8B(10) 8C(6) 8D(6) | ✅ 全問 |
-| **Ch.9** | **9A(8) 9B(5) 9C(3) 9D(4)** | **❌ 0 問** |
+| **Ch.9** | **9A(8) 9B(5) 9C(3) 9D(4)** | **§9A ✅ 完済 (2026-07-29) / 9B・9C・9D 未** |
 | **Ch.10** | **10A(7) 10B(2) 10C(1)** | **❌ 0 問** |
 
 * 素の差分では 1F.1 / 3C.1 も欠落に見えたが **誤検出**: どちらも実装済みで、docstring が
@@ -6457,3 +6457,27 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
    * `sSup = ⊤` は `Basis.span_eq`。
 3. 最後に骨格の 2 分岐を合流させて 9A.8 本体
    (`exists_simpleFamily_of_isCharacteristicallySimple`) を組む。
+
+### 🎉 §9A 完済 (2026-07-29) — 9A.1〜9A.8 全問
+
+`Ch09_MoreSubnormality/Problems9A.lean` (1035 行) + 新 shared leaf
+`OddOrder/GroupTheory/Holomorph.lean` (issue 9214)。全て axiom-clean / lint --strict clean。
+
+9A.8 の abelian 枝で踏んだ罠 (再発必至なので記録):
+
+* **letI-bound-instance synthesis trap** (`PRank.lean` の `addAutEquivGL` 注記が正本):
+  `letI := h.zmodModule` の下で `Submodule (ZMod p) (Additive G)` を式に書くと
+  `LE (Submodule …)` の instance 合成が「stuck due to metavariables」で止まる。
+  **回避 = module を抽象のまま保つ補題に切り出す**
+  (`exists_addSubgroup_basis_family {M} [AddCommGroup M] [Module (ZMod p) M]`)。
+  呼び出し側は `AddSubgroup (Additive G)` と `Subgroup G` しか触らない
+  (`IsElementaryAbelian.exists_isComplement'` と同じ橋渡し)。
+* `Group` + `IsMulCommutative` から `CommGroup` を得る instance は **scoped** —
+  `open scoped IsMulCommutative in` が必要 (かつ `open … in` は **docstring の前**)。
+* `IsElementaryAbelian` は `def` で `And` に unfold されるため `h.zmodModule` が
+  `And.zmodModule` を探して失敗する → `IsElementaryAbelian.zmodModule h` と明示。
+
+**次 = §9B** (書籍 pp. 278-283 付近, 5 問; Wielandt の automorphism tower 周辺)。
+repo には `AutTower.lean` / `AutTowerBounds.lean` / `Schenkman.lean` /
+`InnerAutomorphisms.lean` が既にあるので, まず原文 (ページ画像) で statement を確定してから
+既存資産と突き合わせる。
