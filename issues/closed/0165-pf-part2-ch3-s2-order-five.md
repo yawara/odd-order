@@ -482,3 +482,45 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 必要な `typeAQuadraticMap_radical_eq_zero` は
 `q(a) = a·φ(a)` の極形式 `B(w,v) = wφ(v) + vφ(w)` について
 `v = 1` から `φ(w) = w`、次に `w(φ(v)+v) = 0` と `φ ≠ 1` から `w = 0`。
+
+## ✅ 配線完了 — case (b) の言葉だけで §2 Proposition (2026-07-29)
+
+`Suzuki2Groups/ModelCenters.lean` に type A の 3 本を追加:
+
+| 定理 | 内容 |
+|---|---|
+| `typeAQuadraticMap_radical_eq_zero` | `q(a) = a·φ(a)` の極形式 `B(w,v) = wφ(v)+vφ(w)` の根基は 0 (`v = 1` から `φ(w) = w`、次に `w(φ(v)+v) = 0` と `φ ≠ 1`) |
+| `BilinearTwistedProduct.mem_center_of_quotient_eq_zero` | 商座標 0 ⟹ 中心的 |
+| `TypeAData.sq_eq_one_of_mem_center` | type A の中心は指数 2 (B/C/D と同じ形) |
+| `TypeAData.isElementaryAbelian_quotient_center` | **`P/Z(P)` は基本可換** (交換子と 2 乗の商座標が 0) |
+
+新 leaf `StructureOfH/CaseBStructure.lean`:
+
+| 定理 | 内容 |
+|---|---|
+| `center_eq_Q0_subgroupOf_of_isTypeA` | `Z(S) = Q₀` |
+| `isElementaryAbelian_quotient_center_of_isTypeA` | `S/Z(S)` 基本可換 |
+| `tConjMiddle_mem_K_of_isTypeA` | `∀ x ∈ S^#, h(x) ∈ K` |
+| **`typeASubgroup`** + `coe_typeASubgroup` | **§2 Proposition** — 仮説は `IsTypeA ↥S` / `\|S\| = \|Q₀\|²` / `orderOf (st) = 5` の 3 つだけ |
+
+`hKfree` は `kfree_mod_Q0_of_center_eq hZQ0` から自動。
+
+### 残る任意の締め (優先度低)
+
+`hQcard : |S| = |Q₀|²` は `IsTypeA` から導ける (モデルは `F × F` で `Z = {quotient = 0} ≅ F`、
+`Z = Q₀` は上で証明済) ので、`Nat.card (BilinearTwistedProduct B) = |V|·|W|` と
+`Nat.card (center) = |W|` を足せば仮説を 1 本減らせる。ただし `hQcard` は case (b)
+(「`S` は位数 q² の非可換群」) そのものであり、`trichotomy` の case (b) 分岐は
+`natCard_Q_eq_sq_or_cube` の sq 側から来るので、消費側は必ず手元に持っている。
+
+## ✅ CLOSED (2026-07-29)
+
+完了条件「`case (b) ⟹ (SK) ∪ (SKtS) ≤ G` が sorry-free で landing、AxiomsCheck 登録」を満たした。
+`Hypothesis.typeASubgroup` (仮説 = `IsTypeA ↥S` / `|S| = |Q₀|²` / `orderOf (st) = 5`) が
+`Hypothesis.orderFiveCarrier = (SK) ∪ (SKtS)` を担体とする `Subgroup G` を与える。
+
+新設 leaf: `StructureOfH/{TConjugateTriple, OrderFiveOrbits, OrderFiveSubgroup,
+QuotientFieldCoordinate, OrderFivePairing, CaseBStructure}.lean` +
+`Appendices/SemilinearField.lean` の Prop2Regular 節 + `Suzuki2Groups/ModelCenters.lean` の type A 節。
+
+次は文書順で **Ch. III §3 (pp. 119–121)**。

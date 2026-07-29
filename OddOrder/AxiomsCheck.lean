@@ -290,6 +290,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.QuotientFieldCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFivePairing
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
@@ -14309,3 +14310,31 @@ hypothesis beyond case (b) and the standing structure of the type A Suzuki `2`-g
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K_of_case_b
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.caseBSubgroup
+
+/-! **Case (b) in its own terms** (issue 0165, 2026-07-29).
+`Suzuki2Groups/ModelCenters.lean` (type A) and
+`StructureOfH/CaseBStructure.lean`, Peterfalvi Part II Ch. III §2, pp. 118–119.
+
+The Proposition of §2 needs, besides case (b)'s `orderOf (st) = 5` and `|S| = q²`, the standing
+structure of the type A Suzuki `2`-group `S`: `Z(S) = Q₀`, `S/Q₀` elementary abelian, and `K`
+free on `S/Q₀`.  All three come from the type-A model `q(a) = a·φ(a)`, whose polar form
+`B(w,v) = wφ(v) + vφ(w)` has trivial radical because `φ ≠ 1`
+(`typeAQuadraticMap_radical_eq_zero`): the center then has exponent `2`, and the quotient
+coordinate — additive into a `ZMod 2`-space with central kernel — makes `S/Z(S)` elementary
+abelian.  Freeness of `K` follows from `Z(S) = Q₀` by `kfree_mod_Q0_of_center_eq`.
+
+`typeASubgroup` is the Proposition: in case (b), `(SK) ∪ (SKtS)` is a subgroup of `G`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.typeAQuadraticMap_radical_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeAData.sq_eq_one_of_mem_center
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TypeAData.isElementaryAbelian_quotient_center
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.center_eq_Q0_subgroupOf_of_isTypeA
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isElementaryAbelian_quotient_center_of_isTypeA
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K_of_isTypeA
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.typeASubgroup
