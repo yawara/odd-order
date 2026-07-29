@@ -570,7 +570,7 @@ theorem kernelN_inf_W_eq_bot (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     intro q hq
     rw [hCdef, Subgroup.mem_centralizer_iff]
     intro x hx
-    exact fc.W_mem_centralizes_Q0 (hXW hx) hq
+    exact fc.toHypothesis.W_centralizes_Q0 (hXW hx) hq
   -- four-subgroup in `C_G(X)`
   obtain ⟨E0, hE0Q0, hE04, hE0sq⟩ := fc.toHypothesis.exists_four_subgroup_le_Q0
   have hA3 : ∃ E : Subgroup ↥C, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1 := by

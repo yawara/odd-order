@@ -256,6 +256,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearIdentification
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemidirectReassociation
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearRealization
+import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesis
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisPSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.InductionHypothesisSuzuki
@@ -13755,3 +13756,21 @@ counting argument (`FixedPoints.finrank_eq_card`) directly in `RingAut F`: `fixe
 #assert_only_allowed_axioms OddOrder.RingAut.fixer_fixedSet
 #assert_only_allowed_axioms OddOrder.RingAut.mem_of_fixes_fixedPoints
 #assert_only_allowed_axioms OddOrder.RingAut.eq_of_fixedSet_eq
+
+/-! **`C_V(C_{Q₀}(P)) = PW`** (issue 0164, 2026-07-29).
+`Peterfalvi/Appendices/Suzuki/GaloisCentralizer.lean`, Part II, Ch. III §1 Proposition p. 117
+("By Chapter I, §2, Proposition 3, `V` then acts as a group of field automorphisms on `Q₀`
+and, by the theorem of Galois, `C_V(C_{Q₀}(P)) = P`").
+
+Ch. I §2 Proposition 3 (`exists_semilinear_equiv`) turns `Q₀` into the additive group of a
+finite field `F` on which `V̄ = V/W` acts through `A ≤ RingAut F`.  Under that dictionary
+`C_{Q₀}(P)` is the fixed set `F^B` of the image `B` of `P`, and the Galois correspondence
+(`OddOrder.RingAut.fixer_fixedSet`) says the automorphisms fixing `F^B` are exactly `B`.
+Pulling back along `V → A`, whose kernel is `W`, gives `P ⊔ W`; the book's `= P` is the
+`W = 1` specialisation it is about to be in. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.W_centralizes_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_V_centralizer_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_V_centralizer_Q0_of_W_eq_bot
