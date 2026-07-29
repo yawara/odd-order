@@ -6636,3 +6636,59 @@ tower が相異なる群を高々 2 個しか含まないことを示せ」。�
 9B.2 / 9B.3 / 9B.4 の "contains at most two different groups" が具体化される。
 
 **⟹ 次 = §9C (3 問)、その後 §9D (4 問)。文書順どおり。**
+
+## Ch.9 §9C — 着手 (2026-07-29)
+
+書籍 pp. 288-289 (`references/isaacs/pages/isaacs-p288-301.png` /
+`isaacs-p289-302.png` でページ画像を切り出して statement 確定; 規約どおり references に保存)。
+**⚠ pdftotext は上付きを落とす** ([[pdftotext-drops-superscripts]]): 9C.2/9C.3 は
+`O_p` でなく **`O^p` (p-residual)**。画像で確認済。
+
+* **9C.1** Thm 9.24 の設定で `H`, `K` がともに subnormal ⟹ `U = 1` または `V = 1`。
+* **9C.2** `G = AB`, `A, B ⊲⊲ G` ⟹ `O^p(G) = O^p(A) O^p(B)`。
+  hint =「9B.5 と同様に、まず両方 normal の場合、次に `|G|` の帰納法」。
+* **9C.3** `G = ⟨A, B⟩`, `A, B ⊲⊲ G`, `|A:A'|` と `|B:B'|` が互いに素 ⟹ `G = AB`。
+  極小反例 + (a)-(e) の 5 段 (最後に 9C.2 を使う)。
+
+### 進捗 (2026-07-29)
+
+* **9C.1 ✅** `relCore_thompsonWielandtCore_eq_bot_or_of_isSubnormal`
+  (新設 `Ch09_MoreSubnormality/Problems9C.lean`)。Thm 9.24 (`thompsonWielandt`) は
+  repo に sorry-free で在ったのでそのまま使える。証明は書籍 hint どおり
+  「`Z(O_p(G)) ≤ H` を `U` が `p`-群かどうかで場合分け」。
+  * `p`-群のとき: `U ≤ O_p(G)` ⟹ `Z(O_p(G)) ≤ C_G(U) ≤ N_G(U) = H`。
+  * そうでないとき: `O^p(U) ≠ 1` に **Corollary 9.27**
+    (`le_normalizer_pResidualOf_of_isSubnormal`) を当てて `O_p(G) ≤ N_G(O^p(U)) = H`。
+  * shared infra (issue 9216 closed): `le_oPiCore_of_isSubnormal`
+    (subnormal な π-部分群は `O_π(G)` に入る)。⚠ `S` について帰納すると `step` の IH が
+    「π-群とは限らない `K`」の主張になって回らない。`O_π(K)` を噛ませて `K` 側で帰納する。
+* **9C.2 の材料 ✅** `pResidualOf_le_pResidual` / `pResidualOf_mono` (`PResidual.lean`)。
+  `nilpotentResidual_mono` の `O^p` 版が無かったので追加。
+
+### 9C.2 の設計 (次 iteration)
+
+9B.5 (`nilpotentResidual_top_eq_sup_of_isSubnormal`) の証明を `nilpotentResidual` →
+`pResidualOf p` に置き換えてそのまま写す。対応表:
+
+| 9B.5 で使ったもの | 9C.2 の対応物 | 状態 |
+|---|---|---|
+| `nilpotentResidual_mono` | `pResidualOf_mono` | ✅ landing |
+| `nilpotentResidual_le_iff_isNilpotent_map` | `pResidual_le_of_isPGroup_quotient` | ✅ 既存 |
+| `map_subtype_nilpotentResidual_top` | `pResidualOf_top` | ✅ 既存 |
+| `map_subtype_nilpotentResidual_subgroupOf` | `map_subtype_pResidualOf_subgroupOf` | ✅ 既存 |
+| `Ch01.fitting` / `nilpotent_normal_le_fitting` | `Ch03.oPiCore {p}` / `IsPiGroup.le_oPiCore` | ✅ 既存 |
+
+**base case** (`A, B ⊴ G`, `A ⊔ B = ⊤` ⟹ `O^p(G) = O^p(A) ⊔ O^p(B)`):
+`N := O^p(A) ⊔ O^p(B)` は正規 (`pResidualOf.normal`)。`G/N` で `A`, `B` の像は
+正規 `p`-群なので `O_p(G/N)` に入り、生成するので `O_p(G/N) = ⊤` ⟹ `G/N` は `p`-群
+⟹ `O^p(G) ≤ N` (`pResidual_le_of_isPGroup_quotient`)。9B.5 の `F(G/N) = ⊤` 論法の
+`O_p` 版 (Fitting → `oPiCore {p}` の読み替えがそのまま効く)。
+
+⚠ 「`O^p(A) ≤ N` ⟹ `A` の像が `p`-群」の橋渡しだけ 9B.5 に対応物が無い
+(あちらは `nilpotentResidual_le_iff_isNilpotent_map` という ⟺ 補題があった)。
+`↥A / (N ⊓ A)` が `↥A / O^p(↥A)` の商であることを使う小補題を先に立てる。
+
+**帰納段**は 9B.5 とまったく同型 (`IsSubnormal.lt_normal` で `A ≤ A₁ ◁ G`, `A₁ < ⊤` を取り、
+base case + Dedekind `A₁ = A (B ⊓ A₁)` で `↥A₁` に IH)。⚠ 仮説は join でなく**積**
+`(A : Set G) * B = Set.univ`。`hprod_sub` / `hcard_lt` は 9B.5 のものが再利用できる形
+(現在 `nilpotentResidual_sup_aux` の中の `have` なので、共用するなら切り出す)。
