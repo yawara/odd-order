@@ -35,7 +35,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
       **§3E 🎉 完済 (2026-07-29)**: 3E.1 (両ケース) / 3E.2 / 3E.3 / 3E.4 / 3E.5 全問
       (`Ch04_Commutators/Problems3E.lean` 748 行, axiom-clean)。
-      **次の frontier = §3F (3F.1–3F.5)**。
+      **§3F 進行中 (2026-07-29)**: **3F.1 ✅**
+      (新 leaf `Ch03_SplitExtensions/Problems3F.lean`)。残り = 3F.2–3F.5。
 
 * ✅ **3E.2** `actionFixedSubgroup_eq_mul` (2026-07-29): `c ∈ C` を `c = h₀k₀` と書くと
   `H ∩ cK` は `A`-不変な `H ∩ K` の剰余類なので Thm 3.27
@@ -6088,3 +6089,102 @@ repo/mathlib に「有限冪零群の Sylow と Hall `p'` が元ごとに可換�
   `Subgroup.commute_of_normal_of_disjoint` で `[C_p, Q] = 1`。
 * この `Q ⊴ C` (= 「冪零群の Hall 部分群は正規」) は汎用なので
   `Carter/` でなく `OddOrder/GroupTheory/` 側の leaf に置くのが妥当。
+
+## Ch.3 §3F (書籍 pp. 110–111) — 着手 (2026-07-29)
+
+書籍の statement は**ページ画像で確定済** (`references/isaacs/pages/isaacs-p110-123.png`,
+`isaacs-p110-124.png`)。⚠ pdftotext は `SL(2,3)` を `51/(2,3)`, `Q_8` を `Qg`,
+`|S| = 24` を `|5| = 2 4` に潰すので画像必須。⚠ 書籍 3F.1 の本文は
+"suppose that **N** has a cyclic subgroup C of index 2" だが、続く `G − C` から
+**`G` の誤植**と確定 (画像で確認)。
+
+* **3F.1** `|G| = n` (`8 ∣ n`), 指数 2 の巡回部分群 `C`, `G ∖ C` の元がすべて位数 4
+  ⟹ `G ≅ Q_n`。
+* **3F.2** 自明群から Thm 3.36 を繰り返し適用してすべての可解群が作れる。
+* **3F.3** `Q = Q_8` の位数 4 の巡回部分群はちょうど 3 個で `Aut(Q)` が推移的に置換。
+* **3F.4** `S = SL(2,3)` は `|S| = 24` で正規 Sylow 2-部分群 `≅ Q_8` をもつ。
+* **3F.5** `S ◁ G = GL(2,3)` (指数 2)。`G ∖ S` に位数 2 の元 `g` はあるが位数 4 の元は無い。
+  `S` を指数 2 で含む群 `H` で、`H ∖ S` に「`g` と同じ `S` の自己同型を誘導する」位数 4 の
+  元 `h` をもつものが存在することを示す。`H ∖ S` に位数 2 の元は無く、`G ∖ S` と `H ∖ S` は
+  どちらも位数 8 の元をもつ。
+
+### `Q_n` の形式化 = mathlib `QuaternionGroup (n/4)`
+
+書籍の `Q_n` は位数 `n`。mathlib の `QuaternionGroup M` は位数 `4M` で、生成元関係
+(`a^{2M} = 1`, `b² = a^M`, `b⁻¹ab = a⁻¹`) が Isaacs の構成 (巡回 `N` = 位数 `n/2`,
+`g² = a` = `N` の唯一の involution, `x^g = x⁻¹`) と一致する。⟹ `Q_n = QuaternionGroup (n/4)`。
+(§3A.2 の `semidihedralQuaternion n` は semidihedral 群の部分群としての別モデルで、
+そちらは 3A.2 の主張のための構成。§3F では mathlib モデルを使う。)
+
+### ⚠ 四元数認識定理を共有 leaf へ引き上げた (2026-07-29)
+
+3F.1 の核 = 「`⟨c⟩` 指数 2 + `a ∉ ⟨c⟩` が `c` を反転 + `a² = c^M` ⟹ `QuaternionGroup M`」。
+これは **`Isaacs/Ch06_FrobeniusActions/DQSDRecognition.lean` に `private` で既にあった**
+(`quaternionIsoOfInverting` + 巡回群の involution 一意性
+`eq_pow_half_orderOf_of_mem_zpowers_sq_eq_one`)。Ch.3 → Ch.6 の import は逆向きなので、
+**純粋に一般の群論であるこの 2 つだけを新 leaf
+[`OddOrder/GroupTheory/QuaternionRecognition.lean`](../OddOrder/GroupTheory/QuaternionRecognition.lean)
+へ移して public 化**した (`private` をファイル跨ぎで使わない方針にも合致)。
+`DQSDRecognition.lean` は新 leaf を import して自前の private 版を削除
+(同ファイルは既に `open OddOrder.GroupTheory` していたので呼び出し側は無変更)。
+⚠ 新 leaf は `nlinarith`/`positivity`/`group`/`ring_nf` を使うので
+`Mathlib.Tactic.{Group,Linarith,Positivity,Ring}` の明示 import が要る
+(元ファイルは推移的に拾っていた)。
+
+### 3F.1 完了 (2026-07-29)
+
+`nonempty_mulEquiv_quaternionGroup_of_isCyclic_index_two`。証明:
+`C = ⟨c⟩` (mathlib `Subgroup.isCyclic_iff_exists_zpowers_eq_top`)、
+`orderOf c = n/2 = 2M` (`M = n/4`)。`a ∉ C` を取ると **任意の `x ∈ C` について**
+`a * x ∉ C` ゆえ `orderOf (a*x) = 4`, すなわち `(a*x)²` は `C` の位数 2 の元で、
+巡回群ではそれが一意なので `(a*x)² = c^M` が `x` によらない。
+`x = 1` ⟹ `a² = c^M`、`x = c` ⟹ `(ac)² = a²` ⟹ `c a c = a` ⟹ `a c a⁻¹ = c⁻¹`。
+`quaternionIsoOfInverting` を当てて終わり。axiom-clean。
+
+### 3F.2 完了 (2026-07-29)
+
+`isCyclicExtensionTower_top`。「Thm 3.36 を繰り返して構成できる」を **inductive predicate**
+`IsCyclicExtensionTower : Subgroup G → Prop` (`bot` / `step`) で表した。
+⚠ **設計の要**: 商の巡回性を quotient 型で書くと `∃ h : Normal …, IsCyclic (↥K ⧸ …)` という
+「instance を存在量化の中で作る」形になり statement が書けない。**`K = H ⊔ ⟨g⟩` (`g ∈ K`) と
+`∀ x ∈ K, ∀ y ∈ H, x y x⁻¹ ∈ H`** で書けば quotient 型を一切使わずに済み、しかも Thm 3.36 の
+出力そのものの形になる。inductive predicate にしたので帰納の組み立ても自明 (列の添字管理が不要)。
+
+証明は `|K|` の強帰納: `K ≠ ⊥` ⟹ `↥K` 非自明可解 ⟹ `commutator ↥K < ⊤`
+(`IsSolvable.commutator_lt_top_of_nontrivial`) ⟹ それを含む coatom `M`
+(`eq_top_or_exists_le_coatom`; ⚠ `IsCoatomic.exists_le_coatom` という名前は無い) を取る。
+`M ⊇ commutator` から共役閉性、coatom 性から `M ⊔ ⟨ĝ⟩ = ⊤` (`ĝ ∉ M`)。
+`M.map K.subtype` に戻して `|N| = |M| < |K|` で帰納法の仮説。
+
+### 3F.3 前半 完了 (2026-07-29) / 後半 (Aut の推移性) が残り
+
+`quaternionTwo_orderOf_eq_four_iff` — `Q_8` では `a 0` (単位元) と `a 2` (唯一の involution)
+以外の 6 元がすべて位数 4。`orderOf_a i` (mathlib) で `4 / gcd 4 i.val` に落として
+`revert i; decide` (`ZMod 4` は 4 元)。`xa i` 側は `orderOf_xa i` が mathlib にある。
+⚠ `xa i ≠ a 0` は `simp` だと `a 0 → 1` に正規化されて詰まる → **`nofun`** を使う。
+
+`quaternionTwo_zpowers_of_orderOf_eq_four` — 位数 4 の巡回部分群は
+`⟨a 1⟩ = ⟨a 3⟩`, `⟨xa 0⟩ = ⟨xa 2⟩`, `⟨xa 1⟩ = ⟨xa 3⟩` の 3 個。
+`u^3 = v` かつ `v^3 = u` (どちらも `decide` で通る) から `zpowers` が一致。
+
+**残り (3F.3 後半)**: 3 個が相異なること + `Aut(Q_8)` が推移的に置換すること。
+設計 (調査済, 次の iteration の出発点):
+* 相異なる: `xa 0 ∉ ⟨a 1⟩` 等。`⟨a 1⟩` の元は `a _` の形 (`a_one_pow : (a 1)^k = a k`)。
+* 推移性は **明示の自己同型 2 本**を `MulEquiv.ofBijective` + `decide` (`map_mul` は 64 通り)
+  で作るのが最短 (書籍 Hint の Thm 3.35 経由よりデータ準備が軽い)。
+  `QuaternionGroup 2` は `deriving DecidableEq` かつ `Fintype` なので `decide` が効く。
+  - `φ` (`i ↔ j`): `a0↦a0, a1↦xa0, a2↦a2, a3↦xa2, xa0↦a1, xa1↦xa3, xa2↦a3, xa3↦xa1`
+    (`φ(a k) = (xa 0)^k`, `φ(xa k) = a 1 * (xa 0)^k`) ⟹ `⟨a 1⟩ ↦ ⟨xa 0⟩`。
+  - `χ`: `a0↦a0, a1↦xa1, a2↦a2, a3↦xa3, xa0↦a1, xa1↦xa0, xa2↦a3, xa3↦xa2`
+    (`χ(a k) = (xa 1)^k`, `χ(xa k) = a 1 * (xa 1)^k`) ⟹ `⟨a 1⟩ ↦ ⟨xa 1⟩`。
+  (どちらも `x a x⁻¹ = a⁻¹` 型の関係を保つことは手計算で確認済。)
+
+### 3F.4 / 3F.5 の見通し (未着手, 2026-07-29 時点の調査)
+
+* **mathlib に `|SL(n,q)|` の公式は無い** (`Matrix.SpecialLinearGroup` はあるが位数計算は無い)。
+  3F.4 の `|SL(2,3)| = 24` は自前。`Matrix (Fin 2) (Fin 2) (ZMod 3)` は 81 元で
+  `Fintype`+`DecidableEq` があるので `decide` が原理的には効くが、行列の `det` を
+  kernel で 81 回評価する重さは未計測。⚠ `native_decide` は **禁止** (`ofReduceBool` 公理が
+  入り axiom-clean が壊れる)。
+* 3F.5 は §3F 最難 (`H` の構成に Thm 3.36 を実際に使う)。3F.4 の `Q_8 ⊴ SL(2,3)` を
+  土台にするので、3F.4 → 3F.5 の順。

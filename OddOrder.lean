@@ -6,6 +6,7 @@ import OddOrder.Algebra.SemilinearFixedPoint
 import OddOrder.Algebra.PrincipalIdealTheorem
 import OddOrder.Algebra.QuadraticMapCoordinates
 import OddOrder.GroupTheory.AInvariantComplement
+import OddOrder.GroupTheory.QuaternionRecognition
 import OddOrder.GroupTheory.SolvablePrimeIndex
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.BrauerSuzuki
@@ -231,6 +232,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Injector
 import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Conjugacy
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiLength
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3F
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsFaithfulOrbit
