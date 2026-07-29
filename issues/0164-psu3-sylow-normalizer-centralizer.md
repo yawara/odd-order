@@ -503,3 +503,59 @@ type B では `S/Q₀` は isotypic で **`K`-部分群が `q+1` 個**ある (�
     `dim_{F₀} M = 2p`、非自明既約の次元は `d₀ = ord_p(q₀)`。
     `d₀ ∣ 2p` かつ `d₀ ∣ p−1` ⟹ `d₀ ∣ 2`。ここから先を詰める。
 (c) Lang/Speiser (GL_n 版 Hilbert 90) を形式化する。
+
+
+## 🎯 PSL 分岐の完全な議論が確定 — 2 ルートは**相補的** (2026-07-29)
+
+行き詰まりだと思っていた「type B + `p ∣ q+1`」は、実は**書籍の Frobenius ルートが
+使える唯一の場合**だった。`p ∣ q₀ − 1` で場合分けすると議論が閉じる。
+
+設定: case (3), `W = 1`, `X ≤ V` 位数 `p` (奇), PSL 分岐。
+Artin (`finrank_fixedSet`) より `q = q₀^p` (`q = |Q₀|`, `q₀ = |C_{Q₀}(X)|`)。
+PSL 分岐より `C_Q(X) = C_{Q₀}(X) ≤ Q₀`。
+
+### 場合 1: `p ∤ q₀ − 1` — **書籍の Frobenius ルート**
+
+このとき `C_{⁅K,X⁆}(X) = 1` (既に示した同値性) なので `⁅K,X⁆ ⋊ X` は Frobenius 群。
+`K` は `Q` 上 fpf (`conjQByK_fixed_eq_one`) だから kernel `⁅K,X⁆` も fpf。
+Wielandt (9.1) の ambient 版 `natCard_eq_pow_natCard_inf_centralizer_of_kernel_fpf` を
+`Q` と `Q₀` に当てると
+
+  `|Q| = |C_Q(X)|^p`,  `|Q₀| = |C_{Q₀}(X)|^p`
+
+で `C_Q(X) = C_{Q₀}(X)` だから `|Q| = |Q₀|`。case (3) の `|Q| = |Q₀|³` と
+`2 ≤ |Q₀|` に矛盾。∎
+
+### 場合 2: `p ∣ q₀ − 1` — **Hilbert 90 ルート**
+
+`q₀ − 1 ∣ q − 1` なので `p ∣ q − 1`。すると `p ∣ q + 1` なら `p ∣ 2` で `p` 奇に反するので
+**`p ∤ q + 1`**。
+
+`Q/Q₀` の位数 `q` の `K`-部分加群の個数は **2 個 (非 isotypic) か `q+1` 個 (isotypic)**
+のいずれかで、`p` はそのどちらも割らない (`p` 奇ゆえ `p ∤ 2`、上より `p ∤ q+1`)。
+⟹ 位数 `p` の `X` はそれらを置換して**必ず固定する**ものがある。
+
+固定された `N/Q₀` (位数 `q`, `K`-既約) の上で `X` は `q₀`-半線形に作用するので
+`RingAut.exists_ne_zero_mul_pow_eq` (Hilbert 90, 1 次元版) より `C_{N/Q₀}(X) ≠ 1`。
+しかし PSL 分岐の `C_Q(X) ≤ Q₀` と coprime 作用から `C_{Q/Q₀}(X) = 1`。矛盾。∎
+
+### 意義
+
+* **Lang/Speiser (GL₂ 版 Hilbert 90) は要らない** — 2 次元の困難な場合は
+  ちょうど Frobenius ルートが使える場合と一致する。
+* 書籍の議論は**間違いではなく不完全**だった: `p ∤ q₀ − 1` のときは正しく、
+  `p ∣ q₀ − 1` のときに別の理由 (Hilbert 90) が要る。
+  Ch. II では `q₀ = 2` なので常に場合 1。
+
+### 形式化の残り
+
+1. 場合 1: `⁅K,X⁆ ⋊ X` の `IsFrobeniusGroup` 構成
+   (`isFrobeniusGroup_of_prime_complement_fixedFree` + BG の
+   `commutator_inf_centralizer_eq_bot_of_isCommutative`; 部品は揃っている)
+   + `natCard_eq_pow_natCard_inf_centralizer_of_kernel_fpf` の適用 2 回。
+2. 場合 2: `Q/Q₀` の `K`-部分加群の個数が 2 か `q+1`、`X` が固定するものの存在、
+   その上での半線形性 (`End_K(既約) ≅ 𝔽_q`) と `exists_ne_zero_mul_pow_eq` の適用。
+   `TwoKSubgroups.lean` の `IsKSubgroupSquare` / operator Maschke /
+   `conj_mem_of_unique_of_le_V` が土台。
+3. Artin から `q = q₀^p` (= `|Q₀| = |C_{Q₀}(X)|^p`) を出す配線
+   (`finrank_fixedSet` + `GaloisCentralizer.lean` の半線形モデル)。
