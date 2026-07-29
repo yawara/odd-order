@@ -64,6 +64,15 @@ theorem typeAQuadraticMap_apply (phi : RingAut F) (a : F) :
     typeAQuadraticMap phi a = a * phi a :=
   rfl
 
+/-- The type-A quadratic map is anisotropic: `a · φ(a) = 0` forces `a = 0`. -/
+theorem typeAQuadraticMap_anisotropic (phi : RingAut F) :
+    (typeAQuadraticMap phi).Anisotropic := by
+  intro a ha
+  rw [typeAQuadraticMap_apply] at ha
+  rcases mul_eq_zero.mp ha with h | h
+  · exact h
+  · exact (map_eq_zero_iff phi phi.injective).mp h
+
 /-- Peterfalvi's concrete group `A(n, phi)`, obtained from the quadratic map
 in Definition 2 by Appendix III, Lemma 1(b). -/
 abbrev TypeAModel [Finite F] (phi : RingAut F) :=
@@ -258,6 +267,14 @@ theorem map_sq (x : P) :
   rw [map_pow]
   exact TypeAModel.sq_eq_inl_quadraticMap data.phi (data.equivModel x)
 
+/-- **A type-A group has order `|F|²` and exactly `|F|` elements of order
+dividing `2`** (Peterfalvi Appendix III, Definition 2). -/
+theorem natCard_and_natCard_sq_eq_one :
+    Nat.card P = Nat.card data.F * Nat.card data.F ∧
+      Nat.card {x : P // x ^ 2 = 1} = Nat.card data.F :=
+  QuadraticExtension.natCard_and_natCard_sq_eq_one_of_mulEquiv _ _
+    (typeAQuadraticMap_anisotropic data.phi) data.equivModel
+
 end TypeAData
 
 /-- **Peterfalvi Appendix III, Definition 3.**  Honest data witnessing that
@@ -369,6 +386,14 @@ theorem map_sq (x : P) :
   rw [map_pow]
   exact TypeBModel.sq_eq_inl_quadraticMap
     data.phi (data.epsilon : data.F) (data.equivModel x)
+
+/-- **A type-B group has order `|F|³` and exactly `|F|` elements of order
+dividing `2`** (Peterfalvi Appendix III, Definition 3). -/
+theorem natCard_and_natCard_sq_eq_one :
+    Nat.card P = Nat.card (data.F × data.F) * Nat.card data.F ∧
+      Nat.card {x : P // x ^ 2 = 1} = Nat.card data.F :=
+  QuadraticExtension.natCard_and_natCard_sq_eq_one_of_mulEquiv _ _
+    data.quadraticMap_anisotropic data.equivModel
 
 end TypeBData
 

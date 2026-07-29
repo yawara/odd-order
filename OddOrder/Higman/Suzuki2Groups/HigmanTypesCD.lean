@@ -333,6 +333,14 @@ theorem map_sq (x : P) :
   exact TypeCModel.sq_eq_inl_quadraticMap
     data.theta (data.epsilon : data.F) (data.equivModel x)
 
+/-- **A type-C group has order `|F|³` and exactly `|F|` elements of order
+dividing `2`** (Higman's classification, Peterfalvi Appendix III). -/
+theorem natCard_and_natCard_sq_eq_one :
+    Nat.card P = Nat.card (data.F × data.F) * Nat.card data.F ∧
+      Nat.card {x : P // x ^ 2 = 1} = Nat.card data.F :=
+  Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.natCard_and_natCard_sq_eq_one_of_mulEquiv
+    _ _ data.quadraticMap_anisotropic data.equivModel
+
 end TypeCData
 
 /-- **Higman p. 81, type `D`.**  Honest data witnessing that `P` is a Suzuki
@@ -450,6 +458,14 @@ theorem map_sq (x : P) :
   rw [map_pow]
   exact TypeDModel.sq_eq_inl_quadraticMap
     data.theta (data.epsilon : data.F) (data.equivModel x)
+
+/-- **A type-D group has order `|F|³` and exactly `|F|` elements of order
+dividing `2`** (Higman's classification, Peterfalvi Appendix III). -/
+theorem natCard_and_natCard_sq_eq_one :
+    Nat.card P = Nat.card (data.F × data.F) * Nat.card data.F ∧
+      Nat.card {x : P // x ^ 2 = 1} = Nat.card data.F :=
+  Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.natCard_and_natCard_sq_eq_one_of_mulEquiv
+    _ _ data.quadraticMap_anisotropic data.equivModel
 
 end TypeDData
 

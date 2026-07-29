@@ -262,6 +262,19 @@ theorem range_inl_le_center :
     (extension q basis).inl.range ≤ Subgroup.center (QuadraticExtension q basis) :=
   BilinearTwistedProduct.centralEmbedding_range_le_center
 
+/-- The twisted product is the product of its two coordinates as a set. -/
+theorem _root_.OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.natCard
+    {V' W' : Type*} [AddCommGroup V'] [AddCommGroup W'] [Module (ZMod 2) V']
+    [Module (ZMod 2) W'] [Finite V'] [Finite W']
+    (B : LinearMap.BilinMap (ZMod 2) V' W') :
+    Nat.card (BilinearTwistedProduct B) = Nat.card V' * Nat.card W' := by
+  rw [← Nat.card_prod]
+  exact Nat.card_congr
+    { toFun := fun x => (x.quotient, x.central)
+      invFun := fun p => ⟨p.1, p.2⟩
+      left_inv := fun x => rfl
+      right_inv := fun p => rfl }
+
 /-- **Peterfalvi Appendix III, Lemma 1(b).**  Squaring in the constructed
 central extension recovers `q` under the kernel embedding. -/
 theorem sq_eq_inl_q (x : QuadraticExtension q basis) :
@@ -273,6 +286,70 @@ theorem sq_eq_inl_q (x : QuadraticExtension q basis) :
   · change q.toBilin basis x.quotient x.quotient + x.central + x.central =
       q x.quotient
     rw [toBilin_self q basis, add_assoc, add_self_eq_zero, add_zero]
+
+/-- **The involutions of an anisotropic quadratic extension are exactly its
+kernel.**  `x² = 1` says `q(x.quotient) = 0`, which for an anisotropic `q` says
+`x.quotient = 0`. -/
+theorem sq_eq_one_iff (hq : q.Anisotropic) (x : QuadraticExtension q basis) :
+    x ^ 2 = 1 ↔ x.quotient = 0 := by
+  rw [sq_eq_inl_q]
+  constructor
+  · intro h
+    refine hq _ ?_
+    have h1 : Multiplicative.ofAdd (q x.quotient) = 1 :=
+      (extension q basis).inl_injective (by rw [h, map_one])
+    simpa using h1
+  · intro h
+    rw [h, map_zero]
+    simp
+
+/-- **The order of an anisotropic quadratic extension is `|V| · |W|`, and its
+involutions together with `1` number `|W|`.**
+
+For the Appendix III models this is the source of the two possible orders of a
+Suzuki `2`-group: type A has `V = W = F`, so `|P| = |F|²`, while types B, C
+and D have `V = F × F` and `W = F`, so `|P| = |F|³`; in both `Ω₁(P)` has order
+`|F|`. -/
+theorem natCard_sq_eq_one [Finite V] [Finite W] (hq : q.Anisotropic) :
+    Nat.card {x : QuadraticExtension q basis // x ^ 2 = 1} = Nat.card W := by
+  refine Nat.card_congr ?_
+  refine
+    { toFun := fun x => x.1.central
+      invFun := fun w => ⟨⟨0, w⟩, (sq_eq_one_iff q basis hq _).mpr rfl⟩
+      left_inv := ?_
+      right_inv := fun w => rfl }
+  rintro ⟨x, hx⟩
+  have hx0 : x.quotient = 0 := (sq_eq_one_iff q basis hq x).mp hx
+  exact Subtype.ext (by
+    cases x
+    simp only at hx0 ⊢
+    rw [hx0])
+
+/-- **The two Appendix III orders, in transported form.**  A group isomorphic to
+the quadratic extension of an anisotropic `q` has order `|V| · |W|` and exactly
+`|W|` elements of order dividing `2`.
+
+Type A has `V = W = F`, so `|P| = |F|²`; types B, C and D have `V = F × F` and
+`W = F`, so `|P| = |F|³`.  In every case `Ω₁(P)` has order `|F|`, which is what
+identifies `|F|` with `|Q₀|` in Peterfalvi Part II. -/
+theorem natCard_and_natCard_sq_eq_one_of_mulEquiv
+    {P : Type*} [Group P] [Finite V] [Finite W]
+    (hq : q.Anisotropic) (e : P ≃* QuadraticExtension q basis) :
+    Nat.card P = Nat.card V * Nat.card W ∧
+      Nat.card {x : P // x ^ 2 = 1} = Nat.card W := by
+  constructor
+  · rw [Nat.card_congr e.toEquiv]
+    exact BilinearTwistedProduct.natCard _
+  · rw [← natCard_sq_eq_one q basis hq]
+    have hx : ∀ x : P, e.toEquiv x = e x := fun _ => rfl
+    refine Nat.card_congr (Equiv.subtypeEquiv e.toEquiv fun x => ?_)
+    rw [hx]
+    constructor
+    · intro h
+      rw [← map_pow, h, map_one]
+    · intro h
+      apply e.injective
+      rw [map_pow, h, map_one]
 
 end QuadraticExtension
 

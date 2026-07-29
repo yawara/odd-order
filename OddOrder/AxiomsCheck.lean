@@ -13647,5 +13647,36 @@ isomorphic? — and the type-B count is replaced by a construction plus operator
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.not_cQ_isElementaryAbelian_of_kSubgroup
+
+/-! **The two possible orders of a Suzuki `2`-group** (issue 0163, 2026-07-29).
+`Higman/Suzuki2Groups/Classification.lean`, Appendix III p. 141, as used in Part II, Ch. III §1
+p. 117 ("`S` is non-abelian of order `q²`" versus "of order `q³`").
+
+`higmanClassification_of_isSuzuki2Group` names the four types but says nothing about orders,
+and `XiLengthFromCard.lean` only runs from an order hypothesis to the ξ-length.  The orders
+come from the models: each type is the quadratic extension of an **anisotropic** quadratic map,
+so `x² = 1` says exactly that the quotient coordinate vanishes.
+
+* `BilinearTwistedProduct.natCard` — the twisted product is `V × W` as a set.
+* `QuadraticExtension.sq_eq_one_iff`, `natCard_sq_eq_one` — for anisotropic `q` the elements of
+  order dividing `2` are the kernel, of order `|W|`.
+* `natCard_and_natCard_sq_eq_one_of_mulEquiv` — transported along a model equivalence, and its
+  four instances `Type{A,B,C,D}Data.natCard_and_natCard_sq_eq_one`.
+* `typeAQuadraticMap_anisotropic` — `a·φ(a) = 0` forces `a = 0` in a field (types B, C, D
+  already had their anisotropy recorded).
+* `natCard_eq_sq_or_cube_of_isSuzuki2Group` — **the dichotomy**: `|P| = |Ω₁(P)|²` (type A, both
+  coordinates the field) or `|P| = |Ω₁(P)|³` (types B, C, D, two-dimensional quotient). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.natCard
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.sq_eq_one_iff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.natCard_sq_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtension.natCard_and_natCard_sq_eq_one_of_mulEquiv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.typeAQuadraticMap_anisotropic
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.natCard_eq_sq_or_cube_of_isSuzuki2Group
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB

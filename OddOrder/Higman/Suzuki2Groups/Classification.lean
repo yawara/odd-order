@@ -127,4 +127,37 @@ theorem higmanClassification_of_isSuzuki2Group
   obtain ⟨h2, hncomm, hmulti, A, hcyc, hregular⟩ := hP
   exact higmanClassification h2 hncomm hmulti A hcyc hregular.transitive
 
+/-- **The two possible orders of a Suzuki `2`-group** (Higman's classification,
+as Peterfalvi uses it in Part II, Ch. III §1: "`S` is non-abelian of order `q²`"
+versus "of order `q³`", p. 117).
+
+Every one of the four types is the quadratic extension of an anisotropic
+quadratic map, so its elements of order dividing `2` are exactly the kernel of
+the extension.  Type A has both coordinates equal to the field, giving
+`|P| = |Ω₁(P)|²`; types B, C and D have a two-dimensional quotient coordinate,
+giving `|P| = |Ω₁(P)|³`. -/
+theorem natCard_eq_sq_or_cube_of_isSuzuki2Group
+    {P : Type uP} [Group P] [Finite P] (hP : IsSuzuki2Group P) :
+    Nat.card P = Nat.card {x : P // x ^ 2 = 1} ^ 2 ∨
+      Nat.card P = Nat.card {x : P // x ^ 2 = 1} ^ 3 := by
+  rcases higmanClassification_of_isSuzuki2Group hP with hA | hB | hC | hD
+  · obtain ⟨data⟩ := hA
+    obtain ⟨hcard, hsq⟩ := data.natCard_and_natCard_sq_eq_one
+    exact Or.inl (by rw [hcard, hsq, sq])
+  · obtain ⟨data⟩ := hB
+    obtain ⟨hcard, hsq⟩ := data.natCard_and_natCard_sq_eq_one
+    refine Or.inr ?_
+    rw [hcard, hsq, Nat.card_prod]
+    ring
+  · obtain ⟨data⟩ := hC
+    obtain ⟨hcard, hsq⟩ := data.natCard_and_natCard_sq_eq_one
+    refine Or.inr ?_
+    rw [hcard, hsq, Nat.card_prod]
+    ring
+  · obtain ⟨data⟩ := hD
+    obtain ⟨hcard, hsq⟩ := data.natCard_and_natCard_sq_eq_one
+    refine Or.inr ?_
+    rw [hcard, hsq, Nat.card_prod]
+    ring
+
 end OddOrder.Higman.Suzuki2Groups
