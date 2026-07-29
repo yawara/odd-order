@@ -30,7 +30,9 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [x] **Ch.1 Sylow** — **🎉 完済 (2026-07-28)**: §1A–§1G 全問
       (§1E は Sylow 計数の非単純性 8 問, §1F は Brodkey 周辺 3 問, §1G は Chermak–Delgado 4 問)
 - [ ] Ch.2 Subnormality
-- [ ] Ch.3 Split Extensions
+- [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
+      **次の frontier = §3D (3D.1-3D.5)**, その後 §3E (3E.1-3E.x)。書籍の該当ページは
+      §3D = π-separable / Hall-Higman 1.2.3, §3E = coprime action。
 - [ ] Ch.4 Commutators
 - [x] Ch.5 Transfer — **🎉 完済 (2026-07-27)**: §5A–§5E 全問
 - [x] Ch.6 Frobenius Actions — **🎉 完済 (2026-07-27)**: §6A (11 問) / §6B (9 問) / §6C (2 問) 全問
