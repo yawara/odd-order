@@ -14009,3 +14009,23 @@ this forces `r² ≠ 1` (else `(st)³ = 1`). -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sq_st_eq_conj_structureConjugator
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_sq_ne_one
+
+/-! **The main computation (4)** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+> `t r r^{-k} t = r r^{-ℓ⁻¹} · ℓ²k² · t · r^{ℓ⁻¹k⁻²} r^{-k⁻¹}`,
+> which is to say `f(rr^{-k}) = r^{ℓ⁻¹k⁻²} r^{-k⁻¹}`, `g(rr^{-k}) = r r^{-ℓ⁻¹}` and
+> `h(rr^{-k}) = ℓ²k²`.
+
+Here `x^a = a⁻¹ x a` and `ℓ ∈ K` is determined by `s k s k⁻¹ = s^ℓ`.  The identity is pure
+group algebra from three inputs: `t` inverts `k` and `ℓ` (they lie in `K`), the structure
+equation `tst = r⁻¹tr`, and the defining relation for `ℓ`.  Both sides normalize to
+`r ℓ r⁻¹ · t · r ℓ⁻¹ k⁻¹ r⁻¹ k⁻¹` — on the right using `k²tk² = t` and `ℓtℓ = t`.
+
+Its point is that the middle factor `ℓ²k²` lies in `K`, which together with the equivariance
+`h(xᵃ) = a h(x) a` and `h(s) = h(r) = h(r⁻¹) = 1` gives `h(x) ∈ K` on a full system of
+representatives for the `K`-orbits of `S#`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_mul
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_structureConjugator_mul_conj_inv

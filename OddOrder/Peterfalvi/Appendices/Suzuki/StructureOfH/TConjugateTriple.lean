@@ -232,6 +232,14 @@ theorem tConjTriple_conj {x a : G} (hx : x ∈ hyp.Q) (hx1 : x ≠ 1)
   rw [hkey, heq, hexp, hata]
   group
 
+/-- Conjugation by the involution `t` is multiplicative. -/
+lemma t_conj_mul (x y : G) :
+    hyp.t * (x * y) * hyp.t = (hyp.t * x * hyp.t) * (hyp.t * y * hyp.t) := by
+  have htt : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+  calc hyp.t * (x * y) * hyp.t = hyp.t * x * (hyp.t * hyp.t) * y * hyp.t := by
+        rw [htt]; group
+    _ = (hyp.t * x * hyp.t) * (hyp.t * y * hyp.t) := by group
+
 /-! ## The values at `s`, `r` and `r⁻¹`
 
 Peterfalvi Part II, Ch. III §2, p. 118: from the structure equation
@@ -391,6 +399,96 @@ lemma structureConjugator_sq_ne_one
   rw [hu] at h5
   rw [h5] at hdvd
   omega
+
+/-! ## The main computation (4)
+
+Peterfalvi Part II, Ch. III §2, p. 118: for `k ∈ K#` and `ℓ ∈ K` determined by
+`s k s k⁻¹ = s^ℓ`,
+
+`t r r^{-k} t = r r^{-ℓ⁻¹} · ℓ²k² · t · r^{ℓ⁻¹k⁻²} r^{-k⁻¹}`,
+
+so `h(r r^{-k}) = ℓ²k² ∈ K`.  Here `x^a = a⁻¹ x a`. -/
+
+/-- **The identity (4)** (Peterfalvi Part II, Ch. III §2, p. 118), as a pure
+computation in `G`: it uses only that `t` inverts `k` and `ℓ`, that `k` and `ℓ`
+commute (`K` is cyclic), the structure equation `tst = r⁻¹tr` and the defining
+relation `s k s k⁻¹ = s^ℓ`. -/
+theorem t_conj_structureConjugator_mul_conj_inv {k l : G} (hk : k ∈ hyp.KSet)
+    (hl : l ∈ hyp.KSet)
+    (hskl : hyp.distinguishedInvolution * k * hyp.distinguishedInvolution * k⁻¹
+      = l⁻¹ * hyp.distinguishedInvolution * l) :
+    hyp.t * (hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k))
+        * hyp.t
+      = (hyp.structureConjugator * (l * hyp.structureConjugator⁻¹ * l⁻¹)) *
+          (l ^ 2 * k ^ 2) * hyp.t *
+          ((k ^ 2 * (l * hyp.structureConjugator * l⁻¹) * (k ^ 2)⁻¹) *
+            (k * hyp.structureConjugator⁻¹ * k⁻¹)) := by
+  set s : G := hyp.distinguishedInvolution with hs
+  set r : G := hyp.structureConjugator with hr
+  set T : G := hyp.t with hT
+  have htk : T * k * T = k⁻¹ := hk.2
+  have htki : T * k⁻¹ * T = k := by
+    have := (hyp.inv_mem_KSet hk).2
+    rwa [inv_inv] at this
+  have hkT : k * T = T * k⁻¹ := by
+    have h := htki
+    calc k * T = (T * k⁻¹ * T) * T := by rw [h]
+      _ = T * k⁻¹ * (T * T) := by group
+      _ = T * k⁻¹ := by
+          rw [show T * T = 1 by rw [hT, ← sq]; exact hyp.t_sq, mul_one]
+  have hlT : l * T = T * l⁻¹ := by
+    have h : T * l⁻¹ * T = l := by
+      have := (hyp.inv_mem_KSet hl).2
+      rwa [inv_inv] at this
+    calc l * T = (T * l⁻¹ * T) * T := by rw [h]
+      _ = T * l⁻¹ * (T * T) := by group
+      _ = T * l⁻¹ := by
+          rw [show T * T = 1 by rw [hT, ← sq]; exact hyp.t_sq, mul_one]
+  have hts : T * s * T = r⁻¹ * T * r := hyp.structure_equation
+  have htrt : T * r * T = r * T * s := hyp.t_conj_structureConjugator
+  have htrit : T * r⁻¹ * T = s * T * r⁻¹ := hyp.t_conj_structureConjugator_inv
+  -- the left-hand side, expanded through `t`-conjugation
+  have hL : T * (r * (k⁻¹ * r⁻¹ * k)) * T
+      = (r * T * s) * (k * (s * T * r⁻¹) * k⁻¹) := by
+    rw [hyp.t_conj_mul r (k⁻¹ * r⁻¹ * k), hyp.t_conj_mul (k⁻¹ * r⁻¹) k,
+      hyp.t_conj_mul k⁻¹ r⁻¹, htrt, htrit, htk, htki]
+  -- both sides reduce to the same word
+  have hLnorm : (r * T * s) * (k * (s * T * r⁻¹) * k⁻¹)
+      = r * l * r⁻¹ * T * r * l⁻¹ * k⁻¹ * r⁻¹ * k⁻¹ := by
+    have e3 : (l * k) * T = T * l⁻¹ * k⁻¹ := by
+      calc (l * k) * T = l * (k * T) := by group
+        _ = l * (T * k⁻¹) := by rw [hkT]
+        _ = (l * T) * k⁻¹ := by group
+        _ = (T * l⁻¹) * k⁻¹ := by rw [hlT]
+        _ = T * l⁻¹ * k⁻¹ := by group
+    calc (r * T * s) * (k * (s * T * r⁻¹) * k⁻¹)
+        = r * T * (s * k * s * k⁻¹) * (k * T * r⁻¹ * k⁻¹) := by group
+      _ = r * T * (l⁻¹ * s * l) * (k * T * r⁻¹ * k⁻¹) := by rw [hskl]
+      _ = r * (T * l⁻¹) * s * ((l * k) * T) * r⁻¹ * k⁻¹ := by group
+      _ = r * (T * l⁻¹) * s * (T * l⁻¹ * k⁻¹) * r⁻¹ * k⁻¹ := by rw [e3]
+      _ = r * (l * T) * s * (T * l⁻¹ * k⁻¹) * r⁻¹ * k⁻¹ := by rw [hlT]
+      _ = r * l * (T * s * T) * l⁻¹ * k⁻¹ * r⁻¹ * k⁻¹ := by group
+      _ = r * l * (r⁻¹ * T * r) * l⁻¹ * k⁻¹ * r⁻¹ * k⁻¹ := by rw [hts]
+      _ = r * l * r⁻¹ * T * r * l⁻¹ * k⁻¹ * r⁻¹ * k⁻¹ := by group
+  have hk2T : k ^ 2 * T * k ^ 2 = T := by
+    calc k ^ 2 * T * k ^ 2 = k * (k * T) * k * k := by rw [pow_two]; group
+      _ = k * (T * k⁻¹) * k * k := by rw [hkT]
+      _ = (k * T) * k := by group
+      _ = (T * k⁻¹) * k := by rw [hkT]
+      _ = T := by group
+  have hlTl : l * T * l = T := by
+    calc l * T * l = (T * l⁻¹) * l := by rw [hlT]
+      _ = T := by group
+  have hRnorm : (r * (l * r⁻¹ * l⁻¹)) * (l ^ 2 * k ^ 2) * T *
+      ((k ^ 2 * (l * r * l⁻¹) * (k ^ 2)⁻¹) * (k * r⁻¹ * k⁻¹))
+      = r * l * r⁻¹ * T * r * l⁻¹ * k⁻¹ * r⁻¹ * k⁻¹ := by
+    calc (r * (l * r⁻¹ * l⁻¹)) * (l ^ 2 * k ^ 2) * T *
+          ((k ^ 2 * (l * r * l⁻¹) * (k ^ 2)⁻¹) * (k * r⁻¹ * k⁻¹))
+        = r * l * r⁻¹ * (l * (k ^ 2 * T * k ^ 2) * l) * r * l⁻¹ * k⁻¹ * r⁻¹ *
+            k⁻¹ := by group
+      _ = r * l * r⁻¹ * (l * T * l) * r * l⁻¹ * k⁻¹ * r⁻¹ * k⁻¹ := by rw [hk2T]
+      _ = r * l * r⁻¹ * T * r * l⁻¹ * k⁻¹ * r⁻¹ * k⁻¹ := by rw [hlTl]
+  exact hL.trans (hLnorm.trans hRnorm.symm)
 
 end Hypothesis
 
