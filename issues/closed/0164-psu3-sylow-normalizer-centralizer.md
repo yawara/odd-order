@@ -967,3 +967,35 @@ isotypic 加群論が要らなくなる。
 
 **(iv)** `Trichotomy.lean` の `hWcube` を除去して `W_ne_bot_of_card_cube` を配線
 ⟹ [issue 0163](0163-pf-part2-ch3-s1-trichotomy.md) の `W ≠ 1` が閉じる。
+
+## ✅ CLOSED (2026-07-29): 全部品が landing、`trichotomy` は仮説ゼロ
+
+最後のギャップ (type B での「位数 `q²` の `K`-部分群は `q+1` 個」) は
+**迂回して不要になった** — `K`-部分加群でなく `K`-**軌道**で議論するため。
+
+### landing した最終部品
+
+| 部品 | 場所 |
+|---|---|
+| `conjQ0_fixed_eq_one` / `isAInvariant_eq_bot_or_eq_top_conjQ0` | `StructureOfH/FieldRealizationK.lean` (新 leaf) |
+| **`exists_field_realization_K`** — `(F, μ : K ≃* Fˣ, σ ≠ 1)` を `Q₀` から | 同上 |
+| **`exists_mem_inf_centralizer_not_mem_Q0_of_orbit`** — `N` 不要版の `C_Q(X) ⊄ Q₀` | `StructureOfH/HilbertNinetyOnQ.lean` |
+| `center_eq_Q0_subgroupOf_of_card_cube` / `kfree_mod_Q0_of_center_eq` / `exists_mem_inf_centralizer_not_mem_Q0_of_card_cube` | 同上 (case (3) 用の梱包) |
+| `W_ne_bot_of_card_cube` (sorry ゼロ化) / `trichotomy` (`hWcube` 除去) | `StructureOfH/WNeBot.lean` |
+
+削除: `exists_kSubgroupSquare_invariant_of_card_cube` (type B の sorry を抱えていた) —
+case 2 が軌道版で直接閉じるので consumer が消えた。
+
+### 書籍に対する最終評価
+
+* **PSU 分岐**: 書籍の "as can be checked" は実際に計算が要り、`𝔽_{ℓ²}^×` のノルム核
+  (位数 `ℓ+1`) で閉じた (`false_of_W_eq_bot`)。
+* **PSL 分岐**: 書籍の「`[K,P] ⋊ P` は Frobenius」は **`p ∤ q₀−1` と同値**で、
+  Ch. III の仮説からは出ず type C/D では実際に偽 (`p ∣ q₀−1` が導ける)。
+  Ch. II では `q₀ = 2` なので常に成立する — 書籍は Ch. III で言い回しを流用したと思われる。
+  `p ∤ q₀−1` では書籍のルート (Wielandt) が有効、`p ∣ q₀−1` では
+  `p ∤ q+1` となり **`K`-軌道上の Hilbert 90** が閉じる。両者は相補的。
+* **type B の `K`-部分群が `q+1` 個**: 書籍は述べるだけで証明しない
+  (isotypic な `𝔽₂[K]`-加群の射影直線)。軌道で議論すれば**そもそも要らない**。
+
+フルビルド green (4923 jobs)、AxiomsCheck OK、lint --strict 0 件。
