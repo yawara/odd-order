@@ -14069,3 +14069,26 @@ the property along `K`-orbits.  What remains of the Proposition of §2 is that t
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_structureConjugator_inv_mem_K
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_structureConjugator_mul_conj_inv_mem_K
+
+/-! **The system of representatives, and what is left of §2** (issue 0165, 2026-07-29).
+`GroupTheory/FreeActionOrbitCount.lean` and
+`Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+`exists_mem_orbit_of_card_mul_eq` is the counting criterion the book uses implicitly: for a free
+action, a set `R` of pairwise inequivalent points with `|R| · |Γ| = |S|` meets every orbit —
+the map `R × Γ → S`, `(y, a) ↦ a • y`, is injective and the cardinalities agree.
+
+`orbitReprSet` is the book's list `{s, r, r⁻¹} ∪ {r r^{-k} : k ∈ K#}`, and
+`tConjMiddle_mem_K_of_orbitReprSet_covers` reduces the Proposition of §2 to the single statement
+that this list meets every `K`-orbit of `S#` — everything else (`h` at each representative, and
+the equivariance that spreads it over an orbit) is proved. -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.FreeActionOrbitCount.exists_mem_orbit_of_card_mul_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orbitReprSet_subset_Q
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.one_notMem_orbitReprSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K_of_mem_orbitReprSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K_of_orbitReprSet_covers
