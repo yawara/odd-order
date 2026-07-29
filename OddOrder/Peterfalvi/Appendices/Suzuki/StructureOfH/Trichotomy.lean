@@ -32,8 +32,10 @@ in `SquareRootFibres.lean`; this file assembles the cases from it.
 > whence `C_S(P) ⊄ Q₀`, which is a contradiction.  Thus `S = Q₀`.
 
 **Case (3)** (`S` non-abelian of order `q³`) concludes `orderOf (st) = 3` and
-`W ≠ 1`; Ch. I §3 Lemma 5 (`lemmaFive_of_orderThree`) then gives type B.  Its
-first half is here, reduced to the supply of the two `K`-subgroups.
+`W ≠ 1`; Ch. I §3 Lemma 5 (`lemmaFive_of_orderThree`) then gives type B.  The
+first half is complete here; the book's count of the `K`-subgroups of `S` of
+order `q²` is replaced by a construction plus operator Maschke, see
+`Hypothesis.exists_two_kSubgroups_invariant_of_card_cube`.
 
 **Case (2)** (`S` non-abelian of order `q²`) concludes `W = 1` and
 `orderOf (st) = 5`.  The book's `PSU(3, ℓ)` exclusion, which it defers with "as
@@ -55,8 +57,9 @@ Ch. I §3 Proposition 1(c) carries in that branch; see
 * `false_of_typeA_centralizer_of_two_kSubgroups`,
   `orderOf_st_eq_three_of_two_kSubgroups` — **case (3)'s `st` has order `3`**,
   given the two `K`-subgroups of `S` of order `q²` that `P` normalizes.
-* `orderOf_st_eq_three_of_card_cube_of_not_isTypeB` — the same for `S` of order
-  `q³` outside type B, where the two `K`-subgroups are the only ones.
+* `orderOf_st_eq_three_of_card_cube_of_not_isTypeB`,
+  `orderOf_st_eq_three_of_card_cube` — **case (3)**: `S` of order `q³` forces
+  `st` to have order `3`, with no hypothesis on the type of `S`.
 -/
 
 set_option autoImplicit false
@@ -473,6 +476,70 @@ theorem orderOf_st_eq_three_of_card_cube_of_not_isTypeB
     (Hypothesis.conj_mem_of_unique_of_le_V hp hPcard hPV hX hne huniq)
     (Hypothesis.conj_mem_of_unique_of_le_V hp hPcard hPV hY (Ne.symm hne)
       (fun Z hZ => (huniq Z hZ).symm))
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (3): `st` has order 3**
+(p. 117), unconditionally.
+
+> Suppose that `st` has order 5.  It follows that `C_S(P)` is a Suzuki `2`-group
+> of type A. … `P` normalizes at least two `K`-subgroups `X` and `Y` of order
+> `q²` in `S`. … which is a contradiction.  Thus `st` has order 3.
+
+If `st` had order `5`, Ch. I §3 Proposition 1(c) would put a Suzuki `2`-group
+structure on `C_Q(P)`; being non-abelian it has an element `v` of order `4`,
+which `P` centralizes.  `exists_two_kSubgroups_invariant_of_card_cube` then
+produces the two `K`-subgroups of order `q²` normalized by `P`, and
+`false_of_typeA_centralizer_of_two_kSubgroups` refutes the branch. -/
+theorem orderOf_st_eq_three_of_card_cube
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q)
+    {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥sc.toHypothesis.Q0 = 2 ^ m)
+    (hcardQ : Nat.card ↥sc.toHypothesis.Q = Nat.card ↥sc.toHypothesis.Q0 ^ 3)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ sc.toHypothesis.V) :
+    orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3 := by
+  classical
+  have hPne : P ≠ ⊥ := by
+    intro h
+    rw [h, Subgroup.card_bot] at hPcard
+    exact hp.one_lt.ne hPcard
+  letI := sc.toHypothesis.centralizerQuotientMulAction hPV
+  obtain ⟨data⟩ := sc.toHypothesis.centralizer_trichotomy_of_induction hPV hPne
+    (sc.twoRank_centralizer_ge_two P hPV p hp hPcard) ind
+  rcases data.branch with ⟨d, -, det⟩ | ⟨d, -, det⟩ | ⟨d, -, det⟩
+  · exact det.distinguishedProduct_order
+  · exfalso
+    -- a non-abelian group of exponent dividing `4` has an element of order `4`
+    obtain ⟨x, hx⟩ : ∃ x : ↥(sc.toHypothesis.Q.subgroupOf
+        (Subgroup.centralizer (P : Set G))), x ^ 2 ≠ 1 := by
+      by_contra hall
+      push Not at hall
+      refine det.cQ_isSuzuki2Group.2.1 ⟨⟨fun a b => ?_⟩⟩
+      have ha : a * a = 1 := by rw [← sq]; exact hall a
+      have hb : b * b = 1 := by rw [← sq]; exact hall b
+      have hab : (a * b) * (a * b) = 1 := by rw [← sq]; exact hall (a * b)
+      have h1 : (a * b)⁻¹ = a * b := inv_eq_of_mul_eq_one_right hab
+      rw [mul_inv_rev, inv_eq_of_mul_eq_one_right hb,
+        inv_eq_of_mul_eq_one_right ha] at h1
+      exact h1.symm
+    set v : G := ((x : ↥(Subgroup.centralizer (P : Set G))) : G) with hvdef
+    have hvQ : v ∈ sc.toHypothesis.Q := Subgroup.mem_subgroupOf.mp x.2
+    have hvC : ∀ g ∈ P, g * v = v * g := fun g hg =>
+      Subgroup.mem_centralizer_iff.mp
+        (x : ↥(Subgroup.centralizer (P : Set G))).2 g hg
+    have hvsq : v ^ 2 ≠ 1 := by
+      intro h
+      refine hx (Subtype.ext (Subtype.ext ?_))
+      simpa using h
+    have hvQ0 : v ∉ sc.toHypothesis.Q0 := fun h =>
+      hvsq (sc.toHypothesis.sq_eq_one_of_mem_Q0 h)
+    obtain ⟨X, Y, hX, hY, hne, hXP, hYP⟩ :=
+      sc.toHypothesis.exists_two_kSubgroups_invariant_of_card_cube hQsuz hm
+        hQ0card hcardQ hp hPcard hPV hvQ hvQ0 hvC
+    exact sc.false_of_typeA_centralizer_of_two_kSubgroups hQsuz
+      hX.1 hX.2.1 hX.2.2.1 hX.2.2.2 hY.1 hY.2.1 hY.2.2.1 hY.2.2.2 hne hp hPcard
+      hPV hXP hYP det.standardTypeAData
+  · exact det.distinguishedProduct_order
 
 /-- **After Theorem C, the book's `S` is `Q`**: `Q₁ = 1` (`Q1_eq_bot`) makes the
 Sylow `2`-subgroup `S` of `Q` equal to `Q`, so Ch. III §1's Proposition — stated

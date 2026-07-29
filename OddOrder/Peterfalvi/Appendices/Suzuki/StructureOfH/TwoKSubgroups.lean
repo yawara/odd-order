@@ -285,6 +285,23 @@ theorem conj_mem_of_unique_of_le_V {P : Subgroup G} {p : ℕ} (hp : p.Prime)
     rwa [show g⁻¹ * (g * y * g⁻¹) * g = y from by group]
   rwa [hfix] at hmem
 
+/-- Invariance under two operator subgroups gives invariance under their join. -/
+theorem conj_mem_sup {G : Type uG} [Group G] {A B N : Subgroup G}
+    (hA : ∀ a ∈ A, ∀ y ∈ N, a * y * a⁻¹ ∈ N)
+    (hB : ∀ b ∈ B, ∀ y ∈ N, b * y * b⁻¹ ∈ N) :
+    ∀ c ∈ A ⊔ B, ∀ y ∈ N, c * y * c⁻¹ ∈ N := by
+  have hnorm : ∀ (C : Subgroup G),
+      (∀ a ∈ C, ∀ y ∈ N, a * y * a⁻¹ ∈ N) → C ≤ Subgroup.normalizer N := by
+    intro C hC a ha
+    rw [Subgroup.mem_normalizer_iff]
+    intro n
+    refine ⟨fun hn => hC a ha n hn, fun hn => ?_⟩
+    have h := hC a⁻¹ (C.inv_mem ha) _ hn
+    rwa [show a⁻¹ * (a * n * a⁻¹) * a⁻¹⁻¹ = n from by group] at h
+  intro c hc y hy
+  exact (Subgroup.mem_normalizer_iff.mp
+    (sup_le (hnorm A hA) (hnorm B hB) hc) y).mp hy
+
 /-! ## Conjugation by a subgroup of `H`, and the Maschke complement -/
 
 /-- Conjugation on `Q` by a subgroup `A` of `H`; `Q ⊴ H`.  Generalizes
@@ -616,6 +633,43 @@ theorem exists_two_kSubgroups_unique_of_card_cube
     exact hnotB (isTypeB_of_isomorphicOrderQModuleSplit_of_card_eq_cube hQsuz
       hKcyc hreg hm hKKcard hcard ⟨csplit, e⟩)
 
+/-- **A `K`-subgroup of `S` of order `q²` containing an element that `P`
+centralizes is normalized by `P`.**
+
+Its conjugates are again such subgroups (`isKSubgroupSquare_map_conj`), and two
+distinct ones meet in `Q₀` (`inf_eq_Q0_of_ne_of_kInvariant`) — but the common
+element lies outside `Q₀`.  This is what makes the book's "`P` centralizes an
+element of order `4` in `S`" produce a `P`-invariant `K`-subgroup (p. 117). -/
+theorem conj_mem_of_mem_centralizer
+    (hQsuz : IsSuzuki2Group ↥hyp.Q)
+    {N : Subgroup G} (hN : hyp.IsKSubgroupSquare N)
+    {P : Subgroup G} (hPV : P ≤ hyp.V)
+    {v : G} (hvN : v ∈ N) (hvQ0 : v ∉ hyp.Q0)
+    (hvC : ∀ g ∈ P, g * v = v * g) :
+    ∀ g ∈ P, ∀ y ∈ N, g * y * g⁻¹ ∈ N := by
+  intro g hg
+  have hgV : g ∈ hyp.V := hPV hg
+  have hNg : hyp.IsKSubgroupSquare (N.map (MulAut.conj g).toMonoidHom) :=
+    isKSubgroupSquare_map_conj hgV hN
+  have hcv : g⁻¹ * v * g = v := by
+    have h := hvC g hg
+    calc g⁻¹ * v * g = g⁻¹ * (v * g) := by group
+      _ = g⁻¹ * (g * v) := by rw [← h]
+      _ = v := by group
+  have hvNg : v ∈ N.map (MulAut.conj g).toMonoidHom := by
+    refine mem_map_conj.mpr ?_
+    rwa [hcv]
+  have heq : N.map (MulAut.conj g).toMonoidHom = N := by
+    by_contra hne
+    have hinf := hyp.inf_eq_Q0_of_ne_of_kInvariant hQsuz hNg.1 hNg.2.1 hNg.2.2.1
+      hNg.2.2.2 hN.2.1 hN.2.2.1 hN.2.2.2 hne
+    exact hvQ0 (by rw [← hinf]; exact ⟨hvNg, hvN⟩)
+  intro y hy
+  have hmem : g * y * g⁻¹ ∈ N.map (MulAut.conj g).toMonoidHom := by
+    refine mem_map_conj.mpr ?_
+    rwa [show g⁻¹ * (g * y * g⁻¹) * g = y from by group]
+  rwa [heq] at hmem
+
 /-- **Peterfalvi Appendix III, Higman theorem (d), in the ambient group**
 (p. 141), as case (3) of the Ch. III §1 Proposition uses it (p. 117): if `S = Q`
 is a Suzuki `2`-group of order `q³` then `S` has two distinct `K`-subgroups of
@@ -668,6 +722,167 @@ theorem exists_two_kSubgroups_of_card_cube
   rcases Nat.pow_eq_one.mp hcardR.symm with h | h
   · omega
   · exact hm h
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (3): the two
+`K`-subgroups that `P` normalizes** (p. 117), unconditionally.
+
+The book splits on the type of `S` — for types C and D the two `K`-subgroups of
+order `q²` are the only ones, and for type B it counts `q + 1` of them.  The
+dichotomy used here is the one that actually drives both halves: are the two
+summands of Higman's split `K`-equivariantly isomorphic?
+
+* **No** — then a third invariant subgroup of the summand order cannot exist
+  (`nonempty_kEquivariantMulEquiv_of_third_invariant`), so the two lifts are the
+  only `K`-subgroups of `S` of order `q²` and the odd-order `P` fixes both
+  (`conj_mem_of_unique_of_le_V`).
+* **Yes** — then the element `v` of order `4` that `P` centralizes lies in a
+  `K`-invariant subgroup of the summand order
+  (`exists_invariant_mem_of_kEquivariantMulEquiv`), whose lift `X` is normalized
+  by `P` (`conj_mem_of_mem_centralizer`); operator Maschke for `K ⊔ P ≤ D` then
+  supplies the partner (`exists_kSubgroupSquare_complement`).  This replaces the
+  book's count. -/
+theorem exists_two_kSubgroups_invariant_of_card_cube
+    (hQsuz : IsSuzuki2Group ↥hyp.Q) {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ hyp.V)
+    {v : G} (hvQ : v ∈ hyp.Q) (hvQ0 : v ∉ hyp.Q0)
+    (hvC : ∀ g ∈ P, g * v = v * g) :
+    ∃ X Y : Subgroup G, hyp.IsKSubgroupSquare X ∧ hyp.IsKSubgroupSquare Y ∧
+      X ≠ Y ∧ (∀ g ∈ P, ∀ y ∈ X, g * y * g⁻¹ ∈ X) ∧
+      (∀ g ∈ P, ∀ y ∈ Y, g * y * g⁻¹ ∈ Y) := by
+  classical
+  have hKcyc : IsCyclic ↥hyp.actualKActor := hyp.actualKActor_isCyclic
+  have hreg : ActsRegularlyOnInvolutions hyp.actualKActor :=
+    hyp.actualKActor_actsRegularlyOnInvolutions
+  have hKKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1 := by
+    have h1 : Nat.card ↥hyp.actualKActor = Nat.card ↥hyp.K :=
+      Nat.card_congr (MonoidHom.ofInjective hyp.conjQByK_injective).toEquiv.symm
+    rw [h1, hyp.card_K_eq_card_Q0_sub_one, hQ0card]
+  have hcard : Nat.card ↥hyp.Q = (2 ^ m) ^ 3 := by rw [hcardQ, hQ0card]
+  obtain ⟨-, hZsq, ⟨csplit⟩⟩ :=
+    center_payload_of_card_eq_cube hQsuz hKcyc hreg hm hKKcard hcard
+  have hZQ0 : Subgroup.center ↥hyp.Q = hyp.Q0.subgroupOf hyp.Q :=
+    hyp.center_Q_eq_Q0_subgroupOf_of_sq_eq_one hZsq
+  have hZcard : Nat.card ↥(Subgroup.center ↥hyp.Q) = Nat.card ↥hyp.Q0 := by
+    rw [hZQ0, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv]
+  have hcardK' : Nat.card ↥hyp.actualKActor =
+      Nat.card ↥(Subgroup.center ↥hyp.Q) - 1 := by
+    rw [hZcard, hQ0card, hKKcard]
+  have hcardlift : ∀ U : Subgroup (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q),
+      Nat.card ↥U = Nat.card ↥(Subgroup.center ↥hyp.Q) →
+      Nat.card ↥(hyp.liftCentralQuotient U) = Nat.card ↥hyp.Q0 ^ 2 := by
+    intro U hU
+    rw [card_liftCentralQuotient, hU, hZcard, sq]
+  obtain ⟨hP2, -, -, -⟩ := id hQsuz
+  have hfreeP := fixedPointFree_of_actsRegularlyOnInvolutions hP2 hreg
+  have hfree : ∀ k : ↥hyp.actualKActor, k ≠ 1 →
+      ∀ q : ↥hyp.Q ⧸ Subgroup.center ↥hyp.Q,
+        IsAInvariant.quotientMulAutHom
+          (IsAInvariant.of_characteristic hyp.actualKActor.subtype) k q = q →
+          q = 1 := by
+    apply Suzuki2Groups.quotient_fixedPointFree_of_fixedPoints_le
+      hyp.actualKActor.subtype (Subgroup.center ↥hyp.Q)
+      (IsAInvariant.of_characteristic hyp.actualKActor.subtype)
+    · exact Suzuki2Groups.card_coprime_of_card_eq_sub_one
+        (Subgroup.center ↥hyp.Q) hcardK'
+    · intro k hk x hx
+      rw [hfreeP k hk x hx]
+      exact Subgroup.one_mem _
+  have hqcomm : ∀ a b : (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q), a * b = b * a :=
+    csplit.quotientEA.1
+  have hnormal : ∀ U : Subgroup (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q), U.Normal := by
+    intro U
+    refine ⟨fun x hx g => ?_⟩
+    rw [hqcomm g x, mul_assoc, mul_inv_cancel, mul_one]
+    exact hx
+  haveI := hnormal csplit.left
+  haveI := hnormal csplit.right
+  have hXpack : hyp.IsKSubgroupSquare (hyp.liftCentralQuotient csplit.left) :=
+    ⟨liftCentralQuotient_le_Q _, Q0_le_liftCentralQuotient hZQ0 _,
+      kInvariant_liftCentralQuotient csplit.leftInvariant,
+      hcardlift _ csplit.leftCard⟩
+  have hYpack : hyp.IsKSubgroupSquare (hyp.liftCentralQuotient csplit.right) :=
+    ⟨liftCentralQuotient_le_Q _, Q0_le_liftCentralQuotient hZQ0 _,
+      kInvariant_liftCentralQuotient csplit.rightInvariant,
+      hcardlift _ csplit.rightCard⟩
+  have hLRne : hyp.liftCentralQuotient csplit.left
+      ≠ hyp.liftCentralQuotient csplit.right := by
+    intro heq
+    have hLR : csplit.left = csplit.right := liftCentralQuotient_injective heq
+    have hdisj := csplit.complementary.disjoint
+    rw [hLR, disjoint_self] at hdisj
+    have hcardR : Nat.card ↥csplit.right = Nat.card ↥(Subgroup.center ↥hyp.Q) :=
+      csplit.rightCard
+    rw [hdisj, Subgroup.card_bot, hZcard, hQ0card] at hcardR
+    rcases Nat.pow_eq_one.mp hcardR.symm with h | h
+    · omega
+    · exact hm h
+  rcases isEmpty_or_nonempty (Suzuki2Groups.KEquivariantMulEquiv
+    csplit.leftInvariant.restrict csplit.rightInvariant.restrict) with hno | hyes
+  · -- non-isomorphic summands: the two lifts are the only ones
+    have huniq : ∀ Z : Subgroup G, hyp.IsKSubgroupSquare Z →
+        Z = hyp.liftCentralQuotient csplit.left ∨
+        Z = hyp.liftCentralQuotient csplit.right := by
+      intro Z hZ
+      obtain ⟨U, hUinv, hUcard, hUlift⟩ :=
+        exists_eq_liftCentralQuotient_of_isKSubgroupSquare hZQ0 hZ
+      have hUcard' : Nat.card ↥U = Nat.card ↥(Subgroup.center ↥hyp.Q) := by
+        rw [hUcard, hZcard]
+      by_cases hU1 : U = csplit.left
+      · exact Or.inl (by rw [← hUlift, hU1])
+      by_cases hU2 : U = csplit.right
+      · exact Or.inr (by rw [← hUlift, hU2])
+      exact absurd (Suzuki2Groups.nonempty_kEquivariantMulEquiv_of_third_invariant
+        (IsAInvariant.quotientMulAutHom
+          (IsAInvariant.of_characteristic hyp.actualKActor.subtype))
+        hfree csplit.leftInvariant csplit.rightInvariant hUinv
+        csplit.complementary (by rw [hUcard']; exact hcardK')
+        (by rw [hUcard']; exact csplit.leftCard)
+        (by rw [hUcard']; exact csplit.rightCard) hU1 hU2) (by simpa using hno)
+    exact ⟨_, _, hXpack, hYpack, hLRne,
+      conj_mem_of_unique_of_le_V hp hPcard hPV hXpack hLRne huniq,
+      conj_mem_of_unique_of_le_V hp hPcard hPV hYpack (Ne.symm hLRne)
+        (fun Z hZ => (huniq Z hZ).symm)⟩
+  · -- isomorphic summands: build a `K`-subgroup through `v`, then Maschke
+    obtain ⟨e⟩ := hyes
+    have hKAcomm : ∀ a b : ↥hyp.actualKActor, a * b = b * a := fun a b => by
+      obtain ⟨g, hg⟩ := hKcyc.exists_generator
+      obtain ⟨i, rfl⟩ := hg a
+      obtain ⟨j, rfl⟩ := hg b
+      rw [← zpow_add, ← zpow_add, add_comm]
+    have htrans : ∀ a b : ↥csplit.right, a ≠ 1 → b ≠ 1 →
+        ∃ k : ↥hyp.actualKActor, csplit.rightInvariant.restrict k a = b := by
+      apply Suzuki2Groups.restrict_transitive_of_fixedPointFree_card
+        (IsAInvariant.quotientMulAutHom
+          (IsAInvariant.of_characteristic hyp.actualKActor.subtype))
+        hfree csplit.rightInvariant
+      rw [csplit.rightCard]
+      exact hcardK'
+    obtain ⟨N, hNinv, hNcard, hNmem⟩ :=
+      Suzuki2Groups.exists_invariant_mem_of_kEquivariantMulEquiv hKAcomm hqcomm
+        csplit.leftInvariant csplit.rightInvariant csplit.complementary e htrans
+        (QuotientGroup.mk' (Subgroup.center ↥hyp.Q) ⟨v, hvQ⟩)
+    have hNpack : hyp.IsKSubgroupSquare (hyp.liftCentralQuotient N) :=
+      ⟨liftCentralQuotient_le_Q _, Q0_le_liftCentralQuotient hZQ0 _,
+        kInvariant_liftCentralQuotient hNinv,
+        hcardlift _ (hNcard.trans csplit.leftCard)⟩
+    have hvX : v ∈ hyp.liftCentralQuotient N :=
+      mem_liftCentralQuotient_iff.mpr ⟨hvQ, hNmem⟩
+    have hXP := conj_mem_of_mem_centralizer hQsuz hNpack hPV hvX hvQ0 hvC
+    have hPD : P ≤ hyp.D := hPV.trans hyp.V_le_D
+    have hAD : hyp.K ⊔ P ≤ hyp.D := sup_le hyp.K_le_D hPD
+    have hXA : ∀ a ∈ hyp.K ⊔ P, ∀ y ∈ hyp.liftCentralQuotient N,
+        a * y * a⁻¹ ∈ hyp.liftCentralQuotient N :=
+      conj_mem_sup hNpack.2.2.1 hXP
+    obtain ⟨Y, hYQ, hQ0Y, hYA, hYcard, hne⟩ :=
+      hyp.exists_kSubgroupSquare_complement hAD hP2 hZQ0 csplit.quotientEA
+        hcardQ hNpack.1 hNpack.2.1 hXA hNpack.2.2.2
+    exact ⟨_, Y, hNpack,
+      ⟨hYQ, hQ0Y, fun k hk => hYA k ((le_sup_left : hyp.K ≤ hyp.K ⊔ P) hk),
+        hYcard⟩, hne, hXP,
+      fun g hg => hYA g ((le_sup_right : P ≤ hyp.K ⊔ P) hg)⟩
 
 end Hypothesis
 

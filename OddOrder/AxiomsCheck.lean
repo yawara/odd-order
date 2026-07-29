@@ -13614,5 +13614,36 @@ subgroup through a prescribed element is used.
   and of order `|U₁|` because `U₁ ⊓ U₂ = 1`. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.exists_invariant_mem_of_kEquivariantMulEquiv
+
+/-! **Peterfalvi Part II, Ch. III §1, Proposition, case (3): `st` has order 3, unconditionally**
+(issue 0163, 2026-07-29).  `Appendices/Suzuki/StructureOfH/{TwoKSubgroups,Trichotomy}.lean`,
+p. 117.
+
+The book splits case (3) on the type of `S`: for types C and D the two `K`-subgroups of `S` of
+order `q²` are the only ones, and for type B it counts `q + 1` of them.  The dichotomy used
+here is the one that drives both halves — are the summands of Higman's split `K`-equivariantly
+isomorphic? — and the type-B count is replaced by a construction plus operator Maschke.
+
+* `conj_mem_sup` — invariance under two operator subgroups gives invariance under their join.
+* `conj_mem_of_mem_centralizer` — a `K`-subgroup of order `q²` containing an element that `P`
+  centralizes is normalized by `P`: its conjugates are again such subgroups and two distinct
+  ones meet in `Q₀`, which the common element avoids.  This is the content of the book's "since
+  `P` centralizes an element of order `4` in `S`".
+* `exists_two_kSubgroups_invariant_of_card_cube` — **the two `K`-subgroups `P` normalizes**.
+  Non-isomorphic summands: the two lifts are the only such subgroups and `P` fixes both.
+  Isomorphic summands: `exists_invariant_mem_of_kEquivariantMulEquiv` puts the order-`4`
+  element in one, and `exists_kSubgroupSquare_complement` supplies its partner.
+* `orderOf_st_eq_three_of_card_cube` — **case (3)'s `orderOf (st) = 3`**.  Only the `Sz(ℓ)`
+  branch of Ch. I §3 Proposition 1(c) has `orderOf (st) = 5`; there `C_Q(P)` is a Suzuki
+  `2`-group, hence non-abelian, hence has an element of order `4` (a group of exponent `2` is
+  commutative), and the two `K`-subgroups then refute the branch. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_sup
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_of_mem_centralizer
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_two_kSubgroups_invariant_of_card_cube
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB
