@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Conjugacy
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.Isaacs.Ch04_Commutators.ProblemsCyclicSylow
 
 /-!
 # Isaacs §3E の演習 (書籍 pp. 106-107)
@@ -29,6 +31,8 @@ Glauberman, Thm 3.27-3.30) は Ch.4 の交換子機構を要するため
 namespace OddOrder.Isaacs.Ch04
 
 open Subgroup Pointwise
+
+open scoped commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -577,6 +581,167 @@ theorem relIndex_dvd_index_of_aInvariant {φ : A →* MulAut G}
       have := hkey p hp
       omega
     · simp [hp]
+
+/-! ### Problem 3E.5 — `O_p(G)` は `O_p(G)/Φ(O_p(G))` への作用の核
+
+`G` を `p`-可解, `O_{p'}(G) = 1` とし `P = O_p(G)`, `F = Φ(P)` とおく。`F` は `P` の
+特性部分群なので `F ⊴ G` で, `G` は `P/F` に共役で作用する。`P/F` は可換なので `P` は
+その核に入る (書籍の "observe")。逆に核が `P` に収まることを示すのが本問。
+-/
+
+/-- **3E.5 の作用の核**: `P ⊴ G` に対する, `G` の `P/Φ(P)` への共役作用の核。
+
+`Φ(P)` は `P` の特性部分群なので `G` で正規 (`Subgroup.normal_of_characteristic_of_normal`)。
+`G` の `P/Φ(P)` への共役作用は `G ⧸ Φ(P)` の中で `P/Φ(P)` に共役で作用することと同じなので,
+核は `C_{G/Φ(P)}(P/Φ(P))` の引き戻し。元による特徴付け (`g` が `P/Φ(P)` に自明に作用する
+⟺ `∀ y ∈ P, ⁅g, y⁆ ∈ Φ(P)`) は `mem_frattiniQuotientKernel_iff`。 -/
+def frattiniQuotientKernel {G : Type*} [Group G] (P : Subgroup G) [P.Normal] : Subgroup G :=
+  Subgroup.comap (QuotientGroup.mk' ((frattini ↥P).map P.subtype))
+    (Subgroup.centralizer
+      ((P.map (QuotientGroup.mk' ((frattini ↥P).map P.subtype)) :
+          Subgroup (G ⧸ (frattini ↥P).map P.subtype)) :
+        Set (G ⧸ (frattini ↥P).map P.subtype)))
+
+/-- `frattiniQuotientKernel P` は文字どおり `G` の `P/Φ(P)` への共役作用
+`MulAut.conjNormal ∘ (G ↠ G ⧸ Φ(P)) : G →* MulAut (P/Φ(P))` の核。
+
+`MonoidHom.comap_ker` + `ker_conjNormal_eq_centralizer`。 -/
+theorem frattiniQuotientKernel_eq_ker {G : Type*} [Group G] (P : Subgroup G) [P.Normal] :
+    frattiniQuotientKernel P =
+      ((MulAut.conjNormal (H := P.map (QuotientGroup.mk' ((frattini ↥P).map P.subtype)))).comp
+        (QuotientGroup.mk' ((frattini ↥P).map P.subtype))).ker := by
+  rw [← MonoidHom.comap_ker, ker_conjNormal_eq_centralizer]
+  rfl
+
+/-- **核の元による特徴付け**: `g` が `P/Φ(P)` に自明に作用する ⟺ `∀ y ∈ P, ⁅g, y⁆ ∈ Φ(P)`。
+
+`⁅g, y⁆ ∈ Φ(P)` は `G ⧸ Φ(P)` で `ḡ` と `ȳ` が可換であることに他ならない。 -/
+theorem mem_frattiniQuotientKernel_iff {G : Type*} [Group G] {P : Subgroup G} [P.Normal]
+    {g : G} :
+    g ∈ frattiniQuotientKernel P ↔ ∀ y ∈ P, ⁅g, y⁆ ∈ (frattini ↥P).map P.subtype := by
+  simp only [frattiniQuotientKernel, Subgroup.mem_comap, Subgroup.mem_centralizer_iff,
+    SetLike.mem_coe]
+  constructor
+  · intro h y hy
+    have hc : Commute ((QuotientGroup.mk' ((frattini ↥P).map P.subtype)) y)
+        ((QuotientGroup.mk' ((frattini ↥P).map P.subtype)) g) :=
+      h _ (Subgroup.mem_map_of_mem _ hy)
+    rw [← QuotientGroup.ker_mk' ((frattini ↥P).map P.subtype), MonoidHom.mem_ker,
+      map_commutatorElement, commutatorElement_eq_one_iff_commute]
+    exact hc.symm
+  · intro h z hz
+    obtain ⟨y, hy, rfl⟩ := Subgroup.mem_map.mp hz
+    have hy' := h y hy
+    rw [← QuotientGroup.ker_mk' ((frattini ↥P).map P.subtype), MonoidHom.mem_ker,
+      map_commutatorElement, commutatorElement_eq_one_iff_commute] at hy'
+    exact hy'.symm
+
+/-- `↥P` の元が `Φ(P)` の `G` への像に入るなら, もとの `Φ(↥P)` に入る。 -/
+theorem mem_frattini_of_coe_mem_map {G : Type*} [Group G] {P : Subgroup G} {z : ↥P}
+    (hz : (z : G) ∈ (frattini ↥P).map P.subtype) : z ∈ frattini ↥P := by
+  obtain ⟨w, hw, hwz⟩ := hz
+  exact (Subtype.ext hwz : w = z) ▸ hw
+
+/-- **書籍の "observe"**: `P` が `p`-群なら `P/Φ(P)` は可換なので `P` は作用の核に入る。
+
+`⁅x, y⁆ ∈ P' ≤ Φ(P)` (`commutator_le_frattini_of_pgroup`)。 -/
+theorem le_frattiniQuotientKernel {G : Type*} [Group G] [Finite G] {P : Subgroup G} [P.Normal]
+    {p : ℕ} [Fact p.Prime] (hP : IsPGroup p ↥P) : P ≤ frattiniQuotientKernel P := by
+  intro g hg
+  rw [mem_frattiniQuotientKernel_iff]
+  intro y hy
+  refine ⟨⁅(⟨g, hg⟩ : ↥P), (⟨y, hy⟩ : ↥P)⁆, ?_, rfl⟩
+  refine commutator_le_frattini_of_pgroup hP ?_
+  rw [commutator_def]
+  exact commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+
+/-- **3E.5 の核心**: `P ⊴ G` が `p`-群で, `x` の位数が `p` で割れず `x` が `P/Φ(P)` に
+自明に作用するなら, `x` は `P` を中心化する。
+
+`⟨x⟩` を `P` に共役で作用させると `(|⟨x⟩|, |Φ(P)|) = 1` かつ `P/Φ(P)` 上自明なので,
+**3D.4** (`smul_eq_self_of_trivial_mod_frattini`) がそのまま適用できる。 -/
+theorem mem_centralizer_of_mem_frattiniQuotientKernel {G : Type*} [Group G] [Finite G]
+    {P : Subgroup G} [P.Normal] {p : ℕ} [Fact p.Prime] (hP : IsPGroup p ↥P) {x : G}
+    (hx : x ∈ frattiniQuotientKernel P) (hord : ¬ p ∣ orderOf x) :
+    x ∈ Subgroup.centralizer (P : Set G) := by
+  classical
+  set Z : Subgroup G := Subgroup.zpowers x with hZ
+  letI : MulDistribMulAction ↥Z ↥P :=
+    MulDistribMulAction.compHom ↥P ((MulAut.conjNormal (H := P)).comp Z.subtype)
+  have hZK : Z ≤ frattiniQuotientKernel P := Subgroup.zpowers_le.mpr hx
+  have hcop : Nat.Coprime (Nat.card ↥Z) (Nat.card ↥(frattini ↥P)) := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hP
+    have hdvd : Nat.card ↥(frattini ↥P) ∣ Nat.card ↥P := Subgroup.card_subgroup_dvd_card _
+    have hcard : Nat.card ↥Z = orderOf x := by rw [hZ]; exact Nat.card_zpowers x
+    rw [hcard]
+    refine Nat.Coprime.coprime_dvd_right (hn ▸ hdvd) ?_
+    exact Nat.Coprime.pow_right n
+      ((Nat.Prime.coprime_iff_not_dvd (Fact.out : p.Prime)).mpr hord).symm
+  have htriv : ∀ (h : ↥Z) (g : ↥P), g⁻¹ * (h • g) ∈ frattini ↥P := by
+    intro h g
+    have hmem : ⁅(h : G), ((g : G))⁻¹⁆ ∈ (frattini ↥P).map P.subtype :=
+      mem_frattiniQuotientKernel_iff.mp (hZK h.2) _ (inv_mem g.2)
+    refine mem_frattini_of_coe_mem_map ?_
+    have hsmul : ((h • g : ↥P) : G) = (h : G) * (g : G) * (h : G)⁻¹ := rfl
+    have hcoe : ((g⁻¹ * (h • g) : ↥P) : G) = ⁅((g : G))⁻¹, (h : G)⁆ := by
+      rw [Subgroup.coe_mul, Subgroup.coe_inv, hsmul, commutatorElement_def]
+      group
+    rw [hcoe, ← commutatorElement_inv]
+    exact inv_mem hmem
+  have hfix := OddOrder.Isaacs.Ch03.smul_eq_self_of_trivial_mod_frattini hcop htriv
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  have hxy : x * y * x⁻¹ = y :=
+    congrArg (Subtype.val : ↥P → G) (hfix ⟨x, Subgroup.mem_zpowers x⟩ ⟨y, hy⟩)
+  calc y * x = x * y * x⁻¹ * x := by rw [hxy]
+    _ = x * y := by group
+
+/-- **Isaacs Problem 3E.5** (書籍 p. 107): `G` を `p`-可解, `O_{p'}(G) = 1` とし
+`P = O_p(G)`, `F = Φ(P)` とおくと, `G` の `P/F` への自然な共役作用の核はちょうど `P`。
+
+(書籍の Note: したがって `G/P` は `Aut(P/F)` の部分群と同型で, `P/F` が位数 `pⁿ` の
+初等可換 `p`-群であることから `G/P` は `GL(n, p)` の部分群と同型になる。)
+
+**証明**: `P ≤ K` は `P/F` が可換だから (`le_frattiniQuotientKernel`)。逆向きは `K` が
+`p`-群であることを示す: `q ≠ p` が `|K|` を割るとして Cauchy で位数 `q` の元 `x ∈ K` を
+取ると, `x` は `P` に互いに素に作用し `P/F` 上自明なので **3D.4** で `P` に自明に作用し
+(`mem_centralizer_of_mem_frattiniQuotientKernel`), **Hall-Higman 1.2.3**
+(`hall_higman_1_2_3`, ここで `O_{p'}(G) = 1` を使う) より
+`x ∈ C_G(O_p(G)) ≤ O_p(G) = P`。すると `q ∣ |P| = p^n` で矛盾。
+`K ⊴ G` は `p`-群なので `K ≤ O_p(G) = P`。 -/
+theorem frattiniQuotientKernel_oPiCore_eq {p : ℕ} [Fact p.Prime]
+    [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G]
+    (hp' : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥) :
+    frattiniQuotientKernel (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)
+      = OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G := by
+  classical
+  set P : Subgroup G := OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G with hPdef
+  have hPp : IsPGroup p ↥P :=
+    OddOrder.Isaacs.Ch03.Subgroup.isPiGroup_singleton_iff_isPGroup.mp
+      (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup _)
+  refine le_antisymm ?_ (le_frattiniQuotientKernel hPp)
+  haveI hKnormal : (frattiniQuotientKernel P).Normal :=
+    (Subgroup.normal_centralizer).comap _
+  refine OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore ?_
+  intro q hq
+  rw [Set.mem_singleton_iff]
+  by_contra hqp
+  obtain ⟨hqprime, hqdvd, -⟩ := Nat.mem_primeFactors.mp hq
+  haveI : Fact q.Prime := ⟨hqprime⟩
+  obtain ⟨z, hz⟩ := exists_prime_orderOf_dvd_card' (G := ↥(frattiniQuotientKernel P)) q hqdvd
+  have hzord : orderOf ((z : G)) = q := by rw [Subgroup.orderOf_coe]; exact hz
+  have hnotdvd : ¬ p ∣ orderOf ((z : G)) := by
+    rw [hzord]
+    exact fun hdvd =>
+      hqp ((Nat.prime_dvd_prime_iff_eq (Fact.out : p.Prime) hqprime).mp hdvd).symm
+  have hzP : (z : G) ∈ P :=
+    OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({p} : Set ℕ) hp'
+      (mem_centralizer_of_mem_frattiniQuotientKernel hPp z.2 hnotdvd)
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hPp
+  have hdvd : orderOf ((⟨(z : G), hzP⟩ : ↥P)) ∣ Nat.card ↥P := orderOf_dvd_natCard _
+  rw [Subgroup.orderOf_mk, hzord, hn] at hdvd
+  exact hqp ((Nat.prime_dvd_prime_iff_eq hqprime (Fact.out : p.Prime)).mp
+    (hqprime.dvd_of_dvd_pow hdvd))
 
 end -- 3E
 

@@ -33,22 +33,37 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
       **§3D 🎉 完済 (2026-07-29)**: 3D.1(a)(b) / 3D.2 / 3D.3 / 3D.4 / 3D.5 全問
       (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
-      **§3E 進行中 (2026-07-29)**: **3E.1 ✅ (両ケース)** / 3E.3 ✅
-      (新 leaf **`Ch04_Commutators/Problems3E.lean`** 583 行)。
-      **残り = 3E.5 のみ** (3E.1 / 3E.2 / 3E.3 / 3E.4 完済)。
+      **§3E 🎉 完済 (2026-07-29)**: 3E.1 (両ケース) / 3E.2 / 3E.3 / 3E.4 / 3E.5 全問
+      (`Ch04_Commutators/Problems3E.lean` 748 行, axiom-clean)。
+      **次の frontier = §3F (3F.1–3F.5)**。
 
 * ✅ **3E.2** `actionFixedSubgroup_eq_mul` (2026-07-29): `c ∈ C` を `c = h₀k₀` と書くと
   `H ∩ cK` は `A`-不変な `H ∩ K` の剰余類なので Thm 3.27
   (`aInvariant_coset_mem_centralizer`) が `A`-固定点 `c'` を与える。
   `c' ∈ C ∩ H` かつ `c'⁻¹c ∈ C ∩ K`。一発 green。
 
-**3E.5 の証明経路 (確定済)**: `K` を `G` の `P/Φ(P)` への作用の核とすると `P ≤ K`。
+**3E.5 ✅ 完成 (2026-07-29)** `frattiniQuotientKernel_oPiCore_eq`。証明経路は計画どおり:
+`K` を `G` の `P/Φ(P)` への作用の核とすると `P ≤ K`。
 逆は「`K` は `p`-群」を示す: `q ≠ p` 素数と `K` の位数 `q` の元 `x` について
 `⟨x⟩` は `P` に互いに素に作用し `P/Φ(P)` 上自明なので **3D.4**
 (`smul_eq_self_of_trivial_mod_frattini`) で `P` に自明に作用、すなわち
 `⟨x⟩ ≤ C_G(P) = C_G(O_p(G)) ≤ O_p(G) = P` (Hall–Higman, `O_{p'}(G) = 1`) となり
 `q`-群が `p`-群に入って矛盾。ゆえに `K` は正規 `p`-群で `K ≤ O_p(G) = P`。
-⚠ 実装コスト = `⟨x⟩ ≤ N_G(P)` の共役作用 `MulDistribMulAction ↥⟨x⟩ ↥P` の plumbing。
+
+* **核の定式化**: `frattiniQuotientKernel P` (`P ⊴ G` に対し `G ⧸ Φ(P)` の中で
+  `P/Φ(P)` の中心化群を引き戻したもの)。`frattiniQuotientKernel_eq_ker` で
+  **文字どおり `MulAut.conjNormal ∘ (G ↠ G/Φ(P))` の核**であることを別途証明した
+  (命名だけに頼らない; `MonoidHom.comap_ker` + 既存 `ker_conjNormal_eq_centralizer`)。
+  元による特徴付け `mem_frattiniQuotientKernel_iff` = `∀ y ∈ P, ⁅g, y⁆ ∈ Φ(P)`。
+* ⚠ 想定していた `MulDistribMulAction ↥⟨x⟩ ↥P` の plumbing は
+  `MulDistribMulAction.compHom ↥P ((MulAut.conjNormal (H := P)).comp Z.subtype)` の 1 行で済み、
+  `h • g` の coe が `(h:G) * (g:G) * (h:G)⁻¹` に `rfl` で落ちるので
+  `g⁻¹ * (h • g) = ⁅g⁻¹, h⁆ = ⁅h, g⁻¹⁆⁻¹` の変形も `group` 一発。
+* ⚠ `⟨x⟩` 全体が核に入ることを使うので、核を**部分群として**定義しておくのが要点
+  (元 `x` についての `∀ y ∈ P, ⁅x,y⁆ ∈ Φ(P)` だけを仮説にすると冪について閉じない)。
+* `(P.map (QuotientGroup.mk' N)).Normal` は mathlib の instance
+  (`QuotientGroup.map_normal`) なので `haveI` 不要。`Φ(P)` の `G` での正規性も
+  `Subgroup.normal_of_characteristic_of_normal` が instance で拾う。
 
 **3E.4 の証明経路 (2026-07-29 に原文確認して確定)**:
 書籍 **Lemma 3.32** (p.105) = 「互いに素な作用で `P ∈ Syl_p(G)` が `A`-不変なら
