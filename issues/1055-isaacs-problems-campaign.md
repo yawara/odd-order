@@ -64,8 +64,16 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 * ✅ 核の不等式 `card_mul_card_inf_le_of_le` (2026-07-29 landing):
   `P ≤ Q` なら `|P|·|Q ⊓ C| ≤ |Q|·|P ⊓ C|` (`P·(Q⊓C) ⊆ Q` と
   `card_HK_mul_card_inf_eq_card_mul_card` から)。
-* ⬜ 残り = `p`-部分の突き合わせ (`Lemma 3.32` で `|H∩C|_p = |P∩C|` 等) と
-  `Nat.factorization_le_iff_dvd` による組み立て。
+* ✅ `p`-部分の取り出し `exists_aInvariant_sylow_card_inf` (2026-07-29 landing):
+  `A`-不変部分群 `H` に対し `H` の `A`-不変 Sylow `p` `P` (を `G` の部分群として) が取れて
+  `|P| = |H|_p` かつ `|P ⊓ C| = |H ⊓ C|_p`。`↥H` に `IsAInvariant.toMulAutHom` で
+  作用を制限し Lemma 3.32 (`card_inf_fixedSubgroup_of_aInvariant_sylow`) を当てる。
+  補助 `fixedSubgroup_toMulAutHom_top` (制限作用の固定部分群 = `C_G(A) ⊓ H`)。
+* ⬜ 残り (組み立て): `H` 側の `P` と `G` 側の `Q` を `Cor 3.25`
+  (`aInvariant_pSubgroup_le_aInvariant_sylow`) で `P ≤ Q` に取り,
+  `card_mul_card_inf_le_of_le` の不等式を `Nat.factorization` に翻訳して
+  `Nat.factorization_le_iff_dvd` で整除に直す。
+  (`|H⊓C|_p + relIndex_p = |H|_p` 等の加法関係は `Nat.factorization_mul` から。)
 
 ⚠ **重複定義の解消 (2026-07-29)**: 一時 `actionFixedSubgroup φ` を新設したが、
 これは既存の `OddOrder.GroupTheory.fixedSubgroup φ K` (`GroupTheory/FixedSubgroup.lean`) の
