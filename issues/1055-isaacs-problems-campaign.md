@@ -33,9 +33,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
       **§3D 🎉 完済 (2026-07-29)**: 3D.1(a)(b) / 3D.2 / 3D.3 / 3D.4 / 3D.5 全問
       (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
-      **§3E 進行中 (2026-07-29)**: 3E.1 の Hint 前半 ✅ / **3E.1 (`G` 可解の場合) ✅** /
-      3E.3 ✅ (新 leaf **`Ch04_Commutators/Problems3E.lean`**)。
-      残り = 3E.1 (`A` 可解の場合) / 3E.2 / 3E.4 / 3E.5。
+      **§3E 進行中 (2026-07-29)**: **3E.1 ✅ (両ケース)** / 3E.3 ✅
+      (新 leaf **`Ch04_Commutators/Problems3E.lean`** 386 行)。残り = 3E.2 / 3E.4 / 3E.5。
 
 ### §3E の置き場と統制情報 (2026-07-29)
 
@@ -61,17 +60,23 @@ import できない (Ch03 → Ch04 は逆向き)。
   `nilPiPart_map_mulAut` で `A`-不変。**半直積を作る必要は無い**。
   そのために `PiParts.lean` に `IsHallPart.map_mulAut` / `isNilpotent_map_mulAut` /
   `nilPiPart_map_mulAut` (自己同型同変版) を追加した。
-* `A` 可解の場合 (実装中): **`|G|` のみの帰納**に整理できる。各段でまず `A` を
+* ✅ `A` 可解の場合 `exists_isAInvariant_isPGroup_of_isSolvable_aut` (2026-07-29 完成)。
+  **`|G|` のみの帰納**に整理した。各段でまず `A` を
   `A/ker φ` に置き換えて `φ` を単射にすれば「`B` が自明に作用する」分岐が消えるため。
   `B̄ ⊴ Ā` 極小正規 (elementary abelian `p₀`-群) を取ると `C := C_G(B̄) ≠ ⊤`:
   * ✅ **case (iii) `C = ⊥`** — `exists_isAInvariant_sylow_of_normal_of_trivial_fixed`
     (2026-07-29 landing): Hint 前半の対偶で `p₀ ∤ |G|` すなわち `(|B|,|G|) = 1`。
     Thm 3.23(a) で `B`-不変 Sylow `S` を取ると `(φ a) • S` も `B`-不変 (`B ⊴ A`) なので
     Thm 3.23(b) が `C_G(B) = ⊥` の元での共役を与え、一致する ⟹ `A`-不変。
-  * ⬜ **case (ii) `⊥ ≠ C < ⊤`** — `IsAInvariant.toMulAutHom` (既存, ThreeSubgroups.lean)
-    で `A` を `↥C` に作用させ `|C| < |G|` の帰納法の仮説。像を `C.subtype` で `G` へ戻す。
-  * ⬜ 前処理 (`A → A/ker φ` の lift) と全体の組み立て。
-  補助 `actionFixedSubgroup` (固定部分群 `C_G(A)`) は landing 済。
+  * ✅ **case (ii) `⊥ ≠ C < ⊤`** — `IsAInvariant.toMulAutHom` (既存, ThreeSubgroups.lean)
+    で `Ā` を `↥C` に作用させ `|C| < |G|` の帰納法の仮説。像を `C.subtype` で `G` へ戻す。
+  * ✅ 前処理は `QuotientGroup.kerLift φ` (単射) + `htransfer`
+    (`IsAInvariant ψ H → IsAInvariant φ H`)。
+  補助 = `actionFixedSubgroup` (固定部分群) / `isAInvariant_actionFixedSubgroup_comp`
+  (`B ⊴ A` なら `C_G(B)` は `A`-不変)。
+  ⚠ **実装の罠**: `IsAInvariant` を `Subgroup.pointwise_smul_def` 経由で展開すると
+  `MulDistribMulAction.toMonoidEnd` が挟まって `rw` が効かない。
+  **`Ch03.isAInvariant_iff_smul_mem` (要素版の特徴付け) を使う**のが正解。
 
 ### 3D.1(b) の基盤 `Ch03_SplitExtensions/PiLength.lean` (2026-07-29 landing)
 
