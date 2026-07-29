@@ -14169,3 +14169,19 @@ type `Fin 3 ⊕ K#`, and `card_orbitReprIndex_mul_card_K_succ` is the identity
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_K_ne_one
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_orbitReprIndex_mul_card_K_succ
+
+/-! **The representatives are pairwise non-conjugate** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/OrderFiveOrbits.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+`orbitRepVal_pairwise` collects the separations of the four families, granted the last pair
+(the `r r^{-k}` among themselves — the field computation of p. 119).  What separates them is
+three `K`-orbit invariants: membership of `y`, of `g(y)` and of `f(y)` in `Q₀`, with values
+`(T, F, F)` at `s`, `(F, F, T)` at `r`, `(F, T, F)` at `r⁻¹` and `(F, F, F)` at `r r^{-k}`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_inv_notMem_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.not_conj_distinguishedInvolution_of_notMem_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.not_conj_of_notMem_Q0_distinguishedInvolution
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orbitRepVal_pairwise

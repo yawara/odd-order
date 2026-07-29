@@ -273,3 +273,29 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 
 ⟹ 次の一手: `orbitReprSet_covers` を
 `exists_mem_orbit_of_card_mul_succ_eq` + 上の不変量 + p.119 を仮説にして組む。
+
+
+## `orbitRepVal_pairwise` が landing — 残りは p.119 と最終組み立てのみ (2026-07-29)
+
+`OrderFiveOrbits.lean`:
+
+* `structureConjugator_inv_notMem_Q0` / `not_conj_distinguishedInvolution_of_notMem_Q0` /
+  `not_conj_of_notMem_Q0_distinguishedInvolution`
+* **`orbitRepVal_pairwise`** — 代表族が互いに `K`-非共役 (16 場合を
+  `fin_cases` で列挙し、既存の 4 本の分離補題と `Q₀` テストで消化)。
+  **仮説は `hpair` (`rr^{-k₁}` 同士、p.119) だけ**。
+
+### 残り 2 点
+
+1. **p.119** = `hpair`:
+   `a⁻¹ (r r^{-k₁}) a = r r^{-k₂}` (`a, k₁, k₂ ∈ K^#`) ⟹ `k₁ = k₂`。
+   `exists_field_realization_K` で `S/Q₀ ≅ 𝔽_q`, `K ≅ 𝔽_q^×` に落とし、(1)+(4) から
+   (5)(6)(7) を出す。`x_i ≠ 1` の背理法で `fg ∈ Q₀` と involution 積の矛盾。
+2. **最終組み立て** (短い):
+   `letI : MulAction ↥K ↥Q := MulAction.compHom _ hyp.conjQByK` を据えて
+   `exists_mem_orbit_of_card_mul_succ_eq` に
+   `rep := fun i => ⟨orbitRepVal i, orbitRepVal_mem_Q i⟩`, `e := 1`,
+   `hfree := conjQByK_fixed_eq_one`, `hrepne := orbitRepVal_ne_one`,
+   `hrep := orbitRepVal_pairwise`, `hcard := card_orbitReprIndex_mul_card_K_succ`
+   を渡し、`tConjMiddle_mem_K_of_orbitReprSet_covers` に接続
+   (`orbitRepVal_mem_orbitReprSet` が橋渡し)。
