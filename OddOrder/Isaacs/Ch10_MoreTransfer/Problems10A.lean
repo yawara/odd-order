@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.FrattiniPGroup
+import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 
 /-!
@@ -14,6 +16,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 10A。
 * **10A.1** `isRegularPGroup_two_iff_commute` — **2-群は regular ⟺ 可換**。
 * **10A.2** `pow_mul_eq_one_of_isRegularPGroup` — **regular `p`-群では `{x | x^p = 1}` が
   部分群** (`omegaOneOfIsRegularPGroup` がその部分群)。
+* **10A.5** `exists_injective_hom_regularWreath_of_index_sq` — `|P : Q| = p²` かつ
+  `Q ∩ Z(P) = 1` なら `P` は `C_p ≀ C_p` の部分群と同型。
 
 ## regular `p`-群の定義について
 
@@ -409,5 +413,51 @@ def omegaOneOfIsRegularPGroup [Finite P] {p : ℕ} [Fact p.Prime] (hp : IsPGroup
     rw [inv_pow, hu, inv_one]
 
 end -- 10A.2
+
+section /- 10A.5: 指数 p² の core-free 部分群があれば C_p ≀ C_p に埋め込める (p. 308) -/
+
+/-- **Isaacs Problem 10A.5** (書籍 p. 308) ⭐: `P` を `p`-群, `Q ≤ P` を `|P : Q| = p²` かつ
+`Q ∩ Z(P) = 1` とすると, `P` は `C_p ≀ C_p` の部分群と同型 (= 単射準同型が存在)。
+
+`Q ⊓ Z(P) = 1` から `core_P(Q) = 1` (`p`-群の非自明な正規部分群は中心と交わる) なので
+`P` の `P ⧸ Q` (`p²` 点) への作用は忠実。像は `Sym(p²)` の `p`-部分群なので Sylow
+`p`-部分群 `S` に含まれ, mathlib の `Sylow.mulEquivIteratedWreathProduct` で
+`S ≃* C_p ≀ C_p`。 -/
+theorem exists_injective_hom_regularWreath_of_index_sq [Finite P] {p : ℕ} [Fact p.Prime]
+    (hP : IsPGroup p P) {Q : Subgroup P} (hidx : Q.index = p ^ 2)
+    (hQZ : Q ⊓ Subgroup.center P = ⊥) :
+    ∃ f : P →* (Multiplicative (ZMod p) ≀ᵣ Multiplicative (ZMod p)), Function.Injective f := by
+  classical
+  -- `core_P(Q) = ⊥`
+  have hcore : Q.normalCore = ⊥ := by
+    by_contra hne
+    obtain ⟨x, hxN, hxZ, hxne⟩ :=
+      OddOrder.GroupTheory.exists_mem_center_of_normal_ne_bot hP (K := Q.normalCore) hne
+    have hmem : x ∈ Q ⊓ Subgroup.center P := ⟨Q.normalCore_le hxN, hxZ⟩
+    rw [hQZ, Subgroup.mem_bot] at hmem
+    exact hxne hmem
+  -- `P ⧸ Q` (`p²` 点) への忠実な作用
+  have hf_inj : Function.Injective (MulAction.toPermHom P (P ⧸ Q)) := by
+    rw [← MonoidHom.ker_eq_bot_iff, ← Subgroup.normalCore_eq_ker]
+    exact hcore
+  have hquot : Nat.card (P ⧸ Q) = p ^ 2 := by rw [← Subgroup.index_eq_card, hidx]
+  -- 像は `p`-部分群なので Sylow に含まれる
+  have hrange : IsPGroup p ↥(MulAction.toPermHom P (P ⧸ Q)).range :=
+    hP.of_surjective _ (MulAction.toPermHom P (P ⧸ Q)).rangeRestrict_surjective
+  obtain ⟨S, hS⟩ := hrange.exists_le_sylow
+  have e := Sylow.mulEquivIteratedWreathProduct p 2 (P ⧸ Q) hquot (Multiplicative (ZMod p))
+    (by rw [Nat.card_congr Multiplicative.toAdd, Nat.card_zmod]) S
+  refine ⟨(((iteratedWreathProductTwoMulEquiv (Multiplicative (ZMod p))).toMonoidHom.comp
+    e.toMonoidHom).comp (Subgroup.inclusion hS)).comp
+      (MulAction.toPermHom P (P ⧸ Q)).rangeRestrict, fun a b hab => ?_⟩
+  simp only [MonoidHom.coe_comp, Function.comp_apply, MulEquiv.coe_toMonoidHom] at hab
+  have h1 := (iteratedWreathProductTwoMulEquiv (Multiplicative (ZMod p))).injective hab
+  have h2 := e.injective h1
+  have h3 := Subgroup.inclusion_injective hS h2
+  have h4 : (MulAction.toPermHom P (P ⧸ Q)) a = (MulAction.toPermHom P (P ⧸ Q)) b :=
+    congrArg Subtype.val h3
+  exact hf_inj h4
+
+end -- 10A.5
 
 end OddOrder.Isaacs.Ch10
