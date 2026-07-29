@@ -617,3 +617,80 @@ Wielandt (9.1) の ambient 版 `natCard_eq_pow_natCard_inf_centralizer_of_kernel
 
 土台: `TwoKSubgroups.lean` の `IsKSubgroupSquare` / operator Maschke /
 `exists_two_kSubgroups_unique_of_card_cube` / `conj_mem_of_unique_of_le_V`。
+
+
+## β の再設計: **加群論は要らない** — `K` が正則に作用することを使う (2026-07-29)
+
+「`End_{𝔽₂[K]}(N/Q₀) ≅ 𝔽_q` (Schur + Wedderburn)」は**不要**だった。
+
+`K` は `N/Q₀` (位数 `q`) 上 fpf で `|K| = q − 1 = |(N/Q₀) ∖ {1}|` なので、
+`K` は `(N/Q₀) ∖ {1}` 上 **正則 (regular)** に作用する。基点 `ω₀` を取ると
+`Ω := (N/Q₀) ∖ {1}` は `K` と同一視でき、`X` の作用は
+
+  `k ↦ α(k) · c`   (`α(k) = x k x⁻¹`, `c` は `x · ω₀ = c · ω₀` で決まる)
+
+になる。固定点があること ⟺ `c⁻¹ ∈ Im(k ↦ k⁻¹ α(k))`。
+`x^p = 1` は `x^p` が `k ↦ k · N(c)` (`N(c) = ∏_{i<p} α^i(c)`) なので `N(c) = 1`。
+
+⟹ **β は「巡回群 `K` に対する Hilbert 90 (`ker N = Im(k ↦ k⁻¹α(k))`)」に帰着**。
+加群の斉次分解も `End = 体` も要らない。
+
+## ⚠ 現行 `exists_ne_zero_mul_pow_eq` は一般の `σ` を覆っていない
+
+現行版の仮説は `Nat.card F = s ^ n` (`σ x = x^s`)。しかし応用では `σ` は
+`Gal(F/F₀)` の**生成元**であって Frobenius そのものとは限らない:
+`σ = Frob_{F₀}^j` (`gcd(j, p) = 1`) なので `s = q₀^j` で、
+`|F| = q₀^p ≠ s^p = q₀^{jp}` (`j ≠ 1` のとき)。⟹ そのままでは適用できない。
+
+### 一般形とその証明
+
+**必要な形**: 有限体 `F`, `σ : RingAut F`, `n = orderOf σ`,
+`N(c) = ∏_{i<n} σ^i(c)`。このとき `ker N = Im(a ↦ a · σ(a)⁻¹)` (Fˣ 内)。
+
+* `Im ⊆ ker N` は自明 (`N ∘ σ = N`)。
+* `|Im| = (Q−1)/(s₀−1)` (`s₀ = |F^σ|`; `ker(a ↦ a σ(a)⁻¹) = (F^σ)ˣ`)。
+* `|ker N| = (Q−1)/|Im N|` かつ `Im N ⊆ (F^σ)ˣ` ⟹ `|ker N| ≥ |Im|`。
+* 等号には **ノルムの全射性** `FiniteField.norm_surjective` が要る
+  (`Mathlib/FieldTheory/Finite/GaloisField.lean`)。
+  そのためには `Algebra.norm (F^σ) = ∏_{i<n} σ^i` の同一視 (Galois 拡大の
+  ノルム = 自己同型の積) を経由する。
+
+⟹ **次の一手**: `SemilinearFixedPoint.lean` に一般形を足す。
+`FixedPoints.subfield ⟨σ⟩ F` を基礎体に据えて `IsGalois` を出し
+(`FixedPoints.normal` / `isSeparable` の instance は mathlib にある)、
+`Algebra.norm_eq_prod_automorphisms` 系で積表示に直し、
+`FiniteField.norm_surjective` を使う。想定 150–250 行。
+現行の `s`-冪版は特殊化として残す (`|F| = s^n` を満たす場合には短い)。
+
+
+## ✅ 穴の回避策: **`X` の生成元を選び直す** (2026-07-29)
+
+前節の「一般形 Hilbert 90 が要る」は**回避できる**。一般形も
+`FiniteField.norm_surjective` も要らない。
+
+問題は「`x` が誘導する `σ` が `Frob_{F₀}` そのものとは限らない
+(`σ = Frob_{F₀}^j`)」ことだった。しかし `X` は素数位数 `p` の巡回群なので
+**生成元を取り替えればよい**:
+
+1. `B` = `X` の `RingAut F` での像 (位数 `p`)。
+   Artin の `fixer_fixedSet` (既に landing 済) より **`B = fixer (fixedSet B)`**。
+2. `F₀ := fixedSet B` は位数 `q₀` の部分体なので、`τ : a ↦ a^{q₀}` は `F₀` を
+   各点固定する ⟹ **`τ ∈ fixer (fixedSet B) = B`**。
+3. `q₀ < q` なら `τ ≠ 1`、`|B| = p` は素数 ⟹ **`τ` は `B` を生成**。
+4. ⟹ `X` の生成元 `x'` で、誘導する自己同型がちょうど `τ` になるものが取れる。
+5. その `x'` に対しては `s = q₀` で `|F| = q₀^p = s^p` なので
+   **現行の `exists_ne_zero_mul_pow_eq` がそのまま使える**。
+   `X = ⟨x'⟩` だから `C_M(X) = C_M(x')` で情報は失われない。
+
+⟹ β は「生成元の取り替え + 既存の 1 次元 Hilbert 90 + `K` の正則作用」で閉じる。
+新規の重い代数 (Schur / Wedderburn / Lang / ノルム全射性) は**一切不要**。
+
+### β の実装手順 (確定版)
+
+1. `exists_frobenius_generator`: `W = 1`, `X ≤ V` 位数 `p` のとき、
+   `X` の生成元 `x'` で `Q₀` 上の作用が `a ↦ a^{q₀}` (`q₀ = |C_{Q₀}(X)|`) に
+   なるものの存在。⟸ `fixer_fixedSet` + `τ ∈ B` + 素数位数。
+2. `K` の `(N/Q₀) ∖ {1}` 上の正則性 (fpf + 位数一致)。
+3. 基点を取って `Ω ≅ K` とし、`x'` の作用を `k ↦ α(k)·c` の形にする。
+4. `x'^p = 1` から `N(c) = 1`、`exists_ne_zero_mul_pow_eq` で固定点を得る。
+5. `C_{Q/Q₀}(X) ≠ 1` ⟹ PSL 分岐の `C_Q(X) ≤ Q₀` と矛盾。
