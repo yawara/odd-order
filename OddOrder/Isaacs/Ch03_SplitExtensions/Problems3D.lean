@@ -145,6 +145,220 @@ theorem le_oPiCore_compl_of_sylow_le_normalizer [Finite G] {p : ℕ} [Fact p.Pri
     rwa [hbot, Subgroup.mem_bot] at this
   rwa [hf, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at this
 
+/-- 中心に含まれる部分群は正規。 -/
+theorem normal_of_le_center {A : Subgroup G} (hA : A ≤ Subgroup.center G) : A.Normal := by
+  refine ⟨fun n hn g => ?_⟩
+  have hc : g * n = n * g := Subgroup.mem_center_iff.mp (hA hn) g
+  have heq : g * n * g⁻¹ = n := by rw [hc]; group
+  rw [heq]
+  exact hn
+
+/-- `A ≤ K` のとき `|A| · [K : A] = |K|`。 -/
+theorem card_mul_relIndex [Finite G] {A K : Subgroup G} (hAK : A ≤ K) :
+    Nat.card ↥A * A.relIndex K = Nat.card ↥K := by
+  have h := Subgroup.card_mul_index (A.subgroupOf K)
+  rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAK).toEquiv] at h
+
+/-- **Isaacs Problem 3D.2** (書籍 p. 95): `Z ≤ Z(G)` なら `O_π(G/Z) = \overline{O_π(G)}`
+(bar は `G/Z` への像)。
+
+`⊇` は像が正規 `π`-部分群であること。`⊆` は `K := O_π(G/Z)` の引き戻しについて,
+`Z` の `π'`-部分 `Z_{π'}` (`Z` は可換ゆえ冪零) が `K` の**中心的な**正規 Hall `π'`-部分群に
+なるので Schur–Zassenhaus で補元 `H` が取れ, `H` は `K` の唯一の Hall `π`-部分群ゆえ
+`G`-正規, したがって `H ≤ O_π(G)` かつ `K = Z_{π'} H ≤ Z · O_π(G)`。 -/
+theorem oPiCore_quotient_center_eq_map [Finite G] {Z : Subgroup G} [Z.Normal]
+    (hZ : Z ≤ Subgroup.center G) (π : Set ℕ) :
+    oPiCore π (G ⧸ Z) = (oPiCore π G).map (QuotientGroup.mk' Z) := by
+  classical
+  haveI hZnil : Group.IsNilpotent ↥Z := by
+    refine ⟨⟨1, ?_⟩⟩
+    rw [Subgroup.upperCentralSeries_one, eq_top_iff]
+    intro a _
+    refine Subgroup.mem_center_iff.mpr fun b => ?_
+    exact Subtype.ext (Subgroup.mem_center_iff.mp (hZ b.2) a).symm
+  have hfsurj : Function.Surjective (QuotientGroup.mk' Z) := QuotientGroup.mk'_surjective Z
+  refine le_antisymm ?_ ?_
+  swap
+  · haveI : ((oPiCore π G).map (QuotientGroup.mk' Z)).Normal :=
+      (oPiCore.normal π G).map _ hfsurj
+    exact Subgroup.IsPiGroup.le_oPiCore (Subgroup.IsPiGroup.map_quotient (oPiCore.isPiGroup π))
+  -- `K` = `O_π(G/Z)` の引き戻し
+  set Q : Subgroup (G ⧸ Z) := oPiCore π (G ⧸ Z) with hQ
+  set K : Subgroup G := Q.comap (QuotientGroup.mk' Z) with hKdef
+  have hZK : Z ≤ K := by
+    have h := Subgroup.ker_le_comap (QuotientGroup.mk' Z) Q
+    rwa [QuotientGroup.ker_mk'] at h
+  haveI hKnormal : K.Normal := (oPiCore.normal π (G ⧸ Z)).comap _
+  have hKmap : K.map (QuotientGroup.mk' Z) = Q :=
+    Subgroup.map_comap_eq_self_of_surjective hfsurj _
+  -- `|K| = |Z| · |Q|`
+  have hcardK : Nat.card ↥K = Nat.card ↥Z * Nat.card ↥Q := by
+    have h1 : K.index = Q.index := Q.index_comap_of_surjective hfsurj
+    refine Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero
+      (Subgroup.index_ne_zero_of_finite (H := Q))) ?_
+    calc Nat.card ↥K * Q.index
+        = Nat.card ↥K * K.index := by rw [h1]
+      _ = Nat.card G := Subgroup.card_mul_index K
+      _ = Nat.card (G ⧸ Z) * Nat.card ↥Z := Subgroup.card_eq_card_quotient_mul_card_subgroup Z
+      _ = Nat.card ↥Q * Q.index * Nat.card ↥Z := by rw [Subgroup.card_mul_index]
+      _ = Nat.card ↥Z * Nat.card ↥Q * Q.index := by ring
+  -- `Z` の `π`/`π'`-部分
+  have hZp := isHallPart_nilPiPart (N := Z) π hZnil
+  have hZc := isHallPart_nilPiPart (N := Z) (πᶜ) hZnil
+  haveI hZcN : (nilPiPart Z πᶜ).Normal := normal_of_le_center (hZc.1.trans hZ)
+  have hinfZ : nilPiPart Z π ⊓ nilPiPart Z πᶜ = ⊥ := by
+    refine (Subgroup.eq_bot_iff_card _).mpr ?_
+    by_contra hne
+    obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hne
+    have h1 : q ∈ π := hZp.isPiGroup q (Nat.mem_primeFactors.mpr
+      ⟨hq, hqdvd.trans (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩)
+    have h2 : q ∈ πᶜ := hZc.isPiGroup q (Nat.mem_primeFactors.mpr
+      ⟨hq, hqdvd.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩)
+    exact h2 h1
+  have hcardZ : Nat.card ↥(nilPiPart Z π) * Nat.card ↥(nilPiPart Z πᶜ) = Nat.card ↥Z := by
+    have h := Subgroup.card_HK_mul_card_inf_eq_card_mul_card (nilPiPart Z π) (nilPiPart Z πᶜ)
+    rw [hinfZ, ← Subgroup.mul_normal (nilPiPart Z π) (nilPiPart Z πᶜ),
+      IsHallPart.sup_eq hZp hZc] at h
+    simpa using h.symm
+  -- `[K : Z_{π'}] = |Z_π| · |Q|` は `π`-数
+  have hZcK : nilPiPart Z πᶜ ≤ K := hZc.1.trans hZK
+  have hrelval : (nilPiPart Z πᶜ).relIndex K = Nat.card ↥(nilPiPart Z π) * Nat.card ↥Q := by
+    refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥(nilPiPart Z πᶜ))) ?_
+    rw [card_mul_relIndex hZcK, hcardK, ← hcardZ]
+    ring
+  have hrelpi : ∀ q ∈ ((nilPiPart Z πᶜ).relIndex K).primeFactors, q ∈ π := by
+    intro q hq
+    rw [hrelval, Nat.mem_primeFactors] at hq
+    rcases hq.1.dvd_mul.mp hq.2.1 with h | h
+    · exact hZp.isPiGroup q (Nat.mem_primeFactors.mpr ⟨hq.1, h, Nat.card_pos.ne'⟩)
+    · exact oPiCore.isPiGroup (G := G ⧸ Z) π q (Nat.mem_primeFactors.mpr
+        ⟨hq.1, h, Nat.card_pos.ne'⟩)
+  -- Schur–Zassenhaus
+  haveI : ((nilPiPart Z πᶜ).subgroupOf K).Normal := Subgroup.normal_subgroupOf
+  have hcard_sub : Nat.card ↥((nilPiPart Z πᶜ).subgroupOf K) = Nat.card ↥(nilPiPart Z πᶜ) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZcK).toEquiv
+  have hcop : Nat.Coprime (Nat.card ↥((nilPiPart Z πᶜ).subgroupOf K))
+      ((nilPiPart Z πᶜ).subgroupOf K).index := by
+    rw [Nat.coprime_iff_gcd_eq_one]
+    by_contra hne
+    obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hne
+    rw [Nat.dvd_gcd_iff] at hqdvd
+    refine hZc.isPiGroup q (Nat.mem_primeFactors.mpr
+      ⟨hq, hcard_sub ▸ hqdvd.1, Nat.card_pos.ne'⟩) ?_
+    exact hrelpi q (Nat.mem_primeFactors.mpr ⟨hq, hqdvd.2, Subgroup.index_ne_zero_of_finite⟩)
+  obtain ⟨H', hH'⟩ := Subgroup.exists_right_complement'_of_coprime hcop
+  -- `H := H'` を `G` に落とす
+  have hHK : H'.map K.subtype ≤ K := Subgroup.map_subtype_le H'
+  have hHsub : (H'.map K.subtype).subgroupOf K = H' :=
+    Subgroup.comap_map_eq_self_of_injective K.subtype_injective H'
+  have hcardH : Nat.card ↥(H'.map K.subtype) = (nilPiPart Z πᶜ).relIndex K := by
+    have hmul := hH'.card_mul
+    have hcH : Nat.card ↥(H'.map K.subtype) = Nat.card ↥H' :=
+      Subgroup.card_map_of_injective K.subtype_injective
+    refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥(nilPiPart Z πᶜ))) ?_
+    rw [hcH, card_mul_relIndex hZcK, ← hcard_sub]
+    exact hmul
+  -- `H` は `K` の Hall `π`-部分
+  have hHall : IsHallPart K (H'.map K.subtype) π := by
+    refine ⟨hHK, ?_, ?_⟩
+    · intro q hq
+      refine hrelpi q ?_
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHK).toEquiv, hcardH] at hq
+    · intro q hq hqpi
+      -- `[K : H] = |Z_{π'}|` は `π'`-数
+      have hidxH : (H'.map K.subtype).relIndex K = Nat.card ↥(nilPiPart Z πᶜ) := by
+        refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥(H'.map K.subtype))) ?_
+        rw [card_mul_relIndex hHK, hcardH, ← card_mul_relIndex hZcK]
+        ring
+      refine hZc.isPiGroup q ?_ hqpi
+      rw [← hidxH]
+      exact hq
+  -- `K = Z_{π'} ⊔ H`
+  have hsupK : nilPiPart Z πᶜ ⊔ H'.map K.subtype = K := by
+    have htop := hH'.sup_eq_top
+    have := congrArg (Subgroup.map K.subtype) htop
+    rwa [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hZcK,
+      ← MonoidHom.range_eq_map, Subgroup.range_subtype] at this
+  -- `H` は `G` に正規
+  have hHnormK : K ≤ Subgroup.normalizer ((H'.map K.subtype : Subgroup G) : Set G) := by
+    have h1 : nilPiPart Z πᶜ ≤ Subgroup.normalizer ((H'.map K.subtype : Subgroup G) : Set G) :=
+      fun z hz => Subgroup.centralizer_le_normalizer _
+        (Subgroup.mem_centralizer_iff.mpr fun h _ =>
+          Subgroup.mem_center_iff.mp (hZ (hZc.1 hz)) h)
+    have h2 : nilPiPart Z πᶜ ⊔ H'.map K.subtype
+        ≤ Subgroup.normalizer ((H'.map K.subtype : Subgroup G) : Set G) :=
+      sup_le h1 Subgroup.le_normalizer
+    exact hsupK.symm.le.trans h2
+  haveI hHnormal : (H'.map K.subtype).Normal := by
+    refine Subgroup.normal_iff_map_conj_eq.mpr fun g => ?_
+    have hconjK : (H'.map K.subtype).map (MulAut.conj g).toMonoidHom ≤ K := by
+      have hKconj : K.map (MulAut.conj g).toMonoidHom = K :=
+        Subgroup.Normal.map_conj_eq K g
+      have := Subgroup.map_mono (f := (MulAut.conj g).toMonoidHom) hHK
+      rwa [hKconj] at this
+    have hcardc : Nat.card ↥((H'.map K.subtype).map (MulAut.conj g).toMonoidHom : Subgroup G)
+        = Nat.card ↥(H'.map K.subtype) := by
+      apply Subgroup.card_map_of_injective
+      exact (MulAut.conj g).injective
+    have hle : (H'.map K.subtype).map (MulAut.conj g).toMonoidHom ≤ H'.map K.subtype := by
+      have hsub : ((H'.map K.subtype).map (MulAut.conj g).toMonoidHom).subgroupOf K
+          ≤ (H'.map K.subtype).subgroupOf K := by
+        refine isPiSubgroup_le_of_isHallSubgroup_of_le_normalizer hHall.2 ?_ ?_
+        · intro r hr
+          refine hHall.isPiGroup r ?_
+          rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hconjK).toEquiv, hcardc] at hr
+        · rw [← Subgroup.subgroupOf_normalizer_eq hHK]
+          intro z hz
+          exact Subgroup.mem_subgroupOf.mpr (hHnormK (hconjK hz))
+      intro z hz
+      exact (Subgroup.mem_subgroupOf (H := H'.map K.subtype) (K := K)
+        (h := ⟨z, hconjK hz⟩)).mp (hsub (Subgroup.mem_subgroupOf.mpr hz))
+    exact Subgroup.eq_of_le_of_card_ge hle hcardc.ge
+  -- 仕上げ
+  have hHcore : H'.map K.subtype ≤ oPiCore π G :=
+    Subgroup.IsPiGroup.le_oPiCore hHall.isPiGroup
+  have hKle : K ≤ Z ⊔ oPiCore π G := by
+    rw [← hsupK]
+    exact sup_le (hZc.1.trans le_sup_left) (hHcore.trans le_sup_right)
+  rw [← hKmap]
+  refine le_trans (Subgroup.map_mono hKle) ?_
+  rw [Subgroup.map_sup, QuotientGroup.map_mk'_self, bot_sup_eq]
+
+/-- **Isaacs Problem 3D.3** (書籍 p. 95): `G` が `π`-separable で
+`O_π(G) O_{π'}(G) ≤ Z(G)` なら `G` は可換。
+
+`N := O_{π'}(G)` で割ると `O_{π'}(Ḡ) = 1` なので Hall–Higman 1.2.3 が使え,
+3D.2 (`oPiCore_quotient_center_eq_map`) より `O_π(Ḡ)` は `O_π(G)` の像。
+`O_π(G) ≤ Z(G)` なのでこの像は `Ḡ` の全体に中心化され, したがって `O_π(Ḡ) = ⊤`,
+すなわち `O_π(G) ⊔ N = ⊤ ≤ Z(G)`。 -/
+theorem center_eq_top_of_oPiCore_sup_le_center [Finite G] (π : Set ℕ) [IsPiSeparable π G]
+    (h : oPiCore π G ⊔ oPiCore {p | p ∉ π} G ≤ Subgroup.center G) :
+    Subgroup.center G = ⊤ := by
+  set N : Subgroup G := oPiCore {p | p ∉ π} G with hNdef
+  have hNZ : N ≤ Subgroup.center G := le_sup_right.trans h
+  have hpiZ : oPiCore π G ≤ Subgroup.center G := le_sup_left.trans h
+  have h32 : oPiCore π (G ⧸ N) = (oPiCore π G).map (QuotientGroup.mk' N) :=
+    oPiCore_quotient_center_eq_map hNZ π
+  -- `O_π(Ḡ)` は `Ḡ` 全体に中心化される
+  have hcent : (⊤ : Subgroup (G ⧸ N))
+      ≤ Subgroup.centralizer ((oPiCore π (G ⧸ N) : Subgroup (G ⧸ N)) : Set (G ⧸ N)) := by
+    intro x _
+    refine Subgroup.mem_centralizer_iff.mpr fun y hy => ?_
+    rw [h32] at hy
+    obtain ⟨a, ha, rfl⟩ := hy
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective N x
+    have hcomm : g * a = a * g := Subgroup.mem_center_iff.mp (hpiZ ha) g
+    rw [← map_mul, ← map_mul, hcomm]
+  have htop : oPiCore π (G ⧸ N) = ⊤ :=
+    le_antisymm le_top (hcent.trans (hall_higman_1_2_3 π (oPiCore_quotient_self_eq_bot _)))
+  -- 引き戻して `O_π(G) ⊔ N = ⊤`
+  have hsup : oPiCore π G ⊔ N = ⊤ := by
+    have hpull := congrArg (Subgroup.comap (QuotientGroup.mk' N)) (h32.symm.trans htop)
+    rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk', Subgroup.comap_top] at hpull
+  refine le_antisymm le_top ?_
+  rw [← hsup]
+  exact h
+
 end -- 3D
 
 end OddOrder.Isaacs.Ch03

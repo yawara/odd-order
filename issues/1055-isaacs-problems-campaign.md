@@ -31,11 +31,9 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       (§1E は Sylow 計数の非単純性 8 問, §1F は Brodkey 周辺 3 問, §1G は Chermak–Delgado 4 問)
 - [ ] Ch.2 Subnormality
 - [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
-      **§3D 進行中 (2026-07-29)**: 3D.1(a) ✅ / 3D.5 ✅ (`Problems3D.lean`)。
-      残り = 3D.1(b) (`p`-length ≤ `P` の冪零類; `p`-length の定義から要) /
-      3D.2 (`Z ≤ Z(G)` ⟹ `O_π(G/Z) = \overline{O_π(G)}`) /
-      3D.3 (`O_π(G)O_{π'}(G) ≤ Z(G)` ⟹ 可換; 3D.2 を使う) /
-      3D.4 (`Φ(G)` 上自明な互いに素な作用は自明)。その後 §3E (coprime action)。
+      **§3D 進行中 (2026-07-29)**: 3D.1(a) ✅ / 3D.2 ✅ / 3D.3 ✅ / 3D.5 ✅
+      (`Problems3D.lean`)。残り = **3D.4** (`Φ(G)` 上自明な互いに素な作用は自明) と
+      **3D.1(b)** (`p`-length ≤ `P` の冪零類; `p`-length の定義から要)。その後 §3E。
 
 ### §3D の統制情報 (2026-07-29)
 
@@ -50,11 +48,26 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   `eq_bot_of_sylow_le_normalizer_of_oPiCore_compl_eq_bot`):
   `O_{p'} = 1` の場合は `[K, O_p(G)] ≤ K ⊓ O_p(G) = 1` から `K ≤ C_G(O_p) ≤ O_p` で
   位数から `K = 1`。一般は `G/O_{p'}(G)` に落とす (`oPiCore_quotient_self_eq_bot`)。
-* ⬜ **3D.2** の証明経路 (確定済、次の実装対象): `K := O_π(G/Z)` の引き戻しについて,
+* ✅ **3D.2** `oPiCore_quotient_center_eq_map`: `K := O_π(G/Z)` の引き戻しについて,
   `Z` の `π'`-部分 `Z_{π'}` (= `nilPiPart Z πᶜ`; `Z` 可換ゆえ冪零) は `K` の**中心的な**
-  正規 Hall `π'`-部分群。Schur–Zassenhaus で補元 `H` が取れ, `H` は `K` の唯一の
-  Hall `π`-部分群ゆえ `G`-正規, したがって `H ≤ O_π(G)` かつ `K = Z_{π'}H ≤ Z·O_π(G)`。
-  ⚠ 位数計算 (`[K:Z_{π'}] = |Z_π|·[K:Z]` が `π`-数) が実装の主コスト。
+  正規 Hall `π'`-部分群。Schur–Zassenhaus (`Subgroup.exists_right_complement'_of_coprime`)
+  で補元 `H` が取れ, `H` は `K` の唯一の Hall `π`-部分群ゆえ `G`-正規, したがって
+  `H ≤ O_π(G)` かつ `K = Z_{π'}H ≤ Z·O_π(G)`。位数計算 (`|K| = |Z|·|O_π(Ḡ)|`,
+  `[K:Z_{π'}] = |Z_π|·|O_π(Ḡ)|`) は `card_mul_relIndex` 補助で機械的に。
+  補助 = `normal_of_le_center` / `card_mul_relIndex`。
+  ⚠ `Group.IsNilpotent ↥Z` は `CommGroup ↥Z` を作ると instance diamond
+  (`CommGroup.toGroup` ≠ `Z.toGroup`) になるので、`upperCentralSeries ↥Z 1 = ⊤` を
+  直接示す (`Subgroup.upperCentralSeries_one`)。
+* ✅ **3D.3** `center_eq_top_of_oPiCore_sup_le_center`: `N := O_{π'}(G)` で割ると
+  `O_{π'}(Ḡ) = 1` ゆえ Hall–Higman が効き, 3D.2 より `O_π(Ḡ)` は `O_π(G)` の像。
+  `O_π(G) ≤ Z(G)` なのでこの像は `Ḡ` 全体に中心化され `O_π(Ḡ) = ⊤`,
+  引き戻して `O_π(G) ⊔ N = ⊤ ≤ Z(G)`。
+* ⬜ **3D.4** の証明経路 (次の実装対象): 書籍 Hint どおり `H` が `q`-群の場合に帰着
+  (各素数 `q` の Sylow `Q ≤ H` が自明に作用 ⟹ `|H|_q ∣ |ker|` ⟹ `[H:ker] = 1`)。
+  `q`-群の場合は `Φ(G)` の各剰余類 `gΦ` が `Q`-不変で
+  `|gΦ| = |Φ| ≢ 0 (mod q)` なので `IsPGroup.card_modEq_card_fixedPoints` から
+  不動点が存在 ⟹ `C_G(Q)Φ(G) = G` ⟹ Frattini 性 (`Φ` は非生成元) で `C_G(Q) = G`。
+  ⚠ 実装コスト = 剰余類 `↥(gΦ)` 上の `MulAction Q` を `letI` で手作りする plumbing。
 
 ⚠ `NilpotentInjector/PiParts.lean` の `exists_isHallPart` / `isHallPart_nilPiPart` /
 `le_nilPiPart_of_isPiGroup` は環境の `[IsSolvable G]` から **`[IsSolvable ↥N]` に緩和**
