@@ -23,6 +23,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9A
 * **9A.5** `commutator_eq_bot_of_isComponent_notLe` — `H ⊴ G` で component `C ⊄ H` なら
   `⁅H, C⁆ = 1`。⚠ 書籍 hint の `E = E(H)` は `E = E(G)` の誤植。
 * **9A.6** `layer_le_of_centralizer_le` — `H ⊴ G` で `C_G(H) ≤ H` なら `E(G) ≤ H`。
+* **9A.7** `exists_conj_map_eq_of_isSimpleFactorOf` — 非可換な極小正規部分群 `N` の
+  単純直積因子 (`IsSimpleFactorOf`) たちに `G` は共役で推移的に作用する。
 
 ## 実装ノート (9A.1)
 
@@ -231,14 +233,26 @@ theorem abelianSocle_le_centralizer_semisimpleSocle :
   refine isMinimalNormal_le_centralizer_of_ne M.2.1 N.2.1 fun h => ?_
   exact N.2.2 (h ▸ M.2.2)
 
+/-- **`N` の単純直積因子**: `N` に含まれ, `N` に正規化される非可換単純部分群。
+
+`N` が非可換な極小正規部分群のとき, `↥N` は semisimple (Lemma 9.6) でその単純正規因子を
+ambient に押し出したものがちょうどこれ (`exists_simpleFamily_of_isMinimalNormal`)。
+9A.7 で `G` がこの族に共役で推移的に作用することを示す。 -/
+structure IsSimpleFactorOf (N T : Subgroup G) : Prop where
+  le : T ≤ N
+  le_normalizer : N ≤ Subgroup.normalizer (T : Set G)
+  isSimpleGroup : IsSimpleGroup ↥T
+  not_isMulCommutative : ¬IsMulCommutative ↥T
+
+theorem IsSimpleFactorOf.ne_bot {N T : Subgroup G} (h : IsSimpleFactorOf N T) : T ≠ ⊥ := by
+  haveI := h.isSimpleGroup
+  exact (Subgroup.nontrivial_iff_ne_bot T).mp inferInstance
+
 /-- 非可換な極小正規部分群 `M` を, `M` で正規な非可換単純部分群たちの join に分解する
 (Lemma 9.6 で `↥M` は semisimple, その族を ambient に押し出したもの)。 -/
 theorem exists_simpleFamily_of_isMinimalNormal [Finite G] {M : Subgroup G}
     (hM : Ch02.IsMinimalNormal M) (hnab : ¬IsMulCommutative ↥M) :
-    ∃ 𝒵 : Set (Subgroup G),
-      (∀ T ∈ 𝒵, T ≤ M ∧ M ≤ Subgroup.normalizer T ∧ IsSimpleGroup ↥T ∧
-        ¬IsMulCommutative ↥T) ∧
-      sSup 𝒵 = M := by
+    ∃ 𝒵 : Set (Subgroup G), (∀ T ∈ 𝒵, IsSimpleFactorOf M T) ∧ sSup 𝒵 = M := by
   haveI := hM.1
   obtain ⟨𝒳, h𝒳, hsup⟩ :=
     (isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal hM).resolve_left hnab
@@ -630,5 +644,148 @@ theorem layer_le_of_centralizer_le [Finite G] {H : Subgroup G} [H.Normal]
   exact hCH ((Subgroup.le_centralizer_iff.mp h1).trans h)
 
 end -- 9A.6
+
+section /- 9A.7: 単純直積因子への G の共役作用は推移的 (p. 277) -/
+
+/-- `C` が `A` と `B` の両方を正規化するなら `A ⊓ B` も正規化する。 -/
+theorem le_normalizer_inf {A B C : Subgroup G} (hA : C ≤ Subgroup.normalizer (A : Set G))
+    (hB : C ≤ Subgroup.normalizer (B : Set G)) :
+    C ≤ Subgroup.normalizer ((A ⊓ B : Subgroup G) : Set G) := by
+  intro x hx
+  rw [Subgroup.mem_normalizer_iff]
+  intro h
+  constructor
+  · rintro ⟨h1, h2⟩
+    exact ⟨(Subgroup.mem_normalizer_iff.mp (hA hx) h).mp h1,
+      (Subgroup.mem_normalizer_iff.mp (hB hx) h).mp h2⟩
+  · rintro ⟨h1, h2⟩
+    exact ⟨(Subgroup.mem_normalizer_iff.mp (hA hx) h).mpr h1,
+      (Subgroup.mem_normalizer_iff.mp (hB hx) h).mpr h2⟩
+
+/-- 互いに正規化しあう disjoint な部分群の元は可換:
+`⁅a,b⁆ = a (b a⁻¹ b⁻¹) ∈ A` かつ `⁅a,b⁆ = (a b a⁻¹) b⁻¹ ∈ B` なので `⁅a,b⁆ ∈ A ⊓ B = 1`。 -/
+theorem commute_of_le_normalizer_of_disjoint {A B : Subgroup G}
+    (hAB : A ≤ Subgroup.normalizer (B : Set G)) (hBA : B ≤ Subgroup.normalizer (A : Set G))
+    (hdisj : Disjoint A B) {a b : G} (ha : a ∈ A) (hb : b ∈ B) : Commute a b := by
+  have hmemA : ⁅a, b⁆ ∈ A := by
+    have hba : b * a⁻¹ * b⁻¹ ∈ A :=
+      (Subgroup.mem_normalizer_iff.mp (hBA hb) a⁻¹).mp (A.inv_mem ha)
+    have heq : ⁅a, b⁆ = a * (b * a⁻¹ * b⁻¹) := by rw [commutatorElement_def]; group
+    rw [heq]
+    exact A.mul_mem ha hba
+  have hmemB : ⁅a, b⁆ ∈ B := by
+    have hab : a * b * a⁻¹ ∈ B := (Subgroup.mem_normalizer_iff.mp (hAB ha) b).mp hb
+    rw [commutatorElement_def]
+    exact B.mul_mem hab (B.inv_mem hb)
+  have hmem : ⁅a, b⁆ ∈ A ⊓ B := ⟨hmemA, hmemB⟩
+  rw [disjoint_iff.mp hdisj, Subgroup.mem_bot] at hmem
+  exact commutatorElement_eq_one_iff_commute.mp hmem
+
+/-- 単純直積因子の共役はまた単純直積因子 (`N ⊴ G` なので `N^g = N`)。 -/
+theorem IsSimpleFactorOf.conj {N T : Subgroup G} [hN : N.Normal] (h : IsSimpleFactorOf N T)
+    (g : G) : IsSimpleFactorOf N (T.map (MulAut.conj g).toMonoidHom) := by
+  have he : ↥T ≃* ↥(T.map (MulAut.conj g).toMonoidHom) :=
+    Subgroup.equivMapOfInjective T _ (MulAut.conj g).injective
+  have hNg : N.map (MulAut.conj g).toMonoidHom = N := by
+    refine le_antisymm ?_ fun x hx => ?_
+    · rintro _ ⟨x, hx, rfl⟩
+      exact hN.conj_mem x hx g
+    · refine ⟨g⁻¹ * x * g, ?_, ?_⟩
+      · have := hN.conj_mem x hx g⁻¹
+        rwa [inv_inv] at this
+      · change MulAut.conj g _ = x
+        simp only [MulAut.conj_apply]
+        group
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · rintro _ ⟨x, hx, rfl⟩
+    exact hN.conj_mem x (h.le hx) g
+  · calc N = N.map (MulAut.conj g).toMonoidHom := hNg.symm
+      _ ≤ (Subgroup.normalizer (T : Set G)).map (MulAut.conj g).toMonoidHom :=
+          Subgroup.map_mono h.le_normalizer
+      _ = Subgroup.normalizer ((T.map (MulAut.conj g).toMonoidHom : Subgroup G) : Set G) :=
+          Subgroup.map_equiv_normalizer_eq T (MulAut.conj g)
+  · haveI := h.isSimpleGroup
+    exact he.symm.isSimpleGroup
+  · exact fun _ => h.not_isMulCommutative
+      (isMulCommutative_of_surjective he.symm.toMonoidHom he.symm.surjective)
+
+/-- semisimple な部分群は自身の中心化群と自明にしか交わらない (`Z(↥N) = 1` ゆえ)。 -/
+theorem inf_centralizer_eq_bot_of_isSemisimpleGroup_coe {N : Subgroup G} [Finite G]
+    (hss : IsSemisimpleGroup ↥N) : N ⊓ Subgroup.centralizer (N : Set G) = ⊥ := by
+  refine le_bot_iff.mp fun x hx => ?_
+  have hmem : (⟨x, hx.1⟩ : ↥N) ∈ center ↥N := by
+    rw [Subgroup.mem_center_iff]
+    intro y
+    exact Subtype.ext (Subgroup.mem_centralizer_iff.mp hx.2 y y.2)
+  rw [hss.center_eq_bot, Subgroup.mem_bot] at hmem
+  exact Subgroup.mem_bot.mpr (congrArg Subtype.val hmem)
+
+/-- **Isaacs Problem 9A.7** (書籍 p. 277) ⭐: 非可換な極小正規部分群 `N` の単純直積因子
+たちに `G` は共役で推移的に作用する。
+
+**証明**: `S^g ≠ T` がすべての `g` で成り立つと仮定する。`S^g ⊓ T` は `T` に含まれ `T` で
+正規なので `T` の単純性から `⊥` か `T`; 後者だと `T ≤ S^g` から `S^g` の単純性で
+`T = S^g` となり仮定に反する。よって `S^g` と `T` は disjoint で互いを正規化するので可換
+(`commute_of_le_normalizer_of_disjoint`)。`S` の共役全体が生成する正規部分群は `N` の
+極小性から `N` に等しいので `N ≤ C_G(T)`, すなわち `T ≤ N ⊓ C_G(N) = 1`
+(`↥N` は semisimple ゆえ centerless) となり `T ≠ 1` に矛盾。 -/
+theorem exists_conj_map_eq_of_isSimpleFactorOf [Finite G] {N : Subgroup G}
+    (hN : Ch02.IsMinimalNormal N) (hnab : ¬IsMulCommutative ↥N)
+    {S T : Subgroup G} (hS : IsSimpleFactorOf N S) (hT : IsSimpleFactorOf N T) :
+    ∃ g : G, S.map (MulAut.conj g).toMonoidHom = T := by
+  haveI := hN.1
+  by_contra hcon0
+  have hcon : ∀ g : G, S.map (MulAut.conj g).toMonoidHom ≠ T := fun g h => hcon0 ⟨g, h⟩
+  -- 各共役 `S^g` は `T` を中心化する。
+  have hcentSg : ∀ g : G,
+      S.map (MulAut.conj g).toMonoidHom ≤ Subgroup.centralizer (T : Set G) := by
+    intro g
+    have hSg := hS.conj (N := N) g
+    obtain ⟨-, hTmin⟩ := Subgroup.isSimpleGroup_iff.mp hT.isSimpleGroup
+    have hinfnorm : T ≤ Subgroup.normalizer
+        ((S.map (MulAut.conj g).toMonoidHom ⊓ T : Subgroup G) : Set G) :=
+      le_normalizer_inf (hT.le.trans hSg.le_normalizer) Subgroup.le_normalizer
+    have hdisj : Disjoint (S.map (MulAut.conj g).toMonoidHom) T := by
+      rcases hTmin _ inf_le_right
+        ((Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_right).mpr hinfnorm) with h | h
+      · exact disjoint_iff.mpr h
+      · -- `T ≤ S^g` ⟹ `S^g` の単純性で `T = S^g`, 仮定に反する
+        exfalso
+        have hTS : T ≤ S.map (MulAut.conj g).toMonoidHom := h ▸ inf_le_left
+        obtain ⟨-, hSmin⟩ := Subgroup.isSimpleGroup_iff.mp hSg.isSimpleGroup
+        rcases hSmin T hTS
+          ((Subgroup.normal_subgroupOf_iff_le_normalizer hTS).mpr
+            (hSg.le.trans hT.le_normalizer)) with h' | h'
+        · exact hT.ne_bot h'
+        · exact hcon g h'.symm
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact (commute_of_le_normalizer_of_disjoint (hSg.le.trans hT.le_normalizer)
+      (hT.le.trans hSg.le_normalizer) hdisj hx hy).symm.eq
+  -- `S` の正規閉包は `N` (極小性), よって `N ≤ C_G(T)`。
+  have hNC : N ≤ Subgroup.centralizer (T : Set G) := by
+    have hNS : Subgroup.normalClosure (S : Set G) = N := by
+      rcases hN.2.2 (Subgroup.normalClosure (S : Set G)) inferInstance
+        (Subgroup.normalClosure_le_normal (by exact_mod_cast hS.le)) with h | h
+      · exact absurd (le_bot_iff.mp fun x hx =>
+          h ▸ Subgroup.subset_normalClosure (s := (S : Set G)) hx) hS.ne_bot
+      · exact h
+    rw [← hNS]
+    refine (Subgroup.closure_le _).mpr fun x hx => ?_
+    rw [Group.mem_conjugatesOfSet_iff] at hx
+    obtain ⟨a, ha, hconj⟩ := hx
+    rw [isConj_iff] at hconj
+    obtain ⟨c, rfl⟩ := hconj
+    exact hcentSg c ⟨a, ha, rfl⟩
+  -- `T ≤ N ⊓ C_G(N) = 1`, 矛盾。
+  have hss : IsSemisimpleGroup ↥N :=
+    (isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal hN).resolve_left hnab
+  have hTle : T ≤ N ⊓ Subgroup.centralizer (N : Set G) :=
+    le_inf hT.le (Subgroup.le_centralizer_iff.mp hNC)
+  rw [inf_centralizer_eq_bot_of_isSemisimpleGroup_coe hss] at hTle
+  exact hT.ne_bot (le_bot_iff.mp hTle)
+
+end -- 9A.7
 
 end OddOrder.Isaacs.Ch09
