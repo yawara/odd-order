@@ -165,6 +165,7 @@ import OddOrder.GroupTheory.SpecificGroups.QuaternionGroupMulAut
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType

@@ -33,6 +33,7 @@ import OddOrder.GroupTheory.SpecificGroups.ProjectiveSpecialLinear.RootGroupSylo
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Field
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
@@ -13712,5 +13713,29 @@ in case (2) the same computation was replaced by a cardinality count
 `PSU(3, ℓ)`, so no count can replace it. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.trichotomy
+
+/-! **`C_{D₀}(Ω₁(S₀)) ≠ 1` in `PSU(3, ℓ)`** (issue 0164, 2026-07-29).
+`GroupTheory/SpecificGroups/ProjectiveUnitary/TorusCentralizer.lean`, Peterfalvi Part II,
+Ch. III §1 p. 117 — the step the book states "as can be checked" and does not carry out.
+
+In these coordinates it is a computation in `𝔽_{ℓ²}^×`.  `Ω₁(S₀)` is the centre line
+`{u | u.fst = 0}` (`sq_eq_one_iff_fst_eq_zero`); the torus acts on the second coordinate through
+the norm `N(c) = c · c* = c^{ℓ+1}` (`scalePoint_snd`); and the determinant-one torus is the
+image of `t ↦ t^{2ℓ−1}` (`PSUTorusParameter`).  For `c = t^{2ℓ−1}` the norm is
+`(t^{ℓ+1})^{2ℓ−1}`, so an element `t` of order exactly `ℓ + 1` — available because the unit
+group is cyclic of order `(ℓ−1)(ℓ+1)` — gives `N(c) = 1`, while `c ≠ 1` because
+`2ℓ − 1 = 2(ℓ+1) − 3` makes `(ℓ+1) ∣ (2ℓ−1)` equivalent to `ℓ ≤ 2` (and `PSU3InductionTarget`
+carries `1 < n`).
+
+⚠ This is exactly where `PSU(3, ℓ)` parts company with `Sz(ℓ)`: the Suzuki torus acts
+*regularly* on the involutions of its root group (`standardRootTorus_actsRegularlyOnInvolutions`),
+so its centralizer there is trivial, whereas the unitary torus contains the norm-one subgroup of
+order `ℓ + 1`. -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_units_field
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_ne_one_mem_psuTorus_torusWeight_eq_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB
