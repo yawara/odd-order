@@ -94,13 +94,15 @@ type C / type D なら `S/Q₀` は `𝐅₂[K]`-加群で `S/Q₀ = X ⊕ Y` (`
 | Ch.I §2 Prop 3 (`V` が体自己同型) | `exists_semilinear_equiv` (`SemilinearRealization.lean:339`) | ✅ |
 | Ch.I §3 Lemma 5 | `WCyclicDivides.lean:352` | ✅ |
 | Appendix III type A / type B | `IsTypeA` / `IsTypeB` (`Suzuki2Groups/Types.lean:194` / `:285`) | ✅ |
-| Appendix III type C / type D | **未実測** — `Types.lean` に `IsTypeC` / `IsTypeD` は無い。case (3) の「type C/D なら `S/Q₀ = X ⊕ Y`」に必要かを見極める |
+| Appendix III type C / type D | ✅ **在る (2026-07-29 再実測)** — `IsTypeC` / `IsTypeD` は `OddOrder.Higman.Suzuki2Groups` 名前空間 (`Peterfalvi/Appendices/Suzuki2Groups/Types.lean` でなく `Higman/Suzuki2Groups/**`)。前回の「無い」は grep 範囲が狭かっただけ |
+| **Appendix III の定理 (Higman classification)** | ✅ **在る・sorry-free** — `Higman.Suzuki2Groups.higmanClassification_of_isSuzuki2Group : IsSuzuki2Group P → IsTypeA ∨ IsTypeB ∨ IsTypeC ∨ IsTypeD`。派生の `pow_four_eq_one_of_isSuzuki2Group` (Higman Thm 1(a), 指数 ∣ 4) も在り、`Trichotomy.lean` の import closure から到達可 |
 | `PSU(3,ℓ)` の `C_{D₀}(Ω₁(S₀)) ≠ 1` | **未** — 書籍が "as can be checked" とする具体計算。`CentralizerPSU*.lean` が何を構成済かを実測してから判断 |
 
 ## やること
 
 - [x] **case (1)** (`S` アーベル ⟹ `S = Q₀` かつ `st` 位数 3) — **2026-07-29 完了** (下記)
-- [ ] case (2) の `W = 1` パート (`C_S(P)` の指数 4 + `D` の忠実性)
+- [x] **case (2) の指数 4 パート** — **2026-07-29 完了** (`C_Q(P)` が Suzuki 2-群 = PSL 分岐排除)
+- [ ] case (2) の `W = 1` パート (`C_S(P)` は指数 4 の `K`-部分群 ⟹ `C_S(P) = S` ⟹ `D` の忠実性に矛盾)
 - [ ] case (2) の PSU 排除 (`C_{D₀}(Ω₁(S₀)) ≠ 1`) — gated なら 9500 番台で hub issue 化
 - [ ] case (3) の `st` 位数 3 パート
 - [ ] case (3) の `W ≠ 1` パート (Frobenius `[K,P] ⋊ P`)
@@ -155,3 +157,39 @@ AxiomsCheck に登録されて axiom-clean。フルビルド green + `--strict` 
 (`C_S(P)` の指数 4 + `D` の `S` 上の忠実性)。PSU 排除の
 `C_{D₀}(Ω₁(S₀)) ≠ 1` が gated 候補 — 着手時に `CentralizerPSU*.lean` /
 `GroupTheory/SpecificGroups/ProjectiveUnitary/**` が何を構成済かを実測する。
+
+## case (2) 前半 完了記録 (2026-07-29)
+
+case (1) から**再利用可能な機構を切り出して**から case (2) に進んだ:
+
+| 定理 | 内容 |
+|---|---|
+| `Hypothesis.sqFibre` | 書籍の `{y ∈ S \| y² = s}` (3 ケース共通) |
+| `Hypothesis.mul_mem_sqFibre` | `Q₀ ≤ Z(Q)` ゆえ fibre は `Q₀`-剰余類の和 (**`Q` の可換性は不要**) |
+| `Hypothesis.prime_ne_two_of_le_V` / `not_dvd_card_Q0` | `p` は奇 / `p ∤ \|Q₀\|` |
+| `Hypothesis.exists_mem_centralizer_mem_sqFibre` | **不動点ステップ**: `p ∤ \|fibre\|` ⟹ `C_Q(P)` に `s` の平方根 |
+| `Hypothesis.card_sqFibre_eq_card_Q0_of_commute` | case (1) の数え上げ (`Q` 可換) |
+| `Hypothesis.two_le_card_Q0` | `s ∈ Q₀` ゆえ `\|Q₀\| ≥ 2` |
+| `Hypothesis.card_sqFibre_eq_card_Q0_of_isSuzuki2Group` | **case (2) の数え上げ** `(q²−q)/(q−1) = q` |
+| `SecondCaseHypothesis.exists_mem_centralizer_mem_sqFibre_of_isSuzuki2Group` | 指数 4 (位数 4 の元が `C_Q(P)` に在る) |
+| `SecondCaseHypothesis.isSuzuki2Group_centralizer_of_card_sq` | **case (2) の分岐選択**: `C_Q(P)` は Suzuki 2-群 (= PSL 分岐排除) |
+
+### case (2) の数え上げの実装
+
+Higman Thm 1(a) (`pow_four_eq_one_of_isSuzuki2Group`) で指数 ∣ 4 ⟹ 平方は `Q₀` に入り、
+`Q ∖ Q₀` は `Q₀^#` 上に写る。`K`-共役 (`image_conj_KSet_eq_involutions_H`) で
+`\|Q₀\| − 1` 本の fibre が全単射に対応 (`Finset.card_image_of_injective`)、
+`Finset.card_eq_sum_card_fiberwise` + `Finset.sum_const` で
+`\|Q\| − \|Q₀\| = (\|Q₀\|−1)·\|fibre\|`、`\|Q\| = \|Q₀\|²` と `\|Q₀\| ≥ 2` から
+`Nat.eq_of_mul_eq_mul_left` で `\|fibre\| = \|Q₀\|`。
+
+### 次にやること
+
+1. **case (2) の `W = 1`** — 書籍: `W ≠ 1` なら `C_S(P)` は指数 4 の `K`-部分群ゆえ
+   `C_S(P) = S`、しかし `D` は `S` に忠実に作用するので矛盾。
+   ⟹ 「`K`-部分群」の repo での表現 (`Suzuki2Groups/KSubgroupOrbit.lean` 系) と
+   `D` の忠実性 (`dMulAutHom_injective` 系?) を実測すること。
+2. **case (2) の PSU 排除** (`C_{D₀}(Ω₁(S₀)) ≠ 1`) — 書籍 "as can be checked"。
+   `isSuzuki2Group_centralizer_of_card_sq` が入力を用意済なので、ここだけが残る。
+   `GroupTheory/SpecificGroups/ProjectiveUnitary/**` の実測が必要。
+3. case (3)、そして 3 分岐の組み立て。

@@ -125,78 +125,79 @@ theorem exists_sq_eq_distinguishedInvolution
   rw [hconj, hwsq, ← hk]
   group
 
-/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (1) core** (p. 117):
-if `Q` is abelian and `C_Q(P) ≤ Q₀` for some prime-order `P ≤ V`, then
-`Q = Q₀`.
+/-- The set of square roots of the distinguished involution `s` inside `Q` —
+the book's `{y ∈ S | y² = s}` (p. 117), which appears in cases (1), (2) and (3)
+of the Ch. III §1 Proposition. -/
+def sqFibre : Set G := {y | y ∈ hyp.Q ∧ y ^ 2 = hyp.distinguishedInvolution}
 
-The book's argument verbatim.  Assuming `Q ≠ Q₀`, pick `x ∈ Q` with `x² = s`
-(`exists_sq_eq_distinguishedInvolution`).  Commutativity turns the fibre
-`T = {y ∈ Q | y² = s}` into the coset `xQ₀`, so `|T| = |Q₀|` is a power of `2`
-and hence prime to the odd `p`.  Since `P ≤ V = C_D(s)` (Ch. I §1
-Proposition 5) centralizes `s` and normalizes `Q`, it acts on `T`, so it has a
-fixed point `y ∈ T`.  Then `y ∈ C_Q(P) ≤ Q₀` forces `y² = 1`, contradicting
-`y² = s ≠ 1`. -/
-theorem Q_eq_Q0_of_commute_of_centralizer_le
-    (hQ2 : IsPGroup 2 ↥hyp.Q)
-    (hcomm : ∀ a ∈ hyp.Q, ∀ b ∈ hyp.Q, Commute a b)
-    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
-    (hPV : P ≤ hyp.V)
-    (hCle : hyp.Q ⊓ Subgroup.centralizer (P : Set G) ≤ hyp.Q0) :
-    hyp.Q = hyp.Q0 := by
-  classical
-  by_contra hne
-  obtain ⟨x, hxQ, hxs⟩ := hyp.exists_sq_eq_distinguishedInvolution hQ2 hne
-  set s := hyp.distinguishedInvolution with hsdef
-  -- the fibre `T = {y ∈ Q | y² = s}`
-  set T : Set G := {y | y ∈ hyp.Q ∧ y ^ 2 = s} with hTdef
-  -- `T = xQ₀`, hence `|T| = |Q₀|`
-  have hcardT : Nat.card ↥hyp.Q0 = Nat.card ↥T := by
-    refine Nat.card_eq_of_bijective
-      (fun q : ↥hyp.Q0 => (⟨x * (q : G), ?_, ?_⟩ : ↥T)) ⟨?_, ?_⟩
-    · exact hyp.Q.mul_mem hxQ (hyp.Q0_le_Q q.2)
-    · have hq2 : ((q : G)) ^ 2 = 1 := hyp.sq_eq_one_of_mem_Q0 q.2
-      have hcm : Commute x (q : G) := hcomm _ hxQ _ (hyp.Q0_le_Q q.2)
-      calc (x * (q : G)) ^ 2 = x * ((q : G) * x) * (q : G) := by rw [sq]; group
-        _ = x * (x * (q : G)) * (q : G) := by rw [← hcm.eq]
-        _ = x ^ 2 * (q : G) ^ 2 := by rw [sq, sq]; group
-        _ = s := by rw [hxs, hq2, mul_one]
-    · intro q₁ q₂ h
-      exact Subtype.ext (mul_left_cancel (congrArg Subtype.val h))
-    · rintro ⟨y, hyQ, hys⟩
-      have hcm : Commute x⁻¹ y := ((hcomm _ hxQ _ hyQ).inv_left)
-      refine ⟨⟨x⁻¹ * y, ?_, hyp.Q_le_H (hyp.Q.mul_mem (hyp.Q.inv_mem hxQ) hyQ)⟩,
-        Subtype.ext (by group)⟩
-      calc (x⁻¹ * y) ^ 2 = x⁻¹ * (y * x⁻¹) * y := by rw [sq]; group
-        _ = x⁻¹ * (x⁻¹ * y) * y := by rw [← hcm.eq]
-        _ = (x ^ 2)⁻¹ * y ^ 2 := by rw [sq, sq]; group
-        _ = 1 := by rw [hxs, hys, inv_mul_cancel]
-  -- `p` is odd, and `|Q₀|` is a power of `2`
-  have hpodd : p ≠ 2 := by
-    intro hp2
-    have hdvd : p ∣ Nat.card ↥hyp.D :=
-      hPcard ▸ Subgroup.card_dvd_of_le (hPV.trans hyp.V_le_D)
-    obtain ⟨j, hj⟩ := hyp.D_odd
-    rw [hp2] at hdvd
-    omega
+lemma mem_sqFibre_iff {y : G} :
+    y ∈ hyp.sqFibre ↔ y ∈ hyp.Q ∧ y ^ 2 = hyp.distinguishedInvolution := Iff.rfl
+
+/-- **The fibre is a union of `Q₀`-cosets**: `Q₀ ≤ Z(Q)` (Ch. I §2 Prop 1(c)), so
+multiplying a square root of `s` by an element of `Q₀` gives another one.  No
+commutativity of `Q` is needed — this is the inclusion `xQ₀ ⊆ {y | y² = s}` the
+book uses in all three cases. -/
+theorem mul_mem_sqFibre {y c : G} (hy : y ∈ hyp.sqFibre) (hc : c ∈ hyp.Q0) :
+    y * c ∈ hyp.sqFibre := by
+  have hcm : c * y = y * c :=
+    (Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hc) y hy.1).symm
+  refine ⟨hyp.Q.mul_mem hy.1 (hyp.Q0_le_Q hc), ?_⟩
+  calc (y * c) ^ 2 = y * (c * y) * c := by rw [sq]; group
+    _ = y * (y * c) * c := by rw [hcm]
+    _ = y ^ 2 * c ^ 2 := by rw [sq, sq]; group
+    _ = hyp.distinguishedInvolution := by
+        rw [hy.2, hyp.sq_eq_one_of_mem_Q0 hc, mul_one]
+
+/-- **A prime-order subgroup of `V` has odd order**: `V ≤ D` and `|D|` is odd. -/
+theorem prime_ne_two_of_le_V {P : Subgroup G} {p : ℕ} (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ hyp.V) : p ≠ 2 := by
+  intro hp2
+  have hdvd : p ∣ Nat.card ↥hyp.D :=
+    hPcard ▸ Subgroup.card_dvd_of_le (hPV.trans hyp.V_le_D)
+  obtain ⟨j, hj⟩ := hyp.D_odd
+  rw [hp2] at hdvd
+  omega
+
+/-- **`p` does not divide `|Q₀|`**: `Q₀` is a `2`-group and `p` is odd. -/
+theorem not_dvd_card_Q0 (hQ2 : IsPGroup 2 ↥hyp.Q) {P : Subgroup G} {p : ℕ}
+    (hp : p.Prime) (hPcard : Nat.card ↥P = p) (hPV : P ≤ hyp.V) :
+    ¬ p ∣ Nat.card ↥hyp.Q0 := by
   obtain ⟨n, hn⟩ := (hQ2.to_le hyp.Q0_le_Q).exists_card_eq
-  have hnotdvd : ¬ p ∣ Nat.card ↥T := by
-    rw [← hcardT, hn]
-    intro hdvd
-    exact hpodd ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).mp
-      (hp.dvd_of_dvd_pow hdvd))
-  -- `P` acts on `T` by conjugation
+  rw [hn]
+  intro hdvd
+  exact hyp.prime_ne_two_of_le_V hPcard hPV
+    ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).mp (hp.dvd_of_dvd_pow hdvd))
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, the fixed-point step**
+(p. 117): "`P` … normalizes `xQ₀` which is of cardinality prime to `p`".
+
+`P ≤ V = C_D(s)` (Ch. I §1 Proposition 5) centralizes `s` and normalizes `Q`, so
+it acts by conjugation on the fibre `{y ∈ Q | y² = s}`.  If `p` does not divide
+the size of that fibre, the action has a fixed point — an element of `C_Q(P)`
+squaring to `s`.
+
+The book invokes this twice: in case (1) it contradicts `C_S(P) ⊆ Q₀`, and in
+case (2) it shows `C_S(P)` has exponent `4`. -/
+theorem exists_mem_centralizer_mem_sqFibre
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ hyp.V) (hnotdvd : ¬ p ∣ Nat.card ↥hyp.sqFibre) :
+    ∃ y ∈ hyp.sqFibre, y ∈ Subgroup.centralizer (P : Set G) := by
+  classical
+  set T : Set G := hyp.sqFibre with hTdef
   have hTsmul : ∀ (g : ↥P) (y : ↥T), (g : G) * (y : G) * (g : G)⁻¹ ∈ T := by
     intro g y
     have hgH : (g : G) ∈ hyp.H := hyp.D_le_H (hyp.V_le_D (hPV g.2))
     refine ⟨hyp.Q_normal_in_H _ hgH _ y.2.1, ?_⟩
-    have hgs : (g : G) * s * (g : G)⁻¹ = s := by
+    have hgs : (g : G) * hyp.distinguishedInvolution * (g : G)⁻¹
+        = hyp.distinguishedInvolution := by
       have hgV : (g : G) ∈ hyp.V := hPV g.2
       rw [hyp.V_eq_centralizer_distinguishedInvolution] at hgV
-      have hc := Subgroup.mem_centralizer_iff.mp hgV.2 s rfl
+      have hc := Subgroup.mem_centralizer_iff.mp hgV.2
+        hyp.distinguishedInvolution rfl
       rw [← hc]; group
     calc ((g : G) * (y : G) * (g : G)⁻¹) ^ 2
         = (g : G) * (y : G) ^ 2 * (g : G)⁻¹ := by rw [sq, sq]; group
-      _ = s := by rw [y.2.2]; exact hgs
+      _ = hyp.distinguishedInvolution := by rw [y.2.2]; exact hgs
   letI actP : MulAction ↥P ↥T :=
     { smul := fun g y => ⟨(g : G) * (y : G) * (g : G)⁻¹, hTsmul g y⟩
       one_smul := fun y => Subtype.ext (by
@@ -210,18 +211,229 @@ theorem Q_eq_Q0_of_commute_of_centralizer_le
   haveI : Fact p.Prime := ⟨hp⟩
   haveI hPp : IsPGroup p ↥P := IsPGroup.of_card (n := 1) (by rw [hPcard, pow_one])
   obtain ⟨y, hy⟩ := hPp.nonempty_fixed_point_of_prime_not_dvd_card ↥T hnotdvd
-  -- the fixed point lies in `C_Q(P) ≤ Q₀`, so it squares to `1`
-  have hyC : (y : G) ∈ hyp.Q ⊓ Subgroup.centralizer (P : Set G) := by
-    refine ⟨y.2.1, Subgroup.mem_centralizer_iff.mpr ?_⟩
-    intro g hg
-    show g * (y : G) = (y : G) * g
-    have hval : g * (y : G) * g⁻¹ = (y : G) :=
-      congrArg (Subtype.val (p := fun z => z ∈ T))
-        (MulAction.mem_fixedPoints.mp hy ⟨g, hg⟩)
-    calc g * (y : G) = g * (y : G) * g⁻¹ * g := by group
-      _ = (y : G) * g := by rw [hval]
-  have h1 : (y : G) ^ 2 = 1 := hyp.sq_eq_one_of_mem_Q0 (hCle hyC)
-  rw [y.2.2] at h1
+  refine ⟨(y : G), y.2, Subgroup.mem_centralizer_iff.mpr ?_⟩
+  intro g hg
+  show g * (y : G) = (y : G) * g
+  have hval : g * (y : G) * g⁻¹ = (y : G) :=
+    congrArg (Subtype.val (p := fun z => z ∈ T))
+      (MulAction.mem_fixedPoints.mp hy ⟨g, hg⟩)
+  calc g * (y : G) = g * (y : G) * g⁻¹ * g := by group
+    _ = (y : G) * g := by rw [hval]
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (1), the coset count**
+(p. 117): "since `S` is abelian, `{y ∈ S | y² = s} = xQ₀`".
+
+For abelian `Q` the fibre is exactly one coset, because `y² = x²` forces
+`(x⁻¹y)² = 1`, i.e. `x⁻¹y ∈ Q₀`. -/
+theorem card_sqFibre_eq_card_Q0_of_commute
+    (hcomm : ∀ a ∈ hyp.Q, ∀ b ∈ hyp.Q, Commute a b)
+    {x : G} (hx : x ∈ hyp.sqFibre) :
+    Nat.card ↥hyp.Q0 = Nat.card ↥hyp.sqFibre := by
+  classical
+  refine Nat.card_eq_of_bijective
+    (fun c : ↥hyp.Q0 => (⟨x * (c : G), hyp.mul_mem_sqFibre hx c.2⟩ :
+      ↥hyp.sqFibre)) ⟨?_, ?_⟩
+  · intro c₁ c₂ h
+    exact Subtype.ext (mul_left_cancel (congrArg Subtype.val h))
+  · rintro ⟨y, hyQ, hys⟩
+    have hcm : Commute x⁻¹ y := (hcomm _ hx.1 _ hyQ).inv_left
+    refine ⟨⟨x⁻¹ * y, ?_, hyp.Q_le_H (hyp.Q.mul_mem (hyp.Q.inv_mem hx.1) hyQ)⟩,
+      Subtype.ext (by group)⟩
+    calc (x⁻¹ * y) ^ 2 = x⁻¹ * (y * x⁻¹) * y := by rw [sq]; group
+      _ = x⁻¹ * (x⁻¹ * y) * y := by rw [← hcm.eq]
+      _ = (x ^ 2)⁻¹ * y ^ 2 := by rw [sq, sq]; group
+      _ = 1 := by rw [hx.2, hys, inv_mul_cancel]
+
+/-- **`s ∈ Q₀`**, so `Q₀ ≠ 1` and `|Q₀| ≥ 2`. -/
+theorem two_le_card_Q0 : 2 ≤ Nat.card ↥hyp.Q0 := by
+  have hs : hyp.distinguishedInvolution ∈ hyp.Q0 :=
+    ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
+  have hpos : 0 < Nat.card ↥hyp.Q0 := Nat.card_pos
+  rcases Nat.lt_or_ge (Nat.card ↥hyp.Q0) 2 with hlt | hge
+  · exfalso
+    have h1 : Nat.card ↥hyp.Q0 = 1 := by omega
+    rw [Subgroup.eq_bot_of_card_eq _ h1, Subgroup.mem_bot] at hs
+    exact hyp.distinguishedInvolution_ne_one hs
+  · exact hge
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (2), the coset count**
+(p. 117): "Let `x ∈ S` be such that `x² = s`.  Since
+`|{y ∈ S | y² = s}| = (q² − q)/(q − 1) = q`, we again find that
+`{y ∈ S | y² = s} = xQ₀`."
+
+A Suzuki `2`-group has exponent dividing `4` (Higman Theorem 1(a),
+`pow_four_eq_one_of_isSuzuki2Group`), so squaring maps `Q` into `Q₀` and maps
+`Q ∖ Q₀` onto `Q₀^#`.  Conjugation by `K`, which is transitive on `Q₀^#`
+(§1 Proposition 3), matches the fibres bijectively, so all `|Q₀| − 1` of them
+have the same size and `(|Q₀| − 1)·|fibre| = |Q| − |Q₀|`.  With `|Q| = |Q₀|²`
+this gives `|fibre| = |Q₀|`. -/
+theorem card_sqFibre_eq_card_Q0_of_isSuzuki2Group
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    (hcard : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 2) :
+    Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0 := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  -- exponent `4`: squares land in `Q₀`
+  have hsq : ∀ y ∈ hyp.Q, y ^ 2 ∈ hyp.Q0 := by
+    intro y hy
+    refine hyp.mem_Q0_of_mem_Q_of_sq_eq_one (hyp.Q.pow_mem hy 2) ?_
+    have h4 : (⟨y, hy⟩ : ↥hyp.Q) ^ 4 = 1 :=
+      OddOrder.Higman.Suzuki2Groups.pow_four_eq_one_of_isSuzuki2Group hQsuz _
+    have hy4 : y ^ 4 = 1 := by
+      simpa using congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) h4
+    calc (y ^ 2) ^ 2 = y ^ 4 := by group
+      _ = 1 := hy4
+  -- the relevant finsets
+  set QS : Finset G := (hyp.Q : Set G).toFinset with hQS
+  set Q0S : Finset G := (hyp.Q0 : Set G).toFinset with hQ0S
+  have hQ0sub : Q0S ⊆ QS := by
+    intro y hy
+    simp only [hQ0S, Set.mem_toFinset, SetLike.mem_coe] at hy
+    simp only [hQS, Set.mem_toFinset, SetLike.mem_coe]
+    exact hyp.Q0_le_Q hy
+  set A : Finset G := QS \ Q0S with hA
+  set B : Finset G := Q0S.erase 1 with hB
+  have hmemA : ∀ y : G, y ∈ A ↔ y ∈ hyp.Q ∧ y ∉ hyp.Q0 := by
+    intro y
+    simp only [hA, Finset.mem_sdiff, hQS, hQ0S, Set.mem_toFinset, SetLike.mem_coe]
+  have hmemB : ∀ u : G, u ∈ B ↔ u ∈ hyp.Q0 ∧ u ≠ 1 := by
+    intro u
+    simp only [hB, Finset.mem_erase, hQ0S, Set.mem_toFinset, SetLike.mem_coe]
+    exact ⟨fun h => ⟨h.2, h.1⟩, fun h => ⟨h.2, h.1⟩⟩
+  -- squaring maps `A` into `B`
+  have hfibmap : ∀ y ∈ A, y ^ 2 ∈ B := by
+    intro y hy
+    obtain ⟨hyQ, hyQ0⟩ := (hmemA y).mp hy
+    refine (hmemB _).mpr ⟨hsq y hyQ, ?_⟩
+    intro h
+    exact hyQ0 (hyp.mem_Q0_of_mem_Q_of_sq_eq_one hyQ h)
+  have hsum := Finset.card_eq_sum_card_fiberwise hfibmap
+  -- all fibres have the size of the one over `s`
+  have hconst : ∀ u ∈ B, (A.filter fun y => y ^ 2 = u).card
+      = (A.filter fun y => y ^ 2 = hyp.distinguishedInvolution).card := by
+    intro u hu
+    obtain ⟨huQ0, hu1⟩ := (hmemB u).mp hu
+    -- `K` moves `s` to `u`
+    have himg := hyp.image_conj_KSet_eq_involutions_H
+      hyp.distinguishedInvolution_mem_H hyp.distinguishedInvolution_sq
+      hyp.distinguishedInvolution_ne_one
+    have humem : u ∈ {y : G | y ^ 2 = 1 ∧ y ≠ 1 ∧ y ∈ hyp.H} :=
+      ⟨hyp.sq_eq_one_of_mem_Q0 huQ0, hu1, huQ0.2⟩
+    rw [← himg] at humem
+    obtain ⟨k, hkK, hk0⟩ := humem
+    have hk : k⁻¹ * hyp.distinguishedInvolution * k = u := hk0
+    have hkH : k ∈ hyp.H := hyp.D_le_H hkK.1
+    have hkiH : k⁻¹ ∈ hyp.H := hyp.H.inv_mem hkH
+    have hinj : Function.Injective (fun y : G => k⁻¹ * y * k) := by
+      intro a b h
+      simp only at h
+      exact mul_left_cancel (mul_right_cancel h)
+    -- conjugation by `k⁻¹` sends the `s`-fibre onto the `u`-fibre
+    have hfwd : ∀ y : G, y ^ 2 = hyp.distinguishedInvolution →
+        (k⁻¹ * y * k) ^ 2 = u := by
+      intro y hy
+      calc (k⁻¹ * y * k) ^ 2 = k⁻¹ * y ^ 2 * k := by rw [sq, sq]; group
+        _ = k⁻¹ * hyp.distinguishedInvolution * k := by rw [hy]
+        _ = u := hk
+    have hbwd : ∀ z : G, z ^ 2 = u →
+        (k * z * k⁻¹) ^ 2 = hyp.distinguishedInvolution := by
+      intro z hz
+      calc (k * z * k⁻¹) ^ 2 = k * z ^ 2 * k⁻¹ := by rw [sq, sq]; group
+        _ = k * u * k⁻¹ := by rw [hz]
+        _ = k * (k⁻¹ * hyp.distinguishedInvolution * k) * k⁻¹ := by rw [hk]
+        _ = hyp.distinguishedInvolution := by group
+    have himg2 : (A.filter fun y => y ^ 2 = u)
+        = (A.filter fun y => y ^ 2 = hyp.distinguishedInvolution).image
+            (fun y => k⁻¹ * y * k) := by
+      ext z
+      simp only [Finset.mem_filter, Finset.mem_image]
+      constructor
+      · rintro ⟨hzA, hzu⟩
+        obtain ⟨hzQ, -⟩ := (hmemA z).mp hzA
+        have hsqz : (k * z * k⁻¹) ^ 2 = hyp.distinguishedInvolution := hbwd z hzu
+        refine ⟨k * z * k⁻¹, ⟨(hmemA _).mpr
+          ⟨hyp.Q_normal_in_H k hkH z hzQ, ?_⟩, hsqz⟩, by group⟩
+        intro hmem
+        exact hyp.distinguishedInvolution_ne_one
+          (by rw [← hsqz, hyp.sq_eq_one_of_mem_Q0 hmem])
+      · rintro ⟨y, ⟨hyA, hys⟩, rfl⟩
+        obtain ⟨hyQ, -⟩ := (hmemA y).mp hyA
+        have hval : (k⁻¹ * y * k) ^ 2 = u := hfwd y hys
+        have hmemQ : k⁻¹ * y * k ∈ hyp.Q := by
+          have h := hyp.Q_normal_in_H k⁻¹ hkiH y hyQ
+          rwa [inv_inv] at h
+        refine ⟨(hmemA _).mpr ⟨hmemQ, ?_⟩, hval⟩
+        intro hmem
+        exact hu1 (by rw [← hval, hyp.sq_eq_one_of_mem_Q0 hmem])
+    rw [himg2, Finset.card_image_of_injective _ hinj]
+  rw [Finset.sum_congr rfl hconst, Finset.sum_const, smul_eq_mul] at hsum
+  -- turn the finset counts into `Nat.card`s
+  have hQScard : QS.card = Nat.card ↥hyp.Q := by
+    simp [hQS, Set.toFinset_card, Nat.card_eq_fintype_card]
+  have hQ0Scard : Q0S.card = Nat.card ↥hyp.Q0 := by
+    simp [hQ0S, Set.toFinset_card, Nat.card_eq_fintype_card]
+  have hAcard : A.card = Nat.card ↥hyp.Q - Nat.card ↥hyp.Q0 := by
+    rw [hA, Finset.card_sdiff, Finset.inter_eq_left.mpr hQ0sub, hQScard, hQ0Scard]
+  have hBcard : B.card = Nat.card ↥hyp.Q0 - 1 := by
+    rw [hB, Finset.card_erase_of_mem (by
+      simp only [hQ0S, Set.mem_toFinset, SetLike.mem_coe]; exact hyp.Q0.one_mem),
+      hQ0Scard]
+  have hFcard : (A.filter fun y => y ^ 2 = hyp.distinguishedInvolution).card
+      = Nat.card ↥hyp.sqFibre := by
+    have hset : (A.filter fun y => y ^ 2 = hyp.distinguishedInvolution)
+        = hyp.sqFibre.toFinset := by
+      ext z
+      simp only [Finset.mem_filter, Set.mem_toFinset, hyp.mem_sqFibre_iff]
+      constructor
+      · rintro ⟨hzA, hzs⟩
+        exact ⟨((hmemA z).mp hzA).1, hzs⟩
+      · rintro ⟨hzQ, hzs⟩
+        refine ⟨(hmemA z).mpr ⟨hzQ, ?_⟩, hzs⟩
+        intro hmem
+        exact hyp.distinguishedInvolution_ne_one
+          (by rw [← hzs, hyp.sq_eq_one_of_mem_Q0 hmem])
+    rw [hset]
+    simp [Set.toFinset_card, Nat.card_eq_fintype_card]
+  rw [hAcard, hBcard, hFcard, hcard] at hsum
+  -- `q² − q = (q − 1) · F` with `q ≥ 2` gives `F = q`
+  have hq2 := hyp.two_le_card_Q0
+  set q := Nat.card ↥hyp.Q0 with hqdef
+  set F := Nat.card ↥hyp.sqFibre with hFdef
+  have hkey : (q - 1) * q = (q - 1) * F := by
+    rw [← hsum]
+    have : q ^ 2 - q = (q - 1) * q := by
+      rw [sq, Nat.sub_mul]
+      omega
+    rw [this]
+  exact (Nat.eq_of_mul_eq_mul_left (by omega) hkey).symm
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (1) core** (p. 117):
+if `Q` is abelian and `C_Q(P) ≤ Q₀` for some prime-order `P ≤ V`, then
+`Q = Q₀`.
+
+The book's argument verbatim.  Assuming `Q ≠ Q₀`, pick `x ∈ Q` with `x² = s`
+(`exists_sq_eq_distinguishedInvolution`).  Commutativity turns the fibre
+`{y ∈ Q | y² = s}` into the coset `xQ₀`, so its size `|Q₀|` is a power of `2`
+and hence prime to the odd `p`; the fixed-point step then produces
+`y ∈ C_Q(P) ≤ Q₀` with `y² = s ≠ 1`, a contradiction. -/
+theorem Q_eq_Q0_of_commute_of_centralizer_le
+    (hQ2 : IsPGroup 2 ↥hyp.Q)
+    (hcomm : ∀ a ∈ hyp.Q, ∀ b ∈ hyp.Q, Commute a b)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ hyp.V)
+    (hCle : hyp.Q ⊓ Subgroup.centralizer (P : Set G) ≤ hyp.Q0) :
+    hyp.Q = hyp.Q0 := by
+  classical
+  by_contra hne
+  obtain ⟨x, hxQ, hxs⟩ := hyp.exists_sq_eq_distinguishedInvolution hQ2 hne
+  have hx : x ∈ hyp.sqFibre := ⟨hxQ, hxs⟩
+  have hnotdvd : ¬ p ∣ Nat.card ↥hyp.sqFibre := by
+    rw [← hyp.card_sqFibre_eq_card_Q0_of_commute hcomm hx]
+    exact hyp.not_dvd_card_Q0 hQ2 hp hPcard hPV
+  obtain ⟨y, hyT, hyC⟩ :=
+    hyp.exists_mem_centralizer_mem_sqFibre hp hPcard hPV hnotdvd
+  have h1 : y ^ 2 = 1 := hyp.sq_eq_one_of_mem_Q0 (hCle ⟨hyT.1, hyC⟩)
+  rw [hyT.2] at h1
   exact hyp.distinguishedInvolution_ne_one h1
 
 end Hypothesis
@@ -320,6 +532,69 @@ theorem Q_eq_Q0_and_orderOf_st_of_commute
     sc.centralizer_le_Q0_and_orderOf_st_of_commute ind hcomm hp hcardP hPV
   exact ⟨sc.toHypothesis.Q_eq_Q0_of_commute_of_centralizer_le hQ2 hcomm hp
     hcardP hPV hCle, hst⟩
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, cases (2) and (3), the
+exponent-`4` step** (p. 117): "`P` normalizes `xQ₀` whence `C_S(P)` has
+exponent `4`".
+
+If `Q` is a Suzuki `2`-group of order `|Q₀|²` then the fibre `{y ∈ Q | y² = s}`
+has `|Q₀|` elements (`card_sqFibre_eq_card_Q0_of_isSuzuki2Group`), a power of
+`2`, so the fixed-point step yields `y ∈ C_Q(P)` with `y² = s ≠ 1`. -/
+theorem exists_mem_centralizer_mem_sqFibre_of_isSuzuki2Group
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q)
+    (hcard : Nat.card ↥sc.toHypothesis.Q = Nat.card ↥sc.toHypothesis.Q0 ^ 2)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ sc.toHypothesis.V) :
+    ∃ y ∈ sc.toHypothesis.sqFibre, y ∈ Subgroup.centralizer (P : Set G) := by
+  refine sc.toHypothesis.exists_mem_centralizer_mem_sqFibre hp hPcard hPV ?_
+  rw [sc.toHypothesis.card_sqFibre_eq_card_Q0_of_isSuzuki2Group hQsuz hcard]
+  exact sc.toHypothesis.not_dvd_card_Q0 hQsuz.1 hp hPcard hPV
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (2), branch selection**
+(p. 117): if `Q` is a Suzuki `2`-group of order `|Q₀|²` then `C_Q(P)` is a
+Suzuki `2`-group.
+
+Equivalently: the `PSL(2, ℓ)` alternative of Ch. I §3 Proposition 1(c), whose
+payload makes `C_Q(P)` elementary abelian, cannot occur — the previous lemma
+puts an element of order `4` in `C_Q(P)`.  Both surviving alternatives
+(`Sz(ℓ)`, `PSU(3, ℓ)`) carry `cQ_isSuzuki2Group`.
+
+This is the input to the book's remaining step, which rules out `PSU(3, ℓ)` by
+the computation `C_{D₀}(Ω₁(S₀)) ≠ 1` in `PSU(3, ℓ)` and then concludes
+`F/Z(F) ≅ Sz(ℓ)` with `st` of order `5`. -/
+theorem isSuzuki2Group_centralizer_of_card_sq
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q)
+    (hcard : Nat.card ↥sc.toHypothesis.Q = Nat.card ↥sc.toHypothesis.Q0 ^ 2)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ sc.toHypothesis.V) :
+    OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
+      ↥(sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G))) := by
+  classical
+  obtain ⟨y, hyT, hyC⟩ := sc.exists_mem_centralizer_mem_sqFibre_of_isSuzuki2Group
+    hQsuz hcard hp hPcard hPV
+  have hPne : P ≠ ⊥ := by
+    intro h
+    rw [h, Subgroup.card_bot] at hPcard
+    exact hp.one_lt.ne hPcard
+  letI := sc.toHypothesis.centralizerQuotientMulAction hPV
+  obtain ⟨data⟩ := sc.toHypothesis.centralizer_trichotomy_of_induction hPV hPne
+    (sc.twoRank_centralizer_ge_two P hPV p hp hPcard) ind
+  rcases data.branch with ⟨d, -, det⟩ | ⟨d, -, det⟩ | ⟨d, -, det⟩
+  · -- the `PSL(2, ℓ)` branch would make `C_Q(P)` elementary abelian
+    exfalso
+    have hmem : (⟨⟨y, hyC⟩, Subgroup.mem_subgroupOf.mpr hyT.1⟩ :
+        ↥(sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G))))
+        ^ 2 = 1 := det.cQ_isElementaryAbelian.2 _
+    have h1 : y ^ 2 = 1 := by
+      simpa using congrArg (fun z => ((z : ↥(Subgroup.centralizer (P : Set G))) : G))
+        (congrArg (Subtype.val (p := fun z =>
+          z ∈ sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G))))
+          hmem)
+    rw [hyT.2] at h1
+    exact sc.toHypothesis.distinguishedInvolution_ne_one h1
+  · exact det.cQ_isSuzuki2Group
+  · exact det.cQ_isSuzuki2Group
 
 /-- **After Theorem C, the book's `S` is `Q`**: `Q₁ = 1` (`Q1_eq_bot`) makes the
 Sylow `2`-subgroup `S` of `Q` equal to `Q`, so Ch. III §1's Proposition — stated

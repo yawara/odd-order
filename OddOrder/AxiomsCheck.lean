@@ -13340,3 +13340,32 @@ order `3`** — the book's alternative (a).  By Theorem C, `Q₁ = 1`, so the bo
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.centralizer_le_Q0_and_orderOf_st_of_commute
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.Q_eq_Q0_and_orderOf_st_of_commute
+
+/-! **Peterfalvi Part II, Ch. III §1, Proposition, case (2) — the ungated part**
+(issue 0163, 2026-07-29).  `Appendices/Suzuki/StructureOfH/Trichotomy.lean`, p. 117.
+
+The book's second case ("`S` is non-abelian of order `q²`") up to the one step it defers to a
+`PSU(3, ℓ)` computation.  The reusable machinery of the Proposition was factored out of case (1):
+
+* `mul_mem_sqFibre` — `Q₀ ≤ Z(Q)` (Ch. I §2 Prop 1(c)) makes `{y ∈ Q | y² = s}` a union of
+  `Q₀`-cosets.  No commutativity of `Q` needed, so this serves all three cases.
+* `exists_mem_centralizer_mem_sqFibre` — the fixed-point step, "`P` … normalizes `xQ₀` which is
+  of cardinality prime to `p`".  `P ≤ V = C_D(s)` centralizes `s` and normalizes `Q`, so it acts
+  on the fibre; if `p ∤ |fibre|` there is a `P`-fixed square root of `s`.
+* `card_sqFibre_eq_card_Q0_of_isSuzuki2Group` — the book's `(q² − q)/(q − 1) = q`.  A Suzuki
+  `2`-group has exponent dividing `4` (Higman Thm 1(a), `pow_four_eq_one_of_isSuzuki2Group`), so
+  squaring maps `Q ∖ Q₀` onto `Q₀^#`; `K`-conjugation (transitive on `Q₀^#`, §1 Prop 3) matches
+  the `|Q₀| − 1` fibres bijectively, and `|Q| = |Q₀|²` forces each to have `|Q₀|` elements.
+* `isSuzuki2Group_centralizer_of_card_sq` — **case (2)'s branch selection**: `C_Q(P)` is a Suzuki
+  `2`-group.  The element of order `4` produced above contradicts `cQ_isElementaryAbelian`, so the
+  `PSL(2, ℓ)` alternative of Ch. I §3 Prop 1(c) is out and both survivors carry
+  `cQ_isSuzuki2Group`.  This is the input to the book's remaining step (rule out `PSU(3, ℓ)` via
+  `C_{D₀}(Ω₁(S₀)) ≠ 1`, then `F/Z(F) ≅ Sz(ℓ)` and `st` of order `5`). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mul_mem_sqFibre
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_centralizer_mem_sqFibre
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_sqFibre_eq_card_Q0_of_isSuzuki2Group
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.isSuzuki2Group_centralizer_of_card_sq
