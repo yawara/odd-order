@@ -287,6 +287,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
@@ -354,7 +355,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 14000
+set_option linter.style.longFile 14200
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -13954,3 +13955,77 @@ the projective line over `End_K(irreducible) ≅ 𝔽_q`, which the text does no
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_inf_centralizer_not_mem_Q0_of_card_cube
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.W_ne_bot_of_card_cube
+
+/-! **The canonical decomposition of `t x t`** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+> Let `f, g : S# → S#` and `h : S# → D` be the mappings such that, for `x ∈ S#`,
+> `txt = g(x)h(x)tf(x)`.
+
+`S = Q` after Theorem C.  Existence and uniqueness come from Ch. I §1 Proposition 4(a)
+(`existsUnique_canonicalForm`) once `t x t ∉ H` is known — which is `Q ⊓ D = 1`, since
+`t x t ∈ H` would put `x` in the stabilizer of both `basept` and `t • basept`.  The `H`-part
+splits as `Q ⋊ D`; `f(x) ≠ 1` because `t x t ∈ H t` would give `t ∈ H`, and `g(x) ≠ 1` because
+the same applied to `x⁻¹` would (using that `t` normalizes `D`).
+
+`tConjTriple_conj` is the book's identity (1): `t` inverts `K`, so conjugating by `a ∈ K` sends
+the decomposition of `t x t` to that of `t xᵃ t` with `g, f` conjugated by `a⁻¹` and
+`h(xᵃ) = a h(x) a`.  This is what reduces the Proposition of §2 to a system of representatives
+for the `K`-orbits of `S#`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_notMem_H_of_mem_Q
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_notMem_mul_t
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.existsUnique_tConjTriple
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_spec
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_eq_of
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_conj
+
+/-! **`h(s) = h(r) = h(r⁻¹) = 1` and `r² ≠ 1`** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+The structure equation `tst = r⁻¹tr` (Ch. I §1 Proposition 4(b)) *is* the canonical
+decomposition of `t s t`, with middle factor `1`; inverting `trt = rts` gives `tr⁻¹t = str⁻¹`,
+so the same holds at `r` and `r⁻¹`.  Since `s ∈ Q₀ ≤ Z(Q)` commutes with `r ∈ Q`, the equation
+also reads `(st)² = (st)^r`, and iterating gives `(st)^{r²} = (st)⁴`; with `st` of order `5`
+this forces `r² ≠ 1` (else `(st)³ = 1`). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_ne_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_structureConjugator
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_structureConjugator_inv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_distinguishedInvolution
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_structureConjugator
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjTriple_structureConjugator_inv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sq_st_eq_conj_structureConjugator
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_sq_ne_one
+
+/-! **The main computation (4)** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+> `t r r^{-k} t = r r^{-ℓ⁻¹} · ℓ²k² · t · r^{ℓ⁻¹k⁻²} r^{-k⁻¹}`,
+> which is to say `f(rr^{-k}) = r^{ℓ⁻¹k⁻²} r^{-k⁻¹}`, `g(rr^{-k}) = r r^{-ℓ⁻¹}` and
+> `h(rr^{-k}) = ℓ²k²`.
+
+Here `x^a = a⁻¹ x a` and `ℓ ∈ K` is determined by `s k s k⁻¹ = s^ℓ`.  The identity is pure
+group algebra from three inputs: `t` inverts `k` and `ℓ` (they lie in `K`), the structure
+equation `tst = r⁻¹tr`, and the defining relation for `ℓ`.  Both sides normalize to
+`r ℓ r⁻¹ · t · r ℓ⁻¹ k⁻¹ r⁻¹ k⁻¹` — on the right using `k²tk² = t` and `ℓtℓ = t`.
+
+Its point is that the middle factor `ℓ²k²` lies in `K`, which together with the equivariance
+`h(xᵃ) = a h(x) a` and `h(s) = h(r) = h(r⁻¹) = 1` gives `h(x) ∈ K` on a full system of
+representatives for the `K`-orbits of `S#`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_mul
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.t_conj_structureConjugator_mul_conj_inv
