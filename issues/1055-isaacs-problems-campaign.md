@@ -6770,3 +6770,32 @@ step (b) の未解決点 (前節に記録) が残るため、文書順を一時�
 Web 検索 (Wielandt の該当定理の証明) では該当文献に当たらなかった。次に戻るときは
 CLAUDE.md の [[feedback-ask-chatgpt-for-elided-gaps]] 手順 (最強モデルに自己完結プロンプト)
 を使う。
+
+### §9D 進捗 (2026-07-29, 続き) — 9D.3 完了
+
+* **9D.3 ✅** `subnormalCore_ne_sInf_conj`。`G = S₄`, `σ = (0 1 2 3)`, `τ = σ²`。
+  * `subnormalCore ⟨σ⟩ = ⟨τ⟩` (位数 2)。`⟨τ⟩ ◁ V₄ ◁ S₄` で subnormal、
+    `X = ⟨σ⟩` は subnormal でない — **issue 9216 の `le_oPiCore_of_isSubnormal` が効く**:
+    subnormal なら `X ≤ O_2(S₄)` だが `O_2(S₄)` は正規なので `σ` の共役も含み
+    `σ·(0 1)σ(0 1)⁻¹` が**位数 3** になって 2-群と矛盾。
+  * `⟨τ⟩` を含む `X` の共役は `X` だけ (`conjAct_smul_cyclicFour4_eq`):
+    `τ ∈ ⟨gσg⁻¹⟩` ⟹ `g⁻¹τg` は `σ` と可換で位数 2 ⟹ `C(σ) = ⟨σ⟩` から `g⁻¹τg = τ`
+    ⟹ `C(τ) = N(X)` から `gσg⁻¹ ∈ {σ, σ⁻¹}`。
+  * 共役の交わりは `⊤` (位数 24) か `X` (位数 4) のみ ⟹ 位数 2 にならない。
+
+**⚠ 具体群 `decide` の実務知見** (S₄ = 24 元):
+* **`orderOf` は `decide` で簡約されない** (`Nat.find` 経由)。`x^n = 1` / `x ≠ 1` を
+  `decide` し `orderOf_eq_prime` / `orderOf_eq_prime_pow` で持ち上げる。
+* `set_option maxRecDepth 40000` が要る (既定 512 では `S₄` 上の全数チェックが尽きる)。
+* `Subgroup` の membership を `decide` させるには
+  `instance : DecidablePred (· ∈ V₄) := fun g => decidable_of_iff (明示的な選言) Iff.rfl`
+  を与える (carrier が `Set` なので自動では付かない)。`Normal` は `⟨by decide⟩`。
+* `Nat.primeFactors 4 = {2}` は `decide` で詰まる (`Multiset.isPerm` が止まる)。
+  `IsPGroup.of_card` → `Subgroup.isPiSubgroup_of_isPGroup_of_mem` の経路が楽。
+* `∀ g, P g → Q g` を `decide` するには `revert` してから (仮説を含む全称形にする)。
+
+### 残り
+
+* **9D.4** Kegel 予想 (Lem 9.31 の逆) の極小反例で `G`, `S` が非可換単純であることを示す。
+  極小正規部分群を取る hint。§9D はこれで完了。
+* **9C.3** deferred (step (b) 未解決)。
