@@ -306,6 +306,57 @@ theorem quaternionTwo_exists_mulAut_map_zpowers {x y : QuaternionGroup 2}
   congr 1
   exact MonoidHom.ext fun z => by simp
 
+/-! ### 指数 2 の拡大 (3F.5 の一般部品)
+
+Thm 3.36 を `m = 2` で使ったときの出力 (`N ⊴ H`, `H ⧸ N` が位数 2, 生成元 `h`,
+`h² = ι a`, `h ι(x) h⁻¹ = ι(σ x)`) から, `H ∖ N` の元の 2 乗を `N` の中の式に
+還元するための一般補題。3F.5 では `H = GL(2,3)` 側と Thm 3.36 で作る `H` 側の
+両方でこの計算を使う。 -/
+
+section /- 指数 2 の拡大 -/
+
+variable {H : Type*} [Group H] {N : Subgroup H} [N.Normal]
+
+/-- 商 `H ⧸ N` が位数 2 で `h` の像がそれを生成するなら `h ∉ N`。
+
+`h ∈ N` だと像が `1` になり `zpowers 1 = ⊥ = ⊤` から `H ⧸ N` が自明群になってしまう。 -/
+theorem notMem_of_zpowers_quotientMk_eq_top {h : H}
+    (hgen : Subgroup.zpowers ((h : H ⧸ N)) = ⊤) (hcard : Nat.card (H ⧸ N) = 2) : h ∉ N := by
+  obtain ⟨y, hy1, -⟩ := (Nat.card_eq_two_iff' (1 : H ⧸ N)).mp hcard
+  intro hmem
+  have hh0 : ((h : H) : H ⧸ N) = 1 := (QuotientGroup.eq_one_iff h).mpr hmem
+  rw [hh0, Subgroup.zpowers_one_eq_bot] at hgen
+  have hmem2 : y ∈ (⊥ : Subgroup (H ⧸ N)) := by rw [hgen]; exact Subgroup.mem_top y
+  exact hy1 (Subgroup.mem_bot.mp hmem2)
+
+/-- 商 `H ⧸ N` が位数 2 なら `N` の外の 2 元は同じ剰余類に属する: `t = h n` (`n ∈ N`)。 -/
+theorem exists_eq_mul_of_notMem_of_card_quotient_eq_two (hcard : Nat.card (H ⧸ N) = 2) {h t : H}
+    (hhN : h ∉ N) (ht : t ∉ N) : ∃ n : ↥N, t = h * (n : H) := by
+  obtain ⟨y, -, hyuniq⟩ := (Nat.card_eq_two_iff' (1 : H ⧸ N)).mp hcard
+  have ht1 : ((t : H) : H ⧸ N) ≠ 1 := fun hc => ht ((QuotientGroup.eq_one_iff t).mp hc)
+  have hh1 : ((h : H) : H ⧸ N) ≠ 1 := fun hc => hhN ((QuotientGroup.eq_one_iff h).mp hc)
+  have heq : ((h : H) : H ⧸ N) = ((t : H) : H ⧸ N) := (hyuniq _ hh1).trans (hyuniq _ ht1).symm
+  exact ⟨⟨h⁻¹ * t, QuotientGroup.eq.mp heq⟩, by simp⟩
+
+variable {S : Type*} [Group S]
+
+omit [N.Normal] in
+/-- `h ι(x)` の 2 乗は `ι(σ(x) a x)`: `(h ι x)² = (h ι x h⁻¹) h² ι x = ι(σ x) ι a ι x`。 -/
+theorem sq_mul_coe_of_conj (ι : S ≃* ↥N) {h : H} {a : S} (σ : MulAut S)
+    (hhsq : h ^ 2 = (ι a : H)) (hconj : ∀ x : S, h * (ι x : H) * h⁻¹ = (ι (σ x) : H))
+    (x : S) : (h * (ι x : H)) ^ 2 = (ι (σ x * a * x) : H) := by
+  rw [pow_two]
+  calc h * (ι x : H) * (h * (ι x : H))
+      = (h * (ι x : H) * h⁻¹) * h ^ 2 * (ι x : H) := by group
+    _ = (ι (σ x) : H) * (ι a : H) * (ι x : H) := by rw [hconj x, hhsq]
+    _ = (ι (σ x * a * x) : H) := by rw [map_mul, map_mul, Subgroup.coe_mul, Subgroup.coe_mul]
+
+omit [N.Normal] in
+@[simp] theorem coe_mulEquiv_eq_one_iff (ι : S ≃* ↥N) {z : S} : (ι z : H) = 1 ↔ z = 1 := by
+  simp
+
+end -- 指数 2 の拡大
+
 end -- 3F
 
 end OddOrder.Isaacs.Ch03
