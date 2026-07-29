@@ -25,6 +25,9 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9B
   ⚠ 書籍の「`i ≤ 2`」はこの形に**再解釈**して形式化した (issue 1055 参照)。
 * **9B.3** `isCompleteGroup_mulAut_of_isSemisimpleGroup` — `G` semisimple なら `Aut(G)` は
   complete (`E(Aut G) = Inn(G)` が characteristic なので 9B.2 が使える)。
+* **9B.5** `nilpotentResidual_top_eq_sup_of_isSubnormal` — `G = AB` で `A, B ⊲⊲ G` なら
+  `G^∞ = A^∞ B^∞`。⚠ 仮説は join でなく**積** (`(A : Set G) * B = Set.univ`);
+  帰納段の Dedekind が積の恒等式なので join では回らない。
 
 書籍の statement はページ画像 `references/isaacs/pages/isaacs-p284-297.png` /
 `isaacs-p285-298.png` で確定 (⚠ 9B.5 の `A, B ⊲⊲ G` は **subnormal**)。
@@ -34,7 +37,7 @@ namespace OddOrder.Isaacs.Ch09
 
 open Subgroup
 
-open scoped commutatorElement
+open scoped commutatorElement Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -303,7 +306,7 @@ theorem isCompleteGroup_mulAut_of_isSemisimpleGroup [Finite G] (hss : IsSemisimp
 
 end -- 9B.3
 
-section /- 9B.5 (base case): A, B ともに正規のとき (p. 285) -/
+section /- 9B.5: G = AB (A, B subnormal) なら G^∞ = A^∞ B^∞ (p. 285) -/
 
 /-- **9B.5 の base case** (書籍 hint の第 1 段): `A, B ⊴ G` で `G = AB` なら
 `G^∞ = A^∞ B^∞`。
@@ -336,6 +339,101 @@ theorem nilpotentResidual_top_eq_sup_of_normal [Finite G] {A B : Subgroup G}
   haveI := Ch01.fitting.isNilpotent (G := G ⧸ N)
   exact Group.nilpotent_of_mulEquiv (MulEquiv.subgroupCongr (top_le_iff.mp htop))
 
-end -- 9B.5 (base case)
+/-- 9B.5 の帰納核: `Nat.card G ≤ n` の有限群で `A, B ◁◁ G`, `G = AB` ⟹
+`G^∞ ≤ A^∞ ⊔ B^∞`。`∀ G` を内側に量化して `n` で帰納 (Lemma 9.15 の核と同型)。 -/
+private theorem nilpotentResidual_sup_aux.{u} (n : ℕ) :
+    ∀ (G : Type u) [Group G] [Finite G], Nat.card G ≤ n →
+      ∀ {A B : Subgroup G}, A.IsSubnormal → B.IsSubnormal →
+        (A : Set G) * (B : Set G) = Set.univ →
+        nilpotentResidual (⊤ : Subgroup G) ≤ nilpotentResidual A ⊔ nilpotentResidual B := by
+  induction n with
+  | zero =>
+    intro G _ _ hcard
+    exact absurd (Nat.le_zero.mp hcard) Nat.card_pos.ne'
+  | succ n IH =>
+    intro G _ _ hcard A B hA hB hprod
+    have hjoin : A ⊔ B = ⊤ := by
+      refine top_le_iff.mp fun g _ => ?_
+      have hg : g ∈ (A : Set G) * (B : Set G) := by rw [hprod]; trivial
+      obtain ⟨a, ha, b, hb, rfl⟩ := hg
+      exact Subgroup.mul_mem _ (Subgroup.mem_sup_left ha) (Subgroup.mem_sup_right hb)
+    rcases hA.lt_normal with rfl | ⟨A₁, hA₁norm, hAA₁, hA₁lt⟩
+    · exact le_sup_of_le_left (nilpotentResidual_mono le_top)
+    rcases hB.lt_normal with rfl | ⟨B₁, hB₁norm, hBB₁, hB₁lt⟩
+    · exact le_sup_of_le_right (nilpotentResidual_mono le_top)
+    haveI := hA₁norm
+    haveI := hB₁norm
+    have hA₁B₁ : A₁ ⊔ B₁ = ⊤ := by
+      refine top_le_iff.mp ?_
+      rw [← hjoin]
+      exact sup_le_sup hAA₁ hBB₁
+    rw [nilpotentResidual_top_eq_sup_of_normal hA₁B₁]
+    -- `X₁ < ⊤` なら `|X₁| ≤ n`。
+    have hcard_lt : ∀ {X : Subgroup G}, X < ⊤ → Nat.card ↥X ≤ n := by
+      intro X hX
+      have hne : Nat.card ↥X ≠ Nat.card G := fun h => hX.ne (Subgroup.eq_top_of_card_eq _ h)
+      have hle := Subgroup.card_le_card_group X
+      omega
+    -- `X ≤ X₁` のとき `X₁ = X (Y ⊓ X₁)` (Dedekind) を `↥X₁` の積として持ち上げる。
+    have hprod_sub : ∀ {X Y X₁ : Subgroup G}, X ≤ X₁ →
+        (X : Set G) * (Y : Set G) = Set.univ →
+        ((X.subgroupOf X₁ : Subgroup ↥X₁) : Set ↥X₁) *
+          (((Y ⊓ X₁).subgroupOf X₁ : Subgroup ↥X₁) : Set ↥X₁) = Set.univ := by
+      intro X Y X₁ hXX₁ hXY
+      ext x
+      simp only [Set.mem_univ, iff_true]
+      have hx : (x : G) ∈ (X : Set G) * (Y : Set G) := by rw [hXY]; trivial
+      obtain ⟨a, ha, b, hb, hab⟩ := hx
+      have haX₁ : a ∈ X₁ := hXX₁ ha
+      have hbX₁ : b ∈ X₁ := by
+        have hbe : b = a⁻¹ * (x : G) := by rw [← hab]; group
+        rw [hbe]
+        exact Subgroup.mul_mem _ (Subgroup.inv_mem _ haX₁) x.2
+      exact ⟨⟨a, haX₁⟩, ha, ⟨b, hbX₁⟩, ⟨hb, hbX₁⟩, Subtype.ext hab⟩
+    refine sup_le ?_ ?_
+    · -- `A₁^∞ ≤ A^∞ ⊔ (B ⊓ A₁)^∞ ≤ A^∞ ⊔ B^∞`
+      have hIHA := IH ↥A₁ (hcard_lt hA₁lt) hA.subgroupOf
+        (hB.inf hA₁norm.isSubnormal).subgroupOf (hprod_sub hAA₁ hprod)
+      have hm := Subgroup.map_mono (f := A₁.subtype) hIHA
+      rw [map_subtype_nilpotentResidual_top, Subgroup.map_sup,
+        map_subtype_nilpotentResidual_subgroupOf hAA₁,
+        map_subtype_nilpotentResidual_subgroupOf (inf_le_right : B ⊓ A₁ ≤ A₁)] at hm
+      exact hm.trans (sup_le le_sup_left
+        ((nilpotentResidual_mono inf_le_left).trans le_sup_right))
+    · -- 対称
+      have hprodBA : (B : Set G) * (A : Set G) = Set.univ := by
+        ext g
+        simp only [Set.mem_univ, iff_true]
+        have hg : g⁻¹ ∈ (A : Set G) * (B : Set G) := by rw [hprod]; trivial
+        obtain ⟨a, ha, b, hb, hab⟩ := hg
+        have hab' : a * b = g⁻¹ := hab
+        refine ⟨b⁻¹, Subgroup.inv_mem _ hb, a⁻¹, Subgroup.inv_mem _ ha, ?_⟩
+        change b⁻¹ * a⁻¹ = g
+        rw [← mul_inv_rev, hab', inv_inv]
+      have hIHB := IH ↥B₁ (hcard_lt hB₁lt) hB.subgroupOf
+        (hA.inf hB₁norm.isSubnormal).subgroupOf (hprod_sub hBB₁ hprodBA)
+      have hm := Subgroup.map_mono (f := B₁.subtype) hIHB
+      rw [map_subtype_nilpotentResidual_top, Subgroup.map_sup,
+        map_subtype_nilpotentResidual_subgroupOf hBB₁,
+        map_subtype_nilpotentResidual_subgroupOf (inf_le_right : A ⊓ B₁ ≤ B₁)] at hm
+      exact hm.trans (sup_le le_sup_right
+        ((nilpotentResidual_mono inf_le_left).trans le_sup_left))
+
+/-- **Isaacs Problem 9B.5** (書籍 p. 285) ⭐: `G = AB` で `A, B ⊲⊲ G` (**subnormal**)
+なら `G^∞ = A^∞ B^∞`。
+
+書籍 hint どおり「まず両方 normal の場合 (`nilpotentResidual_top_eq_sup_of_normal`)、
+次に `|G|` の帰納法」。帰納段は `A ≤ A₁ ◁ G`, `A₁ < ⊤` (subnormal 性) を取って
+base case で `G^∞ = A₁^∞ ⊔ B₁^∞` とし、Dedekind (`A₁ = A (B ⊓ A₁)`) で `A₁` に帰納法を
+当てる。⚠ 仮説は join でなく**積** `(A : Set G) * B = Set.univ` — Dedekind が
+積の恒等式なので join では回らない (部分群束は一般に modular でない)。 -/
+theorem nilpotentResidual_top_eq_sup_of_isSubnormal [Finite G] {A B : Subgroup G}
+    (hA : A.IsSubnormal) (hB : B.IsSubnormal)
+    (hprod : (A : Set G) * (B : Set G) = Set.univ) :
+    nilpotentResidual (⊤ : Subgroup G) = nilpotentResidual A ⊔ nilpotentResidual B :=
+  le_antisymm (nilpotentResidual_sup_aux (Nat.card G) G le_rfl hA hB hprod)
+    (sup_le (nilpotentResidual_mono le_top) (nilpotentResidual_mono le_top))
+
+end -- 9B.5
 
 end OddOrder.Isaacs.Ch09
