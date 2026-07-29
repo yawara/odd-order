@@ -13516,3 +13516,5 @@ the `X = S` instances):
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inf_eq_Q0_of_ne_of_kInvariant
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.false_of_typeA_centralizer_of_two_kSubgroups
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_two_kSubgroups

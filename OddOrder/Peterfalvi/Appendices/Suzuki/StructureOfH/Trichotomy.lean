@@ -31,6 +31,10 @@ in `SquareRootFibres.lean`; this file assembles the cases from it.
 > Proposition 5) and so normalizes `xQ₀` which is of cardinality prime to `p`,
 > whence `C_S(P) ⊄ Q₀`, which is a contradiction.  Thus `S = Q₀`.
 
+**Case (3)** (`S` non-abelian of order `q³`) concludes `orderOf (st) = 3` and
+`W ≠ 1`; Ch. I §3 Lemma 5 (`lemmaFive_of_orderThree`) then gives type B.  Its
+first half is here, reduced to the supply of the two `K`-subgroups.
+
 **Case (2)** (`S` non-abelian of order `q²`) concludes `W = 1` and
 `orderOf (st) = 5`.  The book's `PSU(3, ℓ)` exclusion, which it defers with "as
 can be checked", is replaced by a count against the cardinality relation
@@ -48,6 +52,9 @@ Ch. I §3 Proposition 1(c) carries in that branch; see
   the resulting branch selection (`C_Q(P)` is a Suzuki `2`-group).
 * `orderOf_st_eq_five_of_isSuzuki2Group`, `W_eq_bot_of_isSuzuki2Group` —
   **case (2)**: `st` has order `5` and `W = 1`.
+* `false_of_typeA_centralizer_of_two_kSubgroups`,
+  `orderOf_st_eq_three_of_two_kSubgroups` — **case (3)'s `st` has order `3`**,
+  given the two `K`-subgroups of `S` of order `q²` that `P` normalizes.
 -/
 
 set_option autoImplicit false
@@ -395,6 +402,48 @@ theorem false_of_typeA_centralizer_of_two_kSubgroups
   have hy1 : y ^ 2 = 1 := sc.toHypothesis.sq_eq_one_of_mem_Q0 hyQ0
   rw [hyT.2] at hy1
   exact sc.toHypothesis.distinguishedInvolution_ne_one hy1
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (3): `st` has order 3**
+(p. 117), given the two `K`-subgroups.
+
+> Suppose that `st` has order 5. … `P` normalizes at least two `K`-subgroups `X`
+> and `Y` of order `q²` in `S`. … which is a contradiction.  Thus `st` has
+> order 3.
+
+Of the three alternatives of Ch. I §3 Proposition 1(c) only the `Sz(ℓ)` one has
+`orderOf (st) = 5`, and it puts standard type-A data on `C_Q(P)` — refuted by
+`false_of_typeA_centralizer_of_two_kSubgroups`.  Both surviving alternatives
+carry `orderOf (st) = 3`. -/
+theorem orderOf_st_eq_three_of_two_kSubgroups
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q)
+    {X Y : Subgroup G}
+    (hXQ : X ≤ sc.toHypothesis.Q) (hQ0X : sc.toHypothesis.Q0 ≤ X)
+    (hXinv : ∀ k ∈ sc.toHypothesis.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X)
+    (hXcard : Nat.card ↥X = Nat.card ↥sc.toHypothesis.Q0 ^ 2)
+    (hYQ : Y ≤ sc.toHypothesis.Q) (hQ0Y : sc.toHypothesis.Q0 ≤ Y)
+    (hYinv : ∀ k ∈ sc.toHypothesis.K, ∀ y ∈ Y, k * y * k⁻¹ ∈ Y)
+    (hYcard : Nat.card ↥Y = Nat.card ↥sc.toHypothesis.Q0 ^ 2)
+    (hne : X ≠ Y)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ sc.toHypothesis.V)
+    (hPX : ∀ g ∈ P, ∀ y ∈ X, g * y * g⁻¹ ∈ X)
+    (hPY : ∀ g ∈ P, ∀ y ∈ Y, g * y * g⁻¹ ∈ Y) :
+    orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3 := by
+  classical
+  have hPne : P ≠ ⊥ := by
+    intro h
+    rw [h, Subgroup.card_bot] at hPcard
+    exact hp.one_lt.ne hPcard
+  letI := sc.toHypothesis.centralizerQuotientMulAction hPV
+  obtain ⟨data⟩ := sc.toHypothesis.centralizer_trichotomy_of_induction hPV hPne
+    (sc.twoRank_centralizer_ge_two P hPV p hp hPcard) ind
+  rcases data.branch with ⟨d, -, det⟩ | ⟨d, -, det⟩ | ⟨d, -, det⟩
+  · exact det.distinguishedProduct_order
+  · exact (sc.false_of_typeA_centralizer_of_two_kSubgroups hQsuz hXQ hQ0X hXinv
+      hXcard hYQ hQ0Y hYinv hYcard hne hp hPcard hPV hPX hPY
+      det.standardTypeAData).elim
+  · exact det.distinguishedProduct_order
 
 /-- **After Theorem C, the book's `S` is `Q`**: `Q₁ = 1` (`Q1_eq_bot`) makes the
 Sylow `2`-subgroup `S` of `Q` equal to `Q`, so Ch. III §1's Proposition — stated
