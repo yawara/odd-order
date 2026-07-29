@@ -589,3 +589,31 @@ Wielandt (9.1) の ambient 版 `natCard_eq_pow_natCard_inf_centralizer_of_kernel
 | Galois `C_V(C_{Q₀}(P)) = P ⊔ W` | ✅ |
 | Artin `q = q₀^p` | 配線 γ 残 |
 | 組み立て | δ 残 |
+
+
+## 進捗表 (2026-07-29 セッション終盤)
+
+| 部品 | 状態 | 場所 |
+|---|---|---|
+| PSU 分岐 (書籍の "as can be checked") | ✅ | `PSUCentre.lean` `CentralizerPSUData.false_of_W_eq_bot` |
+| PSL 分岐 case 1 (`p ∤ q₀−1`) | ✅ end-to-end | `WielandtOnQ.lean` `false_of_natCard_cQ_eq_cQ0_of_card_cube` |
+| PSL 分岐 case 2 (`p ∣ q₀−1`) | 代数 ✅ / 群論 β 残 | `SemilinearFixedPoint.lean` (Hilbert 90) |
+| Sz 分岐 | 組み立て時に `st` 位数 5 vs 3 で即死 | — |
+| Galois `C_V(C_{Q₀}(P)) = P ⊔ W` | ✅ | `GaloisCentralizer.lean` |
+| Artin `\|Q₀\| = \|C_{Q₀}(X)\|^{\|X\|}` | ✅ | `GaloisCentralizer.lean` `natCard_Q0_eq_pow_of_W_eq_bot` |
+| Fermat 橋 (`p ∤ q₀−1 ⟹ p ∤ \|K\|`) | ✅ | `WielandtOnQ.lean` `coprime_natCard_K_of_not_dvd` |
+| 組み立て δ | 残 | `Trichotomy.lean` の `hWcube` 除去 |
+
+### 残り β の内訳 (case 2 の群論配線)
+
+`p ∣ q₀−1` ⟹ `p ∣ q−1` ⟹ `p ∤ q+1`。`Q/Q₀` の位数 `q` の `K`-部分加群は
+2 個か `q+1` 個で `p` はどちらも割らないので `X` は必ずどれかを固定する。
+その固定された `N/Q₀` の上で:
+
+1. `End_{𝔽₂[K]}(N/Q₀) ≅ 𝔽_q` (Schur + 有限可除環は体) — **新規**
+2. `X` が `q₀`-半線形に作用 (`x k x⁻¹ = k^{q₀}`) — `exists_pow_eq` を使う
+3. `exists_ne_zero_mul_pow_eq` を適用して `C_{N/Q₀}(X) ≠ 1`
+4. PSL 分岐の `C_Q(X) ≤ Q₀` + coprime 作用の `C_{Q/Q₀}(X) = 1` と矛盾
+
+土台: `TwoKSubgroups.lean` の `IsKSubgroupSquare` / operator Maschke /
+`exists_two_kSubgroups_unique_of_card_cube` / `conj_mem_of_unique_of_le_V`。
