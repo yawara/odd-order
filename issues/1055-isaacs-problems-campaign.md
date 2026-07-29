@@ -6304,7 +6304,7 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
 | Ch.6 | 6A(10) 6B(9) 6C(2) | ✅ 全問 |
 | Ch.7 | 7A(6) 7C(1) | ✅ 全問 |
 | Ch.8 | 8A(13) 8B(10) 8C(6) 8D(6) | ✅ 全問 |
-| **Ch.9** | **9A(8) 9B(5) 9C(3) 9D(4)** | **§9A ✅ 完済 (2026-07-29) / 9B・9C・9D 未** |
+| **Ch.9** | **9A(8) 9B(5) 9C(3) 9D(4)** | **§9A ✅ / §9B ✅ 完済 (2026-07-29) / 9C・9D 未** |
 | **Ch.10** | **10A(7) 10B(2) 10C(1)** | **❌ 0 問** |
 
 * 素の差分では 1F.1 / 3C.1 も欠落に見えたが **誤検出**: どちらも実装済みで、docstring が
@@ -6601,3 +6601,38 @@ Dedekind の恒等式 `A (A₁ ∩ B) = (AB) ∩ A₁` は積についてのも�
 ⏳ 次 iteration = この帰納法の実装。base case と mathlib の
 `IsSubnormal.lt_normal` / `IsSubnormal.subgroupOf`、repo の
 `map_subtype_nilpotentResidual_top` / `map_subtype_nilpotentResidual_subgroupOf` が材料。
+
+### 🎉 §9B 完済 (2026-07-29) — 9B.4 完成で 9B.1–9B.5 全問
+
+**9B.4 ✅** `isCompleteGroup_mulAut_dihedralGroup` (Problems9B.lean) +
+新設 `OddOrder/GroupTheory/DihedralAut.lean` (issue 9215、516 行、closed)。
+
+書籍 statement (`references/isaacs/pages/isaacs-p285-298.png` で確定):
+「`G` を位数 `2n` (`n` 奇数) の二面体群とせよ。`Z(G) = 1` を観察し、`G` の automorphism
+tower が相異なる群を高々 2 個しか含まないことを示せ」。前半 (`Z(G) = 1`) は mathlib
+`DihedralGroup.center_eq_bot_of_odd_ne_one` そのもので新規形式化の対象ではない。
+
+⚠ **2026-07-29 の当初メモ (「9B.4 は大物」節) の訂正**:
+
+* あの節は「`n` 奇数のとき `(ℤ/n)ˣ` は involution を複数持つので `{±1}` は
+  characteristic に決まらず、**`Inn(D_{2n})` は characteristic でない**」と書いたが、
+  **これは誤り**。`Hol(ℤ/n)` の内部自己同型は `(a,σ)(b,ε)(a,σ)⁻¹ = (a + σb - εa, ε)` で
+  **unit 成分を保つ**ので、`ℤ/n ⋊ S` の形の部分群は全部 `Hol` で正規。よって
+  `Hol` が complete である以上 `Inn(D_{2n}) = ℤ/n ⋊ {±1}` は実際に characteristic。
+* 9B.2 が使えない**真の理由は循環**: 9B.2 の仮説「`Inn(G)` が `Aut(G)` で characteristic」を
+  確かめるには `Aut(Aut(D_{2n}))` を知る必要があり、それがまさに示したい completeness。
+* 「(a) `Aut(D_{2n}) ≅ Hol(ℤ/n)` と (b) `Hol(ℤ/n)` complete の 2 本が要る」という
+  見積り自体は正しかった。ただし**抽象的な半直積を作る必要は無く**、
+  `dihedralAut a u` の座標表示だけで (a)(b) が両方書ける (実装 = `DihedralAut.lean`)。
+
+**実際に効いた鍵** ⭐: `n` 奇数のとき **`⁅Aut(D_{2n}), Aut(D_{2n})⁆ = 平行移動部分群 `N``**。
+`⊆` は `(ℤ/n)ˣ` 可換で unit 成分が消えること、`⊇` は `⁅(0,-1),(b,1)⁆ = (-2b,1)` と `2` の
+可逆性。⟹ `N` は交換子部分群なので **characteristic が無料**で出る。あとは
+`Φ|_N` = 単元 `w` 倍 → `conj(0,w)` で割る → 残りは 1-cocycle
+`A(uv) = A u + u·A v` で、`u = -1` を可換性で両側から使うと `2 A u = (1-u) A(-1)`、
+`2` を割って `A u = (1-u)c` = `(c,1)` 共役。
+
+副産物 `mulEquivMulAutOfIsCompleteGroup` (complete ⟹ `H ≃* Aut(H)`) で
+9B.2 / 9B.3 / 9B.4 の "contains at most two different groups" が具体化される。
+
+**⟹ 次 = §9C (3 問)、その後 §9D (4 問)。文書順どおり。**
