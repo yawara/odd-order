@@ -300,6 +300,7 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
 import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9B
 import OddOrder.Isaacs.Ch09_MoreSubnormality.PResidual
 import OddOrder.Isaacs.Ch09_MoreSubnormality.ThompsonWielandt
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
