@@ -726,6 +726,97 @@ theorem tConjMiddle_mem_K_of_orbitReprSet_covers
   exact hyp.tConjMiddle_conj_mem_K hyQ hy1 ha
     (hyp.tConjMiddle_mem_K_of_mem_orbitReprSet hy)
 
+/-! ## The representatives are pairwise non-conjugate: the easy separations
+
+Peterfalvi Part II, Ch. III §2, p. 118 argues with the orders of `r` and of
+`f(r r^{-k})`.  The membership test "is it in `Q₀`?" is shorter and needs only
+`r² ≠ 1`: `Q₀` is `K`-invariant, `s ∈ Q₀`, and `r`, `r⁻¹`, `r r^{-k}` are not. -/
+
+/-- `r ∉ Q₀`: elements of `Q₀` square to `1`. -/
+lemma structureConjugator_notMem_Q0 (hr2 : hyp.structureConjugator ^ 2 ≠ 1) :
+    hyp.structureConjugator ∉ hyp.Q0 := fun h => hr2 h.1
+
+/-- **`r r^{-k} ∉ Q₀`** for `1 ≠ k ∈ K` (Peterfalvi Part II, Ch. III §2, p. 118):
+if `r r^{-k} = z ∈ Q₀` then `z` is a central involution of `Q`, so
+`(r²)^k = (r^k)² = (zr)² = r²`, and `C_Q(k) = 1` forces `r² = 1`. -/
+lemma structureConjugator_mul_conj_inv_notMem_Q0
+    (hr2 : hyp.structureConjugator ^ 2 ≠ 1) {k : G} (hk : k ∈ hyp.KSet)
+    (hk1 : k ≠ 1) :
+    hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k) ∉ hyp.Q0 := by
+  intro hz
+  set r : G := hyp.structureConjugator with hr
+  set z : G := r * (k⁻¹ * r⁻¹ * k) with hzdef
+  -- `z` is a central involution of `Q`
+  have hzc : ∀ y ∈ hyp.Q, z * y = y * z := fun y hy =>
+    (Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hz) y hy).symm
+  have hzsq : z * z = 1 := by rw [← pow_two]; exact hz.1
+  -- `k⁻¹ r k = z⁻¹ r`
+  have hconj : k⁻¹ * r * k = z⁻¹ * r := by
+    have h1 : k⁻¹ * r⁻¹ * k = r⁻¹ * z := by rw [hzdef]; group
+    have h2 : (k⁻¹ * r⁻¹ * k)⁻¹ = (r⁻¹ * z)⁻¹ := by rw [h1]
+    calc k⁻¹ * r * k = (k⁻¹ * r⁻¹ * k)⁻¹ := by group
+      _ = (r⁻¹ * z)⁻¹ := h2
+      _ = z⁻¹ * r := by group
+  -- so `k` centralizes `r²`
+  have hzr : z⁻¹ * r = r * z⁻¹ := by
+    have hc := hzc r hyp.structureConjugator_mem_Q
+    calc z⁻¹ * r = z⁻¹ * (r * z) * z⁻¹ := by group
+      _ = z⁻¹ * (z * r) * z⁻¹ := by rw [← hc]
+      _ = r * z⁻¹ := by group
+  have hsq : k⁻¹ * r ^ 2 * k = r ^ 2 := by
+    have hzz : z⁻¹ * z⁻¹ = 1 := by
+      rw [← mul_inv_rev, hzsq, inv_one]
+    have hstep : (z⁻¹ * r) * (z⁻¹ * r) = (z⁻¹ * z⁻¹) * (r * r) :=
+      calc (z⁻¹ * r) * (z⁻¹ * r) = z⁻¹ * ((r * z⁻¹) * r) := by group
+        _ = z⁻¹ * ((z⁻¹ * r) * r) := by rw [hzr]
+        _ = (z⁻¹ * z⁻¹) * (r * r) := by group
+    calc k⁻¹ * r ^ 2 * k = (k⁻¹ * r * k) * (k⁻¹ * r * k) := by rw [pow_two]; group
+      _ = (z⁻¹ * r) * (z⁻¹ * r) := by rw [hconj]
+      _ = (z⁻¹ * z⁻¹) * (r * r) := hstep
+      _ = r ^ 2 := by rw [hzz, pow_two, one_mul]
+  refine hr2 ?_
+  have hmem : r ^ 2 ∈ hyp.Q ⊓ Subgroup.centralizer ({k} : Set G) := by
+    refine ⟨hyp.Q.pow_mem hyp.structureConjugator_mem_Q 2,
+      Subgroup.mem_centralizer_singleton_iff.mpr ?_⟩
+    calc r ^ 2 * k = k * (k⁻¹ * r ^ 2 * k) := by group
+      _ = k * r ^ 2 := by rw [hsq]
+  rw [hyp.Q_inf_centralizer_eq_bot_of_mem_KSet hk hk1, Subgroup.mem_bot] at hmem
+  exact hmem
+
+/-- `k ↦ r r^{-k}` is injective on `K`: equality says that `k₂k₁⁻¹` centralizes
+`r`, and `C_Q(·) = 1`. -/
+lemma structureConjugator_mul_conj_inv_injective {k₁ k₂ : G} (hk₁ : k₁ ∈ hyp.KSet)
+    (hk₂ : k₂ ∈ hyp.KSet)
+    (heq : hyp.structureConjugator * (k₁⁻¹ * hyp.structureConjugator⁻¹ * k₁)
+      = hyp.structureConjugator * (k₂⁻¹ * hyp.structureConjugator⁻¹ * k₂)) :
+    k₁ = k₂ := by
+  set r : G := hyp.structureConjugator with hr
+  have h1 : k₁⁻¹ * r⁻¹ * k₁ = k₂⁻¹ * r⁻¹ * k₂ := mul_left_cancel heq
+  set m : G := k₂ * k₁⁻¹ with hm
+  have hk₁K : k₁ ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact hk₁
+  have hk₂K : k₂ ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact hk₂
+  have hmK : m ∈ hyp.KSet := by
+    rw [← hyp.coe_K]
+    exact hyp.K.mul_mem hk₂K (hyp.K.inv_mem hk₁K)
+  by_cases hm1 : m = 1
+  · exact (mul_inv_eq_one.mp (hm.symm.trans hm1)).symm
+  · exfalso
+    refine hyp.structureConjugator_ne_one ?_
+    have hcomm : r⁻¹ * m = m * r⁻¹ := by
+      have h2 : m⁻¹ * r⁻¹ * m = r⁻¹ := by
+        rw [hm, mul_inv_rev, inv_inv]
+        calc k₁ * k₂⁻¹ * r⁻¹ * (k₂ * k₁⁻¹)
+            = k₁ * (k₂⁻¹ * r⁻¹ * k₂) * k₁⁻¹ := by group
+          _ = k₁ * (k₁⁻¹ * r⁻¹ * k₁) * k₁⁻¹ := by rw [← h1]
+          _ = r⁻¹ := by group
+      calc r⁻¹ * m = m * (m⁻¹ * r⁻¹ * m) := by group
+        _ = m * r⁻¹ := by rw [h2]
+    have hmem : r⁻¹ ∈ hyp.Q ⊓ Subgroup.centralizer ({m} : Set G) :=
+      ⟨hyp.Q.inv_mem hyp.structureConjugator_mem_Q,
+        Subgroup.mem_centralizer_singleton_iff.mpr hcomm⟩
+    rw [hyp.Q_inf_centralizer_eq_bot_of_mem_KSet hmK hm1, Subgroup.mem_bot] at hmem
+    exact inv_eq_one.mp hmem
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
