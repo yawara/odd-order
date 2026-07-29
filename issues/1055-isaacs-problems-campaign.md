@@ -6521,3 +6521,23 @@ repo には `AutTower.lean` / `AutTowerBounds.lean` / `Schenkman.lean` /
 `card_le_card_mulAut_of_centralizer_eq_bot`。
 ⏳ 残り = `AutTower.lean` の `autTowerType` / `autTowerEmbLe` 上での組み立て
 (`G` の `G₃` 内の像を `A`, `G₂` の像を `B` として上の 3 本を当てる)。
+
+### 9B.2 完了 / 9B.3 の部品 (2026-07-29)
+
+* **9B.2 ✅** `isCompleteGroup_autTowerType_one_of_normal_range` (再解釈版)。
+  新補助 = `card_mulAut_congr` (`MulAut` の同型移送; mathlib に functor 性が無い) /
+  `range_autTowerEmb_two`。
+  ⚠ `Subgroup.map_top` も `MonoidHom.range_id` も mathlib に無い
+  (`← MonoidHom.range_eq_map` / `MonoidHom.range_eq_top.mpr Function.surjective_id` で代替)。
+* **9B.3 部品 ✅** `normal_map_conj_of_map_le` (characteristic ⟹ `Aut(H)` での像が正規) /
+  `layer_mulAut_le_innAut` (`Z(G)=1` ⟹ `E(Aut G) ≤ Inn G`; **9A.6 の直接適用**)。
+
+**9B.3 の残り**: 逆向き `Inn(G) ≤ E(Aut G)`。`G` semisimple の族 `𝒳` の各 `S` について
+`S.map MulAut.conj` が `Aut(G)` の component であることを示す:
+* subnormal: `S.map conj ⊴ Inn G ⊴ Aut G` (`Subgroup.IsSubnormal.trans` を使う)。
+* quasisimple: `↥(S.map conj) ≃* ↥S` (conj は `Z(G)=1` で単射) と
+  `isQuasisimple_of_isSimpleGroup_not_isMulCommutative` (`SubnormalSocle.lean`)。
+* `innAut G = (sSup 𝒳).map conj` を `(gc_map_comap).l_sSup` で分配。
+
+これで `Inn G = E(Aut G)` が characteristic (`map_layer_mulEquiv`) になり、
+`normal_map_conj_of_map_le` で `G` の像が `G₃` で正規 ⟹ **9B.2 を適用して 9B.3 完成**。
