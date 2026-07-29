@@ -231,12 +231,24 @@ Ch. I §3 Prop 1(c) の三分岐 (`centralizer_trichotomy_of_induction`) を回�
 * ⟹ `|Q| = |Q₀|`。しかし case (3) は `|Q| = |Q₀|³` なので `|Q₀|² = 1`、
   `two_le_card_Q0` に矛盾。∎
 
+**進捗 (2026-07-29)**: 汎用部品
+`OddOrder.GroupTheory.natCard_eq_pow_natCard_inf_centralizer_of_kernel_fpf`
+(`GroupTheory/WielandtFixedPoint.lean`) を landing。
+既存の `frobenius_kernel_centralizes_of_complement_fpf` と対になる
+**ambient-subgroup 版**で、`U ⊔ E ≤ N_G(N)` の Frobenius 作用と
+「kernel `U` が `N` 上 fpf」から `|N| = |C_N(E)|^{|E|}` を出す。
+⟹ 残りは `[K,X] ⋊ X` の Frobenius 構造を組むだけ。
+
 必要な入力はすべて repo に在る:
 * `K` は巡回 (`K_isCyclic`)、`K ⊓ V = ⊥` (`K_inf_V_eq_bot`) ⟹ `X ⊓ K = ⊥`
 * `K` は `Q` 上 fpf (`Q_inf_centralizer_eq_bot_of_mem_KSet` / `conjQByK_fixed_eq_one`)
 * `[K,X] ≠ 1`: さもなくば `X ≤ C_V(K) = W = ⊥` で `X ≠ ⊥` に矛盾
-* `K` 巡回 + coprime 作用 ⟹ `K = C_K(X) × [K,X]` で `X` は `[K,X]` 上 fpf
-  ⟹ `[K,X] ⋊ X` は Frobenius (`IsFrobeniusGroup` の構成が要る)
+* `K` 巡回 + coprime 作用 ⟹ `⁅K, X⁆ ⊓ C_G(X) = ⊥`
+  (`BG.Ch3.commutator_inf_centralizer_eq_bot_of_isCommutative`,
+  `S13_Corollary132.lean:273`; Peterfalvi Appendices は既に BG Ch1/Ch2/Ch3 を import 済)
+* `X` は素数位数なので `Isaacs.Ch06.isFrobeniusGroup_of_prime_complement_fixedFree`
+  (`FrobeniusGroup.lean:258`) で `IsFrobeniusGroup` が直接組める
+  (要 `IsComplement'` + `⁅K,X⁆ ≠ ⊥` + fpf)
 
 ### Sz 分岐は `st` の位数で即死
 

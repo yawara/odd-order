@@ -318,6 +318,83 @@ theorem exists_ne_one_centralized_by_complement_of_kernel_not_centralizes
   by_contra hn1
   exact hcon ⟨n, hnK, hn1, hfix⟩
 
+/-- **Peterfalvi (9.1), the order corollary (ambient form).**  Let a Frobenius group `U ⋊ E`
+(kernel `U`, complement `E`), realised as subgroups of `G` with `U ⊔ E ≤ N_G(N)`, act coprimely
+on a finite solvable subgroup `N`.  If the *kernel* `U` acts **fixed-point-freely** on `N`
+(`C_N(U) = 1`), then `|N| = |C_N(E)|^{|E|}`.
+
+This is the ambient-subgroup packaging of `wielandt_fixedPoint_trivial_U_fixed`, companion to
+`frobenius_kernel_centralizes_of_complement_fpf` (which packages the other corollary).  It is the
+form Peterfalvi Part II, Ch. III §1 needs: with `U = [K, P]` and `E = P` acting on `Q` (and on
+`Q₀`), the kernel is fixed-point-free because `K` already is, and the conclusion
+`|Q| = |C_Q(P)|^{|P|}` is what contradicts the `PSL(2, ℓ)` branch of Ch. I §3 Proposition 1(c). -/
+theorem natCard_eq_pow_natCard_inf_centralizer_of_kernel_fpf {G : Type*} [Group G] [Finite G]
+    {N U E : Subgroup G} (hUEnorm : U ⊔ E ≤ Subgroup.normalizer (N : Set G))
+    (hUE : Ch06.IsFrobeniusGroup ↥(U ⊔ E) (U.subgroupOf (U ⊔ E)) (E.subgroupOf (U ⊔ E)))
+    (hsolv : IsSolvable ↥N)
+    (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥(U ⊔ E)))
+    (hUfpf : ∀ n ∈ N, (∀ u ∈ U, u * n * u⁻¹ = n) → n = 1) :
+    Nat.card ↥N = Nat.card ↥(N ⊓ Subgroup.centralizer (E : Set G)) ^ Nat.card ↥E := by
+  classical
+  letI act : MulDistribMulAction ↥(U ⊔ E) ↥N :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
+      (Subgroup.inclusion hUEnorm)
+  set φ : ↥(U ⊔ E) →* MulAut ↥N := MulDistribMulAction.toMulAut ↥(U ⊔ E) ↥N with hφ
+  have hφ_coe : ∀ (a : ↥(U ⊔ E)) (x : ↥N), ((φ a) x : G) = (a : G) * (x : G) * (a : G)⁻¹ :=
+    fun _ _ => rfl
+  let act' : CoprimeFrobeniusAction ↥(U ⊔ E) ↥N :=
+    { U := U.subgroupOf (U ⊔ E), E := E.subgroupOf (U ⊔ E), frobenius := hUE,
+      H_solvable := hsolv, φ := φ, coprime_order := hcop }
+  -- `C_N(U) = 1` translates to `act'.fixedByU = ⊥`.
+  have hU : act'.fixedByU = ⊥ := by
+    rw [eq_bot_iff]
+    intro n hn
+    rw [Subgroup.mem_bot]
+    refine OneMemClass.coe_eq_one.mp (hUfpf (n : G) n.2 (fun u hu => ?_))
+    have huUE : u ∈ U ⊔ E := (le_sup_left : U ≤ U ⊔ E) hu
+    have hfix := (mem_fixedSubgroup.mp hn) ⟨u, huUE⟩ (Subgroup.mem_subgroupOf.mpr hu)
+    have hco := hφ_coe ⟨u, huUE⟩ n
+    rw [hfix] at hco
+    exact hco.symm
+  have key := wielandt_fixedPoint_trivial_U_fixed act' hU
+  -- identify `C_N(E)` and `|E|`
+  have hE : act'.fixedByE = (Subgroup.centralizer (E : Set G)).subgroupOf N := by
+    ext n
+    constructor
+    · intro hn
+      refine Subgroup.mem_subgroupOf.mpr (Subgroup.mem_centralizer_iff.mpr fun e he => ?_)
+      have heUE : e ∈ U ⊔ E := (le_sup_right : E ≤ U ⊔ E) he
+      have hfix := (mem_fixedSubgroup.mp hn) ⟨e, heUE⟩ (Subgroup.mem_subgroupOf.mpr he)
+      have hco := hφ_coe ⟨e, heUE⟩ n
+      rw [hfix] at hco
+      calc e * (n : G) = (e * (n : G) * e⁻¹) * e := by group
+        _ = (n : G) * e := by rw [← hco]
+    · intro hn
+      refine mem_fixedSubgroup.mpr fun l hl => ?_
+      have hlE : (l : G) ∈ E := Subgroup.mem_subgroupOf.mp hl
+      have hcent := Subgroup.mem_centralizer_iff.mp (Subgroup.mem_subgroupOf.mp hn) (l : G) hlE
+      refine Subtype.ext ?_
+      rw [hφ_coe l n]
+      calc (l : G) * (n : G) * (l : G)⁻¹ = ((n : G) * (l : G)) * (l : G)⁻¹ := by rw [hcent]
+        _ = (n : G) := by group
+  have hEcard : Nat.card ↥act'.fixedByE = Nat.card ↥(N ⊓ Subgroup.centralizer (E : Set G)) := by
+    rw [hE]
+    have h1 : Nat.card ↥((Subgroup.centralizer (E : Set G)).subgroupOf N) =
+        Nat.card ↥(Subgroup.centralizer (E : Set G) ⊓ N) := by
+      rw [← Subgroup.inf_subgroupOf_right]
+      exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (inf_le_right : Subgroup.centralizer (E : Set G) ⊓ N ≤ N)).toEquiv
+    rw [h1, inf_comm]
+  have hEexp : Nat.card ↥act'.E = Nat.card ↥E := by
+    change Nat.card ↥(E.subgroupOf (U ⊔ E)) = Nat.card ↥E
+    have h1 : Nat.card ↥(E.subgroupOf (U ⊔ E)) = Nat.card ↥(E ⊓ (U ⊔ E)) := by
+      rw [← Subgroup.inf_subgroupOf_right]
+      exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (inf_le_right : E ⊓ (U ⊔ E) ≤ U ⊔ E)).toEquiv
+    rw [h1, inf_eq_left.mpr (le_sup_right : E ≤ U ⊔ E)]
+  rw [hEcard, hEexp] at key
+  exact key
+
 end FrobeniusCentralizer
 
 end OddOrder.GroupTheory

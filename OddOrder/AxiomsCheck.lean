@@ -9779,6 +9779,8 @@ fully unconditional (axiom-clean).**  Likewise its corollaries and the (13.17.b)
 -- coprimely on a finite solvable `N` with `C_N(E) = 1` has `U ≤ C_G(N)`.  The §8-free Wielandt step
 -- of (13.16): `K W₂` with `C_{Q₁}(W₂) = 1` ⟹ `K` centralizes the Maschke complement `Q₁`.
 #assert_only_allowed_axioms OddOrder.GroupTheory.frobenius_kernel_centralizes_of_complement_fpf
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.natCard_eq_pow_natCard_inf_centralizer_of_kernel_fpf
 
 -- Group-cardinality form of the kernel-FPF identity (†) ([Is] Thm 15.16, issue 2053):
 -- `|V| = |C_V(E)|^{|E|}` for a Frobenius-like `U ⋊ E = L` acting on an elementary abelian
