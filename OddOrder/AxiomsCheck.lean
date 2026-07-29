@@ -13788,6 +13788,7 @@ counting argument (`FixedPoints.finrank_eq_card`) directly in `RingAut F`: `fixe
 #assert_only_allowed_axioms OddOrder.RingAut.exists_pow_eq
 #assert_only_allowed_axioms OddOrder.exists_pow_eq_of_pow_natCard_div_eq_one
 #assert_only_allowed_axioms OddOrder.RingAut.exists_ne_zero_mul_pow_eq
+#assert_only_allowed_axioms OddOrder.RingAut.exists_generator_pow_natCard_fixedSet
 
 /-! **`C_V(C_{Q₀}(P)) = PW`** (issue 0164, 2026-07-29).
 `Peterfalvi/Appendices/Suzuki/GaloisCentralizer.lean`, Part II, Ch. III §1 Proposition p. 117
