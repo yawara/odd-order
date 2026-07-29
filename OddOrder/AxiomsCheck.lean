@@ -13874,10 +13874,21 @@ Ch. III §1 Proposition が `F/Z(F)` 側から持ち上げた元 `x` を `Q`-成
 
 `K ⊴ D` (`K_normal`, Ch. I §2 Prop 2) から `X ≤ D` に対し `⁅K, X⁆ ≤ K` かつ
 `X` は `⁅K, X⁆` を正規化する。`⁅K, X⁆ ≠ 1` は `W = 1` から: さもなくば `X` は
-`K` を中心化し `X ≤ C_V(K) = W = 1` となる。 -/
+`K` を中心化し `X ≤ C_V(K) = W = 1` となる。
+
+`isFrobeniusGroup_commutator_K_sup` が Frobenius 性、
+`natCard_eq_pow_natCard_inf_centralizer` が Wielandt の帰結
+`|N| = |C_N(X)|^{|X|}` (H-不変な 2-部分群 N ≤ Q すべてに対して)。
+⚠ 互いに素性 `p ∤ |K| = q−1` (⟺ `p ∤ q₀−1`) が**仮説として必要** — 書籍は
+無条件に Frobenius と述べるが Ch. III では成り立たない。補集合の場合
+`p ∣ q₀−1` は Hilbert 90 (`RingAut.exists_ne_zero_mul_pow_eq`) で処理する。 -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.commutator_K_le_K
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.commutator_K_ne_bot
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_commutator_K_of_mem
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isFrobeniusGroup_commutator_K_sup
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_eq_pow_natCard_inf_centralizer
