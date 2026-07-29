@@ -6282,3 +6282,56 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
 
 **⟹ Isaacs Ch.1 / Ch.2 / Ch.3 の章末演習は全問完済。次の frontier = Ch.4 §4A**
 (`Problems 4A` は 4A.1–4A.13 の 13 問。Ch.4 の section は §4A–§4D の 4 つ)。
+
+## 📊 全章 census 実測 (2026-07-29) — 残りは Ch.9 / Ch.10 のみ
+
+§3F 完済後に「次は Ch.4」と思って `Ch04_Commutators/` を見に行ったところ、
+**§4A–§4D は既に全問形式化済み**だった (`ProblemsExtraspecial` / `ProblemsMaximalClass` /
+`ProblemsWreath*` / `ProblemsCenterIndex` / `ProblemsNilpotencyClass` / `ProblemsHallWitt` …)。
+本 issue 上部の「Ch.4 以降の章末演習は 1 問も形式化されていない」は **stale** だった
+([[verify-port-state-by-number-not-coq-name]] の再現)。そこで全数 census を実測した。
+
+**方法**: 原文 `pdftotext` から `^NX.M.` を全抽出 (書籍側)、repo から
+`Problem NX.M` を全抽出 (実装側) して差分を取る。
+
+| 章 | 節 (問題数) | 状態 |
+|---|---|---|
+| Ch.1 | 1A(9) 1B(2) 1C(7) 1D(4) 1E(6) 1F(2) 1G(4) | ✅ 全問 |
+| Ch.2 | 2A(8) 2B(6) 2C(1) 2D(2) | ✅ 全問 |
+| Ch.3 | 3A(9) 3B(8) 3C(8) 3D(4) 3E(5) 3F(5) | ✅ 全問 |
+| Ch.4 | 4A(13) 4B(5) 4C(3) 4D(7) | ✅ 全問 |
+| Ch.5 | 5A(8) 5B(3) 5C(13) 5D(6) 5E(3) | ✅ 全問 |
+| Ch.6 | 6A(10) 6B(9) 6C(2) | ✅ 全問 |
+| Ch.7 | 7A(6) 7C(1) | ✅ 全問 |
+| Ch.8 | 8A(13) 8B(10) 8C(6) 8D(6) | ✅ 全問 |
+| **Ch.9** | **9A(8) 9B(5) 9C(3) 9D(4)** | **❌ 0 問** |
+| **Ch.10** | **10A(7) 10B(2) 10C(1)** | **❌ 0 問** |
+
+* 素の差分では 1F.1 / 3C.1 も欠落に見えたが **誤検出**: どちらも実装済みで、docstring が
+  `**1F.1**` / `**Isaacs 3C.1 (Hall D-定理, Wielandt)**` と `Problem ` 前置なしで書かれて
+  いるだけ (`ProblemsBrodkey.lean` / `Ch03/Basic.lean` の `hall_D`)。
+* Isaacs 配下は sorry-free (census 時点)。
+
+**⟹ 残りは Ch.9 (20 問) + Ch.10 (10 問) の計 30 問。文書順で Ch.9 §9A から。**
+
+## Ch.9 (More on Subnormality) §9A — 着手 (2026-07-29)
+
+書籍 p. 277 (`references/isaacs/pages/isaacs-p277-290.png` で statement 確定。
+`⊲` はすべて単一 = **normal** であって subnormal ではない — [[mmd-collapses-subnormal-symbol]])。
+
+* **9A.1** `F*(G) ⊆ H ⊆ G` ⟹ `E(H) = E(G)`。
+* **9A.2** 任意の有限群の socle は「abelian 群 × semisimple 群」。
+* **9A.3** `N ⊴ G` (`G` semisimple) なら `N` は「`N` に含まれる `G` の極小正規部分群」の積。
+* **9A.4** `E = E(G)`, `N ⊴ E` なら `N = M Y` (`M` = `N` に含まれる `G` の component の積,
+  `Y = N ∩ Z(E)`)。⚠ 書籍は `Y = M ∩ Z(E)` と誤植 (それだと `Y ≤ M` で `MY = M`)。
+* **9A.5** `H ⊴ G`, `C` が `H` に含まれない `G` の component なら `⁅H, C⁆ = 1`。
+* **9A.6** `H ⊴ G`, `C_G(H) ≤ H` なら `E(G) ≤ H`。
+* **9A.7** 非可換な極小正規部分群 `N` の単純直積因子の族 `X` に `G` は共役で推移的に作用。
+* **9A.8** characteristically simple な群は同型な単純群の直積。
+
+**repo の既存資産** (`Ch09_MoreSubnormality/`): `layer G` (= `E(G)`, `Layer.lean`) /
+`IsComponent` (`Components.lean`) / `genFitting` (= `F*`, `GeneralizedFitting.lean`) /
+`Semisimple.lean` / `SubnormalSocle.lean` / `Quasisimple.lean`。
+とくに **`LayerRestriction.lean` の Lemma 9.25 (`F(G) = 1` の場合の `E(G) = E(H)`)** が
+9A.1 の特殊ケースで、証明の型がそのまま使える (component ごとに「`G` の component と
+一致する」か「全部を中心化して `C_G(F*) ≤ F*` に落ちる」かの二分)。
