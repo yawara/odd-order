@@ -106,7 +106,9 @@ type C / type D なら `S/Q₀` は `𝐅₂[K]`-加群で `S/Q₀ = X ⊕ Y` (`
 - [x] case (2) の PSU 排除 — **2026-07-29 完了 (書籍と別経路: 位数の数え上げ)**
 - [x] case (3) の `st` 位数 3 パート — **type C/D 側 2026-07-29 完了**
 - [x] case (3) の `st` 位数 3 パート — **type B 側も 2026-07-29 完了 (無条件)**
-- [ ] case (3) の `W ≠ 1` パート (Frobenius `[K,P] ⋊ P`)
+- [x] case (3) の PSL 分岐排除 — **2026-07-29 完了** (Frobenius 論法は不要になった)
+- [ ] case (3) の `W ≠ 1` パート — **[issue 0164](0164-psu3-sylow-normalizer-centralizer.md) に gate**
+- [ ] Suzuki 2-群の位数二分法 `|P| = |Z(P)|²` (type A) / `|Z(P)|³` (type B/C/D) — 3 分岐の組み立ての前提
 - [ ] 3 分岐の組み立て (Proposition 本体)
 
 ⚠ 上流優先 + 文書順に従い、**gated な部分 (PSU 計算) が出ても止まらない**:
@@ -415,3 +417,27 @@ K-部分群の平方根 fibre から位数 4 の元を直接出して PSL 分岐
 
 ⟹ **`W ≠ 1` は `PSU(3,ℓ)` の構造計算 (issue 0164) を待つ**。それまでは
 case (3) の残りを仮説パラメータ化して前倒しする。
+
+
+## 次の前提: Suzuki 2-群の位数二分法 (2026-07-29 実測)
+
+Proposition 本体 (3 分岐の disjunction) の組み立てには、書籍が
+「Appendix III の定理」で使う**位数の二分法**が要る:
+
+> Suzuki 2-群 `P` は `|P| = |Z(P)|²` (type A) または `|P| = |Z(P)|³` (type B/C/D)。
+
+**repo に無い** (2026-07-29 実測):
+* `higmanClassification_of_isSuzuki2Group` は型の disjunction を出すが**位数は言わない**
+* `XiLengthFromCard.lean` は `|P| = q³ ⟹ ξ-length 3` の**向きだけ**
+  (`hasXiLengthThree_of_card_eq_cube`)。逆向き (型 ⟹ 位数) は無い
+* 各型の `*Data` は `equivModel : P ≃* TypeXModel …` を持つので、
+  **モデルの位数**から出る: `TypeXModel = QuadraticExtension q basis
+  = BilinearTwistedProduct (q.toBilin basis)` は `W × V` 型ゆえ
+  `Nat.card = |W| * |V|`。type A は `V = W = F` で `|F|²`、
+  type B/C/D は `V = F × F`, `W = F` で `|F|³`。
+* あわせて `Z(P) = inl.range` (位数 `|F|`) の同定が要る
+  (`range_inl_le_center` は片側包含のみ; 逆包含は非可換性から)。
+
+⚠ 部分的な代替: `K` が `Q₀^#` 上推移的なので平方写像の fibre 数え上げから
+`(|Q₀|−1) ∣ (|Q|/|Q₀| − 1)` が出て `|Q| = |Q₀|^{k+1}` (`k ≥ 1`) までは言える。
+上限 `k ≤ 2` が Higman (ξ-length ≤ 3) の内容で、そこが未 export。
