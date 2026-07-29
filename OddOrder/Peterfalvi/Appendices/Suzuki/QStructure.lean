@@ -428,6 +428,70 @@ lemma mem_D_of_odd_orderOf_of_mem_centralizer_KSet {k : G} (hk : k ∈ hyp.KSet)
   exact ⟨MulAction.mem_stabilizer_iff.mpr hfixα,
     MulAction.mem_stabilizer_iff.mpr hfixβ⟩
 
+/-! ## `C_H(s) = QV` -/
+
+open scoped Pointwise
+
+/-- `Q` centralizes the distinguished involution: `s ∈ Q₀ ≤ C_G(Q)`
+(`Q0_le_centralizer_Q`). -/
+theorem Q_le_centralizer_distinguishedInvolution :
+    hyp.Q ≤ Subgroup.centralizer {hyp.distinguishedInvolution} := by
+  intro q hq
+  rw [Subgroup.mem_centralizer_singleton_iff]
+  have hs : hyp.distinguishedInvolution ∈ Subgroup.centralizer (hyp.Q : Set G) :=
+    hyp.Q0_le_centralizer_Q
+      ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
+  exact Subgroup.mem_centralizer_iff.mp hs q hq
+
+/-- **`C_H(s) = QV`, in decomposed form.**  An element of `H` centralizing the
+distinguished involution `s` factors as `q v` with `q ∈ Q` and `v ∈ V`.
+
+`H = QD` (`Q_mul_D_eq_H`) writes `x = q d`; since `Q` already centralizes `s`
+(`Q_le_centralizer_distinguishedInvolution`), the factor `d` centralizes `s`
+too, and `V = C_D(s)` (`V_eq_centralizer_distinguishedInvolution`, Ch. I
+Prop 5). -/
+theorem exists_mem_Q_mem_V_of_mem_H_of_commute_distinguishedInvolution
+    {x : G} (hxH : x ∈ hyp.H)
+    (hxs : Commute x hyp.distinguishedInvolution) :
+    ∃ q ∈ hyp.Q, ∃ v ∈ hyp.V, x = q * v := by
+  set s := hyp.distinguishedInvolution with hs
+  have hmem : x ∈ (hyp.Q : Set G) * (hyp.D : Set G) := by
+    rw [hyp.Q_mul_D_eq_H]; exact hxH
+  obtain ⟨q, hq, d, hd, hqd⟩ := Set.mem_mul.mp hmem
+  have hqs : Commute q s :=
+    Subgroup.mem_centralizer_singleton_iff.mp
+      (hyp.Q_le_centralizer_distinguishedInvolution hq)
+  have hds : Commute d s := by
+    have hcancel : q * (d * s) = q * (s * d) := by
+      calc q * (d * s) = (q * d) * s := by group
+        _ = x * s := by rw [hqd]
+        _ = s * x := hxs
+        _ = s * (q * d) := by rw [hqd]
+        _ = (s * q) * d := by group
+        _ = (q * s) * d := by rw [hqs.eq]
+        _ = q * (s * d) := by group
+    exact mul_left_cancel hcancel
+  refine ⟨q, hq, d, ?_, hqd.symm⟩
+  rw [hyp.V_eq_centralizer_distinguishedInvolution]
+  exact ⟨hd, Subgroup.mem_centralizer_singleton_iff.mpr hds⟩
+
+/-- **`C_H(s) = QV`** (Peterfalvi Part II, Ch. I Prop 5 packaging).
+
+`Q` centralizes `s` outright and `V = C_D(s)`, so the centralizer of `s` in
+`H = QD` is exactly `QV`. -/
+theorem inf_centralizer_distinguishedInvolution_eq_sup :
+    hyp.H ⊓ Subgroup.centralizer {hyp.distinguishedInvolution} =
+      hyp.Q ⊔ hyp.V := by
+  refine le_antisymm (fun x hx => ?_) (sup_le ?_ ?_)
+  · obtain ⟨q, hq, v, hv, rfl⟩ :=
+      hyp.exists_mem_Q_mem_V_of_mem_H_of_commute_distinguishedInvolution hx.1
+        (Subgroup.mem_centralizer_singleton_iff.mp hx.2)
+    exact Subgroup.mul_mem_sup hq hv
+  · exact le_inf hyp.Q_le_H hyp.Q_le_centralizer_distinguishedInvolution
+  · refine le_inf (hyp.V_le_D.trans hyp.D_le_H) ?_
+    rw [hyp.V_eq_centralizer_distinguishedInvolution]
+    exact inf_le_right
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

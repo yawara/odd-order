@@ -83,6 +83,36 @@ lemma VtoVbar_eq_one_iff (v : ↥hyp.V) :
     rw [QuotientGroup.eq_one_iff]
     exact h
 
+/-! ## `V` is abelian when `W = 1` -/
+
+/-- **Ch. I §2 Proposition 3**: `V̄ = V/W` is cyclic. -/
+theorem isCyclic_Vbar : IsCyclic ↥hyp.Vbar := by
+  obtain ⟨_F, _hF, _hFin, _A, _hcard, hcyc, -⟩ := hyp.exists_semilinear_equiv
+  exact hcyc
+
+/-- When `W = 1` the point stabilizer `V` is abelian: it embeds into the cyclic
+group `V̄ = V/W` (`VtoVbar_eq_one_iff`, `isCyclic_Vbar`). -/
+theorem isMulCommutative_V_of_W_eq_bot (hW : hyp.W = ⊥) :
+    IsMulCommutative ↥hyp.V := by
+  haveI := hyp.isCyclic_Vbar
+  refine MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center hyp.VtoVbar ?_
+  intro v hv
+  have hvW : (v : G) ∈ hyp.W := (hyp.VtoVbar_eq_one_iff v).mp hv
+  rw [hW, Subgroup.mem_bot] at hvW
+  have : v = 1 := Subtype.ext hvW
+  subst this
+  exact Subgroup.one_mem _
+
+/-- When `W = 1`, every subgroup of `V` is centralized by all of `V`. -/
+theorem V_le_centralizer_of_le_V_of_W_eq_bot (hW : hyp.W = ⊥)
+    {P : Subgroup G} (hPV : P ≤ hyp.V) :
+    hyp.V ≤ Subgroup.centralizer (P : Set G) := by
+  haveI := hyp.isMulCommutative_V_of_W_eq_bot hW
+  intro v hv
+  refine Subgroup.mem_centralizer_iff.mpr fun g hg => ?_
+  exact congrArg (Subtype.val (p := fun z => z ∈ hyp.V))
+    (this.1.comm (⟨g, hPV hg⟩ : ↥hyp.V) ⟨v, hv⟩)
+
 /-! ## The Galois computation -/
 
 /-- **Peterfalvi Part II, Ch. III §1, Proposition** (p. 117): "`V` acts as a

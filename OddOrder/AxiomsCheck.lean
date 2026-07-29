@@ -13798,3 +13798,27 @@ Ch. III §1 Proposition が `C_{G₀}(Ω₁(S₀))` の元を `F` に持ち上�
 #assert_only_allowed_axioms Sylow.not_dvd_natCard_of_natCard_eq
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.CentralizerPSUData.odd_natCard_center_residual
+
+/-! **`C_H(s) = QV` と `W = 1 ⟹ V 可換`** (issue 0164, 2026-07-29).
+Ch. III §1 Proposition が `F/Z(F)` 側から持ち上げた元 `x` を `Q`-成分と `V`-成分に
+分解するための 2 点。
+
+`s ∈ Q₀ ≤ Z(Q)` (`Q0_le_centralizer_Q`) より `Q` は `s` を丸ごと中心化するので、
+`H = QD` の分解 `x = q d` で `d` も `s` を中心化し、`V = C_D(s)` (Ch. I Prop 5) から
+`d ∈ V`。逆向きは自明なので `C_H(s) = Q ⊔ V`。
+
+`V` の可換性は Ch. I §2 Prop 3 の「`V̄` は巡回」(`isCyclic_Vbar`) と、`W = 1` のとき
+`V → V̄` が単射であること (`VtoVbar_eq_one_iff`) から出る。これにより
+`x = q v` の `v` 側が自動的に `C_G(P)` に入り、`q ∈ C_Q(P)` が従う。 -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_le_centralizer_distinguishedInvolution
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_Q_mem_V_of_mem_H_of_commute_distinguishedInvolution
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inf_centralizer_distinguishedInvolution_eq_sup
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isCyclic_Vbar
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isMulCommutative_V_of_W_eq_bot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.V_le_centralizer_of_le_V_of_W_eq_bot
