@@ -104,7 +104,8 @@ type C / type D なら `S/Q₀` は `𝐅₂[K]`-加群で `S/Q₀ = X ⊕ Y` (`
 - [x] **case (2) の指数 4 パート** — **2026-07-29 完了** (`C_Q(P)` が Suzuki 2-群 = PSL 分岐排除)
 - [x] case (2) の `W = 1` パート — **2026-07-29 完了**
 - [x] case (2) の PSU 排除 — **2026-07-29 完了 (書籍と別経路: 位数の数え上げ)**
-- [ ] case (3) の `st` 位数 3 パート
+- [x] case (3) の `st` 位数 3 パート — **type C/D 側 2026-07-29 完了**
+- [ ] case (3) の `st` 位数 3 パート — type B 側 (下記の設計で実装中)
 - [ ] case (3) の `W ≠ 1` パート (Frobenius `[K,P] ⋊ P`)
 - [ ] 3 分岐の組み立て (Proposition 本体)
 
@@ -315,3 +316,64 @@ case (2) 完結時点で `Trichotomy.lean` が 1090 行 ⟹ mathlib 粒度に沿
 * `StructureOfH/Trichotomy.lean` (367 行) — `exists_le_card_eq_prime` と 3 ケースの組み立て
 
 module 名不変ゆえ下流 import は無変更。`OddOrder.lean` / `AxiomsCheck.lean` 配線済。
+
+
+## case (3) 進捗 (2026-07-29)
+
+### 完了した部分
+
+| 定理 | 所在 | 内容 |
+|---|---|---|
+| `mul_titsTwist_injective` | `Suzuki/Field.lean` | `a ↦ a·θ(a)` は体全体で単射 (`θ(θx) = x²` だけで証明) |
+| `RootGroup.sq_inv_mul_eq_one_of_sq_eq` / `StandardTypeAData.sq_inv_mul_eq_one_of_sq_eq` | `Suzuki/{RootGroup,RootSubgroupSuzukiType}.lean` | **type A の平方写像は Ω₁ を法として単射** |
+| `exists_mem_centralizer_of_conj_invariant` | `SquareRootFibres.lean` | 不動点ステップの一般形 |
+| `card_sqFibreIn_eq_card_Q0_of_kInvariant` ほか `*In` 系 | `SquareRootFibres.lean` | fibre 機構を `S` から K-不変 `X` (`Q₀ ≤ X ≤ Q`、位数 `\|Q₀\|²`) へ一般化 |
+| `inf_eq_Q0_of_ne_of_kInvariant` | `SquareRootFibres.lean` | 相異なる 2 つの K-部分群は `Q₀` で交わる |
+| `false_of_typeA_centralizer_of_two_kSubgroups` | `Trichotomy.lean` | **case (3) の矛盾本体** |
+| `orderOf_st_eq_three_of_two_kSubgroups` | `Trichotomy.lean` | 2 つの K-部分群 ⟹ `orderOf (st) = 3` |
+| `liftCentralQuotient` + 4 補題 / `exists_two_kSubgroups_of_card_cube` | `TwoKSubgroups.lean` (新 leaf) | **Higman (d) を G の言葉へ** |
+| `isKSubgroupSquare_map_conj` / `map_conj_eq_self_of_unique` / `conj_mem_of_unique_of_le_V` | `TwoKSubgroups.lean` | 奇位数の `P` は 2 元集合を交換できない (`g` の平方根 `h = g^((p+1)/2)` を取るだけ) |
+| `exists_two_kSubgroups_unique_of_card_cube` | `TwoKSubgroups.lean` | **`¬IsTypeB` ⟹ K-部分群はちょうど 2 つ** |
+| `orderOf_st_eq_three_of_card_cube_of_not_isTypeB` | `Trichotomy.lean` | **type C/D 側の case (3) `st` 位数 3 が完結** |
+
+### 残り (1): type B 側の設計 — 数え上げでなく Maschke で行く
+
+書籍は「位数 4 の元が生成する K-部分群 (1 つ目) + 位数 `q²` の K-部分群は `q+1` 個」
+という**数え上げ**で 2 つ目を得るが、`q+1` の計算には `End_K(M) = 𝐅_q` 相当の加群論が要る。
+**より短い経路を採る**:
+
+1. **1 つ目**: Sz 分岐なら `C_Q(P)` は Suzuki 2-群 = 非可換 ⟹ 位数 4 の元 `v ∈ C_Q(P)` が在る。
+   `v̄ ∈ S/Q₀` は `P` 不動で `≠ 1`。`N := ⟨v̄^K⟩` は `K`-不変
+   (`P` は `v̄` を固定し `K ⊴ D` を正規化するので **`P`-不変でもある**)。
+2. **`\|N\| = q` を出す** (type B のときの鍵): `S/Q₀ = X̄ ⊕ Ȳ` で
+   `e : X̄ ≅_K Ȳ` が在る (type B = 和因子が K-同変同型;
+   `IsTypeB.exists_isomorphicOrderQModuleSplit`)。`v̄ = x·y` と分解して
+   * `y = 1` / `x = 1` なら `N ⊆ X̄` または `Ȳ` で位数 ≤ q
+   * 両方 ≠ 1 なら **`K` は `Ȳ^#` 上推移的** (`restrict_transitive_of_fixedPointFree_card`)
+     なので `k·(e x) = y` なる `k ∈ K` が在り、**graph**
+     `N' := {z · (k·(e z)) : z ∈ X̄}` が `v̄` を含む位数 `q` の `K`-部分加群。
+     `⟨v̄^K⟩ ⊆ N'` ゆえ `\|N\| ≤ q`。
+3. **2 つ目**: **operator Maschke**
+   (`BG/Ch1_Preliminary/OperatorMaschke.lean` の
+   `exists_aInvariant_complement_of_isElementaryAbelian`) を
+   `E := ↥Q ⧸ Z(↥Q)` (基本アーベル 2-群、`csplit.quotientEA`)、
+   `A := K ⊔ P ≤ D` (**`\|D\|` は奇** = `hyp.D_odd` ゆえ `\|A\|` も奇で `\|E\|` と互素)、
+   `U := N` に当てて `A`-不変な補群 `N'` (位数 `q`) を得る。
+   `A`-不変 ⟹ `K`-不変かつ `P`-不変。⟹ `N`, `N'` の lift が求める `X ≠ Y`。
+
+必要な新規プラミング: `conjQByD : ↥hyp.D →* MulAut ↥hyp.Q` (既存の
+`conjQByK` / `conjQByW` と同型の構成) とその `K ⊔ P` への制限。
+
+### 残り (2): `W ≠ 1` (Frobenius)
+
+書籍: `W = 1` とすると case (2) 同様 `C_V(C_{Q₀}(P)) = P`、`F/Z(F) ≇ PSU(3,ℓ)`、
+`st` 位数 3 ゆえ `C_S(P)` 基本アーベルの場合になる。しかし `[K,P] ⋊ P` は `S/Q₀` 上の
+Frobenius 群で `[K,P]` は不動点自由 ⟹ `C_{S/Q₀}(P) ≠ 1` で矛盾。
+
+⟹ 必要なのは (i) `C_S(P)` 基本アーベル ⟹ `C_{S/Q₀}(P) = 1`、
+(ii) Frobenius 群の補群は不動点を持つ (repo の `CoprimeFrobeniusKernel` 系を実測)。
+
+### 残り (3): Ch.I §3 Lemma 5 で締める
+
+`lemmaFive_of_orderThree` (`WCyclicDivides.lean:352`) が
+`st` 位数 3 + `W ≠ 1` から **type B** を出す。これは**完成形で repo に在る**。
