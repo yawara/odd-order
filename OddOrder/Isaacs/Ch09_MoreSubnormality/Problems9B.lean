@@ -9,6 +9,7 @@ import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Group
 import OddOrder.Isaacs.Ch09_MoreSubnormality.AutTower
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
+import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 
 /-!
 # Isaacs §9B の演習 (書籍 pp. 284-285)
@@ -21,6 +22,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9B
 * **9B.2** `isCompleteGroup_autTowerType_one_of_normal_range` — `Z(G) = 1` で `G` の像が
   `G₃ = Aut(Aut(G))` で正規なら `Aut(G)` は complete (= tower は `G₂` で止まる)。
   ⚠ 書籍の「`i ≤ 2`」はこの形に**再解釈**して形式化した (issue 1055 参照)。
+* **9B.3** `isCompleteGroup_mulAut_of_isSemisimpleGroup` — `G` semisimple なら `Aut(G)` は
+  complete (`E(Aut G) = Inn(G)` が characteristic なので 9B.2 が使える)。
 
 書籍の statement はページ画像 `references/isaacs/pages/isaacs-p284-297.png` /
 `isaacs-p285-298.png` で確定 (⚠ 9B.5 の `A, B ⊲⊲ G` は **subnormal**)。
@@ -216,7 +219,7 @@ theorem isCompleteGroup_autTowerType_one_of_normal_range.{u} {G : Type u} [Group
 
 end -- 9B.2
 
-section /- 9B.3 の部品: E(Aut G) と Inn(G) (p. 285) -/
+section /- 9B.3: G semisimple なら Aut(G) は complete (p. 285) -/
 
 /-- `K` が `H` のすべての自己同型で保たれる (= characteristic) なら, `K` の `Aut(H)` での像
 `{τ_k | k ∈ K}` は `Aut(H)` で**正規**。`α τ_k α⁻¹ = τ_{α k}` (Lemma 9.11 の計算) から。
@@ -237,6 +240,66 @@ theorem layer_mulAut_le_innAut [Finite G] (hZ : Subgroup.center G = ⊥) :
   rw [centralizer_innAut_eq_bot hZ]
   exact bot_le
 
-end -- 9B.3 の部品
+/-- `S ⊴ G` なら `S.map conj` は `Inn(G)` に正規化される
+(`τ_{g} τ_s τ_{g}⁻¹ = τ_{g s g⁻¹}` と `S` の正規性)。 -/
+theorem innAut_le_normalizer_map_conj {S : Subgroup G} [S.Normal] :
+    innAut G ≤ Subgroup.normalizer ((S.map (MulAut.conj : G →* MulAut G) :
+      Subgroup (MulAut G)) : Set (MulAut G)) := by
+  rintro _ ⟨g, rfl⟩
+  rw [Subgroup.mem_normalizer_iff_map_conj_eq, Subgroup.map_map]
+  have hcomp : ((MulAut.conj (MulAut.conj g : MulAut G)).toMonoidHom.comp
+      (MulAut.conj : G →* MulAut G))
+      = (MulAut.conj : G →* MulAut G).comp (MulAut.conj g).toMonoidHom :=
+    MonoidHom.ext fun s => mulAut_conj_conj (MulAut.conj g) s
+  rw [show ((MulAut.conj (MulAut.conj g : MulAut G)) : MulAut G →* MulAut G)
+      = (MulAut.conj (MulAut.conj g : MulAut G)).toMonoidHom from rfl, hcomp,
+    ← Subgroup.map_map, map_conj_eq_self_of_normal]
+
+/-- **`G` semisimple なら `Inn(G) ≤ E(Aut G)`**: `G` の単純正規因子 `S` の像
+`S.map conj` は `S ⊴ Inn G ⊴ Aut G` で subnormal かつ quasisimple, すなわち
+`Aut(G)` の component。 -/
+theorem innAut_le_layer_mulAut [Finite G] (hss : IsSemisimpleGroup G) :
+    innAut G ≤ layer (MulAut G) := by
+  obtain ⟨𝒳, h𝒳, hsup⟩ := hss
+  have hZ : Subgroup.center G = ⊥ := center_eq_bot_of_semisimpleFamily h𝒳 hsup
+  have hIm : innAut G = (sSup 𝒳).map (MulAut.conj : G →* MulAut G) := by
+    rw [hsup, ← MonoidHom.range_eq_map]
+    rfl
+  rw [hIm, (Subgroup.gc_map_comap (MulAut.conj : G →* MulAut G)).l_sSup]
+  refine iSup₂_le fun S hS => ?_
+  obtain ⟨hSnorm, hSsimple, hSnab⟩ := h𝒳 S hS
+  haveI := hSnorm
+  have hle : S.map (MulAut.conj : G →* MulAut G) ≤ innAut G := Subgroup.map_le_range _ _
+  have e : ↥S ≃* ↥(S.map (MulAut.conj : G →* MulAut G)) :=
+    Subgroup.equivMapOfInjective S _ (conj_injective hZ)
+  refine IsComponent.le_layer ⟨?_, ?_⟩
+  · refine Subgroup.IsSubnormal.trans hle ?_ (innAut.normal (G := G)).isSubnormal
+    exact Subgroup.Normal.isSubnormal
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hle).mpr innAut_le_normalizer_map_conj)
+  · haveI := hSsimple
+    refine isQuasisimple_of_isSimpleGroup_not_isMulCommutative e.symm.isSimpleGroup ?_
+    exact fun _ => hSnab (isMulCommutative_of_surjective e.symm.toMonoidHom e.symm.surjective)
+
+/-- **Isaacs Problem 9B.3** (書籍 p. 285) ⭐: `G` が semisimple なら `Aut(G)` は
+**complete**, したがって `G` の automorphism tower は高々 2 種類の群しか含まない。
+
+`E(Aut G) = Inn(G)` (`≤` は 9A.6, `≥` は各単純正規因子が component) で `Inn(G)` は
+layer ゆえ characteristic, すると `G` の像が `G₃` で正規になり 9B.2 が使える。 -/
+theorem isCompleteGroup_mulAut_of_isSemisimpleGroup [Finite G] (hss : IsSemisimpleGroup G) :
+    IsCompleteGroup (MulAut G) := by
+  have hZ : Subgroup.center G = ⊥ := hss.center_eq_bot
+  have hEq : layer (MulAut G) = innAut G :=
+    le_antisymm (layer_mulAut_le_innAut hZ) (innAut_le_layer_mulAut hss)
+  have hchar : ∀ α : MulAut (MulAut G),
+      (innAut G).map (α : MulAut G →* MulAut G) ≤ innAut G := by
+    intro α
+    rw [← hEq]
+    exact le_of_eq (map_layer_mulEquiv α)
+  have hnormal : ((autTowerEmb G 0 2).range).Normal := by
+    rw [range_autTowerEmb_two]
+    exact normal_map_conj_of_map_le hchar
+  exact isCompleteGroup_autTowerType_one_of_normal_range hZ hnormal
+
+end -- 9B.3
 
 end OddOrder.Isaacs.Ch09
