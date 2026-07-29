@@ -32,8 +32,37 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.2 Subnormality
 - [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
       **§3D 🎉 完済 (2026-07-29)**: 3D.1(a)(b) / 3D.2 / 3D.3 / 3D.4 / 3D.5 全問
-      (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。**次の frontier = §3E**
-      (3E.1-3E.x, coprime action)。
+      (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
+      **§3E 進行中 (2026-07-29)**: 3E.1 の Hint 前半 ✅ / 3E.3 ✅
+      (新 leaf **`Ch04_Commutators/Problems3E.lean`**)。残り = 3E.1 本体 / 3E.2 / 3E.4 / 3E.5。
+
+### §3E の置き場と統制情報 (2026-07-29)
+
+⚠ **§3E の演習は `Ch04_Commutators/Problems3E.lean` に置く**。§3E の主定理群
+(Thm 3.23 A-不変 Sylow / Thm 3.24 Glauberman / Thm 3.27-3.30) は Ch.4 の交換子機構を
+要するため `Ch04_Commutators/ForwardFromCh03.lean` に置かれており、演習も同じ層でないと
+import できない (Ch03 → Ch04 は逆向き)。
+
+* ✅ **3E.1 Hint 前半** `exists_ne_one_fixed_of_isPGroup_of_dvd`:
+  `p`-群 `A` が `G` に作用し `p ∣ |G|` なら `C_G(A) ≠ 1`。
+  ⚠ 書籍の Hint は Sylow 経由を示唆するが、**`A` の `G` そのものへの作用に
+  `IsPGroup.card_modEq_card_fixedPoints` を当てるだけ**で済む (`|G| ≡ |C_G(A)| mod p`)。
+* ✅ **3E.3** `smul_eq_self_of_trivial_on_normal_and_quotient`:
+  `g` を固定すると `a ↦ g⁻¹(φ a g)` が `A →* ↥N` の**準同型**になる
+  (`A` が `N` に自明に作用するので cocycle 条件が積になる)。像の位数は `|A|` と `|N|` の
+  両方を割るので自明。⚠ 書籍 Hint の「`A` を巡回群としてよい」は**不要**だった。
+
+**3E.1 本体の証明経路 (確定済、次の実装対象)**:
+* `G` 可解の場合: `Γ := G ⋊ A` の中で `G` に含まれる極小正規部分群 `M` を取る
+  (`Ch02.exists_isMinimalNormal_le_of_normal`)。`M ≤ G` は可解なので
+  `solvable_minimal_normal_isElementaryAbelian` で elementary abelian、
+  `Γ`-正規だから `A`-不変。
+* `A` 可解の場合: `|A|` + `|G|` の帰納。`B ⊴ A` 極小正規 (elementary abelian `p`-群) を取る。
+  * `B` が `G` に自明に作用 ⟹ `A/B` の作用に帰着 (`|A|` 減少)。
+  * `C_G(B) ≠ 1` かつ `C_G(B) < G` ⟹ `A` は `C_G(B)` に作用 (`B ⊴ A`) ので `|G|` 減少。
+  * `C_G(B) = 1` ⟹ 上の Hint 前半の対偶で `p ∤ |G|`, すなわち `(|B|,|G|) = 1`。
+    Thm 3.23 で `B`-不変 Sylow `q` が存在し、Thm 3.23(b) より `C_G(B) = 1` から**一意**。
+    一意なので `A` (が `B` を正規化する) で不変 ⟹ 求めるもの。
 
 ### 3D.1(b) の基盤 `Ch03_SplitExtensions/PiLength.lean` (2026-07-29 landing)
 
