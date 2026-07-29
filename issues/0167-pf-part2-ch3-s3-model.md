@@ -78,14 +78,18 @@ Appendix III Definition 3 により `S` は中心拡大
 | Appendix III Prop 2 (`B(n,1)` の自己同型) | `Suzuki2Groups/AutomorphismClassification.lean` | ✅ |
 | Ch. I §3 Lemma 5 | `StructureOfH/*` `lemmaFive_of_orderThree` | ✅ |
 | (C2) の供給 | `CaseABConclusion.lean` `theoremAConclusion_or_caseC2` (0166) | ✅ |
-| Appendix III Prop 1 (`θ=1` の `S/Q₀ ≅ E`) | 要実測 | ❓ |
-| Appendix III Lemma 1(c) (拡大の同値) / 1(d) (`U` は 2 群) | 要実測 | ❓ |
-| Appendix III Lemma 2(c) (`χ` の展開) | 要実測 | ❓ |
-| Zassenhaus [H] I.18.3 (補群の共役性) | mathlib `SchurZassenhaus` 系 or 自作 | ❓ |
+| Appendix III Prop 1 (`θ=1` の体モデル) | `Suzuki2Groups/FieldModel.lean` | ✅ |
+| Appendix III Lemma 1(a)(b) | `Suzuki2Groups/QuadraticExtensions.lean` | ✅ |
+| Appendix III Lemma 1(c) (拡大の同値) / 1(d) (`U` は 2 群) | `GroupTheory/CentralExtensionAutomorphisms.lean` | ✅ |
+| Appendix III Lemma 2(a)(b)(c) | `GroupTheory/RepresentationTheory/SemilinearFieldAut.lean` + `Algebra/QuadraticMapCoordinates.lean` (issue 0148) | ✅ |
+| Zassenhaus [H] I.18.3 (補群の共役性) | `OddOrder/Mathlib/SchurZassenhausConj.lean` | ✅ |
+
+**⟹ 必要な Appendix III の道具はすべて repo に在る**。§3 本体は
+「既存部品を (C2) の `S` に当てて標準形へ移す」作業で、新規の外部理論は要らない。
 
 ## やること (段ごとに leaf を切る想定)
 
-- [ ] 上表の ❓ を実測して埋める (先に調査 leaf を作らず、grep + 番号で確認)
+- [x] 上表の ❓ を実測 (2026-07-29: 全部 ✅ だった)
 - [ ] 段 (1): `S/Q₀ ≅ E` と `w` のスカラー化
 - [ ] 段 (2): `σ` の存在
 - [ ] 段 (3): `S ≅ S₁`
