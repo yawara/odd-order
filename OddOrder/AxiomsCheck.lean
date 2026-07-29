@@ -14272,3 +14272,40 @@ give `g = 1` — contradicting `g ≠ 1`. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.eq_one_of_sq_eq_one_of_mem_K
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjRight_mul_tConjLeft_notMem_Q0
+
+/-! **🎯 The Proposition of Peterfalvi Part II, Ch. III §2** (issue 0165, 2026-07-29).
+`StructureOfH/OrderFivePairing.lean`, pp. 118–119:
+
+> If case (b) of the proposition of §1 holds, then `(SK) ∪ (SKtS)` is a subgroup of `G`.
+
+The last non-conjugacy of the book's system of representatives is the field computation of
+p. 119.  Identifying `S/Q₀` with `𝐅_q` and `K` with `𝐅_q^×` and writing `α` for the coordinate
+(`exists_quotient_field_coordinate`), a conjugacy `(r r^{-k₁})^a = r r^{-k₂}` gives
+
+* (5) `1 + k₂ = a(1 + k₁)` — apply `α`;
+* (6) `ℓ₂k₂ = aℓ₁k₁` — apply the identification to `h(x^a) = a h(x) a` with `h = ℓ²k²`, then
+  take square roots (injective in characteristic `2`);
+* (7) `ℓ₂⁻¹k₂⁻² + k₂⁻¹ = a⁻¹(ℓ₁⁻¹k₁⁻² + k₁⁻¹)` — apply `α` to `f(x^a) = a f(x) a⁻¹`.
+
+With `xᵢ = ℓᵢ⁻¹(kᵢ⁻¹+1)` and `yᵢ = kᵢ⁻¹+ℓᵢ`, (5)/(6) gives `x₁ = x₂`, (6)·(7) gives
+`y₁ = y₂`, and `(x+1)k⁻¹ = xy+1` (characteristic `2`) reads `(x+1)k₁⁻¹ = (x+1)k₂⁻¹`, so
+`k₁ = k₂` unless `x = 1`.  And `x = 1` would give `α(fg) = 0`, i.e. `f g ∈ Q₀`, which
+`tConjRight_mul_tConjLeft_notMem_Q0` forbids.
+
+`caseBSubgroup` is the resulting subgroup; `tConjMiddle_mem_K_of_case_b` is the Proposition's
+actual content (`h(x) ∈ K` for all `x ∈ S#`, i.e. `t S t ⊆ S K t S`), now with no residual
+hypothesis beyond case (b) and the standing structure of the type A Suzuki `2`-group `S`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.eq_of_charTwo_pairing
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.eq_of_sq_eq_sq_of_charTwo
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.charTwo_pairing_degenerate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coord_tConjTriple_values
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.structureConjugator_mul_conj_inv_pairwise
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_mem_K_of_case_b
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.caseBSubgroup
