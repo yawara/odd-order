@@ -29,9 +29,11 @@ This leaf carries **case (1)** — the book's
 > Proposition 5) and so normalizes `xQ₀` which is of cardinality prime to `p`,
 > whence `C_S(P) ⊄ Q₀`, which is a contradiction.  Thus `S = Q₀`.
 
-— and, of **case (2)** (`S` non-abelian of order `q²`), everything up to the
-`PSU(3, ℓ)` computation the book defers to "as can be checked": the exponent-`4`
-step, the branch selection `C_Q(P)` is a Suzuki `2`-group, and `W = 1`.
+— and **case (2)** (`S` non-abelian of order `q²`), whose conclusions are
+`W = 1` and `orderOf (st) = 5`.  The book's `PSU(3, ℓ)` exclusion, which it
+defers with "as can be checked", is replaced by a count against the cardinality
+relation Ch. I §3 Proposition 1(c) carries in that branch; see
+`natCard_inf_centralizer_le_sq`.
 
 ## Main results
 
@@ -56,6 +58,9 @@ step, the branch selection `C_Q(P)` is a Suzuki `2`-group, and `W = 1`.
   containing an element of order `4` is `Q`, via transitivity of `K` on `Q₀^#`
   and on `(Q/Q₀)^#`.
 * `W_eq_bot_of_isSuzuki2Group` — **case (2)'s `W = 1`**.
+* `natCard_inf_centralizer_le_sq`, `orderOf_st_eq_five_of_isSuzuki2Group` —
+  **case (2)'s `orderOf (st) = 5`**, with the `PSU(3, ℓ)` alternative excluded
+  by `|C_Q(P)| ≤ |C_{Q₀}(P)|²`.
 -/
 
 set_option autoImplicit false
@@ -613,6 +618,95 @@ theorem Q_le_of_kInvariant_of_sq_ne_one
   rw [hzeq]
   exact X.mul_mem hyk (X.inv_mem (hQ0le hc))
 
+/-- **`s` is a non-trivial element of `C_{Q₀}(P)`** for any `P ≤ V`, since
+`V = C_D(s)` (Ch. I §1 Proposition 5).  Hence `|C_{Q₀}(P)| ≥ 2`. -/
+theorem two_le_natCard_inf_Q0_centralizer {P : Subgroup G} (hPV : P ≤ hyp.V) :
+    2 ≤ Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer (P : Set G)) := by
+  have hsC : hyp.distinguishedInvolution ∈ Subgroup.centralizer (P : Set G) := by
+    refine Subgroup.mem_centralizer_iff.mpr fun g hg => ?_
+    have hgV : g ∈ hyp.V := hPV hg
+    rw [hyp.V_eq_centralizer_distinguishedInvolution] at hgV
+    exact (Subgroup.mem_centralizer_iff.mp hgV.2 hyp.distinguishedInvolution rfl).symm
+  have hs : hyp.distinguishedInvolution ∈
+      hyp.Q0 ⊓ Subgroup.centralizer (P : Set G) :=
+    ⟨⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩, hsC⟩
+  rcases Nat.lt_or_ge
+    (Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer (P : Set G))) 2 with hlt | hge
+  · exfalso
+    have h1 : Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer (P : Set G)) = 1 := by
+      have := Nat.card_pos (α := ↥(hyp.Q0 ⊓ Subgroup.centralizer (P : Set G)))
+      omega
+    rw [Subgroup.eq_bot_of_card_eq _ h1, Subgroup.mem_bot] at hs
+    exact hyp.distinguishedInvolution_ne_one hs
+  · exact hge
+
+/-- **`|C_Q(P)| ≤ |C_{Q₀}(P)|²`** — the count that rules out the `PSU(3, ℓ)`
+alternative in case (2) of the Ch. III §1 Proposition (p. 117).
+
+In case (2) squaring maps `Q` into `Q₀` (exponent `4`,
+`sq_mem_Q0_of_isSuzuki2Group`) with every fibre inside a single `Q₀`-coset
+(`inv_mul_mem_Q0_of_sq_eq`).  Both properties survive intersecting with any
+centralizer, so squaring gives `C_Q(P) → C_{Q₀}(P)` with at most `|C_{Q₀}(P)|`
+fibres, each of size at most `|C_{Q₀}(P)|`.
+
+**Deviation from the book.**  Peterfalvi rules out `PSU(3, ℓ)` here by the
+structural computation "if `G₀ = PSU(3, ℓ)`, `S₀ ∈ Syl₂(G₀)` and
+`N_{G₀}(S₀) = S₀ ⋊ D₀`, then, as can be checked, `C_{D₀}(Ω₁(S₀)) ≠ 1`", which he
+does not carry out.  The repository's Ch. I §3 Proposition 1(c) already records
+the exact cardinality relation `|C_Q(P)| = |C_{Q₀}(P)|³` of that branch
+(`CentralizerPSUData.natCard_cQ_eq_cQ0_cube`), so the present bound contradicts
+it outright once `|C_{Q₀}(P)| ≥ 2` (`two_le_natCard_inf_Q0_centralizer`).  Same
+conclusion, no `PSU(3, ℓ)` Sylow-normalizer computation. -/
+theorem natCard_inf_centralizer_le_sq
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    (hcard : Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0) (P : Subgroup G) :
+    Nat.card ↥(hyp.Q ⊓ Subgroup.centralizer (P : Set G)) ≤
+      Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer (P : Set G)) ^ 2 := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  set C : Subgroup G := Subgroup.centralizer (P : Set G) with hC
+  set A : Finset G := ((hyp.Q ⊓ C : Subgroup G) : Set G).toFinset with hA
+  set B : Finset G := ((hyp.Q0 ⊓ C : Subgroup G) : Set G).toFinset with hB
+  have hmemA : ∀ y : G, y ∈ A ↔ y ∈ hyp.Q ∧ y ∈ C := by
+    intro y
+    simp only [hA, Set.mem_toFinset, SetLike.mem_coe, Subgroup.mem_inf]
+  have hmemB : ∀ y : G, y ∈ B ↔ y ∈ hyp.Q0 ∧ y ∈ C := by
+    intro y
+    simp only [hB, Set.mem_toFinset, SetLike.mem_coe, Subgroup.mem_inf]
+  -- squaring sends `C_Q(P)` into `C_{Q₀}(P)`
+  have hmap : ∀ y ∈ A, y ^ 2 ∈ B := by
+    intro y hy
+    obtain ⟨hyQ, hyC⟩ := (hmemA y).mp hy
+    exact (hmemB _).mpr ⟨hyp.sq_mem_Q0_of_isSuzuki2Group hQsuz hyQ, C.pow_mem hyC 2⟩
+  have hsum := Finset.card_eq_sum_card_fiberwise hmap
+  -- every fibre lies in a coset of `C_{Q₀}(P)`
+  have hfib : ∀ u ∈ B, (A.filter fun y => y ^ 2 = u).card ≤ B.card := by
+    intro u hu
+    rcases Finset.eq_empty_or_nonempty (A.filter fun y => y ^ 2 = u) with he | ⟨y₀, hy₀⟩
+    · simp [he]
+    obtain ⟨hy₀A, hy₀u⟩ := Finset.mem_filter.mp hy₀
+    obtain ⟨hy₀Q, hy₀C⟩ := (hmemA y₀).mp hy₀A
+    refine Finset.card_le_card_of_injOn (fun y => y₀⁻¹ * y) ?_ fun a _ b _ hab =>
+      mul_left_cancel hab
+    intro y hy
+    obtain ⟨hyA, hyu⟩ := Finset.mem_filter.mp hy
+    obtain ⟨hyQ, hyC⟩ := (hmemA y).mp hyA
+    refine (hmemB _).mpr ⟨?_, C.mul_mem (C.inv_mem hy₀C) hyC⟩
+    rcases eq_or_ne u 1 with rfl | hu1
+    · exact hyp.Q0.mul_mem
+        (hyp.Q0.inv_mem (hyp.mem_Q0_of_mem_Q_of_sq_eq_one hy₀Q hy₀u))
+        (hyp.mem_Q0_of_mem_Q_of_sq_eq_one hyQ hyu)
+    · exact hyp.inv_mul_mem_Q0_of_sq_eq hcard hy₀Q hyQ (hy₀u.trans hyu.symm)
+        (by rw [hy₀u]; exact hu1) (by rw [hy₀u]; exact ((hmemB u).mp hu).1)
+  have hAcard : A.card = Nat.card ↥(hyp.Q ⊓ C) := by
+    rw [hA, Set.toFinset_card, ← Nat.card_eq_fintype_card]; rfl
+  have hBcard : B.card = Nat.card ↥(hyp.Q0 ⊓ C) := by
+    rw [hB, Set.toFinset_card, ← Nat.card_eq_fintype_card]; rfl
+  rw [← hAcard, ← hBcard]
+  calc A.card = ∑ u ∈ B, (A.filter fun y => y ^ 2 = u).card := hsum
+    _ ≤ ∑ _u ∈ B, B.card := Finset.sum_le_sum hfib
+    _ = B.card ^ 2 := by rw [Finset.sum_const, smul_eq_mul, sq]
+
 /-- **`[K, W] = 1`** — a Chapter I fact the Ch. III §1 Proposition needs but that
 Chapters I and II never state.
 
@@ -852,6 +946,82 @@ theorem isSuzuki2Group_centralizer_of_card_sq
     exact sc.toHypothesis.distinguishedInvolution_ne_one h1
   · exact det.cQ_isSuzuki2Group
   · exact det.cQ_isSuzuki2Group
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (2), conclusion** (p. 117):
+if `S = Q` is a Suzuki `2`-group of order `q²`, then `st` has order `5`.
+
+The book:
+
+> But, if `G₀ = PSU(3, ℓ)`, `S₀` is a Sylow `2`-subgroup of `G₀` and
+> `N_{G₀}(S₀) = S₀ ⋊ D₀`, then, as can be checked, `C_{D₀}(Ω₁(S₀)) ≠ 1`.  It
+> follows that `F/Z(F)` is not isomorphic to `PSU(3, ℓ)` and so, since `C_S(P)`
+> has exponent `4`, `F/Z(F) ≅ Sz(ℓ)` and `st` has order `5`.
+
+Both exclusions are carried out against Ch. I §3 Proposition 1(c):
+
+* `PSL(2, ℓ)` is out because its payload makes `C_Q(P)` elementary abelian while
+  the exponent-`4` step puts an element of order `4` there
+  (`exists_mem_centralizer_mem_sqFibre_of_isSuzuki2Group`);
+* `PSU(3, ℓ)` is out because its payload asserts `|C_Q(P)| = |C_{Q₀}(P)|³`,
+  which exceeds the bound `|C_Q(P)| ≤ |C_{Q₀}(P)|²` forced by squaring
+  (`natCard_inf_centralizer_le_sq`) as soon as `|C_{Q₀}(P)| ≥ 2` — and `s` is a
+  non-trivial element of `C_{Q₀}(P)`.  This replaces the book's unperformed
+  `PSU(3, ℓ)` Sylow-normalizer computation; see
+  `natCard_inf_centralizer_le_sq` for the discussion.
+
+What survives is the `Sz(ℓ)` branch, whose payload is `orderOf (st) = 5`. -/
+theorem orderOf_st_eq_five_of_isSuzuki2Group
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q)
+    (hcard : Nat.card ↥sc.toHypothesis.Q = Nat.card ↥sc.toHypothesis.Q0 ^ 2)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ sc.toHypothesis.V) :
+    orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 5 := by
+  classical
+  have hPne : P ≠ ⊥ := by
+    intro h
+    rw [h, Subgroup.card_bot] at hPcard
+    exact hp.one_lt.ne hPcard
+  letI := sc.toHypothesis.centralizerQuotientMulAction hPV
+  obtain ⟨data⟩ := sc.toHypothesis.centralizer_trichotomy_of_induction hPV hPne
+    (sc.twoRank_centralizer_ge_two P hPV p hp hPcard) ind
+  have hconv : ∀ H : Subgroup G,
+      Nat.card ↥(H.subgroupOf (Subgroup.centralizer (P : Set G))) =
+        Nat.card ↥(H ⊓ Subgroup.centralizer (P : Set G)) := by
+    intro H
+    rw [← Subgroup.inf_subgroupOf_right]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (inf_le_right : H ⊓ Subgroup.centralizer (P : Set G) ≤ _)).toEquiv
+  rcases data.branch with ⟨d, -, det⟩ | ⟨d, -, det⟩ | ⟨d, -, det⟩
+  · -- the `PSL(2, ℓ)` branch would make `C_Q(P)` elementary abelian
+    exfalso
+    obtain ⟨y, hyT, hyC⟩ := sc.exists_mem_centralizer_mem_sqFibre_of_isSuzuki2Group
+      hQsuz hcard hp hPcard hPV
+    have hmem : (⟨⟨y, hyC⟩, Subgroup.mem_subgroupOf.mpr hyT.1⟩ :
+        ↥(sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G))))
+        ^ 2 = 1 := det.cQ_isElementaryAbelian.2 _
+    have h1 : y ^ 2 = 1 := by
+      simpa using congrArg (fun z => ((z : ↥(Subgroup.centralizer (P : Set G))) : G))
+        (congrArg (Subtype.val (p := fun z =>
+          z ∈ sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G))))
+          hmem)
+    rw [hyT.2] at h1
+    exact sc.toHypothesis.distinguishedInvolution_ne_one h1
+  · exact det.distinguishedProduct_order
+  · -- the `PSU(3, ℓ)` branch asserts `|C_Q(P)| = |C_{Q₀}(P)|³`
+    exfalso
+    have hb := sc.toHypothesis.natCard_inf_centralizer_le_sq hQsuz
+      (sc.toHypothesis.card_sqFibre_eq_card_Q0_of_isSuzuki2Group hQsuz hcard) P
+    have h3 := det.natCard_cQ_eq_cQ0_cube
+    simp only [hconv] at h3
+    have h2 := sc.toHypothesis.two_le_natCard_inf_Q0_centralizer hPV
+    rw [h3] at hb
+    set c := Nat.card ↥(sc.toHypothesis.Q0 ⊓ Subgroup.centralizer (P : Set G))
+      with hcdef
+    have hpow : c ^ 3 = c ^ 2 * c := by ring
+    have hcpos : 0 < c ^ 2 := pow_pos (by omega) 2
+    have hmul : c ^ 2 * 2 ≤ c ^ 2 * c := Nat.mul_le_mul_left _ h2
+    omega
 
 /-- **Peterfalvi Part II, Ch. III §1, Proposition, case (2): `W = 1`** (p. 117).
 

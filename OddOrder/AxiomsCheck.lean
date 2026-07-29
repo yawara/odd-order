@@ -13433,3 +13433,28 @@ element of order `4` is all of `S`, which is a two-layer transitivity statement:
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.Q_le_of_kInvariant_of_sq_ne_one
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.W_eq_bot_of_isSuzuki2Group
+
+/-! **Peterfalvi Part II, Ch. III §1, Proposition, case (2) complete: `st` has order `5`**
+(issue 0163, 2026-07-29).  `Appendices/Suzuki/StructureOfH/Trichotomy.lean`, p. 117.
+
+The last step of case (2) rules out the `PSU(3, ℓ)` alternative of Ch. I §3 Proposition 1(c).
+
+**Deviation from the book, deliberate.**  Peterfalvi argues "if `G₀ = PSU(3, ℓ)`, `S₀` is a
+Sylow `2`-subgroup of `G₀` and `N_{G₀}(S₀) = S₀ ⋊ D₀`, then, as can be checked,
+`C_{D₀}(Ω₁(S₀)) ≠ 1`", a structural computation inside `PSU(3, ℓ)` that the text does not
+perform.  The repository's `CentralizerPSUData` already records the exact cardinality relation
+of that branch, `|C_Q(P)| = |C_{Q₀}(P)|³`, and case (2) contradicts it by counting:
+
+* `natCard_inf_centralizer_le_sq` — in case (2) squaring maps `C_Q(P)` into `C_{Q₀}(P)` with
+  every fibre inside a coset of `C_{Q₀}(P)` (`sq_mem_Q0_of_isSuzuki2Group` and
+  `inv_mul_mem_Q0_of_sq_eq`), so `|C_Q(P)| ≤ |C_{Q₀}(P)|²`.
+* `two_le_natCard_inf_Q0_centralizer` — `s ∈ C_{Q₀}(P)` because `P ≤ V = C_D(s)`, so
+  `|C_{Q₀}(P)| ≥ 2` and `|C_{Q₀}(P)|³ > |C_{Q₀}(P)|²`.
+* `orderOf_st_eq_five_of_isSuzuki2Group` — with `PSL(2, ℓ)` excluded by the element of order
+  `4` and `PSU(3, ℓ)` by the count, the surviving `Sz(ℓ)` branch gives `orderOf (st) = 5`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.two_le_natCard_inf_Q0_centralizer
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_inf_centralizer_le_sq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_five_of_isSuzuki2Group
