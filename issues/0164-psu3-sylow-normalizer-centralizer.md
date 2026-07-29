@@ -723,3 +723,42 @@ Wielandt (9.1) の ambient 版 `natCard_eq_pow_natCard_inf_centralizer_of_kernel
 `exists_two_kSubgroups_unique_of_card_cube` + `conj_mem_of_unique_of_le_V`、
 および isotypic 側は `p ∤ q+1` からの固定点数え上げ) と、上の配線だけ。
 **新規の重い代数はもう無い。**
+
+
+## ⚠ 抽象補題には `σ ≠ 1` が要る (2026-07-29)
+
+「`E` 上の素数位数 `p` の自己同型 `g` は非自明な固定点を持つ」は**そのままでは偽**。
+
+`finrank F E = 1` なので基底 `e₀` を取ると `g(a • e₀) = σ(a)·c • e₀`
+(`g(e₀) = c • e₀`)。もし **`σ = 1`** なら `g` は `F`-線形、すなわち `c ∈ Fˣ` による
+スカラー倍で、`a·c = a` の非零解は無い ⟹ `C_E(g) = 1`。
+(`σ = 1` は「`g` が `End_T(E) = F` と可換」= 「`g` 自身がスカラー」の場合。)
+
+### 本件では `σ ≠ 1` が保証される
+
+`σ` は `F` への `g` の共役作用で、`T = K` の像 (= スカラー `Fˣ`) の上では
+`k ↦ x k x⁻¹` に一致する。もし `σ = 1` なら `x` は `K` を中心化し
+`x ∈ C_V(K) = W = ⊥` となって `x ≠ 1` に矛盾。
+⟹ **`W = 1` がここでも効く** (Galois の箇所とは別の使われ方)。
+
+### 抽象補題の確定形
+
+```
+(hE : IsElementaryAbelian p₀ E) [Nontrivial E]
+(ψ : T →* MulAut E) (hψ : Function.Injective ψ)   -- T 可換有限
+(hirr : ∀ U, IsAInvariant ψ U → U = ⊥ ∨ U = ⊤)
+{g : MulAut E} (hgord : orderOf g = p) (hp : p.Prime)
+{cT : T ≃* T} (hcT : ∀ t, ψ (cT t) = g * ψ t * g⁻¹) (hcTne : cT ≠ 1)
+⟹ ∃ e ≠ 1, g e = e
+```
+
+証明手順:
+1. `exists_field_semilinear` で `F`, `finrank F E = 1`, `σ` を得る。
+2. `cT ≠ 1` + `ψ` 単射 ⟹ `σ ≠ 1` ⟹ `B := ⟨σ⟩` は位数 `p`。
+3. `exists_generator_pow_natCard_fixedSet` で `B` の標準生成元 `τ` (`a ↦ a^s`,
+   `|F| = s^p`) を取り、`σ = τ^j` (`gcd(j,p) = 1`) から
+   **`g` を `g^{j'}` に取り替える** (`jj' ≡ 1 mod p`)。`⟨g⟩` は不変なので
+   固定点集合も不変。
+4. `g^{j'}` は `τ`-半線形。基底座標で `a ↦ c·τ(a) = c·a^s`。
+   `(g^{j'})^p = 1` から `N(c) = c^{(|F|−1)/(s−1)} = 1`。
+5. `exists_ne_zero_mul_pow_eq` で非零固定点 ⟹ 非自明な `e ∈ E` で `g e = e`。
