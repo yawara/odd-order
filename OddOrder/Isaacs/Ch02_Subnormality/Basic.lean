@@ -290,6 +290,51 @@ theorem socle_ne_bot_of_nontrivial [Finite G] [Nontrivial G] : socle G ≠ ⊥ :
   apply hM.2.1
   exact le_bot_iff.mp (hbot ▸ isMinimalNormal_le_socle hM)
 
+/-- **中心的な極小正規部分群は素数位数** (Isaacs Problem 9C.3 step (c) で使用): `M` が極小正規
+かつ `M ≤ Z(G)` なら `|M|` は素数。
+
+中心的な部分群はすべて `G`-正規なので、極小性から `M` は真の非自明部分群をもたない。任意の
+`1 ≠ x ∈ M` について `⟨x⟩ = M`、さらに素因数 `q ∣ o(x)` に対し `z := x^{o(x)/q} ≠ 1` も
+`⟨z⟩ = M` で `o(z) = q`、ゆえに `|M| = o(z) = q`。 -/
+theorem exists_prime_card_of_isMinimalNormal_of_le_center [Finite G] {M : Subgroup G}
+    (hM : IsMinimalNormal M) (hc : M ≤ Subgroup.center G) :
+    ∃ q : ℕ, q.Prime ∧ Nat.card ↥M = q := by
+  -- 中心的部分群は自動的に正規、極小性から `M` 内の非自明巡回部分群は `M` 自身
+  have hzp : ∀ {z : G}, z ∈ M → z ≠ 1 → Subgroup.zpowers z = M := by
+    intro z hz hz1
+    have hnormal : (Subgroup.zpowers z).Normal := by
+      refine ⟨fun k hk g => ?_⟩
+      have hkM : k ∈ M := (Subgroup.zpowers_le.mpr hz) hk
+      have hcomm : g * k = k * g := Subgroup.mem_center_iff.mp (hc hkM) g
+      rwa [show g * k * g⁻¹ = k by rw [hcomm]; group]
+    rcases hM.2.2 _ hnormal (Subgroup.zpowers_le.mpr hz) with hbot | hMeq
+    · exact absurd (Subgroup.mem_bot.mp (hbot ▸ Subgroup.mem_zpowers z)) hz1
+    · exact hMeq
+  obtain ⟨x, hxM, hx1⟩ : ∃ x ∈ M, x ≠ 1 := by
+    by_contra hall
+    push Not at hall
+    exact hM.2.1 ((Subgroup.eq_bot_iff_forall M).mpr hall)
+  have hord_pos : 0 < orderOf x := orderOf_pos x
+  have hord_ne_one : orderOf x ≠ 1 := fun h => hx1 (orderOf_eq_one_iff.mp h)
+  have hqprime : (orderOf x).minFac.Prime := Nat.minFac_prime hord_ne_one
+  -- `z := x^(o(x)/q)` は位数 `q`
+  set z := x ^ (orderOf x / (orderOf x).minFac) with hzdef
+  have hzne : z ≠ 1 := by
+    have hlt : orderOf x / (orderOf x).minFac < orderOf x :=
+      Nat.div_lt_self hord_pos hqprime.one_lt
+    have hpos : 0 < orderOf x / (orderOf x).minFac :=
+      Nat.div_pos (Nat.minFac_le hord_pos) hqprime.pos
+    exact pow_ne_one_of_lt_orderOf hpos.ne' hlt
+  have hzq : z ^ (orderOf x).minFac = 1 := by
+    rw [hzdef, ← pow_mul, Nat.div_mul_cancel (Nat.minFac_dvd (orderOf x)),
+      pow_orderOf_eq_one]
+  have hzord : orderOf z = (orderOf x).minFac := by
+    rcases hqprime.eq_one_or_self_of_dvd _ (orderOf_dvd_of_pow_eq_one hzq) with h1 | h
+    · exact absurd (orderOf_eq_one_iff.mp h1) hzne
+    · exact h
+  have hzM : z ∈ M := by rw [hzdef]; exact pow_mem hxM _
+  exact ⟨(orderOf x).minFac, hqprime, by rw [← hzp hzM hzne, Nat.card_zpowers, hzord]⟩
+
 /-! ### Isaacs Thm 2.2 (`H ⊆ F(G) ⇔ H` 冪零 + subnormal) -/
 
 /-- Thm 2.2 逆方向の strong induction を `|G| ≤ n` で外側に出した補助補題.

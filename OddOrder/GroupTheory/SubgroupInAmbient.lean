@@ -471,6 +471,49 @@ theorem subgroupOf_mul_inf_subgroupOf_eq_univ {X Y X₁ : Subgroup G} (hXX₁ : 
     exact Subgroup.mul_mem _ (Subgroup.inv_mem _ haX₁) x.2
   exact ⟨⟨a, haX₁⟩, ha, ⟨b, hbX₁⟩, ⟨hb, hbX₁⟩, Subtype.ext hab⟩
 
+/-- **部分群の集合積は大きい方に吸収される (右吸収)**: `X ≤ Y` なら `X · Y = Y`. -/
+theorem coe_mul_coe_eq_right {X Y : Subgroup G} (h : X ≤ Y) :
+    (X : Set G) * (Y : Set G) = (Y : Set G) := by
+  refine Set.Subset.antisymm ?_ fun y hy => ⟨1, X.one_mem, y, hy, one_mul y⟩
+  rintro z ⟨a, ha, b, hb, rfl⟩
+  exact Y.mul_mem (h ha) hb
+
+/-- **部分群の集合積は大きい方に吸収される (左吸収)**: `Y ≤ X` なら `X · Y = X`. -/
+theorem coe_mul_coe_eq_left {X Y : Subgroup G} (h : Y ≤ X) :
+    (X : Set G) * (Y : Set G) = (X : Set G) := by
+  refine Set.Subset.antisymm ?_ fun x hx => ⟨x, hx, 1, Y.one_mem, mul_one x⟩
+  rintro z ⟨a, ha, b, hb, rfl⟩
+  exact X.mul_mem ha (h hb)
+
+/-- **`Y` が `X` を正規化するなら join は集合積**: `↑(X ⊔ Y) = ↑X * ↑Y`.
+`Subgroup.mul_normal` (`X` が ambient 正規のとき) の normalizer 条件版。
+`X·Y` が積閉・逆元閉であることを normalizer 条件から直接確かめ、`X ⊔ Y` との
+相互包含を取る。 -/
+theorem coe_sup_eq_mul_of_le_normalizer {X Y : Subgroup G}
+    (h : Y ≤ Subgroup.normalizer (X : Set G)) :
+    ((X ⊔ Y : Subgroup G) : Set G) = (X : Set G) * (Y : Set G) := by
+  have hconj : ∀ y ∈ Y, ∀ x ∈ X, y * x * y⁻¹ ∈ X := fun y hy x hx =>
+    (Subgroup.mem_normalizer_iff.mp (h hy) x).mp hx
+  have hmul : ∀ {a b : G}, a ∈ (X : Set G) * (Y : Set G) → b ∈ (X : Set G) * (Y : Set G) →
+      a * b ∈ (X : Set G) * (Y : Set G) := by
+    rintro _ _ ⟨x₁, hx₁, y₁, hy₁, rfl⟩ ⟨x₂, hx₂, y₂, hy₂, rfl⟩
+    exact ⟨x₁ * (y₁ * x₂ * y₁⁻¹), X.mul_mem hx₁ (hconj y₁ hy₁ x₂ hx₂),
+      y₁ * y₂, Y.mul_mem hy₁ hy₂, by group⟩
+  have hinv : ∀ {a : G}, a ∈ (X : Set G) * (Y : Set G) → a⁻¹ ∈ (X : Set G) * (Y : Set G) := by
+    rintro _ ⟨x, hx, y, hy, rfl⟩
+    exact ⟨y⁻¹ * x⁻¹ * y⁻¹⁻¹, hconj y⁻¹ (Y.inv_mem hy) x⁻¹ (X.inv_mem hx), y⁻¹, Y.inv_mem hy,
+      by group⟩
+  let S : Subgroup G :=
+    { carrier := (X : Set G) * (Y : Set G)
+      one_mem' := ⟨1, X.one_mem, 1, Y.one_mem, one_mul 1⟩
+      mul_mem' := hmul
+      inv_mem' := hinv }
+  refine Set.Subset.antisymm (show X ⊔ Y ≤ S from sup_le ?_ ?_) ?_
+  · exact fun x hx => ⟨x, hx, 1, Y.one_mem, mul_one x⟩
+  · exact fun y hy => ⟨1, X.one_mem, y, hy, one_mul y⟩
+  · rintro z ⟨x, hx, y, hy, rfl⟩
+    exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hx) (Subgroup.mem_sup_right hy)
+
 /-- 積分解 `X · Y = G` は join `X ⊔ Y = ⊤` を含意する (逆は一般に偽). -/
 theorem sup_eq_top_of_mul_eq_univ {X Y : Subgroup G}
     (hXY : (X : Set G) * (Y : Set G) = Set.univ) : X ⊔ Y = ⊤ := by
