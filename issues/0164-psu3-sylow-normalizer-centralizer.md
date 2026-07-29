@@ -204,8 +204,38 @@ Ch. I §3 Prop 1(c) の三分岐 (`centralizer_trichotomy_of_induction`) を回�
 
 ### 次の部品 (この順)
 
-1. `Z(F)` が奇位数 (上記 2)
-2. `C_H(s) = Q·V` と `C_{QV}(P) = C_Q(P)·V` (上記 6)
-3. PSU 分岐の組み立て (上記 1–8)
-4. PSL 分岐の Frobenius/Wielandt (上記)
+1. ~~`Z(F)` が奇位数~~ ✅ `CentralizerPSUData.odd_natCard_center_residual`
+   (`StructureOfH/PSUCentre.lean`) + 一般補題 `Sylow.not_dvd_natCard_of_natCard_eq`
+2. ~~`C_H(s) = Q·V`~~ ✅ `inf_centralizer_distinguishedInvolution_eq_sup` /
+   `exists_mem_Q_mem_V_of_mem_H_of_commute_distinguishedInvolution` (`QStructure.lean`)、
+   および `W = 1 ⟹ V 可換` = `isMulCommutative_V_of_W_eq_bot` /
+   `V_le_centralizer_of_le_V_of_W_eq_bot` (`GaloisCentralizer.lean`)。
+   ⚠ 当初想定した coprime 分解 `C_{QV}(P) = C_Q(P)·V` は**不要だった** —
+   `V ≤ C_G(P)` から `q = x v⁻¹ ∈ C_G(P)` が直ちに出る。
+3. **PSU 分岐の組み立て** ← 現在地
+4. PSL 分岐の Frobenius/Wielandt
 5. `W_ne_bot_of_card_cube` を組んで `trichotomy` の `hWcube` 仮説を除去 → 0163 を閉じる
+
+### ⚠ 組み立ての簡略化: 持ち上げは**任意の逆像でよい** (2026-07-29)
+
+当初「`d` を奇位数の元 `x ∈ F` に持ち上げる」と書いたが、**`x` の位数は使わない**。
+矛盾は最後に `d = image(q)` (`q` は 2-元) と「`d` は奇位数 ≠ 1」の衝突で出るので、
+`d` の位数だけが効く。⟹ 中心拡大での奇位数持ち上げ補題は不要。
+
+確定した組み立て (`X` が書籍の `P`):
+
+1. `S := C_Q(X)` は `C = C_G(X)` の Sylow 2 かつ `F` の Sylow 2、その像 `T` は
+   `F/Z(F) ≅ standardPermGroup n` の Sylow 2。
+2. `exists_ne_one_odd_centralizing_involutions_of_sylowTwo` を `T` に当てて
+   `d ≠ 1`, 奇位数, `T` の involution を全部中心化、を得る。
+3. `d` の**任意の**逆像 `x ∈ F` を取る (`d ≠ 1` ⟹ `x ∉ Z(F)`)。
+4. `y ∈ C_{Q₀}(X)` は 2-元でその像は `T` の involution ⟹ `⁅x, y⁆ ∈ Z(F)`。
+   `Z(F)` 奇 (部品 1) + `commute_of_commutatorElement_mem_of_coprime_natCard`
+   ⟹ **`x` は `C_{Q₀}(X)` を中心化**。
+5. 特に `Commute x s` ⟹ `x ∈ C_G(s) ≤ H` (`centralizer_le_H_of_mem_Q`) ⟹
+   `x = q v` (`q ∈ Q`, `v ∈ V`; 部品 2)。
+6. `V ≤ C_G(X)` (部品 2) ⟹ `q = x v⁻¹ ∈ Q ⊓ C = C_Q(X) ≤ F`、また `v ∈ F`。
+7. `q ∈ Q` は `Q₀ ⊇ C_{Q₀}(X)` を中心化する (`Q0_le_centralizer_Q`) ので、
+   `v` も `C_{Q₀}(X)` を中心化 ⟹ `v ∈ C_V(C_{Q₀}(X)) = X ⊔ W = X` (Galois, `W = ⊥`)。
+8. `X ≤ Z(C)` かつ `F ≤ C` ⟹ `X ⊓ F ≤ Z(F)` ⟹ `image(v) = 1` ⟹ `d = image(q)`。
+   `q` は 2-群 `C_Q(X)` の元だから `d` の位数は 2 冪。`d` は奇位数 ≠ 1 ⟹ 矛盾。∎
