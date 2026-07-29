@@ -445,6 +445,67 @@ theorem card_mul_card_inf_le_of_le {P Q C : Subgroup G} (hPQ : P ≤ Q) :
       = Nat.card ((P : Set G) * ((Q ⊓ C : Subgroup G) : Set G)) * Nat.card ↥(P ⊓ C) := hkey.symm
     _ ≤ Nat.card ↥Q * Nat.card ↥(P ⊓ C) := Nat.mul_le_mul_right _ hle
 
+omit [Finite A] [Finite G] in
+/-- `A`-不変部分群 `H` への作用制限の固定部分群は `C_G(A) ⊓ H` (を `↥H` で見たもの)。 -/
+theorem fixedSubgroup_toMulAutHom_top {φ : A →* MulAut G} {H : Subgroup G}
+    (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) :
+    OddOrder.GroupTheory.fixedSubgroup
+        (OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH) (⊤ : Subgroup A)
+      = (OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A)).subgroupOf H := by
+  ext x
+  simp only [OddOrder.GroupTheory.mem_fixedSubgroup, Subgroup.mem_subgroupOf]
+  constructor
+  · exact fun h a ha => congrArg (Subtype.val : ↥H → G) (h a ha)
+  · exact fun h a ha => Subtype.ext (h a ha)
+
+/-- **3E.4 の `p`-部分**: `A`-不変部分群 `H` に対し, `H` の `A`-不変 Sylow `p`-部分群 `P`
+(を `G` の部分群として見たもの) が取れて, `|P|` は `|H|` の `p`-部分,
+`|P ⊓ C_G(A)|` は `|H ⊓ C_G(A)|` の `p`-部分になる (Lemma 3.32 を `↥H` に適用)。 -/
+theorem exists_aInvariant_sylow_card_inf {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
+    (hSolv : IsSolvable A ∨ IsSolvable G)
+    {H : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) {p : ℕ} [Fact p.Prime] :
+    ∃ P : Subgroup G, P ≤ H ∧ OddOrder.Isaacs.Ch03.IsAInvariant φ P ∧
+      Nat.card ↥P = p ^ (Nat.card ↥H).factorization p ∧
+      Nat.card ↥(P ⊓ OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A))
+        = p ^ (Nat.card ↥(H ⊓ OddOrder.GroupTheory.fixedSubgroup φ
+            (⊤ : Subgroup A))).factorization p := by
+  set ρ := OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH with hρ
+  have hCopH : Nat.Coprime (Nat.card A) (Nat.card ↥H) :=
+    hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card H)
+  have hSolvH : IsSolvable A ∨ IsSolvable ↥H := by
+    rcases hSolv with h | h
+    · exact Or.inl h
+    · haveI := h; exact Or.inr inferInstance
+  obtain ⟨P', hP'inv⟩ := exists_aInvariant_sylow (φ := ρ) hCopH hSolvH p
+  have h32 := card_inf_fixedSubgroup_of_aInvariant_sylow (φ := ρ) hCopH hSolvH hP'inv
+  rw [fixedSubgroup_toMulAutHom_top hH] at h32
+  refine ⟨(P' : Subgroup ↥H).map H.subtype, Subgroup.map_subtype_le _, ?_, ?_, ?_⟩
+  · refine OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem.mpr ?_
+    rintro a - ⟨y, hy, rfl⟩
+    exact ⟨ρ a y, hP'inv.smul_mem a hy, rfl⟩
+  · rw [Subgroup.card_map_of_injective H.subtype_injective]
+    exact P'.card_eq_multiplicity
+  · have hmap : ((P' : Subgroup ↥H).map H.subtype)
+        ⊓ OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A)
+        = (((P' : Subgroup ↥H) ⊓ (OddOrder.GroupTheory.fixedSubgroup φ
+            (⊤ : Subgroup A)).subgroupOf H)).map H.subtype := by
+      ext z
+      constructor
+      · intro hz
+        obtain ⟨hz1, hz2⟩ := Subgroup.mem_inf.mp hz
+        obtain ⟨y, hy, rfl⟩ := hz1
+        exact ⟨y, Subgroup.mem_inf.mpr ⟨hy, Subgroup.mem_subgroupOf.mpr hz2⟩, rfl⟩
+      · rintro ⟨y, hy, rfl⟩
+        exact Subgroup.mem_inf.mpr ⟨⟨y, (Subgroup.mem_inf.mp hy).1, rfl⟩,
+          Subgroup.mem_subgroupOf.mp (Subgroup.mem_inf.mp hy).2⟩
+    have hcard : Nat.card ↥((OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A)).subgroupOf H)
+        = Nat.card ↥(H ⊓ OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A)) := by
+      rw [← Subgroup.inf_subgroupOf_left]
+      exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left :
+        H ⊓ OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A) ≤ H)).toEquiv
+    rw [hmap, Subgroup.card_map_of_injective H.subtype_injective, h32, hcard]
+
 end -- 3E
 
 end OddOrder.Isaacs.Ch04
