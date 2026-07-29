@@ -13536,13 +13536,26 @@ Ch. III §1 Proposition needs the same content as plain subgroups of `G`.
   determines the original.
 * `exists_two_kSubgroups_of_card_cube` — the packaged conclusion: a Suzuki `2`-group `Q` with
   `|Q| = |Q₀|³` has two distinct `K`-invariant subgroups `X ≠ Y` with `Q₀ ≤ X, Y ≤ Q` and
-  `|X| = |Y| = |Q₀|²`.  (What case (3) still needs on top of this is that `P` normalizes two
-  of them.) -/
+  `|X| = |Y| = |Q₀|²`.
+* `isKSubgroupSquare_map_conj` — `V` permutes these subgroups: it normalizes `Q` and `Q₀`, and
+  normalizes `K` because `K ⊴ D` (Ch. I §2 Proposition 2).
+* `map_conj_eq_self_of_unique`, `conj_mem_of_unique_of_le_V` — **"`P` therefore normalizes `X`
+  and `Y`"** when they are the only two: `P` has odd order (`prime_ne_two_of_le_V`) and an
+  odd-order element cannot swap a two-element set, since it has a square root in its own
+  cyclic group and `X^{h²} = X` however `h` acts.  What case (3) still needs on top of this is
+  the uniqueness itself — from non-isomorphic summands (types C, D) or from the count `q + 1`
+  (type B). -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_liftCentralQuotient
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.liftCentralQuotient_injective
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.kInvariant_liftCentralQuotient
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isKSubgroupSquare_map_conj
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.map_conj_eq_self_of_unique
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_of_unique_of_le_V
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_two_kSubgroups_of_card_cube

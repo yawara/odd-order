@@ -43,9 +43,28 @@ open OddOrder.GroupTheory.Suzuki2Group
 open OddOrder.Isaacs.Ch03
 open OddOrder.Higman.Suzuki2Groups
 
-namespace Hypothesis
-
 universe uG uΩ
+
+/-! ## Conjugating a `K`-subgroup by `V` -/
+
+theorem mem_map_conj {G : Type uG} [Group G] {g y : G} {X : Subgroup G} :
+    y ∈ X.map (MulAut.conj g).toMonoidHom ↔ g⁻¹ * y * g ∈ X := by
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    have hx' : g⁻¹ * ((MulAut.conj g).toMonoidHom x) * g = x := by
+      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+      group
+    rwa [hx']
+  · intro h
+    refine ⟨g⁻¹ * y * g, h, ?_⟩
+    simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+    group
+
+theorem map_conj_injective {G : Type uG} [Group G] (g : G) :
+    Function.Injective fun X : Subgroup G => X.map (MulAut.conj g).toMonoidHom :=
+  Subgroup.map_injective (MulAut.conj g).injective
+
+namespace Hypothesis
 
 variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
   (hyp : Hypothesis G Ω)
@@ -156,6 +175,115 @@ theorem kInvariant_liftCentralQuotient
 
 variable (hyp)
 
+/-- **The `K`-subgroups of `S` of order `q²`** — the objects case (3) of the
+Ch. III §1 Proposition works with (p. 117). -/
+def IsKSubgroupSquare (X : Subgroup G) : Prop :=
+  X ≤ hyp.Q ∧ hyp.Q0 ≤ X ∧ (∀ k ∈ hyp.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X) ∧
+    Nat.card ↥X = Nat.card ↥hyp.Q0 ^ 2
+
+variable {hyp}
+
+/-- **`V` permutes the `K`-subgroups of `S` of order `q²`.**
+
+`V ≤ D` normalizes `Q` and `Q₀`, and normalizes `K` because `K ⊴ D`
+(Ch. I §2 Proposition 2); conjugation preserves cardinality. -/
+theorem isKSubgroupSquare_map_conj {g : G} (hg : g ∈ hyp.V) {X : Subgroup G}
+    (hX : hyp.IsKSubgroupSquare X) :
+    hyp.IsKSubgroupSquare (X.map (MulAut.conj g).toMonoidHom) := by
+  obtain ⟨hXQ, hQ0X, hXinv, hXcard⟩ := hX
+  have hgD : g ∈ hyp.D := hyp.V_le_D hg
+  have hgiD : g⁻¹ ∈ hyp.D := hyp.D.inv_mem hgD
+  have hgH : g ∈ hyp.H := hyp.D_le_H hgD
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · rintro y hy
+    have := hXQ (mem_map_conj.mp hy)
+    have hcj := hyp.Q_normal_in_H g hgH _ this
+    rwa [show g * (g⁻¹ * y * g) * g⁻¹ = y from by group] at hcj
+  · intro c hc
+    refine mem_map_conj.mpr (hQ0X ?_)
+    have := hyp.conj_mem_Q0_of_mem_D hgiD hc
+    rwa [show g⁻¹ * c * g⁻¹⁻¹ = g⁻¹ * c * g from by group] at this
+  · intro k hk y hy
+    refine mem_map_conj.mpr ?_
+    have hkK : g⁻¹ * k * g ∈ hyp.K := by
+      have hmem : (⟨g⁻¹, hgiD⟩ * ⟨k, hyp.K_le_D hk⟩ * ⟨g⁻¹, hgiD⟩⁻¹ : ↥hyp.D)
+          ∈ hyp.K.subgroupOf hyp.D :=
+        hyp.K_normal.conj_mem _ (Subgroup.mem_subgroupOf.mpr hk) ⟨g⁻¹, hgiD⟩
+      have := Subgroup.mem_subgroupOf.mp hmem
+      rwa [show ((⟨g⁻¹, hgiD⟩ * ⟨k, hyp.K_le_D hk⟩ * ⟨g⁻¹, hgiD⟩⁻¹ : ↥hyp.D) : G)
+          = g⁻¹ * k * g from by push_cast; group] at this
+    have hy' := hXinv _ hkK _ (mem_map_conj.mp hy)
+    rwa [show (g⁻¹ * k * g) * (g⁻¹ * y * g) * (g⁻¹ * k * g)⁻¹
+        = g⁻¹ * (k * y * k⁻¹) * g from by group] at hy'
+  · rw [← hXcard]
+    exact (Nat.card_congr (Subgroup.equivMapOfInjective X _
+      (MulAut.conj g).injective).toEquiv).symm
+
+/-- **"`P` therefore normalizes `X` and `Y`"** (p. 117, case (3)) when they are
+the only two `K`-subgroups of `S` of order `q²`.
+
+`P` has odd order, so it cannot swap a two-element set: if `g` interchanged `X`
+and `Y`, then the square root `h` of `g` inside `⟨g⟩` — available because `p` is
+odd — would satisfy `X^{h²} = X` either way, contradicting `X^g = Y ≠ X`. -/
+theorem map_conj_eq_self_of_unique {g : G} (hg : g ∈ hyp.V) {p : ℕ}
+    (hodd : Odd p) (hgp : g ^ p = 1)
+    {X Y : Subgroup G} (hX : hyp.IsKSubgroupSquare X) (hne : X ≠ Y)
+    (huniq : ∀ Z : Subgroup G, hyp.IsKSubgroupSquare Z → Z = X ∨ Z = Y) :
+    X.map (MulAut.conj g).toMonoidHom = X := by
+  classical
+  -- `p` is odd, so `g` is a square inside `⟨g⟩`
+  obtain ⟨j, hj⟩ := hodd
+  set h : G := g ^ (j + 1) with hhdef
+  have hhV : h ∈ hyp.V := hyp.V.pow_mem hg _
+  have hsq : h * h = g := by
+    rw [hhdef, ← pow_add, show j + 1 + (j + 1) = p + 1 from by omega, pow_succ,
+      hgp, one_mul]
+  have hcomp : ∀ Z : Subgroup G,
+      (Z.map (MulAut.conj h).toMonoidHom).map (MulAut.conj h).toMonoidHom
+        = Z.map (MulAut.conj g).toMonoidHom := by
+    intro Z
+    ext y
+    rw [mem_map_conj, mem_map_conj, mem_map_conj]
+    rw [show h⁻¹ * (h⁻¹ * y * h) * h = (h * h)⁻¹ * y * (h * h) from by group, hsq]
+  by_contra hXg
+  have hXgY : X.map (MulAut.conj g).toMonoidHom = Y :=
+    (huniq _ (isKSubgroupSquare_map_conj hg hX)).resolve_left hXg
+  have hXh := huniq _ (isKSubgroupSquare_map_conj hhV hX)
+  rcases hXh with hXhX | hXhY
+  · -- `h` fixes `X`, so `g = h²` does too
+    have : X.map (MulAut.conj g).toMonoidHom = X := by
+      rw [← hcomp, hXhX, hXhX]
+    exact hXg this
+  · -- `h` sends `X` to `Y`; then `Y^h = X` by injectivity, so `g = h²` fixes `X`
+    have hYh : Y.map (MulAut.conj h).toMonoidHom = X := by
+      rcases huniq _ (isKSubgroupSquare_map_conj hhV
+        (hXhY ▸ isKSubgroupSquare_map_conj hhV hX)) with hh | hh
+      · exact hh
+      · exact absurd (map_conj_injective h (hXhY.trans hh.symm)) hne
+    have : X.map (MulAut.conj g).toMonoidHom = X := by
+      rw [← hcomp, hXhY, hYh]
+    exact hXg this
+
+/-- **"`P` therefore normalizes `X` and `Y`"** (p. 117, case (3)), elementwise,
+for a subgroup `P ≤ V` of prime order: `p` is odd (`prime_ne_two_of_le_V`), so
+each of its elements fixes both members of a two-element set of `K`-subgroups. -/
+theorem conj_mem_of_unique_of_le_V {P : Subgroup G} {p : ℕ} (hp : p.Prime)
+    (hPcard : Nat.card ↥P = p) (hPV : P ≤ hyp.V)
+    {X Y : Subgroup G} (hX : hyp.IsKSubgroupSquare X) (hne : X ≠ Y)
+    (huniq : ∀ Z : Subgroup G, hyp.IsKSubgroupSquare Z → Z = X ∨ Z = Y) :
+    ∀ g ∈ P, ∀ y ∈ X, g * y * g⁻¹ ∈ X := by
+  intro g hg y hy
+  have hgp : g ^ p = 1 := by
+    have hone := pow_card_eq_one' (G := ↥P) (x := ⟨g, hg⟩)
+    rw [hPcard] at hone
+    simpa using congrArg (Subtype.val (p := fun z => z ∈ P)) hone
+  have hodd : Odd p := hp.odd_of_ne_two (hyp.prime_ne_two_of_le_V hPcard hPV)
+  have hfix := map_conj_eq_self_of_unique (hPV hg) hodd hgp hX hne huniq
+  have hmem : g * y * g⁻¹ ∈ X.map (MulAut.conj g).toMonoidHom := by
+    refine mem_map_conj.mpr ?_
+    rwa [show g⁻¹ * (g * y * g⁻¹) * g = y from by group]
+  rwa [hfix] at hmem
+
 /-! ## Higman clause (d) in `G`-language -/
 
 /-- **Peterfalvi Appendix III, Higman theorem (d), in the ambient group**
@@ -172,13 +300,7 @@ theorem exists_two_kSubgroups_of_card_cube
     (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (hcardQ : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3) :
     ∃ X Y : Subgroup G,
-      X ≤ hyp.Q ∧ hyp.Q0 ≤ X ∧
-        (∀ k ∈ hyp.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X) ∧
-        Nat.card ↥X = Nat.card ↥hyp.Q0 ^ 2 ∧
-      Y ≤ hyp.Q ∧ hyp.Q0 ≤ Y ∧
-        (∀ k ∈ hyp.K, ∀ y ∈ Y, k * y * k⁻¹ ∈ Y) ∧
-        Nat.card ↥Y = Nat.card ↥hyp.Q0 ^ 2 ∧
-      X ≠ Y := by
+      hyp.IsKSubgroupSquare X ∧ hyp.IsKSubgroupSquare Y ∧ X ≠ Y := by
   classical
   have hKcyc : IsCyclic ↥hyp.actualKActor := hyp.actualKActor_isCyclic
   have hreg : ActsRegularlyOnInvolutions hyp.actualKActor :=
@@ -200,12 +322,12 @@ theorem exists_two_kSubgroups_of_card_cube
     intro U hU
     rw [card_liftCentralQuotient, hU, hZcard, sq]
   refine ⟨hyp.liftCentralQuotient csplit.left, hyp.liftCentralQuotient csplit.right,
-    liftCentralQuotient_le_Q _, Q0_le_liftCentralQuotient hZQ0 _,
-    kInvariant_liftCentralQuotient csplit.leftInvariant,
-    hcardlift _ csplit.leftCard,
-    liftCentralQuotient_le_Q _, Q0_le_liftCentralQuotient hZQ0 _,
-    kInvariant_liftCentralQuotient csplit.rightInvariant,
-    hcardlift _ csplit.rightCard, ?_⟩
+    ⟨liftCentralQuotient_le_Q _, Q0_le_liftCentralQuotient hZQ0 _,
+      kInvariant_liftCentralQuotient csplit.leftInvariant,
+      hcardlift _ csplit.leftCard⟩,
+    ⟨liftCentralQuotient_le_Q _, Q0_le_liftCentralQuotient hZQ0 _,
+      kInvariant_liftCentralQuotient csplit.rightInvariant,
+      hcardlift _ csplit.rightCard⟩, ?_⟩
   intro heq
   have hLR : csplit.left = csplit.right := liftCentralQuotient_injective heq
   have hdisj := csplit.complementary.disjoint
