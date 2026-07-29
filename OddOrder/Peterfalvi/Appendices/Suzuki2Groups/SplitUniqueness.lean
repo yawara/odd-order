@@ -184,6 +184,98 @@ theorem nonempty_kEquivariantMulEquiv_of_third_invariant
 
 end ThirdInvariant
 
+/-! ## The converse: isomorphic summands give many invariant subgroups -/
+
+section IsomorphicSummands
+
+variable {K : Type uK} {E : Type uE} [Group K] [Group E] [Finite E]
+
+omit [Finite E] in
+/-- **Isomorphic summands put every element in an invariant subgroup of the
+summand order** — the converse of `nonempty_kEquivariantMulEquiv_of_third_invariant`.
+
+If `E = U₁ ⊕ U₂` with `U₁`, `U₂` `K`-equivariantly isomorphic and `K` transitive
+on `U₂ ∖ {1}`, then for every `v ∈ E` the graph of a suitable `K`-translate of
+the isomorphism is a `K`-invariant subgroup of order `|U₁|` containing `v`.
+
+Peterfalvi uses the resulting family in Part II, Ch. III §1, case (3) as "the
+number of `K`-subgroups of `S` of order `q²` is `q + 1`" (p. 117); only the
+existence of one through a prescribed element is needed. -/
+theorem exists_invariant_mem_of_kEquivariantMulEquiv
+    {rho : K →* MulAut E} (hKcomm : ∀ a b : K, a * b = b * a)
+    (hcomm : ∀ x y : E, x * y = y * x)
+    {U₁ U₂ : Subgroup E} (hU₁inv : IsAInvariant rho U₁)
+    (hU₂inv : IsAInvariant rho U₂) (hcompl : IsCompl U₁ U₂)
+    (e : KEquivariantMulEquiv hU₁inv.restrict hU₂inv.restrict)
+    (htrans : ∀ a b : ↥U₂, a ≠ 1 → b ≠ 1 →
+      ∃ k : K, hU₂inv.restrict k a = b)
+    (v : E) :
+    ∃ N : Subgroup E, IsAInvariant rho N ∧
+      Nat.card ↥N = Nat.card ↥U₁ ∧ v ∈ N := by
+  classical
+  have hcardU : Nat.card ↥U₂ = Nat.card ↥U₁ :=
+    Nat.card_congr e.toMulEquiv.symm.toEquiv
+  -- decompose `v = x * y`
+  haveI : U₁.Normal := ⟨fun n hn g => by
+    rw [hcomm g n, mul_assoc, mul_inv_cancel, mul_one]; exact hn⟩
+  haveI : U₂.Normal := ⟨fun n hn g => by
+    rw [hcomm g n, mul_assoc, mul_inv_cancel, mul_one]; exact hn⟩
+  have hmem : v ∈ ((U₁ ⊔ U₂ : Subgroup E) : Set E) := by
+    rw [hcompl.sup_eq_top]; trivial
+  rw [Subgroup.mul_normal] at hmem
+  obtain ⟨x, hx, y, hy, rfl⟩ := hmem
+  rcases eq_or_ne y 1 with rfl | hy1
+  · exact ⟨U₁, hU₁inv, rfl, by simpa using hx⟩
+  rcases eq_or_ne x 1 with rfl | hx1
+  · exact ⟨U₂, hU₂inv, hcardU, by simpa using hy⟩
+  -- both parts non-trivial: translate the isomorphism so that `x ↦ y`
+  have hex1 : e.toMulEquiv ⟨x, hx⟩ ≠ 1 := by
+    intro h
+    exact hx1 (congrArg Subtype.val (e.toMulEquiv.injective (h.trans (map_one _).symm)))
+  obtain ⟨k, hk⟩ := htrans (e.toMulEquiv ⟨x, hx⟩) ⟨y, hy⟩ hex1
+    (fun h => hy1 (congrArg Subtype.val h))
+  -- the graph of `z ↦ k · e z`
+  letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hcomm }
+  set g : ↥U₁ →* E :=
+    U₂.subtype.comp (((hU₂inv.restrict k).toMonoidHom).comp
+      e.toMulEquiv.toMonoidHom) with hgdef
+  set f : ↥U₁ →* E := U₁.subtype * g with hfdef
+  have hfapply : ∀ z : ↥U₁, f z = (z : E) * (g z) := fun z => rfl
+  have hfinj : Function.Injective f := by
+    rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+    intro z hz
+    rw [MonoidHom.mem_ker, hfapply] at hz
+    have hzmem : (z : E) ∈ U₁ ⊓ U₂ := by
+      refine ⟨z.2, ?_⟩
+      have hzg : (z : E) = (g z)⁻¹ := by
+        rw [eq_inv_iff_mul_eq_one]; exact hz
+      rw [hzg]
+      exact U₂.inv_mem ((hU₂inv.restrict k) (e.toMulEquiv z)).2
+    rw [hcompl.inf_eq_bot, Subgroup.mem_bot] at hzmem
+    exact Subgroup.mem_bot.mpr (Subtype.ext hzmem)
+  refine ⟨f.range, ?_, ?_, ⟨⟨x, hx⟩, ?_⟩⟩
+  · rw [isAInvariant_iff_smul_mem]
+    rintro k' z ⟨w, rfl⟩
+    refine ⟨hU₁inv.restrict k' w, ?_⟩
+    have hkk : (hU₂inv.restrict k) ((hU₂inv.restrict k') (e.toMulEquiv w))
+        = (hU₂inv.restrict k') ((hU₂inv.restrict k) (e.toMulEquiv w)) := by
+      have h1 := congrArg (fun m : MulAut ↥U₂ => m (e.toMulEquiv w))
+        (congrArg (hU₂inv.restrict) (hKcomm k k'))
+      simpa [map_mul] using h1
+    rw [hfapply, hfapply, hgdef]
+    simp only [MonoidHom.coe_comp, Function.comp_apply, MulEquiv.coe_toMonoidHom,
+      Subgroup.coe_subtype]
+    rw [e.equivariant, hkk, map_mul]
+    rfl
+  · exact (Nat.card_congr (Equiv.ofInjective f hfinj)).symm
+  · rw [hfapply, hgdef]
+    simp only [MonoidHom.coe_comp, Function.comp_apply, MulEquiv.coe_toMonoidHom,
+      Subgroup.coe_subtype]
+    rw [hk]
+
+
+end IsomorphicSummands
+
 section SplitEndpoint
 
 variable {K : Type uK} {P : Type uP} [Group K] [Group P] [Finite P]

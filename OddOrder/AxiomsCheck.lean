@@ -13595,5 +13595,24 @@ Maschke** applied to the odd-order operator group.
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.aInvariant_map_of_conj_mem
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_kSubgroupSquare_complement
+
+/-! **The converse of split uniqueness: isomorphic summands give many invariant subgroups**
+(issue 0163, 2026-07-29).  `Appendices/Suzuki2Groups/SplitUniqueness.lean`.
+
+`nonempty_kEquivariantMulEquiv_of_third_invariant` says a third invariant subgroup of the
+summand order forces the summands to be `K`-equivariantly isomorphic.  Case (3) of the
+Ch. III §1 Proposition needs the converse for its type-B half: Peterfalvi phrases it as "every
+element of order `4` in `S` generates a `K`-subgroup of order `q²`, and the number of
+`K`-subgroups of `S` of order `q²` is `q + 1`" (p. 117), but only the existence of one such
+subgroup through a prescribed element is used.
+
+* `exists_invariant_mem_of_kEquivariantMulEquiv` — with `E = U₁ ⊕ U₂`, an equivariant
+  isomorphism `e : U₁ ≅_K U₂` and `K` transitive on `U₂ ∖ {1}`, every `v ∈ E` lies in a
+  `K`-invariant subgroup of order `|U₁|`: decompose `v = x·y`, use transitivity to translate
+  `e` by a `k ∈ K` carrying `e x` to `y`, and take the graph of the result.  The graph is a
+  subgroup because `E` is abelian, `K`-invariant because `K` is abelian and `e` equivariant,
+  and of order `|U₁|` because `U₁ ⊓ U₂ = 1`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.exists_invariant_mem_of_kEquivariantMulEquiv
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB
