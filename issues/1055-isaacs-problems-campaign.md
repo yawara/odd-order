@@ -34,7 +34,8 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       **§3D 🎉 完済 (2026-07-29)**: 3D.1(a)(b) / 3D.2 / 3D.3 / 3D.4 / 3D.5 全問
       (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
       **§3E 進行中 (2026-07-29)**: **3E.1 ✅ (両ケース)** / 3E.3 ✅
-      (新 leaf **`Ch04_Commutators/Problems3E.lean`**)。残り = **3E.4 / 3E.5**。
+      (新 leaf **`Ch04_Commutators/Problems3E.lean`** 583 行)。
+      **残り = 3E.5 のみ** (3E.1 / 3E.2 / 3E.3 / 3E.4 完済)。
 
 * ✅ **3E.2** `actionFixedSubgroup_eq_mul` (2026-07-29): `c ∈ C` を `c = h₀k₀` と書くと
   `H ∩ cK` は `A`-不変な `H ∩ K` の剰余類なので Thm 3.27
@@ -69,11 +70,12 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
   `|P| = |H|_p` かつ `|P ⊓ C| = |H ⊓ C|_p`。`↥H` に `IsAInvariant.toMulAutHom` で
   作用を制限し Lemma 3.32 (`card_inf_fixedSubgroup_of_aInvariant_sylow`) を当てる。
   補助 `fixedSubgroup_toMulAutHom_top` (制限作用の固定部分群 = `C_G(A) ⊓ H`)。
-* ⬜ 残り (組み立て): `H` 側の `P` と `G` 側の `Q` を `Cor 3.25`
-  (`aInvariant_pSubgroup_le_aInvariant_sylow`) で `P ≤ Q` に取り,
-  `card_mul_card_inf_le_of_le` の不等式を `Nat.factorization` に翻訳して
-  `Nat.factorization_le_iff_dvd` で整除に直す。
-  (`|H⊓C|_p + relIndex_p = |H|_p` 等の加法関係は `Nat.factorization_mul` から。)
+* ✅ **3E.4 完成** `relIndex_dvd_index_of_aInvariant` (2026-07-29):
+  `H` 側の `P` を `Cor 3.25` (`aInvariant_pSubgroup_le_aInvariant_sylow`) で
+  `G` 側の `A`-不変 Sylow `Q` に埋め込み, `card_mul_card_inf_le_of_le` から
+  `|H|_p + |C|_p ≤ |G|_p + |H⊓C|_p` を得て,
+  `Nat.factorization_mul` による加法関係 + `omega` + `Nat.factorization_le_iff_dvd` で
+  2 主張 (`[H:H⊓C] ∣ [G:C]` と `[C:H⊓C] ∣ [G:H]`) を同時に出す。
 
 ⚠ **重複定義の解消 (2026-07-29)**: 一時 `actionFixedSubgroup φ` を新設したが、
 これは既存の `OddOrder.GroupTheory.fixedSubgroup φ K` (`GroupTheory/FixedSubgroup.lean`) の
