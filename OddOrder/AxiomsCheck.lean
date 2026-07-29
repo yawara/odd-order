@@ -287,6 +287,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.QuotientFieldCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveOrbits
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
@@ -14238,3 +14239,17 @@ and of the identification of `S/Q₀` with `𝐅_q` that p. 119 needs. -/
   OddOrder.Peterfalvi.Appendices.Huppert.exists_field_scalar_realization
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Huppert.exists_field_coordinate_realization
+
+/-! **Coordinates on `S/Q₀`** (issue 0165, 2026-07-29).
+`StructureOfH/QuotientFieldCoordinate.lean`, Peterfalvi Part II Ch. III §2, p. 119:
+
+> We identify `S/Q₀` with `𝐅_q` and `K` with `𝐅_q^×` in such a way that the action of `K`
+> on `S/Q₀` is multiplication, and we write `α` for the corresponding map `S → 𝐅_q`.
+
+In case (b) `|S| = q²` and `Z(S) = Q₀` has order `q`, so the central quotient has `q` elements
+while `|K| = q − 1`; `K` acts freely on it (`kfree_mod_Q0_of_center_eq`), so
+`exists_field_coordinate_realization` applies and yields the book's `α` as a map
+`β : G → F` that is additive on `Q`, vanishes exactly on `Q₀`, and satisfies
+`β (a⁻¹ y a) = γ a · β y`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_quotient_field_coordinate
