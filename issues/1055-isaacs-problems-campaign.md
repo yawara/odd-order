@@ -31,8 +31,34 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       (§1E は Sylow 計数の非単純性 8 問, §1F は Brodkey 周辺 3 問, §1G は Chermak–Delgado 4 問)
 - [ ] Ch.2 Subnormality
 - [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
-      **次の frontier = §3D (3D.1-3D.5)**, その後 §3E (3E.1-3E.x)。書籍の該当ページは
-      §3D = π-separable / Hall-Higman 1.2.3, §3E = coprime action。
+      **§3D 進行中 (2026-07-29)**: 3D.1(a) ✅ / 3D.5 ✅ (`Problems3D.lean`)。
+      残り = 3D.1(b) (`p`-length ≤ `P` の冪零類; `p`-length の定義から要) /
+      3D.2 (`Z ≤ Z(G)` ⟹ `O_π(G/Z) = \overline{O_π(G)}`) /
+      3D.3 (`O_π(G)O_{π'}(G) ≤ Z(G)` ⟹ 可換; 3D.2 を使う) /
+      3D.4 (`Φ(G)` 上自明な互いに素な作用は自明)。その後 §3E (coprime action)。
+
+### §3D の統制情報 (2026-07-29)
+
+書籍の statement は **ページ画像で確定済** (`references/isaacs/pages/isaacs-p095.png`)。
+特に 3D.2 は `O_π(Ḡ) = \overline{O_π(G)}` (bar = `XZ/Z` の像) で、OCR の
+`On(G) = O ^ G )` はこれ。
+
+* ✅ **3D.1(a)** `center_sylow_le_oPiCore_of_oPiCore_compl_eq_bot`:
+  `O_p(G) ≤ P` (`oPiCore_singleton_le_sylow`) なので `Z(P) ≤ C_G(O_p(G))`,
+  Hall–Higman 1.2.3 (`hall_higman_1_2_3`) で `≤ O_p(G)`。
+* ✅ **3D.5** `le_oPiCore_compl_of_sylow_le_normalizer` (+ `O_{p'}(G) = 1` 版
+  `eq_bot_of_sylow_le_normalizer_of_oPiCore_compl_eq_bot`):
+  `O_{p'} = 1` の場合は `[K, O_p(G)] ≤ K ⊓ O_p(G) = 1` から `K ≤ C_G(O_p) ≤ O_p` で
+  位数から `K = 1`。一般は `G/O_{p'}(G)` に落とす (`oPiCore_quotient_self_eq_bot`)。
+* ⬜ **3D.2** の証明経路 (確定済、次の実装対象): `K := O_π(G/Z)` の引き戻しについて,
+  `Z` の `π'`-部分 `Z_{π'}` (= `nilPiPart Z πᶜ`; `Z` 可換ゆえ冪零) は `K` の**中心的な**
+  正規 Hall `π'`-部分群。Schur–Zassenhaus で補元 `H` が取れ, `H` は `K` の唯一の
+  Hall `π`-部分群ゆえ `G`-正規, したがって `H ≤ O_π(G)` かつ `K = Z_{π'}H ≤ Z·O_π(G)`。
+  ⚠ 位数計算 (`[K:Z_{π'}] = |Z_π|·[K:Z]` が `π`-数) が実装の主コスト。
+
+⚠ `NilpotentInjector/PiParts.lean` の `exists_isHallPart` / `isHallPart_nilPiPart` /
+`le_nilPiPart_of_isPiGroup` は環境の `[IsSolvable G]` から **`[IsSolvable ↥N]` に緩和**
+(3D.2 で `G` に可解性が無いため)。既存の呼び出しは instance 解決でそのまま通る。
 - [ ] Ch.4 Commutators
 - [x] Ch.5 Transfer — **🎉 完済 (2026-07-27)**: §5A–§5E 全問
 - [x] Ch.6 Frobenius Actions — **🎉 完済 (2026-07-27)**: §6A (11 問) / §6B (9 問) / §6C (2 問) 全問
