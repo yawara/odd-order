@@ -14221,3 +14221,18 @@ because `h(u) ∈ K`.  Inverses: `(q k t q')⁻¹ = q'⁻¹ k t q⁻¹`. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.orderFiveSubgroup
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coe_orderFiveSubgroup
+
+/-! **A free action of the right size is the full scalar action** (issue 0165, 2026-07-29).
+`Appendices/SemilinearField.lean`, Peterfalvi Appendix I Proposition 2, in the form Part II
+Ch. I §2 Proposition 3 and Ch. III §2 p. 119 both use it.
+
+If a finite abelian `T` acts on an elementary abelian `E` freely off the identity and
+`|T| = |E| − 1`, the action is transitive on `E ∖ {1}` — the `T`-orbit of one non-identity
+element already has `|T| = |E| − 1` members — hence irreducible.  Appendix I Proposition 2 then
+makes `E` a line over a field `F` with `|F| = |E|` on which `T` acts by scalars, and
+`μ : T → Fˣ` is a bijection because both sides have `|E| − 1` elements.
+
+This is the common core of the identification of `Q₀` with `𝐅_q` (`exists_field_realization_K`)
+and of the identification of `S/Q₀` with `𝐅_q` that p. 119 needs. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.exists_field_scalar_realization
