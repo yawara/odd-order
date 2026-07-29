@@ -7,6 +7,7 @@ import Lean.Elab.Command
 import Lean.Util.CollectAxioms
 import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.Algebra.FixedPointsGalois
 import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.GroupTheory.HallWielandt
 import OddOrder.GroupTheory.TransferIndexTwo
@@ -13739,3 +13740,18 @@ order `ℓ + 1`. -/
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB
+
+/-! **The theorem of Galois for `RingAut F`** (issue 0164, 2026-07-29).
+`Algebra/FixedPointsGalois.lean`, upstream half of Peterfalvi Part II, Ch. III §1 p. 117
+("`V` then acts as a group of field automorphisms on `Q₀` and, by the theorem of Galois,
+`C_V(C_{Q₀}(P)) = P`").
+
+mathlib's Galois correspondence (`IntermediateField.fixingSubgroup_fixedField`) is stated for
+`E ≃ₐ[F] E`, but Ch. I §2 Proposition 3 (`exists_semilinear_equiv`) hands the acting group over
+as an abstract subgroup `A ≤ RingAut F` with no base field in sight.  These lemmas run Artin's
+counting argument (`FixedPoints.finrank_eq_card`) directly in `RingAut F`: `fixer (F^B)` contains
+`B` and fixes the same set, so the two have equal order and hence coincide. -/
+#assert_only_allowed_axioms OddOrder.RingAut.finrank_fixedSet
+#assert_only_allowed_axioms OddOrder.RingAut.fixer_fixedSet
+#assert_only_allowed_axioms OddOrder.RingAut.mem_of_fixes_fixedPoints
+#assert_only_allowed_axioms OddOrder.RingAut.eq_of_fixedSet_eq
