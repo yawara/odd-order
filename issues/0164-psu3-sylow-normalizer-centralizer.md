@@ -782,3 +782,43 @@ Wielandt (9.1) の ambient 版 `natCard_eq_pow_natCard_inf_centralizer_of_kernel
 この形なら `exists_generator_pow_natCard_fixedSet` +
 `exists_ne_zero_mul_pow_eq` に繋がる。**次セッションはこの形で書き直す。**
 (今回の draft は sorry を残さないよう撤収済み。)
+
+
+## 進捗表 (2026-07-29 セッション終了時)
+
+### 代数側: **完済**
+
+| 定理 | 場所 |
+|---|---|
+| `RingAut.fixer_fixedSet` / `finrank_fixedSet` | `Algebra/FixedPointsGalois.lean` |
+| `RingAut.exists_pow_eq` | `Algebra/SemilinearFixedPoint.lean` |
+| `exists_pow_eq_of_pow_natCard_div_eq_one` | 同上 |
+| `RingAut.exists_ne_zero_mul_pow_eq` (Hilbert 90) | 同上 |
+| `RingAut.exists_generator_pow_natCard_fixedSet` | 同上 |
+| **`exists_ne_zero_fixed_of_semilinear`** | 同上 (β の核) |
+
+### 群論側
+
+| 部品 | 状態 |
+|---|---|
+| PSU 分岐 (書籍の "as can be checked") | ✅ `CentralizerPSUData.false_of_W_eq_bot` |
+| PSL 分岐 case 1 (`p ∤ q₀−1`) | ✅ `false_of_natCard_cQ_eq_cQ0_of_card_cube` |
+| Galois `C_V(C_{Q₀}(P)) = P ⊔ W` | ✅ |
+| Artin `\|Q₀\| = \|C_{Q₀}(X)\|^{\|X\|}` | ✅ |
+| Fermat 橋 / Frobenius 構成 / Wielandt | ✅ |
+| **PSL 分岐 case 2 の配線** | 残 |
+| **3 分岐の組み立て (`hWcube` 除去)** | 残 |
+
+### 残り 2 件の内訳
+
+**(β-wire)** `N/Q₀` を `CommGroup` として作り、`K` の共役作用
+`ψ : ↥K →* MulAut (N/Q₀)` を組んで `exists_field_semilinear` に渡す。
+`hirr` は `K` fpf + `|K| = |N/Q₀| − 1` から (軌道が 1 個)。
+得た半線形性を `exists_ne_zero_fixed_of_semilinear` に渡して
+`C_{N/Q₀}(X) ≠ 1`、PSL 分岐の `C_Q(X) ≤ Q₀` と矛盾。
+⚠ `σ ≠ 1` は `W = ⊥` + `x ≠ 1` から (`x ∈ C_V(K) = W`)。
+
+**(δ)** `X` 不変な `K`-部分群 `N` の取得 (`TwoKSubgroups.lean` の
+`exists_two_kSubgroups_unique_of_card_cube` + `conj_mem_of_unique_of_le_V`;
+isotypic 側は `p ∤ q+1` からの固定点数え上げ) と、
+Sz 分岐 (`st` 位数 5 vs 3) を含む 3 分岐の組み立て。
