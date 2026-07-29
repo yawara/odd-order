@@ -33,7 +33,33 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 - [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
       **§3D 進行中 (2026-07-29)**: 3D.1(a) ✅ / 3D.2 ✅ / 3D.3 ✅ / 3D.4 ✅ / 3D.5 ✅
       (`Problems3D.lean`, 495 行)。残り = **3D.1(b) のみ**
-      (`p`-length ≤ `P` の冪零類; `p`-length の定義から要)。その後 §3E。
+      (`p`-length ≤ `P` の冪零類)。`π`-length の基盤 `PiLength.lean` は landing 済。
+      その後 §3E。
+
+### 3D.1(b) の基盤 `Ch03_SplitExtensions/PiLength.lean` (2026-07-29 landing)
+
+repo に `p`-length の定義が無かったので新設。
+
+* `oPiCoreOver π N` — 正規部分群 `N` の上の `π`-core (`O_π(G/N)` の逆像)。
+  `N` の正規性を **`dite` で全域化** (非正規なら `⊤`; その値は使わない) することで、
+  依存型の再帰を避けている。`oPiCoreOver_of_normal` / `oPiCoreOver.normal` /
+  `le_oPiCoreOver`。
+* `piUpperSeries π G k` — upper `π`-series (`k` = `π`-因子の個数)。
+  `piUpperSeries π G 0 = O_{π'}(G)`、`piUpperSeries π G 1 = O_{π',π,π'}(G)`
+  (= BG の `oPiPrimePiPiPrimeCore`; `piUpperSeries_one` + `oPiCoreOver_oPiCore_compl`)。
+  `piUpperSeries.normal` / `piUpperSeries_monotone`。
+* `HasPiLengthLE π G k` (= `piUpperSeries π G k = ⊤`) + `.mono` +
+  `hasPiLengthLE_zero_of_isPiGroup` (`π'`-群は length 0 = 帰納の base case)。
+
+**次の一手 (3D.1(b) 本体)**: 帰納の骨格は
+`c := nilpotencyClass ↥P` に関する帰納で、`M := O_{π',π}(G)` として
+`piUpperSeries π G (k+1) = comap (mk' M) (piUpperSeries π (G ⧸ M) k)` (**shift 補題**) を使う。
+shift 補題の要は
+`oPiCoreOver π (comap (mk' M) N̄) = comap (mk' M) (oPiCoreOver π N̄)` で、
+`(G/M)/N̄ ≅ G/N` (`QuotientGroup.quotientQuotientEquivQuotient`) と
+`oPiCore.map_eq_of_mulEquiv` で示す。
+クラス降下は 3D.1(a) から `Z(P) ≤ M` を出し、`PM/M ≅ P/(P ⊓ M)` が `P/Z(P)` の商ゆえ
+class ≤ c−1。
 
 ### §3D の統制情報 (2026-07-29)
 
