@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
 import OddOrder.Isaacs.Ch01_Sylow.Problems
+import OddOrder.Isaacs.Ch03_SplitExtensions.PiLength
 
 /-!
 # Isaacs §3D の演習 (書籍 p. 95)
@@ -489,6 +490,107 @@ theorem smul_eq_self_of_trivial_mod_frattini {G H : Type*} [Group G] [Finite G] 
   intro h g
   have : h ∈ K := by rw [hKtop]; trivial
   exact this g
+
+/-! ### Problem 3D.1(b) — `p`-length ≤ Sylow `p`-部分群の冪零類 -/
+
+/-- **3D.1(b) の要**: `Z(P) ≤ O_{p',p}(G)`。
+
+`N := O_{p'}(G)` で割ると `z ∈ Z(P)` の像は `P̄ = PN/N` を中心化し (`[z̄, x̄] = 1`),
+かつ `z̄ ∈ P̄` なので `z̄ ∈ Z(P̄) ≤ O_p(Ḡ)` (3D.1(a))。ゆえに `z ∈ O_{p',p}(G)`。
+`P ≅ P̄` の同型を作る必要はない。 -/
+theorem center_sylow_le_oPiPrimePiCore [Finite G] {p : ℕ} [Fact p.Prime]
+    [IsPiSeparable ({p} : Set ℕ) G] (P : Sylow p G) :
+    (P : Subgroup G) ⊓ Subgroup.centralizer ((P : Subgroup G) : Set G)
+      ≤ oPiPrimePiCore ({p} : Set ℕ) G := by
+  set N : Subgroup G := oPiCore {q | q ∉ ({p} : Set ℕ)} G with hN
+  have hsurj : Function.Surjective (QuotientGroup.mk' N) := QuotientGroup.mk'_surjective N
+  obtain ⟨Pbar, hPbar⟩ := Ch01.exists_sylow_coe_eq_of_isHallSubgroup_singleton
+    (Ch01.IsHallSubgroup.map_of_surjective hsurj (Ch01.sylow_isHallSubgroup_singleton P))
+  intro z hz
+  have hmem : (QuotientGroup.mk' N) z ∈ (Pbar : Subgroup (G ⧸ N))
+      ⊓ Subgroup.centralizer ((Pbar : Subgroup (G ⧸ N)) : Set (G ⧸ N)) := by
+    refine Subgroup.mem_inf.mpr ⟨?_, ?_⟩
+    · rw [hPbar]
+      exact ⟨z, hz.1, rfl⟩
+    · refine Subgroup.mem_centralizer_iff.mpr fun y hy => ?_
+      rw [hPbar] at hy
+      obtain ⟨x, hx, rfl⟩ := hy
+      rw [← map_mul, ← map_mul, Subgroup.mem_centralizer_iff.mp hz.2 x hx]
+  exact center_sylow_le_oPiCore_of_oPiCore_compl_eq_bot (G := G ⧸ N) Pbar
+    (oPiCore_quotient_self_eq_bot _) hmem
+
+universe u
+
+/-- 3D.1(b) の帰納本体 (`P` の冪零類に関する帰納)。 -/
+private theorem hasPiLengthLE_nilpotencyClass_aux :
+    ∀ (c : ℕ) {G : Type u} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+      [IsPiSeparable ({p} : Set ℕ) G] (P : Sylow p G),
+      Group.nilpotencyClass ↥(P : Subgroup G) ≤ c → HasPiLengthLE ({p} : Set ℕ) G c := by
+  intro c
+  induction c with
+  | zero =>
+    intro G _ _ p _ _ P hc
+    haveI : Group.IsNilpotent ↥(P : Subgroup G) := P.isPGroup'.isNilpotent
+    haveI : Subsingleton ↥(P : Subgroup G) :=
+      Group.nilpotencyClass_zero_iff_subsingleton.mp (Nat.le_zero.mp hc)
+    have hcard : Nat.card ↥(P : Subgroup G) = 1 :=
+      Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, inferInstance⟩
+    have hmult := P.card_eq_multiplicity
+    rw [hcard] at hmult
+    have hfac : (Nat.card G).factorization p = 0 :=
+      (Nat.pow_eq_one.mp hmult.symm).resolve_left (Nat.Prime.ne_one Fact.out)
+    have hnd : ¬ p ∣ Nat.card G := by
+      intro hdvd
+      have hpos := Nat.Prime.factorization_pos_of_dvd Fact.out
+        (Nat.card_pos (α := G)).ne' hdvd
+      omega
+    refine hasPiLengthLE_zero_of_isPiGroup (fun r hr hrp => ?_)
+    exact hnd (hrp ▸ (Nat.mem_primeFactors.mp hr).2.1)
+  | succ n ih =>
+    intro G _ _ p _ _ P hc
+    haveI hPnil : Group.IsNilpotent ↥(P : Subgroup G) := P.isPGroup'.isNilpotent
+    set M : Subgroup G := oPiPrimePiCore ({p} : Set ℕ) G with hM
+    have hsurjM : Function.Surjective (QuotientGroup.mk' M) := QuotientGroup.mk'_surjective M
+    obtain ⟨Q, hQ⟩ := Ch01.exists_sylow_coe_eq_of_isHallSubgroup_singleton
+      (Ch01.IsHallSubgroup.map_of_surjective hsurjM (Ch01.sylow_isHallSubgroup_singleton P))
+    -- `Z(↥P)` は `↥P → ↥(P.map (mk' M))` の核に入る
+    have hZM := center_sylow_le_oPiPrimePiCore (G := G) P
+    have hker : ∀ x ∈ Subgroup.center ↥(P : Subgroup G),
+        ((QuotientGroup.mk' M).subgroupMap (P : Subgroup G)) x = 1 := by
+      intro x hx
+      have hxM : (x : G) ∈ M := by
+        refine hZM (Subgroup.mem_inf.mpr ⟨x.2, Subgroup.mem_centralizer_iff.mpr fun y hy => ?_⟩)
+        exact congrArg (Subtype.val : ↥(P : Subgroup G) → G)
+          (Subgroup.mem_center_iff.mp hx ⟨y, hy⟩)
+      refine Subtype.ext ?_
+      exact (QuotientGroup.eq_one_iff (x : G)).mpr hxM
+    -- 商への持ち上げは全射
+    have hlift : Function.Surjective (QuotientGroup.lift (Subgroup.center ↥(P : Subgroup G))
+        ((QuotientGroup.mk' M).subgroupMap (P : Subgroup G)) hker) := by
+      intro y
+      obtain ⟨x, hx⟩ := MonoidHom.subgroupMap_surjective (QuotientGroup.mk' M)
+        (P : Subgroup G) y
+      exact ⟨QuotientGroup.mk' _ x, hx⟩
+    -- 類の降下
+    have hclass : Group.nilpotencyClass ↥(Q : Subgroup (G ⧸ M)) ≤ n := by
+      rw [hQ]
+      refine le_trans (Group.nilpotencyClass_le_of_surjective _ hlift) ?_
+      rw [Group.nilpotencyClass_quotient_center]
+      omega
+    have hIH : HasPiLengthLE ({p} : Set ℕ) (G ⧸ M) n := ih Q hclass
+    rw [HasPiLengthLE, piUpperSeries_succ_eq_comap, hIH, Subgroup.comap_top]
+
+/-- **Isaacs Problem 3D.1(b)** (書籍 p. 95): `G` が `p`-可解なら `G` の `p`-length は
+Sylow `p`-部分群 `P` の冪零類以下。
+
+`P` の冪零類に関する帰納。類 `0` (= `P` 自明) なら `p ∤ |G|` で `p`-length `0`。
+一般には `M := O_{p',p}(G)` に落とすと, 3D.1(a) から `Z(P) ≤ M` なので `G/M` の
+Sylow `p`-部分群は `P/Z(P)` の商, したがって類が 1 下がる。`π`-length の shift
+(`piUpperSeries_succ_eq_comap`) で帰納が閉じる。 -/
+theorem hasPiLengthLE_nilpotencyClass {G : Type u} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    [IsPiSeparable ({p} : Set ℕ) G] (P : Sylow p G) :
+    HasPiLengthLE ({p} : Set ℕ) G (Group.nilpotencyClass ↥(P : Subgroup G)) :=
+  hasPiLengthLE_nilpotencyClass_aux _ P le_rfl
 
 end -- 3D
 

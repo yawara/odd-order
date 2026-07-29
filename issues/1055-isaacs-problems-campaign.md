@@ -31,10 +31,42 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
       (§1E は Sylow 計数の非単純性 8 問, §1F は Brodkey 周辺 3 問, §1G は Chermak–Delgado 4 問)
 - [ ] Ch.2 Subnormality
 - [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
-      **§3D 進行中 (2026-07-29)**: 3D.1(a) ✅ / 3D.2 ✅ / 3D.3 ✅ / 3D.4 ✅ / 3D.5 ✅
-      (`Problems3D.lean`, 495 行)。残り = **3D.1(b) のみ**
-      (`p`-length ≤ `P` の冪零類)。`π`-length の基盤 `PiLength.lean` は landing 済。
-      その後 §3E。
+      **§3D 🎉 完済 (2026-07-29)**: 3D.1(a)(b) / 3D.2 / 3D.3 / 3D.4 / 3D.5 全問
+      (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
+      **§3E 進行中 (2026-07-29)**: 3E.1 の Hint 前半 ✅ / **3E.1 (`G` 可解の場合) ✅** /
+      3E.3 ✅ (新 leaf **`Ch04_Commutators/Problems3E.lean`**)。
+      残り = 3E.1 (`A` 可解の場合) / 3E.2 / 3E.4 / 3E.5。
+
+### §3E の置き場と統制情報 (2026-07-29)
+
+⚠ **§3E の演習は `Ch04_Commutators/Problems3E.lean` に置く**。§3E の主定理群
+(Thm 3.23 A-不変 Sylow / Thm 3.24 Glauberman / Thm 3.27-3.30) は Ch.4 の交換子機構を
+要するため `Ch04_Commutators/ForwardFromCh03.lean` に置かれており、演習も同じ層でないと
+import できない (Ch03 → Ch04 は逆向き)。
+
+* ✅ **3E.1 Hint 前半** `exists_ne_one_fixed_of_isPGroup_of_dvd`:
+  `p`-群 `A` が `G` に作用し `p ∣ |G|` なら `C_G(A) ≠ 1`。
+  ⚠ 書籍の Hint は Sylow 経由を示唆するが、**`A` の `G` そのものへの作用に
+  `IsPGroup.card_modEq_card_fixedPoints` を当てるだけ**で済む (`|G| ≡ |C_G(A)| mod p`)。
+* ✅ **3E.3** `smul_eq_self_of_trivial_on_normal_and_quotient`:
+  `g` を固定すると `a ↦ g⁻¹(φ a g)` が `A →* ↥N` の**準同型**になる
+  (`A` が `N` に自明に作用するので cocycle 条件が積になる)。像の位数は `|A|` と `|N|` の
+  両方を割るので自明。⚠ 書籍 Hint の「`A` を巡回群としてよい」は**不要**だった。
+
+**3E.1 本体の証明経路**:
+* ✅ `G` 可解の場合 `exists_isAInvariant_isPGroup_of_isSolvable` (2026-07-29):
+  ⚠ 当初計画の「`Γ := G ⋊ A` の極小正規部分群」より**ずっと軽い筋**が見つかった —
+  **導来列の最後の非自明な項 `K`** は可換かつ `A`-不変 (`IsAInvariant.derivedSeries`)。
+  `p ∣ |K|` を取れば `K` の Sylow `p` (= `nilPiPart K {p}`) は一意なので
+  `nilPiPart_map_mulAut` で `A`-不変。**半直積を作る必要は無い**。
+  そのために `PiParts.lean` に `IsHallPart.map_mulAut` / `isNilpotent_map_mulAut` /
+  `nilPiPart_map_mulAut` (自己同型同変版) を追加した。
+* `A` 可解の場合: `|A|` + `|G|` の帰納。`B ⊴ A` 極小正規 (elementary abelian `p`-群) を取る。
+  * `B` が `G` に自明に作用 ⟹ `A/B` の作用に帰着 (`|A|` 減少)。
+  * `C_G(B) ≠ 1` かつ `C_G(B) < G` ⟹ `A` は `C_G(B)` に作用 (`B ⊴ A`) ので `|G|` 減少。
+  * `C_G(B) = 1` ⟹ 上の Hint 前半の対偶で `p ∤ |G|`, すなわち `(|B|,|G|) = 1`。
+    Thm 3.23 で `B`-不変 Sylow `q` が存在し、Thm 3.23(b) より `C_G(B) = 1` から**一意**。
+    一意なので `A` (が `B` を正規化する) で不変 ⟹ 求めるもの。
 
 ### 3D.1(b) の基盤 `Ch03_SplitExtensions/PiLength.lean` (2026-07-29 landing)
 
@@ -60,16 +92,19 @@ repo に `p`-length の定義が無かったので新設。
   = 「`π`-length は `G/O_{π',π}(G)` に移ると 1 減る」の形式化。
   補助 = `oPiPrimePiCore_le_piUpperSeries_succ`。
 
-**次の一手 (3D.1(b) 本体)**: `c := nilpotencyClass ↥P` に関する帰納。
-* base `c = 0`: `P` 自明 ⟹ `p ∤ |G|` ⟹ `hasPiLengthLE_zero_of_isPiGroup`。
-* step: `M := O_{p',p}(G)`。`Z(P) ≤ M` を出す (下記) と `↥P/(M.subgroupOf P)` は
-  `↥P/Z(↥P)` の商ゆえ class ≤ c (`Group.nilpotencyClass_quotient_center` +
-  `Group.nilpotencyClass_le_of_surjective`)。これが `G/M` の Sylow `p` と同型なので
-  帰納法の仮説 + `piUpperSeries_succ_eq_comap` で閉じる。
-* **`Z(P) ≤ M` の出し方 (iso を経由しない筋を確定済)**: `N := O_{p'}(G)`, `Ḡ := G/N` で
-  `z ∈ Z(P)` の像は `P̄ = PN/N` を中心化し (`[z̄, p̄n̄] = [z̄, p̄] = 1`)、かつ `z̄ ∈ P̄` なので
-  `z̄ ∈ Z(P̄) ≤ O_p(Ḡ)` (3D.1(a))。ゆえに `z ∈ comap (mk' N) (O_p(Ḡ)) = M`。
-  ⚠ `P ≅ P̄` の同型を作る必要は無い。
+* ✅ **3D.1(b)** `hasPiLengthLE_nilpotencyClass` (2026-07-29 完成)。
+  `c := nilpotencyClass ↥P` に関する帰納:
+  * base `c = 0`: `P` 自明 ⟹ `p ∤ |G|` ⟹ `hasPiLengthLE_zero_of_isPiGroup`。
+  * step: `M := O_{p',p}(G)`。`center_sylow_le_oPiPrimePiCore` で `Z(P) ≤ M` を出すと
+    `↥P → ↥(P.map (mk' M))` が `Z(↥P)` を殺すので `QuotientGroup.lift` で
+    `↥P/Z(↥P) ↠ ↥(P.map (mk' M))`、`Group.nilpotencyClass_quotient_center` +
+    `Group.nilpotencyClass_le_of_surjective` で class ≤ c。
+    `P.map (mk' M)` は `G/M` の Sylow `p` (`exists_sylow_coe_eq_of_isHallSubgroup_singleton`)
+    なので帰納法の仮説 + `piUpperSeries_succ_eq_comap` で閉じる。
+  * **`Z(P) ≤ M` (`center_sylow_le_oPiPrimePiCore`)**: `N := O_{p'}(G)`, `Ḡ := G/N` で
+    `z ∈ Z(P)` の像は `P̄ = PN/N` を中心化し (`[z̄, x̄] = 1`)、かつ `z̄ ∈ P̄` なので
+    `z̄ ∈ Z(P̄) ≤ O_p(Ḡ)` (3D.1(a))。ゆえに `z ∈ comap (mk' N) (O_p(Ḡ)) = M`。
+    ⚠ `P ≅ P̄` の同型を作る必要は無い (当初の見立てより軽かった)。
 
 ### §3D の統制情報 (2026-07-29)
 

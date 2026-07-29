@@ -311,6 +311,7 @@ import OddOrder.Isaacs.Ch04_Commutators.ProblemsHallWitt
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsSupersolvableMann
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsStabilityGroup
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsCoprimeAction
+import OddOrder.Isaacs.Ch04_Commutators.Problems3E
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsBaerAddition
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsIrreducibleAction
 import OddOrder.Isaacs.Ch04_Commutators.ProblemsDerivedLength
