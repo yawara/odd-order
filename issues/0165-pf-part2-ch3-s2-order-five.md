@@ -342,3 +342,15 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 
 1. **`hpair` = p.119 の体計算** (本 issue の唯一の実質的数学的残作業)
 2. `(SK) ∪ (SKtS)` が部分群であることの組み立て (上の閉包計算、機械的)
+
+## ✅ 部分群性が landing — §2 の残りは p.119 の 1 点のみ (2026-07-29)
+
+新 leaf `StructureOfH/OrderFiveSubgroup.lean`:
+
+* `orderFiveCarrier` — 集合 `(SK) ∪ (SKtS)` (`S = Q`)
+* **`orderFiveSubgroup`** — `h(x) ∈ K` (∀ x ∈ Q^#) を仮定して `Subgroup G` を構成
+  (4 種の積 + 逆元をすべて明示的な witness で)
+* `coe_orderFiveSubgroup`
+
+⟹ **§2 Proposition の残りは `hpair` (p.119 の体計算) だけ**。
+`hpair` が入れば `tConjMiddle_mem_K_of_orderOf_st_eq_five` → `orderFiveSubgroup` で完結する。
