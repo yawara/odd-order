@@ -75,4 +75,49 @@ theorem titsTwist_sq (m : ℕ) :
   ext x
   simpa [pow_two, frobenius_def] using titsTwist_twice m x
 
+/-- `a θ(a)` vanishes only at `a = 0`. -/
+theorem mul_titsTwist_eq_zero_iff (m : ℕ) {a : Field m} :
+    a * titsTwist m a = 0 ↔ a = 0 := by
+  refine ⟨fun ha => ?_, fun ha => by rw [ha, map_zero, mul_zero]⟩
+  rcases mul_eq_zero.mp ha with h | h
+  · exact h
+  · exact (titsTwist m).injective (by rw [h, map_zero])
+
+/-- **The quadratic map `a ↦ a θ(a)` is injective.**
+
+This is the multiplication rule for squares in the Suzuki root group
+(`RootGroup.sq_eq`), so injectivity says that squaring in a Suzuki `2`-group of
+type A is injective modulo the central line — the step Peterfalvi uses in
+Part II, Ch. III §1, Proposition, case (3) ("since `C_S(P)` is of type A, it
+follows that `y ∈ x Ω₁ C_S(P)`", p. 117).
+
+The proof needs only the defining identity `θ(θ x) = x²`
+(`titsTwist_twice`): applying `θ` to `a θ(a) = b θ(b)` gives
+`θ(a) a² = θ(b) b²`, and multiplying the original by `a` turns the left-hand
+side into `a b θ(b)`, so `a b θ(b) = b² θ(b)` and `b`, `θ(b)` cancel.
+
+Restricted to units this is the injectivity of the torus weight
+(`torusWeightUnit_injective`), which is what Ch. I §3 Lemma 1 needs; the
+statement here covers `0` as well, which is what the square map on the whole
+root group needs. -/
+theorem mul_titsTwist_injective (m : ℕ) :
+    Function.Injective (fun a : Field m => a * titsTwist m a) := by
+  intro a b hab
+  simp only at hab
+  rcases eq_or_ne b 0 with rfl | hb
+  · rw [map_zero, mul_zero] at hab
+    exact (mul_titsTwist_eq_zero_iff m).mp hab
+  have hθb : titsTwist m b ≠ 0 := fun h =>
+    hb ((titsTwist m).injective (by rw [h, map_zero]))
+  have h2 : titsTwist m a * a ^ 2 = titsTwist m b * b ^ 2 := by
+    have h := congrArg (titsTwist m) hab
+    rwa [map_mul, map_mul, titsTwist_twice, titsTwist_twice] at h
+  have hkey : b * (a * titsTwist m b) = b * (b * titsTwist m b) :=
+    calc b * (a * titsTwist m b) = a * (b * titsTwist m b) := by ring
+      _ = a * (a * titsTwist m a) := by rw [hab]
+      _ = titsTwist m a * a ^ 2 := by ring
+      _ = titsTwist m b * b ^ 2 := h2
+      _ = b * (b * titsTwist m b) := by ring
+  exact mul_right_cancel₀ hθb (mul_left_cancel₀ hb hkey)
+
 end OddOrder.GroupTheory.SpecificGroups.Suzuki

@@ -289,6 +289,22 @@ theorem map_sq (x : P) :
           titsTwist data.parameter (data.equivRootGroup x).fst) := by
   rw [map_pow, RootGroup.sq_eq]
 
+include data in
+/-- **In a type-A Suzuki `2`-group, squaring is injective modulo `Ω₁`**:
+`x² = y²` forces `(x⁻¹y)² = 1`.
+
+Transported from `RootGroup.sq_inv_mul_eq_one_of_sq_eq` along the model
+equivalence.  Peterfalvi uses it in Part II, Ch. III §1, Proposition, case (3):
+"since `C_S(P)` is of type A, it follows that `y ∈ x Ω₁ C_S(P)`" (p. 117). -/
+theorem sq_inv_mul_eq_one_of_sq_eq {x y : P} (h : x ^ 2 = y ^ 2) :
+    (x⁻¹ * y) ^ 2 = 1 := by
+  have hx : data.equivRootGroup x ^ 2 = data.equivRootGroup y ^ 2 := by
+    rw [← map_pow, ← map_pow, h]
+  have hkey := RootGroup.sq_inv_mul_eq_one_of_sq_eq hx
+  apply data.equivRootGroup.injective
+  rw [map_pow, map_mul, map_inv, map_one]
+  exact hkey
+
 end StandardTypeAData
 
 /-- The coordinate root group is the standard honest type-A model. -/

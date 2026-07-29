@@ -13459,3 +13459,25 @@ of that branch, `|C_Q(P)| = |C_{Q₀}(P)|³`, and case (2) contradicts it by cou
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_inf_centralizer_le_sq
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_five_of_isSuzuki2Group
+
+/-! **Type-A squaring is injective modulo `Ω₁`** — the step Peterfalvi Part II, Ch. III §1,
+Proposition, case (3) states as "since `C_S(P)` is of type A, it follows that
+`y ∈ x Ω₁ C_S(P)`" (p. 117).  `GroupTheory/SpecificGroups/Suzuki/{Field,RootGroup,
+RootSubgroupSuzukiType}.lean`.
+
+* `mul_titsTwist_injective` — the quadratic map `a ↦ a θ(a)` of Appendix III, Definition 2 is
+  injective on the whole defining field.  Only the defining identity `θ(θ x) = x²` is needed:
+  applying `θ` to `a θ(a) = b θ(b)` gives `θ(a) a² = θ(b) b²`, and multiplying the original by
+  `a` turns the left side into `a b θ(b)`, so `b` and `θ(b)` cancel.  Restricted to units this
+  is the existing `torusWeightUnit_injective` of Ch. I §3 Lemma 1, whose private helper
+  `torusWeight_ne_one_of_ne_one` now derives from it instead of repeating the argument.
+* `RootGroup.sq_inv_mul_eq_one_of_sq_eq` — since squaring is `(a, b) ↦ (0, a θ(a))`, equal
+  squares force equal first coordinates, so `x⁻¹y` lies in the central line.
+* `StandardTypeAData.sq_inv_mul_eq_one_of_sq_eq` — the same statement for any group carrying
+  standard type-A data, transported along the model equivalence. -/
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.mul_titsTwist_injective
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.sq_inv_mul_eq_one_of_sq_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardTypeAData.sq_inv_mul_eq_one_of_sq_eq

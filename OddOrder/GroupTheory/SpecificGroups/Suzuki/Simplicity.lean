@@ -34,22 +34,11 @@ section /- §3 Lemma 1: perfectness and the solvable point stabilizer (pp. 100--
 private theorem torusWeight_ne_one_of_ne_one (c : TorusParameter m) (hc : c ≠ 1) :
     torusWeight c ≠ 1 := by
   intro hw
-  have hs : (c : Field m) ≠ 0 := Units.ne_zero c
-  have htw := congrArg (titsTwist m) hw
-  change (c : Field m) * titsTwist m (c : Field m) = 1 at hw
-  simp only [torusWeight, map_mul, titsTwist_twice, map_one] at htw
-  have hsq : (c : Field m) = (c : Field m) ^ 2 := by
-    calc
-      (c : Field m) = (c : Field m) * 1 := by rw [mul_one]
-      _ = (c : Field m) *
-          (titsTwist m (c : Field m) * (c : Field m) ^ 2) := by rw [htw]
-      _ = ((c : Field m) * titsTwist m (c : Field m)) *
-          (c : Field m) ^ 2 := by ring
-      _ = (c : Field m) ^ 2 := by rw [hw, one_mul]
-  apply hc
-  apply Units.ext
-  apply mul_left_cancel₀ hs
-  simpa only [pow_two, Units.val_one, mul_one] using hsq.symm
+  have h1 : (c : Field m) * titsTwist m (c : Field m)
+      = (1 : Field m) * titsTwist m (1 : Field m) := by
+    rw [map_one, mul_one]
+    exact hw
+  exact hc (Units.ext (by simpa using mul_titsTwist_injective m h1))
 
 /-- **Peterfalvi Part II, Ch. I, §3 Lemma 1 (Suzuki target).**
 The torus weight is one exactly at the identity parameter. -/

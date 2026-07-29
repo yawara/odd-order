@@ -67,6 +67,68 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 universe uG uΩ
 
+/-! ## Two general steps of the Proposition's proof -/
+
+/-- **"Let `P` be a subgroup of prime order `p`"** (Peterfalvi Part II, Ch. III
+§1, p. 116) — a non-trivial subgroup of a finite group has a subgroup of prime
+order.
+
+The Proposition's proof opens by choosing such a `P` inside `V`, and — when
+`W ≠ 1` — inside `W`; both choices are instances of this. -/
+theorem exists_le_card_eq_prime {G : Type uG} [Group G] [Finite G]
+    {Y : Subgroup G} (hY : Y ≠ ⊥) :
+    ∃ (P : Subgroup G) (p : ℕ), p.Prime ∧ Nat.card ↥P = p ∧ P ≤ Y := by
+  obtain ⟨g, hgY, hg1⟩ : ∃ g ∈ Y, g ≠ 1 := by
+    by_contra hall
+    push Not at hall
+    exact hY (le_bot_iff.mp fun x hx => Subgroup.mem_bot.mpr (hall x hx))
+  have hord : orderOf g ≠ 1 := fun h => hg1 (orderOf_eq_one_iff.mp h)
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hord
+  have hpos : 0 < orderOf g := orderOf_pos g
+  have hmpos : 0 < orderOf g / p := Nat.div_pos (Nat.le_of_dvd hpos hpdvd) hp.pos
+  have hyord : orderOf (g ^ (orderOf g / p)) = p := by
+    rw [orderOf_pow_of_dvd hmpos.ne' (Nat.div_dvd_of_dvd hpdvd)]
+    exact Nat.div_div_self hpdvd hpos.ne'
+  exact ⟨Subgroup.zpowers (g ^ (orderOf g / p)), p, hp,
+    by rw [Nat.card_zpowers, hyord], Subgroup.zpowers_le.mpr (Y.pow_mem hgY _)⟩
+
+/-- **The fixed-point step** (Peterfalvi Part II, Ch. III §1, p. 117): "`P` …
+normalizes `xQ₀` which is of cardinality prime to `p`", in the general form the
+Proposition uses it.
+
+A subgroup `P` of prime order `p` acting by conjugation on a set `T` whose
+cardinality is prime to `p` has a fixed point in `T` — that is, some element of
+`T` centralizes `P`.  The Proposition applies this to the fibre
+`{y ∈ S | y² = s}` in cases (1) and (2), and to its intersection with a
+`K`-subgroup of `S` in case (3). -/
+theorem exists_mem_centralizer_of_conj_invariant {G : Type uG} [Group G] [Finite G]
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    {T : Set G} (hTinv : ∀ g ∈ P, ∀ y ∈ T, g * y * g⁻¹ ∈ T)
+    (hnotdvd : ¬ p ∣ Nat.card ↥T) :
+    ∃ y ∈ T, y ∈ Subgroup.centralizer (P : Set G) := by
+  classical
+  letI actP : MulAction ↥P ↥T :=
+    { smul := fun g y => ⟨(g : G) * (y : G) * (g : G)⁻¹, hTinv g g.2 y y.2⟩
+      one_smul := fun y => Subtype.ext (by
+        change ((1 : ↥P) : G) * (y : G) * ((1 : ↥P) : G)⁻¹ = (y : G)
+        simp)
+      mul_smul := fun g h y => Subtype.ext (by
+        change ((g * h : ↥P) : G) * (y : G) * ((g * h : ↥P) : G)⁻¹
+            = (g : G) * ((h : G) * (y : G) * (h : G)⁻¹) * (g : G)⁻¹
+        push_cast
+        group) }
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI hPp : IsPGroup p ↥P := IsPGroup.of_card (n := 1) (by rw [hPcard, pow_one])
+  obtain ⟨y, hy⟩ := hPp.nonempty_fixed_point_of_prime_not_dvd_card ↥T hnotdvd
+  refine ⟨(y : G), y.2, Subgroup.mem_centralizer_iff.mpr ?_⟩
+  intro g hg
+  show g * (y : G) = (y : G) * g
+  have hval : g * (y : G) * g⁻¹ = (y : G) :=
+    congrArg (Subtype.val (p := fun z => z ∈ T))
+      (MulAction.mem_fixedPoints.mp hy ⟨g, hg⟩)
+  calc g * (y : G) = g * (y : G) * g⁻¹ * g := by group
+    _ = (y : G) * g := by rw [hval]
+
 namespace Hypothesis
 
 variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
@@ -186,6 +248,25 @@ theorem not_dvd_card_Q0 (hQ2 : IsPGroup 2 ↥hyp.Q) {P : Subgroup G} {p : ℕ}
   exact hyp.prime_ne_two_of_le_V hPcard hPV
     ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).mp (hp.dvd_of_dvd_pow hdvd))
 
+/-- **The fibre is `P`-invariant for any `P ≤ V`** — the book's "`P` centralizes
+`s` (Chapter I, §1, Proposition 5) and so normalizes `xQ₀`" (p. 117).
+
+`V = C_D(s)` centralizes `s` and `V ≤ D ≤ H` normalizes `Q`, so conjugation by an
+element of `V` permutes `{y ∈ Q | y² = s}`. -/
+theorem conj_mem_sqFibre_of_mem_V {g : G} (hg : g ∈ hyp.V) {y : G}
+    (hy : y ∈ hyp.sqFibre) : g * y * g⁻¹ ∈ hyp.sqFibre := by
+  have hgH : g ∈ hyp.H := hyp.D_le_H (hyp.V_le_D hg)
+  refine ⟨hyp.Q_normal_in_H _ hgH _ hy.1, ?_⟩
+  have hgs : g * hyp.distinguishedInvolution * g⁻¹
+      = hyp.distinguishedInvolution := by
+    have hgV : g ∈ hyp.V := hg
+    rw [hyp.V_eq_centralizer_distinguishedInvolution] at hgV
+    have hc := Subgroup.mem_centralizer_iff.mp hgV.2
+      hyp.distinguishedInvolution rfl
+    rw [← hc]; group
+  calc (g * y * g⁻¹) ^ 2 = g * y ^ 2 * g⁻¹ := by rw [sq, sq]; group
+    _ = hyp.distinguishedInvolution := by rw [hy.2]; exact hgs
+
 /-- **Peterfalvi Part II, Ch. III §1, Proposition, the fixed-point step**
 (p. 117): "`P` … normalizes `xQ₀` which is of cardinality prime to `p`".
 
@@ -199,44 +280,9 @@ case (2) it shows `C_S(P)` has exponent `4`. -/
 theorem exists_mem_centralizer_mem_sqFibre
     {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
     (hPV : P ≤ hyp.V) (hnotdvd : ¬ p ∣ Nat.card ↥hyp.sqFibre) :
-    ∃ y ∈ hyp.sqFibre, y ∈ Subgroup.centralizer (P : Set G) := by
-  classical
-  set T : Set G := hyp.sqFibre with hTdef
-  have hTsmul : ∀ (g : ↥P) (y : ↥T), (g : G) * (y : G) * (g : G)⁻¹ ∈ T := by
-    intro g y
-    have hgH : (g : G) ∈ hyp.H := hyp.D_le_H (hyp.V_le_D (hPV g.2))
-    refine ⟨hyp.Q_normal_in_H _ hgH _ y.2.1, ?_⟩
-    have hgs : (g : G) * hyp.distinguishedInvolution * (g : G)⁻¹
-        = hyp.distinguishedInvolution := by
-      have hgV : (g : G) ∈ hyp.V := hPV g.2
-      rw [hyp.V_eq_centralizer_distinguishedInvolution] at hgV
-      have hc := Subgroup.mem_centralizer_iff.mp hgV.2
-        hyp.distinguishedInvolution rfl
-      rw [← hc]; group
-    calc ((g : G) * (y : G) * (g : G)⁻¹) ^ 2
-        = (g : G) * (y : G) ^ 2 * (g : G)⁻¹ := by rw [sq, sq]; group
-      _ = hyp.distinguishedInvolution := by rw [y.2.2]; exact hgs
-  letI actP : MulAction ↥P ↥T :=
-    { smul := fun g y => ⟨(g : G) * (y : G) * (g : G)⁻¹, hTsmul g y⟩
-      one_smul := fun y => Subtype.ext (by
-        change ((1 : ↥P) : G) * (y : G) * ((1 : ↥P) : G)⁻¹ = (y : G)
-        simp)
-      mul_smul := fun g h y => Subtype.ext (by
-        change ((g * h : ↥P) : G) * (y : G) * ((g * h : ↥P) : G)⁻¹
-            = (g : G) * ((h : G) * (y : G) * (h : G)⁻¹) * (g : G)⁻¹
-        push_cast
-        group) }
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI hPp : IsPGroup p ↥P := IsPGroup.of_card (n := 1) (by rw [hPcard, pow_one])
-  obtain ⟨y, hy⟩ := hPp.nonempty_fixed_point_of_prime_not_dvd_card ↥T hnotdvd
-  refine ⟨(y : G), y.2, Subgroup.mem_centralizer_iff.mpr ?_⟩
-  intro g hg
-  show g * (y : G) = (y : G) * g
-  have hval : g * (y : G) * g⁻¹ = (y : G) :=
-    congrArg (Subtype.val (p := fun z => z ∈ T))
-      (MulAction.mem_fixedPoints.mp hy ⟨g, hg⟩)
-  calc g * (y : G) = g * (y : G) * g⁻¹ * g := by group
-    _ = (y : G) * g := by rw [hval]
+    ∃ y ∈ hyp.sqFibre, y ∈ Subgroup.centralizer (P : Set G) :=
+  exists_mem_centralizer_of_conj_invariant hp hPcard
+    (fun _ hg _ hy => hyp.conj_mem_sqFibre_of_mem_V (hPV hg) hy) hnotdvd
 
 /-- **Peterfalvi Part II, Ch. III §1, Proposition, case (1), the coset count**
 (p. 117): "since `S` is abelian, `{y ∈ S | y² = s} = xQ₀`".

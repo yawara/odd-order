@@ -40,7 +40,6 @@ Ch. I §3 Proposition 1(c) carries in that branch; see
 ## Main results
 
 * `sylowTwoOfQ_eq_Q` — after Theorem C, the book's `S` is `Q`.
-* `exists_le_card_eq_prime` — "let `P` be a subgroup of prime order `p`".
 * `centralizer_le_Q0_and_orderOf_st_of_commute`,
   `Q_eq_Q0_and_orderOf_st_of_commute` — **case (1)**: if `Q` is abelian then
   `Q = Q₀` and `st` has order `3`.
@@ -56,29 +55,6 @@ set_option autoImplicit false
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 universe uG uΩ
-
-/-- **"Let `P` be a subgroup of prime order `p`"** (Peterfalvi Part II, Ch. III
-§1, p. 116) — a non-trivial subgroup of a finite group has a subgroup of prime
-order.
-
-The Proposition's proof opens by choosing such a `P` inside `V`, and — when
-`W ≠ 1` — inside `W`; both choices are instances of this. -/
-theorem exists_le_card_eq_prime {G : Type uG} [Group G] [Finite G]
-    {Y : Subgroup G} (hY : Y ≠ ⊥) :
-    ∃ (P : Subgroup G) (p : ℕ), p.Prime ∧ Nat.card ↥P = p ∧ P ≤ Y := by
-  obtain ⟨g, hgY, hg1⟩ : ∃ g ∈ Y, g ≠ 1 := by
-    by_contra hall
-    push Not at hall
-    exact hY (le_bot_iff.mp fun x hx => Subgroup.mem_bot.mpr (hall x hx))
-  have hord : orderOf g ≠ 1 := fun h => hg1 (orderOf_eq_one_iff.mp h)
-  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hord
-  have hpos : 0 < orderOf g := orderOf_pos g
-  have hmpos : 0 < orderOf g / p := Nat.div_pos (Nat.le_of_dvd hpos hpdvd) hp.pos
-  have hyord : orderOf (g ^ (orderOf g / p)) = p := by
-    rw [orderOf_pow_of_dvd hmpos.ne' (Nat.div_dvd_of_dvd hpdvd)]
-    exact Nat.div_div_self hpdvd hpos.ne'
-  exact ⟨Subgroup.zpowers (g ^ (orderOf g / p)), p, hp,
-    by rw [Nat.card_zpowers, hyord], Subgroup.zpowers_le.mpr (Y.pow_mem hgY _)⟩
 
 namespace SecondCaseHypothesis
 

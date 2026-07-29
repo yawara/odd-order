@@ -129,6 +129,24 @@ theorem sq_eq_one_iff (x : RootGroup m) : x ^ 2 = 1 ↔ x.fst = 0 := by
     rw [sq_eq]
     ext <;> simp [hx]
 
+/-- **Squaring is injective modulo the central line**: `x² = y²` forces
+`(x⁻¹y)² = 1`.
+
+The square of `(a, b)` is `(0, a θ(a))` (`sq_eq`) and `a ↦ a θ(a)` is injective
+(`mul_titsTwist_injective`), so equal squares force equal first coordinates; in
+characteristic two the first coordinate of `x⁻¹y` is then `0`.
+
+Peterfalvi uses this in Part II, Ch. III §1, Proposition, case (3): "since
+`C_S(P)` is of type A, it follows that `y ∈ x Ω₁ C_S(P)`" (p. 117). -/
+theorem sq_inv_mul_eq_one_of_sq_eq {x y : RootGroup m} (h : x ^ 2 = y ^ 2) :
+    (x⁻¹ * y) ^ 2 = 1 := by
+  have hfst : x.fst = y.fst := by
+    apply mul_titsTwist_injective m
+    have h2 := congrArg RootGroup.snd h
+    rw [sq_eq, sq_eq] at h2
+    exact h2
+  rw [sq_eq_one_iff, fst_mul, fst_inv, hfst, CharTwo.add_self_eq_zero]
+
 /-- Every element of the root group has fourth power one. -/
 theorem pow_four_eq_one (x : RootGroup m) : x ^ 4 = 1 := by
   rw [show 4 = 2 * 2 by omega, pow_mul, sq_eq, sq_eq]
