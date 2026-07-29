@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
 
 /-!
 # The determinant-one torus does not act faithfully on `Ω₁(S₀)`
@@ -38,9 +39,16 @@ its kernel.
 
 * `exists_ne_one_mem_psuTorus_torusWeight_eq_one` — a non-trivial parameter of
   the determinant-one torus with trivial norm.
-* `exists_ne_one_mem_psuTorus_scalePoint_eq_of_fst_eq_zero` — the same in the
+* `exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one` — the same in the
   form Peterfalvi uses: a non-trivial `c ∈ D₀` fixing every element of
   `Ω₁(S₀)`.
+* `exists_ne_one_odd_centralizing_involutions_standardRoot` — the statement
+  transported into `standardPermGroup n`: a non-trivial element of odd order
+  commuting with every involution of the standard root group.
+* `exists_ne_one_odd_centralizing_involutions_of_sylowTwo` — the same for an
+  arbitrary Sylow `2`-subgroup, by Sylow conjugacy.  This is the form the
+  Ch. III §1 Proposition consumes, because there the Sylow `2`-subgroup is the
+  image of `C_Q(P)` and is not the standard one on the nose.
 -/
 
 set_option autoImplicit false
@@ -118,6 +126,22 @@ theorem exists_ne_one_mem_psuTorus_torusWeight_eq_one (n : ℕ) (hn : 1 < n) :
         = ((t ^ (2 * l - 1) : (Field n)ˣ) : Field n) ^ (l + 1) := by ring
       _ = 1 := hval
 
+/-- Every torus parameter has odd order: the unit group of `𝔽_{ℓ²}` has order
+`ℓ² − 1` with `ℓ` a power of two. -/
+theorem odd_orderOf_psuTorusParameter (n : ℕ) (hn : 0 < n)
+    (c : PSUTorusParameter n) : Odd (orderOf c) := by
+  have hdvd : orderOf c ∣ Nat.card (GeneralTorusParameter n) := by
+    refine dvd_trans (orderOf_dvd_natCard c) ?_
+    exact Subgroup.card_subgroup_dvd_card _
+  rw [natCard_units_field n hn] at hdvd
+  have hodd : Odd (2 ^ (2 * n) - 1) := by
+    have h1 : 1 ≤ 2 ^ (2 * n) := Nat.one_le_two_pow
+    have h2 : 2 ∣ 2 ^ (2 * n) :=
+      dvd_pow_self 2 (by positivity)
+    rcases h2 with ⟨k, hk⟩
+    exact ⟨k - 1, by omega⟩
+  exact hodd.of_dvd_nat hdvd
+
 /-- **`C_{D₀}(Ω₁(S₀)) ≠ 1`** (Peterfalvi Part II, Ch. III §1, Proposition,
 p. 117, the step stated "as can be checked").
 
@@ -133,5 +157,82 @@ theorem exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one (n : ℕ) (hn : 1 
   ext
   · rw [scalePoint_fst, hfst, mul_zero]
   · rw [scalePoint_snd, hw, one_mul]
+
+/-! ## The same statement inside `standardPermGroup n` -/
+
+/-- **`C_{D₀}(Ω₁(S₀)) ≠ 1`, for the standard Sylow `2`-subgroup**
+(Peterfalvi Part II, Ch. III §1, Proposition, p. 117).
+
+The determinant-one torus element of `exists_ne_one_mem_psuTorus_torusWeight_eq_one`,
+read inside `standardPermGroup n`: it is non-trivial, of odd order, and it
+commutes with every involution of the standard root group — which is a Sylow
+`2`-subgroup (`standardRootSylow`). -/
+theorem exists_ne_one_odd_centralizing_involutions_standardRoot
+    (n : ℕ) (hn : 1 < n) :
+    ∃ g : standardPermGroup n, g ≠ 1 ∧ Odd (orderOf g) ∧
+      ∀ u ∈ standardRootSubgroup n, u ^ 2 = 1 → g * u = u * g := by
+  obtain ⟨c, hmem, hne, hfix⟩ :=
+    exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one n hn
+  set d : PSUTorusParameter n := ⟨c, hmem⟩ with hd
+  refine ⟨psuTorusHom n d, ?_, ?_, ?_⟩
+  · intro h
+    exact hne (congrArg Subtype.val
+      (psuTorusHom_injective n (h.trans (map_one (psuTorusHom n)).symm)))
+  · rw [orderOf_injective (psuTorusHom n) (psuTorusHom_injective n) d]
+    exact odd_orderOf_psuTorusParameter n (Nat.zero_lt_one.trans hn) d
+  · rintro _ ⟨v, rfl⟩ hsq
+    have hv : v ^ 2 = 1 :=
+      rootHom_injective n (by rw [map_pow, hsq, map_one])
+    have hconj := psuTorusHom_mul_rootHom_mul_inv d v
+    rw [psuTorusScaleHom_apply, hfix v hv] at hconj
+    calc psuTorusHom n d * rootHom n v
+        = (psuTorusHom n d * rootHom n v * (psuTorusHom n d)⁻¹) *
+            psuTorusHom n d := by group
+      _ = rootHom n v * psuTorusHom n d := by rw [hconj]
+
+/-- **`C_{D₀}(Ω₁(S₀)) ≠ 1`, for an arbitrary Sylow `2`-subgroup**
+(Peterfalvi Part II, Ch. III §1, Proposition, p. 117).
+
+Sylow's theorem transports
+`exists_ne_one_odd_centralizing_involutions_standardRoot` to any Sylow
+`2`-subgroup `S`: the element that centralizes `Ω₁(S₀)` for the standard `S₀`
+is conjugated along with `S₀`. -/
+theorem exists_ne_one_odd_centralizing_involutions_of_sylowTwo
+    (n : ℕ) (hn : 1 < n) (S : Sylow 2 (standardPermGroup n)) :
+    ∃ g : standardPermGroup n, g ≠ 1 ∧ Odd (orderOf g) ∧
+      ∀ u ∈ (S : Subgroup (standardPermGroup n)), u ^ 2 = 1 → g * u = u * g := by
+  classical
+  obtain ⟨g₀, hg₀ne, hg₀odd, hg₀fix⟩ :=
+    exists_ne_one_odd_centralizing_involutions_standardRoot n hn
+  obtain ⟨h, hh⟩ := MulAction.exists_smul_eq (standardPermGroup n)
+    (standardRootSylow n (Nat.zero_lt_one.trans hn)) S
+  refine ⟨h * g₀ * h⁻¹, ?_, ?_, ?_⟩
+  · intro hcon
+    exact hg₀ne (by
+      have := congrArg (fun x => h⁻¹ * x * h) hcon
+      simpa [mul_assoc] using this)
+  · have heq : orderOf (h * g₀ * h⁻¹) = orderOf g₀ := by
+      simpa [MulAut.conj_apply] using
+        orderOf_injective (MulAut.conj h).toMonoidHom (MulAut.conj h).injective g₀
+    rwa [heq]
+  · intro u hu hsq
+    -- `h⁻¹ u h` is an involution of the standard root subgroup
+    have hmem : h⁻¹ * u * h ∈ standardRootSubgroup n := by
+      have hSu : u ∈ (S : Set (standardPermGroup n)) := hu
+      rw [← hh, Sylow.coe_smul] at hSu
+      obtain ⟨x, hx, hxu⟩ := hSu
+      have hxval : h * x * h⁻¹ = u := hxu
+      have : h⁻¹ * u * h = x := by rw [← hxval]; group
+      rw [this]
+      exact hx
+    have hsq' : (h⁻¹ * u * h) ^ 2 = 1 := by
+      have hcp : (h⁻¹ * u * h) ^ 2 = h⁻¹ * u ^ 2 * (h⁻¹)⁻¹ :=
+        conj_pow (a := h⁻¹) (b := u) (i := 2)
+      rw [hcp, hsq, mul_one, inv_inv, inv_mul_cancel]
+    have hc := hg₀fix _ hmem hsq'
+    calc (h * g₀ * h⁻¹) * u
+        = h * (g₀ * (h⁻¹ * u * h)) * h⁻¹ := by group
+      _ = h * ((h⁻¹ * u * h) * g₀) * h⁻¹ := by rw [hc]
+      _ = u * (h * g₀ * h⁻¹) := by group
 
 end OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary

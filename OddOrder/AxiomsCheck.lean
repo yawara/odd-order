@@ -13740,6 +13740,12 @@ order `ℓ + 1`. -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one
 #assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.odd_orderOf_psuTorusParameter
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_ne_one_odd_centralizing_involutions_standardRoot
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.exists_ne_one_odd_centralizing_involutions_of_sylowTwo
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB
 
 /-! **The theorem of Galois for `RingAut F`** (issue 0164, 2026-07-29).
