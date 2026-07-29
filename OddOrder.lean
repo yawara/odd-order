@@ -1,3 +1,4 @@
+import OddOrder.Algebra.PowSubOneDvd
 import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.Algebra.ChevalleyWarning
 import OddOrder.Algebra.FiniteIndexAnnihilator

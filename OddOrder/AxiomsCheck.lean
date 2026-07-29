@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Lean.Elab.Command
 import Lean.Util.CollectAxioms
+import OddOrder.Algebra.PowSubOneDvd
 import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.Algebra.FixedPointsGalois
@@ -14374,3 +14375,18 @@ applies. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.theoremAConclusion_of_caseA
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.theoremAConclusion_or_caseC2
+
+/-! **Divisibility among the numbers `aⁿ − 1`** (issue 0167, 2026-07-29).
+`Algebra/PowSubOneDvd.lean`.  `a ^ m - 1 ∣ a ^ n - 1 ↔ m ∣ n` for `2 ≤ a`, `m ≠ 0`
+(mathlib has the easy direction; the converse is `a ^ n - 1 ≡ a ^ (n % m) - 1` modulo
+`a ^ m - 1`, with the remainder term too small to be a non-zero multiple).
+
+The consequence is the counting step of Peterfalvi Part II Ch. III §3, p. 120: a subgroup of
+`S/Q₀` (a `2`-group of order `q² = 2^(2n)`) invariant under the fixed-point-free action of `K`
+(of order `q − 1`) has order `2ʲ` with `q − 1 ∣ 2ʲ − 1` and `j ≤ 2n`, hence `1`, `q` or `q²` —
+so the proper non-trivial `K`-invariant subgroups are exactly the "`K`-subgroups" of order `q`
+on which `W` acts fixed-point-freely. -/
+#assert_only_allowed_axioms
+  OddOrder.Nat.pow_sub_one_dvd_pow_sub_one_iff
+#assert_only_allowed_axioms
+  OddOrder.Nat.eq_zero_or_eq_or_eq_two_mul_of_two_pow_sub_one_dvd
