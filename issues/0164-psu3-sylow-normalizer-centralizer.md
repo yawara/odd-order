@@ -127,3 +127,23 @@ AxiomsCheck 登録済、sorry ゼロ。
 
 ⟹ 残るのは **(a) Galois の `C_V(C_{Q₀}(P)) = P`** (`W = 1` + Ch.I §2 Prop 3
 `exists_semilinear_equiv`) と **(b) 上の 4 = `C_H(s)` の Hall 分解**。
+
+
+## Galois パートの mathlib API (2026-07-29 実測)
+
+`C_V(C_{Q₀}(P)) = P` の中身は**有限体の Galois 基本定理**:
+`Q₀ ≅ F` (位数 `q = 2^m`) 上で `V` は `RingAut F` の部分群として作用し
+(Ch.I §2 Prop 3 = `exists_semilinear_equiv`)、`C_{Q₀}(P)` は `P` の固定体。
+
+* **mathlib の本体**: `IntermediateField.fixingSubgroup_fixedField`
+  (`FieldTheory/Galois/Basic.lean:274`)
+  — `[FiniteDimensional F E]` の下で `fixingSubgroup (fixedField H) = H`。
+  `H : Subgroup (E ≃ₐ[F] E)` なので `F := ZMod 2`、`E := F` (有限体)。
+* **`RingAut F` → `F ≃ₐ[ZMod 2] F` の変換**: `AlgEquiv.ofRingEquiv`
+  (`Algebra/Algebra/Equiv.lean:625`)。`commutes'` は素体上自動
+  (`ZMod 2` からの環準同型は一意)。
+* 有限体は `ZMod 2` 上有限次元なので `FiniteDimensional` は自動。
+
+⟹ Galois パートは **API が揃っている**。残る実装コストは
+`exists_semilinear_equiv` の出力 (`νe : Vbar ≃* A`) を上の形に繋ぐ配線と、
+`W = 1 ⟹ V ≃ Vbar` (忠実性)。
