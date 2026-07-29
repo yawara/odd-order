@@ -58,7 +58,14 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 で `P ≤ Q` (`Q` は `G` の `A`-不変 Sylow `p`) を取ると
 `[H : H∩C]_p = [P : P∩C]`, `[G : C]_p = [Q : Q∩C]` で,
 `P(Q∩C) ⊆ Q` から `[P:P∩C] ≤ [Q:Q∩C]`。両辺 `p`-冪なので整除。
-全素数で合わせて `[H:H∩C] ∣ [G:C]`。もう一方も同様。
+全素数で合わせて `[H:H∩C] ∣ [G:C]`。もう一方も同様
+(`|Q∩C|·|P| ≤ |Q|·|P∩C|` は両主張に共通の核)。
+
+* ✅ 核の不等式 `card_mul_card_inf_le_of_le` (2026-07-29 landing):
+  `P ≤ Q` なら `|P|·|Q ⊓ C| ≤ |Q|·|P ⊓ C|` (`P·(Q⊓C) ⊆ Q` と
+  `card_HK_mul_card_inf_eq_card_mul_card` から)。
+* ⬜ 残り = `p`-部分の突き合わせ (`Lemma 3.32` で `|H∩C|_p = |P∩C|` 等) と
+  `Nat.factorization_le_iff_dvd` による組み立て。
 
 ⚠ **重複定義の解消 (2026-07-29)**: 一時 `actionFixedSubgroup φ` を新設したが、
 これは既存の `OddOrder.GroupTheory.fixedSubgroup φ K` (`GroupTheory/FixedSubgroup.lean`) の

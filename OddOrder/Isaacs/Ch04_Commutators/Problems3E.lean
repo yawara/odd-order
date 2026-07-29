@@ -423,6 +423,28 @@ theorem fixedSubgroup_top_eq_mul (φ : A →* MulAut G)
     intro a ha
     rw [map_mul, (Subgroup.mem_inf.mp hx).1 a ha, (Subgroup.mem_inf.mp hy).1 a ha]
 
+/-! ### 3E.4 の核となる不等式 -/
+
+omit [Finite A] in
+/-- **`P ≤ Q` なら `[P : P ⊓ C] ≤ [Q : Q ⊓ C]`** (積の形): `P·(Q ⊓ C) ⊆ Q` と
+`|P·(Q ⊓ C)|·|P ⊓ C| = |P|·|Q ⊓ C|` から。
+
+3E.4 の `p`-部分比較の核 (`P`, `Q` を `A`-不変 Sylow に取る)。 -/
+theorem card_mul_card_inf_le_of_le {P Q C : Subgroup G} (hPQ : P ≤ Q) :
+    Nat.card ↥P * Nat.card ↥(Q ⊓ C) ≤ Nat.card ↥Q * Nat.card ↥(P ⊓ C) := by
+  have hkey := Subgroup.card_HK_mul_card_inf_eq_card_mul_card P (Q ⊓ C)
+  have hinf : P ⊓ (Q ⊓ C) = P ⊓ C := by
+    rw [← inf_assoc, inf_eq_left.mpr hPQ]
+  rw [hinf] at hkey
+  have hsub : ((P : Set G) * ((Q ⊓ C : Subgroup G) : Set G)) ⊆ (Q : Set G) := by
+    rintro - ⟨a, ha, b, hb, rfl⟩
+    exact Q.mul_mem (hPQ ha) (Subgroup.mem_inf.mp hb).1
+  have hle : Nat.card ((P : Set G) * ((Q ⊓ C : Subgroup G) : Set G)) ≤ Nat.card ↥Q :=
+    Nat.card_le_card_of_injective (Set.inclusion hsub) (Set.inclusion_injective hsub)
+  calc Nat.card ↥P * Nat.card ↥(Q ⊓ C)
+      = Nat.card ((P : Set G) * ((Q ⊓ C : Subgroup G) : Set G)) * Nat.card ↥(P ⊓ C) := hkey.symm
+    _ ≤ Nat.card ↥Q * Nat.card ↥(P ⊓ C) := Nat.mul_le_mul_right _ hle
+
 end -- 3E
 
 end OddOrder.Isaacs.Ch04
