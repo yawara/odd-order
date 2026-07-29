@@ -6572,3 +6572,32 @@ Lemma 9.15 (`nilpotentResidual_top_eq_of_isSubnormal_sup_nilpotent`) /
 相対形 (`nilpotentResidual_sup_eq_of_isSubnormal`) / `map_nilpotentResidual` /
 `nilpotentResidual_le_iff_isNilpotent_map` などが既にある。
 書籍 hint は「まず `A`, `B` ともに normal の場合、次に `|G|` の帰納法」。
+
+### 9B.5 の帰納法の設計が確定 (2026-07-29) — ⚠ 仮説は join でなく **積**
+
+**base case ✅** (`nilpotentResidual_top_eq_sup_of_normal`, commit f55ae54b5):
+`A, B ⊴ G`, `A ⊔ B = ⊤` ⟹ `G^∞ = A^∞ ⊔ B^∞`。
+
+**一般ケース (subnormal) の帰納法**は次で閉じる (`Nat.card G` の強帰納, `∀ G` を内側に
+量化する `nilpotentResidual_top_aux` と同じ型):
+
+1. `A = ⊤` または `B = ⊤` なら自明 (`le_sup_left` / `le_sup_right`)。
+2. 両方 proper なら `IsSubnormal.lt_normal` (mathlib) で
+   `A ≤ A₁ ⊴ G`, `A₁ < ⊤` と `B ≤ B₁ ⊴ G`, `B₁ < ⊤` を取る。
+   `A₁ ⊔ B₁ = ⊤` なので **base case** で `G^∞ = A₁^∞ ⊔ B₁^∞`。
+3. `A₁ = A (A₁ ⊓ B)` (**Dedekind**)。`A ⊴⊴ A₁`, `A₁ ⊓ B ⊴⊴ A₁`
+   (`IsSubnormal.subgroupOf` は任意の `K` に効く) で `|A₁| < |G|` なので **IH**:
+   `A₁^∞ = A^∞ ⊔ (A₁ ⊓ B)^∞`。対称に `B₁^∞ = (B₁ ⊓ A)^∞ ⊔ B^∞`。
+4. `(A₁ ⊓ B)^∞ ≤ B^∞` と `(B₁ ⊓ A)^∞ ≤ A^∞` は `nilpotentResidual_mono`。
+   合わせて `G^∞ ≤ A^∞ ⊔ B^∞`、逆は単調性。
+
+⚠ **仮説は `A ⊔ B = ⊤` (join) ではなく `G = AB` (積) でないと step 3 が回らない**。
+Dedekind の恒等式 `A (A₁ ∩ B) = (AB) ∩ A₁` は積についてのもので、
+部分群束は一般に modular でないため join では代用できない。書籍も `G = AB` と書いている。
+⟹ Lean statement は `(A : Set G) * B = Set.univ` を仮説に取り、
+`↥A₁` へ落とすときも積の形で持ち回る (`Subgroup.mul_normal` 等は片方の正規性が要るので
+素の `Set` の積で扱うのが安全)。
+
+⏳ 次 iteration = この帰納法の実装。base case と mathlib の
+`IsSubnormal.lt_normal` / `IsSubnormal.subgroupOf`、repo の
+`map_subtype_nilpotentResidual_top` / `map_subtype_nilpotentResidual_subgroupOf` が材料。
