@@ -299,3 +299,21 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
    `hrep := orbitRepVal_pairwise`, `hcard := card_orbitReprIndex_mul_card_K_succ`
    を渡し、`tConjMiddle_mem_K_of_orbitReprSet_covers` に接続
    (`orbitRepVal_mem_orbitReprSet` が橋渡し)。
+
+
+## 🎯 §2 Proposition が p.119 の 1 点に完全還元 (2026-07-29)
+
+`OrderFiveOrbits.lean`:
+
+* `orbitReprSet_covers` — `exists_mem_orbit_of_card_mul_succ_eq` に
+  `MulAction ↥K ↥Q := MulAction.compHom _ conjQByK` を据えて適用。
+* **`tConjMiddle_mem_K`** — `∀ x ∈ Q^#, h(x) ∈ K`。
+  仮説は `r² ≠ 1`、`|Q| = |Q₀|²`、および `hpair` (p.119) の 3 つだけ。
+
+⟹ **§2 Proposition の内容はこれで尽きる** (`txt = g(x)h(x)t f(x)` で `h(x) ∈ K` が
+`tSt ⊆ SKtS`)。残るのは:
+
+* **`hpair`** = p.119 の体計算 (`a⁻¹ (rr^{-k₁}) a = rr^{-k₂} ⟹ k₁ = k₂`)
+* `(SK) ∪ (SKtS)` が実際に部分群であることの組み立て (`tSt ⊆ SKtS` からの一般論)
+* case (b) から `r² ≠ 1` (= `structureConjugator_sq_ne_one` + `orderOf_st_eq_five_of_isSuzuki2Group`)
+  と `|Q| = |Q₀|²` (= `natCard_Q_eq_sq_or_cube` の sq 側) を供給する配線
