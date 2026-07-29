@@ -14051,3 +14051,21 @@ defined; the identity (4) identifies its middle factor as `ℓ²k² ∈ K`. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_KSet_conj_distinguishedInvolution
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_tConjMiddle_eq
+
+/-! **`h(x) ∈ K` on the book's system of representatives** (issue 0165, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/TConjugateTriple.lean`, Peterfalvi Part II, Ch. III §2, p. 118.
+
+`h(s) = h(r) = h(r⁻¹) = 1` and `h(r r^{-k}) = ℓ²k²`, all in `K`; and `h(xᵃ) = a h(x) a` moves
+the property along `K`-orbits.  What remains of the Proposition of §2 is that these elements
+*are* a full system of representatives for the `K`-orbits of `S#` — there are
+`|S#|/|K| = q + 1 = |K#| + 3` orbits, so it suffices that they be pairwise non-conjugate. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_conj_mem_K
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_distinguishedInvolution_mem_K
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_structureConjugator_mem_K
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_structureConjugator_inv_mem_K
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.tConjMiddle_structureConjugator_mul_conj_inv_mem_K

@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
 import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 
 /-!
 # The canonical decomposition of `t x t` for `x ∈ Q ∖ {1}`
@@ -631,6 +632,47 @@ theorem exists_tConjMiddle_eq {k : G} (hk : k ∈ hyp.KSet) (hk1 : k ≠ 1) :
   exact (hyp.tConjTriple_eq_of (hyp.structureConjugator_mul_conj_inv_mem hk)
     (hyp.structureConjugator_mul_conj_inv_ne_one hk hk1) hgQ hdD hfQ
     (hyp.t_conj_structureConjugator_mul_conj_inv hk hl hskl)).2.1
+
+/-! ## `h(x) ∈ K` on the book's system of representatives
+
+Peterfalvi Part II, Ch. III §2, p. 118: `h(s) = h(r) = h(r⁻¹) = 1` and
+`h(r r^{-k}) = ℓ²k² ∈ K`, and by the equivariance (1) the property `h(x) ∈ K`
+passes along `K`-orbits. -/
+
+/-- **`h(x) ∈ K` passes along `K`-orbits** (Peterfalvi Part II, Ch. III §2,
+p. 118, identity (1)): `h(xᵃ) = a h(x) a`. -/
+lemma tConjMiddle_conj_mem_K {y a : G} (hy : y ∈ hyp.Q) (hy1 : y ≠ 1)
+    (ha : a ∈ hyp.K) (hmem : hyp.tConjMiddle y ∈ hyp.K) :
+    hyp.tConjMiddle (a⁻¹ * y * a) ∈ hyp.K := by
+  have haK : a ∈ hyp.KSet := by rw [← hyp.coe_K]; exact ha
+  rw [(hyp.tConjTriple_conj hy hy1 haK).2.1]
+  exact hyp.K.mul_mem (hyp.K.mul_mem ha hmem) ha
+
+lemma tConjMiddle_distinguishedInvolution_mem_K :
+    hyp.tConjMiddle hyp.distinguishedInvolution ∈ hyp.K := by
+  rw [hyp.tConjTriple_distinguishedInvolution.2.1]
+  exact hyp.K.one_mem
+
+lemma tConjMiddle_structureConjugator_mem_K :
+    hyp.tConjMiddle hyp.structureConjugator ∈ hyp.K := by
+  rw [hyp.tConjTriple_structureConjugator.2.1]
+  exact hyp.K.one_mem
+
+lemma tConjMiddle_structureConjugator_inv_mem_K :
+    hyp.tConjMiddle hyp.structureConjugator⁻¹ ∈ hyp.K := by
+  rw [hyp.tConjTriple_structureConjugator_inv.2.1]
+  exact hyp.K.one_mem
+
+/-- **`h(r r^{-k}) ∈ K`** (Peterfalvi Part II, Ch. III §2, p. 118, identity (4)). -/
+theorem tConjMiddle_structureConjugator_mul_conj_inv_mem_K {k : G} (hk : k ∈ hyp.K)
+    (hk1 : k ≠ 1) :
+    hyp.tConjMiddle
+        (hyp.structureConjugator * (k⁻¹ * hyp.structureConjugator⁻¹ * k)) ∈ hyp.K := by
+  have hkK : k ∈ hyp.KSet := by rw [← hyp.coe_K]; exact hk
+  obtain ⟨l, hl, hval⟩ := hyp.exists_tConjMiddle_eq hkK hk1
+  have hlK : l ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact hl
+  rw [hval]
+  exact hyp.K.mul_mem (hyp.K.pow_mem hlK 2) (hyp.K.pow_mem hk 2)
 
 end Hypothesis
 
