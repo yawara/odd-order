@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
 
 /-!
 # Peterfalvi Part II, Ch. III §1, Proposition: the three cases for `S`
@@ -55,6 +55,8 @@ Ch. I §3 Proposition 1(c) carries in that branch; see
 * `false_of_typeA_centralizer_of_two_kSubgroups`,
   `orderOf_st_eq_three_of_two_kSubgroups` — **case (3)'s `st` has order `3`**,
   given the two `K`-subgroups of `S` of order `q²` that `P` normalizes.
+* `orderOf_st_eq_three_of_card_cube_of_not_isTypeB` — the same for `S` of order
+  `q³` outside type B, where the two `K`-subgroups are the only ones.
 -/
 
 set_option autoImplicit false
@@ -444,6 +446,33 @@ theorem orderOf_st_eq_three_of_two_kSubgroups
       hXcard hYQ hQ0Y hYinv hYcard hne hp hPcard hPV hPX hPY
       det.standardTypeAData).elim
   · exact det.distinguishedProduct_order
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (3), types C and D**
+(p. 117): if `S` is a Suzuki `2`-group of order `q³` that is not of type B, then
+`st` has order `3`.
+
+Higman's clause (d) supplies two `K`-subgroups of order `q²`, and outside type B
+they are the only ones (`exists_two_kSubgroups_unique_of_card_cube`), so the
+odd-order `P` normalizes both (`conj_mem_of_unique_of_le_V`) — the input of
+`orderOf_st_eq_three_of_two_kSubgroups`. -/
+theorem orderOf_st_eq_three_of_card_cube_of_not_isTypeB
+    (ind : Hypothesis.TheoremAInductionBelow G Ω)
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q)
+    {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥sc.toHypothesis.Q0 = 2 ^ m)
+    (hcardQ : Nat.card ↥sc.toHypothesis.Q = Nat.card ↥sc.toHypothesis.Q0 ^ 3)
+    (hnotB : ¬ Suzuki2Groups.IsTypeB.{uG, 0} ↥sc.toHypothesis.Q)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ sc.toHypothesis.V) :
+    orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3 := by
+  obtain ⟨X, Y, hX, hY, hne, huniq⟩ :=
+    sc.toHypothesis.exists_two_kSubgroups_unique_of_card_cube hQsuz hm hQ0card
+      hcardQ hnotB
+  exact sc.orderOf_st_eq_three_of_two_kSubgroups ind hQsuz
+    hX.1 hX.2.1 hX.2.2.1 hX.2.2.2 hY.1 hY.2.1 hY.2.2.1 hY.2.2.2 hne hp hPcard hPV
+    (Hypothesis.conj_mem_of_unique_of_le_V hp hPcard hPV hX hne huniq)
+    (Hypothesis.conj_mem_of_unique_of_le_V hp hPcard hPV hY (Ne.symm hne)
+      (fun Z hZ => (huniq Z hZ).symm))
 
 /-- **After Theorem C, the book's `S` is `Q`**: `Q₁ = 1` (`Q1_eq_bot`) makes the
 Sylow `2`-subgroup `S` of `Q` equal to `Q`, so Ch. III §1's Proposition — stated

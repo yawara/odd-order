@@ -13570,3 +13570,5 @@ Ch. III §1 Proposition needs the same content as plain subgroups of `G`.
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_eq_liftCentralQuotient_of_isKSubgroupSquare
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_two_kSubgroups_unique_of_card_cube
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB
