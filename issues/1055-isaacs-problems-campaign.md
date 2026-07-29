@@ -7034,3 +7034,35 @@ lane a は main より **88 commits 先行**した状態が続いている (hub 
 
 **未解決として明示記録したもの**: 9C.3 step (b) / 9D.4 の `N` 非可換ケースと「`S` も単純」/
 10A.3 後半 (`A` 基本可換) / 10B.2 の Maschke。
+
+## 9C.3 解決 — Fable 5 単独・ChatGPT 相談なし (2026-07-30)
+
+**`mul_eq_univ_of_isSubnormal_of_coprime_abelianization` (Problems9C.lean, axiom-clean)**。
+deferred だった step (b) の未解決点は **Thm 2.6 (Wielandt) がそのまま鍵**だった:
+
+* **(b)** 「`A` が `(N∩A)(N∩B)` を正規化する理由」= `isMinimalNormal_le_normalizer_of_isSubnormal`
+  (repo 既存, `Basic.lean`)。極小正規 `N` は subnormal な `A`, `B` を**正規化する**ので
+  `[A, N] ≤ N ⊓ A`、よって `x ∈ N⊓B` に対し `a x a⁻¹ = [a,x]·x ∈ D`。
+  前回セッションが検討していた「characteristically simple の構造論」は**不要**
+  (abelian / 非 abelian の場合分けも消える)。`A ◁◁ G` の鎖から直接出そうとして
+  出なかったのは、鎖でなく **N 側の normalizer 定理**を使うべきだったから。
+* **(c) 後半** 「`N` は素数位数」も同じ流れで即決: `N∩A = N∩B = ⊥` ⟹ `[N,A] = [N,B] = 1`
+  ⟹ `N ≤ C_G(⟨A,B⟩) = Z(G)`。中心的極小正規は素数位数
+  (`Ch02.exists_prime_card_of_isMinimalNormal_of_le_center` 新設)。
+* **(d)** の「9C.2 をどう使うか」: 反例内では `G ≠ AB` なので 9C.2 を `(A,B)` に直接は
+  当てられない。**pair `(A ⊔ N, B)`** なら積 `(A⊔N)·B = A·N·B = G` が (a) から出る。
+  `O^p(A⊔N) = O^p(A)` は **Lemma 9.26** (`pResidualOf_sup_eq_of_isSubnormal`, repo 既存)。
+* **(e)** には 9C.2 の**積形**が要る (書籍の結論 `O^p(A)O^p(B)` は集合の積; repo の
+  join 形は弱形だった)。積形は 2 段の `|G|` 帰納で証明
+  (`pResidualOf_top_eq_mul_of_isSubnormal`): まず (normal × subnormal) を確立
+  (`B ≤ B₁ ◁ G` に降ろすと middle 項 `O^p(A⊓B₁) ≤ O^p(A)` が**吸収**で消える)、
+  一般は `A ≤ A₁ ◁ G` + (i) + `↥A₁` 内帰納で `O^p(B⊓A₁) ≤ O^p(B)` を吸収。
+  そのうえで `B ≤ O^p(G)` ⟹ `G = A·O^p(G) = A·O^p(A)·B = AB`。
+
+構成 (全 sorry-free / `#print axioms` = 標準 3): 積形 9C.2 (aux 2 本 + 公開 2 本) /
+`pResidual_eq_top_of_not_dvd_card_abelianization` (`p ∤ |Q:Q'|` ⟹ `O^p(Q) = Q`) /
+`commutator_ne_top_of_isNilpotent` / `card_abelianization_map_dvd` (互いに素性の商への遺伝) /
+`GroupTheory.coe_mul_coe_eq_left/right` (部分群集合積の吸収) /
+`coe_sup_eq_mul_of_le_normalizer` (normalizer 条件下の join = 積)。
+
+**⟹ §9C 完済 (3/3)。** 残る「ChatGPT 行き」候補は 9D.4 の 2 点と 10A.3 後半のみ。
