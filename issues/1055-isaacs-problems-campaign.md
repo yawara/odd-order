@@ -6389,3 +6389,36 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
 
 **次々 = 9A.8** (characteristically simple ⟹ 同型な単純群の直積)。書籍 hint は
 `G ⋊ Aut(G)` を考えて `G` をその極小正規部分群にし 9A.7 を当てる。
+
+### §9A 進捗 (2026-07-29, 続き 2) — 9A.7 完了、残り 9A.8 のみ
+
+* **9A.7 ✅** `exists_conj_map_eq_of_isSimpleFactorOf`。あわせて
+  **`IsSimpleFactorOf N T`** (structure: `T ≤ N` / `N ≤ N_G(T)` / `IsSimpleGroup ↥T` /
+  `¬IsMulCommutative ↥T`) を導入し `exists_simpleFamily_of_isMinimalNormal` の出力を
+  これに書き換え (使用側は無変更で通った)。新補助 = `le_normalizer_inf` /
+  `commute_of_le_normalizer_of_disjoint` / `IsSimpleFactorOf.conj` /
+  `inf_centralizer_eq_bot_of_isSemisimpleGroup_coe`。
+  ⚠ `mem_conjugatesOfSet_iff` は `Group` namespace (`Subgroup` でない)。
+  ⚠ `push_neg` は deprecated 警告 → `by_contra` + `fun g h => hcon0 ⟨g, h⟩` で回避。
+
+**次 = 9A.8** (characteristically simple ⟹ 同型な単純群の直積)。**§9A 最難**。調査結果:
+
+* **holomorph は repo にも mathlib にも無い** → 自前で
+  `SemidirectProduct G (MulAut G) (MonoidHom.id (MulAut G))` として作る
+  (`SemidirectProduct` は mathlib にあり `Ch03/CyclicExtensions.lean` で使用実績あり)。
+* 鍵の対応: `Γ := G ⋊ Aut(G)` で `inl.range ⊴ Γ`。`K ≤ inl.range` が `Γ`-normal
+  ⟺ 対応する `K₀ ≤ G` が `G`-normal かつ `Aut(G)`-不変 ⟺ **`K₀` characteristic**。
+  ⟹ `G` characteristically simple ⟺ `inl.range` が `Γ` の極小正規部分群。
+* そこで Lemma 9.6 (`isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal`) で 2 分:
+  - **非可換枝**: `↥(inl.range) ≅ G` は semisimple ⟹ 単純直積因子に分解、
+    **9A.7 で `Γ` の共役により全て同型** ⟹ 同型な非可換単純群の直積。
+  - **可換枝**: `G` abelian かつ characteristically simple ⟹ elementary abelian
+    (`{x | x^p = 1}` が characteristic)。repo の `OddOrder.GroupTheory.IsElementaryAbelian`
+    + `IsElementaryAbelian.zmodModule` (`PRank.lean`) で `ZMod p`-ベクトル空間になるので
+    基底を取って `(ZMod p)^n` に分解 ⟹ 同型な単純群 (`ZMod p`) の直積。
+* 想定 statement:
+  `∃ 𝒵 : Set (Subgroup G), 𝒵.Nonempty ∧ (∀ T ∈ 𝒵, T.Normal ∧ IsSimpleGroup ↥T) ∧`
+  `(∀ T ∈ 𝒵, ∀ U ∈ 𝒵, Nonempty (↥T ≃* ↥U)) ∧ iSupIndep … ∧ sSup 𝒵 = ⊤`
+  (`iSupIndep_of_semisimpleFamily` が非可換枝の独立性を与える)。
+* 規模的に 2-3 iteration 想定。holomorph + characteristic 対応を先に別 leaf
+  (`OddOrder/GroupTheory/Holomorph.lean` 相当) に切り出すのが素直。
