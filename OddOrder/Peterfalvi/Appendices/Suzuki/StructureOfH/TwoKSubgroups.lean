@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualCenter
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TwoSummandSplit
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
 # The two `K`-subgroups of `S` of order `q²`
@@ -283,6 +284,176 @@ theorem conj_mem_of_unique_of_le_V {P : Subgroup G} {p : ℕ} (hp : p.Prime)
     refine mem_map_conj.mpr ?_
     rwa [show g⁻¹ * (g * y * g⁻¹) * g = y from by group]
   rwa [hfix] at hmem
+
+/-! ## Conjugation by a subgroup of `H`, and the Maschke complement -/
+
+/-- Conjugation on `Q` by a subgroup `A` of `H`; `Q ⊴ H`.  Generalizes
+`conjQByK` and `conjQByW` to an arbitrary operator subgroup. -/
+def conjQBy {A : Subgroup G} (hAH : A ≤ hyp.H) : ↥A →* MulAut ↥hyp.Q where
+  toFun a :=
+    { toFun := fun x => ⟨(a : G) * x * (a : G)⁻¹,
+        hyp.Q_normal_in_H a (hAH a.2) x x.2⟩
+      invFun := fun x => ⟨(a : G)⁻¹ * x * (a : G), by
+        simpa using hyp.Q_normal_in_H (a : G)⁻¹ (inv_mem (hAH a.2)) x x.2⟩
+      left_inv := fun x => Subtype.ext (by simp [mul_assoc])
+      right_inv := fun x => Subtype.ext (by simp [mul_assoc])
+      map_mul' := fun x y => Subtype.ext (by
+        change (a : G) * ((x : G) * (y : G)) * (a : G)⁻¹ =
+          ((a : G) * x * (a : G)⁻¹) * ((a : G) * y * (a : G)⁻¹)
+        group) }
+  map_one' := by
+    ext x
+    change ((1 : ↥A) : G) * (x : G) * ((1 : ↥A) : G)⁻¹ = (x : G)
+    simp
+  map_mul' a b := by
+    ext x
+    change (((a : G) * (b : G)) * (x : G) * (((a : G) * (b : G))⁻¹)) =
+      (a : G) * ((b : G) * (x : G) * (b : G)⁻¹) * (a : G)⁻¹
+    group
+
+theorem conjQBy_apply {A : Subgroup G} (hAH : A ≤ hyp.H) (a : ↥A) (x : ↥hyp.Q) :
+    ((hyp.conjQBy hAH a x : ↥hyp.Q) : G) = (a : G) * (x : G) * (a : G)⁻¹ := rfl
+
+/-- The induced action of `A` on the central quotient of `Q`. -/
+noncomputable def conjQuotientBy {A : Subgroup G} (hAH : A ≤ hyp.H) :
+    ↥A →* MulAut (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q) :=
+  IsAInvariant.quotientMulAutHom
+    (IsAInvariant.of_characteristic (hyp.conjQBy hAH))
+
+/-- The lift of an `A`-invariant subgroup of the central quotient is invariant
+under conjugation by `A`, elementwise. -/
+theorem conj_mem_liftCentralQuotient {A : Subgroup G} (hAH : A ≤ hyp.H)
+    {U : Subgroup (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q)}
+    (hUinv : IsAInvariant (hyp.conjQuotientBy hAH) U) :
+    ∀ a ∈ A, ∀ y ∈ hyp.liftCentralQuotient U,
+      a * y * a⁻¹ ∈ hyp.liftCentralQuotient U := by
+  intro a ha y hy
+  obtain ⟨hyQ, hyU⟩ := mem_liftCentralQuotient_iff.mp hy
+  have hconjQ : a * y * a⁻¹ ∈ hyp.Q := hyp.Q_normal_in_H a (hAH ha) y hyQ
+  refine mem_liftCentralQuotient_iff.mpr ⟨hconjQ, ?_⟩
+  have hval : (hyp.conjQBy hAH ⟨a, ha⟩) (⟨y, hyQ⟩ : ↥hyp.Q)
+      = (⟨a * y * a⁻¹, hconjQ⟩ : ↥hyp.Q) := rfl
+  have hmem := hUinv.smul_mem (⟨a, ha⟩ : ↥A) hyU
+  rwa [conjQuotientBy, IsAInvariant.quotientMulAutHom_apply_mk', hval] at hmem
+
+/-- The image in the central quotient of a subgroup between `Q₀` and `Q` that is
+invariant under conjugation by `A` is `A`-invariant. -/
+theorem aInvariant_map_of_conj_mem {A : Subgroup G} (hAH : A ≤ hyp.H)
+    {N : Subgroup G} (hNinv : ∀ a ∈ A, ∀ y ∈ N, a * y * a⁻¹ ∈ N) :
+    IsAInvariant (hyp.conjQuotientBy hAH)
+      ((N.subgroupOf hyp.Q).map
+        (QuotientGroup.mk' (Subgroup.center ↥hyp.Q))) := by
+  rw [isAInvariant_iff_smul_mem]
+  rintro a x ⟨y, hy, rfl⟩
+  refine ⟨(hyp.conjQBy hAH a) y, ?_, rfl⟩
+  refine Subgroup.mem_subgroupOf.mpr ?_
+  have hyN : (y : G) ∈ N := Subgroup.mem_subgroupOf.mp hy
+  rw [conjQBy_apply]
+  exact hNinv a a.2 _ hyN
+
+/-- **Operator Maschke for `S ⧸ Q₀`** (BG Ch. 1,
+`exists_aInvariant_complement_of_isElementaryAbelian`).
+
+A subgroup `N` with `Q₀ ≤ N ≤ S` of order `q²`, invariant under conjugation by
+an operator subgroup `A ≤ D` of odd order, has a partner `N'` of the same
+description with `N ⊓ N' = Q₀`.  This replaces the book's count of the
+`K`-subgroups of `S` of order `q²` (p. 117, case (3)): applied with
+`A = K ⊔ P`, one such subgroup produces a second one that `P` also
+normalizes. -/
+theorem exists_kSubgroupSquare_complement {A : Subgroup G} (hAD : A ≤ hyp.D)
+    (hQ2 : IsPGroup 2 ↥hyp.Q)
+    (hZQ0 : Subgroup.center ↥hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hEA : OddOrder.GroupTheory.IsElementaryAbelian 2
+      (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q))
+    (hQcard : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
+    {N : Subgroup G} (hNQ : N ≤ hyp.Q) (hQ0N : hyp.Q0 ≤ N)
+    (hNinv : ∀ a ∈ A, ∀ y ∈ N, a * y * a⁻¹ ∈ N)
+    (hNcard : Nat.card ↥N = Nat.card ↥hyp.Q0 ^ 2) :
+    ∃ N' : Subgroup G, N' ≤ hyp.Q ∧ hyp.Q0 ≤ N' ∧
+      (∀ a ∈ A, ∀ y ∈ N', a * y * a⁻¹ ∈ N') ∧
+      Nat.card ↥N' = Nat.card ↥hyp.Q0 ^ 2 ∧ N ≠ N' := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hAH : A ≤ hyp.H := hAD.trans hyp.D_le_H
+  set U : Subgroup (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q) :=
+    (N.subgroupOf hyp.Q).map
+      (QuotientGroup.mk' (Subgroup.center ↥hyp.Q)) with hUdef
+  -- cardinalities
+  have hZcard : Nat.card ↥(Subgroup.center ↥hyp.Q) = Nat.card ↥hyp.Q0 := by
+    rw [hZQ0, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv]
+  have hQ0two : 2 ≤ Nat.card ↥hyp.Q0 := hyp.two_le_card_Q0
+  obtain ⟨n, hn⟩ := (hQ2.to_le hyp.Q0_le_Q).exists_card_eq
+  have hn1 : n ≠ 0 := by
+    intro h
+    rw [h, pow_zero] at hn
+    omega
+  have hEcard : Nat.card (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q)
+      = Nat.card ↥hyp.Q0 ^ 2 := by
+    have h := Subgroup.card_eq_card_quotient_mul_card_subgroup
+      (Subgroup.center ↥hyp.Q)
+    rw [hQcard, hZcard] at h
+    refine Nat.eq_of_mul_eq_mul_right (Nat.card_pos (α := ↥hyp.Q0)) ?_
+    rw [← h, pow_succ]
+  have hCle : Subgroup.center ↥hyp.Q ≤ N.subgroupOf hyp.Q := by
+    intro x hx
+    rw [hZQ0] at hx
+    exact Subgroup.mem_subgroupOf.mpr (hQ0N (Subgroup.mem_subgroupOf.mp hx))
+  have hcomap : U.comap (QuotientGroup.mk' (Subgroup.center ↥hyp.Q))
+      = N.subgroupOf hyp.Q := by
+    rw [hUdef, Subgroup.comap_map_eq, QuotientGroup.ker_mk', sup_eq_left.mpr hCle]
+  have hliftU : hyp.liftCentralQuotient U = N := by
+    rw [liftCentralQuotient, hcomap, Subgroup.subgroupOf_map_subtype,
+      inf_eq_left.mpr hNQ]
+  have hUcard : Nat.card ↥U = Nat.card ↥hyp.Q0 := by
+    have h := card_liftCentralQuotient (hyp := hyp) U
+    rw [hliftU, hNcard, hZcard, sq] at h
+    exact (Nat.eq_of_mul_eq_mul_right Nat.card_pos h).symm
+  -- coprimality: `|A|` divides the odd `|D|`, and the quotient is a `2`-group
+  have hcop : Nat.Coprime (Nat.card ↥A)
+      (Nat.card (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q)) := by
+    have hAodd : ¬ 2 ∣ Nat.card ↥A := by
+      intro hdvd
+      have hdvdD : (2 : ℕ) ∣ Nat.card ↥hyp.D :=
+        hdvd.trans (Subgroup.card_dvd_of_le hAD)
+      obtain ⟨j, hj⟩ := hyp.D_odd
+      obtain ⟨i, hi⟩ := hdvdD
+      omega
+    have h2 : Nat.card (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q) = 2 ^ (2 * n) := by
+      rw [hEcard, hn, ← pow_mul, mul_comm]
+    rw [h2]
+    exact Nat.Coprime.pow_right _
+      ((Nat.Prime.coprime_iff_not_dvd Nat.prime_two).mpr hAodd).symm
+  have hpE : 2 ∣ Nat.card (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q) := by
+    rw [hEcard, hn, ← pow_mul]
+    exact dvd_pow_self 2 (by omega)
+  -- operator Maschke
+  obtain ⟨W, hWinv, hinf, hsup⟩ :=
+    OddOrder.BG.Ch1_Preliminary.exists_aInvariant_complement_of_isElementaryAbelian
+      hpE (φ := hyp.conjQuotientBy hAH) hcop hEA
+      (aInvariant_map_of_conj_mem hAH hNinv)
+  have hinf' : U ⊓ W = ⊥ := hinf
+  have hsup' : U ⊔ W = ⊤ := hsup
+  -- the complement has order `|Q₀|`
+  haveI hUnormal : U.Normal :=
+    ⟨fun x hx g => by
+      rw [hEA.comm g x, mul_assoc, mul_inv_cancel, mul_one]; exact hx⟩
+  have hcompl : IsCompl U W := ⟨disjoint_iff.mpr hinf', codisjoint_iff.mpr hsup'⟩
+  have hquot := Suzuki2Groups.card_quotient_of_isCompl hcompl
+  have hWcard : Nat.card ↥W = Nat.card ↥hyp.Q0 := by
+    have hq := Subgroup.card_eq_card_quotient_mul_card_subgroup U
+    rw [hquot, hUcard, hEcard, sq] at hq
+    exact (Nat.eq_of_mul_eq_mul_right Nat.card_pos hq).symm
+  refine ⟨hyp.liftCentralQuotient W, liftCentralQuotient_le_Q _,
+    Q0_le_liftCentralQuotient hZQ0 _, conj_mem_liftCentralQuotient hAH hWinv,
+    by rw [card_liftCentralQuotient, hWcard, hZcard, sq], ?_⟩
+  intro heq
+  have hUW : U = W := liftCentralQuotient_injective (hliftU.trans heq)
+  have hbot : U = ⊥ := by
+    have h := hinf'
+    rw [← hUW, inf_idem] at h
+    exact h
+  rw [hbot, Subgroup.card_bot] at hUcard
+  omega
 
 /-! ## Higman clause (d) in `G`-language -/
 

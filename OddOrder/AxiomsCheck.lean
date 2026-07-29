@@ -345,7 +345,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 13600
+set_option linter.style.longFile 13800
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -13570,5 +13570,30 @@ Ch. III §1 Proposition needs the same content as plain subgroups of `G`.
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_eq_liftCentralQuotient_of_isKSubgroupSquare
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_two_kSubgroups_unique_of_card_cube
+
+/-! **Operator Maschke replaces the book's count of `K`-subgroups** (issue 0163, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/TwoKSubgroups.lean`, p. 117 case (3).
+
+For the type-B half of case (3) the book produces the second `K`-subgroup by counting: "every
+element of order `4` in `S` generates a `K`-subgroup of order `q²`, and the number of
+`K`-subgroups of `S` of order `q²` is `q + 1`".  That count needs the module theory behind
+`End_K(M) = 𝐅_q`.  It is avoided here: one such subgroup produces a second one by **operator
+Maschke** applied to the odd-order operator group.
+
+* `conjQBy`, `conjQuotientBy` — conjugation on `Q` and on `Q ⧸ Z(Q)` by an arbitrary operator
+  subgroup `A ≤ H`, generalizing `conjQByK` and `conjQByW`.
+* `conj_mem_liftCentralQuotient`, `aInvariant_map_of_conj_mem` — the bridge in both directions
+  for that action.
+* `exists_kSubgroupSquare_complement` — **the replacement**: since `|D|` is odd
+  (`D_odd`) and `Q ⧸ Z(Q)` is an elementary abelian `2`-group, any `A ≤ D` acts coprimely, so
+  BG Ch. 1's `exists_aInvariant_complement_of_isElementaryAbelian` gives an `A`-invariant
+  complement.  Its preimage is a second subgroup of the same description meeting the first in
+  `Q₀`.  Applied with `A = K ⊔ P`, the partner is normalized by `P` as well. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_liftCentralQuotient
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.aInvariant_map_of_conj_mem
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_kSubgroupSquare_complement
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB
