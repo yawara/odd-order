@@ -176,6 +176,59 @@ theorem exists_isAInvariant_isPGroup_of_isSolvable [IsSolvable G] [Nontrivial G]
     rw [Subgroup.pointwise_smul_def]
     exact hmap.symm
 
+/-! ### 3E.1 (`A` 可解の場合) の部品 -/
+
+/-- 作用の固定部分群 `C_G(A)`。 -/
+def actionFixedSubgroup (φ : A →* MulAut G) : Subgroup G where
+  carrier := {g : G | ∀ a : A, (φ a) g = g}
+  one_mem' := fun a => map_one (φ a)
+  mul_mem' := fun {x y} hx hy a => by rw [map_mul, hx a, hy a]
+  inv_mem' := fun {x} hx a => by rw [map_inv, hx a]
+
+omit [Finite A] [Finite G] in
+theorem mem_actionFixedSubgroup {φ : A →* MulAut G} {g : G} :
+    g ∈ actionFixedSubgroup φ ↔ ∀ a : A, (φ a) g = g := Iff.rfl
+
+/-- **3E.1 (`A` 可解) の case (iii)**: `B ⊴ A` が `G` に互いに素に作用し
+`C_G(B) = 1` なら, 各素数 `q` について `A`-不変な Sylow `q`-部分群がある。
+
+Thm 3.23(a) で `B`-不変 Sylow `S` を取る。`a ∈ A` について `(φ a) • S` も `B`-不変
+(`B ⊴ A`) な Sylow なので, Thm 3.23(b) より `C_G(B) = 1` の元で共役, すなわち一致する。 -/
+theorem exists_isAInvariant_sylow_of_normal_of_trivial_fixed (φ : A →* MulAut G)
+    {B : Subgroup A} [B.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥B) (Nat.card G))
+    (hsolv : IsSolvable ↥B ∨ IsSolvable G)
+    (hfix : ∀ g : G, (∀ b : ↥B, (φ (b : A)) g = g) → g = 1)
+    (q : ℕ) [Fact q.Prime] :
+    ∃ S : Sylow q G, OddOrder.Isaacs.Ch03.IsAInvariant φ (S : Subgroup G) := by
+  set ψ : ↥B →* MulAut G := φ.comp B.subtype with hψ
+  obtain ⟨S, hS⟩ := exists_aInvariant_sylow (φ := ψ) hcop hsolv q
+  refine ⟨S, fun a => ?_⟩
+  have hcoe : (((φ a : MulAut G) • S : Sylow q G) : Subgroup G)
+      = (φ a : MulAut G) • (S : Subgroup G) := rfl
+  -- `(φ a) • S` も `B`-不変
+  have hconj : OddOrder.Isaacs.Ch03.IsAInvariant ψ
+      ((((φ a : MulAut G) • S : Sylow q G)) : Subgroup G) := by
+    rw [hcoe]
+    intro b
+    have hb : (b : A) ∈ B := b.2
+    have hmem : a⁻¹ * (b : A) * a ∈ B := by
+      simpa using (‹B.Normal›.conj_mem (b : A) hb a⁻¹)
+    have hkey : ψ b • ((φ a : MulAut G) • (S : Subgroup G))
+        = (φ a : MulAut G) • (ψ ⟨a⁻¹ * (b : A) * a, hmem⟩ • (S : Subgroup G)) := by
+      rw [smul_smul, smul_smul]
+      congr 1
+      change φ (b : A) * φ a = φ a * φ (a⁻¹ * (b : A) * a)
+      rw [← map_mul, ← map_mul]
+      congr 1
+      group
+    rw [hkey, hS _]
+  -- Thm 3.23(b) で共役, しかし `C_G(B) = 1`
+  obtain ⟨c, hcfix, hceq⟩ := aInvariant_sylow_conj (φ := ψ) hcop hsolv hS hconj
+  have h1 : MulAut.conj (1 : G) • (S : Subgroup G) = (S : Subgroup G) := by simp
+  rw [hfix c hcfix, h1, hcoe] at hceq
+  exact hceq.symm
+
 end -- 3E
 
 end OddOrder.Isaacs.Ch04

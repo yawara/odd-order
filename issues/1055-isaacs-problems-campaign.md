@@ -61,12 +61,17 @@ import できない (Ch03 → Ch04 は逆向き)。
   `nilPiPart_map_mulAut` で `A`-不変。**半直積を作る必要は無い**。
   そのために `PiParts.lean` に `IsHallPart.map_mulAut` / `isNilpotent_map_mulAut` /
   `nilPiPart_map_mulAut` (自己同型同変版) を追加した。
-* `A` 可解の場合: `|A|` + `|G|` の帰納。`B ⊴ A` 極小正規 (elementary abelian `p`-群) を取る。
-  * `B` が `G` に自明に作用 ⟹ `A/B` の作用に帰着 (`|A|` 減少)。
-  * `C_G(B) ≠ 1` かつ `C_G(B) < G` ⟹ `A` は `C_G(B)` に作用 (`B ⊴ A`) ので `|G|` 減少。
-  * `C_G(B) = 1` ⟹ 上の Hint 前半の対偶で `p ∤ |G|`, すなわち `(|B|,|G|) = 1`。
-    Thm 3.23 で `B`-不変 Sylow `q` が存在し、Thm 3.23(b) より `C_G(B) = 1` から**一意**。
-    一意なので `A` (が `B` を正規化する) で不変 ⟹ 求めるもの。
+* `A` 可解の場合 (実装中): **`|G|` のみの帰納**に整理できる。各段でまず `A` を
+  `A/ker φ` に置き換えて `φ` を単射にすれば「`B` が自明に作用する」分岐が消えるため。
+  `B̄ ⊴ Ā` 極小正規 (elementary abelian `p₀`-群) を取ると `C := C_G(B̄) ≠ ⊤`:
+  * ✅ **case (iii) `C = ⊥`** — `exists_isAInvariant_sylow_of_normal_of_trivial_fixed`
+    (2026-07-29 landing): Hint 前半の対偶で `p₀ ∤ |G|` すなわち `(|B|,|G|) = 1`。
+    Thm 3.23(a) で `B`-不変 Sylow `S` を取ると `(φ a) • S` も `B`-不変 (`B ⊴ A`) なので
+    Thm 3.23(b) が `C_G(B) = ⊥` の元での共役を与え、一致する ⟹ `A`-不変。
+  * ⬜ **case (ii) `⊥ ≠ C < ⊤`** — `IsAInvariant.toMulAutHom` (既存, ThreeSubgroups.lean)
+    で `A` を `↥C` に作用させ `|C| < |G|` の帰納法の仮説。像を `C.subtype` で `G` へ戻す。
+  * ⬜ 前処理 (`A → A/ker φ` の lift) と全体の組み立て。
+  補助 `actionFixedSubgroup` (固定部分群 `C_G(A)`) は landing 済。
 
 ### 3D.1(b) の基盤 `Ch03_SplitExtensions/PiLength.lean` (2026-07-29 landing)
 
