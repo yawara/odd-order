@@ -6305,7 +6305,7 @@ leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
 | Ch.7 | 7A(6) 7C(1) | ✅ 全問 |
 | Ch.8 | 8A(13) 8B(10) 8C(6) 8D(6) | ✅ 全問 |
 | **Ch.9** | **9A(8) 9B(5) 9C(3) 9D(4)** | **§9A ✅ / §9B ✅ / 9C.1-2 ✅ (9C.3 保留) / 9D.1-3 ✅ (9D.4 土台のみ)** |
-| **Ch.10** | **10A(7) 10B(2) 10C(1)** | **10A.1 ✅ (2026-07-29 着手)** |
+| **Ch.10** | **10A(7) 10B(2) 10C(1)** | **10A.1-2 ✅ (2026-07-29 着手)** |
 
 * 素の差分では 1F.1 / 3C.1 も欠落に見えたが **誤検出**: どちらも実装済みで、docstring が
   `**1F.1**` / `**Isaacs 3C.1 (Hall D-定理, Wielandt)**` と `Problem ` 前置なしで書かれて
@@ -6866,7 +6866,6 @@ Lem 10.14 / Thm 10.15 / Thm 10.18 (principal ideal theorem)。演習はこの上
 
 ### 残り (10A.2-10A.7 / 10B.1-2 / 10C.1)
 
-* **10A.2** regular `p`-群で `{x | x^p = 1}` が部分群。hint = 部分群への遺伝 + 極小反例。
 * **10A.3 / 10A.5 / 10A.7** はいずれも `C_p ≀ C_p` への埋め込み/準同型像。
   repo の `WreathRecognition.lean` (Thm 10.4 = `C_p ≀ C_p` recognition, 1308 行) が土台。
 * **10A.4** `P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G`。Yoshida を使う。
@@ -6876,3 +6875,22 @@ Lem 10.14 / Thm 10.15 / Thm 10.18 (principal ideal theorem)。演習はこの上
   冪零類 `n` の metacyclic `p`-群 (hint = Thm 4.7)。
 * **10B.2** `E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)` (Maschke)。
 * **10C.1** 未確認 (ページ画像を切り出していない)。
+
+### 10A.2 完了 (2026-07-29)
+
+`pow_mul_eq_one_of_isRegularPGroup` / `omegaOneOfIsRegularPGroup` /
+`IsRegularPGroup.subgroup` (部分群への遺伝)。極小反例:
+
+1. `⟨x,y⟩ < P` なら極小性 ⟹ `P = ⟨x,y⟩`。`P` 可換でも終わり ⟹ 非可換。
+2. **Step A** `a^p = 1 ⟹ ⁅a,g⁆^p = 1`。`K := ⟨a, g a g⁻¹⟩` が真部分群なら極小性。
+   `K = P` のときが**書籍 hint に書かれていない部分**で、`g a g⁻¹ = a·⁅a⁻¹,g⁆ ∈ ⟨a⟩ ⊔ Φ(P)`
+   から `⟨a⟩ ⊔ Φ(P) = ⊤`、**Frattini の非生成性** (mathlib `frattini_nongenerating`) で
+   `⟨a⟩ = ⊤` ⟹ `P` 巡回 ⟹ 可換で矛盾。
+   (repo の `GroupTheory/FrattiniPGroup.lean` の `IsPGroup.commutator_mem_frattini` を使う。)
+3. **Step B** `Ω := {c ∈ P' | c^p = 1}` は部分群 (`P' < P` に極小性) で `P`-正規。
+   `⁅x,y⁆ ∈ Ω` から `P/Ω` は可換な 2 元で生成され可換 ⟹ `P' ≤ Ω`。
+4. regular 性の `c ∈ P'` は `c^p = 1` ⟹ `(xy)^p = 1` で矛盾。
+
+⚠ **Lean の罠**: `Ω` を `let` で置くと elaborator が本体を展開し続けて heartbeat 超過する。
+`obtain ⟨Ω, hΩ⟩ : ∃ Ω, ∀ c, c ∈ Ω ↔ …` で**不透明に**取り出すと通る
+([[lean-local-have-instance-blowup]] の「opaque obtain」と同じ)。
