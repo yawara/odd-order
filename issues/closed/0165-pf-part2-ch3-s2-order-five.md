@@ -512,3 +512,15 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 `Nat.card (center) = |W|` を足せば仮説を 1 本減らせる。ただし `hQcard` は case (b)
 (「`S` は位数 q² の非可換群」) そのものであり、`trichotomy` の case (b) 分岐は
 `natCard_Q_eq_sq_or_cube` の sq 側から来るので、消費側は必ず手元に持っている。
+
+## ✅ CLOSED (2026-07-29)
+
+完了条件「`case (b) ⟹ (SK) ∪ (SKtS) ≤ G` が sorry-free で landing、AxiomsCheck 登録」を満たした。
+`Hypothesis.typeASubgroup` (仮説 = `IsTypeA ↥S` / `|S| = |Q₀|²` / `orderOf (st) = 5`) が
+`Hypothesis.orderFiveCarrier = (SK) ∪ (SKtS)` を担体とする `Subgroup G` を与える。
+
+新設 leaf: `StructureOfH/{TConjugateTriple, OrderFiveOrbits, OrderFiveSubgroup,
+QuotientFieldCoordinate, OrderFivePairing, CaseBStructure}.lean` +
+`Appendices/SemilinearField.lean` の Prop2Regular 節 + `Suzuki2Groups/ModelCenters.lean` の type A 節。
+
+次は文書順で **Ch. III §3 (pp. 119–121)**。
