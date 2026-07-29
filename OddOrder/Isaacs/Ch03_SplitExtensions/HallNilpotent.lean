@@ -35,6 +35,10 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 * `IsHallSubgroup.normal_of_isNilpotent` — 冪零群の Hall 部分群は正規。
 * `commute_of_isHallSubgroup_of_isHallSubgroup_compl` — 冪零群の `π`-Hall と
   `π'`-Hall は元ごとに可換。
+* `isHallSubgroup_subgroupOf_of_le` / `isHallSubgroup_subgroupOf_of_normal_left` —
+  Hall 性の部分群への制限 (冪零性不要)。
+* `sup_eq_top_of_isHallSubgroup_compl` — `π`-Hall と `π'`-Hall は全体を生成する
+  (冪零性不要)。
 -/
 
 namespace OddOrder.Isaacs.Ch03
@@ -85,6 +89,39 @@ theorem isPiSubgroup_le_of_isHallSubgroup_of_le_normalizer [Finite G] {π : Set 
   intro x hx
   have hx_sup : x ∈ (N ⊔ H : Subgroup G) := Subgroup.mem_sup_left hx
   rwa [h_sup_eq] at hx_sup
+
+/-- **Hall 性は部分群への制限で保たれる**: `H ≤ K` で `H` が `G` の `π`-Hall なら
+`H` は `K` の `π`-Hall (`[K:H] ∣ [G:H]`)。 -/
+theorem isHallSubgroup_subgroupOf_of_le [Finite G] {π : Set ℕ} {H K : Subgroup G}
+    (hH : IsHallSubgroup π H) (hHK : H ≤ K) : IsHallSubgroup π (H.subgroupOf K) :=
+  ⟨Subgroup.IsPiGroup.subgroupOf hHK hH.1, fun q hq =>
+    hH.2 q (Nat.primeFactors_mono (Subgroup.relIndex_dvd_index_of_le hHK)
+      Subgroup.index_ne_zero_of_finite hq)⟩
+
+/-- **正規な `π`-Hall 部分群は任意の部分群に切っても Hall**: `H ⊴ G` が `π`-Hall なら
+`H ⊓ K` は `K` の `π`-Hall (`[K : H ⊓ K] = [H : K]_rel ∣ [G:H]`)。
+
+`isHallSubgroup_subgroupOf_of_normal` (Hall 側でなく**環境**側が正規な版) の対。 -/
+theorem isHallSubgroup_subgroupOf_of_normal_left [Finite G] {π : Set ℕ} {H K : Subgroup G}
+    [H.Normal] (hH : IsHallSubgroup π H) : IsHallSubgroup π (H.subgroupOf K) := by
+  refine ⟨?_, fun q hq => hH.2 q (Nat.primeFactors_mono
+    (Subgroup.relIndex_dvd_index_of_normal H K) Subgroup.index_ne_zero_of_finite hq)⟩
+  rw [← Subgroup.inf_subgroupOf_right]
+  exact Subgroup.IsPiGroup.subgroupOf inf_le_right (Subgroup.IsPiGroup.le inf_le_left hH.1)
+
+/-- **`π`-Hall と `π'`-Hall は全体を生成する**: `H ⊔ K` の指数は `[G:H]` (=`π'`-数) と
+`[G:K]` (=`π`-数) の両方を割るので 1。 -/
+theorem sup_eq_top_of_isHallSubgroup_compl [Finite G] {π : Set ℕ} {H K : Subgroup G}
+    (hH : IsHallSubgroup π H) (hK : IsHallSubgroup πᶜ K) : H ⊔ K = ⊤ := by
+  rw [← Subgroup.index_eq_one]
+  by_contra hne
+  obtain ⟨q, hqp, hqd⟩ := Nat.exists_prime_and_dvd hne
+  have hqmem : q ∈ ((H ⊔ K).index).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hqp, hqd, Subgroup.index_ne_zero_of_finite⟩
+  exact hK.2 q (Nat.primeFactors_mono (Subgroup.index_dvd_of_le le_sup_right)
+      Subgroup.index_ne_zero_of_finite hqmem)
+    (hH.2 q (Nat.primeFactors_mono (Subgroup.index_dvd_of_le le_sup_left)
+      Subgroup.index_ne_zero_of_finite hqmem))
 
 /-- **`π`-Hall 部分群の正規化子は自己正規化**: `N_G(N_G(H)) = N_G(H)`。
 
@@ -143,7 +180,7 @@ theorem IsHallSubgroup.normal_of_isNilpotent [Finite G] [Group.IsNilpotent G] {�
 Isaacs Problem 3C.7 (Carter 部分群) の共役性で `C = C_p × C_{p'}` を得るのに使う。 -/
 theorem commute_of_isHallSubgroup_of_isHallSubgroup_compl [Finite G] [Group.IsNilpotent G]
     {π : Set ℕ} {S Q : Subgroup G} (hS : IsHallSubgroup π S)
-    (hQ : IsHallSubgroup {p | p ∉ π} Q) :
+    (hQ : IsHallSubgroup πᶜ Q) :
     ∀ x ∈ S, ∀ y ∈ Q, Commute x y := by
   haveI := hS.normal_of_isNilpotent
   haveI := hQ.normal_of_isNilpotent

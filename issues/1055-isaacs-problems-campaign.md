@@ -5670,8 +5670,9 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   型を量化し、1 段ごとに `↥(commutator G)` へ降りる)。
   `commutator G < ⊤` = `IsSolvable.commutator_lt_top_of_nontrivial`、
   位数減少は `Finite.card_subtype_lt`、部分群の元の位数は `Subgroup.orderOf_mk`。
-* ⬜ **3C.7** — Carter 部分群 (`C` 冪零かつ `C = N_G(C)`) の (a) 存在 (b) 共役性
+* 🔄 **3C.7** — Carter 部分群 (`C` 冪零かつ `C = N_G(C)`) の (a) 存在 (b) 共役性
   (c) `G/N` 冪零なら `NC = G`。⚠ **書籍自身が「この問題と次はかなり難しい」と注記**。
+  **(b) 共役性は 2026-07-29 に完成** (`exists_conj_of_isCarterSubgroup`)。残り (a)(c)。
 * ⬜ **3C.8** — 可解群の nilpotent injector (`F(G)` を含む極大な冪零部分群) は全て共役。
   ⚠ 同上 (書籍が challenge として提示)。
 
@@ -5751,9 +5752,34 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   `N_{G/N}(K/N) = N_G(K)/N`) / `normalizer_eq_iff_map_mk'` /
   `sup_map_mk'_eq_map_mk'` / `isNilpotent_map_of_isNilpotent` /
   `exists_conj_of_map_mk'_conj` / `card_quotient_lt`。
-* ⬜ **`Carter/Conjugacy.lean`** — (b)。次の実装対象。
-* ⬜ **`Carter/NilpotentQuotient.lean`** — (c)。
+* ✅ **`Carter/MinimalNormal.lean`** — (b) step 4 (帰納が閉じない `C ⊔ N = D ⊔ N = ⊤` の場合)。
+  `isNilpotent_of_isCarterSubgroup_eq_top` / `normal_inf_of_comm_of_sup_eq_top` /
+  `exists_mem_normalizer_notMem_of_isNilpotent` (正規化条件の部分群版) /
+  `sylow_normal_of_isPGroup_of_isNilpotent_quotient` /
+  `sup_inf_eq_and_commute_of_isNilpotent` / `inf_eq_centralizer_inf_of_isCarterSubgroup` /
+  `eq_of_isCarterSubgroup_of_hall_eq` / `exists_conj_of_isCarterSubgroup_of_isComplement` /
+  `exists_conj_of_isCarterSubgroup_of_isMinimalNormal`。
+* ✅ **`Carter/Conjugacy.lean`** — **🎉 (b) 完成 (2026-07-29)**:
+  `exists_conj_of_isCarterSubgroup` (有限可解群の 2 つの Carter 部分群は共役)。
+  step 1–3 は帰納法の仮説を引数に取る独立補題 (`normalizer_sup_eq_self_of_ih` /
+  `isCarterSubgroup_map_mk'_of_ih` / `exists_conj_sup_eq_sup_of_ih`)、本体は
+  `exists_conj_aux` の `|G|` 強帰納。axiom-clean。
+* ⬜ **`Carter/NilpotentQuotient.lean`** — (c)。次の実装対象。
 * ⬜ **`Carter/Existence.lean`** — (a)。
+
+#### (b) step 4 で実際に使った経路 (2026-07-29 に確定・実装済)
+
+計画どおり: `N` 極小正規 (可換) ⟹ `C ⊓ N ⊴ G` ⟹ 極小性で `⊥` か `N`。
+`N ≤ C` なら `C = ⊤` で `G` 冪零ゆえ `D = ⊤`。ともに補元の場合は
+
+1. `G ⧸ N` 冪零 ⟹ **`G` の Sylow `p` は正規** (`Sylow.comapOfKerIsPGroup` で `G/N` の
+   Sylow を引き戻し、`Sylow.unique_of_normal` で任意の Sylow と同一視)。
+2. `[G:C] = |N|` は `p`-冪 ⟹ `C` の Hall `p'` は **`G` の** Hall `p'`
+   (`IsHallSubgroup.map_subtype_of_index_no_pi`)。
+3. `hall_C` で `Q_C^x = Q_D` に揃える。
+4. `C^x` と `D` はどちらも `(· ⊓ P) ⊔ Q_D` に分解し (issue 9213 の
+   `commute_of_isHallSubgroup_of_isHallSubgroup_compl` + `sup_eq_top_of_isHallSubgroup_compl`)、
+   `p`-部分はどちらも `C_G(Q_D) ⊓ P` に等しい (正規化条件による背理法) ⟹ `C^x = D`。
 
 #### (b) の Lean 構造 (確定)
 
