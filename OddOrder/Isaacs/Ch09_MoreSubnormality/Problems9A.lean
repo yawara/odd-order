@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.NoncommCoprod
 import OddOrder.GroupTheory.ElementaryAbelian
+import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.Holomorph
 import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
 
@@ -27,13 +28,11 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9A
 * **9A.6** `layer_le_of_centralizer_le` — `H ⊴ G` で `C_G(H) ≤ H` なら `E(G) ≤ H`。
 * **9A.7** `exists_conj_map_eq_of_isSimpleFactorOf` — 非可換な極小正規部分群 `N` の
   単純直積因子 (`IsSimpleFactorOf`) たちに `G` は共役で推移的に作用する。
-* **9A.8 (骨格)** `isMulCommutative_or_isSemisimpleGroup_of_isCharacteristicallySimple` —
-  characteristically simple な有限群は abelian か semisimple。書籍 hint の
-  holomorph `Hol(G) = G ⋊ Aut(G)` (`OddOrder/GroupTheory/Holomorph.lean`) で
-  `G` の像が極小正規部分群になることから Lemma 9.6 を当てる。
-  さらに `exists_simpleFamily_of_isSemisimpleGroup_of_isCharacteristicallySimple` で
-  **semisimple 枝は完結** (同型性は 9A.7 を `Hol(G)` で当てて出す)。
-  ⏳ 残り = abelian 枝 (elementary abelian ⟹ `ZMod p` の直積)。
+* **9A.8** `exists_simpleFamily_of_isCharacteristicallySimple` — characteristically simple
+  な有限群は互いに同型な単純群の直積。書籍 hint の holomorph `Hol(G) = G ⋊ Aut(G)`
+  (`OddOrder/GroupTheory/Holomorph.lean`) で `G` の像が極小正規部分群になることから
+  Lemma 9.6 で「abelian か semisimple」に二分し, semisimple 枝は 9A.7 (共役の推移性),
+  abelian 枝は elementary abelian 化 + `ZMod p`-基底分解で片付ける。
 
 ## 実装ノート (9A.1)
 
@@ -951,6 +950,85 @@ theorem exists_isElementaryAbelian_of_isCharacteristicallySimple [Finite G]
   · intro x
     have : x ∈ K := htop ▸ Subgroup.mem_top x
     exact this
+
+/-- **抽象モジュール版**: 有限非自明な `ZMod p`-ベクトル空間は 1 次元部分空間 (位数 `p`)
+の直和。`Module` を抽象のまま保つのが要点 — `letI` 束縛の `zmodModule` 上で基底の
+instance 合成を走らせると詰まる (`PRank.lean` の `addAutEquivGL` の注記)。 -/
+theorem exists_addSubgroup_basis_family.{u} {p : ℕ} [Fact p.Prime] {M : Type u}
+    [AddCommGroup M] [Module (ZMod p) M] [Finite M] [Nontrivial M] :
+    ∃ (ι : Type u) (_ : Nonempty ι) (N : ι → AddSubgroup M),
+      (∀ i, Nat.card ↥(N i) = p) ∧ iSupIndep N ∧ ⨆ i, N i = ⊤ := by
+  let e : AddSubgroup M ≃o Submodule (ZMod p) M := AddSubgroup.toZModSubmodule p
+  let b := Module.Basis.ofVectorSpace (ZMod p) M
+  refine ⟨_, b.index_nonempty, fun i => e.symm (Submodule.span (ZMod p) {b i}), ?_, ?_, ?_⟩
+  · intro i
+    have hcong : Nat.card ↥(e.symm (Submodule.span (ZMod p) {b i}))
+        = Nat.card ↥(Submodule.span (ZMod p) {b i}) :=
+      Nat.card_congr ⟨fun x => ⟨x.1, x.2⟩, fun y => ⟨y.1, y.2⟩, fun _ => rfl, fun _ => rfl⟩
+    rw [hcong, ← FiniteField.pow_finrank_eq_natCard p ↥(Submodule.span (ZMod p) {b i}),
+      finrank_span_singleton (b.ne_zero i), pow_one]
+  · exact (iSupIndep_map_orderIso_iff e.symm).mpr b.linearIndependent.iSupIndep_span_singleton
+  · rw [← OrderIso.map_iSup e.symm, ← Submodule.span_range_eq_iSup, b.span_eq, OrderIso.map_top]
+
+open scoped IsMulCommutative in
+/-- **9A.8 の abelian 枝 (step 2)**: elementary abelian な有限群は位数 `p` の部分群
+(どれも互いに同型) の直積。
+
+`Additive G` を `ZMod p`-ベクトル空間と見て `exists_addSubgroup_basis_family` を当て,
+`Subgroup.toAddSubgroup` の order iso で `G` に戻す (`PRank.lean` の
+`IsElementaryAbelian.exists_isComplement'` と同じ橋渡し)。 -/
+theorem exists_simpleFamily_of_isElementaryAbelian.{u} {G : Type u} [Group G] [Finite G]
+    [Nontrivial G] {p : ℕ} [Fact p.Prime] (h : IsElementaryAbelian p G) :
+    ∃ (ι : Type u) (_ : Nonempty ι) (T : ι → Subgroup G),
+      (∀ i, (T i).Normal ∧ IsSimpleGroup ↥(T i)) ∧
+      (∀ i j, Nonempty (↥(T i) ≃* ↥(T j))) ∧
+      iSupIndep T ∧ ⨆ i, T i = ⊤ := by
+  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
+  letI : CommGroup G := inferInstance
+  letI := IsElementaryAbelian.zmodModule (p := p) (G := G) h
+  haveI : Finite (Additive G) := Finite.of_equiv G Additive.ofMul
+  haveI : Nontrivial (Additive G) := Additive.ofMul.symm.injective.nontrivial
+  obtain ⟨ι, hι, N, hcardN, hindep, hsupN⟩ :=
+    exists_addSubgroup_basis_family (p := p) (M := Additive G)
+  have hcardT : ∀ i, Nat.card ↥(Subgroup.toAddSubgroup.symm (N i)) = p := fun i => by
+    rw [← hcardN i]
+    exact Nat.card_congr ⟨fun x => ⟨Additive.ofMul (x : G), x.2⟩,
+      fun y => ⟨Additive.toMul (y : Additive G), y.2⟩, fun _ => rfl, fun _ => rfl⟩
+  refine ⟨ι, hι, fun i => Subgroup.toAddSubgroup.symm (N i), ?_, ?_, ?_, ?_⟩
+  · exact fun i => ⟨⟨fun n hn g => by rwa [mul_comm' g n, mul_assoc, mul_inv_cancel, mul_one]⟩,
+      isSimpleGroup_of_prime_card (p := p) (hcardT i)⟩
+  · exact fun i j => ⟨mulEquivOfPrimeCardEq (hcardT i) (hcardT j)⟩
+  · exact (iSupIndep_map_orderIso_iff Subgroup.toAddSubgroup.symm).mpr hindep
+  · rw [← OrderIso.map_iSup Subgroup.toAddSubgroup.symm, hsupN, OrderIso.map_top]
+
+/-- **Isaacs Problem 9A.8** (書籍 p. 277) ⭐: characteristically simple な有限群は,
+互いに同型な単純群の直積。
+
+書籍 hint の holomorph `G ⋊ Aut(G)` で `G` を極小正規部分群にすると Lemma 9.6 が
+「abelian か semisimple」の二分を与える (`isMulCommutative_or_isSemisimpleGroup_…`)。
+
+* **semisimple 枝**: 非可換単純正規部分群の族が取れ, 9A.7 (`Hol(G)` の共役の推移性) で
+  互いに同型。
+* **abelian 枝**: `{x | x ^ p = 1}` が characteristic なので elementary abelian になり,
+  `ZMod p`-基底から位数 `p` の部分群の族が取れる (どれも `ZMod p` に同型)。 -/
+theorem exists_simpleFamily_of_isCharacteristicallySimple.{u} {G : Type u} [Group G] [Finite G]
+    (h : IsCharacteristicallySimple G) :
+    ∃ (ι : Type u) (_ : Nonempty ι) (T : ι → Subgroup G),
+      (∀ i, (T i).Normal ∧ IsSimpleGroup ↥(T i)) ∧
+      (∀ i j, Nonempty (↥(T i) ≃* ↥(T j))) ∧
+      iSupIndep T ∧ ⨆ i, T i = ⊤ := by
+  haveI := h.1
+  rcases isMulCommutative_or_isSemisimpleGroup_of_isCharacteristicallySimple h with hab | hss
+  · obtain ⟨p, hp, hea⟩ := exists_isElementaryAbelian_of_isCharacteristicallySimple h hab
+    haveI : Fact p.Prime := ⟨hp⟩
+    exact exists_simpleFamily_of_isElementaryAbelian hea
+  · obtain ⟨𝒵, hne, hsimple, hiso, hindep, hsup⟩ :=
+      exists_simpleFamily_of_isSemisimpleGroup_of_isCharacteristicallySimple h hss
+    refine ⟨↥𝒵, hne.to_subtype, fun S => (S : Subgroup G), fun S => hsimple S S.2,
+      fun S U => hiso S S.2 U U.2, hindep, ?_⟩
+    rw [← sSup_eq_iSup']
+    exact hsup
 
 end -- 9A.8
 
