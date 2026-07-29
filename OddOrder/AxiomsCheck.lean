@@ -278,6 +278,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSL
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreePSLInduction
 import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.ExceptionalNearField
@@ -343,7 +344,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 13400
+set_option linter.style.longFile 13600
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -13310,7 +13311,7 @@ produces (`Q₁` is the odd normal `2`-complement of the nilpotent `Q`). -/
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.isPGroup_two_Q
 
 /-! **Peterfalvi Part II, Ch. III §1, Proposition, case (1)** (issue 0163, 2026-07-29).
-`Appendices/Suzuki/StructureOfH/Trichotomy.lean`, p. 117.
+`Appendices/Suzuki/StructureOfH/{SquareRootFibres,Trichotomy}.lean`, p. 117.
 
 The first of the Proposition's three cases: **if `Q` is abelian then `Q = Q₀` and `st` has
 order `3`** — the book's alternative (a).  By Theorem C, `Q₁ = 1`, so the book's Sylow
@@ -13342,7 +13343,7 @@ order `3`** — the book's alternative (a).  By Theorem C, `Q₁ = 1`, so the bo
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.Q_eq_Q0_and_orderOf_st_of_commute
 
 /-! **Peterfalvi Part II, Ch. III §1, Proposition, case (2) — the ungated part**
-(issue 0163, 2026-07-29).  `Appendices/Suzuki/StructureOfH/Trichotomy.lean`, p. 117.
+(issue 0163, 2026-07-29).  `Appendices/Suzuki/StructureOfH/{SquareRootFibres,Trichotomy}.lean`, p. 117.
 
 The book's second case ("`S` is non-abelian of order `q²`") up to the one step it defers to a
 `PSU(3, ℓ)` computation.  The reusable machinery of the Proposition was factored out of case (1):
@@ -13372,7 +13373,7 @@ The book's second case ("`S` is non-abelian of order `q²`") up to the one step 
 
 /-! **`[K, W] = 1`** — a Chapter I fact that Chapters I and II never state, needed by the
 Ch. III §1 Proposition (issue 0163, 2026-07-29).
-`Appendices/Suzuki/StructureOfH/Trichotomy.lean`.
+`Appendices/Suzuki/StructureOfH/SquareRootFibres.lean`.
 
 The book's case (2) says "`C_S(P)` is a `K`-subgroup of `S`", which relies on the choice made at
 the start of that proof ("if `W ≠ 1`, assume that `P ⊂ W`").  For that to give `K`-invariance,
@@ -13394,7 +13395,7 @@ it lies in `K ⊓ W ≤ K ⊓ V = 1`.
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sqFibre_eq_coset_of_card
 
 /-! **Peterfalvi Part II, Ch. III §1, Proposition, case (2): `W = 1`** (issue 0163,
-2026-07-29).  `Appendices/Suzuki/StructureOfH/Trichotomy.lean`, p. 117.
+2026-07-29).  `Appendices/Suzuki/StructureOfH/{SquareRootFibres,Trichotomy}.lean`, p. 117.
 
 > If `W ≠ 1`, `C_S(P)` is a `K`-subgroup of `S` which has exponent `4` and so `C_S(P) = S`,
 > contrary to the fact that `D` acts faithfully on `S`.
@@ -13435,7 +13436,7 @@ element of order `4` is all of `S`, which is a two-layer transitivity statement:
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.W_eq_bot_of_isSuzuki2Group
 
 /-! **Peterfalvi Part II, Ch. III §1, Proposition, case (2) complete: `st` has order `5`**
-(issue 0163, 2026-07-29).  `Appendices/Suzuki/StructureOfH/Trichotomy.lean`, p. 117.
+(issue 0163, 2026-07-29).  `Appendices/Suzuki/StructureOfH/{SquareRootFibres,Trichotomy}.lean`, p. 117.
 
 The last step of case (2) rules out the `PSU(3, ℓ)` alternative of Ch. I §3 Proposition 1(c).
 
