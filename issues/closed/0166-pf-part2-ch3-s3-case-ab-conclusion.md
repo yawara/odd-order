@@ -123,3 +123,11 @@ Nonempty (TheoremAConclusion G Ω) ∨ (IsTypeB ↥S ∧ orderOf (st) = 3 ∧ W 
 ```
 
 ⟹ **§3 本体以降は (C2) だけを仮定してよい**ことが形式化された。
+
+## ✅ CLOSED (2026-07-29)
+
+完了条件「trichotomy の case (a)/(b) から `Nonempty (TheoremAConclusion G Ω)` が
+sorry-free で出る」を満たした (`SecondCaseHypothesis.theoremAConclusion_or_caseC2`)。
+以後 §3 本体は (C2) だけを仮定できる。
+
+次は **§3 本体** (pp. 119–121 の Proposition = `S ⋊ KW ≅ S₁ ⋊ K₁W₁` モデル)。
