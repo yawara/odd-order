@@ -295,6 +295,30 @@ theorem pResidualOf_eq_bot_iff_isPGroup [Finite G] [Fact p.Prime] (S : Subgroup 
   rw [pResidualOf, Subgroup.map_eq_bot_iff_of_injective _ S.subtype_injective,
     pResidual_eq_bot_iff_isPGroup]
 
+/-- **`O^p` の単調性 (絶対形)**: 任意の `S ≤ G` について `O^p(S) ≤ O^p(G)`.
+
+`↥S / (O^p(G) ⊓ S)` は `G / O^p(G)` の部分群と同型ゆえ `p`-群なので, 普遍性
+(`pResidual_le_of_isPGroup_quotient`) から `O^p(↥S) ≤ (O^p(G) ⊓ S).subgroupOf S`.
+ambient に落として `O^p(S) ≤ O^p(G)`.
+(`pResidual_eq_map_subtype_of_sup_isPGroup` の `⊇` 側と同じ計算を単独補題に切り出したもの.) -/
+theorem pResidualOf_le_pResidual [Finite G] [Fact p.Prime] (S : Subgroup G) :
+    pResidualOf p S ≤ pResidual p G := by
+  have hkey : pResidual p ↥S ≤ (pResidual p G).subgroupOf S := by
+    apply pResidual_le_of_isPGroup_quotient
+    have hkerf : ((QuotientGroup.mk' (pResidual p G)).comp S.subtype).ker
+        = (pResidual p G).subgroupOf S := by
+      rw [← MonoidHom.comap_ker, QuotientGroup.ker_mk']
+      rfl
+    have e : (↥S ⧸ (pResidual p G).subgroupOf S)
+        ≃* ((QuotientGroup.mk' (pResidual p G)).comp S.subtype).range :=
+      (QuotientGroup.quotientMulEquivOfEq hkerf.symm).trans
+        (QuotientGroup.quotientKerEquivRange _)
+    exact ((isPGroup_quotient_pResidual (G := G)).to_subgroup _).of_equiv e.symm
+  calc pResidualOf p S = (pResidual p ↥S).map S.subtype := rfl
+    _ ≤ ((pResidual p G).subgroupOf S).map S.subtype := Subgroup.map_mono hkey
+    _ = pResidual p G ⊓ S := Subgroup.subgroupOf_map_subtype _ _
+    _ ≤ pResidual p G := inf_le_left
+
 /-- `↥H` で正規な `A` を ambient に落とした `A.map H.subtype` は `H` に正規化される. -/
 theorem le_normalizer_map_subtype_of_normal {H : Subgroup G} {A : Subgroup ↥H} (hA : A.Normal) :
     H ≤ Subgroup.normalizer ((A.map H.subtype : Subgroup G) : Set G) := by
@@ -350,6 +374,15 @@ theorem map_subtype_pResidualOf_subgroupOf {S R : Subgroup G} (h : S ≤ R) :
   rw [pResidualOf, Subgroup.map_map, hhom, ← Subgroup.map_map,
     map_pResidual_mulEquiv (Subgroup.subgroupOfEquivOfLe h)]
   rfl
+
+/-- **`O^p` の単調性**: `S ≤ T` なら `O^p(S) ≤ O^p(T)` (`nilpotentResidual_mono` の `O^p` 版).
+
+`↥T` の中で絶対形 (`pResidualOf_le_pResidual`) を使い
+`map_subtype_pResidualOf_subgroupOf` で ambient に戻す. -/
+theorem pResidualOf_mono [Finite G] [Fact p.Prime] {S T : Subgroup G} (h : S ≤ T) :
+    pResidualOf p S ≤ pResidualOf p T := by
+  rw [← map_subtype_pResidualOf_subgroupOf h]
+  exact Subgroup.map_mono (pResidualOf_le_pResidual (S.subgroupOf T))
 
 end
 
