@@ -6799,3 +6799,44 @@ CLAUDE.md の [[feedback-ask-chatgpt-for-elided-gaps]] 手順 (最強モデル�
 * **9D.4** Kegel 予想 (Lem 9.31 の逆) の極小反例で `G`, `S` が非可換単純であることを示す。
   極小正規部分群を取る hint。§9D はこれで完了。
 * **9C.3** deferred (step (b) 未解決)。
+
+### 9D.4 の土台 landing + 残りの設計 (2026-07-29)
+
+statement 確定 (`references/isaacs/pages/isaacs-p294-307.png`): Lemma 9.31 の逆
+(**Kegel 予想**、Kleidman が CFSG を使って証明) の**極小反例** `(G, S)`
+(`|S| + |G|` 最小) で `G` と `S` が非可換単純であることを示す。
+
+**landing 済 (axiom-clean)**:
+* `KegelHypothesis S` = 「∀ 素数 `p`, ∀ `P ∈ Syl_p(G)`, `P ∩ S ∈ Syl_p(S)`」
+  (repo の Lemma 9.31 に合わせ `¬ p ∣ (P ⊓ S).relIndex S` の形)。
+* `KegelHypothesis.of_isSubnormal` = Lemma 9.31 の言い換え。
+* `exists_sylow_inf_eq` — `↥H` の Sylow は `(P ⊓ H).subgroupOf H` の形 (Sylow の極大性)。
+* **(F1)** `KegelHypothesis.subgroupOf` — `S ≤ H` への降下。
+* **(F3)** `KegelHypothesis.infNormal` — `N ◁ G` の `(N, S ⊓ N)` への降下。
+
+**残り (設計は下記まで確定、最後の 1 ケースが未解決)**:
+
+* **(F2) 商への降下**: `N ◁ G` ⟹ `KegelHypothesis (SN/N)` in `G/N`。
+  `Syl_p(G/N) = {PN/N}`、`[SN/N : (P∩S)N/N] ∣ [S : P∩S]` (∵ `P∩S ≤ S ∩ (P∩S)N`) で
+  `p` と互いに素、かつ `(PN/N) ∩ (SN/N)` は `p`-群でこの Sylow を含むので一致。
+* **極小反例の骨格** (すべて上の降下補題で回る):
+  1. `S ≠ ⊥, ⊤` (どちらも subnormal)。`N` を極小正規とする。
+  2. **`SN = G`**: `SN < G` なら (F1) で `S ◁◁ SN`、(F2) で `SN/N ◁◁ G/N` ⟹ `SN ◁◁ G`、
+     繋いで `S ◁◁ G` で矛盾。
+  3. `N < G` なら (F3) + 極小性で **`S ∩ N ◁◁ N`**。
+  4. `(S∩N)^N` は `N` と `S` (∵ `S∩N ◁ S`) に正規化されるので `◁ SN = G`、`≤ N`、
+     `N` の極小性で `= 1` か `= N`。
+     * `= N`: **subnormal `T ◁◁ N` の正規閉包が `N` なら `T = N`** (鎖 `T ◁ ⋯ ◁ T_{k-1} ◁ N`
+       で `T^N ≤ T_{k-1}` なので鎖が短くなる、帰納) ⟹ `N ≤ S` ⟹ `G = SN = S` で矛盾。
+     * `= 1`: `S ∩ N = 1`、つまり `G = S ⋉ N`。
+  5. `S ∩ N = 1` のとき、`q ∤ |N|` なる素数では `|G|_q = |S|_q` なので Kegel 仮説から
+     **`Syl_q(G)` はすべて `S` に含まれる** ⟹ `O^π(G) ≤ S` (`π = π(|N|)`)。
+     * **`N` が可換 (= 基本可換 `p`-群) なら `π = {p}` で `G/O^p(G)` は `p`-群
+       ⟹ `S` は subnormal ⟹ 矛盾** ⟹ 極小正規 `N` は非可換。
+     * ⚠ **`N` 非可換 (`N = T^k`, `T` 非可換単純) の場合が未解決**。
+       `[S, N] ≤ S ∩ N = 1` を出せれば `G = S × N` で `S ◁ G` ⟹ 矛盾、という筋を想定。
+* **「`S` も非可換単純」の部分は未着手** (極小性をどの pair に当てるかが未特定)。
+
+⟹ **9D.4 も 9C.3 と同じく「設計の最後の 1 ケースが未解決」の状態で記録**。
+どちらも CLAUDE.md の [[feedback-ask-chatgpt-for-elided-gaps]] 手順 (最強モデルに
+自己完結プロンプト) を使う回をまとめて設ける。文書順では次は **Ch.10 (10 問)**。
