@@ -193,3 +193,30 @@ Higman Thm 1(a) (`pow_four_eq_one_of_isSuzuki2Group`) で指数 ∣ 4 ⟹ 平方
    `isSuzuki2Group_centralizer_of_card_sq` が入力を用意済なので、ここだけが残る。
    `GroupTheory/SpecificGroups/ProjectiveUnitary/**` の実測が必要。
 3. case (3)、そして 3 分岐の組み立て。
+
+## case (2) の `W = 1` パート — 部品の実測 (2026-07-29)
+
+書籍 p.117: 「`W ≠ 1` なら `C_S(P)` は指数 4 の `K`-部分群ゆえ `C_S(P) = S`、
+しかし `D` は `S` に忠実に作用するので矛盾 ⟹ `W = 1`」。
+
+| 必要なもの | repo | 状態 |
+|---|---|---|
+| `D` が `Q` に忠実 (`C_D(Q) = 1`) | `centralizer_Q_inf_D_eq_bot` (`DistinguishedInvolution.lean:356`) | ✅ |
+| 「`K`-不変部分群は `⊥` か `⊤`」engine | `Suzuki2Groups.invariant_eq_bot_or_top_of_fixedPointFree_card` (`InvariantSummands.lean:165`) | ✅ 仮説 = `rho : K →* MulAut E` の不動点自由性 + **`\|K\| = \|U\| − 1`** + `IsAInvariant` |
+| `KSet · W` の構造 | `fittingPreimageInG_eq_KSet_mul_W` (`KCyclic.lean:664`) | ✅ |
+| `W = C_D(H ∩ I)` | `W_eq_centralizer_involutions_H` (`CentralizerStructure.lean:241`) | ✅ |
+
+### ⚠ 次セッションで最初に確定すべき論点
+
+書籍は「`C_S(P)` は `K`-部分群」と言うが、これは **`P ⊂ W` という証明冒頭の取り方**
+(「`W ≠ 1` なら `P ⊂ W` と仮定する」) に依存する。`K` が `C_S(P)` を正規化する理由
+(= `K` が `P` を正規化/中心化する理由) を repo の事実で確定すること。候補:
+
+* `W = C_D(H ∩ I) = C_D(Q₀^#)` なので `P ⊆ W` は `Q₀` を中心化する。
+* `D` の構造 (`\|D\| = \|V\|\|K\|`、`K ⊴ D` cyclic = I.2 Prop 2、`W ≤ V`) から
+  `[K, W] = 1` が出るか。**これは未確認** — `KCyclic.lean` / `CentralizerStructure.lean` を
+  実測し、無ければ書籍 pp. 100-107 の該当箇所をページ画像で読む。
+
+⚠ この論点を仮定で埋めない。確定できないうちは「`K` が `C_Q(P)` を正規化する」を
+**明示仮説に取った形**で `W = 1` を証明し、仮説の供給は別 landing にする
+(sorried-cite でなく仮説パラメータ化なので sorry は増えない)。
