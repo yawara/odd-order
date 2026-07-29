@@ -16,6 +16,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 9A
   `F*(G) ≤ H ≤ G` なら `E(H) = E(G)`。
 * **9A.2** `exists_socle_mulEquiv_prod_abelian_semisimple` — `Soc(G)` は
   「abelian 群」と「semisimple 群」の直積 (`abelianSocle` × `semisimpleSocle`)。
+* **9A.3** `eq_iSup_isMinimalNormal_le_of_isSemisimpleGroup` — `G` semisimple, `N ⊴ G` なら
+  `N` は `N` に含まれる極小正規部分群の join。
 
 ## 実装ノート (9A.1)
 
@@ -353,5 +355,98 @@ theorem exists_socle_mulEquiv_prod_abelian_semisimple [Finite G] :
   exact ⟨hrange ▸ MonoidHom.ofInjective hinj⟩
 
 end -- 9A.2
+
+section /- 9A.3: semisimple 群の正規部分群は極小正規部分群の積 (p. 277) -/
+
+/-- `p` を満たす極小正規部分群は, それらの join に含まれる (`⨆` の添字が subtype なので
+`le_iSup` を当てるだけだが, 9A.3 で 2 つの述語について使うので切り出す)。 -/
+theorem le_iSup_isMinimalNormal {p : Subgroup G → Prop} {M : Subgroup G}
+    (hM : Ch02.IsMinimalNormal M) (hp : p M) :
+    M ≤ ⨆ M' : {M' : Subgroup G // Ch02.IsMinimalNormal M' ∧ p M'}, (M' : Subgroup G) :=
+  le_iSup (fun M' : {M' : Subgroup G // Ch02.IsMinimalNormal M' ∧ p M'} => (M' : Subgroup G))
+    ⟨M, hM, hp⟩
+
+/-- **semisimple 群では `W ⊓ C_G(W) = 1`**: それは abelian な正規部分群なので, 中に入る
+極小正規部分群が abelian になってしまい Lemma 9.5 の帰結
+(`IsSemisimpleGroup.isSimpleGroup_of_isMinimalNormal`) に反する。 -/
+theorem inf_centralizer_eq_bot_of_isSemisimpleGroup [Finite G] (hss : IsSemisimpleGroup G)
+    (W : Subgroup G) [W.Normal] : W ⊓ Subgroup.centralizer (W : Set G) = ⊥ := by
+  by_contra hne
+  obtain ⟨M, hMmin, hMle⟩ :=
+    Ch02.exists_isMinimalNormal_le_of_normal (W ⊓ Subgroup.centralizer (W : Set G)) hne
+  have hMab : M ≤ Subgroup.centralizer (M : Set G) :=
+    (hMle.trans inf_le_right).trans
+      (Subgroup.centralizer_le (by exact_mod_cast hMle.trans inf_le_left))
+  haveI := Subgroup.le_centralizer_iff_isMulCommutative.mp hMab
+  exact (hss.isSimpleGroup_of_isMinimalNormal hMmin).2 inferInstance
+
+/-- `N` に**含まれない**極小正規部分群の join (9A.3 の `V`; 書籍の hint の `G = U × V`)。 -/
+private def minimalNormalNotLe (N : Subgroup G) : Subgroup G :=
+  ⨆ M : {M : Subgroup G // Ch02.IsMinimalNormal M ∧ ¬(M ≤ N)}, (M : Subgroup G)
+
+private theorem minimalNormalNotLe_normal (N : Subgroup G) : (minimalNormalNotLe N).Normal := by
+  haveI : ∀ M : {M : Subgroup G // Ch02.IsMinimalNormal M ∧ ¬(M ≤ N)},
+      ((M : Subgroup G)).Normal := fun M => M.2.1.1
+  exact Subgroup.iSup_normal _
+
+/-- `V ≤ C_G(N)`: `N` に含まれない極小正規 `M` は `M ⊓ N ⊴ G` と極小性から `N` と disjoint,
+よって元ごとに可換。 -/
+private theorem minimalNormalNotLe_le_centralizer (N : Subgroup G) [N.Normal] :
+    minimalNormalNotLe N ≤ Subgroup.centralizer (N : Set G) := by
+  refine iSup_le fun M => ?_
+  haveI := M.2.1.1
+  have hdisj : Disjoint (M : Subgroup G) N := by
+    rcases M.2.1.2.2 ((M : Subgroup G) ⊓ N) inferInstance inf_le_left with h | h
+    · rw [disjoint_iff]; exact h
+    · exact absurd (h ▸ (inf_le_right : (M : Subgroup G) ⊓ N ≤ N)) M.2.2
+  intro y hy
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hx
+  exact (Subgroup.commute_of_normal_of_disjoint _ N M.2.1.1 inferInstance hdisj y x hy hx).symm.eq
+
+/-- **Isaacs Problem 9A.3** (書籍 p. 277) ⭐: `G` が semisimple で `N ⊴ G` なら, `N` は
+`N` に含まれる `G` の極小正規部分群たちの積 (join)。
+
+**証明** (書籍の hint に沿う): `U` = `N` に含まれる極小正規の join,
+`V` = 含まれない極小正規の join とすると, 極小正規全体が `G` を生成する (Lemma 9.5) ので
+`U ⊔ V = ⊤`。`V ≤ C_G(N)` (極小性から `M ⊓ N = 1`) ゆえ `N ≤ C_G(V)`, したがって
+`U ≤ N ≤ C_G(V)`。`n ∈ N` を `n = u v` (`u ∈ U`, `v ∈ V`) と書くと
+`v = u⁻¹ n ∈ V ⊓ C_G(V) = 1` (semisimple 群では abelian normal が自明) なので `n = u ∈ U`。 -/
+theorem eq_iSup_isMinimalNormal_le_of_isSemisimpleGroup [Finite G] (hss : IsSemisimpleGroup G)
+    (N : Subgroup G) [N.Normal] :
+    N = ⨆ M : {M : Subgroup G // Ch02.IsMinimalNormal M ∧ M ≤ N}, (M : Subgroup G) := by
+  haveI := minimalNormalNotLe_normal (G := G) N
+  have hUN : (⨆ M : {M : Subgroup G // Ch02.IsMinimalNormal M ∧ M ≤ N}, (M : Subgroup G)) ≤ N :=
+    iSup_le fun M => M.2.2
+  -- 極小正規全体が `G` を生成するので `U ⊔ V = ⊤`。
+  have hUV : (⨆ M : {M : Subgroup G // Ch02.IsMinimalNormal M ∧ M ≤ N}, (M : Subgroup G))
+      ⊔ minimalNormalNotLe N = ⊤ := by
+    refine top_le_iff.mp ?_
+    obtain ⟨𝒳, h𝒳, hsup⟩ := hss
+    rw [← hsup]
+    refine sSup_le fun S hS => ?_
+    have hSmin : Ch02.IsMinimalNormal S := isMinimalNormal_of_mem_semisimpleFamily h𝒳 hS
+    by_cases hSN : S ≤ N
+    · exact le_sup_of_le_left (le_iSup_isMinimalNormal hSmin hSN)
+    · exact le_sup_of_le_right (le_iSup_isMinimalNormal hSmin hSN)
+  have hNC : N ≤ Subgroup.centralizer (minimalNormalNotLe N : Set G) :=
+    Subgroup.le_centralizer_iff.mp (minimalNormalNotLe_le_centralizer N)
+  refine le_antisymm (fun n hn => ?_) hUN
+  have hntop : n ∈ (⨆ M : {M : Subgroup G // Ch02.IsMinimalNormal M ∧ M ≤ N},
+      (M : Subgroup G)) ⊔ minimalNormalNotLe N := by rw [hUV]; exact Subgroup.mem_top n
+  rw [← SetLike.mem_coe, Subgroup.mul_normal] at hntop
+  obtain ⟨u, hu, v, hv, rfl⟩ := hntop
+  have hvC : v ∈ Subgroup.centralizer (minimalNormalNotLe N : Set G) := by
+    have hveq : v = u⁻¹ * (u * v) := by group
+    rw [hveq]
+    exact Subgroup.mul_mem _ (Subgroup.inv_mem _ (hNC (hUN hu))) (hNC hn)
+  have hvbot : v ∈ (⊥ : Subgroup G) := by
+    rw [← inf_centralizer_eq_bot_of_isSemisimpleGroup hss (minimalNormalNotLe N)]
+    exact ⟨hv, hvC⟩
+  rw [Subgroup.mem_bot] at hvbot
+  subst hvbot
+  simpa using hu
+
+end -- 9A.3
 
 end OddOrder.Isaacs.Ch09
