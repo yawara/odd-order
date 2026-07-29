@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.HilbertNinetyOnQ
 
 /-!
 # Case (3) of the Ch. III §1 Proposition: `W ≠ 1`
@@ -30,17 +31,18 @@ prime-order `P ≤ V` are all refuted:
   `|Q₀| = q₀ ^ p` by Artin).  If it does not, the book's Frobenius route is
   available and Wielandt's formula gives `|Q| = |Q₀|`
   (`false_of_natCard_cQ_eq_cQ0_of_card_cube`).  If it does, then `p ∤ q + 1`,
-  so `P` normalizes a `K`-subgroup of `S` of order `q²` and
-  `not_cQ_isElementaryAbelian_of_kSubgroup` applies.
+  and Hilbert 90 on a `K`-orbit of `S/Q₀` produces an element of `C_Q(P)`
+  outside `Q₀` (`exists_mem_inf_centralizer_not_mem_Q0_of_card_cube`), against
+  `C_Q(P) = C_{Q₀}(P)`.
 
 ⚠ The book asserts the Frobenius property of `[K, P] ⋊ P` unconditionally;
 that is equivalent to `p ∤ q₀ − 1` and genuinely fails otherwise (issue 0164).
 
 ## Main results
 
-* `Hypothesis.exists_kSubgroupSquare_invariant_of_card_cube` — `P` normalizes a
-  `K`-subgroup of `S` of order `q²` when `p ∤ q + 1`.
 * `SecondCaseHypothesis.W_ne_bot_of_card_cube` — case (3) forces `W ≠ 1`.
+* `SecondCaseHypothesis.trichotomy` — the Proposition itself, now with no
+  hypothesis left over.
 -/
 
 set_option autoImplicit false
@@ -48,40 +50,6 @@ set_option autoImplicit false
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 universe uG uΩ
-
-namespace Hypothesis
-
-variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
-  (hyp : Hypothesis G Ω)
-
-/-- **`P` normalizes a `K`-subgroup of `S` of order `q²`** (Peterfalvi Part II,
-Ch. III §1, p. 117, case (3)), whenever `p ∤ q + 1`.
-
-Outside type B there are exactly two such subgroups
-(`exists_two_kSubgroups_unique_of_card_cube`) and the odd-order `P` cannot swap
-them (`conj_mem_of_unique_of_le_V`) — the hypothesis `p ∤ q + 1` is not even
-needed there.
-
-In type B the book counts them: "the number of `K`-subgroups of `S` of order
-`q²` is `q + 1`", so `P` — of order `p` prime to `q + 1` — fixes one of them.
-
-⚠ The type-B count is the one step of case (3) still open (issue 0164). -/
-theorem exists_kSubgroupSquare_invariant_of_card_cube
-    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
-    {m : ℕ} (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
-    (hcardQ : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
-    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
-    (hPV : P ≤ hyp.V) (hnd : ¬ p ∣ Nat.card ↥hyp.Q0 + 1) :
-    ∃ N : Subgroup G, hyp.IsKSubgroupSquare N ∧
-      ∀ g ∈ P, ∀ y ∈ N, g * y * g⁻¹ ∈ N := by
-  by_cases hB : Suzuki2Groups.IsTypeB.{uG, 0} ↥hyp.Q
-  · -- type B: `q + 1` `K`-subgroups, and `p ∤ q + 1`
-    sorry
-  · obtain ⟨X, Y, hX, -, hne, huniq⟩ :=
-      hyp.exists_two_kSubgroups_unique_of_card_cube hQsuz hm hQ0card hcardQ hB
-    exact ⟨X, hX, conj_mem_of_unique_of_le_V hp hPcard hPV hX hne huniq⟩
-
-end Hypothesis
 
 namespace SecondCaseHypothesis
 
@@ -139,7 +107,7 @@ theorem W_ne_bot_of_card_cube
       have h := sc.toHypothesis.natCard_Q0_eq_pow_of_W_eq_bot hW hPV
       rwa [hPcard] at h
     by_cases hdvd : p ∣ q₀ - 1
-    · -- `p ∣ q₀ − 1`: then `p ∤ q + 1`, so `P` normalizes a `K`-subgroup
+    · -- `p ∣ q₀ − 1`: then `p ∤ q + 1`, and Hilbert 90 on a `K`-orbit applies
       have hq₀pos : 0 < q₀ := Nat.card_pos
       have hQ0pos : 0 < Nat.card ↥sc.toHypothesis.Q0 := Nat.card_pos
       have hdvd' : p ∣ Nat.card ↥sc.toHypothesis.Q0 - 1 := by
@@ -152,11 +120,16 @@ theorem W_ne_bot_of_card_cube
           rwa [show Nat.card ↥sc.toHypothesis.Q0 + 1 -
             (Nat.card ↥sc.toHypothesis.Q0 - 1) = 2 by omega] at this
         exact hpodd ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).mp h2)
-      obtain ⟨N, hN, hNP⟩ :=
-        sc.toHypothesis.exists_kSubgroupSquare_invariant_of_card_cube hQsuz hm
-          hQ0card hcardQ hp hPcard hPV hnd
-      exact sc.not_cQ_isElementaryAbelian_of_kSubgroup hQsuz hN.1 hN.2.1 hN.2.2.1
-        hN.2.2.2 hp hPcard hPV hNP det.cQ_isElementaryAbelian
+      obtain ⟨y, hyQC, hyQ0⟩ :=
+        sc.toHypothesis.exists_mem_inf_centralizer_not_mem_Q0_of_card_cube hQsuz hm
+          hQ0card hcardQ hW hPV hp hPcard hnd
+      -- `C_Q(P) = C_{Q₀}(P)` in this branch, so `y` cannot avoid `Q₀`
+      refine hyQ0 ?_
+      have hEq : sc.toHypothesis.Q0 ⊓ C = sc.toHypothesis.Q ⊓ C :=
+        Subgroup.eq_of_le_of_card_ge
+          (inf_le_inf_right C sc.toHypothesis.Q0_le_Q) heq.le
+      have hy0 : y ∈ sc.toHypothesis.Q0 ⊓ C := by rw [hEq]; exact hyQC
+      exact hy0.1
     · -- `p ∤ q₀ − 1`: the book's Frobenius route, via Wielandt's formula
       have hcop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥sc.toHypothesis.K) := by
         rw [hPcard]
@@ -168,6 +141,59 @@ theorem W_ne_bot_of_card_cube
     omega
   · -- `PSU(3, ℓ)`: the book's deferred computation
     exact det.false_of_W_eq_bot hPV hW data.common
+
+/-- **Peterfalvi Part II, Ch. III §1, Proposition** (pp. 116–117).
+
+> One of the following three cases holds.
+> (a) `S = Q₀` and `st` has order `3`.
+> (b) `S` is a Suzuki `2`-group of type A, `st` has order `5` and `W = 1`.
+> (c) `S` is a Suzuki `2`-group of type B, `st` has order `3` and `W ≠ 1`.
+
+`S = Q` after Theorem C (`sylowTwoOfQ_eq_Q`).  The case split is Ch. I §2's
+"either `S` is abelian or `S` is a Suzuki `2`-group"
+(`isMulCommutative_or_isSuzuki2Group_Q`) refined by Appendix III's two possible
+orders `|Q₀|²` and `|Q₀|³` (`natCard_Q_eq_sq_or_cube`).
+
+The `W ≠ 1` clause of case (c) is `W_ne_bot_of_card_cube`; it subsumes both the
+book's deferred `PSU(3, ℓ)` computation ("as can be checked") and the repair of
+its `PSL(2, ℓ)` argument (issue 0164). -/
+theorem trichotomy (ind : Hypothesis.TheoremAInductionBelow G Ω) :
+    (sc.toHypothesis.Q = sc.toHypothesis.Q0 ∧
+        orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3)
+      ∨ (Suzuki2Groups.IsTypeA.{uG, 0} ↥sc.toHypothesis.Q ∧
+        orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 5 ∧
+        sc.toHypothesis.W = ⊥)
+      ∨ (Suzuki2Groups.IsTypeB.{uG, 0} ↥sc.toHypothesis.Q ∧
+        orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3 ∧
+        sc.toHypothesis.W ≠ ⊥) := by
+  classical
+  have hQ2 : IsPGroup 2 ↥sc.toHypothesis.Q := sc.isPGroup_two_Q ind
+  obtain ⟨m, hQ0card⟩ := (hQ2.to_le sc.toHypothesis.Q0_le_Q).exists_card_eq
+  have hm : m ≠ 0 := by
+    intro h
+    have h2 := sc.toHypothesis.two_le_card_Q0
+    rw [hQ0card, h, pow_zero] at h2
+    omega
+  rcases sc.isMulCommutative_or_isSuzuki2Group_Q ind with hcomm | hQsuz
+  · -- (1) `S` abelian
+    have hc : ∀ a ∈ sc.toHypothesis.Q, ∀ b ∈ sc.toHypothesis.Q, Commute a b := by
+      intro a ha b hb
+      exact congrArg (Subtype.val (p := fun z => z ∈ sc.toHypothesis.Q))
+        (hcomm.1.comm (⟨a, ha⟩ : ↥sc.toHypothesis.Q) ⟨b, hb⟩)
+    exact Or.inl (sc.Q_eq_Q0_and_orderOf_st_of_commute ind hQ2 hc)
+  · obtain ⟨P, p, hp, hPcard, hPV⟩ := exists_le_card_eq_prime sc.V_ne_bot
+    rcases sc.toHypothesis.natCard_Q_eq_sq_or_cube hQsuz with hsq | hcube
+    · -- (2) `S` non-abelian of order `q²`
+      exact Or.inr (Or.inl ⟨sc.toHypothesis.isTypeA_of_natCard_eq_sq hQsuz hsq,
+        sc.orderOf_st_eq_five_of_isSuzuki2Group ind hQsuz hsq hp hPcard hPV,
+        sc.W_eq_bot_of_isSuzuki2Group hQsuz hsq⟩)
+    · -- (3) `S` non-abelian of order `q³`
+      have hst := sc.orderOf_st_eq_three_of_card_cube ind hQsuz hm hQ0card hcube
+        hp hPcard hPV
+      have hW := sc.W_ne_bot_of_card_cube ind hQsuz hm hQ0card hcube
+      obtain ⟨-, -, hB⟩ := sc.toHypothesis.lemmaFive_of_orderThree hst hQsuz hm
+        hQ0card hcube ind
+      exact Or.inr (Or.inr ⟨hB hW, hst, hW⟩)
 
 end SecondCaseHypothesis
 

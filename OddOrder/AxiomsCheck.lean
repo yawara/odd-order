@@ -288,6 +288,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.OrderThreeSuzukiCentralizer
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CoherenceContradiction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.SquareRootFibres
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
 import OddOrder.Peterfalvi.Appendices.NearFields
 import OddOrder.Peterfalvi.Appendices.ExceptionalNearField
@@ -13701,7 +13702,7 @@ so `x² = 1` says exactly that the quotient coordinate vanishes.
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.isMulCommutative_or_isSuzuki2Group_Q
 
 /-! **Peterfalvi Part II, Ch. III §1, Proposition** (issue 0163, 2026-07-29).
-`Appendices/Suzuki/StructureOfH/Trichotomy.lean`, pp. 116–117.
+`Appendices/Suzuki/StructureOfH/{Trichotomy,WNeBot}.lean`, pp. 116–117.
 
 > One of the following three cases holds.
 > (a) `S = Q₀` and `st` has order `3`.
@@ -13715,11 +13716,11 @@ so `x² = 1` says exactly that the quotient coordinate vanishes.
 `W_eq_bot_of_isSuzuki2Group`; case (c) is `orderOf_st_eq_three_of_card_cube` followed by
 Ch. I §3 Lemma 5 (`lemmaFive_of_orderThree`).
 
-**One hypothesis remains**: the `W ≠ 1` clause of case (c).  It is the book's own deferred
-`PSU(3, ℓ)` Sylow-normalizer computation ("as can be checked", p. 117), tracked as issue 0164;
-in case (2) the same computation was replaced by a cardinality count
-(`natCard_inf_centralizer_le_sq`), but in case (3) the surviving branch really is
-`PSU(3, ℓ)`, so no count can replace it. -/
+The `W ≠ 1` clause of case (c) is `W_ne_bot_of_card_cube` (issue 0164): under `W = 1` the
+three alternatives of Ch. I §3 Proposition 1(c) are refuted one by one.  Two of them needed
+work the book does not do — the deferred `PSU(3, ℓ)` Sylow-normalizer computation ("as can be
+checked", p. 117), and the `PSL(2, ℓ)` branch, whose stated Frobenius argument is equivalent to
+`p ∤ q₀ − 1` and genuinely fails otherwise; Hilbert 90 on a `K`-orbit of `S/Q₀` replaces it. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.trichotomy
 
@@ -13915,3 +13916,41 @@ Ch. III §1 Proposition が `F/Z(F)` 側から持ち上げた元 `x` を `Q`-成
   OddOrder.GroupTheory.exists_ne_one_fixed_of_free_orbit_semilinear
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_inf_centralizer_not_mem_Q0
+
+/-! **`W ≠ 1` in case (3) of the Ch. III §1 Proposition** (issue 0164, 2026-07-29).
+`Appendices/Suzuki/StructureOfH/{FieldRealizationK,HilbertNinetyOnQ,WNeBot}.lean`, p. 117.
+
+The book closes case (3) with "But `[K, P] ⋊ P` is a Frobenius group acting on `S/Q₀` … whence
+`C_{S/Q₀}(P) ≠ 1`".  That Frobenius property is equivalent to `p ∤ q₀ − 1` and genuinely fails
+in some Chapter III configurations, so the conclusion needs a different proof.  It has one:
+
+* `exists_field_realization_K` — `K` acts on the elementary abelian `Q₀` freely off the identity
+  (Ch. I §2 Prop 1(a)) and `|K| = |Q₀| − 1`, so the action is transitive on `Q₀ ∖ {1}` and hence
+  irreducible; Appendix I Prop 2 makes `Q₀` a line over a field `F` of order `|Q₀|` and
+  `μ : K → Fˣ` a bijection.  Conjugation by `x ∈ V` is `σ`-semilinear with `μ ∘ α = σ ∘ μ`, and
+  `σ ≠ 1` is exactly `W = C_V(K) = 1`.
+* `exists_mem_inf_centralizer_not_mem_Q0_of_orbit` — `K` is free on `S/Q₀ = Q ⧸ Z(Q)`, so its
+  orbits there have length `q − 1` and there are `(q² − 1)/(q − 1) = q + 1` of them; a `P` of
+  prime order `p ∤ q + 1` fixes one setwise, and on that `K`-torsor Hilbert 90
+  (`exists_ne_one_fixed_of_free_orbit_semilinear`) produces a fixed point.  A coprime lift
+  (Isaacs Cor 3.28) moves it to `C_Q(P) ∖ Q₀`.
+
+⚠ Working with `K`-*orbits* rather than `K`-submodules is what removes the book's count of the
+`K`-subgroups of `S` of order `q²` — in type B that count ("there are `q + 1` of them") rests on
+the projective line over `End_K(irreducible) ≅ 𝔽_q`, which the text does not prove either. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conjQ0_fixed_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isAInvariant_eq_bot_or_eq_top_conjQ0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_field_realization_K
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.center_eq_Q0_subgroupOf_of_card_cube
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.kfree_mod_Q0_of_center_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_inf_centralizer_not_mem_Q0_of_orbit
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_inf_centralizer_not_mem_Q0_of_card_cube
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.W_ne_bot_of_card_cube
