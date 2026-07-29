@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.CriticalSubgroup
+import OddOrder.Isaacs.Ch02_Subnormality.Basic
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
@@ -25,6 +26,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 10A。
   **2-推移的 ⟺ ある `g` で `G = H ∪ HgH`**。
 * **10A.7** `exists_surjective_wreath_of_mem_compl_orders` — `A ◁ P` が基本可換で指数 `p`,
   `P ∖ A` に位数 `p` の元と位数 `p²` の元があれば `C_p ≀ C_p` は `P` の準同型像。
+* **10B.2 の骨格** `le_socle_of_exists_normal_complement` — `Soc(G) ⊓ E` に `G`-不変な補元が
+  取れれば `E ≤ Soc(G)`。10B.2 は残り Maschke (`E` の完全可約性) だけ。
 
 ## regular `p`-群の定義について
 
@@ -673,5 +676,35 @@ theorem exists_surjective_wreath_of_mem_compl_orders [Finite P] {p : ℕ} [Fact 
   exact exists_surjective_wreath_of_conj_list_prod_ne_one hP hidx hEA haA haZ hwA hlist
 
 end -- 10A.7
+
+section /- 10B.2 の骨格: 補元が取れれば socle に入る (p. 312) -/
+
+/-- **10B.2 の骨格** ⭐: `E` の中で `Soc(G) ⊓ E` が `G`-不変な補元をもてば `E ≤ Soc(G)`。
+
+帰納法は要らない: 補元 `M` が非自明なら `M` は `G` の極小正規部分群 `M₀` を含み,
+`M₀ ≤ Soc(G) ⊓ E ⊓ M = ⊥` で矛盾。よって `M = ⊥` すなわち `E = Soc(G) ⊓ E`。
+
+Isaacs Problem 10B.2 (`E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ⊆ Soc(G)`) は
+これに **Maschke** (`p′`-群 `G/C_G(E)` の `p`-群 `E` への作用が完全可約) を合わせれば従う。
+Maschke 側 (`Additive ↥E` の `ZMod p`-加群化 + 表現 + `MonoidAlgebra.Submodule.exists_isCompl`)
+は未実装 (issue 1055 に設計を記録)。 -/
+theorem le_socle_of_exists_normal_complement {G : Type*} [Group G] [Finite G] {E : Subgroup G}
+    (hcompl : ∃ M : Subgroup G, M.Normal ∧ M ≤ E ∧
+      (Ch02.socle G ⊓ E) ⊓ M = ⊥ ∧ (Ch02.socle G ⊓ E) ⊔ M = E) :
+    E ≤ Ch02.socle G := by
+  obtain ⟨M, hMnorm, hME, hinf, hsup⟩ := hcompl
+  haveI := hMnorm
+  have hMbot : M = ⊥ := by
+    by_contra hne
+    obtain ⟨M₀, hM₀min, hM₀M⟩ := Ch02.exists_isMinimalNormal_le_of_normal M hne
+    have hM₀ : M₀ ≤ (Ch02.socle G ⊓ E) ⊓ M :=
+      le_inf (le_inf (Ch02.isMinimalNormal_le_socle hM₀min) (hM₀M.trans hME)) hM₀M
+    rw [hinf, le_bot_iff] at hM₀
+    exact hM₀min.2.1 hM₀
+  rw [hMbot, sup_bot_eq] at hsup
+  rw [← hsup]
+  exact inf_le_left
+
+end -- 10B.2 の骨格
 
 end OddOrder.Isaacs.Ch10
