@@ -106,3 +106,27 @@ Appendix III Definition 3 により `S` は中心拡大
 * pp. 119–121 = `references/peterfalvi/pages/peterfalvi-p{119,120,121}.png`
 * 上流 = [0165](closed/0165-pf-part2-ch3-s2-order-five.md) / [0166](closed/0166-pf-part2-ch3-s3-case-ab-conclusion.md)
 * 下流 = Ch. IV「Characterization of PSU(3,q)」(pp. 122–134)
+
+## 進捗 (2026-07-29 その 2)
+
+段 (1) の**数え上げ核**を先に landing:
+
+`OddOrder/Algebra/PowSubOneDvd.lean`
+* `OddOrder.Nat.pow_sub_one_dvd_pow_sub_one_iff` — `a^m − 1 ∣ a^n − 1 ↔ m ∣ n` (`2 ≤ a`, `m ≠ 0`)
+* `OddOrder.Nat.eq_zero_or_eq_or_eq_two_mul_of_two_pow_sub_one_dvd` —
+  `2^n − 1 ∣ 2^j − 1` かつ `j ≤ 2n` ⟹ `j ∈ {0, n, 2n}`
+
+これで「`S/Q₀` (位数 `q² = 2^{2n}`) の `K`-不変部分群の位数は `1`, `q`, `q²` のいずれか」が出る
+(`K` は位数 `q−1` で自由に作用 ⟹ `FreeActionOrbitCount.dvd_card_sub_one_of_free_off_unique_fixed`
+で `q−1 ∣ |U| − 1`)。よって**真の非自明 `K`-不変部分群 = 書籍の「`K`-部分群」(位数 `q`)** となり、
+`W` がその上で固定点自由 (Ch. I §3 Lemma 5 の内部事実 `hprojfree`) ならば `KW` は既約に作用する。
+
+### 段 (1) の残り (次の一手)
+
+1. **`KW` の `S/Q₀` 上の既約性** — 上の数え上げ + `W` の固定点自由性。
+   ⚠ `hprojfree` は `WCyclicDivides.lean` の `isCyclic_W_and_card_dvd_of_orderThree` 内部の
+   `have` (l.246) に埋まっている。`Q/Z(Q) ≃ 𝔽_q × 𝔽_q` の設定ごと**再利用可能な補題に切り出す**
+   のが次の作業。
+2. `Huppert.exists_field_of_irreducible` を `T := KW`, `E := S/Q₀` に当てて
+   **`E = 𝔽_{q²}`** と `S/Q₀` の 1 次元性を得る (= 書籍の `S/Q₀ ≅ E`)。
+3. `K ↦ F^×`, `W ↦ W₁ ≤ {x : x^{1+q} = 1}` の同定。
