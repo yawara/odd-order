@@ -30,7 +30,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Defs
 
 ## Main results
 
-- `map_conj_eq_self_of_mem_pCentralizer` — 上記。
+- `map_conj_eq_self_of_normal_of_inf_le` — 一般形 (`D ⊴ G` で `D ⊓ C(q) ≤ C_G(F)`)。
+- `map_conj_eq_self_of_mem_pCentralizer` — `D = C(p)` (`p ≠ q`) の場合。
 -/
 
 namespace OddOrder.Isaacs.Ch03
@@ -56,21 +57,29 @@ theorem centralizer_fitting_le_pCentralizer [Finite G] [IsSolvable G] (p : ℕ) 
     Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G) ≤ pCentralizer G p :=
   Subgroup.centralizer_le (by exact_mod_cast fittingPPrimePart_le (G := G) p)
 
-/-- `p ≠ q` なら `C(p)` と `C(q)` の元の交換子は `C_G(F(G))` に入る。 -/
-theorem commutator_mem_centralizer_fitting [Finite G] [IsSolvable G] {p q : ℕ} (hpq : p ≠ q)
-    {x y : G} (hx : x ∈ pCentralizer G p) (hy : y ∈ pCentralizer G q) :
+/-- `D ⊴ G` が `D ⊓ C(q) ≤ C_G(F(G))` を満たすなら, `D` と `C(q)` の元の交換子は
+`C_G(F(G))` に入る。 -/
+theorem commutator_mem_centralizer_fitting [Finite G] [IsSolvable G] {q : ℕ} {D : Subgroup G}
+    [D.Normal]
+    (hD : D ⊓ pCentralizer G q ≤ Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G))
+    {x y : G} (hx : x ∈ D) (hy : y ∈ pCentralizer G q) :
     x * y * x⁻¹ * y⁻¹ ∈ Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G) := by
-  refine pCentralizer_inf_le_centralizer_fitting hpq (Subgroup.mem_inf.mpr ⟨?_, ?_⟩)
-  · have hconj : y * x⁻¹ * y⁻¹ ∈ pCentralizer G p :=
-      (pCentralizer_normal (G := G) p).conj_mem x⁻¹ (inv_mem hx) y
+  refine hD (Subgroup.mem_inf.mpr ⟨?_, ?_⟩)
+  · have hconj : y * x⁻¹ * y⁻¹ ∈ D := ‹D.Normal›.conj_mem x⁻¹ (inv_mem hx) y
     have := mul_mem hx hconj
     simpa [mul_assoc] using this
   · exact mul_mem ((pCentralizer_normal (G := G) q).conj_mem y hy x) (inv_mem hy)
 
-/-- **Mann の核心補題**: `p ≠ q` のとき `C(p)` の元は `C(q)` の Sylow `q`-部分群を正規化する。 -/
-theorem map_conj_eq_self_of_mem_pCentralizer [Finite G] [IsSolvable G] {p q : ℕ} (hpq : p ≠ q)
-    {S : Subgroup G} (hS : IsHallPart (pCentralizer G q) S ({q} : Set ℕ))
-    {x : G} (hx : x ∈ pCentralizer G p) :
+/-- **Mann の核心補題 (一般形)**: `D ⊴ G` が `D ⊓ C(q) ≤ C_G(F(G))` を満たすなら,
+`D` の元は `C(q)` の Sylow `q`-部分群を正規化する。
+
+`D = C(p)` (`p ≠ q`) の場合が `map_conj_eq_self_of_mem_pCentralizer`,
+`D = C_G(F_q)` の場合が 3C.8 の injector 側の議論で使われる。 -/
+theorem map_conj_eq_self_of_normal_of_inf_le [Finite G] [IsSolvable G] {q : ℕ}
+    {D S : Subgroup G} [D.Normal]
+    (hD : D ⊓ pCentralizer G q ≤ Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G))
+    (hS : IsHallPart (pCentralizer G q) S ({q} : Set ℕ))
+    {x : G} (hx : x ∈ D) :
     S.map (MulAut.conj x).toMonoidHom = S := by
   set Z : Subgroup G := Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G) with hZdef
   have hZnil : Group.IsNilpotent ↥Z := isNilpotent_centralizer_fitting
@@ -107,7 +116,7 @@ theorem map_conj_eq_self_of_mem_pCentralizer [Finite G] [IsSolvable G] {p q : �
   have hconj_le_H : S.map (MulAut.conj x).toMonoidHom ≤ H := by
     rintro - ⟨y, hy, rfl⟩
     have hc : x * y * x⁻¹ * y⁻¹ ∈ Z :=
-      commutator_mem_centralizer_fitting hpq hx (hS.1 hy)
+      commutator_mem_centralizer_fitting hD hx (hS.1 hy)
     have hfac : (MulAut.conj x) y = (x * y * x⁻¹ * y⁻¹) * y := by
       simp [MulAut.conj_apply]
     rw [MulEquiv.coe_toMonoidHom, hfac]
@@ -135,6 +144,13 @@ theorem map_conj_eq_self_of_mem_pCentralizer [Finite G] [IsSolvable G] {p q : �
     exact (Subgroup.mem_subgroupOf (H := S) (K := pCentralizer G q)
       (h := ⟨z, hconj_le_C hz⟩)).mp (hsub (Subgroup.mem_subgroupOf.mpr hz))
   exact Subgroup.eq_of_le_of_card_ge hle hcard.ge
+
+/-- **Mann の核心補題**: `p ≠ q` のとき `C(p)` の元は `C(q)` の Sylow `q`-部分群を正規化する。 -/
+theorem map_conj_eq_self_of_mem_pCentralizer [Finite G] [IsSolvable G] {p q : ℕ} (hpq : p ≠ q)
+    {S : Subgroup G} (hS : IsHallPart (pCentralizer G q) S ({q} : Set ℕ))
+    {x : G} (hx : x ∈ pCentralizer G p) :
+    S.map (MulAut.conj x).toMonoidHom = S :=
+  map_conj_eq_self_of_normal_of_inf_le (pCentralizer_inf_le_centralizer_fitting hpq) hS hx
 
 end -- 3C.8: Mann の核心補題
 

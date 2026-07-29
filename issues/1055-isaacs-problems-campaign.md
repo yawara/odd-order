@@ -5675,8 +5675,9 @@ docstring の `3C.1` は正しく演習を指していた。⟹ **3C.1 は ✅**
   (b) 共役性 `exists_conj_of_isCarterSubgroup` /
   (c) `G/N` 冪零なら `NC = G` `sup_eq_top_of_isNilpotent_quotient`。
   ⚠ **書籍自身が「この問題と次はかなり難しい」と注記**しており証明は与えていない (自前)。
-* ⬜ **3C.8** — 可解群の nilpotent injector (`F(G)` を含む極大な冪零部分群) は全て共役。
-  ⚠ 同上 (書籍が challenge として提示)。
+* ✅ **3C.8** — **🎉 完成 (2026-07-29)**: 可解群の nilpotent injector
+  (`F(G)` を含む極大な冪零部分群) は全て共役 (`exists_conj_of_isNilpotentInjector`)。
+  ⚠ 同上 (書籍が challenge として提示、証明なし)。Mann の構造定理経由。
 
 **着手順は番号順** (3C.2 から)。3C.7 / 3C.8 は書籍自身が難問と明示しているので、
 時間がかかっても正面から進める (CLAUDE.md「難易度は着手判断の基準でない」)。
@@ -5806,10 +5807,14 @@ arXiv:2408.15622 "Counting in nilpotent injectors and Carter subgroups" の Rema
   `centralizer_fitting_le_pCentralizer`。
   ⚠ 述語は `IsNilpotentPiPart` → **`IsHallPart` に改名** (定義自体は `N` の冪零性を
   要求せず、3C.8 では `N = C(q)` (非冪零) にも使うため)。
-* ⬜ **`NilpotentInjector/Injector.lean`** — 次: injector の `{p}`-部分が `C(p)` の
-  Sylow `p` であること (と逆)。`I = ⨆_p I_p` の代わりに
-  「`∀ p, |I|_p ∣ |I ⊓ J|` ⟹ `|I| ∣ |I ⊓ J|`」で押す予定。
-* ⬜ **`NilpotentInjector/Conjugacy.lean`** — 素数ごとの帰納 (`Finset` 上) で共役性。
+* ✅ **`NilpotentInjector/Injector.lean`** — **Mann の構造定理 (主要部分)**
+  `isHallPart_pCentralizer_of_isNilpotentInjector`: injector の `{p}`-部分は `C(p)` の
+  Sylow `p`-部分群。汎用補助 = `isNilpotent_sup_of_commute` (元ごとに可換な 2 つの
+  冪零部分群の join は冪零 — Fitting 部分群経由) / `eq_one_of_conj_mul_inv_mem_of_coprime`
+  (交換子消去の位数論法) / `exists_isHallPart_singleton_ge` / `isPGroup_of_isPiGroup_singleton`。
+* ✅ **`NilpotentInjector/Conjugacy.lean`** — **🎉 3C.8 完成 (2026-07-29)**:
+  `exists_conj_of_isNilpotentInjector`。素数ごとの `Finset` 帰納 +
+  `eq_of_nilPiPart_eq` (全素数で `{p}`-部分が一致 ⟹ 位数比較で `I = J`)。
 
 `C_G(F(G)) ≤ F(G)` は `OddOrder.GroupTheory.centralizer_fitting_le_fitting` を使う。
 
