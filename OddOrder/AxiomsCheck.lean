@@ -13665,7 +13665,10 @@ so `x² = 1` says exactly that the quotient coordinate vanishes.
 * `typeAQuadraticMap_anisotropic` — `a·φ(a) = 0` forces `a = 0` in a field (types B, C, D
   already had their anisotropy recorded).
 * `natCard_eq_sq_or_cube_of_isSuzuki2Group` — **the dichotomy**: `|P| = |Ω₁(P)|²` (type A, both
-  coordinates the field) or `|P| = |Ω₁(P)|³` (types B, C, D, two-dimensional quotient). -/
+  coordinates the field) or `|P| = |Ω₁(P)|³` (types B, C, D, two-dimensional quotient).
+* `natCard_sq_eq_one_eq_natCard_Q0`, `natCard_Q_eq_sq_or_cube` — the same for the ambient `Q`,
+  using `Ω₁(Q) = Q₀`: this is the book's split into "`S` non-abelian of order `q²`" (case (2))
+  and "of order `q³`" (case (3)). -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.natCard
 #assert_only_allowed_axioms
@@ -13678,5 +13681,9 @@ so `x² = 1` says exactly that the quotient coordinate vanishes.
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.typeAQuadraticMap_anisotropic
 #assert_only_allowed_axioms
   OddOrder.Higman.Suzuki2Groups.natCard_eq_sq_or_cube_of_isSuzuki2Group
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_sq_eq_one_eq_natCard_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_Q_eq_sq_or_cube
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.orderOf_st_eq_three_of_card_cube_of_not_isTypeB

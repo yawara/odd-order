@@ -285,6 +285,34 @@ theorem conj_mem_of_unique_of_le_V {P : Subgroup G} {p : ℕ} (hp : p.Prime)
     rwa [show g⁻¹ * (g * y * g⁻¹) * g = y from by group]
   rwa [hfix] at hmem
 
+/-- **`Ω₁(Q) = Q₀`, as a cardinality**: the elements of `Q` of order dividing `2`
+are exactly `Q₀` (`mem_Q0_of_mem_Q_of_sq_eq_one`). -/
+theorem natCard_sq_eq_one_eq_natCard_Q0 {G : Type uG} {Ω : Type uΩ} [Group G]
+    [MulAction G Ω] [Finite G] (hyp : Hypothesis G Ω) :
+    Nat.card {x : ↥hyp.Q // x ^ 2 = 1} = Nat.card ↥hyp.Q0 := by
+  refine Nat.card_congr ?_
+  refine
+    { toFun := fun x => ⟨((x : ↥hyp.Q) : G),
+        hyp.mem_Q0_of_mem_Q_of_sq_eq_one (x : ↥hyp.Q).2 ?_⟩
+      invFun := fun c => ⟨⟨(c : G), hyp.Q0_le_Q c.2⟩, ?_⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl }
+  · simpa using congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) x.2
+  · exact Subtype.ext (by simpa using hyp.sq_eq_one_of_mem_Q0 c.2)
+
+/-- **The order of `S`** (Peterfalvi Part II, Ch. III §1, p. 117): a Suzuki
+`2`-group `Q` has order `|Q₀|²` (the book's case (2)) or `|Q₀|³` (case (3)).
+
+Higman's dichotomy `natCard_eq_sq_or_cube_of_isSuzuki2Group` phrased with
+`Ω₁(Q) = Q₀`. -/
+theorem natCard_Q_eq_sq_or_cube {G : Type uG} {Ω : Type uΩ} [Group G]
+    [MulAction G Ω] [Finite G] (hyp : Hypothesis G Ω)
+    (hQsuz : IsSuzuki2Group ↥hyp.Q) :
+    Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 2 ∨
+      Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3 := by
+  have h := natCard_eq_sq_or_cube_of_isSuzuki2Group hQsuz
+  rwa [natCard_sq_eq_one_eq_natCard_Q0] at h
+
 /-- Invariance under two operator subgroups gives invariance under their join. -/
 theorem conj_mem_sup {G : Type uG} [Group G] {A B N : Subgroup G}
     (hA : ∀ a ∈ A, ∀ y ∈ N, a * y * a⁻¹ ∈ N)
