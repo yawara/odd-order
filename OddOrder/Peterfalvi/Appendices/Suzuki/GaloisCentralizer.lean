@@ -30,6 +30,8 @@ is in when it invokes this.
 * `Hypothesis.VtoVbar` — the map `V → V̄ = VW/W`, with kernel `W`.
 * `Hypothesis.centralizer_V_centralizer_Q0` — `C_V(C_{Q₀}(P)) = P ⊔ W`.
 * `Hypothesis.centralizer_V_centralizer_Q0_of_W_eq_bot` — the book's `= P`.
+* `Hypothesis.natCard_Q0_eq_pow_of_W_eq_bot` — **Artin's degree formula** in this
+  setting: `|Q₀| = |C_{Q₀}(X)| ^ |X|` when `W = 1`.
 -/
 
 set_option autoImplicit false
@@ -257,6 +259,144 @@ theorem centralizer_V_centralizer_Q0_of_W_eq_bot (hW : hyp.W = ⊥)
     hyp.V ⊓ Subgroup.centralizer
         ((hyp.Q0 ⊓ Subgroup.centralizer (P : Set G) : Subgroup G) : Set G) = P := by
   rw [hyp.centralizer_V_centralizer_Q0 hPV, hW, sup_bot_eq]
+
+/-! ## Artin's degree formula -/
+
+/-- **Artin's degree formula in the Ch. III §1 setting**: when `W = 1`,
+`|Q₀| = |C_{Q₀}(X)| ^ |X|` for every `X ≤ V`.
+
+`Q₀` is the additive group of a finite field `F` on which `X` acts faithfully
+(because `W = 1`) through a subgroup `B ≤ RingAut F`; `C_{Q₀}(X)` is the fixed
+field `F^B`, Artin's lemma gives `[F : F^B] = |B| = |X|`
+(`OddOrder.RingAut.finrank_fixedSet`), and a finite-dimensional vector space over
+a finite field has `|F| = |F^B| ^ [F : F^B]`.
+
+This is what makes `q = q₀ ^ p` available to Ch. III §1, both for Fermat
+(`coprime_natCard_K_of_not_dvd`) and for the order count that contradicts the
+`PSL(2, ℓ)` branch. -/
+theorem natCard_Q0_eq_pow_of_W_eq_bot (hW : hyp.W = ⊥) {X : Subgroup G}
+    (hXV : X ≤ hyp.V) :
+    Nat.card ↥hyp.Q0 =
+      Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer (X : Set G)) ^ Nat.card ↥X := by
+  classical
+  obtain ⟨F, hField, hFinite, A, hcardF, _hVcyc, eQ, μ, νe, _hT, hE, _hκ,
+      _eL, _hL1, _hL2, _hL3⟩ := hyp.exists_semilinear_equiv
+  letI : Field F := hField
+  letI : Finite F := hFinite
+  set σ : ↥hyp.V →* RingAut F := A.subtype.comp (νe.toMonoidHom.comp hyp.VtoVbar)
+    with hσdef
+  have hσker : ∀ v : ↥hyp.V, σ v = 1 ↔ (v : G) ∈ hyp.W := by
+    intro v
+    rw [← hyp.VtoVbar_eq_one_iff v, hσdef]
+    refine ⟨fun h => ?_, fun h => by simp [h]⟩
+    have h1 : νe (hyp.VtoVbar v) = 1 := Subtype.ext h
+    simpa using νe.injective (by simpa using h1)
+  have hbridge : ∀ (v : ↥hyp.V) (x : ↥hyp.Q0),
+      eQ (hyp.conjQ0bar ((hyp.VtoVbar v : ↥hyp.Vbar) : hyp.Dbar) x) =
+        fieldRingAutOnAdditive F (σ v) (eQ x) := by
+    intro v x
+    have happ := congrArg
+      (fun e : ↥hyp.Q0 ≃* Multiplicative F => e x) (hE (hyp.VtoVbar v))
+    simp only [MulEquiv.trans_apply] at happ
+    have hinr : hyp.fittingSemidirectEquiv
+        (SemidirectProduct.inr (hyp.VtoVbar v)) =
+        ((hyp.VtoVbar v : ↥hyp.Vbar) : hyp.Dbar) := by
+      change SemidirectProduct.mulEquivSubgroup _
+        (SemidirectProduct.inr (hyp.VtoVbar v)) = _
+      simp [SemidirectProduct.mulEquivSubgroup]
+    have hract : SemidirectProduct.rightFactorAction hyp.fittingConjAction
+        (hyp.conjQ0bar.comp hyp.fittingSemidirectEquiv.toMonoidHom)
+        (hyp.VtoVbar v) =
+        hyp.conjQ0bar ((hyp.VtoVbar v : ↥hyp.Vbar) : hyp.Dbar) := by
+      change hyp.conjQ0bar
+        (hyp.fittingSemidirectEquiv (SemidirectProduct.inr (hyp.VtoVbar v))) = _
+      rw [hinr]
+    rwa [hract] at happ
+  have hfix : ∀ (v : ↥hyp.V) (x : ↥hyp.Q0),
+      (v : G) * (x : G) * (v : G)⁻¹ = (x : G) ↔
+        σ v (Multiplicative.toAdd (eQ x)) = Multiplicative.toAdd (eQ x) := by
+    intro v x
+    constructor
+    · intro h
+      have hx : hyp.conjQ0bar ((hyp.VtoVbar v : ↥hyp.Vbar) : hyp.Dbar) x = x :=
+        Subtype.ext h
+      have hb := hbridge v x
+      rw [hx] at hb
+      exact (congrArg Multiplicative.toAdd hb).symm
+    · intro h
+      have h2 : eQ (hyp.conjQ0bar ((hyp.VtoVbar v : ↥hyp.Vbar) : hyp.Dbar) x)
+          = eQ x := by
+        rw [hbridge v x]
+        apply Multiplicative.toAdd.injective
+        rw [fieldRingAutOnAdditive_apply]
+        exact h
+      exact congrArg (fun y : ↥hyp.Q0 => (y : G)) (eQ.injective h2)
+  set B : Subgroup (RingAut F) := (X.subgroupOf hyp.V).map σ with hBdef
+  -- `C_{Q₀}(X)` is the fixed set of `B`
+  have hmemB : ∀ τ : RingAut F, τ ∈ B ↔ ∃ v : ↥hyp.V, (v : G) ∈ X ∧ σ v = τ :=
+    fun τ => ⟨fun ⟨v, hv, h⟩ => ⟨v, hv, h⟩, fun ⟨v, hv, h⟩ => ⟨v, hv, h⟩⟩
+  have hfixedSet : ∀ x : ↥hyp.Q0,
+      (x : G) ∈ Subgroup.centralizer (X : Set G) ↔
+        Multiplicative.toAdd (eQ x) ∈ OddOrder.RingAut.fixedSet B := by
+    intro x
+    constructor
+    · intro hx τ hτ
+      obtain ⟨v, hvX, rfl⟩ := (hmemB τ).mp hτ
+      refine (hfix v x).mp ?_
+      have := Subgroup.mem_centralizer_iff.mp hx (v : G) hvX
+      calc (v : G) * (x : G) * (v : G)⁻¹
+          = ((x : G) * (v : G)) * (v : G)⁻¹ := by rw [this]
+        _ = (x : G) := by group
+    · intro hx
+      refine Subgroup.mem_centralizer_iff.mpr fun g hg => ?_
+      have hgV : g ∈ hyp.V := hXV hg
+      have hconj := (hfix ⟨g, hgV⟩ x).mpr (hx _ ⟨⟨g, hgV⟩, hg, rfl⟩)
+      calc g * (x : G) = (g * (x : G) * g⁻¹) * g := by group
+        _ = (x : G) * g := by rw [hconj]
+  -- `|B| = |X|` because `W = 1` makes `σ` injective
+  have hBcard : Nat.card ↥B = Nat.card ↥X := by
+    have hσinj : Function.Injective σ := by
+      rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+      intro v hv
+      rw [MonoidHom.mem_ker] at hv
+      have h2 := (hσker v).mp hv
+      rw [hW, Subgroup.mem_bot] at h2
+      exact Subgroup.mem_bot.mpr (Subtype.ext h2)
+    have h1 : Nat.card ↥B = Nat.card ↥(X.subgroupOf hyp.V) :=
+      (Nat.card_congr
+        (Subgroup.equivMapOfInjective _ σ hσinj).toEquiv).symm
+    rw [h1, ← Subgroup.inf_subgroupOf_right]
+    have h2 : Nat.card ↥((X ⊓ hyp.V).subgroupOf hyp.V) = Nat.card ↥(X ⊓ hyp.V) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (inf_le_right : X ⊓ hyp.V ≤ hyp.V)).toEquiv
+    rw [h2, inf_eq_left.mpr hXV]
+  -- `C_{Q₀}(X) ≃ F^B` through `eQ`
+  have hcardFix : Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer (X : Set G)) =
+      Nat.card ↥(OddOrder.RingAut.fixedSet B) := by
+    refine Nat.card_congr ?_
+    refine (Equiv.subtypeEquivRight (p := fun x : G => x ∈ hyp.Q0 ⊓
+      Subgroup.centralizer (X : Set G)) (q := fun x : G => x ∈ hyp.Q0 ∧
+        x ∈ Subgroup.centralizer (X : Set G)) fun x => Iff.rfl).trans ?_
+    refine ((Equiv.subtypeSubtypeEquivSubtypeInter
+      (fun x : G => x ∈ hyp.Q0) (fun x : G => x ∈ Subgroup.centralizer
+        (X : Set G))).symm).trans ?_
+    exact Equiv.subtypeEquiv (eQ.toEquiv.trans Multiplicative.toAdd)
+      fun x => hfixedSet x
+  -- Artin plus the vector-space count
+  haveI : Fintype F := Fintype.ofFinite F
+  have hArtin := OddOrder.RingAut.finrank_fixedSet (F := F) B
+  have hVS : Nat.card F =
+      Nat.card ↥(FixedPoints.subfield (↥B) F) ^
+        Module.finrank (FixedPoints.subfield (↥B) F) F := by
+    haveI : Fintype ↥(FixedPoints.subfield (↥B) F) := Fintype.ofFinite _
+    simpa [Nat.card_eq_fintype_card] using
+      (Module.card_eq_pow_finrank (K := FixedPoints.subfield (↥B) F) (V := F))
+  have hsub : Nat.card ↥(FixedPoints.subfield (↥B) F) =
+      Nat.card ↥(OddOrder.RingAut.fixedSet B) := by
+    rw [OddOrder.RingAut.fixedSet_eq_subfield]
+    rfl
+  rw [← hcardF, hVS, hArtin, hsub, hcardFix, hBcard]
+
 
 end Hypothesis
 

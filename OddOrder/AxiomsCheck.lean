@@ -13806,6 +13806,8 @@ Pulling back along `V → A`, whose kernel is `W`, gives `P ⊔ W`; the book's `
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_V_centralizer_Q0
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralizer_V_centralizer_Q0_of_W_eq_bot
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_Q0_eq_pow_of_W_eq_bot
 
 /-! **`Z(F)` は奇位数** (issue 0164, 2026-07-29).
 `Peterfalvi/Appendices/Suzuki/StructureOfH/PSUCentre.lean`, Ch. I §3 Prop 1(c) の PSU 分岐.
