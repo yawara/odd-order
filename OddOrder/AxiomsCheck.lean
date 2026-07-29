@@ -13822,3 +13822,23 @@ Ch. III §1 Proposition が `F/Z(F)` 側から持ち上げた元 `x` を `Q`-成
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isMulCommutative_V_of_W_eq_bot
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.V_le_centralizer_of_le_V_of_W_eq_bot
+
+/-! **PSU(3,ℓ) 分岐は `W = 1` と両立しない** (issue 0164, 2026-07-29).
+`StructureOfH/PSUCentre.lean`, Peterfalvi Part II, Ch. III §1 Proposition p. 117
+「It follows that `F/Z(F)` is not isomorphic to `PSU(3, ℓ)`」— 書籍が
+"as can be checked" で省略した計算を実際に遂行して得た結論。
+
+連鎖: PSU の計算 (`exists_ne_one_odd_centralizing_involutions_of_sylowTwo`) が
+`F/Z(F)` の Sylow 2 の involution を全部中心化する非自明・奇位数の `d` を出す →
+その**任意の**逆像 `x ∈ F` は `⁅x, y⁆ ∈ Z(F)` しか満たさないが、`Z(F)` は奇位数
+(`odd_natCard_center_residual`) なので 2-元 `y ∈ C_{Q₀}(X)` との交換子は消える
+(`commute_of_commutatorElement_mem_of_coprime_natCard`) → `x` は `s` を中心化 ⟹
+`x ∈ C_G(s) ≤ H` (Ch. I §3 Prop 1(b)) ⟹ `x = q v` (`C_H(s) = QV`) →
+`W = 1` で `V` 可換ゆえ `V ≤ C_G(X)`、よって `q ∈ C_Q(X)`、`v` は `x` から
+`C_{Q₀}(X)` の中心化を継承 → Galois (`centralizer_V_centralizer_Q0_of_W_eq_bot`)
+で `v ∈ X` → `X` は `C_G(X)` の中心ゆえ `F` でも中心 ⟹ `d = image(q)` は 2-元。
+奇位数の非自明元が 2-元であることはない。∎ -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.CentralizerPSUData.exists_mem_residual_commute_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.CentralizerPSUData.false_of_W_eq_bot

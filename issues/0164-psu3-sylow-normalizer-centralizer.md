@@ -212,9 +212,36 @@ Ch. I §3 Prop 1(c) の三分岐 (`centralizer_trichotomy_of_induction`) を回�
    `V_le_centralizer_of_le_V_of_W_eq_bot` (`GaloisCentralizer.lean`)。
    ⚠ 当初想定した coprime 分解 `C_{QV}(P) = C_Q(P)·V` は**不要だった** —
    `V ≤ C_G(P)` から `q = x v⁻¹ ∈ C_G(P)` が直ちに出る。
-3. **PSU 分岐の組み立て** ← 現在地
-4. PSL 分岐の Frobenius/Wielandt
+3. ~~**PSU 分岐の組み立て**~~ ✅ `CentralizerPSUData.false_of_W_eq_bot`
+   (`StructureOfH/PSUCentre.lean`) — **書籍の "as can be checked" が閉じた**
+4. **PSL 分岐** ← 現在地 (下記の通り Wielandt 2 回で済むと判明)
 5. `W_ne_bot_of_card_cube` を組んで `trichotomy` の `hWcube` 仮説を除去 → 0163 を閉じる
+
+### PSL 分岐は Wielandt (9.1) を 2 回当てるだけでよい (2026-07-29 判明)
+
+書籍は「`[K,P] ⋊ P` は Frobenius で `[K,P]` が `S/Q₀` 上 fpf ⟹ `C_{S/Q₀}(P) ≠ 1`」と
+`S/Q₀` への作用で議論するが、**`C_{S/Q₀}(K) = 1` を出すのが面倒**。
+`Q` と `Q₀` に直接 Wielandt を当てる方が短い:
+
+* `wielandt_fixedPoint_trivial_U_fixed` (kernel が fpf ⟹ `|H| = |C_H(E)|^{|E|}`) を
+  Frobenius 群 `[K,X] ⋊ X` の **`Q` への作用**と **`Q₀` への作用**に当てる:
+  - `|Q| = |C_Q(X)|^p`
+  - `|Q₀| = |C_{Q₀}(X)|^p`
+* PSL 分岐は `natCard_cQ_eq_field` = `natCard_cQ0_eq_field` ⟹ `|C_Q(X)| = |C_{Q₀}(X)|`
+* ⟹ `|Q| = |Q₀|`。しかし case (3) は `|Q| = |Q₀|³` なので `|Q₀|² = 1`、
+  `two_le_card_Q0` に矛盾。∎
+
+必要な入力はすべて repo に在る:
+* `K` は巡回 (`K_isCyclic`)、`K ⊓ V = ⊥` (`K_inf_V_eq_bot`) ⟹ `X ⊓ K = ⊥`
+* `K` は `Q` 上 fpf (`Q_inf_centralizer_eq_bot_of_mem_KSet` / `conjQByK_fixed_eq_one`)
+* `[K,X] ≠ 1`: さもなくば `X ≤ C_V(K) = W = ⊥` で `X ≠ ⊥` に矛盾
+* `K` 巡回 + coprime 作用 ⟹ `K = C_K(X) × [K,X]` で `X` は `[K,X]` 上 fpf
+  ⟹ `[K,X] ⋊ X` は Frobenius (`IsFrobeniusGroup` の構成が要る)
+
+### Sz 分岐は `st` の位数で即死
+
+`CentralizerSuzukiData.distinguishedProduct_order = 5` vs case (3) の
+`orderOf_st_eq_three_of_card_cube` = 3。
 
 ### ⚠ 組み立ての簡略化: 持ち上げは**任意の逆像でよい** (2026-07-29)
 
