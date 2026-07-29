@@ -937,3 +937,33 @@ theorem exists_ne_one_fixed_of_free_orbit_semilinear
 `exists_generator_pow_natCard_fixedSet` (`Algebra/SemilinearFixedPoint.lean`)、
 `exists_field_semilinear_with_scalar` (`Appendices/SemilinearField.lean`)、
 `HilbertNinetyOnQ.lean` の `hμc`/`hσne` 導出パターン。
+
+## 📌 2026-07-29 セッション終了時の状態
+
+### 完了 (すべて main、フルビルド green 4922 jobs / lint 0 件)
+
+| # | 成果 | 場所 | 状態 |
+|---|---|---|---|
+| 1 | 抽象 Hilbert 90 (既約作用・半線形固定点) | `Appendices/SemilinearField.lean` `exists_ne_one_fixed_of_prime_pow_eq_one` | ✅ sorry ゼロ |
+| 2 | β-wire `C_Q(X) ⊄ Q₀` (`K`-部分群 `N` 入力版) | `StructureOfH/HilbertNinetyOnQ.lean` | ✅ sorry ゼロ |
+| 3 | 3 分岐の組み立て `W ≠ ⊥` | `StructureOfH/WNeBot.lean` | sorry 1 (type B の数え上げ) |
+| 4 | **自由軌道上の Hilbert 90 engine** | `GroupTheory/SemilinearOrbitFixedPoint.lean` | ✅ sorry ゼロ |
+
+4 が「type B の分類を迂回する」本命の engine。`K`-部分加群でなく **`K`-軌道**で
+議論するので、書籍 p.117 の「type B では `K`-部分群は `q+1` 個」という
+isotypic 加群論が要らなくなる。
+
+### 残り (次セッションの入口)
+
+**(i)** `exists_field_realization_K` — engine の入力 `(F, μ : K ≃* Fˣ, σ)` を
+`Q₀` から取り出す配線。**draft は `notes/peterfalvi/field_realization_K_draft.md`
+に退避済** (未ビルド、既知の未解決点も記載)。
+
+**(ii)** それを使って `HilbertNinetyOnQ.lean` に
+`exists_mem_inf_centralizer_not_mem_Q0_of_orbit` (`N` 不要版) を追加。
+
+**(iii)** `WNeBot.lean` の case 2 を差し替え ⟹
+`exists_kSubgroupSquare_invariant_of_card_cube` の type B sorry を**削除**。
+
+**(iv)** `Trichotomy.lean` の `hWcube` を除去して `W_ne_bot_of_card_cube` を配線
+⟹ [issue 0163](0163-pf-part2-ch3-s1-trichotomy.md) の `W ≠ 1` が閉じる。
