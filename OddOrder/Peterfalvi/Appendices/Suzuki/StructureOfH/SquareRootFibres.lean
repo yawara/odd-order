@@ -205,10 +205,19 @@ theorem exists_sq_eq_distinguishedInvolution
   rw [hconj, hwsq, ← hk]
   group
 
-/-- The set of square roots of the distinguished involution `s` inside `Q` —
-the book's `{y ∈ S | y² = s}` (p. 117), which appears in cases (1), (2) and (3)
-of the Ch. III §1 Proposition. -/
-def sqFibre : Set G := {y | y ∈ hyp.Q ∧ y ^ 2 = hyp.distinguishedInvolution}
+/-- The square roots of the distinguished involution `s` inside a subgroup `X`
+of `Q`.
+
+Cases (1) and (2) of the Ch. III §1 Proposition use `X = S`; case (3) uses the
+two `K`-subgroups `X`, `Y` of `S` of order `q²` (p. 117). -/
+def sqFibreIn (X : Subgroup G) : Set G :=
+  {y | y ∈ X ∧ y ^ 2 = hyp.distinguishedInvolution}
+
+lemma mem_sqFibreIn_iff {X : Subgroup G} {y : G} :
+    y ∈ hyp.sqFibreIn X ↔ y ∈ X ∧ y ^ 2 = hyp.distinguishedInvolution := Iff.rfl
+
+/-- The book's `{y ∈ S | y² = s}` (p. 117). -/
+def sqFibre : Set G := hyp.sqFibreIn hyp.Q
 
 lemma mem_sqFibre_iff {y : G} :
     y ∈ hyp.sqFibre ↔ y ∈ hyp.Q ∧ y ^ 2 = hyp.distinguishedInvolution := Iff.rfl
@@ -217,16 +226,23 @@ lemma mem_sqFibre_iff {y : G} :
 multiplying a square root of `s` by an element of `Q₀` gives another one.  No
 commutativity of `Q` is needed — this is the inclusion `xQ₀ ⊆ {y | y² = s}` the
 book uses in all three cases. -/
-theorem mul_mem_sqFibre {y c : G} (hy : y ∈ hyp.sqFibre) (hc : c ∈ hyp.Q0) :
-    y * c ∈ hyp.sqFibre := by
+theorem mul_mem_sqFibreIn {X : Subgroup G} (hXQ : X ≤ hyp.Q) (hQ0X : hyp.Q0 ≤ X)
+    {y c : G} (hy : y ∈ hyp.sqFibreIn X) (hc : c ∈ hyp.Q0) :
+    y * c ∈ hyp.sqFibreIn X := by
   have hcm : c * y = y * c :=
-    (Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hc) y hy.1).symm
-  refine ⟨hyp.Q.mul_mem hy.1 (hyp.Q0_le_Q hc), ?_⟩
+    (Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hc) y
+      (hXQ hy.1)).symm
+  refine ⟨X.mul_mem hy.1 (hQ0X hc), ?_⟩
   calc (y * c) ^ 2 = y * (c * y) * c := by rw [sq]; group
     _ = y * (y * c) * c := by rw [hcm]
     _ = y ^ 2 * c ^ 2 := by rw [sq, sq]; group
     _ = hyp.distinguishedInvolution := by
         rw [hy.2, hyp.sq_eq_one_of_mem_Q0 hc, mul_one]
+
+/-- The `X = S` case of `mul_mem_sqFibreIn`. -/
+theorem mul_mem_sqFibre {y c : G} (hy : y ∈ hyp.sqFibre) (hc : c ∈ hyp.Q0) :
+    y * c ∈ hyp.sqFibre :=
+  hyp.mul_mem_sqFibreIn le_rfl hyp.Q0_le_Q hy hc
 
 /-- **A prime-order subgroup of `V` has odd order**: `V ≤ D` and `|D|` is odd. -/
 theorem prime_ne_two_of_le_V {P : Subgroup G} {p : ℕ} (hPcard : Nat.card ↥P = p)
@@ -337,37 +353,42 @@ theorem sq_mem_Q0_of_isSuzuki2Group
   calc (y ^ 2) ^ 2 = y ^ 4 := by group
     _ = 1 := hy4
 
-/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (2), the coset count**
-(p. 117): "Let `x ∈ S` be such that `x² = s`.  Since
-`|{y ∈ S | y² = s}| = (q² − q)/(q − 1) = q`, we again find that
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, the coset count** (p. 117):
+"Since `|{y ∈ S | y² = s}| = (q² − q)/(q − 1) = q`, we again find that
 `{y ∈ S | y² = s} = xQ₀`."
 
+Stated for an arbitrary `K`-invariant subgroup `X` with `Q₀ ≤ X ≤ Q` of order
+`|Q₀|²`: case (2) takes `X = S` and case (3) takes for `X` each of the two
+`K`-subgroups of `S` of order `q²`.
+
 A Suzuki `2`-group has exponent dividing `4` (Higman Theorem 1(a),
-`pow_four_eq_one_of_isSuzuki2Group`), so squaring maps `Q` into `Q₀` and maps
-`Q ∖ Q₀` onto `Q₀^#`.  Conjugation by `K`, which is transitive on `Q₀^#`
-(§1 Proposition 3), matches the fibres bijectively, so all `|Q₀| − 1` of them
-have the same size and `(|Q₀| − 1)·|fibre| = |Q| − |Q₀|`.  With `|Q| = |Q₀|²`
-this gives `|fibre| = |Q₀|`. -/
-theorem card_sqFibre_eq_card_Q0_of_isSuzuki2Group
+`pow_four_eq_one_of_isSuzuki2Group`), so squaring maps `X` into `Q₀` and maps
+`X ∖ Q₀` onto `Q₀^#`.  Conjugation by `K`, which is transitive on `Q₀^#`
+(§1 Proposition 3) and preserves `X`, matches the fibres bijectively, so all
+`|Q₀| − 1` of them have the same size and `(|Q₀| − 1)·|fibre| = |X| − |Q₀|`.
+With `|X| = |Q₀|²` this gives `|fibre| = |Q₀|`. -/
+theorem card_sqFibreIn_eq_card_Q0_of_kInvariant
     (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
-    (hcard : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 2) :
-    Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0 := by
+    {X : Subgroup G} (hXQ : X ≤ hyp.Q) (hQ0X : hyp.Q0 ≤ X)
+    (hXinv : ∀ k ∈ hyp.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X)
+    (hcard : Nat.card ↥X = Nat.card ↥hyp.Q0 ^ 2) :
+    Nat.card ↥(hyp.sqFibreIn X) = Nat.card ↥hyp.Q0 := by
   classical
   haveI : Fintype G := Fintype.ofFinite G
   -- exponent `4`: squares land in `Q₀`
-  have hsq : ∀ y ∈ hyp.Q, y ^ 2 ∈ hyp.Q0 := fun _ hy =>
-    hyp.sq_mem_Q0_of_isSuzuki2Group hQsuz hy
+  have hsq : ∀ y ∈ X, y ^ 2 ∈ hyp.Q0 := fun _ hy =>
+    hyp.sq_mem_Q0_of_isSuzuki2Group hQsuz (hXQ hy)
   -- the relevant finsets
-  set QS : Finset G := (hyp.Q : Set G).toFinset with hQS
+  set QS : Finset G := (X : Set G).toFinset with hQS
   set Q0S : Finset G := (hyp.Q0 : Set G).toFinset with hQ0S
   have hQ0sub : Q0S ⊆ QS := by
     intro y hy
     simp only [hQ0S, Set.mem_toFinset, SetLike.mem_coe] at hy
     simp only [hQS, Set.mem_toFinset, SetLike.mem_coe]
-    exact hyp.Q0_le_Q hy
+    exact hQ0X hy
   set A : Finset G := QS \ Q0S with hA
   set B : Finset G := Q0S.erase 1 with hB
-  have hmemA : ∀ y : G, y ∈ A ↔ y ∈ hyp.Q ∧ y ∉ hyp.Q0 := by
+  have hmemA : ∀ y : G, y ∈ A ↔ y ∈ X ∧ y ∉ hyp.Q0 := by
     intro y
     simp only [hA, Finset.mem_sdiff, hQS, hQ0S, Set.mem_toFinset, SetLike.mem_coe]
   have hmemB : ∀ u : G, u ∈ B ↔ u ∈ hyp.Q0 ∧ u ≠ 1 := by
@@ -380,7 +401,7 @@ theorem card_sqFibre_eq_card_Q0_of_isSuzuki2Group
     obtain ⟨hyQ, hyQ0⟩ := (hmemA y).mp hy
     refine (hmemB _).mpr ⟨hsq y hyQ, ?_⟩
     intro h
-    exact hyQ0 (hyp.mem_Q0_of_mem_Q_of_sq_eq_one hyQ h)
+    exact hyQ0 (hyp.mem_Q0_of_mem_Q_of_sq_eq_one (hXQ hyQ) h)
   have hsum := Finset.card_eq_sum_card_fiberwise hfibmap
   -- all fibres have the size of the one over `s`
   have hconst : ∀ u ∈ B, (A.filter fun y => y ^ 2 = u).card
@@ -396,8 +417,8 @@ theorem card_sqFibre_eq_card_Q0_of_isSuzuki2Group
     rw [← himg] at humem
     obtain ⟨k, hkK, hk0⟩ := humem
     have hk : k⁻¹ * hyp.distinguishedInvolution * k = u := hk0
-    have hkH : k ∈ hyp.H := hyp.D_le_H hkK.1
-    have hkiH : k⁻¹ ∈ hyp.H := hyp.H.inv_mem hkH
+    have hkKsub : k ∈ hyp.K := Subgroup.subset_closure hkK
+    have hkiK : k⁻¹ ∈ hyp.K := hyp.K.inv_mem hkKsub
     have hinj : Function.Injective (fun y : G => k⁻¹ * y * k) := by
       intro a b h
       simp only at h
@@ -426,15 +447,15 @@ theorem card_sqFibre_eq_card_Q0_of_isSuzuki2Group
         obtain ⟨hzQ, -⟩ := (hmemA z).mp hzA
         have hsqz : (k * z * k⁻¹) ^ 2 = hyp.distinguishedInvolution := hbwd z hzu
         refine ⟨k * z * k⁻¹, ⟨(hmemA _).mpr
-          ⟨hyp.Q_normal_in_H k hkH z hzQ, ?_⟩, hsqz⟩, by group⟩
+          ⟨hXinv k hkKsub z hzQ, ?_⟩, hsqz⟩, by group⟩
         intro hmem
         exact hyp.distinguishedInvolution_ne_one
           (by rw [← hsqz, hyp.sq_eq_one_of_mem_Q0 hmem])
       · rintro ⟨y, ⟨hyA, hys⟩, rfl⟩
         obtain ⟨hyQ, -⟩ := (hmemA y).mp hyA
         have hval : (k⁻¹ * y * k) ^ 2 = u := hfwd y hys
-        have hmemQ : k⁻¹ * y * k ∈ hyp.Q := by
-          have h := hyp.Q_normal_in_H k⁻¹ hkiH y hyQ
+        have hmemQ : k⁻¹ * y * k ∈ X := by
+          have h := hXinv k⁻¹ hkiK y hyQ
           rwa [inv_inv] at h
         refine ⟨(hmemA _).mpr ⟨hmemQ, ?_⟩, hval⟩
         intro hmem
@@ -442,22 +463,22 @@ theorem card_sqFibre_eq_card_Q0_of_isSuzuki2Group
     rw [himg2, Finset.card_image_of_injective _ hinj]
   rw [Finset.sum_congr rfl hconst, Finset.sum_const, smul_eq_mul] at hsum
   -- turn the finset counts into `Nat.card`s
-  have hQScard : QS.card = Nat.card ↥hyp.Q := by
+  have hQScard : QS.card = Nat.card ↥X := by
     simp [hQS, Set.toFinset_card, Nat.card_eq_fintype_card]
   have hQ0Scard : Q0S.card = Nat.card ↥hyp.Q0 := by
     simp [hQ0S, Set.toFinset_card, Nat.card_eq_fintype_card]
-  have hAcard : A.card = Nat.card ↥hyp.Q - Nat.card ↥hyp.Q0 := by
+  have hAcard : A.card = Nat.card ↥X - Nat.card ↥hyp.Q0 := by
     rw [hA, Finset.card_sdiff, Finset.inter_eq_left.mpr hQ0sub, hQScard, hQ0Scard]
   have hBcard : B.card = Nat.card ↥hyp.Q0 - 1 := by
     rw [hB, Finset.card_erase_of_mem (by
       simp only [hQ0S, Set.mem_toFinset, SetLike.mem_coe]; exact hyp.Q0.one_mem),
       hQ0Scard]
   have hFcard : (A.filter fun y => y ^ 2 = hyp.distinguishedInvolution).card
-      = Nat.card ↥hyp.sqFibre := by
+      = Nat.card ↥(hyp.sqFibreIn X) := by
     have hset : (A.filter fun y => y ^ 2 = hyp.distinguishedInvolution)
-        = hyp.sqFibre.toFinset := by
+        = (hyp.sqFibreIn X).toFinset := by
       ext z
-      simp only [Finset.mem_filter, Set.mem_toFinset, hyp.mem_sqFibre_iff]
+      simp only [Finset.mem_filter, Set.mem_toFinset, hyp.mem_sqFibreIn_iff]
       constructor
       · rintro ⟨hzA, hzs⟩
         exact ⟨((hmemA z).mp hzA).1, hzs⟩
@@ -472,7 +493,7 @@ theorem card_sqFibre_eq_card_Q0_of_isSuzuki2Group
   -- `q² − q = (q − 1) · F` with `q ≥ 2` gives `F = q`
   have hq2 := hyp.two_le_card_Q0
   set q := Nat.card ↥hyp.Q0 with hqdef
-  set F := Nat.card ↥hyp.sqFibre with hFdef
+  set F := Nat.card ↥(hyp.sqFibreIn X) with hFdef
   have hkey : (q - 1) * q = (q - 1) * F := by
     rw [← hsum]
     have : q ^ 2 - q = (q - 1) * q := by
@@ -481,23 +502,33 @@ theorem card_sqFibre_eq_card_Q0_of_isSuzuki2Group
     rw [this]
   exact (Nat.eq_of_mul_eq_mul_left (by omega) hkey).symm
 
-/-- **The fibre is a single `Q₀`-coset once its size is `|Q₀|`** — the book's
-"`{y ∈ S | y² = s} = xQ₀`" (p. 117), in the form used by both case (1) and
-case (2).
+/-- The `X = S` case of `card_sqFibreIn_eq_card_Q0_of_kInvariant`: case (2)'s
+count `(q² − q)/(q − 1) = q`. -/
+theorem card_sqFibre_eq_card_Q0_of_isSuzuki2Group
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    (hcard : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 2) :
+    Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0 :=
+  hyp.card_sqFibreIn_eq_card_Q0_of_kInvariant hQsuz le_rfl hyp.Q0_le_Q
+    (fun k hk y hy => hyp.Q_normal_in_H k (hyp.D_le_H (hyp.K_le_D hk)) y hy)
+    hcard
 
-`xQ₀ ⊆ {y ∈ Q | y² = s}` always (`mul_mem_sqFibre`), so equality of sizes
+/-- **The fibre is a single `Q₀`-coset once its size is `|Q₀|`** — the book's
+"`{y ∈ S | y² = s} = xQ₀`" (p. 117), used in all three cases.
+
+`xQ₀ ⊆ {y ∈ X | y² = s}` always (`mul_mem_sqFibreIn`), so equality of sizes
 forces equality of sets. -/
-theorem sqFibre_eq_coset_of_card
-    (hcard : Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0)
-    {x y : G} (hx : x ∈ hyp.sqFibre) (hy : y ∈ hyp.sqFibre) :
+theorem sqFibreIn_eq_coset_of_card
+    {X : Subgroup G} (hXQ : X ≤ hyp.Q) (hQ0X : hyp.Q0 ≤ X)
+    (hcard : Nat.card ↥(hyp.sqFibreIn X) = Nat.card ↥hyp.Q0)
+    {x y : G} (hx : x ∈ hyp.sqFibreIn X) (hy : y ∈ hyp.sqFibreIn X) :
     x⁻¹ * y ∈ hyp.Q0 := by
   classical
-  have hsub : (fun c => x * c) '' (hyp.Q0 : Set G) ⊆ hyp.sqFibre := by
+  have hsub : (fun c => x * c) '' (hyp.Q0 : Set G) ⊆ hyp.sqFibreIn X := by
     rintro z ⟨c, hc, rfl⟩
-    exact hyp.mul_mem_sqFibre hx hc
+    exact hyp.mul_mem_sqFibreIn hXQ hQ0X hx hc
   have hinj : Function.Injective (fun c : G => x * c) := fun a b h =>
     mul_left_cancel h
-  have heq : (fun c => x * c) '' (hyp.Q0 : Set G) = hyp.sqFibre := by
+  have heq : (fun c => x * c) '' (hyp.Q0 : Set G) = hyp.sqFibreIn X := by
     refine Set.eq_of_subset_of_ncard_le hsub ?_ (Set.toFinite _)
     rw [Set.ncard_image_of_injective _ hinj,
       ← Nat.card_coe_set_eq, ← Nat.card_coe_set_eq, hcard]
@@ -507,6 +538,35 @@ theorem sqFibre_eq_coset_of_card
   have hxy : x⁻¹ * y = c := by rw [← hcy]; group
   rw [hxy]
   exact hc
+
+/-- The `X = S` case of `sqFibreIn_eq_coset_of_card`. -/
+theorem sqFibre_eq_coset_of_card
+    (hcard : Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0)
+    {x y : G} (hx : x ∈ hyp.sqFibre) (hy : y ∈ hyp.sqFibre) :
+    x⁻¹ * y ∈ hyp.Q0 :=
+  hyp.sqFibreIn_eq_coset_of_card le_rfl hyp.Q0_le_Q hcard hx hy
+
+/-- **"As in case (2), `P` then centralizes an element `x ∈ X` such that
+`x² = s`"** (p. 117, case (3)).
+
+For a `K`-invariant `X` with `Q₀ ≤ X ≤ Q` of order `|Q₀|²` the fibre
+`{y ∈ X | y² = s}` has `|Q₀|` elements
+(`card_sqFibreIn_eq_card_Q0_of_kInvariant`), a power of `2` and so prime to the
+odd `p`.  If `P` also normalizes `X`, it acts on the fibre and therefore fixes
+a point of it. -/
+theorem exists_mem_centralizer_mem_sqFibreIn
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    {X : Subgroup G} (hXQ : X ≤ hyp.Q) (hQ0X : hyp.Q0 ≤ X)
+    (hXinv : ∀ k ∈ hyp.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X)
+    (hXcard : Nat.card ↥X = Nat.card ↥hyp.Q0 ^ 2)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ hyp.V) (hPX : ∀ g ∈ P, ∀ y ∈ X, g * y * g⁻¹ ∈ X) :
+    ∃ y ∈ hyp.sqFibreIn X, y ∈ Subgroup.centralizer (P : Set G) := by
+  refine exists_mem_centralizer_of_conj_invariant hp hPcard
+    (fun g hg y hy => ⟨hPX g hg y hy.1,
+      (hyp.conj_mem_sqFibre_of_mem_V (hPV hg) ⟨hXQ hy.1, hy.2⟩).2⟩) ?_
+  rw [hyp.card_sqFibreIn_eq_card_Q0_of_kInvariant hQsuz hXQ hQ0X hXinv hXcard]
+  exact hyp.not_dvd_card_Q0 hQsuz.1 hp hPcard hPV
 
 /-- **`K` is transitive on `Q₀^#`** in the elementwise form used below: any two
 non-trivial elements of `Q₀` are `K`-conjugate.
@@ -550,94 +610,174 @@ theorem eq_bot_or_Q0_le_of_kInvariant {X : Subgroup G} (hXQ0 : X ≤ hyp.Q0)
   rw [← hk]
   exact hXinv k hkK u huX
 
-/-- **Every fibre of squaring over `Q₀^#` is a single `Q₀`-coset**, given that the
-one over `s` is (`sqFibre_eq_coset_of_card`).
+/-- **Every fibre of squaring over `Q₀^#` is a single `Q₀`-coset**, given that
+the one over `s` is (`sqFibreIn_eq_coset_of_card`).
 
 Transitivity of `K` on `Q₀^#` moves any fibre onto the `s`-fibre, and `Q₀` is
 `D`-invariant, so the coset statement transports back. -/
-theorem inv_mul_mem_Q0_of_sq_eq
-    (hcard : Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0)
-    {y w : G} (hyQ : y ∈ hyp.Q) (hwQ : w ∈ hyp.Q) (hsq : y ^ 2 = w ^ 2)
+theorem inv_mul_mem_Q0_of_sq_eq_in
+    {X : Subgroup G} (hXQ : X ≤ hyp.Q) (hQ0X : hyp.Q0 ≤ X)
+    (hXinv : ∀ k ∈ hyp.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X)
+    (hcard : Nat.card ↥(hyp.sqFibreIn X) = Nat.card ↥hyp.Q0)
+    {y w : G} (hyX : y ∈ X) (hwX : w ∈ X) (hsq : y ^ 2 = w ^ 2)
     (hne : y ^ 2 ≠ 1) (hsqQ0 : y ^ 2 ∈ hyp.Q0) :
     y⁻¹ * w ∈ hyp.Q0 := by
   obtain ⟨k, hkK, hk⟩ := hyp.exists_mem_K_conj_eq_of_mem_Q0 hsqQ0 hne
     ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
     hyp.distinguishedInvolution_ne_one
   have hkD : k ∈ hyp.D := hyp.K_le_D hkK
-  have hkH : k ∈ hyp.H := hyp.D_le_H hkD
   have hconjsq : ∀ v : G, (k * v * k⁻¹) ^ 2 = k * v ^ 2 * k⁻¹ := by
     intro v; rw [sq, sq]; group
-  have hy' : k * y * k⁻¹ ∈ hyp.sqFibre :=
-    ⟨hyp.Q_normal_in_H k hkH y hyQ, by rw [hconjsq]; exact hk⟩
-  have hw' : k * w * k⁻¹ ∈ hyp.sqFibre :=
-    ⟨hyp.Q_normal_in_H k hkH w hwQ, by rw [hconjsq, ← hsq]; exact hk⟩
-  have hmem := hyp.sqFibre_eq_coset_of_card hcard hy' hw'
+  have hy' : k * y * k⁻¹ ∈ hyp.sqFibreIn X :=
+    ⟨hXinv k hkK y hyX, by rw [hconjsq]; exact hk⟩
+  have hw' : k * w * k⁻¹ ∈ hyp.sqFibreIn X :=
+    ⟨hXinv k hkK w hwX, by rw [hconjsq, ← hsq]; exact hk⟩
+  have hmem := hyp.sqFibreIn_eq_coset_of_card hXQ hQ0X hcard hy' hw'
   have hrw : (k * y * k⁻¹)⁻¹ * (k * w * k⁻¹) = k * (y⁻¹ * w) * k⁻¹ := by group
   rw [hrw] at hmem
   have hback := hyp.conj_mem_Q0_of_mem_D (Subgroup.inv_mem _ hkD) hmem
   rw [show k⁻¹ * (k * (y⁻¹ * w) * k⁻¹) * (k⁻¹)⁻¹ = y⁻¹ * w from by group] at hback
   exact hback
 
-/-- **`K` is transitive on `(Q/Q₀)^#`** in elementwise form — step (2) of the
-"`C_S(P)` is a `K`-subgroup, hence `= S`" argument (p. 117).
-
-Squaring induces a `K`-equivariant map `Q/Q₀ → Q₀` (well defined because
-`Q₀ ≤ Z(Q)` has exponent `2`) whose fibres over `Q₀^#` are single cosets
-(`inv_mul_mem_Q0_of_sq_eq`).  So transitivity on `Q₀^#` lifts: given `y, z ∈ Q`
-outside `Q₀`, some `k ∈ K` carries `y` into the coset `zQ₀`. -/
-theorem exists_mem_K_conj_mem_coset
+/-- The `X = S` case of `inv_mul_mem_Q0_of_sq_eq_in`. -/
+theorem inv_mul_mem_Q0_of_sq_eq
     (hcard : Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0)
-    {y z : G} (hyQ : y ∈ hyp.Q) (hzQ : z ∈ hyp.Q)
+    {y w : G} (hyQ : y ∈ hyp.Q) (hwQ : w ∈ hyp.Q) (hsq : y ^ 2 = w ^ 2)
+    (hne : y ^ 2 ≠ 1) (hsqQ0 : y ^ 2 ∈ hyp.Q0) :
+    y⁻¹ * w ∈ hyp.Q0 :=
+  hyp.inv_mul_mem_Q0_of_sq_eq_in le_rfl hyp.Q0_le_Q
+    (fun k hk v hv => hyp.Q_normal_in_H k (hyp.D_le_H (hyp.K_le_D hk)) v hv)
+    hcard hyQ hwQ hsq hne hsqQ0
+
+/-- **`K` is transitive on `(X/Q₀)^#`** in elementwise form.
+
+Squaring induces a `K`-equivariant map `X/Q₀ → Q₀` (well defined because
+`Q₀ ≤ Z(Q)` has exponent `2`) whose fibres over `Q₀^#` are single cosets
+(`inv_mul_mem_Q0_of_sq_eq_in`).  So transitivity on `Q₀^#` lifts: given
+`y, z ∈ X` outside `Q₀`, some `k ∈ K` carries `y` into the coset `zQ₀`.
+
+Case (2) uses `X = S`; case (3) uses each of the two `K`-subgroups of order
+`q²`. -/
+theorem exists_mem_K_conj_mem_coset_in
+    {X : Subgroup G} (hXQ : X ≤ hyp.Q) (hQ0X : hyp.Q0 ≤ X)
+    (hXinv : ∀ k ∈ hyp.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X)
+    (hcard : Nat.card ↥(hyp.sqFibreIn X) = Nat.card ↥hyp.Q0)
+    {y z : G} (hyX : y ∈ X) (hzX : z ∈ X)
     (hy2 : y ^ 2 ≠ 1) (hz2 : z ^ 2 ≠ 1)
     (hyQ0 : y ^ 2 ∈ hyp.Q0) (hzQ0 : z ^ 2 ∈ hyp.Q0) :
     ∃ k ∈ hyp.K, z⁻¹ * (k * y * k⁻¹) ∈ hyp.Q0 := by
   obtain ⟨k, hkK, hk⟩ :=
     hyp.exists_mem_K_conj_eq_of_mem_Q0 hyQ0 hy2 hzQ0 hz2
-  have hkH : k ∈ hyp.H := hyp.D_le_H (hyp.K_le_D hkK)
-  have hyQ' : k * y * k⁻¹ ∈ hyp.Q := hyp.Q_normal_in_H k hkH y hyQ
+  have hyX' : k * y * k⁻¹ ∈ X := hXinv k hkK y hyX
   have hsq' : (k * y * k⁻¹) ^ 2 = z ^ 2 := by
     rw [show (k * y * k⁻¹) ^ 2 = k * y ^ 2 * k⁻¹ from by rw [sq, sq]; group]
     exact hk
-  exact ⟨k, hkK, hyp.inv_mul_mem_Q0_of_sq_eq hcard hzQ hyQ' hsq'.symm hz2 hzQ0⟩
+  exact ⟨k, hkK, hyp.inv_mul_mem_Q0_of_sq_eq_in hXQ hQ0X hXinv hcard hzX hyX'
+    hsq'.symm hz2 hzQ0⟩
 
-/-- **A `K`-invariant subgroup of `Q` containing an element of order `4` is `Q`**
-— the book's "`C_S(P)` is a `K`-subgroup of `S` which has exponent `4` and so
-`C_S(P) = S`" (p. 117).
+/-- The `X = S` case of `exists_mem_K_conj_mem_coset_in`. -/
+theorem exists_mem_K_conj_mem_coset
+    (hcard : Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0)
+    {y z : G} (hyQ : y ∈ hyp.Q) (hzQ : z ∈ hyp.Q)
+    (hy2 : y ^ 2 ≠ 1) (hz2 : z ^ 2 ≠ 1)
+    (hyQ0 : y ^ 2 ∈ hyp.Q0) (hzQ0 : z ^ 2 ∈ hyp.Q0) :
+    ∃ k ∈ hyp.K, z⁻¹ * (k * y * k⁻¹) ∈ hyp.Q0 :=
+  hyp.exists_mem_K_conj_mem_coset_in le_rfl hyp.Q0_le_Q
+    (fun k hk v hv => hyp.Q_normal_in_H k (hyp.D_le_H (hyp.K_le_D hk)) v hv)
+    hcard hyQ hzQ hy2 hz2 hyQ0 hzQ0
 
-Its square is a non-trivial element of `X ⊓ Q₀`, so `Q₀ ≤ X`
-(`eq_bot_or_Q0_le_of_kInvariant`); transitivity on `(Q/Q₀)^#`
-(`exists_mem_K_conj_mem_coset`) then reaches every element of `Q` outside `Q₀`. -/
+/-- **`X` is simple as a `K`-group over `Q₀`**: a `K`-invariant subgroup between
+`Q₀` and `X` is one of the two.
+
+The book's case (3) uses this twice: to see that two distinct `K`-subgroups of
+`S` of order `q²` meet in `Q₀`, and — with `X = S` in case (2) — that a
+`K`-invariant subgroup of `S` containing an element of order `4` is all of `S`.
+
+A `K`-invariant `Z` with an element `y` of order `4` swallows `Q₀`
+(`eq_bot_or_Q0_le_of_kInvariant` applied to `Z ⊓ Q₀`, which contains `y²`) and
+then meets every `Q₀`-coset of `X` by transitivity on `(X/Q₀)^#`. -/
+theorem le_of_kInvariant_of_sq_ne_one_in
+    {X : Subgroup G} (hXQ : X ≤ hyp.Q) (hQ0X : hyp.Q0 ≤ X)
+    (hXinv : ∀ k ∈ hyp.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X)
+    (hcard : Nat.card ↥(hyp.sqFibreIn X) = Nat.card ↥hyp.Q0)
+    (hsqQ0 : ∀ v ∈ X, v ^ 2 ∈ hyp.Q0)
+    {Z : Subgroup G} (hZX : Z ≤ X)
+    (hZinv : ∀ k ∈ hyp.K, ∀ v ∈ Z, k * v * k⁻¹ ∈ Z)
+    {y : G} (hyZ : y ∈ Z) (hy2 : y ^ 2 ≠ 1) :
+    X ≤ Z := by
+  -- `Q₀ ≤ Z`
+  have hQ0le : hyp.Q0 ≤ Z := by
+    have hinter : Z ⊓ hyp.Q0 ≤ hyp.Q0 := inf_le_right
+    have hintinv : ∀ k ∈ hyp.K, ∀ v ∈ Z ⊓ hyp.Q0, k * v * k⁻¹ ∈ Z ⊓ hyp.Q0 := by
+      intro k hk v hv
+      exact ⟨hZinv k hk v hv.1,
+        hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D hk) hv.2⟩
+    rcases hyp.eq_bot_or_Q0_le_of_kInvariant hinter hintinv with h | h
+    · exfalso
+      have hmem : y ^ 2 ∈ Z ⊓ hyp.Q0 :=
+        ⟨Z.pow_mem hyZ 2, hsqQ0 _ (hZX hyZ)⟩
+      rw [h, Subgroup.mem_bot] at hmem
+      exact hy2 hmem
+    · exact le_trans h inf_le_left
+  -- reach every element of `X`
+  intro z hzX
+  rcases eq_or_ne (z ^ 2) 1 with hz2 | hz2
+  · exact hQ0le (hyp.mem_Q0_of_mem_Q_of_sq_eq_one (hXQ hzX) hz2)
+  obtain ⟨k, hkK, hc⟩ := hyp.exists_mem_K_conj_mem_coset_in hXQ hQ0X hXinv hcard
+    (hZX hyZ) hzX hy2 hz2 (hsqQ0 _ (hZX hyZ)) (hsqQ0 _ hzX)
+  have hyk : k * y * k⁻¹ ∈ Z := hZinv k hkK y hyZ
+  have hzeq : z = (k * y * k⁻¹) * (z⁻¹ * (k * y * k⁻¹))⁻¹ := by group
+  rw [hzeq]
+  exact Z.mul_mem hyk (Z.inv_mem (hQ0le hc))
+
+/-- The `X = S` case of `le_of_kInvariant_of_sq_ne_one_in` — case (2)'s
+"`C_S(P)` is a `K`-subgroup of `S` which has exponent `4` and so
+`C_S(P) = S`". -/
 theorem Q_le_of_kInvariant_of_sq_ne_one
     (hcard : Nat.card ↥hyp.sqFibre = Nat.card ↥hyp.Q0)
     (hsqQ0 : ∀ v ∈ hyp.Q, v ^ 2 ∈ hyp.Q0)
     {X : Subgroup G} (hXQ : X ≤ hyp.Q)
     (hXinv : ∀ k ∈ hyp.K, ∀ v ∈ X, k * v * k⁻¹ ∈ X)
     {y : G} (hyX : y ∈ X) (hy2 : y ^ 2 ≠ 1) :
-    hyp.Q ≤ X := by
-  -- `Q₀ ≤ X`
-  have hQ0le : hyp.Q0 ≤ X := by
-    have hinter : X ⊓ hyp.Q0 ≤ hyp.Q0 := inf_le_right
-    have hintinv : ∀ k ∈ hyp.K, ∀ v ∈ X ⊓ hyp.Q0, k * v * k⁻¹ ∈ X ⊓ hyp.Q0 := by
-      intro k hk v hv
-      exact ⟨hXinv k hk v hv.1,
-        hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D hk) hv.2⟩
-    rcases hyp.eq_bot_or_Q0_le_of_kInvariant hinter hintinv with h | h
-    · exfalso
-      have hmem : y ^ 2 ∈ X ⊓ hyp.Q0 :=
-        ⟨X.pow_mem hyX 2, hsqQ0 _ (hXQ hyX)⟩
-      rw [h, Subgroup.mem_bot] at hmem
-      exact hy2 hmem
-    · exact le_trans h inf_le_left
-  -- reach every element of `Q`
-  intro z hzQ
-  rcases eq_or_ne (z ^ 2) 1 with hz2 | hz2
-  · exact hQ0le (hyp.mem_Q0_of_mem_Q_of_sq_eq_one hzQ hz2)
-  obtain ⟨k, hkK, hc⟩ := hyp.exists_mem_K_conj_mem_coset hcard (hXQ hyX) hzQ
-    hy2 hz2 (hsqQ0 _ (hXQ hyX)) (hsqQ0 _ hzQ)
-  have hyk : k * y * k⁻¹ ∈ X := hXinv k hkK y hyX
-  have hzeq : z = (k * y * k⁻¹) * (z⁻¹ * (k * y * k⁻¹))⁻¹ := by group
-  rw [hzeq]
-  exact X.mul_mem hyk (X.inv_mem (hQ0le hc))
+    hyp.Q ≤ X :=
+  hyp.le_of_kInvariant_of_sq_ne_one_in le_rfl hyp.Q0_le_Q
+    (fun k hk v hv => hyp.Q_normal_in_H k (hyp.D_le_H (hyp.K_le_D hk)) v hv)
+    hcard hsqQ0 hXQ hXinv hyX hy2
+
+/-- **Two distinct `K`-subgroups of `S` of order `q²` meet in `Q₀`** — the step
+that makes the contradiction of case (3) work (p. 117): the element `y ∈ Y` that
+turns out to lie in `X` is then in `Q₀`, contradicting `y² = s ≠ 1`.
+
+`X ⊓ Y` is a `K`-invariant subgroup between `Q₀` and `X`; if it were bigger than
+`Q₀` it would contain an element of order `4` and hence be all of `X`
+(`le_of_kInvariant_of_sq_ne_one_in`), forcing `X ≤ Y` and so `X = Y`. -/
+theorem inf_eq_Q0_of_ne_of_kInvariant
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    {X Y : Subgroup G} (hXQ : X ≤ hyp.Q) (hQ0X : hyp.Q0 ≤ X)
+    (hXinv : ∀ k ∈ hyp.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X)
+    (hXcard : Nat.card ↥X = Nat.card ↥hyp.Q0 ^ 2)
+    (hQ0Y : hyp.Q0 ≤ Y)
+    (hYinv : ∀ k ∈ hyp.K, ∀ y ∈ Y, k * y * k⁻¹ ∈ Y)
+    (hYcard : Nat.card ↥Y = Nat.card ↥hyp.Q0 ^ 2)
+    (hne : X ≠ Y) :
+    X ⊓ Y = hyp.Q0 := by
+  refine le_antisymm ?_ (le_inf hQ0X hQ0Y)
+  by_contra hnotle
+  obtain ⟨y, hyZ, hyQ0⟩ : ∃ y ∈ X ⊓ Y, y ∉ hyp.Q0 := by
+    by_contra hall
+    push Not at hall
+    exact hnotle fun z hz => hall z hz
+  have hy2 : y ^ 2 ≠ 1 := fun h =>
+    hyQ0 (hyp.mem_Q0_of_mem_Q_of_sq_eq_one (hXQ hyZ.1) h)
+  have hXle : X ≤ X ⊓ Y :=
+    hyp.le_of_kInvariant_of_sq_ne_one_in hXQ hQ0X hXinv
+      (hyp.card_sqFibreIn_eq_card_Q0_of_kInvariant hQsuz hXQ hQ0X hXinv hXcard)
+      (fun v hv => hyp.sq_mem_Q0_of_isSuzuki2Group hQsuz (hXQ hv))
+      inf_le_left
+      (fun k hk v hv => ⟨hXinv k hk v hv.1, hYinv k hk v hv.2⟩)
+      hyZ hy2
+  exact hne (Subgroup.eq_of_le_of_card_ge (le_trans hXle inf_le_right)
+    (by rw [hXcard, hYcard]))
 
 /-- **`s` is a non-trivial element of `C_{Q₀}(P)`** for any `P ≤ V`, since
 `V = C_D(s)` (Ch. I §1 Proposition 5).  Hence `|C_{Q₀}(P)| ≥ 2`. -/

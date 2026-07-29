@@ -13481,3 +13481,38 @@ RootSubgroupSuzukiType}.lean`.
   OddOrder.GroupTheory.SpecificGroups.Suzuki.RootGroup.sq_inv_mul_eq_one_of_sq_eq
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardTypeAData.sq_inv_mul_eq_one_of_sq_eq
+
+/-! **Peterfalvi Part II, Ch. III §1, Proposition, case (3): the two `K`-subgroups**
+(issue 0163, 2026-07-29).  `Appendices/Suzuki/StructureOfH/{SquareRootFibres,Trichotomy}.lean`,
+p. 117.
+
+Case (3) runs the case-(2) apparatus twice, on the two `K`-subgroups `X`, `Y` of `S` of order
+`q²` rather than on `S` itself, so the fibre machinery is generalized from `S` to any
+`K`-invariant `X` with `Q₀ ≤ X ≤ S` and `|X| = |Q₀|²` (the previous `S`-only statements are now
+the `X = S` instances):
+
+* `sqFibreIn`, `mul_mem_sqFibreIn`, `sqFibreIn_eq_coset_of_card` — the fibre
+  `{y ∈ X | y² = s}` and its identification with a `Q₀`-coset.
+* `card_sqFibreIn_eq_card_Q0_of_kInvariant` — the count `(q² − q)/(q − 1) = q` inside `X`.
+* `exists_mem_centralizer_mem_sqFibreIn` — the book's "as in case (2), `P` then centralizes an
+  element `x ∈ X` such that `x² = s`", for `P` normalizing `X`.
+* `inv_mul_mem_Q0_of_sq_eq_in`, `exists_mem_K_conj_mem_coset_in`,
+  `le_of_kInvariant_of_sq_ne_one_in` — `K` is transitive on `(X/Q₀)^#`, so `X` is simple as a
+  `K`-group over `Q₀`.
+* `inf_eq_Q0_of_ne_of_kInvariant` — hence two distinct such subgroups meet exactly in `Q₀`.
+* `false_of_typeA_centralizer_of_two_kSubgroups` — **the case-(3) contradiction**: with `P`
+  normalizing both and `C_Q(P)` of type A (the `Sz(ℓ)` branch, i.e. `st` of order `5`), the two
+  square roots `x ∈ X`, `y ∈ Y` of `s` satisfy `x⁻¹y ∈ Q₀` by type-A injectivity, so `y` lies
+  in `X ⊓ Y = Q₀` while `y² = s ≠ 1`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_sqFibreIn_eq_card_Q0_of_kInvariant
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sqFibreIn_eq_coset_of_card
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_centralizer_mem_sqFibreIn
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.le_of_kInvariant_of_sq_ne_one_in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inf_eq_Q0_of_ne_of_kInvariant
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.false_of_typeA_centralizer_of_two_kSubgroups

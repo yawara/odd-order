@@ -328,6 +328,74 @@ theorem W_eq_bot_of_isSuzuki2Group
   rw [hPbot, Subgroup.card_bot] at hPcard
   exact hp.one_lt.ne hPcard
 
+/-- **Peterfalvi Part II, Ch. III §1, Proposition, case (3): `st` does not have
+order `5`** (p. 117), given the two `K`-subgroups the book produces.
+
+> As in case (2), `P` then centralizes an element `x ∈ X` and an element `y ∈ Y`
+> such that `x² = y² = s`.  But, since `C_S(P)` is of type A, it follows that
+> `y ∈ x Ω₁ C_S(P)` and `y ∈ X`, which is a contradiction.
+
+Hypotheses: `X` and `Y` are distinct `K`-invariant subgroups between `Q₀` and
+`Q` of order `|Q₀|²`, both normalized by `P`, and `C_Q(P)` carries standard
+type-A data — which is exactly what the `Sz(ℓ)` branch of Ch. I §3
+Proposition 1(c) supplies when `st` has order `5`.
+
+The two square roots come from `exists_mem_centralizer_mem_sqFibreIn`.  Type A
+makes squaring injective modulo `Ω₁` (`sq_inv_mul_eq_one_of_sq_eq`), so
+`(x⁻¹y)² = 1` and hence `x⁻¹y ∈ Q₀`; then `y ∈ xQ₀ ⊆ X`, so
+`y ∈ X ⊓ Y = Q₀` (`inf_eq_Q0_of_ne_of_kInvariant`) while `y² = s ≠ 1`. -/
+theorem false_of_typeA_centralizer_of_two_kSubgroups
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q)
+    {X Y : Subgroup G}
+    (hXQ : X ≤ sc.toHypothesis.Q) (hQ0X : sc.toHypothesis.Q0 ≤ X)
+    (hXinv : ∀ k ∈ sc.toHypothesis.K, ∀ y ∈ X, k * y * k⁻¹ ∈ X)
+    (hXcard : Nat.card ↥X = Nat.card ↥sc.toHypothesis.Q0 ^ 2)
+    (hYQ : Y ≤ sc.toHypothesis.Q) (hQ0Y : sc.toHypothesis.Q0 ≤ Y)
+    (hYinv : ∀ k ∈ sc.toHypothesis.K, ∀ y ∈ Y, k * y * k⁻¹ ∈ Y)
+    (hYcard : Nat.card ↥Y = Nat.card ↥sc.toHypothesis.Q0 ^ 2)
+    (hne : X ≠ Y)
+    {P : Subgroup G} {p : ℕ} (hp : p.Prime) (hPcard : Nat.card ↥P = p)
+    (hPV : P ≤ sc.toHypothesis.V)
+    (hPX : ∀ g ∈ P, ∀ y ∈ X, g * y * g⁻¹ ∈ X)
+    (hPY : ∀ g ∈ P, ∀ y ∈ Y, g * y * g⁻¹ ∈ Y)
+    (dataA : OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardTypeAData
+      ↥(sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G)))) :
+    False := by
+  classical
+  obtain ⟨x, hxT, hxC⟩ := sc.toHypothesis.exists_mem_centralizer_mem_sqFibreIn
+    hQsuz hXQ hQ0X hXinv hXcard hp hPcard hPV hPX
+  obtain ⟨y, hyT, hyC⟩ := sc.toHypothesis.exists_mem_centralizer_mem_sqFibreIn
+    hQsuz hYQ hQ0Y hYinv hYcard hp hPcard hPV hPY
+  -- type A: equal squares force `x⁻¹y ∈ Ω₁`
+  have hsq : (⟨⟨x, hxC⟩, Subgroup.mem_subgroupOf.mpr (hXQ hxT.1)⟩ :
+        ↥(sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G)))) ^ 2
+      = (⟨⟨y, hyC⟩, Subgroup.mem_subgroupOf.mpr (hYQ hyT.1)⟩ :
+        ↥(sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G)))) ^ 2 := by
+    have hval : x ^ 2 = y ^ 2 := by rw [hxT.2, hyT.2]
+    exact Subtype.ext (Subtype.ext hval)
+  have hone := dataA.sq_inv_mul_eq_one_of_sq_eq hsq
+  have hsq1 : (x⁻¹ * y) ^ 2 = 1 := by
+    simpa using congrArg
+      (fun z => ((z : ↥(Subgroup.centralizer (P : Set G))) : G))
+      (congrArg (Subtype.val (p := fun z =>
+        z ∈ sc.toHypothesis.Q.subgroupOf (Subgroup.centralizer (P : Set G))))
+        hone)
+  have hQ0mem : x⁻¹ * y ∈ sc.toHypothesis.Q0 :=
+    sc.toHypothesis.mem_Q0_of_mem_Q_of_sq_eq_one
+      (sc.toHypothesis.Q.mul_mem (sc.toHypothesis.Q.inv_mem (hXQ hxT.1))
+        (hYQ hyT.1)) hsq1
+  -- so `y ∈ X ⊓ Y = Q₀`, contradicting `y² = s ≠ 1`
+  have hyX : y ∈ X := by
+    rw [show y = x * (x⁻¹ * y) from by group]
+    exact X.mul_mem hxT.1 (hQ0X hQ0mem)
+  have hinf := sc.toHypothesis.inf_eq_Q0_of_ne_of_kInvariant hQsuz hXQ hQ0X
+    hXinv hXcard hQ0Y hYinv hYcard hne
+  have hyQ0 : y ∈ sc.toHypothesis.Q0 := by
+    rw [← hinf]; exact ⟨hyX, hyT.1⟩
+  have hy1 : y ^ 2 = 1 := sc.toHypothesis.sq_eq_one_of_mem_Q0 hyQ0
+  rw [hyT.2] at hy1
+  exact sc.toHypothesis.distinguishedInvolution_ne_one hy1
+
 /-- **After Theorem C, the book's `S` is `Q`**: `Q₁ = 1` (`Q1_eq_bot`) makes the
 Sylow `2`-subgroup `S` of `Q` equal to `Q`, so Ch. III §1's Proposition — stated
 for `S` — is a statement about `Q`. -/
