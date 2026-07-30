@@ -796,6 +796,19 @@ theorem betaRatio_div_betaRatio {E : Type*} [Field E] (h2 : (2 : E) = 0) {β : E
   rw [hstep, betaSum_mul_betaSum_add_two h2 hβ i, add_div,
     div_self (pow_ne_zero 2 hci1), ← div_pow]
 
+/-- **The conclusion `α₁ = α₂ = x₁ + x₂` of step (20)** (Peterfalvi Part II, p. 128).
+
+Instance `i = 1` of the book's (∗∗∗) gives `x₁ = x₂ + α₂`, and instance `i = m − 1` gives
+`x₁ + α₁ = x₂`.  In characteristic `2` each of those says that one of the two `α`'s is
+`x₁ + x₂`, so they agree — which is the first assertion of (20), and what lets the two
+families of sequences `(u_i)` and `(u'_i)` be identified. -/
+theorem eq_add_of_add_char_two {E : Type*} [Field E] (h2 : (2 : E) = 0)
+    {x₁ x₂ α₁ α₂ : E} (ha : x₁ = x₂ + α₂) (hb : x₁ + α₁ = x₂) :
+    α₁ = x₁ + x₂ ∧ α₂ = x₁ + x₂ ∧ α₁ = α₂ := by
+  have hα₁ : α₁ = x₁ + x₂ := by linear_combination hb - x₁ * h2
+  have hα₂ : α₂ = x₁ + x₂ := by linear_combination -ha - x₂ * h2
+  exact ⟨hα₁, hα₂, hα₁.trans hα₂.symm⟩
+
 /-- **Unrolling the recursion of step (18)** (Peterfalvi Part II, p. 127).
 
 From `F(i+2) = g · F(i+1) · z(i+2)` one gets `F(n+1) = gⁿ · F(1) · ∏_{j=2}^{n+1} z(j)`.
