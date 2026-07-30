@@ -1232,6 +1232,26 @@ theorem stepEleven_step (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   rw [hyp.stepTen H hC2 hζ hωQ hωQ0 hyQ0 haK hfω hz, hinv]
   group
 
+/-- **`K ∩ W = 1` splits a trivial product** (Peterfalvi Part II, p. 126, inside step
+(15)): if `k · w = 1` with `k ∈ K` and `w ∈ W`, both factors are trivial.
+
+Step (15) applies this to `ζ^{m₁+1} · (c_{m₁}/α)^{2τ} = 1`, whose two factors lie in `W`
+and in `K` respectively — that is how it extracts both `ζ^{m₁+1} = 1` (fixing the length
+of the sequences) and `c_{m₁} = α`. -/
+theorem eq_one_of_mul_eq_one_of_mem_K_of_mem_W {k w : G} (hk : k ∈ hyp.K)
+    (hw : w ∈ hyp.W) (h : k * w = 1) : k = 1 ∧ w = 1 := by
+  have hkinv : k = w⁻¹ := by
+    have e : k * w * w⁻¹ = 1 * w⁻¹ := by rw [h]
+    simpa using e
+  have hmem : k ∈ hyp.K ⊓ hyp.W := by
+    refine ⟨hk, ?_⟩
+    rw [hkinv]
+    exact hyp.W.inv_mem hw
+  rw [hyp.K_inf_W_eq_bot, Subgroup.mem_bot] at hmem
+  refine ⟨hmem, ?_⟩
+  rw [hmem, one_mul] at h
+  exact h
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
