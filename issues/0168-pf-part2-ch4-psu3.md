@@ -138,9 +138,47 @@ Lemma が全部 `G` で使える**。
   `f` は誘導置換群の中で `j` と共役 (= 上記 p.123 の注) だから `f` も持たない
 * **(6)** `f(ωx) = (f(ω)y)^a` (`x,y ∈ Q₀`, `y ≠ 1`, `a ∈ D`) なら `a ∈ K`
 
-**着手前に要確認**: `s` (distinguished involution, Ch. I Prop 4(b))、`Q₀`、`K`、
-`A` が repo のどこにあるか。`s` は `CanonicalForm.lean` の Prop 4(b) にある見込み。
-`Q ⋊ KW` と Ch. III §3 の `S₁ ⋊ K₁W₁` (= 0167 `exists_standardModel`) の同一視も要る。
+### 進捗 (2026-07-31): (1)-(3) 完了
+
+`OddOrder/Peterfalvi/Appendices/Suzuki/PSU3Preliminary.lean` (新 leaf)。
+
+* `fgh_at_distinguishedInvolution` — `f(s) = g(s) = s`, `h(s) = 1`。
+  **`s t s` が既に §1 の canonical form** (`p = q = s ∈ Q`, `d = 1 ∈ D`) なので
+  `fgh_eq_of_canonical` が直接読み取る。
+* `fgh_at_conj_distinguishedInvolution` — **(1)**。(H3) が 3 つ全部を `a^t` で運び、
+  `a ∈ K ⟺ a^t = a⁻¹` で `s^{a⁻¹}` と `a²` が出る。
+* `f_mul_conj_distinguishedInvolution` — **(2)** ((H6) を `x = ω, y = s^a`)。
+  指数 `a⁻²` は `h(s^a) = a²` の `t` 捻れ。
+* `f_conj_distinguishedInvolution_mul` — **(3)** ((H6) を `x = s^a, y = ω`)。
+
+⚠ **書籍の (3) は積の順序が両方逆** (`f(ω s^a) = f(g(ω)s^{a⁻¹})^{h(ω)^t}f(ω)`;
+300dpi 画像で確認)。一致の理由は `s^a, s^{a⁻¹}` が `Q` の対合 ⟹ `Q₀ = Z(Q)` に属して
+`Q` の全元と可換だから。repo では (H6) が直接与える形で述べ docstring に注記。
+
+(C2) は `hC2 : t s t = s t s` を明示仮説で取っている ((C1)/(C2) の構造体は repo に
+未形式化 — 書籍自身が §2 冒頭で「Ch. III の (C1)(C2) を再開する」と言うので仮説で正しい)。
+Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数 3、`W ≠ 1`」で、
+`st` の位数 3 ⟺ `tst = sts` (`s`,`t` が対合ゆえ)。
+
+### 次 = (4)-(6)
+
+**(4)** `f(ωx) = f(ω)y` (`ω ∈ Q−Q₀`, `x,y ∈ Q₀`) ⟹ `x = 1`。書籍の証明:
+`x ≠ 1` なら `x = s^k` (`k ∈ K`) → (3) で `f(ω)y = f(g(ω)s^{k⁻¹})^{h(ω)^t} f(ω)`
+→ `f(g(ω)s^{k⁻¹}) ∈ Q₀` → `g(ω) ∈ Q₀` → `ω ∈ Q₀` で矛盾。
+
+**必要な部品と repo の所在 (調査済)**:
+* `x ∈ Q₀^#` ⟹ `∃ k ∈ K, x = s^k` = 既存の
+  `Hypothesis.image_conj_KSet_eq_involutions_H`
+  (`(fun k => k⁻¹ s k) '' KSet = {x | x² = 1 ∧ x ≠ 1 ∧ x ∈ H}`) を `s` で適用。
+* **`f` と `g` は `Q₀^#` を `Q₀^#` に写す** — (1) の `f(s^a) = g(s^a) = s^{a⁻¹}` と
+  上記の enumeration から。`f∘f = id` ((H2)) と `g∘g = id` (`hFive` の中で証明済:
+  `g(g x) = x`) で全単射性が出るので `f(z) ∈ Q₀ ⟹ z ∈ Q₀` も従う。⟸ これが (4) の鍵。
+* `Q₀ ⊴ Q` と `D` が `Q₀` を正規化 — `ActualCenter.lean` 周辺を要確認。
+
+**(5)** `f(ω) = (ωy)^a` ⟹ `y ≠ 1` かつ `a ∉ K`。`|D|` 奇数 ⟹ `j` は `Q−Q₀` の
+`D`-軌道集合上に不動点なし、`f` は誘導置換群内で `j` と共役 (= p.123 の注、
+`IsFGH.dOrbitRel_f`/`_fj_cube` で形式化済) ⟹ `f` も不動点なし。
+**(6)** `f(ωx) = (f(ω)y)^a` (`y ≠ 1`) ⟹ `a ∈ K`。(2) と (5) から。
 
 ## 参照
 
