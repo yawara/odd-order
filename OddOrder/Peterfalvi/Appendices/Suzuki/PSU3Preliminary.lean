@@ -1187,6 +1187,31 @@ theorem exists_conjQHom_quotient_eq_of_coset_eq {m : ℕ} (M : hyp.QuotientField
   have h2 := Additive.ofMul.injective this
   rw [h2, hyp.quotientKWHom_mk]
 
+/-- **The fibre translation** (step 7, assembling steps 1–6): if the coordinates of
+`z, z' ∈ Q` lie in the same coset of `μ(KW)` in `E^×`, then
+
+  `z' = (z · y)^a`  for some `y ∈ Q₀` and `a ∈ D`,
+
+which is exactly the hypothesis shape of `ncard_le_card_V_of_f_eq_conj` and
+`not_mem_K_of_f_eq_conj_self`. -/
+theorem exists_conj_of_coset_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {z z' : G} (hzQ : z ∈ hyp.Q) (hz'Q : z' ∈ hyp.Q) {u u' : M.Eˣ}
+    (hu : (u : M.E) = M.coord (Additive.ofMul (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q))))
+    (hu' : (u' : M.E)
+      = M.coord (Additive.ofMul (QuotientGroup.mk (⟨z', hz'Q⟩ : ↥hyp.Q))))
+    (heq : (QuotientGroup.mk u : M.Eˣ ⧸ MonoidHom.range M.mu) = QuotientGroup.mk u') :
+    ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D, z' = a⁻¹ * (z * y) * a := by
+  obtain ⟨kv, hkv⟩ :=
+    hyp.exists_conjQHom_quotient_eq_of_coset_eq M hzQ hz'Q hu hu' heq
+  obtain ⟨d, hd, hconj⟩ := hyp.exists_mem_D_conjQHom kv
+  obtain ⟨w, hw, hzw⟩ := hyp.exists_mem_Q0_mul_of_quotient_eq hZ
+    (hyp.conjQHom kv ⟨z, hzQ⟩).2 hz'Q hkv.symm
+  rw [hconj ⟨z, hzQ⟩] at hzw
+  refine hyp.exists_conj_mul_Q0_iff.mp ⟨d⁻¹, hyp.D.inv_mem hd, w, hw, ?_⟩
+  rw [hzw]
+  group
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
