@@ -425,9 +425,10 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 `not_mem_K_of_f_eq_conj_self` の仮説の形そのもの**。
 
 ⟹ **段 (8) の残りは `card_fiber_eq_of_card_eq` への流し込みのみ**:
-* `Φ⁻¹(c)` が空でなければ代表 `x₀` を取り `ω' := f(ω x₀)`。
-  `exists_conj_of_coset_eq` で `Φ⁻¹(c) ⊆ {x | ∃ y ∈ Q₀, ∃ a ∈ D, f(ωx) = (ω'y)^a}`
-  なので `ncard_le_card_V_of_f_eq_conj` から `≤ |V| = |W|` (`V = W` の下)。
+* ✅ **`ncard_fiber_orbitOfF_le` として形式化済** — 各ファイバーは `≤ |V|`
+  (`V = W` の下で書籍の `m_i ≤ m`)。空の場合と代表を取る場合で分け、
+  `exists_conj_of_coset_eq` + `ncard_le_card_V_of_f_eq_conj` + `Subtype.val` の単射性。
+  `fUnit_val` を `rfl` にしておいたので `hu`/`hu'` は `rfl` で埋まった。
 * `ω` 自身の類では `not_mem_K_of_f_eq_conj_self` が単位剰余類を除外 ⟹ `≤ |W|−1`。
 * `|α| = |Q₀| = q` (`hQ0card`)、`|β| = index = (q+1)/|W|` (`index_range_mu`)。
 
