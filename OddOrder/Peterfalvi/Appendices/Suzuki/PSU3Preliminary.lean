@@ -970,31 +970,6 @@ theorem card_actualKActor_eq {m : ℕ} (s : hyp.LemmaFiveSetup m)
     exact (Nat.card_range_of_injective hinj).symm
   rw [hcard, hrange, hT]
 
-/-- `μ` restricted to `W` is injective, given that `W` acts faithfully on `Q/Q₀`
-(`quotientWHom_injective`).
-
-`coord_act` says the action of `(1, v)` on `Q/Q₀` becomes multiplication by
-`μ(1, v)` in `E`, and `coord` is an isomorphism — so equal scalars force equal
-automorphisms, hence equal elements of `W`. -/
-theorem mu_W_injective {m : ℕ} (M : hyp.QuotientFieldModel m)
-    (hWinj : Function.Injective hyp.quotientWHom) :
-    Function.Injective fun v : ↥hyp.W => M.mu (1, v) := by
-  intro v v' h
-  have h' : M.mu (1, v) = M.mu (1, v') := h
-  refine hWinj ?_
-  have hone : ∀ w : ↥hyp.W, hyp.quotientKWHom (1, w) = hyp.quotientWHom w := by
-    intro w
-    rw [hyp.quotientKWHom_apply, map_one, one_mul]
-  rw [← hone v, ← hone v']
-  refine MulEquiv.ext fun y => ?_
-  have e1 := M.coord_act (1, v) y
-  have e2 := M.coord_act (1, v') y
-  rw [h'] at e1
-  have hcoord : M.coord (Additive.ofMul (hyp.quotientKWHom (1, v) y))
-      = M.coord (Additive.ofMul (hyp.quotientKWHom (1, v') y)) := by
-    rw [e1, e2]
-  exact Additive.ofMul.injective (M.coord.injective hcoord)
-
 /-- **`μ(K) ∩ μ(W) = 1`**: a common value is killed by both `q − 1` and `q + 1`, which
 are coprime. -/
 theorem mu_K_eq_mu_W_imp_eq_one {m : ℕ} (hm : m ≠ 0) (M : hyp.QuotientFieldModel m)
