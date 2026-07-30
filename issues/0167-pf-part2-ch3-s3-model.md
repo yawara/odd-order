@@ -443,11 +443,20 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
     a b^θ e Tr(φ) = a b^θ A(x,y)` (`a, b` は bar 不変)。
   ⟹ 一般補題「対角が `F` 値な双線形持ち上げは、同じ対角のまま `F` 値に補正でき、
   `F`-半双線形性を保つ」(~40 行) で片付く。
-* **P5 ⏳ 組み立て (Peterfalvi 側; 部品はすべて揃った)**。手順:
-  1. χ_E (`exists_quadraticMap_of_lemmaFiveSetup`) の pin 展開 (P1) を取る。
-     scaling は `∀ a ∈ F^×` の形が要るので **`μ(K) = F^×`** を先に出す
-     (`mu_K_frobFixed` + `mu_K_injective` + `|K| = q−1` + 巡回群の位数一意部分群
-     `cyclic_subgroup_eq_of_card_eq`)。
+* **P5 (着手 2026-07-30 その 8) 組み立て (Peterfalvi 側; 部品はすべて揃った)**。手順:
+  1. ✅ **`μ(K) = F^×`** (`exists_actualKActor_mu_eq`, `ModelIsomorphism.lean`)。
+     `μ` は `K` 上単射で `F` に落ちるので、像は `|K| = |Z(Q)| − 1 = q − 1` 個の元を
+     `q − 1` 元集合 `F ∖ {0}` の中に持つ ⟹ 一致 (有限集合の濃度比較のみ、
+     巡回群の部分群一意性は不要だった)。
+  1b. ✅ **χ の scaling を `∀ a ∈ F^×` の形に** (`exists_scaling_of_mem_frobFixed`)。
+     `b` は存在量化のまま — pin は 2 つの生き残る対を `b` 経由で**比較**するだけなので
+     `b = a^d` という具体形は最後まで要らない。
+  1c. ✅ **χ の `K`-scaling を ι-パラメータ化** (`centreQuadraticMap_smul`)。
+     ⚠ **設計上の要点**: `exists_quadraticMap_of_lemmaFiveSetup` は内部で
+     `exists_center_coordinate_exponent` を呼んで**自前の ι** を取るので、
+     `exists_center_coordinate_equiv` が返す ι とは**同一視できない**。
+     `centreQuadraticMap` は ι を引数に取るので、scaling も同じ ι で再証明して
+     `E` 値版と `F` 値版が 1 つの座標を共有するようにした。
   2. 生き残る対を 1 つ基準に取り、他の対と `restrict_pair_eq_of_mul_eq_on_frobFixed`
      (P3) で比較して `hres` を作る。
   3. `exists_bilinear_lift_of_pinned_restriction` (P3) で

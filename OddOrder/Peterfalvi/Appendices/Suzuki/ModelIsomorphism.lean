@@ -72,6 +72,49 @@ variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
 
 variable {m : ℕ} (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
 
+/-! ## `K₁ = F^×`: the scalars exhaust the nonzero elements of `F` -/
+
+include s in
+/-- **`K₁ = F^×`** (Peterfalvi Part II, Ch. III §3, p. 120).  The scalars `μ(K)`
+are *all* the nonzero elements of the subfield `F`.
+
+`μ` is injective on `K` and lands in `F` (`QuotientFieldModel.mu_K_injective`,
+`mu_K_frobFixed`), so its image has `|K| = |Z(Q)| − 1 = q − 1` elements inside the
+`(q − 1)`-element set `F ∖ {0}`; equal finite cardinalities force equality.
+
+Step (3) needs this to turn the `K`-indexed scaling law of `χ` into one indexed by
+all of `F^×`, which is what the Lemma 2(c) pinning consumes. -/
+theorem exists_actualKActor_mu_eq (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    {a : M.E} (ha : a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) (ha0 : a ≠ 0) :
+    ∃ k : ↥hyp.actualKActor, ((M.mu (k, 1) : M.Eˣ) : M.E) = a := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set f : ↥hyp.actualKActor → M.E := fun k => ((M.mu (k, 1) : M.Eˣ) : M.E) with hf
+  have hinj : Function.Injective f := fun k k' h => M.mu_K_injective (Units.ext h)
+  have hsub : Set.range f ⊆
+      ((OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E) \ {0}) := by
+    rintro _ ⟨k, rfl⟩
+    exact ⟨OddOrder.FiniteField.mem_frobFixedSubfield.mpr (M.mu_K_frobFixed k),
+      (M.mu (k, 1) : M.Eˣ).ne_zero⟩
+  have hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1 := by
+    rw [s.cardActorCenter, s.centerEqQ0,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv, hQ0card]
+  have hrange : (Set.range f).ncard = 2 ^ m - 1 := by
+    rw [← Set.image_univ, Set.ncard_image_of_injective _ hinj, Set.ncard_univ, hKcard]
+  have hT : ((OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E) \ {0}).ncard
+      = 2 ^ m - 1 := by
+    have hcardF : ((OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E)).ncard
+        = 2 ^ m := by
+      rw [← Nat.card_coe_set_eq]
+      exact OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm
+    rw [Set.ncard_sdiff_singleton_of_mem
+      (OddOrder.FiniteField.frobFixedSubfield M.E 2 m).zero_mem, hcardF]
+  have heq := Set.eq_of_subset_of_ncard_le hsub (by rw [hrange, hT]) (Set.toFinite _)
+  have hmem : a ∈ Set.range f := by
+    rw [heq]
+    exact ⟨ha, ha0⟩
+  exact hmem
+
 /-! ## The quadratic map of the extension, in the coordinates of steps (1)–(2) -/
 
 open scoped Classical in
@@ -161,6 +204,67 @@ theorem centreQuadraticMap_anisotropic
   have hzero : M.coord.symm x = 0 := Additive.toMul.injective hone
   have := congrArg M.coord hzero
   rwa [M.coord.apply_symm_apply, map_zero] at this
+
+include s in
+/-- **The `K`-scaling law of `χ`, for a given centre coordinate `ι`.**
+
+`exists_quadraticMap_of_lemmaFiveSetup` proves the same law, but for the
+coordinate it chooses internally; step (3) needs it for the *same* `ι` that
+`centreQuadraticMap` is built from, so that the `E`-valued and `F`-valued forms of
+`χ` share one coordinate.
+
+The content is the `K`-equivariance of the descended square map
+(`centralSquare_quotientKHom`: conjugation commutes with squaring) transported
+along the two coordinates. -/
+theorem centreQuadraticMap_smul
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (k : ↥hyp.actualKActor) (x : M.E) :
+    ((hyp.centreQuadraticMap s M ι (((M.mu (k, 1) : M.Eˣ) : M.E) * x) :
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+      = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+        ((hyp.centreQuadraticMap s M ι x :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) := by
+  classical
+  rw [hyp.centreQuadraticMap_apply s M ι, hyp.centreQuadraticMap_apply s M ι]
+  have hact : M.coord.symm (((M.mu (k, 1) : M.Eˣ) : M.E) * x)
+      = Additive.ofMul (hyp.quotientKHom k (M.coord.symm x).toMul) := by
+    refine M.coord.injective ?_
+    rw [M.coord.apply_symm_apply]
+    have h := M.coord_act (k, 1) (M.coord.symm x).toMul
+    have hkw : hyp.quotientKWHom (k, 1) = hyp.quotientKHom k := by
+      rw [hyp.quotientKWHom_apply, map_one, mul_one]
+    rw [hkw] at h
+    rw [h]
+    congr 1
+    exact (M.coord.apply_symm_apply x).symm
+  rw [hact]
+  simp only [toMul_ofMul]
+  rw [hyp.centralSquare_quotientKHom]
+  exact hequiv k _
+
+include s in
+/-- **The scaling law of `χ` indexed by all of `F^×`**, in the form the Lemma 2(c)
+pinning consumes: for every nonzero `a ∈ F` there is a `b` with
+`χ (a x) = b χ (x)`.
+
+The `b` is left existential on purpose — the pinning only ever *compares* two
+surviving pairs through it, so its explicit value `a^d` is never needed. -/
+theorem exists_scaling_of_mem_frobFixed (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (χ : QuadraticMap (ZMod 2) M.E M.E) (d : ℤ)
+    (hscale : ∀ (k : ↥hyp.actualKActor) (x : M.E),
+      χ (((M.mu (k, 1) : M.Eˣ) : M.E) * x)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) * χ x)
+    {a : M.E} (ha : a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) (ha0 : a ≠ 0) :
+    ∃ b : M.E, ∀ x : M.E, χ (a * x) = b * χ x := by
+  obtain ⟨k, hk⟩ := hyp.exists_actualKActor_mu_eq s M hm hQ0card ha ha0
+  exact ⟨((M.mu (k, 1) ^ d : M.Eˣ) : M.E), fun x => by rw [← hk]; exact hscale k x⟩
 
 /-! ## Step (3): the isomorphism with the model -/
 
