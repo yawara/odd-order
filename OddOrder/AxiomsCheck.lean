@@ -371,7 +371,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 14600
+set_option linter.style.longFile 14700
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -14575,8 +14575,10 @@ only through its diagonal. -/
 /-! **The mappings `f`, `g`, `h` of a rank-one split BN-pair** (issue 0168, 2026-07-31).
 `GroupTheory/RankOneBNPair.lean` — Peterfalvi Part II, Ch. IV §1, p. 122: `t x t = g(x) h(x) t f(x)`
 determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and `L − M = M t Q`. -/
-#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.exists_fgh
-#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.fgh_unique
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.exists_fgh
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.IsFGH.unique
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.IsFGH.f_ne_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.IsFGH.g_ne_one
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.fgh_eq_of_canonical
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.canonical_inv
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.canonical_f
@@ -14584,6 +14586,7 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hOne
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hTwo
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hThree
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hFive
 #assert_only_allowed_axioms Subgroup.mem_normalizer_of_conj_mem
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.range_le_normalizer_inducingIdAuts
