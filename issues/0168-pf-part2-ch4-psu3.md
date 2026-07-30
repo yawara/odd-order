@@ -475,8 +475,18 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 ⚠ **要リファクタ**: 現状その単射は `ncard_le_card_V_sub_one_of_f_eq_conj_self` /
 `ncard_fiber_orbitOfF_base_le` の**証明の中に `choose!` で埋め込まれている**ので、
 全射性を言うには外に出す必要がある。手順:
-1. 「区別されたファイバーの各 `x` に付随する `a_x ∈ D` とその剰余類」を
-   独立した定義/補題として切り出す (現在の `choose!` 部分)。
+1. ✅ **`exists_witness_not_mem_K` で存在 + `a ∉ K` を 1 本にまとめた** (完了)。
+   残りは `choose!` された剰余類写像の全射性。
+
+   ⚠ **設計上の要点 (2026-07-31)**: 全射性には `stepEight` の**厳密な個数**が要る。
+   `stepEight` は `{x : ↥Q₀ | Φ x = c₀}.ncard = |W| − 1` を与え、
+   `ncard_fiber_orbitOfF_base_le` の証明はその像が集合
+   `S = {z ∈ Q₀ | ∃ y ∈ Q₀, ∃ a ∈ D, f(ωz) = (ωy)^a}` に含まれることを示し、
+   `ncard_le_card_V_sub_one_of_f_eq_conj_self` は `S.ncard ≤ |V| − 1`。
+   `|V| = |W|` なので **両者とも ちょうど `|W| − 1`** ⟹ 包含は等号 ⟹
+   `S` 上の剰余類写像 (単射・像は `1` を外す・`|S| = |D/K| − 1`) は
+   `(D/K) ∖ {1}` への**全単射**。
+   ⟸ この補題は `stepEight` を使うので **`PSU3OrbitCount` 側**に置くこと。
 2. 単射性 (既存 `eq_of_inv_mul_mem_K`) + 像が `K` を外す
    (既存 `not_mem_K_of_f_eq_conj_self`) + `stepEight` の基数一致 `|W| − 1`
    ⟹ 像 = `(D/K) ∖ {1}` (有限集合で単射かつ基数一致なら全射)。
