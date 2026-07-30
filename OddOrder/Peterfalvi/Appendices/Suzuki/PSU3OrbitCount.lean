@@ -228,7 +228,7 @@ theorem card_rootsOfUnity_ge {E : Type*} [Field E] [Finite E] {r : ℕ} (hr : r 
   have hrange : (powMonoidHom r : Eˣ →* Eˣ).range ≤ rootsOfUnity (r + 2) E := by
     rintro _ ⟨u, rfl⟩
     rw [mem_rootsOfUnity]
-    show (u ^ r) ^ (r + 2) = 1
+    change (u ^ r) ^ (r + 2) = 1
     rw [← pow_mul, ← hcard]
     exact pow_card_eq_one'
   -- its kernel is the `r`-th roots of unity, so has at most `r` elements
@@ -253,6 +253,184 @@ theorem card_rootsOfUnity_ge {E : Type*} [Field E] [Finite E] {r : ℕ} (hr : r 
     _ ≤ Nat.card ↥(rootsOfUnity (r + 2) E) :=
         Nat.card_le_card_of_injective (Subgroup.inclusion hrange)
           (Subgroup.inclusion_injective hrange)
+
+/-- **A two-to-one map onto a target of half the size is onto.**
+
+If `f` sends `s` into `t`, every fibre of `f` has at most two points, and `2|t| ≤ |s| + 1`,
+then `f` maps `s` *onto* `t`.  The `+1` is what makes the bound usable when `|s|` is odd,
+which is the case in step (12) (`|s| = 2q − 1`, `|t| = q`). -/
+theorem image_eq_of_card_fiber_le_two {α β : Type*} [DecidableEq β]
+    {s : Finset α} {t : Finset β} {f : α → β} (hmaps : ∀ x ∈ s, f x ∈ t)
+    (hfib : ∀ c : β, (s.filter fun x => f x = c).card ≤ 2)
+    (hcard : 2 * t.card ≤ s.card + 1) :
+    s.image f = t := by
+  refine Finset.eq_of_subset_of_card_le (fun c hc => ?_) ?_
+  · obtain ⟨x, hxs, rfl⟩ := Finset.mem_image.mp hc
+    exact hmaps x hxs
+  · have hle : s.card ≤ 2 * (s.image f).card :=
+      Finset.card_le_mul_card_image s 2 fun c _ => hfib c
+    omega
+
+/-- **Peterfalvi Part II, Ch. IV §2, step (12)** (p. 125): over a field `E` of
+characteristic `2` with `|E| = q²`, `q = 2^m`, every `α` in the subfield `F = {x | x^q = x}`
+is `β + β⁻¹` for some `β ≠ 0` — that is, `X² + αX + 1` has a root in `E` — and every such
+`β` lies in `F` or satisfies `β^{q+1} = 1`, i.e. `β⁻¹ = β^q`.
+
+The book states this of the roots `β, β⁻¹` of the characteristic polynomial of
+`[[0,1],[1,α]]`, asserting `β ∈ E` without argument.
+
+Proved by counting, with no field extension and no Artin–Schreier theory.  Put
+`S = F^× ∪ N` with `N` the norm-one subgroup.  Then `x ↦ x + x⁻¹` maps `S` into `F`; its
+fibres are the pairs `{x, x⁻¹}` (`add_inv_eq_add_inv_iff`); and
+
+  `|S| ≥ (q − 1) + (q + 1) − 1 = 2q − 1`
+
+because `F^× ∩ N = 1` — the orders `q − 1` and `q + 1` being coprime.  A two-to-one map
+from a set that large onto a target of size `q = |F|` must be onto
+(`image_eq_of_card_fiber_le_two`).  Membership of `β` in `S` is exactly the dichotomy. -/
+theorem exists_add_inv_eq {E : Type*} [Field E] [Finite E] [Fact (Nat.Prime 2)] [CharP E 2]
+    {m : ℕ} (hm : m ≠ 0) (hcard : Nat.card E = (2 ^ m) ^ 2) {α : E}
+    (hα : α ^ 2 ^ m = α) :
+    ∃ β : E, β ≠ 0 ∧ β + β⁻¹ = α ∧ (β ^ 2 ^ m = β ∨ β ^ (2 ^ m + 1) = 1) := by
+  classical
+  haveI : Fintype E := Fintype.ofFinite E
+  obtain ⟨r, hr⟩ : ∃ r, 2 ^ m = r + 1 := ⟨2 ^ m - 1, by
+    have : 2 ≤ 2 ^ m := by
+      calc (2:ℕ) = 2 ^ 1 := (pow_one 2).symm
+        _ ≤ 2 ^ m := Nat.pow_le_pow_right (by norm_num) (Nat.one_le_iff_ne_zero.mpr hm)
+    omega⟩
+  have hrne : r ≠ 0 := by
+    have h2 : (2:ℕ) ≤ 2 ^ m := by
+      calc (2:ℕ) = 2 ^ 1 := (pow_one 2).symm
+        _ ≤ 2 ^ m := Nat.pow_le_pow_right (by norm_num) (Nat.one_le_iff_ne_zero.mpr hm)
+    omega
+  -- the fixed field and the norm-one set, as `Finset`s
+  obtain ⟨Ffin, hFmem⟩ : ∃ s : Finset E, ∀ x, x ∈ s ↔ x ^ 2 ^ m = x :=
+    ⟨Finset.univ.filter fun x => x ^ 2 ^ m = x, by simp⟩
+  obtain ⟨Nfin, hNmem⟩ : ∃ s : Finset E, ∀ x, x ∈ s ↔ x ^ (2 ^ m + 1) = 1 :=
+    ⟨Finset.univ.filter fun x => x ^ (2 ^ m + 1) = 1, by simp⟩
+  -- `|F| = q`
+  have hFcard : Ffin.card = 2 ^ m := by
+    have h1 : Ffin.card = Fintype.card {x : E // x ∈ Ffin} := (Fintype.card_coe Ffin).symm
+    have h2 : Fintype.card {x : E // x ∈ Ffin}
+        = Fintype.card ↥(OddOrder.FiniteField.frobFixedSubfield E 2 m) :=
+      Fintype.card_congr (Equiv.subtypeEquivRight fun x =>
+        (hFmem x).trans (OddOrder.FiniteField.mem_frobFixedSubfield).symm)
+    rw [h1, h2, ← Nat.card_eq_fintype_card]
+    exact OddOrder.FiniteField.natCard_frobFixedSubfield hcard hm
+  -- `|N| ≥ q + 1`
+  have hNcard : 2 ^ m + 1 ≤ Nfin.card := by
+    have hEu : Nat.card Eˣ = r * (r + 2) := by
+      have hsq : (r + 1) ^ 2 = r * (r + 2) + 1 := by ring
+      rw [Nat.card_eq_fintype_card, Fintype.card_units, ← Nat.card_eq_fintype_card, hcard, hr]
+      omega
+    have hge := card_rootsOfUnity_ge (E := E) hrne hEu
+    rw [show r + 2 = 2 ^ m + 1 by omega] at hge
+    refine le_trans hge ?_
+    rw [Nat.card_eq_fintype_card, ← Fintype.card_coe Nfin]
+    refine Fintype.card_le_of_injective (fun u => ⟨((u : Eˣ) : E), ?_⟩) ?_
+    · exact (hNmem _).mpr (by exact_mod_cast (mem_rootsOfUnity' _ _).mp u.2)
+    · intro u v huv
+      exact Subtype.ext (Units.ext (congrArg Subtype.val huv))
+  -- `0 ∈ F`, so `|F^×| = q − 1`
+  have h0F : (0 : E) ∈ Ffin := (hFmem 0).mpr (by rw [hr]; simp)
+  have hEraseCard : (Ffin.erase 0).card = 2 ^ m - 1 := by
+    rw [Finset.card_erase_of_mem h0F, hFcard]
+  -- `F^× ∩ N = {1}`, by coprimality of `q − 1` and `q + 1`
+  have hInter : (Ffin.erase 0 ∩ Nfin).card ≤ 1 := by
+    refine le_trans (Finset.card_le_card (fun x hx => ?_)) (Finset.card_singleton (1 : E)).le
+    obtain ⟨hxe, hxN⟩ := Finset.mem_inter.mp hx
+    have hx0 : x ≠ 0 := Finset.ne_of_mem_erase hxe
+    have hxF : x ^ 2 ^ m = x := (hFmem x).mp (Finset.mem_of_mem_erase hxe)
+    have hu1 : (Units.mk0 x hx0) ^ (2 ^ m - 1) = 1 := by
+      refine Units.ext ?_
+      push_cast
+      rw [show 2 ^ m - 1 = r by omega]
+      have : x * x ^ r = x := by rw [← pow_succ', ← hr]; exact hxF
+      field_simp at this ⊢
+      exact this
+    have hu2 : (Units.mk0 x hx0) ^ (2 ^ m + 1) = 1 := by
+      refine Units.ext ?_
+      push_cast
+      exact (hNmem x).mp hxN
+    have := eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one hm hu1 hu2
+    have hx1 : x = 1 := congrArg Units.val this
+    simpa using hx1
+  -- so `|S| ≥ 2q − 1`
+  have hScard : 2 * (2 ^ m) ≤ (Ffin.erase 0 ∪ Nfin).card + 1 := by
+    have hun := Finset.card_union_add_card_inter (Ffin.erase 0) Nfin
+    omega
+  -- `x ↦ x + x⁻¹` maps `S` into `F`
+  have hmaps : ∀ x ∈ Ffin.erase 0 ∪ Nfin, x + x⁻¹ ∈ Ffin := by
+    intro x hx
+    have hx0 : x ≠ 0 := by
+      rcases Finset.mem_union.mp hx with h | h
+      · exact Finset.ne_of_mem_erase h
+      · intro hzero
+        rw [hzero] at h
+        have := (hNmem 0).mp h
+        rw [zero_pow (by omega)] at this
+        exact zero_ne_one this
+    refine (hFmem _).mpr ?_
+    rw [add_pow_char_pow, inv_pow]
+    rcases Finset.mem_union.mp hx with h | h
+    · rw [(hFmem x).mp (Finset.mem_of_mem_erase h)]
+    · have hinv : x ^ 2 ^ m = x⁻¹ := by
+        have h1 : x ^ 2 ^ m * x = 1 := by rw [← pow_succ]; exact (hNmem x).mp h
+        field_simp at h1 ⊢
+        linear_combination h1
+      rw [hinv, inv_inv, add_comm]
+  -- the fibres are the pairs `{x, x⁻¹}`
+  have hfib : ∀ c : E, ((Ffin.erase 0 ∪ Nfin).filter fun x => x + x⁻¹ = c).card ≤ 2 := by
+    intro c
+    rcases Finset.eq_empty_or_nonempty
+        ((Ffin.erase 0 ∪ Nfin).filter fun x => x + x⁻¹ = c) with he | ⟨x₀, hx₀⟩
+    · rw [he]; simp
+    obtain ⟨hx₀S, hx₀c⟩ := Finset.mem_filter.mp hx₀
+    have hx₀0 : x₀ ≠ 0 := by
+      rcases Finset.mem_union.mp hx₀S with h | h
+      · exact Finset.ne_of_mem_erase h
+      · intro hzero
+        rw [hzero] at h
+        have := (hNmem 0).mp h
+        rw [zero_pow (by omega)] at this
+        exact zero_ne_one this
+    have hsub : ((Ffin.erase 0 ∪ Nfin).filter fun x => x + x⁻¹ = c)
+        ⊆ {x₀, x₀⁻¹} := by
+      intro y hy
+      obtain ⟨hyS, hyc⟩ := Finset.mem_filter.mp hy
+      have hy0 : y ≠ 0 := by
+        rcases Finset.mem_union.mp hyS with h | h
+        · exact Finset.ne_of_mem_erase h
+        · intro hzero
+          rw [hzero] at h
+          have := (hNmem 0).mp h
+          rw [zero_pow (by omega)] at this
+          exact zero_ne_one this
+      have := (add_inv_eq_add_inv_iff hx₀0 hy0).mp (hx₀c.trans hyc.symm)
+      rcases this with h | h
+      · exact Finset.mem_insert.mpr (Or.inl h.symm)
+      · refine Finset.mem_insert.mpr (Or.inr (Finset.mem_singleton.mpr ?_))
+        field_simp
+        linear_combination h
+    exact le_trans (Finset.card_le_card hsub)
+      (le_trans (Finset.card_insert_le _ _) (by simp))
+  -- so the map is onto `F`
+  have himg := image_eq_of_card_fiber_le_two hmaps hfib (by rw [hFcard]; exact hScard)
+  have hαF : α ∈ Ffin := (hFmem α).mpr hα
+  rw [← himg] at hαF
+  obtain ⟨β, hβS, hβ⟩ := Finset.mem_image.mp hαF
+  refine ⟨β, ?_, hβ, ?_⟩
+  · rcases Finset.mem_union.mp hβS with h | h
+    · exact Finset.ne_of_mem_erase h
+    · intro hzero
+      rw [hzero] at h
+      have := (hNmem 0).mp h
+      rw [zero_pow (by omega)] at this
+      exact zero_ne_one this
+  · rcases Finset.mem_union.mp hβS with h | h
+    · exact Or.inl ((hFmem β).mp (Finset.mem_of_mem_erase h))
+    · exact Or.inr ((hNmem β).mp h)
 
 /-- **An automorphism of odd order fixes whatever its square fixes.**
 
