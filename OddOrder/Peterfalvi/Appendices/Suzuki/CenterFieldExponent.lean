@@ -40,6 +40,9 @@ than imported from the type-B data; see issue 0167.
   (transitivity plus the count `|K| = |Z(Q)| − 1`).
 * `Hypothesis.exists_center_coordinate_exponent` — the coordinate `ι` and the
   exponent `d`.
+* `Hypothesis.exists_quadraticMap_of_lemmaFiveSetup` — the book's `χ : E → F`, as a
+  genuine `𝔽₂`-quadratic map on `E`, anisotropic and satisfying
+  `χ (a x) = a^d χ (x)` for `a ∈ K₁`.
 -/
 
 set_option autoImplicit false
@@ -49,6 +52,7 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki
 open OddOrder.GroupTheory
 open OddOrder.GroupTheory.Suzuki2Group
 open OddOrder.Isaacs.Ch03
+open scoped IsMulCommutative
 
 namespace Hypothesis
 
@@ -240,6 +244,121 @@ theorem exists_center_coordinate_exponent {m : ℕ} (hm : m ≠ 0)
       rw [h2, hνval]
     rw [hcoe, hιapply, hιapply, hγ k z, map_mul]
     simp
+
+
+/-! ## The quadratic map `χ : E → F` -/
+
+/-- Conjugation by `K` commutes with squaring: the descended square map of
+Appendix III Lemma 1(a) is `K`-equivariant. -/
+theorem centralSquare_quotientKHom
+    (hW : IsElementaryAbelian 2 ↥(Subgroup.center hyp.Q))
+    (hV : IsElementaryAbelian 2 (↥hyp.Q ⧸ Subgroup.center hyp.Q))
+    (k : ↥hyp.actualKActor) (y : ↥hyp.Q ⧸ Subgroup.center hyp.Q) :
+    Suzuki2Groups.centralSquare (le_refl (Subgroup.center ↥hyp.Q)) hW hV
+        (hyp.quotientKHom k y)
+      = hyp.centerKHom k
+          (Suzuki2Groups.centralSquare (le_refl (Subgroup.center ↥hyp.Q)) hW hV y) := by
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective y
+  rw [hyp.quotientKHom_apply_mk, Suzuki2Groups.centralSquare_mk,
+    Suzuki2Groups.centralSquare_mk]
+  refine Subtype.ext ?_
+  rw [hyp.centerKHom_apply_val]
+  exact (map_pow (hyp.actualKActor.subtype k) x 2).symm
+
+open scoped Classical in
+/-- **The quadratic map `χ : E → F` of the central extension `F → S → E`**
+(Peterfalvi Part II, Ch. III §3, p. 121, the map expanded by Appendix III
+Lemma 2(c) in step (2)).
+
+Squaring descends to `S/Q₀ → Q₀` (Appendix III Lemma 1(a),
+`Suzuki2Groups.centralSquareQuadraticMap`); transporting along the coordinate
+`M.coord` of step (1) and the coordinate `ι` of
+`exists_center_coordinate_exponent` puts it on `E`, valued in the subfield
+`F = {x : x^q = x}`.
+
+* it is **anisotropic** — `χ x = 0` forces `x = 0` — because an element of `Q`
+  with square `1` is central (`LemmaFiveSetup.invMem`);
+* it satisfies the book's scaling `χ (a x) = a^d χ (x)` for `a ∈ K₁ = μ(K)`,
+  with `d` the exponent of `exists_center_coordinate_exponent`.  The book writes
+  `d = 1 + θ`; that normalization is the next step. -/
+theorem exists_quadraticMap_of_lemmaFiveSetup {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m) :
+    ∃ (χ : QuadraticMap (ZMod 2) M.E M.E) (d : ℤ),
+      (∀ x : M.E, χ x = 0 → x = 0) ∧
+      (∀ x : M.E, (χ x) ^ 2 ^ m = χ x) ∧
+      ∀ (k : ↥hyp.actualKActor) (x : M.E),
+        χ (((M.mu (k, 1) : M.Eˣ) : M.E) * x)
+          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) * χ x := by
+  classical
+  obtain ⟨ι, d, hιinj, hιF, hιequiv⟩ :=
+    hyp.exists_center_coordinate_exponent hm hQ0card s M
+  have hW : IsElementaryAbelian 2 ↥(Subgroup.center hyp.Q) :=
+    hyp.isElementaryAbelian_center_of_lemmaFiveSetup s
+  have hV : IsElementaryAbelian 2 (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
+    s.isplit.split.quotientEA
+  letI : IsMulCommutative (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
+    IsMulCommutative.of_comm hV.comm
+  letI : IsMulCommutative ↥(Subgroup.center hyp.Q) := IsMulCommutative.of_comm hW.comm
+  letI : Module (ZMod 2) (Additive (↥hyp.Q ⧸ Subgroup.center hyp.Q)) := hV.zmodModule
+  letI : Module (ZMod 2) (Additive ↥(Subgroup.center hyp.Q)) := hW.zmodModule
+  -- the descended square map (Appendix III Lemma 1(a))
+  set χ₀ := Suzuki2Groups.centralSquareQuadraticMap
+    (le_refl (Subgroup.center ↥hyp.Q)) hW hV with hχ₀
+  have hχ₀apply : ∀ a, χ₀ a =
+      Additive.ofMul (Suzuki2Groups.centralSquare
+        (le_refl (Subgroup.center ↥hyp.Q)) hW hV a.toMul) := fun _ => rfl
+  -- the two coordinates as `ZMod 2`-linear maps
+  let f : M.E →ₗ[ZMod 2] Additive (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
+    { toFun := M.coord.symm
+      map_add' := M.coord.symm.map_add
+      map_smul' := fun a x => ZMod.map_smul M.coord.symm.toAddMonoidHom a x }
+  let g : Additive ↥(Subgroup.center hyp.Q) →ₗ[ZMod 2] M.E :=
+    { toFun := ι
+      map_add' := ι.map_add
+      map_smul' := fun a x => ZMod.map_smul ι a x }
+  refine ⟨g.compQuadraticMap (χ₀.comp f), d, ?_, ?_, ?_⟩
+  · -- anisotropy
+    intro x hx
+    have hx' : ι (χ₀ (M.coord.symm x)) = 0 := hx
+    have hz : χ₀ (M.coord.symm x) = 0 := by
+      have h0 : ι 0 = 0 := ι.map_zero
+      exact hιinj (hx'.trans h0.symm)
+    obtain ⟨y, hy⟩ := QuotientGroup.mk_surjective (M.coord.symm x).toMul
+    have hsq : (y : ↥hyp.Q) ^ 2 = 1 := by
+      have := hχ₀apply (M.coord.symm x)
+      rw [hz, ← hy] at this
+      rw [Suzuki2Groups.centralSquare_mk] at this
+      exact congrArg (Subtype.val (p := fun z => z ∈ Subgroup.center ↥hyp.Q))
+        (Additive.ofMul.injective this.symm)
+    have hyZ : y ∈ Subgroup.center ↥hyp.Q := s.invMem y hsq
+    have : (M.coord.symm x).toMul = 1 := by
+      rw [← hy]
+      exact (QuotientGroup.eq_one_iff y).mpr hyZ
+    have hzero : M.coord.symm x = 0 := Additive.toMul.injective this
+    have := congrArg M.coord hzero
+    rwa [M.coord.apply_symm_apply, map_zero] at this
+  · -- the values lie in the subfield `F`
+    intro x
+    exact hιF _
+  · -- the scaling law
+    intro k x
+    have hact : M.coord.symm (((M.mu (k, 1) : M.Eˣ) : M.E) * x)
+        = Additive.ofMul (hyp.quotientKHom k (M.coord.symm x).toMul) := by
+      refine M.coord.injective ?_
+      rw [M.coord.apply_symm_apply]
+      have h := M.coord_act (k, 1) (M.coord.symm x).toMul
+      have hkw : hyp.quotientKWHom (k, 1) = hyp.quotientKHom k := by
+        rw [hyp.quotientKWHom_apply, map_one, mul_one]
+      rw [hkw] at h
+      rw [h]
+      congr 1
+      exact (M.coord.apply_symm_apply x).symm
+    change ι (χ₀ (M.coord.symm (((M.mu (k, 1) : M.Eˣ) : M.E) * x)))
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) * ι (χ₀ (M.coord.symm x))
+    rw [hact, hχ₀apply, hχ₀apply]
+    simp only [toMul_ofMul]
+    rw [hyp.centralSquare_quotientKHom hW hV, hιequiv]
 
 end Hypothesis
 

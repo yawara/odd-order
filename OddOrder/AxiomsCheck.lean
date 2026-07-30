@@ -14440,6 +14440,10 @@ are injective and the action is free. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.actualKActor_free_on_center
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_center_coordinate_exponent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralSquare_quotientKHom
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_quadraticMap_of_lemmaFiveSetup
 
 /-! **The `q`-power Frobenius of a field of order `q²`** (issues 0167 / 9504, 2026-07-30).
 `Algebra/QuadraticFrobenius.lean` — the ambient field theory of Ch. III §3, p. 120, where

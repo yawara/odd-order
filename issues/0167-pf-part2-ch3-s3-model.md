@@ -286,7 +286,15 @@ Appendix I Prop 2 の regular 版 (`exists_field_coordinate_realization`) で
      `ν` (= `Q₀` 側 `γ` を `E^×` へ送ったもの) と `μ'` (= 段 (1) の `μ|_K`) はどちらも単射
      なので像は同位数の部分群 ⟹ 一致。`K` の生成元 `k₀` で `ν k₀ = (μ' k₀)^d` を取り、
      `k = k₀^t` で全 `k` へ伝播 (`MonoidHom.map_cyclic` は使わずに済んだ)。
-  2. **χ を `E` 座標へ**: `Suzuki2Groups.centralSquareQuadraticMap`
+  2. ✅ **χ を `E` 座標へ — 2026-07-30 完了**
+     (`exists_quadraticMap_of_lemmaFiveSetup`)。`χ : QuadraticMap (ZMod 2) E E` で
+     anisotropic (`s.invMem`: `x² = 1 ⟹ x ∈ Z(Q)`)、値は部分体 `F` 内、
+     スケーリング `χ (a x) = a^d χ x` (`a ∈ K₁ = μ(K)`)。
+     `K`-同変性の核は `centralSquare_quotientKHom` (共役と二乗が可換 = `map_pow`)。
+     ⚠ `Algebra (ZMod 2) E` は instance search で出ない (`ZMod.algebra` は意図的に `def`)
+     ので `QuotientFieldModel.instAlgebraZModTwo` として登録した — これが
+     `QuadraticMap (ZMod 2) E E` を statement に書けるようにする鍵。
+     以下は当初の計画メモ: `Suzuki2Groups.centralSquareQuadraticMap`
      (Appendix III Lemma 1(a)、`Additive (Q ⧸ Z(Q)) → Additive ↥(Z(Q))` の
      `QuadraticMap (ZMod 2)`) を `M.coord` と `ι` で移して `χ_E : E → E`。
      anisotropic は `s.invMem` (`x² = 1 ⟹ x ∈ Z(Q)`) から。

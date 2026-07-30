@@ -409,6 +409,15 @@ universe uG uΩ
 variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
   {hyp : Hypothesis G Ω} {m : ℕ} (M : hyp.QuotientFieldModel m)
 
+/-- `E` is a `ZMod 2`-algebra, since it has characteristic `2`.
+
+Not derivable by instance search (`ZMod.algebra` is a `def`, deliberately — see the
+implementation note in `Mathlib/Data/ZMod/Defs.lean`), but canonical, so it is
+registered here once for every `QuotientFieldModel`.  This is what puts
+`QuadraticMap (ZMod 2) E E` — the home of the Appendix III Lemma 2(c) expansion
+used in step (2) — in scope. -/
+noncomputable instance instAlgebraZModTwo : Algebra (ZMod 2) M.E := ZMod.algebra M.E 2
+
 /-- The book's bar operation `x ↦ x̄ = x^q` on `E`. -/
 noncomputable def bar : RingAut M.E := OddOrder.FiniteField.qFrobenius M.E 2 m
 
