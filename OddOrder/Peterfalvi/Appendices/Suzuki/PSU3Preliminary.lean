@@ -676,6 +676,18 @@ theorem index_K_subgroupOf_D : (hyp.K.subgroupOf hyp.D).index = Nat.card ↥hyp.
   have hKpos : 0 < Nat.card ↥hyp.K := Nat.card_pos
   exact Nat.eq_of_mul_eq_mul_right hKpos hmul
 
+/-- `W` centralizes `K` (`W = C_V(K)` by definition), so the left and right cosets
+`ζK` and `Kζ` agree.
+
+Step (9) uses this: `exists_witness_coset_eq` produces `a ∈ ζK`, while the book writes
+the witness as `a = kζ` with `k ∈ K`. -/
+theorem commute_of_mem_W_of_mem_K {w k : G} (hw : w ∈ hyp.W) (hk : k ∈ hyp.K) :
+    k * w = w * k := by
+  have hkSet : k ∈ hyp.KSet := by
+    have h : k ∈ (hyp.K : Set G) := hk
+    rwa [hyp.coe_K] at h
+  exact Subgroup.mem_centralizer_iff.mp hw.2 k hkSet
+
 /-- `|K|` is odd, being a subgroup of the odd-order `D`. -/
 theorem odd_card_K : Odd (Nat.card ↥hyp.K) := by
   have hcard : Nat.card ↥(hyp.K.subgroupOf hyp.D) = Nat.card ↥hyp.K :=
