@@ -7,6 +7,21 @@ created: 2026-07-29
 
 # Peterfalvi Part II, Ch. III §3 本体: `S ⋊ KW ≅ S₁ ⋊ K₁W₁`
 
+> **✅ CLOSED 2026-07-31** — 段 (1)-(5) と Proposition 本体
+> (`exists_standardModel`, `Appendices/Suzuki/ModelAction.lean`) がすべて
+> sorry-free で landing、AxiomsCheck 全 green。下流 = Ch. IV (pp. 122-134)。
+>
+> **書籍より短くなった点 4 つ** (詳細は本文): (i) `λ₂ = 0` は段 (3)(4) とも不要 /
+> (ii) `F` 値性は trace 補正 / (iii) `d` の `1+2^t` 正規化は不要 — ただし
+> **α-正規化で定数が捻れるので `d ↦ d·2^j` の吸収が要る** (途中で発覚・修正済) /
+> (iv) 段 (5) は `ι` の定数倍だけでよく `K` の推移性・内部自己同型は不要。
+>
+> **副産物の汎用補題**: `Subgroup.mul_eq_sup_of_le_normalizer` /
+> `Subgroup.sup_range_eq_of_mul_inv_mem` /
+> `Subgroup.exists_conj_range_eq_of_mul_inv_mem` /
+> `GroupExtension.inducingIdAuts_conj_mem` /
+> `BilinearTwistedProduct.congrEquiv` / `sq_eq_inl_diag` ほか。
+
 ## 背景
 
 [0165](closed/0165-pf-part2-ch3-s2-order-five.md) で §2 の Proposition、
