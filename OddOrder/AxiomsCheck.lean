@@ -14449,6 +14449,10 @@ are injective and the action is free. -/
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_algAut_pair_scaling_of_ne_zero
 #assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sum_autMulQuadratic_eq_zero_of_symm
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_scaling_pinned_expansion
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_scalingPair_of_lemmaFiveSetup
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centralSquare_quotientWHom

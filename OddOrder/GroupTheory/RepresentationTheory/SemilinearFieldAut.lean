@@ -974,6 +974,159 @@ theorem span_autMulQuadraticMap_eq_top [Finite F] :
   exact ⟨q.1, rfl⟩
 
 
+/-- **A symmetric coefficient family with zero diagonal contributes nothing.**
+
+In characteristic `2` the terms of `∑ c_{στ} σ(x) τ(x)` pair up under the swap
+`(σ, τ) ↦ (τ, σ)`, which fixes the value `σ(x) τ(x)`; so a symmetric family with
+vanishing diagonal sums to zero.  This is the ambiguity in the Lemma 2(c)
+expansion — only the symmetrized coefficients `c_{στ} + c_{τσ}` are determined —
+and it is what `exists_scaling_pinned_expansion` normalizes away. -/
+theorem sum_autMulQuadratic_eq_zero_of_symm [Finite F]
+    (c : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) → F)
+    (hd : ∀ σ : F ≃ₐ[ZMod 2] F, c (σ, σ) = 0)
+    (hs : ∀ σ τ : F ≃ₐ[ZMod 2] F, c (σ, τ) = c (τ, σ)) (x : F) :
+    haveI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+    (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F), c στ * (στ.1 x * στ.2 x)) = 0 := by
+  classical
+  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  haveI : CharP F 2 :=
+    charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
+  refine Finset.sum_involution (fun στ _ => (στ.2, στ.1)) (fun στ _ => ?_)
+    (fun στ _ hne => ?_) (fun στ _ => Finset.mem_univ _) (fun στ _ => rfl)
+  · rw [hs στ.2 στ.1]
+    have hcomm : c στ * (στ.1 x * στ.2 x) + c στ * ((στ.2) x * (στ.1) x)
+        = c στ * (στ.1 x * στ.2 x) + c στ * (στ.1 x * στ.2 x) := by ring
+    rw [hcomm, CharTwo.add_self_eq_zero]
+  · intro heq
+    have h1 : στ.2 = στ.1 := congrArg Prod.fst heq
+    exact hne (by rw [show στ = (στ.1, στ.1) from Prod.ext rfl h1, hd στ.1, zero_mul])
+
+/-- **The Lemma 2(c) expansion, normalized to one representative per unordered
+pair — so that *every* surviving coefficient is pinned by the scaling relations
+of `χ`.**
+
+The raw expansion `χ = ∑ c_{στ} σ·τ` is not unique: adding any symmetric family
+with zero diagonal changes nothing (`sum_autMulQuadratic_eq_zero_of_symm`), and
+correspondingly the independence half of Lemma 2(c) only controls the symmetrized
+coefficients.  Folding each unordered pair onto one representative — chosen by an
+arbitrary enumeration of `Aut F` — removes the ambiguity, and then a scaling
+relation `χ(a x) = b χ(x)` forces `σ(a) τ(a) = b` for *every* pair with
+`c_{στ} ≠ 0`.
+
+This is what step (3) of Peterfalvi Part II, Ch. III §3 (p. 121) needs: the
+bilinear lift `φ(x, y) = ∑ c_{στ} σ(x) τ(y)` of `χ` then inherits the
+semilinearity of `χ` term by term, giving the book's
+`φ(a x, b y) = a b^θ φ(x, y)`.  Compare `exists_algAut_pair_scaling_of_ne_zero`,
+which extracts a *single* pinned pair — enough for step (2), where only one
+nonzero coefficient is needed. -/
+theorem exists_scaling_pinned_expansion [Finite F] (χ : QuadraticMap (ZMod 2) F F) :
+    ∃ c : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) → F,
+      (∀ y : F,
+        haveI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+        χ y = ∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+          c στ * (στ.1 y * στ.2 y)) ∧
+      ∀ a b : F, (∀ x : F, χ (a * x) = b * χ x) →
+        ∀ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F), c στ ≠ 0 → στ.1 a * στ.2 a = b := by
+  classical
+  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  haveI : CharP F 2 :=
+    charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
+  -- an arbitrary enumeration of `Aut F`, used to pick a representative per pair
+  set eqv := Fintype.equivFin (F ≃ₐ[ZMod 2] F) with heqv
+  -- the raw expansion (Lemma 2(c), spanning side)
+  obtain ⟨c₀, hc₀⟩ := (Submodule.mem_span_range_iff_exists_fun F).mp
+    (by rw [span_autMulQuadraticMap_eq_top F]; exact Submodule.mem_top :
+      χ ∈ Submodule.span F (Set.range fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
+        autMulQuadraticMap F στ.1 στ.2))
+  have happ₀ : ∀ y : F,
+      χ y = ∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        c₀ στ * (στ.1 y * στ.2 y) := by
+    intro y
+    have h := congrArg (fun q : QuadraticMap (ZMod 2) F F => q y) hc₀
+    simpa [QuadraticMap.sum_apply, QuadraticMap.smul_apply, autMulQuadraticMap_apply,
+      smul_eq_mul] using h.symm
+  -- fold each unordered pair onto its `eqv`-smaller representative
+  set c : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) → F := fun στ =>
+    if eqv στ.1 < eqv στ.2 then c₀ στ + c₀ (στ.2, στ.1)
+    else if στ.1 = στ.2 then c₀ στ else 0 with hcdef
+  -- the difference of the two families is symmetric with zero diagonal
+  have hdiag : ∀ σ : F ≃ₐ[ZMod 2] F, (c + c₀) (σ, σ) = 0 := by
+    intro σ
+    have hlt : ¬ eqv σ < eqv σ := lt_irrefl _
+    simp only [Pi.add_apply, hcdef, if_neg hlt]
+    exact CharTwo.add_self_eq_zero _
+  have hsymm : ∀ σ τ : F ≃ₐ[ZMod 2] F, (c + c₀) (σ, τ) = (c + c₀) (τ, σ) := by
+    intro σ τ
+    rcases lt_trichotomy (eqv σ) (eqv τ) with hlt | heq | hgt
+    · have hne : σ ≠ τ := fun h => absurd (congrArg eqv h) (ne_of_lt hlt)
+      have hne' : τ ≠ σ := hne.symm
+      simp only [Pi.add_apply, hcdef, if_pos hlt, if_neg (asymm hlt), if_neg hne']
+      rw [zero_add]
+      -- `c₀ (σ,τ) + c₀ (τ,σ) + c₀ (σ,τ) = c₀ (τ,σ)`
+      rw [add_assoc, add_comm (c₀ (τ, σ)) (c₀ (σ, τ)), ← add_assoc,
+        CharTwo.add_self_eq_zero, zero_add]
+    · have hst : σ = τ := eqv.injective heq
+      subst hst
+      rfl
+    · have hne : σ ≠ τ := fun h => absurd (congrArg eqv h) (ne_of_gt hgt)
+      simp only [Pi.add_apply, hcdef, if_neg (asymm hgt), if_pos hgt, if_neg hne]
+      rw [zero_add, add_comm (c₀ (τ, σ)) (c₀ (σ, τ)), add_assoc,
+        CharTwo.add_self_eq_zero, add_zero]
+  -- hence the two families have the same sum, and `c` is another expansion
+  have happ : ∀ y : F, χ y =
+      ∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F), c στ * (στ.1 y * στ.2 y) := by
+    intro y
+    have h0 := sum_autMulQuadratic_eq_zero_of_symm F (c + c₀) hdiag hsymm y
+    have hsplit : (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+          (c + c₀) στ * (στ.1 y * στ.2 y))
+        = (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F), c στ * (στ.1 y * στ.2 y))
+          + ∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F), c₀ στ * (στ.1 y * στ.2 y) := by
+      rw [← Finset.sum_add_distrib]
+      exact Finset.sum_congr rfl fun στ _ => by simp only [Pi.add_apply]; ring
+    rw [hsplit, ← happ₀ y] at h0
+    have := congrArg (fun z : F => z + χ y) h0
+    simpa [add_assoc, CharTwo.add_self_eq_zero] using this.symm
+  refine ⟨c, happ, fun a b hscale στ hne => ?_⟩
+  -- the independence half applied to the vanishing combination of the relation
+  have hzero : (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+      (fun ρ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
+        c ρ * (ρ.1 a * ρ.2 a) + b * c ρ) στ •
+        autMulQuadraticMap F στ.1 στ.2) = 0 := by
+    refine QuadraticMap.ext fun x => ?_
+    have hsum : (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        (c στ * (στ.1 a * στ.2 a) + b * c στ) * (στ.1 x * στ.2 x))
+        = χ (a * x) + b * χ x := by
+      rw [happ (a * x), happ x, Finset.mul_sum, ← Finset.sum_add_distrib]
+      refine Finset.sum_congr rfl fun στ _ => ?_
+      simp only [map_mul]
+      ring
+    simp only [QuadraticMap.sum_apply, QuadraticMap.smul_apply,
+      autMulQuadraticMap_apply, smul_eq_mul, QuadraticMap.zero_apply]
+    rw [hsum, hscale x, CharTwo.add_self_eq_zero]
+  -- on the diagonal the coefficient itself vanishes; off it, the swapped one is `0`
+  rcases eq_or_ne στ.1 στ.2 with hdiagpair | hoff
+  · have hpair : στ = (στ.1, στ.1) := Prod.ext rfl hdiagpair.symm
+    have h := autMulQuadratic_diag_eq_zero F _ hzero στ.1
+    rw [← hpair] at h
+    rcases mul_eq_zero.mp (by linear_combination h :
+        c στ * (στ.1 a * στ.2 a + b) = 0) with h0 | h0
+    · exact absurd h0 hne
+    · rwa [← CharTwo.sub_eq_add, sub_eq_zero] at h0
+  · -- the `eqv`-larger representative carries coefficient `0`
+    have hswapzero : c (στ.2, στ.1) = 0 := by
+      have hlt : eqv στ.1 < eqv στ.2 := by
+        rcases lt_trichotomy (eqv στ.1) (eqv στ.2) with h | h | h
+        · exact h
+        · exact absurd (eqv.injective h) hoff
+        · exact absurd (by simp only [hcdef, if_neg (asymm h), if_neg hoff] : c στ = 0) hne
+      simp only [hcdef, if_neg (asymm hlt), if_neg (Ne.symm hoff)]
+    have h := autMulQuadratic_coeff_symm F _ hzero στ.1 στ.2
+    rw [hswapzero, zero_mul, mul_zero, add_zero] at h
+    rcases mul_eq_zero.mp (by linear_combination h :
+        c στ * (στ.1 a * στ.2 a + b) = 0) with h0 | h0
+    · exact absurd h0 hne
+    · rwa [← CharTwo.sub_eq_add, sub_eq_zero] at h0
+
 /-- **A nonzero `𝔽₂`-quadratic map has a scaling pair.**
 
 If `χ ≠ 0`, there is a *single* pair of automorphisms `σ, τ` of `F` such that every
@@ -1046,22 +1199,10 @@ theorem exists_algAut_pair_scaling_of_ne_zero [Finite F]
       linear_combination hAB
   -- a symmetric coefficient family with zero diagonal would give the zero map
   have hzeroOfSym : (∀ σ : F ≃ₐ[ZMod 2] F, c (σ, σ) = 0) →
-      (∀ σ τ : F ≃ₐ[ZMod 2] F, c (σ, τ) = c (τ, σ)) → χ = 0 := by
-    intro hd hs
-    refine QuadraticMap.ext fun x => ?_
-    rw [happ x, QuadraticMap.zero_apply]
-    refine Finset.sum_involution (fun στ _ => (στ.2, στ.1)) (fun στ _ => ?_)
-      (fun στ _ hne => ?_) (fun στ _ => Finset.mem_univ _) (fun στ _ => rfl)
-    · have hcc : c (στ.2, στ.1) = c στ := hs στ.2 στ.1
-      rw [hcc]
-      have hcomm : c στ * (στ.1 x * στ.2 x) + c στ * ((στ.2) x * (στ.1) x)
-          = c στ * (στ.1 x * στ.2 x) + c στ * (στ.1 x * στ.2 x) := by ring
-      rw [hcomm, CharTwo.add_self_eq_zero]
-    · intro heq
-      have h1 : στ.2 = στ.1 := congrArg Prod.fst heq
-      refine hne ?_
-      have hpair : στ = (στ.1, στ.1) := Prod.ext rfl h1
-      rw [hpair, hd στ.1, zero_mul]
+      (∀ σ τ : F ≃ₐ[ZMod 2] F, c (σ, τ) = c (τ, σ)) → χ = 0 := fun hd hs =>
+    QuadraticMap.ext fun x => by
+      rw [happ x, QuadraticMap.zero_apply]
+      exact sum_autMulQuadratic_eq_zero_of_symm F c hd hs x
   -- pick the pair once and for all
   by_cases hd : ∀ σ : F ≃ₐ[ZMod 2] F, c (σ, σ) = 0
   · by_cases hs : ∀ σ τ : F ≃ₐ[ZMod 2] F, c (σ, τ) = c (τ, σ)
