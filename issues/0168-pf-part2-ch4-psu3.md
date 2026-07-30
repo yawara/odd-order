@@ -631,6 +631,31 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 
 汎用補題 4 本を tail 側に置く理由: いずれも消費者がモデル数値部分のみ。
 
+## セッション総括 (2026-07-31)
+
+**Ch. IV で形式化されたもの** (すべて sorry 0 / AxiomsCheck OK / lint 0):
+
+| leaf | 行数 | 内容 |
+|---|---|---|
+| `OddOrder/GroupTheory/RankOneBNPair.lean` | 784 | §1 全体 — `Setup`/`IsFGH`、(H1)-(H6)、Lemma (置換モデル)、`⟨f,j⟩` の `D`-軌道作用 |
+| `…/Suzuki/RankOneSetup.lean` | 122 | (A1)-(A3) → `Setup` の橋渡し |
+| `…/Suzuki/PSU3Preliminary.lean` | 1025 | §2 (1)-(7)、ファイバー評価 (集合版)、`\|D:K\|`、`D = KW`、翻訳の群論部分、(9) の部品 |
+| `…/Suzuki/PSU3OrbitCount.lean` | 778 | モデル数値部分 — `μ(KW)` の位数、`n = (q+1)/\|W\|`、`Φ`、翻訳、段 (8)、段 (9) |
+
+**到達点**: §1 完了 + 橋渡し + §2 (1)-(9) 完了。
+
+**次の一手**: 段 (10)。`exists_mulEquiv_bilinearTwistedProduct` を直接使って
+`y = (0, α)` (`α ∈ F`) と `coord = Φ.quotient` を取り、正規化仮説
+(`f(ω) = (ωy)^ζ`) の下で `b^{1+θ} = α + a^{-(1+θ)} ⟹ f(ωs^a) = (f(ωs^b)s^a)^{ζa⁻²}`
+を示す。⚠ **(10) 以降は座標計算**なので §1-§2(9) とは作業の質が変わる。
+
+**本セッションで訂正したこと** (再発防止):
+1. `pdftotext` の上付き落ちで **3 件**の転記ミス ((H3) の指数 / (6) の結論
+   `a ∉ K` / (5) の表示式欠落)。**すべてページ画像を見て初めて判明**。
+   ⟹ Ch. IV の式は必ず 300dpi 画像で確認する。
+2. `mu_injective` を**重複証明**して撤回。⟹ Ch. IV に補題を足す前に
+   `QuotientKWField` / `ModelIsomorphism` / `StructureOfH/**` を grep する。
+
 ## 参照
 
 <!-- 関連 issue / PR / ファイル / コミット. -->
