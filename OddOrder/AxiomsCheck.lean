@@ -14646,6 +14646,11 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.image_eq_of_card_fiber_le_two
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.exists_add_inv_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.alpha_mul_betaSum
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.betaSum_rec
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.betaSum_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.betaSum_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.add_betaSum_div
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNorm_mul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNorm_ne_zero
 #assert_only_allowed_axioms

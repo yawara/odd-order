@@ -432,6 +432,67 @@ theorem exists_add_inv_eq {E : Type*} [Field E] [Finite E] [Fact (Nat.Prime 2)] 
     · exact Or.inl ((hFmem β).mp (Finset.mem_of_mem_erase h))
     · exact Or.inr ((hNmem β).mp h)
 
+/-! ### The closed form (13) for `(u_i)` (p. 126)
+
+The book solves the recursion `u_{i+1} = 1/(α + u_i)`, `u₁ = 0` of (11) by diagonalizing
+`[[0,1],[1,α]]` over its eigenvalues `β, β⁻¹`, obtaining
+
+  `u_i = (β^{i-1} + β^{-i+1}) / (β^i + β^{-i})`.
+
+Everything rests on the quantities `c_i = β^i + β^{-i}`, which satisfy the three-term
+recurrence `c_{i+2} = α c_{i+1} + c_i`; the ratios `c_i / c_{i+1}` are then the `u`'s.
+-/
+
+/-- The book's `β^i + β^{-i}` (Peterfalvi Part II, p. 126) — up to the factor `1/α`, the
+entries of the `i`-th power of `[[0,1],[1,α]]`. -/
+noncomputable def betaSum {E : Type*} [Field E] (β : E) (i : ℕ) : E := β ^ i + (β ^ i)⁻¹
+
+/-- `α · c_{i+1} = c_{i+2} + c_i` when `α = β + β⁻¹`.
+
+An identity in any field — no characteristic assumption; expanding
+`(β + β⁻¹)(β^{i+1} + β^{-i-1})` gives `β^{i+2} + β^{-i-2}` plus `β^i + β^{-i}`. -/
+theorem alpha_mul_betaSum {E : Type*} [Field E] {β α : E} (hβ : β ≠ 0)
+    (hα : β + β⁻¹ = α) (i : ℕ) :
+    α * betaSum β (i + 1) = betaSum β (i + 2) + betaSum β i := by
+  subst hα
+  have hβi : β ^ i ≠ 0 := pow_ne_zero _ hβ
+  simp only [betaSum]
+  field_simp
+  ring
+
+/-- **The three-term recurrence** `c_{i+2} = α c_{i+1} + c_i` in characteristic `2`.
+
+This is `alpha_mul_betaSum` with the duplicated `c_i` absorbed by `2 = 0` — the point at
+which the book's computation becomes a recursion rather than a two-sided identity. -/
+theorem betaSum_rec {E : Type*} [Field E] (h2 : (2 : E) = 0) {β α : E} (hβ : β ≠ 0)
+    (hα : β + β⁻¹ = α) (i : ℕ) :
+    betaSum β (i + 2) = α * betaSum β (i + 1) + betaSum β i := by
+  rw [alpha_mul_betaSum hβ hα i]
+  linear_combination (-(betaSum β i)) * h2
+
+/-- `c₀ = 0` in characteristic `2`, which is the book's `u₁ = 0`. -/
+theorem betaSum_zero {E : Type*} [Field E] (h2 : (2 : E) = 0) (β : E) :
+    betaSum β 0 = 0 := by
+  simp only [betaSum, pow_zero, inv_one]
+  linear_combination h2
+
+/-- `c₁ = α`. -/
+theorem betaSum_one {E : Type*} [Field E] {β α : E} (hα : β + β⁻¹ = α) :
+    betaSum β 1 = α := by
+  simp only [betaSum, pow_one]
+  exact hα
+
+/-- **`α + u_i = c_{i+2}/c_{i+1}`**, so that `u_{i+1} = 1/(α + u_i)` — the recursion of
+(11) holds for the closed form (13).
+
+With `u_{i+1} := c_i / c_{i+1}` this says `α + u_{i+1} = c_{i+2}/c_{i+1}`, whose inverse
+is `c_{i+1}/c_{i+2} = u_{i+2}`. -/
+theorem add_betaSum_div {E : Type*} [Field E] (h2 : (2 : E) = 0) {β α : E} (hβ : β ≠ 0)
+    (hα : β + β⁻¹ = α) (i : ℕ) (hne : betaSum β (i + 1) ≠ 0) :
+    α + betaSum β i / betaSum β (i + 1) = betaSum β (i + 2) / betaSum β (i + 1) := by
+  rw [eq_div_iff hne, add_mul, div_mul_cancel₀ _ hne]
+  exact (betaSum_rec h2 hβ hα i).symm
+
 /-- **An automorphism of odd order fixes whatever its square fixes.**
 
 If `orderOf θ = 2m + 1` then `θ = (θ²)^{m+1}`, so every `θ²`-fixed point is `θ`-fixed. -/
