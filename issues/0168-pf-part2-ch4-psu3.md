@@ -574,9 +574,18 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 モデルを**数え上げ**にしか使っていなかった。(10) に着手する前に用意が要るもの:
 1. **正規化仮説**: `f(ω) = (ωy)^ζ`, `y ∈ Q₀^#` (段 (9) が存在を保証)。
    これを持ち回る形にする (`stepNine` の結論をそのまま仮説に取ればよい)。
-2. **`y` の座標 `α`**: 書籍は `y = (0, α)` と書く。`Φ : Q ≃* BilinearTwistedProduct φ`
-   (0167 `exists_standardModel`) で `y ∈ Q₀ = Z(Q)` の像が `(0, α)` の形に
-   なることを言う必要がある (`Q₀` = `BilinearTwistedProduct` の中心)。
+2. **`y` の座標 `α`**: 書籍は `y = (0, α)` と書く。
+   * ✅ 第 1 成分が 0 = **`coord_eq_zero_of_mem_Q0`** (証明済)。
+   * ⚠ **型の要点 (2026-07-31 に確認)**: `BilinearTwistedProduct φ` は
+     `quotient : V` と `central : W` の 2 フィールド (QuadraticExtensions.lean:57)。
+     ここで `V = M.E`、**`W = frobFixedSubfield M.E 2 m = F`**。
+     つまり **`α = (Φ y).central ∈ F` であって `E` ではない**。
+     (10) の `b^{1+θ} = α + a^{-(1+θ)}` は `F` の中の等式
+     (`b ∈ K ≅ F^×`、`θ` は `F` を保つ) — 型付けはこれに合わせること。
+   * **残り**: `M.coord ⟦z⟧` (QuotientFieldModel の座標) と `(Φ z).quotient`
+     (標準モデルの座標) が一致するか要確認。`exists_standardModel` は
+     `Φ x₀ = ⟨0,1⟩` 等を与えるが、`coord` との互換性は明示されていないかもしれない。
+     ⟸ **次セッションはここを確認するところから**。
 3. **`θ`**: `exists_standardModel` の `θ : M.E ≃ₐ[ZMod 2] M.E`。
 4. **`K ≅ F^×`**: `a, b ∈ K` を `F^×` の元として扱う
    (`exists_actualKActor_mu_eq` + `card_actualKActor_eq` で確立済)。
