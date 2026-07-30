@@ -1,0 +1,297 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
+import OddOrder.Peterfalvi.Appendices.SemilinearField
+
+/-!
+# Peterfalvi Part II, Ch. III §3: the field `E = 𝐅_{q²}` on `S ⧸ Q₀`
+
+T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
+2000), Part II, Ch. III §3, p. 120, first step of the Proposition:
+
+> We identify `(S/Q₀) ⋊ KW` with `E ⋊ K₁W₁`, where `E = 𝐅_{q²}`, `K₁ = F^×` and
+> `W₁ ≤ {x ∈ E^× : x^{1+q} = 1}`.
+
+The book gets there by splitting on `θ = 1` / `θ ≠ 1` and invoking Appendix III
+Propositions 1 and 2 to make `w` act as multiplication by some `ω ∈ E^×`.  The
+route taken here avoids the case split: `KW` acts *irreducibly* on `S/Q₀`, so
+Appendix I Proposition 2 (`Huppert.exists_field_semilinear_with_scalar`) produces
+the field directly, of order `|S/Q₀| = q²`, with the whole of `KW` realized by
+scalars.
+
+Irreducibility is a two-line count once the pieces of Ch. I §3 Lemma 5 are in
+hand.  Let `U ≤ S/Q₀` be `KW`-invariant.
+
+* `U` is `K`-invariant and `K` (of order `q − 1 = 2^m − 1`) acts freely off the
+  identity, so `q − 1` divides `|U| − 1`; as `|U|` is a power of `2` this forces
+  `|U|` to be a power of `q` (`card_invariant_eq_pow_of_fixedPointFree`), hence
+  `|U| ∈ {1, q, q²}` because `|S/Q₀| = q²`.
+* The middle case is excluded by the moved-summand engine
+  (`Suzuki2Groups.map_quotientCongr_ne_of_fixedPoints_le`): an invariant subgroup
+  of order exactly `|Z(Q)|` cannot be stabilized by a nonidentity element of `W`,
+  and `W ≠ 1` under hypothesis (C2).
+
+## Main results
+
+* `Hypothesis.quotientKWHom` — the combined `K × W` action on `Q ⧸ Z(Q)`
+  (the two actions commute because `W = C_V(K)`).
+* `Hypothesis.isAInvariant_quotientKW_eq_bot_or_top` — irreducibility of that
+  action.
+* `Hypothesis.exists_field_quotient_of_orderThree` — the field `E` with
+  `|E| = q²` over which `Q ⧸ Z(Q)` is a line, together with the scalar
+  realization `μ : K × W →* Eˣ` of the action.
+-/
+
+set_option autoImplicit false
+
+namespace OddOrder.Peterfalvi.Appendices.Suzuki
+
+open OddOrder.GroupTheory
+open OddOrder.GroupTheory.Suzuki2Group
+open OddOrder.Isaacs.Ch03
+open OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom)
+
+namespace Hypothesis
+
+universe uG uΩ
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  (hyp : Hypothesis G Ω)
+
+/-! ## The combined `K × W` action on the central quotient -/
+
+/-- The action of `W` on the central quotient `Q ⧸ Z(Q)` induced by conjugation.
+(The centre is characteristic, so no fixed-point information is needed to induce
+the action; that `W` fixes `Z(Q) = Q₀` *pointwise* is the extra input used by the
+moved-summand engine, see `quotientWHom_eq_quotientCongr`.) -/
+@[reducible] noncomputable def quotientWHom :
+    ↥hyp.W →* MulAut (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
+  quotientMulAutHom (IsAInvariant.of_characteristic hyp.conjQByW)
+
+/-- The action of the actual `K`-actor on the central quotient.  Kept reducible
+so that the `LemmaFiveSetup` fields and the moved-summand engine — both phrased
+with the raw `quotientMulAutHom` — unify with it without an explicit rewrite. -/
+@[reducible] noncomputable def quotientKHom :
+    ↥hyp.actualKActor →* MulAut (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
+  quotientMulAutHom (IsAInvariant.of_characteristic hyp.actualKActor.subtype)
+
+@[simp] theorem quotientWHom_apply_mk (v : ↥hyp.W) (x : ↥hyp.Q) :
+    hyp.quotientWHom v (QuotientGroup.mk x) =
+      QuotientGroup.mk (hyp.conjQByW v x) := rfl
+
+@[simp] theorem quotientKHom_apply_mk (k : ↥hyp.actualKActor) (x : ↥hyp.Q) :
+    hyp.quotientKHom k (QuotientGroup.mk x) =
+      QuotientGroup.mk (hyp.actualKActor.subtype k x) := rfl
+
+/-- On the central quotient the induced `W`-action agrees with the
+`Suzuki2Groups.quotientCongr` form required by the moved-summand engine.  Both
+are `QuotientGroup.congr` applied to the same automorphism, so this is `rfl`
+(the differing hypotheses are proofs of propositions). -/
+theorem quotientWHom_eq_quotientCongr (v : ↥hyp.W)
+    (hfix : ∀ z ∈ Subgroup.center hyp.Q, hyp.conjQByW v z = z) :
+    hyp.quotientWHom v = Suzuki2Groups.quotientCongr (hyp.conjQByW v) hfix := rfl
+
+/-- The `K`- and `W`-actions on `Q ⧸ Z(Q)` commute: `W = C_V(K)` centralizes `K`
+inside `G`, so the two conjugation automorphisms of `Q` commute
+(`conjQByW_commute_actualKActor`) and the property descends to the quotient. -/
+theorem commute_quotientKHom_quotientWHom (k : ↥hyp.actualKActor) (v : ↥hyp.W) :
+    Commute (hyp.quotientKHom k) (hyp.quotientWHom v) := by
+  have key : hyp.quotientKHom k * hyp.quotientWHom v
+      = hyp.quotientWHom v * hyp.quotientKHom k := by
+    refine MulEquiv.ext fun q => ?_
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
+    have hx : (hyp.actualKActor.subtype k * hyp.conjQByW v) x
+        = (hyp.conjQByW v * hyp.actualKActor.subtype k) x :=
+      DFunLike.congr_fun (hyp.conjQByW_commute_actualKActor v k).eq x
+    exact congrArg
+      (fun y : ↥hyp.Q => (QuotientGroup.mk y : ↥hyp.Q ⧸ Subgroup.center hyp.Q)) hx
+  exact key
+
+/-- **The combined `K × W` action on `Q ⧸ Z(Q)`** (Peterfalvi Part II, Ch. III
+§3, p. 120: the group called `KW` there).  Taking the *direct product* of the two
+cyclic actors rather than their product inside `MulAut` keeps the group
+commutative, which is what Appendix I Proposition 2 requires; the two actions do
+commute, so this is a homomorphism. -/
+noncomputable def quotientKWHom :
+    ↥hyp.actualKActor × ↥hyp.W →*
+      MulAut (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
+  MonoidHom.noncommCoprod hyp.quotientKHom hyp.quotientWHom
+    hyp.commute_quotientKHom_quotientWHom
+
+theorem quotientKWHom_apply (kv : ↥hyp.actualKActor × ↥hyp.W) :
+    hyp.quotientKWHom kv = hyp.quotientKHom kv.1 * hyp.quotientWHom kv.2 :=
+  rfl
+
+/-- A `KW`-invariant subgroup of the quotient is `K`-invariant. -/
+theorem isAInvariant_quotientKHom_of_quotientKW
+    {U : Subgroup (↥hyp.Q ⧸ Subgroup.center hyp.Q)}
+    (hU : IsAInvariant hyp.quotientKWHom U) :
+    IsAInvariant hyp.quotientKHom U := by
+  intro k
+  have h := hU (k, 1)
+  rwa [hyp.quotientKWHom_apply, map_one, mul_one] at h
+
+/-- A `KW`-invariant subgroup of the quotient is `W`-invariant. -/
+theorem isAInvariant_quotientWHom_of_quotientKW
+    {U : Subgroup (↥hyp.Q ⧸ Subgroup.center hyp.Q)}
+    (hU : IsAInvariant hyp.quotientKWHom U) :
+    IsAInvariant hyp.quotientWHom U := by
+  intro v
+  have h := hU (1, v)
+  rwa [hyp.quotientKWHom_apply, map_one, one_mul] at h
+
+/-! ## Irreducibility of the `KW`-action -/
+
+/-- `|Q ⧸ Z(Q)| = q²` when `|Q| = q³` and `|Z(Q)| = q`. -/
+theorem card_quotient_center_eq_sq {m : ℕ}
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
+    (hZcard : Nat.card ↥(Subgroup.center hyp.Q) = 2 ^ m) :
+    Nat.card (↥hyp.Q ⧸ Subgroup.center hyp.Q) = (2 ^ m) ^ 2 := by
+  have hpos : 0 < (2 : ℕ) ^ m := by positivity
+  have h := Subgroup.card_eq_card_quotient_mul_card_subgroup
+    (Subgroup.center hyp.Q)
+  rw [hZcard, hcardQ, hQ0card] at h
+  refine Nat.eq_of_mul_eq_mul_right hpos ?_
+  rw [← h]
+  ring
+
+/-- **Irreducibility of the `KW`-action on `S/Q₀`** (Peterfalvi Part II, Ch. III
+§3, p. 120).  Under hypothesis (C2) — in particular `W ≠ 1` — every
+`KW`-invariant subgroup of `Q ⧸ Z(Q)` is trivial or everything.
+
+`K` acts freely off the identity and has order `q − 1`, so an invariant subgroup
+has order a power of `q`; since `|Q ⧸ Z(Q)| = q²` the only remaining possibility
+is order exactly `q = |Z(Q)|`, and that is excluded by the moved-summand engine
+applied to a nonidentity element of `W`. -/
+theorem isAInvariant_quotientKW_eq_bot_or_top
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
+    (inductionHypothesis : TheoremAInductionBelow G Ω)
+    (s : hyp.LemmaFiveSetup m)
+    {w : G} (hw : w ∈ hyp.W) (hw1 : w ≠ 1)
+    (U : Subgroup (↥hyp.Q ⧸ Subgroup.center hyp.Q))
+    (hU : IsAInvariant hyp.quotientKWHom U) :
+    U = ⊥ ∨ U = ⊤ := by
+  classical
+  have hZcard : Nat.card ↥(Subgroup.center hyp.Q) = 2 ^ m := by
+    rw [s.centerEqQ0,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv,
+      hQ0card]
+  have hMcard : Nat.card (↥hyp.Q ⧸ Subgroup.center hyp.Q) = (2 ^ m) ^ 2 :=
+    hyp.card_quotient_center_eq_sq hQ0card hcardQ hZcard
+  -- `|U|` is a power of `q`
+  have hP2 : IsPGroup 2 (↥hyp.Q ⧸ Subgroup.center hyp.Q) := by
+    refine (IsPGroup.of_card (p := 2) (n := m * 3) ?_).to_quotient _
+    rw [hcardQ, hQ0card, ← pow_mul]
+  obtain ⟨j, hj⟩ :=
+    OddOrder.Higman.Suzuki2Groups.card_invariant_eq_pow_of_fixedPointFree
+      hP2 hm s.freeQuotient s.cardActor
+      (hyp.isAInvariant_quotientKHom_of_quotientKW hU)
+  -- `|U| ∣ q²` bounds the exponent
+  have hdvd : Nat.card ↥U ∣ (2 ^ m) ^ 2 := hMcard ▸ Subgroup.card_subgroup_dvd_card U
+  have hq1 : 1 < (2 : ℕ) ^ m := Nat.one_lt_pow hm (by norm_num)
+  have hjle : j ≤ 2 :=
+    (Nat.pow_dvd_pow_iff_le_right hq1).mp (hj ▸ hdvd)
+  interval_cases j
+  · -- `|U| = 1`
+    left
+    rw [pow_zero] at hj
+    exact Subgroup.eq_bot_of_card_eq U hj
+  · -- `|U| = q = |Z(Q)|`: excluded by the moved-summand engine
+    exfalso
+    rw [pow_one] at hj
+    obtain ⟨hω1, hωodd, -, -, hωfix⟩ :=
+      hyp.conjQByW_omega_facts hw hw1 hst hm hQ0card hcardQ inductionHypothesis
+        s.centerEqQ0
+    have hWfix : ∀ z ∈ Subgroup.center hyp.Q,
+        hyp.conjQByW ⟨w, hw⟩ z = z :=
+      hyp.conjQByW_fixes_center s.centerEqQ0 ⟨w, hw⟩
+    have hne := Suzuki2Groups.map_quotientCongr_ne_of_fixedPoints_le
+      (le_refl _) s.centerSq s.sqMem s.invMem
+      (hyp.isAInvariant_quotientKHom_of_quotientKW hU) (by rw [hj, hZcard])
+      s.transCenter s.centerNeBot
+      (hyp.conjQByW ⟨w, hw⟩) hω1 hωodd hWfix hωfix
+    apply hne
+    rw [← hyp.quotientWHom_eq_quotientCongr ⟨w, hw⟩ hWfix]
+    exact hyp.isAInvariant_quotientWHom_of_quotientKW hU ⟨w, hw⟩
+  · -- `|U| = q²`: everything
+    right
+    exact Subgroup.eq_top_of_card_eq U (by rw [hj, hMcard])
+
+/-! ## The field `E = 𝐅_{q²}` -/
+
+/-- **`S/Q₀` is a line over `E = 𝐅_{q²}`, and `KW` acts by scalars**
+(Peterfalvi Part II, Ch. III §3, p. 120, first step of the Proposition).
+
+Appendix I Proposition 2 (`Huppert.exists_field_semilinear_with_scalar`) applied
+to the irreducible `K × W`-action of `isAInvariant_quotientKW_eq_bot_or_top`: the
+endomorphism algebra of the central quotient is a field `E` with
+`|E| = |S/Q₀| = q²`, over which `S/Q₀` is one-dimensional, and every element of
+`KW` acts as multiplication by a unit of `E`.
+
+This is the book's identification of `(S/Q₀) ⋊ KW` with `E ⋊ K₁W₁`.  The book
+reaches it by splitting on `θ = 1` / `θ ≠ 1` and invoking Appendix III
+Propositions 1 and 2 to exhibit `ω ∈ E^×` with `x^w = ω x`; here the field comes
+out of the irreducibility of the *whole* of `KW` in one step, and `ω = μ (1, w)`.
+
+Stated with the additive coordinate `α : Additive (S/Q₀) ≃+ E` of p. 119 rather
+than with a `Module E` structure on the quotient: the commutativity of `S/Q₀` is
+a *theorem* here (it comes from `LemmaFiveSetup`), so no `CommGroup` instance on
+the quotient is available in the statement, and `AddEquiv` needs none. -/
+theorem exists_field_quotient_of_orderThree
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hQsuz : IsSuzuki2Group ↥hyp.Q)
+    {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
+    (inductionHypothesis : TheoremAInductionBelow G Ω)
+    (s : hyp.LemmaFiveSetup m)
+    {w : G} (hw : w ∈ hyp.W) (hw1 : w ≠ 1) :
+    ∃ (E : Type uG) (_ : Field E) (_ : Finite E)
+      (μ : ↥hyp.actualKActor × ↥hyp.W →* Eˣ)
+      (α : Additive (↥hyp.Q ⧸ Subgroup.center hyp.Q) ≃+ E),
+      Nat.card E = (2 ^ m) ^ 2 ∧
+      ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+        (y : ↥hyp.Q ⧸ Subgroup.center hyp.Q),
+        α (Additive.ofMul (hyp.quotientKWHom kv y))
+          = (μ kv : E) * α (Additive.ofMul y) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hZcard : Nat.card ↥(Subgroup.center hyp.Q) = 2 ^ m := by
+    rw [s.centerEqQ0,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv,
+      hQ0card]
+  have hMcard : Nat.card (↥hyp.Q ⧸ Subgroup.center hyp.Q) = (2 ^ m) ^ 2 :=
+    hyp.card_quotient_center_eq_sq hQ0card hcardQ hZcard
+  have hirr : ∀ U : Subgroup (↥hyp.Q ⧸ Subgroup.center hyp.Q),
+      IsAInvariant hyp.quotientKWHom U → U = ⊥ ∨ U = ⊤ := fun U hU =>
+    hyp.isAInvariant_quotientKW_eq_bot_or_top hst hm hQ0card hcardQ
+      inductionHypothesis s hw hw1 U hU
+  have hEA : IsElementaryAbelian 2 (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
+    s.isplit.split.quotientEA
+  haveI hWcyc : IsCyclic ↥hyp.W :=
+    (hyp.isCyclic_W_and_card_dvd_of_orderThree hst hQsuz hm hQ0card hcardQ
+      inductionHypothesis).1
+  letI : CommGroup (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
+    { (inferInstance : Group (↥hyp.Q ⧸ Subgroup.center hyp.Q)) with
+      mul_comm := hEA.comm }
+  haveI : Nontrivial (↥hyp.Q ⧸ Subgroup.center hyp.Q) := by
+    refine Finite.one_lt_card_iff_nontrivial.mp ?_
+    rw [hMcard]
+    calc 1 < 2 ^ m := Nat.one_lt_pow hm (by norm_num)
+      _ ≤ (2 ^ m) ^ 2 := Nat.le_self_pow (by norm_num) _
+  letI : CommGroup ↥hyp.actualKActor := IsCyclic.commGroup
+  letI : CommGroup ↥hyp.W := IsCyclic.commGroup
+  obtain ⟨E, instE, instFin, μ, α, hcardE, hμ⟩ :=
+    Huppert.exists_field_coordinate_of_irreducible hEA hyp.quotientKWHom hirr
+  exact ⟨E, instE, instFin, μ, α, hcardE.trans hMcard, hμ⟩
+
+end Hypothesis
+
+end OddOrder.Peterfalvi.Appendices.Suzuki

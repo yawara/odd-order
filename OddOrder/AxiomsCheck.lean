@@ -294,6 +294,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFivePairing
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
+import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
@@ -362,7 +363,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 14400
+set_option linter.style.longFile 14600
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -14390,3 +14391,28 @@ on which `W` acts fixed-point-freely. -/
   OddOrder.Nat.pow_sub_one_dvd_pow_sub_one_iff
 #assert_only_allowed_axioms
   OddOrder.Nat.eq_zero_or_eq_or_eq_two_mul_of_two_pow_sub_one_dvd
+
+/-! **The field `E = 𝐅_{q²}` on `S/Q₀`** (issue 0167, 2026-07-30).
+`Peterfalvi/Appendices/Suzuki/QuotientKWField.lean` — the first step of the Ch. III §3
+Proposition (p. 120).
+
+`KW` acts *irreducibly* on `S/Q₀`: a `KW`-invariant subgroup is `K`-invariant, hence of order
+a power of `q` (`card_invariant_eq_pow_of_fixedPointFree`, now stated for an arbitrary actor
+homomorphism so that the induced action on `Q ⧸ Z(Q)` qualifies), hence of order `1`, `q` or
+`q²` because `|S/Q₀| = q²`; the middle case is killed by the moved-summand engine, which forbids
+a nonidentity element of `W` from stabilizing an invariant subgroup of order `|Z(Q)|`.
+
+Appendix I Proposition 2 then makes `S/Q₀` a line over a field of order `q²` on which the whole
+of `KW` acts by scalars — the book's `S/Q₀ ≅ E`, `KW ↪ E^×` — with no case split on `θ`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.exists_addEquiv_of_finrank_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Huppert.exists_field_coordinate_of_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.commute_quotientKHom_quotientWHom
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_quotient_center_eq_sq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isAInvariant_quotientKW_eq_bot_or_top
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_field_quotient_of_orderThree

@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.LengthThreeReduction
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.GroupTheory.FreeActionOrbitCount
+import OddOrder.Algebra.PowSubOneDvd
 import Mathlib.FieldTheory.Finite.GaloisField
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 import OddOrder.GroupTheory.RepresentationTheory.FrobeniusCoordinates
@@ -91,15 +92,20 @@ theorem fixedPointFree_of_actsRegularlyOnInvolutions
 /-! ## Orbit counting on invariant subgroups -/
 
 /-- **Free orbit counting**: the order of a fixed-point-free actor divides
-`|T| - 1` for every invariant subgroup `T`. -/
+`|T| - 1` for every invariant subgroup `T`.
+
+Stated for an arbitrary actor homomorphism `φ : A →* MulAut P` rather than only
+for the inclusion of a subgroup of `MulAut P`: the actors that arise on a
+quotient `P ⧸ Z` are induced homomorphisms (`IsAInvariant.quotientMulAutHom`),
+not subgroup inclusions. -/
 theorem card_dvd_card_sub_one_of_fixedPointFree
-    {K : Subgroup (MulAut P)}
-    (hfree : ∀ k : ↥K, k ≠ 1 → ∀ x : P, (k : MulAut P) x = x → x = 1)
-    {T : Subgroup P} (hT : IsAInvariant K.subtype T) :
-    Nat.card ↥K ∣ Nat.card ↥T - 1 := by
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut P}
+    (hfree : ∀ k : A, k ≠ 1 → ∀ x : P, φ k x = x → x = 1)
+    {T : Subgroup P} (hT : IsAInvariant φ T) :
+    Nat.card A ∣ Nat.card ↥T - 1 := by
   classical
   letI : Fintype ↥T := Fintype.ofFinite ↥T
-  letI : MulAction ↥K {t : ↥T // t ≠ 1} :=
+  letI : MulAction A {t : ↥T // t ≠ 1} :=
     { smul := fun k t => ⟨hT.restrict k t.1, fun h => t.2 (by
         have := congrArg (hT.restrict k).symm h
         rwa [MulEquiv.symm_apply_apply, map_one] at this)⟩
@@ -117,55 +123,25 @@ theorem card_dvd_card_sub_one_of_fixedPointFree
   intro k hk t ht
   apply t.2
   have hfix : hT.restrict k t.1 = t.1 := congrArg Subtype.val ht
-  have hfixP : (k : MulAut P) (t.1 : P) = (t.1 : P) := by
+  have hfixP : φ k (t.1 : P) = (t.1 : P) := by
     have := congrArg Subtype.val hfix
     rwa [IsAInvariant.restrict_apply_val] at this
   exact Subtype.ext (hfree k hk (t.1 : P) hfixP)
 
-/-- `2^n - 1 ∣ 2^k - 1` forces `n ∣ k`. -/
+/-- `2^n - 1 ∣ 2^k - 1` forces `n ∣ k` (the base-`2` case of
+`OddOrder.Nat.pow_sub_one_dvd_pow_sub_one_iff`). -/
 theorem dvd_of_two_pow_sub_one_dvd {n k : ℕ} (hn : n ≠ 0)
-    (h : 2 ^ n - 1 ∣ 2 ^ k - 1) : n ∣ k := by
-  have hone : (1 : ℕ) ≤ 2 ^ n := Nat.one_le_two_pow
-  have h1n : (1 : ℕ) ≡ 2 ^ n [MOD 2 ^ n - 1] :=
-    (Nat.modEq_iff_dvd' hone).mpr dvd_rfl
-  have hpow : (1 : ℕ) ≡ 2 ^ (n * (k / n)) [MOD 2 ^ n - 1] := by
-    have := h1n.pow (k / n)
-    rwa [one_pow, ← pow_mul] at this
-  have hsplit : 2 ^ (k % n) ≡ 2 ^ k [MOD 2 ^ n - 1] := by
-    calc 2 ^ (k % n) = 1 * 2 ^ (k % n) := (one_mul _).symm
-      _ ≡ 2 ^ (n * (k / n)) * 2 ^ (k % n) [MOD 2 ^ n - 1] :=
-        hpow.mul_right _
-      _ = 2 ^ (n * (k / n) + k % n) := by rw [← pow_add]
-      _ = 2 ^ k := by rw [Nat.div_add_mod]
-  have hk1 : (1 : ℕ) ≡ 2 ^ k [MOD 2 ^ n - 1] :=
-    (Nat.modEq_iff_dvd' Nat.one_le_two_pow).mpr h
-  have hmod : (2 : ℕ) ^ (k % n) ≡ 1 [MOD 2 ^ n - 1] :=
-    hsplit.trans hk1.symm
-  have hdvd : 2 ^ n - 1 ∣ 2 ^ (k % n) - 1 :=
-    (Nat.modEq_iff_dvd' Nat.one_le_two_pow).mp hmod.symm
-  have hlt : 2 ^ (k % n) - 1 < 2 ^ n - 1 := by
-    have hpowlt : (2 : ℕ) ^ (k % n) < 2 ^ n :=
-      (Nat.pow_lt_pow_iff_right (by norm_num : (1 : ℕ) < 2)).mpr
-        (Nat.mod_lt k (Nat.pos_of_ne_zero hn))
-    have hge1 : (1 : ℕ) ≤ 2 ^ (k % n) := Nat.one_le_two_pow
-    omega
-  have hzero : 2 ^ (k % n) - 1 = 0 := Nat.eq_zero_of_dvd_of_lt hdvd hlt
-  have hge : (1 : ℕ) ≤ 2 ^ (k % n) := Nat.one_le_two_pow
-  have h2 : (2 : ℕ) ^ (k % n) = 1 :=
-    le_antisymm (Nat.sub_eq_zero_iff_le.mp hzero) hge
-  have hkn : k % n = 0 := by
-    rcases Nat.pow_eq_one.mp h2 with h | h
-    · norm_num at h
-    · exact h
-  exact Nat.dvd_of_mod_eq_zero hkn
+    (h : 2 ^ n - 1 ∣ 2 ^ k - 1) : n ∣ k :=
+  (OddOrder.Nat.pow_sub_one_dvd_pow_sub_one_iff (le_refl 2) hn).mp h
 
 /-- **Every invariant subgroup has order a power of `q = 2^n`** when the
 actor has order `2^n - 1` and acts fixed-point-freely. -/
 theorem card_invariant_eq_pow_of_fixedPointFree
-    (hP2 : IsPGroup 2 P) {K : Subgroup (MulAut P)} {n : ℕ} (hn : n ≠ 0)
-    (hfree : ∀ k : ↥K, k ≠ 1 → ∀ x : P, (k : MulAut P) x = x → x = 1)
-    (hKcard : Nat.card ↥K = 2 ^ n - 1)
-    {T : Subgroup P} (hT : IsAInvariant K.subtype T) :
+    (hP2 : IsPGroup 2 P) {A : Type*} [Group A] [Finite A] {φ : A →* MulAut P}
+    {n : ℕ} (hn : n ≠ 0)
+    (hfree : ∀ k : A, k ≠ 1 → ∀ x : P, φ k x = x → x = 1)
+    (hKcard : Nat.card A = 2 ^ n - 1)
+    {T : Subgroup P} (hT : IsAInvariant φ T) :
     ∃ j : ℕ, Nat.card ↥T = (2 ^ n) ^ j := by
   obtain ⟨m, hm⟩ := (hP2.to_subgroup T).exists_card_eq
   have hdvd : 2 ^ n - 1 ∣ 2 ^ m - 1 := by

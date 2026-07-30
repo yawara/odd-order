@@ -739,6 +739,47 @@ theorem exists_field_scalar_realization {p : ℕ} [Fact p.Prime]
   exact ⟨F, instF, instMod, instFin, hdim, hcardF, MulEquiv.ofBijective μ₀ hμbij,
     fun t y => hμ₀' t (Additive.toMul y)⟩
 
+/-- **A line is its own field of scalars.**  If `Additive E` is a one-dimensional
+`F`-space, a choice of basis vector gives an additive isomorphism
+`α : Additive E ≃+ F` transporting the scalar action to multiplication in `F`. -/
+theorem exists_addEquiv_of_finrank_eq_one {F : Type*} [Field F] {E : Type u}
+    [CommGroup E] [Module F (Additive E)]
+    (hdim : Module.finrank F (Additive E) = 1) :
+    ∃ α : Additive E ≃+ F, ∀ (a : F) (x : Additive E), α (a • x) = a * α x := by
+  obtain ⟨e⟩ :=
+    Module.nonempty_linearEquiv_of_finrank_eq_one (R := F) (M := Additive E) hdim
+  refine ⟨e.symm.toAddEquiv, fun a x => ?_⟩
+  change e.symm (a • x) = a * e.symm x
+  simp [smul_eq_mul]
+
+/-- **Coordinates for the scalar realization, irreducible case.**  Combining
+Appendix I Proposition 2(a)+(b) with `exists_addEquiv_of_finrank_eq_one`: an
+irreducible action of a commutative `T` on the elementary abelian `E` turns `E`
+itself into a finite field `F` of the same order, with each `t ∈ T` acting as
+multiplication by a unit `μ t`.
+
+`exists_field_coordinate_realization` is the refinement in which the action is
+moreover *regular*, so that `μ` is an isomorphism onto `Fˣ`. -/
+theorem exists_field_coordinate_of_irreducible {p : ℕ} [Fact p.Prime]
+    {E : Type u} [CommGroup E] [Finite E] [Nontrivial E]
+    (hE : IsElementaryAbelian p E) {T : Type*} [CommGroup T] [Finite T]
+    (ψ : T →* MulAut E)
+    (hirr : ∀ U : Subgroup E, IsAInvariant ψ U → U = ⊥ ∨ U = ⊤) :
+    ∃ (F : Type u) (_ : Field F) (_ : Finite F) (μ : T →* Fˣ) (α : Additive E ≃+ F),
+      Nat.card F = Nat.card E ∧
+      ∀ (t : T) (y : E), α (Additive.ofMul ((ψ t) y))
+        = ((μ t : Fˣ) : F) * α (Additive.ofMul y) := by
+  obtain ⟨F, instF, instMod, instFin, hdim, hcardF, ⟨μ, hμ⟩, -⟩ :=
+    exists_field_semilinear_with_scalar hE ψ hirr
+  letI : Field F := instF
+  letI : Module F (Additive E) := instMod
+  letI : Finite F := instFin
+  obtain ⟨α, hα⟩ := exists_addEquiv_of_finrank_eq_one (F := F) (E := E) hdim
+  refine ⟨F, instF, instFin, μ, α, hcardF, fun t y => ?_⟩
+  have hval : ((μ t : Fˣ) : F) • (Additive.ofMul y)
+      = Additive.ofMul ((ψ t) y) := hμ t (Additive.ofMul y)
+  rw [← hval, hα]
+
 /-- **Coordinates for the scalar realization.**  With `E` a line over `F`, a
 choice of basis vector turns `E` into `F` itself: an additive isomorphism
 `α : E → F` under which the action of `t ∈ T` is multiplication by `μ t`.
@@ -759,16 +800,11 @@ theorem exists_field_coordinate_realization {p : ℕ} [Fact p.Prime]
   letI : Field F := instF
   letI : Module F (Additive E) := instMod
   letI : Finite F := instFin
-  obtain ⟨e⟩ := Module.nonempty_linearEquiv_of_finrank_eq_one (R := F) (M := Additive E) hdim
-  refine ⟨F, instF, instFin, μ, e.symm.toAddEquiv, hcardF, fun t y => ?_⟩
-  have hlin : ∀ (a : F) (x : Additive E), e.symm (a • x) = a * e.symm x := by
-    intro a x
-    simp [smul_eq_mul]
+  obtain ⟨α, hα⟩ := exists_addEquiv_of_finrank_eq_one (F := F) (E := E) hdim
+  refine ⟨F, instF, instFin, μ, α, hcardF, fun t y => ?_⟩
   have hval : ((μ t : Fˣ) : F) • (Additive.ofMul y)
-      = Additive.ofMul ((ψ t) y) := hμ t y
-  change e.symm (Additive.ofMul ((ψ t) y))
-      = ((μ t : Fˣ) : F) * e.symm (Additive.ofMul y)
-  rw [← hval, hlin]
+      = Additive.ofMul ((ψ t) y) := hμ t (Additive.ofMul y)
+  rw [← hval, hα]
 
 end Prop2Regular
 

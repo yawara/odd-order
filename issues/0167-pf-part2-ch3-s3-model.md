@@ -90,7 +90,7 @@ Appendix III Definition 3 により `S` は中心拡大
 ## やること (段ごとに leaf を切る想定)
 
 - [x] 上表の ❓ を実測 (2026-07-29: 全部 ✅ だった)
-- [ ] 段 (1): `S/Q₀ ≅ E` と `w` のスカラー化
+- [x] 段 (1): `S/Q₀ ≅ E` と `w` のスカラー化 (2026-07-30, `QuotientKWField.lean`)
 - [ ] 段 (2): `σ` の存在
 - [ ] 段 (3): `S ≅ S₁`
 - [ ] 段 (4): 作用の共役化 (Zassenhaus)
@@ -121,12 +121,52 @@ Appendix III Definition 3 により `S` は中心拡大
 で `q−1 ∣ |U| − 1`)。よって**真の非自明 `K`-不変部分群 = 書籍の「`K`-部分群」(位数 `q`)** となり、
 `W` がその上で固定点自由 (Ch. I §3 Lemma 5 の内部事実 `hprojfree`) ならば `KW` は既約に作用する。
 
-### 段 (1) の残り (次の一手)
+## 進捗 (2026-07-30) — 段 (1) 完了、書籍の場合分けは不要だった
 
-1. **`KW` の `S/Q₀` 上の既約性** — 上の数え上げ + `W` の固定点自由性。
-   ⚠ `hprojfree` は `WCyclicDivides.lean` の `isCyclic_W_and_card_dvd_of_orderThree` 内部の
-   `have` (l.246) に埋まっている。`Q/Z(Q) ≃ 𝔽_q × 𝔽_q` の設定ごと**再利用可能な補題に切り出す**
-   のが次の作業。
-2. `Huppert.exists_field_of_irreducible` を `T := KW`, `E := S/Q₀` に当てて
-   **`E = 𝔽_{q²}`** と `S/Q₀` の 1 次元性を得る (= 書籍の `S/Q₀ ≅ E`)。
-3. `K ↦ F^×`, `W ↦ W₁ ≤ {x : x^{1+q} = 1}` の同定。
+`OddOrder/Peterfalvi/Appendices/Suzuki/QuotientKWField.lean` (新 leaf)。
+
+**設計上の発見**: 書籍は `θ = 1` / `θ ≠ 1` で場合分けし、Appendix III Prop 1/2 で
+`ω ∈ E^×` を作る。しかし **`KW` 全体の既約性**を先に出すと、Appendix I Prop 2
+(`Huppert.exists_field_semilinear_with_scalar`) が一発で体 `E` (位数 `q²`) を吐き、
+`ω = μ (1, w)` として自動的に得られる。**`θ` の場合分けは要らない**。
+
+* `Hypothesis.quotientKHom` / `quotientWHom` — 中心商 `Q ⧸ Z(Q)` 上の `K` / `W` 作用
+  (どちらも `quotientMulAutHom`; 中心は characteristic なので誘導は無条件)。
+  `@[reducible]` にしてあるのは `LemmaFiveSetup` の各フィールドと moved-summand engine が
+  生の `quotientMulAutHom` で書かれているため (書換なしで unify させる)。
+* `Hypothesis.quotientKWHom` — `MonoidHom.noncommCoprod` による `K × W` の結合作用。
+  **直積**を取るのが要点: `W = C_V(K)` ゆえ 2 つの作用は可換
+  (`commute_quotientKHom_quotientWHom`) で、直積なら群自体が可換 = Appendix I Prop 2 の
+  `[CommGroup T]` を満たす (`MulAut` 内での積を取ると可換性が言えない)。
+* `Hypothesis.isAInvariant_quotientKW_eq_bot_or_top` — **既約性**。`KW`-不変 ⟹ `K`-不変 ⟹
+  位数は `q` の冪 (`card_invariant_eq_pow_of_fixedPointFree`) ⟹ `|S/Q₀| = q²` から
+  `1`, `q`, `q²` のいずれか ⟹ 中間の `q = |Z(Q)|` は moved-summand engine
+  (`map_quotientCongr_ne_of_fixedPoints_le`) が `W ∋ w ≠ 1` で潰す。
+* `Hypothesis.exists_field_quotient_of_orderThree` — 体 `E`, `|E| = q²`,
+  座標 `α : Additive (S/Q₀) ≃+ E` (書籍 p.119 の `α`)、`μ : K × W →* E^×` で
+  作用が `E` 内の乗算になる。
+
+### 副産物 (一般化 / dedup)
+
+* `card_dvd_card_sub_one_of_fixedPointFree` と `card_invariant_eq_pow_of_fixedPointFree`
+  (`Higman/.../XiLengthFromCard.lean`) を **`K : Subgroup (MulAut P)` から任意の
+  `φ : A →* MulAut P` へ一般化**。商 `P ⧸ Z` 上の actor は誘導準同型で subgroup 包含では
+  ないので、これが無いと当てられなかった。
+* `dvd_of_two_pow_sub_one_dvd` (同ファイル、35 行の自己完結証明) を
+  `OddOrder.Nat.pow_sub_one_dvd_pow_sub_one_iff` の base-2 特殊化に置換 (dedup)。
+* `Huppert.exists_addEquiv_of_finrank_eq_one` — 「1 次元空間はその係数体そのもの」の
+  座標化ステップを切り出し、`exists_field_coordinate_realization` と新規
+  `exists_field_coordinate_of_irreducible` の両方で共有。
+* `Huppert.exists_field_coordinate_of_irreducible` — 既存の
+  `exists_field_coordinate_realization` (作用が regular = `|T| = |E| − 1` を要求) の
+  **既約版**。`|KW| = (q−1)|W|` は `|W| ∣ q+1` しか分からないので regular 版は使えない。
+
+### 段 (1) の残り → 段 (2) へ
+
+* `K₁ = F^×` / `W₁ ≤ {x : x^{1+q} = 1}` の明示: `|K| = q−1`, `|W| ∣ q+1` と `μ` が準同型
+  なので `μ(k,1)^q = μ(k,1)` (= `𝔽_q` に落ちる) と `μ(1,v)^{q+1} = 1` は即出る。
+  `μ|_K` の単射性も `s.freeQuotient` から即。**次の commit で本定理の結論に足す**。
+* `μ` 全体の単射性 (= `K ∩ W = 1` の像版) は `W` の商上の忠実性が必要で、
+  monolith 内の `hfaith` (`WCyclicDivides.lean`) を切り出す作業になる。下流が要求したら着手。
+* 段 (2) `σ` の存在は Appendix III Lemma 2(c) +
+  `SemilinearFieldAut` / `QuadraticMapCoordinates` (issue 0148) を `E` に当てる。
