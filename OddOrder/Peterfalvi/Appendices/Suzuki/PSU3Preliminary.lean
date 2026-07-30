@@ -896,6 +896,65 @@ theorem not_mem_K_of_f_eq_conj_self (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   rw [hxy] at heq
   exact hyp.f_ne_conj_of_not_mem_Q0 H hC2 hωyQ hωyQ0 haD heq
 
+/-- **The sharpened bound for `ω' = ω`**: at most `|V| − 1` elements `x ∈ Q₀`
+satisfy `f(ω x) = (ω y)^a`.
+
+Same injection into `D/K` as `ncard_le_card_V_of_f_eq_conj`, but now
+`not_mem_K_of_f_eq_conj_self` says no `a` lies in `K`, so the image avoids the
+identity coset.  Under `V = W` this is the book's `m₁ ≤ m − 1`. -/
+theorem ncard_le_card_V_sub_one_of_f_eq_conj_self
+    (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) :
+    {x : G | x ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+        f (ω * x) = a⁻¹ * (ω * y) * a}.ncard ≤ Nat.card ↥hyp.V - 1 := by
+  classical
+  set S : Set G := {x : G | x ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+    f (ω * x) = a⁻¹ * (ω * y) * a} with hSdef
+  have key : ∀ x ∈ S, ∃ a, a ∈ hyp.D ∧ ∃ b, b ∈ hyp.Q0 ∧
+      f (ω * x) = a⁻¹ * (ω * b) * a := by
+    rintro x ⟨-, b, hb, a, ha, heq⟩
+    exact ⟨a, ha, b, hb, heq⟩
+  choose! A hAD B hBQ0 hAeq using key
+  set A' : G → ↥hyp.D := fun x => if h : A x ∈ hyp.D then ⟨A x, h⟩ else 1 with hA'def
+  have hA'val : ∀ x ∈ S, (A' x : G) = A x := by
+    intro x hx
+    simp only [hA'def, dif_pos (hAD x hx)]
+  have hinj : Set.InjOn
+      (fun x => (QuotientGroup.mk (A' x) : ↥hyp.D ⧸ hyp.K.subgroupOf hyp.D)) S := by
+    intro x₁ hx₁ x₂ hx₂ hxy
+    have hmem : (A' x₁)⁻¹ * A' x₂ ∈ hyp.K.subgroupOf hyp.D :=
+      QuotientGroup.eq.mp hxy
+    rw [Subgroup.mem_subgroupOf] at hmem
+    have hmem' : (A x₁)⁻¹ * A x₂ ∈ hyp.K := by
+      have e : (((A' x₁)⁻¹ * A' x₂ : ↥hyp.D) : G) = (A x₁)⁻¹ * A x₂ := by
+        rw [Subgroup.coe_mul, Subgroup.coe_inv, hA'val x₁ hx₁, hA'val x₂ hx₂]
+      rwa [e] at hmem
+    exact hyp.eq_of_inv_mul_mem_K H hC2 hωQ hωQ0 hx₁.1 hx₂.1
+      (hBQ0 x₁ hx₁) (hBQ0 x₂ hx₂) (hAD x₁ hx₁) (hAD x₂ hx₂)
+      (hAeq x₁ hx₁) (hAeq x₂ hx₂) hmem'
+  -- the image avoids the identity coset
+  have hmaps : ∀ x ∈ S,
+      (QuotientGroup.mk (A' x) : ↥hyp.D ⧸ hyp.K.subgroupOf hyp.D)
+        ∈ (Set.univ \ {1} : Set (↥hyp.D ⧸ hyp.K.subgroupOf hyp.D)) := by
+    intro x hx
+    refine ⟨Set.mem_univ _, fun hc => ?_⟩
+    have hone : A' x ∈ hyp.K.subgroupOf hyp.D := by
+      have := QuotientGroup.eq_one_iff (A' x) |>.mp hc
+      exact this
+    rw [Subgroup.mem_subgroupOf, hA'val x hx] at hone
+    exact hyp.not_mem_K_of_f_eq_conj_self H hC2 hωQ hωQ0 hx.1 (hBQ0 x hx)
+      (hAD x hx) (hAeq x hx) hone
+  have hbound := Set.ncard_le_ncard_of_injOn
+    (fun x => (QuotientGroup.mk (A' x) : ↥hyp.D ⧸ hyp.K.subgroupOf hyp.D))
+    hmaps hinj (Set.toFinite _)
+  have hdiff : (Set.univ \ {1} :
+      Set (↥hyp.D ⧸ hyp.K.subgroupOf hyp.D)).ncard = Nat.card ↥hyp.V - 1 := by
+    rw [Set.ncard_sdiff_singleton_of_mem (Set.mem_univ _), Set.ncard_univ,
+      ← Subgroup.index_eq_card, hyp.index_K_subgroupOf_D]
+  rwa [hdiff] at hbound
+
 /-! ## Translating "lies in the orbit modulo `Q₀`"
 
 Step (8) speaks of `f(ω₁ x)` lying, *modulo `Q₀`*, in the `KW`-orbit of `ω_i`.  The
