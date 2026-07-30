@@ -652,6 +652,23 @@ theorem stepNine {m : ℕ} (M : hyp.QuotientFieldModel m)
   refine ⟨_, hω'Q, hω'Q0, _, hyQ0, ?_, hcoll⟩
   exact hyp.ne_one_of_f_eq_conj H hC2 hω'Q hω'Q0 hζD hcoll
 
+/-- **Step (15)'s conclusion, group side** (Peterfalvi Part II, p. 126).
+
+By (14) the last term of the sequence is `d_{m₁} = ζ^{m₁} (c_{m₁}/α)^{2τ}`, and step (15)
+identifies it with `ζ⁻¹`; rearranged, that says `κ · ζ^{m₁+1} = 1` where `κ ∈ K` is the
+image of `(c_{m₁}/α)^{2τ}` and `ζ^{m₁+1} ∈ W`.  Since `K ∩ W = 1`, both factors are
+trivial, and `ζ` having order `m` with `m₁ + 1 ≤ m` pins the length:
+
+* `m₁ + 1 = m`, the book's `m₁ = m − 1`;
+* `κ = 1`, which transported back through `K ↪ E^×` is the book's `c_{m₁} = α`
+  (`eq_one_of_frobNormEquiv_symm_sq_eq_one`). -/
+theorem stepFifteen_length {ζ κ : G} {m m₁ : ℕ} (hζ : ζ ∈ hyp.W) (hκK : κ ∈ hyp.K)
+    (hprod : κ * ζ ^ (m₁ + 1) = 1) (hord : orderOf ζ = m) (hle : m₁ + 1 ≤ m) :
+    m₁ + 1 = m ∧ κ = 1 := by
+  obtain ⟨hκ1, hζ1⟩ :=
+    hyp.eq_one_of_mul_eq_one_of_mem_K_of_mem_W hκK (hyp.W.pow_mem hζ _) hprod
+  exact ⟨eq_of_pow_succ_eq_one_of_le hord hζ1 hle, hκ1⟩
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
