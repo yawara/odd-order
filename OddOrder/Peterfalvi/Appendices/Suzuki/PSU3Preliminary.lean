@@ -845,6 +845,23 @@ theorem ncard_le_card_V_sub_one_of_f_eq_conj_self
       ← Subgroup.index_eq_card, hyp.index_K_subgroupOf_D]
   rwa [hdiff] at hbound
 
+/-- The witness attached to an element of the distinguished set, with the extra
+information that it avoids `K`.
+
+Step (9) needs the `D`-elements arising here to run over *all* nontrivial cosets of
+`K`; this packages the existence together with `not_mem_K_of_f_eq_conj_self` so the
+surjectivity argument has a single statement to work from. -/
+theorem exists_witness_not_mem_K (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    {x : G} (hxQ0 : x ∈ hyp.Q0)
+    (hmem : ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D, f (ω * x) = a⁻¹ * (ω * y) * a) :
+    ∃ a ∈ hyp.D, a ∉ hyp.K ∧ ∃ y ∈ hyp.Q0, f (ω * x) = a⁻¹ * (ω * y) * a := by
+  obtain ⟨y, hy, a, ha, heq⟩ := hmem
+  exact ⟨a, ha, hyp.not_mem_K_of_f_eq_conj_self H hC2 hωQ hωQ0 hxQ0 hy ha heq,
+    y, hy, heq⟩
+
 /-! ## Translating "lies in the orbit modulo `Q₀`"
 
 Step (8) speaks of `f(ω₁ x)` lying, *modulo `Q₀`*, in the `KW`-orbit of `ω_i`.  The
