@@ -665,6 +665,16 @@ twisted product では `inl w = ⟨0, w⟩`, `rightHom p = ofAdd p.quotient` な
 は**使えない** — あれは `N`/`K` が**全体 `G` の**補群である場合の降下で、こちらは
 `H` の中でだけ補群だから。上の 1 から直接組む。
 
+⚠ **同様に `Subgroup.mul_normal` / `normal_mul` も使えない** — どちらも `N` が
+**全体で**正規であることを要求するが、`U` を正規化するのは `A`・`B` だけで
+`Aut(S₁)` 全体ではない。代わりに 2026-07-31 に
+**`Subgroup.mul_eq_sup_of_le_normalizer`** を用意した
+(`CentralExtensionAutomorphisms.lean`): `K ≤ N(U)` なら `U·K` はすでに部分群なので
+`↑U * ↑K = ↑(U ⊔ K)`。これで step 1 の `mul_eq_univ` 側が組める。
+⚠ 実装上の罠 2 つ: `Subgroup.normalizer` は **`Set` を取る** (`U.normalizer` は
+不可、`Subgroup.normalizer (U : Set G)` と書く) / 集合の積は
+`open scoped Pointwise` が要る。
+
 その後 段 (5) (`s ↦ (0,1)` の正規化)。
 
 landing 済 (2026-07-31):
