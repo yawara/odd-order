@@ -96,20 +96,51 @@ created: 2026-07-31
 
 **⟹ §1 完了** (`OddOrder/GroupTheory/RankOneBNPair.lean`, 714 行, sorry 0)。
 
-**次 = §2 Preliminary Calculation (p. 123-124)**。Ch. III の (C1)/(C2) を
-再導入し `L = G`, `M = H` として `f` を決定していく。`Q ⋊ W` を Ch. III §3 の
-`S₁ ⋊ K₁W₁` (= 0167 の `exists_standardModel`) と同一視する。
-`pdftotext` 抽出の (1)-(6) は下記だが、**上付きが壊れているのでページ画像で
-確定してから着手する** (p.123-124 は未取得):
+### `⟨f,j⟩` の `Q^#/D` への作用 (p. 123 の注) — 完了
 
-* (1) `a ∈ A^#` に対し `f(s^a) = g(s^a) = s^{a⁻¹}`、`h(s^a) = a²` — (C2) の
-  `tst = s*s` と (H3)(H4) から
-* (2) `x = ω ∈ Q − Q₀`, `y = s^a` に (H6) を適用
-* (3) `x = s^a`, `y = ω` に (H6) を適用
-* (4) `f(ωx) = f(ω)y` (`ω ∈ Q−Q₀`, `x,y ∈ Q₀`) なら `ω = 1`
-* (5) `f(ω) = (ωy)^a` なら `y ≠ 1` かつ `a ∉ K` — `|D|` が奇数なので `j` は
-  `Q−Q₀` の `D`-軌道の集合上に不動点を持たない、が要点
-* (6) `f(ωx) = (f(ω)y)^a` (`x,y ∈ Q₀`, `y ≠ 1`, `a ∈ D`) なら `a ∈ K`
+* `dOrbitRel` (+ `refl`/`symm`/`trans`/`inv`) / `IsFGH.dOrbitRel_f` /
+  `IsFGH.dOrbitRel_fj_cube`。`j² = f² = (f∘j)³ = 1` が位数 6 の二面体群の提示。
+  `f` が降りるのは (H3) の捻れ `a ↦ a^t` が `D` 内に留まるから、
+  `(f∘j)³ = 1` は (H5) のずれ `x^{h(x)⁻¹}` が軌道上で見えないから。
+* §2 step (5) で「`|D|` 奇数 ⟹ `j` は軌道集合上に不動点なし」を `f` へ移すのに使う。
+
+### 仮説 (A1)-(A3) → `Setup` の橋渡し — 完了
+
+`OddOrder/Peterfalvi/Appendices/Suzuki/RankOneSetup.lean` (新 leaf)。
+
+⚠ **重要な発見**: Ch. IV §1 冒頭の設定は repo に既にある Part II の standing
+hypothesis **`Hypothesis G Ω` (p. 97, (A1)-(A3))** と逐語で同じ。よって
+`Setup` の 9 フィールドのうち 7 つは `Hypothesis` の公理そのもので、残り 2 つも
+既存資産で埋まる:
+* `fact` (`G − H` の一意分解 `H t Q`) = Ch. I §1 Prop 4 (a)
+  = 既存の `Hypothesis.existsUnique_canonicalForm`
+* `tconj` (`t x t ∉ H` for `x ∈ Q^#`) = `Q ∩ D = 1` (`t x t ∈ H` かつ `x ∈ H`
+  はちょうど `x ∈ D`)
+
+`Hypothesis.rankOneSetup` / `Hypothesis.exists_fgh` で **(H1)-(H6) と §1 の
+Lemma が全部 `G` で使える**。
+
+## §2 Preliminary Calculation (p. 123-124)
+
+⚠ **以下はページ画像 `references/peterfalvi/pages/peterfalvi-p123.png` で確定**。
+以前の `pdftotext` 転記は (1) の `a ∈ A^#`、(4) の結論 `ω = 1` など複数が誤り
+だった ([[pdftotext-drops-superscripts]])。
+
+(C2) より `tst = sts`。よって (H3) と (H4) から
+
+* **(1)** `a ∈ K` に対し `f(s^a) = g(s^a) = s^{a⁻¹}` かつ `h(s^a) = a²`
+* **(2)** `f(ω s^a) = f(f(ω) s^{a⁻¹})^{a⁻²} s^{a⁻¹}`  (`ω ∈ Q − Q₀`, `a ∈ K`)
+  — (H6) を `x = ω`, `y = s^a` に適用
+* **(3)** `f(ω s^a) = f(g(ω) s^{a⁻¹})^{h(ω)^t} f(ω)` — (H6) を `x = s^a`, `y = ω` に
+* **(4)** `f(ωx) = f(ω)y` (`ω ∈ Q−Q₀`, `x,y ∈ Q₀`) なら **`x = 1`**
+* **(5)** `f(ω) = (ωy)^a` (`ω ∈ Q−Q₀`, `y ∈ Q₀`, `a ∈ D`) なら `y ≠ 1` かつ `a ∉ K`
+  — `|D|` が奇数ゆえ `j` は `Q−Q₀` の `D`-軌道集合上に不動点を持たず、
+  `f` は誘導置換群の中で `j` と共役 (= 上記 p.123 の注) だから `f` も持たない
+* **(6)** `f(ωx) = (f(ω)y)^a` (`x,y ∈ Q₀`, `y ≠ 1`, `a ∈ D`) なら `a ∈ K`
+
+**着手前に要確認**: `s` (distinguished involution, Ch. I Prop 4(b))、`Q₀`、`K`、
+`A` が repo のどこにあるか。`s` は `CanonicalForm.lean` の Prop 4(b) にある見込み。
+`Q ⋊ KW` と Ch. III §3 の `S₁ ⋊ K₁W₁` (= 0167 `exists_standardModel`) の同一視も要る。
 
 ## 参照
 
