@@ -51,7 +51,8 @@ It comes out of `t s t = s t s` being *already* a canonical factorization
 * `Hypothesis.not_mem_KSet_of_f_mul_eq_conj` — step (6).
 * `Hypothesis.not_mem_mul_KSet_of_f_mul_eq_conj`, `Hypothesis.eq_of_inv_mul_mem_K` —
   step (7) and its counting form.
-* `Hypothesis.index_K_subgroupOf_D` — `|D : K| = |V|`, the bound behind step (8).
+* `Hypothesis.index_K_subgroupOf_D` — `|D : K| = |V|`.
+* `Hypothesis.ncard_le_card_V_of_f_eq_conj` — step (8)'s bound `m_i ≤ |V|`.
 -/
 
 set_option autoImplicit false
@@ -663,6 +664,51 @@ theorem eq_of_inv_mul_mem_K (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     rwa [hyp.coe_K] at h
   exact hyp.not_mem_mul_KSet_of_f_mul_eq_conj H hC2 hωQ hωQ0 hx₁ hx₂ hxne hy₁ hy₂
     ha₁ ha₂ heq₁ heq₂ hmem
+
+/-- **The bound behind step (8)**: for fixed `ω, ω' ∈ Q − Q₀`, at most `|D : K| = |V|`
+elements `x ∈ Q₀` satisfy `f(ω x) = (ω' y)^a` for some `y ∈ Q₀` and `a ∈ D`.
+
+Choosing such an `a` for each `x` and passing to its coset in `D/K` gives an injection
+by `eq_of_inv_mul_mem_K`, which is step (7).
+
+Under Chapter IV's standing hypothesis `V = W` this reads `≤ |W| = m`, the book's
+`m_i ≤ m`; the case `i = 1` sharpens it to `m − 1` via step (5). -/
+theorem ncard_le_card_V_of_f_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω ω' : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) :
+    {x : G | x ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+        f (ω * x) = a⁻¹ * (ω' * y) * a}.ncard ≤ Nat.card ↥hyp.V := by
+  classical
+  set S : Set G := {x : G | x ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+    f (ω * x) = a⁻¹ * (ω' * y) * a} with hSdef
+  have key : ∀ x ∈ S, ∃ a, a ∈ hyp.D ∧ ∃ b, b ∈ hyp.Q0 ∧
+      f (ω * x) = a⁻¹ * (ω' * b) * a := by
+    rintro x ⟨-, b, hb, a, ha, heq⟩
+    exact ⟨a, ha, b, hb, heq⟩
+  choose! A hAD B hBQ0 hAeq using key
+  -- lift the chosen `a` into `D`
+  set A' : G → ↥hyp.D := fun x => if h : A x ∈ hyp.D then ⟨A x, h⟩ else 1 with hA'def
+  have hA'val : ∀ x ∈ S, (A' x : G) = A x := by
+    intro x hx
+    simp only [hA'def, dif_pos (hAD x hx)]
+  have hinj : Set.InjOn
+      (fun x => (QuotientGroup.mk (A' x) : ↥hyp.D ⧸ hyp.K.subgroupOf hyp.D)) S := by
+    intro x₁ hx₁ x₂ hx₂ hxy
+    have hmem : (A' x₁)⁻¹ * A' x₂ ∈ hyp.K.subgroupOf hyp.D :=
+      QuotientGroup.eq.mp hxy
+    rw [Subgroup.mem_subgroupOf] at hmem
+    have hmem' : (A x₁)⁻¹ * A x₂ ∈ hyp.K := by
+      have e : (((A' x₁)⁻¹ * A' x₂ : ↥hyp.D) : G) = (A x₁)⁻¹ * A x₂ := by
+        rw [Subgroup.coe_mul, Subgroup.coe_inv, hA'val x₁ hx₁, hA'val x₂ hx₂]
+      rwa [e] at hmem
+    exact hyp.eq_of_inv_mul_mem_K H hC2 hωQ hωQ0 hx₁.1 hx₂.1
+      (hBQ0 x₁ hx₁) (hBQ0 x₂ hx₂) (hAD x₁ hx₁) (hAD x₂ hx₂)
+      (hAeq x₁ hx₁) (hAeq x₂ hx₂) hmem'
+  have hbound := Set.ncard_le_ncard_of_injOn
+    (fun x => (QuotientGroup.mk (A' x) : ↥hyp.D ⧸ hyp.K.subgroupOf hyp.D))
+    (fun _ _ => Set.mem_univ _) hinj Set.finite_univ
+  rwa [Set.ncard_univ, ← Subgroup.index_eq_card, hyp.index_K_subgroupOf_D] at hbound
 
 end Hypothesis
 
