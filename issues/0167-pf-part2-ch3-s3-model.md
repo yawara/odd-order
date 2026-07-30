@@ -567,11 +567,14 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
   `quotientWHom_eq_quotientCongr` (rfl) が橋になる。
   ⚠ 配置: `quotientWHom` は `QuotientKWField.lean` 定義なので、`WCyclicDivides.lean`
   には置けない (import 方向が逆)。
-* ⏳ 次: `Function.Injective M.mu` — `μ(k,1)` の位数は `q−1` を、`μ(1,v)` の位数は
-  `q+1` を割り、`gcd(q−1, q+1) = 1` (q 偶数ゆえ両方奇数) なので分離できる。
-  `μ(1,v) = 1` から `quotientWHom v = 1` (coord_act) → 上の忠実性で `v = 1`。
+* ✅ `Hypothesis.mu_injective` (2026-07-31, `QuotientKWField.lean`) —
+  **`μ` は `K × W` 上忠実**。2 成分は**位数で分離する**: `μ(k,1)` は部分体 `F` に
+  居るので位数が `q−1` を割り (`mu_K_frobFixed`)、`μ(1,v)` はノルム 1 なので `q+1` を
+  割る (`mu_W_normOne`)。`q` は偶数ゆえ `q∓1` は両方奇数で差が 2、したがって互いに素
+  ⟹ `μ(k,1)·μ(1,v) = 1` なら両因子が 1。`K` 成分は `mu_K_injective`、`W` 成分は
+  `μ(1,v)=1 ⟹ quotientWHom v = 1` (`coord_act`) と上の忠実性で潰れる。
 
-**次**: `M.mu` の単射性 → `A` (KW の `S` 上の共役作用の像) を `Φ` で `Aut S₁` へ移送 →
+**次**: `A` (KW の `S` 上の共役作用の像) を `Φ` で `Aut S₁` へ移送 →
 `U` = `inducingIdAuts` の設定と `UA = UB` → Zassenhaus で `A^u = B`。
 
 landing 済 (2026-07-31):

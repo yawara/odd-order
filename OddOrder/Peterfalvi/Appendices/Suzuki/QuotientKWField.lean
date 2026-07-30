@@ -446,6 +446,110 @@ theorem nonempty_quotientFieldModel_of_orderThree
            mu_W_normOne := hWnorm }⟩
 
 
+/-- **`μ` is faithful on `K × W`** (Peterfalvi Part II, Ch. III §3, p. 120: the
+identification of `K W` with `K₁ W₁ ≤ E^×` is an isomorphism).
+
+The two components separate by order: `μ(k,1)` lies in the subfield `F`, so its
+order divides `q − 1`, while `μ(1,v)` has norm one, so its order divides `q + 1`.
+As `q` is even, `q − 1` and `q + 1` are both odd and differ by `2`, hence are
+coprime — so a relation `μ(k,1) μ(1,v) = 1` forces both factors to be `1`.  The
+`K`-part is then killed by `mu_K_injective` and the `W`-part by
+`quotientWHom_injective`.
+
+Step (4) of Ch. III §3 needs this: it is what makes the image of `K W` in
+`Aut(S₁)` a complement to the automorphisms inducing the identity on both ends. -/
+theorem mu_injective
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card hyp.Q = Nat.card hyp.Q0 ^ 3)
+    (inductionHypothesis : TheoremAInductionBelow G Ω)
+    (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m) :
+    Function.Injective M.mu := by
+  classical
+  -- `q - 1` and `q + 1` are coprime
+  have h2 : 2 ≤ 2 ^ m := by
+    calc 2 = 2 ^ 1 := (pow_one 2).symm
+      _ ≤ 2 ^ m := Nat.pow_le_pow_right (by omega) (Nat.pos_of_ne_zero hm)
+  have hpow : 2 ∣ 2 ^ m := dvd_pow_self 2 hm
+  have hoddK : ¬ (2 ∣ (2 ^ m - 1)) := by
+    intro h
+    obtain ⟨a, ha⟩ := hpow
+    obtain ⟨b, hb⟩ := h
+    omega
+  have hcop : Nat.Coprime (2 ^ m - 1) (2 ^ m + 1) := by
+    have hdvd2 : Nat.gcd (2 ^ m - 1) (2 ^ m + 1) ∣ 2 := by
+      have hl := Nat.gcd_dvd_left (2 ^ m - 1) (2 ^ m + 1)
+      have hr := Nat.gcd_dvd_right (2 ^ m - 1) (2 ^ m + 1)
+      have hsub : Nat.gcd (2 ^ m - 1) (2 ^ m + 1) ∣ (2 ^ m + 1) - (2 ^ m - 1) :=
+        Nat.dvd_sub hr hl
+      have heq : (2 ^ m + 1) - (2 ^ m - 1) = 2 := by omega
+      rwa [heq] at hsub
+    rcases (Nat.dvd_prime Nat.prime_two).mp hdvd2 with h | h
+    · exact h
+    · exfalso
+      have hg := Nat.gcd_dvd_left (2 ^ m - 1) (2 ^ m + 1)
+      rw [h] at hg
+      exact hoddK hg
+  -- kernel triviality
+  have hker : ∀ kv : ↥hyp.actualKActor × ↥hyp.W, M.mu kv = 1 → kv = 1 := by
+    intro kv hkv
+    have hsplit : M.mu (kv.1, 1) * M.mu (1, kv.2) = 1 := by
+      rw [← map_mul, ← hkv]
+      congr 1
+      exact Prod.ext (mul_one _) (one_mul _)
+    -- the `K`-part has order dividing `q - 1`
+    have hKpow : M.mu (kv.1, 1) ^ (2 ^ m - 1) = 1 := by
+      have hfix : (M.mu (kv.1, 1)) ^ (2 ^ m) = M.mu (kv.1, 1) :=
+        Units.ext (by
+          rw [Units.val_pow_eq_pow_val]
+          exact M.mu_K_frobFixed kv.1)
+      have hsplitpow : (2 : ℕ) ^ m = 1 + (2 ^ m - 1) := by omega
+      rw [hsplitpow, pow_add, pow_one] at hfix
+      refine mul_left_cancel (a := M.mu (kv.1, 1)) ?_
+      rw [mul_one]
+      exact hfix
+    -- so the `W`-part does too, and its order also divides `q + 1`
+    have hWpow1 : M.mu (1, kv.2) ^ (2 ^ m - 1) = 1 := by
+      have hinv : M.mu (1, kv.2) = (M.mu (kv.1, 1))⁻¹ := by
+        rw [eq_inv_iff_mul_eq_one, mul_comm]
+        exact hsplit
+      rw [hinv, inv_pow, hKpow, inv_one]
+    have hW1 : M.mu (1, kv.2) = 1 := by
+      have hd1 := orderOf_dvd_of_pow_eq_one hWpow1
+      have hd2 := orderOf_dvd_of_pow_eq_one (M.mu_W_normOne kv.2)
+      have hdg : orderOf (M.mu (1, kv.2)) ∣ Nat.gcd (2 ^ m - 1) (2 ^ m + 1) :=
+        Nat.dvd_gcd hd1 hd2
+      have hone : Nat.gcd (2 ^ m - 1) (2 ^ m + 1) = 1 := hcop
+      rw [hone] at hdg
+      exact orderOf_eq_one_iff.mp (Nat.dvd_one.mp hdg)
+    have hK1 : M.mu (kv.1, 1) = 1 := by
+      rw [hW1, mul_one] at hsplit
+      exact hsplit
+    -- the `K`-component
+    have hk : kv.1 = 1 := by
+      refine M.mu_K_injective ?_
+      change M.mu (kv.1, 1) = M.mu ((1 : ↥hyp.actualKActor), (1 : ↥hyp.W))
+      rw [hK1, show ((1 : ↥hyp.actualKActor), (1 : ↥hyp.W)) = 1 from rfl, map_one]
+    -- the `W`-component: `μ(1, v) = 1` makes the induced action trivial
+    have hv : kv.2 = 1 := by
+      refine hyp.quotientWHom_injective hst hm hQ0card hcardQ inductionHypothesis s
+        (a₁ := kv.2) (a₂ := 1) ?_
+      refine MulEquiv.ext fun y => ?_
+      have hact := M.coord_act (1, kv.2) y
+      have hkw : hyp.quotientKWHom (1, kv.2) = hyp.quotientWHom kv.2 := by
+        rw [hyp.quotientKWHom_apply, map_one, one_mul]
+      rw [hkw, hW1, Units.val_one, one_mul] at hact
+      have := M.coord.injective hact
+      rw [map_one]
+      exact Additive.ofMul.injective this
+    exact Prod.ext hk hv
+  intro a b hab
+  have hmul : M.mu (a⁻¹ * b) = 1 := by
+    rw [map_mul, ← hab, ← map_mul, inv_mul_cancel, map_one]
+  have := hker _ hmul
+  rwa [inv_mul_eq_one] at this
+
 end Hypothesis
 
 /-! ## Step (2) of the Proposition when `θ = 1`
