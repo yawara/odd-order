@@ -438,16 +438,32 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 **`fUnit_val : (fUnit … : E) = M.coord (…) := rfl`** が成立する (`@[simp]`)。
 `exists_conj_of_coset_eq` の `hu`/`hu'` はこれで埋まる。
 
-## ⚠ ファイル分割の予告
+## ⚠ ファイル分割 — 実施すべき (境界確定済)
 
-`PSU3Preliminary.lean` は 984 行 (2026-07-31)。1500 行上限に対してまだ余裕は
-あるが、内容は既に 2 トピックに分かれている:
-1. §2 段 (1)-(7) + (8) の群論部分 (モデル非依存)
-2. (8) のモデル数値部分 (`QuotientFieldModel` / `μ` / 基数)
+`PSU3Preliminary.lean` = **1407 行** (2026-07-31)。上限 1500 が近いので、
+段 (8) の最終組み立てを入れる**前に**分割する。**境界は調査済**:
 
-(8) の組み立てを入れて 1200 行を超えるようなら、2 を
-`PSU3ScalarGroup.lean` (仮) に切り出して `PSU3Preliminary` が import する形にする。
-`ModelIsomorphism` の import もそちらに寄せられる。
+```
+1–77     ヘッダ + import
+78–176   汎用補題 4 本 (coprime_two_pow_sub_one_two_pow_add_one /
+         eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one /
+         two_pow_sq_sub_one_div / card_fiber_eq_of_card_eq)
+177      namespace Hypothesis
+178–1046 §2 段 (1)-(7) + `|D:K|` + 翻訳の群論部分   ← モデル非依存
+1047–1404 「The scalar group μ(KW) inside E^×」以降 ← モデル依存
+1405     end Hypothesis
+```
+
+**分割案** (tail-out; 下流未消費なので module 名の維持は不要):
+* 新 `PSU3OrbitCount.lean` ← `78–176` + `namespace Hypothesis` + `1047–1404`
+  + `end Hypothesis`。import = `PSU3Preliminary` + `QuotientKWField`
+  + `ModelIsomorphism`。
+* `PSU3Preliminary.lean` から上記を削除し、`QuotientKWField` /
+  `ModelIsomorphism` の import も落とす (群論部分は使っていない)。
+* `OddOrder.lean` と `AxiomsCheck.lean` に新 leaf を配線
+  (⚠ orphan leaf 防止; AxiomsCheck の該当エントリも移す)。
+
+汎用補題 4 本を tail 側に置く理由: いずれも消費者がモデル数値部分のみ。
 
 ## 参照
 
