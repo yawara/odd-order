@@ -71,15 +71,45 @@ created: 2026-07-31
 並べ替えがそのままでは通らない。**共役対の 2 つめの `t` を `t⁻¹` で書くと
 自由群の恒等式**になって `group` が閉じ、`rw [hS.tinv]` で目的の形に戻せる。
 
-**次**: §1 の Lemma (`f` が `⟨Q^x⟩` と `L` を同型を除いて決める)。書籍の証明は
-`X` を `Q ∪ {a}` と同一視 (`x ∈ Q` ↔ 点 `a t x`) する。この同一視の下で
-* `q ∈ Q` は `x ↦ x q`, `a ↦ a`
-* `d ∈ D` は `x ↦ x^d`, `a ↦ a`
-* `t` は `x ↦ f(x)` (`x ≠ 1`)、`1 ↔ a` を入れ替え
+### §1 の Lemma (p. 123) — 完了
 
-となり (`a t x t = a·g(x)h(x)·t f(x) = a t f(x)`, `g(x)h(x) ∈ M` が `a` を固定)、
-`L = ⟨M, t⟩ ≤ Sym(Q ⊔ {a})` が `M = Q ⋊ D` と `f` だけで決まる。
-⚠ `f ∘ f = id` ((H2)) がちょうど「`t` が対合」に対応する。
+書籍は `X` を `Q ∪ {a}` と同一視 (`x ∈ Q` ↔ 点 `a t x`) する。ここでは
+`X = L ⧸ M`、`a` = `1` の剰余類、`a t x` = **`x⁻¹ t` の左剰余類**とした。
+⚠ 左剰余類にすると `t` の作用がちょうど `f` になる (`x t` を使うと `g` が出る)。
+
+* `Setup.conj_mem_Q` (`Q ⊴ M`) / `Setup.closure_M_union_t` (`L = ⟨M,t⟩`) /
+  `Setup.closure_conj_Q` (`⟨Q^y | y ∈ L⟩ = ⟨Q ∪ Q^t⟩`) — 生成の部分。
+  `f, g, h` を使わず分解 `L = M ∪ M t Q` だけから出る。
+* `coords` / `coords_bijective` / `coordsEquiv` — 同一視 `Option ↥Q ≃ L ⧸ M`。
+  単射性は `t ∉ M` と `t x t ∉ M`、全射性は `y = a t b`, `a = q d`,
+  `d t M = t (t d t) M = t M`。⚠ `Setup` に `t ∉ M` を足した (書籍の
+  「`t` は `L − M` の対合」; `Q^# ≠ ∅` を仮定しない限り他の field から出ない)。
+* `coords_smul_t_some` — **`t` は `f` で作用する**。(H1) の
+  `g(x⁻¹) = f(x)⁻¹` が効く。`coords_smul_t_none`/`_t_one` で `a ↔ 1` を交換
+  ((H2) `f∘f = id` がこの対合性に対応)。
+* `coords_smul_none_of_mem_M` / `_some_of_mem_M` — **`M` は `Q ⋊ D` だけで
+  作用する** (`m x⁻¹ = q d` の `D` 成分は `d t M = t M` で消える)。
+
+忠実性は mathlib の `Subgroup.normalCore_eq_ker` (`M.normalCore = ⊥` ⟺
+`MulAction.toPermHom L (L ⧸ M)` が単射)。これと `L = ⟨M,t⟩` を合わせて
+`L` は `Equiv.Perm (Option ↥Q)` の中で `M = Q ⋊ D` と `f` から復元される。
+
+**⟹ §1 完了** (`OddOrder/GroupTheory/RankOneBNPair.lean`, 714 行, sorry 0)。
+
+**次 = §2 Preliminary Calculation (p. 123-124)**。Ch. III の (C1)/(C2) を
+再導入し `L = G`, `M = H` として `f` を決定していく。`Q ⋊ W` を Ch. III §3 の
+`S₁ ⋊ K₁W₁` (= 0167 の `exists_standardModel`) と同一視する。
+`pdftotext` 抽出の (1)-(6) は下記だが、**上付きが壊れているのでページ画像で
+確定してから着手する** (p.123-124 は未取得):
+
+* (1) `a ∈ A^#` に対し `f(s^a) = g(s^a) = s^{a⁻¹}`、`h(s^a) = a²` — (C2) の
+  `tst = s*s` と (H3)(H4) から
+* (2) `x = ω ∈ Q − Q₀`, `y = s^a` に (H6) を適用
+* (3) `x = s^a`, `y = ω` に (H6) を適用
+* (4) `f(ωx) = f(ω)y` (`ω ∈ Q−Q₀`, `x,y ∈ Q₀`) なら `ω = 1`
+* (5) `f(ω) = (ωy)^a` なら `y ≠ 1` かつ `a ∉ K` — `|D|` が奇数なので `j` は
+  `Q−Q₀` の `D`-軌道の集合上に不動点を持たない、が要点
+* (6) `f(ωx) = (f(ω)y)^a` (`x,y ∈ Q₀`, `y ≠ 1`, `a ∈ D`) なら `a ∈ K`
 
 ## 参照
 
