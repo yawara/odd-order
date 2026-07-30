@@ -1076,6 +1076,27 @@ theorem index_range_mu {m : ℕ} (hm : m ≠ 0) (M : hyp.QuotientFieldModel m)
   rw [← two_pow_sq_sub_one_div (e := m) (m := Nat.card ↥hyp.W) hm]
   rw [← hidx, Nat.mul_div_cancel _ hpos]
 
+/-- The coordinate of an element of `Q − Q₀` is a **nonzero** element of `E`.
+
+`coord` is an additive isomorphism `Q/Z(Q) ≃+ E`, and under `Z(Q) = Q₀` (the
+`LemmaFiveSetup` hypothesis) an element of `Q` has trivial image in the quotient
+exactly when it lies in `Q₀`.  This is what lets step (8) send `x ∈ Q₀` to a *unit*
+of `E`, hence to a coset of `μ(KW)`. -/
+theorem coord_ne_zero_of_not_mem_Q0 {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {z : G} (hzQ : z ∈ hyp.Q) (hzQ0 : z ∉ hyp.Q0) :
+    M.coord (Additive.ofMul (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q))) ≠ 0 := by
+  intro hc
+  refine hzQ0 ?_
+  have hzero : (Additive.ofMul (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q))) = 0 :=
+    (AddEquiv.map_eq_zero_iff M.coord).mp hc
+  have hone : (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q) :
+      ↥hyp.Q ⧸ Subgroup.center hyp.Q) = 1 := hzero
+  have hmem : (⟨z, hzQ⟩ : ↥hyp.Q) ∈ Subgroup.center hyp.Q :=
+    QuotientGroup.eq_one_iff _ |>.mp hone
+  rw [hZ, Subgroup.mem_subgroupOf] at hmem
+  exact hmem
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
