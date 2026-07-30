@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Complement
+import Mathlib.Tactic.Group
 
 /-!
 # The mappings `f`, `g`, `h` of a rank-one split BN-pair
@@ -108,5 +109,50 @@ theorem fgh_unique
   exact ⟨hsnd,
     congrArg (Subtype.val (p := fun z => z ∈ Q)) (congrArg Prod.fst hpair'),
     congrArg (Subtype.val (p := fun z => z ∈ D)) (congrArg Prod.snd hpair')⟩
+
+/-! ## The identities (H1)–(H6) -/
+
+/-- **(H1)**: `f(x⁻¹) = g(x)⁻¹` (Peterfalvi Part II, Ch. IV §1, p. 122).
+
+Inverting `t x t = g(x) h(x) t f(x)` gives `t x⁻¹ t = f(x)⁻¹ · t · h(x)⁻¹ g(x)⁻¹`,
+which is not yet in the canonical form `a · t · b` with `b ∈ Q`.  Moving `h(x)⁻¹`
+across `t` — legitimate because `D = M ∩ M^t`, so `t h(x)⁻¹ t ∈ M` — puts it in that
+form with `Q`-part `g(x)⁻¹`, and uniqueness identifies it with `f(x⁻¹)`. -/
+theorem hOne
+    (hfact : ∀ y : L, y ∉ M → ∃! p : ↥M × ↥Q, y = (p.1 : L) * t * (p.2 : L))
+    (hQM : Q ≤ M) (hDM : D ≤ M)
+    (ht : t * t = 1) (hDt : ∀ d ∈ D, t * d * t ∈ M)
+    {f g h : L → L}
+    (hmem : ∀ x ∈ Q, x ≠ 1 → f x ∈ Q ∧ g x ∈ Q ∧ h x ∈ D)
+    (heq : ∀ x ∈ Q, x ≠ 1 → t * x * t = g x * h x * t * f x)
+    {x : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) (hinvM : t * x⁻¹ * t ∉ M) :
+    f x⁻¹ = (g x)⁻¹ := by
+  classical
+  obtain ⟨hfQ, hgQ, hhD⟩ := hmem x hxQ hx1
+  have hxinvQ : x⁻¹ ∈ Q := Q.inv_mem hxQ
+  have hxinv1 : x⁻¹ ≠ 1 := fun hc => hx1 (inv_eq_one.mp hc)
+  obtain ⟨hfQ', hgQ', hhD'⟩ := hmem x⁻¹ hxinvQ hxinv1
+  have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht
+  -- inverting the defining equation and moving `h(x)⁻¹` across `t`
+  have hcomp : t * x⁻¹ * t = ((f x)⁻¹ * (t * (h x)⁻¹ * t)) * t * (g x)⁻¹ := by
+    have hinv : t * x⁻¹ * t = (t * x * t)⁻¹ := by
+      rw [mul_inv_rev, mul_inv_rev, htinv]
+      group
+    rw [hinv, heq x hxQ hx1, mul_inv_rev, mul_inv_rev, mul_inv_rev, htinv]
+    have hcancel : (f x)⁻¹ * (t * (h x)⁻¹ * t) * t * (g x)⁻¹
+        = (f x)⁻¹ * (t * (h x)⁻¹ * (t * t)) * (g x)⁻¹ := by group
+    rw [hcancel, ht]
+    group
+  -- the two factorizations of `t x⁻¹ t`
+  obtain ⟨w, -, huniq⟩ := hfact (t * x⁻¹ * t) hinvM
+  have hMa : g x⁻¹ * h x⁻¹ ∈ M := M.mul_mem (hQM hgQ') (hDM hhD')
+  have hMb : (f x)⁻¹ * (t * (h x)⁻¹ * t) ∈ M :=
+    M.mul_mem (M.inv_mem (hQM hfQ)) (hDt _ (D.inv_mem hhD))
+  have e₁ := huniq (⟨⟨g x⁻¹ * h x⁻¹, hMa⟩, ⟨f x⁻¹, hfQ'⟩⟩)
+    (by rw [heq x⁻¹ hxinvQ hxinv1])
+  have e₂ := huniq (⟨⟨(f x)⁻¹ * (t * (h x)⁻¹ * t), hMb⟩, ⟨(g x)⁻¹, Q.inv_mem hgQ⟩⟩)
+    (by rw [hcomp])
+  exact congrArg (Subtype.val (p := fun z => z ∈ Q))
+    (congrArg Prod.snd (e₁.trans e₂.symm))
 
 end OddOrder.GroupTheory.RankOneBNPair
