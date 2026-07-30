@@ -256,6 +256,17 @@ theorem existsUnique_frobNorm_eq {E : Type*} [Field E] [Finite E] (hchar : (2 : 
     {θ : E ≃+* E} (hodd : Odd (orderOf θ)) (c : E) : ∃! u : E, u * θ u = c :=
   (frobNorm_bijective hchar hodd).existsUnique c
 
+/-- `τ` maps `F^×` into `F^×`: the solution of `u^{1+θ} = c` is nonzero when `c` is.
+The recursion (11) needs this, since it inverts `u_{i+1}^τ`. -/
+theorem existsUnique_frobNorm_eq_of_ne_zero {E : Type*} [Field E] [Finite E]
+    (hchar : (2 : E) = 0) {θ : E ≃+* E} (hodd : Odd (orderOf θ)) {c : E} (hc : c ≠ 0) :
+    ∃! u : E, u ≠ 0 ∧ u * θ u = c := by
+  obtain ⟨u, hu, huniq⟩ := existsUnique_frobNorm_eq hchar hodd c
+  have hune : u ≠ 0 := by
+    rintro rfl
+    exact hc (by simpa using hu.symm)
+  exact ⟨u, ⟨hune, hu⟩, fun v hv => huniq v hv.2⟩
+
 namespace Hypothesis
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]

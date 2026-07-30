@@ -640,6 +640,36 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 ⟸ 揃っている部品: `Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q`
    (`ActualCenter.lean:145`、PSU3OrbitCount では仮説 `hZ` として持ち回り済)。
 
+### 座標橋の仕様を確定 (2026-07-31) — 規約を実測で照合済
+
+repo 側の向きの規約 (すべて実測):
+
+| repo | 内容 |
+|---|---|
+| `conjQByK_apply_val` | `(conjQByK k x : G) = k · x · k⁻¹` |
+| `centerKHom_apply_val` | `(centerKHom k z : Q) = actualKActor.subtype k (z : Q)` |
+| `hequiv'` (`exists_mulEquiv_bookCocycle`) | `ι'(centerKHom k z) = μ(k,1)^d · ι'(z)` (`d : ℤ`) |
+| `coord_act` (`QuotientFieldModel`) | `coord(quotientKWHom kv y) = μ(kv) · coord(y)` |
+| `ActualCenter.lean:145` | `center Q = Q0.subgroupOf Q` |
+
+⟹ `A := μ(conjQByK a, 1)`, `B := μ(conjQByK b, 1)` とおくと
+
+    a·s·a⁻¹ = s^{a⁻¹}  ↦  ι'(·) = A^{d}·ι'(s)
+    b⁻¹·s·b = s^{b}    ↦  ι'(·) = B^{-d}·ι'(s)
+
+したがって
+
+    y·s^{a⁻¹} = s^b   ⟺   ι'(y) + A^{d}·ι'(s) = B^{-d}·ι'(s)
+                      ⟺   α + A^{d} = B^{-d}       (`α := ι'(y)/ι'(s)`, `ι'(s) ≠ 0`)
+
+書籍は `b^{1+θ} = α + a^{-(1+θ)}`。⟹ **書籍の `x ↦ x^{1+θ}` = repo の
+`x ↦ μ(conjQByK x, 1)^{-d}`** で整合 ✓ (符号は `d` が吸収する)。
+
+⚠ 残る作業は**強い数学でなく coercion の配管**: `Additive`/`Subtype`/`subgroupOf`/
+`frobFixedSubfield` の往復。`ι'` は `Additive ↥(center Q) ≃+ ↥F` なので
+`Q0 → center Q` の持ち上げ (`hZ` 経由) と `ofMul` の出し入れが要る。
+`ι'(s) ≠ 0` は `s ≠ 1` + `ι'` が同型であることから。
+
 ### 次 — 段 (11) (p.125)
 
 `u_i, v_i ∈ F`, `d_i ∈ KW` を `f(ω(0,u_i)) = (ω(0,v_i))^{d_i}` を満たすよう帰納的に:
