@@ -604,6 +604,75 @@ theorem existsUnique_frobNorm_eq {E : Type*} [Field E] [Finite E] (hchar : (2 : 
     {θ : E ≃+* E} (hodd : Odd (orderOf θ)) (c : E) : ∃! u : E, u * θ u = c :=
   (frobNorm_bijective hchar hodd).existsUnique c
 
+/-- **`u ↦ u^{1+θ}` as a multiplicative equivalence** (Peterfalvi Part II, p. 125).
+
+Bundling the bijection (`frobNorm_bijective`) with its multiplicativity (`frobNorm_mul`)
+makes the book's `τ` — the inverse — multiplicative for free.  That is exactly what the
+induction for (14) needs, where `(c_i/α)^{2τ}` has to be split across a product. -/
+noncomputable def frobNormEquiv {E : Type*} [Field E] [Finite E] (hchar : (2 : E) = 0)
+    {θ : E ≃+* E} (hodd : Odd (orderOf θ)) : E ≃* E :=
+  { Equiv.ofBijective (fun u : E => u * θ u) (frobNorm_bijective hchar hodd) with
+    map_mul' := frobNorm_mul θ }
+
+@[simp] theorem frobNormEquiv_apply {E : Type*} [Field E] [Finite E] (hchar : (2 : E) = 0)
+    {θ : E ≃+* E} (hodd : Odd (orderOf θ)) (u : E) :
+    frobNormEquiv hchar hodd u = u * θ u := rfl
+
+/-- **`τ(u)^{1+θ} = u`** — the defining property of the book's `τ`, which is
+`(frobNormEquiv …).symm`.  Multiplicativity of `τ` is then `map_mul` on that `MulEquiv`. -/
+@[simp] theorem frobNormEquiv_symm_spec {E : Type*} [Field E] [Finite E]
+    (hchar : (2 : E) = 0) {θ : E ≃+* E} (hodd : Odd (orderOf θ)) (u : E) :
+    (frobNormEquiv hchar hodd).symm u * θ ((frobNormEquiv hchar hodd).symm u) = u :=
+  (frobNormEquiv hchar hodd).apply_symm_apply u
+
+@[simp] theorem frobNormEquiv_symm_zero {E : Type*} [Field E] [Finite E]
+    (hchar : (2 : E) = 0) {θ : E ≃+* E} (hodd : Odd (orderOf θ)) :
+    (frobNormEquiv hchar hodd).symm 0 = 0 := by
+  rw [MulEquiv.symm_apply_eq, frobNormEquiv_apply, map_zero, mul_zero]
+
+theorem frobNormEquiv_symm_ne_zero {E : Type*} [Field E] [Finite E] (hchar : (2 : E) = 0)
+    {θ : E ≃+* E} (hodd : Odd (orderOf θ)) {u : E} (hu : u ≠ 0) :
+    (frobNormEquiv hchar hodd).symm u ≠ 0 := fun h =>
+  hu ((frobNormEquiv hchar hodd).symm.injective
+    (h.trans (frobNormEquiv_symm_zero hchar hodd).symm))
+
+/-- `τ` respects division.  It is multiplicative and sends `0` to `0`, so it restricts to
+a group automorphism of `F^×`; this is that, stated where it gets used. -/
+theorem frobNormEquiv_symm_div {E : Type*} [Field E] [Finite E] (hchar : (2 : E) = 0)
+    {θ : E ≃+* E} (hodd : Odd (orderOf θ)) (x : E) {y : E} (hy : y ≠ 0) :
+    (frobNormEquiv hchar hodd).symm (x / y)
+      = (frobNormEquiv hchar hodd).symm x / (frobNormEquiv hchar hodd).symm y := by
+  rw [eq_div_iff (frobNormEquiv_symm_ne_zero hchar hodd hy), ← map_mul,
+    div_mul_cancel₀ _ hy]
+
+/-- **Peterfalvi Part II, Ch. IV §2, step (14)** (p. 126): the closed form
+`d_i = ζ^i (c_i/α)^{2τ}` satisfies the recursion `d_{i+1} = d_i ζ u_{i+1}^{-2τ}` of (11).
+
+The book gets (14) "by induction on `i`" from (11); this is the induction step.  All of
+its content is that `τ` is multiplicative, together with the algebraic identity
+`(c_i/α) / (c_i/c_{i+1}) = c_{i+1}/α`. -/
+theorem betaScale_succ {E : Type*} [Field E] [Finite E] (hchar : (2 : E) = 0)
+    {θ : E ≃+* E} (hodd : Odd (orderOf θ)) {α β ζ : E} (hαne : α ≠ 0) (i : ℕ)
+    (hci : betaSum β i ≠ 0) (hci1 : betaSum β (i + 1) ≠ 0) :
+    ζ ^ i * ((frobNormEquiv hchar hodd).symm (betaSum β i / α)) ^ 2 * ζ *
+        (((frobNormEquiv hchar hodd).symm (betaRatio β i)) ^ 2)⁻¹
+      = ζ ^ (i + 1) * ((frobNormEquiv hchar hodd).symm (betaSum β (i + 1) / α)) ^ 2 := by
+  have hratne : betaRatio β i ≠ 0 := by
+    simp only [betaRatio]
+    exact div_ne_zero hci hci1
+  have hdiv : betaSum β i / α / betaRatio β i = betaSum β (i + 1) / α := by
+    simp only [betaRatio]
+    field_simp
+  have hτ : (frobNormEquiv hchar hodd).symm (betaSum β i / α)
+      / (frobNormEquiv hchar hodd).symm (betaRatio β i)
+      = (frobNormEquiv hchar hodd).symm (betaSum β (i + 1) / α) := by
+    rw [← frobNormEquiv_symm_div hchar hodd _ hratne, hdiv]
+  have hBne : (frobNormEquiv hchar hodd).symm (betaRatio β i) ≠ 0 :=
+    frobNormEquiv_symm_ne_zero hchar hodd hratne
+  rw [← hτ, div_pow, pow_succ]
+  field_simp
+  ring
+
 /-- `τ` maps `F^×` into `F^×`: the solution of `u^{1+θ} = c` is nonzero when `c` is.
 The recursion (11) needs this, since it inverts `u_{i+1}^τ`. -/
 theorem existsUnique_frobNorm_eq_of_ne_zero {E : Type*} [Field E] [Finite E]
