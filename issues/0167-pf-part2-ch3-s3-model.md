@@ -231,18 +231,46 @@ Appendix I Prop 2 の regular 版 (`exists_field_coordinate_realization`) で
   単元群の群同型だけでは体同型にならないので、`K`-同変性を使って `θ` を移送する設計が要る。
   ここが本 §3 の最大の行間。
 
-  **2026-07-30 に詰めた分析**: 接着の中身は数値的な指数 `d` に落ちる。
-  `Q₀` 側の座標 (`exists_Q0_field_coordinate`) で `K` は `γ : K ≅ F^×` として乗算で作用し、
-  `S/Q₀` 側 (段 (1)) では `μ|_K : K ≅ (frobFixedSubfield M.E)^×`。両者はどちらも
-  位数 `q−1` の巡回群への同型なので、体同型 `F ≅ frobFixedSubfield M.E` を 1 つ選べば
-  `γ'(k) = μ(k)^d` となる `d` (`gcd(d, q−1) = 1`) が一意に定まる。
-  **書籍の `θ` が入るのはここ**: type-B 構造の `c^x = x^{1+θ} c` が `d = 1 + 2^j` を与える
-  (`θ = Frob^j`)。この `d = 1 + 2^j` が無いと、χ の Lemma 2(c) 展開から出るのは
-  「`λ_{στ} ≠ 0 ⟹ a^{σ|F} a^{τ|F} = a^d` (`a ∈ F^×`)」すなわち `d ≡ 2^i + 2^{i'}`
-  までで、書籍の `{σ|_F, τ|_F} = {1_F, θ}` (= 一方が恒等) に絞れない。
-  ⟹ **`TypeBData ↥hyp.Q` から `d = 1 + 2^j` を取り出すのが次の実作業**。
-  χ 自体は `Suzuki2Groups.centralSquareQuadraticMap` (Appendix III Lemma 1(a)) が
-  `Additive (Q ⧸ Z(Q)) → Additive ↥(Z(Q))` の `QuadraticMap (ZMod 2)` として既に在る。
+  **2026-07-30 に詰めた分析 — `TypeBData` は要らない (段 (1) と同じく書籍の入力を回避できる)**。
+
+  接着の中身は数値的な指数 `d` に落ちる。`Q₀` 側の座標
+  (`exists_Q0_field_coordinate`) で `K` は `γ : K ≅ F^×` として乗算で作用し、
+  `S/Q₀` 側 (段 (1)) では `μ|_K : K ≅ (frobFixedSubfield M.E)^×`。どちらも位数 `q−1` の
+  巡回群への同型なので、体同型 `F ≅ frobFixedSubfield M.E` を 1 つ選べば
+  `γ'(k) = μ(k)^d` の `d` (`gcd(d, q−1) = 1`) が定まる。
+
+  当初「書籍の `θ` = type-B パラメータを `TypeBData` から取り出す必要がある」と書いたが
+  **それは誤り**。理由:
+
+  1. χ (= `centralSquare`) の Lemma 2(c) 展開 + `K`-同変性 + 係数の一意性から
+     「`λ_{στ} ≠ 0 ⟹ σ(a) τ(a) = a^d` (`a ∈ F^×`)」。`Aut(F)` は Frobenius の冪
+     (`FiniteField.exists_pow_eq_of_ringAut`, 9504) なので `d ≡ 2^i + 2^{i'} (mod q−1)`
+     (`i, i' < m`)。
+  2. **`d` は 2 の冪倍の分しか決まらない**: `Q₀` 座標を `Frob^i ∘ α₀` に取り替えると
+     `d ↦ 2^i d`。よって `2^m ≡ 1 (mod q−1)` を使って
+     `2^{m−i} d ≡ 1 + 2^{(i'−i) mod m}` と**正規化できる**。
+  3. ⟹ 座標を選び直せば `d = 1 + 2^j` とでき、`θ := Frob^j` (on `F`)、
+     `σ := qFrobenius E 2 j` (延長は `exists_ringAut_extending_frobFixedSubfield`) と
+     **intrinsic に定義できる**。Proposition の主張は `θ` を含む形で自己完結しているので、
+     type-B パラメータとの一致は label 合わせ (χ の比較) にすぎない。
+
+  ### 段 (2) `θ ≠ 1` 分岐の実装計画 (次の一手)
+
+  1. **`Z(Q)` 座標を `M.E` の中へ**: `exists_Q0_field_coordinate` の `F` を
+     `FiniteField.ringEquivOfCardEq` (Algebra instance 不要) で
+     `frobFixedSubfield M.E` に移す。`s.centerEqQ0` で `Z(Q) ↔ Q₀` を渡す。
+     出力 = `ι : Additive ↥(Z(Q)) ≃+ ↥(frobFixedSubfield M.E)` と
+     `ι (k • z) = μ(k)^d * ι z`。
+  2. **χ を `E` 座標へ**: `Suzuki2Groups.centralSquareQuadraticMap`
+     (Appendix III Lemma 1(a)、`Additive (Q ⧸ Z(Q)) → Additive ↥(Z(Q))` の
+     `QuadraticMap (ZMod 2)`) を `M.coord` と `ι` で移して `χ_E : E → E`。
+     anisotropic は `s.invMem` (`x² = 1 ⟹ x ∈ Z(Q)`) から。
+  3. **Lemma 2(c) 展開**: `SemilinearFieldAut.span_autMulQuadraticMap_eq_top` で
+     `χ_E = Σ λ_{στ} • autMulQuadraticMap σ τ`、`autMulQuadratic_coeff_symm` /
+     `autMulQuadratic_diag_eq_zero` で係数一意。`K`-同変性から `d ≡ 2^i + 2^{i'}`。
+  4. **正規化** (上記 2.) で `d = 1 + 2^j`、`σ` 確定。
+  5. **`χ(ωx) = χ(x)`** (`w` は `Q₀` 上自明 = `conjQByW_fixes_center`) を同じ展開に当てて
+     `ω^{1+σ} = 1` (`λ₂` は `ω^q ≠ ω` で落とす)。
 
 ## 📖 p.120–121 の proof 全文の書き起こし (2026-07-30, ページ画像から)
 
