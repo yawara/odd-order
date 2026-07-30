@@ -413,6 +413,7 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
    `= ⟦conjQHom kv (f(ω x))⟧` (`quotientKWHom_mk`, rfl)。
 5. `exists_mem_D_conjQHom` で `conjQHom kv (f(ωx)) = d · f(ωx) · d⁻¹` (`d ∈ D`)。
 6. 商での等式 ⟹ `f(ω x') = d · f(ω x) · d⁻¹ · w` (`w ∈ Z(Q) = Q₀`)。
+   ✅ **`exists_mem_Q0_mul_of_quotient_eq` として形式化済**。
 7. `a := d⁻¹ ∈ D` とおくと `a⁻¹ · f(ωx) · a = d · f(ωx) · d⁻¹` なので、これは
    `exists_conj_mul_Q0_iff` の左辺の形。よって
    `∃ y ∈ Q₀, ∃ a ∈ D, f(ω x') = (f(ω x) · y)^a` ✓
