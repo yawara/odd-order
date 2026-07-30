@@ -897,6 +897,40 @@ theorem exists_witness_not_mem_K (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   exact ⟨a, ha, hyp.not_mem_K_of_f_eq_conj_self H hC2 hωQ hωQ0 hxQ0 hy ha heq,
     y, hy, heq⟩
 
+/-- **The exponent collapse of step (9)** (Peterfalvi Part II, Ch. IV §2, p. 125).
+
+From `f(ω z) = (ω b)^{c²ζ}` with `c ∈ K`, setting `ω' = (ω z)^c` and `y = (z b)^c`
+gives `f(ω') = (ω' y)^ζ`: applying (H3) turns the outer conjugation into `c⁻¹`
+(because `c ∈ K` means `c^t = c⁻¹`), the square `c²` cancels against it, and `ζ`
+passes through `c` because `W` centralizes `K`. -/
+theorem f_conj_collapse (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {ω z b c ζ : G} (hωzQ : ω * z ∈ hyp.Q) (hωz1 : ω * z ≠ 1)
+    (hzQ0 : z ∈ hyp.Q0) (hcKSet : c ∈ hyp.KSet) (hζW : ζ ∈ hyp.W)
+    (heq : f (ω * z) = (c ^ 2 * ζ)⁻¹ * (ω * b) * (c ^ 2 * ζ)) :
+    f (c⁻¹ * (ω * z) * c)
+      = ζ⁻¹ * ((c⁻¹ * (ω * z) * c) * (c⁻¹ * (z * b) * c)) * ζ := by
+  have hcK : c ∈ hyp.K := by
+    have h : c ∈ hyp.KSet := hcKSet
+    rw [← hyp.coe_K] at h
+    exact h
+  have hcm : Commute c ζ := hyp.commute_of_mem_W_of_mem_K hζW hcK
+  have hzsq : z * z = 1 := by
+    have h := hzQ0.1
+    rwa [sq] at h
+  have hA : c * ζ⁻¹ * c⁻¹ = ζ⁻¹ := by rw [hcm.inv_right.eq]; group
+  have hB : c * ζ * c⁻¹ = ζ := by rw [hcm.eq]; group
+  rw [sq] at heq
+  -- (H3) at `c`, whose `t`-twist is `c⁻¹`
+  have h3 := (hThree hyp.rankOneSetup H hωzQ hωz1 hcKSet.1).1
+  rw [h3, hcKSet.2, heq, inv_inv]
+  -- redistribute the conjugations
+  have e1 : c * ((c * c * ζ)⁻¹ * (ω * b) * (c * c * ζ)) * c⁻¹
+      = (c * ζ⁻¹ * c⁻¹) * (c⁻¹ * (ω * b) * c) * (c * ζ * c⁻¹) := by group
+  rw [e1, hA, hB]
+  have hR : ζ⁻¹ * ((c⁻¹ * (ω * z) * c) * (c⁻¹ * (z * b) * c)) * ζ
+      = ζ⁻¹ * (c⁻¹ * (ω * (z * z) * b) * c) * ζ := by group
+  rw [hR, hzsq, mul_one]
+
 /-! ## Translating "lies in the orbit modulo `Q₀`"
 
 Step (8) speaks of `f(ω₁ x)` lying, *modulo `Q₀`*, in the `KW`-orbit of `ω_i`.  The
