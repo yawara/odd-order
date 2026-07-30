@@ -215,17 +215,46 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 
 `OddOrder/Peterfalvi/Appendices/Suzuki/PSU3Preliminary.lean` = 554 行, sorry 0。
 
-### 次 = (7) 以降
+### 🎯 (7) 完了 — §2 の (1)-(7) が揃った (2026-07-31)
 
-**(7)** `ω, ω' ∈ Q−Q₀`、`x_i, y_i ∈ Q₀`、`a_i ∈ D` (i=1,2) で `x₁ ≠ x₂` かつ
-`f(ωx_i) = (ω'y_i)^{a_i}` なら **`a₂ ∉ a₁K`**。
-⚠ 証明は p.124 の (6) の直後から。**まだ読んでいない** — ページ画像
-(`references/peterfalvi/pages/peterfalvi-p124.png`, 取得済) の下半分を
-300dpi でクロップして読むこと。(4)(5)(6) を使う見込み。
+`not_mem_mul_KSet_of_f_mul_eq_conj`。2 つの仮説から `ω'` を消去すると
+(`y₁² = 1` を使う)
 
-その先 (p.125-134) は未調査。`peterfalvi-p125.png` / `-p126.png` は取得済、
-それ以降は未レンダリング (`pdftoppm -png -r 200 -f <n> -l <n>` で pdf ページ
-番号 = 書籍ページ − 121)。
+    f(ωx₂) = (f(ωx₁)^{a₁⁻¹} y₁y₂)^{a₂} = (f(ωx₁)(y₁y₂)^{a₁})^{a₁⁻¹a₂}
+
+でちょうど段 (6) の形。**要点は `(ωx₁)(x₁⁻¹x₂) = ωx₂`** — (6) を
+`ω ↦ ωx₁`, `x ↦ x₁⁻¹x₂`, `y ↦ (y₁y₂)^{a₁}`, `a ↦ a₁⁻¹a₂` で適用する。
+
+`PSU3Preliminary.lean` = 606 行, sorry 0。
+
+### 次 = (8) 以降 — ここから標準モデルとの同一視が要る
+
+⚠ **(8) で性格が変わる**。p.124 の (7) の後に書籍は記号を導入する:
+
+> Set `m = |W|` and `n = (q+1)/m = |E*/KW|`. For `ω ∈ Q`, let `ω̄` denote the image
+> of `ω` in `Q/Q₀`. If `ω = (α, β)`, then `ω̄` is identified with `α ∈ E`.
+> Let `ω₁,…,ω_n ∈ Q − Q₀` be such that the `ω̄_i` comprise a system of
+> representatives of the orbits of `(Q/Q₀)^#` under `KW`.
+
+**(8)** `x ∈ Q₀` で `f(ω₁x)‾` が `ω̄_i` の `KW`-軌道に入るものの個数は
+`i > 1` なら `m`、`i = 1` なら `m − 1`。
+証明: `m_i` をその個数とすると `i > 1` では (7) (`ω = ω₁`, `ω' = ω_i`) から
+`m_i ≤ m`、`i = 1` では (7)+(5) から `m₁ ≤ m − 1`。よって
+`q = Σ m_i ≤ nm − 1 = q` で全て等号。
+
+⟹ **前提**: `ω = (α, β)` という座標表示 = Ch. III §3 の標準モデル
+`Q ⋊ KW ≅ S₁ ⋊ K₁W₁` (0167 の `exists_standardModel`) との同一視。
+`m = |W|`, `n = (q+1)/m = |E*/KW|`, `|Q₀| = q`, `Q/Q₀ ≅ E` も要る。
+
+**次セッションの着手順**:
+1. `exists_standardModel` の結論の形を読み、`Q/Q₀ ≅ E` と `KW` 作用を取り出せるか確認。
+2. `|Q₀| = q` / `|Q/Q₀| = q` / `|E*| = q+1`(?) 等の基数事実が repo にあるか grep。
+3. 揃っていれば (8) の数え上げへ。足りなければその補題を先に立てる。
+
+**(9) 以降** (p.124 末〜) は未読。`ζ` = `W` の生成元、(C2) より `ζ ≠ 1`。
+ページ画像は p.125/p.126 まで取得済、それ以降は
+`pdftoppm -png -r 200 -f <pdfページ> -l <同> pdf/05.6_*.pdf pages/peterfalvi-p<書籍ページ>`
+(pdf ページ = 書籍ページ − 121)。
 
 ## 参照
 
