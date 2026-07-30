@@ -163,6 +163,29 @@ theorem card_fiber_eq_of_card_eq {α β : Type*} [Finite α] [Finite β]
   · rw [hconv b₀, key b₀]
     simp only [hg, if_pos rfl]
 
+/-! ### The book's `u^{1+θ}` (p. 125)
+
+Peterfalvi writes `u^{1+θ}` for `u · θ(u)` and uses `τ` for its inverse on `F^×`
+(bijective because `θ` has odd order).  Step (10)'s hypothesis
+`b^{1+θ} = α + a^{-(1+θ)}` is stated in these terms.
+-/
+
+/-- `u ↦ u^{1+θ}` is multiplicative. -/
+theorem frobNorm_mul {E : Type*} [Field E] (θ : E ≃+* E) (u v : E) :
+    (u * v) * θ (u * v) = (u * θ u) * (v * θ v) := by
+  rw [map_mul]
+  ring
+
+/-- `u ↦ u^{1+θ}` sends `1` to `1`. -/
+@[simp] theorem frobNorm_one {E : Type*} [Field E] (θ : E ≃+* E) :
+    (1 : E) * θ 1 = 1 := by
+  rw [map_one, mul_one]
+
+/-- `u^{1+θ} ≠ 0` for `u ≠ 0`. -/
+theorem frobNorm_ne_zero {E : Type*} [Field E] (θ : E ≃+* E) {u : E}
+    (hu : u ≠ 0) : u * θ u ≠ 0 :=
+  mul_ne_zero hu (by simpa using hu)
+
 namespace Hypothesis
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
