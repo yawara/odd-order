@@ -10,6 +10,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
 import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
+import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 
@@ -933,6 +934,41 @@ theorem mu_K_pow_two_pow_sub_one {m : ℕ} (M : hyp.QuotientFieldModel m)
   have h2 : M.mu (k, 1) * M.mu (k, 1) ^ (2 ^ m - 1) = M.mu (k, 1) * 1 := by
     rw [mul_one]; exact hfix
   exact mul_left_cancel h2
+
+/-- **`|K| = q − 1`**: `μ` maps `K` bijectively onto `F^× = 𝐅_q^×`.
+
+Injectivity is `QuotientFieldModel.mu_K_injective`; surjectivity is
+`exists_actualKActor_mu_eq`; and `|F| = q` is
+`OddOrder.FiniteField.natCard_frobFixedSubfield`. -/
+theorem card_actualKActor_eq {m : ℕ} (s : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m) (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) :
+    Nat.card ↥hyp.actualKActor = 2 ^ m - 1 := by
+  classical
+  set f : ↥hyp.actualKActor → M.E := fun k => ((M.mu (k, 1) : M.Eˣ) : M.E) with hf
+  have hinj : Function.Injective f := fun k k' h => M.mu_K_injective (Units.ext h)
+  have hrange : Set.range f
+      = ((OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E) \ {0}) := by
+    apply Set.Subset.antisymm
+    · rintro _ ⟨k, rfl⟩
+      exact ⟨OddOrder.FiniteField.mem_frobFixedSubfield.mpr (M.mu_K_frobFixed k),
+        Units.ne_zero _⟩
+    · rintro a ⟨haF, ha0⟩
+      obtain ⟨k, hk⟩ := hyp.exists_actualKActor_mu_eq s M hm hQ0card haF
+        (by simpa using ha0)
+      exact ⟨k, hk⟩
+  have hcardF : ((OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E)).ncard
+      = 2 ^ m := by
+    rw [← Nat.card_coe_set_eq]
+    exact OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm
+  have hT : ((OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E) \ {0}).ncard
+      = 2 ^ m - 1 := by
+    rw [Set.ncard_sdiff_singleton_of_mem
+      (OddOrder.FiniteField.frobFixedSubfield M.E 2 m).zero_mem, hcardF]
+  have hcard : Nat.card ↥hyp.actualKActor = (Set.range f).ncard := by
+    rw [← Nat.card_coe_set_eq]
+    exact (Nat.card_range_of_injective hinj).symm
+  rw [hcard, hrange, hT]
 
 /-- **`μ(K) ∩ μ(W) = 1`**: a common value is killed by both `q − 1` and `q + 1`, which
 are coprime. -/
