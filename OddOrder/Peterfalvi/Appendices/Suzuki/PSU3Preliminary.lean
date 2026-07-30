@@ -1248,6 +1248,50 @@ theorem exists_conj_of_coset_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
   rw [hzw]
   group
 
+/-- **Each fibre of `orbitOfF` has at most `|V|` elements.**
+
+If the fibre over `c` is nonempty, pick `x₀` in it and set `ω' = f(ω x₀)`.  For any
+other `x` in the fibre, `exists_conj_of_coset_eq` gives `f(ω x) = (ω' y)^a`, so the
+fibre embeds in the set bounded by `ncard_le_card_V_of_f_eq_conj`.
+
+Under Chapter IV's `V = W` this is the book's `m_i ≤ m`. -/
+theorem ncard_fiber_orbitOfF_le {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (c : M.Eˣ ⧸ (MonoidHom.range M.mu)) :
+    {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x = c}.ncard
+      ≤ Nat.card ↥hyp.V := by
+  classical
+  rcases Set.eq_empty_or_nonempty
+      {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x = c} with he | ⟨x₀, hx₀⟩
+  · rw [he, Set.ncard_empty]
+    exact Nat.zero_le _
+  · have hsub : ((↑) : ↥hyp.Q0 → G) ''
+        {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x = c}
+        ⊆ {z : G | z ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+            f (ω * z) = a⁻¹ * (f (ω * (x₀ : G)) * y) * a} := by
+      rintro _ ⟨x, hx, rfl⟩
+      refine ⟨x.2, ?_⟩
+      have hcoset :
+          (QuotientGroup.mk (hyp.fUnit M hZ H hC2 hωQ hωQ0 x₀) :
+            M.Eˣ ⧸ MonoidHom.range M.mu)
+            = QuotientGroup.mk (hyp.fUnit M hZ H hC2 hωQ hωQ0 x) :=
+        hx₀.trans hx.symm
+      exact hyp.exists_conj_of_coset_eq M hZ
+        (hyp.f_mul_mem_Q H hC2 hωQ hωQ0 x₀) (hyp.f_mul_mem_Q H hC2 hωQ hωQ0 x)
+        rfl rfl hcoset
+    calc {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x = c}.ncard
+        = (((↑) : ↥hyp.Q0 → G) ''
+            {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x = c}).ncard :=
+          (Set.ncard_image_of_injective _ Subtype.val_injective).symm
+      _ ≤ {z : G | z ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+            f (ω * z) = a⁻¹ * (f (ω * (x₀ : G)) * y) * a}.ncard :=
+          Set.ncard_le_ncard hsub (Set.toFinite _)
+      _ ≤ Nat.card ↥hyp.V := hyp.ncard_le_card_V_of_f_eq_conj H hC2 hωQ hωQ0
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
