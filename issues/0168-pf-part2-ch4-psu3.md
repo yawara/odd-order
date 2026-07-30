@@ -336,7 +336,25 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 ⟹ **`|μ(KW)| = (q−1)·|W|` に必要なものは全部揃っている**
 (`card_actualKActor_eq` + 既存 `mu_injective`)。
 
-**残るのは組み立てのみ**:
+**指数算術も完了**: `two_pow_sq_sub_one_div` — `(q²−1)/((q−1)m) = (q+1)/m`。
+`|W| ∣ q+1` は既存 `isCyclic_W_and_card_dvd_of_orderThree` (WCyclicDivides.lean)。
+
+⟹ **段 (8) の部品は数値側も含めて全部揃った**:
+
+| | |
+|---|---|
+| `\|E^×\| = q²−1` | `QuotientFieldModel.card` |
+| `\|μ(KW)\| = (q−1)·\|W\|` | `card_actualKActor_eq` + 既存 `mu_injective` |
+| `\|W\| ∣ q+1` | 既存 `isCyclic_W_and_card_dvd_of_orderThree` |
+| `n = (q+1)/\|W\|` | `two_pow_sq_sub_one_div` |
+| `m_i ≤ \|W\|`, `m₁ ≤ \|W\|−1` | `ncard_le_card_V_of_f_eq_conj`, `not_mem_K_of_f_eq_conj_self` (+ `V = W`) |
+| `Σ m_i = \|Q₀\| = q` | `f_mem_sdiff_Q0` + `hQ0card` |
+
+**残るのは最終組み立てのみ**: 軌道代表系 `ω₁,…,ω_n` を取り、`m_i` を定義して
+`q = Σ m_i ≤ n·\|W\| − 1 = q` の挟み込みから全等号を出す。ここは Lean 上で
+「軌道分解に沿った有限和」を組む必要があり、`Finset` の設計を先に決めること。
+
+(旧メモ) 残るのは組み立てのみ:
 `|μ(KW)| = (q−1)m` → `n = |E^×|/|μ(KW)| = (q+1)/m` →
 `q = Σ m_i ≤ n·m − 1 = q` の挟み込み → 全等号。
 
