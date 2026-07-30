@@ -395,9 +395,15 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
   `KW` の `Q` への作用は `conjQHom` すなわち `D` の元による共役なので
   (`D = KW` = `exists_mem_K_mem_W_mul`)、`f(ωx) ≡ a⁻¹ f(ωx') a (mod Q₀)`。
   最後に `exists_conj_mul_Q0_iff` で目的の形へ。
-* ⚠ **3 つの作用の符号合わせが唯一の面倒**: `quotientKWHom` (商への作用) /
-  `conjQHom` (`Q` への共役作用) / `coord_act` (`E` でのスカラー倍)。
-  `conjQHom_apply` と `quotientKWHom_apply` で成分に分けて突き合わせる。
+* ✅ **商と `Q` の作用の突き合わせは既にある**: `quotientKWHom_mk` (:219) が
+  `quotientKWHom kv ⟦x⟧ = ⟦conjQHom kv x⟧` を **`rfl` かつ `@[simp]`** で与える。
+* ⚠ **残る面倒は `conjQHom kv` を「`D` の元による共役」と同定すること**。
+  `conjQHom_apply : conjQHom kv = actualKActor.subtype kv.1 * conjQByW kv.2` は
+  `MulAut ↥Q` の積であって群の元による共役の形になっていない。
+  `actualKActor` の元が `K` の元による共役であること、`conjQByW v` が `v` による
+  共役であることを使って `MulAut.conj (k*v)` の形に直す必要がある。
+  ⟸ **次セッションはここから**。`actualKActor` の定義と `conjQByW` の定義を
+  読んで、共役として実現する補題が既にあるか grep すること。
 
 **そのあとの流し込み** (機械的):
 1. ファイバー `Φ⁻¹(c)` が空でなければ代表 `x₀` を取り `ω' := f(ω x₀)` とおく。
