@@ -698,8 +698,37 @@ MulEquiv.coe_toMonoidHom]` で展開してから rw する。
 `∀ z, ι z = 1 → ι' z = 1` を `exists_bilinear_lift_normalized` と
 `exists_mulEquiv_bookCocycle` の両方に足して貫通させた。
 
-**次 (最後)**: Proposition 本体の statement 化 — 段 (1)-(5) を書籍の 1 つの主張に
-束ねる。必要な材料はすべて揃っている:
+### ⚠ 束ね直しで発覚: α-正規化は K-scaling 定数を捻る (2026-07-31 その 11)
+
+Proposition を束ねようと鎖を組んだところ、**段 (3) の α-正規化が段 (4) の入力仮説を
+壊す**ことが判明した。正確には:
+
+* `exists_mulEquiv_bookCocycle` が返す座標は `ι' = ι.trans (frobFixedRestrict α⁻¹)`。
+* `ι` の K-scaling は `ι(k•z) = μ(k,1)^d · ι(z)` だが、`α⁻¹` を通すと
+  **`ι'(k•z) = α⁻¹(μ(k,1)^d) · ι'(z)`** になる。`α|_F` は恒等とは限らないので
+  定数が捻れる。
+* ところが `exists_modelScalarHom` / `exists_conj_conjQHom_range_eq` は
+  `hequiv` を **`μ(k,1)^d` の形ちょうど**で要求している ⟹ **`ι'` では直接
+  適用できない**。
+
+⚠ **これは「`d` の `1+2^t` 正規化は不要」(所見 iii) の但し書きである**。`d` を
+正規化する代わりに `α⁻¹` を後合成する、という回避は捻れを**別の場所へ移しただけ**で、
+消してはいない。個々の定理は正しい (それぞれ仮説を満たす対象に対して成立) が、
+**鎖として繋ぐには捻れを吸収する必要がある**。
+
+**修正方針 (自明・機械的)**: 定数を自由パラメータにする。
+`centreQuadraticMap_smul` / `centreQuadraticMap_smul_KW` / `exists_modelScalarHom` /
+`exists_conj_conjQHom_range_eq` の `hequiv` を
+
+    ι (k•z) = ((ν (k,1) : (↥F)ˣ) : M.E) * ι z        -- ν : K × W →* (↥F)ˣ 任意
+
+の形に一般化すれば、捻れた定数 `α⁻¹ ∘ (μ(·,1)^d)` もそのまま `ν` として渡せる
+(`α⁻¹` は `F` の環同型なので `F^×` の自己同型を誘導し、合成はやはり準同型)。
+`ν(k,v)` が `v` に依らないことは `centreQuadraticMap_W_invariant` から従うので
+構造は変わらない。
+
+**次**: 上の一般化 (4 定理の `hequiv` を `ν` パラメータ化) → Proposition の束ね直し。
+必要な材料の対応:
 * cocycle の 2 条件 = `exists_mulEquiv_bookCocycle` の第 1・2 連言
 * `Φ x₀ = ⟨0,1⟩` = `hker` + 上の正規化貫通
 * `K₁ = F^×` = `exists_actualKActor_mu_eq`
