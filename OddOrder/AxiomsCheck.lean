@@ -21,6 +21,7 @@ import OddOrder.GroupTheory.TransferIndexTwo
 import OddOrder.GroupTheory.WeaklyClosed
 import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.CentralExtensionAutomorphisms
+import OddOrder.GroupTheory.RankOneBNPair
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -14570,6 +14571,12 @@ only through its diagonal. -/
 #assert_only_allowed_axioms Subgroup.sup_range_eq_of_mul_inv_mem
 #assert_only_allowed_axioms Subgroup.mul_eq_sup_of_le_normalizer
 #assert_only_allowed_axioms Subgroup.exists_conj_range_eq_of_mul_inv_mem
+
+/-! **The mappings `f`, `g`, `h` of a rank-one split BN-pair** (issue 0168, 2026-07-31).
+`GroupTheory/RankOneBNPair.lean` — Peterfalvi Part II, Ch. IV §1, p. 122: `t x t = g(x) h(x) t f(x)`
+determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and `L − M = M t Q`. -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.exists_fgh
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.fgh_unique
 #assert_only_allowed_axioms Subgroup.mem_normalizer_of_conj_mem
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.range_le_normalizer_inducingIdAuts

@@ -19,6 +19,27 @@ created: 2026-07-31
 
 <!-- 何をもって closed とするか. 例: 該当 sorry が消える / lake build が通る / ノート x.md を書く -->
 
+## 進捗 (2026-07-31): §1 の `f`, `g`, `h`
+
+`OddOrder/GroupTheory/RankOneBNPair.lean` (新 leaf)。
+
+⚠ **設計判断**: 「2 重推移作用」から出発せず、証明が実際に使う**2 つの一意分解**を
+仮説に取った:
+* `M = Q ⋊ D` (`M` の元は一意に `q · d`)
+* `L − M` の元は一意に `a · t · b` (`a ∈ M`, `b ∈ Q`) — 書籍が Ch. I §1 Prop 4 を
+  引くところ
+* `x ∈ Q^#` に対し `t x t ∉ M` (`Q^t ∩ M = 1` が効く箇所)
+
+書籍自身がこの 3 つしか使っていないので、2 重推移性の一般論を先に積む必要がない
+(必要になったら供給側で示せばよい)。
+
+* `exists_fgh` — `t x t = g(x) h(x) t f(x)` を満たす `f, g, h : L → L` の存在
+  (値の所属 `f x, g x ∈ Q`, `h x ∈ D` 込み)。
+* `fgh_unique` — 2 組が `Q^#` 上で一致する (両方の一意分解から)。
+
+**次**: 恒等式 (H1)-(H6)。(H1)-(H4) は「straightforward calculations」、
+(H5)(H6) は書籍に計算が書いてある (p.122-123)。
+
 ## 参照
 
 <!-- 関連 issue / PR / ファイル / コミット. -->
@@ -82,8 +103,8 @@ Ch. I §1 Prop 4 と同じ論法)。
 
 ## やること
 
-- [ ] §1 の設定 (split BN-pair rank 1) を Lean の構造体に落とす
-- [ ] `f`, `g`, `h` の存在と一意性 (Ch. I §1 Prop 4 相当の一意表示から)
+- [x] `f`, `g`, `h` の存在と一意性 — **完了** (2026-07-31,
+  `GroupTheory/RankOneBNPair.lean`: `exists_fgh` / `fgh_unique`)
 - [ ] (H1)-(H6)
 - [ ] Lemma (`f` が `L` を決める)
 - [ ] §2 以降の調査 (ページ画像で式を確定) → 段ごとに issue 更新
