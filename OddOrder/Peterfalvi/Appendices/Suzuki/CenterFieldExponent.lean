@@ -49,6 +49,9 @@ than imported from the type-B data; see issue 0167.
 * `Hypothesis.exists_sigma_inverting_W1` — **step (2) of the Proposition**: an
   automorphism `σ` of `E` with `ω^{1+σ} = 1` for every `ω ∈ W₁`, i.e. `σ` inverts
   `W₁`.
+* `Hypothesis.exists_center_coordinate_equiv` — the coordinate `ι` upgraded to an
+  additive *isomorphism* onto the subfield `F`, which is the form step (3) needs
+  for the kernel map of Appendix III Lemma 1(c).
 -/
 
 set_option autoImplicit false
@@ -493,6 +496,62 @@ theorem exists_sigma_inverting_W1 {m : ℕ} (hm : m ≠ 0)
   rw [OddOrder.FiniteField.qFrobenius_apply, OddOrder.FiniteField.qFrobenius_apply,
     ← hi, ← hi']
   exact hW v
+
+
+/-! ## The centre coordinate as an isomorphism onto `F`
+
+Appendix III Lemma 1(c) (`GroupExtension.exists_mulEquiv_of_comp_squareMap_eq`)
+takes an additive *isomorphism* between the kernels of the two extensions, so the
+embedding `ι` of `exists_center_coordinate_exponent` has to be corestricted to its
+image and upgraded.  Both sides have `q` elements, so injectivity suffices. -/
+
+open scoped Classical in
+/-- **The centre coordinate as an isomorphism `Z(Q) ≃+ F`.**  Same content as
+`exists_center_coordinate_exponent`, with `ι` presented as an additive isomorphism
+onto the subfield `F = {x : x^q = x}` of `E` — the form required by the kernel map
+of Appendix III Lemma 1(c) in step (3) of the Proposition. -/
+theorem exists_center_coordinate_equiv {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m) :
+    ∃ (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ),
+      ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+        ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+            ((ι (Additive.ofMul z) :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨ι₀, d, hinj, hF, hequiv⟩ :=
+    hyp.exists_center_coordinate_exponent hm hQ0card s M
+  -- corestrict `ι₀` to the subfield
+  set F₁ : Subfield M.E := OddOrder.FiniteField.frobFixedSubfield M.E 2 m with hF₁
+  have hmem : ∀ z, ι₀ z ∈ F₁ := fun z =>
+    (OddOrder.FiniteField.mem_frobFixedSubfield).mpr (hF z)
+  set ι₁ : Additive ↥(Subgroup.center hyp.Q) →+ ↥F₁ :=
+    { toFun := fun z => ⟨ι₀ z, hmem z⟩
+      map_zero' := Subtype.ext ι₀.map_zero
+      map_add' := fun a b => Subtype.ext (ι₀.map_add a b) } with hι₁
+  have hι₁inj : Function.Injective ι₁ := fun a b hab =>
+    hinj (congrArg (Subtype.val (p := fun x => x ∈ F₁)) hab)
+  -- both sides have `q` elements, so `ι₁` is bijective
+  have hZcard : Nat.card ↥(Subgroup.center hyp.Q) = 2 ^ m := by
+    rw [s.centerEqQ0,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv, hQ0card]
+  have hcards : Nat.card (Additive ↥(Subgroup.center hyp.Q)) = Nat.card ↥F₁ := by
+    rw [Nat.card_congr (Additive.toMul (α := ↥(Subgroup.center hyp.Q))), hZcard, hF₁]
+    exact (OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm).symm
+  haveI : Finite ↥F₁ := Subtype.finite
+  haveI : Finite (Additive ↥(Subgroup.center hyp.Q)) := by
+    exact Finite.of_equiv _ (Additive.ofMul (α := ↥(Subgroup.center hyp.Q)))
+  haveI : Fintype (Additive ↥(Subgroup.center hyp.Q)) := Fintype.ofFinite _
+  haveI : Fintype ↥F₁ := Fintype.ofFinite _
+  have hbij : Function.Bijective ι₁ := by
+    refine (Fintype.bijective_iff_injective_and_card ι₁).mpr ⟨hι₁inj, ?_⟩
+    rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card, hcards]
+  refine ⟨AddEquiv.ofBijective ι₁ hbij, d, fun k z => ?_⟩
+  exact hequiv k z
 
 end Hypothesis
 

@@ -92,7 +92,17 @@ Appendix III Definition 3 により `S` は中心拡大
 - [x] 上表の ❓ を実測 (2026-07-29: 全部 ✅ だった)
 - [x] 段 (1): `S/Q₀ ≅ E` と `w` のスカラー化 (2026-07-30, `QuotientKWField.lean`)
 - [x] 段 (2): `σ` の存在 — **完了** (2026-07-30, `exists_sigma_inverting_W1`)。`θ = 1` 分岐は `QuotientFieldModel.bar_mu_K`/`bar_mu_W`、一般の場合は 5 段計画 (下記) を全部通した
-- [ ] 段 (3): `S ≅ S₁`
+- [~] 段 (3): `S ≅ S₁` — 着手 (2026-07-30)。Appendix III Lemma 1(c) =
+  `GroupExtension.exists_mulEquiv_of_comp_squareMap_eq` (`CentralExtensionAutomorphisms.lean`)
+  が中身。必要な入力と現状:
+  * 中心拡大 `Z(Q) → Q → Q/Z(Q)`: `GroupExtension.ofNormalSubgroupCoordinates`
+    (`CentralElementaryExtension.lean`) で組める。
+  * モデル側 `S₁`: `Suzuki2Groups.QuadraticExtension χ basis` (Lemma 1(b)) に χ を食わせる。
+  * 商の同型 `f`: 段 (1) の `M.coord`。
+  * **核の同型 `g`**: ✅ `exists_center_coordinate_equiv` (2026-07-30) —
+    step 1 の `ι` は単射 `→+` だったので、値が部分体 `F` に落ちること + 両側とも `q` 元
+    から全単射に格上げして `Additive Z(Q) ≃+ ↥F` にした。Lemma 1(c) が要求する形。
+  * `g ∘ q = q' ∘ f` (二次写像の整合): χ の構成 (step 2) がまさにこれ。
 - [ ] 段 (4): 作用の共役化 (Zassenhaus)
 - [ ] 段 (5): `s ↦ (0,1)` の正規化
 - [ ] Proposition 本体の statement + AxiomsCheck 登録

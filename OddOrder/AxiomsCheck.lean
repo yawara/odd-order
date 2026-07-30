@@ -14454,6 +14454,8 @@ are injective and the action is free. -/
 #assert_only_allowed_axioms OddOrder.FiniteField.exists_qFrobenius_normalized_index
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sigma_inverting_W1
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_center_coordinate_equiv
 
 /-! **The `q`-power Frobenius of a field of order `q²`** (issues 0167 / 9504, 2026-07-30).
 `Algebra/QuadraticFrobenius.lean` — the ambient field theory of Ch. III §3, p. 120, where
