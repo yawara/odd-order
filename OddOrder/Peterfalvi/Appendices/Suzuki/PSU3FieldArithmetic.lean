@@ -796,6 +796,44 @@ theorem betaRatio_div_betaRatio {E : Type*} [Field E] (h2 : (2 : E) = 0) {β : E
   rw [hstep, betaSum_mul_betaSum_add_two h2 hβ i, add_div,
     div_self (pow_ne_zero 2 hci1), ← div_pow]
 
+/-- **Unrolling the recursion of step (18)** (Peterfalvi Part II, p. 127).
+
+From `F(i+2) = g · F(i+1) · z(i+2)` one gets `F(n+1) = gⁿ · F(1) · ∏_{j=2}^{n+1} z(j)`.
+
+No commutativity is needed: the scalars accumulate on the right in order, and the `g`'s
+collect on the left because each step contributes one at the front.
+
+The book's `h(ω(0,u_i)) = (h(ω)ζ⁻¹) · h(ω(0,u_{i-1})) · (ζ u_i)` has exactly this shape,
+with `g = h(ω)ζ⁻¹` and `z(i) = ζ u_i`. -/
+theorem eq_pow_mul_prod_of_rec {H : Type*} [Group H] (F : ℕ → H) (g : H) (z : ℕ → H)
+    (hrec : ∀ i, F (i + 2) = g * F (i + 1) * z (i + 2)) (n : ℕ) :
+    F (n + 1) = g ^ n * F 1 * ((List.range n).map fun j => z (j + 2)).prod := by
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    rw [hrec k, ih, List.range_succ, List.map_append, List.prod_append, pow_succ']
+    simp only [List.map_cons, List.map_nil, List.prod_cons, List.prod_nil, mul_one]
+    group
+
+/-- **The telescoping product behind step (18)** (Peterfalvi Part II, p. 127):
+
+  `u₂ u₃ ⋯ u_i = c₁ / c_i`.
+
+Unrolling the recursion `h(ω(0,u_i)) = (h(ω)ζ⁻¹) · h(ω(0,u_{i-1})) · (ζ u_i)` collects the
+scalars into `ζ^{i-1}` times this product — which is what produces the `α/(β^i + β^{-i})`
+of the book's closed form, `α` being `c₁`. -/
+theorem prod_betaRatio {E : Type*} [Field E] {β : E} (n : ℕ)
+    (hne : ∀ j, j ≤ n → betaSum β (j + 1) ≠ 0) :
+    ∏ j ∈ Finset.Ico 1 (n + 1), betaRatio β j = betaSum β 1 / betaSum β (n + 1) := by
+  induction n with
+  | zero => simp [div_self (hne 0 le_rfl)]
+  | succ k ih =>
+    rw [Finset.prod_Ico_succ_top (by omega), ih fun j hj => hne j (by omega)]
+    have h1 : betaSum β (k + 1) ≠ 0 := hne k (by omega)
+    have h2 : betaSum β (k + 1 + 1) ≠ 0 := hne (k + 1) le_rfl
+    simp only [betaRatio]
+    field_simp
+
 /-! ### Step (18): `u_i` is fixed by `θ`, so `u_i^{2τ} = u_i` (p. 127)
 
 Step (18) opens with "by (13) and (16), `u_i^θ = u_i` and so `u_i^{2τ} = u_i`".  Both
