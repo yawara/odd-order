@@ -213,6 +213,16 @@ def groupExtension (B : BilinMap R V W) :
   range_inl_eq_ker_rightHom := range_centralEmbedding_eq_ker_projection
   rightHom_surjective := projection_surjective
 
+/-- The twisted product is the product of its two coordinates, as a type. -/
+def prodEquiv (B : BilinMap R V W) : BilinearTwistedProduct B ≃ V × W where
+  toFun x := (x.quotient, x.central)
+  invFun p := ⟨p.1, p.2⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+instance [Finite V] [Finite W] : Finite (BilinearTwistedProduct B) :=
+  Finite.of_equiv _ (prodEquiv B).symm
+
 /-- **A compatible pair of coordinate automorphisms is an automorphism of the
 twisted product.**
 

@@ -548,6 +548,37 @@ theorem inducingIdAuts_conj_mem_of_scalar
     · exact hc w.toAdd
   · exact congrArg Multiplicative.ofAdd (hq e)
 
+/-! ## `U` is a solvable `2`-group -/
+
+/-- **`U` is an elementary abelian `2`-group** (Peterfalvi Appendix III,
+Lemma 1(d)): the kernel `F` of the model extension is one. -/
+theorem isElementaryAbelian_inducingIdAuts_model
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) :
+    IsElementaryAbelian 2
+      ↥((Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts) :=
+  GroupExtension.isElementaryAbelian_inducingIdAuts _
+    Suzuki2Groups.BilinearTwistedProduct.centralEmbedding_range_le_center
+
+/-- `U` is solvable, being abelian — the solvability input to the Zassenhaus step. -/
+theorem isSolvable_inducingIdAuts_model
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) :
+    IsSolvable
+      ↥((Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts) :=
+  isSolvable_of_comm (hyp.isElementaryAbelian_inducingIdAuts_model M φ).comm
+
+/-- `|U|` is a power of `2` — the coprimality input to the Zassenhaus step, against
+the odd `|K W|` of `card_actualKActor_prod_W_odd`. -/
+theorem card_inducingIdAuts_model
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) :
+    ∃ n : ℕ, Nat.card
+      ↥((Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts)
+        = 2 ^ n := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  exact (hyp.isElementaryAbelian_inducingIdAuts_model M φ).isPGroup.exists_card_eq
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

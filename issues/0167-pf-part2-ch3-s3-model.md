@@ -633,9 +633,20 @@ twisted product では `inl w = ⟨0, w⟩`, `rightHom p = ofAdd p.quotient` な
 * `Hypothesis.inducingIdAuts_conj_mem_of_scalar` — `A`・`B` の両方がこの形
   (両座標を単元でスケールする) なので `U ⊴ U A` が従う。
 
-**次 (段 (4) 最終)**: 有限性 instance + `U` の 2 群性
-(`isElementaryAbelian_inducingIdAuts`) + 可解性 を揃えて `IsComplement'` を組み、
-`exists_conj_of_coprime` を適用 → `A^u = B`。その後 段 (5) (`s ↦ (0,1)` の正規化)。
+* `BilinearTwistedProduct.prodEquiv` + `Finite` instance
+  (`Suzuki2Groups/QuadraticExtensions.lean`) — 模型は 2 座標の直積なので有限。
+  ⚠ これが無いと `MulAut S₁` の有限性が出ず、Zassenhaus に食わせられない。
+* `isElementaryAbelian_inducingIdAuts_model` / `isSolvable_inducingIdAuts_model` /
+  `card_inducingIdAuts_model` — `U` は初等アーベル 2 群 (Appendix III Lemma 1(d))
+  ⟹ 可解、かつ `|U|` は 2 冪。
+
+**⟹ Zassenhaus の仮説はすべて揃った**:
+`U ⊴ U A` (正規化) / `U ∩ A = U ∩ B = ⊥` / `U A = U B` / `|U|` 2 冪 vs `|K W|` 奇数 /
+`U` 可解 / 有限性。
+
+**次 (段 (4) 最終)**: `IsComplement'` の packaging (`↥(U ⊔ A.range)` へ
+`subgroupOf` で降ろす) → `IsComplement'.exists_conj_of_coprime` → `A^u = B`。
+その後 段 (5) (`s ↦ (0,1)` の正規化)。
 
 landing 済 (2026-07-31):
 * `exists_bilinear_lift_of_pinned_restriction` に第 3 の結論として追加。

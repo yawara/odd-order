@@ -14572,6 +14572,12 @@ only through its diagonal. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inducingIdAuts_conj_mem_of_scalar
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isElementaryAbelian_inducingIdAuts_model
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isSolvable_inducingIdAuts_model
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_inducingIdAuts_model
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.congrEquiv_quotient
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.congrEquiv_central
