@@ -421,6 +421,93 @@ theorem congr_conjQHom_mul_inv_mem_inducingIdAuts
       ← Units.val_mul, inv_mul_cancel, Units.val_one, one_mul]
     rfl
 
+/-! ## The complement conditions for the Zassenhaus argument -/
+
+/-- **An automorphism of the model that lies in `U` cannot scale the quotient
+coordinate.**  Evaluating the `InducesId` condition at `⟨1, 0⟩` reads the scalar
+off directly.
+
+This is what makes both `A` and `B` meet `U` trivially, once `μ` is known to be
+faithful (`mu_injective`). -/
+theorem eq_one_of_mem_inducingIdAuts_of_quotient_smul
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (Ψ : MulAut (Suzuki2Groups.BilinearTwistedProduct φ)) (u : M.Eˣ)
+    (hΨ : ∀ p : Suzuki2Groups.BilinearTwistedProduct φ,
+      (Ψ p).quotient = ((u : M.Eˣ) : M.E) * p.quotient)
+    (hmem : Ψ ∈ (Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts) :
+    u = 1 := by
+  have h := hmem.2 (⟨1, 0⟩ : Suzuki2Groups.BilinearTwistedProduct φ)
+  have hq : (Ψ (⟨1, 0⟩ : Suzuki2Groups.BilinearTwistedProduct φ)).quotient
+      = (⟨1, 0⟩ : Suzuki2Groups.BilinearTwistedProduct φ).quotient :=
+    congrArg (fun z : Multiplicative M.E => z.toAdd) h
+  rw [hΨ] at hq
+  refine Units.ext ?_
+  rw [Units.val_one]
+  change ((u : M.Eˣ) : M.E) * (1 : M.E) = (1 : M.E) at hq
+  rwa [mul_one] at hq
+
+include s in
+/-- **The model action is injective**: it determines the scalar `μ(k,v)`, and `μ`
+is faithful. -/
+theorem modelScalarHom_injective_of_quotient
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card hyp.Q = Nat.card hyp.Q0 ^ 3)
+    (inductionHypothesis : TheoremAInductionBelow G Ω)
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (Θ : ↥hyp.actualKActor × ↥hyp.W →*
+      MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+    (hΘq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+        (Θ kv p).quotient = ((M.mu kv : M.Eˣ) : M.E) * p.quotient) :
+    Function.Injective Θ := by
+  have hker : ∀ kv, Θ kv = 1 → kv = 1 := by
+    intro kv hkv
+    refine hyp.mu_injective hst hm hQ0card hcardQ inductionHypothesis s M ?_
+    rw [map_one]
+    refine hyp.eq_one_of_mem_inducingIdAuts_of_quotient_smul M φ (Θ kv) (M.mu kv)
+      (hΘq kv) ?_
+    rw [hkv]
+    exact Subgroup.one_mem _
+  intro a b hab
+  have hmul : Θ (a⁻¹ * b) = 1 := by
+    rw [map_mul, ← hab, ← map_mul, inv_mul_cancel, map_one]
+  have := hker _ hmul
+  rwa [inv_mul_eq_one] at this
+
+include s in
+/-- **`U` meets the image of a scalar action trivially.**
+
+Stated for any homomorphism into `Aut S₁` whose quotient-coordinate effect is
+multiplication by `μ` — which covers both the model action `B` and the transported
+conjugation action `A` (`congr_conjQHom_quotient`).  This is the complement
+condition `U ∩ A = U ∩ B = 1` of the Zassenhaus step. -/
+theorem inducingIdAuts_inf_range_eq_bot
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card hyp.Q = Nat.card hyp.Q0 ^ 3)
+    (inductionHypothesis : TheoremAInductionBelow G Ω)
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (Ξ : ↥hyp.actualKActor × ↥hyp.W →*
+      MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+    (hΞq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+        (Ξ kv p).quotient = ((M.mu kv : M.Eˣ) : M.E) * p.quotient) :
+    (Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts ⊓ Ξ.range
+      = ⊥ := by
+  rw [eq_bot_iff]
+  rintro Ψ ⟨hU, kv, rfl⟩
+  have hu : M.mu kv = 1 :=
+    hyp.eq_one_of_mem_inducingIdAuts_of_quotient_smul M φ (Ξ kv) (M.mu kv) (hΞq kv) hU
+  have hkv : kv = 1 :=
+    hyp.mu_injective hst hm hQ0card hcardQ inductionHypothesis s M
+      (by rw [hu, map_one])
+  rw [hkv, map_one]
+  exact Subgroup.mem_bot.mpr rfl
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

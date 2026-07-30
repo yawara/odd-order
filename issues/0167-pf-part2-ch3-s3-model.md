@@ -606,8 +606,20 @@ twisted product では `inl w = ⟨0, w⟩`, `rightHom p = ofAdd p.quotient` な
   要求する形) が直に出る。⚠ 逆元の公式は導出不要 — `Θ` は準同型なので
   `(Θ kv)⁻¹ = Θ (kv⁻¹)` で、`μ`・`ν` の逆元版がそのまま使える。
 
-**次 (段 (4) 最終)**: 補群条件 (`U ∩ A = U ∩ B = 1` は `mu_injective` から) +
-互いに素 + 可解性 を揃えて `IsComplement'.exists_conj_of_coprime` を適用 → `A^u = B`。
+### 補群条件 (2026-07-31 その 7)
+
+* `eq_one_of_mem_inducingIdAuts_of_quotient_smul` — **`U` の元は商座標をスケール
+  できない**。`InducesId` の第 2 条件を `⟨1,0⟩` で評価するとスカラーが直接読める
+  (3 行)。
+* `modelScalarHom_injective_of_quotient` — 作用は `μ(k,v)` を決めるので
+  `mu_injective` から単射。
+* `inducingIdAuts_inf_range_eq_bot` — **`U ∩ (像) = ⊥`**。⚠ 商座標の効果が
+  `μ` 倍である**任意の**準同型に対して述べたので、模型作用 `B` と移送共役作用 `A`
+  の**両方**を 1 本でカバーする (`A` 側は `congr_conjQHom_quotient` が仮説を供給)。
+
+**次 (段 (4) 最終)**: `U A = U B` (各点版から) + 互いに素 (`|U|` 2 冪 vs `|K||W|` 奇数)
++ 可解性 (`U` 初等アーベル) + 有限性 instance を揃えて
+`IsComplement'.exists_conj_of_coprime` を適用 → `A^u = B`。
 その後 段 (5) (`s ↦ (0,1)` の正規化)。
 
 landing 済 (2026-07-31):

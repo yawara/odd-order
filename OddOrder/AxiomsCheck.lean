@@ -14556,6 +14556,12 @@ only through its diagonal. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.congr_conjQHom_mul_inv_mem_inducingIdAuts
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.eq_one_of_mem_inducingIdAuts_of_quotient_smul
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.modelScalarHom_injective_of_quotient
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inducingIdAuts_inf_range_eq_bot
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.congrEquiv_quotient
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.congrEquiv_central
