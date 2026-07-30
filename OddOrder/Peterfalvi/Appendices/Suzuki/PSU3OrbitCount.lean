@@ -690,6 +690,71 @@ theorem exists_witness_coset_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
   rw [Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv, hA'val z hz] at hmm
   exact hmm
 
+/-- **Peterfalvi Part II, Ch. IV §2, step (9)** (p. 124–125):
+
+> For all `i`, there are elements `ω'_i ∈ Q − Q₀` and `y_i ∈ Q₀^#` such that `ω̄'_i` is
+> in the orbit of `ω̄_i` under `KW` and `f(ω'_i) = (ω'_i y_i)^ζ`.
+
+Here `ζ` is any nontrivial element of `W` (the book takes a generator, nontrivial by
+(C2)).  The witness for the coset `ζK` exists by `exists_witness_coset_eq`, its
+`K`-part has a square root by `exists_sq_eq_of_mem_K`, and `f_conj_collapse` turns the
+exponent into `ζ`. -/
+theorem stepNine {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hVW : hyp.V = hyp.W) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hinj : Function.Injective M.mu)
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    {ζ : G} (hζW : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1) :
+    ∃ ω' ∈ hyp.Q, ω' ∉ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, y ≠ 1 ∧
+      f ω' = ζ⁻¹ * (ω' * y) * ζ := by
+  have hWD : hyp.W ≤ hyp.D := le_trans inf_le_left hyp.V_le_D
+  have hζD : ζ ∈ hyp.D := hWD hζW
+  have hζK : ζ ∉ hyp.K := by
+    intro hc
+    refine hζ1 ?_
+    have : ζ ∈ hyp.K ⊓ hyp.W := ⟨hc, hζW⟩
+    rwa [hyp.K_inf_W_eq_bot, Subgroup.mem_bot] at this
+  obtain ⟨z, hzQ0, b, hbQ0, a, haD, haζ, heq⟩ :=
+    hyp.exists_witness_coset_eq M hZ H hC2 hVW hm hQ0card hinj hKcard hWdvd
+      hωQ hωQ0 hζD hζK
+  -- `a = k ζ` with `k ∈ K`, using that `W` centralizes `K`
+  have hkK : ζ⁻¹ * a ∈ hyp.K := by
+    have := hyp.K.inv_mem haζ
+    simpa using this
+  obtain ⟨c, hcK, hcsq⟩ := hyp.exists_sq_eq_of_mem_K hkK
+  have hcKSet : c ∈ hyp.KSet := by
+    have hh : c ∈ (hyp.K : Set G) := hcK
+    rwa [hyp.coe_K] at hh
+  have haeq : a = c ^ 2 * ζ := by
+    rw [hcsq]
+    have hcm : ζ * (ζ⁻¹ * a) = a := by group
+    rw [← hyp.commute_of_mem_W_of_mem_K hζW hkK] at hcm
+    exact hcm.symm
+  obtain ⟨hωzQ, hωzQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hzQ0
+  have hωz1 : ω * z ≠ 1 := fun hc => hωzQ0 (hc ▸ hyp.Q0.one_mem)
+  rw [haeq] at heq
+  have hcoll := hyp.f_conj_collapse H hωzQ hωz1 hzQ0 hcKSet hζW heq
+  -- package the result
+  have hcD : c ∈ hyp.D := hyp.K_le_D hcK
+  have hω'Q : c⁻¹ * (ω * z) * c ∈ hyp.Q := hyp.rankOneSetup.DQ c hcD _ hωzQ
+  have hω'Q0 : c⁻¹ * (ω * z) * c ∉ hyp.Q0 := by
+    intro hcc
+    refine hωzQ0 ?_
+    have e : ω * z = c * (c⁻¹ * (ω * z) * c) * c⁻¹ := by group
+    rw [e]
+    exact hyp.conj_mem_Q0_of_mem_H (hyp.D_le_H hcD) hcc
+  have hyQ0 : c⁻¹ * (z * b) * c ∈ hyp.Q0 := by
+    have := hyp.conj_mem_Q0_of_mem_H (hyp.H.inv_mem (hyp.D_le_H hcD))
+      (hyp.Q0.mul_mem hzQ0 hbQ0)
+    rwa [inv_inv] at this
+  refine ⟨_, hω'Q, hω'Q0, _, hyQ0, ?_, hcoll⟩
+  exact hyp.ne_one_of_f_eq_conj H hC2 hω'Q hω'Q0 hζD hcoll
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
