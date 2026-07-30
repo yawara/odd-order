@@ -569,6 +569,51 @@ theorem stepEight {m : ℕ} (M : hyp.QuotientFieldModel m)
   · have := hyp.ncard_fiber_orbitOfF_base_le M hZ H hC2 hωQ hωQ0
     rwa [hVW] at this
 
+/-- **The set-level count is exact**: `|S| = |W| − 1`, where
+
+  `S = {z ∈ Q₀ | ∃ y ∈ Q₀, ∃ a ∈ D, f(ω z) = (ω y)^a}`.
+
+`≤` is `ncard_le_card_V_sub_one_of_f_eq_conj_self`; `≥` comes from step (8), which
+pins the distinguished fibre at exactly `|W| − 1` and whose image lies in `S`.
+
+Exactness is what makes the coset map on `S` *surjective* onto the nontrivial cosets
+of `K`, which is how step (9) produces its `kζ`. -/
+theorem ncard_eq_card_W_sub_one_of_f_eq_conj_self {m : ℕ}
+    (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hVW : hyp.V = hyp.W) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hinj : Function.Injective M.mu)
+    (hK : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) :
+    {z : G | z ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+        f (ω * z) = a⁻¹ * (ω * y) * a}.ncard = Nat.card ↥hyp.W - 1 := by
+  classical
+  refine le_antisymm ?_ ?_
+  · have hle := hyp.ncard_le_card_V_sub_one_of_f_eq_conj_self H hC2 hωQ hωQ0
+    rwa [hVW] at hle
+  · have hstep := (hyp.stepEight M hZ H hC2 hVW hm hQ0card hinj hK hWdvd hωQ hωQ0).2
+    have hsub : ((↑) : ↥hyp.Q0 → G) ''
+        {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x
+          = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)}
+        ⊆ {z : G | z ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+            f (ω * z) = a⁻¹ * (ω * y) * a} := by
+      rintro _ ⟨x, hx, rfl⟩
+      refine ⟨x.2, ?_⟩
+      exact hyp.exists_conj_of_coset_eq M hZ hωQ
+        (hyp.f_mul_mem_Q H hC2 hωQ hωQ0 x) rfl rfl hx.symm
+    calc Nat.card ↥hyp.W - 1
+        = {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x
+            = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)}.ncard := hstep.symm
+      _ = (((↑) : ↥hyp.Q0 → G) ''
+            {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x
+              = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)}).ncard :=
+          (Set.ncard_image_of_injective _ Subtype.val_injective).symm
+      _ ≤ _ := Set.ncard_le_ncard hsub (Set.toFinite _)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
