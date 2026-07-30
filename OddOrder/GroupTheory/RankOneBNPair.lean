@@ -40,6 +40,9 @@ The chapter uses these mappings to pin down `G` in the characterization of
 * `hSix` — the identity (H6), the addition formulas for `f`, `g`, `h` at `xy`.
 * `Setup.closure_M_union_t`, `Setup.closure_conj_Q` — `L = ⟨M, t⟩` and
   `⟨Q^x | x ∈ L⟩ = ⟨Q, Q^t⟩`, the generation half of the Lemma of §1.
+* `coordsEquiv`, `coords_smul_t_some`, `coords_smul_some_of_mem_M` — the permutation
+  model `X ≅ Q ∪ {a}` of the Lemma of §1, in which `t` acts by `f` and `M` acts
+  through its `Q ⋊ D` structure.
 
 ## Implementation notes
 
@@ -78,6 +81,8 @@ structure Setup (M Q D : Subgroup L) (t : L) : Prop where
   /-- Every element of `L − M` is uniquely `a · t · b` with `a ∈ M` and `b ∈ Q`
   (Peterfalvi Ch. I §1, Proposition 4). -/
   fact : ∀ y : L, y ∉ M → ∃! p : ↥M × ↥Q, y = (p.1 : L) * t * (p.2 : L)
+  /-- `t ∉ M`: Peterfalvi's `t` is an involution in `L − M`. -/
+  tnotmem : t ∉ M
   /-- `t x t ∉ M` for `x ∈ Q^#`; this is `Q^t ∩ M = 1`. -/
   tconj : ∀ x ∈ Q, x ≠ 1 → t * x * t ∉ M
   /-- `t x ∉ M` for `x ∈ Q^#`; equivalently `t x t ∉ M t`.  This is what forces `f`
@@ -555,5 +560,155 @@ theorem hSix (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
   obtain ⟨e₁, e₂, e₃⟩ := fgh_eq_of_canonical hS H (Q.mul_mem hxQ hyQ) hxy1 hp hd hq
     (canonical_mul hS H hxQ hx1 hyQ hy1 hne)
   exact ⟨hne, e₁, e₂, e₃⟩
+
+/-! ## The permutation model
+
+The rest of the Lemma of Ch. IV §1 (p. 123): *if `L` acts faithfully on `X` then
+`⟨Q^x | x ∈ L⟩` is determined up to isomorphism by `Q` and `f`, and `L` is determined
+up to isomorphism by `M = Q ⋊ D` and `f`.*
+
+Peterfalvi identifies `X` with `Q ∪ {a}`, the element `x ∈ Q` naming the point `a t x`.
+Here `X` is the coset space `L ⧸ M`, `a` is the coset of `1`, and `a t x` is the left
+coset of `x⁻¹ t`.  The content of the Lemma is then the pair of formulas
+`coords_smul_t` and `coords_smul_of_mem_M` below: **`t` acts by `f`** (interchanging
+`a` with `1`), and `M` acts through its `Q ⋊ D` structure alone.  Since `L = ⟨M, t⟩`
+(`Setup.closure_M_union_t`) and the action is faithful exactly when `M` has trivial
+normal core (mathlib's `Subgroup.normalCore_eq_ker`), `L` is recovered inside
+`Equiv.Perm X` from `M = Q ⋊ D` and `f`.
+-/
+
+/-- Coordinates on `X = L ⧸ M`: the point `a` (the coset of `1`) together with a copy
+of `Q`, where `x ∈ Q` names the point `a t x` of Peterfalvi's right-action notation,
+i.e. the left coset of `x⁻¹ t`. -/
+def coords (M Q : Subgroup L) (t : L) : Option ↥Q → L ⧸ M
+  | none => ((1 : L) : L ⧸ M)
+  | some x => (((x : L)⁻¹ * t : L) : L ⧸ M)
+
+@[simp] theorem coords_none : coords M Q t none = ((1 : L) : L ⧸ M) := rfl
+
+@[simp] theorem coords_some (x : ↥Q) :
+    coords M Q t (some x) = (((x : L)⁻¹ * t : L) : L ⧸ M) := rfl
+
+/-- `coords` is a bijection: this is the identification `X ≅ Q ∪ {a}`. -/
+theorem coords_bijective (hS : Setup M Q D t) :
+    Function.Bijective (coords M Q t) := by
+  constructor
+  · rintro (_ | x) (_ | y) hxy
+    · rfl
+    · rw [coords_none, coords_some, QuotientGroup.eq] at hxy
+      refine absurd ?_ hS.tnotmem
+      have h1 : (y : L)⁻¹ * t ∈ M := by simpa using hxy
+      simpa using M.mul_mem (hS.QM y.2) h1
+    · rw [coords_some, coords_none, QuotientGroup.eq] at hxy
+      refine absurd ?_ hS.tnotmem
+      have h1 : t⁻¹ * (x : L) ∈ M := by simpa using hxy
+      have h3 : t⁻¹ ∈ M := by
+        simpa using M.mul_mem h1 (M.inv_mem (hS.QM x.2))
+      rwa [hS.tinv] at h3
+    · rw [coords_some, coords_some, QuotientGroup.eq] at hxy
+      have e : ((x : L)⁻¹ * t)⁻¹ * ((y : L)⁻¹ * t) = t * ((x : L) * (y : L)⁻¹) * t := by
+        have e' : ((x : L)⁻¹ * t)⁻¹ * ((y : L)⁻¹ * t)
+            = t⁻¹ * ((x : L) * (y : L)⁻¹) * t := by group
+        rwa [hS.tinv] at e'
+      rw [e] at hxy
+      by_cases hc : (x : L) * (y : L)⁻¹ = 1
+      · exact congrArg some (Subtype.ext (mul_inv_eq_one.mp hc))
+      · exact absurd hxy (hS.tconj _ (Q.mul_mem x.2 (Q.inv_mem y.2)) hc)
+  · intro c
+    obtain ⟨y, rfl⟩ := QuotientGroup.mk_surjective c
+    by_cases hy : y ∈ M
+    · exact ⟨none, by rw [coords_none, QuotientGroup.eq]; simpa using hy⟩
+    · obtain ⟨p, hp, -⟩ := hS.fact y hy
+      obtain ⟨r, hr, -⟩ := hS.split (p.1 : L) p.1.2
+      refine ⟨some ⟨(r.1 : L)⁻¹, Q.inv_mem r.1.2⟩, ?_⟩
+      rw [coords_some, hp, hr, inv_inv, QuotientGroup.eq]
+      have e : ((r.1 : L) * t)⁻¹ * ((r.1 : L) * (r.2 : L) * t * (p.2 : L))
+          = (t * (r.2 : L) * t) * (p.2 : L) := by
+        have e' : ((r.1 : L) * t)⁻¹ * ((r.1 : L) * (r.2 : L) * t * (p.2 : L))
+            = (t⁻¹ * (r.2 : L) * t) * (p.2 : L) := by group
+        rwa [hS.tinv] at e'
+      rw [e]
+      exact M.mul_mem (hS.DM (hS.Dstab _ r.2.2)) (hS.QM p.2.2)
+
+/-- The identification `X ≅ Q ∪ {a}` of Peterfalvi Part II, Ch. IV §1, p. 123. -/
+noncomputable def coordsEquiv (hS : Setup M Q D t) : Option ↥Q ≃ L ⧸ M :=
+  Equiv.ofBijective _ (coords_bijective hS)
+
+@[simp] theorem coordsEquiv_apply (hS : Setup M Q D t) (o : Option ↥Q) :
+    coordsEquiv hS o = coords M Q t o := rfl
+
+/-! ### The action in coordinates
+
+These three formulas are the content of the Lemma: `t` acts by `f` (interchanging the
+point `a` with the point `1`), and `M` acts through its `Q ⋊ D` structure alone.
+-/
+
+/-- `t` maps the point `a` to the point `1`. -/
+theorem coords_smul_t_none :
+    (t : L) • coords M Q t (none : Option ↥Q) = coords M Q t (some 1) := by
+  change ((t * (1 : L) : L) : L ⧸ M) = _
+  rw [coords_some]
+  simp
+
+/-- ... and the point `1` back to `a`, `t` being an involution. -/
+theorem coords_smul_t_one (hS : Setup M Q D t) :
+    (t : L) • coords M Q t (some (1 : ↥Q)) = coords M Q t (none : Option ↥Q) := by
+  change ((t * (((1 : ↥Q) : L)⁻¹ * t) : L) : L ⧸ M) = _
+  rw [coords_none]
+  have e : t * ((((1 : ↥Q) : L))⁻¹ * t) = t * t := by
+    simp
+  rw [e, hS.invol]
+
+/-- **The action of `t` on `X` is determined by `f`** (Peterfalvi Part II, Ch. IV §1,
+p. 123): in the coordinates `X ≅ Q ∪ {a}`, `t` sends the point `x` to the point
+`f(x)`.
+
+Indeed `t · (a t x) = a t x t = a · g(x)h(x) · t f(x) = a t f(x)`, because
+`g(x) h(x) ∈ M` fixes `a`.  In left-coset form the same computation reads
+`t · x⁻¹ t M = g(x⁻¹) h(x⁻¹) t f(x⁻¹) M = g(x⁻¹) t M`, and `g(x⁻¹) = f(x)⁻¹` by (H1). -/
+theorem coords_smul_t_some (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
+    {x : ↥Q} (hx1 : (x : L) ≠ 1) :
+    (t : L) • coords M Q t (some x)
+      = coords M Q t (some ⟨f (x : L), H.f_mem x.2 hx1⟩) := by
+  have hxinvQ : (x : L)⁻¹ ∈ Q := Q.inv_mem x.2
+  have hxinv1 : (x : L)⁻¹ ≠ 1 := fun hc => hx1 (inv_eq_one.mp hc)
+  have hteq : t * ((x : L)⁻¹ * t)
+      = (f (x : L))⁻¹ * h ((x : L)⁻¹) * t * f ((x : L)⁻¹) := by
+    have e : t * ((x : L)⁻¹ * t) = t * (x : L)⁻¹ * t := by group
+    rw [e, H.eq _ hxinvQ hxinv1, (hOne hS H x.2 hx1).2.1]
+  change ((t * ((x : L)⁻¹ * t) : L) : L ⧸ M) = _
+  rw [hteq, QuotientGroup.mk_mul_of_mem _ (hS.QM (H.f_mem hxinvQ hxinv1)),
+    coords_some, QuotientGroup.eq]
+  have e2 : ((f (x : L))⁻¹ * h ((x : L)⁻¹) * t)⁻¹ * ((f (x : L))⁻¹ * t)
+      = t * (h ((x : L)⁻¹))⁻¹ * t := by
+    have e' : ((f (x : L))⁻¹ * h ((x : L)⁻¹) * t)⁻¹ * ((f (x : L))⁻¹ * t)
+        = t⁻¹ * (h ((x : L)⁻¹))⁻¹ * t := by group
+    rwa [hS.tinv] at e'
+  rw [e2]
+  exact hS.DM (hS.Dstab _ (D.inv_mem (H.h_mem hxinvQ hxinv1)))
+
+/-- `M` fixes the point `a`. -/
+theorem coords_smul_none_of_mem_M {m : L} (hm : m ∈ M) :
+    m • coords M Q t (none : Option ↥Q) = coords M Q t (none : Option ↥Q) := by
+  change ((m * (1 : L) : L) : L ⧸ M) = _
+  rw [coords_none, QuotientGroup.eq]
+  simpa using M.inv_mem hm
+
+/-- **The action of `M` on `X` is determined by `M = Q ⋊ D`** (Peterfalvi Part II,
+Ch. IV §1, p. 123): the image of the point `x` under `m` is read off from the
+`Q ⋊ D` decomposition `m x⁻¹ = q · d`, the `D`-part being absorbed by
+`d t M = t (t d t) M = t M`. -/
+theorem coords_smul_some_of_mem_M (hS : Setup M Q D t) (x : ↥Q)
+    {m q d : L} (hq : q ∈ Q) (hd : d ∈ D) (hqd : m * (x : L)⁻¹ = q * d) :
+    m • coords M Q t (some x) = coords M Q t (some ⟨q⁻¹, Q.inv_mem hq⟩) := by
+  change ((m * ((x : L)⁻¹ * t) : L) : L ⧸ M) = _
+  have e : m * ((x : L)⁻¹ * t) = q * d * t := by
+    rw [← hqd]; group
+  rw [e, coords_some, inv_inv, QuotientGroup.eq]
+  have e2 : (q * d * t)⁻¹ * (q * t) = t * d⁻¹ * t := by
+    have e' : (q * d * t)⁻¹ * (q * t) = t⁻¹ * d⁻¹ * t := by group
+    rwa [hS.tinv] at e'
+  rw [e2]
+  exact hS.DM (hS.Dstab _ (D.inv_mem hd))
 
 end OddOrder.GroupTheory.RankOneBNPair
