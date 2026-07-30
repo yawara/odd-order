@@ -1102,13 +1102,51 @@ theorem coord_ne_zero_of_not_mem_Q0 {m : ℕ} (M : hyp.QuotientFieldModel m)
   rw [hZ, Subgroup.mem_subgroupOf] at hmem
   exact hmem
 
+/-- `f(ω x) ∈ Q` for `x ∈ Q₀` — named so that it can serve as the coercion proof in
+`fUnit`, making `fUnit_val` hold by `rfl`. -/
+theorem f_mul_mem_Q {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (x : ↥hyp.Q0) :
+    f (ω * (x : G)) ∈ hyp.Q :=
+  (hyp.f_mem_sdiff_Q0 H hC2 (hyp.mul_mem_sdiff_Q0 hωQ hωQ0 x.2).1
+    (hyp.mul_mem_sdiff_Q0 hωQ hωQ0 x.2).2).1
+
+/-- `f(ω x) ∉ Q₀` for `x ∈ Q₀`. -/
+theorem f_mul_not_mem_Q0 {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (x : ↥hyp.Q0) :
+    f (ω * (x : G)) ∉ hyp.Q0 :=
+  (hyp.f_mem_sdiff_Q0 H hC2 (hyp.mul_mem_sdiff_Q0 hωQ hωQ0 x.2).1
+    (hyp.mul_mem_sdiff_Q0 hωQ hωQ0 x.2).2).2
+
+/-- The coordinate of `f(ω x)` as a **unit** of `E`. -/
+noncomputable def fUnit {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (x : ↥hyp.Q0) : M.Eˣ :=
+  Units.mk0 (M.coord (Additive.ofMul (QuotientGroup.mk
+      (⟨f (ω * (x : G)), hyp.f_mul_mem_Q H hC2 hωQ hωQ0 x⟩ : ↥hyp.Q))))
+    (hyp.coord_ne_zero_of_not_mem_Q0 M hZ _ (hyp.f_mul_not_mem_Q0 H hC2 hωQ hωQ0 x))
+
+@[simp] theorem fUnit_val {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (x : ↥hyp.Q0) :
+    ((hyp.fUnit M hZ H hC2 hωQ hωQ0 x : M.Eˣ) : M.E)
+      = M.coord (Additive.ofMul (QuotientGroup.mk
+          (⟨f (ω * (x : G)), hyp.f_mul_mem_Q H hC2 hωQ hωQ0 x⟩ : ↥hyp.Q))) := rfl
+
 /-- **The map of step (8)**: `x ∈ Q₀ ↦` the `μ(KW)`-coset of the coordinate of
 `f(ω x)`.
 
-Well-defined because `ω x` and hence `f(ω x)` stay in `Q − Q₀`
-(`mul_mem_sdiff_Q0`, `f_mem_sdiff_Q0`), so the coordinate is a nonzero element of `E`
-(`coord_ne_zero_of_not_mem_Q0`), i.e. a unit.  Its class modulo `μ(KW)` is exactly the
-`KW`-orbit the book refers to, because `KW` acts by scalars. -/
+Because `KW` acts on `Q/Q₀ ≅ E` by scalars, this coset is exactly the `KW`-orbit the
+book refers to. -/
 noncomputable def orbitOfF {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
@@ -1116,9 +1154,7 @@ noncomputable def orbitOfF {m : ℕ} (M : hyp.QuotientFieldModel m)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (x : ↥hyp.Q0) :
     M.Eˣ ⧸ (MonoidHom.range M.mu) :=
-  let hx := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 x.2
-  let hfx := hyp.f_mem_sdiff_Q0 H hC2 hx.1 hx.2
-  QuotientGroup.mk (Units.mk0 _ (hyp.coord_ne_zero_of_not_mem_Q0 M hZ hfx.1 hfx.2))
+  QuotientGroup.mk (hyp.fUnit M hZ H hC2 hωQ hωQ0 x)
 
 /-- **`conjQHom kv` is conjugation by an element of `D`.**
 
