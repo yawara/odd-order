@@ -174,10 +174,45 @@ Appendix III Definition 3 により `S` は中心拡大
 さらに `(2 : E) = 0` (標数 2) も結論に入れた — 以降の段はすべて `E` の `q` 乗
 Frobenius `x ↦ x^q` (書籍の `x ↦ x̄`) で書かれるので標数が必要。
 
-### 段 (1) の残り → 段 (2) へ
+### 構造化 + 段 (2) の `θ = 1` 分岐 (2026-07-30 その 3)
+
+結論が 8 連言まで膨らんだので **`Hypothesis.QuotientFieldModel hyp m` 構造体**に束ねた
+(`LemmaFiveSetup` / `Suzuki2Groups.TypeBData` と同じ流儀; 段 (3)–(5) が `σ`・`λ₁`・`φ` を
+同じ体の上に足していくので、伸ばせる場所が要る)。フィールド = `E` (`Field`/`Finite`/`CharP 2`
+は instance フィールド), `card`, `mu`, `coord` (書籍の `α`), `coord_act`,
+`mu_K_frobFixed`, `mu_K_injective`, `mu_W_normOne`。
+供給定理は `nonempty_quotientFieldModel_of_orderThree`。
+
+**段 (2) の `θ = 1` 分岐が landing**:
+* `QuotientFieldModel.bar` — 書籍の bar 作用 `x ↦ x̄ = x^q` (= `FiniteField.qFrobenius M.E 2 m`)
+* `bar_mu_K` — `K₁` は bar の固定体 `F` に入る
+* `bar_mu_W` — bar は `W₁` を反転する (書籍 p.120 の `x^σ = x^{-1}` for `x ∈ W₁`)
+
+⟹ `θ = 1` なら `σ := bar` が Proposition の要求 (`σ|_F = θ = id`, `W₁` 反転) を満たす。
+
+支える体論は [9504](closed/9504-quadratic-frobenius-subfield.md) (closed) に切り出した:
+`E = 𝔽_{q²}` の bar 作用・位数 `q` の固定部分体 `F`・`Aut(F) → Aut(E)` の延長
+(存在 + ちょうど 2 個)。
+
+### 段 (1) の残り → 段 (2) の `θ ≠ 1` 分岐へ
 
 * `μ` 全体の単射性 (= `K ∩ W = 1` の像版) は `W` の商上の忠実性が必要で、
   monolith 内の `hfaith` (`WCyclicDivides.lean`) を切り出す作業になる。下流が要求したら着手。
+* **`θ ≠ 1` 分岐の設計上の要点 (次セッションの起点)**: Appendix III Lemma 2(c) は
+  **repo に完備している** — `GroupTheory/RepresentationTheory/SemilinearFieldAut.lean` の
+  `autMulQuadraticMap` / `autMulQuadratic_coeff_symm` / `autMulQuadratic_diag_eq_zero`
+  (独立性) + `span_autMulQuadraticMap_eq_top` (生成) で
+  `χ(x) = Σ λ_{στ} σ(x) τ(x)` の一意展開が得られる。さらに
+  `exists_smul_algAut_of_norm_intertwiner` はノルム形の intertwiner が単一の半線形写像
+  `λ·σ` になることを言っており、Appendix III Prop 2 相当の内容。
+  ⚠ **本当の障害は Lemma 2(c) ではなく「担体の位置合わせ」**: 段 (1) が吐く `E` は
+  `End_{𝔽₂[KW]}(S/Q₀)` という抽象体で、type-B データ (`TypeBData`) の体 `F` と `θ` は
+  別の抽象体の上にある。`χ(ax) = a^{1+θ} χ(x)` を使うには
+  「`Q₀ ≅ F`」「`K ≅ F^×`」(既存: `FieldRealizationK` / `exists_field_scalar_realization`) と
+  「`μ(K) = frobFixedSubfield E ^×`」(段 (1) の `mu_K_frobFixed` + `mu_K_injective`) を
+  **同じ `K` 上で突き合わせて**、`F ≅ frobFixedSubfield E` の**体同型**を作る必要がある。
+  単元群の群同型だけでは体同型にならないので、`K`-同変性を使って `θ` を移送する設計が要る。
+  ここが本 §3 の最大の行間。
 
 ## 📖 p.120–121 の proof 全文の書き起こし (2026-07-30, ページ画像から)
 

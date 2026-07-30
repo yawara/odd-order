@@ -40,6 +40,17 @@ namespace OddOrder.FiniteField
 
 open Module
 
+/-- A nontrivial ring in which `2 = 0` has characteristic `2`.
+
+Used to turn the `(2 : E) = 0` conjunct that the Suzuki-side constructions carry
+around into the `[CharP E 2]` instance that `qFrobenius` needs. -/
+theorem charP_two_of_two_eq_zero {R : Type*} [Ring R] [Nontrivial R]
+    (h : (2 : R) = 0) : CharP R 2 := by
+  refine ringChar.of_eq ?_
+  have h' : ((2 : ℕ) : R) = 0 := by exact_mod_cast h
+  exact ((Nat.dvd_prime Nat.prime_two).mp (ringChar.dvd h')).resolve_left
+    CharP.ringChar_ne_one
+
 /-- The `q`-power Frobenius `x ↦ x ^ pⁿ` of a finite field of characteristic `p`,
 as a ring automorphism (surjectivity is automatic on a finite — hence perfect —
 field). -/

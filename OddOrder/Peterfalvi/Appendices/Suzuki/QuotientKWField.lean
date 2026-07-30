@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.WCyclicDivides
 import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Algebra.QuadraticFrobenius
 
 /-!
 # Peterfalvi Part II, Ch. III §3: the field `E = 𝐅_{q²}` on `S ⧸ Q₀`
@@ -226,6 +227,47 @@ theorem isAInvariant_quotientKW_eq_bot_or_top
 
 /-! ## The field `E = 𝐅_{q²}` -/
 
+/-- **The standard model of `(S/Q₀) ⋊ KW`** produced by step (1) of the Ch. III §3
+Proposition (Peterfalvi Part II, p. 120): a field `E` of order `q²` whose additive
+group *is* `S/Q₀` and on which `KW` acts by multiplication, with `K₁ = μ(K) = F^×`
+and `W₁ = μ(W)` inside the norm-one subgroup.
+
+Bundled as a structure rather than left as a long existential because the later
+steps of the Proposition (`σ`, `λ₁`, `φ`, the identification `S ≅ S₁`) all add
+data on top of the same field; cf. `LemmaFiveSetup` and `Suzuki2Groups.TypeBData`.
+
+The additive coordinate `coord : Additive (S/Q₀) ≃+ E` is the book's `α` of p. 119.
+It is an `AddEquiv` rather than a `Module E` structure on the quotient because the
+commutativity of `S/Q₀` is a *theorem* here (it comes from `LemmaFiveSetup`), so no
+`CommGroup` instance on the quotient is available in the statement. -/
+structure QuotientFieldModel (hyp : Hypothesis G Ω) (m : ℕ) where
+  /-- the field `E = 𝐅_{q²}` -/
+  E : Type uG
+  [field : Field E]
+  [finite : Finite E]
+  [charTwo : CharP E 2]
+  /-- `|E| = q²` -/
+  card : Nat.card E = (2 ^ m) ^ 2
+  /-- the scalar realization `K × W → E^×` of the action, i.e. `K₁W₁` -/
+  mu : ↥hyp.actualKActor × ↥hyp.W →* Eˣ
+  /-- the book's coordinate `α : S/Q₀ → E` -/
+  coord : Additive (↥hyp.Q ⧸ Subgroup.center hyp.Q) ≃+ E
+  /-- the action of `KW` becomes multiplication in `E` -/
+  coord_act : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+    (y : ↥hyp.Q ⧸ Subgroup.center hyp.Q),
+    coord (Additive.ofMul (hyp.quotientKWHom kv y))
+      = (mu kv : E) * coord (Additive.ofMul y)
+  /-- `K₁ ⊆ F`: `μ(K)` is fixed by the `q`-power Frobenius, as `|K| = q − 1` -/
+  mu_K_frobFixed : ∀ k : ↥hyp.actualKActor,
+    ((mu (k, 1) : Eˣ) : E) ^ 2 ^ m = ((mu (k, 1) : Eˣ) : E)
+  /-- `μ` is injective on `K`, so `K₁` is *all* of `F^×` -/
+  mu_K_injective : Function.Injective fun k : ↥hyp.actualKActor => mu (k, 1)
+  /-- `W₁ ≤ {x : x^{1+q} = 1}`, as `|W|` divides `q + 1` (Ch. I §3 Lemma 5) -/
+  mu_W_normOne : ∀ v : ↥hyp.W, mu (1, v) ^ (2 ^ m + 1) = 1
+
+attribute [instance] QuotientFieldModel.field QuotientFieldModel.finite
+  QuotientFieldModel.charTwo
+
 /-- **`S/Q₀` is a line over `E = 𝐅_{q²}`, and `KW` acts by scalars**
 (Peterfalvi Part II, Ch. III §3, p. 120, first step of the Proposition).
 
@@ -254,10 +296,10 @@ The last three conjuncts are the book's `K₁ = F^×` and
   `F^×` of the cyclic group `E^×`;
 * `μ (1, v)^{1+q} = 1`, because `|W|` divides `q + 1` (Ch. I §3 Lemma 5).
 
-`(2 : E) = 0` is recorded because every later step of the Proposition works with
-the `q`-power Frobenius `x ↦ x^q` of `E` (the book's `x ↦ x̄`), which needs the
-characteristic. -/
-theorem exists_field_quotient_of_orderThree
+The characteristic is recorded as the `charTwo` instance field of
+`QuotientFieldModel` because every later step of the Proposition works with the
+`q`-power Frobenius `x ↦ x^q` of `E` (the book's `x ↦ x̄`). -/
+theorem nonempty_quotientFieldModel_of_orderThree
     (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
     (hQsuz : IsSuzuki2Group ↥hyp.Q)
     {m : ℕ} (hm : m ≠ 0)
@@ -266,18 +308,7 @@ theorem exists_field_quotient_of_orderThree
     (inductionHypothesis : TheoremAInductionBelow G Ω)
     (s : hyp.LemmaFiveSetup m)
     {w : G} (hw : w ∈ hyp.W) (hw1 : w ≠ 1) :
-    ∃ (E : Type uG) (_ : Field E) (_ : Finite E)
-      (μ : ↥hyp.actualKActor × ↥hyp.W →* Eˣ)
-      (α : Additive (↥hyp.Q ⧸ Subgroup.center hyp.Q) ≃+ E),
-      Nat.card E = (2 ^ m) ^ 2 ∧ (2 : E) = 0 ∧
-      (∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
-        (y : ↥hyp.Q ⧸ Subgroup.center hyp.Q),
-        α (Additive.ofMul (hyp.quotientKWHom kv y))
-          = (μ kv : E) * α (Additive.ofMul y)) ∧
-      (∀ k : ↥hyp.actualKActor,
-        ((μ (k, 1) : Eˣ) : E) ^ 2 ^ m = ((μ (k, 1) : Eˣ) : E)) ∧
-      Function.Injective (fun k : ↥hyp.actualKActor => μ (k, 1)) ∧
-      (∀ v : ↥hyp.W, μ (1, v) ^ (2 ^ m + 1) = 1) := by
+    Nonempty (hyp.QuotientFieldModel m) := by
   classical
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hZcard : Nat.card ↥(Subgroup.center hyp.Q) = 2 ^ m := by
@@ -309,8 +340,8 @@ theorem exists_field_quotient_of_orderThree
   obtain ⟨E, instE, instFin, μ, α, hcardE, hμ⟩ :=
     Huppert.exists_field_coordinate_of_irreducible hEA hyp.quotientKWHom hirr
   letI : Field E := instE
-  refine ⟨E, instE, instFin, μ, α, hcardE.trans hMcard, ?_, hμ, ?_, ?_, ?_⟩
-  · -- characteristic `2`: the quotient has exponent `2` and `α` is additive
+  haveI : Finite E := instFin
+  have htwo : (2 : E) = 0 := by
     obtain ⟨u, hu⟩ := exists_ne (1 : ↥hyp.Q ⧸ Subgroup.center hyp.Q)
     have h1 : Additive.ofMul u + Additive.ofMul u = 0 := by
       have h := hEA.pow_eq_one u
@@ -324,7 +355,10 @@ theorem exists_field_quotient_of_orderThree
       rw [two_mul]; exact h2) with h | h
     · exact h
     · exact absurd h hne
-  · -- `μ (k, 1)` is Frobenius-fixed: its order divides `|K| = q − 1`
+  haveI : CharP E 2 := OddOrder.FiniteField.charP_two_of_two_eq_zero htwo
+  -- `μ (k, 1)` is Frobenius-fixed: its order divides `|K| = q − 1`
+  have hKfix : ∀ k : ↥hyp.actualKActor,
+      ((μ (k, 1) : Eˣ) : E) ^ 2 ^ m = ((μ (k, 1) : Eˣ) : E) := by
     intro k
     have hk : k ^ (2 ^ m - 1) = 1 := by rw [← s.cardActor]; exact pow_card_eq_one'
     have hp : ((k, 1) : ↥hyp.actualKActor × ↥hyp.W) ^ (2 ^ m - 1) = 1 := by
@@ -333,7 +367,8 @@ theorem exists_field_quotient_of_orderThree
       rw [← Units.val_pow_eq_pow_val, ← map_pow, hp, map_one, Units.val_one]
     have hle : 1 ≤ (2 : ℕ) ^ m := Nat.one_le_two_pow
     rw [show (2 : ℕ) ^ m = (2 ^ m - 1) + 1 by omega, pow_succ, hone, one_mul]
-  · -- injectivity: a `K`-actor acting trivially on the quotient is trivial
+  -- injectivity: a `K`-actor acting trivially on the quotient is trivial
+  have hKinj : Function.Injective fun k : ↥hyp.actualKActor => μ (k, 1) := by
     refine (injective_iff_map_eq_one (f := (μ.comp (MonoidHom.inl _ _)))).mpr ?_
     intro k hk1
     by_contra hkne
@@ -345,7 +380,8 @@ theorem exists_field_quotient_of_orderThree
       have : μ (k, 1) = 1 := hk1
       rw [this, Units.val_one, one_mul]
     rwa [hyp.quotientKWHom_apply, map_one, mul_one] at hfix
-  · -- `|W|` divides `q + 1`, so `μ (1, v)^{q+1} = 1`
+  -- `|W|` divides `q + 1`, so `μ (1, v)^{q+1} = 1`
+  have hWnorm : ∀ v : ↥hyp.W, μ (1, v) ^ (2 ^ m + 1) = 1 := by
     intro v
     obtain ⟨c, hc⟩ := hWdvd
     have hv : v ^ (2 ^ m + 1) = 1 := by
@@ -353,7 +389,47 @@ theorem exists_field_quotient_of_orderThree
     have hp : ((1, v) : ↥hyp.actualKActor × ↥hyp.W) ^ (2 ^ m + 1) = 1 := by
       rw [Prod.pow_mk, hv, one_pow, Prod.mk_one_one]
     rw [← map_pow, hp, map_one]
+  exact ⟨{ E := E, card := hcardE.trans hMcard, mu := μ, coord := α
+           coord_act := hμ, mu_K_frobFixed := hKfix, mu_K_injective := hKinj
+           mu_W_normOne := hWnorm }⟩
+
 
 end Hypothesis
+
+/-! ## Step (2) of the Proposition when `θ = 1`
+
+The book's `σ` in the case `θ = 1` is the `q`-power Frobenius: it fixes `F` — hence
+`K₁ = μ(K)` — pointwise, and it inverts `W₁ = μ(W)`.  Both are immediate from the
+`QuotientFieldModel` fields, so this branch of step (2) needs no further input. -/
+
+namespace Hypothesis.QuotientFieldModel
+
+universe uG uΩ
+
+variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
+  {hyp : Hypothesis G Ω} {m : ℕ} (M : hyp.QuotientFieldModel m)
+
+/-- The book's bar operation `x ↦ x̄ = x^q` on `E`. -/
+noncomputable def bar : RingAut M.E := OddOrder.FiniteField.qFrobenius M.E 2 m
+
+@[simp] theorem bar_apply (x : M.E) : M.bar x = x ^ 2 ^ m :=
+  OddOrder.FiniteField.qFrobenius_apply M.E 2 m x
+
+/-- **`K₁` lies in the fixed field `F` of the bar operation.** -/
+theorem bar_mu_K (k : ↥hyp.actualKActor) :
+    M.bar ((M.mu (k, 1) : M.Eˣ) : M.E) = ((M.mu (k, 1) : M.Eˣ) : M.E) := by
+  rw [bar_apply]
+  exact M.mu_K_frobFixed k
+
+/-- **The bar operation inverts `W₁`** — the book's `x^σ = x^{-1}` for `x ∈ W₁`
+in the case `θ = 1` (p. 120, step (2)). -/
+theorem bar_mu_W (v : ↥hyp.W) :
+    M.bar ((M.mu (1, v) : M.Eˣ) : M.E) = (((M.mu (1, v) : M.Eˣ) : M.E))⁻¹ := by
+  have h := OddOrder.FiniteField.qFrobenius_eq_inv_of_pow_succ_eq_one
+    (E := M.E) (p := 2) (n := m) (M.mu_W_normOne v)
+  rw [bar, h]
+  simp
+
+end Hypothesis.QuotientFieldModel
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
