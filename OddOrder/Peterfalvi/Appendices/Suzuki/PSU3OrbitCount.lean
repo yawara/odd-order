@@ -493,6 +493,47 @@ theorem add_betaSum_div {E : Type*} [Field E] (h2 : (2 : E) = 0) {β α : E} (h�
   rw [eq_div_iff hne, add_mul, div_mul_cancel₀ _ hne]
   exact (betaSum_rec h2 hβ hα i).symm
 
+/-- **`c_i = 0` exactly when `β^i = 1`.**
+
+`β^i + β^{-i} = 0` says `(β^i)² = 1`, and squaring is injective in characteristic `2`.
+The book uses this in (16): from `b_{i-1} = (β^i + β^{-i})/α ≠ 0` it concludes `β^i ≠ 1`. -/
+theorem betaSum_eq_zero_iff {E : Type*} [Field E] (h2 : (2 : E) = 0) {β : E} (hβ : β ≠ 0)
+    (i : ℕ) : betaSum β i = 0 ↔ β ^ i = 1 := by
+  have hβi : β ^ i ≠ 0 := pow_ne_zero _ hβ
+  simp only [betaSum]
+  constructor
+  · intro h
+    field_simp at h
+    have hsq : (β ^ i + 1) * (β ^ i + 1) = 0 := by linear_combination h + (β ^ i) * h2
+    have hroot := mul_self_eq_zero.mp hsq
+    linear_combination hroot - h2
+  · intro h
+    rw [h, inv_one]
+    linear_combination h2
+
+/-- The book's `u_i` of (13), shifted to start at `0`: `betaRatio β i = c_i / c_{i+1}` is
+the book's `u_{i+1}`.  The shift avoids truncated subtraction in the index. -/
+noncomputable def betaRatio {E : Type*} [Field E] (β : E) (i : ℕ) : E :=
+  betaSum β i / betaSum β (i + 1)
+
+/-- `u₁ = 0`, the initial value in (11). -/
+theorem betaRatio_zero {E : Type*} [Field E] (h2 : (2 : E) = 0) (β : E) :
+    betaRatio β 0 = 0 := by
+  simp only [betaRatio, betaSum_zero h2, zero_div]
+
+/-- **Peterfalvi Part II, Ch. IV §2, step (13)** (p. 126): the closed form satisfies the
+recursion of (11).
+
+`u_{i+1} = 1/(α + u_i)` for the ratios `u_i = c_{i-1}/c_i`, so the sequence the book
+defines recursively in (11) is the one it writes in closed form in (13).  The hypothesis
+`c_{i+1} ≠ 0` is the book's `b_i ≠ 0`, equivalently `β^{i+1} ≠ 1` by
+`betaSum_eq_zero_iff` — the condition under which the sequence is still defined. -/
+theorem betaRatio_succ {E : Type*} [Field E] (h2 : (2 : E) = 0) {β α : E} (hβ : β ≠ 0)
+    (hα : β + β⁻¹ = α) (i : ℕ) (hne : betaSum β (i + 1) ≠ 0) :
+    betaRatio β (i + 1) = (α + betaRatio β i)⁻¹ := by
+  simp only [betaRatio]
+  rw [add_betaSum_div h2 hβ hα i hne, inv_div]
+
 /-- **An automorphism of odd order fixes whatever its square fixes.**
 
 If `orderOf θ = 2m + 1` then `θ = (θ²)^{m+1}`, so every `θ²`-fixed point is `θ`-fixed. -/
