@@ -10,6 +10,7 @@ import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.Algebra.FixedPointsGalois
 import OddOrder.Algebra.QuadraticFrobenius
+import OddOrder.Algebra.FrobeniusExponentPairs
 import OddOrder.Algebra.SemilinearFixedPoint
 import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
 import OddOrder.GroupTheory.BrauerSuzuki
@@ -14457,6 +14458,18 @@ are injective and the action is free. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sigma_inverting_W1
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_center_coordinate_equiv
+
+/-! **Frobenius exponent pairs** (issue 0167, 2026-07-30).
+`Algebra/FrobeniusExponentPairs.lean` + `Higman/…/TwoPowerCongruence.lean` — the exponent
+bookkeeping for Ch. III §3, p. 121: a pair of automorphisms of `𝐅_{2^n}` is determined, up to
+order, by the product map `a ↦ σ(a) τ(a)`, because two powers of two can only collide with two
+powers of two modulo `2^n − 1`. -/
+#assert_only_allowed_axioms
+  OddOrder.Higman.Suzuki2Groups.two_pow_pair_sum_eq
+#assert_only_allowed_axioms
+  OddOrder.FiniteField.two_pow_pair_congruence_of_pow_eq
+#assert_only_allowed_axioms
+  OddOrder.FiniteField.frobIndex_pair_eq_of_pow_mul_eq
 
 /-! **Step (3) of the Ch. III §3 Proposition: `S ≅ S₁`** (issue 0167, 2026-07-30).
 `Appendices/Suzuki/ModelIsomorphism.lean` — the book's `S₁` is the twisted product `E ×_φ F`

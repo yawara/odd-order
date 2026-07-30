@@ -845,6 +845,103 @@ theorem higman_two_pow_add_eq_two_pow {n a b c : ℕ} (hn : 0 < n)
     · exact absurd hT0 (Finset.singleton_ne_empty _)
     · exact absurd hS0 (Finset.insert_ne_empty _ _)
 
+/-- **An unordered pair of exponents is determined by its power-sum mod
+`2 ^ n - 1`**: if `2 ^ i + 2 ^ j ≡ 2 ^ k + 2 ^ l` then `{i, j} = {k, l}` modulo
+`n`.
+
+Two powers of two can only collide with two powers of two: the possible carry
+`2 ^ a + 2 ^ a = 2 ^ (a + 1)` shortens *both* sides at once, so a merged left
+side forces a merged right side.  This is Peterfalvi Part II, Ch. III §3, p. 121
+step (2)-(3) in exponent form: the automorphism pairs `(σ, τ)` of the Lemma 2(c)
+expansion of `χ` all satisfy `σ(a) τ(a) = a^d` on `F^×`, so once `d` is
+normalized to `1 + 2^t` their restrictions to `F` are forced to be `{1_F, θ}`. -/
+theorem two_pow_pair_sum_eq {n i j k l : ℕ} (hn : 0 < n)
+    (h : (2 : ZMod (2 ^ n - 1)) ^ i + 2 ^ j = 2 ^ k + 2 ^ l) :
+    ((i : ZMod n) = (k : ZMod n) ∧ (j : ZMod n) = (l : ZMod n)) ∨
+      ((i : ZMod n) = (l : ZMod n) ∧ (j : ZMod n) = (k : ZMod n)) := by
+  classical
+  have bridge : ∀ x y : ℕ, x % n = y % n → (x : ZMod n) = (y : ZMod n) :=
+    fun x y hxy => (ZMod.natCast_eq_natCast_iff' x y n).mpr hxy
+  have hmemrange : ∀ x : ℕ, x % n ∈ Finset.range n := fun x =>
+    Finset.mem_range.mpr (Nat.mod_lt _ hn)
+  have hmodcast : ∀ x : ℕ, ((x % n : ℕ) : ZMod n) = (x : ZMod n) :=
+    fun x => bridge _ _ (Nat.mod_mod_of_dvd x dvd_rfl)
+  -- the power-sum of a pair of *distinct* exponents, as a two-element Finset sum
+  have pairSum : ∀ a b : ℕ, a % n ≠ b % n →
+      (∑ x ∈ ({a % n, b % n} : Finset ℕ), (2 : ZMod (2 ^ n - 1)) ^ x)
+        = (2 : ZMod (2 ^ n - 1)) ^ a + 2 ^ b := by
+    intro a b hab
+    rw [Finset.sum_pair hab, ← two_pow_zmod_eq_pow_mod, ← two_pow_zmod_eq_pow_mod]
+  -- the power-sum of a merging pair, as a one-element Finset sum
+  have mergeSum : ∀ a b : ℕ, a % n = b % n →
+      (∑ x ∈ ({(a + 1) % n} : Finset ℕ), (2 : ZMod (2 ^ n - 1)) ^ x)
+        = (2 : ZMod (2 ^ n - 1)) ^ a + 2 ^ b := by
+    intro a b hab
+    rw [Finset.sum_singleton, ← two_pow_zmod_eq_pow_mod, pow_succ, mul_two,
+      two_pow_zmod_eq_pow_mod n b, ← hab, ← two_pow_zmod_eq_pow_mod]
+  have subSingleton : ∀ a : ℕ, ({a % n} : Finset ℕ) ⊆ Finset.range n := by
+    intro a x hx
+    simp only [Finset.mem_singleton] at hx
+    subst hx
+    exact hmemrange _
+  have subPair : ∀ a b : ℕ, ({a % n, b % n} : Finset ℕ) ⊆ Finset.range n := by
+    intro a b x hx
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+    rcases hx with rfl | rfl <;> exact hmemrange _
+  by_cases hij : i % n = j % n <;> by_cases hkl : k % n = l % n
+  · -- both pairs merge: compare the two merged singletons
+    have heq := (mergeSum i j hij).trans (h.trans (mergeSum k l hkl).symm)
+    rcases sum_two_pow_zmod_eq_or_of_subset_range (subSingleton (i + 1))
+        (subSingleton (k + 1)) heq with hST | ⟨_, hT0⟩ | ⟨hS0, _⟩
+    · have hs : (i + 1) % n = (k + 1) % n := Finset.singleton_injective hST
+      have h1 := bridge _ _ hs
+      push_cast at h1
+      have hik : (i : ZMod n) = (k : ZMod n) := by
+        have := congrArg (fun z : ZMod n => z - 1) h1
+        simpa using this
+      exact Or.inl ⟨hik, by rw [← bridge _ _ hij, hik, bridge _ _ hkl]⟩
+    · exact absurd hT0 (Finset.singleton_ne_empty _)
+    · exact absurd hS0 (Finset.singleton_ne_empty _)
+  · -- a merged left side cannot equal a two-element right side
+    exfalso
+    have heq := (mergeSum i j hij).trans (h.trans (pairSum k l hkl).symm)
+    rcases sum_two_pow_zmod_eq_or_of_subset_range (subSingleton (i + 1))
+        (subPair k l) heq with hST | ⟨_, hT0⟩ | ⟨hS0, _⟩
+    · have := congrArg Finset.card hST
+      rw [Finset.card_singleton, Finset.card_pair hkl] at this
+      omega
+    · exact absurd hT0 (Finset.insert_ne_empty _ _)
+    · exact absurd hS0 (Finset.singleton_ne_empty _)
+  · exfalso
+    have heq := (pairSum i j hij).trans (h.trans (mergeSum k l hkl).symm)
+    rcases sum_two_pow_zmod_eq_or_of_subset_range (subPair i j)
+        (subSingleton (k + 1)) heq with hST | ⟨_, hT0⟩ | ⟨hS0, _⟩
+    · have := congrArg Finset.card hST
+      rw [Finset.card_pair hij, Finset.card_singleton] at this
+      omega
+    · exact absurd hT0 (Finset.singleton_ne_empty _)
+    · exact absurd hS0 (Finset.insert_ne_empty _ _)
+  · -- both sides are genuine two-element sets
+    have heq := (pairSum i j hij).trans (h.trans (pairSum k l hkl).symm)
+    rcases sum_two_pow_zmod_eq_or_of_subset_range (subPair i j) (subPair k l)
+      heq with hST | ⟨_, hT0⟩ | ⟨hS0, _⟩
+    · have hmem : i % n ∈ ({k % n, l % n} : Finset ℕ) := by
+        rw [← hST]; simp
+      have hmem' : j % n ∈ ({k % n, l % n} : Finset ℕ) := by
+        rw [← hST]; simp
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hmem hmem'
+      rcases hmem with hik | hil
+      · refine Or.inl ⟨bridge _ _ hik, ?_⟩
+        rcases hmem' with hjk | hjl
+        · exact absurd (hik.trans hjk.symm) hij
+        · exact bridge _ _ hjl
+      · refine Or.inr ⟨bridge _ _ hil, ?_⟩
+        rcases hmem' with hjk | hjl
+        · exact bridge _ _ hjk
+        · exact absurd (hil.trans hjl.symm) hij
+    · exact absurd hT0 (Finset.insert_ne_empty _ _)
+    · exact absurd hS0 (Finset.insert_ne_empty _ _)
+
 /-- **Higman's `s = ±r` matching** (*Suzuki 2-groups*, p. 91, case
 `θ = φ ≠ 1`): if `r, s` are nonzero mod `n` and
 `2 ^ i (1 + 2 ^ s) ≡ 2 ^ t (1 + 2 ^ r) (mod 2 ^ n - 1)` then `s ≡ r` or
