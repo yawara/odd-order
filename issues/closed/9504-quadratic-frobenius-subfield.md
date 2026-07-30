@@ -61,17 +61,18 @@ Proposition の各条件 (`W₁ ≤ {x : x^{1+q} = 1}`, `σ|_F = θ`, `x^σ = x^
 まるごと不要だった。`pow_sub_one_dvd_pow_sub_one_iff` を 0167 段 (1) で一般化しておいたのが
 そのまま効いた。
 
-## やること (残り)
+## 延長の一意性 (ちょうど 2 個) も landing → **完了**
 
-- [ ] 延長がちょうど 2 個 (`σ` と `σ σ₀`) であること。段 (2) の「必要なら `σ` を `σ̄` に
-  取り替える」に必要。核が `⟨σ₀⟩` (位数 2) なのは `RingAut.fixer_fixedSet` +
-  `fixedSet_qFrobenius` から出る。
+| 宣言 | 内容 |
+|---|---|
+| `eq_one_or_eq_qFrobenius_of_fixes` | `F` を各点固定する `E` の自己同型は `1` か `σ₀`。Galois 対応 (`RingAut.mem_of_fixes_fixedPoints`) で `⟨σ₀⟩` に入り、そこは位数 2 |
+| `eq_or_eq_mul_qFrobenius_of_eq_on_frobFixed` | `σ`, `σ'` が `F` 上一致 ⟹ `σ' = σ` または `σ' = σ σ₀`。= 書籍 p.121 の「必要なら `σ` を `σ̄` に取り替える」 |
 
-## 完了条件
+## 完了条件 — 達成 (2026-07-30)
 
 `E` を位数 `q²` の有限体とするとき、bar 作用・固定部分体 `F` (位数 `q`)・
-`Aut(F)` の `Aut(E)` への延長がすべて sorry-free で揃う。**上 2 節で達成**
-(延長の一意性 2 個だけ残り)。
+`Aut(F)` の `Aut(E)` への延長 (存在 + ちょうど 2 個) がすべて sorry-free で揃った。
+`Algebra/QuadraticFrobenius.lean` (354 行、AxiomsCheck 16 件すべて allowlist のみ)。
 
 ## 参照
 

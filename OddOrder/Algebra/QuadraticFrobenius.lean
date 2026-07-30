@@ -349,6 +349,58 @@ theorem exists_ringAut_extending_frobFixedSubfield
   push_cast
   rfl
 
+/-- **An automorphism of `E` fixing `F` pointwise is `1` or the `q`-Frobenius.**
+
+Galois correspondence (`OddOrder.RingAut.mem_of_fixes_fixedPoints`): such an
+automorphism lies in `⟨σ₀⟩`, which has order `2`. -/
+theorem eq_one_or_eq_qFrobenius_of_fixes
+    (hcard : Nat.card E = (p ^ n) ^ 2) (hn : n ≠ 0)
+    {τ : RingAut E} (hτ : ∀ x : E, x ^ p ^ n = x → τ x = x) :
+    τ = 1 ∨ τ = qFrobenius E p n := by
+  have hmem : τ ∈ Subgroup.zpowers (qFrobenius E p n) := by
+    refine OddOrder.RingAut.mem_of_fixes_fixedPoints ?_
+    intro x hx
+    rw [fixedSet_qFrobenius] at hx
+    exact hτ x hx
+  obtain ⟨j, hj⟩ : τ ∈ Submonoid.powers (qFrobenius E p n) :=
+    mem_powers_iff_mem_zpowers.mpr hmem
+  have hj' : qFrobenius E p n ^ j = τ := hj
+  have hord : orderOf (qFrobenius E p n) = 2 := orderOf_qFrobenius hcard hn
+  have hmod : qFrobenius E p n ^ (j % 2) = τ := by
+    rw [← hord, pow_mod_orderOf]
+    exact hj'
+  have hlt : j % 2 < 2 := Nat.mod_lt j (by omega)
+  rcases (by omega : j % 2 = 0 ∨ j % 2 = 1) with h | h
+  · left
+    rw [h, pow_zero] at hmod
+    exact hmod.symm
+  · right
+    rw [h, pow_one] at hmod
+    exact hmod.symm
+
+/-- **The extensions of an automorphism of `F` to `E` come in pairs**: if `σ` and
+`σ'` agree on `F`, then `σ' = σ` or `σ' = σ σ₀`.
+
+This is the book's "possibly on replacing `σ` by `σ̄`" at the end of step (2) of the
+Ch. III §3 Proposition (p. 121). -/
+theorem eq_or_eq_mul_qFrobenius_of_eq_on_frobFixed
+    (hcard : Nat.card E = (p ^ n) ^ 2) (hn : n ≠ 0) {σ σ' : RingAut E}
+    (h : ∀ x : E, x ^ p ^ n = x → σ x = σ' x) :
+    σ' = σ ∨ σ' = σ * qFrobenius E p n := by
+  have hτ : ∀ x : E, x ^ p ^ n = x → (σ⁻¹ * σ') x = x := by
+    intro x hx
+    change σ.symm (σ' x) = x
+    rw [← h x hx, σ.symm_apply_apply]
+  rcases eq_one_or_eq_qFrobenius_of_fixes hcard hn hτ with h1 | h1
+  · left
+    have h2 : σ * (σ⁻¹ * σ') = σ * 1 := by rw [h1]
+    rw [mul_inv_cancel_left, mul_one] at h2
+    exact h2
+  · right
+    have h2 : σ * (σ⁻¹ * σ') = σ * qFrobenius E p n := by rw [h1]
+    rw [mul_inv_cancel_left] at h2
+    exact h2
+
 end Extension
 
 end OddOrder.FiniteField

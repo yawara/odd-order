@@ -14454,3 +14454,5 @@ comment. -/
 #assert_only_allowed_axioms OddOrder.FiniteField.orderOf_frobenius
 #assert_only_allowed_axioms OddOrder.FiniteField.exists_pow_eq_of_ringAut
 #assert_only_allowed_axioms OddOrder.FiniteField.exists_ringAut_extending_frobFixedSubfield
+#assert_only_allowed_axioms OddOrder.FiniteField.eq_one_or_eq_qFrobenius_of_fixes
+#assert_only_allowed_axioms OddOrder.FiniteField.eq_or_eq_mul_qFrobenius_of_eq_on_frobFixed
