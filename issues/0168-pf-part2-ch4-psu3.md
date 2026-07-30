@@ -307,6 +307,10 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 | `\|E^×\| = q²−1` | `QuotientFieldModel.card` (`\|E\| = (2^m)^2`) |
 | `Σ m_i = \|Q₀\| = q` | `f_mem_sdiff_Q0` + `hQ0card` |
 
+`μ(K) ∩ μ(W) = 1` の群論形も用意済:
+**`eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one`** (任意の群で
+`x^(2^m−1) = x^(2^m+1) = 1` ⟹ `x = 1`)。`E^×` に適用すればよい。
+
 **残るのは組み立てのみ**: `|μ(KW)| = (q−1)m` → `n = |E^×|/|μ(KW)| = (q+1)/m` →
 `q = Σ m_i ≤ n·m − 1 = q` の挟み込み → 全等号。
 
