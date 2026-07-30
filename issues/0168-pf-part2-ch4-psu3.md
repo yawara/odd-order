@@ -749,6 +749,42 @@ repo 側の向きの規約 (すべて実測):
 (b) `ψ(Sfin) ⊆ Ffin`、(c) 繊維 ≤ 2 ⟹ `#Sfin ≤ 2·#(image)` ⟹ `#image ≥ q`
 (∵ `2(q-1) = 2q-2 < 2q-1`)、(d) `eq_of_subset_of_card_le` で `image = Ffin`。
 
+### 📊 2026-07-31 セッション終盤の状態 (§2 の到達点)
+
+| 段 | 状態 | 主定理 |
+|---|---|---|
+| §1 全体 | ✅ | `RankOneBNPair.lean` (784 行, sorry-free) |
+| (A1)-(A3) → Setup 橋 | ✅ | `Hypothesis.rankOneSetup` |
+| (1)-(9) | ✅ | `PSU3Preliminary` + `PSU3OrbitCount` |
+| **(10)** | ✅ 群論版+座標版 | `stepTen` / `stepTen_exists` / `stepTen_base` / `stepTen_coord` |
+| **(11)** | 🔶 帰納段のみ | `stepEleven_step` |
+| **(12)** | ✅ | `exists_add_inv_eq` |
+| **(13)** | ✅ | `betaRatio_succ` (+ `betaSum_eq_zero_iff`) |
+| **(14)** | ✅ 帰納段 | `betaScale_succ` (+ `frobNormEquiv` = τ) |
+| **(15)** | 🔶 部品のみ | `eq_one_of_frobNormEquiv_symm_sq_eq_one` / `eq_of_pow_succ_eq_one_of_le` / `eq_one_of_mul_eq_one_of_mem_K_of_mem_W` |
+| **(16)** | 🔶 体論的核 | `pow_eq_one_of_betaSum_eq` |
+| 座標橋 | ✅ | `PSU3CenterCoordinate.lean` |
+| (17)(18) | ❌ 未着手 | — |
+| §3 以降 (pp.127-134) | ❌ 未読 | — |
+
+**ファイル構成 (本セッションで整理)**:
+* `PSU3Preliminary.lean` (1256 行) — §2 の群論 (1)-(7), (10), (11)
+* `PSU3OrbitCount.lean` (656 行) — (8)/(9) の軌道数え上げ (モデル依存)
+* `PSU3FieldArithmetic.lean` (~760 行) — `E/F` の算術 (12)-(16) (モデル非依存)
+* `PSU3CenterCoordinate.lean` (~210 行) — 座標橋
+* `RankOneSetup.lean` (122 行) — (A1)-(A3) → Setup
+
+**次の一手**: (15) の組み立て。部品は 3 本とも揃っている:
+1. `d_{m₁} = ζ⁻¹` を `ζ^{m₁+1} · (c_{m₁}/α)^{2τ} = 1` へ ((14) の閉じた式から)
+2. `eq_one_of_mul_eq_one_of_mem_K_of_mem_W` で両因子を 1 に
+3. `eq_one_of_frobNormEquiv_symm_sq_eq_one` で `c_{m₁} = α`、
+   `eq_of_pow_succ_eq_one_of_le` で `m₁ = m-1`
+⚠ 残るのは `d_i ∈ KW` の同定 (μ 経由) と `m₁ ≤ m-1` (段 (5) との矛盾)。
+前者は座標橋と同種の配管、後者は段 (5) `not_mem_KSet_of_f_eq_conj` を使う。
+
+⚠ **本セッションで 2 回 forward reference をやらかした** (定義より前に補題を置く)。
+Lean に前方参照は無い — 新補題は依存先の**後ろ**に置く。
+
 ## セッション総括 (2026-07-31)
 
 **Ch. IV で形式化されたもの** (すべて sorry 0 / AxiomsCheck OK / lint 0):
