@@ -7,6 +7,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
 import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 
@@ -43,6 +44,9 @@ It comes out of `t s t = s t s` being *already* a canonical factorization
 * `Hypothesis.f_conj_distinguishedInvolution_mul` — step (3).
 * `Hypothesis.f_mem_Q0_of_mem_Q0` and friends — `f` and `g` preserve and reflect `Q₀`.
 * `Hypothesis.eq_one_of_f_mul_eq` — step (4).
+* `Hypothesis.inv_ne_conj_of_not_mem_Q0`, `Hypothesis.f_ne_conj_of_not_mem_Q0` —
+  `j` and `f` act without fixed points on the `D`-orbits of `Q − Q₀`.
+* `Hypothesis.ne_one_of_f_eq_conj` — step (5), first half.
 -/
 
 set_option autoImplicit false
@@ -293,6 +297,86 @@ theorem eq_one_of_f_mul_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       ((k * hyp.distinguishedInvolution * k⁻¹) * g ω) := by group
   rw [e]
   exact hyp.Q0.mul_mem (hyp.Q0.inv_mem hkS) hargQ0
+
+/-! ## Step (5): no fixed points on the `D`-orbits of `Q − Q₀` -/
+
+/-- **`j : x ↦ x⁻¹` has no fixed point on the `D`-orbits of `Q − Q₀`.**
+
+If `ω⁻¹ = ω^d` with `d ∈ D`, then `d²` centralizes `ω`; since `|D|` is odd, `d` is a
+power of `d²`, so `d` itself centralizes `ω` and `ω⁻¹ = ω`, i.e. `ω ∈ Q₀`. -/
+theorem inv_ne_conj_of_not_mem_Q0 {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    {d : G} (hd : d ∈ hyp.D) : ω⁻¹ ≠ d⁻¹ * ω * d := by
+  intro hc
+  -- `d²` centralizes `ω`
+  have hsq : (d ^ 2)⁻¹ * ω * d ^ 2 = ω := by
+    have e1 : (d ^ 2)⁻¹ * ω * d ^ 2 = d⁻¹ * (d⁻¹ * ω * d) * d := by rw [sq]; group
+    rw [e1, ← hc]
+    have e2 : d⁻¹ * ω⁻¹ * d = (d⁻¹ * ω * d)⁻¹ := by group
+    rw [e2, ← hc, inv_inv]
+  have hcomm2 : d ^ 2 * ω = ω * d ^ 2 := by
+    have e : d ^ 2 * ((d ^ 2)⁻¹ * ω * d ^ 2) = ω * d ^ 2 := by group
+    rwa [hsq] at e
+  -- `|D|` odd, so `d` is a power of `d²`
+  have hpow : (d ^ 2) ^ ((Nat.card hyp.D + 1) / 2) = d :=
+    invertedBy.pow_half_sq hyp.D_odd hd
+  have hcomm2' : Commute (d ^ 2) ω := hcomm2
+  have hcd : Commute d ω := by
+    rw [← hpow]
+    exact hcomm2'.pow_left _
+  have hdω : d⁻¹ * ω * d = ω := by
+    rw [mul_assoc, ← hcd.eq, ← mul_assoc, inv_mul_cancel, one_mul]
+  rw [hdω] at hc
+  refine hωQ0 ⟨?_, hyp.Q_le_H hωQ⟩
+  rw [sq]
+  nth_rewrite 1 [← hc]
+  exact inv_mul_cancel ω
+
+/-- **`f` has no fixed point on the `D`-orbits of `Q − Q₀`** either.
+
+In the permutation group induced by `⟨f, j⟩` on these orbits one has
+`f = (f ∘ j)⁻¹ ∘ j ∘ (f ∘ j)`, so `f` is conjugate to `j`.  Concretely: if
+`f(ω) = ω^d` then applying `g` gives `g(ω)^{d^t} = g(f(ω)) = (g(ω)⁻¹)^{h(ω)}` by (H3)
+and (H2), so `g(ω)⁻¹ = g(ω)^e` with `e = d^t h(ω)⁻¹ ∈ D` — a fixed point of `j` at
+`g(ω)`, which lies in `Q − Q₀` because `g` reflects `Q₀`. -/
+theorem f_ne_conj_of_not_mem_Q0 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    {d : G} (hd : d ∈ hyp.D) : f ω ≠ d⁻¹ * ω * d := by
+  intro hc
+  have hω1 : ω ≠ 1 := fun hcc => hωQ0 (hcc ▸ hyp.Q0.one_mem)
+  have hgQ : g ω ∈ hyp.Q := H.g_mem hωQ hω1
+  have hgQ0 : g ω ∉ hyp.Q0 := fun hcc =>
+    hωQ0 (hyp.mem_Q0_of_g_mem_Q0 H hC2 hωQ hω1 hcc)
+  have hbD : hyp.t * d * hyp.t ∈ hyp.D := hyp.rankOneSetup.Dstab d hd
+  have hhD : h ω ∈ hyp.D := H.h_mem hωQ hω1
+  -- the two evaluations of `g` at `f(ω) = ω^d`
+  have e1 : g (d⁻¹ * ω * d) = (hyp.t * d * hyp.t)⁻¹ * g ω * (hyp.t * d * hyp.t) :=
+    (hThree hyp.rankOneSetup H hωQ hω1 hd).2.1
+  have e2 : g (f ω) = (h ω)⁻¹ * (g ω)⁻¹ * h ω :=
+    (hTwo hyp.rankOneSetup H hωQ hω1).2.1
+  rw [hc, e1] at e2
+  -- read off a `j`-fixed point at `g ω`
+  refine hyp.inv_ne_conj_of_not_mem_Q0 hgQ hgQ0
+    (hyp.D.mul_mem hbD (hyp.D.inv_mem hhD)) ?_
+  have e3 : ((hyp.t * d * hyp.t) * (h ω)⁻¹)⁻¹ * g ω * ((hyp.t * d * hyp.t) * (h ω)⁻¹)
+      = h ω * ((hyp.t * d * hyp.t)⁻¹ * g ω * (hyp.t * d * hyp.t)) * (h ω)⁻¹ := by
+    group
+  rw [e3, e2]
+  group
+
+/-- **Peterfalvi Part II, Ch. IV §2, step (5)**, first half (p. 124): if
+`f(ω) = (ωy)^a` with `ω ∈ Q − Q₀`, `y ∈ Q₀` and `a ∈ D`, then `y ≠ 1`.
+
+Otherwise `f` would fix the `D`-orbit of `ω`. -/
+theorem ne_one_of_f_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω y a : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (haD : a ∈ hyp.D)
+    (heq : f ω = a⁻¹ * (ω * y) * a) : y ≠ 1 := by
+  intro hy1
+  refine hyp.f_ne_conj_of_not_mem_Q0 H hC2 hωQ hωQ0 haD ?_
+  rw [heq, hy1, mul_one]
 
 end Hypothesis
 
