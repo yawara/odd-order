@@ -8,6 +8,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
 import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
+import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 
@@ -47,6 +48,7 @@ It comes out of `t s t = s t s` being *already* a canonical factorization
 * `Hypothesis.inv_ne_conj_of_not_mem_Q0`, `Hypothesis.f_ne_conj_of_not_mem_Q0` —
   `j` and `f` act without fixed points on the `D`-orbits of `Q − Q₀`.
 * `Hypothesis.ne_one_of_f_eq_conj`, `Hypothesis.not_mem_KSet_of_f_eq_conj` — step (5).
+* `Hypothesis.not_mem_KSet_of_f_mul_eq_conj` — step (6).
 -/
 
 set_option autoImplicit false
@@ -429,6 +431,123 @@ theorem not_mem_KSet_of_f_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     have := hyp.conj_mem_Q0_of_mem_H (hyp.H.inv_mem (hyp.D_le_H haD)) hyQ0
     rwa [inv_inv] at this
   exact hy1 (hyp.eq_one_of_f_mul_eq H hC2 hωQ hωQ0 hyQ0 hyaQ0 hgoal)
+
+/-! ## Step (6) -/
+
+/-- Elements of `K` commute: `K` is cyclic (`Hypothesis.K_isCyclic`). -/
+theorem commute_of_mem_K {a b : G} (ha : a ∈ hyp.K) (hb : b ∈ hyp.K) : a * b = b * a := by
+  haveI := hyp.K_isCyclic
+  letI : CommGroup ↥hyp.K := IsCyclic.commGroup
+  exact congrArg (Subtype.val (p := fun z => z ∈ hyp.K))
+    (mul_comm (⟨a, ha⟩ : ↥hyp.K) ⟨b, hb⟩)
+
+/-- `K` is closed under `a, k ↦ a k²`: `t`-inversion is multiplicative here because
+`a` and `k²` commute inside the cyclic group `K`.  This is what turns step (6)'s
+`a k² ∉ K` into `a ∉ K`. -/
+theorem mul_sq_mem_KSet {a k : G} (ha : a ∈ hyp.KSet) (hk : k ∈ hyp.KSet) :
+    a * k ^ 2 ∈ hyp.KSet := by
+  refine ⟨hyp.D.mul_mem ha.1 (hyp.D.pow_mem hk.1 2), ?_⟩
+  have hinvol : hyp.t * hyp.t = 1 := hyp.rankOneSetup.invol
+  have e1 : hyp.t * (a * k ^ 2) * hyp.t
+      = (hyp.t * a * hyp.t) * (hyp.t * k * hyp.t) * (hyp.t * k * hyp.t) := by
+    have e : (hyp.t * a * hyp.t) * (hyp.t * k * hyp.t) * (hyp.t * k * hyp.t)
+        = hyp.t * a * (hyp.t * hyp.t) * k * (hyp.t * hyp.t) * k * hyp.t := by group
+    rw [e, hinvol, sq]
+    group
+  have haK : a ∈ hyp.K := Subgroup.subset_closure ha
+  have hkK : k ∈ hyp.K := Subgroup.subset_closure hk
+  have hc : a⁻¹ * k⁻¹ = k⁻¹ * a⁻¹ :=
+    hyp.commute_of_mem_K (hyp.K.inv_mem haK) (hyp.K.inv_mem hkK)
+  rw [e1, ha.2, hk.2, mul_inv_rev, sq, mul_inv_rev]
+  calc a⁻¹ * k⁻¹ * k⁻¹ = (k⁻¹ * a⁻¹) * k⁻¹ := by rw [hc]
+    _ = k⁻¹ * (a⁻¹ * k⁻¹) := by group
+    _ = k⁻¹ * (k⁻¹ * a⁻¹) := by rw [hc]
+    _ = k⁻¹ * k⁻¹ * a⁻¹ := by group
+
+/-- **Peterfalvi Part II, Ch. IV §2, step (6)** (p. 124):
+
+> If `f(ωx) = (f(ω)y)^a` for some `ω ∈ Q − Q₀`, `x, y ∈ Q₀`, `x ≠ 1`, and `a ∈ D`,
+> then `a ∉ K`.
+
+Write `x = s^k` with `k ∈ K` and `u = s^{k⁻¹}`.  Step (2) evaluates `f(ωx)`, and
+solving for the inner value turns the hypothesis into
+
+  `f(f(ω)u) = ((f(ω)u) · y')^{a k²}`,  `y' = u y u^{a⁻¹} ∈ Q₀`,
+
+which is exactly the shape of step (5) at `f(ω)u ∈ Q − Q₀`.  Hence `a k² ∉ K`, and
+`mul_sq_mem_KSet` upgrades that to `a ∉ K`. -/
+theorem not_mem_KSet_of_f_mul_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω x y a : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hxQ0 : x ∈ hyp.Q0) (hx1 : x ≠ 1) (hyQ0 : y ∈ hyp.Q0) (haD : a ∈ hyp.D)
+    (heq : f (ω * x) = a⁻¹ * (f ω * y) * a) : a ∉ hyp.KSet := by
+  intro haK
+  have hω1 : ω ≠ 1 := fun hcc => hωQ0 (hcc ▸ hyp.Q0.one_mem)
+  obtain ⟨k, hk, hxk⟩ := hyp.exists_mem_KSet_conj_eq_of_mem_Q0 hxQ0 hx1
+  -- `u = s^{k⁻¹}` is an involution of `Q₀`
+  have huQ0 : k * hyp.distinguishedInvolution * k⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_H (hyp.D_le_H hk.1) hyp.distinguishedInvolution_mem_Q0
+  have huu : (k * hyp.distinguishedInvolution * k⁻¹) *
+      (k * hyp.distinguishedInvolution * k⁻¹) = 1 := by
+    have := huQ0.1; rwa [sq] at this
+  -- step (2)
+  have hne : ω * (k⁻¹ * hyp.distinguishedInvolution * k) ≠ 1 := by
+    intro hcc
+    refine hωQ0 ?_
+    rw [eq_inv_of_mul_eq_one_left hcc, hxk]
+    exact hyp.Q0.inv_mem hxQ0
+  have h2 := hyp.f_mul_conj_distinguishedInvolution H hC2 hk hωQ hω1 hne
+  rw [hxk, heq] at h2
+  -- solve for the inner value
+  have hsolve : f (f ω * (k * hyp.distinguishedInvolution * k⁻¹))
+      = (k ^ 2)⁻¹ * (a⁻¹ * (f ω * y) * a * (k * hyp.distinguishedInvolution * k⁻¹)) *
+        ((k⁻¹) ^ 2)⁻¹ := by
+    rw [h2]
+    have e : (k ^ 2)⁻¹ * ((k ^ 2 * f (f ω * (k * hyp.distinguishedInvolution * k⁻¹)) *
+          (k⁻¹) ^ 2 * (k * hyp.distinguishedInvolution * k⁻¹)) *
+          (k * hyp.distinguishedInvolution * k⁻¹)) * ((k⁻¹) ^ 2)⁻¹
+        = (k ^ 2)⁻¹ * (k ^ 2 * f (f ω * (k * hyp.distinguishedInvolution * k⁻¹)) *
+          (k⁻¹) ^ 2 * ((k * hyp.distinguishedInvolution * k⁻¹) *
+          (k * hyp.distinguishedInvolution * k⁻¹))) * ((k⁻¹) ^ 2)⁻¹ := by group
+    rw [e, huu]
+    group
+  -- put it in the shape of step (5)
+  have hZ : f (f ω * (k * hyp.distinguishedInvolution * k⁻¹))
+      = (a * k ^ 2)⁻¹ *
+        ((f ω * (k * hyp.distinguishedInvolution * k⁻¹)) *
+          ((k * hyp.distinguishedInvolution * k⁻¹) * y *
+            (a * (k * hyp.distinguishedInvolution * k⁻¹) * a⁻¹))) *
+        (a * k ^ 2) := by
+    rw [hsolve]
+    have e2 : (a * k ^ 2)⁻¹ *
+        ((f ω * (k * hyp.distinguishedInvolution * k⁻¹)) *
+          ((k * hyp.distinguishedInvolution * k⁻¹) * y *
+            (a * (k * hyp.distinguishedInvolution * k⁻¹) * a⁻¹))) * (a * k ^ 2)
+        = (k ^ 2)⁻¹ * (a⁻¹ * (f ω * ((k * hyp.distinguishedInvolution * k⁻¹) *
+            (k * hyp.distinguishedInvolution * k⁻¹)) * y) * a *
+            (k * hyp.distinguishedInvolution * k⁻¹)) * ((k⁻¹) ^ 2)⁻¹ := by
+      group
+    rw [e2, huu]
+    group
+  -- apply step (5)
+  have hωuQ : f ω * (k * hyp.distinguishedInvolution * k⁻¹) ∈ hyp.Q :=
+    hyp.Q.mul_mem (H.f_mem hωQ hω1) (hyp.Q0_le_Q huQ0)
+  have hωuQ0 : f ω * (k * hyp.distinguishedInvolution * k⁻¹) ∉ hyp.Q0 := by
+    intro hcc
+    refine hωQ0 (hyp.mem_Q0_of_f_mem_Q0 H hC2 hωQ hω1 ?_)
+    have e : f ω = (f ω * (k * hyp.distinguishedInvolution * k⁻¹)) *
+        (k * hyp.distinguishedInvolution * k⁻¹)⁻¹ := by group
+    rw [e]
+    exact hyp.Q0.mul_mem hcc (hyp.Q0.inv_mem huQ0)
+  have hy'Q0 : (k * hyp.distinguishedInvolution * k⁻¹) * y *
+      (a * (k * hyp.distinguishedInvolution * k⁻¹) * a⁻¹) ∈ hyp.Q0 :=
+    hyp.Q0.mul_mem (hyp.Q0.mul_mem huQ0 hyQ0)
+      (hyp.conj_mem_Q0_of_mem_H (hyp.D_le_H haD) huQ0)
+  have hak2 : a * k ^ 2 ∉ hyp.KSet :=
+    hyp.not_mem_KSet_of_f_eq_conj H hC2 hωuQ hωuQ0 hy'Q0
+      (hyp.D.mul_mem haD (hyp.D.pow_mem hk.1 2)) hZ
+  exact hak2 (hyp.mul_sq_mem_KSet haK hk)
 
 end Hypothesis
 

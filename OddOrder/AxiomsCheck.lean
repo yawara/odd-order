@@ -14611,6 +14611,9 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.f_ne_conj_of_not_mem_Q0
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.ne_one_of_f_eq_conj
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.not_mem_KSet_of_f_eq_conj
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.commute_of_mem_K
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mul_sq_mem_KSet
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.not_mem_KSet_of_f_mul_eq_conj
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.conj_mem_Q
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_M_union_t
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_conj_Q
