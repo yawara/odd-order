@@ -328,6 +328,53 @@ theorem centreQuadraticMap_smul_KW
     hyp.centreQuadraticMap_smul s M ι d hequiv kv.1,
     hyp.centreQuadraticMap_W_invariant s M ι kv.2]
 
+include s in
+/-- **Step (5) of the Ch. III §3 Proposition** (Peterfalvi Part II, p. 121):
+the isomorphism can be normalized so that a chosen nonidentity central element goes
+to `(0, 1)`.
+
+> `K` is transitive on `Q₀^#`, so composing with an inner automorphism of
+> `S₁ ⋊ K₁W₁` sends `s` to `(0,1)`.
+
+Here the centre coordinate `ι` is a free parameter rather than a fixed
+identification, so the normalization is simply a rescaling: replacing `ι` by
+`ι(s)⁻¹ · ι` sends `s` to `1`.  The rescaling is by a constant, so it preserves the
+`K`-scaling law — and hence every property of `χ` and of the cocycle that depends
+on it.  Neither the transitivity of `K` on `Q₀^#` nor an inner automorphism is
+needed. -/
+theorem exists_center_coordinate_normalized (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (x₀ : ↥(Subgroup.center hyp.Q)) (hx₀ : x₀ ≠ 1) :
+    ∃ (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ),
+      ι (Additive.ofMul x₀) = 1 ∧
+      ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+        ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+            ((ι (Additive.ofMul z) :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) := by
+  classical
+  obtain ⟨ι, d, hequiv⟩ := hyp.exists_center_coordinate_equiv hm hQ0card s M
+  set c := ι (Additive.ofMul x₀) with hc
+  have hc0 : c ≠ 0 := by
+    intro h
+    refine hx₀ (Additive.ofMul.injective (ι.injective ?_))
+    rw [← hc, h]
+    exact (map_zero ι).symm
+  -- rescale the coordinate by `c⁻¹`
+  refine ⟨ι.trans (AddEquiv.mk' (Equiv.mulLeft₀ c⁻¹ (inv_ne_zero hc0))
+    (mul_add c⁻¹)), d, ?_, fun k z => ?_⟩
+  · change c⁻¹ * ι (Additive.ofMul x₀) = 1
+    rw [← hc]
+    exact inv_mul_cancel₀ hc0
+  · change ((c⁻¹ * ι (Additive.ofMul (hyp.centerKHom k z)) :
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) = _
+    change _ = _ * ((c⁻¹ * ι (Additive.ofMul z) :
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+    rw [Submonoid.coe_mul, Submonoid.coe_mul, hequiv k z]
+    ring
+
 /-! ## The book's cocycle: a semilinear bilinear lift of `χ` -/
 
 /-- The `E`-valued form of `χ`, built from the *same* centre coordinate `ι` as the

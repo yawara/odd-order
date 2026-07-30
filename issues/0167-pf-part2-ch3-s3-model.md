@@ -107,7 +107,7 @@ Appendix III Definition 3 により `S` は中心拡大
 - [x] 段 (3) の残り (書籍の明示 cocycle): **完了** (2026-07-31,
   `exists_mulEquiv_bookCocycle`)
 - [x] 段 (4): 作用の共役化 (Zassenhaus) — **完了** (2026-07-31)
-- [ ] 段 (5): `s ↦ (0,1)` の正規化
+
 - [ ] Proposition 本体の statement + AxiomsCheck 登録
 
 ## 完了条件
@@ -678,8 +678,20 @@ import を追加した (循環なし)。
 `rw` パターンが合わなくなる — `simp only [hA, MonoidHom.comp_apply,
 MulEquiv.coe_toMonoidHom]` で展開してから rw する。
 
-**次**: 段 (5) (`K` は `Q₀^#` 上推移的なので内部自己同型で `s ↦ (0,1)` に正規化)
-→ Proposition 本体の statement 化。
+## 🎯 段 (5) 完了 (2026-07-31)
+
+`exists_center_coordinate_normalized` — 任意の非単位中心元 `x₀` に対し
+`ι (ofMul x₀) = 1` となる座標が取れる (K-scaling は保たれる)。
+
+⚠ **書籍より短くなった点 (4 つ目)**: 書籍は「`K` が `Q₀^#` 上推移的だから内部自己同型
+で `s ↦ (0,1)` にできる」と論じるが、本 repo では **`ι` が自由パラメータ**なので
+`ι ↦ ι(x₀)⁻¹ · ι` と**定数倍するだけ**でよい。定数倍は K-scaling 則を保つので
+χ・cocycle の性質は全部そのまま。`K` の推移性も内部自己同型も要らない。
+
+- [x] 段 (5): `s ↦ (0,1)` の正規化 — **完了** (2026-07-31)
+
+**次**: Proposition 本体の statement 化 (段 (1)-(5) を書籍の 1 つの主張に束ねる)
++ AxiomsCheck 登録。
 
 ---
 (以下は packaging の下調べ。汎用補題ができたので直接は不要だが、罠の記録として残す)
