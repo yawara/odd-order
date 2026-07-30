@@ -1046,6 +1046,36 @@ theorem mu_K_eq_mu_W_imp_eq_one {m : ℕ} (hm : m ≠ 0) (M : hyp.QuotientFieldM
     (hyp.mu_K_pow_two_pow_sub_one M k)
     (by rw [heq]; exact M.mu_W_normOne v)
 
+/-- **The number of `KW`-orbits on `(Q/Q₀)^#` is `n = (q + 1)/|W|`.**
+
+Since `KW` acts on `Q/Q₀ ≅ E` by scalars, its orbits on `E^×` are the cosets of the
+subgroup `μ(KW) ≤ E^×`, so their number is the index of that subgroup.  Its order is
+`|K| · |W| = (q − 1)|W|` (by injectivity of `μ`), and `|E^×| = q² − 1`. -/
+theorem index_range_mu {m : ℕ} (hm : m ≠ 0) (M : hyp.QuotientFieldModel m)
+    (hinj : Function.Injective M.mu)
+    (hK : Nat.card ↥hyp.actualKActor = 2 ^ m - 1) :
+    (MonoidHom.range M.mu).index = (2 ^ m + 1) / Nat.card ↥hyp.W := by
+  classical
+  haveI : Fintype M.E := Fintype.ofFinite _
+  have hrange : Nat.card ↥(MonoidHom.range M.mu)
+      = (2 ^ m - 1) * Nat.card ↥hyp.W := by
+    have e1 : Nat.card (↥hyp.actualKActor × ↥hyp.W) = Nat.card ↥(MonoidHom.range M.mu) :=
+      Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv
+    rw [← e1, Nat.card_prod, hK]
+  have hunits : Nat.card M.Eˣ = (2 ^ m) ^ 2 - 1 := by
+    rw [Nat.card_eq_fintype_card, Fintype.card_units, ← Nat.card_eq_fintype_card, M.card]
+  have hidx := (MonoidHom.range M.mu).index_mul_card
+  rw [hrange, hunits] at hidx
+  have hpos : 0 < (2 ^ m - 1) * Nat.card ↥hyp.W := by
+    have h2 : (2 : ℕ) ≤ 2 ^ m := by
+      calc (2 : ℕ) = 2 ^ 1 := (pow_one 2).symm
+        _ ≤ 2 ^ m := Nat.pow_le_pow_right (by norm_num) (Nat.one_le_iff_ne_zero.mpr hm)
+    have hW : 0 < Nat.card ↥hyp.W := Nat.card_pos
+    have h1 : 0 < 2 ^ m - 1 := by omega
+    exact Nat.mul_pos h1 hW
+  rw [← two_pow_sq_sub_one_div (e := m) (m := Nat.card ↥hyp.W) hm]
+  rw [← hidx, Nat.mul_div_cancel _ hpos]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
