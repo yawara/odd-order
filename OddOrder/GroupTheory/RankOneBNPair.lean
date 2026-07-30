@@ -26,7 +26,7 @@ from double transitivity:
 * `M = Q ⋊ D`, i.e. every element of `M` is uniquely `q · d`;
 * every element of `L − M` is uniquely `a · t · b` with `a ∈ M`, `b ∈ Q`
   (Peterfalvi Ch. I §1, Proposition 4);
-* `t x t ∉ M` and `t x ∉ M` for `x ∈ Q^#`, which is where `Q^t ∩ M = 1` enters.
+* `t ∉ M`, and `t x t ∉ M` for `x ∈ Q^#` — the latter is `Q^t ∩ M = 1`.
 
 The chapter uses these mappings to pin down `G` in the characterization of
 `PSU(3,q)`.
@@ -87,18 +87,22 @@ structure Setup (M Q D : Subgroup L) (t : L) : Prop where
   tnotmem : t ∉ M
   /-- `t x t ∉ M` for `x ∈ Q^#`; this is `Q^t ∩ M = 1`. -/
   tconj : ∀ x ∈ Q, x ≠ 1 → t * x * t ∉ M
-  /-- `t x ∉ M` for `x ∈ Q^#`; equivalently `t x t ∉ M t`.  This is what forces `f`
-  and `g` to take values in `Q^#` rather than merely in `Q`. -/
-  tleft : ∀ x ∈ Q, x ≠ 1 → t * x ∉ M
 
 namespace Setup
 
 theorem tinv (hS : Setup M Q D t) : t⁻¹ = t := inv_eq_of_mul_eq_one_right hS.invol
 
-theorem tright (hS : Setup M Q D t) {x : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) :
-    x * t ∉ M := by
+/-- `t x ∉ M` for `x ∈ Q`: otherwise `t = (t x) x⁻¹ ∈ M`.  This is what forces `f`
+and `g` to take values in `Q^#` rather than merely in `Q`. -/
+theorem tleft (hS : Setup M Q D t) {x : L} (hxQ : x ∈ Q) : t * x ∉ M := by
   intro hc
-  refine hS.tleft x⁻¹ (Q.inv_mem hxQ) (fun hcc => hx1 (inv_eq_one.mp hcc)) ?_
+  refine hS.tnotmem ?_
+  simpa using M.mul_mem hc (M.inv_mem (hS.QM hxQ))
+
+/-- `x t ∉ M` for `x ∈ Q`, the mirror image of `Setup.tleft`. -/
+theorem tright (hS : Setup M Q D t) {x : L} (hxQ : x ∈ Q) : x * t ∉ M := by
+  intro hc
+  refine hS.tleft (Q.inv_mem hxQ) ?_
   have e : t * x⁻¹ = (x * t)⁻¹ := by rw [mul_inv_rev, hS.tinv]
   rw [e]
   exact M.inv_mem hc
@@ -203,7 +207,7 @@ theorem f_ne_one (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
   intro hc
   have e := H.eq x hxQ hx1
   rw [hc, mul_one] at e
-  refine hS.tleft x hxQ hx1 ?_
+  refine hS.tleft hxQ ?_
   have key : t * x = g x * h x := by
     calc t * x = t * x * (t * t) := by rw [hS.invol, mul_one]
     _ = t * x * t * t := by group
@@ -220,7 +224,7 @@ theorem g_ne_one (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
   intro hc
   have e := H.eq x hxQ hx1
   rw [hc, one_mul] at e
-  refine hS.tright hxQ hx1 ?_
+  refine hS.tright hxQ ?_
   have key : x * t = t * h x * t * f x := by
     calc x * t = t * t * x * t := by rw [hS.invol, one_mul]
     _ = t * (t * x * t) := by group

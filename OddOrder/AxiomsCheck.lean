@@ -22,6 +22,7 @@ import OddOrder.GroupTheory.WeaklyClosed
 import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.CentralExtensionAutomorphisms
 import OddOrder.GroupTheory.RankOneBNPair
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -14591,6 +14592,9 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.f_mul_g_ne_one
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.canonical_mul
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hSix
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.existsUnique_Q_mul_D
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.rankOneSetup
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_fgh
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.conj_mem_Q
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_M_union_t
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_conj_Q

@@ -676,6 +676,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TwoKSubgroups
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.InducedLambda
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
+import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
