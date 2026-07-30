@@ -678,6 +678,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.InducedLambda
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.LinearCharacter
 import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FieldArithmetic
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
 import OddOrder.Higman.Suzuki2Groups

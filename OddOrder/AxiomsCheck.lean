@@ -24,6 +24,7 @@ import OddOrder.GroupTheory.CentralExtensionAutomorphisms
 import OddOrder.GroupTheory.RankOneBNPair
 import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
@@ -14661,6 +14662,14 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNormEquiv_symm_div
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.betaScale_succ
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.pow_eq_one_of_betaSum_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.toCenter_coe
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.toCenter_mul
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.toCenter_eq_one_iff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centerCoord_mul
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centerCoord_eq_zero_iff
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNorm_mul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNorm_ne_zero
 #assert_only_allowed_axioms
