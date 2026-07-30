@@ -199,6 +199,22 @@ theorem mem_semisimpleFamily_of_isMinimalNormal [Finite G]
   rw [center_eq_bot_of_semisimpleFamily h𝒳 hsup] at hNZ
   exact hN.2.1 (le_bot_iff.mp hNZ)
 
+/-- semisimple 性は群同型で移る (族を像に写すだけ). -/
+theorem IsSemisimpleGroup.of_mulEquiv {H : Type*} [Group H] (e : G ≃* H)
+    (h : IsSemisimpleGroup G) : IsSemisimpleGroup H := by
+  obtain ⟨𝒳, h𝒳, hsup⟩ := h
+  refine ⟨(fun S : Subgroup G => S.map e.toMonoidHom) '' 𝒳, ?_, ?_⟩
+  · rintro _ ⟨S, hS, rfl⟩
+    obtain ⟨hnormal, hsimple, hnab⟩ := h𝒳 S hS
+    have ee : ↥S ≃* ↥(S.map e.toMonoidHom) :=
+      Subgroup.equivMapOfInjective S e.toMonoidHom e.injective
+    refine ⟨hnormal.map _ e.surjective, ?_, fun _ => hnab ?_⟩
+    · haveI := hsimple
+      exact ee.symm.isSimpleGroup
+    · exact isMulCommutative_of_surjective ee.symm.toMonoidHom ee.symm.surjective
+  · rw [sSup_image, ← (Subgroup.gc_map_comap (e.toMonoidHom)).l_sSup, hsup,
+      Subgroup.map_top_of_surjective _ e.surjective]
+
 /-- semisimple 群の中心は自明. -/
 theorem IsSemisimpleGroup.center_eq_bot [Finite G] (h : IsSemisimpleGroup G) :
     center G = ⊥ := by

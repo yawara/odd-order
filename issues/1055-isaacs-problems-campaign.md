@@ -29,26 +29,41 @@ Isaacs FGT は各章を section (1A, 1B, ...) に分け、各 section 末に "Pr
 
 - [x] **Ch.1 Sylow** — **🎉 完済 (2026-07-28)**: §1A–§1G 全問
       (§1E は Sylow 計数の非単純性 8 問, §1F は Brodkey 周辺 3 問, §1G は Chermak–Delgado 4 問)
-- [ ] Ch.2 Subnormality
-- [ ] Ch.3 Split Extensions — **§3A ✅ / §3B ✅ (3B.1-3B.15) / §3C ✅ (3C.1-3C.8, 2026-07-29)**。
-      **§3D 🎉 完済 (2026-07-29)**: 3D.1(a)(b) / 3D.2 / 3D.3 / 3D.4 / 3D.5 全問
-      (`Problems3D.lean` 597 行 + `PiLength.lean` 200 行)。
-      **§3E 進行中 (2026-07-29)**: **3E.1 ✅ (両ケース)** / 3E.3 ✅
-      (新 leaf **`Ch04_Commutators/Problems3E.lean`** 583 行)。
-      **残り = 3E.5 のみ** (3E.1 / 3E.2 / 3E.3 / 3E.4 完済)。
+- [x] **Ch.2 Subnormality** — **🎉 完済 (2026-07-25)**: §2A/§2B/§2C/§2D 全問
+      (`Problems.lean` / `ProblemsInvolutions.lean` / `ProblemsNGroups.lean` / `Problems2D.lean`)。
+- [x] **Ch.3 Split Extensions** — **🎉 完済 (2026-07-29)**。§3A ✅ / §3B ✅ (3B.1-3B.15) /
+      §3C ✅ (3C.1-3C.8) / §3D ✅ (3D.1-3D.5, `Problems3D.lean` + `PiLength.lean`) /
+      §3E ✅ (3E.1-3E.5, `Ch04_Commutators/Problems3E.lean`) /
+      **§3F ✅ (3F.1-3F.5, `Problems3F.lean` + `Problems3FSpecialLinear.lean`)**。
+      Ch.3 の section は §3A-§3F の 6 つで全部 (原文 grep で確認)。
 
 * ✅ **3E.2** `actionFixedSubgroup_eq_mul` (2026-07-29): `c ∈ C` を `c = h₀k₀` と書くと
   `H ∩ cK` は `A`-不変な `H ∩ K` の剰余類なので Thm 3.27
   (`aInvariant_coset_mem_centralizer`) が `A`-固定点 `c'` を与える。
   `c' ∈ C ∩ H` かつ `c'⁻¹c ∈ C ∩ K`。一発 green。
 
-**3E.5 の証明経路 (確定済)**: `K` を `G` の `P/Φ(P)` への作用の核とすると `P ≤ K`。
+**3E.5 ✅ 完成 (2026-07-29)** `frattiniQuotientKernel_oPiCore_eq`。証明経路は計画どおり:
+`K` を `G` の `P/Φ(P)` への作用の核とすると `P ≤ K`。
 逆は「`K` は `p`-群」を示す: `q ≠ p` 素数と `K` の位数 `q` の元 `x` について
 `⟨x⟩` は `P` に互いに素に作用し `P/Φ(P)` 上自明なので **3D.4**
 (`smul_eq_self_of_trivial_mod_frattini`) で `P` に自明に作用、すなわち
 `⟨x⟩ ≤ C_G(P) = C_G(O_p(G)) ≤ O_p(G) = P` (Hall–Higman, `O_{p'}(G) = 1`) となり
 `q`-群が `p`-群に入って矛盾。ゆえに `K` は正規 `p`-群で `K ≤ O_p(G) = P`。
-⚠ 実装コスト = `⟨x⟩ ≤ N_G(P)` の共役作用 `MulDistribMulAction ↥⟨x⟩ ↥P` の plumbing。
+
+* **核の定式化**: `frattiniQuotientKernel P` (`P ⊴ G` に対し `G ⧸ Φ(P)` の中で
+  `P/Φ(P)` の中心化群を引き戻したもの)。`frattiniQuotientKernel_eq_ker` で
+  **文字どおり `MulAut.conjNormal ∘ (G ↠ G/Φ(P))` の核**であることを別途証明した
+  (命名だけに頼らない; `MonoidHom.comap_ker` + 既存 `ker_conjNormal_eq_centralizer`)。
+  元による特徴付け `mem_frattiniQuotientKernel_iff` = `∀ y ∈ P, ⁅g, y⁆ ∈ Φ(P)`。
+* ⚠ 想定していた `MulDistribMulAction ↥⟨x⟩ ↥P` の plumbing は
+  `MulDistribMulAction.compHom ↥P ((MulAut.conjNormal (H := P)).comp Z.subtype)` の 1 行で済み、
+  `h • g` の coe が `(h:G) * (g:G) * (h:G)⁻¹` に `rfl` で落ちるので
+  `g⁻¹ * (h • g) = ⁅g⁻¹, h⁆ = ⁅h, g⁻¹⁆⁻¹` の変形も `group` 一発。
+* ⚠ `⟨x⟩` 全体が核に入ることを使うので、核を**部分群として**定義しておくのが要点
+  (元 `x` についての `∀ y ∈ P, ⁅x,y⁆ ∈ Φ(P)` だけを仮説にすると冪について閉じない)。
+* `(P.map (QuotientGroup.mk' N)).Normal` は mathlib の instance
+  (`QuotientGroup.map_normal`) なので `haveI` 不要。`Φ(P)` の `G` での正規性も
+  `Subgroup.normal_of_characteristic_of_normal` が instance で拾う。
 
 **3E.4 の証明経路 (2026-07-29 に原文確認して確定)**:
 書籍 **Lemma 3.32** (p.105) = 「互いに素な作用で `P ∈ Syl_p(G)` が `A`-不変なら
@@ -6073,3 +6088,1063 @@ repo/mathlib に「有限冪零群の Sylow と Hall `p'` が元ごとに可換�
   `Subgroup.commute_of_normal_of_disjoint` で `[C_p, Q] = 1`。
 * この `Q ⊴ C` (= 「冪零群の Hall 部分群は正規」) は汎用なので
   `Carter/` でなく `OddOrder/GroupTheory/` 側の leaf に置くのが妥当。
+
+## Ch.3 §3F (書籍 pp. 110–111) — 着手 (2026-07-29)
+
+書籍の statement は**ページ画像で確定済** (`references/isaacs/pages/isaacs-p110-123.png`,
+`isaacs-p110-124.png`)。⚠ pdftotext は `SL(2,3)` を `51/(2,3)`, `Q_8` を `Qg`,
+`|S| = 24` を `|5| = 2 4` に潰すので画像必須。⚠ 書籍 3F.1 の本文は
+"suppose that **N** has a cyclic subgroup C of index 2" だが、続く `G − C` から
+**`G` の誤植**と確定 (画像で確認)。
+
+* **3F.1** `|G| = n` (`8 ∣ n`), 指数 2 の巡回部分群 `C`, `G ∖ C` の元がすべて位数 4
+  ⟹ `G ≅ Q_n`。
+* **3F.2** 自明群から Thm 3.36 を繰り返し適用してすべての可解群が作れる。
+* **3F.3** `Q = Q_8` の位数 4 の巡回部分群はちょうど 3 個で `Aut(Q)` が推移的に置換。
+* **3F.4** `S = SL(2,3)` は `|S| = 24` で正規 Sylow 2-部分群 `≅ Q_8` をもつ。
+* **3F.5** `S ◁ G = GL(2,3)` (指数 2)。`G ∖ S` に位数 2 の元 `g` はあるが位数 4 の元は無い。
+  `S` を指数 2 で含む群 `H` で、`H ∖ S` に「`g` と同じ `S` の自己同型を誘導する」位数 4 の
+  元 `h` をもつものが存在することを示す。`H ∖ S` に位数 2 の元は無く、`G ∖ S` と `H ∖ S` は
+  どちらも位数 8 の元をもつ。
+
+### `Q_n` の形式化 = mathlib `QuaternionGroup (n/4)`
+
+書籍の `Q_n` は位数 `n`。mathlib の `QuaternionGroup M` は位数 `4M` で、生成元関係
+(`a^{2M} = 1`, `b² = a^M`, `b⁻¹ab = a⁻¹`) が Isaacs の構成 (巡回 `N` = 位数 `n/2`,
+`g² = a` = `N` の唯一の involution, `x^g = x⁻¹`) と一致する。⟹ `Q_n = QuaternionGroup (n/4)`。
+(§3A.2 の `semidihedralQuaternion n` は semidihedral 群の部分群としての別モデルで、
+そちらは 3A.2 の主張のための構成。§3F では mathlib モデルを使う。)
+
+### ⚠ 四元数認識定理を共有 leaf へ引き上げた (2026-07-29)
+
+3F.1 の核 = 「`⟨c⟩` 指数 2 + `a ∉ ⟨c⟩` が `c` を反転 + `a² = c^M` ⟹ `QuaternionGroup M`」。
+これは **`Isaacs/Ch06_FrobeniusActions/DQSDRecognition.lean` に `private` で既にあった**
+(`quaternionIsoOfInverting` + 巡回群の involution 一意性
+`eq_pow_half_orderOf_of_mem_zpowers_sq_eq_one`)。Ch.3 → Ch.6 の import は逆向きなので、
+**純粋に一般の群論であるこの 2 つだけを新 leaf
+[`OddOrder/GroupTheory/QuaternionRecognition.lean`](../OddOrder/GroupTheory/QuaternionRecognition.lean)
+へ移して public 化**した (`private` をファイル跨ぎで使わない方針にも合致)。
+`DQSDRecognition.lean` は新 leaf を import して自前の private 版を削除
+(同ファイルは既に `open OddOrder.GroupTheory` していたので呼び出し側は無変更)。
+⚠ 新 leaf は `nlinarith`/`positivity`/`group`/`ring_nf` を使うので
+`Mathlib.Tactic.{Group,Linarith,Positivity,Ring}` の明示 import が要る
+(元ファイルは推移的に拾っていた)。
+
+### 3F.1 完了 (2026-07-29)
+
+`nonempty_mulEquiv_quaternionGroup_of_isCyclic_index_two`。証明:
+`C = ⟨c⟩` (mathlib `Subgroup.isCyclic_iff_exists_zpowers_eq_top`)、
+`orderOf c = n/2 = 2M` (`M = n/4`)。`a ∉ C` を取ると **任意の `x ∈ C` について**
+`a * x ∉ C` ゆえ `orderOf (a*x) = 4`, すなわち `(a*x)²` は `C` の位数 2 の元で、
+巡回群ではそれが一意なので `(a*x)² = c^M` が `x` によらない。
+`x = 1` ⟹ `a² = c^M`、`x = c` ⟹ `(ac)² = a²` ⟹ `c a c = a` ⟹ `a c a⁻¹ = c⁻¹`。
+`quaternionIsoOfInverting` を当てて終わり。axiom-clean。
+
+### 3F.2 完了 (2026-07-29)
+
+`isCyclicExtensionTower_top`。「Thm 3.36 を繰り返して構成できる」を **inductive predicate**
+`IsCyclicExtensionTower : Subgroup G → Prop` (`bot` / `step`) で表した。
+⚠ **設計の要**: 商の巡回性を quotient 型で書くと `∃ h : Normal …, IsCyclic (↥K ⧸ …)` という
+「instance を存在量化の中で作る」形になり statement が書けない。**`K = H ⊔ ⟨g⟩` (`g ∈ K`) と
+`∀ x ∈ K, ∀ y ∈ H, x y x⁻¹ ∈ H`** で書けば quotient 型を一切使わずに済み、しかも Thm 3.36 の
+出力そのものの形になる。inductive predicate にしたので帰納の組み立ても自明 (列の添字管理が不要)。
+
+証明は `|K|` の強帰納: `K ≠ ⊥` ⟹ `↥K` 非自明可解 ⟹ `commutator ↥K < ⊤`
+(`IsSolvable.commutator_lt_top_of_nontrivial`) ⟹ それを含む coatom `M`
+(`eq_top_or_exists_le_coatom`; ⚠ `IsCoatomic.exists_le_coatom` という名前は無い) を取る。
+`M ⊇ commutator` から共役閉性、coatom 性から `M ⊔ ⟨ĝ⟩ = ⊤` (`ĝ ∉ M`)。
+`M.map K.subtype` に戻して `|N| = |M| < |K|` で帰納法の仮説。
+
+### 3F.3 前半 完了 (2026-07-29) / 後半 (Aut の推移性) が残り
+
+`quaternionTwo_orderOf_eq_four_iff` — `Q_8` では `a 0` (単位元) と `a 2` (唯一の involution)
+以外の 6 元がすべて位数 4。`orderOf_a i` (mathlib) で `4 / gcd 4 i.val` に落として
+`revert i; decide` (`ZMod 4` は 4 元)。`xa i` 側は `orderOf_xa i` が mathlib にある。
+⚠ `xa i ≠ a 0` は `simp` だと `a 0 → 1` に正規化されて詰まる → **`nofun`** を使う。
+
+`quaternionTwo_zpowers_of_orderOf_eq_four` — 位数 4 の巡回部分群は
+`⟨a 1⟩ = ⟨a 3⟩`, `⟨xa 0⟩ = ⟨xa 2⟩`, `⟨xa 1⟩ = ⟨xa 3⟩` の 3 個。
+`u^3 = v` かつ `v^3 = u` (どちらも `decide` で通る) から `zpowers` が一致。
+
+**残り (3F.3 後半)**: 3 個が相異なること + `Aut(Q_8)` が推移的に置換すること。
+設計 (調査済, 次の iteration の出発点):
+* 相異なる: `xa 0 ∉ ⟨a 1⟩` 等。`⟨a 1⟩` の元は `a _` の形 (`a_one_pow : (a 1)^k = a k`)。
+* 推移性は **明示の自己同型 2 本**を `MulEquiv.ofBijective` + `decide` (`map_mul` は 64 通り)
+  で作るのが最短 (書籍 Hint の Thm 3.35 経由よりデータ準備が軽い)。
+  `QuaternionGroup 2` は `deriving DecidableEq` かつ `Fintype` なので `decide` が効く。
+  - `φ` (`i ↔ j`): `a0↦a0, a1↦xa0, a2↦a2, a3↦xa2, xa0↦a1, xa1↦xa3, xa2↦a3, xa3↦xa1`
+    (`φ(a k) = (xa 0)^k`, `φ(xa k) = a 1 * (xa 0)^k`) ⟹ `⟨a 1⟩ ↦ ⟨xa 0⟩`。
+  - `χ`: `a0↦a0, a1↦xa1, a2↦a2, a3↦xa3, xa0↦a1, xa1↦xa0, xa2↦a3, xa3↦xa2`
+    (`χ(a k) = (xa 1)^k`, `χ(xa k) = a 1 * (xa 1)^k`) ⟹ `⟨a 1⟩ ↦ ⟨xa 1⟩`。
+  (どちらも `x a x⁻¹ = a⁻¹` 型の関係を保つことは手計算で確認済。)
+
+### 3F.4 / 3F.5 の見通し (未着手, 2026-07-29 時点の調査)
+
+* **mathlib に `|SL(n,q)|` の公式は無い** (`Matrix.SpecialLinearGroup` はあるが位数計算は無い)。
+  3F.4 の `|SL(2,3)| = 24` は自前。`Matrix (Fin 2) (Fin 2) (ZMod 3)` は 81 元で
+  `Fintype`+`DecidableEq` があるので `decide` が原理的には効くが、行列の `det` を
+  kernel で 81 回評価する重さは未計測。⚠ `native_decide` は **禁止** (`ofReduceBool` 公理が
+  入り axiom-clean が壊れる)。
+* 3F.5 は §3F 最難 (`H` の構成に Thm 3.36 を実際に使う)。3F.4 の `Q_8 ⊴ SL(2,3)` を
+  土台にするので、3F.4 → 3F.5 の順。
+
+### 3F.3 完了 (2026-07-29) — 後半 (Aut の推移性) も landing
+
+* `quaternionTwo_zpowers_pairwise_ne` — 3 個が相異なる。
+  `mem_zpowers_iff_mem_range_orderOf` で `⟨u⟩` の元を `(Finset.range (orderOf u)).image (u ^ ·)`
+  に落とすと **決定可能**になるので `decide` 一発。
+* `quaternionSwapIJ` / `quaternionSwapIK` — 明示の自己同型 (関数)。
+  `a k ↦ (xa j)^k`, `xa k ↦ (a 1) * (xa j)^k` (`j = 0` / `j = 1`) と定義。
+  ⚠ `ZMod 4` の数値パターンマッチは書けないので **`i.val` (ℕ) 経由の冪**で定義するのがコツ
+  (こう書くと全体が決定可能式になる)。
+* `quaternionSwapIJAut` / `quaternionSwapIKAut` —
+  `MulEquiv.ofBijective (MonoidHom.mk' f (by decide)) (by decide)`。
+  **`map_mul` (64 通り) も全単射性も `decide` が通る** (`QuaternionGroup 2` は 8 元 +
+  `deriving DecidableEq`, `Fintype.decidableBijectiveFintype` があるため)。
+  ⚠ `MulEquiv.ofBijective` は noncomputable なので `noncomputable def` が要る。
+* `quaternionTwo_exists_mulAut_map_zpowers` — 一般の位数 4 の `x`, `y` に対し
+  `φ.symm.trans ψ` (両方を `⟨a 1⟩` に戻して合成) で推移性。
+  `Subgroup.map_map` + `MonoidHom.ext` で `(φ.symm.trans ψ) ∘ φ = ψ`。
+
+**⟹ 残り = 3F.4 (`SL(2,3)`) と 3F.5**。
+
+### 3F.4 完了 (2026-07-29) — `SL(2,3)` は `decide` で全部片付く
+
+新 leaf `Ch03_SplitExtensions/Problems3FSpecialLinear.lean` (行列群の import と
+具体計算をここに隔離)。⚠ **前 iteration の見積り「decide の重さは未計測」は外れで、
+全部 kernel `decide` が通る (leaf build 5.8s)**:
+
+* `card_specialLinearTwoThree : Nat.card SL(2,3) = 24` — `Nat.card_eq_fintype_card` +
+  `decide` (81 行列の det 判定)。
+* `slQuaternionI = [[0,-1],[1,0]]`, `slQuaternionJ = [[1,1],[1,-1]]` —
+  `⟨!![…], by decide⟩` で det = 1。
+* `quaternionToSL23 : Q_8 →* SL(2,3)` — 台写像を `a k ↦ i^k`, `xa k ↦ j * i^k` と
+  `i.val` 経由で定義し `MonoidHom.mk' _ (by decide)` (64 通り)。単射性も `decide`。
+* `sylowTwoSL23 := quaternionToSL23.range`、正規性も `decide` (24×8 通り)。
+  ⚠ `Subgroup.Normal` を直接 `⟨by decide⟩` にすると `sylowTwoSL23` が `def` で
+  unfold されず `Decidable` instance 合成に失敗する → **`quaternionToSL23.range` と
+  書いた別 theorem にして `⟨thm⟩` で渡す**。
+* `exists_normal_sylow_two_mulEquiv_quaternion` — `Sylow.ofCard` で `Sylow 2` に
+  仕立てる。⚠ `(24:ℕ).factorization 2 = 3` は `decide` 不可 (Finsupp) →
+  `Nat.Prime.pow_dvd_iff_le_factorization` を上下から当てて `omega`。
+
+⚠ `native_decide` は使っていない (axiom-clean 維持)。
+
+**⟹ §3F の残りは 3F.5 のみ** (`G = GL(2,3) ⊃ S` 指数 2 と、`Thm 3.36` で作る `H`)。
+
+### 3F.5 完了 (2026-07-29) — 🎉 §3F 完済 = Isaacs Ch.3 章末演習 全問完済
+
+書籍の statement (ページ画像 `isaacs-p110-123.png` / `isaacs-p110-124.png` で確定):
+`S = SL(2,3) ⊴ G = GL(2,3)` (指数 2)。`G ∖ S` に位数 2 の元 `g` はあるが位数 4 の元は
+無い。`S` を指数 2 で含む群 `H` で `H ∖ S` が「`g` と同じ `S` の自己同型を誘導する」
+位数 4 の元 `h` をもつものが存在する。`H ∖ S` に位数 2 の元は無く、`G ∖ S` と `H ∖ S`
+はどちらも位数 8 の元をもつ。
+
+**設計の要**: 全部が「`S` の外の元の 2 乗が `SL(2,3)` のどの元か」に帰着する。
+`g = diag(1,-1)` (`g² = 1`) が誘導する `σ = slConjReflection : MulAut SL(2,3)` を使って
+```
+  (g x)²    = σ(x) x           (x ∈ SL(2,3))
+  (h ι(x))² = σ(x) (-I) x      (h² = ι(-I))
+```
+なので、必要な核心事実は **24 元の全数検査 2 本だけ**:
+* `slConjReflection_mul_ne_slNegOne` : `σ(x) x ≠ -I` ⟹ `G ∖ S` に位数 4 の元が無い
+* `slConjReflection_mul_slNegOne_mul_ne_one` : `σ(x) (-I) x ≠ 1` ⟹ `H ∖ S` に位数 2 の元が無い
+
+(手計算: `x = !![a,b;c,d]` に対し `σ(x) x = !![a²-bc, b(a-d); c(d-a), d²-bc]`。これが
+`-I` なら `a(a-d) = 1` ゆえ `a ≠ 0`, `a ≠ d`、したがって `b = c = 0`、よって `a² = -1`
+だが `ZMod 3` の平方は `0, 1` のみで矛盾。書籍が 2 つの主張として書くものは同じ計算。)
+
+位数 8 は両側とも `j = !![1,1;1,-1]` が証人: `σ(j) j = i` (位数 4)、`σ(j)(-I) j = -i` (位数 4)。
+
+**新規の一般補題** (`Problems3F.lean`、Thm 3.36 を `m = 2` で使った出力の解析部品):
+`notMem_of_zpowers_quotientMk_eq_top` / `exists_eq_mul_of_notMem_of_card_quotient_eq_two` /
+`sq_mul_coe_of_conj` / `coe_mulEquiv_eq_one_iff`。
+
+**新規の具体計算** (`Problems3FSpecialLinear.lean`): `glReflection` / `slConjReflection` /
+`specialLinearTwoThreeSubgroup_index = 2` (= `ker det` + `det` 全射 + `|(ZMod 3)ˣ| = 2`) /
+`exists_eq_glReflection_mul` (`G ∖ S = g S`, 判別式で剰余類を決める) /
+`glReflection_conj` (`σ` が本当に `g` の誘導する自己同型: `Units.ext rfl` 一発) /
+`orderOf_glReflection` / `orderOf_ne_four_of_notMem_specialLinear` /
+`exists_orderOf_eq_eight_notMem_specialLinear` / `exists_index_two_extension_orderOf_four` ⭐。
+
+**⚠ 罠 2 つ (次に存在型から群を取り出すときに必ず踏む)**:
+1. **存在型 `∃ (H : Type) (_ : Group H), …` から取り出した instance は `haveI` でなく
+   `letI` で入れる**。`haveI` は本体を忘れるので、`hgen`/`hhsq` など既に `hHgrp` で
+   elaborate 済みの仮説と defeq でない別インスタンス (`this✝ : Group H`) が立ち、
+   "synthesized type class instance is not definitionally equal" でほぼ全ステップが落ちる。
+2. **商群の議論を `SpecialLinearTwoThree` が context にある巨大証明の中で直接書くと
+   `whnf`/`isDefEq` が heartbeat 爆発する** (`decide` 可能な具体型が context にあると
+   unifier が行列計算に潜る)。抽象型 `{H : Type*} [Group H] {N : Subgroup H} [N.Normal]`
+   の一般補題に切り出すと即座に通る (上の 4 本がそれ)。
+
+⚠ `decide` は `GL(2,3)` (48 元, `Units` 型) でも `(ZMod 3)ˣ` でも通る。`native_decide` 不使用。
+leaf build 6.8s / `bin/check-warnings --strict` clean / 全定理 axiom-clean。
+
+**⟹ Isaacs Ch.1 / Ch.2 / Ch.3 の章末演習は全問完済。次の frontier = Ch.4 §4A**
+(`Problems 4A` は 4A.1–4A.13 の 13 問。Ch.4 の section は §4A–§4D の 4 つ)。
+
+## 📊 全章 census 実測 (2026-07-29) — 残りは Ch.9 / Ch.10 のみ
+
+§3F 完済後に「次は Ch.4」と思って `Ch04_Commutators/` を見に行ったところ、
+**§4A–§4D は既に全問形式化済み**だった (`ProblemsExtraspecial` / `ProblemsMaximalClass` /
+`ProblemsWreath*` / `ProblemsCenterIndex` / `ProblemsNilpotencyClass` / `ProblemsHallWitt` …)。
+本 issue 上部の「Ch.4 以降の章末演習は 1 問も形式化されていない」は **stale** だった
+([[verify-port-state-by-number-not-coq-name]] の再現)。そこで全数 census を実測した。
+
+**方法**: 原文 `pdftotext` から `^NX.M.` を全抽出 (書籍側)、repo から
+`Problem NX.M` を全抽出 (実装側) して差分を取る。
+
+| 章 | 節 (問題数) | 状態 |
+|---|---|---|
+| Ch.1 | 1A(9) 1B(2) 1C(7) 1D(4) 1E(6) 1F(2) 1G(4) | ✅ 全問 |
+| Ch.2 | 2A(8) 2B(6) 2C(1) 2D(2) | ✅ 全問 |
+| Ch.3 | 3A(9) 3B(8) 3C(8) 3D(4) 3E(5) 3F(5) | ✅ 全問 |
+| Ch.4 | 4A(13) 4B(5) 4C(3) 4D(7) | ✅ 全問 |
+| Ch.5 | 5A(8) 5B(3) 5C(13) 5D(6) 5E(3) | ✅ 全問 |
+| Ch.6 | 6A(10) 6B(9) 6C(2) | ✅ 全問 |
+| Ch.7 | 7A(6) 7C(1) | ✅ 全問 |
+| Ch.8 | 8A(13) 8B(10) 8C(6) 8D(6) | ✅ 全問 |
+| **Ch.9** | **9A(8) 9B(5) 9C(3) 9D(4)** | **§9A ✅ / §9B ✅ / 9C.1-2 ✅ (9C.3 保留) / 9D.1-3 ✅ (9D.4 土台のみ)** |
+| **Ch.10** | **10A(7) 10B(2) 10C(1)** | **§10A は 10A.4 と 10A.3 後半を除き ✅ (1/2/3前半/5/6/7)** |
+
+* 素の差分では 1F.1 / 3C.1 も欠落に見えたが **誤検出**: どちらも実装済みで、docstring が
+  `**1F.1**` / `**Isaacs 3C.1 (Hall D-定理, Wielandt)**` と `Problem ` 前置なしで書かれて
+  いるだけ (`ProblemsBrodkey.lean` / `Ch03/Basic.lean` の `hall_D`)。
+* Isaacs 配下は sorry-free (census 時点)。
+
+**⟹ 残りは Ch.9 (20 問) + Ch.10 (10 問) の計 30 問。文書順で Ch.9 §9A から。**
+
+## Ch.9 (More on Subnormality) §9A — 着手 (2026-07-29)
+
+書籍 p. 277 (`references/isaacs/pages/isaacs-p277-290.png` で statement 確定。
+`⊲` はすべて単一 = **normal** であって subnormal ではない — [[mmd-collapses-subnormal-symbol]])。
+
+* **9A.1** `F*(G) ⊆ H ⊆ G` ⟹ `E(H) = E(G)`。
+* **9A.2** 任意の有限群の socle は「abelian 群 × semisimple 群」。
+* **9A.3** `N ⊴ G` (`G` semisimple) なら `N` は「`N` に含まれる `G` の極小正規部分群」の積。
+* **9A.4** `E = E(G)`, `N ⊴ E` なら `N = M Y` (`M` = `N` に含まれる `G` の component の積,
+  `Y = N ∩ Z(E)`)。⚠ 書籍は `Y = M ∩ Z(E)` と誤植 (それだと `Y ≤ M` で `MY = M`)。
+* **9A.5** `H ⊴ G`, `C` が `H` に含まれない `G` の component なら `⁅H, C⁆ = 1`。
+* **9A.6** `H ⊴ G`, `C_G(H) ≤ H` なら `E(G) ≤ H`。
+* **9A.7** 非可換な極小正規部分群 `N` の単純直積因子の族 `X` に `G` は共役で推移的に作用。
+* **9A.8** characteristically simple な群は同型な単純群の直積。
+
+**repo の既存資産** (`Ch09_MoreSubnormality/`): `layer G` (= `E(G)`, `Layer.lean`) /
+`IsComponent` (`Components.lean`) / `genFitting` (= `F*`, `GeneralizedFitting.lean`) /
+`Semisimple.lean` / `SubnormalSocle.lean` / `Quasisimple.lean`。
+とくに **`LayerRestriction.lean` の Lemma 9.25 (`F(G) = 1` の場合の `E(G) = E(H)`)** が
+9A.1 の特殊ケースで、証明の型がそのまま使える (component ごとに「`G` の component と
+一致する」か「全部を中心化して `C_G(F*) ≤ F*` に落ちる」かの二分)。
+
+### §9A 進捗 (2026-07-29)
+
+* **9A.1 ✅** `map_layer_eq_layer_of_genFitting_le` (+ ambient 版
+  `layerInG_eq_layer_of_genFitting_le`)。Lemma 9.25 の一般化。
+* **9A.2 ✅** `exists_socle_mulEquiv_prod_abelian_semisimple`。
+  `abelianSocle` / `semisimpleSocle` を定義し, 新補題
+  `exists_simpleFamily_of_isMinimalNormal` (非可換極小正規を ambient の単純正規因子の
+  join に分解) で `IsSemisimpleGroup ↥(semisimpleSocle G)` を出す。
+* ⚠ **`OddOrder.lean` の配線を `git add -A OddOrder/` で拾い損ねた** (それは
+  `OddOrder/` ディレクトリしか見ない — `OddOrder.lean` は**ファイル**)。9A.1 の commit で
+  orphan leaf になりかけ, 9A.2 の commit で amend して回収。以後 `git add -A OddOrder/`
+  ではなく `git add -A OddOrder/ OddOrder.lean` を使う。
+
+**次 = 9A.3** (`N ⊴ G`, `G` semisimple ⟹ `N` は含まれる極小正規部分群の積)。設計:
+`𝒳` = `G` の極小正規部分群の全体 (= semisimple 族, `mem_semisimpleFamily_of_isMinimalNormal`),
+`U := ⨆ {S ∈ 𝒳 | S ≤ N}`, `V := ⨆ {S ∈ 𝒳 | S ≰ N}` とおく。
+
+1. `S ∈ 𝒳`, `S ≰ N` ⟹ `S ⊓ N ⊴ S` かつ `S` 単純ゆえ `S ⊓ N = 1` ⟹ `⁅S,N⁆ = 1`。
+   よって `V ≤ C_G(N)`, 対称に `N ≤ C_G(V)`。
+2. `Z(N) = 1`: `Z(N)` は `N` で characteristic ⟹ `G`-normal, かつ abelian (solvable) なので
+   `IsSemisimpleGroup.eq_bot_of_normal_of_isSolvable` で自明。⟹ `N ⊓ V ≤ Z(N) = 1`。
+3. `Z(↥V) = 1` (`↥V` も semisimple)。`U ⊔ V = sSup 𝒳 = ⊤` と `Subgroup.mul_normal` で
+   `n ∈ N` を `n = u v` (`u ∈ U`, `v ∈ V`) と書くと, `U ≤ C_G(V)` かつ `n ∈ C_G(V)` から
+   `v ∈ C_G(V) ⊓ V = Z(V) = 1`。⟹ `N ≤ U`, 逆は自明で `N = U`。
+
+### §9A 進捗 (2026-07-29, 続き) — 9A.3 / 9A.4 / 9A.5 / 9A.6 完了
+
+* **9A.3 ✅** `eq_iSup_isMinimalNormal_le_of_isSemisimpleGroup` + 新補題
+  `inf_centralizer_eq_bot_of_isSemisimpleGroup` (semisimple 群で `W ⊓ C_G(W) = 1`)。
+* **9A.4 ✅** `eq_iSup_component_sup_inf_center`。⚠ **書籍の誤植**: `Y = M ∩ Z(E)` は
+  `N ∩ Z(E)` が正しい (`E` quasisimple・`N = Z(E)` で反例)。
+  付随して `Layer.lean` の Thm 9.7(b) の semisimple 族を `componentImageFamily` +
+  `componentImageFamily_spec` + `sSup_componentImageFamily` として切り出した
+  (「`E/Z(E)` の極小正規は component の像に限る」を出すのに族の同一性が要る)。
+* **9A.5 ✅** `commutator_eq_bot_of_isComponent_notLe`。⚠ **書籍 hint の誤植**:
+  `E = E(H)` は `E = E(G)` (`H ∩ E` と書いているので `E ⊄ H`)。
+* **9A.6 ✅** `layer_le_of_centralizer_le` (9A.5 の直接の帰結)。
+
+**次 = 9A.7** (非可換極小正規 `N` の単純直積因子の族に `G` が共役で推移的に作用)。設計:
+
+1. 「`N` の単純直積因子」= `T ≤ N` かつ `N ≤ N_G(T)` かつ `↥T` 単純非可換
+   (`exists_simpleFamily_of_isMinimalNormal` の出力述語そのもの — 述語 `IsSimpleFactorOf`
+   として名前を付けると 9A.7 が書きやすい)。
+2. `S` が単純直積因子なら `S^g` もそう (`N ⊴ G` ゆえ)。
+   `U := ⨆ g, S^g` は `G`-normal・`≤ N`・`≠ 1` なので `N` の極小性で `U = N`。
+3. `T` が `S^g` のどれとも異なるとすると: `S^g ⊓ T` は `N` で正規かつ `T` に含まれるので
+   `T` の単純性から `⊥` か `T`, 後者だと `T ≤ S^g` → `S^g` の単純性で `T = S^g` で矛盾。
+   ⟹ disjoint かつ両方 `N`-normal ⟹ 可換。よって `T ≤ C_N(U) = C_N(N)`,
+   すなわち `T.subgroupOf N ≤ center ↥N = ⊥` (`↥N` semisimple は centerless) で `T = ⊥`,
+   単純群は非自明だから矛盾。
+
+**次々 = 9A.8** (characteristically simple ⟹ 同型な単純群の直積)。書籍 hint は
+`G ⋊ Aut(G)` を考えて `G` をその極小正規部分群にし 9A.7 を当てる。
+
+### §9A 進捗 (2026-07-29, 続き 2) — 9A.7 完了、残り 9A.8 のみ
+
+* **9A.7 ✅** `exists_conj_map_eq_of_isSimpleFactorOf`。あわせて
+  **`IsSimpleFactorOf N T`** (structure: `T ≤ N` / `N ≤ N_G(T)` / `IsSimpleGroup ↥T` /
+  `¬IsMulCommutative ↥T`) を導入し `exists_simpleFamily_of_isMinimalNormal` の出力を
+  これに書き換え (使用側は無変更で通った)。新補助 = `le_normalizer_inf` /
+  `commute_of_le_normalizer_of_disjoint` / `IsSimpleFactorOf.conj` /
+  `inf_centralizer_eq_bot_of_isSemisimpleGroup_coe`。
+  ⚠ `mem_conjugatesOfSet_iff` は `Group` namespace (`Subgroup` でない)。
+  ⚠ `push_neg` は deprecated 警告 → `by_contra` + `fun g h => hcon0 ⟨g, h⟩` で回避。
+
+**次 = 9A.8** (characteristically simple ⟹ 同型な単純群の直積)。**§9A 最難**。調査結果:
+
+* **holomorph は repo にも mathlib にも無い** → 自前で
+  `SemidirectProduct G (MulAut G) (MonoidHom.id (MulAut G))` として作る
+  (`SemidirectProduct` は mathlib にあり `Ch03/CyclicExtensions.lean` で使用実績あり)。
+* 鍵の対応: `Γ := G ⋊ Aut(G)` で `inl.range ⊴ Γ`。`K ≤ inl.range` が `Γ`-normal
+  ⟺ 対応する `K₀ ≤ G` が `G`-normal かつ `Aut(G)`-不変 ⟺ **`K₀` characteristic**。
+  ⟹ `G` characteristically simple ⟺ `inl.range` が `Γ` の極小正規部分群。
+* そこで Lemma 9.6 (`isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal`) で 2 分:
+  - **非可換枝**: `↥(inl.range) ≅ G` は semisimple ⟹ 単純直積因子に分解、
+    **9A.7 で `Γ` の共役により全て同型** ⟹ 同型な非可換単純群の直積。
+  - **可換枝**: `G` abelian かつ characteristically simple ⟹ elementary abelian
+    (`{x | x^p = 1}` が characteristic)。repo の `OddOrder.GroupTheory.IsElementaryAbelian`
+    + `IsElementaryAbelian.zmodModule` (`PRank.lean`) で `ZMod p`-ベクトル空間になるので
+    基底を取って `(ZMod p)^n` に分解 ⟹ 同型な単純群 (`ZMod p`) の直積。
+* 想定 statement:
+  `∃ 𝒵 : Set (Subgroup G), 𝒵.Nonempty ∧ (∀ T ∈ 𝒵, T.Normal ∧ IsSimpleGroup ↥T) ∧`
+  `(∀ T ∈ 𝒵, ∀ U ∈ 𝒵, Nonempty (↥T ≃* ↥U)) ∧ iSupIndep … ∧ sSup 𝒵 = ⊤`
+  (`iSupIndep_of_semisimpleFamily` が非可換枝の独立性を与える)。
+* 規模的に 2-3 iteration 想定。holomorph + characteristic 対応を先に別 leaf
+  (`OddOrder/GroupTheory/Holomorph.lean` 相当) に切り出すのが素直。
+
+### 9A.8 の進捗 (2026-07-29) — 骨格 + semisimple 枝が landing、残りは abelian 枝
+
+* **holomorph 新設** `OddOrder/GroupTheory/Holomorph.lean` (issue 9214 claim 済):
+  `Holomorph G = G ⋊[id] MulAut G` / `conj_inl` (`inr σ` の共役 = `σ` の作用) /
+  `conj_inl_general` (`y (inl x) y⁻¹ = inl (y.left · y.right x · y.left⁻¹)`) /
+  **`normal_iff_characteristic`** / `IsCharacteristicallySimple` /
+  `eq_bot_or_eq_range_inl_of_normal` / `Finite (Holomorph G)`。
+* **骨格 ✅** `isMulCommutative_or_isSemisimpleGroup_of_isCharacteristicallySimple`
+  (`inl.range` が極小正規 ⟹ Lemma 9.6)。
+* **semisimple 枝 ✅** `exists_simpleFamily_of_isSemisimpleGroup_of_isCharacteristicallySimple`
+  (同型性は 9A.7 を `Hol(G)` で当てる; 橋は `isSimpleFactorOf_map_inl`)。
+* `Semisimple.lean` に `IsSemisimpleGroup.of_mulEquiv` を追加。
+
+**残り = abelian 枝**。設計:
+
+1. **characteristically simple + abelian ⟹ elementary abelian**:
+   `p` を `|G|` の素因数に取り (`Nat.exists_prime_and_dvd`, `|G| > 1`),
+   `K := {x | x^p = 1}` は `G` 可換ゆえ部分群で **characteristic** (自己同型が `x^p=1` を保つ)。
+   Cauchy (`exists_prime_orderOf_dvd_card`) で `K ≠ ⊥` なので `K = ⊤`,
+   すなわち `IsElementaryAbelian p G`。
+   ⚠ `{x | x^p = 1}` を `Subgroup` にするには `IsMulCommutative G` から `CommGroup G` を
+   `letI` で作る (`IsMulCommutative.of_comm` の逆向き; `PRank.lean` の `zmodModule` が
+   `letI : CommGroup G := inferInstance` でやっている形が参考になる)。
+2. **elementary abelian ⟹ 位数 p の部分群の直積**:
+   `IsElementaryAbelian.zmodModule` (`PRank.lean`) で `Module (ZMod p) (Additive G)`,
+   `ZMod p` は体 (p 素数) なので `Module.Basis.ofVectorSpace` で基底を取る。
+   族 = 各基底ベクトルの張る `Submodule` を
+   `AddSubgroup.toZModSubmodule p` (order iso, `PRank.lean` で使用実績) と
+   `Subgroup.toAddSubgroup` で `Subgroup G` に戻したもの。
+   * 各因子は位数 `p` ⟹ `isSimpleGroup_of_prime_card` で単純, 互いに同型 (どれも `ZMod p`)。
+   * `iSupIndep` は基底の線形独立性を order iso で移す。
+   * `sSup = ⊤` は `Basis.span_eq`。
+3. 最後に骨格の 2 分岐を合流させて 9A.8 本体
+   (`exists_simpleFamily_of_isCharacteristicallySimple`) を組む。
+
+### 🎉 §9A 完済 (2026-07-29) — 9A.1〜9A.8 全問
+
+`Ch09_MoreSubnormality/Problems9A.lean` (1035 行) + 新 shared leaf
+`OddOrder/GroupTheory/Holomorph.lean` (issue 9214)。全て axiom-clean / lint --strict clean。
+
+9A.8 の abelian 枝で踏んだ罠 (再発必至なので記録):
+
+* **letI-bound-instance synthesis trap** (`PRank.lean` の `addAutEquivGL` 注記が正本):
+  `letI := h.zmodModule` の下で `Submodule (ZMod p) (Additive G)` を式に書くと
+  `LE (Submodule …)` の instance 合成が「stuck due to metavariables」で止まる。
+  **回避 = module を抽象のまま保つ補題に切り出す**
+  (`exists_addSubgroup_basis_family {M} [AddCommGroup M] [Module (ZMod p) M]`)。
+  呼び出し側は `AddSubgroup (Additive G)` と `Subgroup G` しか触らない
+  (`IsElementaryAbelian.exists_isComplement'` と同じ橋渡し)。
+* `Group` + `IsMulCommutative` から `CommGroup` を得る instance は **scoped** —
+  `open scoped IsMulCommutative in` が必要 (かつ `open … in` は **docstring の前**)。
+* `IsElementaryAbelian` は `def` で `And` に unfold されるため `h.zmodModule` が
+  `And.zmodModule` を探して失敗する → `IsElementaryAbelian.zmodModule h` と明示。
+
+**次 = §9B** (書籍 pp. 278-283 付近, 5 問; Wielandt の automorphism tower 周辺)。
+repo には `AutTower.lean` / `AutTowerBounds.lean` / `Schenkman.lean` /
+`InnerAutomorphisms.lean` が既にあるので, まず原文 (ページ画像) で statement を確定してから
+既存資産と突き合わせる。
+
+### §9B 着手 (2026-07-29) — statement 確定 + 9B.1 完了
+
+書籍 pp. 284-285 (ページ画像 `isaacs-p284-297.png` / `isaacs-p285-298.png` で確定):
+
+* **9B.1 ✅** `S ⊴ G`, `S` complete ⟹ `G = S × T`。
+  新 leaf `Ch09_MoreSubnormality/Problems9B.lean`, `IsCompleteGroup` を定義。
+* **9B.2** `Z(G) = 1`, automorphism tower `G = G₁ ⊲ G₂ ⊲ ⋯`。`G ⊲ Gᵢ` なら `i ≤ 2`。
+* **9B.3** `G` semisimple ⟹ `Aut(G)` は complete, ゆえに tower は高々 2 種類。
+* **9B.4** `G` = 位数 `2n` の二面体群 (`n` 奇数)。`Z(G) = 1` で tower は高々 2 種類。
+* **9B.5** `G = AB` (`A, B` ⊲⊲ **subnormal**) ⟹ `G^∞ = A^∞ B^∞`。
+  hint: まず両方 normal の場合、次に `|G|` の帰納法。
+
+**既存資産**: `AutTower.lean` (`autTowerType` / `autTowerStep` / `autTowerEmb` /
+`center_autTowerType_eq_bot` / `chainAux`) / `AutTowerBounds.lean` / `Schenkman.lean` /
+`InnerAutomorphisms.lean` (Lemma 9.11 一式: `innAut` / `conj_ker` / `centralizer_innAut_eq_bot`
+/ `center_mulAut_eq_bot`)。9B.2-9B.4 はこの tower インフラの上に書ける見込み。
+9B.5 は `nilpotentResidual` (`Ch09/NilpotentResidual.lean` の `G^∞`) を使う。
+
+### ⚠ 9B.2 の書籍 statement は要再解釈 (2026-07-29)
+
+書籍 9B.2: 「`Z(G) = 1`, `G = G₁ ⊲ G₂ ⊲ ⋯` が automorphism tower のとき `G ⊲ Gᵢ` なら
+`i ≤ 2`」。**そのままでは偽** — `G` が complete なら tower は最初から定常
+(`G = G₂ = G₃ = ⋯`) で `G ⊲ Gᵢ` が全ての `i` で成り立つ。書籍は tower の項が
+相異なることを暗黙に仮定している (9B.3 / 9B.4 の "contains at most two different groups"
+と同じ言い回し)。**形式化する内容**:
+
+  `Z(G) = 1` かつ `G ⊴ G₃` ⟹ **`G₂ = G₃`** (tower が `G₂` で止まる = 相異なる群は高々 2 個)
+
+証明の筋:
+1. `C_{G₃}(G) ⊓ G₂ = C_{G₂}(G) = 1` (Lemma 9.11(c) `centralizer_innAut_eq_bot`)。
+2. `C_{G₃}(G)` と `G₂` はともに `G₃`-正規なので `⁅C_{G₃}(G), G₂⁆ ≤ C_{G₃}(G) ⊓ G₂ = 1`,
+   すなわち `C_{G₃}(G) ≤ C_{G₃}(G₂) = 1` (`Z(G₂) = 1` は `center_autTowerType_eq_bot`)。
+3. `G ⊴ G₃` への共役作用は忠実 ⟹ `G₃ ↪ Aut(G) = G₂`, 有限性 + `G₂ ≤ G₃` で `G₂ = G₃`。
+
+**step 2 / 3 の一般形は landing 済** (`Problems9B.lean`):
+`centralizer_eq_bot_of_inf_eq_bot_of_centralizer_eq_bot` / `ker_conjNormal` /
+`card_le_card_mulAut_of_centralizer_eq_bot`。
+⏳ 残り = `AutTower.lean` の `autTowerType` / `autTowerEmbLe` 上での組み立て
+(`G` の `G₃` 内の像を `A`, `G₂` の像を `B` として上の 3 本を当てる)。
+
+### 9B.2 完了 / 9B.3 の部品 (2026-07-29)
+
+* **9B.2 ✅** `isCompleteGroup_autTowerType_one_of_normal_range` (再解釈版)。
+  新補助 = `card_mulAut_congr` (`MulAut` の同型移送; mathlib に functor 性が無い) /
+  `range_autTowerEmb_two`。
+  ⚠ `Subgroup.map_top` も `MonoidHom.range_id` も mathlib に無い
+  (`← MonoidHom.range_eq_map` / `MonoidHom.range_eq_top.mpr Function.surjective_id` で代替)。
+* **9B.3 部品 ✅** `normal_map_conj_of_map_le` (characteristic ⟹ `Aut(H)` での像が正規) /
+  `layer_mulAut_le_innAut` (`Z(G)=1` ⟹ `E(Aut G) ≤ Inn G`; **9A.6 の直接適用**)。
+
+**9B.3 の残り**: 逆向き `Inn(G) ≤ E(Aut G)`。`G` semisimple の族 `𝒳` の各 `S` について
+`S.map MulAut.conj` が `Aut(G)` の component であることを示す:
+* subnormal: `S.map conj ⊴ Inn G ⊴ Aut G` (`Subgroup.IsSubnormal.trans` を使う)。
+* quasisimple: `↥(S.map conj) ≃* ↥S` (conj は `Z(G)=1` で単射) と
+  `isQuasisimple_of_isSimpleGroup_not_isMulCommutative` (`SubnormalSocle.lean`)。
+* `innAut G = (sSup 𝒳).map conj` を `(gc_map_comap).l_sSup` で分配。
+
+これで `Inn G = E(Aut G)` が characteristic (`map_layer_mulEquiv`) になり、
+`normal_map_conj_of_map_le` で `G` の像が `G₃` で正規 ⟹ **9B.2 を適用して 9B.3 完成**。
+
+### 9B.3 完了 / 9B.4 の実状調査 (2026-07-29)
+
+* **9B.3 ✅** `isCompleteGroup_mulAut_of_isSemisimpleGroup`。`E(Aut G) = Inn(G)`
+  (`≤` = 9A.6 の直接適用 / `≥` = 各単純正規因子の像が component) から
+  `Inn(G)` characteristic ⟹ 9B.2 適用。新補助 = `innAut_le_normalizer_map_conj` /
+  `innAut_le_layer_mulAut`。
+
+**9B.4 は大物** (`G` = 位数 `2n` の二面体群, `n` 奇数; tower は高々 2 種類):
+
+* 「`Z(G) = 1`」の部分は **mathlib に既存** —
+  `DihedralGroup.center_eq_bot_of_odd_ne_one (hodd : Odd n) (hne1 : n ≠ 1)`。
+  形式化すべき新規内容ではない。
+* 本体は「`Aut(D_{2n})` が complete」。**9B.2 経由の近道は使えない**:
+  9B.2 は `Inn(G)` が `Aut(G)` で characteristic であることを要求するが、
+  `n` 奇数のとき `Aut(D_{2n}) ≅ Hol(Z/n) = Z/n ⋊ (Z/n)ˣ` で
+  `Inn(D_{2n}) = Z/n ⋊ {±1}`。`(Z/n)ˣ` は一般に involution を複数持つ
+  (例: `n = 15` で `(Z/15)ˣ ≅ Z/2 × Z/4` は involution 3 個) ので
+  `{±1}` は characteristic に決まらず、`Inn(D_{2n})` は characteristic でない。
+* したがって必要なのは **(a) `Aut(D_{2n}) ≅ Hol(Z/n)` (`n` 奇数)** と
+  **(b) `Hol(Z/n)` が complete (`n` 奇数)** の 2 本。どちらも mathlib に無く、
+  (a) は `D_{2n}` の巡回部分群 `C` が characteristic (奇位数元全体) であることから
+  `Aut(D_{2n}) → Aut(C)` を作る筋、(b) は古典的定理で独立の議論が要る。
+  **`OddOrder/GroupTheory/Holomorph.lean` (9214 で新設済) が (b) の置き場になる**。
+* 見積り: 2-3 iteration。9B.5 とは独立なので、着手順は入れ替えてよい。
+
+**9B.5 の材料は揃っている**: `NilpotentResidual.lean` に `nilpotentResidual` /
+Lemma 9.15 (`nilpotentResidual_top_eq_of_isSubnormal_sup_nilpotent`) /
+相対形 (`nilpotentResidual_sup_eq_of_isSubnormal`) / `map_nilpotentResidual` /
+`nilpotentResidual_le_iff_isNilpotent_map` などが既にある。
+書籍 hint は「まず `A`, `B` ともに normal の場合、次に `|G|` の帰納法」。
+
+### 9B.5 の帰納法の設計が確定 (2026-07-29) — ⚠ 仮説は join でなく **積**
+
+**base case ✅** (`nilpotentResidual_top_eq_sup_of_normal`, commit f55ae54b5):
+`A, B ⊴ G`, `A ⊔ B = ⊤` ⟹ `G^∞ = A^∞ ⊔ B^∞`。
+
+**一般ケース (subnormal) の帰納法**は次で閉じる (`Nat.card G` の強帰納, `∀ G` を内側に
+量化する `nilpotentResidual_top_aux` と同じ型):
+
+1. `A = ⊤` または `B = ⊤` なら自明 (`le_sup_left` / `le_sup_right`)。
+2. 両方 proper なら `IsSubnormal.lt_normal` (mathlib) で
+   `A ≤ A₁ ⊴ G`, `A₁ < ⊤` と `B ≤ B₁ ⊴ G`, `B₁ < ⊤` を取る。
+   `A₁ ⊔ B₁ = ⊤` なので **base case** で `G^∞ = A₁^∞ ⊔ B₁^∞`。
+3. `A₁ = A (A₁ ⊓ B)` (**Dedekind**)。`A ⊴⊴ A₁`, `A₁ ⊓ B ⊴⊴ A₁`
+   (`IsSubnormal.subgroupOf` は任意の `K` に効く) で `|A₁| < |G|` なので **IH**:
+   `A₁^∞ = A^∞ ⊔ (A₁ ⊓ B)^∞`。対称に `B₁^∞ = (B₁ ⊓ A)^∞ ⊔ B^∞`。
+4. `(A₁ ⊓ B)^∞ ≤ B^∞` と `(B₁ ⊓ A)^∞ ≤ A^∞` は `nilpotentResidual_mono`。
+   合わせて `G^∞ ≤ A^∞ ⊔ B^∞`、逆は単調性。
+
+⚠ **仮説は `A ⊔ B = ⊤` (join) ではなく `G = AB` (積) でないと step 3 が回らない**。
+Dedekind の恒等式 `A (A₁ ∩ B) = (AB) ∩ A₁` は積についてのもので、
+部分群束は一般に modular でないため join では代用できない。書籍も `G = AB` と書いている。
+⟹ Lean statement は `(A : Set G) * B = Set.univ` を仮説に取り、
+`↥A₁` へ落とすときも積の形で持ち回る (`Subgroup.mul_normal` 等は片方の正規性が要るので
+素の `Set` の積で扱うのが安全)。
+
+⏳ 次 iteration = この帰納法の実装。base case と mathlib の
+`IsSubnormal.lt_normal` / `IsSubnormal.subgroupOf`、repo の
+`map_subtype_nilpotentResidual_top` / `map_subtype_nilpotentResidual_subgroupOf` が材料。
+
+### 🎉 §9B 完済 (2026-07-29) — 9B.4 完成で 9B.1–9B.5 全問
+
+**9B.4 ✅** `isCompleteGroup_mulAut_dihedralGroup` (Problems9B.lean) +
+新設 `OddOrder/GroupTheory/DihedralAut.lean` (issue 9215、516 行、closed)。
+
+書籍 statement (`references/isaacs/pages/isaacs-p285-298.png` で確定):
+「`G` を位数 `2n` (`n` 奇数) の二面体群とせよ。`Z(G) = 1` を観察し、`G` の automorphism
+tower が相異なる群を高々 2 個しか含まないことを示せ」。前半 (`Z(G) = 1`) は mathlib
+`DihedralGroup.center_eq_bot_of_odd_ne_one` そのもので新規形式化の対象ではない。
+
+⚠ **2026-07-29 の当初メモ (「9B.4 は大物」節) の訂正**:
+
+* あの節は「`n` 奇数のとき `(ℤ/n)ˣ` は involution を複数持つので `{±1}` は
+  characteristic に決まらず、**`Inn(D_{2n})` は characteristic でない**」と書いたが、
+  **これは誤り**。`Hol(ℤ/n)` の内部自己同型は `(a,σ)(b,ε)(a,σ)⁻¹ = (a + σb - εa, ε)` で
+  **unit 成分を保つ**ので、`ℤ/n ⋊ S` の形の部分群は全部 `Hol` で正規。よって
+  `Hol` が complete である以上 `Inn(D_{2n}) = ℤ/n ⋊ {±1}` は実際に characteristic。
+* 9B.2 が使えない**真の理由は循環**: 9B.2 の仮説「`Inn(G)` が `Aut(G)` で characteristic」を
+  確かめるには `Aut(Aut(D_{2n}))` を知る必要があり、それがまさに示したい completeness。
+* 「(a) `Aut(D_{2n}) ≅ Hol(ℤ/n)` と (b) `Hol(ℤ/n)` complete の 2 本が要る」という
+  見積り自体は正しかった。ただし**抽象的な半直積を作る必要は無く**、
+  `dihedralAut a u` の座標表示だけで (a)(b) が両方書ける (実装 = `DihedralAut.lean`)。
+
+**実際に効いた鍵** ⭐: `n` 奇数のとき **`⁅Aut(D_{2n}), Aut(D_{2n})⁆ = 平行移動部分群 `N``**。
+`⊆` は `(ℤ/n)ˣ` 可換で unit 成分が消えること、`⊇` は `⁅(0,-1),(b,1)⁆ = (-2b,1)` と `2` の
+可逆性。⟹ `N` は交換子部分群なので **characteristic が無料**で出る。あとは
+`Φ|_N` = 単元 `w` 倍 → `conj(0,w)` で割る → 残りは 1-cocycle
+`A(uv) = A u + u·A v` で、`u = -1` を可換性で両側から使うと `2 A u = (1-u) A(-1)`、
+`2` を割って `A u = (1-u)c` = `(c,1)` 共役。
+
+副産物 `mulEquivMulAutOfIsCompleteGroup` (complete ⟹ `H ≃* Aut(H)`) で
+9B.2 / 9B.3 / 9B.4 の "contains at most two different groups" が具体化される。
+
+**⟹ 次 = §9C (3 問)、その後 §9D (4 問)。文書順どおり。**
+
+## Ch.9 §9C — 着手 (2026-07-29)
+
+書籍 pp. 288-289 (`references/isaacs/pages/isaacs-p288-301.png` /
+`isaacs-p289-302.png` でページ画像を切り出して statement 確定; 規約どおり references に保存)。
+**⚠ pdftotext は上付きを落とす** ([[pdftotext-drops-superscripts]]): 9C.2/9C.3 は
+`O_p` でなく **`O^p` (p-residual)**。画像で確認済。
+
+* **9C.1** Thm 9.24 の設定で `H`, `K` がともに subnormal ⟹ `U = 1` または `V = 1`。
+* **9C.2** `G = AB`, `A, B ⊲⊲ G` ⟹ `O^p(G) = O^p(A) O^p(B)`。
+  hint =「9B.5 と同様に、まず両方 normal の場合、次に `|G|` の帰納法」。
+* **9C.3** `G = ⟨A, B⟩`, `A, B ⊲⊲ G`, `|A:A'|` と `|B:B'|` が互いに素 ⟹ `G = AB`。
+  極小反例 + (a)-(e) の 5 段 (最後に 9C.2 を使う)。
+
+### 進捗 (2026-07-29)
+
+* **9C.1 ✅** `relCore_thompsonWielandtCore_eq_bot_or_of_isSubnormal`
+  (新設 `Ch09_MoreSubnormality/Problems9C.lean`)。Thm 9.24 (`thompsonWielandt`) は
+  repo に sorry-free で在ったのでそのまま使える。証明は書籍 hint どおり
+  「`Z(O_p(G)) ≤ H` を `U` が `p`-群かどうかで場合分け」。
+  * `p`-群のとき: `U ≤ O_p(G)` ⟹ `Z(O_p(G)) ≤ C_G(U) ≤ N_G(U) = H`。
+  * そうでないとき: `O^p(U) ≠ 1` に **Corollary 9.27**
+    (`le_normalizer_pResidualOf_of_isSubnormal`) を当てて `O_p(G) ≤ N_G(O^p(U)) = H`。
+  * shared infra (issue 9216 closed): `le_oPiCore_of_isSubnormal`
+    (subnormal な π-部分群は `O_π(G)` に入る)。⚠ `S` について帰納すると `step` の IH が
+    「π-群とは限らない `K`」の主張になって回らない。`O_π(K)` を噛ませて `K` 側で帰納する。
+* **9C.2 の材料 ✅** `pResidualOf_le_pResidual` / `pResidualOf_mono` (`PResidual.lean`)。
+  `nilpotentResidual_mono` の `O^p` 版が無かったので追加。
+
+### 9C.2 の設計 (次 iteration)
+
+9B.5 (`nilpotentResidual_top_eq_sup_of_isSubnormal`) の証明を `nilpotentResidual` →
+`pResidualOf p` に置き換えてそのまま写す。対応表:
+
+| 9B.5 で使ったもの | 9C.2 の対応物 | 状態 |
+|---|---|---|
+| `nilpotentResidual_mono` | `pResidualOf_mono` | ✅ landing |
+| `nilpotentResidual_le_iff_isNilpotent_map` | `pResidual_le_of_isPGroup_quotient` | ✅ 既存 |
+| `map_subtype_nilpotentResidual_top` | `pResidualOf_top` | ✅ 既存 |
+| `map_subtype_nilpotentResidual_subgroupOf` | `map_subtype_pResidualOf_subgroupOf` | ✅ 既存 |
+| `Ch01.fitting` / `nilpotent_normal_le_fitting` | `Ch03.oPiCore {p}` / `IsPiGroup.le_oPiCore` | ✅ 既存 |
+
+**base case** (`A, B ⊴ G`, `A ⊔ B = ⊤` ⟹ `O^p(G) = O^p(A) ⊔ O^p(B)`):
+`N := O^p(A) ⊔ O^p(B)` は正規 (`pResidualOf.normal`)。`G/N` で `A`, `B` の像は
+正規 `p`-群なので `O_p(G/N)` に入り、生成するので `O_p(G/N) = ⊤` ⟹ `G/N` は `p`-群
+⟹ `O^p(G) ≤ N` (`pResidual_le_of_isPGroup_quotient`)。9B.5 の `F(G/N) = ⊤` 論法の
+`O_p` 版 (Fitting → `oPiCore {p}` の読み替えがそのまま効く)。
+
+⚠ 「`O^p(A) ≤ N` ⟹ `A` の像が `p`-群」の橋渡しだけ 9B.5 に対応物が無い
+(あちらは `nilpotentResidual_le_iff_isNilpotent_map` という ⟺ 補題があった)。
+`↥A / (N ⊓ A)` が `↥A / O^p(↥A)` の商であることを使う小補題を先に立てる。
+
+**帰納段**は 9B.5 とまったく同型 (`IsSubnormal.lt_normal` で `A ≤ A₁ ◁ G`, `A₁ < ⊤` を取り、
+base case + Dedekind `A₁ = A (B ⊓ A₁)` で `↥A₁` に IH)。⚠ 仮説は join でなく**積**
+`(A : Set G) * B = Set.univ`。`hprod_sub` / `hcard_lt` は 9B.5 のものが再利用できる形
+(現在 `nilpotentResidual_sup_aux` の中の `have` なので、共用するなら切り出す)。
+
+### §9C 進捗 (2026-07-29, 続き) — 9C.2 完了、残り 9C.3
+
+* **9C.2 ✅** `pResidualOf_top_eq_sup_of_isSubnormal`。設計どおり 9B.5 の証明を
+  `nilpotentResidual` → `pResidualOf p` に写して完了。base case の `F(G/N) = ⊤` 論法は
+  `Ch03.oPiCore {p}` にそのまま読み替わる。
+  * 補った橋渡し 2 本: `isPGroup_quotient_of_pResidual_le` / `isPGroup_map_of_pResidualOf_le`
+    (9B.5 側の `nilpotentResidual_le_iff_isNilpotent_map` に当たる ⟺ が `O^p` に無かった)。
+  * `PResidual.lean` に `map_subtype_pResidualOf_top` を追加。
+* **重複解消**: 9B.5 の証明内 inline `have` 3 つ (真部分群の位数評価 / 積の左右対称性 /
+  積の Dedekind 降下) を `GroupTheory/SubgroupInAmbient.lean` の名前付き補題に切り出し、
+  9B.5 と 9C.2 の両方から呼ぶようにした (`card_le_of_lt_top` / `mul_eq_univ_comm` /
+  `subgroupOf_mul_inf_subgroupOf_eq_univ` / `sup_eq_top_of_mul_eq_univ`)。
+
+### 9C.3 の分析と ⚠ 未解決点 (2026-07-29)
+
+statement (ページ画像 `isaacs-p289-302.png`): `G = ⟨A, B⟩`, `A, B ⊲⊲ G`,
+`|A:A'|` と `|B:B'|` が互いに素 ⟹ `G = AB`。極小反例 `G` を取り 5 段:
+
+* **(a)** `N` を極小正規とすると `ANB = G`。
+  ⟹ `G/N` で像 `Ā`, `B̄` は subnormal・生成し、`|Ā:Ā'| ∣ |A:A'|` なので互いに素性が遺伝。
+  `|G/N| < |G|` で極小性 ⟹ `G/N = Ā B̄` ⟹ `G = ANBN = ANB` (`N ◁ G`)。**筋は明快**。
+* **(b)** `(N∩A)(N∩B)` は `A` にも `B` にも正規化される。
+  ⚠ **ここが未解決**。`N∩A ⊴ N` と `N∩B ⊴ N` は言える
+  (極小正規 `N` は characteristically simple = 同型単純群の直積で、その subnormal 部分群は
+  常に normal — 非可換なら部分積、可換なら自明)。よって積は部分群で `N` に正規。
+  `A` が `N∩A` を、`B` が `N∩B` を正規化するのも自明。**しかし `A` が `N∩B` を
+  (あるいは積を) 正規化する理由が未特定**。`A ◁◁ G` の鎖 `A = A₀ ◁ ⋯ ◁ Aₙ = G` からは
+  `[N ∩ Aᵢ, A] ≤ N ∩ A_{i-1}` (= `A` は `N` に冪零に作用) までは出るが、
+  `[N∩B, A] ≤ (N∩A)(N∩B)` に直結しない。次 iteration の主題。
+* **(c)** (b) が出れば `⟨A, N, B⟩ = G` (∵ (a)) が積を正規化 ⟹ 極小性で `= 1` か `= N`。
+  `= N` なら `G = ANB = A(N∩A)(N∩B)B = AB` で反例に矛盾 ⟹ `N∩A = 1 = N∩B`。
+  そのあと「`N` は素数位数」を出す部分は未検討。
+* **(d)** `p ∤ |B:B'|` として **9C.2** で `O^p(G) = O^p(A)B`。
+* **(e)** `A·O^p(G)` が群であることから矛盾。
+
+**repo の材料**: `Ch02.IsMinimalNormal` / `exists_isMinimalNormal_le_of_normal` は在る。
+「極小正規は characteristically simple」「characteristically simple の subnormal 部分群は
+normal」に相当する補題が repo にあるかは未確認 (次 iteration で実測)。
+
+## Ch.9 §9D — 着手 (2026-07-29)
+
+書籍 p. 294 (`Problems 9D`)。§9D の infra (`SubnormalClosure.lean` = Thm 9.28 Bartels /
+`StrongConjugacy.lean` = Lem 9.29-9.30 / `SylowSubnormal.lean` = Lem 9.31) は
+すべて repo に sorry-free で在るので、演習は既存 API の上で書ける。
+
+* **9D.1 ✅** `exists_unique_greatest_isSubnormal_le` (新設 `Problems9D.lean`)。
+  `subnormalCore X := sSup {S | S ≤ X ∧ S.IsSubnormal}`。**Wielandt 結合定理の族版**
+  (`Ch02.isSubnormal_sSup_of_isSubnormal`) が直接効くので極大元を取る議論は不要。
+  `X`-正規性は「共役も `X` 内の subnormal 部分群 ⟹ 最大性で戻る」+ 位数一致で等号。
+* **9D.2 ✅** `isSubnormal_strongCore` / `normal_strongCore_subgroupOf`。
+  `strongCore X := sInf {Y | IsStronglyConjugate X Y}`。
+  * `X`-正規性: `x ∈ X` の共役は強共役全体を**置換**する (`Y ~ X ⟹ x•Y ~ x•X = X`)。
+  * 書籍 hint `L^{(G)} ⊆ X` (`strongClosure_strongCore_le`) ⭐: `M = g•L` が `L` の強共役
+    (`g ∈ L ⊔ M`) のとき、その所属関係を `g⁻¹` で共役すると `g ∈ L ⊔ (g⁻¹•L)`。
+    `L ≤ X` から `g⁻¹ ∈ X ⊔ (g⁻¹•X)` = **`g⁻¹•X` は `X` の強共役** ⟹ `L ≤ g⁻¹•X` ⟹ `M ≤ X`。
+  * subnormal 性は書籍が導出を書いていないが、hint から `L ≤ L^{(G)} ≤ X` と `L ◁ X` で
+    `L ◁ L^{(G)}`、`L^{(G)} ◁◁ G` (Thm 9.28) と合わせて `IsSubnormal.step` 一発。
+    ⚠ `L = L^{(G)}` を示す必要は無い (`G = S₄`, `X` = 位数 4 巡回群で `L = 1` だが
+    `subnormalCore X` は位数 2 — 両者は一致しない)。
+
+### 残り
+
+* **9D.3** subnormal core は `X` の共役たちの交わりでは書けない (`G = S₄`, `X` = 位数 4 巡回群)。
+  紙の計算は済み: `S₄` の subnormal 部分群は `1`/`V₄` の部分群/`V₄`/`A₄`/`S₄` なので
+  `subnormalCore ⟨(1234)⟩ = ⟨(13)(24)⟩` (位数 2)。一方 `X` の共役は 3 個で、相異なる 2 つの
+  交わりは `1`、1 個だけなら位数 4 ⟹ 位数 2 は作れない。**具体群の計算なので `Equiv.Perm (Fin 4)`
+  での decide/計算量が主な課題**。
+* **9D.4** Kegel 予想 (Lem 9.31 の逆) の極小反例で `G`, `S` が非可換単純であることを示す。
+  極小正規部分群を取る hint。
+
+## ⏸ 9C.3 は deferred (2026-07-29)
+
+step (b) の未解決点 (前節に記録) が残るため、文書順を一時外して §9D を先行させた
+(issue 1055 の方針「1 問で堂々巡りせず、genuine に blocked なら記録して先へ進み後で戻る」)。
+Web 検索 (Wielandt の該当定理の証明) では該当文献に当たらなかった。次に戻るときは
+CLAUDE.md の [[feedback-ask-chatgpt-for-elided-gaps]] 手順 (最強モデルに自己完結プロンプト)
+を使う。
+
+### §9D 進捗 (2026-07-29, 続き) — 9D.3 完了
+
+* **9D.3 ✅** `subnormalCore_ne_sInf_conj`。`G = S₄`, `σ = (0 1 2 3)`, `τ = σ²`。
+  * `subnormalCore ⟨σ⟩ = ⟨τ⟩` (位数 2)。`⟨τ⟩ ◁ V₄ ◁ S₄` で subnormal、
+    `X = ⟨σ⟩` は subnormal でない — **issue 9216 の `le_oPiCore_of_isSubnormal` が効く**:
+    subnormal なら `X ≤ O_2(S₄)` だが `O_2(S₄)` は正規なので `σ` の共役も含み
+    `σ·(0 1)σ(0 1)⁻¹` が**位数 3** になって 2-群と矛盾。
+  * `⟨τ⟩` を含む `X` の共役は `X` だけ (`conjAct_smul_cyclicFour4_eq`):
+    `τ ∈ ⟨gσg⁻¹⟩` ⟹ `g⁻¹τg` は `σ` と可換で位数 2 ⟹ `C(σ) = ⟨σ⟩` から `g⁻¹τg = τ`
+    ⟹ `C(τ) = N(X)` から `gσg⁻¹ ∈ {σ, σ⁻¹}`。
+  * 共役の交わりは `⊤` (位数 24) か `X` (位数 4) のみ ⟹ 位数 2 にならない。
+
+**⚠ 具体群 `decide` の実務知見** (S₄ = 24 元):
+* **`orderOf` は `decide` で簡約されない** (`Nat.find` 経由)。`x^n = 1` / `x ≠ 1` を
+  `decide` し `orderOf_eq_prime` / `orderOf_eq_prime_pow` で持ち上げる。
+* `set_option maxRecDepth 40000` が要る (既定 512 では `S₄` 上の全数チェックが尽きる)。
+* `Subgroup` の membership を `decide` させるには
+  `instance : DecidablePred (· ∈ V₄) := fun g => decidable_of_iff (明示的な選言) Iff.rfl`
+  を与える (carrier が `Set` なので自動では付かない)。`Normal` は `⟨by decide⟩`。
+* `Nat.primeFactors 4 = {2}` は `decide` で詰まる (`Multiset.isPerm` が止まる)。
+  `IsPGroup.of_card` → `Subgroup.isPiSubgroup_of_isPGroup_of_mem` の経路が楽。
+* `∀ g, P g → Q g` を `decide` するには `revert` してから (仮説を含む全称形にする)。
+
+### 残り
+
+* **9D.4** Kegel 予想 (Lem 9.31 の逆) の極小反例で `G`, `S` が非可換単純であることを示す。
+  極小正規部分群を取る hint。§9D はこれで完了。
+* **9C.3** deferred (step (b) 未解決)。
+
+### 9D.4 の土台 landing + 残りの設計 (2026-07-29)
+
+statement 確定 (`references/isaacs/pages/isaacs-p294-307.png`): Lemma 9.31 の逆
+(**Kegel 予想**、Kleidman が CFSG を使って証明) の**極小反例** `(G, S)`
+(`|S| + |G|` 最小) で `G` と `S` が非可換単純であることを示す。
+
+**landing 済 (axiom-clean)**:
+* `KegelHypothesis S` = 「∀ 素数 `p`, ∀ `P ∈ Syl_p(G)`, `P ∩ S ∈ Syl_p(S)`」
+  (repo の Lemma 9.31 に合わせ `¬ p ∣ (P ⊓ S).relIndex S` の形)。
+* `KegelHypothesis.of_isSubnormal` = Lemma 9.31 の言い換え。
+* `exists_sylow_inf_eq` — `↥H` の Sylow は `(P ⊓ H).subgroupOf H` の形 (Sylow の極大性)。
+* **(F1)** `KegelHypothesis.subgroupOf` — `S ≤ H` への降下。
+* **(F3)** `KegelHypothesis.infNormal` — `N ◁ G` の `(N, S ⊓ N)` への降下。
+
+**残り (設計は下記まで確定、最後の 1 ケースが未解決)**:
+
+* **(F2) 商への降下**: `N ◁ G` ⟹ `KegelHypothesis (SN/N)` in `G/N`。
+  `Syl_p(G/N) = {PN/N}`、`[SN/N : (P∩S)N/N] ∣ [S : P∩S]` (∵ `P∩S ≤ S ∩ (P∩S)N`) で
+  `p` と互いに素、かつ `(PN/N) ∩ (SN/N)` は `p`-群でこの Sylow を含むので一致。
+* **極小反例の骨格** (すべて上の降下補題で回る):
+  1. `S ≠ ⊥, ⊤` (どちらも subnormal)。`N` を極小正規とする。
+  2. **`SN = G`**: `SN < G` なら (F1) で `S ◁◁ SN`、(F2) で `SN/N ◁◁ G/N` ⟹ `SN ◁◁ G`、
+     繋いで `S ◁◁ G` で矛盾。
+  3. `N < G` なら (F3) + 極小性で **`S ∩ N ◁◁ N`**。
+  4. `(S∩N)^N` は `N` と `S` (∵ `S∩N ◁ S`) に正規化されるので `◁ SN = G`、`≤ N`、
+     `N` の極小性で `= 1` か `= N`。
+     * `= N`: **subnormal `T ◁◁ N` の正規閉包が `N` なら `T = N`** (鎖 `T ◁ ⋯ ◁ T_{k-1} ◁ N`
+       で `T^N ≤ T_{k-1}` なので鎖が短くなる、帰納) ⟹ `N ≤ S` ⟹ `G = SN = S` で矛盾。
+     * `= 1`: `S ∩ N = 1`、つまり `G = S ⋉ N`。
+  5. `S ∩ N = 1` のとき、`q ∤ |N|` なる素数では `|G|_q = |S|_q` なので Kegel 仮説から
+     **`Syl_q(G)` はすべて `S` に含まれる** ⟹ `O^π(G) ≤ S` (`π = π(|N|)`)。
+     * **`N` が可換 (= 基本可換 `p`-群) なら `π = {p}` で `G/O^p(G)` は `p`-群
+       ⟹ `S` は subnormal ⟹ 矛盾** ⟹ 極小正規 `N` は非可換。
+     * ⚠ **`N` 非可換 (`N = T^k`, `T` 非可換単純) の場合が未解決**。
+       `[S, N] ≤ S ∩ N = 1` を出せれば `G = S × N` で `S ◁ G` ⟹ 矛盾、という筋を想定。
+* **「`S` も非可換単純」の部分は未着手** (極小性をどの pair に当てるかが未特定)。
+
+⟹ **9D.4 も 9C.3 と同じく「設計の最後の 1 ケースが未解決」の状態で記録**。
+どちらも CLAUDE.md の [[feedback-ask-chatgpt-for-elided-gaps]] 手順 (最強モデルに
+自己完結プロンプト) を使う回をまとめて設ける。文書順では次は **Ch.10 (10 問)**。
+
+## Ch.10 (More Transfer Theory) — 着手 (2026-07-29)
+
+書籍 pp. 307-308 (`Problems 10A`), p. 312 (`Problems 10B`), p. 31x (`Problems 10C`)。
+ページ画像は `references/isaacs/pages/isaacs-p29[7]-*.png` / `isaacs-p30[789]-*.png` に保存済。
+
+Ch.10 の**本文側は repo にほぼ揃っている**: Yoshida (Thm 10.1) / Lem 10.3 / Thm 10.4
+(`C_p ≀ C_p` recognition) / Lem 10.6-10.7 / Thm 10.9 / Lem 10.11 / Thm 10.12 (Huppert) /
+Lem 10.14 / Thm 10.15 / Thm 10.18 (principal ideal theorem)。演習はこの上に書ける。
+
+### ⚠ regular `p`-群の定義の所在
+
+本文に定義環境は無く、**p. 297 の地の文の括弧書き**にある:
+「任意の `x, y ∈ P` に対し `⟨x, y⟩` の導来部分群の元 `c` があって `(xy)^p = x^p y^p c^p`
+となる `p`-群を **regular** という」。`C_p ≀ C_p` が準同型像にならない十分条件として
+導入されている。索引の "regular p-group, 297, 307" で所在を特定した。
+
+### 進捗
+
+* **10A.1 ✅** `isRegularPGroup_two_iff_commute` (新設 `Ch10_MoreTransfer/Problems10A.lean`)。
+  `IsRegularPGroup` の定義 + 商への遺伝 (`IsRegularPGroup.quotient`) + 極小反例。
+  ⚠ 書籍 hint は「極小反例で `|P'| = 2`」だが、`|P'|` を計算せず
+  「`P'` の元は中心的で 2 乗が 1」だけ出せば足りる (そちらが短い)。
+
+### 残り (10A.2-10A.7 / 10B.1-2 / 10C.1)
+
+* **10A.3 / 10A.7** は `C_p ≀ C_p` への埋め込み/準同型像。
+  repo の `WreathRecognition.lean` (Thm 10.4 = `C_p ≀ C_p` recognition, 1308 行) が土台。
+* **10A.4** `P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G`。Yoshida を使う。
+* **10B.1** `C = ⟨x⟩` 位数 `p^n`, `a ∈ Aut(C)` が `x ↦ x^{p+1}`, `P = C ⋊ ⟨a⟩` は
+  冪零類 `n` の metacyclic `p`-群 (hint = Thm 4.7)。
+* **10B.2** `E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)` (Maschke)。
+* **10C.1** 未確認 (ページ画像を切り出していない)。
+
+### 10A.2 完了 (2026-07-29)
+
+`pow_mul_eq_one_of_isRegularPGroup` / `omegaOneOfIsRegularPGroup` /
+`IsRegularPGroup.subgroup` (部分群への遺伝)。極小反例:
+
+1. `⟨x,y⟩ < P` なら極小性 ⟹ `P = ⟨x,y⟩`。`P` 可換でも終わり ⟹ 非可換。
+2. **Step A** `a^p = 1 ⟹ ⁅a,g⁆^p = 1`。`K := ⟨a, g a g⁻¹⟩` が真部分群なら極小性。
+   `K = P` のときが**書籍 hint に書かれていない部分**で、`g a g⁻¹ = a·⁅a⁻¹,g⁆ ∈ ⟨a⟩ ⊔ Φ(P)`
+   から `⟨a⟩ ⊔ Φ(P) = ⊤`、**Frattini の非生成性** (mathlib `frattini_nongenerating`) で
+   `⟨a⟩ = ⊤` ⟹ `P` 巡回 ⟹ 可換で矛盾。
+   (repo の `GroupTheory/FrattiniPGroup.lean` の `IsPGroup.commutator_mem_frattini` を使う。)
+3. **Step B** `Ω := {c ∈ P' | c^p = 1}` は部分群 (`P' < P` に極小性) で `P`-正規。
+   `⁅x,y⁆ ∈ Ω` から `P/Ω` は可換な 2 元で生成され可換 ⟹ `P' ≤ Ω`。
+4. regular 性の `c ∈ P'` は `c^p = 1` ⟹ `(xy)^p = 1` で矛盾。
+
+⚠ **Lean の罠**: `Ω` を `let` で置くと elaborator が本体を展開し続けて heartbeat 超過する。
+`obtain ⟨Ω, hΩ⟩ : ∃ Ω, ∀ c, c ∈ Ω ↔ …` で**不透明に**取り出すと通る
+([[lean-local-have-instance-blowup]] の「opaque obtain」と同じ)。
+
+### 10A.5 完了 (2026-07-29)
+
+`exists_injective_hom_regularWreath_of_index_sq`: `|P : Q| = p²`, `Q ∩ Z(P) = 1` ⟹
+`P ↪ C_p ≀ C_p`。`core_P(Q) = ⊥` → `P ⧸ Q` (`p²` 点) への忠実な作用 → 像は Sylow に含まれ
+mathlib の `Sylow.mulEquivIteratedWreathProduct` で `C_p ≀ C_p`。
+
+repo の `WreathRecognition.lean` の私有補題 `nonempty_mulEquiv_wreath_of_card_pow`
+(Thm 10.4 の Sylow-埋め込み半分) と同じ筋だが、あちらは位数条件 `m ≥ p` から**同型**を出す。
+10A.5 は位数条件なしの**埋め込み**なので独立に書いた。
+
+### 10A.3 の状況
+
+* **前半 (埋め込み)** は 10A.5 に帰着する: `A = Z(P) × K` (直積因子) なら
+  `Q := K.map A.subtype` が `|P : Q| = |P:A|·|A:K| = p · |Z(P)| = p²` かつ
+  `Q ∩ Z(P) = 1` をみたす。指数計算 (`|A| = |Z(P)|·|K|`) を書けば終わり。
+* **後半「`A` は基本可換」は未解決**。`A = Z(P) × K` (`|Z(P)| = p`) だけでは `K` が
+  基本可換になる理由が出ない (`K ≅ C_{p²}` を排除する議論が要る)。
+  `φ : A → A`, `a ↦ a⁻¹ u a u⁻¹` (`u ∉ A`) が準同型で `ker φ = Z(P)`,
+  `im φ = P'` になるところまでは紙で出たが、そこから先が未特定。
+
+### 10A.3 (前半) / 10A.6 完了 (2026-07-29)
+
+* **10A.3 前半 ✅** `exists_injective_hom_regularWreath_of_center_isComplement`。
+  `Q := K` (=`Z(P)` の `A` 内補元) を `P` に押し出せば `|P:Q| = p²`, `Q ∩ Z(P) = 1` で
+  **10A.5 に帰着**。指数計算だけ。
+  ⏳ **後半「`A` は基本可換」は未解決** (前掲のとおり `A = Z(P) × K` だけでは出ない)。
+* **10A.6 ✅** `isTwoTransitive_iff_exists_doubleCoset`。2-推移性を
+  「`∀ a b c d, a ≠ b → c ≠ d → ∃ g, g•a = c ∧ g•b = d`」の初等形で述べ、
+  `H ∪ HgH` を「`∀ x, x ∈ H ∨ ∃ h₁ h₂ ∈ H, x = h₁ g h₂`」で述べた。
+  `mathlib` の `IsMultiplyPretransitive` (= `IsPretransitive G (Fin n ↪ α)`) は
+  `Fin 2 ↪ Ω` の取り回しが煩雑なので使わなかった。
+  ⚠ `Ω` が 1 点の場合 (`H = G`, `g = 1`) を別扱いする必要がある。
+
+### Ch.10 の残り
+
+* **10A.3 後半** `A` は基本可換 (未解決)。
+* **10A.4** `P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G` (Yoshida を使う)。
+* **10B.1** `C = ⟨x⟩` 位数 `p^n`, `a : x ↦ x^{p+1}`, `P = C ⋊ ⟨a⟩` は冪零類 `n` の
+  metacyclic `p`-群 (hint = Thm 4.7)。
+* **10B.2** `E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)` (Maschke)。
+* **10C.1** 未確認 (ページ画像未切り出し)。
+
+### 10A.7 完了 (2026-07-29)
+
+`exists_surjective_wreath_of_mem_compl_orders`。repo の **Cor 10.5**
+(`exists_surjective_wreath_of_conj_list_prod_ne_one`, `WreathRecognition.lean:1041`) が
+「共役類積 ≠ 1」から直接 surjection を出すので、そこに帰着させるだけだった:
+
+* `v ≡ u^j (mod A)` として `w := u^j` (`w ∉ A`, `w^p = 1`), `a := v w⁻¹ ∈ A`。
+* 新規補題 `mul_pow_eq_conj_list_prod` (一般の群で `(aw)^n = (∏_{i<n} w^i a w^{-i})·w^n`)
+  と `w^p = 1` から **`v^p = 共役類積`** ⟹ `orderOf v = p²` で ≠ 1。
+* `a ∈ Z(P)` だと積が `a^p = 1` になるので `a ∉ Z(P)`。
+
+書籍の「位数 `p` の元」の役割は **`w^p = 1`** を保証すること (これがないと `(aw)^p` が
+共役積そのものにならない)。「位数 `p²` の元」が共役積 ≠ 1 を与える。
+
+### Ch.10 の残り (5 問)
+
+* **10A.3 後半** `A` は基本可換 (未解決)。
+* **10A.4** `P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G`。hint = `C₂ ≀ C₂ ≅ D₈`、
+  `N = N_G(P)` として `N/P` が `P/Φ(P)` 上に非自明な固定点をもつことを示す。Yoshida を使う。
+* **10B.1** `C = ⟨x⟩` 位数 `p^n`, `a : x ↦ x^{p+1}`, `P = C ⋊ ⟨a⟩` は冪零類 `n` の
+  metacyclic `p`-群 (hint = Thm 4.7)。
+* **10B.2** `E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)` (Maschke)。
+* **10C.1** 未確認 (ページ画像未切り出し)。
+
+### Ch.10 の残り 5 問の見積り (2026-07-29 調査)
+
+§10A は 10A.1 / 10A.2 / 10A.3前半 / 10A.5 / 10A.6 / 10A.7 が完了。
+**残りはいずれも「新しいインフラを 1 枚必要とする」問題**なので、1 問あたりの所要が
+これまでより大きい。着手順の見通し:
+
+* **10B.2** (`E ◁ G` 基本可換, `p ∤ |G : C_G(E)|` ⟹ `E ≤ Soc(G)`) — **Maschke が本質**。
+  * 群論的な迂回は無い: `E ≤ Soc(G)` は「`E` が極小正規部分群たちの積」= `E` の
+    完全可約性そのもの。repo の `AInvariantComplement.lean` は **Hall** 型 (互いに素な位数)
+    なので使えない (ここでは `N` も `E/N` も `p`-群)。
+  * 必要な橋: `Additive ↥E` を `ZMod p`-加群にし (`IsElementaryAbelian.zmodModule`,
+    `BG/Ch1_Preliminary/S03g_Thm310Module.lean` に前例あり)、共役作用を
+    `Representation (ZMod p) (G ⧸ C_G(E)) (Additive ↥E)` にして
+    mathlib の `MonoidAlgebra.Submodule.exists_isCompl` (`Invertible (card : ZMod p)`) を当てる。
+    そのうえで「`G`-部分加群 ↔ `E` に含まれる `G`-正規部分群」の対応を作る。
+  * 有用な副産物: この橋は BG/Pf 側でも使い回せる。
+  * ⚠ 途中で使う事実: `p ∤ [G : C_G(E)]` ⟹ **Sylow `p` は `C_G(E)` に含まれる**
+    (`E ≤ Z(P)`)。
+* **10A.4** (`P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G`) — Yoshida (repo に有り) を使う。
+  * 紙の筋: `D₈ = C₂ ≀ C₂` は `Q₈ × C₂` の準同型像ではない (位数 8 の商は `Q₈` か
+    `C₂³` のみ — 位数 2 の部分群 3 つを全部潰して確認済) ので Yoshida が適用でき、
+    `N_G(P)` が 2-transfer を制御する。
+  * hint「`N/P` が `P/Φ(P)` に非自明な固定点をもつ」: `Ω₁(P) = ⟨-1, c⟩` は characteristic
+    で `Φ(P) = ⟨-1⟩` なので `Ω₁(P)` の像が `P/Φ(P)` の 1 次元 `N`-不変部分空間になる。
+* **10B.1** (`P = C_{p^n} ⋊ ⟨x ↦ x^{p+1}⟩` は冪零類 `n` の metacyclic `p`-群) —
+  半直積の構成 + `orderOf` の計算 (`(1+p)` の `(ℤ/p^n)ˣ` での位数) + 下降中心列。
+  ⚠ `p = 2` に例外があるので statement の確認が要る。
+* **10A.3 後半** (`A` は基本可換) — 未解決。`A = Z(P) × K` だけからは出ない。
+* **10C.1** — 未確認 (ページ画像未切り出し)。
+
+## ⚠ 運用メモ (2026-07-29)
+
+lane a は main より **88 commits 先行**した状態が続いている (hub の合流待ち)。
+レーン側は規約どおり leaf build のみで検証しフルビルドは打っていない。
+
+### 10B.2 の骨格 landing (2026-07-29)
+
+`le_socle_of_exists_normal_complement`: `E` の中で `Soc(G) ⊓ E` が `G`-不変な補元 `M` を
+もてば `E ≤ Soc(G)`。
+
+⚠ 当初「`|E|` の帰納 + 補元の部分群への降下 (要 modularity)」を想定していたが**不要**だった:
+補元 `M` が非自明なら `M ⊇ M₀` (極小正規) で `M₀ ≤ Soc(G) ⊓ E ⊓ M = ⊥` と即矛盾するので
+`M = ⊥`。帰納法も modularity も要らない。
+
+⟹ **10B.2 の残りは Maschke だけ**: `p′`-群 `G/C_G(E)` の `p`-群 `E` への作用が完全可約
+であること。実装経路 (`Additive ↥E` の `ZMod p`-加群化 → `Representation` →
+`MonoidAlgebra.Submodule.exists_isCompl`) は前節に記録済。
+
+## 2026-07-29 セッションの成果まとめ (lane a)
+
+**Isaacs §9B 完済 / §9C 2/3 / §9D 3/4 / §10A 5/7 + 10B.2 骨格**。landing 一覧:
+
+| 問題 | 定理名 | 備考 |
+|---|---|---|
+| 9B.4 | `isCompleteGroup_mulAut_dihedralGroup` | 新設 `GroupTheory/DihedralAut.lean` (issue 9215) |
+| 9C.1 | `relCore_thompsonWielandtCore_eq_bot_or_of_isSubnormal` | 新設 `Problems9C.lean` + issue 9216 |
+| 9C.2 | `pResidualOf_top_eq_sup_of_isSubnormal` | 9B.5 との重複を共有補題に切り出し |
+| 9D.1 | `exists_unique_greatest_isSubnormal_le` | 新設 `Problems9D.lean` |
+| 9D.2 | `isSubnormal_strongCore` | |
+| 9D.3 | `subnormalCore_ne_sInf_conj` | `S₄` の具体計算 (`decide` の罠 5 点を記録) |
+| 9D.4 | `KegelHypothesis` + 降下 2 本 | 本体は未了 |
+| 10A.1 | `isRegularPGroup_two_iff_commute` | 新設 `Problems10A.lean` |
+| 10A.2 | `pow_mul_eq_one_of_isRegularPGroup` | |
+| 10A.3前半 | `exists_injective_hom_regularWreath_of_center_isComplement` | 10A.5 に帰着 |
+| 10A.5 | `exists_injective_hom_regularWreath_of_index_sq` | |
+| 10A.6 | `isTwoTransitive_iff_exists_doubleCoset` | |
+| 10A.7 | `exists_surjective_wreath_of_mem_compl_orders` | repo の Cor 10.5 に帰着 |
+| 10B.2骨格 | `le_socle_of_exists_normal_complement` | 残りは Maschke |
+
+共有インフラ: `le_oPiCore_of_isSubnormal` (9216) / `pResidualOf_mono` /
+`card_le_of_lt_top`・`mul_eq_univ_comm`・`subgroupOf_mul_inf_subgroupOf_eq_univ`・
+`sup_eq_top_of_mul_eq_univ` (`SubgroupInAmbient.lean`) / `mulEquivMulAutOfIsCompleteGroup`。
+
+**未解決として明示記録したもの**: 9C.3 step (b) / 9D.4 の `N` 非可換ケースと「`S` も単純」/
+10A.3 後半 (`A` 基本可換) / 10B.2 の Maschke。
+
+## 9C.3 解決 — Fable 5 単独・ChatGPT 相談なし (2026-07-30)
+
+**`mul_eq_univ_of_isSubnormal_of_coprime_abelianization` (Problems9C.lean, axiom-clean)**。
+deferred だった step (b) の未解決点は **Thm 2.6 (Wielandt) がそのまま鍵**だった:
+
+* **(b)** 「`A` が `(N∩A)(N∩B)` を正規化する理由」= `isMinimalNormal_le_normalizer_of_isSubnormal`
+  (repo 既存, `Basic.lean`)。極小正規 `N` は subnormal な `A`, `B` を**正規化する**ので
+  `[A, N] ≤ N ⊓ A`、よって `x ∈ N⊓B` に対し `a x a⁻¹ = [a,x]·x ∈ D`。
+  前回セッションが検討していた「characteristically simple の構造論」は**不要**
+  (abelian / 非 abelian の場合分けも消える)。`A ◁◁ G` の鎖から直接出そうとして
+  出なかったのは、鎖でなく **N 側の normalizer 定理**を使うべきだったから。
+* **(c) 後半** 「`N` は素数位数」も同じ流れで即決: `N∩A = N∩B = ⊥` ⟹ `[N,A] = [N,B] = 1`
+  ⟹ `N ≤ C_G(⟨A,B⟩) = Z(G)`。中心的極小正規は素数位数
+  (`Ch02.exists_prime_card_of_isMinimalNormal_of_le_center` 新設)。
+* **(d)** の「9C.2 をどう使うか」: 反例内では `G ≠ AB` なので 9C.2 を `(A,B)` に直接は
+  当てられない。**pair `(A ⊔ N, B)`** なら積 `(A⊔N)·B = A·N·B = G` が (a) から出る。
+  `O^p(A⊔N) = O^p(A)` は **Lemma 9.26** (`pResidualOf_sup_eq_of_isSubnormal`, repo 既存)。
+* **(e)** には 9C.2 の**積形**が要る (書籍の結論 `O^p(A)O^p(B)` は集合の積; repo の
+  join 形は弱形だった)。積形は 2 段の `|G|` 帰納で証明
+  (`pResidualOf_top_eq_mul_of_isSubnormal`): まず (normal × subnormal) を確立
+  (`B ≤ B₁ ◁ G` に降ろすと middle 項 `O^p(A⊓B₁) ≤ O^p(A)` が**吸収**で消える)、
+  一般は `A ≤ A₁ ◁ G` + (i) + `↥A₁` 内帰納で `O^p(B⊓A₁) ≤ O^p(B)` を吸収。
+  そのうえで `B ≤ O^p(G)` ⟹ `G = A·O^p(G) = A·O^p(A)·B = AB`。
+
+構成 (全 sorry-free / `#print axioms` = 標準 3): 積形 9C.2 (aux 2 本 + 公開 2 本) /
+`pResidual_eq_top_of_not_dvd_card_abelianization` (`p ∤ |Q:Q'|` ⟹ `O^p(Q) = Q`) /
+`commutator_ne_top_of_isNilpotent` / `card_abelianization_map_dvd` (互いに素性の商への遺伝) /
+`GroupTheory.coe_mul_coe_eq_left/right` (部分群集合積の吸収) /
+`coe_sup_eq_mul_of_le_normalizer` (normalizer 条件下の join = 積)。
+
+**⟹ §9C 完済 (3/3)。** 残る「ChatGPT 行き」候補は 9D.4 の 2 点と 10A.3 後半のみ。
+
+## 9D.4 の未解決 2 点を解決 — Fable 5 単独・紙の証明 (2026-07-30)
+
+前回 deferred の 2 点 (「`N` 非可換ケース」「`S` も非可換単純」) の証明が立った。
+形式化は下記の紙の証明を正とする。
+
+### (I) `N` 非可換ケース: `[S, N] = 1` の導出 (想定筋の実現)
+
+設定: 極小反例 `(G, S)`、`N` 極小正規 (`< G`)、`S ∩ N = 1`, `SN = G` (skeleton 1-4 済)、
+`N` 非可換 (可換なら `O^p` 論法で済 — 既記録)。`N = T₁ × ⋯ × T_k`, `Tᵢ` 非可換単純。
+
+任意の素数 `p ∣ |S|` について:
+
+1. `S_p ∈ Syl_p(S)` を取る。`S_p` は `Syl_p(N)` に共役で作用し `|Syl_p(N)| ≡ 1 (mod p)`
+   なので **`S_p`-不変な `N_p ∈ Syl_p(N)`** が取れる (p-群作用の不動点)。
+2. `P := S_p N_p` は部分群 (`S_p ≤ N_G(N_p)`) で `|P| = |S|_p |N|_p = |G|_p`
+   (`S_p ∩ N_p ≤ S ∩ N = 1`) ⟹ `P ∈ Syl_p(G)`。
+3. **Kegel 仮説を `P^n` (`n ∈ N`) に適用**: `P^n ∩ S ∈ Syl_p(S)`。一方、射影
+   `π_S : G = S ⋉ N → S` で `P^n ∩ S ⊆ π_S(P^n) = π_S(P)^{π_S(n)} = S_p`。
+   位数が `|S_p|` なので **`P^n ∩ S = S_p`、すなわち `S_p ≤ P^n` が全 `n ∈ N` で成立**。
+4. `R := ⟨S_p^N⟩` (`N`-共役たちの生成)。step 3 から各 `n S_p n⁻¹ ≤ P` なので
+   `R ≤ P` は **`p`-群**。構成から `N` は `R` を正規化する ⟹ `R ◁ NR` ⟹
+   `[N, R] ≤ N ∩ R` かつ `N ∩ R ◁ N`。
+5. 半単純 (非可換単純の直積) `N` の正規部分群は**因子の部分積のみ** (Isaacs §9A/
+   `Semisimple.lean` 圏の標準事実; 各 `Z(Tᵢ) = 1`)。`N ∩ R` は `p`-群なので部分積としては
+   **自明**: `N ∩ R = 1`。
+6. ⟹ `[N, S_p] ≤ [N, R] = 1`。これを `|S|` の全素数 `p` で回すと
+   `S = ⟨S_p : p⟩ ≤ C_G(N)`、つまり **`[S, N] = 1`**。
+7. `S ∩ N = 1` かつ `N` が `S` を中心化するので `S ◁ SN = G` ⟹ `S ◁◁ G` で反例に矛盾。∎
+
+⚠ step 5 が `N` 非可換を使う唯一の箇所 (可換 `N = q`-基本可換だと `p = q` のとき
+`N ∩ R ≠ 1` があり得る — だから可換ケースは従来どおり `O^q(G) ≤ S` 論法で別処理)。
+⚠ 前回検討した「`C_G(N) = 1` を先に出す」「相異なる極小正規 2 つの解析」は**不要**になった。
+
+### (II) `S` は非可換単純
+
+1. **`S` の真 subnormal は `G`-subnormal**: `T ◁◁ S`, `T < S` なら `(G, T)` も Kegel
+   仮説を満たす (`P ∩ T = (P ∩ S) ∩ T` と Lemma 9.31 を `S` 内で適用) ので
+   `|T| + |G| < |S| + |G|` の極小性から `T ◁◁ G`。
+2. `T ◁ S` 真正規, `T ≠ 1` とし `R := T^G ◁ G` (`≠ 1`)。**(F2) 商降下** + 極小性で
+   `SR/R ◁◁ G/R` ⟹ `SR ◁◁ G`。
+3. `SR < G` なら (F1) + 極小性で `S ◁◁ SR`、繋いで `S ◁◁ G` で矛盾 ⟹ **`G = S·T^G`**。
+4. すると `T^G = ⟨T^{sr} : s ∈ S, r ∈ T^G⟩ = ⟨(T^s)^r⟩ = ⟨T^r : r ∈ T^G⟩ = T^{T^G}`
+   (**`T ◁ S` なので `T^s = T`**)。真の subnormal 部分群の正規閉包列は真に降下する
+   (`T ◁◁ K`, `T < K` ⟹ `T^K < K`: 極小長の鎖 `T ≤ K_{m-1} ◁ K`, `K_{m-1} < K` で
+   `T^K ≤ K_{m-1}`) ので、停滞 `T^{T^G} = T^G` は **`T = T^G ◁ G`** を強制。
+5. `T ≠ 1` ⟹ 極小正規 `M ≤ T ≤ S`。skeleton step 4 は任意の極小正規で `S ∩ M = 1`
+   を与えるので `M = S ∩ M = 1` で矛盾 (`G` が単純なら `T ◁◁ G` 真 ⟹ `T = 1` は直ちに出る
+   ので step 2-5 は不要)。⟹ `S` の真正規部分群は `1` のみ = **`S` は単純** (`S ≠ 1` は
+   skeleton step 1)。
+6. **非可換**: `|S| = q` 素数なら Kegel から `S = P ∩ S ≤ P` が全 `P ∈ Syl_q(G)` で成立
+   ⟹ `S^g ≤ P` (∀g, 固定 P) ⟹ `⟨S^G⟩` は正規 `q`-部分群 ⟹ `S ≤ O_q(G)`。
+   `O_q(G)` は冪零正規なので `S ◁◁ O_q(G) ◁ G` ⟹ subnormal で矛盾。∎
+
+### 形式化順序 (残り)
+
+(F2) 商降下 → skeleton 1-4 (含 chain-shortening = 正規閉包の真降下補題) →
+(I) の endgame (半単純の正規部分群 = 部分積、は `Semisimple.lean` / Problems9A 圏を実測) →
+(II)。すべて教科書レベルの標準事実のみで、CFSG 系の外部入力は不要。
+
+## 10A.3 後半 (A は基本可換) 解決 — Fable 5 単独・紙の証明 (2026-07-30)
+
+statement 再確認 (p. 308): `|Z(P)| = p`, `A` abelian, `|P:A| = p`, `Z(P)` は `A` の直積因子
+⟹ (i) `P ↪ C_p ≀ C_p` (済) **かつ (ii) `A` は基本可換**。
+
+(ii) の証明 (前回の `φ : a ↦ a⁻¹uau⁻¹`, `ker φ = Z(P)`, `im φ = P'` の解析は**不要**だった):
+
+1. `P` は自動的に非可換 (`P` 可換なら `Z(P) = P ≤ A` が `|P:A| = p` に矛盾)。
+   `u ∈ P − A` を取ると `A` は極大 (指数 `p`) なので `⟨A, u⟩ = P`、ゆえに
+   **`C_A(u) = Z(P)`** (`c ∈ C_A(u)` は `A` とも `u` とも可換 ⟹ 中心的; 逆は
+   `Z(P) ≤ A` (直積因子) から)。
+2. `A^p := {a^p | a ∈ A}` (可換なので `p` 乗写像の像 = 部分群)。`A = Z(P) × K`,
+   `|Z(P)| = p` から `(zk)^p = z^p k^p = k^p` ⟹ **`A^p ≤ K`**。
+3. `A` 基本可換でない ⟺ `A^p ≠ 1` とする。`A ⊴ P` (p-群の指数 p) で `p` 乗と共役は可換
+   なので `A^p` は `u`-共役不変。`p`-群 `⟨u⟩` の非自明 `p`-群 `A^p` への作用は
+   **非自明な固定点** `z ≠ 1` をもつ (|Fix| ≡ |A^p| ≡ 0 mod p, 1 ∈ Fix)。
+4. `z ∈ C_A(u) = Z(P)` (step 1) かつ `z ∈ A^p ≤ K` (step 2) ⟹ `z ∈ Z(P) ⊓ K = 1`
+   で矛盾。∎
+
+⟹ **「ChatGPT 行き」とされていた難問 3 件 (9C.3 / 9D.4 / 10A.3 後半) はすべて
+Fable 5 単独で解決** (9C.3 は形式化まで完了; 9D.4 / 10A.3 後半は紙の証明を本 issue に
+記録済、形式化は文書順 9D.4 → 10A.3)。

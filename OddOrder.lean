@@ -7,6 +7,7 @@ import OddOrder.Algebra.SemilinearFixedPoint
 import OddOrder.Algebra.PrincipalIdealTheorem
 import OddOrder.Algebra.QuadraticMapCoordinates
 import OddOrder.GroupTheory.AInvariantComplement
+import OddOrder.GroupTheory.QuaternionRecognition
 import OddOrder.GroupTheory.SolvablePrimeIndex
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.BrauerSuzuki
@@ -183,6 +184,8 @@ import OddOrder.GroupTheory.SpecificGroups.Suzuki.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.GeneratedAction
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Borel
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Bruhat
+import OddOrder.GroupTheory.Holomorph
+import OddOrder.GroupTheory.DihedralAut
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupStructure
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.RootSubgroupSuzukiType
 import OddOrder.GroupTheory.SpecificGroups.Suzuki.Simplicity
@@ -233,6 +236,8 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Injector
 import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Conjugacy
 import OddOrder.Isaacs.Ch03_SplitExtensions.PiLength
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3D
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3F
+import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3FSpecialLinear
 import OddOrder.Isaacs.Ch03_SplitExtensions.Problems3B
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsSupersolvable
 import OddOrder.Isaacs.Ch03_SplitExtensions.ProblemsFaithfulOrbit
@@ -296,6 +301,10 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalSocle
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 import OddOrder.Isaacs.Ch09_MoreSubnormality.OrderBound
 import OddOrder.Isaacs.Ch09_MoreSubnormality.LayerRestriction
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9A
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9B
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9C
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9D
 import OddOrder.Isaacs.Ch09_MoreSubnormality.PResidual
 import OddOrder.Isaacs.Ch09_MoreSubnormality.ThompsonWielandt
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh02
@@ -348,6 +357,7 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
 import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
+import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
 import OddOrder.Isaacs.Appendix.DirectDiamond
 import OddOrder.Isaacs.Appendix.SubgroupBasics
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable

@@ -260,6 +260,44 @@ theorem opiCoreInG_normal (π : Set ℕ) {H : Subgroup G} [H.Normal] :
     rw [Subgroup.normalizer_eq_top]
   exact le_normalizer_opiCoreInG_of_le_normalizer π htop_le_norm_H
 
+/-- **A `π`-subgroup that is normal in a subnormal subgroup lies in `O_π(G)`.**
+
+This is the induction-friendly (strengthened) form of
+`le_oPiCore_of_isSubnormal`: we induct on the subnormal chain of `K`, not on `S`.
+A naive induction on `S` fails because the inductive step would need the intermediate
+subgroup `K` to be a `π`-group, which it need not be. Passing through `O_π(K)` — which
+*is* a `π`-group, and is normal in the next term of the chain because it is characteristic
+in `K` — closes the induction. -/
+theorem le_oPiCore_of_normal_in_isSubnormal [Finite G] {π : Set ℕ} {K : Subgroup G}
+    (hK : K.IsSubnormal) : ∀ {S : Subgroup G}, S ≤ K → (S.subgroupOf K).Normal →
+      Subgroup.IsPiSubgroup π S → S ≤ Ch03.oPiCore π G := by
+  induction hK with
+  | top =>
+    intro S hSK hSn hSpi
+    haveI : S.Normal := by
+      rw [← Subgroup.normalizer_eq_top_iff, eq_top_iff]
+      exact (Subgroup.normal_subgroupOf_iff_le_normalizer hSK).mp hSn
+    exact Ch03.Subgroup.IsPiGroup.le_oPiCore hSpi
+  | step K L hKL hLsn hKn ih =>
+    intro S hSK hSn hSpi
+    have hcore_le : opiCoreInG π K ≤ L := (opiCoreInG_le π K).trans hKL
+    refine (le_opiCoreInG_of_normal_of_isPiSubgroup hSK hSn hSpi).trans
+      (ih hcore_le ?_ (isPiSubgroup_opiCoreInG π K))
+    exact (Subgroup.normal_subgroupOf_iff_le_normalizer hcore_le).mpr
+      (le_normalizer_opiCoreInG_of_le_normalizer π
+        ((Subgroup.normal_subgroupOf_iff_le_normalizer hKL).mp hKn))
+
+/-- **A subnormal `π`-subgroup lies in `O_π(G)`.**
+
+Specialising `le_oPiCore_of_normal_in_isSubnormal` to `K = S`. The normal case
+(`le_opiCoreInG_of_normal_of_isPiSubgroup`) is the maximality of `O_π`; this is the
+subnormal upgrade, used by Isaacs Problem 9C.1 to produce `O_p(G) > 1` from a nontrivial
+subnormal `p`-subgroup. -/
+theorem le_oPiCore_of_isSubnormal [Finite G] {π : Set ℕ} {S : Subgroup G}
+    (hS : S.IsSubnormal) (hSpi : Subgroup.IsPiSubgroup π S) : S ≤ Ch03.oPiCore π G :=
+  le_oPiCore_of_normal_in_isSubnormal hS le_rfl
+    (by rw [Subgroup.subgroupOf_self]; infer_instance) hSpi
+
 /-- **A self-normalizing `p`-subgroup of a Sylow overgroup is the whole Sylow.**
 If a subgroup `P ≤ Q` of a Sylow `p`-subgroup `Q` of `G` has the property that every element of `Q`
 normalizing `P` already lies in `P` (`P.normalizer ⊓ Q ≤ P`), then `P = Q`.
@@ -385,5 +423,105 @@ theorem normal_map_subtype_of_characteristic {W : Type*} [Group W] {N : Subgroup
   have hmem : (MulAut.conjNormal w) ⟨a', ha'N⟩ ∈ L := by
     rw [← hmap]; exact Subgroup.mem_map_of_mem _ ha'L
   exact ⟨(MulAut.conjNormal w) ⟨a', ha'N⟩, hmem, MulAut.conjNormal_apply w ⟨a', ha'N⟩⟩
+
+section /- 積分解 `G = XY` に沿った帰納法の道具 -/
+
+open scoped Pointwise
+
+/-- **真部分群の位数評価**: `|G| ≤ n + 1` かつ `X < ⊤` なら `|X| ≤ n`.
+
+`Nat.card G` についての強帰納法で真部分群に降りるときの定型 (Isaacs Problems 9B.5 / 9C.2). -/
+theorem card_le_of_lt_top [Finite G] {n : ℕ} (hcard : Nat.card G ≤ n + 1) {X : Subgroup G}
+    (hX : X < ⊤) : Nat.card ↥X ≤ n := by
+  have hne : Nat.card ↥X ≠ Nat.card G := fun h => hX.ne (Subgroup.eq_top_of_card_eq _ h)
+  have hle := Subgroup.card_le_card_group X
+  omega
+
+/-- **積分解は左右対称**: `A · B = G` なら `B · A = G` (両辺の逆元を取るだけ). -/
+theorem mul_eq_univ_comm {A B : Subgroup G} (h : (A : Set G) * (B : Set G) = Set.univ) :
+    (B : Set G) * (A : Set G) = Set.univ := by
+  ext g
+  simp only [Set.mem_univ, iff_true]
+  have hg : g⁻¹ ∈ (A : Set G) * (B : Set G) := by rw [h]; trivial
+  obtain ⟨a, ha, b, hb, hab⟩ := hg
+  have hab' : a * b = g⁻¹ := hab
+  refine ⟨b⁻¹, Subgroup.inv_mem _ hb, a⁻¹, Subgroup.inv_mem _ ha, ?_⟩
+  change b⁻¹ * a⁻¹ = g
+  rw [← mul_inv_rev, hab', inv_inv]
+
+/-- **積分解の Dedekind 降下**: `X ≤ X₁` かつ `X · Y = G` なら `↥X₁` の中で
+`(X ∩ X₁) · (Y ∩ X₁) = X₁`, すなわち `X₁ = X (Y ∩ X₁)`.
+
+Isaacs Problem 9B.5 (`G^∞ = A^∞B^∞`) と 9C.2 (`O^p(G) = O^p(A)O^p(B)`) は
+どちらもこの段で帰納法を `↥X₁` に降ろす。⚠ 仮説が join `X ⊔ Y = ⊤` でなく**積**
+`X · Y = G` でなければならない: 部分群束は一般に modular でないので、Dedekind の恒等式
+`X (Y ∩ X₁) = (XY) ∩ X₁` は積についてしか使えない。 -/
+theorem subgroupOf_mul_inf_subgroupOf_eq_univ {X Y X₁ : Subgroup G} (hXX₁ : X ≤ X₁)
+    (hXY : (X : Set G) * (Y : Set G) = Set.univ) :
+    ((X.subgroupOf X₁ : Subgroup ↥X₁) : Set ↥X₁) *
+      (((Y ⊓ X₁).subgroupOf X₁ : Subgroup ↥X₁) : Set ↥X₁) = Set.univ := by
+  ext x
+  simp only [Set.mem_univ, iff_true]
+  have hx : (x : G) ∈ (X : Set G) * (Y : Set G) := by rw [hXY]; trivial
+  obtain ⟨a, ha, b, hb, hab⟩ := hx
+  have haX₁ : a ∈ X₁ := hXX₁ ha
+  have hbX₁ : b ∈ X₁ := by
+    have hbe : b = a⁻¹ * (x : G) := by rw [← hab]; group
+    rw [hbe]
+    exact Subgroup.mul_mem _ (Subgroup.inv_mem _ haX₁) x.2
+  exact ⟨⟨a, haX₁⟩, ha, ⟨b, hbX₁⟩, ⟨hb, hbX₁⟩, Subtype.ext hab⟩
+
+/-- **部分群の集合積は大きい方に吸収される (右吸収)**: `X ≤ Y` なら `X · Y = Y`. -/
+theorem coe_mul_coe_eq_right {X Y : Subgroup G} (h : X ≤ Y) :
+    (X : Set G) * (Y : Set G) = (Y : Set G) := by
+  refine Set.Subset.antisymm ?_ fun y hy => ⟨1, X.one_mem, y, hy, one_mul y⟩
+  rintro z ⟨a, ha, b, hb, rfl⟩
+  exact Y.mul_mem (h ha) hb
+
+/-- **部分群の集合積は大きい方に吸収される (左吸収)**: `Y ≤ X` なら `X · Y = X`. -/
+theorem coe_mul_coe_eq_left {X Y : Subgroup G} (h : Y ≤ X) :
+    (X : Set G) * (Y : Set G) = (X : Set G) := by
+  refine Set.Subset.antisymm ?_ fun x hx => ⟨x, hx, 1, Y.one_mem, mul_one x⟩
+  rintro z ⟨a, ha, b, hb, rfl⟩
+  exact X.mul_mem ha (h hb)
+
+/-- **`Y` が `X` を正規化するなら join は集合積**: `↑(X ⊔ Y) = ↑X * ↑Y`.
+`Subgroup.mul_normal` (`X` が ambient 正規のとき) の normalizer 条件版。
+`X·Y` が積閉・逆元閉であることを normalizer 条件から直接確かめ、`X ⊔ Y` との
+相互包含を取る。 -/
+theorem coe_sup_eq_mul_of_le_normalizer {X Y : Subgroup G}
+    (h : Y ≤ Subgroup.normalizer (X : Set G)) :
+    ((X ⊔ Y : Subgroup G) : Set G) = (X : Set G) * (Y : Set G) := by
+  have hconj : ∀ y ∈ Y, ∀ x ∈ X, y * x * y⁻¹ ∈ X := fun y hy x hx =>
+    (Subgroup.mem_normalizer_iff.mp (h hy) x).mp hx
+  have hmul : ∀ {a b : G}, a ∈ (X : Set G) * (Y : Set G) → b ∈ (X : Set G) * (Y : Set G) →
+      a * b ∈ (X : Set G) * (Y : Set G) := by
+    rintro _ _ ⟨x₁, hx₁, y₁, hy₁, rfl⟩ ⟨x₂, hx₂, y₂, hy₂, rfl⟩
+    exact ⟨x₁ * (y₁ * x₂ * y₁⁻¹), X.mul_mem hx₁ (hconj y₁ hy₁ x₂ hx₂),
+      y₁ * y₂, Y.mul_mem hy₁ hy₂, by group⟩
+  have hinv : ∀ {a : G}, a ∈ (X : Set G) * (Y : Set G) → a⁻¹ ∈ (X : Set G) * (Y : Set G) := by
+    rintro _ ⟨x, hx, y, hy, rfl⟩
+    exact ⟨y⁻¹ * x⁻¹ * y⁻¹⁻¹, hconj y⁻¹ (Y.inv_mem hy) x⁻¹ (X.inv_mem hx), y⁻¹, Y.inv_mem hy,
+      by group⟩
+  let S : Subgroup G :=
+    { carrier := (X : Set G) * (Y : Set G)
+      one_mem' := ⟨1, X.one_mem, 1, Y.one_mem, one_mul 1⟩
+      mul_mem' := hmul
+      inv_mem' := hinv }
+  refine Set.Subset.antisymm (show X ⊔ Y ≤ S from sup_le ?_ ?_) ?_
+  · exact fun x hx => ⟨x, hx, 1, Y.one_mem, mul_one x⟩
+  · exact fun y hy => ⟨1, X.one_mem, y, hy, one_mul y⟩
+  · rintro z ⟨x, hx, y, hy, rfl⟩
+    exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hx) (Subgroup.mem_sup_right hy)
+
+/-- 積分解 `X · Y = G` は join `X ⊔ Y = ⊤` を含意する (逆は一般に偽). -/
+theorem sup_eq_top_of_mul_eq_univ {X Y : Subgroup G}
+    (hXY : (X : Set G) * (Y : Set G) = Set.univ) : X ⊔ Y = ⊤ := by
+  refine top_le_iff.mp fun g _ => ?_
+  have hg : g ∈ (X : Set G) * (Y : Set G) := by rw [hXY]; trivial
+  obtain ⟨a, ha, b, hb, rfl⟩ := hg
+  exact Subgroup.mul_mem _ (Subgroup.mem_sup_left ha) (Subgroup.mem_sup_right hb)
+
+end
 
 end OddOrder.GroupTheory
