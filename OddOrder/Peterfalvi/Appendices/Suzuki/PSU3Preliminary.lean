@@ -107,6 +107,25 @@ theorem eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one
     rwa [coprime_two_pow_sub_one_two_pow_add_one hm] at this
   exact orderOf_eq_one_iff.mp (Nat.dvd_one.mp hdvd)
 
+/-- The index arithmetic behind step (8)'s `n = (q + 1)/m`:
+
+  `|E^×| / |μ(KW)| = (q² − 1) / ((q − 1) · m) = (q + 1) / m`,
+
+using `q² − 1 = (q − 1)(q + 1)` and cancelling the positive factor `q − 1`. -/
+theorem two_pow_sq_sub_one_div {e m : ℕ} (he : e ≠ 0) :
+    ((2 ^ e) ^ 2 - 1) / ((2 ^ e - 1) * m) = (2 ^ e + 1) / m := by
+  have h2 : (2 : ℕ) ≤ 2 ^ e := by
+    calc (2 : ℕ) = 2 ^ 1 := (pow_one 2).symm
+      _ ≤ 2 ^ e := Nat.pow_le_pow_right (by norm_num) (Nat.one_le_iff_ne_zero.mpr he)
+  obtain ⟨r, hr⟩ : ∃ r, 2 ^ e = r + 1 := ⟨2 ^ e - 1, by omega⟩
+  have hrpos : 0 < r := by omega
+  rw [hr]
+  have hsq : (r + 1) ^ 2 = r * (r + 2) + 1 := by ring
+  have hone : r + 1 - 1 = r := by omega
+  have htwo : r + 1 + 1 = r + 2 := by omega
+  rw [hsq, Nat.add_sub_cancel, hone, htwo]
+  exact Nat.mul_div_mul_left _ _ hrpos
+
 namespace Hypothesis
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
