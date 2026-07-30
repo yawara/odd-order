@@ -326,6 +326,24 @@ noncomputable def fUnit {m : ℕ} (M : hyp.QuotientFieldModel m)
       = M.coord (Additive.ofMul (QuotientGroup.mk
           (⟨f (ω * (x : G)), hyp.f_mul_mem_Q H hC2 hωQ hωQ0 x⟩ : ↥hyp.Q))) := rfl
 
+/-- Elements of `Q₀` have **zero** coordinate in `E` — the `(0, ·)` half of the book's
+`y = (0, α)` (p. 125).
+
+Converse of `coord_ne_zero_of_not_mem_Q0`: under `Z(Q) = Q₀` an element of `Q₀` is
+trivial in `Q/Z(Q)`, so its coordinate vanishes.  Step (10) needs this to speak of the
+second coordinate `α` of `y` at all. -/
+theorem coord_eq_zero_of_mem_Q0 {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {z : G} (hzQ : z ∈ hyp.Q) (hzQ0 : z ∈ hyp.Q0) :
+    M.coord (Additive.ofMul (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q))) = 0 := by
+  have hmem : (⟨z, hzQ⟩ : ↥hyp.Q) ∈ Subgroup.center hyp.Q := by
+    rw [hZ, Subgroup.mem_subgroupOf]
+    exact hzQ0
+  have hone : (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q) :
+      ↥hyp.Q ⧸ Subgroup.center hyp.Q) = 1 := (QuotientGroup.eq_one_iff _).mpr hmem
+  have hzero : (Additive.ofMul (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q))) = 0 := hone
+  rw [hzero, map_zero]
+
 /-- **The map of step (8)**: `x ∈ Q₀ ↦` the `μ(KW)`-coset of the coordinate of
 `f(ω x)`.
 
