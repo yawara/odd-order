@@ -838,7 +838,7 @@ theorem actionCommutator_eq_bot_iff_acts_trivially {A G : Type*} [Group A] [Grou
 `A →* MulAut ↥H` を構成. 関数本体は `(φ a)` を `H` に制限したもの.
 
 Thm 4.36 induction で IH を `[G, A] < G` 等の subgroup に適用するために必要. -/
-def OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom {A G : Type*} [Group A] [Group G]
+def _root_.OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom {A G : Type*} [Group A] [Group G]
     {φ : A →* MulAut G} {H : Subgroup G}
     (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) : A →* MulAut H where
   toFun a := {
@@ -861,7 +861,7 @@ def OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom {A G : Type*} [Group A] [Group
     change ((φ (a * b) : MulAut G) h.val) = ((φ a) ((φ b) h.val))
     rw [map_mul]; rfl
 
-@[simp] lemma OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom_apply_val
+@[simp] lemma _root_.OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom_apply_val
     {A G : Type*} [Group A] [Group G] {φ : A →* MulAut G} {H : Subgroup G}
     (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) (a : A) (h : H) :
     ((OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH a) h).val =

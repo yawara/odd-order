@@ -254,13 +254,33 @@ Appendix I Prop 2 の regular 版 (`exists_field_coordinate_realization`) で
      **intrinsic に定義できる**。Proposition の主張は `θ` を含む形で自己完結しているので、
      type-B パラメータとの一致は label 合わせ (χ の比較) にすぎない。
 
+  ### 段 (2) `θ ≠ 1` 分岐: step 1 の前半 landing (2026-07-30 その 5)
+
+  `Appendices/Suzuki/CenterFieldExponent.lean` (新 leaf):
+  * `isElementaryAbelian_center_of_lemmaFiveSetup` — `Z(Q)` は指数 2 の初等アーベル
+    (中心ゆえ可換 + `s.centerSq`)。
+  * `centerKHom` — `Z(Q)` (characteristic) 上の `K`-作用。
+  * `actualKActor_free_on_center` — **`K` は `Z(Q) ∖ {1}` 上自由**。`s.transCenter` の
+    推移性 + `s.cardActorCenter` (`|K| = |Z(Q)| − 1`) から、軌道写像が有限同数集合間の
+    全射 ⟹ 単射 ⟹ 固定化群自明。
+
+  ⚠ 途中で `IsAInvariant.toMulAutHom` (Isaacs Ch04 `Main/ThreeSubgroups.lean`) の
+  **名前の欠陥**を発見・修正: `_root_.` を欠いた宣言だったため実名が
+  `OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom` になっており、
+  `OddOrder.Isaacs.Ch04` 名前空間の外から参照できなかった (既存 call site は全て
+  その名前空間内だったので露見していなかった)。`_root_.` を付与して修正済 (call site 不変)。
+
   ### 段 (2) `θ ≠ 1` 分岐の実装計画 (次の一手)
 
-  1. **`Z(Q)` 座標を `M.E` の中へ**: `exists_Q0_field_coordinate` の `F` を
+  1. **`Z(Q)` 座標を `M.E` の中へ** (前半 = 初等アーベル性 + 自由性は上で landing 済):
+     `Huppert.exists_field_coordinate_realization` を `Z(Q)` + `centerKHom` に当てて
+     位数 `q` の体 `F` を得る。`F` を
      `FiniteField.ringEquivOfCardEq` (Algebra instance 不要) で
      `frobFixedSubfield M.E` に移す。`s.centerEqQ0` で `Z(Q) ↔ Q₀` を渡す。
      出力 = `ι : Additive ↥(Z(Q)) ≃+ ↥(frobFixedSubfield M.E)` と
      `ι (k • z) = μ(k)^d * ι z`。
+     ⚠ **残る道具**: `γ` と `μ|_K` の像が `E^×` 内で一致すること = 「巡回群の与位数の
+     部分群は一意」。これが出れば `MonoidHom.map_cyclic` で `d` が取れる。
   2. **χ を `E` 座標へ**: `Suzuki2Groups.centralSquareQuadraticMap`
      (Appendix III Lemma 1(a)、`Additive (Q ⧸ Z(Q)) → Additive ↥(Z(Q))` の
      `QuadraticMap (ZMod 2)`) を `M.coord` と `ι` で移して `χ_E : E → E`。

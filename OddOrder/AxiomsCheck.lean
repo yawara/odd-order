@@ -296,6 +296,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseBStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
 import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
+import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
@@ -14423,6 +14424,20 @@ of `KW` acts by scalars — the book's `S/Q₀ ≅ E`, `KW ↪ E^×` — with no
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.QuotientFieldModel.bar_mu_K
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.QuotientFieldModel.bar_mu_W
+
+/-! **`Z(Q)` is elementary abelian with a regular `K`-action** (issue 0167, 2026-07-30).
+`Appendices/Suzuki/CenterFieldExponent.lean` — the `Q₀` half of the standing identification of
+Ch. III §3, p. 120, inside the field `E` of step (1).
+
+`LemmaFiveSetup` gives transitivity of `K` on the nonidentity central elements together with
+`|K| = |Z(Q)| − 1`; a surjection between finite sets of equal size is injective, so the orbit maps
+are injective and the action is free. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isElementaryAbelian_center_of_lemmaFiveSetup
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centerKHom_apply_val
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.actualKActor_free_on_center
 
 /-! **The `q`-power Frobenius of a field of order `q²`** (issues 0167 / 9504, 2026-07-30).
 `Algebra/QuadraticFrobenius.lean` — the ambient field theory of Ch. III §3, p. 120, where
