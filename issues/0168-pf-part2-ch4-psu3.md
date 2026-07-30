@@ -297,16 +297,18 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 * `exists_mem_K_mem_W_mul` — **`D = KW`** (`V = W` の下)。これで「`KW`-軌道」=
   「`D`-共役」の同一視が付いた。
 
-**(8) の残り = 数値部分のみ**:
-1. `Σ_i m_i = |Q₀| = q`。`f` は `Q−Q₀` を保つ (**`f_mem_sdiff_Q0` で肯定形を
-   用意済**) のですべての `x ∈ Q₀` で `f(ω₁x)‾ ∈ (Q/Q₀)^#`、属する軌道は 1 つ。
-2. `n` = `(Q/Q₀)^#` 上の `D`-軌道の個数、`m = |W|` として `n·m = q+1`。
-   ⟸ `QuotientFieldModel` (`|E| = q²`, `coord : Q/Q₀ ≃+ E`, `coord_act`) から。
-   軌道は `μ(KW) ≤ E^×` の乗法軌道なので、`|E^×| = q²−1` を `|μ(KW)| = m(q−1)` で
-   割る形。**確認済**: `|μ(K)| = q−1` は既存の `exists_actualKActor_mu_eq`
-   (`μ(K×1)` が `F^× = frobFixedSubfield ∖ {0}` を覆う) + `M.mu_K_injective`
-   から出る。残りは `|μ(KW)| = |μ(K)|·|W|` (= `μ` が `K × W` 上単射) の確認。
-3. 上の 2 評価と合わせて `q = Σ m_i ≤ nm − 1 = q` ⟹ 全等号。
+**(8) 数値部分の部品調査 = 完了 (2026-07-31)。必要な事実はすべて所在が判明**:
+
+| 必要な事実 | 出所 |
+|---|---|
+| `\|μ(K)\| = q−1` | `exists_actualKActor_mu_eq` (μ(K×1) が `F^×` を覆う) + `M.mu_K_injective` |
+| `\|μ(W)\| = \|W\| = m` | `quotientWHom_injective` (QuotientKWField.lean:134) + `coord_act` |
+| `μ(K) ∩ μ(W) = 1` | `mu_K_frobFixed` (⊆`F^×`, 位数 `q−1`) + `mu_W_normOne` (⊆ norm-1, 位数 `q+1`) + **`coprime_two_pow_sub_one_two_pow_add_one`** (本 leaf, 新規) |
+| `\|E^×\| = q²−1` | `QuotientFieldModel.card` (`\|E\| = (2^m)^2`) |
+| `Σ m_i = \|Q₀\| = q` | `f_mem_sdiff_Q0` + `hQ0card` |
+
+**残るのは組み立てのみ**: `|μ(KW)| = (q−1)m` → `n = |E^×|/|μ(KW)| = (q+1)/m` →
+`q = Σ m_i ≤ n·m − 1 = q` の挟み込み → 全等号。
 
 ⚠ **`V = W` は仮説として明示的に渡している** (`exists_mem_K_mem_W_mul` の
 `hVW`)。`hC2` と同じ流儀。`Setup` には入れない (§1 は `V = W` 抜きで成立するので)。
