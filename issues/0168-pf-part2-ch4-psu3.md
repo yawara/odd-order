@@ -570,83 +570,25 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 
 その後: `τ` = `u ↦ u^{1+θ} : F^× → F^×` の逆写像 (`θ` が奇数位数ゆえ全単射)。
 
-⚠ **「`θ` が奇数位数ゆえ全単射」の中身を展開した (2026-07-31)**。書籍は 1 節で
-済ませているが、論法はこう:
+⚠ **「`θ` が奇数位数ゆえ全単射」の中身 (2026-07-31)**。書籍は 1 節で済ませている。
+最初に群環 `ℤ[θ]` で `(1+θ)·(交代和) = 2` という論法を書いたが、
+**もっと簡単な論法がある** (こちらを採る):
 
-`θ` の位数を `d` (奇数) とする。`F^×` に作用する自己準同型として、群環 `ℤ[θ]` の中で
+`N : F^× → F^×`, `N(u) = u · θ(u)` は**準同型** (`frobNorm_mul`)。核が自明を示せば、
+有限集合上の自己準同型なので全単射。
 
-    (1 + θ) · (1 − θ + θ² − ⋯ + θ^{d−1})  =  1 + θ^d  =  1 + 1  =  2
+    u ∈ ker N  ⟹  θ(u) = u⁻¹
+               ⟹  θ²(u) = θ(u⁻¹) = (u⁻¹)⁻¹ = u      (θ² が u を固定)
+               ⟹  θ も u を固定                        (θ の位数 d が奇数なので
+                                                         θ = (θ²)^{(d+1)/2})
+               ⟹  u⁻¹ = θ(u) = u  ⟹  u² = 1
+               ⟹  u = 1                                (|F^×| = q−1 が奇数)
 
-(`d` 奇数なので最後の符号が `+`)。つまり **`1+θ` と交代和の合成が「2 乗写像」**。
-`|F^×| = q − 1` は奇数 (`q = 2^m`) なので 2 乗写像は `F^×` 上**全単射**。
-ゆえに `1+θ` も全単射 ✓ (合成が全単射なら右因子は単射・左因子は全射、
-有限集合で自己写像なので両方全単射)。
+⚠ **`inv_ne_conj_of_not_mem_Q0` と同じ形の論法** (「`d²` が中心化 ⟹ `d` が中心化」)。
+奇数位数から「2 乗が全単射」を使う定型。`Finset.prod` の telescoping 帰納法は不要。
 
-⟹ 形式化では `F^×` 上の `u ↦ u · θ(u)` の全単射性をこの形で示す。
-`ℤ[θ]` を陽に作らず、`u ↦ ∏_i θ^i(u)^{±1}` を直接書いて
-`(u·θu) の交代積 = u²` を計算するのが早いかもしれない — 着手時に判断。
-基本性質 (`frobNorm_mul` 等) は用意済。
-
-⚠ **(10) は Ch. IV で初めて標準モデルの座標を「計算に」使う**。(1)-(9) は
-モデルを**数え上げ**にしか使っていなかった。(10) に着手する前に用意が要るもの:
-1. **正規化仮説**: `f(ω) = (ωy)^ζ`, `y ∈ Q₀^#` (段 (9) が存在を保証)。
-   これを持ち回る形にする (`stepNine` の結論をそのまま仮説に取ればよい)。
-2. **`y` の座標 `α`**: 書籍は `y = (0, α)` と書く。
-   * ✅ 第 1 成分が 0 = **`coord_eq_zero_of_mem_Q0`** (証明済)。
-   * ⚠ **型の要点 (2026-07-31 に確認)**: `BilinearTwistedProduct φ` は
-     `quotient : V` と `central : W` の 2 フィールド (QuadraticExtensions.lean:57)。
-     ここで `V = M.E`、**`W = frobFixedSubfield M.E 2 m = F`**。
-     つまり **`α = (Φ y).central ∈ F` であって `E` ではない**。
-     (10) の `b^{1+θ} = α + a^{-(1+θ)}` は `F` の中の等式
-     (`b ∈ K ≅ F^×`、`θ` は `F` を保つ) — 型付けはこれに合わせること。
-   * ✅ **両方とも 0167 で証明済だった (2026-07-31 確認)**。
-     **`exists_mulEquiv_bilinearTwistedProduct`** (ModelIsomorphism.lean:627) の
-     結論が**まさに必要な 2 つ**を与える:
-     ```
-     (∀ z : ↥(center Q), Φ z = ⟨0, ι (Additive.ofMul z)⟩) ∧
-     (∀ e : ↥Q, (Φ e).quotient = M.coord (Additive.ofMul ⟦e⟧))
-     ```
-     * 第 1 conjunct = **`y = (0, α)` そのもの**、`α = ι (ofMul y) ∈ F`
-       (`ι : Additive (center Q) ≃+ frobFixedSubfield`) — 型の確認も取れた。
-     * 第 2 conjunct = **`coord` と `Φ.quotient` の互換性**。
-     ⚠ ただし **`exists_standardModel` の結論はこの 2 つを露出していない**
-     (`φ` の性質 / `Φ x₀ = ⟨0,1⟩` / `Θ` / `u` のみ)。段 (10) では
-     `exists_mulEquiv_bilinearTwistedProduct` を直接使うか、
-     `exists_standardModel` に conjunct を追加するか — **前者が素直**。
-3. **`θ`**: `exists_standardModel` の `θ : M.E ≃ₐ[ZMod 2] M.E`。
-4. **`K ≅ F^×`**: `a, b ∈ K` を `F^×` の元として扱う
-   (`exists_actualKActor_mu_eq` + `card_actualKActor_eq` で確立済)。
-
-⟹ **次セッションはまず 2 (「`Q₀` の元の座標は `(0, α)` 型」) から**。
-これが無いと (10) の `b^{1+θ} = α + a^{-(1+θ)}` が書けない。
-
-
-## ⚠ ファイル分割 — 実施すべき (境界確定済)
-
-`PSU3Preliminary.lean` = **1407 行** (2026-07-31)。上限 1500 が近いので、
-段 (8) の最終組み立てを入れる**前に**分割する。**境界は調査済**:
-
-```
-1–77     ヘッダ + import
-78–176   汎用補題 4 本 (coprime_two_pow_sub_one_two_pow_add_one /
-         eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one /
-         two_pow_sq_sub_one_div / card_fiber_eq_of_card_eq)
-177      namespace Hypothesis
-178–1046 §2 段 (1)-(7) + `|D:K|` + 翻訳の群論部分   ← モデル非依存
-1047–1404 「The scalar group μ(KW) inside E^×」以降 ← モデル依存
-1405     end Hypothesis
-```
-
-**分割案** (tail-out; 下流未消費なので module 名の維持は不要):
-* 新 `PSU3OrbitCount.lean` ← `78–176` + `namespace Hypothesis` + `1047–1404`
-  + `end Hypothesis`。import = `PSU3Preliminary` + `QuotientKWField`
-  + `ModelIsomorphism`。
-* `PSU3Preliminary.lean` から上記を削除し、`QuotientKWField` /
-  `ModelIsomorphism` の import も落とす (群論部分は使っていない)。
-* `OddOrder.lean` と `AxiomsCheck.lean` に新 leaf を配線
-  (⚠ orphan leaf 防止; AxiomsCheck の該当エントリも移す)。
-
-汎用補題 4 本を tail 側に置く理由: いずれも消費者がモデル数値部分のみ。
+**必要な入力**: `θ` の位数が奇数であること。0167 の `θ` は `E` の Frobenius 冪で、
+`F` 上の作用の位数は…要確認 (`exists_standardModel` の `θ` の性質を見る)。
 
 ## セッション総括 (2026-07-31)
 
