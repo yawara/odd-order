@@ -372,7 +372,11 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 `Φ : ↥Q₀ → β` は `x ↦ ⟦coord(f(ω₁x) の Q/Q₀ 像) を単位として⟧`。
 `f(ω₁x) ∈ Q−Q₀` (`f_mem_sdiff_Q0`) なので `coord` の値は非零 ⟹ 単位 ✓。
 
-**残作業**: (i) `Φ` の構成、(ii) `|β| = n` の計算、(iii) ファイバー評価 2 本を
+**(ii) は完了**: `index_range_mu` — `(MonoidHom.range M.mu).index = (q+1)/|W|`。
+`MonoidHom.ofInjective` (既存 `mu_injective`) + `card_actualKActor_eq` +
+`Fintype.card_units` + `Subgroup.index_mul_card` + `two_pow_sq_sub_one_div`。
+
+**残作業**: (i) `Φ` の構成、(iii) ファイバー評価 2 本を
 `Φ` の言葉に翻訳 (`exists_conj_mul_Q0_iff` + `exists_mem_K_mem_W_mul` で
 「同じ剰余類」⟺「`∃ y ∈ Q₀, ∃ a ∈ D, …`」に落とす)、(iv) `card_fiber_eq_of_card_eq`
 に流し込む。
