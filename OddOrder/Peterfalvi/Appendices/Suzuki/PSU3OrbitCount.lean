@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FieldArithmetic
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
 import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
 
@@ -668,6 +669,26 @@ theorem stepFifteen_length {ζ κ : G} {m m₁ : ℕ} (hζ : ζ ∈ hyp.W) (hκK
   obtain ⟨hκ1, hζ1⟩ :=
     hyp.eq_one_of_mul_eq_one_of_mem_K_of_mem_W hκK (hyp.W.pow_mem hζ _) hprod
   exact ⟨eq_of_pow_succ_eq_one_of_le hord hζ1 hle, hκ1⟩
+
+/-- **Step (15)'s other conclusion**: `c_{m₁} = α` (Peterfalvi Part II, p. 126).
+
+`stepFifteen_length` gives `κ = 1` for the `K`-part of `d_{m₁} = ζ⁻¹`.  Transporting that
+across `μ` — a homomorphism, and `kActor 1 = 1` — makes the scalar `1`, so the square
+`(c_{m₁}/α)^{2τ}` is `1` and `eq_one_of_frobNormEquiv_symm_sq_eq_one` reads off
+`c_{m₁}/α = 1`.
+
+The identification of `μ(κ)` with that square is passed in: it is exactly what the closed
+form (14) asserts once `d_{m₁}` is written inside `KW`. -/
+theorem eq_one_of_kPart_eq_one {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hchar : (2 : M.E) = 0) {θ : M.E ≃+* M.E} (hodd : Odd (orderOf θ))
+    {κ : G} (hκK : κ ∈ hyp.K) (hκ1 : κ = 1) {u : M.E}
+    (hid : ((M.mu (hyp.kActor hκK, 1) : M.Eˣ) : M.E)
+      = ((frobNormEquiv hchar hodd).symm u) ^ 2) : u = 1 := by
+  subst hκ1
+  rw [hyp.kActor_one hκK,
+    show ((1 : ↥hyp.actualKActor), (1 : ↥hyp.W)) = 1 from rfl, map_one,
+    Units.val_one] at hid
+  exact eq_one_of_frobNormEquiv_symm_sq_eq_one hchar hodd hid.symm
 
 end Hypothesis
 

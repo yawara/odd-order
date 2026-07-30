@@ -158,6 +158,15 @@ power, which is why a single exponent `d` suffices.
 def kActor {a : G} (ha : a ∈ hyp.K) : ↥hyp.actualKActor :=
   ⟨hyp.conjQByK ⟨a, ha⟩, ⟨⟨a, ha⟩, rfl⟩⟩
 
+/-- `kActor` sends the identity to the identity — `conjQByK` is a homomorphism.
+
+Step (15) uses this to transport `κ = 1` (from `K ∩ W = 1`) across `μ`: the scalar
+`μ(κ)` is then `1`, which is what forces `c_{m₁} = α`. -/
+@[simp] theorem kActor_one (h : (1 : G) ∈ hyp.K) : hyp.kActor h = 1 := by
+  apply Subtype.ext
+  change hyp.conjQByK ⟨1, h⟩ = 1
+  rw [show (⟨1, h⟩ : ↥hyp.K) = 1 from Subtype.ext rfl, map_one]
+
 /-- Conjugating an element of `Q₀` by `a ∈ K` is `centerKHom` at the corresponding
 actor. -/
 theorem toCenter_conj {m : ℕ} (s : hyp.LemmaFiveSetup m) {a : G} (ha : a ∈ hyp.K)
