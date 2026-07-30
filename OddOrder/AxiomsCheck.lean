@@ -14416,6 +14416,8 @@ of `KW` acts by scalars — the book's `S/Q₀ ≅ E`, `KW ↪ E^×` — with no
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isAInvariant_quotientKW_eq_bot_or_top
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_Q0_field_coordinate
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.nonempty_quotientFieldModel_of_orderThree
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.QuotientFieldModel.bar_mu_K

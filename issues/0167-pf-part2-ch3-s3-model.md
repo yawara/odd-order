@@ -194,6 +194,23 @@ Frobenius `x ↦ x^q` (書籍の `x ↦ x̄`) で書かれるので標数が必�
 `E = 𝔽_{q²}` の bar 作用・位数 `q` の固定部分体 `F`・`Aut(F) → Aut(E)` の延長
 (存在 + ちょうど 2 個)。
 
+### p.120 冒頭の設定の `Q₀` 側 (2026-07-30 その 4)
+
+`Hypothesis.exists_Q0_field_coordinate` (`StructureOfH/FieldRealizationK.lean`) —
+書籍 p.120 冒頭の
+
+> `K` can be identified with `F^*` in such a way that the actions of `K` on `S/Q₀`
+> and on `Q₀` ... are given by `(a,b)^x = (xa,xb)` and `c^x = x^{1+θ} c`
+
+の **`Q₀` 側**: `K` は `Q₀ ∖ {1}` 上自由かつ `|K| = |Q₀| − 1` なので regular、
+Appendix I Prop 2 の regular 版 (`exists_field_coordinate_realization`) で
+`Q₀` が位数 `q` の体 `F` になり `K` は乗算で作用する。座標 `α : Additive Q₀ ≃+ F`
+と `γ : K ≃* F^×` が出る。既存の `exists_field_realization_K` と違い `W = 1` を要求しない
+(捻り `σ` だけがその仮説を使っていた)。
+
+`S/Q₀` 側は段 (1) の `QuotientFieldModel` (`coord` / `mu`) が担う。
+**残る接着 = この 2 つの体 (`F` と `frobFixedSubfield M.E`) を同一視すること** (下記)。
+
 ### 段 (1) の残り → 段 (2) の `θ ≠ 1` 分岐へ
 
 * `μ` 全体の単射性 (= `K ∩ W = 1` の像版) は `W` の商上の忠実性が必要で、
@@ -213,6 +230,19 @@ Frobenius `x ↦ x^q` (書籍の `x ↦ x̄`) で書かれるので標数が必�
   **同じ `K` 上で突き合わせて**、`F ≅ frobFixedSubfield E` の**体同型**を作る必要がある。
   単元群の群同型だけでは体同型にならないので、`K`-同変性を使って `θ` を移送する設計が要る。
   ここが本 §3 の最大の行間。
+
+  **2026-07-30 に詰めた分析**: 接着の中身は数値的な指数 `d` に落ちる。
+  `Q₀` 側の座標 (`exists_Q0_field_coordinate`) で `K` は `γ : K ≅ F^×` として乗算で作用し、
+  `S/Q₀` 側 (段 (1)) では `μ|_K : K ≅ (frobFixedSubfield M.E)^×`。両者はどちらも
+  位数 `q−1` の巡回群への同型なので、体同型 `F ≅ frobFixedSubfield M.E` を 1 つ選べば
+  `γ'(k) = μ(k)^d` となる `d` (`gcd(d, q−1) = 1`) が一意に定まる。
+  **書籍の `θ` が入るのはここ**: type-B 構造の `c^x = x^{1+θ} c` が `d = 1 + 2^j` を与える
+  (`θ = Frob^j`)。この `d = 1 + 2^j` が無いと、χ の Lemma 2(c) 展開から出るのは
+  「`λ_{στ} ≠ 0 ⟹ a^{σ|F} a^{τ|F} = a^d` (`a ∈ F^×`)」すなわち `d ≡ 2^i + 2^{i'}`
+  までで、書籍の `{σ|_F, τ|_F} = {1_F, θ}` (= 一方が恒等) に絞れない。
+  ⟹ **`TypeBData ↥hyp.Q` から `d = 1 + 2^j` を取り出すのが次の実作業**。
+  χ 自体は `Suzuki2Groups.centralSquareQuadraticMap` (Appendix III Lemma 1(a)) が
+  `Additive (Q ⧸ Z(Q)) → Additive ↥(Z(Q))` の `QuadraticMap (ZMod 2)` として既に在る。
 
 ## 📖 p.120–121 の proof 全文の書き起こし (2026-07-30, ページ画像から)
 

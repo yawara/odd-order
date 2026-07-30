@@ -33,6 +33,10 @@ needs in order to run Hilbert 90 on a `K`-orbit — see
 
 * `Hypothesis.exists_field_realization_K` — the field `F`, the isomorphism
   `μ : K ≃* Fˣ` and the non-trivial twist `σ`.
+* `Hypothesis.exists_Q0_field_coordinate` — the same field with the *coordinate*
+  `α : Q₀ → F` under which the `K`-action is multiplication.  This is the half
+  `Q₀ ≅ F`, `K ≅ F^×` of the standing identification of Ch. III §3, p. 120, and
+  unlike `exists_field_realization_K` it does not need `W = 1`.
 -/
 
 set_option autoImplicit false
@@ -239,6 +243,55 @@ theorem exists_field_realization_K (hW : hyp.W = ⊥)
     rw [h3] at h4
     exact h4.symm
   exact ⟨F, instF, instFin, μ, σ, hσne, hcardF, hμσ⟩
+
+/-- **`Q₀ ≅ F` and `K ≅ F^×`, with the coordinate** (Peterfalvi Part II, the
+standing identification set up at the top of Ch. III §3, p. 120:
+
+> `K` can be identified with `F^*` in such a way that the actions of `K` on
+> `S/Q₀` and on `Q₀`, identified with `F × F` and with `F` respectively, are given
+> by `(a,b)^x = (xa, xb)` and `c^x = x^{1+θ} c`.
+
+This supplies the `Q₀` half.)  `K` acts freely on `Q₀ ∖ {1}` and
+`|K| = |Q₀| − 1`, so the action is regular and Appendix I Proposition 2 in its
+regular form (`Huppert.exists_field_coordinate_realization`) turns `Q₀` into a
+field `F` of order `|Q₀|` with `K` acting by multiplication.
+
+Unlike `exists_field_realization_K` this needs no hypothesis on `W`: the twist
+`σ` — the only part of that theorem that uses `W = 1` — is not asserted here. -/
+theorem exists_Q0_field_coordinate :
+    ∃ (F : Type uG) (_ : Field F) (_ : Finite F)
+      (γ : ↥hyp.K ≃* Fˣ) (α : Additive ↥hyp.Q0 ≃+ F),
+      Nat.card F = Nat.card ↥hyp.Q0 ∧
+      ∀ (k : ↥hyp.K) (y : ↥hyp.Q0),
+        α (Additive.ofMul
+            (hyp.conjQ0 (Subgroup.inclusion hyp.K_le_D k) y))
+          = ((γ k : Fˣ) : F) * α (Additive.ofMul y) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI := hyp.K_isCyclic
+  letI : CommGroup ↥hyp.K := IsCyclic.commGroup
+  have hQ0two : 2 ≤ Nat.card ↥hyp.Q0 := hyp.two_le_card_Q0
+  haveI : Nontrivial ↥hyp.Q0 :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr fun hbot => by
+      rw [hbot, Subgroup.card_bot] at hQ0two; omega
+  letI : CommGroup ↥hyp.Q0 :=
+    { (inferInstance : Group ↥hyp.Q0) with
+      mul_comm := hyp.isElementaryAbelian_Q0.comm }
+  set ψ : ↥hyp.K →* MulAut ↥hyp.Q0 :=
+    hyp.conjQ0.comp (Subgroup.inclusion hyp.K_le_D) with hψdef
+  have hψval : ∀ (k : ↥hyp.K) (y : ↥hyp.Q0),
+      ((ψ k y : ↥hyp.Q0) : G) = (k : G) * (y : G) * (k : G)⁻¹ := fun _ _ => rfl
+  have hfree : ∀ (k : ↥hyp.K) (y : ↥hyp.Q0), y ≠ 1 → ψ k y = y → k = 1 := by
+    intro k y hy hfix
+    by_contra hk
+    refine hy (hyp.conjQ0_fixed_eq_one hk (Subtype.ext ?_))
+    rw [hyp.conjQ0_apply_coe, ← hψval k y, hfix]
+  have hcard : Nat.card ↥hyp.K = Nat.card ↥hyp.Q0 - 1 :=
+    hyp.card_K_eq_card_Q0_sub_one
+  obtain ⟨F, instF, instFin, γ, α, hcardF, hγ⟩ :=
+    Huppert.exists_field_coordinate_realization hyp.isElementaryAbelian_Q0 ψ
+      hfree hcard
+  exact ⟨F, instF, instFin, γ, α, hcardF, hγ⟩
 
 end Hypothesis
 
