@@ -289,6 +289,36 @@ theorem centreQuadraticMap_W_invariant
   simp only [toMul_ofMul]
   rw [hyp.centralSquare_quotientWHom s]
 
+include s in
+/-- **The scaling constant of `χ` for the whole of `K W`**: it is `μ(k,1)^d`, and in
+particular **does not depend on the `W`-component**, because `W` fixes `χ`.
+
+This is what makes the scaling constants into a homomorphism on `K × W`, hence the
+action of `K₁W₁` on the model `S₁` into a homomorphism (Peterfalvi Part II,
+Ch. III §3, p. 121, step (4)). -/
+theorem centreQuadraticMap_smul_KW
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (kv : ↥hyp.actualKActor × ↥hyp.W) (x : M.E) :
+    ((hyp.centreQuadraticMap s M ι (((M.mu kv : M.Eˣ) : M.E) * x) :
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+      = ((M.mu (kv.1, 1) ^ d : M.Eˣ) : M.E) *
+        ((hyp.centreQuadraticMap s M ι x :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) := by
+  have hsplit : M.mu kv = M.mu (kv.1, 1) * M.mu (1, kv.2) := by
+    rw [← map_mul]
+    congr 1
+    exact Prod.ext (mul_one _).symm (one_mul _).symm
+  rw [hsplit, Units.val_mul, mul_assoc,
+    hyp.centreQuadraticMap_smul s M ι d hequiv kv.1,
+    hyp.centreQuadraticMap_W_invariant s M ι kv.2]
+
 /-! ## The book's cocycle: a semilinear bilinear lift of `χ` -/
 
 /-- The `E`-valued form of `χ`, built from the *same* centre coordinate `ι` as the
@@ -728,6 +758,81 @@ noncomputable def modelScalarAut
     (h : ∀ x y : M.E, φ (a * x) (a * y) = ν * φ x y)
     (p : Suzuki2Groups.BilinearTwistedProduct φ) :
     (hyp.modelScalarAut M φ ha hν h p).central = ν * p.central :=
+  rfl
+
+/-- **The scalar action of a group on the model `S₁`, as a homomorphism.**
+
+Given compatible homomorphisms `A` into the scalars acting on the quotient
+coordinate and `N` into those acting on the central coordinate,
+`g ↦ ((x, y) ↦ (A g · x, N g · y))` is a homomorphism into `Aut S₁`.
+
+Its image is the subgroup `B` of Peterfalvi Part II, Ch. III §3, p. 121, step (4),
+once `A` is taken to be the scalar realization `μ` of `K W` and `N` the
+corresponding family of scaling constants of `χ`. -/
+noncomputable def modelScalarHom {Γ : Type*} [Group Γ]
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (A : Γ →* M.Eˣ)
+    (N : Γ →* (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ)
+    (h : ∀ (g : Γ) (x y : M.E),
+      φ (((A g : M.Eˣ) : M.E) * x) (((A g : M.Eˣ) : M.E) * y)
+        = ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * φ x y) :
+    Γ →* MulAut (Suzuki2Groups.BilinearTwistedProduct φ) where
+  toFun g := Suzuki2Groups.BilinearTwistedProduct.congrEquiv
+    (AddEquiv.mk' (Equiv.mulLeft₀ ((A g : M.Eˣ) : M.E) (A g).ne_zero) (mul_add _))
+    (AddEquiv.mk' (Equiv.mulLeft₀
+      ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (N g).ne_zero) (mul_add _))
+    (h g)
+  map_one' := by
+    refine MulEquiv.ext fun p => ?_
+    refine Suzuki2Groups.BilinearTwistedProduct.ext ?_ ?_
+    · change ((A 1 : M.Eˣ) : M.E) * p.quotient = p.quotient
+      rw [map_one, Units.val_one, one_mul]
+    · change ((N 1 : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * p.central = p.central
+      rw [map_one, Units.val_one, one_mul]
+  map_mul' g g' := by
+    refine MulEquiv.ext fun p => ?_
+    refine Suzuki2Groups.BilinearTwistedProduct.ext ?_ ?_
+    · change ((A (g * g') : M.Eˣ) : M.E) * p.quotient
+        = ((A g : M.Eˣ) : M.E) * (((A g' : M.Eˣ) : M.E) * p.quotient)
+      rw [map_mul, Units.val_mul, mul_assoc]
+    · change ((N (g * g') : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * p.central
+        = ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) *
+          (((N g' : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * p.central)
+      rw [map_mul, Units.val_mul, mul_assoc]
+
+@[simp] theorem modelScalarHom_quotient {Γ : Type*} [Group Γ]
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (A : Γ →* M.Eˣ)
+    (N : Γ →* (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ)
+    (h : ∀ (g : Γ) (x y : M.E),
+      φ (((A g : M.Eˣ) : M.E) * x) (((A g : M.Eˣ) : M.E) * y)
+        = ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * φ x y)
+    (g : Γ) (p : Suzuki2Groups.BilinearTwistedProduct φ) :
+    (hyp.modelScalarHom M φ A N h g p).quotient = ((A g : M.Eˣ) : M.E) * p.quotient :=
+  rfl
+
+@[simp] theorem modelScalarHom_central {Γ : Type*} [Group Γ]
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (A : Γ →* M.Eˣ)
+    (N : Γ →* (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ)
+    (h : ∀ (g : Γ) (x y : M.E),
+      φ (((A g : M.Eˣ) : M.E) * x) (((A g : M.Eˣ) : M.E) * y)
+        = ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * φ x y)
+    (g : Γ) (p : Suzuki2Groups.BilinearTwistedProduct φ) :
+    (hyp.modelScalarHom M φ A N h g p).central =
+      ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * p.central :=
   rfl
 
 end Hypothesis

@@ -523,8 +523,18 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
 * `Hypothesis.modelScalarAut` — スカラー 1 個の作用
   `(x,y) ↦ (ax, ν y)` を `MulAut (BilinearTwistedProduct φ)` として。
 
-**次**: `K₁W₁ →* MulAut S₁` の群準同型化 (scaling 定数 `ν` の乗法性は χ の
-scaling 定数の一意性から出る) → `A`/`B`/`U` の設定 → Zassenhaus。
+* `Hypothesis.modelScalarHom` (2026-07-31 その 3) — **群準同型版**
+  `Γ →* MulAut S₁`。両座標のスカラー準同型 `A : Γ →* Eˣ`, `N : Γ →* F^×` と
+  整合性 `φ(A g · x, A g · y) = N g · φ(x,y)` を与えると作用が準同型になる。
+  この像が書籍 step (4) の `B`。
+* `Hypothesis.centreQuadraticMap_smul_KW` — **`KW` 全体の scaling 定数は
+  `μ(k,1)^d` で `W` 成分に依らない** (W が χ を固定するため)。
+  ⟹ 定数の族がそのまま `K × W` 上の準同型になり、`N` が組める
+  (χ の scaling 定数の一意性を経由する必要がなかった)。
+
+**次**: `N : K × W →* (↥F)ˣ` の実体化 (`μ(k,1)` の `F`-単元版 + `d` 乗) →
+`modelScalarHom` に食わせて `B` を得る → `A` (KW の共役作用の像) を `Φ` で移送 →
+`U` = `inducingIdAuts` の設定と `B ⊆ UA` → Zassenhaus で `A^u = B`。
 
 landing 済 (2026-07-31):
 * `exists_bilinear_lift_of_pinned_restriction` に第 3 の結論として追加。
