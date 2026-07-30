@@ -1120,6 +1120,27 @@ noncomputable def orbitOfF {m : ℕ} (M : hyp.QuotientFieldModel m)
   let hfx := hyp.f_mem_sdiff_Q0 H hC2 hx.1 hx.2
   QuotientGroup.mk (Units.mk0 _ (hyp.coord_ne_zero_of_not_mem_Q0 M hZ hfx.1 hfx.2))
 
+/-- **`conjQHom kv` is conjugation by an element of `D`.**
+
+`actualKActor` is the range of `conjQByK`, and both `conjQByK k` and `conjQByW v` are
+literally `x ↦ k x k⁻¹` and `x ↦ v x v⁻¹`; composing them gives conjugation by `k v`,
+which lies in `D` since `K ≤ D` and `W ≤ V ≤ D`.
+
+This is what turns the `KW`-orbit of step (8) into a `D`-conjugacy class, so that
+`exists_conj_mul_Q0_iff` applies. -/
+theorem exists_mem_D_conjQHom (kv : ↥hyp.actualKActor × ↥hyp.W) :
+    ∃ d ∈ hyp.D, ∀ x : ↥hyp.Q,
+      ((hyp.conjQHom kv x : ↥hyp.Q) : G) = d * (x : G) * d⁻¹ := by
+  obtain ⟨k, hk⟩ := (MonoidHom.mem_range).mp kv.1.2
+  have hWD : hyp.W ≤ hyp.D := le_trans inf_le_left hyp.V_le_D
+  refine ⟨(k : G) * (kv.2 : G),
+    hyp.D.mul_mem (hyp.K_le_D k.2) (hWD kv.2.2), fun x => ?_⟩
+  rw [hyp.conjQHom_apply, MulAut.mul_apply]
+  simp only [Subgroup.coe_subtype]
+  rw [← hk]
+  change (k : G) * ((kv.2 : G) * (x : G) * (kv.2 : G)⁻¹) * (k : G)⁻¹ = _
+  group
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
