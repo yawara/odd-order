@@ -189,6 +189,41 @@ theorem centerCoord_conj {m : ℕ} (s : hyp.LemmaFiveSetup m)
   simp only [centerCoord, hyp.toCenter_conj s ha hx]
   exact hequiv (hyp.kActor ha) (hyp.toCenter s hx)
 
+/-- **Step (10)'s hypothesis, in the coordinates of the standard model**
+(Peterfalvi Part II, p. 125).
+
+The group-theoretic hypothesis of `stepTen` — `y · s'^{a⁻¹} = s'^c` — holds exactly when
+
+  `coord y + μ(a)^d · coord s' = μ(c)^d · coord s'`.
+
+Dividing by `coord s' ≠ 0` and writing `α = coord y / coord s'`, this is the book's
+`b^{1+θ} = α + a^{-(1+θ)}`: the book normalizes the model so that `s ↦ (0,1)`, i.e.
+`coord s' = 1`, but no such normalization is needed — the ratio carries it.
+
+Both conjugations are written in the shape `k · x · k⁻¹`; a caller matching the book's
+`s^b = b⁻¹ s b` instantiates `c := b⁻¹`. -/
+theorem stepTen_coord {m : ℕ} (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    {y s' a c : G} (hy : y ∈ hyp.Q0) (hs' : s' ∈ hyp.Q0) (ha : a ∈ hyp.K)
+    (hc : c ∈ hyp.K) :
+    y * (a * s' * a⁻¹) = c * s' * c⁻¹ ↔
+      hyp.centerCoord s M ι hy
+          + ((M.mu (hyp.kActor ha, 1) ^ d : M.Eˣ) : M.E) * hyp.centerCoord s M ι hs'
+        = ((M.mu (hyp.kActor hc, 1) ^ d : M.Eˣ) : M.E) * hyp.centerCoord s M ι hs' := by
+  rw [hyp.eq_iff_centerCoord_eq s M ι
+      (hyp.Q0.mul_mem hy (hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D ha) hs'))
+      (hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D hc) hs'),
+    hyp.centerCoord_mul s M ι hy (hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D ha) hs'),
+    hyp.centerCoord_conj s M ι d hequiv ha hs',
+    hyp.centerCoord_conj s M ι d hequiv hc hs']
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
