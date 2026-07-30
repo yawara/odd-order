@@ -690,8 +690,21 @@ MulEquiv.coe_toMonoidHom]` で展開してから rw する。
 
 - [x] 段 (5): `s ↦ (0,1)` の正規化 — **完了** (2026-07-31)
 
-**次**: Proposition 本体の statement 化 (段 (1)-(5) を書籍の 1 つの主張に束ねる)
-+ AxiomsCheck 登録。
+### 正規化の貫通 (2026-07-31 その 10)
+
+段 (5) の正規化 (`ι (ofMul x₀) = 1`) は段 (3) の α-正規化を**通り抜ける**必要がある。
+`exists_bilinear_lift_normalized` は `ι' = ι.trans (frobFixedRestrict α⁻¹)` を返すので
+`ι z = 1 ⟹ ι' z = 1` (環同型は 1 を固定する)。結論
+`∀ z, ι z = 1 → ι' z = 1` を `exists_bilinear_lift_normalized` と
+`exists_mulEquiv_bookCocycle` の両方に足して貫通させた。
+
+**次 (最後)**: Proposition 本体の statement 化 — 段 (1)-(5) を書籍の 1 つの主張に
+束ねる。必要な材料はすべて揃っている:
+* cocycle の 2 条件 = `exists_mulEquiv_bookCocycle` の第 1・2 連言
+* `Φ x₀ = ⟨0,1⟩` = `hker` + 上の正規化貫通
+* `K₁ = F^×` = `exists_actualKActor_mu_eq`
+* `W₁` のノルム 1 と `σ` = `M.mu_W_normOne` / `exists_sigma_inverting_W1`
+* 作用と共役性 = `exists_modelScalarHom` / `exists_conj_conjQHom_range_eq`
 
 ---
 (以下は packaging の下調べ。汎用補題ができたので直接は不要だが、罠の記録として残す)

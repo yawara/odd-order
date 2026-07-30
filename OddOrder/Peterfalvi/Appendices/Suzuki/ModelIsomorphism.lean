@@ -537,6 +537,7 @@ theorem exists_bilinear_lift_normalized (hm : m ≠ 0)
       (∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
         ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
           ∀ x y : M.E, φ (a * x) (b * y) = a * θ b * φ x y) ∧
+      (∀ z : Additive ↥(Subgroup.center hyp.Q), ι z = 1 → ι' z = 1) ∧
       ∀ a b : M.E,
         (∀ x : M.E, hyp.centreQuadraticMapE s M ι' (a * x)
           = b * hyp.centreQuadraticMapE s M ι' x) →
@@ -555,7 +556,7 @@ theorem exists_bilinear_lift_normalized (hm : m ≠ 0)
     rfl
   refine ⟨ι.trans (OddOrder.FiniteField.frobFixedRestrict (m := m) α.symm.toRingEquiv),
     φ₀.compr₂ α.symm.toLinearMap, β.trans α.symm, fun x => ?_, fun a ha b hb x y => ?_,
-    fun a b hb x y => ?_⟩
+    fun z hz => ?_, fun a b hb x y => ?_⟩
   · -- the diagonal, read through the moved coordinate
     simp only [LinearMap.compr₂_apply, AlgEquiv.toLinearMap_apply]
     rw [hdiag x, hyp.centreQuadraticMapE_apply, hyp.centreQuadraticMapE_apply,
@@ -565,6 +566,12 @@ theorem exists_bilinear_lift_normalized (hm : m ≠ 0)
     change α.symm (φ₀ (a * x) (b * y)) = _
     rw [hsemi a ha b hb x y, map_mul, map_mul, α.symm_apply_apply]
     rfl
+  · -- the normalization `ι z = 1` survives: `α⁻¹` is a ring automorphism
+    refine Subtype.ext ?_
+    change α.symm ((ι z : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) = _
+    rw [hz]
+    change α.symm (1 : M.E) = (1 : M.E)
+    exact map_one α.symm
   · -- the diagonal scaling, with the constant read through `α`
     have hsc : ∀ x : M.E, hyp.centreQuadraticMapE s M ι (a * x)
         = α b * hyp.centreQuadraticMapE s M ι x := by
@@ -675,6 +682,7 @@ theorem exists_mulEquiv_bookCocycle (hm : m ≠ 0)
               = a * θ b *
                 ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) ∧
       (∀ x : M.E, x ≠ 0 → φ x x ≠ 0) ∧
+      (∀ z : Additive ↥(Subgroup.center hyp.Q), ι z = 1 → ι' z = 1) ∧
       (∀ a b : M.E,
         (∀ x : M.E,
           ((hyp.centreQuadraticMap s M ι' (a * x) :
@@ -692,7 +700,7 @@ theorem exists_mulEquiv_bookCocycle (hm : m ≠ 0)
         M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) e)) := by
   classical
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  obtain ⟨ι', φ₀, θ, hdiag, hsemi, hdiagscale⟩ :=
+  obtain ⟨ι', φ₀, θ, hdiag, hsemi, hone, hdiagscale⟩ :=
     hyp.exists_bilinear_lift_normalized s M hm hQ0card ι d hequiv
   -- the diagonal already lies in `F`
   have hdiagF : ∀ x : M.E,
@@ -712,7 +720,8 @@ theorem exists_mulEquiv_bookCocycle (hm : m ≠ 0)
     rfl
   obtain ⟨Φ, hker, hquot⟩ :=
     hyp.exists_mulEquiv_bilinearTwistedProduct s M ι' _ hdiagφ
-  refine ⟨ι', OddOrder.FiniteField.bilinCodRestrict m ψ hval, θ, Φ, ?_, ?_, ?_, hker, hquot⟩
+  refine ⟨ι', OddOrder.FiniteField.bilinCodRestrict m ψ hval, θ, Φ, ?_, ?_, hone, ?_,
+    hker, hquot⟩
   · -- the semilinearity survives the correction, since `a · θ b` lies in `F`
     intro a ha b hb x y
     rw [OddOrder.FiniteField.bilinCodRestrict_apply,
