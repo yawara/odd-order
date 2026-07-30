@@ -110,63 +110,174 @@ theorem fgh_unique
     congrArg (Subtype.val (p := fun z => z ∈ Q)) (congrArg Prod.fst hpair'),
     congrArg (Subtype.val (p := fun z => z ∈ D)) (congrArg Prod.snd hpair')⟩
 
-/-! ## The identities (H1)–(H6) -/
+/-! ## The identities (H1)–(H6)
 
-/-- **(H1)**: `f(x⁻¹) = g(x)⁻¹` (Peterfalvi Part II, Ch. IV §1, p. 122).
+All of (H1)–(H4) follow the same two-step pattern: exhibit a factorization
+`t y t = p · d · t · q` with `p ∈ Q`, `d ∈ D`, `q ∈ Q`, then invoke uniqueness.
+`fgh_eq_of_canonical` packages the second step, so each identity reduces to the
+group-theoretic rearrangement recorded in the `canonical_*` lemmas below.
+-/
 
-Inverting `t x t = g(x) h(x) t f(x)` gives `t x⁻¹ t = f(x)⁻¹ · t · h(x)⁻¹ g(x)⁻¹`,
-which is not yet in the canonical form `a · t · b` with `b ∈ Q`.  Moving `h(x)⁻¹`
-across `t` — legitimate because `D = M ∩ M^t`, so `t h(x)⁻¹ t ∈ M` — puts it in that
-form with `Q`-part `g(x)⁻¹`, and uniqueness identifies it with `f(x⁻¹)`. -/
-theorem hOne
+/-- Read-off lemma: **any** canonical factorization `t y t = p · d · t · q` with
+`p ∈ Q`, `d ∈ D` and `q ∈ Q` is *the* one produced by `f, g, h`.
+
+Both uniqueness statements are used: `hfact` identifies the `M`-part `p d` and the
+`Q`-part `q`, and `hsplit` then separates `p` from `d` inside `M = Q ⋊ D`. -/
+theorem fgh_eq_of_canonical
+    (hsplit : ∀ a ∈ M, ∃! p : ↥Q × ↥D, a = (p.1 : L) * (p.2 : L))
     (hfact : ∀ y : L, y ∉ M → ∃! p : ↥M × ↥Q, y = (p.1 : L) * t * (p.2 : L))
     (hQM : Q ≤ M) (hDM : D ≤ M)
-    (ht : t * t = 1) (hDt : ∀ d ∈ D, t * d * t ∈ M)
+    {f g h : L → L}
+    (hmem : ∀ x ∈ Q, x ≠ 1 → f x ∈ Q ∧ g x ∈ Q ∧ h x ∈ D)
+    (heq : ∀ x ∈ Q, x ≠ 1 → t * x * t = g x * h x * t * f x)
+    {y p d q : L} (hyQ : y ∈ Q) (hy1 : y ≠ 1) (hyM : t * y * t ∉ M)
+    (hp : p ∈ Q) (hd : d ∈ D) (hq : q ∈ Q)
+    (hcan : t * y * t = p * d * t * q) :
+    f y = q ∧ g y = p ∧ h y = d := by
+  classical
+  obtain ⟨hfQ, hgQ, hhD⟩ := hmem y hyQ hy1
+  obtain ⟨w, -, huniq⟩ := hfact (t * y * t) hyM
+  have hM₁ : g y * h y ∈ M := M.mul_mem (hQM hgQ) (hDM hhD)
+  have hM₂ : p * d ∈ M := M.mul_mem (hQM hp) (hDM hd)
+  have e₁ := huniq (⟨⟨g y * h y, hM₁⟩, ⟨f y, hfQ⟩⟩) (by rw [heq y hyQ hy1])
+  have e₂ := huniq (⟨⟨p * d, hM₂⟩, ⟨q, hq⟩⟩) (by rw [hcan])
+  have hpair := e₁.trans e₂.symm
+  have hfst : g y * h y = p * d :=
+    congrArg (Subtype.val (p := fun z => z ∈ M)) (congrArg Prod.fst hpair)
+  have hsnd : f y = q :=
+    congrArg (Subtype.val (p := fun z => z ∈ Q)) (congrArg Prod.snd hpair)
+  obtain ⟨w', -, huniq'⟩ := hsplit (g y * h y) hM₁
+  have d₁ := huniq' (⟨⟨g y, hgQ⟩, ⟨h y, hhD⟩⟩) rfl
+  have d₂ := huniq' (⟨⟨p, hp⟩, ⟨d, hd⟩⟩) hfst
+  have hpair' := d₁.trans d₂.symm
+  exact ⟨hsnd,
+    congrArg (Subtype.val (p := fun z => z ∈ Q)) (congrArg Prod.fst hpair'),
+    congrArg (Subtype.val (p := fun z => z ∈ D)) (congrArg Prod.snd hpair')⟩
+
+/-! ### The three canonical factorizations
+
+Each is a pure rearrangement of the defining equation using only `t * t = 1`.
+-/
+
+/-- Inverting `t x t = g(x) h(x) t f(x)` and moving `h(x)⁻¹` across `t`. -/
+theorem canonical_inv (ht : t * t = 1) {f g h : L → L}
+    (heq : ∀ x ∈ Q, x ≠ 1 → t * x * t = g x * h x * t * f x)
+    {x : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) :
+    t * x⁻¹ * t = (f x)⁻¹ * (t * (h x)⁻¹ * t) * t * (g x)⁻¹ := by
+  have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht
+  have hinv : t * x⁻¹ * t = (t * x * t)⁻¹ := by
+    rw [mul_inv_rev, mul_inv_rev, htinv]
+    group
+  rw [hinv, heq x hxQ hx1, mul_inv_rev, mul_inv_rev, mul_inv_rev, htinv]
+  have hcancel : (f x)⁻¹ * (t * (h x)⁻¹ * t) * t * (g x)⁻¹
+      = (f x)⁻¹ * (t * (h x)⁻¹ * (t * t)) * (g x)⁻¹ := by group
+  rw [hcancel, ht]
+  group
+
+/-- Solving `t x t = g(x) h(x) t f(x)` for `t f(x) t`; the result
+`h(x)⁻¹ g(x)⁻¹ t x` is already canonical. -/
+theorem canonical_f (ht : t * t = 1) {f g h : L → L}
+    (heq : ∀ x ∈ Q, x ≠ 1 → t * x * t = g x * h x * t * f x)
+    {x : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) :
+    t * f x * t = ((h x)⁻¹ * (g x)⁻¹ * h x) * (h x)⁻¹ * t * x := by
+  have e2 : (h x)⁻¹ * (g x)⁻¹ * (t * x * t) * t
+      = (h x)⁻¹ * (g x)⁻¹ * (g x * h x * t * f x) * t := by
+    rw [heq x hxQ hx1]
+  have lhs : (h x)⁻¹ * (g x)⁻¹ * (t * x * t) * t
+      = (h x)⁻¹ * (g x)⁻¹ * t * x * (t * t) := by group
+  have rhs : (h x)⁻¹ * (g x)⁻¹ * (g x * h x * t * f x) * t = t * f x * t := by group
+  rw [lhs, rhs, ht, mul_one] at e2
+  rw [← e2]
+  group
+
+/-- Conjugating the defining equation by `t`: writing `b = a^t = t a t`, we get
+`t x^a t = (g(x)^b) · (b⁻¹ h(x) a) · t · (f(x)^b)`. -/
+theorem canonical_conj (ht : t * t = 1) {f g h : L → L}
+    (heq : ∀ x ∈ Q, x ≠ 1 → t * x * t = g x * h x * t * f x)
+    {x a : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) :
+    t * (a⁻¹ * x * a) * t
+      = ((t * a⁻¹ * t) * g x * (t * a * t)) * ((t * a⁻¹ * t) * h x * a) * t *
+        ((t * a⁻¹ * t) * f x * (t * a * t)) := by
+  have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht
+  -- Both rearrangements are genuine free-group identities once the *second* `t` of
+  -- each conjugating pair is written as `t⁻¹`; `t * t = 1` then turns them into the
+  -- displayed form.
+  have hexp : t * (a⁻¹ * x * a) * t
+      = (t * a⁻¹ * t) * (t * x * t) * (t * a * t) := by
+    have e : t * (a⁻¹ * x * a) * t
+        = (t * a⁻¹ * t⁻¹) * (t * x * t⁻¹) * (t * a * t) := by group
+    rwa [htinv] at e
+  have key : ∀ u v w : L,
+      (t * a⁻¹ * t) * (u * v * t * w) * (t * a * t)
+      = ((t * a⁻¹ * t) * u * (t * a * t)) * ((t * a⁻¹ * t) * v * a) * t *
+        ((t * a⁻¹ * t) * w * (t * a * t)) := by
+    intro u v w
+    have e : (t⁻¹ * a⁻¹ * t) * (u * v * t * w) * (t⁻¹ * a * t)
+        = ((t⁻¹ * a⁻¹ * t) * u * (t⁻¹ * a * t)) * ((t⁻¹ * a⁻¹ * t) * v * a) * t *
+          ((t⁻¹ * a⁻¹ * t) * w * (t⁻¹ * a * t)) := by group
+    rwa [htinv] at e
+  rw [hexp, heq x hxQ hx1, key]
+
+/-! ### (H1)–(H4) -/
+
+/-- **(H1)**: `f(x⁻¹) = g(x)⁻¹`, together with its `g`-companion `g(x⁻¹) = f(x)⁻¹`
+and **(H4)**'s `h(x⁻¹) = h(x)^{-t}` (Peterfalvi Part II, Ch. IV §1, p. 122).
+
+All three fall out of the single canonical factorization `canonical_inv`, whose
+`D`-part is `t h(x)⁻¹ t = (h(x)^t)⁻¹` — an element of `D` because `D = M ∩ M^t`. -/
+theorem hOne
+    (hsplit : ∀ a ∈ M, ∃! p : ↥Q × ↥D, a = (p.1 : L) * (p.2 : L))
+    (hfact : ∀ y : L, y ∉ M → ∃! p : ↥M × ↥Q, y = (p.1 : L) * t * (p.2 : L))
+    (hQM : Q ≤ M) (hDM : D ≤ M)
+    (ht : t * t = 1) (hDstab : ∀ d ∈ D, t * d * t ∈ D)
     {f g h : L → L}
     (hmem : ∀ x ∈ Q, x ≠ 1 → f x ∈ Q ∧ g x ∈ Q ∧ h x ∈ D)
     (heq : ∀ x ∈ Q, x ≠ 1 → t * x * t = g x * h x * t * f x)
     {x : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) (hinvM : t * x⁻¹ * t ∉ M) :
-    f x⁻¹ = (g x)⁻¹ := by
-  classical
+    f x⁻¹ = (g x)⁻¹ ∧ g x⁻¹ = (f x)⁻¹ ∧ h x⁻¹ = (t * h x * t)⁻¹ := by
   obtain ⟨hfQ, hgQ, hhD⟩ := hmem x hxQ hx1
-  have hxinvQ : x⁻¹ ∈ Q := Q.inv_mem hxQ
-  have hxinv1 : x⁻¹ ≠ 1 := fun hc => hx1 (inv_eq_one.mp hc)
-  obtain ⟨hfQ', hgQ', hhD'⟩ := hmem x⁻¹ hxinvQ hxinv1
   have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht
-  -- inverting the defining equation and moving `h(x)⁻¹` across `t`
-  have hcomp : t * x⁻¹ * t = ((f x)⁻¹ * (t * (h x)⁻¹ * t)) * t * (g x)⁻¹ := by
-    have hinv : t * x⁻¹ * t = (t * x * t)⁻¹ := by
-      rw [mul_inv_rev, mul_inv_rev, htinv]
-      group
-    rw [hinv, heq x hxQ hx1, mul_inv_rev, mul_inv_rev, mul_inv_rev, htinv]
-    have hcancel : (f x)⁻¹ * (t * (h x)⁻¹ * t) * t * (g x)⁻¹
-        = (f x)⁻¹ * (t * (h x)⁻¹ * (t * t)) * (g x)⁻¹ := by group
-    rw [hcancel, ht]
+  have hdD : t * (h x)⁻¹ * t ∈ D := hDstab _ (D.inv_mem hhD)
+  have hdeq : t * (h x)⁻¹ * t = (t * h x * t)⁻¹ := by
+    rw [mul_inv_rev, mul_inv_rev, htinv]
     group
-  -- the two factorizations of `t x⁻¹ t`
-  obtain ⟨w, -, huniq⟩ := hfact (t * x⁻¹ * t) hinvM
-  have hMa : g x⁻¹ * h x⁻¹ ∈ M := M.mul_mem (hQM hgQ') (hDM hhD')
-  have hMb : (f x)⁻¹ * (t * (h x)⁻¹ * t) ∈ M :=
-    M.mul_mem (M.inv_mem (hQM hfQ)) (hDt _ (D.inv_mem hhD))
-  have e₁ := huniq (⟨⟨g x⁻¹ * h x⁻¹, hMa⟩, ⟨f x⁻¹, hfQ'⟩⟩)
-    (by rw [heq x⁻¹ hxinvQ hxinv1])
-  have e₂ := huniq (⟨⟨(f x)⁻¹ * (t * (h x)⁻¹ * t), hMb⟩, ⟨(g x)⁻¹, Q.inv_mem hgQ⟩⟩)
-    (by rw [hcomp])
-  exact congrArg (Subtype.val (p := fun z => z ∈ Q))
-    (congrArg Prod.snd (e₁.trans e₂.symm))
+  obtain ⟨h₁, h₂, h₃⟩ := fgh_eq_of_canonical hsplit hfact hQM hDM hmem heq
+    (Q.inv_mem hxQ) (fun hc => hx1 (inv_eq_one.mp hc)) hinvM
+    (Q.inv_mem hfQ) hdD (Q.inv_mem hgQ)
+    (canonical_inv ht heq hxQ hx1)
+  exact ⟨h₁, h₂, hdeq ▸ h₃⟩
 
-/-- **(H3)**: `f(x^a) = f(x)^{a^t}` for `a ∈ D` (Peterfalvi Part II, Ch. IV §1,
-p. 122).
+/-- **(H2)**: `f(f(x)) = x`, together with **(H4)**'s `h(f(x)) = h(x)⁻¹`
+(Peterfalvi Part II, Ch. IV §1, p. 122).
 
-⚠ The exponent is `a^t = t a t`, **not** `a`: `D = M ∩ M^t` is normalized by `t` but
-in general not centralized by it.  (The `pdftotext` extraction of p. 122 drops this
-superscript; the page image is the authority.)
+`canonical_f` says `t f(x) t = h(x)⁻¹ g(x)⁻¹ t x`, which is *already* canonical:
+splitting `h(x)⁻¹ g(x)⁻¹` as `(g(x)⁻¹)^{h(x)} · h(x)⁻¹` inside `M = Q ⋊ D` reads off
+`f(f(x)) = x` and `h(f(x)) = h(x)⁻¹` at once. -/
+theorem hTwo
+    (hsplit : ∀ a ∈ M, ∃! p : ↥Q × ↥D, a = (p.1 : L) * (p.2 : L))
+    (hfact : ∀ y : L, y ∉ M → ∃! p : ↥M × ↥Q, y = (p.1 : L) * t * (p.2 : L))
+    (hQM : Q ≤ M) (hDM : D ≤ M) (ht : t * t = 1)
+    (hDQ : ∀ d ∈ D, ∀ q ∈ Q, d⁻¹ * q * d ∈ Q)
+    {f g h : L → L}
+    (hmem : ∀ x ∈ Q, x ≠ 1 → f x ∈ Q ∧ g x ∈ Q ∧ h x ∈ D)
+    (heq : ∀ x ∈ Q, x ≠ 1 → t * x * t = g x * h x * t * f x)
+    {x : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1)
+    (hfne : f x ≠ 1) (hfM : t * f x * t ∉ M) :
+    f (f x) = x ∧ g (f x) = (h x)⁻¹ * (g x)⁻¹ * h x ∧ h (f x) = (h x)⁻¹ := by
+  obtain ⟨hfQ, hgQ, hhD⟩ := hmem x hxQ hx1
+  exact fgh_eq_of_canonical hsplit hfact hQM hDM hmem heq hfQ hfne hfM
+    (hDQ (h x) hhD (g x)⁻¹ (Q.inv_mem hgQ)) (D.inv_mem hhD) hxQ
+    (canonical_f ht heq hxQ hx1)
 
-Conjugating the defining equation by `t` replaces `a` by `a^t` throughout:
-`t x^a t = (a^t)⁻¹ (t x t) a^t`.  Regrouping — the `a` and `a⁻¹` that appear on
-either side of `t · t = 1` cancel — puts it in canonical form with `Q`-part
-`f(x)^{a^t}`. -/
+/-- **(H3)**: `f(x^a) = f(x)^{a^t}` for `a ∈ D`, together with its `g`-companion
+`g(x^a) = g(x)^{a^t}` and **(H4)**'s `h(x^a) = a^{-t} h(x) a`
+(Peterfalvi Part II, Ch. IV §1, p. 122).
+
+Conjugating the defining equation by `t` turns `a` into `a^t`, which again lies in
+`D` because `D = M ∩ M^t`; the `M`-part `(g(x)^{a^t}) · (a^{-t} h(x) a)` is already
+displayed in its `Q ⋊ D` form by `canonical_conj`. -/
 theorem hThree
+    (hsplit : ∀ a ∈ M, ∃! p : ↥Q × ↥D, a = (p.1 : L) * (p.2 : L))
     (hfact : ∀ y : L, y ∉ M → ∃! p : ↥M × ↥Q, y = (p.1 : L) * t * (p.2 : L))
     (hQM : Q ≤ M) (hDM : D ≤ M)
     (ht : t * t = 1) (hDstab : ∀ d ∈ D, t * d * t ∈ D)
@@ -177,49 +288,24 @@ theorem hThree
     {x a : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) (haD : a ∈ D)
     (hconjQ : a⁻¹ * x * a ∈ Q) (hconj1 : a⁻¹ * x * a ≠ 1)
     (hconjM : t * (a⁻¹ * x * a) * t ∉ M) :
-    f (a⁻¹ * x * a) = (t * a * t)⁻¹ * f x * (t * a * t) := by
-  classical
+    f (a⁻¹ * x * a) = (t * a * t)⁻¹ * f x * (t * a * t) ∧
+      g (a⁻¹ * x * a) = (t * a * t)⁻¹ * g x * (t * a * t) ∧
+      h (a⁻¹ * x * a) = (t * a * t)⁻¹ * h x * a := by
   obtain ⟨hfQ, hgQ, hhD⟩ := hmem x hxQ hx1
-  obtain ⟨hfQ', hgQ', hhD'⟩ := hmem _ hconjQ hconj1
   have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht
   have hbD : t * a * t ∈ D := hDstab a haD
   have hbinv : (t * a * t)⁻¹ = t * a⁻¹ * t := by
     rw [mul_inv_rev, mul_inv_rev, htinv]
     group
-  -- the canonical factorization of `t x^a t`
-  have hstep : t * (a⁻¹ * x * a) * t
-      = ((t * a⁻¹ * t) * g x * h x * a) * t * ((t * a⁻¹ * t) * f x * (t * a * t)) := by
-    have hexp : t * (a⁻¹ * x * a) * t
-        = (t * a⁻¹ * t) * (t * x * t) * (t * a * t) := by
-      have e : (t * a⁻¹ * t) * (t * x * t) * (t * a * t)
-          = t * a⁻¹ * (t * t) * x * (t * t) * a * t := by group
-      rw [e, ht]
-      group
-    rw [hexp, heq x hxQ hx1]
-    have e2 : ((t * a⁻¹ * t) * g x * h x * a) * t *
-          ((t * a⁻¹ * t) * f x * (t * a * t))
-        = (t * a⁻¹ * t) * g x * h x * (a * (t * t) * a⁻¹) * t * f x * (t * a * t) := by
-      group
-    rw [e2, ht]
-    group
-  -- both parts lie where they should
-  have hMa : (t * a⁻¹ * t) * g x * h x * a ∈ M :=
-    M.mul_mem (M.mul_mem (M.mul_mem (hDM (hbinv ▸ D.inv_mem hbD)) (hQM hgQ))
-      (hDM hhD)) (hDM haD)
-  have hQb : (t * a⁻¹ * t) * f x * (t * a * t) ∈ Q := by
-    have := hDQ (t * a * t) hbD (f x) hfQ
+  have hconjMem : ∀ z ∈ Q, (t * a⁻¹ * t) * z * (t * a * t) ∈ Q := by
+    intro z hz
+    have := hDQ (t * a * t) hbD z hz
     rwa [hbinv] at this
-  -- uniqueness of the factorization
-  obtain ⟨w, -, huniq⟩ := hfact (t * (a⁻¹ * x * a) * t) hconjM
-  have hMa' : g (a⁻¹ * x * a) * h (a⁻¹ * x * a) ∈ M :=
-    M.mul_mem (hQM hgQ') (hDM hhD')
-  have e₁ := huniq (⟨⟨g (a⁻¹ * x * a) * h (a⁻¹ * x * a), hMa'⟩, ⟨f (a⁻¹ * x * a), hfQ'⟩⟩)
-    (by rw [heq _ hconjQ hconj1])
-  have e₂ := huniq (⟨⟨(t * a⁻¹ * t) * g x * h x * a, hMa⟩,
-    ⟨(t * a⁻¹ * t) * f x * (t * a * t), hQb⟩⟩) (by rw [hstep])
-  have hfeq : f (a⁻¹ * x * a) = (t * a⁻¹ * t) * f x * (t * a * t) :=
-    congrArg (Subtype.val (p := fun z => z ∈ Q))
-      (congrArg Prod.snd (e₁.trans e₂.symm))
-  rw [hfeq, hbinv]
+  have hdD : (t * a⁻¹ * t) * h x * a ∈ D :=
+    D.mul_mem (D.mul_mem (hbinv ▸ D.inv_mem hbD) hhD) haD
+  obtain ⟨e₁, e₂, e₃⟩ := fgh_eq_of_canonical hsplit hfact hQM hDM hmem heq
+    hconjQ hconj1 hconjM (hconjMem _ hgQ) hdD (hconjMem _ hfQ)
+    (canonical_conj ht heq hxQ hx1)
+  exact ⟨by rw [e₁, hbinv], by rw [e₂, hbinv], by rw [e₃, hbinv]⟩
 
 end OddOrder.GroupTheory.RankOneBNPair

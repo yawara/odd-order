@@ -14577,7 +14577,12 @@ only through its diagonal. -/
 determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and `L − M = M t Q`. -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.exists_fgh
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.fgh_unique
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.fgh_eq_of_canonical
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.canonical_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.canonical_f
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.canonical_conj
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hOne
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hTwo
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hThree
 #assert_only_allowed_axioms Subgroup.mem_normalizer_of_conj_mem
 #assert_only_allowed_axioms
