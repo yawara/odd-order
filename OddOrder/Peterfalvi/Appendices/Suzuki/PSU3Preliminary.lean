@@ -308,6 +308,28 @@ theorem eq_one_of_f_mul_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   rw [e]
   exact hyp.Q0.mul_mem (hyp.Q0.inv_mem hkS) hargQ0
 
+/-- **`f` maps `Q − Q₀` into `Q − Q₀`** (positive form of `mem_Q0_of_f_mem_Q0`).
+
+Step (8) needs this to know that `f(ω₁ x)` really has a nontrivial image in `Q/Q₀`,
+so that it lies in exactly one `D`-orbit of `(Q/Q₀)^#` and the counts `m_i` sum to
+`|Q₀|`. -/
+theorem f_mem_sdiff_Q0 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {x : G} (hxQ : x ∈ hyp.Q) (hxQ0 : x ∉ hyp.Q0) :
+    f x ∈ hyp.Q ∧ f x ∉ hyp.Q0 := by
+  have hx1 : x ≠ 1 := fun hc => hxQ0 (hc ▸ hyp.Q0.one_mem)
+  exact ⟨H.f_mem hxQ hx1, fun hcc => hxQ0 (hyp.mem_Q0_of_f_mem_Q0 H hC2 hxQ hx1 hcc)⟩
+
+/-- **`g` maps `Q − Q₀` into `Q − Q₀`**, likewise. -/
+theorem g_mem_sdiff_Q0 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {x : G} (hxQ : x ∈ hyp.Q) (hxQ0 : x ∉ hyp.Q0) :
+    g x ∈ hyp.Q ∧ g x ∉ hyp.Q0 := by
+  have hx1 : x ≠ 1 := fun hc => hxQ0 (hc ▸ hyp.Q0.one_mem)
+  exact ⟨H.g_mem hxQ hx1, fun hcc => hxQ0 (hyp.mem_Q0_of_g_mem_Q0 H hC2 hxQ hx1 hcc)⟩
+
 /-! ## Step (5): no fixed points on the `D`-orbits of `Q − Q₀` -/
 
 /-- **`j : x ↦ x⁻¹` has no fixed point on the `D`-orbits of `Q − Q₀`.**
