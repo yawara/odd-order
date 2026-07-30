@@ -68,7 +68,10 @@ theorem exists_bilinear_lift_of_pinned_restriction [Finite F]
         (∀ a ∈ A, στ.1 a = β a ∧ στ.2 a = α a)) :
     ∃ φ : LinearMap.BilinMap (ZMod 2) F F,
       (∀ x : F, φ x x = χ x) ∧
-      ∀ a ∈ A, ∀ b ∈ A, ∀ x y : F, φ (a * x) (b * y) = α a * β b * φ x y := by
+      (∀ a ∈ A, ∀ b ∈ A, ∀ x y : F, φ (a * x) (b * y) = α a * β b * φ x y) ∧
+      ∀ a b : F,
+        (∀ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F), c στ ≠ 0 → στ.1 a * στ.2 a = b) →
+        ∀ x y : F, φ (a * x) (a * y) = b * φ x y := by
   classical
   letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
   haveI : SMulCommClass F (ZMod 2) F := SMulCommClass.symm _ _ _
@@ -78,7 +81,8 @@ theorem exists_bilinear_lift_of_pinned_restriction [Finite F]
   set g : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) → (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) :=
     fun στ => if P στ then στ else (στ.2, στ.1) with hg
   refine ⟨∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
-    c στ • algAutMulBilin F 2 (g στ).1 (g στ).2, fun x => ?_, fun a ha b hb x y => ?_⟩
+    c στ • algAutMulBilin F 2 (g στ).1 (g στ).2, fun x => ?_,
+    fun a ha b hb x y => ?_, fun a b hab x y => ?_⟩
   · -- the two orders agree on the diagonal
     rw [hexp x]
     simp only [LinearMap.sum_apply, LinearMap.smul_apply, algAutMulBilin_apply,
@@ -106,6 +110,23 @@ theorem exists_bilinear_lift_of_pinned_restriction [Finite F]
             exact ⟨(h a ha).2, (h b hb).1⟩
       rw [map_mul, map_mul, hgres.1, hgres.2]
       ring
+  · -- the *diagonal* scaling needs no reordering: `ρ₁(a) ρ₂(a)` is order-independent
+    simp only [LinearMap.sum_apply, LinearMap.smul_apply, algAutMulBilin_apply,
+      smul_eq_mul, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun στ _ => ?_
+    rcases eq_or_ne (c στ) 0 with h0 | h0
+    · rw [h0, zero_mul, zero_mul, mul_zero]
+    · have hdiag : (g στ).1 a * (g στ).2 a = b := by
+        by_cases hPστ : P στ
+        · simp only [hg, if_pos hPστ]
+          exact hab στ h0
+        · simp only [hg, if_neg hPστ]
+          rw [mul_comm]
+          exact hab στ h0
+      rw [map_mul, map_mul]
+      calc c στ * ((g στ).1 a * (g στ).1 x * ((g στ).2 a * (g στ).2 y))
+          = c στ * (((g στ).1 a * (g στ).2 a) * ((g στ).1 x * (g στ).2 y)) := by ring
+        _ = b * (c στ * ((g στ).1 x * (g στ).2 y)) := by rw [hdiag]; ring
 
 end BilinearLift
 

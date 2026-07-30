@@ -306,9 +306,13 @@ theorem exists_bilinear_lift_semilinear (hm : m ≠ 0)
             ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) :
     ∃ (φ : LinearMap.BilinMap (ZMod 2) M.E M.E) (α β : M.E ≃ₐ[ZMod 2] M.E),
       (∀ x : M.E, φ x x = hyp.centreQuadraticMapE s M ι x) ∧
-      ∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+      (∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
         ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
-          ∀ x y : M.E, φ (a * x) (b * y) = α a * β b * φ x y := by
+          ∀ x y : M.E, φ (a * x) (b * y) = α a * β b * φ x y) ∧
+      ∀ a b : M.E,
+        (∀ x : M.E, hyp.centreQuadraticMapE s M ι (a * x)
+          = b * hyp.centreQuadraticMapE s M ι x) →
+        ∀ x y : M.E, φ (a * x) (a * y) = b * φ x y := by
   classical
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   letI : Fintype (M.E ≃ₐ[ZMod 2] M.E) := Fintype.ofFinite _
@@ -376,11 +380,12 @@ theorem exists_bilinear_lift_semilinear (hm : m ≠ 0)
     · exact Or.inr fun a ha => by
         rw [hi, hj, hi', hj']
         exact ⟨(h a ha).1, (h a ha).2⟩
-  obtain ⟨φ, hdiag, hsemi⟩ :=
+  obtain ⟨φ, hdiag, hsemi, hdiagscale⟩ :=
     OddOrder.RepresentationTheory.exists_bilinear_lift_of_pinned_restriction M.E
       (hyp.centreQuadraticMapE s M ι) c hexp
       ((OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E)) στ₀.1 στ₀.2 hres
-  exact ⟨φ, στ₀.1, στ₀.2, hdiag, hsemi⟩
+  exact ⟨φ, στ₀.1, στ₀.2, hdiag, hsemi,
+    fun a b hb x y => hdiagscale a b (fun στ hne => hpin a b hb στ hne) x y⟩
 
 /-- Moving the centre coordinate by an automorphism of `E` moves `χ` the same way:
 `centreQuadraticMap` is `ι` post-composed with the descended square map. -/
@@ -415,15 +420,28 @@ theorem exists_bilinear_lift_normalized (hm : m ≠ 0)
         ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
       (φ : LinearMap.BilinMap (ZMod 2) M.E M.E) (θ : M.E ≃ₐ[ZMod 2] M.E),
       (∀ x : M.E, φ x x = hyp.centreQuadraticMapE s M ι' x) ∧
-      ∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+      (∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
         ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
-          ∀ x y : M.E, φ (a * x) (b * y) = a * θ b * φ x y := by
+          ∀ x y : M.E, φ (a * x) (b * y) = a * θ b * φ x y) ∧
+      ∀ a b : M.E,
+        (∀ x : M.E, hyp.centreQuadraticMapE s M ι' (a * x)
+          = b * hyp.centreQuadraticMapE s M ι' x) →
+        ∀ x y : M.E, φ (a * x) (a * y) = b * φ x y := by
   classical
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  obtain ⟨φ₀, α, β, hdiag, hsemi⟩ :=
+  obtain ⟨φ₀, α, β, hdiag, hsemi, hdiagscale⟩ :=
     hyp.exists_bilinear_lift_semilinear s M hm hQ0card ι d hequiv
+  have hχ' : ∀ x : M.E,
+      hyp.centreQuadraticMapE s M
+          (ι.trans (OddOrder.FiniteField.frobFixedRestrict (m := m) α.symm.toRingEquiv)) x
+        = α.symm (hyp.centreQuadraticMapE s M ι x) := by
+    intro x
+    rw [hyp.centreQuadraticMapE_apply, hyp.centreQuadraticMapE_apply,
+      hyp.centreQuadraticMap_trans s M ι]
+    rfl
   refine ⟨ι.trans (OddOrder.FiniteField.frobFixedRestrict (m := m) α.symm.toRingEquiv),
-    φ₀.compr₂ α.symm.toLinearMap, β.trans α.symm, fun x => ?_, fun a ha b hb x y => ?_⟩
+    φ₀.compr₂ α.symm.toLinearMap, β.trans α.symm, fun x => ?_, fun a ha b hb x y => ?_,
+    fun a b hb x y => ?_⟩
   · -- the diagonal, read through the moved coordinate
     simp only [LinearMap.compr₂_apply, AlgEquiv.toLinearMap_apply]
     rw [hdiag x, hyp.centreQuadraticMapE_apply, hyp.centreQuadraticMapE_apply,
@@ -432,6 +450,16 @@ theorem exists_bilinear_lift_normalized (hm : m ≠ 0)
   · -- `α⁻¹ (α a · β b · φ₀ x y) = a · (α⁻¹ β) b · α⁻¹ (φ₀ x y)`
     change α.symm (φ₀ (a * x) (b * y)) = _
     rw [hsemi a ha b hb x y, map_mul, map_mul, α.symm_apply_apply]
+    rfl
+  · -- the diagonal scaling, with the constant read through `α`
+    have hsc : ∀ x : M.E, hyp.centreQuadraticMapE s M ι (a * x)
+        = α b * hyp.centreQuadraticMapE s M ι x := by
+      intro x
+      have := congrArg (fun z : M.E => α z) (hb x)
+      simp only [hχ'] at this
+      rwa [α.apply_symm_apply, map_mul α, α.apply_symm_apply] at this
+    change α.symm (φ₀ (a * x) (a * y)) = _
+    rw [hdiagscale a (α b) hsc x y, map_mul α.symm, α.symm_apply_apply]
     rfl
 
 /-! ## Step (3): the isomorphism with the model -/
@@ -533,13 +561,24 @@ theorem exists_mulEquiv_bookCocycle (hm : m ≠ 0)
               = a * θ b *
                 ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) ∧
       (∀ x : M.E, x ≠ 0 → φ x x ≠ 0) ∧
+      (∀ a b : M.E,
+        (∀ x : M.E,
+          ((hyp.centreQuadraticMap s M ι' (a * x) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+            = b * ((hyp.centreQuadraticMap s M ι' x :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) →
+        ∀ x y : M.E,
+          ((φ (a * x) (a * y) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+            = b * ((φ x y :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) ∧
       (∀ z : ↥(Subgroup.center hyp.Q),
         Φ (z : ↥hyp.Q) = ⟨0, ι' (Additive.ofMul z)⟩) ∧
       ∀ e : ↥hyp.Q, (Φ e).quotient =
         M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) e)) := by
   classical
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  obtain ⟨ι', φ₀, θ, hdiag, hsemi⟩ :=
+  obtain ⟨ι', φ₀, θ, hdiag, hsemi, hdiagscale⟩ :=
     hyp.exists_bilinear_lift_normalized s M hm hQ0card ι d hequiv
   -- the diagonal already lies in `F`
   have hdiagF : ∀ x : M.E,
@@ -559,7 +598,7 @@ theorem exists_mulEquiv_bookCocycle (hm : m ≠ 0)
     rfl
   obtain ⟨Φ, hker, hquot⟩ :=
     hyp.exists_mulEquiv_bilinearTwistedProduct s M ι' _ hdiagφ
-  refine ⟨ι', OddOrder.FiniteField.bilinCodRestrict m ψ hval, θ, Φ, ?_, ?_, hker, hquot⟩
+  refine ⟨ι', OddOrder.FiniteField.bilinCodRestrict m ψ hval, θ, Φ, ?_, ?_, ?_, hker, hquot⟩
   · -- the semilinearity survives the correction, since `a · θ b` lies in `F`
     intro a ha b hb x y
     rw [OddOrder.FiniteField.bilinCodRestrict_apply,
@@ -576,6 +615,26 @@ theorem exists_mulEquiv_bookCocycle (hm : m ≠ 0)
     have := congrArg (fun z : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) => (z : M.E)) h0
     rw [OddOrder.FiniteField.bilinCodRestrict_apply, hdiagψ x, hdiag x] at this
     exact this
+  · -- the *diagonal* scaling, which is what makes the `K₁W₁`-action an automorphism
+    intro a b hb x y
+    -- the scaling constant lies in `F`, since `χ` is `F`-valued and anisotropic
+    have hbF : b ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := by
+      obtain ⟨x₀, hx₀⟩ := exists_ne (0 : M.E)
+      have hval0 : ((hyp.centreQuadraticMap s M ι' x₀ :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) ≠ 0 := fun h =>
+        hx₀ (hyp.centreQuadraticMap_anisotropic s M ι' x₀ (Subtype.ext h))
+      have hbeq : b = ((hyp.centreQuadraticMap s M ι' (a * x₀) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) *
+          (((hyp.centreQuadraticMap s M ι' x₀ :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))⁻¹ := by
+        rw [hb x₀, mul_assoc, mul_inv_cancel₀ hval0, mul_one]
+      rw [hbeq]
+      exact Subfield.mul_mem _ (hyp.centreQuadraticMap s M ι' (a * x₀)).2
+        (Subfield.inv_mem _ (hyp.centreQuadraticMap s M ι' x₀).2)
+    rw [OddOrder.FiniteField.bilinCodRestrict_apply,
+      OddOrder.FiniteField.bilinCodRestrict_apply, hform, hform,
+      hdiagscale a b hb x y, OddOrder.FiniteField.frobTrace_mul_of_mem m hbF]
+    ring
 
 open scoped Classical in
 /-- **The model `S₁` exists**: taking the canonical bilinear lift of `χ` supplied
