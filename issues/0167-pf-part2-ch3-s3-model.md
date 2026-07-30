@@ -104,6 +104,8 @@ Appendix III Definition 3 により `S` は中心拡大
     step 1 の `ι` は単射 `→+` だったので、値が部分体 `F` に落ちること + 両側とも `q` 元
     から全単射に格上げして `Additive Z(Q) ≃+ ↥F` にした。Lemma 1(c) が要求する形。
   * `g ∘ q = q' ∘ f` (二次写像の整合): χ の構成 (step 2) がまさにこれ。
+- [x] 段 (3) の残り (書籍の明示 cocycle): **完了** (2026-07-31,
+  `exists_mulEquiv_bookCocycle`)
 - [ ] 段 (4): 作用の共役化 (Zassenhaus)
 - [ ] 段 (5): `s ↦ (0,1)` の正規化
 - [ ] Proposition 本体の statement + AxiomsCheck 登録
@@ -472,10 +474,25 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
      座標を選ぶ」の intrinsic 版。支える補助 = `map_mem_frobFixedSubfield`
      (`E` の自己同型は `F` を保つ: `α(a)^q = α(a^q) = α(a)`) と
      `frobFixedRestrict` (その `F` への制限)。
-  5. `exists_bilinear_frobFixed_of_diag` (P4) で `F` 値に補正 (半双線形性は
-     明示式から従う)。
-  6. `↥F` に corestrict して `centreQuadraticMap s M ι'` と対角を突き合わせ、
-     `exists_mulEquiv_bilinearTwistedProduct` に食わせて完了。
+  5-6. ✅ **完了** (`exists_mulEquiv_bookCocycle`, 2026-07-31)。
+     `exists_bilinear_frobFixed_of_diag` (P4) で `F` 値に補正 → `bilinCodRestrict`
+     で `↥F` 値の `BilinMap` に corestrict → 対角が `centreQuadraticMap s M ι'` と
+     一致 → `exists_mulEquiv_bilinearTwistedProduct` に食わせて完了。
+     半双線形性は補正の明示式から: `a · θ(b) ∈ F` なので `Tr` を素通りする。
+
+## 🎯 段 (3) 完了 (2026-07-31)
+
+`exists_mulEquiv_bookCocycle` — **書籍 p.120 の Proposition の cocycle 条件込みで
+`S ≅ S₁`**:
+* `S₁ = E ×_φ F` (`BilinearTwistedProduct φ`)、`φ : E × E → F` 双加法的
+* `φ(ax, by) = a · b^θ · φ(x,y)` (`a, b ∈ F`) — Proposition の半双線形性
+* `x ≠ 0 ⟹ φ(x,x) ≠ 0` — Proposition の anisotropy (χ の anisotropy から)
+* 同型は `Z(Q)` を核座標へ (`ι'` 経由)、商へ `M.coord` を誘導
+
+⚠ **書籍より短くなった点 3 つ**: (i) `λ₂ = 0` は不要 (Proposition の 3 条件は
+`λ₂` 項も満たす)、(ii) `F` 値性は係数の bar 対称性でなく trace 補正で出る、
+(iii) `d` の `1 + 2^t` 正規化は不要 (生き残る対 2 つの比較だけで `F` 制限が
+共通と分かり、`α = id` は後から `α⁻¹` を後合成すれば済む)。
 
 ### 段 (2) 完了 (2026-07-30)
 

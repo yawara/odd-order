@@ -58,14 +58,6 @@ open OddOrder.GroupTheory.Suzuki2Group
 open OddOrder.Isaacs.Ch03
 open scoped IsMulCommutative
 
-/-- The subfield `F = {x : x^q = x}` of `E` carries a `ZMod 2`-algebra structure,
-just as `E` does (`QuotientFieldModel.instAlgebraZModTwo`); it is not derivable by
-instance search because `ZMod.algebra` is deliberately a `def`. -/
-noncomputable instance instAlgebraZModTwoFrobFixed {E : Type*} [Field E] [Finite E]
-    [CharP E 2] (n : ℕ) :
-    Algebra (ZMod 2) ↥(OddOrder.FiniteField.frobFixedSubfield E 2 n) :=
-  ZMod.algebra _ 2
-
 namespace Hypothesis
 
 universe uG uΩ
@@ -499,6 +491,91 @@ theorem exists_mulEquiv_bilinearTwistedProduct
               (Multiplicative.ofAdd (ι (Additive.ofMul z)))) := congrArg Φ hz.symm
       _ = _ := hinl (ι (Additive.ofMul z))
   · exact hquot e
+
+include s in
+/-- **Step (3) of the Ch. III §3 Proposition, in the book's form** (Peterfalvi
+Part II, p. 120–121).
+
+`S ≅ S₁ = E ×_φ F` where the cocycle `φ : E × E → F` is bi-additive and satisfies
+
+* `φ (a x) (b y) = a · b^θ · φ (x, y)` for `a, b ∈ F` — the Proposition's
+  semilinearity, with `θ` the automorphism produced by the Lemma 2(c) expansion;
+* `x ≠ 0 ⟹ φ (x, x) ≠ 0` — the Proposition's anisotropy, which is the anisotropy
+  of `χ` since `φ` lifts it.
+
+The isomorphism carries `Z(Q)` onto the kernel coordinate by `ι'` and induces
+`M.coord` on the quotient.
+
+The chain is: pinned Lemma 2(c) expansion → all surviving pairs restrict to `F` the
+same way → reordered bilinear lift → normalize the first automorphism to the
+identity → correct the values into `F` by the relative trace. -/
+theorem exists_mulEquiv_bookCocycle (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) :
+    ∃ (ι' : Additive ↥(Subgroup.center hyp.Q) ≃+
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+      (φ : LinearMap.BilinMap (ZMod 2) M.E
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+      (θ : M.E ≃ₐ[ZMod 2] M.E)
+      (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ),
+      (∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+        ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+          ∀ x y : M.E,
+            ((φ (a * x) (b * y) :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+              = a * θ b *
+                ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) ∧
+      (∀ x : M.E, x ≠ 0 → φ x x ≠ 0) ∧
+      (∀ z : ↥(Subgroup.center hyp.Q),
+        Φ (z : ↥hyp.Q) = ⟨0, ι' (Additive.ofMul z)⟩) ∧
+      ∀ e : ↥hyp.Q, (Φ e).quotient =
+        M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) e)) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨ι', φ₀, θ, hdiag, hsemi⟩ :=
+    hyp.exists_bilinear_lift_normalized s M hm hQ0card ι d hequiv
+  -- the diagonal already lies in `F`
+  have hdiagF : ∀ x : M.E,
+      φ₀ x x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := by
+    intro x
+    rw [hdiag x, hyp.centreQuadraticMapE_apply]
+    exact (hyp.centreQuadraticMap s M ι' x).2
+  -- correct the off-diagonal values into `F`
+  obtain ⟨u, ψ, hform, hval, hdiagψ⟩ :=
+    OddOrder.FiniteField.exists_bilinear_frobFixed_of_diag (E := M.E) m hm M.card φ₀ hdiagF
+  have hdiagφ : ∀ x : M.E,
+      OddOrder.FiniteField.bilinCodRestrict m ψ hval x x
+        = hyp.centreQuadraticMap s M ι' x := by
+    intro x
+    refine Subtype.ext ?_
+    rw [OddOrder.FiniteField.bilinCodRestrict_apply, hdiagψ x, hdiag x]
+    rfl
+  obtain ⟨Φ, hker, hquot⟩ :=
+    hyp.exists_mulEquiv_bilinearTwistedProduct s M ι' _ hdiagφ
+  refine ⟨ι', OddOrder.FiniteField.bilinCodRestrict m ψ hval, θ, Φ, ?_, ?_, hker, hquot⟩
+  · -- the semilinearity survives the correction, since `a · θ b` lies in `F`
+    intro a ha b hb x y
+    rw [OddOrder.FiniteField.bilinCodRestrict_apply,
+      OddOrder.FiniteField.bilinCodRestrict_apply, hform, hform, hsemi a ha b hb x y]
+    have hab : a * θ b ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m :=
+      Subfield.mul_mem _ ha
+        (OddOrder.FiniteField.map_mem_frobFixedSubfield θ.toRingEquiv hb)
+    rw [OddOrder.FiniteField.frobTrace_mul_of_mem m hab]
+    ring
+  · -- anisotropy, inherited from `χ`
+    intro x hx h0
+    refine hx (hyp.centreQuadraticMap_anisotropic s M ι' x ?_)
+    refine Subtype.ext ?_
+    have := congrArg (fun z : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) => (z : M.E)) h0
+    rw [OddOrder.FiniteField.bilinCodRestrict_apply, hdiagψ x, hdiag x] at this
+    exact this
 
 open scoped Classical in
 /-- **The model `S₁` exists**: taking the canonical bilinear lift of `χ` supplied

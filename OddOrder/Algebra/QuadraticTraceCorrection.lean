@@ -50,6 +50,15 @@ open Module
 
 variable {E : Type*} [Field E] [Finite E] [CharP E 2] [Algebra (ZMod 2) E] (m : ℕ)
 
+/-- The subfield `F = {x : x^q = x}` carries a `ZMod 2`-algebra structure, just as
+`E` does.  Not derivable by instance search because `ZMod.algebra` is deliberately
+a `def`; registered here so that `QuadraticMap (ZMod 2) E ↥F` and bilinear forms
+into `F` can be written down. -/
+noncomputable instance instAlgebraZModTwoFrobFixed {E' : Type*} [Field E'] [Finite E']
+    [CharP E' 2] (n : ℕ) :
+    Algebra (ZMod 2) ↥(frobFixedSubfield E' 2 n) :=
+  ZMod.algebra _ 2
+
 /-! ## The relative trace -/
 
 /-- **The relative trace `Tr : E → E` of `E = 𝐅_{q²}` over `F = 𝐅_q`**, `z ↦ z + z^q`
@@ -127,6 +136,33 @@ theorem exists_frobTrace_eq_one (hm : m ≠ 0) (hcard : Nat.card E = (2 ^ m) ^ 2
   refine ⟨(frobTrace (E := E) m e)⁻¹ * e, ?_⟩
   rw [frobTrace_mul_of_mem m (Subfield.inv_mem _ hmem) e]
   exact inv_mul_cancel₀ he
+
+/-- **Corestrict an `F`-valued bilinear form on `E` to a bilinear form into `F`.**
+
+Needed because the model `S₁` of Peterfalvi Part II, Ch. III §3 has kernel `F`, so
+its cocycle must be typed as a form into `F`, while the correction above produces
+one typed into `E` that happens to take values in `F`. -/
+noncomputable def bilinCodRestrict (ψ : LinearMap.BilinMap (ZMod 2) E E)
+    (h : ∀ x y : E, ψ x y ∈ OddOrder.FiniteField.frobFixedSubfield E 2 m) :
+    LinearMap.BilinMap (ZMod 2) E ↥(OddOrder.FiniteField.frobFixedSubfield E 2 m) where
+  toFun x :=
+    { toFun := fun y => ⟨ψ x y, h x y⟩
+      map_add' := fun y y' => Subtype.ext (by simp)
+      map_smul' := fun c y => by
+        refine Subtype.ext ?_
+        rcases (by decide : ∀ a : ZMod 2, a = 0 ∨ a = 1) c with hc | hc <;> subst hc <;> simp }
+  map_add' x x' := by
+    refine LinearMap.ext fun y => Subtype.ext ?_
+    simp
+  map_smul' c x := by
+    refine LinearMap.ext fun y => Subtype.ext ?_
+    rcases (by decide : ∀ a : ZMod 2, a = 0 ∨ a = 1) c with hc | hc <;> subst hc <;> simp
+
+@[simp] theorem bilinCodRestrict_apply (ψ : LinearMap.BilinMap (ZMod 2) E E)
+    (h : ∀ x y : E, ψ x y ∈ OddOrder.FiniteField.frobFixedSubfield E 2 m) (x y : E) :
+    ((bilinCodRestrict m ψ h x y :
+      ↥(OddOrder.FiniteField.frobFixedSubfield E 2 m)) : E) = ψ x y :=
+  rfl
 
 /-! ## Correcting a bilinear form into `F` -/
 

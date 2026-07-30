@@ -14498,6 +14498,7 @@ cocycle of Ch. III §3, p. 121, which reads it off a bar-symmetry of the expansi
 #assert_only_allowed_axioms OddOrder.FiniteField.frobTrace_mem
 #assert_only_allowed_axioms OddOrder.FiniteField.exists_frobTrace_eq_one
 #assert_only_allowed_axioms OddOrder.FiniteField.exists_bilinear_frobFixed_of_diag
+#assert_only_allowed_axioms OddOrder.FiniteField.bilinCodRestrict_apply
 
 /-! **Step (3) of the Ch. III §3 Proposition: `S ≅ S₁`** (issue 0167, 2026-07-30).
 `Appendices/Suzuki/ModelIsomorphism.lean` — the book's `S₁` is the twisted product `E ×_φ F`
@@ -14525,6 +14526,8 @@ only through its diagonal. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centreQuadraticMap_trans
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_bilinear_lift_normalized
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mulEquiv_bookCocycle
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.toMul_symm_centreQuadraticMap
 #assert_only_allowed_axioms
