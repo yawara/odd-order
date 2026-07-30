@@ -272,15 +272,20 @@ Appendix I Prop 2 の regular 版 (`exists_field_coordinate_realization`) で
 
   ### 段 (2) `θ ≠ 1` 分岐の実装計画 (次の一手)
 
-  1. **`Z(Q)` 座標を `M.E` の中へ** (前半 = 初等アーベル性 + 自由性は上で landing 済):
+  1. ✅ **`Z(Q)` 座標を `M.E` の中へ — 2026-07-30 完了**
+     (`exists_center_coordinate_exponent`)。以下は当初の計画メモ:
      `Huppert.exists_field_coordinate_realization` を `Z(Q)` + `centerKHom` に当てて
      位数 `q` の体 `F` を得る。`F` を
      `FiniteField.ringEquivOfCardEq` (Algebra instance 不要) で
      `frobFixedSubfield M.E` に移す。`s.centerEqQ0` で `Z(Q) ↔ Q₀` を渡す。
      出力 = `ι : Additive ↥(Z(Q)) ≃+ ↥(frobFixedSubfield M.E)` と
      `ι (k • z) = μ(k)^d * ι z`。
-     ⚠ **残る道具**: `γ` と `μ|_K` の像が `E^×` 内で一致すること = 「巡回群の与位数の
-     部分群は一意」。これが出れば `MonoidHom.map_cyclic` で `d` が取れる。
+     ⚠ **残る道具**だった「巡回群の与位数の部分群は一意」は **repo に既存**だった:
+     `OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq`
+     (`GroupTheory/CyclicSubgroupUniqueness.lean`, issue 9161 の dedup 産物)。
+     `ν` (= `Q₀` 側 `γ` を `E^×` へ送ったもの) と `μ'` (= 段 (1) の `μ|_K`) はどちらも単射
+     なので像は同位数の部分群 ⟹ 一致。`K` の生成元 `k₀` で `ν k₀ = (μ' k₀)^d` を取り、
+     `k = k₀^t` で全 `k` へ伝播 (`MonoidHom.map_cyclic` は使わずに済んだ)。
   2. **χ を `E` 座標へ**: `Suzuki2Groups.centralSquareQuadraticMap`
      (Appendix III Lemma 1(a)、`Additive (Q ⧸ Z(Q)) → Additive ↥(Z(Q))` の
      `QuadraticMap (ZMod 2)`) を `M.coord` と `ι` で移して `χ_E : E → E`。

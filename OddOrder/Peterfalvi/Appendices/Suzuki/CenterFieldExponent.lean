@@ -38,10 +38,8 @@ than imported from the type-B data; see issue 0167.
   elementary abelian of exponent `2`.
 * `Hypothesis.actualKActor_free_on_center` — `K` acts freely on `Z(Q) ∖ {1}`
   (transitivity plus the count `|K| = |Z(Q)| − 1`).
-The coordinate `ι` and the exponent `d` themselves are the next step; see
-issue 0167 for the remaining ingredient (a subgroup of given order in a cyclic
-group is unique, used to see that the two presentations of `K` inside `E^×` have
-the same image).
+* `Hypothesis.exists_center_coordinate_exponent` — the coordinate `ι` and the
+  exponent `d`.
 -/
 
 set_option autoImplicit false
@@ -120,6 +118,128 @@ theorem actualKActor_free_on_center {m : ℕ} (s : hyp.LemmaFiveSetup m)
   refine hinj ?_
   rw [hf]
   exact Subtype.ext (by simpa [map_one] using hfix)
+
+
+/-! ## The coordinate and the exponent -/
+
+open scoped Classical in
+/-- **The `Q₀`-side coordinate inside `E`, with the exponent `d`** (Peterfalvi
+Part II, Ch. III §3, p. 120).
+
+`K` is regular on `Z(Q) ∖ {1}`, so Appendix I Proposition 2 in its regular form
+turns `Z(Q)` into a field of order `q` on which `K` acts by multiplication; by
+uniqueness of finite fields (`FiniteField.ringEquivOfCardEq`) that field *is* the
+subfield `F = {x : x^q = x}` of `E`.  Transporting gives an additive embedding
+`ι : Z(Q) → E` with image in `F`, and the `K`-action becomes multiplication by
+`μ(k)^d` for a single integer `d`.
+
+The exponent exists because the two presentations `γ` and `μ|_K` of `K` inside
+`E^×` have the *same image*: both are injective, so the images are subgroups of
+the cyclic group `E^×` of the same order, hence equal
+(`cyclic_subgroup_eq_of_card_eq`).  Writing `k = k₀^t` for a generator `k₀` then
+propagates a single `d` to all of `K`. -/
+theorem exists_center_coordinate_exponent {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m) :
+    ∃ (ι : Additive ↥(Subgroup.center hyp.Q) →+ M.E) (d : ℤ),
+      Function.Injective ι ∧
+      (∀ z, (ι z) ^ 2 ^ m = ι z) ∧
+      ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+        ι (Additive.ofMul (hyp.centerKHom k z))
+          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) * ι (Additive.ofMul z) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hEA : IsElementaryAbelian 2 ↥(Subgroup.center hyp.Q) :=
+    hyp.isElementaryAbelian_center_of_lemmaFiveSetup s
+  have hZcard : Nat.card ↥(Subgroup.center hyp.Q) = 2 ^ m := by
+    rw [s.centerEqQ0,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv, hQ0card]
+  letI : CommGroup ↥(Subgroup.center hyp.Q) :=
+    { (inferInstance : Group ↥(Subgroup.center hyp.Q)) with mul_comm := hEA.comm }
+  haveI : Nontrivial ↥(Subgroup.center hyp.Q) := by
+    refine Finite.one_lt_card_iff_nontrivial.mp ?_
+    rw [hZcard]
+    exact Nat.one_lt_pow hm (by norm_num)
+  haveI := hyp.actualKActor_isCyclic
+  letI : CommGroup ↥hyp.actualKActor := IsCyclic.commGroup
+  -- Appendix I Proposition 2 on `Z(Q)`
+  obtain ⟨F, instF, instFin, γ, α, hcardF, hγ⟩ :=
+    Huppert.exists_field_coordinate_realization hEA hyp.centerKHom
+      (fun k z hz hfix => hyp.actualKActor_free_on_center s k z hz hfix)
+      s.cardActorCenter
+  letI : Field F := instF
+  haveI : Finite F := instFin
+  -- `F` is the subfield `{x : x^q = x}` of `E`
+  set F₁ : Subfield M.E := OddOrder.FiniteField.frobFixedSubfield M.E 2 m with hF₁
+  have hF₁card : Nat.card ↥F₁ = 2 ^ m :=
+    OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm
+  haveI : Fintype F := Fintype.ofFinite F
+  haveI : Fintype ↥F₁ := Fintype.ofFinite _
+  have hcards : Fintype.card F = Fintype.card ↥F₁ := by
+    rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card, hcardF, hZcard, hF₁card]
+  let e : F ≃+* ↥F₁ := FiniteField.ringEquivOfCardEq hcards
+  -- the coordinate
+  let ι : Additive ↥(Subgroup.center hyp.Q) →+ M.E :=
+    (F₁.subtype.toAddMonoidHom).comp
+      ((e.toAddEquiv.toAddMonoidHom).comp α.toAddMonoidHom)
+  have hιapply : ∀ z, ι z = ((e (α z) : ↥F₁) : M.E) := fun _ => rfl
+  have hιinj : Function.Injective ι := by
+    intro a b hab
+    rw [hιapply, hιapply] at hab
+    exact α.injective (e.injective (Subtype.ext hab))
+  -- the two presentations of `K` inside `E^×`
+  let ν : ↥hyp.actualKActor →* M.Eˣ :=
+    ((Units.map F₁.subtype.toMonoidHom).comp (Units.map e.toMonoidHom)).comp
+      γ.toMonoidHom
+  let μ' : ↥hyp.actualKActor →* M.Eˣ := M.mu.comp (MonoidHom.inl _ _)
+  have hνval : ∀ k, ((ν k : M.Eˣ) : M.E) = ((e (γ k : F) : ↥F₁) : M.E) :=
+    fun _ => rfl
+  have hνinj : Function.Injective ν := by
+    intro a b hab
+    refine γ.injective (Units.ext ?_)
+    have := congrArg (fun u : M.Eˣ => (u : M.E)) hab
+    rw [hνval, hνval] at this
+    exact e.injective (Subtype.ext this)
+  have hμ'inj : Function.Injective μ' := M.mu_K_injective
+  -- equal ranges, by uniqueness of subgroups of a given order in a cyclic group
+  have hrangecard : Nat.card ↥(ν.range) = Nat.card ↥(μ'.range) := by
+    have h1 : Nat.card ↥hyp.actualKActor = Nat.card ↥(ν.range) :=
+      Nat.card_congr (Equiv.ofInjective ν hνinj)
+    have h2 : Nat.card ↥hyp.actualKActor = Nat.card ↥(μ'.range) :=
+      Nat.card_congr (Equiv.ofInjective μ' hμ'inj)
+    exact h1.symm.trans h2
+  have hrange : ν.range = μ'.range :=
+    OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq hrangecard
+  -- a generator of `K` transports a single exponent to all of `K`
+  obtain ⟨k₀, hk₀⟩ := IsCyclic.exists_generator (α := ↥hyp.actualKActor)
+  have hmem : ν k₀ ∈ μ'.range := hrange ▸ ⟨k₀, rfl⟩
+  obtain ⟨k₁, hk₁⟩ := hmem
+  obtain ⟨t₁, ht₁'⟩ := hk₀ k₁
+  have ht₁ : k₀ ^ t₁ = k₁ := ht₁'
+  refine ⟨ι, t₁, hιinj, ?_, ?_⟩
+  · -- the coordinate lands in the subfield
+    intro z
+    have hz : ((e (α z) : ↥F₁) : M.E) ∈ F₁ := (e (α z)).2
+    rw [hιapply]
+    exact (OddOrder.FiniteField.mem_frobFixedSubfield).mp hz
+  · -- equivariance
+    intro k z
+    have hν : ν k = μ' k ^ t₁ := by
+      obtain ⟨t, ht'⟩ := hk₀ k
+      have ht : k₀ ^ t = k := ht'
+      have h₀ : ν k₀ = μ' k₀ ^ t₁ := by
+        rw [← hk₁, ← ht₁, map_zpow]
+      calc ν k = ν (k₀ ^ t) := by rw [ht]
+        _ = (ν k₀) ^ t := by rw [map_zpow]
+        _ = (μ' k₀ ^ t₁) ^ t := by rw [h₀]
+        _ = (μ' k₀ ^ t) ^ t₁ := by rw [← zpow_mul, ← zpow_mul, mul_comm]
+        _ = μ' k ^ t₁ := by rw [← map_zpow, ht]
+    have hcoe : ((M.mu (k, 1) ^ t₁ : M.Eˣ) : M.E) = ((e (γ k : F) : ↥F₁) : M.E) := by
+      have : (μ' k ^ t₁ : M.Eˣ) = ν k := hν.symm
+      have h2 : (M.mu (k, 1) ^ t₁ : M.Eˣ) = ν k := this
+      rw [h2, hνval]
+    rw [hcoe, hιapply, hιapply, hγ k z, map_mul]
+    simp
 
 end Hypothesis
 
