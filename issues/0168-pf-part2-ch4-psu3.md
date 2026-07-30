@@ -380,7 +380,11 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 `M.coord ⟦z⟧ ≠ 0` (`coord` が加法同型 + `Z(Q) = Q₀`)。これで
 `f(ω₁x)` の座標を**単位**として扱える。
 
-**残作業**: (i) `Φ` 本体の構成 (単位化 + 剰余類化)、(iii) ファイバー評価 2 本を
+**(i) 完了**: `orbitOfF : ↥Q₀ → M.Eˣ ⧸ (MonoidHom.range M.mu)` —
+`x ↦ f(ω x) の座標の μ(KW)-剰余類`。well-defined は
+`mul_mem_sdiff_Q0` → `f_mem_sdiff_Q0` → `coord_ne_zero_of_not_mem_Q0` → `Units.mk0`。
+
+**残作業**: (iii) ファイバー評価 2 本を
 `Φ` の言葉に翻訳 (`exists_conj_mul_Q0_iff` + `exists_mem_K_mem_W_mul` で
 「同じ剰余類」⟺「`∃ y ∈ Q₀, ∃ a ∈ D, …`」に落とす)、(iv) `card_fiber_eq_of_card_eq`
 に流し込む。
