@@ -326,7 +326,13 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 **`|K| = q−1` 完了**: `card_actualKActor_eq`。`μ` が `K` を `F^×` の上へ全単射
 (`mu_K_injective` + `exists_actualKActor_mu_eq`) と `natCard_frobFixedSubfield`。
 
-**残るのは組み立てのみ**: `|μ(W)| = |W|` (`quotientWHom_injective` + `coord_act`) →
+**`|μ(W)| = |W|` も完了**: `mu_W_injective`。`coord_act` で `(1,v)` の作用が
+`μ(1,v)` 倍になり、`coord` が同型なので `quotientWHom` の単射性 (仮説に取る) から
+`μ(1,·)` の単射性が出る。
+
+⟹ **`|μ(KW)| = (q−1)·|W|` の 2 因子が両方確定**。
+
+**残るのは組み立てのみ**:
 `|μ(KW)| = (q−1)m` → `n = |E^×|/|μ(KW)| = (q+1)/m` →
 `q = Σ m_i ≤ n·m − 1 = q` の挟み込み → 全等号。
 
