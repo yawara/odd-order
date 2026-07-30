@@ -14628,6 +14628,8 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_K_mem_W_mul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.coprime_two_pow_sub_one_two_pow_add_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mu_K_pow_two_pow_sub_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mu_K_eq_mu_W_imp_eq_one
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.conj_mem_Q
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_M_union_t
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_conj_Q

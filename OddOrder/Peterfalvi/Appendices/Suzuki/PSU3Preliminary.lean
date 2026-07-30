@@ -9,6 +9,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
 import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.InvertedProduct
 import OddOrder.Peterfalvi.Appendices.Suzuki.KCyclic
+import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 
@@ -910,6 +911,37 @@ theorem exists_mem_K_mem_W_mul (hVW : hyp.V = hyp.W) {d : G} (hd : d ∈ hyp.D) 
     (Nat.bijective_iff_injective_and_card F).mpr ⟨hinj, hcard⟩
   obtain ⟨p, hp⟩ := hbij.2 ⟨d, hd⟩
   exact ⟨(p.1 : G), p.1.2, (p.2 : G), p.2.2, (congrArg Subtype.val hp).symm⟩
+
+/-! ## The scalar group `μ(KW)` inside `E^×`
+
+Step (8) counts the `KW`-orbits on `(Q/Q₀)^# ≅ E^×`, i.e. the index of `μ(KW)` in
+`E^×`.  The two containments recorded in `QuotientFieldModel` — `μ(K) ⊆ F^×` and
+`μ(W)` in the norm-one subgroup — pin its order down to `(q − 1) · |W|`.
+-/
+
+/-- `μ(k)^{q−1} = 1`: `μ(K)` lies in `F^× = 𝐅_q^×`
+(`QuotientFieldModel.mu_K_frobFixed` says `μ(k)^q = μ(k)`). -/
+theorem mu_K_pow_two_pow_sub_one {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (k : ↥hyp.actualKActor) : M.mu (k, 1) ^ (2 ^ m - 1) = 1 := by
+  have hfix : M.mu (k, 1) ^ (2 ^ m) = M.mu (k, 1) := by
+    apply Units.ext
+    rw [Units.val_pow_eq_pow_val]
+    exact M.mu_K_frobFixed k
+  have hle : 1 ≤ 2 ^ m := Nat.one_le_two_pow
+  have e : (2 : ℕ) ^ m = 1 + (2 ^ m - 1) := by omega
+  rw [e, pow_add, pow_one] at hfix
+  have h2 : M.mu (k, 1) * M.mu (k, 1) ^ (2 ^ m - 1) = M.mu (k, 1) * 1 := by
+    rw [mul_one]; exact hfix
+  exact mul_left_cancel h2
+
+/-- **`μ(K) ∩ μ(W) = 1`**: a common value is killed by both `q − 1` and `q + 1`, which
+are coprime. -/
+theorem mu_K_eq_mu_W_imp_eq_one {m : ℕ} (hm : m ≠ 0) (M : hyp.QuotientFieldModel m)
+    {k : ↥hyp.actualKActor} {v : ↥hyp.W} (heq : M.mu (k, 1) = M.mu (1, v)) :
+    M.mu (k, 1) = 1 :=
+  eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one hm
+    (hyp.mu_K_pow_two_pow_sub_one M k)
+    (by rw [heq]; exact M.mu_W_normOne v)
 
 end Hypothesis
 
