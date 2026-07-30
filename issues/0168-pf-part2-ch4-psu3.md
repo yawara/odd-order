@@ -355,11 +355,27 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 書籍 p.124 の「whence all the inequalities are in fact equalities」そのもの。
 完全に一般な補題 (`Finset.sum_eq_sum_iff_of_le` ベース) なので namespace 外。
 
-**残るのは instantiate のみ**: `α = Q₀`、`β = (Q/Q₀)^#` 上の `KW`-軌道集合、
-`M = |W|`、`b₀ = ω̄₁` の軌道、`Φ x = f(ω₁x)‾ の軌道` として上の補題に流し込む。
-必要な 3 つの仮説はすべて既に証明済み (ファイバー評価 2 本 + `|Q₀| = q` と
-`n·|W| = q+1`)。**軌道集合を `Fintype`/`DecidableEq` として構成する部分が
-唯一の新規作業**。
+**残るのは instantiate のみ**。⚠ **設計上の要点 (2026-07-31 に気づいた): 軌道集合を
+一般の `MulAction.orbitRel.Quotient` として作る必要はない**。
+
+`KW` は `Q/Q₀ ≅ E` に**スカラー倍**で作用する (`coord_act`) ので、
+`(Q/Q₀)^# ≅ E^×` 上の `μ(KW)`-軌道は**部分群 `μ(KW) ≤ E^×` の剰余類そのもの**。
+`E^×` は可換なので
+
+    β := Eˣ ⧸ (MonoidHom.range M.mu)
+
+が軌道集合で、これは**商群**なので `Fintype`/`DecidableEq` は mathlib から出る。
+`|β| = (MonoidHom.range M.mu).index` で、`|Eˣ| = q²−1` (`Fintype.card_units`) と
+`|range μ| = |K×W| = (q−1)|W|` (既存 `mu_injective` + `card_actualKActor_eq`) から
+`|β| = (q+1)/|W| = n` ✓。
+
+`Φ : ↥Q₀ → β` は `x ↦ ⟦coord(f(ω₁x) の Q/Q₀ 像) を単位として⟧`。
+`f(ω₁x) ∈ Q−Q₀` (`f_mem_sdiff_Q0`) なので `coord` の値は非零 ⟹ 単位 ✓。
+
+**残作業**: (i) `Φ` の構成、(ii) `|β| = n` の計算、(iii) ファイバー評価 2 本を
+`Φ` の言葉に翻訳 (`exists_conj_mul_Q0_iff` + `exists_mem_K_mem_W_mul` で
+「同じ剰余類」⟺「`∃ y ∈ Q₀, ∃ a ∈ D, …`」に落とす)、(iv) `card_fiber_eq_of_card_eq`
+に流し込む。
 
 (旧メモ) 軌道代表系 `ω₁,…,ω_n` を取り、`m_i` を定義して
 `q = Σ m_i ≤ n·\|W\| − 1 = q` の挟み込みから全等号を出す。ここは Lean 上で
