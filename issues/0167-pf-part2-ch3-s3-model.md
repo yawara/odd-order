@@ -543,8 +543,36 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
 作用まわり (段 (4)) を新 leaf **`ModelAction.lean`** へ切り出した (725 + 282 行)。
 段 (4)/(5) はこちらに積む。
 
-**次**: `A` (KW の `S` 上の共役作用の像) を `Φ` で `Aut S₁` へ移送 →
-`U` = `inducingIdAuts` の設定と `B ⊆ UA` → Zassenhaus で `A^u = B`。
+### Zassenhaus (step (4) 後半) の設計 (2026-07-31 その 5)
+
+`IsComplement'.exists_conj_of_coprime` (`Mathlib/SchurZassenhausConj.lean`) に
+食わせるための要件を洗い出した:
+
+* `U ⊴ Aut(S₁)`: 核 `F` は `Z(S₁)` に一致する (`Φ` が `Z(Q)` を核座標へ送る = `hker`、
+  かつ `s.centerEqQ0`) ので characteristic ⟹ 正規。
+* `UA = UB` かつ `U ∩ A = U ∩ B = 1` (= 補群条件)。
+  `UA = UB` は step (1) より強く出る: 各 `kv` で **共役作用と模型作用は `U` の元だけ
+  違う** (両者とも `E` 上 `μ(kv)` 倍、`F` 上 `μ(k,1)^d` 倍を誘導する)。
+* 互いに素: `|U|` は 2 冪 (Appendix III Lemma 1(d) + `isElementaryAbelian_inducingIdAuts`)、
+  `|A| = |K||W|` は奇数 (`q ∓ 1` はどちらも奇数)。
+* 可解性: `U` は初等アーベル ⟹ 可解。
+
+⚠ **本質的に足りなかったのは `μ` の忠実性** (`U ∩ A = 1` に要る)。issue 冒頭で
+「下流が要求したら着手」と繰延していた項目 — **下流 (step (4)) が要求したので着手**。
+
+* ✅ `Hypothesis.quotientWHom_injective` (2026-07-31, `QuotientKWField.lean`) —
+  **`W` は `Q ⧸ Z(Q)` に忠実に作用する**。monolith
+  (`WCyclicDivides.lean` の `isCyclic_W_and_card_dvd_of_orderThree`) 内の `hfaith` を
+  独立定理として切り出した。ψ 経由の変換は不要で、既存の
+  `quotientWHom_eq_quotientCongr` (rfl) が橋になる。
+  ⚠ 配置: `quotientWHom` は `QuotientKWField.lean` 定義なので、`WCyclicDivides.lean`
+  には置けない (import 方向が逆)。
+* ⏳ 次: `Function.Injective M.mu` — `μ(k,1)` の位数は `q−1` を、`μ(1,v)` の位数は
+  `q+1` を割り、`gcd(q−1, q+1) = 1` (q 偶数ゆえ両方奇数) なので分離できる。
+  `μ(1,v) = 1` から `quotientWHom v = 1` (coord_act) → 上の忠実性で `v = 1`。
+
+**次**: `M.mu` の単射性 → `A` (KW の `S` 上の共役作用の像) を `Φ` で `Aut S₁` へ移送 →
+`U` = `inducingIdAuts` の設定と `UA = UB` → Zassenhaus で `A^u = B`。
 
 landing 済 (2026-07-31):
 * `exists_bilinear_lift_of_pinned_restriction` に第 3 の結論として追加。

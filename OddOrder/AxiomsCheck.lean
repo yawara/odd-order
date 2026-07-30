@@ -14512,6 +14512,8 @@ only through its diagonal. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.sq_eq_inl_diag
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.quotientWHom_injective
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_actualKActor_mu_eq
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centreQuadraticMap_apply

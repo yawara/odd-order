@@ -95,6 +95,58 @@ theorem quotientWHom_eq_quotientCongr (v : ↥hyp.W)
     (hfix : ∀ z ∈ Subgroup.center hyp.Q, hyp.conjQByW v z = z) :
     hyp.quotientWHom v = Suzuki2Groups.quotientCongr (hyp.conjQByW v) hfix := rfl
 
+/-- **`W` acts faithfully on `Q ⧸ Z(Q)`** (Peterfalvi Part II, Ch. I §3, Lemma 5,
+p. 107 — an internal fact of that proof, isolated here for use downstream).
+
+A nonidentity `v ∈ W` moves the `K`-invariant subgroup of order `|Z(Q)|` supplied
+by the splitting (`map_quotientCongr_ne_of_fixedPoints_le`), so it cannot induce
+the identity on `Q ⧸ Z(Q)`.
+
+Step (4) of Ch. III §3 needs this: it is what makes the image of `K W` in
+`Aut(S₁)` meet the automorphisms inducing the identity on both ends of the
+extension trivially, hence a complement for the Zassenhaus argument. -/
+theorem quotientWHom_injective
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card hyp.Q = Nat.card hyp.Q0 ^ 3)
+    (inductionHypothesis : TheoremAInductionBelow G Ω)
+    (s : hyp.LemmaFiveSetup m) :
+    Function.Injective hyp.quotientWHom := by
+  classical
+  have hWfix : ∀ v : ↥hyp.W, ∀ z ∈ Subgroup.center hyp.Q,
+      hyp.conjQByW v z = z :=
+    fun v => hyp.conjQByW_fixes_center s.centerEqQ0 v
+  have hker : ∀ v : ↥hyp.W, hyp.quotientWHom v = 1 → v = 1 := by
+    intro v hv
+    by_contra hvne
+    have hv1 : (v : G) ≠ 1 := fun h => hvne (Subtype.ext h)
+    obtain ⟨hω1, hωodd, -, -, hωfix⟩ :=
+      hyp.conjQByW_omega_facts v.2 hv1 hst hm hQ0card hcardQ
+        inductionHypothesis s.centerEqQ0
+    have hid : ∀ q : ↥hyp.Q ⧸ Subgroup.center hyp.Q,
+        Suzuki2Groups.quotientCongr (hyp.conjQByW v) (hWfix v) q = q := by
+      intro q
+      rw [← hyp.quotientWHom_eq_quotientCongr v (hWfix v), hv]
+      rfl
+    refine Suzuki2Groups.map_quotientCongr_ne_of_fixedPoints_le
+      (le_refl _) s.centerSq s.sqMem s.invMem
+      s.isplit.split.leftInvariant s.isplit.split.leftCard
+      s.transCenter s.centerNeBot
+      (hyp.conjQByW v) hω1 hωodd (hWfix v) hωfix ?_
+    ext y
+    simp only [Subgroup.mem_map, MulEquiv.coe_toMonoidHom]
+    constructor
+    · rintro ⟨x, hx, rfl⟩
+      rwa [hid]
+    · intro hy
+      exact ⟨y, hy, hid y⟩
+  intro v u hvu
+  have hmul : hyp.quotientWHom (v⁻¹ * u) = 1 := by
+    rw [map_mul, ← hvu, ← map_mul, inv_mul_cancel, map_one]
+  have := hker _ hmul
+  rwa [inv_mul_eq_one] at this
+
 /-- The `K`- and `W`-actions on `Q ⧸ Z(Q)` commute: `W = C_V(K)` centralizes `K`
 inside `G`, so the two conjugation automorphisms of `Q` commute
 (`conjQByW_commute_actualKActor`) and the property descends to the quotient. -/
