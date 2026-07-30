@@ -596,8 +596,19 @@ twisted product では `inl w = ⟨0, w⟩`, `rightHom p = ofAdd p.quotient` な
   `conjQHom kv` は中心上 `centerKHom kv.1` に一致し、`hequiv` が定数を出す。
   `Θ` 側は `hΘc`。
 
-**次**: 上記 2 つ (`A` の両端での効果) → `A kv * (Θ kv)⁻¹ ∈ U` → `UA = UB` と
-補群条件 (`mu_injective` で `U ∩ A = U ∩ B = 1`) → Zassenhaus で `A^u = B`。
+✅ **完了 (2026-07-31 その 6)**:
+* `congr_conjQHom_quotient` — 移送した共役作用は商座標を `μ(k,v)` 倍する
+  (`hquot` → `quotientKWHom_mk` → `coord_act` → `hquot` の 4 段、`rw` 一行)。
+* `congr_conjQHom_central` — 核座標は `μ(k,1)^d` 倍。`conjQByW` が `Z(Q)` を各点
+  固定するので `conjQHom` は中心上 `centerKHom` に落ち、`hequiv` が定数を出す。
+* `congr_conjQHom_mul_inv_mem_inducingIdAuts` — **`(Θ kv)⁻¹ · A kv ∈ U`**。
+  書籍の `B ⊆ U A` より強い**各点版**なので `U A = U B` (補群形の Zassenhaus が
+  要求する形) が直に出る。⚠ 逆元の公式は導出不要 — `Θ` は準同型なので
+  `(Θ kv)⁻¹ = Θ (kv⁻¹)` で、`μ`・`ν` の逆元版がそのまま使える。
+
+**次 (段 (4) 最終)**: 補群条件 (`U ∩ A = U ∩ B = 1` は `mu_injective` から) +
+互いに素 + 可解性 を揃えて `IsComplement'.exists_conj_of_coprime` を適用 → `A^u = B`。
+その後 段 (5) (`s ↦ (0,1)` の正規化)。
 
 landing 済 (2026-07-31):
 * `exists_bilinear_lift_of_pinned_restriction` に第 3 の結論として追加。

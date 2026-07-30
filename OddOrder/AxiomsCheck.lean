@@ -14550,6 +14550,12 @@ only through its diagonal. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.modelScalarHom_central
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.congr_conjQHom_quotient
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.congr_conjQHom_central
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.congr_conjQHom_mul_inv_mem_inducingIdAuts
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.congrEquiv_quotient
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.congrEquiv_central
