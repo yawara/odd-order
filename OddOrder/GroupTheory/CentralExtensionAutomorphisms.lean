@@ -217,6 +217,39 @@ theorem _root_.GroupExtension.mem_inducingIdAuts_iff (Φ : MulAut E) :
     Φ ∈ S.inducingIdAuts ↔ S.InducesId Φ :=
   Iff.rfl
 
+/-- **An automorphism preserving the two ends normalizes `U`.**
+
+If `Ψ` maps the embedded kernel *onto* itself (`Ψ ∘ inl = inl ∘ g` with `g`
+surjective) and transforms the quotient coordinate by some `f`
+(`rightHom ∘ Ψ = f ∘ rightHom`), then conjugation by `Ψ` preserves the group of
+automorphisms inducing the identity on both ends.
+
+No condition on `f` is needed: the quotient half follows by comparing `hright` at
+`e` and at `Ψ⁻¹ e`.
+
+Peterfalvi Part II, Ch. III §3, p. 121, step (4) uses this to see `U ⊴ U A`, which
+is what makes `A` and `B` complements of `U` there. -/
+theorem _root_.GroupExtension.inducingIdAuts_conj_mem (Ψ : MulAut E)
+    (g : Multiplicative W → Multiplicative W)
+    (f : Multiplicative V → Multiplicative V)
+    (hg : Function.Surjective g)
+    (hinl : ∀ w : Multiplicative W, Ψ (S.inl w) = S.inl (g w))
+    (hright : ∀ e : E, S.rightHom (Ψ e) = f (S.rightHom e))
+    {u : MulAut E} (hu : u ∈ S.inducingIdAuts) :
+    Ψ * u * Ψ⁻¹ ∈ S.inducingIdAuts := by
+  refine ⟨fun w => ?_, fun e => ?_⟩
+  · obtain ⟨w', rfl⟩ := hg w
+    have h1 : (Ψ⁻¹ : MulAut E) (S.inl (g w')) = S.inl w' := by
+      rw [← hinl]
+      exact Ψ.symm_apply_apply _
+    change Ψ (u ((Ψ⁻¹ : MulAut E) (S.inl (g w')))) = S.inl (g w')
+    rw [h1, hu.1 w', hinl]
+  · change S.rightHom (Ψ (u ((Ψ⁻¹ : MulAut E) e))) = S.rightHom e
+    rw [hright, hu.2]
+    have h2 := hright ((Ψ⁻¹ : MulAut E) e)
+    rw [show Ψ ((Ψ⁻¹ : MulAut E) e) = e from Ψ.apply_symm_apply e] at h2
+    exact h2.symm
+
 /-- **Two homomorphisms differing pointwise by a subgroup have the same product
 with it.**
 

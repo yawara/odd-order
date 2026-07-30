@@ -627,10 +627,15 @@ twisted product では `inl w = ⟨0, w⟩`, `rightHom p = ofAdd p.quotient` な
   (`QuotientKWField.lean`) — `|W|` は `D` の奇数位数から、`|K| = q−1` は `q` が
   2 冪だから奇数。積も奇数 ⟹ `|U|` (2 冪) と互いに素。
 
-**次 (段 (4) 最終)**: 有限性 instance (`Finite (BilinearTwistedProduct φ)` →
-`Finite (MulAut ...)`) + `U` の 2 群性 (`isElementaryAbelian_inducingIdAuts`) +
-可解性 を揃えて `IsComplement'` を組み、`exists_conj_of_coprime` を適用 → `A^u = B`。
-その後 段 (5) (`s ↦ (0,1)` の正規化)。
+* `GroupExtension.inducingIdAuts_conj_mem` — **両端を保つ自己同型は `U` を正規化する**
+  (核を核へ全射に送り、商座標を何らかの `f` で変換すれば十分)。⚠ `f` への条件は不要:
+  商側は `hright` を `e` と `Ψ⁻¹ e` で比べれば出る。
+* `Hypothesis.inducingIdAuts_conj_mem_of_scalar` — `A`・`B` の両方がこの形
+  (両座標を単元でスケールする) なので `U ⊴ U A` が従う。
+
+**次 (段 (4) 最終)**: 有限性 instance + `U` の 2 群性
+(`isElementaryAbelian_inducingIdAuts`) + 可解性 を揃えて `IsComplement'` を組み、
+`exists_conj_of_coprime` を適用 → `A^u = B`。その後 段 (5) (`s ↦ (0,1)` の正規化)。
 
 landing 済 (2026-07-31):
 * `exists_bilinear_lift_of_pinned_restriction` に第 3 の結論として追加。

@@ -508,6 +508,46 @@ theorem inducingIdAuts_inf_range_eq_bot
   rw [hkv, map_one]
   exact Subgroup.mem_bot.mpr rfl
 
+/-- **A scalar automorphism of the model normalizes `U`.**
+
+Both the model action `B` and the transported conjugation action `A` scale the two
+coordinates by units, hence map the kernel onto itself; `inducingIdAuts_conj_mem`
+then applies.  This is `U ⊴ U A` of Peterfalvi Part II, Ch. III §3, p. 121,
+step (4). -/
+theorem inducingIdAuts_conj_mem_of_scalar
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (Ψ : MulAut (Suzuki2Groups.BilinearTwistedProduct φ)) (u : M.Eˣ)
+    (ν : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ)
+    (hq : ∀ p : Suzuki2Groups.BilinearTwistedProduct φ,
+      (Ψ p).quotient = ((u : M.Eˣ) : M.E) * p.quotient)
+    (hc : ∀ w : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
+      (Ψ (⟨0, w⟩ : Suzuki2Groups.BilinearTwistedProduct φ)).central
+        = ((ν : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * w)
+    {x : MulAut (Suzuki2Groups.BilinearTwistedProduct φ)}
+    (hx : x ∈ (Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts) :
+    Ψ * x * Ψ⁻¹ ∈
+      (Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts := by
+  refine GroupExtension.inducingIdAuts_conj_mem _ Ψ
+    (fun w => Multiplicative.ofAdd
+      (((ν : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * w.toAdd))
+    (fun y => Multiplicative.ofAdd (((u : M.Eˣ) : M.E) * y.toAdd))
+    (fun w => ⟨Multiplicative.ofAdd
+      (((ν⁻¹ : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * w.toAdd), by
+      simp only [toAdd_ofAdd, ← mul_assoc, ← Units.val_mul, mul_inv_cancel,
+        Units.val_one, one_mul, ofAdd_toAdd]⟩)
+    (fun w => ?_) (fun e => ?_) hx
+  · refine Suzuki2Groups.BilinearTwistedProduct.ext ?_ ?_
+    · change (Ψ (⟨0, w.toAdd⟩ : Suzuki2Groups.BilinearTwistedProduct φ)).quotient = 0
+      rw [hq]
+      change ((u : M.Eˣ) : M.E) * (0 : M.E) = (0 : M.E)
+      rw [mul_zero]
+    · exact hc w.toAdd
+  · exact congrArg Multiplicative.ofAdd (hq e)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
