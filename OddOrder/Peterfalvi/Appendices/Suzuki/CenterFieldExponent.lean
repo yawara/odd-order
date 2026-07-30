@@ -43,6 +43,9 @@ than imported from the type-B data; see issue 0167.
 * `Hypothesis.exists_quadraticMap_of_lemmaFiveSetup` — the book's `χ : E → F`, as a
   genuine `𝔽₂`-quadratic map on `E`, anisotropic and satisfying
   `χ (a x) = a^d χ (x)` for `a ∈ K₁`.
+* `Hypothesis.exists_scalingPair_of_lemmaFiveSetup` — the pair of automorphisms
+  `σ, τ` of `E` with `σ(a) τ(a) = a^d` on `K₁`, i.e. the book's
+  `{σ|_F, τ|_F} = {1_F, θ}` before normalization.
 -/
 
 set_option autoImplicit false
@@ -359,6 +362,44 @@ theorem exists_quadraticMap_of_lemmaFiveSetup {m : ℕ} (hm : m ≠ 0)
     rw [hact, hχ₀apply, hχ₀apply]
     simp only [toMul_ofMul]
     rw [hyp.centralSquare_quotientKHom hW hV, hιequiv]
+
+
+/-! ## The automorphism pair of the Lemma 2(c) expansion -/
+
+/-- **The scaling pair `(σ, τ)` of `χ`** (Peterfalvi Part II, Ch. III §3, p. 121,
+step (2)).
+
+`χ` is nonzero (it is anisotropic and `E` is nontrivial), so the Lemma 2(c)
+expansion has a surviving coefficient, and the corresponding automorphism pair
+converts *every* scaling relation of `χ` into an identity
+`σ(a) τ(a) = b`.  Applied to `χ (a x) = a^d χ (x)` for `a ∈ K₁`, this is the book's
+
+> if `λ_{μν} ≠ 0`, then `a^μ a^ν = a a^θ` for `a ∈ F`, whence
+> `{μ|_F, ν|_F} = {1_F, θ}`
+
+before the normalization of `d` into the shape `1 + 2^j`.
+
+The pair does not depend on the relation, which is what will let the *same* pair be
+re-used on `χ (ω x) = χ (x)` to produce `ω^{1+σ} = 1`. -/
+theorem exists_scalingPair_of_lemmaFiveSetup {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m) :
+    ∃ (d : ℤ) (σ τ : M.E ≃ₐ[ZMod 2] M.E),
+      ∀ k : ↥hyp.actualKActor,
+        σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
+          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) := by
+  classical
+  obtain ⟨χ, d, haniso, _hF, hscale⟩ :=
+    hyp.exists_quadraticMap_of_lemmaFiveSetup hm hQ0card s M
+  have hχ : χ ≠ 0 := by
+    intro h
+    obtain ⟨x, hx⟩ := exists_ne (0 : M.E)
+    refine hx (haniso x ?_)
+    rw [h]
+    rfl
+  obtain ⟨σ, τ, hpair⟩ :=
+    OddOrder.RepresentationTheory.exists_algAut_pair_scaling_of_ne_zero M.E χ hχ
+  exact ⟨d, σ, τ, fun k => hpair _ _ (hscale k)⟩
 
 end Hypothesis
 

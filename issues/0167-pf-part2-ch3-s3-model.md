@@ -298,7 +298,19 @@ Appendix I Prop 2 の regular 版 (`exists_field_coordinate_realization`) で
      (Appendix III Lemma 1(a)、`Additive (Q ⧸ Z(Q)) → Additive ↥(Z(Q))` の
      `QuadraticMap (ZMod 2)`) を `M.coord` と `ι` で移して `χ_E : E → E`。
      anisotropic は `s.invMem` (`x² = 1 ⟹ x ∈ Z(Q)`) から。
-  3. **Lemma 2(c) 展開**: `SemilinearFieldAut.span_autMulQuadraticMap_eq_top` で
+  3. ✅ **Lemma 2(c) 展開 — 2026-07-30 完了** (`exists_scalingPair_of_lemmaFiveSetup`)。
+     **設計上の要点**: 汎用エンジン
+     `RepresentationTheory.exists_algAut_pair_scaling_of_ne_zero` として切り出した —
+     「`χ ≠ 0` なら**単一の**自己同型対 `(σ,τ)` があって、χ の**あらゆる**スケーリング関係
+     `χ(ax) = b χ(x)` が `σ(a)τ(a) = b` を強制する」。
+     ⚠ **対が関係ごとでなく 1 つであることが本質** — 書籍が同じ係数 `λ₁` から
+     `{σ|_F, τ|_F} = {1_F, θ}` と `ω^{1+σ} = 1` の**両方**を読むため。
+     これで step 5 (`χ(ωx) = χ(x)`) は同じ対への 2 度目の適用で済む。
+     証明: 展開の係数 `c` に対しスケーリングは
+     `c_{σσ}(σ(a)²+b) = 0` と `(c_{στ}+c_{τσ})(σ(a)τ(a)+b) = 0` を与える
+     (独立性側)。`c` が対称かつ対角ゼロなら swap involution + 標数 2 で χ = 0 に
+     なるので、そうでない場所を 1 つ選べばよい。
+     以下は当初の計画メモ: `SemilinearFieldAut.span_autMulQuadraticMap_eq_top` で
      `χ_E = Σ λ_{στ} • autMulQuadraticMap σ τ`、`autMulQuadratic_coeff_symm` /
      `autMulQuadratic_diag_eq_zero` で係数一意。`K`-同変性から `d ≡ 2^i + 2^{i'}`。
   4. **正規化** (上記 2.) で `d = 1 + 2^j`、`σ` 確定。

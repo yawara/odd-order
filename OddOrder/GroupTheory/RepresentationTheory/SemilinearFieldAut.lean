@@ -973,6 +973,117 @@ theorem span_autMulQuadraticMap_eq_top [Finite F] :
   rintro _ ⟨q, rfl⟩
   exact ⟨q.1, rfl⟩
 
+
+/-- **A nonzero `𝔽₂`-quadratic map has a scaling pair.**
+
+If `χ ≠ 0`, there is a *single* pair of automorphisms `σ, τ` of `F` such that every
+scaling relation `χ (a x) = b · χ (x)` forces `b = σ(a) · τ(a)`.
+
+This is the engine of step (2) of Peterfalvi Part II, Ch. III §3 (p. 121), where it
+is applied twice to the *same* pair: with `a ∈ F^×`, `b = a^{1+θ}`, giving
+`{σ|_F, τ|_F} = {1_F, θ}`; and with `a = ω`, `b = 1`, giving `ω^{1+σ} = 1`.  It is
+essential that the pair does not depend on the relation — that is what lets the
+book read both conclusions off one nonzero coefficient `λ₁`.
+
+Proof: expand `χ = ∑ c_{στ} · σ·τ` by the spanning half of Lemma 2(c).  A scaling
+relation makes the combination with coefficients `c_{στ}(σ(a)τ(a) + b)` vanish, so
+by the independence half those are symmetric with zero diagonal, i.e.
+`c_{σσ}(σ(a)² + b) = 0` and `(c_{στ} + c_{τσ})(σ(a)τ(a) + b) = 0`.  Choosing the
+pair once and for all at a place where `c` is *not* symmetric, or on the diagonal
+where `c_{σσ} ≠ 0`, makes the second factor vanish for every relation.  Such a place
+exists: otherwise the swap involution pairs the off-diagonal terms of `∑ c_{στ}·σ·τ`
+and characteristic `2` cancels them, making `χ = 0`. -/
+theorem exists_algAut_pair_scaling_of_ne_zero [Finite F]
+    (χ : QuadraticMap (ZMod 2) F F) (hχ : χ ≠ 0) :
+    ∃ σ τ : F ≃ₐ[ZMod 2] F, ∀ a b : F,
+      (∀ x : F, χ (a * x) = b * χ x) → σ a * τ a = b := by
+  classical
+  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  haveI : CharP F 2 :=
+    charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
+  -- expand `χ` over the quadratic family (Lemma 2(c), spanning side)
+  obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun F).mp
+    (by rw [span_autMulQuadraticMap_eq_top F]; exact Submodule.mem_top :
+      χ ∈ Submodule.span F (Set.range fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
+        autMulQuadraticMap F στ.1 στ.2))
+  have happ : ∀ y : F,
+      χ y = ∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        c στ * (στ.1 y * στ.2 y) := by
+    intro y
+    have h := congrArg (fun q : QuadraticMap (ZMod 2) F F => q y) hc
+    simpa [QuadraticMap.sum_apply, QuadraticMap.smul_apply, autMulQuadraticMap_apply,
+      smul_eq_mul] using h.symm
+  -- what one scaling relation gives
+  have key : ∀ a b : F, (∀ x : F, χ (a * x) = b * χ x) →
+      (∀ σ : F ≃ₐ[ZMod 2] F, c (σ, σ) * (σ a * σ a + b) = 0) ∧
+      (∀ σ τ : F ≃ₐ[ZMod 2] F, (c (σ, τ) + c (τ, σ)) * (σ a * τ a + b) = 0) := by
+    intro a b hscale
+    have hzero : (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+        (fun ρ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
+          c ρ * (ρ.1 a * ρ.2 a) + b * c ρ) στ •
+          autMulQuadraticMap F στ.1 στ.2) = 0 := by
+      refine QuadraticMap.ext fun x => ?_
+      have hsum : (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
+          (c στ * (στ.1 a * στ.2 a) + b * c στ) * (στ.1 x * στ.2 x))
+          = χ (a * x) + b * χ x := by
+        rw [happ (a * x), happ x, Finset.mul_sum, ← Finset.sum_add_distrib]
+        refine Finset.sum_congr rfl fun στ _ => ?_
+        simp only [map_mul]
+        ring
+      simp only [QuadraticMap.sum_apply, QuadraticMap.smul_apply,
+        autMulQuadraticMap_apply, smul_eq_mul, QuadraticMap.zero_apply]
+      rw [hsum, hscale x, CharTwo.add_self_eq_zero]
+    refine ⟨fun σ => ?_, fun σ τ => ?_⟩
+    · have h : c (σ, σ) * (σ a * σ a) + b * c (σ, σ) = 0 :=
+        autMulQuadratic_diag_eq_zero F _ hzero σ
+      linear_combination h
+    · have h : c (σ, τ) * (σ a * τ a) + b * c (σ, τ)
+          = c (τ, σ) * (τ a * σ a) + b * c (τ, σ) :=
+        autMulQuadratic_coeff_symm F _ hzero σ τ
+      have hAB : (c (σ, τ) * (σ a * τ a) + b * c (σ, τ))
+          + (c (τ, σ) * (τ a * σ a) + b * c (τ, σ)) = 0 := by
+        rw [← h]; exact CharTwo.add_self_eq_zero _
+      linear_combination hAB
+  -- a symmetric coefficient family with zero diagonal would give the zero map
+  have hzeroOfSym : (∀ σ : F ≃ₐ[ZMod 2] F, c (σ, σ) = 0) →
+      (∀ σ τ : F ≃ₐ[ZMod 2] F, c (σ, τ) = c (τ, σ)) → χ = 0 := by
+    intro hd hs
+    refine QuadraticMap.ext fun x => ?_
+    rw [happ x, QuadraticMap.zero_apply]
+    refine Finset.sum_involution (fun στ _ => (στ.2, στ.1)) (fun στ _ => ?_)
+      (fun στ _ hne => ?_) (fun στ _ => Finset.mem_univ _) (fun στ _ => rfl)
+    · have hcc : c (στ.2, στ.1) = c στ := hs στ.2 στ.1
+      rw [hcc]
+      have hcomm : c στ * (στ.1 x * στ.2 x) + c στ * ((στ.2) x * (στ.1) x)
+          = c στ * (στ.1 x * στ.2 x) + c στ * (στ.1 x * στ.2 x) := by ring
+      rw [hcomm, CharTwo.add_self_eq_zero]
+    · intro heq
+      have h1 : στ.2 = στ.1 := congrArg Prod.fst heq
+      refine hne ?_
+      have hpair : στ = (στ.1, στ.1) := Prod.ext rfl h1
+      rw [hpair, hd στ.1, zero_mul]
+  -- pick the pair once and for all
+  by_cases hd : ∀ σ : F ≃ₐ[ZMod 2] F, c (σ, σ) = 0
+  · by_cases hs : ∀ σ τ : F ≃ₐ[ZMod 2] F, c (σ, τ) = c (τ, σ)
+    · exact absurd (hzeroOfSym hd hs) hχ
+    · push Not at hs
+      obtain ⟨σ, τ, hστ⟩ := hs
+      refine ⟨σ, τ, fun a b hscale => ?_⟩
+      have hne : c (σ, τ) + c (τ, σ) ≠ 0 := by
+        intro h0
+        exact hστ (by rwa [← CharTwo.sub_eq_add, sub_eq_zero] at h0)
+      have h := ((key a b hscale).2 σ τ)
+      rcases mul_eq_zero.mp h with h0 | h0
+      · exact absurd h0 hne
+      · rwa [← CharTwo.sub_eq_add, sub_eq_zero] at h0
+  · push Not at hd
+    obtain ⟨σ, hσ⟩ := hd
+    refine ⟨σ, σ, fun a b hscale => ?_⟩
+    have h := ((key a b hscale).1 σ)
+    rcases mul_eq_zero.mp h with h0 | h0
+    · exact absurd h0 hσ
+    · rwa [← CharTwo.sub_eq_add, sub_eq_zero] at h0
+
 end QuadraticChar2
 
 /-! ### Lifting an automorphism expansion along a normal extension
