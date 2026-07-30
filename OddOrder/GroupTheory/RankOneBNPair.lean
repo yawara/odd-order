@@ -155,4 +155,71 @@ theorem hOne
   exact congrArg (Subtype.val (p := fun z => z ∈ Q))
     (congrArg Prod.snd (e₁.trans e₂.symm))
 
+/-- **(H3)**: `f(x^a) = f(x)^{a^t}` for `a ∈ D` (Peterfalvi Part II, Ch. IV §1,
+p. 122).
+
+⚠ The exponent is `a^t = t a t`, **not** `a`: `D = M ∩ M^t` is normalized by `t` but
+in general not centralized by it.  (The `pdftotext` extraction of p. 122 drops this
+superscript; the page image is the authority.)
+
+Conjugating the defining equation by `t` replaces `a` by `a^t` throughout:
+`t x^a t = (a^t)⁻¹ (t x t) a^t`.  Regrouping — the `a` and `a⁻¹` that appear on
+either side of `t · t = 1` cancel — puts it in canonical form with `Q`-part
+`f(x)^{a^t}`. -/
+theorem hThree
+    (hfact : ∀ y : L, y ∉ M → ∃! p : ↥M × ↥Q, y = (p.1 : L) * t * (p.2 : L))
+    (hQM : Q ≤ M) (hDM : D ≤ M)
+    (ht : t * t = 1) (hDstab : ∀ d ∈ D, t * d * t ∈ D)
+    (hDQ : ∀ d ∈ D, ∀ q ∈ Q, d⁻¹ * q * d ∈ Q)
+    {f g h : L → L}
+    (hmem : ∀ x ∈ Q, x ≠ 1 → f x ∈ Q ∧ g x ∈ Q ∧ h x ∈ D)
+    (heq : ∀ x ∈ Q, x ≠ 1 → t * x * t = g x * h x * t * f x)
+    {x a : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) (haD : a ∈ D)
+    (hconjQ : a⁻¹ * x * a ∈ Q) (hconj1 : a⁻¹ * x * a ≠ 1)
+    (hconjM : t * (a⁻¹ * x * a) * t ∉ M) :
+    f (a⁻¹ * x * a) = (t * a * t)⁻¹ * f x * (t * a * t) := by
+  classical
+  obtain ⟨hfQ, hgQ, hhD⟩ := hmem x hxQ hx1
+  obtain ⟨hfQ', hgQ', hhD'⟩ := hmem _ hconjQ hconj1
+  have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht
+  have hbD : t * a * t ∈ D := hDstab a haD
+  have hbinv : (t * a * t)⁻¹ = t * a⁻¹ * t := by
+    rw [mul_inv_rev, mul_inv_rev, htinv]
+    group
+  -- the canonical factorization of `t x^a t`
+  have hstep : t * (a⁻¹ * x * a) * t
+      = ((t * a⁻¹ * t) * g x * h x * a) * t * ((t * a⁻¹ * t) * f x * (t * a * t)) := by
+    have hexp : t * (a⁻¹ * x * a) * t
+        = (t * a⁻¹ * t) * (t * x * t) * (t * a * t) := by
+      have e : (t * a⁻¹ * t) * (t * x * t) * (t * a * t)
+          = t * a⁻¹ * (t * t) * x * (t * t) * a * t := by group
+      rw [e, ht]
+      group
+    rw [hexp, heq x hxQ hx1]
+    have e2 : ((t * a⁻¹ * t) * g x * h x * a) * t *
+          ((t * a⁻¹ * t) * f x * (t * a * t))
+        = (t * a⁻¹ * t) * g x * h x * (a * (t * t) * a⁻¹) * t * f x * (t * a * t) := by
+      group
+    rw [e2, ht]
+    group
+  -- both parts lie where they should
+  have hMa : (t * a⁻¹ * t) * g x * h x * a ∈ M :=
+    M.mul_mem (M.mul_mem (M.mul_mem (hDM (hbinv ▸ D.inv_mem hbD)) (hQM hgQ))
+      (hDM hhD)) (hDM haD)
+  have hQb : (t * a⁻¹ * t) * f x * (t * a * t) ∈ Q := by
+    have := hDQ (t * a * t) hbD (f x) hfQ
+    rwa [hbinv] at this
+  -- uniqueness of the factorization
+  obtain ⟨w, -, huniq⟩ := hfact (t * (a⁻¹ * x * a) * t) hconjM
+  have hMa' : g (a⁻¹ * x * a) * h (a⁻¹ * x * a) ∈ M :=
+    M.mul_mem (hQM hgQ') (hDM hhD')
+  have e₁ := huniq (⟨⟨g (a⁻¹ * x * a) * h (a⁻¹ * x * a), hMa'⟩, ⟨f (a⁻¹ * x * a), hfQ'⟩⟩)
+    (by rw [heq _ hconjQ hconj1])
+  have e₂ := huniq (⟨⟨(t * a⁻¹ * t) * g x * h x * a, hMa⟩,
+    ⟨(t * a⁻¹ * t) * f x * (t * a * t), hQb⟩⟩) (by rw [hstep])
+  have hfeq : f (a⁻¹ * x * a) = (t * a⁻¹ * t) * f x * (t * a * t) :=
+    congrArg (Subtype.val (p := fun z => z ∈ Q))
+      (congrArg Prod.snd (e₁.trans e₂.symm))
+  rw [hfeq, hbinv]
+
 end OddOrder.GroupTheory.RankOneBNPair
