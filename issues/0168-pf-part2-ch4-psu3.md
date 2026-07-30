@@ -264,7 +264,15 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 `G ≅ PSU(3,q)` または `PGU(3,q)`」)。**`V = W` をまだ仮説に入れていない** —
 (8) に着手する前に `Setup`/`hC2` と同じ流儀で明示仮説として導入すること。
 
-**着手順**: (i) `V = W` と `|D : K| = |W|` を仮説/補題として立てる →
+**(8) 基盤 = 完了 (2026-07-31)**:
+* `card_D_eq_card_V_mul_card_K` — `|D| = |V|·|K|` (既存の一般補題
+  `card_eq_card_centralizer_mul_ncard_invertedBy` に渡すだけ; `V = D ⊓ C(t)` と
+  `KSet = invertedBy D t` は定義的一致)
+* `index_K_subgroupOf_D` — **`|D : K| = |V|`**
+* `eq_of_inv_mul_mem_K` — **(7) の数え上げ形**: `a₁⁻¹a₂ ∈ K` ⟹ `x₁ = x₂`。
+  `x ↦ a_x K` の単射性で、(8) が直接消費する形。
+
+**残る着手順**: (i) `V = W` を明示仮説として導入 (`|D:K| = |W| = m` になる) →
 (ii) 「`f(ω₁x)‾` が `ω̄_i` の `KW`-軌道に入る」を `∃ y ∈ Q₀, ∃ a ∈ D,
 f(ω₁x) = (ω_i y)^a` に翻訳する補題 → (iii) (7) で `m_i ≤ m`、(5) で `m₁ ≤ m−1`
 → (iv) `Σ m_i = |Q₀| = q` と `n = (q+1)/m` で挟み込んで等号。
