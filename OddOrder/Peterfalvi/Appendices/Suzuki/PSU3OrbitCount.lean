@@ -527,6 +527,48 @@ theorem ncard_fiber_orbitOfF_base_le {m : ℕ} (M : hyp.QuotientFieldModel m)
     _ ≤ Nat.card ↥hyp.V - 1 :=
         hyp.ncard_le_card_V_sub_one_of_f_eq_conj_self H hC2 hωQ hωQ0
 
+/-- **Peterfalvi Part II, Ch. IV §2, step (8)** (p. 124):
+
+> The number of elements `x ∈ Q₀` such that `f(ω₁ x)‾` is in the orbit of `ω̄_i` under
+> `KW` is `m` if `i > 1` and `m − 1` if `i = 1`.
+
+All the inequalities are equalities: every fibre of `Φ = orbitOfF` other than the one
+over `ω`'s own orbit has exactly `|W|` elements, and that distinguished fibre has
+exactly `|W| − 1`.
+
+The bounds are `ncard_fiber_orbitOfF_le` and `ncard_fiber_orbitOfF_base_le` (which
+give `|V|`, equal to `|W|` under Chapter IV's `V = W`); the counting is
+`card_fiber_eq_of_card_eq` with `|Q₀| = q` and `|E^× ⧸ μ(KW)| = (q + 1)/|W|`, so that
+`q = ((q+1)/|W|) · |W| − 1`. -/
+theorem stepEight {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hVW : hyp.V = hyp.W) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hinj : Function.Injective M.mu)
+    (hK : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) :
+    (∀ c, c ≠ QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0) →
+        {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x = c}.ncard
+          = Nat.card ↥hyp.W)
+      ∧ {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x
+          = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)}.ncard
+          = Nat.card ↥hyp.W - 1 := by
+  have hβ : Nat.card (M.Eˣ ⧸ MonoidHom.range M.mu) = (2 ^ m + 1) / Nat.card ↥hyp.W := by
+    rw [← Subgroup.index_eq_card, hyp.index_range_mu hm M hinj hK]
+  have hcard : Nat.card ↥hyp.Q0
+      = Nat.card (M.Eˣ ⧸ MonoidHom.range M.mu) * Nat.card ↥hyp.W - 1 := by
+    rw [hβ, Nat.div_mul_cancel hWdvd, hQ0card]
+    omega
+  refine card_fiber_eq_of_card_eq (hyp.orbitOfF M hZ H hC2 hωQ hωQ0) Nat.card_pos _
+    (fun c => ?_) ?_ hcard
+  · have := hyp.ncard_fiber_orbitOfF_le M hZ H hC2 hωQ hωQ0 c
+    rwa [hVW] at this
+  · have := hyp.ncard_fiber_orbitOfF_base_le M hZ H hC2 hωQ hωQ0
+    rwa [hVW] at this
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
