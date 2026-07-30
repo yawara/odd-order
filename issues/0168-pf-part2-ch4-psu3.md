@@ -487,9 +487,18 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
    `S` 上の剰余類写像 (単射・像は `1` を外す・`|S| = |D/K| − 1`) は
    `(D/K) ∖ {1}` への**全単射**。
    ⟸ この補題は `stepEight` を使うので **`PSU3OrbitCount` 側**に置くこと。
-2. 単射性 (既存 `eq_of_inv_mul_mem_K`) + 像が `K` を外す
-   (既存 `not_mem_K_of_f_eq_conj_self`) + `stepEight` の基数一致 `|W| − 1`
-   ⟹ 像 = `(D/K) ∖ {1}` (有限集合で単射かつ基数一致なら全射)。
+2. ✅ **`ncard_eq_card_W_sub_one_of_f_eq_conj_self` で `|S| = |W| − 1` (厳密) を
+   証明済** (段 (8) の厳密個数 + 既存の `≤`)。
+
+   **残り = 全射性の読み取り**。手順が確定した:
+   * `S` 上の剰余類写像 `Ψ z = ⟦A' z⟧ ∈ ↥D ⧸ K.subgroupOf D` を作る
+     (`choose!` — `ncard_le_card_V_sub_one_of_f_eq_conj_self` と同じ定型 ~15 行)
+   * `Ψ '' S ⊆ univ ∖ {1}` (`not_mem_K_of_f_eq_conj_self`)
+   * `(Ψ '' S).ncard = S.ncard = |W| − 1` (`Set.ncard_image_of_injOn` + 上記)
+   * `(univ ∖ {1}).ncard = |D:K| − 1 = |W| − 1`
+   * ⟹ **`Set.eq_of_subset_of_ncard_le`** で `Ψ '' S = univ ∖ {1}` ✓
+     ⟸ **この補題名が最後の未確定要素だった (確認済: Mathlib/Data/Set/Card.lean:875)**
+   * `d ∈ D ∖ K` なら `⟦d⟧ ≠ 1` なので像に入る ⟹ 対応する `z ∈ S` が取れる
 3. `ζ ≠ 1` (C2) より `ζK ∈ 像` ⟹ 対応する `x` が `a = kζ` を与える
    (`K` と `W` は可換 — `W = C_V(K)` — なので `Kζ = ζK`、左右の剰余類は一致)。
 
