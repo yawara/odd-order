@@ -12,6 +12,7 @@ import OddOrder.Algebra.FixedPointsGalois
 import OddOrder.Algebra.QuadraticFrobenius
 import OddOrder.Algebra.FrobeniusExponentPairs
 import OddOrder.Algebra.QuadraticTraceCorrection
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearBilinearLift
 import OddOrder.Algebra.SemilinearFixedPoint
 import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
 import OddOrder.GroupTheory.BrauerSuzuki
@@ -14453,6 +14454,8 @@ are injective and the action is free. -/
   OddOrder.RepresentationTheory.sum_autMulQuadratic_eq_zero_of_symm
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_scaling_pinned_expansion
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_bilinear_lift_of_pinned_restriction
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_scalingPair_of_lemmaFiveSetup
 #assert_only_allowed_axioms
