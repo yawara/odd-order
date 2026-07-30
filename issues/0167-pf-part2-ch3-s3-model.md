@@ -92,7 +92,8 @@ Appendix III Definition 3 により `S` は中心拡大
 - [x] 上表の ❓ を実測 (2026-07-29: 全部 ✅ だった)
 - [x] 段 (1): `S/Q₀ ≅ E` と `w` のスカラー化 (2026-07-30, `QuotientKWField.lean`)
 - [x] 段 (2): `σ` の存在 — **完了** (2026-07-30, `exists_sigma_inverting_W1`)。`θ = 1` 分岐は `QuotientFieldModel.bar_mu_K`/`bar_mu_W`、一般の場合は 5 段計画 (下記) を全部通した
-- [~] 段 (3): `S ≅ S₁` — 着手 (2026-07-30)。Appendix III Lemma 1(c) =
+- [x] 段 (3): `S ≅ S₁` — **本体完了** (2026-07-30, `ModelIsomorphism.lean`)。残るのは
+  書籍の**明示 cocycle `φ`** の構成のみ (下記「段 (3) の残り」)。Appendix III Lemma 1(c) =
   `GroupExtension.exists_mulEquiv_of_comp_squareMap_eq` (`CentralExtensionAutomorphisms.lean`)
   が中身。必要な入力と現状:
   * 中心拡大 `Z(Q) → Q → Q/Z(Q)`: `GroupExtension.ofNormalSubgroupCoordinates`
@@ -336,6 +337,50 @@ Appendix I Prop 2 の regular 版 (`exists_field_coordinate_realization`) で
        これが書籍の「必要なら `σ` を `σ̄` に取り替える」の正体。
      ⚠ 書籍の `λ₂` を `ω^q ≠ ω` で落とす議論は**不要だった** — 対称形
        `σ(ω)τ(ω) = 1` から直接正規化できるため。
+
+### 段 (3) 完了 — `S ≅ S₁` (2026-07-30 その 6)
+
+`OddOrder/Peterfalvi/Appendices/Suzuki/ModelIsomorphism.lean` (新 leaf)。
+
+**設計上の発見: Lemma 1(c) の `q`/`q'` は「関数」で足りる**。
+`GroupExtension.exists_mulEquiv_of_comp_squareMap_eq` の square map 引数は
+`(q : V → W) (q' : V' → W')` という**素の関数**なので、`F` 値版の χ を
+`QuadraticMap` として作り直す必要は無い…と当初は考えたが、`φ` の側 (`BilinMap`) を
+書くには結局 `F` 値の対象が要るので、χ 自体を `F` 値の `QuadraticMap` として作った
+(`ι` が既に `F` 値なので `gL.compQuadraticMap` 一発で、証明の重複はゼロ)。
+
+* `centreQuadraticMap` — `χ : E → F` を `𝔽₂`-二次写像として。段 (1) の `M.coord` と
+  段 (3) 準備の `ι : Additive Z(Q) ≃+ ↥F` で、降下した二乗写像 (Appendix III Lemma 1(a))
+  を移送しただけ。`E` 値の `exists_quadraticMap_of_lemmaFiveSetup` (段 (2) 用) との違いは
+  値域だけ。
+* `toMul_symm_centreQuadraticMap` — Lemma 1(c) の `hsqS`: `e²` を `ι` 越しに読むと `χ`。
+* `centreQuadraticMap_anisotropic` — `χ x = 0 → x = 0` (`s.invMem`)。
+* `exists_mulEquiv_bilinearTwistedProduct` — **段 (3) 本体**。`φ x x = χ x` を満たす
+  **任意の**双線形 `φ` に対し `Q ≃* (E ×_φ F)`、しかも**両座標と整合**
+  (中心 → 核座標が `ι`、商 → `M.coord`)。書籍が「`φ` を書き下して対角が `χ` であることを
+  確認する」という使い方をするので、この形が正しい一般性。
+* `exists_mulEquiv_quadraticExtension` — 基底による標準リフト `χ.toBilin basis` を入れた
+  無条件版 (モデルの存在)。
+
+副産物 (`Suzuki2Groups/QuadraticExtensions.lean`):
+`BilinearTwistedProduct.sq_eq_inl_diag` — **twisted product の二乗写像は cocycle の対角
+にしか依らない**。これが「書籍の明示 `φ` と基底リフトが交換可能」の根拠。既存の
+`QuadraticExtension.sq_eq_inl_q` はこの特殊化に置換 (dedup、private `add_self_eq_zero` は
+公開の `zmodTwo_add_self` に一本化)。
+
+### 段 (3) の残り — 書籍の明示 cocycle `φ`
+
+Proposition の主張は `φ` に **`φ(ax, by) = a b^θ φ(x,y)` (`a,b ∈ F`)** を要求する
+(基底リフトはこれを満たさない)。書籍の `φ(x,y) = λ₁ x y^σ + λ̄₁ x̄ ȳ^σ` を作るには
+Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある — 現在の
+`exists_scalingPair_of_lemmaFiveSetup` は対 `(σ, τ)` しか返していない。必要な追加は
+
+1. 展開 `χ(x) = Σ λ_{μν} x^μ x^ν` の係数を、`σ` を固定したうえで `λ₁` として取り出す。
+2. `λ_{μ̄ν̄} = λ̄_{μν}` (χ が `F` 値であること) と `λ₂ = 0` (`ω^q ≠ ω`) の 2 本。
+   ⚠ 段 (2) では `λ₂ = 0` を**迂回**した (対称形から直接正規化できたため) が、
+   明示 `φ` を書くにはここで正面から要る。
+3. `φ(x,y) := λ₁ x y^σ + λ̄₁ x̄ ȳ^σ` を置いて `φ(x,x) = χ(x)` を確認 →
+   `exists_mulEquiv_bilinearTwistedProduct` に食わせるだけ。
 
 ### 段 (2) 完了 (2026-07-30)
 

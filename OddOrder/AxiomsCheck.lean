@@ -297,6 +297,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
 import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
 import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
+import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
@@ -14456,6 +14457,27 @@ are injective and the action is free. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sigma_inverting_W1
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_center_coordinate_equiv
+
+/-! **Step (3) of the Ch. III §3 Proposition: `S ≅ S₁`** (issue 0167, 2026-07-30).
+`Appendices/Suzuki/ModelIsomorphism.lean` — the book's `S₁` is the twisted product `E ×_φ F`
+of p. 120, and the identification is Appendix III Lemma 1(c) applied to the central extension
+`Z(Q) → Q → Q ⧸ Z(Q)` read in the coordinates of steps (1) and (2).
+
+`BilinearTwistedProduct.sq_eq_inl_diag` isolates the fact that makes the book's explicit cocycle
+`φ` interchangeable with a basis lift: the square map of a twisted product depends on the cocycle
+only through its diagonal. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.sq_eq_inl_diag
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centreQuadraticMap_apply
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.toMul_symm_centreQuadraticMap
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centreQuadraticMap_anisotropic
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mulEquiv_bilinearTwistedProduct
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mulEquiv_quadraticExtension
 
 /-! **The `q`-power Frobenius of a field of order `q²`** (issues 0167 / 9504, 2026-07-30).
 `Algebra/QuadraticFrobenius.lean` — the ambient field theory of Ch. III §3, p. 120, where

@@ -217,6 +217,43 @@ end BilinearTwistedProduct
 
 end BilinearTwistedProduct
 
+section TwistedSquare
+
+variable {V : Type uV} {W : Type uW}
+  [AddCommGroup V] [AddCommGroup W]
+  [Module (ZMod 2) V] [Module (ZMod 2) W]
+
+/-- Addition is self-cancelling in a module over `F₂`. -/
+theorem zmodTwo_add_self (w : W) : w + w = 0 := by
+  calc
+    w + w = 2 • w := (two_nsmul w).symm
+    _ = (2 : ZMod 2) • w :=
+      (Nat.cast_smul_eq_nsmul (ZMod 2) 2 w).symm
+    _ = 0 := by
+      rw [show (2 : ZMod 2) = 0 from ZMod.natCast_self 2, zero_smul]
+
+/-- **Squaring in a twisted product over `F₂` is the diagonal of the cocycle.**
+
+The general form of `QuadraticExtension.sq_eq_inl_q`: the square map of
+`BilinearTwistedProduct B` depends on `B` only through `v ↦ B v v`, which is why
+Appendix III Lemma 1(c) makes any two bilinear lifts of the same quadratic map
+give isomorphic extensions.  Peterfalvi uses this in Part II, Ch. III §3, p. 121,
+where the model `S₁` is built from an explicit cocycle `φ` rather than from a
+basis lift. -/
+theorem BilinearTwistedProduct.sq_eq_inl_diag (B : LinearMap.BilinMap (ZMod 2) V W)
+    (x : BilinearTwistedProduct B) :
+    x ^ 2 = (BilinearTwistedProduct.groupExtension B).inl
+      (Multiplicative.ofAdd (B x.quotient x.quotient)) := by
+  rw [pow_two]
+  ext
+  · change x.quotient + x.quotient = 0
+    exact zmodTwo_add_self x.quotient
+  · change B x.quotient x.quotient + x.central + x.central =
+      B x.quotient x.quotient
+    rw [add_assoc, zmodTwo_add_self, add_zero]
+
+end TwistedSquare
+
 section QuadraticExtension
 
 variable {V : Type uV} {W : Type uW} {ι : Type uI}
@@ -240,15 +277,6 @@ theorem toBilin_self (v : V) : q.toBilin basis v v = q v := by
   have h := QuadraticMap.congr_fun
     (QuadraticMap.toQuadraticMap_toBilin q basis) v
   simpa only [LinearMap.BilinMap.toQuadraticMap_apply] using h
-
-/-- Addition is self-cancelling in a module over `F₂`. -/
-private theorem add_self_eq_zero (w : W) : w + w = 0 := by
-  calc
-    w + w = 2 • w := (two_nsmul w).symm
-    _ = (2 : ZMod 2) • w :=
-      (Nat.cast_smul_eq_nsmul (ZMod 2) 2 w).symm
-    _ = 0 := by
-      rw [show (2 : ZMod 2) = 0 from ZMod.natCast_self 2, zero_smul]
 
 /-- **Peterfalvi Appendix III, Lemma 1(b).**  The explicit twisted product is
 a central extension of the additive groups of `W` and `V`. -/
@@ -279,13 +307,8 @@ theorem _root_.OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProdu
 central extension recovers `q` under the kernel embedding. -/
 theorem sq_eq_inl_q (x : QuadraticExtension q basis) :
     x ^ 2 = (extension q basis).inl (Multiplicative.ofAdd (q x.quotient)) := by
-  rw [pow_two]
-  ext
-  · change x.quotient + x.quotient = 0
-    exact add_self_eq_zero x.quotient
-  · change q.toBilin basis x.quotient x.quotient + x.central + x.central =
-      q x.quotient
-    rw [toBilin_self q basis, add_assoc, add_self_eq_zero, add_zero]
+  rw [BilinearTwistedProduct.sq_eq_inl_diag (q.toBilin basis) x, toBilin_self]
+  rfl
 
 /-- **The involutions of an anisotropic quadratic extension are exactly its
 kernel.**  `x² = 1` says `q(x.quotient) = 0`, which for an anisotropic `q` says
