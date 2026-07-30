@@ -397,13 +397,15 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
   最後に `exists_conj_mul_Q0_iff` で目的の形へ。
 * ✅ **商と `Q` の作用の突き合わせは既にある**: `quotientKWHom_mk` (:219) が
   `quotientKWHom kv ⟦x⟧ = ⟦conjQHom kv x⟧` を **`rfl` かつ `@[simp]`** で与える。
-* ⚠ **残る面倒は `conjQHom kv` を「`D` の元による共役」と同定すること**。
-  `conjQHom_apply : conjQHom kv = actualKActor.subtype kv.1 * conjQByW kv.2` は
-  `MulAut ↥Q` の積であって群の元による共役の形になっていない。
-  `actualKActor` の元が `K` の元による共役であること、`conjQByW v` が `v` による
-  共役であることを使って `MulAut.conj (k*v)` の形に直す必要がある。
-  ⟸ **次セッションはここから**。`actualKActor` の定義と `conjQByW` の定義を
-  読んで、共役として実現する補題が既にあるか grep すること。
+* ✅ **`conjQHom kv` の同定も完了**: `exists_mem_D_conjQHom` —
+  `∃ d ∈ D, ∀ x, conjQHom kv x = d x d⁻¹`。`actualKActor = conjQByK.range` かつ
+  `conjQByK` / `conjQByW` は**定義がそのまま共役**なので、合成は `k·v` (∈ `D`)
+  による共役。
+
+⟹ **翻訳に要る部品はすべて揃った**。あとは
+`quotientKWHom_mk` → `exists_mem_D_conjQHom` → `exists_conj_mul_Q0_iff` を
+繋いで `Φ x = Φ x' ⟺ ∃ y ∈ Q₀, ∃ a ∈ D, f(ωx) = (f(ωx')·y)^a` を出し、
+`card_fiber_eq_of_card_eq` に流し込むだけ。
 
 **そのあとの流し込み** (機械的):
 1. ファイバー `Φ⁻¹(c)` が空でなければ代表 `x₀` を取り `ω' := f(ω x₀)` とおく。
