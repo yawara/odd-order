@@ -46,7 +46,7 @@ It comes out of `t s t = s t s` being *already* a canonical factorization
 * `Hypothesis.eq_one_of_f_mul_eq` — step (4).
 * `Hypothesis.inv_ne_conj_of_not_mem_Q0`, `Hypothesis.f_ne_conj_of_not_mem_Q0` —
   `j` and `f` act without fixed points on the `D`-orbits of `Q − Q₀`.
-* `Hypothesis.ne_one_of_f_eq_conj` — step (5), first half.
+* `Hypothesis.ne_one_of_f_eq_conj`, `Hypothesis.not_mem_KSet_of_f_eq_conj` — step (5).
 -/
 
 set_option autoImplicit false
@@ -377,6 +377,58 @@ theorem ne_one_of_f_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   intro hy1
   refine hyp.f_ne_conj_of_not_mem_Q0 H hC2 hωQ hωQ0 haD ?_
   rw [heq, hy1, mul_one]
+
+/-- **Peterfalvi Part II, Ch. IV §2, step (5)**, second half (p. 124): in the same
+situation, `a ∉ K`.
+
+The book computes, by (H2) and (H3),
+
+  `f(ωy) = ω^{a^{-t}} = (f(ω)^{a⁻¹} y)^{a^{-t}} = (f(ω) y^a)^{a⁻¹ a^{-t}}`
+
+and concludes from (4) that `a⁻¹ a^{-t} ≠ 1`.  Here the contrapositive is taken
+directly: if `a ∈ K` then `a^t = a⁻¹`, so the twist `a⁻¹ a^{-t}` is trivial, the
+displayed identity collapses to `f(ωy) = f(ω) y^a`, and (4) forces `y = 1` — against
+the first half. -/
+theorem not_mem_KSet_of_f_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω y a : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hyQ0 : y ∈ hyp.Q0)
+    (haD : a ∈ hyp.D) (heq : f ω = a⁻¹ * (ω * y) * a) : a ∉ hyp.KSet := by
+  intro haK
+  have hy1 : y ≠ 1 := hyp.ne_one_of_f_eq_conj H hC2 hωQ hωQ0 haD heq
+  have hω1 : ω ≠ 1 := fun hcc => hωQ0 (hcc ▸ hyp.Q0.one_mem)
+  have hyQ : y ∈ hyp.Q := hyp.Q0_le_Q hyQ0
+  have hωyQ : ω * y ∈ hyp.Q := hyp.Q.mul_mem hωQ hyQ
+  have hωy1 : ω * y ≠ 1 := by
+    intro hcc
+    refine hωQ0 ?_
+    rw [eq_inv_of_mul_eq_one_left hcc]
+    exact hyp.Q0.inv_mem hyQ0
+  -- apply `f` to the hypothesis: (H2) on the left, (H3) on the right
+  have hfω : f (f ω) = ω := (hTwo hyp.rankOneSetup H hωQ hω1).1
+  have hstep : f (a⁻¹ * (ω * y) * a)
+      = (hyp.t * a * hyp.t)⁻¹ * f (ω * y) * (hyp.t * a * hyp.t) :=
+    (hThree hyp.rankOneSetup H hωyQ hωy1 haD).1
+  rw [heq, hstep, haK.2] at hfω
+  have hfωy : f (ω * y) = a⁻¹ * ω * a := by
+    have e : a⁻¹ * (a⁻¹⁻¹ * f (ω * y) * a⁻¹) * a = f (ω * y) := by group
+    rw [hfω] at e
+    exact e.symm
+  -- rewrite `ω` using the hypothesis and `y² = 1`
+  have hω : ω = a * f ω * a⁻¹ * y := by
+    rw [heq]
+    have e : a * (a⁻¹ * (ω * y) * a) * a⁻¹ * y = ω * (y * y) := by group
+    rw [e, ← sq, hyQ0.1, mul_one]
+  have hgoal : f (ω * y) = f ω * (a⁻¹ * y * a) := by
+    rw [hfωy]
+    have e : a⁻¹ * (a * f ω * a⁻¹ * y) * a = f ω * (a⁻¹ * y * a) := by group
+    rw [← hω] at e
+    exact e
+  -- step (4) now forces `y = 1`
+  have hyaQ0 : a⁻¹ * y * a ∈ hyp.Q0 := by
+    have := hyp.conj_mem_Q0_of_mem_H (hyp.H.inv_mem (hyp.D_le_H haD)) hyQ0
+    rwa [inv_inv] at this
+  exact hy1 (hyp.eq_one_of_f_mul_eq H hC2 hωQ hωQ0 hyQ0 hyaQ0 hgoal)
 
 end Hypothesis
 
