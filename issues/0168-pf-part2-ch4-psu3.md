@@ -350,7 +350,18 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 | `m_i ≤ \|W\|`, `m₁ ≤ \|W\|−1` | `ncard_le_card_V_of_f_eq_conj`, `not_mem_K_of_f_eq_conj_self` (+ `V = W`) |
 | `Σ m_i = \|Q₀\| = q` | `f_mem_sdiff_Q0` + `hQ0card` |
 
-**残るのは最終組み立てのみ**: 軌道代表系 `ω₁,…,ω_n` を取り、`m_i` を定義して
+**挟み込み補題も完了**: `card_fiber_eq_of_card_eq` — `Φ : α → β` の全ファイバーが
+`≤ M`、特定の `b₀` が `≤ M−1`、`|α| = |β|·M − 1` なら**全部等号**。
+書籍 p.124 の「whence all the inequalities are in fact equalities」そのもの。
+完全に一般な補題 (`Finset.sum_eq_sum_iff_of_le` ベース) なので namespace 外。
+
+**残るのは instantiate のみ**: `α = Q₀`、`β = (Q/Q₀)^#` 上の `KW`-軌道集合、
+`M = |W|`、`b₀ = ω̄₁` の軌道、`Φ x = f(ω₁x)‾ の軌道` として上の補題に流し込む。
+必要な 3 つの仮説はすべて既に証明済み (ファイバー評価 2 本 + `|Q₀| = q` と
+`n·|W| = q+1`)。**軌道集合を `Fintype`/`DecidableEq` として構成する部分が
+唯一の新規作業**。
+
+(旧メモ) 軌道代表系 `ω₁,…,ω_n` を取り、`m_i` を定義して
 `q = Σ m_i ≤ n·\|W\| − 1 = q` の挟み込みから全等号を出す。ここは Lean 上で
 「軌道分解に沿った有限和」を組む必要があり、`Finset` の設計を先に決めること。
 
