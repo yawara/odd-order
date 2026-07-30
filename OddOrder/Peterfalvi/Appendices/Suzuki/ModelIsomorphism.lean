@@ -390,6 +390,58 @@ theorem exists_bilinear_lift_semilinear (hm : m ≠ 0)
       ((OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E)) στ₀.1 στ₀.2 hres
   exact ⟨φ, στ₀.1, στ₀.2, hdiag, hsemi⟩
 
+/-- Moving the centre coordinate by an automorphism of `E` moves `χ` the same way:
+`centreQuadraticMap` is `ι` post-composed with the descended square map. -/
+theorem centreQuadraticMap_trans
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (j : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (x : M.E) :
+    hyp.centreQuadraticMap s M (ι.trans j) x = j (hyp.centreQuadraticMap s M ι x) :=
+  rfl
+
+include s in
+/-- **The book's cocycle `φ`, normalized** (Peterfalvi Part II, Ch. III §3, p. 121,
+step (3)): `φ (a x) (b y) = a · θ(b) · φ(x, y)` for `a, b ∈ F`, which with
+`θ|_F` the book's `θ` is exactly the Proposition's requirement on the cocycle.
+
+`exists_bilinear_lift_semilinear` produces the law with a general `α` in the first
+slot; post-composing everything with `α⁻¹` normalizes `α` to the identity.  On the
+quadratic map that is the substitution `ι ↦ α⁻¹ ∘ ι` of the centre coordinate —
+the intrinsic version of the book's "choose coordinates so that `d = 1 + 2^t`". -/
+theorem exists_bilinear_lift_normalized (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) :
+    ∃ (ι' : Additive ↥(Subgroup.center hyp.Q) ≃+
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+      (φ : LinearMap.BilinMap (ZMod 2) M.E M.E) (θ : M.E ≃ₐ[ZMod 2] M.E),
+      (∀ x : M.E, φ x x = hyp.centreQuadraticMapE s M ι' x) ∧
+      ∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+        ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+          ∀ x y : M.E, φ (a * x) (b * y) = a * θ b * φ x y := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨φ₀, α, β, hdiag, hsemi⟩ :=
+    hyp.exists_bilinear_lift_semilinear s M hm hQ0card ι d hequiv
+  refine ⟨ι.trans (OddOrder.FiniteField.frobFixedRestrict (m := m) α.symm.toRingEquiv),
+    φ₀.compr₂ α.symm.toLinearMap, β.trans α.symm, fun x => ?_, fun a ha b hb x y => ?_⟩
+  · -- the diagonal, read through the moved coordinate
+    simp only [LinearMap.compr₂_apply, AlgEquiv.toLinearMap_apply]
+    rw [hdiag x, hyp.centreQuadraticMapE_apply, hyp.centreQuadraticMapE_apply,
+      hyp.centreQuadraticMap_trans s M ι]
+    rfl
+  · -- `α⁻¹ (α a · β b · φ₀ x y) = a · (α⁻¹ β) b · α⁻¹ (φ₀ x y)`
+    change α.symm (φ₀ (a * x) (b * y)) = _
+    rw [hsemi a ha b hb x y, map_mul, map_mul, α.symm_apply_apply]
+    rfl
+
 /-! ## Step (3): the isomorphism with the model -/
 
 open scoped Classical in

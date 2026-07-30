@@ -14482,6 +14482,10 @@ powers of two modulo `2^n − 1`. -/
   OddOrder.FiniteField.pow_two_pow_mod_of_mem_frobFixed
 #assert_only_allowed_axioms
   OddOrder.FiniteField.restrict_pair_eq_of_mul_eq_on_frobFixed
+#assert_only_allowed_axioms
+  OddOrder.FiniteField.map_mem_frobFixedSubfield
+#assert_only_allowed_axioms
+  OddOrder.FiniteField.frobFixedRestrict_apply
 
 /-! **The relative trace of `𝐅_{q²}/𝐅_q` and the `F`-valued correction** (issue 0167, 2026-07-30).
 `Algebra/QuadraticTraceCorrection.lean` — a bilinear form on `E` whose diagonal lies in the subfield
@@ -14517,6 +14521,10 @@ only through its diagonal. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centreQuadraticMapE_apply
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_bilinear_lift_semilinear
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centreQuadraticMap_trans
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_bilinear_lift_normalized
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.toMul_symm_centreQuadraticMap
 #assert_only_allowed_axioms

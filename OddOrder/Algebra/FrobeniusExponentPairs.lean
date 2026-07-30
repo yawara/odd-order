@@ -94,6 +94,30 @@ section Restrict
 
 variable {E : Type*} [Field E] [Finite E] [CharP E 2] {m : ℕ}
 
+/-- **Every automorphism of `E` preserves `F`**: `α(a)^q = α(a^q) = α(a)`. -/
+theorem map_mem_frobFixedSubfield (α : E ≃+* E) {a : E}
+    (ha : a ∈ frobFixedSubfield E 2 m) : α a ∈ frobFixedSubfield E 2 m := by
+  rw [mem_frobFixedSubfield] at ha ⊢
+  rw [← map_pow, ha]
+
+/-- The restriction to `F` of an automorphism of `E`, as an additive automorphism.
+
+Used to move a coordinate `ι : … ≃+ F` by an automorphism of `E`, which is how the
+normalization `α = 1` of Peterfalvi Part II, Ch. III §3, p. 121 is carried out:
+replacing `ι` by `α⁻¹ ∘ ι` replaces `χ` by `α⁻¹ ∘ χ`. -/
+noncomputable def frobFixedRestrict (α : E ≃+* E) :
+    ↥(frobFixedSubfield E 2 m) ≃+ ↥(frobFixedSubfield E 2 m) where
+  toFun a := ⟨α a, map_mem_frobFixedSubfield α a.2⟩
+  invFun a := ⟨α.symm a, map_mem_frobFixedSubfield α.symm a.2⟩
+  left_inv a := Subtype.ext (α.symm_apply_apply a)
+  right_inv a := Subtype.ext (α.apply_symm_apply a)
+  map_add' a b := Subtype.ext (map_add α (a : E) (b : E))
+
+@[simp] theorem frobFixedRestrict_apply (α : E ≃+* E)
+    (a : ↥(frobFixedSubfield E 2 m)) :
+    ((frobFixedRestrict (m := m) α a : ↥(frobFixedSubfield E 2 m)) : E) = α (a : E) :=
+  rfl
+
 /-- **On `F` the Frobenius exponent only matters modulo `m`**: the `q`-power
 Frobenius is the identity there, so `a^{2^i} = a^{2^{i mod m}}`. -/
 theorem pow_two_pow_mod_of_mem_frobFixed {a : E}

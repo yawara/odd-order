@@ -464,8 +464,14 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
      支える補助: `centreQuadraticMapE` (同じ ι から作る `E` 値版の χ — 展開は
      `E` 上に住むので必要)。生き残る対の存在は χ の anisotropy から
      (全係数 0 なら χ = 0)。
-  4. `Frob_E^{-i₀}` を当てて `α = id` に正規化 (χ は `Frob^{-i₀} ∘ χ`、
-     すなわち座標 `ι' := Frob^{-i₀} ∘ ι` に対する χ)。
+  4. ✅ **`α = id` への正規化** (`exists_bilinear_lift_normalized`, 2026-07-31)。
+     `φ` 全体に `α⁻¹` を後合成すると `φ(ax,by) = a · θ(b) · φ(x,y)`
+     (`θ := α⁻¹ ∘ β`)。対角は `α⁻¹ ∘ χ` になるが、これは**座標
+     `ι' := ι.trans (α⁻¹|_F)` に対する χ そのもの** (`centreQuadraticMap_trans`)
+     なので、`(ι', φ, θ)` の組で返せば整合する。書籍の「`d = 1 + 2^t` になるよう
+     座標を選ぶ」の intrinsic 版。支える補助 = `map_mem_frobFixedSubfield`
+     (`E` の自己同型は `F` を保つ: `α(a)^q = α(a^q) = α(a)`) と
+     `frobFixedRestrict` (その `F` への制限)。
   5. `exists_bilinear_frobFixed_of_diag` (P4) で `F` 値に補正 (半双線形性は
      明示式から従う)。
   6. `↥F` に corestrict して `centreQuadraticMap s M ι'` と対角を突き合わせ、
