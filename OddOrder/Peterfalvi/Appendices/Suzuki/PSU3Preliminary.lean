@@ -1351,6 +1351,57 @@ theorem ncard_fiber_orbitOfF_le {m : ℕ} (M : hyp.QuotientFieldModel m)
           Set.ncard_le_ncard hsub (Set.toFinite _)
       _ ≤ Nat.card ↥hyp.V := hyp.ncard_le_card_V_of_f_eq_conj H hC2 hωQ hωQ0
 
+/-- The coordinate of `ω` itself as a unit of `E`; its coset is the distinguished
+orbit `b₀` of step (8) (the book's `ω̄₁`). -/
+noncomputable def baseUnit {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) : M.Eˣ :=
+  Units.mk0 (M.coord (Additive.ofMul (QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q))))
+    (hyp.coord_ne_zero_of_not_mem_Q0 M hZ hωQ hωQ0)
+
+@[simp] theorem baseUnit_val {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) :
+    ((hyp.baseUnit M hZ hωQ hωQ0 : M.Eˣ) : M.E)
+      = M.coord (Additive.ofMul (QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q))) := rfl
+
+/-- **The distinguished fibre has at most `|V| − 1` elements** — the book's
+`m₁ ≤ m − 1`.
+
+Here no representative is needed: `ω` itself is the reference point, so
+`exists_conj_of_coset_eq` applies with `z = ω` directly and the target set is the one
+bounded by `ncard_le_card_V_sub_one_of_f_eq_conj_self`. -/
+theorem ncard_fiber_orbitOfF_base_le {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) :
+    {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x
+        = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)}.ncard
+      ≤ Nat.card ↥hyp.V - 1 := by
+  classical
+  have hsub : ((↑) : ↥hyp.Q0 → G) ''
+      {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x
+        = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)}
+      ⊆ {z : G | z ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+          f (ω * z) = a⁻¹ * (ω * y) * a} := by
+    rintro _ ⟨x, hx, rfl⟩
+    refine ⟨x.2, ?_⟩
+    exact hyp.exists_conj_of_coset_eq M hZ hωQ
+      (hyp.f_mul_mem_Q H hC2 hωQ hωQ0 x) rfl rfl hx.symm
+  calc {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x
+        = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)}.ncard
+      = (((↑) : ↥hyp.Q0 → G) ''
+          {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x
+            = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)}).ncard :=
+        (Set.ncard_image_of_injective _ Subtype.val_injective).symm
+    _ ≤ {z : G | z ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+          f (ω * z) = a⁻¹ * (ω * y) * a}.ncard :=
+        Set.ncard_le_ncard hsub (Set.toFinite _)
+    _ ≤ Nat.card ↥hyp.V - 1 :=
+        hyp.ncard_le_card_V_sub_one_of_f_eq_conj_self H hC2 hωQ hωQ0
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
