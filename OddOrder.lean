@@ -632,6 +632,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
 import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
 import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
 import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
 import OddOrder.Peterfalvi.Appendices.Huppert
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.NearFieldClass

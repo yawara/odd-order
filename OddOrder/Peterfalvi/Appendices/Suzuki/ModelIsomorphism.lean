@@ -40,13 +40,22 @@ canonical choice `φ = χ.toBilin basis` is recorded as
 
 ## Main results
 
+* `Hypothesis.exists_actualKActor_mu_eq` — `K₁ = F^×`.
 * `Hypothesis.centreQuadraticMap` — the quadratic map `χ : E → F` of the
   central extension, in the coordinates of steps (1)–(2).
-* `Hypothesis.exists_mulEquiv_bilinearTwistedProduct` — **step (3)**: for any
-  bilinear lift `φ` of `χ`, an isomorphism `Q ≃* (E ×_φ F)` carrying the centre
-  coordinate to the kernel coordinate and `M.coord` to the quotient coordinate.
+* `Hypothesis.exists_mulEquiv_bilinearTwistedProduct` — for any bilinear lift `φ`
+  of `χ`, an isomorphism `Q ≃* (E ×_φ F)` carrying the centre coordinate to the
+  kernel coordinate and `M.coord` to the quotient coordinate.
 * `Hypothesis.exists_mulEquiv_quadraticExtension` — the same with the canonical
   lift, so that the model exists unconditionally.
+* `Hypothesis.exists_bilinear_lift_semilinear` /
+  `Hypothesis.exists_bilinear_lift_normalized` — the book's cocycle, obtained from
+  the pinned Lemma 2(c) expansion and then normalized.
+* `Hypothesis.exists_mulEquiv_bookCocycle` — **step (3) in the book's form**:
+  `S ≅ S₁` with a cocycle satisfying the Proposition's semilinearity and
+  anisotropy, plus the diagonal scaling that step (4) needs.
+
+The `K₁W₁`-action on the model is in `ModelAction.lean`.
 -/
 
 set_option autoImplicit false
@@ -719,121 +728,6 @@ theorem exists_mulEquiv_quadraticExtension (hm : m ≠ 0)
       ((hyp.centreQuadraticMap s M ι).toBilin (Module.finBasis (ZMod 2) M.E))
       (fun x => Suzuki2Groups.QuadraticExtension.toBilin_self _ _ x)
   exact ⟨ι, Φ, hyp.centreQuadraticMap_anisotropic s M ι, hker, hquot⟩
-
-/-! ## The scalar action on the model `S₁` -/
-
-/-- **A scalar acting on the model `S₁`** (Peterfalvi Part II, Ch. III §3, p. 120):
-`(x, y)^a = (a x, ν y)`, where `ν` is the scaling constant of the cocycle.
-
-Well defined as a group automorphism exactly because of the diagonal scaling
-`φ (a x) (a y) = ν · φ (x, y)` — which, unlike the `F`-semilinearity, holds for
-every `a` admitting a scaling relation on `χ`, in particular for the whole of
-`K₁W₁` (`W₁` is not contained in `F`). -/
-noncomputable def modelScalarAut
-    (φ : LinearMap.BilinMap (ZMod 2) M.E
-      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
-    {a : M.E} (ha : a ≠ 0)
-    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)} (hν : ν ≠ 0)
-    (h : ∀ x y : M.E, φ (a * x) (a * y) = ν * φ x y) :
-    MulAut (Suzuki2Groups.BilinearTwistedProduct φ) :=
-  Suzuki2Groups.BilinearTwistedProduct.congrEquiv
-    (AddEquiv.mk' (Equiv.mulLeft₀ a ha) (mul_add a))
-    (AddEquiv.mk' (Equiv.mulLeft₀ ν hν) (mul_add ν)) h
-
-@[simp] theorem modelScalarAut_quotient
-    (φ : LinearMap.BilinMap (ZMod 2) M.E
-      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
-    {a : M.E} (ha : a ≠ 0)
-    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)} (hν : ν ≠ 0)
-    (h : ∀ x y : M.E, φ (a * x) (a * y) = ν * φ x y)
-    (p : Suzuki2Groups.BilinearTwistedProduct φ) :
-    (hyp.modelScalarAut M φ ha hν h p).quotient = a * p.quotient :=
-  rfl
-
-@[simp] theorem modelScalarAut_central
-    (φ : LinearMap.BilinMap (ZMod 2) M.E
-      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
-    {a : M.E} (ha : a ≠ 0)
-    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)} (hν : ν ≠ 0)
-    (h : ∀ x y : M.E, φ (a * x) (a * y) = ν * φ x y)
-    (p : Suzuki2Groups.BilinearTwistedProduct φ) :
-    (hyp.modelScalarAut M φ ha hν h p).central = ν * p.central :=
-  rfl
-
-/-- **The scalar action of a group on the model `S₁`, as a homomorphism.**
-
-Given compatible homomorphisms `A` into the scalars acting on the quotient
-coordinate and `N` into those acting on the central coordinate,
-`g ↦ ((x, y) ↦ (A g · x, N g · y))` is a homomorphism into `Aut S₁`.
-
-Its image is the subgroup `B` of Peterfalvi Part II, Ch. III §3, p. 121, step (4),
-once `A` is taken to be the scalar realization `μ` of `K W` and `N` the
-corresponding family of scaling constants of `χ`. -/
-noncomputable def modelScalarHom {Γ : Type*} [Group Γ]
-    (φ : LinearMap.BilinMap (ZMod 2) M.E
-      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
-    (A : Γ →* M.Eˣ)
-    (N : Γ →* (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ)
-    (h : ∀ (g : Γ) (x y : M.E),
-      φ (((A g : M.Eˣ) : M.E) * x) (((A g : M.Eˣ) : M.E) * y)
-        = ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
-            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * φ x y) :
-    Γ →* MulAut (Suzuki2Groups.BilinearTwistedProduct φ) where
-  toFun g := Suzuki2Groups.BilinearTwistedProduct.congrEquiv
-    (AddEquiv.mk' (Equiv.mulLeft₀ ((A g : M.Eˣ) : M.E) (A g).ne_zero) (mul_add _))
-    (AddEquiv.mk' (Equiv.mulLeft₀
-      ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
-        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (N g).ne_zero) (mul_add _))
-    (h g)
-  map_one' := by
-    refine MulEquiv.ext fun p => ?_
-    refine Suzuki2Groups.BilinearTwistedProduct.ext ?_ ?_
-    · change ((A 1 : M.Eˣ) : M.E) * p.quotient = p.quotient
-      rw [map_one, Units.val_one, one_mul]
-    · change ((N 1 : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
-        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * p.central = p.central
-      rw [map_one, Units.val_one, one_mul]
-  map_mul' g g' := by
-    refine MulEquiv.ext fun p => ?_
-    refine Suzuki2Groups.BilinearTwistedProduct.ext ?_ ?_
-    · change ((A (g * g') : M.Eˣ) : M.E) * p.quotient
-        = ((A g : M.Eˣ) : M.E) * (((A g' : M.Eˣ) : M.E) * p.quotient)
-      rw [map_mul, Units.val_mul, mul_assoc]
-    · change ((N (g * g') : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
-          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * p.central
-        = ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
-            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) *
-          (((N g' : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
-            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * p.central)
-      rw [map_mul, Units.val_mul, mul_assoc]
-
-@[simp] theorem modelScalarHom_quotient {Γ : Type*} [Group Γ]
-    (φ : LinearMap.BilinMap (ZMod 2) M.E
-      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
-    (A : Γ →* M.Eˣ)
-    (N : Γ →* (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ)
-    (h : ∀ (g : Γ) (x y : M.E),
-      φ (((A g : M.Eˣ) : M.E) * x) (((A g : M.Eˣ) : M.E) * y)
-        = ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
-            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * φ x y)
-    (g : Γ) (p : Suzuki2Groups.BilinearTwistedProduct φ) :
-    (hyp.modelScalarHom M φ A N h g p).quotient = ((A g : M.Eˣ) : M.E) * p.quotient :=
-  rfl
-
-@[simp] theorem modelScalarHom_central {Γ : Type*} [Group Γ]
-    (φ : LinearMap.BilinMap (ZMod 2) M.E
-      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
-    (A : Γ →* M.Eˣ)
-    (N : Γ →* (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ)
-    (h : ∀ (g : Γ) (x y : M.E),
-      φ (((A g : M.Eˣ) : M.E) * x) (((A g : M.Eˣ) : M.E) * y)
-        = ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
-            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * φ x y)
-    (g : Γ) (p : Suzuki2Groups.BilinearTwistedProduct φ) :
-    (hyp.modelScalarHom M φ A N h g p).central =
-      ((N g : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
-        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * p.central :=
-  rfl
 
 end Hypothesis
 

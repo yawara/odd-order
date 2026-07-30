@@ -301,6 +301,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.OrderFiveSubgroup
 import OddOrder.Peterfalvi.Appendices.Suzuki.QuotientKWField
 import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
 import OddOrder.Peterfalvi.Appendices.Suzuki.ModelIsomorphism
+import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.Trichotomy
 import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot

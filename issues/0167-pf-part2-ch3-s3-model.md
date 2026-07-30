@@ -532,8 +532,18 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
   ⟹ 定数の族がそのまま `K × W` 上の準同型になり、`N` が組める
   (χ の scaling 定数の一意性を経由する必要がなかった)。
 
-**次**: `N : K × W →* (↥F)ˣ` の実体化 (`μ(k,1)` の `F`-単元版 + `d` 乗) →
-`modelScalarHom` に食わせて `B` を得る → `A` (KW の共役作用の像) を `Φ` で移送 →
+* `Hypothesis.muKUnit` / `muKUnitHom` / `frobFixedUnitsHom` / `muKUnitHom_zpow_val`
+  (2026-07-31 その 4) — `μ(k,1)` の `F`-単元版と、`F` 内の冪が `E` 内の冪と一致する
+  こと (coercion の橋)。
+* `Hypothesis.exists_modelScalarHom` — **`K × W` の作用**
+  `(x,y)^{(k,v)} = (μ(k,v)·x, μ(k,1)^d·y)` を `K × W →* MulAut S₁` として。
+  この像が書籍 step (4) の `B`。⚠ `hm` / `hQ0card` は不要だった (linter が検出)。
+
+**ファイル分割 (2026-07-31)**: `ModelIsomorphism.lean` が 951 行になったので、
+作用まわり (段 (4)) を新 leaf **`ModelAction.lean`** へ切り出した (725 + 282 行)。
+段 (4)/(5) はこちらに積む。
+
+**次**: `A` (KW の `S` 上の共役作用の像) を `Φ` で `Aut S₁` へ移送 →
 `U` = `inducingIdAuts` の設定と `B ⊆ UA` → Zassenhaus で `A^u = B`。
 
 landing 済 (2026-07-31):
