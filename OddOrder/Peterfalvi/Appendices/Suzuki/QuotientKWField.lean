@@ -252,7 +252,11 @@ The last three conjuncts are the book's `K₁ = F^×` and
   `F = 𝐅_q`, because `|K| = q − 1`;
 * `k ↦ μ (k, 1)` is injective, so `μ` maps `K` *onto* the order-`(q − 1)` subgroup
   `F^×` of the cyclic group `E^×`;
-* `μ (1, v)^{1+q} = 1`, because `|W|` divides `q + 1` (Ch. I §3 Lemma 5). -/
+* `μ (1, v)^{1+q} = 1`, because `|W|` divides `q + 1` (Ch. I §3 Lemma 5).
+
+`(2 : E) = 0` is recorded because every later step of the Proposition works with
+the `q`-power Frobenius `x ↦ x^q` of `E` (the book's `x ↦ x̄`), which needs the
+characteristic. -/
 theorem exists_field_quotient_of_orderThree
     (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
     (hQsuz : IsSuzuki2Group ↥hyp.Q)
@@ -265,7 +269,7 @@ theorem exists_field_quotient_of_orderThree
     ∃ (E : Type uG) (_ : Field E) (_ : Finite E)
       (μ : ↥hyp.actualKActor × ↥hyp.W →* Eˣ)
       (α : Additive (↥hyp.Q ⧸ Subgroup.center hyp.Q) ≃+ E),
-      Nat.card E = (2 ^ m) ^ 2 ∧
+      Nat.card E = (2 ^ m) ^ 2 ∧ (2 : E) = 0 ∧
       (∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
         (y : ↥hyp.Q ⧸ Subgroup.center hyp.Q),
         α (Additive.ofMul (hyp.quotientKWHom kv y))
@@ -305,7 +309,21 @@ theorem exists_field_quotient_of_orderThree
   obtain ⟨E, instE, instFin, μ, α, hcardE, hμ⟩ :=
     Huppert.exists_field_coordinate_of_irreducible hEA hyp.quotientKWHom hirr
   letI : Field E := instE
-  refine ⟨E, instE, instFin, μ, α, hcardE.trans hMcard, hμ, ?_, ?_, ?_⟩
+  refine ⟨E, instE, instFin, μ, α, hcardE.trans hMcard, ?_, hμ, ?_, ?_, ?_⟩
+  · -- characteristic `2`: the quotient has exponent `2` and `α` is additive
+    obtain ⟨u, hu⟩ := exists_ne (1 : ↥hyp.Q ⧸ Subgroup.center hyp.Q)
+    have h1 : Additive.ofMul u + Additive.ofMul u = 0 := by
+      have h := hEA.pow_eq_one u
+      rw [pow_two] at h
+      exact Additive.toMul.injective (by simpa using h)
+    have h2 : α (Additive.ofMul u) + α (Additive.ofMul u) = 0 := by
+      rw [← map_add, h1, map_zero]
+    have hne : α (Additive.ofMul u) ≠ 0 := fun h =>
+      hu (Additive.ofMul.injective (α.injective (h.trans (map_zero α).symm)))
+    rcases mul_eq_zero.mp (show (2 : E) * α (Additive.ofMul u) = 0 by
+      rw [two_mul]; exact h2) with h | h
+    · exact h
+    · exact absurd h hne
   · -- `μ (k, 1)` is Frobenius-fixed: its order divides `|K| = q − 1`
     intro k
     have hk : k ^ (2 ^ m - 1) = 1 := by rw [← s.cardActor]; exact pow_card_eq_one'
