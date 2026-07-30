@@ -796,4 +796,50 @@ theorem betaRatio_div_betaRatio {E : Type*} [Field E] (h2 : (2 : E) = 0) {β : E
   rw [hstep, betaSum_mul_betaSum_add_two h2 hβ i, add_div,
     div_self (pow_ne_zero 2 hci1), ← div_pow]
 
+/-! ### Step (18): `u_i` is fixed by `θ`, so `u_i^{2τ} = u_i` (p. 127)
+
+Step (18) opens with "by (13) and (16), `u_i^θ = u_i` and so `u_i^{2τ} = u_i`".  Both
+halves are recorded here: (16) says `σ` inverts `β`, which makes it fix every
+`c_j = β^j + β^{-j}` and hence every ratio `u_i = c_{i-1}/c_i`; and on a `θ`-fixed
+element `u ↦ u^{1+θ}` is just squaring, so `τ` is a square root there.
+-/
+
+/-- **An automorphism inverting `β` fixes every `c_j = β^j + β^{-j}`.**
+
+This is how step (18) gets `u_i^θ = u_i`: by (16) `β` generates `W`, so `β^σ = β⁻¹`, and
+`σ` then swaps the two summands of `c_j`.  The ratios `u_i = c_{i-1}/c_i` inherit it. -/
+theorem betaSum_fixed_of_inv {E : Type*} [Field E] {β : E} {θ : E ≃+* E}
+    (hinv : θ β = β⁻¹) (j : ℕ) : θ (betaSum β j) = betaSum β j := by
+  simp only [betaSum, map_add, map_pow, map_inv₀, hinv, inv_pow, inv_inv]
+  ring
+
+/-- **`u^{2τ} = u` for `θ`-fixed `u`** (Peterfalvi Part II, p. 127, inside step (18)).
+
+`τ(u) · θ(τ(u)) = u` by definition of `τ`; applying `θ` and cancelling gives
+`θ²(τ u) = τ u`, which odd order upgrades to `θ(τ u) = τ u`
+(`apply_eq_self_of_odd_orderOf`).  Then `τ(u)² = τ(u) · θ(τ(u)) = u`. -/
+theorem frobNormEquiv_symm_sq_of_fixed {E : Type*} [Field E] [Finite E]
+    (hchar : (2 : E) = 0) {θ : E ≃+* E} (hodd : Odd (orderOf θ)) {u : E} (hu : u ≠ 0)
+    (hfix : θ u = u) : ((frobNormEquiv hchar hodd).symm u) ^ 2 = u := by
+  have hspec : (frobNormEquiv hchar hodd).symm u * θ ((frobNormEquiv hchar hodd).symm u)
+      = u := frobNormEquiv_symm_spec hchar hodd u
+  have hvne : (frobNormEquiv hchar hodd).symm u ≠ 0 :=
+    frobNormEquiv_symm_ne_zero hchar hodd hu
+  have hθθ : θ (θ ((frobNormEquiv hchar hodd).symm u))
+      = (frobNormEquiv hchar hodd).symm u := by
+    have h1 : θ ((frobNormEquiv hchar hodd).symm u) *
+        θ (θ ((frobNormEquiv hchar hodd).symm u)) = u := by
+      rw [← map_mul, hspec, hfix]
+    have h2 : θ ((frobNormEquiv hchar hodd).symm u) *
+        (frobNormEquiv hchar hodd).symm u = u := by
+      rw [mul_comm]; exact hspec
+    exact mul_left_cancel₀ (by simpa using hvne) (h1.trans h2.symm)
+  have hfv : θ ((frobNormEquiv hchar hodd).symm u)
+      = (frobNormEquiv hchar hodd).symm u := apply_eq_self_of_odd_orderOf hodd hθθ
+  calc ((frobNormEquiv hchar hodd).symm u) ^ 2
+      = (frobNormEquiv hchar hodd).symm u * (frobNormEquiv hchar hodd).symm u := sq _
+    _ = (frobNormEquiv hchar hodd).symm u *
+          θ ((frobNormEquiv hchar hodd).symm u) := by rw [hfv]
+    _ = u := hspec
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
