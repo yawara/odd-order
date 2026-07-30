@@ -582,10 +582,20 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
      つまり **`α = (Φ y).central ∈ F` であって `E` ではない**。
      (10) の `b^{1+θ} = α + a^{-(1+θ)}` は `F` の中の等式
      (`b ∈ K ≅ F^×`、`θ` は `F` を保つ) — 型付けはこれに合わせること。
-   * **残り**: `M.coord ⟦z⟧` (QuotientFieldModel の座標) と `(Φ z).quotient`
-     (標準モデルの座標) が一致するか要確認。`exists_standardModel` は
-     `Φ x₀ = ⟨0,1⟩` 等を与えるが、`coord` との互換性は明示されていないかもしれない。
-     ⟸ **次セッションはここを確認するところから**。
+   * ✅ **両方とも 0167 で証明済だった (2026-07-31 確認)**。
+     **`exists_mulEquiv_bilinearTwistedProduct`** (ModelIsomorphism.lean:627) の
+     結論が**まさに必要な 2 つ**を与える:
+     ```
+     (∀ z : ↥(center Q), Φ z = ⟨0, ι (Additive.ofMul z)⟩) ∧
+     (∀ e : ↥Q, (Φ e).quotient = M.coord (Additive.ofMul ⟦e⟧))
+     ```
+     * 第 1 conjunct = **`y = (0, α)` そのもの**、`α = ι (ofMul y) ∈ F`
+       (`ι : Additive (center Q) ≃+ frobFixedSubfield`) — 型の確認も取れた。
+     * 第 2 conjunct = **`coord` と `Φ.quotient` の互換性**。
+     ⚠ ただし **`exists_standardModel` の結論はこの 2 つを露出していない**
+     (`φ` の性質 / `Φ x₀ = ⟨0,1⟩` / `Θ` / `u` のみ)。段 (10) では
+     `exists_mulEquiv_bilinearTwistedProduct` を直接使うか、
+     `exists_standardModel` に conjunct を追加するか — **前者が素直**。
 3. **`θ`**: `exists_standardModel` の `θ : M.E ≃ₐ[ZMod 2] M.E`。
 4. **`K ≅ F^×`**: `a, b ∈ K` を `F^×` の元として扱う
    (`exists_actualKActor_mu_eq` + `card_actualKActor_eq` で確立済)。
