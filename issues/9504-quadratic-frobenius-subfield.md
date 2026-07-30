@@ -42,24 +42,36 @@ Proposition の各条件 (`W₁ ≤ {x : x^{1+q} = 1}`, `σ|_F = θ`, `x^σ = x^
 ⟹ **`θ = 1` 分岐の段 (2) はこれで揃った**: `σ := qFrobenius` は `F` 上恒等 (= `θ`) で
 `W₁` を反転する。
 
+## 自己同型の延長も landing (2026-07-30 その 2)
+
+⚠ **`AlgEquiv.restrictNormalHom_surjective` は使わなかった** — もっと初等的で短い経路が
+あった。「有限体の自己同型はすべて Frobenius の冪」を先に出せば、延長は同じ式を大きい体に
+書くだけで済む。
+
+| 宣言 | 内容 |
+|---|---|
+| `qFrobenius_pow` | `(x ↦ x^p)^j = (x ↦ x^{p^j})` |
+| `qFrobenius_eq_one_iff` | 位数 `pⁿ` の体で `x ↦ x^{p^j}` が恒等 ⟺ `n ∣ j`。順方向は「全単元が `x^{p^j−1} = 1`」⟹ 巡回群 `K^×` の指数 `pⁿ−1` が `p^j−1` を割る ⟹ **`OddOrder.Nat.pow_sub_one_dvd_pow_sub_one_iff`** (0167 で一般化した補題) で `n ∣ j` |
+| `orderOf_frobenius` | Frobenius の位数は `n` |
+| `exists_pow_eq_of_ringAut` | **有限体の自己同型はすべて `x ↦ x^{p^j}`**。`\|Aut K\| = [K : 𝔽_p] = n` (`RepresentationTheory.natCard_ringAut_eq_finrank`) と Frobenius の位数 `n` が一致するので生成する |
+| `charP_frobFixedSubfield` | `CharP ↥F p` (= `Subfield.charP`) |
+| `exists_ringAut_extending_frobFixedSubfield` | **任意の `θ ∈ Aut(F)` は `E` の自己同型に延長する** = 段 (2) 冒頭で書籍が無言で使う入力 |
+
+⟹ 目論んでいた Galois 理論 (中間体・`Normal` instance・`restrictNormalHom`) の plumbing は
+まるごと不要だった。`pow_sub_one_dvd_pow_sub_one_iff` を 0167 段 (1) で一般化しておいたのが
+そのまま効いた。
+
 ## やること (残り)
 
-- [ ] **自己同型の延長** (段 (2) の `θ ≠ 1` 分岐の前提): 任意の `θ ∈ Aut(F)` は `E` の
-  自己同型に延長でき、延長はちょうど 2 個 (`σ` と `σ σ₀`)。書籍は暗黙に使っている。
-  経路 = `E/𝔽_p` は Galois (有限体の有限拡大) なので中間体への制限
-  `Gal(E/𝔽_p) → Gal(F/𝔽_p)` は全射 (`AlgEquiv.restrictNormalHom_surjective`)、
-  `RingAut ≃* AlgEquiv over ZMod p` は `SemilinearFieldAut.lean` の
-  `Huppert.ringAutMulEquivAlgAut` で橋渡し。核が `⟨σ₀⟩` (位数 2) なのは
-  `RingAut.fixer_fixedSet` から。
-  ⚠ instance plumbing: `[Algebra (ZMod p) E]` は global instance ではない
-  (`ZMod.algebra` を `letI` で入れる; `SemilinearFieldAut.lean` は仮説として持っている)。
-- [ ] 延長が入れば `{σ, σ σ₀}` の 2 択から `ω^{1+σ} = 1` を満たす方を選ぶ、という
-  書籍の「必要なら `σ` を `σ̄` に取り替える」が形式化できる。
+- [ ] 延長がちょうど 2 個 (`σ` と `σ σ₀`) であること。段 (2) の「必要なら `σ` を `σ̄` に
+  取り替える」に必要。核が `⟨σ₀⟩` (位数 2) なのは `RingAut.fixer_fixedSet` +
+  `fixedSet_qFrobenius` から出る。
 
 ## 完了条件
 
 `E` を位数 `q²` の有限体とするとき、bar 作用・固定部分体 `F` (位数 `q`)・
-`Aut(E) → Aut(F)` の全射性と核 `⟨σ₀⟩` がすべて sorry-free で揃う。
+`Aut(F)` の `Aut(E)` への延長がすべて sorry-free で揃う。**上 2 節で達成**
+(延長の一意性 2 個だけ残り)。
 
 ## 参照
 
