@@ -178,6 +178,23 @@ theorem quotientKWHom_apply (kv : ↥hyp.actualKActor × ↥hyp.W) :
     hyp.quotientKWHom kv = hyp.quotientKHom kv.1 * hyp.quotientWHom kv.2 :=
   rfl
 
+/-- **The combined `K × W` action on `Q` itself**, by conjugation — the group
+Peterfalvi calls `K W` acting on `S`.  Its image in `Aut(S₁)` under the
+isomorphism of step (3) is the subgroup `A` of Ch. III §3, p. 121, step (4). -/
+noncomputable def conjQHom : ↥hyp.actualKActor × ↥hyp.W →* MulAut ↥hyp.Q :=
+  MonoidHom.noncommCoprod hyp.actualKActor.subtype hyp.conjQByW
+    (fun k v => hyp.conjQByW_commute_actualKActor v k)
+
+theorem conjQHom_apply (kv : ↥hyp.actualKActor × ↥hyp.W) :
+    hyp.conjQHom kv = hyp.actualKActor.subtype kv.1 * hyp.conjQByW kv.2 :=
+  rfl
+
+/-- The action on `Q ⧸ Z(Q)` is the one induced by the action on `Q`. -/
+@[simp] theorem quotientKWHom_mk (kv : ↥hyp.actualKActor × ↥hyp.W) (x : ↥hyp.Q) :
+    hyp.quotientKWHom kv (QuotientGroup.mk x) =
+      QuotientGroup.mk (hyp.conjQHom kv x) :=
+  rfl
+
 /-- A `KW`-invariant subgroup of the quotient is `K`-invariant. -/
 theorem isAInvariant_quotientKHom_of_quotientKW
     {U : Subgroup (↥hyp.Q ⧸ Subgroup.center hyp.Q)}

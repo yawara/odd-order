@@ -574,8 +574,30 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
   ⟹ `μ(k,1)·μ(1,v) = 1` なら両因子が 1。`K` 成分は `mu_K_injective`、`W` 成分は
   `μ(1,v)=1 ⟹ quotientWHom v = 1` (`coord_act`) と上の忠実性で潰れる。
 
-**次**: `A` (KW の `S` 上の共役作用の像) を `Φ` で `Aut S₁` へ移送 →
-`U` = `inducingIdAuts` の設定と `UA = UB` → Zassenhaus で `A^u = B`。
+* ✅ `Hypothesis.conjQHom` (2026-07-31, `QuotientKWField.lean`) — **`K × W` の `Q`
+  自身への共役作用** (`noncommCoprod`; 可換性は `conjQByW_commute_actualKActor`)。
+  `quotientKWHom_mk` で商上の作用と整合 (rfl)。`MulAut.congr Φ` で移送した像が
+  書籍 step (4) の `A`。⚠ `MulAut.congr` は mathlib に既存 (End.lean) で repo 内でも
+  既に使用実績あり — 自作不要だった。
+
+### `A kv` と `Θ kv` が `U` の分だけ違うことの証明計画
+
+`InducesId Ψ` = `(∀ w, Ψ (inl w) = inl w) ∧ (∀ e, rightHom (Ψ e) = rightHom e)`。
+twisted product では `inl w = ⟨0, w⟩`, `rightHom p = ofAdd p.quotient` なので
+
+    InducesId Ψ ⟺ (∀ w, Ψ ⟨0,w⟩ = ⟨0,w⟩) ∧ (∀ p, (Ψ p).quotient = p.quotient)。
+
+`Ψ := A kv * (Θ kv)⁻¹` に対しこれを出すには、`A kv` と `Θ kv` が**両端で同じ**ことを
+示せばよい:
+* **商側**: `(A kv p).quotient = μ(kv) * p.quotient`。`hquot` → `quotientKWHom_mk` →
+  `coord_act` → `hquot` の 4 段で出る。`Θ` 側は `hΘq` (定義通り)。
+* **核側**: `A kv ⟨0,w⟩ = ⟨0, μ(kv.1,1)^d * w⟩`。`hker` で `Φ.symm ⟨0,w⟩` が中心の元と
+  分かり、`conjQByW` は `Z(Q)` を各点固定する (`conjQByW_fixes_center`) ので
+  `conjQHom kv` は中心上 `centerKHom kv.1` に一致し、`hequiv` が定数を出す。
+  `Θ` 側は `hΘc`。
+
+**次**: 上記 2 つ (`A` の両端での効果) → `A kv * (Θ kv)⁻¹ ∈ U` → `UA = UB` と
+補群条件 (`mu_injective` で `U ∩ A = U ∩ B = 1`) → Zassenhaus で `A^u = B`。
 
 landing 済 (2026-07-31):
 * `exists_bilinear_lift_of_pinned_restriction` に第 3 の結論として追加。
