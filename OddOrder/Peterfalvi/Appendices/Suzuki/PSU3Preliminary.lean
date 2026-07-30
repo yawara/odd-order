@@ -1141,6 +1141,22 @@ theorem exists_mem_D_conjQHom (kv : ↥hyp.actualKActor × ↥hyp.W) :
   change (k : G) * ((kv.2 : G) * (x : G) * (kv.2 : G)⁻¹) * (k : G)⁻¹ = _
   group
 
+/-- Two elements of `Q` with the same image in `Q/Z(Q)` differ by an element of `Q₀`.
+
+Step 6 of the fibre translation: the quotient equality coming from `coord` is turned
+into an honest product `z' = z · w` with `w ∈ Q₀`, which is what
+`exists_conj_mul_Q0_iff` consumes. -/
+theorem exists_mem_Q0_mul_of_quotient_eq
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {z z' : G} (hzQ : z ∈ hyp.Q) (hz'Q : z' ∈ hyp.Q)
+    (heq : (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q) : ↥hyp.Q ⧸ Subgroup.center hyp.Q)
+      = QuotientGroup.mk ⟨z', hz'Q⟩) :
+    ∃ w ∈ hyp.Q0, z' = z * w := by
+  have hmem : (⟨z, hzQ⟩ : ↥hyp.Q)⁻¹ * ⟨z', hz'Q⟩ ∈ Subgroup.center hyp.Q :=
+    QuotientGroup.eq.mp heq
+  rw [hZ, Subgroup.mem_subgroupOf] at hmem
+  refine ⟨z⁻¹ * z', hmem, by group⟩
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
