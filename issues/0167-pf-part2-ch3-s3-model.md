@@ -91,7 +91,7 @@ Appendix III Definition 3 により `S` は中心拡大
 
 - [x] 上表の ❓ を実測 (2026-07-29: 全部 ✅ だった)
 - [x] 段 (1): `S/Q₀ ≅ E` と `w` のスカラー化 (2026-07-30, `QuotientKWField.lean`)
-- [~] 段 (2): `σ` の存在 — **`θ = 1` 分岐は完了** (2026-07-30, `QuotientFieldModel.bar_mu_K` / `bar_mu_W`)。`θ ≠ 1` 分岐は担体位置合わせが残り (下記「設計上の要点」)
+- [x] 段 (2): `σ` の存在 — **完了** (2026-07-30, `exists_sigma_inverting_W1`)。`θ = 1` 分岐は `QuotientFieldModel.bar_mu_K`/`bar_mu_W`、一般の場合は 5 段計画 (下記) を全部通した
 - [ ] 段 (3): `S ≅ S₁`
 - [ ] 段 (4): 作用の共役化 (Zassenhaus)
 - [ ] 段 (5): `s ↦ (0,1)` の正規化
@@ -313,9 +313,25 @@ Appendix I Prop 2 の regular 版 (`exists_field_coordinate_realization`) で
      以下は当初の計画メモ: `SemilinearFieldAut.span_autMulQuadraticMap_eq_top` で
      `χ_E = Σ λ_{στ} • autMulQuadraticMap σ τ`、`autMulQuadratic_coeff_symm` /
      `autMulQuadratic_diag_eq_zero` で係数一意。`K`-同変性から `d ≡ 2^i + 2^{i'}`。
-  4. **正規化** (上記 2.) で `d = 1 + 2^j`、`σ` 確定。
-  5. **`χ(ωx) = χ(x)`** (`w` は `Q₀` 上自明 = `conjQByW_fixes_center`) を同じ展開に当てて
-     `ω^{1+σ} = 1` (`λ₂` は `ω^q ≠ ω` で落とす)。
+  4-5. ✅ **正規化 + `ω^{1+σ} = 1` — 2026-07-30 完了** (`exists_sigma_inverting_W1`)。
+     実装は当初計画より短くなった:
+     * `χ(ωx) = χ(x)` は `centralSquare_quotientWHom` (= `w` は `Q₀` 上自明かつ
+       二乗は既に `Q₀` に居る) から出て、step 3 と**同じ対** `(σ,τ)` に 2 度目の
+       適用をするだけで `σ(ω)τ(ω) = 1` になる。
+     * `σ`, `τ` は有限体の自己同型ゆえ Frobenius の冪 (9504 の
+       `exists_pow_eq_of_ringAut`)。よって関係は `ω^{2^i} ω^{2^{i'}} = 1` という
+       **純粋な指数計算**に落ちる。
+     * `FiniteField.exists_qFrobenius_normalized_index` — `Frob^{N-i}` を両辺に当てると
+       (`Frob^N = 1` ゆえ) 第 1 因子が `ω` になり `ω · ω^{2^j} = 1` を得る。
+       これが書籍の「必要なら `σ` を `σ̄` に取り替える」の正体。
+     ⚠ 書籍の `λ₂` を `ω^q ≠ ω` で落とす議論は**不要だった** — 対称形
+       `σ(ω)τ(ω) = 1` から直接正規化できるため。
+
+### 段 (2) 完了 (2026-07-30)
+
+`exists_sigma_inverting_W1`: `∃ j`, 全ての `v ∈ W` で
+`μ(1,v) · Frob^j(μ(1,v)) = 1`。すなわち `σ := Frob^j` が `W₁` を反転する。
+`σ|_F` が書籍の `θ` (本 repo では intrinsic に**定義**する側なので追加の整合は不要)。
 
 ## 📖 p.120–121 の proof 全文の書き起こし (2026-07-30, ページ画像から)
 

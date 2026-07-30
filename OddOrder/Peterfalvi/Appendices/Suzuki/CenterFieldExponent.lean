@@ -46,6 +46,9 @@ than imported from the type-B data; see issue 0167.
 * `Hypothesis.exists_scalingPair_of_lemmaFiveSetup` — the pair of automorphisms
   `σ, τ` of `E` with `σ(a) τ(a) = a^d` on `K₁`, i.e. the book's
   `{σ|_F, τ|_F} = {1_F, θ}` before normalization.
+* `Hypothesis.exists_sigma_inverting_W1` — **step (2) of the Proposition**: an
+  automorphism `σ` of `E` with `ω^{1+σ} = 1` for every `ω ∈ W₁`, i.e. `σ` inverts
+  `W₁`.
 -/
 
 set_option autoImplicit false
@@ -268,6 +271,23 @@ theorem centralSquare_quotientKHom
   rw [hyp.centerKHom_apply_val]
   exact (map_pow (hyp.actualKActor.subtype k) x 2).symm
 
+/-- `W` fixes the descended square map: `w` acts trivially on `Q₀ = Z(Q)`, and the
+square of any element already lies there. -/
+theorem centralSquare_quotientWHom {m : ℕ} (s : hyp.LemmaFiveSetup m)
+    (hW : IsElementaryAbelian 2 ↥(Subgroup.center hyp.Q))
+    (hV : IsElementaryAbelian 2 (↥hyp.Q ⧸ Subgroup.center hyp.Q))
+    (v : ↥hyp.W) (y : ↥hyp.Q ⧸ Subgroup.center hyp.Q) :
+    Suzuki2Groups.centralSquare (le_refl (Subgroup.center ↥hyp.Q)) hW hV
+        (hyp.quotientWHom v y)
+      = Suzuki2Groups.centralSquare (le_refl (Subgroup.center ↥hyp.Q)) hW hV y := by
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective y
+  rw [hyp.quotientWHom_apply_mk, Suzuki2Groups.centralSquare_mk,
+    Suzuki2Groups.centralSquare_mk]
+  refine Subtype.ext ?_
+  have hsq : x ^ 2 ∈ Subgroup.center hyp.Q := s.sqMem x
+  calc hyp.conjQByW v x ^ 2 = hyp.conjQByW v (x ^ 2) := (map_pow _ _ _).symm
+    _ = x ^ 2 := hyp.conjQByW_fixes_center s.centerEqQ0 v (x ^ 2) hsq
+
 open scoped Classical in
 /-- **The quadratic map `χ : E → F` of the central extension `F → S → E`**
 (Peterfalvi Part II, Ch. III §3, p. 121, the map expanded by Appendix III
@@ -290,9 +310,11 @@ theorem exists_quadraticMap_of_lemmaFiveSetup {m : ℕ} (hm : m ≠ 0)
     ∃ (χ : QuadraticMap (ZMod 2) M.E M.E) (d : ℤ),
       (∀ x : M.E, χ x = 0 → x = 0) ∧
       (∀ x : M.E, (χ x) ^ 2 ^ m = χ x) ∧
-      ∀ (k : ↥hyp.actualKActor) (x : M.E),
+      (∀ (k : ↥hyp.actualKActor) (x : M.E),
         χ (((M.mu (k, 1) : M.Eˣ) : M.E) * x)
-          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) * χ x := by
+          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) * χ x) ∧
+      ∀ (v : ↥hyp.W) (x : M.E),
+        χ (((M.mu (1, v) : M.Eˣ) : M.E) * x) = χ x := by
   classical
   obtain ⟨ι, d, hιinj, hιF, hιequiv⟩ :=
     hyp.exists_center_coordinate_exponent hm hQ0card s M
@@ -320,7 +342,7 @@ theorem exists_quadraticMap_of_lemmaFiveSetup {m : ℕ} (hm : m ≠ 0)
     { toFun := ι
       map_add' := ι.map_add
       map_smul' := fun a x => ZMod.map_smul ι a x }
-  refine ⟨g.compQuadraticMap (χ₀.comp f), d, ?_, ?_, ?_⟩
+  refine ⟨g.compQuadraticMap (χ₀.comp f), d, ?_, ?_, ?_, ?_⟩
   · -- anisotropy
     intro x hx
     have hx' : ι (χ₀ (M.coord.symm x)) = 0 := hx
@@ -362,6 +384,24 @@ theorem exists_quadraticMap_of_lemmaFiveSetup {m : ℕ} (hm : m ≠ 0)
     rw [hact, hχ₀apply, hχ₀apply]
     simp only [toMul_ofMul]
     rw [hyp.centralSquare_quotientKHom hW hV, hιequiv]
+  · -- `W` acts trivially on the values, so `χ` is `W`-invariant
+    intro v x
+    have hact : M.coord.symm (((M.mu (1, v) : M.Eˣ) : M.E) * x)
+        = Additive.ofMul (hyp.quotientWHom v (M.coord.symm x).toMul) := by
+      refine M.coord.injective ?_
+      rw [M.coord.apply_symm_apply]
+      have h := M.coord_act (1, v) (M.coord.symm x).toMul
+      have hkw : hyp.quotientKWHom (1, v) = hyp.quotientWHom v := by
+        rw [hyp.quotientKWHom_apply, map_one, one_mul]
+      rw [hkw] at h
+      rw [h]
+      congr 1
+      exact (M.coord.apply_symm_apply x).symm
+    change ι (χ₀ (M.coord.symm (((M.mu (1, v) : M.Eˣ) : M.E) * x)))
+        = ι (χ₀ (M.coord.symm x))
+    rw [hact, hχ₀apply, hχ₀apply]
+    simp only [toMul_ofMul]
+    rw [hyp.centralSquare_quotientWHom s hW hV]
 
 
 /-! ## The automorphism pair of the Lemma 2(c) expansion -/
@@ -385,11 +425,13 @@ theorem exists_scalingPair_of_lemmaFiveSetup {m : ℕ} (hm : m ≠ 0)
     (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m) :
     ∃ (d : ℤ) (σ τ : M.E ≃ₐ[ZMod 2] M.E),
-      ∀ k : ↥hyp.actualKActor,
+      (∀ k : ↥hyp.actualKActor,
         σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
-          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) := by
+          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E)) ∧
+      ∀ v : ↥hyp.W,
+        σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1 := by
   classical
-  obtain ⟨χ, d, haniso, _hF, hscale⟩ :=
+  obtain ⟨χ, d, haniso, _hF, hscale, hWinv⟩ :=
     hyp.exists_quadraticMap_of_lemmaFiveSetup hm hQ0card s M
   have hχ : χ ≠ 0 := by
     intro h
@@ -399,7 +441,58 @@ theorem exists_scalingPair_of_lemmaFiveSetup {m : ℕ} (hm : m ≠ 0)
     rfl
   obtain ⟨σ, τ, hpair⟩ :=
     OddOrder.RepresentationTheory.exists_algAut_pair_scaling_of_ne_zero M.E χ hχ
-  exact ⟨d, σ, τ, fun k => hpair _ _ (hscale k)⟩
+  refine ⟨d, σ, τ, fun k => hpair _ _ (hscale k), fun v => ?_⟩
+  refine hpair _ _ (fun x => ?_)
+  rw [hWinv v x, one_mul]
+
+
+/-! ## Step (2) of the Proposition: the automorphism `σ` -/
+
+/-- **Step (2) of the Ch. III §3 Proposition** (Peterfalvi Part II, p. 121):
+there is an automorphism `σ` of `E` — a power of the Frobenius — with
+
+> `x^σ = x^{-1}` for `x ∈ W₁`, equivalently `x^{1+σ} = 1`.
+
+The pair `(σ, τ)` of the Lemma 2(c) expansion satisfies `σ(ω) τ(ω) = 1` for every
+`ω ∈ W₁`, because `w` acts trivially on `Q₀` and hence `χ (ω x) = χ (x)`.  Both are
+Frobenius powers, so `exists_qFrobenius_normalized_index` rewrites the symmetric
+relation `ω^{p^i} ω^{p^{i'}} = 1` in the Proposition's form `ω · ω^{p^j} = 1` —
+this is the book's "possibly on replacing `σ` by `σ̄`".
+
+The restriction of `σ` to `F` is the book's `θ`; in this development `θ` is *defined*
+that way rather than imported from the type-B data, so no further compatibility is
+needed (see issue 0167). -/
+theorem exists_sigma_inverting_W1 {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m) :
+    ∃ j : ℕ, ∀ v : ↥hyp.W,
+      ((M.mu (1, v) : M.Eˣ) : M.E) *
+          OddOrder.FiniteField.qFrobenius M.E 2 j ((M.mu (1, v) : M.Eˣ) : M.E) = 1 := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨_d, σ, τ, _hK, hW⟩ :=
+    hyp.exists_scalingPair_of_lemmaFiveSetup hm hQ0card s M
+  -- `|E| = 2 ^ (2m)`
+  have hcard : Nat.card M.E = 2 ^ (m * 2) := by
+    rw [M.card, ← pow_mul]
+  have hN : m * 2 ≠ 0 := by positivity
+  -- both automorphisms are Frobenius powers
+  have hpow : ∀ ρ : M.E ≃ₐ[ZMod 2] M.E, ∃ i : ℕ, ∀ x : M.E, ρ x = x ^ 2 ^ i := by
+    intro ρ
+    obtain ⟨i, hi⟩ := OddOrder.FiniteField.exists_pow_eq_of_ringAut
+      (K := M.E) (p := 2) (n := m * 2) hcard hN
+      ((OddOrder.RepresentationTheory.ringAutMulEquivAlgAut M.E 2).symm ρ)
+    exact ⟨i, fun x => (hi x)⟩
+  obtain ⟨i, hi⟩ := hpow σ
+  obtain ⟨i', hi'⟩ := hpow τ
+  obtain ⟨j, hj⟩ :=
+    OddOrder.FiniteField.exists_qFrobenius_normalized_index
+      (E := M.E) (p := 2) (N := m * 2) hcard hN i i'
+  refine ⟨j, fun v => ?_⟩
+  refine hj _ ?_
+  rw [OddOrder.FiniteField.qFrobenius_apply, OddOrder.FiniteField.qFrobenius_apply,
+    ← hi, ← hi']
+  exact hW v
 
 end Hypothesis
 

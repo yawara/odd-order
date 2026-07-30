@@ -333,6 +333,49 @@ theorem exists_pow_eq_of_ringAut {n : ℕ} (hcard : Nat.card K = p ^ n) (hn : n 
 
 end FrobeniusGenerates
 
+/-! ## Normalizing a Frobenius pair relation -/
+
+section Normalize
+
+variable {E : Type*} [Field E] [Finite E] {p N : ℕ} [Fact p.Prime] [CharP E p]
+
+/-- Composing Frobenius powers adds the exponents. -/
+theorem qFrobenius_comp (a b : ℕ) (y : E) :
+    qFrobenius E p a (qFrobenius E p b y) = qFrobenius E p (a + b) y := by
+  rw [qFrobenius_apply, qFrobenius_apply, qFrobenius_apply, ← pow_mul, ← pow_add,
+    Nat.add_comm b a]
+
+/-- **Normalizing a Frobenius pair relation.**  On a field of order `p^N`, a relation
+`x^{p^i} · x^{p^{i'}} = 1` can always be rewritten as `x · x^{p^j} = 1`, with `j`
+depending only on `i` and `i'`.
+
+Applying `Frobⁿ⁻ⁱ` to the relation turns the first factor into `x` (because
+`Frob^N = 1`) and the second into `Frob^{N-i+i'} x`.
+
+This is the book's "possibly on replacing `σ` by `σ̄`" step made precise: it is what
+converts the symmetric conclusion `σ(ω) τ(ω) = 1` of the Lemma 2(c) expansion into
+the Proposition's `ω^{1+σ} = 1` (Peterfalvi Part II, Ch. III §3, p. 121). -/
+theorem exists_qFrobenius_normalized_index (hcard : Nat.card E = p ^ N) (hN : N ≠ 0)
+    (i i' : ℕ) :
+    ∃ j : ℕ, ∀ x : E,
+      qFrobenius E p i x * qFrobenius E p i' x = 1 → x * qFrobenius E p j x = 1 := by
+  classical
+  set t := N - i % N with ht
+  have hmod : i % N < N := Nat.mod_lt _ (Nat.pos_of_ne_zero hN)
+  have hdvd : N ∣ t + i := by
+    refine ⟨1 + i / N, ?_⟩
+    have hdm : N * (i / N) + i % N = i := Nat.div_add_mod i N
+    have hexp : N * (1 + i / N) = N + N * (i / N) := by ring
+    rw [ht, hexp]
+    omega
+  have hone : qFrobenius E p (t + i) = 1 := (qFrobenius_eq_one_iff hcard hN).mpr hdvd
+  refine ⟨t + i', fun x hx => ?_⟩
+  have key := congrArg (qFrobenius E p t) hx
+  rw [map_mul, map_one, qFrobenius_comp, qFrobenius_comp] at key
+  rwa [hone, RingAut.one_apply] at key
+
+end Normalize
+
 /-! ## Extending an automorphism of `F` to `E` -/
 
 section Extension
