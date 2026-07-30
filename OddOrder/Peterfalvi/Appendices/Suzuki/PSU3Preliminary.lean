@@ -126,6 +126,54 @@ theorem two_pow_sq_sub_one_div {e m : ℕ} (he : e ≠ 0) :
   rw [hsq, Nat.add_sub_cancel, hone, htwo]
   exact Nat.mul_div_mul_left _ _ hrpos
 
+/-- **The squeeze behind step (8)**.
+
+If `Φ : α → β` has every fibre of size at most `M`, one distinguished fibre of size at
+most `M − 1`, and `|α| = |β| · M − 1`, then *all* those bounds are equalities: the
+fibre over `b₀` has exactly `M − 1` elements and every other fibre exactly `M`.
+
+This is the book's "whence all the inequalities are in fact equalities" (p. 124), with
+`α = Q₀`, `β` the set of `KW`-orbits on `(Q/Q₀)^#`, `M = m = |W|`, and `b₀` the orbit
+of `ω̄₁`. -/
+theorem card_fiber_eq_of_card_eq {α β : Type*} [Fintype α] [Fintype β] [DecidableEq β]
+    (Φ : α → β) {M : ℕ} (hM : 1 ≤ M) (b₀ : β)
+    (hle : ∀ b, (Finset.univ.filter fun a => Φ a = b).card ≤ M)
+    (hb₀ : (Finset.univ.filter fun a => Φ a = b₀).card ≤ M - 1)
+    (hcard : Fintype.card α = Fintype.card β * M - 1) :
+    ∀ b, (Finset.univ.filter fun a => Φ a = b).card = if b = b₀ then M - 1 else M := by
+  classical
+  set g : β → ℕ := fun b => if b = b₀ then M - 1 else M with hg
+  have hpt : ∀ b ∈ (Finset.univ : Finset β),
+      (Finset.univ.filter fun a => Φ a = b).card ≤ g b := by
+    intro b _
+    by_cases h : b = b₀
+    · simp only [hg, if_pos h]
+      exact h ▸ hb₀
+    · simp only [hg, if_neg h]
+      exact hle b
+  have hsumf : ∑ b : β, (Finset.univ.filter fun a => Φ a = b).card = Fintype.card α := by
+    rw [← Finset.card_eq_sum_card_fiberwise (fun a _ => Finset.mem_univ (Φ a))]
+    exact Finset.card_univ
+  have hsumg : ∑ b : β, g b = Fintype.card β * M - 1 := by
+    have hsplit : ∑ b : β, g b = ∑ b ∈ Finset.univ.erase b₀, g b + g b₀ :=
+      (Finset.sum_erase_add _ _ (Finset.mem_univ b₀)).symm
+    have hconst : ∀ b ∈ Finset.univ.erase b₀, g b = M := by
+      intro b hb
+      simp only [hg, if_neg (Finset.ne_of_mem_erase hb)]
+    have herase : ∑ b ∈ Finset.univ.erase b₀, g b = (Fintype.card β - 1) * M := by
+      rw [Finset.sum_congr rfl hconst, Finset.sum_const,
+        Finset.card_erase_of_mem (Finset.mem_univ b₀), Finset.card_univ, smul_eq_mul]
+    rw [hsplit, herase]
+    simp only [hg, if_pos rfl]
+    have hpos : 1 ≤ Fintype.card β := Fintype.card_pos_iff.mpr ⟨b₀⟩
+    obtain ⟨k, hk⟩ : ∃ k, Fintype.card β = k + 1 := ⟨Fintype.card β - 1, by omega⟩
+    rw [hk, Nat.add_sub_cancel, add_mul, one_mul]
+    generalize k * M = t
+    omega
+  have heq : ∑ b : β, (Finset.univ.filter fun a => Φ a = b).card = ∑ b : β, g b := by
+    rw [hsumf, hsumg, hcard]
+  exact fun b => (Finset.sum_eq_sum_iff_of_le hpt).mp heq b (Finset.mem_univ b)
+
 namespace Hypothesis
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
