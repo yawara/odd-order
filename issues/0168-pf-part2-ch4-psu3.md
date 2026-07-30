@@ -512,6 +512,28 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 ⚠ `k ∈ K` の平方根 `a ∈ K` の存在は **`|K|` が奇数** (`K ≤ D`, `|D|` 奇数) から。
 既存 `invertedBy.pow_half_sq` (`(a²)^{(|X|+1)/2} = a`) がそのまま使える。
 
+### (9) の組み立て — 手で追い切った (2026-07-31)
+
+部品は全部揃った: `exists_witness_coset_eq` (入口) と
+`exists_sq_eq_of_mem_K` (締め)。あとは以下を Lean に落とすだけ:
+
+1. `exists_witness_coset_eq` を `d := ζ` で適用 ⟹ `z, b ∈ Q₀`, `a ∈ D` で
+   `a⁻¹ζ ∈ K` かつ `f(ωz) = (ωb)^a`。
+   `a⁻¹ζ ∈ K` すなわち `a ∈ ζK`。`K` と `W` は可換 (`W = C_V(K)`) なので
+   **`a = kζ` (`k ∈ K`) と書ける**。
+2. `exists_sq_eq_of_mem_K` で `c ∈ K`, `c² = k` を取る。
+3. `ω' := (ω z)^c`、`y := (z b)^c` とおく。
+4. **計算**: (H3) を `c ∈ K` (⟹ `c^t = c⁻¹`) で使うと
+   `f(ω') = f((ωz)^c) = f(ωz)^{c⁻¹} = ((ωb))^{c⁻¹kζ}`。
+   `ωb = (ωz)(zb)` (`z² = 1`, `z ∈ Q₀`) と書き直して conjugation を
+   ばらすと `((ωz)^c (zb)^c)^{c⁻²kζ}`。**`c² = k` より `c⁻²k = 1`** ⟹
+   `= (ω' y)^ζ` ✓
+5. `y ≠ 1` は (5) (`ne_one_of_f_eq_conj`) から。
+6. `ω' ∈ Q − Q₀` は `mul_mem_sdiff_Q0` + `D`-共役が `Q₀` を保つことから。
+
+⚠ 4 の conjugation の付け替えが唯一の手数。`z² = 1` (`Q₀` は指数 2) と
+`(u^c)^{c⁻²kζ} = u^{c⁻¹kζ}` を使う。
+
 ### ⚠ (9) の後の「正規化」— §2 の残りの前提
 
 > **We will assume from here on in §2** that the elements `ω_i` have been chosen in
