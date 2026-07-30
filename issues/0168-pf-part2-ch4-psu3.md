@@ -431,6 +431,13 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 * `ω` 自身の類では `not_mem_K_of_f_eq_conj_self` が単位剰余類を除外 ⟹ `≤ |W|−1`。
 * `|α| = |Q₀| = q` (`hQ0card`)、`|β| = index = (q+1)/|W|` (`index_range_mu`)。
 
+⚠ **流し込みで最初に確認すべき点**: `exists_conj_of_coset_eq` は
+`hu : (u : E) = M.coord (…)` を仮説に取る。`orbitOfF` は `Units.mk0 _ proof` で
+定義してあるので**これは `rfl` で埋まるはず**だが、`let` で束ねた所属証明が
+挟まるため syntactic に一致するか要確認。合わなければ `orbitOfF` を
+`fUnit` (単位を返す def) と `orbitOfF := QuotientGroup.mk ∘ fUnit` に分け、
+`fUnit_val : (fUnit … : E) = M.coord (…) := rfl` を明示的に用意する。
+
 そのあと `card_fiber_eq_of_card_eq` に流し込んで段 (8) 完了。
 
 **そのあとの流し込み** (機械的):
