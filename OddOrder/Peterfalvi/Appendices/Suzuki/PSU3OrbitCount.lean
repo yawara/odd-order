@@ -534,6 +534,35 @@ theorem betaRatio_succ {E : Type*} [Field E] (h2 : (2 : E) = 0) {β α : E} (hβ
   simp only [betaRatio]
   rw [add_betaSum_div h2 hβ hα i hne, inv_div]
 
+/-- **Peterfalvi Part II, Ch. IV §2, step (16)** (p. 126), the field-theoretic core: if
+`c_{m-1} = α` and no `β^i` with `1 ≤ i ≤ m − 1` equals `1`, then `β^m = 1`.
+
+The book reaches `β^m = 1` from `u_{m-1} = α` (that is, `c_{m-1} = α = c₁`) as follows:
+`β^{m-1}` is then another root of `X² + αX + 1`, so `β^{m-1} = β` or `β^{m-1} = β⁻¹`; the
+first would give `β^{m-2} = 1`, excluded.  Here that dichotomy is
+`add_inv_eq_add_inv_iff`, the same fibre computation that drove (12).
+
+Stated with `m = k + 3` because the argument needs `1 ≤ m − 2`; the book's own chain
+forces `m ≥ 3` anyway, since `u₁ = 0` and `u_{m-1} = α ≠ 0`. -/
+theorem pow_eq_one_of_betaSum_eq {E : Type*} [Field E] {β α : E} (hβ : β ≠ 0)
+    (hα : β + β⁻¹ = α) {k : ℕ} (hlast : betaSum β (k + 2) = α)
+    (hne : ∀ i, 1 ≤ i → i ≤ k + 2 → β ^ i ≠ 1) :
+    β ^ (k + 3) = 1 := by
+  have hβk : β ^ (k + 2) ≠ 0 := pow_ne_zero _ hβ
+  simp only [betaSum] at hlast
+  rw [← hα] at hlast
+  rcases (add_inv_eq_add_inv_iff hβk hβ).mp hlast with h | h
+  · -- `β^{m-1} = β` would give `β^{m-2} = 1`
+    exfalso
+    refine hne (k + 1) (by omega) (by omega) ?_
+    have e : β ^ (k + 1) * β = 1 * β := by
+      rw [one_mul, ← pow_succ]
+      exact h
+    exact mul_right_cancel₀ hβ e
+  · -- `β^{m-1} · β = 1` is `β^m = 1`
+    rw [pow_succ]
+    exact h
+
 /-- **An automorphism of odd order fixes whatever its square fixes.**
 
 If `orderOf θ = 2m + 1` then `θ = (θ²)^{m+1}`, so every `θ²`-fixed point is `θ`-fixed. -/

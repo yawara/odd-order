@@ -14660,6 +14660,7 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
   OddOrder.Peterfalvi.Appendices.Suzuki.frobNormEquiv_symm_ne_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNormEquiv_symm_div
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.betaScale_succ
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.pow_eq_one_of_betaSum_eq
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNorm_mul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNorm_ne_zero
 #assert_only_allowed_axioms
