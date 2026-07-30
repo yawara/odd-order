@@ -644,8 +644,27 @@ twisted product では `inl w = ⟨0, w⟩`, `rightHom p = ofAdd p.quotient` な
 `U ⊴ U A` (正規化) / `U ∩ A = U ∩ B = ⊥` / `U A = U B` / `|U|` 2 冪 vs `|K W|` 奇数 /
 `U` 可解 / 有限性。
 
-**次 (段 (4) 最終)**: `IsComplement'` の packaging (`↥(U ⊔ A.range)` へ
-`subgroupOf` で降ろす) → `IsComplement'.exists_conj_of_coprime` → `A^u = B`。
+**次 (段 (4) 最終) — packaging の雛形が repo 内に在る**:
+
+`Isaacs/Ch03_SplitExtensions/Basic.lean` の 1050-1140 行が
+**`IsComplement'.exists_conj_of_coprime` を部分群 `P` の中で使う完全な実例**で、
+必要な手順が全部揃っている。踏襲すべき流れ:
+
+1. `H := U ⊔ A.range` と置き、`isComplement'_of_disjoint_and_mul_eq_univ` で
+   `IsComplement' (U.subgroupOf H) (A.range.subgroupOf H)` を作る
+   (`mul_eq_univ` 側は `Subgroup.mem_sup_of_normal_left` で `x = n * k` に分解;
+   雛形の `h_compl_K` の作り方そのまま)。`B` 側も同様 (`U A = U B` を使う)。
+2. 互いに素は `IsComplement'.index_eq_card` で index を `|K W|` に読み替えてから
+   `card_inducingIdAuts_model` (2 冪) と `card_actualKActor_prod_W_odd` (奇数)。
+3. 可解性は `isSolvable_inducingIdAuts_model` を
+   `Subgroup.subgroupOfEquivOfLe` + `solvable_of_solvable_injective` で `↥H` 内へ。
+4. `exists_conj_of_coprime` を適用し、結論を `H.subtype` 越しに押し戻す
+   (雛形の `h_intertwine` / `h_lhs` の 2 段)。
+
+⚠ mathlib の `IsComplement'.subgroupOf_of_le` (`Mathlib/SchurZassenhausConj.lean`)
+は**使えない** — あれは `N`/`K` が**全体 `G` の**補群である場合の降下で、こちらは
+`H` の中でだけ補群だから。上の 1 から直接組む。
+
 その後 段 (5) (`s ↦ (0,1)` の正規化)。
 
 landing 済 (2026-07-31):
