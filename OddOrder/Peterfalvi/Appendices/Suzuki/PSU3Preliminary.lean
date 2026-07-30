@@ -65,6 +65,31 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 open OddOrder.GroupTheory.RankOneBNPair
 
+/-- `q − 1` and `q + 1` are coprime for `q = 2^m`, `m ≥ 1`: both are odd, and they
+differ by `2`.
+
+This is what makes `μ(K) ∩ μ(W) = 1` inside `E^×`: `μ(K)` lies in `F^×`, of order
+`q − 1` (`QuotientFieldModel.mu_K_frobFixed`), while `μ(W)` lies in the norm-one
+subgroup, of order `q + 1` (`QuotientFieldModel.mu_W_normOne`).  Hence
+`|μ(KW)| = |μ(K)| · |μ(W)| = (q − 1) m`, the number behind step (8)'s
+`n = (q + 1)/m`. -/
+theorem coprime_two_pow_sub_one_two_pow_add_one {m : ℕ} (hm : m ≠ 0) :
+    Nat.Coprime (2 ^ m - 1) (2 ^ m + 1) := by
+  have hpow : (2 : ℕ) ∣ 2 ^ m := dvd_pow_self 2 hm
+  have hle : 1 ≤ 2 ^ m := Nat.one_le_two_pow
+  have h1 := Nat.gcd_dvd_left (2 ^ m - 1) (2 ^ m + 1)
+  have h2 := Nat.gcd_dvd_right (2 ^ m - 1) (2 ^ m + 1)
+  have hdvd : Nat.gcd (2 ^ m - 1) (2 ^ m + 1) ∣ 2 := by
+    have hsub : Nat.gcd (2 ^ m - 1) (2 ^ m + 1) ∣ (2 ^ m + 1) - (2 ^ m - 1) :=
+      Nat.dvd_sub h2 h1
+    have e : (2 ^ m + 1) - (2 ^ m - 1) = 2 := by omega
+    rwa [e] at hsub
+  have hodd : ¬ (2 ∣ (2 ^ m - 1)) := by omega
+  rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h | h
+  · exact h
+  · rw [h] at h1
+    exact absurd h1 hodd
+
 namespace Hypothesis
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
