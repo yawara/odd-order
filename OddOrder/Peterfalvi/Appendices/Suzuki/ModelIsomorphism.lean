@@ -261,6 +261,34 @@ theorem exists_scaling_of_mem_frobFixed (hm : m ≠ 0) (hQ0card : Nat.card ↥hy
   obtain ⟨k, hk⟩ := hyp.exists_actualKActor_mu_eq s M hm hQ0card ha ha0
   exact ⟨((M.mu (k, 1) ^ d : M.Eˣ) : M.E), fun x => by rw [← hk]; exact hscale k x⟩
 
+include s in
+/-- **`W` fixes `χ`** (Peterfalvi Part II, Ch. III §3): `w` acts trivially on
+`Q₀ = Z(Q)`, so the descended square map is `W`-invariant.  Together with
+`centreQuadraticMap_smul` this gives a scaling relation for every element of
+`K₁W₁`, which is what makes the whole of `K₁W₁` act on the model `S₁`. -/
+theorem centreQuadraticMap_W_invariant
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (v : ↥hyp.W) (x : M.E) :
+    hyp.centreQuadraticMap s M ι (((M.mu (1, v) : M.Eˣ) : M.E) * x)
+      = hyp.centreQuadraticMap s M ι x := by
+  classical
+  rw [hyp.centreQuadraticMap_apply s M ι, hyp.centreQuadraticMap_apply s M ι]
+  have hact : M.coord.symm (((M.mu (1, v) : M.Eˣ) : M.E) * x)
+      = Additive.ofMul (hyp.quotientWHom v (M.coord.symm x).toMul) := by
+    refine M.coord.injective ?_
+    rw [M.coord.apply_symm_apply]
+    have h := M.coord_act (1, v) (M.coord.symm x).toMul
+    have hkw : hyp.quotientKWHom (1, v) = hyp.quotientWHom v := by
+      rw [hyp.quotientKWHom_apply, map_one, one_mul]
+    rw [hkw] at h
+    rw [h]
+    congr 1
+    exact (M.coord.apply_symm_apply x).symm
+  rw [hact]
+  simp only [toMul_ofMul]
+  rw [hyp.centralSquare_quotientWHom s]
+
 /-! ## The book's cocycle: a semilinear bilinear lift of `χ` -/
 
 /-- The `E`-valued form of `χ`, built from the *same* centre coordinate `ι` as the
@@ -661,6 +689,46 @@ theorem exists_mulEquiv_quadraticExtension (hm : m ≠ 0)
       ((hyp.centreQuadraticMap s M ι).toBilin (Module.finBasis (ZMod 2) M.E))
       (fun x => Suzuki2Groups.QuadraticExtension.toBilin_self _ _ x)
   exact ⟨ι, Φ, hyp.centreQuadraticMap_anisotropic s M ι, hker, hquot⟩
+
+/-! ## The scalar action on the model `S₁` -/
+
+/-- **A scalar acting on the model `S₁`** (Peterfalvi Part II, Ch. III §3, p. 120):
+`(x, y)^a = (a x, ν y)`, where `ν` is the scaling constant of the cocycle.
+
+Well defined as a group automorphism exactly because of the diagonal scaling
+`φ (a x) (a y) = ν · φ (x, y)` — which, unlike the `F`-semilinearity, holds for
+every `a` admitting a scaling relation on `χ`, in particular for the whole of
+`K₁W₁` (`W₁` is not contained in `F`). -/
+noncomputable def modelScalarAut
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    {a : M.E} (ha : a ≠ 0)
+    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)} (hν : ν ≠ 0)
+    (h : ∀ x y : M.E, φ (a * x) (a * y) = ν * φ x y) :
+    MulAut (Suzuki2Groups.BilinearTwistedProduct φ) :=
+  Suzuki2Groups.BilinearTwistedProduct.congrEquiv
+    (AddEquiv.mk' (Equiv.mulLeft₀ a ha) (mul_add a))
+    (AddEquiv.mk' (Equiv.mulLeft₀ ν hν) (mul_add ν)) h
+
+@[simp] theorem modelScalarAut_quotient
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    {a : M.E} (ha : a ≠ 0)
+    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)} (hν : ν ≠ 0)
+    (h : ∀ x y : M.E, φ (a * x) (a * y) = ν * φ x y)
+    (p : Suzuki2Groups.BilinearTwistedProduct φ) :
+    (hyp.modelScalarAut M φ ha hν h p).quotient = a * p.quotient :=
+  rfl
+
+@[simp] theorem modelScalarAut_central
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    {a : M.E} (ha : a ≠ 0)
+    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)} (hν : ν ≠ 0)
+    (h : ∀ x y : M.E, φ (a * x) (a * y) = ν * φ x y)
+    (p : Suzuki2Groups.BilinearTwistedProduct φ) :
+    (hyp.modelScalarAut M φ ha hν h p).central = ν * p.central :=
+  rfl
 
 end Hypothesis
 

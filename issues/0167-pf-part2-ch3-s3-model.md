@@ -511,6 +511,21 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
 順序の入れ替えにも不変 (`ρ₁(a)ρ₂(a)` は対称) なので並べ替えとも両立する。
 ⟹ 上の「短くなった点 (i)」は段 (4) にも及ぶ。
 
+### 段 (4) の部品 (2026-07-31 その 2)
+
+* `BilinearTwistedProduct.congrEquiv` (`Suzuki2Groups/QuadraticExtensions.lean`) —
+  **座標ごとの自己同型の対が twisted product の自己同型になる**条件は
+  `B (f x) (f y) = g (B x y)` だけ。書籍の `(x,y)^a = (ax, a^{1+σ} y)` の
+  well-definedness がまさにこれで、条件は対角スケーリングそのもの。
+* `Hypothesis.centreQuadraticMap_W_invariant` — `W` は χ を固定する
+  (`w` は `Q₀` 上自明)。`centreQuadraticMap_smul` (K 側) と合わせて
+  **`K₁W₁` の全元に scaling 関係が付く** ⟹ 全体が `S₁` に作用する。
+* `Hypothesis.modelScalarAut` — スカラー 1 個の作用
+  `(x,y) ↦ (ax, ν y)` を `MulAut (BilinearTwistedProduct φ)` として。
+
+**次**: `K₁W₁ →* MulAut S₁` の群準同型化 (scaling 定数 `ν` の乗法性は χ の
+scaling 定数の一意性から出る) → `A`/`B`/`U` の設定 → Zassenhaus。
+
 landing 済 (2026-07-31):
 * `exists_bilinear_lift_of_pinned_restriction` に第 3 の結論として追加。
 * Peterfalvi 側は `exists_bilinear_lift_semilinear` →
