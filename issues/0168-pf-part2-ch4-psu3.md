@@ -246,10 +246,28 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 `Q ⋊ KW ≅ S₁ ⋊ K₁W₁` (0167 の `exists_standardModel`) との同一視。
 `m = |W|`, `n = (q+1)/m = |E*/KW|`, `|Q₀| = q`, `Q/Q₀ ≅ E` も要る。
 
-**次セッションの着手順**:
-1. `exists_standardModel` の結論の形を読み、`Q/Q₀ ≅ E` と `KW` 作用を取り出せるか確認。
-2. `|Q₀| = q` / `|Q/Q₀| = q` / `|E*| = q+1`(?) 等の基数事実が repo にあるか grep。
-3. 揃っていれば (8) の数え上げへ。足りなければその補題を先に立てる。
+**(8) の設計調査 — 完了 (2026-07-31)**。必要な部品は**ほぼ全部 repo にある**:
+
+* `QuotientFieldModel hyp m` (QuotientKWField.lean:338) がちょうど求める interface:
+  - `E` + `card : Nat.card E = (2^m)^2` — つまり `q = 2^m`、`|E| = q²`
+  - `coord : Additive (↥Q ⧸ Z(Q)) ≃+ E` — 書籍の `ω ↦ ω̄ ↦ α` そのもの
+  - `coord_act` — `KW` 作用が `E` の乗法 `mu kv * ·` になる
+  - `mu : K × W →* Eˣ` — 書籍の `K₁W₁ ≤ E^×`
+* `exists_standardModel` (ModelAction.lean:731) は `Φ : ↥Q ≃* BilinearTwistedProduct φ`
+  と `Θ` を与え、`(Θ kv p).quotient = μ(kv) * p.quotient`。
+* `Nat.card ↥hyp.D = Nat.card ↥hyp.V * hyp.KSet.ncard` (CentralizerStructure.lean:160)
+
+**(8) の証明の中身 (書籍の "by (7)" の展開)**: `x, x' ∈ Q₀` が同じ `i` を与えると
+(7) を `ω = ω₁`, `ω' = ω_i` で適用して `a, a'` が `K` の**相異なる剰余類**に入る。
+よって `m_i ≤ |D : K|`。⚠ **`|D : K| = m = |W|` は Ch. IV の標準仮説 `V = W`
+に依存する** (`|D| = |V|·|K|` かつ `W = C_V(K)`; 章の主張自体が「`V = W` なら
+`G ≅ PSU(3,q)` または `PGU(3,q)`」)。**`V = W` をまだ仮説に入れていない** —
+(8) に着手する前に `Setup`/`hC2` と同じ流儀で明示仮説として導入すること。
+
+**着手順**: (i) `V = W` と `|D : K| = |W|` を仮説/補題として立てる →
+(ii) 「`f(ω₁x)‾` が `ω̄_i` の `KW`-軌道に入る」を `∃ y ∈ Q₀, ∃ a ∈ D,
+f(ω₁x) = (ω_i y)^a` に翻訳する補題 → (iii) (7) で `m_i ≤ m`、(5) で `m₁ ≤ m−1`
+→ (iv) `Σ m_i = |Q₀| = q` と `n = (q+1)/m` で挟み込んで等号。
 
 **(9) 以降** (p.124 末〜) は未読。`ζ` = `W` の生成元、(C2) より `ζ ≠ 1`。
 ページ画像は p.125/p.126 まで取得済、それ以降は
