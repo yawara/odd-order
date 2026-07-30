@@ -1157,6 +1157,36 @@ theorem exists_mem_Q0_mul_of_quotient_eq
   rw [hZ, Subgroup.mem_subgroupOf] at hmem
   refine ⟨z⁻¹ * z', hmem, by group⟩
 
+/-- Steps 1–4 of the fibre translation: if the coordinates of `z, z' ∈ Q` lie in the
+same coset of `μ(KW)` in `E^×`, then `z'` and a `KW`-translate of `z` agree in
+`Q/Z(Q)`.
+
+`coord_act` turns multiplication by `μ(kv)` in `E` into the action of `kv` on the
+quotient, and `quotientKWHom_mk` re-expresses that action as `conjQHom`. -/
+theorem exists_conjQHom_quotient_eq_of_coset_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {z z' : G} (hzQ : z ∈ hyp.Q) (hz'Q : z' ∈ hyp.Q) {u u' : M.Eˣ}
+    (hu : (u : M.E) = M.coord (Additive.ofMul (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q))))
+    (hu' : (u' : M.E)
+      = M.coord (Additive.ofMul (QuotientGroup.mk (⟨z', hz'Q⟩ : ↥hyp.Q))))
+    (heq : (QuotientGroup.mk u : M.Eˣ ⧸ MonoidHom.range M.mu) = QuotientGroup.mk u') :
+    ∃ kv, (QuotientGroup.mk (⟨z', hz'Q⟩ : ↥hyp.Q) : ↥hyp.Q ⧸ Subgroup.center hyp.Q)
+      = QuotientGroup.mk (hyp.conjQHom kv ⟨z, hzQ⟩) := by
+  obtain ⟨kv, hkv⟩ := MonoidHom.mem_range.mp (QuotientGroup.eq.mp heq)
+  refine ⟨kv, ?_⟩
+  -- `u' = u * μ kv`, hence the same relation between the coordinates in `E`
+  have hprod : u' = u * M.mu kv := by
+    rw [hkv]
+    group
+  have hE : M.coord (Additive.ofMul (QuotientGroup.mk (⟨z', hz'Q⟩ : ↥hyp.Q)))
+      = ((M.mu kv : M.Eˣ) : M.E)
+        * M.coord (Additive.ofMul (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q))) := by
+    rw [← hu, ← hu', hprod, Units.val_mul, mul_comm]
+  -- `coord_act` identifies the right-hand side with the action of `kv`
+  rw [← M.coord_act kv (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q))] at hE
+  have := M.coord.injective hE
+  have h2 := Additive.ofMul.injective this
+  rw [h2, hyp.quotientKWHom_mk]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
