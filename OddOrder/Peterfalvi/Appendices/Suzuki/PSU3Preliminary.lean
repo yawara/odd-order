@@ -49,6 +49,7 @@ It comes out of `t s t = s t s` being *already* a canonical factorization
   `j` and `f` act without fixed points on the `D`-orbits of `Q − Q₀`.
 * `Hypothesis.ne_one_of_f_eq_conj`, `Hypothesis.not_mem_KSet_of_f_eq_conj` — step (5).
 * `Hypothesis.not_mem_KSet_of_f_mul_eq_conj` — step (6).
+* `Hypothesis.not_mem_mul_KSet_of_f_mul_eq_conj` — step (7).
 -/
 
 set_option autoImplicit false
@@ -548,6 +549,57 @@ theorem not_mem_KSet_of_f_mul_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     hyp.not_mem_KSet_of_f_eq_conj H hC2 hωuQ hωuQ0 hy'Q0
       (hyp.D.mul_mem haD (hyp.D.pow_mem hk.1 2)) hZ
   exact hak2 (hyp.mul_sq_mem_KSet haK hk)
+
+/-! ## Step (7) -/
+
+/-- **Peterfalvi Part II, Ch. IV §2, step (7)** (p. 124):
+
+> Let `ω, ω' ∈ Q − Q₀` and let `x_i, y_i ∈ Q₀` and `a_i ∈ D` (`i = 1, 2`) be such that
+> `x₁ ≠ x₂` and `f(ω x_i) = (ω' y_i)^{a_i}`.  Then `a₂ ∉ a₁ K`.
+
+Eliminating `ω'` between the two hypotheses gives
+
+  `f(ω x₂) = (f(ω x₁)^{a₁⁻¹} y₁ y₂)^{a₂} = (f(ω x₁) (y₁y₂)^{a₁})^{a₁⁻¹ a₂}`,
+
+which is step (6) at `ω x₁ ∈ Q − Q₀` with `x = x₁⁻¹ x₂ ≠ 1` — note
+`(ω x₁)(x₁⁻¹ x₂) = ω x₂`.  Hence `a₁⁻¹ a₂ ∉ K`. -/
+theorem not_mem_mul_KSet_of_f_mul_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω ω' x₁ x₂ y₁ y₂ a₁ a₂ : G}
+    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hx₁ : x₁ ∈ hyp.Q0) (hx₂ : x₂ ∈ hyp.Q0) (hxne : x₁ ≠ x₂)
+    (hy₁ : y₁ ∈ hyp.Q0) (hy₂ : y₂ ∈ hyp.Q0)
+    (ha₁ : a₁ ∈ hyp.D) (ha₂ : a₂ ∈ hyp.D)
+    (heq₁ : f (ω * x₁) = a₁⁻¹ * (ω' * y₁) * a₁)
+    (heq₂ : f (ω * x₂) = a₂⁻¹ * (ω' * y₂) * a₂) :
+    a₁⁻¹ * a₂ ∉ hyp.KSet := by
+  have hωx₁Q : ω * x₁ ∈ hyp.Q := hyp.Q.mul_mem hωQ (hyp.Q0_le_Q hx₁)
+  have hωx₁Q0 : ω * x₁ ∉ hyp.Q0 := by
+    intro hcc
+    refine hωQ0 ?_
+    have e : ω = (ω * x₁) * x₁⁻¹ := by group
+    rw [e]
+    exact hyp.Q0.mul_mem hcc (hyp.Q0.inv_mem hx₁)
+  have hx'Q0 : x₁⁻¹ * x₂ ∈ hyp.Q0 := hyp.Q0.mul_mem (hyp.Q0.inv_mem hx₁) hx₂
+  have hx'1 : x₁⁻¹ * x₂ ≠ 1 := fun hcc => hxne (inv_mul_eq_one.mp hcc)
+  have hy'Q0 : a₁⁻¹ * (y₁ * y₂) * a₁ ∈ hyp.Q0 := by
+    have := hyp.conj_mem_Q0_of_mem_H (hyp.H.inv_mem (hyp.D_le_H ha₁))
+      (hyp.Q0.mul_mem hy₁ hy₂)
+    rwa [inv_inv] at this
+  have hy₁sq : y₁ * y₁ = 1 := by have := hy₁.1; rwa [sq] at this
+  -- eliminate `ω'`
+  have hkey : f ((ω * x₁) * (x₁⁻¹ * x₂))
+      = (a₁⁻¹ * a₂)⁻¹ * (f (ω * x₁) * (a₁⁻¹ * (y₁ * y₂) * a₁)) * (a₁⁻¹ * a₂) := by
+    have hprod : (ω * x₁) * (x₁⁻¹ * x₂) = ω * x₂ := by group
+    rw [hprod, heq₂, heq₁]
+    have e : (a₁⁻¹ * a₂)⁻¹ *
+          ((a₁⁻¹ * (ω' * y₁) * a₁) * (a₁⁻¹ * (y₁ * y₂) * a₁)) * (a₁⁻¹ * a₂)
+        = a₂⁻¹ * (ω' * (y₁ * y₁) * y₂) * a₂ := by group
+    rw [e, hy₁sq]
+    group
+  exact hyp.not_mem_KSet_of_f_mul_eq_conj H hC2 hωx₁Q hωx₁Q0 hx'Q0 hx'1 hy'Q0
+    (hyp.D.mul_mem (hyp.D.inv_mem ha₁) ha₂) hkey
 
 end Hypothesis
 
