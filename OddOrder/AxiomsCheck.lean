@@ -11,6 +11,7 @@ import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.Algebra.FixedPointsGalois
 import OddOrder.Algebra.QuadraticFrobenius
 import OddOrder.Algebra.FrobeniusExponentPairs
+import OddOrder.Algebra.QuadraticTraceCorrection
 import OddOrder.Algebra.SemilinearFixedPoint
 import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
 import OddOrder.GroupTheory.BrauerSuzuki
@@ -14474,6 +14475,18 @@ powers of two modulo `2^n − 1`. -/
   OddOrder.FiniteField.two_pow_pair_congruence_of_pow_eq
 #assert_only_allowed_axioms
   OddOrder.FiniteField.frobIndex_pair_eq_of_pow_mul_eq
+
+/-! **The relative trace of `𝐅_{q²}/𝐅_q` and the `F`-valued correction** (issue 0167, 2026-07-30).
+`Algebra/QuadraticTraceCorrection.lean` — a bilinear form on `E` whose diagonal lies in the subfield
+`F` can be corrected, without changing that diagonal, into one taking all its values in `F`
+(`ψ = φ + u·(Tr ∘ φ)` with `Tr u = 1`).  This replaces the book's route to the `F`-valuedness of the
+cocycle of Ch. III §3, p. 121, which reads it off a bar-symmetry of the expansion coefficients. -/
+#assert_only_allowed_axioms OddOrder.FiniteField.frobTrace_apply
+#assert_only_allowed_axioms OddOrder.FiniteField.frobTrace_eq_zero_iff
+#assert_only_allowed_axioms OddOrder.FiniteField.frobTrace_mul_of_mem
+#assert_only_allowed_axioms OddOrder.FiniteField.frobTrace_mem
+#assert_only_allowed_axioms OddOrder.FiniteField.exists_frobTrace_eq_one
+#assert_only_allowed_axioms OddOrder.FiniteField.exists_bilinear_frobFixed_of_diag
 
 /-! **Step (3) of the Ch. III §3 Proposition: `S ≅ S₁`** (issue 0167, 2026-07-30).
 `Appendices/Suzuki/ModelIsomorphism.lean` — the book's `S₁` is the twisted product `E ×_φ F`
