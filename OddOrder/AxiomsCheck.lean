@@ -14512,6 +14512,12 @@ only through its diagonal. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.sq_eq_inl_diag
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.W_card_odd
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.actualKActor_card_odd
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.card_actualKActor_prod_W_odd
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.quotientWHom_injective
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mu_injective
@@ -14561,6 +14567,7 @@ only through its diagonal. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.modelScalarHom_injective_of_quotient
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inducingIdAuts_inf_range_eq_bot
+#assert_only_allowed_axioms Subgroup.sup_range_eq_of_mul_inv_mem
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.congrEquiv_quotient
 #assert_only_allowed_axioms

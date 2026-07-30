@@ -217,6 +217,31 @@ theorem _root_.GroupExtension.mem_inducingIdAuts_iff (Φ : MulAut E) :
     Φ ∈ S.inducingIdAuts ↔ S.InducesId Φ :=
   Iff.rfl
 
+/-- **Two homomorphisms differing pointwise by a subgroup have the same product
+with it.**
+
+If `(g x)⁻¹ · f x ∈ U` for every `x`, then `U ⊔ f.range = U ⊔ g.range`.  This
+upgrades an inclusion of the shape "`B ⊆ U A`" into the equality of products that
+the complement form of the Schur–Zassenhaus conjugacy theorem needs — used in
+Peterfalvi Part II, Ch. III §3, p. 121, step (4). -/
+theorem _root_.Subgroup.sup_range_eq_of_mul_inv_mem {G' : Type*} [Group G']
+    {Γ : Type*} [Group Γ] (U : Subgroup G') (f g : Γ →* G')
+    (h : ∀ x : Γ, (g x)⁻¹ * f x ∈ U) :
+    U ⊔ f.range = U ⊔ g.range := by
+  refine le_antisymm (sup_le le_sup_left ?_) (sup_le le_sup_left ?_)
+  · rintro _ ⟨x, rfl⟩
+    have hx : f x = g x * ((g x)⁻¹ * f x) := by group
+    rw [hx]
+    exact Subgroup.mul_mem _
+      ((le_sup_right : g.range ≤ U ⊔ g.range) ⟨x, rfl⟩)
+      ((le_sup_left : U ≤ U ⊔ g.range) (h x))
+  · rintro _ ⟨x, rfl⟩
+    have hx : g x = f x * ((g x)⁻¹ * f x)⁻¹ := by group
+    rw [hx]
+    exact Subgroup.mul_mem _
+      ((le_sup_right : f.range ≤ U ⊔ f.range) ⟨x, rfl⟩)
+      ((le_sup_left : U ≤ U ⊔ f.range) (Subgroup.inv_mem _ (h x)))
+
 /-- The `W`-coordinate of an element of the embedded kernel. -/
 private noncomputable def kernelCoordinate (x : E) (hx : x ∈ S.inl.range) :
     W :=

@@ -95,6 +95,32 @@ theorem quotientWHom_eq_quotientCongr (v : ↥hyp.W)
     (hfix : ∀ z ∈ Subgroup.center hyp.Q, hyp.conjQByW v z = z) :
     hyp.quotientWHom v = Suzuki2Groups.quotientCongr (hyp.conjQByW v) hfix := rfl
 
+/-- **`|W|` is odd**: `W ≤ V ≤ D` and `D` has odd order. -/
+theorem W_card_odd : Odd (Nat.card ↥hyp.W) :=
+  hyp.D_odd.of_dvd_nat (Subgroup.card_dvd_of_le (hyp.W_le_V.trans hyp.V_le_D))
+
+/-- **`|K|` is odd**: it equals `|Z(Q)| − 1 = q − 1` with `q` a power of `2`. -/
+theorem actualKActor_card_odd {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) (s : hyp.LemmaFiveSetup m) :
+    Odd (Nat.card ↥hyp.actualKActor) := by
+  have hZ : Nat.card ↥(Subgroup.center hyp.Q) = 2 ^ m := by
+    rw [s.centerEqQ0,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv, hQ0card]
+  rw [s.cardActorCenter, hZ]
+  have h2 : 2 ≤ 2 ^ m := by
+    calc 2 = 2 ^ 1 := (pow_one 2).symm
+      _ ≤ 2 ^ m := Nat.pow_le_pow_right (by omega) (Nat.pos_of_ne_zero hm)
+  obtain ⟨a, ha⟩ := dvd_pow_self 2 hm
+  exact ⟨a - 1, by omega⟩
+
+/-- **`|K W|` is odd** — the coprimality input to the Zassenhaus step of
+Ch. III §3 (`U` there is a `2`-group). -/
+theorem card_actualKActor_prod_W_odd {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) (s : hyp.LemmaFiveSetup m) :
+    Odd (Nat.card (↥hyp.actualKActor × ↥hyp.W)) := by
+  rw [Nat.card_prod]
+  exact (hyp.actualKActor_card_odd hm hQ0card s).mul hyp.W_card_odd
+
 /-- **`W` acts faithfully on `Q ⧸ Z(Q)`** (Peterfalvi Part II, Ch. I §3, Lemma 5,
 p. 107 — an internal fact of that proof, isolated here for use downstream).
 

@@ -617,9 +617,19 @@ twisted product では `inl w = ⟨0, w⟩`, `rightHom p = ofAdd p.quotient` な
   `μ` 倍である**任意の**準同型に対して述べたので、模型作用 `B` と移送共役作用 `A`
   の**両方**を 1 本でカバーする (`A` 側は `congr_conjQHom_quotient` が仮説を供給)。
 
-**次 (段 (4) 最終)**: `U A = U B` (各点版から) + 互いに素 (`|U|` 2 冪 vs `|K||W|` 奇数)
-+ 可解性 (`U` 初等アーベル) + 有限性 instance を揃えて
-`IsComplement'.exists_conj_of_coprime` を適用 → `A^u = B`。
+### Zassenhaus 入力の残り (2026-07-31 その 8)
+
+* `Subgroup.sup_range_eq_of_mul_inv_mem` (`CentralExtensionAutomorphisms.lean`) —
+  **各点で `U` の分だけ違う 2 つの準同型は `U` との積が等しい**
+  (`U ⊔ f.range = U ⊔ g.range`)。書籍の包含 `B ⊆ U A` を補群形が要求する**等式**へ
+  格上げする汎用補題 (群論のみ、拡大とは無関係)。
+* `W_card_odd` / `actualKActor_card_odd` / `card_actualKActor_prod_W_odd`
+  (`QuotientKWField.lean`) — `|W|` は `D` の奇数位数から、`|K| = q−1` は `q` が
+  2 冪だから奇数。積も奇数 ⟹ `|U|` (2 冪) と互いに素。
+
+**次 (段 (4) 最終)**: 有限性 instance (`Finite (BilinearTwistedProduct φ)` →
+`Finite (MulAut ...)`) + `U` の 2 群性 (`isElementaryAbelian_inducingIdAuts`) +
+可解性 を揃えて `IsComplement'` を組み、`exists_conj_of_coprime` を適用 → `A^u = B`。
 その後 段 (5) (`s ↦ (0,1)` の正規化)。
 
 landing 済 (2026-07-31):
