@@ -326,11 +326,15 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 **`|K| = q−1` 完了**: `card_actualKActor_eq`。`μ` が `K` を `F^×` の上へ全単射
 (`mu_K_injective` + `exists_actualKActor_mu_eq`) と `natCard_frobFixedSubfield`。
 
-**`|μ(W)| = |W|` も完了**: `mu_W_injective`。`coord_act` で `(1,v)` の作用が
-`μ(1,v)` 倍になり、`coord` が同型なので `quotientWHom` の単射性 (仮説に取る) から
-`μ(1,·)` の単射性が出る。
+⚠ **`μ` の単射性は既存だった (2026-07-31 の訂正)**。`QuotientKWField.lean:504` の
+**`mu_injective : Function.Injective M.mu`** が `K × W` 全体で成り立つので、
+`|μ(KW)| = |K|·|W| = (q−1)·|W|` は直ちに出る。自作した `mu_W_injective` は
+重複だったので撤回した。**Ch. IV の leaf に補題を足す前に
+`QuotientKWField` / `ModelIsomorphism` / `StructureOfH/**` を grep すること**
+(本 issue で 2 度目 — 1 度目は `conj_mem_Q0_of_mem_H` 等)。
 
-⟹ **`|μ(KW)| = (q−1)·|W|` の 2 因子が両方確定**。
+⟹ **`|μ(KW)| = (q−1)·|W|` に必要なものは全部揃っている**
+(`card_actualKActor_eq` + 既存 `mu_injective`)。
 
 **残るのは組み立てのみ**:
 `|μ(KW)| = (q−1)m` → `n = |E^×|/|μ(KW)| = (q+1)/m` →
