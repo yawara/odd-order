@@ -710,6 +710,52 @@ theorem ncard_le_card_V_of_f_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (fun _ _ => Set.mem_univ _) hinj Set.finite_univ
   rwa [Set.ncard_univ, ← Subgroup.index_eq_card, hyp.index_K_subgroupOf_D] at hbound
 
+/-- **The sharpening for `i = 1`**: when `ω' = ω`, the element `a` can never lie in
+`K`.  This is what turns the bound `m₁ ≤ m` into `m₁ ≤ m − 1`.
+
+If `a ∈ K` then `a^t = a⁻¹`, so applying `f` to `f(ωx) = (ωy)^a` and using (H2), (H3)
+gives the *symmetric* relation `f(ωy) = (ωx)^a` with the **same** `a`.  Step (7) then
+forces `x = y` (else `a ∉ aK`, absurd), whence `f(ωx) = (ωx)^a` — that is, `f` fixes
+the `D`-orbit of `ωx ∈ Q − Q₀`, contradicting `f_ne_conj_of_not_mem_Q0`. -/
+theorem not_mem_K_of_f_eq_conj_self (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω x y a : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hxQ0 : x ∈ hyp.Q0) (hyQ0 : y ∈ hyp.Q0) (haD : a ∈ hyp.D)
+    (heq : f (ω * x) = a⁻¹ * (ω * y) * a) : a ∉ hyp.K := by
+  intro haK
+  have haKSet : a ∈ hyp.KSet := by
+    have h : a ∈ (hyp.K : Set G) := haK
+    rwa [hyp.coe_K] at h
+  -- `ω x` and `ω y` lie in `Q − Q₀`
+  have hmul : ∀ z ∈ hyp.Q0, ω * z ∈ hyp.Q ∧ ω * z ∉ hyp.Q0 := by
+    intro z hz
+    refine ⟨hyp.Q.mul_mem hωQ (hyp.Q0_le_Q hz), fun hcc => hωQ0 ?_⟩
+    have e : ω = (ω * z) * z⁻¹ := by group
+    rw [e]
+    exact hyp.Q0.mul_mem hcc (hyp.Q0.inv_mem hz)
+  obtain ⟨hωxQ, hωxQ0⟩ := hmul x hxQ0
+  obtain ⟨hωyQ, hωyQ0⟩ := hmul y hyQ0
+  have hωx1 : ω * x ≠ 1 := fun hcc => hωxQ0 (hcc ▸ hyp.Q0.one_mem)
+  have hωy1 : ω * y ≠ 1 := fun hcc => hωyQ0 (hcc ▸ hyp.Q0.one_mem)
+  -- apply `f`: (H2) on the left, (H3) on the right, and `a^t = a⁻¹`
+  have hff : f (f (ω * x)) = ω * x := (hTwo hyp.rankOneSetup H hωxQ hωx1).1
+  have hstep : f (a⁻¹ * (ω * y) * a)
+      = (hyp.t * a * hyp.t)⁻¹ * f (ω * y) * (hyp.t * a * hyp.t) :=
+    (hThree hyp.rankOneSetup H hωyQ hωy1 haD).1
+  rw [heq, hstep, haKSet.2] at hff
+  have hsym : f (ω * y) = a⁻¹ * (ω * x) * a := by
+    have e : a⁻¹ * (a⁻¹⁻¹ * f (ω * y) * a⁻¹) * a = f (ω * y) := by group
+    rw [hff] at e
+    exact e.symm
+  -- step (7) forces `x = y`
+  have hxy : x = y :=
+    hyp.eq_of_inv_mul_mem_K H hC2 hωQ hωQ0 hxQ0 hyQ0 hyQ0 hxQ0 haD haD heq hsym
+      (by simp)
+  -- ... and then `f` fixes the `D`-orbit of `ω x`
+  rw [hxy] at heq
+  exact hyp.f_ne_conj_of_not_mem_Q0 H hC2 hωyQ hωyQ0 haD heq
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
