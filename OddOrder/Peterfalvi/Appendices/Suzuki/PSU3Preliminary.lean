@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 import OddOrder.Peterfalvi.Appendices.Suzuki.InvolutionClass
+import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.TConjugateTriple
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WielandtOnQ
 
 /-!
 # Peterfalvi Part II, Ch. IV §2: preliminary calculation
@@ -38,6 +41,8 @@ It comes out of `t s t = s t s` being *already* a canonical factorization
 * `Hypothesis.fgh_at_conj_distinguishedInvolution` — step (1).
 * `Hypothesis.f_mul_conj_distinguishedInvolution` — step (2).
 * `Hypothesis.f_conj_distinguishedInvolution_mul` — step (3).
+* `Hypothesis.f_mem_Q0_of_mem_Q0` and friends — `f` and `g` preserve and reflect `Q₀`.
+* `Hypothesis.eq_one_of_f_mul_eq` — step (4).
 -/
 
 set_option autoImplicit false
@@ -52,12 +57,6 @@ variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
   (hyp : Hypothesis G Ω) {f g h : G → G}
 
 include hyp
-
-/-- The distinguished involution lies in `Q` (Ch. I Prop 4 (b) plus
-`Hypothesis.mem_Q_of_sq_eq_one_of_mem_H`). -/
-theorem distinguishedInvolution_mem_Q : hyp.distinguishedInvolution ∈ hyp.Q :=
-  hyp.mem_Q_of_sq_eq_one_of_mem_H hyp.distinguishedInvolution_mem_H
-    hyp.distinguishedInvolution_sq
 
 /-- **Peterfalvi Part II, Ch. IV §2** (p. 123), the base case of step (1):
 under `(C2)` — in the form `t s t = s t s` — the mappings of §1 take the values
@@ -173,6 +172,127 @@ theorem f_conj_distinguishedInvolution_mul (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f 
   obtain ⟨-, e₂, -, -⟩ :=
     hSix hyp.rankOneSetup H hsaQ (hyp.conj_distinguishedInvolution_ne_one a) hωQ hω1 hne
   rw [e₂, hf1]
+
+/-! ## `f` and `g` preserve `Q₀`
+
+`Q₀ = (H ∩ I) ∪ {1}` is the set of involutions of `H` together with `1`, and by
+`Hypothesis.image_conj_KSet_eq_involutions_H` its nonidentity elements are exactly the
+`K`-conjugates `s^k` of the distinguished involution.  Step (1) says `f` and `g` send
+`s^k` to `s^{k⁻¹}`, again an involution — so both preserve `Q₀^#`, and being
+involutive maps they reflect it as well.
+
+This is the engine of step (4).
+-/
+
+/-- Every nonidentity element of `Q₀` is a `K`-conjugate `s^k` of the distinguished
+involution (Ch. I; `Hypothesis.image_conj_KSet_eq_involutions_H`). -/
+theorem exists_mem_KSet_conj_eq_of_mem_Q0 {z : G} (hzQ0 : z ∈ hyp.Q0) (hz1 : z ≠ 1) :
+    ∃ k ∈ hyp.KSet, k⁻¹ * hyp.distinguishedInvolution * k = z := by
+  have hmem : z ∈ {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := ⟨hzQ0.1, hz1, hzQ0.2⟩
+  rw [← hyp.image_conj_KSet_eq_involutions_H hyp.distinguishedInvolution_mem_H
+    hyp.distinguishedInvolution_sq hyp.distinguishedInvolution_ne_one] at hmem
+  obtain ⟨k, hk, hkz⟩ := hmem
+  exact ⟨k, hk, hkz⟩
+
+/-- **`f` maps `Q₀^#` into `Q₀`**: by step (1) it sends `s^k` to `s^{k⁻¹}`. -/
+theorem f_mem_Q0_of_mem_Q0 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {z : G} (hzQ0 : z ∈ hyp.Q0) (hz1 : z ≠ 1) : f z ∈ hyp.Q0 := by
+  obtain ⟨k, hk, rfl⟩ := hyp.exists_mem_KSet_conj_eq_of_mem_Q0 hzQ0 hz1
+  rw [(hyp.fgh_at_conj_distinguishedInvolution H hC2 hk).1]
+  exact hyp.conj_mem_Q0_of_mem_H (hyp.D_le_H hk.1) hyp.distinguishedInvolution_mem_Q0
+
+/-- **`g` maps `Q₀^#` into `Q₀`**, likewise by step (1). -/
+theorem g_mem_Q0_of_mem_Q0 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {z : G} (hzQ0 : z ∈ hyp.Q0) (hz1 : z ≠ 1) : g z ∈ hyp.Q0 := by
+  obtain ⟨k, hk, rfl⟩ := hyp.exists_mem_KSet_conj_eq_of_mem_Q0 hzQ0 hz1
+  rw [(hyp.fgh_at_conj_distinguishedInvolution H hC2 hk).2.1]
+  exact hyp.conj_mem_Q0_of_mem_H (hyp.D_le_H hk.1) hyp.distinguishedInvolution_mem_Q0
+
+/-- **`f` reflects `Q₀`**: `f(z) ∈ Q₀ → z ∈ Q₀` for `z ∈ Q^#`, since `f ∘ f = id`. -/
+theorem mem_Q0_of_f_mem_Q0 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {z : G} (hzQ : z ∈ hyp.Q) (hz1 : z ≠ 1) (hfz : f z ∈ hyp.Q0) : z ∈ hyp.Q0 := by
+  have hfz1 : f z ≠ 1 := H.f_ne_one hyp.rankOneSetup hzQ hz1
+  have := hyp.f_mem_Q0_of_mem_Q0 H hC2 hfz hfz1
+  rwa [(hTwo hyp.rankOneSetup H hzQ hz1).1] at this
+
+/-- **`g` reflects `Q₀`**: `g(z) ∈ Q₀ → z ∈ Q₀` for `z ∈ Q^#`, since `g ∘ g = id`. -/
+theorem mem_Q0_of_g_mem_Q0 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {z : G} (hzQ : z ∈ hyp.Q) (hz1 : z ≠ 1) (hgz : g z ∈ hyp.Q0) : z ∈ hyp.Q0 := by
+  have hgz1 : g z ≠ 1 := H.g_ne_one hyp.rankOneSetup hzQ hz1
+  have := hyp.g_mem_Q0_of_mem_Q0 H hC2 hgz hgz1
+  rwa [g_involutive hyp.rankOneSetup H hzQ hz1] at this
+
+/-! ## Step (4) -/
+
+/-- **Peterfalvi Part II, Ch. IV §2, step (4)** (p. 123):
+
+> If `f(ωx) = f(ω)y` for some `ω ∈ Q − Q₀` and `x, y ∈ Q₀`, then `x = 1`.
+
+Suppose `x ≠ 1`.  Then `x = s^k` for some `k ∈ K`, and since `Q₀` centralizes `Q` the
+hypothesis reads `f(s^k ω) = f(ω) y`.  Comparing with step (3) and solving for the
+inner value gives `f(s^{k⁻¹} g(ω)) = (f(ω) y f(ω)⁻¹)^{h(ω)^{-t}}`, which lies in `Q₀`
+because `Q₀ ⊴ H`.  As `f` reflects `Q₀`, so does `s^{k⁻¹} g(ω)`, hence `g(ω) ∈ Q₀`;
+and as `g` reflects `Q₀` too, `ω ∈ Q₀` — contradiction. -/
+theorem eq_one_of_f_mul_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω x y : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hxQ0 : x ∈ hyp.Q0) (hyQ0 : y ∈ hyp.Q0)
+    (heq : f (ω * x) = f ω * y) : x = 1 := by
+  by_contra hx1
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
+  obtain ⟨k, hk, rfl⟩ := hyp.exists_mem_KSet_conj_eq_of_mem_Q0 hxQ0 hx1
+  -- `Q₀` centralizes `Q`, so `ω` and `s^k` commute
+  have hcomm : ω * (k⁻¹ * hyp.distinguishedInvolution * k)
+      = (k⁻¹ * hyp.distinguishedInvolution * k) * ω :=
+    Subgroup.mem_centralizer_iff.mp
+      (hyp.involutions_H_subset_centralizer_Q hxQ0.2 hxQ0.1 hx1) ω hωQ
+  have hne : (k⁻¹ * hyp.distinguishedInvolution * k) * ω ≠ 1 := by
+    intro hc
+    refine hωQ0 ?_
+    rw [eq_inv_of_mul_eq_one_right hc]
+    exact hyp.Q0.inv_mem hxQ0
+  -- step (3), with the hypothesis substituted on the left
+  have heq' : f ((k⁻¹ * hyp.distinguishedInvolution * k) * ω) = f ω * y := by
+    rw [← hcomm]; exact heq
+  have e3 := hyp.f_conj_distinguishedInvolution_mul H hC2 hk hωQ hω1 hne
+  rw [heq'] at e3
+  -- solve for the inner value
+  have hZeq : f ((k * hyp.distinguishedInvolution * k⁻¹) * g ω)
+      = (hyp.t * h ω * hyp.t) * (f ω * y * (f ω)⁻¹) * (hyp.t * h ω * hyp.t)⁻¹ := by
+    rw [e3]; group
+  -- it lies in `Q₀`, because `Q₀ ⊴ H`
+  have hbH : hyp.t * h ω * hyp.t ∈ hyp.H :=
+    hyp.D_le_H (hyp.rankOneSetup.Dstab _ (H.h_mem hωQ hω1))
+  have hZQ0 : f ((k * hyp.distinguishedInvolution * k⁻¹) * g ω) ∈ hyp.Q0 := by
+    rw [hZeq]
+    exact hyp.conj_mem_Q0_of_mem_H hbH
+      (hyp.conj_mem_Q0_of_mem_H (hyp.Q_le_H (H.f_mem hωQ hω1)) hyQ0)
+  -- ... hence so does its argument, hence `g ω`, hence `ω`
+  have hkS : k * hyp.distinguishedInvolution * k⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_H (hyp.D_le_H hk.1) hyp.distinguishedInvolution_mem_Q0
+  have hargQ : (k * hyp.distinguishedInvolution * k⁻¹) * g ω ∈ hyp.Q :=
+    hyp.Q.mul_mem (hyp.Q0_le_Q hkS) (H.g_mem hωQ hω1)
+  have harg1 : (k * hyp.distinguishedInvolution * k⁻¹) * g ω ≠ 1 := by
+    intro hc
+    refine hωQ0 (hyp.mem_Q0_of_g_mem_Q0 H hC2 hωQ hω1 ?_)
+    rw [eq_inv_of_mul_eq_one_right hc]
+    exact hyp.Q0.inv_mem hkS
+  have hargQ0 : (k * hyp.distinguishedInvolution * k⁻¹) * g ω ∈ hyp.Q0 :=
+    hyp.mem_Q0_of_f_mem_Q0 H hC2 hargQ harg1 hZQ0
+  refine hωQ0 (hyp.mem_Q0_of_g_mem_Q0 H hC2 hωQ hω1 ?_)
+  have e : g ω = (k * hyp.distinguishedInvolution * k⁻¹)⁻¹ *
+      ((k * hyp.distinguishedInvolution * k⁻¹) * g ω) := by group
+  rw [e]
+  exact hyp.Q0.mul_mem (hyp.Q0.inv_mem hkS) hargQ0
 
 end Hypothesis
 

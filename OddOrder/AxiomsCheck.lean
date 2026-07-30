@@ -14588,6 +14588,7 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hOne
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hTwo
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hThree
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.g_involutive
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hFive
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.expand_mul
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.f_mul_g_ne_one
@@ -14600,6 +14601,12 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.fgh_at_conj_distinguishedInvolution
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.f_mul_conj_distinguishedInvolution
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.f_conj_distinguishedInvolution_mul
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_KSet_conj_eq_of_mem_Q0
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.f_mem_Q0_of_mem_Q0
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.g_mem_Q0_of_mem_Q0
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mem_Q0_of_f_mem_Q0
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mem_Q0_of_g_mem_Q0
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.eq_one_of_f_mul_eq
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.conj_mem_Q
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_M_union_t
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_conj_Q

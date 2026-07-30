@@ -36,6 +36,7 @@ The chapter uses these mappings to pin down `G` in the characterization of
 * `Setup.exists_fgh` / `IsFGH.unique` — the mappings exist and are unique.
 * `IsFGH.f_ne_one`, `IsFGH.g_ne_one` — `f` and `g` really map `Q^#` into `Q^#`.
 * `hOne`, `hTwo`, `hThree` — the identities (H1)–(H4).
+* `g_involutive` — `g ∘ g = id`, the `g`-companion of (H2).
 * `hFive` — the identity (H5), `(f ∘ j)³(x) = x^{h(x)⁻¹}` for `j : x ↦ x⁻¹`.
 * `hSix` — the identity (H6), the addition formulas for `f`, `g`, `h` at `xy`.
 * `Setup.closure_M_union_t`, `Setup.closure_conj_Q` — `L = ⟨M, t⟩` and
@@ -432,6 +433,18 @@ theorem hThree (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
     (canonical_conj hS H hxQ hx1)
   exact ⟨by rw [e₁, hbinv], by rw [e₂, hbinv], by rw [e₃, hbinv]⟩
 
+/-- **`g ∘ g = id` on `Q^#`**, the companion of (H2) for `g`.
+
+By (H1) `g = j ∘ f ∘ j`, so `g ∘ g = j f (j j) f j = j (f f) j = id`. -/
+theorem g_involutive (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
+    (hxQ : x ∈ Q) (hx1 : x ≠ 1) : g (g x) = x := by
+  have hxinvQ : x⁻¹ ∈ Q := Q.inv_mem hxQ
+  have hxinv1 : x⁻¹ ≠ 1 := fun hc => hx1 (inv_eq_one.mp hc)
+  have o₁ := (hOne hS H hxQ hx1).1
+  have e := (hOne hS H (H.g_mem hxQ hx1) (H.g_ne_one hS hxQ hx1)).1
+  rw [← o₁, (hTwo hS H hxinvQ hxinv1).1] at e
+  exact (inv_injective e).symm
+
 /-- **(H5)** `(f ∘ j)³(x) = x^{h(x)⁻¹}`, where `j : x ↦ x⁻¹`
 (Peterfalvi Part II, Ch. IV §1, p. 122).
 
@@ -448,11 +461,7 @@ theorem hFive (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
   have hgQ : g x ∈ Q := H.g_mem hxQ hx1
   have hg1 : g x ≠ 1 := H.g_ne_one hS hxQ hx1
   have harg : (f x⁻¹)⁻¹ = g x := by rw [o₁, inv_inv]
-  -- `g ∘ g = id` on `Q^#`
-  have hB : g (g x) = x := by
-    have e := (hOne hS H hgQ hg1).1
-    rw [← o₁, (hTwo hS H hxinvQ hxinv1).1] at e
-    exact (inv_injective e).symm
+  have hB : g (g x) = x := g_involutive hS H hxQ hx1
   -- `h(g(x)) = h(x)⁻¹`
   have hC : h (g x) = (h x)⁻¹ := by
     have hfQ' : f x⁻¹ ∈ Q := H.f_mem hxinvQ hxinv1
