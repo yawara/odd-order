@@ -457,10 +457,13 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
      `exists_center_coordinate_equiv` が返す ι とは**同一視できない**。
      `centreQuadraticMap` は ι を引数に取るので、scaling も同じ ι で再証明して
      `E` 値版と `F` 値版が 1 つの座標を共有するようにした。
-  2. 生き残る対を 1 つ基準に取り、他の対と `restrict_pair_eq_of_mul_eq_on_frobFixed`
-     (P3) で比較して `hres` を作る。
-  3. `exists_bilinear_lift_of_pinned_restriction` (P3) で
-     `φ(ax,by) = α(a) β(b) φ(x,y)`。
+  2-3. ✅ **`exists_bilinear_lift_semilinear`** (2026-07-31)。生き残る対を 1 つ
+     基準 `(σ₀,τ₀)` に取り、他の対と `restrict_pair_eq_of_mul_eq_on_frobFixed`
+     (P3) で比較して `hres` を作り、`exists_bilinear_lift_of_pinned_restriction`
+     (P3) に食わせて `φ(ax,by) = α(a) β(b) φ(x,y)` (`α = σ₀`, `β = τ₀`) を得た。
+     支える補助: `centreQuadraticMapE` (同じ ι から作る `E` 値版の χ — 展開は
+     `E` 上に住むので必要)。生き残る対の存在は χ の anisotropy から
+     (全係数 0 なら χ = 0)。
   4. `Frob_E^{-i₀}` を当てて `α = id` に正規化 (χ は `Frob^{-i₀} ∘ χ`、
      すなわち座標 `ι' := Frob^{-i₀} ∘ ι` に対する χ)。
   5. `exists_bilinear_frobFixed_of_diag` (P4) で `F` 値に補正 (半双線形性は

@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.CenterFieldExponent
 import OddOrder.GroupTheory.CentralExtensionAutomorphisms
 import OddOrder.GroupTheory.CentralElementaryExtension
+import OddOrder.GroupTheory.RepresentationTheory.SemilinearBilinearLift
+import OddOrder.Algebra.FrobeniusExponentPairs
+import OddOrder.Algebra.QuadraticTraceCorrection
 
 /-!
 # Step (3) of the Ch. III §3 Proposition: `S ≅ S₁`
@@ -265,6 +268,127 @@ theorem exists_scaling_of_mem_frobFixed (hm : m ≠ 0) (hQ0card : Nat.card ↥hy
     ∃ b : M.E, ∀ x : M.E, χ (a * x) = b * χ x := by
   obtain ⟨k, hk⟩ := hyp.exists_actualKActor_mu_eq s M hm hQ0card ha ha0
   exact ⟨((M.mu (k, 1) ^ d : M.Eˣ) : M.E), fun x => by rw [← hk]; exact hscale k x⟩
+
+/-! ## The book's cocycle: a semilinear bilinear lift of `χ` -/
+
+/-- The `E`-valued form of `χ`, built from the *same* centre coordinate `ι` as the
+`F`-valued `centreQuadraticMap`.  The Lemma 2(c) expansion lives on `E`, so the
+pinning machinery needs this form; the model `S₁` needs the `F`-valued one. -/
+noncomputable def centreQuadraticMapE
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) :
+    QuadraticMap (ZMod 2) M.E M.E :=
+  (((OddOrder.FiniteField.frobFixedSubfield M.E 2 m).subtype :
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) →+* M.E).toAddMonoidHom.toZModLinearMap
+    2).compQuadraticMap (hyp.centreQuadraticMap s M ι)
+
+@[simp] theorem centreQuadraticMapE_apply
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (x : M.E) :
+    hyp.centreQuadraticMapE s M ι x =
+      ((hyp.centreQuadraticMap s M ι x :
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) :=
+  rfl
+
+include s in
+/-- **The book's cocycle `φ`, before normalization** (Peterfalvi Part II, Ch. III §3,
+p. 121, step (3)).
+
+Chaining the pinned Lemma 2(c) expansion (`exists_scaling_pinned_expansion`), the
+comparison of surviving pairs on `F` (`restrict_pair_eq_of_mul_eq_on_frobFixed`)
+and the reordered lift (`exists_bilinear_lift_of_pinned_restriction`): `χ` has a
+bilinear lift `φ` obeying `φ (a x) (b y) = α(a) β(b) φ(x, y)` for `a, b ∈ F`.
+
+The book gets `α = 1` by choosing coordinates so that `d = 1 + 2^t`; here `α` and
+`β` come out of the expansion and the normalization `α = 1` is applied afterwards,
+by replacing `ι` with `α⁻¹ ∘ ι`. -/
+theorem exists_bilinear_lift_semilinear (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) :
+    ∃ (φ : LinearMap.BilinMap (ZMod 2) M.E M.E) (α β : M.E ≃ₐ[ZMod 2] M.E),
+      (∀ x : M.E, φ x x = hyp.centreQuadraticMapE s M ι x) ∧
+      ∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+        ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+          ∀ x y : M.E, φ (a * x) (b * y) = α a * β b * φ x y := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  letI : Fintype (M.E ≃ₐ[ZMod 2] M.E) := Fintype.ofFinite _
+  have hcardE : Nat.card M.E = 2 ^ (m * 2) := by rw [M.card, ← pow_mul]
+  have hN : m * 2 ≠ 0 := by positivity
+  -- the pinned expansion of the `E`-valued `χ`
+  obtain ⟨c, hexp, hpin⟩ :=
+    OddOrder.RepresentationTheory.exists_scaling_pinned_expansion M.E
+      (hyp.centreQuadraticMapE s M ι)
+  -- the scaling law, for every nonzero `a ∈ F`
+  have hscaleE : ∀ (k : ↥hyp.actualKActor) (x : M.E),
+      hyp.centreQuadraticMapE s M ι (((M.mu (k, 1) : M.Eˣ) : M.E) * x)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) * hyp.centreQuadraticMapE s M ι x :=
+    fun k x => hyp.centreQuadraticMap_smul s M ι d hequiv k x
+  -- some pair survives, else `χ` would be zero
+  have hsurv : ∃ στ : (M.E ≃ₐ[ZMod 2] M.E) × (M.E ≃ₐ[ZMod 2] M.E), c στ ≠ 0 := by
+    by_contra hcon
+    push Not at hcon
+    obtain ⟨x, hx⟩ := exists_ne (0 : M.E)
+    refine hx (hyp.centreQuadraticMap_anisotropic s M ι x ?_)
+    refine Subtype.ext ?_
+    have := hexp x
+    rw [Finset.sum_congr rfl (fun στ _ => by rw [hcon στ, zero_mul]), Finset.sum_const_zero]
+      at this
+    exact this
+  obtain ⟨στ₀, hστ₀⟩ := hsurv
+  -- surviving pairs induce the same product map on `F`
+  have hsame : ∀ στ : (M.E ≃ₐ[ZMod 2] M.E) × (M.E ≃ₐ[ZMod 2] M.E), c στ ≠ 0 →
+      ∀ a : M.E, a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m →
+        στ.1 a * στ.2 a = στ₀.1 a * στ₀.2 a := by
+    intro στ hne a ha
+    rcases eq_or_ne a 0 with rfl | ha0
+    · simp
+    · obtain ⟨b, hb⟩ :=
+        hyp.exists_scaling_of_mem_frobFixed s M hm hQ0card _ d hscaleE ha ha0
+      rw [hpin a b hb στ hne, hpin a b hb στ₀ hστ₀]
+  -- every automorphism of `E` is a Frobenius power
+  have hpow : ∀ ρ : M.E ≃ₐ[ZMod 2] M.E, ∃ i : ℕ, ∀ x : M.E, ρ x = x ^ 2 ^ i := by
+    intro ρ
+    obtain ⟨i, hi⟩ := OddOrder.FiniteField.exists_pow_eq_of_ringAut
+      (K := M.E) (p := 2) (n := m * 2) hcardE hN
+      ((OddOrder.RepresentationTheory.ringAutMulEquivAlgAut M.E 2).symm ρ)
+    exact ⟨i, fun x => hi x⟩
+  -- hence the restriction of every surviving pair to `F` matches `στ₀`
+  have hres : ∀ στ : (M.E ≃ₐ[ZMod 2] M.E) × (M.E ≃ₐ[ZMod 2] M.E), c στ ≠ 0 →
+      (∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+          στ.1 a = στ₀.1 a ∧ στ.2 a = στ₀.2 a) ∨
+        (∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+          στ.1 a = στ₀.2 a ∧ στ.2 a = στ₀.1 a) := by
+    intro στ hne
+    obtain ⟨i, hi⟩ := hpow στ.1
+    obtain ⟨j, hj⟩ := hpow στ.2
+    obtain ⟨i', hi'⟩ := hpow στ₀.1
+    obtain ⟨j', hj'⟩ := hpow στ₀.2
+    have hmul : ∀ a : M.E, a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m →
+        a ^ 2 ^ i * a ^ 2 ^ j = a ^ 2 ^ i' * a ^ 2 ^ j' := by
+      intro a ha
+      rw [← hi, ← hj, ← hi', ← hj']
+      exact hsame στ hne a ha
+    rcases OddOrder.FiniteField.restrict_pair_eq_of_mul_eq_on_frobFixed
+      (E := M.E) hm M.card i j i' j' hmul with h | h
+    · exact Or.inl fun a ha => by
+        rw [hi, hj, hi', hj']
+        exact ⟨(h a ha).1, (h a ha).2⟩
+    · exact Or.inr fun a ha => by
+        rw [hi, hj, hi', hj']
+        exact ⟨(h a ha).1, (h a ha).2⟩
+  obtain ⟨φ, hdiag, hsemi⟩ :=
+    OddOrder.RepresentationTheory.exists_bilinear_lift_of_pinned_restriction M.E
+      (hyp.centreQuadraticMapE s M ι) c hexp
+      ((OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E)) στ₀.1 στ₀.2 hres
+  exact ⟨φ, στ₀.1, στ₀.2, hdiag, hsemi⟩
 
 /-! ## Step (3): the isomorphism with the model -/
 
