@@ -107,13 +107,24 @@ fibre over `b₀` has exactly `M − 1` elements and every other fibre exactly `
 This is the book's "whence all the inequalities are in fact equalities" (p. 124), with
 `α = Q₀`, `β` the set of `KW`-orbits on `(Q/Q₀)^#`, `M = m = |W|`, and `b₀` the orbit
 of `ω̄₁`. -/
-theorem card_fiber_eq_of_card_eq {α β : Type*} [Fintype α] [Fintype β] [DecidableEq β]
+theorem card_fiber_eq_of_card_eq {α β : Type*} [Finite α] [Finite β]
     (Φ : α → β) {M : ℕ} (hM : 1 ≤ M) (b₀ : β)
-    (hle : ∀ b, (Finset.univ.filter fun a => Φ a = b).card ≤ M)
-    (hb₀ : (Finset.univ.filter fun a => Φ a = b₀).card ≤ M - 1)
-    (hcard : Fintype.card α = Fintype.card β * M - 1) :
-    ∀ b, (Finset.univ.filter fun a => Φ a = b).card = if b = b₀ then M - 1 else M := by
+    (hle : ∀ b, {a | Φ a = b}.ncard ≤ M)
+    (hb₀ : {a | Φ a = b₀}.ncard ≤ M - 1)
+    (hcard : Nat.card α = Nat.card β * M - 1) :
+    (∀ b, b ≠ b₀ → {a | Φ a = b}.ncard = M) ∧ {a | Φ a = b₀}.ncard = M - 1 := by
   classical
+  haveI : Fintype α := Fintype.ofFinite _
+  haveI : Fintype β := Fintype.ofFinite _
+  have hconv : ∀ b : β, {a | Φ a = b}.ncard
+      = (Finset.univ.filter fun a => Φ a = b).card := by
+    intro b
+    rw [Set.ncard_eq_toFinset_card']
+    congr 1
+    ext a
+    simp
+  simp only [hconv] at hle hb₀
+  rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card] at hcard
   set g : β → ℕ := fun b => if b = b₀ then M - 1 else M with hg
   have hpt : ∀ b ∈ (Finset.univ : Finset β),
       (Finset.univ.filter fun a => Φ a = b).card ≤ g b := by
@@ -144,7 +155,13 @@ theorem card_fiber_eq_of_card_eq {α β : Type*} [Fintype α] [Fintype β] [Deci
     omega
   have heq : ∑ b : β, (Finset.univ.filter fun a => Φ a = b).card = ∑ b : β, g b := by
     rw [hsumf, hsumg, hcard]
-  exact fun b => (Finset.sum_eq_sum_iff_of_le hpt).mp heq b (Finset.mem_univ b)
+  have key : ∀ b, (Finset.univ.filter fun a => Φ a = b).card = g b :=
+    fun b => (Finset.sum_eq_sum_iff_of_le hpt).mp heq b (Finset.mem_univ b)
+  refine ⟨fun b hb => ?_, ?_⟩
+  · rw [hconv b, key b]
+    simp only [hg, if_neg hb]
+  · rw [hconv b₀, key b₀]
+    simp only [hg, if_pos rfl]
 
 namespace Hypothesis
 
