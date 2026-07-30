@@ -614,6 +614,82 @@ theorem ncard_eq_card_W_sub_one_of_f_eq_conj_self {m : ℕ}
           (Set.ncard_image_of_injective _ Subtype.val_injective).symm
       _ ≤ _ := Set.ncard_le_ncard hsub (Set.toFinite _)
 
+/-- **The witnesses realize every nontrivial coset of `K`.**
+
+The coset map on `S` is injective (step (7)), avoids the identity coset
+(`not_mem_K_of_f_eq_conj_self`), and `|S| = |W| − 1 = |D : K| − 1`
+(`ncard_eq_card_W_sub_one_of_f_eq_conj_self`) — so its image is *all* of
+`(D/K) ∖ {1}`.
+
+This is what lets step (9) choose the witness with `a ∈ Kζ`: `ζ ≠ 1` by (C2). -/
+theorem exists_witness_coset_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hVW : hyp.V = hyp.W) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hinj : Function.Injective M.mu)
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    {d : G} (hdD : d ∈ hyp.D) (hdK : d ∉ hyp.K) :
+    ∃ z ∈ hyp.Q0, ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+      a⁻¹ * d ∈ hyp.K ∧ f (ω * z) = a⁻¹ * (ω * y) * a := by
+  classical
+  set S : Set G := {z : G | z ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D,
+    f (ω * z) = a⁻¹ * (ω * y) * a} with hSdef
+  have key : ∀ z ∈ S, ∃ a, a ∈ hyp.D ∧ ∃ b, b ∈ hyp.Q0 ∧
+      f (ω * z) = a⁻¹ * (ω * b) * a := by
+    rintro z ⟨-, b, hb, a, ha, heq⟩
+    exact ⟨a, ha, b, hb, heq⟩
+  choose! A hAD B hBQ0 hAeq using key
+  set A' : G → ↥hyp.D := fun z => if hh : A z ∈ hyp.D then ⟨A z, hh⟩ else 1 with hA'def
+  have hA'val : ∀ z ∈ S, (A' z : G) = A z := by
+    intro z hz
+    simp only [hA'def, dif_pos (hAD z hz)]
+  set Ψ : G → ↥hyp.D ⧸ hyp.K.subgroupOf hyp.D := fun z => QuotientGroup.mk (A' z)
+    with hΨdef
+  have hinjOn : Set.InjOn Ψ S := by
+    intro z₁ hz₁ z₂ hz₂ hzz
+    have hmem : (A' z₁)⁻¹ * A' z₂ ∈ hyp.K.subgroupOf hyp.D := QuotientGroup.eq.mp hzz
+    rw [Subgroup.mem_subgroupOf] at hmem
+    have hmem' : (A z₁)⁻¹ * A z₂ ∈ hyp.K := by
+      have e : (((A' z₁)⁻¹ * A' z₂ : ↥hyp.D) : G) = (A z₁)⁻¹ * A z₂ := by
+        rw [Subgroup.coe_mul, Subgroup.coe_inv, hA'val z₁ hz₁, hA'val z₂ hz₂]
+      rwa [e] at hmem
+    exact hyp.eq_of_inv_mul_mem_K H hC2 hωQ hωQ0 hz₁.1 hz₂.1
+      (hBQ0 z₁ hz₁) (hBQ0 z₂ hz₂) (hAD z₁ hz₁) (hAD z₂ hz₂)
+      (hAeq z₁ hz₁) (hAeq z₂ hz₂) hmem'
+  have hmaps : Ψ '' S ⊆ (Set.univ \ {1} : Set (↥hyp.D ⧸ hyp.K.subgroupOf hyp.D)) := by
+    rintro _ ⟨z, hz, rfl⟩
+    refine ⟨Set.mem_univ _, fun hc => ?_⟩
+    have hone : A' z ∈ hyp.K.subgroupOf hyp.D := (QuotientGroup.eq_one_iff (A' z)).mp hc
+    rw [Subgroup.mem_subgroupOf, hA'val z hz] at hone
+    exact hyp.not_mem_K_of_f_eq_conj_self H hC2 hωQ hωQ0 hz.1 (hBQ0 z hz)
+      (hAD z hz) (hAeq z hz) hone
+  have hScard := hyp.ncard_eq_card_W_sub_one_of_f_eq_conj_self M hZ H hC2 hVW hm
+    hQ0card hinj hKcard hWdvd hωQ hωQ0
+  have hdiff : (Set.univ \ {1} : Set (↥hyp.D ⧸ hyp.K.subgroupOf hyp.D)).ncard
+      = Nat.card ↥hyp.W - 1 := by
+    rw [Set.ncard_sdiff_singleton_of_mem (Set.mem_univ _), Set.ncard_univ,
+      ← Subgroup.index_eq_card, hyp.index_K_subgroupOf_D, hVW]
+  have heq : Ψ '' S = (Set.univ \ {1} : Set (↥hyp.D ⧸ hyp.K.subgroupOf hyp.D)) :=
+    Set.eq_of_subset_of_ncard_le hmaps
+      (by rw [hinjOn.ncard_image, hScard, hdiff]) (Set.toFinite _)
+  have hdne : (QuotientGroup.mk (⟨d, hdD⟩ : ↥hyp.D) :
+      ↥hyp.D ⧸ hyp.K.subgroupOf hyp.D) ≠ 1 := by
+    intro hc
+    have hmm := (QuotientGroup.eq_one_iff (⟨d, hdD⟩ : ↥hyp.D)).mp hc
+    rw [Subgroup.mem_subgroupOf] at hmm
+    exact hdK hmm
+  obtain ⟨z, hz, hzd⟩ : (QuotientGroup.mk (⟨d, hdD⟩ : ↥hyp.D)) ∈ Ψ '' S := by
+    rw [heq]
+    exact ⟨Set.mem_univ _, hdne⟩
+  refine ⟨z, hz.1, B z, hBQ0 z hz, A z, hAD z hz, ?_, hAeq z hz⟩
+  have hmm := QuotientGroup.eq.mp hzd
+  rw [Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv, hA'val z hz] at hmm
+  exact hmm
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
