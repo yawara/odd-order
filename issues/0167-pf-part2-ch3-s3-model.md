@@ -716,19 +716,29 @@ Proposition を束ねようと鎖を組んだところ、**段 (3) の α-正規
 消してはいない。個々の定理は正しい (それぞれ仮説を満たす対象に対して成立) が、
 **鎖として繋ぐには捻れを吸収する必要がある**。
 
-**修正方針 (自明・機械的)**: 定数を自由パラメータにする。
-`centreQuadraticMap_smul` / `centreQuadraticMap_smul_KW` / `exists_modelScalarHom` /
-`exists_conj_conjQHom_range_eq` の `hequiv` を
+**修正方針 — 一般化は不要だった (2026-07-31 その 11 続き)**。当初は
+`hequiv` を `ν : K × W →* (↥F)ˣ` の自由パラメータへ一般化する (7 定理の signature
+変更) つもりだったが、**もっと軽い解がある**:
 
-    ι (k•z) = ((ν (k,1) : (↥F)ˣ) : M.E) * ι z        -- ν : K × W →* (↥F)ˣ 任意
+`α⁻¹` は有限体 `E` の自己同型なので **Frobenius の冪** (`exists_pow_eq_of_ringAut`)、
+すなわち `x ↦ x^{2^j}`。したがって
 
-の形に一般化すれば、捻れた定数 `α⁻¹ ∘ (μ(·,1)^d)` もそのまま `ν` として渡せる
-(`α⁻¹` は `F` の環同型なので `F^×` の自己同型を誘導し、合成はやはり準同型)。
-`ν(k,v)` が `v` に依らないことは `centreQuadraticMap_W_invariant` から従うので
-構造は変わらない。
+    α⁻¹(μ(k,1)^d) = (μ(k,1)^d)^{2^j} = μ(k,1)^{d · 2^j}
 
-**次**: 上の一般化 (4 定理の `hequiv` を `ν` パラメータ化) → Proposition の束ね直し。
-必要な材料の対応:
+で、**捻れた定数もまた `μ(k,1)^{d'}` の形** (`d' := d · 2^j`)。つまり signature は
+そのままで、`exists_bilinear_lift_normalized` / `exists_mulEquiv_bookCocycle` に
+
+    ∃ d', ∀ k z, ι' (k•z) = μ(k,1)^{d'} · ι' z
+
+という結論を足すだけでよい。⟹ これは issue 冒頭の分析にあった
+「**`d` は 2 の冪倍の分しか決まらない**」がそのまま効いている場面。
+
+✅ **解消済 (2026-07-31)**: `exists_bilinear_lift_normalized` と
+`exists_mulEquiv_bookCocycle` に結論
+`∃ d', ∀ k z, ι'(k•z) = μ(k,1)^{d'} · ι'(z)` を追加した (`d' = d · 2^j`、
+`j` は `α⁻¹` の Frobenius 指数)。signature 変更ゼロで鎖が繋がる。
+
+**次**: Proposition 本体の束ね直し。必要な材料の対応:
 * cocycle の 2 条件 = `exists_mulEquiv_bookCocycle` の第 1・2 連言
 * `Φ x₀ = ⟨0,1⟩` = `hker` + 上の正規化貫通
 * `K₁ = F^×` = `exists_actualKActor_mu_eq`
