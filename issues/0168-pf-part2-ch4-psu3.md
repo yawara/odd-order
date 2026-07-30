@@ -419,9 +419,17 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
    `exists_conj_mul_Q0_iff` の左辺の形。よって
    `∃ y ∈ Q₀, ∃ a ∈ D, f(ω x') = (f(ω x) · y)^a` ✓
 
-**step 1-6 は全部形式化済 (2026-07-31)**。残るは step 7 (3 つを結合して
-`exists_conj_mul_Q0_iff` の左辺の形にする) と `card_fiber_eq_of_card_eq` への
-流し込みのみ。
+🎯 **翻訳 7 ステップは全部形式化済 (2026-07-31)**。結合済の到達点 =
+**`exists_conj_of_coset_eq`**: 座標が同じ剰余類 ⟹ `z' = (z·y)^a`
+(`y ∈ Q₀`, `a ∈ D`) — **これは `ncard_le_card_V_of_f_eq_conj` と
+`not_mem_K_of_f_eq_conj_self` の仮説の形そのもの**。
+
+⟹ **段 (8) の残りは `card_fiber_eq_of_card_eq` への流し込みのみ**:
+* `Φ⁻¹(c)` が空でなければ代表 `x₀` を取り `ω' := f(ω x₀)`。
+  `exists_conj_of_coset_eq` で `Φ⁻¹(c) ⊆ {x | ∃ y ∈ Q₀, ∃ a ∈ D, f(ωx) = (ω'y)^a}`
+  なので `ncard_le_card_V_of_f_eq_conj` から `≤ |V| = |W|` (`V = W` の下)。
+* `ω` 自身の類では `not_mem_K_of_f_eq_conj_self` が単位剰余類を除外 ⟹ `≤ |W|−1`。
+* `|α| = |Q₀| = q` (`hQ0card`)、`|β| = index = (q+1)/|W|` (`index_range_mu`)。
 
 そのあと `card_fiber_eq_of_card_eq` に流し込んで段 (8) 完了。
 
