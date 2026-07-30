@@ -186,6 +186,28 @@ theorem frobNorm_ne_zero {E : Type*} [Field E] (θ : E ≃+* E) {u : E}
     (hu : u ≠ 0) : u * θ u ≠ 0 :=
   mul_ne_zero hu (by simpa using hu)
 
+/-! ### The map `x ↦ x + x⁻¹` (p. 125, step (12))
+
+Step (12) needs a root `β` of `X² + αX + 1`, i.e. an element with `β + β⁻¹ = α`.  The
+map `x ↦ x + x⁻¹` is two-to-one, its only collisions being `x ↔ x⁻¹`; that is what makes
+the counting argument for (12) work.
+-/
+
+/-- `x + x⁻¹ = y + y⁻¹` exactly when `y` is `x` or `x⁻¹`: the difference factors as
+`(x − y)(xy − 1)/(xy)`.
+
+So `x ↦ x + x⁻¹` is two-to-one on the nonzero elements, the fibres being the pairs
+`{x, x⁻¹}`. -/
+theorem add_inv_eq_add_inv_iff {E : Type*} [Field E] {x y : E} (hx : x ≠ 0) (hy : y ≠ 0) :
+    x + x⁻¹ = y + y⁻¹ ↔ x = y ∨ x * y = 1 := by
+  have hxy : x * y ≠ 0 := mul_ne_zero hx hy
+  rw [← sub_eq_zero]
+  have hkey : x + x⁻¹ - (y + y⁻¹) = (x - y) * (x * y - 1) / (x * y) := by
+    field_simp
+    ring
+  rw [hkey, div_eq_zero_iff, mul_eq_zero, sub_eq_zero, sub_eq_zero]
+  simp [hxy]
+
 /-- **An automorphism of odd order fixes whatever its square fixes.**
 
 If `orderOf θ = 2m + 1` then `θ = (θ²)^{m+1}`, so every `θ²`-fixed point is `θ`-fixed. -/

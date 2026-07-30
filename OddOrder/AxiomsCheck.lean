@@ -14641,6 +14641,7 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.coprime_two_pow_sub_one_two_pow_add_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.two_pow_sq_sub_one_div
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.add_inv_eq_add_inv_iff
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNorm_mul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNorm_ne_zero
 #assert_only_allowed_axioms
