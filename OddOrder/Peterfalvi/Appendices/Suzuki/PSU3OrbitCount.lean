@@ -208,6 +208,52 @@ theorem add_inv_eq_add_inv_iff {E : Type*} [Field E] {x y : E} (hx : x ≠ 0) (h
   rw [hkey, div_eq_zero_iff, mul_eq_zero, sub_eq_zero, sub_eq_zero]
   simp [hxy]
 
+/-- **The norm-one subgroup of `E^×` has at least `q + 1` elements** when `|E^×| = q² − 1`
+(written here as `|E^×| = r(r+2)` with `q = r + 1`, to keep clear of truncated
+subtraction).
+
+`u ↦ u^{q−1}` lands in it, since `u^{q²−1} = 1`, and its kernel — the `(q−1)`-st roots of
+unity — has at most `q − 1` elements; so its image has at least `(q²−1)/(q−1) = q + 1`.
+
+Step (12) needs only this lower bound, never the exact count.  That matters: mathlib's
+exact root count for cyclic groups (`card_pow_eq_one_eq_orderOf_aux`) is private, whereas
+the bound `card_rootsOfUnity` is public. -/
+theorem card_rootsOfUnity_ge {E : Type*} [Field E] [Finite E] {r : ℕ} (hr : r ≠ 0)
+    (hcard : Nat.card Eˣ = r * (r + 2)) :
+    r + 2 ≤ Nat.card ↥(rootsOfUnity (r + 2) E) := by
+  classical
+  haveI : Fintype E := Fintype.ofFinite E
+  haveI : NeZero r := ⟨hr⟩
+  -- `u ↦ u^r` lands in the norm-one subgroup
+  have hrange : (powMonoidHom r : Eˣ →* Eˣ).range ≤ rootsOfUnity (r + 2) E := by
+    rintro _ ⟨u, rfl⟩
+    rw [mem_rootsOfUnity]
+    show (u ^ r) ^ (r + 2) = 1
+    rw [← pow_mul, ← hcard]
+    exact pow_card_eq_one'
+  -- its kernel is the `r`-th roots of unity, so has at most `r` elements
+  have hkercard : Nat.card ↥(powMonoidHom r : Eˣ →* Eˣ).ker ≤ r := by
+    rw [← rootsOfUnity_eq_ker, Nat.card_eq_fintype_card]
+    exact card_rootsOfUnity (k := r) (R := E)
+  have hidx : Nat.card ↥(powMonoidHom r : Eˣ →* Eˣ).range
+      = (powMonoidHom r : Eˣ →* Eˣ).ker.index :=
+    (Nat.card_congr (QuotientGroup.quotientKerEquivRange _).toEquiv).symm
+  have hmul := Subgroup.index_mul_card (powMonoidHom r : Eˣ →* Eˣ).ker
+  -- `index · |ker| = r(r+2)` with `|ker| ≤ r` forces `index ≥ r + 2`
+  have hle : (r + 2) * r ≤ (powMonoidHom r : Eˣ →* Eˣ).ker.index * r := by
+    calc (r + 2) * r = r * (r + 2) := by ring
+      _ = (powMonoidHom r : Eˣ →* Eˣ).ker.index *
+            Nat.card ↥(powMonoidHom r : Eˣ →* Eˣ).ker := by rw [hmul, hcard]
+      _ ≤ (powMonoidHom r : Eˣ →* Eˣ).ker.index * r :=
+            Nat.mul_le_mul_left _ hkercard
+  have hfinal : r + 2 ≤ (powMonoidHom r : Eˣ →* Eˣ).ker.index :=
+    Nat.le_of_mul_le_mul_right hle (Nat.pos_of_ne_zero hr)
+  calc r + 2 ≤ (powMonoidHom r : Eˣ →* Eˣ).ker.index := hfinal
+    _ = Nat.card ↥(powMonoidHom r : Eˣ →* Eˣ).range := hidx.symm
+    _ ≤ Nat.card ↥(rootsOfUnity (r + 2) E) :=
+        Nat.card_le_card_of_injective (Subgroup.inclusion hrange)
+          (Subgroup.inclusion_injective hrange)
+
 /-- **An automorphism of odd order fixes whatever its square fixes.**
 
 If `orderOf θ = 2m + 1` then `θ = (θ²)^{m+1}`, so every `θ²`-fixed point is `θ`-fixed. -/
