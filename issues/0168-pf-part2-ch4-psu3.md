@@ -432,6 +432,25 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 * `ω` 自身の類では `not_mem_K_of_f_eq_conj_self` が単位剰余類を除外 ⟹ `≤ |W|−1`。
 * `|α| = |Q₀| = q` (`hQ0card`)、`|β| = index = (q+1)/|W|` (`index_range_mu`)。
 
+### 最終組み立てに要る 6 点 (調査済 2026-07-31)
+
+`card_fiber_eq_of_card_eq` は `Finset.card (univ.filter …)` で書かれているので、
+`Set.ncard` 版のファイバー評価との橋渡しが要る。必要なものは以下:
+
+| # | 要る事実 | 出所 |
+|---|---|---|
+| 1 | `Fintype ↥Q₀` | `Fintype.ofFinite` (`Finite G` から) |
+| 2 | `Fintype (Eˣ ⧸ range μ)` / `DecidableEq` | mathlib + `Classical.dec` |
+| 3 | `Set.ncard {x \| P x} = (univ.filter P).card` | `Set.ncard_eq_toFinset_card'` 系 |
+| 4 | `Fintype.card ↥Q₀ = 2^m` | `hQ0card` + `Nat.card_eq_fintype_card` |
+| 5 | `Fintype.card (Eˣ ⧸ range μ) = (q+1)/\|W\|` | `index_range_mu` + `Subgroup.index_eq_card` |
+| 6 | `q = ((q+1)/\|W\|)·\|W\| − 1` | `\|W\| ∣ q+1` (`isCyclic_W_and_card_dvd_of_orderThree`) + `Nat.div_mul_cancel` |
+
+そのうえで `M := \|W\|`, `b₀ := ⟦baseUnit⟧` として
+`card_fiber_eq_of_card_eq` を適用すれば段 (8) が出る。
+⚠ 3 の変換が一番手間 (`Set.ncard` ↔ `Finset.card`)。ファイバー評価 2 本を
+最初から `Finset.card` で述べ直す方が早いかもしれない — 着手時に判断すること。
+
 ✅ **`rfl` の懸念は先回りで解消済 (2026-07-31)**。`orbitOfF` を
 `fUnit` (単位を返す def) + `QuotientGroup.mk` に分割し、所属証明に
 `f_mul_mem_Q` / `f_mul_not_mem_Q0` と名前を付けたので
