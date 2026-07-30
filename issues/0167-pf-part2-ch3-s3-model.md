@@ -404,10 +404,13 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
     (両順序は対角上で一致するので並べ替えは見えない)、かつ
     `φ(ax, by) = α(a) β(b) φ(x,y)` (`a, b ∈ A`)。`A = F^×`, `α = 1`, `β = θ` で
     書籍の cocycle 条件そのもの。**純粋に代数的** — 数論は仮説に出してある。
-  * ⏳ **残り**: その仮説 (`hres`) を pin から出すこと。必要なのは
-    (i) `E` の自己同型は Frobenius 冪 (既存 `exists_pow_eq_of_ringAut`)、
-    (ii) `a ∈ F ⟹ a^{2^i} = a^{2^{i mod m}}` (`F` 上 `Frob^m = 1`)、
-    (iii) 2 つの生き残る対を `frobIndex_pair_eq_of_pow_mul_eq` (P2) で比較。
+  * ✅ **制限の比較** (2026-07-30, `Algebra/FrobeniusExponentPairs.lean`)。
+    `pow_two_pow_mod_of_mem_frobFixed` (`a ∈ F ⟹ a^{2^i} = a^{2^{i mod m}}`) と
+    `restrict_pair_eq_of_mul_eq_on_frobFixed` (`F` 上で同じ積写像を誘導する
+    Frobenius 冪の対は、`F` 上で順序を除いて一致)。型も噛み合う: 後者の結論は
+    `∀ a ∈ F, a^{2^i} = a^{2^{i'}}`、すなわち `σ a = α a` の形で、これが
+    `exists_bilinear_lift_of_pinned_restriction` の `hres`
+    (体 = `E`、`A = ↑(frobFixedSubfield E 2 m)`、`α β : E ≃ₐ[ZMod 2] E`)。
   * ⏳ **`α = id` への正規化**: `Frob_E^{-i₀}` を全体に当てる (χ は
     `Frob^{-i₀} ∘ χ` に、これは座標 `ι' := Frob^{-i₀} ∘ ι` に対する χ)。
   以下は当初の分析メモ:
@@ -440,9 +443,21 @@ Lemma 2(c) 展開の**係数 `λ₁` 自体**を露出させる必要がある �
     a b^θ e Tr(φ) = a b^θ A(x,y)` (`a, b` は bar 不変)。
   ⟹ 一般補題「対角が `F` 値な双線形持ち上げは、同じ対角のまま `F` 値に補正でき、
   `F`-半双線形性を保つ」(~40 行) で片付く。
-* **P5 ⏳ 組み立て**: `φ(x,y) := Σ c_{στ} σ(x) τ(y)` (P1 の正規化係数) → P3 で順序を
-  揃えて半双線形性 → P4 で `F` 値に補正 → corestrict して
-  `exists_mulEquiv_bilinearTwistedProduct` に食わせて完了。
+* **P5 ⏳ 組み立て (Peterfalvi 側; 部品はすべて揃った)**。手順:
+  1. χ_E (`exists_quadraticMap_of_lemmaFiveSetup`) の pin 展開 (P1) を取る。
+     scaling は `∀ a ∈ F^×` の形が要るので **`μ(K) = F^×`** を先に出す
+     (`mu_K_frobFixed` + `mu_K_injective` + `|K| = q−1` + 巡回群の位数一意部分群
+     `cyclic_subgroup_eq_of_card_eq`)。
+  2. 生き残る対を 1 つ基準に取り、他の対と `restrict_pair_eq_of_mul_eq_on_frobFixed`
+     (P3) で比較して `hres` を作る。
+  3. `exists_bilinear_lift_of_pinned_restriction` (P3) で
+     `φ(ax,by) = α(a) β(b) φ(x,y)`。
+  4. `Frob_E^{-i₀}` を当てて `α = id` に正規化 (χ は `Frob^{-i₀} ∘ χ`、
+     すなわち座標 `ι' := Frob^{-i₀} ∘ ι` に対する χ)。
+  5. `exists_bilinear_frobFixed_of_diag` (P4) で `F` 値に補正 (半双線形性は
+     明示式から従う)。
+  6. `↥F` に corestrict して `centreQuadraticMap s M ι'` と対角を突き合わせ、
+     `exists_mulEquiv_bilinearTwistedProduct` に食わせて完了。
 
 ### 段 (2) 完了 (2026-07-30)
 

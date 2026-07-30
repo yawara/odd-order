@@ -88,4 +88,64 @@ theorem frobIndex_pair_eq_of_pow_mul_eq {F : Type*} [Field F] [Finite F]
   exact two_pow_pair_sum_eq (Nat.pos_of_ne_zero hn)
     (two_pow_pair_congruence_of_pow_eq (Nat.pos_of_ne_zero hn) hordg hpow)
 
+/-! ## Restricting Frobenius powers of `E` to the subfield `F` -/
+
+section Restrict
+
+variable {E : Type*} [Field E] [Finite E] [CharP E 2] {m : ℕ}
+
+/-- **On `F` the Frobenius exponent only matters modulo `m`**: the `q`-power
+Frobenius is the identity there, so `a^{2^i} = a^{2^{i mod m}}`. -/
+theorem pow_two_pow_mod_of_mem_frobFixed {a : E}
+    (ha : a ∈ frobFixedSubfield E 2 m) (i : ℕ) :
+    a ^ 2 ^ i = a ^ 2 ^ (i % m) := by
+  have hfix : a ^ 2 ^ m = a := mem_frobFixedSubfield.mp ha
+  have key : ∀ k : ℕ, a ^ 2 ^ (m * k) = a := by
+    intro k
+    induction k with
+    | zero => simp
+    | succ k ih =>
+      rw [Nat.mul_succ, pow_add, pow_mul, ih, hfix]
+  conv_lhs => rw [← Nat.div_add_mod i m]
+  rw [pow_add, pow_mul, key (i / m)]
+
+/-- **A pair of Frobenius powers of `E` is determined on `F`, up to order, by the
+product map it induces there.**
+
+`E`'s automorphisms restrict to `F` through their exponent modulo `m`, so this is
+`frobIndex_pair_eq_of_pow_mul_eq` for the field `F` of order `2^m`.
+
+Peterfalvi Part II, Ch. III §3, p. 121: applied to two pairs surviving in the
+Lemma 2(c) expansion of `χ` — both satisfying `σ(a) τ(a) = a^d` on `F^×` — it says
+all surviving pairs have the *same* restriction to `F`, which is the hypothesis of
+`exists_bilinear_lift_of_pinned_restriction`. -/
+theorem restrict_pair_eq_of_mul_eq_on_frobFixed (hm : m ≠ 0)
+    (hcard : Nat.card E = (2 ^ m) ^ 2) (i j i' j' : ℕ)
+    (h : ∀ a : E, a ∈ frobFixedSubfield E 2 m →
+      a ^ 2 ^ i * a ^ 2 ^ j = a ^ 2 ^ i' * a ^ 2 ^ j') :
+    (∀ a ∈ frobFixedSubfield E 2 m, a ^ 2 ^ i = a ^ 2 ^ i' ∧ a ^ 2 ^ j = a ^ 2 ^ j') ∨
+      (∀ a ∈ frobFixedSubfield E 2 m,
+        a ^ 2 ^ i = a ^ 2 ^ j' ∧ a ^ 2 ^ j = a ^ 2 ^ i') := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
+  -- the hypothesis, read inside `F`
+  have hF : ∀ a : ↥(frobFixedSubfield E 2 m),
+      a ^ 2 ^ i * a ^ 2 ^ j = a ^ 2 ^ i' * a ^ 2 ^ j' := by
+    intro a
+    refine Subtype.ext ?_
+    push_cast
+    exact h (a : E) a.2
+  -- `mod m` transport of the conclusion back to `E`
+  have hmod : ∀ (k l : ℕ), (k : ZMod m) = (l : ZMod m) →
+      ∀ a ∈ frobFixedSubfield E 2 m, a ^ 2 ^ k = a ^ 2 ^ l := by
+    intro k l hkl a ha
+    have : k % m = l % m := (ZMod.natCast_eq_natCast_iff' k l m).mp hkl
+    rw [pow_two_pow_mod_of_mem_frobFixed ha k, pow_two_pow_mod_of_mem_frobFixed ha l, this]
+  rcases frobIndex_pair_eq_of_pow_mul_eq (F := ↥(frobFixedSubfield E 2 m)) hm
+    (natCard_frobFixedSubfield hcard hm) hF with ⟨h1, h2⟩ | ⟨h1, h2⟩
+  · exact Or.inl fun a ha => ⟨hmod i i' h1 a ha, hmod j j' h2 a ha⟩
+  · exact Or.inr fun a ha => ⟨hmod i j' h1 a ha, hmod j i' h2 a ha⟩
+
+end Restrict
+
 end OddOrder.FiniteField

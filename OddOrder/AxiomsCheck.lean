@@ -14478,6 +14478,10 @@ powers of two modulo `2^n − 1`. -/
   OddOrder.FiniteField.two_pow_pair_congruence_of_pow_eq
 #assert_only_allowed_axioms
   OddOrder.FiniteField.frobIndex_pair_eq_of_pow_mul_eq
+#assert_only_allowed_axioms
+  OddOrder.FiniteField.pow_two_pow_mod_of_mem_frobFixed
+#assert_only_allowed_axioms
+  OddOrder.FiniteField.restrict_pair_eq_of_mul_eq_on_frobFixed
 
 /-! **The relative trace of `𝐅_{q²}/𝐅_q` and the `F`-valued correction** (issue 0167, 2026-07-30).
 `Algebra/QuadraticTraceCorrection.lean` — a bilinear form on `E` whose diagonal lies in the subfield
