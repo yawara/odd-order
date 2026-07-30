@@ -243,7 +243,16 @@ out of the irreducibility of the *whole* of `KW` in one step, and `ω = μ (1, w
 Stated with the additive coordinate `α : Additive (S/Q₀) ≃+ E` of p. 119 rather
 than with a `Module E` structure on the quotient: the commutativity of `S/Q₀` is
 a *theorem* here (it comes from `LemmaFiveSetup`), so no `CommGroup` instance on
-the quotient is available in the statement, and `AddEquiv` needs none. -/
+the quotient is available in the statement, and `AddEquiv` needs none.
+
+The last three conjuncts are the book's `K₁ = F^×` and
+`W₁ ≤ {x ∈ E^× : x^{1+q} = 1}`:
+
+* `μ (k, 1)` is fixed by the Frobenius `x ↦ x^q` of `E`, i.e. lies in the subfield
+  `F = 𝐅_q`, because `|K| = q − 1`;
+* `k ↦ μ (k, 1)` is injective, so `μ` maps `K` *onto* the order-`(q − 1)` subgroup
+  `F^×` of the cyclic group `E^×`;
+* `μ (1, v)^{1+q} = 1`, because `|W|` divides `q + 1` (Ch. I §3 Lemma 5). -/
 theorem exists_field_quotient_of_orderThree
     (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
     (hQsuz : IsSuzuki2Group ↥hyp.Q)
@@ -257,10 +266,14 @@ theorem exists_field_quotient_of_orderThree
       (μ : ↥hyp.actualKActor × ↥hyp.W →* Eˣ)
       (α : Additive (↥hyp.Q ⧸ Subgroup.center hyp.Q) ≃+ E),
       Nat.card E = (2 ^ m) ^ 2 ∧
-      ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
         (y : ↥hyp.Q ⧸ Subgroup.center hyp.Q),
         α (Additive.ofMul (hyp.quotientKWHom kv y))
-          = (μ kv : E) * α (Additive.ofMul y) := by
+          = (μ kv : E) * α (Additive.ofMul y)) ∧
+      (∀ k : ↥hyp.actualKActor,
+        ((μ (k, 1) : Eˣ) : E) ^ 2 ^ m = ((μ (k, 1) : Eˣ) : E)) ∧
+      Function.Injective (fun k : ↥hyp.actualKActor => μ (k, 1)) ∧
+      (∀ v : ↥hyp.W, μ (1, v) ^ (2 ^ m + 1) = 1) := by
   classical
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hZcard : Nat.card ↥(Subgroup.center hyp.Q) = 2 ^ m := by
@@ -275,13 +288,14 @@ theorem exists_field_quotient_of_orderThree
       inductionHypothesis s hw hw1 U hU
   have hEA : IsElementaryAbelian 2 (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
     s.isplit.split.quotientEA
-  haveI hWcyc : IsCyclic ↥hyp.W :=
-    (hyp.isCyclic_W_and_card_dvd_of_orderThree hst hQsuz hm hQ0card hcardQ
-      inductionHypothesis).1
+  obtain ⟨hWcyc, hWdvd⟩ :=
+    hyp.isCyclic_W_and_card_dvd_of_orderThree hst hQsuz hm hQ0card hcardQ
+      inductionHypothesis
+  haveI := hWcyc
   letI : CommGroup (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
     { (inferInstance : Group (↥hyp.Q ⧸ Subgroup.center hyp.Q)) with
       mul_comm := hEA.comm }
-  haveI : Nontrivial (↥hyp.Q ⧸ Subgroup.center hyp.Q) := by
+  haveI hMnontriv : Nontrivial (↥hyp.Q ⧸ Subgroup.center hyp.Q) := by
     refine Finite.one_lt_card_iff_nontrivial.mp ?_
     rw [hMcard]
     calc 1 < 2 ^ m := Nat.one_lt_pow hm (by norm_num)
@@ -290,7 +304,37 @@ theorem exists_field_quotient_of_orderThree
   letI : CommGroup ↥hyp.W := IsCyclic.commGroup
   obtain ⟨E, instE, instFin, μ, α, hcardE, hμ⟩ :=
     Huppert.exists_field_coordinate_of_irreducible hEA hyp.quotientKWHom hirr
-  exact ⟨E, instE, instFin, μ, α, hcardE.trans hMcard, hμ⟩
+  letI : Field E := instE
+  refine ⟨E, instE, instFin, μ, α, hcardE.trans hMcard, hμ, ?_, ?_, ?_⟩
+  · -- `μ (k, 1)` is Frobenius-fixed: its order divides `|K| = q − 1`
+    intro k
+    have hk : k ^ (2 ^ m - 1) = 1 := by rw [← s.cardActor]; exact pow_card_eq_one'
+    have hp : ((k, 1) : ↥hyp.actualKActor × ↥hyp.W) ^ (2 ^ m - 1) = 1 := by
+      rw [Prod.pow_mk, hk, one_pow, Prod.mk_one_one]
+    have hone : ((μ (k, 1) : Eˣ) : E) ^ (2 ^ m - 1) = 1 := by
+      rw [← Units.val_pow_eq_pow_val, ← map_pow, hp, map_one, Units.val_one]
+    have hle : 1 ≤ (2 : ℕ) ^ m := Nat.one_le_two_pow
+    rw [show (2 : ℕ) ^ m = (2 ^ m - 1) + 1 by omega, pow_succ, hone, one_mul]
+  · -- injectivity: a `K`-actor acting trivially on the quotient is trivial
+    refine (injective_iff_map_eq_one (f := (μ.comp (MonoidHom.inl _ _)))).mpr ?_
+    intro k hk1
+    by_contra hkne
+    obtain ⟨y, hy⟩ := exists_ne (1 : ↥hyp.Q ⧸ Subgroup.center hyp.Q)
+    refine hy (s.freeQuotient k hkne y ?_)
+    have hfix : hyp.quotientKWHom (k, 1) y = y := by
+      refine Additive.ofMul.injective (α.injective ?_)
+      rw [hμ (k, 1) y]
+      have : μ (k, 1) = 1 := hk1
+      rw [this, Units.val_one, one_mul]
+    rwa [hyp.quotientKWHom_apply, map_one, mul_one] at hfix
+  · -- `|W|` divides `q + 1`, so `μ (1, v)^{q+1} = 1`
+    intro v
+    obtain ⟨c, hc⟩ := hWdvd
+    have hv : v ^ (2 ^ m + 1) = 1 := by
+      rw [hc, pow_mul, pow_card_eq_one', one_pow]
+    have hp : ((1, v) : ↥hyp.actualKActor × ↥hyp.W) ^ (2 ^ m + 1) = 1 := by
+      rw [Prod.pow_mk, hv, one_pow, Prod.mk_one_one]
+    rw [← map_pow, hp, map_one]
 
 end Hypothesis
 

@@ -161,12 +161,22 @@ Appendix III Definition 3 により `S` は中心拡大
   `exists_field_coordinate_realization` (作用が regular = `|T| = |E| − 1` を要求) の
   **既約版**。`|KW| = (q−1)|W|` は `|W| ∣ q+1` しか分からないので regular 版は使えない。
 
+### `K₁ = F^×` / `W₁ ≤ {x : x^{1+q} = 1}` も同 leaf に landing (2026-07-30 その 2)
+
+`exists_field_quotient_of_orderThree` の結論に 3 つの連言を追加:
+
+* `((μ (k,1) : E)) ^ q = (μ (k,1) : E)` — `|K| = q−1` ゆえ `μ(K)` は Frobenius
+  `x ↦ x^q` の固定体 = 部分体 `F = 𝔽_q` に入る (書籍の `K₁ = F^×` の「⊆」)。
+* `Function.Injective (fun k => μ (k,1))` — `s.freeQuotient` から。これで像の位数が
+  ちょうど `q−1`、すなわち巡回群 `E^×` の唯一の位数 `q−1` 部分群 = `F^×` に**一致**する。
+* `μ (1,v) ^ (q+1) = 1` — Lemma 5 の `|W| ∣ q+1` から (書籍の `W₁ ≤ {x : x^{1+q} = 1}`)。
+
 ### 段 (1) の残り → 段 (2) へ
 
-* `K₁ = F^×` / `W₁ ≤ {x : x^{1+q} = 1}` の明示: `|K| = q−1`, `|W| ∣ q+1` と `μ` が準同型
-  なので `μ(k,1)^q = μ(k,1)` (= `𝔽_q` に落ちる) と `μ(1,v)^{q+1} = 1` は即出る。
-  `μ|_K` の単射性も `s.freeQuotient` から即。**次の commit で本定理の結論に足す**。
 * `μ` 全体の単射性 (= `K ∩ W = 1` の像版) は `W` の商上の忠実性が必要で、
   monolith 内の `hfaith` (`WCyclicDivides.lean`) を切り出す作業になる。下流が要求したら着手。
 * 段 (2) `σ` の存在は Appendix III Lemma 2(c) +
   `SemilinearFieldAut` / `QuadraticMapCoordinates` (issue 0148) を `E` に当てる。
+  ⚠ `exists_field_semilinear_with_scalar` の**第 4 連言 (semilinearity)** を今は捨てている
+  (`- ` で潰した) が、段 (2) の `σ` はまさにこれ — `t` による共役が `KW` の作用を
+  正規化するので、`σ : E ≃+* E` が出る。段 (2) では捨てずに受け取ること。
