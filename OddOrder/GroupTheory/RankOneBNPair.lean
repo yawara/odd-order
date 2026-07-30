@@ -40,6 +40,8 @@ The chapter uses these mappings to pin down `G` in the characterization of
 * `hSix` — the identity (H6), the addition formulas for `f`, `g`, `h` at `xy`.
 * `Setup.closure_M_union_t`, `Setup.closure_conj_Q` — `L = ⟨M, t⟩` and
   `⟨Q^x | x ∈ L⟩ = ⟨Q, Q^t⟩`, the generation half of the Lemma of §1.
+* `IsFGH.dOrbitRel_f`, `IsFGH.dOrbitRel_fj_cube` — `⟨f, j⟩` acts on the `D`-orbits of
+  `Q^#` as a quotient of the dihedral group of order `6`.
 * `coordsEquiv`, `coords_smul_t_some`, `coords_smul_some_of_mem_M` — the permutation
   model `X ≅ Q ∪ {a}` of the Lemma of §1, in which `t` acts by `f` and `M` acts
   through its `Q ⋊ D` structure.
@@ -560,6 +562,61 @@ theorem hSix (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
   obtain ⟨e₁, e₂, e₃⟩ := fgh_eq_of_canonical hS H (Q.mul_mem hxQ hyQ) hxy1 hp hd hq
     (canonical_mul hS H hxQ hx1 hyQ hy1 hne)
   exact ⟨hne, e₁, e₂, e₃⟩
+
+/-! ## The action of `⟨f, j⟩` on the `D`-orbits of `Q^#`
+
+Peterfalvi Part II, Ch. IV §1, p. 123:
+
+> We note that, by (H2), (H3) and (H5), `⟨f, j⟩` acts on the set of orbits of `Q^#`
+> under `D`, and that the permutation group induced by `⟨f, j⟩` on this set is
+> isomorphic to a quotient of the dihedral group of order 6.
+
+Both maps descend to the orbit set — `j` trivially, `f` by (H3), whose twist `a ↦ a^t`
+stays inside `D` — and there they satisfy `j² = f² = (f ∘ j)³ = 1`, which is exactly a
+presentation of the dihedral group of order `6`.  The third relation is (H5): the
+discrepancy `x^{h(x)⁻¹}` is invisible on orbits because `h(x)⁻¹ ∈ D`.
+
+§2 uses this to transfer a fixed-point statement from `j` to `f` (step (5), p. 124).
+-/
+
+/-- The `D`-orbit relation on `Q^#`, in Peterfalvi's exponent convention
+`x^d = d⁻¹ x d`. -/
+def dOrbitRel (D : Subgroup L) (x y : L) : Prop := ∃ d ∈ D, y = d⁻¹ * x * d
+
+namespace dOrbitRel
+
+theorem refl (x : L) : dOrbitRel D x x := ⟨1, D.one_mem, by group⟩
+
+theorem symm {x y : L} (hxy : dOrbitRel D x y) : dOrbitRel D y x := by
+  obtain ⟨d, hd, rfl⟩ := hxy
+  exact ⟨d⁻¹, D.inv_mem hd, by group⟩
+
+theorem trans {x y z : L} (hxy : dOrbitRel D x y) (hyz : dOrbitRel D y z) :
+    dOrbitRel D x z := by
+  obtain ⟨d, hd, rfl⟩ := hxy
+  obtain ⟨e, he, rfl⟩ := hyz
+  exact ⟨d * e, D.mul_mem hd he, by group⟩
+
+/-- `j : x ↦ x⁻¹` descends to the orbit set. -/
+theorem inv {x y : L} (hxy : dOrbitRel D x y) : dOrbitRel D x⁻¹ y⁻¹ := by
+  obtain ⟨d, hd, rfl⟩ := hxy
+  exact ⟨d, hd, by group⟩
+
+end dOrbitRel
+
+/-- **`f` descends to the orbit set**, by (H3): conjugating `x` by `a ∈ D` conjugates
+`f(x)` by `a^t`, which again lies in `D` because `D = M ∩ M^t`. -/
+theorem IsFGH.dOrbitRel_f (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
+    (hxQ : x ∈ Q) (hx1 : x ≠ 1) {a : L} (haD : a ∈ D) :
+    dOrbitRel D (f x) (f (a⁻¹ * x * a)) :=
+  ⟨t * a * t, hS.Dstab a haD, (hThree hS H hxQ hx1 haD).1⟩
+
+/-- **`(f ∘ j)³ = 1` on the orbit set**, by (H5): `(f ∘ j)³(x) = x^{h(x)⁻¹}` and
+`h(x)⁻¹ ∈ D`. -/
+theorem IsFGH.dOrbitRel_fj_cube (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
+    (hxQ : x ∈ Q) (hx1 : x ≠ 1) :
+    dOrbitRel D x (f ((f ((f x⁻¹)⁻¹))⁻¹)) :=
+  ⟨(h x)⁻¹, D.inv_mem (H.h_mem hxQ hx1), by rw [hFive hS H hxQ hx1]; group⟩
 
 /-! ## The permutation model
 

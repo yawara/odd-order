@@ -14594,6 +14594,9 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.conj_mem_Q
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_M_union_t
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_conj_Q
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.dOrbitRel.inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.IsFGH.dOrbitRel_f
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.IsFGH.dOrbitRel_fj_cube
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.coords_bijective
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.coords_smul_t_none
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.coords_smul_t_one
