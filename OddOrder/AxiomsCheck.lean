@@ -14670,6 +14670,13 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centerCoord_mul
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centerCoord_eq_zero_iff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centerCoord_injective
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.eq_iff_centerCoord_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.toCenter_conj
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.centerCoord_conj
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNorm_mul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNorm_ne_zero
 #assert_only_allowed_axioms
