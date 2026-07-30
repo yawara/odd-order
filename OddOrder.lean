@@ -3,6 +3,7 @@ import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.Algebra.ChevalleyWarning
 import OddOrder.Algebra.FiniteIndexAnnihilator
 import OddOrder.Algebra.FixedPointsGalois
+import OddOrder.Algebra.QuadraticFrobenius
 import OddOrder.Algebra.SemilinearFixedPoint
 import OddOrder.Algebra.PrincipalIdealTheorem
 import OddOrder.Algebra.QuadraticMapCoordinates

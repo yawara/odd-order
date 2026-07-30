@@ -9,6 +9,7 @@ import OddOrder.Algebra.PowSubOneDvd
 import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.Algebra.FixedPointsGalois
+import OddOrder.Algebra.QuadraticFrobenius
 import OddOrder.Algebra.SemilinearFixedPoint
 import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
 import OddOrder.GroupTheory.BrauerSuzuki
@@ -14416,3 +14417,22 @@ of `KW` acts by scalars — the book's `S/Q₀ ≅ E`, `KW ↪ E^×` — with no
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isAInvariant_quotientKW_eq_bot_or_top
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_field_quotient_of_orderThree
+
+/-! **The `q`-power Frobenius of a field of order `q²`** (issues 0167 / 9504, 2026-07-30).
+`Algebra/QuadraticFrobenius.lean` — the ambient field theory of Ch. III §3, p. 120, where
+`E = 𝐅_{q²}` carries the bar operation `x ↦ x̄ = x^q` and `F = 𝐅_q` is its fixed field.
+
+`σ₀ : x ↦ x^q` is an involution (its square is the `q²`-power map = identity) and is not the
+identity (else every unit would satisfy `x^{q-1} = 1`, forcing the exponent `q² − 1` of the cyclic
+group `E^×` to divide `q − 1`).  Artin's lemma (`RingAut.finrank_fixedSet`) applied to `⟨σ₀⟩`, of
+order `2`, gives `[E : F] = 2`, hence `|F| = q`.  Finally `σ₀` inverts the norm-one subgroup
+`{x : x^{1+q} = 1}` — which is exactly the book's `σ` in the case `θ = 1`. -/
+#assert_only_allowed_axioms OddOrder.FiniteField.qFrobenius_sq
+#assert_only_allowed_axioms OddOrder.FiniteField.qFrobenius_ne_one
+#assert_only_allowed_axioms OddOrder.FiniteField.orderOf_qFrobenius
+#assert_only_allowed_axioms OddOrder.FiniteField.fixedSet_qFrobenius
+#assert_only_allowed_axioms OddOrder.FiniteField.mem_frobFixedSubfield
+#assert_only_allowed_axioms OddOrder.FiniteField.natCard_fixedSet_qFrobenius
+#assert_only_allowed_axioms OddOrder.FiniteField.natCard_frobFixedSubfield
+#assert_only_allowed_axioms OddOrder.FiniteField.qFrobenius_eq_inv_of_pow_succ_eq_one
+#assert_only_allowed_axioms OddOrder.FiniteField.qFrobenius_mul_self_eq_one
