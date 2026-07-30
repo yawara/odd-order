@@ -417,6 +417,17 @@ theorem eq_one_of_f_mul_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   rw [e]
   exact hyp.Q0.mul_mem (hyp.Q0.inv_mem hkS) hargQ0
 
+/-- `Q − Q₀` is stable under right multiplication by `Q₀`.
+
+Used throughout step (8): `ω₁ x` stays in `Q − Q₀` as `x` ranges over `Q₀`, so
+`f(ω₁ x)` is defined and again lies in `Q − Q₀`. -/
+theorem mul_mem_sdiff_Q0 {ω z : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hz : z ∈ hyp.Q0) : ω * z ∈ hyp.Q ∧ ω * z ∉ hyp.Q0 := by
+  refine ⟨hyp.Q.mul_mem hωQ (hyp.Q0_le_Q hz), fun hcc => hωQ0 ?_⟩
+  have e : ω = (ω * z) * z⁻¹ := by group
+  rw [e]
+  exact hyp.Q0.mul_mem hcc (hyp.Q0.inv_mem hz)
+
 /-- **`f` maps `Q − Q₀` into `Q − Q₀`** (positive form of `mem_Q0_of_f_mem_Q0`).
 
 Step (8) needs this to know that `f(ω₁ x)` really has a nontrivial image in `Q/Q₀`,
@@ -863,14 +874,8 @@ theorem not_mem_K_of_f_eq_conj_self (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     have h : a ∈ (hyp.K : Set G) := haK
     rwa [hyp.coe_K] at h
   -- `ω x` and `ω y` lie in `Q − Q₀`
-  have hmul : ∀ z ∈ hyp.Q0, ω * z ∈ hyp.Q ∧ ω * z ∉ hyp.Q0 := by
-    intro z hz
-    refine ⟨hyp.Q.mul_mem hωQ (hyp.Q0_le_Q hz), fun hcc => hωQ0 ?_⟩
-    have e : ω = (ω * z) * z⁻¹ := by group
-    rw [e]
-    exact hyp.Q0.mul_mem hcc (hyp.Q0.inv_mem hz)
-  obtain ⟨hωxQ, hωxQ0⟩ := hmul x hxQ0
-  obtain ⟨hωyQ, hωyQ0⟩ := hmul y hyQ0
+  obtain ⟨hωxQ, hωxQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hxQ0
+  obtain ⟨hωyQ, hωyQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hyQ0
   have hωx1 : ω * x ≠ 1 := fun hcc => hωxQ0 (hcc ▸ hyp.Q0.one_mem)
   have hωy1 : ω * y ≠ 1 := fun hcc => hωyQ0 (hcc ▸ hyp.Q0.one_mem)
   -- apply `f`: (H2) on the left, (H3) on the right, and `a^t = a⁻¹`
