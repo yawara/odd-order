@@ -33,6 +33,7 @@ The group-theoretic side of §2 - the orbit counts of steps (8) and (9) - is in
 set_option autoImplicit false
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
+
 /-- `q − 1` and `q + 1` are coprime for `q = 2^m`, `m ≥ 1`: both are odd, and they
 differ by `2`.
 
@@ -667,6 +668,36 @@ theorem frobNormEquiv_symm_div {E : Type*} [Field E] [Finite E] (hchar : (2 : E)
       = (frobNormEquiv hchar hodd).symm x / (frobNormEquiv hchar hodd).symm y := by
   rw [eq_div_iff (frobNormEquiv_symm_ne_zero hchar hodd hy), ← map_mul,
     div_mul_cancel₀ _ hy]
+
+/-- **`u^{2τ} = 1` forces `u = 1`** (Peterfalvi Part II, p. 126, inside step (15)).
+
+Step (15) reads `c_{m₁} = α` off from `d_{m₁} = ζ⁻¹`: rearranged, that is
+`ζ^{m₁+1} · (c_{m₁}/α)^{2τ} = 1` with the first factor in `W` and the second in `K`, so
+`K ∩ W = 1` makes each of them `1`.  Getting from `(c_{m₁}/α)^{2τ} = 1` to
+`c_{m₁} = α` is this lemma: squaring is injective in characteristic `2`, and `τ` is a
+bijection fixing `1`. -/
+theorem eq_one_of_frobNormEquiv_symm_sq_eq_one {E : Type*} [Field E] [Finite E]
+    (hchar : (2 : E) = 0) {θ : E ≃+* E} (hodd : Odd (orderOf θ)) {u : E}
+    (h : ((frobNormEquiv hchar hodd).symm u) ^ 2 = 1) : u = 1 := by
+  have hx : (frobNormEquiv hchar hodd).symm u = 1 := by
+    have hsq : ((frobNormEquiv hchar hodd).symm u + 1) *
+        ((frobNormEquiv hchar hodd).symm u + 1) = 0 := by
+      linear_combination h + ((frobNormEquiv hchar hodd).symm u) * hchar + hchar
+    have hroot := mul_self_eq_zero.mp hsq
+    linear_combination hroot - hchar
+  have himg := congrArg (frobNormEquiv hchar hodd) hx
+  rwa [MulEquiv.apply_symm_apply, map_one] at himg
+
+/-- **A positive power below the order that is trivial pins the exponent**: if
+`ζ^{n+1} = 1` with `ζ` of order `m` and `n + 1 ≤ m`, then `n + 1 = m`.
+
+Step (15) finishes with exactly this: `m₁ ≤ m − 1` and `ζ^{m₁+1} = 1` with `ζ` of order
+`m` give `m₁ = m − 1`, the length of the sequences. -/
+theorem eq_of_pow_succ_eq_one_of_le {H : Type*} [Group H] {ζ : H} {m n : ℕ}
+    (hord : orderOf ζ = m) (h : ζ ^ (n + 1) = 1) (hle : n + 1 ≤ m) : n + 1 = m := by
+  have hdvd : m ∣ n + 1 := hord ▸ orderOf_dvd_of_pow_eq_one h
+  have hm : m ≤ n + 1 := Nat.le_of_dvd (Nat.succ_pos n) hdvd
+  omega
 
 /-- **Peterfalvi Part II, Ch. IV §2, step (14)** (p. 126): the closed form
 `d_i = ζ^i (c_i/α)^{2τ}` satisfies the recursion `d_{i+1} = d_i ζ u_{i+1}^{-2τ}` of (11).
