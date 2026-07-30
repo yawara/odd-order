@@ -14570,6 +14570,11 @@ only through its diagonal. -/
 #assert_only_allowed_axioms Subgroup.sup_range_eq_of_mul_inv_mem
 #assert_only_allowed_axioms Subgroup.mul_eq_sup_of_le_normalizer
 #assert_only_allowed_axioms Subgroup.exists_conj_range_eq_of_mul_inv_mem
+#assert_only_allowed_axioms Subgroup.mem_normalizer_of_conj_mem
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.range_le_normalizer_inducingIdAuts
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_conj_conjQHom_range_eq
 #assert_only_allowed_axioms GroupExtension.inducingIdAuts_conj_mem
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inducingIdAuts_conj_mem_of_scalar

@@ -312,6 +312,17 @@ theorem _root_.Subgroup.sup_range_eq_of_mul_inv_mem {G' : Type*} [Group G']
       ((le_sup_right : f.range ≤ U ⊔ f.range) ⟨x, rfl⟩)
       ((le_sup_left : U ≤ U ⊔ f.range) (Subgroup.inv_mem _ (h x)))
 
+/-- Conjugation stability in both directions gives membership in the normalizer. -/
+theorem _root_.Subgroup.mem_normalizer_of_conj_mem {G' : Type*} [Group G']
+    {U : Subgroup G'} {y : G'}
+    (h : ∀ x ∈ U, y * x * y⁻¹ ∈ U) (h' : ∀ x ∈ U, y⁻¹ * x * y ∈ U) :
+    y ∈ Subgroup.normalizer (U : Set G') := by
+  rw [Subgroup.mem_normalizer_iff]
+  refine fun n => ⟨fun hn => h n hn, fun hn => ?_⟩
+  have hb := h' _ hn
+  have he : y⁻¹ * (y * n * y⁻¹) * y = n := by group
+  rwa [he] at hb
+
 open scoped Pointwise in
 /-- **Two homomorphisms differing pointwise by a subgroup have conjugate images.**
 

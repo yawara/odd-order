@@ -106,8 +106,7 @@ Appendix III Definition 3 により `S` は中心拡大
   * `g ∘ q = q' ∘ f` (二次写像の整合): χ の構成 (step 2) がまさにこれ。
 - [x] 段 (3) の残り (書籍の明示 cocycle): **完了** (2026-07-31,
   `exists_mulEquiv_bookCocycle`)
-- [~] 段 (4): 作用の共役化 (Zassenhaus) — 着手 (2026-07-31)。作用が自己同型である
-  ことの根拠 (対角スケーリング) が landing 済 (下記)
+- [x] 段 (4): 作用の共役化 (Zassenhaus) — **完了** (2026-07-31)
 - [ ] 段 (5): `s ↦ (0,1)` の正規化
 - [ ] Proposition 本体の statement + AxiomsCheck 登録
 
@@ -661,8 +660,26 @@ twisted product では `inl w = ⟨0, w⟩`, `rightHom p = ofAdd p.quotient` な
 ⚠ `CentralExtensionAutomorphisms.lean` に `OddOrder.Mathlib.SchurZassenhausConj` の
 import を追加した (循環なし)。
 
-**次**: 上を `f := (MulAut.congr Φ).comp conjQHom`, `g := Θ` で適用 → 段 (4) 完了。
-その後 段 (5) (`s ↦ (0,1)` の正規化)。
+## 🎯 段 (4) 完了 (2026-07-31)
+
+`exists_conj_conjQHom_range_eq` — **`KW` の 2 つの作用 (共役 / 模型) は `U` の元で共役**:
+
+    ∃ u ∈ U, (共役作用の像).map (conj u) = (模型作用の像)
+
+書籍 p.121 step (4) そのもの。汎用補題
+`Subgroup.exists_conj_range_eq_of_mul_inv_mem` に、既証明の
+`congr_conjQHom_mul_inv_mem_inducingIdAuts` (各点で `U` 差) /
+`range_le_normalizer_inducingIdAuts` (正規化) /
+`inducingIdAuts_inf_range_eq_bot` (`U ∩ · = ⊥`) /
+`card_inducingIdAuts_model` + `card_actualKActor_prod_W_odd` (互いに素) /
+`isSolvable_inducingIdAuts_model` (可解) を渡すだけ。
+
+⚠ 実装メモ: `set A := ...` で抽象化すると `congr_conjQHom_central` の
+`rw` パターンが合わなくなる — `simp only [hA, MonoidHom.comp_apply,
+MulEquiv.coe_toMonoidHom]` で展開してから rw する。
+
+**次**: 段 (5) (`K` は `Q₀^#` 上推移的なので内部自己同型で `s ↦ (0,1)` に正規化)
+→ Proposition 本体の statement 化。
 
 ---
 (以下は packaging の下調べ。汎用補題ができたので直接は不要だが、罠の記録として残す)

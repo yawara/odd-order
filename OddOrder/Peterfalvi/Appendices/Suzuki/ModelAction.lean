@@ -579,6 +579,139 @@ theorem card_inducingIdAuts_model
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact (hyp.isElementaryAbelian_inducingIdAuts_model M φ).isPGroup.exists_card_eq
 
+/-! ## Step (4): the two actions are conjugate -/
+
+/-- **A scalar action normalizes `U`** — the normalizer form of
+`inducingIdAuts_conj_mem_of_scalar`, obtained by applying it at `kv` and at `kv⁻¹`. -/
+theorem range_le_normalizer_inducingIdAuts
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (Ξ : ↥hyp.actualKActor × ↥hyp.W →*
+      MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+    (uu : ↥hyp.actualKActor × ↥hyp.W → M.Eˣ)
+    (νν : ↥hyp.actualKActor × ↥hyp.W →
+      (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ)
+    (hq : ∀ kv (p : Suzuki2Groups.BilinearTwistedProduct φ),
+      (Ξ kv p).quotient = ((uu kv : M.Eˣ) : M.E) * p.quotient)
+    (hc : ∀ kv (w : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)),
+      (Ξ kv (⟨0, w⟩ : Suzuki2Groups.BilinearTwistedProduct φ)).central
+        = ((νν kv : (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * w) :
+    Ξ.range ≤ Subgroup.normalizer
+      (((Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts :
+        Subgroup (MulAut (Suzuki2Groups.BilinearTwistedProduct φ))) :
+        Set (MulAut (Suzuki2Groups.BilinearTwistedProduct φ))) := by
+  rintro _ ⟨kv, rfl⟩
+  refine Subgroup.mem_normalizer_of_conj_mem (fun x hx => ?_) (fun x hx => ?_)
+  · exact hyp.inducingIdAuts_conj_mem_of_scalar M φ (Ξ kv) (uu kv) (νν kv)
+      (hq kv) (hc kv) hx
+  · have hinv : (Ξ kv)⁻¹ = Ξ kv⁻¹ := (map_inv Ξ kv).symm
+    have := hyp.inducingIdAuts_conj_mem_of_scalar M φ (Ξ kv⁻¹) (uu kv⁻¹) (νν kv⁻¹)
+      (hq kv⁻¹) (hc kv⁻¹) hx
+    rw [← hinv] at this
+    have he : (Ξ kv)⁻¹ * x * ((Ξ kv)⁻¹)⁻¹ = (Ξ kv)⁻¹ * x * Ξ kv := by group
+    rwa [he] at this
+
+include s in
+/-- **Step (4) of the Ch. III §3 Proposition** (Peterfalvi Part II, p. 121):
+the two actions of `K W` on the model are conjugate by an element of `U`.
+
+> `U ⊴ Aut(S₁)` and, by (1), `B ⊆ U A`.  `U` is a `2`-group (Appendix III
+> Lemma 1(d)), so by Zassenhaus there is `u ∈ U` with `A^u = B`.
+
+Here `A` is the conjugation action of `K W` on `S ≅ S₁` and `B` the model's own
+scalar action; the conjugator comes from
+`Subgroup.exists_conj_range_eq_of_mul_inv_mem`. -/
+theorem exists_conj_conjQHom_range_eq
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card hyp.Q = Nat.card hyp.Q0 ^ 3)
+    (inductionHypothesis : TheoremAInductionBelow G Ω)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (hker : ∀ z : ↥(Subgroup.center hyp.Q),
+      Φ (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩)
+    (hquot : ∀ e : ↥hyp.Q, (Φ e).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) e)))
+    (Θ : ↥hyp.actualKActor × ↥hyp.W →*
+      MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+    (hΘq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+        (Θ kv p).quotient = ((M.mu kv : M.Eˣ) : M.E) * p.quotient)
+    (hΘc : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+        (((Θ kv p).central :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = ((M.mu (kv.1, 1) ^ d : M.Eˣ) : M.E) *
+            ((p.central :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) :
+    ∃ u ∈ (Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts,
+      (((MulAut.congr Φ).toMonoidHom.comp (hyp.conjQHom)).range).map
+        (MulAut.conj u).toMonoidHom = Θ.range := by
+  classical
+  set A := (MulAut.congr Φ).toMonoidHom.comp (hyp.conjQHom) with hA
+  -- both actions scale the two coordinates by the same units
+  have hAq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+      (A kv p).quotient = ((M.mu kv : M.Eˣ) : M.E) * p.quotient :=
+    fun kv p => hyp.congr_conjQHom_quotient M φ Φ hquot kv p
+  have hAc : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (w : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)),
+      (A kv (⟨0, w⟩ : Suzuki2Groups.BilinearTwistedProduct φ)).central
+        = ((hyp.muKUnitHom M kv.1 ^ d :
+            (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * w := by
+    intro kv w
+    refine Subtype.ext ?_
+    simp only [hA, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom]
+    rw [hyp.congr_conjQHom_central s M ι d hequiv φ Φ hker]
+    exact congrArg (· * _) (hyp.muKUnitHom_zpow_val M kv.1 d).symm
+  have hΘc' : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (w : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)),
+      (Θ kv (⟨0, w⟩ : Suzuki2Groups.BilinearTwistedProduct φ)).central
+        = ((hyp.muKUnitHom M kv.1 ^ d :
+            (↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))ˣ) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) * w := by
+    intro kv w
+    refine Subtype.ext ?_
+    rw [hΘc kv ⟨0, w⟩]
+    exact congrArg (· * _) (hyp.muKUnitHom_zpow_val M kv.1 d).symm
+  -- the cardinality of the image
+  have hAinj : Function.Injective A :=
+    hyp.modelScalarHom_injective_of_quotient s M hst hm hQ0card hcardQ
+      inductionHypothesis φ A hAq
+  have hcardA : Nat.card ↥A.range = Nat.card (↥hyp.actualKActor × ↥hyp.W) :=
+    (Nat.card_congr (MonoidHom.ofInjective hAinj).toEquiv).symm
+  obtain ⟨n, hn⟩ := hyp.card_inducingIdAuts_model M φ
+  have hodd := hyp.card_actualKActor_prod_W_odd hm hQ0card s
+  refine Subgroup.exists_conj_range_eq_of_mul_inv_mem _ A Θ
+    (fun kv => hyp.congr_conjQHom_mul_inv_mem_inducingIdAuts s M ι d hequiv φ Φ hker
+      hquot Θ hΘq hΘc kv)
+    (hyp.range_le_normalizer_inducingIdAuts M φ A (fun kv => M.mu kv)
+      (fun kv => hyp.muKUnitHom M kv.1 ^ d) hAq hAc)
+    (hyp.range_le_normalizer_inducingIdAuts M φ Θ (fun kv => M.mu kv)
+      (fun kv => hyp.muKUnitHom M kv.1 ^ d) hΘq hΘc')
+    (hyp.inducingIdAuts_inf_range_eq_bot s M hst hm hQ0card hcardQ
+      inductionHypothesis φ A hAq)
+    (hyp.inducingIdAuts_inf_range_eq_bot s M hst hm hQ0card hcardQ
+      inductionHypothesis φ Θ hΘq)
+    ?_ (hyp.isSolvable_inducingIdAuts_model M φ)
+  rw [hn, hcardA]
+  refine Nat.Coprime.pow_left n ?_
+  refine (Nat.prime_two.coprime_iff_not_dvd).mpr ?_
+  rintro ⟨a, ha⟩
+  obtain ⟨b, hb⟩ := hodd
+  omega
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
