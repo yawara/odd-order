@@ -407,19 +407,21 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 
 1. `Φ x = Φ x'` ⟺ `u_x⁻¹ * u_{x'} ∈ MonoidHom.range M.mu` (`QuotientGroup.eq`)
    ⟺ `∃ kv, u_{x'} = u_x * μ kv`。
+   ✅ **step 1-4 は `exists_conjQHom_quotient_eq_of_coset_eq` として形式化済**。
 2. `E` に降ろす: `coord (f(ω x')) = μ kv * coord (f(ω x))` (`Eˣ` は可換)。
 3. `coord_act` で右辺 = `coord (quotientKWHom kv ⟦f(ω x)⟧)`。
 4. `coord` は同型なので `⟦f(ω x')⟧ = quotientKWHom kv ⟦f(ω x)⟧`
    `= ⟦conjQHom kv (f(ω x))⟧` (`quotientKWHom_mk`, rfl)。
-5. `exists_mem_D_conjQHom` で `conjQHom kv (f(ωx)) = d · f(ωx) · d⁻¹` (`d ∈ D`)。
+5. `exists_mem_D_conjQHom` で `conjQHom kv (f(ωx)) = d · f(ωx) · d⁻¹` (`d ∈ D`)。✅
 6. 商での等式 ⟹ `f(ω x') = d · f(ω x) · d⁻¹ · w` (`w ∈ Z(Q) = Q₀`)。
    ✅ **`exists_mem_Q0_mul_of_quotient_eq` として形式化済**。
 7. `a := d⁻¹ ∈ D` とおくと `a⁻¹ · f(ωx) · a = d · f(ωx) · d⁻¹` なので、これは
    `exists_conj_mul_Q0_iff` の左辺の形。よって
    `∃ y ∈ Q₀, ∃ a ∈ D, f(ω x') = (f(ω x) · y)^a` ✓
 
-⚠ Lean 上の面倒は 1→2 の `Units` と `E` の行き来 (`Units.val_mul` 等) と
-4→6 の `QuotientGroup.eq` + `Z(Q) = Q₀` の往復のみ。数学的な穴はない。
+**step 1-6 は全部形式化済 (2026-07-31)**。残るは step 7 (3 つを結合して
+`exists_conj_mul_Q0_iff` の左辺の形にする) と `card_fiber_eq_of_card_eq` への
+流し込みのみ。
 
 そのあと `card_fiber_eq_of_card_eq` に流し込んで段 (8) 完了。
 
