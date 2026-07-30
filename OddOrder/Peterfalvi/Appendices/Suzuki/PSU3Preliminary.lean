@@ -90,6 +90,21 @@ theorem coprime_two_pow_sub_one_two_pow_add_one {m : ℕ} (hm : m ≠ 0) :
   · rw [h] at h1
     exact absurd h1 hodd
 
+/-- An element killed by both `q − 1` and `q + 1` is trivial, for `q = 2^m`, `m ≥ 1`.
+
+This is the group-theoretic form of `μ(K) ∩ μ(W) = 1` in `E^×`: an element of `μ(K)`
+lies in `F^×` so is killed by `q − 1` (`QuotientFieldModel.mu_K_frobFixed`), and an
+element of `μ(W)` is killed by `q + 1` (`QuotientFieldModel.mu_W_normOne`). -/
+theorem eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one
+    {H : Type*} [Group H] {m : ℕ} (hm : m ≠ 0) {x : H}
+    (h1 : x ^ (2 ^ m - 1) = 1) (h2 : x ^ (2 ^ m + 1) = 1) : x = 1 := by
+  have d1 : orderOf x ∣ 2 ^ m - 1 := orderOf_dvd_of_pow_eq_one h1
+  have d2 : orderOf x ∣ 2 ^ m + 1 := orderOf_dvd_of_pow_eq_one h2
+  have hdvd : orderOf x ∣ 1 := by
+    have := Nat.dvd_gcd d1 d2
+    rwa [coprime_two_pow_sub_one_two_pow_add_one hm] at this
+  exact orderOf_eq_one_iff.mp (Nat.dvd_one.mp hdvd)
+
 namespace Hypothesis
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
