@@ -186,6 +186,76 @@ theorem frobNorm_ne_zero {E : Type*} [Field E] (θ : E ≃+* E) {u : E}
     (hu : u ≠ 0) : u * θ u ≠ 0 :=
   mul_ne_zero hu (by simpa using hu)
 
+/-- **An automorphism of odd order fixes whatever its square fixes.**
+
+If `orderOf θ = 2m + 1` then `θ = (θ²)^{m+1}`, so every `θ²`-fixed point is `θ`-fixed. -/
+theorem apply_eq_self_of_odd_orderOf {E : Type*} [Field E] {θ : E ≃+* E}
+    (hodd : Odd (orderOf θ)) {u : E} (hsq : θ (θ u) = u) : θ u = u := by
+  obtain ⟨m, hm⟩ := hodd
+  have hsq' : (θ ^ 2) u = u := by
+    rw [sq, RingAut.mul_apply]
+    exact hsq
+  have hpow : ∀ k : ℕ, ((θ ^ 2) ^ k) u = u := by
+    intro k
+    induction k with
+    | zero => simp
+    | succ n ih => rw [pow_succ, RingAut.mul_apply, hsq', ih]
+  have hx : (θ ^ 2) ^ (m + 1) = θ := by
+    rw [← pow_mul, show 2 * (m + 1) = orderOf θ + 1 by omega, pow_succ,
+      pow_orderOf_eq_one, one_mul]
+  calc θ u = ((θ ^ 2) ^ (m + 1)) u := by rw [hx]
+    _ = u := hpow _
+
+/-- **`u ↦ u^{1+θ}` is bijective** on a finite field of characteristic `2` whose
+automorphism `θ` has odd order (Peterfalvi Part II, p. 125: "the mapping
+`u ↦ u^{1+θ} : F* → F*` … is bijective since `θ` is of odd order"; Peterfalvi calls
+the inverse `τ`).  That `θ` has odd order is part of Appendix III, Definition 3 — the
+definition of a Suzuki `2`-group of type `B`.
+
+The book leaves the argument out.  It is: if `u^{1+θ} = v^{1+θ}` with `u, v ≠ 0`, then
+`w = u/v` satisfies `w · θ(w) = 1`, so `w` and `θ(θ w)` are both inverse to `θ w` and
+hence equal; odd order upgrades that to `θ w = w`, whence `w² = 1` and so `w = 1`
+because the characteristic is `2`.  Injective on a finite type is bijective. -/
+theorem frobNorm_bijective {E : Type*} [Field E] [Finite E] (hchar : (2 : E) = 0)
+    {θ : E ≃+* E} (hodd : Odd (orderOf θ)) :
+    Function.Bijective (fun u : E => u * θ u) := by
+  refine Finite.injective_iff_bijective.mp ?_
+  have hzero : ∀ x : E, x * θ x = 0 → x = 0 := by
+    intro x hx
+    by_contra hne
+    exact frobNorm_ne_zero θ hne hx
+  intro u v huv
+  simp only at huv
+  rcases eq_or_ne u 0 with rfl | hu
+  · exact (hzero v (by rw [← huv]; simp)).symm
+  rcases eq_or_ne v 0 with rfl | hv
+  · exact absurd (hzero u (by rw [huv]; simp)) hu
+  obtain ⟨w, hwne, rfl⟩ : ∃ w : E, w ≠ 0 ∧ u = w * v :=
+    ⟨u / v, div_ne_zero hu hv, by field_simp⟩
+  -- cancel the `v`-part: `w^{1+θ} = 1`
+  have hkey : (w * θ w) * (v * θ v) = 1 * (v * θ v) := by
+    rw [one_mul, ← frobNorm_mul, huv]
+  have hw1 : w * θ w = 1 := mul_right_cancel₀ (frobNorm_ne_zero θ hv) hkey
+  -- `w` and `θ(θ w)` are both inverse to `θ w`
+  have hθθ : θ (θ w) = w := by
+    have h1 : θ w * θ (θ w) = 1 := by rw [← map_mul, hw1, map_one]
+    have h2 : θ w * w = 1 := by rw [mul_comm]; exact hw1
+    exact mul_left_cancel₀ (by simpa using hwne) (h1.trans h2.symm)
+  have hfix : θ w = w := apply_eq_self_of_odd_orderOf hodd hθθ
+  rw [hfix] at hw1
+  -- `w² = 1` in characteristic `2` forces `w = 1`
+  have hw : w = 1 := by
+    have hsq : (w + 1) * (w + 1) = 0 := by linear_combination hw1 + w * hchar + hchar
+    have hroot := mul_self_eq_zero.mp hsq
+    linear_combination hroot - hchar
+  rw [hw, one_mul]
+
+/-- **`τ`** (Peterfalvi Part II, p. 125): every `c` has a unique `u` with `u^{1+θ} = c`.
+`τ` is the map `c ↦ u`; the book uses it in the recursion (11) for `(d_i)`. -/
+theorem existsUnique_frobNorm_eq {E : Type*} [Field E] [Finite E] (hchar : (2 : E) = 0)
+    {θ : E ≃+* E} (hodd : Odd (orderOf θ)) (c : E) : ∃! u : E, u * θ u = c :=
+  (frobNorm_bijective hchar hodd).existsUnique c
+
 namespace Hypothesis
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
