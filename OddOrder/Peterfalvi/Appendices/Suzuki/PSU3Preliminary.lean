@@ -1102,6 +1102,24 @@ theorem coord_ne_zero_of_not_mem_Q0 {m : ℕ} (M : hyp.QuotientFieldModel m)
   rw [hZ, Subgroup.mem_subgroupOf] at hmem
   exact hmem
 
+/-- **The map of step (8)**: `x ∈ Q₀ ↦` the `μ(KW)`-coset of the coordinate of
+`f(ω x)`.
+
+Well-defined because `ω x` and hence `f(ω x)` stay in `Q − Q₀`
+(`mul_mem_sdiff_Q0`, `f_mem_sdiff_Q0`), so the coordinate is a nonzero element of `E`
+(`coord_ne_zero_of_not_mem_Q0`), i.e. a unit.  Its class modulo `μ(KW)` is exactly the
+`KW`-orbit the book refers to, because `KW` acts by scalars. -/
+noncomputable def orbitOfF {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (x : ↥hyp.Q0) :
+    M.Eˣ ⧸ (MonoidHom.range M.mu) :=
+  let hx := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 x.2
+  let hfx := hyp.f_mem_sdiff_Q0 H hC2 hx.1 hx.2
+  QuotientGroup.mk (Units.mk0 _ (hyp.coord_ne_zero_of_not_mem_Q0 M hZ hfx.1 hfx.2))
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
