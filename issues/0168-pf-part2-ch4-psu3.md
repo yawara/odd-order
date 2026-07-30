@@ -311,6 +311,18 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 **`eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one`** (任意の群で
 `x^(2^m−1) = x^(2^m+1) = 1` ⟹ `x = 1`)。`E^×` に適用すればよい。
 
+**`E^×` での実現も完了 (2026-07-31)**:
+* `mu_K_pow_two_pow_sub_one` — `μ(k)^{q−1} = 1` (`mu_K_frobFixed` を `Eˣ` へ持ち上げ、
+  `q = 1 + (q−1)` で分解して左簡約)
+* `mu_K_eq_mu_W_imp_eq_one` — **`μ(K) ∩ μ(W) = 1`**
+
+**基数化の部品も所在確定**: `|F| = 2^m` は
+`OddOrder.FiniteField.natCard_frobFixedSubfield` (Algebra/QuadraticFrobenius.lean:189)。
+`|F^×| = 2^m − 1` の計算は `ModelIsomorphism.lean:108-115` に `hT` として
+インラインで既にある (`Set.ncard_sdiff_singleton_of_mem` 経由) — **export されて
+いないので、`|actualKActor| = 2^m − 1` を作るときはそこを参照して同じ形で書く**
+(`exists_actualKActor_mu_eq` の全射性 + `M.mu_K_injective` の単射性で全単射)。
+
 **残るのは組み立てのみ**: `|μ(KW)| = (q−1)m` → `n = |E^×|/|μ(KW)| = (q+1)/m` →
 `q = Σ m_i ≤ n·m − 1 = q` の挟み込み → 全等号。
 
