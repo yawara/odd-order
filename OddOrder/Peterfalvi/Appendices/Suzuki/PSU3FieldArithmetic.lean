@@ -738,4 +738,62 @@ theorem existsUnique_frobNorm_eq_of_ne_zero {E : Type*} [Field E] [Finite E]
     exact hc (by simpa using hu.symm)
   exact ⟨u, ⟨hune, hu⟩, fun v hv => huniq v hv.2⟩
 
+/-! ### Step (17): `v_i = u_i + α` (p. 126)
+
+The book shows `v_i + u_i` is constant by computing `u_i/u_{i+1} = 1 + d_i^{-(1+σ)}`.
+All of that rests on one identity, `c_{i-1} c_{i+1} = c_i² + c₁²`, which holds because
+squaring loses the cross term in characteristic `2`.
+-/
+
+/-- `(a + a⁻¹)² = a² + (a²)⁻¹` in characteristic `2`: the cross term `2·a·a⁻¹` vanishes. -/
+theorem add_inv_sq {E : Type*} [Field E] (h2 : (2 : E) = 0) {a : E} (ha : a ≠ 0) :
+    (a + a⁻¹) ^ 2 = a ^ 2 + (a ^ 2)⁻¹ := by
+  have hinv : a * a⁻¹ = 1 := mul_inv_cancel₀ ha
+  rw [← inv_pow]
+  linear_combination 2 * hinv + h2
+
+/-- **`c_j² = c_{2j}`** in characteristic `2` — squaring doubles the index. -/
+theorem betaSum_sq {E : Type*} [Field E] (h2 : (2 : E) = 0) {β : E} (hβ : β ≠ 0)
+    (j : ℕ) : betaSum β j ^ 2 = betaSum β (2 * j) := by
+  simp only [betaSum]
+  rw [add_inv_sq h2 (pow_ne_zero j hβ), ← pow_mul, mul_comm j 2]
+
+/-- **`c_i · c_{i+2} = c_{i+1}² + c₁²`** — the identity behind step (17)
+(Peterfalvi Part II, p. 126).
+
+Once the two squares are rewritten by `betaSum_sq` this is exact algebra: both sides come
+to `β^{2i+2} + β^{-2i-2} + β² + β^{-2}`.  Dividing by `c_{i+1}²` turns it into the book's
+`u_i/u_{i+1} = 1 + (c₁/c_{i+1})² = 1 + d_i^{-(1+σ)}`, which is what makes `v_i + u_i`
+constant, hence equal to `v₁ + u₁ = α`. -/
+theorem betaSum_mul_betaSum_add_two {E : Type*} [Field E] (h2 : (2 : E) = 0) {β : E}
+    (hβ : β ≠ 0) (i : ℕ) :
+    betaSum β i * betaSum β (i + 2)
+      = betaSum β (i + 1) ^ 2 + betaSum β 1 ^ 2 := by
+  rw [betaSum_sq h2 hβ, betaSum_sq h2 hβ]
+  simp only [betaSum]
+  have hβi : β ^ i ≠ 0 := pow_ne_zero _ hβ
+  have hβ2 : β ≠ 0 := hβ
+  field_simp
+  ring
+
+/-- **Peterfalvi Part II, Ch. IV §2, step (17)**, the computation (p. 126):
+
+  `u_i / u_{i+1} = 1 + (c₁/c_{i+1})²`,
+
+the book's `1 + d_i^{-(1+σ)}`.  Multiplying by `u_{i+1}` gives
+`u_i = u_{i+1} + u_{i+1} d_i^{-(1+σ)}`, so the recursion
+`v_{i+1} = v_i + u_{i+1} d_i^{-(1+σ)}` of (11) preserves `v + u`; hence
+`v_i + u_i = v₁ + u₁ = α`, which is step (17)'s `v_i = u_i + α`. -/
+theorem betaRatio_div_betaRatio {E : Type*} [Field E] (h2 : (2 : E) = 0) {β : E}
+    (hβ : β ≠ 0) (i : ℕ) (hci : betaSum β i ≠ 0) (hci1 : betaSum β (i + 1) ≠ 0)
+    (hci2 : betaSum β (i + 2) ≠ 0) :
+    betaRatio β i / betaRatio β (i + 1)
+      = 1 + (betaSum β 1 / betaSum β (i + 1)) ^ 2 := by
+  have hstep : betaRatio β i / betaRatio β (i + 1)
+      = betaSum β i * betaSum β (i + 2) / betaSum β (i + 1) ^ 2 := by
+    simp only [betaRatio]
+    field_simp
+  rw [hstep, betaSum_mul_betaSum_add_two h2 hβ i, add_div,
+    div_self (pow_ne_zero 2 hci1), ← div_pow]
+
 end OddOrder.Peterfalvi.Appendices.Suzuki

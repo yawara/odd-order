@@ -14657,6 +14657,12 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.betaSum_eq_zero_iff
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.betaRatio_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.betaRatio_succ
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.add_inv_sq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.betaSum_sq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.betaSum_mul_betaSum_add_two
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.betaRatio_div_betaRatio
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNormEquiv_symm_spec
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.frobNormEquiv_symm_zero
 #assert_only_allowed_axioms
