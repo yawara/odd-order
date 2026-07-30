@@ -384,7 +384,31 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 `x ↦ f(ω x) の座標の μ(KW)-剰余類`。well-defined は
 `mul_mem_sdiff_Q0` → `f_mem_sdiff_Q0` → `coord_ne_zero_of_not_mem_Q0` → `Units.mk0`。
 
-**残作業**: (iii) ファイバー評価 2 本を
+### 残る 1 ステップ = ファイバーの翻訳 (設計を確定した)
+
+**要点の補題**:
+
+    Φ x = Φ x'  ⟺  ∃ a ∈ D, ∃ y ∈ Q₀, f(ω x) = a⁻¹ · (f(ω x') · y) · a
+
+* **⟸ / ⟹ の中身**: 同じ剰余類 ⟺ `coord(f(ωx)) = μ(kv) · coord(f(ωx'))`。
+  `coord_act` によりこれは `f(ωx) ≡ quotientKWHom kv (f(ωx')) (mod Q₀)`。
+  `KW` の `Q` への作用は `conjQHom` すなわち `D` の元による共役なので
+  (`D = KW` = `exists_mem_K_mem_W_mul`)、`f(ωx) ≡ a⁻¹ f(ωx') a (mod Q₀)`。
+  最後に `exists_conj_mul_Q0_iff` で目的の形へ。
+* ⚠ **3 つの作用の符号合わせが唯一の面倒**: `quotientKWHom` (商への作用) /
+  `conjQHom` (`Q` への共役作用) / `coord_act` (`E` でのスカラー倍)。
+  `conjQHom_apply` と `quotientKWHom_apply` で成分に分けて突き合わせる。
+
+**そのあとの流し込み** (機械的):
+1. ファイバー `Φ⁻¹(c)` が空でなければ代表 `x₀` を取り `ω' := f(ω x₀)` とおく。
+   上の補題で `Φ⁻¹(c) ⊆ {x | ∃ y ∈ Q₀, ∃ a ∈ D, f(ωx) = (ω'y)^a}` なので
+   `ncard_le_card_V_of_f_eq_conj` から `|Φ⁻¹(c)| ≤ |V| = |W|`。空なら 0 ≤ |W|。
+2. `c = Φ` の `ω` 自身の類 (書籍の `i = 1`) では `not_mem_K_of_f_eq_conj_self` が
+   単位剰余類を除外するので `|Φ⁻¹(c)| ≤ |W| − 1`。
+3. `card_fiber_eq_of_card_eq` に `M := |W|`, `|α| = |Q₀| = q`,
+   `|β| = index = (q+1)/|W|` を渡して全等号。
+
+(旧メモ) 残作業: (iii) ファイバー評価 2 本を
 `Φ` の言葉に翻訳 (`exists_conj_mul_Q0_iff` + `exists_mem_K_mem_W_mul` で
 「同じ剰余類」⟺「`∃ y ∈ Q₀, ∃ a ∈ D, …`」に落とす)、(iv) `card_fiber_eq_of_card_eq`
 に流し込む。
