@@ -14577,6 +14577,8 @@ only through its diagonal. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_conj_conjQHom_range_eq
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_center_coordinate_normalized
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_standardModel
 #assert_only_allowed_axioms GroupExtension.inducingIdAuts_conj_mem
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inducingIdAuts_conj_mem_of_scalar

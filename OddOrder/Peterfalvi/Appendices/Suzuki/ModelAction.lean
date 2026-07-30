@@ -712,6 +712,68 @@ theorem exists_conj_conjQHom_range_eq
   obtain ⟨b, hb⟩ := hodd
   omega
 
+/-! ## The Proposition of Ch. III §3 -/
+
+include s in
+/-- **The Proposition of Peterfalvi Part II, Ch. III §3** (pp. 120–121), assembled
+from steps (1)–(5).
+
+> There is an isomorphism `S ⋊ K W → S₁ ⋊ K₁ W₁` with `S ↦ S₁`, `K ↦ K₁`,
+> `s ↦ (0,1)`, where `S₁` is the set of pairs `(x, y)` with the operation
+> `(x,z)(y,u) = (x+y, z+u+φ(x,y))`, `φ` is bi-additive with
+> `φ(a x, b y) = a b^θ φ(x, y)` and `x ≠ 0 ⟹ φ(x,x) ≠ 0`, and `K₁ W₁ ≤ E^×` acts by
+> `(x,y)^a = (a x, a^{1+σ} y)`.
+
+Here `S₁` is `BilinearTwistedProduct φ`; `Θ` is the action of `K W` through the
+scalars `μ`, whose image is the book's `B`; and the last clause says the conjugation
+action `A` becomes `B` after conjugating by an element of `U` — the book's
+Zassenhaus step. -/
+theorem exists_standardModel
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card hyp.Q = Nat.card hyp.Q0 ^ 3)
+    (inductionHypothesis : TheoremAInductionBelow G Ω)
+    (x₀ : ↥(Subgroup.center hyp.Q)) (hx₀ : x₀ ≠ 1) :
+    ∃ (φ : LinearMap.BilinMap (ZMod 2) M.E
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+      (θ : M.E ≃ₐ[ZMod 2] M.E)
+      (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+      (Θ : ↥hyp.actualKActor × ↥hyp.W →*
+        MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+      (u : MulAut (Suzuki2Groups.BilinearTwistedProduct φ)),
+      -- the cocycle is `F`-semilinear and anisotropic
+      (∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+        ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+          ∀ x y : M.E,
+            ((φ (a * x) (b * y) :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+              = a * θ b *
+                ((φ x y :
+                  ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) ∧
+      (∀ x : M.E, x ≠ 0 → φ x x ≠ 0) ∧
+      -- `s ↦ (0, 1)`
+      Φ (x₀ : ↥hyp.Q) = ⟨0, 1⟩ ∧
+      -- the scalar action of `K W` on the model
+      (∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+        (p : Suzuki2Groups.BilinearTwistedProduct φ),
+          (Θ kv p).quotient = ((M.mu kv : M.Eˣ) : M.E) * p.quotient) ∧
+      -- the conjugation action becomes it after conjugating by `u ∈ U`
+      u ∈ (Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts ∧
+      (((MulAut.congr Φ).toMonoidHom.comp (hyp.conjQHom)).range).map
+        (MulAut.conj u).toMonoidHom = Θ.range := by
+  classical
+  obtain ⟨ι, d, hnorm, hequiv⟩ :=
+    hyp.exists_center_coordinate_normalized s M hm hQ0card x₀ hx₀
+  obtain ⟨ι', φ, θ, Φ, hsemi, haniso, hone, ⟨d', hequiv'⟩, hdiagscale, hker, hquot⟩ :=
+    hyp.exists_mulEquiv_bookCocycle s M hm hQ0card ι d hequiv
+  obtain ⟨Θ, hΘq, hΘc⟩ :=
+    hyp.exists_modelScalarHom s M ι' d' hequiv' φ hdiagscale
+  obtain ⟨u, hu, hconj⟩ :=
+    hyp.exists_conj_conjQHom_range_eq s M hst hm hQ0card hcardQ inductionHypothesis
+      ι' d' hequiv' φ Φ hker hquot Θ hΘq hΘc
+  refine ⟨φ, θ, Φ, Θ, u, hsemi, haniso, ?_, hΘq, hu, hconj⟩
+  rw [hker x₀, hone (Additive.ofMul x₀) hnorm]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

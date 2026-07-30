@@ -108,7 +108,7 @@ Appendix III Definition 3 により `S` は中心拡大
   `exists_mulEquiv_bookCocycle`)
 - [x] 段 (4): 作用の共役化 (Zassenhaus) — **完了** (2026-07-31)
 
-- [ ] Proposition 本体の statement + AxiomsCheck 登録
+
 
 ## 完了条件
 
@@ -738,7 +738,29 @@ Proposition を束ねようと鎖を組んだところ、**段 (3) の α-正規
 `∃ d', ∀ k z, ι'(k•z) = μ(k,1)^{d'} · ι'(z)` を追加した (`d' = d · 2^j`、
 `j` は `α⁻¹` の Frobenius 指数)。signature 変更ゼロで鎖が繋がる。
 
-**次**: Proposition 本体の束ね直し。必要な材料の対応:
+## 🎯🎯 Proposition 完成 (2026-07-31)
+
+`exists_standardModel` (`ModelAction.lean`) — **書籍 pp.120-121 の Proposition が
+sorry-free で landing**:
+
+    ∃ φ θ Φ Θ u,
+      φ が F-半双線形 (φ(ax,by) = a b^θ φ(x,y)) ∧
+      φ が anisotropic (x ≠ 0 → φ(x,x) ≠ 0) ∧
+      Φ x₀ = (0, 1)                                  -- s ↦ (0,1)
+      Θ が K W のスカラー作用 ((x,y)^{kv} = (μ(kv) x, ...)) ∧
+      u ∈ U ∧ (共役作用の像)^u = (模型作用の像)         -- Zassenhaus
+
+段 (1)-(5) の鎖:
+`exists_center_coordinate_normalized` (段 5) →
+`exists_mulEquiv_bookCocycle` (段 3) →
+`exists_modelScalarHom` (段 4 前半) →
+`exists_conj_conjQHom_range_eq` (段 4 後半)。
+
+- [x] Proposition 本体の statement + AxiomsCheck 登録 — **完了** (2026-07-31)
+
+(以下は途中経過の記録)
+
+**材料の対応:**
 * cocycle の 2 条件 = `exists_mulEquiv_bookCocycle` の第 1・2 連言
 * `Φ x₀ = ⟨0,1⟩` = `hker` + 上の正規化貫通
 * `K₁ = F^×` = `exists_actualKActor_mu_eq`
