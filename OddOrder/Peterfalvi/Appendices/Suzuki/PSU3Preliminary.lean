@@ -52,7 +52,10 @@ It comes out of `t s t = s t s` being *already* a canonical factorization
 * `Hypothesis.not_mem_mul_KSet_of_f_mul_eq_conj`, `Hypothesis.eq_of_inv_mul_mem_K` —
   step (7) and its counting form.
 * `Hypothesis.index_K_subgroupOf_D` — `|D : K| = |V|`.
-* `Hypothesis.ncard_le_card_V_of_f_eq_conj` — step (8)'s bound `m_i ≤ |V|`.
+* `Hypothesis.ncard_le_card_V_of_f_eq_conj`, `Hypothesis.not_mem_K_of_f_eq_conj_self` —
+  step (8)'s bounds `m_i ≤ |V|` and `m₁ ≤ |V| − 1`.
+* `Hypothesis.K_inf_W_eq_bot`, `Hypothesis.exists_conj_mul_Q0_iff` — the group-theoretic
+  half of step (8)'s translation.
 -/
 
 set_option autoImplicit false
@@ -755,6 +758,60 @@ theorem not_mem_K_of_f_eq_conj_self (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   -- ... and then `f` fixes the `D`-orbit of `ω x`
   rw [hxy] at heq
   exact hyp.f_ne_conj_of_not_mem_Q0 H hC2 hωyQ hωyQ0 haD heq
+
+/-! ## Translating "lies in the orbit modulo `Q₀`"
+
+Step (8) speaks of `f(ω₁ x)` lying, *modulo `Q₀`*, in the `KW`-orbit of `ω_i`.  The
+lemmas above instead consume the shape `f(ω₁ x) = (ω_i y)^a` with `y ∈ Q₀`, `a ∈ D`.
+The two agree because `D` normalizes `Q₀`, which is pure group theory; what still
+needs the standard model is only the identification of the `KW`-action on `Q/Q₀` with
+`D`-conjugacy, for which `D = KW` — and that follows from `K ∩ W = 1` together with
+Chapter IV's `V = W`, since `|D| = |V| · |K|`.
+-/
+
+/-- `K ∩ W = 1`: an element of `K` is inverted by `t` and an element of `W ≤ C_D(t)`
+is centralized by it, so a common element squares to `1` — impossible in the
+odd-order group `D`. -/
+theorem K_inf_W_eq_bot : hyp.K ⊓ hyp.W = ⊥ := by
+  rw [eq_bot_iff]
+  rintro x ⟨hxK, hxW⟩
+  have hxD : x ∈ hyp.D := hyp.K_le_D hxK
+  -- `t x t = x⁻¹` from `K`
+  have hinv : hyp.t * x * hyp.t = x⁻¹ := by
+    have h : x ∈ (hyp.K : Set G) := hxK
+    rw [hyp.coe_K] at h
+    exact h.2
+  -- `t x t = x` from `W ≤ C_D(t)`
+  have hfix : hyp.t * x * hyp.t = x := by
+    have hxV : x ∈ hyp.V := hxW.1
+    have hcent : x ∈ Subgroup.centralizer ({hyp.t} : Set G) := hxV.2
+    have hcomm : hyp.t * x = x * hyp.t :=
+      (Subgroup.mem_centralizer_singleton_iff.mp hcent).symm
+    rw [hcomm, mul_assoc, hyp.rankOneSetup.invol, mul_one]
+  have hsq : x ^ 2 = 1 := by
+    have hxx : x = x⁻¹ := hfix.symm.trans hinv
+    rw [sq]
+    nth_rewrite 1 [hxx]
+    exact inv_mul_cancel x
+  -- odd order forces `x = 1`
+  have hodd : Odd (orderOf x) := invertedBy.odd_orderOf_of_mem hyp.D_odd hxD
+  have hdvd : orderOf x ∣ 2 := orderOf_dvd_of_pow_eq_one hsq
+  rcases Nat.prime_two.eq_one_or_self_of_dvd _ hdvd with h | h
+  · exact Subgroup.mem_bot.mpr (orderOf_eq_one_iff.mp h)
+  · exact absurd (h ▸ hodd) (by decide)
+
+/-- The two shapes agree: `z` is congruent modulo `Q₀` to a `D`-conjugate of `ω'`
+exactly when `z = (ω' y)^a` for some `y ∈ Q₀` and `a ∈ D`. -/
+theorem exists_conj_mul_Q0_iff {ω' z : G} :
+    (∃ a ∈ hyp.D, ∃ w ∈ hyp.Q0, z = a⁻¹ * ω' * a * w)
+      ↔ ∃ y ∈ hyp.Q0, ∃ a ∈ hyp.D, z = a⁻¹ * (ω' * y) * a := by
+  constructor
+  · rintro ⟨a, ha, w, hw, rfl⟩
+    refine ⟨a * w * a⁻¹, hyp.conj_mem_Q0_of_mem_H (hyp.D_le_H ha) hw, a, ha, by group⟩
+  · rintro ⟨y, hy, a, ha, rfl⟩
+    refine ⟨a, ha, a⁻¹ * y * a, ?_, by group⟩
+    have := hyp.conj_mem_Q0_of_mem_H (hyp.H.inv_mem (hyp.D_le_H ha)) hy
+    rwa [inv_inv] at this
 
 end Hypothesis
 
