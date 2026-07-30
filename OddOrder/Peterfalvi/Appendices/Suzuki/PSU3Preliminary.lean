@@ -1039,43 +1039,46 @@ on `Q₀` by `c^x = x^{1+θ} c` (p. 119), and `(0,c)(0,c') = (0, c + c')`.  So
 Taking the hypothesis in the group-theoretic form keeps the step free of coordinates.
 -/
 
-/-- **Peterfalvi Part II, Ch. IV §2, step (10)** (p. 125): with `f(ω) = (ω y)^ζ` and
-`a, b ∈ K` such that `y · s^{a⁻¹} = s^b`,
+/-- **Peterfalvi Part II, Ch. IV §2, step (10)** (p. 125): with `f(ω) = (ω y)^ζ`,
+`a ∈ K` and `z = y · s^{a⁻¹}`,
 
-  `f(ω s^a) = (f(ω s^b) s^a)^{ζ a⁻²}`.
+  `f(ω s^a) = (f(ω z) s^a)^{ζ a⁻²}`.
 
 The book's proof is one line, "by (2)".  Unfolded: step (2) turns the left side into
 `f(f(ω) s^{a⁻¹})^{a⁻²} s^{a⁻¹}`; then `f(ω) = (ω y)^ζ` and the fact that `ζ ∈ W`
-centralizes `Q₀ ∋ s^{a⁻¹}` make `f(ω) s^{a⁻¹}` the `ζ`-conjugate of `ω y s^{a⁻¹} = ω s^b`;
+centralizes `Q₀ ∋ s^{a⁻¹}` make `f(ω) s^{a⁻¹}` the `ζ`-conjugate of `ω y s^{a⁻¹} = ω z`;
 then (H3) with `ζ^t = ζ` (`ζ ∈ V`) pulls that `ζ` back out through `f`.  What remains is
-a rearrangement, using that `ζ` commutes with `a` (it centralizes `K`) and with `s`. -/
+a rearrangement, using that `ζ` commutes with `a` (it centralizes `K`) and with `s`.
+
+Stated for an arbitrary `z` rather than the book's `s^b`: the proof uses nothing about
+`z` beyond `z ∈ Q₀`, which is automatic from `y, s^{a⁻¹} ∈ Q₀`.  Both instances occur in
+(11) — `z = s^b` is the book's statement, driving each step of the recursion
+(`stepTen_exists`), and the degenerate `z = 1` is its base case `u₁ = 0`
+(`stepTen_base`), which the `s^b` form cannot express because `s^b ≠ 1` always. -/
 theorem stepTen (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
-    {ζ ω y a b : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
-    (haK : a ∈ hyp.K) (hbK : b ∈ hyp.K) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
-    (hab : y * (a * hyp.distinguishedInvolution * a⁻¹)
-      = b⁻¹ * hyp.distinguishedInvolution * b) :
+    {ζ ω y a z : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (haK : a ∈ hyp.K) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hz : y * (a * hyp.distinguishedInvolution * a⁻¹) = z) :
     f (ω * (a⁻¹ * hyp.distinguishedInvolution * a))
       = a ^ 2 * ζ⁻¹ *
-          (f (ω * (b⁻¹ * hyp.distinguishedInvolution * b)) *
-            (a⁻¹ * hyp.distinguishedInvolution * a)) * ζ * (a⁻¹) ^ 2 := by
+          (f (ω * z) * (a⁻¹ * hyp.distinguishedInvolution * a)) * ζ * (a⁻¹) ^ 2 := by
   have hsQ0 : hyp.distinguishedInvolution ∈ hyp.Q0 :=
     ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
   have haD : a ∈ hyp.D := hyp.K_le_D haK
-  have hbD : b ∈ hyp.D := hyp.K_le_D hbK
   have haKSet : a ∈ hyp.KSet := by
     have hx : a ∈ (hyp.K : Set G) := haK
     rwa [hyp.coe_K] at hx
-  -- the three conjugates of `s` in play all lie in `Q₀`
+  -- the two conjugates of `s` in play lie in `Q₀`, hence so does `z`
   have hsa : a⁻¹ * hyp.distinguishedInvolution * a ∈ hyp.Q0 := by
     have hmem := hyp.conj_mem_Q0_of_mem_D (hyp.D.inv_mem haD) hsQ0
     rwa [inv_inv] at hmem
   have hsainv : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q0 :=
     hyp.conj_mem_Q0_of_mem_D haD hsQ0
-  have hsb : b⁻¹ * hyp.distinguishedInvolution * b ∈ hyp.Q0 := by
-    have hmem := hyp.conj_mem_Q0_of_mem_D (hyp.D.inv_mem hbD) hsQ0
-    rwa [inv_inv] at hmem
+  have hzQ0 : z ∈ hyp.Q0 := by
+    rw [← hz]
+    exact hyp.Q0.mul_mem hyQ0 hsainv
   -- `ω x ≠ 1` for `x ∈ Q₀`, because `ω ∉ Q₀`
   have hmulne : ∀ x ∈ hyp.Q0, ω * x ≠ 1 := by
     intro x hx hc
@@ -1097,20 +1100,18 @@ theorem stepTen (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have hcomS : Commute ζ hyp.distinguishedInvolution := hζs
   -- step (2)
   have h2 := hyp.f_mul_conj_distinguishedInvolution H hC2 haKSet hωQ hω1 (hmulne _ hsa)
-  -- `f(ω) · s^{a⁻¹}` is the `ζ`-conjugate of `ω · s^b`
-  have e1 : f ω * (a * hyp.distinguishedInvolution * a⁻¹)
-      = ζ⁻¹ * (ω * (b⁻¹ * hyp.distinguishedInvolution * b)) * ζ := by
-    rw [hfω, ← hab, mul_assoc (ζ⁻¹ * (ω * y)) ζ, hζsainv]
+  -- `f(ω) · s^{a⁻¹}` is the `ζ`-conjugate of `ω · z`
+  have e1 : f ω * (a * hyp.distinguishedInvolution * a⁻¹) = ζ⁻¹ * (ω * z) * ζ := by
+    rw [hfω, ← hz, mul_assoc (ζ⁻¹ * (ω * y)) ζ, hζsainv]
     group
   -- (H3) at `ζ ∈ D`, where `ζ^t = ζ`
   have htζt : hyp.t * ζ * hyp.t = ζ := by
     have hc := hyp.commute_t_of_mem_V (hyp.W_le_V hζ)
     rw [← hc.eq, mul_assoc, hyp.rankOneSetup.invol, mul_one]
-  have hωbQ : ω * (b⁻¹ * hyp.distinguishedInvolution * b) ∈ hyp.Q :=
-    hyp.Q.mul_mem hωQ
-      (hyp.rankOneSetup.DQ b hbD _ hyp.distinguishedInvolution_mem_Q)
+  have hωzQ : ω * z ∈ hyp.Q :=
+    hyp.Q.mul_mem hωQ (hyp.mem_Q_of_sq_eq_one_of_mem_H hzQ0.2 hzQ0.1)
   obtain ⟨h3, -, -⟩ :=
-    hThree hyp.rankOneSetup H hωbQ (hmulne _ hsb)
+    hThree hyp.rankOneSetup H hωzQ (hmulne _ hzQ0)
       (hyp.V_le_D (hyp.W_le_V hζ))
   -- the surviving rearrangement: `ζ` passes through `a` and `s`
   have hkey : ζ * (a⁻¹) ^ 2 * (a * hyp.distinguishedInvolution * a⁻¹)
@@ -1141,6 +1142,55 @@ theorem stepTen (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       _ = a ^ 2 * ζ⁻¹ * (F * (a⁻¹ * hyp.distinguishedInvolution * a)) * ζ *
             (a⁻¹) ^ 2 := by group
   rw [h2, e1, h3, htζt, hF]
+
+/-- **Step (10) in the book's own form** (Peterfalvi Part II, p. 125): the `b ∈ K` whose
+existence the book's hypothesis `b^{1+θ} = α + a^{-(1+θ)}` asserts.
+
+`K` is transitive on `Q₀^#` with base point `s` (`exists_mem_KSet_conj_eq_of_mem_Q0`), so
+such a `b` exists exactly when `y · s^{a⁻¹} ≠ 1`.  In the coordinates of the standard
+model `y · s^{a⁻¹} = (0, α + a^{-(1+θ)})`, so that condition is the book's stopping rule
+`u_i ≠ α` for the sequences of (11). -/
+theorem stepTen_exists (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y a : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (haK : a ∈ hyp.K) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hne : y * (a * hyp.distinguishedInvolution * a⁻¹) ≠ 1) :
+    ∃ b ∈ hyp.K,
+      b⁻¹ * hyp.distinguishedInvolution * b
+          = y * (a * hyp.distinguishedInvolution * a⁻¹) ∧
+        f (ω * (a⁻¹ * hyp.distinguishedInvolution * a))
+          = a ^ 2 * ζ⁻¹ *
+              (f (ω * (b⁻¹ * hyp.distinguishedInvolution * b)) *
+                (a⁻¹ * hyp.distinguishedInvolution * a)) * ζ * (a⁻¹) ^ 2 := by
+  have hsQ0 : hyp.distinguishedInvolution ∈ hyp.Q0 :=
+    ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
+  have hprod : y * (a * hyp.distinguishedInvolution * a⁻¹) ∈ hyp.Q0 :=
+    hyp.Q0.mul_mem hyQ0 (hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D haK) hsQ0)
+  obtain ⟨b, hbKSet, hb⟩ := hyp.exists_mem_KSet_conj_eq_of_mem_Q0 hprod hne
+  have hbK : b ∈ hyp.K := by
+    have hx : b ∈ (hyp.K : Set G) := by rw [hyp.coe_K]; exact hbKSet
+    exact hx
+  exact ⟨b, hbK, hb, hyp.stepTen H hC2 hζ hωQ hωQ0 hyQ0 haK hfω hb.symm⟩
+
+/-- **The base case of the recursion (11)** (Peterfalvi Part II, p. 125): when
+`y · s^{a⁻¹} = 1` — in coordinates `α + a^{-(1+θ)} = 0`, the book's `u₁ = 0` —
+
+  `f(ω s^a) = (f(ω) s^a)^{ζ a⁻²}`.
+
+This is the degenerate `z = 1` of `stepTen`, and it is what starts the sequences of (11)
+off from `f(ω) = (ω y)^ζ` itself. -/
+theorem stepTen_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y a : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (haK : a ∈ hyp.K) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hone : y * (a * hyp.distinguishedInvolution * a⁻¹) = 1) :
+    f (ω * (a⁻¹ * hyp.distinguishedInvolution * a))
+      = a ^ 2 * ζ⁻¹ * (f ω * (a⁻¹ * hyp.distinguishedInvolution * a)) * ζ *
+          (a⁻¹) ^ 2 := by
+  have hstep := hyp.stepTen H hC2 hζ hωQ hωQ0 hyQ0 haK hfω hone
+  rwa [mul_one] at hstep
 
 end Hypothesis
 
