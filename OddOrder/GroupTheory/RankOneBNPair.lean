@@ -37,6 +37,7 @@ The chapter uses these mappings to pin down `G` in the characterization of
 * `IsFGH.f_ne_one`, `IsFGH.g_ne_one` — `f` and `g` really map `Q^#` into `Q^#`.
 * `hOne`, `hTwo`, `hThree` — the identities (H1)–(H4).
 * `hFive` — the identity (H5), `(f ∘ j)³(x) = x^{h(x)⁻¹}` for `j : x ↦ x⁻¹`.
+* `hSix` — the identity (H6), the addition formulas for `f`, `g`, `h` at `xy`.
 
 ## Implementation notes
 
@@ -384,5 +385,104 @@ theorem hFive (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
   rw [harg, (hOne hS H (H.f_mem hgQ hg1) (H.f_ne_one hS hgQ hg1)).1,
     (hTwo hS H hgQ hg1).2.1, hB, hC]
   group
+
+/-! ## (H6): the addition formulas
+
+For `x, y ∈ Q^#` with `xy ≠ 1`, splitting `t (xy) t = (t x t)(t y t)` and pushing the
+inner `f(x) g(y)` through `t` expresses `f, g, h` at `xy` in terms of their values at
+`x`, `y` and `z = f(x) g(y)`.
+-/
+
+/-- The two-factor expansion `t (xy) t = g(x) h(x) · (t z t) · (t h(y) t) · f(y)`
+with `z = f(x) g(y)`, obtained from `t (xy) t = (t x t)(t y t)` by inserting `t t = 1`
+around `z`.  This does not yet require `z ≠ 1`. -/
+theorem expand_mul (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
+    {x y : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) (hyQ : y ∈ Q) (hy1 : y ≠ 1) :
+    t * (x * y) * t
+      = g x * h x * (t * (f x * g y) * t) * (t * h y * t) * f y := by
+  have e1 : t * (x * y) * t = (t * x * t) * (t * y * t) := by
+    have e : t * (x * y) * t = (t * x * t⁻¹) * (t * y * t) := by group
+    rwa [hS.tinv] at e
+  have e3 : (g x * h x * t * f x) * (g y * h y * t * f y)
+      = g x * h x * (t * (f x * g y) * t) * (t * h y * t) * f y := by
+    have e : (g x * h x * t * f x) * (g y * h y * t * f y)
+        = g x * h x * (t * (f x * g y) * t⁻¹) * (t * h y * t) * f y := by group
+    rwa [hS.tinv] at e
+  rw [e1, H.eq x hxQ hx1, H.eq y hyQ hy1, e3]
+
+/-- **(H6), first part**: `f(x) g(y) ≠ 1` whenever `x, y, xy ∈ Q^#`.
+
+Otherwise the middle factor `t (f(x)g(y)) t` of `expand_mul` collapses to `1`, leaving
+`t (xy) t = g(x) h(x) (t h(y) t) f(y) ∈ M`, which contradicts `Q^t ∩ M = 1`. -/
+theorem f_mul_g_ne_one (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
+    {x y : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) (hyQ : y ∈ Q) (hy1 : y ≠ 1)
+    (hxy1 : x * y ≠ 1) : f x * g y ≠ 1 := by
+  intro hc
+  refine hS.tconj (x * y) (Q.mul_mem hxQ hyQ) hxy1 ?_
+  have e : t * (x * y) * t = g x * h x * (t * h y * t) * f y := by
+    rw [expand_mul hS H hxQ hx1 hyQ hy1, hc]
+    have e' : g x * h x * (t * 1 * t) * (t * h y * t) * f y
+        = g x * h x * (t * t) * ((t * h y * t) * f y) := by group
+    rw [e', hS.invol]
+    group
+  rw [e]
+  exact M.mul_mem (M.mul_mem (M.mul_mem (hS.QM (H.g_mem hxQ hx1)) (hS.DM (H.h_mem hxQ hx1)))
+    (hS.DM (hS.Dstab _ (H.h_mem hyQ hy1)))) (hS.QM (H.f_mem hyQ hy1))
+
+/-- The canonical factorization of `t (xy) t`: expanding `t z t` by the defining
+equation and moving `h(x)` past `g(z)`, respectively `h(y)` past `t`, puts it in the
+form `p · d · t · q` with `p ∈ Q`, `d ∈ D`, `q ∈ Q`. -/
+theorem canonical_mul (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
+    {x y : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) (hyQ : y ∈ Q) (hy1 : y ≠ 1)
+    (hz1 : f x * g y ≠ 1) :
+    t * (x * y) * t
+      = (g x * (h x * g (f x * g y) * (h x)⁻¹)) *
+        (h x * h (f x * g y) * h y) * t *
+        ((t * h y * t)⁻¹ * f (f x * g y) * (t * h y * t) * f y) := by
+  have hzQ : f x * g y ∈ Q := Q.mul_mem (H.f_mem hxQ hx1) (H.g_mem hyQ hy1)
+  have hbinv : (t * h y * t)⁻¹ = t * (h y)⁻¹ * t := by
+    rw [mul_inv_rev, mul_inv_rev, hS.tinv]
+    group
+  have e5 : g x * h x * (g (f x * g y) * h (f x * g y) * t * f (f x * g y)) *
+        (t * h y * t) * f y
+      = (g x * (h x * g (f x * g y) * (h x)⁻¹)) *
+        (h x * h (f x * g y) * h y) * t *
+        ((t * (h y)⁻¹ * t) * f (f x * g y) * (t * h y * t) * f y) := by
+    have e : g x * h x * (g (f x * g y) * h (f x * g y) * t * f (f x * g y)) *
+          (t * h y * t) * f y
+        = (g x * (h x * g (f x * g y) * (h x)⁻¹)) *
+          (h x * h (f x * g y) * h y) * t *
+          ((t⁻¹ * (h y)⁻¹ * t) * f (f x * g y) * (t * h y * t) * f y) := by group
+    rwa [hS.tinv] at e
+  rw [expand_mul hS H hxQ hx1 hyQ hy1, H.eq _ hzQ hz1, e5, hbinv]
+
+/-- **(H6)** (Peterfalvi Part II, Ch. IV §1, p. 122–123).  For `x, y ∈ Q^#` with
+`xy ≠ 1`, writing `z = f(x) g(y)` (which is again in `Q^#`):
+
+* `f(xy) = f(z)^{h(y)^t} f(y)`;
+* `h(xy) = h(x) h(z) h(y)`;
+
+together with the `g`-companion `g(xy) = g(x) · g(z)^{h(x)⁻¹}`. -/
+theorem hSix (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
+    {x y : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) (hyQ : y ∈ Q) (hy1 : y ≠ 1)
+    (hxy1 : x * y ≠ 1) :
+    f x * g y ≠ 1 ∧
+      f (x * y) = (t * h y * t)⁻¹ * f (f x * g y) * (t * h y * t) * f y ∧
+      g (x * y) = g x * (h x * g (f x * g y) * (h x)⁻¹) ∧
+      h (x * y) = h x * h (f x * g y) * h y := by
+  have hne : f x * g y ≠ 1 := f_mul_g_ne_one hS H hxQ hx1 hyQ hy1 hxy1
+  have hzQ : f x * g y ∈ Q := Q.mul_mem (H.f_mem hxQ hx1) (H.g_mem hyQ hy1)
+  have hp : g x * (h x * g (f x * g y) * (h x)⁻¹) ∈ Q := by
+    refine Q.mul_mem (H.g_mem hxQ hx1) ?_
+    have := hS.DQ (h x)⁻¹ (D.inv_mem (H.h_mem hxQ hx1)) (g (f x * g y)) (H.g_mem hzQ hne)
+    rwa [inv_inv] at this
+  have hd : h x * h (f x * g y) * h y ∈ D :=
+    D.mul_mem (D.mul_mem (H.h_mem hxQ hx1) (H.h_mem hzQ hne)) (H.h_mem hyQ hy1)
+  have hq : (t * h y * t)⁻¹ * f (f x * g y) * (t * h y * t) * f y ∈ Q :=
+    Q.mul_mem (hS.DQ (t * h y * t) (hS.Dstab _ (H.h_mem hyQ hy1))
+      (f (f x * g y)) (H.f_mem hzQ hne)) (H.f_mem hyQ hy1)
+  obtain ⟨e₁, e₂, e₃⟩ := fgh_eq_of_canonical hS H (Q.mul_mem hxQ hyQ) hxy1 hp hd hq
+    (canonical_mul hS H hxQ hx1 hyQ hy1 hne)
+  exact ⟨hne, e₁, e₂, e₃⟩
 
 end OddOrder.GroupTheory.RankOneBNPair
