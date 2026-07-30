@@ -1020,6 +1020,128 @@ theorem exists_mem_K_mem_W_mul (hVW : hyp.V = hyp.W) {d : G} (hd : d ∈ hyp.D) 
   obtain ⟨p, hp⟩ := hbij.2 ⟨d, hd⟩
   exact ⟨(p.1 : G), p.1.2, (p.2 : G), p.2.2, (congrArg Subtype.val hp).symm⟩
 
+/-! ## Step (10): the identity driving the recursion (p. 125)
+
+After (9) the book fixes the representatives once and for all:
+
+> We will assume from here on in §2 that the elements `ω_i` have been chosen in such a
+> way that `f(ω_i) = (ω_i y_i)^ζ`, `y_i ∈ Q₀^#`.  In (10) to (18), we let `ω` denote one
+> of the elements `ω_i`; we set `y_i = y = (0, α)`.
+
+Step (10) is then the identity that generates the sequences `(u_i), (v_i), (d_i)` of
+(11).  The book states its hypothesis in the coordinates of the Ch. III §3 standard
+model, as `b^{1+θ} = α + a^{-(1+θ)}`.  Those coordinates say exactly `y · s^{a⁻¹} = s^b`:
+the isomorphism sends `s` to `(0,1)`, elements of `Q₀` are the pairs `(0, c)`, `K` acts
+on `Q₀` by `c^x = x^{1+θ} c` (p. 119), and `(0,c)(0,c') = (0, c + c')`.  So
+
+  `y · s^{a⁻¹} = (0, α)(0, a^{-(1+θ)}) = (0, α + a^{-(1+θ)})`  and  `s^b = (0, b^{1+θ})`.
+
+Taking the hypothesis in the group-theoretic form keeps the step free of coordinates.
+-/
+
+/-- **Peterfalvi Part II, Ch. IV §2, step (10)** (p. 125): with `f(ω) = (ω y)^ζ` and
+`a, b ∈ K` such that `y · s^{a⁻¹} = s^b`,
+
+  `f(ω s^a) = (f(ω s^b) s^a)^{ζ a⁻²}`.
+
+The book's proof is one line, "by (2)".  Unfolded: step (2) turns the left side into
+`f(f(ω) s^{a⁻¹})^{a⁻²} s^{a⁻¹}`; then `f(ω) = (ω y)^ζ` and the fact that `ζ ∈ W`
+centralizes `Q₀ ∋ s^{a⁻¹}` make `f(ω) s^{a⁻¹}` the `ζ`-conjugate of `ω y s^{a⁻¹} = ω s^b`;
+then (H3) with `ζ^t = ζ` (`ζ ∈ V`) pulls that `ζ` back out through `f`.  What remains is
+a rearrangement, using that `ζ` commutes with `a` (it centralizes `K`) and with `s`. -/
+theorem stepTen (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y a b : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (haK : a ∈ hyp.K) (hbK : b ∈ hyp.K) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hab : y * (a * hyp.distinguishedInvolution * a⁻¹)
+      = b⁻¹ * hyp.distinguishedInvolution * b) :
+    f (ω * (a⁻¹ * hyp.distinguishedInvolution * a))
+      = a ^ 2 * ζ⁻¹ *
+          (f (ω * (b⁻¹ * hyp.distinguishedInvolution * b)) *
+            (a⁻¹ * hyp.distinguishedInvolution * a)) * ζ * (a⁻¹) ^ 2 := by
+  have hsQ0 : hyp.distinguishedInvolution ∈ hyp.Q0 :=
+    ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
+  have haD : a ∈ hyp.D := hyp.K_le_D haK
+  have hbD : b ∈ hyp.D := hyp.K_le_D hbK
+  have haKSet : a ∈ hyp.KSet := by
+    have hx : a ∈ (hyp.K : Set G) := haK
+    rwa [hyp.coe_K] at hx
+  -- the three conjugates of `s` in play all lie in `Q₀`
+  have hsa : a⁻¹ * hyp.distinguishedInvolution * a ∈ hyp.Q0 := by
+    have hmem := hyp.conj_mem_Q0_of_mem_D (hyp.D.inv_mem haD) hsQ0
+    rwa [inv_inv] at hmem
+  have hsainv : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D haD hsQ0
+  have hsb : b⁻¹ * hyp.distinguishedInvolution * b ∈ hyp.Q0 := by
+    have hmem := hyp.conj_mem_Q0_of_mem_D (hyp.D.inv_mem hbD) hsQ0
+    rwa [inv_inv] at hmem
+  -- `ω x ≠ 1` for `x ∈ Q₀`, because `ω ∉ Q₀`
+  have hmulne : ∀ x ∈ hyp.Q0, ω * x ≠ 1 := by
+    intro x hx hc
+    refine hωQ0 ?_
+    have hω : ω = x⁻¹ := by
+      have e : ω * x * x⁻¹ = 1 * x⁻¹ := by rw [hc]
+      simpa using e
+    rw [hω]
+    exact hyp.Q0.inv_mem hx
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (by rw [hc]; exact hyp.Q0.one_mem)
+  -- `ζ` commutes with `a` (it centralizes `K`) and with everything in `Q₀`
+  have hζa : ζ * a = a * ζ := (hyp.commute_of_mem_W_of_mem_K hζ haK).symm
+  have hζs : ζ * hyp.distinguishedInvolution = hyp.distinguishedInvolution * ζ :=
+    hyp.W_centralizes_Q0 hζ hsQ0
+  have hζsainv : ζ * (a * hyp.distinguishedInvolution * a⁻¹)
+      = (a * hyp.distinguishedInvolution * a⁻¹) * ζ :=
+    hyp.W_centralizes_Q0 hζ hsainv
+  have hcomA : Commute ζ a := hζa
+  have hcomS : Commute ζ hyp.distinguishedInvolution := hζs
+  -- step (2)
+  have h2 := hyp.f_mul_conj_distinguishedInvolution H hC2 haKSet hωQ hω1 (hmulne _ hsa)
+  -- `f(ω) · s^{a⁻¹}` is the `ζ`-conjugate of `ω · s^b`
+  have e1 : f ω * (a * hyp.distinguishedInvolution * a⁻¹)
+      = ζ⁻¹ * (ω * (b⁻¹ * hyp.distinguishedInvolution * b)) * ζ := by
+    rw [hfω, ← hab, mul_assoc (ζ⁻¹ * (ω * y)) ζ, hζsainv]
+    group
+  -- (H3) at `ζ ∈ D`, where `ζ^t = ζ`
+  have htζt : hyp.t * ζ * hyp.t = ζ := by
+    have hc := hyp.commute_t_of_mem_V (hyp.W_le_V hζ)
+    rw [← hc.eq, mul_assoc, hyp.rankOneSetup.invol, mul_one]
+  have hωbQ : ω * (b⁻¹ * hyp.distinguishedInvolution * b) ∈ hyp.Q :=
+    hyp.Q.mul_mem hωQ
+      (hyp.rankOneSetup.DQ b hbD _ hyp.distinguishedInvolution_mem_Q)
+  obtain ⟨h3, -, -⟩ :=
+    hThree hyp.rankOneSetup H hωbQ (hmulne _ hsb)
+      (hyp.V_le_D (hyp.W_le_V hζ))
+  -- the surviving rearrangement: `ζ` passes through `a` and `s`
+  have hkey : ζ * (a⁻¹) ^ 2 * (a * hyp.distinguishedInvolution * a⁻¹)
+      = a⁻¹ * hyp.distinguishedInvolution * a * ζ * (a⁻¹) ^ 2 := by
+    have hpow : ζ * (a⁻¹) ^ 2 = (a⁻¹) ^ 2 * ζ := (hcomA.inv_right.pow_right 2).eq
+    have hall : ζ * ((a⁻¹) ^ 2 * (a * hyp.distinguishedInvolution * a⁻¹))
+        = (a⁻¹) ^ 2 * (a * hyp.distinguishedInvolution * a⁻¹) * ζ :=
+      ((hcomA.inv_right.pow_right 2).mul_right
+        ((hcomA.mul_right hcomS).mul_right hcomA.inv_right)).eq
+    calc ζ * (a⁻¹) ^ 2 * (a * hyp.distinguishedInvolution * a⁻¹)
+        = ζ * ((a⁻¹) ^ 2 * (a * hyp.distinguishedInvolution * a⁻¹)) := by
+          rw [mul_assoc]
+      _ = (a⁻¹) ^ 2 * (a * hyp.distinguishedInvolution * a⁻¹) * ζ := hall
+      _ = a⁻¹ * hyp.distinguishedInvolution * a * ((a⁻¹) ^ 2 * ζ) := by group
+      _ = a⁻¹ * hyp.distinguishedInvolution * a * ζ * (a⁻¹) ^ 2 := by
+          rw [← hpow, ← mul_assoc]
+  have hF : ∀ F : G,
+      a ^ 2 * (ζ⁻¹ * F * ζ) * (a⁻¹) ^ 2 * (a * hyp.distinguishedInvolution * a⁻¹)
+        = a ^ 2 * ζ⁻¹ * (F * (a⁻¹ * hyp.distinguishedInvolution * a)) * ζ *
+            (a⁻¹) ^ 2 := by
+    intro F
+    calc a ^ 2 * (ζ⁻¹ * F * ζ) * (a⁻¹) ^ 2 *
+          (a * hyp.distinguishedInvolution * a⁻¹)
+        = a ^ 2 * ζ⁻¹ * F *
+            (ζ * (a⁻¹) ^ 2 * (a * hyp.distinguishedInvolution * a⁻¹)) := by group
+      _ = a ^ 2 * ζ⁻¹ * F *
+            (a⁻¹ * hyp.distinguishedInvolution * a * ζ * (a⁻¹) ^ 2) := by rw [hkey]
+      _ = a ^ 2 * ζ⁻¹ * (F * (a⁻¹ * hyp.distinguishedInvolution * a)) * ζ *
+            (a⁻¹) ^ 2 := by group
+  rw [h2, e1, h3, htζt, hF]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
