@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.CentralElementaryExtension
 import OddOrder.GroupTheory.ElementaryAbelian
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # Isomorphisms of central elementary extensions along coordinate changes
@@ -310,6 +311,94 @@ theorem _root_.Subgroup.sup_range_eq_of_mul_inv_mem {G' : Type*} [Group G']
     exact Subgroup.mul_mem _
       ((le_sup_right : f.range ≤ U ⊔ f.range) ⟨x, rfl⟩)
       ((le_sup_left : U ≤ U ⊔ f.range) (Subgroup.inv_mem _ (h x)))
+
+open scoped Pointwise in
+/-- **Two homomorphisms differing pointwise by a subgroup have conjugate images.**
+
+Schur–Zassenhaus conjugacy, packaged for the situation of Peterfalvi Part II,
+Ch. III §3, p. 121, step (4): `f` and `g` are the two actions of `K W` on the model
+(by conjugation and by the explicit formula), `U` is the group of automorphisms
+inducing the identity on both ends of the extension, and `(g x)⁻¹ f x ∈ U` says
+they differ by `U` pointwise.
+
+Everything happens inside `H = U ⊔ f.range = U ⊔ g.range`, where `U` is normal
+because both images normalize it; `f.range` and `g.range` are then complements of
+`U` there, and coprimality plus solvability give a single conjugator in `U`. -/
+theorem _root_.Subgroup.exists_conj_range_eq_of_mul_inv_mem {G' : Type*} [Group G']
+    [Finite G'] {Γ : Type*} [Group Γ] (U : Subgroup G') (f g : Γ →* G')
+    (hmem : ∀ x : Γ, (g x)⁻¹ * f x ∈ U)
+    (hnf : f.range ≤ Subgroup.normalizer (U : Set G'))
+    (hng : g.range ≤ Subgroup.normalizer (U : Set G'))
+    (hdf : U ⊓ f.range = ⊥) (hdg : U ⊓ g.range = ⊥)
+    (hcop : Nat.Coprime (Nat.card U) (Nat.card f.range))
+    (hsolv : IsSolvable U) :
+    ∃ u ∈ U, f.range.map (MulAut.conj u).toMonoidHom = g.range := by
+  classical
+  set H : Subgroup G' := U ⊔ f.range with hHdef
+  have hHg : U ⊔ g.range = H := (Subgroup.sup_range_eq_of_mul_inv_mem U f g hmem).symm
+  have hUH : U ≤ H := le_sup_left
+  have hfH : f.range ≤ H := le_sup_right
+  have hgH : g.range ≤ H := hHg ▸ le_sup_right
+  have hHnorm : H ≤ Subgroup.normalizer (U : Set G') :=
+    sup_le Subgroup.le_normalizer hnf
+  -- `U` is normal in `H`
+  haveI hUn : (U.subgroupOf H).Normal := by
+    refine ⟨fun n hn h => ?_⟩
+    rw [Subgroup.mem_subgroupOf] at hn ⊢
+    exact (Subgroup.mem_normalizer_iff.mp (hHnorm h.2) (n : G')).mp hn
+  -- the two complement statements
+  have hcompl : ∀ (k : Γ →* G'), k.range ≤ H →
+      U ⊓ k.range = ⊥ → ((U : Set G') * (k.range : Set G') = (H : Set G')) →
+      Subgroup.IsComplement' (U.subgroupOf H) (k.range.subgroupOf H) := by
+    intro k hkH hdk hprod
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+    · rw [disjoint_iff, eq_bot_iff]
+      intro y hy
+      obtain ⟨hU, hk⟩ := Subgroup.mem_inf.mp hy
+      have hb : (y : G') ∈ U ⊓ k.range :=
+        ⟨Subgroup.mem_subgroupOf.mp hU, Subgroup.mem_subgroupOf.mp hk⟩
+      rw [hdk] at hb
+      exact Subtype.ext (Subgroup.mem_bot.mp hb)
+    · rw [Set.eq_univ_iff_forall]
+      rintro ⟨y, hy⟩
+      have hy' : y ∈ (U : Set G') * (k.range : Set G') := by rw [hprod]; exact hy
+      obtain ⟨u, hu, r, hr, hur⟩ := hy'
+      have huH : u ∈ H := hUH hu
+      have hrH : r ∈ H := hkH hr
+      exact ⟨⟨u, huH⟩, Subgroup.mem_subgroupOf.mpr hu, ⟨r, hrH⟩,
+        Subgroup.mem_subgroupOf.mpr hr, Subtype.ext hur⟩
+  have hcf := hcompl f hfH hdf (Subgroup.mul_eq_sup_of_le_normalizer hnf)
+  have hcg := hcompl g hgH hdg
+    ((Subgroup.mul_eq_sup_of_le_normalizer hng).trans (congrArg _ hHg))
+  -- coprimality of `|U|` and its index in `H`
+  have hcardU : Nat.card ↥(U.subgroupOf H) = Nat.card U :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUH).toEquiv
+  have hcardf : Nat.card ↥(f.range.subgroupOf H) = Nat.card f.range :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hfH).toEquiv
+  have hcop' : Nat.Coprime (Nat.card ↥(U.subgroupOf H)) (U.subgroupOf H).index := by
+    rw [hcardU, hcf.symm.index_eq_card, hcardf]
+    exact hcop
+  -- solvability transported into `H`
+  have hsolv' : IsSolvable ↥(U.subgroupOf H) ∨ IsSolvable (↥H ⧸ U.subgroupOf H) := by
+    left
+    exact solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hUH).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hUH).injective
+  obtain ⟨n, hn, hconj⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop' hsolv' hcf hcg
+  refine ⟨(n : G'), Subgroup.mem_subgroupOf.mp hn, ?_⟩
+  -- push the conjugacy back along `H.subtype`
+  have hint : H.subtype.comp (MulAut.conj n).toMonoidHom
+      = ((MulAut.conj (n : G')).toMonoidHom).comp H.subtype := by
+    ext ⟨x, hx⟩; rfl
+  have hlhs : ((f.range.subgroupOf H).map (MulAut.conj n).toMonoidHom).map H.subtype
+      = f.range.map (MulAut.conj (n : G')).toMonoidHom := by
+    rw [Subgroup.map_map, hint, ← Subgroup.map_map,
+      Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hfH]
+  have hrhs : (g.range.subgroupOf H).map H.subtype = g.range := by
+    rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hgH]
+  rw [← hlhs, ← hrhs, hconj]
+
 
 /-- The `W`-coordinate of an element of the embedded kernel. -/
 private noncomputable def kernelCoordinate (x : E) (hx : x ∈ S.inl.range) :

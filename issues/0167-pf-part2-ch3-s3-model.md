@@ -644,7 +644,30 @@ twisted product では `inl w = ⟨0, w⟩`, `rightHom p = ofAdd p.quotient` な
 `U ⊴ U A` (正規化) / `U ∩ A = U ∩ B = ⊥` / `U A = U B` / `|U|` 2 冪 vs `|K W|` 奇数 /
 `U` 可解 / 有限性。
 
-**次 (段 (4) 最終) — packaging の雛形が repo 内に在る**:
+### ✅ 汎用 Zassenhaus 補題 (2026-07-31 その 9)
+
+`Subgroup.exists_conj_range_eq_of_mul_inv_mem`
+(`GroupTheory/CentralExtensionAutomorphisms.lean`) — **各点で `U` の分だけ違う 2 つの
+準同型は像が `U` の元で共役**:
+
+    (∀ x, (g x)⁻¹ * f x ∈ U) → f.range/g.range が U を正規化 →
+    U ⊓ f.range = U ⊓ g.range = ⊥ → gcd(|U|, |f.range|) = 1 → U 可解 →
+    ∃ u ∈ U, f.range.map (conj u) = g.range
+
+段 (4) の Peterfalvi 固有部分を全部仮説に出した形なので、応用は
+`hmem` = `congr_conjQHom_mul_inv_mem_inducingIdAuts` /
+`hdf`,`hdg` = `inducingIdAuts_inf_range_eq_bot` /
+`hsolv` = `isSolvable_inducingIdAuts_model` / 互いに素 = 2 冪 vs 奇数、を渡すだけ。
+⚠ `CentralExtensionAutomorphisms.lean` に `OddOrder.Mathlib.SchurZassenhausConj` の
+import を追加した (循環なし)。
+
+**次**: 上を `f := (MulAut.congr Φ).comp conjQHom`, `g := Θ` で適用 → 段 (4) 完了。
+その後 段 (5) (`s ↦ (0,1)` の正規化)。
+
+---
+(以下は packaging の下調べ。汎用補題ができたので直接は不要だが、罠の記録として残す)
+
+**packaging の雛形が repo 内に在る**:
 
 `Isaacs/Ch03_SplitExtensions/Basic.lean` の 1050-1140 行が
 **`IsComplement'.exists_conj_of_coprime` を部分群 `P` の中で使う完全な実例**で、
