@@ -54,8 +54,9 @@ It comes out of `t s t = s t s` being *already* a canonical factorization
 * `Hypothesis.index_K_subgroupOf_D` — `|D : K| = |V|`.
 * `Hypothesis.ncard_le_card_V_of_f_eq_conj`, `Hypothesis.not_mem_K_of_f_eq_conj_self` —
   step (8)'s bounds `m_i ≤ |V|` and `m₁ ≤ |V| − 1`.
-* `Hypothesis.K_inf_W_eq_bot`, `Hypothesis.exists_conj_mul_Q0_iff` — the group-theoretic
-  half of step (8)'s translation.
+* `Hypothesis.K_inf_W_eq_bot`, `Hypothesis.exists_conj_mul_Q0_iff`,
+  `Hypothesis.exists_mem_K_mem_W_mul` — the group-theoretic half of step (8)'s
+  translation, including `D = K W` under `V = W`.
 -/
 
 set_option autoImplicit false
@@ -812,6 +813,41 @@ theorem exists_conj_mul_Q0_iff {ω' z : G} :
     refine ⟨a, ha, a⁻¹ * y * a, ?_, by group⟩
     have := hyp.conj_mem_Q0_of_mem_H (hyp.H.inv_mem (hyp.D_le_H ha)) hy
     rwa [inv_inv] at this
+
+/-- **`D = K W`** under Chapter IV's standing hypothesis `V = W`.
+
+`K ∩ W = 1` makes `(k, w) ↦ k w` injective from `K × W` into `D`, and
+`|K| · |W| = |K| · |V| = |D|` makes it surjective.  This is what identifies the
+`KW`-orbits of step (8) with `D`-conjugacy classes modulo `Q₀`. -/
+theorem exists_mem_K_mem_W_mul (hVW : hyp.V = hyp.W) {d : G} (hd : d ∈ hyp.D) :
+    ∃ k ∈ hyp.K, ∃ w ∈ hyp.W, d = k * w := by
+  classical
+  have hWD : hyp.W ≤ hyp.D := le_trans inf_le_left hyp.V_le_D
+  set F : ↥hyp.K × ↥hyp.W → ↥hyp.D := fun p =>
+    ⟨(p.1 : G) * (p.2 : G), hyp.D.mul_mem (hyp.K_le_D p.1.2) (hWD p.2.2)⟩ with hFdef
+  have hinj : Function.Injective F := by
+    rintro ⟨⟨k₁, hk₁⟩, ⟨w₁, hw₁⟩⟩ ⟨⟨k₂, hk₂⟩, ⟨w₂, hw₂⟩⟩ hEq
+    have hval : k₁ * w₁ = k₂ * w₂ := congrArg Subtype.val hEq
+    have hmem : k₂⁻¹ * k₁ ∈ hyp.K ⊓ hyp.W := by
+      refine ⟨hyp.K.mul_mem (hyp.K.inv_mem hk₂) hk₁, ?_⟩
+      have e : k₂⁻¹ * k₁ = w₂ * w₁⁻¹ := by
+        calc k₂⁻¹ * k₁ = k₂⁻¹ * (k₁ * w₁) * w₁⁻¹ := by group
+          _ = k₂⁻¹ * (k₂ * w₂) * w₁⁻¹ := by rw [hval]
+          _ = w₂ * w₁⁻¹ := by group
+      rw [e]
+      exact hyp.W.mul_mem hw₂ (hyp.W.inv_mem hw₁)
+    rw [hyp.K_inf_W_eq_bot, Subgroup.mem_bot] at hmem
+    have hk : k₁ = k₂ := (inv_mul_eq_one.mp hmem).symm
+    subst hk
+    have hw : w₁ = w₂ := mul_left_cancel hval
+    subst hw
+    rfl
+  have hcard : Nat.card (↥hyp.K × ↥hyp.W) = Nat.card ↥hyp.D := by
+    rw [Nat.card_prod, hyp.card_D_eq_card_V_mul_card_K, hVW, mul_comm]
+  have hbij : Function.Bijective F :=
+    (Nat.bijective_iff_injective_and_card F).mpr ⟨hinj, hcard⟩
+  obtain ⟨p, hp⟩ := hbij.2 ⟨d, hd⟩
+  exact ⟨(p.1 : G), p.1.2, (p.2 : G), p.2.2, (congrArg Subtype.val hp).symm⟩
 
 end Hypothesis
 
