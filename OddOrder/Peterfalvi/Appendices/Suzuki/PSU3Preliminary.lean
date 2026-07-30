@@ -676,6 +676,29 @@ theorem index_K_subgroupOf_D : (hyp.K.subgroupOf hyp.D).index = Nat.card ↥hyp.
   have hKpos : 0 < Nat.card ↥hyp.K := Nat.card_pos
   exact Nat.eq_of_mul_eq_mul_right hKpos hmul
 
+/-- `|K|` is odd, being a subgroup of the odd-order `D`. -/
+theorem odd_card_K : Odd (Nat.card ↥hyp.K) := by
+  have hcard : Nat.card ↥(hyp.K.subgroupOf hyp.D) = Nat.card ↥hyp.K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.K_le_D).toEquiv
+  have hdvd : Nat.card ↥hyp.K ∣ Nat.card ↥hyp.D := by
+    rw [← hcard]
+    exact Dvd.intro_left _ (hyp.K.subgroupOf hyp.D).index_mul_card
+  rw [Nat.odd_iff]
+  by_contra hc
+  have h2 : (2 : ℕ) ∣ Nat.card ↥hyp.K := Nat.dvd_of_mod_eq_zero (by omega)
+  have hd2 : (2 : ℕ) ∣ Nat.card ↥hyp.D := h2.trans hdvd
+  have hodd := Nat.odd_iff.mp hyp.D_odd
+  omega
+
+/-- **Every element of `K` has a square root in `K`** — `|K|` is odd, so squaring is
+bijective.
+
+Step (9) needs this: from `f(ω x) = (ω z)^{kζ}` it takes `a ∈ K` with `a² = k`, which
+collapses the exponent `a⁻²kζ` to `ζ`. -/
+theorem exists_sq_eq_of_mem_K {k : G} (hk : k ∈ hyp.K) : ∃ a ∈ hyp.K, a ^ 2 = k :=
+  ⟨k ^ ((Nat.card ↥hyp.K + 1) / 2), hyp.K.pow_mem hk _,
+    invertedBy.sq_pow_half hyp.odd_card_K hk⟩
+
 /-- **The counting form of step (7)**: for fixed `ω, ω' ∈ Q − Q₀`, two elements
 `x₁, x₂ ∈ Q₀` whose associated `a₁, a₂ ∈ D` lie in the *same* coset of `K` must be
 equal.
