@@ -1192,6 +1192,46 @@ theorem stepTen_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have hstep := hyp.stepTen H hC2 hζ hωQ hωQ0 hyQ0 haK hfω hone
   rwa [mul_one] at hstep
 
+/-- **One step of the recursion (11)** (Peterfalvi Part II, p. 125), coordinate-free.
+
+The book builds sequences `(u_i), (v_i), (d_i)` in `F`, `F`, `KW` carrying the invariant
+`f(ω(0,u_i)) = (ω(0,v_i))^{d_i}`.  Group-theoretically the invariant is
+
+  `f(ω z) = (ω w)^d`,   `z, w ∈ Q₀`,  `d ∈ KW`,
+
+and (10) advances it to `f(ω z') = (ω w')^{d'}` with
+
+  `z' = s^a`,   `w' = w · (s^a)^{d⁻¹}`,   `d' = d ζ a⁻²`,
+
+where `a ∈ K` solves `s^{a⁻¹} = y z`.  Such an `a` exists exactly when `y z ≠ 1`, which
+is the book's stopping condition `u_i ≠ α` (`stepTen_exists`).
+
+The book's formulas are these read off in coordinates.  `s^a = (0, u_{i+1})` forces
+`a = u_{i+1}^τ` — this is what `τ` is for — hence `a⁻² = u_{i+1}^{-2τ}` and
+`d_{i+1} = d_i ζ u_{i+1}^{-2τ}`; and `(0,u)^{d⁻¹} = (0, d^{-(1+σ)} u)` turns `w'` into
+`v_{i+1} = v_i + u_{i+1} d_i^{-(1+σ)}`.
+
+Only the arithmetic of `(u_i)` needs coordinates; the invariant itself does not. -/
+theorem stepEleven_step (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y z w d a : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (haK : a ∈ hyp.K) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (ha : a * hyp.distinguishedInvolution * a⁻¹ = y * z)
+    (hinv : f (ω * z) = d⁻¹ * (ω * w) * d) :
+    f (ω * (a⁻¹ * hyp.distinguishedInvolution * a))
+      = (d * ζ * (a⁻¹) ^ 2)⁻¹ *
+          (ω * (w * (d * (a⁻¹ * hyp.distinguishedInvolution * a) * d⁻¹))) *
+          (d * ζ * (a⁻¹) ^ 2) := by
+  -- `y² = 1`, so `s^{a⁻¹} = y z` is exactly `y · s^{a⁻¹} = z`
+  have hy2 : y * y = 1 := by
+    have hsq := hyQ0.1
+    rwa [sq] at hsq
+  have hz : y * (a * hyp.distinguishedInvolution * a⁻¹) = z := by
+    rw [ha, ← mul_assoc, hy2, one_mul]
+  rw [hyp.stepTen H hC2 hζ hωQ hωQ0 hyQ0 haK hfω hz, hinv]
+  group
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
