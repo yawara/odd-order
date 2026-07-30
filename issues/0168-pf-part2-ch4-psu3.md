@@ -323,7 +323,11 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 いないので、`|actualKActor| = 2^m − 1` を作るときはそこを参照して同じ形で書く**
 (`exists_actualKActor_mu_eq` の全射性 + `M.mu_K_injective` の単射性で全単射)。
 
-**残るのは組み立てのみ**: `|μ(KW)| = (q−1)m` → `n = |E^×|/|μ(KW)| = (q+1)/m` →
+**`|K| = q−1` 完了**: `card_actualKActor_eq`。`μ` が `K` を `F^×` の上へ全単射
+(`mu_K_injective` + `exists_actualKActor_mu_eq`) と `natCard_frobFixedSubfield`。
+
+**残るのは組み立てのみ**: `|μ(W)| = |W|` (`quotientWHom_injective` + `coord_act`) →
+`|μ(KW)| = (q−1)m` → `n = |E^×|/|μ(KW)| = (q+1)/m` →
 `q = Σ m_i ≤ n·m − 1 = q` の挟み込み → 全等号。
 
 ⚠ **`V = W` は仮説として明示的に渡している** (`exists_mem_K_mem_W_mul` の
@@ -333,6 +337,17 @@ Ch. III §3 原文の (C2) = 「`S` は type B の Suzuki 2-群、`st` の位数
 ページ画像は p.125/p.126 まで取得済、それ以降は
 `pdftoppm -png -r 200 -f <pdfページ> -l <同> pdf/05.6_*.pdf pages/peterfalvi-p<書籍ページ>`
 (pdf ページ = 書籍ページ − 121)。
+
+## ⚠ ファイル分割の予告
+
+`PSU3Preliminary.lean` は 984 行 (2026-07-31)。1500 行上限に対してまだ余裕は
+あるが、内容は既に 2 トピックに分かれている:
+1. §2 段 (1)-(7) + (8) の群論部分 (モデル非依存)
+2. (8) のモデル数値部分 (`QuotientFieldModel` / `μ` / 基数)
+
+(8) の組み立てを入れて 1200 行を超えるようなら、2 を
+`PSU3ScalarGroup.lean` (仮) に切り出して `PSU3Preliminary` が import する形にする。
+`ModelIsomorphism` の import もそちらに寄せられる。
 
 ## 参照
 
