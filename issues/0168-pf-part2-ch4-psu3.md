@@ -431,44 +431,11 @@ Lean に落とせばよい (`u_x := Units.mk0 (coord (f(ω x))) …` と書く):
 * `ω` 自身の類では `not_mem_K_of_f_eq_conj_self` が単位剰余類を除外 ⟹ `≤ |W|−1`。
 * `|α| = |Q₀| = q` (`hQ0card`)、`|β| = index = (q+1)/|W|` (`index_range_mu`)。
 
-⚠ **流し込みで最初に確認すべき点**: `exists_conj_of_coset_eq` は
-`hu : (u : E) = M.coord (…)` を仮説に取る。`orbitOfF` は `Units.mk0 _ proof` で
-定義してあるので**これは `rfl` で埋まるはず**だが、`let` で束ねた所属証明が
-挟まるため syntactic に一致するか要確認。合わなければ `orbitOfF` を
-`fUnit` (単位を返す def) と `orbitOfF := QuotientGroup.mk ∘ fUnit` に分け、
-`fUnit_val : (fUnit … : E) = M.coord (…) := rfl` を明示的に用意する。
-
-そのあと `card_fiber_eq_of_card_eq` に流し込んで段 (8) 完了。
-
-**そのあとの流し込み** (機械的):
-1. ファイバー `Φ⁻¹(c)` が空でなければ代表 `x₀` を取り `ω' := f(ω x₀)` とおく。
-   上の補題で `Φ⁻¹(c) ⊆ {x | ∃ y ∈ Q₀, ∃ a ∈ D, f(ωx) = (ω'y)^a}` なので
-   `ncard_le_card_V_of_f_eq_conj` から `|Φ⁻¹(c)| ≤ |V| = |W|`。空なら 0 ≤ |W|。
-2. `c = Φ` の `ω` 自身の類 (書籍の `i = 1`) では `not_mem_K_of_f_eq_conj_self` が
-   単位剰余類を除外するので `|Φ⁻¹(c)| ≤ |W| − 1`。
-3. `card_fiber_eq_of_card_eq` に `M := |W|`, `|α| = |Q₀| = q`,
-   `|β| = index = (q+1)/|W|` を渡して全等号。
-
-(旧メモ) 残作業: (iii) ファイバー評価 2 本を
-`Φ` の言葉に翻訳 (`exists_conj_mul_Q0_iff` + `exists_mem_K_mem_W_mul` で
-「同じ剰余類」⟺「`∃ y ∈ Q₀, ∃ a ∈ D, …`」に落とす)、(iv) `card_fiber_eq_of_card_eq`
-に流し込む。
-
-(旧メモ) 軌道代表系 `ω₁,…,ω_n` を取り、`m_i` を定義して
-`q = Σ m_i ≤ n·\|W\| − 1 = q` の挟み込みから全等号を出す。ここは Lean 上で
-「軌道分解に沿った有限和」を組む必要があり、`Finset` の設計を先に決めること。
-
-(旧メモ) 残るのは組み立てのみ:
-`|μ(KW)| = (q−1)m` → `n = |E^×|/|μ(KW)| = (q+1)/m` →
-`q = Σ m_i ≤ n·m − 1 = q` の挟み込み → 全等号。
-
-⚠ **`V = W` は仮説として明示的に渡している** (`exists_mem_K_mem_W_mul` の
-`hVW`)。`hC2` と同じ流儀。`Setup` には入れない (§1 は `V = W` 抜きで成立するので)。
-
-**(9) 以降** (p.124 末〜) は未読。`ζ` = `W` の生成元、(C2) より `ζ ≠ 1`。
-ページ画像は p.125/p.126 まで取得済、それ以降は
-`pdftoppm -png -r 200 -f <pdfページ> -l <同> pdf/05.6_*.pdf pages/peterfalvi-p<書籍ページ>`
-(pdf ページ = 書籍ページ − 121)。
+✅ **`rfl` の懸念は先回りで解消済 (2026-07-31)**。`orbitOfF` を
+`fUnit` (単位を返す def) + `QuotientGroup.mk` に分割し、所属証明に
+`f_mul_mem_Q` / `f_mul_not_mem_Q0` と名前を付けたので
+**`fUnit_val : (fUnit … : E) = M.coord (…) := rfl`** が成立する (`@[simp]`)。
+`exists_conj_of_coset_eq` の `hu`/`hu'` はこれで埋まる。
 
 ## ⚠ ファイル分割の予告
 
