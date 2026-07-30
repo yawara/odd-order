@@ -14591,6 +14591,9 @@ determines `f, g, h` uniquely, from the unique factorizations `M = Q ⋊ D` and 
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.f_mul_g_ne_one
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.canonical_mul
 #assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.hSix
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.conj_mem_Q
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_M_union_t
+#assert_only_allowed_axioms OddOrder.GroupTheory.RankOneBNPair.Setup.closure_conj_Q
 #assert_only_allowed_axioms Subgroup.mem_normalizer_of_conj_mem
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.range_le_normalizer_inducingIdAuts

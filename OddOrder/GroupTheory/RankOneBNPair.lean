@@ -38,6 +38,8 @@ The chapter uses these mappings to pin down `G` in the characterization of
 * `hOne`, `hTwo`, `hThree` — the identities (H1)–(H4).
 * `hFive` — the identity (H5), `(f ∘ j)³(x) = x^{h(x)⁻¹}` for `j : x ↦ x⁻¹`.
 * `hSix` — the identity (H6), the addition formulas for `f`, `g`, `h` at `xy`.
+* `Setup.closure_M_union_t`, `Setup.closure_conj_Q` — `L = ⟨M, t⟩` and
+  `⟨Q^x | x ∈ L⟩ = ⟨Q, Q^t⟩`, the generation half of the Lemma of §1.
 
 ## Implementation notes
 
@@ -95,6 +97,75 @@ theorem tright (hS : Setup M Q D t) {x : L} (hxQ : x ∈ Q) (hx1 : x ≠ 1) :
   exact M.inv_mem hc
 
 end Setup
+
+/-! ## Generation
+
+The two generation facts used at the end of the Lemma of Ch. IV §1 (p. 123):
+`L = ⟨M, t⟩` and `⟨Q^x | x ∈ L⟩ = ⟨Q, Q^{tx} | x ∈ Q⟩ = ⟨Q, Q^t⟩`.  Neither needs the
+mappings `f, g, h`; both are immediate from the factorization `L = M ∪ M t Q`.
+-/
+
+/-- `Q` is normal in `M`, the remaining half of `M = Q ⋊ D`: writing `m = q · d`,
+conjugation by `q` preserves `Q` trivially and conjugation by `d` does by `Setup.DQ`. -/
+theorem Setup.conj_mem_Q (hS : Setup M Q D t) {m : L} (hm : m ∈ M) {q : L}
+    (hq : q ∈ Q) : m⁻¹ * q * m ∈ Q := by
+  obtain ⟨r, hr, -⟩ := hS.split m hm
+  rw [hr]
+  have e : ((r.1 : L) * (r.2 : L))⁻¹ * q * ((r.1 : L) * (r.2 : L))
+      = (r.2 : L)⁻¹ * ((r.1 : L)⁻¹ * q * (r.1 : L)) * (r.2 : L) := by group
+  rw [e]
+  exact hS.DQ _ r.2.2 _ (Q.mul_mem (Q.mul_mem (Q.inv_mem r.1.2) hq) r.1.2)
+
+/-- **`L = ⟨M, t⟩`** (Peterfalvi Part II, Ch. IV §1, p. 123).  Every element outside
+`M` is `a · t · b` with `a ∈ M` and `b ∈ Q ≤ M`. -/
+theorem Setup.closure_M_union_t (hS : Setup M Q D t) :
+    Subgroup.closure ((M : Set L) ∪ {t}) = ⊤ := by
+  rw [eq_top_iff]
+  intro y _
+  by_cases hy : y ∈ M
+  · exact Subgroup.subset_closure (Or.inl hy)
+  · obtain ⟨p, hp, -⟩ := hS.fact y hy
+    rw [hp]
+    exact mul_mem (mul_mem (Subgroup.subset_closure (Or.inl p.1.2))
+      (Subgroup.subset_closure (Or.inr rfl)))
+      (Subgroup.subset_closure (Or.inl (hS.QM p.2.2)))
+
+/-- **`⟨Q^x | x ∈ L⟩ = ⟨Q, Q^t⟩`** (Peterfalvi Part II, Ch. IV §1, p. 123).
+
+For `y ∈ M` one has `Q^y = Q`, and for `y = a t b` outside `M` one has
+`Q^y = (Q^a)^{tb} = (Q^t)^b`, so only `Q` and `Q^t` are ever needed. -/
+theorem Setup.closure_conj_Q (hS : Setup M Q D t) :
+    Subgroup.closure (⋃ y : L, ((fun q => y⁻¹ * q * y) '' (Q : Set L)))
+      = Subgroup.closure ((Q : Set L) ∪ (fun z => t * z * t) '' (Q : Set L)) := by
+  set N := Subgroup.closure ((Q : Set L) ∪ (fun z => t * z * t) '' (Q : Set L)) with hNdef
+  have hQN : ∀ z ∈ Q, z ∈ N := fun z hz => Subgroup.subset_closure (Or.inl hz)
+  have hQtN : ∀ z ∈ Q, t * z * t ∈ N := fun z hz =>
+    Subgroup.subset_closure (Or.inr ⟨z, hz, rfl⟩)
+  -- the key computation: every `L`-conjugate of an element of `Q` lies in `N`
+  have key : ∀ y q : L, q ∈ Q → y⁻¹ * q * y ∈ N := by
+    intro y q hq
+    by_cases hy : y ∈ M
+    · exact hQN _ (hS.conj_mem_Q hy hq)
+    · obtain ⟨p, hp, -⟩ := hS.fact y hy
+      have hqa : (p.1 : L)⁻¹ * q * (p.1 : L) ∈ Q := hS.conj_mem_Q p.1.2 hq
+      have e : y⁻¹ * q * y
+          = (p.2 : L)⁻¹ * (t * ((p.1 : L)⁻¹ * q * (p.1 : L)) * t) * (p.2 : L) := by
+        rw [hp]
+        have e' : ((p.1 : L) * t * (p.2 : L))⁻¹ * q * ((p.1 : L) * t * (p.2 : L))
+            = (p.2 : L)⁻¹ * (t⁻¹ * ((p.1 : L)⁻¹ * q * (p.1 : L)) * t) * (p.2 : L) := by
+          group
+        rwa [hS.tinv] at e'
+      rw [e]
+      exact N.mul_mem (N.mul_mem (N.inv_mem (hQN _ p.2.2)) (hQtN _ hqa)) (hQN _ p.2.2)
+  refine le_antisymm ((Subgroup.closure_le N).mpr ?_) ((Subgroup.closure_le _).mpr ?_)
+  · rintro w hw
+    simp only [Set.mem_iUnion, Set.mem_image] at hw
+    obtain ⟨y, q, hq, rfl⟩ := hw
+    exact key y q hq
+  · rintro w (hw | ⟨z, hz, rfl⟩)
+    · exact Subgroup.subset_closure (Set.mem_iUnion.2 ⟨1, ⟨w, hw, by group⟩⟩)
+    · refine Subgroup.subset_closure (Set.mem_iUnion.2 ⟨t, ⟨z, hz, ?_⟩⟩)
+      rw [hS.tinv]
 
 /-- The defining property of the triple `f, g, h` (Peterfalvi Part II, Ch. IV §1,
 p. 122): `t x t = g(x) h(x) t f(x)` for `x ∈ Q^#`, with `f x, g x ∈ Q` and
