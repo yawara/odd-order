@@ -722,9 +722,32 @@ repo 側の向きの規約 (すべて実測):
 `β ∈ N` (= `β⁻¹ = β^q`) のいずれか — これが (12) の
 「`β ∈ E` and if `β ∉ F` then `β⁻¹ = β^q`」そのもの ✓
 
-⚠ 既存部品が揃っている: `add_inv_eq_add_inv_iff` ✓ /
-`natCard_frobFixedSubfield` ✓ / `eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one` ✓ /
-`coprime_two_pow_sub_one_two_pow_add_one` ✓。残りは 4 の巡回群下界と 6 の繊維数え上げ。
+⚠ **部品の状況 (2026-07-31 更新)**:
+
+| 部品 | 状態 |
+|---|---|
+| `add_inv_eq_add_inv_iff` (繊維 = `{x,x⁻¹}`) | ✓ 証明済 |
+| `card_rootsOfUnity_ge` (`\|N\| ≥ q+1`) | ✓ 証明済 (本セッション) |
+| `natCard_frobFixedSubfield` (`\|F\| = q`) | ✓ 既存 |
+| `eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one` (`F^× ∩ N = 1`) | ✓ 既存 |
+| 組み立て | ← **残り** |
+
+**組み立てに使う mathlib API (実測で確認済)**:
+
+* `Finset.card_le_mul_card_image (s) (n) (hn : ∀ b ∈ s.image f, #{a ∈ s \| f a = b} ≤ n)`
+  `: #s ≤ n * #(s.image f)` — `n := 2` で使う。⚠ 姉妹補題
+  `card_le_mul_card_image_of_maps_to` (`t` を陽に取る版) は**使えない**:
+  `#S ≤ 2·#F` が出るだけで全射性が出ない。像を `t` にする方を使うこと。
+* `Finset.eq_of_subset_of_card_le : s ⊆ t → #t ≤ #s → s = t`
+* `mem_frobFixedSubfield : x ∈ frobFixedSubfield E p n ↔ x ^ p ^ n = x` (simp)
+* `Fintype.card_subtype` + `Equiv.subtypeEquivRight` で
+  `#{x ∈ univ \| x^q = x}` ↔ `Nat.card ↥(frobFixedSubfield E 2 m)`
+* `card_rootsOfUnity` は `[NeZero k]` を要求 (引数順は `(k := ) (R := )` で明示)
+
+**残りの手順**: `Sfin := {x ≠ 0 ∧ (x^q = x ∨ x^{q+1} = 1)}` を作り、
+(a) `#Sfin ≥ 2q-1` (`F^×` と `N` の合併、交わりは `{1}`)、
+(b) `ψ(Sfin) ⊆ Ffin`、(c) 繊維 ≤ 2 ⟹ `#Sfin ≤ 2·#(image)` ⟹ `#image ≥ q`
+(∵ `2(q-1) = 2q-2 < 2q-1`)、(d) `eq_of_subset_of_card_le` で `image = Ffin`。
 
 ## セッション総括 (2026-07-31)
 
