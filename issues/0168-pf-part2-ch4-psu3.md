@@ -761,11 +761,14 @@ repo 側の向きの規約 (すべて実測):
 | **(12)** | ✅ | `exists_add_inv_eq` |
 | **(13)** | ✅ | `betaRatio_succ` (+ `betaSum_eq_zero_iff`) |
 | **(14)** | ✅ 帰納段 | `betaScale_succ` (+ `frobNormEquiv` = τ) |
-| **(15)** | 🔶 部品のみ | `eq_one_of_frobNormEquiv_symm_sq_eq_one` / `eq_of_pow_succ_eq_one_of_le` / `eq_one_of_mul_eq_one_of_mem_K_of_mem_W` |
+| **(15)** | 🔶 結論 2 本を導出済 | `stepFifteen_length` (長さ `m₁+1=m`) / `eq_one_of_kPart_eq_one` (`c_{m₁}=α`) |
 | **(16)** | 🔶 体論的核 | `pow_eq_one_of_betaSum_eq` |
+| **(17)** | ✅ | `betaSum_mul_betaSum_add_two` / `betaRatio_div_betaRatio` |
+| **(18)** | 🔶 部品 4 本 | `betaSum_fixed_of_inv` / `frobNormEquiv_symm_sq_of_fixed` / `eq_pow_mul_prod_of_rec` / `prod_betaRatio` |
+| **(19)** | 🔶 入口 | `exists_inv_frobNorm_eq_of_ne` |
+| **(20)** | 🔶 結論 | `eq_add_of_add_char_two` (`α₁ = α₂ = x₁+x₂`) |
 | 座標橋 | ✅ | `PSU3CenterCoordinate.lean` |
-| (17)(18) | ❌ 未着手 | — |
-| §3 以降 (pp.127-134) | ❌ 未読 | — |
+| §3 以降 (pp.129-134) | ❌ 未読 (p.129/130 は画像保存済) | — |
 
 **ファイル構成 (本セッションで整理)**:
 * `PSU3Preliminary.lean` (1256 行) — §2 の群論 (1)-(7), (10), (11)
@@ -774,7 +777,11 @@ repo 側の向きの規約 (すべて実測):
 * `PSU3CenterCoordinate.lean` (~210 行) — 座標橋
 * `RankOneSetup.lean` (122 行) — (A1)-(A3) → Setup
 
-**次の一手**: (15) の組み立て。部品は 3 本とも揃っている:
+**次の一手 (2026-07-31 終盤時点)**: (19) の (a)(b) 本体。段 (2) を使う等式の連鎖で、
+`ω₁(0,x)` 記法 (= `ω` に `Q₀` の元を掛ける) の座標インタフェースが要る。
+座標橋 (`centerCoord`) は完成しているので、あとは `f` の値と `KW` 軌道の対応。
+
+**旧・次の一手 (完了)**: (15) の組み立て。部品は 3 本とも揃っている:
 1. `d_{m₁} = ζ⁻¹` を `ζ^{m₁+1} · (c_{m₁}/α)^{2τ} = 1` へ ((14) の閉じた式から)
 2. `eq_one_of_mul_eq_one_of_mem_K_of_mem_W` で両因子を 1 に
 3. `eq_one_of_frobNormEquiv_symm_sq_eq_one` で `c_{m₁} = α`、
