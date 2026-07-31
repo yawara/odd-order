@@ -812,6 +812,74 @@ Lean に前方参照は無い — 新補題は依存先の**後ろ**に置く。
 ⚠ §2 は (18) で終わらず (19)(20) まで続く。(19)(20) は
 **`n ≥ 2` の下での 2 組の列の比較**で、`f` の値の軌道を突き合わせる。
 
+## 2026-08-01: (19) 完成 / (20) の核 / (11) の実体化 / (15) の長さ
+
+### 🎯 段 (19)(a)(b) 完成 — `PSU3PairComparison.lean` (新 leaf)
+
+⚠ **座標は要らなかった**。書籍の等式連鎖は (H3) + 段 (2) + 不変式だけで閉じ、
+`u, v, d` に所属仮説すら不要 (`d ∈ KW` も不要)。
+
+* `stepNineteen` — **(19)(a)**: `f(ω₂ z₂ · s^{ak⁻¹}) = (ω₁ v · s^{ad⁻¹})^{d a⁻² k}`。
+* `f_conj_swap` (`f x = y^e` ⟹ `f y = x^{e^{-t}}`, `e ∈ D`) / `f_swap_of_pair`
+  (`e = k ∈ K` の場合) — (19)(b) は (a) を `ω₁ ↔ ω₂` で呼ぶだけ (`stepNineteen_swap`)。
+
+書籍の `1/(k^{1+θ}(x₁+u_i))` 等は**結論を座標で読むだけ** (module docstring に対応表:
+`s^{ak⁻¹} = (0, a^{1+θ}k^{-(1+θ)})`, `a⁻² = (x₁+u_i)^{2τ}`, `e_i = k d_i a⁻²`)。
+
+### 🎯 段 (20) の核 — (∗)(∗∗)(∗∗∗) を段 (7) + `K` の自由性から
+
+* `eq_and_conj_of_inv_mul_mem_K` — 段 (7) が与えるもの: 引数一致 (= (∗)) と
+  `ω' y₂ = (ω' y₁)^{a₁a₂⁻¹}`。
+* 🎯 `eq_one_of_conj_eq_mul_Q0` — **`K` は `(Q/Q₀)^#` に自由に作用する**。
+  ⚠ **書籍は標準モデル (`μ` 単射) で読むが、モデル不要だった**: Prop 1(a)
+  (`Q_inf_centralizer_eq_bot_of_mem_KSet`) の固定点自由性のみ。
+  論法 = `ψ : z ↦ z·z^c` が `Q₀` 上単射 (`z⁻¹ = z` と `(z'^c)² = 1` だけ使う)
+  ⟹ 有限性から全射 ⟹ `ω^c = ωy` なら `ψ(z) = y` なる `z` で `ωz` が `c` の
+  非自明固定点になり矛盾。
+* `eq_and_eq_of_inv_mul_mem_K` — **(∗) と (∗∗∗) を同時に**: 同じ `K`-剰余類の
+  2 表示 `f(ω x_j) = (ω' y_j)^{a_j}` は完全一致 (`x₁=x₂ ∧ a₁=a₂ ∧ y₁=y₂`)。
+  可換性仮説は `D = KW` (`V = W` の下 abelian) から満たされる。
+
+### 🎯 段 (11) の実体化 — `PSU3Sequence.lean` (新 leaf)
+
+⚠ **設計**: 状態 `(z,w,d)` = 書籍の `((0,u_i),(0,v_i),d_i)` として**群の中で**再帰。
+停止条件 (`y z = 1` ⟺ `u_i = α`) では**状態をそのまま返す**ので、不変式が
+**全 index で無条件**に成り立ち、長さを定義に埋め込まずに済む。
+
+* `exists_mem_K_conj_eq_mul` / `stepElevenNext` / `stepElevenSeq` (`Nat.rec`,
+  初期値 `(1, y, ζ)`) / `stepElevenSeq_succ_of_ne` (非停止時の明示形)
+* `stepElevenSeq_mem` (`z_i,w_i ∈ Q₀`, `d_i ∈ D`; `f` も段 (10) も使わない)
+* `stepElevenSeq_spec` — **不変式 `f(ω z_i) = (ω w_i)^{d_i}`**
+* `stepElevenSeq_coset` — **`d_i K = ζ^i K`** (各段は `d` に `ζ` と `K` の平方を
+  掛けるだけ + `ζ` が `K` を中心化)
+
+### 🎯 段 (15) の長さ
+
+* `stepElevenSeq_fst_mem_orbitSet` — 各 `z_i` は段 (8) が数える集合そのものに入る
+* `stepElevenSeq_pow_ne_one` — 非停止で `n` 段進めたなら `ζ^{n+1} ≠ 1`
+  (`not_mem_K_of_f_eq_conj_self` で `d_i ∉ K`、`d_i ∈ ζ^i K` と突き合わせ)
+* `exists_stop_lt_orderOf` — **列は `orderOf ζ − 1` 未満で停止**
+  (`ζ` が `W` 生成元なら `= m`、書籍の「`1 ≤ i ≤ m−1`」)
+
+### 📊 状態 (2026-08-01)
+
+| 段 | 状態 | 主定理 |
+|---|---|---|
+| §1 / (A1)-(A3) 橋 / (1)-(10) | ✅ | 既存 |
+| **(11)** | ✅ 群レベル完成 | `stepElevenSeq` + `_spec` + `_coset` |
+| (12)(13)(14)(17) | ✅ 体側 | `PSU3FieldArithmetic` |
+| **(15)** | 🔶 長さ ✅ / 「`u_i` で尽くす」= 残 | `exists_stop_lt_orderOf` |
+| (16) | 🔶 体論的核 | `pow_eq_one_of_betaSum_eq` |
+| (18) | 🔶 部品 4 本 (`h` の漸化式が残り) | — |
+| **(19)** | ✅ | `stepNineteen` / `stepNineteen_swap` |
+| **(20)** | 🔶 核 ✅ / 列の instantiate が残り | `eq_and_eq_of_inv_mul_mem_K` |
+
+**次の一手**: (a) (15) の「`f(ω(0,u))` が軌道に入る `u` は `u_i` に尽きる」=
+`stepElevenSeq_fst_mem_orbitSet` の像と `ncard_eq_card_W_sub_one_of_f_eq_conj_self`
+の基数一致 (`z_i` の相異性が要る — 剰余類 `ζ^i K` が相異なることから出る)。
+(b) (18) の `h(ω z_i)` 漸化式 (部品 4 本は揃っている)。
+(c) (20) の組み立て — (19) を列に instantiate。
+
 ## セッション総括 (2026-07-31)
 
 **Ch. IV で形式化されたもの** (すべて sorry 0 / AxiomsCheck OK / lint 0):
