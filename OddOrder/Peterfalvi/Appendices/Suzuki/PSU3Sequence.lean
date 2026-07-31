@@ -42,6 +42,11 @@ The book's own formulas are these read off in the coordinates of the standard mo
   with `z_i, w_i ∈ Q₀` and `d_i ∈ D`, at every index.
 * `Hypothesis.stepElevenSeq_succ_of_ne` — the explicit form of one step, for reading the
   recursion off in coordinates.
+* `Hypothesis.stepElevenSeq_coset` — `d_i` lies in the coset `ζ^i K`.
+* `Hypothesis.stepElevenSeq_fst_mem_orbitSet`,
+  `Hypothesis.stepElevenSeq_pow_ne_one`, `Hypothesis.exists_stop_lt_orderOf` — the
+  length half of step (15): the sequence lies in the set step (8) counts, so its `d_i`
+  never lie in `K`, so it must stop before `ζ^i` returns to `1`.
 -/
 
 set_option autoImplicit false
@@ -222,6 +227,62 @@ theorem stepElevenSeq_coset {ζ y : G} (hζ : ζ ∈ hyp.W) (hyQ0 : y ∈ hyp.Q0
         = ζ ^ (n + 1) * (k * ζ) * (a⁻¹) ^ 2 := by group
       _ = ζ ^ (n + 1) * (ζ * k) * (a⁻¹) ^ 2 := by rw [hcomm]
       _ = ζ ^ (n + 1 + 1) * (k * (a⁻¹) ^ 2) := by rw [pow_succ]; group
+
+/-- **Every `z_i` is one of the elements step (8) counts** (Peterfalvi Part II, p. 126,
+step (15)): the invariant of (11) is literally the membership condition of the set whose
+cardinality step (8) computes, taken at `ω' = ω`.
+
+Step (15)'s assertion that the `u ∈ F` with `f(ω(0,u))` in the `KW`-orbit of `ω̄` are
+exactly the `u_i` is the statement that this inclusion is an equality; the count on the
+right is `|W| − 1` (`ncard_eq_card_W_sub_one_of_f_eq_conj_self`). -/
+theorem stepElevenSeq_fst_mem_orbitSet (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) (i : ℕ) :
+    (hyp.stepElevenSeq ζ y i).1 ∈ {x : G | x ∈ hyp.Q0 ∧ ∃ w ∈ hyp.Q0, ∃ a ∈ hyp.D,
+      f (ω * x) = a⁻¹ * (ω * w) * a} := by
+  obtain ⟨hz, hw, hd⟩ := hyp.stepElevenSeq_mem hζ hyQ0 i
+  exact ⟨hz, _, hw, _, hd, hyp.stepElevenSeq_spec H hC2 hζ hωQ hωQ0 hyQ0 hfω i⟩
+
+/-- **The sequence runs only while `ζ^i ≠ 1`** (Peterfalvi Part II, p. 126, step (15)).
+
+Step (8)'s sharpening `not_mem_K_of_f_eq_conj_self` says the conjugator in
+`f(ω x) = (ω y)^a` — with the *same* `ω` on both sides, which is exactly the invariant of
+(11) — never lies in `K`.  Since `d_i` lies in the coset `ζ^i K`, that forbids
+`ζ^i = 1`. -/
+theorem stepElevenSeq_pow_ne_one (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) (n : ℕ)
+    (hns : ∀ i < n, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1) :
+    ζ ^ (n + 1) ≠ 1 := by
+  intro hpow
+  obtain ⟨k, hkK, hk⟩ := hyp.stepElevenSeq_coset hζ hyQ0 n hns
+  obtain ⟨hz, hw, hd⟩ := hyp.stepElevenSeq_mem hζ hyQ0 n
+  refine hyp.not_mem_K_of_f_eq_conj_self H hC2 hωQ hωQ0 hz hw hd
+    (hyp.stepElevenSeq_spec H hC2 hζ hωQ hωQ0 hyQ0 hfω n) ?_
+  rw [hk, hpow, one_mul]
+  exact hkK
+
+/-- **The sequence stops within `m − 1` steps** (Peterfalvi Part II, p. 126, step (15)):
+the stopping rule `u_i = α` is reached at some index below `orderOf ζ − 1`.
+
+With `ζ` a generator of `W`, `orderOf ζ` is `m = |W|`, so — with this file's indexing,
+which is the book's shifted by one — the book's sequences run for `1 ≤ i ≤ m − 1` and no
+further, which is the length assertion of step (15). -/
+theorem exists_stop_lt_orderOf (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) :
+    ∃ i < orderOf ζ - 1, y * (hyp.stepElevenSeq ζ y i).1 = 1 := by
+  by_contra hcon
+  push Not at hcon
+  refine hyp.stepElevenSeq_pow_ne_one H hC2 hζ hωQ hωQ0 hyQ0 hfω (orderOf ζ - 1) hcon ?_
+  rw [Nat.sub_add_cancel (orderOf_pos ζ)]
+  exact pow_orderOf_eq_one ζ
 
 end Hypothesis
 
