@@ -284,6 +284,126 @@ theorem exists_stop_lt_orderOf (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   rw [Nat.sub_add_cancel (orderOf_pos ζ)]
   exact pow_orderOf_eq_one ζ
 
+/-! ## Step (18): the recursion for `h` along the same sequence (p. 127)
+
+Step (18) proves `(h(ω)ζ⁻¹)^m = 1` by running (H6) along the sequence of (11).  Its
+first display,
+
+  `h(ω(0,u_i)) = h(ω) h((ω(0,α))^ζ(0,u_i⁻¹)) u_i^{2τ}
+              = h(ω) h(ω(0,u_{i-1}))^ζ u_i = (h(ω)ζ⁻¹) h(ω(0,u_{i-1})) (ζ u_i)`,
+
+is `stepEighteen_step` below.  The `(0,u_{i-1})` in the middle is not an accident of the
+coordinates: the step of (11) picks `a ∈ K` with `s^{a⁻¹} = y z_{i-1}`, so
+`y · s^{a⁻¹} = z_{i-1}` exactly, `y` being an involution.
+-/
+
+/-- **The recursion of step (18)** (Peterfalvi Part II, p. 127): along one step of (11),
+
+  `h(ω s^a) = h(ω) · h(ω z)^ζ · a²`,   where `s^{a⁻¹} = y z`.
+
+This is (H6) at `x = ω`, `y = s^a`, with step (1) supplying `g(s^a) = s^{a⁻¹}` and
+`h(s^a) = a²`, and (H4) pulling the `ζ` of the normalization `f(ω) = (ω y)^ζ` back out
+of `h`; the twist `ζ^t` is `ζ` because `ζ ∈ W ≤ V` centralizes `t`.
+
+The book's `a² = u_i^{2τ}` is the coordinate reading of the last factor, and its
+`(h(ω)ζ⁻¹)h(ω(0,u_{i-1}))(ζu_i)` is this regrouped. -/
+theorem stepEighteen_step (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y z a : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hzQ0 : z ∈ hyp.Q0) (haK : a ∈ hyp.K)
+    (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (ha : a * hyp.distinguishedInvolution * a⁻¹ = y * z) :
+    h (ω * (a⁻¹ * hyp.distinguishedInvolution * a))
+      = h ω * (ζ⁻¹ * h (ω * z) * ζ) * a ^ 2 := by
+  have hsQ0 : hyp.distinguishedInvolution ∈ hyp.Q0 :=
+    ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
+  have haKSet : a ∈ hyp.KSet := by
+    have hx : a ∈ (hyp.K : Set G) := haK
+    rwa [hyp.coe_K] at hx
+  have haD : a ∈ hyp.D := hyp.K_le_D haK
+  have hζD : ζ ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hζ)
+  have hsa : a⁻¹ * hyp.distinguishedInvolution * a ∈ hyp.Q0 := by
+    have hmem := hyp.conj_mem_Q0_of_mem_D (hyp.D.inv_mem haD) hsQ0
+    rwa [inv_inv] at hmem
+  have hsainv : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D haD hsQ0
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
+  obtain ⟨-, hωsaQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hsa
+  have hωsa1 : ω * (a⁻¹ * hyp.distinguishedInvolution * a) ≠ 1 :=
+    fun hc => hωsaQ0 (hc ▸ hyp.Q0.one_mem)
+  obtain ⟨hωzQ, hωzQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hzQ0
+  have hωz1 : ω * z ≠ 1 := fun hc => hωzQ0 (hc ▸ hyp.Q0.one_mem)
+  have hsaQ : a⁻¹ * hyp.distinguishedInvolution * a ∈ hyp.Q :=
+    hyp.rankOneSetup.DQ a haD _ hyp.distinguishedInvolution_mem_Q
+  obtain ⟨-, -, -, e6⟩ := hSix hyp.rankOneSetup H hωQ hω1 hsaQ
+    (hyp.conj_distinguishedInvolution_ne_one a) hωsa1
+  obtain ⟨-, hg1, hh1⟩ := hyp.fgh_at_conj_distinguishedInvolution H hC2 haKSet
+  rw [e6, hg1, hh1]
+  have hy2 : y * y = 1 := by
+    have hsq := hyQ0.1
+    rwa [sq] at hsq
+  have hζc : ζ * (a * hyp.distinguishedInvolution * a⁻¹)
+      = (a * hyp.distinguishedInvolution * a⁻¹) * ζ := hyp.W_centralizes_Q0 hζ hsainv
+  have harg : f ω * (a * hyp.distinguishedInvolution * a⁻¹) = ζ⁻¹ * (ω * z) * ζ := by
+    rw [hfω]
+    calc ζ⁻¹ * (ω * y) * ζ * (a * hyp.distinguishedInvolution * a⁻¹)
+        = ζ⁻¹ * (ω * y) * (ζ * (a * hyp.distinguishedInvolution * a⁻¹)) := by group
+      _ = ζ⁻¹ * (ω * y) * ((a * hyp.distinguishedInvolution * a⁻¹) * ζ) := by rw [hζc]
+      _ = ζ⁻¹ * (ω * (y * (a * hyp.distinguishedInvolution * a⁻¹))) * ζ := by group
+      _ = ζ⁻¹ * (ω * (y * (y * z))) * ζ := by rw [ha]
+      _ = ζ⁻¹ * (ω * z) * ζ := by rw [← mul_assoc y y z, hy2, one_mul]
+  rw [harg]
+  obtain ⟨-, -, e4⟩ := hThree hyp.rankOneSetup H hωzQ hωz1 hζD
+  have htζt : hyp.t * ζ * hyp.t = ζ := by
+    have hc := hyp.commute_t_of_mem_V (hyp.W_le_V hζ)
+    rw [← hc.eq, mul_assoc, hyp.rankOneSetup.invol, mul_one]
+  rw [e4, htζt]
+
+/-- **The closed form of step (18)** (Peterfalvi Part II, p. 127):
+
+  `h(ω z_i) = (h(ω)ζ⁻¹)^i · h(ω) · (ζ^i k)`,   `k ∈ K`.
+
+Unrolling `stepEighteen_step` collects one `h(ω)ζ⁻¹` on the left and one `ζ a²` on the
+right per step, and `ζ` centralizes `K`, so the `ζ`'s gather into `ζ^i` and the squares
+into a single element of `K`.
+
+That element is the book's `(α/(β^i + β^{-i}))^{2τ}` — its `2τ`-shape is visible here as
+the product of the squares `a_j²` — and the book's display
+
+  `h(ω(0,u_i)) = (h(ω)ζ⁻¹)^i ζ^i (α/(β^i + β^{-i}))`
+
+differs only in having `h(ω)` absorbed, `h(ω(0,u_1)) = h(ω)` being the base case. -/
+theorem stepEighteen_unroll (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) (n : ℕ)
+    (hns : ∀ i < n, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1) :
+    ∃ k ∈ hyp.K, h (ω * (hyp.stepElevenSeq ζ y n).1)
+      = (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * k) := by
+  induction n with
+  | zero =>
+    refine ⟨1, hyp.K.one_mem, ?_⟩
+    rw [hyp.stepElevenSeq_zero]
+    simp
+  | succ n ih =>
+    obtain ⟨k, hkK, hk⟩ := ih fun i hi => hns i (by omega)
+    have hz : (hyp.stepElevenSeq ζ y n).1 ∈ hyp.Q0 := (hyp.stepElevenSeq_mem hζ hyQ0 n).1
+    obtain ⟨a, haK, ha, hstep⟩ :=
+      hyp.stepElevenSeq_succ_of_ne ζ y n
+        (hyp.exists_mem_K_conj_eq_mul hyQ0 hz (hns n (by omega)))
+    have hfst : (hyp.stepElevenSeq ζ y (n + 1)).1
+        = a⁻¹ * hyp.distinguishedInvolution * a := by rw [hstep]
+    have hcomm : k * ζ = ζ * k := hyp.commute_of_mem_W_of_mem_K hζ hkK
+    refine ⟨k * a ^ 2, hyp.K.mul_mem hkK (pow_mem haK 2), ?_⟩
+    rw [hfst, hyp.stepEighteen_step H hC2 hζ hωQ hωQ0 hyQ0 hz haK hfω ha, hk,
+      pow_succ' (h ω * ζ⁻¹) n, pow_succ ζ n]
+    calc h ω * (ζ⁻¹ * ((h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * k)) * ζ) * a ^ 2
+        = (h ω * ζ⁻¹) * (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * (k * ζ)) * a ^ 2 := by group
+      _ = (h ω * ζ⁻¹) * (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * (ζ * k)) * a ^ 2 := by rw [hcomm]
+      _ = (h ω * ζ⁻¹) * (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * ζ * (k * a ^ 2)) := by group
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
