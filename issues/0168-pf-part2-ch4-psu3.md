@@ -874,11 +874,49 @@ Lean に前方参照は無い — 新補題は依存先の**後ろ**に置く。
 | **(19)** | ✅ | `stepNineteen` / `stepNineteen_swap` |
 | **(20)** | 🔶 核 ✅ / 列の instantiate が残り | `eq_and_eq_of_inv_mul_mem_K` |
 
-**次の一手**: (a) (15) の「`f(ω(0,u))` が軌道に入る `u` は `u_i` に尽きる」=
-`stepElevenSeq_fst_mem_orbitSet` の像と `ncard_eq_card_W_sub_one_of_f_eq_conj_self`
-の基数一致 (`z_i` の相異性が要る — 剰余類 `ζ^i K` が相異なることから出る)。
-(b) (18) の `h(ω z_i)` 漸化式 (部品 4 本は揃っている)。
-(c) (20) の組み立て — (19) を列に instantiate。
+### 段 (18) も群レベルで完成 (2026-08-01)
+
+* `stepEighteen_step` — `h(ω s^a) = h(ω)·h(ω z)^ζ·a²` ((H6) の `h` 節 + 段 (1) + (H4))
+* `stepEighteen_unroll` — 閉じた形 `h(ω z_i) = (h(ω)ζ⁻¹)^i·h(ω)·(ζ^i k)` (`k ∈ K`)
+
+### ⚠⚠ 残る crux が 1 本に同定された: `D` の `(Q/Q₀)^#` への自由性
+
+**次の 3 つが全部これ待ち**:
+1. (15) の「`f(ω(0,u))` が軌道に入る `u` は `u_i` に尽きる」 —
+   `z_i` の相異性に要る (`z_i = z_j` から `d_i d_j⁻¹` が `ω̄` を固定する、を潰す)
+2. (18) の締め `d_{m-1} = ζ⁻¹` ⟹ `(h(ω)ζ⁻¹)^m = 1` —
+   停止点で `f(ωy) = ω^{ζ⁻¹}` (`f_conj_swap` で出る) と不変式を突き合わせると
+   `ζ⁻¹d_N⁻¹` が `ω̄` を固定する形になる
+3. (20) の (∗∗∗) を一般の `a_j ∈ D` で使うとき
+
+**`K` 版は群論的に取れた** (`eq_one_of_conj_eq_mul_Q0`, `PSU3PairComparison.lean`)。
+**`W` の元は `Q₀` を中心化する**ので同じ ψ 論法 (`Q` 上の固定点自由性) は効かない。
+⟹ **モデル経由が正解**: `D = KW` の元は `Q/Q₀ ≅ E` にスカラー `μ(k,v)` 倍で作用し、
+`μ` は単射。
+
+**部品はすべて所在確認済 (2026-08-01、着手可能)**:
+
+| 必要なもの | 出所 |
+|---|---|
+| `D = KW` の分解 | `exists_mem_K_mem_W_mul hVW` (PSU3Preliminary:993) |
+| 対 `(kActor k, v)` の作用 = `c` による共役 | `conjQHom_apply` + `conjQByK_apply_val` (SylowTwo:56) + `conjQByW_apply_val` (TypeBFromW:75) — どれも `rfl` |
+| 商への降下 | `quotientKWHom_mk` (QuotientKWField:219, `rfl`/`simp`) |
+| スカラー作用 | `M.coord_act` (`QuotientFieldModel` の field) |
+| `coord ≠ 0` | `coord_ne_zero_of_not_mem_Q0` (PSU3OrbitCount:154) |
+| `μ` 単射 | `mu_injective` (QuotientKWField:504) — 仮説で受けるのが簡単 (hst/hm/hQ0card/hcardQ/induction/s/M が要る) |
+| `kv = 1` から `k = 1` | `conjQByK_injective` (ActualKActor:33) |
+
+⟹ **書く場所 = `PSU3OrbitCount.lean`** (モデル配管が全部そこにある、695 行で余裕)。
+署名案:
+```
+theorem eq_one_of_conj_eq_mul_Q0_of_mem_D {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ω c y : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hcD : c ∈ hyp.D)
+    (hy : y ∈ hyp.Q0) (hconj : c * ω * c⁻¹ = ω * y) : c = 1
+```
+
+**その後**: (a) (15) の尽くし、(b) (18) の締め、(c) (20) の組み立て。
 
 ## セッション総括 (2026-07-31)
 
