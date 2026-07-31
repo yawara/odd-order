@@ -796,6 +796,21 @@ theorem betaRatio_div_betaRatio {E : Type*} [Field E] (h2 : (2 : E) = 0) {β : E
   rw [hstep, betaSum_mul_betaSum_add_two h2 hβ i, add_div,
     div_self (pow_ne_zero 2 hci1), ← div_pow]
 
+/-- **The element `a` of step (19)** (Peterfalvi Part II, p. 127): for `x ≠ u` there is a
+nonzero `a` with `a^{-(1+θ)} = x + u`, i.e. `x + a^{-(1+θ)} = u` in characteristic `2`.
+
+`x ≠ u` says `x + u ≠ 0`, and `u ↦ u^{1+θ}` is bijective on `F^×`, so the root exists;
+`a` is its inverse.  The book's hypothesis `x₁ ≠ u_i` comes from `f(ω₁(0,x₁))` not lying
+in the `KW`-orbit of `ω₁`. -/
+theorem exists_inv_frobNorm_eq_of_ne {E : Type*} [Field E] [Finite E]
+    (hchar : (2 : E) = 0) {θ : E ≃+* E} (hodd : Odd (orderOf θ)) {x u : E} (hne : x ≠ u) :
+    ∃ a : E, a ≠ 0 ∧ a⁻¹ * θ a⁻¹ = x + u := by
+  have hne0 : x + u ≠ 0 := fun h => hne (by linear_combination h - u * hchar)
+  obtain ⟨v, ⟨hvne, hv⟩, -⟩ := existsUnique_frobNorm_eq_of_ne_zero hchar hodd hne0
+  refine ⟨v⁻¹, inv_ne_zero hvne, ?_⟩
+  rw [inv_inv]
+  exact hv
+
 /-- **The conclusion `α₁ = α₂ = x₁ + x₂` of step (20)** (Peterfalvi Part II, p. 128).
 
 Instance `i = 1` of the book's (∗∗∗) gives `x₁ = x₂ + α₂`, and instance `i = m − 1` gives
