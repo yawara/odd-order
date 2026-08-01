@@ -337,6 +337,48 @@ theorem structureConjugator_mem_residualImage (hXV : X ≤ hyp.V)
   hyp.inf_centralizer_le_residual hCQ (Subgroup.mem_inf.mpr
     ⟨hyp.structureConjugator_mem_Q, hyp.structureConjugator_mem_centralizer_of_le_V hXV⟩)
 
+/-! ### `Z(Q̄) = Q̄₀` for the centralizer quotient
+
+`corollaryTwo_of_standardModel` takes `hZc : Z(Q) = Q₀ ∩ Q`, which for `C/𝒩(C)` reduces to
+"`Z(Q̄)` has exponent `2`" (`center_Q_eq_Q0_subgroupOf_of_sq_eq_one`).  That is a fact
+about the root group: `Q̄ ≅ C_Q(X)` (`centralizerQQuotientEquiv`), Ch. I §3 Proposition 1(c)
+identifies `C_Q(X)` with `RootGroup ℓ` (`cQEquivRoot`), and `Z(RootGroup ℓ)` is the
+square-one central line (`RootGroup.center_eq_centerLine`).
+
+The identification is taken as a parameter rather than read off `CentralizerPSUData`, so
+that the statement does not depend on which `MulAction` instance the caller has in
+scope. -/
+
+/-- Every central element of `Q̄` is an involution, because `Z(RootGroup ℓ)` is the
+square-one central line. -/
+theorem sq_eq_one_of_mem_center_Q_centralizerQuotient (hXV : X ≤ hyp.V) {n : ℕ} (hn : 0 < n)
+    (eRoot : ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) ≃* RootGroup n)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1) :
+    letI := hyp.centralizerQuotientMulAction hXV
+    ∀ z ∈ Subgroup.center ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q, z ^ 2 = 1 := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  intro z hz
+  set e : ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q ≃* RootGroup n :=
+    (hyp.centralizerQQuotientEquiv hXV).symm.trans eRoot with he
+  have hcz : e z ∈ Subgroup.center (RootGroup n) :=
+    (MulEquivClass.apply_mem_center_iff e).mpr hz
+  rw [RootGroup.center_eq_centerLine n hn, RootGroup.mem_centerLine_iff_sq_eq_one] at hcz
+  exact e.injective (by rw [map_pow, hcz, map_one])
+
+/-- **`Z(Q̄) = Q̄₀ ∩ Q̄`** — `corollaryTwo_of_standardModel`'s `hZc` for `C/𝒩(C)`. -/
+theorem center_Q_eq_Q0_centralizerQuotient (hXV : X ≤ hyp.V) {n : ℕ} (hn : 0 < n)
+    (eRoot : ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) ≃* RootGroup n)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1) :
+    letI := hyp.centralizerQuotientMulAction hXV
+    Subgroup.center ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q
+      = (hyp.centralizerQuotientHypothesis hXV hA3).Q0.subgroupOf
+        (hyp.centralizerQuotientHypothesis hXV hA3).Q := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  exact (hyp.centralizerQuotientHypothesis hXV hA3).center_Q_eq_Q0_subgroupOf_of_sq_eq_one
+    (hyp.sq_eq_one_of_mem_center_Q_centralizerQuotient hXV hn eRoot hA3)
+
 section Model
 
 variable [MulAction (hyp.centralizerActionQuotient X) ↥(MulAction.fixedPoints X Ω)]
