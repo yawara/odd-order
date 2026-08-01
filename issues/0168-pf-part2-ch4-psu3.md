@@ -6443,3 +6443,42 @@ centralizes `C_{Q₀}(P)` … `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` 
 centralizer quotient 版が在るものを列挙すること** (`natCard_quotient_*`,
 `isSuzuki2Group_quotient_Q`, `psu3Numerics_and_standingData_centralizerQuotient` の
 周辺に固まっている)。
+
+## 2026-08-02 (123): 🎯 §3 の Proposition が `C/𝒩(C)` で成立 — 段 (2) の中央が埋まった
+
+`SectionFourSetup.isStandardModel_centralizerQuotient` (`PSU3SectionFourIntrinsic.lean`)。
+`centralizerQuotientHypothesis` について `IsStandardModel` を得た。**必要な入力は
+全部既に在った**:
+
+* `standingData_centralizerQuotient` — 2 bundle + 数値 4 本
+* `theoremAInductionBelow_centralizerActionQuotient` — 帰納法仮説の制限
+* `exists_center_Q_ne_one` — `x₀ ∈ Z(Q̄), ≠ 1` (任意の `Hypothesis` に generic)
+
+⚠ 実務メモ: `exists_standardModel` は section variable の `s : LemmaFiveSetup m` と
+`M : QuotientFieldModel m` を**先頭の explicit 引数**として取る (`include s in` +
+自動 include)。`hst` から渡すと型不一致になる。
+
+### 段 (2) の 3 ピース
+
+| ピース | 定理 | 状態 |
+|---|---|---|
+| `G ← C` | `exists_fgh_centralizer_eq` | ✅ (122) |
+| 中央 (§3 Corollary 2) | `isStandardModel_centralizerQuotient` → `corollaryTwo_of_sectionThree` | ✅ 前半 / ⚠ 後半 |
+| `C ← C/𝒩(C)` | `fgh_map_centralizerQuotient` | ✅ (122) |
+
+### ⚠ 次セッションはここから — `corollaryTwo_of_sectionThree` を当てる
+
+`IsStandardModel` は得たので、残りは `corollaryTwo_of_sectionThree` の**それ以外**の
+仮説を `C/𝒩(C)` について供給すること:
+
+`H` (= `IsFGH`, `setup_centralizerQuotient` + `Setup.exists_fgh` で出る) /
+`hC2` (`t̄s̄t̄ = s̄t̄s̄`; `|s̄t̄| = 3` と対合性から) / `hZc` (`Z(Q̄) = Q̄₀ ∩ Q̄`) /
+`hmu` / `hVW` (`V̄ = W̄`) / `hcard` (`5 ≤ |frobFixedSubfield|`) /
+`hKcard` (`|actualKActor| = 2ᵐ - 1`) / `hWdvd` / `hW1` / `hfQ` / `hhW` /
+bilinear package (`Φ`, `φ`, `θm`, `Θ`, `ι`, `hker`, `hquot`, `hW`, `hΘq`, `hΘc`)。
+
+⚠ **bilinear package は `IsStandardModel` の分解で出るはず** — `IsStandardModel` の
+定義を読んで、`corollaryTwo_of_sectionThree` の引数と 1:1 に対応するか確認すること
+(`isStandardModel_residualQuotient` の呼び出し側 = 未だ無い、が
+`PSU3CorollaryTwo.lean` に `corollaryTwo_of_standardModel` が在るのでそちらが
+package 済みの入口かもしれない — **まずそれを grep**)。
