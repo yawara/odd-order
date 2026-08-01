@@ -1065,6 +1065,47 @@ theorem eq_add_inv_add_inv_of_mul_inv_eq {E : Type*} [Field E] (h2 : (2 : E) = 0
   rw [hexp] at heq
   linear_combination -heq - Z * h2
 
+/-- **`ρ(a)² = a · ψ(a)` forces `ρ = ψ = id`** (Peterfalvi Part II, p. 130, reconciling the
+two `θ`'s of §3).
+
+The model of Ch. III §3 scales the centre of `Q` by `a ↦ a^{1+θ} = a · θ(a)`, while the
+scaling pair `(σ, τ)` of the same Proposition scales it by `σ(a) τ(a)`.  Once §3 (3) has
+identified `σ` with `τ` on `F`, the two readings say `σ(a)² = a · θ(a)` there — and *that
+alone* pins both maps down, with no appeal to the classification of `Aut F`:
+
+additivity of `ψ` applied to `a + b`, together with `(ρa + ρb)² = ρa² + ρb²` in
+characteristic `2`, gives `a ψ(b) = b ψ(a)`; at `b = 1` this is `ψ = id`, and then
+`ρ(a)² = a²` gives `ρ = id` because squaring is injective.
+
+So the book's normalization `{μ|_F, ν|_F} = {1_F, θ}` is not an extra choice: it is forced.
+-/
+theorem eq_id_of_sq_eq_mul_on {E : Type*} [Field E] (h2 : (2 : E) = 0) (S : Subfield E)
+    (ρ ψ : E →+* E) (h : ∀ a ∈ S, ρ a ^ 2 = a * ψ a) :
+    (∀ a ∈ S, ρ a = a) ∧ (∀ a ∈ S, ψ a = a) := by
+  -- the cross relation `a ψ(b) = b ψ(a)`
+  have hcross : ∀ a ∈ S, ∀ b ∈ S, a * ψ b = b * ψ a := by
+    intro a ha b hb
+    have hab := h (a + b) (S.add_mem ha hb)
+    rw [map_add, map_add] at hab
+    have hsq : (ρ a + ρ b) ^ 2 = ρ a ^ 2 + ρ b ^ 2 := by
+      linear_combination ρ a * ρ b * h2
+    rw [hsq, h a ha, h b hb] at hab
+    linear_combination -hab - b * ψ a * h2
+  -- at `b = 1`
+  have hψ : ∀ a ∈ S, ψ a = a := by
+    intro a ha
+    have hc := hcross a ha 1 S.one_mem
+    rw [map_one, mul_one, one_mul] at hc
+    exact hc.symm
+  refine ⟨fun a ha => ?_, hψ⟩
+  -- `ρ(a)² = a²`, and squaring is injective in characteristic `2`
+  have hsq : (ρ a + a) ^ 2 = 0 := by
+    have hh := h a ha
+    rw [hψ a ha] at hh
+    linear_combination hh + (ρ a * a + a ^ 2) * h2
+  have hzero : ρ a + a = 0 := pow_eq_zero_iff two_ne_zero |>.mp hsq
+  linear_combination hzero - a * h2
+
 /-- An additive map preserving a subfield, restricted to it. -/
 def subfieldRestrict {E : Type*} [Field E] (θ : E →+ E) (S : Subfield E)
     (hS : ∀ x ∈ S, θ x ∈ S) : ↥S →+ ↥S where

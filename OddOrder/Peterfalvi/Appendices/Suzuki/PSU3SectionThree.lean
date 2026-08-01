@@ -725,10 +725,12 @@ the book's single excluded point `α^{2τ}`.
 Two normalizations of the book are visible in the conclusion and are *not* gaps:
 
 * `θ = 1` reads here as `σ|_F = τ|_F`, since `θ` is defined as `σ⁻¹ ∘ τ` rather than
-  imported from the type-`B` datum; the two differ by an overall Frobenius twist of the
-  coordinate identification.
-* correspondingly `α` appears as `σ⁻¹ α`.  The book's `{μ|_F, ν|_F} = {1_F, θ}` makes
-  `σ|_F` the identity and erases both.
+  imported from the type-`B` datum.
+* correspondingly `α` appears as `σ⁻¹ α`.
+
+Neither survives: `eq_id_of_sq_eq_mul_on` shows that `σ|_F = τ|_F` already *forces*
+`σ|_F = 1` — the book's `{μ|_F, ν|_F} = {1_F, θ}` is a consequence, not a choice — so the
+model's `θ` is the identity on `F` and `σ⁻¹ α` is `α`.
 
 `hcard` is the book's "`|F| ≥ 8`, since `θ` is of odd order".  It is carried as a
 hypothesis because the odd order of `θ` belongs to the type-`B` datum, which this
