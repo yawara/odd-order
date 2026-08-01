@@ -37,11 +37,13 @@ statements about the field `E` alone.
 ## Main results
 
 * `star_of_secondEntry` — the second-entry comparison *is* `(∗∗)`.
-* `eq_and_inv_of_star` — `(∗∗)` forces `x = ζ⁻¹` and `γ(a) = 1/(a + ζ⁻¹)`.
-* `gamma_eq_inv_of_secondEntry` — the two combined, in the form stage (4) consumes:
-  the second unitary coordinate of `f(ω̄, x + a)` is `1/(x + a)`, for `a ∈ F − {0, 1}`.
+* `eq_of_star_at_one`, `inv_of_star` — `(∗∗)` forces `x = ζ⁻¹`, and then
+  `γ(a) = 1/(a + ζ⁻¹)` one `a` at a time.
 * `secondEntry_of_chain`, `star_of_chain` — the bridge from a two-factor identity in
   the twisted product to `(∗∗)`, which is how stage (1) enters.
+* `Hypothesis.stepFour_base`, `Hypothesis.stepFour_pointwise`,
+  `Hypothesis.stepFour_at_omega`, `Hypothesis.stepFour_elem`,
+  `Hypothesis.stepFour_cover` — stage (4) itself.
 -/
 
 set_option autoImplicit false
@@ -87,72 +89,43 @@ theorem star_of_secondEntry (h2 : (2 : E) = 0) {m : ℕ} {w ω x a γa : E}
   rw [hcoc] at hchain
   linear_combination hchain + (γa - a) * h2
 
-/-- **`(∗∗)` forces `x = w` and `γ(a) = 1/(a + w)`** (Peterfalvi Part II, p. 131,
-with `w = ζ⁻¹`).
+/-- **`(∗∗)` at `a = 1` pins `x`** (Peterfalvi Part II, p. 131: "For `a = 1`, this
+becomes `0 = x + 1 + (1 + ζ⁻¹) = x + ζ⁻¹`").
 
-Only two features of `w` are used: it lies outside the subfield `S = F` (so that `a + w`
-never vanishes for `a ∈ S`), and `1 ∈ S`.  Both steps are the same manipulation,
-`(a + w)² = a² + w²` in characteristic two:
+The left side vanishes in characteristic two, and `(1 + w²)/(1 + w) = 1 + w`. -/
+theorem eq_of_star_at_one (h2 : (2 : E) = 0) {w x v : E} (hw : (1 : E) + w ≠ 0)
+    (hstar : ((1 : E) ^ 2 + 1) * v = x + 1 + (1 + w ^ 2) / (1 + w)) :
+    x = w := by
+  have hsq : (1 : E) + w ^ 2 = (1 + w) * (1 + w) := by linear_combination (-w) * h2
+  have hzero : ((1 : E) ^ 2 + 1) * v = 0 := by
+    rw [show ((1 : E) ^ 2 + 1) = 0 by linear_combination h2, zero_mul]
+  rw [hsq, mul_div_assoc, div_self hw, mul_one, hzero] at hstar
+  linear_combination -hstar + (-w - 1) * h2
 
-* at `a = 1` the left side vanishes and `(1 + w²)/(1 + w) = 1 + w`, giving `x = w`;
-* at `a ∉ {0, 1}` the right side becomes `[(a + w)² + 1 + w²]/(a + w) = (a² + 1)/(a + w)`,
-  and `a² + 1 = (a + 1)²` is invertible.
+/-- **`(∗∗)` away from `a ∈ {0, 1}` gives the value** (Peterfalvi Part II, p. 131:
+"Thus, for `a ∈ F − {0,1}`, `γ(a) = 1/(a + ζ⁻¹)`").
 
-The excluded value `a = 1` is exactly the one the book recovers at the end of (4) by
-replacing `ω` with `ω⁻¹` and `ζ` with `ζ⁻¹`. -/
-theorem eq_and_inv_of_star (h2 : (2 : E) = 0) (S : Subfield E) {w x : E} {γ : E → E}
-    (hw : w ∉ S)
-    (hstar : ∀ a ∈ S, a ≠ 0 → (a ^ 2 + 1) * γ a = x + a + (1 + w ^ 2) / (a + w)) :
-    x = w ∧ ∀ a ∈ S, a ≠ 0 → a ≠ 1 → γ a = (a + w)⁻¹ := by
-  have hne : ∀ a ∈ S, a + w ≠ 0 := by
-    intro a ha hc
-    refine hw ?_
-    have hwa : w = a := by linear_combination hc - a * h2
-    rw [hwa]
-    exact ha
-  have hone : (1 : E) ∈ S := S.one_mem
-  -- the instance `a = 1` pins `x`
-  have hx : x = w := by
-    have h := hstar 1 hone one_ne_zero
-    have h1w : (1 : E) + w ≠ 0 := hne 1 hone
-    have hsq : (1 : E) + w ^ 2 = (1 + w) * (1 + w) := by linear_combination (-w) * h2
-    have hzero : ((1 : E) ^ 2 + 1) * γ 1 = 0 := by
-      rw [show ((1 : E) ^ 2 + 1) = 0 by linear_combination h2, zero_mul]
-    rw [hsq, mul_div_assoc, div_self h1w, mul_one, hzero] at h
-    linear_combination -h + (-w - 1) * h2
-  refine ⟨hx, fun a ha ha0 ha1 => ?_⟩
-  have haw : a + w ≠ 0 := hne a ha
+Once `x = w` is known the right side collapses:
+`w + a + (1 + w²)/(a + w) = [(a + w)² + 1 + w²]/(a + w) = (a² + 1)/(a + w)`, and
+`a² + 1 = (a + 1)²` is invertible.
+
+Stated for one `a` at a time — the value `v` is whatever the group side produces there,
+so no indexing function is needed. -/
+theorem inv_of_star (h2 : (2 : E) = 0) {w x a v : E} (haw : a + w ≠ 0) (ha1 : a ≠ 1)
+    (hx : x = w) (hstar : (a ^ 2 + 1) * v = x + a + (1 + w ^ 2) / (a + w)) :
+    v = (a + w)⁻¹ := by
   have hsq : a ^ 2 + 1 ≠ 0 := by
     intro hc
     refine ha1 ?_
     have hfac : (a + 1) * (a + 1) = 0 := by linear_combination hc + a * h2
     rcases mul_eq_zero.mp hfac with h | h <;>
       exact (by linear_combination h - h2 : a = 1)
-  -- the right-hand side is `(a² + 1)/(a + w)`
   have hnum : (a ^ 2 + 1 : E) = (w + a) * (a + w) + (1 + w ^ 2) := by
     linear_combination (-(a * w) - w ^ 2) * h2
   have hrhs : (a ^ 2 + 1) / (a + w) = w + a + (1 + w ^ 2) / (a + w) := by
     rw [hnum, add_div, mul_div_assoc, div_self haw, mul_one]
-  have h := hstar a ha ha0
-  rw [hx, ← hrhs, div_eq_mul_inv] at h
-  exact mul_left_cancel₀ hsq h
-
-/-- **Stage (4), as an identity between the unitary coordinates** (Peterfalvi Part II,
-p. 131).
-
-Combining the two previous lemmas: the second entry of `f(ω̄, x + a)` is `1/(x + a)`,
-since `x = w` turns `a + w` into `x + a`.  Together with stage (2)'s first entry
-`ω̄/(a + w) = ω̄/(x + a)` this is the book's `f(ω̄, y) = (ω̄/y, 1/y)`, for
-`y = x + a` with `a ∈ F − {0, 1}`. -/
-theorem gamma_eq_inv_of_secondEntry (h2 : (2 : E) = 0) {m : ℕ} (S : Subfield E)
-    {w ω x : E} {γ : E → E} (hw : w ≠ 0) (hwnorm : w * w ^ 2 ^ m = 1)
-    (hω : ω * ω ^ 2 ^ m = w + w⁻¹) (hwS : w ∉ S)
-    (hchain : ∀ a ∈ S, a ≠ 0 → a ^ 2 * γ a + a
-      = γ a + x + (w ^ 2 * ω / (a + w)) * (w * ω) ^ 2 ^ m) :
-    x = w ∧ ∀ a ∈ S, a ≠ 0 → a ≠ 1 → γ a = (x + a)⁻¹ := by
-  obtain ⟨hx, hγ⟩ := eq_and_inv_of_star h2 S (w := w) (x := x) (γ := γ) hwS
-    fun a ha ha0 => star_of_secondEntry h2 hw hwnorm hω (hchain a ha ha0)
-  exact ⟨hx, fun a ha ha0 ha1 => by rw [hγ a ha ha0 ha1, hx, add_comm a w]⟩
+  rw [hx, ← hrhs, div_eq_mul_inv] at hstar
+  exact mul_left_cancel₀ hsq hstar
 
 end StepFourArithmetic
 
@@ -464,28 +437,15 @@ theorem stepFour_star (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     exact hstage3
   exact star_of_chain m M.card hu h2 hZ0 hZmul hω hL₂q hL₁y hL₂y hR₁y hR₁q hR₂y hR₂q heq
 
-/-- **§3 (4)** (Peterfalvi Part II, p. 131): *`f(ω̄, y) = (ω̄/y, 1/y)`* on the fibre of
-`ω̄`, in the two halves the book proves it in —
+/-- **§3 (4), the base point**: `ω = (ω̄, ζ⁻¹)` (Peterfalvi Part II, p. 131: "For
+`a = 1`, this becomes `0 = x + 1 + (1 + ζ⁻¹) = x + ζ⁻¹`, whence `x = ζ⁻¹`").
 
-* `ω = (ω̄, ζ⁻¹)`: the second unitary coordinate of `ω` is `Z = μ(ζ)`;
-* `f(ω̄, x + A) = (ω̄/(x + A), 1/(x + A))` for `A ∈ F − {0, 1}`.
-
-The first coordinate is stage (2) (`stepTwo_quotient`, whose denominator `A + Z` is
-`x + A` once `x = Z` is known); this theorem supplies the second.
-
-`(∗∗)` holds for one `a ∈ K` at a time (`stepFour_star`); `exists_mem_K_mu_sq_eq` says
-the resulting scalars `μ(a²)` are *all* of `F^×`, which is what lets
-`eq_and_inv_of_star` run over the whole subfield.  The two excluded values are the
-book's: `A = 0` is `ω` itself, and `A = 1` is the point it recovers at the end of (4) by
-replacing `ω` with `ω⁻¹` and `ζ` with `ζ⁻¹`.
-
-`γ` is the caller's name for `a ↦` the unitary coordinate of `f(ω s^a)`, indexed by the
-scalar rather than by the group element. -/
-theorem stepFour (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+One instance of `(∗∗)` suffices, the one at the `a ∈ K` whose scalar `μ(a²)` is `1`;
+`exists_mem_K_mu_sq_eq` provides it. -/
+theorem stepFour_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
-    {m : ℕ} (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
-    (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
     {φ : LinearMap.BilinMap (ZMod 2) M.E
@@ -526,38 +486,88 @@ theorem stepFour (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hstage3 : (Ψ ⟨ω, hωQ⟩).quotient ^ (2 ^ m + 1)
       = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
         + ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (hfQ : ∀ a : G, a ∈ hyp.K →
-      f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q)
-    (γ : M.E → M.E)
-    (hγ : ∀ (a : G) (haK : a ∈ hyp.K),
-      γ ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)
-        = Suzuki2Groups.unitaryCoord m u
-          (Ψ ⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hfQ a haK⟩)) :
+      f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q) :
     Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩)
-        = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ∧
-      ∀ A ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, A ≠ 0 → A ≠ 1 →
-        γ A = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩) + A)⁻¹ := by
+      = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) := by
   have h2 : (2 : M.E) = 0 := by
     have := M.charTwo
     simpa using (CharP.cast_eq_zero M.E 2)
-  have hstar : ∀ A ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, A ≠ 0 →
-      (A ^ 2 + 1) * γ A
-        = Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩) + A
-          + (1 + ((M.mu ((1 : ↥hyp.actualKActor),
-              (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ^ 2)
-            / (A + ((M.mu ((1 : ↥hyp.actualKActor),
-              (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)) := by
-    intro A hA hA0
-    obtain ⟨a, haK, hAeq⟩ := hyp.exists_mem_K_mu_sq_eq hm hQ0card sfive M hA hA0
-    rw [← hAeq, hγ a haK]
-    exact hyp.stepFour_star H hC2 sfive M hZc hmu hVW Φ hquot ι hker hu Ψ hΨq hΨc
+  obtain ⟨a, haK, hAeq⟩ := hyp.exists_mem_K_mu_sq_eq hm hQ0card sfive M
+    (one_mem _) one_ne_zero
+  have hval := hyp.stepFour_star H hC2 sfive M hZc hmu hVW Φ hquot ι hker hu Ψ hΨq hΨc
+    hconjq hconjy d hequiv hdsq hs hζ hζ1 hωQ hωQ0 haK (pow_mem haK 2) hf
+    (hfQ a haK) hstage3
+  have hne := hyp.mu_K_add_mu_W_ne_zero M hmu hζ1 (hyp.kActor (pow_mem haK 2))
+  rw [hAeq] at hval hne
+  exact eq_of_star_at_one h2 hne hval
+
+/-- **§3 (4), the value at one point of the fibre**: the second unitary coordinate of
+`f(ω s^a)` is `1/(μ(a²) + ζ⁻¹)` (Peterfalvi Part II, p. 131).
+
+`stepFour_star` gives `(∗∗)` at this `a`, and `inv_of_star` solves it once the base
+point is known (`stepFour_base`).  The excluded `μ(a²) = 1` is the book's `a = 1`. -/
+theorem stepFour_pointwise (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (hquot : ∀ ρ : ↥hyp.Q, (Φ ρ).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) ρ)))
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hker : ∀ z : ↥(Subgroup.center hyp.Q),
+      Φ (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {e : M.E} {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (hΨq : ∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient)
+    (hΨc : ∀ ρ : ↥hyp.Q, (Ψ ρ).central = ν * (Φ ρ).central)
+    (hconjq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      (Ψ (hyp.conjQHom kv ρ)).quotient
+        = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ρ).quotient)
+    (hconjy : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      Suzuki2Groups.unitaryCoord m u (Ψ (hyp.conjQHom kv ρ))
+        = ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1) *
+          Suzuki2Groups.unitaryCoord m u (Ψ ρ))
+    (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hdsq : ∀ k : ↥hyp.actualKActor,
+      ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) = ((M.mu (k, 1) : M.Eˣ) : M.E) ^ 2)
+    (hs : (ν : M.E) *
+      hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 = 1)
+    {ζ ω : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1)
+    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hstage3 : (Ψ ⟨ω, hωQ⟩).quotient ^ (2 ^ m + 1)
+      = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+        + ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹)
+    (hx : Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩)
+      = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E))
+    {a : G} (haK : a ∈ hyp.K)
+    (ha1 : ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) ≠ 1)
+    (hfQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q) :
+    Suzuki2Groups.unitaryCoord m u
+        (Ψ ⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hfQ⟩)
+      = (((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)
+        + ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E))⁻¹ := by
+  have h2 : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  exact inv_of_star h2 (hyp.mu_K_add_mu_W_ne_zero M hmu hζ1 _) ha1 hx
+    (hyp.stepFour_star H hC2 sfive M hZc hmu hVW Φ hquot ι hker hu Ψ hΨq hΨc
       hconjq hconjy d hequiv hdsq hs hζ hζ1 hωQ hωQ0 haK (pow_mem haK 2) hf
-      (hfQ a haK) hstage3
-  obtain ⟨hx, hginv⟩ := eq_and_inv_of_star h2
-    (OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
-    (hyp.mu_W_notMem_frobFixed M hmu hζ1) hstar
-  exact ⟨hx, fun A hA hA0 hA1 => by
-    rw [hginv A hA hA0 hA1, hx, add_comm A _]⟩
+      hfQ hstage3)
 
 /-- **Stage (4) at the excluded point `A = 0`**, that is at `ω` itself (Peterfalvi
 Part II, p. 131: "For `y = ζ⁻¹`, `(ω̄, y) = ω` and again we obtain
@@ -743,9 +753,9 @@ theorem eq_or_exists_conj_mul_of_quotient_eq {m : ℕ} (M : hyp.QuotientFieldMod
 /-- **§3 (4), on elements**: `f(ω̄, y) = (ω̄/y, 1/y)` for every element of the fibre of
 `ω̄` other than the one excluded point (Peterfalvi Part II, p. 131).
 
-The `γ`-indexed conclusions of `stepFour`, `stepTwo_quotient` and `stepFour_at_omega`
-are transported to elements by the parametrization of the fibre: an element with the
-same quotient coordinate as `ω` is `ω` itself or `ω s^a`, and in the latter case its
+The pointwise conclusions of `stepFour_pointwise`, `stepTwo_quotient` and
+`stepFour_at_omega` are transported to elements by the parametrization of the fibre: an
+element with the same quotient coordinate as `ω` is `ω` itself or `ω s^a`, and its
 unitary coordinate is `x + μ(a²)` (`unitaryCoord_mul_conj`).  The excluded point is
 `y = x + 1`, i.e. `μ(a²) = 1`; the book recovers it by re-running the argument with
 `ω⁻¹` and `ζ⁻¹`, which moves the exclusion to `x⁻¹ + 1 ≠ x + 1` (`mu_W_ne_inv`). -/
@@ -779,20 +789,20 @@ theorem stepFour_elem {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
       ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) = ((M.mu (k, 1) : M.Eˣ) : M.E) ^ 2)
     (hs : (ν : M.E) *
       hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 = 1)
-    {ω : G} (hωQ : ω ∈ hyp.Q) (γ : M.E → M.E)
-    (hγ : ∀ (a : G) (haK : a ∈ hyp.K)
+    {ω : G} (hωQ : ω ∈ hyp.Q)
+    (hpt : ∀ (a : G) (haK : a ∈ hyp.K)
       (hfQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q),
-      γ ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)
-        = Suzuki2Groups.unitaryCoord m u
-          (Ψ ⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hfQ⟩))
-    (hγq : ∀ (a : G) (haK : a ∈ hyp.K)
+      ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) ≠ 1 →
+      Suzuki2Groups.unitaryCoord m u
+          (Ψ ⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hfQ⟩)
+        = (((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)
+          + Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩))⁻¹)
+    (hquotf : ∀ (a : G) (haK : a ∈ hyp.K)
       (hfQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q),
       (Ψ ⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hfQ⟩).quotient
         = (Ψ ⟨ω, hωQ⟩).quotient
           / (((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)
             + Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩)))
-    (hγinv : ∀ A ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, A ≠ 0 → A ≠ 1 →
-      γ A = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩) + A)⁻¹)
     (homega : ∀ hfωQ : f ω ∈ hyp.Q,
       (Ψ ⟨f ω, hfωQ⟩).quotient
           = (Ψ ⟨ω, hωQ⟩).quotient /
@@ -814,20 +824,99 @@ theorem stepFour_elem {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
   · subst hρ
     have hy := hyp.unitaryCoord_mul_conj sfive M Φ ι hker hu Ψ hΨq hΨc d hequiv hdsq
       hs hωQ haK hρQ
-    have hA0 : ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) ≠ 0 :=
-      Units.ne_zero _
-    have hAF : ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)
-        ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m :=
-      OddOrder.FiniteField.mem_frobFixedSubfield.mpr
-        (M.mu_K_frobFixed (hyp.kActor (pow_mem haK 2)))
     have hA1 : ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) ≠ 1 := by
       intro hc
       exact hne (by rw [hy, hc])
     refine ⟨?_, ?_⟩
-    · rw [hγq a haK hfρQ, hy]
+    · rw [hquotf a haK hfρQ, hy]
       congr 1
       exact add_comm _ _
-    · rw [← hγ a haK hfρQ, hγinv _ hAF hA0 hA1, hy]
+    · rw [hpt a haK hfρQ hA1, hy]
+      congr 1
+      exact add_comm _ _
+
+/-! ### The second half of stage (4): re-running the argument at `ω⁻¹` -/
+
+/-- **Inversion does not move the quotient coordinate** (characteristic two). -/
+theorem quotient_inv_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωinvQ : ω⁻¹ ∈ hyp.Q) :
+    (Ψ ⟨ω⁻¹, hωinvQ⟩).quotient = (Ψ ⟨ω, hωQ⟩).quotient := by
+  have h2 : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  have heq : (⟨ω⁻¹, hωinvQ⟩ : ↥hyp.Q) = (⟨ω, hωQ⟩ : ↥hyp.Q)⁻¹ := Subtype.ext rfl
+  rw [heq, map_inv, Suzuki2Groups.BilinearTwistedProduct.quotient_inv]
+  linear_combination (-(Ψ (⟨ω, hωQ⟩ : ↥hyp.Q)).quotient) * h2
+
+/-- **Inversion `q`-powers the unitary coordinate**: `(a, y)⁻¹ = (a, ȳ)`. -/
+theorem unitaryCoord_inv_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωinvQ : ω⁻¹ ∈ hyp.Q) :
+    Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω⁻¹, hωinvQ⟩)
+      = Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩) ^ 2 ^ m := by
+  have heq : (⟨ω⁻¹, hωinvQ⟩ : ↥hyp.Q) = (⟨ω, hωQ⟩ : ↥hyp.Q)⁻¹ := Subtype.ext rfl
+  rw [heq, map_inv, Suzuki2Groups.unitaryCoord_inv m M.card hu]
+
+/-- **Stage (4) on the whole fibre** (Peterfalvi Part II, p. 131: "all of these results
+remain valid if we replace `ω` by `ω⁻¹` and `ζ` by `ζ⁻¹` … this completes the proof as
+`ζ + 1 ≠ ζ⁻¹ + 1`").
+
+Each run of `stepFour_elem` leaves out one point — the one whose unitary coordinate is
+`1` more than that of its base point.  The two base points `ω` and `ω⁻¹` have distinct
+unitary coordinates (`x` and `x^q = x⁻¹`, distinct by `mu_W_ne_inv`), so the two
+excluded points differ and the two runs together cover the fibre.
+
+That `ω⁻¹` may be used as a base point at all is `f_inv_eq`: `f(ω⁻¹) = ζ ω ζ⁻¹` is
+exactly the standing hypothesis `f(ω') = ζ'⁻¹ ω'⁻¹ ζ'` for `(ω', ζ') = (ω⁻¹, ζ⁻¹)`. -/
+theorem stepFour_cover {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωinvQ : ω⁻¹ ∈ hyp.Q)
+    (hxne : Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩)
+      ≠ Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω⁻¹, hωinvQ⟩))
+    (h1 : ∀ (ρ : G) (hρQ : ρ ∈ hyp.Q) (hfρQ : f ρ ∈ hyp.Q),
+      (Ψ ⟨ρ, hρQ⟩).quotient = (Ψ ⟨ω, hωQ⟩).quotient →
+      Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩)
+          ≠ Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩) + 1 →
+        (Ψ ⟨f ρ, hfρQ⟩).quotient
+            = (Ψ ⟨ω, hωQ⟩).quotient /
+              Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩) ∧
+          Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ρ, hfρQ⟩)
+            = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹)
+    (h2 : ∀ (ρ : G) (hρQ : ρ ∈ hyp.Q) (hfρQ : f ρ ∈ hyp.Q),
+      (Ψ ⟨ρ, hρQ⟩).quotient = (Ψ ⟨ω⁻¹, hωinvQ⟩).quotient →
+      Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩)
+          ≠ Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω⁻¹, hωinvQ⟩) + 1 →
+        (Ψ ⟨f ρ, hfρQ⟩).quotient
+            = (Ψ ⟨ω⁻¹, hωinvQ⟩).quotient /
+              Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩) ∧
+          Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ρ, hfρQ⟩)
+            = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹) :
+    ∀ (ρ : G) (hρQ : ρ ∈ hyp.Q) (hfρQ : f ρ ∈ hyp.Q),
+      (Ψ ⟨ρ, hρQ⟩).quotient = (Ψ ⟨ω, hωQ⟩).quotient →
+        (Ψ ⟨f ρ, hfρQ⟩).quotient
+            = (Ψ ⟨ω, hωQ⟩).quotient /
+              Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩) ∧
+          Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ρ, hfρQ⟩)
+            = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹ := by
+  have hq := hyp.quotient_inv_eq M hu Ψ hωQ hωinvQ
+  intro ρ hρQ hfρQ hfib
+  by_cases hy : Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩)
+      = Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩) + 1
+  · -- the point `ω` misses; the run at `ω⁻¹` catches it
+    have hy2 : Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩)
+        ≠ Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω⁻¹, hωinvQ⟩) + 1 := by
+      rw [hy]
+      exact fun hc => hxne (add_right_cancel hc)
+    obtain ⟨hA, hB⟩ := h2 ρ hρQ hfρQ (hfib.trans hq.symm) hy2
+    exact ⟨hA.trans (by rw [hq]), hB⟩
+  · exact h1 ρ hρQ hfρQ hfib hy
 
 end Hypothesis
 
