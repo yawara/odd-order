@@ -26,6 +26,8 @@ universes of the source and target.
 
 * `Hypothesis.ofMulEquiv` — transport of the standing hypothesis along
   `e : A ≃* B` and an `e`-equivariant `f : Λ ≃ Λ'`.
+* `Hypothesis.ofMulEquivPullback` — the special case where only the group moves and the
+  action is pulled back along the isomorphism.
 * `Hypothesis.ofMulEquiv_V`, `Hypothesis.ofMulEquiv_KSet`,
   `Hypothesis.ofMulEquiv_W`, `Hypothesis.ofMulEquiv_Q0`,
   `Hypothesis.ofMulEquiv_distinguishedInvolution` — the *derived* data
@@ -276,6 +278,20 @@ theorem ofMulEquiv_exists_ne_one_mem_W (hw : ∃ w ∈ h.W, w ≠ 1) :
     exact Subgroup.mem_map_of_mem _ hwW
   · intro hcon
     exact hw1 (e.injective (by rw [hcon, map_one]))
+
+/-- **Transport along a group isomorphism alone**, pulling the action back along `e`.
+
+This is the form Ch. IV §4 needs: the standard model's permutation action is carried to
+`U/Z(U)` along `residualQuotientEquiv`, so that the ambient induction hypothesis — which
+quantifies over groups in the *ambient* universe — becomes applicable to it.  The permuted
+set does not move, only the group acting on it. -/
+noncomputable def ofMulEquivPullback (h : Hypothesis A Λ) (e : A ≃* B) :
+    letI := MulAction.compHom Λ e.symm.toMonoidHom
+    Hypothesis B Λ := by
+  letI := MulAction.compHom Λ e.symm.toMonoidHom
+  refine h.ofMulEquiv e (Equiv.refl Λ) fun a l => ?_
+  change a • l = (e.symm (e a)) • l
+  rw [e.symm_apply_apply]
 
 end Hypothesis
 
