@@ -951,6 +951,57 @@ theorem isStandardModel_centralizerQuotient {m : ℕ} (M : hyp.QuotientFieldMode
 
 end SectionFourSetup
 
+/-! ### `Q₀` and `W` are determined by `H` and `D`
+
+`Q₀ = {x ∈ H | x² = 1}` and `W = D ⊓ C(Q₀)` (`W_eq_inf_centralizer_Q0`), so a conjugation
+matching `H` and `D` matches `Q₀` and `W` — **without any reference to `t`**.  That is what
+lets Ch. IV §4, step (2) move `1 ≠ w ∈ W` from the transported standing hypothesis to the
+intrinsic one on `U/Z(U)` using only `Setup.exists_conj_eq_triple`. -/
+
+section ConjMatch
+
+variable {L : Type*} [Group L] [Finite L] {Λ Λ' : Type*} [MulAction L Λ] [MulAction L Λ']
+
+/-- `Q₀` is determined by `H`. -/
+theorem map_Q0_of_conj (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L Λ') {c : L}
+    (hH : h₁.H.map (MulAut.conj c).toMonoidHom = h₂.H) :
+    h₁.Q0.map (MulAut.conj c).toMonoidHom = h₂.Q0 := by
+  ext y
+  rw [Subgroup.mem_map_equiv, h₁.mem_Q0_iff, h₂.mem_Q0_iff, ← hH, Subgroup.mem_map_equiv]
+  refine and_congr ?_ Iff.rfl
+  constructor
+  · intro hy
+    have hc := congrArg (MulAut.conj c) hy
+    rwa [map_pow, map_one, MulEquiv.apply_symm_apply] at hc
+  · intro hy
+    have hc := congrArg (MulAut.conj c).symm hy
+    rwa [map_pow, map_one] at hc
+
+/-- `W` is determined by `H` and `D` — **no `t`**. -/
+theorem map_W_of_conj (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L Λ') {c : L}
+    (hH : h₁.H.map (MulAut.conj c).toMonoidHom = h₂.H)
+    (hD : h₁.D.map (MulAut.conj c).toMonoidHom = h₂.D) :
+    h₁.W.map (MulAut.conj c).toMonoidHom = h₂.W := by
+  have himg : (MulAut.conj c) '' (h₁.Q0 : Set L) = (h₂.Q0 : Set L) := by
+    rw [← map_Q0_of_conj h₁ h₂ hH]; rfl
+  rw [h₁.W_eq_inf_centralizer_Q0, h₂.W_eq_inf_centralizer_Q0,
+    Subgroup.map_inf _ _ (MulAut.conj c).toMonoidHom (MulAut.conj c).injective, hD,
+    map_centralizer_equiv (MulAut.conj c) (h₁.Q0 : Set L), himg]
+
+/-- A non-trivial element of `W` moves along the conjugation. -/
+theorem exists_ne_one_mem_W_of_conj (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L Λ') {c : L}
+    (hH : h₁.H.map (MulAut.conj c).toMonoidHom = h₂.H)
+    (hD : h₁.D.map (MulAut.conj c).toMonoidHom = h₂.D)
+    (hw : ∃ w ∈ h₁.W, w ≠ 1) : ∃ w ∈ h₂.W, w ≠ 1 := by
+  obtain ⟨w, hwW, hw1⟩ := hw
+  refine ⟨MulAut.conj c w, ?_, ?_⟩
+  · rw [← map_W_of_conj h₁ h₂ hH hD]
+    exact Subgroup.mem_map_of_mem _ hwW
+  · intro hc
+    exact hw1 ((MulAut.conj c).injective (by rw [hc, map_one]))
+
+end ConjMatch
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
