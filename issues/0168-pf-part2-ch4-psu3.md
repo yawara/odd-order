@@ -3074,3 +3074,44 @@ p.132 のページ画像で Corollary 1 / Corollary 2 / Remark / §4 冒頭を�
 2. **§4 段 (1)(2)** の群論。(2) は `corollaryTwo_of_stepFour` に乗る。
    ⚠ `O^{2'}` は repo に無い (`TheoremAConclusion` の「奇数指数の正規部分群」が対応物)。
 3. Corollary 1 第 2 段 = PGU(3,q) infra (大きい、別立て)。
+
+## 2026-08-01 (42): §4 (9) landing — 算術と群論の境界が確定
+
+`PSU3SectionFourArithmetic.lean` 304 行 (警告 0、axiom-clean)。
+
+分子分母を `A = a^{2μ}` で割ると (7)(8) は書籍の表示形になり、**(9) の両辺に同じ
+分母 `1 + b²a^{-2μ}` が現れる**:
+
+| 定理 | 内容 |
+|---|---|
+| `one_add_mul_inv_ne_zero` | `1 + b²a^{-2μ} = (a^{2μ}+b²)a^{-2μ} ≠ 0` |
+| `sectionFour_seven_book` | `X = (ζ⁻¹ + a^{-2μ})/(1 + b²a^{-2μ}) · ω̄` |
+| `sectionFour_eight_book` | `Y = (b² + ζ)/(1 + b²a^{-2μ}) · ω̄` |
+| `sectionFour_nine` | (9) 本体 (`ω̄ ≠ 0` で割るだけ) |
+
+⚠ **(9) の群論的入力を仮説 `hsemi : Y = Z * w` に切り出した**。中身は
+「`η` は `E = Q/Q₀` に `μ`-semilinear に作用し (App. I Prop 2)、`ω̄` を固定する
+(段 (2) が `ω` を中心化する `η` を選ぶ)」で、`Z` = (7) のスカラーの `μ`-像。
+⟹ **§4 の算術部分と群論部分の境界がここで切れた**。
+
+### 前提の実測 (自分で grep)
+
+| 書籍 | repo | 状態 |
+|---|---|---|
+| App. I Prop 2 (semilinear) | `Peterfalvi/Appendices/SemilinearField.lean` (2(a)(b) とも複数定理) | ✅ |
+| Ch. I §2 Prop 3 | `Suzuki/SemilinearRealization.lean` の `exists_semilinear_equiv` | ✅ |
+
+### ⚠ 次セッションはここから
+
+**§4 で残るのは群論側だけ**:
+
+1. **段 (1)** — `U = O^{2'}(C_G(P))`、`U/(P∩U) ≅ PSU(3,ℓ)`、`q = ℓ^p`、`ℓ > 2`。
+   ⚠ `O^{2'}` は repo に無い。`TheoremAConclusion` (奇数指数の正規部分群 + 具体モデル)
+   が対応物なので、まずそこと突き合わせる。Ch. I §3 Prop 1(c) は repo にあり。
+2. **段 (2)** — `∃ ω,ζ,η`: `η` が `ω`,`ζ` を中心化、`f(ω) = ω^{-ζ}`、`h(ω) = ζ³η⁻¹`。
+   `corollaryTwo_of_stepFour` にそのまま乗る (`U` 側で使う)。
+3. **段 (3)(4)** — §2 (2)(3) を `ω`,`s^a` に当てて座標へ。既存の
+   `sectionTwoStepTwo_coords` 等が近所。
+4. **(5)(6) の供給** — (3)(4) と semilinearity から。ここまで来れば
+   `sectionFour_solve` 以降は全部 landing 済で §4 が閉じる。
+5. Corollary 1 第 2 段 = PGU(3,q) infra (大きい、別立て)。
