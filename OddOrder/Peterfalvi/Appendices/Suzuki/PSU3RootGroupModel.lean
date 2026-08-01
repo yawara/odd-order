@@ -179,16 +179,20 @@ p. 130, the coordinate change between stages (3) and (4)).
 Given the model of Ch. III §3 whose square map is `c` times the Hermitian norm
 (`cocycle_diag_eq_norm`), `exists_hermitianCocycle_eq` identifies the *cocycle* with
 `c` times a Hermitian one: `φ x y = c · H_u(x, y)` for a suitable `u` of trace one.
-Writing `c = e²` with `e ∈ F` and rescaling the quotient coordinate by `e` therefore
-matches the cocycles on the nose — `H_u(e x, e y) = e^{1+q} H_u(x, y) = φ x y` — so the
-comparison is the plain `congrEquiv`
+Rescaling the quotient coordinate by `e` and the central one by `ν` therefore matches
+the cocycles on the nose as soon as `e² = ν c`, since `H_u(e x, e y) = e^{1+q} H_u(x, y)`
+(`e` lies in `F`).  The comparison is then the plain `congrEquiv`
 
-  `(x, w) ↦ (e x, w)`.
+  `(x, w) ↦ (e x, ν w)`.
 
 This is stronger than matching the diagonals: the isomorphism is *given* on both
-coordinates, it fixes the centre pointwise, and — because the quotient coordinate is
-rescaled by a scalar — it commutes with the `E`-scalar action of `KW`.  That is what
-stages (4) and (5) compute with. -/
+coordinates, and — both coordinates being rescaled by scalars — it commutes with the
+`E`-scalar action of `KW`.  That is what stages (4) and (5) compute with.
+
+The central factor `ν` is left free precisely so that a caller can impose the book's
+normalization `s = (0, 1)`: taking `ν` to be the inverse of the central coordinate of
+the distinguished involution puts it at `1`.  Every `ν ≠ 0` in `F` is admissible
+because squaring is onto `F` — which is the Hermitian norm there. -/
 theorem exists_unitaryModel {m : ℕ} (M : hyp.QuotientFieldModel m) (hm : m ≠ 0)
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
@@ -203,35 +207,38 @@ theorem exists_unitaryModel {m : ℕ} (M : hyp.QuotientFieldModel m) (hm : m ≠
         = ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
           * x ^ (2 ^ m + 1))
     (hone : ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) ≠ 0)
+    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)} (hν : ν ≠ 0)
     (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ) :
     ∃ (u : M.E) (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1) (e : M.E)
       (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
         (OddOrder.FiniteField.hermitianCocycle m M.card hu)),
       e ≠ 0 ∧ e ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m ∧
       (∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient) ∧
-      (∀ ρ : ↥hyp.Q, (Ψ ρ).central = (Φ ρ).central) := by
+      (∀ ρ : ↥hyp.Q, (Ψ ρ).central = ν * (Φ ρ).central) := by
   classical
   -- the cocycle *is* `φ(1,1)` times a Hermitian one
   obtain ⟨u, hu, hφ⟩ := OddOrder.FiniteField.exists_hermitianCocycle_eq m hm M.card φ
     hbil hone hnorm
-  -- the square root of the leading coefficient, inside `F`
+  -- the square root of `ν · φ(1,1)`, inside `F`
   obtain ⟨e, he⟩ := (frobeniusEquiv
-    ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) 2).surjective (φ 1 1)
+    ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) 2).surjective (ν * φ 1 1)
   have heval : ((e : M.E)) ^ 2
-      = ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) :=
+      = (ν : M.E) *
+        ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) :=
     congrArg Subtype.val he
+  have hνne : (ν : M.E) ≠ 0 := fun h => hν (Subtype.ext h)
   have hene : ((e : M.E)) ≠ 0 := by
     intro h
-    exact hone (by rw [← heval, h]; ring)
+    exact (mul_ne_zero hνne hone) (by rw [← heval, h]; ring)
   have heq : ((e : M.E)) ^ 2 ^ m = (e : M.E) :=
     OddOrder.FiniteField.mem_frobFixedSubfield.mp e.2
-  have hesq : ((e : M.E)) ^ 2 ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := by
-    rw [heval]
-    exact (φ 1 1).2
-  -- rescaling the quotient coordinate by `e` matches the two cocycles exactly
+  have hesq : ((e : M.E)) ^ 2 ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m :=
+    pow_mem e.2 2
+  -- rescaling by `(e, ν)` matches the two cocycles exactly
   have hcompat : ∀ x y : M.E,
       OddOrder.FiniteField.hermitianCocycle m M.card hu ((e : M.E) * x)
-          ((e : M.E) * y) = AddEquiv.refl _ (φ x y) := by
+          ((e : M.E) * y)
+        = AddEquiv.mk' (Equiv.mulLeft₀ ν hν) (mul_add ν) (φ x y) := by
     intro x y
     refine Subtype.ext ?_
     have hsplit : ((e : M.E) * x) * ((e : M.E) * y) ^ 2 ^ m
@@ -240,13 +247,14 @@ theorem exists_unitaryModel {m : ℕ} (M : hyp.QuotientFieldModel m) (hm : m ≠
       ring
     rw [OddOrder.FiniteField.hermitianCocycle_apply, hsplit,
       OddOrder.FiniteField.frobTrace_mul_of_mem m hesq, heval]
-    change _ = ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+    change _ = (ν : M.E) *
+      ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
     rw [hφ x y]
     ring
   refine ⟨u, hu, (e : M.E),
     Φ.trans (Suzuki2Groups.BilinearTwistedProduct.congrEquiv
       (AddEquiv.mk' (Equiv.mulLeft₀ (e : M.E) hene) (mul_add (e : M.E)))
-      (AddEquiv.refl _) hcompat),
+      (AddEquiv.mk' (Equiv.mulLeft₀ ν hν) (mul_add ν)) hcompat),
     hene, e.2, fun _ => rfl, fun _ => rfl⟩
 
 include hyp in
@@ -261,10 +269,10 @@ unitary group of pairs `(a, y)` with `Tr y = a ā` in which
 * the first coordinate is `e` times the book's `α` — a *scalar* multiple, so the
   equations of §2 and §3, which are stated in `α` and use the `E`-multiplication and
   the scalar action of `KW`, translate by multiplying by `e`;
-* the centre is not moved at all (`(Ψ ρ).central = (Φ ρ).central`).
+* the centre is rescaled by the chosen `ν` (`(Ψ ρ).central = ν · (Φ ρ).central`), which
+  is how the book's normalization `s = (0, 1)` is imposed.
 
-The scalar `e` is a square root in `F` of `φ(1,1)`; it is `1` exactly when the model's
-square map is the norm on the nose. -/
+The scalar `e` is a square root in `F` of `ν · φ(1,1)`. -/
 theorem exists_unitaryModel_coord {m : ℕ} (M : hyp.QuotientFieldModel m) (hm : m ≠ 0)
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
@@ -282,6 +290,7 @@ theorem exists_unitaryModel_coord {m : ℕ} (M : hyp.QuotientFieldModel m) (hm :
         ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
         = ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
     (hmu : Function.Injective M.mu) {ζ : ↥hyp.W} (hζ : ζ ≠ 1)
+    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)} (hν : ν ≠ 0)
     (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
     (hquot : ∀ e : ↥hyp.Q, (Φ e).quotient =
       M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) e))) :
@@ -291,9 +300,9 @@ theorem exists_unitaryModel_coord {m : ℕ} (M : hyp.QuotientFieldModel m) (hm :
       e ≠ 0 ∧ e ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m ∧
       (∀ ρ : ↥hyp.Q, (Ψ ρ).quotient =
         e * M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) ρ))) ∧
-      (∀ ρ : ↥hyp.Q, (Ψ ρ).central = (Φ ρ).central) ∧
+      (∀ ρ : ↥hyp.Q, (Ψ ρ).central = ν * (Φ ρ).central) ∧
       ∀ w : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
-        Ψ (Φ.symm ⟨0, w⟩) = ⟨0, w⟩ := by
+        Ψ (Φ.symm ⟨0, w⟩) = ⟨0, ν * w⟩ := by
   have hnorm := hyp.cocycle_diag_eq_norm M hm θm hsemi hθ hW hmu hζ
   have hone : ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
       ≠ 0 := by
@@ -308,13 +317,51 @@ theorem exists_unitaryModel_coord {m : ℕ} (M : hyp.QuotientFieldModel m) (hm :
     intro a ha b hb x y
     rw [hsemi a ha b hb x y, hθ b hb]
   obtain ⟨u, hu, e, Ψ, hene, heF, hΨq, hΨc⟩ :=
-    hyp.exists_unitaryModel M hm hbil hnorm hone Φ
+    hyp.exists_unitaryModel M hm hbil hnorm hone hν Φ
   refine ⟨u, hu, e, Ψ, hene, heF, fun ρ => ?_, hΨc, fun w => ?_⟩
   · rw [hΨq ρ, hquot ρ]
   · refine Suzuki2Groups.BilinearTwistedProduct.ext ?_ ?_
     · rw [hΨq, Φ.apply_symm_apply]
       exact mul_zero _
     · rw [hΨc, Φ.apply_symm_apply]
+
+include hyp in
+/-- **The centre exponent is squaring on `μ(K)`**: `μ(k,1)^d = μ(k,1)²` (Peterfalvi
+Part II, Ch. IV §3 (3), p. 130 — this is the concrete content of `θ = 1`).
+
+`exists_center_coordinate_equiv` produces the `K`-action on the centre as an opaque
+integer power `μ(k,1)^d` — the book's `a^{1+θ}`.  Once the cocycle's diagonal is known
+to be a multiple of the norm, `centralScale_eq_norm_of_quotientScale` evaluates that
+power as the norm `μ(k,1)^{1+q}`, and `μ(K) ⊆ F` makes the norm a square.
+
+So every statement of §2 carrying `μ(k,1)^d` — `centerCoord_conj`, `stepTen_coord` —
+can be read with the explicit scalar `μ(k,1)²`. -/
+theorem mu_K_zpow_eq_sq {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (hnorm : ∀ x : M.E,
+      ((φ x x : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          * x ^ (2 ^ m + 1))
+    (hone : ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) ≠ 0)
+    (Θ : ↥hyp.actualKActor × ↥hyp.W →*
+      MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+    (hΘq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+        (Θ kv p).quotient = ((M.mu kv : M.Eˣ) : M.E) * p.quotient)
+    {d : ℤ}
+    (hΘc : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+        (((Θ kv p).central :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = ((M.mu (kv.1, 1) ^ d : M.Eˣ) : M.E) *
+            ((p.central :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (k : ↥hyp.actualKActor) :
+    ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) = ((M.mu (k, 1) : M.Eˣ) : M.E) ^ 2 := by
+  have h := Suzuki2Groups.centralScale_eq_norm_of_quotientScale m hone hnorm
+    (Θ (k, 1)) (hΘq (k, 1)) (hΘc (k, 1))
+  rw [h, pow_succ, M.mu_K_frobFixed k, ← pow_two]
 
 include hyp in
 /-- **Conjugation by `K W` in the unitary coordinates** (Peterfalvi Part II, Ch. IV §3,
@@ -343,18 +390,19 @@ theorem exists_unitaryModel_conj {m : ℕ} (M : hyp.QuotientFieldModel m) (hm : 
         = ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
           * x ^ (2 ^ m + 1))
     (hone : ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) ≠ 0)
+    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)} (hν : ν ≠ 0)
     (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
     (Θ : ↥hyp.actualKActor × ↥hyp.W →*
       MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
     (hΘq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
       (p : Suzuki2Groups.BilinearTwistedProduct φ),
         (Θ kv p).quotient = ((M.mu kv : M.Eˣ) : M.E) * p.quotient)
-    (ν : ↥hyp.actualKActor × ↥hyp.W → M.E)
+    (κ : ↥hyp.actualKActor × ↥hyp.W → M.E)
     (hΘc : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
       (p : Suzuki2Groups.BilinearTwistedProduct φ),
         (((Θ kv p).central :
           ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
-          = ν kv * ((p.central :
+          = κ kv * ((p.central :
             ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
     (hconj : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
       Φ (hyp.conjQHom kv ρ) = Θ kv (Φ ρ)) :
@@ -363,7 +411,7 @@ theorem exists_unitaryModel_conj {m : ℕ} (M : hyp.QuotientFieldModel m) (hm : 
         (OddOrder.FiniteField.hermitianCocycle m M.card hu)),
       e ≠ 0 ∧ e ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m ∧
       (∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient) ∧
-      (∀ ρ : ↥hyp.Q, (Ψ ρ).central = (Φ ρ).central) ∧
+      (∀ ρ : ↥hyp.Q, (Ψ ρ).central = ν * (Φ ρ).central) ∧
       (∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
         (Ψ (hyp.conjQHom kv ρ)).quotient
           = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ρ).quotient) ∧
@@ -373,10 +421,10 @@ theorem exists_unitaryModel_conj {m : ℕ} (M : hyp.QuotientFieldModel m) (hm : 
             Suzuki2Groups.unitaryCoord m u (Ψ ρ) := by
   classical
   obtain ⟨u, hu, e, Ψ, hene, heF, hΨq, hΨc⟩ :=
-    hyp.exists_unitaryModel M hm hbil hnorm hone Φ
+    hyp.exists_unitaryModel M hm hbil hnorm hone hν Φ
   -- the central scalar of `Θ kv` is the norm of its quotient scalar
-  have hν : ∀ kv : ↥hyp.actualKActor × ↥hyp.W,
-      ν kv = ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1) := fun kv =>
+  have hκ : ∀ kv : ↥hyp.actualKActor × ↥hyp.W,
+      κ kv = ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1) := fun kv =>
     Suzuki2Groups.centralScale_eq_norm_of_quotientScale m hone hnorm (Θ kv)
       (hΘq kv) (hΘc kv)
   refine ⟨u, hu, e, Ψ, hene, heF, hΨq, hΨc, fun kv ρ => ?_, fun kv ρ => ?_⟩
@@ -386,7 +434,15 @@ theorem exists_unitaryModel_conj {m : ℕ} (M : hyp.QuotientFieldModel m) (hm : 
       rw [pow_succ]; ring]
     refine Suzuki2Groups.unitaryCoord_of_scaled m ((M.mu kv : M.Eˣ) : M.E) ?_ ?_
     · rw [hΨq, hconj kv ρ, hΘq, hΨq, mul_left_comm]
-    · rw [hΨc, hconj kv ρ, hΘc, hΨc, hν kv, pow_succ]
+    · have hc : ((Ψ (hyp.conjQHom kv ρ)).central :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+          = ν * (Θ kv (Φ ρ)).central := by rw [hΨc, hconj kv ρ]
+      rw [show (((Ψ (hyp.conjQHom kv ρ)).central :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = ((ν * (Θ kv (Φ ρ)).central :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) from
+        congrArg Subtype.val hc]
+      rw [Submonoid.coe_mul, hΘc, hκ kv, hΨc, Submonoid.coe_mul, pow_succ]
       ring
 
 include hyp in
