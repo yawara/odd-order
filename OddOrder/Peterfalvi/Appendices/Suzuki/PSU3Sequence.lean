@@ -43,6 +43,9 @@ The book's own formulas are these read off in the coordinates of the standard mo
 * `Hypothesis.stepElevenSeq_succ_of_ne` — the explicit form of one step, for reading the
   recursion off in coordinates.
 * `Hypothesis.stepElevenSeq_coset` — `d_i` lies in the coset `ζ^i K`.
+* `Hypothesis.stepEighteen_step`, `Hypothesis.stepEighteen_unroll` — the recursion of
+  step (18) for `h` along the same sequence, and its closed form with the `K`-part tied to
+  that of `d_i`.
 * `Hypothesis.stepElevenSeq_fst_mem_orbitSet`,
   `Hypothesis.stepElevenSeq_pow_ne_one`, `Hypothesis.exists_stop_lt_orderOf` — the
   length half of step (15): the sequence lies in the set step (8) counts, so its `d_i`
@@ -362,14 +365,20 @@ theorem stepEighteen_step (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
 
 /-- **The closed form of step (18)** (Peterfalvi Part II, p. 127):
 
-  `h(ω z_i) = (h(ω)ζ⁻¹)^i · h(ω) · (ζ^i k)`,   `k ∈ K`.
+  `h(ω z_i) = (h(ω)ζ⁻¹)^i · h(ω) · (ζ^i k⁻¹)`,   where `d_i = ζ^{i+1} k`, `k ∈ K`.
 
 Unrolling `stepEighteen_step` collects one `h(ω)ζ⁻¹` on the left and one `ζ a²` on the
 right per step, and `ζ` centralizes `K`, so the `ζ`'s gather into `ζ^i` and the squares
 into a single element of `K`.
 
-That element is the book's `(α/(β^i + β^{-i}))^{2τ}` — its `2τ`-shape is visible here as
-the product of the squares `a_j²` — and the book's display
+The element accumulated here is the *inverse* of the one accumulated by
+`stepElevenSeq_coset` — each step contributes `a²` to the first and `a⁻²` to the second —
+so the two are recorded together: that is what lets step (15)'s `k = 1` be fed straight
+into step (18).  The book's own bookkeeping is the closed form
+`(α/(β^i + β^{-i}))^{2τ}` for the `K`-part of `d_i`, which at `i = m − 1` is `1` because
+`c_{m-1} = α`.
+
+The book's display
 
   `h(ω(0,u_i)) = (h(ω)ζ⁻¹)^i ζ^i (α/(β^i + β^{-i}))`
 
@@ -380,15 +389,16 @@ theorem stepEighteen_unroll (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) (n : ℕ)
     (hns : ∀ i < n, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1) :
-    ∃ k ∈ hyp.K, h (ω * (hyp.stepElevenSeq ζ y n).1)
-      = (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * k) := by
+    ∃ k ∈ hyp.K, (hyp.stepElevenSeq ζ y n).2.2 = ζ ^ (n + 1) * k ∧
+      h (ω * (hyp.stepElevenSeq ζ y n).1)
+        = (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * k⁻¹) := by
   induction n with
   | zero =>
-    refine ⟨1, hyp.K.one_mem, ?_⟩
+    refine ⟨1, hyp.K.one_mem, by simp, ?_⟩
     rw [hyp.stepElevenSeq_zero]
     simp
   | succ n ih =>
-    obtain ⟨k, hkK, hk⟩ := ih fun i hi => hns i (by omega)
+    obtain ⟨k, hkK, hkcoset, hk⟩ := ih fun i hi => hns i (by omega)
     have hz : (hyp.stepElevenSeq ζ y n).1 ∈ hyp.Q0 := (hyp.stepElevenSeq_mem hζ hyQ0 n).1
     obtain ⟨a, haK, ha, hstep⟩ :=
       hyp.stepElevenSeq_succ_of_ne ζ y n
@@ -396,13 +406,29 @@ theorem stepEighteen_unroll (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     have hfst : (hyp.stepElevenSeq ζ y (n + 1)).1
         = a⁻¹ * hyp.distinguishedInvolution * a := by rw [hstep]
     have hcomm : k * ζ = ζ * k := hyp.commute_of_mem_W_of_mem_K hζ hkK
-    refine ⟨k * a ^ 2, hyp.K.mul_mem hkK (pow_mem haK 2), ?_⟩
-    rw [hfst, hyp.stepEighteen_step H hC2 hζ hωQ hωQ0 hyQ0 hz haK hfω ha, hk,
-      pow_succ' (h ω * ζ⁻¹) n, pow_succ ζ n]
-    calc h ω * (ζ⁻¹ * ((h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * k)) * ζ) * a ^ 2
-        = (h ω * ζ⁻¹) * (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * (k * ζ)) * a ^ 2 := by group
-      _ = (h ω * ζ⁻¹) * (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * (ζ * k)) * a ^ 2 := by rw [hcomm]
-      _ = (h ω * ζ⁻¹) * (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * ζ * (k * a ^ 2)) := by group
+    have hkinv : k⁻¹ * ζ = ζ * k⁻¹ :=
+      hyp.commute_of_mem_W_of_mem_K hζ (hyp.K.inv_mem hkK)
+    refine ⟨k * (a⁻¹) ^ 2, hyp.K.mul_mem hkK (pow_mem (hyp.K.inv_mem haK) 2), ?_, ?_⟩
+    · rw [hstep]
+      change (hyp.stepElevenSeq ζ y n).2.2 * ζ * (a⁻¹) ^ 2
+        = ζ ^ (n + 1 + 1) * (k * (a⁻¹) ^ 2)
+      rw [hkcoset]
+      calc ζ ^ (n + 1) * k * ζ * (a⁻¹) ^ 2
+          = ζ ^ (n + 1) * (k * ζ) * (a⁻¹) ^ 2 := by group
+        _ = ζ ^ (n + 1) * (ζ * k) * (a⁻¹) ^ 2 := by rw [hcomm]
+        _ = ζ ^ (n + 1 + 1) * (k * (a⁻¹) ^ 2) := by rw [pow_succ]; group
+    · have hinvprod : (k * (a⁻¹) ^ 2)⁻¹ = k⁻¹ * a ^ 2 := by
+        have hcm := hyp.commute_of_mem_K (hyp.K.inv_mem hkK) (pow_mem haK 2)
+        rw [mul_inv_rev, hcm]
+        congr 1
+        group
+      rw [hfst, hyp.stepEighteen_step H hC2 hζ hωQ hωQ0 hyQ0 hz haK hfω ha, hk,
+        pow_succ' (h ω * ζ⁻¹) n, pow_succ ζ n, hinvprod]
+      calc h ω * (ζ⁻¹ * ((h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * k⁻¹)) * ζ) * a ^ 2
+          = (h ω * ζ⁻¹) * (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * (k⁻¹ * ζ)) * a ^ 2 := by group
+        _ = (h ω * ζ⁻¹) * (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * (ζ * k⁻¹)) * a ^ 2 := by
+            rw [hkinv]
+        _ = (h ω * ζ⁻¹) * (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * ζ * (k⁻¹ * a ^ 2)) := by group
 
 end Hypothesis
 
