@@ -904,6 +904,48 @@ theorem stepFour_elem {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
       congr 1
       exact add_comm _ _
 
+/-- **The base point of Corollary 2 exists** (Peterfalvi Part II, Ch. IV §3,
+Corollary 2, p. 132: "As `ζ⁻¹ + ζ^{-q} ≠ 0`, there is an element `ω̄ ∈ E − {0}` such
+that `ω̄^{1+q} = ζ⁻¹ + ζ^{-q}`.  Then `ω = (ω̄, ζ⁻¹) ∈ Q`").
+
+`μ(ζ) + μ(ζ)⁻¹` is the trace of `μ(ζ)`, so it lies in `F` and — for `ζ ≠ 1` — is
+nonzero; a square root inside `F` is a norm-one-shaped preimage, since the Hermitian
+norm restricted to `F` *is* squaring.  The resulting pair `(ω̄, μ(ζ))` satisfies the
+defining relation `Tr y = ω̄ ω̄̄` of the unitary coordinates, so `ofUnitary` builds the
+element. -/
+theorem exists_normPreimage_of_mem_W {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hmu : Function.Injective M.mu) {ζ : ↥hyp.W} (hζ1 : ζ ≠ 1) :
+    ∃ r : M.E, r ≠ 0 ∧
+      OddOrder.FiniteField.frobTrace (E := M.E) m ((M.mu (1, ζ) : M.Eˣ) : M.E)
+        = r * r ^ 2 ^ m := by
+  classical
+  have hmem := hyp.mu_W_add_inv_mem_frobFixed M ζ
+  have hne := hyp.mu_W_add_inv_ne_zero M hmu hζ1
+  -- a square root inside `F`
+  obtain ⟨r, hr⟩ := (frobeniusEquiv
+    ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) 2).surjective
+    (⟨_, hmem⟩ : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+  have hrval : ((r : M.E)) ^ 2
+      = ((M.mu (1, ζ) : M.Eˣ) : M.E) + ((M.mu (1, ζ) : M.Eˣ) : M.E)⁻¹ :=
+    congrArg Subtype.val hr
+  have hr0 : ((r : M.E)) ≠ 0 := by
+    intro hc
+    exact hne (by rw [← hrval, hc]; ring)
+  have hrfix : ((r : M.E)) ^ 2 ^ m = (r : M.E) :=
+    OddOrder.FiniteField.mem_frobFixedSubfield.mp r.2
+  refine ⟨(r : M.E), hr0, ?_⟩
+  -- `Tr μ(ζ) = μ(ζ) + μ(ζ)^q = μ(ζ) + μ(ζ)⁻¹`
+  have hZnorm : ((M.mu (1, ζ) : M.Eˣ) : M.E) ^ (2 ^ m + 1) = 1 := by
+    have h := congrArg (fun x : M.Eˣ => (x : M.E)) (M.mu_W_normOne ζ)
+    simpa using h
+  have hZq : ((M.mu (1, ζ) : M.Eˣ) : M.E) ^ 2 ^ m
+      = ((M.mu (1, ζ) : M.Eˣ) : M.E)⁻¹ := by
+    have hZ0 : ((M.mu (1, ζ) : M.Eˣ) : M.E) ≠ 0 := Units.ne_zero _
+    field_simp
+    rw [← pow_succ]
+    exact hZnorm
+  rw [OddOrder.FiniteField.frobTrace_apply, hZq, ← hrval, pow_two, hrfix]
+
 /-- **The converse of `stepFour_at_omega`**: the inversion formula at a point whose
 unitary coordinate is `μ(ζ)` *forces* `f(ω) = ω^{-ζ}` (Peterfalvi Part II, Ch. IV §3,
 Corollary 2, p. 132).
