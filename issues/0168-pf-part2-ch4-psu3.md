@@ -5032,3 +5032,43 @@ Hypothesis.ofMulEquiv (h : Hypothesis A Λ) (e : A ≃* B) (f : Λ ≃ Λ')
    Equiv.ulift.symm` で組み、`ih` を ambient から供給
    (`Nat.card (U/Z(U)) < Nat.card G`)。
 4. → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2)。
+
+## 2026-08-01 (92): 🎯 `ofMulEquiv` の transport 補題が全部そろった
+
+(フルビルド green 4988 jobs・lint 純ゼロ)
+
+| 補題 | 供給する前提 |
+|---|---|
+| `ofMulEquiv_distinguishedInvolution` | — (下の 2 本の土台) |
+| `ofMulEquiv_orderOf_distinguishedInvolution_mul_t` | **`hst`** |
+| `ofMulEquiv_V_eq_W` | **`hVW`** |
+| `ofMulEquiv_natCard_Q0` / `_natCard_Q` | **`hQ0card`** / **`hcardQ`** |
+| `ofMulEquiv_exists_ne_one_mem_W` | **`w ∈ W#`** |
+| `ofMulEquiv_Q` (+ `IsSuzuki2Group.of_equiv`) | **`hQsuz`** |
+
+⚠ `distinguishedInvolution` は `Classical.choose` なので transport で「計算」できない。
+`(e s, e r)` を定義条件に当てて一意性 `eq_distinguishedPair_of_structure` で同定する
+(`standardHypothesis_distinguishedInvolution` (88) と同じ手口)。
+
+⟹ **標準モデルで証明した (86)-(89) の成果がすべて transport 先へ渡る**。
+
+### 残り
+
+1. **`U/Z(U)` 上の組み立て**: `residualQuotientEquiv : (U ⧸ Z(U)) ≃* standardPermGroup n`
+   なので `e := residualQuotientEquiv.symm`、`f := Equiv.ulift.symm`
+   (`Unital n ≃ ULift.{v} (Unital n)`)、`hf` は `ULift` の作用の定義から。
+   ⚠ `ULift (Unital n)` 上の `MulAction` インスタンスをどう与えるか要実測
+   (`Equiv.ulift` を使った transport が要る可能性)。
+2. **`ih`**: ambient `ih : TheoremAInductionBelow G Ω` + `Nat.card (U ⧸ Z(U)) < Nat.card G`。
+   ⚠ ただし `Ω` と `ULift (Unital n)` は別の型なので、`TheoremAInductionBelow` の
+   `Lambda` は `Type v` を量化する ⟹ `ULift.{v} (Unital n) : Type v` なら合う。
+3. → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2)。
+
+### ⚠ 次セッションはここから
+
+1. `ULift` 上の `MulAction` transport (`MulAction.compHom` か `Equiv.ulift` 経由) を実測し、
+   `standardHypothesis n hn |>.ofMulEquiv (MulEquiv.refl _) Equiv.ulift.symm _` で
+   universe を上げた版を作る。
+2. `Nat.card (U ⧸ Z(U)) < Nat.card G` を示す (`U ≤ C_G(P) ≤ G`、`Z(U) ≠ ⊥` か
+   `C_G(P) < G`)。
+3. `ih` を供給し `exists_standardModel` を呼ぶ。
