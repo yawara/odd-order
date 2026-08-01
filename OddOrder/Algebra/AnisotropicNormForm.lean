@@ -44,6 +44,12 @@ machinery is needed:
   for a quadratic map given by its diagonal and polar form.
 * `OddOrder.FiniteField.exists_addEquiv_norm_of_anisotropic` — the same for an
   `F`-bilinear anisotropic cocycle `φ`, the form in which Chapter III §3 delivers it.
+* `OddOrder.FiniteField.eq_norm_smul_of_normOne_invariant` — the sharper statement
+  available when the quadratic map is *invariant* under a norm-one scalar of order at
+  least three: then it is `χ 1` times the norm **in the given field structure**, with
+  no change of variable at all.  This is the form Chapter IV §3 needs, because its
+  computations use the `E`-scalar multiplication that a mere `F`-linear change of
+  variable would not respect.
 -/
 
 set_option autoImplicit false
@@ -463,5 +469,139 @@ theorem exists_addEquiv_norm_of_anisotropic (hm : m ≠ 0)
     exact haniso x hx (Subtype.ext h0)
 
 end Classification
+
+/-! ## Invariance under a norm-one element pins the diagonal exactly -/
+
+section NormOneInvariance
+
+variable {E : Type*} [Field E] [Finite E] [CharP E 2] (m : ℕ)
+
+/-- In characteristic two squaring is injective, so `z² = 1` forces `z = 1`. -/
+theorem eq_one_of_sq_eq_one {z : E} (hz : z ^ 2 = 1) : z = 1 := by
+  have h : z ^ 2 = (1 : E) ^ 2 := by rw [one_pow]; exact hz
+  exact (frobeniusEquiv E 2).injective h
+
+/-- A norm-one element other than `1` does not lie in `F`: `μ^q = μ` together with
+`μ^{q+1} = 1` gives `μ² = 1`, hence `μ = 1` in characteristic two. -/
+theorem notMem_frobFixedSubfield_of_normOne {μ : E} (hnorm : μ ^ (2 ^ m + 1) = 1)
+    (hμ : μ ≠ 1) : μ ∉ frobFixedSubfield E 2 m := by
+  intro hmem
+  have hfix : μ ^ 2 ^ m = μ := mem_frobFixedSubfield.mp hmem
+  have hsq : μ ^ 2 = 1 := by
+    rw [pow_succ, hfix] at hnorm
+    linear_combination hnorm
+  exact hμ (eq_one_of_sq_eq_one hsq)
+
+/-- **A quadratic map fixed by a norm-one element of order at least three is the
+Hermitian norm, up to the scalar `χ 1`** (Peterfalvi Part II, Ch. IV §3, p. 130,
+the coordinate change between stages (3) and (4)).
+
+Chapter III §3's model has `Q` scaled by `μ(KW) ≤ E^×`, with the central coordinate
+scaled by the `K`-part alone; so the square map `χ` is *invariant* under the norm-one
+scalars `μ(W)`.  Since `W ≠ 1` and `|W|` is odd, `μ(W)` contains an element `μ` with
+`μ, μ²` both outside `F`, and evaluating at `1`, `μ`, `μ²` — three distinct `F`-lines —
+already forces `χ = χ(1) · N`.  No counting over `F` is needed.
+
+This is what lets Chapter IV pass to the unitary coordinates in which stage (4) is
+stated, and unlike `exists_addEquiv_norm_of_anisotropic` it keeps the field `E` and its
+scalar action fixed, which the computations of §3 use. -/
+theorem eq_norm_smul_of_normOne_invariant (hm : m ≠ 0)
+    (hcard : Nat.card E = (2 ^ m) ^ 2) (χ : E → E) (B : E → E → E)
+    (hχadd : ∀ x y : E, χ (x + y) = χ x + χ y + B x y)
+    (hχsmul : ∀ a ∈ frobFixedSubfield E 2 m, ∀ x : E, χ (a * x) = a ^ 2 * χ x)
+    (hBleft : ∀ a ∈ frobFixedSubfield E 2 m, ∀ x y : E, B (a * x) y = a * B x y)
+    (hBright : ∀ a ∈ frobFixedSubfield E 2 m, ∀ x y : E, B x (a * y) = a * B x y)
+    {μ : E} (hnorm : μ ^ (2 ^ m + 1) = 1) (hμ : μ ≠ 1)
+    (hfix : χ μ = χ 1) (hfix2 : χ (μ ^ 2) = χ 1) :
+    ∀ x : E, χ x = χ 1 * x ^ (2 ^ m + 1) := by
+  classical
+  have h2E : (2 : E) = 0 := CharTwo.two_eq_zero
+  have hμ0 : μ ≠ 0 := by
+    intro h
+    rw [h, zero_pow (Nat.succ_ne_zero _)] at hnorm
+    exact zero_ne_one hnorm
+  -- `μ` and `μ²` avoid `F`
+  have hμF : μ ∉ frobFixedSubfield E 2 m :=
+    notMem_frobFixedSubfield_of_normOne m hnorm hμ
+  have hnorm2 : (μ ^ 2) ^ (2 ^ m + 1) = 1 := by
+    rw [← pow_mul, mul_comm, pow_mul, hnorm, one_pow]
+  have hμ2ne : μ ^ 2 ≠ 1 := fun hc => hμ (eq_one_of_sq_eq_one hc)
+  have hμ2F : μ ^ 2 ∉ frobFixedSubfield E 2 m :=
+    notMem_frobFixedSubfield_of_normOne m hnorm2 hμ2ne
+  -- the norm in the coordinates `(a, b) ↦ a + b μ`
+  have hN : ∀ a b : E, a ∈ frobFixedSubfield E 2 m → b ∈ frobFixedSubfield E 2 m →
+      (a * 1 + b * μ) ^ (2 ^ m + 1)
+        = a ^ 2 + a * b * (μ + μ ^ 2 ^ m) + b ^ 2 := by
+    intro a b ha hb
+    have haq : a ^ 2 ^ m = a := mem_frobFixedSubfield.mp ha
+    have hbq : b ^ 2 ^ m = b := mem_frobFixedSubfield.mp hb
+    have hexp : (a * 1 + b * μ) ^ 2 ^ m = a + b * μ ^ 2 ^ m := by
+      rw [mul_one, add_pow_char_pow, mul_pow, haq, hbq]
+    rw [pow_succ, hexp]
+    linear_combination b ^ 2 * hnorm
+  -- the quadratic map in the same coordinates
+  have hχcoord : ∀ a b : E, a ∈ frobFixedSubfield E 2 m →
+      b ∈ frobFixedSubfield E 2 m →
+      χ (a * 1 + b * μ) = a ^ 2 * χ 1 + b ^ 2 * χ μ + a * b * B 1 μ := by
+    intro a b ha hb
+    rw [hχadd, hχsmul a ha, hχsmul b hb, hBleft a ha, hBright b hb]
+    ring
+  -- coordinates exist: `1` and `μ` are independent over `F`
+  have hind : ∀ a b : E, a ∈ frobFixedSubfield E 2 m →
+      b ∈ frobFixedSubfield E 2 m → a * 1 + b * μ = 0 → a = 0 ∧ b = 0 := by
+    intro a b ha hb hab
+    by_cases hb0 : b = 0
+    · subst hb0
+      refine ⟨?_, rfl⟩
+      simpa using hab
+    · exfalso
+      refine hμF ?_
+      have hbμ : b * μ = a := by linear_combination hab - a * h2E
+      have hμeq : μ = b⁻¹ * a := by
+        rw [← hbμ, ← mul_assoc, inv_mul_cancel₀ hb0, one_mul]
+      rw [hμeq]
+      exact Subfield.mul_mem _ (Subfield.inv_mem _ hb) ha
+  -- read off the off-diagonal coefficient from `χ (μ²) = χ 1`
+  obtain ⟨p, hp⟩ := (frobCoordEquiv m hm hcard hind).surjective (μ ^ 2)
+  have hpval : (p.1 : E) * 1 + (p.2 : E) * μ = μ ^ 2 := hp
+  have hp1 : (p.1 : E) ≠ 0 := by
+    intro h
+    refine hμF ?_
+    have : μ = (p.2 : E) := by
+      have hmul : μ * μ = (p.2 : E) * μ := by
+        rw [← pow_two, ← hpval, h]
+        ring
+      exact mul_right_cancel₀ hμ0 hmul
+    rw [this]
+    exact p.2.2
+  have hp2 : (p.2 : E) ≠ 0 := by
+    intro h
+    refine hμ2F ?_
+    have : μ ^ 2 = (p.1 : E) := by rw [← hpval, h]; ring
+    rw [this]
+    exact p.1.2
+  have hkey : B 1 μ = χ 1 * (μ + μ ^ 2 ^ m) := by
+    have hval := hχcoord (p.1 : E) (p.2 : E) p.1.2 p.2.2
+    rw [hpval, hfix2, hfix] at hval
+    have hnval := hN (p.1 : E) (p.2 : E) p.1.2 p.2.2
+    rw [hpval, hnorm2] at hnval
+    -- `χ 1 = χ 1 (a² + b²) + a b B 1 μ` and `1 = a² + a b T + b²`
+    have hfac : (p.1 : E) * (p.2 : E) * (B 1 μ + χ 1 * (μ + μ ^ 2 ^ m)) = 0 := by
+      linear_combination -hval + χ 1 * hnval
+        + (χ 1 * (p.1 : E) * (p.2 : E) * (μ + μ ^ 2 ^ m)) * h2E
+    rcases mul_eq_zero.mp hfac with hc | hc
+    · rcases mul_eq_zero.mp hc with hc' | hc'
+      · exact absurd hc' hp1
+      · exact absurd hc' hp2
+    · linear_combination hc - (χ 1 * (μ + μ ^ 2 ^ m)) * h2E
+  -- conclude, in coordinates
+  intro x
+  obtain ⟨p', hp'⟩ := (frobCoordEquiv m hm hcard hind).surjective x
+  have hx : (p'.1 : E) * 1 + (p'.2 : E) * μ = x := hp'
+  rw [← hx, hχcoord (p'.1 : E) (p'.2 : E) p'.1.2 p'.2.2,
+    hN (p'.1 : E) (p'.2 : E) p'.1.2 p'.2.2, hfix, hkey]
+  ring
+
+end NormOneInvariance
 
 end OddOrder.FiniteField
