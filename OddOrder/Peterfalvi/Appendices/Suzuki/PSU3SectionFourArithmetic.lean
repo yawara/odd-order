@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Field.Basic
+import Mathlib.Algebra.Field.Subfield.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.LinearCombination
 import OddOrder.Algebra.FixedPointDensity
@@ -45,6 +46,8 @@ numerator and denominator by `a^{2μ}` gives the form used here, which avoids in
 * `sectionFour_fixed_of_shift`, `sectionFour_sq_eq_id` — the closing shift trick of
   p. 134: writing (10) at `X + 1` and subtracting leaves `X^{μ²} = X`, and that on
   enough points forces `μ² = id`.
+* `sectionFour_lambda_eq_one` — `λ = 1` and `b² + a^{-2μ²} = ζ + ζ⁻¹`, from `ζ ∉ F`.
+* `eq_one_of_sq_eq_one_of_odd_pow` — `μ² = 1` and odd order give `μ = 1`.
 -/
 
 set_option autoImplicit false
@@ -165,6 +168,74 @@ theorem sectionFour_sq_eq_id [Finite E] (μ : E ≃+* E) {s : E} (T : Finset E)
     (μ.toRingHom.toAddMonoidHom.comp μ.toRingHom.toAddMonoidHom) T
     (fun y hy => sectionFour_fixed_of_shift μ.toRingHom (hten y hy).1 (hten y hy).2)
     hcard X
+
+/-! ### `ζ` is quadratic over `F`
+
+Peterfalvi Part II, Ch. IV §4, p. 134, reads off `λ = 1` and `b² + a^{-2μ²} = ζ + ζ⁻¹`
+from
+
+  `λ ζ² + (λ b² + a^{-2μ²}) ζ + 1 = 0`,
+
+"as `ζ^{1+q} = 1` and `ζ ∉ F`".  The content is that `ζ ∉ F` makes `1`, `ζ` independent
+over `F`, while `ζ` satisfies the quadratic `ζ² + (ζ + ζ⁻¹) ζ + 1 = 0` whose
+coefficients lie in `F` — in characteristic `2` that quadratic is an identity, needing
+only `ζ ≠ 0`.
+-/
+
+/-- **`1` and `ζ` are independent over a subfield missing `ζ`.** -/
+theorem eq_zero_of_add_mul_eq_zero {F : Subfield E} {ζ u v : E} (hζ : ζ ∉ F)
+    (hu : u ∈ F) (hv : v ∈ F) (h : u + v * ζ = 0) : u = 0 ∧ v = 0 := by
+  have hv0 : v = 0 := by
+    by_contra hne
+    refine hζ ?_
+    have hz : v * ζ = -u := by linear_combination h
+    have hζeq : ζ = v⁻¹ * -u := by
+      rw [← hz, ← mul_assoc, inv_mul_cancel₀ hne, one_mul]
+    rw [hζeq]
+    exact F.mul_mem (F.inv_mem hv) (F.neg_mem hu)
+  refine ⟨?_, hv0⟩
+  rw [hv0, zero_mul, add_zero] at h
+  exact h
+
+/-- **The quadratic satisfied by `ζ`** — an identity in characteristic `2`, since
+`(ζ + ζ⁻¹) ζ = ζ² + 1`. -/
+theorem sq_add_traceCoeff_mul_add_one (h2 : (2 : E) = 0) {ζ : E} (hζ : ζ ≠ 0) :
+    ζ ^ 2 + (ζ + ζ⁻¹) * ζ + 1 = 0 := by
+  have hinv : ζ⁻¹ * ζ = 1 := inv_mul_cancel₀ hζ
+  linear_combination hinv + (ζ ^ 2 + 1) * h2
+
+/-- **Peterfalvi Part II, Ch. IV §4** (p. 134): `λ = 1`, and `b² + a^{-2μ²} = ζ + ζ⁻¹`.
+
+Substituting the quadratic `ζ² = s ζ + 1` into `λ ζ² + (λ β + α) ζ + 1 = 0` collapses it
+to `(λ + 1) + (λ s + λ β + α) ζ = 0`, whose two `F`-coefficients must vanish separately
+because `ζ ∉ F`. -/
+theorem sectionFour_lambda_eq_one (h2 : (2 : E) = 0) {F : Subfield E} {ζ s lam α β : E}
+    (hζ : ζ ∉ F) (hs : s ∈ F) (hlam : lam ∈ F) (hα : α ∈ F) (hβ : β ∈ F)
+    (hmin : ζ ^ 2 + s * ζ + 1 = 0)
+    (heq : lam * ζ ^ 2 + (lam * β + α) * ζ + 1 = 0) :
+    lam = 1 ∧ β + α = s := by
+  have hlin : (lam + 1) + (lam * s + lam * β + α) * ζ = 0 := by
+    linear_combination heq - lam * hmin + (lam + lam * s * ζ) * h2
+  obtain ⟨h1, h3⟩ := eq_zero_of_add_mul_eq_zero hζ (F.add_mem hlam F.one_mem)
+    (F.add_mem (F.add_mem (F.mul_mem hlam hs) (F.mul_mem hlam hβ)) hα) hlin
+  have hlam1 : lam = 1 := by linear_combination h1 - h2
+  refine ⟨hlam1, ?_⟩
+  rw [hlam1] at h3
+  linear_combination h3 - s * h2
+
+/-! ### From `μ² = 1` to `μ = 1` -/
+
+/-- **An element squaring to `1` and killed by an odd power is trivial.**
+
+This is the one place where Peterfalvi Part II, Ch. IV §4 (p. 134) uses that `μ` has odd
+order: `μ² = 1` from the shift trick, `μ^p = 1` because `μ` comes from `η ∈ P` of odd
+prime order `p`.  Writing `n = 2k + 1` makes `x^n = (x²)^k x` read `x = 1` outright. -/
+theorem eq_one_of_sq_eq_one_of_odd_pow {G : Type*} [Monoid G] {x : G} {n : ℕ}
+    (hn : Odd n) (hsq : x ^ 2 = 1) (hpow : x ^ n = 1) : x = 1 := by
+  obtain ⟨k, rfl⟩ := hn
+  have hk : x ^ (2 * k) = 1 := by rw [pow_mul, hsq, one_pow]
+  rw [pow_add, hk, one_mul, pow_one] at hpow
+  exact hpow
 
 end SectionFourArithmetic
 
