@@ -6303,3 +6303,23 @@ centralizes `C_{Q₀}(P)` … `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` 
    `Q` は一致する見込みがある)。
 2. 一致するなら照合は安く済む。しないなら `V ∩ U` の指数計算 (書籍の Galois の定理
    経由) を正面から形式化する。
+
+### (119) 追記: 同一視の作り方を実測した
+
+`residualQuotientEquiv = (centralizerResidualQuotientEquiv hXV hCQ).trans eTarget`
+(`CentralizerTrichotomy.lean:334`) で、
+
+* `centralizerResidualQuotientEquiv` (`CentralizerResidual.lean:312`) —
+  `O^{2'}(C) ⧸ Z(O^{2'}(C)) ≃* O^{2'}(C ⧸ (H.subgroupOf C).normalCore)`。
+  **`H` の normal core で割った商**を経由する。
+* `eTarget = data.groupEquiv` — 帰納法の結論が与える
+  `O^{2'}(C/core) ≃* standardPermGroup n`。これは `data.actionEquiv`
+  (`Fix(X) ≃ Unital n`, equivariant) と対になっている。
+
+⟹ transported 仮説の `H` は「`actionEquiv` が `infinity` に送る点の安定化群」で、
+内在の `M̄ = π(H ∩ U)` は「`basept` の安定化群の像」。**どちらも `L̄` の点安定化群**だが
+`actionEquiv` は任意の同変全単射なので `actionEquiv(basept) = infinity` は自明でない。
+推移性から**共役**にはなるはずで、そこが照合の要点になる見込み。
+
+⚠ ただし `M̄` が本当に `Fix(X)` 上の作用の点安定化群かは要確認 (`Z(U)` が `Fix(X)` に
+自明に作用するか)。次セッションはまずここを実測すること。
