@@ -714,31 +714,14 @@ theorem exists_conj_conjQHom_range_eq
 
 /-! ## The Proposition of Ch. III §3 -/
 
-include s in
-/-- **The Proposition of Peterfalvi Part II, Ch. III §3** (pp. 120–121), assembled
-from steps (1)–(5).
+/-- **The conclusion of the Proposition of Peterfalvi Part II, Ch. III §3**
+(pp. 120–121), as a predicate: the standard model of `Q ⋊ K W` normalized so that
+the chosen central element `x₀` is the book's `s = (0, 1)`.
 
-> There is an isomorphism `S ⋊ K W → S₁ ⋊ K₁ W₁` with `S ↦ S₁`, `K ↦ K₁`,
-> `s ↦ (0,1)`, where `S₁` is the set of pairs `(x, y)` with the operation
-> `(x,z)(y,u) = (x+y, z+u+φ(x,y))`, `φ` is bi-additive with
-> `φ(a x, b y) = a b^θ φ(x, y)` and `x ≠ 0 ⟹ φ(x,x) ≠ 0`, and `K₁ W₁ ≤ E^×` acts by
-> `(x,y)^a = (a x, a^{1+σ} y)`.
-
-Here `S₁` is `BilinearTwistedProduct φ`; `Θ` is the action of `K W` through the
-scalars `μ`, whose image is the book's `B`; and the clause about `u` says the
-conjugation action `A` becomes `B` after conjugating by an element of `U` — the book's
-Zassenhaus step.
-
-The centre coordinate `ι` is carried along because §3 works in it: `hker` identifies
-`Z(Q)` with the kernel coordinate, the exponent `d` is stated in `ι` as well as in `Φ`
-and `Θ`, and the diagonal scaling law is what turns the `K`-equivariance of the centre's
-quadratic map into the `K`-scaling of the cocycle (`cocycle_scale_of_diagScale`). -/
-theorem exists_standardModel
-    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
-    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
-    (hcardQ : Nat.card hyp.Q = Nat.card hyp.Q0 ^ 3)
-    (inductionHypothesis : TheoremAInductionBelow G Ω)
-    (x₀ : ↥(Subgroup.center hyp.Q)) (hx₀ : x₀ ≠ 1) :
+`exists_standardModel` produces it from the numerics and the induction hypothesis.
+Naming it lets §4 state the same Proposition for `U/Z(U)` without repeating the
+eleven clauses. -/
+def IsStandardModel (x₀ : ↥(Subgroup.center hyp.Q)) : Prop :=
     ∃ (φ : LinearMap.BilinMap (ZMod 2) M.E
         ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
       (θ : M.E ≃ₐ[ZMod 2] M.E)
@@ -811,7 +794,34 @@ theorem exists_standardModel
               ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
               = ((M.mu (kv.1, 1) ^ d : M.Eˣ) : M.E) *
                 ((p.central :
-                  ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) := by
+                  ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+
+include s in
+/-- **The Proposition of Peterfalvi Part II, Ch. III §3** (pp. 120–121), assembled
+from steps (1)–(5).
+
+> There is an isomorphism `S ⋊ K W → S₁ ⋊ K₁ W₁` with `S ↦ S₁`, `K ↦ K₁`,
+> `s ↦ (0,1)`, where `S₁` is the set of pairs `(x, y)` with the operation
+> `(x,z)(y,u) = (x+y, z+u+φ(x,y))`, `φ` is bi-additive with
+> `φ(a x, b y) = a b^θ φ(x, y)` and `x ≠ 0 ⟹ φ(x,x) ≠ 0`, and `K₁ W₁ ≤ E^×` acts by
+> `(x,y)^a = (a x, a^{1+σ} y)`.
+
+Here `S₁` is `BilinearTwistedProduct φ`; `Θ` is the action of `K W` through the
+scalars `μ`, whose image is the book's `B`; and the clause about `u` says the
+conjugation action `A` becomes `B` after conjugating by an element of `U` — the book's
+Zassenhaus step.
+
+The centre coordinate `ι` is carried along because §3 works in it: `hker` identifies
+`Z(Q)` with the kernel coordinate, the exponent `d` is stated in `ι` as well as in `Φ`
+and `Θ`, and the diagonal scaling law is what turns the `K`-equivariance of the centre's
+quadratic map into the `K`-scaling of the cocycle (`cocycle_scale_of_diagScale`). -/
+theorem exists_standardModel
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card hyp.Q = Nat.card hyp.Q0 ^ 3)
+    (inductionHypothesis : TheoremAInductionBelow G Ω)
+    (x₀ : ↥(Subgroup.center hyp.Q)) (hx₀ : x₀ ≠ 1) :
+    hyp.IsStandardModel s M x₀ := by
   classical
   obtain ⟨ι, d, hnorm, hequiv⟩ :=
     hyp.exists_center_coordinate_normalized s M hm hQ0card x₀ hx₀
