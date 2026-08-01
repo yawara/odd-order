@@ -5954,3 +5954,44 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
 2. 段 1 の位数計算 (`natCard_cQ_eq_baseField_cube` と
    `natCard_residualQuotientHypothesis_Q`)。
 3. 段 2 の Schur–Zassenhaus 共役性 (mathlib の `IsComplement`/`SchurZassenhaus` を実測)。
+
+## 2026-08-02 (112): 経路 B に舵を切った — `Setup` から 2-推移性が出る
+
+(110)(111) の経路 A (共役で三つ組を合わせる) は段 3 が landing したが、段 1-2
+(Sylow 共役 + Schur–Zassenhaus) と「`π t` と `t'` の差が `K` に入る」前段が残る。
+一方 **経路 B (降下 setup から `U/Z(U)` 自身の `Hypothesis` を作る)** の主要部品が
+安く出ることが分かったので、そちらへ切り替える。
+
+* `Setup.exists_mem_M_smul_eq` — `M` は `L ⧸ M` の基点以外に推移的。
+  `coords_smul_some_of_mem_M` が `Q` の作用を「`Q` 上の右移動」として読むので
+  `b⁻¹a` を取るだけ (**新しい数学ゼロ**)。
+* `Setup.isMultiplyPretransitive_two` — ⟹ **`L` は `L ⧸ M` に 2-重推移的**。
+
+⟹ `Hypothesis.rankOneSetup` の逆向き (`Setup ⟹ Hypothesis`) の (A1) 部分が完了。
+
+### `Setup ⟹ Hypothesis` の残りフィールド (全部安い見込み)
+
+| フィールド | 出どころ |
+|---|---|
+| `basept` / `doubly_transitive` | `(1 : L ⧸ M)` / **今回** |
+| `H_def` | `MulAction.stabilizer_quotient` (`stabilizer L ↑1 = M`) |
+| `D_def` | **`Setup.D_eq_inf_map_conj`** (110) |
+| `Q_le_H` / `Q_inf_D_eq_bot` / `Q_mul_D_eq_H` | `QM` / `split` の一意性 / `split` |
+| `Q_normal_in_H` | `DQ` (`d⁻¹`版) + `Q` 内共役 |
+| `t_sq` / `t_not_mem_H` | `invol` / `tnotmem` |
+| `t_ne_one` | `tnotmem` + `1 ∈ M` |
+| `faithful` | ⚠ 仮説 (`M.normalCore = ⊥`; `permHom_ker` 経由) |
+| `Q_even` / `D_odd` / `two_rank_ge_two` | ⚠ 仮説 |
+
+### ⚠ 次セッションはここから
+
+1. **`Setup.toHypothesis`** を書く (上表; 仮説は faithful / Q even / D odd / 2-rank)。
+2. `U/Z(U)` の降下 setup にそれを当てる — 各仮説の供給:
+   * `Q̄` even: `π(Q∩U) ≅ C_Q(P)` が非自明 2-群 (`cQ_isPGroup`)。
+   * `D̄` odd: `D∩U` の商で `D_odd` から。
+   * 2-rank: §4 の `hA3`。
+   * faithful: `M̄.normalCore = ⊥` — ⚠ ここだけ要調査
+     (`normalCore_subgroupOf_normalClosure_cQ_eq_center` が近い形)。
+3. そのうえで §2/§3 の数値仮説を内在版で供給
+   (`|Q̄| = |C_Q(P)| = ℓ³` は `natCard_cQ_eq_baseField_cube`、
+   `|Q̄₀| = ℓ` は `natCard_cQ0_eq_baseField`、Suzuki 2-群性は `cQ_isSuzuki2Group`)。
