@@ -43,6 +43,8 @@ The chapter uses these mappings to pin down `G` in the characterization of
   `⟨Q^x | x ∈ L⟩ = ⟨Q, Q^t⟩`, the generation half of the Lemma of §1.
 * `IsFGH.eq_of_le` — the triple of a smaller setup (same `t`) agrees with the ambient
   one, by uniqueness of the canonical factorization.
+* `IsFGH.map` — its quotient counterpart: along a homomorphism carrying one setup into
+  another, the triple downstairs is the image of the triple upstairs.
 * `IsFGH.dOrbitRel_f`, `IsFGH.dOrbitRel_fj_cube` — `⟨f, j⟩` acts on the `D`-orbits of
   `Q^#` as a quotient of the dihedral group of order `6`.
 * `coordsEquiv`, `coords_smul_t_some`, `coords_smul_some_of_mem_M` — the permutation
@@ -327,6 +329,36 @@ theorem IsFGH.eq_of_le (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
   obtain ⟨hf, hg, hh⟩ := H'.mem x hxQ' hx1
   exact fgh_eq_of_canonical hS H (hQ' hxQ') hx1 (hQ' hg) (hD' hh) (hQ' hf)
     (H'.eq x hxQ' hx1)
+
+/-- **The `f, g, h` of a homomorphic image are the images of the ambient ones.**
+
+If `π` carries a rank-one setup into another one — same involution up to `π`, `Q` into
+`Q'` and `D` into `D'` — then applying `π` to `t x t = g(x) h(x) t f(x)` produces a
+canonical factorization *downstairs*, with factors in `Q'`, `D'`, `Q'`.  Uniqueness of
+that factorization identifies the two triples on the image of `Q^#`.
+
+This is the quotient counterpart of `IsFGH.eq_of_le`, and it is what Peterfalvi Part II,
+Ch. IV §4, step (2) (p. 133) uses to read Corollary 2 of §3 — proved for the quotient
+`U/Z(U)`, which Ch. I §3 Proposition 1(c) identifies with `PSU(3, ℓ)` — back inside `U`:
+the conclusions there hold modulo the kernel, which is the book's `P ∩ U`.
+
+Note the hypothesis is `π x ≠ 1`, not `x ≠ 1`: the statement is empty for the elements
+of `Q` that the map kills, and that is exactly right — nothing pins `f'` there. -/
+theorem IsFGH.map {L' : Type*} [Group L'] {M' Q' D' : Subgroup L'} {t' : L'}
+    {f₁ g₁ h₁ : L' → L'} (hS' : Setup M' Q' D' t')
+    (H : IsFGH M Q D t f g h) (H' : IsFGH M' Q' D' t' f₁ g₁ h₁)
+    (π : L →* L') (ht : π t = t')
+    (hQπ : ∀ y ∈ Q, π y ∈ Q') (hDπ : ∀ y ∈ D, π y ∈ D')
+    (hxQ : x ∈ Q) (hx1 : π x ≠ 1) :
+    f₁ (π x) = π (f x) ∧ g₁ (π x) = π (g x) ∧ h₁ (π x) = π (h x) := by
+  have hx1' : x ≠ 1 := fun hc => hx1 (by rw [hc, map_one])
+  obtain ⟨hfQ, hgQ, hhD⟩ := H.mem x hxQ hx1'
+  have hcan : t' * π x * t' = π (g x) * π (h x) * t' * π (f x) := by
+    rw [← ht]
+    simp only [← map_mul]
+    exact congrArg π (H.eq x hxQ hx1')
+  exact fgh_eq_of_canonical hS' H' (hQπ x hxQ) hx1 (hQπ _ hgQ) (hDπ _ hhD)
+    (hQπ _ hfQ) hcan
 
 /-! ## The three canonical factorizations
 
