@@ -7183,3 +7183,49 @@ ULift 版へ `intrinsicResidualQuotientULift_{H,Q,D,t}` + section `SameGroup` �
 
 次セッションはまず (b) を実測 (書籍 p.122-134 と §4 の repo ファイルを `ℓ = 4` /
 `q > 4` で grep)、無ければ (a) の規模を見積もる。
+
+### (143) `hcard` の特殊化債務を返済 — 書籍どおり「θ が奇位数」へ (段 (2) の `ℓ = 4` 障害を解消)
+
+(142) で「(a) θ の奇位数を追跡 / (b) ℓ = 4 を別途排除」の 2 択と書いたが、**(a) を実施して landing**。
+併せて (142) の記述を 2 点訂正する。
+
+**訂正 1**: `corollaryTwo_of_standardModel` は `hcard` を**取らない**。取るのは合成版の
+`corollaryTwo_of_sectionThree` だけ (中で `stepThree_model` → `stepThree` を走らせるため)。
+
+**訂正 2**: 書籍 p.130 の原文 (実測) は
+
+> Therefore, `c = X + X^θ` is independent of `X` for `X ∈ F − {0, α^{2τ}}`.
+> **If `θ ≠ 1`, then `|F| > 8` since `θ` is of odd order**, and so there are elements
+> `X, Y ∈ F` such that `{X,Y,X+Y} ∩ {0,α^{2τ}} = ∅` and `c = X+Y+(X+Y)^θ = c+c = 0`.
+
+つまり `|F| > 8` は**仮説でなく θ の奇位数からの帰結**。`𝐅₄` の Frobenius は位数 2 ゆえ
+書籍の仮説から落ちる。⟹ repo の `hcard : 5 ≤ |F|` は proxy であり特殊化債務。
+
+**実装** (commits `3e6b4e6e5`, `927d46475`):
+
+* `OddOrder/Algebra/FixedPointsGalois.lean`
+  * `orderOf_dvd_of_card_eq_pow` — Artin の補題を `B = ⟨θ⟩` に適用: `[F : F^B] = |B|`
+    かつ `|F| = |F^B|^{orderOf θ}`、両者 `p` 冪ゆえ **`orderOf θ ∣ m`**。
+  * `three_le_of_odd_orderOf` — `|E| = p^{m·2}`、`θ ≠ 1` が奇位数 ⟹ `orderOf θ` は
+    `2m` の奇約数 (> 1) ⟹ `m` の約数 ⟹ **`3 ≤ m`** (= 書籍の `|F| ≥ 8`)。
+* `PSU3FieldArithmetic.lean` — `exists_ne_zero_ne` (3 元あれば `{0,z}` の外が取れる)。
+* `PSU3SectionThree.lean`
+  * `stepThree_star_all` — 旧 `stepThree` の本体を `(∗)` 止まりで切り出し
+    (`∃ z ∈ F, ∀ X ∈ F, X ≠ 0 → X ≠ z → α² + w² + w(X + X^θ) = 0`)。
+    補助 `theta_mem_frobFixed` / `sigma_symm_mem_frobFixed` / `theta_injective` /
+    `centerCoord_div_mem_frobFixed` も切り出し。
+  * `stepThree` — `5 ≤ |F|` 版 (従来の数え上げ)。入口として保持。
+  * **`stepThree_of_odd`** — 書籍版。`3 ≤ |F|` + `Odd (orderOf (τ.trans σ.symm))`。
+    `θ ≠ 1` なら `three_le_of_odd_orderOf` で `|F| ≥ 8` を出して `stepThree`、
+    `θ = 1` なら (∗) の括弧が標数 2 で消えて `α² = w²` のみ (数え上げ不要)。
+* `PSU3CorollaryTwo.lean` — `stepThree_model` / `corollaryTwo_of_sectionThree` の
+  `hcard : 5 ≤ |F|` を `3 ≤ |F|` + `hodd` に in-place で差し替え (外部呼び出し無し)。
+
+**段 (2) への影響**: `ℓ = 4` 障害は**消えた**。内在版 `U/Z(U)` は `ℓ = 2ⁿ`, `n ≥ 2` ゆえ
+`3 ≤ |F| = 2ⁿ` は自明。残るのは `hodd` の供給だが、これは **σ, τ (type-`B` scaling pair) を
+`U/Z(U)` について供給する仕事の一部**であり、cardinality 制約ではなくなった
+(σ, τ の供給自体は §3 の type-`B` 入力として元から必要)。
+
+**次**: 段 (2) の残りは (i) `U/Z(U)` の σ, τ + `hodd`、(ii) §2 の base pair
+`f(ω₀) = (ω₀ω₀²)^{ζ₀}`、(iii) `IsStandardModel` の 11 節を `corollaryTwo_of_sectionThree`
+の引数形へ展開。(iii) は `exists_isStandardModel_intrinsicResidualQuotient` から機械的。
