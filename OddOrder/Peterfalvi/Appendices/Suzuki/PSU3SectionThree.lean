@@ -778,6 +778,40 @@ theorem mu_W_add_inv_ne_zero {m : ℕ} (M : hyp.QuotientFieldModel m)
   have hmu1 : M.mu (1, v) = 1 := Units.ext hval
   exact hv (congrArg Prod.snd (hmu (hmu1.trans (map_one M.mu).symm)))
 
+/-- **The scaling pair's twist on `F` has odd order, given the type-`B` automorphism**
+(Peterfalvi Part II, Ch. III §3, p. 121, into Ch. IV §3 (3), p. 130).
+
+The pair satisfies `σ(a) τ(a) = a^d` on `μ(K)`, which is all of `F^×`
+(`exists_actualKActor_mu_eq`).  If the exponent has the type-`B` shape `a^d = a · φ(a)`
+for an automorphism `φ` of `F` of odd order — that is Appendix III Definition 3's `θ`,
+carried by `Suzuki2Groups.TypeBData.phi` together with `phi_orderOf_odd` — then the book's
+`{σ|_F, τ|_F} = {1_F, φ}` forces `θ|_F` to be `φ` or `φ⁻¹`
+(`odd_orderOf_restrictToFrobFixed_inv_mul`), hence of odd order.
+
+This is `stepThree_of_odd`'s `hodd`, reduced to a statement about the exponent `d` alone. -/
+theorem odd_orderOf_scalingPair_restrict {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) (sfive : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m) {d : ℤ} (σ τ : M.E ≃+* M.E)
+    (hscale : ∀ k : ↥hyp.actualKActor,
+      σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
+    (φ : RingAut ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hodd : Odd (orderOf φ))
+    (hshape : ∀ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m), (a : M.E) ≠ 0 →
+      (a : M.E) ^ d
+        = (a : M.E) * ((φ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) :
+    Odd (orderOf ((OddOrder.FiniteField.restrictToFrobFixed (m := m) σ)⁻¹ *
+      OddOrder.FiniteField.restrictToFrobFixed (m := m) τ)) := by
+  refine OddOrder.FiniteField.odd_orderOf_restrictToFrobFixed_inv_mul hm M.card σ τ φ hodd
+    fun a => ?_
+  rcases eq_or_ne ((a : M.E)) 0 with h0 | h0
+  · rw [h0, map_zero, map_zero, zero_mul, zero_mul]
+  · obtain ⟨k, hk⟩ := hyp.exists_actualKActor_mu_eq sfive M hm hQ0card a.2 h0
+    have hs := hscale k
+    rw [Units.val_zpow_eq_zpow_val, hk] at hs
+    rw [hs]
+    exact hshape a h0
+
 /-- `θ = σ⁻¹ ∘ τ` preserves `F`, being a composite of ring maps. -/
 theorem theta_mem_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m) (σ τ : M.E ≃+* M.E)
     (θ : M.E →+ M.E) (hθ : ∀ x : M.E, θ x = σ.symm (τ x)) :
