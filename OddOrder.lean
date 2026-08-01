@@ -7,6 +7,7 @@ import OddOrder.Algebra.QuadraticFrobenius
 import OddOrder.Algebra.FrobeniusExponentPairs
 import OddOrder.Algebra.QuadraticTraceCorrection
 import OddOrder.Algebra.AnisotropicNormForm
+import OddOrder.Algebra.HermitianCocycle
 import OddOrder.Algebra.SemilinearFixedPoint
 import OddOrder.Algebra.PrincipalIdealTheorem
 import OddOrder.Algebra.QuadraticMapCoordinates
