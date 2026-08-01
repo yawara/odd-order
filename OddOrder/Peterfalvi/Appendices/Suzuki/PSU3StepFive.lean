@@ -359,6 +359,200 @@ theorem stepFive_secondCase_fibre {m : ℕ} (M : hyp.QuotientFieldModel m)
     rw [hQeq, hFeq]
     exact ⟨e1, e2⟩
 
+/-- **Stage (5)** (Peterfalvi Part II, Ch. IV §3 (5), p. 131), complete: for every
+`ρ ∈ Q − Q₀` the map `f` is given in unitary coordinates by `f(ρ̄, y) = (ρ̄/y, 1/y)`.
+
+The book splits into two cases and so does this proof.
+
+* If `ρ̄` lies in the `K W`-orbit of `ω̄` — the orbit on which stage (4) has already
+  established the formula, here supplied as `hcover` — then `stepFive_of_mem_orbit`
+  transports it.
+* Otherwise, "possibly on replacing `ρ` by an element of `ρ Q₀`, we may assume by (8) of
+  §2 that `f(ρ)` is in the orbit of `ω̄`": `exists_mem_Q0_orbitOfF_eq` produces the
+  `x ∈ Q₀` with `f(ρ x)` in that orbit, so the formula holds throughout the fibre of
+  `f(ρ x)`; `inverseFormula_symm` reads it back at `ρ x` itself and
+  `stepFive_secondCase_elem` / `stepFive_secondCase_fibre` walk it out to the whole
+  fibre of `ρ x`, which contains `ρ`.
+
+Note that the orbit condition depends on `ρ` only through its quotient coordinate, which
+is why the *whole* fibre of `f(ρ x)` comes for free in the second case — that is exactly
+the `hsolved` hypothesis of `stepFive_secondCase_elem`. -/
+theorem stepFive (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (hquot : ∀ ρ : ↥hyp.Q, (Φ ρ).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) ρ)))
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hker : ∀ z : ↥(Subgroup.center hyp.Q),
+      Φ (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {e : M.E} (hene : e ≠ 0)
+    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (hΨq : ∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient)
+    (hΨc : ∀ ρ : ↥hyp.Q, (Ψ ρ).central = ν * (Φ ρ).central)
+    (hconjq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      (Ψ (hyp.conjQHom kv ρ)).quotient
+        = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ρ).quotient)
+    (hconjy : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      Suzuki2Groups.unitaryCoord m u (Ψ (hyp.conjQHom kv ρ))
+        = ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1) *
+          Suzuki2Groups.unitaryCoord m u (Ψ ρ))
+    (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hdsq : ∀ k : ↥hyp.actualKActor,
+      ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) = ((M.mu (k, 1) : M.Eˣ) : M.E) ^ 2)
+    (hs : (ν : M.E) *
+      hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 = 1)
+    (hVW : hyp.V = hyp.W) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hinj : Function.Injective M.mu)
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
+    (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hcover : ∀ (σ : G) (hσQ : σ ∈ hyp.Q),
+      (Ψ ⟨σ, hσQ⟩).quotient = (Ψ ⟨ω, hωQ⟩).quotient →
+        (Ψ ⟨f σ, hfQ σ hσQ⟩).quotient
+            = (Ψ ⟨σ, hσQ⟩).quotient /
+              Suzuki2Groups.unitaryCoord m u (Ψ ⟨σ, hσQ⟩) ∧
+          Suzuki2Groups.unitaryCoord m u (Ψ ⟨f σ, hfQ σ hσQ⟩)
+            = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨σ, hσQ⟩))⁻¹)
+    {ρ : G} (hρQ : ρ ∈ hyp.Q) (hρQ0 : ρ ∉ hyp.Q0) :
+    (Ψ ⟨f ρ, hfQ ρ hρQ⟩).quotient
+        = (Ψ ⟨ρ, hρQ⟩).quotient /
+          Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩) ∧
+      Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ρ, hfQ ρ hρQ⟩)
+        = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹ := by
+  classical
+  -- off `Q₀` the quotient coordinate is nonzero
+  have hne0 : ∀ (τ : G) (hτQ : τ ∈ hyp.Q), τ ∉ hyp.Q0 →
+      (Ψ ⟨τ, hτQ⟩).quotient ≠ 0 := by
+    intro τ hτQ hτQ0 hc
+    rw [hΨq, hquot] at hc
+    rcases mul_eq_zero.mp hc with h0 | h0
+    · exact hene h0
+    · exact hyp.coord_ne_zero_of_not_mem_Q0 M hZc hτQ hτQ0 h0
+  have hω0 : (Ψ ⟨ω, hωQ⟩).quotient ≠ 0 := hne0 ω hωQ hωQ0
+  -- the formula holds at every point of `Q` in the `K W`-orbit of `ω`
+  have key : ∀ (τ : G) (hτQ : τ ∈ hyp.Q),
+      (∃ kv : ↥hyp.actualKActor × ↥hyp.W, (Ψ ⟨τ, hτQ⟩).quotient
+        = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ⟨ω, hωQ⟩).quotient) →
+      ((Ψ ⟨f τ, hfQ τ hτQ⟩).quotient
+          = (Ψ ⟨τ, hτQ⟩).quotient /
+            Suzuki2Groups.unitaryCoord m u (Ψ ⟨τ, hτQ⟩) ∧
+        Suzuki2Groups.unitaryCoord m u (Ψ ⟨f τ, hfQ τ hτQ⟩)
+          = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨τ, hτQ⟩))⁻¹) := by
+    rintro τ hτQ ⟨kv, hkv⟩
+    exact hyp.stepFive_of_mem_orbit H M hu Ψ hconjq hconjy hfQ hωQ hcover hτQ hω0 kv hkv
+  by_cases horb : ∃ kv : ↥hyp.actualKActor × ↥hyp.W, (Ψ ⟨ρ, hρQ⟩).quotient
+      = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ⟨ω, hωQ⟩).quotient
+  · exact key ρ hρQ horb
+  -- ### the second case: move inside the fibre of `ρ` so that `f` lands in the orbit
+  obtain ⟨x, hx⟩ := hyp.exists_mem_Q0_orbitOfF_eq M hZc H hC2 hVW hm hQ0card hinj
+    hKcard hWdvd hW1 hρQ hρQ0 (QuotientGroup.mk (hyp.baseUnit M hZc hωQ hωQ0))
+  obtain ⟨hρxQ, hρxQ0⟩ := hyp.mul_mem_sdiff_Q0 hρQ hρQ0 x.2
+  have hρx0 : (Ψ ⟨ρ * (x : G), hρxQ⟩).quotient ≠ 0 := hne0 _ hρxQ hρxQ0
+  have hρx1 : ρ * (x : G) ≠ 1 := by
+    intro hc
+    exact hρxQ0 (by rw [hc]; exact hyp.Q0.one_mem)
+  have hff : f (f (ρ * (x : G))) = ρ * (x : G) :=
+    (hTwo hyp.rankOneSetup H hρxQ hρx1).1
+  -- `f(ρ x)` lies in the orbit of `ω`, read off the coordinates
+  have hΨf : (Ψ ⟨f (ρ * (x : G)), hfQ _ hρxQ⟩).quotient
+      = e * ((hyp.fUnit M hZc H hC2 hρQ hρQ0 x : M.Eˣ) : M.E) := by
+    rw [hΨq, hquot, hyp.fUnit_val]
+    rfl
+  have hΨω : (Ψ ⟨ω, hωQ⟩).quotient
+      = e * ((hyp.baseUnit M hZc hωQ hωQ0 : M.Eˣ) : M.E) := by
+    rw [hΨq, hquot, hyp.baseUnit_val]
+    rfl
+  have hmk : (QuotientGroup.mk (hyp.fUnit M hZc H hC2 hρQ hρQ0 x)
+      : M.Eˣ ⧸ MonoidHom.range M.mu)
+      = QuotientGroup.mk (hyp.baseUnit M hZc hωQ hωQ0) := hx
+  obtain ⟨kv, hkv⟩ := QuotientGroup.eq.mp hmk
+  have hprod : hyp.fUnit M hZc H hC2 hρQ hρQ0 x * M.mu kv
+      = hyp.baseUnit M hZc hωQ hωQ0 := by rw [hkv, mul_inv_cancel_left]
+  have hfb : hyp.fUnit M hZc H hC2 hρQ hρQ0 x
+      = M.mu kv⁻¹ * hyp.baseUnit M hZc hωQ hωQ0 := by
+    rw [map_inv, ← hprod, mul_comm (hyp.fUnit M hZc H hC2 hρQ hρQ0 x) (M.mu kv),
+      inv_mul_cancel_left]
+  have hforb : (Ψ ⟨f (ρ * (x : G)), hfQ _ hρxQ⟩).quotient
+      = ((M.mu kv⁻¹ : M.Eˣ) : M.E) * (Ψ ⟨ω, hωQ⟩).quotient := by
+    rw [hΨf, hΨω, hfb, Units.val_mul]; ring
+  -- hence the formula throughout the fibre of `f(ρ x)`
+  have hsolved : ∀ (σ : G) (hσQ : σ ∈ hyp.Q),
+      (Ψ ⟨σ, hσQ⟩).quotient = (Ψ ⟨f (ρ * (x : G)), hfQ _ hρxQ⟩).quotient →
+      ((Ψ ⟨f σ, hfQ σ hσQ⟩).quotient
+          = (Ψ ⟨σ, hσQ⟩).quotient /
+            Suzuki2Groups.unitaryCoord m u (Ψ ⟨σ, hσQ⟩) ∧
+        Suzuki2Groups.unitaryCoord m u (Ψ ⟨f σ, hfQ σ hσQ⟩)
+          = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨σ, hσQ⟩))⁻¹) :=
+    fun σ hσQ hfib => key σ hσQ ⟨kv⁻¹, hfib.trans hforb⟩
+  -- at `f(ρ x)` itself the formula inverts (H2), giving the base point of the fibre
+  obtain ⟨hb1, hb2⟩ := hsolved (f (ρ * (x : G))) (hfQ _ hρxQ) rfl
+  have hfσ : (⟨f (f (ρ * (x : G))), hfQ _ (hfQ _ hρxQ)⟩ : ↥hyp.Q)
+      = ⟨ρ * (x : G), hρxQ⟩ := Subtype.ext hff
+  rw [hfσ] at hb1 hb2
+  have hyσ0 : Suzuki2Groups.unitaryCoord m u
+      (Ψ ⟨f (ρ * (x : G)), hfQ _ hρxQ⟩) ≠ 0 := by
+    intro hc
+    exact hρx0 (by rw [hb1, hc, div_zero])
+  have hbase := inverseFormula_symm hyσ0 hb1 hb2
+  -- and the shifts `ρ x s^{a⁻¹}` sweep the rest of the fibre
+  have hstep : ∀ a : G, a ∈ hyp.K →
+      ∀ hQ : ρ * (x : G) * (a⁻¹ * hyp.distinguishedInvolution * a) ∈ hyp.Q,
+        (Ψ ⟨f (ρ * (x : G) * (a⁻¹ * hyp.distinguishedInvolution * a)),
+            hfQ _ hQ⟩).quotient
+            = (Ψ ⟨ρ * (x : G) * (a⁻¹ * hyp.distinguishedInvolution * a),
+                hQ⟩).quotient /
+              Suzuki2Groups.unitaryCoord m u
+                (Ψ ⟨ρ * (x : G) * (a⁻¹ * hyp.distinguishedInvolution * a), hQ⟩) ∧
+          Suzuki2Groups.unitaryCoord m u
+              (Ψ ⟨f (ρ * (x : G) * (a⁻¹ * hyp.distinguishedInvolution * a)),
+                hfQ _ hQ⟩)
+            = (Suzuki2Groups.unitaryCoord m u
+              (Ψ ⟨ρ * (x : G) * (a⁻¹ * hyp.distinguishedInvolution * a),
+                hQ⟩))⁻¹ := by
+    intro a haK hQ
+    have haKSet : a ∈ hyp.KSet := by rw [← hyp.coe_K]; exact haK
+    have hz'Q0 : a⁻¹ * hyp.distinguishedInvolution * a ∈ hyp.Q0 := by
+      have hmem := hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D (hyp.K.inv_mem haK))
+        hyp.distinguishedInvolution_mem_Q0
+      rwa [inv_inv] at hmem
+    have hne : ρ * (x : G) * (a⁻¹ * hyp.distinguishedInvolution * a) ≠ 1 := by
+      intro hc
+      refine hρxQ0 ?_
+      have hz : ρ * (x : G) = (a⁻¹ * hyp.distinguishedInvolution * a)⁻¹ := by
+        rw [eq_inv_iff_mul_eq_one]; exact hc
+      rw [hz]
+      exact hyp.Q0.inv_mem hz'Q0
+    exact hyp.stepFive_secondCase_elem H hC2 sfive M Φ ι hker hu Ψ hΨq hΨc hconjq
+      hconjy d hequiv hdsq hs hfQ hρxQ hρx1 hρx0 hff hsolved haK haKSet hne hQ
+  -- `ρ` lies in that fibre, since `x ∈ Q₀` is central
+  have hfibρ : (Ψ ⟨ρ, hρQ⟩).quotient = (Ψ ⟨ρ * (x : G), hρxQ⟩).quotient := by
+    have hmul : (⟨ρ * (x : G), hρxQ⟩ : ↥hyp.Q)
+        = (⟨ρ, hρQ⟩ : ↥hyp.Q) * ⟨(x : G), hyp.Q0_le_Q x.2⟩ := Subtype.ext rfl
+    have hcq : (Ψ ⟨(x : G), hyp.Q0_le_Q x.2⟩).quotient = 0 := by
+      rw [show (⟨(x : G), hyp.Q0_le_Q x.2⟩ : ↥hyp.Q)
+          = ((hyp.toCenter sfive x.2 : ↥(Subgroup.center hyp.Q)) : ↥hyp.Q) from rfl,
+        hΨq, hker]
+      exact mul_zero e
+    rw [hmul, map_mul, Suzuki2Groups.BilinearTwistedProduct.quotient_mul, hcq, add_zero]
+  exact hyp.stepFive_secondCase_fibre M hZc Φ hquot hu Ψ hene hΨq hfQ hρxQ hbase hstep
+    hρQ hfibρ
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
