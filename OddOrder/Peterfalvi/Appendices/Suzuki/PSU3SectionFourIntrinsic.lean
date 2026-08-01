@@ -1291,6 +1291,8 @@ theorem exists_isStandardModel_intrinsicResidualQuotient (hXV : X ≤ hyp.V) (hX
           hZD).QuotientFieldModel data.n)
       (x₀ : ↥(Subgroup.center (hyp.intrinsicResidualQuotientULift details hXD htX hCQ
           hZD).Q)), x₀ ≠ 1 ∧
+      Nat.card ↥(hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).actualKActor
+          = 2 ^ data.n - 1 ∧
       (hyp.intrinsicResidualQuotientULift details hXD htX hCQ
         hZD).IsStandardModel sfive Mq x₀ := by
   letI := Hypothesis.rankOneSetupAction
@@ -1323,6 +1325,8 @@ theorem exists_isStandardModel_intrinsicResidualQuotient (hXV : X ≤ hyp.V) (hX
     rw [hQ, hQ0]
     exact hyp.natCard_Q_intrinsicResidualQuotient hXV common details hXD htX hCQ hZD
   exact ⟨sfive, Mq, x₀, hx₀,
+    (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).card_actualKActor_eq
+      sfive Mq hn0 hQ0card,
     (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).exists_standardModel sfive
       Mq hst hn0 hQ0card hcardQ
       (hyp.theoremAInductionBelow_intrinsicResidualQuotient details hXD htX hCQ hZD hXV hX ih)
