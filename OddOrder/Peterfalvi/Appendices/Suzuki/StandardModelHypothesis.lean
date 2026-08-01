@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
 import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
+import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
 
 /-!
@@ -45,6 +46,10 @@ where the §3 machinery applies unconditionally and the conclusions transport ba
 model — `TheoremAInductionBelow` quantifies over all smaller groups, so §4 has to supply
 it from the ambient induction hypothesis together with
 `Nat.card (standardPermGroup n) ≤ Nat.card G`.
+
+* `standardHypothesisULift` and its transported facts — the same model with the permuted
+  set moved to an arbitrary universe, which is what lets §4 hand it the ambient induction
+  hypothesis.
 -/
 
 set_option autoImplicit false
@@ -54,6 +59,8 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki
 open OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary
 
 section /- The standard model as a source hypothesis -/
+
+universe w
 
 variable {n : ℕ}
 
@@ -286,6 +293,58 @@ theorem exists_ne_one_mem_standardHypothesis_W (n : ℕ) (hn : 1 < n) :
   · intro h
     exact hcne (congrArg Subtype.val
       (psuTorusHom_injective n (h.trans (map_one (psuTorusHom n)).symm)))
+
+/-! ### The model with the permuted set lifted to an arbitrary universe
+
+`TheoremAInductionBelow G Ω` quantifies over groups in `G`'s universe and sets in `Ω`'s,
+so §4 can only feed its induction hypothesis to a model whose permuted set sits in the
+same universe as `Ω`.  `Unital n` is in `Type 0`; `ULift` moves it. -/
+
+/-- **The standard model acting on a universe-lifted unital.**
+
+Only the permuted set moves; the group and all of its distinguished subgroups are
+unchanged, since the transporting isomorphism is the identity. -/
+noncomputable def standardHypothesisULift (n : ℕ) (hn : 1 < n) :
+    Hypothesis (standardPermGroup n) (ULift.{w} (Unital n)) :=
+  (standardHypothesis n hn).ofMulEquiv (MulEquiv.refl _) Equiv.ulift.symm fun _ _ => rfl
+
+/-- `V = W` survives the universe lift. -/
+theorem standardHypothesisULift_V_eq_W (n : ℕ) (hn : 1 < n) :
+    (standardHypothesisULift.{w} n hn).V = (standardHypothesisULift.{w} n hn).W :=
+  Hypothesis.ofMulEquiv_V_eq_W _ _ _ _ (standardHypothesis_V_eq_W n hn)
+
+/-- `|Q₀| = 2ⁿ` survives the universe lift. -/
+theorem natCard_standardHypothesisULift_Q0 (n : ℕ) (hn : 1 < n) :
+    Nat.card ((standardHypothesisULift.{w} n hn).Q0) = 2 ^ n :=
+  (Hypothesis.ofMulEquiv_natCard_Q0 (standardHypothesis n hn) _ _ _).trans
+    (natCard_standardHypothesis_Q0 n hn)
+
+/-- `|Q| = |Q₀|³` survives the universe lift. -/
+theorem natCard_standardHypothesisULift_Q (n : ℕ) (hn : 1 < n) :
+    Nat.card ((standardHypothesisULift.{w} n hn).Q)
+      = Nat.card ((standardHypothesisULift.{w} n hn).Q0) ^ 3 :=
+  calc Nat.card ((standardHypothesisULift.{w} n hn).Q)
+      = Nat.card ((standardHypothesis n hn).Q) :=
+        Hypothesis.ofMulEquiv_natCard_Q (standardHypothesis n hn) _ _ _
+    _ = Nat.card ((standardHypothesis n hn).Q0) ^ 3 := natCard_standardHypothesis_Q n hn
+    _ = Nat.card ((standardHypothesisULift.{w} n hn).Q0) ^ 3 :=
+        congrArg (· ^ 3)
+          (Hypothesis.ofMulEquiv_natCard_Q0 (standardHypothesis n hn) _ _ _).symm
+
+/-- `|s t| = 3` survives the universe lift. -/
+theorem standardHypothesisULift_orderOf_distinguishedInvolution_mul_t
+    (n : ℕ) (hn : 1 < n) :
+    orderOf ((standardHypothesisULift.{w} n hn).distinguishedInvolution *
+        (standardHypothesisULift.{w} n hn).t) = 3 :=
+  (Hypothesis.ofMulEquiv_orderOf_distinguishedInvolution_mul_t
+      (standardHypothesis n hn) _ _ _).trans
+    (standardHypothesis_orderOf_distinguishedInvolution_mul_t n hn)
+
+/-- A non-trivial element of `W` survives the universe lift. -/
+theorem exists_ne_one_mem_standardHypothesisULift_W (n : ℕ) (hn : 1 < n) :
+    ∃ x ∈ (standardHypothesisULift.{w} n hn).W, x ≠ 1 :=
+  Hypothesis.ofMulEquiv_exists_ne_one_mem_W _ _ _ _
+    (exists_ne_one_mem_standardHypothesis_W n hn)
 
 end
 
