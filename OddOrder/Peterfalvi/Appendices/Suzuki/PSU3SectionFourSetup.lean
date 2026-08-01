@@ -83,6 +83,12 @@ element of `Q − Q₀` does *not* square to `1`.
   and `P ≤ D` normalizes `W`, so `P ⊔ W = P · W`.
 * `SectionFourSetup.exists_ne_one_mem_W_centralizer` — **`C_W(P) ≠ 1`**, the book's
   `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` in the form step (2) uses it.
+* `SectionFourSetup.exists_ne_one_mem_quotient_W` — that `ζ` stays non-trivial in the
+  quotient, because the kernel centralizes all of `C_Q(P)` while `W` is fixed-point-free
+  on `Q/Q₀`.
+* `SectionFourSetup.standingData_centralizerQuotient` — **§2/§3 run inside the
+  centralizer quotient on §4's ambient hypotheses alone**: both standing bundles and the
+  numerics of `exists_standardModel`, with no residual hypothesis about the quotient.
 -/
 
 set_option autoImplicit false
@@ -1051,6 +1057,105 @@ theorem exists_ne_one_mem_W_centralizer (hP : s4.P ≠ ⊥)
           (Nat.two_dvd_ne_zero.mpr (Nat.odd_iff.mp hdodd))).symm)
       dvd_rfl hdvd
   exact hdne (orderOf_eq_one_iff.mp hone)
+
+/-- **Step (2)'s `ζ` survives in the centralizer quotient** (Peterfalvi Part II,
+Ch. IV §4, p. 133).
+
+`ζ ∈ C_W(P)` lands in `W̄` because `W = D ∩ C(Q₀)` on both sides
+(`W_eq_inf_centralizer_Q0`) and `Q̄₀` is the image of `C_{Q₀}(P)`
+(`map_centralizer_Q0_eq_quotient_Q0`).  It stays non-trivial because the kernel
+`𝒩(C_G(P)) = C_D(P) ∩ C(C_Q(P))` centralizes *all* of `C_Q(P)`, which contains the
+`P`-fixed `ω ∈ Q − Q₀` of step (1) — and `W` acts fixed-point-freely on `Q/Q₀`
+(`eq_one_of_conj_eq_mul_Q0_of_mem_W`), so only `1` can do that.
+
+This is the last input of `psu3Numerics_and_standingData_centralizerQuotient`. -/
+theorem exists_ne_one_mem_quotient_W {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hωfix : ∀ a ∈ s4.P, a * ω * a⁻¹ = ω)
+    {ζ : G} (hζW : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1)
+    (hζC : ζ ∈ Subgroup.centralizer ((s4.P : Set G))) :
+    letI := hyp.centralizerQuotientMulAction s4.P_le_V
+    ∃ z ∈ (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).W, z ≠ 1 := by
+  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  set C : Subgroup G := Subgroup.centralizer ((s4.P : Set G)) with hCdef
+  set N : Subgroup ↥C := (hyp.H.subgroupOf C).normalCore with hNdef
+  set pi : ↥C →* ↥C ⧸ N := QuotientGroup.mk' N with hpidef
+  have hζCmem : ζ ∈ C := hζC
+  set ζC : ↥C := ⟨ζ, hζCmem⟩ with hζCdef
+  have hωC : ω ∈ C := by
+    refine Subgroup.mem_centralizer_iff.mpr fun a ha => ?_
+    have := hωfix a ha
+    calc a * ω = (a * ω * a⁻¹) * a := by group
+      _ = ω * a := by rw [this]
+  refine ⟨pi ζC, ?_, ?_⟩
+  · rw [(hyp.centralizerQuotientHypothesis s4.P_le_V hA3).W_eq_inf_centralizer_Q0]
+    refine Subgroup.mem_inf.mpr ⟨?_, Subgroup.mem_centralizer_iff.mpr fun y hy => ?_⟩
+    · exact ⟨ζC, Subgroup.mem_subgroupOf.mpr (hyp.V_le_D (hyp.W_le_V hζW)), rfl⟩
+    · rw [← hyp.map_centralizer_Q0_eq_quotient_Q0 s4.P_le_V hA3] at hy
+      obtain ⟨y0, hy0, rfl⟩ := hy
+      have hy0Q0 : ((y0 : ↥C) : G) ∈ hyp.Q0 := Subgroup.mem_subgroupOf.mp hy0
+      have hcomm : ζ * ((y0 : ↥C) : G) = ((y0 : ↥C) : G) * ζ :=
+        (Subgroup.mem_centralizer_iff.mp
+          (hyp.W_eq_inf_centralizer_Q0 ▸ hζW).2 _ hy0Q0).symm
+      rw [← map_mul, ← map_mul]
+      exact congrArg pi (Subtype.ext (by simpa using hcomm.symm))
+  · intro hone
+    have hmemN : ζC ∈ N := (QuotientGroup.eq_one_iff _).mp hone
+    rw [hNdef, hyp.normalCore_cH_eq_centralizer_cQ s4.P_le_V] at hmemN
+    have hωQC : (⟨ω, hωC⟩ : ↥C) ∈ hyp.Q.subgroupOf C := Subgroup.mem_subgroupOf.mpr hωQ
+    have hcomm : ((⟨ω, hωC⟩ : ↥C) : ↥C) * ζC = ζC * ⟨ω, hωC⟩ :=
+      Subgroup.mem_centralizer_iff.mp hmemN.2 _ hωQC
+    have hcommG : ω * ζ = ζ * ω := congrArg (Subtype.val (p := fun z => z ∈ C)) hcomm
+    refine hζ1 (hyp.eq_one_of_conj_eq_mul_Q0_of_mem_W M hZ hmu hωQ hωQ0 hζW
+      hyp.Q0.one_mem ?_)
+    rw [mul_one]
+    calc ζ⁻¹ * ω * ζ = ζ⁻¹ * (ω * ζ) := by group
+      _ = ζ⁻¹ * (ζ * ω) := by rw [hcommG]
+      _ = ω := by group
+
+/-- **§2/§3 run inside the centralizer quotient, on §4's ambient hypotheses alone**
+(Peterfalvi Part II, Ch. IV §4, step (2), p. 133).
+
+`psu3Numerics_and_standingData_centralizerQuotient` still asked for a `1 ≠ w ∈ W̄`; the
+book supplies it as `ζ₁ ∈ (V ∩ U) − (P ∩ U)`.  Chaining `exists_ne_one_mem_W_centralizer`
+(the `PSU(3, ℓ)` input) with `exists_ne_one_mem_quotient_W` (its descent) closes that last
+gap, so both standing bundles of §2/§3 — and the numerics `exists_standardModel` takes —
+are now available for the quotient with no residual hypothesis about it. -/
+theorem standingData_centralizerQuotient {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu)
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
+    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (ih : TheoremAInductionBelow G Ω) :
+    letI := hyp.centralizerQuotientMulAction s4.P_le_V
+    ∃ n : ℕ, n ≠ 0 ∧
+      Nat.card ↥(hyp.centralizerQuotientHypothesis s4.P_le_V hA3).Q0 = 2 ^ n ∧
+      Nat.card (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).Q
+        = Nat.card ↥(hyp.centralizerQuotientHypothesis s4.P_le_V hA3).Q0 ^ 3 ∧
+      orderOf ((hyp.centralizerQuotientHypothesis s4.P_le_V hA3).distinguishedInvolution *
+        (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).t) = 3 ∧
+      OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
+        ↥(hyp.centralizerQuotientHypothesis s4.P_le_V hA3).Q ∧
+      Nonempty ((hyp.centralizerQuotientHypothesis s4.P_le_V hA3).LemmaFiveSetup n) ∧
+      Nonempty ((hyp.centralizerQuotientHypothesis s4.P_le_V hA3).QuotientFieldModel n) := by
+  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  have hnea := s4.not_isElementaryAbelian_cQ hQsuz hZ hCop hSolv
+  obtain ⟨ω, hωQ, hωQ0, hωfix⟩ := s4.exists_fixed_not_mem_Q0 hZ hCop hSolv
+  obtain ⟨ζ, hζW, hζ1, hζC⟩ := s4.exists_ne_one_mem_W_centralizer hP hA3 hord hnea ih
+  obtain ⟨z, hzW, hz1⟩ :=
+    s4.exists_ne_one_mem_quotient_W M hZ hmu hA3 hωQ hωQ0 hωfix hζW hζ1 hζC
+  obtain ⟨n, hn, hQ0card, hcardQ, hst, hQsuzBar, hdata⟩ :=
+    hyp.psu3Numerics_and_standingData_centralizerQuotient s4.P_le_V hP hA3 hord hnea ih
+  obtain ⟨h5, hM⟩ := hdata z hzW hz1
+  exact ⟨n, hn, hQ0card, hcardQ, hst, hQsuzBar, h5, hM⟩
 
 /-! ### `t` lives in `U`
 
