@@ -53,6 +53,8 @@ element of `Q − Q₀` does *not* square to `1`.
   — `t ∈ U`, which is what lets §4 use the *same* involution inside `U`.
 * `Hypothesis.theoremAInductionBelow_centralizerActionQuotient` — the induction
   hypothesis passes to the faithful centralizer quotient, so §2/§3 can be run there.
+* `exists_sq_eq_one_of_odd_kernel` — involutions lift through an odd-order normal
+  subgroup, the crux of the `Q₀`-analogue of `centralizerQQuotientEquiv`.
 -/
 
 set_option autoImplicit false
@@ -298,6 +300,40 @@ theorem theoremAInductionBelow_centralizerActionQuotient {X : Subgroup G}
   letI := hyp.centralizerQuotientMulAction hXV
   intro A Λ _ _ _ hlt hA
   exact ih (hlt.trans (hyp.card_centralizerActionQuotient_lt hXV hX)) hA
+
+/-! ### Involutions lift through an odd-order kernel
+
+The `Q₀`-analogue of `centralizerQQuotientEquiv` needs more than the `Q`-version: `Q₀` is
+the *derived* subgroup `{x | x² = 1 ∧ x ∈ H}`, so surjectivity onto `Q̄₀` asks for a
+preimage that is again an involution.  That is exactly the statement below, and it holds
+because the kernel `𝒩(C_G(X)) ≤ C_D(X)` has odd order (`Hypothesis.D_odd`).
+-/
+
+/-- **An involution of `L/N` lifts to an involution of `L` when `|N|` is odd.**
+
+Pick any preimage `x`.  Then `x² ∈ N`, so `d := orderOf (x²)` divides `|N|` and is odd;
+`y := x^d` satisfies `y² = (x²)^d = 1`, and `ȳ = x̄^d = x̄` because `x̄² = 1` and `d` is
+odd. -/
+theorem exists_sq_eq_one_of_odd_kernel {L : Type*} [Group L] [Finite L]
+    {N : Subgroup L} [N.Normal] (hN : Odd (Nat.card ↥N)) {z : L ⧸ N} (h2 : z ^ 2 = 1) :
+    ∃ y : L, y ^ 2 = 1 ∧ QuotientGroup.mk' N y = z := by
+  classical
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective N z
+  have hx2N : x ^ 2 ∈ N := by
+    rw [← QuotientGroup.eq_one_iff]
+    simpa using h2
+  have hdvd : orderOf (⟨x ^ 2, hx2N⟩ : ↥N) ∣ Nat.card ↥N := orderOf_dvd_natCard _
+  obtain ⟨c, hc⟩ := hdvd
+  rw [hc] at hN
+  have hdodd : Odd (orderOf (⟨x ^ 2, hx2N⟩ : ↥N)) := (Nat.odd_mul.mp hN).1
+  have hsq : (x ^ 2) ^ orderOf (⟨x ^ 2, hx2N⟩ : ↥N) = 1 :=
+    congrArg (Subtype.val (p := fun w => w ∈ N))
+      (pow_orderOf_eq_one (⟨x ^ 2, hx2N⟩ : ↥N))
+  refine ⟨x ^ orderOf (⟨x ^ 2, hx2N⟩ : ↥N), ?_, ?_⟩
+  · rw [← pow_mul, mul_comm, pow_mul]
+    exact hsq
+  · obtain ⟨k, hk⟩ := hdodd
+    rw [hk, map_pow, pow_add, pow_mul, h2, one_pow, one_mul, pow_one]
 
 /-! ## The standing hypothesis of §4 -/
 
