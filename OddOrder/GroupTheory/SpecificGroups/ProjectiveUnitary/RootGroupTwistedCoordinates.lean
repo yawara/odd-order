@@ -41,6 +41,8 @@ the trace term `u · Tr(a c̄)` needed to convert the cocycle `a c̄` into an `F
   root group.
 * `ProjectiveUnitary.norm_cocycle` — the coboundary of `a ↦ u a ā` is `u · Tr(a c̄)`.
 * `ProjectiveUnitary.rootBilin` — the corrected cocycle `x ȳ + u Tr(x ȳ)`, `F`-valued.
+* `ProjectiveUnitary.rootBilin_diag_coe`, `ProjectiveUnitary.rootBilin_anisotropic` — its
+  diagonal is the Hermitian norm, hence anisotropic.
 * `ProjectiveUnitary.toTwistedProduct` — the isomorphism
   `RootGroup n ≃* BilinearTwistedProduct (rootBilin …)`.
 -/
@@ -164,6 +166,32 @@ noncomputable def rootBilin (hn : 0 < n) {u : Field n}
   rw [rootBilin]
   change correctedBilin n u x y = _
   rw [correctedBilin_apply]
+
+/-- **The corrected cocycle has the Hermitian norm as its diagonal.**
+
+The correction vanishes on the diagonal: `a ā` already lies in `F`, so its trace is zero.
+This is the invariant along which `rootBilin` is to be matched with Chapter III §3's
+cocycle, whose diagonal is the square map of `Q`. -/
+@[simp] theorem rootBilin_diag_coe (hn : 0 < n) {u : Field n}
+    (hu : frobTrace (E := Field n) n u = 1) (x : Field n) :
+    ((rootBilin hn hu x x : ↥(frobFixedSubfield (Field n) 2 n)) : Field n)
+      = x * star x := by
+  rw [rootBilin_apply_coe hn hu,
+    (frobTrace_eq_zero_iff n (x * star x)).mpr (norm_mem_frobFixed hn x), mul_zero, add_zero]
+
+/-- **The corrected cocycle is anisotropic** — the Hermitian norm has no nontrivial
+zero. -/
+theorem rootBilin_anisotropic (hn : 0 < n) {u : Field n}
+    (hu : frobTrace (E := Field n) n u = 1) {x : Field n} (hx : x ≠ 0) :
+    rootBilin hn hu x x ≠ 0 := by
+  intro hc
+  have hval : ((rootBilin hn hu x x : ↥(frobFixedSubfield (Field n) 2 n)) : Field n) = 0 := by
+    rw [hc]
+    rfl
+  rw [rootBilin_diag_coe hn hu] at hval
+  rcases mul_eq_zero.mp hval with h | h
+  · exact hx h
+  · exact hx (star_eq_zero.mp h)
 
 /-! ## The isomorphism -/
 
