@@ -53,8 +53,11 @@ element of `Q − Q₀` does *not* square to `1`.
   — `t ∈ U`, which is what lets §4 use the *same* involution inside `U`.
 * `Hypothesis.theoremAInductionBelow_centralizerActionQuotient` — the induction
   hypothesis passes to the faithful centralizer quotient, so §2/§3 can be run there.
-* `exists_sq_eq_one_of_odd_kernel` — involutions lift through an odd-order normal
-  subgroup, the crux of the `Q₀`-analogue of `centralizerQQuotientEquiv`.
+* `exists_pow_sq_eq_one_of_odd_kernel`, `exists_sq_eq_one_of_odd_kernel`,
+  `map_involutionSet_eq_of_odd_kernel` — involutions lift through an odd-order normal
+  subgroup, so the involution set of `H` maps *onto* that of `H̄`.  Since `Q₀` is the
+  derived subgroup `{x | x² = 1 ∧ x ∈ H}`, this is the `Q₀`-analogue of
+  `centralizerQQuotientEquiv` at the set level.
 -/
 
 set_option autoImplicit false
@@ -314,11 +317,12 @@ because the kernel `𝒩(C_G(X)) ≤ C_D(X)` has odd order (`Hypothesis.D_odd`).
 Pick any preimage `x`.  Then `x² ∈ N`, so `d := orderOf (x²)` divides `|N|` and is odd;
 `y := x^d` satisfies `y² = (x²)^d = 1`, and `ȳ = x̄^d = x̄` because `x̄² = 1` and `d` is
 odd. -/
-theorem exists_sq_eq_one_of_odd_kernel {L : Type*} [Group L] [Finite L]
-    {N : Subgroup L} [N.Normal] (hN : Odd (Nat.card ↥N)) {z : L ⧸ N} (h2 : z ^ 2 = 1) :
-    ∃ y : L, y ^ 2 = 1 ∧ QuotientGroup.mk' N y = z := by
+theorem exists_pow_sq_eq_one_of_odd_kernel {L : Type*} [Group L] [Finite L]
+    {N : Subgroup L} [N.Normal] (hN : Odd (Nat.card ↥N)) {x : L}
+    (h2 : (QuotientGroup.mk' N x) ^ 2 = 1) :
+    ∃ d : ℕ, (x ^ d) ^ 2 = 1 ∧
+      QuotientGroup.mk' N (x ^ d) = QuotientGroup.mk' N x := by
   classical
-  obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective N z
   have hx2N : x ^ 2 ∈ N := by
     rw [← QuotientGroup.eq_one_iff]
     simpa using h2
@@ -329,11 +333,40 @@ theorem exists_sq_eq_one_of_odd_kernel {L : Type*} [Group L] [Finite L]
   have hsq : (x ^ 2) ^ orderOf (⟨x ^ 2, hx2N⟩ : ↥N) = 1 :=
     congrArg (Subtype.val (p := fun w => w ∈ N))
       (pow_orderOf_eq_one (⟨x ^ 2, hx2N⟩ : ↥N))
-  refine ⟨x ^ orderOf (⟨x ^ 2, hx2N⟩ : ↥N), ?_, ?_⟩
+  refine ⟨orderOf (⟨x ^ 2, hx2N⟩ : ↥N), ?_, ?_⟩
   · rw [← pow_mul, mul_comm, pow_mul]
     exact hsq
   · obtain ⟨k, hk⟩ := hdodd
     rw [hk, map_pow, pow_add, pow_mul, h2, one_pow, one_mul, pow_one]
+
+/-- **An involution of `L/N` lifts to an involution of `L` when `|N|` is odd** — the
+preimage-free form of `exists_pow_sq_eq_one_of_odd_kernel`. -/
+theorem exists_sq_eq_one_of_odd_kernel {L : Type*} [Group L] [Finite L]
+    {N : Subgroup L} [N.Normal] (hN : Odd (Nat.card ↥N)) {z : L ⧸ N} (h2 : z ^ 2 = 1) :
+    ∃ y : L, y ^ 2 = 1 ∧ QuotientGroup.mk' N y = z := by
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective N z
+  obtain ⟨d, hd1, hd2⟩ := exists_pow_sq_eq_one_of_odd_kernel hN h2
+  exact ⟨x ^ d, hd1, hd2⟩
+
+/-- **The involutions of `H` map onto the involutions of `H̄`** when the kernel `N ≤ H`
+has odd order.
+
+This is `Q₀ ↦ Q̄₀` at the set level: `Q₀ = {x | x² = 1 ∧ x ∈ H}` is a *derived*
+subgroup, so the `Q₀`-analogue of `centralizerQQuotientEquiv` reduces to this.  `⊆` is
+immediate; `⊇` picks a preimage *inside `H`* and replaces it by an odd power
+(`exists_pow_sq_eq_one_of_odd_kernel`), which stays in `H`. -/
+theorem map_involutionSet_eq_of_odd_kernel {L : Type*} [Group L] [Finite L]
+    {N H : Subgroup L} [N.Normal] (hN : Odd (Nat.card ↥N)) :
+    (QuotientGroup.mk' N) '' {x : L | x ^ 2 = 1 ∧ x ∈ H}
+      = {z : L ⧸ N | z ^ 2 = 1 ∧ z ∈ H.map (QuotientGroup.mk' N)} := by
+  ext z
+  constructor
+  · rintro ⟨x, ⟨hx2, hxH⟩, rfl⟩
+    exact ⟨by rw [← map_pow, hx2, map_one], Subgroup.mem_map_of_mem _ hxH⟩
+  · rintro ⟨hz2, hzH⟩
+    obtain ⟨x, hxH, rfl⟩ := hzH
+    obtain ⟨d, hd1, hd2⟩ := exists_pow_sq_eq_one_of_odd_kernel hN hz2
+    exact ⟨x ^ d, ⟨hd1, H.pow_mem hxH d⟩, hd2⟩
 
 /-! ## The standing hypothesis of §4 -/
 
