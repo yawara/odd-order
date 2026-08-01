@@ -45,6 +45,8 @@ The chapter uses these mappings to pin down `G` in the characterization of
   one, by uniqueness of the canonical factorization.
 * `IsFGH.map` — its quotient counterpart: along a homomorphism carrying one setup into
   another, the triple downstairs is the image of the triple upstairs.
+* `Setup.restrict` — a setup restricts to a subgroup containing `t` whose intersection
+  with `Q` absorbs the `Q`-parts of the two decompositions.
 * `IsFGH.dOrbitRel_f`, `IsFGH.dOrbitRel_fj_cube` — `⟨f, j⟩` acts on the `D`-orbits of
   `Q^#` as a quotient of the dihedral group of order `6`.
 * `coordsEquiv`, `coords_smul_t_some`, `coords_smul_some_of_mem_M` — the permutation
@@ -359,6 +361,69 @@ theorem IsFGH.map {L' : Type*} [Group L'] {M' Q' D' : Subgroup L'} {t' : L'}
     exact congrArg π (H.eq x hxQ hx1')
   exact fgh_eq_of_canonical hS' H' (hQπ x hxQ) hx1 (hQπ _ hgQ) (hDπ _ hhD)
     (hQπ _ hfQ) hcan
+
+/-- **A rank-one setup restricts to a subgroup that contains `t` and absorbs the
+`Q`-parts.**
+
+Both decompositions a `Setup` asks for are *unique* in the ambient group, so a subgroup
+`K ∋ t` inherits them as soon as their factors lie in `K` — and only the `Q`-part has to
+be checked: the other factor is then a quotient of elements of `K`.
+
+Peterfalvi Part II, Ch. IV §4, step (2) (p. 133) uses it for `K = U = O^{2′}(C_G(P))`,
+where the absorption holds because conjugation by `P` fixes the canonical form, putting
+its `Q`-part in `C_Q(P)`, and `C_Q(P) ≤ U`. -/
+theorem Setup.restrict (hS : Setup M Q D t) {K : Subgroup L} (htK : t ∈ K)
+    (habsFact : ∀ y ∈ K, y ∉ M → ∀ x ∈ M, ∀ q ∈ Q, y = x * t * q → q ∈ K)
+    (habsSplit : ∀ a ∈ K, a ∈ M → ∀ q ∈ Q, ∀ d ∈ D, a = q * d → q ∈ K) :
+    Setup (M.subgroupOf K) (Q.subgroupOf K) (D.subgroupOf K) (⟨t, htK⟩ : ↥K) where
+  QM := fun _ hx => hS.QM hx
+  DM := fun _ hx => hS.DM hx
+  invol := Subtype.ext hS.invol
+  Dstab := fun d hd => hS.Dstab (d : L) hd
+  DQ := fun d hd q hq => hS.DQ (d : L) hd (q : L) hq
+  split := by
+    intro a ha
+    obtain ⟨⟨q, d⟩, hqd, huniq⟩ := hS.split (a : L) ha
+    have hqK : (q : L) ∈ K :=
+      habsSplit (a : L) a.2 ha (q : L) q.2 (d : L) d.2 hqd
+    have hdK : (d : L) ∈ K := by
+      have hd : (d : L) = (q : L)⁻¹ * (a : L) := by rw [hqd]; group
+      rw [hd]
+      exact K.mul_mem (K.inv_mem hqK) a.2
+    refine ⟨(⟨⟨(q : L), hqK⟩, Subgroup.mem_subgroupOf.mpr q.2⟩,
+      ⟨⟨(d : L), hdK⟩, Subgroup.mem_subgroupOf.mpr d.2⟩), Subtype.ext hqd, ?_⟩
+    rintro ⟨q', d'⟩ heq
+    have hpair := huniq (⟨((q' : ↥K) : L), Subgroup.mem_subgroupOf.mp q'.2⟩,
+      ⟨((d' : ↥K) : L), Subgroup.mem_subgroupOf.mp d'.2⟩)
+      (congrArg (Subtype.val (p := fun z => z ∈ K)) heq)
+    exact Prod.ext (Subtype.ext (Subtype.ext (congrArg
+        (Subtype.val (p := fun z => z ∈ Q)) (congrArg Prod.fst hpair))))
+      (Subtype.ext (Subtype.ext (congrArg
+        (Subtype.val (p := fun z => z ∈ D)) (congrArg Prod.snd hpair))))
+  fact := by
+    intro y hy
+    have hyM : (y : L) ∉ M := fun hc => hy (Subgroup.mem_subgroupOf.mpr hc)
+    obtain ⟨⟨x, q⟩, hxq, huniq⟩ := hS.fact (y : L) hyM
+    have hqK : (q : L) ∈ K :=
+      habsFact (y : L) y.2 hyM (x : L) x.2 (q : L) q.2 hxq
+    have hxK : (x : L) ∈ K := by
+      have hx : (x : L) = (y : L) * (q : L)⁻¹ * t⁻¹ := by rw [hxq]; group
+      rw [hx]
+      exact K.mul_mem (K.mul_mem y.2 (K.inv_mem hqK)) (K.inv_mem htK)
+    refine ⟨(⟨⟨(x : L), hxK⟩, Subgroup.mem_subgroupOf.mpr x.2⟩,
+      ⟨⟨(q : L), hqK⟩, Subgroup.mem_subgroupOf.mpr q.2⟩), Subtype.ext hxq, ?_⟩
+    rintro ⟨x', q'⟩ heq
+    have hpair := huniq (⟨((x' : ↥K) : L), Subgroup.mem_subgroupOf.mp x'.2⟩,
+      ⟨((q' : ↥K) : L), Subgroup.mem_subgroupOf.mp q'.2⟩)
+      (congrArg (Subtype.val (p := fun z => z ∈ K)) heq)
+    exact Prod.ext (Subtype.ext (Subtype.ext (congrArg
+        (Subtype.val (p := fun z => z ∈ M)) (congrArg Prod.fst hpair))))
+      (Subtype.ext (Subtype.ext (congrArg
+        (Subtype.val (p := fun z => z ∈ Q)) (congrArg Prod.snd hpair))))
+  tnotmem := fun hc => hS.tnotmem (Subgroup.mem_subgroupOf.mp hc)
+  tconj := by
+    intro x hxQ hx1 hc
+    exact hS.tconj (x : L) hxQ (fun hcc => hx1 (Subtype.ext hcc)) hc
 
 /-! ## The three canonical factorizations
 
