@@ -704,6 +704,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StarEquation
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3InverseFormula
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFive
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
