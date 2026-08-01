@@ -2094,7 +2094,7 @@ Ch. I §1 Prop 4 と同じ論法)。
 - [x] `f`, `g`, `h` の存在と一意性 — **完了** (2026-07-31,
   `GroupTheory/RankOneBNPair.lean`: `exists_fgh` / `fgh_unique`)
 - [~] (H1)-(H6) — (H1)(H3) 完了 (2026-07-31)
-- [ ] Lemma (`f` が `L` を決める)
+- [x] Lemma (`f` が `L` を決める) — **完了** (2026-08-01, `GroupTheory/RankOneBNPairRigidity.lean`)
 - [ ] §2 以降の調査 (ページ画像で式を確定) → 段ごとに issue 更新
 - [ ] Theorem A の結論への接続
 
@@ -2830,4 +2830,40 @@ eta により `⟨(kv.2 : G), kv.2.2⟩` と `kv.2` は defeq で、
    未チェック項目。§1 の Lemma で、**Corollary 1 の前提**。⟹ 上流優先でこれが次。
 2. **Corollary 1** (p.132) — `O^{2'}(G) ≅ PSU(3,q)`。1. の上に乗る。
 3. **§4** (p.132-134、`V ≠ W` の場合)。段 (1)(2)… ⚠ Ch. I §3 Prop 1(c) /
+   Ch. I §2 Prop 3 / Ch. II (11) を引くので repo 対応物の実測が先。
+
+## 2026-08-01 (36): 🎯 §1 の Lemma (`f` が `L` を決める) landing
+
+新 leaf **`OddOrder/GroupTheory/RankOneBNPairRigidity.lean`** (366 行、警告 0)。
+書籍 p.123 の Lemma を、既存の置換モデルを準同型にまとめて形式化した。
+
+| 結果 | 内容 |
+|---|---|
+| `permHom : L →* Equiv.Perm (Option ↥Q)` | `MulAction.toPermHom L (L ⧸ M)` を `coordsEquiv` 経由で読んだもの |
+| `permHom_ker` | `= M.normalCore` (忠実性 = `Subgroup.normalCore_eq_ker`) |
+| `permHom_range_eq` | `L = ⟨M,t⟩` ⟹ 像 = ⟨`t` の置換, `M` の置換たち⟩ |
+| `permHom_map_conjQ_eq` | `⟨Q^x⟩ = ⟨Q,Q^t⟩` ⟹ 像 = ⟨`Q` の置換, その `t`-共役⟩ |
+| `mulEquivOfPermMatch` / `conjQMulEquivOfPermMatch` | 生成元対応 ⟹ `L ≃* L'` / `⟨Q^x⟩ ≃* ⟨Q'^x⟩` |
+| `mAct` (+`qPart`/`dPart`/`mAct_eq`) | `Setup.split` の `Q`-成分を名付けた `M` の点集合 `Q` への作用 |
+| **`mulEquivOfData`** | 書籍の言葉: `εQ` が基点と `f` を、`θ : M ≃* M'` が `mAct` を保てば `L ≃* L'` |
+
+### ⚠ 実装メモ
+
+1. `Equiv.optionCongr_symm` は **`optionCongr e.symm = (optionCongr e).symm`** の向き。
+   `(optionCongr e).symm` を潰すには **`rw [← Equiv.optionCongr_symm]`**。
+2. `Equiv.Perm` の等式に `ext o` を使うと `Option.ext` まで降りて `↔` が出る
+   (`... = some a ↔ ... = some a`)。**`refine Equiv.ext fun o => ?_`** を使う。
+3. `Equiv.permCongrHom` は `MulEquiv`。`⇑↑e` (MonoidHom 経由) と `⇑e` は
+   syntactic に別物なので `Subgroup.map` 後は **`simp only [MonoidHom.coe_coe]`** で揃える。
+   `Subgroup.map_closure` は存在せず **`MonoidHom.map_closure`**。
+4. `MonoidHom.ker_mulEquiv_comp` は `(↑iso).comp f` の形を要求し
+   `iso.toMonoidHom.comp f` と合わない → `permHom_ker` は `MulEquiv.map_eq_one_iff` で直に書いた。
+
+### ⚠ 次セッションはここから
+
+1. **Corollary 1** (p.132) — `O^{2'}(G) ≅ PSU(3,q)`、`V = W` なら
+   `G ≅ PSU(3,q)` or `PGU(3,q)`。⚠ 先に実測すること:
+   `GroupTheory/SpecificGroups/ProjectiveUnitary/*` に何があるか
+   (PSU(3,q) の構成・位数・`O^{2'}`・PGU との関係)。
+2. **§4** (p.132-134、`V ≠ W` の場合)。段 (1)(2)… ⚠ Ch. I §3 Prop 1(c) /
    Ch. I §2 Prop 3 / Ch. II (11) を引くので repo 対応物の実測が先。
