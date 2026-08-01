@@ -909,3 +909,82 @@ theorem frobNormEquiv_symm_sq_of_fixed {E : Type*} [Field E] [Finite E]
     _ = u := hspec
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
+
+/-- **The counting step behind `θ = 1`** (Peterfalvi Part II, p. 130, §3 stage (3)).
+
+If an injective additive map `θ` on a field of characteristic `2` satisfies
+`X + θ X = c` for every `X` outside the two-element set `{0, z}`, and the field has at
+least `5` elements, then `θ` is the identity.
+
+This is the book's
+
+> `c = X + Y + (X+Y)^θ = c + c = 0`.  Thus `X^θ = X` for `X ∈ F − {0, α^{2τ}}`, whence
+> `θ = 1`.
+
+Pick `X` outside `{0, z}` and then `Y` outside the four values `0, z, X, X + z`, so that
+`X`, `Y` and `X + Y` all lie where the hypothesis applies; additivity then gives
+`c = c + c`, i.e. `c = 0`.  The remaining point `z` is fixed because `θ` is injective and
+already fixes everything else.
+
+The book's `|F| ≥ 8` comes from `θ` having odd order in the cyclic automorphism group of
+`F`; `5` is all the counting needs. -/
+theorem eq_self_of_add_eq_const {F : Type*} [Field F] [Finite F] (h2 : (2 : F) = 0)
+    (θ : F →+ F) (hinj : Function.Injective θ) {z c : F}
+    (hconst : ∀ X : F, X ≠ 0 → X ≠ z → X + θ X = c)
+    (hcard : 5 ≤ Nat.card F) (X : F) : θ X = X := by
+  classical
+  haveI : Fintype F := Fintype.ofFinite F
+  have hcardF : 5 ≤ Fintype.card F := by rwa [← Nat.card_eq_fintype_card]
+  -- an element outside `{0, z}`
+  obtain ⟨x, hx⟩ : ∃ x : F, x ∉ ({0, z} : Finset F) := by
+    by_contra hcon
+    push Not at hcon
+    have hle := Finset.card_le_card (fun a (_ : a ∈ Finset.univ) => hcon a)
+    rw [Finset.card_univ] at hle
+    have e1 := Finset.card_insert_le (0 : F) {z}
+    have e2 : ({z} : Finset F).card = 1 := Finset.card_singleton _
+    omega
+  -- an element outside `{0, z, x, x + z}`
+  obtain ⟨y, hy⟩ : ∃ y : F, y ∉ ({0, z, x, x + z} : Finset F) := by
+    by_contra hcon
+    push Not at hcon
+    have hle := Finset.card_le_card (fun a (_ : a ∈ Finset.univ) => hcon a)
+    rw [Finset.card_univ] at hle
+    have e1 := Finset.card_insert_le (0 : F) {z, x, x + z}
+    have e2 := Finset.card_insert_le z ({x, x + z} : Finset F)
+    have e3 := Finset.card_insert_le x ({x + z} : Finset F)
+    have e4 : ({x + z} : Finset F).card = 1 := Finset.card_singleton _
+    omega
+  simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hx hy
+  obtain ⟨hx0, hxz⟩ := hx
+  obtain ⟨hy0, hyz, hyx, hyxz⟩ := hy
+  -- `x + y` also avoids `{0, z}`
+  have hxy0 : x + y ≠ 0 := by
+    intro hc
+    exact hyx (by linear_combination hc - x * h2)
+  have hxyz : x + y ≠ z := by
+    intro hc
+    exact hyxz (by linear_combination hc - x * h2)
+  -- `c = 0`
+  have hc0 : c = 0 := by
+    have e1 := hconst x hx0 hxz
+    have e2 := hconst y hy0 hyz
+    have e3 := hconst (x + y) hxy0 hxyz
+    rw [map_add] at e3
+    linear_combination e3 - e1 - e2
+  -- everything outside `{0, z}` is fixed
+  have hfix : ∀ V : F, V ≠ 0 → V ≠ z → θ V = V := by
+    intro V h0 hz
+    have hV := hconst V h0 hz
+    rw [hc0] at hV
+    linear_combination hV - V * h2
+  rcases eq_or_ne X 0 with rfl | hX0
+  · exact map_zero θ
+  rcases eq_or_ne X z with rfl | hXz
+  · rcases eq_or_ne X (0 : F) with rfl | hz0
+    · exact map_zero θ
+    by_contra hne
+    have hθz0 : θ X ≠ 0 := fun hc => hz0 (hinj (by rw [hc, map_zero]))
+    exact hne (hinj (hfix (θ X) hθz0 hne))
+  · exact hfix X hX0 hXz
+
