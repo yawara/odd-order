@@ -43,6 +43,8 @@ hypothesis, and then reads off `h(ω⁻¹) = ζ⁻³` from (H5) — a step the b
 * `Hypothesis.exists_mem_K_mu_sq_inv_eq` — the scalars `a⁻²` sweep `F^×`, so that `(∗)`
   is available at every `X ∈ F^×`.
 * `Hypothesis.stepThree` — §3's stage (3): `θ = 1` and `ω² = (0, ζ + ζ⁻¹)`.
+* `Hypothesis.thetaModel_eq_id_on_frobFixed` — the model's `θ` and `σ` are both the
+  identity on `F`, so stage (3) really is the book's `θ = 1`.
 -/
 
 set_option autoImplicit false
@@ -848,6 +850,77 @@ theorem stepThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hyp.mu_W_add_inv_mem_frobFixed M ⟨ζ, hζ⟩) hzmem
     (hyp.mu_W_add_inv_ne_zero M hmu (fun hc => hζ1 (congrArg Subtype.val hc)))
     hcard hstar
+
+/-- **The model's `θ` is the identity on `F` — and so is `σ`** (Peterfalvi Part II, p. 130,
+reconciling the two `θ`'s of §3).
+
+Ch. III §3 produces a cocycle `φ` that is `F`-semilinear with a twist `θ` (`hsemi`) and is
+scaled by `μ(k)^d` under the action of `k ∈ K` (`hscaleQ0`).  Evaluating both at `x = y = 1`
+— legitimate because `φ` is anisotropic, so `φ(1,1) ≠ 0` — identifies the two scalars:
+
+  `μ(k) · θ(μ(k)) = μ(k)^d`.
+
+The scaling pair of the same Proposition reads the very same `μ(k)^d` as `σ(μ(k)) τ(μ(k))`
+(`hpair`).  Once §3 (3) has identified `σ` with `τ` on `F` (`hστ`), and since `μ` covers all
+of `F^×`, this says `σ(a)² = a · θ(a)` throughout `F` — which by `eq_id_of_sq_eq_mul_on`
+forces both maps to be the identity there.
+
+So the book's normalization `{μ|_F, ν|_F} = {1_F, θ}` is *forced*, and `stepThree`'s
+conclusion is literally the book's `θ = 1`. -/
+theorem thetaModel_eq_id_on_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) (sfive : hyp.LemmaFiveSetup m)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (σ τ θm : M.E →+* M.E) (d : ℤ)
+    (hsemi : ∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+      ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E), ∀ x y : M.E,
+        ((φ (a * x) (b * y) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = a * θm b *
+            ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (haniso : ∀ x : M.E, x ≠ 0 → φ x x ≠ 0)
+    (hscaleQ0 : ∀ k : ↥hyp.actualKActor, ∀ x y : M.E,
+      ((φ (((M.mu (k, 1) : M.Eˣ) : M.E) * x) (((M.mu (k, 1) : M.Eˣ) : M.E) * y) :
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hpair : ∀ k : ↥hyp.actualKActor,
+      σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
+    (hστ : ∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, σ a = τ a) :
+    (∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, σ a = a) ∧
+      (∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, θm a = a) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have h2E : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  -- `φ(1,1) ≠ 0`, by anisotropy
+  have hφ1 : ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) ≠ 0 := by
+    intro hc
+    exact haniso 1 one_ne_zero (Subtype.ext hc)
+  -- the model's scaling law: `μ(k) · θ(μ(k)) = μ(k)^d`
+  have hmodel : ∀ k : ↥hyp.actualKActor,
+      ((M.mu (k, 1) : M.Eˣ) : M.E) * θm ((M.mu (k, 1) : M.Eˣ) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) := by
+    intro k
+    have hmemF : ((M.mu (k, 1) : M.Eˣ) : M.E)
+        ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E) :=
+      OddOrder.FiniteField.mem_frobFixedSubfield.mpr (M.mu_K_frobFixed k)
+    have h1 := hsemi _ hmemF _ hmemF 1 1
+    have h2 := hscaleQ0 k 1 1
+    rw [mul_one] at h1 h2
+    exact mul_right_cancel₀ hφ1 (h1.symm.trans h2)
+  -- `σ(a)² = a · θ(a)` on all of `F`
+  have hkey : ∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
+      σ a ^ 2 = a * θm a := by
+    intro a ha
+    rcases eq_or_ne a 0 with rfl | ha0
+    · simp
+    obtain ⟨k, hk⟩ := hyp.exists_actualKActor_mu_eq sfive M hm hQ0card ha ha0
+    calc σ a ^ 2 = σ a * τ a := by rw [pow_two, hστ a ha]
+      _ = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) := by rw [← hk]; exact hpair k
+      _ = a * θm a := by rw [← hk]; exact (hmodel k).symm
+  exact eq_id_of_sq_eq_mul_on h2E _ σ θm hkey
 
 end Hypothesis
 
