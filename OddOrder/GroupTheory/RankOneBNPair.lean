@@ -47,6 +47,7 @@ The chapter uses these mappings to pin down `G` in the characterization of
   another, the triple downstairs is the image of the triple upstairs.
 * `Setup.restrict` — a setup restricts to a subgroup containing `t` whose intersection
   with `Q` absorbs the `Q`-parts of the two decompositions.
+* `Setup.quotient` — and descends to the quotient by a normal subgroup of `D`.
 * `IsFGH.dOrbitRel_f`, `IsFGH.dOrbitRel_fj_cube` — `⟨f, j⟩` acts on the `D`-orbits of
   `Q^#` as a quotient of the dihedral group of order `6`.
 * `coordsEquiv`, `coords_smul_t_some`, `coords_smul_some_of_mem_M` — the permutation
@@ -424,6 +425,109 @@ theorem Setup.restrict (hS : Setup M Q D t) {K : Subgroup L} (htK : t ∈ K)
   tconj := by
     intro x hxQ hx1 hc
     exact hS.tconj (x : L) hxQ (fun hcc => hx1 (Subtype.ext hcc)) hc
+
+/-- **A rank-one setup descends to a quotient by a normal subgroup of `D`.**
+
+Both decompositions survive because the kernel `N` sits inside `D`, so it never disturbs
+the `Q`-factor: in `split`, two lifts differ by an `n ∈ N ≤ D` that is absorbed into the
+`D`-factor; in `fact`, the shift `a' t b' n = a'(t n t) · t · (n⁻¹ b' n)` puts `t n t ∈ N`
+into the `M`-factor and conjugates the `Q`-factor by `n`, so both become invisible
+downstairs.
+
+Peterfalvi Part II, Ch. IV §4, step (2) (p. 133) uses it for `U → U/Z(U)`, where the
+kernel `Z(U) = P ∩ U` lies in `D` because `P ≤ V ≤ D`. -/
+theorem Setup.quotient (hS : Setup M Q D t) {N : Subgroup L} [N.Normal] (hND : N ≤ D) :
+    Setup (M.map (QuotientGroup.mk' N)) (Q.map (QuotientGroup.mk' N))
+      (D.map (QuotientGroup.mk' N)) (QuotientGroup.mk' N t) := by
+  classical
+  have hNM : N ≤ M := hND.trans hS.DM
+  have hmem : ∀ (K : Subgroup L), N ≤ K → ∀ x : L,
+      QuotientGroup.mk' N x ∈ K.map (QuotientGroup.mk' N) ↔ x ∈ K := by
+    intro K hNK x
+    refine ⟨?_, fun hx => ⟨x, hx, rfl⟩⟩
+    rintro ⟨y, hy, hxy⟩
+    have hz : y⁻¹ * x ∈ N := QuotientGroup.eq.mp hxy
+    have hx : x = y * (y⁻¹ * x) := by group
+    rw [hx]
+    exact K.mul_mem hy (hNK hz)
+  have htNt : ∀ n ∈ N, t * n * t ∈ N := by
+    intro n hn
+    have h := ‹N.Normal›.conj_mem n hn t
+    rwa [hS.tinv] at h
+  refine ⟨Subgroup.map_mono hS.QM, Subgroup.map_mono hS.DM, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · rw [← map_mul, hS.invol, map_one]
+  · rintro _ ⟨d, hd, rfl⟩
+    exact ⟨t * d * t, hS.Dstab d hd, by rw [map_mul, map_mul]⟩
+  · rintro _ ⟨d, hd, rfl⟩ _ ⟨q, hq, rfl⟩
+    exact ⟨d⁻¹ * q * d, hS.DQ d hd q hq, by rw [map_mul, map_mul, map_inv]⟩
+  · -- `split`
+    rintro _ ⟨a, ha, rfl⟩
+    obtain ⟨⟨q, d⟩, hqd, huniq⟩ := hS.split a ha
+    refine ⟨(⟨QuotientGroup.mk' N (q : L), ⟨(q : L), q.2, rfl⟩⟩,
+      ⟨QuotientGroup.mk' N (d : L), ⟨(d : L), d.2, rfl⟩⟩), by
+        change QuotientGroup.mk' N a
+          = QuotientGroup.mk' N (q : L) * QuotientGroup.mk' N (d : L)
+        rw [← map_mul, ← hqd], ?_⟩
+    rintro ⟨⟨_, q', hq', rfl⟩, ⟨_, d', hd', rfl⟩⟩ heq
+    rw [← map_mul] at heq
+    set n : L := (q' * d')⁻¹ * a with hndef
+    have hn : n ∈ N := QuotientGroup.eq.mp heq.symm
+    have hsplit : a = q' * (d' * n) := by rw [hndef]; group
+    have hpair := huniq (⟨q', hq'⟩, ⟨d' * n, D.mul_mem hd' (hND hn)⟩) hsplit
+    have hq₁ : q' = (q : L) :=
+      congrArg (Subtype.val (p := fun z => z ∈ Q)) (congrArg Prod.fst hpair)
+    have hd₁ : d' * n = (d : L) :=
+      congrArg (Subtype.val (p := fun z => z ∈ D)) (congrArg Prod.snd hpair)
+    refine Prod.ext (Subtype.ext (congrArg (QuotientGroup.mk' N) hq₁)) (Subtype.ext ?_)
+    refine QuotientGroup.eq.mpr ?_
+    rw [← hd₁]
+    simpa using hn
+  · -- `fact`
+    rintro yq hy
+    obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective N yq
+    have hyM : y ∉ M := fun hc => hy ((hmem M hNM y).mpr hc)
+    obtain ⟨⟨a, b⟩, hab, huniq⟩ := hS.fact y hyM
+    refine ⟨(⟨QuotientGroup.mk' N (a : L), ⟨(a : L), a.2, rfl⟩⟩,
+      ⟨QuotientGroup.mk' N (b : L), ⟨(b : L), b.2, rfl⟩⟩), by
+        change QuotientGroup.mk' N y = QuotientGroup.mk' N (a : L) *
+          QuotientGroup.mk' N t * QuotientGroup.mk' N (b : L)
+        rw [← map_mul, ← map_mul, ← hab], ?_⟩
+    rintro ⟨⟨_, a', ha', rfl⟩, ⟨_, b', hb', rfl⟩⟩ heq
+    rw [← map_mul, ← map_mul] at heq
+    set n : L := (a' * t * b')⁻¹ * y with hndef
+    have hn : n ∈ N := QuotientGroup.eq.mp heq.symm
+    have hshift : y = a' * (t * n * t) * t * (n⁻¹ * b' * n) := by
+      have htt : t * t = 1 := hS.invol
+      have hy' : y = a' * t * b' * n := by rw [hndef]; group
+      calc y = a' * t * b' * n := hy'
+        _ = a' * t * (n * (n⁻¹ * b' * n)) := by group
+        _ = a' * (t * n * (t * t)) * (n⁻¹ * b' * n) := by rw [htt]; group
+        _ = a' * (t * n * t) * t * (n⁻¹ * b' * n) := by group
+    have hpair := huniq (⟨a' * (t * n * t), M.mul_mem ha' (hS.DM (hS.Dstab n (hND hn)))⟩,
+      ⟨n⁻¹ * b' * n, hS.DQ n (hND hn) b' hb'⟩) hshift
+    have ha₁ : a' * (t * n * t) = (a : L) :=
+      congrArg (Subtype.val (p := fun z => z ∈ M)) (congrArg Prod.fst hpair)
+    have hb₁ : n⁻¹ * b' * n = (b : L) :=
+      congrArg (Subtype.val (p := fun z => z ∈ Q)) (congrArg Prod.snd hpair)
+    refine Prod.ext (Subtype.ext ?_) (Subtype.ext ?_)
+    · refine QuotientGroup.eq.mpr ?_
+      rw [← ha₁]
+      have : a'⁻¹ * (a' * (t * n * t)) = t * n * t := by group
+      rw [this]
+      exact htNt n hn
+    · refine QuotientGroup.eq.mpr ?_
+      rw [← hb₁]
+      have : b'⁻¹ * (n⁻¹ * b' * n) = (b'⁻¹ * n⁻¹ * b') * n := by group
+      rw [this]
+      exact N.mul_mem (by simpa using ‹N.Normal›.conj_mem n⁻¹ (N.inv_mem hn) b'⁻¹) hn
+  · exact fun hc => hS.tnotmem ((hmem M hNM t).mp hc)
+  · rintro _ ⟨q, hq, rfl⟩ hx1 hc
+    have hq1 : q ≠ 1 := by
+      rintro rfl
+      exact hx1 (map_one _)
+    refine hS.tconj q hq hq1 ((hmem M hNM (t * q * t)).mp ?_)
+    rw [map_mul, map_mul]
+    exact hc
 
 /-! ## The three canonical factorizations
 
