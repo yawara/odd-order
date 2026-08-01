@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RankOneBNPair
+import OddOrder.GroupTheory.PrimeComplementResidual
 
 /-!
 # The rigidity Lemma of a rank-one split BN-pair
@@ -35,6 +36,9 @@ into a homomorphism `permHom : L →* Equiv.Perm (Option ↥Q)` and reads the Le
   give `L ≃* L'` and `⟨Q^x⟩ ≃* ⟨Q'^x⟩`.
 * `mulEquivOfData` — the Lemma in the book's terms: an isomorphism `M ≃* M'` compatible
   with the point sets, together with `f' ∘ ε = ε ∘ f`, gives `L ≃* L'`.
+* `closure_iUnion_conj_eq_primeComplementResidual` — for `Q` a Sylow `p`-subgroup the
+  subgroup `⟨Q^x | x ∈ L⟩` the Lemma is about is `O^{p'}(L)`, which is how Corollary 1
+  of §3 (p. 132) invokes it.
 -/
 
 set_option autoImplicit false
@@ -185,6 +189,44 @@ theorem permHom_map_conjQ_eq (hS : Setup M Q D t) :
     simp only [Function.comp_apply]
     rw [map_mul, map_mul]
   rw [hS.closure_conj_Q, MonoidHom.map_closure, Set.image_union, himg]
+
+/-! ## `⟨Q^x | x ∈ L⟩` as a residual
+
+Peterfalvi Part II, Ch. IV §3, Corollary 1 (p. 132) opens with "`O^{2'}(G) =
+⟨Q^x | x ∈ G⟩`".  The subgroup the Lemma is about is therefore the `2`-complement
+residual of `L` whenever `Q` is a Sylow `2`-subgroup, and the rigidity statements above
+apply to it verbatim.
+-/
+
+/-- `⟨H^x | x ∈ L⟩` is the normal closure of `H`. -/
+theorem closure_iUnion_conj_eq_normalClosure (H : Subgroup L) :
+    Subgroup.closure (⋃ y : L, ((fun q => y⁻¹ * q * y) '' (H : Set L)))
+      = Subgroup.normalClosure (H : Set L) := by
+  rw [Subgroup.normalClosure_eq_iSup_map_conj, Subgroup.iSup_eq_closure]
+  congr 1
+  ext x
+  simp only [Set.mem_iUnion, Set.mem_image, SetLike.mem_coe, Subgroup.coe_map]
+  constructor
+  · rintro ⟨y, q, hq, rfl⟩
+    refine ⟨y⁻¹, q, hq, ?_⟩
+    simp
+  · rintro ⟨g, q, hq, rfl⟩
+    refine ⟨g⁻¹, q, hq, ?_⟩
+    simp
+
+/-- **`⟨Q^x | x ∈ L⟩ = O^{p'}(L)` for `Q` a Sylow `p`-subgroup** (Peterfalvi Part II,
+Ch. IV §3, Corollary 1, p. 132, with `p = 2`).
+
+`primeComplementResidual` is the join of the Sylow `p`-subgroups, hence the normal
+closure of any one of them (`primeComplementResidual_eq_normalClosure`), which is
+`⟨Q^x | x ∈ L⟩`. -/
+theorem closure_iUnion_conj_eq_primeComplementResidual [Finite L] {p : ℕ} [Fact p.Prime]
+    (P : Sylow p L) :
+    Subgroup.closure
+        (⋃ y : L, ((fun q => y⁻¹ * q * y) '' ((P : Subgroup L) : Set L)))
+      = Subgroup.primeComplementResidual p L := by
+  rw [closure_iUnion_conj_eq_normalClosure,
+    Subgroup.primeComplementResidual_eq_normalClosure P]
 
 /-! ## The transport
 
