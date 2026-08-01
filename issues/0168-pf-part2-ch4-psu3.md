@@ -2787,3 +2787,47 @@ eta により `⟨(kv.2 : G), kv.2.2⟩` と `kv.2` は defeq で、
 `M.coord (mk (f (ρ x)))` なので、`QuotientGroup.eq` を剥がして
 `∃ kv, μ(kv) = fUnit⁻¹ · baseUnit` を得、`(Ψ·).quotient = e · M.coord(·)` で
 座標の等式に翻訳する。⚠ 向き (kv か kv⁻¹ か) に注意。
+
+## 2026-08-01 (35): 🎯🎯 段 (5) 完成 → **§3 が段 (4) の上で完結**
+
+### `stepFive` — 段 (5) 本体 (p.131)
+
+`ρ ∈ Q − Q₀` すべてで `f(ρ̄, y) = (ρ̄/y, 1/y)`。書籍どおり 2 ケース:
+
+* **軌道内** — 判定述語は `∃ kv, (Ψρ).quotient = μ(kv)·(Ψω).quotient`。
+  軌道条件が**商座標だけに依存する**のが効いて、`key` として括り出せる
+  (`stepFive_of_mem_orbit` を任意の点に当てる形)。
+* **軌道外** — `exists_mem_Q0_orbitOfF_eq` で `x ∈ Q₀` を取り `ρ x` に移る。
+  `orbitOfF = mk (fUnit)` と `mk (baseUnit)` の等式を `QuotientGroup.eq` で剥がし、
+  `hΨq`+`hquot` (どちらも `M.coord` に落ちる) で座標の関係
+  `(Ψ f(ρx)).quotient = μ(kv⁻¹)·(Ψω).quotient` に翻訳。
+  ⟹ `f(ρx)` のファイバー**全体**が `key` に乗る = `hsolved`。
+  `inverseFormula_symm` で `ρx` 自身の公式 (= `hbase`)、
+  `stepFive_secondCase_elem` で各 `a ∈ K` の `hstep`、
+  `stepFive_secondCase_fibre` でファイバー全体、`ρ` はそこに居る。
+
+### `corollaryTwo_of_stepFour` — Corollary 2 が無条件に
+
+`corollaryTwo` の `hfive` を `stepFive` で塞いだ。残る入力は段 (4) の被覆
+`hcover` (1 点 `ω₀ ∈ Q − Q₀` のファイバー上の逆元公式) と §2 の standing data のみ。
+
+両者とも `#print axioms` = propext / Classical.choice / Quot.sound。
+`PSU3StepFive.lean` 630 行、leaf build green・警告 0。
+
+### ⚠ 実装メモ (次に似た配線をするとき)
+
+1. `hΨq`+`hquot` で `(Ψ ⟨τ,_⟩).quotient = e * ↑(fUnit …)` を出すとき、
+   `rw [hΨq, hquot, fUnit_val]` の後に**明示の `rfl` が要る** —
+   `QuotientGroup.mk'` と `mk` の差は `rw` 末尾の自動 rfl (reducible) では閉じない。
+2. `M.Eˣ` は `CommGroup` なので `mu_kv` の移項は `mul_comm` + `inv_mul_cancel_left`
+   で済む (値レベルに落として `field_simp` する必要は無い)。
+3. `exists_mem_Q0_orbitOfF_eq` は「**`ρ` を基点に**した軌道写像が `ω` の軌道を
+   取る `x`」を返す (基点が `ρ` 側なのを取り違えない)。
+
+### ⚠ 次セッションはここから
+
+1. **`RankOneBNPair` の Lemma (`f` が `L` を決める)** — issue 冒頭「やること」の
+   未チェック項目。§1 の Lemma で、**Corollary 1 の前提**。⟹ 上流優先でこれが次。
+2. **Corollary 1** (p.132) — `O^{2'}(G) ≅ PSU(3,q)`。1. の上に乗る。
+3. **§4** (p.132-134、`V ≠ W` の場合)。段 (1)(2)… ⚠ Ch. I §3 Prop 1(c) /
+   Ch. I §2 Prop 3 / Ch. II (11) を引くので repo 対応物の実測が先。
