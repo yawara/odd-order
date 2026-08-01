@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 
 /-!
 # Transporting the standing hypothesis along an isomorphism of actions
@@ -26,7 +27,8 @@ universes of the source and target.
 * `Hypothesis.ofMulEquiv` — transport of the standing hypothesis along
   `e : A ≃* B` and an `e`-equivariant `f : Λ ≃ Λ'`.
 * `Hypothesis.ofMulEquiv_V`, `Hypothesis.ofMulEquiv_KSet`,
-  `Hypothesis.ofMulEquiv_W`, `Hypothesis.ofMulEquiv_Q0` — the *derived* subgroups
+  `Hypothesis.ofMulEquiv_W`, `Hypothesis.ofMulEquiv_Q0`,
+  `Hypothesis.ofMulEquiv_distinguishedInvolution` — the *derived* data
   transport too.  `H`, `Q`, `D` and `t` are fields, so they cross by `rfl`; `V`, `K`,
   `W` and `Q₀` are defined from them and need these lemmas.
 -/
@@ -220,6 +222,60 @@ theorem ofMulEquiv_Q0 : (h.ofMulEquiv e f hf).Q0 = h.Q0.map e.toMonoidHom := by
   · intro hb
     have h2 := congrArg e hb
     rwa [map_pow, map_one, e.apply_symm_apply] at h2
+
+/-- The distinguished involution transports.
+
+`distinguishedInvolution` is a `Classical.choose`, so it cannot be computed through the
+transport; instead `(e s, e r)` is checked against the defining conditions and uniqueness
+(`eq_distinguishedPair_of_structure`) identifies it. -/
+theorem ofMulEquiv_distinguishedInvolution :
+    (h.ofMulEquiv e f hf).distinguishedInvolution = e h.distinguishedInvolution := by
+  have ht : (h.ofMulEquiv e f hf).t = e h.t := rfl
+  refine (((h.ofMulEquiv e f hf).eq_distinguishedPair_of_structure
+    (s' := e h.distinguishedInvolution) (r' := e h.structureConjugator)
+    (Subgroup.mem_map_of_mem _ h.distinguishedInvolution_mem_H) ?_ ?_
+    (Subgroup.mem_map_of_mem _ h.distinguishedPair_spec.2.1) ?_).1).symm
+  · rw [← map_pow, h.distinguishedInvolution_sq, map_one]
+  · intro hcon
+    exact h.distinguishedInvolution_ne_one (e.injective (by rw [hcon, map_one]))
+  · rw [ht]
+    simpa only [map_mul, map_inv] using congrArg e h.distinguishedPair_spec.2.2
+
+/-- `|s t| = 3` transports. -/
+theorem ofMulEquiv_orderOf_distinguishedInvolution_mul_t :
+    orderOf ((h.ofMulEquiv e f hf).distinguishedInvolution * (h.ofMulEquiv e f hf).t)
+      = orderOf (h.distinguishedInvolution * h.t) := by
+  rw [ofMulEquiv_distinguishedInvolution, show (h.ofMulEquiv e f hf).t = e h.t from rfl,
+    ← map_mul]
+  exact orderOf_injective e.toMonoidHom e.injective _
+
+/-- `V = W` transports. -/
+theorem ofMulEquiv_V_eq_W (hVW : h.V = h.W) :
+    (h.ofMulEquiv e f hf).V = (h.ofMulEquiv e f hf).W := by
+  rw [ofMulEquiv_V, ofMulEquiv_W, hVW]
+
+/-- `|Q₀|` transports. -/
+theorem ofMulEquiv_natCard_Q0 :
+    Nat.card ((h.ofMulEquiv e f hf).Q0) = Nat.card (h.Q0) := by
+  rw [ofMulEquiv_Q0]
+  exact (Nat.card_congr
+    (Subgroup.equivMapOfInjective h.Q0 e.toMonoidHom e.injective).toEquiv).symm
+
+/-- `|Q|` transports. -/
+theorem ofMulEquiv_natCard_Q :
+    Nat.card ((h.ofMulEquiv e f hf).Q) = Nat.card (h.Q) :=
+  (Nat.card_congr
+    (Subgroup.equivMapOfInjective h.Q e.toMonoidHom e.injective).toEquiv).symm
+
+/-- A non-trivial element of `W` transports. -/
+theorem ofMulEquiv_exists_ne_one_mem_W (hw : ∃ w ∈ h.W, w ≠ 1) :
+    ∃ w ∈ (h.ofMulEquiv e f hf).W, w ≠ 1 := by
+  obtain ⟨w, hwW, hw1⟩ := hw
+  refine ⟨e w, ?_, ?_⟩
+  · rw [ofMulEquiv_W]
+    exact Subgroup.mem_map_of_mem _ hwW
+  · intro hcon
+    exact hw1 (e.injective (by rw [hcon, map_one]))
 
 end Hypothesis
 
