@@ -1531,9 +1531,38 @@ full build green (4973 jobs) / lint --strict clean / sorry 0 / AxiomsCheck OK。
 ⚠ これは章末の `G ≅ PSU(3,q)` でも必ず要る (repo の PSU(3,q) は `RootGroup` +
 `StandardGenerators` + `Bruhat` で構成されている) ので、迂回できない本体作業。
 
-### ⚠ 次の一手
+**足がかりは landing 済** (2026-08-01): `rootBilin_diag_coe` /
+`rootBilin_anisotropic` — `rootBilin(x,x) = x·x̄` (補正項は対角で消える)。
 
-1. **余輪体の同定** (上記)。対角 (`χ` vs `N`) の突き合わせ + `congrEquiv`。
+### 📐 同定は既存の type B 基盤に載せる (2026-08-01 の実測)
+
+⚠ `BilinearTwistedProduct.congrEquiv` は**同じ `B` の自己同型**用で、異なる 2 つの
+余輪体を繋ぐものではない。2 余輪体版 (`B' (f x) (f y) = g (B x y)` から
+`BilinearTwistedProduct B ≃* BilinearTwistedProduct B'`) の一般化が要る
+(`congrEquiv` の直接の一般化、~30 行)。
+
+**より重要**: repo には type B の分類基盤が既にある — 手で分類を書き起こす前に
+必ずこちらを読むこと:
+* `Suzuki2Groups/Types.lean` — `typeBQuadraticMap phi epsilon` と
+  `typeBQuadraticMap_anisotropic`。**`phi = 1` がまさに我々の `θ = 1` の場合**。
+* `Suzuki2Groups/FieldModel.lean` — `epsilon_ne_zero_of_anisotropic` /
+  `isField (hq : (typeBQuadraticMap (1 : RingAut F) ε).Anisotropic)`。
+* `Suzuki2Groups/SplitUniqueness.lean` — Appendix III Theorem (e) の一意性半分
+  (`nonempty_summandEquiv_of_isomorphic`)。
+* `Suzuki2Groups/QuotientPlaneModel.lean` — `exists_planeCoordinates_of_isomorphicSplit`。
+
+⟹ **`φ` と `rootBilin` をそれぞれ `typeBQuadraticMap 1 ε` の形に同定し、`ε` の
+スケーリングで突き合わせる**のが筋。⚠ 標数 2・2 次元の非等方二次形式の分類を
+自前で書き起こす前に、上記が何を既に与えているかを実測すること。
+
+### ⚠ 次の一手 (次セッションはここから)
+
+1. `Suzuki2Groups/Types.lean` + `FieldModel.lean` + `SplitUniqueness.lean` の実測
+   (何が既にあるか)。
+2. 2 余輪体版 `congrEquiv` の一般化。
+3. `φ` と `rootBilin` の同定 ⟹ `Q ≃* RootGroup n`。
+4. §3 (4) 本体 (骨格は上記で確定済)。
+5. `5 ≤ |F|` の供給 (場合分けは上記に記録)。
 2. §3 (4) 本体 (骨格は上記のとおり確定済)。
 3. `5 ≤ |F|` の供給。⚠ 完全な解決は場合分けになる:
    `m ≥ 3` は数え上げ / `m = 2` は「`θ|_F = Frob` なら `σ(x)τ(x) = σ(x³) = 1`
