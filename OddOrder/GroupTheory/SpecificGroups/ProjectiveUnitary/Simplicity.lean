@@ -76,7 +76,7 @@ theorem commutator_psuTorusHom_rootHom
 
 /-- For `q = 2^n > 2`, the determinant-one torus contains an element whose
 Hermitian norm weight is nontrivial. -/
-private theorem exists_psuTorus_weight_ne_one (hn : 1 < n) :
+theorem exists_psuTorus_weight_ne_one (hn : 1 < n) :
     ∃ c : PSUTorusParameter n, torusWeight c.1 ≠ 1 := by
   have hn0 : 0 < n := by omega
   have hUnits : 1 < Nat.card ((BaseField n)ˣ) := by
@@ -286,6 +286,39 @@ theorem commutator_standardPermGroup_eq_top (hn : 1 < n) :
   rcases hg with ⟨x, hx, hxeq⟩
   have hxg : x = g := Subtype.ext hxeq
   exact hxg ▸ hx
+
+/-- **The root subgroup meets the centralizer of the determinant-one torus trivially**
+(`C_Q(D) = 1` for `q = 2ⁿ > 2`).
+
+A torus element of nontrivial norm weight acts fixed-point-freely on the root group
+(`psuTorusScale_fixedPointFree_of_torusWeight_ne_one`), and the torus–root commutator is
+the corresponding root displacement (`commutator_psuTorusHom_rootHom`), so a root
+translation commuting with the whole torus is trivial.
+
+Peterfalvi Part II, Ch. IV §4, step (2) (p. 133) needs it: `C_Q(D) = 1` is what makes the
+point `t · a` — hence the distinguished involution up to the conjugations fixing `H`, `Q`
+and `D` — determined by `D`. -/
+theorem rootHom_range_inf_centralizer_psuTorus_eq_bot (hn : 1 < n) :
+    (rootHom n).range ⊓ Subgroup.centralizer
+        (((psuTorusHom n).range : Subgroup (standardPermGroup n)) :
+          Set (standardPermGroup n)) = ⊥ := by
+  obtain ⟨c, hc⟩ := exists_psuTorus_weight_ne_one hn
+  rw [eq_bot_iff]
+  rintro x ⟨⟨u, rfl⟩, hxc⟩
+  have hcomm : psuTorusHom n c * rootHom n u = rootHom n u * psuTorusHom n c :=
+    Subgroup.mem_centralizer_iff.mp hxc _ ⟨c, rfl⟩
+  have hone : ⁅psuTorusHom n c, rootHom n u⁆ = 1 :=
+    commutatorElement_eq_one_iff_mul_comm.mpr hcomm
+  rw [commutator_psuTorusHom_rootHom] at hone
+  have hfix : psuTorusScaleHom n c u = u := by
+    have h : psuTorusScaleHom n c u * u⁻¹ = 1 := by
+      have hone' := hone
+      rw [← map_one (rootHom n)] at hone'
+      exact rootHom_injective n hone'
+    exact mul_inv_eq_one.mp h
+  have hu1 : u = 1 :=
+    psuTorusScale_fixedPointFree_of_torusWeight_ne_one c hc u hfix
+  rw [Subgroup.mem_bot, hu1, map_one]
 
 end
 
