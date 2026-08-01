@@ -2754,3 +2754,36 @@ eta により `⟨(kv.2 : G), kv.2.2⟩` と `kv.2` は defeq で、
 (`Classical.em` で分岐。`orbitOfF` の商群を経由しなくても直接書ける)。
 ⚠ 「no」の側で `exists_mem_Q0_orbitOfF_eq` が返す軌道の等式を上の形に翻訳する層が要る
 (`baseUnit`/`fUnit` は `M.coord`、`Ψ` の商座標はその `e` 倍)。
+
+## 2026-08-01 (34): 段 (5) 両ケースがファイバー単位に揃った
+
+**`stepFive_secondCase_fibre`**: `stepFive_secondCase_elem` (1 つの `a` ごと) を
+`eq_or_exists_conj_mul_of_quotient_eq` (ファイバー = `{ρ} ∪ {ρ s^a}`) と合わせて
+ファイバー全体へ。`s^a = s^{(a⁻¹)⁻¹}` の付け替えだけ。
+
+現状 (`PSU3StepFive.lean` 364 行):
+
+| 定理 | 入力 | 出力 |
+|---|---|---|
+| `stepFive_of_mem_orbit` | `stepFour_cover` + `(Ψρ).quotient = μ(kv)·(Ψω).quotient` | `ρ` での公式 |
+| `stepFive_secondCase_elem` | `f(ρ)` のファイバーでの公式 | `ρ s^{a⁻¹}` での公式 |
+| `stepFive_secondCase_fibre` | 上 + 基点 | `ρ` のファイバー全体での公式 |
+
+### ⚠ 段 (5) の残り: 場合分け 1 本 (これで §3 完成)
+
+```
+∀ ρ ∈ Q, (Ψρ).quotient ≠ 0 → 公式 at ρ
+  by_cases horb : ∃ kv, (Ψρ).quotient = μ(kv) * (Ψω).quotient
+  · exact stepFive_of_mem_orbit … horb.choose_spec
+  · -- exists_mem_Q0_orbitOfF_eq で x₀ ∈ Q₀ を取り ρ' := ρ x₀
+    -- f(ρ') が軌道内 ⟹ stepFive_of_mem_orbit で f(ρ') のファイバー全体
+    -- ⟹ stepFive_secondCase_elem + stepFive_secondCase_fibre で ρ' のファイバー
+    -- ρ は ρ' と同じファイバー (x₀ ∈ Q₀) なので終わり
+```
+
+⚠ 「no」の側の翻訳: `exists_mem_Q0_orbitOfF_eq` は
+`orbitOfF … x = QuotientGroup.mk (baseUnit … hωQ hωQ0)` を返す。
+`orbitOfF … x = QuotientGroup.mk (fUnit … x)` で `fUnit` は
+`M.coord (mk (f (ρ x)))` なので、`QuotientGroup.eq` を剥がして
+`∃ kv, μ(kv) = fUnit⁻¹ · baseUnit` を得、`(Ψ·).quotient = e · M.coord(·)` で
+座標の等式に翻訳する。⚠ 向き (kv か kv⁻¹ か) に注意。
