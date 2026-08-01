@@ -467,6 +467,36 @@ theorem stepEight {m : ℕ} (M : hyp.QuotientFieldModel m)
   · have := hyp.ncard_fiber_orbitOfF_base_le M hZ H hC2 hωQ hωQ0
     rwa [hVW] at this
 
+/-- **Every `K W`-orbit is attained on the fibre `ρ Q₀`** (Peterfalvi Part II, Ch. IV
+§3 (5), p. 131: "possibly on replacing `ρ` by an element of `ρ Q₀`, we may assume by (8)
+of §2 that `f(ρ)` is in the orbit of `ω̄` under `K W`").
+
+Step (8) counts every fibre of `orbitOfF` as `|W|` — or `|W| − 1` on the distinguished
+orbit — and `|W| > 1`, so no fibre is empty.  That is exactly the freedom stage (5) uses
+in its second case. -/
+theorem exists_mem_Q0_orbitOfF_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hVW : hyp.V = hyp.W) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hinj : Function.Injective M.mu)
+    (hK : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (c : M.Eˣ ⧸ (MonoidHom.range M.mu)) :
+    ∃ x : ↥hyp.Q0, hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x = c := by
+  obtain ⟨hgen, hbase⟩ :=
+    hyp.stepEight M hZ H hC2 hVW hm hQ0card hinj hK hWdvd hωQ hωQ0
+  have hne : {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x = c}.ncard ≠ 0 := by
+    by_cases hc : c = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)
+    · rw [hc, hbase]
+      omega
+    · rw [hgen c hc]
+      omega
+  obtain ⟨x, hx⟩ := Set.nonempty_of_ncard_ne_zero hne
+  exact ⟨x, hx⟩
+
 /-- **The set-level count is exact**: `|S| = |W| − 1`, where
 
   `S = {z ∈ Q₀ | ∃ y ∈ Q₀, ∃ a ∈ D, f(ω z) = (ω y)^a}`.

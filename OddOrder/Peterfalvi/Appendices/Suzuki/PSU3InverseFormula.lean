@@ -162,6 +162,20 @@ theorem stepFive_secondCase (h2 : (2 : E) = 0) {r x a : E}
     field_simp
     linear_combination x * h2
 
+/-- **The inversion formula is self-inverse** (Peterfalvi Part II, p. 131: "Then
+`(ρ̄, x) = f(ω̄', x') = (ω̄'/x', 1/x')` and so `ω̄' = ρ̄/x` and `x' = 1/x`").
+
+If `f` carries `(r_σ, y_σ)` to `(r_ρ, y_ρ)` by the formula, then it carries
+`(r_ρ, y_ρ)` back to `(r_σ, y_σ)` by the same formula.  Stage (5) uses this in the
+direction the book does: knowing `f` at `f(ρ)` — which is where the orbit argument puts
+one — determines `f(ρ)` from `ρ`, since `f` is an involution (H2). -/
+theorem inverseFormula_symm {rρ yρ rσ yσ : E} (hyσ : yσ ≠ 0)
+    (h1 : rρ = rσ / yσ) (h2 : yρ = yσ⁻¹) :
+    rσ = rρ / yρ ∧ yσ = yρ⁻¹ := by
+  subst h1
+  subst h2
+  exact ⟨by field_simp, (inv_inv yσ).symm⟩
+
 end StepFourArithmetic
 
 section ChainBridge
