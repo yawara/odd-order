@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
+import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
 
 /-!
 # Transporting the standing hypothesis along an isomorphism of actions
@@ -25,6 +25,10 @@ universes of the source and target.
 
 * `Hypothesis.ofMulEquiv` — transport of the standing hypothesis along
   `e : A ≃* B` and an `e`-equivariant `f : Λ ≃ Λ'`.
+* `Hypothesis.ofMulEquiv_V`, `Hypothesis.ofMulEquiv_KSet`,
+  `Hypothesis.ofMulEquiv_W`, `Hypothesis.ofMulEquiv_Q0` — the *derived* subgroups
+  transport too.  `H`, `Q`, `D` and `t` are fields, so they cross by `rfl`; `V`, `K`,
+  `W` and `Q₀` are defined from them and need these lemmas.
 -/
 
 set_option autoImplicit false
@@ -140,6 +144,82 @@ noncomputable def ofMulEquiv (h : Hypothesis A Λ) (e : A ≃* B) (f : Λ ≃ Λ
         (Subgroup.equivMapOfInjective E e.toMonoidHom e.injective).toEquiv.symm]
     · rintro _ ⟨x, hx, rfl⟩
       rw [← map_pow, hEsq x hx, map_one]
+
+omit [Finite A] [Finite B] in
+/-- An isomorphism carries centralizers to centralizers. -/
+theorem map_centralizer_equiv (e : A ≃* B) (S : Set A) :
+    (Subgroup.centralizer S).map e.toMonoidHom = Subgroup.centralizer (e '' S) := by
+  ext b
+  rw [Subgroup.mem_map_equiv, Subgroup.mem_centralizer_iff, Subgroup.mem_centralizer_iff]
+  constructor
+  · rintro hb _ ⟨a, ha, rfl⟩
+    have := hb a ha
+    have h2 := congrArg e this
+    rwa [map_mul, map_mul, e.apply_symm_apply] at h2
+  · intro hb a ha
+    have := hb (e a) ⟨a, ha, rfl⟩
+    have h2 := congrArg e.symm this
+    rwa [map_mul, map_mul, e.symm_apply_apply] at h2
+
+omit [Finite A] [Finite B] in
+/-- An isomorphism commutes with intersections of subgroups. -/
+theorem map_inf_equiv (e : A ≃* B) (K L : Subgroup A) :
+    (K ⊓ L).map e.toMonoidHom = K.map e.toMonoidHom ⊓ L.map e.toMonoidHom := by
+  ext b
+  simp only [Subgroup.mem_map_equiv, Subgroup.mem_inf]
+
+variable (h : Hypothesis A Λ) (e : A ≃* B) (f : Λ ≃ Λ')
+  (hf : ∀ (a : A) (l : Λ), f (a • l) = e a • f l)
+
+@[simp] theorem ofMulEquiv_H : (h.ofMulEquiv e f hf).H = h.H.map e.toMonoidHom := rfl
+
+@[simp] theorem ofMulEquiv_Q : (h.ofMulEquiv e f hf).Q = h.Q.map e.toMonoidHom := rfl
+
+@[simp] theorem ofMulEquiv_D : (h.ofMulEquiv e f hf).D = h.D.map e.toMonoidHom := rfl
+
+@[simp] theorem ofMulEquiv_t : (h.ofMulEquiv e f hf).t = e h.t := rfl
+
+/-- `V = C_D(t)` transports. -/
+theorem ofMulEquiv_V : (h.ofMulEquiv e f hf).V = h.V.map e.toMonoidHom := by
+  rw [Hypothesis.V, Hypothesis.V, map_inf_equiv, map_centralizer_equiv,
+    Set.image_singleton]
+  rfl
+
+/-- `K = {x ∈ D | xᵗ = x⁻¹}` transports. -/
+theorem ofMulEquiv_KSet : (h.ofMulEquiv e f hf).KSet = e '' h.KSet := by
+  have ht : (h.ofMulEquiv e f hf).t = e h.t := rfl
+  ext b
+  constructor
+  · rintro ⟨hD, hinv⟩
+    rw [ht] at hinv
+    refine ⟨e.symm b, ⟨?_, ?_⟩, e.apply_symm_apply b⟩
+    · exact Subgroup.mem_map_equiv.mp hD
+    · have h2 := congrArg e.symm hinv
+      simpa only [map_mul, map_inv, e.symm_apply_apply] using h2
+  · rintro ⟨a, ⟨haD, hainv⟩, rfl⟩
+    refine ⟨Subgroup.mem_map_equiv.mpr (by rwa [e.symm_apply_apply]), ?_⟩
+    rw [ht]
+    have h2 := congrArg e hainv
+    simpa only [map_mul, map_inv] using h2
+
+/-- `W = C_V(K)` transports. -/
+theorem ofMulEquiv_W : (h.ofMulEquiv e f hf).W = h.W.map e.toMonoidHom := by
+  rw [Hypothesis.W, Hypothesis.W, map_inf_equiv, ofMulEquiv_V, map_centralizer_equiv,
+    ofMulEquiv_KSet]
+
+/-- `Q₀`, the involutions of `H` together with `1`, transports. -/
+theorem ofMulEquiv_Q0 : (h.ofMulEquiv e f hf).Q0 = h.Q0.map e.toMonoidHom := by
+  ext b
+  rw [(h.ofMulEquiv e f hf).mem_Q0_iff, Subgroup.mem_map_equiv, h.mem_Q0_iff,
+    ofMulEquiv_H, Subgroup.mem_map_equiv]
+  refine and_congr ?_ Iff.rfl
+  constructor
+  · intro hb
+    have h2 := congrArg e.symm hb
+    rwa [map_pow, map_one] at h2
+  · intro hb
+    have h2 := congrArg e hb
+    rwa [map_pow, map_one, e.apply_symm_apply] at h2
 
 end Hypothesis
 
