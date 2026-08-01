@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the exponent discriminator of step (1)
@@ -38,6 +39,8 @@ element of `Q − Q₀` does *not* square to `1`.
   runs on.
 * `Hypothesis.exists_fixed_not_mem_Q0` — Glauberman's step: a nontrivial `P`-fixed class
   of `Q/Q₀` has a `P`-fixed representative, necessarily outside `Q₀`.
+* `Hypothesis.inf_W_eq_bot_of_centralizes`, `Hypothesis.eq_of_mem_mul_of_inf_eq_bot` —
+  the two steps that take step (1) from `Z(U) ⊆ P W` to `Z(U) ⊆ P`.
 -/
 
 set_option autoImplicit false
@@ -211,6 +214,61 @@ theorem exists_fixed_not_mem_Q0
   · intro a haP
     have hfix := hcfix ⟨a, hPD haP⟩ (Subgroup.mem_subgroupOf.mpr haP)
     exact congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) hfix
+
+/-! ### `Z(U) ⊆ P`
+
+Peterfalvi Part II, Ch. IV §4, step (1) (p. 132) closes with
+
+> As `Z(U) ⊂ C_V(C_{Q₀}(P))`, `Z(U) ⊂ P W` by the theorem of Galois.  Since `P Z(U)`
+> centralizes `C_Q(P) ⊄ Q₀`, `P Z(U) ∩ W = 1` and so `Z(U) ⊂ P`.
+
+The Galois inclusion is `centralizer_V_centralizer_Q0`; the two steps below are the rest.
+-/
+
+include hyp in
+/-- **A subgroup centralizing an element of `Q − Q₀` meets `W` trivially.**
+
+`W` acts fixed-point-freely on `(Q/Q₀)^#` (`eq_one_of_conj_eq_mul_Q0_of_mem_W`) — and
+that version needs no `V = W`, which is what makes it available in Ch. IV §4. -/
+theorem inf_W_eq_bot_of_centralizes {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu)
+    {S : Subgroup G} {y : G} (hyQ : y ∈ hyp.Q) (hy0 : y ∉ hyp.Q0)
+    (hS : ∀ c ∈ S, c * y = y * c) :
+    S ⊓ hyp.W = ⊥ := by
+  rw [eq_bot_iff]
+  intro c hc
+  refine Subgroup.mem_bot.mpr ?_
+  refine hyp.eq_one_of_conj_eq_mul_Q0_of_mem_W M hZ hmu hyQ hy0 hc.2 hyp.Q0.one_mem ?_
+  rw [mul_one]
+  have hcy := hS c hc.1
+  calc c⁻¹ * y * c = c⁻¹ * (y * c) := by group
+    _ = c⁻¹ * (c * y) := by rw [← hcy]
+    _ = y := by group
+
+omit [Finite G] in
+/-- **Dedekind's step**: a subgroup whose elements factor as `P W` and which meets `W`
+trivially is `P` itself.
+
+This is how step (1) gets from `Z(U) ⊆ P W` and `P Z(U) ∩ W = 1` to `Z(U) ⊆ P`: apply
+it to `S = P ⊔ Z(U)`.  Writing `s = p w` with `p ∈ P ≤ S` puts `w = p⁻¹ s` in `S ⊓ W`,
+hence `w = 1`.
+
+The factorization is taken as a hypothesis rather than derived from `S ≤ P ⊔ W`: the
+subgroup lattice of a group is *not* modular in general, and what makes `P ⊔ W = P W`
+here is that `W` is normal in `V`. -/
+theorem eq_of_mem_mul_of_inf_eq_bot {P W S : Subgroup G} (hPS : P ≤ S)
+    (hfac : ∀ s ∈ S, ∃ p ∈ P, ∃ w ∈ W, s = p * w)
+    (hbot : S ⊓ W = ⊥) : S = P := by
+  refine le_antisymm (fun s hs => ?_) hPS
+  obtain ⟨p, hp, w, hw, rfl⟩ := hfac s hs
+  have hwS : w ∈ S := by
+    have hrw : w = p⁻¹ * (p * w) := by group
+    rw [hrw]
+    exact S.mul_mem (S.inv_mem (hPS hp)) hs
+  have hw1 : w = 1 := Subgroup.mem_bot.mp (hbot ▸ ⟨hwS, hw⟩)
+  rw [hw1, mul_one]
+  exact hp
 
 end Hypothesis
 
