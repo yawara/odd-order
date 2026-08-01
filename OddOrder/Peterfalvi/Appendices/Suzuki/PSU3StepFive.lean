@@ -28,8 +28,10 @@ and the bookkeeping that turns "the formula holds throughout the fibre of `f(ρ)
 
 ## Main results
 
-* `Hypothesis.stepFive_secondCase_elem` — the inversion formula at `ρ s^{a⁻¹}`, given it
-  on the fibre of `f(ρ)`.
+* `Hypothesis.stepFive_of_mem_orbit` — the first case, packaged: the formula at every
+  `K W`-translate of `ω`'s fibre.
+* `Hypothesis.stepFive_secondCase_elem` — the second case: the inversion formula at
+  `ρ s^{a⁻¹}`, given it on the fibre of `f(ρ)`.
 -/
 
 set_option autoImplicit false
@@ -80,6 +82,74 @@ theorem exists_conjQHom_eq_of_quotient_smul {m : ℕ} (M : hyp.QuotientFieldMode
       inv_mul_cancel₀ (Units.ne_zero (M.mu kv)), one_mul]
   · rw [map_inv]
     exact (hyp.conjQHom kv).apply_symm_apply p
+
+/-- **Stage (5)'s first case, packaged** (Peterfalvi Part II, p. 131: "If `ρ̄` is in the
+orbit of `ω̄` under `K W`, then (5) follows from (4)").
+
+`hcover` is stage (4) on the fibre of `ω̄` (`stepFour_cover`).  If `ρ`'s quotient
+coordinate is `μ(kv)` times `ω`'s, then `ρ` is the `kv`-conjugate of a point of that
+fibre (`exists_conjQHom_eq_of_quotient_smul`), and `stepFive_orbit` carries the formula
+across. -/
+theorem stepFive_of_mem_orbit (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    (hconjq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      (Ψ (hyp.conjQHom kv ρ)).quotient
+        = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ρ).quotient)
+    (hconjy : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      Suzuki2Groups.unitaryCoord m u (Ψ (hyp.conjQHom kv ρ))
+        = ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1) *
+          Suzuki2Groups.unitaryCoord m u (Ψ ρ))
+    (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
+    {ω : G} (hωQ : ω ∈ hyp.Q)
+    (hcover : ∀ (σ : G) (hσQ : σ ∈ hyp.Q),
+      (Ψ ⟨σ, hσQ⟩).quotient = (Ψ ⟨ω, hωQ⟩).quotient →
+        (Ψ ⟨f σ, hfQ σ hσQ⟩).quotient
+            = (Ψ ⟨σ, hσQ⟩).quotient /
+              Suzuki2Groups.unitaryCoord m u (Ψ ⟨σ, hσQ⟩) ∧
+          Suzuki2Groups.unitaryCoord m u (Ψ ⟨f σ, hfQ σ hσQ⟩)
+            = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨σ, hσQ⟩))⁻¹)
+    {ρ : G} (hρQ : ρ ∈ hyp.Q) (hω0 : (Ψ ⟨ω, hωQ⟩).quotient ≠ 0)
+    (kv : ↥hyp.actualKActor × ↥hyp.W)
+    (hkv : (Ψ ⟨ρ, hρQ⟩).quotient
+      = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ⟨ω, hωQ⟩).quotient) :
+    (Ψ ⟨f ρ, hfQ ρ hρQ⟩).quotient
+        = (Ψ ⟨ρ, hρQ⟩).quotient /
+          Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩) ∧
+      Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ρ, hfQ ρ hρQ⟩)
+        = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹ := by
+  classical
+  obtain ⟨k, hkK, hkveq⟩ := hyp.exists_mem_K_conjQHom_eq kv
+  rw [← hkveq] at hkv
+  obtain ⟨σ, hσq, hσeq⟩ := hyp.exists_conjQHom_eq_of_quotient_smul M hu Ψ hconjq _ hkv
+  have hkSet : k ∈ hyp.KSet := by rw [← hyp.coe_K]; exact hkK
+  -- the conjugate, at the group level
+  have hval : k * (kv.2 : G) * (σ : G) * (k * (kv.2 : G))⁻¹ = ρ := by
+    have h := congrArg (Subtype.val (p := fun x => x ∈ hyp.Q)) hσeq
+    rw [hyp.conjQHom_kActor_apply_val hkK kv.2.2 σ] at h
+    exact h
+  have hσ1 : (σ : G) ≠ 1 := by
+    intro hc
+    have hone : σ = 1 := Subtype.ext hc
+    rw [hone, map_one, Suzuki2Groups.BilinearTwistedProduct.quotient_one] at hσq
+    exact hω0 hσq.symm
+  have hy : Suzuki2Groups.unitaryCoord m u (Ψ σ) ≠ 0 := by
+    refine Suzuki2Groups.unitaryCoord_ne_zero m M.card hu ?_
+    rw [hσq]
+    exact hω0
+  obtain ⟨hc1, hc2⟩ := hcover (σ : G) σ.2 hσq
+  have hρ'Q : k * (kv.2 : G) * (σ : G) * (k * (kv.2 : G))⁻¹ ∈ hyp.Q := by
+    rw [hval]; exact hρQ
+  obtain ⟨e1, e2⟩ := hyp.stepFive_orbit H M hu Ψ hconjq hconjy hkSet hkK kv.2.2
+    σ.2 hσ1 (hfQ _ σ.2) hρ'Q (hfQ _ hρ'Q) hy hc1 hc2
+  have hQeq : (⟨k * (kv.2 : G) * (σ : G) * (k * (kv.2 : G))⁻¹, hρ'Q⟩ : ↥hyp.Q)
+      = ⟨ρ, hρQ⟩ := Subtype.ext hval
+  have hFeq : (⟨f (k * (kv.2 : G) * (σ : G) * (k * (kv.2 : G))⁻¹),
+      hfQ _ hρ'Q⟩ : ↥hyp.Q) = ⟨f ρ, hfQ ρ hρQ⟩ := Subtype.ext (congrArg f hval)
+  rw [hQeq, hFeq] at e1 e2
+  exact ⟨e1, e2⟩
 
 /-- **Stage (5)'s second case** (Peterfalvi Part II, p. 131).
 
