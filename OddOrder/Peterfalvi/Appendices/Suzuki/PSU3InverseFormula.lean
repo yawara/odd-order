@@ -127,6 +127,41 @@ theorem inv_of_star (h2 : (2 : E) = 0) {w x a v : E} (haw : a + w ≠ 0) (ha1 : 
   rw [hx, ← hrhs, div_eq_mul_inv] at hstar
   exact mul_left_cancel₀ hsq hstar
 
+/-- **The computation closing stage (5)'s second case** (Peterfalvi Part II, p. 131, the
+last display).
+
+When `ρ̄` is *not* in the `K W`-orbit of `ω̄`, the book instead arranges that `f(ρ)` is,
+and reads the formula backwards: from `ρ = (ρ̄, x) = f(ω̄', x') = (ω̄'/x', 1/x')` it gets
+`ω̄' = ρ̄/x` and `x' = 1/x`.  Stage (2) of §2 then expresses `f(ρ̄, x + a)` as
+`f(ω̄', x' + a⁻¹)^{a⁻¹} (0, a⁻¹)`, and substituting the known value of the inner `f`
+gives, coordinate by coordinate,
+
+  `a⁻¹ ω̄'/(x' + a⁻¹) = ρ̄/(x + a)`,
+  `a⁻² /(x' + a⁻¹) + a⁻¹ = 1/(x + a)`,
+
+the conjugation by `a⁻¹` scaling the second coordinate by the norm `a⁻²` (`a ∈ F`) and
+the central factor `(0, a⁻¹)` adding `a⁻¹`.  The second identity is where characteristic
+two enters: `x + a + x = a`. -/
+theorem stepFive_secondCase (h2 : (2 : E) = 0) {r x a : E}
+    (ha : a ≠ 0) (hx : x ≠ 0) (hxa : x + a ≠ 0) :
+    a⁻¹ * ((r / x) / (x⁻¹ + a⁻¹)) = r / (x + a) ∧
+      (a⁻¹) ^ 2 * (1 / (x⁻¹ + a⁻¹)) + a⁻¹ = (x + a)⁻¹ := by
+  have hinv : x⁻¹ + a⁻¹ ≠ 0 := by
+    intro hc
+    refine hxa ?_
+    field_simp at hc
+    linear_combination hc
+  have hsum : x⁻¹ + a⁻¹ = (x + a) / (x * a) := by
+    field_simp
+    ring
+  rw [hsum]
+  constructor
+  · rw [div_div_eq_mul_div, eq_div_iff hxa]
+    field_simp
+  · rw [one_div_div, inv_eq_one_div (x + a), eq_div_iff hxa]
+    field_simp
+    linear_combination x * h2
+
 end StepFourArithmetic
 
 section ChainBridge
