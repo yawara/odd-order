@@ -381,6 +381,45 @@ theorem mu_W_notMem_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m)
   exact hζ (congrArg Prod.snd (hmu (hmu1.trans (map_one M.mu).symm)))
 
 include hyp in
+/-- **The `t`-twist of `K W` is `d ↦ d^{-q}` on scalars**: `μ(k⁻¹, v) = (μ(k, v)^q)⁻¹`
+(Peterfalvi Part II, Ch. IV §3 (5), p. 131, the exponent `d^{-q}` in the display).
+
+`t` inverts `K` (`mul_t_eq_of_mem_KSet`) and centralizes `W` (`conj_t_pow_eq`), so on
+`K × W` the twist `d ↦ d^t` is `(k, v) ↦ (k⁻¹, v)`.  On scalars that is `A Z ↦ A⁻¹ Z`,
+and — `μ(K)` lying in `F` and `μ(W)` having norm one — `(A Z)^q = A Z⁻¹`, whose inverse
+is `A⁻¹ Z`.
+
+This is what makes (H3) usable in stage (5): the `K W`-orbit of a solved point is again
+solved. -/
+theorem mu_t_twist {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (k : ↥hyp.actualKActor) (v : ↥hyp.W) :
+    ((M.mu (k⁻¹, v) : M.Eˣ) : M.E)
+      = (((M.mu (k, v) : M.Eˣ) : M.E) ^ 2 ^ m)⁻¹ := by
+  have hKZ : ∀ k' : ↥hyp.actualKActor,
+      ((M.mu (k', v) : M.Eˣ) : M.E)
+        = ((M.mu (k', (1 : ↥hyp.W)) : M.Eˣ) : M.E)
+          * ((M.mu ((1 : ↥hyp.actualKActor), v) : M.Eˣ) : M.E) := by
+    intro k'
+    rw [show ((k', v) : ↥hyp.actualKActor × ↥hyp.W)
+        = (k', (1 : ↥hyp.W)) * ((1 : ↥hyp.actualKActor), v) from
+      Prod.ext (mul_one _).symm (one_mul _).symm, map_mul, Units.val_mul]
+  have hZ0 : ((M.mu ((1 : ↥hyp.actualKActor), v) : M.Eˣ) : M.E) ≠ 0 := Units.ne_zero _
+  have hZ : ((M.mu ((1 : ↥hyp.actualKActor), v) : M.Eˣ) : M.E) ^ 2 ^ m
+      = ((M.mu ((1 : ↥hyp.actualKActor), v) : M.Eˣ) : M.E)⁻¹ := by
+    have hn : ((M.mu ((1 : ↥hyp.actualKActor), v) : M.Eˣ) : M.E) ^ (2 ^ m + 1) = 1 := by
+      have h := congrArg (fun x : M.Eˣ => (x : M.E)) (M.mu_W_normOne v)
+      simpa using h
+    field_simp
+    rw [← pow_succ]
+    exact hn
+  have hinvK : ((M.mu (k⁻¹, (1 : ↥hyp.W)) : M.Eˣ) : M.E)
+      = ((M.mu (k, (1 : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
+    rw [show ((k⁻¹, (1 : ↥hyp.W)) : ↥hyp.actualKActor × ↥hyp.W)
+        = ((k, (1 : ↥hyp.W)) : ↥hyp.actualKActor × ↥hyp.W)⁻¹ from
+      Prod.ext rfl (inv_one (G := ↥hyp.W)).symm, map_inv, Units.val_inv_eq_inv_val]
+  rw [hKZ k⁻¹, hKZ k, mul_pow, M.mu_K_frobFixed k, hZ, hinvK, mul_inv, inv_inv]
+
+include hyp in
 /-- **`μ(1, ζ) ≠ μ(1, ζ)⁻¹`** for `ζ ≠ 1` — the book's `ζ + 1 ≠ ζ⁻¹ + 1`, which is what
 closes stage (4) (Peterfalvi Part II, p. 131, last line).
 

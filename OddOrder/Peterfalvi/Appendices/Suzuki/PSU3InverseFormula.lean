@@ -918,6 +918,50 @@ theorem stepFour_cover {m : ℕ} (M : hyp.QuotientFieldModel m)
     exact ⟨hA.trans (by rw [hq]), hB⟩
   · exact h1 ρ hρQ hfρQ hfib hy
 
+/-! ### Stage (5): the formula is `K W`-equivariant -/
+
+/-- **The inversion formula propagates along `K W`-orbits** (Peterfalvi Part II, §3 (5),
+p. 131, the opening display):
+
+  `f(d ρ̄, d^{1+q} y) = f(ρ̄, y)^{d^t} = (ρ̄/y, 1/y)^{d^{-q}} = (ρ̄/(d^q y), 1/(d^{1+q} y))`.
+
+The hypotheses are the coordinates of the two conjugates: `ρ' = ρ^d` scales by `d` and
+its norm, and `σ' = f(ρ') = f(ρ)^{d^t}` scales by the twisted scalar `(d^q)⁻¹` and *its*
+norm (`mu_t_twist` identifies that twisted scalar).  The conclusion is that the shape
+`(ρ̄/y, 1/y)` is preserved, and it is pure arithmetic: `((d^q)⁻¹)^{1+q} = (d^{1+q})⁻¹`
+because `d^{q²} = d`. -/
+theorem stepFive_equivariant {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {ρ ρ' σ σ' : ↥hyp.Q} {c : M.E} (hc : c ≠ 0)
+    (hy : Suzuki2Groups.unitaryCoord m u (Ψ ρ) ≠ 0)
+    (hρq : (Ψ ρ').quotient = c * (Ψ ρ).quotient)
+    (hρy : Suzuki2Groups.unitaryCoord m u (Ψ ρ')
+      = c ^ (2 ^ m + 1) * Suzuki2Groups.unitaryCoord m u (Ψ ρ))
+    (hσq : (Ψ σ').quotient = (c ^ 2 ^ m)⁻¹ * (Ψ σ).quotient)
+    (hσy : Suzuki2Groups.unitaryCoord m u (Ψ σ')
+      = ((c ^ 2 ^ m)⁻¹) ^ (2 ^ m + 1) * Suzuki2Groups.unitaryCoord m u (Ψ σ))
+    (h1 : (Ψ σ).quotient
+      = (Ψ ρ).quotient / Suzuki2Groups.unitaryCoord m u (Ψ ρ))
+    (h2 : Suzuki2Groups.unitaryCoord m u (Ψ σ)
+      = (Suzuki2Groups.unitaryCoord m u (Ψ ρ))⁻¹) :
+    (Ψ σ').quotient
+        = (Ψ ρ').quotient / Suzuki2Groups.unitaryCoord m u (Ψ ρ') ∧
+      Suzuki2Groups.unitaryCoord m u (Ψ σ')
+        = (Suzuki2Groups.unitaryCoord m u (Ψ ρ'))⁻¹ := by
+  have hcq : (c ^ 2 ^ m) ^ 2 ^ m = c :=
+    OddOrder.FiniteField.frobPow_frobPow m M.card c
+  have hcq0 : c ^ 2 ^ m ≠ 0 := pow_ne_zero _ hc
+  have hcn0 : c ^ (2 ^ m + 1) ≠ 0 := pow_ne_zero _ hc
+  have hkey : (c ^ 2 ^ m) ^ (2 ^ m + 1) = c ^ (2 ^ m + 1) := by
+    rw [pow_succ, pow_succ, hcq]
+    ring
+  constructor
+  · rw [hσq, hρq, hρy, h1, pow_succ]
+    field_simp
+  · rw [hσy, hρy, h2, inv_pow, hkey, mul_inv]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
