@@ -4944,3 +4944,49 @@ Hypothesis.ofMulEquiv (h : Hypothesis A Λ) (e : A ≃* B) (f : Λ ≃ Λ')
    置き場は `Basic.lean` の下流の新 leaf か `QStructure` 手前。
 2. それで `ih` の `ULift` 経由供給を作る。
 3. → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2)。
+
+## 2026-08-01 (90): 🎯 `Hypothesis.ofMulEquiv` landing — universe の壁を越える道具
+
+新 leaf `HypothesisTransport.lean` (`OddOrder.lean` 配線済、フルビルド green 4988 jobs・
+lint 純ゼロ)。
+
+```
+Hypothesis.ofMulEquiv (h : Hypothesis A Λ) (e : A ≃* B) (f : Λ ≃ Λ')
+  (hf : ∀ a l, f (a • l) = e a • f l) : Hypothesis B Λ'
+```
+
+⚠ **universe 制約なし** (`A`/`B`/`Λ`/`Λ'` は独立)。これが (89) の壁を越える道具。
+
+### 実装メモ (再現用)
+
+* `doubly_transitive` — `isMultiplyPretransitive_iff` に落とし tuple を
+  `f.symm.toEmbedding` で引き戻す。⚠ `rw ... at h.doubly_transitive` は**不可**
+  (射影に rw できない) — `have hdt := h.doubly_transitive` してから。
+* `faithful` — `eq_of_smul_eq_smul` を `e.symm b` に当てて `e` で戻す。
+* `D_def` — `Subgroup.mem_map_equiv` は **要素を量化した形**
+  (`∀ K y, y ∈ K.map e ↔ e.symm y ∈ K`) で `have` しないと共役項 `(e t)⁻¹ b (e t)` に
+  当たらない。
+* `Q_mul_D_eq_H` — `Set.image_mul_of_injective` は mathlib に無い ⟹ `ext` + 両方向。
+* `Q_even` / `D_odd` — `rwa` は不可 (仮定は射影なので `assumption` が拾わない)、
+  `rw` + `exact h.Q_even`。
+
+### ⟹ 次の設計 (確定)
+
+段 (2) の §3 適用先は **`U/Z(U)` (= `U/(P∩U)`、`Type u`)** で、そこへ
+`standardHypothesis` (`Type 0`) を `ofMulEquiv` + `residualQuotientEquiv.symm` で移す。
+作用集合は `ULift.{v} (Unital n)` に持ち上げれば ambient の
+`ih : TheoremAInductionBelow G Ω` (`Ω : Type v`) と universe が揃う。
+
+| 供給物 | 経路 |
+|---|---|
+| `Hypothesis (U/Z(U)) (ULift (Unital n))` | `ofMulEquiv standardHypothesis residualQuotientEquiv.symm Equiv.ulift.symm` |
+| `hVW` / `hQ0card` / `hcardQ` / `hst` / `hQsuz` / `w ∈ W#` | 標準モデルで証明済 ((86)-(89)) — transport 後の対応を示す補題が要る |
+| `ih` | ambient `ih` + `Nat.card (U/Z(U)) < Nat.card G` (同 universe なので素直) |
+
+### ⚠ 次セッションはここから
+
+1. `ofMulEquiv` の**フィールド対応補題**を書く (`(h.ofMulEquiv e f hf).Q = h.Q.map e`
+   等は `rfl` のはずだが、`V`/`W`/`Q0` は導出定義なので `map` と可換であることを
+   別途示す必要がある — ここが次の実作業)。
+2. `U/Z(U)` 上の `Hypothesis` を組み、`ih` を ambient から供給する。
+3. → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2)。
