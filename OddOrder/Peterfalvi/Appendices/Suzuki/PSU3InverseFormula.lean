@@ -904,6 +904,88 @@ theorem stepFour_elem {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
       congr 1
       exact add_comm _ _
 
+/-- **The converse of `stepFour_at_omega`**: the inversion formula at a point whose
+unitary coordinate is `μ(ζ)` *forces* `f(ω) = ω^{-ζ}` (Peterfalvi Part II, Ch. IV §3,
+Corollary 2, p. 132).
+
+Corollary 2 constructs `ω = (ω̄, ζ⁻¹)` from `ζ` and reads `f(ω) = (ζ ω̄, ζ) = ω^{-ζ}` off
+stage (5).  This is that reading: both `f(ω)` and `ζ⁻¹ ω⁻¹ ζ` have quotient coordinate
+`μ(ζ)⁻¹ ω̄` and unitary coordinate `μ(ζ)⁻¹`, and the two coordinates determine the
+element (`eq_of_unitaryCoord_eq`).
+
+Unlike `stepFour_at_omega` this needs no standing hypothesis on `f`; the conjugate's
+coordinates are computed outright. -/
+theorem f_eq_conj_inv_of_inverseFormula {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    (hconjq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      (Ψ (hyp.conjQHom kv ρ)).quotient
+        = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ρ).quotient)
+    (hconjy : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      Suzuki2Groups.unitaryCoord m u (Ψ (hyp.conjQHom kv ρ))
+        = ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1) *
+          Suzuki2Groups.unitaryCoord m u (Ψ ρ))
+    {ζ ω : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hfωQ : f ω ∈ hyp.Q)
+    (hx : Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩)
+      = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E))
+    (h1 : (Ψ ⟨f ω, hfωQ⟩).quotient
+      = (Ψ ⟨ω, hωQ⟩).quotient / Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩))
+    (h2 : Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ω, hfωQ⟩)
+      = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩))⁻¹) :
+    f ω = ζ⁻¹ * ω⁻¹ * ζ := by
+  have hZ0 : ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ≠ 0 :=
+    Units.ne_zero _
+  have hZnorm :
+      ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ^ (2 ^ m + 1)
+        = 1 := by
+    have h := congrArg (fun x : M.Eˣ => (x : M.E)) (M.mu_W_normOne (⟨ζ, hζ⟩ : ↥hyp.W))
+    simpa using h
+  have hZq :
+      ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ^ 2 ^ m
+        = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
+    field_simp
+    rw [← pow_succ]
+    exact hZnorm
+  have hkv : ((M.mu (hyp.kActor hyp.K.one_mem,
+        (⟨ζ⁻¹, hyp.W.inv_mem hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
+    rw [hyp.kActor_one hyp.K.one_mem,
+      show ((1 : ↥hyp.actualKActor), (⟨ζ⁻¹, hyp.W.inv_mem hζ⟩ : ↥hyp.W))
+        = ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W))⁻¹ from
+      Prod.ext (inv_one (G := ↥hyp.actualKActor)).symm (Subtype.ext rfl),
+      map_inv, Units.val_inv_eq_inv_val]
+  have hnorm1 : ((M.mu (hyp.kActor hyp.K.one_mem,
+      (⟨ζ⁻¹, hyp.W.inv_mem hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ^ (2 ^ m + 1) = 1 := by
+    rw [hyp.mu_norm_eq M, hyp.kActor_one hyp.K.one_mem,
+      show ((1 : ↥hyp.actualKActor), (1 : ↥hyp.W)) = 1 from rfl, map_one,
+      Units.val_one, one_pow]
+  have hωinvQ : ω⁻¹ ∈ hyp.Q := hyp.Q.inv_mem hωQ
+  -- the conjugate, and its two coordinates
+  set T : ↥hyp.Q := hyp.conjQHom (hyp.kActor hyp.K.one_mem,
+    (⟨ζ⁻¹, hyp.W.inv_mem hζ⟩ : ↥hyp.W)) (⟨ω, hωQ⟩ : ↥hyp.Q)⁻¹ with hT
+  have hTval : (T : G) = ζ⁻¹ * ω⁻¹ * ζ := by
+    rw [hT, hyp.conjQHom_kActor_apply_val hyp.K.one_mem (hyp.W.inv_mem hζ)]
+    change 1 * ζ⁻¹ * ω⁻¹ * (1 * ζ⁻¹)⁻¹ = ζ⁻¹ * ω⁻¹ * ζ
+    group
+  have hTq : (Ψ T).quotient = (Ψ ⟨f ω, hfωQ⟩).quotient := by
+    rw [hT, hconjq, map_inv, Suzuki2Groups.BilinearTwistedProduct.quotient_inv,
+      hkv, h1, hx, div_eq_mul_inv, mul_comm]
+    congr 1
+    have h2E : (2 : M.E) = 0 := by
+      have := M.charTwo
+      simpa using (CharP.cast_eq_zero M.E 2)
+    linear_combination (-(Ψ (⟨ω, hωQ⟩ : ↥hyp.Q)).quotient) * h2E
+  have hTy : Suzuki2Groups.unitaryCoord m u (Ψ T)
+      = Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ω, hfωQ⟩) := by
+    rw [hT, hconjy, map_inv, Suzuki2Groups.unitaryCoord_inv m M.card hu, hnorm1,
+      one_mul, h2, hx, hZq]
+  have hΨeq : Ψ T = Ψ ⟨f ω, hfωQ⟩ :=
+    Suzuki2Groups.eq_of_unitaryCoord_eq m hTq hTy
+  have := congrArg (Subtype.val (p := fun x => x ∈ hyp.Q)) (Ψ.injective hΨeq)
+  rw [hTval] at this
+  exact this.symm
+
 /-! ### The second half of stage (4): re-running the argument at `ω⁻¹` -/
 
 /-- **Inversion does not move the quotient coordinate** (characteristic two). -/
