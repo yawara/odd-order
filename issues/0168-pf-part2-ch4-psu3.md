@@ -1906,6 +1906,54 @@ p.131 の (4) の計算は `f(ω̄,x+a)^{ζ⁻¹a}(0,a) = f(ω̄,x+a)^{ζ⁻²}(
 ⟹ **次の一手 = 上記 1.–3. の層** (`PSU3RootGroupModel.lean` に追加)。
 その後 (4) 本体 (p.131) → (5)。
 
+## 2026-08-01 (15): 🎯 共役の pointwise 化 + 🎯🎯 **`φ` はエルミート余輪体そのもの**
+
+### landing
+
+🎯 `Hypothesis.exists_modelEquiv_conj` — **共役作用 = スカラー作用を pointwise に**。
+Ch. III §3 は像の一致 (Zassenhaus 段) しか言わないので:
+1. **`u` を座標写像に吸収** (`Φ' := Φ ∘ u`; `MulAut.congr Φ' α = u (…) u⁻¹`)。
+   `u ∈ inducingIdAuts` は両端に恒等を誘導 ⟹ `Φ'` の商座標は不変・中心も不動。
+2. **添字は商作用で決まる** (`μ(kv') = μ(kv)` + `M.mu` 単射) ⟹ `kv' = kv`。
+⟹ **`Φ' (dρd⁻¹) = Θ kv (Φ' ρ)`**。`exists_standardModel` に露出済の
+`hΘq`/`hΘc` と合わせて 2 座標とも明示スカラー。
+
+### ⚠⚠ さらに追跡して判明 — **`Ξ` 経由は不要だった**
+
+`exists_unitaryModel` の `Ξ` (= `equivOfCommonSquareMap`) は中心座標を
+`κ(x)` だけずらすので、**共役作用がエルミート側で厳密なスカラー作用にならない**
+(ずれ `λ(x) = κ(μx) + N(μ)κ(x)` は加法的で `inducingIdAuts` の分だけ残る)。
+コホモロジー的に消す (奇数位数 + 2-群で `H¹ = 0`) 手もあるが、**その必要は無い**:
+
+🎯🎯 **`φ` は `u` を選び直せばエルミート余輪体と厳密に一致する** (机上で確定):
+
+`c := φ(1,1)`, `D(x,y) := φ(x,y) + c·x y^q` と置く。
+* `D` は `F`-双線型で **交代的** (`D(x,x) = φ(x,x) + c N(x) = 0`、`χ = c·N` より)
+  ⟹ 標数 2 で**対称**でもある。
+* `Tr u₀ = 1` なる `u₀` を取ると `u₀ ∉ F` で `{1, u₀}` は `F`-基底。
+  基底の 4 組で突き合わせると
+  **`D(x,y) = β·Tr(x y^q)`** (`β := D(1,u₀)`)。
+  (`Tr(1·1^q) = 0`, `Tr(1·u₀^q) = Tr u₀ = 1`, `Tr(u₀ u₀^q) = Tr(N u₀) = 0`。)
+* `φ` が `F` 値であることから `Tr β = c`。⟹ `u := β/c` は **`Tr u = 1`**。
+* ⟹ **`φ(x,y) = c·(x y^q + u·Tr(x y^q)) = hermitianCocycle_u (e x) (e y)`**
+  (`e ∈ F`, `e² = c`; `e^{1+q} = e²`)。
+
+⟹ `congrEquiv (e·) id` が**そのまま**同型を与える (`equivOfCommonSquareMap` 不要)。
+しかも第 1 座標は `e` 倍・中心は恒等なので、**共役作用がエルミート側でも厳密に
+スカラー作用のまま**。(4) の計算が素直に通る。
+
+### ⚠ 次の一手
+
+1. `exists_hermitianCocycle_eq` — 上記の「`φ = c·H_u`」を実装
+   (`AnisotropicNormForm.lean` / `HermitianCocycle.lean` 層、~120 行)。
+   ⚠ 入力は `χ = c·N` (= `cocycle_diag_eq_norm`) と `F`-双線型性だけ。
+2. `exists_unitaryModel` を `congrEquiv` 版に差し替え (対角比較経由を廃止)。
+   ⟹ `exists_mulEquiv_of_diag` は他用途に残す。
+3. 共役のユニタリ座標表示 `(x,y)^d = (μ(d)x, N(μ(d))y)`
+   (`exists_modelEquiv_conj` + `unitaryCoord_of_scaled`;
+   `N(μ(kv)) = μ(kv.1)^d` は `mu_W_normOne` + `mu_K_frobFixed` + `θ|_F = 1` から)。
+4. (4) 本体 (p.131) → (5)。
+
 ## セッション総括 (2026-07-31)
 
 **Ch. IV で形式化されたもの** (すべて sorry 0 / AxiomsCheck OK / lint 0):
