@@ -2916,3 +2916,49 @@ p.132 のページ画像で Corollary 1 / Corollary 2 / Remark / §4 冒頭を�
       Ch. II (11) を引くので repo 対応物の実測が先。
 
 文書順では (a) が先 (§2 (1) は §3 より上流)。
+
+## 2026-08-01 (38): §4 の前提を実測 — **全部そろっている (§4 は unblocked)**
+
+`grep` で確認 (自分で実行):
+
+| §4 が引くもの | repo での所在 | 状態 |
+|---|---|---|
+| Ch. I §3 Prop 1(c) | `CentralizerTrichotomy` / `CentralizerInductionBridge` (AxiomsCheck に 8 節) | ✅ |
+| Ch. I §2 Prop 3 | `exists_semilinear_equiv` (AxiomsCheck 9127) | ✅ |
+| Ch. II (11) | `FirstCase/StepEleven.lean` + `StepElevenComplement.lean` | ✅ |
+| §3 Corollary 2 | `corollaryTwo_of_stepFour` (本 issue、今日) | ✅ |
+| §3 Corollary 1 | **未** (PGU(3,q) が repo に無い) — §4 の**最終行**だけが引く | ⚠ |
+
+⚠ §2 (1) は既に形式化済だった (`PSU3Preliminary.lean`):
+`fgh_at_distinguishedInvolution` (`f(s)=g(s)=s`, `h(s)=1`; `hC2` が既に canonical
+分解 `s·1·t·s` になっているのを読むだけ) と
+`fgh_at_conj_distinguishedInvolution` (= (1) 本体、(H3) + `a^t = a⁻¹` で輸送)。
+(37) の「次は (a) §2 (1)」は**不要**だった。
+
+### §4 の構成 (pp.132-134、実測)
+
+前置き: `D` が素数位数 `p` の部分群 `P` で `C_{Q/Q₀}(P) ≠ 1` なるものを持つと仮定
+してよい。`C_Q(P) ≠ 1` ⟹ `P` は `Ω` に 3 不動点 ⟹ `D` 内で `V` の部分群に共役。
+`P ⊂ V` としてよい。`W` は `Q/Q₀` に固定点自由 ⟹ `P ∩ W = 1`。
+
+| 段 | 内容 |
+|---|---|
+| (1) | `U = O^{2'}(C_G(P))` とすると `U/(P ∩ U) ≅ PSU(3,ℓ)`、`q = ℓ^p`、`ℓ > 2` |
+| (2) | `∃ ω ∈ Q−Q₀, ζ ∈ W^#, η ∈ P`: `η` が `ω`,`ζ` を中心化し `f(ω) = ω^{-ζ}`, `h(ω) = ζ³η⁻¹` (**§3 Cor 2 を使う**) |
+| (3) | `f(ω s^a) = f(ω^{ζ a⁻¹})^{a⁻²} ζ^{a⁻¹}` 型の漸化式 (§2 (2) から) |
+| (4)-(6) | `μ` (= `η` の誘導する `E` の体自己同型) つきの座標方程式 |
+| (7)-(9) | 線形結合で `a²μ + b² ≠ 0` と分数式 |
+| (10) | `(ζ+ζ⁻¹+X^μ)X = (ζ+ζ⁻¹+X^{-2})…` for `X ∈ F − {0, a^{2r}}` |
+| 締め | `X` を `X+1` にずらして引くと `X^μ = X` ⟹ `μ = 1` ⟹ `η ∈ W` ⟹ §3 Cor 1 |
+
+⚠ (3)-(10) は OCR が壊れているので**ページ画像 (p.133/134) で式を確定**すること。
+
+### ⚠ 次セッションはここから
+
+1. **締めの体論補題** (§4 の最後): 「有限体の環自己同型が高々 `|S|` 個の元を除いて
+   固定するなら、`(|F| − |S|)² > |F|` の下で恒等」。書籍は `μ` の奇位数を使うが、
+   固定部分体が真ならば `|Fix|² ≤ |F|` (拡大次数 ≥ 2) で一般に出る方が強く簡単。
+   ⟹ **自己完結・unblocked・再利用可**。repo の `natCard_frobFixedSubfield`
+   (`Algebra/QuadraticFrobenius.lean`) が近所。
+2. §4 段 (1)(2) — (2) は `corollaryTwo_of_stepFour` にそのまま乗る。
+3. Corollary 1 第 2 段 = PGU(3,q) infra (大きい、別立て)。
