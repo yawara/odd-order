@@ -7062,3 +7062,29 @@ ULift 版へ `intrinsicResidualQuotientULift_{H,Q,D,t}` + section `SameGroup` �
    `exists_mem_K_conj_t_eq` ((110)) で四つ組が揃う。
 5. ⟹ `hVW` / `hKcard` が transported 側から移送でき、
    `corollaryTwo_of_standardModel` が当たって**段 (2) が閉じる**。
+
+## 2026-08-02 (140): 🎯 `t` の照合の**数学的な核が片付いた** — 残りは組み立て
+
+* `rootHom_range_inf_centralizer_psuTorus_eq_bot` (`Simplicity.lean`) — 標準モデルで
+  `C_Q(D) = 1` (torus の非自明 weight 元が根群に固定点を持たないこと + torus-根交換子)。
+  ⚠ `exists_psuTorus_weight_ne_one` の `private` を外した。
+* `Setup.mem_D_of_map_conj_eq` — `C_Q(D) = 1` ⟹ **`N_M(D) = D`**。
+* `Setup.mul_mem_K_of_setup` — 同じ `M,Q,D` の 2 setup で **`t₂t₁ ∈ K₁`**。
+
+⟹ (132) が「欠けている 1 文」とした (i) が landing。**段 (2) に残る未証明の数学はゼロ**で、
+あとは組み立てのみ。
+
+### ⚠ 次セッションはここから — 四つ組照合の組み立て
+
+1. `exists_mulEquiv_match_residualQuotient` ((136)) で `H,Q,D` を合わせる `φ` を取る。
+2. transported 仮説を `φ` で押し出した setup (`Setup.map`) と内在 setup に
+   `Setup.mul_mem_K_of_setup` を当てて `d := φ(t_tr) · t̄ ∈ K̄` を得る。
+   ⚠ `C_{Q̄}(D̄) = ⊥` は `hQc`/`hDc` (=`exists_conj_eq_triple` の出力、(131) では
+   `_hQc` として捨てているので拾い直す) + 標準モデルの上記補題から移送。
+3. `Hypothesis.exists_mem_K_conj_t_eq` ((110)) で `e ∈ K̄` を取り、
+   `e⁻¹ t̄ e = d t̄ = φ(t_tr)` (t̄ は対合)。
+4. `e ∈ K̄ ≤ D̄ ≤ M̄` なので conj `e` は `M̄`,`Q̄` (`Q ⊴ M`),`D̄` を動かさない
+   ⟹ `ψ := φ` と conj `e` の合成が**四つ組**を合わせる。
+5. `V`,`K` は `D`,`t` から定義されるので `ψ` で対応 ⟹ transported 側の
+   `residualQuotientHypothesis_V_eq_W` などから **`hVW` / `hKcard` を移送** ⟹
+   `corollaryTwo_of_standardModel` が当たり、(119) の 2 転送と合わせて**段 (2) が閉じる**。
