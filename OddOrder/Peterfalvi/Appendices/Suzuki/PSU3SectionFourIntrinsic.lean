@@ -943,6 +943,50 @@ theorem exists_ne_one_mem_W_intrinsicResidualQuotient
   exact exists_ne_one_mem_W_of_mulEquiv _ _ φ hH hD
     (hyp.exists_ne_one_mem_residualQuotientHypothesis_W details)
 
+/-! ### `C_Q(D) = 1` on `U/Z(U)`
+
+The standard model has it (`rootHom_range_inf_centralizer_psuTorus_eq_bot`), and it is an
+isomorphism invariant of the pair `(Q, D)` (`inf_centralizer_eq_bot_of_mulEquiv`), so it
+travels first to the transported standing hypothesis and then, along the matching of
+`exists_mulEquiv_match_residualQuotient`, to the intrinsic one.  It is the extra input of
+`Setup.mul_mem_K_of_setup`, i.e. of the matching of the distinguished involutions. -/
+
+/-- **`C_Q(D) = 1` for the transported standing hypothesis on `U/Z(U)`.** -/
+theorem inf_centralizer_residualQuotientHypothesis
+    (details : CentralizerPSUData hyp X result data) :
+    letI := MulAction.compHom (ULift.{v} (Unital data.n))
+      details.residualQuotientEquiv.toMonoidHom
+    (hyp.residualQuotientHypothesis details).Q ⊓ Subgroup.centralizer
+        (((hyp.residualQuotientHypothesis details).D : Set (↥(residual (G := G) X) ⧸
+          Subgroup.center ↥(residual (G := G) X)))) = ⊥ := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  have hstd : (standardHypothesis data.n data.one_lt_n).Q ⊓ Subgroup.centralizer
+      (((standardHypothesis data.n data.one_lt_n).D : Set (standardPermGroup data.n))) = ⊥ :=
+    rootHom_range_inf_centralizer_psuTorus_eq_bot data.one_lt_n
+  have hlift := inf_centralizer_eq_bot_of_mulEquiv (MulEquiv.refl (standardPermGroup data.n))
+    (Q := (standardHypothesis data.n data.one_lt_n).Q)
+    (D := (standardHypothesis data.n data.one_lt_n).D) rfl rfl hstd
+  exact inf_centralizer_eq_bot_of_mulEquiv details.residualQuotientEquiv.symm rfl rfl hlift
+
+/-- **`C_Q̄(D̄) = 1` for the intrinsic standing hypothesis on `U/Z(U)`.** -/
+theorem inf_centralizer_intrinsicResidualQuotient
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q ⊓ Subgroup.centralizer
+        (((hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).D :
+          Set (↥(residualImage (G := G) X) ⧸
+            Subgroup.center ↥(residualImage (G := G) X)))) = ⊥ := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  obtain ⟨φ, _hH, hQ, hD⟩ :=
+    hyp.exists_mulEquiv_match_residualQuotient details hXD htX hCQ hZD
+  exact inf_centralizer_eq_bot_of_mulEquiv φ hQ hD
+    (hyp.inf_centralizer_residualQuotientHypothesis details)
+
 /-! ### Moving the point set into `Ω`'s universe
 
 The ambient induction hypothesis `TheoremAInductionBelow G Ω` quantifies over permuted
