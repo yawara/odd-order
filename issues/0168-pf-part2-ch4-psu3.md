@@ -7155,3 +7155,31 @@ ULift 版へ `intrinsicResidualQuotientULift_{H,Q,D,t}` + section `SameGroup` �
 
 ⚠ この判断が済むまで段 (2) の最終組み立て (`corollaryTwo_of_standardModel` の適用) は
 保留。それ以外の引数はすべて内在版で揃っている。
+
+### (142) 追記: `hcard` は**特殊化債務**だった (書籍の仮説は「`θ` の位数が奇」)
+
+`PSU3SectionThree.stepThree` (803 行) の docstring が明記している:
+
+> `hcard` is the book's "`|F| ≥ 8`, since `θ` is of odd order". It is carried as a
+> hypothesis because **the odd order of `θ` belongs to the type-`B` datum, which this
+> development does not track**; without it the count genuinely fails — over `𝐅₄` the
+> Frobenius satisfies `X + X^θ = 1` on both points outside `𝐅₂`.
+
+⟹ 書籍の本当の仮説は「**`θ` の位数が奇**」で、`|F| ≥ 8` はそれが `𝐅₄` を排除することを
+使った proxy。`𝐅₄` (= `ℓ = 4`) では `θ` = Frobenius の位数が 2 (偶) なので書籍の仮説では
+除かれるが、repo の `hcard` では `ℓ = 4` が丸ごと落ちる。
+
+これは [[repo-stronger-hypothesis-is-specialization-not-gap]] の型 —
+**書籍の gap ではなく repo 側の債務**。選択肢:
+
+**(a) `θ` の奇位数を追跡して `hcard` を弱める** — §3 の type-`B` datum に
+`θ` の位数情報を持たせる。正攻法だが §3 の refactor。
+**(b) `ℓ = 4` を別途排除する** — §4 に `ℓ > 4` を出す議論があるか要確認
+(⚠ `PSU(3,4)` は存在するので、あるとすれば §4 固有の理由)。
+
+⚠ どちらにせよ **段 (2) の最終組み立ての前に決着が要る**。それ以外の引数
+(`IsFGH`/`hC2`/`sfive`/`M`/`hZc`/`hmu`/`hm`/`hQ0card`/`hVW`/`hKcard`/bilinear package/
+`hW1`/`hWdvd`/`hhW`) はすべて `U/Z(U)` 内在版で揃っている。
+
+次セッションはまず (b) を実測 (書籍 p.122-134 と §4 の repo ファイルを `ℓ = 4` /
+`q > 4` で grep)、無ければ (a) の規模を見積もる。
