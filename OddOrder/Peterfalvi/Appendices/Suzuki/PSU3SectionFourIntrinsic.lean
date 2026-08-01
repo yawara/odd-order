@@ -987,6 +987,71 @@ theorem inf_centralizer_intrinsicResidualQuotient
   exact inf_centralizer_eq_bot_of_mulEquiv φ hQ hD
     (hyp.inf_centralizer_residualQuotientHypothesis details)
 
+/-- **🎯 The intrinsic and transported standing hypotheses on `U/Z(U)` are matched on all
+four of `H`, `Q`, `D` and `t`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133).
+
+`exists_mulEquiv_match_residualQuotient` matches the first three; the two distinguished
+involutions then differ by an element of `K` (`Setup.mul_mem_K_of_setup`, using
+`C_Q̄(D̄) = 1`), and conjugating by `K` realizes that difference
+(`exists_mem_K_conj_t_eq`) without moving `H`, `Q` or `D`.
+
+Every subgroup Part II attaches to a standing hypothesis — `Q₀`, `V`, `K`, `W`, the
+distinguished pair — is built from these four, so all of them correspond. -/
+theorem exists_mulEquiv_match_residualQuotient_t
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    letI := MulAction.compHom (ULift.{v} (Unital data.n))
+      details.residualQuotientEquiv.toMonoidHom
+    ∃ ψ : (↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X)) ≃*
+        (↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X)),
+      (hyp.residualQuotientHypothesis details).H.map ψ.toMonoidHom
+          = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).H ∧
+        (hyp.residualQuotientHypothesis details).Q.map ψ.toMonoidHom
+          = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q ∧
+        (hyp.residualQuotientHypothesis details).D.map ψ.toMonoidHom
+          = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).D ∧
+        ψ (hyp.residualQuotientHypothesis details).t
+          = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).t := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  obtain ⟨φ, hH, hQ, hD⟩ :=
+    hyp.exists_mulEquiv_match_residualQuotient details hXD htX hCQ hZD
+  set hi := hyp.intrinsicResidualQuotient details hXD htX hCQ hZD with hidef
+  have hSφ : OddOrder.GroupTheory.RankOneBNPair.Setup hi.H hi.Q hi.D
+      (φ (hyp.residualQuotientHypothesis details).t) := by
+    have h := (hyp.residualQuotientHypothesis details).rankOneSetup.map φ
+    rwa [hH, hQ, hD] at h
+  have hK := hi.rankOneSetup.mul_mem_K_of_setup hSφ
+    (hyp.inf_centralizer_intrinsicResidualQuotient details hXD htX hCQ hZD)
+  have hmemK : φ (hyp.residualQuotientHypothesis details).t * hi.t ∈ hi.K := by
+    rw [← SetLike.mem_coe, hi.coe_K]
+    exact ⟨hK.1, hK.2⟩
+  obtain ⟨e, heK, he⟩ := hi.exists_mem_K_conj_t_eq hmemK
+  have heD : e ∈ hi.D := hi.K_le_D heK
+  have heM : e ∈ hi.H := hi.D_le_H heD
+  have hcomp : (φ.trans (MulAut.conj e)).toMonoidHom
+      = (MulAut.conj e).toMonoidHom.comp φ.toMonoidHom := by ext x; rfl
+  have hQe : hi.Q.map (MulAut.conj e).toMonoidHom = hi.Q := by
+    refine le_antisymm ?_ fun x hx => ⟨e⁻¹ * x * e, hi.rankOneSetup.conj_mem_Q heM hx, ?_⟩
+    · rintro _ ⟨x, hx, rfl⟩
+      have h := hi.rankOneSetup.conj_mem_Q (hi.H.inv_mem heM) hx
+      simpa using h
+    · change e * (e⁻¹ * x * e) * e⁻¹ = x
+      group
+  have htt : hi.t * hi.t = 1 := by rw [← sq]; exact hi.t_sq
+  have hteq : e⁻¹ * hi.t * e = φ (hyp.residualQuotientHypothesis details).t := by
+    rw [he, mul_assoc, htt, mul_one]
+  refine ⟨φ.trans (MulAut.conj e), ?_, ?_, ?_, ?_⟩
+  · rw [hcomp, ← Subgroup.map_map, hH]; exact map_conj_self heM
+  · rw [hcomp, ← Subgroup.map_map, hQ]; exact hQe
+  · rw [hcomp, ← Subgroup.map_map, hD]; exact map_conj_self heD
+  · change e * φ (hyp.residualQuotientHypothesis details).t * e⁻¹ = hi.t
+    rw [← hteq]
+    group
+
 /-! ### Moving the point set into `Ω`'s universe
 
 The ambient induction hypothesis `TheoremAInductionBelow G Ω` quantifies over permuted
