@@ -1028,7 +1028,7 @@ theorem eq_one_of_conj_eq_mul_Q0_of_mem_D {m : ℕ} (M : hyp.QuotientFieldModel 
 | §1 / (A1)-(A3) 橋 / (1)-(11) | ✅ | 既存 |
 | (12) | 🔶 体側のみ (`exists_add_inv_eq`) | 群側は `β` の供給だけ |
 | **(13)** | ✅ 群↔体 の橋渡し込み | `stepElevenCoord_eq_betaRatio` |
-| (14) | 🔶 体側のみ (`betaScale_succ`) | ⚠ (20) が要求する |
+| **(14)** | ✅ 群形も (`stepFourteen`) | `d_i = ζ^{i+1}k` + `k` のスカラー |
 | **(15)(16)(17)(18)(19)** | ✅ **完成** | 各 leaf |
 | (20) | 🔶 核 ✅ / 2 本の列の instantiate が残り | `eq_and_eq_of_inv_mul_mem_K` |
 
@@ -1045,11 +1045,10 @@ theorem eq_one_of_conj_eq_mul_Q0_of_mem_D {m : ℕ} (M : hyp.QuotientFieldModel 
 
 **残っている部品**:
 * 2 本の列 (`α = α₁` 用と `α = α₂` 用) を同時に走らせる設定 (`n ≥ 2` の下)。
-* **段 (14) の群↔体 橋渡し** = `d_i = ζ^i (c_i/α)^{2τ}` を群の上で読む。
-  現状あるのは `d_i ∈ ζ^{i+1}K` (`stepEighteen_unroll` の第 1 成分) と
-  `d_i` の `Q₀` 上のスカラー `(c₁/c_{i+1})²` (`centerCoord_conj_stepElevenSeq`)。
-  `e_i^{-t} ∈ e'_{m−i}K` に必要なのは **`K` 成分の同定**なので、後者から
-  `μ(kActor(d_i の K 成分))^d = (c₁/c_{i+1})²` が言えれば足りるはず。
+* ~~段 (14) の群↔体 橋渡し~~ → **完了** (`stepFourteen`, 2026-08-01):
+  `d_i = ζ^{i+1}k` かつ `k` は `Q₀` にスカラー `(c₁/c_{i+1})²` で作用する。
+  ⚠ 書籍の `(c_i/α)^{2τ}` とは規約が逆向き (書籍の `c^a = a^{1+θ}c` は `a⁻¹`
+  による共役)。
 * 添字反転 `i ↔ m − i` の扱い (2 本目の列を逆向きに読む)。
 
 ## セッション総括 (2026-07-31)
