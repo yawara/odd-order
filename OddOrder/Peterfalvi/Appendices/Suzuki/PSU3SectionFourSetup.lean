@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
+import OddOrder.GroupTheory.CoprimeFixedPoints
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the exponent discriminator of step (1)
@@ -32,6 +33,9 @@ element of `Q − Q₀` does *not* square to `1`.
 * `Hypothesis.sq_ne_one_of_not_mem_Q0` — the involutions of `Q` lie in `Q₀`.
 * `Hypothesis.not_isElementaryAbelian_cQ_of_not_mem_Q0` — `C_Q(X)` is not elementary
   abelian once it meets `Q − Q₀`.
+* `Hypothesis.conjQByD`, `Hypothesis.isAInvariant_conjQByD_Q0` — the conjugation action
+  of `D` on `Q` and the `D`-invariance of `Q₀`, the data step (1)'s Glauberman reduction
+  runs on.
 -/
 
 set_option autoImplicit false
@@ -91,6 +95,49 @@ theorem not_isElementaryAbelian_cQ_of_not_mem_Q0
     (fun z : ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) =>
       ((z : ↥(Subgroup.centralizer (X : Set G))) : G)) hpt
   simpa using this
+
+/-! ### The conjugation action of `D` on `Q`
+
+Ch. IV §4's `P` lies in `V ≤ D`, and the Glauberman step of step (1) needs `P` acting on
+`Q` with the `P`-invariant normal subgroup `Q₀`.  `conjQByK` and `conjQByW` are the same
+construction for `K` and `W`; this is the version covering all of `D`. -/
+
+/-- **Conjugation by `D` on `Q`** — `D ≤ H` and `Q ⊴ H`. -/
+def conjQByD : ↥hyp.D →* MulAut ↥hyp.Q where
+  toFun d :=
+    { toFun := fun x => ⟨(d : G) * x * (d : G)⁻¹,
+        hyp.Q_normal_in_H d (hyp.D_le_H d.2) x x.2⟩
+      invFun := fun x => ⟨(d : G)⁻¹ * x * (d : G), by
+        simpa using hyp.Q_normal_in_H (d : G)⁻¹
+          (inv_mem (hyp.D_le_H d.2)) x x.2⟩
+      left_inv := fun x => Subtype.ext (by simp [mul_assoc])
+      right_inv := fun x => Subtype.ext (by simp [mul_assoc])
+      map_mul' := fun x y => Subtype.ext (by
+        change (d : G) * ((x : G) * (y : G)) * (d : G)⁻¹ =
+          ((d : G) * x * (d : G)⁻¹) * ((d : G) * y * (d : G)⁻¹)
+        group) }
+  map_one' := by
+    ext x
+    change ((1 : ↥hyp.D) : G) * (x : G) * ((1 : ↥hyp.D) : G)⁻¹ = (x : G)
+    simp
+  map_mul' d e := by
+    ext x
+    change (((d : G) * (e : G)) * (x : G) * (((d : G) * (e : G))⁻¹)) =
+      (d : G) * ((e : G) * (x : G) * (e : G)⁻¹) * (d : G)⁻¹
+    group
+
+@[simp] theorem conjQByD_apply_val (d : ↥hyp.D) (x : ↥hyp.Q) :
+    ((hyp.conjQByD d x : ↥hyp.Q) : G) = (d : G) * (x : G) * (d : G)⁻¹ := rfl
+
+include hyp in
+/-- **`Q₀` is `D`-invariant inside `Q`** — the normal subgroup along which step (1)'s
+Glauberman argument reduces. -/
+theorem isAInvariant_conjQByD_Q0 :
+    OddOrder.Isaacs.Ch03.IsAInvariant hyp.conjQByD (hyp.Q0.subgroupOf hyp.Q) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro d x hx
+  rw [Subgroup.mem_subgroupOf] at hx ⊢
+  exact hyp.conj_mem_Q0_of_mem_D d.2 hx
 
 end Hypothesis
 
