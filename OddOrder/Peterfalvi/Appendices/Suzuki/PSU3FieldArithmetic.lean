@@ -1041,17 +1041,24 @@ theorem eq_one_and_eq_add_inv_of_star {E : Type*} [Field E] [Finite E] (h2 : (2 
 /-- **From the two readings of stage (2) to `b² = ζ + ζ⁻¹ + a⁻²`**
 (Peterfalvi Part II, p. 130, inside §3 (3)).
 
-Cross-multiplying `1/(a² + ζ⁻¹) = ζ a⁻²/(b² + ζ⁻¹)` gives
-`b² + ζ⁻¹ = ζ a⁻²(a² + ζ⁻¹) = ζ + a⁻²`. -/
-theorem sq_eq_of_one_div_eq {E : Type*} [Field E] (h2 : (2 : E) = 0) {a b ζ : E}
-    (hζ : ζ ≠ 0) (ha : a ≠ 0) (hA : a ^ 2 + ζ⁻¹ ≠ 0) (hB : b ^ 2 + ζ⁻¹ ≠ 0)
-    (heq : 1 / (a ^ 2 + ζ⁻¹) = ζ * (a ^ 2)⁻¹ / (b ^ 2 + ζ⁻¹)) :
-    b ^ 2 = ζ + ζ⁻¹ + (a ^ 2)⁻¹ := by
-  have ha2 : (a : E) ^ 2 ≠ 0 := pow_ne_zero 2 ha
-  have hexp : ζ * (a ^ 2)⁻¹ * (a ^ 2 + ζ⁻¹) = ζ + (a ^ 2)⁻¹ := by
+The book divides the two instances of stage (2) into
+`1/(a² + ζ⁻¹) = ζ a⁻²/(b² + ζ⁻¹)` and cross-multiplies.  Division is avoidable: the two
+instances evaluate the *same* `ω̄`, and stage (10) relates their unknowns by the factor
+`(A Z)⁻¹`, so cancelling the unknown at `b` leaves
+
+  `(A + Z)(A Z)⁻¹ = B + Z`,  i.e.  `Z⁻¹ + A⁻¹ = B + Z`,
+
+with `A = a²`, `B = b²`, `Z = ζ⁻¹` in the book's letters.  No side condition
+`a² + ζ⁻¹ ≠ 0` is then needed.
+
+`Hypothesis.stepThree_sq_eq` supplies the three equations. -/
+theorem eq_add_inv_add_inv_of_mul_inv_eq {E : Type*} [Field E] (h2 : (2 : E) = 0)
+    {A B Z : E} (hA : A ≠ 0) (hZ : Z ≠ 0) (heq : (A + Z) * (A * Z)⁻¹ = B + Z) :
+    B = A⁻¹ + Z + Z⁻¹ := by
+  have hexp : (A + Z) * (A * Z)⁻¹ = Z⁻¹ + A⁻¹ := by
     field_simp
-  rw [div_eq_div_iff hA hB, one_mul, hexp] at heq
-  linear_combination heq - ζ⁻¹ * h2
+  rw [hexp] at heq
+  linear_combination -heq - Z * h2
 
 /-- **`(∗)` from `b² = ζ + ζ⁻¹ + a⁻²`** (Peterfalvi Part II, p. 130, inside §3 (3)).
 

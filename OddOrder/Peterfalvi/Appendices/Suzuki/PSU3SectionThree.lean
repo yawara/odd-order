@@ -34,6 +34,9 @@ hypothesis, and then reads off `h(ω⁻¹) = ζ⁻³` from (H5) — a step the b
   of `f(ω s^a)`.
 * `Hypothesis.stepTwo_linear` — §3's stage (2), the linear equation
   `(a² + ζ⁻¹) · f(ω s^a)‾ = ω̄` in `E`.
+* `Hypothesis.stepTen_quotient_coord` — §2's stage (10) read in `E`.
+* `Hypothesis.stepThree_sq_eq` — the group-to-field bridge of §3 (3):
+  `b² = ζ + ζ⁻¹ + a⁻²`.
 -/
 
 set_option autoImplicit false
@@ -395,6 +398,130 @@ theorem stepTwo_linear (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     + (((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ^ 2 *
       M.coord (Additive.ofMul (QuotientGroup.mk
         (⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hXQ⟩ : ↥hyp.Q)))) * h2E
+
+/-- **§2's stage (10), read in `Q ⧸ Z(Q) ≅ E`** (Peterfalvi Part II, p. 130, first display
+of §3 (3)).
+
+Stage (10) says `f(ω s^a) = (f(ω z) · s^a)^{ζ a⁻²}` with `z = y · s^{a⁻¹}`; in the
+quotient the factor `s^a ∈ Q₀ = Z(Q)` disappears and the conjugation becomes a scalar, so
+
+  `f(ω s^a)‾ = (μ(a²) μ(ζ))⁻¹ · f(ω z)‾`.
+
+This is the book's `f(ωs^a)‾ = ζ a⁻² · f(ω(0, α + a^{-(1+θ)}))‾`.  The scalars are the
+*inverses* of the book's throughout: its `x^d` is conjugation by `d⁻¹`, whereas `coord_act`
+is stated for conjugation by `d`.  Both stages invert in the same way, so the eventual
+field identity has the book's shape (`stepThree_sq_eq`).
+
+The conjugate of `s` is written `a s a⁻¹` — the convention of `stepTwo_linear`, which is
+`s^{a⁻¹}` in the book's; stage (10) is therefore applied at `a⁻¹`. -/
+theorem stepTen_quotient_coord (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {ζ ω y a z : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (haK : a ∈ hyp.K) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hz : y * (a⁻¹ * hyp.distinguishedInvolution * a) = z)
+    (hXQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q)
+    (hWQ : f (ω * z) ∈ hyp.Q) :
+    M.coord (Additive.ofMul (QuotientGroup.mk
+        (⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hXQ⟩ : ↥hyp.Q)))
+      = (((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)
+            * ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E))⁻¹
+        * M.coord (Additive.ofMul (QuotientGroup.mk (⟨f (ω * z), hWQ⟩ : ↥hyp.Q))) := by
+  have hsQ0 : hyp.distinguishedInvolution ∈ hyp.Q0 := hyp.distinguishedInvolution_mem_Q0
+  have haD : a ∈ hyp.D := hyp.K_le_D haK
+  -- stage (10) at `a⁻¹`, with the double inverses removed
+  have hstep := hyp.stepTen H hC2 hζ hωQ hωQ0 hyQ0 (hyp.K.inv_mem haK) hfω
+    (show y * (a⁻¹ * hyp.distinguishedInvolution * a⁻¹⁻¹) = z by rwa [inv_inv])
+  rw [inv_inv] at hstep
+  -- the `Q₀`-factor and the memberships
+  have hsaQ0 : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D haD hsQ0
+  have hsaQ : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q := hyp.Q0_le_Q hsaQ0
+  have hUQ : f (ω * z) * (a * hyp.distinguishedInvolution * a⁻¹) ∈ hyp.Q :=
+    hyp.Q.mul_mem hWQ hsaQ
+  have hκ : (a ^ 2)⁻¹ ∈ hyp.K := hyp.K.inv_mem (pow_mem haK 2)
+  have hv : ζ⁻¹ ∈ hyp.W := hyp.W.inv_mem hζ
+  -- the conjugating element is `(a²)⁻¹ ζ⁻¹`
+  have hval : ((a ^ 2)⁻¹ * ζ⁻¹) * (f (ω * z) * (a * hyp.distinguishedInvolution * a⁻¹))
+      * ((a ^ 2)⁻¹ * ζ⁻¹)⁻¹ = f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) := by
+    rw [hstep]; group
+  rw [hyp.coord_conj_eq M hκ hv hUQ hXQ hval, hyp.coord_mk_mul M hWQ hsaQ hUQ,
+    hyp.coord_mk_eq_zero_of_mem_Q0 M hZ hsaQ0 hsaQ, add_zero]
+  -- identify the scalar as the inverse of `μ(a²) μ(ζ)`
+  congr 1
+  have hpair : (hyp.kActor hκ, (⟨ζ⁻¹, hv⟩ : ↥hyp.W))
+      = ((hyp.kActor (pow_mem haK 2), (1 : ↥hyp.W)) *
+          ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)))⁻¹ := by
+    have hfst : hyp.kActor hκ = (hyp.kActor (pow_mem haK 2))⁻¹ :=
+      hyp.kActor_eq_inv (pow_mem haK 2) hκ rfl
+    have hsnd : (⟨ζ⁻¹, hv⟩ : ↥hyp.W) = (⟨ζ, hζ⟩ : ↥hyp.W)⁻¹ := Subtype.ext rfl
+    rw [Prod.mk_mul_mk, one_mul, mul_one, Prod.inv_mk, hfst, hsnd]
+  rw [hpair, map_inv, Units.val_inv_eq_inv_val, map_mul, Units.val_mul]
+
+/-- **`b² = ζ + ζ⁻¹ + a⁻²`** (Peterfalvi Part II, p. 130, inside §3 (3)) — the bridge from
+the group to the field.
+
+The book gets there by dividing the two instances of stage (2),
+
+  `1/(a² + ζ⁻¹) = ζ a⁻² / (b² + ζ⁻¹)`,
+
+but the division is avoidable: stage (2) at `a` and at `b` both evaluate `ω̄`, and stage
+(10) relates the two unknowns, so cancelling the (nonzero) unknown at `b` already gives the
+identity — no side condition `a² + ζ⁻¹ ≠ 0` is needed.
+
+Written with `A = μ(a²)` and `Z = μ(ζ)`, the three inputs are
+`(A + Z) X_a = ω̄`, `(B + Z) X_b = ω̄` and `X_a = (A Z)⁻¹ X_b`, whence
+`(A + Z)(A Z)⁻¹ = B + Z`, i.e. `B = A⁻¹ + Z + Z⁻¹`.  The scalars being the inverses of the
+book's (see `stepTen_quotient_coord`), this is its `b² = ζ + ζ⁻¹ + a⁻²`.
+
+The element `b` is the one produced by `stepTen_exists`; its defining relation
+`s^b = y · s^{a⁻¹}` is the book's `b^{1+θ} = α + a^{-(1+θ)}` (`stepTen_coord`). -/
+theorem stepThree_sq_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ζ ω y a b : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hsq : ω * ω = y) (haK : a ∈ hyp.K) (hbK : b ∈ hyp.K)
+    (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hb : b * hyp.distinguishedInvolution * b⁻¹
+      = y * (a⁻¹ * hyp.distinguishedInvolution * a)) :
+    ((M.mu (hyp.kActor (pow_mem hbK 2), 1) : M.Eˣ) : M.E)
+      = ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)⁻¹
+        + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
+        + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹ := by
+  have h2E : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  have hsQ0 : hyp.distinguishedInvolution ∈ hyp.Q0 := hyp.distinguishedInvolution_mem_Q0
+  -- the §3 hypothesis in the form stage (1) needs
+  have hf : f ω = ζ⁻¹ * ω⁻¹ * ζ := hyp.f_eq_conj_inv_of_sq_eq hyQ0 hfω hsq
+  -- the two arguments of `f`, and their images
+  have hsaQ0 : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D haK) hsQ0
+  have hsbQ0 : b * hyp.distinguishedInvolution * b⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D hbK) hsQ0
+  obtain ⟨hωaQ, hωaQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hsaQ0
+  obtain ⟨hωbQ, hωbQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hsbQ0
+  obtain ⟨hXaQ, -⟩ := hyp.f_mem_sdiff_Q0 H hC2 hωaQ hωaQ0
+  obtain ⟨hXbQ, hXbQ0⟩ := hyp.f_mem_sdiff_Q0 H hC2 hωbQ hωbQ0
+  -- the three equations
+  have hA := hyp.stepTwo_linear H hC2 M hZ hmu hVW hζ hωQ hωQ0
+    (by rw [← hyp.coe_K] at *; exact haK) (pow_mem haK 2) hf hXaQ
+  have hB := hyp.stepTwo_linear H hC2 M hZ hmu hVW hζ hωQ hωQ0
+    (by rw [← hyp.coe_K] at *; exact hbK) (pow_mem hbK 2) hf hXbQ
+  have hT := hyp.stepTen_quotient_coord H hC2 M hZ hζ hωQ hωQ0 hyQ0 haK hfω hb.symm
+    hXaQ hXbQ
+  -- the unknown at `b` is nonzero, so it cancels
+  have hXb0 := hyp.coord_ne_zero_of_not_mem_Q0 M hZ hXbQ hXbQ0
+  have hAne : ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) ≠ 0 := Units.ne_zero _
+  have hZne : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ≠ 0 := Units.ne_zero _
+  rw [hT] at hA
+  exact eq_add_inv_add_inv_of_mul_inv_eq h2E hAne hZne
+    (mul_right_cancel₀ hXb0 (by rw [← mul_assoc] at hA; exact hA.trans hB.symm))
 
 end Hypothesis
 

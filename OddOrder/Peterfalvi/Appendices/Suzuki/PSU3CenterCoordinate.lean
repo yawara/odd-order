@@ -167,6 +167,17 @@ Step (15) uses this to transport `κ = 1` (from `K ∩ W = 1`) across `μ`: the 
   change hyp.conjQByK ⟨1, h⟩ = 1
   rw [show (⟨1, h⟩ : ↥hyp.K) = 1 from Subtype.ext rfl, map_one]
 
+/-- `kActor` turns inverses into inverses — `conjQByK` is a homomorphism.
+
+The hypothesis is stated as an equation rather than by `inv_mem` so that a caller may
+present the element in whatever shape it arises in: §3 (3) meets it as `(a⁻¹)²`, which is
+`(a²)⁻¹` only up to `inv_pow`. -/
+theorem kActor_eq_inv {a b : G} (ha : a ∈ hyp.K) (hb : b ∈ hyp.K) (hab : b = a⁻¹) :
+    hyp.kActor hb = (hyp.kActor ha)⁻¹ := by
+  apply Subtype.ext
+  change hyp.conjQByK ⟨b, hb⟩ = (hyp.conjQByK ⟨a, ha⟩)⁻¹
+  rw [show (⟨b, hb⟩ : ↥hyp.K) = (⟨a, ha⟩ : ↥hyp.K)⁻¹ from Subtype.ext hab, map_inv]
+
 /-- Conjugating an element of `Q₀` by `a ∈ K` is `centerKHom` at the corresponding
 actor. -/
 theorem toCenter_conj {m : ℕ} (s : hyp.LemmaFiveSetup m) {a : G} (ha : a ∈ hyp.K)
