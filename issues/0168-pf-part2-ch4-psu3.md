@@ -7416,3 +7416,17 @@ type-B 認識を通す必要がある。
 認識定理の内部データを使えば `K` は最初から引数に入っているので直接繋がる。
 
 **次セッションはこの露出リファクタから**。
+
+**(150) 追記 — 露出リファクタの入口**: `nu` / `dataL0` / `dataR0` は
+`exists_complementaryFactorCoordinates_of_xiLengthThree`
+(`TypeBRecognition.lean` l.73) が返す存在量化子。よって露出は
+
+1. `exists_complementaryFactorCoordinates_of_xiLengthThree` の出力 (`nu`, `lambda`) が
+   **入力の actor `K` の作用でどう表せるか**を確認 (`FactorCoordinateData.lambda` の定義)、
+2. `isTypeB_of_isomorphicOrderQModuleSplit_of_xiLengthThree` の 4 分岐すべてで
+   `ν = λ^{1+2^r}` + `Frob^r` 奇位数 が既に手元にあるので、結論に足す、
+3. `..._of_card_eq_cube` → `TypeBFromW.isTypeB_Q_of_orderThree_of_mem_W` へ順に伝搬
+   (呼び出し元は `lemmaFive_of_orderThree` など)
+
+の 3 段。⚠ θ=φ=1 分岐は `ν = λ²` = `λ^{1+2^0}` で `Frob^0 = 1` (位数 1 = 奇) なので
+**全分岐が同じ形に収まる**。
