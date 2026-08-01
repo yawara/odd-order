@@ -39,6 +39,8 @@ its kernel.
 
 * `exists_ne_one_mem_psuTorus_torusWeight_eq_one` — a non-trivial parameter of
   the determinant-one torus with trivial norm.
+* `scalePoint_eq_of_torusWeight_eq_one` — *every* norm-one parameter fixes
+  `Ω₁(S₀)` pointwise.
 * `exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one` — the same in the
   form Peterfalvi uses: a non-trivial `c ∈ D₀` fixing every element of
   `Ω₁(S₀)`.
@@ -142,21 +144,30 @@ theorem odd_orderOf_psuTorusParameter (n : ℕ) (hn : 0 < n)
     exact ⟨k - 1, by omega⟩
   exact hodd.of_dvd_nat hdvd
 
-/-- **`C_{D₀}(Ω₁(S₀)) ≠ 1`** (Peterfalvi Part II, Ch. III §1, Proposition,
-p. 117, the step stated "as can be checked").
+/-- **A norm-one torus parameter fixes `Ω₁(S₀)` pointwise.**
 
-`Ω₁(S₀)` is the centre line `{u | u.fst = 0}`
-(`sq_eq_one_iff_fst_eq_zero`), on which the torus acts through the norm, so the
-non-trivial norm-one parameter of the previous lemma fixes it pointwise. -/
-theorem exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one (n : ℕ) (hn : 1 < n) :
-    ∃ c : GeneralTorusParameter n, c ∈ PSUTorusParameter n ∧ c ≠ 1 ∧
-      ∀ u : RootGroup n, u ^ 2 = 1 → scalePoint c u = u := by
-  obtain ⟨c, hmem, hne, hw⟩ := exists_ne_one_mem_psuTorus_torusWeight_eq_one n hn
-  refine ⟨c, hmem, hne, fun u hu => ?_⟩
+`Ω₁(S₀)` is the centre line `{u | u.fst = 0}` (`sq_eq_one_iff_fst_eq_zero`), on
+which the torus acts through the norm `N(c) = c^{ℓ+1}` (`scalePoint_snd`).  This
+is the `PSU(3, ℓ)` structure fact behind Peterfalvi Part II, Ch. III §1's
+`C_{D₀}(Ω₁(S₀)) ≠ 1` and Ch. IV §4 step (2)'s "`(V ∩ U)/(P ∩ U)` centralizes
+`C_{Q₀}(P)`" (p. 133). -/
+theorem scalePoint_eq_of_torusWeight_eq_one {n : ℕ} {c : GeneralTorusParameter n}
+    (hw : torusWeight c = 1) {u : RootGroup n} (hu : u ^ 2 = 1) :
+    scalePoint c u = u := by
   have hfst : u.fst = 0 := (RootGroup.sq_eq_one_iff_fst_eq_zero u).mp hu
   ext
   · rw [scalePoint_fst, hfst, mul_zero]
   · rw [scalePoint_snd, hw, one_mul]
+
+/-- **`C_{D₀}(Ω₁(S₀)) ≠ 1`** (Peterfalvi Part II, Ch. III §1, Proposition,
+p. 117, the step stated "as can be checked") — the norm-one parameter of
+`exists_ne_one_mem_psuTorus_torusWeight_eq_one`, read through
+`scalePoint_eq_of_torusWeight_eq_one`. -/
+theorem exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one (n : ℕ) (hn : 1 < n) :
+    ∃ c : GeneralTorusParameter n, c ∈ PSUTorusParameter n ∧ c ≠ 1 ∧
+      ∀ u : RootGroup n, u ^ 2 = 1 → scalePoint c u = u := by
+  obtain ⟨c, hmem, hne, hw⟩ := exists_ne_one_mem_psuTorus_torusWeight_eq_one n hn
+  exact ⟨c, hmem, hne, fun _u hu => scalePoint_eq_of_torusWeight_eq_one hw hu⟩
 
 /-! ## The same statement inside `standardPermGroup n` -/
 
