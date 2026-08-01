@@ -43,10 +43,16 @@ setup lives on its image in `G` (`residualImage`).
 * `residualImageMulEquiv`, `residualQuotientMulEquiv` — `U` and `U/Z(U)` read in `G` agree
   with `U` and `U/Z(U)` read in `C_G(X)`.
 * `isSimpleGroup_residualQuotient` — `U/Z(U)` is simple.
-* `natCard_map_Q_residualQuotient` — `|Q̄| = |C_Q(X)|`.
+* `cQMulEquivMapQ`, `natCard_map_Q_residualQuotient` — `Q̄ ≃ C_Q(X)`, so `|Q̄| = |C_Q(X)|`.
 * `odd_natCard_map_D_residualQuotient` — `|D̄|` is odd.
 * `Hypothesis.intrinsicResidualQuotient` — the standing hypothesis on `U/Z(U)` in the
   intrinsic subgroups, which is what step (2) argues with.
+* `natCard_Q0_intrinsicResidualQuotient`, `natCard_Q_intrinsicResidualQuotient`,
+  `isSuzuki2Group_Q_intrinsicResidualQuotient` — the numerical and structural inputs of
+  Ch. I §3 Lemma 5, for it.
+* `intrinsicPointEquiv`, `intrinsicResidualQuotientULift` — the same hypothesis with its
+  point set relabelled as the standard `Unital ℓ`, which lifts into `Ω`'s universe, and
+  `theoremAInductionBelow_intrinsicResidualQuotient` — the induction hypothesis there.
 -/
 
 set_option autoImplicit false
@@ -152,6 +158,13 @@ theorem odd_natCard_map_D_residualQuotient :
     rw [OddOrder.GroupTheory.natCard_subgroupOf]
     exact Subgroup.card_dvd_of_le inf_le_left
   exact Odd.of_dvd_nat hyp.D_odd (hdvd₁.trans hdvd₂)
+
+/-- `|U/Z(U)| < |G|`, read in `G` — the bound the induction hypothesis restricts along. -/
+theorem natCard_residualImageQuotient_lt (hXV : X ≤ hyp.V) (hX : X ≠ ⊥) :
+    Nat.card (↥(residualImage (G := G) X) ⧸
+      Subgroup.center ↥(residualImage (G := G) X)) < Nat.card G := by
+  rw [← Nat.card_congr (residualQuotientMulEquiv (G := G) X).toEquiv]
+  exact hyp.natCard_residualQuotient_lt hXV hX
 
 section Model
 
@@ -381,6 +394,73 @@ theorem isSuzuki2Group_Q_intrinsicResidualQuotient
   rw [hyp.intrinsicResidualQuotient_Q details hXD htX hCQ hZD]
   exact OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv
     details.cQ_isSuzuki2Group (hyp.cQMulEquivMapQ hXD htX hCQ hZD)
+
+/-! ### Moving the point set into `Ω`'s universe
+
+The ambient induction hypothesis `TheoremAInductionBelow G Ω` quantifies over permuted
+sets in `Ω`'s universe, so a standing hypothesis it can be applied below must have its
+permuted set there.  The intrinsic one permutes `L̄ ⧸ M̄`, which lives in `G`'s universe;
+but Ch. IV §1's identification `L̄ ⧸ M̄ ≅ Q̄ ∪ {a}` (`coordsEquiv`) together with
+`Q̄ ≅ RootGroup ℓ` puts it in bijection with the standard `Unital ℓ`, a small type, which
+lifts anywhere.  `ofRankOneSetupOfEquiv` then reads the same hypothesis there. -/
+
+/-- **The point set of the intrinsic action is the standard `Unital ℓ`** — `L̄ ⧸ M̄` is
+`Q̄ ∪ {a}` (Ch. IV §1, p. 123) and `Q̄ ≅ C_Q(X) ≅ RootGroup ℓ` (Ch. I §3 Prop 1(c)). -/
+noncomputable def intrinsicPointEquiv (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    ((↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X)) ⧸
+        (hyp.H.subgroupOf (residualImage (G := G) X)).map
+          (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
+      ≃ Unital data.n :=
+  (coordsEquiv (hyp.setup_residualQuotient hXD htX hCQ hZD)).symm.trans
+    (Equiv.optionCongr
+      ((hyp.cQMulEquivMapQ hXD htX hCQ hZD).symm.trans details.cQEquivRoot).toEquiv)
+
+/-- **The intrinsic standing hypothesis on `U/Z(U)`, permuting `Unital ℓ`** — the same
+`H`, `Q`, `D`, `t` as `intrinsicResidualQuotient`, with the point set relabelled so that
+it lies in `Ω`'s universe. -/
+noncomputable def intrinsicResidualQuotientULift
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    letI := Hypothesis.rankOneSetupAction
+      ((hyp.intrinsicPointEquiv details hXD htX hCQ hZD).trans Equiv.ulift.symm)
+    Hypothesis (↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X))
+      (ULift.{v} (Unital data.n)) :=
+  letI := hyp.isSimpleGroup_residualQuotient details
+  Hypothesis.ofRankOneSetupOfEquiv (hyp.setup_residualQuotient hXD htX hCQ hZD)
+    ((hyp.intrinsicPointEquiv details hXD htX hCQ hZD).trans Equiv.ulift.symm)
+    (hyp.setup_residualQuotient hXD htX hCQ hZD).normalCore_eq_bot_of_isSimpleGroup
+    (hyp.even_natCard_map_Q_residualQuotient details hXD htX hCQ hZD)
+    hyp.odd_natCard_map_D_residualQuotient
+    (hyp.two_rank_ge_two_residualQuotient details)
+
+/-- **The induction hypothesis restricts to `U/Z(U)`** with the intrinsic point set.
+
+`TheoremAInductionBelow` only looks at the order of the group, so this is `ih` composed
+with `natCard_residualImageQuotient_lt`; what makes it typecheck at all is that the
+permuted set has been moved into `Ω`'s universe. -/
+theorem theoremAInductionBelow_intrinsicResidualQuotient
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X))
+    (hXV : X ≤ hyp.V) (hX : X ≠ ⊥) (ih : TheoremAInductionBelow G Ω) :
+    letI := Hypothesis.rankOneSetupAction
+      ((hyp.intrinsicPointEquiv details hXD htX hCQ hZD).trans Equiv.ulift.symm)
+    TheoremAInductionBelow
+      (↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X))
+      (ULift.{v} (Unital data.n)) := by
+  letI := Hypothesis.rankOneSetupAction
+    ((hyp.intrinsicPointEquiv details hXD htX hCQ hZD).trans Equiv.ulift.symm)
+  intro A Λ _ _ _ hlt hA
+  exact ih (hlt.trans (hyp.natCard_residualImageQuotient_lt hXV hX)) hA
 
 end Model
 

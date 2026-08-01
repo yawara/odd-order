@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.CanonicalForm
+import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
 import OddOrder.GroupTheory.RankOneBNPair
 
 /-!
@@ -198,6 +199,72 @@ noncomputable def ofRankOneSetup (hS : Setup M Q D t) (hcore : M.normalCore = �
   Q_even := hQeven
   D_odd := hDodd
   two_rank_ge_two := hrank
+
+/-! ### Moving the point set
+
+`ofRankOneSetup` permutes `L ⧸ M`, which lives in `L`'s universe.  Ch. IV §4, step (2)
+needs the permuted set in the universe of the *ambient* `Ω`, because that is the universe
+`TheoremAInductionBelow G Ω` quantifies over.  There the point set is identified with the
+standard `Unital ℓ` of `PSU(3, ℓ)` — a small type, liftable into any universe — so what is
+needed is the same hypothesis read along a bijection of point sets. -/
+
+/-- The action of `L` on any set identified with `L ⧸ M`, transported along the
+identification. -/
+@[reducible] noncomputable def rankOneSetupAction {Λ : Type*} (ε : (L ⧸ M) ≃ Λ) :
+    MulAction L Λ :=
+  MulAction.compHom Λ
+    ((Equiv.permCongrHom ε).toMonoidHom.comp (MulAction.toPermHom L (L ⧸ M)))
+
+/-- **`ofRankOneSetup` on a relabelled point set** — same group, same `H`, `Q`, `D`, `t`,
+the permuted set carried along `ε`. -/
+noncomputable def ofRankOneSetupOfEquiv {Λ : Type*} (hS : Setup M Q D t) (ε : (L ⧸ M) ≃ Λ)
+    (hcore : M.normalCore = ⊥) (hQeven : Even (Nat.card Q)) (hDodd : Odd (Nat.card D))
+    (hrank : ∃ E : Subgroup L, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1) :
+    letI := rankOneSetupAction ε
+    Hypothesis L Λ :=
+  letI := rankOneSetupAction ε
+  (ofRankOneSetup hS hcore hQeven hDodd hrank).ofMulEquiv (MulEquiv.refl L) ε fun a x => by
+    change ε (a • x) = ε ((MulAction.toPermHom L (L ⧸ M) a) (ε.symm (ε x)))
+    rw [Equiv.symm_apply_apply]
+    rfl
+
+section OfEquivFields
+
+variable {Λ : Type*} (hS : Setup M Q D t) (ε : (L ⧸ M) ≃ Λ) (hcore : M.normalCore = ⊥)
+  (hQeven : Even (Nat.card Q)) (hDodd : Odd (Nat.card D))
+  (hrank : ∃ E : Subgroup L, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+
+omit [MulAction G Ω] [Finite G] hyp in
+/-- Relabelling the point set does not move `H`. -/
+@[simp] theorem ofRankOneSetupOfEquiv_H :
+    letI := rankOneSetupAction ε
+    (ofRankOneSetupOfEquiv hS ε hcore hQeven hDodd hrank).H = M := by
+  ext x
+  exact ⟨fun ⟨_, hy, hxy⟩ => hxy ▸ hy, fun hx => ⟨x, hx, rfl⟩⟩
+
+omit [MulAction G Ω] [Finite G] hyp in
+/-- Relabelling the point set does not move `Q`. -/
+@[simp] theorem ofRankOneSetupOfEquiv_Q :
+    letI := rankOneSetupAction ε
+    (ofRankOneSetupOfEquiv hS ε hcore hQeven hDodd hrank).Q = Q := by
+  ext x
+  exact ⟨fun ⟨_, hy, hxy⟩ => hxy ▸ hy, fun hx => ⟨x, hx, rfl⟩⟩
+
+omit [MulAction G Ω] [Finite G] hyp in
+/-- Relabelling the point set does not move `D`. -/
+@[simp] theorem ofRankOneSetupOfEquiv_D :
+    letI := rankOneSetupAction ε
+    (ofRankOneSetupOfEquiv hS ε hcore hQeven hDodd hrank).D = D := by
+  ext x
+  exact ⟨fun ⟨_, hy, hxy⟩ => hxy ▸ hy, fun hx => ⟨x, hx, rfl⟩⟩
+
+omit [MulAction G Ω] [Finite G] hyp in
+/-- Relabelling the point set does not move `t`. -/
+@[simp] theorem ofRankOneSetupOfEquiv_t :
+    letI := rankOneSetupAction ε
+    (ofRankOneSetupOfEquiv hS ε hcore hQeven hDodd hrank).t = t := rfl
+
+end OfEquivFields
 
 end OfSetup
 
