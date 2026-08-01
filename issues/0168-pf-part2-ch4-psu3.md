@@ -5649,3 +5649,52 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
   次第。ここが段 (2) の残る本物の同定。
 * 逆に `π(Q ∩ U)` が `H''` の正規 Hall 2-部分群であることさえ言えれば
   `Q'' = π(Q ∩ U)` は自動 (一意性)。この線で攻めるのが筋。
+
+## 2026-08-02 (105): 🔍 §4 段 (2) の残りを実測 — `U` 側の `Setup` が本体
+
+`exists_conjugate_t_eq` (Ch. I Prop 2(b) + `conjugate`) を landing
+(⟹ (104) の手順 1-3 完了)。そのうえで**残りが何か**を全数調査した。
+
+### 調査結果 (subagent、全て自分で file:line を再確認済)
+
+| 問 | 実測 |
+|---|---|
+| `RankOneBNPair.Setup` の構成は repo に何個あるか | **1 個だけ**: `RankOneSetup.lean:79` の `hyp.rankOneSetup` (full `Hypothesis` について)。`↥U` / `↥C` 版は無い |
+| `H ∩ K = (Q ∩ K)(D ∩ K)` 型の積分解 | **`K = C_G(X)` について在る**: `FixedPointCentralizer.lean:282` の `cQ_mul_cD_eq_cH`。⚠ `K = U` (residual) 版は無い |
+| `hyp.Q` が 2-群か | **無条件では未証明**。`InductionHypothesis.lean:37` が `hΩ : ∃ n, \|Ω\| − 1 = 2ⁿ` 条件付きで与えるのみ。他は全部仮説 |
+| `C_G(X)` に (A1) 相当の構造があるか | **在る**: `CentralizerInduction.lean:246` の `centralizerHypothesisA1` (`HypothesisA1`, `:75`)。`Hypothesis` から `faithful` と `two_rank_ge_two` を抜いた 15 フィールド |
+| `O^{2'}(G) ⊓ K` 型の補題 | **無い** (`PrimeComplementResidual.lean` 全 150 行を確認; Dedekind 系は `Mathlib/Subgroup.lean:724` 等にあるが residual とは無関係) |
+| `hyp.Q ⊓ U`, `hyp.D ⊓ U`, `hyp.H ⊓ U` | 名前付き補題は**無し**。`C_Q(P) ≤ U` だけ `StructureOfH/PSUCentre.lean:75` に局所 `have` として在る (`residual_eq_normalClosure` から) |
+
+### 🔑 構造の理解 (ここが今回の収穫)
+
+* **`IsFGH.eq_of_le` は小さい方の `Setup` を要求しない** — `IsFGH` だけでよい。
+  ただし `M' Q' D'` は**同じ ambient `L` の部分群**で `f₁ g₁ h₁ : L → L`。
+* ⟹ §4 が要るのは「ambient の三つ組が `(H∩U, Q∩U, D∩U, t)` についても `IsFGH`
+  である」こと。すなわち **`x ∈ (Q∩U)^#` に対し `f(x), g(x) ∈ Q∩U` かつ
+  `h(x) ∈ D∩U`**。
+* `C = C_G(P)` までは行ける: `txt ∈ C` の canonical 分解は ambient の一意性より
+  `C` 内の分解と一致するので `f(x), g(x) ∈ Q∩C`、`h(x) ∈ D∩C`。
+  さらに `Q ∩ C = C_Q(P) ≤ U` (`residual_eq_normalClosure`) ⟹ **`f(x), g(x) ∈ U` は出る**。
+* ⚠ **`h(x) ∈ U` は出ない**: `C/U` は奇位数 (2'-群) で `D∩C` も奇位数なので
+  `D ∩ C ⊄ U` が普通。ここが段 (2) の**本当の残り**。
+
+### ⚠ 次セッションはここから (優先順)
+
+1. **`HypothesisA1.rankOneSetup` の一般化** — `rankOneSetup` の証明 (`RankOneSetup.lean:79`)
+   は `faithful` / `two_rank_ge_two` を**一切使わない** (使うのは `Q_le_H`, `D_def`,
+   `t_sq`, `t_conj_mem_D`, `Q_normal_in_H`, `existsUnique_Q_mul_D`,
+   `existsUnique_canonicalForm`, `t_not_mem_H`, `mem_D_iff`, `t_inv_eq`,
+   `Q_inf_D_eq_bot`)。⚠ ただし `existsUnique_Q_mul_D` / `existsUnique_canonicalForm`
+   (`CanonicalForm.lean:123`) 自体が `Hypothesis` について述べてあるので、
+   **それらの一般化が要るかを先に実測すること** (`exists_canonicalForm` が
+   2-推移性以外を使っていないか)。
+   ⟹ 通れば `C_G(P)` に `Setup` と `f,g,h` が付き、`IsFGH.eq_of_le` で
+   ambient と繋がる。
+2. `h(x) ∈ U` の扱い — 3 案:
+   (a) `D ∩ U` でなく `D ∩ C` を `D'` に取る (= `C` 用の setup で止める) が、
+       その場合 `π : ↥C → ?` の行き先が `U/Z(U)` にならない;
+   (b) `h(x)` の `U`-成分だけ取り出す (書籍の誤差項 `η ∈ P` はまさにこれの可能性);
+   (c) 書籍 p.133 を**ページ画像で読み直す** — `h₁(ω) ∈ ζ₁³(P ∩ U)` の `P ∩ U` が
+       ちょうどこの `D`-side の誤差なら、(b) が書籍の言っていること。
+   ⟹ **まず (c) を実行する** (`references/peterfalvi/pages/` に p.133 を残す)。
