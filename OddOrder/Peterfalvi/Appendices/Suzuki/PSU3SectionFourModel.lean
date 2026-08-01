@@ -132,6 +132,22 @@ theorem exists_ne_one_mem_residualQuotientHypothesis_W :
   exact Hypothesis.ofMulEquivPullback_exists_ne_one_mem_W _ _
     (exists_ne_one_mem_standardHypothesisULift_W data.n data.one_lt_n)
 
+/-- `Q` on `U/Z(U)` is a Suzuki `2`-group: it is the image of the standard root
+subgroup under the identification. -/
+theorem isSuzuki2Group_residualQuotientHypothesis_Q :
+    letI := MulAction.compHom (ULift.{v} (Unital data.n))
+      details.residualQuotientEquiv.toMonoidHom
+    OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
+      ↥((hyp.residualQuotientHypothesis details).Q) := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  refine OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv
+    (standardRootSubgroup_isSuzuki2Group data.n data.one_lt_n) ?_
+  exact (Subgroup.equivMapOfInjective _ (MulEquiv.refl (standardPermGroup data.n)).toMonoidHom
+      (MulEquiv.refl (standardPermGroup data.n)).injective).trans
+    (Subgroup.equivMapOfInjective _ details.residualQuotientEquiv.symm.toMonoidHom
+      details.residualQuotientEquiv.symm.injective)
+
 /-- The ambient induction hypothesis restricts to `U/Z(U)`, which is smaller than `G`
 (`natCard_residualQuotient_lt`). -/
 theorem theoremAInductionBelow_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
@@ -145,6 +161,38 @@ theorem theoremAInductionBelow_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ 
     details.residualQuotientEquiv.toMonoidHom
   intro A Λ'' _ _ _ hlt hA
   exact ih (hlt.trans (hyp.natCard_residualQuotient_lt hXV hX)) hA
+
+/-- **§2/§3 run on `U/Z(U)`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133).
+
+Both standing bundles those sections are parametrized by — `LemmaFiveSetup` (Ch. I §3
+Lemma 5) and `QuotientFieldModel` (Ch. III §3) — are available for `U/Z(U)` on §4's
+ambient hypotheses alone, because every input is either a transported fact about the
+standard model or the ambient induction hypothesis restricted along
+`natCard_residualQuotient_lt`. -/
+theorem nonempty_standingData_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
+    (ih : TheoremAInductionBelow G Ω) :
+    letI := MulAction.compHom (ULift.{v} (Unital data.n))
+      details.residualQuotientEquiv.toMonoidHom
+    Nonempty ((hyp.residualQuotientHypothesis details).LemmaFiveSetup data.n) ∧
+      Nonempty ((hyp.residualQuotientHypothesis details).QuotientFieldModel data.n) := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  obtain ⟨w, hwW, hw1⟩ := hyp.exists_ne_one_mem_residualQuotientHypothesis_W details
+  have hst := hyp.residualQuotientHypothesis_orderOf_distinguishedInvolution_mul_t details
+  have hQsuz := hyp.isSuzuki2Group_residualQuotientHypothesis_Q details
+  have hQ0card := hyp.natCard_residualQuotientHypothesis_Q0 details
+  have hcardQ := hyp.natCard_residualQuotientHypothesis_Q details
+  have ihq : TheoremAInductionBelow
+      (↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X))
+      (ULift.{v} (Unital data.n)) :=
+    hyp.theoremAInductionBelow_residualQuotient details hXV hX ih
+  have hn0 : data.n ≠ 0 := (Nat.zero_lt_one.trans data.one_lt_n).ne'
+  obtain ⟨sfive⟩ :=
+    (hyp.residualQuotientHypothesis details).lemmaFiveSetup_of_orderThree_of_mem_W
+      hwW hw1 hst hQsuz hn0 hQ0card hcardQ ihq
+  exact ⟨⟨sfive⟩,
+    (hyp.residualQuotientHypothesis details).nonempty_quotientFieldModel_of_orderThree
+      hst hQsuz hn0 hQ0card hcardQ ihq sfive hwW hw1⟩
 
 end Hypothesis
 
