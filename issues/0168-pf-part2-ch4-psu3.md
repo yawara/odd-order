@@ -4019,3 +4019,31 @@ def Q0 : Subgroup G where carrier := {x | x ^ 2 = 1 ∧ x ∈ hyp.H}
 1. `centralizerQ0QuotientEquiv` を組む (材料は上表)。
 2. `exists_standardModel` for `qhyp` → 段 (4) 鎖 → `hcover` → 段 (2)。
 3. 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
+
+## 2026-08-01 (70): 🎯 `Q₀` 版の全射性が集合レベルで閉じた
+
+`map_involutionSet_eq_of_odd_kernel` — 核 `N ≤ H` 奇位数なら
+`π '' {x | x² = 1 ∧ x ∈ H} = {z | z² = 1 ∧ z ∈ H.map π}`。
+
+`Q₀` は導出部分群 `{x | x² = 1 ∧ x ∈ H}` (65) なので、これが
+`centralizerQQuotientEquiv` の `Q₀` 版の**集合レベルの中身**そのもの。
+
+⚠ そのために (69) の補題を**逆像を保つ形**に強化した:
+`exists_pow_sq_eq_one_of_odd_kernel` は「与えられた逆像 `x` の**奇冪**で置き換え
+られる」と言うので `x ∈ H ⟹ x^d ∈ H` が保たれる。素の版は 3 行の系。
+⚠ 最初の版 (逆像を `mk'_surjective` で勝手に取る) では `y ∈ H` が言えず、
+`⊇` の証明が通らなかった — **持ち上げ補題は逆像を引数に取る形で書くべき**。
+
+### `centralizerQ0QuotientEquiv` の残り
+
+数学は全部済み。残るのは `qhyp.Q0` の定義展開と `Subgroup` レベルへの持ち上げ:
+* `qhyp.H = (C_H(X)).map π` (`HypothesisA1.quotientOfKernel` の `H := h.H.map π`)
+* `qhyp.Q0 = {z | z² = 1 ∧ z ∈ qhyp.H}` (導出定義)
+* ⟹ 上の集合等式が `(Q0_L).map π = qhyp.Q0` を与える (`Subgroup.ext` + `coe`)
+* 単射性は `Q` 版と同じ ⟹ `MulEquiv.ofBijective`
+
+### ⚠ 次セッションはここから
+
+1. 上の 4 点で `centralizerQ0QuotientEquiv` を組む。
+2. `exists_standardModel` for `qhyp` → 段 (4) 鎖 → `hcover` → 段 (2)。
+3. 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
