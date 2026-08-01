@@ -45,6 +45,42 @@ variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
 
 include hyp
 
+/-- **Every `conjQHom kv` is a `conjQHom` at an explicit element of `K`.**
+
+`actualKActor` is the range of `conjQByK`, so its elements come from `K`; the statements
+of §2 and §3 that name `k ∈ G` explicitly — `conjQHom_kActor_apply_val`, hence
+`stepFive_orbit` — therefore apply to an arbitrary `kv`.
+
+This is the bridge from the orbit condition, which lives in `E^× ⧸ μ(K W)` and so
+produces an abstract `kv`, to the group-level statements. -/
+theorem exists_mem_K_conjQHom_eq (kv : ↥hyp.actualKActor × ↥hyp.W) :
+    ∃ (k : G) (hk : k ∈ hyp.K),
+      (hyp.kActor hk, kv.2) = kv := by
+  obtain ⟨x, hx⟩ := kv.1.2
+  exact ⟨(x : G), x.2, Prod.ext (Subtype.ext hx) rfl⟩
+
+/-- **Pulling back along a `K W`-translate**: if `ρ`'s quotient coordinate is `μ(kv)`
+times `ω`'s, then `ρ` is the `kv`-conjugate of an element in `ω`'s fibre.
+
+This is the first case of stage (5) in usable form: "`ρ̄` lies in the orbit of `ω̄` under
+`K W`" is a statement about coordinates, and this turns it into a group-level conjugacy
+so that `stepFive_orbit` applies. -/
+theorem exists_conjQHom_eq_of_quotient_smul {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    (hconjq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      (Ψ (hyp.conjQHom kv ρ)).quotient
+        = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ρ).quotient)
+    (kv : ↥hyp.actualKActor × ↥hyp.W) {p q : ↥hyp.Q}
+    (h : (Ψ p).quotient = ((M.mu kv : M.Eˣ) : M.E) * (Ψ q).quotient) :
+    ∃ σ : ↥hyp.Q, (Ψ σ).quotient = (Ψ q).quotient ∧ hyp.conjQHom kv σ = p := by
+  refine ⟨hyp.conjQHom kv⁻¹ p, ?_, ?_⟩
+  · rw [hconjq, h, map_inv, Units.val_inv_eq_inv_val, ← mul_assoc,
+      inv_mul_cancel₀ (Units.ne_zero (M.mu kv)), one_mul]
+  · rw [map_inv]
+    exact (hyp.conjQHom kv).apply_symm_apply p
+
 /-- **Stage (5)'s second case** (Peterfalvi Part II, p. 131).
 
 `hsolved` is the first case, applied on the fibre of `f(ρ)`: it says the inversion
