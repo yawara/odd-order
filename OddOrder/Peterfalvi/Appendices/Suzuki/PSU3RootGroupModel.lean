@@ -362,6 +362,57 @@ theorem unitaryCoord_center {m : ℕ} (M : hyp.QuotientFieldModel m)
   rfl
 
 include hyp in
+/-- **The unitary coordinate of an element of `Q₀`** — `unitaryCoord_center` phrased in
+the `centerCoord` of Ch. IV §2, which is the form §2 and §3 state their equations in. -/
+theorem unitaryCoord_toCenter {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hker : ∀ z : ↥(Subgroup.center hyp.Q),
+      Φ (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {e : M.E} {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (hΨq : ∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient)
+    (hΨc : ∀ ρ : ↥hyp.Q, (Ψ ρ).central = ν * (Φ ρ).central)
+    {x : G} (hx : x ∈ hyp.Q0) :
+    Suzuki2Groups.unitaryCoord m u
+        (Ψ ((hyp.toCenter sfive hx : ↥(Subgroup.center hyp.Q)) : ↥hyp.Q))
+      = (ν : M.E) * hyp.centerCoord sfive M ι hx :=
+  hyp.unitaryCoord_center M Φ ι hker hu Ψ hΨq hΨc (hyp.toCenter sfive hx)
+
+include hyp in
+/-- **The `K`-action on the centre is squaring the scalar**: `c^a = μ(a²) · c`
+(Peterfalvi Part II, p. 119, with `θ = 1`).
+
+`centerCoord_conj` carries the opaque power `μ(a)^d`; `mu_K_zpow_eq_sq` evaluates it as
+`μ(a)²`, which is `μ(a²)` (`mu_kActor_sq`).
+
+This is what makes `s^a` the book's `(0, a)` on p. 131 once the centre is normalized so
+that `s = (0, 1)`: the parameter there is the *square* of stage (1)'s. -/
+theorem centerCoord_conj_eq_mu_sq {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hdsq : ∀ k : ↥hyp.actualKActor,
+      ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) = ((M.mu (k, 1) : M.Eˣ) : M.E) ^ 2)
+    {a : G} (ha : a ∈ hyp.K) {x : G} (hx : x ∈ hyp.Q0) :
+    hyp.centerCoord sfive M ι (hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D ha) hx)
+      = ((M.mu (hyp.kActor (pow_mem ha 2), 1) : M.Eˣ) : M.E) *
+        hyp.centerCoord sfive M ι hx := by
+  rw [hyp.centerCoord_conj sfive M ι d hequiv ha hx, hdsq, ← hyp.mu_kActor_sq M ha]
+
+include hyp in
 /-- **The norm of `μ(k, v)` is `μ(k, 1)²`** (Peterfalvi Part II, Ch. III §3, p. 120).
 
 `μ` is multiplicative and `(k, v) = (k, 1)(1, v)`, so the norm splits; the `W`-half is
