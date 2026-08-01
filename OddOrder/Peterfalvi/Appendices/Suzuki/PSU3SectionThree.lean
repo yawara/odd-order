@@ -30,6 +30,8 @@ hypothesis, and then reads off `h(ω⁻¹) = ζ⁻³` from (H5) — a step the b
 * `Hypothesis.h_inv_eq` — `h(ω⁻¹) = ζ⁻³`.
 * `Hypothesis.h_eq_zpow_three` — `h(ω) = ζ³`, given `h(ω) ∈ W`.
 * `Hypothesis.stepOne_chain` — §3's stage (1).
+* `Hypothesis.f_conj_zeta_of_mem_Q0` — the two `f`-values of stage (1) as `ζ^{±1}`-conjugates
+  of `f(ω s^a)`.
 -/
 
 set_option autoImplicit false
@@ -220,6 +222,62 @@ theorem stepOne_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       _ = (ζ ^ 3)⁻¹ := by rw [hp]
   rw [htw, inv_inv] at hB
   exact hA.symm.trans hB
+
+/-- **The two `f`-values of stage (1) are conjugates of a single one** (Peterfalvi
+Part II, p. 130, entering stage (2)).
+
+Writing `X = f(ω s^a)`, the arguments occurring in `stepOne_chain` are `ω s^a` conjugated
+by `ζ^{±1}`: the conjugation does not move `s^a`, which lies in `Q₀ = Z(Q)`, and (H3)
+moves `f` across it without a twist because `t` centralizes `W`.
+
+This is what turns stage (1) into a *linear* equation for the single unknown `X̄` in `E`.
+-/
+theorem f_conj_zeta_of_mem_Q0 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {ζ ω z : G} (hζ : ζ ∈ hyp.W) (hzQ0 : z ∈ hyp.Q0)
+    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) :
+    f ((ζ * ω * ζ⁻¹) * z) = ζ * f (ω * z) * ζ⁻¹ ∧
+      f (z * (ζ⁻¹ * ω * ζ)) = ζ⁻¹ * f (ω * z) * ζ := by
+  have hζD : ζ ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hζ)
+  have htζt : hyp.t * ζ * hyp.t = ζ := by
+    have hp := hyp.conj_t_pow_eq hζ 1
+    rwa [pow_one] at hp
+  have htinv : hyp.t⁻¹ = hyp.t := inv_eq_of_mul_eq_one_right hyp.rankOneSetup.invol
+  have htζit : hyp.t * ζ⁻¹ * hyp.t = ζ⁻¹ := by
+    calc hyp.t * ζ⁻¹ * hyp.t = (hyp.t⁻¹ * ζ * hyp.t⁻¹)⁻¹ := by group
+      _ = (hyp.t * ζ * hyp.t)⁻¹ := by rw [htinv]
+      _ = ζ⁻¹ := by rw [htζt]
+  obtain ⟨hωzQ, hωzQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hzQ0
+  have hωz1 : ω * z ≠ 1 := fun hc => hωzQ0 (hc ▸ hyp.Q0.one_mem)
+  have hcz : ζ * z = z * ζ := hyp.W_centralizes_Q0 hζ hzQ0
+  constructor
+  · -- `(ζ ω ζ⁻¹) z = ζ (ω z) ζ⁻¹`, then (H3) at `ζ⁻¹`
+    obtain ⟨h3, -, -⟩ :=
+      hThree hyp.rankOneSetup H hωzQ hωz1 (hyp.D.inv_mem hζD)
+    rw [htζit, inv_inv] at h3
+    have harg : (ζ * ω * ζ⁻¹) * z = ζ * (ω * z) * ζ⁻¹ := by
+      calc (ζ * ω * ζ⁻¹) * z = ζ * ω * (ζ⁻¹ * z * ζ) * ζ⁻¹ := by group
+        _ = ζ * ω * z * ζ⁻¹ := by
+            rw [show ζ⁻¹ * z * ζ = z from by
+              calc ζ⁻¹ * z * ζ = ζ⁻¹ * (z * ζ) := by group
+                _ = ζ⁻¹ * (ζ * z) := by rw [← hcz]
+                _ = z := by group]
+        _ = ζ * (ω * z) * ζ⁻¹ := by group
+    rw [harg, h3]
+  · -- `z (ζ⁻¹ ω ζ) = ζ⁻¹ (ω z) ζ`, then (H3) at `ζ`
+    obtain ⟨h3, -, -⟩ := hThree hyp.rankOneSetup H hωzQ hωz1 hζD
+    rw [htζt] at h3
+    have harg : z * (ζ⁻¹ * ω * ζ) = ζ⁻¹ * (ω * z) * ζ := by
+      calc z * (ζ⁻¹ * ω * ζ) = ζ⁻¹ * (ζ * z * ζ⁻¹) * ω * ζ := by group
+        _ = ζ⁻¹ * z * ω * ζ := by
+            rw [show ζ * z * ζ⁻¹ = z from by
+              calc ζ * z * ζ⁻¹ = (z * ζ) * ζ⁻¹ := by rw [hcz]
+                _ = z := by group]
+        _ = ζ⁻¹ * (ω * z) * ζ := by
+            have hzω : z * ω = ω * z :=
+              (Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hzQ0) ω hωQ).symm
+            calc ζ⁻¹ * z * ω * ζ = ζ⁻¹ * (z * ω) * ζ := by group
+              _ = ζ⁻¹ * (ω * z) * ζ := by rw [hzω]
+    rw [harg, h3]
 
 end Hypothesis
 
