@@ -6113,3 +6113,35 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
 2. `Z(U/Z(U)) = ⊥` — 標準 `PSU(3,ℓ)` の中心自明性を `ProjectiveUnitary` 側で実測
    (`PSUCentre.lean` が在る)。
 3. ⟹ `ofRankOneSetup` を当てる。
+
+## 2026-08-02 (116): 忠実性が仮説 3 本に還元 — `Setup.normalCore_eq_bot`
+
+`ofRankOneSetup` の `M.normalCore = ⊥` を、**`Q` が Sylow `p`** /
+**`O^{p'}(L) = ⊤`** / **`Z(L) = ⊥`** の 3 条件に還元:
+
+* `Setup.closure_Q_union_conj_eq_top` — 前 2 条件 ⟹ `⟨Q ∪ Q^t⟩ = ⊤`
+  (`closure_conj_Q` + `closure_iUnion_conj_eq_primeComplementResidual`)。
+* `Setup.normalCore_eq_bot` — それを `normalCore_le_center` (114) に食わせ、
+  第 3 条件で `⊥`。
+
+### `ofRankOneSetup` を `U/Z(U)` に当てるための供給表 (これが残り全部)
+
+| 供給物 | 見込み / 材料 |
+|---|---|
+| `Q̄ = π(C_Q(P))` が `U/Z(U)` の Sylow 2 | `C_Q(P)` が `↥C` の Sylow 2 (`exists_sylow_two_eq_cQ_of_isPGroup`) ⟹ `Sylow.subtype` で `↥U` の Sylow 2 ⟹ `π` の像 (核 `Z(U)` は奇位数なので Sylow を保つ) |
+| `O^{2'}(U/Z(U)) = ⊤` | `primeComplementResidual_map_of_surjective` + `O^{2'}(U) = ⊤` (115) |
+| `Z(U/Z(U)) = ⊥` | ⚠ 要調査。`PSUCentre.lean` に標準 `PSU(3,ℓ)` の中心の計算が在るか実測 (中心の自明性は同型不変なので `residualQuotientEquiv` 経由でよい) |
+| `\|Q̄\|` even | `C_Q(P) ≠ 1` かつ 2-群 |
+| `\|D̄\|` odd | `D∩U` の商 (`D_odd` の約数) |
+| (A3) | §4 の `hA3` |
+
+⟹ **`Z(U/Z(U)) = ⊥` だけが未調査**。他は全部既存材料の組み合わせ。
+
+### ⚠ 次セッションはここから
+
+1. `StructureOfH/PSUCentre.lean` と `ProjectiveUnitary/` に標準 `PSU(3,ℓ)` の
+   中心自明性が在るか実測。無ければ `residualQuotientEquiv` を使わず、
+   `Z(U/Z(U)) = ⊥` を「`Z(U)` が `U` の中心の完全な引き戻し」から直接出せるか検討
+   (⚠ 一般には偽なので、モデル側の事実が要る)。
+2. 上表の他の 5 つを landing。
+3. ⟹ `ofRankOneSetup` を当てて `U/Z(U)` の内在 `Hypothesis` を得る ⟹ 段 (2)。
