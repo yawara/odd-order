@@ -6145,3 +6145,62 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
    (⚠ 一般には偽なので、モデル側の事実が要る)。
 2. 上表の他の 5 つを landing。
 3. ⟹ `ofRankOneSetup` を当てて `U/Z(U)` の内在 `Hypothesis` を得る ⟹ 段 (2)。
+
+## 2026-08-02 (117): 🎯 `U/Z(U)` の**内在**標準仮説が landing — `intrinsicResidualQuotient`
+
+新 leaf `OddOrder/Peterfalvi/Appendices/Suzuki/PSU3SectionFourIntrinsic.lean`
+(224 行, sorry 0, `OddOrder.lean` 配線済)。段 (2) の主目的物が出た。
+
+### ⚠ (116) の供給表が半分不要になった — 単純性 1 本で忠実性が出る
+
+(114)-(116) は `M̄.normalCore = ⊥` を「`normalCore ≤ Z(L)`」経由で攻めていたので、
+`Q̄` が Sylow 2 / `O^{2'}(U/Z(U)) = ⊤` / `Z(U/Z(U)) = ⊥` の 3 本を要求していた。
+**`L` が単純ならその 3 本は全部要らない**:
+
+* `Setup.normalCore_eq_bot_of_isSimpleGroup` (`RankOneBNPairRigidity.lean`) —
+  `t ∉ M` (Setup の field) ⟹ `M ≠ ⊤` ⟹ `M.normalCore` は正規で `⊤` になれない ⟹ `⊥`。
+* `U/Z(U)` の単純性 = Ch. I §3 Lemma 1 (`standardPermGroup_isSimpleGroup`) を
+  Proposition 1(c) の同一視で引き戻すだけ (`isSimpleGroup_residualQuotient`)。
+
+⟹ **`Z(U/Z(U)) = ⊥` (116) が「唯一未調査」としていた項目は、そもそも要らなかった**。
+(`normalCore_le_center` / `normalCore_eq_bot` / `O^{p'}` 冪等性 (114)-(116) は
+汎用定理として残るが、この経路では使わない。)
+
+### 供給した 4 本
+
+| 仮説 | 実装 |
+|---|---|
+| `M̄.normalCore = ⊥` | `Setup.normalCore_eq_bot_of_isSimpleGroup` + `isSimpleGroup_residualQuotient` |
+| `\|Q̄\|` even | `natCard_map_Q_residualQuotient` (= `\|C_Q(X)\|`) + `natCard_cQ_eq_baseField_cube` (= `ℓ³`) |
+| `\|D̄\|` odd | `D̄` は `U ∩ D ≤ D` の商、`\|D\|` 奇 (A2) |
+| (A3) | 群だけの性質ゆえ同一視で移送 (`two_rank_ge_two_residualQuotient`) |
+
+**`|Q̄| = |C_Q(X)|` の要点**: 商写像の核 `Z(U)` は `D` の中 (`hZD`)、かつ rank-one setup で
+`Q ⊓ D = 1` ⟹ `π` は `U ∩ Q` 上で単射。さらに `U ∩ Q = C_Q(X)`
+(`Q_inf_residualImage_eq`; `U ≤ C` と「2-群は `2'`-residual に入る」の両包含) ⟹
+**§2/§3 が欲しい `|Q̄| = ℓ³` がそのままの形で出る**。
+
+### 橋渡し (今後も毎回要る)
+
+モデル側の同一視 `residualQuotientEquiv` は `residual X : Subgroup ↥C_G(X)` について
+述べられ、setup は `G` の中の像 `residualImage X` に住む。両者を繋ぐのが
+
+* `residualImageMulEquiv` = `Subgroup.equivMapOfInjective`
+* `residualQuotientMulEquiv` = `quotientCenterCongr` (新設, `SubgroupInAmbient`)
+
+汎用部品として `map_center_mulEquiv` / `quotientCenterCongr` /
+`natCard_subgroupOf` / `natCard_map_mk'_of_inf_eq_bot` を `SubgroupInAmbient` に置いた。
+
+### ⚠ 次セッションはここから — §2/§3 の数値仮説を内在版で
+
+1. `\|Q̄\| = ℓ³` を名前付きで (`natCard_map_Q_residualQuotient` +
+   `natCard_cQ_eq_baseField_cube` + `natCard_baseField`; ほぼ書くだけ)。
+2. **`Q̄₀ = π(Q₀ ∩ U)` の同定** — ここだけ本物の論法が要る。`Q̄₀ = {x̄ ∈ M̄ | x̄² = 1}`
+   なので `x̄² = 1` から `U` 側の対合を作る必要がある: `m := |Z(U)|` は**奇数**
+   (`CentralizerPSUData.odd_natCard_center_residual`, `PSUCentre.lean:61`) なので
+   `y := x^m` が `(x²)^m = 1` かつ `π(y) = x̄^m = x̄` を満たす。
+   ⟹ `\|Q̄₀\| = \|C_{Q₀}(X)\| = ℓ` (`natCard_cQ0_eq_baseField`;
+   単射性は `Q₀ ≤ Q` と `Q ⊓ D = 1` から前項と同じ)。
+3. `Q̄` の Suzuki 2-群性 — `cQ_isSuzuki2Group` を `Q̄ ≅ C_Q(X)` に沿って移送。
+4. ⟹ `corollaryTwo_of_sectionThree` を内在 `Hypothesis` に当て、
+   `IsFGH.map` (π : U → U/Z(U)) → `IsFGH.eq_of_le` で ambient へ。
