@@ -29,7 +29,8 @@ the two diagonals are matched by
 
 * `BilinearTwistedProduct.comap` — pull a cocycle back along a pair of coordinate
   equivalences.
-* `BilinearTwistedProduct.nonempty_mulEquiv_of_diag` — the comparison.
+* `BilinearTwistedProduct.exists_mulEquiv_of_diag` — the comparison, together with its
+  effect on the two coordinates; `nonempty_mulEquiv_of_diag` is the bare form.
 -/
 
 set_option autoImplicit false
@@ -66,10 +67,12 @@ match the cocycles themselves, not just their diagonals (`congrEquiv`).  What is
 in general is that both groups are central extensions of `W` by `V` with the same
 squaring map, and Appendix III, Lemma 1(c) (here
 `GroupExtension.equivOfCommonSquareMap`) identifies those. -/
-theorem nonempty_mulEquiv_of_diag [Finite V] {B : BilinMap (ZMod 2) V W}
+theorem exists_mulEquiv_of_diag [Finite V] {B : BilinMap (ZMod 2) V W}
     {B' : BilinMap (ZMod 2) V' W'} (f : V ≃+ V') (g : W ≃+ W')
     (hdiag : ∀ x : V, B' (f x) (f x) = g (B x x)) :
-    Nonempty (BilinearTwistedProduct B ≃* BilinearTwistedProduct B') := by
+    ∃ Ξ : BilinearTwistedProduct B ≃* BilinearTwistedProduct B',
+      (∀ p : BilinearTwistedProduct B, (Ξ p).quotient = f p.quotient) ∧
+      ∀ w : W, Ξ ⟨0, w⟩ = ⟨0, g w⟩ := by
   classical
   have hdiag' : ∀ x : V, comap B' f g x x = B x x := by
     intro x
@@ -77,14 +80,36 @@ theorem nonempty_mulEquiv_of_diag [Finite V] {B : BilinMap (ZMod 2) V W}
   have hcompat : ∀ x y : V, B' (f x) (f y) = g (comap B' f g x y) := by
     intro x y
     rw [comap_apply, g.apply_symm_apply]
-  refine ⟨(GroupExtension.equivOfCommonSquareMap (groupExtension B)
+  have hsq : ∀ e : BilinearTwistedProduct (comap B' f g), e ^ 2 =
+      (groupExtension (comap B' f g)).inl
+        (Multiplicative.ofAdd ((fun v => B v v)
+          ((groupExtension (comap B' f g)).rightHom e).toAdd)) := by
+    intro e
+    have h := sq_eq_inl_diag (comap B' f g) e
+    rwa [hdiag'] at h
+  set Θ := GroupExtension.equivOfCommonSquareMap (groupExtension B)
     (groupExtension (comap B' f g)) centralEmbedding_range_le_center
     centralEmbedding_range_le_center (fun v => B v v)
-    (Module.finBasis (ZMod 2) V) (fun e => sq_eq_inl_diag B e) ?_).toMulEquiv.trans
-      (congrEquiv f g hcompat)⟩
-  intro e
-  have h := sq_eq_inl_diag (comap B' f g) e
-  rwa [hdiag'] at h
+    (Module.finBasis (ZMod 2) V) (fun e => sq_eq_inl_diag B e) hsq with hΘ
+  refine ⟨Θ.toMulEquiv.trans (congrEquiv f g hcompat), fun p => ?_, fun w => ?_⟩
+  · have h := congrFun Θ.rightHom_comm p
+    have hq : (Θ.toMulEquiv p).quotient = p.quotient :=
+      congrArg Multiplicative.toAdd h
+    simp only [MulEquiv.trans_apply, congrEquiv_quotient, hq]
+  · have h := congrFun Θ.inl_comm (Multiplicative.ofAdd w)
+    have hw : Θ.toMulEquiv (⟨0, w⟩ : BilinearTwistedProduct B)
+        = (⟨0, w⟩ : BilinearTwistedProduct (comap B' f g)) := h
+    simp only [MulEquiv.trans_apply, hw]
+    exact BilinearTwistedProduct.ext (map_zero f) rfl
+
+/-- **Two twisted products whose diagonals correspond are isomorphic** — the bare
+existence, for consumers that do not need the coordinates. -/
+theorem nonempty_mulEquiv_of_diag [Finite V] {B : BilinMap (ZMod 2) V W}
+    {B' : BilinMap (ZMod 2) V' W'} (f : V ≃+ V') (g : W ≃+ W')
+    (hdiag : ∀ x : V, B' (f x) (f x) = g (B x x)) :
+    Nonempty (BilinearTwistedProduct B ≃* BilinearTwistedProduct B') :=
+  let ⟨Ξ, _, _⟩ := exists_mulEquiv_of_diag f g hdiag
+  ⟨Ξ⟩
 
 end BilinearTwistedProduct
 

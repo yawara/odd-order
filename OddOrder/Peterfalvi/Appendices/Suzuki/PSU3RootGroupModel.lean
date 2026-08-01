@@ -171,6 +171,66 @@ theorem cocycle_diag_eq_norm {m : ℕ} (M : hyp.QuotientFieldModel m) (hm : m �
     rw [hsq]
     exact h
 
+include hyp in
+/-- **`Q` in the unitary coordinates of `PSU(3, q)`** (Peterfalvi Part II, Ch. IV §3,
+p. 130, the coordinate change between stages (3) and (4)).
+
+Given the model of Ch. III §3 whose square map is `c` times the Hermitian norm
+(`cocycle_diag_eq_norm`), write `c = e²` with `e ∈ F` and rescale the quotient
+coordinate by `e`: the square map becomes the norm exactly, so the model and the
+Hermitian twisted product are the same central extension of `F` by `E`
+(`exists_mulEquiv_of_diag`).
+
+The rescaling is multiplication by a scalar, hence `E`-linear; that is what makes the
+computations of §2 and §3 — which use the `E`-multiplication of the quotient
+coordinate and the action of `KW` by scalars — survive the change.  The centre is not
+moved at all. -/
+theorem exists_unitaryModel {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (hnorm : ∀ x : M.E,
+      ((φ x x : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          * x ^ (2 ^ m + 1))
+    (hone : ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) ≠ 0)
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ) :
+    ∃ (e : M.E) (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+        (OddOrder.FiniteField.hermitianCocycle m M.card hu)),
+      e ≠ 0 ∧ e ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m ∧
+      (∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient) ∧
+      ∀ w : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
+        Ψ (Φ.symm ⟨0, w⟩) = ⟨0, w⟩ := by
+  classical
+  -- the square root of the leading coefficient, inside `F`
+  obtain ⟨e, he⟩ := (frobeniusEquiv
+    ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) 2).surjective (φ 1 1)
+  have heval : ((e : M.E)) ^ 2
+      = ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) :=
+    congrArg Subtype.val he
+  have hene : ((e : M.E)) ≠ 0 := by
+    intro h
+    exact hone (by rw [← heval, h]; ring)
+  have heq : ((e : M.E)) ^ 2 ^ m = (e : M.E) :=
+    OddOrder.FiniteField.mem_frobFixedSubfield.mp e.2
+  -- rescaling the quotient coordinate by `e` matches the two diagonals
+  have hdiag : ∀ x : M.E,
+      OddOrder.FiniteField.hermitianCocycle m M.card hu ((e : M.E) * x)
+          ((e : M.E) * x) = φ x x := by
+    intro x
+    refine Subtype.ext ?_
+    rw [OddOrder.FiniteField.hermitianCocycle_diag, hnorm x, ← heval, mul_pow, heq,
+      pow_succ]
+    ring
+  obtain ⟨Ξ, hΞq, hΞc⟩ :=
+    Suzuki2Groups.BilinearTwistedProduct.exists_mulEquiv_of_diag
+      (AddEquiv.mk' (Equiv.mulLeft₀ (e : M.E) hene) (mul_add (e : M.E)))
+      (AddEquiv.refl _) hdiag
+  refine ⟨(e : M.E), Φ.trans Ξ, hene, e.2, fun ρ => ?_, fun w => ?_⟩
+  · exact hΞq (Φ ρ)
+  · have h := hΞc w
+    simpa using h
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
