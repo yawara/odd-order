@@ -194,6 +194,54 @@ def ofUnitary (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
   change (y + u * (a * a ^ 2 ^ m)) + u * (a * a ^ 2 ^ m) = y
   linear_combination (u * (a * a ^ 2 ^ m)) * h2
 
+/-- **A scaling automorphism scales the centre by the norm of its quotient scalar**
+(Peterfalvi Part II, Ch. IV §3, p. 131: the torus element acting as `d` on the first
+coordinate acts as `d^{1+q}` on the second).
+
+The hypothesis is only that the cocycle's diagonal is a nonzero multiple of the norm,
+which is what Ch. III §3's model provides (`cocycle_diag_eq_norm`).  The two scalars
+are then linked by squaring `(1, 0)`: its square is central with coordinate `φ(1,1)`,
+and the image of that square is central with coordinate `φ(a, a) = φ(1,1) a^{1+q}`.
+
+This is the missing half of the dictionary between the model action of `K W` — whose
+central scalar is recorded as an opaque power `μ(k,1)^d` — and the unitary
+coordinates. -/
+theorem centralScale_eq_norm_of_quotientScale
+    {φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m)}
+    (hone : ((φ 1 1 : ↥(frobFixedSubfield E 2 m)) : E) ≠ 0)
+    (hdiag : ∀ x : E, ((φ x x : ↥(frobFixedSubfield E 2 m)) : E)
+      = ((φ 1 1 : ↥(frobFixedSubfield E 2 m)) : E) * x ^ (2 ^ m + 1))
+    (σ : BilinearTwistedProduct φ ≃* BilinearTwistedProduct φ) {a ν : E}
+    (hq : ∀ p : BilinearTwistedProduct φ, (σ p).quotient = a * p.quotient)
+    (hc : ∀ p : BilinearTwistedProduct φ,
+      (((σ p).central : ↥(frobFixedSubfield E 2 m)) : E)
+        = ν * ((p.central : ↥(frobFixedSubfield E 2 m)) : E)) :
+    ν = a ^ (2 ^ m + 1) := by
+  set p : BilinearTwistedProduct φ := ⟨1, 0⟩ with hp
+  have hpq : p.quotient = 1 := rfl
+  have hpc : ((p.central : ↥(frobFixedSubfield E 2 m)) : E) = 0 := rfl
+  have hσq : (σ p).quotient = a := by rw [hq, hpq, mul_one]
+  have hσc : (((σ p).central : ↥(frobFixedSubfield E 2 m)) : E) = 0 := by
+    rw [hc, hpc, mul_zero]
+  have hL : (((σ (p * p)).central : ↥(frobFixedSubfield E 2 m)) : E)
+      = ν * ((φ 1 1 : ↥(frobFixedSubfield E 2 m)) : E) := by
+    rw [hc (p * p)]
+    congr 1
+    change ((φ p.quotient p.quotient + p.central + p.central :
+      ↥(frobFixedSubfield E 2 m)) : E) = _
+    push_cast
+    rw [hpq, hpc]
+    ring
+  have hR : (((σ p * σ p).central : ↥(frobFixedSubfield E 2 m)) : E)
+      = ((φ 1 1 : ↥(frobFixedSubfield E 2 m)) : E) * a ^ (2 ^ m + 1) := by
+    change ((φ (σ p).quotient (σ p).quotient + (σ p).central + (σ p).central :
+      ↥(frobFixedSubfield E 2 m)) : E) = _
+    push_cast
+    rw [hσq, hσc, hdiag a]
+    ring
+  rw [map_mul, hR] at hL
+  exact mul_left_cancel₀ hone (by linear_combination -hL)
+
 /-- **The torus scales the unitary coordinate by the norm**: `(a, y)^d = (d a, d^{1+q} y)`
 (Peterfalvi Part II, p. 131, the display in the proof of stage (5)).
 
