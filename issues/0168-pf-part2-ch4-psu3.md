@@ -1754,6 +1754,47 @@ repo では `FieldModel.mul_conj`) を暗黙に適用して座標を張り替え
 
 その後: (4) 本体 (p.131 の `(∗∗)` 計算) → (5) (`KW`-軌道 + (H3)) → 章の結論。
 
+## 2026-08-01 (11): 🎯 §3 (4) の舞台が整った — `Q` のユニタリ座標
+
+新型 (`HermitianRootGroup`) は**作らなかった**。`RootGroup` は 632 箇所で使われて
+おり型の付け替えは churn が大きすぎるので、**座標関数**として供給した。
+
+| 補題 | 場所 | 内容 |
+|---|---|---|
+| `frobPow_frobPow` / `norm_mem_frobFixed` / `norm_cocycle` | `Algebra/HermitianCocycle.lean` (新) | 任意の二次拡大 `E` での基本 |
+| `hermitianBilin` / `correctedBilin` / `hermitianCocycle` | 同 | `x ȳ + u Tr(x ȳ)` を `F` 値双線型に。`hermitianCocycle_diag` で対角 = ノルム |
+| `unitaryCoord` | `Suzuki2Groups/UnitaryCoordinates.lean` (新) | 第 2 座標 `y = z + u a ā` |
+| `unitaryCoord_frobTrace` | 同 | **`Tr y = a ā`** |
+| 🎯 `unitaryCoord_mul` | 同 | **`(a,y)(c,w) = (a+c, y+w+a c̄)`** = PSU(3,q) の積 |
+| `ofUnitary` / `eq_of_unitaryCoord_eq` | 同 | 逆向きと一意性 |
+| `exists_mulEquiv_of_diag` | `TwistedProductComparison` | 対角比較の同型を**座標作用込み**で (強化) |
+| 🎯 `exists_unitaryModel` | `PSU3RootGroupModel` | **`Q ≃* BilinearTwistedProduct (hermitianCocycle)`**、商座標は `e` 倍 (`E`-線型)、**中心不動** |
+
+⟹ 書籍の `f(ρ̄,y) = (ρ̄/y, 1/y)` (`Tr y = ρ̄^{1+q}`) が **`Q` の上で直接書ける**。
+`E`-線型なリスケールなので §2/§3 の等式 (`E` の乗法・`KW` のスカラー作用) が
+そのまま生き残る。
+
+### ⚠ 次の一手 = §3 (4) 本体 (p.131)
+
+書くべき命題 (`ω = (ω̄, x)`, `Tr x = ω̄^{1+q}`, `ζ ∈ W^#`, 仮説は §2 から):
+
+> `Tr y = ω̄^{1+q}` なる全ての `y ∈ E` で `f(ω̄,y) = (ω̄/y, 1/y)`。
+
+p.131 の筋 (すべて `E` の計算):
+1. (1)+(3) から `a ∈ F^#` に対し `f(ω̄, x+a)^{ζ⁻¹a}(0,a) = f(ω̄,x+a)^{ζ⁻²}(ω̄,x)^{ζ⁻¹}`。
+2. (2) より `f(ω̄, x+a) = (ω̄/(a+ζ⁻¹), γ(a))` (`γ(a) ∈ E`)。
+3. 第 2 成分を比較して **`(∗∗) (a²+1)γ(a) = x + a + (1+ζ⁻²)/(a+ζ⁻¹)`**
+   (`ω̄^{1+q} = ζ+ζ⁻¹` = (3) を使う)。
+4. `a = 1` で `x = ζ⁻¹`。すると `(∗∗)` は `(a²+1)γ(a) = (a²+1)/(a+ζ⁻¹)` に化け、
+   `a ∈ F − {0,1}` で `γ(a) = 1/(a+ζ⁻¹)`。
+5. `y = ζ⁻¹` は `(ω̄,y) = ω` 自身、残る 1 点 (`y = ζ⁻¹+1`) は `ω ↦ ω⁻¹`,
+   `ζ ↦ ζ⁻¹` の対称性で潰す (`ζ+1 ≠ ζ⁻¹+1`)。
+
+⚠ 道具立て: `unitaryCoord` / `unitaryCoord_mul` / `ofUnitary` /
+`eq_of_unitaryCoord_eq` (座標)、`stepOne_chain` / `stepTwo_linear` / `stepThree`
+(§3 (1)-(3))、`exists_unitaryModel` (座標系の供給)。
+その後 (5) = p.131 後半 (`KW`-軌道 + (H3) で全 `ρ` へ)。
+
 ## セッション総括 (2026-07-31)
 
 **Ch. IV で形式化されたもの** (すべて sorry 0 / AxiomsCheck OK / lint 0):
