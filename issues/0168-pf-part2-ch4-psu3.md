@@ -5271,3 +5271,37 @@ lint 純ゼロ)。
 2. → §3 段 (4) 鎖 (`stepFour_star`/`base`/`pointwise`/`at_omega`/`cover`) →
    `corollaryTwo_of_stepFour` → 段 (2) の `ω`, `ζ`。
 3. 商から ambient へ持ち上げ (`IsFGH.eq_of_le`) ⟹ **段 (2) が閉じる** ⟹ §4 完成。
+
+## 2026-08-01 (98): 🎯 §2/§3 が `U/Z(U)` の中で走る
+
+(フルビルド green 4989 jobs・lint 純ゼロ)
+
+* `isSuzuki2Group_residualQuotientHypothesis_Q` — `Q` は標準根群の像なので
+  `standardRootSubgroup_isSuzuki2Group` + `Subgroup.equivMapOfInjective` 2 段 +
+  `IsSuzuki2Group.of_equiv`。
+* **`nonempty_standingData_residualQuotient`** — §4 の ambient 仮説
+  (`hXV` / `hX` / `ih` / 枝データ `details`) だけから `U/Z(U)` について
+  `LemmaFiveSetup data.n` と `QuotientFieldModel data.n` の**両方**が出る。
+
+⚠ 実装メモ (罠の族、(96)(97) と同じ): 型に `letI` を持つ補題を `have h := …` で
+受けると `Finite ?m` で stuck ⟹ **期待型を明示**
+(`have ihq : TheoremAInductionBelow … := …`) すれば通る。
+
+### ⟹ 段 (2)(b) は `exists_standardModel` を呼ぶだけ
+
+残る作業:
+1. `exists_standardModel` を `residualQuotientHypothesis` に当てる
+   (`sfive`, `M` は今回の standing data、6 前提は (97) の表)。
+2. §3 段 (4) 鎖 (`stepFour_star` → `base` → `pointwise` → `at_omega` → `cover`) を
+   `U/Z(U)` 上で走らせ `hcover` を作る。
+   ⚠ ここが (60) で言った「多量の仮説スレッディング」の本体。
+   `corollaryTwo_of_stepFour` は ~25 前提を取る。
+3. `corollaryTwo_of_stepFour` → 段 (2) の `ω`, `ζ`。
+4. 商から ambient へ持ち上げ (`IsFGH.eq_of_le`) ⟹ 段 (2) 完了 ⟹ **§4 完成**。
+
+### ⚠ 次セッションはここから
+
+1. `exists_standardModel` を当てて出力 (`φ`, `Φ`, `Θ`, `u`, `d`, `hequiv` …) を取り出す。
+2. 段 (4) 鎖を順に当てる。⚠ 各段の前提は前段の出力なので、`obtain` で受けながら
+   一直線に流せるはず。詰まったら §3 側 (`PSU3InverseFormula.lean`) の
+   `stepFour_cover` の呼び出し形を読んで合わせる。
