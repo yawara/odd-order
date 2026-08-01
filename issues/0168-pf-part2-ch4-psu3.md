@@ -5799,3 +5799,46 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
    (`isConj_of_involutions` (Ch. I Prop 2(b)) と `Sylow.conj` の合成)。
 3. ⟹ 共役でひねった `Hypothesis` で `t̄ = π t` かつ `Q̄ = π(Q∩U)` を同時に達成 ⟹
    `IsFGH.map` → `corollaryTwo_of_sectionThree` → `IsFGH.eq_of_le` ⟹ **段 (2) 完了**。
+
+## 2026-08-02 (108): `Setup.quotient` — 商への降下も landing
+
+`Setup.restrict` (部分群へ) の対。`N ⊴ L`, `N ≤ D` なら
+`Setup (M.map π) (Q.map π) (D.map π) (π t)`。要点は「`N` が `Q`-成分を乱さない」:
+
+* `split` — 2 つの持ち上げは `n ∈ N ≤ D` だけずれ、`D`-成分に吸収される。
+* `fact` — `a' t b' n = a'(t n t)·t·(n⁻¹ b' n)` とずらすと `t n t ∈ N` が `M`-成分へ、
+  `Q`-成分は `n` 共役になるので、どちらも商では見えない。
+
+書籍 p.133 は `U → U/Z(U)` でこれを使う (核 `Z(U) = P ∩ U ≤ P ≤ V ≤ D`、
+`Z(U) ⊆ P` は §4 段 (1) の `eq_P_of_centralizes`)。
+
+⚠ 実測メモ (次回の時間節約用):
+* **`QuotientGroup.mk'_eq_mk'` は現 pin に存在しない** — `QuotientGroup.eq`
+  (`↑x = ↑y ↔ x⁻¹ * y ∈ N`) を使うこと。
+* `ȳ` のような合成文字 (combining macron) は Lean の識別子に使えず parse error。
+* `∃!` を `refine ⟨…, ?_, ?_⟩` で埋めると残る goal が **beta-redex** なので、
+  `rw` の前に `change` で開く。
+* 部分型の第 1 成分を `rw [h]` で書き換えると membership 証明が `h` に依存して
+  **motive not type correct** — `congrArg (mk' N) h` を直接渡す。
+
+### 段 (2) の在庫 (これで道具は全部そろった)
+
+| 段 | 道具 | 状態 |
+|---|---|---|
+| ambient → `U` | `rankOneSetup_residual` + `Setup.exists_fgh` | ✅ (107) |
+| `U` → `U/Z(U)` | `Setup.quotient` + `IsFGH.map` | ✅ 今回 |
+| `U/Z(U)` で Cor 2 | `corollaryTwo_of_sectionThree` + `isStandardModel_residualQuotient` | ✅ (102)(103) |
+| `U` → ambient | `IsFGH.eq_of_le` | ✅ (54) |
+| `t̄` を `π t` に合わせる | `exists_conjugate_t_eq` | ✅ (104) |
+| **降下 setup ≡ transported Hypothesis の setup** | ⚠ **未** | ← 残り |
+
+### ⚠ 次セッションはここから
+
+最後の同定。`Hypothesis` は `(basept, t)` で決まるので、示すべきは
+**`π(Q ∩ U)` が `U/Z(U)` の Sylow 2-部分群**であること (⟹ `π(M_U) = N(π(Q∩U))` が
+点安定化群 ⟹ 共役で `t̄ = π t` と同時に合わせられる)。
+
+材料: `CentralizerPSUData.natCard_cQ_eq_baseField_cube`
+(`|C_Q(P)| = |BaseField n|³`) と `natCard_residualQuotientHypothesis_Q`/`_Q0`
+(`|Q̄| = |Q̄₀|³ = 2^{3n}`)。⟹ 位数が一致するので `π|_{Q∩U}` が単射
+(`Q ⊓ Z(U) ≤ Q ⊓ D = 1`) なら `|π(Q∩U)| = |Q̄|`。
