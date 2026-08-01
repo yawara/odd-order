@@ -2570,3 +2570,27 @@ p.132 をページ画像で確認した結果、Ch. IV の残りは以下の構�
 2. 段 (5) 第 2 ケースの群論組み立て ((25) の 4 手)。
 3. `RankOneBNPair` の Lemma (`f` が `L` を決める) → Corollary 1。
 4. §4 (p.132-134)。
+
+## 2026-08-01 (28): 🎯 §3 Corollary 2 landing + ファイル分割
+
+**`corollaryTwo`** (p.132): 各 `ζ ∈ W^#` に `f(ω) = ω^{-ζ}` かつ `h(ω) = ζ³` なる
+`ω ∈ Q − Q₀` が在る。元は探すのでなく `ζ` から**作る** —
+`exists_normPreimage_of_mem_W` → `ofUnitary (ω̄, μ(ζ))` → 段 (5) →
+`f_eq_conj_inv_of_inverseFormula`。`h(ω) = ζ³` は既存 `h_eq_zpow_three`。
+⚠ 段 (5) は仮説 `hfive` として受けている (第 2 ケースの組み立てが未了のため)。
+
+**分割**: `PSU3InverseFormula.lean` が 1433 行に達したので兄弟 prefix-split。
+
+* `PSU3StarEquation.lean` (246 行) — 純 `E` の算術 (`(∗∗)` とその帰結)
+* `PSU3InverseFormula.lean` (1231 行) — 群論側 (段 (4)・段 (5)・Corollary 2)
+
+`OddOrder.lean` に新 leaf を配線済。module 名不変ゆえ下流 import は無変更。
+
+### ⚠ 次セッションはここから
+
+1. **段 (5) 第 2 ケースの群論組み立て** — 部品は全部揃っている ((25) の 4 手)。
+   これが閉じれば `corollaryTwo` の `hfive` が外れて Corollary 2 が無条件になる。
+2. `RankOneBNPair` の Lemma (`f` が `L` を決める) → **Corollary 1**。
+   ⚠ issue 冒頭「やること」の未チェック項目。§1 の Lemma。
+3. **§4** (p.132-134、`V ≠ W` の場合)。段 (1)(2)… ⚠ Ch. I §3 Prop 1(c) /
+   Ch. I §2 Prop 3 / Ch. II (11) を引くので repo 対応物の実測が先。
