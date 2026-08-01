@@ -4047,3 +4047,78 @@ def Q0 : Subgroup G where carrier := {x | x ^ 2 = 1 ∧ x ∈ hyp.H}
 1. 上の 4 点で `centralizerQ0QuotientEquiv` を組む。
 2. `exists_standardModel` for `qhyp` → 段 (4) 鎖 → `hcover` → 段 (2)。
 3. 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
+
+## 2026-08-01 (71): 🎯 `centralizerQ0QuotientEquiv` landing + 段 (2)(b) の材料が**全部埋まった**
+
+### landing した Lean (すべて `PSU3SectionFourSetup.lean`、leaf build green)
+
+| 定理 | 内容 |
+|---|---|
+| `coe_Q0_subgroupOf_centralizer` | `C_{Q₀}(X)` を「`C_H(X)` の対合部分群」の形へ |
+| `map_centralizer_Q0_eq_quotient_Q0` | `(C_{Q₀}(X)).map π = Q̄₀` (全射性 = (70) の集合等式) |
+| **`centralizerQ0QuotientEquiv`** | `C_{Q₀}(X) ≃* Q̄₀` — (67)〜(70) の crux |
+| `natCard_quotient_Q0_eq` / `natCard_quotient_Q_eq` | 位数移送 (Q₀ 版 / Q 版) |
+| `natCard_quotient_Q0_eq_pow` | `hQ0card` = `\|Q̄₀\| = 2ⁿ` |
+| `natCard_quotient_Q_eq_Q0_cube` | `hcardQ` = `\|Q̄\| = \|Q̄₀\|³` |
+| `isSuzuki2Group_quotient_Q` | `hQsuz` を `C_Q(X)` から `Q̄` へ移送 |
+| `exists_center_Q_ne_one` | `x₀ : Z(Q)`, `x₀ ≠ 1` (汎用) |
+| **`psu3Numerics_and_standingData_centralizerQuotient`** | 上記を枝データから一括で組む |
+
+⚠ 実装メモ: 単射性は `Q₀ ≤ Q` で `Q` 版に帰着するが、**全射性は写経では出ない**
+((67) の訂正どおり)。`Q̄₀` は `C_{Q₀}(X)` の像として定義されているのでなく
+`H̄` の**対合部分群**なので、`map_involutionSet_eq_of_odd_kernel` (70) が要る。
+
+### 🔍 ⚠ 重要な実測訂正: §2/§3 の standing data には **producer が在る**
+
+(60) は「`exists_standardModel` が要る 6 前提」を追っていたが、`exists_standardModel`
+自身が section variable として `s : hyp.LemmaFiveSetup m` と `M : hyp.QuotientFieldModel m`
+を取る。これらは repo 全体で**仮説としてしか現れない**ので一時「producer 無し =
+§2/§3 は standing data に条件付き」と読んだが、**誤り**:
+
+| producer | 場所 | 前提 |
+|---|---|---|
+| `lemmaFiveSetup_of_orderThree_of_mem_W` | `TypeBFromW.lean:254` | `w ∈ W#`, `hst`, `hQsuz`, `hm`, `hQ0card`, `hcardQ`, `ih` |
+| `nonempty_quotientFieldModel_of_orderThree` | `QuotientKWField.lean:397` | 同上 + `s : LemmaFiveSetup m` |
+
+⟹ **`hst`/`hQsuz`/`hm`/`hQ0card`/`hcardQ`/`ih` + `w ∈ W#` から standing data 一式が出る**。
+`psu3Numerics_and_standingData_centralizerQuotient` はこの鎖を商 `qhyp` について
+一括で通したもの。
+
+### 🎯 段 (2) の残り = **`W̄ ≠ 1` ただ 1 つ**
+
+書籍 p.133 段 (2) の証明 (原文):
+
+> By the structure of `PSU(3,ℓ)`, `(V ∩ U)/(P ∩ U)` centralizes `C_{Q₀}(P)`. Thus, by
+> the theorem of Galois, `V ∩ U ⊆ P W` and, since `U ⊆ C_G(P)`, `V ∩ U ⊆ P × C_W(P)`.
+> **Furthermore, `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` since `ℓ > 2`.**
+> Let `ζ₁ ∈ (V ∩ U) − (P ∩ U)` and `ζ ∈ C_W(P)` be such that `ζ₁ ∈ ζP`.
+> If `f₁` and `h₁` denote the mappings `f` and `h` relative to `U`, `U ∩ H` and `t`,
+> then, by Corollary 2 of the proposition of §3, there is an element `ω ∈ (Q − Q₀) ∩ U`
+> such that `f₁(ω) ∈ ω^{-ζ₁}(P ∩ U)` and `h₁(ω) ∈ ζ₁³(P ∩ U)`. By the uniqueness of the
+> canonical form of an element of `G − H`, `f(ω) = f₁(ω) = ω^{-ζ₁} = ω^{-ζ}` and
+> `h(ω) = h₁(ω) ∈ ζ³ …`.
+
+⟹ 対応表:
+
+| 書籍の段 | repo |
+|---|---|
+| `(V∩U)/(P∩U)` が `C_{Q₀}(P)` を中心化 ⟹ `V ∩ U ⊆ PW` | `inf_le_sup_W_of_centralizes` ✅ |
+| `V ∩ U ⊆ P × C_W(P)` | `inf_le_sup_centralizer_W` ✅ |
+| **`\|(V∩U)/(P∩U)\| = (ℓ+1)/(ℓ+1,3) ≠ 1`** | ⚠ **未** — PSU(3,ℓ) トーラス構造事実 |
+| §3 Cor 2 を `U` (= 商) に当てる | `psu3Numerics_and_standingData_centralizerQuotient` + `exists_standardModel` + (60) の段 (4) 鎖 ✅材料 |
+| canonical form の一意性で `f₁ → f` | `IsFGH.eq_of_le` ✅ |
+
+⚠ また `corollaryTwo_of_stepFour` は `hVW : V = W` を要求するが、**商側ではこれが
+定理**になる: `V ∩ U ⊆ P × C_W(P)` を `P` で割ると `V̄ ≤ W̄` (`inf_le_sup_centralizer_W`
+がその材料)。逆は `W ≤ V` (`W_le_V`) から。
+
+### ⚠ 次セッションはここから
+
+1. **PSU(3,ℓ) のトーラス構造事実** — `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) > 1` (`ℓ > 2`)。
+   供給元は `CentralizerPSUData.residualQuotientEquiv` (= `U/Z(U) ≃* standardPermGroup n`)
+   と `ProjectiveUnitary` の標準モデル。これが `w ∈ W̄`, `w ≠ 1` を与える。
+2. `qhyp.V = qhyp.W` を `inf_le_sup_centralizer_W` + `W_le_V` から。
+3. `exists_standardModel` for `qhyp` → (60) の段 (4) 鎖 → `hcover` →
+   `corollaryTwo_of_stepFour` → `ω̄`。
+4. 商から `U` へ持ち上げ + `IsFGH.eq_of_le` ⟹ **段 (2) が閉じる**。
+5. 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
