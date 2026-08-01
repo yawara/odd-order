@@ -6899,3 +6899,34 @@ rank-one setup について `∃ c, Q^c = Q' ∧ M^c = M'`。⚠ **モデルを�
 | `Q ≠ ⊥` | `\|Q̄\| = ℓ³ > 1` ((118)) | `\|Q\| = ℓ³ > 1` |
 
 ⟹ 揃えば `∃ w ∈ W̄, w ≠ 1` が出て **`U/Z(U)` 内在版の Lemma 5 が 7/7**。
+
+## 2026-08-02 (135): 配線の設計判断 — `Setup.map` が要る
+
+(134) の `map_W_of_mulEquiv` は任意の `φ : L ≃* L'` で使えるので、内在版と transported 版が
+別の群に居ても `H`,`D` さえ対応すればよい。問題はその**対応を作る側**:
+`Setup.exists_conj_eq_triple` ((131)) は**同じ群上の 2 つの `Setup`** を要求する。
+
+⟹ transported 側の `Setup` を `residualQuotientMulEquiv` に沿って
+`↥(residualImage X) ⧸ Z` へ移す必要がある。選択肢は 2 つ:
+
+**(a) `Setup.map` を新設** (`RankOneBNPair.lean`) — `Setup M Q D t` と `φ : L ≃* L'` から
+`Setup (M.map φ) (Q.map φ) (D.map φ) (φ t)`。9 フィールドの機械的な移送だが
+`split` / `fact` は `∃!` を subtype の組で扱うので注意
+(⚠ (113) の実測メモ: `∃!` を `obtain ⟨-, -, huniq⟩` で受けると証人ごと `huniq` が消える)。
+自己完結でインスタンスの letI 舞踏が無い。**推奨**。
+
+**(b) `Hypothesis.ofMulEquivPullback` を使う** — 既存だが、`residualQuotientHypothesis`
+自体が `letI := MulAction.compHom … residualQuotientEquiv` の下に居るので
+letI が二重になり、(125) で踏んだ「別インスタンス」問題を再び踏みやすい。
+
+### ⚠ 次セッションの手順
+
+1. `Setup.map` を `RankOneBNPair.lean` に追加 ((a))。
+2. `(hyp.residualQuotientHypothesis details).rankOneSetup.map (residualQuotientMulEquiv X)`
+   と `hyp.setup_residualQuotient …` を `exists_conj_eq_triple` に食わせる
+   (8 仮説は (134) の表のとおり既存資産で埋まる)。
+3. 得た `c` と `residualQuotientMulEquiv` を合成した `φ` を
+   `exists_ne_one_mem_W_of_mulEquiv` に食わせて **`∃ w ∈ W̄, w ≠ 1`**。
+4. ⟹ `U/Z(U)` 内在版の Ch. I §3 Lemma 5 が **7/7**、`LemmaFiveSetup` /
+   `QuotientFieldModel` / `IsStandardModel` が出て、残るは `hVW` / `hKcard` (= `t` の照合、
+   追加仮説 `C_Q(D) = ⊥` が要る ((133)))。
