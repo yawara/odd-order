@@ -36,6 +36,8 @@ by `P` fixes both decompositions of Ch. I, so their factors stay in `C_G(P)`, an
   `C_Q(X)`, `C_D(X)`.
 * `Hypothesis.rankOneSetup_subgroup` — a subgroup of `C_G(X)` containing `t` and
   `C_Q(X)` inherits the rank-one setup.
+* `Hypothesis.rankOneSetup_residual` — in particular `U = O^{2′}(C_G(X))` does, which is
+  what the book's `f₁`, `h₁` are the mappings of.
 * `Hypothesis.isStandardModel_residualQuotient` — the Proposition of Ch. III §3 holds
   on `U/Z(U)`.
 -/
@@ -166,6 +168,69 @@ theorem rankOneSetup_subgroup (hXD : X ≤ hyp.D)
         ⟨hqQ, (hyp.canonicalForm_mem_centralizer hXD htX (hKC hyK) hxH hqQ hy).2⟩))
     (fun _ haK haH _ hqQ _ hdD ha =>
       hQK ((hyp.splitQD_mem_centralizer hXD haH (hKC haK) hqQ hdD ha).1))
+
+/-! ### The residual `O^{2′}(C_G(X))`
+
+The book's `U`.  Both conditions `rankOneSetup_subgroup` asks for hold for it: it
+contains `C_Q(X)` — a `2`-group, hence inside a Sylow `2`-subgroup, hence inside the
+residual — and it contains `t`, for the same reason. -/
+
+/-- **`C_Q(X)` lies in `O^{2′}(C_G(X))`**, provided it is a `2`-group. -/
+theorem inf_centralizer_le_residual
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))) :
+    hyp.Q ⊓ Subgroup.centralizer (X : Set G)
+      ≤ (Subgroup.primeComplementResidual 2
+          (Subgroup.centralizer (X : Set G))).map
+        (Subgroup.centralizer (X : Set G)).subtype := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨S, hS⟩ := hCQ.exists_le_sylow
+  intro x hx
+  obtain ⟨hxQ, hxC⟩ := Subgroup.mem_inf.mp hx
+  exact ⟨⟨x, hxC⟩,
+    Subgroup.le_primeComplementResidual S (hS (Subgroup.mem_subgroupOf.mpr hxQ)), rfl⟩
+
+/-- **`t ∈ O^{2′}(C_G(X))`** whenever `t` centralizes `X`: `t` is an involution, so it
+lies in a Sylow `2`-subgroup of `C_G(X)`, hence in the residual. -/
+theorem t_mem_residual (htX : hyp.t ∈ Subgroup.centralizer (X : Set G)) :
+    hyp.t ∈ (Subgroup.primeComplementResidual 2
+        (Subgroup.centralizer (X : Set G))).map
+      (Subgroup.centralizer (X : Set G)).subtype := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set tC : ↥(Subgroup.centralizer (X : Set G)) := ⟨hyp.t, htX⟩ with htCdef
+  have htsq : tC ^ 2 = 1 := Subtype.ext (by simpa [htCdef] using hyp.t_sq)
+  have hT : IsPGroup 2 ↥(Subgroup.zpowers tC) := by
+    have hdvd : orderOf tC ∣ 2 := orderOf_dvd_of_pow_eq_one htsq
+    have hcard : Nat.card ↥(Subgroup.zpowers tC) = orderOf tC := Nat.card_zpowers tC
+    rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h1 | h2
+    · exact IsPGroup.of_card (n := 0) (by rw [hcard, h1]; norm_num)
+    · exact IsPGroup.of_card (n := 1) (by rw [hcard, h2]; norm_num)
+  obtain ⟨S, hS⟩ := hT.exists_le_sylow
+  exact ⟨tC, Subgroup.le_primeComplementResidual S (hS (Subgroup.mem_zpowers tC)), rfl⟩
+
+/-- **The residual `U = O^{2′}(C_G(X))` is a rank-one setup on `U ∩ H`, `U ∩ Q`,
+`U ∩ D`, `t`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133).
+
+This is what "the mappings `f` and `h` relative to `U`, `U ∩ H` and `t`" means, and with
+`Setup.exists_fgh` it produces those mappings. -/
+theorem rankOneSetup_residual (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))) :
+    OddOrder.GroupTheory.RankOneBNPair.Setup
+      (hyp.H.subgroupOf ((Subgroup.primeComplementResidual 2
+        (Subgroup.centralizer (X : Set G))).map
+          (Subgroup.centralizer (X : Set G)).subtype))
+      (hyp.Q.subgroupOf ((Subgroup.primeComplementResidual 2
+        (Subgroup.centralizer (X : Set G))).map
+          (Subgroup.centralizer (X : Set G)).subtype))
+      (hyp.D.subgroupOf ((Subgroup.primeComplementResidual 2
+        (Subgroup.centralizer (X : Set G))).map
+          (Subgroup.centralizer (X : Set G)).subtype))
+      ⟨hyp.t, hyp.t_mem_residual htX⟩ :=
+  hyp.rankOneSetup_subgroup hXD htX
+    (by rintro _ ⟨u, -, rfl⟩; exact u.2) (hyp.t_mem_residual htX)
+    (hyp.inf_centralizer_le_residual hCQ)
 
 end Centralizer
 
