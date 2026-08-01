@@ -42,6 +42,8 @@ agree as long as the sequence runs.
   `W`.  Both halves fall out of the stopping rule: the sequence runs to the end because no
   small power of `β` is `1`, and stops because `β^m = 1`.
 * `betaSum_eq_of_pow_eq_one` — the book's `c_{m-1} = α`, a corollary of `β^m = 1`.
+* `betaSum_sub_eq`, `betaRatio_add_betaRatio` — the palindrome `c_{m-j} = c_j` and the
+  identity `u_i + u_{m-i} = α` that step (20)'s second assertion runs on.
 -/
 
 set_option autoImplicit false
@@ -65,6 +67,41 @@ theorem betaSum_eq_of_pow_eq_one {E : Type*} [Field E] {β α : E} (hβ : β ≠
     exact mul_right_cancel₀ hβ e
   rw [betaSum, hstep, inv_inv, ← hα]
   exact add_comm _ _
+
+/-- **`c_{m-j} = c_j`** once `β^m = 1`: the sequence `(c_i)` is a palindrome. -/
+theorem betaSum_sub_eq {E : Type*} [Field E] {β : E} {m j : ℕ} (hjm : j ≤ m)
+    (hone : β ^ m = 1) : betaSum β (m - j) = betaSum β j := by
+  have hpow : β ^ (m - j) = (β ^ j)⁻¹ := by
+    have hmul : β ^ (m - j) * β ^ j = 1 := by
+      rw [← pow_add, Nat.sub_add_cancel hjm]
+      exact hone
+    exact eq_inv_of_mul_eq_one_left hmul
+  rw [betaSum, betaSum, hpow, inv_inv]
+  exact add_comm _ _
+
+/-- **`u_i + u_{m-i} = α`** (Peterfalvi Part II, p. 128, behind step (20)'s second
+assertion), in this file's indexing: `p + q = N` and `β^{N+2} = 1` give
+
+  `u_p + u_q = α`.
+
+Both `c_q = c_{p+2}` and `c_{q+1} = c_{p+1}` by the palindrome property, so the sum is
+`(c_p + c_{p+2})/c_{p+1}`, which the three-term recurrence turns into `α`. -/
+theorem betaRatio_add_betaRatio {E : Type*} [Field E] (h2 : (2 : E) = 0) {β α : E}
+    (hβ : β ≠ 0) (hα : β + β⁻¹ = α) {N p q : ℕ} (hpq : p + q = N)
+    (hone : β ^ (N + 2) = 1) (hc : betaSum β (p + 1) ≠ 0) :
+    betaRatio β p + betaRatio β q = α := by
+  have hq : betaSum β q = betaSum β (p + 2) := by
+    have e : q = N + 2 - (p + 2) := by omega
+    rw [e]
+    exact betaSum_sub_eq (by omega) hone
+  have hq1 : betaSum β (q + 1) = betaSum β (p + 1) := by
+    have e : q + 1 = N + 2 - (p + 1) := by omega
+    rw [e]
+    exact betaSum_sub_eq (by omega) hone
+  have hbr0 : betaRatio β p = betaSum β p / betaSum β (p + 1) := rfl
+  have hbr1 : betaRatio β q = betaSum β q / betaSum β (q + 1) := rfl
+  rw [hbr0, hbr1, hq, hq1, ← add_div, eq_comm, eq_div_iff hc, betaSum_rec h2 hβ hα p]
+  linear_combination (-(betaSum β p)) * h2
 
 namespace Hypothesis
 
