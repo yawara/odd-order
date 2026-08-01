@@ -5122,3 +5122,34 @@ standardHypothesisULift (n) (hn : 1 < n) :
    (作用は `MulAction.compHom` で引き戻す必要がある — 要実測)。
 2. `Nat.card (U ⧸ Z(U)) < Nat.card G` → `ih` 供給。
 3. → `exists_standardModel` 以降。
+
+## 2026-08-01 (94): `ofMulEquivPullback` + `natCard_centralizer_lt`
+
+(フルビルド green 4988 jobs・lint 純ゼロ)
+
+* **`Hypothesis.ofMulEquivPullback (h) (e : A ≃* B)`** — 作用集合はそのままで群だけ
+  `e` で移し、作用を `MulAction.compHom Λ e.symm.toMonoidHom` で引き戻す。
+  ⚠ `ofMulEquiv h e (Equiv.refl Λ) _` として定義したので、**既存の `ofMulEquiv_*`
+  transport 補題がそのまま defeq で使える** (新規補題不要)。
+* **`natCard_centralizer_lt (hXV) (hX : X ≠ ⊥) : Nat.card ↥(C_G(X)) < Nat.card G`** —
+  `card_centralizerActionQuotient_lt` の証明本体 (「中心的なら `H` の自明な normal core
+  に入って矛盾」) を切り出して公開。元の定理は全射性で降ろす 3 行になった。
+
+### ⟹ `ih` 供給の材料
+
+`Nat.card (↥U ⧸ Z(U)) ≤ Nat.card ↥U ≤ Nat.card ↥(C_G(P)) < Nat.card G`
+* 1 つ目: `Nat.card_le_card_of_surjective (QuotientGroup.mk' _)`
+* 2 つ目: `U : Subgroup ↥C` なので `Subgroup.card_subgroup_dvd_card` + `Nat.le_of_dvd`
+* 3 つ目: **今回の `natCard_centralizer_lt`**
+
+### ⚠ 次セッションはここから
+
+1. `Nat.card (↥U ⧸ Z(U)) < Nat.card G` を上の 3 段で組む。
+2. `ih : TheoremAInductionBelow (↥U ⧸ Z(U)) (ULift.{v} (Unital n))` を ambient
+   `ih : TheoremAInductionBelow G Ω` から供給する
+   (`theoremAInductionBelow_centralizerActionQuotient` と同形)。
+   ⚠ `Lambda` の universe は `ULift.{v}` で合わせてある (93)。
+3. `hU := (standardHypothesisULift n hn).ofMulEquivPullback residualQuotientEquiv.symm`
+   で `Hypothesis (↥U ⧸ Z(U)) (ULift.{v} (Unital n))` を作る
+   (⚠ `residualQuotientEquiv` は `CentralizerPSUData` のフィールド)。
+4. → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2)。
