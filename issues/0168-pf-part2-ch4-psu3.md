@@ -5525,3 +5525,58 @@ docstring の判断と一致)。数学的な内容は「`a·θ(a) = a^d` が `F^
 ⟹ **`exists_standardModel` を `residualQuotientHypothesis` に当てる**のが次の 1 手
 (7 入力は全部 landing 済)。その後 `corollaryTwo_of_sectionThree` で段 (2) の `ω`, `ζ`、
 最後に `IsFGH.eq_of_le` で ambient へ。
+
+## 2026-08-01 (103): §3 の入力を全部 landing + `IsFGH.map` (商版の一意性)
+
+(102) の続き。`corollaryTwo_of_sectionThree` の仮説のうち標準仮説から出るものと、
+§4 段 (2) の「relative to `U`」の橋を landing。
+
+### `IsStandardModel` 述語化 と `U/Z(U)` 版
+
+* `ModelAction.lean`: `exists_standardModel` の結論 (11 節の連言) を
+  **`Hypothesis.IsStandardModel s M x₀`** として切り出した (定義は逐語で同じ、
+  証明は無変更)。⚠ 目的は §4 が同じ Proposition を `U/Z(U)` について**述べ直さずに**
+  言えること。
+* 新 leaf `PSU3SectionFourCorollaryTwo.lean`: **`isStandardModel_residualQuotient`** —
+  `residualQuotientHypothesis` について Ch. III §3 の Proposition が成り立つ
+  (5 入力は (96)-(101) で移してあったものをそのまま当てるだけ)。
+
+### 残り入力 3 本 (`PSU3CorollaryTwo.lean`)
+
+| 定理 | 供給する仮説 |
+|---|---|
+| `braid_of_orderThree` | `hC2` (`s`,`t` 対合 + `\|st\| = 3` ⟹ braid) |
+| `one_lt_natCard_W` | `hW1` |
+| `exists_fgh_mapsTo` | `hfQ` — ⚠ `IsFGH` は `f` を `Q^#` 上でしか縛らないので `exists_fgh` の `f` は `1` の行き先が不定。`1` での値を `1` に取り替えると `IsFGH` が見るものは不変で `f : Q → Q` になる |
+
+`hKcard` / `hWdvd` は既存の `card_actualKActor_eq` / `lemmaFive_of_orderThree` が
+そのまま与えるのでラッパーは書かない (ラッパー方針)。
+
+### `IsFGH.map` (`OddOrder/GroupTheory/RankOneBNPair.lean`)
+
+`IsFGH.eq_of_le` (部分群版) の**商版**。準同型 `π` が rank-one setup を別の setup へ
+運ぶ (`π t = t'`, `Q → Q'`, `D → D'`) なら、定義式の π 像は下の setup にとっても
+canonical 分解なので `fgh_eq_of_canonical` が `f₁(π x) = π (f x)` 等を与える。
+⚠ 仮説は `x ≠ 1` でなく **`π x ≠ 1`** (π が潰す元では `f₁` を縛るものが無い)。
+
+⟹ 書籍 p.133 段 (2) の「`U/Z(U)` で示した Corollary 2 を `U` の中で読む」
+(結論が核 = `P ∩ U` を法として成り立つ) の道具。
+
+### ⚠ 次セッションはここから — 残る **1 つの本物の同定**
+
+段 (2) を閉じるのに要る配線は、`IsFGH.map` を `π : U → U/Z(U)` に当てること。
+そのために必要な**未検証の点** (次の一手はここの実測):
+
+1. **`U` 自身の `Setup`** (`M = U ∩ H`, `Q ∩ U`, `D ∩ U`, `t`) が repo に在るか。
+   `t ∈ U` は landing 済 (`t_mem_primeComplementResidual`)。
+2. **`π t = t̄`** — ⚠ ここが本物の同定。`residualQuotientHypothesis` の `t̄` は
+   `standardHypothesisULift` の `t` を `residualQuotientEquiv.symm` で引き戻したもので、
+   ambient の `t` の像とは**定義上は別物**。「Ch. I §3 Prop 1(c) の同一視が `t` を
+   標準モデルの区別された対合へ送る」ことを示す必要がある
+   (`CentralizerPSUData.residualQuotientEquiv` の構成を読むこと)。
+   ⚠ 共役で済む可能性もある (`Hypothesis` の `t` は共役を除いて決まる) が、
+   §4 は**同じ `t`** を使うので、共役なら共役元で `Hypothesis` を取り替える必要がある。
+3. `Q ∩ U → Q̄`, `D ∩ U → D̄` の像条件。
+
+⟹ 次の一手 = **`CentralizerPSUData.residualQuotientEquiv` の構成を読み、`t` の行き先を
+実測する**。
