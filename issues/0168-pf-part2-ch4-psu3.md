@@ -3717,3 +3717,42 @@ ambient `G` に固有の仮定は無い。⟹ **商 `Hypothesis` にもそのま
    群が既に商と ambient を往復しているので、そこから取れるはず。要実測)。
 3. 段 (4) 鎖 → `hcover` → `corollaryTwo_of_stepFour` で `ω̄` を得る。
 4. 商から `U` へ持ち上げ、`IsFGH.eq_of_le` で `f₁ → f`。
+
+## 2026-08-01 (61): 商 `qhyp` の `hst` は**既にある** — 段 (2)(b) の前提を個別に追う
+
+`exists_standardModel` が `qhyp` に要求する 6 前提の出どころを追った。
+
+### `hst` (= `orderOf (s·t) = 3`) — ✅ 既存
+
+`orderOf_distinguishedInvolution_mul_t_of_psu3Target (hyp) (L) (hLnormal) (hLodd)
+ (data : PSU3InductionTarget L) : orderOf (hyp.distinguishedInvolution * hyp.t) = 3`
+(`CentralizerPSUDistinguished.lean:161`) は **任意の `hyp`** について述べられている。
+⟹ `hyp := qhyp`, `L := result.L`, `data` = 枝選択 (45) の出力、で
+**`qhyp` の `hst` がそのまま出る**。
+
+⟹ 依存の向きは:
+```
+ambient の orderOf (s·t) = 3  +  exponent 判別子 (48)(49)
+  → nonempty_psu3Data_of_orderOf_eq_three (45)   [枝選択]
+  → PSU3InductionTarget data
+  → orderOf_distinguishedInvolution_mul_t_of_psu3Target  [qhyp の hst]
+  → exists_standardModel for qhyp
+  → §3 の段 (4) 鎖 (60)  → hcover  → corollaryTwo_of_stepFour
+```
+
+### 残る 5 前提 (`qhyp` について)
+
+| 前提 | 見込みの出どころ |
+|---|---|
+| `hm : m ≠ 0` | `data.one_lt_n` (`PSU3InductionTarget` のフィールド) |
+| `hQ0card : \|Q₀\| = 2^m` | `CentralizerPSUData.natCard_cQ0_eq_baseField` 周り (要実測) |
+| `hcardQ : \|Q\| = \|Q₀\|³` | 同上 / PSU(3,q) の Sylow 2 の位数 |
+| `inductionHypothesis` | 商は `G` より小さい (`card_centralizerActionQuotient_lt`) ので ambient の帰納法仮説から継承できるはず (要実測) |
+| `x₀ ∈ Z(Q̄)`, `x₀ ≠ 1` | `exists_involution_mem_center_Q` (`QStructure.lean:220`) の商版 |
+
+⟹ **すべて既存資産の射程内**。段 (2)(b) は依然として配線だが、行き先が全部特定できた。
+
+### ⚠ 次セッションはここから
+
+上の表の 5 前提を 1 つずつ実測して埋め、`exists_standardModel` for `qhyp` を組む。
+その後は (60) の鎖で `hcover` → `corollaryTwo_of_stepFour` → 段 (2) が閉じる。
