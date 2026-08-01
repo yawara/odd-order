@@ -162,6 +162,26 @@ theorem stepFive_secondCase (h2 : (2 : E) = 0) {r x a : E}
     field_simp
     linear_combination x * h2
 
+/-- **Stage (5)'s second case, composed** (Peterfalvi Part II, p. 131).
+
+The two inputs are §2 (2) read in coordinates — `q_L = A q_R`, `y_L = A² y_R + A`, where
+`A = μ(a²)` is the conjugating scalar — and the inversion formula already known at
+`f(ρ) s^a = (ω̄', x' + A)`, with `ω̄' = ρ̄/x` and `x' = 1/x` supplied by
+`inverseFormula_symm`.  Out comes the formula at `ρ s^{a⁻¹} = (ρ̄, x + A⁻¹)`.
+
+The book's parameter is `A⁻¹`, the coordinate of the shift on the left; that is why
+`stepFive_secondCase` is instantiated there. -/
+theorem stepFive_secondCase_compose (h2 : (2 : E) = 0) {r x A qL yL qR yR : E}
+    (hA : A ≠ 0) (hx : x ≠ 0) (hxA : x + A⁻¹ ≠ 0)
+    (hLq : qL = A * qR) (hLy : yL = A ^ 2 * yR + A)
+    (hRq : qR = (r / x) / (x⁻¹ + A)) (hRy : yR = (x⁻¹ + A)⁻¹) :
+    qL = r / (x + A⁻¹) ∧ yL = (x + A⁻¹)⁻¹ := by
+  obtain ⟨e1, e2⟩ :=
+    stepFive_secondCase (r := r) (x := x) (a := A⁻¹) h2 (inv_ne_zero hA) hx hxA
+  rw [inv_inv] at e1 e2
+  rw [one_div] at e2
+  exact ⟨by rw [hLq, hRq]; exact e1, by rw [hLy, hRy]; exact e2⟩
+
 /-- **The inversion formula is self-inverse** (Peterfalvi Part II, p. 131: "Then
 `(ρ̄, x) = f(ω̄', x') = (ω̄'/x', 1/x')` and so `ω̄' = ρ̄/x` and `x' = 1/x`").
 
