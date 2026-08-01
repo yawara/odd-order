@@ -22,13 +22,20 @@ and the induction hypothesis — is already available for it.
 So the Proposition itself is available, and this file says so: the caller obtains the
 model on `U/Z(U)` and feeds it to `corollaryTwo_of_sectionThree`.
 
-Step (2) also has to know that the mappings `f`, `g`, `h` of §1 do not leave `C_G(P)`
-when applied inside it; `fgh_mem_centralizer` is that, for any `X ≤ D` centralizing `t`.
+Step (2) also takes `f` and `h` "relative to `U`, `U ∩ H` and `t`", which presupposes
+that `U` is itself a rank-one setup.  It is, for the same reason throughout: conjugation
+by `P` fixes both decompositions of Ch. I, so their factors stay in `C_G(P)`, and the
+`Q`-factor then lies in `C_Q(P) ≤ U` — from which the other factor follows by division
+(`Setup.restrict`).
 
 ## Main results
 
+* `Hypothesis.canonicalForm_mem_centralizer`, `Hypothesis.splitQD_mem_centralizer` —
+  both decompositions of Ch. I keep their factors inside `C_G(X)`.
 * `Hypothesis.fgh_mem_centralizer` — `f`, `g`, `h` map `C_Q(X)^#` into `C_Q(X)`,
   `C_Q(X)`, `C_D(X)`.
+* `Hypothesis.rankOneSetup_subgroup` — a subgroup of `C_G(X)` containing `t` and
+  `C_Q(X)` inherits the rank-one setup.
 * `Hypothesis.isStandardModel_residualQuotient` — the Proposition of Ch. III §3 holds
   on `U/Z(U)`.
 -/
@@ -47,19 +54,80 @@ section Centralizer
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
   (hyp : Hypothesis G Ω) {f g h : G → G} {X : Subgroup G}
 
+omit [MulAction G Ω] [Finite G] in
+/-- An element fixed by conjugation by every member of `X` centralizes `X`. -/
+theorem mem_centralizer_of_conj_eq {y : G} (hy : ∀ p ∈ X, p * y * p⁻¹ = y) :
+    y ∈ Subgroup.centralizer (X : Set G) := by
+  refine Subgroup.mem_centralizer_iff.mpr fun p hp => ?_
+  calc p * y = (p * y * p⁻¹) * p := by group
+    _ = y * p := by rw [hy p hp]
+
+/-- **The canonical form of an element of `C_G(X)` has both factors in `C_G(X)`**
+(Peterfalvi Part II, Ch. IV §4, step (2), p. 133).
+
+If `X ≤ D` centralizes `t`, conjugation by `p ∈ X` fixes `y` and carries its canonical
+factorization `y = x t q` to another one — the factors stay where they belong because
+`p ∈ H` and `Q ⊴ H`.  Uniqueness (Ch. I Prop 4(a)) therefore fixes `x` and `q`. -/
+theorem canonicalForm_mem_centralizer (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    {y : G} (hyX : y ∈ Subgroup.centralizer (X : Set G))
+    {x q : G} (hxH : x ∈ hyp.H) (hqQ : q ∈ hyp.Q) (hy : y = x * hyp.t * q) :
+    x ∈ Subgroup.centralizer (X : Set G) ∧ q ∈ Subgroup.centralizer (X : Set G) := by
+  have hkey : ∀ p ∈ X, p * x * p⁻¹ = x ∧ p * q * p⁻¹ = q := by
+    intro p hp
+    have hpH : p ∈ hyp.H := hyp.D_le_H (hXD hp)
+    have hpt : p * hyp.t * p⁻¹ = hyp.t := by
+      rw [Subgroup.mem_centralizer_iff.mp htX p hp]; group
+    have hpy : p * y * p⁻¹ = y := by
+      rw [Subgroup.mem_centralizer_iff.mp hyX p hp]; group
+    have heq : p * x * p⁻¹ * hyp.t * (p * q * p⁻¹) = x * hyp.t * q := by
+      calc p * x * p⁻¹ * hyp.t * (p * q * p⁻¹)
+          = p * x * p⁻¹ * (p * hyp.t * p⁻¹) * (p * q * p⁻¹) := by rw [hpt]
+        _ = p * (x * hyp.t * q) * p⁻¹ := by group
+        _ = p * y * p⁻¹ := by rw [hy]
+        _ = y := hpy
+        _ = x * hyp.t * q := hy
+    exact hyp.canonicalForm_unique
+      (hyp.H.mul_mem (hyp.H.mul_mem hpH hxH) (hyp.H.inv_mem hpH))
+      (hyp.Q_normal_in_H p hpH q hqQ) hxH hqQ heq
+  exact ⟨mem_centralizer_of_conj_eq (X := X) fun p hp => (hkey p hp).1,
+    mem_centralizer_of_conj_eq (X := X) fun p hp => (hkey p hp).2⟩
+
+/-- **The `Q D`-decomposition of an element of `C_H(X)` has both factors in `C_G(X)`**
+(Peterfalvi Part II, Ch. I Prop 6(a), p. 102, read through uniqueness).
+
+`cQ_mul_cD_eq_cH` writes the element as a product from `C_Q(X)` and `C_D(X)`; the
+`Q D`-decomposition being unique, that product *is* the given one. -/
+theorem splitQD_mem_centralizer (hXD : X ≤ hyp.D)
+    {a : G} (haH : a ∈ hyp.H) (haX : a ∈ Subgroup.centralizer (X : Set G))
+    {q d : G} (hqQ : q ∈ hyp.Q) (hdD : d ∈ hyp.D) (ha : a = q * d) :
+    q ∈ hyp.Q ⊓ Subgroup.centralizer (X : Set G) ∧
+      d ∈ hyp.D ⊓ Subgroup.centralizer (X : Set G) := by
+  have hmem : a ∈
+      ((hyp.Q ⊓ Subgroup.centralizer (X : Set G) : Subgroup G) : Set G) *
+        ((hyp.D ⊓ Subgroup.centralizer (X : Set G) : Subgroup G) : Set G) := by
+    rw [hyp.cQ_mul_cD_eq_cH hXD]
+    exact Subgroup.mem_inf.mpr ⟨haH, haX⟩
+  obtain ⟨q', hq', d', hd', hqd⟩ := hmem
+  rw [SetLike.mem_coe] at hq' hd'
+  obtain ⟨p₀, -, huniq⟩ := hyp.existsUnique_Q_mul_D haH
+  have e₁ := huniq (⟨q, hqQ⟩, ⟨d, hdD⟩) ha
+  have e₂ := huniq (⟨q', (Subgroup.mem_inf.mp hq').1⟩, ⟨d', (Subgroup.mem_inf.mp hd').1⟩)
+    hqd.symm
+  have hpair := e₁.trans e₂.symm
+  have hq : q = q' :=
+    congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) (congrArg Prod.fst hpair)
+  have hd : d = d' :=
+    congrArg (Subtype.val (p := fun z => z ∈ hyp.D)) (congrArg Prod.snd hpair)
+  exact ⟨hq ▸ hq', hd ▸ hd'⟩
+
 /-- **The mappings of Ch. IV §1 stay inside a centralizer** (Peterfalvi Part II,
 Ch. IV §4, step (2), p. 133 — "the mappings `f` and `h` relative to `U`, `U ∩ H` and
 `t`" presupposes exactly this).
 
-If `X ≤ D` centralizes `t`, then conjugation by `p ∈ X` fixes `t x t` for every
-`x ∈ C_Q(X)`, and carries the canonical factorization `t x t = g(x) h(x) t f(x)` to
-another one — the factors stay where they belong because `p ∈ H` and `Q ⊴ H`.
-Uniqueness of the canonical form (Ch. I Prop 4(a)) therefore fixes `g(x) h(x)` and
-`f(x)`, so both centralize `X`.
-
-Splitting `g(x) h(x)` is then Ch. I Prop 6(a): `C_H(X) = C_Q(X) ⋊ C_D(X)`, and the
-uniqueness of the `Q D`-decomposition identifies the two factors with `g(x)` and
-`h(x)`. -/
+`t x t` centralizes `X` when `x` does, so its canonical form `g(x) h(x) · t · f(x)` has
+both factors in `C_G(X)` (`canonicalForm_mem_centralizer`); splitting `g(x) h(x)` is
+`splitQD_mem_centralizer`. -/
 theorem fgh_mem_centralizer
     (Hfgh : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
@@ -71,56 +139,33 @@ theorem fgh_mem_centralizer
   classical
   obtain ⟨hfQ, hgQ, hhD⟩ := Hfgh.mem x hxQ hx1
   have hgh : g x * h x ∈ hyp.H := hyp.H.mul_mem (hyp.Q_le_H hgQ) (hyp.D_le_H hhD)
-  -- conjugation by `p ∈ X` produces a second canonical form of `t x t`
-  have hkey : ∀ p ∈ X, p * (g x * h x) * p⁻¹ = g x * h x ∧ p * f x * p⁻¹ = f x := by
-    intro p hp
-    have hpH : p ∈ hyp.H := hyp.D_le_H (hXD hp)
-    have hpt : p * hyp.t * p⁻¹ = hyp.t := by
-      rw [Subgroup.mem_centralizer_iff.mp htX p hp]; group
-    have hpx : p * x * p⁻¹ = x := by
-      rw [Subgroup.mem_centralizer_iff.mp hxX p hp]; group
-    have heq : p * (g x * h x) * p⁻¹ * hyp.t * (p * f x * p⁻¹)
-        = g x * h x * hyp.t * f x := by
-      calc p * (g x * h x) * p⁻¹ * hyp.t * (p * f x * p⁻¹)
-          = p * (g x * h x) * p⁻¹ * (p * hyp.t * p⁻¹) * (p * f x * p⁻¹) := by
-            rw [hpt]
-        _ = p * (g x * h x * hyp.t * f x) * p⁻¹ := by group
-        _ = p * (hyp.t * x * hyp.t) * p⁻¹ := by rw [← Hfgh.eq x hxQ hx1]
-        _ = (p * hyp.t * p⁻¹) * (p * x * p⁻¹) * (p * hyp.t * p⁻¹) := by group
-        _ = hyp.t * x * hyp.t := by rw [hpt, hpx]
-        _ = g x * h x * hyp.t * f x := Hfgh.eq x hxQ hx1
-    exact hyp.canonicalForm_unique
-      (hyp.H.mul_mem (hyp.H.mul_mem hpH hgh) (hyp.H.inv_mem hpH))
-      (hyp.Q_normal_in_H p hpH (f x) hfQ) hgh hfQ heq
-  have hcent : ∀ (y : G), (∀ p ∈ X, p * y * p⁻¹ = y) →
-      y ∈ Subgroup.centralizer (X : Set G) := by
-    intro y hy
-    refine Subgroup.mem_centralizer_iff.mpr fun p hp => ?_
-    have := hy p hp
-    calc p * y = (p * y * p⁻¹) * p := by group
-      _ = y * p := by rw [this]
-  have hghC := hcent _ fun p hp => (hkey p hp).1
-  have hfC := hcent _ fun p hp => (hkey p hp).2
-  -- `C_H(X) = C_Q(X) · C_D(X)`, and the `Q D`-decomposition is unique
-  have hmem : g x * h x ∈
-      ((hyp.Q ⊓ Subgroup.centralizer (X : Set G) : Subgroup G) : Set G) *
-        ((hyp.D ⊓ Subgroup.centralizer (X : Set G) : Subgroup G) : Set G) := by
-    rw [hyp.cQ_mul_cD_eq_cH hXD]
-    exact Subgroup.mem_inf.mpr ⟨hgh, hghC⟩
-  obtain ⟨q, hq, d, hd, hqd⟩ := hmem
-  rw [SetLike.mem_coe] at hq hd
-  obtain ⟨p₀, -, huniq⟩ := hyp.existsUnique_Q_mul_D hgh
-  have e₁ := huniq (⟨g x, hgQ⟩, ⟨h x, hhD⟩) rfl
-  have e₂ := huniq (⟨q, (Subgroup.mem_inf.mp hq).1⟩, ⟨d, (Subgroup.mem_inf.mp hd).1⟩)
-    hqd.symm
-  have hpair := e₁.trans e₂.symm
-  have hgq : g x = q :=
-    congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) (congrArg Prod.fst hpair)
-  have hhd : h x = d :=
-    congrArg (Subtype.val (p := fun z => z ∈ hyp.D)) (congrArg Prod.snd hpair)
-  refine ⟨Subgroup.mem_inf.mpr ⟨hfQ, hfC⟩, ?_, ?_⟩
-  · rw [hgq]; exact hq
-  · rw [hhd]; exact hd
+  have htxtX : hyp.t * x * hyp.t ∈ Subgroup.centralizer (X : Set G) :=
+    mul_mem (mul_mem htX hxX) htX
+  obtain ⟨hghX, hfX⟩ := hyp.canonicalForm_mem_centralizer hXD htX htxtX hgh hfQ
+    (Hfgh.eq x hxQ hx1)
+  obtain ⟨hgX, hhX⟩ := hyp.splitQD_mem_centralizer hXD hgh hghX hgQ hhD rfl
+  exact ⟨Subgroup.mem_inf.mpr ⟨hfQ, hfX⟩, hgX, hhX⟩
+
+/-- **A subgroup of `C_G(X)` containing `t` and `C_Q(X)` inherits the rank-one setup**
+(Peterfalvi Part II, Ch. IV §4, step (2), p. 133 — "the mappings `f` and `h` relative to
+`U`, `U ∩ H` and `t`").
+
+`Setup.restrict` only asks that the `Q`-parts of the two decompositions land in `K`, and
+`canonicalForm_mem_centralizer` / `splitQD_mem_centralizer` put them in `C_Q(X)`.  So a
+`K` between `C_Q(X)` and `C_G(X)` that contains `t` — the book's
+`U = O^{2′}(C_G(P))` — is a rank-one setup on `U ∩ H`, `U ∩ Q`, `U ∩ D`, `t`. -/
+theorem rankOneSetup_subgroup (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    {K : Subgroup G} (hKC : K ≤ Subgroup.centralizer (X : Set G)) (htK : hyp.t ∈ K)
+    (hQK : hyp.Q ⊓ Subgroup.centralizer (X : Set G) ≤ K) :
+    OddOrder.GroupTheory.RankOneBNPair.Setup (hyp.H.subgroupOf K) (hyp.Q.subgroupOf K)
+      (hyp.D.subgroupOf K) (⟨hyp.t, htK⟩ : ↥K) :=
+  hyp.rankOneSetup.restrict htK
+    (fun _ hyK _ _ hxH _ hqQ hy =>
+      hQK (Subgroup.mem_inf.mpr
+        ⟨hqQ, (hyp.canonicalForm_mem_centralizer hXD htX (hKC hyK) hxH hqQ hy).2⟩))
+    (fun _ haK haH _ hqQ _ hdD ha =>
+      hQK ((hyp.splitQD_mem_centralizer hXD haH (hKC haK) hqQ hdD ha).1))
 
 end Centralizer
 
