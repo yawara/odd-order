@@ -6,7 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFifteen
 
 /-!
-# Peterfalvi Part II, Ch. IV §2, step (13): the sequence of (11) in coordinates
+# Peterfalvi Part II, Ch. IV §2, steps (13) and (16): the sequence of (11) in coordinates
 
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 Part II, Ch. IV §2, p. 126.
@@ -38,6 +38,10 @@ agree as long as the sequence runs.
 * `Hypothesis.stepElevenCoord_eq_betaRatio` — `U_i` is the book's `u_{i+1}`.
 * `Hypothesis.stepElevenSeq_ne_one_iff` — the stopping rule in coordinates: the sequence
   runs at `i` exactly when `β^{i+2} ≠ 1`.
+* `Hypothesis.stepSixteen` — **step (16)**: `orderOf β = orderOf ζ`, i.e. `β` generates
+  `W`.  Both halves fall out of the stopping rule: the sequence runs to the end because no
+  small power of `β` is `1`, and stops because `β^m = 1`.
+* `betaSum_eq_of_pow_eq_one` — the book's `c_{m-1} = α`, a corollary of `β^m = 1`.
 -/
 
 set_option autoImplicit false
@@ -45,6 +49,22 @@ set_option autoImplicit false
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 open OddOrder.GroupTheory.RankOneBNPair
+
+/-- **`c_{m-1} = α`** (Peterfalvi Part II, p. 126, inside step (15)): the last entry of
+`(c_i)` returns to `α`.
+
+Immediate from `β^m = 1`: then `β^{m-1} = β⁻¹`, so `c_{m-1} = β⁻¹ + β = α`.  The book
+gets it the other way round, from `K ∩ W = 1`, and uses it to *prove* `β^m = 1`. -/
+theorem betaSum_eq_of_pow_eq_one {E : Type*} [Field E] {β α : E} (hβ : β ≠ 0)
+    (hα : β + β⁻¹ = α) {N : ℕ} (hone : β ^ (N + 2) = 1) :
+    betaSum β (N + 1) = α := by
+  have hstep : β ^ (N + 1) = β⁻¹ := by
+    have e : β ^ (N + 1) * β = β⁻¹ * β := by
+      rw [inv_mul_cancel₀ hβ, ← pow_succ]
+      exact hone
+    exact mul_right_cancel₀ hβ e
+  rw [betaSum, hstep, inv_inv, ← hα]
+  exact add_comm _ _
 
 namespace Hypothesis
 
@@ -265,6 +285,107 @@ theorem stepElevenSeq_ne_one_iff {m : ℕ} (s : hyp.LemmaFiveSetup m)
     rcases hor with hor | hor
     · exact hh ((betaSum_eq_zero_iff h2 hβ (n + 2)).mp hor)
     · exact hcne hor
+
+/-! ## Step (16): `β` generates `W`
+
+> **(16)** We have that `β` is a generator of `W`.  In particular, `β^σ = β⁻¹`.
+
+The book argues that `c_i ≠ 0` for `1 ≤ i ≤ m − 1` (so `β^i ≠ 1`) and then that
+`β^{m-1}` is a second root of `X² + αX + 1`, hence `β^m = 1`.  With the stopping rule
+already read off in coordinates (`stepElevenSeq_ne_one_iff`) both halves come out of the
+*same* equivalence: the sequence runs at index `i` exactly while `β^{i+2} ≠ 1`, so it
+runs to the end precisely because `β` has no small power equal to `1`, and it stops
+precisely because `β^m = 1`.
+-/
+
+/-- `β ≠ 1`: otherwise `α = β + β⁻¹ = 0` in characteristic `2`, which would force
+`y = 1` — excluded by step (5) (`ne_one_of_f_eq_conj`). -/
+theorem beta_ne_one {m : ℕ} (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    {y : G} (hyQ0 : y ∈ hyp.Q0) (hy1 : y ≠ 1) {β : M.E}
+    (hα : β + β⁻¹
+      = hyp.centerCoord s M ι hyQ0
+        / hyp.centerCoord s M ι hyp.distinguishedInvolution_mem_Q0) :
+    β ≠ 1 := by
+  have h2 : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  intro hb
+  refine hy1 ((hyp.centerCoord_eq_zero_iff s M ι hyQ0).mp ?_)
+  have hquot : hyp.centerCoord s M ι hyQ0
+      / hyp.centerCoord s M ι hyp.distinguishedInvolution_mem_Q0 = 0 := by
+    rw [← hα, hb, inv_one]
+    linear_combination h2
+  rcases div_eq_zero_iff.mp hquot with hc | hc
+  · exact hc
+  · exact absurd hc (hyp.centerCoord_distinguishedInvolution_ne_zero s M ι)
+
+/-- **The first half of step (16)** (Peterfalvi Part II, p. 126): `β^i ≠ 1` for
+`1 ≤ i ≤ N + 1` (the book's `1 ≤ i ≤ m − 1`).
+
+Induction along the sequence: `β ≠ 1` starts it, and each further step of (11) that is
+available adds one more nontrivial power by `stepElevenSeq_ne_one_iff`. -/
+theorem pow_ne_one_of_le_of_not_stopped {m : ℕ} (s : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : hyp.IsCenterCoordAction M ι d)
+    {ζ y : G} (hζ : ζ ∈ hyp.W) (hyQ0 : y ∈ hyp.Q0) (hy1 : y ≠ 1) {β : M.E} (hβ : β ≠ 0)
+    (hα : β + β⁻¹
+      = hyp.centerCoord s M ι hyQ0
+        / hyp.centerCoord s M ι hyp.distinguishedInvolution_mem_Q0)
+    {N : ℕ} (hns : ∀ i < N, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1) :
+    ∀ i, 1 ≤ i → i ≤ N + 1 → β ^ i ≠ 1 := by
+  have hb1 := hyp.beta_ne_one s M ι hyQ0 hy1 hα
+  have key : ∀ n ≤ N, ∀ i, 1 ≤ i → i ≤ n + 1 → β ^ i ≠ 1 := by
+    intro n
+    induction n with
+    | zero =>
+      intro _ i hi1 hi2
+      have : i = 1 := by omega
+      rw [this, pow_one]
+      exact hb1
+    | succ n ih =>
+      intro hn i hi1 hi2
+      rcases Nat.lt_or_ge i (n + 2) with hlt | hge
+      · exact ih (by omega) i hi1 (by omega)
+      · have hieq : i = n + 2 := by omega
+        rw [hieq]
+        exact (hyp.stepElevenSeq_ne_one_iff s M ι d hequiv hζ hyQ0 hβ hα n
+          (fun j hj => hns j (by omega)) (ih (by omega))).mp (hns n (by omega))
+  exact key N le_rfl
+
+/-- **Step (16)** (Peterfalvi Part II, p. 126): `β` has the same order as `ζ`, i.e. it
+generates `W` once `ζ` does.
+
+The sequence of (11) runs while `β^{i+2} ≠ 1` and stops when `β^{i+2} = 1`
+(`stepElevenSeq_ne_one_iff`); with `N` the first stop, that says `β^{N+2} = 1` while no
+smaller positive power is trivial.  Since `N + 2 = orderOf ζ` (`stepFifteen_length_eq`),
+`orderOf β = orderOf ζ`. -/
+theorem stepSixteen {m : ℕ} (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : hyp.IsCenterCoordAction M ι d)
+    {ζ y : G} (hζ : ζ ∈ hyp.W) (hyQ0 : y ∈ hyp.Q0) (hy1 : y ≠ 1) {β : M.E} (hβ : β ≠ 0)
+    (hα : β + β⁻¹
+      = hyp.centerCoord s M ι hyQ0
+        / hyp.centerCoord s M ι hyp.distinguishedInvolution_mem_Q0)
+    {N : ℕ} (hns : ∀ i < N, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1)
+    (hstop : y * (hyp.stepElevenSeq ζ y N).1 = 1) :
+    β ^ (N + 2) = 1 ∧ orderOf β = N + 2 := by
+  have hpow := hyp.pow_ne_one_of_le_of_not_stopped s M ι d hequiv hζ hyQ0 hy1 hβ hα hns
+  have hone : β ^ (N + 2) = 1 := by
+    by_contra hcon
+    exact (hyp.stepElevenSeq_ne_one_iff s M ι d hequiv hζ hyQ0 hβ hα N hns hpow).mpr hcon
+      hstop
+  refine ⟨hone, ?_⟩
+  have hdvd : orderOf β ∣ N + 2 := orderOf_dvd_of_pow_eq_one hone
+  have hfin : IsOfFinOrder β := isOfFinOrder_iff_pow_eq_one.mpr ⟨N + 2, by omega, hone⟩
+  have hpos : 0 < orderOf β := orderOf_pos_iff.mpr hfin
+  have hle : orderOf β ≤ N + 2 := Nat.le_of_dvd (by omega) hdvd
+  by_contra hne
+  exact hpow (orderOf β) hpos (by omega) (pow_orderOf_eq_one β)
 
 end Hypothesis
 
