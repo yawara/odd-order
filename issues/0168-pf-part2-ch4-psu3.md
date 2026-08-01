@@ -6367,3 +6367,43 @@ centralizes `C_{Q₀}(P)` … `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` 
 
 まず transported 版 `residualQuotientHypothesis_V_eq_W` の証明を読んで、内在版に
 移せるか実測すること。
+
+## 2026-08-02 (121): ⚠ 重要な実測 — §2/§3 は既に**中心化群商 `C/𝒩(C)` の内在仮説**で走っている
+
+`∃ w ∈ W̄, w ≠ 1` を探して §4 の setup を読んだところ、`PSU3SectionFourSetup.lean` に
+**`SectionFourSetup.standingData_centralizerQuotient`** (1163 行) が既にあり、
+`hyp.centralizerQuotientHypothesis s4.P_le_V hA3` (= `C/𝒩(C)` 上の**内在**標準仮説;
+`H`,`Q`,`D` は `C_H(P)`,`C_Q(P)`,`C_D(P)` の像) について
+
+* `n ≠ 0` / `|Q̄₀| = 2ⁿ` / `|Q̄| = |Q̄₀|³` / `|s̄ t̄| = 3` / `Q̄` が Suzuki 2-群
+* `Nonempty (LemmaFiveSetup n)` / `Nonempty (QuotientFieldModel n)`
+
+を**§4 の ambient 仮説だけから**与えている。つまり Ch. I §3 Lemma 5 の入力一式は
+`C/𝒩(C)` については既に揃っている。
+
+とくに、私が探していた `∃ w ∈ W̄, w ≠ 1` に対応するものは
+* `s4.exists_ne_one_mem_W_centralizer` — `∃ w ∈ W, w ≠ 1 ∧ w ∈ C_G(P)`
+  (書籍の `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1`)
+* `s4.exists_ne_one_mem_quotient_W` — その `C/𝒩(C)` への降下
+
+として**既に landing 済**だった。
+
+### ⚠ 戦略上の含意 (次セッションの最初の判断)
+
+`O^{2'}(C/𝒩(C)) ≅ U/Z(U)` (`centralizerResidualQuotientEquiv`) なので、`C/𝒩(C)` は
+`U/Z(U)` を奇指数で含む群。書籍は「`U`, `U ∩ H`, `t` についての `f₁`, `h₁`」と書くが、
+**`C`, `C ∩ H`, `t` についての三つ組でも同じ転送 (`IsFGH.eq_of_le`) が効く** はず
+(`rankOneSetup_subgroup` は `K = C` にも当たる)。だとすると
+
+1. `C/𝒩(C)` 経由で §3 Corollary 2 を当てるほうが**入力が既に揃っている分だけ近道**。
+2. 私が (117)-(120) で作った `U/Z(U)` の内在仮説は無駄ではない (書籍の `U` そのもので、
+   `mem_center_primeComplementResidual_of_mem_P` 等 §4 は `U` を実際に使う) が、
+   段 (2) を閉じる最短路ではないかもしれない。
+
+**次セッションはまずここを裁定する**: `corollaryTwo_of_sectionThree` を
+`centralizerQuotientHypothesis` に当てるのに何が足りないかを実測し
+(`hVW` / `hZc` / `hmu` / `hKcard` / `hWdvd` / `hW1` / bilinear package /
+`IsStandardModel`)、`C/𝒩(C)` 経路と `U/Z(U)` 経路のどちらが短いかを決める。
+⚠ どちらにせよ (119) の 2 方向の転送 (`exists_fgh_residual_eq` /
+`fgh_map_residualQuotient`) は `U` 版なので、`C` 版が要るなら同じ形で作り直す
+(`rankOneSetup_subgroup` に `K = C` を当てるだけ)。
