@@ -1052,6 +1052,29 @@ theorem exists_mulEquiv_match_residualQuotient_t
     rw [← hteq]
     group
 
+/-- **🎯 `V̄ = W̄` for the intrinsic standing hypothesis on `U/Z(U)`** —
+`corollaryTwo_of_standardModel`'s `hVW`.
+
+`V` is determined by `D` and `t`, `W` by `H` and `D`, and
+`exists_mulEquiv_match_residualQuotient_t` matches all four, so `V = W` transports from
+the transported hypothesis (`residualQuotientHypothesis_V_eq_W`). -/
+theorem V_eq_W_intrinsicResidualQuotient (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).V
+      = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).W := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  obtain ⟨ψ, hH, _hQ, hD, ht⟩ :=
+    hyp.exists_mulEquiv_match_residualQuotient_t details hXD htX hCQ hZD
+  have hV := map_V_of_mulEquiv (hyp.residualQuotientHypothesis details)
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD) ψ hD ht
+  have hW := map_W_of_mulEquiv (hyp.residualQuotientHypothesis details)
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD) ψ hH hD
+  rw [← hV, ← hW, hyp.residualQuotientHypothesis_V_eq_W details]
+
 /-! ### Moving the point set into `Ω`'s universe
 
 The ambient induction hypothesis `TheoremAInductionBelow G Ω` quantifies over permuted

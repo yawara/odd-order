@@ -71,6 +71,13 @@ theorem map_W_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (�
     Subgroup.map_inf _ _ φ.toMonoidHom φ.injective, hD,
     map_centralizer_equiv φ (h₁.Q0 : Set L), himg]
 
+/-- `V` is determined by `D` and `t`. -/
+theorem map_V_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (φ : L ≃* L')
+    (hD : h₁.D.map φ.toMonoidHom = h₂.D) (ht : φ h₁.t = h₂.t) :
+    h₁.V.map φ.toMonoidHom = h₂.V := by
+  rw [Hypothesis.V, Hypothesis.V, Subgroup.map_inf _ _ φ.toMonoidHom φ.injective, hD,
+    map_centralizer_equiv φ {h₁.t}, Set.image_singleton, ht]
+
 /-- A non-trivial element of `W` moves along the isomorphism. -/
 theorem exists_ne_one_mem_W_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ')
     (φ : L ≃* L') (hH : h₁.H.map φ.toMonoidHom = h₂.H)
