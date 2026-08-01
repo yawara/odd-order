@@ -194,6 +194,15 @@ theorem nonempty_standingData_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ �
     (hyp.residualQuotientHypothesis details).nonempty_quotientFieldModel_of_orderThree
       hst hQsuz hn0 hQ0card hcardQ ihq sfive hwW hw1⟩
 
+/-- The `x₀ ∈ Z(Q)`, `x₀ ≠ 1` that `exists_standardModel` takes, on `U/Z(U)`. -/
+theorem exists_center_Q_ne_one_residualQuotient :
+    letI := MulAction.compHom (ULift.{v} (Unital data.n))
+      details.residualQuotientEquiv.toMonoidHom
+    ∃ x₀ : ↥(Subgroup.center (hyp.residualQuotientHypothesis details).Q), x₀ ≠ 1 := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  exact (hyp.residualQuotientHypothesis details).exists_center_Q_ne_one
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
