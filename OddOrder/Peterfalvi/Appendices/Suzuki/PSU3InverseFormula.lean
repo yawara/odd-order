@@ -40,6 +40,8 @@ statements about the field `E` alone.
 * `eq_and_inv_of_star` — `(∗∗)` forces `x = ζ⁻¹` and `γ(a) = 1/(a + ζ⁻¹)`.
 * `gamma_eq_inv_of_secondEntry` — the two combined, in the form stage (4) consumes:
   the second unitary coordinate of `f(ω̄, x + a)` is `1/(x + a)`, for `a ∈ F − {0, 1}`.
+* `secondEntry_of_chain`, `star_of_chain` — the bridge from a two-factor identity in
+  the twisted product to `(∗∗)`, which is how stage (1) enters.
 -/
 
 set_option autoImplicit false
@@ -153,5 +155,59 @@ theorem gamma_eq_inv_of_secondEntry (h2 : (2 : E) = 0) {m : ℕ} (S : Subfield E
   exact ⟨hx, fun a ha ha0 ha1 => by rw [hγ a ha ha0 ha1, hx, add_comm a ζ⁻¹]⟩
 
 end StepFourArithmetic
+
+section ChainBridge
+
+open OddOrder.FiniteField Suzuki2Groups
+
+variable {E : Type*} [Field E] [Finite E] [CharP E 2] [Algebra (ZMod 2) E]
+
+/-- **Reading a two-factor identity on its second unitary entries** — the shape stage
+(1) arrives in (Peterfalvi Part II, p. 131).
+
+Both sides of the chain are products of two elements, and the multiplication rule of the
+unitary coordinates contributes a cocycle term `p̄ q̄^q` to each.  On the left that term
+vanishes, the second factor being central; on the right it survives, and it is the term
+the book evaluates using `ω̄^{1+q} = ζ + ζ⁻¹`. -/
+theorem secondEntry_of_chain (m : ℕ) (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
+    (hu : frobTrace (E := E) m u = 1)
+    {L₁ L₂ R₁ R₂ : BilinearTwistedProduct (hermitianCocycle m hcard hu)}
+    (hL₂ : L₂.quotient = 0) (heq : L₁ * L₂ = R₁ * R₂) :
+    unitaryCoord m u L₁ + unitaryCoord m u L₂
+      = unitaryCoord m u R₁ + unitaryCoord m u R₂
+        + R₁.quotient * R₂.quotient ^ 2 ^ m := by
+  have hL := unitaryCoord_mul m hcard hu L₁ L₂
+  rw [heq, unitaryCoord_mul m hcard hu R₁ R₂, hL₂, zero_pow (by positivity),
+    mul_zero, add_zero] at hL
+  exact hL.symm
+
+/-- **Stage (1), read in the unitary coordinates, is `(∗∗)`** (Peterfalvi Part II,
+p. 131).
+
+The hypotheses are the coordinates of the four factors of the chain
+
+  `f(ω̄, x+a)^{ζ⁻¹ a} · (0, a) = f(ω̄, x+a)^{ζ⁻²} · (ω̄, x)^{ζ⁻¹}`,
+
+each obtained from `exists_unitaryModel_conj` (the conjugations scale the two
+coordinates by `μ` and its norm) together with stage (2) for the quotient coordinate of
+`f(ω̄, x+a)`.  The three norms involved are `(ζ⁻¹a)^{1+q} = a²` and
+`(ζ⁻²)^{1+q} = (ζ⁻¹)^{1+q} = 1`. -/
+theorem star_of_chain (m : ℕ) (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
+    (hu : frobTrace (E := E) m u = 1) (h2 : (2 : E) = 0)
+    {L₁ L₂ R₁ R₂ : BilinearTwistedProduct (hermitianCocycle m hcard hu)}
+    {ζ ω x a γa : E} (hζ : ζ ≠ 0) (hζnorm : ζ * ζ ^ 2 ^ m = 1)
+    (hω : ω * ω ^ 2 ^ m = ζ + ζ⁻¹)
+    (hL₂q : L₂.quotient = 0)
+    (hL₁y : unitaryCoord m u L₁ = a ^ 2 * γa) (hL₂y : unitaryCoord m u L₂ = a)
+    (hR₁y : unitaryCoord m u R₁ = γa)
+    (hR₁q : R₁.quotient = ζ⁻¹ ^ 2 * ω / (a + ζ⁻¹))
+    (hR₂y : unitaryCoord m u R₂ = x) (hR₂q : R₂.quotient = ζ⁻¹ * ω)
+    (heq : L₁ * L₂ = R₁ * R₂) :
+    (a ^ 2 + 1) * γa = x + a + (1 + ζ⁻¹ ^ 2) / (a + ζ⁻¹) := by
+  have h := secondEntry_of_chain m hcard hu hL₂q heq
+  rw [hL₁y, hL₂y, hR₁y, hR₂y, hR₁q, hR₂q] at h
+  exact star_of_secondEntry h2 hζ hζnorm hω h
+
+end ChainBridge
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
