@@ -337,6 +337,67 @@ theorem structureConjugator_mem_residualImage (hXV : X ≤ hyp.V)
   hyp.inf_centralizer_le_residual hCQ (Subgroup.mem_inf.mpr
     ⟨hyp.structureConjugator_mem_Q, hyp.structureConjugator_mem_centralizer_of_le_V hXV⟩)
 
+/-! ### Commuting with `Q̄` is commuting with `C_Q(X)`
+
+`hVW` for `C/𝒩(C)` reduces, by `V_eq_W_iff_le_centralizer_Q0`, to `V̄ ≤ C(Q̄₀)`, i.e. to a
+commuting relation *modulo* `𝒩(C)`.  The kernel drops out on the `Q`-side: a commutator of
+`C_D(X)` with `C_Q(X)` lies in `C_Q(X)`, while `𝒩(C) = C_D(X) ⊓ C_C(C_Q(X))` lies in
+`C_D(X)`, and `C_Q(X) ∩ C_D(X) = 1`. -/
+
+/-- **Commuting with `C_Q(X)` modulo `𝒩(C)` is commuting on the nose**, for an element of
+`C_D(X)`. -/
+theorem commute_of_commute_mk'_of_mem_D_of_mem_Q (hXV : X ≤ hyp.V)
+    {v u : ↥(Subgroup.centralizer (X : Set G))}
+    (hv : v ∈ hyp.D.subgroupOf (Subgroup.centralizer (X : Set G)))
+    (hu : u ∈ hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))
+    (h : QuotientGroup.mk'
+          (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore v *
+        QuotientGroup.mk'
+          (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore u
+      = QuotientGroup.mk'
+          (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore u *
+        QuotientGroup.mk'
+          (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore v) :
+    v * u = u * v := by
+  classical
+  have hcommN : v * u * v⁻¹ * u⁻¹ ∈
+      (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore := by
+    refine (QuotientGroup.eq_one_iff _).mp ?_
+    have hmk : (QuotientGroup.mk'
+        (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore)
+        (v * u * v⁻¹ * u⁻¹) = 1 := by
+      have hrw : (QuotientGroup.mk'
+          (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore)
+            (v * u * v⁻¹ * u⁻¹)
+          = (QuotientGroup.mk' _ v * QuotientGroup.mk' _ u) *
+            (QuotientGroup.mk' _ u * QuotientGroup.mk' _ v)⁻¹ := by
+        simp only [map_mul, map_inv]
+        group
+      rw [hrw, h, mul_inv_cancel]
+    simpa using hmk
+  have hvH : v ∈ hyp.H.subgroupOf (Subgroup.centralizer (X : Set G)) :=
+    Subgroup.mem_subgroupOf.mpr (hyp.D_le_H (Subgroup.mem_subgroupOf.mp hv))
+  have hcommQ : v * u * v⁻¹ * u⁻¹ ∈
+      hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)) :=
+    (hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))).mul_mem
+      ((hyp.centralizerHypothesisA1 hXV).Q_normal_in_H v hvH u hu)
+      ((hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))).inv_mem hu)
+  have hNleD : (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore
+      ≤ hyp.D.subgroupOf (Subgroup.centralizer (X : Set G)) := by
+    rw [hyp.normalCore_cH_eq_centralizer_cQ hXV]
+    exact inf_le_left
+  have hbot : v * u * v⁻¹ * u⁻¹ ∈
+      hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))
+        ⊓ hyp.D.subgroupOf (Subgroup.centralizer (X : Set G)) :=
+    ⟨hcommQ, hNleD hcommN⟩
+  have hQD : hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))
+      ⊓ hyp.D.subgroupOf (Subgroup.centralizer (X : Set G)) = ⊥ :=
+    (hyp.centralizerHypothesisA1 hXV).Q_inf_D_eq_bot
+  rw [hQD, Subgroup.mem_bot] at hbot
+  have hvu : v * u * v⁻¹ = u := mul_inv_eq_one.mp hbot
+  calc v * u = v * u * v⁻¹ * v := by group
+    _ = u * v := by rw [hvu]
+
 /-! ### `Z(Q̄) = Q̄₀` for the centralizer quotient
 
 `corollaryTwo_of_standardModel` takes `hZc : Z(Q) = Q₀ ∩ Q`, which for `C/𝒩(C)` reduces to
