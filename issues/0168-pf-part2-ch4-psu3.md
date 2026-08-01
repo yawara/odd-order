@@ -3884,3 +3884,39 @@ def Q0 : Subgroup G where carrier := {x | x ^ 2 = 1 ∧ x ∈ hyp.H}
 1. `HypothesisA1.quotientOfKernel` の `H` フィールドを実測。
 2. `centralizerQ0QuotientEquiv` を書く。
 3. `exists_standardModel` for `qhyp` → 段 (4) 鎖 → 段 (2)。
+
+## 2026-08-01 (66): 🔍 `H` の対応も既存 — 段 (2)(b) の材料が**全部名指しできた**
+
+`HypothesisA1.quotientOfKernel` (`CentralizerQuotient.lean:125`) の構成を実測:
+
+* `H := h.H.map π` (`π = QuotientGroup.mk' N`) — **`H̄` は `H` の像**
+* 構成の中に `mem_H_of_mk_mem (a) (ha : π a ∈ Hbar) : a ∈ h.H` があり、
+  根拠は `Subgroup.comap_map_eq_self hkerH` (`π.ker = N ≤ H`)。
+  ⟹ **`x ∈ C_H(X) ↔ x̄ ∈ H̄` が両方向で取れる** (→ は `Subgroup.mem_map`)。
+* 同様に `Q := h.Q.map π`、`D := h.D.map π`。
+
+⟹ `centralizerQ0QuotientEquiv` の材料が全部そろった:
+  * `x² = 1 ↔ x̄² = 1` — `centralizerQQuotientEquiv` の単射性
+  * `x ∈ C_H(X) ↔ x̄ ∈ H̄` — 上記
+  * `Q₀` の定義 `{x | x² = 1 ∧ x ∈ H}` (65)
+
+### 段 (2)(b) の材料表 (完成)
+
+| 前提 | 出どころ | 状態 |
+|---|---|---|
+| `hst` | `orderOf_distinguishedInvolution_mul_t_of_psu3Target` | ✅ |
+| `hm` | `data.one_lt_n` | ✅ |
+| `hcardQ` | `CentralizerPSUData.natCard_cQ_eq_cQ0_cube` + `centralizerQQuotientEquiv` | ✅ |
+| `hQ0card` | `natCard_cQ0_eq_baseField` + **`centralizerQ0QuotientEquiv` (未実装)** | ⚠ |
+| `inductionHypothesis` | `theoremAInductionBelow_centralizerActionQuotient` (63) | ✅ |
+| `x₀` | `exists_involution_mem_center_Q` (汎用) | ✅ |
+
+⟹ **未実装は `centralizerQ0QuotientEquiv` ただ 1 つ**で、その材料も全部特定済み。
+
+### ⚠ 次セッションはここから (実装フェーズ)
+
+1. `centralizerQ0QuotientEquiv : ↥(hyp.Q0.subgroupOf C) ≃* ↥(qhyp.Q0)` を書く
+   (`CentralizerInductionBridge.lean`、`centralizerQQuotientEquiv` の隣)。
+2. `exists_standardModel` for `qhyp` を組む。
+3. §3 段 (4) 鎖 (60) → `hcover` → `corollaryTwo_of_stepFour` → **段 (2) が閉じる**。
+4. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済 ⟹ **§4 完成**。
