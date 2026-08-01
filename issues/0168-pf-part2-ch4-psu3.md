@@ -3188,3 +3188,44 @@ p.132 のページ画像で Corollary 1 / Corollary 2 / Remark / §4 冒頭を�
 3. `Z(U) ⊆ P`: `Z(U) ⊆ C_V(C_{Q₀}(P)) = P ⊔ W` (上記) と
    「`PZ(U)` が `C_Q(P) ⊄ Q₀` を中心化 ⟹ `PZ(U) ∩ W = 1`」。
 ⟹ **1. と 3. は既存部品でほぼ書ける**。2. が本体。
+
+## 2026-08-01 (45): §4 段 (1) の分岐選択 landing + ⚠ 書籍 2 条件の役割が判明
+
+`Hypothesis.nonempty_psu3Data_of_orderOf_eq_three` (`CentralizerTrichotomy.lean`)。
+
+### ⚠ 「`st` の位数 3」だけでは PSU 枝は決まらない
+
+repo の分岐データを実測すると:
+
+| 枝 | `orderOf (s·t)` | `C_Q(X)` の構造 |
+|---|---|---|
+| PSL(2,ℓ) | **3** | `cQ_isElementaryAbelian` (exponent 2) |
+| Sz(ℓ) | **5** | `cQ_isSuzuki2Group` |
+| PSU(3,ℓ) | **3** | `cQ_isSuzuki2Group` |
+
+⟹ 位数 3 が排除するのは **Suzuki だけ**。PSL2 を排除するのは書籍のもう一方の条件
+「`C_Q(P)` が exponent 4」で、PSL2 枝の `cQ_isElementaryAbelian` と矛盾する。
+**書籍の 2 条件はちょうど 2 枝を 1 つずつ潰しており、どちらも省けない**。
+
+### 実測できた段 (1) の部品 (全部 repo にある)
+
+| 書籍 | repo |
+|---|---|
+| `U = O^{2'}(C_G(P))` | `Subgroup.primeComplementResidual 2 C` — `CentralizerCommonData.residual_eq_normalClosure` が既にこの形 |
+| Ch. I §3 Prop 1(c) | `centralizer_trichotomy_of_induction` (3 枝 + 共通データ) |
+| `U/Z(U) ≅ PSU(3,ℓ)` | `CentralizerPSUData.residualQuotientEquiv` (`(O^{2'}(C) ⧸ Z(·)) ≃* standardPermGroup n`) |
+| 枝の同定 | **今回の `nonempty_psu3Data_of_orderOf_eq_three`** |
+| `q = ℓ^p` | `natCard_Q0_eq_pow` (前 tick で一般化) |
+| `Z(U) ⊂ PW` (Galois) | `centralizer_V_centralizer_Q0` |
+
+⚠ `CentralizerPSUData` は `Type` なので `∃` でなく `Nonempty (Σ' …)` で返す
+(既存 `centralizer_trichotomy_of_induction` の流儀)。
+
+### ⚠ 次セッションはここから
+
+1. **§4 の standing hypothesis を置く** — `P ≤ V` 素数位数 `p`、`C_{Q/Q₀}(P) ≠ 1`、
+   `P ∩ W = 1`、`C_Q(P)` exponent 4。これが決まれば段 (1) は上の 6 部品の配線。
+   ⚠ `C_Q(P)` exponent 4 / 2-rank ≥ 2 / `st` 位数 3 がどこから来るかを先に実測する
+   ((C1)(C2) の repo 対応物)。
+2. 段 (2) — `corollaryTwo_of_stepFour` を `U` 側に当てる。
+3. 段 (3)(4) → (5)(6) の供給 → `sectionFour_solve` 以降は landing 済。
