@@ -3432,3 +3432,32 @@ C_{Q/Q₀}(P) ≠ 1
    `orderOf (s·t) = 3`。
 2. 段 (2)(3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
 3. Corollary 1 第 2 段 = PGU(3,q) infra (大きい、別立て)。
+
+## 2026-08-01 (52): 🎯 §4 の standing hypothesis 構造 landing
+
+`Hypothesis.SectionFourSetup` (`PSU3SectionFourSetup.lean` 346 行):
+
+| フィールド | 書籍 |
+|---|---|
+| `P ≤ V` | 「`D` 内で共役して `P ⊂ V` としてよい」 |
+| `P ⊓ W = ⊥` | 「`W` は `Q/Q₀` に固定点自由ゆえ `P ∩ W = 1`」 |
+| `cardP` 奇素数 + `card_P` | 「素数位数 `p` の部分群 `P`」 |
+| `x ∈ Q − Q₀` + `x_class_fixed` | `C_{Q/Q₀}(P) ≠ 1` (商作用を組まずに綴る) |
+
+派生 (`SectionFourSetup` namespace):
+* `P_le_D`
+* `exists_fixed_not_mem_Q0` — Glauberman を §4 の `P` に当てる
+* **`not_isElementaryAbelian_cQ`** — 段 (1) の exponent 判別子を standing hypothesis
+  から直接出す ⟹ `nonempty_psu3Data_of_orderOf_eq_three` にそのまま渡せる
+
+### ⚠ 次セッションはここから
+
+1. **段 (1) の結論を組む**: `centralizer_trichotomy_of_induction` の
+   `CentralizerTrichotomyData` を取り、`nonempty_psu3Data_of_orderOf_eq_three` で
+   psu3 枝に落とし、`natCard_Q0_eq_pow` で `q = ℓ^p`、
+   `centralizer_V_centralizer_Q0` + `inf_W_eq_bot_of_centralizes` +
+   `eq_of_mem_mul_of_inf_eq_bot` で `Z(U) ⊆ P`。
+   ⚠ `Z(U)` は `↥U` の部分群なので `G` に戻すのに `U.subtype` で map が要る。
+   `PZ(U)` の `P W` 分解 (Dedekind の仮説) をどこから取るかも要検討
+   (`W ⊴ V` + `P, Z(U) ≤ V`)。
+2. 段 (2)(3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
