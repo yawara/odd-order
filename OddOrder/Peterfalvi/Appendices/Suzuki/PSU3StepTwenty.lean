@@ -338,6 +338,76 @@ theorem stepTwenty (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     _ = y₂⁻¹ := by rw [hone, one_mul]
     _ = y₂ := hy₂inv
 
+/-! ## §2's closing Proposition: `f(ω) = (ω⁻¹)^ζ`
+
+> **Proposition.** Suppose that `D` acts without fixed points on `(Q/Q₀)^#`.  Then there
+> exists an index `i`, `1 ≤ i ≤ n`, such that `f(ω) = (ω⁻¹)^ζ` and `h(ω) ∈ W` for
+> `ω = ω_i`.
+
+Its hypothesis is `eq_one_of_conj_eq_mul_Q0_of_mem_D`, and `h(ω) ∈ W` is `h_mem_W`.  What
+is left is `ω_i² = (0,α)`, which the book gets from a chain of three orbit identities fed
+to (H5).  The last two steps of that argument are here; the chain itself — which needs the
+family `ω_1, …, ω_n` of orbit representatives — is not yet formalized.
+-/
+
+/-- **`ω² = (0,α)` from the (H5) conclusion** (Peterfalvi Part II, p. 129).
+
+The chain of (17), (20) and (H5) ends with `(ω⁻¹(0,r))^{KW} = (ω(0,α+r))^{KW}`; since
+`ω⁻¹ = ω · (ω²)⁻¹`, both sides are translates of `ω` by elements of `Q₀`, so the freeness
+of the `D`-action makes the conjugator trivial and the translates equal — which is
+`ω² = (0,α)`. -/
+theorem sq_eq_of_dOrbitRel {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ω y ρ : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hρQ0 : ρ ∈ hyp.Q0) (hsq : ω * ω ∈ hyp.Q0)
+    (hrel : GroupTheory.RankOneBNPair.dOrbitRel hyp.D (ω⁻¹ * ρ) (ω * (ρ * y))) :
+    ω * ω = y := by
+  obtain ⟨d, hdD, hd⟩ := hrel
+  have hsq1 : (ω * ω) * (ω * ω) = 1 := by
+    have hs := hsq.1
+    rwa [sq] at hs
+  -- `ω⁻¹ ρ` is the `Q₀`-translate of `ω` by `ω² ρ`
+  have hleft : ω⁻¹ * ρ = ω * ((ω * ω) * ρ) := by
+    have e : ω⁻¹ = ω * (ω * ω) := by
+      calc ω⁻¹ = ((ω * ω) * (ω * ω)) * ω⁻¹ := by rw [hsq1, one_mul]
+        _ = ω * (ω * ω) := by group
+    rw [e]
+    group
+  have hmemσρ : (ω * ω) * ρ ∈ hyp.Q0 := hyp.Q0.mul_mem hsq hρQ0
+  obtain ⟨hωQ', hωQ0'⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hmemσρ
+  have hw : ((ω * ω) * ρ)⁻¹ * (ρ * y) ∈ hyp.Q0 :=
+    hyp.Q0.mul_mem (hyp.Q0.inv_mem hmemσρ) (hyp.Q0.mul_mem hρQ0 hyQ0)
+  have hconj : d⁻¹ * (ω * ((ω * ω) * ρ)) * d
+      = (ω * ((ω * ω) * ρ)) * (((ω * ω) * ρ)⁻¹ * (ρ * y)) := by
+    have hR : (ω * ((ω * ω) * ρ)) * (((ω * ω) * ρ)⁻¹ * (ρ * y)) = ω * (ρ * y) := by group
+    rw [hR, ← hleft, ← hd]
+  have hd1 : d = 1 :=
+    hyp.eq_one_of_conj_eq_mul_Q0_of_mem_D M hZ hmu hVW hωQ' hωQ0' hdD hw hconj
+  rw [hd1, inv_one, one_mul, mul_one, hleft] at hd
+  -- `Q₀` is abelian, so the two translates cancel
+  have hcancel : (ω * ω) * ρ = ρ * y := (mul_left_cancel hd).symm
+  have hcy : y * ρ = ρ * y :=
+    Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hρQ0) y (hyp.Q0_le_Q hyQ0)
+  refine mul_right_cancel (b := ρ) ?_
+  rw [hcancel, hcy]
+
+/-- **`f(ω) = (ω⁻¹)^ζ`** (Peterfalvi Part II, p. 129): once `ω² = (0,α)`, the
+normalization `f(ω) = (ω(0,α))^ζ` *is* the assertion, because `ω(0,α) = ω³ = ω⁻¹` (the
+square lies in `Q₀`, so `ω⁴ = 1`). -/
+theorem f_eq_conj_inv_of_sq_eq {ζ ω y : G} (hyQ0 : y ∈ hyp.Q0)
+    (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) (hsq : ω * ω = y) :
+    f ω = ζ⁻¹ * ω⁻¹ * ζ := by
+  have hy1 : (ω * ω) * (ω * ω) = 1 := by
+    rw [hsq]
+    have hs := hyQ0.1
+    rwa [sq] at hs
+  have hωy : ω * y = ω⁻¹ := by
+    rw [← hsq]
+    calc ω * (ω * ω) = ((ω * ω) * (ω * ω)) * ω⁻¹ := by group
+      _ = ω⁻¹ := by rw [hy1, one_mul]
+  rw [hfω, hωy]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
