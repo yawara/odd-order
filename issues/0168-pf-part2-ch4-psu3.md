@@ -5395,3 +5395,40 @@ lint 純ゼロ)。
 2. 上表の残り前提を個別に埋める (`hmu` と `H : IsFGH` が要実測)。
 3. 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2) の `ω`, `ζ`。
 4. `IsFGH.eq_of_le` で ambient へ持ち上げ ⟹ **§4 完成**。
+
+## 2026-08-01 (101): `hmu` landing + (100) の ⚠ 2 点は既存資産で埋まると実測 — **セッション区切り**
+
+(フルビルド green 4989 jobs・lint 純ゼロ)
+
+* `mu_injective_residualQuotient` — `M.mu` の単射性 (`hmu`)。
+* 実測 1: **`hmu`** は `QuotientFieldModel` のフィールドではない (フィールドは
+  `mu_K_injective` = K 部分のみ) が、`QuotientKWField.lean:504` の **`mu_injective`** が
+  `hst`/`hm`/`hQ0card`/`hcardQ`/`ih`/`sfive`/`M` から全体の単射性を出す。
+* 実測 2: **`H : IsFGH`** は `RankOneSetup.lean:115` の **`exists_fgh`** が
+  **任意の `hyp`** について与える (`hyp.rankOneSetup` 経由)。新規補題**不要**。
+
+⚠ lint: `∀ (sfive : …)` の binder が結論で参照されないと `unusedVariables` ⟹ `_sfive`。
+
+### 🧭 セッション区切り時点の状態 (ユーザー指示により中断)
+
+**段 (2)(b) の前提はすべて `U/Z(U)` について landing 済**:
+carrier / `hst` / `hm` / `hQ0card` / `hcardQ` / `ih` / `x₀` / `hVW` / `w ∈ W#` /
+`hQsuz` / `LemmaFiveSetup` / `QuotientFieldModel` / `hmu`。
+`H : IsFGH` と `hfQ` / `hhW` は `exists_fgh` から即取れる。
+
+### ⚠ 再開時はここから (残りは 1 本の大きな threading 証明)
+
+1. `exists_standardModel` を `residualQuotientHypothesis` に当てる。
+2. `exists_modelEquiv_conj` (`PSU3RootGroupModel.lean:696`) →
+   `exists_unitaryModel_conj` (:609) で `Ψ` / `hΨq` / `hΨc` / `hconjq` / `hconjy`。
+3. 残り: `hZc = sfive.centerEqQ0` / `hWdvd`・`hW1` (Lemma 5 と `w ∈ W#` から) /
+   `hKcard = card_K_eq_card_Q0_sub_one + hQ0card` / `hC2` (`|st| = 3` から) /
+   `ι`, `hker`, `d`, `hequiv`, `hdsq`, `hs` (`exists_standardModel` の出力)。
+4. 段 (4) 鎖 (`stepFour_star`/`base`/`pointwise`/`at_omega`/`cover`; 前提は共通) →
+   `corollaryTwo_of_stepFour` → 段 (2) の `ω`, `ζ`。
+5. `IsFGH.eq_of_le` で ambient へ持ち上げ ⟹ 段 (2) 完了 ⟹ **§4 完成**
+   (段 (3)-(10) は landing 済)。
+
+⚠ 踏んだ罠 (再開時に注意): 型に `letI` を持つ補題を `have` で受けるときは**期待型を明示** /
+`TheoremAInductionBelow` 系の goal は **`intro` で開く** (汎用補題は unify しない) /
+`ULift` を含む補題は **universe を明示** (`.{v}`) / `∀` binder が未参照なら `_` 前置。
