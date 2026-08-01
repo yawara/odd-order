@@ -4384,3 +4384,56 @@ Galois で `V ⊓ U ≤ P ⊔ W`、coprime 降下 (76) で `V̄ ≤ W̄`、`W_le
 2. (A1) の辞書を `PSUCentre.lean` を手本に作る。
 3. → `hVW` → `exists_standardModel` for `qhyp` → §3 段 (4) 鎖 →
    `corollaryTwo_of_stepFour` → 商から `U` へ持ち上げ ⟹ **段 (2) が閉じる**。
+
+## 2026-08-01 (78): 🎯 (A2) landing — 段 (2) の構造事実の **model 側は完成**
+
+`TorusCentralizer.lean` に 2 本 (フルビルド green・lint 純ゼロ):
+
+| 定理 | 内容 |
+|---|---|
+| `torusWeight_eq_one_of_commute_weylElement` | Weyl 共役は `c ↦ (c*)⁻¹` なので、固定 ⟺ `c c* = 1` ⟺ `torusWeight c = 1` |
+| `commute_rootHom_of_commute_weylElement` | ⟹ そのような**全ての**トーラス元が standard root group の対合を中心化 |
+
+⚠ 既存 `exists_ne_one_odd_centralizing_involutions_standardRoot` は「1 つ在る」型で、
+段 (2) が要るのは「全部そう」型。後者が今回。
+
+⚠ lint: `show` は `linter.style.show` に引っかかる (`have` + `exact` に直した)。
+
+### 🔍 残る (A1) の正確な形 — Borel から torus へ
+
+段 (2) が要るのは `V ⊓ U` の元についてなので、model 側で torus まで降りる必要がある。
+`V ≤ D ≤ H = N_G(Q)` (`normalizer_Q_eq_H`) なので **`V ⊓ U` の像は
+`N(standardRootSubgroup) = standardBorel` に入る**。⟹ 要る model 補題は
+
+> `b ∈ standardBorel n` かつ `Commute (weylElement n) b` ⟹
+> `b` は `standardRootSubgroup n` の対合を中心化する
+
+**証明の道 (実測済の材料で書ける)**:
+* `standardBorel_eq_infinityStabilizer` (`Bruhat.lean:317`) — `b` は `∞` を固定。
+* `weyl` は `∞` と `origin` を入れ替える (`weylElement_smul_*`, `Unital.weylPerm_infinity`
+  / `weylPerm_origin`) ので、`b` が `weyl` と交換 ⟹ `b` は `origin` も固定。
+* `mem_standardBorel_iff_existsUnique_root_torus` (`Borel.lean:105`) で
+  `b = rootHom u * psuTorusHom c` (一意)。`psuTorusHom c` は `origin` を固定するので
+  `b • origin = origin` から `u = 1` ⟹ `b = psuTorusHom c`。
+* あとは今回の `commute_rootHom_of_commute_weylElement`。
+
+### (A1) の群側 (`PSUCentre.lean` が手本)
+
+`v ∈ V ⊓ U`, `y ∈ C_{Q₀}(P)` に対し `Commute v y` を出す:
+1. `U/Z(U) ≃* standardPermGroup n` (`details.residualQuotientEquiv`) で像を取る。
+2. `v` の像は Borel に入り (`v ∈ H = N_G(Q)`)、`t` の像 (= Weyl) と交換する
+   (`v ∈ V = C_D(t)`)。⟹ 上の model 補題で `v` の像は `y` の像と交換。
+3. `Z(U)` は奇位数 (`odd_natCard_center_residual`)、`y` は対合 ⟹
+   `commute_of_commutatorElement_mem_of_coprime_natCard` で `U` 内の交換に持ち上げ。
+   (= `exists_mem_residual_commute_Q0` の最後の 10 行と同じ形)
+
+⟹ これで `hcent` が出て、Galois (`centralizer_V_centralizer_Q0`) で `V ⊓ U ≤ P ⊔ W`、
+coprime 降下 (76) で `V̄ ≤ W̄`、`W_le_V` で **`hVW : qhyp.V = qhyp.W`**。
+
+### ⚠ 次セッションはここから
+
+1. 上の model 補題 (`standardBorel` ∩ `C(weyl)` ⊆ torus) を `Borel.lean` か
+   `TorusCentralizer.lean` に書く。
+2. (A1) の群側を `PSUCentre.lean` を手本に組む。
+3. `hVW` → `exists_standardModel` for `qhyp` → §3 段 (4) 鎖 →
+   `corollaryTwo_of_stepFour` → 商から `U` へ持ち上げ ⟹ **段 (2) が閉じる**。
