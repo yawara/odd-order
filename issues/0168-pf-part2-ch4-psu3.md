@@ -1430,10 +1430,44 @@ p.131 で (4) の証明を読み切った。骨格:
 `μ(k)·θ(μ(k)) = μ(k)^d` → (`hpair` + `stepThree` + `μ(K)=F^×`)
 `σ(a)² = a·θ(a)` → `eq_id_of_sq_eq_mul_on` → `σ|_F = θ_model|_F = id`。
 
+### 📐 PSU(3,q) 座標の実測 (2026-08-01) — `RootGroup` が書籍の座標そのものだった
+
+`OddOrder/GroupTheory/SpecificGroups/ProjectiveUnitary/RootGroup.lean`:
+
+    structure RootGroup (n : ℕ) where
+      fst, snd : Field n
+      condition : snd + star snd = fst * star fst
+    (a,b)*(c,d) = (a+c, b+d+ a * star c)
+
+**書籍 §3 (4) の `(ω̄, y)` (`y + y^q = ω̄^{1+q}`) と逐語で同じ**。docstring 自身が
+「This is Peterfalvi Part II, Chapter III §3, where `phi(x,y) = x * y^q`」と書いている。
+`equivSigma` / `natCard` (= `q³`) / `natCard_add_star_eq_mul_star` (ファイバーは
+ちょうど `q` 個) まで在る。
+
+⚠⚠ **橋渡しの正体が判明した — 素朴な座標変換では**ない:
+* `RootGroup` の 2 つ目の成分は `E` の元 (トレース条件付き)、
+  `BilinearTwistedProduct φ` のそれは `F` の元。
+* 素朴に切断 `b₀` を取って `b = b₀(a) + z` と書くと
+  `φ_std(a,c) = b₀(a)+b₀(c)+b₀(a+c) + a·star c` になるが、
+  **これは双加法的でない** (`b₀` の 2 次コバウンダリ欠損が残る; `Tr∘b₀ = N` で
+  `N` が非加法的ゆえ `b₀` を線型に取れない)。机上で確認した。
+* 正体は **「対角を保ったまま非対角値を `F` に補正する」** 操作で、
+  repo は既に持っている: `exists_bilinear_frobFixed_of_diag`
+  (`ModelIsomorphism.lean:744` で `φ₀ ↦ φ` にまさに使われている)。
+  `φ₀(x,y) = x·y^q` は `E` 値だが対角 `φ₀(x,x) = x^{1+q}` は `F` 値、というのが
+  適用条件。
+
+⟹ **橋渡しの正しい形**: `RootGroup n` と `Q` を、*同じ対角 `x^{1+q}` を持つ
+`F`-双線型 `φ`* を経由して突き合わせる。Ch. III §3 が `Q ≃* BilinearTwistedProduct φ`
+を与えているので、`RootGroup n ≃* BilinearTwistedProduct φ'` を同じ補正で作り、
+`φ` と `φ'` を対角の一致から同定する。⚠ `θ = 1` (§3 (3) + `thetaModel_eq_id_on_frobFixed`)
+が `φ` の `F`-双線型性を保証しているので**今この道が通る**。
+
 ### ⚠ 次の一手
 
-1. **PSU(3,q) unipotent 座標と `BilinearTwistedProduct φ` の橋渡し**
-   (`ProjectiveUnitary/*` の実測から)。§3 (4)(5) と章末の同型の共通土台。
+1. **`RootGroup n ≃* BilinearTwistedProduct φ'` の構成**
+   (`exists_bilinear_frobFixed_of_diag` を `φ₀(x,y) = x·y^q` に適用)。
+   §3 (4)(5) と章末の同型の共通土台。
 2. §3 (4) 本体 (骨格は上記のとおり確定済)。
 3. `5 ≤ |F|` の供給。⚠ 完全な解決は場合分けになる:
    `m ≥ 3` は数え上げ / `m = 2` は「`θ|_F = Frob` なら `σ(x)τ(x) = σ(x³) = 1`
