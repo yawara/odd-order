@@ -9,7 +9,7 @@ import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
 
 /-!
-# Peterfalvi Part II, Ch. IV §4: the exponent discriminator of step (1)
+# Peterfalvi Part II, Ch. IV §4: the standing hypothesis and step (1)'s discriminators
 
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 Part II, Ch. IV §4, step (1), p. 132:
@@ -41,6 +41,9 @@ element of `Q − Q₀` does *not* square to `1`.
   of `Q/Q₀` has a `P`-fixed representative, necessarily outside `Q₀`.
 * `Hypothesis.inf_W_eq_bot_of_centralizes`, `Hypothesis.eq_of_mem_mul_of_inf_eq_bot` —
   the two steps that take step (1) from `Z(U) ⊆ P W` to `Z(U) ⊆ P`.
+* `Hypothesis.SectionFourSetup` — the standing hypothesis of §4, and
+  `SectionFourSetup.not_isElementaryAbelian_cQ`, which delivers the exponent
+  discriminator from it.
 -/
 
 set_option autoImplicit false
@@ -269,6 +272,74 @@ theorem eq_of_mem_mul_of_inf_eq_bot {P W S : Subgroup G} (hPS : P ≤ S)
   have hw1 : w = 1 := Subgroup.mem_bot.mp (hbot ▸ ⟨hwS, hw⟩)
   rw [hw1, mul_one]
   exact hp
+
+/-! ## The standing hypothesis of §4 -/
+
+/-- **The standing hypothesis of Peterfalvi Part II, Ch. IV §4** (p. 132).
+
+> By the proposition of §2 and Corollary 1 to the proposition of §3, to complete the
+> proof of Theorem A, we may assume that `D` has a subgroup `P` of prime order `p` such
+> that `C_{Q/Q₀}(P) ≠ 1`.  Since `C_Q(P) ≠ 1`, `P` has three fixed points on `Ω` and so
+> is conjugate in `D` to a subgroup of `V`.  We may assume that `P ⊂ V`.  Since `W` acts
+> fixed-point-freely on `Q/Q₀`, `P ∩ W = 1`.
+
+The two reductions the book performs before fixing notation — conjugating `P` into `V`,
+and `P ∩ W = 1` — are recorded as fields, since they are what the rest of §4 uses.
+`C_{Q/Q₀}(P) ≠ 1` is spelled out as a witness `x ∈ Q − Q₀` whose class is `P`-fixed,
+which avoids setting up the quotient action just to state it. -/
+structure SectionFourSetup (hyp : Hypothesis G Ω) where
+  /-- The subgroup of prime order the section works with. -/
+  P : Subgroup G
+  /-- `P ⊂ V`, after conjugating in `D`. -/
+  P_le_V : P ≤ hyp.V
+  /-- `P ∩ W = 1`, because `W` is fixed-point-free on `Q/Q₀`. -/
+  P_inf_W : P ⊓ hyp.W = ⊥
+  /-- The prime `p`. -/
+  cardP : ℕ
+  prime_cardP : cardP.Prime
+  /-- `p` is odd — `D` has odd order. -/
+  odd_cardP : Odd cardP
+  card_P : Nat.card ↥P = cardP
+  /-- A witness for `C_{Q/Q₀}(P) ≠ 1`. -/
+  x : G
+  x_mem_Q : x ∈ hyp.Q
+  x_notMem_Q0 : x ∉ hyp.Q0
+  x_class_fixed : ∀ a ∈ P, a * x * a⁻¹ * x⁻¹ ∈ hyp.Q0
+
+namespace SectionFourSetup
+
+variable {hyp} (s4 : hyp.SectionFourSetup)
+
+/-- `P ≤ D`, since `P ≤ V ≤ D`. -/
+theorem P_le_D : s4.P ≤ hyp.D := le_trans s4.P_le_V hyp.V_le_D
+
+/-- **`C_Q(P)` meets `Q − Q₀`** — Glauberman's step at §4's `P`. -/
+theorem exists_fixed_not_mem_Q0
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
+    (hSolv : IsSolvable ↥hyp.Q) :
+    ∃ y : G, y ∈ hyp.Q ∧ y ∉ hyp.Q0 ∧ ∀ a ∈ s4.P, a * y * a⁻¹ = y :=
+  hyp.exists_fixed_not_mem_Q0 hZ s4.P_le_D hCop hSolv s4.x_mem_Q s4.x_notMem_Q0
+    s4.x_class_fixed
+
+/-- **`C_Q(P)` is not elementary abelian** — the exponent discriminator of step (1)
+(p. 132: "`C_Q(P)` has exponent 4"), delivered in the form
+`nonempty_psu3Data_of_orderOf_eq_three` consumes. -/
+theorem not_isElementaryAbelian_cQ
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
+    (hSolv : IsSolvable ↥hyp.Q) :
+    ¬ OddOrder.GroupTheory.IsElementaryAbelian 2
+      ↥(hyp.Q.subgroupOf (Subgroup.centralizer ((s4.P : Set G)))) := by
+  obtain ⟨y, hyQ, hy0, hyfix⟩ := s4.exists_fixed_not_mem_Q0 hZ hCop hSolv
+  refine hyp.not_isElementaryAbelian_cQ_of_not_mem_Q0 hQsuz hZ hyQ hy0 ?_
+  refine Subgroup.mem_centralizer_iff.mpr fun a ha => ?_
+  have hconj := hyfix a ha
+  calc a * y = (a * y * a⁻¹) * a := by group
+    _ = y * a := by rw [hconj]
+
+end SectionFourSetup
 
 end Hypothesis
 
