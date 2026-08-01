@@ -541,6 +541,34 @@ theorem exists_ne_one_mem_W_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothe
 
 end EquivMatch
 
+section SameGroup
+
+variable {L : Type*} [Group L] [Finite L] {Λ Λ' : Type*} [MulAction L Λ] [MulAction L Λ']
+
+/-- `Q₀` depends only on `H`, not on the permuted set. -/
+theorem Q0_eq_of_H_eq (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L Λ') (hH : h₁.H = h₂.H) :
+    h₁.Q0 = h₂.Q0 := by
+  have h := map_Q0_of_mulEquiv h₁ h₂ (MulEquiv.refl L) (by simpa using hH)
+  simpa using h
+
+/-- `W` depends only on `H` and `D`, not on the permuted set. -/
+theorem W_eq_of_H_D_eq (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L Λ') (hH : h₁.H = h₂.H)
+    (hD : h₁.D = h₂.D) : h₁.W = h₂.W := by
+  have h := map_W_of_mulEquiv h₁ h₂ (MulEquiv.refl L) (by simpa using hH) (by simpa using hD)
+  simpa using h
+
+/-- The distinguished involution depends only on `H`, `Q` and `t`, not on the permuted
+set: it is pinned by the uniqueness of the distinguished pair. -/
+theorem distinguishedInvolution_eq_of_eq (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L Λ')
+    (hH : h₁.H = h₂.H) (hQ : h₁.Q = h₂.Q) (ht : h₁.t = h₂.t) :
+    h₁.distinguishedInvolution = h₂.distinguishedInvolution :=
+  (h₂.eq_distinguishedPair_of_structure (s' := h₁.distinguishedInvolution)
+    (r' := h₁.structureConjugator) (hH ▸ h₁.distinguishedInvolution_mem_H)
+    h₁.distinguishedInvolution_sq h₁.distinguishedInvolution_ne_one
+    (hQ ▸ h₁.structureConjugator_mem_Q) (ht ▸ h₁.structure_equation)).1
+
+end SameGroup
+
 section Model
 
 variable [MulAction (hyp.centralizerActionQuotient X) ↥(MulAction.fixedPoints X Ω)]
