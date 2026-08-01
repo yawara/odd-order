@@ -3684,3 +3684,36 @@ repo の `centralizerActionQuotient` と `result.L` がその商に対応する�
    (d) `IsFGH.eq_of_le` で `f₁ → f`、`h₁ → h`
 2. PSU(3,ℓ) 構造事実 2 つ (中心化 / トーラス元の存在 = (56)) を `V ∩ U` の言葉へ。
 3. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
+
+## 2026-08-01 (60): 段 (2)(b) の `hcover` — §3 の段 (4) 鎖は**汎用**、残りは配線
+
+`hcover` (= `corollaryTwo_of_stepFour` が要る「段 (4) の被覆」) を商 `Hypothesis` に
+供給する道筋を実測した。§3 の段 (4) は `PSU3InverseFormula.lean` の 5 段鎖:
+
+| 定理 | 行 | 役割 |
+|---|---|---|
+| `stepFour_star` | 163 | `(∗∗)` の組み立て |
+| `stepFour_base` | 312 | `γ(a) = 1/(a+w)` |
+| `stepFour_pointwise` | 378 | 点ごとの逆元公式 |
+| `stepFour_at_omega` | 451 | `ω` での公式 |
+| `stepFour_cover` | 867 | ファイバー被覆 = **`hcover` そのもの** |
+
+**5 段とも `(hyp : Hypothesis G Ω)` と standing data のみに依存する汎用定理**で、
+ambient `G` に固有の仮定は無い。⟹ **商 `Hypothesis` にもそのまま適用できる**。
+
+⟹ 段 (2)(b) の実質は「商 `qhyp` に対する §2/§3 の standing data を揃える」配線:
+`exists_standardModel` (Ch. III §3 Prop) を `qhyp` に当てて `φ`,`Φ`,`Θ`,`hquot`,`d`,
+`hequiv` … を得て、上の鎖に流す。⚠ `exists_standardModel` 自身が
+`hst` (`|s·t| = 3`) / `hm` / `hQ0card` / `hcardQ` / `inductionHypothesis` / `x₀` を
+要求するので、それらを `qhyp` について供給するのが前段。
+
+⟹ **新しい数学は無く、多量の仮説スレッディング**。fresh context で一気にやるのが吉。
+
+### ⚠ 次セッションの推奨手順
+
+1. `qhyp := centralizerQuotientHypothesis s4.P_le_V hA3` を置く。
+2. `qhyp` に対する `exists_standardModel` の 6 前提を供給する
+   (`hst` は `orderOf (s·t) = 3` の商版 — `orderOf_distinguishedInvolution_mul_t_of_*`
+   群が既に商と ambient を往復しているので、そこから取れるはず。要実測)。
+3. 段 (4) 鎖 → `hcover` → `corollaryTwo_of_stepFour` で `ω̄` を得る。
+4. 商から `U` へ持ち上げ、`IsFGH.eq_of_le` で `f₁ → f`。
