@@ -77,6 +77,12 @@ element of `Q − Q₀` does *not* square to `1`.
 * `Hypothesis.W_eq_inf_centralizer_Q0`, `Hypothesis.V_eq_W_iff_le_centralizer_Q0` —
   the hypothesis `V = W` that every §3 endpoint carries is exactly "`V` centralizes
   `Q₀`", which is how step (2) reads it off the structure of `PSU(3, ℓ)`.
+* `Hypothesis.mem_centralizer_of_qv_decomposition`, `Hypothesis.D_le_normalizer_W` —
+  the two group-theoretic ingredients of step (2)'s `ζ`: the `Q V`-decomposition of
+  `C_H(s)` is unique, so both factors of `x = q v` inherit `x`'s centralizing property;
+  and `P ≤ D` normalizes `W`, so `P ⊔ W = P · W`.
+* `SectionFourSetup.exists_ne_one_mem_W_centralizer` — **`C_W(P) ≠ 1`**, the book's
+  `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` in the form step (2) uses it.
 -/
 
 set_option autoImplicit false
@@ -650,6 +656,76 @@ theorem W_ne_bot_of_psu3_branch {X : Subgroup G} (hXV : X ≤ hyp.V) (hX : X ≠
     nonempty_psu3Data_of_orderOf_eq_three tri.branch hord hnea
   exact details.false_of_W_eq_bot hXV hW tri.common
 
+/-- **Both factors of `x = q v` inherit `x`'s centralizing property**, for `X ≤ V`.
+
+`C_H(s) = Q V` with `Q ∩ V ≤ Q ∩ D = 1`, so the decomposition is unique.  An `a ∈ X`
+lies in `V`, hence normalizes `Q` (it lies in `H`) and normalizes `V` (it centralizes
+`t`, and `V = C_D(t)`); conjugating `x = q v` by `a` therefore produces a second
+decomposition of `x`, which uniqueness identifies with the first. -/
+theorem mem_centralizer_of_qv_decomposition {X : Subgroup G} (hXV : X ≤ hyp.V)
+    {x q v : G} (hqQ : q ∈ hyp.Q) (hvV : v ∈ hyp.V) (hx : x = q * v)
+    (hxC : x ∈ Subgroup.centralizer (X : Set G)) :
+    q ∈ Subgroup.centralizer (X : Set G) ∧ v ∈ Subgroup.centralizer (X : Set G) := by
+  have key : ∀ a ∈ X, a * q * a⁻¹ = q ∧ a * v * a⁻¹ = v := by
+    intro a ha
+    have haV : a ∈ hyp.V := hXV ha
+    have haD : a ∈ hyp.D := hyp.V_le_D haV
+    have haH : a ∈ hyp.H := hyp.D_le_H haD
+    have haq : a * q * a⁻¹ ∈ hyp.Q := hyp.Q_normal_in_H a haH q hqQ
+    have hav : a * v * a⁻¹ ∈ hyp.V := by
+      refine ⟨hyp.D.mul_mem (hyp.D.mul_mem haD (hyp.V_le_D hvV)) (hyp.D.inv_mem haD), ?_⟩
+      have hat := hyp.commute_t_of_mem_V haV
+      have hvt := hyp.commute_t_of_mem_V hvV
+      exact Subgroup.mem_centralizer_singleton_iff.mpr
+        ((hat.mul_left hvt).mul_left hat.inv_left)
+    -- conjugating `x = q v` by `a` gives a second decomposition of the same element
+    have hconj : (a * q * a⁻¹) * (a * v * a⁻¹) = q * v := by
+      have hax : a * x * a⁻¹ = x := by
+        have := Subgroup.mem_centralizer_iff.mp hxC a ha
+        calc a * x * a⁻¹ = (x * a) * a⁻¹ := by rw [← this]
+          _ = x := by group
+      calc (a * q * a⁻¹) * (a * v * a⁻¹) = a * (q * v) * a⁻¹ := by group
+        _ = a * x * a⁻¹ := by rw [hx]
+        _ = x := hax
+        _ = q * v := hx
+    have hbot : q⁻¹ * (a * q * a⁻¹) ∈ hyp.Q ⊓ hyp.D := by
+      refine ⟨hyp.Q.mul_mem (hyp.Q.inv_mem hqQ) haq, ?_⟩
+      have heq : q⁻¹ * (a * q * a⁻¹) = v * (a * v * a⁻¹)⁻¹ := by
+        rw [eq_mul_inv_iff_mul_eq.mpr hconj]
+        group
+      rw [heq]
+      exact hyp.D.mul_mem (hyp.V_le_D hvV) (hyp.D.inv_mem (hyp.V_le_D hav))
+    rw [hyp.Q_inf_D_eq_bot, Subgroup.mem_bot, inv_mul_eq_one] at hbot
+    refine ⟨hbot.symm, ?_⟩
+    rw [← hbot] at hconj
+    exact mul_left_cancel hconj
+  constructor
+  · refine Subgroup.mem_centralizer_iff.mpr fun a ha => ?_
+    have := (key a ha).1
+    calc a * q = (a * q * a⁻¹) * a := by group
+      _ = q * a := by rw [this]
+  · refine Subgroup.mem_centralizer_iff.mpr fun a ha => ?_
+    have := (key a ha).2
+    calc a * v = (a * v * a⁻¹) * a := by group
+      _ = v * a := by rw [this]
+
+/-- **`D` normalizes `W`**, in the ambient group: `W ⊴ D` (`KCyclic`). -/
+theorem D_le_normalizer_W : hyp.D ≤ Subgroup.normalizer hyp.W := by
+  have hconj : ∀ a ∈ hyp.D, ∀ n ∈ hyp.W, a * n * a⁻¹ ∈ hyp.W := by
+    intro a ha n hn
+    have hnD : n ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hn)
+    have hmem : (⟨a, ha⟩ : ↥hyp.D) * ⟨n, hnD⟩ * (⟨a, ha⟩ : ↥hyp.D)⁻¹ ∈
+        hyp.W.subgroupOf hyp.D :=
+      (inferInstance : (hyp.W.subgroupOf hyp.D).Normal).conj_mem _
+        (Subgroup.mem_subgroupOf.mpr hn) _
+    exact Subgroup.mem_subgroupOf.mp hmem
+  intro a ha
+  rw [Subgroup.mem_normalizer_iff]
+  intro n
+  refine ⟨fun hn => hconj a ha n hn, fun hn => ?_⟩
+  have := hconj a⁻¹ (hyp.D.inv_mem ha) _ hn
+  simpa [mul_assoc] using this
+
 /-! ### `V = W` is exactly "`V` centralizes `Q₀`"
 
 Every §3 endpoint (`stepFive`, `corollaryTwo_of_stepFour`, …) carries the hypothesis
@@ -836,6 +912,145 @@ theorem inf_le_sup_centralizer_W {U : Subgroup G}
       _ = (p * w) * a := hva
       _ = p * (w * a) := by group
   exact mul_left_cancel hcancel
+
+open scoped Pointwise in
+/-- **`C_W(P) ≠ 1`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133) — the book's
+
+> Furthermore, `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` since `ℓ > 2`.
+> Let `ζ₁ ∈ (V ∩ U) − (P ∩ U)` and `ζ ∈ C_W(P)` be such that `ζ₁ ∈ ζ P`.
+
+in the only form step (2) uses it: a non-trivial `ζ ∈ W` centralizing `P`.
+
+The `PSU(3, ℓ)` input is Ch. III §1's `exists_mem_residual_commute_Q0`: an `x ∈ U` whose
+image in `U/Z(U)` is non-trivial of odd order and which centralizes `C_{Q₀}(P)`.  Since
+`x` centralizes the distinguished involution it lies in `H`, so `x = q v` with `q ∈ Q`,
+`v ∈ V`; both factors centralize `P` (`mem_centralizer_of_qv_decomposition`), and the
+theorem of Galois (`centralizer_V_centralizer_Q0`) puts `v ∈ P ⊔ W`.  Writing `v = p ζ`
+— legitimate because `P ≤ D` normalizes `W` — gives `ζ ∈ C_W(P)`, and `ζ = 1` would make
+`v ∈ P` central in `U`, so that the image of `x` would be the image of the `2`-element
+`q`: impossible for a non-trivial element of odd order. -/
+theorem exists_ne_one_mem_W_centralizer (hP : s4.P ≠ ⊥)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hnea : ¬ OddOrder.GroupTheory.IsElementaryAbelian 2
+      ↥(hyp.Q.subgroupOf (Subgroup.centralizer ((s4.P : Set G)))))
+    (ih : TheoremAInductionBelow G Ω) :
+    ∃ w ∈ hyp.W, w ≠ 1 ∧ w ∈ Subgroup.centralizer ((s4.P : Set G)) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
+  haveI : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
+  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  obtain ⟨tri⟩ := hyp.centralizer_trichotomy_of_induction s4.P_le_V hP hA3 ih
+  obtain ⟨⟨data, _teq, details⟩⟩ :=
+    nonempty_psu3Data_of_orderOf_eq_three tri.branch hord hnea
+  set C : Subgroup G := Subgroup.centralizer ((s4.P : Set G)) with hCdef
+  set CQ : Subgroup ↥C := hyp.Q.subgroupOf C with hCQdef
+  set F : Subgroup ↥C := Subgroup.primeComplementResidual 2 C with hFdef
+  obtain ⟨x, hdne, hdodd, hcomm⟩ :=
+    details.exists_mem_residual_commute_Q0 s4.P_le_V tri.common
+  set xG : G := ((x : ↥C) : G) with hxG
+  set s : G := hyp.distinguishedInvolution with hs
+  have hs0 : s ∈ hyp.Q0 :=
+    ⟨hyp.distinguishedInvolution_sq, hyp.distinguishedInvolution_mem_H⟩
+  have hsC : s ∈ C := by
+    refine Subgroup.mem_centralizer_iff.mpr fun g hg => ?_
+    have hgV : g ∈ hyp.V := s4.P_le_V hg
+    rw [hyp.V_eq_centralizer_distinguishedInvolution] at hgV
+    exact (Subgroup.mem_centralizer_iff.mp hgV.2 s rfl).symm
+  have hxs : Commute xG s := hcomm s hs0 hsC
+  have hxH : xG ∈ hyp.H :=
+    hyp.centralizer_le_H_of_mem_Q (hyp.Q0_le_Q hs0)
+      hyp.distinguishedInvolution_ne_one
+      (Subgroup.mem_centralizer_singleton_iff.mpr hxs)
+  obtain ⟨q, hqQ, v, hvV, hqv⟩ :=
+    hyp.exists_mem_Q_mem_V_of_mem_H_of_commute_distinguishedInvolution hxH hxs
+  have hxC : xG ∈ C := (x : ↥C).2
+  obtain ⟨hqC, hvC⟩ :=
+    hyp.mem_centralizer_of_qv_decomposition s4.P_le_V hqQ hvV hqv hxC
+  -- the theorem of Galois: `v ∈ P ⊔ W`
+  have hvGal : v ∈ hyp.V ⊓ Subgroup.centralizer
+      ((hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G)) : Subgroup G) : Set G) := by
+    refine ⟨hvV, Subgroup.mem_centralizer_iff.mpr fun y hy => ?_⟩
+    have hxy : Commute xG y := hcomm y hy.1 hy.2
+    have hqy : Commute q y :=
+      Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hy.1) q hqQ
+    have hv : v = q⁻¹ * xG := by rw [hqv]; group
+    rw [hv]
+    calc y * (q⁻¹ * xG) = (y * q⁻¹) * xG := by group
+      _ = (q⁻¹ * y) * xG := by rw [hqy.inv_left.eq]
+      _ = q⁻¹ * (y * xG) := by group
+      _ = q⁻¹ * (xG * y) := by rw [hxy.symm.eq]
+      _ = (q⁻¹ * xG) * y := by group
+  have hvPW : v ∈ s4.P ⊔ hyp.W := by
+    rw [← hyp.centralizer_V_centralizer_Q0 s4.P_le_V]
+    exact hvGal
+  -- `P ≤ D` normalizes `W`, so `P ⊔ W = P · W`
+  have hcoe : ((s4.P ⊔ hyp.W : Subgroup G) : Set G) = (s4.P : Set G) * (hyp.W : Set G) :=
+    Subgroup.coe_mul_of_left_le_normalizer_right _ _
+      (le_trans s4.P_le_D hyp.D_le_normalizer_W)
+  obtain ⟨p, hp, w, hw, hpw⟩ : v ∈ (s4.P : Set G) * (hyp.W : Set G) := hcoe ▸ hvPW
+  have hPC : s4.P ≤ C := by
+    intro a ha
+    refine Subgroup.mem_centralizer_iff.mpr fun b hb => ?_
+    letI := IsCyclic.commGroup (α := ↥s4.P)
+    exact congrArg (Subtype.val (p := fun z => z ∈ s4.P))
+      (mul_comm (⟨b, hb⟩ : ↥s4.P) (⟨a, ha⟩ : ↥s4.P))
+  have hwC : w ∈ C := by
+    have : w = p⁻¹ * v := by rw [← hpw]; group
+    rw [this]
+    exact C.mul_mem (C.inv_mem (hPC hp)) hvC
+  refine ⟨w, hw, ?_, hwC⟩
+  intro hw1
+  -- `w = 1` makes `v ∈ P`, hence central in `U`, so `x` and the `2`-element `q` agree there
+  have hvP : v ∈ s4.P := by
+    rw [← hpw, hw1]
+    simpa using hp
+  have hqCQ : (⟨q, hqC⟩ : ↥C) ∈ CQ := Subgroup.mem_subgroupOf.mpr hqQ
+  have hCQF : CQ ≤ F := by
+    rw [hFdef, tri.common.residual_eq_normalClosure]
+    exact Subgroup.le_normalClosure
+  have hqF : (⟨q, hqC⟩ : ↥C) ∈ F := hCQF hqCQ
+  have hvF : (⟨v, hvC⟩ : ↥C) ∈ F := by
+    have hveq : (⟨v, hvC⟩ : ↥C) = (⟨q, hqC⟩ : ↥C)⁻¹ * (x : ↥C) := by
+      apply Subtype.ext
+      change v = q⁻¹ * xG
+      rw [hqv]; group
+    rw [hveq]
+    exact F.mul_mem (F.inv_mem hqF) x.2
+  set qF : ↥F := ⟨⟨q, hqC⟩, hqF⟩ with hqFdef
+  set vF : ↥F := ⟨⟨v, hvC⟩, hvF⟩ with hvFdef
+  have hxqv : x = qF * vF := by
+    apply Subtype.ext; apply Subtype.ext
+    change xG = q * v
+    exact hqv
+  have hvZ : vF ∈ Subgroup.center ↥F := by
+    rw [Subgroup.mem_center_iff]
+    intro z
+    apply Subtype.ext; apply Subtype.ext
+    change ((z : ↥C) : G) * v = v * ((z : ↥C) : G)
+    exact (Subgroup.mem_centralizer_iff.mp (z : ↥C).2 v hvP).symm
+  have himg : QuotientGroup.mk (s := Subgroup.center ↥F) x =
+      QuotientGroup.mk (s := Subgroup.center ↥F) qF := by
+    rw [hxqv, QuotientGroup.mk_mul, (QuotientGroup.eq_one_iff vF).mpr hvZ, mul_one]
+  obtain ⟨k, hk⟩ := tri.common.cQ_isPGroup (⟨⟨q, hqC⟩, hqCQ⟩ : ↥CQ)
+  have hqpow : qF ^ 2 ^ k = 1 := by
+    apply Subtype.ext; apply Subtype.ext
+    change q ^ 2 ^ k = 1
+    exact congrArg (fun z : ↥CQ => ((z : ↥C) : G)) hk
+  have hmkpow : (QuotientGroup.mk (s := Subgroup.center ↥F) x) ^ 2 ^ k = 1 := by
+    rw [himg, ← QuotientGroup.mk_pow, hqpow]
+    rfl
+  have hdvd : orderOf (QuotientGroup.mk (s := Subgroup.center ↥F) x) ∣ 2 ^ k :=
+    orderOf_dvd_of_pow_eq_one hmkpow
+  have hone : orderOf (QuotientGroup.mk (s := Subgroup.center ↥F) x) = 1 :=
+    Nat.eq_one_of_dvd_coprimes
+      (Nat.Coprime.pow_right k
+        ((Nat.Prime.coprime_iff_not_dvd Nat.prime_two).mpr
+          (Nat.two_dvd_ne_zero.mpr (Nat.odd_iff.mp hdodd))).symm)
+      dvd_rfl hdvd
+  exact hdne (orderOf_eq_one_iff.mp hone)
 
 /-! ### `t` lives in `U`
 
