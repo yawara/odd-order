@@ -6536,3 +6536,38 @@ bilinear package (`φ`,`θ`,`Φ`,`Θ`,`u`,`ι` + 8 条件) を**そのまま bun
    同一視をどう使うか) を裁定する。⚠ `C/𝒩(C)` は `PSU(3,ℓ)` を奇指数で含むので
    `PSU(3,ℓ)` そのものではない点に注意 — `V`,`K`,`W` は `D̄` の中で測るので、
    `D̄` と `PSU(3,ℓ)` の torus の関係が要る。
+
+## 2026-08-02 (125): `hmu` と `hZc` が landing — Corollary 2 の残りは 3 本
+
+| 引数 | 状態 |
+|---|---|
+| `hC2` | ✅ `braid_of_orderOf_mul_eq_three` |
+| `hfQ` の下準備 | ✅ `Setup.exists_fgh_one` |
+| `hmu` | ✅ `isStandardModel_centralizerQuotient` に同梱 |
+| `hZc` | ✅ `center_Q_eq_Q0_centralizerQuotient` |
+| `hVW` / `hKcard` / `hWdvd` | ⚠ **残り 3 本** (`hW1` は `exists_ne_one_mem_quotient_W`、`hhW` は `h_mem_W` 経由) |
+
+`hZc` は根群の事実だけで済んだ: `Z(Q̄)` の指数 2 に還元 (`ActualCenter`) →
+`Q̄ ≅ C_Q(X) ≅ RootGroup ℓ` → **`RootGroup.center_eq_centerLine`** (既存,
+`RootGroupSuzukiType.lean:46`)。
+
+### ⚠ instance の罠 (記憶に残すこと)
+
+`Model` section の抽象 `[MulAction (hyp.centralizerActionQuotient X) ↥(Fix X Ω)]` と
+`hyp.centralizerQuotientMulAction hXV` の `letI` は**別インスタンス**として扱われる。
+`CentralizerPSUData` (前者を使う) と `centralizerQuotientHypothesis` (後者を使う) を
+同じ文に混ぜると `synthesized type class instance is not definitionally equal` が出る。
+⟹ **同一視は `details` から読まずパラメータ (`eRoot : C_Q(X) ≃* RootGroup n`) で受ける**。
+
+### ⚠ 次セッションはここから — `hVW` / `hKcard` / `hWdvd`
+
+3 本とも `D̄` の内部構造 (`V̄`, `K̄`, `W̄` の位数) についての主張。⚠ **`C/𝒩(C)` は
+`PSU(3,ℓ)` を奇指数で含むだけ**なので、`RootGroup` のようにモデルから直に読めない。
+まず transported 版 (`PSU3SectionFourModel.residualQuotientHypothesis_V_eq_W` および
+`standardHypothesis_V_eq_W`) がモデルからどう出しているかを読み、`D̄` と
+`PSU(3,ℓ)` の torus の関係を実測すること。
+
+候補: `V_eq_W_iff_le_centralizer_Q0` で `hVW` を `V̄ ≤ C(Q̄₀)` に還元し、
+`Q̄₀ = π(C_{Q₀}(X))` (`map_centralizer_Q0_eq_quotient_Q0`) を使って ambient の
+`C_D(X) ≤ C(C_{Q₀}(X))` に落とせないか (= §4 の `centralizer_V_centralizer_Q0`
+= Galois の定理の周辺)。
