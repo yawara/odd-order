@@ -285,6 +285,106 @@ theorem commute_rootHom_of_mem_standardBorel_of_commute_weylElement {n : ℕ}
     exists_psuTorusHom_eq_of_mem_standardBorel_of_commute_weylElement hb hc
   exact commute_rootHom_of_commute_weylElement c hc hu
 
+/-- **An element fixing both `∞` and the origin lies in the determinant-one torus.** -/
+theorem exists_psuTorusHom_eq_of_fixes_infinity_origin {n : ℕ} (hn : 0 < n)
+    {b : standardPermGroup n} (hinf : b • Unital.infinity n = Unital.infinity n)
+    (horig : b • Unital.origin n = Unital.origin n) :
+    ∃ c : PSUTorusParameter n, b = psuTorusHom n c := by
+  have hB : b ∈ standardBorel n := by
+    rw [standardBorel_eq_infinityStabilizer n hn, MulAction.mem_stabilizer_iff]
+    exact hinf
+  obtain ⟨x, rfl⟩ := hB
+  have hleft : x.left = 1 := by
+    have h := borelHom_smul_origin x
+    rw [horig, Unital.origin_eq_affine_one] at h
+    exact (Unital.affine_inj.mp h).symm
+  exact ⟨x.right, by rw [borelHom_apply, hleft, map_one, one_mul]⟩
+
+/-- **A Borel element commuting with *any* involution that swaps `∞` and the origin
+centralizes the involutions of the standard root group.**
+
+This is the `PSU(3, ℓ)` structure fact Peterfalvi Part II, Ch. IV §4 step (2) (p. 133)
+quotes as "by the structure of `PSU(3, ℓ)`, `(V ∩ U)/(P ∩ U)` centralizes `C_{Q₀}(P)`".
+The swapping involution is stated abstractly because the image of the ambient `t` is only
+a *conjugate* of the standard Weyl element: putting `Q` in standard root position leaves
+`t` at `T₀ · w` for some torus factor `T₀`, exactly as in
+`orderOf_distinguishedInvolution_mul_t_of_psu3Target`.  That extra factor is harmless —
+`τ · w` fixes both points, hence is itself a torus element, and the torus is abelian. -/
+theorem commute_rootHom_of_mem_standardBorel_of_commute_swap {n : ℕ} (hn : 0 < n)
+    {tau b : standardPermGroup n}
+    (htinf : tau • Unital.infinity n = Unital.origin n)
+    (htorig : tau • Unital.origin n = Unital.infinity n)
+    (hb : b ∈ standardBorel n) (hc : Commute tau b)
+    {u : RootGroup n} (hu : u ^ 2 = 1) :
+    Commute b (rootHom n u) := by
+  have hw2 : weylElement n * weylElement n = 1 := by
+    have h := weylElement_sq_eq_one n
+    rwa [sq] at h
+  -- `b` fixes `∞` (Borel) and, by commuting with `tau`, the origin as well
+  have hbinf : b • Unital.infinity n = Unital.infinity n :=
+    standardBorel_le_infinityStabilizer hb
+  have hborig : b • Unital.origin n = Unital.origin n := by
+    calc b • Unital.origin n = b • (tau • Unital.infinity n) := by rw [htinf]
+      _ = (b * tau) • Unital.infinity n := by rw [mul_smul]
+      _ = (tau * b) • Unital.infinity n := by rw [hc.eq]
+      _ = tau • (b • Unital.infinity n) := by rw [mul_smul]
+      _ = Unital.origin n := by rw [hbinf, htinf]
+  obtain ⟨c, rfl⟩ := exists_psuTorusHom_eq_of_fixes_infinity_origin hn hbinf hborig
+  -- `tau * w` fixes both points, so it is a torus element too
+  have h0inf : (tau * weylElement n) • Unital.infinity n = Unital.infinity n := by
+    rw [mul_smul, weylElement_smul_infinity, htorig]
+  have h0orig : (tau * weylElement n) • Unital.origin n = Unital.origin n := by
+    rw [mul_smul, weylElement_smul_origin, htinf]
+  obtain ⟨c₀, hc₀⟩ := exists_psuTorusHom_eq_of_fixes_infinity_origin hn h0inf h0orig
+  have htau : tau = psuTorusHom n c₀ * weylElement n := by
+    rw [← hc₀]
+    calc tau = tau * (weylElement n * weylElement n) := by rw [hw2, mul_one]
+      _ = tau * weylElement n * weylElement n := by group
+  -- conjugation by `tau` acts on the torus through `psuWeylParameterHom`
+  have hfix : Unital.psuWeylParameterHom n c = c := by
+    have hconj : tau * psuTorusHom n c * tau⁻¹ = psuTorusHom n c := by
+      rw [hc.eq]; group
+    have hweyl := weylElement_mul_psuTorusHom_mul_weylElement c
+    have hwinv : (weylElement n)⁻¹ = weylElement n := inv_eq_of_mul_eq_one_right hw2
+    have hexp : tau * psuTorusHom n c * tau⁻¹
+        = psuTorusHom n (Unital.psuWeylParameterHom n c) := by
+      rw [htau, mul_inv_rev, hwinv]
+      calc psuTorusHom n c₀ * weylElement n * psuTorusHom n c *
+            (weylElement n * (psuTorusHom n c₀)⁻¹)
+          = psuTorusHom n c₀ * (weylElement n * psuTorusHom n c * weylElement n) *
+              (psuTorusHom n c₀)⁻¹ := by group
+        _ = psuTorusHom n c₀ * psuTorusHom n (Unital.psuWeylParameterHom n c) *
+              (psuTorusHom n c₀)⁻¹ := by rw [hweyl]
+        _ = psuTorusHom n (Unital.psuWeylParameterHom n c) := by
+              rw [← map_inv, ← map_mul, ← map_mul,
+                mul_comm c₀ (Unital.psuWeylParameterHom n c), mul_assoc,
+                mul_inv_cancel, mul_one]
+    exact psuTorusHom_injective n (hexp.symm.trans hconj)
+  have hnorm : torusWeight (c : GeneralTorusParameter n) = 1 := by
+    have h3 : weylParameterHom n (c : GeneralTorusParameter n)
+        = (c : GeneralTorusParameter n) := by
+      rw [← Unital.coe_psuWeylParameterHom, hfix]
+    have hstar : (star ((c : GeneralTorusParameter n) : Field n))⁻¹
+        = ((c : GeneralTorusParameter n) : Field n) := by
+      rw [← coe_weylParameterHom]
+      exact congrArg Units.val h3
+    have hne : star ((c : GeneralTorusParameter n) : Field n) ≠ 0 :=
+      (star_ne_zero (R := Field n)).2 (Units.ne_zero _)
+    calc torusWeight (c : GeneralTorusParameter n)
+        = ((c : GeneralTorusParameter n) : Field n) *
+            star ((c : GeneralTorusParameter n) : Field n) := rfl
+      _ = (star ((c : GeneralTorusParameter n) : Field n))⁻¹ *
+            star ((c : GeneralTorusParameter n) : Field n) := by rw [hstar]
+      _ = 1 := inv_mul_cancel₀ hne
+  have hconj2 := psuTorusHom_mul_rootHom_mul_inv c u
+  rw [psuTorusScaleHom_apply, scalePoint_eq_of_torusWeight_eq_one hnorm hu] at hconj2
+  have heq : psuTorusHom n c * rootHom n u = rootHom n u * psuTorusHom n c :=
+    calc psuTorusHom n c * rootHom n u
+        = (psuTorusHom n c * rootHom n u * (psuTorusHom n c)⁻¹) * psuTorusHom n c := by
+          group
+      _ = rootHom n u * psuTorusHom n c := by rw [hconj2]
+  exact heq
+
 /-! ## The same statement inside `standardPermGroup n` -/
 
 /-- **`C_{D₀}(Ω₁(S₀)) ≠ 1`, for the standard Sylow `2`-subgroup**
