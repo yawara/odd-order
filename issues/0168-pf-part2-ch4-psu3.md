@@ -1795,6 +1795,35 @@ p.131 の筋 (すべて `E` の計算):
 (§3 (1)-(3))、`exists_unitaryModel` (座標系の供給)。
 その後 (5) = p.131 後半 (`KW`-軌道 + (H3) で全 `ρ` へ)。
 
+## 2026-08-01 (12): ユニタリ座標の計算則 6 本
+
+(4)(5) の計算が繰り返し使う道具を先に揃えた (`UnitaryCoordinates.lean` /
+`HermitianCocycle.lean`):
+
+| 補題 | 内容 | (4)(5) での役割 |
+|---|---|---|
+| `unitaryCoord_central` / `_one` | 中心元の座標 = 中心成分 | `(0,a)` の扱い |
+| 🎯 `unitaryCoord_mul_central` | **中心元倍 = 座標の平行移動** | `ω s^a` の第 2 座標が `x + a` |
+| `unitaryCoord_sq` | `ω² = (0, ω̄^{1+q})` | §3 (3) の形 |
+| `unitaryCoord_inv` | **`(a,y)⁻¹ = (a, ȳ)`** (`u^q = u+1` が効く) | `ω ↦ ω⁻¹` の対称性 (最後の 1 点潰し) |
+| `unitaryCoord_of_scaled` | **`(a,y)^d = (d a, d^{1+q} y)`** | (5) の `KW`-軌道 |
+| `hermitianCocycle_smul` | `φ(dx,dy) = d^{1+q} φ(x,y)` | 上記の余輪体側 |
+
+### ⚠ 次セッションはここから — (4) 本体の配線
+
+**確認済の接続点**:
+* §2/§3 の等式は **`M.coord`** (商座標) で書かれている (`stepTwo_linear` 参照)。
+  一方 `exists_unitaryModel` の `Ψ` は `Φ` 経由。⟹ **`(Φ ρ).quotient = M.coord …`**
+  が要る。これは `exists_mulEquiv_bookCocycle` の `hquot` にあるが
+  **`exists_standardModel` は結論に出していない**。
+  ⟹ (a) `exists_standardModel` に `hquot` を結論として足す (中で既に得ている) か、
+  (b) (4) の命題の仮説に取る。**(a) が筋** (消費者は Ch. IV だけのはず — 要 grep)。
+* 書籍 (2) の `a²` と (4) の `a` の食い違いは**パラメータ化の差**:
+  `s^a` の中心座標は `μ(a)^d = μ(a)²` (`θ|_F = 1` より)。(4) は中心座標で
+  パラメータ化しており、`F` 上 2 乗は全単射なので同値。
+
+その後の筋は前節 (11) の 1.–5. のとおり。
+
 ## セッション総括 (2026-07-31)
 
 **Ch. IV で形式化されたもの** (すべて sorry 0 / AxiomsCheck OK / lint 0):
