@@ -6629,3 +6629,50 @@ the structure of `PSU(3, ℓ)`**」と明記している。Galois の定理
 ⟹ **`hVW`/`hKcard`/`hWdvd` は 3 本まとめて「`D̄` の構造」の問題**。次セッションは
 `D̄` (= `π(C_D(X))`) と `PSU(3,ℓ)` の torus の関係を実測することから始める
 (`C/𝒩(C)` と `O^{2'}(C/𝒩(C)) ≅ U/Z(U)` の指数が奇であることが効くはず)。
+
+## 2026-08-02 (127): ⚠ (122) の裁定を訂正 — Corollary 2 は `U/Z(U)` でないと当たらない
+
+`hVW` を追ったところ、(122) の「段 (2) は `C/𝒩(C)` 経路で閉じる」は
+**Corollary 2 の段では誤り**だと分かった。
+
+### 理由: `V = W` は `PSU(3,ℓ)` そのものの事実で、`C/𝒩(C)` では成り立つ保証がない
+
+* `O^{2'}(C/𝒩(C)) ≅ U/Z(U) ≅ PSU(3,ℓ)` は `C/𝒩(C)` の**奇指数**正規部分群
+  (Theorem A の結論の形)。つまり `C/𝒩(C)` は `PSU(3,ℓ)` を真に含みうる
+  (差分は奇位数の体自己同型)。
+* `V = W` は `V ≤ C(Q₀)` と同値 (`V_eq_W_iff_le_centralizer_Q0`)。torus の元は
+  `Q₀` を norm-1 のときだけ中心化するが、**体自己同型は `Q₀` を中心化しない**。
+  ⟹ `D̄ = π(C_D(X))` が torus より大きいと `V̄ ⊋ W̄` になりうる。
+* 実測: repo に `V = W` は **`standardHypothesis_V_eq_W`** (標準モデル) と
+  **`residualQuotientHypothesis_V_eq_W`** (`U/Z(U)` へ移送) の 2 本しかなく、
+  `centralizerQuotientHypothesis` 版は**無い**。これは上の分析と整合する。
+* 書籍も「**relative to `U`, `U ∩ H` and `t`** … by Corollary 2 of the proposition of §3」
+  と書いており、Corollary 2 は `U` について当てている (p. 133)。
+
+### 訂正後の像
+
+| 段 | 場所 | 根拠 |
+|---|---|---|
+| Lemma 5 / §3 の Proposition (`IsStandardModel`) | `C/𝒩(C)` で**可** (実際 (123) で landing) | `V = W` を要求しない |
+| **Corollary 2** | **`U/Z(U)` が必要** | `hVW` を要求する |
+
+⟹ (117)-(120) の `U/Z(U)` 内在仮説は**critical path に戻る**。(122) で作った
+`C`/`C/𝒩(C)` の転送 4 本と (123) の `isStandardModel_centralizerQuotient` は
+genuine な結果として残る (§3 の Proposition は実際に `C/𝒩(C)` で成り立つ) が、
+段 (2) を閉じるのは `U/Z(U)` 側。
+
+### ⚠ 次セッションはここから
+
+`U/Z(U)` の**内在**仮説について Corollary 2 の引数を揃える。今の在庫:
+
+| 引数 | `U/Z(U)` 内在版の状態 |
+|---|---|
+| `hm` / `hQ0card` / `hcardQ` / `hst` | ✅ (118)(120) |
+| `hQsuz` (Lemma 5 用) / `ih` | ✅ (118) |
+| `hC2` | ✅ `braid_of_orderOf_mul_eq_three` (generic) |
+| `hZc` | 同じ論法で行けるはず — `Q̄ ≅ C_Q(X) ≅ RootGroup ℓ` は `cQMulEquivMapQ` + `cQEquivRoot` で在る (125 の `C/𝒩` 版をそのまま移す) |
+| `hmu` | generic な `mu_injective` (入力は全部在る) |
+| `∃ w ∈ W̄, w ≠ 1` / `hVW` / `hKcard` / `hWdvd` | ⚠ 未。**`U/Z(U)` では `V̄ = W̄` が真**なので、transported 版 `residualQuotientHypothesis_V_eq_W` を内在版へ移せるかが鍵 = (119) で保留した「内在 vs transported の照合」 |
+
+⟹ 照合 (経路 A) が本当に必要なのはここ。`M̄` と transported `H` はどちらも
+`L̄` の点安定化群なので共役 (121 の実測) — その共役で `V`,`K`,`W` も対応する。
