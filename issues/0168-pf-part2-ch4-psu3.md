@@ -3038,7 +3038,7 @@ p.132 のページ画像で Corollary 1 / Corollary 2 / Remark / §4 冒頭を�
    を解く議論。`ζ` が `F` 上 2 次で、その最小多項式が `ζ² + (ζ+ζ⁻¹)ζ + 1` である
    ことを使う (norm = 1)。
 3. **§4 段 (1)(2)** の群論。(2) は `corollaryTwo_of_stepFour` に乗る。
-   ⚠ `O^{2'}` は repo に無い (`TheoremAConclusion` の「奇数指数の正規部分群」が対応物)。
+   ⚠ (訂正: 下記 (43) 参照 — `O^{2'}` = `Subgroup.primeComplementResidual 2`。repo にある)
 4. Corollary 1 第 2 段 = PGU(3,q) infra (大きい、別立て)。
 
 ## 2026-08-01 (41): §4 の λ = 1 と μ² = 1 ⟹ μ = 1 landing
@@ -3072,7 +3072,7 @@ p.132 のページ画像で Corollary 1 / Corollary 2 / Remark / §4 冒頭を�
    (7)(8) を `μ` で送って比べるだけのはずだが、`(·)^η` と `(·)^μ` の関係
    (App. I Prop 2 = `η` が `Q/Q₀ ≅ E` に semilinear に作用) を先に repo で実測すること。
 2. **§4 段 (1)(2)** の群論。(2) は `corollaryTwo_of_stepFour` に乗る。
-   ⚠ `O^{2'}` は repo に無い (`TheoremAConclusion` の「奇数指数の正規部分群」が対応物)。
+   ⚠ (訂正: 下記 (43) 参照 — `O^{2'}` = `Subgroup.primeComplementResidual 2`。repo にある)
 3. Corollary 1 第 2 段 = PGU(3,q) infra (大きい、別立て)。
 
 ## 2026-08-01 (42): §4 (9) landing — 算術と群論の境界が確定
@@ -3115,3 +3115,39 @@ p.132 のページ画像で Corollary 1 / Corollary 2 / Remark / §4 冒頭を�
 4. **(5)(6) の供給** — (3)(4) と semilinearity から。ここまで来れば
    `sectionFour_solve` 以降は全部 landing 済で §4 が閉じる。
 5. Corollary 1 第 2 段 = PGU(3,q) infra (大きい、別立て)。
+
+## 2026-08-01 (43): ⚠ 訂正 — `O^{2'}` は repo にある + `⟨Q^x⟩` との橋
+
+**(37)(39)(41)(42) に書いた「`O^{2'}` は repo/mathlib に無い」は誤りだった**。
+`Subgroup.primeComplementResidual p G` (`GroupTheory/PrimeComplementResidual.lean`)
+がまさに `O^{p'}`:
+
+* 定義 = `⨆ P : Sylow p G, ↑P` (Sylow p の生成する部分群)
+* `primeComplementResidual_normal` / `_index_coprime` / `_le_of_coprime_index`
+  ⟹ 指数が `p` と互いに素な**最小の**正規部分群
+* `primeComplementResidual_eq_normalClosure` — 任意の Sylow p の正規閉包
+* docstring 自身が「`p = 2` の場合が prime-complement residual 記法」と明記
+
+⚠ 教訓: [[verify-port-state-by-number-not-coq-name]] のとおり「repo に無い」は
+**着手前に必ず実測**する。今回は `grep "O^{2'}"` が AxiomsCheck の docstring 1 件しか
+出さず (記法が違うだけ)、それを「無い」と読んでしまった。**概念名 (`residual`,
+`normalClosure`, `Sylow`) でも grep すること**。
+
+### 追加した橋 (`RankOneBNPairRigidity.lean`)
+
+| 定理 | 内容 |
+|---|---|
+| `closure_iUnion_conj_eq_normalClosure` | `⟨H^x \| x ∈ L⟩ = normalClosure H` |
+| `closure_iUnion_conj_eq_primeComplementResidual` | `Q` が Sylow p ⟹ `⟨Q^x⟩ = O^{p'}(L)` |
+
+⟹ §1 の Lemma (`conjQMulEquivOfData`) の対象が、書籍 Corollary 1 (p.132) の
+`O^{2'}(G) = ⟨Q^x | x ∈ G⟩` とそのまま繋がった。
+
+### ⚠ 次セッションはここから
+
+1. **§4 段 (1)** — `U = O^{2'}(C_G(P))` (= `primeComplementResidual 2 ↥(C_G(P))`)、
+   `U/(P∩U) ≅ PSU(3,ℓ)`。Ch. I §3 Prop 1(c) は repo にあり。
+   ⚠ 先に §4 の standing hypothesis (`P ≤ V` 素数位数 `p`、`C_{Q/Q₀}(P) ≠ 1`) を
+   どう置くか決める。
+2. §4 段 (2)(3)(4) と (5)(6) の供給 → `sectionFour_solve` 以降は landing 済。
+3. Corollary 1 第 2 段 = PGU(3,q) infra。
