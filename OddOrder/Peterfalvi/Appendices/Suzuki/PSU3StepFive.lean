@@ -297,6 +297,68 @@ theorem stepFive_secondCase_elem (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     hconjq hconjy d hequiv hdsq hs haK haKSet hρQ hρ1 hne (hfQ _ hρ'Q) (hfQ _ hσzQ)
   exact hyp.stepFive_secondCase_at M hu Ψ hAF hx0 hxA hLq hLy hRq hRy hρ'q hρ'y
 
+/-- **From the points `ρ s^{a⁻¹}` to the whole fibre of `ρ`.**
+
+`stepFive_secondCase_elem` produces the formula one shift at a time; the fibre of `ρ` is
+`{ρ} ∪ {ρ s^a : a ∈ K}` (`eq_or_exists_conj_mul_of_quotient_eq`), and `s^a = s^{(a⁻¹)⁻¹}`,
+so the two together cover it. -/
+theorem stepFive_secondCase_fibre {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (hquot : ∀ ρ : ↥hyp.Q, (Φ ρ).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) ρ)))
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {e : M.E} (hene : e ≠ 0)
+    (hΨq : ∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient)
+    (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
+    {ρ : G} (hρQ : ρ ∈ hyp.Q)
+    (hbase : (Ψ ⟨f ρ, hfQ ρ hρQ⟩).quotient
+          = (Ψ ⟨ρ, hρQ⟩).quotient /
+            Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩) ∧
+        Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ρ, hfQ ρ hρQ⟩)
+          = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹)
+    (hstep : ∀ (a : G), a ∈ hyp.K →
+      ∀ hQ : ρ * (a⁻¹ * hyp.distinguishedInvolution * a) ∈ hyp.Q,
+        (Ψ ⟨f (ρ * (a⁻¹ * hyp.distinguishedInvolution * a)), hfQ _ hQ⟩).quotient
+            = (Ψ ⟨ρ * (a⁻¹ * hyp.distinguishedInvolution * a), hQ⟩).quotient /
+              Suzuki2Groups.unitaryCoord m u
+                (Ψ ⟨ρ * (a⁻¹ * hyp.distinguishedInvolution * a), hQ⟩) ∧
+          Suzuki2Groups.unitaryCoord m u
+              (Ψ ⟨f (ρ * (a⁻¹ * hyp.distinguishedInvolution * a)), hfQ _ hQ⟩)
+            = (Suzuki2Groups.unitaryCoord m u
+              (Ψ ⟨ρ * (a⁻¹ * hyp.distinguishedInvolution * a), hQ⟩))⁻¹)
+    {τ : G} (hτQ : τ ∈ hyp.Q)
+    (hfib : (Ψ ⟨τ, hτQ⟩).quotient = (Ψ ⟨ρ, hρQ⟩).quotient) :
+    (Ψ ⟨f τ, hfQ τ hτQ⟩).quotient
+        = (Ψ ⟨τ, hτQ⟩).quotient /
+          Suzuki2Groups.unitaryCoord m u (Ψ ⟨τ, hτQ⟩) ∧
+      Suzuki2Groups.unitaryCoord m u (Ψ ⟨f τ, hfQ τ hτQ⟩)
+        = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨τ, hτQ⟩))⁻¹ := by
+  obtain hcase | ⟨a, haK, hτeq⟩ :=
+    hyp.eq_or_exists_conj_mul_of_quotient_eq M hZc Φ hquot hu Ψ hene hΨq hτQ hρQ hfib
+  · subst hcase
+    exact hbase
+  · subst hτeq
+    have hQ : ρ * (a⁻¹⁻¹ * hyp.distinguishedInvolution * a⁻¹) ∈ hyp.Q := by
+      rwa [inv_inv]
+    obtain ⟨e1, e2⟩ := hstep a⁻¹ (hyp.K.inv_mem haK) hQ
+    have hQeq : (⟨ρ * (a * hyp.distinguishedInvolution * a⁻¹), hτQ⟩ : ↥hyp.Q)
+        = ⟨ρ * (a⁻¹⁻¹ * hyp.distinguishedInvolution * a⁻¹), hQ⟩ :=
+      Subtype.ext (by
+        change ρ * (a * hyp.distinguishedInvolution * a⁻¹)
+          = ρ * (a⁻¹⁻¹ * hyp.distinguishedInvolution * a⁻¹)
+        group)
+    have hFeq : (⟨f (ρ * (a * hyp.distinguishedInvolution * a⁻¹)),
+        hfQ _ hτQ⟩ : ↥hyp.Q)
+        = ⟨f (ρ * (a⁻¹⁻¹ * hyp.distinguishedInvolution * a⁻¹)), hfQ _ hQ⟩ :=
+      Subtype.ext (congrArg f (by group))
+    rw [hQeq, hFeq]
+    exact ⟨e1, e2⟩
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
