@@ -553,6 +553,78 @@ theorem stepFive (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   exact hyp.stepFive_secondCase_fibre M hZc Φ hquot hu Ψ hene hΨq hfQ hρxQ hbase hstep
     hρQ hfibρ
 
+/-- **Peterfalvi Part II, Ch. IV §3, Corollary 2** (p. 132), unconditional.
+
+`corollaryTwo` takes stage (5) as the hypothesis `hfive`; `stepFive` now proves it from
+stage (4), so this is the same statement with only stage (4) — the cover `hcover` of the
+fibre of a single `ω₀ ∈ Q − Q₀` — left as an input.
+
+That input is where §3 as a whole rests: everything else here is the standing data of
+§2 (the field model `M`, the two twisted-product coordinatizations `Φ`, `Ψ` and their
+comparison `e`, `ν`, the scalar action `μ` of `K W`) together with the numerology
+`|Q₀| = 2^m`, `|K| = 2^m − 1`, `|W| ∣ 2^m + 1`, `1 < |W|` that step (8) counts with. -/
+theorem corollaryTwo_of_stepFour (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hVW : hyp.V = hyp.W)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (hquot : ∀ ρ : ↥hyp.Q, (Φ ρ).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) ρ)))
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hker : ∀ z : ↥(Subgroup.center hyp.Q),
+      Φ (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {e : M.E} (hene : e ≠ 0)
+    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (hΨq : ∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient)
+    (hΨc : ∀ ρ : ↥hyp.Q, (Ψ ρ).central = ν * (Φ ρ).central)
+    (hconjq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      (Ψ (hyp.conjQHom kv ρ)).quotient
+        = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ρ).quotient)
+    (hconjy : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      Suzuki2Groups.unitaryCoord m u (Ψ (hyp.conjQHom kv ρ))
+        = ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1) *
+          Suzuki2Groups.unitaryCoord m u (Ψ ρ))
+    (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hdsq : ∀ k : ↥hyp.actualKActor,
+      ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) = ((M.mu (k, 1) : M.Eˣ) : M.E) ^ 2)
+    (hs : (ν : M.E) *
+      hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 = 1)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hmu : Function.Injective M.mu)
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
+    (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
+    {ω₀ : G} (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0)
+    (hcover : ∀ (σ : G) (hσQ : σ ∈ hyp.Q),
+      (Ψ ⟨σ, hσQ⟩).quotient = (Ψ ⟨ω₀, hω₀Q⟩).quotient →
+        (Ψ ⟨f σ, hfQ σ hσQ⟩).quotient
+            = (Ψ ⟨σ, hσQ⟩).quotient /
+              Suzuki2Groups.unitaryCoord m u (Ψ ⟨σ, hσQ⟩) ∧
+          Suzuki2Groups.unitaryCoord m u (Ψ ⟨f σ, hfQ σ hσQ⟩)
+            = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨σ, hσQ⟩))⁻¹)
+    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
+    {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
+    ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 :=
+  hyp.corollaryTwo H M hZc hVW Φ hquot hu Ψ hΨq hconjq hconjy hmu hζ hζ1 hfQ
+    (fun _ρ hρQ hρQ0 => hyp.stepFive H hC2 sfive M hZc Φ hquot ι hker hu Ψ hene hΨq hΨc
+      hconjq hconjy d hequiv hdsq hs hVW hm hQ0card hmu hKcard hWdvd hW1 hfQ hω₀Q hω₀Q0
+      hcover hρQ hρQ0)
+    hhW
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
