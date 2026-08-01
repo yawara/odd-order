@@ -30,6 +30,8 @@ free: `t ∉ H` is an axiom, and `t x t ∉ H` for `x ∈ Q^#` is `Q ∩ D = 1`,
 
 * `Hypothesis.rankOneSetup` — `Setup H Q D t`.
 * `Hypothesis.exists_fgh` — the mappings `f, g, h` of Ch. IV §1 exist for `G`.
+* `Hypothesis.ofRankOneSetup` — the converse: a `Setup` whose `M` has trivial normal core
+  and whose `Q`, `D` have the right parities is itself a standing hypothesis, on `L ⧸ M`.
 -/
 
 set_option autoImplicit false
@@ -116,6 +118,88 @@ theorem exists_fgh :
     ∃ f g h : G → G,
       OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g h :=
   hyp.rankOneSetup.exists_fgh
+
+/-! ### The converse: a rank-one setup *is* the standing hypothesis
+
+`rankOneSetup` reads (A1)–(A3) as a rank-one split BN-pair.  The other direction also
+holds, and Ch. IV §4 needs it: a `Setup` supplies the two-transitive action itself
+(`Setup.isMultiplyPretransitive_two`, on `L ⧸ M`), so only the conditions that are not
+combinatorial — faithfulness and the three numerical ones — have to be added. -/
+
+section OfSetup
+
+open OddOrder.GroupTheory.RankOneBNPair
+
+variable {L : Type*} [Group L] [Finite L] {M Q D : Subgroup L} {t : L}
+
+/-- **A rank-one split BN-pair with the right parities is a standing hypothesis**
+(Peterfalvi Part II, Ch. IV §1, p. 122) — the converse of `Hypothesis.rankOneSetup`.
+
+The permuted set is `L ⧸ M`, on which `L` is doubly transitive because `Q` is regular on
+the complement of the base point.  What a `Setup` does not see, and what therefore has to
+be supplied, is: faithfulness (`M` has trivial normal core), `|Q|` even, `|D|` odd, and
+(A3).
+
+Ch. IV §4, step (2) (p. 133) applies it to `U/Z(U)`, whose setup is inherited from `U`
+(`setup_residualQuotient`); that is what "running §2 and §3 relative to `U`" means. -/
+noncomputable def ofRankOneSetup (hS : Setup M Q D t) (hcore : M.normalCore = ⊥)
+    (hQeven : Even (Nat.card Q)) (hDodd : Odd (Nat.card D))
+    (hrank : ∃ E : Subgroup L, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1) :
+    Hypothesis L (L ⧸ M) where
+  basept := ((1 : L) : L ⧸ M)
+  doubly_transitive := hS.isMultiplyPretransitive_two
+  faithful := ⟨by
+    intro g₁ g₂ hg
+    have hker : g₁ * g₂⁻¹ ∈ (MulAction.toPermHom L (L ⧸ M)).ker := by
+      rw [MonoidHom.mem_ker]
+      ext a
+      change (g₁ * g₂⁻¹) • a = a
+      rw [mul_smul, hg (g₂⁻¹ • a), smul_inv_smul]
+    rw [← Subgroup.normalCore_eq_ker, hcore, Subgroup.mem_bot] at hker
+    exact mul_inv_eq_one.mp hker⟩
+  H := M
+  Q := Q
+  D := D
+  H_def := (MulAction.stabilizer_quotient M).symm
+  t := t
+  t_sq := by rw [sq]; exact hS.invol
+  t_ne_one := fun hc => hS.tnotmem (by rw [hc]; exact M.one_mem)
+  t_not_mem_H := hS.tnotmem
+  D_def := hS.D_eq_inf_map_conj
+  Q_le_H := hS.QM
+  Q_normal_in_H := by
+    intro m hm x hx
+    obtain ⟨⟨q, d⟩, hqd, -⟩ := hS.split m hm
+    have hdx : (d : L) * x * (d : L)⁻¹ ∈ Q := by
+      have h := hS.DQ ((d : L)⁻¹) (D.inv_mem d.2) x hx
+      rwa [inv_inv] at h
+    have hrw : m * x * m⁻¹ = (q : L) * ((d : L) * x * (d : L)⁻¹) * (q : L)⁻¹ := by
+      rw [hqd]; group
+    rw [hrw]
+    exact Q.mul_mem (Q.mul_mem q.2 hdx) (Q.inv_mem q.2)
+  Q_inf_D_eq_bot := by
+    rw [eq_bot_iff]
+    intro x hx
+    obtain ⟨hxQ, hxD⟩ := Subgroup.mem_inf.mp hx
+    obtain ⟨p₀, -, huniq⟩ := hS.split x (hS.QM hxQ)
+    have e₁ := huniq (⟨x, hxQ⟩, ⟨1, D.one_mem⟩) (by simp)
+    have e₂ := huniq (⟨1, Q.one_mem⟩, ⟨x, hxD⟩) (by simp)
+    rw [Subgroup.mem_bot]
+    exact congrArg (Subtype.val (p := fun z => z ∈ Q))
+      (congrArg Prod.fst (e₁.trans e₂.symm))
+  Q_mul_D_eq_H := by
+    ext a
+    constructor
+    · rintro ⟨q, hq, d, hd, rfl⟩
+      exact M.mul_mem (hS.QM hq) (hS.DM hd)
+    · intro ha
+      obtain ⟨⟨q, d⟩, hqd, -⟩ := hS.split a ha
+      exact ⟨(q : L), q.2, (d : L), d.2, hqd.symm⟩
+  Q_even := hQeven
+  D_odd := hDodd
+  two_rank_ge_two := hrank
+
+end OfSetup
 
 end Hypothesis
 
