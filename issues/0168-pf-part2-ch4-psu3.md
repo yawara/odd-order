@@ -3853,3 +3853,34 @@ ambient の orderOf (s·t) = 3  +  exponent 判別子 (48)(49)
 2. `exists_standardModel` for `qhyp` を組む (前提はこれで全部そろう)。
 3. (60) の段 (4) 鎖 → `hcover` → `corollaryTwo_of_stepFour` → 段 (2) が閉じる。
 4. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
+
+## 2026-08-01 (65): 🔍 `Q₀` は**導出定義** — `Q₀` 版同型は `Q` 版の制限で出る
+
+`Hypothesis.Q0` は構造フィールドではなく **導出定義** (`QStructure.lean:293`):
+
+```
+def Q0 : Subgroup G where carrier := {x | x ^ 2 = 1 ∧ x ∈ hyp.H}
+```
+(= `(H ∩ I) ∪ {1}`、`H` の対合たち + 単位元。書籍 p.103 の標準記法)
+
+⟹ `qhyp.Q0 = {x̄ | x̄² = 1 ∧ x̄ ∈ qhyp.H}` も自動的にこの形。
+
+⟹ **`centralizerQ0QuotientEquiv` は `centralizerQQuotientEquiv` の制限で出る**:
+`C_Q(X) ≃* Q̄` は単射なので `x² = 1 ↔ x̄² = 1` が両方向で成り立ち、あとは
+`x ∈ C_H(X) ↔ x̄ ∈ qhyp.H` の対応が要るだけ。**新しい幾何は不要**。
+
+⚠ 次に実測すべきは `centralizerQuotientHypothesisA1` の `H` フィールドが
+`C_H(X)` の像として定義されているか (`HypothesisA1.quotientOfKernel` の構成)。
+そこが確認できれば `Q₀` 版はほぼ機械的に書ける。
+
+### 段 (2)(b) の残り (最終形)
+
+**唯一**: `centralizerQ0QuotientEquiv` (= `C_{Q₀}(X) ≃* Q̄₀`)。
+これが入れば `exists_standardModel` for `qhyp` の 6 前提が全部そろい、
+(60) の段 (4) 鎖で `hcover` → `corollaryTwo_of_stepFour` → 段 (2) が閉じる。
+
+### ⚠ 次セッションはここから
+
+1. `HypothesisA1.quotientOfKernel` の `H` フィールドを実測。
+2. `centralizerQ0QuotientEquiv` を書く。
+3. `exists_standardModel` for `qhyp` → 段 (4) 鎖 → 段 (2)。
