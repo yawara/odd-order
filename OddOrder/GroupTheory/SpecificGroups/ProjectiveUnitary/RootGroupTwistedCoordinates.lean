@@ -31,8 +31,7 @@ What works is to correct by the norm itself.  Fixing `u` with `Tr u = 1` and set
 the second coordinate lands in `F` (`snd_add_norm_mem`) because `Tr b = a ā` is exactly what
 the root-group condition says, and the failure of `a ↦ u a ā` to be additive is *precisely*
 the trace term `u · Tr(a c̄)` needed to convert the cocycle `a c̄` into an `F`-valued one
-(`norm_cocycle`).  Those two facts are this file; the bundled isomorphism is assembled from
-them.
+(`norm_cocycle`).  What breaks the naive approach is exactly what makes this one work.
 
 ## Main results
 
@@ -41,6 +40,9 @@ them.
 * `ProjectiveUnitary.snd_add_norm_mem` — `b + u a ā` lies in `F`, for `x = (a,b)` in the
   root group.
 * `ProjectiveUnitary.norm_cocycle` — the coboundary of `a ↦ u a ā` is `u · Tr(a c̄)`.
+* `ProjectiveUnitary.rootBilin` — the corrected cocycle `x ȳ + u Tr(x ȳ)`, `F`-valued.
+* `ProjectiveUnitary.toTwistedProduct` — the isomorphism
+  `RootGroup n ≃* BilinearTwistedProduct (rootBilin …)`.
 -/
 
 set_option autoImplicit false
@@ -162,5 +164,64 @@ noncomputable def rootBilin (hn : 0 < n) {u : Field n}
   rw [rootBilin]
   change correctedBilin n u x y = _
   rw [correctedBilin_apply]
+
+/-! ## The isomorphism -/
+
+/-- The inverse correction lands back in the root group: `Tr(z + u a ā) = a ā` because
+`z ∈ F` is traceless and `Tr(u a ā) = a ā`. -/
+theorem central_add_norm_condition (hn : 0 < n) {u : Field n}
+    (hu : frobTrace (E := Field n) n u = 1) (a : Field n)
+    (z : ↥(frobFixedSubfield (Field n) 2 n)) :
+    ((z : Field n) + u * (a * star a)) + star ((z : Field n) + u * (a * star a))
+      = a * star a := by
+  rw [← frobTrace_eq_add_star hn, map_add]
+  have hz : frobTrace (E := Field n) n (z : Field n) = 0 :=
+    (frobTrace_eq_zero_iff n (z : Field n)).mpr z.2
+  have hN : frobTrace (E := Field n) n (u * (a * star a)) = a * star a := by
+    rw [mul_comm u, frobTrace_mul_of_mem n (norm_mem_frobFixed hn a) u, hu, mul_one]
+  rw [hz, hN, zero_add]
+
+/-- **`RootGroup n ≃* BilinearTwistedProduct (rootBilin …)`** (Peterfalvi Part II,
+Ch. IV §3, pp. 130–131).
+
+The book's unitary coordinates and Chapter III §3's twisted-product model, matched by
+
+  `(a, b) ↦ (a, b + u a ā)`.
+
+Multiplicativity is `norm_cocycle`: the coboundary of the correction is exactly the trace
+term by which `rootBilin` differs from the root group's own cocycle `a c̄`. -/
+noncomputable def toTwistedProduct (hn : 0 < n) {u : Field n}
+    (hu : frobTrace (E := Field n) n u = 1) :
+    RootGroup n ≃*
+      OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct
+        (rootBilin hn hu) where
+  toFun x := ⟨x.fst, ⟨x.snd + u * (x.fst * star x.fst), snd_add_norm_mem hn hu x⟩⟩
+  invFun p :=
+    ⟨p.quotient, (p.central : Field n) + u * (p.quotient * star p.quotient),
+      central_add_norm_condition hn hu p.quotient p.central⟩
+  left_inv x := by
+    have h2 : (2 : Field n) = 0 := two_eq_zero_field n
+    refine RootGroup.ext rfl ?_
+    change x.snd + u * (x.fst * star x.fst) + u * (x.fst * star x.fst) = x.snd
+    linear_combination (u * (x.fst * star x.fst)) * h2
+  right_inv p := by
+    have h2 : (2 : Field n) = 0 := two_eq_zero_field n
+    refine OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.ext rfl ?_
+    refine Subtype.ext ?_
+    change (p.central : Field n) + u * (p.quotient * star p.quotient)
+      + u * (p.quotient * star p.quotient) = (p.central : Field n)
+    linear_combination (u * (p.quotient * star p.quotient)) * h2
+  map_mul' x y := by
+    have h2 : (2 : Field n) = 0 := two_eq_zero_field n
+    refine OddOrder.Peterfalvi.Appendices.Suzuki2Groups.BilinearTwistedProduct.ext rfl ?_
+    refine Subtype.ext ?_
+    change (x.snd + y.snd + x.fst * star y.fst)
+        + u * ((x.fst + y.fst) * star (x.fst + y.fst))
+      = ((rootBilin hn hu x.fst y.fst : ↥(frobFixedSubfield (Field n) 2 n)) : Field n)
+        + (x.snd + u * (x.fst * star x.fst)) + (y.snd + u * (y.fst * star y.fst))
+    rw [rootBilin_apply_coe hn hu]
+    have hc := norm_cocycle hn u x.fst y.fst
+    linear_combination hc
+      - (u * (x.fst * star x.fst) + u * (y.fst * star y.fst)) * h2
 
 end OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary
