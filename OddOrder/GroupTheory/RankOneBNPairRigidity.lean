@@ -333,6 +333,74 @@ theorem permCongrHom_permHom_mem_M (hS : Setup M Q D t) (hS' : Setup M' Q' D' t'
       Option.map_some]
     exact congrArg some (by rw [hθ m (εQ.symm y), εQ.apply_symm_apply])
 
+/-- **`Q` acts on the point set by right translation**: for `q ∈ Q ≤ M` the
+decomposition of `q x⁻¹` is itself, with trivial `D`-part.
+
+This is why the first half of the Lemma needs only a *group* isomorphism `Q ≃* Q'` —
+no separate compatibility with the action is required, the action being translation. -/
+theorem mAct_of_mem_Q (hS : Setup M Q D t) (q x : ↥Q) :
+    mAct hS ⟨(q : L), hS.QM q.2⟩ x = x * q⁻¹ := by
+  rw [mAct_eq hS _ x (q := q * x⁻¹) (d := 1) (by simp)]
+  rw [mul_inv_rev, inv_inv]
+
+/-- A group isomorphism `Q ≃* Q'` matches the permutations of `Q`. -/
+theorem permCongrHom_permHom_mem_Q (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
+    (εQ : ↥Q ≃* ↥Q') (q : ↥Q) :
+    Equiv.permCongrHom (Equiv.optionCongr εQ.toEquiv) (permHom hS (q : L))
+      = permHom hS' ((εQ q : ↥Q') : L') := by
+  refine Equiv.ext fun o => ?_
+  cases o with
+  | none =>
+    change Option.map (⇑εQ) (permHom hS (q : L) none)
+      = permHom hS' ((εQ q : ↥Q') : L') none
+    rw [permHom_none_of_mem_M hS (hS.QM q.2),
+      permHom_none_of_mem_M hS' (hS'.QM (εQ q).2), Option.map_none]
+  | some y =>
+    change Option.map (⇑εQ) (permHom hS (q : L) (some (εQ.symm y)))
+      = permHom hS' ((εQ q : ↥Q') : L') (some y)
+    have e1 : permHom hS (q : L) (some (εQ.symm y))
+        = some (mAct hS ⟨(q : L), hS.QM q.2⟩ (εQ.symm y)) :=
+      permHom_some_of_mem_M hS ⟨(q : L), hS.QM q.2⟩ _
+    have e2 : permHom hS' ((εQ q : ↥Q') : L') (some y)
+        = some (mAct hS' ⟨((εQ q : ↥Q') : L'), hS'.QM (εQ q).2⟩ y) :=
+      permHom_some_of_mem_M hS' ⟨((εQ q : ↥Q') : L'), hS'.QM (εQ q).2⟩ _
+    rw [e1, e2, mAct_of_mem_Q, mAct_of_mem_Q, Option.map_some, map_mul, map_inv,
+      εQ.apply_symm_apply]
+
+/-- The permutations of `Q` and of `Q'` correspond under a group isomorphism. -/
+theorem permCongr_image_Q (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
+    (εQ : ↥Q ≃* ↥Q') :
+    (Equiv.permCongrHom (Equiv.optionCongr εQ.toEquiv)) '' (permHom hS '' (Q : Set L))
+      = permHom hS' '' (Q' : Set L') := by
+  ext σ
+  simp only [Set.mem_image]
+  constructor
+  · rintro ⟨τ, ⟨q, hq, rfl⟩, rfl⟩
+    exact ⟨((εQ ⟨q, hq⟩ : ↥Q') : L'), (εQ ⟨q, hq⟩).2,
+      (permCongrHom_permHom_mem_Q hS hS' εQ ⟨q, hq⟩).symm⟩
+  · rintro ⟨q', hq', rfl⟩
+    refine ⟨permHom hS ((εQ.symm ⟨q', hq'⟩ : ↥Q) : L),
+      ⟨((εQ.symm ⟨q', hq'⟩ : ↥Q) : L), (εQ.symm ⟨q', hq'⟩).2, rfl⟩, ?_⟩
+    rw [permCongrHom_permHom_mem_Q hS hS' εQ (εQ.symm ⟨q', hq'⟩), εQ.apply_symm_apply]
+
+/-- **The first half of the Lemma of Peterfalvi Part II, Ch. IV §1** (p. 123), in the
+book's terms: `⟨Q^x | x ∈ L⟩` is determined up to isomorphism by `Q` and `f`.
+
+Only a group isomorphism `Q ≃* Q'` intertwining `f` with `f'` is needed — the action of
+`Q` on the point set is translation (`mAct_of_mem_Q`), so no separate compatibility is
+required, and `t` contributes exactly `f` (`permCongrHom_permHom_t`). -/
+noncomputable def conjQMulEquivOfData (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
+    (H : IsFGH M Q D t f g h) (H' : IsFGH M' Q' D' t' f' g' h')
+    (hcore : M.normalCore = ⊥) (hcore' : M'.normalCore = ⊥)
+    (εQ : ↥Q ≃* ↥Q')
+    (hεf : ∀ (x : ↥Q) (hx1 : (x : L) ≠ 1),
+      ((εQ ⟨f (x : L), H.f_mem x.2 hx1⟩ : ↥Q') : L') = f' ((εQ x : ↥Q') : L')) :
+    ↥(Subgroup.closure (⋃ y : L, ((fun q => y⁻¹ * q * y) '' (Q : Set L))))
+      ≃* ↥(Subgroup.closure (⋃ y : L', ((fun q => y⁻¹ * q * y) '' (Q' : Set L')))) :=
+  conjQMulEquivOfPermMatch hS hS' hcore hcore' (Equiv.optionCongr εQ.toEquiv)
+    (permCongrHom_permHom_t hS hS' H H' εQ.toEquiv (map_one εQ) hεf)
+    (permCongr_image_Q hS hS' εQ)
+
 /-- **The Lemma of Peterfalvi Part II, Ch. IV §1** (p. 123), in the book's terms:
 `L` is determined up to isomorphism by `M = Q ⋊ D` and `f`.
 

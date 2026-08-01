@@ -625,6 +625,35 @@ theorem corollaryTwo_of_stepFour (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       hcover hρQ hρQ0)
     hhW
 
+/-- **Stage (5) determines `f` off `Q₀`** — the first sentence of Corollary 1's proof
+(Peterfalvi Part II, p. 132: "`Q` and `f` are well defined by the specification of `q`").
+
+Two maps obeying the inversion formula agree wherever it applies: the formula pins both
+unitary coordinates of the value, and those determine the element
+(`Suzuki2Groups.eq_of_unitaryCoord_eq`).  Together with `stepFive`, which supplies the
+formula, this is what makes `f` a function of the coordinates alone — the input to the
+rigidity Lemma of §1. -/
+theorem f_eq_of_inverseFormula {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {f₁ f₂ : G → G}
+    (hf₁Q : ∀ ρ : G, ρ ∈ hyp.Q → f₁ ρ ∈ hyp.Q)
+    (hf₂Q : ∀ ρ : G, ρ ∈ hyp.Q → f₂ ρ ∈ hyp.Q)
+    {ρ : G} (hρQ : ρ ∈ hyp.Q)
+    (h₁q : (Ψ ⟨f₁ ρ, hf₁Q ρ hρQ⟩).quotient
+      = (Ψ ⟨ρ, hρQ⟩).quotient / Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))
+    (h₁y : Suzuki2Groups.unitaryCoord m u (Ψ ⟨f₁ ρ, hf₁Q ρ hρQ⟩)
+      = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹)
+    (h₂q : (Ψ ⟨f₂ ρ, hf₂Q ρ hρQ⟩).quotient
+      = (Ψ ⟨ρ, hρQ⟩).quotient / Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))
+    (h₂y : Suzuki2Groups.unitaryCoord m u (Ψ ⟨f₂ ρ, hf₂Q ρ hρQ⟩)
+      = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹) :
+    f₁ ρ = f₂ ρ := by
+  have hΨ : Ψ ⟨f₁ ρ, hf₁Q ρ hρQ⟩ = Ψ ⟨f₂ ρ, hf₂Q ρ hρQ⟩ :=
+    Suzuki2Groups.eq_of_unitaryCoord_eq m (h₁q.trans h₂q.symm) (h₁y.trans h₂y.symm)
+  exact congrArg (Subtype.val (p := fun x => x ∈ hyp.Q)) (Ψ.injective hΨ)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
