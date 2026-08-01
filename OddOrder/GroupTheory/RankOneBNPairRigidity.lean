@@ -640,4 +640,28 @@ theorem Setup.exists_conj_eq [Finite L] {M' Q' D' : Subgroup L} {t' : L}
   rw [← hS.normalizer_Q_eq hQ1, Subgroup.map_equiv_normalizer_eq Q (MulAut.conj c), hQc,
     hS'.normalizer_Q_eq hQ1']
 
+/-- Two rank-one setups on the same group have the same `|Q|` and the same `|D|` — both
+factors of `|L| = |Q| · |D| · (1 + |Q|)` are determined, because `Q` is a Sylow
+`2`-subgroup. -/
+theorem Setup.natCard_eq_of_setup [Finite L] {M' Q' D' : Subgroup L} {t' : L}
+    (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
+    (hQ : IsPGroup 2 ↥Q) (hDodd : Odd (Nat.card ↥D)) (hQeven : Even (Nat.card ↥Q))
+    (hQ' : IsPGroup 2 ↥Q') (hDodd' : Odd (Nat.card ↥D')) (hQeven' : Even (Nat.card ↥Q'))
+    (hQ1 : Q ≠ ⊥) (hQ1' : Q' ≠ ⊥) :
+    Nat.card ↥Q = Nat.card ↥Q' ∧ Nat.card ↥D = Nat.card ↥D' := by
+  obtain ⟨c, hQc, hMc⟩ :=
+    hS.exists_conj_eq hS' hQ hDodd hQeven hQ' hDodd' hQeven' hQ1 hQ1'
+  have hcard : ∀ K : Subgroup L,
+      Nat.card ↥(K.map (MulAut.conj c).toMonoidHom) = Nat.card ↥K := fun K =>
+    (Nat.card_congr (Subgroup.equivMapOfInjective K (MulAut.conj c).toMonoidHom
+      (MulAut.conj c).injective).toEquiv).symm
+  have hQeq : Nat.card ↥Q = Nat.card ↥Q' := by rw [← hQc, hcard]
+  refine ⟨hQeq, ?_⟩
+  have hMeq : Nat.card ↥M = Nat.card ↥M' := by rw [← hMc, hcard]
+  have h1 := hS.natCard_M
+  have h2 := hS'.natCard_M
+  rw [hMeq, h2, hQeq] at h1
+  have hpos : 0 < Nat.card ↥Q' := Nat.card_pos
+  exact Nat.eq_of_mul_eq_mul_left hpos h1.symm
+
 end OddOrder.GroupTheory.RankOneBNPair
