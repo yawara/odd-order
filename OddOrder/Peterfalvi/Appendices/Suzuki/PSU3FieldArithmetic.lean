@@ -987,4 +987,55 @@ theorem eq_self_of_add_eq_const {F : Type*} [Field F] [Finite F] (h2 : (2 : F) =
     exact hne (hinj (hfix (θ X) hθz0 hne))
   · exact hfix X hX0 hXz
 
+/-- **The last line of §3 (3)** (Peterfalvi Part II, p. 130): `(∗)` with the `θ`-term
+gone reads `α² = (ζ + ζ⁻¹)²`, and squaring is injective in characteristic `2`. -/
+theorem eq_add_inv_of_sq_add_sq {E : Type*} [Field E] (h2 : (2 : E) = 0) {α ζ : E}
+    (hstar : α ^ 2 + ζ ^ 2 + (ζ⁻¹) ^ 2 = 0) : α = ζ + ζ⁻¹ := by
+  have hsq : (α + (ζ + ζ⁻¹)) ^ 2 = 0 := by
+    linear_combination hstar + (α * ζ + α * ζ⁻¹ + ζ * ζ⁻¹) * h2
+  have hzero : α + (ζ + ζ⁻¹) = 0 := pow_eq_zero_iff (two_ne_zero) |>.mp hsq
+  linear_combination hzero - (ζ + ζ⁻¹) * h2
+
+/-- **§3 (3), the field part** (Peterfalvi Part II, p. 130): the book's equation
+
+  `(∗)  α² + ζ² + ζ⁻² + (ζ + ζ⁻¹)(X + X^θ) = 0`   for `X ∈ F − {0, z}`
+
+forces `θ = 1` and `α = ζ + ζ⁻¹`.
+
+Since `ζ + ζ⁻¹ ≠ 0`, `(∗)` says exactly that `X + X^θ` is *independent of `X`* on
+`F − {0, z}`, which is the hypothesis of `eq_self_of_add_eq_const`; and once `θ = 1` the
+bracket vanishes in characteristic `2`, leaving `α² = (ζ + ζ⁻¹)²`. -/
+theorem eq_one_and_eq_add_inv_of_star {E : Type*} [Field E] [Finite E] (h2 : (2 : E) = 0)
+    (θ : E →+ E) (hinj : Function.Injective θ) {α ζ z : E}
+    (hζ : ζ + ζ⁻¹ ≠ 0) (hcard : 5 ≤ Nat.card E)
+    (hstar : ∀ X : E, X ≠ 0 → X ≠ z →
+      α ^ 2 + ζ ^ 2 + (ζ⁻¹) ^ 2 + (ζ + ζ⁻¹) * (X + θ X) = 0) :
+    (∀ X : E, θ X = X) ∧ α = ζ + ζ⁻¹ := by
+  classical
+  haveI : Fintype E := Fintype.ofFinite E
+  have hcardE : 5 ≤ Fintype.card E := by rwa [← Nat.card_eq_fintype_card]
+  -- `X + X^θ` is the same constant for every admissible `X`
+  have hconst : ∀ X : E, X ≠ 0 → X ≠ z →
+      X + θ X = (α ^ 2 + ζ ^ 2 + (ζ⁻¹) ^ 2) / (ζ + ζ⁻¹) := by
+    intro X h0 hz
+    rw [eq_div_iff hζ]
+    linear_combination hstar X h0 hz - (α ^ 2 + ζ ^ 2 + (ζ⁻¹) ^ 2) * h2
+  have hθ := eq_self_of_add_eq_const h2 θ hinj hconst hcard
+  refine ⟨hθ, ?_⟩
+  -- an admissible `X`, at which `(∗)` loses its bracket
+  obtain ⟨X, hX⟩ : ∃ X : E, X ∉ ({0, z} : Finset E) := by
+    by_contra hcon
+    push Not at hcon
+    have hle := Finset.card_le_card (fun b (_ : b ∈ Finset.univ) => hcon b)
+    rw [Finset.card_univ] at hle
+    have e1 := Finset.card_insert_le (0 : E) {z}
+    have e2 : ({z} : Finset E).card = 1 := Finset.card_singleton _
+    omega
+  simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hX
+  have hs := hstar X hX.1 hX.2
+  rw [hθ X] at hs
+  refine eq_add_inv_of_sq_add_sq h2 ?_
+  linear_combination hs - (ζ + ζ⁻¹) * X * h2
+
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
