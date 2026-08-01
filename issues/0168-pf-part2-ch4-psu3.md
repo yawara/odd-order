@@ -2545,3 +2545,28 @@ p.132 をページ画像で確認した結果、Ch. IV の残りは以下の構�
    issue 冒頭「やること」の未チェック項目。
 4. Corollary 1 → §4 (p.132-134、段 (1) から)。⚠ §4 は Ch. I §3 Prop 1(c)、
    Ch. I §2 Prop 3、Ch. II (11) を引く — repo の対応物を先に実測すること。
+
+## 2026-08-01 (27): Corollary 2 の両端が揃った
+
+| 定理 | 内容 |
+|---|---|
+| `exists_normPreimage_of_mem_W` | `ζ ∈ W^#` ⟹ `∃ r ≠ 0`, `Tr μ(ζ) = r·r^q` (基点 `ω̄` の構成) |
+| `f_eq_conj_inv_of_inverseFormula` | 座標から `f(ω) = ζ⁻¹ω⁻¹ζ` を読み取る (`stepFour_at_omega` の逆) |
+| `stepFive_secondCase_compose` | §2 段 (2) の座標形 + 既知の公式 ⟹ `ρ s^{a⁻¹}` での公式 |
+
+⟹ **Corollary 2 は「段 (5) を `ω = ofUnitary r μ(ζ)` に当てる」だけ**になった:
+
+1. `exists_normPreimage_of_mem_W` で `r` を取り `ω := ofUnitary m M.card hu r μ(ζ) h`
+   (`Ψ.symm` で `↥hyp.Q` に戻す)。商座標 `r`、ユニタリ座標 `μ(ζ)`。
+2. 段 (5) で `f(ω)` の座標 = `(r/μ(ζ), 1/μ(ζ))`。
+3. `f_eq_conj_inv_of_inverseFormula` (`hx` は 1. から) で `f(ω) = ζ⁻¹ω⁻¹ζ = ω^{-ζ}`。
+4. `h(ω) = ζ³` は (H5) から — repo の `h_eq_zpow_three` (`PSU3SectionThree`) が
+   まさにこれ (`f ω = ζ⁻¹ω⁻¹ζ` から `h ω = ζ³`)。⚠ 実測済み・再利用可。
+5. `ω ∉ Q₀` は商座標 `r ≠ 0` から。
+
+### ⚠ 次セッションの順序 (更新)
+
+1. **Corollary 2** (上記 5 手、部品は全部 landing 済)。
+2. 段 (5) 第 2 ケースの群論組み立て ((25) の 4 手)。
+3. `RankOneBNPair` の Lemma (`f` が `L` を決める) → Corollary 1。
+4. §4 (p.132-134)。
