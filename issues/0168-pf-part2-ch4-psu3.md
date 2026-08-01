@@ -5920,3 +5920,37 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
    `natCard_cQ_eq_baseField_cube` と `natCard_residualQuotientHypothesis_Q` で示す。
 4. 段 1-3 を合成 ⟹ `Hypothesis.conjugate` で三つ組が完全に一致 ⟹
    `IsFGH.map` + `corollaryTwo_of_sectionThree` + `IsFGH.eq_of_le` ⟹ **段 (2) 完了**。
+
+## 2026-08-02 (111): 段 3 の核が landing — **数え上げは要らなかった**
+
+`exists_mem_K_conj_t_eq` : `d ∈ K` ⟹ `∃ e ∈ K, e⁻¹ t e = d t`。
+
+(110) で「核は `|K| = |D|/|V|` (= `D = K V`) 1 本」と書いたが、**それは不要**だった。
+`e ∈ K` による共役は `e⁻¹ t e = e⁻² t` (K の定義 `t e t = e⁻¹` から直接) なので、
+必要なのは「**平方が `K` 上全射**」だけ。`K ≤ D` は奇位数の部分群なので
+各元は自分の冪の平方 ⟹ 自明。
+
+⚠ しかも `exists_sq_eq_of_mem_K` は **`PSU3Preliminary.lean:749` に既にあった**
+(重複を書いて "already been declared" で気付いた)。着手前 grep の教訓
+= [[grep-concept-names-not-book-notation]] の再確認。
+
+### 段 (2) の残り (更新)
+
+| 段 | 内容 | 状態 |
+|---|---|---|
+| 1 | `π(Q∩U)` が Sylow 2 ⟹ Sylow 共役で `Q̄ = Q'`、`M̄ = N(Q̄) = H'` | ⚠ 未 (位数計算) |
+| 2 | Schur–Zassenhaus の共役性で `u ∈ Q̄` により `D̄ = D'` | ⚠ 未 |
+| 3 | `π t = d t'` (`d ∈ K`) を `e ∈ K` 共役で吸収 | ✅ **今回** |
+| 4 | 合成 ⟹ `IsFGH.map` + `corollaryTwo_of_sectionThree` + `IsFGH.eq_of_le` | ⚠ 未 |
+
+⚠ 段 3 の前段 (「`π t` と `t'` は `D` の元だけ違い、対合性から差は `K` に入る」) は
+`Setup.D_eq_inf_map_conj` (110) と `normalizer_H_eq_H` から出る — これも未 landing。
+
+### ⚠ 次セッションはここから
+
+1. **段 3 の前段**: `M ⊓ M^{t₁} = M ⊓ M^{t₂} = D` かつ `t₁, t₂ ∉ M` 対合 ⟹
+   `t₁ = d t₂` なる `d ∈ D`、さらに対合性から `d ∈ KSet`。
+   (`normalizer_H_eq_H` (`Basic.lean:628`) + `D_eq_inf_map_conj`。)
+2. 段 1 の位数計算 (`natCard_cQ_eq_baseField_cube` と
+   `natCard_residualQuotientHypothesis_Q`)。
+3. 段 2 の Schur–Zassenhaus 共役性 (mathlib の `IsComplement`/`SchurZassenhaus` を実測)。
