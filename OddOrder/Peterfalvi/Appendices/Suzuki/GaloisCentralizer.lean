@@ -30,8 +30,9 @@ is in when it invokes this.
 * `Hypothesis.VtoVbar` — the map `V → V̄ = VW/W`, with kernel `W`.
 * `Hypothesis.centralizer_V_centralizer_Q0` — `C_V(C_{Q₀}(P)) = P ⊔ W`.
 * `Hypothesis.centralizer_V_centralizer_Q0_of_W_eq_bot` — the book's `= P`.
-* `Hypothesis.natCard_Q0_eq_pow_of_W_eq_bot` — **Artin's degree formula** in this
-  setting: `|Q₀| = |C_{Q₀}(X)| ^ |X|` when `W = 1`.
+* `Hypothesis.natCard_Q0_eq_pow` — **Artin's degree formula**:
+  `|Q₀| = |C_{Q₀}(X)| ^ |X|` for `X ≤ V` with `X ⊓ W = 1`;
+  `Hypothesis.natCard_Q0_eq_pow_of_W_eq_bot` is the `W = 1` case.
 -/
 
 set_option autoImplicit false
@@ -262,20 +263,21 @@ theorem centralizer_V_centralizer_Q0_of_W_eq_bot (hW : hyp.W = ⊥)
 
 /-! ## Artin's degree formula -/
 
-/-- **Artin's degree formula in the Ch. III §1 setting**: when `W = 1`,
-`|Q₀| = |C_{Q₀}(X)| ^ |X|` for every `X ≤ V`.
+/-- **Artin's degree formula**: `|Q₀| = |C_{Q₀}(X)| ^ |X|` for `X ≤ V` acting
+faithfully on `Q₀`, i.e. with `X ⊓ W = 1`.
 
-`Q₀` is the additive group of a finite field `F` on which `X` acts faithfully
-(because `W = 1`) through a subgroup `B ≤ RingAut F`; `C_{Q₀}(X)` is the fixed
-field `F^B`, Artin's lemma gives `[F : F^B] = |B| = |X|`
+`Q₀` is the additive group of a finite field `F` on which `X` acts through a subgroup
+`B ≤ RingAut F`; `W` is the kernel of that action, so `X ⊓ W = 1` makes `|B| = |X|`.
+`C_{Q₀}(X)` is the fixed field `F^B`, Artin's lemma gives `[F : F^B] = |B| = |X|`
 (`OddOrder.RingAut.finrank_fixedSet`), and a finite-dimensional vector space over
 a finite field has `|F| = |F^B| ^ [F : F^B]`.
 
 This is what makes `q = q₀ ^ p` available to Ch. III §1, both for Fermat
 (`coprime_natCard_K_of_not_dvd`) and for the order count that contradicts the
-`PSL(2, ℓ)` branch. -/
-theorem natCard_Q0_eq_pow_of_W_eq_bot (hW : hyp.W = ⊥) {X : Subgroup G}
-    (hXV : X ≤ hyp.V) :
+`PSL(2, ℓ)` branch; Ch. IV §4 step (1) (p. 132) uses it in the form `q = ℓ^p` for a
+`P ≤ V` of prime order `p` with `P ∩ W = 1`, where `W ≠ 1`. -/
+theorem natCard_Q0_eq_pow {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (hXW : X ⊓ hyp.W = ⊥) :
     Nat.card ↥hyp.Q0 =
       Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer (X : Set G)) ^ Nat.card ↥X := by
   classical
@@ -353,23 +355,25 @@ theorem natCard_Q0_eq_pow_of_W_eq_bot (hW : hyp.W = ⊥) {X : Subgroup G}
       have hconj := (hfix ⟨g, hgV⟩ x).mpr (hx _ ⟨⟨g, hgV⟩, hg, rfl⟩)
       calc g * (x : G) = (g * (x : G) * g⁻¹) * g := by group
         _ = (x : G) * g := by rw [hconj]
-  -- `|B| = |X|` because `W = 1` makes `σ` injective
+  -- `|B| = |X|` because `X ⊓ W = 1` makes `σ` injective on `X`
   have hBcard : Nat.card ↥B = Nat.card ↥X := by
-    have hσinj : Function.Injective σ := by
+    have hψinj : Function.Injective (σ.comp (X.subgroupOf hyp.V).subtype) := by
       rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
       intro v hv
-      rw [MonoidHom.mem_ker] at hv
-      have h2 := (hσker v).mp hv
-      rw [hW, Subgroup.mem_bot] at h2
-      exact Subgroup.mem_bot.mpr (Subtype.ext h2)
-    have h1 : Nat.card ↥B = Nat.card ↥(X.subgroupOf hyp.V) :=
-      (Nat.card_congr
-        (Subgroup.equivMapOfInjective _ σ hσinj).toEquiv).symm
-    rw [h1, ← Subgroup.inf_subgroupOf_right]
-    have h2 : Nat.card ↥((X ⊓ hyp.V).subgroupOf hyp.V) = Nat.card ↥(X ⊓ hyp.V) :=
-      Nat.card_congr (Subgroup.subgroupOfEquivOfLe
-        (inf_le_right : X ⊓ hyp.V ≤ hyp.V)).toEquiv
-    rw [h2, inf_eq_left.mpr hXV]
+      rw [MonoidHom.mem_ker, MonoidHom.comp_apply] at hv
+      have hW2 := (hσker ((X.subgroupOf hyp.V).subtype v)).mp hv
+      have hX2 : (((v : ↥hyp.V) : G)) ∈ X := Subgroup.mem_subgroupOf.mp v.2
+      have hmem : (((v : ↥hyp.V) : G)) ∈ X ⊓ hyp.W := ⟨hX2, hW2⟩
+      rw [hXW, Subgroup.mem_bot] at hmem
+      exact Subgroup.mem_bot.mpr (Subtype.ext (Subtype.ext hmem))
+    have hrange : (σ.comp (X.subgroupOf hyp.V).subtype).range = B := by
+      ext τ
+      simp [hBdef, Subgroup.mem_map, MonoidHom.mem_range]
+    have h1 : Nat.card ↥B = Nat.card ↥(X.subgroupOf hyp.V) := by
+      rw [← hrange]
+      exact (Nat.card_congr (MonoidHom.ofInjective hψinj).toEquiv).symm
+    rw [h1]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXV).toEquiv
   -- `C_{Q₀}(X) ≃ F^B` through `eQ`
   have hcardFix : Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer (X : Set G)) =
       Nat.card ↥(OddOrder.RingAut.fixedSet B) := by
@@ -397,6 +401,12 @@ theorem natCard_Q0_eq_pow_of_W_eq_bot (hW : hyp.W = ⊥) {X : Subgroup G}
     rfl
   rw [← hcardF, hVS, hArtin, hsub, hcardFix, hBcard]
 
+/-- **Artin's degree formula when `W = 1`** — the case Ch. III §1 uses. -/
+theorem natCard_Q0_eq_pow_of_W_eq_bot (hW : hyp.W = ⊥) {X : Subgroup G}
+    (hXV : X ≤ hyp.V) :
+    Nat.card ↥hyp.Q0 =
+      Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer (X : Set G)) ^ Nat.card ↥X :=
+  hyp.natCard_Q0_eq_pow hXV (by rw [hW, inf_bot_eq])
 
 end Hypothesis
 
