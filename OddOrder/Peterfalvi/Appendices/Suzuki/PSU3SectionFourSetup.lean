@@ -51,6 +51,8 @@ element of `Q − Q₀` does *not* square to `1`.
   `V ∩ U ⊆ P × C_W(P)`.
 * `SectionFourSetup.t_mem_centralizer`, `SectionFourSetup.t_mem_primeComplementResidual`
   — `t ∈ U`, which is what lets §4 use the *same* involution inside `U`.
+* `Hypothesis.theoremAInductionBelow_centralizerActionQuotient` — the induction
+  hypothesis passes to the faithful centralizer quotient, so §2/§3 can be run there.
 -/
 
 set_option autoImplicit false
@@ -279,6 +281,23 @@ theorem eq_of_mem_mul_of_inf_eq_bot {P W S : Subgroup G} (hPS : P ≤ S)
   have hw1 : w = 1 := Subgroup.mem_bot.mp (hbot ▸ ⟨hwS, hw⟩)
   rw [hw1, mul_one]
   exact hp
+
+/-- **The induction hypothesis is inherited by the faithful centralizer quotient.**
+
+`TheoremAInductionBelow G Ω` quantifies over *all* groups smaller than `G`, and the
+quotient is smaller than `G` (`card_centralizerActionQuotient_lt`); so anything smaller
+than the quotient is smaller than `G`.
+
+Ch. IV §4 needs this to run §2/§3 inside the quotient, which is where the mappings
+`f₁, h₁` of step (2) (p. 133) live. -/
+theorem theoremAInductionBelow_centralizerActionQuotient {X : Subgroup G}
+    (hXV : X ≤ hyp.V) (hX : X ≠ ⊥) (ih : TheoremAInductionBelow G Ω) :
+    letI := hyp.centralizerQuotientMulAction hXV
+    TheoremAInductionBelow (hyp.centralizerActionQuotient X)
+      ↥(MulAction.fixedPoints X Ω) := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  intro A Λ _ _ _ hlt hA
+  exact ih (hlt.trans (hyp.card_centralizerActionQuotient_lt hXV hX)) hA
 
 /-! ## The standing hypothesis of §4 -/
 
