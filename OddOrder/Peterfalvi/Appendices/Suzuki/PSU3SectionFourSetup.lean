@@ -58,6 +58,15 @@ element of `Q − Q₀` does *not* square to `1`.
   subgroup, so the involution set of `H` maps *onto* that of `H̄`.  Since `Q₀` is the
   derived subgroup `{x | x² = 1 ∧ x ∈ H}`, this is the `Q₀`-analogue of
   `centralizerQQuotientEquiv` at the set level.
+* `Hypothesis.centralizerQ0QuotientEquiv` — the resulting `C_{Q₀}(X) ≃ Q̄₀`, together
+  with the order transports `natCard_quotient_Q0_eq`, `natCard_quotient_Q_eq`,
+  `natCard_quotient_Q0_eq_pow`, `natCard_quotient_Q_eq_Q0_cube` and the property
+  transport `isSuzuki2Group_quotient_Q`.  These are what turn the `CentralizerPSUData`
+  facts about `C_Q(X)`, `C_{Q₀}(X)` into the hypotheses `exists_standardModel`,
+  `lemmaFiveSetup_of_orderThree_of_mem_W` and
+  `nonempty_quotientFieldModel_of_orderThree` take about `Q̄`, `Q̄₀`.
+* `Hypothesis.exists_center_Q_ne_one` — the `x₀ ∈ Z(Q)`, `x₀ ≠ 1` of
+  `exists_standardModel`.
 -/
 
 set_option autoImplicit false
@@ -515,6 +524,22 @@ theorem natCard_quotient_Q_eq_Q0_cube {X : Subgroup G} (hXV : X ≤ hyp.V)
       = Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q0 ^ 3 := by
   letI := hyp.centralizerQuotientMulAction hXV
   rw [hyp.natCard_quotient_Q_eq hXV hA3, hyp.natCard_quotient_Q0_eq hXV hA3, hcube]
+
+/-- **`Q̄` is a Suzuki `2`-group** — transported from
+`CentralizerPSUData.cQ_isSuzuki2Group` along `centralizerQQuotientEquiv`.  This is the
+`hQsuz` that `lemmaFiveSetup_of_orderThree_of_mem_W` and
+`nonempty_quotientFieldModel_of_orderThree` need for the quotient. -/
+theorem isSuzuki2Group_quotient_Q {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
+      ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))) :
+    letI := hyp.centralizerQuotientMulAction hXV
+    OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
+      ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  exact OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv hQsuz
+    (hyp.centralizerQQuotientEquiv hXV)
 
 /-- **`Z(Q) ≠ 1`, in the shape `exists_standardModel` takes it** — a nonidentity element
 of `Z(Q)`, packaged from `exists_involution_mem_center_Q`. -/
