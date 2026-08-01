@@ -294,6 +294,52 @@ theorem f_conj_zeta_of_mem_Q0 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
               _ = ζ⁻¹ * (ω * z) * ζ := by rw [hzω]
     rw [harg, h3]
 
+/-- **§3, stage (1), with its conjugations packaged as `conjQHom`** (Peterfalvi Part II,
+p. 130, the form stage (4) reads in the unitary coordinates).
+
+`stepOne_chain` presents both sides as iterated conjugations in `G`; collecting them,
+
+  `X^{a²ζ} · s^a = X^{ζ²} · ω^ζ`,   `X = f(ω s^a)`
+
+(all conjugations written `c · x · c⁻¹`, and `ζ³ · ζ⁻¹ = ζ²` on the right).  This is
+exactly the display the book reads coordinatewise on p. 131: each `conjQHom kv` scales
+the quotient coordinate by `μ(kv)` and — once the cocycle's diagonal is known to be a
+multiple of the norm — the unitary coordinate by `μ(kv)^{1+q}`. -/
+theorem stepOne_conjQHom (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ζ ω a : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (haK : a ∈ hyp.KSet) (ha2 : a ^ 2 ∈ hyp.K) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hXQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q) :
+    hyp.conjQHom (hyp.kActor ha2, ⟨ζ, hζ⟩)
+          ⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hXQ⟩
+        * ⟨a * hyp.distinguishedInvolution * a⁻¹,
+            hyp.Q0_le_Q (hyp.conj_mem_Q0_of_mem_D haK.1
+              hyp.distinguishedInvolution_mem_Q0)⟩
+      = hyp.conjQHom (hyp.kActor hyp.K.one_mem, ⟨ζ ^ 2, hyp.W.pow_mem hζ 2⟩)
+            ⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hXQ⟩
+          * hyp.conjQHom (hyp.kActor hyp.K.one_mem, ⟨ζ, hζ⟩) ⟨ω, hωQ⟩ := by
+  have hzQ0 : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D haK.1 hyp.distinguishedInvolution_mem_Q0
+  obtain ⟨hcL, hcR⟩ := hyp.f_conj_zeta_of_mem_Q0 H hζ hzQ0 hωQ hωQ0
+  have hchain := hyp.stepOne_chain H hC2 M hZ hmu hVW hζ hωQ hωQ0 haK hf
+  rw [hcL, hcR] at hchain
+  refine Subtype.ext ?_
+  rw [Submonoid.coe_mul, Submonoid.coe_mul,
+    hyp.conjQHom_kActor_apply_val ha2 hζ,
+    hyp.conjQHom_kActor_apply_val hyp.K.one_mem (hyp.W.pow_mem hζ 2),
+    hyp.conjQHom_kActor_apply_val hyp.K.one_mem hζ]
+  set X := f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) with hX
+  calc (a ^ 2 * ζ) * X * (a ^ 2 * ζ)⁻¹
+        * (a * hyp.distinguishedInvolution * a⁻¹)
+      = a ^ 2 * (ζ * X * ζ⁻¹) * (a⁻¹) ^ 2
+          * (a * hyp.distinguishedInvolution * a⁻¹) := by group
+    _ = ζ ^ 3 * (ζ⁻¹ * X * ζ) * (ζ ^ 3)⁻¹ * (ζ * ω * ζ⁻¹) := hchain
+    _ = (1 * ζ ^ 2) * X * (1 * ζ ^ 2)⁻¹ * ((1 * ζ) * ω * (1 * ζ)⁻¹) := by group
+
 /-- **§3, stage (2)** (Peterfalvi Part II, p. 130): stage (1), read in the coordinates of
 `Q ⧸ Z(Q) ≅ E`, is the linear equation
 
