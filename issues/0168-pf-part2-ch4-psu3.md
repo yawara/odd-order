@@ -1342,12 +1342,16 @@ repo の model 層はその正規化を持たない
 
 1. **§3 (3) の締め = 数え上げへの接続**。`stepThree_star` は admissible な
    `a` 1 つに対する `(∗)`。`eq_one_and_eq_of_star` に渡すには:
-   * ✅ `X` の走査は `exists_mem_K_mu_sq_inv_eq` で完了。
-   * `b` の存在条件 (`stepTen_exists`: `y·s^{a⁻¹} ≠ 1`) が除外する 1 点が
-     書籍の `z = α^{2τ}`。
-   * `(∗)` を部分体の型 `↥(frobFixedSubfield M.E 2 m)` へ移送する
-     (`θ` の制限 + `Subtype.ext`)。`w ≠ 0` は `ζ ≠ 1` + `mu_injective`。
-   * `5 ≤ |F|` は**自明でない** — 上記 §「`5 ≤ |F|` は自明でない」を見よ。
+   * ✅ `X` の走査 = `exists_mem_K_mu_sq_inv_eq`。
+   * ✅ 部分体への移送 = `subfieldRestrict` + `eq_one_and_eq_of_star_subfield`
+     (呼び出し側は方程式を `E` のまま述べてよい)。
+   * ✅ 除外点の一意性 = `eq_of_conj_distinguishedInvolution_eq`
+     (`K` は `Q₀^#` に regular: 全射 + 濃度一致)。⟹ `z := μ(kActor(a₀²),1)⁻¹`
+     (`a₀⁻¹ s a₀ = y` なる `a₀`) と置けば、`X ≠ z` から `b` の存在が出る。
+   * 🔶 **残り = 組み立て**: 各 `X ∈ F^×∖{z}` で `a` を取り `b` を作り
+     `stepThree_star` を呼ぶ ⟹ `hstar` ⟹ `eq_one_and_eq_of_star_subfield`。
+     `w ≠ 0` は `ζ ≠ 1` + `mu_injective` から (`Z² = 1 ⟹ Z = 1` は標数 2)。
+   * 🔶 `5 ≤ |F|` は**自明でない** — 上記 §「`5 ≤ |F|` は自明でない」を見よ。
 2. §3 (3) の後半 `ω² = (0, ζ+ζ⁻¹)` = 上記の `α = σ w`。
 3. §3 (4)。
 4. 軌道代表系 `ω_1,…,ω_n` の形式化 (段 (20) の側条件と §2 締めの `i = k` 用)。
