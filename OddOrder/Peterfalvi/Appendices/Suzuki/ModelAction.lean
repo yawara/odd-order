@@ -725,9 +725,14 @@ from steps (1)–(5).
 > `(x,y)^a = (a x, a^{1+σ} y)`.
 
 Here `S₁` is `BilinearTwistedProduct φ`; `Θ` is the action of `K W` through the
-scalars `μ`, whose image is the book's `B`; and the last clause says the conjugation
-action `A` becomes `B` after conjugating by an element of `U` — the book's
-Zassenhaus step. -/
+scalars `μ`, whose image is the book's `B`; and the clause about `u` says the
+conjugation action `A` becomes `B` after conjugating by an element of `U` — the book's
+Zassenhaus step.
+
+The centre coordinate `ι` is carried along because §3 works in it: `hker` identifies
+`Z(Q)` with the kernel coordinate, the exponent `d` is stated in `ι` as well as in `Φ`
+and `Θ`, and the diagonal scaling law is what turns the `K`-equivariance of the centre's
+quadratic map into the `K`-scaling of the cocycle (`cocycle_scale_of_diagScale`). -/
 theorem exists_standardModel
     (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
     (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
@@ -740,7 +745,9 @@ theorem exists_standardModel
       (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
       (Θ : ↥hyp.actualKActor × ↥hyp.W →*
         MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
-      (u : MulAut (Suzuki2Groups.BilinearTwistedProduct φ)),
+      (u : MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+      (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)),
       -- the cocycle is `F`-semilinear and anisotropic
       (∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
         ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
@@ -769,8 +776,29 @@ theorem exists_standardModel
         ((φ (((M.mu (1, v) : M.Eˣ) : M.E) * x) (((M.mu (1, v) : M.Eˣ) : M.E) * y) :
           ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
           = ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) ∧
-      -- `K` scales the central coordinate by `μ(k)^d`, both in `Q` and in the model
+      -- the centre is the kernel coordinate, read by `ι`
+      (∀ z : ↥(Subgroup.center hyp.Q),
+        Φ (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩) ∧
+      -- the diagonal scaling law: whatever scales the centre's quadratic map scales `φ`
+      (∀ a b : M.E,
+        (∀ x : M.E,
+          ((hyp.centreQuadraticMap s M ι (a * x) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+            = b * ((hyp.centreQuadraticMap s M ι x :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) →
+        ∀ x y : M.E,
+          ((φ (a * x) (a * y) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+            = b * ((φ x y :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) ∧
+      -- `K` scales the central coordinate by `μ(k)^d`, in `ι`, in `Q` and in the model
       (∃ d : ℤ,
+        (∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+          ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+            = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+              ((ι (Additive.ofMul z) :
+                ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) ∧
         (∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
           (((Φ ((hyp.centerKHom k z : ↥(Subgroup.center hyp.Q)) : ↥hyp.Q)).central :
               ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
@@ -794,8 +822,8 @@ theorem exists_standardModel
   obtain ⟨u, hu, hconj⟩ :=
     hyp.exists_conj_conjQHom_range_eq s M hst hm hQ0card hcardQ inductionHypothesis
       ι' d' hequiv' φ Φ hker hquot Θ hΘq hΘc
-  refine ⟨φ, θ, Φ, Θ, u, hsemi, haniso, ?_, hΘq, hu, hconj, hquot, fun v x y => ?_,
-    ⟨d', fun k z => ?_, hΘc⟩⟩
+  refine ⟨φ, θ, Φ, Θ, u, ι', hsemi, haniso, ?_, hΘq, hu, hconj, hquot, fun v x y => ?_,
+    hker, hdiagscale, ⟨d', hequiv', fun k z => ?_, hΘc⟩⟩
   · rw [hker x₀, hone (Additive.ofMul x₀) hnorm]
   · have h := hdiagscale _ _
       (fun z => hyp.centreQuadraticMap_smul_KW s M ι' d' hequiv' (1, v) z) x y
