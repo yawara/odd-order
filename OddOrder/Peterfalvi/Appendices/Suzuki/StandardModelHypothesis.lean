@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
+import OddOrder.Peterfalvi.Appendices.Suzuki.DistinguishedInvolution
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
 
 /-!
@@ -33,6 +34,11 @@ where the §3 machinery applies unconditionally and the conclusions transport ba
 * `standardHypothesis_Q0`, `natCard_standardHypothesis_Q0`,
   `natCard_standardHypothesis_Q` — `Q₀` is `Ω₁(S₀)`, of order `ℓ = 2ⁿ`, and
   `|Q| = |Q₀|³`.  These are `exists_standardModel`'s `hQ0card` and `hcardQ`.
+
+* `standardHypothesis_distinguishedInvolution`,
+  `standardHypothesis_orderOf_distinguishedInvolution_mul_t` — the distinguished
+  involution is the canonical root involution `s = (0, 1)`, and `|s t| = 3`
+  (`exists_standardModel`'s `hst`).
 
 `hQsuz` needs no work here: `Q` is `standardRootSubgroup n` on the nose, so
 `standardRootSubgroup_isSuzuki2Group` applies directly.  `ih` is *not* derivable in the
@@ -213,6 +219,38 @@ theorem natCard_standardHypothesis_Q (n : ℕ) (hn : 1 < n) :
     show (standardHypothesis n hn).Q = standardRootSubgroup n from rfl,
     natCard_standardRootSubgroup n (Nat.zero_lt_one.trans hn), ← pow_mul]
   ring_nf
+
+/-- **The distinguished involution of the standard model is the canonical root
+involution** `s = (0, 1)` of Peterfalvi Part II, Ch. III §3.
+
+The distinguished pair is characterised by the structure equation `t s t = r⁻¹ t r`
+(Ch. I §1 Prop 4(b)), and the standard braid relation
+`w s w = s w s` (`standard_braid`) exhibits `s` itself as the conjugator, since `s` is an
+involution.  Uniqueness (`eq_distinguishedPair_of_structure`) then identifies it. -/
+theorem standardHypothesis_distinguishedInvolution (n : ℕ) (hn : 1 < n) :
+    (standardHypothesis n hn).distinguishedInvolution
+      = rootHom n (RootGroup.centralInvolution n) := by
+  set s : standardPermGroup n := rootHom n (RootGroup.centralInvolution n) with hs
+  have hsq : s ^ 2 = 1 := by
+    rw [hs, ← map_pow, RootGroup.centralInvolution_sq, map_one]
+  have hmul : s * s = 1 := by rw [← sq]; exact hsq
+  have hinv : s⁻¹ = s := inv_eq_of_mul_eq_one_left hmul
+  have hne : s ≠ 1 := by
+    intro h
+    refine RootGroup.centralInvolution_ne_one n (rootHom_injective n ?_)
+    rw [map_one, ← hs, h]
+  refine (((standardHypothesis n hn).eq_distinguishedPair_of_structure
+    (rootHom_mem_standardBorel _) hsq hne
+    ⟨RootGroup.centralInvolution n, rfl⟩ ?_).1).symm
+  rw [hinv]
+  exact standard_braid n
+
+/-- **`|s t| = 3` in the standard model** — `exists_standardModel`'s `hst`. -/
+theorem standardHypothesis_orderOf_distinguishedInvolution_mul_t (n : ℕ) (hn : 1 < n) :
+    orderOf ((standardHypothesis n hn).distinguishedInvolution *
+        (standardHypothesis n hn).t) = 3 := by
+  rw [standardHypothesis_distinguishedInvolution n hn]
+  exact standard_st_order n
 
 /-- **`V = W` in the standard model** — the hypothesis every §3 endpoint carries, here a
 theorem.
