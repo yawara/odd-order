@@ -8,6 +8,7 @@ import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
 import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.PSUCentre
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the standing hypothesis and step (1)'s discriminators
@@ -71,6 +72,8 @@ element of `Q − Q₀` does *not* square to `1`.
   prerequisite in one piece: the `PSU(3, 2ⁿ)` numerics *and* both standing bundles
   (`LemmaFiveSetup`, `QuotientFieldModel`) for the centralizer quotient, from the branch
   data of Ch. I §3 Proposition 1(c).  Its one remaining input is `W̄ ≠ 1`.
+* `Hypothesis.W_ne_bot_of_psu3_branch` — `W ≠ 1` throughout §4, because Ch. III §1's
+  Proposition (p. 117) makes the `PSU(3, ℓ)` branch incompatible with `W = 1`.
 * `Hypothesis.W_eq_inf_centralizer_Q0`, `Hypothesis.V_eq_W_iff_le_centralizer_Q0` —
   the hypothesis `V = W` that every §3 endpoint carries is exactly "`V` centralizes
   `Q₀`", which is how step (2) reads it off the structure of `PSU(3, ℓ)`.
@@ -624,6 +627,28 @@ theorem psu3Numerics_and_standingData_centralizerQuotient {X : Subgroup G}
     hn0.ne' hQ0card hcardQ ihq
   exact ⟨⟨sfive⟩, qhyp.nonempty_quotientFieldModel_of_orderThree hst hQsuz hn0.ne'
     hQ0card hcardQ ihq sfive hw hw1⟩
+
+/-- **`W ≠ 1` in Ch. IV §4.**
+
+Ch. III §1 Proposition (p. 117) — `CentralizerPSUData.false_of_W_eq_bot`, "it follows
+that `F/Z(F)` is not isomorphic to `PSU(3, ℓ)`" — says the `PSU(3, ℓ)` branch of Ch. I §3
+Proposition 1(c) is incompatible with `W = 1`.  Step (1) of §4 puts us in exactly that
+branch, so `W ≠ 1` throughout §4.  This is the ambient half of the book's
+`|(V ∩ U)/(P ∩ U)| ≠ 1` (p. 133). -/
+theorem W_ne_bot_of_psu3_branch {X : Subgroup G} (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hnea : ¬ OddOrder.GroupTheory.IsElementaryAbelian 2
+      ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (ih : TheoremAInductionBelow G Ω) :
+    hyp.W ≠ ⊥ := by
+  intro hW
+  letI := hyp.centralizerQuotientMulAction hXV
+  obtain ⟨tri⟩ := hyp.centralizer_trichotomy_of_induction hXV hX hA3 ih
+  obtain ⟨⟨data, _teq, details⟩⟩ :=
+    nonempty_psu3Data_of_orderOf_eq_three tri.branch hord hnea
+  exact details.false_of_W_eq_bot hXV hW tri.common
 
 /-! ### `V = W` is exactly "`V` centralizes `Q₀`"
 
