@@ -6967,3 +6967,35 @@ letI が二重になり、(125) で踏んだ「別インスタンス」問題を
 と言っているので、上 3 本があれば 6 入力がそのまま ULift 版へ移り、Lemma 5 →
 `QuotientFieldModel` → `exists_standardModel` → `corollaryTwo_of_standardModel` と繋がる
 (残りは `hVW` / `hKcard` = `t` の照合、追加仮説 `C_Q(D) = ⊥` ((133)))。
+
+## 2026-08-02 (137): `Q₀`/`W`/`s` の点集合非依存が landing — 次は ULift 版への移送
+
+`Q0_eq_of_H_eq` / `W_eq_of_H_D_eq` / `distinguishedInvolution_eq_of_eq`
+(`PSU3SectionFourIntrinsic.lean`, section `SameGroup`)。同じ群上の 2 つの標準仮説で
+`H`,`Q`,`D`,`t` が一致すれば `Q0`,`W`,`s` も一致する。
+
+### ⚠ 次セッションはここから — 6 入力を ULift 版へ
+
+`intrinsicResidualQuotientULift` ((118)) と `intrinsicResidualQuotient` ((117)) は
+`ofRankOneSetupOfEquiv_{H,Q,D,t}` により 4 フィールドが一致するので、上の 3 本で
+`Q0`,`W`,`s` も一致し、`|Q̄₀|` / `|Q̄|` / `|s̄t̄|=3` / Suzuki 2-群 / `∃w∈W̄` が
+そのまま移る。
+
+⚠ **実務上の注意**: ULift 版の型は
+`letI := Hypothesis.rankOneSetupAction ((hyp.intrinsicPointEquiv details hXD htX hCQ hZD).trans Equiv.ulift.symm)`
+の下にあるので、各 statement にこの `letI` を書く必要がある (長い)。
+**先に `abbrev` で `ε` を切り出す**と読みやすくなる:
+
+```
+noncomputable abbrev intrinsicPointEquivULift (details) (hXD) (htX) (hCQ) (hZD) :=
+  (hyp.intrinsicPointEquiv details hXD htX hCQ hZD).trans Equiv.ulift.symm
+```
+
+その後:
+1. 4 フィールドの一致 (`ofRankOneSetupOfEquiv_*` を `letI` 付きで言い直す)
+2. `Q0`/`W`/`s` の一致 (section `SameGroup` の 3 本)
+3. 6 入力を移送
+4. `lemmaFiveSetup_of_orderThree_of_mem_W` → `nonempty_quotientFieldModel_of_orderThree`
+   → `exists_standardModel` → `IsStandardModel`
+5. 残り `hVW` / `hKcard` (= `t` の照合、追加仮説 `C_Q(D) = ⊥` ((133))) を埋めれば
+   `corollaryTwo_of_standardModel` が当たり、(119) の 2 転送と合わせて**段 (2) が閉じる**。
