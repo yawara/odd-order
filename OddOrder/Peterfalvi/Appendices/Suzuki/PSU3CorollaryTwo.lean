@@ -468,7 +468,10 @@ first says `σ = τ` on `F`, the second reads `α` after applying `σ⁻¹`.  Bo
 and it simultaneously says the *model's* twist `θ` is the identity on `F`, which is the
 form the unitary coordinates need.
 
-So this is `stepThree` composed with that upgrade: out come exactly `hθ` and `hα`. -/
+So this is `stepThree_of_odd` composed with that upgrade: out come exactly `hθ` and `hα`.
+
+`hodd` is the book's "`θ` is of odd order" (p. 130), which is what it derives `|F| ≥ 8`
+from; `hcard` is then only the three elements the `θ = 1` branch needs. -/
 theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
@@ -476,7 +479,7 @@ theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
-    (hcard : 5 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hcard : 3 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
     (θm : M.E ≃ₐ[ZMod 2] M.E)
@@ -514,6 +517,7 @@ theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
         = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
     (hWinv : ∀ v : ↥hyp.W,
       σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
+    (hodd : Odd (orderOf (τ.trans σ.symm)))
     -- §2's base pair
     {ζ₀ ω₀ y₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
     (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0) (hy₀Q0 : y₀ ∈ hyp.Q0)
@@ -525,9 +529,9 @@ theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
           + ((M.mu ((1 : ↥hyp.actualKActor),
             (⟨ζ₀, hζ₀⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
   have hζ₀ne : ζ₀ ≠ 1 := fun hc => hζ₀1 (Subtype.ext hc)
-  obtain ⟨hστ0, hαst⟩ := hyp.stepThree H hC2 hm hQ0card sfive M hZc hmu hVW hcard ι d
-    hequiv σ τ (σ.symm.toRingHom.comp τ.toRingHom).toAddMonoidHom (fun _ => rfl) hscale
-    hWinv hζ₀ hζ₀ne hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀
+  obtain ⟨hστ0, hαst⟩ := hyp.stepThree_of_odd H hC2 hm hQ0card sfive M hZc hmu hVW hcard
+    ι d hequiv σ τ (σ.symm.toRingHom.comp τ.toRingHom).toAddMonoidHom (fun _ => rfl) hodd
+    hscale hWinv hζ₀ hζ₀ne hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀
   -- `σ = τ` on `F`, which is what the upgrade takes
   have hστ : ∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
       σ.toRingHom a = τ.toRingHom a := by
@@ -563,8 +567,9 @@ and §2's Proposition alone (pp. 120–132).
 
 `stepThree_model` supplies `corollaryTwo_of_standardModel`'s two `§3 (3)` inputs, so
 what is left is exactly: the model of Ch. III §3 (which `exists_standardModel` produces
-from the numerics and the induction hypothesis), the type-`B` scaling pair `σ`, `τ`, and
-the base pair `f(ω₀) = (ω₀ ω₀²)^{ζ₀}` that §2 closes with. -/
+from the numerics and the induction hypothesis), the type-`B` scaling pair `σ`, `τ` — of
+which §3 (3) asks only that `θ = σ⁻¹τ` have odd order, as in the book — and the base pair
+`f(ω₀) = (ω₀ ω₀²)^{ζ₀}` that §2 closes with. -/
 theorem corollaryTwo_of_sectionThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
@@ -572,7 +577,7 @@ theorem corollaryTwo_of_sectionThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
     (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
-    (hcard : 5 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hcard : 3 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
     (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
     (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
     (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
@@ -639,14 +644,15 @@ theorem corollaryTwo_of_sectionThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
         = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
     (hWinv : ∀ v : ↥hyp.W,
       σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
+    (hodd : Odd (orderOf (τ.trans σ.symm)))
     {ζ₀ ω₀ y₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
     (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0) (hy₀Q0 : y₀ ∈ hyp.Q0)
     (hsqω₀ : ω₀ * ω₀ = y₀) (hfω₀ : f ω₀ = ζ₀⁻¹ * (ω₀ * y₀) * ζ₀)
     {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
     ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
   obtain ⟨hθ, hα⟩ := hyp.stepThree_model H hC2 hm hQ0card sfive M hZc hmu hVW hcard θm
-    hsemi haniso ι d hequiv hdiagscale σ τ hscale hWinv hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀
-    hfω₀
+    hsemi haniso ι d hequiv hdiagscale σ τ hscale hWinv hodd hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0
+    hsqω₀ hfω₀
   exact hyp.corollaryTwo_of_standardModel H hC2 sfive M hZc hmu hVW hm hQ0card hKcard
     hWdvd hW1 hfQ hhW θm hsemi hθ haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv uAut huAut
     hconj hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀ hα hζ hζ1
