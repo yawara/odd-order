@@ -207,6 +207,45 @@ theorem exists_mem_KSet_conj_eq_of_mem_Q0 {z : G} (hzQ0 : z ∈ hyp.Q0) (hz1 : z
   obtain ⟨k, hk, hkz⟩ := hmem
   exact ⟨k, hk, hkz⟩
 
+/-- **`K` acts freely on `Q₀^#`** (Peterfalvi Part II, Ch. III §1 Proposition 3): distinct
+elements of `K` send the distinguished involution to distinct places.
+
+`exists_mem_KSet_conj_eq_of_mem_Q0` says the map `k ↦ s^k` from `K` to `Q₀ ∖ {1}` is
+*onto*, and `card_K_eq_card_Q0_sub_one` says the two sides have the same (finite) size; so
+it is a bijection.  In other words `K` is regular on `Q₀^#` — the fact behind
+`exists_center_coordinate_exponent`, here in the form Ch. IV §3 (3) consumes: the single
+`a` for which the book's `b` fails to exist is unique, so `(∗)` is missing at just one
+point of `F^×`. -/
+theorem eq_of_conj_distinguishedInvolution_eq {a b : G} (ha : a ∈ hyp.K) (hb : b ∈ hyp.K)
+    (hab : a⁻¹ * hyp.distinguishedInvolution * a
+      = b⁻¹ * hyp.distinguishedInvolution * b) : a = b := by
+  classical
+  haveI : Fintype ↥hyp.K := Fintype.ofFinite _
+  haveI : Fintype ↥((hyp.Q0 : Set G) \ {1}) := Fintype.ofFinite _
+  have hmem : ∀ k : ↥hyp.K,
+      (k : G)⁻¹ * hyp.distinguishedInvolution * (k : G) ∈ (hyp.Q0 : Set G) \ {1} := by
+    intro k
+    refine ⟨?_, hyp.conj_distinguishedInvolution_ne_one (k : G)⟩
+    have hc := hyp.conj_mem_Q0_of_mem_D (hyp.D.inv_mem (hyp.K_le_D k.2))
+      hyp.distinguishedInvolution_mem_Q0
+    rwa [inv_inv] at hc
+  set Φ : ↥hyp.K → ↥((hyp.Q0 : Set G) \ {1}) :=
+    fun k => ⟨(k : G)⁻¹ * hyp.distinguishedInvolution * (k : G), hmem k⟩ with hΦ
+  have hsurj : Function.Surjective Φ := by
+    rintro ⟨z, hzQ0, hz1⟩
+    obtain ⟨k, hk, hkz⟩ := hyp.exists_mem_KSet_conj_eq_of_mem_Q0 hzQ0
+      (by simpa using hz1)
+    have hkK : k ∈ hyp.K := by rw [← hyp.coe_K] at hk; exact hk
+    exact ⟨⟨k, hkK⟩, Subtype.ext hkz⟩
+  have hcard : Fintype.card ↥hyp.K = Fintype.card ↥((hyp.Q0 : Set G) \ {1}) := by
+    rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card,
+      hyp.card_K_eq_card_Q0_sub_one, Nat.card_coe_set_eq,
+      Set.ncard_sdiff_singleton_of_mem hyp.Q0.one_mem, ← Nat.card_coe_set_eq,
+      SetLike.coe_sort_coe]
+  have hinj := ((Fintype.bijective_iff_surjective_and_card Φ).mpr ⟨hsurj, hcard⟩).1
+  exact congrArg (Subtype.val (p := fun x => x ∈ hyp.K))
+    (hinj (a₁ := ⟨a, ha⟩) (a₂ := ⟨b, hb⟩) (Subtype.ext hab))
+
 /-- **`f` maps `Q₀^#` into `Q₀`**: by step (1) it sends `s^k` to `s^{k⁻¹}`. -/
 theorem f_mem_Q0_of_mem_Q0 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
