@@ -461,20 +461,20 @@ include hyp in
 So the scalar by which `K W` acts on the second unitary coordinate involves only the
 `K`-component — the book's `d^{1+q}` for `d ∈ K W`. -/
 theorem mu_norm_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
-    (kv : ↥hyp.actualKActor × ↥hyp.W) :
-    ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1)
-      = ((M.mu (kv.1, 1) : M.Eˣ) : M.E) ^ 2 := by
-  have hsplit : kv = (kv.1, (1 : ↥hyp.W)) * ((1 : ↥hyp.actualKActor), kv.2) :=
+    (k : ↥hyp.actualKActor) (v : ↥hyp.W) :
+    ((M.mu (k, v) : M.Eˣ) : M.E) ^ (2 ^ m + 1)
+      = ((M.mu (k, 1) : M.Eˣ) : M.E) ^ 2 := by
+  have hsplit : (k, v) = (k, (1 : ↥hyp.W)) * ((1 : ↥hyp.actualKActor), v) :=
     Prod.ext (mul_one _).symm (one_mul _).symm
-  have hW : ((M.mu ((1 : ↥hyp.actualKActor), kv.2) : M.Eˣ) : M.E) ^ (2 ^ m + 1) = 1 := by
-    have h := congrArg (fun u : M.Eˣ => (u : M.E)) (M.mu_W_normOne kv.2)
+  have hW : ((M.mu ((1 : ↥hyp.actualKActor), v) : M.Eˣ) : M.E) ^ (2 ^ m + 1) = 1 := by
+    have h := congrArg (fun x : M.Eˣ => (x : M.E)) (M.mu_W_normOne v)
     simpa using h
-  have hK : ((M.mu (kv.1, (1 : ↥hyp.W)) : M.Eˣ) : M.E) ^ (2 ^ m + 1)
-      = ((M.mu (kv.1, (1 : ↥hyp.W)) : M.Eˣ) : M.E) ^ 2 := by
-    rw [pow_succ, M.mu_K_frobFixed kv.1, ← pow_two]
-  have hmu : ((M.mu kv : M.Eˣ) : M.E)
-      = ((M.mu (kv.1, (1 : ↥hyp.W)) : M.Eˣ) : M.E)
-        * ((M.mu ((1 : ↥hyp.actualKActor), kv.2) : M.Eˣ) : M.E) := by
+  have hK : ((M.mu (k, (1 : ↥hyp.W)) : M.Eˣ) : M.E) ^ (2 ^ m + 1)
+      = ((M.mu (k, (1 : ↥hyp.W)) : M.Eˣ) : M.E) ^ 2 := by
+    rw [pow_succ, M.mu_K_frobFixed k, ← pow_two]
+  have hmu : ((M.mu (k, v) : M.Eˣ) : M.E)
+      = ((M.mu (k, (1 : ↥hyp.W)) : M.Eˣ) : M.E)
+        * ((M.mu ((1 : ↥hyp.actualKActor), v) : M.Eˣ) : M.E) := by
     rw [← Units.val_mul, ← map_mul, ← hsplit]
   rw [hmu, mul_pow, hW, mul_one, hK]
 

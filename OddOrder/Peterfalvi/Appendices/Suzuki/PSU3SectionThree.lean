@@ -732,6 +732,20 @@ theorem exists_mem_K_mu_sq_inv_eq {m : ℕ} (hm : m ≠ 0)
   have hkActor : hyp.kActor x.2 = k := Subtype.ext hx
   rw [hyp.mu_kActor_sq M x.2, hkActor, hk, hrsq, inv_inv]
 
+/-- **The scalars `a²` sweep `F^×`** — `exists_mem_K_mu_sq_inv_eq` without the inverse.
+
+§3 (4) needs it in this direction: its `(∗∗)` is asserted for every `a ∈ F − {0}`, and
+`a` there is the centre coordinate `μ(a²)` of `s^a`. -/
+theorem exists_mem_K_mu_sq_eq {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) (sfive : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m) {c : M.E}
+    (hc : c ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) (hc0 : c ≠ 0) :
+    ∃ (a : G) (haK : a ∈ hyp.K),
+      ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) = c := by
+  obtain ⟨a, haK, h⟩ := hyp.exists_mem_K_mu_sq_inv_eq hm hQ0card sfive M
+    (Subfield.inv_mem _ hc) (inv_ne_zero hc0)
+  exact ⟨a, haK, inv_inj.mp h⟩
+
 /-- **`w = ζ + ζ⁻¹` lies in `F`** (Peterfalvi Part II, p. 130: `(∗)` is an equation of
 `F`, even though `ζ` itself is not in `F`).
 
