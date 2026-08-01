@@ -132,6 +132,20 @@ theorem exists_ne_one_mem_residualQuotientHypothesis_W :
   exact Hypothesis.ofMulEquivPullback_exists_ne_one_mem_W _ _
     (exists_ne_one_mem_standardHypothesisULift_W data.n data.one_lt_n)
 
+/-- The ambient induction hypothesis restricts to `U/Z(U)`, which is smaller than `G`
+(`natCard_residualQuotient_lt`). -/
+theorem theoremAInductionBelow_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
+    (ih : TheoremAInductionBelow G Ω) :
+    letI := MulAction.compHom (ULift.{v} (Unital data.n))
+      details.residualQuotientEquiv.toMonoidHom
+    TheoremAInductionBelow
+      (↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X))
+      (ULift.{v} (Unital data.n)) := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  intro A Λ'' _ _ _ hlt hA
+  exact ih (hlt.trans (hyp.natCard_residualQuotient_lt hXV hX)) hA
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
