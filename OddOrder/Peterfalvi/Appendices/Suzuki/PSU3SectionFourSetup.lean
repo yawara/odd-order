@@ -368,6 +368,110 @@ theorem map_involutionSet_eq_of_odd_kernel {L : Type*} [Group L] [Finite L]
     obtain ⟨d, hd1, hd2⟩ := exists_pow_sq_eq_one_of_odd_kernel hN hz2
     exact ⟨x ^ d, ⟨hd1, H.pow_mem hxH d⟩, hd2⟩
 
+/-- `C_{Q₀}(X)` is the involution subgroup of `C_H(X)`, i.e. the shape
+`map_involutionSet_eq_of_odd_kernel` consumes. -/
+theorem coe_Q0_subgroupOf_centralizer (X : Subgroup G) :
+    ((hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G)) :
+        Subgroup ↥(Subgroup.centralizer (X : Set G))) :
+        Set ↥(Subgroup.centralizer (X : Set G)))
+      = {x : ↥(Subgroup.centralizer (X : Set G)) |
+          x ^ 2 = 1 ∧ x ∈ hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))} := by
+  ext x
+  simp only [Set.mem_setOf_eq, SetLike.mem_coe, Subgroup.mem_subgroupOf, hyp.mem_Q0_iff,
+    Subtype.ext_iff, Subgroup.coe_pow, Subgroup.coe_one]
+
+/-- **Peterfalvi Part II, Ch. I §3 Proposition 1(c), `Q₀`-version.**
+The quotient map carries `C_{Q₀}(X)` *onto* `Q̄₀`.
+
+Unlike the `Q`-version (`centralizerQQuotientEquiv`, where surjectivity is automatic
+because `Q̄` is *defined* as the image of `C_Q(X)`), `Q₀` is the **derived** subgroup
+`{x | x² = 1 ∧ x ∈ H}`, so `Q̄₀` is the involution subgroup of `H̄` rather than the image
+of `C_{Q₀}(X)`.  Surjectivity is therefore a genuine lifting statement, supplied by
+`map_involutionSet_eq_of_odd_kernel`: the kernel `𝒩(C_G(X))` lies in `C_D(X)` and hence
+has odd order, so an involution of the quotient has an involution as preimage — and the
+preimage can be taken inside `C_H(X)`. -/
+theorem map_centralizer_Q0_eq_quotient_Q0 {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1) :
+    letI := hyp.centralizerQuotientMulAction hXV
+    (hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))).map
+        (QuotientGroup.mk'
+          (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore)
+      = (hyp.centralizerQuotientHypothesis hXV hA3).Q0 := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  let L : Subgroup G := Subgroup.centralizer (X : Set G)
+  let N : Subgroup ↥L := (hyp.H.subgroupOf L).normalCore
+  let pi : ↥L →* ↥L ⧸ N := QuotientGroup.mk' N
+  have hNleD : N ≤ hyp.D.subgroupOf L := by
+    dsimp only [N, L]
+    rw [hyp.normalCore_cH_eq_centralizer_cQ hXV]
+    exact inf_le_left
+  have hNodd : Odd (Nat.card ↥N) :=
+    ((hyp.centralizerHypothesisA1 hXV).D_odd).of_dvd_nat
+      (Subgroup.card_dvd_of_le hNleD)
+  have hH : (hyp.centralizerQuotientHypothesis hXV hA3).H
+      = (hyp.H.subgroupOf L).map pi := rfl
+  refine SetLike.ext' ?_
+  rw [Subgroup.coe_map, hyp.coe_Q0_subgroupOf_centralizer X,
+    map_involutionSet_eq_of_odd_kernel (N := N) (H := hyp.H.subgroupOf L) hNodd]
+  ext z
+  simp only [Set.mem_setOf_eq, SetLike.mem_coe,
+    (hyp.centralizerQuotientHypothesis hXV hA3).mem_Q0_iff, hH, pi]
+
+/-- **Peterfalvi Part II, Ch. I §3 Proposition 1(c), `Q₀`-version** — the explicit
+source equivalence `C_{Q₀}(X) ≃ Q̄₀`.
+
+Injectivity is the `Q`-version's argument restricted along `Q₀ ≤ Q`
+(`𝒩(C_G(X)) ≤ C_D(X)` and `C_Q(X) ∩ C_D(X) = 1`); surjectivity is
+`map_centralizer_Q0_eq_quotient_Q0`. -/
+noncomputable def centralizerQ0QuotientEquiv {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1) :
+    letI := hyp.centralizerQuotientMulAction hXV
+    ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) ≃*
+      ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q0 := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  let L : Subgroup G := Subgroup.centralizer (X : Set G)
+  let N : Subgroup ↥L := (hyp.H.subgroupOf L).normalCore
+  let Q0_L : Subgroup ↥L := hyp.Q0.subgroupOf L
+  let pi : ↥L →* ↥L ⧸ N := QuotientGroup.mk' N
+  have hNleD : N ≤ hyp.D.subgroupOf L := by
+    dsimp only [N, L]
+    rw [hyp.normalCore_cH_eq_centralizer_cQ hXV]
+    exact inf_le_left
+  have hQD : hyp.Q.subgroupOf L ⊓ hyp.D.subgroupOf L = ⊥ :=
+    (hyp.centralizerHypothesisA1 hXV).Q_inf_D_eq_bot
+  have hinj : Function.Injective (pi.subgroupMap Q0_L) := by
+    intro q r hqr
+    have hqr' : pi (q : ↥L) = pi (r : ↥L) := congrArg Subtype.val hqr
+    have hquot : pi ((q : ↥L) * (r : ↥L)⁻¹) = 1 := by
+      rw [map_mul, map_inv, hqr', mul_inv_cancel]
+    have hmemN : (q : ↥L) * (r : ↥L)⁻¹ ∈ N :=
+      (QuotientGroup.eq_one_iff _).mp hquot
+    have hmemQ : (q : ↥L) * (r : ↥L)⁻¹ ∈ hyp.Q.subgroupOf L :=
+      Subgroup.mem_subgroupOf.mpr
+        (hyp.Q0_le_Q (Subgroup.mem_subgroupOf.mp
+          (Q0_L.mul_mem q.2 (Q0_L.inv_mem r.2))))
+    have hbot : (q : ↥L) * (r : ↥L)⁻¹ ∈
+        hyp.Q.subgroupOf L ⊓ hyp.D.subgroupOf L :=
+      ⟨hmemQ, hNleD hmemN⟩
+    rw [hQD, Subgroup.mem_bot] at hbot
+    exact Subtype.ext (mul_inv_eq_one.mp hbot)
+  exact (MulEquiv.ofBijective (pi.subgroupMap Q0_L)
+      ⟨hinj, pi.subgroupMap_surjective Q0_L⟩).trans
+    (MulEquiv.subgroupCongr (hyp.map_centralizer_Q0_eq_quotient_Q0 hXV hA3))
+
+/-- **`|Q̄₀| = |C_{Q₀}(X)|`** — the order transport `exists_standardModel` needs for the
+quotient hypothesis, from `centralizerQ0QuotientEquiv`. -/
+theorem natCard_quotient_Q0_eq {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1) :
+    letI := hyp.centralizerQuotientMulAction hXV
+    Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q0
+      = Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  exact Nat.card_congr (hyp.centralizerQ0QuotientEquiv hXV hA3).symm.toEquiv
+
 /-! ## The standing hypothesis of §4 -/
 
 /-- **The standing hypothesis of Peterfalvi Part II, Ch. IV §4** (p. 132).
