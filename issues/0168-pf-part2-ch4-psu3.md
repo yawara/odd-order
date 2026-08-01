@@ -4437,3 +4437,50 @@ coprime 降下 (76) で `V̄ ≤ W̄`、`W_le_V` で **`hVW : qhyp.V = qhyp.W`**
 2. (A1) の群側を `PSUCentre.lean` を手本に組む。
 3. `hVW` → `exists_standardModel` for `qhyp` → §3 段 (4) 鎖 →
    `corollaryTwo_of_stepFour` → 商から `U` へ持ち上げ ⟹ **段 (2) が閉じる**。
+
+## 2026-08-01 (79): 🎯 段 (2) の構造事実 (A) の **model 側が完成**
+
+`TorusCentralizer.lean` (フルビルド green・lint 純ゼロ):
+
+| 定理 | 内容 |
+|---|---|
+| `exists_psuTorusHom_eq_of_mem_standardBorel_of_commute_weylElement` | Borel 元は `∞` を固定、Weyl は `∞`↔`origin` を入れ替えるので Weyl と交換する Borel 元は `origin` も固定 ⟹ `borelHom_smul_origin` で根座標が自明 ⟹ トーラス元 |
+| `commute_rootHom_of_mem_standardBorel_of_commute_weylElement` | 上記 + (A2) ⟹ standard root group の対合を中心化 |
+
+⟹ 書籍 p.133「by the structure of `PSU(3,ℓ)`」の**中身は全部形式化済**。
+
+### ⚠ 群側 (A1) の残り = 「標準位置」問題
+
+群側で要るのは、`v ∈ V ⊓ U` の像について
+* **像が Borel に入る** — `V ≤ D ≤ H = N_G(Q)` (`normalizer_Q_eq_H`) から、像は
+  `C_Q(P)` の像 (= `F/Z(F)` の Sylow 2) の正規化群に入る。
+* **像が `t` の像と交換する** — `V = C_D(t)`。
+
+しかし model 補題は **standard** root subgroup と **standard** Weyl element について
+述べている。`PSUCentre.lean` の `exists_mem_residual_commute_Q0` が
+`exists_ne_one_odd_centralizing_involutions_of_sylowTwo` (= **任意の** Sylow 2 版) を
+使えたのは、その model 補題が最初から任意 Sylow 用に書かれていたから。
+
+⟹ 今回は **`(S, τ)` の対を標準位置に合わせる**必要がある。これは
+`CentralizerPSUDistinguished.lean` (553 行) が `|st| = 3` のためにやっている
+「Sylow 共役 + 根/行列式 1 トーラス補正で `Q` と `t` を同時に標準位置へ」と同じ手順。
+⚠ その補助定理は `private` なので、再利用するには一般化して公開する必要がある。
+
+### 選択肢 (次セッションで判断)
+
+1. **model 補題の任意-Sylow 版を作る** — `exists_ne_one_odd_centralizing_involutions_of_sylowTwo`
+   と同じ流儀で `(S, τ)` を引数に取る形。`τ` が standard Weyl の共役であることを
+   仮説に入れれば機械的な共役移送で済む。
+2. **`CentralizerPSUDistinguished.lean` の標準位置補題を public 化して再利用** —
+   `orderOf_distinguishedInvolution_mul_t_of_psu3Target` の証明中で
+   `e0 : L ≃* standardPermGroup n` を作り `Q`/`t` を同時に標準位置へ送っている
+   (行 161-230 あたり)。ここを `∃ e0, e0 '' Q = standardRootSubgroup ∧ e0 t = weylElement`
+   の形で切り出せれば (A1) は数行になる。**こちらが本命**。
+
+### ⚠ 次セッションはここから
+
+1. `CentralizerPSUDistinguished.lean` の `orderOf_distinguishedInvolution_mul_t_of_psu3Target`
+   の証明 (161-350) を読み、標準位置同型の切り出しが可能か実測する。
+2. 切り出せたら (A1) → `hcent` → Galois → coprime 降下 → `hVW`。
+3. → `exists_standardModel` for `qhyp` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`
+   → 商から `U` へ持ち上げ ⟹ **段 (2) が閉じる**。
