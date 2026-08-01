@@ -1157,6 +1157,28 @@ theorem standingData_centralizerQuotient {m : ℕ} (M : hyp.QuotientFieldModel m
   obtain ⟨h5, hM⟩ := hdata z hzW hz1
   exact ⟨n, hn, hQ0card, hcardQ, hst, hQsuzBar, h5, hM⟩
 
+/-- **`P ∩ U ≤ Z(U)`** (Peterfalvi Part II, Ch. IV §4, step (1), p. 132).
+
+Statement (1) of §4 reads `U/(P ∩ U) ≅ PSU(3, ℓ)` while its proof produces
+`U/Z(U) ≅ PSU(3, ℓ)` together with `Z(U) ⊆ P`.  The two agree, and this is the free
+half: `U ≤ C_G(P)`, so every element of `U` centralizes `P`, hence `P ∩ U` is central in
+`U`.  (The other half is step (1)'s `Z(U) ⊆ P`, `eq_P_of_centralizes`.) -/
+theorem mem_center_primeComplementResidual_of_mem_P
+    {x : ↥(Subgroup.centralizer ((s4.P : Set G)))}
+    (hxU : x ∈ Subgroup.primeComplementResidual 2
+      (Subgroup.centralizer ((s4.P : Set G))))
+    (hxP : (x : G) ∈ s4.P) :
+    (⟨x, hxU⟩ : ↥(Subgroup.primeComplementResidual 2
+        (Subgroup.centralizer ((s4.P : Set G))))) ∈
+      Subgroup.center ↥(Subgroup.primeComplementResidual 2
+        (Subgroup.centralizer ((s4.P : Set G)))) := by
+  rw [Subgroup.mem_center_iff]
+  intro u
+  apply Subtype.ext
+  apply Subtype.ext
+  exact (Subgroup.mem_centralizer_iff.mp
+    ((u : ↥(Subgroup.centralizer ((s4.P : Set G)))).2) (x : G) hxP).symm
+
 /-! ### `t` lives in `U`
 
 Ch. IV §4 works with `f₁`, `h₁` "relative to `U`, `U ∩ H` and `t`" (p. 133) — the *same*
