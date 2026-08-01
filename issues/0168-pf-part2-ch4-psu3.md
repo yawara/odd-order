@@ -4622,3 +4622,54 @@ repo が `C_G(P)/N` を選んだのは (57)(58) で既存構成 `centralizerQuot
    (`N = C_D(P) ⊓ C(C_Q(P))`、`Z(U) ⊆ P`)。一致すれば (81) の懸念自体が消える。
    ⚠ **こちらを先に確認する** — 安ければ既存資産が全部そのまま使える。
 3. 決着後: `hVW` → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
+
+## 2026-08-01 (83): 🧭 hub 裁定 — §3 の適用先は **標準モデル `standardPermGroup n`**
+
+### 実測 1: `P ∩ U = Z(U)` (landing)
+
+`mem_center_primeComplementResidual_of_mem_P` — `U ≤ C_G(P)` なので `U` の元は `P` を
+中心化し、`P ∩ U ≤ Z(U)`。逆は段 (1) の `Z(U) ⊆ P`。
+⟹ **書籍の `U/(P ∩ U)` は `U/Z(U)` そのもの**で、repo は
+`CentralizerPSUData.residualQuotientEquiv : (U ⧸ Z(U)) ≃* standardPermGroup n` を
+既に持っている。(82) の案 (b) が指す商は新規構成でなく**既存**だった。
+
+### 実測 2: `C_G(P)/N` 経路では `hVW` が出ない (再確認)
+
+`qhyp.V = π(V ⊓ C_G(P))` (coprime 降下、(76)) なので `hVW` は
+**`C_V(P) ≤ P ⊔ W`** と同値 (Galois 経由)。書籍が主張するのは `V ∩ U ⊆ P × C_W(P)`
+だけで、`U = O^{2'}(C_G(P))` は `C_G(P)` に**奇指数で真に含まれうる**。
+⟹ `C/N` 経路では一般に `hVW` は取れない。
+
+### 🧭 裁定: §3 は `standardPermGroup n` 上の `Hypothesis` に当てる
+
+**理由**:
+1. `residualQuotientEquiv` で `U/Z(U) ≃* standardPermGroup n` が既にある
+   (新規の商構成が不要)。
+2. `standardPermGroup n` は `Unital n` に**忠実 2 重推移**に作用する
+   (`standardPermGroup_isMultiplyPretransitive`、`Equiv.Perm` の部分群なので忠実) ⟹
+   (A1)-(A2) が既存資産で埋まる。
+3. **`hVW` が標準モデルでは定理になる**: `D` = トーラス、`V = C_D(weyl)` = ノルム 1 部分、
+   `W = D ⊓ C(Q₀)`。今セッションの
+   `commute_rootHom_of_commute_weylElement` (ノルム 1 トーラス元は根群の対合を中心化)
+   がそのまま `V ≤ W` を与え、`W_le_V` と併せて `V = W`。
+   ⟹ (82) で「弱められない」と確定した `hVW` が、正しい対象では**自然に成り立つ**。
+4. 書籍自身が Ch. III §3 で「`Q ⋊ KW` を `S₁ ⋊ K₁W₁` と同一視する」と書いており、
+   標準モデルで議論するのが原文の流儀。
+
+⚠ **未確認**: `Hypothesis (standardPermGroup n) (Unital n)` は repo に**まだ無い**
+(grep 済)。これが次の作業単位。
+
+### ⚠ 次セッションはここから
+
+1. **`Hypothesis (standardPermGroup n) (Unital n)` を構成する**。
+   フィールドの見当:
+   * `basept := Unital.infinity n`、`doubly_transitive := standardPermGroup_isMultiplyPretransitive`
+   * `H := standardBorel n` (= `stabilizer ∞`、`standardBorel_eq_infinityStabilizer`)
+   * `Q := standardRootSubgroup n`、`D := torus` (`psuTorusHom` の range)
+   * `t := weylElement n` (`weylElement_sq_eq_one`、`t ∉ H` は `weylElement • ∞ = origin ≠ ∞`)
+   * `Q_inf_D_eq_bot` / `Q_mul_D_eq_H` = `mem_standardBorel_iff_existsUnique_root_torus`
+   * `D_odd` = `orderOf_psuTorus_odd` 系、`Q_even` = `natCard_standardRootSubgroup`
+   * (A3) `two_rank_ge_two` = 根群の中心 `Ω₁(S₀)` は位数 `2ⁿ ≥ 4` の elementary abelian
+2. その上で `V = W` を `commute_rootHom_of_commute_weylElement` から証明する。
+3. `residualQuotientEquiv` で `U/Z(U)` へ transport し、§3 の endpoint を当てる。
+4. → 段 (2) → 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
