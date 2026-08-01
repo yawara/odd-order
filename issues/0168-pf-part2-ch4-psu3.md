@@ -5072,3 +5072,53 @@ Hypothesis.ofMulEquiv (h : Hypothesis A Λ) (e : A ≃* B) (f : Λ ≃ Λ')
 2. `Nat.card (U ⧸ Z(U)) < Nat.card G` を示す (`U ≤ C_G(P) ≤ G`、`Z(U) ≠ ⊥` か
    `C_G(P) < G`)。
 3. `ih` を供給し `exists_standardModel` を呼ぶ。
+
+## 2026-08-01 (93): 🎯 `standardHypothesisULift` — universe の壁を実際に越えた
+
+(フルビルド green 4988 jobs・lint 純ゼロ)
+
+```
+standardHypothesisULift (n) (hn : 1 < n) :
+  Hypothesis (standardPermGroup n) (ULift.{w} (Unital n)) :=
+  (standardHypothesis n hn).ofMulEquiv (MulEquiv.refl _) Equiv.ulift.symm fun _ _ => rfl
+```
+
+⚠ 実測結果:
+* `ULift.mulAction'` (`Mathlib/Algebra/Module/ULift.lean:61`) が
+  `MulAction R (ULift M)` を与える (`MulAction.compHom` 不要)。
+* 同変性 `Equiv.ulift.symm (m • a) = m • Equiv.ulift.symm a` は **`rfl`**。
+* 群側は恒等同型なので部分群は一切動かない。
+
+持ち上げ済の事実 (すべて (86)-(89) からの transport):
+`standardHypothesisULift_V_eq_W` / `natCard_standardHypothesisULift_Q0` (`= 2ⁿ`) /
+`natCard_standardHypothesisULift_Q` (`= |Q₀|³`) /
+`standardHypothesisULift_orderOf_distinguishedInvolution_mul_t` (`= 3`) /
+`exists_ne_one_mem_standardHypothesisULift_W`。
+
+⚠ 実装メモ: `standardHypothesisULift` は素の `def` なので
+`rw [Hypothesis.ofMulEquiv_natCard_Q0]` は**当たらない** (unfold されない)。
+`exact` / `calc` の**項モード**で書けば defeq で通る。
+
+### ⟹ §4 が使える形になった
+
+`exists_standardModel` の前提のうち **`ih` 以外はすべて `standardHypothesisULift` について
+証明済**。あとは:
+
+1. `ih : TheoremAInductionBelow (standardPermGroup n) (ULift.{v} (Unital n))` を
+   ambient `ih : TheoremAInductionBelow G Ω` から供給する。
+   ⚠ universe は合った (`Ω : Type v`、`ULift.{v} (Unital n) : Type v`) が、**群側**は
+   `standardPermGroup n : Type 0` と `G : Type u` で**まだ合わない**。
+   ⟹ 群も `ULift` するか、`residualQuotientEquiv.symm` で `U/Z(U) : Type u` へ移すか。
+   **後者が本筋** (書籍の対象そのもの)。
+2. `Nat.card (U ⧸ Z(U)) < Nat.card G`。
+3. → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2)。
+
+### ⚠ 次セッションはここから
+
+1. **群側の transport**: `hU := standardHypothesisULift.ofMulEquiv residualQuotientEquiv.symm (Equiv.refl _) _`
+   で `Hypothesis (U ⧸ Z(U)) (ULift.{v} (Unital n))` を作る。
+   ⚠ `residualQuotientEquiv` は `CentralizerPSUData` のフィールドなので、§4 の枝データ
+   から取り出す形になる。同変性 `hf` は `Equiv.refl` + 作用の定義から
+   (作用は `MulAction.compHom` で引き戻す必要がある — 要実測)。
+2. `Nat.card (U ⧸ Z(U)) < Nat.card G` → `ih` 供給。
+3. → `exists_standardModel` 以降。
