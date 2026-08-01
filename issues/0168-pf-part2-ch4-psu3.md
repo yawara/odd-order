@@ -1413,13 +1413,20 @@ p.131 で (4) の証明を読み切った。骨格:
 ⟹ `stepThree` の `σ⁻¹α` は `α`。⚠ 当初「正規化の差」として記録した 2 点は
 **解消**した (`stepThree` の docstring も訂正済)。
 
-🔶 残る配線: 上記「適用」の 2 本 (`a^d = a·θ_model(a)` と `a^d = σ(a)τ(a)`) を
-repo の `hdiagscale`/`hsemi`/`hequiv'`/`exists_scalingPair` から実際に取り出す
-plumbing。数学は済んでいる。
+✅ **配線も完了** — `thetaModel_eq_id_on_frobFixed` (2026-08-01)。
+`hsemi` と `hscaleQ0` を `x = y = 1` で評価して `μ(k)·θ(μ(k)) = μ(k)^d` を出し
+(非等方性 `φ(1,1) ≠ 0` が正当化)、`hpair` の `σ(μ(k))τ(μ(k)) = μ(k)^d` と
+突き合わせ、`μ(K) = F^×` で `F` 全体に広げて `eq_id_of_sq_eq_mul_on` へ。
+
+仮説の出所: `hsemi`/`haniso` = `exists_standardModel` の第 1・2 節 /
+`hpair` = `exists_scalingPair_of_lemmaFiveSetup` / `hστ` = `stepThree`
+(`σ.symm (τ a) = a` から `τ a = σ a`)。
+🔶 **残るのは `hscaleQ0` を `hdiagscale` から取り出す 1 本のみ**
+(`hdiagscale` の仮説「`Q₀` 上のスケールが `b` 倍」を `hequiv'` の `μ^d` で満たす)。
 
 ### ⚠ 次の一手
 
-1. 上記の plumbing (2 本の `a^d` 表示を取り出して `eq_id_of_sq_eq_mul_on` に渡す)。
+1. `hscaleQ0` を `hdiagscale` + `hequiv'` から取り出す (上記、残り 1 本)。
 2. **PSU(3,q) unipotent 座標と `BilinearTwistedProduct φ` の橋渡し**
    (`ProjectiveUnitary/*` の実測から)。§3 (4)(5) と章末の同型の共通土台。
 3. §3 (4) 本体 (骨格は上記のとおり確定済)。
