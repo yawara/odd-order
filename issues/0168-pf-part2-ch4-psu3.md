@@ -3756,3 +3756,41 @@ ambient の orderOf (s·t) = 3  +  exponent 判別子 (48)(49)
 
 上の表の 5 前提を 1 つずつ実測して埋め、`exists_standardModel` for `qhyp` を組む。
 その後は (60) の鎖で `hcover` → `corollaryTwo_of_stepFour` → 段 (2) が閉じる。
+
+## 2026-08-01 (62): 🔍 `CentralizerPSUData` が `exists_standardModel` の前提を**ほぼ全部持っていた**
+
+`CentralizerPSUData` (`CentralizerTrichotomy.lean:144-175`) の全フィールドを実測:
+
+| フィールド | 内容 | §4 での用途 |
+|---|---|---|
+| `residualQuotientEquiv` | `(O^{2'}(C) ⧸ Z(·)) ≃* ProjectiveUnitary.standardPermGroup n` | 段 (1) の `U/Z(U) ≅ PSU(3,ℓ)` |
+| `cQEquivRoot` | `C_Q(X) ≃* ProjectiveUnitary.RootGroup n` | PSU(3,ℓ) 構造事実の供給元 |
+| `distinguishedProduct_order` | `orderOf (s·t) = 3` | 枝選択の確認 |
+| **`cQ_isSuzuki2Group`** | `IsSuzuki2Group ↥(C_Q(X))` | ⟹ `sq_ne_one_of_not_mem_Q0` の `hQsuz` |
+| **`natCard_cQ0_eq_baseField`** | `\|C_{Q₀}(X)\| = \|BaseField n\|` (= `2^n`) | ⟹ `hQ0card` |
+| **`natCard_cQ_eq_cQ0_cube`** | `\|C_Q(X)\| = \|C_{Q₀}(X)\|³` | ⟹ `hcardQ` |
+| `natCard_cQ_eq_baseField_cube` | `\|C_Q(X)\| = \|BaseField n\|³` | 同上の別形 |
+
+⟹ **`exists_standardModel` が要る 6 前提のうち 4 つ (`hst`, `hm`, `hQ0card`,
+`hcardQ`) が枝データから直接出る**。残りは `inductionHypothesis` の継承と `x₀`。
+
+⚠ 1 点だけ翻訳が要る: これらは `C_Q(X)` / `C_{Q₀}(X)` (= `hyp.Q.subgroupOf C` 等)
+についての主張で、商 `qhyp.Q` そのものではない。`N ≤ C_D(X)` かつ `Q ⊓ D = 1` なので
+`C_Q(X) → C_G(X)/N` は単射のはずで、位数はそのまま移る (**要実測**)。
+
+### 段 (2)(b) の前提表 (最終形)
+
+| 前提 | 出どころ | 状態 |
+|---|---|---|
+| `hst` | `orderOf_distinguishedInvolution_mul_t_of_psu3Target` (61) | ✅ |
+| `hm : n ≠ 0` | `data.one_lt_n` | ✅ |
+| `hQ0card` | `natCard_cQ0_eq_baseField` + `\|BaseField n\| = 2^n` | ✅ (要位数補題) |
+| `hcardQ` | `natCard_cQ_eq_cQ0_cube` | ✅ |
+| `inductionHypothesis` | `card_centralizerActionQuotient_lt` から継承 | ⚠ 要実測 |
+| `x₀` | `exists_involution_mem_center_Q` の商版 | ⚠ 要実測 |
+| `C_Q(X) ≅ qhyp.Q` の位数移送 | `centralizerQuotientHypothesisA1` の構成 | ⚠ 要実測 |
+
+### ⚠ 次セッションはここから
+
+上表の ⚠ 3 つを実測して埋め、`exists_standardModel` for `qhyp` を組む。
+そこから先は (60) の鎖で段 (2) が閉じる。
