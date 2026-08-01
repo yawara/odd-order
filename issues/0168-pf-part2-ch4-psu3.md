@@ -4229,3 +4229,54 @@ Ch. III §1 Proposition (p.117) 「`F/Z(F)` は `PSU(3,ℓ)` に同型でない�
 3. (A) `V̄ ≤ C(Q̄₀)` — 同じ辞書で。
 4. → `psu3Numerics_and_standingData_centralizerQuotient` の最後の入力
    → `exists_standardModel` for `qhyp` → 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
+
+## 2026-08-01 (74): 🎯 `C_W(P) ≠ 1` landing — 段 (2) の `ζ ∈ W#` が出た
+
+`SectionFourSetup.exists_ne_one_mem_W_centralizer :
+ ∃ w ∈ hyp.W, w ≠ 1 ∧ w ∈ Subgroup.centralizer (s4.P : Set G)`
+
+⚠ **(56) の読みが正しかった**: 位数 `(ℓ+1)/(ℓ+1,3)` の計算は**一切要らない**。
+PSU(3,ℓ) からの入力は Ch. III §1 の `exists_mem_residual_commute_Q0` 1 本だけ
+(「`U/Z(U)` で非自明・奇位数、かつ `C_{Q₀}(P)` を中心化する `x ∈ U` が在る」)。
+
+### 証明の骨 (5 段)
+
+1. `x` は distinguished involution `s` を中心化 (`s ∈ C_{Q₀}(P)`) ⟹
+   `x ∈ C_G(s) ≤ H` (`centralizer_le_H_of_mem_Q`) ⟹
+   `x = q v` (`q ∈ Q`, `v ∈ V`; `exists_mem_Q_mem_V_of_mem_H_of_commute_distinguishedInvolution`)
+2. **新補題 `mem_centralizer_of_qv_decomposition`** — `q`, `v` とも `P` を中心化。
+   `C_H(s) = QV` は `Q ⊓ V ≤ Q ⊓ D = ⊥` により**一意分解**。`a ∈ X ≤ V` は
+   `Q` を正規化 (`a ∈ H`) し、`V = C_D(t)` も正規化する (`a` は `t` を中心化)。
+   ⟹ `x = q v` を `a` で共役すると第二の分解になり、一意性で `q^a = q`, `v^a = v`。
+3. Galois の定理 `centralizer_V_centralizer_Q0` で `v ∈ P ⊔ W`
+   (`v` が `C_{Q₀}(P)` を中心化することは `x` の性質 + `Q0_le_centralizer_Q` から)
+4. **新補題 `D_le_normalizer_W`** (`W ⊴ D` = `KCyclic.lean:141` の instance から) +
+   `Subgroup.coe_mul_of_left_le_normalizer_right` ⟹ `P ⊔ W = P·W` ⟹ `v = p ζ`
+5. `ζ = p⁻¹ v ∈ C_G(P)` (`P` は可換ゆえ `P ≤ C_G(P)`、`v ∈ C_G(P)` は段 2)。
+   `ζ = 1` なら `v ∈ P` が `U` の中心に入り `x` の像 = 2-元 `q` の像 ⟹
+   非自明・奇位数と矛盾 (`false_of_W_eq_bot` 末尾と同じ parity 論法)。
+
+### 段 (2) の残り (更新)
+
+| 主張 | 状態 |
+|---|---|
+| ambient `W ≠ 1` | ✅ (73) |
+| **`C_W(P) ≠ 1`** | ✅ **今回** |
+| 商で `ζ̄ ≠ 1` (= `ζ ∉ N`) | ⚠ 未 |
+| (A) `V̄ ≤ C(Q̄₀)` (= `hVW : qhyp.V = qhyp.W`) | ⚠ 未 |
+| §2/§3 の standing data (商) | ✅ (71) |
+| §3 の段 (4) 鎖 → `corollaryTwo_of_stepFour` | ⚠ 配線 |
+| 商 → `U` 持ち上げ + `IsFGH.eq_of_le` | ⚠ 未 |
+
+### ⚠ 次セッションはここから
+
+1. **`ζ ∉ N`** — `N = (C_H(P)).normalCore` は `C_D(P)` に含まれる (`hNleD`) 奇位数核。
+   `ζ ∈ C_W(P) ≤ C_D(P)` なので `ζ ∈ N` はありえなくはない ⟹ 要検討。
+   ⚠ 代替: `qhyp.W` の元を直接作るのでなく、`ζ` の像が `qhyp.W` に落ちることを
+   `W = D ⊓ C(Q₀)` (72) 経由で示し、非自明性は別途 (例えば `|W̄|` の下界) で取る。
+2. **(A) `V̄ ≤ C(Q̄₀)`** — `V_eq_W_iff_le_centralizer_Q0` (72) で `hVW` に化ける。
+   材料は段 2 と同じ「`V ∩ U` の元は `P × C_W(P)` に入る」= `inf_le_sup_centralizer_W`
+   で、その `hcent`/`hfac` を今回の `mem_centralizer_of_qv_decomposition` +
+   `D_le_normalizer_W` で作れる可能性が高い (要実測)。
+3. → `psu3Numerics_and_standingData_centralizerQuotient` の最後の入力
+   → `exists_standardModel` for `qhyp` → 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
