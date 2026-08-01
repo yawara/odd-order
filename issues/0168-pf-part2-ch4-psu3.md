@@ -5995,3 +5995,43 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
 3. そのうえで §2/§3 の数値仮説を内在版で供給
    (`|Q̄| = |C_Q(P)| = ℓ³` は `natCard_cQ_eq_baseField_cube`、
    `|Q̄₀| = ℓ` は `natCard_cQ0_eq_baseField`、Suzuki 2-群性は `cQ_isSuzuki2Group`)。
+
+## 2026-08-02 (113): 🎯 `Hypothesis.ofRankOneSetup` — 経路 B の主定理が landing
+
+`rankOneSetup` の**逆**: `Setup M Q D t` + (`M.normalCore = ⊥` / `|Q|` even /
+`|D|` odd / (A3)) ⟹ `Hypothesis L (L ⧸ M)`。
+
+2-推移性は (112) の `Setup.isMultiplyPretransitive_two` がそのまま与え、
+残りは全部 `Setup` のフィールドから出た:
+
+| フィールド | 出どころ |
+|---|---|
+| `H_def` | `MulAction.stabilizer_quotient` |
+| `D_def` | `Setup.D_eq_inf_map_conj` (110) |
+| `Q_normal_in_H` | `split` + `DQ` (`d⁻¹` 版) |
+| `Q_inf_D_eq_bot` | `split` の一意性 (`x·1` と `1·x` の 2 通り) |
+| `Q_mul_D_eq_H` | `split` |
+| `faithful` | `Subgroup.normalCore_eq_ker` + 仮説 |
+
+⟹ **経路 A (transported `hyp'` との三つ組照合) は不要になった**。
+`U/Z(U)` は `setup_residualQuotient` (109) から**自前の** `Hypothesis` を持つ。
+
+⚠ 実測メモ (2 回目、記憶に残すこと): `∃!` を `obtain ⟨-, -, huniq⟩` で受けると
+**証人を `-` で捨てるため `huniq` ごと消える** (`huniq` の型が証人に依存)。
+証人には必ず名前を付ける。
+
+### ⚠ 次セッションはここから — `ofRankOneSetup` を `U/Z(U)` に当てる
+
+供給すべき 4 仮説:
+
+| 仮説 | 見込み |
+|---|---|
+| `\|Q̄\|` even | `π(Q∩U) ≅ C_Q(P)` が非自明 2-群 (`cQ_isPGroup` + `C_Q(P) ≠ 1`) |
+| `\|D̄\|` odd | `D∩U` の商、`D_odd` から (商の位数は約数) |
+| (A3) | §4 の `hA3` を `U/Z(U)` へ (⚠ 像が位数 4 の初等可換のままか要確認) |
+| `M̄.normalCore = ⊥` | ⚠ **要調査**。`normalCore_subgroupOf_normalClosure_cQ_eq_center` (`CentralizerResidual.lean:72`) が近い形 — `U/Z(U)` の忠実性はまさに `Z(U)` で割った理由なので出るはず |
+
+そのうえで §2/§3 の数値仮説を内在版で供給:
+`\|Q̄\| = \|C_Q(P)\| = ℓ³` (`natCard_cQ_eq_baseField_cube`)、
+`\|Q̄₀\| = ℓ` (`natCard_cQ0_eq_baseField`)、Suzuki 2-群性 (`cQ_isSuzuki2Group`)。
+⚠ `Q̄₀` は内在 `Hypothesis` から導かれる量なので、`π(Q₀∩U)` と一致するかを先に確認する。
