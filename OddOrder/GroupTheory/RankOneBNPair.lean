@@ -48,6 +48,8 @@ The chapter uses these mappings to pin down `G` in the characterization of
 * `Setup.restrict` — a setup restricts to a subgroup containing `t` whose intersection
   with `Q` absorbs the `Q`-parts of the two decompositions.
 * `Setup.quotient` — and descends to the quotient by a normal subgroup of `D`.
+* `Setup.D_eq_inf_map_conj` — `D` is the two-point stabilizer `M ∩ M^t`, which is how the
+  standing hypothesis (A1)–(A3) states it.
 * `IsFGH.dOrbitRel_f`, `IsFGH.dOrbitRel_fj_cube` — `⟨f, j⟩` acts on the `D`-orbits of
   `Q^#` as a quotient of the dihedral group of order `6`.
 * `coordsEquiv`, `coords_smul_t_some`, `coords_smul_some_of_mem_M` — the permutation
@@ -528,6 +530,52 @@ theorem Setup.quotient (hS : Setup M Q D t) {N : Subgroup L} [N.Normal] (hND : N
     refine hS.tconj q hq hq1 ((hmem M hNM (t * q * t)).mp ?_)
     rw [map_mul, map_mul]
     exact hc
+
+/-- **`D` is the two-point stabilizer `M ∩ M^t`.**
+
+`Setup` posits `D` through its properties — `t` normalizes it and `M = Q ⋊ D` — rather
+than by the formula, but the formula follows: `D ≤ M^t` because `t d t ∈ D ≤ M`, and
+conversely an `x = q d` of `M` with `t x t ∈ M` forces `t q t ∈ M`, hence `q = 1` by
+`tconj`.
+
+This is what identifies a `Setup` with the `D` of the standing hypothesis (A1)–(A3),
+whose `D_def` field is exactly this equation. -/
+theorem Setup.D_eq_inf_map_conj (hS : Setup M Q D t) :
+    D = M ⊓ M.map (MulAut.conj t).toMonoidHom := by
+  have htt : t * t = 1 := hS.invol
+  refine le_antisymm ?_ ?_
+  · intro d hd
+    refine Subgroup.mem_inf.mpr ⟨hS.DM hd, ⟨t * d * t, hS.DM (hS.Dstab d hd), ?_⟩⟩
+    change t * (t * d * t) * t⁻¹ = d
+    rw [hS.tinv]
+    calc t * (t * d * t) * t = (t * t) * d * (t * t) := by group
+      _ = d := by rw [htt, one_mul, mul_one]
+  · intro x hx
+    obtain ⟨hxM, y, hyM, hxy⟩ := Subgroup.mem_inf.mp hx
+    change t * y * t⁻¹ = x at hxy
+    rw [hS.tinv] at hxy
+    obtain ⟨⟨q, d⟩, hqd, -⟩ := hS.split x hxM
+    have htxt : t * x * t ∈ M := by
+      have hx : t * x * t = y := by
+        rw [← hxy]
+        calc t * (t * y * t) * t = (t * t) * y * (t * t) := by group
+          _ = y := by rw [htt, one_mul, mul_one]
+      rw [hx]
+      exact hyM
+    have htqt : t * (q : L) * t ∈ M := by
+      have hsplit : t * x * t = (t * (q : L) * t) * (t * (d : L) * t) := by
+        rw [hqd]
+        calc t * ((q : L) * (d : L)) * t
+            = t * (q : L) * (t * t) * ((d : L) * t) := by rw [htt]; group
+          _ = (t * (q : L) * t) * (t * (d : L) * t) := by group
+      have hdM : t * (d : L) * t ∈ M := hS.DM (hS.Dstab (d : L) d.2)
+      have := M.mul_mem htxt (M.inv_mem hdM)
+      rwa [hsplit, mul_assoc, mul_inv_cancel, mul_one] at this
+    have hq1 : (q : L) = 1 := by
+      by_contra hc
+      exact hS.tconj (q : L) q.2 hc htqt
+    rw [hqd, hq1, one_mul]
+    exact d.2
 
 /-! ## The three canonical factorizations
 
