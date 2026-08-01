@@ -4484,3 +4484,39 @@ coprime 降下 (76) で `V̄ ≤ W̄`、`W_le_V` で **`hVW : qhyp.V = qhyp.W`**
 2. 切り出せたら (A1) → `hcent` → Galois → coprime 降下 → `hVW`。
 3. → `exists_standardModel` for `qhyp` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`
    → 商から `U` へ持ち上げ ⟹ **段 (2) が閉じる**。
+
+## 2026-08-01 (80): 🎯 (A) の model 側を**任意の入替対合**へ一般化 — 標準位置問題が消えた
+
+(79) で「群側は `(S, τ)` を標準位置へ合わせる必要がある (= `CentralizerPSUDistinguished.lean`
+の 350 行を切り出す)」と書いたが、**model 補題を一般化する方が正しかった**。
+
+`commute_rootHom_of_mem_standardBorel_of_commute_swap (hn : 0 < n)
+ (htinf : tau • ∞ = origin) (htorig : tau • origin = ∞)
+ (hb : b ∈ standardBorel n) (hc : Commute tau b) (hu : u ^ 2 = 1) :
+ Commute b (rootHom n u)`
+
+⚠ **一般化が必須だった理由**: `orderOf_distinguishedInvolution_mul_t_of_psu3Target` の
+証明 (225-330) を実測すると、`Q` を標準根部分群に合わせても `t` の像は
+**`T₀ · w` (トーラス因子付き)** にしかならない (`z1 = psuTorusHom c₀ * weylElement`)。
+その因子は無害: `tau · w` は `∞`/`origin` を両方固定するので自分もトーラス元、
+トーラスは可換なので共役作用は結局 `psuWeylParameterHom` を通り `torusWeight c = 1`。
+
+* `exists_psuTorusHom_eq_of_fixes_infinity_origin` — 2 点を固定 ⟹ トーラス元。
+* 群側に渡す仮説は **`τ • ∞ = origin` と `τ • origin = ∞` だけ**。
+  `orderOf_distinguishedInvolution_mul_t_of_psu3Target` の証明中の `hz1inf`/`hz1origin`
+  がまさにこの形なので、そこを切り出せば足りる (350 行の全体は不要)。
+
+⟹ **model 側は完全に閉じた**。残りは群側の transport のみ。
+
+### ⚠ 次セッションはここから
+
+1. `CentralizerPSUDistinguished.lean` の `hz1inf` / `hz1origin` (行 289-303) に相当する
+   「`e0`, 根共役 `a`, `z1 = a·e0(t)·a⁻¹` が 2 点を入れ替える」データを public 補題に
+   切り出す (`∃ e0 a, (Q の像の a-共役) = standardRootSubgroup ∧ z1 • ∞ = origin ∧
+   z1 • origin = ∞` の形)。⚠ 全体でなく**この 3 点だけ**でよい。
+2. (A1) 群側: `v ∈ V ⊓ U` の像が Borel に入る (`V ≤ D ≤ H = N_G(Q)`) + `v` が `t` の像と
+   交換する ⟹ 上の model 補題 ⟹ `Z(U)` 奇位数で持ち上げ
+   (`commute_of_commutatorElement_mem_of_coprime_natCard`、手本 = `exists_mem_residual_commute_Q0`)。
+3. `hcent` → Galois → coprime 降下 (76) → **`hVW : qhyp.V = qhyp.W`**。
+4. → `exists_standardModel` for `qhyp` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`
+   → 商から `U` へ持ち上げ ⟹ **段 (2) が閉じる**。
