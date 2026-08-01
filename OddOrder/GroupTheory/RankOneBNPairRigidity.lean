@@ -777,4 +777,100 @@ theorem Setup.exists_conj_eq_triple [Finite L] {M' Q' D' : Subgroup L} {t' : L}
   · rw [map_conj_mul, hMc, map_conj_self (hS'.QM hnQ')]
   · rw [map_conj_mul, hn]
 
+/-! ## Matching the distinguished involution
+
+Two setups sharing `M`, `Q` and `D` have `t₂ t₁ ∈ K₁ = {d ∈ D | t₁ d t₁ = d⁻¹}`, which is
+what Peterfalvi Part II, Ch. IV §4, step (2) (p. 133) means by "the two involutions differ
+by an element of `K`".  The one extra input is `C_Q(D) = 1`, which forces `N_M(D) = D`; for
+`PSU(3, ℓ)` it is `rootHom_range_inf_centralizer_psuTorus_eq_bot`. -/
+
+/-- `N_M(D) = D` when `C_Q(D) = 1`: the `Q`-part of a normalizing element centralizes `D`
+because `⁅q, d⁆ ∈ Q ⊓ D = 1`. -/
+theorem Setup.mem_D_of_map_conj_eq (hS : Setup M Q D t)
+    (hCQD : Q ⊓ Subgroup.centralizer (D : Set L) = ⊥) {a : L} (haM : a ∈ M)
+    (ha : D.map (MulAut.conj a).toMonoidHom = D) : a ∈ D := by
+  obtain ⟨⟨q₀, d₀⟩, hqd, -⟩ := hS.split a haM
+  have hd₀ : D.map (MulAut.conj (d₀ : L)).toMonoidHom = D := map_conj_self d₀.2
+  have hq₀ : D.map (MulAut.conj (q₀ : L)).toMonoidHom = D := by
+    have h := map_conj_mul (q₀ : L) (d₀ : L) D
+    rw [← hqd, ha, hd₀] at h
+    exact h.symm
+  have hcent : (q₀ : L) ∈ Subgroup.centralizer (D : Set L) := by
+    refine Subgroup.mem_centralizer_iff.mpr fun d hd => ?_
+    have hmem : (q₀ : L) * d * (q₀ : L)⁻¹ ∈ D := by
+      rw [← hq₀]; exact ⟨d, hd, rfl⟩
+    have hQmem : (q₀ : L) * d * (q₀ : L)⁻¹ * d⁻¹ ∈ Q := by
+      have h := hS.DQ d⁻¹ (D.inv_mem hd) (q₀ : L)⁻¹ (Q.inv_mem q₀.2)
+      have e : (q₀ : L) * d * (q₀ : L)⁻¹ * d⁻¹
+          = (q₀ : L) * ((d⁻¹)⁻¹ * (q₀ : L)⁻¹ * d⁻¹) := by group
+      rw [e]
+      exact Q.mul_mem q₀.2 h
+    have hbot : (q₀ : L) * d * (q₀ : L)⁻¹ * d⁻¹ ∈ Q ⊓ D :=
+      ⟨hQmem, D.mul_mem hmem (D.inv_mem hd)⟩
+    rw [hS.Q_inf_D_eq_bot, Subgroup.mem_bot] at hbot
+    have hqd' : (q₀ : L) * d * (q₀ : L)⁻¹ = d := mul_inv_eq_one.mp hbot
+    calc d * (q₀ : L) = (q₀ : L) * d * (q₀ : L)⁻¹ * (q₀ : L) := by rw [hqd']
+      _ = (q₀ : L) * d := by group
+  have hq₀bot : (q₀ : L) ∈ Q ⊓ Subgroup.centralizer (D : Set L) := ⟨q₀.2, hcent⟩
+  rw [hCQD, Subgroup.mem_bot] at hq₀bot
+  rw [hqd, hq₀bot, one_mul]
+  exact d₀.2
+
+/-- **The two distinguished involutions differ by an element of `K`** — the input of
+`Hypothesis.exists_mem_K_conj_t_eq`. -/
+theorem Setup.mul_mem_K_of_setup (hS : Setup M Q D t) {t₂ : L} (hS' : Setup M Q D t₂)
+    (hCQD : Q ⊓ Subgroup.centralizer (D : Set L) = ⊥) :
+    t₂ * t ∈ D ∧ t * (t₂ * t) * t = (t₂ * t)⁻¹ := by
+  obtain ⟨⟨a, q⟩, hfac, -⟩ := hS.fact t₂ hS'.tnotmem
+  -- `M^{t₂} = (M^t)^a`, so `D^a = D` and hence `a ∈ D`
+  have hMq : M.map (MulAut.conj (q : L)).toMonoidHom = M := map_conj_self (hS.QM q.2)
+  have hconj : M.map (MulAut.conj t₂).toMonoidHom
+      = (M.map (MulAut.conj t).toMonoidHom).map (MulAut.conj (a : L)).toMonoidHom := by
+    rw [hfac, mul_assoc, map_conj_mul, map_conj_mul, hMq]
+  have hDa : D.map (MulAut.conj (a : L)).toMonoidHom = D := by
+    have hMa : M.map (MulAut.conj (a : L)).toMonoidHom = M := map_conj_self a.2
+    calc D.map (MulAut.conj (a : L)).toMonoidHom
+        = (M ⊓ M.map (MulAut.conj t).toMonoidHom).map
+            (MulAut.conj (a : L)).toMonoidHom := by rw [← hS.D_eq_inf_map_conj]
+      _ = M.map (MulAut.conj (a : L)).toMonoidHom ⊓
+            (M.map (MulAut.conj t).toMonoidHom).map (MulAut.conj (a : L)).toMonoidHom :=
+          Subgroup.map_inf _ _ _ (MulAut.conj (a : L)).injective
+      _ = M ⊓ M.map (MulAut.conj t₂).toMonoidHom := by rw [hMa, hconj]
+      _ = D := hS'.D_eq_inf_map_conj.symm
+  have haD : (a : L) ∈ D := hS.mem_D_of_map_conj_eq hCQD a.2 hDa
+  -- `a ∈ D ≤ M^t` gives `t⁻¹ a⁻¹ t ∈ M`
+  have haMt : (a : L) ∈ M.map (MulAut.conj t).toMonoidHom := by
+    have h := haD
+    rw [hS.D_eq_inf_map_conj] at h
+    exact h.2
+  have hmem : t⁻¹ * (a : L)⁻¹ * t ∈ M := by
+    obtain ⟨m, hmM, hm⟩ := haMt
+    have h1 : (a : L) = t * m * t⁻¹ := hm.symm
+    rw [h1]
+    have e : t⁻¹ * (t * m * t⁻¹)⁻¹ * t = m⁻¹ := by group
+    rw [e]
+    exact M.inv_mem hmM
+  have hq' : t₂⁻¹ * t ∈ M := by
+    rw [hfac]
+    have e : ((a : L) * t * (q : L))⁻¹ * t = (q : L)⁻¹ * (t⁻¹ * (a : L)⁻¹ * t) := by group
+    rw [e]
+    exact M.mul_mem (M.inv_mem (hS.QM q.2)) hmem
+  have hprodM : t₂ * t ∈ M := by rw [← hS'.tinv]; exact hq'
+  have hinv : t⁻¹ * t₂ ∈ M := by
+    have h := M.inv_mem hq'
+    have e : (t₂⁻¹ * t)⁻¹ = t⁻¹ * t₂ := by group
+    rwa [e] at h
+  have hprodMt : t₂ * t ∈ M.map (MulAut.conj t).toMonoidHom := by
+    refine ⟨t⁻¹ * t₂, hinv, ?_⟩
+    change t * (t⁻¹ * t₂) * t⁻¹ = t₂ * t
+    have e : t * (t⁻¹ * t₂) * t⁻¹ = t₂ * t⁻¹ := by group
+    rw [e, hS.tinv]
+  refine ⟨?_, ?_⟩
+  · rw [hS.D_eq_inf_map_conj]
+    exact ⟨hprodM, hprodMt⟩
+  · have e : t * (t₂ * t) * t = t * t₂ * (t * t) := by group
+    rw [e, hS.invol, mul_one]
+    have e2 : (t₂ * t)⁻¹ = t⁻¹ * t₂⁻¹ := by group
+    rw [e2, hS.tinv, hS'.tinv]
+
 end OddOrder.GroupTheory.RankOneBNPair
