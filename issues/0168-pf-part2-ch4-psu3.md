@@ -4176,3 +4176,56 @@ def Q0 : Subgroup G where carrier := {x | x ^ 2 = 1 ∧ x ∈ hyp.H}
    → `exists_standardModel` for `qhyp` → (60) の段 (4) 鎖 → `corollaryTwo_of_stepFour`。
 5. 商から `U` へ持ち上げ + `IsFGH.eq_of_le` ⟹ **段 (2) が閉じる**。段 (3)-(10) は
    landing 済 ⟹ **§4 完成**。
+
+## 2026-08-01 (73): 🎯 §4 の `W ≠ 1` は**既存資産から出た** — Ch. III §1 Prop (p.117)
+
+`CentralizerPSUData.false_of_W_eq_bot` (`StructureOfH/PSUCentre.lean:211`) は
+Ch. III §1 Proposition (p.117) 「`F/Z(F)` は `PSU(3,ℓ)` に同型でない」の形式化で、
+中身は「**Ch. I §3 Prop 1(c) の PSU(3,ℓ) 枝は `W = 1` と両立しない**」。
+
+⟹ §4 段 (1) はまさにその枝なので `W_ne_bot_of_psu3_branch : hyp.W ≠ ⊥` が
+枝データから 4 行で出た (landing 済)。
+
+⚠ `PSU3SectionFourSetup.lean` に `StructureOfH.PSUCentre` の import を追加
+(循環なし、jobs 4599 → 4602)。
+
+### 段 (2) の残り (更新)
+
+書籍 p.133 の `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` を repo に落とすと:
+
+| 部分 | 状態 |
+|---|---|
+| ambient `W ≠ 1` | ✅ **今回** (`W_ne_bot_of_psu3_branch`) |
+| `C_W(P) ≠ 1` | ⚠ 未 |
+| 商で `ζ̄ = π ζ₁ ≠ 1` (= `ζ₁ ∉ N`) | ⚠ 未 |
+| (A) `V̄ ≤ C(Q̄₀)` (= `hVW`) | ⚠ 未 |
+
+⚠ `C_W(P) ≠ 1` は **coprime 作用の一般論では出ない** (奇位数 `W` に位数 `p` の `P` が
+不動点自由に作用しうる)。`P ⊓ W = 1` (`SectionFourSetup` フィールド) も効かない。
+⟹ 書籍どおり **PSU(3,ℓ) の構造**を使うしかない: `(V∩U)/(P∩U)` が `U/(P∩U) ≅ PSU(3,ℓ)`
+の中でノルム 1 トーラス (位数 `(ℓ+1)/(ℓ+1,3) > 1`) に対応すること。
+
+### 使えそうな model 側資産 (実測)
+
+* `ProjectiveUnitary.exists_ne_one_odd_centralizing_involutions_of_sylowTwo (n) (1 < n)
+   (S : Sylow 2 (standardPermGroup n))` (`TorusCentralizer.lean:200`)
+  — **任意の** Sylow 2 に対し「`≠ 1`・奇位数・その全対合を中心化する `g`」を与える。
+* `PSUCentre.lean` の `CentralizerPSUData.exists_mem_residual_commute_Q0` が
+  **その transport の完全な手本** (Sylow.mapEquiv で標準モデルへ移し、`Z(F)` を
+  跨ぐ commutator を `commute_of_commutatorElement_mem_of_coprime_natCard` で潰す)。
+
+⟹ 次の単位は「この transport を `C_W(P) ≠ 1` / `V̄ ≤ C(Q̄₀)` の形で作り直す」こと。
+`exists_mem_residual_commute_Q0` は既に「`x ∈ F` が `C_{Q₀}(X)` を中心化」を与えるので、
+**`x` が `D` に入る (⟹ `x ∈ W`)** ことを言えれば `C_W(P) ≠ 1` に届く可能性が高い
+(`false_of_W_eq_bot` の証明が `x ∈ C_G(s) ≤ H`、`x = q v` (`q ∈ Q`, `v ∈ V`) まで
+やっているので、そこを `W = ⊥` 無しで走らせられるか実測する)。
+
+### ⚠ 次セッションはここから
+
+1. `false_of_W_eq_bot` の証明本体 (`PSUCentre.lean:211-` 以降) を読み、`W = ⊥` を
+   使わない部分 (`x = q v` 分解まで) を切り出せるか実測する。
+2. 切り出せれば `v ∈ V` が `C_{Q₀}(X)` を中心化 ⟹ `v ∈ W ⊓ C_G(X)` で
+   **`C_W(P) ≠ 1` が出る**見込み。
+3. (A) `V̄ ≤ C(Q̄₀)` — 同じ辞書で。
+4. → `psu3Numerics_and_standingData_centralizerQuotient` の最後の入力
+   → `exists_standardModel` for `qhyp` → 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
