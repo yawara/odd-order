@@ -1038,4 +1038,35 @@ theorem eq_one_and_eq_add_inv_of_star {E : Type*} [Field E] [Finite E] (h2 : (2 
   linear_combination hs - (ζ + ζ⁻¹) * X * h2
 
 
+/-- **From the two readings of stage (2) to `b² = ζ + ζ⁻¹ + a⁻²`**
+(Peterfalvi Part II, p. 130, inside §3 (3)).
+
+Cross-multiplying `1/(a² + ζ⁻¹) = ζ a⁻²/(b² + ζ⁻¹)` gives
+`b² + ζ⁻¹ = ζ a⁻²(a² + ζ⁻¹) = ζ + a⁻²`. -/
+theorem sq_eq_of_one_div_eq {E : Type*} [Field E] (h2 : (2 : E) = 0) {a b ζ : E}
+    (hζ : ζ ≠ 0) (ha : a ≠ 0) (hA : a ^ 2 + ζ⁻¹ ≠ 0) (hB : b ^ 2 + ζ⁻¹ ≠ 0)
+    (heq : 1 / (a ^ 2 + ζ⁻¹) = ζ * (a ^ 2)⁻¹ / (b ^ 2 + ζ⁻¹)) :
+    b ^ 2 = ζ + ζ⁻¹ + (a ^ 2)⁻¹ := by
+  have ha2 : (a : E) ^ 2 ≠ 0 := pow_ne_zero 2 ha
+  have hexp : ζ * (a ^ 2)⁻¹ * (a ^ 2 + ζ⁻¹) = ζ + (a ^ 2)⁻¹ := by
+    field_simp
+  rw [div_eq_div_iff hA hB, one_mul, hexp] at heq
+  linear_combination heq - ζ⁻¹ * h2
+
+/-- **`(∗)` from `b² = ζ + ζ⁻¹ + a⁻²`** (Peterfalvi Part II, p. 130, inside §3 (3)).
+
+Raising `b² = (ζ + ζ⁻¹) + X` to the `1 + θ` and comparing with
+`b^{2(1+θ)} = α² + X^{1+θ}` leaves `α² + (ζ+ζ⁻¹)² + (ζ+ζ⁻¹)(X + X^θ) = 0`, which is the
+book's `(∗)` once `(ζ+ζ⁻¹)² = ζ² + ζ⁻²` is expanded.  The input `θ(ζ + ζ⁻¹) = ζ + ζ⁻¹`
+is the book's "as `ζ ∈ W`, `(ζ + ζ⁻¹)^θ = ζ^σ + ζ^{-σ} = ζ + ζ⁻¹`". -/
+theorem star_of_sq_eq {E : Type*} [Field E] (h2 : (2 : E) = 0) (θ : E →+ E)
+    {α ζ X Y : E} (hθw : θ (ζ + ζ⁻¹) = ζ + ζ⁻¹)
+    (hY : Y = (ζ + ζ⁻¹) + X) (hnorm : Y * θ Y = α ^ 2 + X * θ X) :
+    α ^ 2 + ζ ^ 2 + (ζ⁻¹) ^ 2 + (ζ + ζ⁻¹) * (X + θ X) = 0 := by
+  subst hY
+  rw [map_add, hθw] at hnorm
+  linear_combination -hnorm + (ζ * ζ⁻¹ + ζ * X + ζ * θ X + ζ ^ 2 + ζ⁻¹ * X
+    + ζ⁻¹ * θ X + (ζ⁻¹) ^ 2) * h2
+
+
 end OddOrder.Peterfalvi.Appendices.Suzuki
