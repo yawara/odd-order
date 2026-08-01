@@ -1721,6 +1721,39 @@ repo では `FieldModel.mul_conj`) を暗黙に適用して座標を張り替え
 4. §3 (4) 本体 = p.131 の計算 (`(∗∗)` → `x = ζ⁻¹` → `γ(a) = 1/(a+ζ⁻¹)`)。
 5. §3 (5) = p.131 後半 (`KW`-軌道 + (H3) で全 `ρ` へ)。
 
+## 2026-08-01 (10): `χ = c·N` 完成 — 座標の張り替えが閉じた
+
+前節の設計どおり実装完了 (2 コミット)。
+
+| 補題 | 場所 | 内容 |
+|---|---|---|
+| `eq_one_of_sq_eq_one` | `AnisotropicNormForm` | 標数 2 で `z² = 1 ⟹ z = 1` |
+| `notMem_frobFixedSubfield_of_normOne` | 同 | `μ^{q+1} = 1`, `μ ≠ 1` ⟹ `μ ∉ F` |
+| `cocycle_diag_add` / `_smul` / `cocycle_polar_left` / `_right` | 同 | `φ` → (`χ`,`B`) の橋 (2 系で共有) |
+| 🎯 `eq_norm_smul_of_normOne_invariant` | 同 | **3 点評価で `χ = χ(1)·N`** |
+| `cocycle_diag_eq_norm_smul_of_normOne_invariant` | 同 | その `φ` 版 |
+| `cocycle_invariant_W` | `PSU3RootGroupModel` | 余輪体は `μ(W)` で不変 (`centreQuadraticMap_smul_KW` を `hdiagscale` へ) |
+| 🎯 `cocycle_diag_eq_norm` | 同 | **`φ(x,x) = φ(1,1)·x^{1+q}`** (`ζ ∈ W^#` から) |
+
+⟹ 書籍が (3)→(4) で暗黙に行う座標の張り替えが、**モデルの `E` と `KW` 作用を
+動かさずに**得られた。
+
+### ⚠ 次の一手 — ユニタリ座標を `M.E` 上で持つ
+
+(4) の計算に入るには `Q ≃ {(a,b) ∈ E × E : Tr b = N(a)}` が `M.E` 上で要る。
+現在 `RootGroupTwistedCoordinates` / `toTwistedProduct` は `Field n` 専用。2 案:
+
+* **(a)** `RootGroupTwistedCoordinates` を任意の二次拡大 `E` に一般化し
+  (`star` → `qFrobenius E 2 m`)、`HermitianRootGroup E m` を新設。
+  `RootGroup n` はその特殊化 (≃* を 1 本書く)。特殊化債務の解消にもなる。
+* **(b)** `BilinearTwistedProduct φ` 座標のまま書籍の式を翻訳
+  (`y = z + u·N(ω̄)`)。新型は不要だが式が汚い。
+
+⟹ **(a) を採る**のが筋 (章末の `G ≅ PSU(3,q)` でも `Field n` 側が要るので、
+両方を繋ぐ形にしておく)。
+
+その後: (4) 本体 (p.131 の `(∗∗)` 計算) → (5) (`KW`-軌道 + (H3)) → 章の結論。
+
 ## セッション総括 (2026-07-31)
 
 **Ch. IV で形式化されたもの** (すべて sorry 0 / AxiomsCheck OK / lint 0):
