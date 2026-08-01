@@ -178,6 +178,15 @@ theorem kActor_eq_inv {a b : G} (ha : a ∈ hyp.K) (hb : b ∈ hyp.K) (hab : b =
   change hyp.conjQByK ⟨b, hb⟩ = (hyp.conjQByK ⟨a, ha⟩)⁻¹
   rw [show (⟨b, hb⟩ : ↥hyp.K) = (⟨a, ha⟩ : ↥hyp.K)⁻¹ from Subtype.ext hab, map_inv]
 
+/-- `kActor` turns powers into powers, likewise.  §3 (3) needs it at `n = 2`: the scalar
+of `a²` on `Q/Q₀` is the square of that of `a`. -/
+theorem kActor_eq_pow {a b : G} (ha : a ∈ hyp.K) (hb : b ∈ hyp.K) (n : ℕ) (hab : b = a ^ n) :
+    hyp.kActor hb = (hyp.kActor ha) ^ n := by
+  apply Subtype.ext
+  change hyp.conjQByK ⟨b, hb⟩ = (hyp.conjQByK ⟨a, ha⟩) ^ n
+  rw [show (⟨b, hb⟩ : ↥hyp.K) = (⟨a, ha⟩ : ↥hyp.K) ^ n from Subtype.ext (by simpa using hab),
+    map_pow]
+
 /-- Conjugating an element of `Q₀` by `a ∈ K` is `centerKHom` at the corresponding
 actor. -/
 theorem toCenter_conj {m : ℕ} (s : hyp.LemmaFiveSetup m) {a : G} (ha : a ∈ hyp.K)

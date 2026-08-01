@@ -988,13 +988,16 @@ theorem eq_self_of_add_eq_const {F : Type*} [Field F] [Finite F] (h2 : (2 : F) =
   · exact hfix X hX0 hXz
 
 /-- **The last line of §3 (3)** (Peterfalvi Part II, p. 130): `(∗)` with the `θ`-term
-gone reads `α² = (ζ + ζ⁻¹)²`, and squaring is injective in characteristic `2`. -/
-theorem eq_add_inv_of_sq_add_sq {E : Type*} [Field E] (h2 : (2 : E) = 0) {α ζ : E}
-    (hstar : α ^ 2 + ζ ^ 2 + (ζ⁻¹) ^ 2 = 0) : α = ζ + ζ⁻¹ := by
-  have hsq : (α + (ζ + ζ⁻¹)) ^ 2 = 0 := by
-    linear_combination hstar + (α * ζ + α * ζ⁻¹ + ζ * ζ⁻¹) * h2
-  have hzero : α + (ζ + ζ⁻¹) = 0 := pow_eq_zero_iff (two_ne_zero) |>.mp hsq
-  linear_combination hzero - (ζ + ζ⁻¹) * h2
+gone reads `α² = w²`, and squaring is injective in characteristic `2`.
+
+The book's `w` is `ζ + ζ⁻¹`; it is kept abstract because that combination — unlike `ζ`
+itself — lies in the subfield `F` over which the counting of `(∗)` runs. -/
+theorem eq_of_sq_add_sq {E : Type*} [Field E] (h2 : (2 : E) = 0) {α w : E}
+    (hstar : α ^ 2 + w ^ 2 = 0) : α = w := by
+  have hsq : (α + w) ^ 2 = 0 := by
+    linear_combination hstar + α * w * h2
+  have hzero : α + w = 0 := pow_eq_zero_iff (two_ne_zero) |>.mp hsq
+  linear_combination hzero - w * h2
 
 /-- **§3 (3), the field part** (Peterfalvi Part II, p. 130): the book's equation
 
@@ -1002,24 +1005,26 @@ theorem eq_add_inv_of_sq_add_sq {E : Type*} [Field E] (h2 : (2 : E) = 0) {α ζ 
 
 forces `θ = 1` and `α = ζ + ζ⁻¹`.
 
-Since `ζ + ζ⁻¹ ≠ 0`, `(∗)` says exactly that `X + X^θ` is *independent of `X`* on
-`F − {0, z}`, which is the hypothesis of `eq_self_of_add_eq_const`; and once `θ = 1` the
-bracket vanishes in characteristic `2`, leaving `α² = (ζ + ζ⁻¹)²`. -/
-theorem eq_one_and_eq_add_inv_of_star {E : Type*} [Field E] [Finite E] (h2 : (2 : E) = 0)
-    (θ : E →+ E) (hinj : Function.Injective θ) {α ζ z : E}
-    (hζ : ζ + ζ⁻¹ ≠ 0) (hcard : 5 ≤ Nat.card E)
-    (hstar : ∀ X : E, X ≠ 0 → X ≠ z →
-      α ^ 2 + ζ ^ 2 + (ζ⁻¹) ^ 2 + (ζ + ζ⁻¹) * (X + θ X) = 0) :
-    (∀ X : E, θ X = X) ∧ α = ζ + ζ⁻¹ := by
+Stated with `w = ζ + ζ⁻¹` — in characteristic `2` the book's `ζ² + ζ⁻²` *is* `w²` — so
+that every element occurring lies in the subfield `F`, which is the field the counting
+runs over (`X` ranges over the scalars of `K`, and `|F| = q`, not `q²`).
+
+Since `w ≠ 0`, `(∗)` says exactly that `X + X^θ` is *independent of `X`* on `F − {0, z}`,
+which is the hypothesis of `eq_self_of_add_eq_const`; and once `θ = 1` the bracket
+vanishes in characteristic `2`, leaving `α² = w²`. -/
+theorem eq_one_and_eq_of_star {E : Type*} [Field E] [Finite E] (h2 : (2 : E) = 0)
+    (θ : E →+ E) (hinj : Function.Injective θ) {α w z : E}
+    (hw : w ≠ 0) (hcard : 5 ≤ Nat.card E)
+    (hstar : ∀ X : E, X ≠ 0 → X ≠ z → α ^ 2 + w ^ 2 + w * (X + θ X) = 0) :
+    (∀ X : E, θ X = X) ∧ α = w := by
   classical
   haveI : Fintype E := Fintype.ofFinite E
   have hcardE : 5 ≤ Fintype.card E := by rwa [← Nat.card_eq_fintype_card]
   -- `X + X^θ` is the same constant for every admissible `X`
-  have hconst : ∀ X : E, X ≠ 0 → X ≠ z →
-      X + θ X = (α ^ 2 + ζ ^ 2 + (ζ⁻¹) ^ 2) / (ζ + ζ⁻¹) := by
+  have hconst : ∀ X : E, X ≠ 0 → X ≠ z → X + θ X = (α ^ 2 + w ^ 2) / w := by
     intro X h0 hz
-    rw [eq_div_iff hζ]
-    linear_combination hstar X h0 hz - (α ^ 2 + ζ ^ 2 + (ζ⁻¹) ^ 2) * h2
+    rw [eq_div_iff hw]
+    linear_combination hstar X h0 hz - (α ^ 2 + w ^ 2) * h2
   have hθ := eq_self_of_add_eq_const h2 θ hinj hconst hcard
   refine ⟨hθ, ?_⟩
   -- an admissible `X`, at which `(∗)` loses its bracket
@@ -1034,8 +1039,8 @@ theorem eq_one_and_eq_add_inv_of_star {E : Type*} [Field E] [Finite E] (h2 : (2 
   simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hX
   have hs := hstar X hX.1 hX.2
   rw [hθ X] at hs
-  refine eq_add_inv_of_sq_add_sq h2 ?_
-  linear_combination hs - (ζ + ζ⁻¹) * X * h2
+  refine eq_of_sq_add_sq h2 ?_
+  linear_combination hs - w * X * h2
 
 
 /-- **From the two readings of stage (2) to `b² = ζ + ζ⁻¹ + a⁻²`**
@@ -1062,18 +1067,17 @@ theorem eq_add_inv_add_inv_of_mul_inv_eq {E : Type*} [Field E] (h2 : (2 : E) = 0
 
 /-- **`(∗)` from `b² = ζ + ζ⁻¹ + a⁻²`** (Peterfalvi Part II, p. 130, inside §3 (3)).
 
-Raising `b² = (ζ + ζ⁻¹) + X` to the `1 + θ` and comparing with
-`b^{2(1+θ)} = α² + X^{1+θ}` leaves `α² + (ζ+ζ⁻¹)² + (ζ+ζ⁻¹)(X + X^θ) = 0`, which is the
-book's `(∗)` once `(ζ+ζ⁻¹)² = ζ² + ζ⁻²` is expanded.  The input `θ(ζ + ζ⁻¹) = ζ + ζ⁻¹`
-is the book's "as `ζ ∈ W`, `(ζ + ζ⁻¹)^θ = ζ^σ + ζ^{-σ} = ζ + ζ⁻¹`". -/
+Raising `b² = w + X` to the `1 + θ` and comparing with `b^{2(1+θ)} = α² + X^{1+θ}` leaves
+`α² + w² + w(X + X^θ) = 0`, which is the book's `(∗)` with `w = ζ + ζ⁻¹` (in characteristic
+`2`, `w² = ζ² + ζ⁻²`).  The input `θ w = w` is the book's "as `ζ ∈ W`,
+`(ζ + ζ⁻¹)^θ = ζ^σ + ζ^{-σ} = ζ + ζ⁻¹`". -/
 theorem star_of_sq_eq {E : Type*} [Field E] (h2 : (2 : E) = 0) (θ : E →+ E)
-    {α ζ X Y : E} (hθw : θ (ζ + ζ⁻¹) = ζ + ζ⁻¹)
-    (hY : Y = (ζ + ζ⁻¹) + X) (hnorm : Y * θ Y = α ^ 2 + X * θ X) :
-    α ^ 2 + ζ ^ 2 + (ζ⁻¹) ^ 2 + (ζ + ζ⁻¹) * (X + θ X) = 0 := by
+    {α w X Y : E} (hθw : θ w = w)
+    (hY : Y = w + X) (hnorm : Y * θ Y = α ^ 2 + X * θ X) :
+    α ^ 2 + w ^ 2 + w * (X + θ X) = 0 := by
   subst hY
   rw [map_add, hθw] at hnorm
-  linear_combination -hnorm + (ζ * ζ⁻¹ + ζ * X + ζ * θ X + ζ ^ 2 + ζ⁻¹ * X
-    + ζ⁻¹ * θ X + (ζ⁻¹) ^ 2) * h2
+  linear_combination -hnorm + (w * X + w * θ X + w ^ 2) * h2
 
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

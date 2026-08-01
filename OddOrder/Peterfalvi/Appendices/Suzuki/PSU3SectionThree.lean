@@ -523,6 +523,70 @@ theorem stepThree_sq_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   exact eq_add_inv_add_inv_of_mul_inv_eq h2E hAne hZne
     (mul_right_cancel₀ hXb0 (by rw [← mul_assoc] at hA; exact hA.trans hB.symm))
 
+/-- **`b^{2(1+θ)} = α² + a^{-2(1+θ)}`** (Peterfalvi Part II, p. 130, inside §3 (3)):
+the defining relation of `b`, read on `Q₀ ≅ F` and squared.
+
+`stepTen_coord` turns `s^b = y · s^{a⁻¹}` into `α + a^{-(1+θ)} = b^{1+θ}`, where the
+`K`-action on `Q₀` is the integer power `μ(·)^d` and `α` is the ratio
+`centerCoord y / centerCoord s` (the book normalizes `s ↦ (0,1)`, so that the ratio is
+its `α`).  Squaring in characteristic `2` kills the cross term and moves the exponent onto
+`a²`, `b²` — the scalars in which `stepThree_sq_eq` speaks. -/
+theorem stepThree_center_relation {m : ℕ} (s : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    {y a b : G} (hyQ0 : y ∈ hyp.Q0) (haK : a ∈ hyp.K) (hbK : b ∈ hyp.K)
+    (hb : b * hyp.distinguishedInvolution * b⁻¹
+      = y * (a⁻¹ * hyp.distinguishedInvolution * a)) :
+    ((M.mu (hyp.kActor (pow_mem hbK 2), 1) ^ d : M.Eˣ) : M.E)
+      = (hyp.centerCoord s M ι hyQ0 /
+          hyp.centerCoord s M ι hyp.distinguishedInvolution_mem_Q0) ^ 2
+        + (((M.mu (hyp.kActor (pow_mem haK 2), 1) ^ d : M.Eˣ) : M.E))⁻¹ := by
+  have h2E : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  have hadd_sq : ∀ x z : M.E, (x + z) ^ 2 = x ^ 2 + z ^ 2 := fun x z => by
+    linear_combination x * z * h2E
+  have hsQ0 : hyp.distinguishedInvolution ∈ hyp.Q0 := hyp.distinguishedInvolution_mem_Q0
+  have hcs : hyp.centerCoord s M ι hsQ0 ≠ 0 := by
+    rw [Ne, hyp.centerCoord_eq_zero_iff]
+    exact hyp.distinguishedInvolution_ne_one
+  -- the scalar of `c²` is the square of that of `c`
+  have hsq : ∀ {c : G} (hc : c ∈ hyp.K),
+      ((M.mu (hyp.kActor (pow_mem hc 2), 1) ^ d : M.Eˣ) : M.E)
+        = (((M.mu (hyp.kActor hc, 1) ^ d : M.Eˣ) : M.E)) ^ 2 := by
+    intro c hc
+    rw [hyp.kActor_eq_pow hc (pow_mem hc 2) 2 rfl,
+      show ((hyp.kActor hc) ^ 2, (1 : ↥hyp.W)) = ((hyp.kActor hc, (1 : ↥hyp.W))) ^ 2 from
+        Prod.ext rfl (one_pow 2).symm,
+      map_pow, pow_two, mul_zpow, Units.val_mul, ← pow_two]
+  -- the scalar of `a⁻¹` is the inverse of that of `a`
+  have hinv : ((M.mu (hyp.kActor (hyp.K.inv_mem haK), 1) ^ d : M.Eˣ) : M.E)
+      = (((M.mu (hyp.kActor haK, 1) ^ d : M.Eˣ) : M.E))⁻¹ := by
+    rw [hyp.kActor_eq_inv haK (hyp.K.inv_mem haK) rfl,
+      show ((hyp.kActor haK)⁻¹, (1 : ↥hyp.W)) = ((hyp.kActor haK, (1 : ↥hyp.W)))⁻¹ from
+        Prod.ext rfl inv_one.symm,
+      map_inv, inv_zpow, Units.val_inv_eq_inv_val]
+  -- the relation on `Q₀`, in coordinates
+  have hiff := hyp.stepTen_coord s M ι d hequiv hyQ0 hsQ0 (hyp.K.inv_mem haK) hbK
+  rw [inv_inv] at hiff
+  have hrel := hiff.mp hb.symm
+  rw [hinv] at hrel
+  -- divide by `centerCoord s` and square
+  have hV : ((M.mu (hyp.kActor hbK, 1) ^ d : M.Eˣ) : M.E)
+      = hyp.centerCoord s M ι hyQ0 / hyp.centerCoord s M ι hsQ0
+        + (((M.mu (hyp.kActor haK, 1) ^ d : M.Eˣ) : M.E))⁻¹ := by
+    have hU : ((M.mu (hyp.kActor haK, 1) ^ d : M.Eˣ) : M.E) ≠ 0 := Units.ne_zero _
+    field_simp at hrel ⊢
+    linear_combination -hrel
+  rw [hsq hbK, hsq haK, hV, hadd_sq, ← inv_pow]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
