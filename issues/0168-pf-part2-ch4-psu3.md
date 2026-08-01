@@ -3151,3 +3151,40 @@ p.132 のページ画像で Corollary 1 / Corollary 2 / Remark / §4 冒頭を�
    どう置くか決める。
 2. §4 段 (2)(3)(4) と (5)(6) の供給 → `sectionFour_solve` 以降は landing 済。
 3. Corollary 1 第 2 段 = PGU(3,q) infra。
+
+## 2026-08-01 (44): §4 段 (1) の部品 2 つが既に repo にあった + Artin を一般化
+
+**実測**: `GaloisCentralizer.lean` (403 行) が §4 段 (1) の 2 つの引用をすでに持つ:
+
+| 書籍 (p.132 段 (1)) | repo |
+|---|---|
+| 「`Z(U) ⊂ C_V(C_{Q₀}(P))` ゆえ Galois の定理で `Z(U) ⊂ PW`」 | `centralizer_V_centralizer_Q0 (hPV : P ≤ V) : C_V(C_{Q₀}(P)) = P ⊔ W` ✅ |
+| 「`\|C_{Q₀}(P)\| = ℓ` ゆえ `q = ℓ^p` (`P` が `Q₀` に体自己同型として作用)」 | `natCard_Q0_eq_pow` (下記で一般化) ✅ |
+
+⚠ 前者は書籍が `⊂ PW` と書くところをそのまま `= P ⊔ W` で持っている
+(書籍の Ch. III §1 版 `= P` は `W = 1` の特殊化)。
+
+### `natCard_Q0_eq_pow` — Artin の次数公式を一般化
+
+旧 `natCard_Q0_eq_pow_of_W_eq_bot` は `W = ⊥` を要求していたが、**§4 は `V ≠ W` の
+場合なので `W ≠ 1`** で届かなかった。実際に必要なのは faithful だけで、`W` は
+`V` の `Q₀` への作用の核だから **`X ⊓ W = ⊥`** で十分:
+
+* `natCard_Q0_eq_pow (hXV : X ≤ V) (hXW : X ⊓ W = ⊥) : |Q₀| = |C_{Q₀}(X)|^{|X|}`
+* 証明で `W = ⊥` を使っていたのは `|B| = |X|` の **1 箇所だけ**で、`σ` の全域単射を
+  `X.subgroupOf V` への制限の単射性に置き換えれば済んだ
+  ([[generalize-by-measuring-which-carrier-fields-are-used]] のとおり)。
+* `_of_W_eq_bot` は 1 行の特殊化として残した (consumer = `StructureOfH/WNeBot.lean`)。
+
+⟹ §4 段 (1) の「`q = ℓ^p`」がそのまま使える (`P ∩ W = 1` は §4 前置きが与える)。
+
+### ⚠ 次セッションはここから
+
+段 (1) の残りは:
+1. `U = O^{2'}(C_G(P))` = `primeComplementResidual 2 ↥(C_G(P))` を置く。
+2. Ch. I §3 Prop 1(c) を `C_G(P)` に当てて `U/Z(U) ≅ PSU(3,ℓ)`
+   (`CentralizerTrichotomy` / `CentralizerInductionBridge` 群、要 API 実測)。
+   前提は「(C1) で 2-rank ≥ 2」「`st` の位数 3」「`C_Q(P)` が exponent 4」。
+3. `Z(U) ⊆ P`: `Z(U) ⊆ C_V(C_{Q₀}(P)) = P ⊔ W` (上記) と
+   「`PZ(U)` が `C_Q(P) ⊄ Q₀` を中心化 ⟹ `PZ(U) ∩ W = 1`」。
+⟹ **1. と 3. は既存部品でほぼ書ける**。2. が本体。
