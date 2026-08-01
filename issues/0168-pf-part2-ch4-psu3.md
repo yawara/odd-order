@@ -5878,3 +5878,45 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
 ⚠ `permHom_ker (hS) : (permHom hS).ker = M.normalCore` と
 `permHom_injective (hS) (hcore : M.normalCore = ⊥)` は既に在る
 (`RankOneBNPairRigidity.lean:148,160`)。
+
+## 2026-08-02 (110): 🔑 最後の同定 — **経路 A が閉じることが分かった** (3 段の共役)
+
+(109) で「経路 A は `H` が外の対合に推移的であることを要し未証明」と書いたが、
+**もっと素直に閉じる**。`U/Z(U)` の中で降下 setup `(M̄, Q̄, D̄, π t)` と transported
+`hyp'` の `(H', Q', D', t')` を、**3 段階の共役**で順に合わせればよい:
+
+1. **`Q` を合わせる** — `π(Q∩U)` が Sylow 2 なら Sylow 共役で `Q̄ = Q'`。
+   このとき `M̄ = N(Q̄) = N(Q') = H'` も自動 (**`normalizer_Q_eq_H`**, `Basic.lean:610`;
+   setup 版も同じ論法で出る)。
+2. **`D` を合わせる** — `Q̄` と `M̄` が一致した時点で `D̄`, `D'` はどちらも
+   `M̄ = Q̄ ⋊ ?` の補群。位数が互いに素 (`Q` even / `D` odd) なので
+   **Schur–Zassenhaus の共役性**で `u ∈ Q̄` により `D̄^u = D'`。⚠ `u ∈ Q̄` は
+   `Q̄` と `M̄` を保つので段 1 を壊さない。
+3. **`t` を合わせる** — ここが (109) で詰まっていた所。段 1-2 の後:
+   * `D = M ⊓ M^t` (**今回 landing した `Setup.D_eq_inf_map_conj`**) が両方に成り立つので
+     `M^{π t} = M^{t'}` ⟹ `t' (π t)⁻¹ ∈ N(M) = M` (`normalizer_H_eq_H`)。
+     さらに 2 点安定化群が一致するので `π t = d · t'` なる **`d ∈ D`** が取れる。
+   * `π t` も `t'` も**対合**なので `(d t')² = d · (t' d t') = d · d^{t'} = 1`、
+     すなわち **`d ∈ K`** (`KSet = {x ∈ D : x^t = x⁻¹}`)。
+   * 一方 `e ∈ D` による共役は `t'` を `e⁻¹ t' e = (e⁻¹ e^{t'}) t'` に送るので、
+     達成できる `d` の範囲は写像 **`e ↦ e⁻¹ e^{t'}`** の像。像は `K` に含まれ、
+     ファイバーは `V = C_D(t')` の剰余類なので**像の位数 = `|D|/|V|`**。
+   * ⟹ **`|K| = |D|/|V|`**、すなわち **`D = K V`** (`V = W` の分岐では
+     `exists_mem_K_mem_W_mul` が既に与える形) が言えれば写像は `K` へ**全射**、
+     よって `e ∈ D` で `t` を合わせられる。⚠ 段 1-2 は `e ∈ D ≤ M̄` が
+     `Q̄`(正規) と `M̄` を保つので壊れない。
+
+⟹ 未証明の核は **`|K| = |D|/|V|` (= `D = K V`)** 1 本に落ちた。
+`h_mem_W` (`PSU3StepEighteen.lean:200`) が `hyp.exists_mem_K_mem_W_mul hVW` で
+`D = K W` の分解を実際に使っているので、**素材は在る**。
+
+### ⚠ 次セッションはここから
+
+1. `exists_mem_K_mem_W_mul` の正確な形と `K ⊓ W = 1` の有無を実測
+   (⟹ `|D| = |K||V|`)。
+2. `e ↦ e⁻¹ e^{t}` が `D → K` へ全射であることを (1) から示す
+   (ファイバー = `V`-剰余類、像 ⊆ `K`、位数勘定)。
+3. 段 1 の `π(Q∩U)` が Sylow 2 (位数 `|C_Q(P)| = ℓ³`) を
+   `natCard_cQ_eq_baseField_cube` と `natCard_residualQuotientHypothesis_Q` で示す。
+4. 段 1-3 を合成 ⟹ `Hypothesis.conjugate` で三つ組が完全に一致 ⟹
+   `IsFGH.map` + `corollaryTwo_of_sectionThree` + `IsFGH.eq_of_le` ⟹ **段 (2) 完了**。
