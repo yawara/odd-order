@@ -340,6 +340,49 @@ theorem IsFGH.eq_of_le (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
   exact fgh_eq_of_canonical hS H (hQ' hxQ') hx1 (hQ' hg) (hD' hh) (hQ' hf)
     (H'.eq x hxQ' hx1)
 
+/-- A map defined on a subgroup, read as a map of the ambient group (arbitrarily `1`
+outside).  `IsFGH` only constrains values on `Q^#`, so the choice outside is immaterial. -/
+noncomputable def liftMap (K : Subgroup L) (f' : ↥K → ↥K) : L → L := by
+  classical
+  exact fun x => if hx : x ∈ K then (f' ⟨x, hx⟩ : L) else 1
+
+theorem liftMap_apply {K : Subgroup L} (f' : ↥K → ↥K) {x : L} (hx : x ∈ K) :
+    liftMap K f' x = (f' ⟨x, hx⟩ : L) := by
+  classical
+  exact dif_pos hx
+
+/-- **The `f, g, h` of a subgroup, read in the ambient group.**
+
+A rank-one setup on a subgroup `K` produces mappings `↥K → ↥K`; Peterfalvi Part II,
+Ch. IV §4, step (2) (p. 133) compares them with the ambient ones, which lives in `L`.
+Since `IsFGH` is a statement about elements, pushing along `K.subtype` is all that is
+needed — and it turns `M'.subgroupOf K` into `M' ⊓ K`, which is the form
+`IsFGH.eq_of_le` takes. -/
+theorem IsFGH.ofSubtype {K : Subgroup L} {M' Q' D' : Subgroup L} {tK : ↥K}
+    {f' g' h' : ↥K → ↥K}
+    (H' : IsFGH (M'.subgroupOf K) (Q'.subgroupOf K) (D'.subgroupOf K) tK f' g' h') :
+    IsFGH (M' ⊓ K) (Q' ⊓ K) (D' ⊓ K) (tK : L)
+      (liftMap K f') (liftMap K g') (liftMap K h') where
+  mem := by
+    rintro x ⟨hxQ, hxK⟩ hx1
+    have hx1' : (⟨x, hxK⟩ : ↥K) ≠ 1 := fun hc => hx1 (congrArg Subtype.val hc)
+    obtain ⟨hf, hg, hh⟩ := H'.mem ⟨x, hxK⟩ (Subgroup.mem_subgroupOf.mpr hxQ) hx1'
+    refine ⟨?_, ?_, ?_⟩
+    · rw [liftMap_apply _ hxK]
+      exact ⟨Subgroup.mem_subgroupOf.mp hf, (f' ⟨x, hxK⟩).2⟩
+    · rw [liftMap_apply _ hxK]
+      exact ⟨Subgroup.mem_subgroupOf.mp hg, (g' ⟨x, hxK⟩).2⟩
+    · rw [liftMap_apply _ hxK]
+      exact ⟨Subgroup.mem_subgroupOf.mp hh, (h' ⟨x, hxK⟩).2⟩
+  eq := by
+    rintro x ⟨hxQ, hxK⟩ hx1
+    have hx1' : (⟨x, hxK⟩ : ↥K) ≠ 1 := fun hc => hx1 (congrArg Subtype.val hc)
+    have heq := H'.eq ⟨x, hxK⟩ (Subgroup.mem_subgroupOf.mpr hxQ) hx1'
+    have := congrArg (Subtype.val (p := fun z => z ∈ K)) heq
+    rw [liftMap_apply _ hxK, liftMap_apply _ hxK, liftMap_apply _ hxK]
+    push_cast at this
+    exact this
+
 /-- **The `f, g, h` of a homomorphic image are the images of the ambient ones.**
 
 If `π` carries a rank-one setup into another one — same involution up to `π`, `Q` into

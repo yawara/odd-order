@@ -159,6 +159,29 @@ theorem odd_natCard_map_D_residualQuotient :
     exact Subgroup.card_dvd_of_le inf_le_left
   exact Odd.of_dvd_nat hyp.D_odd (hdvd₁.trans hdvd₂)
 
+/-! ### `f₁`, `h₁` relative to `U`, and their agreement with `f`, `h`
+
+Step (2) ends by reading the conclusion it gets on `U` back inside `G`: "By the uniqueness
+of the canonical form of an element of `G − H`, `f(ω) = f₁(ω)` … and `h(ω) = h₁(ω)`"
+(p. 133).  Formally: the setup `U` inherits produces mappings `↥U → ↥U`, which read in `G`
+(`liftMap`) factor `t x t` with factors in `Q ∩ U ≤ Q` and `D ∩ U ≤ D`; `IsFGH.eq_of_le`
+is exactly the uniqueness the book invokes. -/
+
+/-- **The mappings relative to `U`, `U ∩ H` and `t` exist in `G` and agree with the
+ambient ones on `(Q ∩ U)^#`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133). -/
+theorem exists_fgh_residual_eq {f g h : G → G}
+    (Hfgh : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h) (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))) :
+    ∃ f₁ g₁ h₁ : G → G,
+      IsFGH (hyp.H ⊓ residualImage (G := G) X) (hyp.Q ⊓ residualImage (G := G) X)
+          (hyp.D ⊓ residualImage (G := G) X) hyp.t f₁ g₁ h₁ ∧
+        ∀ x ∈ hyp.Q ⊓ residualImage (G := G) X, x ≠ 1 →
+          f x = f₁ x ∧ g x = g₁ x ∧ h x = h₁ x := by
+  obtain ⟨f₁, g₁, h₁, H₁⟩ := (hyp.rankOneSetup_residual hXD htX hCQ).exists_fgh
+  refine ⟨liftMap _ f₁, liftMap _ g₁, liftMap _ h₁, H₁.ofSubtype, fun x hx hx1 => ?_⟩
+  exact IsFGH.eq_of_le hyp.rankOneSetup Hfgh inf_le_left inf_le_left H₁.ofSubtype hx hx1
+
 /-- `|U/Z(U)| < |G|`, read in `G` — the bound the induction hypothesis restricts along. -/
 theorem natCard_residualImageQuotient_lt (hXV : X ≤ hyp.V) (hX : X ≠ ⊥) :
     Nat.card (↥(residualImage (G := G) X) ⧸
