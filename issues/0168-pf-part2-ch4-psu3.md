@@ -2625,3 +2625,34 @@ p.132 をページ画像で確認した結果、Ch. IV の残りは以下の構�
    閉じれば `corollaryTwo` の `hfive` が外れる。
 2. `RankOneBNPair` の Lemma (`f` が `L` を決める) → Corollary 1。
 3. §4 (p.132-134)。
+
+## 2026-08-01 (30): 🎯 段 (5) 第 2 ケースの配線 landing
+
+新 leaf **`PSU3StepFive.lean`** (196 行、`OddOrder.lean` に配線済)。
+
+**`stepFive_secondCase_elem`**: 第 1 ケース (`hsolved` = `f(ρ)` のファイバー上で
+成り立つ逆元公式) から `ρ s^{a⁻¹}` での公式を出す。
+
+1. `hsolved` を `f(ρ)` 自身に → (H2) `f(f ρ) = ρ` + `inverseFormula_symm` で
+   `f(ρ) = (ρ̄/x, 1/x)` 確定
+2. `hsolved` を `f(ρ)s^a` に → §2 (2) の内側の `f` (座標は `unitaryCoord_mul_conj`)
+3. `sectionTwoStepTwo_coords` + `stepFive_secondCase_at` で締め
+
+**`unitaryCoord_ne_zero`** (`UnitaryCoordinates`): 商座標 ≠ 0 ⟹ ユニタリ座標 ≠ 0。
+
+⟹ `a` が `K` を動けば `ρ s^{a⁻¹}` は `ρ` 自身を除くファイバー全体を掃き、
+`ρ` 自身は 1. の時点で片付いている。**段 (5) の数学は完了**。
+
+### ⚠ 次セッションはここから
+
+1. **段 (5) の最終梱包** — 第 1 ケース (`stepFour_cover` + `stepFive_orbit`) と
+   第 2 ケース (`stepFive_secondCase_elem`) を場合分けで束ね、
+   「全 `ρ ∈ Q − Q₀` で `f(ρ) = (ρ̄/y, 1/y)`」の 1 本にする。
+   ⚠ 場合分けの述語は「`ρ̄` が `μ(KW)` の軌道 `[ω̄]` に居るか」
+   (`orbitOfF`/`QuotientGroup.mk` のレベル)。軌道内なら
+   `exists_conjQHom_quotient_eq_of_coset_eq` (`PSU3OrbitCount`) で `KW`-共役に、
+   軌道外なら `exists_mem_Q0_orbitOfF_eq` で `ρQ₀` 内に取り替え。
+   これが閉じれば `corollaryTwo` の `hfive` が外れる。
+2. `RankOneBNPair` の Lemma (`f` が `L` を決める) → **Corollary 1**。
+3. **§4** (p.132-134、`V ≠ W`)。⚠ Ch. I §3 Prop 1(c) / Ch. I §2 Prop 3 /
+   Ch. II (11) の repo 対応物を先に実測。
