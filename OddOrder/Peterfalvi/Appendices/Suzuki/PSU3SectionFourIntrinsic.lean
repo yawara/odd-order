@@ -159,6 +159,95 @@ theorem odd_natCard_map_D_residualQuotient :
     exact Subgroup.card_dvd_of_le inf_le_left
   exact Odd.of_dvd_nat hyp.D_odd (hdvd₁.trans hdvd₂)
 
+/-! ### The same transfers for `C = C_G(X)` and `C/𝒩(C)`
+
+`PSU3SectionFourSetup.standingData_centralizerQuotient` supplies *every* input of Ch. I §3
+Lemma 5 — including the `1 ≠ w ∈ W̄` the book gets from `|(V ∩ U)/(P ∩ U)| ≠ 1` — for the
+standing hypothesis `centralizerQuotientHypothesis` on `C/𝒩(C)`, whose `H`, `Q`, `D` are
+already the images of `C_H(X)`, `C_Q(X)`, `C_D(X)`.  Since `O^{2′}(C/𝒩(C)) ≅ U/Z(U)`, that
+group is `PSU(3, ℓ)` extended by an odd-order group, and the transfers of step (2) work
+there verbatim: `C` inherits the rank-one setup for the same reason `U` does, and
+`𝒩(C) = C_D(X) ⊓ C_{C}(C_Q(X))` lies in `D`, so the setup descends to `C/𝒩(C)`. -/
+
+/-- **`C = C_G(X)` inherits the rank-one setup** — the case `K = C` of
+`rankOneSetup_subgroup`. -/
+theorem rankOneSetup_centralizer (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G)) :
+    Setup (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G)))
+      (hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))
+      (hyp.D.subgroupOf (Subgroup.centralizer (X : Set G)))
+      (⟨hyp.t, htX⟩ : ↥(Subgroup.centralizer (X : Set G))) :=
+  hyp.rankOneSetup_subgroup hXD htX le_rfl htX inf_le_right
+
+/-- **`C/𝒩(C)` inherits it too** — `𝒩(C) = C_D(X) ⊓ C_C(C_Q(X))` lies in `C_D(X)`
+(`normalCore_cH_eq_centralizer_cQ`), which is a legitimate kernel for `Setup.quotient`.
+
+The three images are exactly the `H`, `Q`, `D` of `centralizerQuotientHypothesis`, so the
+mappings `Setup.exists_fgh` produces here are that hypothesis's `f`, `g`, `h`. -/
+theorem setup_centralizerQuotient (hXV : X ≤ hyp.V) (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G)) :
+    Setup
+      ((hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).map
+        (QuotientGroup.mk' (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore))
+      ((hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))).map
+        (QuotientGroup.mk' (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore))
+      ((hyp.D.subgroupOf (Subgroup.centralizer (X : Set G))).map
+        (QuotientGroup.mk' (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore))
+      (QuotientGroup.mk' (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore
+        ⟨hyp.t, htX⟩) :=
+  (hyp.rankOneSetup_centralizer hXD htX).quotient
+    (by rw [hyp.normalCore_cH_eq_centralizer_cQ hXV]; exact inf_le_left)
+
+/-- **The mappings relative to `C`, `C ∩ H` and `t` exist in `G` and agree with the
+ambient ones on `(Q ∩ C)^#`** — the `C`-version of `exists_fgh_residual_eq`. -/
+theorem exists_fgh_centralizer_eq {f g h : G → G}
+    (Hfgh : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h) (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G)) :
+    ∃ f₁ g₁ h₁ : G → G,
+      IsFGH (hyp.H ⊓ Subgroup.centralizer (X : Set G))
+          (hyp.Q ⊓ Subgroup.centralizer (X : Set G))
+          (hyp.D ⊓ Subgroup.centralizer (X : Set G)) hyp.t f₁ g₁ h₁ ∧
+        ∀ x ∈ hyp.Q ⊓ Subgroup.centralizer (X : Set G), x ≠ 1 →
+          f x = f₁ x ∧ g x = g₁ x ∧ h x = h₁ x := by
+  obtain ⟨f₁, g₁, h₁, H₁⟩ := (hyp.rankOneSetup_centralizer hXD htX).exists_fgh
+  refine ⟨liftMap _ f₁, liftMap _ g₁, liftMap _ h₁, H₁.ofSubtype, fun x hx hx1 => ?_⟩
+  exact IsFGH.eq_of_le hyp.rankOneSetup Hfgh inf_le_left inf_le_left H₁.ofSubtype hx hx1
+
+/-- **The mappings of `C/𝒩(C)` are the images of those of `C`** — the `C`-version of
+`fgh_map_residualQuotient`, and the direction that reads §3's Corollary 2 back inside
+`C_G(X)`. -/
+theorem fgh_map_centralizerQuotient (hXV : X ≤ hyp.V) (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    {f₁ g₁ h₁ : ↥(Subgroup.centralizer (X : Set G)) → ↥(Subgroup.centralizer (X : Set G))}
+    (H₁ : IsFGH (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G)))
+      (hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))
+      (hyp.D.subgroupOf (Subgroup.centralizer (X : Set G)))
+      ⟨hyp.t, htX⟩ f₁ g₁ h₁)
+    {fb gb hb :
+      (↥(Subgroup.centralizer (X : Set G)) ⧸
+          (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore) →
+        (↥(Subgroup.centralizer (X : Set G)) ⧸
+          (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore)}
+    (Hb : IsFGH
+      ((hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).map
+        (QuotientGroup.mk' (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore))
+      ((hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))).map
+        (QuotientGroup.mk' (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore))
+      ((hyp.D.subgroupOf (Subgroup.centralizer (X : Set G))).map
+        (QuotientGroup.mk' (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore))
+      (QuotientGroup.mk' (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore
+        ⟨hyp.t, htX⟩) fb gb hb)
+    {x : ↥(Subgroup.centralizer (X : Set G))}
+    (hxQ : x ∈ hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))
+    (hx1 : QuotientGroup.mk'
+      (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore x ≠ 1) :
+    fb (QuotientGroup.mk' _ x) = QuotientGroup.mk' _ (f₁ x) ∧
+      gb (QuotientGroup.mk' _ x) = QuotientGroup.mk' _ (g₁ x) ∧
+      hb (QuotientGroup.mk' _ x) = QuotientGroup.mk' _ (h₁ x) :=
+  IsFGH.map (hyp.setup_centralizerQuotient hXV hXD htX) H₁ Hb
+    (QuotientGroup.mk' _) rfl (fun _ hy => Subgroup.mem_map_of_mem _ hy)
+    (fun _ hy => Subgroup.mem_map_of_mem _ hy) hxQ hx1
+
 /-! ### `f₁`, `h₁` relative to `U`, and their agreement with `f`, `h`
 
 Step (2) ends by reading the conclusion it gets on `U` back inside `G`: "By the uniqueness
