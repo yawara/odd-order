@@ -203,6 +203,30 @@ theorem exists_center_Q_ne_one_residualQuotient :
     details.residualQuotientEquiv.toMonoidHom
   exact (hyp.residualQuotientHypothesis details).exists_center_Q_ne_one
 
+/-- `M.mu` is injective on `U/Z(U)` — the `hmu` of the stage-(4) chain.
+
+`mu_injective` (Ch. III §3 step (4)) needs exactly the numerics and the induction
+hypothesis, all of which are available here. -/
+theorem mu_injective_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
+    (ih : TheoremAInductionBelow G Ω) :
+    letI := MulAction.compHom (ULift.{v} (Unital data.n))
+      details.residualQuotientEquiv.toMonoidHom
+    ∀ (_sfive : (hyp.residualQuotientHypothesis details).LemmaFiveSetup data.n)
+      (M : (hyp.residualQuotientHypothesis details).QuotientFieldModel data.n),
+      Function.Injective M.mu := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  have ihq : TheoremAInductionBelow
+      (↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X))
+      (ULift.{v} (Unital data.n)) :=
+    hyp.theoremAInductionBelow_residualQuotient details hXV hX ih
+  intro sfive M
+  exact (hyp.residualQuotientHypothesis details).mu_injective
+    (hyp.residualQuotientHypothesis_orderOf_distinguishedInvolution_mul_t details)
+    (Nat.zero_lt_one.trans data.one_lt_n).ne'
+    (hyp.natCard_residualQuotientHypothesis_Q0 details)
+    (hyp.natCard_residualQuotientHypothesis_Q details) ihq sfive M
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
