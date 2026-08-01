@@ -385,6 +385,56 @@ theorem commute_rootHom_of_mem_standardBorel_of_commute_swap {n : ℕ} (hn : 0 <
       _ = rootHom n u * psuTorusHom n c := by rw [hconj2]
   exact heq
 
+/-- **`B ∩ B^w` is the determinant-one torus.**
+
+The standard Borel is the stabilizer of `∞`, and conjugating by the Weyl element turns it
+into the stabilizer of the origin, so the intersection is the two-point stabilizer —
+which is exactly the torus (`exists_psuTorusHom_eq_of_fixes_infinity_origin`).
+
+This is the `D = H ∩ H^t` of Peterfalvi's hypothesis, for the standard `PSU(3, ℓ)`
+model. -/
+theorem standardBorel_inf_conj_weylElement {n : ℕ} (hn : 0 < n) :
+    standardBorel n ⊓
+        (standardBorel n).map (MulAut.conj (weylElement n)).toMonoidHom
+      = (psuTorusHom n).range := by
+  have hw2 : weylElement n * weylElement n = 1 := by
+    have h := weylElement_sq_eq_one n
+    rwa [sq] at h
+  have hwinv : (weylElement n)⁻¹ = weylElement n := inv_eq_of_mul_eq_one_right hw2
+  have hstab : ∀ g : standardPermGroup n,
+      g ∈ (standardBorel n).map (MulAut.conj (weylElement n)).toMonoidHom ↔
+        g • Unital.origin n = Unital.origin n := by
+    intro g
+    rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply,
+      standardBorel_eq_infinityStabilizer n hn, MulAction.mem_stabilizer_iff]
+    constructor
+    · intro h
+      calc g • Unital.origin n
+          = g • (weylElement n • Unital.infinity n) := by rw [weylElement_smul_infinity]
+        _ = (g * weylElement n) • Unital.infinity n := (mul_smul _ _ _).symm
+        _ = (weylElement n * ((weylElement n)⁻¹ * g * weylElement n)) •
+              Unital.infinity n := by
+            rw [show weylElement n * ((weylElement n)⁻¹ * g * weylElement n)
+                = g * weylElement n from by group]
+        _ = weylElement n • (((weylElement n)⁻¹ * g * weylElement n) •
+              Unital.infinity n) := mul_smul _ _ _
+        _ = weylElement n • Unital.infinity n := by rw [h]
+        _ = Unital.origin n := weylElement_smul_infinity n
+    · intro h
+      calc ((weylElement n)⁻¹ * g * weylElement n) • Unital.infinity n
+          = ((weylElement n)⁻¹ * g) • Unital.origin n := by
+            rw [mul_smul, weylElement_smul_infinity]
+        _ = (weylElement n)⁻¹ • Unital.origin n := by rw [mul_smul, h]
+        _ = Unital.infinity n := by rw [hwinv, weylElement_smul_origin]
+  refine le_antisymm (fun g hg => ?_) (fun g hg => ?_)
+  · obtain ⟨hgB, hgW⟩ := Subgroup.mem_inf.mp hg
+    obtain ⟨c, rfl⟩ := exists_psuTorusHom_eq_of_fixes_infinity_origin hn
+      (standardBorel_le_infinityStabilizer hgB) ((hstab g).mp hgW)
+    exact ⟨c, rfl⟩
+  · obtain ⟨c, rfl⟩ := hg
+    refine Subgroup.mem_inf.mpr ⟨psuTorusHom_mem_standardBorel c, (hstab _).mpr ?_⟩
+    rw [Unital.origin_eq_affine_one, psuTorusHom_smul_affine, map_one]
+
 /-! ## The same statement inside `standardPermGroup n` -/
 
 /-- **`C_{D₀}(Ω₁(S₀)) ≠ 1`, for the standard Sylow `2`-subgroup**
