@@ -1463,11 +1463,43 @@ p.131 で (4) の証明を読み切った。骨格:
 `φ` と `φ'` を対角の一致から同定する。⚠ `θ = 1` (§3 (3) + `thetaModel_eq_id_on_frobFixed`)
 が `φ` の `F`-双線型性を保証しているので**今この道が通る**。
 
+### 🎯 橋渡しの明示公式を導出した (2026-08-01) — 次セッションは実装のみ
+
+`u` を `frobTrace n u = 1` なる元とする (`exists_frobTrace_eq_one`)。
+`φ₀(x,y) := x · star y` (= `x·y^q`) と置く。これは `ZMod 2`-双線型
+(`star` = `2^n` 乗は加法的) で、対角 `φ₀(x,x) = x·star x = N(x)` は `F` 値。
+
+    ψ(x,y) := φ₀(x,y) + u · frobTrace n (φ₀(x,y))        -- F 値・同じ対角
+
+**同型**:
+
+    Ξ : RootGroup n → BilinearTwistedProduct ψ'
+    Ξ (a, b) = ⟨ a , b + u · a · star a ⟩
+
+* **終域に入ること**: `Tr(b + u·N(a)) = Tr b + N(a)·Tr u = N(a) + N(a) = 0`
+  (`Tr b = b + star b = N(a)` が `RootGroup` の条件、`N(a) ∈ F` ゆえ
+  `Tr(u·N(a)) = N(a)·Tr(u) = N(a)`)。
+* **乗法性** (机上で検算済): `γ(a) := u·N(a)` と置くと必要なのは
+  `γ(a)+γ(c)+γ(a+c) = u·Tr(a·star c)` で、
+  `N(a+c) = N(a)+N(c)+a·star c+star a·c` から左辺 `= u(a star c + star a c)`、
+  右辺も `u·Tr(a star c) = u(a star c + star a c)` ✓。
+  ⟹ `Ξ((a,b)(c,d)) = Ξ(a,b)·Ξ(c,d)` が厳密に成立。
+* **全単射**: `Ξ⁻¹⟨a,z⟩ = (a, z + u·N(a))`。
+
+⚠ **`exists_bilinear_frobFixed_of_diag` をそのまま使わない**理由: その結論は
+`ψ x y = φ x y + u * frobTrace (φ x y)` の形で `u` を出すが、**`frobTrace u = 1`
+を結論に含めない** (証明内部の `exists_frobTrace_eq_one` に隠れている)。
+上の `γ` は同じ `u` の `Tr u = 1` を要るので、`exists_frobTrace_eq_one` から
+`u` を自分で取り `ψ` を直接定義する方が短い。
+
+**API 接続**: `star x = conjugation n x = x ^ 2 ^ n` (`conjugation_apply`, 要 `0 < n`)
+⟹ `OddOrder.FiniteField` 側の `qFrobenius (Field n) 2 n` / `frobTrace n` /
+`frobFixedSubfield (Field n) 2 n` と繋がる。`Nat.card (Field n) = (2^n)^2` は
+`natCard_field`。
+
 ### ⚠ 次の一手
 
-1. **`RootGroup n ≃* BilinearTwistedProduct φ'` の構成**
-   (`exists_bilinear_frobFixed_of_diag` を `φ₀(x,y) = x·y^q` に適用)。
-   §3 (4)(5) と章末の同型の共通土台。
+1. 上記 `Ξ` の実装 (公式は確定済、`star ↔ qFrobenius` の接続だけが手数)。
 2. §3 (4) 本体 (骨格は上記のとおり確定済)。
 3. `5 ≤ |F|` の供給。⚠ 完全な解決は場合分けになる:
    `m ≥ 3` は数え上げ / `m = 2` は「`θ|_F = Frob` なら `σ(x)τ(x) = σ(x³) = 1`
