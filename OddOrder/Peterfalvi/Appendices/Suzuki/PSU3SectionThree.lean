@@ -32,6 +32,8 @@ hypothesis, and then reads off `h(ω⁻¹) = ζ⁻³` from (H5) — a step the b
 * `Hypothesis.stepOne_chain` — §3's stage (1).
 * `Hypothesis.f_conj_zeta_of_mem_Q0` — the two `f`-values of stage (1) as `ζ^{±1}`-conjugates
   of `f(ω s^a)`.
+* `Hypothesis.stepTwo_linear` — §3's stage (2), the linear equation
+  `(a² + ζ⁻¹) · f(ω s^a)‾ = ω̄` in `E`.
 -/
 
 set_option autoImplicit false
@@ -278,6 +280,121 @@ theorem f_conj_zeta_of_mem_Q0 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
             calc ζ⁻¹ * z * ω * ζ = ζ⁻¹ * (z * ω) * ζ := by group
               _ = ζ⁻¹ * (ω * z) * ζ := by rw [hzω]
     rw [harg, h3]
+
+/-- **§3, stage (2)** (Peterfalvi Part II, p. 130): stage (1), read in the coordinates of
+`Q ⧸ Z(Q) ≅ E`, is the linear equation
+
+  `(a² + ζ⁻¹) · f(ω s^a)‾ = ω̄`.
+
+The conjugate `s^a` lies in `Q₀ = Z(Q)` and so disappears in the quotient
+(`coord_mk_eq_zero_of_mem_Q0`); each conjugation becomes multiplication by a scalar
+(`coord_conj_eq`), and the products split by additivity (`coord_mk_mul`).
+
+The book's `ζ⁻¹` is `μ(1, ζ)` here — its `x^d` is conjugation by `d⁻¹`, whereas `coord_act`
+is stated for conjugation by `d`. -/
+theorem stepTwo_linear (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ζ ω a : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (haK : a ∈ hyp.KSet) (ha2 : a ^ 2 ∈ hyp.K) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hXQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q) :
+    (((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E)
+        + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E))
+      * M.coord (Additive.ofMul (QuotientGroup.mk
+          (⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hXQ⟩ : ↥hyp.Q)))
+      = M.coord (Additive.ofMul (QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q))) := by
+  classical
+  have h2E : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  have hζD : ζ ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hζ)
+  have hconjQ : ∀ {c x : G}, c ∈ hyp.D → x ∈ hyp.Q → c * x * c⁻¹ ∈ hyp.Q := by
+    intro c x hc hx
+    have hm := hyp.rankOneSetup.DQ c⁻¹ (hyp.D.inv_mem hc) x hx
+    rwa [inv_inv] at hm
+  have hzQ0 : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D haK.1 hyp.distinguishedInvolution_mem_Q0
+  have hzQ : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q := hyp.Q0_le_Q hzQ0
+  -- the chain of stage (1), with both `f`-values expressed through `X`
+  obtain ⟨hcL, hcR⟩ := hyp.f_conj_zeta_of_mem_Q0 H hζ hzQ0 hωQ hωQ0
+  have hchain := hyp.stepOne_chain H hC2 M hZ hmu hVW hζ hωQ hωQ0 haK hf
+  rw [hcL, hcR] at hchain
+  -- memberships
+  have ha2D : a ^ 2 ∈ hyp.D := hyp.K_le_D ha2
+  have hζ3D : ζ ^ 3 ∈ hyp.D := pow_mem hζD 3
+  have hYQ : ζ * f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) * ζ⁻¹ ∈ hyp.Q :=
+    hconjQ hζD hXQ
+  have hZ'Q : ζ⁻¹ * f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) * ζ ∈ hyp.Q := by
+    have hm := hconjQ (hyp.D.inv_mem hζD) hXQ
+    rwa [inv_inv] at hm
+  have hAQ : a ^ 2 * (ζ * f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) * ζ⁻¹)
+      * (a⁻¹) ^ 2 ∈ hyp.Q := by
+    have hm := hconjQ ha2D hYQ
+    rwa [show (a ^ 2)⁻¹ = (a⁻¹) ^ 2 from by group] at hm
+  have hBQ : ζ ^ 3 * (ζ⁻¹ * f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) * ζ)
+      * (ζ ^ 3)⁻¹ ∈ hyp.Q := hconjQ hζ3D hZ'Q
+  have hCQ : ζ * ω * ζ⁻¹ ∈ hyp.Q := hconjQ hζD hωQ
+  have hLQ : a ^ 2 * (ζ * f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) * ζ⁻¹)
+      * (a⁻¹) ^ 2 * (a * hyp.distinguishedInvolution * a⁻¹) ∈ hyp.Q :=
+    hyp.Q.mul_mem hAQ hzQ
+  have hRQ : ζ ^ 3 * (ζ⁻¹ * f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) * ζ)
+      * (ζ ^ 3)⁻¹ * (ζ * ω * ζ⁻¹) ∈ hyp.Q := hyp.Q.mul_mem hBQ hCQ
+  -- one coordinate of each side
+  have hone : (⟨(1 : G), hyp.W.one_mem⟩ : ↥hyp.W) = 1 := rfl
+  have honeK : (hyp.kActor (hyp.K.one_mem)) = 1 := hyp.kActor_one hyp.K.one_mem
+  have hL : M.coord (Additive.ofMul (QuotientGroup.mk (⟨_, hLQ⟩ : ↥hyp.Q)))
+      = ((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E) *
+        (((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E) *
+          M.coord (Additive.ofMul (QuotientGroup.mk (⟨_, hXQ⟩ : ↥hyp.Q)))) := by
+    rw [hyp.coord_mk_mul M hAQ hzQ hLQ,
+      hyp.coord_mk_eq_zero_of_mem_Q0 M hZ hzQ0 hzQ, add_zero,
+      hyp.coord_conj_eq M ha2 hyp.W.one_mem hYQ hAQ (by group),
+      hyp.coord_conj_eq M hyp.K.one_mem hζ hXQ hYQ (by group)]
+    rw [hone, honeK]
+  have hR : M.coord (Additive.ofMul (QuotientGroup.mk (⟨_, hRQ⟩ : ↥hyp.Q)))
+      = ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W) ^ 3) : M.Eˣ) : M.E) *
+          (((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)⁻¹) : M.Eˣ) : M.E) *
+            M.coord (Additive.ofMul (QuotientGroup.mk (⟨_, hXQ⟩ : ↥hyp.Q))))
+        + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E) *
+          M.coord (Additive.ofMul (QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q))) := by
+    rw [hyp.coord_mk_mul M hBQ hCQ hRQ,
+      hyp.coord_conj_eq M hyp.K.one_mem (hyp.W.pow_mem hζ 3) hZ'Q hBQ (by group),
+      hyp.coord_conj_eq M hyp.K.one_mem (hyp.W.inv_mem hζ) hXQ hZ'Q (by group),
+      hyp.coord_conj_eq M hyp.K.one_mem hζ hωQ hCQ (by group)]
+    rw [honeK]
+    rfl
+  -- the two sides of stage (1) are the same element, so their coordinates agree
+  have hcoordeq : M.coord (Additive.ofMul (QuotientGroup.mk (⟨_, hLQ⟩ : ↥hyp.Q)))
+      = M.coord (Additive.ofMul (QuotientGroup.mk (⟨_, hRQ⟩ : ↥hyp.Q))) :=
+    congrArg (fun q : ↥hyp.Q => M.coord (Additive.ofMul (QuotientGroup.mk q)))
+      (Subtype.ext hchain)
+  have hprod : ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W) ^ 3) *
+      ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)⁻¹)
+      = ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) ^ 2 := by
+    have e1 : ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W) ^ 3) *
+        ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)⁻¹)
+        = ((1 : ↥hyp.actualKActor) * 1,
+            (⟨ζ, hζ⟩ : ↥hyp.W) ^ 3 * (⟨ζ, hζ⟩ : ↥hyp.W)⁻¹) := rfl
+    have e2 : ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) ^ 2
+        = ((1 : ↥hyp.actualKActor) ^ 2, (⟨ζ, hζ⟩ : ↥hyp.W) ^ 2) := rfl
+    rw [e1, e2, one_mul, one_pow]
+    congr 1
+    group
+  have hVpow : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W) ^ 3) : M.Eˣ) : M.E)
+      * ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)⁻¹) : M.Eˣ) : M.E)
+      = ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ^ 2 := by
+    rw [← Units.val_mul, ← map_mul, hprod, map_pow, Units.val_pow_eq_pow_val]
+  rw [hL, hR] at hcoordeq
+  refine mul_left_cancel₀ (Units.ne_zero (M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)))) ?_
+  linear_combination hcoordeq
+    + (M.coord (Additive.ofMul (QuotientGroup.mk
+        (⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hXQ⟩ : ↥hyp.Q)))) * hVpow
+    + (((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ^ 2 *
+      M.coord (Additive.ofMul (QuotientGroup.mk
+        (⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hXQ⟩ : ↥hyp.Q)))) * h2E
 
 end Hypothesis
 
