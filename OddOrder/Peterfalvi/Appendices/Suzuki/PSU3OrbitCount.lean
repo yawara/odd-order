@@ -690,6 +690,96 @@ theorem eq_one_of_kPart_eq_one {m : ℕ} (M : hyp.QuotientFieldModel m)
     Units.val_one] at hid
   exact eq_one_of_frobNormEquiv_symm_sq_eq_one hchar hodd hid.symm
 
+/-! ## Freeness of the `D`-action on `(Q/Q₀)^#`
+
+Steps (15), (18) and (20) all need the same fact: an element of `D` fixing the class
+of some `ω ∈ Q − Q₀` modulo `Q₀` is trivial.  For `c ∈ K` this is group-theoretic —
+`eq_one_of_conj_eq_mul_Q0` in `PSU3PairComparison` derives it from the fixed-point
+freeness of `K` on `Q` — but the elements of `W` centralize `Q₀`, so that argument
+cannot reach the whole of `D`.  The model does: `D = KW` acts on `Q/Q₀ ≅ E` by the
+scalars `μ(k, v)`, and `μ` is injective.
+-/
+
+/-- Conjugation by `k v` (`k ∈ K`, `v ∈ W`) is the action of the actor pair
+`(kActor k, v)` on `Q`.
+
+Both `conjQByK k` and `conjQByW v` are literally `x ↦ k x k⁻¹` and `x ↦ v x v⁻¹`, and
+`conjQHom` is their (commuting) product, so this is the definitional unfolding.  It is
+the converse direction of `exists_mem_D_conjQHom`, which starts from the actor pair;
+here the group element is given first, as `exists_mem_K_mem_W_mul` produces it. -/
+theorem conjQHom_kActor_apply_val {k v : G} (hk : k ∈ hyp.K) (hv : v ∈ hyp.W)
+    (x : ↥hyp.Q) :
+    ((hyp.conjQHom (hyp.kActor hk, ⟨v, hv⟩) x : ↥hyp.Q) : G)
+      = (k * v) * (x : G) * (k * v)⁻¹ := by
+  have hval : ((hyp.conjQHom (hyp.kActor hk, ⟨v, hv⟩) x : ↥hyp.Q) : G)
+      = k * (v * (x : G) * v⁻¹) * k⁻¹ := rfl
+  rw [hval]
+  group
+
+/-- **`D` acts freely on `(Q/Q₀)^#`** (Peterfalvi Part II, Ch. IV §2, used at pp. 126–128).
+
+If `c ∈ D` fixes the class of `ω ∈ Q − Q₀` modulo `Q₀` — i.e. `ω^c = ω y` for some
+`y ∈ Q₀` — then `c = 1`.
+
+Under Chapter IV's standing hypothesis `V = W` every `c ∈ D` factors as `k v` with
+`k ∈ K` and `v ∈ W` (`exists_mem_K_mem_W_mul`), and conjugation by it induces the
+action of the actor pair `(kActor k, v)` on `Q/Z(Q)`.  In the standard model of
+Ch. III §3 that action is multiplication by the scalar `μ(k, v)` on `E`, and the
+coordinate of `ω` is a *unit* because `ω ∉ Q₀ = Z(Q)`; so the fixed-point equation
+reads `μ(k, v) · α = α` with `α ≠ 0`, forcing `μ(k, v) = 1`.  Injectivity of `μ`
+then makes the pair trivial, and `conjQByK` is faithful, so `k = v = 1`.
+
+The `K`-part alone is `eq_one_of_conj_eq_mul_Q0`, proved without the model; the model
+is what covers the `W`-part, whose elements centralize `Q₀` and hence are invisible to
+the fixed-point-freeness argument used there.
+
+This is the fact behind step (15)'s "the `u_i` exhaust the orbit", step (18)'s
+`d_{m−1} = ζ⁻¹`, and the general form of step (20)'s (∗∗∗). -/
+theorem eq_one_of_conj_eq_mul_Q0_of_mem_D {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ω c y : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hcD : c ∈ hyp.D)
+    (hy : y ∈ hyp.Q0) (hconj : c⁻¹ * ω * c = ω * y) : c = 1 := by
+  obtain ⟨k, hk, v, hv, hkv⟩ := hyp.exists_mem_K_mem_W_mul hVW (hyp.D.inv_mem hcD)
+  set kv : ↥hyp.actualKActor × ↥hyp.W := (hyp.kActor hk, ⟨v, hv⟩) with hkvdef
+  -- the actor pair acts as conjugation by `c⁻¹ = k v`
+  have hact : ∀ x : ↥hyp.Q, ((hyp.conjQHom kv x : ↥hyp.Q) : G) = c⁻¹ * (x : G) * c := by
+    intro x
+    rw [hkvdef, hyp.conjQHom_kActor_apply_val hk hv x, ← hkv, inv_inv]
+  -- hence it fixes the class of `ω` in `Q ⧸ Z(Q)`
+  have hfix : hyp.quotientKWHom kv (QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q))
+      = QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q) := by
+    rw [hyp.quotientKWHom_mk]
+    refine QuotientGroup.eq.mpr ?_
+    rw [hZ, Subgroup.mem_subgroupOf]
+    have hval : (((hyp.conjQHom kv ⟨ω, hωQ⟩ : ↥hyp.Q)⁻¹ * ⟨ω, hωQ⟩ : ↥hyp.Q) : G)
+        = y⁻¹ := by
+      change ((hyp.conjQHom kv ⟨ω, hωQ⟩ : ↥hyp.Q) : G)⁻¹ * ω = y⁻¹
+      rw [hact ⟨ω, hωQ⟩, hconj]
+      group
+    rw [hval]
+    exact hyp.Q0.inv_mem hy
+  -- in coordinates: `μ(kv) · α = α` with `α ≠ 0`
+  have hcoord := M.coord_act kv (QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q))
+  rw [hfix] at hcoord
+  have hne := hyp.coord_ne_zero_of_not_mem_Q0 M hZ hωQ hωQ0
+  have hmu1 : M.mu kv = 1 := by
+    apply Units.ext
+    rw [Units.val_one]
+    refine mul_right_cancel₀ hne ?_
+    rw [one_mul]
+    exact hcoord.symm
+  -- injectivity of `μ` and faithfulness of `conjQByK` kill both factors
+  have hkv1 : kv = 1 := hmu (by rw [hmu1, map_one])
+  have hv1 : v = 1 := congrArg Subtype.val (congrArg Prod.snd hkv1)
+  have hk1 : k = 1 := by
+    have hactor : hyp.conjQByK (⟨k, hk⟩ : ↥hyp.K) = 1 :=
+      congrArg Subtype.val (congrArg Prod.fst hkv1)
+    have : (⟨k, hk⟩ : ↥hyp.K) = 1 := hyp.conjQByK_injective (by rw [hactor, map_one])
+    exact congrArg Subtype.val this
+  have : c⁻¹ = 1 := by rw [hkv, hk1, hv1, mul_one]
+  rw [← inv_inv c, this, inv_one]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
