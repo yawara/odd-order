@@ -920,6 +920,52 @@ theorem stepFour_cover {m : ℕ} (M : hyp.QuotientFieldModel m)
 
 /-! ### Stage (5): the formula is `K W`-equivariant -/
 
+/-- **(H3) for the `K W`-action, in the shape `conjQHom` uses**:
+`f(ρ^{(k,v)}) = f(ρ)^{(k⁻¹, v)}`.
+
+(H3) reads `f(x^a) = f(x)^{a^t}`, and on `K W` the twist `a ↦ a^t` is `(k, v) ↦
+(k⁻¹, v)`: `t` inverts `K` (`mul_t_eq_of_mem_KSet`, whose content is exactly the
+defining property of `KSet`) and centralizes `W` (`conj_t_pow_eq`).
+
+Together with `mu_t_twist` this is what feeds `stepFive_equivariant`. -/
+theorem f_conjQHom (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {k v : G} (hk : k ∈ hyp.KSet) (hkK : k ∈ hyp.K) (hv : v ∈ hyp.W)
+    {x : G} (hxQ : x ∈ hyp.Q) (hx1 : x ≠ 1) (hfxQ : f x ∈ hyp.Q)
+    (hfconjQ : f (k * v * x * (k * v)⁻¹) ∈ hyp.Q) :
+    (⟨f (k * v * x * (k * v)⁻¹), hfconjQ⟩ : ↥hyp.Q)
+      = hyp.conjQHom (hyp.kActor (hyp.K.inv_mem hkK), ⟨v, hv⟩) ⟨f x, hfxQ⟩ := by
+  have htinv : hyp.t⁻¹ = hyp.t := inv_eq_of_mul_eq_one_right hyp.rankOneSetup.invol
+  have htt : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+  have hvD : v ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hv)
+  have hcD : k * v ∈ hyp.D := hyp.D.mul_mem (hyp.K_le_D hkK) hvD
+  obtain ⟨h3, -, -⟩ := hThree hyp.rankOneSetup H hxQ hx1 (hyp.D.inv_mem hcD)
+  rw [inv_inv] at h3
+  -- the `t`-twist of `k v` is `k⁻¹ v`
+  have htv : hyp.t * v * hyp.t = v := by
+    have hp := hyp.conj_t_pow_eq hv 1
+    rwa [pow_one] at hp
+  have hsplit : hyp.t * (k * v) * hyp.t = k⁻¹ * v := by
+    have e : (hyp.t * k * hyp.t) * (hyp.t * v * hyp.t) = hyp.t * (k * v) * hyp.t := by
+      calc (hyp.t * k * hyp.t) * (hyp.t * v * hyp.t)
+          = hyp.t * k * (hyp.t * hyp.t) * v * hyp.t := by group
+        _ = hyp.t * (k * v) * hyp.t := by rw [htt]; group
+    rw [← e, hk.2, htv]
+  have hprod : (hyp.t * (k * v) * hyp.t) * (hyp.t * (k * v)⁻¹ * hyp.t) = 1 := by
+    calc (hyp.t * (k * v) * hyp.t) * (hyp.t * (k * v)⁻¹ * hyp.t)
+        = hyp.t * (k * v) * (hyp.t * hyp.t) * (k * v)⁻¹ * hyp.t := by group
+      _ = hyp.t * (k * v) * 1 * (k * v)⁻¹ * hyp.t := by rw [htt]
+      _ = hyp.t * hyp.t := by group
+      _ = 1 := htt
+  have hstep : hyp.t * (k * v)⁻¹ * hyp.t = (k⁻¹ * v)⁻¹ := by
+    rw [← hsplit]
+    symm
+    rw [inv_eq_iff_mul_eq_one]
+    exact hprod
+  rw [hstep, inv_inv] at h3
+  refine Subtype.ext ?_
+  rw [hyp.conjQHom_kActor_apply_val (hyp.K.inv_mem hkK) hv]
+  exact h3
+
 /-- **The inversion formula propagates along `K W`-orbits** (Peterfalvi Part II, §3 (5),
 p. 131, the opening display):
 
@@ -961,6 +1007,56 @@ theorem stepFive_equivariant {m : ℕ} (M : hyp.QuotientFieldModel m)
   · rw [hσq, hρq, hρy, h1, pow_succ]
     field_simp
   · rw [hσy, hρy, h2, inv_pow, hkey, mul_inv]
+
+/-- **Stage (5)'s first half**: the inversion formula holds at every `K W`-translate of
+a point where it holds (Peterfalvi Part II, p. 131).
+
+`f_conjQHom` turns (H3) into the statement that `f` intertwines the `K W`-action with
+its `t`-twist, `mu_t_twist` evaluates that twist on scalars as `d ↦ (d^q)⁻¹`, and
+`stepFive_equivariant` checks that the shape `(ρ̄/y, 1/y)` survives.
+
+So stage (4) plus this covers every `ρ` whose quotient coordinate lies in the
+`K W`-orbit of `ω̄` — which is the first case of the book's proof. -/
+theorem stepFive_orbit (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    (hconjq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      (Ψ (hyp.conjQHom kv ρ)).quotient
+        = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ρ).quotient)
+    (hconjy : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      Suzuki2Groups.unitaryCoord m u (Ψ (hyp.conjQHom kv ρ))
+        = ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1) *
+          Suzuki2Groups.unitaryCoord m u (Ψ ρ))
+    {k v : G} (hk : k ∈ hyp.KSet) (hkK : k ∈ hyp.K) (hv : v ∈ hyp.W)
+    {ρ : G} (hρQ : ρ ∈ hyp.Q) (hρ1 : ρ ≠ 1) (hfρQ : f ρ ∈ hyp.Q)
+    (hρ'Q : k * v * ρ * (k * v)⁻¹ ∈ hyp.Q)
+    (hfρ'Q : f (k * v * ρ * (k * v)⁻¹) ∈ hyp.Q)
+    (hy : Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩) ≠ 0)
+    (h1 : (Ψ ⟨f ρ, hfρQ⟩).quotient
+      = (Ψ ⟨ρ, hρQ⟩).quotient / Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))
+    (h2 : Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ρ, hfρQ⟩)
+      = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹) :
+    (Ψ ⟨f (k * v * ρ * (k * v)⁻¹), hfρ'Q⟩).quotient
+        = (Ψ ⟨k * v * ρ * (k * v)⁻¹, hρ'Q⟩).quotient /
+          Suzuki2Groups.unitaryCoord m u (Ψ ⟨k * v * ρ * (k * v)⁻¹, hρ'Q⟩) ∧
+      Suzuki2Groups.unitaryCoord m u (Ψ ⟨f (k * v * ρ * (k * v)⁻¹), hfρ'Q⟩)
+        = (Suzuki2Groups.unitaryCoord m u
+          (Ψ ⟨k * v * ρ * (k * v)⁻¹, hρ'Q⟩))⁻¹ := by
+  have hkinv : hyp.kActor (hyp.K.inv_mem hkK) = (hyp.kActor hkK)⁻¹ :=
+    hyp.kActor_eq_inv hkK (hyp.K.inv_mem hkK) rfl
+  have hρeq : (⟨k * v * ρ * (k * v)⁻¹, hρ'Q⟩ : ↥hyp.Q)
+      = hyp.conjQHom (hyp.kActor hkK, ⟨v, hv⟩) ⟨ρ, hρQ⟩ :=
+    Subtype.ext (hyp.conjQHom_kActor_apply_val hkK hv ⟨ρ, hρQ⟩).symm
+  have hfeq := hyp.f_conjQHom H hk hkK hv hρQ hρ1 hfρQ hfρ'Q
+  refine hyp.stepFive_equivariant M hu Ψ
+    (c := ((M.mu (hyp.kActor hkK, (⟨v, hv⟩ : ↥hyp.W)) : M.Eˣ) : M.E))
+    (Units.ne_zero _) hy ?_ ?_ ?_ ?_ h1 h2
+  · rw [hρeq, hconjq]
+  · rw [hρeq, hconjy]
+  · rw [hfeq, hconjq, hkinv, hyp.mu_t_twist M]
+  · rw [hfeq, hconjy, hkinv, hyp.mu_t_twist M]
 
 end Hypothesis
 
