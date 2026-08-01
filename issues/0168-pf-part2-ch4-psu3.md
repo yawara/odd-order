@@ -4804,3 +4804,49 @@ repo が `C_G(P)/N` を選んだのは (57)(58) で既存構成 `centralizerQuot
 2. `residualQuotientEquiv` で `U/Z(U)` へ transport し、段 (2) の `ω`, `ζ`, `η` を
    ambient へ持ち上げる (`IsFGH.eq_of_le`)。
 3. 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
+
+## 2026-08-01 (87): 標準モデルの `hQ0card` / `hcardQ` + ⚠ `ih` は導出不能と実測
+
+(フルビルド green 4987 jobs・lint 純ゼロ)
+
+| 定理 | 内容 |
+|---|---|
+| `standardHypothesis_Q0` | `Q₀ = (RootGroup.centerLine n).map (rootHom n)` (= `Ω₁(S₀)`) |
+| `natCard_standardHypothesis_Q0` | `\|Q₀\| = 2ⁿ` |
+| `natCard_standardHypothesis_Q` | `\|Q\| = \|Q₀\|³` |
+
+`Q₀` の同定: Borel 元を半直積分解 `r · c` で書くと `x² = 1` ⟹ `c² = 1`、
+トーラスは奇位数なので `c = 1` ⟹ 残るのは根群の対合 = 中心線。
+⚠ 実装は `SemidirectProduct.rightHom` で右成分を取り、`SemidirectProduct.ext rfl hright`
+で `y = inl y.left` を出すのが素直 (`mk_eq_inl_mul_inr` は形が違って使えない)。
+⚠ import は `Basic` → `QStructure` に差し替え (`Q0` は `QStructure.lean` 定義)。
+
+### 🔍 `exists_standardModel` の残り前提の所在 (実測)
+
+| 前提 | 標準モデルでの出どころ |
+|---|---|
+| `hQ0card` / `hcardQ` | ✅ **今回** |
+| `hm : m ≠ 0` | `hn : 1 < n` から (`m := n`) |
+| `hQsuz` | ✅ `standardRootSubgroup_isSuzuki2Group` — `Q` は defeq なので**新規作業ゼロ** |
+| `hst : \|s·t\| = 3` | ⚠ `standard_st_order n` が model 側にあるが、`distinguishedInvolution` との同定が要る |
+| `x₀ ∈ Z(Q)`, `≠ 1` | `exists_center_Q_ne_one` (汎用、(71)) |
+| **`ih`** | ⚠⚠ **モデル内では導出不能** |
+
+⚠⚠ **`ih : TheoremAInductionBelow (standardPermGroup n) (Unital n)` は
+標準モデル単体からは出ない**。「`Nat.card A < Nat.card (standardPermGroup n)` なる
+すべての `A`」を量化するので、これは Theorem A の帰納法仮説そのもの。
+⟹ §4 が ambient の `ih` と `Nat.card (standardPermGroup n) ≤ Nat.card G` から供給する
+(`theoremAInductionBelow_centralizerActionQuotient` と同じ形)。
+その不等式は `standardPermGroup n ≅ U/Z(U)`、`U ≤ C_G(P) ≤ G` から出る見込み。
+
+### ⚠ 次セッションはここから
+
+1. `hst` — `standardHypothesis` の `distinguishedInvolution` を `sStd`
+   (= `rootHom (RootGroup.centralInvolution n)`) と同定し、`standard_st_order n` を当てる。
+   ⚠ `distinguishedInvolution` の定義 (どう選ばれるか) を先に実測すること。
+2. `ih` の供給補題: `Nat.card (standardPermGroup n) ≤ Nat.card G` (経由:
+   `residualQuotientEquiv` + `U ≤ C_G(P) ≤ G`) → `theoremAInductionBelow_standardModel`。
+3. 揃ったら `lemmaFiveSetup_of_orderThree_of_mem_W` /
+   `nonempty_quotientFieldModel_of_orderThree` → `exists_standardModel` →
+   §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
+4. `residualQuotientEquiv` で `U/Z(U)` へ transport → 段 (2) → **§4 完成**。
