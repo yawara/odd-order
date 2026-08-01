@@ -33,6 +33,9 @@ universes of the source and target.
   `Hypothesis.ofMulEquiv_distinguishedInvolution` — the *derived* data
   transport too.  `H`, `Q`, `D` and `t` are fields, so they cross by `rfl`; `V`, `K`,
   `W` and `Q₀` are defined from them and need these lemmas.
+* `Hypothesis.conjugate` — the same hypothesis with the base point moved by `c` and `t`
+  replaced by `c t c⁻¹`.  Ch. IV §4 uses it to put `t` where the ambient group's
+  involution lands.
 -/
 
 set_option autoImplicit false
@@ -332,6 +335,31 @@ theorem ofMulEquivPullback_exists_ne_one_mem_W (hw : ∃ x ∈ hp.W, x ≠ 1) :
     ∃ x ∈ (hp.ofMulEquivPullback ep).W, x ≠ 1 := by
   letI := MulAction.compHom Λ ep.symm.toMonoidHom
   exact ofMulEquiv_exists_ne_one_mem_W _ _ _ _ hw
+
+/-! ### Conjugation
+
+A standing hypothesis is determined by its base point and its distinguished involution
+`t`, both of which move under conjugation; so conjugating gives another one, on the same
+group and the same permuted set.
+
+Ch. IV §4 needs it because the identification `U/Z(U) ≅ PSU(3, ℓ)` of Ch. I §3
+Proposition 1(c) is *opaque* data returned by the induction — it says nothing about
+where the ambient involution `t` goes.  The involutions being a single conjugacy class
+(Ch. I Prop 2(b), `isConj_of_involutions`), conjugating the transported hypothesis moves
+its `t` onto the image of the ambient one, which is what lets §4 read Corollary 2 of §3
+"relative to `U`". -/
+
+/-- **The standing hypothesis conjugated by `c`**: the same group and the same permuted
+set, with the base point moved by `c` and `t` replaced by `c t c⁻¹`. -/
+noncomputable def conjugate (h : Hypothesis A Λ) (c : A) : Hypothesis A Λ :=
+  h.ofMulEquiv (MulAut.conj c) (MulAction.toPerm c) fun a l => by
+    change c • (a • l) = (c * a * c⁻¹) • (c • l)
+    rw [← mul_smul, ← mul_smul]
+    congr 1
+    group
+
+@[simp] theorem conjugate_t (h : Hypothesis A Λ) (c : A) :
+    (h.conjugate c).t = c * h.t * c⁻¹ := rfl
 
 end Hypothesis
 
