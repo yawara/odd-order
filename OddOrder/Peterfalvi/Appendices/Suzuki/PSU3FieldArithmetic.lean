@@ -1065,6 +1065,49 @@ theorem eq_add_inv_add_inv_of_mul_inv_eq {E : Type*} [Field E] (h2 : (2 : E) = 0
   rw [hexp] at heq
   linear_combination -heq - Z * h2
 
+/-- An additive map preserving a subfield, restricted to it. -/
+def subfieldRestrict {E : Type*} [Field E] (θ : E →+ E) (S : Subfield E)
+    (hS : ∀ x ∈ S, θ x ∈ S) : ↥S →+ ↥S where
+  toFun x := ⟨θ (x : E), hS (x : E) x.2⟩
+  map_zero' := Subtype.ext (map_zero θ)
+  map_add' a b := Subtype.ext (map_add θ (a : E) (b : E))
+
+@[simp] theorem subfieldRestrict_coe {E : Type*} [Field E] (θ : E →+ E) (S : Subfield E)
+    (hS : ∀ x ∈ S, θ x ∈ S) (x : ↥S) :
+    ((subfieldRestrict θ S hS x : ↥S) : E) = θ (x : E) := rfl
+
+/-- **`(∗)` on a subfield** (Peterfalvi Part II, p. 130, inside §3 (3)).
+
+The counting of `(∗)` runs over `F`, the subfield of order `q`, not over the ambient `E`
+of order `q²`: `X` is a scalar of `K`, and `α`, `w = ζ + ζ⁻¹` lie in `F` as well.  This is
+`eq_one_and_eq_of_star` transported along `F ↪ E`, so that callers may keep stating their
+equations in `E`. -/
+theorem eq_one_and_eq_of_star_subfield {E : Type*} [Field E] [Finite E] (h2 : (2 : E) = 0)
+    (S : Subfield E) (θ : E →+ E) (hS : ∀ x ∈ S, θ x ∈ S) (hinj : Function.Injective θ)
+    {α w z : E} (hα : α ∈ S) (hw : w ∈ S) (hz : z ∈ S) (hw0 : w ≠ 0)
+    (hcard : 5 ≤ Nat.card ↥S)
+    (hstar : ∀ X ∈ S, X ≠ 0 → X ≠ z → α ^ 2 + w ^ 2 + w * (X + θ X) = 0) :
+    (∀ X ∈ S, θ X = X) ∧ α = w := by
+  have h2' : (2 : ↥S) = 0 := by
+    apply Subtype.ext
+    push_cast
+    exact h2
+  have hinj' : Function.Injective (subfieldRestrict θ S hS) := fun a b hab =>
+    Subtype.ext (hinj (congrArg (Subtype.val (p := fun x => x ∈ S)) hab))
+  have hw0' : (⟨w, hw⟩ : ↥S) ≠ 0 := fun hc => hw0 (congrArg Subtype.val hc)
+  have hstar' : ∀ X : ↥S, X ≠ 0 → X ≠ (⟨z, hz⟩ : ↥S) →
+      (⟨α, hα⟩ : ↥S) ^ 2 + (⟨w, hw⟩ : ↥S) ^ 2
+        + (⟨w, hw⟩ : ↥S) * (X + subfieldRestrict θ S hS X) = 0 := by
+    intro X hX0 hXz
+    apply Subtype.ext
+    push_cast
+    exact hstar (X : E) X.2 (fun hc => hX0 (Subtype.ext hc))
+      (fun hc => hXz (Subtype.ext hc))
+  obtain ⟨hθ, hαw⟩ :=
+    eq_one_and_eq_of_star h2' (subfieldRestrict θ S hS) hinj' hw0' hcard hstar'
+  exact ⟨fun X hX => congrArg (Subtype.val (p := fun x => x ∈ S)) (hθ ⟨X, hX⟩),
+    congrArg (Subtype.val (p := fun x => x ∈ S)) hαw⟩
+
 /-- **`(∗)` from `b² = ζ + ζ⁻¹ + a⁻²`** (Peterfalvi Part II, p. 130, inside §3 (3)).
 
 Raising `b² = w + X` to the `1 + θ` and comparing with `b^{2(1+θ)} = α² + X^{1+θ}` leaves
