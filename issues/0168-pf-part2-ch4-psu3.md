@@ -3543,3 +3543,41 @@ canonical 分解**であり、`fgh_eq_of_canonical` (分解の一意性) がそ�
 2. `U` 側の `Hypothesis` 構成 — 段 (2) の本体。⚠ `CentralizerQuotient.lean` の
    `centralizerQuotientHypothesis` が「`C_G(X)` の faithful 商に (A1)-(A3) を
    与える」構成なので、まずそれが `U` にも使えるか実測すること。
+
+## 2026-08-01 (56): 🔍 段 (2) の `(ℓ+1)/(ℓ+1,3) ≠ 1` は**位数計算でなく存在で足りる**
+
+書籍 p.133 段 (2) は
+> Furthermore, `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` since `ℓ > 2`.
+> Let `ζ₁ ∈ (V∩U) − (P∩U)` …
+
+と書くが、**この位数が使われるのは「`(V∩U) − (P∩U)` が空でない」ことだけ**。
+⟹ 正確な位数 `(ℓ+1)/(ℓ+1,3)` を計算する必要はなく、**存在命題で足りる**。
+
+そして model 側にちょうどその形の定理がある:
+
+* `ProjectiveUnitary.exists_ne_one_mem_psuTorus_torusWeight_eq_one (n) (hn : 1 < n)`
+  — `∃ c, c ∈ PSUTorusParameter n ∧ c ≠ 1 ∧ torusWeight c = 1`
+  (`TorusCentralizer.lean:76`)。`1 < n` すなわち `ℓ = 2ⁿ ≥ 4` は書籍の `ℓ > 2` と一致。
+  証明の骨: `(F_{ℓ²})ˣ` は位数 `ℓ²−1 = (ℓ−1)(ℓ+1)` の巡回群なので位数ちょうど
+  `ℓ+1` の元 `t` を持ち、`c = t^{2ℓ−1}` が行列式 1 のトーラスに入り `c ≠ 1`。
+
+⟹ 段 (2) で要るのは「この存在を `V ∩ U` の言葉に翻訳する」ことで、
+`(ℓ+1)/(ℓ+1,3)` の計算は**不要**。
+
+### 段 (2) の残り (更新)
+
+| 主張 | 状態 |
+|---|---|
+| `(V ∩ U)/(P ∩ U)` が `C_{Q₀}(P)` を中心化 | ⚠ 未 (PSU(3,ℓ) 構造) |
+| `V ∩ U ⊂ PW` / `⊂ P × C_W(P)` | ✅ (55) |
+| `(V∩U) − (P∩U) ≠ ∅` | ⚠ **存在で足りる** — model 側に `exists_ne_one_mem_psuTorus_torusWeight_eq_one` |
+| `U` 側で §3 Cor 2 | ⚠ `U` 側 `Hypothesis` の構成 (段 (2) の本体) |
+| `f(ω) = f₁(ω)`, `h(ω) = h₁(ω)` | ✅ (54) |
+
+### ⚠ 次セッションはここから
+
+1. **`U` 側の `Hypothesis` 構成** — 段 (2) の本体。`CentralizerQuotient.lean` の
+   `centralizerQuotientHypothesis` が「`C_G(X)` の faithful 商に (A1)-(A3) を与える」
+   構成なので、まずそれが `U = O^{2'}(C_G(P))` にも使えるか実測する。
+2. 上の 2 つの PSU(3,ℓ) 構造事実 (中心化 / トーラス元の存在) を `V ∩ U` の言葉へ翻訳。
+3. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
