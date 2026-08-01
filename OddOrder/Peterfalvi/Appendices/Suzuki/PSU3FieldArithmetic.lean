@@ -1149,6 +1149,30 @@ theorem eq_one_and_eq_of_star_subfield {E : Type*} [Field E] [Finite E] (h2 : (2
   exact ⟨fun X hX => congrArg (Subtype.val (p := fun x => x ∈ S)) (hθ ⟨X, hX⟩),
     congrArg (Subtype.val (p := fun x => x ∈ S)) hαw⟩
 
+/-- **A finite type with more than two elements has an element outside `{0, z}`.**
+
+This is the whole cost of the second half of Peterfalvi's §3 (3) once `θ` is known to be
+the identity: the bracket `X + X^θ` of `(∗)` then vanishes in characteristic `2` at any
+single admissible `X`, leaving `α² = w²`.  Five elements are needed only for the *first*
+half, where `X + X^θ` has to be constant on `F − {0, z}` to force `θ = 1`. -/
+theorem exists_ne_zero_ne {α : Type*} [Zero α] [Finite α] (hcard : 3 ≤ Nat.card α)
+    (z : α) : ∃ x : α, x ≠ 0 ∧ x ≠ z := by
+  classical
+  haveI : Fintype α := Fintype.ofFinite α
+  have hcard' : 3 ≤ Fintype.card α := by rwa [← Nat.card_eq_fintype_card]
+  by_contra hcon
+  push Not at hcon
+  have hsub : (Finset.univ : Finset α) ⊆ ({0, z} : Finset α) := by
+    intro b _
+    rcases eq_or_ne b 0 with rfl | hb
+    · exact Finset.mem_insert_self _ _
+    · exact Finset.mem_insert_of_mem (Finset.mem_singleton.mpr (hcon b hb))
+  have hle := Finset.card_le_card hsub
+  rw [Finset.card_univ] at hle
+  have e1 := Finset.card_insert_le (0 : α) {z}
+  have e2 : ({z} : Finset α).card = 1 := Finset.card_singleton _
+  omega
+
 /-- **`(∗)` from `b² = ζ + ζ⁻¹ + a⁻²`** (Peterfalvi Part II, p. 130, inside §3 (3)).
 
 Raising `b² = w + X` to the `1 + θ` and comparing with `b^{2(1+θ)} = α² + X^{1+θ}` leaves

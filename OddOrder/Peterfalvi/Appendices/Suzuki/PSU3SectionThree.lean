@@ -778,7 +778,44 @@ theorem mu_W_add_inv_ne_zero {m : ℕ} (M : hyp.QuotientFieldModel m)
   have hmu1 : M.mu (1, v) = 1 := Units.ext hval
   exact hv (congrArg Prod.snd (hmu (hmu1.trans (map_one M.mu).symm)))
 
-/-- **§3 (3)** (Peterfalvi Part II, p. 130): **`θ = 1` and `ω² = (0, ζ + ζ⁻¹)`**.
+/-- `θ = σ⁻¹ ∘ τ` preserves `F`, being a composite of ring maps. -/
+theorem theta_mem_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m) (σ τ : M.E ≃+* M.E)
+    (θ : M.E →+ M.E) (hθ : ∀ x : M.E, θ x = σ.symm (τ x)) :
+    ∀ x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
+      θ x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := by
+  intro x hx
+  rw [OddOrder.FiniteField.mem_frobFixedSubfield] at hx ⊢
+  rw [hθ, ← map_pow, ← map_pow, hx]
+
+/-- `σ⁻¹` preserves `F`, being a ring map. -/
+theorem sigma_symm_mem_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m) (σ : M.E ≃+* M.E) :
+    ∀ x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
+      σ.symm x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := by
+  intro x hx
+  rw [OddOrder.FiniteField.mem_frobFixedSubfield] at hx ⊢
+  rw [← map_pow, hx]
+
+/-- `θ = σ⁻¹ ∘ τ` is injective. -/
+theorem theta_injective {m : ℕ} (M : hyp.QuotientFieldModel m) (σ τ : M.E ≃+* M.E)
+    (θ : M.E →+ M.E) (hθ : ∀ x : M.E, θ x = σ.symm (τ x)) : Function.Injective θ := by
+  intro x₁ x₂ hx
+  rw [hθ, hθ] at hx
+  exact τ.injective (σ.symm.injective hx)
+
+/-- The book's `α` — the ratio of two central coordinates, read through `σ⁻¹` — lies
+in `F`, both coordinates being values of `ι`. -/
+theorem centerCoord_div_mem_frobFixed {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (σ : M.E ≃+* M.E) {y z : G} (hy : y ∈ hyp.Q0) (hz : z ∈ hyp.Q0) :
+    σ.symm (hyp.centerCoord sfive M ι hy / hyp.centerCoord sfive M ι hz)
+      ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m :=
+  hyp.sigma_symm_mem_frobFixed M σ _ (Subfield.div_mem _
+    (ι (Additive.ofMul (hyp.toCenter sfive hy))).2
+    (ι (Additive.ofMul (hyp.toCenter sfive hz))).2)
+
+/-- **`(∗)` at every admissible point of `F`** (Peterfalvi Part II, p. 130, inside §3 (3)).
 
 `stepThree_star` gives the book's `(∗)` for one admissible `a`; this assembles the whole
 count.  The `X` occurring there sweep all of `F^×` (`exists_mem_K_mu_sq_inv_eq`), and the
@@ -786,28 +823,16 @@ only `X` at which the argument is unavailable is the one whose `a` solves `s^a =
 unique because `K` is regular on `Q₀^#` (`eq_of_conj_distinguishedInvolution_eq`).  That is
 the book's single excluded point `α^{2τ}`.
 
-Two normalizations of the book are visible in the conclusion and are *not* gaps:
-
-* `θ = 1` reads here as `σ|_F = τ|_F`, since `θ` is defined as `σ⁻¹ ∘ τ` rather than
-  imported from the type-`B` datum.
-* correspondingly `α` appears as `σ⁻¹ α`.
-
-Neither survives: `eq_id_of_sq_eq_mul_on` shows that `σ|_F = τ|_F` already *forces*
-`σ|_F = 1` — the book's `{μ|_F, ν|_F} = {1_F, θ}` is a consequence, not a choice — so the
-model's `θ` is the identity on `F` and `σ⁻¹ α` is `α`.
-
-`hcard` is the book's "`|F| ≥ 8`, since `θ` is of odd order".  It is carried as a
-hypothesis because the odd order of `θ` belongs to the type-`B` datum, which this
-development does not track; without it the count genuinely fails — over `𝐅₄` the Frobenius
-satisfies `X + X^θ = 1` on both points outside `𝐅₂`. -/
-theorem stepThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+What `(∗)` is then used for splits into two halves with *different* hypotheses —
+`stepThree` (the book's `|F| ≥ 8`) and `stepThree_of_odd` (the book's "`θ` is of odd
+order") — and both start here. -/
+theorem stepThree_star_all (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
-    (hcard : 5 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
     (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
     (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
@@ -822,13 +847,16 @@ theorem stepThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
         = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
     (hWinv : ∀ v : ↥hyp.W,
       σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
-    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (_hζ1 : ζ ≠ 1) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) :
-    (∀ X ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, θ X = X) ∧
-      σ.symm (hyp.centerCoord sfive M ι hyQ0 /
-          hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)
-        = ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
-          + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹ := by
+    ∃ z ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
+      ∀ X ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, X ≠ 0 → X ≠ z →
+        (σ.symm (hyp.centerCoord sfive M ι hyQ0 /
+            hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)) ^ 2
+          + (((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
+              + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹) ^ 2
+          + (((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
+              + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹) * (X + θ X) = 0 := by
   classical
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have h2E : (2 : M.E) = 0 := by
@@ -908,10 +936,142 @@ theorem stepThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     have hs := hyp.stepThree_star H hC2 sfive M hZc hmu hVW ι d hequiv σ τ θ hθ
       hscale hWinv hζ hωQ hωQ0 hyQ0 hsqω haK (hyp.K.inv_mem hcK) hfω hb
     rwa [hXa] at hs
-  exact eq_one_and_eq_of_star_subfield h2E _ θ hθmem hθinj hαmem
+  exact ⟨_, hzmem, hstar⟩
+
+/-- **§3 (3)** (Peterfalvi Part II, p. 130): **`θ = 1` and `ω² = (0, ζ + ζ⁻¹)`**, run off
+`(∗)` by the book's counting.
+
+`hcard` is the book's "`|F| ≥ 8`", which it derives from the odd order of `θ`.  Carried
+as a hypothesis here, it is the *only* thing the counting needs; `stepThree_of_odd`
+replaces it by the odd order itself and so also covers `|F| = 4`.
+
+Two normalizations of the book are visible in the conclusion and are *not* gaps:
+
+* `θ = 1` reads here as `σ|_F = τ|_F`, since `θ` is defined as `σ⁻¹ ∘ τ` rather than
+  imported from the type-`B` datum.
+* correspondingly `α` appears as `σ⁻¹ α`.
+
+Neither survives: `eq_id_of_sq_eq_mul_on` shows that `σ|_F = τ|_F` already *forces*
+`σ|_F = 1` — the book's `{μ|_F, ν|_F} = {1_F, θ}` is a consequence, not a choice — so the
+model's `θ` is the identity on `F` and `σ⁻¹ α` is `α`. -/
+theorem stepThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hcard : 5 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (σ τ : M.E ≃+* M.E) (θ : M.E →+ M.E) (hθ : ∀ x : M.E, θ x = σ.symm (τ x))
+    (hscale : ∀ k : ↥hyp.actualKActor,
+      σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
+    (hWinv : ∀ v : ↥hyp.W,
+      σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) :
+    (∀ X ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, θ X = X) ∧
+      σ.symm (hyp.centerCoord sfive M ι hyQ0 /
+          hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)
+        = ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
+          + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹ := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have h2E : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  obtain ⟨z, hzmem, hstar⟩ := hyp.stepThree_star_all H hC2 hm hQ0card sfive M hZc hmu hVW
+    ι d hequiv σ τ θ hθ hscale hWinv hζ hζ1 hωQ hωQ0 hyQ0 hsqω hfω
+  exact eq_one_and_eq_of_star_subfield h2E _ θ
+    (hyp.theta_mem_frobFixed M σ τ θ hθ) (hyp.theta_injective M σ τ θ hθ)
+    (hyp.centerCoord_div_mem_frobFixed sfive M ι σ hyQ0 hyp.distinguishedInvolution_mem_Q0)
     (hyp.mu_W_add_inv_mem_frobFixed M ⟨ζ, hζ⟩) hzmem
     (hyp.mu_W_add_inv_ne_zero M hmu (fun hc => hζ1 (congrArg Subtype.val hc)))
     hcard hstar
+
+/-- **§3 (3) with the book's own hypothesis** (Peterfalvi Part II, p. 130): `θ = 1` and
+`ω² = (0, ζ + ζ⁻¹)`, from **"`θ` is of odd order"** rather than from `|F| ≥ 8`.
+
+The book writes "if `θ ≠ 1`, then `|F| > 8` since `θ` is of odd order", and only then runs
+the count.  Both branches are here:
+
+* `θ ≠ 1` — `OddOrder.RingAut.three_le_of_odd_orderOf` turns the odd order into `m ≥ 3`,
+  i.e. `|F| ≥ 8`, and `stepThree` runs the count;
+* `θ = 1` — nothing to count: `(∗)` loses its bracket in characteristic `2` at any single
+  admissible `X`, leaving `α² = w²`.  Three elements of `F` suffice, which `hcard` gives.
+
+So `|F| = 4` — the case the count genuinely fails on, since over `𝐅₄` the Frobenius
+satisfies `X + X^θ = 1` at both points outside `𝐅₂` — is covered: there the Frobenius has
+order `2`, so an automorphism of odd order is already the identity. -/
+theorem stepThree_of_odd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hcard : 3 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (σ τ : M.E ≃+* M.E) (θ : M.E →+ M.E) (hθ : ∀ x : M.E, θ x = σ.symm (τ x))
+    (hodd : Odd (orderOf (τ.trans σ.symm)))
+    (hscale : ∀ k : ↥hyp.actualKActor,
+      σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
+    (hWinv : ∀ v : ↥hyp.W,
+      σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) :
+    (∀ X ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, θ X = X) ∧
+      σ.symm (hyp.centerCoord sfive M ι hyQ0 /
+          hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)
+        = ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
+          + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹ := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have h2E : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  by_cases hne : (τ.trans σ.symm : M.E ≃+* M.E) = 1
+  · -- `θ` is the identity outright; `(∗)` at one admissible point gives `α = w`
+    have hfix : ∀ x : M.E, θ x = x := by
+      intro x
+      rw [hθ]
+      exact congrFun (congrArg (fun ρ : M.E ≃+* M.E => (ρ : M.E → M.E)) hne) x
+    refine ⟨fun X _ => hfix X, ?_⟩
+    obtain ⟨z, hzmem, hstar⟩ := hyp.stepThree_star_all H hC2 hm hQ0card sfive M hZc hmu
+      hVW ι d hequiv σ τ θ hθ hscale hWinv hζ hζ1 hωQ hωQ0 hyQ0 hsqω hfω
+    obtain ⟨X, hX0, hXz⟩ :=
+      exists_ne_zero_ne (α := ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) hcard
+        ⟨z, hzmem⟩
+    have hs := hstar (X : M.E) X.2 (fun hc => hX0 (Subtype.ext hc))
+      (fun hc => hXz (Subtype.ext hc))
+    rw [hfix (X : M.E)] at hs
+    refine eq_of_sq_add_sq h2E ?_
+    linear_combination hs - (((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
+      + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹) * (X : M.E) * h2E
+  · -- `θ ≠ 1`: the odd order forces `m ≥ 3`, i.e. the book's `|F| ≥ 8`
+    have hcardE : Nat.card M.E = 2 ^ (m * 2) := by rw [M.card, ← pow_mul]
+    have hm3 : 3 ≤ m :=
+      OddOrder.RingAut.three_le_of_odd_orderOf (p := 2) hcardE hodd hne
+    have hcard5 : 5 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) := by
+      rw [OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm]
+      calc (5 : ℕ) ≤ 2 ^ 3 := by norm_num
+        _ ≤ 2 ^ m := Nat.pow_le_pow_right (by norm_num) hm3
+    exact hyp.stepThree H hC2 hm hQ0card sfive M hZc hmu hVW hcard5 ι d hequiv σ τ θ hθ
+      hscale hWinv hζ hζ1 hωQ hωQ0 hyQ0 hsqω hfω
 
 /-- **The model's `θ` is the identity on `F` — and so is `σ`** (Peterfalvi Part II, p. 130,
 reconciling the two `θ`'s of §3).

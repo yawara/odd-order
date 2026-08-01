@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.FieldTheory.Fixed
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.Algebra.CharP.Subring
 import Mathlib.Algebra.Ring.Action.End
 import Mathlib.Algebra.Ring.Action.Subobjects
 
@@ -30,6 +32,10 @@ the automorphism group is handed over as an abstract subgroup of `RingAut F`.
   element that all of `B` fixes, then `σ ∈ B`.
 * `OddOrder.RingAut.eq_of_fixedSet_eq` — subgroups of `RingAut F` with the same
   fixed set are equal.
+* `OddOrder.RingAut.orderOf_dvd_of_card_eq_pow` — the order of an automorphism
+  divides the degree over the prime field.
+* `OddOrder.RingAut.three_le_of_odd_orderOf` — Peterfalvi's "`|F| > 8`, since `θ`
+  is of odd order" (Part II, Ch. IV §3 (3), p. 130).
 -/
 
 namespace OddOrder.RingAut
@@ -122,5 +128,61 @@ theorem mem_of_fixes_fixedPoints {B : Subgroup (_root_.RingAut F)}
 theorem eq_of_fixedSet_eq {B B' : Subgroup (_root_.RingAut F)}
     (h : fixedSet B = fixedSet B') : B = B' := by
   rw [← fixer_fixedSet B, ← fixer_fixedSet B', h]
+
+/-- **The order of a field automorphism divides the degree over the prime field.**
+
+Artin's lemma applied to `B = ⟨θ⟩`: the fixed field `F^B` has index `orderOf θ` in `F`,
+so `|F| = |F^B|^{orderOf θ}`; both cardinalities being powers of `p`, the exponent
+`orderOf θ` divides `m`.
+
+This is the arithmetic behind Peterfalvi's "`|F| > 8`, since `θ` is of odd order"
+(Part II, Ch. IV §3 (3), p. 130): an automorphism of odd order `> 1` forces `m` to have
+an odd divisor `> 1`, hence `m ≥ 3`. -/
+theorem orderOf_dvd_of_card_eq_pow {p m : ℕ} [Fact p.Prime] [CharP F p]
+    (hcard : Nat.card F = p ^ m) (θ : _root_.RingAut F) : orderOf θ ∣ m := by
+  classical
+  haveI : Fintype F := Fintype.ofFinite F
+  haveI : Fintype ↥(FixedPoints.subfield (↥(Subgroup.zpowers θ)) F) := Fintype.ofFinite _
+  haveI : CharP ↥(FixedPoints.subfield (↥(Subgroup.zpowers θ)) F) p :=
+    Subfield.charP (FixedPoints.subfield (↥(Subgroup.zpowers θ)) F) p
+  have hrank : Module.finrank ↥(FixedPoints.subfield (↥(Subgroup.zpowers θ)) F) F
+      = orderOf θ := by
+    rw [finrank_fixedSet, Nat.card_zpowers]
+  obtain ⟨k, -, hk⟩ := FiniteField.card (K := ↥(FixedPoints.subfield (↥(Subgroup.zpowers θ)) F)) p
+  have hFcard : Fintype.card F = p ^ ((k : ℕ) * orderOf θ) := by
+    rw [Module.card_eq_pow_finrank
+      (K := ↥(FixedPoints.subfield (↥(Subgroup.zpowers θ)) F)) (V := F), hk, hrank, ← pow_mul]
+  have hm : m = (k : ℕ) * orderOf θ := by
+    refine Nat.pow_right_injective (Fact.out (p := p.Prime)).two_le ?_
+    change p ^ m = p ^ ((k : ℕ) * orderOf θ)
+    rw [← hFcard, ← hcard, Nat.card_eq_fintype_card]
+  exact ⟨(k : ℕ), by rw [hm, Nat.mul_comm]⟩
+
+/-- **"`|F| > 8`, since `θ` is of odd order"** (Peterfalvi Part II, Ch. IV §3 (3), p. 130).
+
+Stated for the *quadratic extension* `E` of `F`, which is where §3 (3) meets it: `θ` is
+an automorphism of `E = 𝐅_{q²}` and `F = 𝐅_q` with `q = pᵐ`.  A nontrivial `θ` of odd
+order has order an odd divisor `> 1` of `2m`, hence of `m`, so `m ≥ 3` and `|F| ≥ 8`.
+
+The odd order of `θ`, not any bound on `|F|`, is what the book uses: the counting of
+§3 (3) fails over `𝐅₄`, whose only nontrivial automorphism is the Frobenius — and that
+one is excluded because its order is `2`. -/
+theorem three_le_of_odd_orderOf {p m : ℕ} [Fact p.Prime] [CharP F p]
+    (hcard : Nat.card F = p ^ (m * 2)) {θ : _root_.RingAut F} (hodd : Odd (orderOf θ))
+    (hne : θ ≠ 1) : 3 ≤ m := by
+  have hdvd := orderOf_dvd_of_card_eq_pow hcard θ
+  have h1 : orderOf θ ≠ 1 := fun hc => hne (orderOf_eq_one_iff.mp hc)
+  obtain ⟨j, hj⟩ := hodd
+  have h3 : 3 ≤ orderOf θ := by omega
+  -- an odd divisor of `2m` divides `m`
+  have hcop : Nat.Coprime (orderOf θ) 2 := by
+    exact Odd.coprime_two_right ⟨j, hj⟩
+  have hdvdm : orderOf θ ∣ m := (Nat.Coprime.dvd_of_dvd_mul_right hcop) hdvd
+  have hm0 : m ≠ 0 := by
+    rintro rfl
+    have hone : Nat.card F = 1 := by rw [hcard]; simp
+    exact one_ne_zero (α := F)
+      (Finite.card_le_one_iff_subsingleton.mp (le_of_eq hone) |>.elim _ _)
+  exact le_trans h3 (Nat.le_of_dvd (Nat.pos_of_ne_zero hm0) hdvdm)
 
 end OddOrder.RingAut
