@@ -6,12 +6,13 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Field.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.LinearCombination
+import OddOrder.Algebra.FixedPointDensity
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: solving (5) and (6)
 
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
-Part II, Ch. IV §4, p. 133.
+Part II, Ch. IV §4, pp. 133-134.
 
 Writing `X` for the quotient coordinate `f(ω s^b)‾` and `Y` for its `η`-image, the
 book's equations read
@@ -41,6 +42,9 @@ numerator and denominator by `a^{2μ}` gives the form used here, which avoids in
 * `sectionFour_solve` — (5) and (6) with `Y` eliminated, in inverse-free form.
 * `sectionFour_seven`, `sectionFour_eight` — the displayed (7) and (8).
 * `sectionFour_eq_of_add_eq_zero` — a vanishing denominator forces `a^{2μ} = ζ`.
+* `sectionFour_fixed_of_shift`, `sectionFour_sq_eq_id` — the closing shift trick of
+  p. 134: writing (10) at `X + 1` and subtracting leaves `X^{μ²} = X`, and that on
+  enough points forces `μ² = id`.
 -/
 
 set_option autoImplicit false
@@ -117,6 +121,50 @@ theorem sectionFour_eq_of_add_eq_zero (h2 : (2 : E) = 0) {X Y w A B c : E} (hA :
     · exact h
     · exact absurd h hw
   linear_combination hAc - c * h2
+
+/-! ### (10) and the shift trick
+
+The book's (10) (p. 134) reads
+
+  `(ζ + ζ⁻¹ + X^μ) X = (ζ + ζ⁻¹ + X^{μ²}) X^μ`  for `X ∈ F − {0, α^{2τ}}`,
+
+and it is closed by: "Writing (10) with `X + 1` in place of `X` and subtracting (10)
+from the result, we see that `X^{μ²} = X`."
+-/
+
+/-- **The shift trick of Peterfalvi Part II, Ch. IV §4** (p. 134).
+
+Writing (10) at `X + 1` and subtracting (10) at `X`, every quadratic term cancels — `μ`
+being a ring map, `(X+1)^μ = X^μ + 1` — and what is left is `X^{μ²} = X`.
+
+No characteristic hypothesis is needed: the cancellation is an identity of commutative
+rings. -/
+theorem sectionFour_fixed_of_shift (μ : E →+* E) {s X : E}
+    (hX : (s + μ X) * X = (s + μ (μ X)) * μ X)
+    (hX1 : (s + μ (X + 1)) * (X + 1) = (s + μ (μ (X + 1))) * μ (X + 1)) :
+    μ (μ X) = X := by
+  simp only [map_add, map_one] at hX1
+  linear_combination hX - hX1
+
+/-- **(10) forces `μ² = id`** (Peterfalvi Part II, Ch. IV §4, p. 134).
+
+`T` collects the points where (10) — at `X` or at `X + 1` — is unavailable; the book's
+is `{0, α^{2τ}, 1, α^{2τ} + 1}`.  The shift trick fixes every point outside `T`, and the
+fixed points of the additive map `μ²` form a subgroup, so `μ² = id` as soon as `T` is
+smaller than half of `F` (`eq_id_of_fixes_compl`).
+
+In §4 that hypothesis is comfortable: there `|F| = q = ℓ^p` with `ℓ > 2` and `p` an odd
+prime, so `q ≥ 64` while `|T| = 4`. -/
+theorem sectionFour_sq_eq_id [Finite E] (μ : E ≃+* E) {s : E} (T : Finset E)
+    (hten : ∀ X : E, X ∉ T →
+      (s + μ X) * X = (s + μ (μ X)) * μ X ∧
+        (s + μ (X + 1)) * (X + 1) = (s + μ (μ (X + 1))) * μ (X + 1))
+    (hcard : 2 * T.card < Nat.card E) (X : E) :
+    μ (μ X) = X :=
+  OddOrder.FiniteField.eq_id_of_fixes_compl
+    (μ.toRingHom.toAddMonoidHom.comp μ.toRingHom.toAddMonoidHom) T
+    (fun y hy => sectionFour_fixed_of_shift μ.toRingHom (hten y hy).1 (hten y hy).2)
+    hcard X
 
 end SectionFourArithmetic
 
