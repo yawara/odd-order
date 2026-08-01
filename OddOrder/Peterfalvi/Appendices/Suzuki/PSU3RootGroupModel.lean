@@ -362,6 +362,45 @@ theorem unitaryCoord_center {m : ℕ} (M : hyp.QuotientFieldModel m)
   rfl
 
 include hyp in
+/-- **`μ(1, ζ)` lies outside `F` for `ζ ≠ 1`** (Peterfalvi Part II, Ch. IV §3, p. 131:
+the book's `ζ⁻¹ ∉ F`, which is what makes `a + ζ⁻¹` invertible for `a ∈ F`).
+
+`μ(W)` consists of norm-one elements (`mu_W_normOne`), and a norm-one element of `F`
+squares to `1`, hence is `1` in characteristic two; `μ` injective transfers `ζ ≠ 1` to
+`μ(1, ζ) ≠ 1`. -/
+theorem mu_W_notMem_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hmu : Function.Injective M.mu) {ζ : ↥hyp.W} (hζ : ζ ≠ 1) :
+    ((M.mu (1, ζ) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := by
+  have hnorm : ((M.mu (1, ζ) : M.Eˣ) : M.E) ^ (2 ^ m + 1) = 1 := by
+    have h := congrArg (fun u : M.Eˣ => (u : M.E)) (M.mu_W_normOne ζ)
+    simpa using h
+  refine OddOrder.FiniteField.notMem_frobFixedSubfield_of_normOne m hnorm ?_
+  intro hval
+  have hmu1 : M.mu ((1 : ↥hyp.actualKActor), ζ) = 1 := Units.ext hval
+  exact hζ (congrArg Prod.snd (hmu (hmu1.trans (map_one M.mu).symm)))
+
+include hyp in
+/-- **`μ(k, 1) + μ(1, ζ) ≠ 0`** for `ζ ≠ 1` — the denominator `a + ζ⁻¹` of stages (2)
+and (4) never vanishes, `μ(K)` lying in `F` and `μ(1, ζ)` not.
+
+This is both what lets stage (2) be solved for `f(ω s^a)‾` and the hypothesis `w ∉ S`
+of `eq_and_inv_of_star`. -/
+theorem mu_K_add_mu_W_ne_zero {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hmu : Function.Injective M.mu) {ζ : ↥hyp.W} (hζ : ζ ≠ 1)
+    (k : ↥hyp.actualKActor) :
+    ((M.mu (k, 1) : M.Eˣ) : M.E) + ((M.mu (1, ζ) : M.Eˣ) : M.E) ≠ 0 := by
+  have h2 : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  intro hc
+  refine hyp.mu_W_notMem_frobFixed M hmu hζ ?_
+  have hval : ((M.mu (1, ζ) : M.Eˣ) : M.E) = ((M.mu (k, 1) : M.Eˣ) : M.E) := by
+    linear_combination hc - ((M.mu (k, 1) : M.Eˣ) : M.E) * h2
+  rw [hval]
+  exact OddOrder.FiniteField.mem_frobFixedSubfield.mpr (M.mu_K_frobFixed k)
+
+include hyp in
 /-- **The unitary coordinate of an element of `Q₀`** — `unitaryCoord_center` phrased in
 the `centerCoord` of Ch. IV §2, which is the form §2 and §3 state their equations in. -/
 theorem unitaryCoord_toCenter {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
