@@ -53,6 +53,13 @@ setup lives on its image in `G` (`residualImage`).
 * `intrinsicPointEquiv`, `intrinsicResidualQuotientULift` — the same hypothesis with its
   point set relabelled as the standard `Unital ℓ`, which lifts into `Ω`'s universe, and
   `theoremAInductionBelow_intrinsicResidualQuotient` — the induction hypothesis there.
+* `exists_fgh_residual_eq`, `fgh_map_residualQuotient` — step (2)'s two transfers,
+  `G ← U` (uniqueness of the canonical form) and `U ← U/Z(U)`.
+* `rankOneSetup_centralizer`, `setup_centralizerQuotient`, `exists_fgh_centralizer_eq`,
+  `fgh_map_centralizerQuotient` — the same for `C = C_G(X)` and `C/𝒩(C)`, whose standing
+  data `PSU3SectionFourSetup` already supplies in full.
+* `SectionFourSetup.isStandardModel_centralizerQuotient` — hence the Proposition of
+  Ch. III §3 on `C/𝒩(C)`, with no residual hypothesis about the quotient.
 -/
 
 set_option autoImplicit false
@@ -716,6 +723,49 @@ theorem theoremAInductionBelow_intrinsicResidualQuotient
   exact ih (hlt.trans (hyp.natCard_residualImageQuotient_lt hXV hX)) hA
 
 end Model
+
+/-! ### §2 and §3 run outright on `C/𝒩(C)`
+
+`PSU3SectionFourSetup.standingData_centralizerQuotient` supplies both standing bundles and
+all the numerics for `centralizerQuotientHypothesis`; the induction hypothesis restricts
+along `theoremAInductionBelow_centralizerActionQuotient` and the central `x₀ ≠ 1` is
+generic.  So the Proposition of Ch. III §3 holds there with no residual hypothesis, which
+is what step (2) applies before reading its conclusion back into `C_G(P)` along the two
+transfers above. -/
+
+namespace SectionFourSetup
+
+variable {hyp} (s4 : hyp.SectionFourSetup)
+
+/-- **The Proposition of Ch. III §3 holds on `C/𝒩(C)`** (Peterfalvi Part II, Ch. IV §4,
+step (2), p. 133). -/
+theorem isStandardModel_centralizerQuotient {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu)
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
+    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (ih : TheoremAInductionBelow G Ω) :
+    letI := hyp.centralizerQuotientMulAction s4.P_le_V
+    ∃ (n : ℕ) (sfive : (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).LemmaFiveSetup n)
+      (Mq : (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).QuotientFieldModel n)
+      (x₀ : ↥(Subgroup.center (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).Q)),
+      n ≠ 0 ∧ x₀ ≠ 1 ∧
+        (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).IsStandardModel sfive Mq x₀ := by
+  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  obtain ⟨n, hn, hQ0card, hcardQ, hst, _hQsuzBar, ⟨sfive⟩, ⟨Mq⟩⟩ :=
+    s4.standingData_centralizerQuotient M hZ hmu hQsuz hCop hSolv hP hA3 hord ih
+  obtain ⟨x₀, hx₀⟩ :=
+    (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).exists_center_Q_ne_one
+  exact ⟨n, sfive, Mq, x₀, hn, hx₀,
+    (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).exists_standardModel sfive Mq hst hn
+      hQ0card hcardQ (hyp.theoremAInductionBelow_centralizerActionQuotient s4.P_le_V hP ih)
+      x₀ hx₀⟩
+
+end SectionFourSetup
 
 end Hypothesis
 
