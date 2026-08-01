@@ -651,6 +651,53 @@ theorem corollaryTwo_of_sectionThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     hWdvd hW1 hfQ hhW θm hsemi hθ haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv uAut huAut
     hconj hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀ hα hζ hζ1
 
+/-! ### The remaining inputs of `corollaryTwo_of_sectionThree`
+
+Apart from the model, the type-`B` scaling pair and §2's base pair, every hypothesis is
+a fact about the standing hypothesis itself. -/
+
+/-- **The braid relation `t s t = s t s`** (Peterfalvi Part II, Ch. I §3, Lemma 4,
+p. 107) for the standing hypothesis' own involutions — the `hC2` of §3.
+
+Both `s` and `t` are involutions, so `|s t| = 3` *is* the braid relation. -/
+theorem braid_of_orderThree
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3) :
+    hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution :=
+  braid_of_involutions_of_orderOf_mul_eq_three hyp.distinguishedInvolution_sq hyp.t_sq hst
+
+/-- **`1 < |W|`** — the `hW1` of §3, from a single non-trivial element. -/
+theorem one_lt_natCard_W (hW : ∃ x ∈ hyp.W, x ≠ 1) : 1 < Nat.card ↥hyp.W := by
+  obtain ⟨x, hxW, hx1⟩ := hW
+  haveI : Nontrivial ↥hyp.W :=
+    ⟨⟨⟨x, hxW⟩, 1, fun hc => hx1 (congrArg Subtype.val hc)⟩⟩
+  exact Finite.one_lt_card
+
+/-- **`f` may be taken to map `Q` into `Q`** — the `hfQ` of §3.
+
+`IsFGH` constrains `f` only on `Q^#`, so the `f` of `exists_fgh` need not send `1`
+anywhere in particular.  Redefining it at `1` changes nothing that `IsFGH` sees and makes
+it map `Q` into `Q`, which is the form stages (4) and (5) use (they apply `f` to elements
+of `Q` without knowing they are non-trivial). -/
+theorem exists_fgh_mapsTo :
+    ∃ f₁ g₁ h₁ : G → G,
+      OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f₁ g₁ h₁ ∧
+        ∀ ρ : G, ρ ∈ hyp.Q → f₁ ρ ∈ hyp.Q := by
+  classical
+  obtain ⟨f₁, g₁, h₁, H₁⟩ := hyp.exists_fgh
+  refine ⟨fun x => if x = 1 then 1 else f₁ x, g₁, h₁,
+    ⟨fun x hxQ hx1 => ?_, fun x hxQ hx1 => ?_⟩, fun ρ hρQ => ?_⟩
+  · rw [if_neg hx1]
+    exact H₁.mem x hxQ hx1
+  · rw [if_neg hx1]
+    exact H₁.eq x hxQ hx1
+  · change (if ρ = 1 then (1 : G) else f₁ ρ) ∈ hyp.Q
+    by_cases hρ1 : ρ = 1
+    · rw [if_pos hρ1]
+      exact hyp.Q.one_mem
+    · rw [if_neg hρ1]
+      exact (H₁.mem ρ hρQ hρ1).1
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
