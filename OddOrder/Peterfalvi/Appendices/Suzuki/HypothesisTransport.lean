@@ -293,6 +293,46 @@ noncomputable def ofMulEquivPullback (h : Hypothesis A Λ) (e : A ≃* B) :
   change a • l = (e.symm (e a)) • l
   rw [e.symm_apply_apply]
 
+/-! ### The transported facts, for the pullback form
+
+`ofMulEquivPullback` fixes its equivariance proof internally, so the general
+`ofMulEquiv_*` lemmas cannot have that argument inferred at a use site; these restate
+them with it discharged. -/
+
+variable (hp : Hypothesis A Λ) (ep : A ≃* B)
+
+theorem ofMulEquivPullback_V_eq_W (hVW : hp.V = hp.W) :
+    letI := MulAction.compHom Λ ep.symm.toMonoidHom
+    (hp.ofMulEquivPullback ep).V = (hp.ofMulEquivPullback ep).W := by
+  letI := MulAction.compHom Λ ep.symm.toMonoidHom
+  exact ofMulEquiv_V_eq_W _ _ _ _ hVW
+
+theorem ofMulEquivPullback_natCard_Q0 :
+    letI := MulAction.compHom Λ ep.symm.toMonoidHom
+    Nat.card ((hp.ofMulEquivPullback ep).Q0) = Nat.card (hp.Q0) := by
+  letI := MulAction.compHom Λ ep.symm.toMonoidHom
+  exact ofMulEquiv_natCard_Q0 _ _ _ _
+
+theorem ofMulEquivPullback_natCard_Q :
+    letI := MulAction.compHom Λ ep.symm.toMonoidHom
+    Nat.card ((hp.ofMulEquivPullback ep).Q) = Nat.card (hp.Q) := by
+  letI := MulAction.compHom Λ ep.symm.toMonoidHom
+  exact ofMulEquiv_natCard_Q _ _ _ _
+
+theorem ofMulEquivPullback_orderOf_distinguishedInvolution_mul_t :
+    letI := MulAction.compHom Λ ep.symm.toMonoidHom
+    orderOf ((hp.ofMulEquivPullback ep).distinguishedInvolution *
+        (hp.ofMulEquivPullback ep).t)
+      = orderOf (hp.distinguishedInvolution * hp.t) := by
+  letI := MulAction.compHom Λ ep.symm.toMonoidHom
+  exact ofMulEquiv_orderOf_distinguishedInvolution_mul_t _ _ _ _
+
+theorem ofMulEquivPullback_exists_ne_one_mem_W (hw : ∃ x ∈ hp.W, x ≠ 1) :
+    letI := MulAction.compHom Λ ep.symm.toMonoidHom
+    ∃ x ∈ (hp.ofMulEquivPullback ep).W, x ≠ 1 := by
+  letI := MulAction.compHom Λ ep.symm.toMonoidHom
+  exact ofMulEquiv_exists_ne_one_mem_W _ _ _ _ hw
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
