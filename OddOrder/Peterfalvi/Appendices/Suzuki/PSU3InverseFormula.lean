@@ -638,6 +638,108 @@ theorem stepFour_at_omega {m : ℕ} (M : hyp.QuotientFieldModel m)
   · rw [hfeq, hconjy, map_inv,
       Suzuki2Groups.unitaryCoord_inv m M.card hu, hnorm1, one_mul, hx, hZq]
 
+/-- **Moving along the fibre adds `μ(a²)` to the unitary coordinate**: `ω s^a` is the
+book's `(ω̄, x + a)` (Peterfalvi Part II, p. 131).
+
+Right multiplication by a central element shifts the unitary coordinate by that
+element's own coordinate (the cocycle term drops out, the quotient coordinate of a
+central element being `0`), and that coordinate is `μ(a²)` once the centre is
+normalized so that `s = (0, 1)`. -/
+theorem unitaryCoord_mul_conj {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hker : ∀ z : ↥(Subgroup.center hyp.Q),
+      Φ (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {e : M.E} {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (hΨq : ∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient)
+    (hΨc : ∀ ρ : ↥hyp.Q, (Ψ ρ).central = ν * (Φ ρ).central)
+    (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hdsq : ∀ k : ↥hyp.actualKActor,
+      ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) = ((M.mu (k, 1) : M.Eˣ) : M.E) ^ 2)
+    (hs : (ν : M.E) *
+      hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 = 1)
+    {ω a : G} (hωQ : ω ∈ hyp.Q) (haK : a ∈ hyp.K)
+    (hprodQ : ω * (a * hyp.distinguishedInvolution * a⁻¹) ∈ hyp.Q) :
+    Suzuki2Groups.unitaryCoord m u
+        (Ψ ⟨ω * (a * hyp.distinguishedInvolution * a⁻¹), hprodQ⟩)
+      = Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩)
+        + ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) := by
+  have hzQ0 : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D haK) hyp.distinguishedInvolution_mem_Q0
+  have hSaeq : (⟨a * hyp.distinguishedInvolution * a⁻¹, hyp.Q0_le_Q hzQ0⟩ : ↥hyp.Q)
+      = ((hyp.toCenter sfive hzQ0 : ↥(Subgroup.center hyp.Q)) : ↥hyp.Q) := rfl
+  have hcq : (Ψ ⟨a * hyp.distinguishedInvolution * a⁻¹,
+      hyp.Q0_le_Q hzQ0⟩).quotient = 0 := by
+    rw [hSaeq, hΨq, hker]
+    exact mul_zero e
+  have hcy : Suzuki2Groups.unitaryCoord m u
+      (Ψ ⟨a * hyp.distinguishedInvolution * a⁻¹, hyp.Q0_le_Q hzQ0⟩)
+      = ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) := by
+    rw [hSaeq, hyp.unitaryCoord_toCenter sfive M Φ ι hker hu Ψ hΨq hΨc hzQ0,
+      hyp.centerCoord_conj_eq_mu_sq sfive M ι d hequiv hdsq haK
+        hyp.distinguishedInvolution_mem_Q0]
+    linear_combination ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) * hs
+  have hmul : (⟨ω * (a * hyp.distinguishedInvolution * a⁻¹), hprodQ⟩ : ↥hyp.Q)
+      = (⟨ω, hωQ⟩ : ↥hyp.Q) *
+        ⟨a * hyp.distinguishedInvolution * a⁻¹, hyp.Q0_le_Q hzQ0⟩ := Subtype.ext rfl
+  rw [hmul, map_mul, Suzuki2Groups.unitaryCoord_mul m M.card hu, hcq, hcy,
+    zero_pow (by positivity), mul_zero, add_zero]
+
+/-- **The fibre of `ω̄` is `{ω} ∪ {ω s^a : a ∈ K}`** (Peterfalvi Part II, p. 131: the
+elements `(ω̄, y)` over which stage (4) quantifies).
+
+Elements of `Q` with the same quotient coordinate differ by an element of `Q₀`
+(`exists_mem_Q0_mul_of_quotient_eq`), and `K` is transitive on `Q₀^#`
+(`exists_mem_KSet_conj_eq_of_mem_Q0`), so the fibre is swept by `a ↦ ω s^a` together
+with `ω` itself. -/
+theorem eq_or_exists_conj_mul_of_quotient_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (hquot : ∀ ρ : ↥hyp.Q, (Φ ρ).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) ρ)))
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {e : M.E} (hene : e ≠ 0)
+    (hΨq : ∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient)
+    {ρ ω : G} (hρQ : ρ ∈ hyp.Q) (hωQ : ω ∈ hyp.Q)
+    (h : (Ψ ⟨ρ, hρQ⟩).quotient = (Ψ ⟨ω, hωQ⟩).quotient) :
+    ρ = ω ∨ ∃ (a : G) (_ : a ∈ hyp.K),
+      ρ = ω * (a * hyp.distinguishedInvolution * a⁻¹) := by
+  -- the two coordinates agree, hence the two classes
+  have hcoord : M.coord (Additive.ofMul
+        (QuotientGroup.mk' (Subgroup.center hyp.Q) (⟨ρ, hρQ⟩ : ↥hyp.Q)))
+      = M.coord (Additive.ofMul
+        (QuotientGroup.mk' (Subgroup.center hyp.Q) (⟨ω, hωQ⟩ : ↥hyp.Q))) := by
+    rw [← hquot, ← hquot]
+    exact mul_left_cancel₀ hene (by rw [← hΨq, ← hΨq]; exact h)
+  have hmk : (QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q) :
+      ↥hyp.Q ⧸ Subgroup.center hyp.Q) = QuotientGroup.mk ⟨ρ, hρQ⟩ :=
+    (M.coord.injective hcoord).symm
+  obtain ⟨w, hwQ0, hw⟩ := hyp.exists_mem_Q0_mul_of_quotient_eq hZc hωQ hρQ hmk
+  by_cases hw1 : w = 1
+  · exact Or.inl (by rw [hw, hw1, mul_one])
+  · obtain ⟨k, hkSet, hk⟩ := hyp.exists_mem_KSet_conj_eq_of_mem_Q0 hwQ0 hw1
+    have hkK : k ∈ hyp.K := by rw [← hyp.coe_K] at hkSet; exact hkSet
+    refine Or.inr ⟨k⁻¹, hyp.K.inv_mem hkK, ?_⟩
+    rw [hw, ← hk]
+    group
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
