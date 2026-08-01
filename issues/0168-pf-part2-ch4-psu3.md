@@ -5234,3 +5234,40 @@ lint 純ゼロ)。
 2. 6 本そろったら `exists_standardModel` を `residualQuotientHypothesis` に当てる。
 3. → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2) の `ω`, `ζ`。
 4. 商から ambient へ持ち上げ (`IsFGH.eq_of_le`) ⟹ **段 (2) が閉じる** ⟹ §4 完成。
+
+## 2026-08-01 (97): 🎯 `ih` 供給 landing — 段 (2)(b) の前提が**全部そろった**
+
+`theoremAInductionBelow_residualQuotient` (フルビルド green 4989 jobs・lint 純ゼロ)。
+
+⚠ **(96) の未解決点の原因は数学でなく elaboration だった**。汎用補題
+`TheoremAInductionBelow.of_natCard_le` を当てると `Finite ?m` で stuck になるのは、
+`TheoremAInductionBelow` が**素の `def`** なので goal との unify で `B` が決まらないため
+(`(B := …) (Λ' := …) (G := G) (Ω := Ω)` を全部明示しても解消しなかった)。
+⟹ **`intro` で直接展開して ambient `ih` を当てれば通る**
+(`TheoremAInductionBelow` は `∀` に展開されるので `intro` が効く)。
+⚠ 同種の「汎用補題が当たらない」は今後も起きるので、**`TheoremAInductionBelow` 系は
+`intro` で開くのが定石**と覚えておく。
+
+### 🎯 `residualQuotientHypothesis` について前提が全部そろった
+
+| 前提 | 供給元 |
+|---|---|
+| `hst` | `residualQuotientHypothesis_orderOf_distinguishedInvolution_mul_t` |
+| `hm : n ≠ 0` | `data.one_lt_n` |
+| `hQ0card` | `natCard_residualQuotientHypothesis_Q0` |
+| `hcardQ` | `natCard_residualQuotientHypothesis_Q` |
+| `ih` | **今回** |
+| `x₀ ∈ Z(Q)`, `≠ 1` | `exists_center_Q_ne_one` (汎用、(71)) |
+| `hVW` (§3 endpoint) | `residualQuotientHypothesis_V_eq_W` |
+| `w ∈ W#` (Lemma 5) | `exists_ne_one_mem_residualQuotientHypothesis_W` |
+| `hQsuz` | `IsSuzuki2Group.of_equiv` + `standardRootSubgroup_isSuzuki2Group` |
+
+### ⚠ 次セッションはここから
+
+1. `lemmaFiveSetup_of_orderThree_of_mem_W` → `nonempty_quotientFieldModel_of_orderThree`
+   → **`exists_standardModel` を `residualQuotientHypothesis` に当てる**。
+   ⚠ `hQsuz` は `(residualQuotientHypothesis details).Q` が標準根群の像であることを
+   使う ⟹ `ofMulEquivPullback_Q` 相当 (`ofMulEquiv_Q` は `rfl`) + `of_equiv`。
+2. → §3 段 (4) 鎖 (`stepFour_star`/`base`/`pointwise`/`at_omega`/`cover`) →
+   `corollaryTwo_of_stepFour` → 段 (2) の `ω`, `ζ`。
+3. 商から ambient へ持ち上げ (`IsFGH.eq_of_le`) ⟹ **段 (2) が閉じる** ⟹ §4 完成。
