@@ -5580,3 +5580,52 @@ canonical 分解なので `fgh_eq_of_canonical` が `f₁(π x) = π (f x)` 等�
 
 ⟹ 次の一手 = **`CentralizerPSUData.residualQuotientEquiv` の構成を読み、`t` の行き先を
 実測する**。
+
+## 2026-08-01 (104): 🔍 `π t = t̄` は**そのままでは成り立たない** — 経路は共役で確定
+
+(103) の「次の一手」を実測した結果、**設計上の要点**が 1 つ判明した。
+
+### 実測: `residualQuotientEquiv` は `t` について何も言わない不透明データ
+
+`CentralizerPSUData.residualQuotientEquiv` は**構造体のフィールド**で、
+`centralizer_trichotomy_of_induction` での構成は
+
+```
+residualQuotientEquiv := (hyp.centralizerResidualQuotientEquiv hXV hCQ).trans eTarget
+```
+
+`eTarget` は**帰納法が返す `TheoremAConclusion` の `data.groupEquiv`** — 完全に不透明。
+⟹ `residualQuotientHypothesis` の `t̄` (標準モデルの `t` を引き戻したもの) が
+ambient の `t` の像 `π t` と一致する保証は**無く、フィールドを足して主張することも
+できない** (構成側で証明できないので unsound になる)。
+
+### 🔑 経路: 対合は 1 つの共役類 (Ch. I Prop 2(b)) — 既に repo に在る
+
+`Hypothesis.isConj_of_involutions` (`InvolutionClass.lean:149`) が
+**任意の `Hypothesis` について「`G` の対合は単一の共役類」**を与える。
+`residualQuotientHypothesis` にこれを当てればよい:
+
+1. `t ∈ U` は landing 済 (`t_mem_primeComplementResidual`)。`Z(U) = P ∩ U` は
+   奇位数なので `π t ≠ 1`、かつ `(π t)² = 1` ⟹ `π t` は `U/Z(U)` の対合。
+2. `isConj_of_involutions` (対 `residualQuotientHypothesis`) で `IsConj t̄ (π t)`、
+   すなわち `π t = c * t̄ * c⁻¹` なる `c` を得る。
+3. `Hypothesis.ofMulEquiv` は **`t := e h.t`** と定める
+   (`HypothesisTransport.lean`)。`e := MulAut.conj c`、点の写像を `ω ↦ c • ω`
+   (内部自己同型と作用は両立: `(c g c⁻¹) • (c • ω) = c • (g • ω)`) に取ると、
+   **`t` が `π t` である `Hypothesis` が `U/Z(U)` 上で得られる**。
+4. そこへ `IsFGH.map` (`π : U → U/Z(U)`) を当てる ⟹ 書籍 p.133 の
+   `f₁(ω) ∈ ω^{-ζ₁}(P ∩ U)`、`h₁(ω) ∈ ζ₁³(P ∩ U)`。
+
+⚠ (96)-(101) で landing した `U/Z(U)` の供給物 (`hVW`, `hQ0card`, …) は
+`residualQuotientHypothesis` について述べてあるので、**共役でひねった版へ移す**
+補題が要る (どれも `ofMulEquiv_*` transport で機械的。`ofMulEquiv` は
+`MulAut.conj c` について `Q`, `Q0`, `W`, `V` を `map (conj c)` に送る)。
+
+### ⚠ 次セッションはここから
+
+1. `conjugateHypothesis` (仮称) — `Hypothesis A Λ` と `c : A` から
+   `MulAut.conj c` + `ω ↦ c • ω` で移した `Hypothesis`。`ofMulEquiv` の特殊化。
+2. `π t` が対合であること (`Z(U)` の奇位数 = `P` が奇素数位数から)。
+3. `isConj_of_involutions` で `c` を取り、`t = π t` の `Hypothesis` を作る。
+4. (96)-(101) の供給物をその版へ移す (`ofMulEquiv_*`)。
+5. `IsFGH.map` + `IsFGH.eq_of_le` ⟹ 段 (2) 完了。
