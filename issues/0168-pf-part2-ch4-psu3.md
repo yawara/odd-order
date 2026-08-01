@@ -3323,3 +3323,44 @@ repo では `hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3` として
 2. §4 の standing hypothesis 構造 + 段 (1) 本体の配線
    (`natCard_Q0_eq_pow` で `q = ℓ^p`、`centralizer_V_centralizer_Q0` で `Z(U) ⊆ PW`)。
 3. 段 (2)(3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
+
+## 2026-08-01 (49): 🎯 §4 段 (1) の Glauberman ステップ landing
+
+`exists_fixed_not_mem_Q0` (`PSU3SectionFourSetup.lean`) — `Q/Q₀` の非自明な
+`P`-固定類は `P`-固定な代表を持ち、その代表は `Q₀` の外に居る。
+道具は `GroupTheory.CoprimeFixedPoints.map_fixedSubgroup_eq_fixedSubgroup_quotient`
+(Isaacs Cor 3.28 経由)。
+
+⟹ **段 (1) の exponent 判別子が §4 の standing hypothesis から完全に供給される**:
+
+```
+C_{Q/Q₀}(P) ≠ 1
+  → exists_fixed_not_mem_Q0            (Glauberman、今回)
+  → not_isElementaryAbelian_cQ_of_not_mem_Q0   (48)
+  → nonempty_psu3Data_of_orderOf_eq_three      (45)  ⟹ PSU(3,ℓ) 枝
+```
+
+⚠ 実装の罠: `d x d⁻¹ = u·x` (`u = d x d⁻¹ x⁻¹`) への書き換えを素の `rw` でやると
+`u` の中の `d x d⁻¹` も一緒に潰れて goal が壊れる (`x d x d⁻¹ x d x⁻¹ d⁻¹ x⁻¹ = x`
+のような形になる)。**`set u := …` で先に抽象化してから `rw`** する。
+`u·x = x·u` は `Q₀ ≤ Z(Q)` の中心性 (`hZ`) から。
+
+### §4 段 (1) の現状
+
+| 部品 | 状態 |
+|---|---|
+| `U = O^{2'}(C_G(P))` | ✅ `primeComplementResidual 2 C` |
+| Ch. I §3 Prop 1(c) | ✅ `centralizer_trichotomy_of_induction` |
+| 枝の同定 (位数 3 + exponent) | ✅ `nonempty_psu3Data_of_orderOf_eq_three` |
+| exponent 判別子の供給 | ✅ (48) + (49) |
+| `U/Z(U) ≅ PSU(3,ℓ)` | ✅ `CentralizerPSUData.residualQuotientEquiv` |
+| `q = ℓ^p` | ✅ `natCard_Q0_eq_pow` |
+| `Z(U) ⊂ PW` (Galois) | ✅ `centralizer_V_centralizer_Q0` |
+| **`Z(U) ⊆ P`** | ⚠ 残り: 「`PZ(U)` が `C_Q(P) ⊄ Q₀` を中心化 ⟹ `PZ(U) ∩ W = 1`」 |
+
+### ⚠ 次セッションはここから
+
+1. `Z(U) ⊆ P` の詰め (`PZ(U) ∩ W = 1`)。⚠ 「`W` が `Q/Q₀` に固定点自由に作用」
+   (§4 前置きが `P ∩ W = 1` に使うのと同じ事実) を repo で実測すること。
+2. §4 の standing hypothesis 構造を置いて段 (1) を組み上げる。
+3. 段 (2)(3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
