@@ -6571,3 +6571,40 @@ bilinear package (`φ`,`θ`,`Φ`,`Θ`,`u`,`ι` + 8 条件) を**そのまま bun
 `Q̄₀ = π(C_{Q₀}(X))` (`map_centralizer_Q0_eq_quotient_Q0`) を使って ambient の
 `C_D(X) ≤ C(C_{Q₀}(X))` に落とせないか (= §4 の `centralizer_V_centralizer_Q0`
 = Galois の定理の周辺)。
+
+## 2026-08-02 (126): `hVW` の核 — 「モデルから読む中心化」が §4 では既に**仮説として孤立**している
+
+`commute_of_commute_mk'_of_mem_D_of_mem_Q` (今回) で `hVW` は次に還元される:
+
+`hVW` ⟸ `V̄ ≤ C(Q̄₀)` (`V_eq_W_iff_le_centralizer_Q0`)
+      ⟸ 「`π(v) ∈ V̄` なる `v ∈ C_D(X)` は `C_{Q₀}(X)` を中心化する」(本補題で核が落ちる)
+
+⚠ **重要な実測**: この形の主張は §4 では既に**孤立した仮説**として扱われている。
+`SectionFourSetup.inf_le_sup_W_of_centralizes` (`PSU3SectionFourSetup.lean:918`) は
+
+```
+(hcent : V ⊓ U ≤ centralizer (Q₀ ⊓ C(P)))  →  V ⊓ U ≤ P ⊔ W
+```
+
+で、docstring が「**the hypothesis here is the centralizing statement the book reads off
+the structure of `PSU(3, ℓ)`**」と明記している。Galois の定理
+(`centralizer_V_centralizer_Q0 : V ⊓ C(Q₀ ⊓ C(P)) = P ⊔ W`) は逆向きの計算で、
+中心化そのものは与えない。
+
+`exists_ne_one_mem_W_centralizer` はこれを**モデルから**取っている:
+`details.exists_mem_residual_commute_Q0` が `C_{Q₀}(P)` と可換な `x ∈ O^{2'}(C)` を与え、
+その `V`-成分に Galois を当てて `v ∈ P ⊔ W` を得る (証明 1015-1030 行)。
+
+⟹ `hVW` も同種の**モデル入力**を要する。次セッションはまず
+`CentralizerPSUData.exists_mem_residual_commute_Q0` の statement を読み、
+`V̄` の元の持ち上げ全体について同じ中心化が言えるか (= `PSU(3,ℓ)` で
+`C_{D̄}(t̄) ≤ C(Q̄₀)` = torus の中で `V = W`) を実測すること。
+
+### 今の在庫 (Corollary 2 の引数)
+
+| 引数 | 状態 |
+|---|---|
+| `hC2` / `hfQ` 下準備 / `hmu` / `hZc` | ✅ |
+| `hW1` / `hhW` | ✅ 導出可 |
+| `hVW` | ⚠ 上記の還元まで。モデル入力が要る |
+| `hKcard` / `hWdvd` | ⚠ 未着手 |
