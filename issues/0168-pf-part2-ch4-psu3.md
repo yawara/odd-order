@@ -3514,3 +3514,32 @@ canonical 分解**であり、`fgh_eq_of_canonical` (分解の一意性) がそ�
    `primeComplementResidual` が `C_G(P)` の部分群なので自明。
 2. `(ℓ+1)/(ℓ+1,3) ≠ 1` — `ProjectiveUnitary` 側の位数計算を実測すること。
 3. `U` 側の `Hypothesis` 構成 (§3 Cor 2 を当てるため)。⚠ ここが段 (2) の本体。
+
+## 2026-08-01 (55): §4 段 (2) の `V ∩ U ⊆ P × C_W(P)` landing
+
+| 定理 | 書籍 (p.133 段 (2)) |
+|---|---|
+| `inf_le_sup_W_of_centralizes` | 「Galois の定理で `V ∩ U ⊂ PW`」 |
+| `inf_le_sup_centralizer_W` | 「`U ⊂ C_G(P)` ゆえ `V ∩ U ⊂ P × C_W(P)`」 |
+
+後者の要点: `v = p·w` と書くと `w = p⁻¹v` が `P` を中心化する。`v` が中心化するのは
+`U ⊆ C_G(P)` から、`p` が中心化するのは **`P` が素数位数ゆえ可換**だから
+(`isCyclic_of_prime_card` + `IsCyclic.commGroup` を `letI` で入れる)。
+
+### 段 (2) の残り
+
+| 主張 | 状態 |
+|---|---|
+| `(V ∩ U)/(P ∩ U)` が `C_{Q₀}(P)` を中心化 (PSU(3,ℓ) 構造) | ⚠ 未 (上記 2 定理の仮説) |
+| `V ∩ U ⊂ PW` / `⊂ P × C_W(P)` | ✅ 今回 |
+| `\|(V∩U)/(P∩U)\| = (ℓ+1)/(ℓ+1,3) ≠ 1` | ⚠ 未 (PSU(3,ℓ) の位数計算) |
+| `U` 側で §3 Cor 2 | ⚠ `U` 側 `Hypothesis` の構成が要る |
+| `f(ω) = f₁(ω)`, `h(ω) = h₁(ω)` | ✅ `IsFGH.eq_of_le` (54) |
+
+### ⚠ 次セッションはここから
+
+1. `ProjectiveUnitary` 側で `(ℓ+1)/(ℓ+1,3)` 相当の位数計算が在るか実測する
+   (`Bruhat.lean` / `TorusCentralizer.lean` / `Simplicity.lean` 付近)。
+2. `U` 側の `Hypothesis` 構成 — 段 (2) の本体。⚠ `CentralizerQuotient.lean` の
+   `centralizerQuotientHypothesis` が「`C_G(X)` の faithful 商に (A1)-(A3) を
+   与える」構成なので、まずそれが `U` にも使えるか実測すること。
