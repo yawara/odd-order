@@ -2721,3 +2721,36 @@ p.132 をページ画像で確認した結果、Ch. IV の残りは以下の構�
 軌道外: exists_mem_Q0_orbitOfF_eq → x₀, ρ' := ρ x₀ (f(ρ') が軌道内)
         → 上で f(ρ') のファイバー全体に P → stepFive_secondCase_elem → P ρ
 ```
+
+## 2026-08-01 (33): 段 (5) 第 1 ケースの梱包 landing
+
+**`stepFive_of_mem_orbit`**: `ρ` の商座標が `ω` の `μ(kv)` 倍なら逆元公式が `ρ` で
+成り立つ (書籍 p.131「`ρ̄` が `ω̄` の `KW`-軌道に居れば (5) は (4) から従う」)。
+
+`exists_conjQHom_eq_of_quotient_smul` で `ρ = σ^{kv}` に分解 → `hcover`
+(= `stepFour_cover`) で σ → `exists_mem_K_conjQHom_eq` + `stepFive_orbit` で ρ。
+
+⚠ **実装の要点** (次に似た配線をするとき): `conjQHom kv σ = ⟨ρ,_⟩` から
+群レベルの `k·v·σ·(k·v)⁻¹ = ρ` を取り出し、結論の書き換えは**部分型の元として**
+(`Subtype.ext` で `⟨k·v·σ·(k·v)⁻¹, _⟩ = ⟨ρ, _⟩`) 行う。所属証明が式に依存するので
+式の中で `rw` すると motive が壊れる。
+
+⚠ 罠 2 (前記の「`⟨v,hv⟩` vs `kv.2`」) は**問題にならなかった** — Lean 4 の構造体
+eta により `⟨(kv.2 : G), kv.2.2⟩` と `kv.2` は defeq で、
+`conjQHom_kActor_apply_val hkK kv.2.2` がそのまま通る。
+
+### ⚠ 段 (5) の残り: 場合分け 1 本
+
+```
+∀ ρ ∈ Q − Q₀:
+  by_cases 「(Ψρ).quotient が (Ψω).quotient の μ(KW)-倍か」
+  · yes → stepFive_of_mem_orbit
+  · no  → exists_mem_Q0_orbitOfF_eq で x₀, ρ' := ρ x₀ (f(ρ') が軌道内)
+          → stepFive_of_mem_orbit を f(ρ') のファイバーに
+          → stepFive_secondCase_elem で ρ へ
+```
+
+場合分けの述語は `∃ kv, (Ψρ).quotient = μ(kv) * (Ψω).quotient`
+(`Classical.em` で分岐。`orbitOfF` の商群を経由しなくても直接書ける)。
+⚠ 「no」の側で `exists_mem_Q0_orbitOfF_eq` が返す軌道の等式を上の形に翻訳する層が要る
+(`baseUnit`/`fUnit` は `M.coord`、`Ψ` の商座標はその `e` 倍)。
