@@ -760,7 +760,15 @@ theorem exists_standardModel
       -- the conjugation action becomes it after conjugating by `u ∈ U`
       u ∈ (Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts ∧
       (((MulAut.congr Φ).toMonoidHom.comp (hyp.conjQHom)).range).map
-        (MulAut.conj u).toMonoidHom = Θ.range := by
+        (MulAut.conj u).toMonoidHom = Θ.range ∧
+      -- the quotient coordinate of the model is the book's `α : Q / Q₀ → E`
+      (∀ e : ↥hyp.Q, (Φ e).quotient =
+        M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) e))) ∧
+      -- the cocycle is invariant under the norm-one scalars `μ(W)`
+      (∀ (v : ↥hyp.W) (x y : M.E),
+        ((φ (((M.mu (1, v) : M.Eˣ) : M.E) * x) (((M.mu (1, v) : M.Eˣ) : M.E) * y) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) := by
   classical
   obtain ⟨ι, d, hnorm, hequiv⟩ :=
     hyp.exists_center_coordinate_normalized s M hm hQ0card x₀ hx₀
@@ -771,8 +779,13 @@ theorem exists_standardModel
   obtain ⟨u, hu, hconj⟩ :=
     hyp.exists_conj_conjQHom_range_eq s M hst hm hQ0card hcardQ inductionHypothesis
       ι' d' hequiv' φ Φ hker hquot Θ hΘq hΘc
-  refine ⟨φ, θ, Φ, Θ, u, hsemi, haniso, ?_, hΘq, hu, hconj⟩
-  rw [hker x₀, hone (Additive.ofMul x₀) hnorm]
+  refine ⟨φ, θ, Φ, Θ, u, hsemi, haniso, ?_, hΘq, hu, hconj, hquot, fun v x y => ?_⟩
+  · rw [hker x₀, hone (Additive.ofMul x₀) hnorm]
+  · have h := hdiagscale _ _
+      (fun z => hyp.centreQuadraticMap_smul_KW s M ι' d' hequiv' (1, v) z) x y
+    have hone' : M.mu ((1 : ↥hyp.actualKActor), (1 : ↥hyp.W)) = 1 := map_one M.mu
+    rw [hone'] at h
+    simpa using h
 
 end Hypothesis
 
