@@ -196,6 +196,35 @@ theorem torusWeight_eq_one_of_commute_weylElement {n : ℕ} (c : PSUTorusParamet
           star ((c : GeneralTorusParameter n) : Field n) := by rw [hstar]
     _ = 1 := inv_mul_cancel₀ hne
 
+/-- **Converse of `torusWeight_eq_one_of_commute_weylElement`**: a norm-one
+determinant-one torus parameter commutes with the Weyl element.
+
+`c c* = 1` says `(c*)⁻¹ = c`, i.e. that Weyl conjugation — which sends the parameter to
+`(c*)⁻¹` — fixes it. -/
+theorem commute_weylElement_psuTorusHom_of_torusWeight_eq_one {n : ℕ}
+    (c : PSUTorusParameter n)
+    (hw : torusWeight (c : GeneralTorusParameter n) = 1) :
+    Commute (weylElement n) (psuTorusHom n c) := by
+  have hw2 : weylElement n * weylElement n = 1 := by
+    have h := weylElement_sq_eq_one n
+    rwa [sq] at h
+  have hstar : (star ((c : GeneralTorusParameter n) : Field n))⁻¹
+      = ((c : GeneralTorusParameter n) : Field n) :=
+    inv_eq_of_mul_eq_one_left hw
+  have hfix : Unital.psuWeylParameterHom n c = c := by
+    apply Subtype.ext
+    apply Units.ext
+    rw [Unital.coe_psuWeylParameterHom, coe_weylParameterHom]
+    exact hstar
+  have hconj := weylElement_mul_psuTorusHom_mul_weylElement c
+  rw [hfix] at hconj
+  have heq : weylElement n * psuTorusHom n c = psuTorusHom n c * weylElement n :=
+    calc weylElement n * psuTorusHom n c
+        = (weylElement n * psuTorusHom n c * weylElement n) * weylElement n := by
+          rw [mul_assoc (weylElement n * psuTorusHom n c), hw2, mul_one]
+      _ = psuTorusHom n c * weylElement n := by rw [hconj]
+  exact heq
+
 /-- **A norm-one torus parameter fixes `Ω₁(S₀)` pointwise.**
 
 `Ω₁(S₀)` is the centre line `{u | u.fst = 0}` (`sq_eq_one_iff_fst_eq_zero`), on

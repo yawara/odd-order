@@ -270,6 +270,23 @@ theorem standardHypothesis_V_eq_W (n : ℕ) (hn : 1 < n) :
   obtain ⟨c₂, hc₂⟩ : x ∈ (psuTorusHom n).range := hx.1
   rw [← hc₁, ← hc₂, ← map_mul, ← map_mul, mul_comm]
 
+/-- **`W ≠ 1` in the standard model** — the `1 ≠ w ∈ W` that Ch. I §3 Lemma 5 and the
+Ch. III §3 field model need.
+
+`W = V` here (`standardHypothesis_V_eq_W`) and `V = C_D(t)` is the norm-one torus, which
+is non-trivial for `ℓ = 2ⁿ > 2` (`exists_ne_one_mem_psuTorus_torusWeight_eq_one`). -/
+theorem exists_ne_one_mem_standardHypothesis_W (n : ℕ) (hn : 1 < n) :
+    ∃ w ∈ (standardHypothesis n hn).W, w ≠ 1 := by
+  obtain ⟨c, hcmem, hcne, hcw⟩ := exists_ne_one_mem_psuTorus_torusWeight_eq_one n hn
+  refine ⟨psuTorusHom n ⟨c, hcmem⟩, ?_, ?_⟩
+  · rw [← standardHypothesis_V_eq_W n hn]
+    exact ⟨⟨⟨c, hcmem⟩, rfl⟩,
+      Subgroup.mem_centralizer_singleton_iff.mpr
+        (commute_weylElement_psuTorusHom_of_torusWeight_eq_one ⟨c, hcmem⟩ hcw).symm⟩
+  · intro h
+    exact hcne (congrArg Subtype.val
+      (psuTorusHom_injective n (h.trans (map_one (psuTorusHom n)).symm)))
+
 end
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
