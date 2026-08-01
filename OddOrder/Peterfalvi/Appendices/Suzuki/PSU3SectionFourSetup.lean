@@ -67,6 +67,10 @@ element of `Q − Q₀` does *not* square to `1`.
   `nonempty_quotientFieldModel_of_orderThree` take about `Q̄`, `Q̄₀`.
 * `Hypothesis.exists_center_Q_ne_one` — the `x₀ ∈ Z(Q)`, `x₀ ≠ 1` of
   `exists_standardModel`.
+* `Hypothesis.psu3Numerics_and_standingData_centralizerQuotient` — step (2)'s
+  prerequisite in one piece: the `PSU(3, 2ⁿ)` numerics *and* both standing bundles
+  (`LemmaFiveSetup`, `QuotientFieldModel`) for the centralizer quotient, from the branch
+  data of Ch. I §3 Proposition 1(c).  Its one remaining input is `W̄ ≠ 1`.
 -/
 
 set_option autoImplicit false
@@ -548,6 +552,75 @@ theorem exists_center_Q_ne_one : ∃ x₀ : ↥(Subgroup.center hyp.Q), x₀ ≠
   refine ⟨⟨⟨u, huQ⟩, Subgroup.mem_center_iff.mpr fun v => ?_⟩, ?_⟩
   · exact Subtype.ext (hucomm (v : G) v.2).symm
   · exact fun hone => hu1 (congrArg (Subtype.val ∘ Subtype.val) hone)
+
+/-- **The `PSU(3, 2ⁿ)` numerics and the §2/§3 standing data, for the centralizer
+quotient** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133).
+
+> If `f₁` and `h₁` denote the mappings `f` and `h` relative to `U`, `U ∩ H` and `t`,
+> then, by Corollary 2 of the proposition of §3, there is an element
+> `ω ∈ (Q − Q₀) ∩ U` such that `f₁(ω) ∈ ω^{-ζ₁}(P ∩ U)` and `h₁(ω) ∈ ζ₁³(P ∩ U)`.
+
+Running §2/§3 there means supplying the data those sections are parametrized by.  This
+assembles all of it out of the `PSU(3, ℓ)` branch of Ch. I §3 Proposition 1(c):
+
+* `n ≠ 0`, `|Q̄₀| = 2ⁿ`, `|Q̄| = |Q̄₀|³` — the numerics `exists_standardModel` takes,
+  transported from `CentralizerPSUData` by `natCard_quotient_Q0_eq_pow` and
+  `natCard_quotient_Q_eq_Q0_cube`;
+* `|s̄ t̄| = 3` (`orderOf_distinguishedInvolution_mul_t_of_psu3Target` at the quotient)
+  and `Q̄` a Suzuki `2`-group (`isSuzuki2Group_quotient_Q`);
+* and, for any `1 ≠ w ∈ W̄`, the two standing bundles themselves —
+  `LemmaFiveSetup` (Ch. I §3 Lemma 5) and `QuotientFieldModel` (Ch. III §3).
+
+The one remaining input for step (2) is therefore `W̄ ≠ 1`, which the book reads off the
+`PSU(3, ℓ)` structure as `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1`, using `ℓ > 2`. -/
+theorem psu3Numerics_and_standingData_centralizerQuotient {X : Subgroup G}
+    (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hnea : ¬ OddOrder.GroupTheory.IsElementaryAbelian 2
+      ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (ih : TheoremAInductionBelow G Ω) :
+    letI := hyp.centralizerQuotientMulAction hXV
+    ∃ n : ℕ, n ≠ 0 ∧
+      Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q0 = 2 ^ n ∧
+      Nat.card (hyp.centralizerQuotientHypothesis hXV hA3).Q
+        = Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q0 ^ 3 ∧
+      orderOf ((hyp.centralizerQuotientHypothesis hXV hA3).distinguishedInvolution *
+        (hyp.centralizerQuotientHypothesis hXV hA3).t) = 3 ∧
+      OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
+        ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q ∧
+      ∀ w ∈ (hyp.centralizerQuotientHypothesis hXV hA3).W, w ≠ 1 →
+        Nonempty ((hyp.centralizerQuotientHypothesis hXV hA3).LemmaFiveSetup n) ∧
+        Nonempty ((hyp.centralizerQuotientHypothesis hXV hA3).QuotientFieldModel n) := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  set qhyp := hyp.centralizerQuotientHypothesis hXV hA3 with hqhyp
+  obtain ⟨tri⟩ := hyp.centralizer_trichotomy_of_induction hXV hX hA3 ih
+  obtain ⟨⟨data, _teq, details⟩⟩ :=
+    nonempty_psu3Data_of_orderOf_eq_three tri.branch hord hnea
+  have hn0 : 0 < data.n := lt_trans Nat.zero_lt_one data.one_lt_n
+  have hQ0 : Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G)))
+      = 2 ^ data.n :=
+    details.natCard_cQ0_eq_baseField.trans
+      (OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_baseField
+        data.n hn0)
+  have hQ0card : Nat.card ↥qhyp.Q0 = 2 ^ data.n :=
+    hyp.natCard_quotient_Q0_eq_pow hXV hA3 hQ0
+  have hcardQ : Nat.card qhyp.Q = Nat.card ↥qhyp.Q0 ^ 3 :=
+    hyp.natCard_quotient_Q_eq_Q0_cube hXV hA3 details.natCard_cQ_eq_cQ0_cube
+  have hst : orderOf (qhyp.distinguishedInvolution * qhyp.t) = 3 :=
+    orderOf_distinguishedInvolution_mul_t_of_psu3Target qhyp tri.result.L
+      tri.result.normal tri.result.oddIndex data
+  have hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥qhyp.Q :=
+    hyp.isSuzuki2Group_quotient_Q hXV hA3 details.cQ_isSuzuki2Group
+  have ihq : TheoremAInductionBelow (hyp.centralizerActionQuotient X)
+      ↥(MulAction.fixedPoints X Ω) :=
+    hyp.theoremAInductionBelow_centralizerActionQuotient hXV hX ih
+  refine ⟨data.n, hn0.ne', hQ0card, hcardQ, hst, hQsuz, fun w hw hw1 => ?_⟩
+  obtain ⟨sfive⟩ := qhyp.lemmaFiveSetup_of_orderThree_of_mem_W hw hw1 hst hQsuz
+    hn0.ne' hQ0card hcardQ ihq
+  exact ⟨⟨sfive⟩, qhyp.nonempty_quotientFieldModel_of_orderThree hst hQsuz hn0.ne'
+    hQ0card hcardQ ihq sfive hw hw1⟩
 
 /-! ## The standing hypothesis of §4 -/
 
