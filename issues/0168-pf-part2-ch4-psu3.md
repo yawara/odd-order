@@ -4355,3 +4355,32 @@ PSU(3,ℓ) からの入力は Ch. III §1 の `exists_mem_residual_commute_Q0` 1
 3. `hVW : qhyp.V = qhyp.W` を組む (上の降下 + Galois + (72))。
 4. → `exists_standardModel` for `qhyp` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`
    → 商から `U` へ持ち上げ + `IsFGH.eq_of_le` ⟹ **段 (2) が閉じる**。
+
+## 2026-08-01 (77): (A) の model 側の中身を一般化 — `scalePoint_eq_of_torusWeight_eq_one`
+
+`exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one` の証明本体は「特定の `c`」に
+依存せず `torusWeight c = 1` だけを使っていた ⟹ 全ノルム 1 パラメータの一般形
+`scalePoint_eq_of_torusWeight_eq_one` に切り出し、既存定理はその系にした
+(`TorusCentralizer.lean`、フルビルド green・lint 純ゼロ)。
+
+これが (A)「`(V ∩ U)/(P ∩ U)` centralizes `C_{Q₀}(P)`」の model 側の中身
+(トーラスは `Z(Q)` = `Ω₁(S₀)` にノルム倍で作用するので、ノルム 1 なら自明作用)。
+
+### (A) の残り = 群側の辞書 2 本
+
+| # | 主張 | 手本 |
+|---|---|---|
+| (A1) | `V ⊓ U` の像が `standardPermGroup n` のトーラスに入る | `PSUCentre.lean` の `exists_mem_residual_commute_Q0` (Sylow.mapEquiv + `Z(F)` 跨ぎ commutator の coprime 潰し) |
+| (A2) | `t` を中心化するトーラス元は `torusWeight = 1` | model 側 (`GeneratedAction` / `Bruhat`) を実測 |
+
+これが入れば `scalePoint_eq_of_torusWeight_eq_one` で `V ⊓ U ≤ C(C_{Q₀}(P))`、
+Galois で `V ⊓ U ≤ P ⊔ W`、coprime 降下 (76) で `V̄ ≤ W̄`、`W_le_V` で `hVW` が出る。
+
+### ⚠ 次セッションはここから
+
+1. (A2) の実測 — `standardPermGroup n` の Weyl 対合 `t` とトーラスの交換関係
+   (`Bruhat.lean` / `StandardGenerators.lean` に `t c t⁻¹ = c^{-q}` 型の式が在るはず)。
+   `c` が `t` と交換 ⟺ `c^{1+q} = 1` ⟺ `torusWeight c = 1` が狙い。
+2. (A1) の辞書を `PSUCentre.lean` を手本に作る。
+3. → `hVW` → `exists_standardModel` for `qhyp` → §3 段 (4) 鎖 →
+   `corollaryTwo_of_stepFour` → 商から `U` へ持ち上げ ⟹ **段 (2) が閉じる**。
