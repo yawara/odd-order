@@ -2103,3 +2103,73 @@ Ch. I §1 Prop 4 と同じ論法)。
 * pp. 122-134 = `references/peterfalvi/pdftotext/05.6_pp_122_134_Characterization_of_PSU3_q.txt`
 * 上流 = [0167](closed/0167-pf-part2-ch3-s3-model.md) (Ch. III §3)
 * Coq 併読 = `coq/theories/PFsection*.v` の該当箇所 (対応表 = `notes/meta/coq_odd_order_reference.md`)
+
+## 2026-08-01 (17): unitary model を `congrEquiv` 化、共役をユニタリ座標へ、(4) の `(∗∗)` 完成
+
+### (a) `exists_unitaryModel` を `congrEquiv` 版に差し替え (完了)
+
+`exists_hermitianCocycle_eq` で `φ x y = c·H_u(x,y)` (`c = φ(1,1)`) が取れるので、
+`c = e²` (`e ∈ F`) と置けば `H_u(e x, e y) = e^{1+q} H_u(x,y) = φ x y` ちょうど。
+⟹ 比較は素の `congrEquiv (x,w) ↦ (e x, w)`。
+
+対角比較版との差:
+* 両座標が明示 (`(Ψ ρ).quotient = e·(Φ ρ).quotient`, **`(Ψ ρ).central = (Φ ρ).central`**)
+* 中心が **pointwise** 不動 (以前は `Φ.symm ⟨0,w⟩` の像だけ)
+* 商座標がスカラー倍 ⟹ `E`-スカラー作用と可換
+
+`u` は定理側が選ぶので結論が `∃ u, ∃ hu, ∃ e, ∃ Ψ, …` に変わった
+(`exists_unitaryModel_coord` も同型に変更、`{u} (hu)` 引数は削除)。
+`hbil` (θ=1 版の `F`-双線型性) が新たな入力。
+
+### (b) `centralScale_eq_norm_of_quotientScale` (`UnitaryCoordinates.lean`)
+
+**余輪体の対角がノルムの 0 でない定数倍なら、商座標を `a` 倍する自己同型は
+中心座標を `a^{1+q}` 倍する。**
+
+証明は `(1,0)` の平方 1 本: 平方は中心で座標 `φ(1,1)`、その像は中心で座標
+`φ(a,a) = φ(1,1)·a^{1+q}`。
+
+⟹ モデル作用 `Θ` の中心スカラーは書籍の `μ(k,1)^d` という**不透明な冪**だったが、
+`d` を知らずにノルムと同定できる (`mu_W_normOne` + `mu_K_frobFixed` 経由で
+`d = 2` を示す必要が無い)。
+
+### (c) `exists_unitaryModel_conj` — p.131 の共役公式
+
+    (a, y)^{kv} = (μ(kv)·a, μ(kv)^{1+q}·y)
+
+を `Ψ` の両座標について取得 ((a)+(b)+`unitaryCoord_of_scaled`)。
+
+### (d) 段 (4) の算術 — 新 leaf `PSU3InverseFormula.lean`
+
+| 定理 | 内容 |
+|---|---|
+| `star_of_secondEntry` | 第 2 成分比較 ⟹ `(∗∗) (a²+1)γ(a) = x + a + (1+ζ⁻²)/(a+ζ⁻¹)` |
+| `eq_and_inv_of_star` | `(∗∗)` ⟹ `x = ζ⁻¹` かつ `γ(a) = 1/(a+ζ⁻¹)` (`a ∈ F − {0,1}`) |
+| `gamma_eq_inv_of_secondEntry` | 上 2 つの合成 (`γ(a) = 1/(x+a)` = 書籍の `1/y`) |
+
+`eq_and_inv_of_star` は `w := ζ⁻¹` について「部分体 `S` の外」しか使わないので
+一般の `Subfield E` + `w ∉ S` で述べた (再利用可)。
+
+⚠ **`a = 1` (= `y = ζ⁻¹+1`) は原理的に除外される** — 書籍もそこは
+`ω → ω⁻¹`, `ζ → ζ⁻¹` の対称性で回収している (`f(ω⁻¹) = ω^{ζ⁻¹}` ゆえ
+`(ω', ζ') = (ω⁻¹, ζ⁻¹)` が §3 の仮説を満たす)。`ζ+1 ≠ ζ⁻¹+1` で被覆完了。
+
+### ⚠ 次セッションはここから (段 (4) の群論部分)
+
+算術は済んだので、残りは**座標公式を段 (1) に流し込む配線**:
+
+1. **`ω s^a` のユニタリ座標が `x + a`** — 中心 `Q₀` の座標写像が `s^a ↦ a`
+   (§2 段 (1) の `h(s^a) = a²` と整合するよう `a` は `K` の元の平方)
+   であることを確認 (`PSU3CenterCoordinate.lean` を実測すること)。
+   ⚠ p.130 の (1)(2) は `a ∈ K` で `a²` が出るが、p.131 は `a ∈ F − {0}` に
+   置き換わっている (`s^a = (0, a²)`、平方は標数 2 で全単射)。
+2. **段 (1) をユニタリ座標に降ろす** — `exists_unitaryModel_conj` の共役公式 +
+   `unitaryCoord_mul` / `unitaryCoord_mul_central` で
+   `star_of_secondEntry` の `hchain` を作る。
+   ⚠ 共役するスカラーは `ζ⁻¹a` と `ζ⁻²` と `ζ⁻¹`; ノルムはそれぞれ `a²`, `1`, `1`。
+3. **段 (2) の第 1 座標**を `stepTwo_linear` から取り出して `f(ω̄, x+a)` の
+   商座標を `ω̄/(a+ζ⁻¹)` に固定 (repo の `stepTwo_linear` は
+   `(μ(a²) + μ(ζ))·X̄ = ω̄` の形)。
+4. `y = ζ⁻¹` (= `a = 0`) の場合を `unitaryCoord_inv` + 共役公式で個別に処理
+   (`f(ω) = ω^{-ζ} = (ω̄ζ, ζ)` と `(ω̄/y, 1/y)` の一致)。
+5. `ω → ω⁻¹`, `ζ → ζ⁻¹` の対称性で `a = 1` を回収 → 段 (4) 完成 → 段 (5)。
