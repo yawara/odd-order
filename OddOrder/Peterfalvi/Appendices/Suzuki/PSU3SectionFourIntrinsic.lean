@@ -758,6 +758,34 @@ theorem orderOf_distinguishedInvolution_mul_t_intrinsicResidualQuotient (hXV : X
   · exact absurd (orderOf_eq_one_iff.mp h1) hne
   · exact h3
 
+/-- **`Z(Q̄) = Q̄₀ ∩ Q̄` for the intrinsic hypothesis on `U/Z(U)`** —
+`corollaryTwo_of_standardModel`'s `hZc`.
+
+Same argument as `center_Q_eq_Q0_centralizerQuotient`: `Z(Q̄)` has exponent `2` because
+`Q̄ ≅ C_Q(X) ≅ RootGroup ℓ` (`cQMulEquivMapQ`, `cQEquivRoot`) and `Z(RootGroup ℓ)` is the
+square-one central line. -/
+theorem center_Q_eq_Q0_intrinsicResidualQuotient
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    Subgroup.center ↥(hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q
+      = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q0.subgroupOf
+        (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q := by
+  refine (hyp.intrinsicResidualQuotient details hXD htX hCQ
+    hZD).center_Q_eq_Q0_subgroupOf_of_sq_eq_one (fun z hz => ?_)
+  have hn := data.one_lt_n
+  set e : ↥(hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q ≃* RootGroup data.n :=
+    (MulEquiv.subgroupCongr
+        (hyp.intrinsicResidualQuotient_Q details hXD htX hCQ hZD)).trans
+      ((hyp.cQMulEquivMapQ hXD htX hCQ hZD).symm.trans details.cQEquivRoot) with he
+  have hcz : e z ∈ Subgroup.center (RootGroup data.n) :=
+    (MulEquivClass.apply_mem_center_iff e).mpr hz
+  rw [RootGroup.center_eq_centerLine data.n (by omega), RootGroup.mem_centerLine_iff_sq_eq_one]
+    at hcz
+  exact e.injective (by rw [map_pow, hcz, map_one])
+
 /-! ### Moving the point set into `Ω`'s universe
 
 The ambient induction hypothesis `TheoremAInductionBelow G Ω` quantifies over permuted
