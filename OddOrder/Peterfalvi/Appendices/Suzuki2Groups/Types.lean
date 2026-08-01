@@ -120,6 +120,19 @@ theorem typeBQuadraticMap_apply (phi : RingAut F) (epsilon : F) (x : F × F) :
       x.1 * phi x.1 + epsilon * (x.1 * phi x.2) + x.2 * phi x.2 :=
   by simp [typeBQuadraticMap]
 
+/-- **The type-B quadratic map scales by `λ · φ(λ)`** (Peterfalvi Appendix III,
+Definition 3, read as the book's `c^x = x^{1+θ} c` of Part II, Ch. III §3, p. 120).
+
+Every term of `typeBQuadraticMap` is `(linear) · φ(linear)`, so scaling both coordinates
+by `λ ∈ F` scales the value by `λ φ(λ)` — the exponent `1 + θ` of the standing
+identification.  This is why the exponent `d` by which the actor scales `Z(Q)` has the
+shape `1 + 2^r`: it *is* `λ φ(λ)` in these coordinates. -/
+theorem typeBQuadraticMap_smul (phi : RingAut F) (epsilon lam : F) (x : F × F) :
+    typeBQuadraticMap phi epsilon (lam * x.1, lam * x.2)
+      = lam * phi lam * typeBQuadraticMap phi epsilon x := by
+  simp only [typeBQuadraticMap_apply, map_mul]
+  ring
+
 /-- The condition on `epsilon` in Appendix III, Definition 3.  Peterfalvi
 requires the displayed value to be nonzero when both coordinates are nonzero.
 -/
