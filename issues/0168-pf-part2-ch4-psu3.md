@@ -7280,3 +7280,41 @@ ULift 版へ `intrinsicResidualQuotientULift_{H,Q,D,t}` + section `SameGroup` �
 1. `hpair` — `U/Z(U)` の type-`B` scaling pair。§3 の type-`B` 入力を内在版へ移す仕事。
 2. `hsq` — §2 (20)。`f_eq_conj_inv_of_stepTwenty_chain` の未形式化前提
    (相異なる `KW` 軌道の代表族) を先に形式化するのが本筋。
+
+### (146) ⚠ 自己訂正: 奇位数仮説は `E` 上でなく `F` 上に置く (E 上だと充足不能)
+
+(143) で入れた `hodd : Odd (orderOf (τ.trans σ.symm))` (= `E = 𝐅_{q²}` 上の
+`θ = σ⁻¹τ` の位数) は**実際の状況で充足できない**。commit `0e97a301c` で訂正。
+
+**理由** (実測で確定):
+* `hWinv : σ(μ(1,v))·τ(μ(1,v)) = 1` ⟹ `τ(x) = σ(x)⁻¹` on `μ(W)` ⟹
+  `θ(x) = σ.symm(σ(x)⁻¹) = x⁻¹`、つまり **`θ` は `μ(W)` を反転する**。
+* `QuadraticFrobenius.qFrobenius_eq_inv_of_pow_succ_eq_one` より `q`-Frobenius `σ₀` も
+  norm-one 部分群を反転する。⟹ `θ = σ₀` がありうる (**位数 2 = 偶**)。
+* しかも `F = fixedSet σ₀` なので `σ₀|_F = id` で、§3 (3) の結論 `θ|_F = 1` と完全に整合。
+
+**書籍の `θ` は `F` 上の自己同型** — type-`B` datum が持つ `TypeBData.phi : RingAut F`
+(`phi_orderOf_odd : Odd (orderOf phi)` を**構造フィールドとして持つ**)。よって仮説も
+`θ|_F` に置くのが正しい転写で、これなら `θ = σ₀` のケースは `θF = 1` (位数 1 = 奇) として
+第一分岐に入る。
+
+**訂正後の interface**: `(θF : RingAut ↥F)` + `(hθF : (θF a : E) = σ.symm (τ a))` +
+`(hodd : Odd (orderOf θF))`。`RingAut.three_le_of_odd_orderOf` も `Nat.card F = p ^ m`
+版に戻した (`p^{m·2}` 版は不要になり、奇約数の coprime 段も落ちて証明が短くなった)。
+
+**教訓**: 「教科書の仮説をそのまま転写」でも、**どの体の上の自己同型か**を取り違えると
+充足不能な仮説になる。`hWinv` のような既存の関係式から `θ` の実際の姿を計算して
+sanity check すること (ここでは「θ は μ(W) を反転する」から `θ = σ₀` の可能性が出た)。
+
+### (147) `hpair` の現状 — producer は在る、欠けるのは奇位数だけ
+
+* **producer は既存**: `CenterFieldExponent.exists_scalingPair_of_lemmaFiveSetup`
+  (`LemmaFiveSetup` + `QuotientFieldModel` から `∃ d σ τ, hscale ∧ hWinv`)。
+* 欠けるのは **(i) `θF` の奇位数**、**(ii) その `d` がモデルの `d` と一致すること**。
+* (i) の出所は `TypeBData.phi_orderOf_odd`。`Q` が type B であること自体は
+  `TypeBFromW.isTypeB_Q_of_orderThree_of_mem_W` が出す。⟹ **`exists_scalingPair_…` の
+  `σ, τ` の `F` 上の制限を type-`B` の `phi` と同定する**のが次の仕事。
+  書籍 p.121 の「`{μ|_F, ν|_F} = {1_F, θ}`」がまさにこの同定。
+* `QuadraticFrobenius.odd_orderOf_or_odd_orderOf_mul_qFrobenius` (`45a1fc5ba`) は
+  「`E` への持ち上げのうち一方が奇位数」という正しい一般事実だが、上記のとおり
+  §3 (3) にはこの向きは要らない (F 上で完結する)。誤解を招く docstring は訂正済。
