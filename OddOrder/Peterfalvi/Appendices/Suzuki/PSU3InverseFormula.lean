@@ -559,6 +559,85 @@ theorem stepFour (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   exact ⟨hx, fun A hA hA0 hA1 => by
     rw [hginv A hA hA0 hA1, hx, add_comm A _]⟩
 
+/-- **Stage (4) at the excluded point `A = 0`**, that is at `ω` itself (Peterfalvi
+Part II, p. 131: "For `y = ζ⁻¹`, `(ω̄, y) = ω` and again we obtain
+`f(ω) = ω^{-ζ} = (ω̄, ζ)^ζ = (ω̄/y, 1/y)`").
+
+There is nothing to solve here — the standing hypothesis `f(ω) = ζ⁻¹ ω⁻¹ ζ` already
+gives `f(ω)` as a conjugate of `ω⁻¹`, and the two coordinates come out directly:
+inversion `q`-powers the unitary coordinate (`unitaryCoord_inv`) and the conjugation
+multiplies it by the norm of `μ(1, ζ⁻¹)`, which is `1`.  With `y = Z` the answer
+`(Z⁻¹ ω̄, Z⁻¹)` is `(ω̄/y, 1/y)`.
+
+Note the direction: the book's `x^d` is `d⁻¹ x d`, so its `ζ` is conjugation by `ζ⁻¹`
+here, whose scalar is `μ(1, ζ)⁻¹ = Z⁻¹`. -/
+theorem stepFour_at_omega {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    (hconjq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      (Ψ (hyp.conjQHom kv ρ)).quotient
+        = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ρ).quotient)
+    (hconjy : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      Suzuki2Groups.unitaryCoord m u (Ψ (hyp.conjQHom kv ρ))
+        = ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1) *
+          Suzuki2Groups.unitaryCoord m u (Ψ ρ))
+    {ζ ω : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hfωQ : f ω ∈ hyp.Q)
+    (hx : Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩)
+      = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)) :
+    (Ψ ⟨f ω, hfωQ⟩).quotient
+        = (Ψ ⟨ω, hωQ⟩).quotient / Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩) ∧
+      Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ω, hfωQ⟩)
+        = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩))⁻¹ := by
+  have h2 : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  have hZ0 : ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ≠ 0 :=
+    Units.ne_zero _
+  have hZnorm :
+      ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ^ (2 ^ m + 1)
+        = 1 := by
+    have h := congrArg (fun x : M.Eˣ => (x : M.E)) (M.mu_W_normOne (⟨ζ, hζ⟩ : ↥hyp.W))
+    simpa using h
+  have hZq :
+      ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ^ 2 ^ m
+        = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
+    field_simp
+    rw [← pow_succ]
+    exact hZnorm
+  -- the scalar of the conjugation is `Z⁻¹`
+  have hkv : ((M.mu (hyp.kActor hyp.K.one_mem,
+        (⟨ζ⁻¹, hyp.W.inv_mem hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
+    rw [hyp.kActor_one hyp.K.one_mem,
+      show ((1 : ↥hyp.actualKActor), (⟨ζ⁻¹, hyp.W.inv_mem hζ⟩ : ↥hyp.W))
+        = ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W))⁻¹ from
+      Prod.ext (inv_one (G := ↥hyp.actualKActor)).symm (Subtype.ext rfl),
+      map_inv, Units.val_inv_eq_inv_val]
+  have hnorm1 : ((M.mu (hyp.kActor hyp.K.one_mem,
+      (⟨ζ⁻¹, hyp.W.inv_mem hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) ^ (2 ^ m + 1) = 1 := by
+    rw [hyp.mu_norm_eq M, hyp.kActor_one hyp.K.one_mem,
+      show ((1 : ↥hyp.actualKActor), (1 : ↥hyp.W)) = 1 from rfl, map_one,
+      Units.val_one, one_pow]
+  -- `f(ω)` is the conjugate of `ω⁻¹` by `ζ⁻¹`
+  have hfeq : (⟨f ω, hfωQ⟩ : ↥hyp.Q)
+      = hyp.conjQHom (hyp.kActor hyp.K.one_mem,
+          (⟨ζ⁻¹, hyp.W.inv_mem hζ⟩ : ↥hyp.W)) (⟨ω, hωQ⟩ : ↥hyp.Q)⁻¹ := by
+    refine Subtype.ext ?_
+    rw [hyp.conjQHom_kActor_apply_val hyp.K.one_mem (hyp.W.inv_mem hζ)]
+    change f ω = 1 * ζ⁻¹ * ω⁻¹ * (1 * ζ⁻¹)⁻¹
+    rw [hf]
+    group
+  constructor
+  · have hneg : -(Ψ (⟨ω, hωQ⟩ : ↥hyp.Q)).quotient
+        = (Ψ (⟨ω, hωQ⟩ : ↥hyp.Q)).quotient := by
+      linear_combination (-(Ψ (⟨ω, hωQ⟩ : ↥hyp.Q)).quotient) * h2
+    rw [hfeq, hconjq, map_inv, Suzuki2Groups.BilinearTwistedProduct.quotient_inv, hkv,
+      hx, hneg, div_eq_mul_inv, mul_comm]
+  · rw [hfeq, hconjy, map_inv,
+      Suzuki2Groups.unitaryCoord_inv m M.card hu, hnorm1, one_mul, hx, hZq]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
