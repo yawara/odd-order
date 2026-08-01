@@ -908,7 +908,6 @@ theorem frobNormEquiv_symm_sq_of_fixed {E : Type*} [Field E] [Finite E]
           θ ((frobNormEquiv hchar hodd).symm u) := by rw [hfv]
     _ = u := hspec
 
-end OddOrder.Peterfalvi.Appendices.Suzuki
 
 /-- **The counting step behind `θ = 1`** (Peterfalvi Part II, p. 130, §3 stage (3)).
 
@@ -988,3 +987,4 @@ theorem eq_self_of_add_eq_const {F : Type*} [Field F] [Finite F] (h2 : (2 : F) =
     exact hne (hinj (hfix (θ X) hθz0 hne))
   · exact hfix X hX0 hXz
 
+end OddOrder.Peterfalvi.Appendices.Suzuki
