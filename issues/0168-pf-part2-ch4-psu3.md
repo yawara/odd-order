@@ -6407,3 +6407,39 @@ centralizes `C_{Q₀}(P)` … `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` 
 ⚠ どちらにせよ (119) の 2 方向の転送 (`exists_fgh_residual_eq` /
 `fgh_map_residualQuotient`) は `U` 版なので、`C` 版が要るなら同じ形で作り直す
 (`rankOneSetup_subgroup` に `K = C` を当てるだけ)。
+
+## 2026-08-02 (122): 裁定 — 段 (2) は `C/𝒩(C)` 経路で閉じる
+
+(121) の実測を受けて裁定した。**`C/𝒩(C)` 経路を採る**。
+
+| | `U/Z(U)` 経路 | `C/𝒩(C)` 経路 |
+|---|---|---|
+| 内在仮説 | (117) で新造 | `centralizerQuotientHypothesis` (既存) |
+| Lemma 5 の 7 入力 | 6/7 ((118)-(120)) | **7/7** (`standingData_centralizerQuotient`) |
+| `LemmaFiveSetup` / `QuotientFieldModel` | 未 | **済** (同上) |
+| 点集合の universe | ⚠ `L̄ ⧸ M̄ : Type u` ゆえ `Unital ℓ` へ貼り替えが必要だった | `Fix(X) : Type v` で**問題なし** |
+| 転送 (`G ← · ← 商`) | (119) | **今回** |
+
+⟹ 今回 `C` 版の転送 4 本を landing:
+* `rankOneSetup_centralizer` (`rankOneSetup_subgroup` の `K = C`)
+* `setup_centralizerQuotient` — `𝒩(C) = C_D(X) ⊓ C_C(C_Q(X))` (`normalCore_cH_eq_centralizer_cQ`)
+  が `C_D(X)` に入るので `Setup.quotient` が効く。**3 像は `centralizerQuotientHypothesis` の
+  `H`,`Q`,`D` そのもの**なので `Setup.exists_fgh` はその仮説の `f`,`g`,`h` を返す。
+* `exists_fgh_centralizer_eq` (`G ← C`) / `fgh_map_centralizerQuotient` (`C ← C/𝒩(C)`)
+
+`U/Z(U)` 側 (117)-(120) は破棄しない — 書籍の `U` そのもので §4 は実際に `U` を使う
+(`mem_center_primeComplementResidual_of_mem_P` 等)。`∃ w ∈ W̄_{U/Z(U)}, w ≠ 1` だけが
+未証明で残るが、これは段 (2) の critical path から外れた。
+
+### ⚠ 次セッションはここから
+
+`corollaryTwo_of_sectionThree` を `centralizerQuotientHypothesis` に当てる。
+`standingData_centralizerQuotient` が `sfive`/`M`/数値を与えるので、残りは
+`exists_standardModel` を回して `IsStandardModel` を得ること、および
+`corollaryTwo_of_sectionThree` の残り仮説:
+`hC2` (`t̄s̄t̄ = s̄t̄s̄`, `|s̄t̄| = 3` から) / `hZc` / `hmu` / `hVW` / `hcard` /
+`hKcard` / `hWdvd` / `hW1` / `hfQ` / `hhW` / bilinear package (`IsStandardModel` から分解)。
+**まず `PSU3SectionFourSetup.lean` を grep して、これらのうち既に
+centralizer quotient 版が在るものを列挙すること** (`natCard_quotient_*`,
+`isSuzuki2Group_quotient_Q`, `psu3Numerics_and_standingData_centralizerQuotient` の
+周辺に固まっている)。
