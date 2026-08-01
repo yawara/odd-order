@@ -6999,3 +6999,38 @@ noncomputable abbrev intrinsicPointEquivULift (details) (hXD) (htX) (hCQ) (hZD) 
    → `exists_standardModel` → `IsStandardModel`
 5. 残り `hVW` / `hKcard` (= `t` の照合、追加仮説 `C_Q(D) = ⊥` ((133))) を埋めれば
    `corollaryTwo_of_standardModel` が当たり、(119) の 2 転送と合わせて**段 (2) が閉じる**。
+
+## 2026-08-02 (138): 🎯 §3 の Proposition が `U/Z(U)` の**内在**仮説で成立
+
+`nonempty_standingData_intrinsicResidualQuotient` (Lemma 5 + `QuotientFieldModel`) と
+`exists_isStandardModel_intrinsicResidualQuotient` (`IsStandardModel`)。
+
+⟹ **書籍の「§2 と §3 を `U` について走らせる」(p.133) が形式化された**。得られるモデルは
+`H`,`Q`,`D`,`t` が `U ∩ H`, `U ∩ Q`, `U ∩ D`, `t` の像である仮説についてのものなので、
+そこで制約される写像は書籍の `f₁`, `h₁` そのもの。
+
+配線の要点: 6 入力は `intrinsicResidualQuotient` について証明済で、点集合を貼り替えた
+ULift 版へ `intrinsicResidualQuotientULift_{H,Q,D,t}` + section `SameGroup` の 3 本
+(`Q0`/`W`/`s` は点集合に依らない) で移した。帰納法仮説だけ universe の都合で ULift 版。
+
+### 段 (2) の残り
+
+| ピース | 状態 |
+|---|---|
+| `G ← U` 転送 | ✅ (119) |
+| `U ← U/Z(U)` 転送 | ✅ (119) |
+| §3 の Proposition (`IsStandardModel`) on `U/Z(U)` 内在 | ✅ **今回** |
+| `corollaryTwo_of_standardModel` の `hVW` / `hKcard` | ⚠ 残り |
+
+### ⚠ 次セッションはここから
+
+`hVW` は `V̄ = D̄ ⊓ C(t̄)` なので `t` の照合が要る ((132)(133))。追加仮説は
+**`C_{Q̄}(D̄) = ⊥`** で、これは `exists_conj_eq_triple` が `Q` も合わせている
+(`hQc`, (131) では `_hQc` として捨てているので拾い直す) ので transported 側の
+`C_{Q_tr}(D_tr) = ⊥` から移送できる。⟹ **標準モデルで
+`C_{standardRootSubgroup}(psuTorusHom.range) = 1` を示す**のが実体
+(`RootGroupStructure` の `psuTorusScale_fixedPointFree_of_torusWeight_ne_one`
+(`Simplicity.lean:42`) が近い — torus の非自明元は根群に固定点を持たない)。
+
+⚠ `PSU3SectionFourIntrinsic.lean` は **1330 行**。1500 に近いので次に大きく足す前に
+分割を検討する (`ConjMatch`/`SameGroup`/`EquivMatch` の汎用部分を別 leaf へ、が自然)。
