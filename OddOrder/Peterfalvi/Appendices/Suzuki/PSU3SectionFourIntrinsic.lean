@@ -97,9 +97,37 @@ theorem Q_inf_residualImage_eq (hCQ : IsPGroup 2
   le_antisymm (inf_le_inf_left _ (Subgroup.map_subtype_le _))
     (le_inf inf_le_left (hyp.inf_centralizer_le_residual hCQ))
 
-/-- **The quotient map is injective on `U ∩ Q`** — its kernel is `Z(U)`, which lies in `D`
-by hypothesis, and `Q ∩ D = 1` in a rank-one setup.  Hence `|Q̄| = |C_Q(X)|`, which is the
-form §2 and §3 want (`|Q̄| = ℓ³`). -/
+/-- The quotient map is injective on `U ∩ Q`: its kernel is `Z(U)`, which lies in `D` by
+hypothesis, and `Q ∩ D = 1` in a rank-one setup. -/
+theorem Q_subgroupOf_inf_center_eq_bot (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    hyp.Q.subgroupOf (residualImage (G := G) X)
+      ⊓ Subgroup.center ↥(residualImage (G := G) X) = ⊥ :=
+  le_bot_iff.mp ((inf_le_inf_left _ hZD).trans_eq
+    (hyp.rankOneSetup_residual hXD htX hCQ).Q_inf_D_eq_bot)
+
+/-- **`Q̄ ≃ C_Q(X)`** — `π` is injective on `U ∩ Q` and `U ∩ Q = C_Q(X)`, so the two
+descriptions of the root group of `U/Z(U)` agree.  This is what carries the facts Ch. I §3
+Proposition 1(c) proves about `C_Q(X)` — its order and its being a Suzuki `2`-group — over
+to the intrinsic standing hypothesis. -/
+noncomputable def cQMulEquivMapQ (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))
+      ≃* ↥((hyp.Q.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)))) :=
+  ((OddOrder.GroupTheory.subgroupOfMulEquivInf hyp.Q
+        (Subgroup.centralizer (X : Set G))).trans
+      (MulEquiv.subgroupCongr (hyp.Q_inf_residualImage_eq hCQ).symm)).trans
+    ((OddOrder.GroupTheory.subgroupOfMulEquivInf hyp.Q (residualImage (G := G) X)).symm.trans
+      (OddOrder.GroupTheory.mapMk'MulEquiv (hyp.Q_subgroupOf_inf_center_eq_bot hXD htX hCQ hZD)))
+
+/-- **`|Q̄| = |C_Q(X)|`**, which is the form §2 and §3 want (`|Q̄| = ℓ³`). -/
 theorem natCard_map_Q_residualQuotient (hXD : X ≤ hyp.D)
     (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
     (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
@@ -107,14 +135,8 @@ theorem natCard_map_Q_residualQuotient (hXD : X ≤ hyp.D)
       ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
     Nat.card ↥((hyp.Q.subgroupOf (residualImage (G := G) X)).map
         (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
-      = Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) := by
-  have hbot : hyp.Q.subgroupOf (residualImage (G := G) X)
-      ⊓ Subgroup.center ↥(residualImage (G := G) X) = ⊥ :=
-    le_bot_iff.mp ((inf_le_inf_left _ hZD).trans_eq
-      (hyp.rankOneSetup_residual hXD htX hCQ).Q_inf_D_eq_bot)
-  rw [OddOrder.GroupTheory.natCard_map_mk'_of_inf_eq_bot hbot,
-    OddOrder.GroupTheory.natCard_subgroupOf, hyp.Q_inf_residualImage_eq hCQ,
-    ← OddOrder.GroupTheory.natCard_subgroupOf]
+      = Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) :=
+  (Nat.card_congr (hyp.cQMulEquivMapQ hXD htX hCQ hZD).toEquiv).symm
 
 /-- **`|D̄|` is odd** — `D̄` is a quotient of `U ∩ D ≤ D`, and `|D|` is odd by (A2). -/
 theorem odd_natCard_map_D_residualQuotient :
@@ -342,6 +364,23 @@ theorem natCard_Q_intrinsicResidualQuotient (hXV : X ≤ hyp.V)
     hyp.intrinsicResidualQuotient_Q details hXD htX hCQ hZD,
     hyp.natCard_map_Q_residualQuotient hXD htX hCQ hZD,
     details.natCard_cQ_eq_baseField_cube, natCard_baseField data.n (by omega)]
+
+/-- **`Q̄` is a Suzuki `2`-group** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133) — the
+third input of Ch. I §3 Lemma 5, in the intrinsic subgroups.
+
+Ch. I §3 Proposition 1(c) proves it for `C_Q(X)` (`cQ_isSuzuki2Group`), and being a
+Suzuki `2`-group is an isomorphism invariant (`IsSuzuki2Group.of_equiv`). -/
+theorem isSuzuki2Group_Q_intrinsicResidualQuotient
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
+      ↥(hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q := by
+  rw [hyp.intrinsicResidualQuotient_Q details hXD htX hCQ hZD]
+  exact OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv
+    details.cQ_isSuzuki2Group (hyp.cQMulEquivMapQ hXD htX hCQ hZD)
 
 end Model
 

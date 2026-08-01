@@ -421,17 +421,21 @@ theorem map_center_mulEquiv {G' : Type*} [Group G'] (e : G ≃* G') :
   · intro hy
     exact ⟨e.symm y, (MulEquivClass.apply_mem_center_iff e.symm).mpr hy, by simp⟩
 
-/-- `H ⊓ K` は `K` の内側で見ても外側で見ても同じ位数 (`H.subgroupOf K` の位数). -/
-theorem natCard_subgroupOf (H K : Subgroup G) :
-    Nat.card ↥(H.subgroupOf K) = Nat.card ↥(H ⊓ K) := by
-  rw [← Subgroup.subgroupOf_map_subtype H K]
-  exact Nat.card_congr
-    (Subgroup.equivMapOfInjective (H.subgroupOf K) K.subtype K.subtype_injective).toEquiv
+/-- `H ⊓ K` は `K` の内側で見ても外側で見ても同じ群: `H.subgroupOf K ≃* H ⊓ K`. -/
+noncomputable def subgroupOfMulEquivInf (H K : Subgroup G) :
+    ↥(H.subgroupOf K) ≃* ↥(H ⊓ K) :=
+  (Subgroup.equivMapOfInjective (H.subgroupOf K) K.subtype K.subtype_injective).trans
+    (MulEquiv.subgroupCongr (Subgroup.subgroupOf_map_subtype H K))
 
-/-- **正規部分群と交わらない部分群は商へ位数を保って写る**: `K ⊓ N = ⊥` なら
-`|K N/N| = |K|`。商写像の核 `N` を `K` が避けるので `K` への制限が単射. -/
-theorem natCard_map_mk'_of_inf_eq_bot {N K : Subgroup G} [N.Normal] (h : K ⊓ N = ⊥) :
-    Nat.card ↥(K.map (QuotientGroup.mk' N)) = Nat.card ↥K := by
+/-- `H ⊓ K` は `K` の内側で見ても外側で見ても同じ位数. -/
+theorem natCard_subgroupOf (H K : Subgroup G) :
+    Nat.card ↥(H.subgroupOf K) = Nat.card ↥(H ⊓ K) :=
+  Nat.card_congr (subgroupOfMulEquivInf H K).toEquiv
+
+/-- **正規部分群と交わらない部分群は商へ単射に写る**: `K ⊓ N = ⊥` なら `K ≃* K N/N`.
+商写像の核が `N` で, `K` はそれを避けるので `K` への制限が単射. -/
+noncomputable def mapMk'MulEquiv {N K : Subgroup G} [N.Normal] (h : K ⊓ N = ⊥) :
+    ↥K ≃* ↥(K.map (QuotientGroup.mk' N)) :=
   have hinj : Function.Injective ((QuotientGroup.mk' N).comp K.subtype) := by
     rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
     intro x hx
@@ -440,11 +444,13 @@ theorem natCard_map_mk'_of_inf_eq_bot {N K : Subgroup G} [N.Normal] (h : K ⊓ N
       Subgroup.mem_inf.mpr ⟨x.2, (QuotientGroup.eq_one_iff (x : G)).mp hx'⟩
     rw [h, Subgroup.mem_bot] at hmem
     exact Subgroup.mem_bot.mpr (Subtype.ext hmem)
-  have hrange : ((QuotientGroup.mk' N).comp K.subtype).range
-      = K.map (QuotientGroup.mk' N) := by
-    rw [MonoidHom.range_comp, Subgroup.range_subtype]
-  rw [← hrange]
-  exact (Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv).symm
+  (MonoidHom.ofInjective hinj).trans
+    (MulEquiv.subgroupCongr (by rw [MonoidHom.range_comp, Subgroup.range_subtype]))
+
+/-- `K ⊓ N = ⊥` なら `|K N/N| = |K|`. -/
+theorem natCard_map_mk'_of_inf_eq_bot {N K : Subgroup G} [N.Normal] (h : K ⊓ N = ⊥) :
+    Nat.card ↥(K.map (QuotientGroup.mk' N)) = Nat.card ↥K :=
+  (Nat.card_congr (mapMk'MulEquiv h).toEquiv).symm
 
 /-- **中心による商は群同型に沿って移る**: `G ⧸ Z(G) ≃* G' ⧸ Z(G')`.
 
