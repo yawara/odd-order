@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.TwistedProductComparison
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.Types
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.FieldModel
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.HigmanDE

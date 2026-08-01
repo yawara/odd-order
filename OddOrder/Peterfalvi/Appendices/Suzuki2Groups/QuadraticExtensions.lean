@@ -223,19 +223,22 @@ def prodEquiv (B : BilinMap R V W) : BilinearTwistedProduct B ≃ V × W where
 instance [Finite V] [Finite W] : Finite (BilinearTwistedProduct B) :=
   Finite.of_equiv _ (prodEquiv B).symm
 
-/-- **A compatible pair of coordinate automorphisms is an automorphism of the
-twisted product.**
+/-- **A compatible pair of coordinate equivalences is an isomorphism of twisted
+products.**
 
-If `f` acts on the quotient coordinate and `g` on the central one, and they are
-compatible with the cocycle — `B (f x) (f y) = g (B x y)` — then `(x, w) ↦ (f x, g w)`
-is a group automorphism.
+If `f` matches the quotient coordinates and `g` the central ones, and they are
+compatible with the cocycles — `B' (f x) (f y) = g (B x y)` — then
+`(x, w) ↦ (f x, g w)` is a group isomorphism.
 
-This is how the scalars act on Peterfalvi's model `S₁` in Part II, Ch. III §3,
-p. 120: `(x, y)^a = (a x, a^{1+σ} y)`, whose compatibility condition is exactly the
-diagonal scaling `φ (a x) (a y) = a^{1+σ} φ (x, y)` of the cocycle. -/
-def congrEquiv (f : V ≃+ V) (g : W ≃+ W)
-    (h : ∀ x y : V, B (f x) (f y) = g (B x y)) :
-    BilinearTwistedProduct B ≃* BilinearTwistedProduct B where
+With `B' = B` this is how the scalars act on Peterfalvi's model `S₁` in Part II,
+Ch. III §3, p. 120: `(x, y)^a = (a x, a^{1+σ} y)`, whose compatibility condition is
+exactly the diagonal scaling `φ (a x) (a y) = a^{1+σ} φ (x, y)` of the cocycle.  The
+two-cocycle form is what compares that model with the unitary coordinates of
+`PSU(3, q)` in Ch. IV §3 (4). -/
+def congrEquiv {V' : Type*} {W' : Type*} [AddCommGroup V'] [AddCommGroup W']
+    [Module R V'] [Module R W'] {B' : BilinMap R V' W'} (f : V ≃+ V') (g : W ≃+ W')
+    (h : ∀ x y : V, B' (f x) (f y) = g (B x y)) :
+    BilinearTwistedProduct B ≃* BilinearTwistedProduct B' where
   toFun p := ⟨f p.quotient, g p.central⟩
   invFun p := ⟨f.symm p.quotient, g.symm p.central⟩
   left_inv p := by
@@ -250,16 +253,20 @@ def congrEquiv (f : V ≃+ V) (g : W ≃+ W)
     ext
     · exact map_add f _ _
     · change g (B p.quotient q.quotient + p.central + q.central)
-        = B (f p.quotient) (f q.quotient) + g p.central + g q.central
+        = B' (f p.quotient) (f q.quotient) + g p.central + g q.central
       rw [map_add, map_add, h]
 
-@[simp] theorem congrEquiv_quotient (f : V ≃+ V) (g : W ≃+ W)
-    (h : ∀ x y : V, B (f x) (f y) = g (B x y)) (p : BilinearTwistedProduct B) :
+@[simp] theorem congrEquiv_quotient {V' : Type*} {W' : Type*} [AddCommGroup V']
+    [AddCommGroup W'] [Module R V'] [Module R W'] {B' : BilinMap R V' W'}
+    (f : V ≃+ V') (g : W ≃+ W')
+    (h : ∀ x y : V, B' (f x) (f y) = g (B x y)) (p : BilinearTwistedProduct B) :
     (congrEquiv f g h p).quotient = f p.quotient :=
   rfl
 
-@[simp] theorem congrEquiv_central (f : V ≃+ V) (g : W ≃+ W)
-    (h : ∀ x y : V, B (f x) (f y) = g (B x y)) (p : BilinearTwistedProduct B) :
+@[simp] theorem congrEquiv_central {V' : Type*} {W' : Type*} [AddCommGroup V']
+    [AddCommGroup W'] [Module R V'] [Module R W'] {B' : BilinMap R V' W'}
+    (f : V ≃+ V') (g : W ≃+ W')
+    (h : ∀ x y : V, B' (f x) (f y) = g (B x y)) (p : BilinearTwistedProduct B) :
     (congrEquiv f g h p).central = g p.central :=
   rfl
 
