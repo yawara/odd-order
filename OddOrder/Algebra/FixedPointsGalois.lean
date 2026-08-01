@@ -160,29 +160,29 @@ theorem orderOf_dvd_of_card_eq_pow {p m : ℕ} [Fact p.Prime] [CharP F p]
 
 /-- **"`|F| > 8`, since `θ` is of odd order"** (Peterfalvi Part II, Ch. IV §3 (3), p. 130).
 
-Stated for the *quadratic extension* `E` of `F`, which is where §3 (3) meets it: `θ` is
-an automorphism of `E = 𝐅_{q²}` and `F = 𝐅_q` with `q = pᵐ`.  A nontrivial `θ` of odd
-order has order an odd divisor `> 1` of `2m`, hence of `m`, so `m ≥ 3` and `|F| ≥ 8`.
+A nontrivial automorphism of odd order has order an odd divisor `> 1` of the degree `m`,
+so `m ≥ 3`.  Over `𝐅₂` that is the book's `|F| ≥ 8`.
 
 The odd order of `θ`, not any bound on `|F|`, is what the book uses: the counting of
 §3 (3) fails over `𝐅₄`, whose only nontrivial automorphism is the Frobenius — and that
-one is excluded because its order is `2`. -/
+one is excluded because its order is `2`.
+
+⚠ `θ` here is an automorphism of `F` itself, as in the book (its `θ` comes from the
+type-`B` datum, which lives on `F` — `TypeBData.phi`).  The corresponding automorphism of
+the quadratic extension `E` may well have even order: the `q`-Frobenius of `E` restricts
+to the identity on `F`. -/
 theorem three_le_of_odd_orderOf {p m : ℕ} [Fact p.Prime] [CharP F p]
-    (hcard : Nat.card F = p ^ (m * 2)) {θ : _root_.RingAut F} (hodd : Odd (orderOf θ))
+    (hcard : Nat.card F = p ^ m) {θ : _root_.RingAut F} (hodd : Odd (orderOf θ))
     (hne : θ ≠ 1) : 3 ≤ m := by
   have hdvd := orderOf_dvd_of_card_eq_pow hcard θ
   have h1 : orderOf θ ≠ 1 := fun hc => hne (orderOf_eq_one_iff.mp hc)
   obtain ⟨j, hj⟩ := hodd
   have h3 : 3 ≤ orderOf θ := by omega
-  -- an odd divisor of `2m` divides `m`
-  have hcop : Nat.Coprime (orderOf θ) 2 := by
-    exact Odd.coprime_two_right ⟨j, hj⟩
-  have hdvdm : orderOf θ ∣ m := (Nat.Coprime.dvd_of_dvd_mul_right hcop) hdvd
   have hm0 : m ≠ 0 := by
     rintro rfl
     have hone : Nat.card F = 1 := by rw [hcard]; simp
     exact one_ne_zero (α := F)
       (Finite.card_le_one_iff_subsingleton.mp (le_of_eq hone) |>.elim _ _)
-  exact le_trans h3 (Nat.le_of_dvd (Nat.pos_of_ne_zero hm0) hdvdm)
+  exact le_trans h3 (Nat.le_of_dvd (Nat.pos_of_ne_zero hm0) hdvd)
 
 end OddOrder.RingAut

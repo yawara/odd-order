@@ -476,7 +476,9 @@ form the unitary coordinates need.
 So this is `stepThree_of_odd` composed with that upgrade: out come exactly `hθ` and `hα`.
 
 `hodd` is the book's "`θ` is of odd order" (p. 130), which is what it derives `|F| ≥ 8`
-from; `hcard` is then only the three elements the `θ = 1` branch needs. -/
+from; `hcard` is then only the three elements the `θ|_F = 1` branch needs.  It is stated
+for `θF`, the restriction of `θ = σ⁻¹τ` to `F`, because that is where the book's `θ` lives
+— on `E` the same map may be the `q`-Frobenius, of order `2`. -/
 theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
@@ -522,7 +524,10 @@ theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
         = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
     (hWinv : ∀ v : ↥hyp.W,
       σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
-    (hodd : Odd (orderOf (τ.trans σ.symm)))
+    (θF : RingAut ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hθF : ∀ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
+      ((θF a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) = σ.symm (τ a))
+    (hodd : Odd (orderOf θF))
     -- §2's base pair
     {ζ₀ ω₀ y₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
     (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0) (hy₀Q0 : y₀ ∈ hyp.Q0)
@@ -535,8 +540,8 @@ theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
             (⟨ζ₀, hζ₀⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
   have hζ₀ne : ζ₀ ≠ 1 := fun hc => hζ₀1 (Subtype.ext hc)
   obtain ⟨hστ0, hαst⟩ := hyp.stepThree_of_odd H hC2 hm hQ0card sfive M hZc hmu hVW hcard
-    ι d hequiv σ τ (σ.symm.toRingHom.comp τ.toRingHom).toAddMonoidHom (fun _ => rfl) hodd
-    hscale hWinv hζ₀ hζ₀ne hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀
+    ι d hequiv σ τ (σ.symm.toRingHom.comp τ.toRingHom).toAddMonoidHom (fun _ => rfl) θF
+    hθF hodd hscale hWinv hζ₀ hζ₀ne hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀
   -- `σ = τ` on `F`, which is what the upgrade takes
   have hστ : ∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
       σ.toRingHom a = τ.toRingHom a := by
@@ -649,15 +654,18 @@ theorem corollaryTwo_of_sectionThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
         = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
     (hWinv : ∀ v : ↥hyp.W,
       σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
-    (hodd : Odd (orderOf (τ.trans σ.symm)))
+    (θF : RingAut ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hθF : ∀ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
+      ((θF a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) = σ.symm (τ a))
+    (hodd : Odd (orderOf θF))
     {ζ₀ ω₀ y₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
     (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0) (hy₀Q0 : y₀ ∈ hyp.Q0)
     (hsqω₀ : ω₀ * ω₀ = y₀) (hfω₀ : f ω₀ = ζ₀⁻¹ * (ω₀ * y₀) * ζ₀)
     {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
     ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
   obtain ⟨hθ, hα⟩ := hyp.stepThree_model H hC2 hm hQ0card sfive M hZc hmu hVW hcard θm
-    hsemi haniso ι d hequiv hdiagscale σ τ hscale hWinv hodd hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0
-    hsqω₀ hfω₀
+    hsemi haniso ι d hequiv hdiagscale σ τ hscale hWinv θF hθF hodd hζ₀ hζ₀1 hω₀Q hω₀Q0
+    hy₀Q0 hsqω₀ hfω₀
   exact hyp.corollaryTwo_of_standardModel H hC2 sfive M hZc hmu hVW hm hQ0card hKcard
     hWdvd hW1 hfQ hhW θm hsemi hθ haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv uAut huAut
     hconj hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀ hα hζ hζ1
@@ -718,8 +726,10 @@ it in, so a caller who has the Proposition on some group needs to supply only wh
 genuinely extra:
 
 * `hpair`, the type-`B` scaling pair, for whatever central identification `ι` and
-  exponent `d` the model exhibits.  `hodd` sits inside it: the book's "`θ` is of odd
-  order" for `θ = σ⁻¹τ`, which is all §3 (3) asks of the pair.
+  exponent `d` the model exhibits.  The odd order sits inside it: the book's "`θ` is of
+  odd order" for the restriction of `θ = σ⁻¹τ` to `F`, which is all §3 (3) asks of the
+  pair.  `Hypothesis.exists_scalingPair_of_lemmaFiveSetup` produces such a pair from the
+  standing bundles; what it does not yet carry is the odd order.
 * the base pair `f(ω₀) = (ω₀ ω₀²)^{ζ₀}` that §2 closes with.
 
 Two of the eleven clauses go unused here — the normalization `Φ(x₀) = (0, 1)` and the
@@ -747,7 +757,12 @@ theorem corollaryTwo_of_isStandardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h
           = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
             ((ι (Additive.ofMul z) :
               ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) →
-      ∃ σ τ : M.E ≃+* M.E, Odd (orderOf (τ.trans σ.symm)) ∧
+      ∃ (σ τ : M.E ≃+* M.E)
+        (θF : RingAut ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)),
+        (∀ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
+          ((θF a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+            = σ.symm (τ a)) ∧
+        Odd (orderOf θF) ∧
         (∀ k : ↥hyp.actualKActor,
           σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
             = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E)) ∧
@@ -761,11 +776,11 @@ theorem corollaryTwo_of_isStandardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h
     ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
   obtain ⟨φ, θm, Φ, Θ, u, ι, hsemi, haniso, -, hΘq, hu, hconj, hquot, hW, hker,
     hdiagscale, d, hequiv, -, hΘc⟩ := hmodel
-  obtain ⟨σ, τ, hodd, hscale, hWinv⟩ := hpair ι d hequiv
+  obtain ⟨σ, τ, θF, hθF, hodd, hscale, hWinv⟩ := hpair ι d hequiv
   exact hyp.corollaryTwo_of_sectionThree H hC2 sfive M hZc hmu hVW hm hQ0card hcard
     hKcard hWdvd hW1 hfQ hhW θm hsemi haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv
-    hdiagscale u hu hconj σ τ hscale hWinv hodd hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀
-    hζ hζ1
+    hdiagscale u hu hconj σ τ hscale hWinv θF hθF hodd hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀
+    hfω₀ hζ hζ1
 
 /-- `Q` is strictly larger than `Q₀`, since `|Q| = |Q₀|³` and `|Q₀| > 1`. -/
 theorem exists_mem_Q_notMem_Q0 {m : ℕ} (hm : m ≠ 0)
@@ -816,7 +831,12 @@ theorem corollaryTwo_of_isStandardModel_of_normalization
           = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
             ((ι (Additive.ofMul z) :
               ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) →
-      ∃ σ τ : M.E ≃+* M.E, Odd (orderOf (τ.trans σ.symm)) ∧
+      ∃ (σ τ : M.E ≃+* M.E)
+        (θF : RingAut ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)),
+        (∀ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
+          ((θF a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+            = σ.symm (τ a)) ∧
+        Odd (orderOf θF) ∧
         (∀ k : ↥hyp.actualKActor,
           σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
             = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E)) ∧

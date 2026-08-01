@@ -39,8 +39,7 @@ other are `σ` and `σ̄ = σ σ₀`, the two preimages of `θ` under the restri
   extensions come in pairs `σ`, `σσ₀`.
 * `OddOrder.FiniteField.odd_orderOf_or_odd_orderOf_mul_qFrobenius` — of that pair, one has
   odd order whenever the restriction does.  This is the book's "possibly on replacing `σ`
-  by `σ̄`", and it is what turns the type-`B` datum's odd-order automorphism into the odd
-  order of `θ = σ⁻¹τ` that §3 (3) asks for.
+  by `σ̄`".
 -/
 
 namespace OddOrder.FiniteField
@@ -485,9 +484,13 @@ odd order — then `ψ^d` is `1` or the `q`-Frobenius `σ₀` (`eq_one_or_eq_qFr
 In the first case `ψ` itself has odd order; in the second the twist `ψσ₀` does, because
 `(ψσ₀)^d = σ₀^{d+1} = 1` with `d + 1` even and `σ₀² = 1`.
 
-So of the two extensions of `ψ|_F` to `E`, exactly the one §3 (3) wants is available: the
-odd order of `θ = σ⁻¹τ` is not an extra assumption on the type-`B` datum but a normalization
-of the pair, given that the datum's own automorphism has odd order. -/
+So of the two extensions of `ψ|_F` to `E`, exactly one has odd order.
+
+⚠ This is *not* how §3 (3) gets its odd-order hypothesis.  There the automorphism is
+`θ = σ⁻¹τ` and the relation `hWinv` forces `θ` to invert `μ(W)`, so `θ` may be the
+`q`-Frobenius itself — of order `2` on `E` while restricting to the identity on `F`.  The
+hypothesis §3 (3) needs is the odd order of `θ|_F` (the book's `θ`, which lives on `F` as
+`TypeBData.phi` does); this lemma is about lifting in the other direction. -/
 theorem odd_orderOf_or_odd_orderOf_mul_qFrobenius
     (hcard : Nat.card E = (p ^ n) ^ 2) (hn : n ≠ 0) {ψ : RingAut E} {d : ℕ} (hd : Odd d)
     (hfix : ∀ x : E, x ^ p ^ n = x → (ψ ^ d) x = x) :

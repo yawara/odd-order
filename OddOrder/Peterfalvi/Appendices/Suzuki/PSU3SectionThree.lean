@@ -1002,14 +1002,20 @@ theorem stepThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
 The book writes "if `θ ≠ 1`, then `|F| > 8` since `θ` is of odd order", and only then runs
 the count.  Both branches are here:
 
-* `θ ≠ 1` — `OddOrder.RingAut.three_le_of_odd_orderOf` turns the odd order into `m ≥ 3`,
-  i.e. `|F| ≥ 8`, and `stepThree` runs the count;
-* `θ = 1` — nothing to count: `(∗)` loses its bracket in characteristic `2` at any single
-  admissible `X`, leaving `α² = w²`.  Three elements of `F` suffice, which `hcard` gives.
+* `θ|_F ≠ 1` — `OddOrder.RingAut.three_le_of_odd_orderOf` turns the odd order into
+  `m ≥ 3`, i.e. `|F| ≥ 8`, and `stepThree` runs the count;
+* `θ|_F = 1` — nothing to count: `(∗)` loses its bracket in characteristic `2` at any
+  single admissible `X`, leaving `α² = w²`.  Three elements of `F` suffice — `hcard`.
 
 So `|F| = 4` — the case the count genuinely fails on, since over `𝐅₄` the Frobenius
 satisfies `X + X^θ = 1` at both points outside `𝐅₂` — is covered: there the Frobenius has
-order `2`, so an automorphism of odd order is already the identity. -/
+order `2`, so an automorphism of odd order is already the identity.
+
+⚠ `hodd` is about `θF`, the restriction of `θ` to `F`, because that is where the book's
+`θ` lives (it comes from the type-`B` datum, whose automorphism is `TypeBData.phi` on
+`F`).  The hypothesis must *not* be put on `θ` as an automorphism of `E`: `θ` inverts
+`μ(W)` (that is `hWinv` read through `hθ`), so it may well be the `q`-Frobenius of `E` —
+of order `2`, while restricting to the identity on `F`. -/
 theorem stepThree_of_odd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
@@ -1027,7 +1033,10 @@ theorem stepThree_of_odd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
           ((ι (Additive.ofMul z) :
             ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
     (σ τ : M.E ≃+* M.E) (θ : M.E →+ M.E) (hθ : ∀ x : M.E, θ x = σ.symm (τ x))
-    (hodd : Odd (orderOf (τ.trans σ.symm)))
+    (θF : RingAut ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hθF : ∀ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
+      ((θF a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) = θ (a : M.E))
+    (hodd : Odd (orderOf θF))
     (hscale : ∀ k : ↥hyp.actualKActor,
       σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
         = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
@@ -1044,13 +1053,14 @@ theorem stepThree_of_odd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have h2E : (2 : M.E) = 0 := by
     have := M.charTwo
     simpa using (CharP.cast_eq_zero M.E 2)
-  by_cases hne : (τ.trans σ.symm : M.E ≃+* M.E) = 1
-  · -- `θ` is the identity outright; `(∗)` at one admissible point gives `α = w`
-    have hfix : ∀ x : M.E, θ x = x := by
-      intro x
-      rw [hθ]
-      exact congrFun (congrArg (fun ρ : M.E ≃+* M.E => (ρ : M.E → M.E)) hne) x
-    refine ⟨fun X _ => hfix X, ?_⟩
+  by_cases hne : θF = 1
+  · -- `θ` is the identity on `F`; `(∗)` at one admissible point gives `α = w`
+    have hfix : ∀ X ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, θ X = X := by
+      intro X hX
+      have h0 := hθF ⟨X, hX⟩
+      rw [hne] at h0
+      exact h0.symm
+    refine ⟨hfix, ?_⟩
     obtain ⟨z, hzmem, hstar⟩ := hyp.stepThree_star_all H hC2 hm hQ0card sfive M hZc hmu
       hVW ι d hequiv σ τ θ hθ hscale hWinv hζ hζ1 hωQ hωQ0 hyQ0 hsqω hfω
     obtain ⟨X, hX0, hXz⟩ :=
@@ -1058,14 +1068,15 @@ theorem stepThree_of_odd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
         ⟨z, hzmem⟩
     have hs := hstar (X : M.E) X.2 (fun hc => hX0 (Subtype.ext hc))
       (fun hc => hXz (Subtype.ext hc))
-    rw [hfix (X : M.E)] at hs
+    rw [hfix (X : M.E) X.2] at hs
     refine eq_of_sq_add_sq h2E ?_
     linear_combination hs - (((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
       + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹) * (X : M.E) * h2E
-  · -- `θ ≠ 1`: the odd order forces `m ≥ 3`, i.e. the book's `|F| ≥ 8`
-    have hcardE : Nat.card M.E = 2 ^ (m * 2) := by rw [M.card, ← pow_mul]
+  · -- `θ|_F ≠ 1`: the odd order forces `m ≥ 3`, i.e. the book's `|F| ≥ 8`
+    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     have hm3 : 3 ≤ m :=
-      OddOrder.RingAut.three_le_of_odd_orderOf (p := 2) hcardE hodd hne
+      OddOrder.RingAut.three_le_of_odd_orderOf (p := 2)
+        (OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm) hodd hne
     have hcard5 : 5 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) := by
       rw [OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm]
       calc (5 : ℕ) ≤ 2 ^ 3 := by norm_num
