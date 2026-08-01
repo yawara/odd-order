@@ -695,6 +695,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepSeventeen
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEighteen
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepTwenty
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourArithmetic
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StarEquation
