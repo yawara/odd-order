@@ -1421,22 +1421,27 @@ p.131 で (4) の証明を読み切った。骨格:
 仮説の出所: `hsemi`/`haniso` = `exists_standardModel` の第 1・2 節 /
 `hpair` = `exists_scalingPair_of_lemmaFiveSetup` / `hστ` = `stepThree`
 (`σ.symm (τ a) = a` から `τ a = σ a`)。
-🔶 **残るのは `hscaleQ0` を `hdiagscale` から取り出す 1 本のみ**
-(`hdiagscale` の仮説「`Q₀` 上のスケールが `b` 倍」を `hequiv'` の `μ^d` で満たす)。
+✅ **`hscaleQ0` も完了** — `cocycle_scale_of_diagScale` (2026-08-01)。
+`hdiagscale` の前提がちょうど `centreQuadraticMap_smul` (降下した平方写像の
+`K`-同変性) で、直接の instantiation だった。
+
+⟹ **照合チェーンは端から端まで閉じた**:
+`hdiagscale` + `centreQuadraticMap_smul` → `hscaleQ0` → (`hsemi`+`haniso`)
+`μ(k)·θ(μ(k)) = μ(k)^d` → (`hpair` + `stepThree` + `μ(K)=F^×`)
+`σ(a)² = a·θ(a)` → `eq_id_of_sq_eq_mul_on` → `σ|_F = θ_model|_F = id`。
 
 ### ⚠ 次の一手
 
-1. `hscaleQ0` を `hdiagscale` + `hequiv'` から取り出す (上記、残り 1 本)。
-2. **PSU(3,q) unipotent 座標と `BilinearTwistedProduct φ` の橋渡し**
+1. **PSU(3,q) unipotent 座標と `BilinearTwistedProduct φ` の橋渡し**
    (`ProjectiveUnitary/*` の実測から)。§3 (4)(5) と章末の同型の共通土台。
-3. §3 (4) 本体 (骨格は上記のとおり確定済)。
-4. `5 ≤ |F|` の供給。⚠ 完全な解決は場合分けになる:
+2. §3 (4) 本体 (骨格は上記のとおり確定済)。
+3. `5 ≤ |F|` の供給。⚠ 完全な解決は場合分けになる:
    `m ≥ 3` は数え上げ / `m = 2` は「`θ|_F = Frob` なら `σ(x)τ(x) = σ(x³) = 1`
    ⟹ `x^d = 1` が `F^×` 全体で成り立ち `x ↦ x^d` の全単射性に矛盾」/
    `m = 1` は `F = 𝐅₂` で自明 (環準同型は `0,1` を固定)。
    ⟹ 要 `x ↦ x^d` の `F^×` 上の全単射性 (全射は
    `exists_mem_KSet_conj_eq_of_mem_Q0` + `centerCoord` の全単射性から)。
-5. 軌道代表系 `ω_1,…,ω_n` の形式化 (段 (20) の側条件と §2 締めの `i = k` 用)。
+4. 軌道代表系 `ω_1,…,ω_n` の形式化 (段 (20) の側条件と §2 締めの `i = k` 用)。
 
 ## セッション総括 (2026-07-31)
 
