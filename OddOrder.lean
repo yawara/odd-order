@@ -688,6 +688,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SequenceCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepSeventeen
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEighteen
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepTwenty
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
