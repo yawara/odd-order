@@ -4520,3 +4520,58 @@ coprime 降下 (76) で `V̄ ≤ W̄`、`W_le_V` で **`hVW : qhyp.V = qhyp.W`**
 3. `hcent` → Galois → coprime 降下 (76) → **`hVW : qhyp.V = qhyp.W`**。
 4. → `exists_standardModel` for `qhyp` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`
    → 商から `U` へ持ち上げ ⟹ **段 (2) が閉じる**。
+
+## 2026-08-01 (81): 標準位置同型を切り出した + ⚠ `hVW` の前提そのものに疑義
+
+### landing: `exists_standardPosition_of_psu3Target`
+
+`orderOf_distinguishedInvolution_mul_t_of_psu3Target` の証明本体から切り出して公開:
+
+```
+∃ (e : L ≃* standardPermGroup data.n) (tL : L), (tL : G) = hyp.t ∧
+  (∀ x : L, e x ∈ standardRootSubgroup data.n ↔ (x : G) ∈ hyp.Q) ∧
+  e tL = weylElement data.n
+```
+
+⚠ **(80) の記述を訂正**: 既存証明は入替補正 (`hz1inf`/`hz1origin`) の**先**まで進み、
+行列式 1 トーラス補正 (`hnormalize`) で `t` の像を**標準 Weyl 元ちょうど**に正規化して
+いた。⟹ 切り出しは (79)/(80) の想定より素直で、`_swap` 版の一般化は無くてもよかった
+(ただし一般化自体は正しく、より弱い仮説なので保持)。
+
+元の定理は `obtain` + 残り (braid → `eq_distinguishedPair_of_structure` → 位数 3) に
+なった。フルビルド green (4986 jobs)・lint 純ゼロ。
+
+### ⚠⚠ 重大: `hVW : qhyp.V = qhyp.W` は**そもそも真でない可能性が高い**
+
+(A1) を組もうとして判明した:
+
+* `exists_standardPosition_of_psu3Target` を `qhyp` に当てると `e` は
+  `L̄ = tri.result.L`(= `O^{2'}(Ḡ)`) 上の同型。**`v̄ ∈ qhyp.V` が `L̄` に入る保証がない**。
+  `L̄` は奇指数の正規部分群で、`V̄` は奇位数 — 奇位数元が奇指数部分群に入る理由はない。
+* **書籍もそう主張していない**。p.133 の主張は `(V ∩ U)/(P ∩ U)` についてであって
+  `V` 全体ではない。§3 Corollary 2 は書籍では `V = W` を仮説にしていない
+  (それは Corollary **1** の追加仮説)。
+* ⟹ repo の `corollaryTwo_of_stepFour` が担ぐ `hVW` は**特殊化債務の疑い**
+  ([[repo-stronger-hypothesis-is-specialization-not-gap]] の典型パターン)。
+
+### 次に決めるべき設計分岐 (2 案)
+
+| 案 | 内容 | コスト |
+|---|---|---|
+| (a) | `hVW` の消費点を trace し、実際に要るもの (`D = KW` か、`V ⊓ L = W ⊓ L` 等) まで弱める | `exists_mem_Q0_orbitOfF_eq` / `corollaryTwo` / `stepFive` の `hVW` 使用箇所を全部追う |
+| (b) | §3 の適用先を `C_G(P)/N` でなく **`U/(P ∩ U)`** に変える (書籍どおり) | 段 (1) の `Z(U) ⊆ P` があるので `P ∩ U ⊇ Z(U)`。`U/(P∩U)` 上の `Hypothesis` 構成が要る |
+
+⚠ (58) は「§3 Cor 2 が完全な `Hypothesis` を要求するので商経路」と裁定したが、
+その商を `C_G(P)/N` と取ったのは repo の既存構成に合わせただけで、書籍の `U/(P∩U)` とは
+違う。**`hVW` が真になるのは後者**の可能性が高い (`V ∩ U ⊆ P × C_W(P)` を `P ∩ U` で
+割ると `V̄ ≤ W̄` になる)。
+
+### ⚠ 次セッションはここから
+
+1. **まず (a) の trace**: `hVW` が `stepFive` / `corollaryTwo` /
+   `exists_mem_Q0_orbitOfF_eq` の証明中で実際に何に使われているかを実測する
+   (`exists_mem_K_mem_W_mul` = `D = KW` 以外に使われているか)。
+2. `D = KW` だけなら、商 `qhyp` について `D̄ = K̄W̄` を直接示せるか検討 (`hVW` を回避)。
+3. 弱められないなら (b) を検討 — `U/(P ∩ U)` 上の `Hypothesis` 構成。
+   ⚠ これは設計分岐なので、判断根拠を issue に残すこと。
+4. 決着後: → `exists_standardModel` for 商 → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
