@@ -71,6 +71,9 @@ element of `Q − Q₀` does *not* square to `1`.
   prerequisite in one piece: the `PSU(3, 2ⁿ)` numerics *and* both standing bundles
   (`LemmaFiveSetup`, `QuotientFieldModel`) for the centralizer quotient, from the branch
   data of Ch. I §3 Proposition 1(c).  Its one remaining input is `W̄ ≠ 1`.
+* `Hypothesis.W_eq_inf_centralizer_Q0`, `Hypothesis.V_eq_W_iff_le_centralizer_Q0` —
+  the hypothesis `V = W` that every §3 endpoint carries is exactly "`V` centralizes
+  `Q₀`", which is how step (2) reads it off the structure of `PSU(3, ℓ)`.
 -/
 
 set_option autoImplicit false
@@ -621,6 +624,48 @@ theorem psu3Numerics_and_standingData_centralizerQuotient {X : Subgroup G}
     hn0.ne' hQ0card hcardQ ihq
   exact ⟨⟨sfive⟩, qhyp.nonempty_quotientFieldModel_of_orderThree hst hQsuz hn0.ne'
     hQ0card hcardQ ihq sfive hw hw1⟩
+
+/-! ### `V = W` is exactly "`V` centralizes `Q₀`"
+
+Every §3 endpoint (`stepFive`, `corollaryTwo_of_stepFour`, …) carries the hypothesis
+`V = W`.  Ch. IV §4 step (2) (p. 133) discharges it for `U` in the book's words
+
+> By the structure of `PSU(3, ℓ)`, `(V ∩ U)/(P ∩ U)` centralizes `C_{Q₀}(P)`.
+
+so it is worth having the two phrasings identified once and for all. -/
+
+/-- **`W = D ∩ C(Q₀)`.**  `W_eq_centralizer_involutions_H` states this with the
+involutions of `H`; `Q₀` is that set together with `1`, which every element centralizes. -/
+theorem W_eq_inf_centralizer_Q0 :
+    hyp.W = hyp.D ⊓ Subgroup.centralizer (hyp.Q0 : Set G) := by
+  rw [hyp.W_eq_centralizer_involutions_H]
+  refine le_antisymm (fun d hd => ?_) (fun d hd => ?_)
+  · obtain ⟨hdD, hdc⟩ := Subgroup.mem_inf.mp hd
+    refine Subgroup.mem_inf.mpr ⟨hdD, Subgroup.mem_centralizer_iff.mpr fun x hx => ?_⟩
+    obtain ⟨hx2, hxH⟩ := hyp.mem_Q0_iff.mp hx
+    rcases eq_or_ne x 1 with rfl | hx1
+    · simp
+    · exact Subgroup.mem_centralizer_iff.mp hdc x ⟨hx2, hx1, hxH⟩
+  · obtain ⟨hdD, hdc⟩ := Subgroup.mem_inf.mp hd
+    refine Subgroup.mem_inf.mpr ⟨hdD, Subgroup.mem_centralizer_iff.mpr fun x hx => ?_⟩
+    exact Subgroup.mem_centralizer_iff.mp hdc x (hyp.mem_Q0_iff.mpr ⟨hx.1, hx.2.2⟩)
+
+/-- **`V = W` if and only if `V` centralizes `Q₀`** (Peterfalvi Part II, Ch. IV §4,
+step (2), p. 133 — the book's "by the structure of `PSU(3, ℓ)`, `(V ∩ U)/(P ∩ U)`
+centralizes `C_{Q₀}(P)`").
+
+`W ≤ V` is free (`W_le_V`), and `W = D ∩ C(Q₀)` with `V ≤ D`, so the only content in
+`V = W` is that `V` acts trivially on `Q₀`. -/
+theorem V_eq_W_iff_le_centralizer_Q0 :
+    hyp.V = hyp.W ↔ hyp.V ≤ Subgroup.centralizer (hyp.Q0 : Set G) := by
+  constructor
+  · intro hVW
+    rw [hVW, hyp.W_eq_inf_centralizer_Q0]
+    exact inf_le_right
+  · intro hcent
+    refine le_antisymm ?_ hyp.W_le_V
+    rw [hyp.W_eq_inf_centralizer_Q0]
+    exact le_inf hyp.V_le_D hcent
 
 /-! ## The standing hypothesis of §4 -/
 
