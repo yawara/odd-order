@@ -7034,3 +7034,31 @@ ULift 版へ `intrinsicResidualQuotientULift_{H,Q,D,t}` + section `SameGroup` �
 
 ⚠ `PSU3SectionFourIntrinsic.lean` は **1330 行**。1500 に近いので次に大きく足す前に
 分割を検討する (`ConjMatch`/`SameGroup`/`EquivMatch` の汎用部分を別 leaf へ、が自然)。
+
+## 2026-08-02 (139): leaf 分割 + `C_Q(D) = ⊥` の材料を実測
+
+`PSU3SectionFourIntrinsic.lean` が 1330 行になったので、`Q₀`/`W`/`s` の決定性補題 6 本を
+**`HypothesisFieldMatching.lean`** (118 行) へ切り出した (leaf は 1252 行に)。
+内容は §4 固有でなく Part II の標準仮説一般の事実なので独立 leaf が適切。
+
+### ⚠ 次セッションはここから — `C_{Q̄}(D̄) = ⊥`
+
+`t` の照合 ((132)(133)) の追加仮説。materials は全部 `ProjectiveUnitary` に在る:
+
+* 標準モデルの `Q = standardRootSubgroup n`, `D = (psuTorusHom n).range`
+  (`StandardModelHypothesis.lean:154`)。
+* `psuTorusScale_fixedPointFree_of_torusWeight_ne_one` (`Simplicity.lean:42`) —
+  norm weight が非自明な torus 元は根群に**固定点を持たない**。
+* `exists_psuTorus_weight_ne_one` (`Simplicity.lean:79`) — `1 < n` ならそういう元が在る。
+  ⚠ **`private`** なので公開する必要がある (または再証明)。
+
+⟹ 手順:
+1. `exists_psuTorus_weight_ne_one` の `private` を外す (または
+   `center_...`-style の公開補題を `Simplicity.lean` に足す)。
+2. 標準モデルで `C_{standardRootSubgroup n}((psuTorusHom n).range) = ⊥`。
+3. `exists_conj_eq_triple` の `hQc` (現在 (131) の呼び出しで `_hQc` として捨てている)
+   を拾い直し、`hDc` と合わせて `C_{Q̄}(D̄) = ⊥` を移送。
+4. `t` の照合 (i) `t₂t₁ ∈ K₁` ((132)) を証明 →
+   `exists_mem_K_conj_t_eq` ((110)) で四つ組が揃う。
+5. ⟹ `hVW` / `hKcard` が transported 側から移送でき、
+   `corollaryTwo_of_standardModel` が当たって**段 (2) が閉じる**。
