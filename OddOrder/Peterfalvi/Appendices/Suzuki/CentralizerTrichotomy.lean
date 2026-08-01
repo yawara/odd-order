@@ -354,6 +354,39 @@ theorem centralizer_trichotomy_of_induction (hyp : Hypothesis G Omega)
           common := common
           branch := .psu3 data htarget details }⟩
 
+/-- **The branch of Proposition 1(c) is `PSU(3, ℓ)` when `st` has order `3` and
+`C_Q(X)` is not elementary abelian.**
+
+This is the branch selection of Peterfalvi Part II, Ch. IV §4, step (1) (p. 132):
+
+> By (C1), `C_G(P)` has 2-rank `≥ 2` and, by Chapter I, §3, Proposition 1(c),
+> `U/Z(U) ≅ PSU(3, ℓ)` for some `ℓ > 2` since `st` has order 3 and `C_Q(P)` has
+> exponent 4.
+
+Order `3` alone does *not* single out the unitary branch — `PSL(2, ℓ)` has it too, and
+only `Sz(ℓ)` is excluded, where the order is `5`.  What excludes `PSL(2, ℓ)` is the
+exponent: there `C_Q(X)` is elementary abelian (`cQ_isElementaryAbelian`), whereas the
+book's `C_Q(P)` has exponent `4`. -/
+theorem nonempty_psu3Data_of_orderOf_eq_three
+    {hyp : Hypothesis G Omega} {X : Subgroup G}
+    [MulAction (hyp.centralizerActionQuotient X)
+      ↥(MulAction.fixedPoints X Omega)]
+    {result : TheoremAConclusion (hyp.centralizerActionQuotient X)
+      ↥(MulAction.fixedPoints X Omega)}
+    (br : CentralizerBranchData hyp X result)
+    (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hnea : ¬ OddOrder.GroupTheory.IsElementaryAbelian 2
+      ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))) :
+    Nonempty (Σ' data : PSU3InductionTarget
+        (Omega := ↥(MulAction.fixedPoints X Omega)) result.L,
+      (result.target = TheoremATarget.psu3 data) ×'
+        CentralizerPSUData hyp X result data) := by
+  cases br with
+  | psl2 data teq details => exact absurd details.cQ_isElementaryAbelian hnea
+  | suzuki data teq details =>
+      exact absurd (hord.symm.trans details.distinguishedProduct_order) (by norm_num)
+  | psu3 data teq details => exact ⟨⟨data, teq, details⟩⟩
+
 end
 
 end OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis
