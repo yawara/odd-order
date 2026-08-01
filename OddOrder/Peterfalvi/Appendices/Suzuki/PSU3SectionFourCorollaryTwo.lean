@@ -39,6 +39,8 @@ by `P` fixes both decompositions of Ch. I, so their factors stay in `C_G(P)`, an
 * `Hypothesis.rankOneSetup_residual` — in particular `U = O^{2′}(C_G(X))` does, which is
   what the book's `f₁`, `h₁` are the mappings of.
 * `Hypothesis.setup_residualQuotient` — and so does `U/Z(U)`, where step (2) argues.
+* `Hypothesis.exists_mem_K_conj_t_eq` — conjugating `t` by `K` realizes every `K`-translate
+  of `t`, which is how step (2) matches the two distinguished involutions.
 * `Hypothesis.isStandardModel_residualQuotient` — the Proposition of Ch. III §3 holds
   on `U/Z(U)`.
 -/
@@ -254,6 +256,38 @@ theorem setup_residualQuotient (hXD : X ≤ hyp.D)
       (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))
         ⟨hyp.t, hyp.t_mem_residual htX⟩) :=
   (hyp.rankOneSetup_residual hXD htX hCQ).quotient hZD
+
+/-! ### Matching the distinguished involution
+
+Step (2) compares the setup `U/Z(U)` inherits from `U` with the one Ch. I §3
+Proposition 1(c) transports from the standard `PSU(3, ℓ)`.  Once `H`, `Q` and `D` are
+matched, the two involutions differ by an element of `K` — both being involutions forces
+`t' = d t` with `d^t = d⁻¹` — and conjugating by `K` covers exactly those differences,
+because squaring is onto `K` (`exists_sq_eq_of_mem_K`, `K` having odd order). -/
+
+/-- **Conjugating `t` by `K` realizes every `K`-translate of `t`** (Peterfalvi Part II,
+Ch. IV §4, step (2), p. 133).
+
+For `e ∈ K` the conjugate is `e⁻¹ t e = e⁻² t`, because `t e t = e⁻¹` is the defining
+property of `K`.  Squaring being onto `K` (`exists_sq_eq_of_mem_K`), every `d t` with
+`d ∈ K` occurs. -/
+theorem exists_mem_K_conj_t_eq {d : G} (hd : d ∈ hyp.K) :
+    ∃ e ∈ hyp.K, e⁻¹ * hyp.t * e = d * hyp.t := by
+  obtain ⟨e, he, hesq⟩ := hyp.exists_sq_eq_of_mem_K (hyp.K.inv_mem hd)
+  refine ⟨e, he, ?_⟩
+  have htt : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+  have heK : e ∈ hyp.KSet := by rw [← hyp.coe_K]; exact he
+  have hte : hyp.t * e * hyp.t = e⁻¹ := heK.2
+  have hdd : e⁻¹ * e⁻¹ = d := by
+    rw [← inv_inv d, ← hesq]
+    group
+  calc e⁻¹ * hyp.t * e
+      = e⁻¹ * (hyp.t * e * hyp.t) * hyp.t := by
+        calc e⁻¹ * hyp.t * e = e⁻¹ * hyp.t * e * (hyp.t * hyp.t) := by
+              rw [htt, mul_one]
+          _ = e⁻¹ * (hyp.t * e * hyp.t) * hyp.t := by group
+    _ = e⁻¹ * e⁻¹ * hyp.t := by rw [hte]
+    _ = d * hyp.t := by rw [hdd]
 
 end Centralizer
 
