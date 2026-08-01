@@ -7229,3 +7229,32 @@ ULift 版へ `intrinsicResidualQuotientULift_{H,Q,D,t}` + section `SameGroup` �
 **次**: 段 (2) の残りは (i) `U/Z(U)` の σ, τ + `hodd`、(ii) §2 の base pair
 `f(ω₀) = (ω₀ω₀²)^{ζ₀}`、(iii) `IsStandardModel` の 11 節を `corollaryTwo_of_sectionThree`
 の引数形へ展開。(iii) は `exists_isStandardModel_intrinsicResidualQuotient` から機械的。
+
+### (144) `corollaryTwo_of_isStandardModel` — 段 (2) の残り供給物が 2 件に確定
+
+`corollaryTwo_of_sectionThree` は Ch. III §3 Proposition を 11 節ばらばらに取るので、
+`IsStandardModel` (同じものを束ねた述語) から直接入る版を追加 (`5f0abd00d`)。
+`hpair` は「モデルが提示した `ι`・`d` について type-`B` scaling pair が存在する」形
+(`ι`・`d` はモデル内で ∃ 束縛なので、それらを ∀ で受ける以外に書きようがない)。
+`hodd` はこの `hpair` の中に入る。
+
+**段 (2) の引数表 (内在版 `U/Z(U)`)**:
+
+| 引数 | 状態 |
+|---|---|
+| `H : IsFGH` | ✓ `exists_fgh_residual_eq` + `fgh_map_residualQuotient` |
+| `hC2` (braid) | ✓ |
+| `sfive`, `Mq`, `x₀`, `hmodel` | ✓ `exists_isStandardModel_intrinsicResidualQuotient` |
+| `hZc` | ✓ `center_Q_eq_Q0_intrinsicResidualQuotient` |
+| `hmu`, `hVW` | ✓ (`V_eq_W_intrinsicResidualQuotient`) |
+| `hm`, `hQ0card` | ✓ `natCard_Q0_intrinsicResidualQuotient` |
+| `hcard : 3 ≤ |F|` | ✓ 自明 (`|F| = 2ⁿ`, `n ≥ 2`) — **(143) で `5 ≤` から緩和済** |
+| `hKcard` | ✓ (`exists_isStandardModel_…` が同時に返す) |
+| `ζ ∈ W^#` | ✓ `exists_ne_one_mem_W_intrinsicResidualQuotient` |
+| `hWdvd`, `hW1`, `hfQ`, `hhW` | ○ 既存部品から出るはず (未接続) |
+| **`hpair` (type-`B` scaling pair + `hodd`)** | **✗ 未** |
+| **§2 の base pair `f(ω₀) = (ω₀ω₀²)^{ζ₀}`** | **✗ 未** |
+
+⟹ 残る本物の仕事は**「§2 を `U` について走らせる」の 2 件だけ**。これは書籍 step (2) の
+"run §2 and §3 relative to `U`" の §2 側そのもの。§3 側 (Proposition + Corollary 2 の
+経路) は揃った。
