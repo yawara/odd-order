@@ -694,6 +694,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEighteen
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepTwenty
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3InverseFormula
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
