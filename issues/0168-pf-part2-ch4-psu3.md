@@ -2465,3 +2465,32 @@ lint 0、フルビルド green (4980 jobs)。
    3 と合わせて `ρ'Q₀` = ファイバー全体を被覆 → 段 (5) 完成。
 
 その後 p.132-134 (段 (6) 以降) は**未調査** — ページ画像で段の一覧を作ることから。
+
+## 2026-08-01 (25): §2 段 (2) をユニタリ座標へ — 段 (5) 第 2 ケースの部品完備
+
+* **`unitaryCoord_mul_of_quotient_eq_zero`** (`UnitaryCoordinates`) — 中心元による
+  乗算は座標を足すだけ (商座標の条件で述べたので `Z(Q)` の像に直接使える)
+* **`sectionTwoStepTwo_coords`** — §2 段 (2) を `Ψ` で読んだ形:
+
+      (Ψ (f(ω s^{a⁻¹}))).quotient = A · (Ψ (f(f(ω) s^a))).quotient
+      unitaryCoord (Ψ (f(ω s^{a⁻¹}))) = A² · unitaryCoord (Ψ (f(f(ω) s^a))) + A
+        (A = μ(a²))
+
+  ⚠ 書籍 p.131 の助変数は**左辺のずれ** `μ(a⁻²) = A⁻¹` の方。付け替えの差だけで
+  `stepFive_secondCase` とちょうど噛み合う。
+
+### ⚠ 次セッション: 段 (5) 第 2 ケースの最終組み立て
+
+部品は全部揃っている。手順:
+
+1. `exists_mem_Q0_orbitOfF_eq` で `x₀ ∈ Q₀` を取り `ρ' := ρ x₀`
+   (`f(ρ')‾` が `ω̄` の `KW`-軌道内)。
+2. `f(ρ')` に第 1 ケース (`stepFour_cover` + `stepFive_orbit`) を適用し、
+   `hTwo` (H2) と `inverseFormula_symm` で `f(ρ')` の座標 = `(ρ̄/x, 1/x)` を確定。
+3. `sectionTwoStepTwo_coords` + `stepFive_secondCase` で
+   `f(ρ' s^{a⁻¹}) = (ρ̄/(x+A⁻¹), 1/(x+A⁻¹))`。⚠ `stepFive_secondCase` の `a` に
+   `A⁻¹ = μ(a⁻²)` を入れること (書籍の助変数)。
+4. 2 で `ρ'` 自身 (`A⁻¹ = 0` に相当) も済んでいるので、`ρ'Q₀` = ファイバー全体を被覆。
+   `exists_mem_K_mu_sq_eq` で `A⁻¹` が `F^×` を掃くことを使う。
+
+その後 p.132-134 (段 (6) 以降) は**未調査** — ページ画像で段の一覧を作ることから。
