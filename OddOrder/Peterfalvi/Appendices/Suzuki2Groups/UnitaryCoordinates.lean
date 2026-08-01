@@ -68,6 +68,23 @@ theorem unitaryCoord_frobTrace (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
     mul_comm u, frobTrace_mul_of_mem m (norm_mem_frobFixed m hcard p.quotient) u, hu,
     mul_one]
 
+/-- **A non-central element has nonzero unitary coordinate**: `Tr y = a ā` is nonzero
+when `a` is, and the trace of `0` is `0`.
+
+Stage (5) divides by that coordinate throughout, so this is what keeps its formulas
+meaningful off `Q₀`. -/
+theorem unitaryCoord_ne_zero (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
+    (hu : frobTrace (E := E) m u = 1)
+    {φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m)}
+    {p : BilinearTwistedProduct φ} (hp : p.quotient ≠ 0) :
+    unitaryCoord m u p ≠ 0 := by
+  intro hc
+  have h := unitaryCoord_frobTrace m hcard hu p
+  rw [hc, map_zero] at h
+  rcases mul_eq_zero.mp h.symm with h' | h'
+  · exact hp h'
+  · exact hp (pow_eq_zero_iff (by positivity) |>.mp h')
+
 /-- **The multiplication rule of `PSU(3, q)`** in the unitary coordinates:
 `(a, y)(c, w) = (a + c, y + w + a c̄)`.
 
