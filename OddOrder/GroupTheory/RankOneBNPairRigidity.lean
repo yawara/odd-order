@@ -519,4 +519,61 @@ theorem Setup.normalCore_eq_bot_of_isSimpleGroup [IsSimpleGroup L] (hS : Setup M
     rw [htop]
     exact Subgroup.mem_top t
 
+/-! ## The order formula, and `Q` as a Sylow subgroup
+
+`M = Q ⋊ D` and `L ⧸ M ≅ Q ∪ {a}` give `|L| = |Q| · |D| · (1 + |Q|)`.  When `Q` is a
+`2`-group and `|D|` is odd, the other two factors are odd, so `Q` is a Sylow
+`2`-subgroup — which is what identifies `M` with its normalizer, and hence identifies the
+standing hypothesis up to conjugacy (Peterfalvi Part II, Ch. IV §4, step (2), p. 133). -/
+
+/-- `|M| = |Q| · |D|`: the decomposition `M = Q ⋊ D` is a bijection `Q × D ≃ M`. -/
+theorem Setup.natCard_M [Finite L] (hS : Setup M Q D t) :
+    Nat.card ↥M = Nat.card ↥Q * Nat.card ↥D := by
+  classical
+  have hf : Function.Bijective (fun p : ↥Q × ↥D => (⟨(p.1 : L) * (p.2 : L),
+      M.mul_mem (hS.QM p.1.2) (hS.DM p.2.2)⟩ : ↥M)) := by
+    constructor
+    · rintro ⟨q, d⟩ ⟨q', d'⟩ hqd
+      have hval : (q : L) * (d : L) = (q' : L) * (d' : L) := congrArg Subtype.val hqd
+      obtain ⟨p₀, -, huniq⟩ :=
+        hS.split ((q : L) * (d : L)) (M.mul_mem (hS.QM q.2) (hS.DM d.2))
+      exact (huniq (q, d) rfl).trans (huniq (q', d') hval).symm
+    · rintro ⟨a, ha⟩
+      obtain ⟨⟨q, d⟩, hqd, -⟩ := hS.split a ha
+      exact ⟨(q, d), Subtype.ext hqd.symm⟩
+  rw [← Nat.card_congr (Equiv.ofBijective _ hf), Nat.card_prod]
+
+/-- `[L : M] = 1 + |Q|`, because `L ⧸ M ≅ Q ∪ {a}` (Ch. IV §1, p. 123). -/
+theorem Setup.index_M [Finite L] (hS : Setup M Q D t) :
+    M.index = Nat.card ↥Q + 1 := by
+  classical
+  rw [Subgroup.index, ← Nat.card_congr (coordsEquiv hS)]
+  simp
+
+/-- **`|L| = |Q| · |D| · (1 + |Q|)`.** -/
+theorem Setup.natCard_L [Finite L] (hS : Setup M Q D t) :
+    Nat.card L = Nat.card ↥Q * (Nat.card ↥D * (Nat.card ↥Q + 1)) := by
+  rw [← Subgroup.card_mul_index M, hS.natCard_M, hS.index_M, mul_assoc]
+
+/-- **`Q` is a Sylow `2`-subgroup of `L`** when it is a `2`-group and `|D|` is odd: the
+index `|D| · (1 + |Q|)` is then odd, so no `2`-subgroup properly contains `Q`. -/
+theorem Setup.exists_sylow_two_eq [Finite L] (hS : Setup M Q D t) (hQ : IsPGroup 2 ↥Q)
+    (hDodd : Odd (Nat.card ↥D)) (hQeven : Even (Nat.card ↥Q)) :
+    ∃ S : Sylow 2 L, (S : Subgroup L) = Q := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨S, hQS⟩ := hQ.exists_le_sylow
+  refine ⟨S, (Subgroup.eq_of_le_of_card_ge hQS ?_).symm⟩
+  obtain ⟨k, hk⟩ := S.2.exists_card_eq
+  obtain ⟨j, hj⟩ := hQ.exists_card_eq
+  have hodd : Odd (Nat.card ↥D * (Nat.card ↥Q + 1)) := hDodd.mul hQeven.add_one
+  have hdvd : (2 : ℕ) ^ k ∣ 2 ^ j * (Nat.card ↥D * (Nat.card ↥Q + 1)) := by
+    rw [← hk, ← hj, ← hS.natCard_L]
+    exact Subgroup.card_subgroup_dvd_card _
+  have hcop : Nat.Coprime ((2 : ℕ) ^ k) (Nat.card ↥D * (Nat.card ↥Q + 1)) :=
+    Nat.Coprime.pow_left k (Nat.coprime_two_left.mpr hodd)
+  have hpow : (2 : ℕ) ^ k ∣ 2 ^ j := hcop.dvd_of_dvd_mul_right hdvd
+  rw [hk, hj]
+  exact Nat.le_of_dvd (by positivity) hpow
+
 end OddOrder.GroupTheory.RankOneBNPair
