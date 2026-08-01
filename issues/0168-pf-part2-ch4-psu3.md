@@ -6802,3 +6802,33 @@ rank-one setup について `∃ c, Q^c = Q' ∧ M^c = M'`。⚠ **モデルを�
 `V`,`K`,`W`,`Q₀` はすべて `H,Q,D,t` から定義されるので対応する。⟹ transported 側の
 `residualQuotientHypothesis_V_eq_W` 等から **`hVW` / `hKcard` / `hWdvd` / `∃w∈W̄` が
 まとめて移送**でき、Corollary 2 が `U/Z(U)` に当たって段 (2) が閉じる。
+
+## 2026-08-02 (132): `t` の照合 — 欠けている 1 文を特定
+
+`exists_conj_eq_triple` ((131)) で `Q,M,D` が揃った後、残るのは
+`Setup M Q D t₁` と `Setup M Q D t₂` (同じ `M,Q,D`!) の `t` を合わせること。
+
+書籍 p.133 の該当文:
+
+> Once `H`, `Q` and `D` are matched, the two involutions differ by an element of `K` —
+> both being involutions forces `t' = d t` with `d^t = d⁻¹` — and conjugating by `K`
+> covers exactly those differences, because squaring is onto `K`.
+
+⟹ 分解すると:
+
+| 段 | 状態 |
+|---|---|
+| (i) `t₂ t₁ ∈ K₁` (= `t₂ = d t₁` with `d ∈ D`, `t₁ d t₁ = d⁻¹`) | ⚠ **これが欠けている 1 文** |
+| (ii) `∃ e ∈ K, e⁻¹ t₁ e = d t₁` | ✅ `Hypothesis.exists_mem_K_conj_t_eq` ((110)) |
+| (iii) `e ∈ K ≤ D ≤ M` による共役は `M`,`Q`,`D` を動かさない | 自明 (`Q ⊴ M`, `D` は自身を正規化) |
+
+### ⚠ 次セッションはここから — (i) の証明
+
+`t₁`, `t₂` はどちらも `L − M` の対合で、**同じ** `D = M ⊓ M^{t₁} = M ⊓ M^{t₂}`
+(`Setup.D_eq_inf_map_conj`) を与える。ここから `t₂ t₁ ∈ D` と `t₁ (t₂t₁) t₁ = (t₂t₁)⁻¹`
+を出すのが目標。
+
+⚠ **有用な観察** (逆向きの依存): `g` が `M` を正規化して `g t₁ g⁻¹ = t₂` なら
+`D₂ = M ⊓ M^{t₂} = g (M ⊓ M^{t₁}) g⁻¹ = g D₁ g⁻¹` が**自動**。つまり `t` を合わせれば
+`D` は付いてくる。(131) で `D` を先に合わせたのは Schur-Zassenhaus が使えたからで、
+`t` 側から攻める設計も可能 — どちらが短いかは (i) の難易度次第。
