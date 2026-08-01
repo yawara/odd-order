@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.Borel
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupStructure
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.StandardGenerators
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroupSuzukiType
@@ -44,8 +45,12 @@ its kernel.
 * `torusWeight_eq_one_of_commute_weylElement`,
   `commute_rootHom_of_commute_weylElement` — a determinant-one torus element
   commuting with the Weyl element has norm one, hence centralizes every
-  involution of the standard root group.  This is the structure fact
-  Peterfalvi Part II, Ch. IV §4 step (2) (p. 133) quotes for `V ∩ U`.
+  involution of the standard root group.
+* `exists_psuTorusHom_eq_of_mem_standardBorel_of_commute_weylElement`,
+  `commute_rootHom_of_mem_standardBorel_of_commute_weylElement` — the same
+  starting from the Borel subgroup, which is where `V ∩ U` lands
+  (`V ≤ D ≤ H = N_G(Q)`).  This is the structure fact Peterfalvi Part II,
+  Ch. IV §4 step (2) (p. 133) quotes for `V ∩ U`.
 * `exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one` — the same in the
   form Peterfalvi uses: a non-trivial `c ∈ D₀` fixing every element of
   `Ω₁(S₀)`.
@@ -235,6 +240,50 @@ theorem commute_rootHom_of_commute_weylElement {n : ℕ} (c : PSUTorusParameter 
           group
       _ = rootHom n u * psuTorusHom n c := by rw [hconj]
   exact heq
+
+/-- **A Borel element commuting with the Weyl element lies in the determinant-one
+torus.**
+
+A Borel element fixes `∞`; commuting with the Weyl element, which swaps `∞` and the
+origin, makes it fix the origin as well.  Since a Borel element moves the origin to the
+affine point indexed by its root coordinate (`borelHom_smul_origin`), that coordinate is
+trivial and only the torus factor survives. -/
+theorem exists_psuTorusHom_eq_of_mem_standardBorel_of_commute_weylElement {n : ℕ}
+    {b : standardPermGroup n} (hb : b ∈ standardBorel n)
+    (hc : Commute (weylElement n) b) :
+    ∃ c : PSUTorusParameter n, b = psuTorusHom n c := by
+  obtain ⟨x, rfl⟩ := hb
+  have hinf : borelHom n x • Unital.infinity n = Unital.infinity n :=
+    borelHom_smul_infinity x
+  have horig : borelHom n x • Unital.origin n = Unital.origin n := by
+    calc borelHom n x • Unital.origin n
+        = borelHom n x • (weylElement n • Unital.infinity n) := by
+          rw [weylElement_smul_infinity]
+      _ = (borelHom n x * weylElement n) • Unital.infinity n := by rw [mul_smul]
+      _ = (weylElement n * borelHom n x) • Unital.infinity n := by rw [hc.eq]
+      _ = weylElement n • (borelHom n x • Unital.infinity n) := by rw [mul_smul]
+      _ = weylElement n • Unital.infinity n := by rw [hinf]
+      _ = Unital.origin n := weylElement_smul_infinity n
+  have hleft : x.left = 1 := by
+    have h := borelHom_smul_origin x
+    rw [horig, Unital.origin_eq_affine_one] at h
+    exact (Unital.affine_inj.mp h).symm
+  exact ⟨x.right, by rw [borelHom_apply, hleft, map_one, one_mul]⟩
+
+/-- **A Borel element commuting with the Weyl element centralizes the involutions of the
+standard root group.**
+
+This is the `PSU(3, ℓ)` structure fact Peterfalvi Part II, Ch. IV §4 step (2) (p. 133)
+quotes as "by the structure of `PSU(3, ℓ)`, `(V ∩ U)/(P ∩ U)` centralizes `C_{Q₀}(P)`":
+`V ≤ D ≤ H = N_G(Q)` puts the image of `V ∩ U` in the Borel, and `V = C_D(t)` makes it
+commute with the Weyl involution. -/
+theorem commute_rootHom_of_mem_standardBorel_of_commute_weylElement {n : ℕ}
+    {b : standardPermGroup n} (hb : b ∈ standardBorel n)
+    (hc : Commute (weylElement n) b) {u : RootGroup n} (hu : u ^ 2 = 1) :
+    Commute b (rootHom n u) := by
+  obtain ⟨c, rfl⟩ :=
+    exists_psuTorusHom_eq_of_mem_standardBorel_of_commute_weylElement hb hc
+  exact commute_rootHom_of_commute_weylElement c hc hu
 
 /-! ## The same statement inside `standardPermGroup n` -/
 
