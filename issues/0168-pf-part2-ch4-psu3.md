@@ -7318,3 +7318,32 @@ sanity check すること (ここでは「θ は μ(W) を反転する」から 
 * `QuadraticFrobenius.odd_orderOf_or_odd_orderOf_mul_qFrobenius` (`45a1fc5ba`) は
   「`E` への持ち上げのうち一方が奇位数」という正しい一般事実だが、上記のとおり
   §3 (3) にはこの向きは要らない (F 上で完結する)。誤解を招く docstring は訂正済。
+
+### (148) `hpair` の奇位数を出す具体経路 (次セッション着手点)
+
+書籍 p.121:
+
+> if `λ_{μν} ≠ 0`, then **`a^μ a^ν = a a^θ` for `a ∈ F`, whence `{μ|_F, ν|_F} = {1_F, θ}`**
+
+この「2 つのペアが `F` 上で同じ積写像を与えるなら、順序を除いて一致する」は
+**`FrobeniusExponentPairs.restrict_pair_eq_of_mul_eq_on_frobFixed` が既に持っている**
+(`E` の Frobenius 冪ペアは `F` 上で誘導する積写像により順序を除き決まる)。
+
+⟹ 経路:
+1. `TypeBFromW.isTypeB_Q_of_orderThree_of_mem_W` で `Q` が type B ⟹
+   `TypeBData ↥Q` の `phi : RingAut F'` と **`phi_orderOf_odd`** (構造フィールド)。
+2. type-`B` の平方写像 `x ↦ x·phi(x)` (+ ε 項) が中心の quadratic map `χ` と一致する
+   ことから、ペア `(1_F, phi)` も `χ(a x) = a·phi(a)·χ(x)` を満たす。
+3. `exists_scalingPair_of_lemmaFiveSetup` の `(σ, τ)` は `σ(a)τ(a) = a^d` on `μ(K)`。
+   `hKcard : |K| = 2^m − 1` と `M.mu` 単射より **`μ(K) = F^×`** なので `F` 全体で成立。
+4. 2 と 3 の積写像が一致 ⟹ `restrict_pair_eq_of_mul_eq_on_frobFixed` で
+   `{σ|_F, τ|_F} = {1_F, phi}` ⟹ `θ|_F = σ|_F⁻¹τ|_F` は `phi` か `phi⁻¹`。
+   どちらも奇位数 ⟹ **`hodd` が出る**。
+
+⚠ 障害になりうる点: `TypeBData` の体 `F'` と `frobFixedSubfield M.E 2 m` の同定
+(どちらも位数 `2^m` の体なので `FiniteField.ringEquivOfCardEq` で移送できるが、
+`phi` の移送先が `M.E` 側の何と一致するかを追う必要がある)。
+`LemmaFiveSetup` は `phi` を持たず `isplit` (同型な 2 成分分解) しか持たないので、
+type-B 認識を通す必要がある。
+
+**次セッションはここから**。
