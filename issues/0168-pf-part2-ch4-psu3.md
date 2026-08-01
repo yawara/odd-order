@@ -4673,3 +4673,47 @@ repo が `C_G(P)/N` を選んだのは (57)(58) で既存構成 `centralizerQuot
 2. その上で `V = W` を `commute_rootHom_of_commute_weylElement` から証明する。
 3. `residualQuotientEquiv` で `U/Z(U)` へ transport し、§3 の endpoint を当てる。
 4. → 段 (2) → 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
+
+## 2026-08-01 (84): 標準モデル `Hypothesis` の材料 — `D_def` landing
+
+`standardBorel_inf_conj_weylElement (hn : 0 < n) :
+ standardBorel n ⊓ (standardBorel n).map (MulAut.conj (weylElement n)).toMonoidHom
+   = (psuTorusHom n).range`
+
+`B` = `∞` の固定化群、`B^w` = `origin` の固定化群 ⟹ 交わり = 2 点固定化群 = トーラス。
+(フルビルド green・lint 純ゼロ)
+
+### `Hypothesis (standardPermGroup n) (Unital n)` フィールド別の材料表
+
+| フィールド | 材料 | 状態 |
+|---|---|---|
+| `basept` | `Unital.infinity n` | ✅ |
+| `doubly_transitive` | `standardPermGroup_isMultiplyPretransitive` | ✅ |
+| `faithful` | `Equiv.Perm` の部分群 ⟹ 自明 | ⚠ 要確認 |
+| `H` / `H_def` | `standardBorel n` + `standardBorel_eq_infinityStabilizer` | ✅ |
+| `Q` | `standardRootSubgroup n` | ✅ |
+| `D` | `(psuTorusHom n).range` | ✅ |
+| `t` / `t_sq` | `weylElement n` / `weylElement_sq_eq_one` | ✅ |
+| `t_ne_one` | `weylElement • ∞ = origin ≠ ∞` | ⚠ 易 |
+| `t_not_mem_H` | 同上 (`∞` を固定しない) | ⚠ 易 |
+| **`D_def`** | **`standardBorel_inf_conj_weylElement`** | ✅ **今回** |
+| `Q_le_H` | `rootHom_mem_standardBorel` | ✅ |
+| `Q_normal_in_H` | Borel = 根群 ⋊ トーラス; `psuTorusHom_mul_rootHom_mul_inv` + 根群自身 | ⚠ 易 |
+| `Q_inf_D_eq_bot` / `Q_mul_D_eq_H` | `mem_standardBorel_iff_existsUnique_root_torus` | ⚠ 中 |
+| `Q_even` | `natCard_standardRootSubgroup` (`= (2ⁿ)³`) | ⚠ 易 |
+| `D_odd` | `orderOf_psuTorus_odd` 系 / `natCard_standardBorel` から | ⚠ 中 |
+| `two_rank_ge_two` | `Ω₁(S₀)` (= 根群の中心、位数 `2ⁿ`) の部分群で位数 4 (`n ≥ 2`) | ⚠ 中 |
+| `[Finite (standardPermGroup n)]` | `Unital n` 有限 ⟹ `Equiv.Perm` 有限 | ⚠ 要確認 |
+
+⟹ **残りは全部「既存 API を組む」型**。新しい数学は無い。
+
+### ⚠ 次セッションはここから
+
+1. 上表の ⚠ を順に埋め、`standardHypothesis (n : ℕ) (hn : 1 < n) :
+   Hypothesis (standardPermGroup n) (Unital n)` を新 leaf
+   (`OddOrder/Peterfalvi/Appendices/Suzuki/StandardModelHypothesis.lean`) に構成する。
+   ⚠ 新 leaf は同じ commit で `OddOrder.lean` に配線すること。
+2. `V = W` を証明: `V = C_D(t)` はノルム 1 トーラス
+   (`torusWeight_eq_one_of_commute_weylElement`)、`W = D ⊓ C(Q₀)` (72) で
+   `commute_rootHom_of_commute_weylElement` が `V ≤ W` を与える。`W_le_V` で等号。
+3. `residualQuotientEquiv` で `U/Z(U)` へ transport → §3 endpoint → 段 (2)。
