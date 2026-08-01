@@ -361,6 +361,18 @@ noncomputable def conjugate (h : Hypothesis A Λ) (c : A) : Hypothesis A Λ :=
 @[simp] theorem conjugate_t (h : Hypothesis A Λ) (c : A) :
     (h.conjugate c).t = c * h.t * c⁻¹ := rfl
 
+/-- **Every involution is the `t` of a conjugate hypothesis.**
+
+The involutions of a group carrying a standing hypothesis form a single conjugacy class
+(Ch. I Prop 2(b), `isConj_of_involutions`), so `t` can be moved onto any prescribed one.
+
+This is what makes the opacity of Ch. I §3 Proposition 1(c) harmless: the identification
+`U/Z(U) ≅ PSU(3, ℓ)` is data returned by the induction and says nothing about where the
+ambient involution goes, but it does not have to — §4 conjugates afterwards. -/
+theorem exists_conjugate_t_eq (h : Hypothesis A Λ) {τ : A} (hτ2 : τ ^ 2 = 1)
+    (hτ1 : τ ≠ 1) : ∃ c : A, (h.conjugate c).t = τ :=
+  isConj_iff.mp (h.isConj_of_involutions h.t_sq h.t_ne_one hτ2 hτ1)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
