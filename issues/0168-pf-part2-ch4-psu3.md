@@ -7381,3 +7381,38 @@ type-B 認識を通す必要がある。
 
 **次セッションはこの transport から**。`LemmaFiveSetup` は `phi` を持たず `isplit` のみ
 なので `isTypeB_Q_of_orderThree_of_mem_W` を通す必要がある点に注意。
+
+### (150) type-`B` transport の実態 — 必要な関係式は認識定理の**内部に既にある**
+
+`hshape : ∀ a ∈ F^×, a^d = a·φ(a)` の出所を実測した結果、**新規理論は要らない**ことが判明。
+必要なのは Higman 認識定理の中間データを外に出すこと。
+
+**(a) 橋そのものは 3 行** (commit `b6dd30efc`):
+`Suzuki2Groups.typeBQuadraticMap_smul` — type-`B` の平方写像
+`(a,b) ↦ a·φ(a) + ε·a·φ(b) + b·φ(b)` は各項が `(線形)·φ(線形)` なので、
+両座標を `λ ∈ F` 倍すると値は **`λ·φ(λ)` 倍**。これが書籍 p.120 の標準同一視
+`c^x = x^{1+θ} c` の中身で、`d = 1 + 2^r` の理由。
+
+**(b) 認識定理は既にこの関係式を作っている**:
+`HigmanLemmaTwelve/TypeBRecognition.lean` の
+`isTypeB_of_isomorphicOrderQModuleSplit_of_xiLengthThree` の証明中に
+
+* `hlamnuL : dL.lambda ^ (1 + 2 ^ rL) = nu` (= `ν = λ^{1+2^r}`)
+* `hθLfrob : dL.theta = Frob^{rL}`、**`hθLodd : dL.theta_order_odd`**
+
+が**局所的な `have` として存在する** (l.194-195, 232-236, 279-283)。`λ` は actor が
+`Q/Z(Q)` に掛ける スカラー、`ν` は `Z(Q)` に掛けるスカラー。これはモデル側の
+`μ(k)` と `μ(k)^d` に他ならない。
+
+⟹ **必要な仕事 = 認識定理を強化して `IsTypeB` と一緒にこの指数データを返すこと**
+(`∃ r, (∀ k, ν_k = λ_k^{1+2^r}) ∧ Odd (orderOf (Frob^r))` の形)。
+新規数学ではなく「中間結果の露出」。`isTypeB_of_isomorphicOrderQModuleSplit_of_card_eq_cube`
+と `..._of_xiLengthThree` の 2 段、およびそれを呼ぶ `TypeBFromW.isTypeB_Q_of_orderThree_of_mem_W`
+の signature 変更を伴う (呼び出しは `lemmaFive_of_orderThree` 等)。
+
+⚠ 逆に **`TypeBData` 経由は遠回り**: `TypeBData` は `phi` と `phi_orderOf_odd` を持つが
+**actor `K` の作用を記録していない**ので、`λ`/`ν` との関係が復元できず、
+座標同定 (`TypeBData` の体 ↔ `frobFixedSubfield M.E 2 m`) も別途要る。
+認識定理の内部データを使えば `K` は最初から引数に入っているので直接繋がる。
+
+**次セッションはこの露出リファクタから**。
