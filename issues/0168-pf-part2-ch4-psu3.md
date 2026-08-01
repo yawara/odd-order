@@ -6608,3 +6608,24 @@ the structure of `PSU(3, ℓ)`**」と明記している。Galois の定理
 | `hW1` / `hhW` | ✅ 導出可 |
 | `hVW` | ⚠ 上記の還元まで。モデル入力が要る |
 | `hKcard` / `hWdvd` | ⚠ 未着手 |
+
+### (126) 追記: 既存のモデル入力は「1 点」で `hVW` には足りない
+
+`CentralizerPSUData.exists_mem_residual_commute_Q0` (`StructureOfH/PSUCentre.lean:111`) は
+
+```
+∃ x ∈ O^{2'}(C), π(x) ≠ 1 ∧ Odd (orderOf π(x)) ∧ ∀ y ∈ Q₀ ∩ C, Commute x y
+```
+
+で、**`C_{Q₀}(X)` を中心化する元を 1 つ**しか与えない。`hVW` (`V̄ ≤ C(Q̄₀)`) は
+`V̄` の**全元**についての主張なので、これでは足りない。
+
+必要なモデル入力は「`PSU(3,ℓ)` の torus で `C_D(t) ≤ C(Q₀)`」= 標準モデルの
+`standardHypothesis_V_eq_W` (`StandardModelHypothesis.lean:271`; 証明は
+`V ≤ D = psuTorusHom.range` が可換であることによる) を `C/𝒩(C)` へ移すこと。
+⚠ `C/𝒩(C)` は `PSU(3,ℓ)` を奇指数で含むので `D̄` は torus より大きくてよい —
+`D̄` が可換かどうかから調べる必要がある (`D̄ = π(C_D(X))`)。
+
+⟹ **`hVW`/`hKcard`/`hWdvd` は 3 本まとめて「`D̄` の構造」の問題**。次セッションは
+`D̄` (= `π(C_D(X))`) と `PSU(3,ℓ)` の torus の関係を実測することから始める
+(`C/𝒩(C)` と `O^{2'}(C/𝒩(C)) ≅ U/Z(U)` の指数が奇であることが効くはず)。
