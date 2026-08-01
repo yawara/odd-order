@@ -417,14 +417,12 @@ noncomputable def centralizerQuotientHypothesis (hXV : X ≤ hyp.V)
     (hyp.centralizerQuotient_faithful hXV)
     (hyp.centralizerQuotient_twoRankGeTwo hXV hA3)
 
-/-- **Peterfalvi Part II, Ch. I §3 Prop 1(c)** — the faithful quotient is
-strictly smaller than the ambient group when
-`X ≠ 1`, as required to invoke the source induction hypothesis. -/
-theorem card_centralizerActionQuotient_lt (hXV : X ≤ hyp.V)
-    (hX : X ≠ ⊥) :
-    Nat.card (centralizerActionQuotient hyp X) < Nat.card G := by
+/-- **`C_G(X) < G` for `1 ≠ X ≤ V`.**  If the centralizer were everything then `X`
+would be central, hence normal and inside `H`, hence inside the trivial normal core
+of `H` — contradicting `X ≠ 1`. -/
+theorem natCard_centralizer_lt (hXV : X ≤ hyp.V) (hX : X ≠ ⊥) :
+    Nat.card ↥(Subgroup.centralizer (X : Set G)) < Nat.card G := by
   let L : Subgroup G := Subgroup.centralizer (X : Set G)
-  let N : Subgroup L := (hyp.H.subgroupOf L).normalCore
   have hLlt : L < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro hLtop
@@ -447,10 +445,19 @@ theorem card_centralizerActionQuotient_lt (hXV : X ≤ hyp.V)
       exact hXcore
     exact hX (eq_bot_iff.mpr hXbot)
   obtain ⟨g, -, hgL⟩ := SetLike.exists_of_lt hLlt
-  have hLcard : Nat.card L < Nat.card G :=
-    Finite.card_subtype_lt hgL
+  exact Finite.card_subtype_lt hgL
+
+/-- **Peterfalvi Part II, Ch. I §3 Prop 1(c)** — the faithful quotient is
+strictly smaller than the ambient group when
+`X ≠ 1`, as required to invoke the source induction hypothesis. -/
+theorem card_centralizerActionQuotient_lt (hXV : X ≤ hyp.V)
+    (hX : X ≠ ⊥) :
+    Nat.card (centralizerActionQuotient hyp X) < Nat.card G := by
+  let L : Subgroup G := Subgroup.centralizer (X : Set G)
+  let N : Subgroup L := (hyp.H.subgroupOf L).normalCore
   exact (Nat.card_le_card_of_surjective
-    (QuotientGroup.mk' N) (QuotientGroup.mk'_surjective N)).trans_lt hLcard
+    (QuotientGroup.mk' N) (QuotientGroup.mk'_surjective N)).trans_lt
+    (hyp.natCard_centralizer_lt hXV hX)
 
 /-- **Peterfalvi Part II, Ch. I §3 Prop 1(c)** — on quotient representatives,
 the factored action is definitionally
