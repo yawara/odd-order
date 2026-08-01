@@ -30,6 +30,7 @@ Against this the book plays (H4): `h(ω(0,α)) = h(f(ω)^{ζ⁻¹}) = ζ h(ω)�
 * `Hypothesis.h_mul_eq_conj_inv` — (H4) at the normalization: `h(ω y) = ζ h(ω)⁻¹ ζ⁻¹`.
 * `Hypothesis.commute_h_zeta` — `h(ω)` commutes with `ζ` (`D = KW`, `W = ⟨ζ⟩`).
 * `Hypothesis.stepEighteen` — **step (18)**.
+* `Hypothesis.h_mem_W` — `h(ω) ∈ W`, the first half of §2's closing Proposition.
 -/
 
 set_option autoImplicit false
@@ -147,6 +148,61 @@ theorem stepEighteen (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     rw [hlen]
     exact pow_orderOf_eq_one ζ
   rw [← hlen, hcinv.mul_pow, hpow, one_mul, inv_pow, hζpow, inv_one]
+
+/-- **`h(ω) ∈ W`** (Peterfalvi Part II, p. 129, first half of §2's closing Proposition).
+
+The book argues that the Sylow subgroups of `D` are cyclic ([H], Kap. V, Satz 8.15), so
+that each `p`-component of `h(ω)ζ⁻¹` lands in `W` because `|P ∩ W| = m_p`.  With
+`D = K W` in hand the coprimality does it directly: writing `h(ω) = κ v`, step (18) gives
+`κ^m = 1` (the `W`-part is killed by `m = |W|` anyway), while `κ^{q-1} = 1` because
+`|K| = q − 1`; and `m` divides `q + 1`, which is coprime to `q − 1`. -/
+theorem h_mem_W (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W) (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hWcard : orderOf ζ = Nat.card ↥hyp.W)
+    {N : ℕ} (hns : ∀ i < N, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1)
+    (hstop : y * (hyp.stepElevenSeq ζ y N).1 = 1) :
+    h ω ∈ hyp.W := by
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
+  have hc : Commute (h ω) ζ := hyp.commute_h_zeta H hVW hζ hωQ hωQ0 hWcard
+  -- step (18), with the `ζ` factored off
+  have h18 := hyp.stepEighteen H hC2 M hZ hmu hVW hζ hωQ hωQ0 hyQ0 hfω hWcard hns hstop
+  have hζpow : ζ ^ orderOf ζ = 1 := pow_orderOf_eq_one ζ
+  have hhpow : (h ω) ^ orderOf ζ = 1 := by
+    rw [hc.inv_right.mul_pow, inv_pow, hζpow, inv_one, mul_one] at h18
+    exact h18
+  -- split `h(ω)` along `D = K W`
+  obtain ⟨κ, hκK, v, hvW, hκv⟩ := hyp.exists_mem_K_mem_W_mul hVW (H.h_mem hωQ hω1)
+  have hcomm : κ * v = v * κ := hyp.commute_of_mem_W_of_mem_K hvW hκK
+  have hvpow : v ^ orderOf ζ = 1 := by
+    rw [hWcard]
+    have := pow_card_eq_one' (G := ↥hyp.W) (x := ⟨v, hvW⟩)
+    exact congrArg Subtype.val this
+  have hκpow : κ ^ orderOf ζ = 1 := by
+    have hsplit : (κ * v) ^ orderOf ζ = κ ^ orderOf ζ * v ^ orderOf ζ :=
+      (Commute.mul_pow (h := hcomm) _)
+    rw [hκv, hsplit, hvpow, mul_one] at hhpow
+    exact hhpow
+  -- `κ` is killed by `q + 1` and by `q − 1`
+  have hκadd : κ ^ (2 ^ m + 1) = 1 := by
+    obtain ⟨c, hcc⟩ := hWdvd
+    rw [hcc, ← hWcard, pow_mul, hκpow, one_pow]
+  have hκsub : κ ^ (2 ^ m - 1) = 1 := by
+    have hKcard : Nat.card ↥hyp.K = 2 ^ m - 1 := by
+      rw [hyp.card_K_eq_card_Q0_sub_one, hQ0card]
+    have := pow_card_eq_one' (G := ↥hyp.K) (x := ⟨κ, hκK⟩)
+    rw [hKcard] at this
+    exact congrArg Subtype.val this
+  have hκ1 : κ = 1 :=
+    eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one hm hκsub hκadd
+  rw [hκv, hκ1, one_mul]
+  exact hvW
 
 end Hypothesis
 
