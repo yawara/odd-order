@@ -4850,3 +4850,44 @@ repo が `C_G(P)/N` を選んだのは (57)(58) で既存構成 `centralizerQuot
    `nonempty_quotientFieldModel_of_orderThree` → `exists_standardModel` →
    §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
 4. `residualQuotientEquiv` で `U/Z(U)` へ transport → 段 (2) → **§4 完成**。
+
+## 2026-08-01 (88): 🎯 標準モデルの `hst` landing — `exists_standardModel` の前提は `ih` を残すのみ
+
+(フルビルド green 4987 jobs・lint 純ゼロ)
+
+* `standardHypothesis_distinguishedInvolution` — 区別された対合 =
+  `rootHom (RootGroup.centralInvolution n)` (書籍 Ch. III §3 の `s = (0,1)`)。
+  ⚠ 経路: `distinguishedInvolution` は `Classical.choose` で opaque だが、
+  `eq_distinguishedPair_of_structure` (一意性) に候補を渡せば同定できる。
+  候補は `s' = r' = rootHom(centralInvolution)` で、構造方程式
+  `t s t = r⁻¹ t r` は標準組紐関係 `standard_braid` (`w s w = s w s`) がそのまま与える
+  (`s` は対合なので `s⁻¹ = s`)。
+* `standardHypothesis_orderOf_distinguishedInvolution_mul_t` — `|s t| = 3`
+  (`standard_st_order`)。
+
+### `exists_standardModel` の前提表 (標準モデル、最終)
+
+| 前提 | 状態 |
+|---|---|
+| `hst` | ✅ **今回** |
+| `hm : m ≠ 0` | ✅ `hn : 1 < n` |
+| `hQ0card` / `hcardQ` | ✅ (87) |
+| `hQsuz` | ✅ `standardRootSubgroup_isSuzuki2Group` (defeq、作業ゼロ) |
+| `x₀ ∈ Z(Q)`, `≠ 1` | ✅ `exists_center_Q_ne_one` (汎用、(71)) |
+| `hVW` (§3 endpoint 用) | ✅ `standardHypothesis_V_eq_W` (86) |
+| **`ih`** | ⚠ **§4 が ambient から供給** ((87) で導出不能と確定) |
+| `s : LemmaFiveSetup m` / `M : QuotientFieldModel m` | producer あり ((71))、上記が揃えば出る |
+
+### ⚠ 次セッションはここから
+
+1. **`ih` の供給補題**: `Nat.card (standardPermGroup n) ≤ Nat.card G` を
+   `residualQuotientEquiv` (= `U/Z(U) ≃* standardPermGroup n`) と `U ≤ C_G(P) ≤ G` から
+   出し、`theoremAInductionBelow_centralizerActionQuotient` と同形の
+   `theoremAInductionBelow_standardModel` を作る。
+   ⚠ `|U/Z(U)| ≤ |U| ≤ |C_G(P)| ≤ |G|` は素直だが、`Nat.card` の商での不等式
+   (`Subgroup.card_quotient_le` 等) を実測すること。
+2. 揃ったら `lemmaFiveSetup_of_orderThree_of_mem_W` (要 `w ∈ W#` — 標準モデルでは
+   `W = V` = ノルム 1 トーラスなので `exists_ne_one_mem_psuTorus_torusWeight_eq_one`
+   (`1 < n`) から直接出る) → `nonempty_quotientFieldModel_of_orderThree` →
+   `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
+3. `residualQuotientEquiv` で `U/Z(U)` へ transport → 段 (2) → **§4 完成**。
