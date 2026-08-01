@@ -3393,3 +3393,42 @@ C_{Q/Q₀}(P) ≠ 1
    (今回の `eq_one_of_conj_eq_mul_Q0_of_mem_W`) を繋ぐ。
 2. §4 の standing hypothesis 構造を置いて段 (1) を組み上げる。
 3. 段 (2)(3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
+
+## 2026-08-01 (51): 🎯 §4 段 (1) の `Z(U) ⊆ P` 部品 landing
+
+書籍 p.132 段 (1) の締めの残り 2 手 (`PSU3SectionFourSetup.lean`):
+
+| 定理 | 内容 |
+|---|---|
+| `inf_W_eq_bot_of_centralizes` | `Q − Q₀` の元を中心化する部分群は `W` と自明に交わる (前 tick の `_of_mem_W` 版から) |
+| `eq_of_mem_mul_of_inf_eq_bot` | Dedekind: `P W` に分解する元からなり `W` と自明に交わる部分群は `P` |
+
+⚠ **部分群束は一般には modular でない** — mathlib の `IsModularLattice (Subgroup ·)` は
+**可換群**用 (`Algebra/Group/Subgroup/Order.lean`)。`S ≤ P ⊔ W` から直接 `S ≤ P` は
+出せないので、`P ⊔ W = P W` の分解を仮説に取る形にした (実際にそれを与えるのは
+「`W` が `V` で正規」)。
+
+### 段 (1) の部品は**これで全部そろった**
+
+| 書籍の主張 | repo |
+|---|---|
+| `U = O^{2'}(C_G(P))` | `primeComplementResidual 2 C` |
+| Ch. I §3 Prop 1(c) | `centralizer_trichotomy_of_induction` |
+| 2-rank ≥ 2 (C1) | 同定理の `hA3` |
+| `st` 位数 3 (C2) | `hst` |
+| `C_Q(P)` exponent 4 | `exists_fixed_not_mem_Q0` → `not_isElementaryAbelian_cQ_of_not_mem_Q0` |
+| 枝の同定 | `nonempty_psu3Data_of_orderOf_eq_three` |
+| `U/Z(U) ≅ PSU(3,ℓ)` | `CentralizerPSUData.residualQuotientEquiv` |
+| `q = ℓ^p` | `natCard_Q0_eq_pow` |
+| `Z(U) ⊂ PW` (Galois) | `centralizer_V_centralizer_Q0` |
+| `PZ(U) ∩ W = 1` | `inf_W_eq_bot_of_centralizes` |
+| `Z(U) ⊆ P` | `eq_of_mem_mul_of_inf_eq_bot` |
+
+### ⚠ 次セッションはここから
+
+1. **§4 の standing hypothesis 構造を置いて段 (1) を組み上げる** (残りは配線のみ)。
+   構造の中身: `P ≤ V`、`Nat.card P` = 奇素数 `p`、`C_{Q/Q₀}(P) ≠ 1` (= `∃ x ∈ Q−Q₀`
+   でクラスが `P`-固定)、`P ⊓ W = ⊥`、`Q` が Suzuki 2-群、`Z(Q) = Q₀`、`μ` 単射、
+   `orderOf (s·t) = 3`。
+2. 段 (2)(3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
+3. Corollary 1 第 2 段 = PGU(3,q) infra (大きい、別立て)。
