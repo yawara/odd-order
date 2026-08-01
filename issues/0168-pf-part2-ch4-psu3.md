@@ -5745,3 +5745,15 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
    (`fgh_mem_centralizer` の共役論法を `y ∈ C − H` 一般に切り出す)。
 3. `Setup.exists_fgh` ⟹ `U` の `f₁,g₁,h₁`。`IsFGH.map` で `U/Z(U)` へ、
    `IsFGH.eq_of_le` で ambient へ。⟹ **段 (2) 完了**。
+
+### (106) 続き: `Setup.restrict` landing
+
+`RankOneBNPair.lean` に一般補題を追加 (手順 1 完了)。⚠ 吸収条件は結局
+**`Q`-成分だけ**でよい形に絞れた (もう一方は `d = q⁻¹a`, `x = y q⁻¹ t⁻¹` と
+割り算で出る)。残り = 手順 2 (吸収条件を `C_Q(P) ≤ U` から供給) と手順 3。
+
+⚠ 手順 2 の材料はもう在る: `fgh_mem_centralizer` (今回) の共役論法
+(「`p ∈ X` が `y` を中心化 ⟹ canonical 分解が `p`-不変 ⟹ 因子が `C_G(X)` に入る」)
+を `y = t x t` でなく **任意の `y ∈ C_G(P) − H`** について切り出せばよい。
+`C_Q(P) ≤ U` は `CentralizerCommonData.residual_eq_normalClosure` から
+(`StructureOfH/PSUCentre.lean:75` に局所 `have` の実例)。
