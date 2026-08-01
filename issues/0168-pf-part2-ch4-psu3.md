@@ -5153,3 +5153,39 @@ standardHypothesisULift (n) (hn : 1 < n) :
    で `Hypothesis (↥U ⧸ Z(U)) (ULift.{v} (Unital n))` を作る
    (⚠ `residualQuotientEquiv` は `CentralizerPSUData` のフィールド)。
 4. → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2)。
+
+## 2026-08-01 (95): `ih` の制限補題 + `|U/Z(U)| < |G|` landing
+
+(フルビルド green 4988 jobs・lint 純ゼロ)
+
+* **`TheoremAInductionBelow.of_natCard_le (ih) (hle : Nat.card B ≤ Nat.card G) :
+  TheoremAInductionBelow B Λ'`** — `TheoremAInductionBelow` は `Nat.card G` 未満を
+  すべて量化するので、位数がそれ以下の任意の群へ制限できる。
+  ⚠ **`B`/`Λ'` の universe は statement が許す範囲で自由** — これが (89) の壁を実際に
+  通す補題。§4 は `B := ↥U ⧸ Z(U)` (`Type u`)、`Λ' := ULift.{v} (Unital n)` (`Type v`) で
+  使う。
+* **`natCard_residualQuotient_lt`** — `|U/Z(U)| < |G|`。3 段: 商の全射性 →
+  `Subgroup.card_subgroup_dvd_card` → `natCard_centralizer_lt` (94)。
+
+⚠ `theoremAInductionBelow_centralizerActionQuotient` を新補題で書き直すのは**前方参照**
+になるので見送った (新補題は同 leaf の後方)。将来 leaf 整理するときに順序を入れ替える。
+
+### ⟹ 段 (2)(b) に必要な部品はすべて揃った
+
+| 部品 | 状態 |
+|---|---|
+| `Hypothesis (↥U ⧸ Z(U)) (ULift.{v} (Unital n))` | `ofMulEquivPullback` + `standardHypothesisULift` で**組むだけ** |
+| `hVW` / `hQ0card` / `hcardQ` / `hst` / `w ∈ W#` | ✅ transport 補題群 (91)(92)(93) |
+| `hQsuz` | ✅ `IsSuzuki2Group.of_equiv` |
+| `x₀ ∈ Z(Q)` | ✅ `exists_center_Q_ne_one` (71) |
+| **`ih`** | ✅ **今回** (`of_natCard_le` + `natCard_residualQuotient_lt`) |
+
+### ⚠ 次セッションはここから
+
+1. **組み立て**: §4 の枝データ (`CentralizerPSUData`) から `residualQuotientEquiv` を
+   取り出し、`hU := (standardHypothesisULift n hn).ofMulEquivPullback
+   residualQuotientEquiv.symm` で `Hypothesis (↥U ⧸ Z(U)) (ULift.{v} (Unital n))` を作る。
+   ⚠ `n := data.n` で `1 < data.n` は `data.one_lt_n`。
+2. 上表の前提を `hU` について並べ、`exists_standardModel` を呼ぶ。
+3. → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2) の `ω`, `ζ` を得る。
+4. 商から ambient へ持ち上げ (`IsFGH.eq_of_le`) ⟹ **段 (2) が閉じる** ⟹ §4 完成。
