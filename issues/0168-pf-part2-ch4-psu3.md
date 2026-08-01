@@ -3461,3 +3461,27 @@ C_{Q/Q₀}(P) ≠ 1
    `PZ(U)` の `P W` 分解 (Dedekind の仮説) をどこから取るかも要検討
    (`W ⊴ V` + `P, Z(U) ≤ V`)。
 2. 段 (2)(3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
+
+## 2026-08-01 (53): 🎯 §4 段 (1) の結論 2 本を standing hypothesis から
+
+| 定理 | 書籍 (p.132 段 (1)) |
+|---|---|
+| `SectionFourSetup.natCard_Q0_eq_pow_cardP` | 「`\|C_{Q₀}(P)\| = ℓ` ゆえ `q = ℓ^p`」 |
+| `SectionFourSetup.eq_P_of_centralizes` | 「`PZ(U)` が `C_Q(P) ⊄ Q₀` を中心化 ⟹ `Z(U) ⊂ P`」 |
+
+⚠ 前者で **(44) の Artin 一般化がそのまま効いた** — 旧 `_of_W_eq_bot` 版は
+`V ≠ W` の §4 には届かず、必要な faithful 性はちょうど setup の
+`P ⊓ W = ⊥` フィールドだった。
+
+⟹ **段 (1) の 3 結論 (枝 = PSU(3,ℓ) / `q = ℓ^p` / `Z(U) ⊆ P`) がすべて
+standing hypothesis から出る形になった**。
+
+### ⚠ 次セッションはここから
+
+1. 段 (1) を 1 本の定理に梱包する (任意) か、段 (2) に進む。
+   ⚠ 梱包するなら `Z(U)` を `↥U` から `G` に戻す map (`U.subtype`) と
+   `PZ(U)` の `P W` 分解 (Galois の `Z(U) ⊆ P ⊔ W` + `W ⊴ V`) の 2 点が要る。
+   これらは配線であって新しい数学ではない。
+2. **段 (2)** — `∃ ω ∈ Q−Q₀, ζ ∈ W^#, η ∈ P`: `η` が `ω`,`ζ` を中心化し
+   `f(ω) = ω^{-ζ}`、`h(ω) = ζ³η⁻¹`。`corollaryTwo_of_stepFour` を `U` 側に当てる。
+3. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
