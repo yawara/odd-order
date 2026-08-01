@@ -918,6 +918,79 @@ theorem eq_one_of_conj_eq_mul_Q0_of_mem_D {m : ℕ} (M : hyp.QuotientFieldModel 
 
 **その後**: (a) (15) の尽くし、(b) (18) の締め、(c) (20) の組み立て。
 
+## 2026-08-01 (2): crux 解消 → 段 (15)(13)(16) 完成
+
+### 🎯 残る crux が落ちた — `D` の `(Q/Q₀)^#` への自由性
+
+`PSU3OrbitCount.lean` に追加 (前回の「部品所在」表どおりの配管で通った):
+
+* `conjQHom_kActor_apply_val` — 対 `(kActor k, v)` の `Q` 上の作用が `k v` による
+  共役そのもの (定義の展開; `exists_mem_D_conjQHom` の逆向き)。
+* 🎯 `eq_one_of_conj_eq_mul_Q0_of_mem_D` — **`c ∈ D`, `ω ∈ Q − Q₀`, `y ∈ Q₀`,
+  `ω^c = ω y` ⟹ `c = 1`**。`D = KW` (⟸ `V = W`) で `c⁻¹ = k v` と分解し、
+  `quotientKWHom_mk` で `Q/Z(Q)` へ降ろし、`coord_act` でスカラー倍に翻訳、
+  `coord_ne_zero_of_not_mem_Q0` で `μ(k,v) = 1`、`μ` 単射 + `conjQByK_injective`。
+
+### 🎯 段 (15) 完成 — `PSU3StepFifteen.lean` (新 leaf)
+
+* `f_mul_eq_conj_of_normalized` — 正規化を裏返して `f(ωy) = ω^{ζ⁻¹}`。
+* 🎯 `stepFifteen_stop_d_eq_inv` — **`d_N = ζ⁻¹`** (書籍 p.126 の
+  `d_{m₁} = ζ⁻¹`)。⚠ 書籍はここを「By (14), it follows that」で済ませているが、
+  2 つの表示を突き合わせて `ζ⁻¹d_N⁻¹ = 1` と結論するには**自由性が要る** — それが
+  この章で自由性を必要とした本当の理由。
+* `lt_orderOf_of_not_stopped` / 🎯 `stepFifteen_length_eq` — **`N + 2 = orderOf ζ`**
+  (= `m₁ = m−1`) と `d_N` の `K` 成分の自明性 (= `c_{m₁} = α`)。
+* `pow_sub_eq_one_of_coset_eq` / 🎯 `stepElevenSeq_fst_injOn` — **`z_i` は相異なる**。
+  ⚠ 書籍は「`u_i` が相異なるのは `d_i` が相異なるから」と書くだけだが、
+  `z_i = z_j ⟹ d_i = d_j` は自由性そのもの。
+* 🎯 `stepFifteen_exhaust` — **段 (8) が数える集合 = `{z_0, …, z_N}`**。
+
+### 🎯 段 (13) の橋渡し + 段 (16) — `PSU3SequenceCoordinate.lean` (新 leaf)
+
+* `IsCenterCoordAction` (仮説の命名) / `centerCoord_congr` / `centerCoord_conj_eq`
+  (共役を等式で受ける版) / `kActor_inv`。
+* 🎯 `stepElevenCoord` + `_succ` — 正規化座標 `U_i = coord(z_i)/coord(s)` が
+  **`U_{i+1} = 1/(α + U_i)`** を満たす。
+* 🎯 `stepElevenCoord_eq_betaRatio` — **段 (13)**: `U_i = betaRatio β i`。
+* 🎯 `stepElevenSeq_ne_one_iff` — 停止則を座標で: 段 `n` で続行可能 ⟺ `β^{n+2} ≠ 1`。
+* 🎯 `stepSixteen` — **段 (16)**: `β^{N+2} = 1` かつ `orderOf β = N + 2 = orderOf ζ`。
+  ⚠ 書籍は `c_{m−1} = α` 経由だが、停止則を座標で読むと**逆順に**取れて
+  `pow_eq_one_of_betaSum_eq` を経由しない (後者は今のところ未使用のまま残る)。
+* `betaSum_eq_of_pow_eq_one` — 書籍の `c_{m−1} = α` は `β^m = 1` の系。
+
+### 📊 状態 (2026-08-01 セッション 2 終了時)
+
+| 段 | 状態 | 主定理 |
+|---|---|---|
+| §1 / (A1)-(A3) 橋 / (1)-(10) | ✅ | 既存 |
+| (11) | ✅ | `stepElevenSeq` + `_spec` + `_coset` |
+| **(13)** | ✅ 群↔体 の橋渡し込み | `stepElevenCoord_eq_betaRatio` |
+| (12)(14)(17) | 🔶 体側のみ | `PSU3FieldArithmetic` |
+| **(15)** | ✅ **完成** (長さ + 尽くし) | `stepFifteen_length_eq` / `stepFifteen_exhaust` |
+| **(16)** | ✅ **完成** | `stepSixteen` |
+| (18) | 🔶 漸化式 ✅ / 締めが残り | `stepEighteen_unroll` |
+| (19) | ✅ | `stepNineteen` / `stepNineteen_swap` |
+| (20) | 🔶 核 ✅ / 列の instantiate が残り | `eq_and_eq_of_inv_mul_mem_K` |
+
+### ⚠ 次の一手 = (17) の群レベル ⟹ (18) の締め
+
+**(17)** `f(ω(0,u_i)) = (ω(0,u_i+α))^{d_i}` は、群レベルでは
+**`w_i = y z_i`** (第 2 成分が `y z_i` に等しい) と同値。列の漸化式で書くと
+`w_{i+1} = w_i · (d_i z_{i+1} d_i⁻¹)` なので、必要なのは
+
+    d_i z_{i+1} d_i⁻¹ = z_i z_{i+1}      (⟸ `W` は `Q₀` を中心化するので `K` 成分だけ効く)
+
+座標では `μ(kActor k_i)^d · U_{i+1} = U_i + U_{i+1}`、ここで `k_i` は `d_i` の `K` 成分で
+`μ(kActor k_i)^d = (∏_{j=1}^{i} U_j)² = (α/c_{i+1})²`。あとは
+`betaSum_mul_betaSum_add_two` (`c_n c_{n+2} = c_{n+1}² + c_1²`, 既存) で閉じる。
+⟹ **必要な新規部品 = 「`d_i` の `K` 成分のスカラーを座標で追う」帰納法 1 本**。
+
+**(18)** の締めもこれ待ち: `stepEighteen_unroll` の `k` (= `∏ a_j²`) が
+`i = m−1` で 1 になることが要り、それが上と同じ telescoping (書籍の
+`α/(β^i + β^{-i})` が `i = m−1` で `α/α = 1`)。
+`D = KW` は `V = W` の下 abelian なので、そこまで来れば
+`(h(ω)ζ⁻¹)^m = h(ω)^m = k⁻¹ = 1` は 3 行。
+
 ## セッション総括 (2026-07-31)
 
 **Ch. IV で形式化されたもの** (すべて sorry 0 / AxiomsCheck OK / lint 0):
