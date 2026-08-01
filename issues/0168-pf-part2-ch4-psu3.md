@@ -5757,3 +5757,45 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
 を `y = t x t` でなく **任意の `y ∈ C_G(P) − H`** について切り出せばよい。
 `C_Q(P) ≤ U` は `CentralizerCommonData.residual_eq_normalClosure` から
 (`StructureOfH/PSUCentre.lean:75` に局所 `have` の実例)。
+
+## 2026-08-02 (107): 🎯 `U` の rank-one setup が landing — 段 (2) の部品が全部そろった
+
+(106) の手順 1-2 完了。**新しい数学は一切要らず**、既存の一意性 2 本の組み合わせだった。
+
+| 定理 | 内容 |
+|---|---|
+| `Setup.restrict` (`RankOneBNPair.lean`) | `t ∈ K` かつ 2 分解の **`Q`-成分が `K` に入る** なら `K` は setup を継承 (他の因子は `d = q⁻¹a`, `x = y q⁻¹ t⁻¹` と割り算で出る) |
+| `mem_centralizer_of_conj_eq` | 「全 `p ∈ X` で `p y p⁻¹ = y`」⟹ `y ∈ C_G(X)` |
+| `canonicalForm_mem_centralizer` | `y ∈ C_G(X)` の canonical 分解 `y = x·t·q` は両因子が `C_G(X)` に入る (Ch. I Prop 4(a) の一意性) |
+| `splitQD_mem_centralizer` | `a ∈ C_H(X)` の `Q·D` 分解も同様 (Ch. I Prop 6(a) + `Q·D` 一意性) |
+| `fgh_mem_centralizer` | 上 2 本の系に書き直し (証明 6 行) |
+| `rankOneSetup_subgroup` | `C_Q(X) ≤ K ≤ C_G(X)`, `t ∈ K` ⟹ `K` は setup を持つ |
+| `inf_centralizer_le_residual` | `C_Q(X)` が 2-群 ⟹ `C_Q(X) ≤ O^{2'}(C_G(X))` |
+| `t_mem_residual` | `t ∈ O^{2'}(C_G(X))` (§4 固有だった補題の一般化) |
+| **`rankOneSetup_residual`** | ⟹ **`U = O^{2'}(C_G(X))` が rank-one setup を持つ** |
+
+⟹ `Setup.exists_fgh` が書籍の **`f₁, g₁, h₁`** を与える。
+
+### ⚠ 残る 1 点: 商 `U/Z(U)` 側の `H̄` / `Q̄` と `π(H ∩ U)` / `π(Q ∩ U)` の同定
+
+`IsFGH.map` は下の setup について `hQπ : π(Q ∩ U) ⊆ Q̄`, `hDπ : π(D ∩ U) ⊆ D̄` を要求する。
+`t̄ = π t` は `exists_conjugate_t_eq` (104) で合わせられるが、**`H̄` が
+`π(H ∩ U)` と一致するかは base point の取り方次第**。
+
+⚠ `Hypothesis` は `(basept, t)` で決まる (`H = stab(basept)`, `D = H ⊓ H^t`,
+`Q = H` の正規 Hall 2-部分群で一意) ので、制約は 2 本 (`t̄ = π t` と `H̄ = π(H∩U)`)、
+共役の自由度は 1 パラメータ。**両立するか**が次の問い。
+
+見通し: `π(C_Q(P))` は `U/Z(U)` の 2-部分群、`Q̄` は Sylow 2。もし
+`π(C_Q(P))` が Sylow 2 なら `Q̄` の共役で、あとは「(Sylow 2, `H` の外の対合) の対に
+群が推移的に働く」= 2-推移性の帰結、で両立が言えるはず。
+
+### ⚠ 次セッションはここから
+
+1. `π(Q ∩ U)` が `U/Z(U)` の Sylow 2-部分群か実測 (`|C_Q(P)|` と `|U/Z(U)|₂` の比較;
+   `natCard_residualQuotientHypothesis_Q0`/`_Q` と `CentralizerPSUData` の
+   `natCard_cQ_eq_baseField_cube` が使えるはず)。
+2. 「(Sylow 2, 外の対合) の対の共役性」を `Hypothesis` の公理から示す
+   (`isConj_of_involutions` (Ch. I Prop 2(b)) と `Sylow.conj` の合成)。
+3. ⟹ 共役でひねった `Hypothesis` で `t̄ = π t` かつ `Q̄ = π(Q∩U)` を同時に達成 ⟹
+   `IsFGH.map` → `corollaryTwo_of_sectionThree` → `IsFGH.eq_of_le` ⟹ **段 (2) 完了**。
