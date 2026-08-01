@@ -4122,3 +4122,57 @@ def Q0 : Subgroup G where carrier := {x | x ^ 2 = 1 ∧ x ∈ hyp.H}
    `corollaryTwo_of_stepFour` → `ω̄`。
 4. 商から `U` へ持ち上げ + `IsFGH.eq_of_le` ⟹ **段 (2) が閉じる**。
 5. 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
+
+## 2026-08-01 (72): 🎯 段 (2) の PSU(3,ℓ) 構造事実は **2 つに整理された**
+
+`V = W` の中身を特定して、書籍の 2 つの「by the structure of PSU(3,ℓ)」を
+同一の対象についての主張にまとめた。
+
+### `V = W` ⟺ `V ≤ C(Q₀)` (landing)
+
+* `W_eq_centralizer_involutions_H` (`CentralizerStructure.lean:241`) は
+  `W = D ⊓ C({x | x² = 1 ∧ x ≠ 1 ∧ x ∈ H})`。
+* `Q₀ = {x | x² = 1 ∧ x ∈ H}` は同じ集合 + `1` で、`1` は誰でも中心化する
+  ⟹ **`W_eq_inf_centralizer_Q0` : `W = D ⊓ C(Q₀)`**。
+* `W ≤ V` (`W_le_V`) と `V ≤ D` (`V_le_D`) は自明なので
+  ⟹ **`V_eq_W_iff_le_centralizer_Q0` : `V = W ↔ V ≤ C(Q₀)`**。
+
+⚠ 別ルートの確認: `ker_conjQ0 : conjQ0.ker = W.subgroupOf D` (`KCyclic.lean:96`)
+も同じことを言っている (`W` = `D` のうち `Q₀` に自明に作用するもの)。
+
+### ⟹ 段 (2) の残りは商 `qhyp` についての **2 つ**だけ
+
+| # | 主張 | 用途 | 書籍の根拠 |
+|---|---|---|---|
+| **(A)** | `V̄ ≤ C(Q̄₀)` | `hVW : qhyp.V = qhyp.W` (§3 の全 endpoint が担ぐ) | 「`(V∩U)/(P∩U)` centralizes `C_{Q₀}(P)`」 |
+| **(B)** | `V̄ ≠ 1` | `ζ ∈ W̄#` (= `w ∈ W̄`, `w ≠ 1`) | 「`\|(V∩U)/(P∩U)\| = (ℓ+1)/(ℓ+1,3) ≠ 1` since `ℓ > 2`」 |
+
+(A) が入れば `V̄ = W̄` なので (B) の `V̄ ≠ 1` がそのまま `W̄ ≠ 1` を与える。
+⟹ **(A) と (B) の 2 本で `psu3Numerics_and_standingData_centralizerQuotient` の
+最後の入力が埋まり、§2/§3 が商で走る**。
+
+### 数学的な中身 (PSU(3,q) の標準モデルで)
+
+`D̄` = トーラス (位数 `(q²−1)/d`)、`t̄` = Weyl 対合、`V̄ = C_{D̄}(t̄)` = ノルム 1 部分
+(位数 `(q+1)/d`)、`Q̄₀ = Z(Q̄)`。トーラス元 `a` は `Q̄₀` を**ノルム `a^{1+q}` 倍**で
+スケールするので、ノルム 1 の元は `Q̄₀` に自明に作用する = **(A)**。
+(B) は model 側に既存: `ProjectiveUnitary.exists_ne_one_mem_psuTorus_torusWeight_eq_one`
+(`TorusCentralizer.lean:76`、`1 < n` すなわち `ℓ = 2ⁿ ≥ 4` = 書籍の `ℓ > 2`) (56)。
+
+⚠ 必要なのは **`hyp` 側の `D`/`V`/`Q₀` と標準モデルの辞書**。
+`CentralizerPSUDistinguished.lean` は `|st| = 3` のためだけの transport (553 行) で、
+`D`/`V`/`W` についての辞書は**持っていない** (実測: `hyp.D`/`hyp.V`/`hyp.W` の登場は
+`hXV : X ≤ hyp.V` の 1 箇所のみ)。
+
+### ⚠ 次セッションはここから
+
+1. **PSU(3,ℓ) 辞書**: `L̄ ≃* standardPermGroup n` (枝データ) の下で
+   `H̄ ⊓ L̄ = N_{L̄}(Q̄)` = Borel、`D̄ ⊓ L̄` = トーラス、を対応づける。
+   材料: `normalizer_Q_eq_H` (`Basic.lean:610`)、`D_def : D = H ⊓ H^t`、
+   `CentralizerPSUDistinguished.lean` の Sylow 共役 + 根群位置合わせの骨格。
+2. (A) `V̄ ≤ C(Q̄₀)` — ノルム 1 のトーラス元が根群の中心に自明に作用すること。
+3. (B) `V̄ ≠ 1` — `exists_ne_one_mem_psuTorus_torusWeight_eq_one` を辞書で移送。
+4. → `psu3Numerics_and_standingData_centralizerQuotient` の最後の入力が埋まる
+   → `exists_standardModel` for `qhyp` → (60) の段 (4) 鎖 → `corollaryTwo_of_stepFour`。
+5. 商から `U` へ持ち上げ + `IsFGH.eq_of_le` ⟹ **段 (2) が閉じる**。段 (3)-(10) は
+   landing 済 ⟹ **§4 完成**。
