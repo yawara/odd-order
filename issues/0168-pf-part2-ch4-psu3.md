@@ -2173,3 +2173,59 @@ Ch. I §1 Prop 4 と同じ論法)。
 4. `y = ζ⁻¹` (= `a = 0`) の場合を `unitaryCoord_inv` + 共役公式で個別に処理
    (`f(ω) = ω^{-ζ} = (ω̄ζ, ζ)` と `(ω̄/y, 1/y)` の一致)。
 5. `ω → ω⁻¹`, `ζ → ζ⁻¹` の対称性で `a = 1` を回収 → 段 (4) 完成 → 段 (5)。
+
+## 2026-08-01 (18): 段 (4) の配線部品が揃った (フルビルド green・lint 0)
+
+(17) の続き。段 (4) を組み立てるための部品を全部落とした。
+
+| 定理 | 所在 | 内容 |
+|---|---|---|
+| `stepOne_conjQHom` | `PSU3SectionThree` | 段 (1) を `X^{a²ζ}·s^a = X^{ζ²}·ω^ζ` の形に |
+| `mu_norm_eq` | `PSU3RootGroupModel` | `μ(k,v)^{1+q} = μ(k,1)²` |
+| `unitaryCoord_of_quotient_eq_zero` | `UnitaryCoordinates` | 商座標 0 ⟹ ユニタリ座標 = 中心座標 |
+| `unitaryCoord_center` | `PSU3RootGroupModel` | 中心元の `Ψ` ユニタリ座標 = `ν·ι(z)` |
+| `secondEntry_of_chain` / `star_of_chain` | `PSU3InverseFormula` | 2 因子等式 ⟹ `(∗∗)` |
+
+### 段 (4) 組み立ての設計図 (辞書つき)
+
+書籍 p.131 の記号 ↔ repo の対応:
+
+| 書籍 | repo |
+|---|---|
+| `a` (p.131、`F − {0}`) | `Ā := μ(kActor(a²), 1)`  (= `μ(kActor a,1)²`、`mu_kActor_sq`) |
+| `ζ⁻¹` | `Z := μ(1, ζ)` |
+| `ω̄` | `(Ψ Ω).quotient = e·M.coord(ω)` |
+| `x` | `unitaryCoord m u (Ψ Ω)` |
+| `γ(a)` | `unitaryCoord m u (Ψ X)`、`X = f(ω s^a)` |
+| `s^a = (0,a)` | `unitaryCoord m u (Ψ (s^a)) = ν·ι(s^a) = Ā`  (`ν = ι(s)⁻¹`) |
+
+⚠ **`star_of_secondEntry` / `star_of_chain` の `ζ` には `Z⁻¹` を入れる**
+(定理側は `ζ⁻¹` で書いてあるので、書籍の `ζ⁻¹ = Z` に合わせる)。
+`hζnorm` は `mu_W_normOne`、`hω : ω̄^{1+q} = ζ + ζ⁻¹` は段 (3) (`stepThree` の
+`α = Z + Z⁻¹`) + 余輪体がエルミートゆえ `(Ψω)²` の中心座標が `ω̄^{1+q}`。
+
+4 因子の座標 (`exists_unitaryModel_conj` + `mu_norm_eq`):
+
+| 因子 | 商座標 | ユニタリ座標 |
+|---|---|---|
+| `L₁ = Ψ(X^{a²ζ})` | `Ā·Z·X̄` | `Ā²·γ` |
+| `L₂ = Ψ(s^a)` | `0` | `Ā` |
+| `R₁ = Ψ(X^{ζ²})` | `Z²·X̄` | `γ` |
+| `R₂ = Ψ(ω^ζ)` | `Z·ω̄` | `x` |
+
+段 (2) (`stepTwo_linear` に `e` を掛ける) が `(Ā + Z)·X̄ = ω̄`、
+すなわち `X̄ = ω̄/(Ā+Z)` を与えるので `star_of_chain` の `hR₁q` が埋まる。
+
+### ⚠ 次セッションはここから
+
+1. **`exists_unitaryModel_conj` に `hquot` を足した合成版**を作る
+   (段 (2) を `Ψ` の商座標で読むのに要る)。`exists_unitaryModel_coord` と
+   `exists_unitaryModel_conj` は入力がほぼ同じなので 1 本に束ねてよい。
+2. `ν := ι(s)⁻¹` を入れて `unitaryCoord (Ψ (s^a)) = Ā` を出す
+   (`unitaryCoord_center` + `centerCoord_conj` + `mu_K_zpow_eq_sq` + `mu_kActor_sq`)。
+3. `stepOne_conjQHom` を `Ψ` で送って `star_of_chain` を適用 → `(∗∗)`。
+4. `gamma_eq_inv_of_secondEntry` で `x = Z` と `γ = 1/(x+Ā)` → 段 (4) 本体。
+   ⚠ `Ā` は `a ∈ K` を動かすと `F^×` 全体を掃く (`exists_mem_K_mu_sq_inv_eq`
+   と同じ論法; 平方は標数 2 で全単射)。
+5. `y = Z` (`Ā = 0` に相当、`ω` 自身) と `Ā = 1` の 2 例外を
+   `unitaryCoord_inv` / `ω → ω⁻¹, ζ → ζ⁻¹` の対称性で回収 → 段 (5)。
