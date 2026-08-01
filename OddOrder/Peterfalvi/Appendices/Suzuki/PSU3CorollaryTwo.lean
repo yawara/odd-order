@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SequenceCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFive
 
 /-!
@@ -34,6 +35,10 @@ because inversion fixes the quotient coordinate (`quotient_inv_eq`) while `μ(1,
   of `corollaryTwo_of_stepFour`.
 * `Hypothesis.corollaryTwo_of_base` — Corollary 2 with only the base pair of §2 left as
   a hypothesis.
+* `Hypothesis.corollaryTwo_of_standardModel` — the same, phrased directly on the output
+  of the Proposition of Ch. III §3 (`exists_standardModel`) plus §3 (3): the unitary
+  coordinates, the normalization `ν c(s) = 1`, the exponent `d = 2` and stage (3) at the
+  base pair are all built here.
 -/
 
 set_option autoImplicit false
@@ -299,6 +304,157 @@ theorem corollaryTwo_of_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       Ψ hene hΨq hΨc hconjq hconjy d hequiv hdsq hs hm hQ0card hfQ hζ₀ hζ₀1 hω₀Q hω₀Q0
       hf₀ hstage3 σ hσQ (hfQ σ hσQ))
     hhW hζ hζ1
+
+/-- **Peterfalvi Part II, Ch. IV §3, Corollary 2**, on the output of the Proposition of
+Ch. III §3 (pp. 120–132).
+
+Everything between `exists_standardModel` and Corollary 2 is assembled here:
+
+* `hθ` (§3 (3): the model's twist is the identity on `F`) turns the semilinearity into
+  `F`-bilinearity, so `cocycle_diag_eq_norm` puts the cocycle's diagonal in the Hermitian
+  shape `φ(1,1) · x^{1+q}`;
+* that shape evaluates the opaque exponent `d` as squaring (`mu_K_zpow_eq_sq`) — the
+  concrete content of `θ = 1`;
+* `exists_modelEquiv_conj` makes the conjugation action pointwise and
+  `exists_unitaryModel_conj` moves to the book's unitary coordinates `(a, y)` with
+  `Tr y = a ā`;
+* the book's normalization `s = (0, 1)` is imposed by taking `ν = c(s)⁻¹`;
+* stage (3) at the base pair is `stepThree_quotient_norm` read through `hα`.
+
+`hθ` and `hα` are the two conclusions of §3 (3) (`stepThree` composed with
+`thetaModel_eq_id_on_frobFixed`, which also says `σ` is the identity on `F` — that is
+why `hα` can be stated without `σ`).  The base pair itself is what §2 closes with
+(`f_eq_conj_inv_of_stepTwenty_chain`); it arrives in §2's shape `f(ω₀) = (ω₀ ω₀²)^{ζ₀}`
+and `f_eq_conj_inv_of_sq_eq` reads it as the inversion formula. -/
+theorem corollaryTwo_of_standardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
+    (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
+    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
+    -- the model of Ch. III §3
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (θm : M.E → M.E)
+    (hsemi : ∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+      ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E), ∀ x y : M.E,
+        ((φ (a * x) (b * y) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = a * θm b *
+            ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hθ : ∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, θm a = a)
+    (haniso : ∀ x : M.E, x ≠ 0 → φ x x ≠ 0)
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (hquot : ∀ ρ : ↥hyp.Q, (Φ ρ).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) ρ)))
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hker : ∀ z : ↥(Subgroup.center hyp.Q),
+      Φ (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩)
+    (hW : ∀ (v : ↥hyp.W) (x y : M.E),
+      ((φ (((M.mu (1, v) : M.Eˣ) : M.E) * x) (((M.mu (1, v) : M.Eˣ) : M.E) * y) :
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (Θ : ↥hyp.actualKActor × ↥hyp.W →*
+      MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+    (hΘq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+        (Θ kv p).quotient = ((M.mu kv : M.Eˣ) : M.E) * p.quotient)
+    {d : ℤ}
+    (hΘc : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+        (((Θ kv p).central :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = ((M.mu (kv.1, 1) ^ d : M.Eˣ) : M.E) *
+            ((p.central :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (uAut : MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+    (huAut : uAut ∈
+      (Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts)
+    (hconj : (((MulAut.congr Φ).toMonoidHom.comp (hyp.conjQHom)).range).map
+      (MulAut.conj uAut).toMonoidHom = Θ.range)
+    -- §2's base pair, and stage (3) at it
+    {ζ₀ ω₀ y₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
+    (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0) (hy₀Q0 : y₀ ∈ hyp.Q0)
+    (hsqω₀ : ω₀ * ω₀ = y₀) (hfω₀ : f ω₀ = ζ₀⁻¹ * (ω₀ * y₀) * ζ₀)
+    (hα : hyp.centerCoord sfive M ι hy₀Q0 /
+        hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0
+      = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ₀, hζ₀⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+        + ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ₀, hζ₀⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹)
+    {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
+    ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
+  classical
+  -- ### `θ = 1` makes the cocycle `F`-bilinear, hence Hermitian on the diagonal
+  have hbil : ∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+      ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E), ∀ x y : M.E,
+        ((φ (a * x) (b * y) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = a * b *
+            ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) := by
+    intro a ha b hb x y
+    rw [hsemi a ha b hb x y, hθ b hb]
+  have hone : ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+      ≠ 0 := fun hc => haniso 1 one_ne_zero (Subtype.ext hc)
+  have hnorm := hyp.cocycle_diag_eq_norm M hm θm hsemi hθ hW hmu hζ₀1
+  -- ### the exponent `d` is squaring
+  have hdsq := hyp.mu_K_zpow_eq_sq M hnorm hone Θ hΘq hΘc
+  -- ### the book's normalization `ν c(s) = 1`
+  set c : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) :=
+    ι (Additive.ofMul (hyp.toCenter sfive hyp.distinguishedInvolution_mem_Q0)) with hcdef
+  have hcval : ((c : M.E)) =
+      hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 := rfl
+  have hcs0 : hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 ≠ 0 :=
+    hyp.centerCoord_distinguishedInvolution_ne_zero sfive M ι
+  have hc0 : c ≠ 0 := fun hcc => hcs0 (by rw [← hcval, hcc]; simp)
+  have hν : c⁻¹ ≠ 0 := inv_ne_zero hc0
+  have hνval : ((c⁻¹ : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+      = (hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)⁻¹ := by
+    rw [← hcval]
+    push_cast
+    ring
+  have hs : ((c⁻¹ : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) *
+      hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 = 1 := by
+    rw [hνval]
+    exact inv_mul_cancel₀ hcs0
+  -- ### the conjugation action, pointwise
+  obtain ⟨Φ', hquot', hcentre', hconj'⟩ :=
+    hyp.exists_modelEquiv_conj M Φ Θ uAut hquot hΘq huAut hconj hmu
+  have hker' : ∀ z : ↥(Subgroup.center hyp.Q),
+      Φ' (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩ := by
+    intro z
+    have hz : Φ.symm (⟨0, ι (Additive.ofMul z)⟩ :
+        Suzuki2Groups.BilinearTwistedProduct φ) = (z : ↥hyp.Q) := by
+      rw [← hker z, Φ.symm_apply_apply]
+    rw [← hz]
+    exact hcentre' _
+  -- ### the unitary coordinates
+  obtain ⟨u, hu, e, Ψ, hene, -, hΨq, hΨc, hconjq, hconjy⟩ :=
+    hyp.exists_unitaryModel_conj M hm hbil hnorm hone hν Φ' Θ hΘq
+      (fun kv => ((M.mu (kv.1, 1) ^ d : M.Eˣ) : M.E)) hΘc hconj'
+  -- ### the base pair in the shape stage (4) uses, and stage (3) at it
+  have hf₀ : f ω₀ = ζ₀⁻¹ * ω₀⁻¹ * ζ₀ :=
+    hyp.f_eq_conj_inv_of_sq_eq hy₀Q0 hfω₀ hsqω₀
+  have hstage3 : (Ψ ⟨ω₀, hω₀Q⟩).quotient ^ (2 ^ m + 1)
+      = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ₀, hζ₀⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+        + ((M.mu ((1 : ↥hyp.actualKActor),
+          (⟨ζ₀, hζ₀⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
+    rw [hyp.stepThree_quotient_norm sfive M Φ' ι hker' hu Ψ hΨq hΨc hω₀Q hy₀Q0 hsqω₀,
+      ← hα, hνval, div_eq_mul_inv]
+    exact mul_comm _ _
+  exact hyp.corollaryTwo_of_base H hC2 sfive M hZc hmu hVW Φ' hquot' ι hker' hu Ψ hene
+    hΨq hΨc hconjq hconjy d hequiv hdsq hs hm hQ0card hKcard hWdvd hW1 hfQ hhW hζ₀ hζ₀1
+    hω₀Q hω₀Q0 hf₀ hstage3 hζ hζ1
 
 end Hypothesis
 
