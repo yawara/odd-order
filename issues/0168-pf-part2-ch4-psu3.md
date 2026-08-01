@@ -6741,3 +6741,35 @@ genuine な結果として残る (§3 の Proposition は実際に `C/𝒩(C)` �
 `φ(H_tr, Q_tr, D_tr, t_tr) = (M̄, Q̄, D̄, t̄)` が取れ、transported 側の
 `residualQuotientHypothesis_V_eq_W` 等から **`hVW` / `hKcard` / `hWdvd` / `∃w∈W̄` が
 まとめて移送できる**。
+
+## 2026-08-02 (130): 🎯 `Setup.exists_conj_eq` — 照合の前半が landing
+
+`Setup.exists_conj_eq` (`RankOneBNPairRigidity.lean`) — 同じ群 `L` 上の 2 つの
+rank-one setup について `∃ c, Q^c = Q' ∧ M^c = M'`。⚠ **モデルを一切使わない**:
+`Q`, `Q'` はどちらも Sylow 2 ((129)) ゆえ共役 (`MulAction.exists_smul_eq` on `Sylow 2 L`)、
+`M = N_L(Q)` ((129)) ゆえ `Subgroup.map_equiv_normalizer_eq` で `M` も移る。
+
+### ⚠ 次セッションはここから — `D` の照合 (道具は repo に在る)
+
+`Q^c = Q'`, `M^c = M'` まで来たので、`↥M'` の中で `D^c` と `D'` はどちらも `Q'` の補群。
+位数は互いに素 (`|Q'|` は 2 冪、`[M' : Q'] = |D'|` は奇) で `Q'` は 2-群ゆえ可解。
+
+⟹ **`Subgroup.IsComplement'.exists_conj_of_coprime`**
+(`OddOrder/Mathlib/SchurZassenhausConj.lean:1292`, 既存!) がそのまま使える:
+
+```
+(hN : Coprime (card N) N.index) (hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
+(hK : IsComplement' N K) (hK' : IsComplement' N K') :
+  ∃ n ∈ N, K.map (MulAut.conj n) = K'
+```
+
+実装の要点:
+* `↥M'` の中で作業する (`N := Q'.subgroupOf M'`, `K := (D.map (conj c)).subgroupOf M'`,
+  `K' := D'.subgroupOf M'`)。
+* `IsComplement'` は `Setup` の `split` (一意分解 `M = Q ⋊ D`) から出る
+  — `Q ⊓ D = ⊥` (`Setup.Q_inf_D_eq_bot`) と `Q * D = M` (`split` の全射性)。
+* 得た `n ∈ Q'` でさらに共役を取ると `Q'`, `M'` は不変 (`Q' ⊴ M'`) なので
+  `Q^{cn} = Q'`, `M^{cn} = M'`, `D^{cn} = D'` が同時に成り立つ。
+
+その後 `t` の照合 (`exists_mem_K_conj_t_eq` (110)) で四つ組が揃い、
+`hVW` / `hKcard` / `hWdvd` / `∃w∈W̄` が transported 側からまとめて移送できる。
