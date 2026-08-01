@@ -285,6 +285,109 @@ theorem exists_unitaryModel_coord {m : ℕ} (M : hyp.QuotientFieldModel m) (hm :
   refine ⟨e, Ψ, hene, heF, fun ρ => ?_, hΨc⟩
   rw [hΨq ρ, hquot ρ]
 
+include hyp in
+/-- **Conjugation by `KW` is the scalar action, pointwise** (Peterfalvi Part II,
+Ch. III §3, p. 121, step (4) — the Zassenhaus step, read on elements).
+
+The Proposition of Ch. III §3 matches the conjugation action with the scalar action
+only as *subgroups* of `MulAut`, after conjugating by an element `u` of `U`.  Two
+observations turn that into a pointwise statement:
+
+* `u` can be absorbed into the coordinate map: `Φ' := Φ ∘ u` satisfies
+  `MulAut.congr Φ' α = u (MulAut.congr Φ α) u⁻¹`, so the equality of images becomes
+  `MulAut.congr Φ' ∘ conjQHom` landing in `Θ.range`.  Since `u` induces the identity
+  on both ends of the extension, `Φ'` has the same quotient coordinate as `Φ` and
+  still sends the centre to the centre coordinate unchanged.
+* the index is then pinned by the *quotient* action: `Θ kv'` scales it by `μ(kv')`
+  and conjugation by `μ(kv)`, so `μ` injective forces `kv' = kv`.
+
+This is what §3 (4) needs: the conjugations appearing in stages (1) and (2) act on
+both coordinates by the explicit scalars of `Θ`. -/
+theorem exists_modelEquiv_conj {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (Θ : ↥hyp.actualKActor × ↥hyp.W →*
+      MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+    (u : MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+    (hquot : ∀ e : ↥hyp.Q, (Φ e).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) e)))
+    (hΘq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+        (Θ kv p).quotient = ((M.mu kv : M.Eˣ) : M.E) * p.quotient)
+    (hu : u ∈ (Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts)
+    (hconj : (((MulAut.congr Φ).toMonoidHom.comp (hyp.conjQHom)).range).map
+      (MulAut.conj u).toMonoidHom = Θ.range)
+    (hmu : Function.Injective M.mu) :
+    ∃ Φ' : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ,
+      (∀ e : ↥hyp.Q, (Φ' e).quotient =
+        M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) e))) ∧
+      (∀ w : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
+        Φ' (Φ.symm ⟨0, w⟩) = ⟨0, w⟩) ∧
+      ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+        Φ' (hyp.conjQHom kv ρ) = Θ kv (Φ' ρ) := by
+  classical
+  obtain ⟨huinl, huright⟩ := hu
+  -- `u` does not move either coordinate of the centre or the quotient
+  have huq : ∀ p : Suzuki2Groups.BilinearTwistedProduct φ,
+      (u p).quotient = p.quotient := by
+    intro p
+    exact congrArg Multiplicative.toAdd (huright p)
+  set Φ' : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ := Φ.trans u with hΦ'
+  have hquot' : ∀ e : ↥hyp.Q, (Φ' e).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) e)) := by
+    intro e
+    rw [hΦ']
+    change (u (Φ e)).quotient = _
+    rw [huq, hquot]
+  -- absorbing `u` turns the conjugated image into the plain one
+  have hcongr : ∀ kv : ↥hyp.actualKActor × ↥hyp.W,
+      MulAut.congr Φ' (hyp.conjQHom kv)
+        = (MulAut.conj u) (MulAut.congr Φ (hyp.conjQHom kv)) :=
+    fun kv => rfl
+  refine ⟨Φ', hquot', fun w => ?_, fun kv ρ => ?_⟩
+  · rw [hΦ']
+    change u (Φ (Φ.symm ⟨0, w⟩)) = _
+    rw [Φ.apply_symm_apply]
+    exact huinl (Multiplicative.ofAdd w)
+  · -- the conjugation lands in the image of `Θ`
+    have hmem : MulAut.congr Φ' (hyp.conjQHom kv) ∈ Θ.range := by
+      rw [← hconj, hcongr kv]
+      exact ⟨MulAut.congr Φ (hyp.conjQHom kv), ⟨kv, rfl⟩, rfl⟩
+    obtain ⟨kv', hkv'⟩ := hmem
+    -- the quotient action pins the index
+    have hact : ∀ σ : ↥hyp.Q,
+        (Φ' (hyp.conjQHom kv σ)).quotient
+          = ((M.mu kv : M.Eˣ) : M.E) * (Φ' σ).quotient := by
+      intro σ
+      rw [hquot' (hyp.conjQHom kv σ), hquot' σ, ← M.coord_act kv]
+      rfl
+    have hone : ((M.mu kv' : M.Eˣ) : M.E) = ((M.mu kv : M.Eˣ) : M.E) := by
+      have hq : (Φ' (Φ'.symm (⟨1, 0⟩ :
+          Suzuki2Groups.BilinearTwistedProduct φ))).quotient = 1 := by
+        rw [Φ'.apply_symm_apply]
+      have h1 := congrArg (fun α : MulAut (Suzuki2Groups.BilinearTwistedProduct φ) =>
+        (α (Φ' (Φ'.symm (⟨1, 0⟩ : Suzuki2Groups.BilinearTwistedProduct φ)))).quotient)
+        hkv'
+      rw [hΘq kv' _, hq, mul_one] at h1
+      have h2 : (MulAut.congr Φ' (hyp.conjQHom kv)
+          (Φ' (Φ'.symm (⟨1, 0⟩ : Suzuki2Groups.BilinearTwistedProduct φ)))).quotient
+          = ((M.mu kv : M.Eˣ) : M.E) := by
+        have : MulAut.congr Φ' (hyp.conjQHom kv) (Φ' (Φ'.symm
+            (⟨1, 0⟩ : Suzuki2Groups.BilinearTwistedProduct φ)))
+            = Φ' (hyp.conjQHom kv (Φ'.symm
+              (⟨1, 0⟩ : Suzuki2Groups.BilinearTwistedProduct φ))) := by
+          change Φ' (hyp.conjQHom kv (Φ'.symm (Φ' (Φ'.symm _)))) = _
+          rw [Φ'.symm_apply_apply]
+        rw [this, hact, hq, mul_one]
+      exact h1.trans h2
+    have hkveq : kv' = kv := hmu (Units.ext hone)
+    rw [hkveq] at hkv'
+    have hval := congrArg (fun α : MulAut (Suzuki2Groups.BilinearTwistedProduct φ) =>
+      α (Φ' ρ)) hkv'
+    rw [hval, show (MulAut.congr Φ') (hyp.conjQHom kv) (Φ' ρ)
+      = Φ' (hyp.conjQHom kv (Φ'.symm (Φ' ρ))) from rfl, Φ'.symm_apply_apply]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
