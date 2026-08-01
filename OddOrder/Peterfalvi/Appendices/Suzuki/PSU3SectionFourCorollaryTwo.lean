@@ -199,16 +199,21 @@ theorem inf_centralizer_le_residual
   exact ⟨⟨x, hxC⟩,
     Subgroup.le_primeComplementResidual S (hS (Subgroup.mem_subgroupOf.mpr hxQ)), rfl⟩
 
-/-- **`t ∈ O^{2′}(C_G(X))`** whenever `t` centralizes `X`: `t` is an involution, so it
-lies in a Sylow `2`-subgroup of `C_G(X)`, hence in the residual. -/
-theorem t_mem_residual (htX : hyp.t ∈ Subgroup.centralizer (X : Set G)) :
-    hyp.t ∈ (Subgroup.primeComplementResidual 2
+omit [MulAction G Ω] [Finite G] hyp in
+/-- **An involution of `C_G(X)` lies in `O^{2′}(C_G(X))`**: it generates a `2`-group, hence
+lies in a Sylow `2`-subgroup of `C_G(X)`, hence in the residual.
+
+Ch. IV §4, step (2) needs this for `t` and for the distinguished involution `s`, both of
+which centralize `X` when `X ≤ V`. -/
+theorem sq_eq_one_mem_residual {y : G} (hy2 : y ^ 2 = 1)
+    (hyX : y ∈ Subgroup.centralizer (X : Set G)) :
+    y ∈ (Subgroup.primeComplementResidual 2
         (Subgroup.centralizer (X : Set G))).map
       (Subgroup.centralizer (X : Set G)).subtype := by
   classical
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  set tC : ↥(Subgroup.centralizer (X : Set G)) := ⟨hyp.t, htX⟩ with htCdef
-  have htsq : tC ^ 2 = 1 := Subtype.ext (by simpa [htCdef] using hyp.t_sq)
+  set tC : ↥(Subgroup.centralizer (X : Set G)) := ⟨y, hyX⟩ with htCdef
+  have htsq : tC ^ 2 = 1 := Subtype.ext (by simpa [htCdef] using hy2)
   have hT : IsPGroup 2 ↥(Subgroup.zpowers tC) := by
     have hdvd : orderOf tC ∣ 2 := orderOf_dvd_of_pow_eq_one htsq
     have hcard : Nat.card ↥(Subgroup.zpowers tC) = orderOf tC := Nat.card_zpowers tC
@@ -217,6 +222,13 @@ theorem t_mem_residual (htX : hyp.t ∈ Subgroup.centralizer (X : Set G)) :
     · exact IsPGroup.of_card (n := 1) (by rw [hcard, h2]; norm_num)
   obtain ⟨S, hS⟩ := hT.exists_le_sylow
   exact ⟨tC, Subgroup.le_primeComplementResidual S (hS (Subgroup.mem_zpowers tC)), rfl⟩
+
+/-- **`t ∈ O^{2′}(C_G(X))`** whenever `t` centralizes `X`. -/
+theorem t_mem_residual (htX : hyp.t ∈ Subgroup.centralizer (X : Set G)) :
+    hyp.t ∈ (Subgroup.primeComplementResidual 2
+        (Subgroup.centralizer (X : Set G))).map
+      (Subgroup.centralizer (X : Set G)).subtype :=
+  sq_eq_one_mem_residual hyp.t_sq htX
 
 /-- **The residual `U = O^{2′}(C_G(X))` is a rank-one setup on `U ∩ H`, `U ∩ Q`,
 `U ∩ D`, `t`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133).

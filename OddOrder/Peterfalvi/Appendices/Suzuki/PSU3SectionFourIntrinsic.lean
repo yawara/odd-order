@@ -226,6 +226,21 @@ theorem natCard_residualImageQuotient_lt (hXV : X ≤ hyp.V) (hX : X ≠ ⊥) :
   rw [← Nat.card_congr (residualQuotientMulEquiv (G := G) X).toEquiv]
   exact hyp.natCard_residualQuotient_lt hXV hX
 
+/-- The distinguished involution lies in `U`: it centralizes `X` (Ch. I §3) and is an
+involution, so it lies in the `2′`-residual. -/
+theorem distinguishedInvolution_mem_residualImage (hXV : X ≤ hyp.V) :
+    hyp.distinguishedInvolution ∈ residualImage (G := G) X :=
+  sq_eq_one_mem_residual hyp.distinguishedInvolution_sq
+    (hyp.distinguishedInvolution_mem_centralizer_of_le_V hXV)
+
+/-- The structure conjugator lies in `U`: it centralizes `X` (Ch. I §3) and lies in `Q`,
+and `C_Q(X) ≤ U`. -/
+theorem structureConjugator_mem_residualImage (hXV : X ≤ hyp.V)
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))) :
+    hyp.structureConjugator ∈ residualImage (G := G) X :=
+  hyp.inf_centralizer_le_residual hCQ (Subgroup.mem_inf.mpr
+    ⟨hyp.structureConjugator_mem_Q, hyp.structureConjugator_mem_centralizer_of_le_V hXV⟩)
+
 section Model
 
 variable [MulAction (hyp.centralizerActionQuotient X) ↥(MulAction.fixedPoints X Ω)]
@@ -454,6 +469,95 @@ theorem isSuzuki2Group_Q_intrinsicResidualQuotient
   rw [hyp.intrinsicResidualQuotient_Q details hXD htX hCQ hZD]
   exact OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv
     details.cQ_isSuzuki2Group (hyp.cQMulEquivMapQ hXD htX hCQ hZD)
+
+/-! ### The distinguished involution of `U/Z(U)`
+
+`exists_standardModel` takes `|s̄ t̄| = 3`.  The distinguished pair is a `Classical.choose`,
+so it has to be *identified*: `s` and its structure conjugator `r` both centralize `X` when
+`X ≤ V` (Ch. I §3), hence both lie in `U`, and their images satisfy the defining conditions
+downstairs.  Uniqueness then gives `s̄ = π(s)`, and `|s̄ t̄| = 3` follows from `|s t| = 3`
+because the only alternative, `s̄ t̄ = 1`, would put `t̄ = s̄` inside `M̄`. -/
+
+/-- **`s̄ = π(s)`**: the distinguished involution of the intrinsic hypothesis on `U/Z(U)`
+is the image of the ambient one. -/
+theorem distinguishedInvolution_intrinsicResidualQuotient (hXV : X ≤ hyp.V)
+    (common : CentralizerCommonData hyp X) (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).distinguishedInvolution
+      = QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))
+        ⟨hyp.distinguishedInvolution, hyp.distinguishedInvolution_mem_residualImage hXV⟩ := by
+  classical
+  set Z : Subgroup ↥(residualImage (G := G) X) :=
+    Subgroup.center ↥(residualImage (G := G) X) with hZ
+  set sU : ↥(residualImage (G := G) X) :=
+    ⟨hyp.distinguishedInvolution, hyp.distinguishedInvolution_mem_residualImage hXV⟩ with hsU
+  set rU : ↥(residualImage (G := G) X) :=
+    ⟨hyp.structureConjugator, hyp.structureConjugator_mem_residualImage hXV hCQ⟩ with hrU
+  set tU : ↥(residualImage (G := G) X) := ⟨hyp.t, hyp.t_mem_residual htX⟩ with htU
+  have hsqU : sU ^ 2 = 1 := Subtype.ext hyp.distinguishedInvolution_sq
+  have hsH : QuotientGroup.mk' Z sU ∈
+      (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).H :=
+    ⟨sU, Subgroup.mem_subgroupOf.mpr hyp.distinguishedInvolution_mem_H, rfl⟩
+  have hs2 : (QuotientGroup.mk' Z sU) ^ 2 = 1 := by rw [← map_pow, hsqU, map_one]
+  have hs1 : QuotientGroup.mk' Z sU ≠ 1 := by
+    intro hcon
+    have h1 : sU = 1 :=
+      OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card
+        (hyp.odd_natCard_center_residualImage hXV common details)
+        ((QuotientGroup.eq_one_iff sU).mp hcon) hsqU
+    exact hyp.distinguishedInvolution_ne_one (congrArg Subtype.val h1)
+  have hrQ : QuotientGroup.mk' Z rU ∈
+      (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q :=
+    ⟨rU, Subgroup.mem_subgroupOf.mpr hyp.structureConjugator_mem_Q, rfl⟩
+  have hstructU : tU * sU * tU = rU⁻¹ * tU * rU := Subtype.ext hyp.structure_equation
+  have heq := congrArg (QuotientGroup.mk' Z) hstructU
+  rw [map_mul, map_mul, map_mul, map_mul, map_inv] at heq
+  exact ((hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).eq_distinguishedPair_of_structure
+    hsH hs2 hs1 hrQ heq).1.symm
+
+/-- **`|s̄ t̄| = 3` on `U/Z(U)`, intrinsically** (Peterfalvi Part II, Ch. IV §4, step (2),
+p. 133).
+
+`|s t| = 3` upstairs (`distinguishedProduct_order`) gives `|s̄ t̄| ∣ 3`, and `s̄ t̄ = 1` is
+barred because it would put `t̄ = s̄` inside `M̄`. -/
+theorem orderOf_distinguishedInvolution_mul_t_intrinsicResidualQuotient (hXV : X ≤ hyp.V)
+    (common : CentralizerCommonData hyp X) (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    orderOf
+        ((hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).distinguishedInvolution *
+          (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).t) = 3 := by
+  classical
+  set hq := hyp.intrinsicResidualQuotient details hXD htX hCQ hZD with hqdef
+  set Z : Subgroup ↥(residualImage (G := G) X) :=
+    Subgroup.center ↥(residualImage (G := G) X) with hZ
+  set sU : ↥(residualImage (G := G) X) :=
+    ⟨hyp.distinguishedInvolution, hyp.distinguishedInvolution_mem_residualImage hXV⟩ with hsU
+  set tU : ↥(residualImage (G := G) X) := ⟨hyp.t, hyp.t_mem_residual htX⟩ with htU
+  have hcube : (sU * tU) ^ 3 = 1 := by
+    refine Subtype.ext ?_
+    change (hyp.distinguishedInvolution * hyp.t) ^ 3 = 1
+    rw [← details.distinguishedProduct_order]
+    exact pow_orderOf_eq_one _
+  have hprod : hq.distinguishedInvolution * hq.t = QuotientGroup.mk' Z (sU * tU) := by
+    rw [hqdef, hyp.distinguishedInvolution_intrinsicResidualQuotient hXV common details
+      hXD htX hCQ hZD, map_mul]
+    rfl
+  have hdvd : orderOf (hq.distinguishedInvolution * hq.t) ∣ 3 :=
+    orderOf_dvd_of_pow_eq_one (by rw [hprod, ← map_pow, hcube, map_one])
+  have hne : hq.distinguishedInvolution * hq.t ≠ 1 := by
+    intro hcon
+    have hst : hq.distinguishedInvolution = hq.t⁻¹ := mul_eq_one_iff_eq_inv.mp hcon
+    exact hq.t_not_mem_H
+      (by rw [← hq.t_inv_eq, ← hst]; exact hq.distinguishedInvolution_mem_H)
+  rcases (Nat.dvd_prime Nat.prime_three).mp hdvd with h1 | h3
+  · exact absurd (orderOf_eq_one_iff.mp h1) hne
+  · exact h3
 
 /-! ### Moving the point set into `Ω`'s universe
 
