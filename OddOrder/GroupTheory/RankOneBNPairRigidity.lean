@@ -576,4 +576,41 @@ theorem Setup.exists_sylow_two_eq [Finite L] (hS : Setup M Q D t) (hQ : IsPGroup
   rw [hk, hj]
   exact Nat.le_of_dvd (by positivity) hpow
 
+/-- **`M = N_L(Q)`** — `M` normalizes `Q` (`Setup.conj_mem_Q`), and nothing outside does:
+an `x ∉ M` factors as `a · t · b` with `a ∈ M` and `b ∈ Q`, so `t` would normalize `Q`
+too, and then `t q t ∈ Q ≤ M` for `q ∈ Q^#` contradicts `Setup.tconj`.
+
+Together with `Setup.exists_sylow_two_eq` this is the rigidity Ch. IV §4, step (2) needs:
+two setups on the same group have conjugate `Q`s (Sylow), hence conjugate `M`s. -/
+theorem Setup.normalizer_Q_eq (hS : Setup M Q D t) (hQ1 : Q ≠ ⊥) :
+    Subgroup.normalizer Q = M := by
+  have hMle : M ≤ Subgroup.normalizer Q := fun m hm =>
+    Subgroup.mem_normalizer_iff.mpr fun n =>
+      ⟨fun hn => by
+        have hc := hS.conj_mem_Q (M.inv_mem hm) hn
+        rwa [inv_inv] at hc,
+       fun hn => by
+        have hc := hS.conj_mem_Q hm hn
+        have e : m⁻¹ * (m * n * m⁻¹) * m = n := by group
+        rwa [e] at hc⟩
+  refine le_antisymm (fun x hx => ?_) hMle
+  by_contra hxM
+  obtain ⟨p, hp, -⟩ := hS.fact x hxM
+  have htN : t ∈ Subgroup.normalizer Q := by
+    have he : t = (p.1 : L)⁻¹ * x * (p.2 : L)⁻¹ := by rw [hp]; group
+    have h1 : (p.1 : L)⁻¹ ∈ Subgroup.normalizer (Q : Set L) := inv_mem (hMle p.1.2)
+    have h2 : (p.2 : L)⁻¹ ∈ Subgroup.normalizer (Q : Set L) :=
+      inv_mem (Subgroup.le_normalizer p.2.2)
+    rw [he]
+    exact mul_mem (mul_mem h1 hx) h2
+  obtain ⟨q, hqQ, hq1⟩ : ∃ q ∈ Q, q ≠ 1 := by
+    by_contra hc
+    refine hQ1 (eq_bot_iff.mpr fun z hz => Subgroup.mem_bot.mpr ?_)
+    by_contra hz1
+    exact hc ⟨z, hz, hz1⟩
+  refine hS.tconj q hqQ hq1 ?_
+  have hmem := (Subgroup.mem_normalizer_iff.mp htN q).mp hqQ
+  rw [hS.tinv] at hmem
+  exact hS.QM hmem
+
 end OddOrder.GroupTheory.RankOneBNPair
