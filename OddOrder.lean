@@ -27,6 +27,7 @@ import OddOrder.GroupTheory.CentralCommutatorPower
 import OddOrder.GroupTheory.CentralElementaryExtension
 import OddOrder.GroupTheory.CentralExtensionAutomorphisms
 import OddOrder.GroupTheory.RankOneBNPair
+import OddOrder.GroupTheory.RankOneBNPairRigidity
 import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
 import OddOrder.GroupTheory.CentralProduct
 import OddOrder.GroupTheory.ChermakDelgado
