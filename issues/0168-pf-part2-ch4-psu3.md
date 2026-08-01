@@ -5305,3 +5305,45 @@ lint 純ゼロ)。
 2. 段 (4) 鎖を順に当てる。⚠ 各段の前提は前段の出力なので、`obtain` で受けながら
    一直線に流せるはず。詰まったら §3 側 (`PSU3InverseFormula.lean`) の
    `stepFour_cover` の呼び出し形を読んで合わせる。
+
+## 2026-08-01 (99): `x₀` も `U/Z(U)` へ — 前提が実際に**全部** landing
+
+`exists_center_Q_ne_one_residualQuotient` (フルビルド green 4989 jobs・lint 純ゼロ)。
+
+### `U/Z(U)` について landing 済の一覧 (これで完全)
+
+| 供給物 | 補題 |
+|---|---|
+| carrier `Hypothesis (↥U ⧸ Z(U)) (ULift (Unital n))` | `residualQuotientHypothesis` (96) |
+| `hst` | `residualQuotientHypothesis_orderOf_distinguishedInvolution_mul_t` |
+| `hm` | `data.one_lt_n` |
+| `hQ0card` / `hcardQ` | `natCard_residualQuotientHypothesis_Q0` / `_Q` |
+| `ih` | `theoremAInductionBelow_residualQuotient` (97) |
+| `x₀` | **今回** |
+| `hVW` | `residualQuotientHypothesis_V_eq_W` |
+| `w ∈ W#` | `exists_ne_one_mem_residualQuotientHypothesis_W` |
+| `hQsuz` | `isSuzuki2Group_residualQuotientHypothesis_Q` (98) |
+| `LemmaFiveSetup` / `QuotientFieldModel` | `nonempty_standingData_residualQuotient` (98) |
+
+### ⚠ 残る作業は **1 本の大きな threading 証明**
+
+`exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` は、
+中間出力 (`φ`, `Φ`, `Θ`, `u`, `d`, `hequiv`, `ι`, `hker`, `Ψ`, `hΨq`, `hΨc`,
+`hconjq`, `hconjy`, `hdsq`, `hs`, `hmu`, `hKcard`, `hWdvd`, `hW1`, `hfQ`, `hhW`,
+`ω₀`, `hcover` …) を一直線に受け渡す **~25 前提の証明**になる。
+分割して commit できる自然な境界が乏しいので、fresh context で一気に書くのが吉
+((60) の見立てどおり)。
+
+⚠ 着手時の注意 (これまでに踏んだ罠):
+* 型に `letI` を持つ補題を `have` で受けるときは**期待型を明示**する。
+* `TheoremAInductionBelow` 系の goal は `intro` で開く (汎用補題は unify しない)。
+* `ULift` を含む補題は universe を明示 (`.{v}`)。
+
+### ⚠ 次セッションはここから
+
+1. `PSU3InverseFormula.lean` の `stepFour_cover` / `stepFour_at_omega` /
+   `stepFour_pointwise` / `stepFour_base` / `stepFour_star` の**呼び出し形**を読み、
+   各段が要る前提と前段の出力の対応表を作る (先に読んでから書く)。
+2. `exists_standardModel` の出力と突き合わせ、足りないものだけを個別に補う。
+3. 一気に threading して `corollaryTwo_of_stepFour` を呼び、段 (2) の `ω`, `ζ` を得る。
+4. `IsFGH.eq_of_le` で ambient へ持ち上げ ⟹ **§4 完成**。
