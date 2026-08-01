@@ -41,6 +41,8 @@ The chapter uses these mappings to pin down `G` in the characterization of
 * `hSix` — the identity (H6), the addition formulas for `f`, `g`, `h` at `xy`.
 * `Setup.closure_M_union_t`, `Setup.closure_conj_Q` — `L = ⟨M, t⟩` and
   `⟨Q^x | x ∈ L⟩ = ⟨Q, Q^t⟩`, the generation half of the Lemma of §1.
+* `IsFGH.eq_of_le` — the triple of a smaller setup (same `t`) agrees with the ambient
+  one, by uniqueness of the canonical factorization.
 * `IsFGH.dOrbitRel_f`, `IsFGH.dOrbitRel_fj_cube` — `⟨f, j⟩` acts on the `D`-orbits of
   `Q^#` as a quotient of the dihedral group of order `6`.
 * `coordsEquiv`, `coords_smul_t_some`, `coords_smul_some_of_mem_M` — the permutation
@@ -306,6 +308,25 @@ theorem IsFGH.unique (hS : Setup M Q D t) {f₁ g₁ h₁ f₂ g₂ h₂ : L →
   obtain ⟨e₁, e₂, e₃⟩ := fgh_eq_of_canonical hS H₁ hxQ hx1
     (H₂.g_mem hxQ hx1) (H₂.h_mem hxQ hx1) (H₂.f_mem hxQ hx1) (H₂.eq x hxQ hx1)
   exact ⟨e₁, e₂, e₃⟩
+
+/-- **The `f, g, h` of a subgroup agree with the ambient ones.**
+
+If a second rank-one setup — same involution `t`, smaller `Q' ≤ Q` and `D' ≤ D` — has its
+own triple `f₁, g₁, h₁`, then its defining equation `t x t = g₁(x) h₁(x) t f₁(x)` is
+*also* a canonical factorization for the ambient setup, its factors lying in `Q`, `D`,
+`Q`.  Uniqueness of that factorization (`fgh_eq_of_canonical`) identifies the two
+triples on `Q'^#`.
+
+This is Peterfalvi Part II, Ch. IV §4, step (2) (p. 133): "By the uniqueness of the
+canonical form of an element of `G − H`, `f(ω) = f₁(ω)` … and `h(ω) = h₁(ω)`", where
+`f₁, h₁` are the mappings relative to `U`, `U ∩ H` and `t`. -/
+theorem IsFGH.eq_of_le (hS : Setup M Q D t) (H : IsFGH M Q D t f g h)
+    {M' Q' D' : Subgroup L} {f₁ g₁ h₁ : L → L} (hQ' : Q' ≤ Q) (hD' : D' ≤ D)
+    (H' : IsFGH M' Q' D' t f₁ g₁ h₁) (hxQ' : x ∈ Q') (hx1 : x ≠ 1) :
+    f x = f₁ x ∧ g x = g₁ x ∧ h x = h₁ x := by
+  obtain ⟨hf, hg, hh⟩ := H'.mem x hxQ' hx1
+  exact fgh_eq_of_canonical hS H (hQ' hxQ') hx1 (hQ' hg) (hD' hh) (hQ' hf)
+    (H'.eq x hxQ' hx1)
 
 /-! ## The three canonical factorizations
 
