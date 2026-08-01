@@ -229,10 +229,12 @@ theorem commute_rootHom_of_commute_weylElement {n : ℕ} (c : PSUTorusParameter 
   have hw := torusWeight_eq_one_of_commute_weylElement c hc
   have hconj := psuTorusHom_mul_rootHom_mul_inv c u
   rw [psuTorusScaleHom_apply, scalePoint_eq_of_torusWeight_eq_one hw hu] at hconj
-  show psuTorusHom n c * rootHom n u = rootHom n u * psuTorusHom n c
-  calc psuTorusHom n c * rootHom n u
-      = (psuTorusHom n c * rootHom n u * (psuTorusHom n c)⁻¹) * psuTorusHom n c := by group
-    _ = rootHom n u * psuTorusHom n c := by rw [hconj]
+  have heq : psuTorusHom n c * rootHom n u = rootHom n u * psuTorusHom n c :=
+    calc psuTorusHom n c * rootHom n u
+        = (psuTorusHom n c * rootHom n u * (psuTorusHom n c)⁻¹) * psuTorusHom n c := by
+          group
+      _ = rootHom n u * psuTorusHom n c := by rw [hconj]
+  exact heq
 
 /-! ## The same statement inside `standardPermGroup n` -/
 
