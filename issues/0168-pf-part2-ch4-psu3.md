@@ -3990,3 +3990,32 @@ def Q0 : Subgroup G where carrier := {x | x ^ 2 = 1 ∧ x ∈ hyp.H}
 段 (4) 鎖 → `hcover` → 段 (2) → 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
 
 ⚠ 訂正 2 件を記録済: `O^{2'}` は repo にある (43) / `Q₀` 版同型は制限では出ない (67)。
+
+## 2026-08-01 (69): 🎯 奇位数核を通した対合の持ち上げ landing
+
+`exists_sq_eq_one_of_odd_kernel` — `|N|` 奇なら `L/N` の対合は `L` の対合に持ち上がる。
+(67) で特定した `Q₀` 版同型の**全射性の crux**がこれで埋まった。
+
+証明: `x̄ = π x` を取ると `x² ∈ N`、`d := orderOf (x²)` は `|N|` を割り奇数。
+`y := x^d` が `y² = (x²)^d = 1` かつ `ȳ = x̄^d = x̄`。
+
+⚠ 実装メモ: `set d := …` すると `obtain ⟨k, rfl⟩` が subst できない (let 束縛)。
+`orderOf …` を直書きして `obtain ⟨k, hk⟩; rw [hk]`。
+`Odd (a*b) → Odd a` は `(Nat.odd_mul.mp ·).1`。
+
+### `centralizerQ0QuotientEquiv` の残り
+
+| 部分 | 状態 |
+|---|---|
+| 単射性 | ✅ `Q` 版の議論をそのまま (`Q0_L ≤ Q_L` + `Q_L ⊓ D_L = ⊥`) |
+| `Q0_L.map π ≤ qhyp.Q0` | ✅ 易しい方向 |
+| `qhyp.Q0 ≤ Q0_L.map π` | ✅ **今回の `exists_sq_eq_one_of_odd_kernel`** + `comap_map_eq_self` |
+| 組み立て | ⚠ 残り (`|N|` 奇は `D_odd` から、`hNleD` は `Q` 版の証明中にある) |
+
+⟹ **数学は全部埋まった。残るのは組み立てのみ**。
+
+### ⚠ 次セッションはここから
+
+1. `centralizerQ0QuotientEquiv` を組む (材料は上表)。
+2. `exists_standardModel` for `qhyp` → 段 (4) 鎖 → `hcover` → 段 (2)。
+3. 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
