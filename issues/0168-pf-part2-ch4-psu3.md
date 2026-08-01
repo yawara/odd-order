@@ -2867,3 +2867,52 @@ eta により `⟨(kv.2 : G), kv.2.2⟩` と `kv.2` は defeq で、
    (PSU(3,q) の構成・位数・`O^{2'}`・PGU との関係)。
 2. **§4** (p.132-134、`V ≠ W` の場合)。段 (1)(2)… ⚠ Ch. I §3 Prop 1(c) /
    Ch. I §2 Prop 3 / Ch. II (11) を引くので repo 対応物の実測が先。
+
+## 2026-08-01 (37): Corollary 1 の前半 (p.132 実測つき)
+
+p.132 のページ画像で Corollary 1 / Corollary 2 / Remark / §4 冒頭を確定した。
+
+**Corollary 1** (p.132):
+> 命題の仮説の下で `O^{2'}(G) ≅ PSU(3,q)`。特に `V = W` なら
+> `G ≅ PSU(3,q)` または `PGU(3,q)`。
+>
+> 証明: `G` が仮説を満たせば `Q` と `f` は `q` の指定で決まり、§1 の Lemma で
+> `O^{2'}(G) = ⟨Q^x | x ∈ G⟩` が同型を除いて決まる。`V = W` なら §2 の命題で
+> 仮説充足。`PGU(3,q)` も同仮説を満たすので `O^{2'}(G) ≅ O^{2'}(PGU(3,q)) = PSU(3,q)`。
+> ゆえ `(q+1)/(q+1,3) ≤ |W|`。等号なら `G ≅ PSU(3,q)`、さもなくば `|W| = q+1` で
+> §1 の Lemma により `G ≅ PGU(3,q)`。
+
+### 今セッションで landing した前半 2 部品
+
+| 定理 | 内容 |
+|---|---|
+| `Hypothesis.f_eq_of_inverseFormula` | 段 (5) の公式を満たす写像は `Q − Q₀` 上一意 (`eq_of_unitaryCoord_eq`)。= 「`f` は座標だけの関数」 |
+| `RankOneBNPair.mAct_of_mem_Q` | `Q` は点集合に**右移動**で作用する (`q x⁻¹` の `D`-成分 = 1) |
+| `RankOneBNPair.permCongrHom_permHom_mem_Q` / `permCongr_image_Q` | 群同型 `Q ≃* Q'` が `Q` の置換たちを対応させる |
+| **`RankOneBNPair.conjQMulEquivOfData`** | `f` を絡める群同型 `Q ≃* Q'` ⟹ `⟨Q^x⟩ ≃* ⟨Q'^x⟩` (Lemma 前半の書籍形) |
+
+### ⚠ Corollary 1 の残り (規模の実測)
+
+残るのは**具体群側**で、repo の現状は:
+
+* `O^{2'}` — repo/mathlib に一般の `O^{π}` は無い (`AxiomsCheck` の docstring に
+  `residual_eq_normalClosure` の言及があるのみ)。Theorem A の結論構造
+  (`CentralizerInductionBridge.TheoremAConclusion`) は「奇数指数の正規部分群 `L`
+  + 具体モデルとの同型」で、これが書籍の `O^{2'}(G)` に当たる。
+* PSU(3,q) の具体モデル = `ProjectiveUnitary.standardPermGroup n`
+  (`GeneratedAction.lean`)。`PSU3InductionTarget` が `L ≃* standardPermGroup n` +
+  作用の同変全単射を要求する形で既にある (4053 行、13 leaf)。
+* **PGU(3,q) は repo に無い** (`grep PGU` は `StandardGenerators.lean` の
+  コメント 1 箇所のみ)。Corollary 1 の第 2 段は
+  「`PGU(3,q)` が同じ仮説を満たす」= `Hypothesis G Ω` の具体インスタンス構成を要し、
+  これは新規の大きな infra。
+
+⟹ **次の 2 択** (どちらも上流優先に反しない):
+  (a) `f` の `Q₀^#` 上の決定 = §2 (1) (`f(s^a) = g(s^a) = s^{a⁻¹}`, `h(s^a) = a²`)。
+      これが入れば `conjQMulEquivOfData` の `hεf` が `Q` 全体で供給でき、
+      Corollary 1 前半が完全に閉じる。⚠ (C2) の repo 対応物 (`hC2` は
+      `t s t = s t s`) から書籍の `tst = s*s` をどう読むか、p.123 の画像で要確認。
+  (b) §4 (p.132-134、`V ≠ W`) に進む。⚠ Ch. I §3 Prop 1(c) / Ch. I §2 Prop 3 /
+      Ch. II (11) を引くので repo 対応物の実測が先。
+
+文書順では (a) が先 (§2 (1) は §3 より上流)。
