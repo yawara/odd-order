@@ -6504,3 +6504,35 @@ bilinear package (`φ`,`θ`,`Φ`,`Θ`,`u`,`ι` + 8 条件) を**そのまま bun
 
 ⟹ 次セッションは上表を上から順に埋める。`hVW` / `hKcard` / `hWdvd` / `hhW` の 4 本が
 実測待ちで、それ以外は既存資産の組み合わせ。
+
+## 2026-08-02 (124): Corollary 2 の残り引数 — 依存を解いた結果、primitive は 3 本
+
+(123) の 7 引数のうち 2 本を landing:
+* `hC2` = `Hypothesis.braid_of_orderOf_mul_eq_three` (`DistinguishedInvolution.lean`)
+* `hfQ` の下準備 = `Setup.exists_fgh_one` (`RankOneBNPair.lean`) — `IsFGH` は `Q^#` 上しか
+  制約しないので `f 1` が野放しだった。`f 1 = g 1 = h 1 = 1` の正規化版。
+
+残りを実測したところ、**`hhW` は独立ではなく `hVW`/`hWdvd`/`hZc`/`hmu` から出る**
+(`PSU3StepEighteen.h_mem_W` (159 行) がまさにそれで、`hC2`/`M`/`hZ`/`hmu`/`hVW`/`hm`/
+`hQ0card`/`hWdvd` を取る §2 の結果)。⟹ 本当の primitive は:
+
+| 引数 | 状態 |
+|---|---|
+| `hZc` (`Z(Q̄) = Q̄₀ ∩ Q̄`) | `ActualCenter.center_Q_eq_Q0_subgroupOf_of_sq_eq_one` に `Z(Q̄)` の指数 2 を与えればよい (`Q̄` は Suzuki 2-群なのでその中心は初等可換 — `Higman` 側に在るはず) |
+| `hmu` | `QuotientKWField.mu_injective` が generic。`hst`/`hn`/`hQ0card`/`hcardQ`/`ih` は全部 in hand ⟹ **ほぼ書くだけ** |
+| `hVW` (`V̄ = W̄`) | ⚠ 本物。`V_eq_W_iff_le_centralizer_Q0` で `V̄ ≤ C(Q̄₀)` に還元できる |
+| `hKcard` (`\|K̄\| = 2ᵐ-1`) | ⚠ 本物 |
+| `hWdvd` (`\|W̄\| ∣ 2ᵐ+1`) | ⚠ 本物 (`hW1` は `exists_ne_one_mem_quotient_W` から出る) |
+
+### ⚠ 次セッションはここから
+
+1. `hmu` — `mu_injective` を `centralizerQuotientHypothesis` に当てる (機械的)。
+2. `hZc` — `Q̄` の中心が指数 2 であること。`Q̄` が Suzuki 2-群であることは
+   `isSuzuki2Group_quotient_Q` で在るので、`Higman/Suzuki2Groups/CenterInvolutions.lean`
+   あたりに「Suzuki 2-群の中心は初等可換」が在るか実測。
+3. `hVW` / `hKcard` / `hWdvd` — この 3 本が段 (2) の実質的な残り。transported 版
+   (`residualQuotientHypothesis_V_eq_W` 等) がモデルからどう出しているかを読み、
+   `centralizerQuotientHypothesis` へ移せるか (= `C/𝒩(C)` と `PSU(3,ℓ)` の
+   同一視をどう使うか) を裁定する。⚠ `C/𝒩(C)` は `PSU(3,ℓ)` を奇指数で含むので
+   `PSU(3,ℓ)` そのものではない点に注意 — `V`,`K`,`W` は `D̄` の中で測るので、
+   `D̄` と `PSU(3,ℓ)` の torus の関係が要る。
