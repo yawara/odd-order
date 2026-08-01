@@ -411,6 +411,49 @@ theorem map_opiCoreInG_mulEquiv {G' : Type*} [Group G'] (π : Set ℕ) (e : G �
 
 end
 
+/-- **群同型は中心を中心へ写す**: `Z(G).map e = Z(G')` (`e : G ≃* G'`). -/
+theorem map_center_mulEquiv {G' : Type*} [Group G'] (e : G ≃* G') :
+    (Subgroup.center G).map (e : G →* G') = Subgroup.center G' := by
+  ext y
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    exact (MulEquivClass.apply_mem_center_iff e).mpr hx
+  · intro hy
+    exact ⟨e.symm y, (MulEquivClass.apply_mem_center_iff e.symm).mpr hy, by simp⟩
+
+/-- `H ⊓ K` は `K` の内側で見ても外側で見ても同じ位数 (`H.subgroupOf K` の位数). -/
+theorem natCard_subgroupOf (H K : Subgroup G) :
+    Nat.card ↥(H.subgroupOf K) = Nat.card ↥(H ⊓ K) := by
+  rw [← Subgroup.subgroupOf_map_subtype H K]
+  exact Nat.card_congr
+    (Subgroup.equivMapOfInjective (H.subgroupOf K) K.subtype K.subtype_injective).toEquiv
+
+/-- **正規部分群と交わらない部分群は商へ位数を保って写る**: `K ⊓ N = ⊥` なら
+`|K N/N| = |K|`。商写像の核 `N` を `K` が避けるので `K` への制限が単射. -/
+theorem natCard_map_mk'_of_inf_eq_bot {N K : Subgroup G} [N.Normal] (h : K ⊓ N = ⊥) :
+    Nat.card ↥(K.map (QuotientGroup.mk' N)) = Nat.card ↥K := by
+  have hinj : Function.Injective ((QuotientGroup.mk' N).comp K.subtype) := by
+    rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+    intro x hx
+    have hx' : ((x : G) : G ⧸ N) = 1 := MonoidHom.mem_ker.mp hx
+    have hmem : (x : G) ∈ K ⊓ N :=
+      Subgroup.mem_inf.mpr ⟨x.2, (QuotientGroup.eq_one_iff (x : G)).mp hx'⟩
+    rw [h, Subgroup.mem_bot] at hmem
+    exact Subgroup.mem_bot.mpr (Subtype.ext hmem)
+  have hrange : ((QuotientGroup.mk' N).comp K.subtype).range
+      = K.map (QuotientGroup.mk' N) := by
+    rw [MonoidHom.range_comp, Subgroup.range_subtype]
+  rw [← hrange]
+  exact (Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv).symm
+
+/-- **中心による商は群同型に沿って移る**: `G ⧸ Z(G) ≃* G' ⧸ Z(G')`.
+
+`map_center_mulEquiv` を `QuotientGroup.congr` に食わせただけだが, 「`Z` で割った商」は
+同型不変であるという事実そのものが必要になる場面 (中心の自明性・単純性の移送) が多い. -/
+def quotientCenterCongr {G' : Type*} [Group G'] (e : G ≃* G') :
+    (G ⧸ Subgroup.center G) ≃* (G' ⧸ Subgroup.center G') :=
+  QuotientGroup.congr _ _ e (map_center_mulEquiv e)
+
 /-- `N ⊴ W` の characteristic 部分群 `L : Subgroup ↥N` は, `↥N` から `W` へ押し出すと `W` で正規。
 共役自己同型 `MulAut.conjNormal w : MulAut ↥N` (`N ⊴ W` ゆえ各 `w ∈ W` の共役が `↥N` の自己同型に
 制限) が `L` を固定する (`characteristic_iff_map_eq`)。 -/

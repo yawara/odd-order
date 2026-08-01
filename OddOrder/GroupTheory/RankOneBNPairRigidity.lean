@@ -42,6 +42,8 @@ into a homomorphism `permHom : L →* Equiv.Perm (Option ↥Q)` and reads the Le
 * `Setup.closure_Q_union_conj_eq_top`, `Setup.normalCore_eq_bot` — when `Q` is a
   Sylow subgroup and `L` has no `p′`-quotient and trivial centre, `M` has trivial normal
   core; this is the faithfulness input of `Hypothesis.ofRankOneSetup`.
+* `Setup.normalCore_eq_bot_of_isSimpleGroup` — the same conclusion in one line when `L`
+  happens to be simple, which is the case Peterfalvi Ch. IV §4, step (2) needs.
 -/
 
 set_option autoImplicit false
@@ -502,5 +504,19 @@ theorem Setup.normalCore_eq_bot [Finite L] {p : ℕ} [Fact p.Prime]
     M.normalCore = ⊥ := by
   rw [eq_bot_iff, ← hcenter]
   exact hS.normalCore_le_center (hS.closure_Q_union_conj_eq_top P hPQ htop)
+
+/-- **`M` has trivial normal core when `L` is simple** — `M` is a proper subgroup because
+`t ∉ M`, so its normal core, being normal, cannot be `⊤`.
+
+Peterfalvi Ch. IV §4, step (2) (p. 133) applies `Hypothesis.ofRankOneSetup` to
+`L = U/Z(U)`, which Ch. I §3 Proposition 1(c) identifies with `PSU(3, ℓ)`; simplicity of
+that group is Ch. I §3 Lemma 1, so this is the cheapest of the two faithfulness routes. -/
+theorem Setup.normalCore_eq_bot_of_isSimpleGroup [IsSimpleGroup L] (hS : Setup M Q D t) :
+    M.normalCore = ⊥ := by
+  rcases (Subgroup.normalCore_normal M).eq_bot_or_eq_top with hbot | htop
+  · exact hbot
+  · refine absurd (M.normalCore_le ?_) hS.tnotmem
+    rw [htop]
+    exact Subgroup.mem_top t
 
 end OddOrder.GroupTheory.RankOneBNPair
