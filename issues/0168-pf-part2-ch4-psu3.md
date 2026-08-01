@@ -2594,3 +2594,34 @@ p.132 をページ画像で確認した結果、Ch. IV の残りは以下の構�
    ⚠ issue 冒頭「やること」の未チェック項目。§1 の Lemma。
 3. **§4** (p.132-134、`V ≠ W` の場合)。段 (1)(2)… ⚠ Ch. I §3 Prop 1(c) /
    Ch. I §2 Prop 3 / Ch. II (11) を引くので repo 対応物の実測が先。
+
+## 2026-08-01 (29): 段 (5) 第 2 ケース — 座標が揃えば締まる形まで
+
+* **`mu_kActor_sq_inv`** — `μ((a⁻¹)²) = μ(a²)⁻¹` (第 2 ケースはファイバー上を
+  `s^{a⁻¹}` で動くが §2 (2) は `a²` で共役するので助変数が互いに逆)
+* **`stepFive_secondCase_at`** — 座標が揃った状態での締め:
+  §2 (2) の座標形 + `f(ρ)s^a` での逆元公式 + `ρ s^{a⁻¹}` の座標
+  ⟹ `ρ s^{a⁻¹}` での逆元公式
+
+### 段 (5) 第 2 ケースの残り (**純粋に配線のみ**)
+
+`stepFive_secondCase_at` の 6 仮説を供給する層を書くだけ。供給元は全部 landing 済:
+
+| 仮説 | 供給元 |
+|---|---|
+| `hLq`, `hLy` | `sectionTwoStepTwo_coords` |
+| `hRq`, `hRy` | 第 1 ケース (`stepFour_cover`/`stepFive_orbit`) を `f(ρ)s^a` に + `inverseFormula_symm` + `unitaryCoord_mul_conj` |
+| `hρ'q`, `hρ'y` | `unitaryCoord_mul_conj` (`a := a⁻¹`) + `mu_kActor_sq_inv` |
+| `hA`, `hx`, `hxA` | `Units.ne_zero` / `x = μ(ζ)` は unit / `mu_K_add_mu_W_ne_zero` 型 |
+| 軌道に入れる自由度 | `exists_mem_Q0_orbitOfF_eq` |
+| `f∘f = id` | `hTwo` (`RankOneBNPair`) |
+
+⚠ この配線層は仮説 30 本規模になる (`stepFour_star` と同じ質)。
+**新 leaf に切ること** — `PSU3InverseFormula.lean` は既に 1270 行。
+
+### ⚠ 次セッションの順序 (更新)
+
+1. 段 (5) 第 2 ケースの配線 (新 leaf `PSU3StepFive.lean` 等)。
+   閉じれば `corollaryTwo` の `hfive` が外れる。
+2. `RankOneBNPair` の Lemma (`f` が `L` を決める) → Corollary 1。
+3. §4 (p.132-134)。
