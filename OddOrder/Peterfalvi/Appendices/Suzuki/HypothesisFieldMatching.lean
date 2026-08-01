@@ -83,6 +83,20 @@ theorem exists_ne_one_mem_W_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothe
   · intro hc
     exact hw1 (φ.injective (by rw [hc, map_one]))
 
+omit [Finite L] [Finite L'] in
+/-- `C_Q(D) = 1` transports along an isomorphism matching `Q` and `D`. -/
+theorem inf_centralizer_eq_bot_of_mulEquiv (φ : L ≃* L') {Q D : Subgroup L}
+    {Q' D' : Subgroup L'} (hQ : Q.map φ.toMonoidHom = Q')
+    (hD : D.map φ.toMonoidHom = D')
+    (h : Q ⊓ Subgroup.centralizer (D : Set L) = ⊥) :
+    Q' ⊓ Subgroup.centralizer (D' : Set L') = ⊥ := by
+  have himg : φ '' (D : Set L) = (D' : Set L') := by rw [← hD]; rfl
+  have := congrArg (fun K : Subgroup L => K.map φ.toMonoidHom) h
+  simp only [Subgroup.map_bot] at this
+  rw [Subgroup.map_inf _ _ φ.toMonoidHom φ.injective, hQ,
+    map_centralizer_equiv φ (D : Set L), himg] at this
+  exact this
+
 end EquivMatch
 
 section SameGroup

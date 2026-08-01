@@ -865,6 +865,8 @@ theorem exists_mulEquiv_match_residualQuotient
         (↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X)),
       (hyp.residualQuotientHypothesis details).H.map φ.toMonoidHom
           = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).H ∧
+        (hyp.residualQuotientHypothesis details).Q.map φ.toMonoidHom
+          = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q ∧
         (hyp.residualQuotientHypothesis details).D.map φ.toMonoidHom
           = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).D := by
   letI := MulAction.compHom (ULift.{v} (Unital data.n))
@@ -910,13 +912,14 @@ theorem exists_mulEquiv_match_residualQuotient
     ne_bot_of_one_lt_natCard (by
       rw [hQcardint, details.natCard_cQ_eq_baseField_cube, natCard_baseField data.n (by omega)]
       exact hcube data.n (by omega))
-  obtain ⟨c, _hQc, hMc, hDc⟩ := hStr.exists_conj_eq_triple hSint hQtr hDoddtr hQevtr
+  obtain ⟨c, hQc, hMc, hDc⟩ := hStr.exists_conj_eq_triple hSint hQtr hDoddtr hQevtr
     hQint (hyp.odd_natCard_map_D_residualQuotient)
     (hyp.even_natCard_map_Q_residualQuotient details hXD htX hCQ hZD) hQ1tr hQ1int
   have hcomp : (e.trans (MulAut.conj c)).toMonoidHom
       = (MulAut.conj c).toMonoidHom.comp e.toMonoidHom := by ext x; rfl
-  refine ⟨e.trans (MulAut.conj c), ?_, ?_⟩
+  refine ⟨e.trans (MulAut.conj c), ?_, ?_, ?_⟩
   · rw [hcomp, ← Subgroup.map_map]; exact hMc
+  · rw [hcomp, ← Subgroup.map_map]; exact hQc
   · rw [hcomp, ← Subgroup.map_map]; exact hDc
 
 /-- **🎯 `1 ≠ w ∈ W̄` for the intrinsic standing hypothesis on `U/Z(U)`** — the last input
@@ -935,7 +938,7 @@ theorem exists_ne_one_mem_W_intrinsicResidualQuotient
     ∃ w ∈ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).W, w ≠ 1 := by
   letI := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
-  obtain ⟨φ, hH, hD⟩ :=
+  obtain ⟨φ, hH, _hQ, hD⟩ :=
     hyp.exists_mulEquiv_match_residualQuotient details hXD htX hCQ hZD
   exact exists_ne_one_mem_W_of_mulEquiv _ _ φ hH hD
     (hyp.exists_ne_one_mem_residualQuotientHypothesis_W details)
