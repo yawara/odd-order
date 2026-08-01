@@ -1176,6 +1176,40 @@ theorem sectionTwoStepTwo_coords (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       Suzuki2Groups.unitaryCoord_mul_of_quotient_eq_zero m M.card hu _ _ hcq, hcy,
       hconjy, hyp.mu_norm_eq M]
 
+/-- **Stage (5)'s second case, at one point of the fibre** (Peterfalvi Part II, p. 131).
+
+Everything is already in coordinates: `hLq`/`hLy` are §2 (2)
+(`sectionTwoStepTwo_coords`), `hRq`/`hRy` are the inversion formula at `f(ρ) s^a` —
+whose coordinates are `(ρ̄/x, x⁻¹ + A)` once `inverseFormula_symm` has turned the known
+value of `f` at `f(ρ)` into `f(ρ) = (ρ̄/x, 1/x)` — and `hρ'q`/`hρ'y` are the coordinates
+of `ρ s^{a⁻¹}`, whose shift is `μ((a⁻¹)²) = A⁻¹` (`mu_kActor_sq_inv`,
+`unitaryCoord_mul_conj`).
+
+The conclusion is the inversion formula at `ρ s^{a⁻¹}`, which is what the second case
+had to produce. -/
+theorem stepFive_secondCase_at {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {L Rin ρ' : ↥hyp.Q} {r x A : M.E}
+    (hA : A ≠ 0) (hx : x ≠ 0) (hxA : x + A⁻¹ ≠ 0)
+    (hLq : (Ψ L).quotient = A * (Ψ Rin).quotient)
+    (hLy : Suzuki2Groups.unitaryCoord m u (Ψ L)
+      = A ^ 2 * Suzuki2Groups.unitaryCoord m u (Ψ Rin) + A)
+    (hRq : (Ψ Rin).quotient = (r / x) / (x⁻¹ + A))
+    (hRy : Suzuki2Groups.unitaryCoord m u (Ψ Rin) = (x⁻¹ + A)⁻¹)
+    (hρ'q : (Ψ ρ').quotient = r)
+    (hρ'y : Suzuki2Groups.unitaryCoord m u (Ψ ρ') = x + A⁻¹) :
+    (Ψ L).quotient
+        = (Ψ ρ').quotient / Suzuki2Groups.unitaryCoord m u (Ψ ρ') ∧
+      Suzuki2Groups.unitaryCoord m u (Ψ L)
+        = (Suzuki2Groups.unitaryCoord m u (Ψ ρ'))⁻¹ := by
+  have h2 : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  obtain ⟨e1, e2⟩ := stepFive_secondCase_compose h2 hA hx hxA hLq hLy hRq hRy
+  exact ⟨by rw [e1, hρ'q, hρ'y], by rw [e2, hρ'y]⟩
+
 /-- **Stage (5)'s first half**: the inversion formula holds at every `K W`-translate of
 a point where it holds (Peterfalvi Part II, p. 131).
 

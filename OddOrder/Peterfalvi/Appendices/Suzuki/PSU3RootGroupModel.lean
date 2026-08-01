@@ -381,6 +381,23 @@ theorem mu_W_notMem_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m)
   exact hζ (congrArg Prod.snd (hmu (hmu1.trans (map_one M.mu).symm)))
 
 include hyp in
+/-- **`μ((a⁻¹)²) = μ(a²)⁻¹`** — the scalar of the opposite shift along `Q₀`.
+
+Stage (5)'s second case moves along the fibre by `s^{a⁻¹}` while §2 (2) conjugates by
+`a²`, so the two parameters are inverse to each other; this is the identity that lets
+`stepFive_secondCase_compose` be read at the element `ρ s^{a⁻¹}`. -/
+theorem mu_kActor_sq_inv {m : ℕ} (M : hyp.QuotientFieldModel m) {a : G}
+    (haK : a ∈ hyp.K) :
+    ((M.mu (hyp.kActor (pow_mem (hyp.K.inv_mem haK) 2), 1) : M.Eˣ) : M.E)
+      = ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)⁻¹ := by
+  have hk : hyp.kActor (pow_mem (hyp.K.inv_mem haK) 2)
+      = (hyp.kActor (pow_mem haK 2))⁻¹ :=
+    hyp.kActor_eq_inv (pow_mem haK 2) (pow_mem (hyp.K.inv_mem haK) 2) (by group)
+  rw [hk, show ((hyp.kActor (pow_mem haK 2))⁻¹, (1 : ↥hyp.W))
+      = ((hyp.kActor (pow_mem haK 2), (1 : ↥hyp.W)))⁻¹ from
+    Prod.ext rfl (inv_one (G := ↥hyp.W)).symm, map_inv, Units.val_inv_eq_inv_val]
+
+include hyp in
 /-- **The `t`-twist of `K W` is `d ↦ d^{-q}` on scalars**: `μ(k⁻¹, v) = (μ(k, v)^q)⁻¹`
 (Peterfalvi Part II, Ch. IV §3 (5), p. 131, the exponent `d^{-q}` in the display).
 
