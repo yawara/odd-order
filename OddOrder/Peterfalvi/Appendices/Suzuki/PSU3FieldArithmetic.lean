@@ -1079,5 +1079,43 @@ theorem star_of_sq_eq {E : Type*} [Field E] (h2 : (2 : E) = 0) (θ : E →+ E)
   rw [map_add, hθw] at hnorm
   linear_combination -hnorm + (w * X + w * θ X + w ^ 2) * h2
 
+/-- **`(∗)`, assembled from the scaling pair of Ch. III §3** (Peterfalvi Part II, p. 130,
+inside §3 (3)).
+
+The `K`-action on `Q₀` is the integer power `x ↦ x^d`, and Ch. III §3 factors that power
+through a pair of automorphisms of `E`:  `σ(x) τ(x) = x^d`.  Setting `θ = σ⁻¹ ∘ τ` makes
+`σ(x · θ x) = σ(x) τ(x)`, so the `Q₀`-relation `R = α² + P⁻¹` — its two sides being the
+`d`-powers of `B` and `A` — pulls back along `σ` to the norm form `star_of_sq_eq` wants.
+The companion relation `σ(Z) τ(Z) = 1` on `W` is what makes `θ` invert `Z`, hence fix
+`w = Z + Z⁻¹`; that is the book's "as `ζ ∈ W`, `(ζ + ζ⁻¹)^θ = ζ + ζ⁻¹`".
+
+`α` appears in the conclusion as `σ⁻¹ α`.  The book normalizes the pair so that `σ|_F` is
+the identity — its `{μ|_F, ν|_F} = {1_F, θ}` — in which case `σ⁻¹ α` is `α` itself; the
+model layer here does not carry that normalization, so it is kept visible. -/
+theorem star_of_scaling_pair {E : Type*} [Field E] (h2 : (2 : E) = 0)
+    (σ τ : E ≃+* E) (θ : E →+ E) (hθ : ∀ x : E, θ x = σ.symm (τ x))
+    {A B Z α P R : E} (hW : σ Z * τ Z = 1)
+    (hAP : σ A * τ A = P) (hBR : σ B * τ B = R)
+    (hbridge : B = A⁻¹ + Z + Z⁻¹) (hcenter : R = α ^ 2 + P⁻¹) :
+    (σ.symm α) ^ 2 + (Z + Z⁻¹) ^ 2 + (Z + Z⁻¹) * (A⁻¹ + θ A⁻¹) = 0 := by
+  have hθinv : ∀ x : E, θ x⁻¹ = (θ x)⁻¹ := by
+    intro x
+    rw [hθ, hθ, map_inv₀, map_inv₀]
+  have hσθ : ∀ x : E, σ (x * θ x) = σ x * τ x := by
+    intro x
+    rw [hθ, map_mul, RingEquiv.apply_symm_apply]
+  -- `θ` inverts `Z`, hence fixes `w = Z + Z⁻¹`
+  have hθZ : θ Z = Z⁻¹ := by
+    rw [hθ, eq_inv_of_mul_eq_one_right hW, map_inv₀, RingEquiv.symm_apply_apply]
+  have hθw : θ (Z + Z⁻¹) = Z + Z⁻¹ := by
+    rw [map_add, hθZ, hθinv, hθZ, inv_inv, add_comm]
+  -- the two inputs of `star_of_sq_eq`
+  have hY : B = (Z + Z⁻¹) + A⁻¹ := by rw [hbridge]; ring
+  have hnorm : B * θ B = (σ.symm α) ^ 2 + A⁻¹ * θ A⁻¹ := by
+    refine σ.injective ?_
+    rw [hσθ, hBR, map_add, map_pow, RingEquiv.apply_symm_apply, hσθ, map_inv₀, map_inv₀,
+      ← mul_inv, hAP, hcenter]
+  exact star_of_sq_eq h2 θ hθw hY hnorm
+
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

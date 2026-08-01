@@ -37,6 +37,9 @@ hypothesis, and then reads off `h(ω⁻¹) = ζ⁻³` from (H5) — a step the b
 * `Hypothesis.stepTen_quotient_coord` — §2's stage (10) read in `E`.
 * `Hypothesis.stepThree_sq_eq` — the group-to-field bridge of §3 (3):
   `b² = ζ + ζ⁻¹ + a⁻²`.
+* `Hypothesis.stepThree_center_relation` — its `Q₀`-side companion
+  `b^{2(1+θ)} = α² + a^{-2(1+θ)}`.
+* `Hypothesis.stepThree_star` — the book's `(∗)`, for one admissible `a`.
 -/
 
 set_option autoImplicit false
@@ -586,6 +589,60 @@ theorem stepThree_center_relation {m : ℕ} (s : hyp.LemmaFiveSetup m)
     field_simp at hrel ⊢
     linear_combination -hrel
   rw [hsq hbK, hsq haK, hV, hadd_sq, ← inv_pow]
+
+/-- **§3 (3)'s `(∗)`, for one admissible `a`** (Peterfalvi Part II, p. 130):
+
+  `α² + w² + w · (X + X^θ) = 0`,   `w = ζ + ζ⁻¹`,  `X = a⁻²`.
+
+Everything group-theoretic has already happened: `stepThree_sq_eq` gives `b² = w + a⁻²`
+in `Q/Q₀`, `stepThree_center_relation` gives `b^{2(1+θ)} = α² + a^{-2(1+θ)}` in `Q₀`, and
+`star_of_scaling_pair` combines the two through the scaling pair `(σ, τ)` of Ch. III §3,
+which is what expresses the `Q₀`-exponent `d` as `x ↦ σ(x · θ x)`.
+
+The pair is passed as ring isomorphisms; `exists_scalingPair_of_lemmaFiveSetup` produces
+it as `ZMod 2`-algebra isomorphisms, of which these are the underlying maps.  `θ` is
+supplied as an additive map together with `hθ`, so that a caller may present `σ⁻¹ ∘ τ` in
+whatever bundled form it has. -/
+theorem stepThree_star (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (σ τ : M.E ≃+* M.E) (θ : M.E →+ M.E) (hθ : ∀ x : M.E, θ x = σ.symm (τ x))
+    (hscale : ∀ k : ↥hyp.actualKActor,
+      σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
+    (hWinv : ∀ v : ↥hyp.W,
+      σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
+    {ζ ω y a b : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hsq : ω * ω = y) (haK : a ∈ hyp.K) (hbK : b ∈ hyp.K)
+    (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hb : b * hyp.distinguishedInvolution * b⁻¹
+      = y * (a⁻¹ * hyp.distinguishedInvolution * a)) :
+    (σ.symm (hyp.centerCoord sfive M ι hyQ0 /
+        hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)) ^ 2
+      + (((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
+          + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹) ^ 2
+      + (((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
+          + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹)
+        * (((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)⁻¹
+            + θ (((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)⁻¹)) = 0 := by
+  have h2E : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  exact star_of_scaling_pair h2E σ τ θ hθ (hWinv ⟨ζ, hζ⟩)
+    (hscale (hyp.kActor (pow_mem haK 2))) (hscale (hyp.kActor (pow_mem hbK 2)))
+    (hyp.stepThree_sq_eq H hC2 M hZc hmu hVW hζ hωQ hωQ0 hyQ0 hsq haK hbK hfω hb)
+    (hyp.stepThree_center_relation sfive M ι d hequiv hyQ0 haK hbK hb)
 
 end Hypothesis
 
