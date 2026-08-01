@@ -1,0 +1,261 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFifteen
+
+/-!
+# Peterfalvi Part II, Ch. IV §2, step (20): `α₁ = α₂`
+
+T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
+Part II, Ch. IV §2, p. 128.
+
+> **(20)** We have `α₁ = α₂`; also, with `α = α₁`,
+> `f(ω₁(0,x)) = (ω₂(0, x + α))^{d(x)}`, with `d(x) ∈ KW`, for all `x` such that
+> `f(ω₁(0,x))‾` is in the orbit of `ω̄₂` under `KW`.
+
+The book runs the two sequences of (11) — one for `α₁`, one for `α₂` — feeds (19)(a) at
+index `i` and (19)(b) at index `m − i` into step (7), and reads the resulting (∗∗∗) at
+`i = 1` and at `i = m − 1`.
+
+Only those two indices are used, and at them the sequence data degenerates:
+
+* at `i = 1`, `(u₁, v₁, d₁) = (0, α, ζ)`, so (19)'s hypothesis is the normalization
+  `f(ω) = (ω y)^ζ` itself;
+* at `i = m − 1`, `(u_{m-1}, v_{m-1}, d_{m-1}) = (α, 0, ζ⁻¹)` — by steps (15) and (17) —
+  so (19)'s hypothesis is the *inverted* normalization `f(ω y) = ω^{ζ⁻¹}`, which is
+  `f_mul_eq_conj_of_normalized`.
+
+So the whole of (20) can be run off the two normalizations, with no sequence at all.  The
+book's `e_i^{-t} ∈ e'_{m-i}K` is likewise free of the field: the twist reverses the
+`W`-part and fixes the `K`-part (`inv_conj_t_of_mem_W_mul_KSet`), and here both `W`-parts
+are `ζ^{±1}`, so the two conjugators sit in the same coset of `K` outright.
+
+## Main results
+
+* `Hypothesis.stepTwenty_fst_eq` — the core: `z₁ = z₂ y₂`, the book's `x₁ = x₂ + α₂`.
+* `Hypothesis.stepTwenty` — **step (20)**'s first assertion `α₁ = α₂`, i.e. `y₁ = y₂`.
+-/
+
+set_option autoImplicit false
+
+namespace OddOrder.Peterfalvi.Appendices.Suzuki
+
+open OddOrder.GroupTheory.RankOneBNPair
+
+namespace Hypothesis
+
+variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+  (hyp : Hypothesis G Ω) {f g h : G → G}
+
+include hyp
+
+/-- Membership in `K` and in `KSet` are the same. -/
+theorem mem_KSet_iff_mem_K {x : G} : x ∈ hyp.KSet ↔ x ∈ hyp.K := by
+  constructor
+  · intro hx
+    have hx' : x ∈ (hyp.K : Set G) := by rw [hyp.coe_K]; exact hx
+    exact hx'
+  · intro hx
+    have hx' : x ∈ (hyp.K : Set G) := hx
+    rwa [hyp.coe_K] at hx'
+
+/-- **The comparison of step (20), at the pair of indices `(1, m − 1)`**
+(Peterfalvi Part II, p. 128).
+
+With `f(ω₁ z₁) = (ω₂ z₂)^k` the relation of (7)–(8), step (19)(a) at the *first* index of
+`ω₁`'s sequence and step (19)(b) at the *last* index of `ω₂`'s sequence produce two
+presentations of the same shape `f(ω₁ ·) = (ω₂ ·)^·` whose conjugators differ by an
+element of `K`.  Step (7) then forces the conjugators to be equal, and unwinding gives
+
+  `z₁ = z₂ y₂`,
+
+the book's `x₁ = x₂ + α₂`.
+
+The two side conditions are the book's standing assumption that `ω₁` and `ω₂` lie in
+different `KW`-orbits: `z₁ = 1` would put `f(ω₁)` in `ω₁`'s own orbit, and `z₂ = y₂`
+would identify `f(ω₂ y₂) = ω₂^{ζ⁻¹}` with `(ω₁ z₁)^{k⁻¹}`. -/
+theorem stepTwenty_fst_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω₁ ω₂ y₁ y₂ z₁ z₂ k : G} (hζ : ζ ∈ hyp.W)
+    (hω₁Q : ω₁ ∈ hyp.Q) (hω₁Q0 : ω₁ ∉ hyp.Q0)
+    (hω₂Q : ω₂ ∈ hyp.Q) (hω₂Q0 : ω₂ ∉ hyp.Q0)
+    (hy₁Q0 : y₁ ∈ hyp.Q0) (hy₂Q0 : y₂ ∈ hyp.Q0)
+    (hz₁Q0 : z₁ ∈ hyp.Q0) (hz₂Q0 : z₂ ∈ hyp.Q0)
+    (hf₁ : f ω₁ = ζ⁻¹ * (ω₁ * y₁) * ζ) (hf₂ : f ω₂ = ζ⁻¹ * (ω₂ * y₂) * ζ)
+    (hkK : k ∈ hyp.KSet) (hpair : f (ω₁ * z₁) = k⁻¹ * (ω₂ * z₂) * k)
+    (hz₁1 : z₁ ≠ 1) (hz₂y₂ : z₂ * y₂ ≠ 1) :
+    z₁ = z₂ * y₂ := by
+  classical
+  have hζD : ζ ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hζ)
+  have hsQ0 : hyp.distinguishedInvolution ∈ hyp.Q0 := hyp.distinguishedInvolution_mem_Q0
+  -- the two elements of `K` realizing the conjugates of `s`
+  obtain ⟨a, haK, ha⟩ : ∃ a ∈ hyp.KSet,
+      a * hyp.distinguishedInvolution * a⁻¹ = z₁ := by
+    obtain ⟨b, hbK, hb⟩ := hyp.exists_mem_KSet_conj_eq_of_mem_Q0 hz₁Q0 hz₁1
+    exact ⟨b⁻¹, hyp.inv_mem_KSet hbK, by rwa [inv_inv]⟩
+  obtain ⟨a', ha'K, ha'⟩ : ∃ a' ∈ hyp.KSet,
+      a' * hyp.distinguishedInvolution * a'⁻¹ = z₂ * y₂ := by
+    obtain ⟨b, hbK, hb⟩ := hyp.exists_mem_KSet_conj_eq_of_mem_Q0
+      (hyp.Q0.mul_mem hz₂Q0 hy₂Q0) hz₂y₂
+    exact ⟨b⁻¹, hyp.inv_mem_KSet hbK, by rwa [inv_inv]⟩
+  -- the two instances of (19)
+  have hu1 : z₁ * (a * hyp.distinguishedInvolution * a⁻¹) = 1 := by
+    rw [ha]
+    have hsq := hz₁Q0.1
+    rwa [sq] at hsq
+  have hu2 : z₂ * (a' * hyp.distinguishedInvolution * a'⁻¹) = y₂ := by
+    rw [ha']
+    have hsq := hz₂Q0.1
+    rw [sq] at hsq
+    calc z₂ * (z₂ * y₂) = (z₂ * z₂) * y₂ := by group
+      _ = y₂ := by rw [hsq, one_mul]
+  have hinv1 : f (ω₁ * 1) = ζ⁻¹ * (ω₁ * y₁) * ζ := by rw [mul_one]; exact hf₁
+  have hinv2 : f (ω₂ * y₂) = (ζ⁻¹)⁻¹ * (ω₂ * 1) * ζ⁻¹ := by
+    rw [inv_inv, mul_one]
+    exact hyp.f_mul_eq_conj_of_normalized H hζ hω₂Q hω₂Q0 hy₂Q0 hf₂
+  have e1 := hyp.stepNineteen H hC2 hω₁Q hω₁Q0 hω₂Q hω₂Q0 hz₁Q0 hz₂Q0 hkK haK hpair
+    hu1 hinv1
+  have e2 := hyp.stepNineteen_swap H hC2 hω₁Q hω₁Q0 hω₂Q hω₂Q0 hz₁Q0 hz₂Q0 hkK ha'K
+    hpair hu2 hinv2
+  -- memberships
+  have hB : a⁻¹ * hyp.distinguishedInvolution * a ∈ hyp.Q0 := by
+    have hmem := hyp.conj_mem_Q0_of_mem_D (hyp.D.inv_mem haK.1) hsQ0
+    rwa [inv_inv] at hmem
+  have hB' : a'⁻¹ * hyp.distinguishedInvolution * a' ∈ hyp.Q0 := by
+    have hmem := hyp.conj_mem_Q0_of_mem_D (hyp.D.inv_mem ha'K.1) hsQ0
+    rwa [inv_inv] at hmem
+  have hkB : k * (a⁻¹ * hyp.distinguishedInvolution * a) * k⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D hkK.1 hB
+  have hkB' : k * (a'⁻¹ * hyp.distinguishedInvolution * a') * k⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D hkK.1 hB'
+  have hζB : ζ * (a⁻¹ * hyp.distinguishedInvolution * a) * ζ⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D hζD hB
+  have hζB' : ζ⁻¹ * (a'⁻¹ * hyp.distinguishedInvolution * a') * (ζ⁻¹)⁻¹ ∈ hyp.Q0 :=
+    hyp.conj_mem_Q0_of_mem_D (hyp.D.inv_mem hζD) hB'
+  have hX : z₂ * (k * (a⁻¹ * hyp.distinguishedInvolution * a) * k⁻¹) ∈ hyp.Q0 :=
+    hyp.Q0.mul_mem hz₂Q0 hkB
+  have hY : y₁ * (ζ * (a⁻¹ * hyp.distinguishedInvolution * a) * ζ⁻¹) ∈ hyp.Q0 :=
+    hyp.Q0.mul_mem hy₁Q0 hζB
+  have hX₂ : z₁ * (k * (a'⁻¹ * hyp.distinguishedInvolution * a') * k⁻¹) ∈ hyp.Q0 :=
+    hyp.Q0.mul_mem hz₁Q0 hkB'
+  have hY₂ : (1 : G) * (ζ⁻¹ * (a'⁻¹ * hyp.distinguishedInvolution * a') * (ζ⁻¹)⁻¹)
+      ∈ hyp.Q0 := hyp.Q0.mul_mem hyp.Q0.one_mem hζB'
+  -- invert the first instance so that both have `ω₁` on the left
+  have heD : ζ * (a⁻¹) ^ 2 * k ∈ hyp.D :=
+    hyp.D.mul_mem (hyp.D.mul_mem hζD (pow_mem (hyp.D.inv_mem haK.1) 2)) hkK.1
+  obtain ⟨hXQ, hXQ0⟩ := hyp.mul_mem_sdiff_Q0 hω₂Q hω₂Q0 hX
+  obtain ⟨hYQ, hYQ0⟩ := hyp.mul_mem_sdiff_Q0 hω₁Q hω₁Q0 hY
+  have hswap := hyp.f_conj_swap H hXQ (fun hc => hXQ0 (hc ▸ hyp.Q0.one_mem)) hYQ
+    (fun hc => hYQ0 (hc ▸ hyp.Q0.one_mem)) heD e1
+  have heq₁ : f (ω₁ * (y₁ * (ζ * (a⁻¹ * hyp.distinguishedInvolution * a) * ζ⁻¹)))
+      = ((hyp.t * (ζ * (a⁻¹) ^ 2 * k) * hyp.t)⁻¹)⁻¹ *
+          (ω₂ * (z₂ * (k * (a⁻¹ * hyp.distinguishedInvolution * a) * k⁻¹))) *
+          (hyp.t * (ζ * (a⁻¹) ^ 2 * k) * hyp.t)⁻¹ := by
+    rw [inv_inv]
+    exact hswap
+  -- the two conjugators, in the shape `ζ^{±1} · (element of K)`
+  have hκK : (a⁻¹) ^ 2 * k ∈ hyp.KSet := by
+    rw [hyp.mem_KSet_iff_mem_K]
+    exact hyp.K.mul_mem (pow_mem (hyp.K.inv_mem (hyp.mem_KSet_iff_mem_K.mp haK)) 2)
+      (hyp.mem_KSet_iff_mem_K.mp hkK)
+  have hκ'K : (a'⁻¹) ^ 2 * k ∈ hyp.KSet := by
+    rw [hyp.mem_KSet_iff_mem_K]
+    exact hyp.K.mul_mem (pow_mem (hyp.K.inv_mem (hyp.mem_KSet_iff_mem_K.mp ha'K)) 2)
+      (hyp.mem_KSet_iff_mem_K.mp hkK)
+  have ha₁ : (hyp.t * (ζ * (a⁻¹) ^ 2 * k) * hyp.t)⁻¹ = ζ⁻¹ * ((a⁻¹) ^ 2 * k) := by
+    rw [mul_assoc ζ ((a⁻¹) ^ 2) k]
+    exact hyp.inv_conj_t_of_mem_W_mul_KSet hζ hκK
+  have ha₂ : ζ⁻¹ * (a'⁻¹) ^ 2 * k = ζ⁻¹ * ((a'⁻¹) ^ 2 * k) := by group
+  -- the coset and commutation hypotheses of step (7)
+  have hcosetK : (ζ⁻¹ * ((a⁻¹) ^ 2 * k))⁻¹ * (ζ⁻¹ * ((a'⁻¹) ^ 2 * k)) ∈ hyp.K := by
+    have e : (ζ⁻¹ * ((a⁻¹) ^ 2 * k))⁻¹ * (ζ⁻¹ * ((a'⁻¹) ^ 2 * k))
+        = ((a⁻¹) ^ 2 * k)⁻¹ * ((a'⁻¹) ^ 2 * k) := by group
+    rw [e]
+    exact hyp.K.mul_mem (hyp.K.inv_mem (hyp.mem_KSet_iff_mem_K.mp hκK))
+      (hyp.mem_KSet_iff_mem_K.mp hκ'K)
+  have hcomm : Commute (ζ⁻¹ * ((a⁻¹) ^ 2 * k)) (ζ⁻¹ * ((a'⁻¹) ^ 2 * k)) := by
+    have hκκ' := hyp.commute_of_mem_K (hyp.mem_KSet_iff_mem_K.mp hκK)
+      (hyp.mem_KSet_iff_mem_K.mp hκ'K)
+    have hζκ := hyp.commute_of_mem_W_of_mem_K (hyp.W.inv_mem hζ)
+      (hyp.mem_KSet_iff_mem_K.mp hκK)
+    have hζκ' := hyp.commute_of_mem_W_of_mem_K (hyp.W.inv_mem hζ)
+      (hyp.mem_KSet_iff_mem_K.mp hκ'K)
+    change ζ⁻¹ * ((a⁻¹) ^ 2 * k) * (ζ⁻¹ * ((a'⁻¹) ^ 2 * k))
+      = ζ⁻¹ * ((a'⁻¹) ^ 2 * k) * (ζ⁻¹ * ((a⁻¹) ^ 2 * k))
+    calc ζ⁻¹ * ((a⁻¹) ^ 2 * k) * (ζ⁻¹ * ((a'⁻¹) ^ 2 * k))
+        = ζ⁻¹ * (((a⁻¹) ^ 2 * k) * ζ⁻¹) * ((a'⁻¹) ^ 2 * k) := by group
+      _ = ζ⁻¹ * (ζ⁻¹ * ((a⁻¹) ^ 2 * k)) * ((a'⁻¹) ^ 2 * k) := by rw [hζκ]
+      _ = ζ⁻¹ * ζ⁻¹ * (((a⁻¹) ^ 2 * k) * ((a'⁻¹) ^ 2 * k)) := by group
+      _ = ζ⁻¹ * ζ⁻¹ * (((a'⁻¹) ^ 2 * k) * ((a⁻¹) ^ 2 * k)) := by rw [hκκ']
+      _ = ζ⁻¹ * (ζ⁻¹ * ((a'⁻¹) ^ 2 * k)) * ((a⁻¹) ^ 2 * k) := by group
+      _ = ζ⁻¹ * (((a'⁻¹) ^ 2 * k) * ζ⁻¹) * ((a⁻¹) ^ 2 * k) := by rw [hζκ']
+      _ = ζ⁻¹ * ((a'⁻¹) ^ 2 * k) * (ζ⁻¹ * ((a⁻¹) ^ 2 * k)) := by group
+  -- step (7)
+  rw [ha₁] at heq₁
+  rw [ha₂] at e2
+  have hstep7 := hyp.eq_and_eq_of_inv_mul_mem_K H hC2 hω₁Q hω₁Q0 hω₂Q hω₂Q0 hY hX₂ hX hY₂
+    (hyp.D.mul_mem (hyp.D.inv_mem hζD) (hyp.K_le_D (hyp.mem_KSet_iff_mem_K.mp hκK)))
+    (hyp.D.mul_mem (hyp.D.inv_mem hζD) (hyp.K_le_D (hyp.mem_KSet_iff_mem_K.mp hκ'K)))
+    heq₁ e2 hcosetK hcomm
+  -- unwind the equality of conjugators
+  have hκeq : (a⁻¹) ^ 2 = (a'⁻¹) ^ 2 := by
+    have h := mul_left_cancel hstep7.2.1
+    exact mul_right_cancel h
+  have hainv : a⁻¹ = a'⁻¹ :=
+    eq_of_sq_eq_of_odd_orderOf (hyp.odd_orderOf_of_mem_D (hyp.D.inv_mem haK.1))
+      (hyp.odd_orderOf_of_mem_D (hyp.D.inv_mem ha'K.1)) rfl hκeq.symm
+  have haa : a = a' := inv_injective hainv
+  rw [← ha, ← ha', haa]
+
+/-- **Step (20)**, first assertion (Peterfalvi Part II, p. 128): `α₁ = α₂`.
+
+`stepTwenty_fst_eq` applied twice — once as stated, once with `ω₁` and `ω₂` exchanged
+(the same `k` serves, by `f_swap_of_pair`) — gives `z₁ = z₂ y₂` and `z₂ = z₁ y₁`.
+Substituting one into the other leaves `y₁ y₂ = 1`, and `y₂` is an involution. -/
+theorem stepTwenty (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω₁ ω₂ y₁ y₂ z₁ z₂ k : G} (hζ : ζ ∈ hyp.W)
+    (hω₁Q : ω₁ ∈ hyp.Q) (hω₁Q0 : ω₁ ∉ hyp.Q0)
+    (hω₂Q : ω₂ ∈ hyp.Q) (hω₂Q0 : ω₂ ∉ hyp.Q0)
+    (hy₁Q0 : y₁ ∈ hyp.Q0) (hy₂Q0 : y₂ ∈ hyp.Q0)
+    (hz₁Q0 : z₁ ∈ hyp.Q0) (hz₂Q0 : z₂ ∈ hyp.Q0)
+    (hf₁ : f ω₁ = ζ⁻¹ * (ω₁ * y₁) * ζ) (hf₂ : f ω₂ = ζ⁻¹ * (ω₂ * y₂) * ζ)
+    (hkK : k ∈ hyp.KSet) (hpair : f (ω₁ * z₁) = k⁻¹ * (ω₂ * z₂) * k)
+    (hz₁1 : z₁ ≠ 1) (hz₂1 : z₂ ≠ 1)
+    (hz₁y₁ : z₁ * y₁ ≠ 1) (hz₂y₂ : z₂ * y₂ ≠ 1) :
+    y₁ = y₂ := by
+  have h₁ := hyp.stepTwenty_fst_eq H hC2 hζ hω₁Q hω₁Q0 hω₂Q hω₂Q0 hy₁Q0 hy₂Q0 hz₁Q0 hz₂Q0
+    hf₁ hf₂ hkK hpair hz₁1 hz₂y₂
+  obtain ⟨hω₁z₁Q, hω₁z₁Q0⟩ := hyp.mul_mem_sdiff_Q0 hω₁Q hω₁Q0 hz₁Q0
+  obtain ⟨hω₂z₂Q, hω₂z₂Q0⟩ := hyp.mul_mem_sdiff_Q0 hω₂Q hω₂Q0 hz₂Q0
+  have hpair' : f (ω₂ * z₂) = k⁻¹ * (ω₁ * z₁) * k :=
+    hyp.f_swap_of_pair H hω₁z₁Q (fun hc => hω₁z₁Q0 (hc ▸ hyp.Q0.one_mem)) hω₂z₂Q
+      (fun hc => hω₂z₂Q0 (hc ▸ hyp.Q0.one_mem)) hkK hpair
+  have h₂ := hyp.stepTwenty_fst_eq H hC2 hζ hω₂Q hω₂Q0 hω₁Q hω₁Q0 hy₂Q0 hy₁Q0 hz₂Q0 hz₁Q0
+    hf₂ hf₁ hkK hpair' hz₂1 hz₁y₁
+  -- `z₁ = z₂ y₂` and `z₂ = z₁ y₁` force `y₁ y₂ = 1`
+  have hcomm : y₁ * y₂ = y₂ * y₁ :=
+    (Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hy₁Q0) (y₂ : G)
+      (hyp.Q0_le_Q hy₂Q0)).symm
+  have hz₁z₁ : z₁ * (y₁ * y₂) = z₁ := by
+    calc z₁ * (y₁ * y₂) = (z₁ * y₁) * y₂ := by group
+      _ = z₂ * y₂ := by rw [← h₂]
+      _ = z₁ := h₁.symm
+  have hone : y₁ * y₂ = 1 := by
+    have e : z₁⁻¹ * (z₁ * (y₁ * y₂)) = z₁⁻¹ * z₁ := by rw [hz₁z₁]
+    simpa using e
+  have hy₂inv : y₂⁻¹ = y₂ := by
+    have hsq := hy₂Q0.1
+    rw [sq] at hsq
+    exact inv_eq_of_mul_eq_one_right hsq
+  calc y₁ = (y₁ * y₂) * y₂⁻¹ := by group
+    _ = y₂⁻¹ := by rw [hone, one_mul]
+    _ = y₂ := hy₂inv
+
+end Hypothesis
+
+end OddOrder.Peterfalvi.Appendices.Suzuki
