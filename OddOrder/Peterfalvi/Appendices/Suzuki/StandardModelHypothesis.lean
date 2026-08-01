@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.Peterfalvi.Appendices.Suzuki.Basic
+import OddOrder.Peterfalvi.Appendices.Suzuki.QStructure
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.TorusCentralizer
 
 /-!
@@ -30,6 +30,15 @@ where the §3 machinery applies unconditionally and the conclusions transport ba
   `Unital n`, with `H` the standard Borel, `Q` the standard root subgroup, `D` the
   determinant-one torus and `t` the Weyl element.
 * `standardHypothesis_V_eq_W` — the `V = W` that every §3 endpoint requires.
+* `standardHypothesis_Q0`, `natCard_standardHypothesis_Q0`,
+  `natCard_standardHypothesis_Q` — `Q₀` is `Ω₁(S₀)`, of order `ℓ = 2ⁿ`, and
+  `|Q| = |Q₀|³`.  These are `exists_standardModel`'s `hQ0card` and `hcardQ`.
+
+`hQsuz` needs no work here: `Q` is `standardRootSubgroup n` on the nose, so
+`standardRootSubgroup_isSuzuki2Group` applies directly.  `ih` is *not* derivable in the
+model — `TheoremAInductionBelow` quantifies over all smaller groups, so §4 has to supply
+it from the ambient induction hypothesis together with
+`Nat.card (standardPermGroup n) ≤ Nat.card G`.
 -/
 
 set_option autoImplicit false
@@ -150,6 +159,60 @@ noncomputable def standardHypothesis (n : ℕ) (hn : 1 < n) :
     exact (Nat.even_pow' (by omega)).mpr even_two
   D_odd := odd_natCard_psuTorusRange n (Nat.zero_lt_one.trans hn)
   two_rank_ge_two := exists_subgroup_card_four n hn
+
+/-- **`Q₀` in the standard model is `Ω₁(S₀)`**, the central line of the root group.
+
+`Q₀` is by definition the involutions of `H` together with `1`.  Writing an element of
+the Borel as `r · c` in the semidirect decomposition, squaring to `1` forces `c² = 1`,
+hence `c = 1` because the torus has odd order; what is left is an involution of the root
+group, i.e. an element of the central line. -/
+theorem standardHypothesis_Q0 (n : ℕ) (hn : 1 < n) :
+    (standardHypothesis n hn).Q0 = (RootGroup.centerLine n).map (rootHom n) := by
+  have hn0 : 0 < n := Nat.zero_lt_one.trans hn
+  ext x
+  rw [(standardHypothesis n hn).mem_Q0_iff]
+  constructor
+  · rintro ⟨hx2, hxH⟩
+    obtain ⟨y, rfl⟩ : ∃ y : BorelModel n, borelHom n y = x := hxH
+    have hy2 : y ^ 2 = 1 := borelHom_injective n (by rw [map_pow, hx2, map_one])
+    have hright : y.right = 1 := by
+      have hr : y.right ^ 2 = 1 := by
+        have := congrArg (SemidirectProduct.rightHom (φ := psuTorusScaleHom n)) hy2
+        rwa [map_pow, map_one] at this
+      have hdvd : orderOf y.right ∣ 2 := orderOf_dvd_of_pow_eq_one hr
+      have hodd : Odd (orderOf y.right) := odd_orderOf_psuTorusParameter n hn0 y.right
+      rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h1 | h2
+      · exact orderOf_eq_one_iff.mp h1
+      · exact absurd (h2 ▸ hodd) (by decide)
+    have hleft : y.left ^ 2 = 1 := by
+      have hinl : y = SemidirectProduct.inl y.left :=
+        SemidirectProduct.ext rfl hright
+      have := hy2
+      rw [hinl, ← map_pow] at this
+      exact SemidirectProduct.inl_injective this
+    refine ⟨y.left, (RootGroup.mem_centerLine_iff_sq_eq_one y.left).mpr hleft, ?_⟩
+    rw [borelHom_apply, hright, map_one, mul_one]
+  · rintro ⟨u, hu, rfl⟩
+    refine ⟨?_, rootHom_mem_standardBorel u⟩
+    rw [← map_pow, (RootGroup.mem_centerLine_iff_sq_eq_one u).mp hu, map_one]
+
+/-- **`|Q₀| = ℓ = 2ⁿ`** in the standard model. -/
+theorem natCard_standardHypothesis_Q0 (n : ℕ) (hn : 1 < n) :
+    Nat.card ((standardHypothesis n hn).Q0) = 2 ^ n := by
+  rw [standardHypothesis_Q0 n hn,
+    Nat.card_congr
+      (Subgroup.equivMapOfInjective _ _ (rootHom_injective n)).toEquiv.symm,
+    Nat.card_congr (RootGroup.centerLineEquivFixed n),
+    natCard_fixedByConjugation n (Nat.zero_lt_one.trans hn)]
+
+/-- **`|Q| = |Q₀|³`** in the standard model: `q³` against `q = 2ⁿ`. -/
+theorem natCard_standardHypothesis_Q (n : ℕ) (hn : 1 < n) :
+    Nat.card ((standardHypothesis n hn).Q)
+      = Nat.card ((standardHypothesis n hn).Q0) ^ 3 := by
+  rw [natCard_standardHypothesis_Q0 n hn,
+    show (standardHypothesis n hn).Q = standardRootSubgroup n from rfl,
+    natCard_standardRootSubgroup n (Nat.zero_lt_one.trans hn), ← pow_mul]
+  ring_nf
 
 /-- **`V = W` in the standard model** — the hypothesis every §3 endpoint carries, here a
 theorem.
