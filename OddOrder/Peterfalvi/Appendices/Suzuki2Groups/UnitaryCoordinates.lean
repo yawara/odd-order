@@ -135,6 +135,19 @@ theorem unitaryCoord_mul_central (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
   change _ = unitaryCoord m u p + (w : E)
   rw [show p.quotient * (0 : E) ^ 2 ^ m = 0 by rw [hz, mul_zero], add_zero]
 
+/-- **Multiplying by an element of the centre just adds its coordinate** — the cocycle
+term drops out because a central element has quotient coordinate `0`.
+
+Stated through the quotient coordinate rather than the constructor `⟨0, w⟩`, for the
+central elements that arrive as images of `Z(Q)`; that is the form §3 (4) and (5) meet
+them in (`ω s^a`, and the factor `(0, a⁻¹)` of §2 (2)). -/
+theorem unitaryCoord_mul_of_quotient_eq_zero (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
+    (hu : frobTrace (E := E) m u = 1)
+    (p q : BilinearTwistedProduct (hermitianCocycle m hcard hu))
+    (hq : q.quotient = 0) :
+    unitaryCoord m u (p * q) = unitaryCoord m u p + unitaryCoord m u q := by
+  rw [unitaryCoord_mul m hcard hu, hq, zero_pow (by positivity), mul_zero, add_zero]
+
 /-- **The square is central with unitary coordinate the norm** — the relation
 `ω² = (0, ω̄^{1+q})` of §3 (3). -/
 theorem unitaryCoord_sq (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
