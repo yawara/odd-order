@@ -182,6 +182,43 @@ theorem exists_fgh_residual_eq {f g h : G → G}
   refine ⟨liftMap _ f₁, liftMap _ g₁, liftMap _ h₁, H₁.ofSubtype, fun x hx hx1 => ?_⟩
   exact IsFGH.eq_of_le hyp.rankOneSetup Hfgh inf_le_left inf_le_left H₁.ofSubtype hx hx1
 
+/-- **The mappings of `U/Z(U)` are the images of those of `U`** (Peterfalvi Part II,
+Ch. IV §4, step (2), p. 133).
+
+This is the other half of step (2)'s transfer: `Corollary 2` of §3 is proved on
+`U/Z(U)`, and its conclusions are read back inside `U` "modulo the kernel", which is the
+book's `P ∩ U = Z(U)`. -/
+theorem fgh_map_residualQuotient (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X))
+    {f₁ g₁ h₁ : ↥(residualImage (G := G) X) → ↥(residualImage (G := G) X)}
+    (H₁ : IsFGH (hyp.H.subgroupOf (residualImage (G := G) X))
+      (hyp.Q.subgroupOf (residualImage (G := G) X))
+      (hyp.D.subgroupOf (residualImage (G := G) X))
+      ⟨hyp.t, hyp.t_mem_residual htX⟩ f₁ g₁ h₁)
+    {fb gb hb : (↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X))
+      → (↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X))}
+    (Hb : IsFGH
+      ((hyp.H.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
+      ((hyp.Q.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
+      ((hyp.D.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
+      (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))
+        ⟨hyp.t, hyp.t_mem_residual htX⟩) fb gb hb)
+    {x : ↥(residualImage (G := G) X)}
+    (hxQ : x ∈ hyp.Q.subgroupOf (residualImage (G := G) X))
+    (hx1 : QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) x ≠ 1) :
+    fb (QuotientGroup.mk' _ x) = QuotientGroup.mk' _ (f₁ x) ∧
+      gb (QuotientGroup.mk' _ x) = QuotientGroup.mk' _ (g₁ x) ∧
+      hb (QuotientGroup.mk' _ x) = QuotientGroup.mk' _ (h₁ x) :=
+  IsFGH.map (hyp.setup_residualQuotient hXD htX hCQ hZD) H₁ Hb
+    (QuotientGroup.mk' _) rfl (fun _ hy => Subgroup.mem_map_of_mem _ hy)
+    (fun _ hy => Subgroup.mem_map_of_mem _ hy) hxQ hx1
+
 /-- `|U/Z(U)| < |G|`, read in `G` — the bound the induction hypothesis restricts along. -/
 theorem natCard_residualImageQuotient_lt (hXV : X ≤ hyp.V) (hX : X ≠ ⊥) :
     Nat.card (↥(residualImage (G := G) X) ⧸
