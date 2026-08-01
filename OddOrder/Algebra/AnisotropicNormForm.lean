@@ -414,6 +414,67 @@ theorem exists_addEquiv_norm_of_anisotropic_aux (hm : m ≠ 0)
       - ((e : E) ^ 2 * (p.2 : E) ^ 2 * (u ^ 2 + u)
         + (e : E) ^ 2 * (t : E) * (p.1 : E) * (p.2 : E)) * h2E
 
+/-- The diagonal of a cocycle is quadratic, with polar form `φ x y + φ y x`. -/
+theorem cocycle_diag_add [Algebra (ZMod 2) E]
+    (φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m)) (x y : E) :
+    ((φ (x + y) (x + y) : ↥(frobFixedSubfield E 2 m)) : E)
+      = ((φ x x : ↥(frobFixedSubfield E 2 m)) : E)
+        + ((φ y y : ↥(frobFixedSubfield E 2 m)) : E)
+        + (((φ x y : ↥(frobFixedSubfield E 2 m)) : E)
+          + ((φ y x : ↥(frobFixedSubfield E 2 m)) : E)) := by
+  have h : φ (x + y) (x + y) = φ x x + φ x y + (φ y x + φ y y) := by
+    simp only [map_add, LinearMap.add_apply]
+    abel
+  rw [h]
+  push_cast
+  ring
+
+/-- The diagonal of an `F`-bilinear cocycle scales by the square. -/
+theorem cocycle_diag_smul [Algebra (ZMod 2) E]
+    (φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m))
+    (hsemi : ∀ a ∈ frobFixedSubfield E 2 m, ∀ b ∈ frobFixedSubfield E 2 m, ∀ x y : E,
+      ((φ (a * x) (b * y) : ↥(frobFixedSubfield E 2 m)) : E)
+        = a * b * ((φ x y : ↥(frobFixedSubfield E 2 m)) : E))
+    {a : E} (ha : a ∈ frobFixedSubfield E 2 m) (x : E) :
+    ((φ (a * x) (a * x) : ↥(frobFixedSubfield E 2 m)) : E)
+      = a ^ 2 * ((φ x x : ↥(frobFixedSubfield E 2 m)) : E) := by
+  rw [hsemi a ha a ha x x]
+  ring
+
+/-- The polar form of an `F`-bilinear cocycle is `F`-linear in the first variable. -/
+theorem cocycle_polar_left [Algebra (ZMod 2) E]
+    (φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m))
+    (hsemi : ∀ a ∈ frobFixedSubfield E 2 m, ∀ b ∈ frobFixedSubfield E 2 m, ∀ x y : E,
+      ((φ (a * x) (b * y) : ↥(frobFixedSubfield E 2 m)) : E)
+        = a * b * ((φ x y : ↥(frobFixedSubfield E 2 m)) : E))
+    {a : E} (ha : a ∈ frobFixedSubfield E 2 m) (x y : E) :
+    ((φ (a * x) y : ↥(frobFixedSubfield E 2 m)) : E)
+        + ((φ y (a * x) : ↥(frobFixedSubfield E 2 m)) : E)
+      = a * (((φ x y : ↥(frobFixedSubfield E 2 m)) : E)
+        + ((φ y x : ↥(frobFixedSubfield E 2 m)) : E)) := by
+  have h1 := hsemi a ha 1 (one_mem _) x y
+  have h2 := hsemi 1 (one_mem _) a ha y x
+  rw [one_mul] at h1 h2
+  rw [h1, h2]
+  ring
+
+/-- The polar form of an `F`-bilinear cocycle is `F`-linear in the second variable. -/
+theorem cocycle_polar_right [Algebra (ZMod 2) E]
+    (φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m))
+    (hsemi : ∀ a ∈ frobFixedSubfield E 2 m, ∀ b ∈ frobFixedSubfield E 2 m, ∀ x y : E,
+      ((φ (a * x) (b * y) : ↥(frobFixedSubfield E 2 m)) : E)
+        = a * b * ((φ x y : ↥(frobFixedSubfield E 2 m)) : E))
+    {a : E} (ha : a ∈ frobFixedSubfield E 2 m) (x y : E) :
+    ((φ x (a * y) : ↥(frobFixedSubfield E 2 m)) : E)
+        + ((φ (a * y) x : ↥(frobFixedSubfield E 2 m)) : E)
+      = a * (((φ x y : ↥(frobFixedSubfield E 2 m)) : E)
+        + ((φ y x : ↥(frobFixedSubfield E 2 m)) : E)) := by
+  have h1 := hsemi 1 (one_mem _) a ha x y
+  have h2 := hsemi a ha 1 (one_mem _) y x
+  rw [one_mul] at h1 h2
+  rw [h1, h2]
+  ring
+
 /-- **Chapter III §3's cocycle is the Hermitian one**, up to an `F`-linear change of
 variable: an anisotropic `F`-bilinear `φ : E × E → F` on `E = 𝐅_{q²}` has
 `φ (f x) (f x) = x x̄` for an additive (indeed `F`-linear) bijection `f`.
@@ -436,37 +497,13 @@ theorem exists_addEquiv_norm_of_anisotropic (hm : m ≠ 0)
     (fun x y => ((φ x y : ↥(frobFixedSubfield E 2 m)) : E)
       + ((φ y x : ↥(frobFixedSubfield E 2 m)) : E))
     (fun x => (φ x x).2) (fun x y => Subfield.add_mem _ (φ x y).2 (φ y x).2)
-    ?_ ?_ ?_ ?_ (fun x => CharTwo.add_self_eq_zero _) ?_
-  · -- the polar form is the defect of additivity of the diagonal
-    intro x y
-    have h : φ (x + y) (x + y) = φ x x + φ x y + (φ y x + φ y y) := by
-      simp only [map_add, LinearMap.add_apply]
-      abel
-    rw [h]
-    push_cast
-    ring
-  · -- the diagonal scales by the square
-    intro a ha x
-    have h := hsemi a ha a ha x x
-    rw [h]
-    ring
-  · -- left `F`-linearity of the polar form
-    intro a ha x y
-    have h1 := hsemi a ha 1 (one_mem _) x y
-    have h2 := hsemi 1 (one_mem _) a ha y x
-    rw [one_mul] at h1 h2
-    rw [h1, h2]
-    ring
-  · -- right `F`-linearity of the polar form
-    intro a ha x y
-    have h1 := hsemi 1 (one_mem _) a ha x y
-    have h2 := hsemi a ha 1 (one_mem _) y x
-    rw [one_mul] at h1 h2
-    rw [h1, h2]
-    ring
-  · -- anisotropy, transported through the coercion
-    intro x hx h0
-    exact haniso x hx (Subtype.ext h0)
+    (cocycle_diag_add m φ) (fun a ha x => cocycle_diag_smul m φ hsemi ha x)
+    (fun a ha x y => cocycle_polar_left m φ hsemi ha x y)
+    (fun a ha x y => cocycle_polar_right m φ hsemi ha x y)
+    (fun x => CharTwo.add_self_eq_zero _) ?_
+  -- anisotropy, transported through the coercion
+  intro x hx h0
+  exact haniso x hx (Subtype.ext h0)
 
 end Classification
 
@@ -601,6 +638,30 @@ theorem eq_norm_smul_of_normOne_invariant (hm : m ≠ 0)
   rw [← hx, hχcoord (p'.1 : E) (p'.2 : E) p'.1.2 p'.2.2,
     hN (p'.1 : E) (p'.2 : E) p'.1.2 p'.2.2, hfix, hkey]
   ring
+
+/-- **The `φ`-packaged form of `eq_norm_smul_of_normOne_invariant`**, matching the shape
+in which the Proposition of Peterfalvi Part II, Ch. III §3 delivers the cocycle. -/
+theorem cocycle_diag_eq_norm_smul_of_normOne_invariant (hm : m ≠ 0)
+    (hcard : Nat.card E = (2 ^ m) ^ 2) [Algebra (ZMod 2) E]
+    (φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m))
+    (hsemi : ∀ a ∈ frobFixedSubfield E 2 m, ∀ b ∈ frobFixedSubfield E 2 m, ∀ x y : E,
+      ((φ (a * x) (b * y) : ↥(frobFixedSubfield E 2 m)) : E)
+        = a * b * ((φ x y : ↥(frobFixedSubfield E 2 m)) : E))
+    {μ : E} (hnorm : μ ^ (2 ^ m + 1) = 1) (hμ : μ ≠ 1)
+    (hfix : ((φ μ μ : ↥(frobFixedSubfield E 2 m)) : E)
+      = ((φ 1 1 : ↥(frobFixedSubfield E 2 m)) : E))
+    (hfix2 : ((φ (μ ^ 2) (μ ^ 2) : ↥(frobFixedSubfield E 2 m)) : E)
+      = ((φ 1 1 : ↥(frobFixedSubfield E 2 m)) : E)) :
+    ∀ x : E, ((φ x x : ↥(frobFixedSubfield E 2 m)) : E)
+      = ((φ 1 1 : ↥(frobFixedSubfield E 2 m)) : E) * x ^ (2 ^ m + 1) :=
+  eq_norm_smul_of_normOne_invariant m hm hcard
+    (fun x => ((φ x x : ↥(frobFixedSubfield E 2 m)) : E))
+    (fun x y => ((φ x y : ↥(frobFixedSubfield E 2 m)) : E)
+      + ((φ y x : ↥(frobFixedSubfield E 2 m)) : E))
+    (cocycle_diag_add m φ) (fun _ ha x => cocycle_diag_smul m φ hsemi ha x)
+    (fun _ ha x y => cocycle_polar_left m φ hsemi ha x y)
+    (fun _ ha x y => cocycle_polar_right m φ hsemi ha x y)
+    hnorm hμ hfix hfix2
 
 end NormOneInvariance
 
