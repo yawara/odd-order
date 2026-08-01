@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SequenceCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFive
 
@@ -42,6 +43,8 @@ because inversion fixes the quotient coordinate (`quotient_inv_eq`) while `μ(1,
 * `Hypothesis.stepThree_model` — §3 (3) in the two shapes that endpoint consumes.
 * `Hypothesis.corollaryTwo_of_sectionThree` — the two composed: Corollary 2 from the
   model of Ch. III §3, the type-`B` scaling pair and §2's base pair.
+* `Hypothesis.corollaryTwo_of_isStandardModel` — the same off the bundled predicate
+  `IsStandardModel`, so a caller supplies only the scaling pair and §2's base pair.
 -/
 
 set_option autoImplicit false
@@ -703,6 +706,64 @@ theorem exists_fgh_mapsTo :
       exact hyp.Q.one_mem
     · rw [if_neg hρ1]
       exact (H₁.mem ρ hρQ hρ1).1
+
+/-- **Peterfalvi Part II, Ch. IV §3, Corollary 2, straight off `IsStandardModel`**
+(pp. 120–132).
+
+`corollaryTwo_of_sectionThree` consumes the Proposition of Ch. III §3 clause by clause;
+this unpacks `IsStandardModel` — the same Proposition as a single predicate — and feeds
+it in, so a caller who has the Proposition on some group needs to supply only what is
+genuinely extra:
+
+* `hpair`, the type-`B` scaling pair, for whatever central identification `ι` and
+  exponent `d` the model exhibits.  `hodd` sits inside it: the book's "`θ` is of odd
+  order" for `θ = σ⁻¹τ`, which is all §3 (3) asks of the pair.
+* the base pair `f(ω₀) = (ω₀ ω₀²)^{ζ₀}` that §2 closes with.
+
+Two of the eleven clauses go unused here — the normalization `Φ(x₀) = (0, 1)` and the
+central half of the `K`-scaling — because Corollary 2 reads the model only through its
+quotient coordinate and its cocycle. -/
+theorem corollaryTwo_of_isStandardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcard : 3 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
+    (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
+    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
+    (x₀ : ↥(Subgroup.center hyp.Q)) (hmodel : hyp.IsStandardModel sfive M x₀)
+    -- the type-`B` scaling pair, for the model's own `ι` and `d`
+    (hpair : ∀ (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ),
+      (∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+        ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+            ((ι (Additive.ofMul z) :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) →
+      ∃ σ τ : M.E ≃+* M.E, Odd (orderOf (τ.trans σ.symm)) ∧
+        (∀ k : ↥hyp.actualKActor,
+          σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
+            = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E)) ∧
+        ∀ v : ↥hyp.W,
+          σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
+    -- §2's base pair
+    {ζ₀ ω₀ y₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
+    (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0) (hy₀Q0 : y₀ ∈ hyp.Q0)
+    (hsqω₀ : ω₀ * ω₀ = y₀) (hfω₀ : f ω₀ = ζ₀⁻¹ * (ω₀ * y₀) * ζ₀)
+    {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
+    ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
+  obtain ⟨φ, θm, Φ, Θ, u, ι, hsemi, haniso, -, hΘq, hu, hconj, hquot, hW, hker,
+    hdiagscale, d, hequiv, -, hΘc⟩ := hmodel
+  obtain ⟨σ, τ, hodd, hscale, hWinv⟩ := hpair ι d hequiv
+  exact hyp.corollaryTwo_of_sectionThree H hC2 sfive M hZc hmu hVW hm hQ0card hcard
+    hKcard hWdvd hW1 hfQ hhW θm hsemi haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv
+    hdiagscale u hu hconj σ τ hscale hWinv hodd hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀
+    hζ hζ1
 
 end Hypothesis
 
