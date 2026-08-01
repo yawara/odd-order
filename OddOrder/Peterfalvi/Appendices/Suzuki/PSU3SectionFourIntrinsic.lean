@@ -489,6 +489,58 @@ theorem center_Q_eq_Q0_centralizerQuotient (hXV : X ≤ hyp.V) {n : ℕ} (hn : 0
   exact (hyp.centralizerQuotientHypothesis hXV hA3).center_Q_eq_Q0_subgroupOf_of_sq_eq_one
     (hyp.sq_eq_one_of_mem_center_Q_centralizerQuotient hXV hn eRoot hA3)
 
+/-! ### `Q₀` and `W` are determined by `H` and `D`
+
+`Q₀ = {x ∈ H | x² = 1}` and `W = D ⊓ C(Q₀)` (`W_eq_inf_centralizer_Q0`), so *any*
+isomorphism matching `H` and `D` matches `Q₀` and `W` — **without any reference to `t`**.
+That is what lets Ch. IV §4, step (2) move `1 ≠ w ∈ W` from the transported standing
+hypothesis to the intrinsic one on `U/Z(U)`: the two are related by
+`residualQuotientMulEquiv` followed by the conjugation of
+`Setup.exists_conj_eq_triple`, and neither step needs the distinguished involution. -/
+
+section EquivMatch
+
+variable {L L' : Type*} [Group L] [Group L'] [Finite L] [Finite L']
+  {Λ Λ' : Type*} [MulAction L Λ] [MulAction L' Λ']
+
+/-- `Q₀` is determined by `H`. -/
+theorem map_Q0_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (φ : L ≃* L')
+    (hH : h₁.H.map φ.toMonoidHom = h₂.H) : h₁.Q0.map φ.toMonoidHom = h₂.Q0 := by
+  ext y
+  rw [Subgroup.mem_map_equiv, h₁.mem_Q0_iff, h₂.mem_Q0_iff, ← hH, Subgroup.mem_map_equiv]
+  refine and_congr ?_ Iff.rfl
+  constructor
+  · intro hy
+    have hc := congrArg φ hy
+    rwa [map_pow, map_one, MulEquiv.apply_symm_apply] at hc
+  · intro hy
+    have hc := congrArg φ.symm hy
+    rwa [map_pow, map_one] at hc
+
+/-- `W` is determined by `H` and `D` — **no `t`**. -/
+theorem map_W_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (φ : L ≃* L')
+    (hH : h₁.H.map φ.toMonoidHom = h₂.H) (hD : h₁.D.map φ.toMonoidHom = h₂.D) :
+    h₁.W.map φ.toMonoidHom = h₂.W := by
+  have himg : φ '' (h₁.Q0 : Set L) = (h₂.Q0 : Set L') := by
+    rw [← map_Q0_of_mulEquiv h₁ h₂ φ hH]; rfl
+  rw [h₁.W_eq_inf_centralizer_Q0, h₂.W_eq_inf_centralizer_Q0,
+    Subgroup.map_inf _ _ φ.toMonoidHom φ.injective, hD,
+    map_centralizer_equiv φ (h₁.Q0 : Set L), himg]
+
+/-- A non-trivial element of `W` moves along the isomorphism. -/
+theorem exists_ne_one_mem_W_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ')
+    (φ : L ≃* L') (hH : h₁.H.map φ.toMonoidHom = h₂.H)
+    (hD : h₁.D.map φ.toMonoidHom = h₂.D) (hw : ∃ w ∈ h₁.W, w ≠ 1) :
+    ∃ w ∈ h₂.W, w ≠ 1 := by
+  obtain ⟨w, hwW, hw1⟩ := hw
+  refine ⟨φ w, ?_, ?_⟩
+  · rw [← map_W_of_mulEquiv h₁ h₂ φ hH hD]
+    exact Subgroup.mem_map_of_mem _ hwW
+  · intro hc
+    exact hw1 (φ.injective (by rw [hc, map_one]))
+
+end EquivMatch
+
 section Model
 
 variable [MulAction (hyp.centralizerActionQuotient X) ↥(MulAction.fixedPoints X Ω)]
@@ -835,6 +887,109 @@ theorem center_Q_eq_Q0_intrinsicResidualQuotient
     at hcz
   exact e.injective (by rw [map_pow, hcz, map_one])
 
+/-! ### Matching the intrinsic and the transported standing hypotheses
+
+`Setup.exists_conj_eq_triple` matches `Q`, `M` and `D` of any two rank-one setups on the
+same group, and `Setup.map` moves the transported one from `U/Z(U)` computed in `C_G(X)`
+to `U/Z(U)` computed in `G`.  Composing the two gives an isomorphism matching `H`, `Q`
+and `D` — enough for `Q₀` and `W` (`map_W_of_mulEquiv`), which is what Ch. I §3 Lemma 5's
+last input needs. -/
+
+/-- A subgroup with more than one element is not trivial. -/
+private theorem ne_bot_of_one_lt_natCard {A : Type*} [Group A] {K : Subgroup A}
+    (h : 1 < Nat.card ↥K) : K ≠ ⊥ := by
+  intro hc
+  rw [hc, Subgroup.card_bot] at h
+  exact absurd h (lt_irrefl 1)
+
+/-- **The two standing hypotheses on `U/Z(U)` are matched on `H`, `Q`, `D`.** -/
+theorem exists_mulEquiv_match_residualQuotient
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    letI := MulAction.compHom (ULift.{v} (Unital data.n))
+      details.residualQuotientEquiv.toMonoidHom
+    ∃ φ : (↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X)) ≃*
+        (↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X)),
+      (hyp.residualQuotientHypothesis details).H.map φ.toMonoidHom
+          = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).H ∧
+        (hyp.residualQuotientHypothesis details).D.map φ.toMonoidHom
+          = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).D := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  classical
+  have hn := data.one_lt_n
+  set htr := hyp.residualQuotientHypothesis details with htrdef
+  set e := residualQuotientMulEquiv (G := G) X with hedef
+  have hcardmap : ∀ K : Subgroup (↥(residual (G := G) X) ⧸
+      Subgroup.center ↥(residual (G := G) X)),
+      Nat.card ↥(K.map e.toMonoidHom) = Nat.card ↥K := fun K =>
+    (Nat.card_congr (Subgroup.equivMapOfInjective K e.toMonoidHom e.injective).toEquiv).symm
+  -- the transported setup, moved to the `residualImage` side
+  have hStr := htr.rankOneSetup.map e
+  have hSint := hyp.setup_residualQuotient hXD htX hCQ hZD
+  -- the eight numerical inputs
+  have hQtr : IsPGroup 2 ↥(htr.Q.map e.toMonoidHom) :=
+    (hyp.isSuzuki2Group_residualQuotientHypothesis_Q details).1.of_equiv
+      (Subgroup.equivMapOfInjective htr.Q e.toMonoidHom e.injective)
+  have hQcardtr : Nat.card ↥(htr.Q.map e.toMonoidHom) = (2 ^ data.n) ^ 3 := by
+    rw [hcardmap, hyp.natCard_residualQuotientHypothesis_Q details,
+      hyp.natCard_residualQuotientHypothesis_Q0 details]
+  have hQevtr : Even (Nat.card ↥(htr.Q.map e.toMonoidHom)) := by
+    rw [hcardmap]; exact htr.Q_even
+  have hDoddtr : Odd (Nat.card ↥(htr.D.map e.toMonoidHom)) := by
+    rw [hcardmap]; exact htr.D_odd
+  have hcube : ∀ k : ℕ, 0 < k → 1 < (2 ^ k) ^ 3 := by
+    intro k hk
+    calc 1 < 2 := by norm_num
+      _ = 2 ^ 1 := (pow_one 2).symm
+      _ ≤ 2 ^ k := Nat.pow_le_pow_right (by omega) hk
+      _ ≤ (2 ^ k) ^ 3 := Nat.le_self_pow (by norm_num) _
+  have hQ1tr : htr.Q.map e.toMonoidHom ≠ ⊥ :=
+    ne_bot_of_one_lt_natCard (by rw [hQcardtr]; exact hcube data.n (by omega))
+  have hQint : IsPGroup 2 ↥((hyp.Q.subgroupOf (residualImage (G := G) X)).map
+      (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)))) := by
+    have h := hyp.isSuzuki2Group_Q_intrinsicResidualQuotient details hXD htX hCQ hZD
+    rw [hyp.intrinsicResidualQuotient_Q details hXD htX hCQ hZD] at h
+    exact h.1
+  have hQcardint := hyp.natCard_map_Q_residualQuotient hXD htX hCQ hZD
+  have hQ1int : (hyp.Q.subgroupOf (residualImage (G := G) X)).map
+      (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))) ≠ ⊥ :=
+    ne_bot_of_one_lt_natCard (by
+      rw [hQcardint, details.natCard_cQ_eq_baseField_cube, natCard_baseField data.n (by omega)]
+      exact hcube data.n (by omega))
+  obtain ⟨c, _hQc, hMc, hDc⟩ := hStr.exists_conj_eq_triple hSint hQtr hDoddtr hQevtr
+    hQint (hyp.odd_natCard_map_D_residualQuotient)
+    (hyp.even_natCard_map_Q_residualQuotient details hXD htX hCQ hZD) hQ1tr hQ1int
+  have hcomp : (e.trans (MulAut.conj c)).toMonoidHom
+      = (MulAut.conj c).toMonoidHom.comp e.toMonoidHom := by ext x; rfl
+  refine ⟨e.trans (MulAut.conj c), ?_, ?_⟩
+  · rw [hcomp, ← Subgroup.map_map]; exact hMc
+  · rw [hcomp, ← Subgroup.map_map]; exact hDc
+
+/-- **🎯 `1 ≠ w ∈ W̄` for the intrinsic standing hypothesis on `U/Z(U)`** — the last input
+of Ch. I §3 Lemma 5 (Peterfalvi Part II, Ch. IV §4, step (2), p. 133).
+
+The book gets it from `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1`; here it comes from the
+transported hypothesis, where `exists_ne_one_mem_residualQuotientHypothesis_W` already has
+it, along the isomorphism of `exists_mulEquiv_match_residualQuotient`.  `W = D ⊓ C(Q₀)`
+depends only on `H` and `D`, so no matching of the distinguished involution is needed. -/
+theorem exists_ne_one_mem_W_intrinsicResidualQuotient
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    ∃ w ∈ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).W, w ≠ 1 := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  obtain ⟨φ, hH, hD⟩ :=
+    hyp.exists_mulEquiv_match_residualQuotient details hXD htX hCQ hZD
+  exact exists_ne_one_mem_W_of_mulEquiv _ _ φ hH hD
+    (hyp.exists_ne_one_mem_residualQuotientHypothesis_W details)
+
 /-! ### Moving the point set into `Ω`'s universe
 
 The ambient induction hypothesis `TheoremAInductionBelow G Ω` quantifies over permuted
@@ -955,57 +1110,6 @@ theorem isStandardModel_centralizerQuotient {m : ℕ} (M : hyp.QuotientFieldMode
 
 end SectionFourSetup
 
-/-! ### `Q₀` and `W` are determined by `H` and `D`
-
-`Q₀ = {x ∈ H | x² = 1}` and `W = D ⊓ C(Q₀)` (`W_eq_inf_centralizer_Q0`), so *any*
-isomorphism matching `H` and `D` matches `Q₀` and `W` — **without any reference to `t`**.
-That is what lets Ch. IV §4, step (2) move `1 ≠ w ∈ W` from the transported standing
-hypothesis to the intrinsic one on `U/Z(U)`: the two are related by
-`residualQuotientMulEquiv` followed by the conjugation of
-`Setup.exists_conj_eq_triple`, and neither step needs the distinguished involution. -/
-
-section EquivMatch
-
-variable {L L' : Type*} [Group L] [Group L'] [Finite L] [Finite L']
-  {Λ Λ' : Type*} [MulAction L Λ] [MulAction L' Λ']
-
-/-- `Q₀` is determined by `H`. -/
-theorem map_Q0_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (φ : L ≃* L')
-    (hH : h₁.H.map φ.toMonoidHom = h₂.H) : h₁.Q0.map φ.toMonoidHom = h₂.Q0 := by
-  ext y
-  rw [Subgroup.mem_map_equiv, h₁.mem_Q0_iff, h₂.mem_Q0_iff, ← hH, Subgroup.mem_map_equiv]
-  refine and_congr ?_ Iff.rfl
-  constructor
-  · intro hy
-    have hc := congrArg φ hy
-    rwa [map_pow, map_one, MulEquiv.apply_symm_apply] at hc
-  · intro hy
-    have hc := congrArg φ.symm hy
-    rwa [map_pow, map_one] at hc
-
-/-- `W` is determined by `H` and `D` — **no `t`**. -/
-theorem map_W_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (φ : L ≃* L')
-    (hH : h₁.H.map φ.toMonoidHom = h₂.H) (hD : h₁.D.map φ.toMonoidHom = h₂.D) :
-    h₁.W.map φ.toMonoidHom = h₂.W := by
-  have himg : φ '' (h₁.Q0 : Set L) = (h₂.Q0 : Set L') := by
-    rw [← map_Q0_of_mulEquiv h₁ h₂ φ hH]; rfl
-  rw [h₁.W_eq_inf_centralizer_Q0, h₂.W_eq_inf_centralizer_Q0,
-    Subgroup.map_inf _ _ φ.toMonoidHom φ.injective, hD,
-    map_centralizer_equiv φ (h₁.Q0 : Set L), himg]
-
-/-- A non-trivial element of `W` moves along the isomorphism. -/
-theorem exists_ne_one_mem_W_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ')
-    (φ : L ≃* L') (hH : h₁.H.map φ.toMonoidHom = h₂.H)
-    (hD : h₁.D.map φ.toMonoidHom = h₂.D) (hw : ∃ w ∈ h₁.W, w ≠ 1) :
-    ∃ w ∈ h₂.W, w ≠ 1 := by
-  obtain ⟨w, hwW, hw1⟩ := hw
-  refine ⟨φ w, ?_, ?_⟩
-  · rw [← map_W_of_mulEquiv h₁ h₂ φ hH hD]
-    exact Subgroup.mem_map_of_mem _ hwW
-  · intro hc
-    exact hw1 (φ.injective (by rw [hc, map_one]))
-
-end EquivMatch
 
 end Hypothesis
 
