@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Complement
+import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
 import Mathlib.Tactic.Group
 
 /-!
@@ -50,6 +51,8 @@ The chapter uses these mappings to pin down `G` in the characterization of
 * `Setup.quotient` — and descends to the quotient by a normal subgroup of `D`.
 * `Setup.D_eq_inf_map_conj` — `D` is the two-point stabilizer `M ∩ M^t`, which is how the
   standing hypothesis (A1)–(A3) states it.
+* `Setup.exists_mem_M_smul_eq`, `Setup.isMultiplyPretransitive_two` — the setup makes `L`
+  doubly transitive on `L ⧸ M`, the combinatorial half of (A1).
 * `IsFGH.dOrbitRel_f`, `IsFGH.dOrbitRel_fj_cube` — `⟨f, j⟩` acts on the `D`-orbits of
   `Q^#` as a quotient of the dihedral group of order `6`.
 * `coordsEquiv`, `coords_smul_t_some`, `coords_smul_some_of_mem_M` — the permutation
@@ -1050,5 +1053,57 @@ theorem coords_smul_some_of_mem_M (hS : Setup M Q D t) (x : ↥Q)
     rwa [hS.tinv] at e'
   rw [e2]
   exact hS.DM (hS.Dstab _ (D.inv_mem hd))
+
+/-! ### Double transitivity
+
+A rank-one setup makes `L` doubly transitive on `L ⧸ M`: `L` is transitive on cosets,
+and `Q ≤ M` — the stabilizer of the base point — is *regular* on the remaining points
+(`coords_smul_some_of_mem_M` reads its action as right translation on `Q`).  This is the
+converse direction to `Hypothesis.rankOneSetup`: the combinatorial half of (A1) comes
+free with the setup. -/
+
+/-- **`M` is transitive on `L ⧸ M` minus the base point.** -/
+theorem Setup.exists_mem_M_smul_eq (hS : Setup M Q D t) {u v : L ⧸ M}
+    (hu : u ≠ ((1 : L) : L ⧸ M)) (hv : v ≠ ((1 : L) : L ⧸ M)) :
+    ∃ m ∈ M, m • u = v := by
+  classical
+  obtain ⟨ou, hou⟩ := (coords_bijective hS).surjective u
+  obtain ⟨ov, hov⟩ := (coords_bijective hS).surjective v
+  rcases ou with _ | a
+  · exact absurd (hou.symm.trans coords_none) hu
+  rcases ov with _ | b
+  · exact absurd (hov.symm.trans coords_none) hv
+  refine ⟨(b : L)⁻¹ * (a : L), hS.QM (Q.mul_mem (Q.inv_mem b.2) a.2), ?_⟩
+  rw [← hou, ← hov]
+  have hstep := coords_smul_some_of_mem_M (D := D) hS a (m := (b : L)⁻¹ * (a : L))
+    (q := (b : L)⁻¹) (d := 1) (Q.inv_mem b.2) D.one_mem (by group)
+  rw [hstep]
+  exact congrArg (coords M Q t) (congrArg some (Subtype.ext (inv_inv _)))
+
+/-- **A rank-one setup is doubly transitive on `L ⧸ M`** (Peterfalvi Part II, Ch. IV §1,
+the Lemma, p. 123) — the (A1) half of the standing hypothesis, for free. -/
+theorem Setup.isMultiplyPretransitive_two (hS : Setup M Q D t) :
+    MulAction.IsMultiplyPretransitive L (L ⧸ M) 2 := by
+  classical
+  have hM : ∀ m ∈ M, m • ((1 : L) : L ⧸ M) = ((1 : L) : L ⧸ M) := by
+    intro m hm
+    rw [← MulAction.mem_stabilizer_iff, MulAction.stabilizer_quotient]
+    exact hm
+  rw [MulAction.isMultiplyPretransitive_iff]
+  intro x y
+  obtain ⟨g₁, hg₁⟩ := MulAction.exists_smul_eq L (x 0) ((1 : L) : L ⧸ M)
+  obtain ⟨g₂, hg₂⟩ := MulAction.exists_smul_eq L (y 0) ((1 : L) : L ⧸ M)
+  have hne : ∀ (z : Fin 2 ↪ L ⧸ M) (g : L), g • z 0 = ((1 : L) : L ⧸ M) →
+      g • z 1 ≠ ((1 : L) : L ⧸ M) := by
+    intro z g hz0 hc
+    have hzz : g • z 1 = g • z 0 := by rw [hc, hz0]
+    exact absurd (z.injective (MulAction.injective g hzz)) (by decide)
+  obtain ⟨m, hm, hmeq⟩ :=
+    hS.exists_mem_M_smul_eq (hne x g₁ hg₁) (hne y g₂ hg₂)
+  refine ⟨g₂⁻¹ * m * g₁, Function.Embedding.ext (Fin.forall_fin_two.mpr ⟨?_, ?_⟩)⟩
+  · change (g₂⁻¹ * m * g₁ : L) • x 0 = y 0
+    rw [mul_smul, mul_smul, hg₁, hM m hm, ← hg₂, ← mul_smul, inv_mul_cancel, one_smul]
+  · change (g₂⁻¹ * m * g₁ : L) • x 1 = y 1
+    rw [mul_smul, mul_smul, hmeq, ← mul_smul, inv_mul_cancel, one_smul]
 
 end OddOrder.GroupTheory.RankOneBNPair
