@@ -36,6 +36,8 @@ element of `Q − Q₀` does *not* square to `1`.
 * `Hypothesis.conjQByD`, `Hypothesis.isAInvariant_conjQByD_Q0` — the conjugation action
   of `D` on `Q` and the `D`-invariance of `Q₀`, the data step (1)'s Glauberman reduction
   runs on.
+* `Hypothesis.exists_fixed_not_mem_Q0` — Glauberman's step: a nontrivial `P`-fixed class
+  of `Q/Q₀` has a `P`-fixed representative, necessarily outside `Q₀`.
 -/
 
 set_option autoImplicit false
@@ -138,6 +140,77 @@ theorem isAInvariant_conjQByD_Q0 :
   intro d x hx
   rw [Subgroup.mem_subgroupOf] at hx ⊢
   exact hyp.conj_mem_Q0_of_mem_D d.2 hx
+
+include hyp in
+/-- **Glauberman's step in Ch. IV §4, step (1)**: a nontrivial `P`-fixed class of
+`Q/Q₀` has a `P`-fixed representative, which then lies outside `Q₀`.
+
+The book assumes `C_{Q/Q₀}(P) ≠ 1` (spelled out here as an `x ∈ Q − Q₀` whose class is
+`P`-fixed) and immediately works with `C_Q(P)`.  The passage from the quotient down to
+`Q` is the coprime fixed-point lemma — Isaacs Cor 3.28, here through
+`map_fixedSubgroup_eq_fixedSubgroup_quotient` — available because `|P|` is odd and `Q` is
+a `2`-group.
+
+Together with `not_isElementaryAbelian_cQ_of_not_mem_Q0` this supplies the exponent
+discriminator of step (1) from the section's standing hypothesis. -/
+theorem exists_fixed_not_mem_Q0
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {P : Subgroup G} (hPD : P ≤ hyp.D)
+    (hCop : Nat.Coprime (Nat.card ↥(P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
+    (hSolv : IsSolvable ↥hyp.Q)
+    {x : G} (hxQ : x ∈ hyp.Q) (hx0 : x ∉ hyp.Q0)
+    (hxfix : ∀ a ∈ P, a * x * a⁻¹ * x⁻¹ ∈ hyp.Q0) :
+    ∃ y : G, y ∈ hyp.Q ∧ y ∉ hyp.Q0 ∧ ∀ a ∈ P, a * y * a⁻¹ = y := by
+  classical
+  haveI hNnormal : (hyp.Q0.subgroupOf hyp.Q).Normal := by rw [← hZ]; infer_instance
+  have hinv := hyp.isAInvariant_conjQByD_Q0
+  have hkey := OddOrder.GroupTheory.map_fixedSubgroup_eq_fixedSubgroup_quotient
+    (φ := hyp.conjQByD) (X := P.subgroupOf hyp.D) hinv hCop (Or.inr hSolv)
+  -- the class of `x` is `P`-fixed
+  have hclass : (QuotientGroup.mk' (hyp.Q0.subgroupOf hyp.Q) ⟨x, hxQ⟩) ∈
+      OddOrder.GroupTheory.fixedSubgroup
+        (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hinv)
+        (P.subgroupOf hyp.D) := by
+    intro d hd
+    rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk' hinv,
+      QuotientGroup.mk'_eq_mk']
+    have hdP : (d : G) ∈ P := Subgroup.mem_subgroupOf.mp hd
+    have hu : (d : G) * x * (d : G)⁻¹ * x⁻¹ ∈ hyp.Q0 := hxfix _ hdP
+    have huQ : (d : G) * x * (d : G)⁻¹ * x⁻¹ ∈ hyp.Q :=
+      hyp.Q.mul_mem (hyp.Q_normal_in_H d (hyp.D_le_H d.2) x hxQ) (hyp.Q.inv_mem hxQ)
+    refine ⟨(⟨(d : G) * x * (d : G)⁻¹ * x⁻¹, huQ⟩ : ↥hyp.Q)⁻¹, ?_, ?_⟩
+    · rw [Subgroup.mem_subgroupOf]
+      exact hyp.Q0.inv_mem hu
+    · have hcent : (⟨(d : G) * x * (d : G)⁻¹ * x⁻¹, huQ⟩ : ↥hyp.Q)
+          ∈ Subgroup.center hyp.Q := by
+        rw [hZ, Subgroup.mem_subgroupOf]; exact hu
+      have hcommG : ((d : G) * x * (d : G)⁻¹ * x⁻¹) * x
+          = x * ((d : G) * x * (d : G)⁻¹ * x⁻¹) := by
+        have hc := Subgroup.mem_center_iff.mp hcent (⟨x, hxQ⟩ : ↥hyp.Q)
+        simpa using congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) hc.symm
+      refine Subtype.ext ?_
+      simp only [Subgroup.coe_mul, Subgroup.coe_inv, hyp.conjQByD_apply_val]
+      set u : G := (d : G) * x * (d : G)⁻¹ * x⁻¹ with hudef
+      have h1 : (d : G) * x * (d : G)⁻¹ = u * x := by rw [hudef]; group
+      rw [h1, hcommG]
+      group
+  rw [← hkey] at hclass
+  obtain ⟨c, hcfix, hceq⟩ := hclass
+  refine ⟨(c : G), c.2, ?_, ?_⟩
+  · -- `c` and `x` have the same class, and `x ∉ Q₀`
+    intro hc0
+    refine hx0 ?_
+    have hmem : c⁻¹ * (⟨x, hxQ⟩ : ↥hyp.Q) ∈ hyp.Q0.subgroupOf hyp.Q := by
+      have hq := hceq
+      rwa [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq] at hq
+    rw [Subgroup.mem_subgroupOf] at hmem
+    have hcQ0 : (c : G) ∈ hyp.Q0 := hc0
+    have : x = (c : G) * ((c : G)⁻¹ * x) := by group
+    rw [this]
+    exact hyp.Q0.mul_mem hcQ0 hmem
+  · intro a haP
+    have hfix := hcfix ⟨a, hPD haP⟩ (Subgroup.mem_subgroupOf.mpr haP)
+    exact congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) hfix
 
 end Hypothesis
 
