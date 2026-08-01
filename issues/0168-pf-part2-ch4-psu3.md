@@ -1497,9 +1497,43 @@ p.131 で (4) の証明を読み切った。骨格:
 `frobFixedSubfield (Field n) 2 n` と繋がる。`Nat.card (Field n) = (2^n)^2` は
 `natCard_field`。
 
+### 🎯🎯 橋渡し完成 (2026-08-01) — `toTwistedProduct`
+
+新 leaf `ProjectiveUnitary/RootGroupTwistedCoordinates.lean` (root aggregator 配線済)。
+
+| 補題 | 内容 |
+|---|---|
+| `frobTrace_eq_add_star` | `star` (= `q` 乗) と `frobTrace` API の接続 |
+| `norm_mem_frobFixed` | `a·ā ∈ F` |
+| `snd_add_norm_mem` | 補正後の第 2 成分が `F` に入る |
+| `norm_cocycle` | `a ↦ u·a·ā` の余境界 = `u·Tr(a c̄)` |
+| `hermitianBilin` / `correctedBilin` / `rootBilin` | `x·ȳ + u·Tr(x·ȳ)` を `F` 値双線型写像として |
+| 🎯 `toTwistedProduct` | **`RootGroup n ≃* BilinearTwistedProduct (rootBilin …)`** |
+
+full build green (4973 jobs) / lint --strict clean / sorry 0 / AxiomsCheck OK。
+
+### 📐 次に要るのは**余輪体の同定** (2026-08-01 の分析)
+
+`toTwistedProduct` は `RootGroup` 側だけの話。§3 (4) を書くには `Q` と繋ぐ必要があり、
+* `Q ≃* BilinearTwistedProduct φ` (Ch. III §3 `exists_standardModel`)
+* `RootGroup n ≃* BilinearTwistedProduct (rootBilin)` (今回)
+の**2 つの `φ` を同定する**のが残り。repo には `BilinearTwistedProduct.congrEquiv`
+(余輪体の同値に沿った輸送) が既にある。
+
+**同定の中身**: `θ = 1` (§3 (3)) により `φ` は `F`-双線型で、`E` は `F` 上 2 次元。
+両者とも非等方。⚠ **対角が鍵**:
+* `rootBilin(x,x) = N(x) + u·Tr(N(x)) = N(x)` — `N(x) ∈ F` ゆえ `Tr(N(x)) = 0`。
+  **対角はちょうどノルム**。
+* `φ(x,x) = χ(x)` (`centreQuadraticMapE`、= `Q` の平方写像)。
+⟹ 標数 2・2 次元の非等方二次形式の分類 (本質的に二次拡大のノルム形式ただ一つ) に
+帰着する。`φ` と `rootBilin` の対角を突き合わせれば `congrEquiv` で輸送できる。
+
+⚠ これは章末の `G ≅ PSU(3,q)` でも必ず要る (repo の PSU(3,q) は `RootGroup` +
+`StandardGenerators` + `Bruhat` で構成されている) ので、迂回できない本体作業。
+
 ### ⚠ 次の一手
 
-1. 上記 `Ξ` の実装 (公式は確定済、`star ↔ qFrobenius` の接続だけが手数)。
+1. **余輪体の同定** (上記)。対角 (`χ` vs `N`) の突き合わせ + `congrEquiv`。
 2. §3 (4) 本体 (骨格は上記のとおり確定済)。
 3. `5 ≤ |F|` の供給。⚠ 完全な解決は場合分けになる:
    `m ≥ 3` は数え上げ / `m = 2` は「`θ|_F = Frob` なら `σ(x)τ(x) = σ(x³) = 1`
