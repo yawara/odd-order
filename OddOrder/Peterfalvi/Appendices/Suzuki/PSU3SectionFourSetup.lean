@@ -335,6 +335,41 @@ theorem theoremAInductionBelow_centralizerActionQuotient {X : Subgroup G}
   intro A Λ _ _ _ hlt hA
   exact ih (hlt.trans (hyp.card_centralizerActionQuotient_lt hXV hX)) hA
 
+/-- **The induction hypothesis passes to any smaller-or-equal group.**
+
+`TheoremAInductionBelow` quantifies over everything strictly below `Nat.card G`, so it
+restricts to any group of at most that order — in whatever universe `B` and `Λ'` are
+allowed by the statement.  This is how Ch. IV §4 feeds the ambient induction hypothesis
+to the model it identifies `U/(P ∩ U)` with. -/
+theorem TheoremAInductionBelow.of_natCard_le {B : Type u} {Λ' : Type v} [Group B]
+    [MulAction B Λ'] [Finite B] (ih : TheoremAInductionBelow G Ω)
+    (hle : Nat.card B ≤ Nat.card G) : TheoremAInductionBelow B Λ' := by
+  intro A Λ'' _ _ _ hlt hA
+  exact ih (hlt.trans_le hle) hA
+
+/-- **`|U/Z(U)| < |G|`** for `U = O^{2′}(C_G(X))` and `1 ≠ X ≤ V`.
+
+`U/Z(U)` is a quotient of a subgroup of `C_G(X)`, which is proper by
+`natCard_centralizer_lt`. -/
+theorem natCard_residualQuotient_lt {X : Subgroup G} (hXV : X ≤ hyp.V) (hX : X ≠ ⊥) :
+    Nat.card (↥(Subgroup.primeComplementResidual 2 (Subgroup.centralizer (X : Set G))) ⧸
+        Subgroup.center
+          ↥(Subgroup.primeComplementResidual 2 (Subgroup.centralizer (X : Set G))))
+      < Nat.card G := by
+  classical
+  have h1 : Nat.card (↥(Subgroup.primeComplementResidual 2
+        (Subgroup.centralizer (X : Set G))) ⧸ Subgroup.center _)
+      ≤ Nat.card ↥(Subgroup.primeComplementResidual 2
+        (Subgroup.centralizer (X : Set G))) :=
+    Nat.card_le_card_of_surjective _ (QuotientGroup.mk'_surjective _)
+  have h2 : Nat.card ↥(Subgroup.primeComplementResidual 2
+        (Subgroup.centralizer (X : Set G)))
+      ≤ Nat.card ↥(Subgroup.centralizer (X : Set G)) :=
+    Nat.le_of_dvd Nat.card_pos
+      (Subgroup.card_subgroup_dvd_card
+        (Subgroup.primeComplementResidual 2 (Subgroup.centralizer (X : Set G))))
+  exact lt_of_le_of_lt (h1.trans h2) (hyp.natCard_centralizer_lt hXV hX)
+
 /-! ### Involutions lift through an odd-order kernel
 
 The `Q₀`-analogue of `centralizerQQuotientEquiv` needs more than the `Q`-version: `Q₀` is
