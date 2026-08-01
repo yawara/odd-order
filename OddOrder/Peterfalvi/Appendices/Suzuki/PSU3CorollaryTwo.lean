@@ -45,6 +45,8 @@ because inversion fixes the quotient coordinate (`quotient_inv_eq`) while `μ(1,
   model of Ch. III §3, the type-`B` scaling pair and §2's base pair.
 * `Hypothesis.corollaryTwo_of_isStandardModel` — the same off the bundled predicate
   `IsStandardModel`, so a caller supplies only the scaling pair and §2's base pair.
+* `Hypothesis.corollaryTwo_of_isStandardModel_of_normalization` — and with the base pair
+  itself produced by §2 (9), leaving only the square relation of §2 (20).
 -/
 
 set_option autoImplicit false
@@ -764,6 +766,74 @@ theorem corollaryTwo_of_isStandardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h
     hKcard hWdvd hW1 hfQ hhW θm hsemi haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv
     hdiagscale u hu hconj σ τ hscale hWinv hodd hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀
     hζ hζ1
+
+/-- `Q` is strictly larger than `Q₀`, since `|Q| = |Q₀|³` and `|Q₀| > 1`. -/
+theorem exists_mem_Q_notMem_Q0 {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3) : ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 := by
+  by_contra hcon
+  push Not at hcon
+  have hle : hyp.Q ≤ hyp.Q0 := fun x hx => hcon x hx
+  have heq : hyp.Q = hyp.Q0 := le_antisymm hle (fun x hx => hyp.Q0_le_Q hx)
+  rw [heq, hQ0card] at hcardQ
+  have h1 : 1 < 2 ^ m := by
+    calc (1 : ℕ) < 2 ^ 1 := by norm_num
+      _ ≤ 2 ^ m := Nat.pow_le_pow_right (by norm_num) (Nat.one_le_iff_ne_zero.mpr hm)
+  have hgt : (2 ^ m : ℕ) ^ 1 < (2 ^ m : ℕ) ^ 3 := Nat.pow_lt_pow_right h1 (by norm_num)
+  rw [pow_one] at hgt
+  omega
+
+/-- **Peterfalvi Part II, Ch. IV §3, Corollary 2, with §2's base pair produced in place**
+(pp. 120–132).
+
+`stepNine` is §2's normalization "the `ω_i` may be chosen so that `f(ω_i) = (ω_i y_i)^ζ`"
+(p. 125), so the base pair need not be supplied: only the *square* relation `ω² = y` that
+§2 closes with (step (20)) is left, and it is taken here in the shape step (20) proves it
+— for every normalized pair at once.
+
+That isolates exactly what "run §2 relative to `U`" still owes: `hsq` and the type-`B`
+scaling pair `hpair`. -/
+theorem corollaryTwo_of_isStandardModel_of_normalization
+    (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
+    (hcard : 3 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
+    (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
+    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
+    (x₀ : ↥(Subgroup.center hyp.Q)) (hmodel : hyp.IsStandardModel sfive M x₀)
+    (hpair : ∀ (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ),
+      (∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+        ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+            ((ι (Additive.ofMul z) :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) →
+      ∃ σ τ : M.E ≃+* M.E, Odd (orderOf (τ.trans σ.symm)) ∧
+        (∀ k : ↥hyp.actualKActor,
+          σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
+            = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E)) ∧
+        ∀ v : ↥hyp.W,
+          σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
+    -- §2 (20): a normalized pair squares to its `y`
+    {ζ₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
+    (hsq : ∀ ω' ∈ hyp.Q, ω' ∉ hyp.Q0 → ∀ y ∈ hyp.Q0,
+      f ω' = ζ₀⁻¹ * (ω' * y) * ζ₀ → ω' * ω' = y)
+    {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
+    ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
+  obtain ⟨ω, hωQ, hωQ0⟩ := hyp.exists_mem_Q_notMem_Q0 hm hQ0card hcardQ
+  obtain ⟨ω₀, hω₀Q, hω₀Q0, y₀, hy₀Q0, -, hfω₀⟩ := hyp.stepNine M hZc H hC2 hVW hm hQ0card
+    hmu hKcard hWdvd hωQ hωQ0 hζ₀ (fun hc => hζ₀1 (Subtype.ext hc))
+  exact hyp.corollaryTwo_of_isStandardModel H hC2 sfive M hZc hmu hVW hm hQ0card hcard
+    hKcard hWdvd hW1 hfQ hhW x₀ hmodel hpair hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0
+    (hsq ω₀ hω₀Q hω₀Q0 y₀ hy₀Q0 hfω₀) hfω₀ hζ hζ1
 
 end Hypothesis
 
