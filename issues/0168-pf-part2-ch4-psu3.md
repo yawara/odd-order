@@ -2229,3 +2229,45 @@ Ch. I §1 Prop 4 と同じ論法)。
    と同じ論法; 平方は標数 2 で全単射)。
 5. `y = Z` (`Ā = 0` に相当、`ω` 自身) と `Ā = 1` の 2 例外を
    `unitaryCoord_inv` / `ω → ω⁻¹, ζ → ζ⁻¹` の対称性で回収 → 段 (5)。
+
+## 2026-08-01 (19): 段 (4) の入力が全部揃った — 残りは組み立て 1 本
+
+(18) の続きで、`star_of_chain` が要求する 4 因子の座標をすべて供給する補題を落とした。
+
+| 定理 | 所在 | 供給する `star_of_chain` の仮説 |
+|---|---|---|
+| `mu_W_notMem_frobFixed` | `PSU3RootGroupModel` | `hζS` (`ζ⁻¹ ∉ F`) |
+| `mu_K_add_mu_W_ne_zero` | `PSU3RootGroupModel` | 分母 `Ā + Z ≠ 0` |
+| `centerCoord_conj_eq_mu_sq` | `PSU3RootGroupModel` | `hL₂y` の元 (`c(s^a) = μ(a²)c(s)`) |
+| `unitaryCoord_toCenter` | `PSU3RootGroupModel` | `hL₂y` (`ν·c`) |
+| `stepTwo_quotient` | `PSU3InverseFormula` | `hR₁q` (`X̄ = ω̄/(Ā+Z)`) |
+| `stepThree_quotient_norm` | `PSU3InverseFormula` | `hω` (`ω̄^{1+q} = ν·c(ω²)`) |
+| `stepOne_conjQHom` | `PSU3SectionThree` | `heq` |
+| `mu_norm_eq` | `PSU3RootGroupModel` | 共役スカラーのノルム |
+
+### 残る組み立て (次セッションの 1 手目)
+
+`stepFour_star`: 上記を全部食わせて `(∗∗)` を出す 1 本。手順:
+
+1. `congrArg Ψ (stepOne_conjQHom …)` + `map_mul` ⟹ `heq : Ψ L₁ * Ψ L₂ = Ψ R₁ * Ψ R₂`。
+2. 4 因子の座標を `exists_unitaryModel_conj` の 2 本 + `mu_norm_eq` で計算:
+   * `unitaryCoord (Ψ L₁) = μ(kActor ha2,1)²·γ = Ā²γ`
+   * `(Ψ L₂).quotient = 0` (`coord_mk_eq_zero_of_mem_Q0` + `hquot` + `hΨq`)
+   * `unitaryCoord (Ψ L₂) = ν·c(s^a) = Ā` (`unitaryCoord_toCenter` +
+     `centerCoord_conj_eq_mu_sq` + 正規化 `ν·c(s) = 1`)
+   * `unitaryCoord (Ψ R₁) = γ`, `(Ψ R₁).quotient = Z²·X̄` (`μ(1,ζ²) = Z²`)
+   * `unitaryCoord (Ψ R₂) = x`, `(Ψ R₂).quotient = Z·ω̄`
+3. `stepTwo_quotient` で `X̄ = ω̄/(Ā+Z)` を代入 ⟹ `hR₁q` の形
+   (`star_of_chain` の `ζ` には `Z⁻¹` を入れる)。
+4. `star_of_chain` ⟹ `(∗∗)`。
+5. `gamma_eq_inv_of_secondEntry` ⟹ `x = Z`, `γ = 1/(x+Ā)` = 段 (4)。
+
+⚠ `hΘc` を `exists_modelScalarHom` から取るとき、その `d` と
+`centerCoord_conj_eq_mu_sq`/`mu_K_zpow_eq_sq` の `d` は同一のものを渡すこと。
+
+### 例外値 (段 (4) の締めと段 (5))
+
+* `Ā = 0` (= `y = Z`, `ω` 自身): `f(ω) = ω^{-ζ} = (ω̄ζ, ζ)` と `(ω̄/y, 1/y)` の一致を
+  `unitaryCoord_inv` + 共役公式で直接。
+* `Ā = 1` (= `y = Z + 1`): `ω → ω⁻¹`, `ζ → ζ⁻¹` の対称性 (`f(ω⁻¹) = ω^{ζ⁻¹}` ゆえ
+  `(ω⁻¹, ζ⁻¹)` が §3 の仮説を満たす) で回収。`ζ + 1 ≠ ζ⁻¹ + 1` で被覆完了。
