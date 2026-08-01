@@ -6773,3 +6773,32 @@ rank-one setup について `∃ c, Q^c = Q' ∧ M^c = M'`。⚠ **モデルを�
 
 その後 `t` の照合 (`exists_mem_K_conj_t_eq` (110)) で四つ組が揃い、
 `hVW` / `hKcard` / `hWdvd` / `∃w∈W̄` が transported 側からまとめて移送できる。
+
+## 2026-08-02 (131): 🎯 照合の主定理 `Setup.exists_conj_eq_triple` — 残りは `t` のみ
+
+同じ群 `L` 上の 2 つの rank-one setup について
+**`∃ c, Q^c = Q' ∧ M^c = M' ∧ D^c = D'`**。⚠ **モデルを一切使わない汎用定理**。
+
+| 部品 | 内容 |
+|---|---|
+| `Setup.exists_conj_eq` ((130)) | `Q` は Sylow 2 ゆえ共役、`M = N_L(Q)` ゆえ `M` も移る |
+| `Setup.exists_conj_D_eq` (今回) | `Q'` の補群で位数が合うものは `Q'` の元で `D'` に共役 |
+| `map_conj_self` / `map_conj_mul` (今回) | 共役の合成・自明化の小道具 |
+
+`exists_conj_D_eq` の中身: `Q'` は `M'` の正規 2-部分群で指数 `|D'|` が奇 ⟹
+**Schur-Zassenhaus 共役** `Subgroup.IsComplement'.exists_conj_of_coprime`
+(`OddOrder/Mathlib/SchurZassenhausConj.lean:1292`, 既存) が当たる。`IsComplement'` は
+`isComplement'_of_card_mul_and_disjoint` (位数積 + disjoint) で作った。得た `n ∈ Q'` で
+さらに共役しても `Q'`,`M'` は動かない (`n ∈ Q' ≤ M'`) ので 3 つ同時に揃う。
+
+### ⚠ 次セッションはここから — `t` の照合
+
+四つ組の最後。`c` で `Q,M,D` を合わせた後、`t^c` と `t'` はどちらも `L − M'` の対合で
+`D' = M' ⊓ M'^{t'}` を与える。書籍 p.133 の「2 つの distinguished involution は
+`K` の元だけずれる」がこれで、道具は `Hypothesis.exists_mem_K_conj_t_eq` ((110)):
+`d ∈ K` に対し `∃ e ∈ K, e⁻¹ t e = d t`。
+
+⟹ 揃えば `L̄` の自己同型 `φ` で `φ(H_tr,Q_tr,D_tr,t_tr) = (M̄,Q̄,D̄,t̄)` が取れ、
+`V`,`K`,`W`,`Q₀` はすべて `H,Q,D,t` から定義されるので対応する。⟹ transported 側の
+`residualQuotientHypothesis_V_eq_W` 等から **`hVW` / `hKcard` / `hWdvd` / `∃w∈W̄` が
+まとめて移送**でき、Corollary 2 が `U/Z(U)` に当たって段 (2) が閉じる。
