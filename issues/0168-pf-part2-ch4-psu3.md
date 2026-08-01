@@ -6204,3 +6204,57 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
 3. `Q̄` の Suzuki 2-群性 — `cQ_isSuzuki2Group` を `Q̄ ≅ C_Q(X)` に沿って移送。
 4. ⟹ `corollaryTwo_of_sectionThree` を内在 `Hypothesis` に当て、
    `IsFGH.map` (π : U → U/Z(U)) → `IsFGH.eq_of_le` で ambient へ。
+
+## 2026-08-02 (118): §2/§3 の入力を内在版で — 残りは `W̄` と `s̄ t̄`
+
+(117) の内在 `Hypothesis` に対して、Ch. I §3 Lemma 5
+(`lemmaFiveSetup_of_orderThree_of_mem_W`) の 7 入力を埋めていく作業。
+
+| 入力 | 状態 | 実装 |
+|---|---|---|
+| `\|Q̄₀\| = 2ⁿ` | ✅ | `natCard_Q0_intrinsicResidualQuotient` |
+| `\|Q̄\| = \|Q̄₀\|³` | ✅ | `natCard_Q_intrinsicResidualQuotient` |
+| `n ≠ 0` | ✅ | `data.one_lt_n` |
+| `Q̄` が Suzuki 2-群 | ✅ | `isSuzuki2Group_Q_intrinsicResidualQuotient` |
+| `TheoremAInductionBelow` | ✅ | `theoremAInductionBelow_intrinsicResidualQuotient` |
+| `∃ w ∈ W̄, w ≠ 1` | ⚠ 未 | |
+| `orderOf (s̄ · t̄) = 3` | ⚠ 未 | distinguished involution の同定 |
+
+### `Q̄₀ = π(U ∩ Q₀)` — 唯一の本物の論法
+
+`Q̄₀ = {x̄ ∈ M̄ | x̄² = 1}` なので `x̄² = 1` から `U` 側の対合を作る必要がある。
+`x̄² = 1` は `x² ∈ Z(U)` しか言わない。**`|Z(U)|` が奇数** (Ch. I §3 Prop 1(c)
+`odd_natCard_center_residual`) なので `m := |Z(U)| = 2k+1` と置くと
+`y := x^m = x·(x²)^k` が `y² = (x²)^m = 1` かつ `x⁻¹y = (x²)^k ∈ Z(U)`。
+汎用補題 `OddOrder.GroupTheory.sq_pow_natCard_eq_one_of_sq_mem` (`OddOrderInvolution.lean`)
+として切り出した。
+
+### ⚠ universe の障害 (formalization 固有、記憶に残すこと)
+
+`TheoremAInductionBelow G Ω` は `∀ {A : Type u} {Λ : Type v}` という量化子なので、
+**そこに食わせる標準仮説の点集合は `Ω` と同じ universe に無ければならない**。
+`ofRankOneSetup` の点集合は `L̄ ⧸ M̄ : Type u` (群と同じ側) なので不適合
+(`ULift.{v} (L̄ ⧸ M̄) : Type (max u v)` も不可)。transported 版が
+`ULift.{v} (Unital n)` を使っているのはこの理由だった。
+
+解決 = **点集合を小さい型へ貼り替える** (群・部分群は不変):
+`ofRankOneSetupOfEquiv` (`RankOneSetup.lean`, 汎用) + `intrinsicPointEquiv`
+(`coordsEquiv : L̄ ⧸ M̄ ≅ Q̄ ∪ {a}` と `Q̄ ≅ C_Q(X) ≅ RootGroup ℓ` の合成) で
+`L̄ ⧸ M̄ ≃ Unital ℓ`、`Unital ℓ : Type 0` は任意の universe へ lift できる。
+⟹ `intrinsicResidualQuotientULift`。
+
+### ⚠ 次セッションはここから
+
+1. `∃ w ∈ W̄, w ≠ 1` — 書籍 p.133 の該当箇所は
+   「`|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` since `ℓ > 2`」で、
+   `V ∩ U ⊆ P × C_W(P)` (Galois の定理) から `W̄` の非自明元を取っている。
+   まず `W̄` (内在版の `W`) と `W ∩ U` の関係を実測すること。
+2. `orderOf (s̄ · t̄) = 3` — `distinguishedInvolution` は `Classical.choose` なので
+   `eq_distinguishedPair_of_structure` の一意性で同定する
+   (`ofMulEquiv_distinguishedInvolution` が transported 版の手本)。
+   ⚠ 内在版の `t̄ = π(t)` は transported 版の `t` と**一致しない**可能性があり、
+   その差は `K̄` の元 (`exists_mem_K_conj_t_eq` (110) が扱う) — ここが段 (2) の
+   「二つの distinguished involution の照合」。
+3. ⟹ Lemma 5 → `QuotientFieldModel` → `exists_standardModel` → `corollaryTwo_of_sectionThree`
+   を内在版に当て、`IsFGH.eq_of_le` (canonical form の一意性) で ambient へ戻す
+   (書籍 p.133 の「By the uniqueness of the canonical form … f(ω) = f₁(ω)」)。
