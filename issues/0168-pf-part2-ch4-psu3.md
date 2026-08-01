@@ -3629,3 +3629,35 @@ repo で自然なのは **`C_G(P)/N` 上の `Hypothesis` に §3 Cor 2 を当て
 * `IsFGH.eq_of_le` (canonical form の一意性)
 
 ⚠ 訂正 1 件: `O^{2'}` は repo にある (`primeComplementResidual`)。
+
+## 2026-08-01 (58): 段 (2) の経路判定 — **商経路が正しい** (書籍の `U/(P∩U)` と一致)
+
+`centralizerHypothesisA1 (hXV : X ≤ V) :
+ HypothesisA1 ↥(Subgroup.centralizer (X : Set G)) ↥(fixedPoints X Ω)`
+は **`C_G(X)` そのもの**の上の (A1) で、しかも `htC : hyp.t ∈ C` — **同じ対合 `t`**
+が `C_G(X)` に居る (`CentralizerInduction.lean:246`)。`t` は 2-元なので
+`t ∈ O^{2'}(C_G(P)) = U` でもある。
+
+⟹ `IsFGH.eq_of_le` (54) は `Q' = C_Q(P)`, `D' = C_D(P)` でそのまま効く。
+
+⚠ **しかし (A2) (忠実性) は `C_G(X)` 自身では成り立たない** — repo が
+`C_G(X)/N` (`N = (C_H(X)).normalCore`) に移るのはまさにそのため。
+§3 Cor 2 (`corollaryTwo_of_stepFour`) は完全な `Hypothesis` を要求するので、
+`U` 上に直接は載らない。
+
+⟹ **書籍の `U/(P∩U) ≅ PSU(3,ℓ)` という書き方自体が商を取っている**ことに注意。
+repo の `centralizerActionQuotient` と `result.L` がその商に対応する。
+**段 (2) の正しい経路は商経路** (`C_G(P)/N` 上の `Hypothesis` に §3 Cor 2 を当て、
+得た `ω̄` を `U` に持ち上げる)。`IsFGH.eq_of_le` は持ち上げ後の
+「`f(ω) = f₁(ω)`」に使う。
+
+### ⚠ 次セッションの具体手順 (段 (2))
+
+1. `centralizerQuotientHypothesis s4.P_le_V hA3` で `C_G(P)/N` 上の `Hypothesis` を得る。
+2. そこに `corollaryTwo_of_stepFour` を当てて `ω̄ ∈ Q̄ − Q̄₀` と
+   `f̄(ω̄) = ζ̄⁻¹ω̄⁻¹ζ̄`、`h̄(ω̄) = ζ̄³` を得る。
+   ⚠ 段 (4) の被覆 `hcover` をその `Hypothesis` に対して供給する必要がある
+   (= §3 が `C_G(P)/N` 側でも成り立つこと)。ここが段 (2) の実質。
+3. 商から `U` への持ち上げ: `N ≤ C_H(P)` の元だけずれるので、書籍の
+   `f₁(ω) ∈ ω^{-ζ₁}(P ∩ U)` / `h₁(ω) ∈ ζ₁³(P ∩ U)` という**剰余類の形**に対応する。
+4. `IsFGH.eq_of_le` で `f₁ → f`、`h₁ → h`。
