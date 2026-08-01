@@ -46,6 +46,9 @@ element of `Q − Q₀` does *not* square to `1`.
   `SectionFourSetup.not_isElementaryAbelian_cQ` (the exponent discriminator),
   `SectionFourSetup.natCard_Q0_eq_pow_cardP` (`q = ℓ^p`) and
   `SectionFourSetup.eq_P_of_centralizes` (`Z(U) ⊆ P`) read off it.
+* `SectionFourSetup.inf_le_sup_W_of_centralizes`,
+  `SectionFourSetup.inf_le_sup_centralizer_W` — step (2)'s `V ∩ U ⊆ P W` and
+  `V ∩ U ⊆ P × C_W(P)`.
 -/
 
 set_option autoImplicit false
@@ -373,6 +376,52 @@ theorem eq_P_of_centralizes {m : ℕ} (M : hyp.QuotientFieldModel m)
     S = s4.P :=
   eq_of_mem_mul_of_inf_eq_bot hPS hfac
     (hyp.inf_W_eq_bot_of_centralizes M hZ hmu hyQ hy0 hS)
+
+/-- **`V ∩ U ⊆ P W`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133):
+
+> By the structure of `PSU(3, ℓ)`, `(V ∩ U)/(P ∩ U)` centralizes `C_{Q₀}(P)`.  Thus, by
+> the theorem of Galois, `V ∩ U ⊂ P W`.
+
+The Galois theorem is `centralizer_V_centralizer_Q0`, which computes `C_V(C_{Q₀}(P))` as
+`P ⊔ W` exactly; the hypothesis here is the centralizing statement the book reads off the
+structure of `PSU(3, ℓ)`. -/
+theorem inf_le_sup_W_of_centralizes {U : Subgroup G}
+    (hcent : hyp.V ⊓ U ≤ Subgroup.centralizer
+      (((hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) : Subgroup G) : Set G)) :
+    hyp.V ⊓ U ≤ s4.P ⊔ hyp.W := by
+  rw [← hyp.centralizer_V_centralizer_Q0 s4.P_le_V]
+  exact le_inf inf_le_left hcent
+
+/-- **`V ∩ U ⊆ P × C_W(P)`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133):
+
+> ... and, since `U ⊂ C_G(P)`, `V ∩ U ⊂ P × C_W(P)`.
+
+Writing `v ∈ V ∩ U` as `p w`, the factor `w = p⁻¹ v` centralizes `P` because `v` does
+(`U ⊆ C_G(P)`) and `p` does (`P` has prime order, hence is abelian). -/
+theorem inf_le_sup_centralizer_W {U : Subgroup G}
+    (hUC : U ≤ Subgroup.centralizer ((s4.P : Set G)))
+    (hfac : ∀ v ∈ hyp.V ⊓ U, ∃ p ∈ s4.P, ∃ w ∈ hyp.W, v = p * w) :
+    hyp.V ⊓ U ≤ s4.P ⊔ (hyp.W ⊓ Subgroup.centralizer ((s4.P : Set G))) := by
+  haveI : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
+  haveI : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
+  intro v hv
+  obtain ⟨p, hp, w, hw, rfl⟩ := hfac v hv
+  refine Subgroup.mul_mem_sup hp ⟨hw, ?_⟩
+  refine Subgroup.mem_centralizer_iff.mpr fun a ha => ?_
+  -- `p` commutes with `a` because `P` is abelian, and `p * w` because `U ⊆ C_G(P)`
+  have hpa : p * a = a * p := by
+    letI := IsCyclic.commGroup (α := ↥s4.P)
+    exact congrArg (Subtype.val (p := fun z => z ∈ s4.P))
+      (mul_comm (⟨p, hp⟩ : ↥s4.P) (⟨a, ha⟩ : ↥s4.P))
+  have hva : a * (p * w) = (p * w) * a :=
+    Subgroup.mem_centralizer_iff.mp (hUC hv.2) a ha
+  have hcancel : p * (a * w) = p * (w * a) := by
+    calc p * (a * w) = (p * a) * w := by group
+      _ = (a * p) * w := by rw [hpa]
+      _ = a * (p * w) := by group
+      _ = (p * w) * a := hva
+      _ = p * (w * a) := by group
+  exact mul_left_cancel hcancel
 
 end SectionFourSetup
 
