@@ -1572,6 +1572,88 @@ full build green (4973 jobs) / lint --strict clean / sorry 0 / AxiomsCheck OK。
    `exists_mem_KSet_conj_eq_of_mem_Q0` + `centerCoord` の全単射性から)。
 4. 軌道代表系 `ω_1,…,ω_n` の形式化 (段 (20) の側条件と §2 締めの `i = k` 用)。
 
+## 2026-08-01 (8): 🎯🎯 同定完成 — `Q ≃* RootGroup q`
+
+§3 (4) が要求していた「Ch. III §3 のモデルと PSU(3,q) ユニタリ座標の同定」が
+**端から端まで閉じた**。3 コミット。
+
+### 🎯 数学的核 — `OddOrder/Algebra/AnisotropicNormForm.lean` (新 leaf)
+
+**標数 2 の有限体上、非等方な 2 変数二次形式は二次拡大のノルム形式ただ一つ**。
+既存の type B 基盤 (`Suzuki2Groups/FieldModel.lean`) は `F[X]/(X²+εX+1)` を
+*作る*向きしか持たなかった (⟸ 前セッションの「同定は既存 type B 基盤に載せる」
+という見立ては半分だけ正しかった: `mul_conj` は使えず、逆向きを書く必要があった)。
+
+| 補題 | 内容 |
+|---|---|
+| `artinSchreier` | `℘ : t ↦ t² + t` (標数 2 で加法的)、核 = `{0,1}` |
+| `index_range_artinSchreier` | 像の指数は 2 |
+| `add_mem_range_artinSchreier` | **像の外の 2 元の和は像に入る** (Arf 不変量の実体) |
+| `frobCoordEquiv` | `F` 上独立な 2 元から座標 `F × F ≃+ E` |
+| 🎯 `exists_addEquiv_norm_of_anisotropic` | **`χ x = f x · (f x)^q` なる `F`-線型全単射 `f`** |
+
+証明 (多項式・体拡大の機構を一切使わない形に組んだ):
+* 極形式 `B` は恒等的に 0 でない — さもなくば `x ↦ √(χ x)` が `E → F` の単射で
+  `q² ≤ q` に矛盾。
+* `B v w = χ v =: c` に正規化 ⟹ `χ(av+bw) = c(a² + ab + δb²)`。
+* 相対トレース 1 の `u` (repo の `exists_frobTrace_eq_one`) を取ると `u^q = u+1` で
+  **`N(a+bu) = a² + ab + b²P`** (`P := u²+u`)。⚠ ここで `{1,u}` が `F`-基底。
+* **非等方性 = `δ, P ∉ ℘(F)`** (`δ = t²+t` なら `χ(tv+w) = 0`、`P = b²+b` なら
+  `u+b ∈ {0,1}` で `u ∈ F`)。指数 2 から `δ + P = t² + t` が解け、置換
+  `a ↦ a + tb` で 2 つの形が一致。
+* ⚠ Artin–Schreier の**可解性** (`∀β∈F, ∃y∈E, y²+y=β`) は**要らなかった** —
+  必要なのは `℘(F)` の指数が 2 という一点だけ。
+
+### 🎯 捻れ積側 — `Suzuki2Groups/TwistedProductComparison.lean` (新 leaf)
+
+* `congrEquiv` を **2 余輪体版に一般化** (`QuadraticExtensions.lean`)。
+  既存の自己同型用途は `B' = B` の特殊化として不変。
+* `BilinearTwistedProduct.comap` — 座標同値に沿った余輪体の引き戻し
+  (`ZMod 2` 加群間の加法写像は自動的に線型)。
+* 🎯 `nonempty_mulEquiv_of_diag` — **対角が対応する 2 つの捻れ積は同型**。
+  ⚠ 座標同値が余輪体そのものを保つ必要は**ない** (それは `congrEquiv`) —
+  「同じ平方写像を持つ中心拡大」として `GroupExtension.equivOfCommonSquareMap`
+  (= Appendix III Lemma 1(c)) に渡す。
+
+### 🎯 合流 — `ProjectiveUnitary/RootGroupIdentification.lean` (新 leaf)
+
+* `frobFixedAddEquiv` — 環同型は `x^q = x` を保つので固定部分体が対応する。
+* 🎯 `nonempty_mulEquiv_rootGroup_of_anisotropic` —
+  **`|E| = q²` で `φ` が非等方 `F`-双線型なら
+  `BilinearTwistedProduct φ ≃* RootGroup n`**。
+  体の同定は `FiniteField.ringEquivOfCardEq` (同位数の有限体は同型)。
+
+### 🎯 適用 — `Suzuki/PSU3RootGroupModel.lean` (新 leaf)
+
+* `Hypothesis.nonempty_mulEquiv_rootGroup` — **`Q ≃* RootGroup q`**。
+  仮説は `exists_standardModel` の出力そのもの + `θ = 1` (§3 (3) +
+  `thetaModel_eq_id_on_frobFixed`)。`θ` は素の関数として取る (2 つの束ね方
+  (`≃ₐ[ZMod 2]` と `→+*`) の差を吸収し、`F` 上の値しか使わないため)。
+
+### 📊 状態
+
+| 段 | 状態 |
+|---|---|
+| §1 / §2 (1)-(20) | ✅ 完了 |
+| §3 (1)(2)(3) | ✅ 完了 |
+| §3 (4) 座標橋 | ✅ **完了** (本セッション) |
+| §3 (4) 本体 | ⬜ `f(ρ̄,y) = (ρ̄/y, 1/y)` の計算 |
+
+すべて sorry 0 / AxiomsCheck OK (propext, Classical.choice, Quot.sound) / lint clean。
+
+### ⚠ 次の一手
+
+1. **§3 (4) 本体**。骨格は 2026-08-01 の設計調査どおり:
+   `(1)+(3)` から `a ∈ F^#` の等式 → (2) で `f(ω̄, x+a) = (ω̄/(a+ζ⁻¹), γ(a))` →
+   第 2 成分の比較で `(∗∗) (a²+1)γ(a) = x + a + (1+ζ⁻²)/(a+ζ⁻¹)` →
+   `a = 1` で `x = ζ⁻¹` → `γ(a) = 1/(a+ζ⁻¹)` → 残り 1 点を `ω ↦ ω⁻¹`, `ζ ↦ ζ⁻¹` で。
+   ⚠ **`Q ≃* RootGroup q` の具体的な形が要る**: 現在の
+   `nonempty_mulEquiv_rootGroup` は `Nonempty` (存在) しか言わない。(4) の計算は
+   `f` (Ch. IV の写像) を座標に写して行うので、**同型を 1 つ固定して
+   `Q` 側の既知の等式 (§2, §3 (1)-(3)) を座標に翻訳する**層が要る。
+2. `5 ≤ |F|` の供給 (場合分けは下記に既述)。
+3. 軌道代表系 `ω_1,…,ω_n` の形式化。
+
 ## セッション総括 (2026-07-31)
 
 **Ch. IV で形式化されたもの** (すべて sorry 0 / AxiomsCheck OK / lint 0):
