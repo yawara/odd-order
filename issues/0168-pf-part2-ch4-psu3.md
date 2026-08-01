@@ -6707,3 +6707,37 @@ genuine な結果として残る (§3 の Proposition は実際に `C/𝒩(C)` �
 実現可能性を実測する: `L̄` の 2 つの 2-推移作用 (`L̄ ⧸ M̄` と `ULift (Unital ℓ)`) が
 同値であること (= 点集合の同変全単射) をどう作るか。(119) の `intrinsicPointEquiv` は
 集合としての全単射までは作っているので、それが**同変**になるよう取り直せるかが鍵。
+
+## 2026-08-02 (129): 標準仮説の**剛性** — `Q` は Sylow 2、`M = N_L(Q)`
+
+照合 (経路 A) の骨格 2 本が landing。⚠ **どちらもモデルを一切使わない汎用の `Setup` の定理**。
+
+* `Setup.natCard_M` / `Setup.index_M` / `Setup.natCard_L` —
+  **`|L| = |Q| · |D| · (1 + |Q|)`**。`M = Q ⋊ D` の一意分解が全単射 `Q × D ≃ M` を与え、
+  `L ⧸ M ≅ Q ∪ {a}` (`coordsEquiv`, Ch. IV §1 p.123) が `[L:M] = 1 + |Q|` を与える。
+* `Setup.exists_sylow_two_eq` — `Q` が 2-群 / `|D|` 奇 / `|Q|` 偶 ⟹ **`Q` は Sylow 2**
+  (残り 2 因子が奇なので `[L:Q]` が奇)。
+* `Setup.normalizer_Q_eq` — `Q ≠ 1` ⟹ **`N_L(Q) = M`**。極大性も単純性も使わない:
+  `x ∉ M` を `a·t·b` と分解すると `t` も `Q` を正規化することになり、
+  `t q t ∈ Q ≤ M` が `Setup.tconj` (`Q^t ∩ M = 1`) に反する。
+
+⟹ **同じ `L` 上の 2 つの setup は `Q` が Sylow 2 ゆえ共役、`M = N_L(Q)` ゆえ `M` も
+同じ共役で移る**。
+
+### ⚠ 次セッションはここから — 照合の残り 3 段
+
+1. **`Setup.exists_conj_eq`** (組み立て) — 上 2 本 + Sylow の共役性
+   (`MulAction.exists_smul_eq` on `Sylow 2 L`, `Sylow.coe_subgroup_smul`) +
+   `Subgroup.map_equiv_normalizer_eq` で
+   `∃ c, Q.map (conj c) = Q' ∧ M.map (conj c) = M'`。
+   ⚠ `Subgroup.normalizer` はこの mathlib では `Set` 引数なので、
+   `map`/`normalizer` の交換補題の形に注意 (`map_equiv_normalizer_eq` を実測すること)。
+2. **`D` の照合** — `D`, `D'` は `M` の中の `Q` の補群で位数が互いに素なので
+   Schur–Zassenhaus で共役。`M` の元でさらに共役を取る。
+3. **`t` の照合** — `exists_mem_K_conj_t_eq` (110) が「2 つの distinguished involution は
+   `K` の元だけずれる」を扱う。
+
+⟹ 3 段が揃えば `L̄` の自己同型 `φ` で
+`φ(H_tr, Q_tr, D_tr, t_tr) = (M̄, Q̄, D̄, t̄)` が取れ、transported 側の
+`residualQuotientHypothesis_V_eq_W` 等から **`hVW` / `hKcard` / `hWdvd` / `∃w∈W̄` が
+まとめて移送できる**。
