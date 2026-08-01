@@ -1111,6 +1111,84 @@ theorem stepFour_cover {m : ℕ} (M : hyp.QuotientFieldModel m)
     exact ⟨hA.trans (by rw [hq]), hB⟩
   · exact h1 ρ hρQ hfρQ hfib hy
 
+/-- **Peterfalvi Part II, Ch. IV §3, Corollary 2** (p. 132): for every `ζ ∈ W^#` there
+is an `ω ∈ Q − Q₀` with `f(ω) = ω^{-ζ}`.
+
+The element is built from `ζ` rather than found: `exists_normPreimage_of_mem_W` supplies
+`ω̄` with `ω̄^{1+q} = Tr μ(ζ)`, so `(ω̄, μ(ζ))` is a legitimate pair of unitary
+coordinates (`ofUnitary`); stage (5) then evaluates `f` there, and
+`f_eq_conj_inv_of_inverseFormula` recognizes the answer as `ω^{-ζ}`.
+
+`ω ∉ Q₀` because its quotient coordinate `ω̄` is nonzero.
+
+Stage (5) enters as the hypothesis `hfive`; the book's second conclusion `h(ω) = ζ³` is
+`h_eq_zpow_three` applied to the first (it needs `h(ω) ∈ W`, which the book reads off
+(H5)). -/
+theorem corollaryTwo (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hVW : hyp.V = hyp.W)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (hquot : ∀ ρ : ↥hyp.Q, (Φ ρ).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) ρ)))
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {e : M.E} (hΨq : ∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient)
+    (hconjq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      (Ψ (hyp.conjQHom kv ρ)).quotient
+        = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ρ).quotient)
+    (hconjy : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W) (ρ : ↥hyp.Q),
+      Suzuki2Groups.unitaryCoord m u (Ψ (hyp.conjQHom kv ρ))
+        = ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1) *
+          Suzuki2Groups.unitaryCoord m u (Ψ ρ))
+    (hmu : Function.Injective M.mu)
+    {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1)
+    (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
+    (hfive : ∀ (ρ : G) (hρQ : ρ ∈ hyp.Q), ρ ∉ hyp.Q0 →
+      (Ψ ⟨f ρ, hfQ ρ hρQ⟩).quotient
+          = (Ψ ⟨ρ, hρQ⟩).quotient /
+            Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩) ∧
+        Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ρ, hfQ ρ hρQ⟩)
+          = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹)
+    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W) :
+    ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
+  classical
+  obtain ⟨r, hr0, hrtr⟩ := hyp.exists_normPreimage_of_mem_W M hmu hζ1
+  set p : Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu) :=
+    Suzuki2Groups.ofUnitary m M.card hu r
+      ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) hrtr with hp
+  set ωQ : ↥hyp.Q := Ψ.symm p with hωQdef
+  have hΨp : Ψ ωQ = p := Ψ.apply_symm_apply p
+  have hωmem : (ωQ : G) ∈ hyp.Q := ωQ.2
+  have hcoe : (⟨(ωQ : G), hωmem⟩ : ↥hyp.Q) = ωQ := rfl
+  have hq : (Ψ (⟨(ωQ : G), hωmem⟩ : ↥hyp.Q)).quotient = r := by
+    rw [hcoe, hΨp, hp]
+    exact Suzuki2Groups.ofUnitary_quotient m M.card hu _ _ hrtr
+  have hy : Suzuki2Groups.unitaryCoord m u (Ψ (⟨(ωQ : G), hωmem⟩ : ↥hyp.Q))
+      = ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) := by
+    rw [hcoe, hΨp, hp]
+    exact Suzuki2Groups.ofUnitary_unitaryCoord m M.card hu _ _ hrtr
+  -- `ω ∉ Q₀`: its quotient coordinate is `r ≠ 0`
+  have hnotQ0 : (ωQ : G) ∉ hyp.Q0 := by
+    intro hc
+    refine hr0 ?_
+    rw [← hq, hΨq, hquot]
+    rw [show M.coord (Additive.ofMul (QuotientGroup.mk'
+          (Subgroup.center hyp.Q) (⟨(ωQ : G), hωmem⟩ : ↥hyp.Q)))
+        = M.coord (Additive.ofMul (QuotientGroup.mk
+          (⟨(ωQ : G), hωmem⟩ : ↥hyp.Q))) from rfl,
+      hyp.coord_mk_eq_zero_of_mem_Q0 M hZc hc hωmem, mul_zero]
+  obtain ⟨h1, h2⟩ := hfive (ωQ : G) hωmem hnotQ0
+  have hfeq := hyp.f_eq_conj_inv_of_inverseFormula M hu Ψ hconjq hconjy hζ hωmem
+    (hfQ _ hωmem) hy h1 h2
+  exact ⟨(ωQ : G), hωmem, hnotQ0, hfeq,
+    hyp.h_eq_zpow_three H M hZc hmu hVW hζ hωmem hnotQ0 hfeq
+      (hhW _ hωmem hnotQ0)⟩
+
 /-! ### Stage (5): the formula is `K W`-equivariant -/
 
 /-- **(H3) for the `K W`-action, in the shape `conjQHom` uses**:
