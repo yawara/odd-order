@@ -3954,3 +3954,39 @@ def Q0 : Subgroup G where carrier := {x | x ^ 2 = 1 ∧ x ∈ hyp.H}
 2. 上の 2-part 論法で `qhyp.Q0 = Q0_L.map pi` を示す。
 3. `centralizerQ0QuotientEquiv` → `exists_standardModel` for `qhyp` →
    段 (4) 鎖 → `hcover` → 段 (2)。
+
+## 2026-08-01 (68): `|N|` 奇数の根拠 — `Hypothesis.D_odd` は**構造フィールド**
+
+`D_odd : Odd (Nat.card D)` は `Hypothesis` の**構造フィールド** (`Basic.lean:161`)。
+`N ≤ hyp.D.subgroupOf L` (`centralizerQQuotientEquiv` の `hNleD`) なので
+`|N| ∣ |D|` で `|N|` は奇数。⟹ (67) の 2-part 論法がそのまま走る。
+
+### `centralizerQ0QuotientEquiv` の材料 (完成)
+
+| 部分 | 根拠 |
+|---|---|
+| 単射性 | `Q0_L ≤ Q_L` + `Q_L ⊓ D_L = ⊥` (`Q` 版と同じ) |
+| `Q0_L.map π ≤ qhyp.Q0` | `x² = 1 ⟹ x̄² = 1`、`Subgroup.mem_map` |
+| `qhyp.Q0 ≤ Q0_L.map π` | `comap_map_eq_self` で `x ∈ C_H(X)` を取り、`|N|` 奇 (`D_odd`) から `y := x^m` (`m` = `x` の位数の奇部分) が `y² = 1`、`π y = x̄` |
+
+⟹ **材料は全部そろった。次セッションは実装のみ**。
+
+### 本セッション (2026-08-01) の最終状態
+
+**landing した Lean 成果** (すべてフルビルド green・lint 純ゼロ・axiom-clean):
+
+1. §3 完成 — `stepFive` / `corollaryTwo_of_stepFour`
+2. §1 の Lemma 一式 — `RankOneBNPairRigidity.lean` (新 leaf) +
+   `closure_iUnion_conj_eq_primeComplementResidual` + `IsFGH.eq_of_le`
+3. §4 の純算術**全部** — `FixedPointDensity.lean` + `PSU3SectionFourArithmetic.lean`
+   ((5)(6)⟹(7)(8) / 分母≠0 / (9) / shift trick / `μ²=id` / `λ=1` / 奇位数)
+4. §4 段 (1) — `nonempty_psu3Data_of_orderOf_eq_three` (枝選択) +
+   `PSU3SectionFourSetup.lean` (standing hypothesis + 3 結論 + Glauberman)
+5. §4 段 (2) の部品 — `V ∩ U ⊆ P × C_W(P)` / `t ∈ U` /
+   `theoremAInductionBelow_centralizerActionQuotient`
+6. 一般化 2 件 — `natCard_Q0_eq_pow` (Artin) / `eq_one_of_conj_eq_mul_Q0_of_mem_W`
+
+**残り**: `centralizerQ0QuotientEquiv` 1 本 → `exists_standardModel` for `qhyp` →
+段 (4) 鎖 → `hcover` → 段 (2) → 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
+
+⚠ 訂正 2 件を記録済: `O^{2'}` は repo にある (43) / `Q₀` 版同型は制限では出ない (67)。
