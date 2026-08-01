@@ -49,6 +49,8 @@ element of `Q − Q₀` does *not* square to `1`.
 * `SectionFourSetup.inf_le_sup_W_of_centralizes`,
   `SectionFourSetup.inf_le_sup_centralizer_W` — step (2)'s `V ∩ U ⊆ P W` and
   `V ∩ U ⊆ P × C_W(P)`.
+* `SectionFourSetup.t_mem_centralizer`, `SectionFourSetup.t_mem_primeComplementResidual`
+  — `t ∈ U`, which is what lets §4 use the *same* involution inside `U`.
 -/
 
 set_option autoImplicit false
@@ -422,6 +424,40 @@ theorem inf_le_sup_centralizer_W {U : Subgroup G}
       _ = (p * w) * a := hva
       _ = p * (w * a) := by group
   exact mul_left_cancel hcancel
+
+/-! ### `t` lives in `U`
+
+Ch. IV §4 works with `f₁`, `h₁` "relative to `U`, `U ∩ H` and `t`" (p. 133) — the *same*
+involution `t`.  That is legitimate: `t` centralizes `V ⊇ P`, and being an involution it
+is a `2`-element, so it lies in a Sylow `2`-subgroup of `C_G(P)` and hence in
+`O^{2'}(C_G(P)) = U`. -/
+
+/-- `t` centralizes `P`, since `P ≤ V` and `t` centralizes `V`. -/
+theorem t_mem_centralizer : hyp.t ∈ Subgroup.centralizer ((s4.P : Set G)) := by
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hx
+  exact (hyp.commute_t_of_mem_V (s4.P_le_V hx)).eq
+
+/-- **`t ∈ U = O^{2'}(C_G(P))`.** -/
+theorem t_mem_primeComplementResidual :
+    (⟨hyp.t, s4.t_mem_centralizer⟩ :
+        ↥(Subgroup.centralizer ((s4.P : Set G)))) ∈
+      Subgroup.primeComplementResidual 2
+        (Subgroup.centralizer ((s4.P : Set G))) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set tC : ↥(Subgroup.centralizer ((s4.P : Set G))) :=
+    ⟨hyp.t, s4.t_mem_centralizer⟩ with htCdef
+  have htsq : tC ^ 2 = 1 := Subtype.ext (by simpa [htCdef] using hyp.t_sq)
+  have hT : IsPGroup 2 ↥(Subgroup.zpowers tC) := by
+    have hdvd : orderOf tC ∣ 2 := orderOf_dvd_of_pow_eq_one htsq
+    have hcard : Nat.card ↥(Subgroup.zpowers tC) = orderOf tC := Nat.card_zpowers tC
+    rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h1 | h2
+    · exact IsPGroup.of_card (n := 0) (by rw [hcard, h1]; norm_num)
+    · exact IsPGroup.of_card (n := 1) (by rw [hcard, h2]; norm_num)
+  obtain ⟨S, hS⟩ := hT.exists_le_sylow
+  exact Subgroup.le_primeComplementResidual S
+    (hS (Subgroup.mem_zpowers tC))
 
 end SectionFourSetup
 
