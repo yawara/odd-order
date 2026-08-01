@@ -6676,3 +6676,34 @@ genuine な結果として残る (§3 の Proposition は実際に `C/𝒩(C)` �
 
 ⟹ 照合 (経路 A) が本当に必要なのはここ。`M̄` と transported `H` はどちらも
 `L̄` の点安定化群なので共役 (121 の実測) — その共役で `V`,`K`,`W` も対応する。
+
+## 2026-08-02 (128): `∃ w ∈ W̄, w ≠ 1` を ambient の言葉に還元
+
+`commute_of_commute_mk'_center_of_mem_D_of_mem_Q` (今回) + `W_eq_inf_centralizer_Q0`
+(generic) + `Q0_intrinsicResidualQuotient_eq` ((118)) で:
+
+> **`∃ w ∈ W̄, w ≠ 1`  ⟺  `∃ v ∈ D ∩ U` with `v ∉ Z(U)` centralizing `C_{Q₀}(X)`**
+
+(核 `Z(U)` は `Q`-側で落ちる: `[v,u] ∈ Q ⊓ Z(U) ≤ Q ⊓ D = 1`。)
+
+⚠ 残るのは**その `v` を `U` の中で作ること**。ambient の
+`SectionFourSetup.exists_ne_one_mem_W_centralizer` は `ζ ∈ W ⊓ C_G(X)`, `ζ ≠ 1` を
+与えるが `ζ ∈ U` は言わない (`ζ` は奇位数で、`U = O^{2'}(C)` は `C` の奇位数商を持つ)。
+書籍が `ζ₁ ∈ (V ∩ U) − (P ∩ U)` を `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` で
+作っているのはまさにここ。
+
+### ⚠ 次セッションの選択肢 (どちらかを裁定する)
+
+**(a) 指数計算を正面から** — `|(V ∩ U)/(P ∩ U)|` をモデルから計算する。
+`U/Z(U) ≅ PSU(3,ℓ)` の中で `V̄ = W̄` の位数が `(ℓ+1)/(ℓ+1,3)` であることを使う。
+⟹ transported 版の `W` の位数が要る (`standardHypothesis` 側に在るか実測)。
+
+**(b) 照合 (経路 A)** — `M̄` と transported `H` が `L̄` の点安定化群として共役
+((121) の実測) であることを使い、`V`,`K`,`W` の対応を出す。これが取れれば
+`∃ w ∈ W̄` だけでなく `hVW` / `hKcard` / `hWdvd` も**まとめて**移送できる
+(transported 版には `residualQuotientHypothesis_V_eq_W` が在る)。
+
+⟹ **(b) のほうが 4 本まとめて片付くので有利**に見える。次セッションは (b) の
+実現可能性を実測する: `L̄` の 2 つの 2-推移作用 (`L̄ ⧸ M̄` と `ULift (Unital ℓ)`) が
+同値であること (= 点集合の同変全単射) をどう作るか。(119) の `intrinsicPointEquiv` は
+集合としての全単射までは作っているので、それが**同変**になるよう取り直せるかが鍵。
