@@ -7258,3 +7258,25 @@ ULift 版へ `intrinsicResidualQuotientULift_{H,Q,D,t}` + section `SameGroup` �
 ⟹ 残る本物の仕事は**「§2 を `U` について走らせる」の 2 件だけ**。これは書籍 step (2) の
 "run §2 and §3 relative to `U`" の §2 側そのもの。§3 側 (Proposition + Corollary 2 の
 経路) は揃った。
+
+### (145) `stepNine` が base pair を出す — 残債は `hsq` (§2 (20)) と `hpair` の 2 つに確定
+
+(144) の「§2 の base pair」を実測したところ、**大半は既にある**:
+
+* `PSU3OrbitCount.stepNine` (§2 (9), 書籍 p.124-125) が
+  `∃ ω' ∈ Q, ω' ∉ Q₀ ∧ ∃ y ∈ Q₀, y ≠ 1 ∧ f ω' = ζ⁻¹(ω' y)ζ` を**出す** — これが
+  書籍 p.125 の「ω_i は f(ω_i) = (ω_i y_i)^ζ となるよう選んでよい」の正規化。
+* 欠けるのは **`ω'² = y`** だけ。これは §2 (20) (`f_eq_conj_inv_of_stepTwenty_chain` の
+  第一結論) で、その docstring 曰く「ω_1,…,ω_n が相異なる `KW` 軌道にあるという族は
+  形式化されていないので `ω_i = ω_k` の一致は仮定」。⟹ repo 側で未閉の §2 項目。
+
+`corollaryTwo_of_isStandardModel_of_normalization` (`8a81d822e`) は `stepNine` を内部で
+呼び、`hsq : ∀ ω' ∈ Q, ω' ∉ Q₀ → ∀ y ∈ Q₀, f ω' = ζ₀⁻¹(ω' y)ζ₀ → ω'² = y` のみを取る。
+
+**⟹ 段 (2) の残債 = `hsq` (§2 (20)) と `hpair` (type-`B` scaling pair + 奇位数) の 2 本**
+(いずれも書籍 step (2) の "run §2 relative to `U`" 側)。§3 側は完備。
+
+次セッションの着手順 (上流優先):
+1. `hpair` — `U/Z(U)` の type-`B` scaling pair。§3 の type-`B` 入力を内在版へ移す仕事。
+2. `hsq` — §2 (20)。`f_eq_conj_inv_of_stepTwenty_chain` の未形式化前提
+   (相異なる `KW` 軌道の代表族) を先に形式化するのが本筋。
