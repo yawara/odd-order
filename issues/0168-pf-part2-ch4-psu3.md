@@ -4754,3 +4754,53 @@ repo が `C_G(P)/N` を選んだのは (57)(58) で既存構成 `centralizerQuot
 2. `V = W` を証明 (`torusWeight_eq_one_of_commute_weylElement` +
    `commute_rootHom_of_commute_weylElement` + `W_eq_inf_centralizer_Q0` + `W_le_V`)。
 3. `residualQuotientEquiv` で `U/Z(U)` へ transport → §3 endpoint → 段 (2)。
+
+## 2026-08-01 (86): 🎯 標準モデル `Hypothesis` 完成 + `hVW` が**定理**になった
+
+新 leaf `OddOrder/Peterfalvi/Appendices/Suzuki/StandardModelHypothesis.lean`
+(`OddOrder.lean` に同 commit で配線済、フルビルド green 4987 jobs・lint 純ゼロ)。
+
+`standardHypothesis (n : ℕ) (hn : 1 < n) : Hypothesis (standardPermGroup n) (Unital n)`
+
+| フィールド | 実装 |
+|---|---|
+| `basept` / `doubly_transitive` | `Unital.infinity n` / `standardPermGroup_isMultiplyPretransitive` |
+| `faithful` | `Equiv.Perm` の部分群 (`Subtype.ext ∘ Equiv.ext`) |
+| `H` / `H_def` | `standardBorel n` / `standardBorel_eq_infinityStabilizer` |
+| `Q` / `D` / `t` | `standardRootSubgroup n` / `(psuTorusHom n).range` / `weylElement n` |
+| `t_ne_one` / `t_not_mem_H` | `weylElement_smul_infinity_ne` (新) |
+| `D_def` | `standardBorel_inf_conj_weylElement` (84) |
+| `Q_normal_in_H` | `conj_mem_standardRootSubgroup_of_mem_standardBorel` (新) |
+| `Q_inf_D_eq_bot` / `Q_mul_D_eq_H` | (85) |
+| `Q_even` / `D_odd` | `natCard_standardRootSubgroup` / `odd_natCard_psuTorusRange` (新) |
+| `two_rank_ge_two` | `exists_subgroup_card_four` (新) |
+
+⚠ `two_rank_ge_two` の実装メモ: 位数 4 部分群は **`Ω₁(S₀)` (根群の中心線
+`RootGroup.centerLine`、位数 `2ⁿ`、exponent 2) の中で** `Sylow.exists_subgroup_card_pow_prime`
+で取る。群全体から取ると巡回群になりうる ((85) の警告どおり)。
+`|centerLine| = 2ⁿ` は `centerLineEquivFixed` + `natCard_fixedByConjugation`。
+
+### 🎯 `standardHypothesis_V_eq_W` — 想定より遥かに安かった
+
+(83) では「ノルム 1 トーラスが根群の対合を中心化する」
+(`commute_rootHom_of_commute_weylElement`) 経路を想定していたが、実際は
+
+> `W = C_V(K)`、`K ⊆ D`、そして **`D` (行列式 1 トーラス) は可換** ⟹
+> `V ≤ D` は `K` を自動的に中心化する
+
+で **3 行**。⟹ (82) で「弱められない」と確定した `hVW` が、正しい対象では自明に成立。
+(83) の hub 裁定が正しかったことが実証された。
+
+### ⚠ 次セッションはここから
+
+1. **§3 の endpoint を `standardHypothesis` に当てる**。
+   `corollaryTwo_of_stepFour` の残り前提 (`sfive`, `M`, `Φ`, `Ψ`, `hcover` …) を
+   `standardHypothesis n hn` について供給する。⚠ `psu3Numerics_and_standingData_*` と
+   同じ流儀で、まず `hst` (`|s̄t̄| = 3`) / `hQsuz` / `hm` / `hQ0card` / `hcardQ` /
+   `ih` を標準モデルについて出す (標準モデルなので**直接計算**できるはず:
+   `|Q₀| = |Ω₁(S₀)| = 2ⁿ`、`|Q| = 2^{3n} = |Q₀|³`)。
+   ⚠ `ih : TheoremAInductionBelow (standardPermGroup n) (Unital n)` の供給が要注意 —
+   標準モデルは「より小さい群すべて」の量化を要求する。実測すること。
+2. `residualQuotientEquiv` で `U/Z(U)` へ transport し、段 (2) の `ω`, `ζ`, `η` を
+   ambient へ持ち上げる (`IsFGH.eq_of_le`)。
+3. 段 (3)-(10) は landing 済 ⟹ **§4 完成**。
