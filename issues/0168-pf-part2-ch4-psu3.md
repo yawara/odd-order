@@ -2425,3 +2425,43 @@ lint 0、フルビルド green (4980 jobs)。
 3. 1+2+`stepFive_secondCase` で第 2 ケース → `stepFive_orbit` と合わせて段 (5) 完成。
 4. その後 p.132 以降 (段 (6)-)。⚠ p.132-134 はまだ**未調査** — ページ画像で
    段の一覧を作るところから。
+
+## 2026-08-01 (24): §2 段 (8)/(2) 実測完了、段 (5) 第 2 ケースの部品
+
+### 実測結果 (辞書)
+
+| 書籍 | repo | 形 |
+|---|---|---|
+| §2 段 (8) | `PSU3OrbitCount.stepEight` | `orbitOfF` の各ファイバーが `\|W\|` (基点だけ `\|W\|−1`) |
+| §2 段 (2) | `PSU3Preliminary.f_mul_conj_distinguishedInvolution` | `f(ω s^a) = f(f(ω) s^{a⁻¹})^{a⁻²} s^{a⁻¹}` (`a ∈ K`) |
+| §2 段 (3) | `PSU3Preliminary.f_conj_distinguishedInvolution_mul` | `f(s^a ω) = f(s^{a⁻¹} g(ω))^{h(ω)^t} f(ω)` |
+
+⚠ **§2 段 (2) の指数 `a⁻²` と p.131 の `a⁻¹` は同じもの**: p.131 の助変数は
+中心座標 `A = μ(a)²` なので、共役 `x ↦ x^{a⁻²}` は商座標を `μ(a)⁻² = A⁻¹` 倍する。
+⟹ p.131 の `f(ρ̄,x+A) = f(ω̄',x'+A⁻¹)^{A⁻¹}(0,A⁻¹)` と一致する
+(`stepFive_secondCase` の `a` は書籍の `a` = `A`)。
+
+### 追加した部品
+
+* **`exists_mem_Q0_orbitOfF_eq`** — 段 (8) から「空のファイバーが無い」(`|W| > 1`)
+  ⟹ `ρ` を `ρQ₀` 内で取り替えて `f(ρ)` を任意の `KW`-軌道に入れられる
+* **`inverseFormula_symm`** — 逆元公式は自己逆 (`f` が対合ゆえ、軌道内に置いた
+  `f(ρ)` 側の情報が `ρ` 側の公式に翻る)
+
+### ⚠ 次セッションはここから (段 (5) の第 2 ケース組み立て)
+
+手順 (全部品は揃っている):
+
+1. `exists_mem_Q0_orbitOfF_eq` で `x₀ ∈ Q₀` を取り `ρ' := ρ x₀`
+   (商座標は不変なので同じファイバー)。`f(ρ')‾` が `ω̄` の `KW`-軌道内。
+2. `f(ρ')` に**第 1 ケース** (`stepFour_cover` + `stepFive_orbit`) を適用。
+   `hTwo` (H2, `f∘f = id`) で `f(f(ρ')) = ρ'`。⟹ `inverseFormula_symm` により
+   `f(ρ')` の座標が `(ρ̄/x, 1/x)` と確定 (`ρ' = (ρ̄,x)`)。
+3. §2 段 (2) (`f_mul_conj_distinguishedInvolution`) を `Ψ` で送り、
+   `stepFive_secondCase` に食わせて `f(ρ' s^a) = (ρ̄/(x+A), 1/(x+A))`。
+   ⚠ 座標に落とす層は `stepFour_star` の 4 因子計算と同じ作り
+   (`hconjq`/`hconjy` + `mu_norm_eq` + `unitaryCoord_mul_conj`)。
+4. `ρ'` 自身は 2. で既に片付いている (`A = 0` に相当) ので、
+   3 と合わせて `ρ'Q₀` = ファイバー全体を被覆 → 段 (5) 完成。
+
+その後 p.132-134 (段 (6) 以降) は**未調査** — ページ画像で段の一覧を作ることから。
