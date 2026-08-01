@@ -681,6 +681,38 @@ theorem exists_mem_K_mu_sq_inv_eq {m : ℕ} (hm : m ≠ 0)
   have hkActor : hyp.kActor x.2 = k := Subtype.ext hx
   rw [hyp.mu_kActor_sq M x.2, hkActor, hk, hrsq, inv_inv]
 
+/-- **`w = ζ + ζ⁻¹` lies in `F`** (Peterfalvi Part II, p. 130: `(∗)` is an equation of
+`F`, even though `ζ` itself is not in `F`).
+
+The bar operation `x ↦ x^q` inverts `W₁` (`bar_mu_W`), so it exchanges the two summands
+and fixes their sum — `w` is the trace of `ζ`. -/
+theorem mu_W_add_inv_mem_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m) (v : ↥hyp.W) :
+    ((M.mu (1, v) : M.Eˣ) : M.E) + ((M.mu (1, v) : M.Eˣ) : M.E)⁻¹
+      ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  rw [OddOrder.FiniteField.mem_frobFixedSubfield, ← M.bar_apply, map_add, M.bar_mu_W v,
+    map_inv₀, M.bar_mu_W v, inv_inv, add_comm]
+
+/-- **`w = ζ + ζ⁻¹ ≠ 0` for `ζ ≠ 1`**: otherwise `ζ` would be its own inverse, hence — in
+characteristic `2`, where squaring is injective — trivial, and `μ` is faithful. -/
+theorem mu_W_add_inv_ne_zero {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hmu : Function.Injective M.mu) {v : ↥hyp.W} (hv : v ≠ 1) :
+    ((M.mu (1, v) : M.Eˣ) : M.E) + ((M.mu (1, v) : M.Eˣ) : M.E)⁻¹ ≠ 0 := by
+  intro hzero
+  have h2E : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  have hne : ((M.mu (1, v) : M.Eˣ) : M.E) ≠ 0 := Units.ne_zero _
+  -- `Z + Z⁻¹ = 0` gives `Z² = 1`, and `(Z + 1)² = Z² + 1`
+  have hsq : (((M.mu (1, v) : M.Eˣ) : M.E) + 1) ^ 2 = 0 := by
+    have hmul := congrArg (fun x => x * ((M.mu (1, v) : M.Eˣ) : M.E)) hzero
+    simp only [add_mul, inv_mul_cancel₀ hne, zero_mul] at hmul
+    linear_combination hmul + ((M.mu (1, v) : M.Eˣ) : M.E) * h2E
+  have hone : ((M.mu (1, v) : M.Eˣ) : M.E) + 1 = 0 := pow_eq_zero_iff two_ne_zero |>.mp hsq
+  have hval : ((M.mu (1, v) : M.Eˣ) : M.E) = 1 := by linear_combination hone - h2E
+  have hmu1 : M.mu (1, v) = 1 := Units.ext hval
+  exact hv (congrArg Prod.snd (hmu (hmu1.trans (map_one M.mu).symm)))
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
