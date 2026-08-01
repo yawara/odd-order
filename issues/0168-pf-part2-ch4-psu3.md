@@ -5189,3 +5189,48 @@ standardHypothesisULift (n) (hn : 1 < n) :
 2. 上表の前提を `hU` について並べ、`exists_standardModel` を呼ぶ。
 3. → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2) の `ω`, `ζ` を得る。
 4. 商から ambient へ持ち上げ (`IsFGH.eq_of_le`) ⟹ **段 (2) が閉じる** ⟹ §4 完成。
+
+## 2026-08-01 (96): 🎯 `U/Z(U)` 上の標準仮説が組めた + §3 前提 5 本
+
+新 leaf `PSU3SectionFourModel.lean` (`OddOrder.lean` 配線済、フルビルド green 4989 jobs・
+lint 純ゼロ)。
+
+* **`Hypothesis.residualQuotientHypothesis (details : CentralizerPSUData …)`** —
+  標準 `PSU(3,ℓ)` モデルを `CentralizerPSUData.residualQuotientEquiv` に沿って
+  `U/Z(U)` へ移した (A1)-(A3) carrier。書籍 p.133 が「`U`, `U ∩ H`, `t` に関して」
+  §2/§3 を走らせる、その `U/(P∩U) = U/Z(U)` ((83) の裁定どおり)。
+* 前提 5 本 (標準モデルからの transport):
+  `residualQuotientHypothesis_V_eq_W` / `natCard_residualQuotientHypothesis_Q0` (`= 2ⁿ`) /
+  `natCard_residualQuotientHypothesis_Q` (`= |Q₀|³`) /
+  `..._orderOf_distinguishedInvolution_mul_t` (`= 3`) /
+  `exists_ne_one_mem_residualQuotientHypothesis_W`。
+* 支援: `HypothesisTransport.lean` に `ofMulEquivPullback_*` 5 本。
+
+### ⚠ 実装メモ (再現用、どれも 1 回ずつ踏んだ)
+
+1. **型の `letI` は項モードの本体からは見えない** ⟹ `by letI := …; exact …` にする。
+2. `ofMulEquivPullback` は同変性証明を**内部で固定**するので、汎用 `ofMulEquiv_*` を
+   使用点で当てると `hf` が推論できない ⟹ pullback 形の言い直しが要る。
+3. `ULift` を含む補題は **universe を明示** (`.{v}`) しないと universe metavariable が残る。
+
+### ⚠⚠ 未解決: `theoremAInductionBelow_residualQuotient` が elaborate しない
+
+`TheoremAInductionBelow.of_natCard_le` を `B := ↥U ⧸ Z(U)`, `Λ' := ULift.{v} (Unital n)`
+で当てようとすると **`Finite ?m` で typeclass instance problem is stuck**。
+`(G := G) (Ω := Ω) (B := …) (Λ' := …)` を明示しても解消しなかった。
+⟹ **この 1 本だけ leaf から外して commit** (他の 5 本と carrier はすべて green)。
+
+⚠ 次セッションの調査方針:
+* `of_natCard_le` の `[Finite B]` が `↥U ⧸ Z(U)` について合成できているか単独で確認する
+  (`example : Finite (↥(residual X) ⧸ Subgroup.center _) := inferInstance`)。
+  `Subgroup.center` の引数が `_` のままだと決まらない可能性が高い ⟹
+  `Subgroup.center ↥(residual (G := G) X)` と完全に書く。
+* それでも駄目なら `@TheoremAInductionBelow.of_natCard_le` で全引数明示。
+* あるいは `of_natCard_le` の `[Finite B]` を `Finite B` の明示引数に変える。
+
+### ⚠ 次セッションはここから
+
+1. 上記 `ih` 供給の 1 本を通す。
+2. 6 本そろったら `exists_standardModel` を `residualQuotientHypothesis` に当てる。
+3. → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2) の `ω`, `ζ`。
+4. 商から ambient へ持ち上げ (`IsFGH.eq_of_le`) ⟹ **段 (2) が閉じる** ⟹ §4 完成。
