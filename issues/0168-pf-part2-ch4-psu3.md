@@ -2656,3 +2656,32 @@ p.132 をページ画像で確認した結果、Ch. IV の残りは以下の構�
 2. `RankOneBNPair` の Lemma (`f` が `L` を決める) → **Corollary 1**。
 3. **§4** (p.132-134、`V ≠ W`)。⚠ Ch. I §3 Prop 1(c) / Ch. I §2 Prop 3 /
    Ch. II (11) の repo 対応物を先に実測。
+
+## 2026-08-01 (31): 段 (5) 最終梱包の部品 + 全結果の axiom 監査
+
+新結果はすべて **axiom-clean** を確認 (`propext`/`Classical.choice`/`Quot.sound` のみ):
+`stepFour_elem` / `stepFour_cover` / `stepFive_orbit` / `stepFive_secondCase_elem` /
+`corollaryTwo`。
+
+追加した梱包部品 (`PSU3StepFive.lean`):
+
+* **`exists_mem_K_conjQHom_eq`** — 任意の `kv` は `K` の明示元での `conjQHom`
+  (`actualKActor` = `conjQByK` の像)。軌道条件が出す抽象的 `kv` を
+  `k ∈ G` を名指しする `stepFive_orbit` に繋ぐ橋。
+* **`exists_conjQHom_eq_of_quotient_smul`** — `ρ` の商座標が `ω` の `μ(kv)` 倍なら
+  `ρ = (ω のファイバー内の元)^{kv}`。証明は `σ := conjQHom kv⁻¹ ρ` を取るだけ。
+
+### ⚠ 段 (5) 最終梱包の残り (次セッション)
+
+述語 `P ρ := 「f(ρ) の座標が (ρ̄/y, 1/y)」` として:
+
+1. **軌道内**: `(Ψρ).quotient = μ(kv)·(Ψω).quotient` なら
+   `exists_conjQHom_eq_of_quotient_smul` で `ρ = σ^{kv}` (σ は ω のファイバー)、
+   `stepFour_cover` で `P σ`、`exists_mem_K_conjQHom_eq` + `stepFive_orbit` で `P ρ`。
+2. **軌道外**: `exists_mem_Q0_orbitOfF_eq` で `x₀ ∈ Q₀` を取り `ρ' := ρ x₀`。
+   `f(ρ')` は軌道内なので 1. により `f(ρ')` のファイバー全体で `P`。
+   `stepFive_secondCase_elem` で `ρ'` のファイバー = `ρ` のファイバーに移す。
+3. 場合分けの述語は `E^× ⧸ μ(KW)` の等式。`orbitOfF`/`baseUnit`/`fUnit`
+   (`PSU3OrbitCount`) の API を使う。⚠ **これらの API を先に実測すること**。
+
+閉じれば `corollaryTwo` の `hfive` が外れ、**§3 が完成**する。
