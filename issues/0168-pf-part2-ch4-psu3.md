@@ -6482,3 +6482,25 @@ bilinear package (`Φ`, `φ`, `θm`, `Θ`, `ι`, `hker`, `hquot`, `hW`, `hΘq`, 
 (`isStandardModel_residualQuotient` の呼び出し側 = 未だ無い、が
 `PSU3CorollaryTwo.lean` に `corollaryTwo_of_standardModel` が在るのでそちらが
 package 済みの入口かもしれない — **まずそれを grep**)。
+
+### (123) 追記: `corollaryTwo_of_standardModel` の残り引数の棚卸し
+
+`IsStandardModel` は**存在命題**で、`corollaryTwo_of_standardModel` が取る
+bilinear package (`φ`,`θ`,`Φ`,`Θ`,`u`,`ι` + 8 条件) を**そのまま bundle している**
+(`ModelAction.lean:724`)。つまり分解して渡すだけ。
+
+`C/𝒩(C)` について残るのは以下 7 本 (数値 `hm`/`hQ0card`、`sfive`/`M`、`H` (=`IsFGH`,
+`setup_centralizerQuotient` + `Setup.exists_fgh`) は済):
+
+| 引数 | 見込み |
+|---|---|
+| `hC2` (`t̄s̄t̄ = s̄t̄s̄`) | `\|s̄t̄\| = 3` + 対合性から初等的 |
+| `hZc` (`Z(Q̄) = Q̄₀ ∩ Q̄`) | `ActualCenter.lean:143` `center_Q_eq_Q0_subgroupOf_of_sq_eq_one` が近い |
+| `hmu` | `QuotientKWField.lean:504` `Hypothesis.mu_injective` が generic (`hst`/`hn`/`hQ0card`/`hcardQ`/`ih` を取る — 全部 in hand) |
+| `hVW` (`V̄ = W̄`) | ⚠ 要調査。`V_eq_W_iff_le_centralizer_Q0` (内在判定) が使える見込み |
+| `hKcard` (`\|K̄\| = 2ᵐ-1`) | ⚠ 要調査。`ModelIsomorphism.lean:91` `exists_actualKActor_mu_eq` の周辺 |
+| `hWdvd` (`\|W̄\| ∣ 2ᵐ+1`) / `hW1` | `hW1` は `exists_ne_one_mem_quotient_W` から。`hWdvd` は要調査 |
+| `hfQ` / `hhW` | 三つ組の性質。`hfQ` は `IsFGH.f_mem`。`hhW` は §2 の結果 (`h ρ ∈ W` for `ρ ∉ Q₀`) を探す |
+
+⟹ 次セッションは上表を上から順に埋める。`hVW` / `hKcard` / `hWdvd` / `hhW` の 4 本が
+実測待ちで、それ以外は既存資産の組み合わせ。
