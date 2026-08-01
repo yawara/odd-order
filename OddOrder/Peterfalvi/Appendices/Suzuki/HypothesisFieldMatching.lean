@@ -78,6 +78,26 @@ theorem map_V_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (�
   rw [Hypothesis.V, Hypothesis.V, Subgroup.map_inf _ _ φ.toMonoidHom φ.injective, hD,
     map_centralizer_equiv φ {h₁.t}, Set.image_singleton, ht]
 
+/-- `K` is determined by `D` and `t`. -/
+theorem map_K_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (φ : L ≃* L')
+    (hD : h₁.D.map φ.toMonoidHom = h₂.D) (ht : φ h₁.t = h₂.t) :
+    h₁.K.map φ.toMonoidHom = h₂.K := by
+  have hset : (φ.toMonoidHom : L → L') '' h₁.KSet = h₂.KSet := by
+    ext y
+    constructor
+    · rintro ⟨x, ⟨hxD, hxinv⟩, rfl⟩
+      refine ⟨?_, ?_⟩
+      · rw [← hD]; exact Subgroup.mem_map_of_mem _ hxD
+      · change h₂.t * φ x * h₂.t = (φ x)⁻¹
+        rw [← ht, ← map_mul, ← map_mul, hxinv, map_inv]
+    · rintro ⟨hyD, hyinv⟩
+      refine ⟨φ.symm y, ⟨?_, ?_⟩, φ.apply_symm_apply y⟩
+      · rw [← hD, Subgroup.mem_map_equiv] at hyD; exact hyD
+      · apply φ.injective
+        rw [map_mul, map_mul, map_inv, φ.apply_symm_apply, ht]
+        exact hyinv
+  rw [Hypothesis.K, Hypothesis.K, MonoidHom.map_closure, hset]
+
 /-- A non-trivial element of `W` moves along the isomorphism. -/
 theorem exists_ne_one_mem_W_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ')
     (φ : L ≃* L') (hH : h₁.H.map φ.toMonoidHom = h₂.H)
