@@ -740,6 +740,95 @@ theorem eq_or_exists_conj_mul_of_quotient_eq {m : ℕ} (M : hyp.QuotientFieldMod
     rw [hw, ← hk]
     group
 
+/-- **§3 (4), on elements**: `f(ω̄, y) = (ω̄/y, 1/y)` for every element of the fibre of
+`ω̄` other than the one excluded point (Peterfalvi Part II, p. 131).
+
+The `γ`-indexed conclusions of `stepFour`, `stepTwo_quotient` and `stepFour_at_omega`
+are transported to elements by the parametrization of the fibre: an element with the
+same quotient coordinate as `ω` is `ω` itself or `ω s^a`, and in the latter case its
+unitary coordinate is `x + μ(a²)` (`unitaryCoord_mul_conj`).  The excluded point is
+`y = x + 1`, i.e. `μ(a²) = 1`; the book recovers it by re-running the argument with
+`ω⁻¹` and `ζ⁻¹`, which moves the exclusion to `x⁻¹ + 1 ≠ x + 1` (`mu_W_ne_inv`). -/
+theorem stepFour_elem {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (hquot : ∀ ρ : ↥hyp.Q, (Φ ρ).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) ρ)))
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hker : ∀ z : ↥(Subgroup.center hyp.Q),
+      Φ (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {e : M.E} (hene : e ≠ 0)
+    {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (hΨq : ∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient)
+    (hΨc : ∀ ρ : ↥hyp.Q, (Ψ ρ).central = ν * (Φ ρ).central)
+    (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hdsq : ∀ k : ↥hyp.actualKActor,
+      ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) = ((M.mu (k, 1) : M.Eˣ) : M.E) ^ 2)
+    (hs : (ν : M.E) *
+      hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 = 1)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (γ : M.E → M.E)
+    (hγ : ∀ (a : G) (haK : a ∈ hyp.K)
+      (hfQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q),
+      γ ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)
+        = Suzuki2Groups.unitaryCoord m u
+          (Ψ ⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hfQ⟩))
+    (hγq : ∀ (a : G) (haK : a ∈ hyp.K)
+      (hfQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q),
+      (Ψ ⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hfQ⟩).quotient
+        = (Ψ ⟨ω, hωQ⟩).quotient
+          / (((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)
+            + Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩)))
+    (hγinv : ∀ A ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, A ≠ 0 → A ≠ 1 →
+      γ A = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩) + A)⁻¹)
+    (homega : ∀ hfωQ : f ω ∈ hyp.Q,
+      (Ψ ⟨f ω, hfωQ⟩).quotient
+          = (Ψ ⟨ω, hωQ⟩).quotient /
+            Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩) ∧
+        Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ω, hfωQ⟩)
+          = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩))⁻¹)
+    {ρ : G} (hρQ : ρ ∈ hyp.Q) (hfρQ : f ρ ∈ hyp.Q)
+    (hfib : (Ψ ⟨ρ, hρQ⟩).quotient = (Ψ ⟨ω, hωQ⟩).quotient)
+    (hne : Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩)
+      ≠ Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩) + 1) :
+    (Ψ ⟨f ρ, hfρQ⟩).quotient
+        = (Ψ ⟨ω, hωQ⟩).quotient / Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩) ∧
+      Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ρ, hfρQ⟩)
+        = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹ := by
+  obtain hcase | ⟨a, haK, hρ⟩ :=
+    hyp.eq_or_exists_conj_mul_of_quotient_eq M hZc Φ hquot hu Ψ hene hΨq hρQ hωQ hfib
+  · subst hcase
+    exact homega hfρQ
+  · subst hρ
+    have hy := hyp.unitaryCoord_mul_conj sfive M Φ ι hker hu Ψ hΨq hΨc d hequiv hdsq
+      hs hωQ haK hρQ
+    have hA0 : ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) ≠ 0 :=
+      Units.ne_zero _
+    have hAF : ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)
+        ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m :=
+      OddOrder.FiniteField.mem_frobFixedSubfield.mpr
+        (M.mu_K_frobFixed (hyp.kActor (pow_mem haK 2)))
+    have hA1 : ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) ≠ 1 := by
+      intro hc
+      exact hne (by rw [hy, hc])
+    refine ⟨?_, ?_⟩
+    · rw [hγq a haK hfρQ, hy]
+      congr 1
+      exact add_comm _ _
+    · rw [← hγ a haK hfρQ, hγinv _ hAF hA0 hA1, hy]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
