@@ -1110,6 +1110,50 @@ Theorem A の組み立て側で discharge する。
 2. **p.129-134 (§3 以降) の調査** — まだ未読。Theorem A の結論
    (`G ≅ PSU(3,q)` または `PGU(3,q)`) への接続。
 
+## 2026-08-01 (5): 段 (20) 第二主張 — **§2 の (1)-(20) が全部揃った**
+
+### 🎯 `stepTwenty_snd` — ここでも列が要らなかった
+
+書籍は (11) の列で「`f(ω₁(0,x))‾` が `ω̄₂` の軌道に入る `x`」を尽くし、
+1 つずつ (19)(b) を当てて第二主張を出す。しかし `stepTwenty_fst_eq` は
+**すべての `z` について**成立しており (仮説は `z ∈ Q₀` と共役元が `K` にあること
+だけ)、必要なのは**共役元を `K` に落とすこと**だけ:
+
+* `c ∈ D = KW` を `c = κ v` と分解 (`exists_mem_K_mem_W_mul`)。
+* `v ∈ W` は `Q₀` を中心化するので `ω₂` 側へ移せる: `(ω₂ w)^c = ((ω₂)^v · w)^κ`。
+* `ω₂^v` が同じ正規化を満たす: `t` が `W` を中心化 ((H3) の捻れが消える) +
+  `v` が `ζ` と可換 (`W = ⟨ζ⟩`)。
+
+⟹ `f(ω₁ z) = (ω₂ w)^c` (`c ∈ D`) なら常に **`w = z y`**。
+
+副産物: `W_eq_zpowers` / `commute_of_mem_W_of_W_eq_zpowers` を
+`PSU3StepFifteen.lean` に切り出し (`commute_h_zeta` の内部展開を置換)。
+
+### 📊 Ch. IV §2 の状態: **完了**
+
+| 段 | 主定理 |
+|---|---|
+| (1)-(11) | 既存 |
+| (12) | `exists_add_inv_eq` (体側; 群側は `β` の供給のみ) |
+| (13) | `stepElevenCoord_eq_betaRatio` |
+| (14) | `stepFourteen` |
+| (15) | `stepFifteen_length_eq` / `stepFifteen_exhaust` |
+| (16) | `stepSixteen` |
+| (17) | `stepSeventeen` |
+| (18) | `stepEighteen` |
+| (19) | `stepNineteen` / `stepNineteen_swap` |
+| (20) | `stepTwenty` (`α₁ = α₂`) / `stepTwenty_snd` (第二主張) |
+
+⚠ (20) の側条件 (`z ≠ 1`, `w y ≠ 1` 等) は書籍の「`ω₁`, `ω₂` は異なる
+`KW`-軌道」に相当し、明示仮説として残してある。Theorem A の組み立て側で
+discharge する。
+
+### ⚠ 次の一手 = **pp.129-134 (§3 以降) の調査**
+
+Ch. IV の残り。Theorem A の結論 (`G ≅ PSU(3,q)` または `PGU(3,q)`) への接続。
+ページ画像は `references/peterfalvi/pages/peterfalvi-p{129,130}.png` まで保存済、
+p.131-134 は未取得。
+
 ## セッション総括 (2026-07-31)
 
 **Ch. IV で形式化されたもの** (すべて sorry 0 / AxiomsCheck OK / lint 0):
