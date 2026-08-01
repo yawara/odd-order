@@ -216,6 +216,133 @@ noncomputable def intrinsicResidualQuotient (details : CentralizerPSUData hyp X 
     hyp.odd_natCard_map_D_residualQuotient
     (hyp.two_rank_ge_two_residualQuotient details)
 
+/-! ### The numerical inputs of §2 and §3, intrinsically
+
+`exists_standardModel` takes `|Q̄₀| = ℓ` and `|Q̄| = |Q̄₀|³`.  For the intrinsic hypothesis
+those are statements about `π(U ∩ Q₀)` and `π(U ∩ Q)`, and both reduce to `C_{Q₀}(X)` and
+`C_Q(X)` for the same reason: `Z(U)` lies in `D`, which meets `Q ⊇ Q₀` trivially. -/
+
+@[simp] theorem intrinsicResidualQuotient_H (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).H
+      = (hyp.H.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))) := rfl
+
+@[simp] theorem intrinsicResidualQuotient_Q (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q
+      = (hyp.Q.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))) := rfl
+
+/-- **`|Z(U)|` is odd, read in `G`** — Ch. I §3 Proposition 1(c) proves it for the residual
+inside `C_G(X)` (`odd_natCard_center_residual`), and the two centres correspond. -/
+theorem odd_natCard_center_residualImage (hXV : X ≤ hyp.V)
+    (common : CentralizerCommonData hyp X) (details : CentralizerPSUData hyp X result data) :
+    Odd (Nat.card ↥(Subgroup.center ↥(residualImage (G := G) X))) := by
+  have hcard : Nat.card ↥(Subgroup.center ↥(residualImage (G := G) X))
+      = Nat.card ↥(Subgroup.center ↥(residual (G := G) X)) := by
+    rw [← OddOrder.GroupTheory.map_center_mulEquiv (residualImageMulEquiv (G := G) X)]
+    exact (Nat.card_congr (Subgroup.equivMapOfInjective _ _
+      (residualImageMulEquiv (G := G) X).injective).toEquiv).symm
+  have hnd := details.odd_natCard_center_residual hXV common
+  rw [hcard]
+  rcases Nat.even_or_odd (Nat.card ↥(Subgroup.center ↥(residual (G := G) X))) with he | ho
+  · obtain ⟨r, hr⟩ := he
+    have h2 : (2 : ℕ) ∣ Nat.card ↥(Subgroup.center ↥(residual (G := G) X)) := ⟨r, by omega⟩
+    exact absurd h2 hnd
+  · exact ho
+
+/-- **`Q̄₀ = π(U ∩ Q₀)`** — the involutions of `M̄` are exactly the images of the
+involutions of `U ∩ H`.
+
+One direction is trivial.  For the other, `x̄² = 1` only says `x² ∈ Z(U)`; the lift is
+`x^{|Z(U)|}`, which squares to `1` and has the same image because `|Z(U)|` is odd
+(`sq_pow_natCard_eq_one_of_sq_mem`). -/
+theorem Q0_intrinsicResidualQuotient_eq (hXV : X ≤ hyp.V)
+    (common : CentralizerCommonData hyp X) (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q0
+      = (hyp.Q0.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))) := by
+  classical
+  have hodd := hyp.odd_natCard_center_residualImage hXV common details
+  ext y
+  rw [Hypothesis.mem_Q0_iff, hyp.intrinsicResidualQuotient_H details hXD htX hCQ hZD]
+  constructor
+  · rintro ⟨hy2, x, hxH, rfl⟩
+    have hxsq : x ^ 2 ∈ Subgroup.center ↥(residualImage (G := G) X) := by
+      refine (QuotientGroup.eq_one_iff (x ^ 2)).mp ?_
+      rw [← QuotientGroup.mk'_apply, map_pow]
+      exact hy2
+    obtain ⟨hsq, hdiff⟩ := OddOrder.GroupTheory.sq_pow_natCard_eq_one_of_sq_mem hodd hxsq
+    refine ⟨x ^ Nat.card ↥(Subgroup.center ↥(residualImage (G := G) X)), ?_, ?_⟩
+    · refine Subgroup.mem_subgroupOf.mpr ⟨?_, ?_⟩
+      · have := congrArg (Subtype.val (p := fun z => z ∈ residualImage (G := G) X)) hsq
+        push_cast at this
+        exact this
+      · exact hyp.H.pow_mem (Subgroup.mem_subgroupOf.mp hxH) _
+    · exact (QuotientGroup.eq.mpr hdiff).symm
+  · rintro ⟨x, hxQ0, rfl⟩
+    have hxG : (x : G) ∈ hyp.Q0 := Subgroup.mem_subgroupOf.mp hxQ0
+    have hxsq : (x : ↥(residualImage (G := G) X)) ^ 2 = 1 :=
+      Subtype.ext (by push_cast; exact hxG.1)
+    refine ⟨?_, ⟨(x : ↥(residualImage (G := G) X)),
+      Subgroup.mem_subgroupOf.mpr hxG.2, rfl⟩⟩
+    rw [← map_pow, hxsq, map_one]
+
+/-- **`|Q̄₀| = ℓ`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133) — one of the two
+numerical inputs of the Proposition of Ch. III §3, in the intrinsic subgroups. -/
+theorem natCard_Q0_intrinsicResidualQuotient (hXV : X ≤ hyp.V)
+    (common : CentralizerCommonData hyp X) (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    Nat.card ↥(hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q0 = 2 ^ data.n := by
+  have hn := data.one_lt_n
+  have hmono : hyp.Q0.subgroupOf (residualImage (G := G) X)
+      ≤ hyp.Q.subgroupOf (residualImage (G := G) X) := fun z hz =>
+    Subgroup.mem_subgroupOf.mpr (hyp.Q0_le_Q (Subgroup.mem_subgroupOf.mp hz))
+  have hbot : hyp.Q0.subgroupOf (residualImage (G := G) X)
+      ⊓ Subgroup.center ↥(residualImage (G := G) X) = ⊥ :=
+    le_bot_iff.mp (((inf_le_inf hmono hZD).trans_eq
+      (hyp.rankOneSetup_residual hXD htX hCQ).Q_inf_D_eq_bot))
+  have hinf : hyp.Q0 ⊓ residualImage (G := G) X
+      = hyp.Q0 ⊓ Subgroup.centralizer (X : Set G) :=
+    le_antisymm (inf_le_inf_left _ (Subgroup.map_subtype_le _))
+      (le_inf inf_le_left ((inf_le_inf_right _ hyp.Q0_le_Q).trans
+        (hyp.inf_centralizer_le_residual hCQ)))
+  rw [hyp.Q0_intrinsicResidualQuotient_eq hXV common details hXD htX hCQ hZD,
+    OddOrder.GroupTheory.natCard_map_mk'_of_inf_eq_bot hbot,
+    OddOrder.GroupTheory.natCard_subgroupOf, hinf,
+    ← OddOrder.GroupTheory.natCard_subgroupOf, details.natCard_cQ0_eq_baseField,
+    natCard_baseField data.n (by omega)]
+
+/-- **`|Q̄| = |Q̄₀|³`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133) — the other
+numerical input of the Proposition of Ch. III §3, in the intrinsic subgroups. -/
+theorem natCard_Q_intrinsicResidualQuotient (hXV : X ≤ hyp.V)
+    (common : CentralizerCommonData hyp X) (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    Nat.card ↥(hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q
+      = Nat.card ↥(hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q0 ^ 3 := by
+  have hn := data.one_lt_n
+  rw [hyp.natCard_Q0_intrinsicResidualQuotient hXV common details hXD htX hCQ hZD,
+    hyp.intrinsicResidualQuotient_Q details hXD htX hCQ hZD,
+    hyp.natCard_map_Q_residualQuotient hXD htX hCQ hZD,
+    details.natCard_cQ_eq_baseField_cube, natCard_baseField data.n (by omega)]
+
 end Model
 
 end Hypothesis
