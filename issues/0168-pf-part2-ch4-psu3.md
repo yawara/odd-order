@@ -6867,3 +6867,35 @@ rank-one setup について `∃ c, Q^c = Q' ∧ M^c = M'`。⚠ **モデルを�
 
 `C_Q(D) = ⊥` は本適用では真 (`PSU(3,ℓ)` の torus は根群を固定点自由に近く動かす;
 `q > 2` で `C_{Q₀}(D) = 1`) だが、`Setup` から出るかは未確認 — 次セッションで検討。
+
+## 2026-08-02 (134): `Q₀`/`W` の共役移送 — `t` 抜きの経路が Lean に
+
+(133) の実測を landing (`PSU3SectionFourIntrinsic.lean`, section `ConjMatch`):
+
+* `map_Q0_of_conj` — `H` を合わせる共役は `Q₀` を合わせる (`Q₀ = {x ∈ H | x²=1}`)。
+* `map_W_of_conj` — `H` と `D` を合わせる共役は `W` を合わせる
+  (`W = D ⊓ C(Q₀)`, `W_eq_inf_centralizer_Q0`)。**`t` は不要**。
+* `exists_ne_one_mem_W_of_conj` — したがって `1 ≠ w ∈ W` も移る。
+
+### ⚠ 次セッションはここから — 2 つの仮説を同じ群に載せる配線
+
+`exists_conj_eq_triple` と `map_W_of_conj` を繋ぐには、内在版と transported 版が
+**同じ群の上**に無ければならない。現状:
+
+* 内在: `intrinsicResidualQuotient` on `↥(residualImage X) ⧸ Z`
+* transported: `residualQuotientHypothesis` on `↥(residual X) ⧸ Z`
+
+⟹ `Hypothesis.ofMulEquivPullback` で transported 側を
+`residualQuotientMulEquiv X : (↥(residual X) ⧸ Z) ≃* (↥(residualImage X) ⧸ Z)` に沿って
+引き戻せばよい (点集合は `ULift (Unital ℓ)` のまま動かない)。
+
+その後 `exists_conj_eq_triple` に食わせる 8 仮説:
+
+| 仮説 | 内在版 | transported 版 |
+|---|---|---|
+| `IsPGroup 2 Q` | `isSuzuki2Group_Q_intrinsicResidualQuotient` の第 1 成分 | 標準モデル (`Q = standardRootSubgroup`) |
+| `Odd \|D\|` | `Hypothesis.D_odd` (フィールド) | 同左 |
+| `Even \|Q\|` | `Hypothesis.Q_even` (フィールド) | 同左 |
+| `Q ≠ ⊥` | `\|Q̄\| = ℓ³ > 1` ((118)) | `\|Q\| = ℓ³ > 1` |
+
+⟹ 揃えば `∃ w ∈ W̄, w ≠ 1` が出て **`U/Z(U)` 内在版の Lemma 5 が 7/7**。
