@@ -7430,3 +7430,35 @@ type-B 認識を通す必要がある。
 
 の 3 段。⚠ θ=φ=1 分岐は `ν = λ²` = `λ^{1+2^0}` で `Frob^0 = 1` (位数 1 = 奇) なので
 **全分岐が同じ形に収まる**。
+
+### (151) 🎯 露出すべき結論が確定 — 体の同定は不要、**純粋な指数の合同**で済む
+
+`NoncommutativeFactorCoordinateData` (`PrescribedFactorCoordinates.lean` l.735) を実測:
+
+```
+  theta : RingAut (GaloisField 2 n)
+  lambda : GaloisField 2 n
+  theta_ne_one : theta ≠ 1
+  theta_order_odd : Odd (orderOf theta)      ← これ
+```
+
+`c : Y` (= actor の元) が `Q/Z(Q)` に掛けるスカラーが `lambda`、`Z(Q)` に掛けるのが `nu`。
+座標は**具体体 `GaloisField 2 n`** で、抽象体ではない。
+
+⟹ 認識定理から露出すべき結論は
+
+```
+∃ r : ℕ, (∀ k, ν_k = λ_k ^ (1 + 2 ^ r)) ∧ Odd (orderOf (qFrobenius (GaloisField 2 m) 2 r))
+```
+
+これがあれば、**体の同定は一切要らない**:
+
+* モデル側の `d` は `ι(centerKHom k z) = μ(k)^d · ι z` で定まり、`μ : K ≅ F^×`。
+* `ν = λ^{1+2^r}` は「actor の商スカラーから中心スカラーへの写像」という**同じ写像**を
+  別座標で見たもの。どちらも位数 `2^m − 1` の巡回群上の冪写像なので、
+  **指数の合同 `d ≡ 1 + 2^r (mod 2^m − 1)` として直接移る**。
+* `hshape : a^d = a · a^{2^r} = a·φ(a)` は `a^{2^m−1} = 1` から従う (φ := `qFrobenius F 2 r`)。
+* `Odd (orderOf φ)` も `F ≅ GaloisField 2 m` で位数が保たれるので移る
+  (体同型を経由するが、位数だけなので `orderOf` の共役不変性で足りる)。
+
+⟹ 残る仕事は **(b) の露出リファクタ 1 本**に確定。数学は全部済んでいる。
