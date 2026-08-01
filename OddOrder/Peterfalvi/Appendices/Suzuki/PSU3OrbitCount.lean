@@ -716,6 +716,31 @@ theorem conjQHom_kActor_apply_val {k v : G} (hk : k ∈ hyp.K) (hv : v ∈ hyp.W
   rw [hval]
   group
 
+/-- **The `D`-action on `Q/Q₀` in coordinates**: conjugation by `c = κ v` (`κ ∈ K`,
+`v ∈ W`) multiplies the coordinate of `Q ⧸ Z(Q) ≅ E` by the scalar `μ(κ, v)`.
+
+This is the `Q/Q₀`-level counterpart of `centerCoord_conj` (which does the same on `Q₀`):
+`conjQHom_kActor_apply_val` identifies the actor pair's action with conjugation by `κ v`,
+`quotientKWHom_mk` pushes it to the quotient, and `coord_act` reads it as a scalar.
+
+Chapter IV §3 runs on it: its stage (2) turns the group identity of stage (1) into the
+linear equation `(a² + ζ⁻¹) · f(ω s^a)‾ = ω̄` in `E`. -/
+theorem coord_conj_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {κ v : G} (hκ : κ ∈ hyp.K) (hv : v ∈ hyp.W)
+    {x w : G} (hxQ : x ∈ hyp.Q) (hwQ : w ∈ hyp.Q)
+    (hval : (κ * v) * x * (κ * v)⁻¹ = w) :
+    M.coord (Additive.ofMul (QuotientGroup.mk (⟨w, hwQ⟩ : ↥hyp.Q)))
+      = ((M.mu (hyp.kActor hκ, ⟨v, hv⟩) : M.Eˣ) : M.E)
+        * M.coord (Additive.ofMul (QuotientGroup.mk (⟨x, hxQ⟩ : ↥hyp.Q))) := by
+  have hact : hyp.conjQHom (hyp.kActor hκ, ⟨v, hv⟩) ⟨x, hxQ⟩ = (⟨w, hwQ⟩ : ↥hyp.Q) := by
+    apply Subtype.ext
+    rw [hyp.conjQHom_kActor_apply_val hκ hv ⟨x, hxQ⟩]
+    exact hval
+  have hq := M.coord_act (hyp.kActor hκ, ⟨v, hv⟩)
+    (QuotientGroup.mk (⟨x, hxQ⟩ : ↥hyp.Q))
+  rw [hyp.quotientKWHom_mk, hact] at hq
+  exact hq
+
 /-- **`D` acts freely on `(Q/Q₀)^#`** (Peterfalvi Part II, Ch. IV §2, used at pp. 126–128).
 
 If `c ∈ D` fixes the class of `ω ∈ Q − Q₀` modulo `Q₀` — i.e. `ω^c = ω y` for some
