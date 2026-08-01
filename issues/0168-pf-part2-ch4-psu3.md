@@ -3270,3 +3270,34 @@ repo では `hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3` として
 2. §4 の standing hypothesis 構造を置いて段 (1) を配線。
 3. 段 (2) — `corollaryTwo_of_stepFour` を `U` 側に。
 4. 段 (3)(4) → (5)(6) の供給 → `sectionFour_solve` 以降は landing 済。
+
+## 2026-08-01 (47): §4 段 (1) の入力 (c) — 導出鎖の部品が**全部そろった**
+
+(46) で「(c) だけ repo に無い」と書いたが、導出に要る補題を全部特定できた:
+
+| 手 | 内容 | repo の補題 |
+|---|---|---|
+| 1 | `\|P\|` 奇素数 / `Q` は 2-群 ⟹ 互いに素、`Q₀ ⊴ Q` は `P`-不変 | (仮説から) |
+| 2 | Glauberman: `X`-固定剰余類は `X`-固定代表を持つ | `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient` (`GroupTheory/CoprimeFixedPoints.lean` が再輸出) |
+| 3 | ⟹ `C_{Q/Q₀}(P) = C_Q(P)Q₀/Q₀`、よって `C_{Q/Q₀}(P) ≠ 1` から `∃ x ∈ C_Q(P) − Q₀` | 2. の帰結 |
+| 4 | `Q` は Suzuki 2-群 ⟹ **対合はすべて中心的** | `OddOrder.Higman.Suzuki2Groups.involutions_subset_center` (`Higman/Suzuki2Groups/CenterInvolutions.lean:66`) |
+| 5 | `Z(Q) = Q₀` | `LemmaFiveSetup.centerEqQ0` / `ActualCenter.center_Q_eq_Q0_subgroupOf_of_sq_eq_one` |
+| 6 | ⟹ `x ∉ Q₀` ゆえ `x² ≠ 1` ⟹ `¬ IsElementaryAbelian 2 C_Q(P)` | 4.+5. |
+
+⟹ **§4 段 (1) は既存部品の配線のみ**になった (新しい数学は要らない)。
+必要なのは §4 の standing hypothesis を置くことと、上の 6 手 + (45) の分岐選択 +
+(44) の Artin/Galois を繋ぐこと。
+
+⚠ 4. は `Higman/` 側 (Suzuki 2-群の一般論) にある — `Peterfalvi/Appendices/Suzuki/`
+だけ grep していると見つからない。[[grep-concept-names-not-book-notation]] の通り
+**概念名 (`involutions`, `center`) で横断 grep すること**。
+
+### ⚠ 次セッションはここから
+
+1. **§4 の standing hypothesis 構造**を置く (`SectionFourSetup` 的なもの):
+   `P ≤ V`、`Nat.card P = p` 素数、`p` 奇、`C_{Q/Q₀}(P) ≠ 1`、`P ⊓ W = ⊥`。
+2. (c) の導出 (上の 6 手) → `nonempty_psu3Data_of_orderOf_eq_three` に入力。
+3. 段 (1) 残り: `q = ℓ^p` (`natCard_Q0_eq_pow`) と `Z(U) ⊆ P`
+   (`centralizer_V_centralizer_Q0` + 「`PZ(U)` が `C_Q(P) ⊄ Q₀` を中心化」)。
+4. 段 (2) — `corollaryTwo_of_stepFour` を `U` 側に。
+5. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
