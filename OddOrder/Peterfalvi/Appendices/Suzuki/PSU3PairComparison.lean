@@ -38,6 +38,8 @@ reads off afterwards.  Concretely, with `a ∈ K` chosen so that `x₁ + a^{-(1+
 * `Hypothesis.stepNineteen` — step (19)(a).
 * `Hypothesis.stepNineteen_swap` — step (19)(b).
 * `Hypothesis.eq_one_of_conj_eq_mul_Q0` — `K` acts freely on `(Q/Q₀)^#`.
+* `Hypothesis.inv_conj_t_of_mem_W_mul_KSet` — the `t`-twist on `D = KW` reverses the
+  `W`-part and fixes the `K`-part.
 * `Hypothesis.eq_and_conj_of_inv_mul_mem_K`, `Hypothesis.eq_and_eq_of_inv_mul_mem_K` —
   what step (7) extracts from the two instances of (19): the book's (∗), (∗∗) and
   (∗∗∗).
@@ -356,6 +358,33 @@ theorem eq_one_of_conj_eq_mul_Q0 {ω c y : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω 
   refine hωzQ0 ?_
   rw [hone]
   exact hyp.Q0.one_mem
+
+/-- **The `t`-twist on `D = K W`** (Peterfalvi Part II, p. 128, behind step (20)'s
+`e_i^{-t} ∈ e'_{m-i}K`): since `t` centralizes `W` and inverts `K`,
+
+  `(w k)^{-t} = w⁻¹ k`   (`w ∈ W`, `k ∈ K`),
+
+so the twist reverses the `W`-part and leaves the `K`-part alone.
+
+That is what makes the book's `e_i^{-t} ∈ e'_{m-i}K` a statement about `W`-parts only:
+by (14) the `W`-part of `e_i` is `ζ^i`, so that of `e_i^{-t}` is `ζ^{-i}`, which by (16)
+(`ζ^m = 1`) is the `W`-part `ζ^{m-i}` of `e'_{m-i}`. -/
+theorem inv_conj_t_of_mem_W_mul_KSet {w k : G} (hw : w ∈ hyp.W) (hkK : k ∈ hyp.KSet) :
+    (hyp.t * (w * k) * hyp.t)⁻¹ = w⁻¹ * k := by
+  have htwt : hyp.t * w * hyp.t = w := by
+    have hc := hyp.commute_t_of_mem_V (hyp.W_le_V hw)
+    rw [← hc.eq, mul_assoc, hyp.rankOneSetup.invol, mul_one]
+  have hsplit : hyp.t * (w * k) * hyp.t = w * k⁻¹ := by
+    have e : (hyp.t * w * hyp.t) * (hyp.t * k * hyp.t)
+        = hyp.t * (w * (hyp.t * hyp.t) * k) * hyp.t := by group
+    rw [hyp.rankOneSetup.invol, mul_one] at e
+    rw [← e, htwt, hkK.2]
+  have hkK' : k ∈ hyp.K := by
+    have hx : k ∈ hyp.KSet := hkK
+    rw [← hyp.coe_K] at hx
+    exact hx
+  rw [hsplit, mul_inv_rev, inv_inv]
+  exact hyp.commute_of_mem_W_of_mem_K (hyp.W.inv_mem hw) hkK'
 
 /-- **Step (20)'s (∗) and (∗∗∗) together** (Peterfalvi Part II, p. 128).
 
