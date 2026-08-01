@@ -4717,3 +4717,40 @@ repo が `C_G(P)/N` を選んだのは (57)(58) で既存構成 `centralizerQuot
    (`torusWeight_eq_one_of_commute_weylElement`)、`W = D ⊓ C(Q₀)` (72) で
    `commute_rootHom_of_commute_weylElement` が `V ≤ W` を与える。`W_le_V` で等号。
 3. `residualQuotientEquiv` で `U/Z(U)` へ transport → §3 endpoint → 段 (2)。
+
+## 2026-08-01 (85): 標準モデル `Hypothesis` — Borel 分解由来の 2 フィールド landing
+
+* `standardRootSubgroup_inf_psuTorusRange` — **`Q ∩ D = 1`**
+  (`mem_standardBorel_iff_existsUnique_root_torus` の一意性から)。
+* `standardRootSubgroup_mul_psuTorusRange` — **`Q · D = H`**。
+
+⚠ 配置: `Borel.lean` からは `standardRootSubgroup` (`RootGroupSuzukiType.lean` 定義) が
+見えないので、両方を import する `TorusCentralizer.lean` に置いた。
+⚠ `ExistsUnique` の一意性部分は `∀ y, p y → y = p` の向き (`p = y` ではない)。
+
+### `Hypothesis (standardPermGroup n) (Unital n)` 残りフィールド
+
+| フィールド | 材料 | 状態 |
+|---|---|---|
+| `D_def` | `standardBorel_inf_conj_weylElement` | ✅ (84) |
+| `Q_inf_D_eq_bot` / `Q_mul_D_eq_H` | **今回** | ✅ |
+| `basept`/`doubly_transitive`/`H`/`H_def`/`Q`/`D`/`t`/`t_sq`/`Q_le_H` | 既存 API 直結 | ✅ |
+| `t_ne_one` / `t_not_mem_H` | `weylElement • ∞ = origin ≠ ∞` | ⚠ 易 |
+| `Q_normal_in_H` | Borel = 根群 ⋊ トーラス (`psuTorusHom_mul_rootHom_mul_inv`) | ⚠ 易 |
+| `Q_even` | `natCard_standardRootSubgroup` (`2^(3n)`) | ⚠ 易 |
+| `D_odd` | `natCard_psuTorus_standard` / `odd_orderOf_psuTorusParameter` | ⚠ 中 |
+| `two_rank_ge_two` | `Ω₁(S₀)` = 根群の中心 (位数 `2ⁿ`, exponent 2) の位数 4 部分群 | ⚠ 中 |
+| `faithful` / `[Finite]` | `Equiv.Perm (Unital n)` の部分群、`Unital n` 有限 | ⚠ 要確認 |
+
+⚠ `two_rank_ge_two` の注意: 位数 4 の部分群を `Sylow.exists_subgroup_card_pow_prime` で
+**群全体から**取ると巡回群かもしれず `∀ x, x² = 1` が出ない。
+**`Ω₁(S₀)` (elementary abelian, 位数 `2ⁿ`, `n ≥ 2`) の中で**取ること。
+
+### ⚠ 次セッションはここから
+
+1. 上表の ⚠ を埋めて `standardHypothesis` を新 leaf
+   `OddOrder/Peterfalvi/Appendices/Suzuki/StandardModelHypothesis.lean` に構成
+   (⚠ 同じ commit で `OddOrder.lean` に配線)。
+2. `V = W` を証明 (`torusWeight_eq_one_of_commute_weylElement` +
+   `commute_rootHom_of_commute_weylElement` + `W_eq_inf_centralizer_Q0` + `W_le_V`)。
+3. `residualQuotientEquiv` で `U/Z(U)` へ transport → §3 endpoint → 段 (2)。
