@@ -6323,3 +6323,47 @@ centralizes `C_{Q₀}(P)` … `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` 
 
 ⚠ ただし `M̄` が本当に `Fix(X)` 上の作用の点安定化群かは要確認 (`Z(U)` が `Fix(X)` に
 自明に作用するか)。次セッションはまずここを実測すること。
+
+## 2026-08-02 (120): `s̄ = π(s)` が landing — Lemma 5 の入力は残り 1 本
+
+⚠ (119) では「distinguished involution の同定には照合 (経路 A) が要るかも」と書いたが
+**不要だった**。Ch. I §3 が既に持っていた 2 本が効いた:
+
+* `distinguishedInvolution_mem_centralizer_of_le_V` /
+  `structureConjugator_mem_centralizer_of_le_V` (`CentralizerDistinguishedBridge.lean`)
+  — `X ≤ V` なら `s` も `r` も `C_G(X)` に入る。
+
+⟹ `s` は対合なので `U` に入り (`sq_eq_one_mem_residual`)、`r ∈ Q ∩ C ≤ U`。構造方程式
+`t s t = r⁻¹ t r` が `U` の中で成り立つので `π` で落とせて、
+`eq_distinguishedPair_of_structure` の一意性で `s̄ = π(s)`。
+`π(s) ≠ 1` は **`|Z(U)|` が奇数** (対合は中心に入れない) から。
+
+`|s̄ t̄| = 3` は `|s t| = 3` (`details.distinguishedProduct_order`) から `∣ 3`、
+`= 1` は `t̄ ∉ M̄` に反する (3 が素数なので二択)。
+
+### Lemma 5 の入力 (更新)
+
+| 入力 | 状態 |
+|---|---|
+| `\|Q̄₀\| = 2ⁿ` / `\|Q̄\| = \|Q̄₀\|³` / `n ≠ 0` | ✅ |
+| `Q̄` が Suzuki 2-群 | ✅ |
+| `TheoremAInductionBelow` | ✅ |
+| `orderOf (s̄ · t̄) = 3` | ✅ **今回** |
+| `∃ w ∈ W̄, w ≠ 1` | ⚠ **残り 1 本** |
+
+### ⚠ 次セッションはここから — `∃ w ∈ W̄, w ≠ 1`
+
+書籍 p.133 は「`(V ∩ U)/(P ∩ U)` が `C_{Q₀}(P)` を中心化 → Galois の定理で
+`V ∩ U ⊆ P W` → `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1 since ℓ > 2`」。
+
+内在版で狙うなら:
+* `W̄ = V̄ ⊓ C(K̄Set)`, `V̄ = D̄ ⊓ C(t̄)`。`π(V ∩ U) ≤ V̄` と `π(K ∩ U) ⊆ K̄Set` は
+  どちらも自明 (`t̄ = π(t)`, `D̄ = π(D ∩ U)`)。⚠ 問題は `W̄` 側で、`C(K̄Set)` の包含が
+  逆向きになる点。
+* 別ルート候補: `V̄ = W̄` を内在的に出せれば `V̄ ≠ 1` に落ちる
+  (transported 版では `residualQuotientHypothesis_V_eq_W` が在る)。
+* さらに別ルート: `|D̄|` と `|K̄|` を数え、`D̄ = V̄ · K̄` (奇位数群への対合作用の分解)
+  から `V̄ ≠ 1`。`|D̄|` は `|D ∩ U|` の商だが、モデル側では `(ℓ²-1)/(ℓ+1,3)`。
+
+まず transported 版 `residualQuotientHypothesis_V_eq_W` の証明を読んで、内在版に
+移せるか実測すること。
