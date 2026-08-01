@@ -3364,3 +3364,32 @@ C_{Q/Q₀}(P) ≠ 1
    (§4 前置きが `P ∩ W = 1` に使うのと同じ事実) を repo で実測すること。
 2. §4 の standing hypothesis 構造を置いて段 (1) を組み上げる。
 3. 段 (2)(3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
+
+## 2026-08-01 (50): (Q/Q₀)^# の固定点自由性を `V = W` から外した
+
+⚠ **§4 は `V ≠ W` の場合なので、既存の `eq_one_of_conj_eq_mul_Q0_of_mem_D` は
+そのままでは使えなかった** (仮説に `hVW : V = W` を持つ)。これは §4 前置きの
+`P ∩ W = 1` と段 (1) の `P Z(U) ∩ W = 1` の両方に要る事実。
+
+証明を読むと `hVW` は `c⁻¹` を `k·v` (`k ∈ K`, `v ∈ W`) に分解するためだけに
+使われており、以降は分解しか見ていない。⟹ 分解を仮説に上げて一般化:
+
+| 定理 | 内容 |
+|---|---|
+| `eq_one_of_conj_eq_mul_Q0_of_decomp` | `c⁻¹ = k·v` を仮説に取る本体 |
+| `eq_one_of_conj_eq_mul_Q0_of_mem_D` | `V = W` から分解を得る 2 行 (signature 不変) |
+| **`eq_one_of_conj_eq_mul_Q0_of_mem_W`** | `W` の元は `k = 1` で既に分解済 ⟹ `V = W` 不要 |
+
+⟹ §4 (`V ≠ W`) でも `W` の固定点自由性が使える。
+
+⚠ 教訓 (2 回目): 既存補題が使えないと思ったら**まず証明を読んで、どの仮説が
+どこで効いているかを実測する**。今回も (44) の Artin 一般化と同じで、
+効いていたのは 1 箇所だけだった。[[generalize-by-measuring-which-carrier-fields-are-used]]
+
+### ⚠ 次セッションはここから
+
+1. `Z(U) ⊆ P`: `Z(U) ≤ C_V(C_{Q₀}(P)) = P ⊔ W` (Galois) と
+   「`P Z(U)` が `C_Q(P) ⊄ Q₀` を中心化 ⟹ `P Z(U) ∩ W = 1`」
+   (今回の `eq_one_of_conj_eq_mul_Q0_of_mem_W`) を繋ぐ。
+2. §4 の standing hypothesis 構造を置いて段 (1) を組み上げる。
+3. 段 (2)(3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
