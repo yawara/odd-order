@@ -753,14 +753,22 @@ theorem isStandardModel_centralizerQuotient {m : ℕ} (M : hyp.QuotientFieldMode
     ∃ (n : ℕ) (sfive : (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).LemmaFiveSetup n)
       (Mq : (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).QuotientFieldModel n)
       (x₀ : ↥(Subgroup.center (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).Q)),
-      n ≠ 0 ∧ x₀ ≠ 1 ∧
+      n ≠ 0 ∧ x₀ ≠ 1 ∧ Nat.card ↥(hyp.centralizerQuotientHypothesis s4.P_le_V hA3).Q0 = 2 ^ n ∧
+        Nat.card (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).Q
+          = Nat.card ↥(hyp.centralizerQuotientHypothesis s4.P_le_V hA3).Q0 ^ 3 ∧
+        orderOf
+            ((hyp.centralizerQuotientHypothesis s4.P_le_V hA3).distinguishedInvolution *
+              (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).t) = 3 ∧
+        Function.Injective Mq.mu ∧
         (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).IsStandardModel sfive Mq x₀ := by
   letI := hyp.centralizerQuotientMulAction s4.P_le_V
   obtain ⟨n, hn, hQ0card, hcardQ, hst, _hQsuzBar, ⟨sfive⟩, ⟨Mq⟩⟩ :=
     s4.standingData_centralizerQuotient M hZ hmu hQsuz hCop hSolv hP hA3 hord ih
   obtain ⟨x₀, hx₀⟩ :=
     (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).exists_center_Q_ne_one
-  exact ⟨n, sfive, Mq, x₀, hn, hx₀,
+  exact ⟨n, sfive, Mq, x₀, hn, hx₀, hQ0card, hcardQ, hst,
+    (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).mu_injective hst hn hQ0card hcardQ
+      (hyp.theoremAInductionBelow_centralizerActionQuotient s4.P_le_V hP ih) sfive Mq,
     (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).exists_standardModel sfive Mq hst hn
       hQ0card hcardQ (hyp.theoremAInductionBelow_centralizerActionQuotient s4.P_le_V hP ih)
       x₀ hx₀⟩
