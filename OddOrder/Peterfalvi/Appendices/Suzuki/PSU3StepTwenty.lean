@@ -38,6 +38,10 @@ are `ζ^{±1}`, so the two conjugators sit in the same coset of `K` outright.
 * `Hypothesis.stepTwenty_snd` — **step (20)**'s second assertion: the image is always
   `ω₂ (z y)`.
 * `Hypothesis.stepTwenty` — **step (20)**'s first assertion `α₁ = α₂`, i.e. `y₁ = y₂`.
+* `Hypothesis.dOrbitRel_of_stepTwenty_chain` — the (H5) chain of §2's closing
+  Proposition.
+* `Hypothesis.f_eq_conj_inv_of_stepTwenty_chain` — §2's closing Proposition, second half:
+  `ω² = (0,α)` and `f(ω) = (ω⁻¹)^ζ`.
 -/
 
 set_option autoImplicit false
@@ -350,6 +354,111 @@ to (H5).  The last two steps of that argument are here; the chain itself — whi
 family `ω_1, …, ω_n` of orbit representatives — is not yet formalized.
 -/
 
+/-- **The (H5) chain of §2's closing Proposition** (Peterfalvi Part II, p. 129).
+
+With `ρ = ω²` (so `ω⁻¹ = ωρ`, the square being an involution of `Q₀`), step (20) applied
+to the pairs `(ω, ω_i)` and `(ω, ω_k)` gives the two orbit relations assumed here.
+Running `(f ∘ j)³` — which is the identity on `D`-orbits by (H5) — from `X = ω_k⁻¹ρ`:
+
+| step | uses | lands on |
+|---|---|---|
+| `(f∘j)(X)` | `X⁻¹ = ω_k ρ`, the `k`-relation, (H2) | `ω(ρy)` |
+| `(f∘j)²(X)` | `(ω(ρy))⁻¹ = ωy`, the normalization, (H2) | `ω` |
+| `(f∘j)³(X)` | `ω⁻¹ = ωρ`, the `i`-relation | `ω_i(ρy)` |
+
+so `X` and `ω_i(ρy)` lie in the same `D`-orbit.  The book's side remark that
+`h(ω_k⁻¹(0,r)) ∈ KW` is automatic here: `h` always takes values in `D`, and `D = KW`
+under Chapter IV's `V = W`. -/
+theorem dOrbitRel_of_stepTwenty_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {ζ ω ωi ωk y ρ : G}
+    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hωkQ : ωk ∈ hyp.Q) (hωkQ0 : ωk ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hρQ0 : ρ ∈ hyp.Q0) (hρ : ρ = ω * ω) (hζD : ζ ∈ hyp.D)
+    (hnorm : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hi : dOrbitRel hyp.D (f (ω * ρ)) (ωi * (ρ * y)))
+    (hk : dOrbitRel hyp.D (f (ω * (ρ * y))) (ωk * ρ)) :
+    dOrbitRel hyp.D (ωk⁻¹ * ρ) (ωi * (ρ * y)) := by
+  classical
+  have hne : ∀ {z : G}, z ∉ hyp.Q0 → z ≠ 1 := fun hz hc => hz (hc ▸ hyp.Q0.one_mem)
+  have hinvQ0 : ∀ {z : G}, z ∈ hyp.Q0 → z⁻¹ = z := by
+    intro z hz
+    have hs := hz.1
+    rw [sq] at hs
+    exact inv_eq_of_mul_eq_one_right hs
+  have hcentQ : ∀ {z w : G}, z ∈ hyp.Q0 → w ∈ hyp.Q → w * z = z * w := by
+    intro z w hz hw
+    exact Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hz) w hw
+  have hρy : ρ * y ∈ hyp.Q0 := hyp.Q0.mul_mem hρQ0 hyQ0
+  obtain ⟨hωρQ, hωρQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hρQ0
+  obtain ⟨hωρyQ, hωρyQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hρy
+  obtain ⟨hωyQ, hωyQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hyQ0
+  obtain ⟨hωkρQ, hωkρQ0⟩ := hyp.mul_mem_sdiff_Q0 hωkQ hωkQ0 hρQ0
+  -- `ω⁻¹ = ω ρ`, since `ρ = ω²` is an involution
+  have hρ1 : ρ * ρ = 1 := by
+    have hs := hρQ0.1
+    rwa [sq] at hs
+  have hωinv : ω⁻¹ = ω * ρ := by
+    rw [hρ]
+    rw [hρ] at hρ1
+    calc ω⁻¹ = ((ω * ω) * (ω * ω)) * ω⁻¹ := by rw [hρ1, one_mul]
+      _ = ω * (ω * ω) := by group
+  -- `X⁻¹ = ω_k ρ` and `(ω(ρy))⁻¹ = ω y`
+  have hXinv : (ωk⁻¹ * ρ)⁻¹ = ωk * ρ := by
+    rw [mul_inv_rev, hinvQ0 hρQ0, inv_inv]
+    exact (hcentQ hρQ0 hωkQ).symm
+  have hprodinv : (ω * (ρ * y))⁻¹ = ω * y := by
+    rw [mul_inv_rev, hinvQ0 hρy, hωinv]
+    calc (ρ * y) * (ω * ρ) = ω * ((ρ * y) * ρ) := by
+          rw [← mul_assoc, ← hcentQ hρy hωQ]
+          group
+      _ = ω * ((ρ * ρ) * y) := by
+          have hcy : y * ρ = ρ * y := hcentQ hρQ0 (hyp.Q0_le_Q hyQ0)
+          calc ω * ((ρ * y) * ρ) = ω * (ρ * (y * ρ)) := by group
+            _ = ω * (ρ * (ρ * y)) := by rw [hcy]
+            _ = ω * ((ρ * ρ) * y) := by group
+      _ = ω * y := by rw [hρ1, one_mul]
+  -- the two tools: `f ∘ f = id` and `f` descends to orbits
+  have hff : ∀ {z : G}, z ∈ hyp.Q → z ≠ 1 → f (f z) = z :=
+    fun hzQ hz1 => (hTwo hyp.rankOneSetup H hzQ hz1).1
+  have hfrel : ∀ {a b : G}, a ∈ hyp.Q → a ≠ 1 → dOrbitRel hyp.D a b →
+      dOrbitRel hyp.D (f a) (f b) := by
+    intro a b haQ ha1 hab
+    obtain ⟨d, hdD, rfl⟩ := hab
+    exact H.dOrbitRel_f hyp.rankOneSetup haQ ha1 hdD
+  -- step 1: `f(X⁻¹) ~ ω(ρy)`
+  have hs1 : dOrbitRel hyp.D (ω * (ρ * y)) (f (ωk * ρ)) := by
+    have h := hfrel (H.f_mem hωρyQ (hne hωρyQ0))
+      (IsFGH.f_ne_one hyp.rankOneSetup H hωρyQ (hne hωρyQ0)) hk
+    rwa [hff hωρyQ (hne hωρyQ0)] at h
+  -- step 2: `f((f X⁻¹)⁻¹) ~ ω`
+  have hs2 : dOrbitRel hyp.D ω (f ((f (ωk * ρ))⁻¹)) := by
+    have hinvrel : dOrbitRel hyp.D (ω * y) ((f (ωk * ρ))⁻¹) := by
+      have h := dOrbitRel.inv hs1
+      rwa [hprodinv] at h
+    have h1 := hfrel hωyQ (hne hωyQ0) hinvrel
+    have h2 : dOrbitRel hyp.D (f (ω * y)) ω := by
+      have hnr : dOrbitRel hyp.D (ω * y) (f ω) := ⟨ζ, hζD, hnorm⟩
+      have h := hfrel hωyQ (hne hωyQ0) hnr
+      rwa [hff hωQ (hne hωQ0)] at h
+    exact dOrbitRel.trans h2.symm h1
+  -- step 3: `f((f((f X⁻¹)⁻¹))⁻¹) ~ ω_i(ρy)`
+  have hs3 : dOrbitRel hyp.D (ωi * (ρ * y))
+      (f ((f ((f (ωk * ρ))⁻¹))⁻¹)) := by
+    have hinvrel : dOrbitRel hyp.D (ω * ρ) ((f ((f (ωk * ρ))⁻¹))⁻¹) := by
+      have h := dOrbitRel.inv hs2
+      rwa [hωinv] at h
+    exact dOrbitRel.trans hi.symm (hfrel hωρQ (hne hωρQ0) hinvrel)
+  -- (H5): the cube is the identity on orbits
+  have hXQ : ωk⁻¹ * ρ ∈ hyp.Q :=
+    hyp.Q.mul_mem (hyp.Q.inv_mem hωkQ) (hyp.Q0_le_Q hρQ0)
+  have hX1 : ωk⁻¹ * ρ ≠ 1 := by
+    intro hc
+    refine hne hωkρQ0 ?_
+    rw [← hXinv, hc, inv_one]
+  have hcube := H.dOrbitRel_fj_cube hyp.rankOneSetup hXQ hX1
+  rw [hXinv] at hcube
+  exact dOrbitRel.trans hcube hs3.symm
+
 /-- **`ω² = (0,α)` from the (H5) conclusion** (Peterfalvi Part II, p. 129).
 
 The chain of (17), (20) and (H5) ends with `(ω⁻¹(0,r))^{KW} = (ω(0,α+r))^{KW}`; since
@@ -407,6 +516,35 @@ theorem f_eq_conj_inv_of_sq_eq {ζ ω y : G} (hyQ0 : y ∈ hyp.Q0)
     calc ω * (ω * ω) = ((ω * ω) * (ω * ω)) * ω⁻¹ := by group
       _ = ω⁻¹ := by rw [hy1, one_mul]
   rw [hfω, hωy]
+
+/-- **§2's closing Proposition, second half** (Peterfalvi Part II, p. 129):
+`f(ω') = (ω'⁻¹)^ζ`.
+
+Assembles the three pieces: the (H5) chain
+(`dOrbitRel_of_stepTwenty_chain`) puts `ω'⁻¹ρ` and `ω'(ρy)` in the same `D`-orbit, the
+freeness of the `D`-action (`sq_eq_of_dOrbitRel`) turns that into `ω'² = (0,α)`, and the
+normalization then reads as the assertion (`f_eq_conj_inv_of_sq_eq`).
+
+The hypothesis `ω_i = ω_k` is the book's "whence `i = k`", which comes from the
+representatives `ω_1, …, ω_n` lying in *distinct* `KW`-orbits; that family is not
+formalized here, so the coincidence is assumed. -/
+theorem f_eq_conj_inv_of_stepTwenty_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ζ ω ω' y ρ : G}
+    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hω'Q : ω' ∈ hyp.Q) (hω'Q0 : ω' ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hρQ0 : ρ ∈ hyp.Q0) (hρ : ρ = ω * ω) (hζD : ζ ∈ hyp.D)
+    (hsq' : ω' * ω' ∈ hyp.Q0)
+    (hnorm : f ω = ζ⁻¹ * (ω * y) * ζ) (hnorm' : f ω' = ζ⁻¹ * (ω' * y) * ζ)
+    (hi : dOrbitRel hyp.D (f (ω * ρ)) (ω' * (ρ * y)))
+    (hk : dOrbitRel hyp.D (f (ω * (ρ * y))) (ω' * ρ)) :
+    ω' * ω' = y ∧ f ω' = ζ⁻¹ * ω'⁻¹ * ζ := by
+  have hchain := hyp.dOrbitRel_of_stepTwenty_chain H hωQ hωQ0 hω'Q hω'Q0 hyQ0 hρQ0 hρ
+    hζD hnorm hi hk
+  have hsq := hyp.sq_eq_of_dOrbitRel M hZ hmu hVW hω'Q hω'Q0 hyQ0 hρQ0 hsq' hchain
+  exact ⟨hsq, hyp.f_eq_conj_inv_of_sq_eq hyQ0 hnorm' hsq⟩
 
 end Hypothesis
 
