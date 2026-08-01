@@ -273,6 +273,23 @@ theorem Setup.exists_fgh (hS : Setup M Q D t) :
     fun x hxQ hx1 => ⟨(hfgh x hxQ hx1).2.2.1, (hfgh x hxQ hx1).1, (hfgh x hxQ hx1).2.1⟩,
     fun x hxQ hx1 => (hfgh x hxQ hx1).2.2.2⟩
 
+/-- **The mappings can be normalized to fix `1`.**
+
+`IsFGH` constrains `f`, `g`, `h` only on `Q^#`, so `Setup.exists_fgh` says nothing about
+`f 1`.  Peterfalvi Ch. IV §3's Corollary 2 asks for `f ρ ∈ Q` for *every* `ρ ∈ Q`, so this
+records the normalization that makes that true. -/
+theorem Setup.exists_fgh_one (hS : Setup M Q D t) :
+    ∃ f g h : L → L, IsFGH M Q D t f g h ∧ f 1 = 1 ∧ g 1 = 1 ∧ h 1 = 1 := by
+  classical
+  obtain ⟨f, g, h, H⟩ := hS.exists_fgh
+  refine ⟨fun x => if x = 1 then 1 else f x, fun x => if x = 1 then 1 else g x,
+    fun x => if x = 1 then 1 else h x, ⟨fun x hxQ hx1 => ?_, fun x hxQ hx1 => ?_⟩,
+    by simp, by simp, by simp⟩
+  · simp only [if_neg hx1]
+    exact H.mem x hxQ hx1
+  · simp only [if_neg hx1]
+    exact H.eq x hxQ hx1
+
 /-! ## Uniqueness, and the read-off lemma
 
 Every identity below is proved by the same two-step pattern: exhibit a factorization

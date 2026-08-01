@@ -421,6 +421,28 @@ lemma structure_equation :
       hyp.structureConjugator⁻¹ * hyp.t * hyp.structureConjugator :=
   hyp.distinguishedPair_spec.2.2
 
+/-- **The braid relation `t s t = s t s`**, which is the form `|s t| = 3` is used in from
+Peterfalvi Part II, Ch. IV §3 onwards (`corollaryTwo_of_standardModel`'s `hC2`).
+
+`s` and `t` are involutions, so `(s t s)(t s t) = (s t)³ = 1` and `s t s = (t s t)⁻¹`,
+which is `t s t` again. -/
+lemma braid_of_orderOf_mul_eq_three
+    (hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3) :
+    hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution := by
+  set s : G := hyp.distinguishedInvolution with hsdef
+  set t : G := hyp.t with htdef
+  have h3 : (s * t) ^ 3 = 1 := by rw [← hst]; exact pow_orderOf_eq_one _
+  have hsinv : s⁻¹ = s :=
+    inv_eq_of_mul_eq_one_right (by rw [← sq]; exact hyp.distinguishedInvolution_sq)
+  have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right (by rw [← sq]; exact hyp.t_sq)
+  have h : s * t * s * (t * s * t) = 1 := by
+    have hexp : (s * t) ^ 3 = s * t * s * (t * s * t) := by
+      rw [pow_succ, pow_succ, pow_one]; group
+    rw [← hexp]; exact h3
+  have h2 : s * t * s = (t * s * t)⁻¹ := mul_eq_one_iff_eq_inv.mp h
+  rw [h2, mul_inv_rev, mul_inv_rev, hsinv, htinv, mul_assoc]
+
 /-- Uniqueness of the distinguished pair: any `(s', r')` satisfying the
 defining conditions equals `(s, r)`. -/
 lemma eq_distinguishedPair_of_structure {s' r' : G} (hsH : s' ∈ hyp.H)
