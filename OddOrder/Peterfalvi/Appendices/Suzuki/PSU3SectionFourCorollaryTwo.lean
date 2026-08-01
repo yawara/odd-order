@@ -38,6 +38,7 @@ by `P` fixes both decompositions of Ch. I, so their factors stay in `C_G(P)`, an
   `C_Q(X)` inherits the rank-one setup.
 * `Hypothesis.rankOneSetup_residual` — in particular `U = O^{2′}(C_G(X))` does, which is
   what the book's `f₁`, `h₁` are the mappings of.
+* `Hypothesis.setup_residualQuotient` — and so does `U/Z(U)`, where step (2) argues.
 * `Hypothesis.isStandardModel_residualQuotient` — the Proposition of Ch. III §3 holds
   on `U/Z(U)`.
 -/
@@ -55,6 +56,12 @@ section Centralizer
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
   (hyp : Hypothesis G Ω) {f g h : G → G} {X : Subgroup G}
+
+/-- **The book's `U`**: the residual `O^{2′}(C_G(X))`, as a subgroup of `G` rather than
+of the centralizer. -/
+abbrev residualImage (X : Subgroup G) : Subgroup G :=
+  (Subgroup.primeComplementResidual 2
+    (Subgroup.centralizer (X : Set G))).map (Subgroup.centralizer (X : Set G)).subtype
 
 omit [MulAction G Ω] [Finite G] in
 /-- An element fixed by conjugation by every member of `X` centralizes `X`. -/
@@ -218,19 +225,35 @@ theorem rankOneSetup_residual (hXD : X ≤ hyp.D)
     (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
     (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))) :
     OddOrder.GroupTheory.RankOneBNPair.Setup
-      (hyp.H.subgroupOf ((Subgroup.primeComplementResidual 2
-        (Subgroup.centralizer (X : Set G))).map
-          (Subgroup.centralizer (X : Set G)).subtype))
-      (hyp.Q.subgroupOf ((Subgroup.primeComplementResidual 2
-        (Subgroup.centralizer (X : Set G))).map
-          (Subgroup.centralizer (X : Set G)).subtype))
-      (hyp.D.subgroupOf ((Subgroup.primeComplementResidual 2
-        (Subgroup.centralizer (X : Set G))).map
-          (Subgroup.centralizer (X : Set G)).subtype))
+      (hyp.H.subgroupOf (residualImage (G := G) X))
+      (hyp.Q.subgroupOf (residualImage (G := G) X))
+      (hyp.D.subgroupOf (residualImage (G := G) X))
       ⟨hyp.t, hyp.t_mem_residual htX⟩ :=
   hyp.rankOneSetup_subgroup hXD htX
     (by rintro _ ⟨u, -, rfl⟩; exact u.2) (hyp.t_mem_residual htX)
     (hyp.inf_centralizer_le_residual hCQ)
+
+/-- **`U/Z(U)` inherits the rank-one setup too** (Peterfalvi Part II, Ch. IV §4,
+step (2), p. 133).
+
+Ch. I §3 Proposition 1(c) identifies `U/Z(U)` with `PSU(3, ℓ)`, and step (2) argues
+there.  The centre is a legitimate kernel for `Setup.quotient` because step (1) puts it
+inside `P`, hence inside `V ≤ D`. -/
+theorem setup_residualQuotient (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    OddOrder.GroupTheory.RankOneBNPair.Setup
+      ((hyp.H.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
+      ((hyp.Q.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
+      ((hyp.D.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
+      (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))
+        ⟨hyp.t, hyp.t_mem_residual htX⟩) :=
+  (hyp.rankOneSetup_residual hXD htX hCQ).quotient hZD
 
 end Centralizer
 
