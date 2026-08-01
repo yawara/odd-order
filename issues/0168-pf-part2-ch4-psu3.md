@@ -7088,3 +7088,42 @@ ULift 版へ `intrinsicResidualQuotientULift_{H,Q,D,t}` + section `SameGroup` �
 5. `V`,`K` は `D`,`t` から定義されるので `ψ` で対応 ⟹ transported 側の
    `residualQuotientHypothesis_V_eq_W` などから **`hVW` / `hKcard` を移送** ⟹
    `corollaryTwo_of_standardModel` が当たり、(119) の 2 転送と合わせて**段 (2) が閉じる**。
+
+## 2026-08-02 (141): 🎯 四つ組の照合が完成 — `hVW` も出た、残るは `hKcard` 1 本
+
+* `exists_mulEquiv_match_residualQuotient_t` — `U/Z(U)` 上の内在仮説と transported 仮説を
+  **`H`,`Q`,`D`,`t` の 4 つすべて**で合わせる同型。
+  - `H,Q,D` は (136) の `φ`。
+  - `t` は `Setup.mul_mem_K_of_setup` ((140)) で差が `K̄` に入ることを見て、
+    `exists_mem_K_conj_t_eq` ((110)) で共役として実現。
+  - conj `e` (`e ∈ K̄ ≤ D̄ ≤ M̄`) は `H,Q,D` を動かさない。
+  - 追加仮説 `C_{Q̄}(D̄) = ⊥` は標準モデルから 3 段で移送済 ((140) 追記)。
+* `map_V_of_mulEquiv` / `map_K_of_mulEquiv` (`HypothesisFieldMatching.lean`) —
+  `V = D ⊓ C({t})`, `K = ⟨{x ∈ D | txt = x⁻¹}⟩` なので `D`,`t` で決まる。
+* `V_eq_W_intrinsicResidualQuotient` — ⟹ **`hVW` が内在版で成立**。
+
+### `corollaryTwo_of_standardModel` の引数 (最終)
+
+| 引数 | 状態 |
+|---|---|
+| `H` (=`IsFGH`) / `hC2` / `sfive` / `M` / `hZc` / `hmu` / `hm` / `hQ0card` / `hVW` | ✅ |
+| bilinear package (`IsStandardModel` の分解) | ✅ ((138)) |
+| `hW1` / `hWdvd` / `hhW` | ✅ 導出可 ((133)(136)) |
+| **`hKcard` (`\|actualKActor\| = 2ᵐ-1`)** | ⚠ **残り 1 本** |
+
+### ⚠ 次セッションはここから — `hKcard`
+
+`actualKActor = conjQByK.range : Subgroup (MulAut ↥Q)` (`ActualKActor.lean:117`)。
+`ψ` は `Q` と `K` を合わせる (`map_K_of_mulEquiv` 今回) ので、`MulAut ↥Q_tr ≃* MulAut ↥Q̄`
+(`ψ` の `Q` への制限が誘導する) の下で `conjQByK` の像が対応する。⟹ 位数が一致。
+
+実装候補:
+1. `MulEquiv.subgroupMap ψ Q_tr : ↥Q_tr ≃* ↥Q̄` (制限) を取る。
+2. `MulAut.congr` (= `MulEquiv.autCongr`?) で `MulAut ↥Q_tr ≃* MulAut ↥Q̄`。⚠ mathlib の
+   正確な名前を実測すること。
+3. `conjQByK` の可換性 (`ψ` で共役してから制限 = 制限してから共役) を示し、range の対応を出す。
+4. transported 側の `|actualKActor| = 2ᵐ-1` を実測 (標準モデルで `|K| = ℓ-1` かつ
+   `K` が `Q` に忠実に作用、が実体)。
+
+⟹ これが済めば `corollaryTwo_of_standardModel` が当たり、(119) の 2 転送と合わせて
+**段 (2) が完全に閉じる**。
