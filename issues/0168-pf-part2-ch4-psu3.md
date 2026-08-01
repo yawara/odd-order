@@ -7127,3 +7127,31 @@ ULift 版へ `intrinsicResidualQuotientULift_{H,Q,D,t}` + section `SameGroup` �
 
 ⟹ これが済めば `corollaryTwo_of_standardModel` が当たり、(119) の 2 転送と合わせて
 **段 (2) が完全に閉じる**。
+
+## 2026-08-02 (142): `hKcard` は移送不要だった — `corollaryTwo_of_standardModel` の引数が出揃った
+
+⚠ `PSU3OrbitCount.card_actualKActor_eq` は
+`(s : LemmaFiveSetup m) (M : QuotientFieldModel m) (hm) (hQ0card)` から
+`|actualKActor| = 2ᵐ-1` を出す**汎用**補題だった。(138) で得ている `sfive`/`Mq` を
+食わせるだけで済み、`MulAut` の congruence 経由の移送 ((141) で見積もった経路) は不要。
+`exists_isStandardModel_intrinsicResidualQuotient` の結論に同梱した。
+
+### ⚠ 新たに判明した制約 — `hcard : 5 ≤ |F|` は `ℓ ≥ 8` を意味する
+
+`corollaryTwo_of_standardModel` / `_of_sectionThree` は
+`hcard : 5 ≤ Nat.card ↥(frobFixedSubfield M.E 2 m)` を取る
+(`PSU3CorollaryTwo.lean:479, 575`; `stepThree` / `stepThree_model` が消費)。
+`|frobFixedSubfield| = 2ᵐ` なので **`2ᵐ ≥ 5` ⟺ `m ≥ 3` ⟺ `ℓ ≥ 8`**。
+
+一方 §4 が持っているのは `data.one_lt_n : 1 < n`、すなわち `ℓ ≥ 4` だけ。
+⟹ **`ℓ = 4` の場合の扱いが未確認**。
+
+次セッションはまずここを実測すること:
+1. 書籍 Ch. IV / Ch. III §3 に `q > 4` 相当の条件があるか (p.120-134 を PDF で確認)。
+2. `stepThree` が `hcard` を何に使っているか (`PSU3CorollaryTwo.lean` の該当箇所) —
+   `5 ≤ |F|` が本当に必要か、それとも `4 ≤ |F|` で足りるのに強く取っているだけか
+   ([[repo-stronger-hypothesis-is-specialization-not-gap]] の型)。
+3. 本当に `ℓ ≥ 8` が要るなら、`ℓ = 4` を別途排除する議論が §4 のどこかにあるはず。
+
+⚠ この判断が済むまで段 (2) の最終組み立て (`corollaryTwo_of_standardModel` の適用) は
+保留。それ以外の引数はすべて内在版で揃っている。
