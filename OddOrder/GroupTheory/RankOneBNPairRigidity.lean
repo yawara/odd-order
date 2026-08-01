@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RankOneBNPair
 import OddOrder.GroupTheory.PrimeComplementResidual
+import OddOrder.Mathlib.SchurZassenhausConj
 
 /-!
 # The rigidity Lemma of a rank-one split BN-pair
@@ -663,5 +664,117 @@ theorem Setup.natCard_eq_of_setup [Finite L] {M' Q' D' : Subgroup L} {t' : L}
   rw [hMeq, h2, hQeq] at h1
   have hpos : 0 < Nat.card ↥Q' := Nat.card_pos
   exact Nat.eq_of_mul_eq_mul_left hpos h1.symm
+
+/-- **Matching `D`**: a complement to `Q'` in `M'` of the right order is conjugate to `D'`
+by an element of `Q'`.
+
+`Q'` is a normal `2`-subgroup of `M'` of odd index `|D'|`, so Schur–Zassenhaus conjugacy
+(`Subgroup.IsComplement'.exists_conj_of_coprime`) applies; the solvability it asks for is
+that of the `2`-group `Q'`. -/
+theorem Setup.exists_conj_D_eq [Finite L] {M' Q' D' : Subgroup L} {t' : L}
+    (hS' : Setup M' Q' D' t') (hQ' : IsPGroup 2 ↥Q') (hDodd' : Odd (Nat.card ↥D'))
+    {D₁ : Subgroup L} (hD₁M : D₁ ≤ M') (hD₁Q : Q' ⊓ D₁ = ⊥)
+    (hD₁card : Nat.card ↥D₁ = Nat.card ↥D') :
+    ∃ n ∈ Q', D₁.map (MulAut.conj n).toMonoidHom = D' := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI hNorm : (Q'.subgroupOf M').Normal := ⟨fun n hn m => Subgroup.mem_subgroupOf.mpr (by
+    have hc := hS'.conj_mem_Q (M'.inv_mem m.2) (Subgroup.mem_subgroupOf.mp hn)
+    simpa using hc)⟩
+  have hcardN : Nat.card ↥(Q'.subgroupOf M') = Nat.card ↥Q' :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hS'.QM).toEquiv
+  have hcardK : Nat.card ↥(D₁.subgroupOf M') = Nat.card ↥D' := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hD₁M).toEquiv, hD₁card]
+  have hcardK' : Nat.card ↥(D'.subgroupOf M') = Nat.card ↥D' :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hS'.DM).toEquiv
+  have hdisj : ∀ {A : Subgroup L}, Q' ⊓ A = ⊥ →
+      Disjoint (Q'.subgroupOf M') (A.subgroupOf M') := by
+    intro A hA
+    rw [disjoint_iff, eq_bot_iff]
+    intro x hx
+    have hx' : (x : L) ∈ Q' ⊓ A :=
+      ⟨Subgroup.mem_subgroupOf.mp hx.1, Subgroup.mem_subgroupOf.mp hx.2⟩
+    rw [hA, Subgroup.mem_bot] at hx'
+    exact Subgroup.mem_bot.mpr (Subtype.ext hx')
+  have hcompl' : Subgroup.IsComplement' (Q'.subgroupOf M') (D'.subgroupOf M') :=
+    Subgroup.isComplement'_of_card_mul_and_disjoint
+      (by rw [hcardN, hcardK', hS'.natCard_M]) (hdisj hS'.Q_inf_D_eq_bot)
+  have hcompl : Subgroup.IsComplement' (Q'.subgroupOf M') (D₁.subgroupOf M') :=
+    Subgroup.isComplement'_of_card_mul_and_disjoint
+      (by rw [hcardN, hcardK, hS'.natCard_M]) (hdisj hD₁Q)
+  have hindex : (Q'.subgroupOf M').index = Nat.card ↥D' := by
+    have h := Subgroup.card_mul_index (Q'.subgroupOf M')
+    rw [hcardN, hS'.natCard_M] at h
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos h
+  have hcop : Nat.Coprime (Nat.card ↥(Q'.subgroupOf M')) (Q'.subgroupOf M').index := by
+    rw [hcardN, hindex]
+    obtain ⟨k, hk⟩ := hQ'.exists_card_eq
+    rw [hk]
+    exact Nat.Coprime.pow_left k (Nat.coprime_two_left.mpr hDodd')
+  haveI hNp : IsPGroup 2 ↥(Q'.subgroupOf M') :=
+    hQ'.of_equiv (Subgroup.subgroupOfEquivOfLe hS'.QM).symm
+  haveI : Group.IsNilpotent ↥(Q'.subgroupOf M') := hNp.isNilpotent
+  obtain ⟨n, hnN, hconj⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop (Or.inl inferInstance) hcompl hcompl'
+  refine ⟨(n : L), Subgroup.mem_subgroupOf.mp hnN, ?_⟩
+  have hcomp : M'.subtype.comp (MulAut.conj n).toMonoidHom
+      = (MulAut.conj (n : L)).toMonoidHom.comp M'.subtype := by ext x; rfl
+  have hmap := congrArg (Subgroup.map M'.subtype) hconj
+  rw [Subgroup.map_map, hcomp, ← Subgroup.map_map, Subgroup.subgroupOf_map_subtype,
+    Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hD₁M, inf_eq_left.mpr hS'.DM] at hmap
+  exact hmap
+
+/-- Conjugating a subgroup by one of its own elements does nothing. -/
+theorem map_conj_self {K : Subgroup L} {n : L} (hn : n ∈ K) :
+    K.map (MulAut.conj n).toMonoidHom = K := by
+  refine le_antisymm ?_ fun x hx => ⟨n⁻¹ * x * n,
+    K.mul_mem (K.mul_mem (K.inv_mem hn) hx) hn, ?_⟩
+  · rintro _ ⟨x, hx, rfl⟩
+    exact K.mul_mem (K.mul_mem hn hx) (K.inv_mem hn)
+  · change n * (n⁻¹ * x * n) * n⁻¹ = x
+    group
+
+/-- Conjugation by a product, as a map of subgroups. -/
+theorem map_conj_mul (a b : L) (K : Subgroup L) :
+    K.map (MulAut.conj (a * b)).toMonoidHom
+      = (K.map (MulAut.conj b).toMonoidHom).map (MulAut.conj a).toMonoidHom := by
+  rw [Subgroup.map_map]
+  congr 1
+  ext x
+  change (a * b) * x * (a * b)⁻¹ = a * (b * x * b⁻¹) * a⁻¹
+  group
+
+/-- **🎯 Two rank-one setups on the same group have conjugate `Q`, `M` and `D`.**
+
+`Setup.exists_conj_eq` matches `Q` and `M`; `Setup.exists_conj_D_eq` then matches `D` by
+an element of `Q'`, which leaves `Q'` and `M'` alone.  This is the comparison Peterfalvi
+Part II, Ch. IV §4, step (2) (p. 133) makes between the setup `U/Z(U)` inherits from `U`
+and the one Ch. I §3 Proposition 1(c) transports from the standard `PSU(3, ℓ)`; only the
+distinguished involution is left, and the two differ by an element of `K`. -/
+theorem Setup.exists_conj_eq_triple [Finite L] {M' Q' D' : Subgroup L} {t' : L}
+    (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
+    (hQ : IsPGroup 2 ↥Q) (hDodd : Odd (Nat.card ↥D)) (hQeven : Even (Nat.card ↥Q))
+    (hQ' : IsPGroup 2 ↥Q') (hDodd' : Odd (Nat.card ↥D')) (hQeven' : Even (Nat.card ↥Q'))
+    (hQ1 : Q ≠ ⊥) (hQ1' : Q' ≠ ⊥) :
+    ∃ c : L, Q.map (MulAut.conj c).toMonoidHom = Q' ∧
+      M.map (MulAut.conj c).toMonoidHom = M' ∧
+      D.map (MulAut.conj c).toMonoidHom = D' := by
+  obtain ⟨c, hQc, hMc⟩ :=
+    hS.exists_conj_eq hS' hQ hDodd hQeven hQ' hDodd' hQeven' hQ1 hQ1'
+  have hD₁M : D.map (MulAut.conj c).toMonoidHom ≤ M' := by
+    rw [← hMc]; exact Subgroup.map_mono hS.DM
+  have hD₁Q : Q' ⊓ D.map (MulAut.conj c).toMonoidHom = ⊥ := by
+    rw [← hQc,
+      ← Subgroup.map_inf Q D (MulAut.conj c).toMonoidHom (MulAut.conj c).injective,
+      hS.Q_inf_D_eq_bot, Subgroup.map_bot]
+  have hD₁card : Nat.card ↥(D.map (MulAut.conj c).toMonoidHom) = Nat.card ↥D' := by
+    rw [← Nat.card_congr (Subgroup.equivMapOfInjective D (MulAut.conj c).toMonoidHom
+      (MulAut.conj c).injective).toEquiv]
+    exact (hS.natCard_eq_of_setup hS' hQ hDodd hQeven hQ' hDodd' hQeven' hQ1 hQ1').2
+  obtain ⟨n, hnQ', hn⟩ := hS'.exists_conj_D_eq hQ' hDodd' hD₁M hD₁Q hD₁card
+  refine ⟨n * c, ?_, ?_, ?_⟩
+  · rw [map_conj_mul, hQc, map_conj_self hnQ']
+  · rw [map_conj_mul, hMc, map_conj_self (hS'.QM hnQ')]
+  · rw [map_conj_mul, hn]
 
 end OddOrder.GroupTheory.RankOneBNPair
