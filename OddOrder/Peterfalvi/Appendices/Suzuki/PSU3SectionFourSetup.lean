@@ -7,6 +7,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.CentralizerTrichotomy
 import OddOrder.Higman.Suzuki2Groups.CenterInvolutions
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.GaloisCentralizer
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: the standing hypothesis and step (1)'s discriminators
@@ -41,9 +42,10 @@ element of `Q − Q₀` does *not* square to `1`.
   of `Q/Q₀` has a `P`-fixed representative, necessarily outside `Q₀`.
 * `Hypothesis.inf_W_eq_bot_of_centralizes`, `Hypothesis.eq_of_mem_mul_of_inf_eq_bot` —
   the two steps that take step (1) from `Z(U) ⊆ P W` to `Z(U) ⊆ P`.
-* `Hypothesis.SectionFourSetup` — the standing hypothesis of §4, and
-  `SectionFourSetup.not_isElementaryAbelian_cQ`, which delivers the exponent
-  discriminator from it.
+* `Hypothesis.SectionFourSetup` — the standing hypothesis of §4, with
+  `SectionFourSetup.not_isElementaryAbelian_cQ` (the exponent discriminator),
+  `SectionFourSetup.natCard_Q0_eq_pow_cardP` (`q = ℓ^p`) and
+  `SectionFourSetup.eq_P_of_centralizes` (`Z(U) ⊆ P`) read off it.
 -/
 
 set_option autoImplicit false
@@ -338,6 +340,39 @@ theorem not_isElementaryAbelian_cQ
   have hconj := hyfix a ha
   calc a * y = (a * y * a⁻¹) * a := by group
     _ = y * a := by rw [hconj]
+
+/-- **`q = ℓ^p`** (Peterfalvi Part II, Ch. IV §4, step (1), p. 132):
+
+> Now `|C_{Q₀}(P)| = ℓ` and so `q = ℓ^p` since `P` acts on `Q₀` as a group of field
+> automorphisms (Chapter I, §2, Proposition 3).
+
+Artin's degree formula (`natCard_Q0_eq_pow`) needs the action of `P` on `Q₀` to be
+faithful, which is `P ∩ W = 1` — a field of the setup.  (The `W = 1` form of the formula
+would be useless here: §4 is the case `V ≠ W`.) -/
+theorem natCard_Q0_eq_pow_cardP :
+    Nat.card ↥hyp.Q0 =
+      Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) ^ s4.cardP := by
+  rw [← s4.card_P]
+  exact hyp.natCard_Q0_eq_pow s4.P_le_V s4.P_inf_W
+
+/-- **`Z(U) ⊆ P`** (Peterfalvi Part II, Ch. IV §4, step (1), p. 132), in the shape the
+assembly uses:
+
+> Since `P Z(U)` centralizes `C_Q(P) ⊄ Q₀`, `P Z(U) ∩ W = 1` and so `Z(U) ⊂ P`.
+
+Applied with `S = P Z(U)`: a subgroup containing `P`, factoring through `P W` (which is
+what the Galois inclusion `Z(U) ⊆ P W` provides) and centralizing an element of
+`Q − Q₀`, is `P` itself. -/
+theorem eq_P_of_centralizes {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu)
+    {S : Subgroup G} (hPS : s4.P ≤ S)
+    (hfac : ∀ s ∈ S, ∃ p ∈ s4.P, ∃ w ∈ hyp.W, s = p * w)
+    {y : G} (hyQ : y ∈ hyp.Q) (hy0 : y ∉ hyp.Q0)
+    (hS : ∀ c ∈ S, c * y = y * c) :
+    S = s4.P :=
+  eq_of_mem_mul_of_inf_eq_bot hPS hfac
+    (hyp.inf_W_eq_bot_of_centralizes M hZ hmu hyQ hy0 hS)
 
 end SectionFourSetup
 
