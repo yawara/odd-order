@@ -5629,3 +5629,23 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
 3. `isConj_of_involutions` で `c` を取り、`t = π t` の `Hypothesis` を作る。
 4. (96)-(101) の供給物をその版へ移す (`ofMulEquiv_*`)。
 5. `IsFGH.map` + `IsFGH.eq_of_le` ⟹ 段 (2) 完了。
+
+### (104) 続き: `Hypothesis.conjugate` landing
+
+`HypothesisTransport.lean` に `conjugate` (= `ofMulEquiv` を `MulAut.conj c` +
+点の写像 `ω ↦ c • ω` に特殊化) と `conjugate_t : (h.conjugate c).t = c * h.t * c⁻¹`
+(`rfl`) を追加。上記手順 1 が landing。
+
+⚠ ただし手順 4 (「(96)-(101) の供給物を共役版へ移す」) を書く前に、**段 (2) の
+`IsFGH.map` に何が要るかを正確に測ること**:
+
+* `IsFGH.map` は下の setup として `Setup M'' Q'' D'' t''` と
+  `hQπ : ∀ y ∈ Q_U, π y ∈ Q''`、`hDπ` を要求する。
+* `Q''` は自由に選べない: `Hypothesis` の公理から **`Q = O_2(H)`**
+  (`Q ⊴ H`, `Q ⊓ D = ⊥`, `Q·D = H`, `Q` even, `D` odd ⟹ `Q` は `H` の正規 Hall
+  2-部分群で一意)、`H = stabilizer(basept)`、`D = H ⊓ H^t` なので、
+  **`Hypothesis` は `(basept, t)` で決まる**。
+* ⟹ `t'' = π t` に合わせても、`H'' = π(U ∩ H)` になるかは **base point の選び方**
+  次第。ここが段 (2) の残る本物の同定。
+* 逆に `π(Q ∩ U)` が `H''` の正規 Hall 2-部分群であることさえ言えれば
+  `Q'' = π(Q ∩ U)` は自動 (一意性)。この線で攻めるのが筋。
