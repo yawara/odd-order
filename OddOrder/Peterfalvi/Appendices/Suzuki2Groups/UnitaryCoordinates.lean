@@ -98,6 +98,75 @@ theorem unitaryCoord_mul (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
       - u * (p.quotient * p.quotient ^ 2 ^ m)
       - u * (q.quotient * q.quotient ^ 2 ^ m)) * h2
 
+/-- The unitary coordinate of a central element is its central coordinate. -/
+@[simp] theorem unitaryCoord_central (u : E)
+    {φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m)}
+    (w : ↥(frobFixedSubfield E 2 m)) :
+    unitaryCoord m u (⟨0, w⟩ : BilinearTwistedProduct φ) = (w : E) := by
+  change (w : E) + u * ((0 : E) * (0 : E) ^ 2 ^ m) = (w : E)
+  rw [zero_mul, mul_zero, add_zero]
+
+@[simp] theorem unitaryCoord_one (u : E)
+    {φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m)} :
+    unitaryCoord m u (1 : BilinearTwistedProduct φ) = 0 := by
+  change ((0 : ↥(frobFixedSubfield E 2 m)) : E) + u * ((0 : E) * (0 : E) ^ 2 ^ m) = 0
+  rw [zero_mul, mul_zero, add_zero]
+  rfl
+
+/-- **Multiplying by a central element shifts the unitary coordinate.**  This is how
+the book moves along the fibre `{y : Tr y = a ā}` in §3 (4): `ω s^a` has unitary
+coordinate `x + a`. -/
+theorem unitaryCoord_mul_central (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
+    (hu : frobTrace (E := E) m u = 1)
+    (p : BilinearTwistedProduct (hermitianCocycle m hcard hu))
+    (w : ↥(frobFixedSubfield E 2 m)) :
+    unitaryCoord m u (p * ⟨0, w⟩) = unitaryCoord m u p + (w : E) := by
+  have hz : (0 : E) ^ 2 ^ m = 0 := zero_pow (by positivity)
+  rw [unitaryCoord_mul m hcard hu, unitaryCoord_central]
+  change _ = unitaryCoord m u p + (w : E)
+  rw [show p.quotient * (0 : E) ^ 2 ^ m = 0 by rw [hz, mul_zero], add_zero]
+
+/-- **The square is central with unitary coordinate the norm** — the relation
+`ω² = (0, ω̄^{1+q})` of §3 (3). -/
+theorem unitaryCoord_sq (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
+    (hu : frobTrace (E := E) m u = 1)
+    (p : BilinearTwistedProduct (hermitianCocycle m hcard hu)) :
+    unitaryCoord m u (p ^ 2) = p.quotient * p.quotient ^ 2 ^ m := by
+  have h2 : (2 : E) = 0 := CharTwo.two_eq_zero
+  rw [pow_two, unitaryCoord_mul m hcard hu]
+  change (p.central : E) + u * (p.quotient * p.quotient ^ 2 ^ m)
+    + ((p.central : E) + u * (p.quotient * p.quotient ^ 2 ^ m))
+    + p.quotient * p.quotient ^ 2 ^ m = _
+  linear_combination ((p.central : E) + u * (p.quotient * p.quotient ^ 2 ^ m)) * h2
+
+/-- **Inversion conjugates the unitary coordinate**: `(a, y)⁻¹ = (a, ȳ)`.
+
+The relation `Tr u = 1` enters as `u^q = u + 1`, which converts the shift by the norm
+into the `q`-power. -/
+theorem unitaryCoord_inv (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
+    (hu : frobTrace (E := E) m u = 1)
+    (p : BilinearTwistedProduct (hermitianCocycle m hcard hu)) :
+    unitaryCoord m u p⁻¹ = (unitaryCoord m u p) ^ 2 ^ m := by
+  have h2 : (2 : E) = 0 := CharTwo.two_eq_zero
+  have hnegq : -p.quotient = p.quotient := by linear_combination (-p.quotient) * h2
+  have huq : u ^ 2 ^ m = u + 1 := by
+    rw [frobTrace_apply] at hu
+    linear_combination hu - u * h2
+  have hzq : ((p.central : E)) ^ 2 ^ m = (p.central : E) :=
+    mem_frobFixedSubfield.mp p.central.2
+  have hNq : (p.quotient * p.quotient ^ 2 ^ m) ^ 2 ^ m
+      = p.quotient * p.quotient ^ 2 ^ m :=
+    mem_frobFixedSubfield.mp (norm_mem_frobFixed m hcard p.quotient)
+  have hval : unitaryCoord m u p⁻¹
+      = ((hermitianCocycle m hcard hu p.quotient p.quotient :
+          ↥(frobFixedSubfield E 2 m)) : E) - (p.central : E)
+        + u * (-p.quotient * (-p.quotient) ^ 2 ^ m) := rfl
+  have hexp : ((p.central : E) + u * (p.quotient * p.quotient ^ 2 ^ m)) ^ 2 ^ m
+      = (p.central : E) + (u + 1) * (p.quotient * p.quotient ^ 2 ^ m) := by
+    rw [add_pow_char_pow, mul_pow, hzq, huq, hNq]
+  rw [hval, hermitianCocycle_diag m hcard hu, hnegq, unitaryCoord, hexp]
+  linear_combination (-(p.central : E)) * h2
+
 /-- **The element with prescribed unitary coordinates.**  The correction lands back in
 `F` because `Tr y = a ā` is exactly what makes `y + u a ā` traceless. -/
 def ofUnitary (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
@@ -124,6 +193,20 @@ def ofUnitary (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
   have h2 : (2 : E) = 0 := CharTwo.two_eq_zero
   change (y + u * (a * a ^ 2 ^ m)) + u * (a * a ^ 2 ^ m) = y
   linear_combination (u * (a * a ^ 2 ^ m)) * h2
+
+/-- **The torus scales the unitary coordinate by the norm**: `(a, y)^d = (d a, d^{1+q} y)`
+(Peterfalvi Part II, p. 131, the display in the proof of stage (5)).
+
+Stated through the two coordinates of the scaled element rather than through the
+automorphism itself, so that it applies to whatever realization of the action is at
+hand. -/
+theorem unitaryCoord_of_scaled {u : E}
+    {φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m)}
+    (d : E) {p q : BilinearTwistedProduct φ} (hq1 : q.quotient = d * p.quotient)
+    (hq2 : (q.central : E) = d * d ^ 2 ^ m * (p.central : E)) :
+    unitaryCoord m u q = d * d ^ 2 ^ m * unitaryCoord m u p := by
+  rw [unitaryCoord, unitaryCoord, hq1, hq2, mul_pow]
+  ring
 
 /-- **The unitary coordinates determine the element.** -/
 theorem eq_of_unitaryCoord_eq {u : E}

@@ -142,6 +142,24 @@ there, since `a ā` already lies in `F`. -/
     (frobTrace_eq_zero_iff m (x * x ^ 2 ^ m)).mpr (norm_mem_frobFixed m hcard x),
     mul_zero, add_zero]
 
+/-- **The Hermitian cocycle scales by the norm**: `φ (d x) (d y) = d^{1+q} φ x y`.
+
+This is the action of the torus of `PSU(3, q)` on the unipotent group,
+`(x, y)^d = (d x, d^{1+q} y)`; the scalar `d^{1+q}` lies in `F`, which is why it passes
+through the trace correction unchanged. -/
+theorem hermitianCocycle_smul (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
+    (hu : frobTrace (E := E) m u = 1) (d x y : E) :
+    ((hermitianCocycle m hcard hu (d * x) (d * y) :
+      ↥(frobFixedSubfield E 2 m)) : E)
+      = d * d ^ 2 ^ m * ((hermitianCocycle m hcard hu x y :
+        ↥(frobFixedSubfield E 2 m)) : E) := by
+  have hsplit : (d * x) * (d * y) ^ 2 ^ m = (d * d ^ 2 ^ m) * (x * y ^ 2 ^ m) := by
+    rw [mul_pow]
+    ring
+  rw [hermitianCocycle_apply, hermitianCocycle_apply, hsplit,
+    frobTrace_mul_of_mem m (norm_mem_frobFixed m hcard d)]
+  ring
+
 end HermitianCocycle
 
 end OddOrder.FiniteField
