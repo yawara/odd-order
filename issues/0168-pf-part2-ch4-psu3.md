@@ -4575,3 +4575,50 @@ coprime 降下 (76) で `V̄ ≤ W̄`、`W_le_V` で **`hVW : qhyp.V = qhyp.W`**
 3. 弱められないなら (b) を検討 — `U/(P ∩ U)` 上の `Hypothesis` 構成。
    ⚠ これは設計分岐なので、判断根拠を issue に残すこと。
 4. 決着後: → `exists_standardModel` for 商 → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
+
+## 2026-08-01 (82): 🔍 `hVW` の全数 trace — **弱められない** (案 (a) は死んだ)
+
+`hVW : hyp.V = hyp.W` の**原始的な**使用箇所 (単なる threading を除く) を全数調査:
+
+| 箇所 | 使い方 |
+|---|---|
+| `PSU3OrbitCount.lean:870` (`eq_one_of_conj_eq_mul_Q0_of_mem_D`) | `exists_mem_K_mem_W_mul hVW` = **`D = KW`** |
+| `PSU3StepTwenty.lean:247`, `PSU3StepEighteen.lean:84` | 同上 (`D = KW`) |
+| `PSU3OrbitCount.lean:466,468,525` | `rwa [hVW]` — `\|V\|` を `\|W\|` に書き換える (ファイバー評価) |
+| `PSU3OrbitCount.lean:603` | `index_K_subgroupOf_D` (`\|D:K\| = \|V\|`) の後に `hVW` で `\|W\|` へ |
+
+⟹ **すべて「`D = KW`」か「`\|V\| = \|W\|`」に帰着する**。
+
+### ⚠ しかし両者は `V = W` と**同値**
+
+* `index_K_subgroupOf_D : (K.subgroupOf D).index = Nat.card V` (`hVW` 不要、
+  `card_D_eq_card_V_mul_card_K` から)。
+* `W ≤ V` (`W_le_V`) は無条件。
+* ⟹ `D = KW` ⟹ `\|D\| ≤ \|K\|·\|W\|` ⟹ `\|V\| ≤ \|W\|` ⟹ (`W ≤ V` と併せて) `V = W`。
+
+⟹ **`hVW` を `D = KW` に弱めても何も得しない** (論理的に同値)。
+**案 (a) は死んだ** — §3 endpoint の `hVW` は特殊化債務ではなく、本質的な仮説。
+
+### ⟹ 残るのは案 (b): §3 の適用先を書籍どおり `U/(P ∩ U)` にする
+
+書籍 p.133 は `f₁`, `h₁` を「`U`, `U ∩ H`, `t` に関して」取る、と明示している。
+repo が `C_G(P)/N` を選んだのは (57)(58) で既存構成 `centralizerQuotientHypothesis` に
+合わせたためで、書籍の商とは**別物**。
+
+* `V ∩ U ⊆ P × C_W(P)` を `P ∩ U` で割ると `V̄ ≤ W̄`、すなわち **`U/(P∩U)` では
+  `hVW` が成り立つ**見込み。
+* 一方 `C_G(P)/N` では `qhyp.V = π(V ⊓ C_G(P))` (coprime 降下、(76)) であって
+  `V ∩ U` より大きく、`hVW` が真である保証がない ((81))。
+
+### ⚠ 次セッションはここから (設計分岐の決着)
+
+1. **`U/(P ∩ U)` 上の `Hypothesis` 構成が可能かを実測する**。
+   材料: 段 (1) の `Z(U) ⊆ P` (`SectionFourSetup.eq_P_of_centralizes`)、
+   `t ∈ U` (`t_mem_primeComplementResidual`)、`U ≤ C_G(P)`。
+   ⚠ `centralizerQuotientHypothesis` は `C_G(X)/normalCore(C_H(X))` 専用なので、
+   `U` 版は新規構成 (A1)-(A3) が要る可能性が高い。手本 = `CentralizerInduction.lean` の
+   `centralizerHypothesisA1` + `CentralizerQuotient.lean` の `quotientOfKernel`。
+2. あるいは **`N ≤ P ∩ U` かつ両商が一致するか**を実測する
+   (`N = C_D(P) ⊓ C(C_Q(P))`、`Z(U) ⊆ P`)。一致すれば (81) の懸念自体が消える。
+   ⚠ **こちらを先に確認する** — 安ければ既存資産が全部そのまま使える。
+3. 決着後: `hVW` → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
