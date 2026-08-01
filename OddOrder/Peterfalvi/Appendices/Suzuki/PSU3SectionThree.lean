@@ -45,6 +45,8 @@ hypothesis, and then reads off `h(ω⁻¹) = ζ⁻³` from (H5) — a step the b
 * `Hypothesis.stepThree` — §3's stage (3): `θ = 1` and `ω² = (0, ζ + ζ⁻¹)`.
 * `Hypothesis.thetaModel_eq_id_on_frobFixed` — the model's `θ` and `σ` are both the
   identity on `F`, so stage (3) really is the book's `θ = 1`.
+* `Hypothesis.cocycle_scale_of_diagScale` — its `K`-scaling input, straight from
+  `centreQuadraticMap_smul`.
 -/
 
 set_option autoImplicit false
@@ -921,6 +923,43 @@ theorem thetaModel_eq_id_on_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m)
       _ = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) := by rw [← hk]; exact hpair k
       _ = a * θm a := by rw [← hk]; exact (hmodel k).symm
   exact eq_id_of_sq_eq_mul_on h2E _ σ θm hkey
+
+/-- **The cocycle is scaled by `μ(k)^d` under `K`** — the input `hscaleQ0` of
+`thetaModel_eq_id_on_frobFixed`.
+
+`exists_mulEquiv_bookCocycle` provides `φ`'s diagonal scaling law conditionally: *if* the
+centre's quadratic map scales by `b` under `a`, *then* so does `φ`.  The premise for
+`a = μ(k)`, `b = μ(k)^d` is exactly `centreQuadraticMap_smul`, which is the `K`-equivariance
+of the descended square map.  So the two feed straight into each other. -/
+theorem cocycle_scale_of_diagScale {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (sfive : hyp.LemmaFiveSetup m)
+    (ι' : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d' : ℤ)
+    (hequiv' : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι' (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d' : M.Eˣ) : M.E) *
+          ((ι' (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (hdiagscale : ∀ a b : M.E,
+      (∀ x : M.E,
+        ((hyp.centreQuadraticMap sfive M ι' (a * x) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = b * ((hyp.centreQuadraticMap sfive M ι' x :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) →
+      ∀ x y : M.E,
+        ((φ (a * x) (a * y) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = b * ((φ x y :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (k : ↥hyp.actualKActor) (x y : M.E) :
+    ((φ (((M.mu (k, 1) : M.Eˣ) : M.E) * x) (((M.mu (k, 1) : M.Eˣ) : M.E) * y) :
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+      = ((M.mu (k, 1) ^ d' : M.Eˣ) : M.E) *
+        ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) :=
+  hdiagscale _ _ (fun z => hyp.centreQuadraticMap_smul sfive M ι' d' hequiv' k z) x y
 
 end Hypothesis
 
