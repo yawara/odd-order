@@ -4891,3 +4891,56 @@ repo が `C_G(P)/N` を選んだのは (57)(58) で既存構成 `centralizerQuot
    (`1 < n`) から直接出る) → `nonempty_quotientFieldModel_of_orderThree` →
    `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
 3. `residualQuotientEquiv` で `U/Z(U)` へ transport → 段 (2) → **§4 完成**。
+
+## 2026-08-01 (89): 標準モデルの `W ≠ 1` landing + ⚠⚠ **`ih` に宇宙 (universe) の壁**
+
+### landing
+
+* `commute_weylElement_psuTorusHom_of_torusWeight_eq_one` — (A2) の逆向き。
+* `exists_ne_one_mem_standardHypothesis_W` — `W = V` = ノルム 1 トーラス ≠ 1。
+
+⟹ `exists_standardModel` / Lemma 5 producer が要る `w ∈ W#` が標準モデルで出た。
+
+### ⚠⚠ `ih` は universe が合わない (実測)
+
+```
+def TheoremAInductionBelow (G : Type u) (Omega : Type v) … : Prop :=
+  ∀ {A : Type u} {Lambda : Type v} …, Nat.card A < Nat.card G → …
+```
+
+`A` は **`G` と同じ universe `u`**。標準モデルは `standardPermGroup n : Type 0`、
+`Unital n : Type 0` なので `TheoremAInductionBelow (standardPermGroup n) (Unital n)` は
+`Type 0` の群だけを量化する。⟹ ambient `ih : TheoremAInductionBelow G Ω` (`G : Type u`)
+からは `u = 0` でない限り**直接は取れない**。
+
+⚠ `Hypothesis` 自体と §3 の endpoint (`corollaryTwo_of_stepFour` 等) は universe
+polymorphic なので、標準モデルに当てること自体は問題ない。**`ih` だけが壁**。
+
+### `ih` を Lemma 5 の結論で置換する案は不可 (実測)
+
+`ih` は Lemma 5 の producer chain に**深く threading されている**:
+`WCyclicDivides.lean:70,205` / `TypeBFromW.lean:162,196,340`。
+単一の消費点ではないので「`IsCyclic W ∧ |W| ∣ q+1` に弱める」では済まない。
+
+### 🧭 次の作業単位 = **`Hypothesis` の transport 構成**
+
+必要なのは `Hypothesis A Λ` を群同型 + 同変全単射に沿って移す一般構成:
+
+```
+Hypothesis.ofMulEquiv (h : Hypothesis A Λ) (e : A ≃* B) (f : Λ ≃ Λ')
+  (hf : ∀ a l, f (a • l) = e a • f l) : Hypothesis B Λ'
+```
+
+これが在れば
+1. **`ih` の universe 問題**: `ULift.{u} A` へ移して ambient `ih` を当て、結論を戻す。
+2. **段 (2) の結論 transport**: `standardPermGroup n` で得た `ω`, `ζ` を
+   `residualQuotientEquiv` で `U/Z(U)` へ、さらに ambient へ持ち上げる。
+両方に効く。⟹ **これを先に作るのが正しい順序**。
+
+### ⚠ 次セッションはここから
+
+1. `Hypothesis.ofMulEquiv` を構成する (フィールドを `e`/`f` で押し出すだけだが、
+   `doubly_transitive` / `faithful` / `H_def` の transport に注意)。
+   置き場は `Basic.lean` の下流の新 leaf か `QStructure` 手前。
+2. それで `ih` の `ULift` 経由供給を作る。
+3. → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2)。
