@@ -25,6 +25,8 @@ hypothesis, and then reads off `h(ω⁻¹) = ζ⁻³` from (H5) — a step the b
 ## Main results
 
 * `Hypothesis.fj_cube_of_f_eq_conj_inv` — `(f ∘ j)³(ω⁻¹) = ω^{-ζ³}`.
+* `Hypothesis.f_inv_eq`, `Hypothesis.g_inv_eq` — `f(ω⁻¹) = ω^{ζ⁻¹}` and
+  `g(ω⁻¹) = ω^ζ`.
 * `Hypothesis.h_inv_eq` — `h(ω⁻¹) = ζ⁻³`.
 * `Hypothesis.h_eq_zpow_three` — `h(ω) = ζ³`, given `h(ω) ∈ W`.
 -/
@@ -74,6 +76,36 @@ theorem fj_cube_of_f_eq_conj_inv (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   rw [hyp.conj_t_pow_eq hζ 2] at h3''
   have hinv2 : (f ((f ω)⁻¹))⁻¹ = (ζ ^ 2)⁻¹ * ω * ζ ^ 2 := by rw [e2]; group
   rw [hinv2, h3'', hf, pow_two, pow_three']
+  group
+
+/-- **`f(ω⁻¹) = ω^{ζ⁻¹}`** (Peterfalvi Part II, p. 130): applying `f` to the hypothesis
+`f(ω) = (ω⁻¹)^ζ` and moving the conjugation across by (H3). -/
+theorem f_inv_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {ζ ω : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) :
+    f ω⁻¹ = ζ * ω * ζ⁻¹ := by
+  have hζD : ζ ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hζ)
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
+  have hωinvQ : ω⁻¹ ∈ hyp.Q := hyp.Q.inv_mem hωQ
+  have hωinv1 : ω⁻¹ ≠ 1 := fun hc => hω1 (inv_eq_one.mp hc)
+  have htζt : hyp.t * ζ * hyp.t = ζ := by
+    have hp := hyp.conj_t_pow_eq hζ 1
+    rwa [pow_one] at hp
+  obtain ⟨h3, -, -⟩ := hThree hyp.rankOneSetup H hωinvQ hωinv1 hζD
+  rw [htζt] at h3
+  have h2 : f (f ω) = ω := (hTwo hyp.rankOneSetup H hωQ hω1).1
+  rw [hf, h3] at h2
+  calc f ω⁻¹ = ζ * (ζ⁻¹ * f ω⁻¹ * ζ) * ζ⁻¹ := by group
+    _ = ζ * ω * ζ⁻¹ := by rw [h2]
+
+/-- **`g(ω⁻¹) = ω^ζ`** (Peterfalvi Part II, p. 130): (H1) says `g(x⁻¹) = f(x)⁻¹`. -/
+theorem g_inv_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {ζ ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) :
+    g ω⁻¹ = ζ⁻¹ * ω * ζ := by
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
+  obtain ⟨-, o2, -⟩ := hOne hyp.rankOneSetup H hωQ hω1
+  rw [o2, hf]
   group
 
 /-- **`h(ω⁻¹) = ζ⁻³`** (Peterfalvi Part II, p. 130).
