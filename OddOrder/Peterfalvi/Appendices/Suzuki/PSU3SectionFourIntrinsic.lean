@@ -166,6 +166,51 @@ theorem odd_natCard_map_D_residualQuotient :
     exact Subgroup.card_dvd_of_le inf_le_left
   exact Odd.of_dvd_nat hyp.D_odd (hdvd₁.trans hdvd₂)
 
+/-- **Commuting with `C_Q(X)` modulo `Z(U)` is commuting on the nose**, for an element of
+`U ∩ D` — the `U/Z(U)` counterpart of `commute_of_commute_mk'_of_mem_D_of_mem_Q`.
+
+Same reason: the commutator lies in `U ∩ Q`, the kernel `Z(U)` lies in `U ∩ D`, and
+`Q ∩ D = 1`.  It turns "`w̄` centralizes `Q̄₀`" — which is what `W̄ = D̄ ⊓ C(Q̄₀)` asks —
+into a statement about `C_{Q₀}(X)` upstairs. -/
+theorem commute_of_commute_mk'_center_of_mem_D_of_mem_Q (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X))
+    {v u : ↥(residualImage (G := G) X)}
+    (hv : v ∈ hyp.D.subgroupOf (residualImage (G := G) X))
+    (hu : u ∈ hyp.Q.subgroupOf (residualImage (G := G) X))
+    (h : QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) v *
+        QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) u
+      = QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) u *
+        QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) v) :
+    v * u = u * v := by
+  classical
+  have hcommZ : v * u * v⁻¹ * u⁻¹ ∈ Subgroup.center ↥(residualImage (G := G) X) := by
+    refine (QuotientGroup.eq_one_iff _).mp ?_
+    have hrw : (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)))
+        (v * u * v⁻¹ * u⁻¹)
+        = (QuotientGroup.mk' _ v * QuotientGroup.mk' _ u) *
+          (QuotientGroup.mk' _ u * QuotientGroup.mk' _ v)⁻¹ := by
+      simp only [map_mul, map_inv]
+      group
+    have := hrw
+    rw [h, mul_inv_cancel] at this
+    simpa using this
+  have hcommQ : v * u * v⁻¹ * u⁻¹ ∈ hyp.Q.subgroupOf (residualImage (G := G) X) := by
+    refine (hyp.Q.subgroupOf (residualImage (G := G) X)).mul_mem ?_
+      ((hyp.Q.subgroupOf (residualImage (G := G) X)).inv_mem hu)
+    refine Subgroup.mem_subgroupOf.mpr ?_
+    have hvH : (v : G) ∈ hyp.H := hyp.D_le_H (Subgroup.mem_subgroupOf.mp hv)
+    have := hyp.Q_normal_in_H (v : G) hvH (u : G) (Subgroup.mem_subgroupOf.mp hu)
+    simpa using this
+  have hbot : v * u * v⁻¹ * u⁻¹ ∈ hyp.Q.subgroupOf (residualImage (G := G) X)
+      ⊓ hyp.D.subgroupOf (residualImage (G := G) X) := ⟨hcommQ, hZD hcommZ⟩
+  rw [(hyp.rankOneSetup_residual hXD htX hCQ).Q_inf_D_eq_bot, Subgroup.mem_bot] at hbot
+  have hvu : v * u * v⁻¹ = u := mul_inv_eq_one.mp hbot
+  calc v * u = v * u * v⁻¹ * v := by group
+    _ = u * v := by rw [hvu]
+
 /-! ### The same transfers for `C = C_G(X)` and `C/𝒩(C)`
 
 `PSU3SectionFourSetup.standingData_centralizerQuotient` supplies *every* input of Ch. I §3
