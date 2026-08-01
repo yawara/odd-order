@@ -3661,3 +3661,26 @@ repo の `centralizerActionQuotient` と `result.L` がその商に対応する�
 3. 商から `U` への持ち上げ: `N ≤ C_H(P)` の元だけずれるので、書籍の
    `f₁(ω) ∈ ω^{-ζ₁}(P ∩ U)` / `h₁(ω) ∈ ζ₁³(P ∩ U)` という**剰余類の形**に対応する。
 4. `IsFGH.eq_of_le` で `f₁ → f`、`h₁ → h`。
+
+## 2026-08-01 (59): §4 — `t ∈ U` landing
+
+書籍 p.133 段 (2) が `f₁`, `h₁` を「`U`, `U ∩ H`, `t` に関して」取ることの正当性:
+
+| 定理 | 内容 |
+|---|---|
+| `SectionFourSetup.t_mem_centralizer` | `t` は `P ≤ V` を中心化 (`commute_t_of_mem_V`) |
+| `SectionFourSetup.t_mem_primeComplementResidual` | `t` は対合 ⟹ 2-元 ⟹ `C_G(P)` の Sylow 2 に含まれる ⟹ `U` に居る |
+
+⚠ `IsPGroup 2 ↥(zpowers t)` は **位数経由**が素直 (`orderOf t ∣ 2` →
+`Nat.card_zpowers` + `IsPGroup.of_card`)。zpow の指数計算に降りると `zpow_mul` の
+向きで詰まる。
+
+### ⚠ 次セッションはここから
+
+1. **段 (2) の本体** — (58) の 4 手順:
+   (a) `centralizerQuotientHypothesis s4.P_le_V hA3` で `C_G(P)/N` 上の `Hypothesis`
+   (b) そこに `corollaryTwo_of_stepFour` を当てる ⟸ **`hcover` の供給が実質**
+   (c) 商から `U` への持ち上げ (書籍の `f₁(ω) ∈ ω^{-ζ₁}(P∩U)` = 剰余類の形)
+   (d) `IsFGH.eq_of_le` で `f₁ → f`、`h₁ → h`
+2. PSU(3,ℓ) 構造事実 2 つ (中心化 / トーラス元の存在 = (56)) を `V ∩ U` の言葉へ。
+3. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
