@@ -1045,6 +1045,18 @@ noncomputable def intrinsicPointEquiv (details : CentralizerPSUData hyp X result
 /-- **The intrinsic standing hypothesis on `U/Z(U)`, permuting `Unital ℓ`** — the same
 `H`, `Q`, `D`, `t` as `intrinsicResidualQuotient`, with the point set relabelled so that
 it lies in `Ω`'s universe. -/
+noncomputable abbrev intrinsicPointEquivULift
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    ((↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X)) ⧸
+        (hyp.H.subgroupOf (residualImage (G := G) X)).map
+          (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
+      ≃ ULift.{v} (Unital data.n) :=
+  (hyp.intrinsicPointEquiv details hXD htX hCQ hZD).trans Equiv.ulift.symm
+
 noncomputable def intrinsicResidualQuotientULift
     (details : CentralizerPSUData hyp X result data)
     (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
@@ -1052,16 +1064,67 @@ noncomputable def intrinsicResidualQuotientULift
     (hZD : Subgroup.center ↥(residualImage (G := G) X)
       ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
     letI := Hypothesis.rankOneSetupAction
-      ((hyp.intrinsicPointEquiv details hXD htX hCQ hZD).trans Equiv.ulift.symm)
+      (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
     Hypothesis (↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X))
       (ULift.{v} (Unital data.n)) :=
   letI := hyp.isSimpleGroup_residualQuotient details
   Hypothesis.ofRankOneSetupOfEquiv (hyp.setup_residualQuotient hXD htX hCQ hZD)
-    ((hyp.intrinsicPointEquiv details hXD htX hCQ hZD).trans Equiv.ulift.symm)
+    (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
     (hyp.setup_residualQuotient hXD htX hCQ hZD).normalCore_eq_bot_of_isSimpleGroup
     (hyp.even_natCard_map_Q_residualQuotient details hXD htX hCQ hZD)
     hyp.odd_natCard_map_D_residualQuotient
     (hyp.two_rank_ge_two_residualQuotient details)
+
+/-- The four structural fields agree with those of `intrinsicResidualQuotient`: relabelling
+the point set does not move them (`ofRankOneSetupOfEquiv_*`). -/
+theorem intrinsicResidualQuotientULift_H (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    letI := Hypothesis.rankOneSetupAction
+      (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
+    (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).H
+      = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).H := by
+  letI := Hypothesis.rankOneSetupAction
+    (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
+  exact ofRankOneSetupOfEquiv_H _ _ _ _ _ _
+
+theorem intrinsicResidualQuotientULift_Q (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    letI := Hypothesis.rankOneSetupAction
+      (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
+    (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).Q
+      = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q := by
+  letI := Hypothesis.rankOneSetupAction
+    (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
+  exact ofRankOneSetupOfEquiv_Q _ _ _ _ _ _
+
+theorem intrinsicResidualQuotientULift_D (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    letI := Hypothesis.rankOneSetupAction
+      (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
+    (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).D
+      = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).D := by
+  letI := Hypothesis.rankOneSetupAction
+    (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
+  exact ofRankOneSetupOfEquiv_D _ _ _ _ _ _
+
+theorem intrinsicResidualQuotientULift_t (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
+    letI := Hypothesis.rankOneSetupAction
+      (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
+    (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).t
+      = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).t := rfl
 
 /-- **The induction hypothesis restricts to `U/Z(U)`** with the intrinsic point set.
 
