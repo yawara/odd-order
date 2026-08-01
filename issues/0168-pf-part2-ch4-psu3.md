@@ -5347,3 +5347,51 @@ lint 純ゼロ)。
 2. `exists_standardModel` の出力と突き合わせ、足りないものだけを個別に補う。
 3. 一気に threading して `corollaryTwo_of_stepFour` を呼び、段 (2) の `ω`, `ζ` を得る。
 4. `IsFGH.eq_of_le` で ambient へ持ち上げ ⟹ **§4 完成**。
+
+## 2026-08-01 (100): 🔍 段 (4) 鎖の呼び出し形を実測 — 橋は**既に在る**
+
+### 段 (4) 鎖 (`PSU3InverseFormula.lean`) の前提は 3 段とも**同一**
+
+`stepFour_star` (163) / `stepFour_base` (312) / `stepFour_pointwise` (378) はいずれも
+
+`H`, `hC2`, `sfive`, `M`, `hZc`, `hmu`, `hVW`, `Φ`, `hquot`, `ι`, `hker`, `hu`, `Ψ`,
+`hΨq`, `hΨc`, `hconjq`, `hconjy`, `d`, `hequiv`, …
+
+という**同じ長いリスト**を取る。`stepFour_at_omega` (451) はもっと短く
+(`M`, `hu`, `Ψ`, `hconjq`, `hconjy`, `ζ`, `ω`, `hf`, `hx`)、`stepFour_cover` (867) は
+`M`, `hu`, `Ψ`, `ω`, `hxne`, `h1`, `h2`。`corollaryTwo_of_stepFour` (`PSU3StepFive.lean:566`)
+も同じリスト + `hcover`, `hhW`, `ζ`。
+
+⟹ **一度そろえれば全部に使い回せる**。分割の必要は薄い。
+
+### 🔑 `exists_standardModel` の出力 → `Ψ` への橋は既存 (`PSU3RootGroupModel.lean`)
+
+| 補題 | 行 | 役割 |
+|---|---|---|
+| `exists_modelEquiv_conj` | 696 | `exists_standardModel` の出力 (`Φ`, `Θ`, `u`, `hquot`, `hΘq`, `hu`, `hconj`, `hmu`) を取り、共役の振る舞いが良い `Φ'` を返す |
+| `exists_unitaryModel_conj` | 609 | `Φ'` から **hermitian cocycle 版 `Ψ`** と `hΨq` / `hΨc` / 共役則を作る |
+| (183 付近の無名補題) | 214-306 | `hsemi`/`haniso`/`hW` から `u`, `hu`, `e`, `Ψ` を出す版 |
+
+⟹ **鎖は `exists_standardModel` → `exists_modelEquiv_conj` → `exists_unitaryModel_conj`
+→ 段 (4) 鎖 → `corollaryTwo_of_stepFour`**。新規の数学は要らない。
+
+### 残る前提の出どころ (`U/Z(U)` について)
+
+| 前提 | 出どころ |
+|---|---|
+| `hZc` | `sfive.centerEqQ0` |
+| `hWdvd : \|W\| ∣ 2^m+1` | Lemma 5 (`lemmaFive_of_orderThree` の第 2 成分) |
+| `hW1 : 1 < \|W\|` | `exists_ne_one_mem_residualQuotientHypothesis_W` から |
+| `hKcard : \|K\| = 2^m−1` | `card_K_eq_card_Q0_sub_one` + `hQ0card` |
+| `hmu` | `M.mu` の単射性 — `QuotientFieldModel` のフィールドか要実測 |
+| `H : IsFGH …`, `hfQ`, `hhW` | §1 の `exists_fgh` (`RankOneBNPair.lean`) |
+| `hC2` | `hst` (`|st| = 3`) から (`orderThree` 系) |
+| `ω₀`, `hcover` | 段 (4) 鎖の出力 |
+
+### ⚠ 次セッションはここから
+
+1. `exists_standardModel` を `residualQuotientHypothesis` に当て、
+   `exists_modelEquiv_conj` → `exists_unitaryModel_conj` で `Ψ` まで進む。
+2. 上表の残り前提を個別に埋める (`hmu` と `H : IsFGH` が要実測)。
+3. 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2) の `ω`, `ζ`。
+4. `IsFGH.eq_of_le` で ambient へ持ち上げ ⟹ **§4 完成**。
