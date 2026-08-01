@@ -4280,3 +4280,78 @@ PSU(3,ℓ) からの入力は Ch. III §1 の `exists_mem_residual_commute_Q0` 1
    `D_le_normalizer_W` で作れる可能性が高い (要実測)。
 3. → `psu3Numerics_and_standingData_centralizerQuotient` の最後の入力
    → `exists_standardModel` for `qhyp` → 段 (4) 鎖 → `corollaryTwo_of_stepFour`。
+
+## 2026-08-01 (75): 🎯 §2/§3 が商の中で走る — 段 (2)(b) の前提が**全部**埋まった
+
+`SectionFourSetup.standingData_centralizerQuotient` — §4 の ambient 仮説
+(`M`, `hZ`, `hmu`, `hQsuz`, `hCop`, `hSolv`, `hP`, `hA3`, `hord`, `ih`) だけから、
+商 `qhyp` について
+
+* `n ≠ 0` / `|Q̄₀| = 2ⁿ` / `|Q̄| = |Q̄₀|³` / `|s̄t̄| = 3` / `Q̄` は Suzuki 2-群
+* `Nonempty (qhyp.LemmaFiveSetup n)` / `Nonempty (qhyp.QuotientFieldModel n)`
+
+を**商についての残余仮説なしで**供給する。
+
+### 最後の隙間 `1 ≠ w ∈ W̄` の埋め方 (2 段)
+
+1. `exists_ne_one_mem_W_centralizer` (74) — ambient で `C_W(P) ≠ 1`。
+2. **`exists_ne_one_mem_quotient_W`** — その `ζ` が商で生き残る:
+   * `ζ̄ ∈ W̄`: `W = D ⊓ C(Q₀)` (72) が**両側で**使え、`Q̄₀` は `C_{Q₀}(P)` の像 (71)。
+   * `ζ̄ ≠ 1`: 核 `𝒩(C_G(P)) = C_D(P) ⊓ C(C_Q(P))`
+     (`normalCore_cH_eq_centralizer_cQ`) は `C_Q(P)` を**丸ごと**中心化する。
+     そこには段 (1) の `P`-固定な `ω ∈ Q − Q₀` が居るので、`ζ ∈ N` なら `ζ` が
+     `Q/Q₀` の非自明元を固定する ⟹ 固定点自由性
+     (`eq_one_of_conj_eq_mul_Q0_of_mem_W`) より `ζ = 1`、矛盾。
+
+⟹ 段 (2)(b) は `exists_standardModel` for `qhyp` を**呼ぶだけ**になった。
+
+## 2026-08-01 (76): 🔍 残る構造事実 (A) `V̄ = W̄` の正確な所在
+
+`exists_standardModel` は `hVW` を**要求しない**が、`stepFive` /
+`corollaryTwo_of_stepFour` は要求する (`D = KW` を `exists_mem_K_mem_W_mul hVW` で
+使うため)。⟹ 段 (2) を閉じるには商について `hVW : qhyp.V = qhyp.W` が要る。
+
+### `qhyp.V = π(V ⊓ C)` — coprime 作用で降りる (未実装だが道は明確)
+
+`t` は `D` を正規化し (`D = H ⊓ H^t` ⟹ `D^t = D`)、`t ∈ C = C_G(P)` なので
+`C_D(P)` も正規化する。核 `N ⊴ C` は `C_D(P)` に含まれ**奇位数**、`|⟨t⟩| = 2`。
+⟹ coprime 作用の固定点定理 (Isaacs Cor 3.28 =
+`OddOrder.GroupTheory.map_fixedSubgroup_eq_fixedSubgroup_quotient`,
+`CoprimeFixedPoints.lean:61`、**本 leaf は既に import 済**) で
+`C_{D̄}(t̄) = π(C_{C_D(P)}(t)) = π(V ⊓ C)`。
+
+### ⚠ 残る本体は PSU(3,ℓ) の辞書 — 迂回できないことを確認した
+
+`V_eq_W_iff_le_centralizer_Q0` (72) より `hVW` ⟺ `V̄ ≤ C(Q̄₀)` ⟺
+(上の降下と Galois の定理より) **`V ⊓ U ≤ C(C_{Q₀}(P))`**、すなわち書籍の
+「`(V ∩ U)/(P ∩ U)` centralizes `C_{Q₀}(P)`」そのもの。
+
+⚠ **(74) の `C_W(P) ≠ 1` の論法は流用できない**。あれは PSU 計算が与える
+**特定の** `x` から出発して `v` を作る向きで、逆向き (「`V ∩ U` の**全**元が
+`C_{Q₀}(P)` を中心化する」) は言えない。体で見ると:
+* `D/W ↪ ΓL₁(q) = F_q^× ⋊ Gal`、`P` は次数 `p` の Frobenius、`C_{Q₀}(P) = F_ℓ`
+  (`q = ℓ^p`)。
+* `C_{V̄}(P̄) = (V̄ ∩ F_ℓ^×) × P̄` なので、書籍の主張は
+  **`V̄ ∩ F_ℓ^× = 1`** と同値。これは `V ∩ U` が `PSU(3,ℓ)` の**ノルム 1 トーラス**で
+  あること (トーラス元は `Z(Q)` をノルム倍でスケールする) から出る。
+⟹ ambient の一般論では出ず、**PSU(3,ℓ) の標準モデルへの transport が必須**。
+
+### 次に要る model 側の事実 (2 本)
+
+1. `standardPermGroup n` で「Weyl 対合 `t` を中心化するトーラス元は
+   standard root subgroup の対合を中心化する」。
+   ⚠ `TorusCentralizer.lean:151`
+   `exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one` が**特定の 1 元**について
+   同じことを言っているので、その証明中に汎用形
+   (`torusWeight c = 1 → ∀ v, v² = 1 → psuTorusScaleHom n c v = v`) が在るはず。要実測。
+2. `V ⊓ U` が (`residualQuotientEquiv` の下で) トーラスの `C(t̄)` に対応すること。
+   手本 = `PSUCentre.lean` の `exists_mem_residual_commute_Q0`
+   (Sylow.mapEquiv + `Z(F)` を跨ぐ commutator の coprime 潰し)。
+
+### ⚠ 次セッションはここから
+
+1. `TorusCentralizer.lean:151` 周辺を読み、汎用形の有無を実測する。
+2. `V ⊓ U` → トーラスの辞書を作る (`PSUCentre.lean` を手本に)。
+3. `hVW : qhyp.V = qhyp.W` を組む (上の降下 + Galois + (72))。
+4. → `exists_standardModel` for `qhyp` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour`
+   → 商から `U` へ持ち上げ + `IsFGH.eq_of_le` ⟹ **段 (2) が閉じる**。
