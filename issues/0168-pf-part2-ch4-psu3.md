@@ -7462,3 +7462,10 @@ type-B 認識を通す必要がある。
   (体同型を経由するが、位数だけなので `orderOf` の共役不変性で足りる)。
 
 ⟹ 残る仕事は **(b) の露出リファクタ 1 本**に確定。数学は全部済んでいる。
+
+**(150)(151) 訂正**: `typeBQuadraticMap_smul` は**既存だった**
+(`TypeBIsomorphicSplit.lean:56`、同名・同証明)。`b6dd30efc` で `Types.lean` に重複追加し、
+leaf build では衝突が見えず素通り → フルビルドで `has already been declared` で赤になり、
+`4102db2c8` で撤回。**橋は既存補題をそのまま使えばよい**。
+⚠ 書く前に概念名で grep する ([[grep-before-writing-transport-defs]])。
+⚠ 新規宣言は leaf build が green でも**フルビルドまで名前衝突を検出しない**。
