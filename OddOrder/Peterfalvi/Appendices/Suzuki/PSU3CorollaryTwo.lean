@@ -39,6 +39,9 @@ because inversion fixes the quotient coordinate (`quotient_inv_eq`) while `μ(1,
   of the Proposition of Ch. III §3 (`exists_standardModel`) plus §3 (3): the unitary
   coordinates, the normalization `ν c(s) = 1`, the exponent `d = 2` and stage (3) at the
   base pair are all built here.
+* `Hypothesis.stepThree_model` — §3 (3) in the two shapes that endpoint consumes.
+* `Hypothesis.corollaryTwo_of_sectionThree` — the two composed: Corollary 2 from the
+  model of Ch. III §3, the type-`B` scaling pair and §2's base pair.
 -/
 
 set_option autoImplicit false
@@ -455,6 +458,198 @@ theorem corollaryTwo_of_standardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   exact hyp.corollaryTwo_of_base H hC2 sfive M hZc hmu hVW Φ' hquot' ι hker' hu Ψ hene
     hΨq hΨc hconjq hconjy d hequiv hdsq hs hm hQ0card hKcard hWdvd hW1 hfQ hhW hζ₀ hζ₀1
     hω₀Q hω₀Q0 hf₀ hstage3 hζ hζ1
+
+/-- **§3 (3), in the shape `corollaryTwo_of_standardModel` consumes it** (Peterfalvi
+Part II, Ch. IV §3 (3), p. 130).
+
+`stepThree` states its two conclusions through the type-`B` scaling pair `σ`, `τ`: the
+first says `σ = τ` on `F`, the second reads `α` after applying `σ⁻¹`.  Both mentions of
+`σ` disappear once `thetaModel_eq_id_on_frobFixed` turns `σ|_F = τ|_F` into `σ|_F = 1` —
+and it simultaneously says the *model's* twist `θ` is the identity on `F`, which is the
+form the unitary coordinates need.
+
+So this is `stepThree` composed with that upgrade: out come exactly `hθ` and `hα`. -/
+theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hcard : 5 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (θm : M.E ≃ₐ[ZMod 2] M.E)
+    (hsemi : ∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+      ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E), ∀ x y : M.E,
+        ((φ (a * x) (b * y) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = a * θm b *
+            ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (haniso : ∀ x : M.E, x ≠ 0 → φ x x ≠ 0)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (d : ℤ)
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hdiagscale : ∀ a b : M.E,
+      (∀ x : M.E,
+        ((hyp.centreQuadraticMap sfive M ι (a * x) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = b * ((hyp.centreQuadraticMap sfive M ι x :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) →
+      ∀ x y : M.E,
+        ((φ (a * x) (a * y) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = b * ((φ x y :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    -- the type-`B` scaling pair
+    (σ τ : M.E ≃+* M.E)
+    (hscale : ∀ k : ↥hyp.actualKActor,
+      σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
+    (hWinv : ∀ v : ↥hyp.W,
+      σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
+    -- §2's base pair
+    {ζ₀ ω₀ y₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
+    (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0) (hy₀Q0 : y₀ ∈ hyp.Q0)
+    (hsqω₀ : ω₀ * ω₀ = y₀) (hfω₀ : f ω₀ = ζ₀⁻¹ * (ω₀ * y₀) * ζ₀) :
+    (∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, θm a = a) ∧
+      hyp.centerCoord sfive M ι hy₀Q0 /
+          hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0
+        = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ₀, hζ₀⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+          + ((M.mu ((1 : ↥hyp.actualKActor),
+            (⟨ζ₀, hζ₀⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
+  have hζ₀ne : ζ₀ ≠ 1 := fun hc => hζ₀1 (Subtype.ext hc)
+  obtain ⟨hστ0, hαst⟩ := hyp.stepThree H hC2 hm hQ0card sfive M hZc hmu hVW hcard ι d
+    hequiv σ τ (σ.symm.toRingHom.comp τ.toRingHom).toAddMonoidHom (fun _ => rfl) hscale
+    hWinv hζ₀ hζ₀ne hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀
+  -- `σ = τ` on `F`, which is what the upgrade takes
+  have hστ : ∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
+      σ.toRingHom a = τ.toRingHom a := by
+    intro a ha
+    have h0 : σ.symm (τ a) = a := hστ0 a ha
+    change σ a = τ a
+    have h1 := congrArg (σ : M.E → M.E) h0
+    rw [σ.apply_symm_apply] at h1
+    exact h1.symm
+  obtain ⟨hσid, hθid⟩ := hyp.thetaModel_eq_id_on_frobFixed M hm hQ0card sfive
+    σ.toRingHom τ.toRingHom θm.toRingEquiv.toRingHom d hsemi haniso
+    (hyp.cocycle_scale_of_diagScale M sfive ι d hequiv hdiagscale) hscale hστ
+  refine ⟨hθid, ?_⟩
+  -- `σ` fixes `F` pointwise, hence so does `σ⁻¹`
+  have hmemF : hyp.centerCoord sfive M ι hy₀Q0 /
+      hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0
+      ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m :=
+    div_mem (SetLike.coe_mem _) (SetLike.coe_mem _)
+  have hfix : σ.symm (hyp.centerCoord sfive M ι hy₀Q0 /
+      hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)
+      = hyp.centerCoord sfive M ι hy₀Q0 /
+        hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 := by
+    have h0 : σ (hyp.centerCoord sfive M ι hy₀Q0 /
+        hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)
+        = hyp.centerCoord sfive M ι hy₀Q0 /
+          hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 := hσid _ hmemF
+    rw [σ.symm_apply_eq]
+    exact h0.symm
+  rwa [hfix] at hαst
+
+/-- **Peterfalvi Part II, Ch. IV §3, Corollary 2**, from the Proposition of Ch. III §3
+and §2's Proposition alone (pp. 120–132).
+
+`stepThree_model` supplies `corollaryTwo_of_standardModel`'s two `§3 (3)` inputs, so
+what is left is exactly: the model of Ch. III §3 (which `exists_standardModel` produces
+from the numerics and the induction hypothesis), the type-`B` scaling pair `σ`, `τ`, and
+the base pair `f(ω₀) = (ω₀ ω₀²)^{ζ₀}` that §2 closes with. -/
+theorem corollaryTwo_of_sectionThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcard : 5 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
+    (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
+    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (θm : M.E ≃ₐ[ZMod 2] M.E)
+    (hsemi : ∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+      ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E), ∀ x y : M.E,
+        ((φ (a * x) (b * y) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = a * θm b *
+            ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (haniso : ∀ x : M.E, x ≠ 0 → φ x x ≠ 0)
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (hquot : ∀ ρ : ↥hyp.Q, (Φ ρ).quotient =
+      M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) ρ)))
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hker : ∀ z : ↥(Subgroup.center hyp.Q),
+      Φ (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩)
+    (hW : ∀ (v : ↥hyp.W) (x y : M.E),
+      ((φ (((M.mu (1, v) : M.Eˣ) : M.E) * x) (((M.mu (1, v) : M.Eˣ) : M.E) * y) :
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (Θ : ↥hyp.actualKActor × ↥hyp.W →*
+      MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+    (hΘq : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+        (Θ kv p).quotient = ((M.mu kv : M.Eˣ) : M.E) * p.quotient)
+    {d : ℤ}
+    (hΘc : ∀ (kv : ↥hyp.actualKActor × ↥hyp.W)
+      (p : Suzuki2Groups.BilinearTwistedProduct φ),
+        (((Θ kv p).central :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = ((M.mu (kv.1, 1) ^ d : M.Eˣ) : M.E) *
+            ((p.central :
+              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
+      ((ι (Additive.ofMul (hyp.centerKHom k z)) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((ι (Additive.ofMul z) :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (hdiagscale : ∀ a b : M.E,
+      (∀ x : M.E,
+        ((hyp.centreQuadraticMap sfive M ι (a * x) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = b * ((hyp.centreQuadraticMap sfive M ι x :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) →
+      ∀ x y : M.E,
+        ((φ (a * x) (a * y) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = b * ((φ x y :
+            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (uAut : MulAut (Suzuki2Groups.BilinearTwistedProduct φ))
+    (huAut : uAut ∈
+      (Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts)
+    (hconj : (((MulAut.congr Φ).toMonoidHom.comp (hyp.conjQHom)).range).map
+      (MulAut.conj uAut).toMonoidHom = Θ.range)
+    (σ τ : M.E ≃+* M.E)
+    (hscale : ∀ k : ↥hyp.actualKActor,
+      σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
+    (hWinv : ∀ v : ↥hyp.W,
+      σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
+    {ζ₀ ω₀ y₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
+    (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0) (hy₀Q0 : y₀ ∈ hyp.Q0)
+    (hsqω₀ : ω₀ * ω₀ = y₀) (hfω₀ : f ω₀ = ζ₀⁻¹ * (ω₀ * y₀) * ζ₀)
+    {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
+    ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
+  obtain ⟨hθ, hα⟩ := hyp.stepThree_model H hC2 hm hQ0card sfive M hZc hmu hVW hcard θm
+    hsemi haniso ι d hequiv hdiagscale σ τ hscale hWinv hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀
+    hfω₀
+  exact hyp.corollaryTwo_of_standardModel H hC2 sfive M hZc hmu hVW hm hQ0card hKcard
+    hWdvd hW1 hfQ hhW θm hsemi hθ haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv uAut huAut
+    hconj hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀ hα hζ hζ1
 
 end Hypothesis
 
