@@ -151,18 +151,25 @@ variable {G : Type u} {Omega : Type v} [Group G] [MulAction G Omega]
 
 /-! ## Transporting the complete pair through a PSU target -/
 
-/-- **Peterfalvi Part II, Ch. I section 3, Proposition 1(c), PSU case.**
-For a concrete PSU(3,q) Theorem A target, the distinguished product s*t
-has order three.
+/-- **Peterfalvi Part II, Ch. I section 3, Proposition 1(c), PSU case —
+standard position.**
 
-The proof retains the ambient Sylow conjugator.  Root and determinant-one
-torus corrections put Q and t simultaneously into standard root/Weyl
-position; the structure equation and uniqueness then determine s. -/
-theorem orderOf_distinguishedInvolution_mul_t_of_psu3Target
+For a concrete PSU(3,q) Theorem A target, `Q` and `t` can be put into standard
+position *simultaneously*: some isomorphism `L ≃ standardPermGroup n` carries
+`Q` onto the standard root subgroup and `t` to the standard Weyl element.
+
+A Sylow conjugator puts `Q` at the standard root subgroup.  The image of `t`
+then moves infinity (else `t` would normalize `Q`, i.e. lie in `H`), so a root
+correction makes it swap infinity and the origin; a determinant-one torus
+correction, available because the torus has odd order, normalizes it to the
+Weyl element itself. -/
+theorem exists_standardPosition_of_psu3Target
     (hyp : Hypothesis G Omega)
     (L : Subgroup G) (hLnormal : L.Normal) (hLodd : Odd L.index)
     (data : PSU3InductionTarget (Omega := Omega) L) :
-    orderOf (hyp.distinguishedInvolution * hyp.t) = 3 := by
+    ∃ (e : L ≃* standardPermGroup data.n) (tL : L), (tL : G) = hyp.t ∧
+      (∀ x : L, e x ∈ standardRootSubgroup data.n ↔ (x : G) ∈ hyp.Q) ∧
+      e tL = weylElement data.n := by
   have hn0 : 0 < data.n := lt_trans Nat.zero_lt_one data.one_lt_n
   have hcore := hyp.Q_and_residual_of_psu3_target L hLnormal hLodd
     data.one_lt_n data.groupEquiv data.actionEquiv
@@ -447,6 +454,29 @@ theorem orderOf_distinguishedInvolution_mul_t_of_psu3Target
     change (MulAut.conj (psuTorusHom data.n d))
       ((MulAut.conj a) (e0 tL)) = weylElement data.n
     exact hnormalize
+  exact ⟨e, tL, rfl, hmem, het⟩
+
+/-- **Peterfalvi Part II, Ch. I section 3, Proposition 1(c), PSU case.**
+For a concrete PSU(3,q) Theorem A target, the distinguished product s*t
+has order three.
+
+The proof retains the ambient Sylow conjugator.  Root and determinant-one
+torus corrections put Q and t simultaneously into standard root/Weyl
+position; the structure equation and uniqueness then determine s. -/
+theorem orderOf_distinguishedInvolution_mul_t_of_psu3Target
+    (hyp : Hypothesis G Omega)
+    (L : Subgroup G) (hLnormal : L.Normal) (hLodd : Odd L.index)
+    (data : PSU3InductionTarget (Omega := Omega) L) :
+    orderOf (hyp.distinguishedInvolution * hyp.t) = 3 := by
+  obtain ⟨e, tL, htLval, hmem, het⟩ :=
+    exists_standardPosition_of_psu3Target hyp L hLnormal hLodd data
+  obtain ⟨-, hQL, -, -⟩ := hyp.Q_and_residual_of_psu3_target L hLnormal hLodd
+    data.one_lt_n data.groupEquiv data.actionEquiv data.actionEquiv_bijective
+  have hsQ : hyp.distinguishedInvolution ∈ hyp.Q :=
+    hyp.mem_Q_of_sq_eq_one_of_mem_H
+      hyp.distinguishedInvolution_mem_H hyp.distinguishedInvolution_sq
+  have hsL : hyp.distinguishedInvolution ∈ L := hQL hsQ
+  let sL : L := ⟨hyp.distinguishedInvolution, hsL⟩
   let sStd : standardPermGroup data.n :=
     rootHom data.n (RootGroup.centralInvolution data.n)
   have hsStdRoot : sStd ∈ standardRootSubgroup data.n :=
@@ -491,8 +521,11 @@ theorem orderOf_distinguishedInvolution_mul_t_of_psu3Target
       sStd] using standard_braid data.n
   have hstructure :
       hyp.t * (s0L : G) * hyp.t =
-        (r0L : G)⁻¹ * hyp.t * (r0L : G) :=
-    congrArg (fun x : L => (x : G)) hstructureL
+        (r0L : G)⁻¹ * hyp.t * (r0L : G) := by
+    have h := congrArg (fun x : L => (x : G)) hstructureL
+    push_cast at h
+    rw [← htLval]
+    exact h
   have hpair := hyp.eq_distinguishedPair_of_structure
     hs0H hs0sq hs0ne hr0Q hstructure
   have hsLs0 : sL = s0L := Subtype.ext hpair.1.symm
@@ -508,9 +541,9 @@ theorem orderOf_distinguishedInvolution_mul_t_of_psu3Target
     change orderOf (e (sL * tL)) = 3
     rw [map_mul]
     exact htarget
-  calc
-    orderOf (hyp.distinguishedInvolution * hyp.t) =
-        orderOf (sL * tL) :=
+  calc orderOf (hyp.distinguishedInvolution * hyp.t)
+      = orderOf ((sL : G) * (tL : G)) := by rw [htLval]
+    _ = orderOf (sL * tL) :=
       orderOf_injective L.subtype L.subtype_injective (sL * tL)
     _ = 3 := hLorder
 
