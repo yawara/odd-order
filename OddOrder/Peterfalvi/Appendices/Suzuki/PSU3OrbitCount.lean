@@ -813,12 +813,12 @@ the fixed-point-freeness argument used there.
 
 This is the fact behind step (15)'s "the `u_i` exhaust the orbit", step (18)'s
 `d_{m−1} = ζ⁻¹`, and the general form of step (20)'s (∗∗∗). -/
-theorem eq_one_of_conj_eq_mul_Q0_of_mem_D {m : ℕ} (M : hyp.QuotientFieldModel m)
+theorem eq_one_of_conj_eq_mul_Q0_of_decomp {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
-    {ω c y : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hcD : c ∈ hyp.D)
+    (hmu : Function.Injective M.mu)
+    {ω c y k v : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hk : k ∈ hyp.K) (hv : v ∈ hyp.W) (hkv : c⁻¹ = k * v)
     (hy : y ∈ hyp.Q0) (hconj : c⁻¹ * ω * c = ω * y) : c = 1 := by
-  obtain ⟨k, hk, v, hv, hkv⟩ := hyp.exists_mem_K_mem_W_mul hVW (hyp.D.inv_mem hcD)
   set kv : ↥hyp.actualKActor × ↥hyp.W := (hyp.kActor hk, ⟨v, hv⟩) with hkvdef
   -- the actor pair acts as conjugation by `c⁻¹ = k v`
   have hact : ∀ x : ↥hyp.Q, ((hyp.conjQHom kv x : ↥hyp.Q) : G) = c⁻¹ * (x : G) * c := by
@@ -857,6 +857,32 @@ theorem eq_one_of_conj_eq_mul_Q0_of_mem_D {m : ℕ} (M : hyp.QuotientFieldModel 
     exact congrArg Subtype.val this
   have : c⁻¹ = 1 := by rw [hkv, hk1, hv1, mul_one]
   rw [← inv_inv c, this, inv_one]
+
+/-- **`D` acts fixed-point-freely on `(Q/Q₀)^#`** (the `V = W` case).
+
+`exists_mem_K_mem_W_mul` decomposes `c⁻¹` as `k v`; the content is
+`eq_one_of_conj_eq_mul_Q0_of_decomp`. -/
+theorem eq_one_of_conj_eq_mul_Q0_of_mem_D {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ω c y : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hcD : c ∈ hyp.D)
+    (hy : y ∈ hyp.Q0) (hconj : c⁻¹ * ω * c = ω * y) : c = 1 := by
+  obtain ⟨k, hk, v, hv, hkv⟩ := hyp.exists_mem_K_mem_W_mul hVW (hyp.D.inv_mem hcD)
+  exact hyp.eq_one_of_conj_eq_mul_Q0_of_decomp M hZ hmu hωQ hωQ0 hk hv hkv hy hconj
+
+/-- **`W` acts fixed-point-freely on `(Q/Q₀)^#`** — no `V = W` needed.
+
+An element of `W` is already its own `K W`-decomposition (`k = 1`), so
+`eq_one_of_conj_eq_mul_Q0_of_decomp` applies directly.  Ch. IV §4 works in the case
+`V ≠ W` (p. 132), where the `D`-version above is unavailable but this one still holds;
+it is what gives `P ∩ W = 1` there, and what forces `P Z(U) ∩ W = 1` in step (1). -/
+theorem eq_one_of_conj_eq_mul_Q0_of_mem_W {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu)
+    {ω c y : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hcW : c ∈ hyp.W)
+    (hy : y ∈ hyp.Q0) (hconj : c⁻¹ * ω * c = ω * y) : c = 1 :=
+  hyp.eq_one_of_conj_eq_mul_Q0_of_decomp M hZ hmu hωQ hωQ0 hyp.K.one_mem
+    (hyp.W.inv_mem hcW) (one_mul _).symm hy hconj
 
 end Hypothesis
 
