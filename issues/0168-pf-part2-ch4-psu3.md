@@ -6078,3 +6078,38 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
 2. `Z(U/Z(U)) = ⊥` を `residualQuotientEquiv` + 標準 `PSU(3,ℓ)` の中心自明性から
    (`ProjectiveUnitary` 側に中心の計算が在るか実測)。
 3. ⟹ `ofRankOneSetup` を当てて `U/Z(U)` の内在 `Hypothesis` を得る。
+
+## 2026-08-02 (115): `O^{p'}` の冪等性 — 生成条件の核
+
+`Subgroup.primeComplementResidual_self_eq_top` : `O^{p'}(O^{p'}(G)) = ⊤`。
+
+⚠ (114) では「位数計算 (`|C:U|` が奇 等) が要る」と見積もったが**不要**だった:
+`G` の Sylow `p` はすべて `U = O^{p'}(G)` に入るので、`U` の中でも Sylow `p` に
+含まれ、したがって `O^{p'}(U)` に入る。⟹ 像が `U` 全体 ⟹ `map` の単射性で `⊤`。
+
+⟹ `Setup.normalCore_le_center` (114) の仮説「`⟨Q ∪ Q^t⟩ = ⊤`」が、
+`closure_conj_Q` + `closure_iUnion_conj_eq_primeComplementResidual`
+(`RankOneBNPairRigidity.lean:217`) と併せて `U` について供給できる
+(`Q_U = C_Q(P)` が `↥U` の Sylow 2 であることが前提)。
+
+### 段 (2) の在庫 (更新)
+
+| 必要物 | 状態 |
+|---|---|
+| `U` の Setup | ✅ (107) |
+| `U/Z(U)` の降下 Setup | ✅ (109) |
+| `Setup ⟹ Hypothesis` | ✅ (113) |
+| 忠実性の核 (`normalCore ≤ Z`) | ✅ (114) |
+| 生成条件 (`⟨Q ∪ Q^t⟩ = ⊤`) の核 | ✅ **今回** |
+| `Q_U = C_Q(P)` が `↥U` の Sylow 2 | ⚠ 未 (`exists_sylow_two_eq_cQ_of_isPGroup` が `↥C` 版で在る — `↥U` へ移す) |
+| `Z(U/Z(U)) = ⊥` | ⚠ 未 (中心の自明性は同型不変なので `residualQuotientEquiv` 経由でよい) |
+| `\|Q̄\|` even / `\|D̄\|` odd / (A3) | ⚠ 未 (どれも既存の材料から) |
+
+### ⚠ 次セッションはここから
+
+1. `C_Q(P)` が `↥U` の Sylow 2 — `exists_sylow_two_eq_cQ_of_isPGroup`
+   (`CentralizerResidual.lean:269`) は `↥C` の Sylow として与える。`C_Q ≤ U` なので
+   `↥U` の Sylow でもある (位数が同じ) — `Sylow.subtype` 系の補題を実測。
+2. `Z(U/Z(U)) = ⊥` — 標準 `PSU(3,ℓ)` の中心自明性を `ProjectiveUnitary` 側で実測
+   (`PSUCentre.lean` が在る)。
+3. ⟹ `ofRankOneSetup` を当てる。
