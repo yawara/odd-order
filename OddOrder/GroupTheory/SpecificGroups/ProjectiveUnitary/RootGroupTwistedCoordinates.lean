@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.RootGroup
 import OddOrder.Algebra.QuadraticTraceCorrection
+import OddOrder.Peterfalvi.Appendices.Suzuki2Groups.QuadraticExtensions
 
 /-!
 # Twisted-product coordinates on the Hermitian root group
@@ -102,5 +103,64 @@ theorem norm_cocycle (hn : 0 < n) (u a c : Field n) :
   have h2 : (2 : Field n) = 0 := two_eq_zero_field n
   rw [frobTrace_eq_add_star hn, star_add, star_mul, star_star]
   linear_combination (u * (a * star a) + u * (c * star c)) * h2
+
+/-! ## The corrected cocycle -/
+
+/-- The Hermitian cocycle `(x, y) ↦ x ȳ` of the root group, as a `ZMod 2`-bilinear map.
+It is bi-additive because `star` is the `q`-power map. -/
+noncomputable def hermitianBilin (n : ℕ) :
+    LinearMap.BilinMap (ZMod 2) (Field n) (Field n) where
+  toFun x :=
+    { toFun := fun y => x * star y
+      map_add' := fun y y' => by rw [star_add, mul_add]
+      map_smul' := fun c y => by
+        rcases (by decide : ∀ a : ZMod 2, a = 0 ∨ a = 1) c with hc | hc <;> subst hc <;> simp }
+  map_add' x x' := LinearMap.ext fun y => by simp [add_mul]
+  map_smul' c x := by
+    rcases (by decide : ∀ a : ZMod 2, a = 0 ∨ a = 1) c with hc | hc <;> subst hc <;>
+      exact LinearMap.ext fun y => by simp
+
+@[simp] theorem hermitianBilin_apply (n : ℕ) (x y : Field n) :
+    hermitianBilin n x y = x * star y := rfl
+
+/-- The trace correction of the Hermitian cocycle: `x ȳ + u · Tr(x ȳ)`.  It has the same
+diagonal as `hermitianBilin` and, when `Tr u = 1`, takes values in `F`. -/
+noncomputable def correctedBilin (n : ℕ) (u : Field n) :
+    LinearMap.BilinMap (ZMod 2) (Field n) (Field n) :=
+  hermitianBilin n + u • (hermitianBilin n).compr₂ (frobTrace (E := Field n) n)
+
+@[simp] theorem correctedBilin_apply (n : ℕ) (u x y : Field n) :
+    correctedBilin n u x y = x * star y + u * frobTrace (E := Field n) n (x * star y) := by
+  simp only [correctedBilin, LinearMap.add_apply, LinearMap.smul_apply,
+    LinearMap.compr₂_apply, hermitianBilin_apply, smul_eq_mul]
+
+/-- **The corrected cocycle is `F`-valued**, when `Tr u = 1`: the trace of `u · Tr z` is
+`Tr z · Tr u = Tr z`, which cancels `Tr z` in characteristic two. -/
+theorem correctedBilin_mem (hn : 0 < n) {u : Field n}
+    (hu : frobTrace (E := Field n) n u = 1) (x y : Field n) :
+    correctedBilin n u x y ∈ frobFixedSubfield (Field n) 2 n := by
+  have hcard : Nat.card (Field n) = (2 ^ n) ^ 2 := by
+    rw [natCard_field n hn, ← pow_mul]
+    congr 1
+    omega
+  rw [← frobTrace_eq_zero_iff, correctedBilin_apply, map_add,
+    mul_comm u (frobTrace (E := Field n) n (x * star y)),
+    frobTrace_mul_of_mem n (frobTrace_mem n hcard (x * star y)) u, hu, mul_one]
+  exact CharTwo.add_self_eq_zero _
+
+/-- The corrected cocycle as an `F`-valued bilinear map — the shape
+`BilinearTwistedProduct` consumes. -/
+noncomputable def rootBilin (hn : 0 < n) {u : Field n}
+    (hu : frobTrace (E := Field n) n u = 1) :
+    LinearMap.BilinMap (ZMod 2) (Field n) ↥(frobFixedSubfield (Field n) 2 n) :=
+  bilinCodRestrict n (correctedBilin n u) (correctedBilin_mem hn hu)
+
+@[simp] theorem rootBilin_apply_coe (hn : 0 < n) {u : Field n}
+    (hu : frobTrace (E := Field n) n u = 1) (x y : Field n) :
+    ((rootBilin hn hu x y : ↥(frobFixedSubfield (Field n) 2 n)) : Field n)
+      = x * star y + u * frobTrace (E := Field n) n (x * star y) := by
+  rw [rootBilin]
+  change correctedBilin n u x y = _
+  rw [correctedBilin_apply]
 
 end OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary
