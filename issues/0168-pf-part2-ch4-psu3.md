@@ -5842,3 +5842,39 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
 (`|C_Q(P)| = |BaseField n|³`) と `natCard_residualQuotientHypothesis_Q`/`_Q0`
 (`|Q̄| = |Q̄₀|³ = 2^{3n}`)。⟹ 位数が一致するので `π|_{Q∩U}` が単射
 (`Q ⊓ Z(U) ≤ Q ⊓ D = 1`) なら `|π(Q∩U)| = |Q̄|`。
+
+## 2026-08-02 (109): `setup_residualQuotient` landing + 🔍 最後の同定の 3 経路を評価
+
+`setup_residualQuotient` = `rankOneSetup_residual` (107) + `Setup.quotient` (108)。
+`residualImage` (= `O^{2'}(C_G(X))` の `G` 内の像) を abbrev 化。
+⟹ **`U/Z(U)` は降下 setup を持つ** (核 `Z(U) ⊆ P ≤ V ≤ D` は §4 段 (1))。
+
+### 何が残っているかの正確な定式化
+
+`IsFGH.eq_of_le` は **同じ `t`** を、`IsFGH.map` は下の setup を要求する。よって
+「降下 setup の三つ組」と「transported `hyp'` の三つ組」を結ぶには、`U/Z(U)` の中で
+
+  **`Q̄_desc = hyp'.Q` かつ `t̄_desc (= π t) = hyp'.t`**
+
+を同時に達成する必要がある。`Hypothesis.conjugate` の自由度は 1 パラメータで
+制約は 2 本なので、自明ではない。
+
+⚠ 既に在るもの: `normalizer_Q_eq_H` (`Basic.lean:610`, **`N_G(Q) = H`**) —
+これで `Q̄` を決めれば `H̄` は自動。Sylow 2 ↔ 点 の対応も `|Ω| = |Q|+1` と
+`n_2 = |G:N(Q)| = |G:H| = |Ω|` から出る。
+
+### 3 経路の評価
+
+| 経路 | 内容 | 要る新定理 |
+|---|---|---|
+| **A 整合** | `hyp'` を共役して `Q̄ = π(Q∩U)` と `t̄ = π t` を同時達成 | 「`H` は `H` の外の対合に推移的」— 未証明、数え上げが必要 (`|D| = \|K\|\|V\|` 等) |
+| **B 内在** | 降下 setup から `U/Z(U)` 自身の `Hypothesis` を作る | `Setup ⟹ Hypothesis` (2-推移性は `coordsEquiv`/`permHom` で在る; あとは faithful = `M̄.normalCore = ⊥`, `Q̄` even, `D̄` odd, 2-rank≥2)。**その後 §2/§3 の数値仮説を内在版で再取得**が要る |
+| **C 移送** | 2 つの setup を結ぶ `U/Z(U)` の自己同型を作り `ofMulEquiv` で `Hypothesis` を移す | `mulEquivOfPermMatch` (`RankOneBNPairRigidity.lean`) が素材。ただし `f` の一致が要る |
+
+⟹ **次は B の各部品のコストを実測する** (2-推移性の梱包が既に在るかを
+`RankOneBNPair.lean` の `coords_smul_*` から確認し、faithful を `permHom_ker`
+(`= M.normalCore`) 経由で見る)。B が通れば A の数え上げは不要になる。
+
+⚠ `permHom_ker (hS) : (permHom hS).ker = M.normalCore` と
+`permHom_injective (hS) (hcore : M.normalCore = ⊥)` は既に在る
+(`RankOneBNPairRigidity.lean:148,160`)。
