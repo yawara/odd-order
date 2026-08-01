@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Field.Basic
 import Mathlib.Algebra.Field.Subfield.Basic
 import Mathlib.Tactic.Ring
+import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.LinearCombination
 import OddOrder.Algebra.FixedPointDensity
 
@@ -43,6 +44,8 @@ numerator and denominator by `a^{2μ}` gives the form used here, which avoids in
 * `sectionFour_solve` — (5) and (6) with `Y` eliminated, in inverse-free form.
 * `sectionFour_seven`, `sectionFour_eight` — the displayed (7) and (8).
 * `sectionFour_eq_of_add_eq_zero` — a vanishing denominator forces `a^{2μ} = ζ`.
+* `sectionFour_seven_book`, `sectionFour_eight_book`, `sectionFour_nine` — the same in
+  the book's displayed shape, with the common denominator `1 + b² a^{-2μ}`, and (9).
 * `sectionFour_fixed_of_shift`, `sectionFour_sq_eq_id` — the closing shift trick of
   p. 134: writing (10) at `X + 1` and subtracting leaves `X^{μ²} = X`, and that on
   enough points forces `μ² = id`.
@@ -124,6 +127,65 @@ theorem sectionFour_eq_of_add_eq_zero (h2 : (2 : E) = 0) {X Y w A B c : E} (hA :
     · exact h
     · exact absurd h hw
   linear_combination hAc - c * h2
+
+/-! ### (7), (8) in the book's displayed shape, and (9)
+
+Dividing numerator and denominator by `A = a^{2μ}` turns (7) and (8) into the forms the
+book displays, in which the *same* denominator `1 + b² a^{-2μ}` occurs on both sides of
+(9).
+-/
+
+/-- `1 + b² a^{-2μ}` is nonzero, being `(a^{2μ} + b²) a^{-2μ}`. -/
+theorem one_add_mul_inv_ne_zero {A B : E} (hA : A ≠ 0) (hAB : A + B ≠ 0) :
+    1 + B * A⁻¹ ≠ 0 := by
+  have hkey : (A + B) * A⁻¹ = 1 + B * A⁻¹ := by field_simp
+  rw [← hkey]
+  exact mul_ne_zero hAB (inv_ne_zero hA)
+
+/-- **(7) in the book's displayed shape** (Peterfalvi Part II, Ch. IV §4, p. 133):
+
+  `f(ω s^b)‾ = (ζ⁻¹ + a^{-2μ}) / (1 + b² a^{-2μ}) · ω̄`.
+
+This is the expression whose `μ`-image stands on the left of (9). -/
+theorem sectionFour_seven_book (h2 : (2 : E) = 0) {X Y w A B c : E} (hA : A ≠ 0)
+    (hc : c ≠ 0) (hAB : A + B ≠ 0) (h5 : c * X = A⁻¹ * Y + w)
+    (h6 : B * X = c⁻¹ * Y + w) :
+    X = (c⁻¹ + A⁻¹) / (1 + B * A⁻¹) * w := by
+  have hD := one_add_mul_inv_ne_zero hA hAB
+  rw [sectionFour_seven h2 hA hc hAB h5 h6]
+  congr 1
+  rw [div_eq_div_iff (mul_ne_zero hc hAB) hD]
+  field_simp
+
+/-- **(8) in the book's displayed shape** (Peterfalvi Part II, Ch. IV §4, p. 133):
+
+  `(f(ω s^b)‾)^η = (b² + ζ) / (1 + b² a^{-2μ}) · ω̄`. -/
+theorem sectionFour_eight_book (h2 : (2 : E) = 0) {X Y w A B c : E} (hA : A ≠ 0)
+    (hc : c ≠ 0) (hAB : A + B ≠ 0) (h5 : c * X = A⁻¹ * Y + w)
+    (h6 : B * X = c⁻¹ * Y + w) :
+    Y = (B + c) / (1 + B * A⁻¹) * w := by
+  have hD := one_add_mul_inv_ne_zero hA hAB
+  rw [sectionFour_eight h2 hA hc hAB h5 h6]
+  congr 1
+  rw [div_eq_div_iff hAB hD]
+  field_simp
+
+/-- **Peterfalvi Part II, Ch. IV §4, (9)** (p. 134).
+
+`η` acts on `E = Q/Q₀` as a `μ`-semilinear map (Appendix I, Proposition 2) and fixes
+`ω̄`, because step (2) chooses `η` centralizing `ω`.  Applying it to (7) therefore gives
+`(f(ω s^b)‾)^η = Z^μ ω̄`, with `Z` the scalar of `sectionFour_seven_book`; comparing with
+(8) and cancelling `ω̄ ≠ 0` leaves (9).
+
+`hsemi` is exactly that group-theoretic input, isolated: `Z` stands for the `μ`-image of
+the scalar of (7). -/
+theorem sectionFour_nine (h2 : (2 : E) = 0) {X Y w A B c Z : E} (hA : A ≠ 0) (hc : c ≠ 0)
+    (hAB : A + B ≠ 0) (hw : w ≠ 0) (h5 : c * X = A⁻¹ * Y + w)
+    (h6 : B * X = c⁻¹ * Y + w) (hsemi : Y = Z * w) :
+    Z = (B + c) / (1 + B * A⁻¹) := by
+  have h8 := sectionFour_eight_book h2 hA hc hAB h5 h6
+  rw [hsemi] at h8
+  exact mul_right_cancel₀ hw h8
 
 /-! ### (10) and the shift trick
 
