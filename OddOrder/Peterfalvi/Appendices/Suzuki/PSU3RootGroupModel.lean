@@ -381,6 +381,27 @@ theorem mu_W_notMem_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m)
   exact hζ (congrArg Prod.snd (hmu (hmu1.trans (map_one M.mu).symm)))
 
 include hyp in
+/-- **`μ(1, ζ) ≠ μ(1, ζ)⁻¹`** for `ζ ≠ 1` — the book's `ζ + 1 ≠ ζ⁻¹ + 1`, which is what
+closes stage (4) (Peterfalvi Part II, p. 131, last line).
+
+Stage (4) run at `ω` leaves out one point of the fibre, and run at `ω⁻¹` (with `ζ⁻¹`)
+leaves out another; the two coincide only if `μ(1, ζ)² = 1`, hence — squaring being
+injective in characteristic two — only if `ζ = 1`. -/
+theorem mu_W_ne_inv {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hmu : Function.Injective M.mu) {ζ : ↥hyp.W} (hζ : ζ ≠ 1) :
+    ((M.mu (1, ζ) : M.Eˣ) : M.E) ≠ ((M.mu (1, ζ) : M.Eˣ) : M.E)⁻¹ := by
+  intro hc
+  have hZ0 : ((M.mu (1, ζ) : M.Eˣ) : M.E) ≠ 0 := Units.ne_zero _
+  have hsq : ((M.mu (1, ζ) : M.Eˣ) : M.E) ^ 2 = 1 := by
+    rw [pow_two]
+    nth_rewrite 2 [hc]
+    exact mul_inv_cancel₀ hZ0
+  have hval : ((M.mu (1, ζ) : M.Eˣ) : M.E) = 1 :=
+    OddOrder.FiniteField.eq_one_of_sq_eq_one hsq
+  have hmu1 : M.mu ((1 : ↥hyp.actualKActor), ζ) = 1 := Units.ext hval
+  exact hζ (congrArg Prod.snd (hmu (hmu1.trans (map_one M.mu).symm)))
+
+include hyp in
 /-- **`μ(k, 1) + μ(1, ζ) ≠ 0`** for `ζ ≠ 1` — the denominator `a + ζ⁻¹` of stages (2)
 and (4) never vanishes, `μ(K)` lying in `F` and `μ(1, ζ)` not.
 
