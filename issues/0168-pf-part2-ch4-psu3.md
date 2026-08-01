@@ -6258,3 +6258,48 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
 3. ⟹ Lemma 5 → `QuotientFieldModel` → `exists_standardModel` → `corollaryTwo_of_sectionThree`
    を内在版に当て、`IsFGH.eq_of_le` (canonical form の一意性) で ambient へ戻す
    (書籍 p.133 の「By the uniqueness of the canonical form … f(ω) = f₁(ω)」)。
+
+## 2026-08-02 (119): 段 (2) の**転送が両方向揃った** — 残りは中央の 2 仮説だけ
+
+段 (2) の骨格は「`G` ← `U` ← `U/Z(U)`」の 2 段転送で、その両端が landing:
+
+| 向き | 定理 | 書籍 p.133 の対応 |
+|---|---|---|
+| `G ← U` | `exists_fgh_residual_eq` | 「By the uniqueness of the canonical form of an element of `G − H`, `f(ω) = f₁(ω)` … and `h(ω) = h₁(ω)`」 |
+| `U ← U/Z(U)` | `fgh_map_residualQuotient` | §3 Corollary 2 の結論を「核 (`P ∩ U = Z(U)`) を法として」`U` へ戻す |
+
+道具:
+* `liftMap` / `IsFGH.ofSubtype` (`RankOneBNPair.lean`, 汎用) — 部分群 `K` 上の三つ組
+  `↥K → ↥K` を ambient の `L → L` として読む。`IsFGH` は元についての主張なので
+  `K.subtype` で押し出すだけでよく、`M'.subgroupOf K` が `M' ⊓ K` になって
+  `IsFGH.eq_of_le` が取る形にちょうど落ちる。
+* `IsFGH.map` は既存 (357 行目) — `π = mk' Z` に当てるだけだった。
+
+⟹ **残るのは中央の「§3 Corollary 2 を内在 `Hypothesis` に当てる」1 点**で、その入力は
+Ch. I §3 Lemma 5 の 7 本中 2 本:
+
+1. `∃ w ∈ W̄, w ≠ 1`
+2. `orderOf (s̄ · t̄) = 3`
+
+### ⚠ この 2 本は PSU(3,ℓ) の構造を使う — 経路 A (照合) が戻る可能性
+
+書籍は `∃ w ∈ W̄, w ≠ 1` を「**By the structure of PSU(3,ℓ)**, `(V ∩ U)/(P ∩ U)`
+centralizes `C_{Q₀}(P)` … `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` since `ℓ > 2`」で出す。
+`W̄ = V̄ ⊓ C(K̄Set)` は内在的に定義されるが、`π(W ∩ U) ≤ W̄` は自明でない
+(`C(K̄Set)` の側の包含が逆向き)。よって
+
+* (113) で「経路 A (transported `hyp'` との三つ組照合) は不要」と書いたのは、
+  **`|Q̄|`・`|Q̄₀|`・Suzuki 2-群性のような「群だけの量」については正しかった**が、
+  `W̄` と distinguished involution については**戻ってくる可能性が高い**。
+* 照合の中身: `M̄` と transported `H` はどちらも指数 `1+ℓ³` の点安定化群なので
+  `L̄` の中で共役なはず。これを Lean で出すのが素直かは要検討 (PSU(3,ℓ) の
+  2-推移作用の一意性)。もう一方の候補は `V ∩ U` の指数計算を直接やること。
+
+### ⚠ 次セッションはここから
+
+1. まず**実測**: `W̄` (内在) と transported `W` の関係、`residualQuotientHypothesis` の
+   `H`/`Q`/`D` が `M̄`/`Q̄`/`D̄` と一致するか (`residualQuotientEquiv` の作り方
+   `centralizerResidualQuotientEquiv` を読む — 同一視が `C_Q(X)` から作られていれば
+   `Q` は一致する見込みがある)。
+2. 一致するなら照合は安く済む。しないなら `V ∩ U` の指数計算 (書籍の Galois の定理
+   経由) を正面から形式化する。
