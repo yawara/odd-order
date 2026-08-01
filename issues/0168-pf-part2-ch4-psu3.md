@@ -1954,6 +1954,43 @@ Ch. III §3 は像の一致 (Zassenhaus 段) しか言わないので:
    `N(μ(kv)) = μ(kv.1)^d` は `mu_W_normOne` + `mu_K_frobFixed` + `θ|_F = 1` から)。
 4. (4) 本体 (p.131) → (5)。
 
+## 2026-08-01 (16): 🎯🎯 `exists_hermitianCocycle_eq` landing — セッション区切り
+
+前節 (15) で机上確定した「`φ` は `u` を選び直せばエルミート余輪体と厳密に一致」を
+実装完了 (`Algebra/HermitianCocycle.lean`)。
+
+`exists_hermitianCocycle_eq`: `φ` が `F`-双線型 + `φ(x,x) = c·x^{1+q}`
+(`c = φ(1,1) ≠ 0`) ⟹ **`∃ u, Tr u = 1 ∧ φ(x,y) = c·(x y^q + u Tr(x y^q))`**。
+
+証明の骨: `D x y := φ(x,y) + c x ȳ` が交代的 (⟹ 標数 2 で対称) →
+トレース 1 の `w` で `{1,w}` を基底に取り、両側を展開して `D = β·Tr(x ȳ)` →
+`φ` の `F` 値性から `Tr β = c` → `u := β/c`。
+
+### 📊 §3 (4) 基盤の到達点 (このセッション、計 14 コミット)
+
+| 層 | 主結果 | 状態 |
+|---|---|---|
+| 分類 | `exists_addEquiv_norm_of_anisotropic` (非等方形式 ≅ ノルム形式) | ✅ |
+| 鋭い版 | `eq_norm_smul_of_normOne_invariant` / `cocycle_diag_eq_norm` (`χ = χ(1)·N`) | ✅ |
+| **厳密版** | **`exists_hermitianCocycle_eq` (`φ = c·H_u`)** | ✅ |
+| 捻れ積比較 | `exists_mulEquiv_of_diag` (座標作用込み) | ✅ |
+| ユニタリ座標 | `unitaryCoord` + 積則 + 計算則 6 本 | ✅ |
+| `Q` への適用 | `exists_unitaryModel(_coord)` | ✅ (要 `congrEquiv` 版へ差し替え) |
+| 共役の pointwise 化 | `exists_modelEquiv_conj` | ✅ |
+| (4) 本体 | p.131 の `(∗∗)` 計算 | ⬜ |
+
+### ⚠ 次セッションはここから
+
+1. **`exists_unitaryModel` を `congrEquiv` 版に差し替え** — `exists_hermitianCocycle_eq`
+   で `u` を選べば `φ (x) (y) = hermitianCocycle_u (e x) (e y)` なので
+   `congrEquiv (e·) id` がそのまま同型。⟹ 中心不動 + スカラー作用と可換。
+   (対角比較版 `exists_mulEquiv_of_diag` は他用途に残す。)
+   ⚠ `hermitianCocycle m hcard hu` の `u` は**この定理が返す `u`** を使うこと。
+2. 共役のユニタリ座標表示 `(x,y)^d = (μ(d)x, N(μ(d))y)`
+   (`exists_modelEquiv_conj` + `hΘq`/`hΘc` + `unitaryCoord_of_scaled`;
+   `N(μ(kv)) = μ(kv.1)^d` は `mu_W_normOne` + `mu_K_frobFixed` + `θ|_F = 1`)。
+3. (4) 本体 (p.131) → (5)。
+
 ## セッション総括 (2026-07-31)
 
 **Ch. IV で形式化されたもの** (すべて sorry 0 / AxiomsCheck OK / lint 0):
