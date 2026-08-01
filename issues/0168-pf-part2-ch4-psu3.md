@@ -3920,3 +3920,37 @@ def Q0 : Subgroup G where carrier := {x | x ^ 2 = 1 ∧ x ∈ hyp.H}
 2. `exists_standardModel` for `qhyp` を組む。
 3. §3 段 (4) 鎖 (60) → `hcover` → `corollaryTwo_of_stepFour` → **段 (2) が閉じる**。
 4. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済 ⟹ **§4 完成**。
+
+## 2026-08-01 (67): ⚠ `Q₀` 版同型は**単なる制限ではない** — 全射性に奇位数論法が要る
+
+`centralizerQQuotientEquiv` の証明 (`CentralizerInductionBridge.lean:148-180`) は
+`Q_L ≃* Q_L.map pi` を `MonoidHom.subgroupMap` + 単射性
+(`Q_L ⊓ D_L = ⊥` と `N ≤ D_L` から) + 全射性 (自動) で作る。
+
+`Q₀` 版で**単射性は同じ**でよい (`Q0_L ≤ Q_L` なので `Q0_L ⊓ D_L = ⊥`)。
+⚠ **問題は目標側**: 欲しいのは `↥Q0_L ≃* ↥qhyp.Q0` だが、上の構成が与えるのは
+`↥Q0_L ≃* ↥(Q0_L.map pi)`。そして
+
+* `Q0_L.map pi ≤ qhyp.Q0` — 易しい (`x² = 1 ⟹ x̄² = 1`、`x ∈ H ⟹ x̄ ∈ H̄`)
+* `qhyp.Q0 ≤ Q0_L.map pi` — ⚠ **非自明**。`x̄² = 1` かつ `x̄ ∈ H̄` から
+  `x ∈ C_H(X)` は取れる (`comap_map_eq_self`) が、`x² ∈ N` であって `x² = 1` ではない。
+
+### 全射性の正しい論法 (次セッション用)
+
+`N ≤ C_D(X)` で **`D` は奇位数**なので `|N|` は奇数。`x` の位数を `2^a·m`
+(`m` 奇) と書き `y := x^m` とすると:
+* `x̄² = 1` かつ `m` 奇 ⟹ `x̄^m = x̄`、よって `π y = x̄`
+* `y² = x^{2m}` は 2-元で、`x̄² = 1` から `x^{2m} ∈ N`。`N` 奇位数ゆえ `x^{2m} = 1`
+⟹ `y ∈ Q0_L` かつ `π y = x̄`。∎
+
+⟹ **`centralizerQ0QuotientEquiv` は写経ではなく、この奇位数論法を要する**
+(単射性だけ `Q` 版から借りる)。⚠ 「`Q₀` 版は `Q` 版の制限で出る」と書いた (65) は
+**単射性についてのみ正しく、全射性については誤り**だった。
+
+### ⚠ 次セッションはここから
+
+1. `|N|` が奇数であることを repo で実測 (`N ≤ C_D(X)`、`D` 奇位数 =
+   `hyp.odd_card_D` 系)。
+2. 上の 2-part 論法で `qhyp.Q0 = Q0_L.map pi` を示す。
+3. `centralizerQ0QuotientEquiv` → `exists_standardModel` for `qhyp` →
+   段 (4) 鎖 → `hcover` → 段 (2)。
