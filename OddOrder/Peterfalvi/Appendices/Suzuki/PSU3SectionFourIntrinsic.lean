@@ -1213,6 +1213,64 @@ theorem nonempty_standingData_intrinsicResidualQuotient (hXV : X ≤ hyp.V) (hX 
     (hyp.theoremAInductionBelow_intrinsicResidualQuotient details hXD htX hCQ hZD hXV hX ih)
     sfive hwW' hw1⟩
 
+/-- **🎯 The Proposition of Ch. III §3 holds for the *intrinsic* standing hypothesis on
+`U/Z(U)`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133).
+
+This is what step (2) means by "running §2 and §3 relative to `U`": the model is obtained
+for the hypothesis whose `H`, `Q`, `D`, `t` are the images of `U ∩ H`, `U ∩ Q`, `U ∩ D`
+and `t`, so the mappings it constrains are the book's `f₁`, `h₁`. -/
+theorem exists_isStandardModel_intrinsicResidualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
+    (common : CentralizerCommonData hyp X) (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X))
+    (ih : TheoremAInductionBelow G Ω) :
+    letI := Hypothesis.rankOneSetupAction
+      (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
+    ∃ (sfive : (hyp.intrinsicResidualQuotientULift details hXD htX hCQ
+          hZD).LemmaFiveSetup data.n)
+      (Mq : (hyp.intrinsicResidualQuotientULift details hXD htX hCQ
+          hZD).QuotientFieldModel data.n)
+      (x₀ : ↥(Subgroup.center (hyp.intrinsicResidualQuotientULift details hXD htX hCQ
+          hZD).Q)), x₀ ≠ 1 ∧
+      (hyp.intrinsicResidualQuotientULift details hXD htX hCQ
+        hZD).IsStandardModel sfive Mq x₀ := by
+  letI := Hypothesis.rankOneSetupAction
+    (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
+  obtain ⟨⟨sfive⟩, ⟨Mq⟩⟩ := hyp.nonempty_standingData_intrinsicResidualQuotient hXV hX
+    common details hXD htX hCQ hZD ih
+  obtain ⟨x₀, hx₀⟩ :=
+    (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).exists_center_Q_ne_one
+  have hH := hyp.intrinsicResidualQuotientULift_H details hXD htX hCQ hZD
+  have hQ := hyp.intrinsicResidualQuotientULift_Q details hXD htX hCQ hZD
+  have ht := hyp.intrinsicResidualQuotientULift_t details hXD htX hCQ hZD
+  have hs := distinguishedInvolution_eq_of_eq
+    (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD)
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD) hH hQ ht
+  have hQ0 := Q0_eq_of_H_eq (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD)
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD) hH
+  have hst : orderOf
+      ((hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).distinguishedInvolution *
+        (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).t) = 3 := by
+    rw [hs, ht]
+    exact hyp.orderOf_distinguishedInvolution_mul_t_intrinsicResidualQuotient hXV common
+      details hXD htX hCQ hZD
+  have hn0 : data.n ≠ 0 := by have := data.one_lt_n; omega
+  have hQ0card : Nat.card
+      ↥(hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).Q0 = 2 ^ data.n := by
+    rw [hQ0]
+    exact hyp.natCard_Q0_intrinsicResidualQuotient hXV common details hXD htX hCQ hZD
+  have hcardQ : Nat.card (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).Q
+      = Nat.card ↥(hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).Q0 ^ 3 := by
+    rw [hQ, hQ0]
+    exact hyp.natCard_Q_intrinsicResidualQuotient hXV common details hXD htX hCQ hZD
+  exact ⟨sfive, Mq, x₀, hx₀,
+    (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).exists_standardModel sfive
+      Mq hst hn0 hQ0card hcardQ
+      (hyp.theoremAInductionBelow_intrinsicResidualQuotient details hXD htX hCQ hZD hXV hX ih)
+      x₀ hx₀⟩
+
 end Model
 
 /-! ### §2 and §3 run outright on `C/𝒩(C)`
