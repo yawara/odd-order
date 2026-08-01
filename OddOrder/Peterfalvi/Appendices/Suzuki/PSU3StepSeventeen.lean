@@ -35,6 +35,8 @@ induction can start at `i = 1`.
   `(c₁/c_{i+1})² u_{i+1} = u_i + u_{i+1}`.
 * `Hypothesis.centerCoord_conj_stepElevenSeq` — `d_i` acts on `Q₀` by the scalar
   `(c₁/c_{i+1})²`.
+* `Hypothesis.stepFourteen` — **step (14)**: `d_i = ζ^{i+1}k` with the scalar of `k`
+  identified.
 * `Hypothesis.stepElevenSeq_snd_fst_eq` — **step (17)**, group form: `w_i = y z_i`.
 * `Hypothesis.stepSeventeen` — the invariant of (11) with `w_i` eliminated.
 -/
@@ -185,6 +187,42 @@ theorem centerCoord_conj_stepElevenSeq {m : ℕ} (s : hyp.LemmaFiveSetup m)
       hyp.centerCoord_conj_eq s M ι d hequiv haiK hx hxa (by group), hμ]
     simp only [betaRatio]
     field_simp
+
+/-- **Step (14)** (Peterfalvi Part II, p. 126): `d_i = ζ^i (c_i/α)^{2τ}`.
+
+The book writes the closed form as a product of a power of `ζ` and an element of `K`
+named by its coordinate; here the `K`-part is named by what it *does*, namely the scalar
+by which it acts on `Q₀`.  The two agree: the book's convention `c^a = a^{1+θ} c` is
+conjugation by `a⁻¹`, so its `(c_i/α)^{2τ}` — whose `(1+θ)`-power is `(c_i/α)²` — is the
+element whose scalar in the sense of `centerCoord_conj` is `(α/c_i)²`.
+
+`stepElevenSeq_coset` supplies the factorization and `centerCoord_conj_stepElevenSeq` the
+scalar; the powers of `ζ` drop out because `W` centralizes `Q₀`. -/
+theorem stepFourteen {m : ℕ} (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
+    (hequiv : hyp.IsCenterCoordAction M ι d)
+    {ζ y : G} (hζ : ζ ∈ hyp.W) (hyQ0 : y ∈ hyp.Q0) {β : M.E} (hβ : β ≠ 0)
+    (hα : β + β⁻¹
+      = hyp.centerCoord s M ι hyQ0
+        / hyp.centerCoord s M ι hyp.distinguishedInvolution_mem_Q0)
+    (n : ℕ) (hns : ∀ i < n, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1)
+    (hpow : ∀ i, 1 ≤ i → i ≤ n + 1 → β ^ i ≠ 1) :
+    ∃ k ∈ hyp.K, (hyp.stepElevenSeq ζ y n).2.2 = ζ ^ (n + 1) * k ∧
+      ∀ (x w : G) (hx : x ∈ hyp.Q0) (hw : w ∈ hyp.Q0), k * x * k⁻¹ = w →
+        hyp.centerCoord s M ι hw
+          = (betaSum β 1 / betaSum β (n + 1)) ^ 2 * hyp.centerCoord s M ι hx := by
+  obtain ⟨k, hkK, hkcoset⟩ := hyp.stepElevenSeq_coset hζ hyQ0 n hns
+  refine ⟨k, hkK, hkcoset, fun x w hx hw hval => ?_⟩
+  refine hyp.centerCoord_conj_stepElevenSeq s M ι d hequiv hζ hyQ0 hβ hα n hns hpow
+    x w hx hw ?_
+  have hkxk : k * x * k⁻¹ ∈ hyp.Q0 := by rw [hval]; exact hw
+  rw [hkcoset, ← hval]
+  calc ζ ^ (n + 1) * k * x * (ζ ^ (n + 1) * k)⁻¹
+      = ζ ^ (n + 1) * (k * x * k⁻¹) * (ζ ^ (n + 1))⁻¹ := by group
+    _ = k * x * k⁻¹ * ζ ^ (n + 1) * (ζ ^ (n + 1))⁻¹ := by
+        rw [hyp.W_centralizes_Q0 (hyp.W.pow_mem hζ (n + 1)) hkxk]
+    _ = k * x * k⁻¹ := by group
 
 /-- **Step (17)**, group form (Peterfalvi Part II, p. 126): the second component of the
 sequence of (11) is `y z_i`, i.e. the book's `v_i = u_i + α`.
