@@ -1148,6 +1148,71 @@ theorem theoremAInductionBelow_intrinsicResidualQuotient
   intro A Λ _ _ _ hlt hA
   exact ih (hlt.trans (hyp.natCard_residualImageQuotient_lt hXV hX)) hA
 
+/-- **🎯 Ch. I §3 Lemma 5 and the field model of Ch. III §3 hold for the *intrinsic*
+standing hypothesis on `U/Z(U)`** (Peterfalvi Part II, Ch. IV §4, step (2), p. 133).
+
+All seven inputs are now available: the three orders and the Suzuki `2`-group property
+((118)), `|s̄ t̄| = 3` ((120)), the induction hypothesis, and `1 ≠ w ∈ W̄`.  The point set
+is the relabelled `ULift (Unital ℓ)`, which is where the ambient induction hypothesis can
+be applied; the structural fields are unchanged. -/
+theorem nonempty_standingData_intrinsicResidualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
+    (common : CentralizerCommonData hyp X) (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X))
+    (ih : TheoremAInductionBelow G Ω) :
+    letI := Hypothesis.rankOneSetupAction
+      (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
+    Nonempty ((hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).LemmaFiveSetup
+        data.n) ∧
+      Nonempty ((hyp.intrinsicResidualQuotientULift details hXD htX hCQ
+        hZD).QuotientFieldModel data.n) := by
+  letI := Hypothesis.rankOneSetupAction
+    (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
+  have hH := hyp.intrinsicResidualQuotientULift_H details hXD htX hCQ hZD
+  have hQ := hyp.intrinsicResidualQuotientULift_Q details hXD htX hCQ hZD
+  have hD := hyp.intrinsicResidualQuotientULift_D details hXD htX hCQ hZD
+  have ht := hyp.intrinsicResidualQuotientULift_t details hXD htX hCQ hZD
+  have hW := W_eq_of_H_D_eq (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD)
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD) hH hD
+  have hs := distinguishedInvolution_eq_of_eq
+    (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD)
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD) hH hQ ht
+  have hQ0 := Q0_eq_of_H_eq (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD)
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD) hH
+  obtain ⟨w, hwW, hw1⟩ :=
+    hyp.exists_ne_one_mem_W_intrinsicResidualQuotient details hXD htX hCQ hZD
+  have hwW' : w ∈ (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).W := by
+    rw [hW]; exact hwW
+  have hst : orderOf
+      ((hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).distinguishedInvolution *
+        (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).t) = 3 := by
+    rw [hs, ht]
+    exact hyp.orderOf_distinguishedInvolution_mul_t_intrinsicResidualQuotient hXV common
+      details hXD htX hCQ hZD
+  have hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
+      ↥(hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).Q := by
+    rw [hQ]
+    exact hyp.isSuzuki2Group_Q_intrinsicResidualQuotient details hXD htX hCQ hZD
+  have hn0 : data.n ≠ 0 := by have := data.one_lt_n; omega
+  have hQ0card : Nat.card
+      ↥(hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).Q0 = 2 ^ data.n := by
+    rw [hQ0]
+    exact hyp.natCard_Q0_intrinsicResidualQuotient hXV common details hXD htX hCQ hZD
+  have hcardQ : Nat.card (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).Q
+      = Nat.card ↥(hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).Q0 ^ 3 := by
+    rw [hQ, hQ0]
+    exact hyp.natCard_Q_intrinsicResidualQuotient hXV common details hXD htX hCQ hZD
+  obtain ⟨sfive⟩ :=
+    (hyp.intrinsicResidualQuotientULift details hXD htX hCQ
+      hZD).lemmaFiveSetup_of_orderThree_of_mem_W hwW' hw1 hst hQsuz hn0 hQ0card hcardQ
+      (hyp.theoremAInductionBelow_intrinsicResidualQuotient details hXD htX hCQ hZD hXV hX ih)
+  exact ⟨⟨sfive⟩, (hyp.intrinsicResidualQuotientULift details hXD htX hCQ
+    hZD).nonempty_quotientFieldModel_of_orderThree hst hQsuz hn0 hQ0card hcardQ
+    (hyp.theoremAInductionBelow_intrinsicResidualQuotient details hXD htX hCQ hZD hXV hX ih)
+    sfive hwW' hw1⟩
+
 end Model
 
 /-! ### §2 and §3 run outright on `C/𝒩(C)`
