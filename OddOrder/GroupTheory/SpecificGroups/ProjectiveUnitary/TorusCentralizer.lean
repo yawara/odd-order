@@ -51,6 +51,10 @@ its kernel.
   starting from the Borel subgroup, which is where `V ∩ U` lands
   (`V ≤ D ≤ H = N_G(Q)`).  This is the structure fact Peterfalvi Part II,
   Ch. IV §4 step (2) (p. 133) quotes for `V ∩ U`.
+* `standardRootSubgroup_inf_psuTorusRange`,
+  `standardRootSubgroup_mul_psuTorusRange`, `standardBorel_inf_conj_weylElement`
+  — the `Q ∩ D = 1`, `Q · D = H` and `D = H ∩ H^t` of Peterfalvi's hypothesis,
+  for the standard `PSU(3, ℓ)` model.
 * `exists_ne_one_mem_psuTorus_scalePoint_eq_of_sq_eq_one` — the same in the
   form Peterfalvi uses: a non-trivial `c ∈ D₀` fixing every element of
   `Ω₁(S₀)`.
@@ -384,6 +388,35 @@ theorem commute_rootHom_of_mem_standardBorel_of_commute_swap {n : ℕ} (hn : 0 <
           group
       _ = rootHom n u * psuTorusHom n c := by rw [hconj2]
   exact heq
+
+/-- **`Q ∩ D = 1` for the standard model**: a root translation that is also a torus
+element is trivial, by uniqueness of the Borel factorisation. -/
+theorem standardRootSubgroup_inf_psuTorusRange (n : ℕ) :
+    standardRootSubgroup n ⊓ (psuTorusHom n).range = ⊥ := by
+  rw [eq_bot_iff]
+  rintro g ⟨hgroot, hgtorus⟩
+  obtain ⟨u, hu⟩ := hgroot
+  obtain ⟨c, hc⟩ := hgtorus
+  have hgB : g ∈ standardBorel n := hu ▸ rootHom_mem_standardBorel u
+  obtain ⟨p, -, huniq⟩ := (mem_standardBorel_iff_existsUnique_root_torus g).mp hgB
+  have h1 : (u, 1) = p := huniq (u, 1) (by rw [← hu]; simp)
+  have h2 : ((1 : RootGroup n), c) = p := huniq (1, c) (by rw [← hc]; simp)
+  have hu1 : u = 1 := congrArg Prod.fst (h1.trans h2.symm)
+  rw [Subgroup.mem_bot, ← hu, hu1, map_one]
+
+/-- **`Q · D = H` for the standard model**: the Borel subgroup is the product of the
+root subgroup and the determinant-one torus (`mem_standardBorel_iff_existsUnique_root_torus`). -/
+theorem standardRootSubgroup_mul_psuTorusRange (n : ℕ) :
+    (standardRootSubgroup n : Set (standardPermGroup n)) *
+        ((psuTorusHom n).range : Set (standardPermGroup n))
+      = (standardBorel n : Set (standardPermGroup n)) := by
+  ext g
+  constructor
+  · rintro ⟨a, ⟨u, rfl⟩, b, ⟨c, rfl⟩, rfl⟩
+    exact Subgroup.mul_mem _ (rootHom_mem_standardBorel u) (psuTorusHom_mem_standardBorel c)
+  · intro hg
+    obtain ⟨p, hp, -⟩ := (mem_standardBorel_iff_existsUnique_root_torus g).mp hg
+    exact ⟨rootHom n p.1, ⟨p.1, rfl⟩, psuTorusHom n p.2, ⟨p.2, rfl⟩, hp.symm⟩
 
 /-- **`B ∩ B^w` is the determinant-one torus.**
 
