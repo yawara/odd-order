@@ -3581,3 +3581,51 @@ canonical 分解**であり、`fgh_eq_of_canonical` (分解の一意性) がそ�
    構成なので、まずそれが `U = O^{2'}(C_G(P))` にも使えるか実測する。
 2. 上の 2 つの PSU(3,ℓ) 構造事実 (中心化 / トーラス元の存在) を `V ∩ U` の言葉へ翻訳。
 3. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
+
+## 2026-08-01 (57): 🔍 段 (2) の `U` 側 `Hypothesis` — repo の構成は `C_G(X)/N` 上
+
+実測結果 (`CentralizerQuotient.lean`):
+
+* `centralizerQuotientHypothesis (hXV : X ≤ V) (hA3) :
+   Hypothesis (centralizerActionQuotient hyp X) ↥(MulAction.fixedPoints X Ω)`
+  — これは **`C_G(X)` の faithful 商 `C_G(X)/N`** 上の `Hypothesis`
+  (`N = (C_H(X)).normalCore`)。**`U = O^{2'}(C_G(P))` 上のものではない**。
+* 一方 `result.L = primeComplementResidual 2 (centralizerActionQuotient hyp X)` で、
+  `CentralizerPSUData.residualQuotientEquiv` は
+  `(O^{2'}(C_G(X)) ⧸ Z(·)) ≃* standardPermGroup n`。
+
+⟹ **設計上の帰結**: 書籍は「`U`, `U ∩ H`, `t` に関する `f₁, h₁`」と literal に書くが、
+repo で自然なのは **`C_G(P)/N` 上の `Hypothesis` に §3 Cor 2 を当てて `U` へ落とす**
+経路。`U` 上に `Hypothesis` を新規構成するより、既存の
+`centralizerQuotientHypothesis` を使う方が整合する。
+
+⚠ ただし `IsFGH.eq_of_le` (54) は「同じ `t` を持つ**部分群**の三つ組は外側と一致」
+なので、`U ≤ G` の形でそのまま使える。商に移ると `t` の像を追う必要があるので、
+**どちらの経路を採るかは段 (2) 実装時の設計判断**。判断材料:
+  * 商経路: `Hypothesis` は既存。`t` の像・`Q` の像の対応を追う手間。
+  * `U` 直接経路: `IsFGH.eq_of_le` がそのまま効く。`U` 上の `Hypothesis`
+    (A1)-(A3) を新規に構成する手間 (`centralizerHypothesisA1` が近い?)。
+
+### ⚠ 次セッションはここから
+
+1. 上の 2 経路を比べて段 (2) の設計を決める。⚠ `centralizerHypothesisA1`
+   (`CentralizerQuotient.lean:343` の手前) が `C_G(X)` **そのもの**上の (A1) を
+   与えているか実測すること — もしそうなら `U` 直接経路が安い。
+2. PSU(3,ℓ) 構造事実 2 つ (中心化 / トーラス元の存在 = (56)) を `V ∩ U` の言葉へ。
+3. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
+
+### 本セッション (2026-08-01) の総括
+
+§3 完成 → §1 Lemma → §4 の算術全部 → §4 段 (1) の全部品 → 段 (2) の 3 部品、
+という順で進んだ。landing した主なもの:
+
+* `stepFive` / `corollaryTwo_of_stepFour` (§3 完成)
+* `RankOneBNPairRigidity.lean` (§1 Lemma 一式) + `closure_iUnion_conj_eq_primeComplementResidual`
+* `FixedPointDensity.lean` + `PSU3SectionFourArithmetic.lean` (§4 の純算術全部)
+* `nonempty_psu3Data_of_orderOf_eq_three` (枝の同定)
+* `PSU3SectionFourSetup.lean` (§4 standing hypothesis + 段 (1) の 3 結論 + 段 (2) の 2 部品)
+* 一般化 2 件: `natCard_Q0_eq_pow` (Artin, `W = ⊥` → `X ⊓ W = ⊥`) /
+  `eq_one_of_conj_eq_mul_Q0_of_mem_W` (固定点自由性, `V = W` 不要版)
+* `IsFGH.eq_of_le` (canonical form の一意性)
+
+⚠ 訂正 1 件: `O^{2'}` は repo にある (`primeComplementResidual`)。
