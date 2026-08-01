@@ -3794,3 +3794,35 @@ ambient の orderOf (s·t) = 3  +  exponent 判別子 (48)(49)
 
 上表の ⚠ 3 つを実測して埋め、`exists_standardModel` for `qhyp` を組む。
 そこから先は (60) の鎖で段 (2) が閉じる。
+
+## 2026-08-01 (63): 帰納法仮説の商への継承 landing + 残り 2 点の実測
+
+`theoremAInductionBelow_centralizerActionQuotient` — `TheoremAInductionBelow G Ω` は
+`G` より小さい群**すべて**を量化するので、商が `G` より小さいことから 2 行で継承。
+⚠ `TheoremAInductionBelow` は `CentralizerInductionBridge.lean` 定義で
+`CentralizerQuotient.lean` からは見えない → §4 の leaf に置いた。
+
+### 残り 2 点の実測結果
+
+* **`x₀`**: `exists_involution_mem_center_Q` (`QStructure.lean:220`) は
+  `∃ u ∈ Q, u² = 1 ∧ u ≠ 1 ∧ ∀ v ∈ Q, u v = v u` を**任意の `hyp`** について与える。
+  ⟹ `qhyp` にそのまま適用できる。`exists_standardModel` が要る
+  `x₀ : ↥(center Q)`, `x₀ ≠ 1` はこれから作れる。✅
+* **`C_Q(X)` ↔ `qhyp.Q` の移送**: `centralizer_cQ_isPGroup_of_quotient hXV
+  (hQbar : IsPGroup 2 qhyp.Q) : IsPGroup 2 ↥(hyp.Q.subgroupOf C)`
+  (`CentralizerInductionBridge.lean:185`) が既に**商 → 中心化群**方向の移送を持つ。
+  位数版が要るならこの近所を辿る。⚠ 唯一残る要実測点。
+
+### 段 (2)(b) の前提表 (最終)
+
+| 前提 | 状態 |
+|---|---|
+| `hst` | ✅ `orderOf_distinguishedInvolution_mul_t_of_psu3Target` |
+| `hm` | ✅ `data.one_lt_n` |
+| `hQ0card` / `hcardQ` | ✅ `CentralizerPSUData` のフィールド (要位数移送) |
+| `inductionHypothesis` | ✅ **今回** |
+| `x₀` | ✅ `exists_involution_mem_center_Q` (汎用) |
+| `C_Q(X) ↔ qhyp.Q` 位数移送 | ⚠ 唯一の要実測点 |
+
+⟹ **段 (2)(b) の前提はほぼ全部埋まった**。次は位数移送を確認して
+`exists_standardModel` for `qhyp` を組み、(60) の鎖で段 (2) を閉じる。
