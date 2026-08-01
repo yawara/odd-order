@@ -290,6 +290,67 @@ theorem Setup.exists_fgh_one (hS : Setup M Q D t) :
   · simp only [if_neg hx1]
     exact H.eq x hxQ hx1
 
+/-- **A rank-one setup transports along a group isomorphism.**
+
+All nine conditions are statements about elements and the two unique factorizations, so an
+isomorphism carries them across; the uniqueness clauses use injectivity.
+
+Peterfalvi Part II, Ch. IV §4, step (2) (p. 133) needs this to compare the setup `U/Z(U)`
+inherits from `U` with the one Ch. I §3 Proposition 1(c) transports from the standard
+`PSU(3, ℓ)`: the two live on isomorphic — but not identical — models of `U/Z(U)`. -/
+theorem Setup.map {L' : Type*} [Group L'] (hS : Setup M Q D t) (φ : L ≃* L') :
+    Setup (M.map φ.toMonoidHom) (Q.map φ.toMonoidHom) (D.map φ.toMonoidHom) (φ t) where
+  QM := Subgroup.map_mono hS.QM
+  DM := Subgroup.map_mono hS.DM
+  invol := by rw [← map_mul, hS.invol, map_one]
+  Dstab := by
+    rintro _ ⟨d, hd, rfl⟩
+    exact ⟨t * d * t, hS.Dstab d hd, by simp [map_mul]⟩
+  DQ := by
+    rintro _ ⟨d, hd, rfl⟩ _ ⟨q, hq, rfl⟩
+    exact ⟨d⁻¹ * q * d, hS.DQ d hd q hq, by simp [map_mul, map_inv]⟩
+  split := by
+    rintro _ ⟨a, ha, rfl⟩
+    obtain ⟨⟨q, d⟩, hqd, huniq⟩ := hS.split a ha
+    refine ⟨(⟨φ (q : L), ⟨(q : L), q.2, rfl⟩⟩, ⟨φ (d : L), ⟨(d : L), d.2, rfl⟩⟩), ?_, ?_⟩
+    · change φ a = φ (q : L) * φ (d : L)
+      rw [← map_mul, ← hqd]
+    · rintro ⟨⟨_, q', hq', rfl⟩, ⟨_, d', hd', rfl⟩⟩ heq
+      have heq' : a = q' * d' := φ.injective (by rw [map_mul]; exact heq)
+      have hpair := huniq (⟨q', hq'⟩, ⟨d', hd'⟩) heq'
+      have hq₁ : q' = (q : L) :=
+        congrArg (Subtype.val (p := fun z => z ∈ Q)) (congrArg Prod.fst hpair)
+      have hd₁ : d' = (d : L) :=
+        congrArg (Subtype.val (p := fun z => z ∈ D)) (congrArg Prod.snd hpair)
+      exact Prod.ext (Subtype.ext (congrArg φ hq₁)) (Subtype.ext (congrArg φ hd₁))
+  fact := by
+    intro y' hy'
+    have hy : φ.symm y' ∉ M := fun hc => hy' (Subgroup.mem_map_equiv.mpr hc)
+    obtain ⟨⟨a, b⟩, hab, huniq⟩ := hS.fact (φ.symm y') hy
+    refine ⟨(⟨φ (a : L), ⟨(a : L), a.2, rfl⟩⟩, ⟨φ (b : L), ⟨(b : L), b.2, rfl⟩⟩), ?_, ?_⟩
+    · change y' = φ (a : L) * φ t * φ (b : L)
+      rw [← map_mul, ← map_mul, ← hab, MulEquiv.apply_symm_apply]
+    · rintro ⟨⟨_, a', ha', rfl⟩, ⟨_, b', hb', rfl⟩⟩ heq
+      have heq' : φ.symm y' = a' * t * b' := by
+        apply φ.injective
+        rw [map_mul, map_mul, MulEquiv.apply_symm_apply]
+        exact heq
+      have hpair := huniq (⟨a', ha'⟩, ⟨b', hb'⟩) heq'
+      have ha₁ : a' = (a : L) :=
+        congrArg (Subtype.val (p := fun z => z ∈ M)) (congrArg Prod.fst hpair)
+      have hb₁ : b' = (b : L) :=
+        congrArg (Subtype.val (p := fun z => z ∈ Q)) (congrArg Prod.snd hpair)
+      exact Prod.ext (Subtype.ext (congrArg φ ha₁)) (Subtype.ext (congrArg φ hb₁))
+  tnotmem := by
+    intro hc
+    exact hS.tnotmem (by simpa using Subgroup.mem_map_equiv.mp hc)
+  tconj := by
+    rintro _ ⟨x, hx, rfl⟩ hx1
+    have hx1' : x ≠ 1 := fun hc => hx1 (by rw [hc, map_one])
+    intro hc
+    refine hS.tconj x hx hx1' ?_
+    simpa using Subgroup.mem_map_equiv.mp hc
+
 /-! ## Uniqueness, and the read-off lemma
 
 Every identity below is proved by the same two-step pattern: exhibit a factorization
@@ -524,9 +585,9 @@ theorem Setup.quotient (hS : Setup M Q D t) {N : Subgroup L} [N.Normal] (hND : N
   refine ⟨Subgroup.map_mono hS.QM, Subgroup.map_mono hS.DM, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · rw [← map_mul, hS.invol, map_one]
   · rintro _ ⟨d, hd, rfl⟩
-    exact ⟨t * d * t, hS.Dstab d hd, by rw [map_mul, map_mul]⟩
+    exact ⟨t * d * t, hS.Dstab d hd, by simp [map_mul]⟩
   · rintro _ ⟨d, hd, rfl⟩ _ ⟨q, hq, rfl⟩
-    exact ⟨d⁻¹ * q * d, hS.DQ d hd q hq, by rw [map_mul, map_mul, map_inv]⟩
+    exact ⟨d⁻¹ * q * d, hS.DQ d hd q hq, by simp [map_mul, map_inv]⟩
   · -- `split`
     rintro _ ⟨a, ha, rfl⟩
     obtain ⟨⟨q, d⟩, hqd, huniq⟩ := hS.split a ha
