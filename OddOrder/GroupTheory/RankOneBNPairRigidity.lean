@@ -613,4 +613,31 @@ theorem Setup.normalizer_Q_eq (hS : Setup M Q D t) (hQ1 : Q ≠ ⊥) :
   rw [hS.tinv] at hmem
   exact hS.QM hmem
 
+/-- **Two rank-one setups on the same group have conjugate `Q` and `M`.**
+
+Both `Q`s are Sylow `2`-subgroups (`Setup.exists_sylow_two_eq`), hence conjugate; and
+`M = N_L(Q)` (`Setup.normalizer_Q_eq`), so the same conjugation carries `M` to `M'`.
+
+Peterfalvi Part II, Ch. IV §4, step (2) (p. 133) compares the setup `U/Z(U)` inherits
+from `U` with the one Ch. I §3 Proposition 1(c) transports from the standard `PSU(3, ℓ)`;
+this is the first half of that comparison. -/
+theorem Setup.exists_conj_eq [Finite L] {M' Q' D' : Subgroup L} {t' : L}
+    (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
+    (hQ : IsPGroup 2 ↥Q) (hDodd : Odd (Nat.card ↥D)) (hQeven : Even (Nat.card ↥Q))
+    (hQ' : IsPGroup 2 ↥Q') (hDodd' : Odd (Nat.card ↥D')) (hQeven' : Even (Nat.card ↥Q'))
+    (hQ1 : Q ≠ ⊥) (hQ1' : Q' ≠ ⊥) :
+    ∃ c : L, Q.map (MulAut.conj c).toMonoidHom = Q' ∧
+      M.map (MulAut.conj c).toMonoidHom = M' := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨S, hSQ⟩ := hS.exists_sylow_two_eq hQ hDodd hQeven
+  obtain ⟨S', hSQ'⟩ := hS'.exists_sylow_two_eq hQ' hDodd' hQeven'
+  obtain ⟨c, hc⟩ := MulAction.exists_smul_eq L S S'
+  have hQc : Q.map (MulAut.conj c).toMonoidHom = Q' := by
+    rw [← hSQ, ← hSQ', ← hc]
+    rfl
+  refine ⟨c, hQc, ?_⟩
+  rw [← hS.normalizer_Q_eq hQ1, Subgroup.map_equiv_normalizer_eq Q (MulAut.conj c), hQc,
+    hS'.normalizer_Q_eq hQ1']
+
 end OddOrder.GroupTheory.RankOneBNPair
