@@ -326,6 +326,69 @@ theorem exists_unitaryModel_coord {m : ℕ} (M : hyp.QuotientFieldModel m) (hm :
     · rw [hΨc, Φ.apply_symm_apply]
 
 include hyp in
+/-- **The unitary coordinate of a central element is its `ι`-coordinate, rescaled**
+(Peterfalvi Part II, Ch. IV §3, p. 131: the elements `s^a = (0, a)`).
+
+`Ψ` multiplies the quotient coordinate by `e` and the central one by `ν`, so on the
+centre — where the quotient coordinate is `0` and the unitary correction `u a ā`
+vanishes — it reads the centre coordinate `ι` scaled by `ν`.
+
+Choosing `ν = ι(s)⁻¹` is the book's normalization `s = (0, 1)`; then `s^a` has unitary
+coordinate `ι(s^a)/ι(s) = μ(a,1)²`, which is the book's `a` on p. 131 (its parameter
+being the square of stage (1)'s). -/
+theorem unitaryCoord_center {m : ℕ} (M : hyp.QuotientFieldModel m)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
+    (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hker : ∀ z : ↥(Subgroup.center hyp.Q),
+      Φ (z : ↥hyp.Q) = ⟨0, ι (Additive.ofMul z)⟩)
+    {u : M.E} (hu : OddOrder.FiniteField.frobTrace (E := M.E) m u = 1)
+    (Ψ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct
+      (OddOrder.FiniteField.hermitianCocycle m M.card hu))
+    {e : M.E} {ν : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (hΨq : ∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient)
+    (hΨc : ∀ ρ : ↥hyp.Q, (Ψ ρ).central = ν * (Φ ρ).central)
+    (z : ↥(Subgroup.center hyp.Q)) :
+    Suzuki2Groups.unitaryCoord m u (Ψ (z : ↥hyp.Q))
+      = (ν : M.E) *
+        ((ι (Additive.ofMul z) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) := by
+  have hq : (Ψ (z : ↥hyp.Q)).quotient = 0 := by
+    rw [hΨq, hker z]
+    exact mul_zero e
+  rw [Suzuki2Groups.unitaryCoord_of_quotient_eq_zero m u hq, hΨc, hker z]
+  rfl
+
+include hyp in
+/-- **The norm of `μ(k, v)` is `μ(k, 1)²`** (Peterfalvi Part II, Ch. III §3, p. 120).
+
+`μ` is multiplicative and `(k, v) = (k, 1)(1, v)`, so the norm splits; the `W`-half is
+`1` (`mu_W_normOne`) and the `K`-half is a square, `μ(K)` lying in `F`
+(`mu_K_frobFixed`).
+
+So the scalar by which `K W` acts on the second unitary coordinate involves only the
+`K`-component — the book's `d^{1+q}` for `d ∈ K W`. -/
+theorem mu_norm_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (kv : ↥hyp.actualKActor × ↥hyp.W) :
+    ((M.mu kv : M.Eˣ) : M.E) ^ (2 ^ m + 1)
+      = ((M.mu (kv.1, 1) : M.Eˣ) : M.E) ^ 2 := by
+  have hsplit : kv = (kv.1, (1 : ↥hyp.W)) * ((1 : ↥hyp.actualKActor), kv.2) :=
+    Prod.ext (mul_one _).symm (one_mul _).symm
+  have hW : ((M.mu ((1 : ↥hyp.actualKActor), kv.2) : M.Eˣ) : M.E) ^ (2 ^ m + 1) = 1 := by
+    have h := congrArg (fun u : M.Eˣ => (u : M.E)) (M.mu_W_normOne kv.2)
+    simpa using h
+  have hK : ((M.mu (kv.1, (1 : ↥hyp.W)) : M.Eˣ) : M.E) ^ (2 ^ m + 1)
+      = ((M.mu (kv.1, (1 : ↥hyp.W)) : M.Eˣ) : M.E) ^ 2 := by
+    rw [pow_succ, M.mu_K_frobFixed kv.1, ← pow_two]
+  have hmu : ((M.mu kv : M.Eˣ) : M.E)
+      = ((M.mu (kv.1, (1 : ↥hyp.W)) : M.Eˣ) : M.E)
+        * ((M.mu ((1 : ↥hyp.actualKActor), kv.2) : M.Eˣ) : M.E) := by
+    rw [← Units.val_mul, ← map_mul, ← hsplit]
+  rw [hmu, mul_pow, hW, mul_one, hK]
+
+include hyp in
 /-- **The centre exponent is squaring on `μ(K)`**: `μ(k,1)^d = μ(k,1)²` (Peterfalvi
 Part II, Ch. IV §3 (3), p. 130 — this is the concrete content of `θ = 1`).
 

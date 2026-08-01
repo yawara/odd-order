@@ -98,6 +98,15 @@ theorem unitaryCoord_mul (hcard : Nat.card E = (2 ^ m) ^ 2) {u : E}
       - u * (p.quotient * p.quotient ^ 2 ^ m)
       - u * (q.quotient * q.quotient ^ 2 ^ m)) * h2
 
+/-- **The unitary coordinate of an element of the centre is its central coordinate** —
+the correction `u a ā` vanishes with `a`.  Stated through the quotient coordinate rather
+than the constructor, for elements arriving as images of `Z(Q)`. -/
+theorem unitaryCoord_of_quotient_eq_zero (u : E)
+    {φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m)}
+    {p : BilinearTwistedProduct φ} (hp : p.quotient = 0) :
+    unitaryCoord m u p = (p.central : E) := by
+  rw [unitaryCoord, hp, zero_mul, mul_zero, add_zero]
+
 /-- The unitary coordinate of a central element is its central coordinate. -/
 @[simp] theorem unitaryCoord_central (u : E)
     {φ : LinearMap.BilinMap (ZMod 2) E ↥(frobFixedSubfield E 2 m)}
