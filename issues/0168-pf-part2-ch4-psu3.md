@@ -3826,3 +3826,30 @@ ambient の orderOf (s·t) = 3  +  exponent 判別子 (48)(49)
 
 ⟹ **段 (2)(b) の前提はほぼ全部埋まった**。次は位数移送を確認して
 `exists_standardModel` for `qhyp` を組み、(60) の鎖で段 (2) を閉じる。
+
+## 2026-08-01 (64): 🔍 位数移送 — `Q` 版はあり、**`Q₀` 版が唯一の隙間**
+
+* `centralizerQQuotientEquiv (hXV : X ≤ V) :
+   ↥(hyp.Q.subgroupOf C) ≃* ↥(centralizerQuotientHypothesisA1 hXV).Q`
+  (`CentralizerInductionBridge.lean:148`) — **`C_Q(X) ≃* Q̄` の明示同型**が既にある。
+  理由は「`𝒩(C_G(X)) ≤ C_D(X)` かつ `C_Q(X) ∩ C_D(X) = 1`」。
+  ⟹ `hcardQ` に要る位数移送はこれで済む (`Nat.card_congr`)。
+
+* ⚠ **`Q₀` 版は無い**。`hQ0card` は `Nat.card ↥qhyp.Q0 = 2^m` を要求するが、
+  `CentralizerPSUData.natCard_cQ0_eq_baseField` が与えるのは
+  `Nat.card ↥(hyp.Q0.subgroupOf C)`。⟹ **`centralizerQ0QuotientEquiv` が要る**。
+
+  証明は `centralizerQQuotientEquiv` の写経でよいはず: `Q₀ ≤ Q` なので
+  `C_{Q₀}(X) ∩ C_D(X) ≤ C_Q(X) ∩ C_D(X) = 1`、単射性は同じ議論。全射性は
+  `qhyp.Q0` の定義次第 (`HypothesisA1.Q0` がどう構成されているか要確認)。
+
+⟹ **段 (2)(b) の前提で残るのはこれ 1 つだけ**。
+
+### ⚠ 次セッションはここから
+
+1. **`centralizerQ0QuotientEquiv` を書く** (`centralizerQQuotientEquiv` の写経、
+   `CentralizerInductionBridge.lean` に置く)。⚠ 先に `HypothesisA1.Q0` /
+   `centralizerQuotientHypothesisA1` の `Q0` フィールドがどう定義されているか実測。
+2. `exists_standardModel` for `qhyp` を組む (前提はこれで全部そろう)。
+3. (60) の段 (4) 鎖 → `hcover` → `corollaryTwo_of_stepFour` → 段 (2) が閉じる。
+4. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
