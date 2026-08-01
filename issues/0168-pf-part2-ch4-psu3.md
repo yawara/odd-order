@@ -6035,3 +6035,46 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
 `\|Q̄\| = \|C_Q(P)\| = ℓ³` (`natCard_cQ_eq_baseField_cube`)、
 `\|Q̄₀\| = ℓ` (`natCard_cQ0_eq_baseField`)、Suzuki 2-群性 (`cQ_isSuzuki2Group`)。
 ⚠ `Q̄₀` は内在 `Hypothesis` から導かれる量なので、`π(Q₀∩U)` と一致するかを先に確認する。
+
+## 2026-08-02 (114): 忠実性の核 `Setup.normalCore_le_center` が landing
+
+(113) の `ofRankOneSetup` が要求する 4 仮説のうち、唯一「要調査」だった
+`M.normalCore = ⊥` の実質が出た:
+
+**`Setup.normalCore_le_center`** — `⟨Q ∪ Q^t⟩ = ⊤` (= `L` が `Q` の共役で生成)
+ならば `M.normalCore ≤ Z(L)`。
+
+論法 (新しい数学ゼロ、既存の一意性の組み合わせ):
+* `N := M.normalCore` は `t` 共役で安定 ⟹ `N ≤ M ⊓ M^t = D` (`D_eq_inf_map_conj`)。
+* `[N, Q] ≤ N ⊓ Q ≤ D ⊓ Q = 1` (`Q_inf_D_eq_bot`、今回切り出した) ⟹ `N` が `Q` を中心化。
+* `t` 共役で `Q^t` も中心化 ⟹ `⟨Q ∪ Q^t⟩ = L` 全体を中心化。
+
+⟹ **`U/Z(U)` で中心が自明になる理由がそのまま忠実性になる** (中心で割ったから)。
+
+⚠ 実測メモ: `hS.DQ d hd q hq : d⁻¹ * q * d ∈ Q` — 欲しい形が `n⁻¹ q⁻¹ n` なら
+`d := n` を渡す。`t` 共役の calc は `group` が `t*t = 1` を知らないので
+`hconj : (t a t)(t b t) = t (a b) t` を先に用意する。
+
+### `ofRankOneSetup` を `U/Z(U)` に当てる — 残り
+
+| 仮説 | 状態 |
+|---|---|
+| `M̄.normalCore = ⊥` | **今回で道具完成**。あとは (a) `⟨Q̄ ∪ Q̄^t̄⟩ = ⊤` (= `U/Z(U)` が `π(Q∩U)` の共役で生成) と (b) `Z(U/Z(U)) = ⊥` を供給 |
+| `\|Q̄\|` even | `π(Q∩U) ≅ C_Q(P)` が非自明 2-群 |
+| `\|D̄\|` odd | `D∩U` の商 |
+| (A3) | §4 の `hA3` |
+
+⚠ (a) は `Setup.closure_conj_Q` + 「`U = O^{2'}(U)`」から:
+`⟨Q_U^x : x ∈ U⟩ = primeComplementResidual 2 U` (`RankOneBNPairRigidity.lean:217`)
+で、`O^{2'}` の冪等性 (`C/U` と `U/O^{2'}(U)` がともに奇位数 ⟹ `C/O^{2'}(U)` も奇
+⟹ `U = O^{2'}(C) ≤ O^{2'}(U)`) から `= U` (商では `⊤`)。
+⚠ (b) `Z(U/Z(U)) = ⊥` は一般には偽 (`U` が冪零なら偽) だが、ここでは
+`U/Z(U) ≅ PSU(3,ℓ)` が中心を持たないことから出る — **`residualQuotientEquiv` を
+使ってよい** (三つ組の照合とは違い、中心の自明性は同型不変)。
+
+### ⚠ 次セッションはここから
+
+1. `O^{2'}` の冪等性 (⟹ (a))。
+2. `Z(U/Z(U)) = ⊥` を `residualQuotientEquiv` + 標準 `PSU(3,ℓ)` の中心自明性から
+   (`ProjectiveUnitary` 側に中心の計算が在るか実測)。
+3. ⟹ `ofRankOneSetup` を当てて `U/Z(U)` の内在 `Hypothesis` を得る。
