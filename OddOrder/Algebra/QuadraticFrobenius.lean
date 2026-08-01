@@ -34,6 +34,13 @@ other are `σ` and `σ̄ = σ σ₀`, the two preimages of `θ` under the restri
 * `OddOrder.FiniteField.qFrobenius_eq_inv_of_pow_succ_eq_one` — `σ₀` inverts the
   norm-one subgroup `{x : x^{q+1} = 1}`, which is what makes it the book's `σ` when
   `θ = 1`.
+* `OddOrder.FiniteField.exists_ringAut_extending_frobFixedSubfield` — every automorphism
+  of `F` extends to `E`, and `eq_or_eq_mul_qFrobenius_of_eq_on_frobFixed` says the
+  extensions come in pairs `σ`, `σσ₀`.
+* `OddOrder.FiniteField.odd_orderOf_or_odd_orderOf_mul_qFrobenius` — of that pair, one has
+  odd order whenever the restriction does.  This is the book's "possibly on replacing `σ`
+  by `σ̄`", and it is what turns the type-`B` datum's odd-order automorphism into the odd
+  order of `θ = σ⁻¹τ` that §3 (3) asks for.
 -/
 
 namespace OddOrder.FiniteField
@@ -454,6 +461,49 @@ theorem eq_or_eq_mul_qFrobenius_of_eq_on_frobFixed
     have h2 : σ * (σ⁻¹ * σ') = σ * qFrobenius E p n := by rw [h1]
     rw [mul_inv_cancel_left] at h2
     exact h2
+
+/-- **Automorphisms of a finite field commute**: they are all powers of the Frobenius
+(`exists_pow_eq_of_ringAut`). -/
+theorem ringAut_commute {N : ℕ} (hcardN : Nat.card E = p ^ N) (hN : N ≠ 0)
+    (α β : RingAut E) : Commute α β := by
+  obtain ⟨i, hi⟩ := exists_pow_eq_of_ringAut hcardN hN α
+  obtain ⟨j, hj⟩ := exists_pow_eq_of_ringAut hcardN hN β
+  have hα : α = qFrobenius E p 1 ^ i := by
+    rw [qFrobenius_pow]
+    exact RingEquiv.ext fun x => hi x
+  have hβ : β = qFrobenius E p 1 ^ j := by
+    rw [qFrobenius_pow]
+    exact RingEquiv.ext fun x => hj x
+  rw [hα, hβ]
+  exact (Commute.refl (qFrobenius E p 1)).pow_pow i j
+
+/-- **Normalizing an extension to odd order** — the book's "possibly on replacing `σ` by
+`σ̄`" (Peterfalvi Part II, Ch. III §3, step (2), p. 121).
+
+If `ψ^d` fixes `F` pointwise for some odd `d` — i.e. the restriction of `ψ` to `F` has
+odd order — then `ψ^d` is `1` or the `q`-Frobenius `σ₀` (`eq_one_or_eq_qFrobenius_of_fixes`).
+In the first case `ψ` itself has odd order; in the second the twist `ψσ₀` does, because
+`(ψσ₀)^d = σ₀^{d+1} = 1` with `d + 1` even and `σ₀² = 1`.
+
+So of the two extensions of `ψ|_F` to `E`, exactly the one §3 (3) wants is available: the
+odd order of `θ = σ⁻¹τ` is not an extra assumption on the type-`B` datum but a normalization
+of the pair, given that the datum's own automorphism has odd order. -/
+theorem odd_orderOf_or_odd_orderOf_mul_qFrobenius
+    (hcard : Nat.card E = (p ^ n) ^ 2) (hn : n ≠ 0) {ψ : RingAut E} {d : ℕ} (hd : Odd d)
+    (hfix : ∀ x : E, x ^ p ^ n = x → (ψ ^ d) x = x) :
+    Odd (orderOf ψ) ∨ Odd (orderOf (ψ * qFrobenius E p n)) := by
+  have hcardN : Nat.card E = p ^ (n * 2) := by rw [hcard, ← pow_mul]
+  have hN : n * 2 ≠ 0 := by simpa using hn
+  have hsq : qFrobenius E p n ^ 2 = 1 := by
+    rw [← orderOf_qFrobenius hcard hn]
+    exact pow_orderOf_eq_one _
+  rcases eq_one_or_eq_qFrobenius_of_fixes hcard hn hfix with h1 | h1
+  · exact Or.inl (hd.of_dvd_nat (orderOf_dvd_of_pow_eq_one h1))
+  · refine Or.inr (hd.of_dvd_nat (orderOf_dvd_of_pow_eq_one ?_))
+    obtain ⟨k, hk⟩ := hd
+    rw [(ringAut_commute hcardN hN ψ (qFrobenius E p n)).mul_pow, h1, ← pow_succ', hk]
+    have h2 : 2 * k + 1 + 1 = 2 * (k + 1) := by ring
+    rw [h2, pow_mul, hsq, one_pow]
 
 end Extension
 
