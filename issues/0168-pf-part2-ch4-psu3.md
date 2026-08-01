@@ -3229,3 +3229,44 @@ repo の分岐データを実測すると:
    ((C1)(C2) の repo 対応物)。
 2. 段 (2) — `corollaryTwo_of_stepFour` を `U` 側に当てる。
 3. 段 (3)(4) → (5)(6) の供給 → `sectionFour_solve` 以降は landing 済。
+
+## 2026-08-01 (46): §4 段 (1) の入力 3 つの出どころを実測
+
+段 (1) を配線するのに要る 3 つの仮説がどこから来るかを追った。
+
+### (a) 2-rank ≥ 2 (書籍「By (C1)」)
+
+`centralizer_trichotomy_of_induction` の仮説
+`hA3 : ∃ E : Subgroup (centralizer X), Nat.card E = 4 ∧ ∀ x ∈ E, x² = 1`
+**がそのまま 2-rank ≥ 2** (Klein 四元群)。⟹ (C1) の役割はこれを供給すること。
+`Basic.lean` の (A3) / `CentralizerQuotient.centralizerQuotient_twoRankGeTwo` も近所。
+
+### (b) `st` の位数 3 (書籍「(C2)」)
+
+repo では `hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3` として
+`exists_standardModel` 等が既に受け取っている。`hC2 : t·s·t = s·t·s` と同値
+(`PSU3Preliminary.lean` ヘッダ参照)。
+
+### (c) `C_Q(P)` が exponent 4 → `¬ IsElementaryAbelian 2 C_Q(P)`
+
+⚠ **これだけ repo に無く、導出が要る**。書籍は §4 前置きの `C_{Q/Q₀}(P) ≠ 1` から
+出している。導出鎖 (全部部品は在る):
+
+1. `|P|` 奇素数、`Q` は 2-群 ⟹ 互いに素。`Q₀ ⊴ Q` は `P`-不変。
+2. **Glauberman の補題** = `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`
+   (「`X`-固定な剰余類は `X`-固定な代表を持つ」、`GroupTheory/CoprimeFixedPoints.lean`
+   に再輸出) ⟹ `C_{Q/Q₀}(P) = C_Q(P)Q₀/Q₀`。
+3. ⟹ `C_{Q/Q₀}(P) ≠ 1` から `∃ x ∈ C_Q(P)`, `x ∉ Q₀`。
+4. `Q₀ = Z(Q)` かつ `Ω₁(Q) ≤ Q₀` (`ActualCenter.lean` の
+   `center_Q_eq_Q0_subgroupOf_of_sq_eq_one` / `LemmaFiveSetup.centerEqQ0` 周り)
+   ⟹ `x² ≠ 1` ⟹ `¬ IsElementaryAbelian 2 C_Q(P)`。
+
+⟹ 段 (1) の分岐選択 (`nonempty_psu3Data_of_orderOf_eq_three`) にそのまま入る。
+
+### ⚠ 次セッションはここから
+
+1. **(c) の導出を書く** — 上の 4 手。⚠ 4. の `Ω₁(Q) ≤ Q₀` が repo でどの補題か
+   (`sqFibre` 周り?) を先に実測すること。ここが段 (1) の唯一の未形式化入力。
+2. §4 の standing hypothesis 構造を置いて段 (1) を配線。
+3. 段 (2) — `corollaryTwo_of_stepFour` を `U` 側に。
+4. 段 (3)(4) → (5)(6) の供給 → `sectionFour_solve` 以降は landing 済。
