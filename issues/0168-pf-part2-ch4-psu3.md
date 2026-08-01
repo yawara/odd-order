@@ -2685,3 +2685,39 @@ p.132 をページ画像で確認した結果、Ch. IV の残りは以下の構�
    (`PSU3OrbitCount`) の API を使う。⚠ **これらの API を先に実測すること**。
 
 閉じれば `corollaryTwo` の `hfive` が外れ、**§3 が完成**する。
+
+## 2026-08-01 (32): 段 (5) 最終梱包の実装メモ (着手前の実測結果)
+
+`PSU3OrbitCount` の API を実測した:
+
+| 名前 | 中身 |
+|---|---|
+| `baseUnit M hZ hωQ hωQ0 : M.Eˣ` | `M.coord (mk ω)` を unit にしたもの (`baseUnit_val` は `rfl`) |
+| `fUnit M hZ H hC2 hωQ hωQ0 x : M.Eˣ` | `M.coord (mk (f (ω x)))` (`fUnit_val` は `rfl`) |
+| `orbitOfF … x` | `QuotientGroup.mk (fUnit … x)` in `M.Eˣ ⧸ range M.mu` |
+
+軌道条件「`ρ̄` が `ω̄` の `KW`-軌道」= `QuotientGroup.mk (baseUnit … hρQ hρQ0)
+= QuotientGroup.mk (baseUnit … hωQ hωQ0)`。`QuotientGroup.eq.mp` で
+`∃ kv, μ(kv) = baseUnit(ρ)⁻¹ · baseUnit(ω)` ⟹ `ρ̄ = μ(kv⁻¹)·ω̄`。
+`(Ψρ).quotient = e·baseUnit(ρ)` なので `e ≠ 0` を消せば座標の関係に落ちる。
+
+### ⚠ 実装で引っかかる点 (先に把握しておくこと)
+
+1. **`subst hkveq` は使えない** — `exists_mem_K_conjQHom_eq` が返す
+   `hkveq : (kActor hk, kv.2) = kv` は右辺 `kv` が左辺にも現れる (`kv.2`) ので
+   `subst` が通らない。`rw [← hkveq] at hkv` のように**項の側だけ**書き換える。
+2. **`conjQHom_kActor_apply_val` は W 成分が `⟨v, hv⟩` の形を要求** —
+   `kv.2 : ↥hyp.W` をそのまま渡せない。`⟨(kv.2 : G), kv.2.2⟩ = kv.2` は `rfl` なので
+   `have hw : (⟨(kv.2 : G), kv.2.2⟩ : ↥hyp.W) = kv.2 := rfl` を挟む。
+3. `stepFive_orbit` は `σ ≠ 1`・`unitaryCoord (Ψ σ) ≠ 0` と、
+   `k*v*σ*(k*v)⁻¹` と その `f` の所属証明を要る。前者 2 つは
+   `unitaryCoord_ne_zero` と商座標 ≠ 0 から出る。
+
+### 梱包の骨 (次セッション)
+
+```
+軌道内: exists_conjQHom_eq_of_quotient_smul → σ (ω のファイバー)
+        → stepFour_cover で P σ → exists_mem_K_conjQHom_eq + stepFive_orbit → P ρ
+軌道外: exists_mem_Q0_orbitOfF_eq → x₀, ρ' := ρ x₀ (f(ρ') が軌道内)
+        → 上で f(ρ') のファイバー全体に P → stepFive_secondCase_elem → P ρ
+```
