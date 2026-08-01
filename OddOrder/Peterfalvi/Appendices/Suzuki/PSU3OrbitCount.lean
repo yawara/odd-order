@@ -716,6 +716,29 @@ theorem conjQHom_kActor_apply_val {k v : G} (hk : k ∈ hyp.K) (hv : v ∈ hyp.W
   rw [hval]
   group
 
+/-- The coordinate of `Q ⧸ Z(Q) ≅ E` is additive along products in `Q`. -/
+theorem coord_mk_mul {m : ℕ} (M : hyp.QuotientFieldModel m) {x y : G}
+    (hxQ : x ∈ hyp.Q) (hyQ : y ∈ hyp.Q) (hxyQ : x * y ∈ hyp.Q) :
+    M.coord (Additive.ofMul (QuotientGroup.mk (⟨x * y, hxyQ⟩ : ↥hyp.Q)))
+      = M.coord (Additive.ofMul (QuotientGroup.mk (⟨x, hxQ⟩ : ↥hyp.Q)))
+        + M.coord (Additive.ofMul (QuotientGroup.mk (⟨y, hyQ⟩ : ↥hyp.Q))) := by
+  have hmul : (⟨x * y, hxyQ⟩ : ↥hyp.Q) = (⟨x, hxQ⟩ : ↥hyp.Q) * ⟨y, hyQ⟩ := rfl
+  rw [hmul, QuotientGroup.mk_mul, ofMul_mul, map_add]
+
+/-- Elements of `Q₀` have coordinate `0`: they are exactly the kernel of `Q → Q ⧸ Z(Q)`.
+This is the converse of `coord_ne_zero_of_not_mem_Q0`. -/
+theorem coord_mk_eq_zero_of_mem_Q0 {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    {z : G} (hzQ0 : z ∈ hyp.Q0) (hzQ : z ∈ hyp.Q) :
+    M.coord (Additive.ofMul (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q))) = 0 := by
+  have hmem : (⟨z, hzQ⟩ : ↥hyp.Q) ∈ Subgroup.center hyp.Q := by
+    rw [hZ, Subgroup.mem_subgroupOf]
+    exact hzQ0
+  have hone : (QuotientGroup.mk (⟨z, hzQ⟩ : ↥hyp.Q) :
+      ↥hyp.Q ⧸ Subgroup.center hyp.Q) = 1 := QuotientGroup.eq_one_iff _ |>.mpr hmem
+  rw [hone]
+  exact map_zero M.coord
+
 /-- **The `D`-action on `Q/Q₀` in coordinates**: conjugation by `c = κ v` (`κ ∈ K`,
 `v ∈ W`) multiplies the coordinate of `Q ⧸ Z(Q) ≅ E` by the scalar `μ(κ, v)`.
 
