@@ -5698,3 +5698,50 @@ ambient の `t` の像 `π t` と一致する保証は**無く、フィールド
    (c) 書籍 p.133 を**ページ画像で読み直す** — `h₁(ω) ∈ ζ₁³(P ∩ U)` の `P ∩ U` が
        ちょうどこの `D`-side の誤差なら、(b) が書籍の言っていること。
    ⟹ **まず (c) を実行する** (`references/peterfalvi/pages/` に p.133 を残す)。
+
+## 2026-08-02 (106): 📖 p.133 再読 + `fgh_mem_centralizer` landing ⟹ 経路が完全に決まった
+
+### 書籍 p.133 の該当段落 (ページ画像 `references/peterfalvi/pages/peterfalvi-p133.png` で確認)
+
+> Let `ζ₁ ∈ (V ∩ U) − (P ∩ U)` and `ζ ∈ C_W(P)` be such that `ζ₁ ∈ ζP`.
+> If `f₁` and `h₁` denote the mappings `f` and `h` relative to `U`, `U ∩ H` and `t`,
+> then, by Corollary 2 of the proposition of §3, there is an element `ω ∈ (Q − Q₀) ∩ U`
+> such that `f₁(ω) ∈ ω^{-ζ₁}(P ∩ U)` and `h₁(ω) ∈ ζ₁³(P ∩ U)`. **By the uniqueness of
+> the canonical form of an element of `G − H`, `f(ω) = f₁(ω) = ω^{-ζ₁} = ω^{-ζ}` and
+> `h(ω) = h₁(ω) ∈ ζ³P`.**
+
+⚠ 重要な読み: **`f` には誤差項が付かない**。`f₁(ω) ∈ ω^{-ζ₁}(P ∩ U)` の剰余元は
+`f₁(ω)` と `ω^{-ζ₁}` が**どちらも `Q` の元**である一方 `P ∩ U` は奇位数で
+`Q ⊓ P = 1` なので**強制的に 1**。だから `f(ω) = ω^{-ζ₁}`。さらに `ω ∈ U ⊆ C_G(P)`
+ゆえ `P` が `ω` を中心化し `ζ₁ ∈ ζP` から `ω^{-ζ₁} = ω^{-ζ}`。
+誤差 `∈ ζ³P` が残るのは **`h` だけ**。
+
+⟹ (105) の「`h(x) ∈ U` が出ない」は**問い方が間違っていた**。書籍は `U` **自身の**
+三つ組 `f₁, g₁, h₁` を使い、`h₁(ω) ∈ D ∩ U` は `U` の `IsFGH` の定義に含まれる。
+必要なのは **`U` の `Setup`** であって「ambient の `h` が `U` に入るか」ではない。
+
+### 🔑 `U` の `Setup` は出る (今回の `fgh_mem_centralizer` の論法を一般化するだけ)
+
+`fgh_mem_centralizer` (今回 landing) の核は「`P` による共役が canonical 分解を保つ
+⟹ 分解の因子が `C_G(P)` に入る」。これを `t x t` でなく**任意の `y ∈ C − H`** に
+適用すると:
+
+* `fact`: `y ∈ U` を `y = x·t·q` (`x ∈ H`, `q ∈ Q`) と書くと `q ∈ C_Q(P)`、
+  そして **`C_Q(P) ≤ U`** (`residual_eq_normalClosure`: `U = normalClosure(C_Q)`)。
+  ⟹ `x = y·q⁻¹·t⁻¹ ∈ U` (`t ∈ U` は landing 済)。**両因子が `U` に入る**。
+* `split`: `a ∈ H ∩ U` を `a = q·d` と書くと同様に `q ∈ C_Q(P) ≤ U`、
+  ⟹ `d = q⁻¹·a ∈ U`。**`h₁(ω) ∈ D ∩ U` はこれで出る**。
+* `tconj` は ambient から自明に降りる。
+
+⟹ **割り算するだけ**で `U` 側の `Setup` が閉じる。新しい数学は要らない。
+
+### ⚠ 次セッションはここから
+
+1. **`Setup.restrict`** (`OddOrder/GroupTheory/RankOneBNPair.lean` に一般補題):
+   `Setup M Q D t` と `t ∈ K` と「canonical / QD 分解の `Q`-成分が `K` に入る」
+   2 条件から `Setup (M.subgroupOf K) (Q.subgroupOf K) (D.subgroupOf K) ⟨t, htK⟩`。
+   (他の因子は割り算で出るので吸収条件は `Q`-成分だけでよい。)
+2. §4 側でその 2 条件を `C_Q(P) ≤ U` から供給する
+   (`fgh_mem_centralizer` の共役論法を `y ∈ C − H` 一般に切り出す)。
+3. `Setup.exists_fgh` ⟹ `U` の `f₁,g₁,h₁`。`IsFGH.map` で `U/Z(U)` へ、
+   `IsFGH.eq_of_le` で ambient へ。⟹ **段 (2) 完了**。
