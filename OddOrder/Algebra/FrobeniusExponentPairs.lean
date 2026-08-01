@@ -39,6 +39,10 @@ split out into a base leaf, this import should follow it.
   `λ` of order `2^n - 1`, the congruence consumed by `two_pow_pair_sum_eq`.
 * `frobIndex_pair_eq_of_pow_mul_eq` — the field form: if
   `a^{2^i} a^{2^j} = a^{2^k} a^{2^l}` for all `a`, then `{i, j} = {k, l}` mod `n`.
+* `odd_orderOf_inv_mul_of_mul_eq_mul_one` — the consequence §3 (3) consumes: if
+  `σ(a) τ(a) = a φ(a)` then `σ⁻¹τ` is `φ` or `φ⁻¹`, so it inherits `φ`'s odd order.
+* `restrictToFrobFixed`, `odd_orderOf_restrictToFrobFixed_inv_mul` — the same for a pair
+  of automorphisms of `E`, restricted to `F`.
 -/
 
 set_option autoImplicit false
@@ -88,6 +92,57 @@ theorem frobIndex_pair_eq_of_pow_mul_eq {F : Type*} [Field F] [Finite F]
   exact two_pow_pair_sum_eq (Nat.pos_of_ne_zero hn)
     (two_pow_pair_congruence_of_pow_eq (Nat.pos_of_ne_zero hn) hordg hpow)
 
+/-- **`{σ, τ} = {1, φ}`, read off as an order statement** (Peterfalvi Part II, Ch. III §3,
+p. 121).
+
+The book's step is
+
+> if `λ_{μν} ≠ 0`, then `a^μ a^ν = a a^θ` for `a ∈ F`, whence `{μ|_F, ν|_F} = {1_F, θ}`.
+
+`frobIndex_pair_eq_of_pow_mul_eq` gives the unordered equality of exponents; here it is
+turned into what §3 (3) actually consumes, namely that `θ = σ⁻¹τ` has the same order as
+the book's `θ` — in particular **odd**, since that is a structure field of the type-`B`
+datum (`TypeBData.phi_orderOf_odd`).
+
+Both branches land: `σ = 1, τ = φ` gives `σ⁻¹τ = φ`, and `σ = φ, τ = 1` gives `φ⁻¹`. -/
+theorem odd_orderOf_inv_mul_of_mul_eq_mul_one {F : Type*} [Field F] [Finite F] [CharP F 2]
+    {n : ℕ} (hn : n ≠ 0) (hcard : Nat.card F = 2 ^ n) (σ τ φ : RingAut F)
+    (hodd : Odd (orderOf φ)) (hmul : ∀ a : F, σ a * τ a = a * φ a) :
+    Odd (orderOf (σ⁻¹ * τ)) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨i, hi⟩ := exists_pow_eq_of_ringAut hcard hn σ
+  obtain ⟨j, hj⟩ := exists_pow_eq_of_ringAut hcard hn τ
+  obtain ⟨l, hl⟩ := exists_pow_eq_of_ringAut hcard hn φ
+  have hσ : σ = qFrobenius F 2 1 ^ i := by
+    rw [qFrobenius_pow]; exact RingEquiv.ext fun x => hi x
+  have hτ : τ = qFrobenius F 2 1 ^ j := by
+    rw [qFrobenius_pow]; exact RingEquiv.ext fun x => hj x
+  have hφ : φ = qFrobenius F 2 1 ^ l := by
+    rw [qFrobenius_pow]; exact RingEquiv.ext fun x => hl x
+  -- congruent exponents give equal automorphisms, the Frobenius having order `n`
+  have key : ∀ a b : ℕ, (a : ZMod n) = (b : ZMod n) →
+      (qFrobenius F 2 1 : RingAut F) ^ a = qFrobenius F 2 1 ^ b := by
+    intro a b hab
+    rw [pow_eq_pow_iff_modEq, orderOf_frobenius hcard hn]
+    exact (ZMod.natCast_eq_natCast_iff a b n).mp hab
+  have h : ∀ a : F, a ^ 2 ^ i * a ^ 2 ^ j = a ^ 2 ^ 0 * a ^ 2 ^ l := by
+    intro a
+    rw [pow_zero, pow_one, ← hi a, ← hj a, ← hl a]
+    exact hmul a
+  rcases frobIndex_pair_eq_of_pow_mul_eq hn hcard h with ⟨h1, h2⟩ | ⟨h1, h2⟩
+  · -- `σ = 1` and `τ = φ`
+    have hσ1 : σ = 1 := by
+      rw [hσ, key i 0 (by simpa using h1), pow_zero]
+    have hτφ : τ = φ := by rw [hτ, hφ, key j l h2]
+    rw [hσ1, hτφ, inv_one, one_mul]
+    exact hodd
+  · -- `σ = φ` and `τ = 1`
+    have hσφ : σ = φ := by rw [hσ, hφ, key i l h1]
+    have hτ1 : τ = 1 := by
+      rw [hτ, key j 0 (by simpa using h2), pow_zero]
+    rw [hσφ, hτ1, mul_one, orderOf_inv]
+    exact hodd
+
 /-! ## Restricting Frobenius powers of `E` to the subfield `F` -/
 
 section Restrict
@@ -133,6 +188,48 @@ theorem pow_two_pow_mod_of_mem_frobFixed {a : E}
   conv_lhs => rw [← Nat.div_add_mod i m]
   rw [pow_add, pow_mul, key (i / m)]
 
+/-- **The restriction of an automorphism of `E` to `F`**, as an automorphism of `F`.
+
+Well defined by `map_mem_frobFixedSubfield`, and bijective because `F` is finite. -/
+noncomputable def restrictToFrobFixed (α : E ≃+* E) :
+    RingAut ↥(frobFixedSubfield E 2 m) :=
+  RingEquiv.ofBijective
+    ({ toFun := fun a => ⟨α (a : E), map_mem_frobFixedSubfield α a.2⟩
+       map_one' := Subtype.ext (by simp)
+       map_mul' := fun a b => Subtype.ext (by simp)
+       map_zero' := Subtype.ext (by simp)
+       map_add' := fun a b => Subtype.ext (by simp) } :
+      ↥(frobFixedSubfield E 2 m) →+* ↥(frobFixedSubfield E 2 m))
+    (by
+      haveI : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
+      have hinj : Function.Injective
+          (fun a : ↥(frobFixedSubfield E 2 m) =>
+            (⟨α (a : E), map_mem_frobFixedSubfield α a.2⟩ :
+              ↥(frobFixedSubfield E 2 m))) :=
+        fun a b hab => Subtype.ext (α.injective (congrArg Subtype.val hab))
+      exact ⟨hinj, Finite.surjective_of_injective hinj⟩)
+
+@[simp] theorem coe_restrictToFrobFixed (α : E ≃+* E)
+    (a : ↥(frobFixedSubfield E 2 m)) :
+    ((restrictToFrobFixed α a : ↥(frobFixedSubfield E 2 m)) : E) = α (a : E) := rfl
+
+/-- The restriction of `σ⁻¹τ` is `σ⁻¹τ` on `F`. -/
+theorem coe_restrictToFrobFixed_inv_mul (σ τ : E ≃+* E)
+    (a : ↥(frobFixedSubfield E 2 m)) :
+    ((((restrictToFrobFixed σ)⁻¹ * restrictToFrobFixed τ :
+      RingAut ↥(frobFixedSubfield E 2 m)) a : ↥(frobFixedSubfield E 2 m)) : E)
+      = σ.symm (τ (a : E)) := by
+  have hb : ((restrictToFrobFixed τ a : ↥(frobFixedSubfield E 2 m)) : E) = τ (a : E) := rfl
+  have happ : (((restrictToFrobFixed σ)⁻¹ * restrictToFrobFixed τ :
+      RingAut ↥(frobFixedSubfield E 2 m)) a : ↥(frobFixedSubfield E 2 m))
+      = (restrictToFrobFixed σ).symm (restrictToFrobFixed τ a) := rfl
+  rw [happ]
+  refine σ.injective ?_
+  rw [σ.apply_symm_apply, ← hb]
+  exact coe_restrictToFrobFixed σ ((restrictToFrobFixed σ).symm (restrictToFrobFixed τ a))
+    ▸ congrArg (Subtype.val (p := fun x => x ∈ frobFixedSubfield E 2 m))
+      ((restrictToFrobFixed σ).apply_symm_apply (restrictToFrobFixed τ a))
+
 /-- **A pair of Frobenius powers of `E` is determined on `F`, up to order, by the
 product map it induces there.**
 
@@ -169,6 +266,30 @@ theorem restrict_pair_eq_of_mul_eq_on_frobFixed (hm : m ≠ 0)
     (natCard_frobFixedSubfield hcard hm) hF with ⟨h1, h2⟩ | ⟨h1, h2⟩
   · exact Or.inl fun a ha => ⟨hmod i i' h1 a ha, hmod j j' h2 a ha⟩
   · exact Or.inr fun a ha => ⟨hmod i j' h1 a ha, hmod j i' h2 a ha⟩
+
+/-- **The scaling pair of `E` has odd-order twist on `F`** — the form §3 (3) consumes
+(Peterfalvi Part II, Ch. III §3, p. 121 into Ch. IV §3 (3), p. 130).
+
+`σ` and `τ` are the scaling pair of the Ch. III §3 Proposition, automorphisms of `E`; the
+relation they satisfy on `F` is the book's `a^μ a^ν = a a^θ`, with `θ` the type-`B`
+automorphism of `F` — of odd order by `TypeBData.phi_orderOf_odd`.  Then `σ⁻¹τ` restricted
+to `F` is `θ` or `θ⁻¹`, hence of odd order.
+
+⚠ On `E` itself `σ⁻¹τ` need *not* have odd order: it inverts the norm-one subgroup, so it
+may be the `q`-Frobenius, of order `2`.  Only the restriction is constrained. -/
+theorem odd_orderOf_restrictToFrobFixed_inv_mul (hm : m ≠ 0)
+    (hcard : Nat.card E = (2 ^ m) ^ 2) (σ τ : E ≃+* E)
+    (φ : RingAut ↥(frobFixedSubfield E 2 m)) (hodd : Odd (orderOf φ))
+    (hmul : ∀ a : ↥(frobFixedSubfield E 2 m),
+      σ (a : E) * τ (a : E) = (a : E) * ((φ a : ↥(frobFixedSubfield E 2 m)) : E)) :
+    Odd (orderOf ((restrictToFrobFixed (m := m) σ)⁻¹ * restrictToFrobFixed (m := m) τ)) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
+  refine odd_orderOf_inv_mul_of_mul_eq_mul_one (F := ↥(frobFixedSubfield E 2 m)) hm
+    (natCard_frobFixedSubfield hcard hm) _ _ φ hodd fun a => ?_
+  apply Subtype.ext
+  push_cast
+  exact hmul a
 
 end Restrict
 
