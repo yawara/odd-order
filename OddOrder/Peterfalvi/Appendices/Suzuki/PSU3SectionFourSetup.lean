@@ -472,6 +472,58 @@ theorem natCard_quotient_Q0_eq {X : Subgroup G} (hXV : X ≤ hyp.V)
   letI := hyp.centralizerQuotientMulAction hXV
   exact Nat.card_congr (hyp.centralizerQ0QuotientEquiv hXV hA3).symm.toEquiv
 
+/-- **`|Q̄| = |C_Q(X)|`** — the `Q`-version of `natCard_quotient_Q0_eq`, from
+`centralizerQQuotientEquiv`. -/
+theorem natCard_quotient_Q_eq {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1) :
+    letI := hyp.centralizerQuotientMulAction hXV
+    Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q
+      = Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  exact Nat.card_congr (hyp.centralizerQQuotientEquiv hXV).symm.toEquiv
+
+/-! ### The order hypotheses of `exists_standardModel` for the centralizer quotient
+
+`CentralizerPSUData` states its two order facts about `C_Q(X)` and `C_{Q₀}(X)`
+(`natCard_cQ0_eq_baseField`, `natCard_cQ_eq_cQ0_cube`), while
+`exists_standardModel` wants them about `Q̄` and `Q̄₀`.  The two transports above turn
+one into the other. -/
+
+/-- **`|Q̄₀| = 2ⁿ`** — `exists_standardModel`'s `hQ0card` for the centralizer quotient.
+The input is `CentralizerPSUData.natCard_cQ0_eq_baseField` combined with
+`|BaseField n| = 2ⁿ`. -/
+theorem natCard_quotient_Q0_eq_pow {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    {n : ℕ} (hQ0 : Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G)))
+      = 2 ^ n) :
+    letI := hyp.centralizerQuotientMulAction hXV
+    Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q0 = 2 ^ n := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  rw [hyp.natCard_quotient_Q0_eq hXV hA3, hQ0]
+
+/-- **`|Q̄| = |Q̄₀|³`** — `exists_standardModel`'s `hcardQ` for the centralizer quotient,
+transported from `CentralizerPSUData.natCard_cQ_eq_cQ0_cube`. -/
+theorem natCard_quotient_Q_eq_Q0_cube {X : Subgroup G} (hXV : X ≤ hyp.V)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer (X : Set G)),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (hcube : Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))
+      = Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) ^ 3) :
+    letI := hyp.centralizerQuotientMulAction hXV
+    Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q
+      = Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q0 ^ 3 := by
+  letI := hyp.centralizerQuotientMulAction hXV
+  rw [hyp.natCard_quotient_Q_eq hXV hA3, hyp.natCard_quotient_Q0_eq hXV hA3, hcube]
+
+/-- **`Z(Q) ≠ 1`, in the shape `exists_standardModel` takes it** — a nonidentity element
+of `Z(Q)`, packaged from `exists_involution_mem_center_Q`. -/
+theorem exists_center_Q_ne_one : ∃ x₀ : ↥(Subgroup.center hyp.Q), x₀ ≠ 1 := by
+  obtain ⟨u, huQ, _, hu1, hucomm⟩ := hyp.exists_involution_mem_center_Q
+  refine ⟨⟨⟨u, huQ⟩, Subgroup.mem_center_iff.mpr fun v => ?_⟩, ?_⟩
+  · exact Subtype.ext (hucomm (v : G) v.2).symm
+  · exact fun hone => hu1 (congrArg (Subtype.val ∘ Subtype.val) hone)
+
 /-! ## The standing hypothesis of §4 -/
 
 /-- **The standing hypothesis of Peterfalvi Part II, Ch. IV §4** (p. 132).
