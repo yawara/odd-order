@@ -3485,3 +3485,32 @@ standing hypothesis から出る形になった**。
 2. **段 (2)** — `∃ ω ∈ Q−Q₀, ζ ∈ W^#, η ∈ P`: `η` が `ω`,`ζ` を中心化し
    `f(ω) = ω^{-ζ}`、`h(ω) = ζ³η⁻¹`。`corollaryTwo_of_stepFour` を `U` 側に当てる。
 3. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
+
+## 2026-08-01 (54): §4 段 (2) の「canonical form の一意性」部品
+
+`RankOneBNPair.IsFGH.eq_of_le` — 同じ `t` を持ち `Q' ≤ Q`, `D' ≤ D` の小さい setup の
+三つ組 `f₁,g₁,h₁` は、外側の `f,g,h` と `Q'^#` 上で一致する。
+
+⚠ **証明は 4 行**だった: 小さい setup の定義式
+`t x t = g₁(x) h₁(x) t f₁(x)` は因子が `Q`,`D`,`Q` に居るので**外側にとっても
+canonical 分解**であり、`fgh_eq_of_canonical` (分解の一意性) がそのまま同定する。
+書籍 p.133 段 (2) の「By the uniqueness of the canonical form of an element of `G − H`」
+がまさにこれ。
+
+### §4 段 (2) の残り (p.133)
+
+| 主張 | 状態 |
+|---|---|
+| `(V ∩ U)/(P ∩ U)` が `C_{Q₀}(P)` を中心化 (PSU(3,ℓ) の構造から) | ⚠ 未 |
+| Galois ⟹ `V ∩ U ⊂ PW`、`U ⊂ C_G(P)` ⟹ `V ∩ U ⊂ P × C_W(P)` | 部品あり (`centralizer_V_centralizer_Q0`) |
+| `\|(V∩U)/(P∩U)\| = (ℓ+1)/(ℓ+1,3) ≠ 1` (`ℓ > 2`) | ⚠ 未 (PSU(3,ℓ) の位数計算) |
+| `U` 側で §3 Cor 2 を使う | ✅ `corollaryTwo_of_stepFour` (要 `U` 側 Hypothesis の構成) |
+| `f(ω) = f₁(ω)`, `h(ω) = h₁(ω)` | ✅ **今回の `IsFGH.eq_of_le`** |
+
+### ⚠ 次セッションはここから
+
+1. `V ∩ U ⊂ P × C_W(P)` の部分 — `centralizer_V_centralizer_Q0` +
+   「`U ⊆ C_G(P)`」から。⚠ `U = O^{2'}(C_G(P)) ≤ C_G(P)` は
+   `primeComplementResidual` が `C_G(P)` の部分群なので自明。
+2. `(ℓ+1)/(ℓ+1,3) ≠ 1` — `ProjectiveUnitary` 側の位数計算を実測すること。
+3. `U` 側の `Hypothesis` 構成 (§3 Cor 2 を当てるため)。⚠ ここが段 (2) の本体。
