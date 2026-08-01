@@ -40,6 +40,8 @@ hypothesis, and then reads off `h(ω⁻¹) = ζ⁻³` from (H5) — a step the b
 * `Hypothesis.stepThree_center_relation` — its `Q₀`-side companion
   `b^{2(1+θ)} = α² + a^{-2(1+θ)}`.
 * `Hypothesis.stepThree_star` — the book's `(∗)`, for one admissible `a`.
+* `Hypothesis.exists_mem_K_mu_sq_inv_eq` — the scalars `a⁻²` sweep `F^×`, so that `(∗)`
+  is available at every `X ∈ F^×`.
 -/
 
 set_option autoImplicit false
@@ -643,6 +645,41 @@ theorem stepThree_star (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hscale (hyp.kActor (pow_mem haK 2))) (hscale (hyp.kActor (pow_mem hbK 2)))
     (hyp.stepThree_sq_eq H hC2 M hZc hmu hVW hζ hωQ hωQ0 hyQ0 hsq haK hbK hfω hb)
     (hyp.stepThree_center_relation sfive M ι d hequiv hyQ0 haK hbK hb)
+
+/-- **The scalars `a⁻²` sweep `F^×`** (Peterfalvi Part II, p. 130: `(∗)` is asserted for
+every `X ∈ F − {0, α^{2τ}}`).
+
+`μ` maps `K` *onto* `F^×` (`exists_actualKActor_mu_eq`, from `|K| = q − 1` and
+`mu_K_injective`), and squaring is a bijection of a field of characteristic `2` — here
+inverted explicitly by `x ↦ x^{2^{m-1}}`, which is a square root because `x^{2^m} = x` on
+`F`.  So the `X` for which `stepThree_star` produces `(∗)` are *all* of `F^×`; only the
+book's single excluded point survives, namely the `a` for which `b` fails to exist. -/
+theorem exists_mem_K_mu_sq_inv_eq {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) (sfive : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m) {c : M.E}
+    (hc : c ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) (hc0 : c ≠ 0) :
+    ∃ (a : G) (haK : a ∈ hyp.K),
+      ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)⁻¹ = c := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- a square root of `c⁻¹` inside `F`
+  have hcinv : c⁻¹ ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m :=
+    Subfield.inv_mem _ hc
+  have hrmem : c⁻¹ ^ 2 ^ (m - 1) ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m :=
+    Subfield.pow_mem _ hcinv _
+  have hr0 : c⁻¹ ^ 2 ^ (m - 1) ≠ 0 := pow_ne_zero _ (inv_ne_zero hc0)
+  have hrsq : (c⁻¹ ^ 2 ^ (m - 1)) ^ 2 = c⁻¹ := by
+    rw [← pow_mul, mul_comm, ← pow_succ']
+    have hm1 : 2 ^ (m - 1 + 1) = 2 ^ m := by
+      congr 1
+      omega
+    rw [hm1]
+    exact OddOrder.FiniteField.mem_frobFixedSubfield.mp hcinv
+  -- an element of `K` with that scalar
+  obtain ⟨k, hk⟩ := hyp.exists_actualKActor_mu_eq sfive M hm hQ0card hrmem hr0
+  obtain ⟨x, hx⟩ := k.2
+  refine ⟨(x : G), x.2, ?_⟩
+  have hkActor : hyp.kActor x.2 = k := Subtype.ext hx
+  rw [hyp.mu_kActor_sq M x.2, hkActor, hk, hrsq, inv_inv]
 
 end Hypothesis
 

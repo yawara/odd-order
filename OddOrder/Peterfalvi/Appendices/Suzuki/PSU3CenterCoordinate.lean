@@ -187,6 +187,15 @@ theorem kActor_eq_pow {a b : G} (ha : a ∈ hyp.K) (hb : b ∈ hyp.K) (n : ℕ) 
   rw [show (⟨b, hb⟩ : ↥hyp.K) = (⟨a, ha⟩ : ↥hyp.K) ^ n from Subtype.ext (by simpa using hab),
     map_pow]
 
+/-- The scalar of `a²` is the square of the scalar of `a`. -/
+theorem mu_kActor_sq {m : ℕ} (M : hyp.QuotientFieldModel m) {a : G} (ha : a ∈ hyp.K) :
+    ((M.mu (hyp.kActor (pow_mem ha 2), 1) : M.Eˣ) : M.E)
+      = ((M.mu (hyp.kActor ha, 1) : M.Eˣ) : M.E) ^ 2 := by
+  rw [hyp.kActor_eq_pow ha (pow_mem ha 2) 2 rfl,
+    show ((hyp.kActor ha) ^ 2, (1 : ↥hyp.W)) = ((hyp.kActor ha, (1 : ↥hyp.W))) ^ 2 from
+      Prod.ext rfl (one_pow 2).symm,
+    map_pow, Units.val_pow_eq_pow_val]
+
 /-- Conjugating an element of `Q₀` by `a ∈ K` is `centerKHom` at the corresponding
 actor. -/
 theorem toCenter_conj {m : ℕ} (s : hyp.LemmaFiveSetup m) {a : G} (ha : a ∈ hyp.K)
