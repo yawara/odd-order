@@ -5432,3 +5432,96 @@ carrier / `hst` / `hm` / `hQ0card` / `hcardQ` / `ih` / `x₀` / `hVW` / `w ∈ W
 ⚠ 踏んだ罠 (再開時に注意): 型に `letI` を持つ補題を `have` で受けるときは**期待型を明示** /
 `TheoremAInductionBelow` 系の goal は **`intro` で開く** (汎用補題は unify しない) /
 `ULift` を含む補題は **universe を明示** (`.{v}`) / `∀` binder が未参照なら `_` 前置。
+
+## 2026-08-01 (102): 🎯 §3 が閉じた — Corollary 2 が「モデル + 型 B 対 + base pair」だけに
+
+新 leaf `OddOrder/Peterfalvi/Appendices/Suzuki/PSU3CorollaryTwo.lean` (656 行, sorry 0)。
+(100)(101) で「残りは 1 本の大きな threading 証明」と書いた本体を通した。
+
+### 段 (4) 鎖 → `hcover` (`corollaryTwo_of_stepFour` が残していた唯一の入力)
+
+| 定理 | 内容 |
+|---|---|
+| `stepFour_fibre` | 段 (4) の **1 回分**。`stepFour_base` で基点の unitary 座標 = `μ(1,ζ)` を出し、`stepFour_elem` の 3 入力 (`stepFour_pointwise` / `stepTwo_quotient` / `stepFour_at_omega`) をそろえる。戻り値に基点の値も返すので呼ぶ側が `hx` を再計算しない |
+| `stepFour_cover_of_base` | `(ω, ζ)` と `(ω⁻¹, ζ⁻¹)` の 2 回を `stepFour_cover` で貼る = **`hcover`** |
+| `corollaryTwo_of_base` | Corollary 2、残る仮説は §2 の base pair と `hstage3` のみ |
+
+⚠ 2 回目に新しい数学は要らない: `f_inv_eq` が標準仮説を移し、段 (3) は
+`quotient_inv_eq` (反転は商座標を動かさない) と `μ(1,ζ⁻¹) = μ(1,ζ)⁻¹` で跡
+`μ(1,ζ)+μ(1,ζ)⁻¹` が不変ゆえそのまま成立。除外点が食い違うのは `mu_W_ne_inv`。
+
+⚠ `stepFour_cover` の結論は分子が `(Ψ ω₀).quotient`、`corollaryTwo_of_stepFour` の
+`hcover` は `(Ψ ρ).quotient` を要求 — ファイバー仮説の下で等しいので
+`stepFour_cover_of_base` 側で合わせた。
+
+### `exists_standardModel` の強化 (`ModelAction.lean`)
+
+段 (1)-(5) は中心座標 `ι` と `hker : Φ z = ⟨0, ι z⟩` の中で計算するのに、
+`exists_standardModel` はそれを結論に出していなかった (証明の中には
+`exists_mulEquiv_bookCocycle` の出力として在った)。結論に追加:
+`ι` / `hker` / 対角スケール則 `hdiagscale` / `∃ d` ブロックの `ι` 版 `hequiv`。
+証明本体は `refine` 1 行の変更のみ。既存 consumer なし。
+
+### モデル → Corollary 2 (`corollaryTwo_of_standardModel`)
+
+`exists_standardModel` の出力 + §3 (3) の 2 結論 (`hθ`, `hα`) + base pair から直接。
+中で組み立てるもの:
+
+* `hθ` ⟹ `hbil` ⟹ `cocycle_diag_eq_norm` で対角が `φ(1,1)·x^{1+q}`;
+* その形が不透明な指数 `d` を 2 乗と同定 (`mu_K_zpow_eq_sq`) — 「θ = 1」の中身;
+* `exists_modelEquiv_conj` (共役作用を点ごと) → `exists_unitaryModel_conj` (ユニタリ座標)。
+  ⚠ `Φ'` の `hker` は「中心の像を動かさない」条件 + 元の `hker` で**同じ `ι`** のまま出る;
+* 書籍の正規化 `s = (0,1)` は `ν := c(s)⁻¹` (`hs`);
+* base pair での段 (3) = `stepThree_quotient_norm` を `hα` で読む。§2 の形
+  `f(ω₀) = ζ₀⁻¹(ω₀y₀)ζ₀` は `f_eq_conj_inv_of_sq_eq` で反転公式へ。
+
+### §3 (3) の梱包 (`stepThree_model`) と合成 (`corollaryTwo_of_sectionThree`)
+
+`stepThree` は結論を型 B のスカラー対 (σ, τ) 越しに述べる (第 1 = 「F 上 σ = τ」、
+第 2 = σ⁻¹ を掛けた `α`)。`thetaModel_eq_id_on_frobFixed` が「F 上 σ = τ」を
+「F 上 σ = 1」に格上げすると σ が両方から消え、同時に**モデルの捻れ θ が F 上恒等**も
+出る ⟹ 出力はちょうど `hθ` と `hα`。
+
+⟹ **`corollaryTwo_of_sectionThree`**: 残る仮説は
+**(a) Ch. III §3 Proposition の出力** (= `exists_standardModel`)、
+**(b) 型 B のスカラー対 (σ, τ) と `hscale` / `hWinv`**、
+**(c) §2 が閉じる base pair** の 3 つだけ。
+
+### 🔍 実測: 型 B の σ, τ は導出できない (回避策を探した記録)
+
+`hscale : σ(μ(k,1))·τ(μ(k,1)) = μ(k,1)^d` と `hWinv : σ(μ(1,v))·τ(μ(1,v)) = 1` を
+既存資産から作れないか検討したが**不可**:
+
+* `σ = id, τ = Frob^m` — `hWinv` は `mu_W_normOne` で ✅ だが `hscale` が `hdsq`
+  (`μ(k,1)^d = μ(k,1)²`) と同値になり循環 (`hdsq` は `hnorm` ⟸ `hθ` ⟸ `stepThree` 経由)。
+* `σ = id, τ = θ_model` — `hscale` は `hsemi` + `hscaleQ0` から ✅ (`hmodel`) だが
+  `hWinv` が `θ(μ(1,v)) = μ(1,v)⁻¹` を要求し、これは「θ = Frob^m」そのもの。
+* `hsemi` を `E` 全体へ広げる路も不可: `φ : E×E → F` なので `a·θ(b)·φ(x,y) ∈ F` が
+  全 `a,b ∈ E` で成り立つのは `φ ≡ 0` のときだけ。
+
+⟹ 書籍どおり**型 B の資料に属する外部入力**として仮説に残す (`stepThree` の
+docstring の判断と一致)。数学的な内容は「`a·θ(a) = a^d` が `F^×` 上で成り立つので
+`1 + 2^j ≡ d (mod 2^m−1)`、`j = 0` を決めるのが §3 (3) の数え上げ」。
+
+### ⚠ 次セッションはここから (§4 段 (2))
+
+`corollaryTwo_of_sectionThree` を `U/Z(U)` に当てる。必要な入力の所在 (実測済):
+
+| 入力 | 出どころ |
+|---|---|
+| carrier / `hst` / `hm` / `hQ0card` / `hcardQ` / `ih` / `x₀` / `hVW` / `w ∈ W#` / `hQsuz` / `sfive` / `M` / `hmu` | `PSU3SectionFourModel.lean` に landing 済 (96)-(101) |
+| `hZc` | `sfive.centerEqQ0` (`LemmaFiveSetup` のフィールド) |
+| `hC2` | `braid_of_involutions_of_orderOf_mul_eq_three` (`OrderThreePSL.lean:42`) を `hst` に |
+| `hKcard` | `card_K_eq_card_Q0_sub_one` + `hQ0card` |
+| `hWdvd` | Lemma 5 (`lemmaFive_of_orderThree`, `WCyclicDivides.lean:356`) |
+| `hW1` | `exists_ne_one_mem_residualQuotientHypothesis_W` |
+| `H : IsFGH` | `exists_fgh` (`RankOneSetup.lean:115`) — 任意の `hyp` に与える |
+| `hfQ` | ⚠ `IsFGH.mem` は `x ≠ 1` 付き。`f' := fun x => if x = 1 then 1 else f x` に取り替えれば `IsFGH` は保たれる (`IsFGH` は `Q^#` 上の 2 フィールドのみ) |
+| `hhW` | ⚠ **未**。`h_mem_W` (`PSU3StepEighteen.lean:171`) は特定の `ω` について §2 の鎖データ込みで出す。∀ 版は要検討 |
+| `hcard : 5 ≤ \|F\|` | 書籍の `\|F\| ≥ 8` (θ の位数が奇 ⟸ 型 B)。仮説のまま |
+| σ, τ, `hscale`, `hWinv` | 型 B の資料 (上記のとおり導出不可) |
+| base pair | §2 の閉じの Proposition (`f_eq_conj_inv_of_stepTwenty_chain`) |
+
+⟹ **`exists_standardModel` を `residualQuotientHypothesis` に当てる**のが次の 1 手
+(7 入力は全部 landing 済)。その後 `corollaryTwo_of_sectionThree` で段 (2) の `ω`, `ζ`、
+最後に `IsFGH.eq_of_le` で ambient へ。
