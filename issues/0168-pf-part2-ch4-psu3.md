@@ -2962,3 +2962,38 @@ p.132 のページ画像で Corollary 1 / Corollary 2 / Remark / §4 冒頭を�
    (`Algebra/QuadraticFrobenius.lean`) が近所。
 2. §4 段 (1)(2) — (2) は `corollaryTwo_of_stepFour` にそのまま乗る。
 3. Corollary 1 第 2 段 = PGU(3,q) infra (大きい、別立て)。
+
+## 2026-08-01 (39): §4 の締めの体論補題 landing
+
+`OddOrder/Algebra/FixedPointDensity.lean` (105 行、警告 0、axiom-clean)。
+
+書籍 p.134 の最終段は「`μ` は 3 元を除いて固定 + `μ` は奇位数 ⟹ `μ = 1`
+(`μ ≠ 1` なら `|F| > 8`)」だが、**奇位数の迂回は不要**だった:
+
+> 加法写像の固定点は**既に部分群**なので、真部分群なら群の半分を取りこぼす。
+> ⟹ **半分超を固定すれば恒等**。位数の仮定も乗法構造も要らない。
+
+| 定理 | 内容 |
+|---|---|
+| `fixedAddSubgroup` | 加法写像の固定点を `AddSubgroup` として |
+| `eq_id_of_fixes_compl` | `2\|S\| < \|A\|` かつ `S` の外で固定 ⟹ 恒等 |
+| `RingEquiv.eq_refl_of_fixes_compl` | 環自己同型版 |
+
+道具は Lagrange (`AddSubgroup.card_mul_index`) と `index_eq_one` だけ。
+書籍の状況 (`|S| = 3`) では仮説が `6 < q` すなわち `q ≥ 8` になり、
+書籍が挙げる境界と一致する。
+
+⚠ 名前の実測: `Set.ncard_coe_finset` (× `ncard_coe_Finset`)、
+`Nat.card_coe_set_eq` (× `Set.Nat.card_coe_set_eq`)。
+
+### ⚠ 次セッションはここから
+
+1. **§4 段 (1)(2)** — (2) は `corollaryTwo_of_stepFour` にそのまま乗る。
+   (1) は `U = O^{2'}(C_G(P))` と Ch. I §3 Prop 1(c) (repo にあり)。
+   ⚠ `O^{2'}` は repo/mathlib に無い — Theorem A の結論構造
+   (`TheoremAConclusion`: 奇数指数の正規部分群) が対応物なので、
+   まずそこと突き合わせること。
+2. **§4 段 (3)-(10)** の座標計算。⚠ OCR 崩壊のため **p.133/134 のページ画像**で
+   式を確定してから着手 (`references/peterfalvi/pages/peterfalvi-p133.png`,
+   `-p134.png` に取得済)。締めは 1. の `eq_id_of_fixes_compl` に落ちる。
+3. Corollary 1 第 2 段 = PGU(3,q) infra (大きい、別立て)。
