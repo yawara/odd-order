@@ -35,6 +35,8 @@ are `ζ^{±1}`, so the two conjugators sit in the same coset of `K` outright.
 ## Main results
 
 * `Hypothesis.stepTwenty_fst_eq` — the core: `z₁ = z₂ y₂`, the book's `x₁ = x₂ + α₂`.
+* `Hypothesis.stepTwenty_snd` — **step (20)**'s second assertion: the image is always
+  `ω₂ (z y)`.
 * `Hypothesis.stepTwenty` — **step (20)**'s first assertion `α₁ = α₂`, i.e. `y₁ = y₂`.
 -/
 
@@ -209,6 +211,86 @@ theorem stepTwenty_fst_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       (hyp.odd_orderOf_of_mem_D (hyp.D.inv_mem ha'K.1)) rfl hκeq.symm
   have haa : a = a' := inv_injective hainv
   rw [← ha, ← ha', haa]
+
+/-- **Step (20)**, second assertion (Peterfalvi Part II, p. 128): whenever `f(ω₁ z)` is
+`D`-conjugate to `ω₂ w` with `w ∈ Q₀`, necessarily
+
+  `w = z y`,
+
+which is the book's `f(ω₁(0,x)) = (ω₂(0, x + α))^{d(x)}`.
+
+The book reaches this by exhausting the `x` in question with the sequence of (11) and
+applying (19)(b) to each; but `stepTwenty_fst_eq` already proves it for every `z` — the
+conjugator merely has to be moved into `K`.  Writing `c = κ v` with `κ ∈ K` and `v ∈ W`
+(`D = KW`), the `W`-part can be absorbed into `ω₂`: it centralizes `Q₀`, and `ω₂^v`
+satisfies the same normalization as `ω₂` because `t` centralizes `W` (so (H3) has no
+twist) and `v` commutes with `ζ` (so the normalization survives conjugation). -/
+theorem stepTwenty_snd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hVW : hyp.V = hyp.W)
+    {ζ ω₁ ω₂ y z w c : G} (hζ : ζ ∈ hyp.W)
+    (hWcard : orderOf ζ = Nat.card ↥hyp.W)
+    (hω₁Q : ω₁ ∈ hyp.Q) (hω₁Q0 : ω₁ ∉ hyp.Q0)
+    (hω₂Q : ω₂ ∈ hyp.Q) (hω₂Q0 : ω₂ ∉ hyp.Q0) (hyQ0 : y ∈ hyp.Q0)
+    (hf₁ : f ω₁ = ζ⁻¹ * (ω₁ * y) * ζ) (hf₂ : f ω₂ = ζ⁻¹ * (ω₂ * y) * ζ)
+    (hzQ0 : z ∈ hyp.Q0) (hwQ0 : w ∈ hyp.Q0) (hcD : c ∈ hyp.D)
+    (hrel : f (ω₁ * z) = c⁻¹ * (ω₂ * w) * c)
+    (hz1 : z ≠ 1) (hwy : w * y ≠ 1) :
+    z = w * y := by
+  classical
+  have hW := hyp.W_eq_zpowers hζ hWcard
+  obtain ⟨κ, hκK, v, hvW, hc⟩ := hyp.exists_mem_K_mem_W_mul hVW hcD
+  have hvD : v ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hvW)
+  have hcomm : κ * v = v * κ := hyp.commute_of_mem_W_of_mem_K hvW hκK
+  have hcinv : v⁻¹ * κ⁻¹ = κ⁻¹ * v⁻¹ := by
+    calc v⁻¹ * κ⁻¹ = (κ * v)⁻¹ := by group
+      _ = (v * κ)⁻¹ := by rw [hcomm]
+      _ = κ⁻¹ * v⁻¹ := by group
+  have hvw : v * w = w * v := hyp.W_centralizes_Q0 hvW hwQ0
+  have hvy : v * y = y * v := hyp.W_centralizes_Q0 hvW hyQ0
+  have hvζ : v * ζ = ζ * v := hyp.commute_of_mem_W_of_W_eq_zpowers hW hvW
+  have hω₂1 : ω₂ ≠ 1 := fun hcc => hω₂Q0 (hcc ▸ hyp.Q0.one_mem)
+  -- the `W`-part moves onto `ω₂`
+  have hω₂'Q : v⁻¹ * ω₂ * v ∈ hyp.Q := hyp.rankOneSetup.DQ v hvD ω₂ hω₂Q
+  have hω₂'Q0 : v⁻¹ * ω₂ * v ∉ hyp.Q0 := by
+    intro hcc
+    refine hω₂Q0 ?_
+    have e : ω₂ = v * (v⁻¹ * ω₂ * v) * v⁻¹ := by group
+    rw [e]
+    exact hyp.conj_mem_Q0_of_mem_D hvD hcc
+  have hnew : f (ω₁ * z) = κ⁻¹ * ((v⁻¹ * ω₂ * v) * w) * κ := by
+    rw [hrel, hc]
+    calc (κ * v)⁻¹ * (ω₂ * w) * (κ * v)
+        = (v⁻¹ * κ⁻¹) * (ω₂ * w) * (κ * v) := by group
+      _ = (κ⁻¹ * v⁻¹) * (ω₂ * w) * (κ * v) := by rw [hcinv]
+      _ = κ⁻¹ * (v⁻¹ * ω₂) * (w * (κ * v)) := by group
+      _ = κ⁻¹ * (v⁻¹ * ω₂) * (w * (v * κ)) := by rw [hcomm]
+      _ = κ⁻¹ * (v⁻¹ * ω₂) * ((w * v) * κ) := by group
+      _ = κ⁻¹ * (v⁻¹ * ω₂) * ((v * w) * κ) := by rw [← hvw]
+      _ = κ⁻¹ * ((v⁻¹ * ω₂ * v) * w) * κ := by group
+  -- the conjugate satisfies the same normalization
+  have hf₂' : f (v⁻¹ * ω₂ * v) = ζ⁻¹ * ((v⁻¹ * ω₂ * v) * y) * ζ := by
+    have htvt : hyp.t * v * hyp.t = v := by
+      have hcv := hyp.commute_t_of_mem_V (hyp.W_le_V hvW)
+      rw [← hcv.eq, mul_assoc, hyp.rankOneSetup.invol, mul_one]
+    obtain ⟨e3, -, -⟩ := hThree hyp.rankOneSetup H hω₂Q hω₂1 hvD
+    rw [htvt] at e3
+    rw [e3, hf₂]
+    calc v⁻¹ * (ζ⁻¹ * (ω₂ * y) * ζ) * v
+        = (v⁻¹ * ζ⁻¹) * (ω₂ * y) * (ζ * v) := by group
+      _ = (ζ⁻¹ * v⁻¹) * (ω₂ * y) * (ζ * v) := by
+          rw [show v⁻¹ * ζ⁻¹ = ζ⁻¹ * v⁻¹ from by
+            calc v⁻¹ * ζ⁻¹ = (ζ * v)⁻¹ := by group
+              _ = (v * ζ)⁻¹ := by rw [hvζ]
+              _ = ζ⁻¹ * v⁻¹ := by group]
+      _ = ζ⁻¹ * (v⁻¹ * ω₂) * (y * (ζ * v)) := by group
+      _ = ζ⁻¹ * (v⁻¹ * ω₂) * (y * (v * ζ)) := by rw [← hvζ]
+      _ = ζ⁻¹ * (v⁻¹ * ω₂) * ((y * v) * ζ) := by group
+      _ = ζ⁻¹ * (v⁻¹ * ω₂) * ((v * y) * ζ) := by rw [← hvy]
+      _ = ζ⁻¹ * ((v⁻¹ * ω₂ * v) * y) * ζ := by group
+  exact hyp.stepTwenty_fst_eq H hC2 hζ hω₁Q hω₁Q0 hω₂'Q hω₂'Q0 hyQ0 hyQ0 hzQ0 hwQ0
+    hf₁ hf₂' (hyp.mem_KSet_iff_mem_K.mpr hκK) hnew hz1 hwy
 
 /-- **Step (20)**, first assertion (Peterfalvi Part II, p. 128): `α₁ = α₂`.
 

@@ -82,20 +82,9 @@ theorem commute_h_zeta (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h) (hVW : hyp.V = 
   obtain ⟨κ, hκ, v, hv, hHkv⟩ :=
     hyp.exists_mem_K_mem_W_mul hVW (H.h_mem hωQ hω1)
   -- `ζ` generates `W`
-  have hW : hyp.W = Subgroup.zpowers ζ := by
-    have hle : Subgroup.zpowers ζ ≤ hyp.W := Subgroup.zpowers_le.mpr hζ
-    have hcard : Nat.card ↥((Subgroup.zpowers ζ).subgroupOf hyp.W) = Nat.card ↥hyp.W := by
-      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv, Nat.card_zpowers,
-        hWcard]
-    have htop := Subgroup.eq_top_of_card_eq _ hcard
-    rw [Subgroup.subgroupOf_eq_top] at htop
-    exact le_antisymm htop hle
+  have hW : hyp.W = Subgroup.zpowers ζ := hyp.W_eq_zpowers hζ hWcard
   have hcκ : Commute κ ζ := hyp.commute_of_mem_W_of_mem_K hζ hκ
-  have hcv : Commute v ζ := by
-    rw [hW] at hv
-    obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp hv
-    rw [← hj]
-    exact (Commute.refl ζ).zpow_left j
+  have hcv : Commute v ζ := hyp.commute_of_mem_W_of_W_eq_zpowers hW hv
   rw [hHkv]
   exact hcκ.mul_left hcv
 

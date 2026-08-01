@@ -56,6 +56,27 @@ variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
 
 include hyp
 
+/-- **`ζ` generates `W`** once it has the right order.
+
+`W` is finite, so a cyclic subgroup of the right cardinality is everything. -/
+theorem W_eq_zpowers {ζ : G} (hζ : ζ ∈ hyp.W)
+    (hWcard : orderOf ζ = Nat.card ↥hyp.W) :
+    hyp.W = Subgroup.zpowers ζ := by
+  have hle : Subgroup.zpowers ζ ≤ hyp.W := Subgroup.zpowers_le.mpr hζ
+  have hcard : Nat.card ↥((Subgroup.zpowers ζ).subgroupOf hyp.W) = Nat.card ↥hyp.W := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv, Nat.card_zpowers, hWcard]
+  have htop := Subgroup.eq_top_of_card_eq _ hcard
+  rw [Subgroup.subgroupOf_eq_top] at htop
+  exact le_antisymm htop hle
+
+/-- Every element of `W` commutes with a generator. -/
+theorem commute_of_mem_W_of_W_eq_zpowers {ζ v : G} (hW : hyp.W = Subgroup.zpowers ζ)
+    (hv : v ∈ hyp.W) : v * ζ = ζ * v := by
+  rw [hW] at hv
+  obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp hv
+  rw [← hj]
+  exact ((Commute.refl ζ).zpow_left j).eq
+
 /-- **The normalization, inverted** (Peterfalvi Part II, p. 126): from
 `f(ω) = (ω y)^ζ` one gets `f(ω y) = ω^{ζ⁻¹}`.
 
