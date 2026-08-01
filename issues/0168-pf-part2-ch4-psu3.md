@@ -6930,3 +6930,40 @@ letI が二重になり、(125) で踏んだ「別インスタンス」問題を
 4. ⟹ `U/Z(U)` 内在版の Ch. I §3 Lemma 5 が **7/7**、`LemmaFiveSetup` /
    `QuotientFieldModel` / `IsStandardModel` が出て、残るは `hVW` / `hKcard` (= `t` の照合、
    追加仮説 `C_Q(D) = ⊥` が要る ((133)))。
+
+## 2026-08-02 (136): 🎯 `U/Z(U)` 内在版の Lemma 5 入力が **7/7**
+
+* `exists_mulEquiv_match_residualQuotient` — 内在版と transported 版の標準仮説を
+  `H`,`D` について合わせる同型。`Setup.map` ((135) の (a)) で transported 側を
+  `residualImage` へ移し、`Setup.exists_conj_eq_triple` ((131)) の共役と合成。
+  8 個の数値仮説はすべて既存資産で埋まった。
+* `exists_ne_one_mem_W_intrinsicResidualQuotient` — それを
+  `exists_ne_one_mem_W_of_mulEquiv` ((134)) に食わせるだけ。
+  ⚠ `W = D ⊓ C(Q₀)` は `t` に依存しないので **distinguished involution の照合は不要**
+  ((133) の観察が効いた)。
+
+| Lemma 5 の入力 | 内在版 |
+|---|---|
+| `\|Q̄₀\| = 2ⁿ` / `\|Q̄\| = \|Q̄₀\|³` / `n ≠ 0` | ✅ (118) |
+| `Q̄` が Suzuki 2-群 | ✅ (118) |
+| `TheoremAInductionBelow` | ✅ (118) ※ ULift 版 |
+| `\|s̄ t̄\| = 3` | ✅ (120) |
+| `∃ w ∈ W̄, w ≠ 1` | ✅ **今回** |
+
+### ⚠ 次セッションはここから — universe の帳尻合わせ
+
+`lemmaFiveSetup_of_orderThree_of_mem_W` を当てるとき、`ihq` だけは
+**`Ω̄` が `Type v` の版** (`intrinsicResidualQuotientULift`, (118)) でないと型が合わない
+(他の 6 入力は `intrinsicResidualQuotient` について証明済)。⟹ 両者の間で
+`Q0` / `W` / `distinguishedInvolution` が一致することを示す必要がある。
+
+**推奨**: 汎用補題 3 本を足す (`φ = MulEquiv.refl` の特殊化 + 一意性):
+* `Q0_eq_of_H_eq` — `H` が同じなら `Q0` も同じ (`map_Q0_of_mulEquiv` + `Subgroup.map_id`)
+* `W_eq_of_H_D_eq` — `H`,`D` が同じなら `W` も同じ (`map_W_of_mulEquiv` + 同上)
+* `distinguishedInvolution_eq_of_H_Q_t_eq` — `H`,`Q`,`t` が同じなら `s` も同じ
+  (`eq_distinguishedPair_of_structure` の一意性)
+
+`ofRankOneSetupOfEquiv_{H,Q,D,t}` ((118)) が「点集合の貼り替えは 4 フィールドを動かさない」
+と言っているので、上 3 本があれば 6 入力がそのまま ULift 版へ移り、Lemma 5 →
+`QuotientFieldModel` → `exists_standardModel` → `corollaryTwo_of_standardModel` と繋がる
+(残りは `hVW` / `hKcard` = `t` の照合、追加仮説 `C_Q(D) = ⊥` ((133)))。
