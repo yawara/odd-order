@@ -4990,3 +4990,45 @@ Hypothesis.ofMulEquiv (h : Hypothesis A Λ) (e : A ≃* B) (f : Λ ≃ Λ')
    別途示す必要がある — ここが次の実作業)。
 2. `U/Z(U)` 上の `Hypothesis` を組み、`ih` を ambient から供給する。
 3. → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2)。
+
+## 2026-08-01 (91): `ofMulEquiv` のフィールド対応補題 landing
+
+(フルビルド green 4988 jobs・lint 純ゼロ)
+
+| 補題 | 内容 |
+|---|---|
+| `map_centralizer_equiv` | `C(S).map e = C(e '' S)` |
+| `map_inf_equiv` | `(K ⊓ L).map e = K.map e ⊓ L.map e` |
+| `ofMulEquiv_H` / `_Q` / `_D` / `_t` | `rfl` (`@[simp]`) |
+| `ofMulEquiv_V` / `_KSet` / `_W` / `_Q0` | 導出定義の transport |
+
+⚠ 実装メモ (再現用):
+* 導出定義の中の `(h.ofMulEquiv e f hf).t` は自動で `e h.t` に簡約されない ⟹
+  `have ht : … = e h.t := rfl` を置いて `rw [ht]`。
+* `rwa [..., e.symm_apply_apply, e.symm_apply_apply]` は片方が既に簡約済で失敗しうる
+  ⟹ `simpa only [...] using h2` が頑健。
+* 一般補題 2 本は `[Finite A] [Finite B]` 不使用 ⟹ `omit … in` (`unusedSectionVars`)。
+* import は `Basic` → `QStructure` (`Q0` の定義元)。
+
+### ⟹ 標準モデルの成果を transport 先へ移す準備が整った
+
+`h' := standardHypothesis n hn |>.ofMulEquiv e f hf` について:
+* `h'.V = V.map e`, `h'.W = W.map e` ⟹ **`hVW` は `standardHypothesis_V_eq_W` の
+  `congrArg (Subgroup.map e)`** で出る。
+* `h'.Q0 = Q0.map e` ⟹ `hQ0card` は `Nat.card` の同型不変性で。
+* `h'.Q = Q.map e` ⟹ `hcardQ` / `hQsuz` (`IsSuzuki2Group.of_equiv`) も同様。
+* `w ∈ h'.W` は像を取るだけ。
+
+⚠ 残る非自明: **`hst`** — `distinguishedInvolution` は `Classical.choose` なので
+`h'.distinguishedInvolution = e (h.distinguishedInvolution)` を**一意性経由**で示す必要
+がある (`eq_distinguishedPair_of_structure` に `e s`, `e r` を渡す)。
+`standardHypothesis_distinguishedInvolution` と同じ手口。
+
+### ⚠ 次セッションはここから
+
+1. `ofMulEquiv_distinguishedInvolution` を一意性経由で示す。
+2. 上の 5 つを `h'` について並べる補題群を書く。
+3. `U/Z(U)` 上の `Hypothesis` を `ofMulEquiv standardHypothesis residualQuotientEquiv.symm
+   Equiv.ulift.symm` で組み、`ih` を ambient から供給
+   (`Nat.card (U/Z(U)) < Nat.card G`)。
+4. → `exists_standardModel` → §3 段 (4) 鎖 → `corollaryTwo_of_stepFour` → 段 (2)。
