@@ -7347,3 +7347,37 @@ sanity check すること (ここでは「θ は μ(W) を反転する」から 
 type-B 認識を通す必要がある。
 
 **次セッションはここから**。
+
+### (149) `hodd` を「指数 `d` の形」1 文に還元 — 残りは type-`B` transport のみ
+
+(148) の経路を実装。commits `8c23b22dd`, `9701282c1`。
+
+**`OddOrder/Algebra/FrobeniusExponentPairs.lean`**:
+* `odd_orderOf_inv_mul_of_mul_eq_mul_one` — `F` 上で `σ(a)τ(a) = a·φ(a)` なら
+  `σ⁻¹τ ∈ {φ, φ⁻¹}` ⟹ `φ` の奇位数を継承。既存 `frobIndex_pair_eq_of_pow_mul_eq` で
+  指数の非順序対を取り、Frobenius の位数 `n` で `ZMod n` 合同を自己同型の等式に戻す。
+* `restrictToFrobFixed` — `E ≃+* E` の `F` への制限 (well-defined は
+  `map_mem_frobFixedSubfield`、全射は有限性)。`coe_restrictToFrobFixed` と
+  **`coe_restrictToFrobFixed_inv_mul`** (= `stepThree_of_odd` の `hθF` そのもの)。
+* `odd_orderOf_restrictToFrobFixed_inv_mul` — `E` のペア版。
+
+**`PSU3SectionThree.lean`**:
+* `odd_orderOf_scalingPair_restrict` — `exists_scalingPair_of_lemmaFiveSetup` の
+  `(σ, τ)` (μ(K) 上で `σ(a)τ(a) = a^d`) と `exists_actualKActor_mu_eq` (`μ(K) = F^×`)
+  を繋ぎ、**`hshape : ∀ a ∈ F^×, a^d = a·φ(a)`** さえあれば `hodd` が出る形にした。
+
+⟹ **`hpair` の残債は `hshape` 1 本** = 「モデルの指数 `d` が type-`B` の形を持つ」。
+出所は `TypeBData.phi` + `phi_orderOf_odd` (`isTypeB_Q_of_orderThree_of_mem_W` が
+`IsTypeB ↥Q` を出す) で、必要なのは **type-`B` モデルの平方写像と `QuotientFieldModel` の
+中心 quadratic map `χ` を同じ座標で見る transport**:
+
+* `TypeBData ↥Q` は `equivModel : ↥Q ≃* TypeBModel phi ε` を持ち、平方写像は
+  `(a,b) ↦ a·phi(a) + ε·a·phi(b) + b·phi(b)` (`typeBQuadraticMap`)。
+* `QuotientFieldModel` 側は `M.coord : Additive (Q/Z(Q)) ≃+ E`、`ι : Additive Z(Q) ≃+ F`、
+  `χ` の scaling が `χ(μ(k)x) = μ(k)^d χ(x)`。
+* 両者は同じ平方写像の別座標。⟹ `TypeBData` の体 (位数 `2^parameter`) と
+  `frobFixedSubfield M.E 2 m` を `FiniteField.ringEquivOfCardEq` で同定し、
+  `phi` を移送して `hshape` を出す。
+
+**次セッションはこの transport から**。`LemmaFiveSetup` は `phi` を持たず `isplit` のみ
+なので `isTypeB_Q_of_orderThree_of_mem_W` を通す必要がある点に注意。
