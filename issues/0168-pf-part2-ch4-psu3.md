@@ -3301,3 +3301,25 @@ repo では `hst : orderOf (hyp.distinguishedInvolution * hyp.t) = 3` として
    (`centralizer_V_centralizer_Q0` + 「`PZ(U)` が `C_Q(P) ⊄ Q₀` を中心化」)。
 4. 段 (2) — `corollaryTwo_of_stepFour` を `U` 側に。
 5. 段 (3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
+
+## 2026-08-01 (48): §4 段 (1) の exponent 判別子 landing
+
+`PSU3SectionFourSetup.lean` (新 leaf、97 行、警告 0、axiom-clean)。
+(47) の導出鎖の手 4-6 を実装:
+
+| 定理 | 内容 |
+|---|---|
+| `sq_ne_one_of_not_mem_Q0` | **`Q` の対合は `Q₀` に居る** (Suzuki 2-群の対合は中心的 + `Z(Q) = Q₀`) ⟹ `Q − Q₀` の元は 1 に平方しない |
+| `not_isElementaryAbelian_cQ_of_not_mem_Q0` | `C_Q(X)` が `Q − Q₀` と交われば elementary abelian でない = `nonempty_psu3Data_of_orderOf_eq_three` の仮説そのもの |
+
+⟹ **段 (1) の 3 入力のうち未形式化だったものが埋まった**。
+
+### 段 (1) の残り
+
+1. **Glauberman の手 (2)(3)**: `C_{Q/Q₀}(P) ≠ 1` ⟹ `∃ x ∈ C_Q(P) − Q₀`。
+   部品 = `GroupTheory.CoprimeFixedPoints.map_fixedSubgroup_eq_fixedSubgroup_quotient`
+   (`C_H(X)` の像 = `C_{H/N}(X)`、Isaacs Cor 3.28 経由)。
+   ⚠ `P` の `Q` への共役作用を `φ : ↥P →* MulAut ↥Q` として組む plumbing が要る。
+2. §4 の standing hypothesis 構造 + 段 (1) 本体の配線
+   (`natCard_Q0_eq_pow` で `q = ℓ^p`、`centralizer_V_centralizer_Q0` で `Z(U) ⊆ PW`)。
+3. 段 (2)(3)(4) → (5)(6) → `sectionFour_solve` 以降は landing 済。
