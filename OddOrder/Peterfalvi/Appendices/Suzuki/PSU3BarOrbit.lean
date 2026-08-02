@@ -204,7 +204,7 @@ theorem not_dOrbitRel_self_mul_Q0 {m : ℕ} (M : hyp.QuotientFieldModel m)
     ¬ dOrbitRel hyp.D ω (ω * z) := by
   rintro ⟨d, hdD, hd⟩
   have hd1 : d = 1 :=
-    hyp.eq_one_of_conj_eq_mul_Q0_of_mem_D M hZ hmu hVW hωQ hωQ0 hdD hzQ0 hd.symm
+    hyp.freeD_of_V_eq_W M hZ hmu hVW hωQ hωQ0 hdD hzQ0 hd.symm
   rw [hd1, inv_one, one_mul, mul_one] at hd
   exact hz1 (mul_left_cancel (a := ω) (by rw [mul_one]; exact hd))
 
@@ -267,6 +267,7 @@ theorem dOrbitRel_mul_of_barOrbitRel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     dOrbitRel hyp.D (f (ω * z)) (ω' * (z * y)) := by
   have hζD : ζ ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hζ)
   obtain ⟨w, hwQ0, c, hcD, hc⟩ := hbar.symm
+  have hcKW : c ∈ hyp.KW := by rw [hyp.KW_eq_D_of_V_eq_W hVW]; exact hcD
   by_cases hwy : w * y = 1
   · -- the degenerate case: `w = y`, which puts `ω'` in the orbit of `ω z`
     refine absurd ?_ hdeg
@@ -281,8 +282,8 @@ theorem dOrbitRel_mul_of_barOrbitRel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     exact hyp.dOrbitRel_of_stepTwenty_degenerate H hζD hωQ hωQ0 hω'Q hω'Q0 hzQ0 hcD hf' hc
   · -- the generic case: step (20) reads off `w = z y`
     have hzw : z = w * y :=
-      hyp.stepTwenty_snd H hC2 hVW hζ hWcard hωQ hωQ0 hω'Q hω'Q0 hyQ0 hf hf' hzQ0 hwQ0
-        hcD hc hz1 hwy
+      hyp.stepTwenty_snd H hC2 hζ hWcard hωQ hωQ0 hω'Q hω'Q0 hyQ0 hf hf' hzQ0 hwQ0
+        hcKW hc hz1 hwy
     have hyinv : y * y = 1 := by
       have hs := hyQ0.1
       rwa [sq] at hs
@@ -344,6 +345,7 @@ theorem y_eq_of_barOrbitRel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     y = y' := by
   have hζD : ζ ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hζ)
   obtain ⟨w, hwQ0, c, hcD, hc⟩ := hbar.symm
+  have hcKW : c ∈ hyp.KW := by rw [hyp.KW_eq_D_of_V_eq_W hVW]; exact hcD
   have hw1 : w ≠ 1 := by
     intro hcc
     refine hdeg2 ?_
@@ -362,8 +364,8 @@ theorem y_eq_of_barOrbitRel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       exact eq_inv_of_mul_eq_one_left hcc
     rw [hwy''] at hc
     exact hyp.dOrbitRel_of_stepTwenty_degenerate H hζD hωQ hωQ0 hω'Q hω'Q0 hzQ0 hcD hf' hc
-  exact hyp.stepTwenty_of_mem_D H hC2 hVW hζ hWcard hωQ hωQ0 hω'Q hω'Q0 hyQ0 hy'Q0 hzQ0
-    hwQ0 hf hf' hcD hc hz1 hw1 hzy hwy'
+  exact hyp.stepTwenty_of_mem_KW H hC2 hζ hWcard hωQ hωQ0 hω'Q hω'Q0 hyQ0 hy'Q0 hzQ0
+    hwQ0 hf hf' hcKW hc hz1 hw1 hzy hwy'
 
 /-- Freeness again, for two `Q₀`-translates of one `ω`. -/
 theorem not_dOrbitRel_mul_Q0_mul_Q0 {m : ℕ} (M : hyp.QuotientFieldModel m)
@@ -545,8 +547,9 @@ theorem exists_f_eq_conj_inv {m : ℕ} (M : hyp.QuotientFieldModel m)
   have hωkfix : r ωk = ωk := by rw [hωkdef]; exact hrfix _ hfρyQ hfρyQ0
   have hki : ωk = ωi := by rw [← hωkfix, ← hωifix]; exact hrinv _ _ hbarki
   rw [hki] at hchain
-  have hsqi : ωi * ωi = y := hyp.sq_eq_of_dOrbitRel M hZ hmu hVW hωiQ hωiQ0 hyQ0 hρQ0
-    (hsqQ0 ωi hωiQ) hchain
+  have hsqi : ωi * ωi = y :=
+    hyp.sq_eq_of_dOrbitRel (hyp.freeD_of_V_eq_W M hZ hmu hVW) hωiQ hωiQ0 hyQ0 hρQ0
+      (hsqQ0 ωi hωiQ) hchain
   exact ⟨ωi, hωiQ, hωiQ0, y, hyQ0, hsqi, hyp.f_eq_conj_inv_of_sq_eq hyQ0 hnormi' hsqi⟩
 
 end Hypothesis

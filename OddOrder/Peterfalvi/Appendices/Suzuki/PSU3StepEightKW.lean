@@ -64,6 +64,64 @@ section /- Ch. IV §2 (7): the conjugator lies in `K W` (p. 124) -/
 /-- `W ≤ D`, through `W ≤ V ≤ D`. -/
 theorem W_le_D : hyp.W ≤ hyp.D := le_trans hyp.W_le_V hyp.V_le_D
 
+/-- **The subgroup `K W`** (Peterfalvi Part II, Ch. IV §2, p. 124: the orbits of §2 are
+those of `K W` on `(Q/Q₀)^#`).
+
+`W = C_V(K)` centralizes `K` (`commute_of_mem_W_of_mem_K`), so the product set is already
+a subgroup.  Under `V = W` it is the whole of `D` (`exists_mem_K_mem_W_mul`); in general
+it is the smaller group the book actually works with, which is why §2 goes through
+without any hypothesis relating `V` and `W` (issue 0169). -/
+def KW : Subgroup G where
+  carrier := {c : G | ∃ κ ∈ hyp.K, ∃ v ∈ hyp.W, c = κ * v}
+  one_mem' := ⟨1, hyp.K.one_mem, 1, hyp.W.one_mem, (one_mul 1).symm⟩
+  mul_mem' := by
+    rintro _ _ ⟨κ₁, hκ₁, v₁, hv₁, rfl⟩ ⟨κ₂, hκ₂, v₂, hv₂, rfl⟩
+    refine ⟨κ₁ * κ₂, hyp.K.mul_mem hκ₁ hκ₂, v₁ * v₂, hyp.W.mul_mem hv₁ hv₂, ?_⟩
+    rw [show κ₁ * v₁ * (κ₂ * v₂) = κ₁ * (v₁ * κ₂) * v₂ by group,
+      ← hyp.commute_of_mem_W_of_mem_K hv₁ hκ₂]
+    group
+  inv_mem' := by
+    rintro _ ⟨κ, hκ, v, hv, rfl⟩
+    refine ⟨κ⁻¹, hyp.K.inv_mem hκ, v⁻¹, hyp.W.inv_mem hv, ?_⟩
+    rw [mul_inv_rev, ← hyp.commute_of_mem_W_of_mem_K (hyp.W.inv_mem hv) (hyp.K.inv_mem hκ)]
+
+theorem mem_KW_iff {c : G} :
+    c ∈ hyp.KW ↔ ∃ κ ∈ hyp.K, ∃ v ∈ hyp.W, c = κ * v := Iff.rfl
+
+theorem mem_KW_of_mem_K {κ : G} (hκ : κ ∈ hyp.K) : κ ∈ hyp.KW :=
+  ⟨κ, hκ, 1, hyp.W.one_mem, (mul_one κ).symm⟩
+
+theorem mem_KW_of_mem_W {v : G} (hv : v ∈ hyp.W) : v ∈ hyp.KW :=
+  ⟨1, hyp.K.one_mem, v, hv, (one_mul v).symm⟩
+
+/-- `K W ≤ D`. -/
+theorem KW_le_D : hyp.KW ≤ hyp.D := by
+  rintro _ ⟨κ, hκ, v, hv, rfl⟩
+  exact hyp.D.mul_mem (hyp.K_le_D hκ) (hyp.W_le_D hv)
+
+/-- **`K W` is `t`-stable**: `t κ t = κ⁻¹` for `κ ∈ K` (the defining property) and `t`
+centralizes `W ≤ V = C_D(t)`. -/
+theorem conj_t_mem_KW {c : G} (hc : c ∈ hyp.KW) : hyp.t * c * hyp.t ∈ hyp.KW := by
+  obtain ⟨κ, hκ, v, hv, rfl⟩ := hc
+  have hκt : hyp.t * κ * hyp.t = κ⁻¹ := by
+    have hκSet : κ ∈ hyp.KSet := by rw [← hyp.coe_K] at *; exact hκ
+    exact hκSet.2
+  have hvt : hyp.t * v * hyp.t = v := by
+    have hc := hyp.commute_t_of_mem_V (hyp.W_le_V hv)
+    rw [← hc.eq, mul_assoc, hyp.rankOneSetup.invol, mul_one]
+  have htt : hyp.t * hyp.t = 1 := by rw [← sq]; exact hyp.t_sq
+  refine ⟨κ⁻¹, hyp.K.inv_mem hκ, v, hv, ?_⟩
+  calc hyp.t * (κ * v) * hyp.t
+      = (hyp.t * κ * hyp.t) * (hyp.t * v * hyp.t) := by
+        rw [show (hyp.t * κ * hyp.t) * (hyp.t * v * hyp.t)
+          = hyp.t * κ * (hyp.t * hyp.t) * v * hyp.t from by group, htt]
+        group
+    _ = κ⁻¹ * v := by rw [hκt, hvt]
+
+/-- **`D = K W` in the case `V = W`** — the old reading of the orbits, recovered. -/
+theorem KW_eq_D_of_V_eq_W (hVW : hyp.V = hyp.W) : hyp.KW = hyp.D :=
+  le_antisymm hyp.KW_le_D fun _ hd => hyp.exists_mem_K_mem_W_mul hVW hd
+
 /-- An element of `W` is trivial as soon as `k v ∈ K` for some `k ∈ K`. -/
 theorem eq_one_of_mul_mem_K {k v : G} (hk : k ∈ hyp.K) (hv : v ∈ hyp.W)
     (hkv : k * v ∈ hyp.K) : v = 1 := by
@@ -535,7 +593,7 @@ theorem stepNine_of_KW {m : ℕ} (M : hyp.QuotientFieldModel m)
     {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     {ζ : G} (hζW : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1) :
     ∃ ω' ∈ hyp.Q, ω' ∉ hyp.Q0 ∧
-      (∃ z ∈ hyp.Q0, OddOrder.GroupTheory.RankOneBNPair.dOrbitRel hyp.D (ω * z) ω') ∧
+      (∃ z ∈ hyp.Q0, OddOrder.GroupTheory.RankOneBNPair.dOrbitRel hyp.KW (ω * z) ω') ∧
       ∃ y ∈ hyp.Q0, y ≠ 1 ∧ f ω' = ζ⁻¹ * (ω' * y) * ζ := by
   have hζD : ζ ∈ hyp.D := hyp.W_le_D hζW
   obtain ⟨z, hzQ0, b, hbQ0, k, hkK, heq⟩ :=
@@ -572,7 +630,7 @@ theorem stepNine_of_KW {m : ℕ} (M : hyp.QuotientFieldModel m)
     have := hyp.conj_mem_Q0_of_mem_H (hyp.H.inv_mem (hyp.D_le_H hcD))
       (hyp.Q0.mul_mem hzQ0 hbQ0)
     rwa [inv_inv] at this
-  refine ⟨_, hω'Q, hω'Q0, ⟨z, hzQ0, c, hcD, rfl⟩, _, hyQ0, ?_, hcoll⟩
+  refine ⟨_, hω'Q, hω'Q0, ⟨z, hzQ0, c, hyp.mem_KW_of_mem_K hcK, rfl⟩, _, hyQ0, ?_, hcoll⟩
   exact hyp.ne_one_of_f_eq_conj H hC2 hω'Q hω'Q0 hζD hcoll
 
 end
