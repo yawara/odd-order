@@ -7735,3 +7735,26 @@ commit `e02a85891`。`corollaryTwo_of_isStandardModel_of_closing` を新設し�
 
 ⚠ `hcard : 3 ≤ |F|` は (143) で「θ が奇位数」へ置換済の側の話と混同しないこと
 (こちらは `θ|_F = 1` 分岐が要求する 3 元)。
+
+### (158) 追記 — 段 (2) 配線の材料、所在を実測
+
+`..._of_closing` の残り仮説について、供給元を grep で確定した (未接続なだけ):
+
+| 仮説 | 供給元 |
+|---|---|
+| `H` (`IsFGH`) + `hfQ` | `Hypothesis.exists_fgh_mapsTo` (汎用、どの仮説にも当たる) |
+| `hC2` | `braid_of_orderOf_mul_eq_three` (`DistinguishedInvolution.lean:429`) ⟸ `hst : orderOf (s·t) = 3`。**商側の `hst` は既存**: `residualQuotientHypothesis_orderOf_distinguishedInvolution_mul_t` |
+| `hmu` | `mu_injective_residualQuotient` (`PSU3SectionFourModel.lean:210`) — transported 版で既存 |
+| `hZc` | `sfive.centerEqQ0` そのもの |
+| `sfive`/`M`/`x₀`/`hKcard`/`hmodel` | `exists_isStandardModel_intrinsicResidualQuotient` の結論に同梱 ((142)) |
+| `hWdvd` + **`hWcyc`** | `isCyclic_W_and_card_dvd_of_orderThree` (同時に返す) |
+| `hW1` | `exists_ne_one_mem_quotient_W` |
+| `hhW` | `h_mem_W` 経由 ((133)) |
+| `hcard : 3 ≤ \|F\|` | `\|F\| = 2^n` なので **`n ≥ 2`** と同値 — ⚠ 商側で `n ≥ 2` が出るか未確認 |
+| `hcardQ : \|Q\| = \|Q₀\|³` | §4 transport で既出 ((138) の 5 入力の 1 つ) |
+
+⚠ **設計分岐 (次セッションが決める)**: 配線先を
+**(a) transported 版 `residualQuotientHypothesis`** (上表の `hmu`/`hst` が直接使える) にするか、
+**(b) 内在 ULift 版 `intrinsicResidualQuotientULift`** (書籍の `f₁`,`h₁` に対応するのはこちら;
+(141) の四つ組照合同型で (a) から移送できる) にするか。
+(b) が最終的に要るが、(a) で先に閉じて移送する方が安全かもしれない。
