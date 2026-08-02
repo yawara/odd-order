@@ -7562,3 +7562,52 @@ twist `σ⁻¹τ` は `φ^{±1}` のまま。⟹ **`d` の `1 + 2^t` 正規化�
 `..._of_normalization` から `hpair` を削除し、pair も `θF` も奇位数も内部で構成する。
 
 ⟹ **「§2 を `U` 相対で走らせる」の残債は `hsq` (step (20) の平方関係) のみ**。
+
+### (155) §2 の閉じ — 軌道 transversal が landing、残りは step (20) との配線
+
+(154) で `hpair` が消えたので、段 (2) の残債は **`hsq` (§2 (20) の平方関係)** 1 本。
+書籍 p.129 の閉じの Proposition を追い直し、必要な道具を 2 つ landing させた
+(commits `3050fd983`, `bbade15b8`)。
+
+**書籍の論法 (p.129)**: `ω_1,…,ω_n` を `(Q/Q₀)^#` の `KW` 軌道の代表系 (各々 (9) で
+正規化済) とする。`ω²= (0,r)` と置き、
+
+* `i` := 「`f(ω⁻¹)` が `ω_i` の軌道に入る」ような添字
+* `k` := 「`f(ω⁻¹(0,α))` が `ω_k` の軌道に入る」ような添字
+
+(17)+(20) で 2 本の等式を出し、(H4)+(H5) で `(ω_i(0,r))^{KW} = (ω_k(0,α+r))^{KW}`、
+**代表系が相異なるから `i = k`**、そして `sq_eq_of_dOrbitRel` で `ω_i² = (0,α)`。
+
+**⚠ 要点 (実測)**: `sq_eq_of_dOrbitRel` は `dOrbitRel D (ω⁻¹ρ) (ω(ρy))` を
+**同一の `ω`** について要求する (両辺が同じ `ω` の `Q₀`-平行移動でないと、自由性から
+`d = 1` を出す議論が動かない)。⟹ 「同じ軌道」では足りず、**代表の一致**が要る。
+
+**landing した道具**:
+
+1. `PSU3BarOrbit.lean` の `barOrbitRel x y := ∃ z ∈ Q₀, dOrbitRel D (x z) y`
+   — 商群を作らずに `Q/Q₀` の `KW` 軌道を表す同値関係 (`refl`/`symm`/`trans`/
+   `barOrbitSetoid`、`mem_Q`/`notMem_Q0`)。
+2. `stepNine` の結論に書籍の軌道条項を復元 (witness は `c⁻¹(ωz)c`, `c ∈ K`)。
+3. `exists_normalizedOrbitRep` — **正規化 transversal**
+   `∃ r : G → G, (軌道上定数) ∧ (∀ x ∈ Q∖Q₀, r x ∈ Q∖Q₀ ∧ barOrbitRel x (r x) ∧ 正規化)`。
+   類の `Quotient.out` を (9) で正規化するだけ。「軌道上定数」が書籍の「相異なる代表」。
+
+**⚠ 次セッションはここから — 閉じの Proposition の組み立て**:
+
+`ω := r x` (任意の `x ∈ Q∖Q₀`; 存在は `exists_mem_Q_notMem_Q0`)、`ρ := ω²`、
+`y` は正規化の随伴元。`ω_i := r (f (ω⁻¹))`、`ω_k := r (f (ω⁻¹ y))` と置く
+(`f` は `Q∖Q₀` を保つ: `IsFGH.mem`)。手順:
+
+1. **`hi`/`hk` を作る**: `stepTwenty_snd` (「像は常に `ω₂(z y)`」) を正規化ペア
+   `(ω, ω_i)` / `(ω, ω_k)` に当てる。⚠ `stepTwenty_snd` の仮説を実測して、
+   `barOrbitRel` レベルの所属から `dOrbitRel` の精密形へ上げる経路を確認すること。
+2. **`i = k`**: (H5) 連鎖 `dOrbitRel_of_stepTwenty_chain` の結論
+   `dOrbitRel D (ω_k⁻¹ρ) (ω_i(ρy))` から `barOrbitRel ω_i ω_k` を読み、
+   transversal の軌道上定数性で `ω_i = ω_k` (⚠ `r (f (ω⁻¹))` と `r (f (ω⁻¹ y))` の
+   引数が同じ軌道に入ることを示す形にする)。
+3. **仕上げ**: `f_eq_conj_inv_of_stepTwenty_chain` (既存) がそのまま
+   `ω_i² = y ∧ f(ω_i) = (ω_i⁻¹)^ζ` を出す。`h(ω_i) ∈ W` は `h_mem_W` (既存)。
+
+⟹ 出口は `∃ ω ∈ Q∖Q₀, f ω = ζ⁻¹ω⁻¹ζ ∧ h ω ∈ W` (書籍の閉じの Proposition そのもの)。
+これが出れば `corollaryTwo_of_isStandardModel` の base pair を内部で供給でき、
+`hsq` も消える。
