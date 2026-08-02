@@ -440,6 +440,87 @@ theorem normal_of_le_centralizer (hsup : S ⊔ N = ⊤)
 
 end Retraction
 
+/-! ## 冪零な極小正規部分群は基本可換 `p`-群 -/
+
+omit [Finite G] in
+/-- **冪零な極小正規部分群は可換**.
+
+`C_G(N) ⊓ N` は `G`-正規 (`Subgroup.normal_centralizer`) で `≤ N` なので極小性から
+`⊥` か `N`. `⊥` なら `Z(N) = ⊥` だが冪零非自明な群の中心は非自明
+(`Group.IsNilpotent.center_ne_bot`) で矛盾. -/
+theorem mul_comm_of_isMinimalNormal_of_isNilpotent {N : Subgroup G}
+    (hN : Ch02.IsMinimalNormal N) (hnil : Group.IsNilpotent ↥N) :
+    ∀ x ∈ N, ∀ y ∈ N, x * y = y * x := by
+  haveI : N.Normal := hN.1
+  haveI : Nontrivial ↥N := N.nontrivial_iff_ne_bot.mpr hN.2.1
+  rcases hN.2.2 (Subgroup.centralizer (N : Set G) ⊓ N) inferInstance inf_le_right with hbot | htop
+  · exfalso
+    refine Group.IsNilpotent.center_ne_bot (G := ↥N) (le_bot_iff.mp ?_)
+    intro z hz
+    have hzC : (z : G) ∈ Subgroup.centralizer (N : Set G) ⊓ N := by
+      refine ⟨Subgroup.mem_centralizer_iff.mpr ?_, z.2⟩
+      intro h hh
+      exact congrArg Subtype.val (Subgroup.mem_center_iff.mp hz ⟨h, hh⟩)
+    rw [hbot] at hzC
+    exact Subtype.ext (Subgroup.mem_bot.mp hzC)
+  · intro x hx y hy
+    exact ((Subgroup.mem_centralizer_iff).mp (htop.ge hx).1 y hy).symm
+
+/-- **可換な極小正規部分群は指数が素数** (基本可換 `p`-群).
+
+`N^p = {x^p : x ∈ N}` は `N` が可換なので部分群で, `N ◁ G` から `G`-正規. 極小性で
+`⊥` か `N`; `= N` なら `p` 乗写像が全射 ⟹ 有限性で単射 ⟹ 位数 `p` の元が無く Cauchy に
+矛盾. -/
+theorem exists_prime_pow_eq_one_of_isMinimalNormal {N : Subgroup G}
+    (hN : Ch02.IsMinimalNormal N) (hab : ∀ x ∈ N, ∀ y ∈ N, x * y = y * x) :
+    ∃ p : ℕ, p.Prime ∧ ∀ x ∈ N, x ^ p = 1 := by
+  haveI : N.Normal := hN.1
+  haveI : Nontrivial ↥N := N.nontrivial_iff_ne_bot.mpr hN.2.1
+  set p := (Nat.card ↥N).minFac with hpdef
+  have hcard : 1 < Nat.card ↥N := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+  have hp : p.Prime := Nat.minFac_prime (by omega)
+  haveI : Fact p.Prime := ⟨hp⟩
+  refine ⟨p, hp, ?_⟩
+  -- `Np := {x ^ p | x ∈ N}` は `G`-正規部分群
+  set Np : Subgroup G :=
+    { carrier := {y : G | ∃ x ∈ N, x ^ p = y}
+      one_mem' := ⟨1, N.one_mem, one_pow p⟩
+      mul_mem' := by
+        rintro a b ⟨x, hx, rfl⟩ ⟨y, hy, rfl⟩
+        exact ⟨x * y, N.mul_mem hx hy, Commute.mul_pow (hab x hx y hy) p⟩
+      inv_mem' := by
+        rintro a ⟨x, hx, rfl⟩
+        exact ⟨x⁻¹, N.inv_mem hx, by rw [inv_pow]⟩ } with hNp
+  haveI : Np.Normal := by
+    refine ⟨fun a ha g => ?_⟩
+    obtain ⟨x, hx, rfl⟩ := ha
+    exact ⟨g * x * g⁻¹, ‹N.Normal›.conj_mem x hx g, by rw [conj_pow]⟩
+  have hNpN : Np ≤ N := by rintro a ⟨x, hx, rfl⟩; exact N.pow_mem hx p
+  rcases hN.2.2 Np inferInstance hNpN with hbot | htop
+  · intro x hx
+    have : x ^ p ∈ Np := ⟨x, hx, rfl⟩
+    rw [hbot] at this
+    exact Subgroup.mem_bot.mp this
+  · exfalso
+    -- `p` 乗写像が `↥N` 上全射 ⟹ 単射 ⟹ 位数 `p` の元なし
+    obtain ⟨z, hz⟩ : ∃ z : ↥N, orderOf z = p := by
+      haveI := Fintype.ofFinite ↥N
+      exact exists_prime_orderOf_dvd_card p
+        (by rw [← Nat.card_eq_fintype_card]; exact Nat.minFac_dvd _)
+    have hsurj : Function.Surjective (fun w : ↥N => w ^ p) := by
+      intro w
+      have hwN : (w : G) ∈ Np := htop.ge w.2
+      obtain ⟨x, hx, hxw⟩ := hwN
+      exact ⟨⟨x, hx⟩, Subtype.ext (by simpa using hxw)⟩
+    have hinj : Function.Injective (fun w : ↥N => w ^ p) :=
+      Finite.injective_iff_surjective.mpr hsurj
+    have hz1 : (fun w : ↥N => w ^ p) z = (fun w : ↥N => w ^ p) 1 := by
+      simp only [one_pow]
+      rw [← hz, pow_orderOf_eq_one]
+    have := hinj hz1
+    rw [this, orderOf_one] at hz
+    exact hp.one_lt.ne hz
+
 section MinimalNormal
 
 variable {S : Subgroup G} (hmc : IsKegelMinimalCounterexample S)

@@ -15210,3 +15210,7 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch09.le_centralizer_of_fitting_inf_eq_bot
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch09.le_fitting_of_isMinimalNormal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.mul_comm_of_isMinimalNormal_of_isNilpotent
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.exists_prime_pow_eq_one_of_isMinimalNormal
