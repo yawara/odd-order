@@ -249,6 +249,38 @@ theorem rankOneSetup_residual (hXD : X ≤ hyp.D)
     (by rintro _ ⟨u, -, rfl⟩; exact u.2) (hyp.t_mem_residual htX)
     (hyp.inf_centralizer_le_residual hCQ)
 
+/-- **The `U`-relative mappings agree with the ambient ones** (Peterfalvi Part II,
+Ch. IV §4, step (3), p. 133):
+
+> By the uniqueness of the canonical form of an element of `G − H`, `f(ω) = f₁(ω)` and
+> `h(ω) = h₁(ω)`.
+
+`U = residualImage X` inherits the rank-one setup (`rankOneSetup_residual`), so it has its
+own mappings `f₁`, `g₁`, `h₁`.  Read in `G` through `IsFGH.ofSubtype` they are an `IsFGH`
+triple for `Q ⊓ U`, `D ⊓ U` with the same `t`, and `IsFGH.eq_of_le` — which *is* the
+uniqueness of the canonical form — identifies them with the ambient ones on `(Q ⊓ U)^#`. -/
+theorem exists_fgh_residual
+    (Hfgh : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G)))) :
+    ∃ f₁ g₁ h₁ : ↥(residualImage (G := G) X) → ↥(residualImage (G := G) X),
+      OddOrder.GroupTheory.RankOneBNPair.IsFGH
+        (hyp.H.subgroupOf (residualImage (G := G) X))
+        (hyp.Q.subgroupOf (residualImage (G := G) X))
+        (hyp.D.subgroupOf (residualImage (G := G) X))
+        ⟨hyp.t, hyp.t_mem_residual htX⟩ f₁ g₁ h₁ ∧
+      ∀ x : ↥(residualImage (G := G) X), (x : G) ∈ hyp.Q → (x : G) ≠ 1 →
+        ((f₁ x : ↥(residualImage (G := G) X)) : G) = f (x : G) ∧
+          ((h₁ x : ↥(residualImage (G := G) X)) : G) = h (x : G) := by
+  obtain ⟨f₁, g₁, h₁, H₁, -, -, -⟩ := (hyp.rankOneSetup_residual hXD htX hCQ).exists_fgh_one
+  refine ⟨f₁, g₁, h₁, H₁, fun x hxQ hx1 => ?_⟩
+  have hsub := H₁.ofSubtype (M' := hyp.H) (Q' := hyp.Q) (D' := hyp.D)
+  obtain ⟨hf, -, hh⟩ :=
+    Hfgh.eq_of_le hyp.rankOneSetup (inf_le_left (b := residualImage (G := G) X))
+      (inf_le_left (b := residualImage (G := G) X)) hsub ⟨hxQ, x.2⟩ hx1
+  rw [OddOrder.GroupTheory.RankOneBNPair.liftMap_apply _ x.2] at hf hh
+  exact ⟨hf.symm, hh.symm⟩
+
 /-- **`U/Z(U)` inherits the rank-one setup too** (Peterfalvi Part II, Ch. IV §4,
 step (2), p. 133).
 
