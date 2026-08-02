@@ -136,18 +136,20 @@ theorem stepFour_fibre (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q := fun a haK =>
     hfQ _ (hyp.Q.mul_mem hωQ (hyp.Q0_le_Q
       (hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D haK) hyp.distinguishedInvolution_mem_Q0)))
-  have hx := hyp.stepFour_base H hC2 sfive M hZc hmu hVW Φ hquot ι hker hu Ψ hΨq hΨc
-    hconjq hconjy d hequiv hdsq hs hζ hζ1 hωQ hωQ0 hf hstage3 hm hQ0card hfibQ
+  -- with `V = W` the freeness of `D` supplies `h(ω) ∈ W`, which the general stages take
+  have hhW : h ω ∈ hyp.W := hyp.h_mem_W_of_freeD H M hZc hmu hVW hζ hωQ hωQ0 hf
+  have hx := hyp.stepFour_base H hC2 sfive M hZc hmu Φ hquot ι hker hu Ψ hΨq hΨc
+    hconjq hconjy d hequiv hdsq hs hζ hζ1 hωQ hωQ0 hf hhW hstage3 hm hQ0card hfibQ
   refine ⟨hx, fun ρ hρQ hfρQ hfib hne => ?_⟩
   refine hyp.stepFour_elem sfive M hZc Φ hquot ι hker hu Ψ hene hΨq hΨc d hequiv hdsq hs
     hωQ (fun a haK hfaQ hA1 => ?_) (fun a haK hfaQ => ?_) (fun hfωQ => ?_) hρQ hfρQ hfib
     hne
   · rw [hx]
-    exact hyp.stepFour_pointwise H hC2 sfive M hZc hmu hVW Φ hquot ι hker hu Ψ hΨq hΨc
-      hconjq hconjy d hequiv hdsq hs hζ hζ1 hωQ hωQ0 hf hstage3 hx haK hA1 hfaQ
+    exact hyp.stepFour_pointwise H hC2 sfive M hZc hmu Φ hquot ι hker hu Ψ hΨq hΨc
+      hconjq hconjy d hequiv hdsq hs hζ hζ1 hωQ hωQ0 hf hhW hstage3 hx haK hA1 hfaQ
   · rw [hx]
-    exact hyp.stepTwo_quotient H hC2 M hZc hmu hVW Φ hquot hu Ψ hΨq hζ hζ1 hωQ hωQ0
-      (by rw [← hyp.coe_K]; exact haK) (pow_mem haK 2) hf hfaQ
+    exact hyp.stepTwo_quotient H hC2 M hZc hmu Φ hquot hu Ψ hΨq hζ hζ1 hωQ hωQ0
+      (by rw [← hyp.coe_K]; exact haK) (pow_mem haK 2) hf hhW hfaQ
   · exact hyp.stepFour_at_omega M hu Ψ hconjq hconjy hζ hωQ hf hfωQ hx
 
 /-- **Stage (4) on the whole fibre**, from the base pair alone (Peterfalvi Part II,
@@ -542,9 +544,12 @@ theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
           + ((M.mu ((1 : ↥hyp.actualKActor),
             (⟨ζ₀, hζ₀⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
   have hζ₀ne : ζ₀ ≠ 1 := fun hc => hζ₀1 (Subtype.ext hc)
-  obtain ⟨hστ0, hαst⟩ := hyp.stepThree_of_odd H hC2 hm hQ0card sfive M hZc hmu hVW hcard
+  have hf₀ : f ω₀ = ζ₀⁻¹ * ω₀⁻¹ * ζ₀ := hyp.f_eq_conj_inv_of_sq_eq hy₀Q0 hfω₀ hsqω₀
+  have hhW₀ : h ω₀ ∈ hyp.W :=
+    hyp.h_mem_W_of_freeD H M hZc hmu hVW hζ₀ hω₀Q hω₀Q0 hf₀
+  obtain ⟨hστ0, hαst⟩ := hyp.stepThree_of_odd H hC2 hm hQ0card sfive M hZc hmu hcard
     ι d hequiv σ τ (σ.symm.toRingHom.comp τ.toRingHom).toAddMonoidHom (fun _ => rfl) θF
-    hθF hodd hscale hWinv hζ₀ hζ₀ne hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀
+    hθF hodd hscale hWinv hζ₀ hζ₀ne hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀ hhW₀
   -- `σ = τ` on `F`, which is what the upgrade takes
   have hστ : ∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
       σ.toRingHom a = τ.toRingHom a := by

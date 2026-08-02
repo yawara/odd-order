@@ -126,14 +126,73 @@ theorem g_inv_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   rw [o2, hf]
   group
 
+/-- **`h(ω⁻¹) = h(ω)⁻¹` when `h(ω) ∈ W`** (Peterfalvi Part II, p. 130).
+
+(H4) gives `h(ω⁻¹) = (h(ω)^t)⁻¹`, and `W ≤ V = C_D(t)`, so the twist is trivial.  This
+is the book's reason for `h(ω⁻¹) ∈ W`. -/
+theorem h_inv_eq_inv_of_mem_W (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hω1 : ω ≠ 1) (hhW : h ω ∈ hyp.W) :
+    h ω⁻¹ = (h ω)⁻¹ := by
+  obtain ⟨-, -, o3⟩ := hOne hyp.rankOneSetup H hωQ hω1
+  have hcomm : hyp.t * h ω = h ω * hyp.t :=
+    (Subgroup.mem_centralizer_singleton_iff.mp (hyp.W_le_V hhW).2).symm
+  rw [o3, hcomm, mul_assoc, hyp.rankOneSetup.invol, mul_one]
+
+/-- `h(ω⁻¹) ∈ W` when `h(ω) ∈ W`. -/
+theorem h_inv_mem_W (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hω1 : ω ≠ 1) (hhW : h ω ∈ hyp.W) :
+    h ω⁻¹ ∈ hyp.W := by
+  rw [hyp.h_inv_eq_inv_of_mem_W H hωQ hω1 hhW]
+  exact hyp.W.inv_mem hhW
+
 /-- **`h(ω⁻¹) = ζ⁻³`** (Peterfalvi Part II, p. 130).
 
 (H5) says `(f ∘ j)³(ω⁻¹) = (ω⁻¹)^{h(ω⁻¹)⁻¹}`, and the left side is `ω^{-ζ³}`; so
-`ζ³ h(ω⁻¹) ∈ D` fixes `ω⁻¹`, hence is trivial by `eq_one_of_conj_eq_mul_Q0_of_mem_D`.
+`ζ³ h(ω⁻¹)` fixes `ω⁻¹`, hence is trivial by the fixed-point-freeness of `W` on
+`(Q/Q₀)^#`.
 
-The book instead argues that `h(ω⁻¹) = h(ω)^{-t}` lies in `W` and reads the exponent off
-there; the freeness makes the detour unnecessary. -/
+Both factors lie in `W`: `ζ ∈ W^#` by hypothesis, and `h(ω⁻¹) = h(ω)^{-t} = h(ω)⁻¹`
+because `h(ω) ∈ W ≤ C_D(t)` — which is exactly the book's argument, and needs no
+relation between `V` and `W` (`eq_one_of_conj_eq_mul_Q0_of_mem_W`).  Chapter IV §4
+supplies `h(ω) ∈ W` along with `f(ω) = (ω⁻¹)^ζ`, so this is available there too. -/
+theorem zpow_three_mul_h_inv_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {ζ ω : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) :
+    (ζ ^ 3 * h ω⁻¹)⁻¹ * ω⁻¹ * (ζ ^ 3 * h ω⁻¹) = ω⁻¹ * 1 := by
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
+  have hωinvQ : ω⁻¹ ∈ hyp.Q := hyp.Q.inv_mem hωQ
+  have hωinv1 : ω⁻¹ ≠ 1 := fun hc => hω1 (inv_eq_one.mp hc)
+  have h5 := hFive hyp.rankOneSetup H hωinvQ hωinv1
+  rw [inv_inv, hyp.fj_cube_of_f_eq_conj_inv H hζ hωQ hωQ0 hf] at h5
+  rw [mul_one]
+  calc (ζ ^ 3 * h ω⁻¹)⁻¹ * ω⁻¹ * (ζ ^ 3 * h ω⁻¹)
+      = (h ω⁻¹)⁻¹ * ((ζ ^ 3)⁻¹ * ω⁻¹ * ζ ^ 3) * h ω⁻¹ := by group
+    _ = (h ω⁻¹)⁻¹ * (h ω⁻¹ * ω⁻¹ * (h ω⁻¹)⁻¹) * h ω⁻¹ := by rw [← h5]
+    _ = ω⁻¹ := by group
+
 theorem h_inv_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu)
+    {ζ ω : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hhW : h ω ∈ hyp.W) :
+    h ω⁻¹ = (ζ ^ 3)⁻¹ := by
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
+  have hωinvQ : ω⁻¹ ∈ hyp.Q := hyp.Q.inv_mem hωQ
+  have hωinvQ0 : ω⁻¹ ∉ hyp.Q0 := fun hc => hωQ0 (by simpa using hyp.Q0.inv_mem hc)
+  have hcW : ζ ^ 3 * h ω⁻¹ ∈ hyp.W :=
+    hyp.W.mul_mem (pow_mem hζ 3) (hyp.h_inv_mem_W H hωQ hω1 hhW)
+  have hone := hyp.eq_one_of_conj_eq_mul_Q0_of_mem_W M hZ hmu hωinvQ hωinvQ0 hcW
+    hyp.Q0.one_mem (hyp.zpow_three_mul_h_inv_conj H hζ hωQ hωQ0 hf)
+  calc h ω⁻¹ = (ζ ^ 3)⁻¹ * (ζ ^ 3 * h ω⁻¹) := by group
+    _ = (ζ ^ 3)⁻¹ := by rw [hone, mul_one]
+
+/-- **`h(ω⁻¹) = ζ⁻³` in the `V = W` case** (Peterfalvi Part II, p. 130).
+
+The same computation, closed by the fixed-point-freeness of the whole of `D` rather than
+of `W`.  Corollary 2 of §3 runs on this: there `G ≅ PSU(3, q)`, so `V = W` is available,
+and `h(ω) ∈ W` is a *conclusion* rather than a hypothesis. -/
+theorem h_inv_eq_of_freeD (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
@@ -144,21 +203,10 @@ theorem h_inv_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have hωinvQ : ω⁻¹ ∈ hyp.Q := hyp.Q.inv_mem hωQ
   have hωinvQ0 : ω⁻¹ ∉ hyp.Q0 := fun hc => hωQ0 (by simpa using hyp.Q0.inv_mem hc)
   have hωinv1 : ω⁻¹ ≠ 1 := fun hc => hω1 (inv_eq_one.mp hc)
-  -- (H5) at `ω⁻¹`, whose `j` is `ω`
-  have h5 := hFive hyp.rankOneSetup H hωinvQ hωinv1
-  rw [inv_inv, hyp.fj_cube_of_f_eq_conj_inv H hζ hωQ hωQ0 hf] at h5
-  -- `ζ³ · h(ω⁻¹)` fixes `ω⁻¹`
-  have hζ3D : ζ ^ 3 ∈ hyp.D := pow_mem (hyp.V_le_D (hyp.W_le_V hζ)) 3
-  have hhD : h ω⁻¹ ∈ hyp.D := H.h_mem hωinvQ hωinv1
-  have hcD : ζ ^ 3 * h ω⁻¹ ∈ hyp.D := hyp.D.mul_mem hζ3D hhD
-  have hconj : (ζ ^ 3 * h ω⁻¹)⁻¹ * ω⁻¹ * (ζ ^ 3 * h ω⁻¹) = ω⁻¹ * 1 := by
-    rw [mul_one]
-    calc (ζ ^ 3 * h ω⁻¹)⁻¹ * ω⁻¹ * (ζ ^ 3 * h ω⁻¹)
-        = (h ω⁻¹)⁻¹ * ((ζ ^ 3)⁻¹ * ω⁻¹ * ζ ^ 3) * h ω⁻¹ := by group
-      _ = (h ω⁻¹)⁻¹ * (h ω⁻¹ * ω⁻¹ * (h ω⁻¹)⁻¹) * h ω⁻¹ := by rw [← h5]
-      _ = ω⁻¹ := by group
+  have hcD : ζ ^ 3 * h ω⁻¹ ∈ hyp.D :=
+    hyp.D.mul_mem (pow_mem (hyp.V_le_D (hyp.W_le_V hζ)) 3) (H.h_mem hωinvQ hωinv1)
   have hone := hyp.eq_one_of_conj_eq_mul_Q0_of_mem_D M hZ hmu hVW hωinvQ hωinvQ0 hcD
-    hyp.Q0.one_mem hconj
+    hyp.Q0.one_mem (hyp.zpow_three_mul_h_inv_conj H hζ hωQ hωQ0 hf)
   calc h ω⁻¹ = (ζ ^ 3)⁻¹ * (ζ ^ 3 * h ω⁻¹) := by group
     _ = (ζ ^ 3)⁻¹ := by rw [hone, mul_one]
 
@@ -167,19 +215,54 @@ theorem h_inv_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
 theorem h_eq_zpow_three (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     {ζ ω : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
-    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) :
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hhW : h ω ∈ hyp.W) :
     h ω = ζ ^ 3 := by
   -- run `h_inv_eq` at `ω⁻¹`, whose normalization is the same shape with `ζ⁻¹`
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
   have hωinvQ : ω⁻¹ ∈ hyp.Q := hyp.Q.inv_mem hωQ
   have hωinvQ0 : ω⁻¹ ∉ hyp.Q0 := fun hc => hωQ0 (by simpa using hyp.Q0.inv_mem hc)
   have hfinv : f ω⁻¹ = (ζ⁻¹)⁻¹ * (ω⁻¹)⁻¹ * ζ⁻¹ := by
     rw [inv_inv, inv_inv]
     exact hyp.f_inv_eq H hζ hωQ hωQ0 hf
-  have hkey := hyp.h_inv_eq H M hZ hmu hVW (hyp.W.inv_mem hζ) hωinvQ hωinvQ0 hfinv
+  have hkey := hyp.h_inv_eq H M hZ hmu (hyp.W.inv_mem hζ) hωinvQ hωinvQ0 hfinv
+    (hyp.h_inv_mem_W H hωQ hω1 hhW)
   rw [inv_inv] at hkey
   rw [hkey, ← inv_pow, inv_inv]
+
+/-- **`h(ω) = ζ³` in the `V = W` case** (Peterfalvi Part II, p. 130).
+
+Corollary 2 of §3 needs `h(ω) ∈ W` as a *conclusion*, so it cannot feed `h_eq_zpow_three`
+the membership; there `V = W` is available instead, and `h_inv_eq_of_freeD` closes the
+same computation. -/
+theorem h_eq_zpow_three_of_freeD (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ζ ω : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) :
+    h ω = ζ ^ 3 := by
+  have hωinvQ : ω⁻¹ ∈ hyp.Q := hyp.Q.inv_mem hωQ
+  have hωinvQ0 : ω⁻¹ ∉ hyp.Q0 := fun hc => hωQ0 (by simpa using hyp.Q0.inv_mem hc)
+  have hfinv : f ω⁻¹ = (ζ⁻¹)⁻¹ * (ω⁻¹)⁻¹ * ζ⁻¹ := by
+    rw [inv_inv, inv_inv]
+    exact hyp.f_inv_eq H hζ hωQ hωQ0 hf
+  have hkey := hyp.h_inv_eq_of_freeD H M hZ hmu hVW (hyp.W.inv_mem hζ) hωinvQ hωinvQ0
+    hfinv
+  rw [inv_inv] at hkey
+  rw [hkey, ← inv_pow, inv_inv]
+
+/-- `h(ω) ∈ W` in the `V = W` case — the form the general stages consume. -/
+theorem h_mem_W_of_freeD (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ζ ω : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) :
+    h ω ∈ hyp.W := by
+  rw [hyp.h_eq_zpow_three_of_freeD H M hZ hmu hVW hζ hωQ hωQ0 hf]
+  exact pow_mem hζ 3
 
 /-- **§3, stage (1)** (Peterfalvi Part II, p. 130):
 
@@ -235,15 +318,15 @@ theorem stepOne_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     {ζ ω a : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
-    (haK : a ∈ hyp.KSet) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) :
+    (haK : a ∈ hyp.KSet) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hhW : h ω ∈ hyp.W) :
     a ^ 2 * f ((ζ * ω * ζ⁻¹) * (a * hyp.distinguishedInvolution * a⁻¹)) * (a⁻¹) ^ 2
         * (a * hyp.distinguishedInvolution * a⁻¹)
       = (ζ ^ 3) * f ((a * hyp.distinguishedInvolution * a⁻¹) * (ζ⁻¹ * ω * ζ))
         * (ζ ^ 3)⁻¹ * (ζ * ω * ζ⁻¹) := by
   refine hyp.stepOne_chain_of_h H hC2 hζ hωQ hωQ0 haK hf
-    (hyp.h_inv_eq H M hZ hmu hVW hζ hωQ hωQ0 hf) ?_
+    (hyp.h_inv_eq H M hZ hmu hζ hωQ hωQ0 hf hhW) ?_
   have htinv : hyp.t⁻¹ = hyp.t := inv_eq_of_mul_eq_one_right hyp.rankOneSetup.invol
   have hp := hyp.conj_t_pow_eq hζ 3
   calc hyp.t * (ζ ^ 3)⁻¹ * hyp.t = (hyp.t⁻¹ * ζ ^ 3 * hyp.t⁻¹)⁻¹ := by group
@@ -361,9 +444,10 @@ theorem stepOne_conjQHom (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     {ζ ω a : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (haK : a ∈ hyp.KSet) (ha2 : a ^ 2 ∈ hyp.K) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hhW : h ω ∈ hyp.W)
     (hXQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q) :
     hyp.conjQHom (hyp.kActor ha2, ⟨ζ, hζ⟩)
           ⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hXQ⟩
@@ -376,7 +460,7 @@ theorem stepOne_conjQHom (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have hzQ0 : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q0 :=
     hyp.conj_mem_Q0_of_mem_D haK.1 hyp.distinguishedInvolution_mem_Q0
   obtain ⟨hcL, hcR⟩ := hyp.f_conj_zeta_of_mem_Q0 H hζ hzQ0 hωQ hωQ0
-  have hchain := hyp.stepOne_chain H hC2 M hZ hmu hVW hζ hωQ hωQ0 haK hf
+  have hchain := hyp.stepOne_chain H hC2 M hZ hmu hζ hωQ hωQ0 haK hf hhW
   rw [hcL, hcR] at hchain
   refine Subtype.ext ?_
   rw [Submonoid.coe_mul, Submonoid.coe_mul,
@@ -407,9 +491,10 @@ theorem stepTwo_linear (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     {ζ ω a : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (haK : a ∈ hyp.KSet) (ha2 : a ^ 2 ∈ hyp.K) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hhW : h ω ∈ hyp.W)
     (hXQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q) :
     (((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E)
         + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E))
@@ -430,7 +515,7 @@ theorem stepTwo_linear (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have hzQ : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q := hyp.Q0_le_Q hzQ0
   -- the chain of stage (1), with both `f`-values expressed through `X`
   obtain ⟨hcL, hcR⟩ := hyp.f_conj_zeta_of_mem_Q0 H hζ hzQ0 hωQ hωQ0
-  have hchain := hyp.stepOne_chain H hC2 M hZ hmu hVW hζ hωQ hωQ0 haK hf
+  have hchain := hyp.stepOne_chain H hC2 M hZ hmu hζ hωQ hωQ0 haK hf hhW
   rw [hcL, hcR] at hchain
   -- memberships
   have ha2D : a ^ 2 ∈ hyp.D := hyp.K_le_D ha2
@@ -590,10 +675,10 @@ theorem stepThree_sq_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     {ζ ω y a b : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hyQ0 : y ∈ hyp.Q0) (hsq : ω * ω = y) (haK : a ∈ hyp.K) (hbK : b ∈ hyp.K)
-    (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) (hhW : h ω ∈ hyp.W)
     (hb : b * hyp.distinguishedInvolution * b⁻¹
       = y * (a⁻¹ * hyp.distinguishedInvolution * a)) :
     ((M.mu (hyp.kActor (pow_mem hbK 2), 1) : M.Eˣ) : M.E)
@@ -616,10 +701,10 @@ theorem stepThree_sq_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   obtain ⟨hXaQ, -⟩ := hyp.f_mem_sdiff_Q0 H hC2 hωaQ hωaQ0
   obtain ⟨hXbQ, hXbQ0⟩ := hyp.f_mem_sdiff_Q0 H hC2 hωbQ hωbQ0
   -- the three equations
-  have hA := hyp.stepTwo_linear H hC2 M hZ hmu hVW hζ hωQ hωQ0
-    (by rw [← hyp.coe_K] at *; exact haK) (pow_mem haK 2) hf hXaQ
-  have hB := hyp.stepTwo_linear H hC2 M hZ hmu hVW hζ hωQ hωQ0
-    (by rw [← hyp.coe_K] at *; exact hbK) (pow_mem hbK 2) hf hXbQ
+  have hA := hyp.stepTwo_linear H hC2 M hZ hmu hζ hωQ hωQ0
+    (by rw [← hyp.coe_K] at *; exact haK) (pow_mem haK 2) hf hhW hXaQ
+  have hB := hyp.stepTwo_linear H hC2 M hZ hmu hζ hωQ hωQ0
+    (by rw [← hyp.coe_K] at *; exact hbK) (pow_mem hbK 2) hf hhW hXbQ
   have hT := hyp.stepTen_quotient_coord H hC2 M hZ hζ hωQ hωQ0 hyQ0 haK hfω hb.symm
     hXaQ hXbQ
   -- the unknown at `b` is nonzero, so it cancels
@@ -712,7 +797,7 @@ theorem stepThree_star (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
     (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
@@ -729,7 +814,7 @@ theorem stepThree_star (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
     {ζ ω y a b : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hyQ0 : y ∈ hyp.Q0) (hsq : ω * ω = y) (haK : a ∈ hyp.K) (hbK : b ∈ hyp.K)
-    (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) (hhW : h ω ∈ hyp.W)
     (hb : b * hyp.distinguishedInvolution * b⁻¹
       = y * (a⁻¹ * hyp.distinguishedInvolution * a)) :
     (σ.symm (hyp.centerCoord sfive M ι hyQ0 /
@@ -745,7 +830,7 @@ theorem stepThree_star (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     simpa using (CharP.cast_eq_zero M.E 2)
   exact star_of_scaling_pair h2E σ τ θ hθ (hWinv ⟨ζ, hζ⟩)
     (hscale (hyp.kActor (pow_mem haK 2))) (hscale (hyp.kActor (pow_mem hbK 2)))
-    (hyp.stepThree_sq_eq H hC2 M hZc hmu hVW hζ hωQ hωQ0 hyQ0 hsq haK hbK hfω hb)
+    (hyp.stepThree_sq_eq H hC2 M hZc hmu hζ hωQ hωQ0 hyQ0 hsq haK hbK hfω hhW hb)
     (hyp.stepThree_center_relation sfive M ι d hequiv hyQ0 haK hbK hb)
 
 /-- **The scalars `a⁻²` sweep `F^×`** (Peterfalvi Part II, p. 130: `(∗)` is asserted for
@@ -1009,7 +1094,7 @@ theorem stepThree_star_all (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     {m : ℕ} (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
     (hequiv : ∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
@@ -1025,7 +1110,8 @@ theorem stepThree_star_all (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hWinv : ∀ v : ↥hyp.W,
       σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
     {ζ ω y : G} (hζ : ζ ∈ hyp.W) (_hζ1 : ζ ≠ 1) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
-    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) :
+    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hhW : h ω ∈ hyp.W) :
     ∃ z ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
       ∀ X ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, X ≠ 0 → X ≠ z →
         (σ.symm (hyp.centerCoord sfive M ι hyQ0 /
@@ -1110,8 +1196,8 @@ theorem stepThree_star_all (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     have hcK : c ∈ hyp.K := by rw [← hyp.coe_K] at hcKSet; exact hcKSet
     have hb : c⁻¹ * hyp.distinguishedInvolution * (c⁻¹)⁻¹
         = y * (a⁻¹ * hyp.distinguishedInvolution * a) := by rwa [inv_inv]
-    have hs := hyp.stepThree_star H hC2 sfive M hZc hmu hVW ι d hequiv σ τ θ hθ
-      hscale hWinv hζ hωQ hωQ0 hyQ0 hsqω haK (hyp.K.inv_mem hcK) hfω hb
+    have hs := hyp.stepThree_star H hC2 sfive M hZc hmu ι d hequiv σ τ θ hθ
+      hscale hWinv hζ hωQ hωQ0 hyQ0 hsqω haK (hyp.K.inv_mem hcK) hfω hhW hb
     rwa [hXa] at hs
   exact ⟨_, hzmem, hstar⟩
 
@@ -1137,7 +1223,7 @@ theorem stepThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     {m : ℕ} (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     (hcard : 5 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
     (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
@@ -1154,7 +1240,8 @@ theorem stepThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hWinv : ∀ v : ↥hyp.W,
       σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
     {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
-    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) :
+    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hhW : h ω ∈ hyp.W) :
     (∀ X ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, θ X = X) ∧
       σ.symm (hyp.centerCoord sfive M ι hyQ0 /
           hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)
@@ -1164,8 +1251,8 @@ theorem stepThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have h2E : (2 : M.E) = 0 := by
     have := M.charTwo
     simpa using (CharP.cast_eq_zero M.E 2)
-  obtain ⟨z, hzmem, hstar⟩ := hyp.stepThree_star_all H hC2 hm hQ0card sfive M hZc hmu hVW
-    ι d hequiv σ τ θ hθ hscale hWinv hζ hζ1 hωQ hωQ0 hyQ0 hsqω hfω
+  obtain ⟨z, hzmem, hstar⟩ := hyp.stepThree_star_all H hC2 hm hQ0card sfive M hZc hmu
+    ι d hequiv σ τ θ hθ hscale hWinv hζ hζ1 hωQ hωQ0 hyQ0 hsqω hfω hhW
   exact eq_one_and_eq_of_star_subfield h2E _ θ
     (hyp.theta_mem_frobFixed M σ τ θ hθ) (hyp.theta_injective M σ τ θ hθ)
     (hyp.centerCoord_div_mem_frobFixed sfive M ι σ hyQ0 hyp.distinguishedInvolution_mem_Q0)
@@ -1199,7 +1286,7 @@ theorem stepThree_of_odd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     {m : ℕ} (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     (hcard : 3 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
     (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ)
@@ -1220,7 +1307,8 @@ theorem stepThree_of_odd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hWinv : ∀ v : ↥hyp.W,
       σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
     {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
-    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) :
+    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hhW : h ω ∈ hyp.W) :
     (∀ X ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, θ X = X) ∧
       σ.symm (hyp.centerCoord sfive M ι hyQ0 /
           hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)
@@ -1239,7 +1327,7 @@ theorem stepThree_of_odd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       exact h0.symm
     refine ⟨hfix, ?_⟩
     obtain ⟨z, hzmem, hstar⟩ := hyp.stepThree_star_all H hC2 hm hQ0card sfive M hZc hmu
-      hVW ι d hequiv σ τ θ hθ hscale hWinv hζ hζ1 hωQ hωQ0 hyQ0 hsqω hfω
+      ι d hequiv σ τ θ hθ hscale hWinv hζ hζ1 hωQ hωQ0 hyQ0 hsqω hfω hhW
     obtain ⟨X, hX0, hXz⟩ :=
       exists_ne_zero_ne (α := ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) hcard
         ⟨z, hzmem⟩
@@ -1258,8 +1346,8 @@ theorem stepThree_of_odd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       rw [OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm]
       calc (5 : ℕ) ≤ 2 ^ 3 := by norm_num
         _ ≤ 2 ^ m := Nat.pow_le_pow_right (by norm_num) hm3
-    exact hyp.stepThree H hC2 hm hQ0card sfive M hZc hmu hVW hcard5 ι d hequiv σ τ θ hθ
-      hscale hWinv hζ hζ1 hωQ hωQ0 hyQ0 hsqω hfω
+    exact hyp.stepThree H hC2 hm hQ0card sfive M hZc hmu hcard5 ι d hequiv σ τ θ hθ
+      hscale hWinv hζ hζ1 hωQ hωQ0 hyQ0 hsqω hfω hhW
 
 /-- **The model's `θ` is the identity on `F` — and so is `σ`** (Peterfalvi Part II, p. 130,
 reconciling the two `θ`'s of §3).

@@ -70,7 +70,7 @@ theorem stepTwo_quotient (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
     (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
@@ -82,14 +82,14 @@ theorem stepTwo_quotient (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     {e : M.E} (hΨq : ∀ ρ : ↥hyp.Q, (Ψ ρ).quotient = e * (Φ ρ).quotient)
     {ζ ω a : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1)
     (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (haK : a ∈ hyp.KSet) (ha2 : a ^ 2 ∈ hyp.K)
-    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hhW : h ω ∈ hyp.W)
     (hXQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q) :
     (Ψ ⟨f (ω * (a * hyp.distinguishedInvolution * a⁻¹)), hXQ⟩).quotient
       = (Ψ ⟨ω, hωQ⟩).quotient /
         (((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E)
           + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)) := by
   have hne := hyp.mu_K_add_mu_W_ne_zero M hmu hζ1 (hyp.kActor ha2)
-  have hlin := hyp.stepTwo_linear H hC2 M hZ hmu hVW hζ hωQ hωQ0 haK ha2 hf hXQ
+  have hlin := hyp.stepTwo_linear H hC2 M hZ hmu hζ hωQ hωQ0 haK ha2 hf hhW hXQ
   rw [eq_div_iff hne, mul_comm]
   rw [hΨq, hΨq, hquot, hquot]
   rw [show M.coord (Additive.ofMul (QuotientGroup.mk'
@@ -165,7 +165,7 @@ theorem stepFour_star (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
     (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
@@ -201,7 +201,7 @@ theorem stepFour_star (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 = 1)
     {ζ ω a : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1)
     (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (haK : a ∈ hyp.K) (ha2 : a ^ 2 ∈ hyp.K)
-    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hhW : h ω ∈ hyp.W)
     (hXQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q)
     (hstage3 : (Ψ ⟨ω, hωQ⟩).quotient ^ (2 ^ m + 1)
       = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
@@ -222,7 +222,7 @@ theorem stepFour_star (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have hzQ0 : a * hyp.distinguishedInvolution * a⁻¹ ∈ hyp.Q0 :=
     hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D haK) hyp.distinguishedInvolution_mem_Q0
   -- ### the chain of stage (1), transported by `Ψ`
-  have hchain0 := hyp.stepOne_conjQHom H hC2 M hZc hmu hVW hζ hωQ hωQ0 haKSet ha2 hf hXQ
+  have hchain0 := hyp.stepOne_conjQHom H hC2 M hZc hmu hζ hωQ hωQ0 haKSet ha2 hf hhW hXQ
   rw [hyp.kActor_one hyp.K.one_mem] at hchain0
   have heq := congrArg Ψ hchain0
   rw [map_mul, map_mul] at heq
@@ -294,8 +294,8 @@ theorem stepFour_star (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
         / (((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E)
           + ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)) := by
     rw [hconjq, hmuZ2,
-      hyp.stepTwo_quotient H hC2 M hZc hmu hVW Φ hquot hu Ψ hΨq hζ hζ1 hωQ hωQ0
-        haKSet ha2 hf hXQ, mul_div_assoc]
+      hyp.stepTwo_quotient H hC2 M hZc hmu Φ hquot hu Ψ hΨq hζ hζ1 hωQ hωQ0
+        haKSet ha2 hf hhW hXQ, mul_div_assoc]
   -- ### stage (3), as the norm of the quotient coordinate
   have hω : (Ψ ⟨ω, hωQ⟩).quotient * (Ψ ⟨ω, hωQ⟩).quotient ^ 2 ^ m
       = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
@@ -314,7 +314,7 @@ theorem stepFour_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
     (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
@@ -349,7 +349,7 @@ theorem stepFour_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hs : (ν : M.E) *
       hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 = 1)
     {ζ ω : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1)
-    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hhW : h ω ∈ hyp.W)
     (hstage3 : (Ψ ⟨ω, hωQ⟩).quotient ^ (2 ^ m + 1)
       = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
         + ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹)
@@ -363,8 +363,8 @@ theorem stepFour_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     simpa using (CharP.cast_eq_zero M.E 2)
   obtain ⟨a, haK, hAeq⟩ := hyp.exists_mem_K_mu_sq_eq hm hQ0card sfive M
     (one_mem _) one_ne_zero
-  have hval := hyp.stepFour_star H hC2 sfive M hZc hmu hVW Φ hquot ι hker hu Ψ hΨq hΨc
-    hconjq hconjy d hequiv hdsq hs hζ hζ1 hωQ hωQ0 haK (pow_mem haK 2) hf
+  have hval := hyp.stepFour_star H hC2 sfive M hZc hmu Φ hquot ι hker hu Ψ hΨq hΨc
+    hconjq hconjy d hequiv hdsq hs hζ hζ1 hωQ hωQ0 haK (pow_mem haK 2) hf hhW
     (hfQ a haK) hstage3
   have hne := hyp.mu_K_add_mu_W_ne_zero M hmu hζ1 (hyp.kActor (pow_mem haK 2))
   rw [hAeq] at hval hne
@@ -380,7 +380,7 @@ theorem stepFour_pointwise (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
     (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
@@ -415,7 +415,7 @@ theorem stepFour_pointwise (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hs : (ν : M.E) *
       hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 = 1)
     {ζ ω : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1)
-    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hhW : h ω ∈ hyp.W)
     (hstage3 : (Ψ ⟨ω, hωQ⟩).quotient ^ (2 ^ m + 1)
       = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
         + ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹)
@@ -432,8 +432,8 @@ theorem stepFour_pointwise (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     have := M.charTwo
     simpa using (CharP.cast_eq_zero M.E 2)
   exact inv_of_star h2 (hyp.mu_K_add_mu_W_ne_zero M hmu hζ1 _) ha1 hx
-    (hyp.stepFour_star H hC2 sfive M hZc hmu hVW Φ hquot ι hker hu Ψ hΨq hΨc
-      hconjq hconjy d hequiv hdsq hs hζ hζ1 hωQ hωQ0 haK (pow_mem haK 2) hf
+    (hyp.stepFour_star H hC2 sfive M hZc hmu Φ hquot ι hker hu Ψ hΨq hΨc
+      hconjq hconjy d hequiv hdsq hs hζ hζ1 hωQ hωQ0 haK (pow_mem haK 2) hf hhW
       hfQ hstage3)
 
 /-- **Stage (4) at the excluded point `A = 0`**, that is at `ω` itself (Peterfalvi
@@ -983,7 +983,7 @@ theorem corollaryTwo (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have hfeq := hyp.f_eq_conj_inv_of_inverseFormula M hu Ψ hconjq hconjy hζ hωmem
     (hfQ _ hωmem) hy h1 h2
   exact ⟨(ωQ : G), hωmem, hnotQ0, hfeq,
-    hyp.h_eq_zpow_three H M hZc hmu hVW hζ hωmem hnotQ0 hfeq⟩
+    hyp.h_eq_zpow_three_of_freeD H M hZc hmu hVW hζ hωmem hnotQ0 hfeq⟩
 
 /-! ### Stage (5): the formula is `K W`-equivariant -/
 
