@@ -8054,3 +8054,30 @@ ambient の `f,h` と一致することを、`t x t = g·h·t·f` の分解の�
 * ⟹ 「`W` は商でも像と一致する」を別途示すか、`ζ` を商で取ったまま
   `π (f x) = ζ⁻¹ (π x)⁻¹ ζ` の形で ambient 結論を述べるか、の設計分岐。
   書籍に忠実なのは前者 (`h(ω) ∈ C_W(P)` まで言うため)。
+
+### (171) `W` の像問題の裁定 — `ζ` は `D ∩ U` の元として取る
+
+(170) の障害を検討した結果:
+
+* **⊇ は易しい**: `w ∈ W ∩ U` ⟹ `π w ∈ W(intr)` (D の像に入り、`Q₀(intr) = π(Q₀∩U)`
+  (`Q0_intrinsicResidualQuotient_eq`, 既存) を中心化する)。
+* **⊆ が問題**: `w̄ ∈ W(intr)` を持ち上げると `w ∈ D∩U` が `Q₀ ∩ U` を中心化することしか
+  出ない。ambient の `W = D ⊓ C(Q₀)` には `Q₀` 全体の中心化が要る
+  (`Q₀ ∩ U = Q₀` は一般には言えない)。
+
+⟹ **裁定: `ζ` は ambient `W` でなく `D ∩ U` の元として取る**。段 (3) の結論は
+
+> `∃ ζ' ∈ D ∩ U`, `∃ ω ∈ (Q ∩ U) ∖ Q₀`, `f ω = ζ'⁻¹ ω⁻¹ ζ'`
+
+の形にする。これで十分な理由:
+* `f₁ x` と `ζ'⁻¹x⁻¹ζ'` はどちらも `Q ∩ U` に居るので、
+  `eq_of_mk_eq_of_mem_Q` (170) で商の等式が `U` の等式へ格上げされる。
+* `exists_fgh_residual` (169) で `f₁` を ambient の `f` に置き換えられる。
+* 書籍の `ζ ∈ C_W(P∩U)` への精密化は §4 の後段が要求したときに足せばよい
+  (`C_W(P∩U) ⊆ D ∩ U` なので結論は弱くならない)。
+
+**次セッション**: この形で段 (3) の主定理を組む。材料は
+`corollaryTwo_intrinsicResidualQuotient` (167) / `exists_fgh_residual` (169) /
+`fgh_residualQuotient_eq` (169) / `eq_of_mk_eq_of_mem_Q` (170) の 4 本。
+⚠ `ω` の持ち上げは `Q(intr) = (Q.subgroupOf U).map π` から、`ζ'` の持ち上げは
+`W(intr) ≤ D(intr) = (D.subgroupOf U).map π` から (どちらも `Subgroup.mem_map`)。
