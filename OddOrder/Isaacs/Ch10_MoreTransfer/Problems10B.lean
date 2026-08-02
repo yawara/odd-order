@@ -8,6 +8,7 @@ import Mathlib.Data.ZMod.Units
 import Mathlib.Data.Nat.Totient
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.GroupTheory.PGroup
+import Mathlib.GroupTheory.Nilpotent
 
 /-!
 # Isaacs, Finite Group Theory — Problems 10B (書籍 p. 312)
@@ -208,6 +209,74 @@ theorem isPGroup_problem10B1 (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
   rw [SemidirectProduct.card, Nat.card_zpowers, hk, pow_add]
   congr 1
   rw [Nat.card_congr (Multiplicative.toAdd (α := ZMod (p ^ n))), Nat.card_zmod]
+
+/-! ## 下降中心列の下からの評価 -/
+
+/-- `φ a` の作用: `a = unitAutHom m u` を `zpowers a` の元と見たとき `(ofAdd v)^a = ofAdd (u v)`. -/
+theorem subtype_zpowers_unitAutHom_apply (m : ℕ) (u : (ZMod m)ˣ) (v : ZMod m) :
+    (Subgroup.subtype (Subgroup.zpowers (unitAutHom m u)))
+        ⟨unitAutHom m u, Subgroup.mem_zpowers _⟩ (Multiplicative.ofAdd v)
+      = Multiplicative.ofAdd ((u : ZMod m) * v) := rfl
+
+/-- **下からの評価**: `x^{p^{k+1}}` は `γ_{k+1}` (mathlib の添字) に入る. -/
+theorem inl_ofAdd_pow_mem_lowerCentralSeries
+    {u : (ZMod (p ^ n))ˣ} (hu : (u : ZMod (p ^ n)) = 1 + (p : ZMod (p ^ n))) (k : ℕ) :
+    (SemidirectProduct.inl (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (k + 1))) :
+        problem10B1Group (p ^ n) u)
+      ∈ (⊤ : Subgroup (problem10B1Group (p ^ n) u)).lowerCentralSeries (k + 1) := by
+  have hstep : ∀ v : ZMod (p ^ n),
+      ((Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ n) u)))
+        ⟨unitAutHom (p ^ n) u, Subgroup.mem_zpowers _⟩ (Multiplicative.ofAdd v))
+        * (Multiplicative.ofAdd v)⁻¹ = Multiplicative.ofAdd ((p : ZMod (p ^ n)) * v) := by
+    intro v
+    rw [subtype_zpowers_unitAutHom_apply, ← ofAdd_neg, ← ofAdd_add, hu]
+    congr 1
+    ring
+  induction k with
+  | zero =>
+    rw [Subgroup.lowerCentralSeries_succ]
+    have hc := commutatorElement_inr_inl
+      (φ := Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ n) u)))
+      ⟨unitAutHom (p ^ n) u, Subgroup.mem_zpowers _⟩ (Multiplicative.ofAdd (1 : ZMod (p ^ n)))
+    have hval : (SemidirectProduct.inl (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ 1)) :
+        problem10B1Group (p ^ n) u)
+        = ⁅(SemidirectProduct.inr ⟨unitAutHom (p ^ n) u, Subgroup.mem_zpowers _⟩ :
+            problem10B1Group (p ^ n) u),
+          SemidirectProduct.inl (Multiplicative.ofAdd (1 : ZMod (p ^ n)))⁆ := by
+      rw [hc, hstep, mul_one, pow_one]
+    rw [hval]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+  | succ k ih =>
+    rw [Subgroup.lowerCentralSeries_succ]
+    have hc := commutatorElement_inl_left
+      (φ := Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ n) u)))
+      (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (k + 1)))
+      (SemidirectProduct.inr ⟨unitAutHom (p ^ n) u, Subgroup.mem_zpowers _⟩)
+    rw [SemidirectProduct.rightHom_inr] at hc
+    have hmem : (⁅(SemidirectProduct.inl
+        (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (k + 1))) : problem10B1Group (p ^ n) u),
+        SemidirectProduct.inr ⟨unitAutHom (p ^ n) u, Subgroup.mem_zpowers _⟩⁆)
+        ∈ ⁅(⊤ : Subgroup (problem10B1Group (p ^ n) u)).lowerCentralSeries (k + 1),
+          (⊤ : Subgroup (problem10B1Group (p ^ n) u))⁆ :=
+      Subgroup.commutator_mem_commutator ih (Subgroup.mem_top _)
+    have hcalc : (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (k + 1))) *
+        ((Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ n) u)))
+          ⟨unitAutHom (p ^ n) u, Subgroup.mem_zpowers _⟩
+          (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (k + 1))))⁻¹
+        = (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (k + 1 + 1)))⁻¹ := by
+      rw [subtype_zpowers_unitAutHom_apply]
+      simp only [← ofAdd_neg, ← ofAdd_add]
+      congr 1
+      rw [hu]
+      ring
+    rw [hc, hcalc] at hmem
+    rw [show (SemidirectProduct.inl
+          ((Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (k + 1 + 1)))⁻¹) :
+            problem10B1Group (p ^ n) u)
+        = (SemidirectProduct.inl
+            (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (k + 1 + 1))))⁻¹ from
+      map_inv SemidirectProduct.inl _] at hmem
+    simpa using Subgroup.inv_mem _ hmem
 
 end
 
