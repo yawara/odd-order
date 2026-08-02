@@ -335,6 +335,49 @@ theorem exists_mem_K_conj_t_eq {d : G} (hd : d ∈ hyp.K) :
     _ = e⁻¹ * e⁻¹ * hyp.t := by rw [hte]
     _ = d * hyp.t := by rw [hdd]
 
+/-- **Step (3), quotient half** (Peterfalvi Part II, Ch. IV §4, p. 133): the mappings of
+`U` and those of `U/Z(U)` correspond under the projection.
+
+`IsFGH.map` — written for this step — applied to `π : U → U/Z(U)`: the conclusions
+computed on `U/Z(U)` (step (2)) are the images of the ones on `U`, so together with
+`exists_fgh_residual` they are the images of the *ambient* `f`, `h`.
+
+The hypothesis is `π x ≠ 1`, i.e. `x ∉ Z(U)` — the book's `P ∩ U` is the kernel. -/
+theorem fgh_residualQuotient_eq (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X))
+    {f₁ g₁ h₁ : ↥(residualImage (G := G) X) → ↥(residualImage (G := G) X)}
+    (H₁ : OddOrder.GroupTheory.RankOneBNPair.IsFGH
+      (hyp.H.subgroupOf (residualImage (G := G) X))
+      (hyp.Q.subgroupOf (residualImage (G := G) X))
+      (hyp.D.subgroupOf (residualImage (G := G) X))
+      ⟨hyp.t, hyp.t_mem_residual htX⟩ f₁ g₁ h₁)
+    {f₂ g₂ h₂ : (↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X)) →
+      ↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X)}
+    (H₂ : OddOrder.GroupTheory.RankOneBNPair.IsFGH
+      ((hyp.H.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
+      ((hyp.Q.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
+      ((hyp.D.subgroupOf (residualImage (G := G) X)).map
+        (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))))
+      (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))
+        ⟨hyp.t, hyp.t_mem_residual htX⟩) f₂ g₂ h₂)
+    {x : ↥(residualImage (G := G) X)} (hxQ : (x : G) ∈ hyp.Q)
+    (hx1 : QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) x ≠ 1) :
+    f₂ (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) x)
+        = QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) (f₁ x) ∧
+      h₂ (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) x)
+        = QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) (h₁ x) := by
+  obtain ⟨hf, -, hh⟩ := OddOrder.GroupTheory.RankOneBNPair.IsFGH.map
+    (hyp.setup_residualQuotient hXD htX hCQ hZD) H₁ H₂
+    (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))) rfl
+    (fun y hy => ⟨y, hy, rfl⟩) (fun y hy => ⟨y, hy, rfl⟩)
+    (Subgroup.mem_subgroupOf.mpr hxQ) hx1
+  exact ⟨hf, hh⟩
+
 end Centralizer
 
 universe u v
