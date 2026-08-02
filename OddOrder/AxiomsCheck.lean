@@ -15235,3 +15235,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch10.not_surjective_regularWreath_of_quaternionProd
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch10.quaternionProd_aut_fixes_mod_frattini
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.transfer_range_eq_of_quaternionProd

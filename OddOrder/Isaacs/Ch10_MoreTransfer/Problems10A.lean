@@ -7,6 +7,7 @@ import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality.Basic
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
+import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
 import Mathlib.GroupTheory.IndexNormal
 import Mathlib.GroupTheory.SpecificGroups.Quaternion
 import OddOrder.GroupTheory.CommGroupAut
@@ -1131,5 +1132,33 @@ theorem le_socle_of_exists_normal_complement {G : Type*} [Group G] [Finite G] {E
   exact inf_le_left
 
 end -- 10B.2 の骨格
+
+section /- 10A.4: `P ≅ Q₈ × C₂` なら `N_G(P)` が 2-transfer を制御する (p. 308) -/
+
+/-- **10A.4 の Yoshida 適用**: Sylow `2`-部分群が `Q₈ × C₂` に同型なら `N_G(P)` は
+`2`-transfer を制御する (`G`-transfer の像 = `N`-level transfer の像).
+
+Isaacs Cor 10.2 と同じ骨格: 常に `v(G) ⊆ w(N)` なので, 等しくなければ真包含となり
+Yoshida (Thm 10.1) が `C₂ ≀ C₂ ↞ P` を与えるが,
+`not_surjective_regularWreath_of_quaternionProd` に反する. -/
+theorem transfer_range_eq_of_quaternionProd {G : Type*} [Group G] [Finite G] (P : Sylow 2 G)
+    (e : ↥(P : Subgroup G) ≃* (QuaternionGroup 2 × Multiplicative (ZMod 2))) :
+    (MonoidHom.transfer (Abelianization.of (G := ↥(P : Subgroup G)))).range
+      = (MonoidHom.transfer (OddOrder.GroupTheory.transferRes Subgroup.le_normalizer
+          (Abelianization.of (G := ↥(P : Subgroup G))))).range := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  by_contra hne
+  have hle : (MonoidHom.transfer
+        (Abelianization.of (G := ↥(P : Subgroup G)))).range
+      ≤ (MonoidHom.transfer (OddOrder.GroupTheory.transferRes Subgroup.le_normalizer
+          (Abelianization.of (G := ↥(P : Subgroup G))))).range := by
+    rw [← OddOrder.GroupTheory.transfer_transfer Subgroup.le_normalizer
+      (Abelianization.of (G := ↥(P : Subgroup G)))]
+    exact OddOrder.GroupTheory.transfer_range_le _
+  obtain ⟨φ, hφ⟩ := exists_surjective_wreath_of_transfer_range_lt P (lt_of_le_of_ne hle hne)
+  exact not_surjective_regularWreath_of_quaternionProd (φ.comp e.symm.toMonoidHom)
+    (hφ.comp e.symm.surjective)
+
+end
 
 end OddOrder.Isaacs.Ch10
