@@ -8687,3 +8687,33 @@ def W : Subgroup G := hyp.V ⊓ Subgroup.centralizer hyp.KSet   -- Basic.lean:18
 **§4 の数学は完結**。残るのは §4 の standing data からこの定理の仮説を供給する
 配線 (step (1)–(3) の `ω`,`ζ`,`η`,`y` と `hq`, `hηord`, `hznot` 等) と、
 §3 Corollary 1 への接続。
+
+### (198) 書籍 p.133 の refinement `ζ₁ ∈ ζ P` を形式化
+
+`Hypothesis.conj_inv_eq_of_commute` / `Hypothesis.cube_mul_eq_of_commute` — 書籍の
+
+> `f(ω) = ω^{-ζ₁} = ω^{-ζ}` and `h(ω) = h₁(ω) ∈ ζ³P`
+
+の中身。`inf_le_sup_centralizer_W` が `ζ₁ = p ζ` (`p ∈ P`, `ζ ∈ C_W(P)`) を与え、
+`ω ∈ C_Q(P)` なので `p` が `ω` を中心化 ⟹ `ω^{ζ₁} = ω^ζ`;
+`p` と `ζ` が可換なので `(pζ)³ c = ζ³(p³c)` ⟹ `h(ω) ∈ ζ³P`。
+
+**残り = §4 standing data からの配線のみ** (新しい数学は無い):
+`sectionFour_mem_W` の仮説を供給する:
+| 仮説 | 供給元 |
+|---|---|
+| `ω`,`ζ₁`,`η` | `exists_f_eq_conj_inv_residual` (step (3)) |
+| `ζ₁ = p·ζ`, `ζ ∈ C_W(P)` | `SectionFourSetup.inf_le_sup_centralizer_W` |
+| `hf`, `hkω` | 上の 2 補題で `ζ₁ → ζ` に書き換え |
+| `hηζ`, `hηω` | `η ∈ P` (step (1) の `Z(U) ⊆ P` = `eq_P_of_centralizes`) + `ζ ∈ C_W(P)` / `ω ∈ C_Q(P)` |
+| `htη` | `η ∈ Z(U)`, `t ∈ U` (`t_mem_primeComplementResidual`) |
+| `hηord` | `η ∈ P`, `|P| = p` 奇素数 |
+| `y = ω²∈ Q₀` | `Q/Q₀` が基本可換 |
+| `hq : 8 < 2^m` | `q = ℓ^p`, `ℓ = 2^n > 2` (n≥2), `p ≥ 3` ⟹ `m = np ≥ 6` |
+| `hznot` | `mu_W_notMem_frobFixed` (要 `hmu`, `ζ ≠ 1`) |
+| `M`,`s` | 周囲の `nonempty_quotientFieldModel_of_orderThree` / `LemmaFiveSetup` |
+
+⚠ この 2 本は `namespace Hypothesis` 内に置いたので完全名は
+`…Suzuki.Hypothesis.conj_inv_eq_of_commute`。AxiomsCheck の登録名を
+`Hypothesis.` 抜きで書いてフルビルドで赤になった (leaf build は通る —
+`#assert_only_allowed_axioms` は AxiomsCheck.lean にしか無いので)。

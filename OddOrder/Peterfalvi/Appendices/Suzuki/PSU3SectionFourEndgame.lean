@@ -49,6 +49,8 @@ membership facts it needs on the model:
   with `a` and `b` produced rather than assumed.
 * `Hypothesis.coordFieldAut_sq_eq_id_on_frobFixed` — **`μ² = id` on `F`**, the shift trick
   plus the count of the excluded points.
+* `conj_inv_eq_of_commute`, `cube_mul_eq_of_commute` — the book's refinement
+  `ζ₁ ∈ ζ P` (p. 133): `ω^{ζ₁} = ω^ζ` and `ζ₁³ P = ζ³ P`.
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
 -/
 
@@ -719,6 +721,39 @@ theorem coordFieldAut_sq_eq_id_on_frobFixed {f g k : G → G}
     push_cast
     exact hc
   exact sectionFour_fixed_of_shift σ.toRingHom hTz hTz1
+
+/-! ### The book's refinement `ζ₁ ∈ ζ P`
+
+Peterfalvi Part II, Ch. IV §4, p. 133:
+
+> Let `ζ₁ ∈ (V ∩ U) − (P ∩ U)` and `ζ ∈ C_W(P)` be such that `ζ₁ ∈ ζ P`.  ... there is an
+> element `ω ∈ (Q − Q₀) ∩ U` such that `f₁(ω) ∈ ω^{-ζ₁}(P ∩ U)` and
+> `h₁(ω) ∈ ζ₁³ (P ∩ U)`.  ... `f(ω) = ω^{-ζ₁} = ω^{-ζ}` and `h(ω) = h₁(ω) ∈ ζ³ P`.
+
+`inf_le_sup_centralizer_W` supplies the factorization `ζ₁ = p ζ` with `p ∈ P` and
+`ζ ∈ C_W(P)`; these two lemmas are the "`= ω^{-ζ}`" and "`∈ ζ³ P`" of the display.  Both
+are pure group algebra: `ω` is centralized by `P` (it lies in `C_Q(P)`), and `p` commutes
+with `ζ` because `ζ ∈ C_W(P)`. -/
+
+omit [Finite G] in
+/-- **`ω^{ζ₁} = ω^ζ` when `ζ₁ = p ζ` with `p ∈ P` centralizing `ω`.** -/
+theorem conj_inv_eq_of_commute {p w ω : G} (hpω : p * ω = ω * p) :
+    (p * w)⁻¹ * ω⁻¹ * (p * w) = w⁻¹ * ω⁻¹ * w := by
+  have hcomm : Commute p ω := hpω
+  have hinv : p⁻¹ * ω⁻¹ * p = ω⁻¹ := by
+    have h : ω⁻¹ * p = p * ω⁻¹ := hcomm.inv_right.eq.symm
+    calc p⁻¹ * ω⁻¹ * p = p⁻¹ * (ω⁻¹ * p) := by group
+      _ = p⁻¹ * (p * ω⁻¹) := by rw [h]
+      _ = ω⁻¹ := by group
+  calc (p * w)⁻¹ * ω⁻¹ * (p * w) = w⁻¹ * (p⁻¹ * ω⁻¹ * p) * w := by group
+    _ = w⁻¹ * ω⁻¹ * w := by rw [hinv]
+
+omit [Finite G] in
+/-- **`ζ₁³ c = ζ³ (p³ c)` when `p` and `ζ` commute** — the book's `h(ω) ∈ ζ³ P`. -/
+theorem cube_mul_eq_of_commute {p w c : G} (hpw : p * w = w * p) :
+    (p * w) ^ 3 * c = w ^ 3 * (p ^ 3 * c) := by
+  have hcomm : Commute p w := hpw
+  rw [hcomm.mul_pow 3, (hcomm.pow_pow 3 3).eq, mul_assoc]
 
 include hyp in
 /-- **🎯🎯 Peterfalvi Part II, Ch. IV §4, p. 134: `η ∈ W` and `h(ω) ∈ W`.**
