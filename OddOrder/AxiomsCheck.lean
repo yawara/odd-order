@@ -22,6 +22,7 @@ import OddOrder.GroupTheory.WeaklyClosed
 import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.CentralExtensionAutomorphisms
 import OddOrder.GroupTheory.RankOneBNPair
+import OddOrder.GroupTheory.Transvection
 import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
@@ -15131,3 +15132,7 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.eq_one_of_three_fixedPoints_of_V_eq_bot
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.natCard_normal_ne_natCard_Omega
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.LinearMap.transvectionSubgroup_isMulCommutative
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.LinearMap.transvectionSubgroup_map_conj

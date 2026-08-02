@@ -59,6 +59,7 @@ import OddOrder.GroupTheory.HallPetresco
 import OddOrder.GroupTheory.RegularPGroup
 import OddOrder.GroupTheory.CNGroupStructure
 import OddOrder.GroupTheory.ThreeStepGroup
+import OddOrder.GroupTheory.Transvection
 import OddOrder.GroupTheory.ThompsonSubgroupAbelian
 import OddOrder.GroupTheory.GlaubermanReplacement
 import OddOrder.GroupTheory.GlaubermanZJ
