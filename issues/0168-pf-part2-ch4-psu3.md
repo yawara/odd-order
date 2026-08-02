@@ -8717,3 +8717,17 @@ def W : Subgroup G := hyp.V ⊓ Subgroup.centralizer hyp.KSet   -- Basic.lean:18
 `…Suzuki.Hypothesis.conj_inv_eq_of_commute`。AxiomsCheck の登録名を
 `Hypothesis.` 抜きで書いてフルビルドで赤になった (leaf build は通る —
 `#assert_only_allowed_axioms` は AxiomsCheck.lean にしか無いので)。
+
+### (199) `q > 8` (数え上げ仮説) を §4 の数値から
+
+`SectionFourSetup.eight_lt_natCard_Q0` — step (1) の `q = |Q₀| = ℓ^p`
+(`natCard_Q0_eq_pow_cardP`) と `ℓ > 2`、`p ≥ 3` (奇素数) から `q ≥ 27`。
+これが `coordFieldAut_sq_eq_id_on_frobFixed` の `hq : 8 < 2^m` (書籍の
+「if `μ ≠ 1`, then `|F| ≥ 8`」) を供給する。
+
+**残り配線 (新しい数学無し)**: `sectionFour_mem_W` の残りの仮説を
+`SectionFourSetup` + step (3) (`exists_f_eq_conj_inv_residual`) から供給する。
+⚠ step (3) は `X : Subgroup G` + `details : CentralizerPSUData` で
+パラメータ化されているので、`X := s4.P` と
+`isStandardModel_centralizerQuotient` (`PSU3SectionFourIntrinsic.lean:1350`)
+から `details` を組む配管が要る。

@@ -49,6 +49,7 @@ membership facts it needs on the model:
   with `a` and `b` produced rather than assumed.
 * `Hypothesis.coordFieldAut_sq_eq_id_on_frobFixed` — **`μ² = id` on `F`**, the shift trick
   plus the count of the excluded points.
+* `Hypothesis.SectionFourSetup.eight_lt_natCard_Q0` — `q > 8`, the counting hypothesis.
 * `conj_inv_eq_of_commute`, `cube_mul_eq_of_commute` — the book's refinement
   `ζ₁ ∈ ζ P` (p. 133): `ω^{ζ₁} = ω^ζ` and `ζ₁³ P = ζ³ P`.
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
@@ -721,6 +722,26 @@ theorem coordFieldAut_sq_eq_id_on_frobFixed {f g k : G → G}
     push_cast
     exact hc
   exact sectionFour_fixed_of_shift σ.toRingHom hTz hTz1
+
+/-- **`q > 8`** (Peterfalvi Part II, Ch. IV §4, p. 134: "if `μ ≠ 1`, then `|F| ≥ 8`").
+
+Step (1) computes `q = |Q₀| = ℓ^p` with `ℓ = |C_{Q₀}(P)|` and `p` the odd prime order of
+`P` (`natCard_Q0_eq_pow_cardP`).  The section's standing `ℓ > 2` and `p ≥ 3` give
+`q ≥ 27`, which is the counting hypothesis `hq` of
+`coordFieldAut_sq_eq_id_on_frobFixed`. -/
+theorem SectionFourSetup.eight_lt_natCard_Q0 (s4 : hyp.SectionFourSetup)
+    (hl : 2 < Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G)))) :
+    8 < Nat.card ↥hyp.Q0 := by
+  rw [s4.natCard_Q0_eq_pow_cardP]
+  have hp : 3 ≤ s4.cardP := by
+    obtain ⟨j, hj⟩ := s4.odd_cardP
+    have h2 := s4.prime_cardP.two_le
+    omega
+  calc 8 < 3 ^ 3 := by norm_num
+    _ ≤ Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) ^ 3 :=
+        Nat.pow_le_pow_left hl 3
+    _ ≤ Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) ^ s4.cardP :=
+        Nat.pow_le_pow_right (by omega) hp
 
 /-! ### The book's refinement `ζ₁ ∈ ζ P`
 
