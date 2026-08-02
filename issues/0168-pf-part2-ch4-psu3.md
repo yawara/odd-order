@@ -8229,3 +8229,35 @@ StepThree)。ページ画像だけ見て「未形式化」と判断しない。
   `a²·Y = ζ⁻¹·Y^η + ω̄` = 書籍の **(4)**。`stepTwo_linear` は `η = 1` の場合。
 * (3) は §2 (2) から同様に。
 * 以後は既存の `sectionFour_*` に配線するだけ。
+
+### (179) §4 (4) の導出プラン (次セッションはこれを実装)
+
+書籍 p.133 の連鎖を repo 補題に割り付けた:
+
+```
+f(ω⁻¹ s^{a⁻¹})  =  f(f(ω⁻¹)s^a)^{a²} s^a        … §2 (2) = f_mul_conj_distinguishedInvolution
+                =  f(g(ω⁻¹)s^a)^{h(ω⁻¹)^t} f(ω⁻¹)  … §2 (3) = f_conj_distinguishedInvolution_mul
+```
+に、段 (3) の出力を代入する:
+* `f ω = ζ⁻¹ω⁻¹ζ` (段 (3) の f 側)
+* `f(ω⁻¹) = ζωζ⁻¹` (`f_inv_eq`, 既存)
+* `g(ω⁻¹) = ζ⁻¹ωζ` (`g_inv_eq`, 既存)
+* `h(ω) = ζ³η` (段 (3) の h 側, (177))、`h(ω⁻¹) = (h(ω)^t)⁻¹` ((H4) = `hOne`)
+  ⟹ `t` は `ζ ∈ W ≤ V` と `η ∈ P ≤ V` を中心化するので `h(ω⁻¹)^t = h(ω)⁻¹ = η⁻¹ζ⁻³`
+
+⟹ 群レベルの結論 (書籍の displayed 式):
+```
+f(ω^{ζ⁻¹} s^a)^{a²} s^a = f(ω^ζ s^a)^{ζ⁻³η} ω^{ζ⁻¹}
+```
+
+**E 座標へ落とす** (手本 = `stepTwo_linear`, `PSU3SectionThree.lean:354`):
+* `s^a ∈ Q₀` は消える (`coord_mk_eq_zero_of_mem_Q0`)
+* `ζ`,`a²` による共役はスカラー倍 (`coord_conj_eq` / `conjQHom_kActor_apply_val`)
+* **`η` による共役だけはスカラーでなく半線形** — ここが §3 との違い。
+  `SemilinearField.lean:196` (Appendix I Prop 2 (a)+(b)) で `η` の作用に付随する
+  体自己同型 `μ` を取り出し、`(·)^η` を `μ`-半線形写像として扱う。
+⟹ 書籍の **(4)** `a²·Y = ζ⁻¹·Y^η + ω̄` が出る。**(3)** は §2 (2) だけから同様。
+
+以後は `sectionFour_seven_book` / `_eight_book` / `_nine` / `sectionFour_sq_eq_id` /
+`eq_one_of_sq_eq_one_of_odd_pow` に配線して `μ = 1` ⟹ `η ∈ W` ⟹ `h(ω) ∈ W` ⟹
+§3 Corollary 1 で Ch. IV 完了。
