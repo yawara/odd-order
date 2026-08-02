@@ -31,6 +31,8 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
 import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -15038,3 +15040,17 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.standardModel_f_rootHom
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.exists_standardModel_fgh
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.unitaryRootEquiv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki2Groups.unitaryRootEquiv_reciprocal
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_conj_KW_of_coset_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.ncard_le_card_W_of_f_eq_conj
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.ncard_le_card_W_sub_one_of_f_eq_conj_self
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.stepEight_of_KW
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_Q0_orbitOfF_eq_of_KW

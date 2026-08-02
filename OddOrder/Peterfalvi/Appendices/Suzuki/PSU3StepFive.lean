@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3InverseFormula
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
 
 /-!
 # Peterfalvi Part II, Ch. IV §3 (5): the second case, wired up
@@ -416,7 +417,7 @@ theorem stepFive (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) = ((M.mu (k, 1) : M.Eˣ) : M.E) ^ 2)
     (hs : (ν : M.E) *
       hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0 = 1)
-    (hVW : hyp.V = hyp.W) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (hinj : Function.Injective M.mu)
     (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
     (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
@@ -460,7 +461,7 @@ theorem stepFive (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = ((M.mu kv : M.Eˣ) : M.E) * (Ψ ⟨ω, hωQ⟩).quotient
   · exact key ρ hρQ horb
   -- ### the second case: move inside the fibre of `ρ` so that `f` lands in the orbit
-  obtain ⟨x, hx⟩ := hyp.exists_mem_Q0_orbitOfF_eq M hZc H hC2 hVW hm hQ0card hinj
+  obtain ⟨x, hx⟩ := hyp.exists_mem_Q0_orbitOfF_eq_of_KW M hZc H hC2 hm hQ0card hinj
     hKcard hWdvd hW1 hρQ hρQ0 (QuotientGroup.mk (hyp.baseUnit M hZc hωQ hωQ0))
   obtain ⟨hρxQ, hρxQ0⟩ := hyp.mul_mem_sdiff_Q0 hρQ hρQ0 x.2
   have hρx0 : (Ψ ⟨ρ * (x : G), hρxQ⟩).quotient ≠ 0 := hne0 _ hρxQ hρxQ0
@@ -620,7 +621,7 @@ theorem corollaryTwo_of_stepFour (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 :=
   hyp.corollaryTwo H M hZc hVW Φ hquot hu Ψ hΨq hconjq hconjy hmu hζ hζ1 hfQ
     (fun _ρ hρQ hρQ0 => hyp.stepFive H hC2 sfive M hZc Φ hquot ι hker hu Ψ hene hΨq hΨc
-      hconjq hconjy d hequiv hdsq hs hVW hm hQ0card hmu hKcard hWdvd hW1 hfQ hω₀Q hω₀Q0
+      hconjq hconjy d hequiv hdsq hs hm hQ0card hmu hKcard hWdvd hW1 hfQ hω₀Q hω₀Q0
       hcover hρQ hρQ0)
 
 /-- **Stage (5) determines `f` off `Q₀`** — the first sentence of Corollary 1's proof
