@@ -251,3 +251,37 @@ engine = `Hypothesis.exists_conjQMulEquiv_actionEquiv` (`PointCoordinates.lean`)
 `actionEquiv := α` (同変性は engine の出力) / `actionEquiv_bijective := α.bijective`。
 ⟹ `TheoremAConclusion` の `L := O^{2′}(G)`、`normal`・`oddIndex` は
 `primeComplementResidual` の一般論。
+
+## ✅ Corollary 1 完了 (2026-08-02)
+
+`PSU3CorollaryOne.lean`:
+```
+Hypothesis.nonempty_theoremAConclusion_psu3
+  : (§3 Proposition の結論 hform) + 模型データ + `IsPGroup 2 Q`
+    ⟹ Nonempty (TheoremAConclusion G Ω)      -- L = O^{2′}(G), target = psu3
+```
+経路: `exists_mulEquiv_intertwining_f` (座標同型が `f` と `f'` を intertwine)
+→ `exists_conjQMulEquiv_actionEquiv` (§1 Lemma の置換群版)
+→ `exists_mulEquiv_standardPermGroup` (`⟨Q^x⟩ ≃* standardPermGroup q` + 同変 `α`)
+→ `nonempty_psu3InductionTarget` (`Q` は Sylow 2 ⟹ `⟨Q^x⟩ = O^{2′}(G)`)
+→ `nonempty_theoremAConclusion_psu3`。
+
+## 次の作業 = §4 の出力を Corollary 1 に繋ぐ配線
+
+`nonempty_theoremAConclusion_psu3` の入力 `hform` は
+`proposition_inverseFormula_of_ne_one` が与えるが、そこには模型データ
+(`sfive`, `M`, `Φ`, `hquot`, `ι`, `hker`, `Ψ`, `hene`, `hΨq`, `hΨc`,
+`hconjq`, `hconjy`, `d`, `hequiv`, `hdsq`, `hs`, `hstage3` + numerology) が要る。
+
+**その配管は Corollary 2 側に既に在る**: `corollaryTwo_of_isStandardModel`
+(`PSU3CorollaryTwo.lean:746`) → `corollaryTwo_of_sectionThree` が
+`IsStandardModel` から `Φ/Ψ/hconjq/hconjy/hstage3/...` を全部組む。
+⟹ **同じ配管で終点を Corollary 2 でなく `hform` にした版**
+(`proposition_of_isStandardModel` 仮称) を作れば、
+`corollaryTwo_of_isStandardModel_of_closing` と同じ入力
+(`IsStandardModel` + numerology) から Corollary 1 に届く。
+
+⚠ ただし `corollaryTwo_of_sectionThree` 系はまだ `hVW : V = W` を持つ
+(Corollary 2 は `G ≅ PSU(3,q)` の話なので正当)。`hform` 版では
+`hVW` の代わりに §4 が与える `h(ω) ∈ W` を使う
+(`proposition_inverseFormula_of_ne_one` の `hhW`)。
