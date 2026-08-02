@@ -8341,3 +8341,19 @@ E 座標へ落とす段の設計を詰めた結果、`stepTwo_linear` をその�
 既存の `QuotientFieldModel` の体と `exists_field_semilinear` が返す体 `F` の同定
 (`FiniteField.ringEquivOfCardEq` 経由。`exists_center_coordinate_exponent` が
 中心について同じことをやっているので、それが手本)。
+
+### (184) `η` の正規化条件の材料 — `K_normal` が在る
+
+`K_normal : (hyp.K.subgroupOf hyp.D).Normal` (`KCyclic.lean:819`) が既存。
+⟹ `η ∈ D` は `K` を正規化する。
+
+`exists_field_semilinear` に渡す形にするには:
+* `T := ↥hyp.actualKActor` (`MulAut ↥Q` の部分群; `conjQByK` の像)
+* `ψ : T →* MulAut (Q ⧸ Z(Q))` — 既存の `conjQHom` / `quotientMulAutHom` 系
+* `g :=` `η` による `Q ⧸ Z(Q)` の自己同型
+* `c : T ≃* T` := `η` による共役 (`K_normal` から well-defined)
+* 条件 `∀ t, ψ (c t) = g * ψ t * g⁻¹` は「共役は準同型」から
+
+⚠ 実装は `actualKActor` (= `MulAut ↥Q` 内の部分群) への `η`-共役が
+`actualKActor` を保つことを示す所が中心。`conjQByK` の定義に沿って
+`η k η⁻¹ ∈ K` (`K_normal`) を持ち上げる。
