@@ -15229,3 +15229,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch09.isSimpleGroup_and_not_isMulCommutative_of_isKegelMinimalCounterexample
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch10.pow_eq_one_of_center_isComplement
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.not_surjective_of_quaternionProd

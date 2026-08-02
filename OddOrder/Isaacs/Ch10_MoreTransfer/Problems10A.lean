@@ -511,6 +511,89 @@ theorem quaternionTwo_commutatorElement (g h : QuaternionGroup 2) :
 
 end
 
+/-- **10A.4 の第一段**: 位数 `8` で非可換かつ involution を 2 つ以上もつ群は
+`Q₈ × C₂` の準同型像でない.
+
+核は位数 `2` ゆえ中心的。`z := (a 2, 1)` (= `Q₈ × 1` の唯一の involution) が核に入るなら,
+交換子はつねに `1` か `z` (`quaternionTwo_commutatorElement`) なので像は可換で矛盾。
+入らないなら `Q₈ × 1 → W` は単射で位数がともに `8` ゆえ全単射, したがって `W` の
+involution は `Q₈` と同じく一意で矛盾。 -/
+theorem not_surjective_of_quaternionProd {W : Type*} [Group W] [Finite W]
+    (hcard : Nat.card W = 8) (hnc : ¬ IsMulCommutative W)
+    {w v : W} (hwv : w ≠ v) (hw1 : w ≠ 1) (hv1 : v ≠ 1) (hw2 : w ^ 2 = 1) (hv2 : v ^ 2 = 1)
+    (φ : (QuaternionGroup 2 × Multiplicative (ZMod 2)) →* W) : ¬ Function.Surjective φ := by
+  intro hsurj
+  set z : QuaternionGroup 2 × Multiplicative (ZMod 2) := (QuaternionGroup.a 2, 1) with hzdef
+  have hcardP : Nat.card (QuaternionGroup 2 × Multiplicative (ZMod 2)) = 16 := by
+    rw [Nat.card_prod, Nat.card_eq_fintype_card (α := QuaternionGroup 2),
+      QuaternionGroup.card, Nat.card_eq_fintype_card (α := Multiplicative (ZMod 2))]
+    simp
+  by_cases hz : z ∈ φ.ker
+  · refine hnc ⟨⟨fun b c => ?_⟩⟩
+    obtain ⟨x, rfl⟩ := hsurj b
+    obtain ⟨y, rfl⟩ := hsurj c
+    have hsnd : (x * y * x⁻¹ * y⁻¹).2 = 1 := by
+      simp only [Prod.snd_mul, Prod.snd_inv]
+      rw [mul_comm x.2 y.2]
+      group
+    have hmem : x * y * x⁻¹ * y⁻¹ ∈ φ.ker := by
+      rcases quaternionTwo_commutatorElement x.1 y.1 with h | h
+      · have hone : x * y * x⁻¹ * y⁻¹ = 1 := by
+          refine Prod.ext ?_ ?_
+          · simpa only [Prod.fst_mul, Prod.fst_inv, Prod.fst_one] using h
+          · simpa only [Prod.snd_one] using hsnd
+        rw [hone]
+        exact Subgroup.one_mem _
+      · have hzz : x * y * x⁻¹ * y⁻¹ = z := by
+          refine Prod.ext ?_ ?_
+          · simpa only [Prod.fst_mul, Prod.fst_inv] using h
+          · simpa only [hzdef] using hsnd
+        rw [hzz]
+        exact hz
+    have h1 : φ x * φ y * (φ x)⁻¹ * (φ y)⁻¹ = 1 := by
+      simpa only [map_mul, map_inv] using MonoidHom.mem_ker.mp hmem
+    calc φ x * φ y = (φ x * φ y * (φ x)⁻¹ * (φ y)⁻¹) * (φ y * φ x) := by group
+      _ = φ y * φ x := by rw [h1, one_mul]
+  · exfalso
+    have hkerW : Nat.card ↥φ.ker * Nat.card W = 16 := by
+      have he : φ.ker.index = Nat.card W :=
+        Nat.card_congr (QuotientGroup.quotientKerEquivOfSurjective φ hsurj).toEquiv
+      have h1 := Subgroup.card_mul_index φ.ker
+      rw [he, hcardP] at h1
+      exact h1
+    have hker2 : Nat.card ↥φ.ker = 2 := by rw [hcard] at hkerW; omega
+    set ψ : QuaternionGroup 2 →* W := φ.comp (MonoidHom.inl _ _) with hψ
+    have hψinj : Function.Injective ψ := by
+      rw [← MonoidHom.ker_eq_bot_iff, Subgroup.eq_bot_iff_forall]
+      intro g hg
+      have hgk : ((g, 1) : QuaternionGroup 2 × Multiplicative (ZMod 2)) ∈ φ.ker := hg
+      by_contra hg1
+      have hord : orderOf (⟨(g, 1), hgk⟩ : ↥φ.ker) ∣ 2 := by
+        have hd := orderOf_dvd_natCard (⟨(g, 1), hgk⟩ : ↥φ.ker)
+        rwa [hker2] at hd
+      have hsq : ((g, 1) : QuaternionGroup 2 × Multiplicative (ZMod 2)) ^ 2 = 1 := by
+        simpa using congrArg Subtype.val (orderOf_dvd_iff_pow_eq_one.mp hord)
+      have hgsq : g ^ 2 = 1 := by simpa using congrArg Prod.fst hsq
+      rcases (quaternionTwo_sq_eq_one_iff g).mp hgsq with h | h
+      · exact hg1 h
+      · exact hz (by rw [hzdef, ← h]; exact hgk)
+    have hψsurj : Function.Surjective ψ := by
+      have hcQ : Nat.card (QuaternionGroup 2) = 8 := by
+        rw [Nat.card_eq_fintype_card, QuaternionGroup.card]
+      obtain ⟨e⟩ := Finite.card_eq.mp (hcQ.trans hcard.symm)
+      exact (Finite.injective_iff_surjective_of_equiv e).mp hψinj
+    obtain ⟨gw, rfl⟩ := hψsurj w
+    obtain ⟨gv, rfl⟩ := hψsurj v
+    have hgw : gw ^ 2 = 1 := hψinj (by rw [map_pow, hw2, map_one])
+    have hgv : gv ^ 2 = 1 := hψinj (by rw [map_pow, hv2, map_one])
+    have hgw1 : gw ≠ 1 := fun h => hw1 (by rw [h, map_one])
+    have hgv1 : gv ≠ 1 := fun h => hv1 (by rw [h, map_one])
+    rcases (quaternionTwo_sq_eq_one_iff gw).mp hgw with h | h
+    · exact hgw1 h
+    rcases (quaternionTwo_sq_eq_one_iff gv).mp hgv with h' | h'
+    · exact hgv1 h'
+    exact hwv (by rw [h, h'])
+
 section /- 10A.3 (後半への準備): 指数が素数の可換部分群 -/
 
 /-- 指数が素数 `p` の部分群は極大: `A ≤ H` なら `H = A` か `H = ⊤`. -/
