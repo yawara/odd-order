@@ -9084,3 +9084,24 @@ step (3) の出力 (`ζ₁ ∈ D ∩ U`, `x ∈ (Q−Q₀)∩U`, `f x = x^{-ζ�
    `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1`)。
 2. `exists_stepThree_data` の prescribed-`ζ̄` 版 (持ち上げ関係 (214) を
    出力に含める) ⟹ `z ∈ V`, `z ∉ P` を継承 ⟹ `mem_W_of_stepThree` で完結。
+
+### (219) 🎯🎯🎯🎯 **§4 全体が 1 本に組み上がった** — `SectionFourSetup.exists_mem_W`
+
+書籍 p.132–134 の §4 全体が
+```
+standing data + hcent + (ζ₁ ∈ V∩U, ζ₁ ∉ P)  ⟹  ∃ x ∈ Q − Q₀, k x ∈ W
+```
+として通った。内部の流れ:
+1. Glauberman の `ω` → `hZD` ((212)) と `Z(U) ⊆ P` ((215))
+2. `details` ((204))、`ζ̄ := mk' ζ₁ ∈ W̄` ((218))、`ζ̄ ≠ 1` (`Z(U) ⊆ P`, `ζ₁ ∉ P`)
+3. step (3) → `z` (持ち上げ関係 (214) 付き)
+4. `z = ζ₁·c₀` (`c₀ ∈ Z(U) ⊆ P`) ⟹ `z ∈ V`, `z ∉ P` を継承
+5. `mem_W_of_stepThree` ((211)) ⟹ `k x ∈ W`
+
+**§4 に残る外部入力は 2 つだけ**:
+* `hcent : V ⊓ U ≤ C(C_{Q₀}(P))` — 書籍「by the structure of PSU(3,ℓ),
+  (V ∩ U)/(P ∩ U) centralizes C_{Q₀}(P)」
+* `ζ₁ ∈ (V ∩ U) − (P ∩ U)` の存在 — 書籍
+  `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` (`ℓ > 2` だから)
+
+どちらも §4 step (2) の PSU(3,ℓ) 構造読み取りで、書籍でも 1 文の主張。

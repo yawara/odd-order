@@ -74,6 +74,8 @@ membership facts it needs on the model:
 * `Hypothesis.SectionFourSetup.center_residualImage_le_P` — **`Z(U) ⊆ P`** of step (1).
 * `Hypothesis.mem_W_intrinsicResidualQuotient_of_mem_V` — the book's `ζ₁ ∈ V ∩ U` really
   is an element of the quotient's `W̄`, because there `V̄ = W̄`.
+* `Hypothesis.SectionFourSetup.exists_mem_W` — **🎯🎯🎯🎯 all of §4 from the section's
+  standing data and the book's choice of `ζ₁`.**
 * `Hypothesis.SectionFourSetup.exists_stepThree_data` — that output, produced from the
   section's standing data (steps (1)–(3) plumbed together).
 -/
@@ -1322,6 +1324,91 @@ theorem mem_W_intrinsicResidualQuotient_of_mem_V
   exact Subtype.ext hζ₁t
 
 end Intrinsic
+
+include hyp in
+/-- **🎯🎯🎯🎯 Peterfalvi Part II, Ch. IV §4, from the section's standing data**
+(pp. 132–134).
+
+Given the book's `ζ₁ ∈ (V ∩ U) − (P ∩ U)`, the whole section runs: its image is a
+nontrivial element of the quotient's `W̄` (`mem_W_intrinsicResidualQuotient_of_mem_V`,
+`center_residualImage_le_P`), step (3) produces `z` lifting it, and `z` inherits
+`z ∈ V`, `z ∉ P` because it differs from `ζ₁` by an element of `Z(U) ⊆ P ≤ V`.
+`mem_W_of_stepThree` then gives `k(x) ∈ W`, which is what §3's Corollary 1 consumes. -/
+theorem SectionFourSetup.exists_mem_W (s4 : hyp.SectionFourSetup) {f g k : G → G}
+    (H : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g k)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (M : hyp.QuotientFieldModel m) (sfive : hyp.LemmaFiveSetup m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hmu : Function.Injective M.mu) (hQ2 : IsPGroup 2 ↥hyp.Q)
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
+    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer ((s4.P : Set G)))))
+    (ih : TheoremAInductionBelow G Ω)
+    (hl : 2 < Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))))
+    (hcent : hyp.V ⊓ residualImage (G := G) s4.P ≤ Subgroup.centralizer
+      (((hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) : Subgroup G) : Set G))
+    {ζ₁ : G} (hζ₁V : ζ₁ ∈ hyp.V) (hζ₁U : ζ₁ ∈ residualImage (G := G) s4.P)
+    (hζ₁P : ζ₁ ∉ s4.P) :
+    ∃ x ∈ hyp.Q, x ∉ hyp.Q0 ∧ k x ∈ hyp.W := by
+  classical
+  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  obtain ⟨ω, hωQ, hωQ0, hωfix⟩ := s4.exists_fixed_not_mem_Q0 hZ hCop hSolv
+  have hZD := SectionFourSetup.center_residualImage_le_D hyp s4 hQ2 hωQ hωQ0 hωfix
+  have hZP : ∀ {c : G} (hc : c ∈ residualImage (G := G) s4.P),
+      (⟨c, hc⟩ : ↥(residualImage (G := G) s4.P))
+        ∈ Subgroup.center ↥(residualImage (G := G) s4.P) → c ∈ s4.P := fun hc hcc =>
+    SectionFourSetup.center_residualImage_le_P hyp s4 M hZ hmu hQ2 hcent hωQ hωQ0 hωfix
+      hc hcc
+  obtain ⟨result, data, ⟨details⟩⟩ :=
+    hyp.nonempty_psu3Data_sectionFour s4 hZ hQsuz hCop hSolv hP hA3 hord ih
+  have hζ₁t : ζ₁ * hyp.t = hyp.t * ζ₁ :=
+    Subgroup.mem_centralizer_singleton_iff.mp hζ₁V.2
+  have hzbarW := hyp.mem_W_intrinsicResidualQuotient_of_mem_V details s4.P_le_D
+    s4.t_mem_centralizer hCQ hZD (hyp.V_le_D hζ₁V) hζ₁t hζ₁U
+  have hzbar1 : QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) s4.P))
+      ⟨ζ₁, hζ₁U⟩ ≠ 1 := by
+    intro hc
+    rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hc
+    exact hζ₁P (hZP hζ₁U hc)
+  obtain ⟨z, x, hzD, hzζ, hxQ, hxQ0, hfx, c, hcZ, hkx⟩ :=
+    hyp.exists_f_eq_conj_inv_residual H s4.P_le_V hP details s4.P_le_D
+      s4.t_mem_centralizer hCQ hZD ih _ hzbarW hzbar1
+  -- `z` differs from `ζ₁` by an element of `Z(U) ⊆ P`
+  have hdiff : (⟨ζ₁, hζ₁U⟩ : ↥(residualImage (G := G) s4.P))⁻¹ * z
+      ∈ Subgroup.center ↥(residualImage (G := G) s4.P) := by
+    rw [← QuotientGroup.eq]
+    exact hzζ.symm
+  set c₀ : ↥(residualImage (G := G) s4.P) :=
+    (⟨ζ₁, hζ₁U⟩ : ↥(residualImage (G := G) s4.P))⁻¹ * z with hc₀def
+  have hc₀P : (c₀ : G) ∈ s4.P := hZP c₀.2 (by simpa using hdiff)
+  have hzeq : (z : G) = ζ₁ * (c₀ : G) := by
+    have hprod : (⟨ζ₁, hζ₁U⟩ : ↥(residualImage (G := G) s4.P)) * c₀ = z := by
+      rw [hc₀def]; group
+    have hv := congrArg Subtype.val hprod
+    push_cast at hv
+    exact hv.symm
+  have hzV : (z : G) ∈ hyp.V := by
+    rw [hzeq]
+    exact hyp.V.mul_mem hζ₁V (s4.P_le_V hc₀P)
+  have hzP : (z : G) ∉ s4.P := by
+    intro hc
+    refine hζ₁P ?_
+    have : ζ₁ = (z : G) * (c₀ : G)⁻¹ := by rw [hzeq]; group
+    rw [this]
+    exact s4.P.mul_mem hc (s4.P.inv_mem hc₀P)
+  -- the conjugator
+  have hcP : (c : G) ∈ s4.P := hZP c.2 (by simpa using hcZ)
+  have hkx' : k (x : G) = (z : G) ^ 3 * (c : G) := by
+    rw [hkx]; push_cast; ring
+  refine ⟨(x : G), hxQ, hxQ0, ?_⟩
+  exact SectionFourSetup.mem_W_of_stepThree hyp s4 H hC2 M sfive hZ hm hQ0card hmu hl
+    hcent hzV z.2 hzP hxQ hxQ0 x.2 hfx c.2 (by simpa using hcZ) hcP hkx'
 
 end Hypothesis
 
