@@ -7501,3 +7501,33 @@ twist `σ⁻¹τ` は `φ^{±1}` のまま。⟹ **`d` の `1 + 2^t` 正規化�
 **次**: `IsStandardModel` の `θ` について `Odd (orderOf (θ|_F))` を出す。
 `isTypeB_Q_of_orderThree_of_mem_W` の `TypeBData` と、`exists_bilinear_lift_normalized`
 が返す `θ` を突き合わせる。
+
+### (153) 最後の 1 点の正体 — 「K が type-`B` 座標で対角スカラーとして作用する」
+
+(152) で `hodd` は `Odd (orderOf (θ|_F))` (θ = モデルの cocycle の twist) 1 文になった。
+これを `TypeBData.phi_orderOf_odd` に結び付ける論証を詰めた結果、**指数だけで閉じる**:
+
+* モデル側: `χ(a x) = a·θ(a)·χ(x)` for `a ∈ F` (`zpow_eq_mul_thetaModel` の元になる
+  `hsemi` を `x = y` で読んだもの)。`θ|_F = Frob^t` とすると係数は `a^{1+2^t}`。
+* type-`B` 側: `typeBQuadraticMap_smul` (既存) より `typeBQ(λ·v) = λ·phi(λ)·typeBQ(v)`。
+  `phi = Frob^{t'}` とすると係数は `λ^{1+2^{t'}}`。
+* `K` の作用は**内在的** (座標に依らない)。`μ : K ≅ F^×` と `λ : K ≅ F_B^×` はどちらも
+  「k の固有値」なので、`ρ := λ ∘ μ⁻¹` は巡回群 `F^×` の群同型 = `x ↦ x^u` (gcd(u, 2^m−1)=1)。
+  中心側の座標同型も同様。⟹ **冪写像は可換なので指数がそのまま移る**:
+  `1 + 2^t ≡ 1 + 2^{t'} (mod 2^m − 1)` ⟹ `t ≡ t' (mod m)` ⟹ `orderOf (θ|_F) = orderOf phi`。
+
+⟹ **必要な唯一の未形式化入力** = 「`K` が type-`B` 座標 `F_B × F_B` に**対角 `F_B`-スカラー**
+として作用する」。これは Higman 認識定理の内部にある (`dataL.lambda` がその固有値) が、
+`TypeBData` は記録していない。
+
+⟹ (151) の露出リファクタは依然必要だが、**露出すべきものは 1 つだけ**に縮んだ:
+
+```
+∃ (lam : ↥K → F_B), (K の Q/Z(Q) への作用が type-B 座標で (a,b) ↦ (lam k * a, lam k * b))
+```
+
+(`ν = λ^{1+2^r}` も `Frob^r` の奇位数も、これがあれば `typeBQuadraticMap_smul` +
+`phi_orderOf_odd` から従う。)
+
+**次セッション**: `TypeBData` にこの `lam` フィールド (または並行する定理) を足す方向で
+`TypeBRecognition` を強化する。
