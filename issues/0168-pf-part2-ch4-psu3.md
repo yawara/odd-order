@@ -8672,3 +8672,18 @@ def W : Subgroup G := hyp.V ⊓ Subgroup.centralizer hyp.KSet   -- Basic.lean:18
 `coordFieldAut_sq_eq_id_of_ten` → `coordFieldAut_eq_id_on_frobFixed_of_sq` →
 `coordFieldAut_eq_id_of_fixes_frobFixed` → `mem_W_of_coordFieldAut_eq_id` →
 `h(ω) = ζ³η ∈ W` → §3 Corollary 1 で **Ch. IV 完了**。
+
+### (197) 🎯🎯 **§4 の結論 `η ∈ W ∧ h(ω) ∈ W` が landing**
+
+* `coordFieldAut_sq_eq_id_on_frobFixed` — **`μ² = id` on `F`**。
+  除外点の数え上げ: (10) が失敗する `a` は `a⁻¹ s a = y⁻¹` を満たすもので
+  `injOn_conj_KSet` により**高々 1 個** ⟹ 悪い `X` は `{0, X₀}` の高々 2 点、
+  shift 用に `T ∪ (T+1)` で高々 4 点。`2·4 = 8 < 2^m = q` が仮説 `hq`
+  (書籍の「if `μ ≠ 1` then `|F| ≥ 8`」に対応; `q = ℓ^p`, `ℓ > 2`, `p ≥ 3` から)。
+* `sectionFour_mem_W` — **§4 の結論**:
+  `μ² = id on F` → `μ|_F = id` (奇数位数) → `μ = 1` → `η ∈ C_V(K) = W` →
+  `h(ω) = ζ³η ∈ W`。
+
+**§4 の数学は完結**。残るのは §4 の standing data からこの定理の仮説を供給する
+配線 (step (1)–(3) の `ω`,`ζ`,`η`,`y` と `hq`, `hηord`, `hznot` 等) と、
+§3 Corollary 1 への接続。

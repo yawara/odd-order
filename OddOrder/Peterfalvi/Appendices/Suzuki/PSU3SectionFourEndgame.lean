@@ -47,6 +47,9 @@ membership facts it needs on the model:
 * `Hypothesis.sectionFour_ten_at` — the whole chain (3)→(10) run at one admissible `a`.
 * `Hypothesis.sectionFour_ten_of_mem_frobFixed` — the same at every admissible `X ∈ F^×`,
   with `a` and `b` produced rather than assumed.
+* `Hypothesis.coordFieldAut_sq_eq_id_on_frobFixed` — **`μ² = id` on `F`**, the shift trick
+  plus the count of the excluded points.
+* `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
 -/
 
 set_option autoImplicit false
@@ -601,6 +604,162 @@ theorem sectionFour_ten_of_mem_frobFixed {f g k : G → G}
   exact hyp.sectionFour_ten_at H hC2 M s hZ hm hQ0card hζ hωQ hωQ0 hyQ0 hsqω haK haKset
     hbiKset (pow_mem hbiK 2) hf hηζ hkω htη hηD hηω hznot hb (hmemQ haK) (hmemQ hbiK)
     hs₀ hXa.symm
+
+include hyp in
+/-- **🎯 `μ² = id` on `F`** (Peterfalvi Part II, Ch. IV §4, p. 134: "Let
+`X ∈ F − {0, α^{2τ}, α^{2τ} + 1}`.  Writing (10) with `X + 1` in place of `X` and
+subtracting (10) from the result, we see that `X^{μ²} = X`").
+
+(10) is available at every `X ∈ F^×` whose `a` satisfies `y · s^{a⁻¹} ≠ 1`
+(`sectionFour_ten_of_mem_frobFixed`), and there is at most *one* offending `a`: it would
+have to satisfy `s^{a⁻¹} = y⁻¹`, and conjugation is injective on `K`
+(`injOn_conj_KSet`).  So (10) fails on at most two points of `F`, the shift trick needs
+two more, and four is fewer than half of `|F| = q` as soon as `q > 8` — which holds since
+`q = ℓ^p` with `ℓ > 2` and `p` an odd prime. -/
+theorem coordFieldAut_sq_eq_id_on_frobFixed {f g k : G → G}
+    (H : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g k)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (M : hyp.QuotientFieldModel m) (s : hyp.LemmaFiveSetup m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) (hq : 8 < 2 ^ m)
+    {ζ ω y η : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hηζ : η * ζ = ζ * η) (hkω : k ω = ζ ^ 3 * η)
+    (htη : hyp.t * η * hyp.t = η) (hηD : η ∈ hyp.D) (hηω : η * ω * η⁻¹ = ω)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    {x : M.E} (hx : x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) :
+    hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+        (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot x) = x := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set F := OddOrder.FiniteField.frobFixedSubfield M.E 2 m with hFdef
+  haveI : Fintype ↥F := Fintype.ofFinite _
+  set σ := hyp.coordFieldAut s M hm hQ0card hηD hζ hznot with hσdef
+  set s₀ := ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹
+    + ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) with hs₀def
+  have h2 : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  -- the admissibility predicate and the equation (10)
+  set Ten : M.E → Prop := fun X => (s₀ + σ X) * X = (s₀ + σ (σ X)) * σ X with hTendef
+  set Adm : M.E → Prop := fun X => ∀ (a : G) (haK : a ∈ hyp.K),
+    (σ ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E))⁻¹ = X →
+      y * (a⁻¹ * hyp.distinguishedInvolution * a) ≠ 1 with hAdmdef
+  have hTen : ∀ z : M.E, z ∈ F → z ≠ 0 → Adm z → Ten z := fun z hzF hz0 hadm =>
+    hyp.sectionFour_ten_of_mem_frobFixed H hC2 M s hZ hm hQ0card hζ hωQ hωQ0 hyQ0 hsqω hf
+      hηζ hkω htη hηD hηω hznot hzF hz0 hadm rfl
+  -- at most one `a` is inadmissible, so at most one nonzero `X` fails `Adm`
+  have hUniq : ∀ z w : M.E, ¬ Adm z → ¬ Adm w → z = w := by
+    intro z w hz hw
+    simp only [hAdmdef, not_forall, not_not] at hz hw
+    obtain ⟨a₁, ha₁K, hz₁, hz₂⟩ := hz
+    obtain ⟨a₂, ha₂K, hw₁, hw₂⟩ := hw
+    have e1 : a₁⁻¹ * hyp.distinguishedInvolution * a₁ = y⁻¹ :=
+      eq_inv_of_mul_eq_one_right hz₂
+    have e2 : a₂⁻¹ * hyp.distinguishedInvolution * a₂ = y⁻¹ :=
+      eq_inv_of_mul_eq_one_right hw₂
+    have hconj : a₁⁻¹ * hyp.distinguishedInvolution * a₁
+        = a₂⁻¹ * hyp.distinguishedInvolution * a₂ := by rw [e1, e2]
+    have hset : ∀ {c : G}, c ∈ hyp.K → c ∈ hyp.KSet := by
+      intro c hc
+      have hx : c ∈ (hyp.K : Set G) := hc
+      rwa [hyp.coe_K] at hx
+    have ha : a₁ = a₂ :=
+      hyp.injOn_conj_KSet hyp.distinguishedInvolution_mem_H
+        hyp.distinguishedInvolution_sq hyp.distinguishedInvolution_ne_one
+        (hset ha₁K) (hset ha₂K) hconj
+    subst ha
+    rw [← hz₁, ← hw₁]
+  -- the exclusion set
+  set T : Finset ↥F := Finset.univ.filter (fun z : ↥F => ¬ Ten (z : M.E)) with hTdef
+  have hTsub : ∃ x₀ : ↥F, ∀ z ∈ T, z = 0 ∨ z = x₀ := by
+    by_cases hex : ∃ z ∈ T, (z : M.E) ≠ 0
+    · obtain ⟨x₀, hx₀T, hx₀0⟩ := hex
+      refine ⟨x₀, fun z hz => ?_⟩
+      by_cases hz0 : (z : M.E) = 0
+      · exact Or.inl (Subtype.ext (by rw [hz0]; rfl))
+      · refine Or.inr (Subtype.ext ?_)
+        refine hUniq (z : M.E) (x₀ : M.E) (fun hadm => ?_) (fun hadm => ?_)
+        · exact (Finset.mem_filter.mp hz).2 (hTen _ z.2 hz0 hadm)
+        · exact (Finset.mem_filter.mp hx₀T).2 (hTen _ x₀.2 hx₀0 hadm)
+    · refine ⟨0, fun z hz => Or.inl (Subtype.ext ?_)⟩
+      by_contra hc
+      exact hex ⟨z, hz, hc⟩
+  obtain ⟨x₀, hx₀⟩ := hTsub
+  have hTcard : T.card ≤ 2 := by
+    have hsub : T ⊆ ({0, x₀} : Finset ↥F) := by
+      intro z hz
+      rcases hx₀ z hz with h | h <;> simp [h]
+    exact le_trans (Finset.card_le_card hsub)
+      ((Finset.card_insert_le _ _).trans (by simp))
+  set S : Finset ↥F := T ∪ T.image (fun z => z + 1) with hSdef
+  have hScard : 2 * S.card < 2 ^ m := by
+    have h1 : S.card ≤ T.card + (T.image (fun z : ↥F => z + 1)).card :=
+      Finset.card_union_le _ _
+    have h2' : (T.image (fun z : ↥F => z + 1)).card ≤ T.card := Finset.card_image_le
+    omega
+  refine hyp.coordFieldAut_sq_eq_id_of_ten M s hm hQ0card hηD hζ hznot S ?_ hScard hx
+  intro z hzS
+  have hzT : z ∉ T := fun hc => hzS (Finset.mem_union_left _ hc)
+  have hz1T : z + 1 ∉ T := by
+    intro hc
+    refine hzS (Finset.mem_union_right _ ?_)
+    refine Finset.mem_image.mpr ⟨z + 1, hc, ?_⟩
+    refine Subtype.ext ?_
+    push_cast
+    linear_combination h2
+  have hTz : Ten (z : M.E) := by
+    by_contra hc
+    exact hzT (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hc⟩)
+  have hTz1 : Ten ((z : M.E) + 1) := by
+    by_contra hc
+    refine hz1T (Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩)
+    push_cast
+    exact hc
+  exact sectionFour_fixed_of_shift σ.toRingHom hTz hTz1
+
+include hyp in
+/-- **🎯🎯 Peterfalvi Part II, Ch. IV §4, p. 134: `η ∈ W` and `h(ω) ∈ W`.**
+
+The whole of §4 assembled: (10) holds on `F` off four points, so `μ² = id` there
+(`coordFieldAut_sq_eq_id_on_frobFixed`); `μ` having odd order this gives `μ|_F = id`
+(`coordFieldAut_eq_id_on_frobFixed_of_sq`) and then `μ = 1`
+(`coordFieldAut_eq_id_of_fixes_frobFixed`); and `μ = 1` is `η ∈ C_V(K) = W`
+(`mem_W_of_coordFieldAut_eq_id`).  Finally `h(ω) = ζ³η` with `ζ ∈ W`.
+
+This is what §3's Corollary 1 consumes to finish the chapter. -/
+theorem sectionFour_mem_W {f g k : G → G}
+    (H : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g k)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (M : hyp.QuotientFieldModel m) (s : hyp.LemmaFiveSetup m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) (hq : 8 < 2 ^ m)
+    {ζ ω y η : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hηζ : η * ζ = ζ * η) (hkω : k ω = ζ ^ 3 * η)
+    (htη : hyp.t * η * hyp.t = η) (hηD : η ∈ hyp.D) (hηV : η ∈ hyp.V)
+    (hηω : η * ω * η⁻¹ = ω)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    {j : ℕ} (hηord : η ^ (2 * j + 1) = 1) :
+    η ∈ hyp.W ∧ k ω ∈ hyp.W := by
+  have hsq := fun {x : M.E} (hx : x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) =>
+    hyp.coordFieldAut_sq_eq_id_on_frobFixed H hC2 M s hZ hm hQ0card hq hζ hωQ hωQ0 hyQ0
+      hsqω hf hηζ hkω htη hηD hηω hznot hx
+  have hFid : ∀ x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
+      hyp.coordFieldAut s M hm hQ0card hηD hζ hznot x = x := fun x hx =>
+    hyp.coordFieldAut_eq_id_on_frobFixed_of_sq M s hm hQ0card hηD hζ hznot hηord
+      (fun z hz => hsq hz) hx
+  have hall : ∀ x : M.E, hyp.coordFieldAut s M hm hQ0card hηD hζ hznot x = x := fun x =>
+    hyp.coordFieldAut_eq_id_of_fixes_frobFixed M s hm hQ0card hηD hζ hznot
+      (odd_two_mul_add_one j) hηord hFid x
+  have hηW := hyp.mem_W_of_coordFieldAut_eq_id M s hm hQ0card hζ hηD hηV hznot hall
+  refine ⟨hηW, ?_⟩
+  rw [hkω]
+  exact hyp.W.mul_mem (pow_mem hζ 3) hηW
 
 end Hypothesis
 
