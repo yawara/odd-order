@@ -29,6 +29,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -14921,3 +14922,21 @@ which is what lets (9) compare the `μ`-image of (7) with (8). -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_muK_ne_mu_W_inv
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_seven_eight_nine
+
+/-! **Ch. IV §4: `λ = 1` and the trace relation** (issue 0168, 2026-08-02).
+`Peterfalvi/Appendices/Suzuki/PSU3SectionFourEndgame.lean` — Peterfalvi Part II, p. 134.
+
+(9) rearranges to `λ (b² + ζ) = ζ⁻¹ + a^{-2μ²}` with
+`λ = (1 + b^{2μ} a^{-2μ²})/(1 + b² a^{-2μ})`, hence to
+`λ ζ² + (λ b² + a^{-2μ²}) ζ + 1 = 0` in characteristic `2`.  All of `λ`, `b²`, `a^{-2μ²}` and
+`ζ + ζ⁻¹` lie in `F` while `ζ` does not, so both coefficients of the resulting linear relation
+vanish separately (`sectionFour_lambda_eq_one`): **`λ = 1`** and **`b² + a^{-2μ²} = ζ + ζ⁻¹`**.
+
+`λ ∈ F` needs `μ(F) ⊆ F` (`coordFieldAut_mapsTo_frobFixed`), which holds because the nonzero
+elements of `F` are exactly the `K`-scalars and `μ` carries `K`-scalars to `K`-scalars.  The
+coefficient `ζ + ζ⁻¹ ∈ F` is the existing `mu_W_add_inv_mem_frobFixed` (the trace of a norm-one
+element). -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_mapsTo_frobFixed
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_lambda

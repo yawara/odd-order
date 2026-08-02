@@ -714,6 +714,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourStepThree
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley

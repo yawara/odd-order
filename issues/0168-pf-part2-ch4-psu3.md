@@ -8509,3 +8509,43 @@ commit `bb2832468`。新 leaf `PSU3SectionFourCoordinate.lean` (185 行)。
    `KW` の元として作用 ⟹ `W = C_V(Q₀)` (`W_eq_inf_centralizer_Q0`) で回収。
    **次セッションで PDF p.134 と Coq `PFsection*` を突き合わせて確定する**。
 7. `h(ω) = ζ³η ∈ W` ⟹ §3 Corollary 1 で Ch. IV 完了。
+
+### (191) 🎯 λ = 1 が landing + **`μ = 1 ⟹ η ∈ W` の行間が解けた**
+
+`PSU3SectionFourEndgame.lean`:
+* `coordFieldAut_mapsTo_frobFixed` — `μ(F) ⊆ F` (`F^×` = `K`-スカラー、`μ` は
+  `K`-スカラーを `K`-スカラーへ)
+* `sectionFour_lambda` — **`λ = 1`** (書籍形「`b²a^{-2μ}` は `μ` 固定」) と
+  **`b² + a^{-2μ²} = ζ + ζ⁻¹`**
+⚠ `mu_W_add_inv_mem_frobFixed` (`ζ+ζ⁻¹ ∈ F`) は既存 (`PSU3SectionThree.lean:805`) —
+また同名で書きかけた。**新規補題を書く前に概念名で grep する**
+([[grep-concept-names-not-book-notation]])。
+
+**⚠ (190) 6. の行間が解けた** — `W` の定義そのものだった:
+
+```
+def W : Subgroup G := hyp.V ⊓ Subgroup.centralizer hyp.KSet   -- Basic.lean:183, `W = C_V(K)`
+```
+
+⟹ `μ = 1` (= `σ = id`) から:
+1. `coordFieldAut_muK` : `σ(μ(κ,1)) = μ(kActor (ηκη⁻¹), 1)`。`σ = id` なので
+   `μ(kActor κ,1) = μ(kActor (ηκη⁻¹),1)`。
+2. `M.mu_K_injective` + `conjQByK_injective` ⟹ **`ηκη⁻¹ = κ` (∀κ ∈ K)** =
+   `η ∈ centralizer KSet`。
+3. `η ∈ P ≤ V` と合わせて **`η ∈ V ⊓ centralizer KSet = W`** ∎
+
+⟹ **`Q₀` 側の Galois 対応 (`VtoVbar`) を経由する必要は無い**。
+
+**残り (次セッション)**:
+1. **(10)**: `λ = 1` ⟹ `σ(BA⁻¹) = BA⁻¹`。`X := A⁻¹` と置き
+   `B = c + c⁻¹ + σ(X)` を代入して `(c+c⁻¹+σX)X = (c+c⁻¹+σ²X)σX`。
+   `X` が `F^×` を掃くこと = `exists_mem_K_mu_sq_inv_eq` の §4 版
+   (`a ∈ K` を動かす; 除外点は `a ≠ α^{-τ}` 由来の高々 2 点 + shift の 2 点)。
+2. `sectionFour_sq_eq_id` を **`E := ↥F`** で適用 ⟹ `σ²|_F = id`
+   (⚠ `σ` の `F` への制限を `↥F ≃+* ↥F` として作る必要がある。
+   `coordFieldAut_mapsTo_frobFixed` + 単射 + 有限で全単射)。
+3. `σ|_F` は位数奇数 (η の位数 p) かつ `σ²|_F = 1` ⟹
+   `eq_one_of_sq_eq_one_of_odd_pow` で `σ|_F = id`。
+4. `eq_one_or_eq_qFrobenius_of_fixes` で `σ ∈ {1, qFrob}`、
+   qFrob は位数 2 (偶) ⟹ **`σ = 1`**。
+5. 上の 1.–3. で `η ∈ W`、`h(ω) = ζ³η ∈ W` ⟹ §3 Corollary 1 で Ch. IV 完了。
