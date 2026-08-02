@@ -377,6 +377,7 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
+import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10B
 import OddOrder.Isaacs.Appendix.DirectDiamond
 import OddOrder.Isaacs.Appendix.SubgroupBasics
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable

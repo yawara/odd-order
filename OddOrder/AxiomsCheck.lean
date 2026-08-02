@@ -151,6 +151,7 @@ import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
+import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10B
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
@@ -15243,3 +15244,7 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch10.commutator_lt_top_of_transfer_ne_one
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch10.commutator_lt_top_of_sylow_quaternionProd
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.orderOf_one_add_prime_dvd
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isMetacyclic_semidirectProduct
