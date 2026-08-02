@@ -432,6 +432,28 @@ theorem h_inv_mul_mem_KW_of_stepTwenty (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   exact hyp.h_inv_mul_mem_KW H hωkQ hωkQ0 hρQ0 hωρyQ
     (fun hc => hωρyQ0 (hc ▸ hyp.Q0.one_mem)) hcKW hrel hz
 
+/-- **`h(ω) ∈ W` for a normalized `ω`** (Peterfalvi Part II, Ch. IV §2, p. 129, the first
+half of the closing Proposition), with the stopping index of step (15) produced inside.
+
+`exists_stop_lt_orderOf` says the sequence of (11) does stop; `Nat.find` takes the first
+index it does, which is what `h_mem_W_of_frobeniusD` consumes. -/
+theorem h_mem_W_of_normalized (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hfree : hyp.FreeD)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hWcyc : IsCyclic ↥hyp.W)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hWcard : orderOf ζ = Nat.card ↥hyp.W) :
+    h ω ∈ hyp.W := by
+  classical
+  have hex : ∃ i, y * (hyp.stepElevenSeq ζ y i).1 = 1 := by
+    obtain ⟨i, -, hi⟩ := hyp.exists_stop_lt_orderOf H hC2 hζ hωQ hωQ0 hyQ0 hfω
+    exact ⟨i, hi⟩
+  exact hyp.h_mem_W_of_frobeniusD H hC2 hfree hZc hWcyc hζ hωQ hωQ0 hyQ0 hfω hWcard
+    (fun _ hi => Nat.find_min hex hi) (Nat.find_spec hex)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

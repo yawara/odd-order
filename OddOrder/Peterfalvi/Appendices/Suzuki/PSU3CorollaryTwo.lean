@@ -883,7 +883,7 @@ theorem corollaryTwo_of_isStandardModel_of_closing
     omega
   -- §2's closing Proposition supplies the base pair
   obtain ⟨ω₁, hω₁Q, hω₁Q0⟩ := hyp.exists_mem_Q_notMem_Q0 hm hQ0card hcardQ
-  obtain ⟨ω₀, hω₀Q, hω₀Q0, y₀, hy₀Q0, hsq₀, hfinv⟩ :=
+  obtain ⟨ω₀, hω₀Q, hω₀Q0, y₀, hy₀Q0, hsq₀, hfinv, hhW₀⟩ :=
     hyp.exists_f_eq_conj_inv M hZc H hC2 hm hQ0card hmu
       (hyp.freeD_of_V_eq_W M hZc hmu hVW) hWcyc hKcard hWdvd
       (fun x hx => hyp.sq_mem_Q0_of_lemmaFiveSetup sfive hx) hwW

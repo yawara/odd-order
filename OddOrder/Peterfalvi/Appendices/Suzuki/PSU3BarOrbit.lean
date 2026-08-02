@@ -425,7 +425,8 @@ theorem exists_f_eq_conj_inv {m : ℕ} (M : hyp.QuotientFieldModel m)
     {ζ : G} (hζW : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1)
     (hWcard : orderOf ζ = Nat.card ↥hyp.W)
     {x₀ : G} (hx₀Q : x₀ ∈ hyp.Q) (hx₀Q0 : x₀ ∉ hyp.Q0) :
-    ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ω * ω = y ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ := by
+    ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ ∃ y ∈ hyp.Q0,
+      ω * ω = y ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω ∈ hyp.W := by
   classical
   have hζD : ζ ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hζW)
   obtain ⟨r, hrinv, hrspec⟩ := hyp.exists_normalizedOrbitRep M hZ H hC2 hm hQ0card hmu
@@ -438,7 +439,8 @@ theorem exists_f_eq_conj_inv {m : ℕ} (M : hyp.QuotientFieldModel m)
   have hρQ0 : ω * ω ∈ hyp.Q0 := hsqQ0 ω hωQ
   have hρ1 : ω * ω ≠ 1 := fun hc => hωQ0 ⟨by rw [sq]; exact hc, hyp.Q_le_H hωQ⟩
   by_cases hcase : ω * ω = y
-  · exact ⟨ω, hωQ, hωQ0, y, hyQ0, hcase, hyp.f_eq_conj_inv_of_sq_eq hyQ0 hnorm hcase⟩
+  · exact ⟨ω, hωQ, hωQ0, y, hyQ0, hcase, hyp.f_eq_conj_inv_of_sq_eq hyQ0 hnorm hcase,
+      hyp.h_mem_W_of_normalized H hC2 hfree hZ hWcyc hζW hωQ hωQ0 hyQ0 hnorm hWcard⟩
   -- `y ≠ ρ`, in the two forms the side conditions take
   have hyinv : y⁻¹ = y := by
     have hs := hyQ0.1
@@ -531,8 +533,7 @@ theorem exists_f_eq_conj_inv {m : ℕ} (M : hyp.QuotientFieldModel m)
   have hns : ∀ i < Nat.find hex, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1 :=
     fun _ hi' => Nat.find_min hex hi'
   have hhW : h ω ∈ hyp.W :=
-    hyp.h_mem_W_of_frobeniusD H hC2 hfree hZ hWcyc hζW hωQ hωQ0 hyQ0 hnorm hWcard hns
-      hstop
+    hyp.h_mem_W_of_normalized H hC2 hfree hZ hWcyc hζW hωQ hωQ0 hyQ0 hnorm hWcard
   obtain ⟨c, hcKW, hcrel⟩ := id hk
   have hhX : h (ωk⁻¹ * ρ) ∈ hyp.KW :=
     hyp.h_inv_mul_mem_KW_of_stepTwenty H hC2 hζW hωQ hωQ0 hyQ0 hnorm hhW hns hstop
@@ -558,7 +559,8 @@ theorem exists_f_eq_conj_inv {m : ℕ} (M : hyp.QuotientFieldModel m)
   rw [hki] at hchain
   have hsqi : ωi * ωi = y :=
     hyp.sq_eq_of_dOrbitRel hfree hωiQ hωiQ0 hyQ0 hρQ0 (hsqQ0 ωi hωiQ) hchain
-  exact ⟨ωi, hωiQ, hωiQ0, y, hyQ0, hsqi, hyp.f_eq_conj_inv_of_sq_eq hyQ0 hnormi' hsqi⟩
+  exact ⟨ωi, hωiQ, hωiQ0, y, hyQ0, hsqi, hyp.f_eq_conj_inv_of_sq_eq hyQ0 hnormi' hsqi,
+    hyp.h_mem_W_of_normalized H hC2 hfree hZ hWcyc hζW hωiQ hωiQ0 hyQ0 hnormi' hWcard⟩
 
 end Hypothesis
 
