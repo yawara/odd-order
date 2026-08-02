@@ -318,6 +318,31 @@ noncomputable def conjQMulEquivOfPermMatch (hS : Setup M Q D t) (hS' : Setup M' 
       ((MulEquiv.subgroupCongr (map_permHom_conjQ_eq hS hS' ε ht hQ)).trans
         (Subgroup.equivMapOfInjective _ _ (permHom_injective hS' hcore')).symm)))
 
+/-- **The characterizing property of `conjQMulEquivOfPermMatch`**: it is the map whose
+permutation representation is the `ε`-conjugate of the source's.
+
+This is what upgrades the Lemma from an isomorphism of abstract groups to an isomorphism
+of *permutation* groups: composed with the two identifications of the point sets with
+`Option ↥Q` and `Option ↥Q'`, it says that `ε` intertwines the two actions. -/
+theorem permHom_conjQMulEquivOfPermMatch (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
+    (hcore : M.normalCore = ⊥) (hcore' : M'.normalCore = ⊥)
+    (ε : Option ↥Q ≃ Option ↥Q')
+    (ht : Equiv.permCongrHom ε (permHom hS t) = permHom hS' t')
+    (hQ : (Equiv.permCongrHom ε) '' (permHom hS '' (Q : Set L))
+      = permHom hS' '' (Q' : Set L'))
+    (l : ↥(Subgroup.closure (⋃ y : L, ((fun q => y⁻¹ * q * y) '' (Q : Set L))))) :
+    permHom hS'
+        ((conjQMulEquivOfPermMatch hS hS' hcore hcore' ε ht hQ l :
+          ↥(Subgroup.closure (⋃ y : L', ((fun q => y⁻¹ * q * y) '' (Q' : Set L'))))) : L')
+      = Equiv.permCongrHom ε (permHom hS (l : L)) := by
+  rw [← Subgroup.coe_equivMapOfInjective_apply _ (permHom hS')
+    (permHom_injective hS' hcore')]
+  change ((Subgroup.equivMapOfInjective _ (permHom hS') (permHom_injective hS' hcore')
+    ((Subgroup.equivMapOfInjective _ (permHom hS')
+      (permHom_injective hS' hcore')).symm _) : _) : Equiv.Perm (Option ↥Q')) = _
+  rw [MulEquiv.apply_symm_apply]
+  rfl
+
 /-! ## The Lemma in the book's terms
 
 The matching hypotheses above are statements about permutations.  What the book supplies
@@ -448,6 +473,21 @@ noncomputable def conjQMulEquivOfData (hS : Setup M Q D t) (hS' : Setup M' Q' D'
   conjQMulEquivOfPermMatch hS hS' hcore hcore' (Equiv.optionCongr εQ.toEquiv)
     (permCongrHom_permHom_t hS hS' H H' εQ.toEquiv (map_one εQ) hεf)
     (permCongr_image_Q hS hS' εQ)
+
+/-- `conjQMulEquivOfData` in the same terms: the isomorphism it produces intertwines the
+two permutation representations along `ε`. -/
+theorem permHom_conjQMulEquivOfData (hS : Setup M Q D t) (hS' : Setup M' Q' D' t')
+    (H : IsFGH M Q D t f g h) (H' : IsFGH M' Q' D' t' f' g' h')
+    (hcore : M.normalCore = ⊥) (hcore' : M'.normalCore = ⊥)
+    (εQ : ↥Q ≃* ↥Q')
+    (hεf : ∀ (x : ↥Q) (hx1 : (x : L) ≠ 1),
+      ((εQ ⟨f (x : L), H.f_mem x.2 hx1⟩ : ↥Q') : L') = f' ((εQ x : ↥Q') : L'))
+    (l : ↥(Subgroup.closure (⋃ y : L, ((fun q => y⁻¹ * q * y) '' (Q : Set L))))) :
+    permHom hS'
+        ((conjQMulEquivOfData hS hS' H H' hcore hcore' εQ hεf l :
+          ↥(Subgroup.closure (⋃ y : L', ((fun q => y⁻¹ * q * y) '' (Q' : Set L'))))) : L')
+      = Equiv.permCongrHom (Equiv.optionCongr εQ.toEquiv) (permHom hS (l : L)) :=
+  permHom_conjQMulEquivOfPermMatch hS hS' hcore hcore' _ _ _ l
 
 /-- **The Lemma of Peterfalvi Part II, Ch. IV §1** (p. 123), in the book's terms:
 `L` is determined up to isomorphism by `M = Q ⋊ D` and `f`.
