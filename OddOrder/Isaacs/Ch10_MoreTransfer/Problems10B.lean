@@ -278,6 +278,60 @@ theorem inl_ofAdd_pow_mem_lowerCentralSeries
       map_inv SemidirectProduct.inl _] at hmem
     simpa using Subgroup.inv_mem _ hmem
 
+/-! ## 下降中心列の上からの評価 -/
+
+/-- `ofAdd (d · v) ∈ zpowers (ofAdd v)`. -/
+theorem ofAdd_mul_mem_zpowers {m : ℕ} [NeZero m] (v d : ZMod m) :
+    Multiplicative.ofAdd (d * v) ∈
+      Subgroup.zpowers (Multiplicative.ofAdd v) := by
+  refine Subgroup.mem_zpowers_iff.mpr ⟨(d.val : ℤ), ?_⟩
+  rw [← ofAdd_zsmul]
+  congr 1
+  rw [zsmul_eq_mul]
+  congr 1
+  push_cast
+  exact (ZMod.natCast_rightInverse d)
+
+/-- **上からの評価の核**: `y` の指数が `p^k` の倍数なら, どんな `g` との交換子も
+`inl ⟨x^{p^{k+1}}⟩` に入る. -/
+theorem commutator_inl_mem_map_zpowers (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
+    (hu : ZMod.unitsMap (dvd_pow_self p hn.ne' : p ∣ p ^ n) u = 1) (k : ℕ)
+    {y : Multiplicative (ZMod (p ^ n))} {c : ZMod (p ^ n)}
+    (hy : Multiplicative.toAdd y = c * (p : ZMod (p ^ n)) ^ k)
+    (g : problem10B1Group (p ^ n) u) :
+    ⁅(SemidirectProduct.inl y : problem10B1Group (p ^ n) u), g⁆
+      ∈ (Subgroup.zpowers (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (k + 1)))).map
+        SemidirectProduct.inl := by
+  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp (SemidirectProduct.rightHom g).2
+  obtain ⟨d, hd⟩ := prime_dvd_one_sub_zpow hp hn hu j
+  rw [commutatorElement_inl_left]
+  refine Subgroup.mem_map.mpr ⟨_, ?_, rfl⟩
+  have hact : (Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ n) u)))
+      (SemidirectProduct.rightHom g) y
+      = Multiplicative.ofAdd (((u ^ j : (ZMod (p ^ n))ˣ) : ZMod (p ^ n)) *
+          Multiplicative.toAdd y) := by
+    have : (Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ n) u)))
+        (SemidirectProduct.rightHom g) = unitAutHom (p ^ n) (u ^ j) := by
+      rw [map_zpow, hj]
+      rfl
+    rw [this]
+    rfl
+  rw [hact]
+  have hval : y * (Multiplicative.ofAdd
+      (((u ^ j : (ZMod (p ^ n))ˣ) : ZMod (p ^ n)) * Multiplicative.toAdd y))⁻¹
+      = Multiplicative.ofAdd ((d * c) * (p : ZMod (p ^ n)) ^ (k + 1)) := by
+    rw [← ofAdd_neg, ← ofAdd_toAdd y, ← ofAdd_add, toAdd_ofAdd]
+    congr 1
+    have hexp : Multiplicative.toAdd y + -(((u ^ j : (ZMod (p ^ n))ˣ) : ZMod (p ^ n)) *
+        Multiplicative.toAdd y)
+        = (1 - ((u ^ j : (ZMod (p ^ n))ˣ) : ZMod (p ^ n))) * Multiplicative.toAdd y := by
+      ring
+    rw [hexp, hd, hy, pow_succ]
+    ring
+  rw [hval]
+  exact ofAdd_mul_mem_zpowers _ _
+
 end
 
 end OddOrder.Isaacs.Ch10
