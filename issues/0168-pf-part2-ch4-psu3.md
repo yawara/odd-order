@@ -8804,3 +8804,17 @@ threading されているだけ**で producer が無い。`hyp.D` は `Hypothesi
 一般の `U : Subgroup G` で述べたので、`U := residualImage X` で `hZD` が出る。
 
 **残り = (200) の配管のみ** (すべて既存補題の組立)。
+
+### (203) 🎯 `hZD` を `residualImage P` に対して完全に discharge
+
+* `mem_residualImage_of_orderOf_eq_two_pow` — `2`-元は `O^{2′}(C_G(X))` に入る
+  (Sylow 2 に含まれ、Sylow 2 は residual に含まれる)。
+  `t_mem_primeComplementResidual` の論法を一般の 2-元へ。
+* `center_residualImage_le_subgroupOf_D` — `t` (位数 2) と
+  `ω ∈ C_Q(P) − Q₀` (位数 2 冪) の 2 つの所属を discharge して
+  **`hZD` を仮説無しで供給**。
+
+⟹ (200) の配管に必要なものが全部そろった:
+`hXD` = `s4.P_le_D` / `htX` = `s4.t_mem_centralizer` / `hZD` = 上記 /
+`hCQ` = `centralizer_cQ_isPGroup_of_quotient` / `hX` = `card_P`+`prime_cardP` /
+`hA3` = 周囲の仮説 / `details` = trichotomy 経由。

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: `λ = 1` and the trace relation
@@ -50,8 +51,8 @@ membership facts it needs on the model:
 * `Hypothesis.coordFieldAut_sq_eq_id_on_frobFixed` — **`μ² = id` on `F`**, the shift trick
   plus the count of the excluded points.
 * `Hypothesis.SectionFourSetup.eight_lt_natCard_Q0` — `q > 8`, the counting hypothesis.
-* `Hypothesis.center_le_subgroupOf_D` — **`Z(U) ⊆ D`**, the `hZD` that §4's step (2)/(3)
-  endpoints thread as a hypothesis.
+* `Hypothesis.center_le_subgroupOf_D`, `Hypothesis.center_residualImage_le_subgroupOf_D` —
+  **`Z(U) ⊆ D`**, the `hZD` that §4's step (2)/(3) endpoints thread as a hypothesis.
 * `conj_inv_eq_of_commute`, `cube_mul_eq_of_commute` — the book's refinement
   `ζ₁ ∈ ζ P` (p. 133): `ω^{ζ₁} = ω^ζ` and `ζ₁³ P = ζ³ P`.
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
@@ -788,6 +789,40 @@ theorem center_le_subgroupOf_D {U : Subgroup G} {ω : G} (hωQ : ω ∈ hyp.Q) (
     hyp.centralizer_le_H_of_mem_Q hωQ hω1
       (Subgroup.mem_centralizer_singleton_iff.mpr hcω)
   exact hyp.mem_D_of_mem_H_of_commute_t hzH hct
+
+omit [MulAction G Ω] [Finite G] in
+/-- A `2`-element of `C_G(X)` lies in `U = O^{2′}(C_G(X))`: it generates a `2`-group, which
+sits inside a Sylow `2`-subgroup, and every Sylow `2`-subgroup lies in the residual. -/
+theorem mem_residualImage_of_orderOf_eq_two_pow {X : Subgroup G} {x : G}
+    (hxC : x ∈ Subgroup.centralizer ((X : Set G))) {n : ℕ} (hord : orderOf x = 2 ^ n) :
+    x ∈ residualImage (G := G) X := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set xC : ↥(Subgroup.centralizer ((X : Set G))) := ⟨x, hxC⟩ with hxCdef
+  have hordC : orderOf xC = 2 ^ n := by
+    rw [← hord]
+    exact (orderOf_injective (Subgroup.centralizer ((X : Set G))).subtype
+      (Subgroup.subtype_injective _) xC).symm
+  have hT : IsPGroup 2 ↥(Subgroup.zpowers xC) :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, hordC])
+  obtain ⟨S, hS⟩ := hT.exists_le_sylow
+  exact ⟨xC, Subgroup.le_primeComplementResidual S (hS (Subgroup.mem_zpowers xC)), rfl⟩
+
+include hyp in
+/-- **🎯 `hZD` for `U = residualImage P`** — `center_le_subgroupOf_D` with both memberships
+discharged: `t` is an involution of `C_G(P)` and `ω` is the `2`-element of `C_Q(P) − Q₀`
+that step (1) produces. -/
+theorem center_residualImage_le_subgroupOf_D (s4 : hyp.SectionFourSetup)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hω1 : ω ≠ 1)
+    (hωC : ω ∈ Subgroup.centralizer ((s4.P : Set G))) {n : ℕ} (hord : orderOf ω = 2 ^ n) :
+    Subgroup.center ↥(residualImage (G := G) s4.P)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) s4.P) :=
+  hyp.center_le_subgroupOf_D hωQ hω1
+    (mem_residualImage_of_orderOf_eq_two_pow (G := G) hωC hord)
+    (mem_residualImage_of_orderOf_eq_two_pow (G := G) s4.t_mem_centralizer
+      (n := 1) (by
+        rw [pow_one]
+        exact orderOf_eq_prime hyp.t_sq hyp.t_ne_one))
 
 /-! ### The book's refinement `ζ₁ ∈ ζ P`
 

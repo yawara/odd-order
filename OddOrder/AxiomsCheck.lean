@@ -14984,6 +14984,10 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.center_le_subgroupOf_D
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mem_residualImage_of_orderOf_eq_two_pow
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.center_residualImage_le_subgroupOf_D
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_inv_eq_of_commute
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.cube_mul_eq_of_commute
