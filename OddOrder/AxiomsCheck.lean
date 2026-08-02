@@ -30,6 +30,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
+import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -15029,3 +15030,11 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.cube_mul_eq_of_commute
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_mem_W
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.standardModel_canonical
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.standardModel_fgh_rootHom
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.standardModel_f_rootHom
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.exists_standardModel_fgh
