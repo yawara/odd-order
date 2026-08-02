@@ -770,6 +770,30 @@ theorem inf_le_centralizer_centralizer_Q0
     rw [h, mul_inv_rev, inv_inv, inv_inv]
   exact hyζ.symm
 
+include hyp in
+/-- **`P ∩ U ⊆ Z(U)`** — `U ≤ C_G(P)`, so an element of `P` inside `U` is central there. -/
+theorem SectionFourSetup.mem_center_of_mem_P (s4 : hyp.SectionFourSetup) {x : G}
+    (hxP : x ∈ s4.P) (hxU : x ∈ residualImage (G := G) s4.P) :
+    (⟨x, hxU⟩ : ↥(residualImage (G := G) s4.P))
+      ∈ Subgroup.center ↥(residualImage (G := G) s4.P) := by
+  refine Subgroup.mem_center_iff.mpr fun u => Subtype.ext ?_
+  exact (Subgroup.mem_centralizer_iff.mp
+    (residualImage_le_centralizer (G := G) u.2) x hxP).symm
+
+include hyp in
+/-- **A `U`-element with nontrivial image is outside `P`** — because `P ∩ U ⊆ Z(U)`.
+
+This is the book's `ζ₁ ∉ P ∩ U` (p. 133), obtained from `ζ̄ ≠ 1` rather than from the
+count `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1`. -/
+theorem SectionFourSetup.notMem_P_of_mk_ne_one (s4 : hyp.SectionFourSetup) {ζ₁ : G}
+    (hζ₁U : ζ₁ ∈ residualImage (G := G) s4.P)
+    (hne : QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) s4.P))
+      ⟨ζ₁, hζ₁U⟩ ≠ 1) : ζ₁ ∉ s4.P := by
+  intro hc
+  refine hne ?_
+  rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+  exact SectionFourSetup.mem_center_of_mem_P hyp s4 hc hζ₁U
+
 end Intrinsic
 
 include hyp in

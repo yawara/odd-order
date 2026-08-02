@@ -15012,6 +15012,10 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.SectionFourSetup.eq_one_of_conj_t_mem_P
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.SectionFourSetup.mem_center_of_mem_P
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.SectionFourSetup.notMem_P_of_mk_ne_one
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inf_le_centralizer_centralizer_Q0
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.SectionFourSetup.exists_mem_W

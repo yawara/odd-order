@@ -68,7 +68,18 @@ Hypothesis.SectionFourSetup.exists_mem_W
 ⟹ `V̄`-元の持ち上げ `ζ₁ ∈ D ∩ U` は `[ζ₁,t] ∈ Z(U) ⊆ P` を持つので
 `[ζ₁,t] = 1`、すなわち **`ζ₁ ∈ V`**。持ち上げの `V`-所属は自動。
 
-残るのは `ζ₁ ∉ P` の方だけ (書籍の `(V∩U)/(P∩U) ≠ 1`)。
+## `ζ₁ ∉ P` も導出できた — `P ∩ U ⊆ Z(U)`
+
+`SectionFourSetup.mem_center_of_mem_P` / `notMem_P_of_mk_ne_one`:
+`U ≤ C_G(P)` (`residualImage_le_centralizer`) なので `P` の元が `U` に入れば
+`U` の中心に入る。⟹ **`P ∩ U ⊆ Z(U)`**。
+
+⟹ `ζ̄ = mk' ζ₁ ≠ 1` なら `ζ₁ ∉ Z(U)` なので `ζ₁ ∉ P ∩ U`、`ζ₁ ∈ U` と
+合わせて **`ζ₁ ∉ P`**。
+
+⟹ 書籍の `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` という**数え上げは不要**
+(PSU(3,ℓ) の構造は使わない)。残るのは `W̄^#` の元を `D̄` 経由で持ち上げて
+`exists_mem_W` に食わせる組立てのみ。
 
 ## 残り = **`ζ₁ ∈ (V ∩ U) − (P ∩ U)` の存在 1 つだけ**
 
