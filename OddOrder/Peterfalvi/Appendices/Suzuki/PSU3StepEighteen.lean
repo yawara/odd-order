@@ -283,6 +283,36 @@ theorem h_mem_W_of_frobeniusD (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   rw [hrw]
   exact hyp.W.mul_mem hgW hζ
 
+/-- **The conjugators of §2 lie in `K W`** (Peterfalvi Part II, Ch. IV §2, p. 129:
+"Moreover, by (H4), `h(ω_k⁻¹(0,r)) ∈ K W`").
+
+The formula (18) is proved from is exactly `stepEighteen_unroll`,
+
+  `h(ω z_n) = (h(ω) ζ⁻¹)^n · h(ω) · ζ^n · k⁻¹`   with `k ∈ K`,
+
+which the book displays as `h(ω(0,u_i)) = (h(ω)ζ⁻¹)^i ζ^i (α / (β^i + β^{-i}))`.  Once
+`h(ω) ∈ W` — the first half of §2's closing Proposition
+(`h_mem_W_of_frobeniusD`) — every factor but the last lies in `W`, and the last lies in
+`K`; so the whole thing lies in `K W`.
+
+This is what makes §2's orbits genuinely `K W`-orbits, i.e. what the closing Proposition
+needs in order to run without `V = W`. -/
+theorem h_mul_stepElevenSeq_mem_KW (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) (hhW : h ω ∈ hyp.W)
+    (n : ℕ) (hns : ∀ i < n, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1) :
+    h (ω * (hyp.stepElevenSeq ζ y n).1) ∈ hyp.KW := by
+  obtain ⟨k, hkK, -, hk⟩ := hyp.stepEighteen_unroll H hC2 hζ hωQ hωQ0 hyQ0 hfω n hns
+  have hWpart : (h ω * ζ⁻¹) ^ n * h ω * ζ ^ n ∈ hyp.W :=
+    hyp.W.mul_mem (hyp.W.mul_mem (pow_mem (hyp.W.mul_mem hhW (hyp.W.inv_mem hζ)) n) hhW)
+      (pow_mem hζ n)
+  have hrw : (h ω * ζ⁻¹) ^ n * h ω * (ζ ^ n * k⁻¹)
+      = ((h ω * ζ⁻¹) ^ n * h ω * ζ ^ n) * k⁻¹ := by group
+  rw [hk, hrw]
+  exact hyp.mem_KW_of_mul_W_K hWpart (hyp.K.inv_mem hkK)
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

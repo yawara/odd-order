@@ -186,9 +186,24 @@ fpf で切るしかなく、そのためには §2/§3 の `hVW` を fpf に一�
 > Moreover, by (H4), `h(f(ω(0,r))) ∈ K W`. By (H5), it follows that
 > `(ω̄⁻¹(0,r))^{KW} = (ω(0,α+r))^{KW}`, whence `i = k` and `ω_i² = (0,α)`.
 
-⟹ **次にやること** = 「`h(f(ω(0,r))) ∈ KW`」を (H4) + (19)/(20) の
-`d_i ∈ KW` (`stepElevenSeq_mem_KW` が既にある) から出す。それができれば
-`barOrbitRel` を `KW` にでき、`exists_f_eq_conj_inv` が `FreeD` で出て (2) 完了。
+**✅ 部品は landing 済 (2026-08-02)**: `h_mul_stepElevenSeq_mem_KW`
+(`PSU3StepEighteen.lean`)。書籍が (18) の証明で表示する
+
+  `h(ω(0,u_i)) = (h(ω)ζ⁻¹)^i ζ^i (α / (β^i + β^{-i}))`
+
+は repo の `stepEighteen_unroll`
+(`h(ω z_n) = (h(ω)ζ⁻¹)^n h(ω) ζ^n k⁻¹`, `k ∈ K`) そのもの。
+`h(ω) ∈ W` (= `h_mem_W_of_frobeniusD`) を入れると最後の因子以外が `W` に入り、
+最後が `K` なので全体が `KW`。補助 `mem_KW_of_mul_W_K` を `PSU3StepEightKW` に追加。
+
+**残る配線 (次の入口)**: 書籍は `h(ω_k⁻¹(0,r)) ∈ KW` を使うが、
+`ω_k⁻¹(0,r) = ω_k(0, r_k + r)` (`ω_k² = (0,r_k)`) なので、これを
+`h_mul_stepElevenSeq_mem_KW` に食わせるには
+**`(0, r_k+r)` が `ω_k` の数列値 `z_n` であること**が要る。
+それは step (15) の exhaustion (`stepFifteen_exhaust`、`KW`-形の集合で述べ直し済)
+の帰結だが、`f(ω_k(0,r_k+r))` が `ω̄_k` の `KW`-軌道に入ることを言う必要がある。
+書籍の添字 `i`, `k` の定義 (「`f(ω₁⁻¹)‾` が `ω̄_i` の軌道」「`f(ω₁⁻¹(0,α))‾` が
+`ω̄_k` の軌道」) を追って確定すること。
 
 現状 `PSU3BarOrbit.lean` は `hVW` を保持しているが、内部では
 `KW_eq_D_of_V_eq_W` / `freeD_of_V_eq_W` 経由で新 API に接続済なので、

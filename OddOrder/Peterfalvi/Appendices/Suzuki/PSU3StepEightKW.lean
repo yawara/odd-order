@@ -99,6 +99,11 @@ theorem KW_le_D : hyp.KW ≤ hyp.D := by
   rintro _ ⟨κ, hκ, v, hv, rfl⟩
   exact hyp.D.mul_mem (hyp.K_le_D hκ) (hyp.W_le_D hv)
 
+/-- `w κ ∈ K W` for `w ∈ W`, `κ ∈ K` — the two factors commute, so the order is free. -/
+theorem mem_KW_of_mul_W_K {w κ : G} (hw : w ∈ hyp.W) (hκ : κ ∈ hyp.K) :
+    w * κ ∈ hyp.KW :=
+  ⟨κ, hκ, w, hw, (hyp.commute_of_mem_W_of_mem_K hw hκ).symm⟩
+
 /-- **`K W` is `t`-stable**: `t κ t = κ⁻¹` for `κ ∈ K` (the defining property) and `t`
 centralizes `W ≤ V = C_D(t)`. -/
 theorem conj_t_mem_KW {c : G} (hc : c ∈ hyp.KW) : hyp.t * c * hyp.t ∈ hyp.KW := by
