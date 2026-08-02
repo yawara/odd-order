@@ -24,6 +24,8 @@ between that hypothesis and its relabelled-point-set twin.
 ## Main results
 
 * `map_Q0_of_mulEquiv`, `map_W_of_mulEquiv`, `exists_ne_one_mem_W_of_mulEquiv`
+* `corollaryTwo_conclusion_of_mulEquiv` — Corollary 2's conclusion transports along a
+  matching isomorphism (Ch. IV §4, step (2))
 * `Q0_eq_of_H_eq`, `W_eq_of_H_D_eq`, `distinguishedInvolution_eq_of_eq`
 -/
 
@@ -60,6 +62,58 @@ theorem map_Q0_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (
   · intro hy
     have hc := congrArg φ.symm hy
     rwa [map_pow, map_one] at hc
+
+/-- **Corollary 2's conclusion transports along a matching isomorphism** (Peterfalvi
+Part II, Ch. IV §4, step (2), p. 133).
+
+Step (2) proves Corollary 2 on the *transported* standing hypothesis on `U/Z(U)`, while
+the book's `f₁`, `h₁` are the mappings of the *intrinsic* one; the two are matched in
+`H`, `Q`, `D` and `t` by `exists_mulEquiv_match_residualQuotient_t`.  `IsFGH.map` — which
+exists for exactly this step — says the two triples of mappings correspond under the
+isomorphism, so the witness `ω` and the parameter `ζ` may simply be pushed forward.
+
+`Q₀` needs no separate hypothesis: it is determined by `H` (`map_Q0_of_mulEquiv`). -/
+theorem corollaryTwo_conclusion_of_mulEquiv (hyp₁ : Hypothesis L Λ) (hyp₂ : Hypothesis L' Λ')
+    (ψ : L ≃* L') (hH : hyp₁.H.map ψ.toMonoidHom = hyp₂.H)
+    (hQ : hyp₁.Q.map ψ.toMonoidHom = hyp₂.Q)
+    (hD : hyp₁.D.map ψ.toMonoidHom = hyp₂.D) (ht : ψ hyp₁.t = hyp₂.t)
+    {f₁ g₁ k₁ : L → L} {f₂ g₂ k₂ : L' → L'}
+    (H₁ : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp₁.H hyp₁.Q hyp₁.D hyp₁.t f₁ g₁ k₁)
+    (H₂ : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp₂.H hyp₂.Q hyp₂.D hyp₂.t f₂ g₂ k₂)
+    {ζ ω : L} (hωQ : ω ∈ hyp₁.Q) (hωQ0 : ω ∉ hyp₁.Q0)
+    (hf : f₁ ω = ζ⁻¹ * ω⁻¹ * ζ) (hk : k₁ ω = ζ ^ 3) :
+    ψ ω ∈ hyp₂.Q ∧ ψ ω ∉ hyp₂.Q0 ∧
+      f₂ (ψ ω) = (ψ ζ)⁻¹ * (ψ ω)⁻¹ * ψ ζ ∧ k₂ (ψ ω) = (ψ ζ) ^ 3 := by
+  have hψQ : ∀ y ∈ hyp₁.Q, ψ y ∈ hyp₂.Q := by
+    intro y hy
+    rw [← hQ]
+    exact ⟨y, hy, rfl⟩
+  have hψD : ∀ y ∈ hyp₁.D, ψ y ∈ hyp₂.D := by
+    intro y hy
+    rw [← hD]
+    exact ⟨y, hy, rfl⟩
+  have hωQ0' : ψ ω ∉ hyp₂.Q0 := by
+    intro hc
+    rw [← map_Q0_of_mulEquiv hyp₁ hyp₂ ψ hH] at hc
+    obtain ⟨z, hz, hzω⟩ := hc
+    exact hωQ0 (ψ.injective hzω ▸ hz)
+  have hω1 : ψ ω ≠ 1 := by
+    intro hc
+    refine hωQ0 ?_
+    have : ω = 1 := by
+      have := congrArg ψ.symm hc
+      rwa [MulEquiv.symm_apply_apply, map_one] at this
+    rw [this]
+    exact hyp₁.Q0.one_mem
+  obtain ⟨hfv, -, hkv⟩ :=
+    OddOrder.GroupTheory.RankOneBNPair.IsFGH.map hyp₂.rankOneSetup H₁ H₂
+      ψ.toMonoidHom ht hψQ hψD hωQ hω1
+  refine ⟨hψQ ω hωQ, hωQ0', ?_, ?_⟩
+  · have hfv' : f₂ (ψ ω) = ψ (f₁ ω) := hfv
+    rw [hfv', hf]
+    simp only [map_mul, map_inv]
+  · have hkv' : k₂ (ψ ω) = ψ (k₁ ω) := hkv
+    rw [hkv', hk, map_pow]
 
 /-- `W` is determined by `H` and `D` — **no `t`**. -/
 theorem map_W_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (φ : L ≃* L')
