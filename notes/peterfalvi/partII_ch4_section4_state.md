@@ -1,4 +1,4 @@
-# Peterfalvi Part II, Ch. IV §4 — 到達状態 (2026-08-02)
+# Peterfalvi Part II, Ch. IV — 到達状態 (2026-08-02: **Ch. IV 完了**)
 
 > 正本の作業ログは [issue 0168](../../issues/0168-pf-part2-ch4-psu3.md) (9k 行)。
 > 本 note はその §4 部分の**要約と残件**だけを持つ。
@@ -266,22 +266,72 @@ Hypothesis.nonempty_theoremAConclusion_psu3
 → `nonempty_psu3InductionTarget` (`Q` は Sylow 2 ⟹ `⟨Q^x⟩ = O^{2′}(G)`)
 → `nonempty_theoremAConclusion_psu3`。
 
-## 次の作業 = §4 の出力を Corollary 1 に繋ぐ配線
+## ✅✅ Ch. IV 完了 (2026-08-02) — §4 → Corollary 1 の配線が通った
+
+### 配管 1: Proposition を `IsStandardModel` から (`PSU3PropositionModel.lean`)
 
 `nonempty_theoremAConclusion_psu3` の入力 `hform` は
 `proposition_inverseFormula_of_ne_one` が与えるが、そこには模型データ
-(`sfive`, `M`, `Φ`, `hquot`, `ι`, `hker`, `Ψ`, `hene`, `hΨq`, `hΨc`,
-`hconjq`, `hconjy`, `d`, `hequiv`, `hdsq`, `hs`, `hstage3` + numerology) が要る。
+(`Φ`, `hquot`, `ι`, `hker`, `Ψ`, `hene`, `hΨq`, `hΨc`, `hconjq`, `hconjy`,
+`d`, `hequiv`, `hdsq`, `hs`, `hstage3` + numerology) が要る。
+**その配管は Corollary 2 側に在った**ので、終点だけ差し替えた:
 
-**その配管は Corollary 2 側に既に在る**: `corollaryTwo_of_isStandardModel`
-(`PSU3CorollaryTwo.lean:746`) → `corollaryTwo_of_sectionThree` が
-`IsStandardModel` から `Φ/Ψ/hconjq/hconjy/hstage3/...` を全部組む。
-⟹ **同じ配管で終点を Corollary 2 でなく `hform` にした版**
-(`proposition_of_isStandardModel` 仮称) を作れば、
-`corollaryTwo_of_isStandardModel_of_closing` と同じ入力
-(`IsStandardModel` + numerology) から Corollary 1 に届く。
+```
+proposition_of_standardModel      -- = corollaryTwo_of_standardModel の終点差し替え
+  : 模型 + §3 (3) の hθ/hα ⟹ ∃ u hu Ψ, hform          -- u, Ψ はここで作る
+proposition_of_isStandardModel    -- = corollaryTwo_of_isStandardModel の同型
+  : IsStandardModel + numerology + 書籍の仮説 ⟹ ∃ u hu Ψ, hform
+nonempty_theoremAConclusion_of_isStandardModel
+  : 同上 + `IsPGroup 2 Q` + `1 < m` ⟹ Nonempty (TheoremAConclusion G Ω)
+```
 
-⚠ ただし `corollaryTwo_of_sectionThree` 系はまだ `hVW : V = W` を持つ
-(Corollary 2 は `G ≅ PSU(3,q)` の話なので正当)。`hform` 版では
-`hVW` の代わりに §4 が与える `h(ω) ∈ W` を使う
-(`proposition_inverseFormula_of_ne_one` の `hhW`)。
+`proposition_of_isStandardModel` は**書籍の仮説そのもの**
+(`ω ∈ Q − Q₀`, `ζ ∈ W^#`, `f(ω) = (ω⁻¹)^ζ`, `h(ω) ∈ W`) を取る。基点対は
+`y₀ = ω²` で §2 の形に直す (`sq_mem_Q0_of_lemmaFiveSetup` ⟹ `ω⁴ = 1` ⟹
+`ω·ω² = ω⁻¹`)。type-B scaling pair は模型自身から
+(`exists_scalingPair_of_centerCoordinate` + `odd_orderOf_scalingPair_of_model`)。
+
+### `stepThree_model` から `V = W` を外した (一般化)
+
+`stepThree_model` の `hVW : V = W` は**唯一 `h_mem_W_of_freeD` を呼ぶためだけ**に
+使われていた。⟹ `hhW₀ : h ω₀ ∈ W` を直接取る形に一般化し、`V = W` 側の呼び出し
+(`corollaryTwo_of_sectionThree`) はその場で `h_mem_W_of_freeD` を渡す。
+**これで Corollary 1 への経路は `V = W` を一切要求しない** — §4 (主題が `V ≠ W`)
+に Proposition を供給できる理由がこれ。
+
+### 配管 2: §4 → Corollary 1 (`PSU3SectionFourCorollaryOne.lean`)
+
+```
+SectionFourSetup.nonempty_theoremAConclusion
+  : §4 の standing data のみ ⟹ Nonempty (TheoremAConclusion G Ω)
+```
+`exists_mem_W` の出力がそのまま Proposition の仮説。残りの入力は全部その場で調達:
+
+| 入力 | 出どころ |
+|---|---|
+| `IsStandardModel` | `exists_standardModel` (`x₀ ≠ 1` = `exists_center_Q_ne_one`) |
+| `hWdvd : |W| ∣ q+1` | `isCyclic_W_and_card_dvd_of_orderThree` (Ch. I §3 Lemma 5) |
+| `hW1 : 1 < |W|` | §4 が返す `ζ ≠ 1` (`one_lt_natCard_W`) |
+| `hKcard : |K| = q−1` | `card_actualKActor_eq` |
+| `1 < m`, `3 ≤ |F|` | `eight_lt_natCard_Q0` (`q > 8`) ⟹ `2^m > 8` |
+| `hfQ` | `exists_fgh_mapsTo` |
+
+3 本とも axiom-clean・AxiomsCheck 登録済。
+
+## 残件 = Corollary 1 の後半 (`V = W ⟹ G ≅ PSU(3,q)` or `PGU(3,q)`)
+
+書籍 p.132 の 2 文目:
+
+> In particular, if `V = W`, then `G` is isomorphic to `PSU(3,q)` or to `PGU(3,q)`.
+> Proof. Suppose `V = W`. Then by the proposition of §2 the hypothesis of the
+> proposition is satisfied. In particular `PGU(3,q)` satisfies this hypothesis and so
+> `O^{2′}(G) ≅ O^{2′}(PGU(3,q)) = PSU(3,q)`. Therefore `(q+1)/(q+1,3) ≤ |W|`, and if
+> `|W| = (q+1)/(q+1,3)` then `G ≅ PSU(3,q)`. If not, `|W| = q+1` and `G ≅ PGU(3,q)`
+> by the lemma of §1.
+
+⚠ **Theorem A には不要** (結論は `L = O^{2′}(G)` が標準模型を持つこと、で既に完了)。
+書籍の番号付き結果としては未形式化。要るもの:
+* `PGU(3,q)` の標準模型 (repo には `ProjectiveUnitary.standardPermGroup` = PSU のみ)
+* `|W|` の 2 値化 (`(q+1)/(q+1,3)` か `q+1`) — §1 Lemma の置換群版を `G` 全体へ
+
+⟹ 低優先繰延 (Theorem A の完成を優先)。
