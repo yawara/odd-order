@@ -15070,3 +15070,7 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_conjQMulEquiv_actionEquiv
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.RankOneBNPair.permHom_conjQMulEquivOfData
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.inverseFormula_of_mem_Q0
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.proposition_inverseFormula_of_ne_one
