@@ -699,6 +699,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
 import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FrobeniusD
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates

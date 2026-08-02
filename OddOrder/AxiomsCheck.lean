@@ -37,6 +37,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryOne
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FrobeniusD
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
@@ -15095,3 +15096,7 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.SectionFourSetup.nonempty_theoremAConclusion
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.nonempty_theoremAConclusion_of_isStandardModel_of_closing
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isFrobeniusAction_D_of_freeD
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isZGroup_D_of_freeD
