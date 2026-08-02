@@ -41,6 +41,23 @@ Hypothesis.SectionFourSetup.exists_mem_W
   `D = H ∩ H^t` と `C_G(ω) ≤ H` (`ω ∈ Q^#`) から出る。
 * **`hS`** (`P·Z(U)` が `C_Q(P)` を中心化) も導出できた。
 
+## ⚠ `hcent` は**導出できる** (2026-08-02 の追加調査)
+
+`hcent : V ⊓ U ≤ C_G(C_{Q₀}(P))` は外部入力ではなく、商仮説の `V̄ = W̄` から出る:
+
+1. `W_eq_inf_centralizer_Q0 : W = D ⊓ C(Q₀)` (`PSU3SectionFourSetup:781`) は
+   **一般の `Hypothesis` に対する定理**なので intrinsic 商仮説にも当たる:
+   `W̄ = D̄ ⊓ C(Q̄₀)`。
+2. `V_eq_W_intrinsicResidualQuotient` (既存) と合わせて **`V̄ ≤ C(Q̄₀)`**。
+3. `ζ₁ ∈ V ⊓ U` の像は `V̄` (`mem_W_intrinsicResidualQuotient_of_mem_V` の前半)、
+   `y ∈ C_{Q₀}(P)` の像は `Q̄₀` (`y` は 2-元なので `y ∈ U`)。
+   ⟹ `[ζ₁, y] ∈ Z(U)`。
+4. 一方 `ζ₁ ∈ D` は `Q` を正規化するので `[ζ₁, y] ∈ Q`。
+5. `Z(U) ≤ D` (既 landing) と `Q ⊓ D = ⊥` (`Hypothesis` の公理) ⟹
+   **`[ζ₁, y] = 1`** ⟹ `ζ₁ ∈ C(y)` ∎
+
+⟹ **§4 の真の外部入力は `ζ₁ ∈ (V∩U) − (P∩U)` の存在 1 つだけ**になる見込み。
+
 ## 残り = PSU(3,ℓ) の構造から読み取る 2 つ
 
 書籍でもそれぞれ 1 文の主張 (§4 step (2), p. 133):
