@@ -7633,3 +7633,40 @@ twist `σ⁻¹τ` は `φ^{±1}` のまま。⟹ **`d` の `1 + 2^t` 正規化�
   `D`-共役、という状況になる。**ここを潰すか、`stepTwenty_snd` を `hwy` 無しに
   強化するのが次の一手**。書籍側の対応箇所 (p.128 の (20) 第二主張の導出) を
   ページ画像で読み直すこと。
+
+### (156) 段 (20) の側条件は解消済 — ただし仮説の形を「精密形」に直す必要がある
+
+commit `814ac78a6` で退化 2 ケースを解消し、`dOrbitRel_mul_of_barOrbitRel` /
+`y_eq_of_barOrbitRel` を landing させた。ただし**両者の仮説 `hne : ¬ barOrbitRel ω ω'`
+は強すぎる** — 閉じの Proposition で `ω_i = ω` (書籍の `i = j`) が起こりうるから。
+
+**⚠ 重要な発見**: `ω_i = ω` は矛盾ではなく**むしろ望ましい**ケース。連鎖の結論
+`dOrbitRel D (ω_k⁻¹ρ) (ω_i(ρy))` で `ω_i = ω_k = ω` なら `sq_eq_of_dOrbitRel` が
+そのまま `ω² = y` を出す。よって排除すべきは「軌道の一致」でなく**退化ケースそのもの**。
+
+`ω' = ω` のとき退化 2 ケースはいずれも矛盾する (`z := ρ = ω²`):
+* `w = y` ケース ⟹ `dOrbitRel D ω (ω ρ)`、`ρ ≠ 1` ゆえ `not_dOrbitRel_self_mul_Q0` で矛盾。
+* `w = 1` ケース ⟹ `dOrbitRel D (ω y) (ω ρ)` = `dOrbitRel D (ωy) ((ωy)(y⁻¹ρ))`、
+  **`ρ ≠ y` なら**同じ補題で矛盾 (`ρ = y` は結論そのものなので場合分けで先に処理)。
+
+⟹ **次セッションの手順** (機械的):
+1. `barOrbitRel_of_stepTwenty_degenerate_one` の結論を精密形
+   `dOrbitRel D (ω' * y') (ω * z)` に変える (現状は `barOrbitRel ω ω'` に潰していて、
+   `ω' = ω` の矛盾論法が動かせない)。
+2. `dOrbitRel_mul_of_barOrbitRel` の仮説を `hdeg : ¬ dOrbitRel D ω' (ω * z)` に戻す。
+3. `y_eq_of_barOrbitRel` の仮説を `hdeg1 : ¬ dOrbitRel D ω' (ω*z)` +
+   `hdeg2 : ¬ dOrbitRel D (ω' * y') (ω*z)` の 2 本に。
+4. 閉じの Proposition の組み立てで、この 2 本を
+   「transversal の軌道上定数性 ⟹ `ω' = ω` ⟹ `not_dOrbitRel_self_mul_Q0`」で潰す。
+
+**組み立ての骨格** (道具はすべて揃っている):
+```
+ω := r x₀ / ρ := ω*ω (∈ Q₀) / y := ω の正規化の随伴元
+case ρ = y  ⟹ f_eq_conj_inv_of_sq_eq で即終了
+case ρ ≠ y  ⟹ ω_i := r (f (ω*ρ)), ω_k := r (f (ω*(ρ*y)))   -- f_mem_sdiff_Q0 で Q∖Q₀
+              y_eq_of_barOrbitRel で y_i = y = y_k
+              dOrbitRel_mul_of_barOrbitRel で hi, hk
+              dOrbitRel_of_stepTwenty_chain ⟹ dOrbitRel D (ω_k⁻¹ρ) (ω_i(ρy))
+              ⟹ barOrbitRel ω_k ω_i ⟹ (transversal) ω_k = ω_i
+              ⟹ sq_eq_of_dOrbitRel ⟹ ω_i² = y、f_eq_conj_inv_of_sq_eq で仕上げ
+```
