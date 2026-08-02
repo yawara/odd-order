@@ -8210,3 +8210,22 @@ StepThree)。ページ画像だけ見て「未形式化」と判断しない。
   `f_conj_distinguishedInvolution_mul` (同 l.162)。**どちらも既存**。
 * `η` の半線形性 (Appendix I Prop 2) で体自己同型 `μ` を取り出す
 * 既存の体計算 (`PSU3SectionFourArithmetic`) へ配線
+
+### (178) §4 の材料は全部そろっている — 残りは (3)(4) の導出 1 箇所
+
+実測: §4 が使う道具はすべて repo に在る。
+
+| 必要物 | 所在 |
+|---|---|
+| §2 (2)(3) | `f_mul_conj_distinguishedInvolution` / `f_conj_distinguishedInvolution_mul` (`PSU3Preliminary.lean:137,162`) |
+| Appendix I Prop 2 (半線形) | `Peterfalvi/Appendices/SemilinearField.lean:196` (`(a)+(b)`, semilinearity 付き) |
+| 体計算 (5)〜(10) | `PSU3SectionFourArithmetic.lean` (全 12 補題) |
+| 段 (2) / 段 (3) | 本セッションで landing ((167)(172)(177)) |
+| E-座標への落とし方の手本 | `stepTwo_linear` (`PSU3SectionThree.lean:354`) — 共役がスカラー倍になる計算 |
+
+⟹ **残りは「群レベルの連鎖 → E 座標」を `η` 込みでもう一度やる 1 箇所**:
+* 群レベル: `f(ω^{ζ⁻¹}s^a)^{a²}s^a = f(ω^ζ s^a)^{ζ⁻³η}ω^{ζ⁻¹}` (§2 (2)(3) から)
+* E 座標: `η` はスカラーでなく**半線形**に作用するので、結論は
+  `a²·Y = ζ⁻¹·Y^η + ω̄` = 書籍の **(4)**。`stepTwo_linear` は `η = 1` の場合。
+* (3) は §2 (2) から同様に。
+* 以後は既存の `sectionFour_*` に配線するだけ。
