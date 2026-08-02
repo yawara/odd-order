@@ -135,6 +135,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.KernelNilpotent
 import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7C
+import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9D
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
