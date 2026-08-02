@@ -169,17 +169,17 @@ theorem h_eq_zpow_three (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
     {ζ ω : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
-    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hhW : h ω ∈ hyp.W) :
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) :
     h ω = ζ ^ 3 := by
-  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
-  obtain ⟨-, -, o3⟩ := hOne hyp.rankOneSetup H hωQ hω1
-  have hth : hyp.t * h ω * hyp.t = h ω := by
-    have hc : Commute (h ω) hyp.t := hyp.commute_t_of_mem_V (hyp.W_le_V hhW)
-    rw [← hc.eq, mul_assoc, hyp.rankOneSetup.invol, mul_one]
-  rw [hth] at o3
-  have hkey := hyp.h_inv_eq H M hZ hmu hVW hζ hωQ hωQ0 hf
-  rw [o3] at hkey
-  exact inv_injective hkey
+  -- run `h_inv_eq` at `ω⁻¹`, whose normalization is the same shape with `ζ⁻¹`
+  have hωinvQ : ω⁻¹ ∈ hyp.Q := hyp.Q.inv_mem hωQ
+  have hωinvQ0 : ω⁻¹ ∉ hyp.Q0 := fun hc => hωQ0 (by simpa using hyp.Q0.inv_mem hc)
+  have hfinv : f ω⁻¹ = (ζ⁻¹)⁻¹ * (ω⁻¹)⁻¹ * ζ⁻¹ := by
+    rw [inv_inv, inv_inv]
+    exact hyp.f_inv_eq H hζ hωQ hωQ0 hf
+  have hkey := hyp.h_inv_eq H M hZ hmu hVW (hyp.W.inv_mem hζ) hωinvQ hωinvQ0 hfinv
+  rw [inv_inv] at hkey
+  rw [hkey, ← inv_pow, inv_inv]
 
 /-- **§3, stage (1)** (Peterfalvi Part II, p. 130):
 

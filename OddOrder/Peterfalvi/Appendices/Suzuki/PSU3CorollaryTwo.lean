@@ -303,7 +303,6 @@ theorem corollaryTwo_of_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
     (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
     (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
-    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
     {ζ₀ ω₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
     (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0) (hf₀ : f ω₀ = ζ₀⁻¹ * ω₀⁻¹ * ζ₀)
     (hstage3 : (Ψ ⟨ω₀, hω₀Q⟩).quotient ^ (2 ^ m + 1)
@@ -316,7 +315,7 @@ theorem corollaryTwo_of_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (fun σ hσQ => hyp.stepFour_cover_of_base H hC2 sfive M hZc hmu hVW Φ hquot ι hker hu
       Ψ hene hΨq hΨc hconjq hconjy d hequiv hdsq hs hm hQ0card hfQ hζ₀ hζ₀1 hω₀Q hω₀Q0
       hf₀ hstage3 σ hσQ (hfQ σ hσQ))
-    hhW hζ hζ1
+    hζ hζ1
 
 /-- **Peterfalvi Part II, Ch. IV §3, Corollary 2**, on the output of the Proposition of
 Ch. III §3 (pp. 120–132).
@@ -349,7 +348,6 @@ theorem corollaryTwo_of_standardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
     (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
     (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
-    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
     -- the model of Ch. III §3
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
@@ -466,7 +464,7 @@ theorem corollaryTwo_of_standardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       ← hα, hνval, div_eq_mul_inv]
     exact mul_comm _ _
   exact hyp.corollaryTwo_of_base H hC2 sfive M hZc hmu hVW Φ' hquot' ι hker' hu Ψ hene
-    hΨq hΨc hconjq hconjy d hequiv hdsq hs hm hQ0card hKcard hWdvd hW1 hfQ hhW hζ₀ hζ₀1
+    hΨq hΨc hconjq hconjy d hequiv hdsq hs hm hQ0card hKcard hWdvd hW1 hfQ hζ₀ hζ₀1
     hω₀Q hω₀Q0 hf₀ hstage3 hζ hζ1
 
 /-- **§3 (3), in the shape `corollaryTwo_of_standardModel` consumes it** (Peterfalvi
@@ -596,7 +594,6 @@ theorem corollaryTwo_of_sectionThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
     (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
     (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
-    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
     (θm : M.E ≃ₐ[ZMod 2] M.E)
@@ -672,7 +669,7 @@ theorem corollaryTwo_of_sectionThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     hsemi haniso ι d hequiv hdiagscale σ τ hscale hWinv θF hθF hodd hζ₀ hζ₀1 hω₀Q hω₀Q0
     hy₀Q0 hsqω₀ hfω₀
   exact hyp.corollaryTwo_of_standardModel H hC2 sfive M hZc hmu hVW hm hQ0card hKcard
-    hWdvd hW1 hfQ hhW θm hsemi hθ haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv uAut huAut
+    hWdvd hW1 hfQ θm hsemi hθ haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv uAut huAut
     hconj hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀ hα hζ hζ1
 
 /-! ### The remaining inputs of `corollaryTwo_of_sectionThree`
@@ -751,7 +748,6 @@ theorem corollaryTwo_of_isStandardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h
     (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
     (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
     (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
-    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
     (x₀ : ↥(Subgroup.center hyp.Q)) (hmodel : hyp.IsStandardModel sfive M x₀)
     -- §2's base pair
     {ζ₀ ω₀ y₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
@@ -778,7 +774,7 @@ theorem corollaryTwo_of_isStandardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h
       (hyp.cocycle_scale_of_diagScale M sfive ι d hequiv hdiagscale) ι hequiv σ τ hscale
       θF hθF
   exact hyp.corollaryTwo_of_sectionThree H hC2 sfive M hZc hmu hVW hm hQ0card hcard
-    hKcard hWdvd hW1 hfQ hhW θm hsemi haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv
+    hKcard hWdvd hW1 hfQ θm hsemi haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv
     hdiagscale u hu hconj σ τ hscale hWinv θF hθF hodd hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀
     hfω₀ hζ hζ1
 
@@ -822,7 +818,6 @@ theorem corollaryTwo_of_isStandardModel_of_normalization
     (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
     (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
     (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
-    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
     (x₀ : ↥(Subgroup.center hyp.Q)) (hmodel : hyp.IsStandardModel sfive M x₀)
     -- §2 (20): a normalized pair squares to its `y`
     {ζ₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
@@ -834,7 +829,7 @@ theorem corollaryTwo_of_isStandardModel_of_normalization
   obtain ⟨ω₀, hω₀Q, hω₀Q0, -, y₀, hy₀Q0, -, hfω₀⟩ := hyp.stepNine M hZc H hC2 hVW hm hQ0card
     hmu hKcard hWdvd hωQ hωQ0 hζ₀ (fun hc => hζ₀1 (Subtype.ext hc))
   exact hyp.corollaryTwo_of_isStandardModel H hC2 sfive M hZc hmu hVW hm hQ0card hcard
-    hKcard hWdvd hW1 hfQ hhW x₀ hmodel hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0
+    hKcard hWdvd hW1 hfQ x₀ hmodel hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0
     (hsq ω₀ hω₀Q hω₀Q0 y₀ hy₀Q0 hfω₀) hfω₀ hζ hζ1
 
 /-- **Peterfalvi Part II, Ch. IV §3, Corollary 2, with §2 run in full** (pp. 120–132).
@@ -862,7 +857,6 @@ theorem corollaryTwo_of_isStandardModel_of_closing
     (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
     (hWcyc : IsCyclic ↥hyp.W)
     (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
-    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
     (x₀ : ↥(Subgroup.center hyp.Q)) (hmodel : hyp.IsStandardModel sfive M x₀)
     {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
     ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
@@ -897,7 +891,7 @@ theorem corollaryTwo_of_isStandardModel_of_closing
     rw [hω₀inv]
     exact hfinv
   exact hyp.corollaryTwo_of_isStandardModel H hC2 sfive M hZc hmu hVW hm hQ0card hcard
-    hKcard hWdvd hW1 hfQ hhW x₀ hmodel hwW hw1 hω₀Q hω₀Q0 hy₀Q0 hsq₀ hfω₀ hζ hζ1
+    hKcard hWdvd hW1 hfQ x₀ hmodel hwW hw1 hω₀Q hω₀Q0 hy₀Q0 hsq₀ hfω₀ hζ hζ1
 
 end Hypothesis
 

@@ -616,14 +616,12 @@ theorem corollaryTwo_of_stepFour (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
               Suzuki2Groups.unitaryCoord m u (Ψ ⟨σ, hσQ⟩) ∧
           Suzuki2Groups.unitaryCoord m u (Ψ ⟨f σ, hfQ σ hσQ⟩)
             = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨σ, hσQ⟩))⁻¹)
-    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
     {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
     ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 :=
   hyp.corollaryTwo H M hZc hVW Φ hquot hu Ψ hΨq hconjq hconjy hmu hζ hζ1 hfQ
     (fun _ρ hρQ hρQ0 => hyp.stepFive H hC2 sfive M hZc Φ hquot ι hker hu Ψ hene hΨq hΨc
       hconjq hconjy d hequiv hdsq hs hVW hm hQ0card hmu hKcard hWdvd hW1 hfQ hω₀Q hω₀Q0
       hcover hρQ hρQ0)
-    hhW
 
 /-- **Stage (5) determines `f` off `Q₀`** — the first sentence of Corollary 1's proof
 (Peterfalvi Part II, p. 132: "`Q` and `f` are well defined by the specification of `q`").

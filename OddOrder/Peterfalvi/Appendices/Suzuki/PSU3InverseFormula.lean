@@ -950,8 +950,7 @@ theorem corollaryTwo (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
           = (Ψ ⟨ρ, hρQ⟩).quotient /
             Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩) ∧
         Suzuki2Groups.unitaryCoord m u (Ψ ⟨f ρ, hfQ ρ hρQ⟩)
-          = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹)
-    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W) :
+          = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹) :
     ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
   classical
   obtain ⟨r, hr0, hrtr⟩ := hyp.exists_normPreimage_of_mem_W M hmu hζ1
@@ -984,8 +983,7 @@ theorem corollaryTwo (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have hfeq := hyp.f_eq_conj_inv_of_inverseFormula M hu Ψ hconjq hconjy hζ hωmem
     (hfQ _ hωmem) hy h1 h2
   exact ⟨(ωQ : G), hωmem, hnotQ0, hfeq,
-    hyp.h_eq_zpow_three H M hZc hmu hVW hζ hωmem hnotQ0 hfeq
-      (hhW _ hωmem hnotQ0)⟩
+    hyp.h_eq_zpow_three H M hZc hmu hVW hζ hωmem hnotQ0 hfeq⟩
 
 /-! ### Stage (5): the formula is `K W`-equivariant -/
 
