@@ -646,6 +646,69 @@ theorem regularWreathTwo_card_and_involutions :
       simp [RegularWreathProduct.mul_def, he₂]
     · simp [RegularWreathProduct.mul_def, he₂, hsq]
 
+/-- `Q₈` には交換子が `a 2` になる組がある (`Q₈' = ⟨a 2⟩`). -/
+theorem quaternionTwo_exists_commutator :
+    ∃ g h : QuaternionGroup 2, g * h * g⁻¹ * h⁻¹ = QuaternionGroup.a 2 := by decide
+
+/-- `Q₈ × C₂` の involution は 3 つ (`Ω₁ = {1, (a2,1), (1,c), (a2,c)}`). -/
+theorem quaternionProd_sq_eq_one_iff (x : QuaternionGroup 2 × Multiplicative (ZMod 2)) :
+    x ^ 2 = 1 ↔ x = 1 ∨ x = (QuaternionGroup.a 2, 1) ∨ x = (1, Multiplicative.ofAdd 1) ∨
+      x = (QuaternionGroup.a 2, Multiplicative.ofAdd 1) := by
+  revert x; decide
+
+/-- `Q₈ × C₂` の自己同型は `Φ(P) = ⟨(a 2, 1)⟩` の非自明元を固定する. -/
+theorem quaternionProd_aut_fixes_frattini
+    (α : MulAut (QuaternionGroup 2 × Multiplicative (ZMod 2))) :
+    α (QuaternionGroup.a 2, 1) = (QuaternionGroup.a 2, 1) := by
+  obtain ⟨g, h, hgh⟩ := quaternionTwo_exists_commutator
+  set x : QuaternionGroup 2 × Multiplicative (ZMod 2) := (g, 1) with hx
+  set y : QuaternionGroup 2 × Multiplicative (ZMod 2) := (h, 1) with hy
+  have hcomm : x * y * x⁻¹ * y⁻¹ = (QuaternionGroup.a 2, 1) := by
+    refine Prod.ext ?_ ?_
+    · simpa only [hx, hy, Prod.fst_mul, Prod.fst_inv] using hgh
+    · simp [hx, hy]
+  have himg : α (QuaternionGroup.a 2, 1) = α x * α y * (α x)⁻¹ * (α y)⁻¹ := by
+    rw [← hcomm]
+    simp only [map_mul, map_inv]
+  have hsnd : (α x * α y * (α x)⁻¹ * (α y)⁻¹).2 = 1 := by
+    simp only [Prod.snd_mul, Prod.snd_inv]
+    rw [mul_comm (α x).2 (α y).2]
+    group
+  rcases quaternionTwo_commutatorElement (α x).1 (α y).1 with hc | hc
+  · exfalso
+    have hone : α x * α y * (α x)⁻¹ * (α y)⁻¹ = 1 := by
+      refine Prod.ext ?_ ?_
+      · simpa only [Prod.fst_mul, Prod.fst_inv, Prod.fst_one] using hc
+      · simpa only [Prod.snd_one] using hsnd
+    rw [hone] at himg
+    have : ((QuaternionGroup.a 2, 1) : QuaternionGroup 2 × Multiplicative (ZMod 2)) = 1 := by
+      have := congrArg (α.symm) himg
+      simpa using this
+    exact absurd (congrArg Prod.fst this) (by decide)
+  · rw [himg]
+    refine Prod.ext ?_ ?_
+    · simpa only [Prod.fst_mul, Prod.fst_inv] using hc
+    · simp [hsnd]
+
+/-- **書籍 hint の固定点**: `Q₈ × C₂` の自己同型は `t := (1, c)` を `Φ(P) = ⟨(a 2, 1)⟩`
+を法として固定する (`Ω₁(P)/Φ(P)` が `𝔽₂` 上 1 次元で Aut-不変だから). -/
+theorem quaternionProd_aut_fixes_mod_frattini
+    (α : MulAut (QuaternionGroup 2 × Multiplicative (ZMod 2))) :
+    α (1, Multiplicative.ofAdd 1) = (1, Multiplicative.ofAdd 1) ∨
+      α (1, Multiplicative.ofAdd 1) = (QuaternionGroup.a 2, Multiplicative.ofAdd 1) := by
+  set t : QuaternionGroup 2 × Multiplicative (ZMod 2) := (1, Multiplicative.ofAdd 1) with ht
+  have ht2 : t ^ 2 = 1 := by rw [ht]; decide
+  have hαt2 : (α t) ^ 2 = 1 := by rw [← map_pow, ht2, map_one]
+  have ht1 : t ≠ 1 := by rw [ht]; decide
+  rcases (quaternionProd_sq_eq_one_iff (α t)).mp hαt2 with h | h | h | h
+  · exact absurd (α.injective (by rw [h, map_one])) ht1
+  · exfalso
+    have := α.injective (h.trans (quaternionProd_aut_fixes_frattini α).symm)
+    rw [ht] at this
+    exact absurd (congrArg Prod.snd this) (by decide)
+  · exact Or.inl h
+  · exact Or.inr h
+
 /-- **10A.4 の第一段 (完成形)**: `C₂ ≀ C₂` は `Q₈ × C₂` の準同型像でない.
 
 `C₂ ≀ C₂` は位数 `8`, 非可換で involution を 2 つもつ
