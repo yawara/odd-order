@@ -153,6 +153,7 @@ import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10B
+import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10C
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
@@ -15269,6 +15270,10 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch10.nilpotencyClass_problem10B1
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch10.le_socle_of_isElementaryAbelian_of_not_dvd_index
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.ker_mapDomainAlgHom_eq_mul_top
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.ker_mapDomainAlgHom_eq_top_mul
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isMetacyclic_semidirectProduct
 #assert_only_allowed_axioms
