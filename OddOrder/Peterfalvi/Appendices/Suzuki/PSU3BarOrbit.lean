@@ -133,6 +133,53 @@ theorem barOrbitRel_of_stepNine {m : ℕ} (M : hyp.QuotientFieldModel m)
     hyp.stepNine M hZ H hC2 hVW hm hQ0card hinj hKcard hWdvd hωQ hωQ0 hζW hζ1
   exact ⟨ω', hω'Q, hω'Q0, ⟨z, hz, horb⟩, y, hyQ0, hy1, hnorm⟩
 
+/-- **A normalized transversal of the `KW`-orbits** (Peterfalvi Part II, Ch. IV §2,
+p. 124–125): the book's `ω_1, …, ω_n`, chosen normalized by (9).
+
+The book indexes the orbits and picks one representative each; the same data is a map
+`r : G → G` that is *constant on orbits* and lands on a normalized element of the orbit.
+Constancy is the book's "distinct representatives", which is all its "whence `i = k`"
+(p. 129) uses: two orbits named by the same `r`-value are the same orbit.
+
+`r` is built by normalizing `Quotient.out` of the class, so it depends on the class only;
+the normalization is (9) (`barOrbitRel_of_stepNine`), which lands in the same orbit. -/
+theorem exists_normalizedOrbitRep {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hVW : hyp.V = hyp.W) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hinj : Function.Injective M.mu)
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
+    {ζ : G} (hζW : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1) :
+    ∃ r : G → G,
+      (∀ x x' : G, hyp.barOrbitRel x x' → r x = r x') ∧
+      ∀ x ∈ hyp.Q, x ∉ hyp.Q0 →
+        r x ∈ hyp.Q ∧ r x ∉ hyp.Q0 ∧ hyp.barOrbitRel x (r x) ∧
+          ∃ y ∈ hyp.Q0, y ≠ 1 ∧ f (r x) = ζ⁻¹ * (r x * y) * ζ := by
+  classical
+  -- a class-invariant choice of a point of the orbit
+  set o : G → G := fun x => Quotient.out (Quotient.mk hyp.barOrbitSetoid x) with ho
+  have hox : ∀ x : G, hyp.barOrbitRel x (o x) := fun x =>
+    barOrbitRel.symm (Quotient.mk_out (s := hyp.barOrbitSetoid) x)
+  have hoeq : ∀ x x' : G, hyp.barOrbitRel x x' → o x = o x' := fun x x' hxx' =>
+    congrArg Quotient.out (Quotient.sound (s := hyp.barOrbitSetoid) hxx')
+  -- normalize it by (9)
+  have key : ∀ w : G, w ∈ hyp.Q ∧ w ∉ hyp.Q0 →
+      ∃ ω' : G, ω' ∈ hyp.Q ∧ ω' ∉ hyp.Q0 ∧ hyp.barOrbitRel w ω' ∧
+        ∃ y ∈ hyp.Q0, y ≠ 1 ∧ f ω' = ζ⁻¹ * (ω' * y) * ζ := by
+    rintro w ⟨hwQ, hwQ0⟩
+    obtain ⟨ω', h1, h2, h3, h4⟩ := hyp.barOrbitRel_of_stepNine M hZ H hC2 hVW hm hQ0card
+      hinj hKcard hWdvd hwQ hwQ0 hζW hζ1
+    exact ⟨ω', h1, h2, h3, h4⟩
+  choose! N hNQ hNQ0 hNrel hNnorm using key
+  refine ⟨fun x => N (o x), fun x x' hxx' => by simp only [hoeq x x' hxx'],
+    fun x hxQ hxQ0 => ?_⟩
+  have hoP : o x ∈ hyp.Q ∧ o x ∉ hyp.Q0 :=
+    ⟨barOrbitRel.mem_Q hxQ (hox x), barOrbitRel.notMem_Q0 hxQ0 (hox x)⟩
+  exact ⟨hNQ _ hoP, hNQ0 _ hoP, barOrbitRel.trans (hox x) (hNrel _ hoP), hNnorm _ hoP⟩
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
