@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.LinearAlgebra.FiniteDimensional.Basic
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.GroupTheory.GroupAction.MultipleTransitivity
 import Mathlib.Data.ZMod.Basic
@@ -35,6 +36,9 @@ apply to any field the caller has already identified with `𝔽₂`.
   linearly independent.
 * `isMultiplyPretransitive_two`, `isPreprimitive_nonzeroVector` — the action is
   `2`-transitive, hence preprimitive (and so quasiprimitive, by instance).
+* `exists_dual_eq_zero_eq_one`, `exists_mem_ker_ne_zero_ne` — the two existence facts that
+  turn `LinearMap.commutator_transvection` into perfectness of the linear group in
+  dimension `≥ 3`.
 -/
 
 set_option autoImplicit false
@@ -94,6 +98,59 @@ theorem exists_linearEquiv_apply_eq_of_linearIndependent [FiniteDimensional K V]
       rw [hBcd, Basis.span_apply]; rfl
     rw [← hb1, ← hc1]
     exact h1.symm
+
+/-! ## Two existence facts used for perfectness of the linear group -/
+
+/-- **A functional separating an independent pair**: `g w = 0` and `g v = 1`.
+
+The pair is a basis of the plane it spans, so the second coordinate functional does the
+job there; `LinearMap.exists_extend` extends it to `V`. -/
+theorem exists_dual_eq_zero_eq_one {w v : V} (hwv : LinearIndependent K ![w, v]) :
+    ∃ g : V →ₗ[K] K, g w = 0 ∧ g v = 1 := by
+  classical
+  set B := Basis.span hwv with hB
+  obtain ⟨g, hg⟩ := LinearMap.exists_extend (B.coord 1)
+  have hval : ∀ i : Fin 2, g (![w, v] i) = B.coord 1 (B i) := by
+    intro i
+    have hi : ((B i : _) : V) = ![w, v] i := by rw [hB, Module.Basis.span_apply]
+    rw [← hi]
+    exact congrFun (congrArg (fun f : _ →ₗ[K] K => (f : _ → K)) hg) (B i)
+  refine ⟨g, ?_, ?_⟩
+  · have := hval 0
+    simpa [Module.Basis.coord_apply, B.repr_self, Finsupp.single_apply] using this
+  · have := hval 1
+    simpa [Module.Basis.coord_apply, B.repr_self, Finsupp.single_apply] using this
+
+/-- **The kernel of a functional contains a vector other than `0` and a given `w`**, as
+soon as `dim V ≥ 3` and `w` is in the kernel.
+
+`ker h` has dimension at least `dim V − 1 ≥ 2`, while `span {w}` has dimension at most `1`,
+so the inclusion `span {w} ≤ ker h` is strict. -/
+theorem exists_mem_ker_ne_zero_ne [FiniteDimensional K V] (h : V →ₗ[K] K) {w : V}
+    (hw : h w = 0) (h3 : 3 ≤ Module.finrank K V) :
+    ∃ v : V, h v = 0 ∧ v ≠ 0 ∧ v ≠ w := by
+  classical
+  have hrank := LinearMap.finrank_range_add_finrank_ker h
+  have hle1 : Module.finrank K (LinearMap.range h) ≤ 1 := by
+    have := Submodule.finrank_le (LinearMap.range h)
+    simpa using this
+  have hker : 2 ≤ Module.finrank K (LinearMap.ker h) := by omega
+  have hspan : (Submodule.span K {w}) ≤ LinearMap.ker h := by
+    rw [Submodule.span_le, Set.singleton_subset_iff]
+    exact hw
+  have hspanrank : Module.finrank K (Submodule.span K {w}) ≤ 1 := by
+    rcases eq_or_ne w 0 with rfl | hw0
+    · rw [Submodule.span_zero_singleton]
+      simp
+    · rw [finrank_span_singleton hw0]
+  have hlt : (Submodule.span K {w}) < LinearMap.ker h :=
+    Submodule.lt_of_le_of_finrank_lt_finrank hspan (by omega)
+  obtain ⟨v, hvker, hvspan⟩ := SetLike.exists_of_lt hlt
+  refine ⟨v, hvker, ?_, ?_⟩
+  · rintro rfl
+    exact hvspan (Submodule.zero_mem _)
+  · rintro rfl
+    exact hvspan (Submodule.mem_span_singleton_self _)
 
 section TwoElementField
 

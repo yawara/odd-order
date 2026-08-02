@@ -15152,3 +15152,7 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.GroupTheory.LinearMap.iSup_transvectionSubgroup_eq_top
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.LinearMap.commutator_transvection
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_dual_eq_zero_eq_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_mem_ker_ne_zero_ne
