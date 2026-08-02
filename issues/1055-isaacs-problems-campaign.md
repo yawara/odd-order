@@ -7234,6 +7234,30 @@ step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可
 ⟹ **Ch.10 の残り = 10A.4 / 10B.1 / 10B.2 (Maschke) / 10C.1–10C.6 の 9 問**。
 文書順の次は 10A.4 (`P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G`)。
 
+### 10A.4 第一段 landing + 第二段の設計 (2026-08-03)
+
+**第一段 ✅** (`Ch10_MoreTransfer/Problems10A.lean`):
+`le_center_of_normal_card_eq_two` / `quaternionTwo_sq_eq_one_iff` (decide) /
+`quaternionTwo_commutatorElement` (decide) / `not_surjective_of_quaternionProd` /
+`regularWreathTwo_card_and_involutions` / **`not_surjective_regularWreath_of_quaternionProd`**。
+⟹ Yoshida の結論が否定でき、`P ≅ Q₈ × C₂` なら
+`(transfer G→P^ab).range = (transfer N→P^ab).range` (= `N_G(P)` が 2-transfer を制御)。
+
+**第二段の設計 (未着手)**: `G' < G` を出す。
+
+* mathlib に **焦点部分群定理**がある (`Mathlib/GroupTheory/Focal.lean`,
+  `Subgroup.commutator_inf_eq_focalSubgroup : ⁅⊤,⊤⁆ ⊓ P = P.focalSubgroup`;
+  repo でも `Ch06_FrobeniusActions/ProblemsTIHypothesis.lean` で使用実績あり)。
+  `G' = ⊤` なら `P = G' ⊓ P = focalSubgroup P` なので、**`focalSubgroup P < P`** を
+  示せばよい。
+* `P = Q₈ × C₂` の Frattini は `Φ(P) = ⟨(a 2, 1)⟩` (位数 2、`P' = P² = Φ(P)`)、
+  `Ω₁(P) = {x | x² = 1}` は位数 4 で characteristic。よって `Ω₁(P)/Φ(P)` は
+  `P/Φ(P) ≅ C₂³` の中の **`N`-不変な 1 次元部分空間**で、`𝔽₂` 上 1 次元だから
+  その非零ベクトルは `N` の固定点 (書籍 hint の「`N/P` が `P/Φ(P)` に非自明な固定点をもつ」)。
+* 残るのは「`N` が transfer を制御 + `P/Φ(P)` に非自明な `N`-固定点」⟹
+  `focalSubgroup P < P` の橋。repo の transfer API (`Ch05_Transfer`,
+  `MonoidHom.transfer` / `transferRes`) で書く必要がある。
+
 ### 10A.4 の設計メモ (2026-08-03 追記)
 
 Yoshida (`Ch10.exists_surjective_wreath_of_transfer_range_lt`, repo に有り) を使うには
