@@ -15253,4 +15253,8 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch10.isPGroup_problem10B1
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.prime_dvd_one_sub_zpow
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.commutatorElement_inl_left
+#assert_only_allowed_axioms
   OddOrder.GroupTheory.isMetacyclic_semidirectProduct

@@ -84,6 +84,37 @@ theorem orderOf_one_add_prime_dvd (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n)
   change (ZMod.castHom (dvd_pow_self p hn.ne') (ZMod p)) (1 + (p : ZMod (p ^ n))) = 1
   rw [map_add, map_one, map_natCast, ZMod.natCast_self, add_zero]
 
+/-- `ZMod (p^n) → ZMod p` の還元で `0` になる元は `p` で割り切れる. -/
+theorem prime_dvd_of_castHom_eq_zero (hp : p.Prime) (hn : 0 < n) {z : ZMod (p ^ n)}
+    (h : ZMod.castHom (dvd_pow_self p hn.ne' : p ∣ p ^ n) (ZMod p) z = 0) :
+    (p : ZMod (p ^ n)) ∣ z := by
+  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  rw [ZMod.castHom_apply] at h
+  have hval : ((z.val : ℕ) : ZMod p) = 0 := by
+    rw [ZMod.natCast_val]
+    exact h
+  obtain ⟨c, hc⟩ := (ZMod.natCast_eq_zero_iff _ _).mp hval
+  refine ⟨(c : ZMod (p ^ n)), ?_⟩
+  have : ((z.val : ℕ) : ZMod (p ^ n)) = z := ZMod.natCast_rightInverse z
+  rw [← this, hc]
+  push_cast
+  ring
+
+/-- **`u ≡ 1 mod p` なら `p ∣ 1 - u^j`** (`j : ℤ`). -/
+theorem prime_dvd_one_sub_zpow (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
+    (hu : ZMod.unitsMap (dvd_pow_self p hn.ne' : p ∣ p ^ n) u = 1) (j : ℤ) :
+    (p : ZMod (p ^ n)) ∣ (1 - ((u ^ j : (ZMod (p ^ n))ˣ) : ZMod (p ^ n))) := by
+  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  refine prime_dvd_of_castHom_eq_zero hp hn ?_
+  have hj : ZMod.unitsMap (dvd_pow_self p hn.ne' : p ∣ p ^ n) (u ^ j) = 1 := by
+    rw [map_zpow, hu, one_zpow]
+  have hval : ZMod.castHom (dvd_pow_self p hn.ne' : p ∣ p ^ n) (ZMod p)
+      ((u ^ j : (ZMod (p ^ n))ˣ) : ZMod (p ^ n)) = 1 := by
+    have := congrArg (Units.val) hj
+    rw [ZMod.unitsMap_val] at this
+    simpa using this
+  rw [map_sub, map_one, hval, sub_self]
+
 /-! ## 単元が定める巡回群の自己同型 -/
 
 /-- 単元 `u : (ZMod m)ˣ` が定める `Multiplicative (ZMod m)` の自己同型 (`x ↦ x^u`).
