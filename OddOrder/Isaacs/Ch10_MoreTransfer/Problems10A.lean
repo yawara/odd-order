@@ -1159,6 +1159,49 @@ theorem transfer_range_eq_of_quaternionProd {G : Type*} [Group G] [Finite G] (P 
   exact not_surjective_regularWreath_of_quaternionProd (φ.comp e.symm.toMonoidHom)
     (hφ.comp e.symm.surjective)
 
+/-- `e.symm (a 2, 1)` は `↥P` の交換子部分群に入る. -/
+theorem quaternionProd_symm_mem_commutator {G : Type*} [Group G] {P : Subgroup G}
+    (e : ↥P ≃* (QuaternionGroup 2 × Multiplicative (ZMod 2))) :
+    e.symm (QuaternionGroup.a 2, 1) ∈ commutator ↥P := by
+  obtain ⟨g, h, hgh⟩ := quaternionTwo_exists_commutator
+  have hc : (⁅((g, 1) : QuaternionGroup 2 × Multiplicative (ZMod 2)),
+      ((h, 1) : QuaternionGroup 2 × Multiplicative (ZMod 2))⁆)
+      = (QuaternionGroup.a 2, 1) := by
+    refine Prod.ext ?_ ?_
+    · simpa only [commutatorElement_def, Prod.fst_mul, Prod.fst_inv] using hgh
+    · simp [commutatorElement_def]
+  rw [← hc]
+  have hmap : (e.symm : _ ≃* _) ⁅((g, 1) : QuaternionGroup 2 × Multiplicative (ZMod 2)),
+      ((h, 1) : QuaternionGroup 2 × Multiplicative (ZMod 2))⁆
+      = ⁅e.symm (g, 1), e.symm (h, 1)⁆ :=
+    map_commutatorElement (e.symm.toMonoidHom) _ _
+  rw [hmap]
+  exact commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+
+/-- **10A.4 の共役不変性**: `s ∈ N_G(P)` による共役は `Abelianization ↥P` の上で
+`t = e.symm (1, c)` を動かさない. -/
+theorem abelianization_conj_eq_of_quaternionProd {G : Type*} [Group G] {P : Subgroup G}
+    (e : ↥P ≃* (QuaternionGroup 2 × Multiplicative (ZMod 2)))
+    {t : ↥P} (ht : e t = (1, Multiplicative.ofAdd 1)) (c : MulAut ↥P) :
+    Abelianization.of (c t) = Abelianization.of t := by
+  set α : MulAut (QuaternionGroup 2 × Multiplicative (ZMod 2)) := e.symm.trans (c.trans e)
+    with hα
+  have hαt : α (1, Multiplicative.ofAdd 1) = e (c t) := by
+    rw [hα, ← ht]
+    simp
+  rcases quaternionProd_aut_fixes_mod_frattini α with h | h
+  · have hct : c t = t := e.injective (by rw [← hαt, h, ht])
+    rw [hct]
+  · set z : ↥P := e.symm (QuaternionGroup.a 2, 1) with hz
+    have hzt : c t = z * t := by
+      refine e.injective ?_
+      rw [map_mul, hz, MulEquiv.apply_symm_apply, ht, ← hαt, h]
+      rfl
+    rw [hzt, map_mul]
+    have hz1 : Abelianization.of z = 1 :=
+      (QuotientGroup.eq_one_iff z).mpr (quaternionProd_symm_mem_commutator e)
+    rw [hz1, one_mul]
+
 /-- transfer が非自明なら `G' < G` (`Abelianization` は可換なので `G' ≤ ker`). -/
 theorem commutator_lt_top_of_transfer_ne_one {G : Type*} [Group G] [Finite G]
     (P : Sylow 2 G) {g : G}
