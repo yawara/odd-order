@@ -14935,8 +14935,17 @@ vanish separately (`sectionFour_lambda_eq_one`): **`λ = 1`** and **`b² + a^{-2
 `λ ∈ F` needs `μ(F) ⊆ F` (`coordFieldAut_mapsTo_frobFixed`), which holds because the nonzero
 elements of `F` are exactly the `K`-scalars and `μ` carries `K`-scalars to `K`-scalars.  The
 coefficient `ζ + ζ⁻¹ ∈ F` is the existing `mu_W_add_inv_mem_frobFixed` (the trace of a norm-one
-element). -/
+element).
+
+(10) is then the substitution of the trace relation into the `μ`-invariance (`sectionFour_ten`).
+And the book's closing "Thus `η ∈ W`" — stated without argument — is the *definition* of `W`:
+`W = C_V(K)` (`Hypothesis.W`, p. 98), and `μ = 1` says `μ(κ^η) = μ(κ)` for every `κ ∈ K`
+(`coordFieldAut_muK`), whence `κ^η = κ` because `μ` on `K` and the conjugation action of `K` on `Q`
+are both faithful (`mem_W_of_coordFieldAut_eq_id`).  No Galois correspondence on `Q₀` is needed. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_mapsTo_frobFixed
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_lambda
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.sectionFour_ten
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mem_W_of_coordFieldAut_eq_id

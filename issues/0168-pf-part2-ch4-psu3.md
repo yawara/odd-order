@@ -8549,3 +8549,31 @@ def W : Subgroup G := hyp.V ⊓ Subgroup.centralizer hyp.KSet   -- Basic.lean:18
 4. `eq_one_or_eq_qFrobenius_of_fixes` で `σ ∈ {1, qFrob}`、
    qFrob は位数 2 (偶) ⟹ **`σ = 1`**。
 5. 上の 1.–3. で `η ∈ W`、`h(ω) = ζ³η ∈ W` ⟹ §3 Corollary 1 で Ch. IV 完了。
+
+### (192) 🎯 (10) と **`μ = 1 ⟹ η ∈ W`** が landing
+
+`PSU3SectionFourEndgame.lean` 追記:
+* `sectionFour_ten` (純代数) — `σ(BX) = BX` と `B + σX = s`、`σ s = s` から
+  **(10)** `(s + σX)X = (s + σ²X)σX`。書籍の「`b² = ζ+ζ⁻¹+a^{-2μ²}` を
+  `b²a^{-2μ}` は `μ` 固定 に代入」そのもの。
+* `mem_W_of_coordFieldAut_eq_id` — **書籍 p.134 の「Thus `η ∈ W`」**。
+  (191) の解析どおり `W = C_V(K)` の定義から:
+  `σ = id` + `coordFieldAut_muK` + `mu_K_injective` + `conjQByK_injective`
+  ⟹ `ηκη⁻¹ = κ` (∀κ ∈ K) ⟹ `η ∈ V ⊓ centralizer KSet = W`。
+
+**残り (Ch. IV §4 完了まで)**:
+1. **`σ^p = 1`** (μ の奇数位数) — `scaledRingEquiv` の反復公式
+   `Ψ^[n] x = σ^[n] x · Ψ^[n] 1` (帰納法、`addEquiv_mul_eq_scaledRingEquiv_mul` を使う)
+   + `coordConjD` が `d` について乗法的 (`quotientDHom` が MonoidHom) + `η^p = 1`。
+2. **`σ|_F : ↥F ≃+* ↥F`** の構成 (`coordFieldAut_mapsTo_frobFixed` + 単射 + 有限)、
+   `sectionFour_sq_eq_id` を `E := ↥F` で適用 ⟹ `σ²|_F = id`。
+3. **(10) を `F^×` 全体で**: `X ∈ F^× ∖ {除外点}` ごとに `a ∈ K` を取り
+   (`a ↦ μ(a²)` は `K` が奇数位数ゆえ全射、`σ` は `F^×` の全単射)、
+   `b` を作って (3)–(9)→λ→(10) を回す。**ここが最大の残り** — §4 の standing data
+   (`SectionFourSetup` / step (3) の `ω`,`ζ`,`η` / `stepTen_exists` 相当) を
+   束ねる必要がある。
+4. `σ²|_F = id` + 奇数位数 ⟹ `σ|_F = id` (`eq_one_of_sq_eq_one_of_odd_pow`)、
+   `eq_one_or_eq_qFrobenius_of_fixes` で `σ ∈ {1, qFrob}`、qFrob は位数 2 ⟹
+   **`σ = 1`**。
+5. `mem_W_of_coordFieldAut_eq_id` で `η ∈ W`、`h(ω) = ζ³η ∈ W` ⟹
+   §3 Corollary 1 で **Ch. IV 完了**。

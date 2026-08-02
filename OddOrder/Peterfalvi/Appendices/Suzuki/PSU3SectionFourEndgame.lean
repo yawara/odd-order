@@ -34,11 +34,32 @@ membership facts it needs on the model:
 * `Hypothesis.coordFieldAut_mapsTo_frobFixed` — `μ(F) ⊆ F`.
 * `Hypothesis.sectionFour_lambda` — **`λ = 1` and `b² + a^{-2μ²} = ζ + ζ⁻¹`**, the first
   in the book's form "`b² a^{-2μ}` is fixed by `μ`".
+* `sectionFour_ten` — **(10)**, the substitution of the trace relation into that
+  invariance.
+* `Hypothesis.mem_W_of_coordFieldAut_eq_id` — **`μ = 1 ⟹ η ∈ W`**, the book's closing
+  "Thus `η ∈ W`".
 -/
 
 set_option autoImplicit false
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
+
+/-- **Peterfalvi Part II, Ch. IV §4, (10)** (p. 134):
+
+  `(ζ + ζ⁻¹ + X^μ) X = (ζ + ζ⁻¹ + X^{μ²}) X^μ`.
+
+The book reaches it from `λ = 1` by substituting `b² = ζ + ζ⁻¹ + a^{-2μ²}` into
+"`b² a^{-2μ}` is fixed by `μ`", with `X = a^{-2μ}`.  That substitution is all this is:
+`hfix` is the `μ`-invariance, `htr` the trace relation, and `hσs` says `μ` fixes
+`s = ζ + ζ⁻¹` (true because `μ` fixes `ζ`). -/
+theorem sectionFour_ten {E : Type*} [Field E] (h2 : (2 : E) = 0) (σ : E ≃+* E)
+    {s B X : E} (hσs : σ s = s) (hfix : σ (B * X) = B * X) (htr : B + σ X = s) :
+    (s + σ X) * X = (s + σ (σ X)) * σ X := by
+  have hB : B = s + σ X := by linear_combination htr - σ X * h2
+  have hσB : σ B = s + σ (σ X) := by rw [hB, map_add, hσs]
+  rw [map_mul, hσB] at hfix
+  rw [← hB]
+  exact hfix.symm
 
 namespace Hypothesis
 
@@ -195,6 +216,44 @@ theorem sectionFour_lambda (M : hyp.QuotientFieldModel m) (s : hyp.LemmaFiveSetu
     exact hlam1
   rw [map_mul, map_inv₀]
   linear_combination hden
+
+include hyp in
+/-- **🎯 `μ = 1` implies `η ∈ W`** (Peterfalvi Part II, Ch. IV §4, p. 134: "Thus `η ∈ W`
+and `h(ω) ∈ W`").
+
+The book states this without argument; it is the *definition* of `W`.  `W = C_V(K)`
+(`Hypothesis.W`, p. 98), so for `η ∈ V` it suffices that `η` centralize `K`.  And `μ` on a
+`K`-scalar is conjugation of the corresponding element of `K` by `η`
+(`coordFieldAut_muK`); `μ = 1` therefore says `μ(κ^η) = μ(κ)` for every `κ ∈ K`, and both
+`μ` on `K` (`mu_K_injective`) and the conjugation action of `K` on `Q`
+(`conjQByK_injective`) are faithful, so `κ^η = κ`.
+
+No property of `Q₀` or of the Galois correspondence `V/W ↪ Aut(F)` is needed. -/
+theorem mem_W_of_coordFieldAut_eq_id (M : hyp.QuotientFieldModel m)
+    (s : hyp.LemmaFiveSetup m) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    {ζ η : G} (hζ : ζ ∈ hyp.W) (hηD : η ∈ hyp.D) (hηV : η ∈ hyp.V)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    (hσ : ∀ x : M.E, hyp.coordFieldAut s M hm hQ0card hηD hζ hznot x = x) :
+    η ∈ hyp.W := by
+  refine Subgroup.mem_inf.mpr ⟨hηV, Subgroup.mem_centralizer_iff.mpr ?_⟩
+  intro κ hκ
+  have hκK : κ ∈ hyp.K := by
+    rw [← SetLike.mem_coe, hyp.coe_K]
+    exact hκ
+  -- `μ` fixes the `K`-scalar of `κ`, so `κ^η` and `κ` have the same scalar
+  have hval := hyp.coordFieldAut_muK s M hm hQ0card hηD hζ hznot hκK
+  rw [hσ] at hval
+  have hunits : M.mu (hyp.kActor hκK, 1)
+      = M.mu (hyp.kActor (hyp.conj_mem_K_of_mem_D hηD hκK), 1) := Units.ext hval
+  have hactor : hyp.kActor hκK = hyp.kActor (hyp.conj_mem_K_of_mem_D hηD hκK) :=
+    M.mu_K_injective hunits
+  have hconj : (⟨κ, hκK⟩ : ↥hyp.K)
+      = ⟨η * κ * η⁻¹, hyp.conj_mem_K_of_mem_D hηD hκK⟩ :=
+    hyp.conjQByK_injective (congrArg Subtype.val hactor)
+  have hfix : η * κ * η⁻¹ = κ := (congrArg Subtype.val hconj).symm
+  calc κ * η = (η * κ * η⁻¹) * η := by rw [hfix]
+    _ = η * κ := by group
 
 end Hypothesis
 
