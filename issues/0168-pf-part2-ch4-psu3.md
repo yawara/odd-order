@@ -7762,3 +7762,27 @@ commit `e02a85891`。`corollaryTwo_of_isStandardModel_of_closing` を新設し�
 **(158) 追記 2 — `hcard` も解決**: `PSU3InductionTarget.one_lt_n : 1 < n`
 (`CentralizerInductionBridge.lean:74`) が構造フィールドなので `|F| = 2^n ≥ 4 ≥ 3`。
 ⟹ **段 (2) 配線に未解決の材料は無い**。残るは (a)/(b) の配線先の選択と実装のみ。
+
+### (159) ⚠ 注記の食い違いを訂正 — `hhW` (∀ 版) は**未解決**
+
+(158) の表で `hhW` を「`h_mem_W` 経由で導出可」と書いたが、**本 issue 内で注記が
+食い違っている**。古い実測 (l.5520) の方が正しい:
+
+> `h_mem_W` (`PSU3StepEighteen.lean:171`) は**特定の `ω`** について §2 の鎖データ
+> (正規化 `hfω` + 停止指数 `hns`/`hstop`) 込みで出す。**∀ 版は要検討**。
+
+一方 (6608)(7111) は「✅ 導出可」としているが、根拠が示されていない。
+⟹ **`hhW : ∀ ρ ∈ Q∖Q₀, h ρ ∈ W` は現時点で未証明**。`hsq` と**同じ型の問題**
+(書籍は代表元 `ω_i` についてしか言っていない) である可能性が高い。
+
+**次セッションの最初の仕事**: `hhW` の消費点を実測する。
+* 消費は `corollaryTwo_of_stepFour` 1 箇所 (`PSU3CorollaryTwo.lean:319` 経由)。
+* §3 段 (4) は `stepFour_cover_of_base` で `Q` を base pair の `KW`-移動で覆うので、
+  **覆いの各元でしか `h ρ ∈ W` を使っていない可能性**がある。
+  そうなら `hhW` は「transversal 代表 + 覆い」に弱められ、`h_mem_W` で閉じる
+  (`hsq` を `exists_f_eq_conj_inv` で閉じたのと同じ形)。
+* 停止指数 `hns`/`hstop` の供給は `stepEleven` 系 (`PSU3Sequence.lean`) を実測すること。
+
+⚠ 教訓: 本 issue は 7000 行を超え、古い ⚠ と新しい ✅ が混在している。
+**表の「✅ 導出可」は、根拠 (定理名) が併記されていなければ信用しない**
+([[verify-port-state-by-number-not-coq-name]])。
