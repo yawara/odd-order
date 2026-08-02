@@ -216,32 +216,25 @@ theorem stepTwenty_fst_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have haa : a = a' := inv_injective hainv
   rw [← ha, ← ha', haa]
 
-/-- **Step (20)**, second assertion (Peterfalvi Part II, p. 128): whenever `f(ω₁ z)` is
-`D`-conjugate to `ω₂ w` with `w ∈ Q₀`, necessarily
+/-- **The `W`-part of a `D`-conjugator moves onto the target** (Peterfalvi Part II,
+p. 128, inside step (20)).
 
-  `w = z y`,
+Step (20) is proved through `stepTwenty_fst_eq`, which wants the conjugator in `K`; what
+a relation `f(ω₁ z) = (ω₂ w)^c` supplies is only `c ∈ D`.  Writing `c = κ v` with `κ ∈ K`
+and `v ∈ W` (`D = KW`), the `W`-part can be absorbed into `ω₂`: it centralizes `Q₀`, and
+`ω₂^v` satisfies the same normalization as `ω₂` because `t` centralizes `W` (so (H3) has
+no twist) and `v` commutes with `ζ` (so the normalization survives conjugation).
 
-which is the book's `f(ω₁(0,x)) = (ω₂(0, x + α))^{d(x)}`.
-
-The book reaches this by exhausting the `x` in question with the sequence of (11) and
-applying (19)(b) to each; but `stepTwenty_fst_eq` already proves it for every `z` — the
-conjugator merely has to be moved into `K`.  Writing `c = κ v` with `κ ∈ K` and `v ∈ W`
-(`D = KW`), the `W`-part can be absorbed into `ω₂`: it centralizes `Q₀`, and `ω₂^v`
-satisfies the same normalization as `ω₂` because `t` centralizes `W` (so (H3) has no
-twist) and `v` commutes with `ζ` (so the normalization survives conjugation). -/
-theorem stepTwenty_snd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
-    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
-      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+Both halves of step (20) go through this, so it is stated once. -/
+theorem exists_mem_K_conj_of_mem_D (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hVW : hyp.V = hyp.W)
     {ζ ω₁ ω₂ y z w c : G} (hζ : ζ ∈ hyp.W)
     (hWcard : orderOf ζ = Nat.card ↥hyp.W)
-    (hω₁Q : ω₁ ∈ hyp.Q) (hω₁Q0 : ω₁ ∉ hyp.Q0)
-    (hω₂Q : ω₂ ∈ hyp.Q) (hω₂Q0 : ω₂ ∉ hyp.Q0) (hyQ0 : y ∈ hyp.Q0)
-    (hf₁ : f ω₁ = ζ⁻¹ * (ω₁ * y) * ζ) (hf₂ : f ω₂ = ζ⁻¹ * (ω₂ * y) * ζ)
-    (hzQ0 : z ∈ hyp.Q0) (hwQ0 : w ∈ hyp.Q0) (hcD : c ∈ hyp.D)
-    (hrel : f (ω₁ * z) = c⁻¹ * (ω₂ * w) * c)
-    (hz1 : z ≠ 1) (hwy : w * y ≠ 1) :
-    z = w * y := by
+    (hω₂Q : ω₂ ∈ hyp.Q) (hω₂Q0 : ω₂ ∉ hyp.Q0) (hyQ0 : y ∈ hyp.Q0) (hwQ0 : w ∈ hyp.Q0)
+    (hcD : c ∈ hyp.D) (hf₂ : f ω₂ = ζ⁻¹ * (ω₂ * y) * ζ)
+    (hrel : f (ω₁ * z) = c⁻¹ * (ω₂ * w) * c) :
+    ∃ ω₂' : G, ω₂' ∈ hyp.Q ∧ ω₂' ∉ hyp.Q0 ∧ ∃ κ : G, κ ∈ hyp.K ∧
+      f ω₂' = ζ⁻¹ * (ω₂' * y) * ζ ∧ f (ω₁ * z) = κ⁻¹ * (ω₂' * w) * κ := by
   classical
   have hW := hyp.W_eq_zpowers hζ hWcard
   obtain ⟨κ, hκK, v, hvW, hc⟩ := hyp.exists_mem_K_mem_W_mul hVW hcD
@@ -293,6 +286,36 @@ theorem stepTwenty_snd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       _ = ζ⁻¹ * (v⁻¹ * ω₂) * ((y * v) * ζ) := by group
       _ = ζ⁻¹ * (v⁻¹ * ω₂) * ((v * y) * ζ) := by rw [← hvy]
       _ = ζ⁻¹ * ((v⁻¹ * ω₂ * v) * y) * ζ := by group
+  exact ⟨v⁻¹ * ω₂ * v, hω₂'Q, hω₂'Q0, κ, hκK, hf₂', hnew⟩
+
+/-- **Step (20)**, second assertion (Peterfalvi Part II, p. 128): whenever `f(ω₁ z)` is
+`D`-conjugate to `ω₂ w` with `w ∈ Q₀`, necessarily
+
+  `w = z y`,
+
+which is the book's `f(ω₁(0,x)) = (ω₂(0, x + α))^{d(x)}`.
+
+The book reaches this by exhausting the `x` in question with the sequence of (11) and
+applying (19)(b) to each; but `stepTwenty_fst_eq` already proves it for every `z` — the
+conjugator merely has to be moved into `K`.  Writing `c = κ v` with `κ ∈ K` and `v ∈ W`
+(`D = KW`), the `W`-part can be absorbed into `ω₂`: it centralizes `Q₀`, and `ω₂^v`
+satisfies the same normalization as `ω₂` because `t` centralizes `W` (so (H3) has no
+twist) and `v` commutes with `ζ` (so the normalization survives conjugation). -/
+theorem stepTwenty_snd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hVW : hyp.V = hyp.W)
+    {ζ ω₁ ω₂ y z w c : G} (hζ : ζ ∈ hyp.W)
+    (hWcard : orderOf ζ = Nat.card ↥hyp.W)
+    (hω₁Q : ω₁ ∈ hyp.Q) (hω₁Q0 : ω₁ ∉ hyp.Q0)
+    (hω₂Q : ω₂ ∈ hyp.Q) (hω₂Q0 : ω₂ ∉ hyp.Q0) (hyQ0 : y ∈ hyp.Q0)
+    (hf₁ : f ω₁ = ζ⁻¹ * (ω₁ * y) * ζ) (hf₂ : f ω₂ = ζ⁻¹ * (ω₂ * y) * ζ)
+    (hzQ0 : z ∈ hyp.Q0) (hwQ0 : w ∈ hyp.Q0) (hcD : c ∈ hyp.D)
+    (hrel : f (ω₁ * z) = c⁻¹ * (ω₂ * w) * c)
+    (hz1 : z ≠ 1) (hwy : w * y ≠ 1) :
+    z = w * y := by
+  obtain ⟨ω₂', hω₂'Q, hω₂'Q0, κ, hκK, hf₂', hnew⟩ :=
+    hyp.exists_mem_K_conj_of_mem_D H hVW hζ hWcard hω₂Q hω₂Q0 hyQ0 hwQ0 hcD hf₂ hrel
   exact hyp.stepTwenty_fst_eq H hC2 hζ hω₁Q hω₁Q0 hω₂'Q hω₂'Q0 hyQ0 hyQ0 hzQ0 hwQ0
     hf₁ hf₂' (hyp.mem_KSet_iff_mem_K.mpr hκK) hnew hz1 hwy
 
@@ -341,6 +364,32 @@ theorem stepTwenty (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   calc y₁ = (y₁ * y₂) * y₂⁻¹ := by group
     _ = y₂⁻¹ := by rw [hone, one_mul]
     _ = y₂ := hy₂inv
+
+/-- **Step (20), first assertion, with a `D`-conjugator** (Peterfalvi Part II, p. 128).
+
+`stepTwenty` wants the conjugator in `K`; the relations that arise from mere orbit
+membership have it only in `D = KW`.  `exists_mem_K_conj_of_mem_D` absorbs the `W`-part
+into `ω₂`, and the normalization — hence `y₂` — is unchanged, so the conclusion
+`y₁ = y₂` is the same one. -/
+theorem stepTwenty_of_mem_D (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hVW : hyp.V = hyp.W)
+    {ζ ω₁ ω₂ y₁ y₂ z₁ z₂ c : G} (hζ : ζ ∈ hyp.W)
+    (hWcard : orderOf ζ = Nat.card ↥hyp.W)
+    (hω₁Q : ω₁ ∈ hyp.Q) (hω₁Q0 : ω₁ ∉ hyp.Q0)
+    (hω₂Q : ω₂ ∈ hyp.Q) (hω₂Q0 : ω₂ ∉ hyp.Q0)
+    (hy₁Q0 : y₁ ∈ hyp.Q0) (hy₂Q0 : y₂ ∈ hyp.Q0)
+    (hz₁Q0 : z₁ ∈ hyp.Q0) (hz₂Q0 : z₂ ∈ hyp.Q0)
+    (hf₁ : f ω₁ = ζ⁻¹ * (ω₁ * y₁) * ζ) (hf₂ : f ω₂ = ζ⁻¹ * (ω₂ * y₂) * ζ)
+    (hcD : c ∈ hyp.D) (hpair : f (ω₁ * z₁) = c⁻¹ * (ω₂ * z₂) * c)
+    (hz₁1 : z₁ ≠ 1) (hz₂1 : z₂ ≠ 1)
+    (hz₁y₁ : z₁ * y₁ ≠ 1) (hz₂y₂ : z₂ * y₂ ≠ 1) :
+    y₁ = y₂ := by
+  obtain ⟨ω₂', hω₂'Q, hω₂'Q0, κ, hκK, hf₂', hnew⟩ :=
+    hyp.exists_mem_K_conj_of_mem_D H hVW hζ hWcard hω₂Q hω₂Q0 hy₂Q0 hz₂Q0 hcD hf₂ hpair
+  exact hyp.stepTwenty H hC2 hζ hω₁Q hω₁Q0 hω₂'Q hω₂'Q0 hy₁Q0 hy₂Q0 hz₁Q0 hz₂Q0
+    hf₁ hf₂' (hyp.mem_KSet_iff_mem_K.mpr hκK) hnew hz₁1 hz₂1 hz₁y₁ hz₂y₂
 
 /-! ## §2's closing Proposition: `f(ω) = (ω⁻¹)^ζ`
 
