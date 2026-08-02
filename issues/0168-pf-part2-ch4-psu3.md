@@ -7670,3 +7670,35 @@ case ρ ≠ y  ⟹ ω_i := r (f (ω*ρ)), ω_k := r (f (ω*(ρ*y)))   -- f_mem_s
               ⟹ barOrbitRel ω_k ω_i ⟹ (transversal) ω_k = ω_i
               ⟹ sq_eq_of_dOrbitRel ⟹ ω_i² = y、f_eq_conj_inv_of_sq_eq で仕上げ
 ```
+
+### (157) 🎯 §2 の閉じの Proposition が landing (`exists_f_eq_conj_inv`)
+
+commit `943afd971`。書籍 p.129 の Proposition 前半が Lean に:
+
+> `∃ ω ∈ Q − Q₀`, `∃ y ∈ Q₀`, `ω² = y ∧ f(ω) = (ω⁻¹)^ζ`
+
+(後半 `h(ω) ∈ W` は既存の `h_mem_W`。) 仮説は `M`/`hZ`/`hmu`/`hVW` (= `D` の自由性)、
+`hsqQ0 : ∀ x ∈ Q, x² ∈ Q₀`、`ζ` は `W` の生成元 (`hWcard`)、および任意の `x₀ ∈ Q∖Q₀`。
+
+(156) で予告した精密形リファクタも完了 (`dOrbitRel_of_stepTwenty_degenerate_one` は
+`dOrbitRel D (ω' y') (ω z)` を返す / 側条件は `hdeg1`,`hdeg2` の 2 本)。
+新規補助: `not_dOrbitRel_mul_Q0_mul_Q0`, `normalization_y_unique`。
+
+### ⚠ 次セッションはここから — `hsq` の消去 (endpoint 配線)
+
+`corollaryTwo_of_isStandardModel_of_normalization` はまだ
+`hsq : ∀ ω' ∈ Q∖Q₀, ∀ y ∈ Q₀, f ω' = ζ₀⁻¹(ω' y)ζ₀ → ω'² = y` (**全称**) を取るが、
+書籍が主張するのは**存在**形。⟹ endpoint を `stepNine + hsq` でなく
+`exists_f_eq_conj_inv` から base pair を取る形に組み替える:
+
+1. `hsqQ0` を `sfive` から作る (`LemmaFiveSetup.sqMem` + `centerEqQ0`)。
+2. `x₀ ∈ Q∖Q₀` は `exists_mem_Q_notMem_Q0` (`hcardQ` 済)。
+3. **`ζ₀` を `W` の生成元に取る**必要がある (`hWcard : orderOf ζ₀ = |W|`)。
+   `W` の巡回性は `isCyclic_W_and_card_dvd_of_orderThree`
+   (`WCyclicDivides.lean:47`、仮説 `hst : orderOf (s·t) = 3` 等) から。
+   ⟹ endpoint の `ζ₀` を**引数でなく内部で選ぶ**版を作るのが素直。
+4. `exists_f_eq_conj_inv` の出力 `(ω, y, ω² = y, f ω = ζ⁻¹ω⁻¹ζ)` から
+   `corollaryTwo_of_isStandardModel` が要る `hfω₀ : f ω₀ = ζ₀⁻¹(ω₀ y₀)ζ₀` を復元
+   (`ω y = ω·ω² = ω³ = ω⁻¹`、`ω⁴ = 1` ゆえ)。
+
+これが済めば **`hsq` が消え、段 (2) の残債はゼロ**になる。
