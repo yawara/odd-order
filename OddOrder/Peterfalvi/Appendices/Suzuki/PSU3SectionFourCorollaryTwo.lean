@@ -43,6 +43,8 @@ by `P` fixes both decompositions of Ch. I, so their factors stay in `C_G(P)`, an
   of `t`, which is how step (2) matches the two distinguished involutions.
 * `Hypothesis.isStandardModel_residualQuotient` — the Proposition of Ch. III §3 holds
   on `U/Z(U)`.
+* `Hypothesis.corollaryTwo_residualQuotient` — **step (2) itself**: Corollary 2 of §3
+  holds on `U/Z(U)`, with §2 run inside and nothing left as a hypothesis.
 -/
 
 set_option autoImplicit false
@@ -342,6 +344,69 @@ theorem isStandardModel_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
     (Nat.zero_lt_one.trans data.one_lt_n).ne'
     (hyp.natCard_residualQuotientHypothesis_Q0 details)
     (hyp.natCard_residualQuotientHypothesis_Q details) ihq x₀ hx₀
+
+/-- **🎯 Ch. IV §4, step (2): Corollary 2 of §3 holds on `U/Z(U)`** (Peterfalvi Part II,
+p. 133).
+
+`isStandardModel_residualQuotient` gives the Proposition of Ch. III §3 there, and
+`corollaryTwo_of_isStandardModel_of_closing` turns it into Corollary 2 with nothing else
+owed: §2 is run inside it (its closing Proposition supplies the base pair).  The mappings
+`f₁`, `g₁`, `h₁` are existentially quantified because `exists_fgh_mapsTo` is what builds
+them.
+
+Every input is the transported numerology of `PSU3SectionFourModel`. -/
+theorem corollaryTwo_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
+    (ih : TheoremAInductionBelow G Ω) :
+    letI := MulAction.compHom (ULift.{v} (Unital data.n))
+      details.residualQuotientEquiv.toMonoidHom
+    ∀ ζ ∈ (hyp.residualQuotientHypothesis details).W, ζ ≠ 1 →
+      ∃ f₁ g₁ h₁ : (↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X)) →
+          ↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X),
+        OddOrder.GroupTheory.RankOneBNPair.IsFGH
+            (hyp.residualQuotientHypothesis details).H
+            (hyp.residualQuotientHypothesis details).Q
+            (hyp.residualQuotientHypothesis details).D
+            (hyp.residualQuotientHypothesis details).t f₁ g₁ h₁ ∧
+          ∃ ω ∈ (hyp.residualQuotientHypothesis details).Q,
+            ω ∉ (hyp.residualQuotientHypothesis details).Q0 ∧
+              f₁ ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h₁ ω = ζ ^ 3 := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  have ihq : TheoremAInductionBelow
+      (↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X))
+      (ULift.{v} (Unital data.n)) :=
+    hyp.theoremAInductionBelow_residualQuotient details hXV hX ih
+  intro ζ hζW hζ1
+  obtain ⟨⟨sfive⟩, ⟨M⟩⟩ := hyp.nonempty_standingData_residualQuotient details hXV hX ih
+  obtain ⟨x₀, hx₀⟩ := hyp.exists_center_Q_ne_one_residualQuotient details
+  obtain ⟨f₁, g₁, h₁, H₁, hfQ⟩ :=
+    (hyp.residualQuotientHypothesis details).exists_fgh_mapsTo
+  have hm : data.n ≠ 0 := (Nat.zero_lt_one.trans data.one_lt_n).ne'
+  have hst := hyp.residualQuotientHypothesis_orderOf_distinguishedInvolution_mul_t details
+  have hQ0card := hyp.natCard_residualQuotientHypothesis_Q0 details
+  have hcardQ := hyp.natCard_residualQuotientHypothesis_Q details
+  have hVW := hyp.residualQuotientHypothesis_V_eq_W details
+  have hmu := hyp.mu_injective_residualQuotient details hXV hX ih sfive M
+  obtain ⟨hWcyc, hWdvd⟩ :=
+    (hyp.residualQuotientHypothesis details).isCyclic_W_and_card_dvd_of_orderThree hst
+      (hyp.isSuzuki2Group_residualQuotientHypothesis_Q details) hm hQ0card hcardQ ihq
+  obtain ⟨w, hwW, hw1⟩ := hyp.exists_ne_one_mem_residualQuotientHypothesis_W details
+  have hW1 : 1 < Nat.card ↥(hyp.residualQuotientHypothesis details).W := by
+    haveI : Nontrivial ↥(hyp.residualQuotientHypothesis details).W :=
+      ⟨⟨⟨w, hwW⟩, 1, fun hc => hw1 (congrArg Subtype.val hc)⟩⟩
+    exact Finite.one_lt_card
+  have hcard : 3 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 data.n) := by
+    rw [OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm]
+    calc (3 : ℕ) ≤ 2 ^ 2 := by norm_num
+      _ ≤ 2 ^ data.n := Nat.pow_le_pow_right (by norm_num) data.one_lt_n
+  refine ⟨f₁, g₁, h₁, H₁, ?_⟩
+  exact (hyp.residualQuotientHypothesis details).corollaryTwo_of_isStandardModel_of_closing
+    H₁ (Hypothesis.braid_of_orderOf_mul_eq_three _ hst) sfive M sfive.centerEqQ0 hmu hVW
+    hm hQ0card hcardQ hcard
+    ((hyp.residualQuotientHypothesis details).card_actualKActor_eq sfive M hm hQ0card)
+    hWdvd hW1 hWcyc hfQ x₀
+    (hyp.isStandardModel_residualQuotient details hXV hX ih sfive M x₀ hx₀)
+    hζW (fun hc => hζ1 (congrArg Subtype.val hc))
 
 end Hypothesis
 
