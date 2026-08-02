@@ -6,13 +6,17 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
 
 /-!
-# Peterfalvi Part II, Ch. IV §4: the equations (5) and (6)
+# Peterfalvi Part II, Ch. IV §4: the equations (3), (5)–(9)
 
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
-Part II, Ch. IV §4, p. 133.  Writing `X = f(ω s^b)‾` and `Y = X^η`:
+Part II, Ch. IV §4, pp. 133–134.  Writing `X = f(ω s^b)‾` and `Y = X^η`:
 
+* **(3)** `f(ω s^a)‾ = ζ a⁻² X`,
 * **(5)** `ζ X = a^{-2μ} Y + ω̄`,
-* **(6)** `b² X = ζ⁻¹ Y + ω̄`.
+* **(6)** `b² X = ζ⁻¹ Y + ω̄`,
+* **(7)** `X = (ζ⁻¹ + a^{-2μ}) / (1 + b² a^{-2μ}) · ω̄`,
+* **(8)** `Y = (b² + ζ) / (1 + b² a^{-2μ}) · ω̄`,
+* **(9)** `(ζ⁻¹ + a^{-2μ})^μ / (1 + b² a^{-2μ})^μ = (b² + ζ) / (1 + b² a^{-2μ})`.
 
 (6) is (4) read at `b` instead of `a`.  (5) is (4) at `a` with `f(ω s^a)‾` replaced by the
 right-hand side of (3) — and that substitution is where the semilinearity is used for the
@@ -32,7 +36,13 @@ below are `sectionFour_seven_book`'s `h5`, `h6` at
 * `Hypothesis.sectionFour_four_coordConjD` — (4) with its `η`-conjugate written through
   `coordConjD`, which is the form (5) and (6) compose with.
 * `Hypothesis.sectionFour_six_linear` — **(6)**.
-* `Hypothesis.sectionFour_five_linear` — **(5)**, from (4) and (3).
+* `Hypothesis.sectionFour_three_coord` — **(3)**, the existing `stepTen_quotient_coord`
+  plus the exponent-`4` bridge `ω⁴ = 1`.
+* `Hypothesis.sectionFour_five_linear`, `Hypothesis.sectionFour_five_of_three` — **(5)**,
+  from (4) and (3).
+* `Hypothesis.coordFieldAut_muK_ne_mu_W_inv` — `a^{2μ} ≠ ζ`, the side condition that makes
+  the denominator of (7), (8) nonzero.
+* `Hypothesis.sectionFour_seven_eight_nine` — **(7), (8), (9)**.
 -/
 
 set_option autoImplicit false
@@ -267,6 +277,120 @@ theorem sectionFour_five_of_three (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   hyp.sectionFour_five_linear H hC2 M s hZ hm hQ0card hζ hωQ hωQ0 haKset (pow_mem haK 2)
     hf hηζ hhω htη hηD hznot hXQ hYQ
     (hyp.sectionFour_three_coord H hC2 M hZ hζ hωQ hωQ0 hyQ0 hsq haK hf hb hXQ hYQ)
+
+/-! ### (7), (8) and (9)
+
+From here on nothing group-theoretic is left except two side conditions:
+
+* `a^{2μ} ≠ ζ`, which makes the denominator `a^{2μ} + b²` of (7) and (8) nonzero;
+* `ω̄^η = ω̄`, which is what lets (9) compare the `μ`-image of (7) with (8).
+
+The rest is `PSU3SectionFourArithmetic`, whose lemmas are stated for an abstract field. -/
+
+include hyp in
+/-- **`a^{2μ} ≠ ζ`** (Peterfalvi Part II, Ch. IV §4, p. 133).
+
+`μ` carries `K`-scalars to `K`-scalars (`coordFieldAut_muK`), and those lie in `F`
+(`mu_K_frobFixed`), whereas `μ(1, ζ)` — hence also its inverse, `F` being a subfield —
+does not.  This is what feeds `sectionFour_eq_of_add_eq_zero` to give the book's
+`a^{2μ} + b² ≠ 0`. -/
+theorem coordFieldAut_muK_ne_mu_W_inv {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (s : hyp.LemmaFiveSetup m) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    {d ζ : G} (hd : d ∈ hyp.D) (hζ : ζ ∈ hyp.W)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    {κ : G} (hκ : κ ∈ hyp.K) :
+    hyp.coordFieldAut s M hm hQ0card hd hζ hznot ((M.mu (hyp.kActor hκ, 1) : M.Eˣ) : M.E)
+      ≠ ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹ := by
+  rw [hyp.coordFieldAut_muK s M hm hQ0card hd hζ hznot hκ]
+  intro heq
+  refine hznot ?_
+  have hF : ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹
+      ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := by
+    rw [← heq]
+    exact OddOrder.FiniteField.mem_frobFixedSubfield.mpr (M.mu_K_frobFixed _)
+  simpa using (OddOrder.FiniteField.frobFixedSubfield M.E 2 m).inv_mem hF
+
+include hyp in
+/-- **🎯 Peterfalvi Part II, Ch. IV §4, equations (7), (8) and (9)** (pp. 133–134):
+
+  **(7)** `f(ω s^b)‾ = (ζ⁻¹ + a^{-2μ}) / (1 + b² a^{-2μ}) · ω̄`,
+  **(8)** `(f(ω s^b)‾)^η = (b² + ζ) / (1 + b² a^{-2μ}) · ω̄`,
+  **(9)** `(ζ⁻¹ + a^{-2μ})^μ / (1 + b² a^{-2μ})^μ = (b² + ζ) / (1 + b² a^{-2μ})`.
+
+(7) and (8) are the linear algebra of `sectionFour_seven_book`, `sectionFour_eight_book`
+applied to (5) and (6); the denominator is nonzero by `coordFieldAut_muK_ne_mu_W_inv` and
+`sectionFour_eq_of_add_eq_zero`.  (9) is the comparison of (8) with the `μ`-image of (7):
+`η` fixes `ω̄` (it centralizes `ω`, `hΨw`), so applying it to (7) gives
+`(f(ω s^b)‾)^η = (scalar of (7))^μ · ω̄`, and `ω̄ ≠ 0` cancels.
+
+Stated for an abstract `X` (`= f(ω s^b)‾`) and `w` (`= ω̄`) so that (5) and (6) — which
+carry the whole `f`, `ω`, `IsFGH` apparatus — enter only through `h5` and `h6`. -/
+theorem sectionFour_seven_eight_nine {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (s : hyp.LemmaFiveSetup m) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    {ζ η a b : G} (hζ : ζ ∈ hyp.W) (hηD : η ∈ hyp.D)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    (ha2 : a ^ 2 ∈ hyp.K) (hb2 : b ^ 2 ∈ hyp.K) {X w : M.E} (hw : w ≠ 0)
+    (hΨw : hyp.coordConjD M ⟨η, hηD⟩ w = w)
+    (h5 : ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹ * X
+      = (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+            ((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E))⁻¹
+          * hyp.coordConjD M ⟨η, hηD⟩ X + w)
+    (h6 : ((M.mu (hyp.kActor hb2, 1) : M.Eˣ) : M.E) * X
+      = ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E) * hyp.coordConjD M ⟨η, hηD⟩ X + w) :
+    X = (((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
+          + (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+              ((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E))⁻¹)
+        / (1 + ((M.mu (hyp.kActor hb2, 1) : M.Eˣ) : M.E)
+            * (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+                ((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E))⁻¹) * w
+      ∧ hyp.coordConjD M ⟨η, hηD⟩ X
+          = (((M.mu (hyp.kActor hb2, 1) : M.Eˣ) : M.E)
+              + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹)
+            / (1 + ((M.mu (hyp.kActor hb2, 1) : M.Eˣ) : M.E)
+                * (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+                    ((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E))⁻¹) * w
+      ∧ hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+            ((((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
+                + (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+                    ((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E))⁻¹)
+              / (1 + ((M.mu (hyp.kActor hb2, 1) : M.Eˣ) : M.E)
+                  * (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+                      ((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E))⁻¹))
+          = (((M.mu (hyp.kActor hb2, 1) : M.Eˣ) : M.E)
+              + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹)
+            / (1 + ((M.mu (hyp.kActor hb2, 1) : M.Eˣ) : M.E)
+                * (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+                    ((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E))⁻¹) := by
+  set σ := hyp.coordFieldAut s M hm hQ0card hηD hζ hznot with hσdef
+  set Ψ := hyp.coordConjD M ⟨η, hηD⟩ with hΨdef
+  set A := σ (((M.mu (hyp.kActor ha2, 1) : M.Eˣ) : M.E)) with hAdef
+  set B := ((M.mu (hyp.kActor hb2, 1) : M.Eˣ) : M.E) with hBdef
+  set c := ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ with hcdef
+  have h2 : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  have hcinv : c⁻¹ = ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) := by
+    rw [hcdef, inv_inv]
+  rw [← hcinv] at h6 ⊢
+  have hc : c ≠ 0 := inv_ne_zero (Units.ne_zero _)
+  have hA : A ≠ 0 := by
+    rw [hAdef, hσdef]
+    exact (map_ne_zero _).mpr (Units.ne_zero _)
+  have hAc : A ≠ c :=
+    hyp.coordFieldAut_muK_ne_mu_W_inv M s hm hQ0card hηD hζ hznot ha2
+  have hAB : A + B ≠ 0 := fun hc0 =>
+    hAc (sectionFour_eq_of_add_eq_zero h2 hA hc hw h5 h6 hc0)
+  have h7 := sectionFour_seven_book h2 hA hc hAB h5 h6
+  have h8 := sectionFour_eight_book h2 hA hc hAB h5 h6
+  refine ⟨h7, h8, ?_⟩
+  -- (9): apply `μ` to (7) and compare with (8)
+  have hsemi : Ψ X = σ ((c⁻¹ + A⁻¹) / (1 + B * A⁻¹)) * w := by
+    rw [h7, hΨdef, hσdef,
+      hyp.coordConjD_mul_eq_coordFieldAut_mul s M hm hQ0card hηD hζ hznot _ w, ← hΨdef,
+      hΨw]
+  exact sectionFour_nine h2 hA hc hAB hw h5 h6 hsemi
 
 end Hypothesis
 

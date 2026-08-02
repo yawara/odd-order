@@ -14892,7 +14892,13 @@ right-hand side of (3); that substitution is the first use of the semilinearity,
 already stated for an arbitrary `ω`, `ζ`, `y` with `f(ω) = (ω y)^ζ`.  The only §4-specific step is
 the exponent-`4` bridge: §4 has `f(ω) = (ω⁻¹)^ζ`, and with `y = ω²` the two forms agree because
 `ω⁴ = 1` — `y ∈ Q₀` and `Q₀` has exponent `2`.  That is step (1)'s "`C_Q(P)` has exponent 4" read
-on `ω`. -/
+on `ω`.
+
+(7), (8), (9) are then the abstract-field arithmetic of `PSU3SectionFourArithmetic` applied to
+(5) and (6).  Only two group-theoretic side conditions remain: the book's `a^{2μ} + b² ≠ 0`, which
+comes from `a^{2μ} ≠ ζ` (`coordFieldAut_muK_ne_mu_W_inv`: `μ` carries `K`-scalars to `K`-scalars,
+which lie in `F`, while `μ(1, ζ)` does not) via `sectionFour_eq_of_add_eq_zero`; and `ω̄^η = ω̄`,
+which is what lets (9) compare the `μ`-image of (7) with (8). -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_eq_of_smul
 #assert_only_allowed_axioms
@@ -14911,3 +14917,7 @@ on `ω`. -/
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_three_coord
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_five_of_three
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_muK_ne_mu_W_inv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_seven_eight_nine

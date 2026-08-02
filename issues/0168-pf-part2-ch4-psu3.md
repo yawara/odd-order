@@ -8469,3 +8469,43 @@ commit `bb2832468`。新 leaf `PSU3SectionFourCoordinate.lean` (185 行)。
 2. (10) → `sectionFour_sq_eq_id` → `μ² = 1` → `eq_one_of_sq_eq_one_of_odd_pow` で
    `μ = 1` → `η ∈ W` → `h(ω) ∈ W` → §3 Corollary 1 で Ch. IV 完了。
 3. `ω̄ ≠ 0` (= `ω ∉ Q₀`) は `coord_ne_zero_of_not_mem_Q0` が既存。
+
+### (190) 🎯 (7)(8)(9) が landing — 残りは λ → (10) → `μ = 1` → `η ∈ W`
+
+`sectionFour_seven_eight_nine` (`PSU3SectionFourEquations.lean`)。抽象 `X`,`w` で
+述べたので (5)(6) は `h5`/`h6` 経由でしか入らない。
+
+* `coordFieldAut_muK_ne_mu_W_inv` = **`a^{2μ} ≠ ζ`** — `μ` は `K`-スカラーを
+  `K`-スカラーに送り (`coordFieldAut_muK`)、それは `F` 内 (`mu_K_frobFixed`)。
+  一方 `μ(1,ζ)` は `F` 外 (`hznot`) で、`F` は逆元で閉じているから逆元も外。
+  ⟹ `sectionFour_eq_of_add_eq_zero` の対偶で書籍の `a^{2μ} + b² ≠ 0`。
+* (9) は「(7) の `μ` 像 vs (8)」。`η` が `ω` を中心化 ⟹ `ω̄^η = ω̄` (`hΨw`)、
+  `ω̄ ≠ 0` で約せる。
+
+**残り (p.134) の導出プラン** (repo スカラー: 書籍 `ζ` = `c := μ(1,ζ)⁻¹`,
+`a^{2μ}` = `A := σ(μ(a²,1))`, `b²` = `B := μ(b²,1)`, `a^{-2μ²}` = `σ(A)⁻¹`):
+
+1. **λ**: (9) を分母払いして
+   `(c⁻¹ + σ(A)⁻¹) = λ (B + c)`、`λ := (1 + σ(B)σ(A)⁻¹)/(1 + B A⁻¹)`。
+   `λ ∈ F` は `A,B ∈ F` かつ `σ(F) = F` から。
+   `c` 倍して `λc² + (λB + σ(A)⁻¹)c + 1 = 0` (char 2)。
+2. **`sectionFour_lambda_eq_one`** に `s := c + c⁻¹`, `lam := λ`, `α := σ(A)⁻¹`,
+   `β := B` で食わせる。要 `s ∈ F` — `c^{q+1} = 1` ⟹ `c^q = c⁻¹`
+   (`qFrobenius_eq_inv_of_pow_succ_eq_one`) ⟹ `(c+c⁻¹)^q = c+c⁻¹`。
+   要 `hmin : c² + s c + 1 = 0` = `sq_add_traceCoeff_mul_add_one`。
+   ⟹ **`λ = 1`** と **`B + σ(A)⁻¹ = c + c⁻¹`**。
+3. **(10)**: `λ = 1` ⟹ `σ(B A⁻¹) = B A⁻¹`。`X := A⁻¹` と置くと
+   `B = c + c⁻¹ + σ(X)` なので
+   `(c+c⁻¹+σ(X))X = (c+c⁻¹+σ²(X))σ(X)` = 書籍の (10)。
+   `X` は `a ∈ K` を動かすと `F^×` 全体を掃く (`exists_mem_K_mu_sq_inv_eq` の §4 版)。
+4. **`sectionFour_sq_eq_id`** を **`E := ↥F`** で適用 (⚠ (10) は `F` 上でしか
+   成立しない) ⟹ `σ²|_F = id`。要 `σ` の `F` への制限 = `σ(F) = F` の構成。
+5. `σ|_F` は奇数位数 (η の位数 p) かつ `σ²|_F = 1` ⟹
+   `eq_one_of_sq_eq_one_of_odd_pow` で **`σ|_F = id`**。
+   さらに `eq_one_or_eq_qFrobenius_of_fixes` (QuadraticFrobenius) で
+   `σ ∈ {1, qFrob}`、qFrob は位数 2 (偶) ⟹ **`σ = 1`**。
+6. **`σ = 1` ⟹ `η ∈ W`** — ⚠ ここだけ書籍が「Thus `η ∈ W`」で済ませており
+   行間。候補: `σ = 1` ⟹ `Ψ` は `E` 上のスカラー倍 ⟹ `η` は `Q/Q₀` に
+   `KW` の元として作用 ⟹ `W = C_V(Q₀)` (`W_eq_inf_centralizer_Q0`) で回収。
+   **次セッションで PDF p.134 と Coq `PFsection*` を突き合わせて確定する**。
+7. `h(ω) = ζ³η ∈ W` ⟹ §3 Corollary 1 で Ch. IV 完了。
