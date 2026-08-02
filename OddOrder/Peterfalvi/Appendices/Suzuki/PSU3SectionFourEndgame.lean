@@ -50,6 +50,8 @@ membership facts it needs on the model:
 * `Hypothesis.coordFieldAut_sq_eq_id_on_frobFixed` — **`μ² = id` on `F`**, the shift trick
   plus the count of the excluded points.
 * `Hypothesis.SectionFourSetup.eight_lt_natCard_Q0` — `q > 8`, the counting hypothesis.
+* `Hypothesis.center_le_subgroupOf_D` — **`Z(U) ⊆ D`**, the `hZD` that §4's step (2)/(3)
+  endpoints thread as a hypothesis.
 * `conj_inv_eq_of_commute`, `cube_mul_eq_of_commute` — the book's refinement
   `ζ₁ ∈ ζ P` (p. 133): `ω^{ζ₁} = ω^ζ` and `ζ₁³ P = ζ³ P`.
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
@@ -742,6 +744,50 @@ theorem SectionFourSetup.eight_lt_natCard_Q0 (s4 : hyp.SectionFourSetup)
         Nat.pow_le_pow_left hl 3
     _ ≤ Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) ^ s4.cardP :=
         Nat.pow_le_pow_right (by omega) hp
+
+/-! ### `Z(U) ⊆ D`
+
+Peterfalvi Part II, Ch. IV §4, step (1) (p. 132) opens with
+
+> As `Z(U) ⊂ C_V(C_{Q₀}(P))`, `Z(U) ⊂ P W` by the theorem of Galois.
+
+The inclusion `Z(U) ⊆ V ≤ D` is used without comment.  It follows from the two-point
+description `D = H ∩ H^t` of the standing hypothesis: `Z(U)` centralizes `t ∈ U`, which
+makes `H`-membership and `H^t`-membership the same condition, and it centralizes a
+nontrivial element of `Q` (namely the `ω ∈ C_Q(P) − Q₀` of step (1)), whose centralizer
+lies in `H` because `Q` is regular on `Ω − {basept}` (`centralizer_le_H_of_mem_Q`). -/
+
+include hyp in
+/-- An element of `H` commuting with `t` lies in the two-point stabilizer `D = H ∩ H^t`. -/
+theorem mem_D_of_mem_H_of_commute_t {z : G} (hzH : z ∈ hyp.H)
+    (hzt : z * hyp.t = hyp.t * z) : z ∈ hyp.D := by
+  rw [hyp.D_def]
+  refine ⟨hzH, ⟨z, hzH, ?_⟩⟩
+  change hyp.t * z * hyp.t⁻¹ = z
+  rw [← hzt, mul_assoc, mul_inv_cancel, mul_one]
+
+include hyp in
+/-- **🎯 `Z(U) ⊆ D`** (Peterfalvi Part II, Ch. IV §4, step (1), p. 132).
+
+Only two memberships in `U` are used: the distinguished involution `t`
+(`t_mem_primeComplementResidual`) and a nontrivial element of `Q` — in §4 the
+`ω ∈ C_Q(P) − Q₀` that Glauberman's step produces.  A central element of `U` commutes with
+both, so it lies in `C_G(ω) ≤ H` and commutes with `t`, hence in `D`. -/
+theorem center_le_subgroupOf_D {U : Subgroup G} {ω : G} (hωQ : ω ∈ hyp.Q) (hω1 : ω ≠ 1)
+    (hωU : ω ∈ U) (htU : hyp.t ∈ U) :
+    Subgroup.center ↥U ≤ hyp.D.subgroupOf U := by
+  intro z hz
+  rw [Subgroup.mem_subgroupOf]
+  have hcω : (z : G) * ω = ω * (z : G) := by
+    have hc := Subgroup.mem_center_iff.mp hz ⟨ω, hωU⟩
+    exact (congrArg Subtype.val hc).symm
+  have hct : (z : G) * hyp.t = hyp.t * (z : G) := by
+    have hc := Subgroup.mem_center_iff.mp hz ⟨hyp.t, htU⟩
+    exact (congrArg Subtype.val hc).symm
+  have hzH : (z : G) ∈ hyp.H :=
+    hyp.centralizer_le_H_of_mem_Q hωQ hω1
+      (Subgroup.mem_centralizer_singleton_iff.mpr hcω)
+  exact hyp.mem_D_of_mem_H_of_commute_t hzH hct
 
 /-! ### The book's refinement `ζ₁ ∈ ζ P`
 

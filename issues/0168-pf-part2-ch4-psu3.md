@@ -8787,3 +8787,20 @@ threading されているだけ**で producer が無い。`hyp.D` は `Hypothesi
 ⟹ **§4 完了には (200) の配管 + この `hZD` の証明が要る**。
 `hZD` は §4 の他の endpoint (step (2)(3)) でも threading されているので、
 証明できれば §4 全体の仮説が 1 本減る。
+
+### (202) 🎯 **`hZD : Z(U) ≤ D` を証明** — (201) の残債を解消
+
+`center_le_subgroupOf_D` (+ 補助 `mem_D_of_mem_H_of_commute_t`)。
+`Hypothesis` の構造体フィールドを読んだら**素直に出た**:
+
+* `D_def : D = H ⊓ H^t` (二点固定群)。⟹ `z ∈ H` かつ `z` が `t` と可換なら
+  `t z t⁻¹ = z ∈ H` なので `z ∈ H^t`、よって **`z ∈ D`**。
+* `Z(U)` は `t ∈ U` と可換 (`t_mem_primeComplementResidual`)。
+* `Z(U)` は `ω ∈ C_Q(P) − Q₀ ⊆ U` とも可換。`ω ∈ Q^#` なので
+  **`C_G(ω) ≤ H`** (`Basic.lean:557` `centralizer_le_H_of_mem_Q`、
+  `Q` が `Ω − {basept}` 上正則だから)。⟹ `Z(U) ≤ H`。
+
+⟹ `U` に対する仮定は「`t ∈ U`」と「ある `1 ≠ ω ∈ Q` が `U` に入る」の 2 つだけ。
+一般の `U : Subgroup G` で述べたので、`U := residualImage X` で `hZD` が出る。
+
+**残り = (200) の配管のみ** (すべて既存補題の組立)。
