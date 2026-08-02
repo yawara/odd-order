@@ -7156,6 +7156,36 @@ skeleton の各段でこの第 3 成分を `↥H` / `G ⧸ N` に当てる。必
 * `Nat.card (G ⧸ N) < Nat.card G` (`N ≠ ⊥`) / `Nat.card (S.map (mk' N)) ≤ Nat.card S`
 * 正規閉包の真降下 `T ◁◁ K`, `T < K` ⟹ `T^K < K` (skeleton 4 と (II) 4 の両方で使う)
 
+## 9D.4 skeleton 1–4 landing + (I) の簡略化 (2026-08-03)
+
+`KegelMinimalCounterexample.lean` に skeleton 1–4 が landing (axiom-clean):
+`ne_bot` / `ne_top` / `sup_eq_top` (`SN = G`) / `inf_isSubnormal` (`S∩N ◁◁ N`) /
+`inf_eq_bot` (`S ∩ N = 1`)。⟹ 極小反例は `G = S ⋉ N`。
+
+### (I) step 1-3 の簡略化 — Sylow の不動点論法は不要
+
+記録済の紙の証明は step 1 で「`S_p`-不変な `N_p ∈ Syl_p(N)` を取る」(p-群作用の不動点)
+としていたが、**`P ∈ Syl_p(G)` を 1 つ取るだけでよい**:
+
+`G = S ⋉ N` の retraction を `π_S : G → S` (= `G ↠ G/N ≅ S`) とすると
+
+* Kegel から `P ∩ S ∈ Syl_p(S)`。一方 `P ∩ S ≤ π_S(P)` で `π_S(P)` は `p`-群
+  ⟹ Sylow の極大性で **`π_S(P) = P ∩ S =: S_p`**。
+* 任意の `n ∈ N` で `π_S(n) = 1` なので `π_S(P^n) = π_S(P)^{π_S(n)} = S_p`。
+  Kegel を `P^n` に適用して `P^n ∩ S ∈ Syl_p(S)` かつ `P^n ∩ S ⊆ π_S(P^n) = S_p`、
+  位数が等しいので **`P^n ∩ S = S_p`、すなわち `S_p ≤ P^n` (∀ n ∈ N)**。
+
+これで step 1-3 が「retraction + Sylow の極大性」だけになり、`S_p N_p` が Sylow である
+ことの確認 (位数計算) も不要になる。step 4 以降 (`R := ⟨S_p^N⟩ ≤ P` が `p`-群 /
+半単純 `N` の正規部分群は部分積なので `N ∩ R = 1` / `[N, S_p] = 1` を全素数で回す) は
+記録どおり。
+
+### 形式化の次の必要部品
+
+* retraction `π_S : G →* ↥S` の構成 (`S ⊓ N = ⊥`, `S ⊔ N = ⊤` から)。
+  `QuotientGroup` 経由 (`↥S ↪ G ↠ G ⧸ N` が同型) が素直。
+* 半単純群の正規部分群 = 因子の部分積 (`Semisimple.lean` / Problems9A 圏を実測)。
+
 ## 10A.3 後半 (A は基本可換) 解決 — Fable 5 単独・紙の証明 (2026-07-30)
 
 statement 再確認 (p. 308): `|Z(P)| = p`, `A` abelian, `|P:A| = p`, `Z(P)` は `A` の直積因子
