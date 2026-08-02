@@ -204,6 +204,112 @@ theorem inf_eq_bot {N : Subgroup G} (hN : Ch02.IsMinimalNormal N) (hNtop : N ≠
 
 end IsKegelMinimalCounterexample
 
+/-! ## `G = S ⋉ N` の retraction と `N`-共役で不変な Sylow 交わり -/
+
+section Retraction
+
+variable {N S : Subgroup G} [N.Normal]
+
+/-- `S ⊓ N = ⊥` かつ `S ⊔ N = ⊤` のとき, 合成 `↥S ↪ G ↠ G ⧸ N` は同型. -/
+noncomputable def splitEquivQuotient (hinf : S ⊓ N = ⊥) (hsup : S ⊔ N = ⊤) : ↥S ≃* G ⧸ N := by
+  refine MulEquiv.ofBijective ((QuotientGroup.mk' N).comp S.subtype) ⟨?_, ?_⟩
+  · rw [injective_iff_map_eq_one]
+    intro x hx
+    have hxN : (x : G) ∈ N := by simpa [QuotientGroup.eq_one_iff] using hx
+    have hmem : (x : G) ∈ S ⊓ N := ⟨x.2, hxN⟩
+    rw [hinf] at hmem
+    exact Subtype.ext (Subgroup.mem_bot.mp hmem)
+  · intro y
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective y
+    have hg : g ∈ (↑(S ⊔ N) : Set G) := by rw [hsup]; trivial
+    rw [Subgroup.mul_normal] at hg
+    obtain ⟨t, ht, n, hn, rfl⟩ := hg
+    refine ⟨⟨t, ht⟩, ?_⟩
+    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype, QuotientGroup.mk'_apply]
+    exact QuotientGroup.eq.mpr (by simpa using hn)
+
+/-- **`G = S ⋉ N` の retraction** `G →* ↥S` (`N` を潰して `G ⧸ N ≅ ↥S` を戻す). -/
+noncomputable def splitRetraction (hinf : S ⊓ N = ⊥) (hsup : S ⊔ N = ⊤) : G →* ↥S :=
+  (splitEquivQuotient hinf hsup).symm.toMonoidHom.comp (QuotientGroup.mk' N)
+
+omit [Finite G] in
+@[simp]
+theorem splitRetraction_coe (hinf : S ⊓ N = ⊥) (hsup : S ⊔ N = ⊤) (x : ↥S) :
+    splitRetraction hinf hsup (x : G) = x :=
+  (splitEquivQuotient hinf hsup).symm_apply_apply x
+
+omit [Finite G] in
+theorem splitRetraction_eq_one (hinf : S ⊓ N = ⊥) (hsup : S ⊔ N = ⊤) {n : G} (hn : n ∈ N) :
+    splitRetraction hinf hsup n = 1 := by
+  simp [splitRetraction, hn]
+
+omit [Finite G] in
+/-- Sylow の共役への所属は共役を戻した所属. -/
+theorem mem_smul_sylow_iff {p : ℕ} [Fact p.Prime] {P : Sylow p G} {g x : G} :
+    x ∈ ((g • P : Sylow p G) : Subgroup G) ↔ g⁻¹ * x * g ∈ (P : Subgroup G) := by
+  simp [Sylow.coe_subgroup_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+
+omit [Finite G] in
+/-- Kegel の仮説のもとで, Sylow `P` と `S` の交わりは retraction による `P` の像に一致する.
+
+`P ∩ S ≤ π(P)` は `π` が `S` 上恒等だから; 逆は `P ∩ S` が `↥S` の Sylow (Kegel) で
+`π(P)` が `p`-群だから極大性. -/
+theorem sylowInf_subgroupOf_eq_map (hK : KegelHypothesis S) (hinf : S ⊓ N = ⊥)
+    (hsup : S ⊔ N = ⊤) {p : ℕ} [Fact p.Prime] (P : Sylow p G) :
+    ((P : Subgroup G) ⊓ S).subgroupOf S = (P : Subgroup G).map (splitRetraction hinf hsup) := by
+  have hpg : IsPGroup p ↥(((P : Subgroup G) ⊓ S).subgroupOf S) :=
+    (P.isPGroup'.of_injective (Subgroup.inclusion inf_le_left)
+      (Subgroup.inclusion_injective _)).comap_subtype
+  have hidx : ¬ p ∣ (((P : Subgroup G) ⊓ S).subgroupOf S).index := by
+    have := hK p ‹Fact p.Prime› P
+    rwa [Subgroup.relIndex] at this
+  have hle : ((P : Subgroup G) ⊓ S).subgroupOf S
+      ≤ (P : Subgroup G).map (splitRetraction hinf hsup) := by
+    intro x hx
+    exact ⟨(x : G), hx.1, splitRetraction_coe hinf hsup x⟩
+  have hmax := (hpg.toSylow hidx).3 (P.isPGroup'.map (splitRetraction hinf hsup)) hle
+  rw [IsPGroup.toSylow_coe] at hmax
+  exact hmax.symm
+
+omit [Finite G] in
+/-- **`P ∩ S` は `N`-共役で変わらない**: `π` が `N` を潰すので `π(P^n) = π(P)`. -/
+theorem inf_smul_eq_inf (hK : KegelHypothesis S) (hinf : S ⊓ N = ⊥) (hsup : S ⊔ N = ⊤)
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) {n : G} (hn : n ∈ N) :
+    ((n • P : Sylow p G) : Subgroup G) ⊓ S = (P : Subgroup G) ⊓ S := by
+  have hmap : ((n • P : Sylow p G) : Subgroup G).map (splitRetraction hinf hsup)
+      = (P : Subgroup G).map (splitRetraction hinf hsup) := by
+    ext y
+    constructor
+    · rintro ⟨x, hx, rfl⟩
+      rw [SetLike.mem_coe, mem_smul_sylow_iff] at hx
+      refine ⟨n⁻¹ * x * n, hx, ?_⟩
+      rw [map_mul, map_mul, map_inv, splitRetraction_eq_one hinf hsup hn]
+      group
+    · rintro ⟨x, hx, rfl⟩
+      refine ⟨n * x * n⁻¹, ?_, ?_⟩
+      · rw [SetLike.mem_coe, mem_smul_sylow_iff]
+        have hgr : n⁻¹ * (n * x * n⁻¹) * n = x := by group
+        rw [hgr]
+        exact hx
+      · rw [map_mul, map_mul, map_inv, splitRetraction_eq_one hinf hsup hn]
+        group
+  have h1 := sylowInf_subgroupOf_eq_map hK hinf hsup (n • P)
+  have h2 := sylowInf_subgroupOf_eq_map hK hinf hsup P
+  have heq : (((n • P : Sylow p G) : Subgroup G) ⊓ S).subgroupOf S
+      = ((P : Subgroup G) ⊓ S).subgroupOf S := by rw [h1, h2, hmap]
+  have := congrArg (fun X : Subgroup ↥S => X.map S.subtype) heq
+  rwa [Subgroup.map_subgroupOf_eq_of_le inf_le_right,
+    Subgroup.map_subgroupOf_eq_of_le inf_le_right] at this
+
+omit [Finite G] in
+/-- **`P ∩ S ≤ P^n` (`n ∈ N`)** — `(I)` step 3. -/
+theorem inf_le_smul (hK : KegelHypothesis S) (hinf : S ⊓ N = ⊥) (hsup : S ⊔ N = ⊤)
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) {n : G} (hn : n ∈ N) :
+    (P : Subgroup G) ⊓ S ≤ ((n • P : Sylow p G) : Subgroup G) :=
+  (inf_smul_eq_inf hK hinf hsup P hn) ▸ inf_le_left
+
+end Retraction
+
 end -- 9D.4
 
 end OddOrder.Isaacs.Ch09
