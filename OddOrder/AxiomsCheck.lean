@@ -26,6 +26,7 @@ import OddOrder.GroupTheory.Transvection
 import OddOrder.GroupTheory.NonzeroVectorAction
 import OddOrder.GroupTheory.ElementaryAbelianLinear
 import OddOrder.GroupTheory.LinearGroupSimple
+import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.AbelianAutSimple
 import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
@@ -15161,3 +15162,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.GroupTheory.commutator_linearEquiv_eq_top
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isSimpleGroup_linearEquiv
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch08.isSimpleGroup_mulAut_of_elementaryAbelian_two

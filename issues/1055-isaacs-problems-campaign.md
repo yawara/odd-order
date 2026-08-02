@@ -7201,6 +7201,24 @@ Fable 5 単独で解決** (9C.3 は形式化まで完了; 9D.4 / 10A.3 後半は
 | `is_generator` | **進行中**。✅ 橋渡し補題 `LinearMap.toMatrix_transvection` (2026-08-03, `Transvection.lean`): 基底 `B` での `transvection (B i) (c • B.coord j)` の行列が mathlib の `Matrix.transvection i j c`。残りは帰納法本体。mathlib の `Matrix.diagonal_transvection_induction_of_det_ne_zero` (Gauss 消去) が使える。`ZMod 2` では可逆対角行列は単位行列だけなので「transvection が生成」が出る。⚠ 行列 ↔ 線形写像の配管が要る: 基底 `B` を取り `P M := ∀ g' : V ≃ₗ V, toMatrix B B g' = M → g' ∈ ⨆ v, transvectionSubgroup v` で帰納法を回す (`hdiag` は `ZMod 2` で `D = 1`、`htransvec` は `Matrix.transvection i j c` ↔ `LinearMap.transvection (B i) (c • B.coord j)`、`hmul` は `toMatrix` の全単射性から因子の equiv を作る) |
 | perfect | 未 — `is_generator` の後。`n ≥ 3` なら各 transvection が transvection 同士の交換子で書けるので `commutator = ⊤` が従う |
 
+### ✅ 残り (a) 完了 (2026-08-03)
+
+```
+Isaacs.Ch08.isSimpleGroup_mulAut_of_elementaryAbelian_two
+  : [CommGroup A] [Finite A] → (∀ x : A, x ^ 2 = 1) → 8 ≤ Nat.card A → IsSimpleGroup (MulAut A)
+```
+(`Ch08_PermutationGroups/Problems8C/AbelianAutSimple.lean`) — axiom-clean。
+
+`Additive A` を `𝔽₂` 上のベクトル空間と見て (`zmodModule_of_pow_eq_one`)、
+`Aut(A)` をその線形群と同一視し (`mulAutEquivLinearEquiv`)、
+`|A| = 2^dim ≥ 8` から `dim ≥ 3` (`Module.card_eq_pow_finrank`)、
+`isSimpleGroup_linearEquiv` (Iwasawa) を適用して `MulEquiv.isSimpleGroup` で移送。
+
+⚠ 配管の罠 2 つ: `Field (ZMod 2)` は `Fact (Nat.Prime 2)` だけでなく
+**`Mathlib.Algebra.Field.ZMod` の import** が要る / `∀ x : ZMod 2, x = 0 ∨ x = 1` の
+`decide` は局所 instance が context にあると「free variables」で落ちるので
+**独立した theorem に切り出す** (`zmod_two_eq_zero_or_one`)。
+
 ### 残り (b) 「⟹」
 
 `A` 可換で `Aut(A)` 単純 ⟹ `|A| = 3` または `A` 初等可換 2-群で `|A| ≥ 8`。
