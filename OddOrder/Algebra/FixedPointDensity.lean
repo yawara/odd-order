@@ -5,9 +5,6 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Index
 import Mathlib.Algebra.Ring.Equiv
-import Mathlib.Algebra.Ring.Aut
-import Mathlib.GroupTheory.OrderOfElement
-import Mathlib.Tactic.LinearCombination
 
 /-!
 # An endomorphism fixing more than half the points is the identity
@@ -104,46 +101,5 @@ theorem _root_.RingEquiv.eq_refl_of_fixes_compl {R : Type*} [Ring R] [Finite R]
     (hcard : 2 * S.card < Nat.card R) :
     μ = RingEquiv.refl R :=
   RingEquiv.ext (eq_id_of_fixes_compl (μ : R ≃+ R).toAddMonoidHom S hfix hcard)
-
-/-- **An automorphism of odd order whose square fixes more than half the points is
-trivial** (Peterfalvi Part II, Ch. IV §4, p. 134).
-
-The last step of Ch. IV: the semilinear automorphism `μ` attached to `η` satisfies
-`X^{μ²} = X` off a three-element set, and `|F| ≥ 8`, so `μ² = 1`; `μ` having odd order it
-is trivial, whence `η ∈ W` and `h(ω) ∈ W`. -/
-theorem _root_.RingEquiv.eq_one_of_odd_orderOf_of_sq_fixes_compl {R : Type*} [Ring R]
-    [Finite R] (μ : RingAut R) (hodd : Odd (orderOf μ)) (S : Finset R)
-    (hfix : ∀ x : R, x ∉ S → μ (μ x) = x) (hcard : 2 * S.card < Nat.card R) :
-    μ = 1 := by
-  have hsq : μ * μ = 1 := by
-    have h := RingEquiv.eq_refl_of_fixes_compl ((μ * μ : RingAut R) : R ≃+* R) S
-      (fun x hx => hfix x hx) hcard
-    exact h
-  have hdvd : orderOf μ ∣ 2 := orderOf_dvd_of_pow_eq_one (by rw [sq]; exact hsq)
-  have h1 : orderOf μ = 1 := by
-    rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h | h
-    · exact h
-    · exact absurd (h ▸ hodd) (by decide)
-  exact orderOf_eq_one_iff.mp h1
-
-/-- **The step that pins `μ²` to the identity** (Peterfalvi Part II, Ch. IV §4, p. 134,
-between (10) and the end).
-
-Equation (10) reads `(c + X^μ) X = (c + X^{μ²}) X^μ` with `c = ζ + ζ⁻¹`.  Writing it at
-`X + 1` as well and subtracting, every quadratic term cancels and what is left is
-`X^{μ²} = X`.  (The cancellation needs no hypothesis on the characteristic, though the
-book's ring is `𝐅_{2^m}`.)
-
-The book applies this for `X ∉ {0, α^{2τ}, α^{2τ} + 1}`, so `μ²` fixes all but three
-points; `RingEquiv.eq_one_of_odd_orderOf_of_sq_fixes_compl` then gives `μ = 1`. -/
-theorem sq_apply_eq_of_relation {F : Type*} [CommRing F] (μ : RingAut F) (c X : F)
-    (h1 : (c + μ X) * X = (c + μ (μ X)) * μ X)
-    (h2 : (c + μ (X + 1)) * (X + 1) = (c + μ (μ (X + 1))) * μ (X + 1)) :
-    μ (μ X) = X := by
-  have hmu1 : μ (X + 1) = μ X + 1 := by rw [map_add, map_one]
-  have hmu2 : μ (μ X + 1) = μ (μ X) + 1 := by rw [map_add, map_one]
-  rw [hmu1] at h2
-  rw [hmu2] at h2
-  linear_combination h1 - h2
 
 end OddOrder.FiniteField
