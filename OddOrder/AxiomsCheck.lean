@@ -15214,3 +15214,9 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch09.mul_comm_of_isMinimalNormal_of_isNilpotent
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch09.exists_prime_pow_eq_one_of_isMinimalNormal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.sylow_le_of_ne_prime
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.isSubnormal_of_pow_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.isSimpleGroup_of_isKegelMinimalCounterexample

@@ -396,6 +396,102 @@ theorem inf_le_centralizer_of_fitting_inf_eq_bot (hK : KegelHypothesis S) (hinf 
       _ = x * n := by rw [hx']
   exact hxn
 
+omit [Finite G] in
+/-- retraction の核はちょうど `N`. -/
+theorem splitRetraction_ker (hinf : S ⊓ N = ⊥) (hsup : S ⊔ N = ⊤) :
+    (splitRetraction hinf hsup).ker = N := by
+  ext x
+  rw [MonoidHom.mem_ker]
+  constructor
+  · intro hx
+    have hx' : (splitEquivQuotient hinf hsup).symm (QuotientGroup.mk' N x) = 1 := hx
+    have hmk : (QuotientGroup.mk' N) x = 1 := by
+      have h := congrArg (splitEquivQuotient hinf hsup) hx'
+      rwa [MulEquiv.apply_symm_apply, map_one] at h
+    exact (QuotientGroup.eq_one_iff x).mp hmk
+  · exact splitRetraction_eq_one hinf hsup
+
+/-- **残り枝 段 4**: `N` の指数が素数 `p` のとき, `q ≠ p` の Sylow は `S` に含まれる.
+
+`Q ⊓ N = ⊥` (`q`-群かつ指数 `p`) なので retraction `π` は `Q` 上単射, したがって
+`|Q ∩ S| = |π(Q)| = |Q|` (`sylowInf_subgroupOf_eq_map`) で `Q ∩ S = Q`. -/
+theorem sylow_le_of_ne_prime (hK : KegelHypothesis S) (hinf : S ⊓ N = ⊥) (hsup : S ⊔ N = ⊤)
+    {p : ℕ} (hp : p.Prime) (hpN : ∀ x ∈ N, x ^ p = 1)
+    {q : ℕ} [hq : Fact q.Prime] (hqp : q ≠ p) (Q : Sylow q G) : (Q : Subgroup G) ≤ S := by
+  -- `Q ⊓ N = ⊥`
+  have hQN : ∀ x ∈ (Q : Subgroup G) ⊓ N, x = 1 := by
+    rintro x ⟨hxQ, hxN⟩
+    have h1 : orderOf x ∣ p := orderOf_dvd_of_pow_eq_one (hpN x hxN)
+    obtain ⟨k, hk⟩ := Q.isPGroup' ⟨x, hxQ⟩
+    have h2 : orderOf x ∣ q ^ k :=
+      orderOf_dvd_of_pow_eq_one (by simpa using congrArg Subtype.val hk)
+    rcases (Nat.dvd_prime hp).mp h1 with h | h
+    · exact orderOf_eq_one_iff.mp h
+    · exact absurd ((Nat.prime_dvd_prime_iff_eq hp hq.out).mp
+        (hp.dvd_of_dvd_pow (h ▸ h2))).symm hqp
+  -- `π` は `Q` 上単射
+  have hinjQ : Function.Injective
+      ((splitRetraction hinf hsup).subgroupMap (Q : Subgroup G)) := by
+    intro a b hab
+    have hker : (a : G) * (b : G)⁻¹ ∈ (splitRetraction hinf hsup).ker := by
+      simp only [MonoidHom.mem_ker, map_mul, map_inv]
+      have : splitRetraction hinf hsup (a : G) = splitRetraction hinf hsup (b : G) :=
+        congrArg Subtype.val hab
+      rw [this]
+      group
+    rw [splitRetraction_ker] at hker
+    exact Subtype.ext (mul_inv_eq_one.mp
+      (hQN _ ⟨(Q : Subgroup G).mul_mem a.2 ((Q : Subgroup G).inv_mem b.2), hker⟩))
+  -- 位数が等しいので `Q ∩ S = Q`
+  have hcard : Nat.card ↥((Q : Subgroup G) ⊓ S) = Nat.card ↥(Q : Subgroup G) := by
+    have h1 : ((Q : Subgroup G) ⊓ S).subgroupOf S
+        = (Q : Subgroup G).map (splitRetraction hinf hsup) :=
+      sylowInf_subgroupOf_eq_map hK hinf hsup Q
+    have h2 : Nat.card ↥((Q : Subgroup G).map (splitRetraction hinf hsup))
+        = Nat.card ↥(Q : Subgroup G) :=
+      (Nat.card_congr (Equiv.ofBijective _
+        ⟨hinjQ, (splitRetraction hinf hsup).subgroupMap_surjective _⟩)).symm
+    calc Nat.card ↥((Q : Subgroup G) ⊓ S)
+        = Nat.card ↥(((Q : Subgroup G) ⊓ S).subgroupOf S) :=
+          (Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_right).toEquiv).symm
+      _ = Nat.card ↥((Q : Subgroup G).map (splitRetraction hinf hsup)) := by rw [h1]
+      _ = Nat.card ↥(Q : Subgroup G) := h2
+  have heq : (Q : Subgroup G) ⊓ S = (Q : Subgroup G) :=
+    Subgroup.eq_of_le_of_card_ge inf_le_left (le_of_eq hcard.symm)
+  exact fun x hx => (heq.ge hx).2
+
+/-- **残り枝 段 5**: `N` の指数が素数 `p` なら `S ◁◁ G`.
+
+`K := normalCore S` は `q ≠ p` のすべての Sylow を含む (段 4 を `Q` の全共役に適用) ので
+`[G : K]` の素因数は `p` のみ ⟹ `G ⧸ K` は `p`-群 ⟹ 冪零 ⟹ 任意の部分群が subnormal
+⟹ `S/K ◁◁ G/K` ⟹ (対応定理) `S ◁◁ G`. -/
+theorem isSubnormal_of_pow_eq_one (hK : KegelHypothesis S) (hinf : S ⊓ N = ⊥)
+    (hsup : S ⊔ N = ⊤) {p : ℕ} [Fact p.Prime] (hpN : ∀ x ∈ N, x ^ p = 1) : S.IsSubnormal := by
+  have hp : p.Prime := Fact.out
+  have hqidx : ∀ {d : ℕ}, d.Prime → d ∣ S.normalCore.index → d = p := by
+    intro q hq hdvd
+    by_contra hqp
+    haveI : Fact q.Prime := ⟨hq⟩
+    obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
+    have hQK : (Q : Subgroup G) ≤ S.normalCore := by
+      intro x hx b
+      refine sylow_le_of_ne_prime hK hinf hsup hp hpN hqp (b • Q) ?_
+      rw [mem_smul_sylow_iff]
+      have hgr : b⁻¹ * (b * x * b⁻¹) * b = x := by group
+      rw [hgr]
+      exact hx
+    exact Q.not_dvd_index (hdvd.trans (Subgroup.index_dvd_of_le hQK))
+  have hidx0 : S.normalCore.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hppow : S.normalCore.index = p ^ S.normalCore.index.primeFactorsList.length :=
+    Nat.eq_prime_pow_of_unique_prime_dvd hidx0 hqidx
+  have hpg : IsPGroup p (G ⧸ S.normalCore) := (IsPGroup.iff_card).mpr ⟨_, hppow⟩
+  haveI : Group.IsNilpotent (G ⧸ S.normalCore) := hpg.isNilpotent
+  have h1 : (S.map (QuotientGroup.mk' S.normalCore)).IsSubnormal :=
+    Ch02.isSubnormal_of_isNilpotent_finite _
+  have h2 := h1.comap (QuotientGroup.mk' S.normalCore)
+  rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk',
+    sup_eq_left.mpr (Subgroup.normalCore_le S)] at h2
+
 /-- `(I)` の帰結その 1: `F(G) ⊓ N = ⊥` なら `S` 全体が `N` を中心化する.
 
 各素数 `p` で `C_G(N) ⊓ S` は `S` の Sylow `p`-部分群を含むから, `[S : C_G(N) ⊓ S]` は
@@ -543,6 +639,37 @@ theorem le_fitting_of_isMinimalNormal {N : Subgroup G} (hN : Ch02.IsMinimalNorma
     haveI := normal_of_le_centralizer hsup hSC
     exact hmc.not_isSubnormal (Subgroup.Normal.isSubnormal inferInstance)
   · exact htop ▸ inf_le_left
+
+/-- **9D.4 の第一段**: Kegel 予想の極小反例の `G` は単純.
+
+`G` が単純でなければ真の非自明正規部分群があり, その中に極小正規 `N ≠ ⊤` が取れる
+(`Ch02.exists_isMinimalNormal_le_of_normal`). `le_fitting_of_isMinimalNormal` で
+`N ≤ F(G)` ゆえ `N` は冪零, したがって可換
+(`mul_comm_of_isMinimalNormal_of_isNilpotent`) で指数が素数
+(`exists_prime_pow_eq_one_of_isMinimalNormal`), すると `isSubnormal_of_pow_eq_one` が
+`S ◁◁ G` を与えて反例であることに矛盾. -/
+theorem isSimpleGroup_of_isKegelMinimalCounterexample : IsSimpleGroup G := by
+  haveI : Nontrivial G := by
+    obtain ⟨⟨x, _⟩, ⟨y, _⟩, hxy⟩ := (S.nontrivial_iff_ne_bot).mpr hmc.ne_bot
+    exact ⟨x, y, fun h => hxy (Subtype.ext h)⟩
+  refine { eq_bot_or_eq_top_of_normal := fun M hM => ?_ }
+  by_contra hcon
+  haveI : M.Normal := hM
+  have hMbot : M ≠ ⊥ := fun h => hcon (Or.inl h)
+  have hMtop : M ≠ ⊤ := fun h => hcon (Or.inr h)
+  obtain ⟨N, hN, hNM⟩ := Ch02.exists_isMinimalNormal_le_of_normal M hMbot
+  haveI : N.Normal := hN.1
+  have hNtop : N ≠ ⊤ := fun h => hMtop (top_le_iff.mp (h ▸ hNM))
+  have hnil : Group.IsNilpotent ↥N :=
+    ((Ch02.le_fitting_iff_isNilpotent_and_isSubnormal N).mp
+      (le_fitting_of_isMinimalNormal hmc hN hNtop)).1
+  obtain ⟨p, hp, hpN⟩ :=
+    exists_prime_pow_eq_one_of_isMinimalNormal hN
+      (mul_comm_of_isMinimalNormal_of_isNilpotent hN hnil)
+  haveI : Fact p.Prime := ⟨hp⟩
+  exact hmc.not_isSubnormal
+    (isSubnormal_of_pow_eq_one hmc.kegel (hmc.inf_eq_bot hN hNtop)
+      (hmc.sup_eq_top (N := N) hN.2.1) hpN)
 
 end MinimalNormal
 
