@@ -470,6 +470,54 @@ theorem exists_injective_hom_regularWreath_of_index_sq [Finite P] {p : ℕ} [Fac
 
 end -- 10A.5
 
+section /- 10A.3 (後半への準備): 指数が素数の可換部分群 -/
+
+/-- 指数が素数 `p` の部分群は極大: `A ≤ H` なら `H = A` か `H = ⊤`. -/
+theorem eq_of_le_of_index_prime [Finite P] {p : ℕ} (hp : p.Prime) {A H : Subgroup P}
+    (hidx : A.index = p) (hAH : A ≤ H) : H = A ∨ H = ⊤ := by
+  have hmul := Subgroup.relIndex_mul_index hAH
+  rw [hidx] at hmul
+  rcases hp.eq_one_or_self_of_dvd H.index ⟨A.relIndex H, by rw [← hmul]; ring⟩ with h | h
+  · exact Or.inr (Subgroup.index_eq_one.mp h)
+  · refine Or.inl ?_
+    rw [h] at hmul
+    have hrel : A.relIndex H = 1 :=
+      Nat.eq_of_mul_eq_mul_right hp.pos (by rw [hmul, one_mul])
+    exact ((Subgroup.relIndex_eq_one).mp hrel).antisymm hAH
+
+/-- **10A.3 後半の鍵**: `A` が可換で指数が素数 `p`, `Z(P) ≤ A`, `u ∈ P ∖ A` のとき,
+`A` の元が `Z(P)` に入る ⟺ `u` と可換.
+
+`A` は極大 (`eq_of_le_of_index_prime`) なので `u ∉ A` から `A ⊔ ⟨u⟩ = ⊤`; `A` 可換なので
+`u` とも可換な `a ∈ A` は `P` 全体を中心化する. -/
+theorem mem_center_iff_commute_of_index_prime [Finite P] {p : ℕ} (hp : p.Prime)
+    {A : Subgroup P} [IsMulCommutative ↥A] (hidx : A.index = p)
+    {u : P} (hu : u ∉ A) {a : P} (ha : a ∈ A) :
+    a ∈ Subgroup.center P ↔ a * u = u * a := by
+  constructor
+  · intro haz
+    exact (Subgroup.mem_center_iff.mp haz u).symm
+  · intro hau
+    have hsup : A ⊔ Subgroup.closure {u} = ⊤ := by
+      rcases eq_of_le_of_index_prime hp hidx (le_sup_left : A ≤ A ⊔ Subgroup.closure {u})
+        with h | h
+      · exact absurd (h ▸ (le_sup_right : Subgroup.closure {u} ≤ _)
+          (Subgroup.mem_closure_singleton_self u)) hu
+      · exact h
+    have hle : A ⊔ Subgroup.closure {u} ≤ Subgroup.centralizer {a} := by
+      refine sup_le (fun x hx => Subgroup.mem_centralizer_iff.mpr ?_)
+        (Subgroup.closure_le _ |>.mpr ?_)
+      · rintro h rfl
+        exact congrArg Subtype.val
+          (IsMulCommutative.is_comm.comm (⟨h, ha⟩ : ↥A) ⟨x, hx⟩)
+      · rintro x rfl
+        exact Subgroup.mem_centralizer_iff.mpr (by rintro h rfl; exact hau)
+    rw [Subgroup.mem_center_iff]
+    intro g
+    exact (Subgroup.mem_centralizer_iff.mp (hle (hsup ▸ Subgroup.mem_top g)) a rfl).symm
+
+end
+
 section /- 10A.3 (前半): Z(P) が A の直積因子なら C_p ≀ C_p に埋め込める (p. 308) -/
 
 /-- **Isaacs Problem 10A.3 の前半** (書籍 p. 308) ⭐: `P` を `p`-群, `|Z(P)| = p`,
