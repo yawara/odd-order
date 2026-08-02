@@ -7990,3 +7990,20 @@ commit 済。書籍 p.133 の段 (2) が、書籍の意味の写像 (`f₁`,`h�
 
 **次**: Ch. IV §4 の段 (3) 以降 (p.133-134)。段 (2) の結論を `U` 内へ読み戻す
 (`IsFGH.map` の docstring が言う "back inside `U`") ところから。
+
+### (168) 次フェーズ = Ch. IV §4 段 (3) (p.133) — 「`U` 内へ読み戻す」
+
+書籍 p.133 の段 (2) の直後 (原文):
+
+> by Corollary 2 of the proposition of §3, there is an element `ω ∈ (Q − Q₀) ∩ U`
+> such that `f₁(ω) = ω^{-ζ}` and `h₁(ω) ∈ C_W(P ∩ U)`. **By the uniqueness of the
+> canonical form of an element of `G − H`**, `f(ω) = f₁(ω) = ω^{-ζ}` and
+> `h(ω) = h₁(ω) ∈ C_W(P)`.
+
+⟹ 段 (3) の核は **Ch. I Prop 4(a) の一意性** = `existsUnique_canonicalForm`
+(`CanonicalForm.lean:123`、既存)。`U` 相対の `f₁,h₁` (段 (2) の出力) が
+ambient の `f,h` と一致することを、`t x t = g·h·t·f` の分解の一意性から出す。
+
+**着手点**: 段 (2) の内在版 `corollaryTwo_intrinsicResidualQuotient` の `ω` は
+`U/Z(U)` の元なので、まず `U` へ持ち上げ (`Z(U)` を法とする曖昧さは `Q₀` に吸収)、
+次に `existsUnique_canonicalForm` で ambient の `f`,`h` と同定する。
