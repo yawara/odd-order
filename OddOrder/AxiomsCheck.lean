@@ -15166,3 +15166,21 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch08.isSimpleGroup_mulAut_of_elementaryAbelian_two
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch08.exists_isSimpleGroup_mulAut_not_card_three_not_elementaryAbelian
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_mulAut_eq_two_of_isSimpleGroup
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.totient_exponent_le_card_mulAut
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exponent_mem_of_isSimpleGroup_mulAut
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_prime_hom_of_ne_top
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isCyclic_of_card_mulAut_eq_two
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isCyclic_and_card_of_isSimpleGroup_mulAut
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.not_isSimpleGroup_of_card_eq_six
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch08.card_linearEquiv_eq_six
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch08.isSimpleGroup_mulAut_iff

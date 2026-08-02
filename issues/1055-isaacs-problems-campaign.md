@@ -7244,4 +7244,46 @@ Isaacs.Ch08.isSimpleGroup_mulAut_of_elementaryAbelian_two
 ⟹ **`Aut(A)` 単純 ⟺ `A ∈ {ℤ/3, ℤ/4, ℤ/6}` または `A` が位数 8 以上の初等可換 2-群**。
 書籍は前 3 者のうち `ℤ/3` しか挙げていない (漏れ)。
 
-⟹ 形式化するのは**訂正後の分類**。次の作業はその「⟹」(原始分解 + 各場合)。
+### 🎉 8C.6 完済 (2026-08-03) — 訂正後の分類を双方向で形式化
+
+```
+Isaacs.Ch08.isSimpleGroup_mulAut_iff {A} [CommGroup A] [Finite A] :
+  IsSimpleGroup (MulAut A) ↔
+    (IsCyclic A ∧ (Nat.card A = 3 ∨ Nat.card A = 4 ∨ Nat.card A = 6)) ∨
+      ((∀ x : A, x ^ 2 = 1) ∧ 8 ≤ Nat.card A)
+```
+(`Problems8C/AbelianAutSimple.lean`, axiom-clean, AxiomsCheck 登録済)
+
+**「⟹」の証明経路** (教科書の原始分解を使わない一様な議論。新 leaf
+`OddOrder/GroupTheory/CommGroupAut.lean`):
+
+1. **反転は中心的** (`invMulAut_mem_center`) — 自己同型は逆元を保つから。
+   ⟹ `Aut(A)` 単純 + 指数 > 2 なら中心 = ⊤ ⟹ 可換単純 ⟹ 素数位数、位数 2 の元 (反転)
+   をもつので **`|Aut(A)| = 2`** (`card_mulAut_eq_two_of_isSimpleGroup`)。
+2. **単元冪写像の埋め込み** (`totient_exponent_le_card_mulAut`) —
+   `Additive A` の `ZMod n`-加群構造 (`n = exp A`) で `u : (ZMod n)ˣ` のスカラー倍
+   = 冪写像 `a ↦ a^u` を自己同型と見なし、位数ちょうど `n` の元で単射性。
+   ⟹ `φ(exp A) ≤ 2` ⟹ **`exp A ∈ {3,4,6}`** (`eq_of_totient_le_two`:
+   約数の φ 整除性から 8∤n / 9∤n / 素因数 ≤ 3 ⟹ n ∣ 12)。
+3. **巡回性** (`isCyclic_of_card_mulAut_eq_two`) — ここが核心。
+   指数と同位数の `g` について `⟨g⟩ ≠ ⊤` と仮定する。
+   *有限可換群の真部分群は素数位数の指標で殺される* (`exists_prime_hom_of_ne_top`:
+   `Q = A/⟨g⟩` の位数の素因数 `p` に対し Cauchy から `p` 乗写像は単射でない ⟹ 有限性から
+   全射でない ⟹ `Q/Q^p` は非自明な `𝔽ₚ`-空間 ⟹ 基底の座標関数)。
+   位数 `p` の `h = g^(n/p)` を使い `f a := h^(φ a).val` を作ると、像が `⟨g⟩ ≤ ker φ` に
+   入るので **`f ∘ f = 1`**、かつ `φ ≠ 1` から `f ≠ 1`。
+   `f² = 0` なら `a ↦ a·f a` は自己同型 (`mulAutOfSquareZero`) で非自明なので、
+   `|Aut(A)| = 2` から**それは反転**しかない ⟹ `f a = a⁻²`。ところが `f g = 1` なので
+   `g² = 1` となり指数 > 2 に矛盾。
+4. **指数 ≤ 2 側の小さい場合**
+   (`not_isSimpleGroup_mulAut_of_elementaryAbelian_two_of_card_lt_eight`) —
+   次元 ≤ 1 なら `|A| ≤ 2` で `Aut(A)` 自明 (`subsingleton_mulAut_of_card_le_two`)、
+   次元 = 2 なら `|Aut(A)| = |GL(2,2)| = 6` (`card_linearEquiv_eq_six`: 基底で
+   `End(V) ≃ₐ Matrix` → 単元 → `Matrix.card_GL_field`) で、
+   位数 6 の群は単純でない (`not_isSimpleGroup_of_card_eq_six`: Cauchy の位数 3 の元が
+   指数 2 の正規部分群を生む)。
+
+⚠ 実装上の罠: `letI` で供給した `ZMod p`-加群構造の下では `V →ₗ[ZMod p] ZMod p` の
+**関数強制 (CoeFun) が解決しない** (`Module` が instance 引数なら解決する)。線形写像を
+扱う部分を instance 引数をもつ補題 (`exists_nontrivial_hom_of_zmodModule`) に閉じ込め、
+外へは `MonoidHom` だけを渡す設計で回避した。

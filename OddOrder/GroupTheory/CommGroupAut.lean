@@ -10,6 +10,8 @@ import Mathlib.Data.ZMod.Units
 import Mathlib.Data.ZMod.QuotientGroup
 import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.Algebra.Field.ZMod
+import Mathlib.GroupTheory.IndexNormal
+import Mathlib.Tactic.NormNum.Prime
 
 /-!
 # The automorphism group of a commutative group
@@ -475,5 +477,43 @@ theorem isCyclic_and_card_of_isSimpleGroup_mulAut [Finite A] (hs : IsSimpleGroup
   refine ⟨inferInstance, ?_⟩
   have hexpA := exponent_mem_of_isSimpleGroup_mulAut hs hexp
   rwa [IsCyclic.exponent_eq_card] at hexpA
+
+/-! ## Two elementary obstructions to simplicity -/
+
+/-- 位数 `2` 以下の群の自己同型群は自明 — 非自明な元は一意なのでどの自己同型もそれを動かせない. -/
+theorem subsingleton_mulAut_of_card_le_two {G : Type*} [Group G] [Finite G]
+    (hG : Nat.card G ≤ 2) : Subsingleton (MulAut G) := by
+  refine ⟨fun φ ψ => MulEquiv.ext fun a => ?_⟩
+  rcases eq_or_ne a 1 with rfl | ha
+  · simp
+  rcases Nat.lt_or_ge (Nat.card G) 2 with hlt | hge
+  · haveI : Subsingleton G := Finite.card_le_one_iff_subsingleton.mp (by omega)
+    exact absurd (Subsingleton.elim a 1) ha
+  have hcard : Nat.card G = 2 := le_antisymm hG hge
+  have hφ : φ a = a :=
+    eq_of_ne_one_of_card_eq_two hcard (fun hc => ha (φ.injective (by simp [hc]))) ha
+  have hψ : ψ a = a :=
+    eq_of_ne_one_of_card_eq_two hcard (fun hc => ha (ψ.injective (by simp [hc]))) ha
+  rw [hφ, hψ]
+
+/-- 位数 `6` の群は単純でない — Cauchy で得た位数 `3` の元の生成する部分群は指数 `2`,
+したがって正規で真かつ非自明. -/
+theorem not_isSimpleGroup_of_card_eq_six {G : Type*} [Group G] (hG : Nat.card G = 6) :
+    ¬ IsSimpleGroup G := by
+  intro hs
+  haveI : Finite G := Nat.finite_of_card_ne_zero (by omega)
+  haveI := Fintype.ofFinite G
+  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  obtain ⟨x, hx⟩ : ∃ x : G, orderOf x = 3 :=
+    exists_prime_orderOf_dvd_card 3 (by rw [← Nat.card_eq_fintype_card, hG]; norm_num)
+  have hcardH : Nat.card (Subgroup.zpowers x) = 3 := by rw [Nat.card_zpowers, hx]
+  have hindex : (Subgroup.zpowers x).index = 2 := by
+    have hmul := Subgroup.card_mul_index (Subgroup.zpowers x)
+    rw [hcardH, hG] at hmul
+    omega
+  haveI : (Subgroup.zpowers x).Normal := Subgroup.normal_of_index_eq_two hindex
+  rcases hs.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) inferInstance with hb | ht
+  · rw [hb, Subgroup.index_bot, hG] at hindex; omega
+  · rw [ht, Subgroup.index_top] at hindex; omega
 
 end OddOrder.GroupTheory
