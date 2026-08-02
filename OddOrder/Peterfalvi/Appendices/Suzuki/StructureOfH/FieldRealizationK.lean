@@ -36,7 +36,7 @@ needs in order to run Hilbert 90 on a `K`-orbit — see
 * `Hypothesis.exists_Q0_field_coordinate` — the same field with the *coordinate*
   `α : Q₀ → F` under which the `K`-action is multiplication.  This is the half
   `Q₀ ≅ F`, `K ≅ F^×` of the standing identification of Ch. III §3, p. 120, and
-  unlike `exists_field_realization_K` it does not need `W = 1`.
+  unlike `exists_field_realization_K` it asks for no element of `V` at all.
 -/
 
 set_option autoImplicit false
@@ -125,9 +125,11 @@ both sides have `|Q₀| − 1` elements.
 
 Conjugation by `x ∈ V` normalizes `K` and acts `σ`-semilinearly on `Q₀`, the two
 being related by `μ ∘ α = σ ∘ μ`.  The twist `σ` is non-trivial exactly because
-`W = C_V(K) = 1`: an `x` centralizing `K` would lie in `W`. -/
-theorem exists_field_realization_K (hW : hyp.W = ⊥)
-    {x : G} (hxV : x ∈ hyp.V) (hxne : x ≠ 1)
+`x ∉ W = C_V(K)`: an `x` centralizing `K` would lie in `W`.  (Ch. III §1 applies
+this in the branch `W = 1`, where every `x ≠ 1` qualifies; Ch. IV §4 is the case
+`V ≠ W`, where the qualifying `x` are those outside `W`.) -/
+theorem exists_field_realization_K
+    {x : G} (hxV : x ∈ hyp.V) (hxW : x ∉ hyp.W)
     (α : ↥hyp.K ≃* ↥hyp.K)
     (hα : ∀ k : ↥hyp.K, ((α k : ↥hyp.K) : G) = x * (k : G) * x⁻¹) :
     ∃ (F : Type uG) (_ : Field F) (_ : Finite F)
@@ -225,14 +227,13 @@ theorem exists_field_realization_K (hW : hyp.W = ⊥)
     obtain ⟨k₀, hk₀K, hk₀ne⟩ : ∃ k ∈ hyp.K, x * k * x⁻¹ ≠ k := by
       by_contra hcon
       push Not at hcon
-      have hxW : x ∈ hyp.W := by
+      have hxW' : x ∈ hyp.W := by
         refine ⟨hxV, Subgroup.mem_centralizer_iff.mpr fun k hk => ?_⟩
         have hkK : k ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact hk
         have h := hcon k hkK
         calc k * x = (x * k * x⁻¹) * x := by rw [h]
           _ = x * k := by group
-      rw [hW, Subgroup.mem_bot] at hxW
-      exact hxne hxW
+      exact hxW hxW'
     refine hk₀ne ?_
     have h2 : μ (α ⟨k₀, hk₀K⟩) = μ (⟨k₀, hk₀K⟩ : ↥hyp.K) := by
       refine Units.ext ?_
@@ -256,7 +257,7 @@ This supplies the `Q₀` half.)  `K` acts freely on `Q₀ ∖ {1}` and
 regular form (`Huppert.exists_field_coordinate_realization`) turns `Q₀` into a
 field `F` of order `|Q₀|` with `K` acting by multiplication.
 
-Unlike `exists_field_realization_K` this needs no hypothesis on `W`: the twist
+Unlike `exists_field_realization_K` this needs no element of `V`: the twist
 `σ` — the only part of that theorem that uses `W = 1` — is not asserted here. -/
 theorem exists_Q0_field_coordinate :
     ∃ (F : Type uG) (_ : Field F) (_ : Finite F)

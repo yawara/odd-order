@@ -41,6 +41,10 @@ prime to `q + 1`, must fix one of the `q + 1` `K`-orbits on `S/Q₀`.
   `C_Q(X)` lies outside `Q₀`.
 * `Hypothesis.exists_mem_inf_centralizer_not_mem_Q0_of_orbit` — the same
   conclusion with no invariant `N`, assuming only `|Q| = q³` and `p ∤ q + 1`.
+
+Both are stated for an `X ⊄ W` rather than in the branch `W = 1` where Ch. III §1
+uses them: the twist only ever needs a single element of `X` outside `W = C_V(K)`,
+and Ch. IV §4 — the case `V ≠ W` — has those without `W` being trivial.
 -/
 
 set_option autoImplicit false
@@ -49,6 +53,31 @@ namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
 open scoped Pointwise
 open OddOrder.GroupTheory OddOrder.Isaacs.Ch03
+
+/-- In a subgroup of prime order every non-trivial element generates, so `X ⊄ Y`
+upgrades to "every non-trivial element of `X` lies outside `Y`". -/
+theorem notMem_of_not_le_of_prime_card {G : Type*} [Group G] [Finite G]
+    {X Y : Subgroup G}
+    (hXY : ¬ X ≤ Y) {p : ℕ} (hp : p.Prime) (hXcard : Nat.card ↥X = p)
+    {x : G} (hxX : x ∈ X) (hxne : x ≠ 1) : x ∉ Y := by
+  intro hxY
+  refine hXY fun y hy => ?_
+  have hx1 : (⟨x, hxX⟩ : ↥X) ≠ 1 := fun hc => hxne (congrArg Subtype.val hc)
+  have hord : orderOf (⟨x, hxX⟩ : ↥X) = p := by
+    have hdvd : orderOf (⟨x, hxX⟩ : ↥X) ∣ p := hXcard ▸ orderOf_dvd_natCard _
+    rcases hp.eq_one_or_self_of_dvd _ hdvd with h1 | h
+    · exact absurd (orderOf_eq_one_iff.mp h1) hx1
+    · exact h
+  have htop : Subgroup.zpowers (⟨x, hxX⟩ : ↥X) = ⊤ :=
+    Subgroup.eq_top_of_card_eq _ (by rw [Nat.card_zpowers, hord, hXcard])
+  obtain ⟨n, hn⟩ := (htop ▸ Subgroup.mem_top (⟨y, hy⟩ : ↥X) :
+    (⟨y, hy⟩ : ↥X) ∈ Subgroup.zpowers (⟨x, hxX⟩ : ↥X))
+  have hyx : y = x ^ n := by
+    have hv := congrArg (Subtype.val (p := fun z => z ∈ X)) hn
+    push_cast at hv
+    exact hv.symm
+  rw [hyx]
+  exact zpow_mem hxY n
 
 namespace Hypothesis
 
@@ -63,7 +92,7 @@ variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
 particular irreducible.  Appendix I, Proposition 2 therefore makes `N/Q₀` a line
 over a field of order `q` on which `K` acts by scalars, and a generator `x` of
 `X` acts semilinearly.  Its twist is non-trivial because `x` does not centralize
-`K` (`W = 1`), so Hilbert 90
+`K` — that is what `X ⊄ W = C_V(K)` says — so Hilbert 90
 (`Huppert.exists_ne_one_fixed_of_prime_pow_eq_one`) gives a non-trivial fixed
 point of `x` in `N/Q₀`; a coprime lift (Isaacs Cor 3.28) turns it into an
 element of `C_Q(X)` outside `Q₀`. -/
@@ -73,7 +102,7 @@ theorem exists_mem_inf_centralizer_not_mem_Q0
     (hKfree : ∀ k ∈ hyp.K, k ≠ 1 → ∀ y ∈ hyp.Q,
       k * y * k⁻¹ * y⁻¹ ∈ hyp.Q0 → y ∈ hyp.Q0)
     (hQ2 : IsPGroup 2 ↥hyp.Q) (hQ0two : 2 ≤ Nat.card ↥hyp.Q0)
-    (hW : hyp.W = ⊥) {X : Subgroup G} (hXV : X ≤ hyp.V)
+    {X : Subgroup G} (hXV : X ≤ hyp.V) (hXW : ¬ X ≤ hyp.W)
     {p : ℕ} (hp : p.Prime) (hXcard : Nat.card ↥X = p)
     {N : Subgroup G} (hQ0N : hyp.Q0 ≤ N) (hNQ : N ≤ hyp.Q)
     (hNcard : Nat.card ↥N = Nat.card ↥hyp.Q0 ^ 2)
@@ -221,7 +250,7 @@ theorem exists_mem_inf_centralizer_not_mem_Q0
           rw [hψ, MonoidHom.comp_apply, h1]
       _ = g * ψ t * g⁻¹ := by
           rw [map_mul, map_mul, map_inv, hgdef, hψ, MonoidHom.comp_apply]
-  -- the twist is non-trivial: `x` does not centralize `K` since `W = 1`
+  -- the twist is non-trivial: `x` does not centralize `K`, since `x ∉ W = C_V(K)`
   obtain ⟨k₀, hk₀K, hk₀ne⟩ : ∃ k ∈ hyp.K, x * k * x⁻¹ ≠ k := by
     by_contra hcon
     push Not at hcon
@@ -231,8 +260,7 @@ theorem exists_mem_inf_centralizer_not_mem_Q0
       have h := hcon k hkK
       calc k * x = (x * k * x⁻¹) * x := by rw [h]
         _ = x * k := by group
-    rw [hW, Subgroup.mem_bot] at hxW
-    exact hxne hxW
+    exact notMem_of_not_le_of_prime_card hXW hp hXcard hxX hxne hxW
   have ht₀ : ψ (c ⟨k₀, hk₀K⟩) ≠ ψ (⟨k₀, hk₀K⟩ : ↥hyp.K) := by
     intro heq
     have h1 : ψ ((c ⟨k₀, hk₀K⟩) * (⟨k₀, hk₀K⟩ : ↥hyp.K)⁻¹) = 1 := by
@@ -389,7 +417,7 @@ theorem exists_mem_inf_centralizer_not_mem_Q0_of_orbit
       k * y * k⁻¹ * y⁻¹ ∈ hyp.Q0 → y ∈ hyp.Q0)
     (hQ2 : IsPGroup 2 ↥hyp.Q) (hQ0two : 2 ≤ Nat.card ↥hyp.Q0)
     (hcardQ : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
-    (hW : hyp.W = ⊥) {X : Subgroup G} (hXV : X ≤ hyp.V)
+    {X : Subgroup G} (hXV : X ≤ hyp.V) (hXW : ¬ X ≤ hyp.W)
     {p : ℕ} (hp : p.Prime) (hXcard : Nat.card ↥X = p)
     (hnd : ¬ p ∣ Nat.card ↥hyp.Q0 + 1) :
     ∃ y ∈ hyp.Q ⊓ Subgroup.centralizer (X : Set G), y ∉ hyp.Q0 := by
@@ -507,19 +535,17 @@ theorem exists_mem_inf_centralizer_not_mem_Q0_of_orbit
           rw [hψ, MonoidHom.comp_apply, h1]
       _ = g * ψ t * g⁻¹ := by
           rw [map_mul, map_mul, map_inv, hgdef, hψ, MonoidHom.comp_apply]
-  -- `K ≠ 1`, since `W = C_V(K) = 1` and `x ≠ 1`
+  have hxnW : x ∉ hyp.W := notMem_of_not_le_of_prime_card hXW hp hXcard hxX hxne
+  -- `K ≠ 1`, since otherwise `x` would centralize `K` and so lie in `W`
   haveI : Nontrivial ↥hyp.K := by
-    refine (Subgroup.nontrivial_iff_ne_bot _).mpr fun hbot => hxne ?_
-    have hxW : x ∈ hyp.W := by
-      refine ⟨hXV hxX, Subgroup.mem_centralizer_iff.mpr fun k hk => ?_⟩
-      have hkK : k ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact hk
-      rw [hbot, Subgroup.mem_bot] at hkK
-      rw [hkK, one_mul, mul_one]
-    rw [hW, Subgroup.mem_bot] at hxW
-    exact hxW
+    refine (Subgroup.nontrivial_iff_ne_bot _).mpr fun hbot => hxnW ?_
+    refine ⟨hXV hxX, Subgroup.mem_centralizer_iff.mpr fun k hk => ?_⟩
+    have hkK : k ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact hk
+    rw [hbot, Subgroup.mem_bot] at hkK
+    rw [hkK, one_mul, mul_one]
   -- the field realization of `K` coming from `Q₀`
   obtain ⟨F, instF, instFin, μ, σ, hσne, -, hμσ⟩ :=
-    hyp.exists_field_realization_K hW (hXV hxX) hxne c hcval
+    hyp.exists_field_realization_K (hXV hxX) hxnW c hcval
   letI : Field F := instF
   letI : Finite F := instFin
   -- there are `q + 1` non-trivial `K`-orbits on `M`, and `p ∤ q + 1`
@@ -697,14 +723,14 @@ theorem exists_mem_inf_centralizer_not_mem_Q0_of_card_cube
     (hQsuz : Suzuki2Group.IsSuzuki2Group ↥hyp.Q) {m : ℕ} (hm : m ≠ 0)
     (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (hcardQ : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
-    (hW : hyp.W = ⊥) {X : Subgroup G} (hXV : X ≤ hyp.V)
+    {X : Subgroup G} (hXV : X ≤ hyp.V) (hXW : ¬ X ≤ hyp.W)
     {p : ℕ} (hp : p.Prime) (hXcard : Nat.card ↥X = p)
     (hnd : ¬ p ∣ Nat.card ↥hyp.Q0 + 1) :
     ∃ y ∈ hyp.Q ⊓ Subgroup.centralizer (X : Set G), y ∉ hyp.Q0 := by
   have hZQ0 := hyp.center_eq_Q0_subgroupOf_of_card_cube hQsuz hm hQ0card hcardQ
   obtain ⟨hQ2, -, -, -⟩ := id hQsuz
   exact hyp.exists_mem_inf_centralizer_not_mem_Q0_of_orbit hZQ0
-    (hyp.kfree_mod_Q0_of_center_eq hZQ0) hQ2 hyp.two_le_card_Q0 hcardQ hW hXV hp
+    (hyp.kfree_mod_Q0_of_center_eq hZQ0) hQ2 hyp.two_le_card_Q0 hcardQ hXV hXW hp
     hXcard hnd
 
 end Hypothesis

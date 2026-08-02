@@ -120,9 +120,14 @@ theorem W_ne_bot_of_card_cube
           rwa [show Nat.card ↥sc.toHypothesis.Q0 + 1 -
             (Nat.card ↥sc.toHypothesis.Q0 - 1) = 2 by omega] at this
         exact hpodd ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).mp h2)
+      have hPW : ¬ P ≤ sc.toHypothesis.W := by
+        rw [hW, le_bot_iff]
+        intro hbot
+        rw [hbot, Subgroup.card_bot] at hPcard
+        exact hp.one_lt.ne hPcard
       obtain ⟨y, hyQC, hyQ0⟩ :=
         sc.toHypothesis.exists_mem_inf_centralizer_not_mem_Q0_of_card_cube hQsuz hm
-          hQ0card hcardQ hW hPV hp hPcard hnd
+          hQ0card hcardQ hPV hPW hp hPcard hnd
       -- `C_Q(P) = C_{Q₀}(P)` in this branch, so `y` cannot avoid `Q₀`
       refine hyQ0 ?_
       have hEq : sc.toHypothesis.Q0 ⊓ C = sc.toHypothesis.Q ⊓ C :=
