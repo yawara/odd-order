@@ -196,3 +196,15 @@ Corollary 2 (`G ≅ PSU(3,q)`) は `V = W` が定理なので `_of_freeD` 版を
 `Ω ≃ Unital n` の同変全単射が要る。`conjQMulEquivOfPermMatch` は点集合
 `Option ↥Q ≃ Option ↥Q'` から作られているので原理的には取れる
 (`coordsEquiv : (L ⧸ M) ≃ Option ↥Q`)。ここが次の設計ポイント。
+
+### Corollary 1 の `actionEquiv` — 点集合の辞書 (実測 2026-08-02)
+
+* `RankOneBNPair.coords (M Q t) : Option ↥Q → L ⧸ M` は
+  `none ↦ 1·M`、`some x ↦ (x⁻¹ t)·M`。
+* `Hypothesis.qRegularEquiv : hyp.Q ≃ {ω : Ω // ω ≠ hyp.basept}` は
+  `x ↦ x • (t • basept)` (`Basic.lean:294`)。
+* `Ω ≅ G ⧸ H` (`g • basept ↦ gH`) の下で `coords (some x) ↦ x⁻¹ • (t • basept)`
+  なので、両者は **`Option.map (·⁻¹)` だけずれる**。
+⟹ `Ω ≃ Option ↥Q` は `qRegularEquiv` + `basept ↦ none` で作り、
+`coords` 側と合わせるときに `inv` を挟む。`Unital n = Option (RootGroup n)` も
+同じ形なので `Equiv.optionCongr εQ` で繋がる。
