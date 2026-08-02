@@ -96,6 +96,22 @@ theorem conjNormal_eq_one_of_mem_centralizer {G : Type*} [Group G] {N : Subgroup
   calc (g : G) * (h : G) * g⁻¹ = ((h : G) * g) * g⁻¹ := by rw [hcomm]
     _ = (h : G) := by group
 
+/-- 共役不変な `Subgroup ↥N` は `G` の正規部分群を与える. -/
+theorem normal_map_subtype_of_conj_invariant {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    {S : Subgroup ↥N} (hS : ∀ (g : G) (x : ↥N), x ∈ S → MulAut.conjNormal g x ∈ S) :
+    (S.map N.subtype).Normal := by
+  refine ⟨fun x hx g => ?_⟩
+  obtain ⟨s, hs, rfl⟩ := Subgroup.mem_map.mp hx
+  exact Subgroup.mem_map.mpr ⟨MulAut.conjNormal g s, hS g s hs, MulAut.conjNormal_apply g s⟩
+
+/-- 逆に, `G`-正規で `N` に含まれる部分群は共役不変な `Subgroup ↥N` を与える. -/
+theorem conj_invariant_subgroupOf {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    {M : Subgroup G} [M.Normal] (g : G) (x : ↥N) (hx : x ∈ M.subgroupOf N) :
+    MulAut.conjNormal g x ∈ M.subgroupOf N := by
+  have : ((MulAut.conjNormal g x : ↥N) : G) = g * (x : G) * g⁻¹ := MulAut.conjNormal_apply g x
+  rw [Subgroup.mem_subgroupOf, this]
+  exact ‹M.Normal›.conj_mem _ hx g
+
 open scoped IsMulCommutative in
 /-- **`N ◁ G` が可換なら, 共役作用は `G ⧸ C_G(N)` の `ZMod n`-線形表現を定める.**
 
