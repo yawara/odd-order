@@ -7884,3 +7884,34 @@ commit `5a294fc66`。(161) の読み通り、`ω⁻¹` 側で `h_inv_eq` を回�
 `hQ0card`/`hcardQ`/`hcard`/`hKcard`/`hWdvd`/`hW1`/`hWcyc`/**`hfQ`**/`x₀`/`hmodel`/`ζ`。
 `hfQ` は `exists_fgh_mapsTo` が供給する (f,g,h を作る側とセット)。
 ⟹ **残るは §4 段 (2) の配線のみ** ((158) の表、材料は全部所在確認済)。
+
+### (163) 段 (2) 配線のレシピ (transported 版) — 全補題名を確定
+
+`PSU3SectionFourCorollaryTwo.lean` に `corollaryTwo_residualQuotient` を書く。
+`qhyp := hyp.residualQuotientHypothesis details`、`n := data.n`。
+`letI := MulAction.compHom (ULift.{v} (Unital data.n)) details.residualQuotientEquiv.toMonoidHom`
+は `isStandardModel_residualQuotient` (同ファイル l.325-) をそのまま真似る。
+
+| `..._of_closing` の引数 | 供給 (すべて実在を確認済) |
+|---|---|
+| `H` + `hfQ` | `qhyp.exists_fgh_mapsTo` (`PSU3CorollaryTwo.lean:~700`) |
+| `hC2` | `braid_of_orderOf_mul_eq_three` ⟸ `residualQuotientHypothesis_orderOf_distinguishedInvolution_mul_t` |
+| `sfive`, `M` | `nonempty_standingData_residualQuotient` (`PSU3SectionFourModel.lean:172`) |
+| `hZc` | `sfive.centerEqQ0` |
+| `hmu` | `mu_injective_residualQuotient` (同 l.210) |
+| `hVW` | `residualQuotientHypothesis_V_eq_W` (同 l.78) |
+| `hm` | `(Nat.zero_lt_one.trans data.one_lt_n).ne'` |
+| `hQ0card` | `natCard_residualQuotientHypothesis_Q0` (同 l.89) |
+| `hcardQ` | `natCard_residualQuotientHypothesis_Q` (同 l.99) |
+| `hcard : 3 ≤ \|F\|` | `natCard_frobFixedSubfield` + `2^n ≥ 4` (`data.one_lt_n`) |
+| `hKcard` | `card_actualKActor_eq` (`PSU3OrbitCount`、汎用: `sfive`+`M`+`hm`+`hQ0card`) |
+| `hWdvd` + `hWcyc` | `isCyclic_W_and_card_dvd_of_orderThree hst hQsuz hm hQ0card hcardQ ihq` (`WCyclicDivides.lean:47`)。`hQsuz` = `isSuzuki2Group_residualQuotientHypothesis_Q` (`PSU3SectionFourModel.lean:137`)、`ihq` = `theoremAInductionBelow_residualQuotient` |
+| `hW1` | `exists_ne_one_mem_residualQuotientHypothesis_W` (同 l.126) から `1 < Nat.card W` |
+| `x₀`, `hmodel` | `exists_center_Q_ne_one_residualQuotient` (同 l.198) + `isStandardModel_residualQuotient` |
+| `ζ` | 引数 (任意の `ζ ∈ W^#`) |
+
+結論の形: `∃ f₁ g₁ h₁, IsFGH … ∧ ∃ ω ∈ Q, ω ∉ Q₀ ∧ f₁ ω = ζ⁻¹ω⁻¹ζ ∧ h₁ ω = ζ³`
+(`f` は `exists_fgh_mapsTo` が作るので存在量化にする)。
+
+⚠ この後さらに内在 ULift 版 (`intrinsicResidualQuotientULift`) へ移す必要がある
+((141) の四つ組照合同型)。書籍の `f₁`,`h₁` は内在版に対応するため。
