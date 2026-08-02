@@ -74,6 +74,8 @@ membership facts it needs on the model:
 * `Hypothesis.SectionFourSetup.center_residualImage_le_P` — **`Z(U) ⊆ P`** of step (1).
 * `Hypothesis.mem_W_intrinsicResidualQuotient_of_mem_V` — the book's `ζ₁ ∈ V ∩ U` really
   is an element of the quotient's `W̄`, because there `V̄ = W̄`.
+* `Hypothesis.inf_le_centralizer_centralizer_Q0` — the `hcent` of §4, *derived* from the
+  quotient's `V̄ = W̄` rather than assumed.
 * `Hypothesis.SectionFourSetup.exists_mem_W` — **🎯🎯🎯🎯 all of §4 from the section's
   standing data and the book's choice of `ζ₁`.**
 * `Hypothesis.SectionFourSetup.exists_stepThree_data` — that output, produced from the
@@ -1323,6 +1325,68 @@ theorem mem_W_intrinsicResidualQuotient_of_mem_V
   congr 1
   exact Subtype.ext hζ₁t
 
+include hyp in
+/-- **🎯 `V ∩ U` centralizes `C_{Q₀}(X)`** (Peterfalvi Part II, Ch. IV §4, step (2),
+p. 133: "By the structure of `PSU(3, ℓ)`, `(V ∩ U)/(P ∩ U)` centralizes `C_{Q₀}(P)`").
+
+Not an external input: it follows from the quotient's `V̄ = W̄`.  Indeed
+`W_eq_inf_centralizer_Q0` (`W = D ∩ C(Q₀)`, a theorem about *any* standing hypothesis)
+applied to `U/Z(U)` gives `W̄ = D̄ ∩ C(Q̄₀)`, so `V̄ ≤ C(Q̄₀)`; hence `[ζ₁, y] ∈ Z(U)`
+for `ζ₁ ∈ V ∩ U` and `y ∈ C_{Q₀}(X) ⊆ U`.  But `[ζ₁, y] ∈ Q` (as `ζ₁ ∈ D ≤ H` normalizes
+`Q`) and `Z(U) ≤ D`, and `Q ∩ D = 1` is an axiom of the standing hypothesis — so the
+commutator is trivial. -/
+theorem inf_le_centralizer_centralizer_Q0
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X))
+    (hQ2 : IsPGroup 2 ↥hyp.Q) :
+    hyp.V ⊓ residualImage (G := G) X ≤ Subgroup.centralizer
+      (((hyp.Q0 ⊓ Subgroup.centralizer ((X : Set G))) : Subgroup G) : Set G) := by
+  rintro ζ₁ ⟨hζ₁V, hζ₁U⟩
+  refine Subgroup.mem_centralizer_iff.mpr fun y hy => ?_
+  obtain ⟨hyQ0, hyC⟩ := Subgroup.mem_inf.mp hy
+  have hyQ : y ∈ hyp.Q := hyp.Q0_le_Q hyQ0
+  have hyU : y ∈ residualImage (G := G) X := hyp.mem_residualImage_of_mem_Q hQ2 hyQ hyC
+  -- `ζ₁`'s image centralizes `Q̄₀`
+  have hzbarW := hyp.mem_W_intrinsicResidualQuotient_of_mem_V details hXD htX hCQ hZD
+    (hyp.V_le_D hζ₁V) (Subgroup.mem_centralizer_singleton_iff.mp hζ₁V.2) hζ₁U
+  rw [(hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).W_eq_inf_centralizer_Q0]
+    at hzbarW
+  have hybar : (QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))
+      ⟨y, hyU⟩) ∈ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q0 := by
+    refine ⟨?_, ⟨⟨y, hyU⟩, Subgroup.mem_subgroupOf.mpr (hyp.Q_le_H hyQ), rfl⟩⟩
+    have hsq : (⟨y, hyU⟩ : ↥(residualImage (G := G) X)) ^ 2 = 1 :=
+      Subtype.ext (by simpa using hyp.sq_eq_one_of_mem_Q0 hyQ0)
+    rw [← map_pow, hsq, map_one]
+  have hcomm := Subgroup.mem_centralizer_iff.mp hzbarW.2 _ hybar
+  -- lift the commuting relation: the commutator is in `Z(U) ≤ D` and in `Q`, so trivial
+  have hker : ((⟨y, hyU⟩ : ↥(residualImage (G := G) X)) * ⟨ζ₁, hζ₁U⟩)⁻¹
+      * ((⟨ζ₁, hζ₁U⟩ : ↥(residualImage (G := G) X)) * ⟨y, hyU⟩)
+      ∈ Subgroup.center ↥(residualImage (G := G) X) := by
+    rw [← QuotientGroup.eq, QuotientGroup.mk_mul, QuotientGroup.mk_mul]
+    simpa using hcomm
+  have hcD : ζ₁⁻¹ * y⁻¹ * (ζ₁ * y) ∈ hyp.D := by
+    have h := Subgroup.mem_subgroupOf.mp (hZD hker)
+    simpa using h
+  have hcQ : ζ₁⁻¹ * y⁻¹ * (ζ₁ * y) ∈ hyp.Q := by
+    have h1 : ζ₁⁻¹ * y⁻¹ * ζ₁⁻¹⁻¹ ∈ hyp.Q :=
+      hyp.Q_normal_in_H ζ₁⁻¹ (hyp.H.inv_mem (hyp.D_le_H (hyp.V_le_D hζ₁V)))
+        y⁻¹ (hyp.Q.inv_mem hyQ)
+    rw [inv_inv] at h1
+    have h2 : ζ₁⁻¹ * y⁻¹ * (ζ₁ * y) = (ζ₁⁻¹ * y⁻¹ * ζ₁) * y := by group
+    rw [h2]
+    exact hyp.Q.mul_mem h1 hyQ
+  have hc1 : ζ₁⁻¹ * y⁻¹ * (ζ₁ * y) = 1 := by
+    have hmem : ζ₁⁻¹ * y⁻¹ * (ζ₁ * y) ∈ hyp.Q ⊓ hyp.D := ⟨hcQ, hcD⟩
+    rw [hyp.Q_inf_D_eq_bot, Subgroup.mem_bot] at hmem
+    exact hmem
+  have hyζ : ζ₁ * y = y * ζ₁ := by
+    have h := eq_inv_of_mul_eq_one_right hc1
+    rw [h, mul_inv_rev, inv_inv, inv_inv]
+  exact hyζ.symm
+
 end Intrinsic
 
 include hyp in
@@ -1351,8 +1415,6 @@ theorem SectionFourSetup.exists_mem_W (s4 : hyp.SectionFourSetup) {f g k : G →
     (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer ((s4.P : Set G)))))
     (ih : TheoremAInductionBelow G Ω)
     (hl : 2 < Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))))
-    (hcent : hyp.V ⊓ residualImage (G := G) s4.P ≤ Subgroup.centralizer
-      (((hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) : Subgroup G) : Set G))
     {ζ₁ : G} (hζ₁V : ζ₁ ∈ hyp.V) (hζ₁U : ζ₁ ∈ residualImage (G := G) s4.P)
     (hζ₁P : ζ₁ ∉ s4.P) :
     ∃ x ∈ hyp.Q, x ∉ hyp.Q0 ∧ k x ∈ hyp.W := by
@@ -1360,13 +1422,15 @@ theorem SectionFourSetup.exists_mem_W (s4 : hyp.SectionFourSetup) {f g k : G →
   letI := hyp.centralizerQuotientMulAction s4.P_le_V
   obtain ⟨ω, hωQ, hωQ0, hωfix⟩ := s4.exists_fixed_not_mem_Q0 hZ hCop hSolv
   have hZD := SectionFourSetup.center_residualImage_le_D hyp s4 hQ2 hωQ hωQ0 hωfix
+  obtain ⟨result, data, ⟨details⟩⟩ :=
+    hyp.nonempty_psu3Data_sectionFour s4 hZ hQsuz hCop hSolv hP hA3 hord ih
+  have hcent := hyp.inf_le_centralizer_centralizer_Q0 details s4.P_le_D
+    s4.t_mem_centralizer hCQ hZD hQ2
   have hZP : ∀ {c : G} (hc : c ∈ residualImage (G := G) s4.P),
       (⟨c, hc⟩ : ↥(residualImage (G := G) s4.P))
         ∈ Subgroup.center ↥(residualImage (G := G) s4.P) → c ∈ s4.P := fun hc hcc =>
     SectionFourSetup.center_residualImage_le_P hyp s4 M hZ hmu hQ2 hcent hωQ hωQ0 hωfix
       hc hcc
-  obtain ⟨result, data, ⟨details⟩⟩ :=
-    hyp.nonempty_psu3Data_sectionFour s4 hZ hQsuz hCop hSolv hP hA3 hord ih
   have hζ₁t : ζ₁ * hyp.t = hyp.t * ζ₁ :=
     Subgroup.mem_centralizer_singleton_iff.mp hζ₁V.2
   have hzbarW := hyp.mem_W_intrinsicResidualQuotient_of_mem_V details s4.P_le_D

@@ -56,16 +56,14 @@ Hypothesis.SectionFourSetup.exists_mem_W
 5. `Z(U) ≤ D` (既 landing) と `Q ⊓ D = ⊥` (`Hypothesis` の公理) ⟹
    **`[ζ₁, y] = 1`** ⟹ `ζ₁ ∈ C(y)` ∎
 
-⟹ **§4 の真の外部入力は `ζ₁ ∈ (V∩U) − (P∩U)` の存在 1 つだけ**になる見込み。
+⟹ **実装済** (`inf_le_centralizer_centralizer_Q0`)。`exists_mem_W` の仮説からも外れた。
 
-## 残り = PSU(3,ℓ) の構造から読み取る 2 つ
+## 残り = **`ζ₁ ∈ (V ∩ U) − (P ∩ U)` の存在 1 つだけ**
 
-書籍でもそれぞれ 1 文の主張 (§4 step (2), p. 133):
+書籍 §4 step (2) (p. 133)「`|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` since `ℓ > 2`」。
 
-1. `hcent : V ⊓ U ≤ C_G(C_{Q₀}(P))`
-   — 「By the structure of `PSU(3, ℓ)`, `(V ∩ U)/(P ∩ U)` centralizes `C_{Q₀}(P)`」
-2. `ζ₁ ∈ (V ∩ U) − (P ∩ U)` の存在
-   — 「`|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` since `ℓ > 2`」
+`hcent` は上記のとおり導出済 (`inf_le_centralizer_centralizer_Q0`) で、
+`exists_mem_W` の仮説からも外した。
 
 ⚠ 既存の `SectionFourSetup.exists_ne_one_mem_W_centralizer` (= `C_W(P) ≠ 1`) は
 docstring が「書籍の `(ℓ+1)/(ℓ+1,3) ≠ 1` を step (2) が使う形」と述べるが、
