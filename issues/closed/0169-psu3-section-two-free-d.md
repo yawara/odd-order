@@ -82,7 +82,8 @@ fpf で切るしかなく、そのためには §2/§3 の `hVW` を fpf に一�
       (hVW-free)、`≥` は `stepEight_of_KW` から出る。
       消費点は `PSU3StepFifteen.lean:365`。
       ⟹ **(2) の置換はほぼ完全に機械的**。
-- [ ] (4) **次の作業** — case (c) → Ch. IV の振り分けを組む:
+- [x] (4) **完了 (2026-08-02)** — `PSU3TheoremADichotomy.lean`。詳細は末尾「(4) 完了」節。
+      当初計画:
       `by_cases` on 「∃ 素数位数 `P ≤ D` with `C_{Q/Q₀}(P) ≠ 1`」
       * yes → `P` を `D`-共役で `V` へ入れ (書籍「`P` has three fixed points on `Ω`
         and so is conjugate in `D` to a subgroup of `V`」)、`P ∩ W = 1` は
@@ -280,3 +281,51 @@ by_cases hfree : hyp.FreeD
    `ω` の類を固定して矛盾。
 5. `SectionFourSetup` の残りのフィールド (`cardP` 素数・奇数、`card_P`、
    `x`/`x_mem_Q`/`x_notMem_Q0`/`x_class_fixed`) は 1.–2. の witness をそのまま。
+
+## ✅ (4) 完了 — issue クローズ (2026-08-02)
+
+新 leaf [`PSU3TheoremADichotomy.lean`](../OddOrder/Peterfalvi/Appendices/Suzuki/PSU3TheoremADichotomy.lean)
+(409 行)。完了条件を満たし、さらにその先 (case (a)(b) との合流) まで通った。
+
+### 到達点
+
+```
+SecondCaseHypothesis.nonempty_theoremAConclusion
+  : (sc : SecondCaseHypothesis G Ω) → TheoremAInductionBelow G Ω
+    → Nonempty (TheoremAConclusion G Ω)
+```
+**仮説ゼロ** (帰納法仮説のみ)、`#print axioms` = propext / Classical.choice / Quot.sound。
+
+### 内訳
+
+| 定理 | 内容 |
+|---|---|
+| `Hypothesis.classStabilizer ω` | `D` の中で類 `ωQ₀` を固定する部分群。`FreeD` = 「`ω ∈ Q−Q₀` すべてでこれが自明」 |
+| `exists_prime_order_le_classStabilizer_of_not_freeD` | `¬FreeD` ⟹ 素数位数の部分群が類を固定 (Cauchy) |
+| `exists_sectionFourSetup_of_not_freeD` | 書籍 p.132 の 4 文 ⟹ `SectionFourSetup` |
+| `two_lt_card_Q0_of_isSuzuki2Group` | `q > 2` (Suzuki 2-群は involution を 2 つ持つ) ⟹ `1 < m` |
+| `SectionFourSetup.two_lt_natCard_inf_centralizer_Q0` | 書籍 §4 step (1) の `ℓ > 2` |
+| `SecondCaseHypothesis.nonempty_theoremAConclusion_of_caseC` | case (c) ⟹ Theorem A (`by_cases FreeD`) |
+| `SecondCaseHypothesis.nonempty_theoremAConclusion` | 3 ケース全部 |
+
+### 設計上のポイント
+
+* **`classStabilizer` を部分群にしたのが鍵**。「ある `c ≠ 1` が類を固定」から
+  Lagrange + Cauchy で「素数位数の部分群が固定」が 5 行で出る (冪の帰納法は不要)。
+* **`hCop` / `hCQ` / `hP` / `hA3` / `hl` は全部導出できた** — §4 endpoint の
+  仮説として残っていたが、`|D|` 奇 + `Q` が 2-群 + `SecondCaseHypothesis` の
+  `twoRank_centralizer_ge_two` + 帰納法の戻り値 (`PSU3InductionTarget.one_lt_n`)
+  から機械的に出る。`ℓ > 2` を「側条件」と読むのは誤りで、**書籍でも Ch. I §3
+  Prop 1(c) の結論**である (標準 `PSU(3,ℓ)` 模型は `ℓ = 2ⁿ`, `n ≥ 2` でしか無い)。
+* `trichotomy` / `theoremAConclusion_or_caseC2` の case (c) に
+  `IsSuzuki2Group Q` と `|Q| = |Q₀|³` を追加 (証明中の分岐条件をそのまま公開しただけ)。
+
+### 残る上流 = `SecondCaseHypothesis` の構成 (C1)
+
+`SecondCaseHypothesis` は repo のどこでも**構成されていない** (2026-08-02 実測:
+`StructureOfH/` と本 leaf 以外に出現しない)。フィールドは書籍の (C1) 2 節:
+
+* `V_ne_bot : V ≠ 1`
+* `twoRank_centralizer_ge_two : 素数位数 P ≤ V に対し C_G(P) の 2-rank ≥ 2`
+
+⟹ **次の frontier はこれ** (Ch. II「第一の場合」との接続)。別 issue で追う。

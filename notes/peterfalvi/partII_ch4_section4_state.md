@@ -1,4 +1,4 @@
-# Peterfalvi Part II, Ch. IV — 到達状態 (2026-08-02: **Ch. IV 完了**)
+# Peterfalvi Part II, Ch. IV — 到達状態 (2026-08-02: **Ch. III/IV 完了**)
 
 > 正本の作業ログは [issue 0168](../../issues/0168-pf-part2-ch4-psu3.md) (9k 行)。
 > 本 note はその §4 部分の**要約と残件**だけを持つ。
@@ -335,3 +335,28 @@ SectionFourSetup.nonempty_theoremAConclusion
 * `|W|` の 2 値化 (`(q+1)/(q+1,3)` か `q+1`) — §1 Lemma の置換群版を `G` 全体へ
 
 ⟹ 低優先繰延 (Theorem A の完成を優先)。
+
+## ✅✅✅ Ch. III の仮説から Theorem A が出た (2026-08-02, issue 0169 完了)
+
+```
+SecondCaseHypothesis.nonempty_theoremAConclusion
+  : (sc : SecondCaseHypothesis G Ω) → TheoremAInductionBelow G Ω
+    → Nonempty (TheoremAConclusion G Ω)
+```
+仮説ゼロ (帰納法仮説のみ)・axiom-clean。`PSU3TheoremADichotomy.lean`。
+
+書籍 §4 冒頭の二分法 (`FreeD` = 「`D` が `(Q/Q₀)^#` 上 fpf」か否か) をそのまま
+形式化し、`¬FreeD ⟹ SectionFourSetup` を landing させたのが最後のピース。
+case (a)(b) は既存の `theoremAConclusion_or_caseC2`。
+
+**§4 endpoint に残っていた仮説 `hCop`/`hCQ`/`hP`/`hA3`/`hl` は全部導出できた** —
+特に `hl` (`ℓ > 2`) は側条件でなく **Ch. I §3 Prop 1(c) の結論**
+(`PSU3InductionTarget.one_lt_n`; 標準 `PSU(3,ℓ)` 模型は `ℓ = 2ⁿ`, `n ≥ 2` でしか無い)。
+詳細は [closed issue 0169](../../issues/closed/0169-psu3-section-two-free-d.md)。
+
+### ⟹ 次の frontier = `SecondCaseHypothesis` の構成 (書籍の (C1))
+
+`SecondCaseHypothesis` は repo のどこでも構成されていない (2026-08-02 実測)。
+フィールド = `V_ne_bot : V ≠ 1` と
+`twoRank_centralizer_ge_two : 素数位数 P ≤ V に対し C_G(P) の 2-rank ≥ 2`。
+Ch. II (「第一の場合」) との接続がここ。
