@@ -8127,3 +8127,18 @@ commit `4764df155`。新 leaf `PSU3SectionFourStepThree.lean` (段 (2) 内在版
 `Fix(μ²)` は部分体で、真部分体なら `|Fix| ≤ √|F|`。`|F| − 3 ≤ |Fix|` と矛盾
 (`|F| ≥ 8`)。⟹ `μ² = 1`、奇位数から `μ = 1`。
 道具: `exists_pow_eq_of_ringAut` (既存) / `natCard_frobFixedSubfield` (既存)。
+
+### (174) §4 終盤の部品 landing — `eq_one_of_odd_orderOf_of_sq_fixes_compl`
+
+commit `de912f257`。書籍 p.134 の最終ステップ (`μ² = 1` から `μ = 1`) が
+`Algebra/FixedPointDensity.lean` に。既存の `eq_refl_of_fixes_compl` の上に
+`orderOf μ ∣ 2` + 奇位数を重ねただけ。
+
+**§4 の残り** = p.133 末〜134 冒頭の計算 (4)〜(10):
+* `η` の半線形性 (Appendix I Prop 2) から体自己同型 `μ` を取り出す
+* (9) の等式 → `λ = 1` と `b² + a^{-2μ²} = ζ + ζ⁻¹`
+* (10) `(ζ + ζ⁻¹ + X^μ)X = (ζ + ζ⁻¹ + X^{μ²})X^μ` (`X ∈ F − {0, α^{2τ}}`)
+* `X+1` で書いて引く ⟹ `X^{μ²} = X` (3 点を除く) ⟹ (174) で `μ = 1`
+
+⚠ この計算は §2 の (2) と §3 の結果を使う。着手前に p.133 の (4)〜(8) を
+ページ画像で読むこと (`references/peterfalvi/pages/peterfalvi-p133.png`)。
