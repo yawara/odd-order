@@ -93,9 +93,21 @@ Isaacs Thm 5.4 弱形 (`not_isMulCommutative_sylow_of_le_commutator_inf_center`)
       `2n` 版は n 奇数で偽)。実装は**偶数一般形**でより強い。
       下界の witness = reduction hom `D_{4t} ↠ D_{2t}` — **∃-側は universal object を
       要さず具体構成 1 本で足りる**ことの実例
-- [ ] 5A.8(a) `|M(A×B)| ≥ |M(A)||M(B)|` / (b) coprime のとき等号
-      — (a) も ∃-側ゆえ具体構成が要る
-- [ ] Isaacs Thm 5.4 の full 形 (要 universal object かを再判定)
+- [x] **5A.8(a)** `isStemExtension_prodMap` / `card_ker_prodMap`
+      (`ProblemsSchurMultiplier.lean`) — ∃-側は具体構成 `f.prodMap g` 1 本
+- [x] **5A.8(b)** `card_ker_eq_mul_card_ker_stem` (`ProblemsProductMultiplier.lean`)
+      — coprime 直積を中心積に分解して `|ker h| = |ker f_A|·|ker f_B|`
+- [x] **Isaacs Cor 5.4 の full 形** = `not_isCyclic_sylow_quotient_of_le_commutator_inf_center`
+      (`CentralTransfer.lean`) — 「`Z ≤ Γ' ⊓ Z(Γ)`, `p ∣ |Z|` ⇒ Sylow_p(Γ/Z) 非巡回」で
+      **書籍の結論そのもの**。universal object は不要だった
+      (⚠ 書籍は Theorem でなく **Corollary** 5.4)。2026-08-03 実測で確認、
+      同 leaf の「full 形は別途」という stale 注記も同時に訂正。
+
+## ✅ close (2026-08-03)
+
+上の全項目が landing 済であることを実測で確認したので close する。
+`M(G)` の universal object は**結局どの演習にも不要**だった — Isaacs 5A.5–5A.8 は
+すべて `IsStemExtension` の ∀-形 (上界) と具体構成 (∃-形/下界) の対で書けている。
 
 ## 実装メモ (2026-07-26)
 

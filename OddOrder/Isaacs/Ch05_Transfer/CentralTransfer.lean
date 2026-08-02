@@ -40,10 +40,12 @@ section /- 5A: Transfer definition + homomorphism (pp. 147-153) -/
 - **Thm 5.2** (transfer 準同型性): 同上, 構造の `map_mul'` フィールドで内包.
 - **Thm 5.3** (`p ∣ |G' ∩ Z(G)|` ⇒ Sylow_p(G) は非可換): ✅
   `not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center`.
-- **Thm 5.4** (Schur multiplier corollary): ✅ 弱形
-  `not_isMulCommutative_sylow_of_le_commutator_inf_center` — `Z ≤ Γ' ∩ Z(Γ)`, `p ∣ |Z|`
-  ⇒ Sylow_p(Γ) 非可換. Schur multiplier 概念 (M(G), 中心 extension の universal) 自体は
-  mathlib 未収載で full 形 (Sylow_p(Γ/Z) noncyclic) は別途. -/
+- **Cor 5.4** (Schur multiplier corollary): ✅ **書籍の結論そのもの**
+  `not_isCyclic_sylow_quotient_of_le_commutator_inf_center` — `Z ≤ Γ' ∩ Z(Γ)`, `p ∣ |Z|`
+  ⇒ Sylow_p(Γ/Z) は**非巡回**. 中間段の `not_isMulCommutative_sylow_of_le_commutator_inf_center`
+  (Sylow_p(Γ) 非可換) も公開している. なお Schur 乗数 `M(G)` の universal object 自体は
+  mathlib 未収載で本リポジトリでも未実装 — Isaacs の演習 5A.5–5A.8 は
+  `IsStemExtension` の ∀/∃ 形で述べてある (`ProblemsSchurMultiplier.lean` 参照). -/
 
 /-- **Isaacs Thm 5.3**: 素数 `p` で `p ∣ |G' ∩ Z(G)|` ⇒ Sylow_p(G) は非可換.
 
