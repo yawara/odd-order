@@ -396,7 +396,74 @@ theorem inf_le_centralizer_of_fitting_inf_eq_bot (hK : KegelHypothesis S) (hinf 
       _ = x * n := by rw [hx']
   exact hxn
 
+/-- `(I)` の帰結その 1: `F(G) ⊓ N = ⊥` なら `S` 全体が `N` を中心化する.
+
+各素数 `p` で `C_G(N) ⊓ S` は `S` の Sylow `p`-部分群を含むから, `[S : C_G(N) ⊓ S]` は
+どの素数でも割れない. -/
+theorem le_centralizer_of_fitting_inf_eq_bot (hK : KegelHypothesis S) (hinf : S ⊓ N = ⊥)
+    (hsup : S ⊔ N = ⊤) (hFN : Ch01.fitting G ⊓ N = ⊥) :
+    S ≤ Subgroup.centralizer (N : Set G) := by
+  have hidx : ((Subgroup.centralizer (N : Set G) ⊓ S).subgroupOf S).index = 1 := by
+    by_contra hne
+    have hpp : (((Subgroup.centralizer (N : Set G) ⊓ S).subgroupOf S).index).minFac.Prime :=
+      Nat.minFac_prime hne
+    haveI : Fact (((Subgroup.centralizer (N : Set G) ⊓ S).subgroupOf S).index).minFac.Prime :=
+      ⟨hpp⟩
+    obtain ⟨P⟩ := (Sylow.nonempty (p := (((Subgroup.centralizer (N : Set G) ⊓ S).subgroupOf
+      S).index).minFac) (G := G))
+    have hle : ((P : Subgroup G) ⊓ S).subgroupOf S
+        ≤ (Subgroup.centralizer (N : Set G) ⊓ S).subgroupOf S := fun x hx =>
+      ⟨inf_le_centralizer_of_fitting_inf_eq_bot hK hinf hsup hFN P hx, x.2⟩
+    have hnotp := hK _ ‹Fact _› P
+    rw [Subgroup.relIndex] at hnotp
+    exact hnotp ((Nat.minFac_dvd _).trans (Subgroup.index_dvd_of_le hle))
+  intro x hx
+  have hmem : (⟨x, hx⟩ : ↥S) ∈ (Subgroup.centralizer (N : Set G) ⊓ S).subgroupOf S := by
+    rw [Subgroup.index_eq_one.mp hidx]
+    trivial
+  exact hmem.1
+
+omit [Finite G] in
+/-- `(I)` の帰結その 2: `S` が `N` を中心化すれば `S ◁ G` (`G = SN` なので). -/
+theorem normal_of_le_centralizer (hsup : S ⊔ N = ⊤)
+    (hSC : S ≤ Subgroup.centralizer (N : Set G)) : S.Normal := by
+  refine ⟨fun n hn g => ?_⟩
+  have hg : g ∈ (↑(S ⊔ N) : Set G) := by rw [hsup]; trivial
+  rw [Subgroup.mul_normal] at hg
+  obtain ⟨t, ht, m, hm, rfl⟩ := hg
+  have hcomm : m * n = n * m := (Subgroup.mem_centralizer_iff).mp (hSC hn) m hm
+  have hrw : t * m * n * (t * m)⁻¹ = t * n * t⁻¹ := by
+    rw [show t * m * n = t * (m * n) by group, hcomm]
+    group
+  rw [hrw]
+  exact S.mul_mem (S.mul_mem ht hn) (S.inv_mem ht)
+
 end Retraction
+
+section MinimalNormal
+
+variable {S : Subgroup G} (hmc : IsKegelMinimalCounterexample S)
+
+include hmc
+
+/-- **`(I)` の完了**: 極小反例の任意の極小正規部分群 `N ≠ ⊤` は Fitting 部分群に含まれる.
+
+`F(G) ⊓ N` は `G`-正規で `≤ N` なので `N` の極小性から `⊥` か `N`. `⊥` の場合は
+`S ≤ C_G(N)` (`le_centralizer_of_fitting_inf_eq_bot`) から `S ◁ G`
+(`normal_of_le_centralizer`) となり, `S` が subnormal でないことに矛盾. -/
+theorem le_fitting_of_isMinimalNormal {N : Subgroup G} (hN : Ch02.IsMinimalNormal N)
+    (hNtop : N ≠ ⊤) : N ≤ Ch01.fitting G := by
+  haveI : N.Normal := hN.1
+  have hinf := hmc.inf_eq_bot hN hNtop
+  have hsup := hmc.sup_eq_top (N := N) hN.2.1
+  rcases hN.2.2 (Ch01.fitting G ⊓ N) inferInstance inf_le_right with hbot | htop
+  · exfalso
+    have hSC := le_centralizer_of_fitting_inf_eq_bot hmc.kegel hinf hsup hbot
+    haveI := normal_of_le_centralizer hsup hSC
+    exact hmc.not_isSubnormal (Subgroup.Normal.isSubnormal inferInstance)
+  · exact htop ▸ inf_le_left
+
+end MinimalNormal
 
 end -- 9D.4
 
