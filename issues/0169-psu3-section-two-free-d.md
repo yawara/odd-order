@@ -145,9 +145,24 @@ fpf で切るしかなく、そのためには §2/§3 の `hVW` を fpf に一�
   (13)(16)+(H6)+(1) の帰納なので、まず commutation を経由しない形に直すか、
   Frobenius 側から `h(ω) ∈ W` を直接出すかの二択。
 
-**次にやること**: 上記 3 点は landing 済。`h_mem_W_of_freeD`
-(`PSU3StepEighteen.lean`、`W ⊴ D` = `normal_W_subgroupOf_D` 込み) を通したら
-(2) は完了で、残るのは (4) の case (c) 振り分け組立てのみ。
+**✅ 完了 (2026-08-02)**: `h_mem_W_of_frobeniusD` (`PSU3StepEighteen.lean`) が通った。
+`W ⊴ D` は `normal_W_subgroupOf_D` (Ch. I Prop 5 の `W = D ∩ C(H∩I)` 経由 —
+`W = D ∩ C(Q₀)` の方は §4 側にあって上流から使えない)。
+⚠ **命名衝突**: `PSU3SectionThree.h_mem_W_of_freeD` が既存 (そこでの "free D" は
+仮説 `V = W` の綴り) なので、新しい方は `h_mem_W_of_frobeniusD`。
+
+### 残り = §2 の閉じ Proposition まで `FreeD` を通す
+
+`PSU3StepTwenty.lean` / `PSU3BarOrbit.lean` の `hVW` (12 宣言)。実測した内訳:
+
+* **`FreeD` で済むもの** — `eq_one_of_conj_eq_mul_Q0_of_mem_D` 経由
+  (`PSU3StepTwenty:544`、`PSU3BarOrbit:207` ほか)。機械的。
+* **`D = K W` を使うもの** — `exists_mem_K_conj_of_mem_D` (`PSU3StepTwenty:230`) が
+  `exists_mem_K_mem_W_mul hVW` で共役子 `c ∈ D` を `κ v` に割る。
+  ⟹ step (9) と同じ処方: **仮説を `KW` の形で取る**
+  (`hrel : f (ω₁ z) = (κ₀ v)⁻¹ (ω₂ w) (κ₀ v)`, `κ₀ ∈ K`, `v ∈ W`)。
+  呼び出し側 (`stepTwenty_snd` 318 / `stepTwenty_of_mem_D` 390) が `KW` 形を
+  供給できるか要確認 — 書籍 (7) より共役子は常に `KW` に居る。
 
 ## 準備として済んでいること (2026-08-02)
 
