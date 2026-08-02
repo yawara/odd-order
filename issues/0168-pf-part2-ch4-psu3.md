@@ -7531,3 +7531,34 @@ twist `σ⁻¹τ` は `φ^{±1}` のまま。⟹ **`d` の `1 + 2^t` 正規化�
 
 **次セッション**: `TypeBData` にこの `lam` フィールド (または並行する定理) を足す方向で
 `TypeBRecognition` を強化する。
+
+### (154) ✅ `hodd` 決着 — 「K が Z(Q)^# 上 regular」1 点で閉じた (type-`B` transport 不要)
+
+(153) は「`K` が type-`B` 座標で対角スカラー」を認識定理から露出せよ、と書いていたが、
+**その道は要らなかった**。`hodd` は**モデル内部の情報だけ**で出る (commit `f177a0886`)。
+
+**(a) 数論の核** (`Algebra/FrobeniusExponentPairs.lean`):
+
+> `odd_orderOf_of_mul_self_surjective` — `F = 𝐅_{2^n}`, `ρ ∈ RingAut F`。
+> 積写像 `a ↦ a · ρ(a)` が `F^×` 上に **onto** なら `Odd (orderOf ρ)`。
+
+`ρ = Frob^r` と書くと写像は `a ↦ a^{1+2^r}`。`orderOf ρ = n / gcd(n,r)` が偶とすると、
+`g := gcd(n,r)` に対し `r/g` は奇なので `2^g + 1 ∣ 2^r + 1`、また `2g ∣ n` なので
+`2^g + 1 ∣ 2^{2g} − 1 ∣ 2^n − 1`。⟹ 位数が `2^g+1 (> 1)` を割る元が `1` の第二の原像。
+
+**(b) onto 性の出所 = `K` の regularity** (`PSU3ModelTwistOdd.lean`):
+
+`exists_zpow_eq_of_mem_frobFixed` — `K` は `Z(Q)^#` 上推移的
+(`LemmaFiveSetup.transCenter`)、座標 `ι` では `z ↦ μ(k)^d z` (`hequiv`)、
+`μ(K) = F^×` (`exists_actualKActor_mu_eq`) ⟹ **`a ↦ a^d` は `F^×` 上 onto**。
+`zpow_eq_mul_thetaModel` の `a^d = a·θ(a)` と合わせて (a) が発火する。
+
+⟹ `TypeBData` も認識定理の露出も**一切不要**。Appendix III Def 3 が構造フィールドとして
+持つ「θ は奇位数」は、標準モデル側では**定理**。
+
+**(c) おまけ: `hpair` 仮説を全廃**。`exists_scalingPair_of_lemmaFiveSetup` は自前の `d` を
+返すので座標が合わなかったが、`exists_scalingPair_of_centerCoordinate` (与えられた
+`(ι, d)` 用に立て直したもの) で解決。`corollaryTwo_of_isStandardModel` /
+`..._of_normalization` から `hpair` を削除し、pair も `θF` も奇位数も内部で構成する。
+
+⟹ **「§2 を `U` 相対で走らせる」の残債は `hsq` (step (20) の平方関係) のみ**。
