@@ -9030,3 +9030,23 @@ step (3) の出力 (`ζ₁ ∈ D ∩ U`, `x ∈ (Q−Q₀)∩U`, `f x = x^{-ζ�
 ⟹ **§4 の外部入力は `hcent` 1 つだけ**になった
 (書籍「(V ∩ U)/(P ∩ U) centralizes `C_{Q₀}(P)`」= PSU(3,ℓ) の構造)
 ＋ `ζ₁ ∈ (V∩U) − (P∩U)` の選択 ((214))。
+
+### (216) `ζ₁ ∈ V∩U` が `W̄`-元になる理由 — 商仮説の `V̄ = W̄`
+
+書籍が `ζ₁ ∈ (V ∩ U) − (P ∩ U)` を Corollary 2 (`ζ ∈ W` を要求) に食わせられる
+のは、**商仮説 `U/Z(U) ≅ PSU(3,ℓ)` の側で `V̄ = W̄`** だから
+(`residualQuotientHypothesis_V_eq_W`, `PSU3SectionFourModel.lean:78`)。
+⚠ 周囲の `V = W` ではない ((182) で確認済)。
+
+`ζ₁ ∈ V ∩ U` の像は
+* `D̄` に入る (`D̄` = `D ∩ U` の像)
+* `t̄` と可換 (`ζ₁` が `t` と可換)
+⟹ `V̄`。そこに `V̄ = W̄` を当てて `W̄` ✓。
+
+**残り (2 段)**:
+1. `residualQuotientHypothesis_V_eq_W` を **intrinsic 側**へ移送
+   (`exists_mulEquiv_match_residualQuotient` + `map_W_of_mulEquiv` の `V` 版)。
+2. `ζ₁ ∈ (V∩U) − (P∩U)` の存在 = 書籍 `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1`。
+   ⟹ その像を `ζ̄` として `exists_stepThree_data` に食わせ、
+   持ち上げ関係 ((214)) で `z ∈ V`, `z ∉ P` を継承し、
+   `mem_W_of_stepThree` ((211)) で **§4 完結**。
