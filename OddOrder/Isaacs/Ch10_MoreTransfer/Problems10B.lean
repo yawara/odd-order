@@ -81,6 +81,47 @@ theorem orderOf_one_add_prime_dvd (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n)
   change (ZMod.castHom (dvd_pow_self p hn.ne') (ZMod p)) (1 + (p : ZMod (p ^ n))) = 1
   rw [map_add, map_one, map_natCast, ZMod.natCast_self, add_zero]
 
+/-! ## 単元が定める巡回群の自己同型 -/
+
+/-- 単元 `u : (ZMod m)ˣ` が定める `Multiplicative (ZMod m)` の自己同型 (`x ↦ x^u`).
+
+`(ZMod m)ˣ →* MulAut (Multiplicative (ZMod m))` としてまとめる. -/
+def unitAutHom (m : ℕ) : (ZMod m)ˣ →* MulAut (Multiplicative (ZMod m)) where
+  toFun u :=
+    { toFun := fun v => Multiplicative.ofAdd ((u : ZMod m) * Multiplicative.toAdd v)
+      invFun := fun v =>
+        Multiplicative.ofAdd (((u⁻¹ : (ZMod m)ˣ) : ZMod m) * Multiplicative.toAdd v)
+      left_inv := fun v => by simp [← mul_assoc, u.inv_mul]
+      right_inv := fun v => by simp [← mul_assoc, u.mul_inv]
+      map_mul' := fun a b => by simp [← ofAdd_add, mul_add] }
+  map_one' := by ext v; simp
+  map_mul' u u' := by ext v; simp [MulAut.mul_apply, mul_assoc]
+
+@[simp]
+theorem unitAutHom_apply (m : ℕ) (u : (ZMod m)ˣ) (v : Multiplicative (ZMod m)) :
+    unitAutHom m u v = Multiplicative.ofAdd ((u : ZMod m) * Multiplicative.toAdd v) := rfl
+
+/-- `unitAutHom` は単射 (`ofAdd 1` での値が `u` を決める). -/
+theorem unitAutHom_injective (m : ℕ) [NeZero m] : Function.Injective (unitAutHom m) := by
+  intro u u' h
+  have hv := congrArg (fun φ : MulAut (Multiplicative (ZMod m)) =>
+    Multiplicative.toAdd (φ (Multiplicative.ofAdd 1))) h
+  simp only [unitAutHom_apply, toAdd_ofAdd, mul_one] at hv
+  exact Units.ext hv
+
+/-- 単元が定める自己同型の位数は単元の位数. -/
+theorem orderOf_unitAutHom (m : ℕ) [NeZero m] (u : (ZMod m)ˣ) :
+    orderOf (unitAutHom m u) = orderOf u :=
+  orderOf_injective (unitAutHom m) (unitAutHom_injective m) u
+
+/-- **`1 + p` が定める `C_{p^n}` の自己同型の位数は `p` 冪**. -/
+theorem orderOf_unitAutHom_one_add_prime (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
+    (hu : (u : ZMod (p ^ n)) = 1 + (p : ZMod (p ^ n))) :
+    orderOf (unitAutHom (p ^ n) u) ∣ p ^ (n - 1) := by
+  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  rw [orderOf_unitAutHom]
+  exact orderOf_one_add_prime_dvd hp hn hu
+
 end
 
 end OddOrder.Isaacs.Ch10
