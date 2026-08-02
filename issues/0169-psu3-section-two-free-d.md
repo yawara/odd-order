@@ -59,17 +59,26 @@ fpf で切るしかなく、そのためには §2/§3 の `hVW` を fpf に一�
       「`V = W ⟹ FreeD`」という補題へ格下げする。
 - [ ] (2) `hVW` を `FreeD` に置換していく (40 宣言)。大半は
       `eq_one_of_conj_eq_mul_Q0_of_mem_D` 経由なので機械的。
-- [ ] (3) ⚠ **機械的でない 4 箇所** = `PSU3OrbitCount.lean` の数え上げ
-      (`stepEight` / `ncard_eq_card_W_sub_one_of_f_eq_conj_self` 系、
-      L466/468/525/603)。repo は `[D : K] = |V|` (`index_K_subgroupOf_D`) を
-      `hVW` で `|W|` に読み替えているが、**書籍 (7)(8) はそう論じていない**:
+- [x] (3) **数え上げは既に解決済だった** (2026-08-02 に実測して訂正)。
+      `PSU3OrbitCount.lean` の `stepEight` /
+      `ncard_eq_card_W_sub_one_of_f_eq_conj_self` は `[D : K] = |V|`
+      (`index_K_subgroupOf_D`) を `hVW` で `|W|` に読み替えているが、
+      **`PSU3StepEightKW.lean` が書籍どおりの `KW`-版を既に持っている**
+      (ファイル冒頭が「§3 が `V = W` を持ち回る羽目になっていた、それは §4 が
+      持たない仮説」と明記):
 
-      > (8) The number of elements `x ∈ Q₀` such that `f(ω₁x)` is in the orbit of `ω̄₁`
-      > under `KW` is `m` if `i > 1` and `m − 1` if `i = 1`.
-      > Proof. … `m_i ≤ m` for `i > 1` by (7) …
+      | `hVW` 版 (`PSU3OrbitCount`) | `hVW`-free 版 (`PSU3StepEightKW`) |
+      |---|---|
+      | `ncard_fiber_orbitOfF_le` | `ncard_fiber_orbitOfF_le_W` |
+      | `ncard_fiber_orbitOfF_base_le` | `ncard_fiber_orbitOfF_base_le_W` |
+      | `stepEight` | `stepEight_of_KW` |
+      | `exists_mem_Q0_orbitOfF_eq` | `exists_mem_Q0_orbitOfF_eq_of_KW` |
 
-      書籍は `a ∈ K W` (対象が **`KW`-軌道**) から `|K W / K| = |W|` で抑える。
-      ⟹ `D/K` でなく `KW/K` で数え直すのが正しい一般化。
+      残るのは `ncard_eq_card_W_sub_one_of_f_eq_conj_self` (等式版) の `_of_KW`
+      変種を作ること — `≤` は既に `ncard_le_card_W_sub_one_of_f_eq_conj_self`
+      (hVW-free)、`≥` は `stepEight_of_KW` から出る。
+      消費点は `PSU3StepFifteen.lean:365`。
+      ⟹ **(2) の置換はほぼ完全に機械的**。
 - [ ] (4) case (c) → Ch. IV の振り分けを組む:
       `by_cases` on 「∃ 素数位数 `P ≤ D` with `C_{Q/Q₀}(P) ≠ 1`」
       * yes → `P` を `D`-共役で `V` へ入れ (書籍「`P` has three fixed points on `Ω`

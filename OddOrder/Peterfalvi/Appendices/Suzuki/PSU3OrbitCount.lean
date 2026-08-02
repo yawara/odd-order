@@ -32,6 +32,9 @@ book's `τ` — is in `PSU3FieldArithmetic`, which this file imports.
 * `Hypothesis.orbitOfF` — the map `Φ` of step (8).
 * `Hypothesis.ncard_fiber_orbitOfF_le`, `Hypothesis.ncard_fiber_orbitOfF_base_le` —
   the fibre bounds.
+* `Hypothesis.FreeD` — §2's standing hypothesis "`D` acts without fixed points on
+  `(Q/Q₀)^#`" (p. 129), and `Hypothesis.freeD_of_V_eq_W`, the route to it the
+  repository uses (issue 0169).
 
 The squeeze that turns those bounds into equalities (`card_fiber_eq_of_card_eq`) is a
 general counting lemma and lives in `PSU3FieldArithmetic` alongside the rest.
@@ -864,6 +867,22 @@ theorem eq_one_of_conj_eq_mul_Q0_of_decomp {m : ℕ} (M : hyp.QuotientFieldModel
   have : c⁻¹ = 1 := by rw [hkv, hk1, hv1, mul_one]
   rw [← inv_inv c, this, inv_one]
 
+/-- **`D` acts without fixed points on `(Q/Q₀)^#`** — the standing hypothesis of
+Peterfalvi Part II, Ch. IV §2 (p. 129):
+
+> **Proposition.** Suppose that `D` acts without fixed points on `(Q/Q₀)^#`. …
+
+The quotient `Q/Q₀` is not formed: "`c` fixes the class of `ω`" is spelled out as
+`c⁻¹ ω c = ω y` with `y ∈ Q₀`, which is the shape every step of §2 uses.
+
+`V = W` implies it (`freeD_of_V_eq_W`) but is strictly stronger: an element of
+`V ∖ W` acts on `Q/Q₀` semilinearly, and Hilbert 90 makes its fixed points depend on
+a norm condition that can fail.  Ch. IV §4 is the case where the hypothesis itself
+fails, i.e. where some `P ≤ D` of prime order does have a fixed point. -/
+def FreeD : Prop :=
+  ∀ ⦃ω c y : G⦄, ω ∈ hyp.Q → ω ∉ hyp.Q0 → c ∈ hyp.D → y ∈ hyp.Q0 →
+    c⁻¹ * ω * c = ω * y → c = 1
+
 /-- **`D` acts fixed-point-freely on `(Q/Q₀)^#`** (the `V = W` case).
 
 `exists_mem_K_mem_W_mul` decomposes `c⁻¹` as `k v`; the content is
@@ -875,6 +894,17 @@ theorem eq_one_of_conj_eq_mul_Q0_of_mem_D {m : ℕ} (M : hyp.QuotientFieldModel 
     (hy : y ∈ hyp.Q0) (hconj : c⁻¹ * ω * c = ω * y) : c = 1 := by
   obtain ⟨k, hk, v, hv, hkv⟩ := hyp.exists_mem_K_mem_W_mul hVW (hyp.D.inv_mem hcD)
   exact hyp.eq_one_of_conj_eq_mul_Q0_of_decomp M hZ hmu hωQ hωQ0 hk hv hkv hy hconj
+
+/-- **`V = W` implies §2's hypothesis** — the packaged form of
+`eq_one_of_conj_eq_mul_Q0_of_mem_D`.
+
+This is the only route to `FreeD` the repository currently has; it is what the
+`V = W` half of Ch. IV runs on. -/
+theorem freeD_of_V_eq_W {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W) : hyp.FreeD :=
+  fun _ _ _ hωQ hωQ0 hcD hy hconj =>
+    hyp.eq_one_of_conj_eq_mul_Q0_of_mem_D M hZ hmu hVW hωQ hωQ0 hcD hy hconj
 
 /-- **`W` acts fixed-point-freely on `(Q/Q₀)^#`** — no `V = W` needed.
 
