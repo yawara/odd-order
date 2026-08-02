@@ -28,6 +28,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -377,7 +378,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 14900
+set_option linter.style.longFile 15000
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -14873,3 +14874,40 @@ identifying the abstract endomorphism field of Appendix I with the model's `E`. 
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordConjD_mul_eq_coordFieldAut_mul
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordConjD_eq_coordFieldAut_mul
+
+/-! **Ch. IV §4: `μ` on the scalars, and the equations (5), (6)** (issue 0168, 2026-08-02).
+`Peterfalvi/Appendices/Suzuki/PSU3SectionFour{Semilinear,Equations}.lean` — Peterfalvi Part II,
+p. 133.
+
+The book describes `μ` twice: as the field automorphism of `E` associated with `η`, and as the
+action of `η` on `K W` under `K W ≅ K₁ W₁`.  `coordFieldAut_muK` / `coordFieldAut_muW` are the
+second description — on a scalar, `μ` is conjugation of the pair — and `coordFieldAut_muW_eq_self`
+is the book's `ζ^μ = ζ`, which holds because it takes `ζ ∈ C_W(P)` and `η ∈ P`.
+
+(6) is (4) read at `b` in place of `a`.  (5) is (4) at `a` with `f(ω s^a)‾` replaced by the
+right-hand side of (3); that substitution is the first use of the semilinearity, and it is exactly
+`ζ^μ = ζ` that makes the two `ζ`'s cancel and leaves the book's `a^{-2μ}`.
+
+(3) itself ("by (2) of §2") turned out to be the *existing* `stepTen_quotient_coord`, which was
+already stated for an arbitrary `ω`, `ζ`, `y` with `f(ω) = (ω y)^ζ`.  The only §4-specific step is
+the exponent-`4` bridge: §4 has `f(ω) = (ω⁻¹)^ζ`, and with `y = ω²` the two forms agree because
+`ω⁴ = 1` — `y ∈ Q₀` and `Q₀` has exponent `2`.  That is step (1)'s "`C_Q(P)` has exponent 4" read
+on `ω`. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_eq_of_smul
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_muK
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_muW
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_muW_eq_self
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_four_coordConjD
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_six_linear
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_five_linear
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_three_coord
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_five_of_three

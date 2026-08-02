@@ -8435,3 +8435,37 @@ commit `bb2832468`。新 leaf `PSU3SectionFourCoordinate.lean` (185 行)。
 4. (7)(8)(9) = 既存の算術補題に `A := a^{2μ}`, `B := b²`, `c := ζ`,
    `w := ω̄`, `Z := μ(Z₇)` を食わせる。
 5. (10) → `μ² = 1` → `μ = 1` → `η ∈ W` → `h(ω) ∈ W` → §3 Corollary 1 で Ch. IV 完了。
+
+### (189) 🎯 (3)(5)(6) が landing — 残りは (7)–(10) の配線だけ
+
+新 leaf `PSU3SectionFourEquations.lean` + `PSU3SectionFourSemilinear.lean` 追記。
+
+**`μ` のスカラー上の姿** (書籍が `μ` を二通りに説明する後者 =「`η` の `KW` への作用」):
+* `coordFieldAut_eq_of_smul` — intertwining 定数で `σ(c)` が決まる
+* `coordFieldAut_muK` / `coordFieldAut_muW` — `(κ₁)^μ = (κ^{d⁻¹})₁`
+* `coordFieldAut_muW_eq_self` — **書籍の `ζ^μ = ζ`** (`η ∈ P` が `ζ ∈ C_W(P)` を中心化)
+
+**方程式**:
+* `sectionFour_four_coordConjD` — (4) を `coordConjD` 形に (半線形性が当たる形)
+* `sectionFour_six_linear` = **(6)** ((4) を `b` で読むだけ)
+* `sectionFour_three_coord` = **(3)** — ⚠ **既存の `stepTen_quotient_coord`
+  (`PSU3SectionThree.lean:524`) がそのまま (3) だった**。任意の `ω`,`ζ`,`y` に対し
+  `f(ω) = (ω y)^ζ` の形で述べてあり `hVW`/`hmu` も取らない。§4 固有なのは
+  **指数 4 の橋渡し**だけ: §4 は `f(ω) = (ω⁻¹)^ζ` だが `y = ω²` とすると
+  `ω⁴ = 1` (`y ∈ Q₀`、`Q₀` は指数 2) で両者が一致する。これが step (1) の
+  「`C_Q(P)` は指数 4」を `ω` に読んだもの。
+* `sectionFour_five_linear` = **(5)**、`sectionFour_five_of_three` = (3) を
+  discharge した合成版 (書籍の「(4) の `f(ωs^a)‾` を (3) の右辺で置き換える」1 手)。
+
+**arithmetic への対応** (`sectionFour_seven_book` の `h5`/`h6`):
+`X := f(ωs^b)‾`, `Y := X^η`, `w := ω̄`, `A := μ(a²,1)^μ`, `B := μ(b²,1)`,
+`c := μ(1,ζ)⁻¹`。repo のスカラーは書籍の逆 (`x^d` = `d⁻¹` 共役) なので
+書籍の `ζ` = `μ(1,ζ)⁻¹`、書籍の `a²` = `μ(kActor a²,1)`。
+
+**残り**:
+1. `sectionFour_seven_book` / `_eight_book` / `_nine` に上の辞書で食わせる
+   (side condition: `A ≠ 0`, `c ≠ 0`, `A + B ≠ 0` — 最後は
+   `sectionFour_eq_of_add_eq_zero` + 群論で排除)。
+2. (10) → `sectionFour_sq_eq_id` → `μ² = 1` → `eq_one_of_sq_eq_one_of_odd_pow` で
+   `μ = 1` → `η ∈ W` → `h(ω) ∈ W` → §3 Corollary 1 で Ch. IV 完了。
+3. `ω̄ ≠ 0` (= `ω ∉ Q₀`) は `coord_ne_zero_of_not_mem_Q0` が既存。

@@ -409,6 +409,65 @@ theorem coordConjD_eq_coordFieldAut_mul (s : hyp.LemmaFiveSetup m)
       = hyp.coordFieldAut s M hm hQ0card hd hζ hznot x * hyp.coordConjD M ⟨d, hd⟩ 1 :=
   addEquiv_eq_scaledRingEquiv_mul_one _ _ _ x
 
+/-! ### `μ` on the scalars of `K W`
+
+The book (p. 133) describes `μ` twice over: as "the automorphism of `E` associated with
+`η`", and as "the action of `η` on `K W` under `K W ≅ K₁ W₁`".  These lemmas are that
+second description: on the scalars, `μ` *is* conjugation of the pair. -/
+
+include hyp in
+/-- `μ` is pinned on a scalar by its intertwining constant. -/
+theorem coordFieldAut_eq_of_smul (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) {d ζ : G} (hd : d ∈ hyp.D)
+    (hζ : ζ ∈ hyp.W)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) {c ν : M.E}
+    (h : ∀ x : M.E, hyp.coordConjD M ⟨d, hd⟩ (c * x) = ν * hyp.coordConjD M ⟨d, hd⟩ x) :
+    hyp.coordFieldAut s M hm hQ0card hd hζ hznot c = ν := by
+  have h1 : hyp.coordConjD M ⟨d, hd⟩ 1 ≠ 0 := fun hc =>
+    one_ne_zero ((hyp.coordConjD M ⟨d, hd⟩).injective (by rw [hc, map_zero]))
+  refine mul_right_cancel₀ h1 ?_
+  rw [← hyp.coordConjD_mul_eq_coordFieldAut_mul s M hm hQ0card hd hζ hznot c 1]
+  exact h 1
+
+include hyp in
+/-- **`μ` on a `K`-scalar is the `K`-scalar of the conjugated element**: `(κ₁)^μ = (κ^{d⁻¹})₁`. -/
+theorem coordFieldAut_muK (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) {d ζ : G} (hd : d ∈ hyp.D)
+    (hζ : ζ ∈ hyp.W)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) {κ : G} (hκ : κ ∈ hyp.K) :
+    hyp.coordFieldAut s M hm hQ0card hd hζ hznot ((M.mu (hyp.kActor hκ, 1) : M.Eˣ) : M.E)
+      = ((M.mu (hyp.kActor (hyp.conj_mem_K_of_mem_D hd hκ), 1) : M.Eˣ) : M.E) :=
+  hyp.coordFieldAut_eq_of_smul s M hm hQ0card hd hζ hznot (hyp.coordConjD_muK_smul M hd hκ)
+
+include hyp in
+/-- **`μ` on a `W`-scalar**: `(v₁)^μ = (v^{d⁻¹})₁`. -/
+theorem coordFieldAut_muW (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) {d ζ : G} (hd : d ∈ hyp.D)
+    (hζ : ζ ∈ hyp.W)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) {v : G} (hv : v ∈ hyp.W) :
+    hyp.coordFieldAut s M hm hQ0card hd hζ hznot ((M.mu (1, ⟨v, hv⟩) : M.Eˣ) : M.E)
+      = ((M.mu (1, ⟨d * v * d⁻¹, hyp.conj_mem_W_of_mem_D hd hv⟩) : M.Eˣ) : M.E) :=
+  hyp.coordFieldAut_eq_of_smul s M hm hQ0card hd hζ hznot (hyp.coordConjD_muW_smul M hd hv)
+
+include hyp in
+/-- **`μ` fixes the scalar of a `W`-element that `d` centralizes** — the book's `ζ^μ = ζ`,
+which holds in §4 because `ζ ∈ C_W(P)` and `η ∈ P`.  It is what turns the substitution of
+(3) into (4) into the book's (5). -/
+theorem coordFieldAut_muW_eq_self (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) {d ζ : G} (hd : d ∈ hyp.D)
+    (hζ : ζ ∈ hyp.W)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) {v : G} (hv : v ∈ hyp.W)
+    (hfix : d * v * d⁻¹ = v) :
+    hyp.coordFieldAut s M hm hQ0card hd hζ hznot ((M.mu (1, ⟨v, hv⟩) : M.Eˣ) : M.E)
+      = ((M.mu (1, ⟨v, hv⟩) : M.Eˣ) : M.E) := by
+  have hv' : (⟨d * v * d⁻¹, hyp.conj_mem_W_of_mem_D hd hv⟩ : ↥hyp.W) = ⟨v, hv⟩ :=
+    Subtype.ext hfix
+  rw [hyp.coordFieldAut_muW s M hm hQ0card hd hζ hznot hv, hv']
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
