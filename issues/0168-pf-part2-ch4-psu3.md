@@ -9069,3 +9069,18 @@ step (3) の出力 (`ζ₁ ∈ D ∩ U`, `x ∈ (Q−Q₀)∩U`, `f x = x^{-ζ�
 (setup_residualQuotient …)` なので `.D`/`.t` の simp 補題は未整備
 (`_H`/`_Q` は `rfl` で在る)。同様に `rfl` で書けるはず。
 `ζ₁ ∈ (V∩U) − (P∩U) ≠ ∅` は書籍 `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` (p.133)。
+
+### (218) 🎯 `ζ₁ ∈ V ∩ U` の像が `W̄` の元であることを証明
+
+`mem_W_intrinsicResidualQuotient_of_mem_V`。`V_eq_W_intrinsicResidualQuotient`
+((217)) で `W̄` を `V̄` に置換し、像が
+* `D̄ = (D ∩ U) の像` に入る (`ζ₁ ∈ D ∩ U`)
+* `t̄` と可換 (`ζ₁ t = t ζ₁`)
+を示すだけ。`intrinsicResidualQuotient` の `D`/`t` は
+`setup_residualQuotient` の値で `rfl`。
+
+**§4 の残り = 2 点**:
+1. `ζ₁ ∈ (V ∩ U) − (P ∩ U)` の存在 (書籍 p.133
+   `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1`)。
+2. `exists_stepThree_data` の prescribed-`ζ̄` 版 (持ち上げ関係 (214) を
+   出力に含める) ⟹ `z ∈ V`, `z ∉ P` を継承 ⟹ `mem_W_of_stepThree` で完結。

@@ -72,6 +72,8 @@ membership facts it needs on the model:
 * `Hypothesis.SectionFourSetup.mem_W_of_stepThree` — **🎯🎯🎯 the same from step (3)'s
   output**, with the `ζ₁ ∈ ζ P` refinement carried out.
 * `Hypothesis.SectionFourSetup.center_residualImage_le_P` — **`Z(U) ⊆ P`** of step (1).
+* `Hypothesis.mem_W_intrinsicResidualQuotient_of_mem_V` — the book's `ζ₁ ∈ V ∩ U` really
+  is an element of the quotient's `W̄`, because there `V̄ = W̄`.
 * `Hypothesis.SectionFourSetup.exists_stepThree_data` — that output, produced from the
   section's standing data (steps (1)–(3) plumbed together).
 -/
@@ -1277,6 +1279,49 @@ theorem SectionFourSetup.exists_stepThree_data (s4 : hyp.SectionFourSetup) {f g 
   · rw [hkx]
     push_cast
     ring
+
+/-! ### The book's `ζ₁ ∈ (V ∩ U) − (P ∩ U)` as a `W̄`-element -/
+
+section Intrinsic
+
+open OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary
+
+variable {X : Subgroup G}
+  [MulAction (hyp.centralizerActionQuotient X) ↥(MulAction.fixedPoints X Ω)]
+  {result : TheoremAConclusion (hyp.centralizerActionQuotient X)
+    ↥(MulAction.fixedPoints X Ω)}
+  {data : PSU3InductionTarget (Omega := ↥(MulAction.fixedPoints X Ω)) result.L}
+
+include hyp in
+/-- **The image of `ζ₁ ∈ V ∩ U` lies in `W̄`** (Peterfalvi Part II, Ch. IV §4, p. 133).
+
+The book applies §3's Corollary 2 — which wants an element of the `W` of the `U`-relative
+standing hypothesis — to its `ζ₁ ∈ (V ∩ U) − (P ∩ U)`.  What makes that legitimate is that
+on `U/Z(U) ≅ PSU(3, ℓ)` one has `V̄ = W̄` (`V_eq_W_intrinsicResidualQuotient`); the image of
+`ζ₁` is in `D̄` and commutes with `t̄`, hence lies in `V̄`.
+
+⚠ This is the *quotient's* `V = W`, not the ambient one — §4 is precisely the case
+`V ≠ W` in `G`. -/
+theorem mem_W_intrinsicResidualQuotient_of_mem_V
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X))
+    {ζ₁ : G} (hζ₁D : ζ₁ ∈ hyp.D) (hζ₁t : ζ₁ * hyp.t = hyp.t * ζ₁)
+    (hζ₁U : ζ₁ ∈ residualImage (G := G) X) :
+    QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) ⟨ζ₁, hζ₁U⟩
+      ∈ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).W := by
+  rw [← hyp.V_eq_W_intrinsicResidualQuotient details hXD htX hCQ hZD]
+  refine ⟨⟨⟨ζ₁, hζ₁U⟩, Subgroup.mem_subgroupOf.mpr hζ₁D, rfl⟩, ?_⟩
+  refine Subgroup.mem_centralizer_singleton_iff.mpr ?_
+  change QuotientGroup.mk' _ _ * QuotientGroup.mk' _ _
+    = QuotientGroup.mk' _ _ * QuotientGroup.mk' _ _
+  rw [← map_mul, ← map_mul]
+  congr 1
+  exact Subtype.ext hζ₁t
+
+end Intrinsic
 
 end Hypothesis
 
