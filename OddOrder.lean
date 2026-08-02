@@ -727,6 +727,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgameCore
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3TheoremADichotomy
+import OddOrder.Peterfalvi.Appendices.Suzuki.TheoremANonTrivialV
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
