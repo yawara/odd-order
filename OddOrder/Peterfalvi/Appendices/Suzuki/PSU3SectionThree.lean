@@ -778,6 +778,51 @@ theorem mu_W_add_inv_ne_zero {m : ℕ} (M : hyp.QuotientFieldModel m)
   have hmu1 : M.mu (1, v) = 1 := Units.ext hval
   exact hv (congrArg Prod.snd (hmu (hmu1.trans (map_one M.mu).symm)))
 
+/-- **`a^d = a · θ(a)` on `F`** (Peterfalvi Part II, Ch. III §3, p. 121, into §3 (3)).
+
+Evaluating the cocycle's semilinearity `hsemi` and its `K`-scaling `hscaleQ0` at
+`x = y = 1` — legitimate because `φ` is anisotropic, so `φ(1, 1) ≠ 0` — identifies the two
+scalars at every `μ(k)`, and `μ(K)` is all of `F^×` (`exists_actualKActor_mu_eq`).
+
+This is the exponent relation the book normalizes into the shape `d = 1 + 2^t`; here it is
+kept as it comes, with `θ` the model's own twist. -/
+theorem zpow_eq_mul_thetaModel {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) (sfive : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (θm : M.E → M.E) {d : ℤ}
+    (hsemi : ∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+      ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E), ∀ x y : M.E,
+        ((φ (a * x) (b * y) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = a * θm b *
+            ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (haniso : ∀ x : M.E, x ≠ 0 → φ x x ≠ 0)
+    (hscaleQ0 : ∀ k : ↥hyp.actualKActor, ∀ x y : M.E,
+      ((φ (((M.mu (k, 1) : M.Eˣ) : M.E) * x) (((M.mu (k, 1) : M.Eˣ) : M.E) * y) :
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) :
+    ∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, a ≠ 0 →
+      a ^ d = a * θm a := by
+  have hφ1 : ((φ 1 1 : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) ≠ 0 := by
+    intro hc
+    exact haniso 1 one_ne_zero (Subtype.ext hc)
+  intro a ha ha0
+  obtain ⟨k, hk⟩ := hyp.exists_actualKActor_mu_eq sfive M hm hQ0card ha ha0
+  have hmemF : ((M.mu (k, 1) : M.Eˣ) : M.E)
+      ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E) :=
+    OddOrder.FiniteField.mem_frobFixedSubfield.mpr (M.mu_K_frobFixed k)
+  have h1 := hsemi _ hmemF _ hmemF 1 1
+  have h2 := hscaleQ0 k 1 1
+  rw [mul_one] at h1 h2
+  have hmodel : ((M.mu (k, 1) : M.Eˣ) : M.E) * θm ((M.mu (k, 1) : M.Eˣ) : M.E)
+      = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) :=
+    mul_right_cancel₀ hφ1 (h1.symm.trans h2)
+  rw [← hk, ← Units.val_zpow_eq_zpow_val]
+  exact hmodel.symm
+
 /-- **The scaling pair's twist on `F` has odd order, given the type-`B` automorphism**
 (Peterfalvi Part II, Ch. III §3, p. 121, into Ch. IV §3 (3), p. 130).
 
@@ -817,6 +862,47 @@ theorem odd_orderOf_scalingPair_restrict {m : ℕ} (hm : m ≠ 0)
     rw [Units.val_zpow_eq_zpow_val, hk] at hs
     rw [hs]
     exact hshape a h0
+
+/-- **The scaling pair's twist on `F` has odd order, given the model's own twist**
+(Peterfalvi Part II, Ch. III §3, p. 121, into Ch. IV §3 (3), p. 130).
+
+Composing `zpow_eq_mul_thetaModel` with `odd_orderOf_scalingPair_restrict`: the pair's
+exponent relation `σ(a) τ(a) = a^d` and the model's `a^d = a θ(a)` compare on `F`, so the
+book's `{σ|_F, τ|_F} = {1_F, θ}` makes `σ⁻¹τ` restrict to `θ^{±1}`.
+
+So §3 (3)'s hypothesis reduces to **one statement about the model itself**: the twist of
+its own cocycle has odd order on `F`.  That is Appendix III Definition 3's `θ`, whose odd
+order is a structure field of the type-`B` datum (`Suzuki2Groups.TypeBData.phi_orderOf_odd`).
+No comparison of `d` with a normalized shape, and no field identification, is needed. -/
+theorem odd_orderOf_scalingPair_restrict_of_model {m : ℕ} (hm : m ≠ 0)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m) (sfive : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m)
+    {φ : LinearMap.BilinMap (ZMod 2) M.E
+      ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
+    (θm : M.E ≃+* M.E) {d : ℤ}
+    (hsemi : ∀ a ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E),
+      ∀ b ∈ (OddOrder.FiniteField.frobFixedSubfield M.E 2 m : Set M.E), ∀ x y : M.E,
+        ((φ (a * x) (b * y) :
+          ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          = a * θm b *
+            ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (haniso : ∀ x : M.E, x ≠ 0 → φ x x ≠ 0)
+    (hscaleQ0 : ∀ k : ↥hyp.actualKActor, ∀ x y : M.E,
+      ((φ (((M.mu (k, 1) : M.Eˣ) : M.E) * x) (((M.mu (k, 1) : M.Eˣ) : M.E) * y) :
+        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
+          ((φ x y : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E))
+    (σ τ : M.E ≃+* M.E)
+    (hscale : ∀ k : ↥hyp.actualKActor,
+      σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
+        = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
+    (hodd : Odd (orderOf (OddOrder.FiniteField.restrictToFrobFixed (m := m) θm))) :
+    Odd (orderOf ((OddOrder.FiniteField.restrictToFrobFixed (m := m) σ)⁻¹ *
+      OddOrder.FiniteField.restrictToFrobFixed (m := m) τ)) := by
+  refine hyp.odd_orderOf_scalingPair_restrict hm hQ0card sfive M σ τ hscale 1
+    (OddOrder.FiniteField.restrictToFrobFixed (m := m) θm) hodd fun a ha0 => ?_
+  simpa using hyp.zpow_eq_mul_thetaModel hm hQ0card sfive M (θm : M.E → M.E) hsemi haniso
+    hscaleQ0 (a : M.E) a.2 ha0
 
 /-- `θ = σ⁻¹ ∘ τ` preserves `F`, being a composite of ring maps. -/
 theorem theta_mem_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m) (σ τ : M.E ≃+* M.E)
