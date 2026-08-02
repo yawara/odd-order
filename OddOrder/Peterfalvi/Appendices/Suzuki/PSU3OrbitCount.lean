@@ -626,7 +626,12 @@ theorem exists_witness_coset_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
 Here `ζ` is any nontrivial element of `W` (the book takes a generator, nontrivial by
 (C2)).  The witness for the coset `ζK` exists by `exists_witness_coset_eq`, its
 `K`-part has a square root by `exists_sq_eq_of_mem_K`, and `f_conj_collapse` turns the
-exponent into `ζ`. -/
+exponent into `ζ`.
+
+The book's orbit clause is kept: `ω'` is `c⁻¹ (ω z) c` for a `z ∈ Q₀` and a `c ∈ K`, so
+modulo `Q₀` it is a `K`-conjugate of `ω` — which is what makes a *transversal* of the
+`KW`-orbits by normalized elements possible, and hence the book's "whence `i = k`" at
+the close of §2. -/
 theorem stepNine {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     {f g h : G → G} (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
@@ -638,8 +643,9 @@ theorem stepNine {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
     {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     {ζ : G} (hζW : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1) :
-    ∃ ω' ∈ hyp.Q, ω' ∉ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, y ≠ 1 ∧
-      f ω' = ζ⁻¹ * (ω' * y) * ζ := by
+    ∃ ω' ∈ hyp.Q, ω' ∉ hyp.Q0 ∧
+      (∃ z ∈ hyp.Q0, OddOrder.GroupTheory.RankOneBNPair.dOrbitRel hyp.D (ω * z) ω') ∧
+      ∃ y ∈ hyp.Q0, y ≠ 1 ∧ f ω' = ζ⁻¹ * (ω' * y) * ζ := by
   have hWD : hyp.W ≤ hyp.D := le_trans inf_le_left hyp.V_le_D
   have hζD : ζ ∈ hyp.D := hWD hζW
   have hζK : ζ ∉ hyp.K := by
@@ -680,7 +686,7 @@ theorem stepNine {m : ℕ} (M : hyp.QuotientFieldModel m)
     have := hyp.conj_mem_Q0_of_mem_H (hyp.H.inv_mem (hyp.D_le_H hcD))
       (hyp.Q0.mul_mem hzQ0 hbQ0)
     rwa [inv_inv] at this
-  refine ⟨_, hω'Q, hω'Q0, _, hyQ0, ?_, hcoll⟩
+  refine ⟨_, hω'Q, hω'Q0, ⟨z, hzQ0, c, hcD, rfl⟩, _, hyQ0, ?_, hcoll⟩
   exact hyp.ne_one_of_f_eq_conj H hC2 hω'Q hω'Q0 hζD hcoll
 
 /-- **Step (15)'s conclusion, group side** (Peterfalvi Part II, p. 126).

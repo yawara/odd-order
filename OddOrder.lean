@@ -701,6 +701,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3ModelTwistOdd
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3BarOrbit
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3RootGroupModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StarEquation
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3InverseFormula

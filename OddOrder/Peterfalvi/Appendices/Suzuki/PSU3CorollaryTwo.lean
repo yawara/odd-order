@@ -827,7 +827,7 @@ theorem corollaryTwo_of_isStandardModel_of_normalization
     {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
     ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
   obtain ⟨ω, hωQ, hωQ0⟩ := hyp.exists_mem_Q_notMem_Q0 hm hQ0card hcardQ
-  obtain ⟨ω₀, hω₀Q, hω₀Q0, y₀, hy₀Q0, -, hfω₀⟩ := hyp.stepNine M hZc H hC2 hVW hm hQ0card
+  obtain ⟨ω₀, hω₀Q, hω₀Q0, -, y₀, hy₀Q0, -, hfω₀⟩ := hyp.stepNine M hZc H hC2 hVW hm hQ0card
     hmu hKcard hWdvd hωQ hωQ0 hζ₀ (fun hc => hζ₀1 (Subtype.ext hc))
   exact hyp.corollaryTwo_of_isStandardModel H hC2 sfive M hZc hmu hVW hm hQ0card hcard
     hKcard hWdvd hW1 hfQ hhW x₀ hmodel hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0
