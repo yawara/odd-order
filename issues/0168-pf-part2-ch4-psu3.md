@@ -8357,3 +8357,16 @@ E 座標へ落とす段の設計を詰めた結果、`stepTwo_linear` をその�
 ⚠ 実装は `actualKActor` (= `MulAut ↥Q` 内の部分群) への `η`-共役が
 `actualKActor` を保つことを示す所が中心。`conjQByK` の定義に沿って
 `η k η⁻¹ ∈ K` (`K_normal`) を持ち上げる。
+
+### (185) `η`-共役が `actualKActor` を保つ — 実装メモ
+
+`actualKActor = conjQByK.range` (`ActualKActor.lean:117`)、
+`conjQByK k` = `k` による `↥Q` の共役 (`SylowTwo.lean:33`)。
+
+⟹ `d ∈ D` による共役自己同型 `φ_d` に対し
+`φ_d * conjQByK k * φ_d⁻¹ = conjQByK (d k d⁻¹)` (両辺とも `x ↦ d k d⁻¹ x (d k d⁻¹)⁻¹`)。
+`K_normal` で `d k d⁻¹ ∈ K` ⟹ **`range` に入る** ⟹ `actualKActor` は `D`-共役で不変。
+
+⚠ 実装の下ごしらえ: `d ∈ D` による `↥Q` の共役自己同型 (`conjQByW` の `D` 版) が
+repo に無いなら作る (`conjQByK` と同型の定義; `Q_normal_in_H` + `D_le_H` で well-defined)。
+その後 `MulEquiv.ext` で上の等式を示すだけ。
