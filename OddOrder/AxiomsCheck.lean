@@ -155,6 +155,7 @@ import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10B
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10C
 import OddOrder.GroupTheory.PRegularElement
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
@@ -15310,6 +15311,18 @@ technical heart of a `p`-modular system: `μ_n(𝒪) ≃* μ_n(k)` whenever `n` 
   OddOrder.RepresentationTheory.Modular.exists_pow_eq_one_residue_eq
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.rootsOfUnityEquivResidue
+
+/-! **`p`-modular systems** (`GroupTheory.RepresentationTheory.Modular.PModularSystem`,
+issue 9506).  `ℤ_[p]` is the base example, so the notion is not vacuous. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.henselianLocalRing_of_isAdicComplete
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isUnit_natCast_of_not_dvd
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.rootsOfUnityEquivResidue_of_not_dvd
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.instIsPModularSystemPadicInt
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isMetacyclic_semidirectProduct
 #assert_only_allowed_axioms

@@ -61,10 +61,18 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
       存在は `HenselianLocalRing.is_henselian`。
       ⟹ **これが p-modular system の技術的核**。`𝒪` に完備 DVR を要求せず
       Henselian だけで足りることが分かったので、束ねの仮説はこれに合わせる。
-- [ ] `OddOrder/GroupTheory/RepresentationTheory/Modular/PModularSystem.lean` —
-      `𝒪` (Henselian 局所環, char 0) / `K = Frac 𝒪` / `k` (char `p`) の束ね
-- [ ] 分裂条件 (`|G|` 乗根を含む) と、**具体構成による instance**
-- [ ] `p`-regular 元 / `p`-regular 類の API (`IsPRegular g ↔ p ∤ orderOf g`)
+- [x] **束ね** = `.../Modular/PModularSystem.lean` (2026-08-03)。
+      `IsPModularSystem p 𝒪` = 「Henselian 局所環 `𝒪` が char 0、剰余体が char `p`」。
+      `isUnit_natCast_of_not_dvd` (`p ∤ n` ⟹ `n` は `𝒪` の単元) と
+      `rootsOfUnityEquivResidue_of_not_dvd` (`p ∤ n` で `μ_n(𝒪) ≃* μ_n(k)`)。
+      ⚠ **非空虚性**: `ℤ_[p]` が instance (`instIsPModularSystemPadicInt`)。
+      そのために `henselianLocalRing_of_isAdicComplete` (完備局所環は Henselian) を
+      補った — mathlib は `HenselianRing R I` 版しか持たない (実測)。
+- [ ] **分裂 p-modular system の具体構成** (`|G|_{p'}` 乗根を剰余体が含むもの)。
+      `ℤ_[p]` は剰余体が素体 `ZMod p` なので分裂しない。次の一手はこれ:
+      不分岐拡大 `W(𝔽_{p^f})` か、`ℤ[ζ_n]` を `p` 上の極大イデアルで局所化 →
+      henselization/完備化。mathlib の資産 (`IsDedekindDomain.HeightOneSpectrum.adicCompletion` /
+      `WittVector`) の当たりを付けるところから。
 - [ ] Brauer 指標 `IBr`: `k G`-加群の `p`-regular 元でのトレースを `U` 経由で char 0 へ持ち上げ
 - [ ] `|IBr G| = p`-regular 類の個数
 
