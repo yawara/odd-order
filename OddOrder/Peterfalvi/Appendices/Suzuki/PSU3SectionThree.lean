@@ -192,18 +192,16 @@ Both sides are the same element `f(ω⁻¹ s^a)`, read through the two halves of
 `s` lie in `Q₀ = Z(Q)`, so the two orders of the product agree; the substitutions are
 `f(ω⁻¹) = ω^{ζ⁻¹}`, `g(ω⁻¹) = ω^ζ` and `h(ω⁻¹) = ζ⁻³`, whose `t`-twist is again `ζ⁻³`
 because `ζ ∈ W`. -/
-theorem stepOne_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+theorem stepOne_chain_of_h (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
-    {m : ℕ} (M : hyp.QuotientFieldModel m)
-    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
-    {ζ ω a : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
-    (haK : a ∈ hyp.KSet) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) :
+    {ζ ω a d : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (haK : a ∈ hyp.KSet) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hhinv : h ω⁻¹ = d⁻¹) (htd : hyp.t * d⁻¹ * hyp.t = d⁻¹) :
     a ^ 2 * f ((ζ * ω * ζ⁻¹) * (a * hyp.distinguishedInvolution * a⁻¹)) * (a⁻¹) ^ 2
         * (a * hyp.distinguishedInvolution * a⁻¹)
-      = (ζ ^ 3) * f ((a * hyp.distinguishedInvolution * a⁻¹) * (ζ⁻¹ * ω * ζ))
-        * (ζ ^ 3)⁻¹ * (ζ * ω * ζ⁻¹) := by
+      = d * f ((a * hyp.distinguishedInvolution * a⁻¹) * (ζ⁻¹ * ω * ζ))
+        * d⁻¹ * (ζ * ω * ζ⁻¹) := by
   have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
   have hωinvQ : ω⁻¹ ∈ hyp.Q := hyp.Q.inv_mem hωQ
   have hωinvQ0 : ω⁻¹ ∉ hyp.Q0 := fun hc => hωQ0 (by simpa using hyp.Q0.inv_mem hc)
@@ -226,17 +224,31 @@ theorem stepOne_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have hB := hyp.f_conj_distinguishedInvolution_mul H hC2 haK hωinvQ hωinv1 hne2
   rw [← hcomm] at hB
   rw [hyp.f_inv_eq H hζ hωQ hωQ0 hf] at hA
-  rw [hyp.g_inv_eq H hωQ hωQ0 hf, hyp.f_inv_eq H hζ hωQ hωQ0 hf,
-    hyp.h_inv_eq H M hZ hmu hVW hζ hωQ hωQ0 hf] at hB
-  -- the `t`-twist of `ζ⁻³` is `ζ⁻³`
-  have htinv : hyp.t⁻¹ = hyp.t := inv_eq_of_mul_eq_one_right hyp.rankOneSetup.invol
-  have htw : hyp.t * (ζ ^ 3)⁻¹ * hyp.t = (ζ ^ 3)⁻¹ := by
-    have hp := hyp.conj_t_pow_eq hζ 3
-    calc hyp.t * (ζ ^ 3)⁻¹ * hyp.t = (hyp.t⁻¹ * ζ ^ 3 * hyp.t⁻¹)⁻¹ := by group
-      _ = (hyp.t * ζ ^ 3 * hyp.t)⁻¹ := by rw [htinv]
-      _ = (ζ ^ 3)⁻¹ := by rw [hp]
-  rw [htw, inv_inv] at hB
+  rw [hyp.g_inv_eq H hωQ hωQ0 hf, hyp.f_inv_eq H hζ hωQ hωQ0 hf, hhinv] at hB
+  rw [htd, inv_inv] at hB
   exact hA.symm.trans hB
+
+/-- **§3, stage (1)** (Peterfalvi Part II, p. 130) — `stepOne_chain_of_h` at `d = ζ³`,
+which is what `h_inv_eq` gives for the `ω` of §3. -/
+theorem stepOne_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ζ ω a : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (haK : a ∈ hyp.KSet) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) :
+    a ^ 2 * f ((ζ * ω * ζ⁻¹) * (a * hyp.distinguishedInvolution * a⁻¹)) * (a⁻¹) ^ 2
+        * (a * hyp.distinguishedInvolution * a⁻¹)
+      = (ζ ^ 3) * f ((a * hyp.distinguishedInvolution * a⁻¹) * (ζ⁻¹ * ω * ζ))
+        * (ζ ^ 3)⁻¹ * (ζ * ω * ζ⁻¹) := by
+  refine hyp.stepOne_chain_of_h H hC2 hζ hωQ hωQ0 haK hf
+    (hyp.h_inv_eq H M hZ hmu hVW hζ hωQ hωQ0 hf) ?_
+  have htinv : hyp.t⁻¹ = hyp.t := inv_eq_of_mul_eq_one_right hyp.rankOneSetup.invol
+  have hp := hyp.conj_t_pow_eq hζ 3
+  calc hyp.t * (ζ ^ 3)⁻¹ * hyp.t = (hyp.t⁻¹ * ζ ^ 3 * hyp.t⁻¹)⁻¹ := by group
+    _ = (hyp.t * ζ ^ 3 * hyp.t)⁻¹ := by rw [htinv]
+    _ = (ζ ^ 3)⁻¹ := by rw [hp]
 
 /-- **The two `f`-values of stage (1) are conjugates of a single one** (Peterfalvi
 Part II, p. 130, entering stage (2)).
