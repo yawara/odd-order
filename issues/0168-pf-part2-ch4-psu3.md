@@ -7844,3 +7844,26 @@ Corollary 2 の証明で `h(ω) ∈ W` をどう出しているかを確定 → 
    `eq_one_of_conj_eq_mul_Q0_of_mem_D` に差し替える。
 3. `h_eq_zpow_three` から `h ω ∈ W` 仮説を落とす → `corollaryTwo` から `hhW` を落とす
    → 上流 6 箇所 (`corollaryTwo_of_stepFour` … `..._of_closing`) を芋づるで掃除。
+
+### (161) 追記 — `hhW` が効いている行は 1 行だけ、正体は「`t` が `h(ω)` と可換」
+
+`h_eq_zpow_three` (`PSU3SectionThree.lean:167`) で `hhW : h ω ∈ W` の使用は:
+
+```
+  have hth : hyp.t * h ω * hyp.t = h ω := by
+    have hc : Commute (h ω) hyp.t := hyp.commute_t_of_mem_V (hyp.W_le_V hhW)
+```
+
+の 1 箇所のみ。これで (H4) `h(ω⁻¹) = (h(ω)^t)⁻¹` を `h(ω⁻¹) = h(ω)⁻¹` に直し、
+`h_inv_eq` (`h(ω⁻¹) = ζ⁻³`) と突き合わせている。
+
+⚠ `V = D ⊓ C({t})` なので `h ω ∈ V` ⟺ `h ω ∈ D` (常に真) **かつ** `t` と可換、で
+**循環**する。⟹ (H4) 経由の現行ルートでは `hhW` は落とせない。
+
+⟹ **書籍どおり (H5) 経由に書き換えるのが正解**:
+* `fj_cube_of_f_eq_conj_inv` (同ファイル、既存) が `(f∘j)³(ω⁻¹) = ω^{-ζ³}` を出す。
+* (H5) `hFive` は `(f∘j)³(x) = x^{h(x)⁻¹}`。
+* 両者を突き合わせると「`D` の元 (`h(·)⁻¹ζ³` 相当) が `ω` を `Q₀` 法で固定」
+  ⟹ `eq_one_of_conj_eq_mul_Q0_of_mem_D` (自由性) で `h(ω) = ζ³`。
+* 自由性の入力 (`M`/`hZ`/`hmu`/`hVW`) は `h_eq_zpow_three` が**既に取っている**ので
+  仮説は増えない。
