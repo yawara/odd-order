@@ -126,3 +126,21 @@ Hypothesis.SectionFourSetup.exists_mem_W
 要調査: §3 Proposition の結論 (`θ = 1` と `f(ρ) = (ρ̄/y, 1/y)`) と
 Corollary 1 が repo にどこまで在るか。`stepThree` は Proposition の
 stage (3) まで。`PSU3CorollaryTwo.lean` は Corollary 2 のみ。
+
+## §3 Proposition / Corollary 1 の repo 実測 (2026-08-02)
+
+* **Proposition の結論** `θ = 1` と `f(ρ) = (ρ̄/y, 1/y)`:
+  * `θ = 1` = `stepThree` / `stepThree_of_odd` / `thetaModel_eq_id_on_frobFixed` ✅
+  * `f(ρ) = (ρ̄/y, 1/y)` の機械は在る — `PSU3RootGroupModel.lean` (冒頭 docstring が
+    まさにこの主張)、`PSU3StarEquation.lean` (`f(ρ)s^a = (ω̄', x'+A)`)、
+    `PSU3InverseFormula.lean:1039`。**組み上がった「Proposition」1 本があるか要確認**。
+* **Corollary 1** = 「`O^{2′}(G) = PSU(3,q)`」は repo では
+  `TheoremAConclusion` (= `L` 正規・奇指数 + 標準モデル、`CentralizerInductionBridge:91`)
+  の `target = psu3` を作ること。`TheoremAConclusion.Q_and_residual` が
+  `L = primeComplementResidual 2 G` を与えるので、`O^{2′}(G)` の同定はそこ。
+  ⟹ Corollary 1 の形式化 = 「Proposition の仮説から `TheoremAConclusion` (psu3) を
+  構成する」。
+
+**次セッションの入口**: `PSU3RootGroupModel` / `PSU3StarEquation` /
+`PSU3InverseFormula` を読み、§3 Proposition が 1 本に組まれているかを実測する。
+組まれていれば `exists_mem_W` の出力を食わせるだけで Ch. IV が閉じる。
