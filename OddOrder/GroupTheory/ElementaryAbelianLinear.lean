@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Module.ZMod
 import Mathlib.Algebra.Module.Equiv.Basic
+import Mathlib.LinearAlgebra.GeneralLinearGroup.Basic
 
 /-!
 # An elementary abelian `p`-group is a vector space, and its automorphisms are linear
@@ -66,5 +67,21 @@ def mulAutEquivLinearEquiv : MulAut E ≃* (Additive E ≃ₗ[ZMod n] Additive E
 @[simp]
 theorem mulAutEquivLinearEquiv_apply (φ : MulAut E) (x : E) :
     (mulAutEquivLinearEquiv (n := n) φ) (Additive.ofMul x) = Additive.ofMul (φ x) := rfl
+
+/-- **群作用から `ZMod n`-線形表現へ.** `A` が可換で指数が `n` を割るとき, 作用
+`φ : G →* MulAut A` は `Additive A` 上の `ZMod n`-線形表現を定める
+(`mulAutEquivLinearEquiv` で線形同型に移し, 単元群から `End` へ落とす).
+
+Maschke (`MonoidAlgebra.Submodule.exists_isCompl`) を当てるための入口. -/
+noncomputable def linearOfMulAutHom {G : Type*} [Group G] (φ : G →* MulAut E) :
+    G →* (Additive E) →ₗ[ZMod n] (Additive E) :=
+  (Units.coeHom (Module.End (ZMod n) (Additive E))).comp
+    (((LinearMap.GeneralLinearGroup.generalLinearEquiv (ZMod n)
+        (Additive E)).symm.toMonoidHom).comp
+      ((mulAutEquivLinearEquiv (n := n) (E := E)).toMonoidHom.comp φ))
+
+@[simp]
+theorem linearOfMulAutHom_apply {G : Type*} [Group G] (φ : G →* MulAut E) (g : G) (x : E) :
+    linearOfMulAutHom (n := n) φ g (Additive.ofMul x) = Additive.ofMul (φ g x) := rfl
 
 end OddOrder.GroupTheory
