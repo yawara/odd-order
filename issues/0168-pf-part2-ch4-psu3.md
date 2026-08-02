@@ -9050,3 +9050,22 @@ step (3) の出力 (`ζ₁ ∈ D ∩ U`, `x ∈ (Q−Q₀)∩U`, `f x = x^{-ζ�
    ⟹ その像を `ζ̄` として `exists_stepThree_data` に食わせ、
    持ち上げ関係 ((214)) で `z ∈ V`, `z ∉ P` を継承し、
    `mem_W_of_stepThree` ((211)) で **§4 完結**。
+
+### (217) ✅ (216) の (a) は**既に repo に在った** — `V_eq_W_intrinsicResidualQuotient`
+
+`PSU3SectionFourIntrinsic.lean:1061` に
+`V_eq_W_intrinsicResidualQuotient : (intrinsicResidualQuotient …).V = (…).W`
+が既存 (`residualQuotientHypothesis_V_eq_W` を
+`map_V_of_mulEquiv` / `map_W_of_mulEquiv` で intrinsic 側へ移送済み)。
+
+⟹ **§4 に残るのは (216) の (b) 1 段のみ**:
+`ζ₁ ∈ (V ∩ U) − (P ∩ U)` を取り、その像 `ζ̄ = mk' ⟨ζ₁,_⟩` について
+* `ζ̄ ∈ W̄` — `V̄ = W̄` と「像が `D̄` に入り `t̄` と可換」から
+* `ζ̄ ≠ 1` — `ζ₁ ∉ Z(U)` (∵ `Z(U) ≤ P` かつ `ζ₁ ∉ P`)
+を示し、`exists_stepThree_data` を「prescribed `ζ̄`」版にして
+持ち上げ関係 ((214)) で `z ∈ V`, `z ∉ P` を継承 ⟹ `mem_W_of_stepThree` で完結。
+
+実装メモ: `intrinsicResidualQuotient` は `Hypothesis.ofRankOneSetup
+(setup_residualQuotient …)` なので `.D`/`.t` の simp 補題は未整備
+(`_H`/`_Q` は `rfl` で在る)。同様に `rfl` で書けるはず。
+`ζ₁ ∈ (V∩U) − (P∩U) ≠ ∅` は書籍 `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` (p.133)。
