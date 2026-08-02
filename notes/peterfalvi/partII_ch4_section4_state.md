@@ -81,17 +81,20 @@ Hypothesis.SectionFourSetup.exists_mem_W
 (PSU(3,ℓ) の構造は使わない)。残るのは `W̄^#` の元を `D̄` 経由で持ち上げて
 `exists_mem_W` に食わせる組立てのみ。
 
-## 残り = **`ζ₁ ∈ (V ∩ U) − (P ∩ U)` の存在 1 つだけ**
+## ✅ §4 完了 (2026-08-02)
 
-書籍 §4 step (2) (p. 133)「`|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` since `ℓ > 2`」。
+```
+Hypothesis.SectionFourSetup.exists_mem_W
+  : (§4 の standing data のみ) ⟹ ∃ x ∈ Q − Q₀, k x ∈ W
+```
+外部入力ゼロ。`hcent` も `ζ₁ ∈ (V∩U) − (P∩U)` も導出できた:
 
-`hcent` は上記のとおり導出済 (`inf_le_centralizer_centralizer_Q0`) で、
-`exists_mem_W` の仮説からも外した。
+* `hcent` = `inf_le_centralizer_centralizer_Q0` — 商仮説の `V̄ = W̄` から。
+* `ζ₁` = `SectionFourSetup.exists_zeta_one` — `W̄^#` の元を `D̄` 経由で
+  持ち上げ、`eq_one_of_conj_t_mem_P` で `V`-所属を、`P ∩ U ⊆ Z(U)` で
+  `∉ P` を得る。**書籍の数え上げ `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` は不要**。
 
-⚠ 既存の `SectionFourSetup.exists_ne_one_mem_W_centralizer` (= `C_W(P) ≠ 1`) は
-docstring が「書籍の `(ℓ+1)/(ℓ+1,3) ≠ 1` を step (2) が使う形」と述べるが、
-それは `standingData_centralizerQuotient` 用であり、**`ζ₁ ∈ V ∩ U` は出ない**
-(`w ∈ C_W(P)` が `U = O^{2′}(C_G(P))` に入る保証がない)。別途要形式化。
+⟹ §3 Corollary 1 への接続 (Ch. IV 全体の完了) が次の作業。
 
 ## 実装上の注意 (再訪時)
 
@@ -103,26 +106,3 @@ docstring が「書籍の `(ℓ+1)/(ℓ+1,3) ≠ 1` を step (2) が使う形」
 * `show` は style linter に掛かる — `change` を使う。
 * AxiomsCheck の登録名は `namespace Hypothesis` 内なら `Hypothesis.` を付ける
   (leaf build では検出できず、フルビルドで初めて赤になる)。
-
-## 残り 1 本の組立てレシピ (2026-08-02、実装は次セッション)
-
-`exists_mem_W` から `{ζ₁} (hζ₁V) (hζ₁U) (hζ₁P)` を外し、`details` を得た直後に
-内部で作る:
-
-```
-obtain ⟨zeta, hzetaW, hzeta1⟩ := exists_ne_one_mem_W_intrinsicResidualQuotient details …
-have hzetaV : zeta ∈ (intrinsic).V := by rw [V_eq_W_intrinsicResidualQuotient …]; exact hzetaW
-obtain ⟨z₀, hz₀D, hz₀eq⟩ := hzetaV.1            -- D̄ = (D∩U) の像
--- [z₀,t] ∈ Z(U) ⊆ P ⟹ = 1  (eq_one_of_conj_t_mem_P)
---   hzetaV.2 : zeta ∈ centralizer {t̄}  →  mk(t̄·z₀) = mk(z₀·t̄)
---   → QuotientGroup.eq → (t̄z₀)⁻¹(z₀t̄) ∈ Z(U) → hZP で ∈ P
-have hzV : (z₀:G) ∈ V    -- ⟨hz₀D, mem_centralizer_singleton_iff.mpr …⟩
-have hzP : (z₀:G) ∉ P := notMem_P_of_mk_ne_one … (hz₀eq ▸ hzeta1)
--- 以降は現行の本体 (step (3) を `zeta` で呼び、持ち上げ差を `Z(U) ⊆ P` で吸収)
-```
-
-⚠ 一度 WIP で書いたが 3 箇所の型不一致 (coercion 周り) で止まり、`sorry` を
-入れない方針で revert した。詰まりどころ:
-* `hcomm` の向き (`mem_centralizer_singleton_iff` は `a*b = b*a`)
-* `hker` を `hZP` に渡すときの `⟨_, _⟩` の形 (`simpa` が過剰簡約する)
-* `eq_one_of_conj_t_mem_P` の `heq` は `ζ⁻¹ * (t*ζ*t) = c` の形ちょうど

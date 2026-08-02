@@ -794,6 +794,73 @@ theorem SectionFourSetup.notMem_P_of_mk_ne_one (s4 : hyp.SectionFourSetup) {ζ�
   rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
   exact SectionFourSetup.mem_center_of_mem_P hyp s4 hc hζ₁U
 
+include hyp in
+/-- **🎯 The book's `ζ₁ ∈ (V ∩ U) − (P ∩ U)`, produced** (Peterfalvi Part II, Ch. IV §4,
+p. 133).
+
+A nontrivial element of the quotient's `W̄ = V̄` lifts to `z₀ ∈ D ∩ U`; the lift lies in
+`V` because `[z₀, t] ∈ Z(U) ⊆ P` is a `t`-commutator inside `P`, hence trivial
+(`eq_one_of_conj_t_mem_P`); and it lies outside `P` because `P ∩ U ⊆ Z(U)`
+(`notMem_P_of_mk_ne_one`).
+
+⚠ The book instead *counts*: `|(V ∩ U)/(P ∩ U)| = (ℓ+1)/(ℓ+1,3) ≠ 1`.  That is not
+needed — no property of `PSU(3, ℓ)` enters. -/
+theorem SectionFourSetup.exists_zeta_one (s4 : hyp.SectionFourSetup)
+    [MulAction (hyp.centralizerActionQuotient s4.P) ↥(MulAction.fixedPoints s4.P Ω)]
+    {result : TheoremAConclusion (hyp.centralizerActionQuotient s4.P)
+      ↥(MulAction.fixedPoints s4.P Ω)}
+    {data : PSU3InductionTarget (Omega := ↥(MulAction.fixedPoints s4.P Ω)) result.L}
+    (details : CentralizerPSUData hyp s4.P result data)
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer ((s4.P : Set G)))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) s4.P)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) s4.P))
+    (hZP : ∀ {c : G} (hc : c ∈ residualImage (G := G) s4.P),
+      (⟨c, hc⟩ : ↥(residualImage (G := G) s4.P))
+        ∈ Subgroup.center ↥(residualImage (G := G) s4.P) → c ∈ s4.P) :
+    ∃ ζ₁ ∈ hyp.V, ζ₁ ∈ residualImage (G := G) s4.P ∧ ζ₁ ∉ s4.P := by
+  classical
+  obtain ⟨zeta, hzetaW, hzeta1⟩ := hyp.exists_ne_one_mem_W_intrinsicResidualQuotient
+    details s4.P_le_D s4.t_mem_centralizer hCQ hZD
+  have hzetaV : zeta ∈ (hyp.intrinsicResidualQuotient details s4.P_le_D
+      s4.t_mem_centralizer hCQ hZD).V := by
+    rw [hyp.V_eq_W_intrinsicResidualQuotient details s4.P_le_D s4.t_mem_centralizer hCQ
+      hZD]
+    exact hzetaW
+  obtain ⟨z₀, hz₀D, hz₀eq⟩ := hzetaV.1
+  set tU : ↥(residualImage (G := G) s4.P) :=
+    ⟨hyp.t, hyp.t_mem_residual s4.t_mem_centralizer⟩ with htUdef
+  have htUval : (tU : G) = hyp.t := rfl
+  -- the `t`-commutator of the lift lies in `Z(U)`
+  have hmk : (QuotientGroup.mk (tU * z₀) :
+        ↥(residualImage (G := G) s4.P) ⧸ Subgroup.center ↥(residualImage (G := G) s4.P))
+      = QuotientGroup.mk (z₀ * tU) := by
+    rw [QuotientGroup.mk_mul, QuotientGroup.mk_mul]
+    have h := (Subgroup.mem_centralizer_singleton_iff.mp hzetaV.2).symm
+    rw [← hz₀eq] at h
+    exact h
+  have hker : (tU * z₀)⁻¹ * (z₀ * tU)
+      ∈ Subgroup.center ↥(residualImage (G := G) s4.P) := QuotientGroup.eq.mp hmk
+  have hcP : (((tU * z₀)⁻¹ * (z₀ * tU) : ↥(residualImage (G := G) s4.P)) : G) ∈ s4.P :=
+    hZP ((tU * z₀)⁻¹ * (z₀ * tU)).2 hker
+  have heq : (z₀ : G)⁻¹ * (hyp.t * (z₀ : G) * hyp.t)
+      = (((tU * z₀)⁻¹ * (z₀ * tU) : ↥(residualImage (G := G) s4.P)) : G) := by
+    push_cast
+    rw [htUval, mul_inv_rev, hyp.t_inv_eq]
+    group
+  have hone := SectionFourSetup.eq_one_of_conj_t_mem_P hyp s4 heq hcP
+  have hz₀t : hyp.t * (z₀ : G) * hyp.t = (z₀ : G) := by
+    have h := heq.trans hone
+    rw [inv_mul_eq_one] at h
+    exact h.symm
+  refine ⟨(z₀ : G), ⟨Subgroup.mem_subgroupOf.mp hz₀D,
+    Subgroup.mem_centralizer_singleton_iff.mpr ?_⟩, z₀.2, ?_⟩
+  · calc (z₀ : G) * hyp.t = (hyp.t * (z₀ : G) * hyp.t) * hyp.t := by rw [hz₀t]
+      _ = hyp.t * (z₀ : G) * (hyp.t * hyp.t) := by group
+      _ = hyp.t * (z₀ : G) := by rw [← sq, hyp.t_sq, mul_one]
+  · refine SectionFourSetup.notMem_P_of_mk_ne_one hyp s4 z₀.2 ?_
+    intro hc
+    exact hzeta1 (by rw [← hz₀eq]; exact hc)
+
 end Intrinsic
 
 include hyp in
@@ -821,9 +888,7 @@ theorem SectionFourSetup.exists_mem_W (s4 : hyp.SectionFourSetup) {f g k : G →
     (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
     (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer ((s4.P : Set G)))))
     (ih : TheoremAInductionBelow G Ω)
-    (hl : 2 < Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))))
-    {ζ₁ : G} (hζ₁V : ζ₁ ∈ hyp.V) (hζ₁U : ζ₁ ∈ residualImage (G := G) s4.P)
-    (hζ₁P : ζ₁ ∉ s4.P) :
+    (hl : 2 < Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G)))) :
     ∃ x ∈ hyp.Q, x ∉ hyp.Q0 ∧ k x ∈ hyp.W := by
   classical
   letI := hyp.centralizerQuotientMulAction s4.P_le_V
@@ -838,6 +903,8 @@ theorem SectionFourSetup.exists_mem_W (s4 : hyp.SectionFourSetup) {f g k : G →
         ∈ Subgroup.center ↥(residualImage (G := G) s4.P) → c ∈ s4.P := fun hc hcc =>
     SectionFourSetup.center_residualImage_le_P hyp s4 M hZ hmu hQ2 hcent hωQ hωQ0 hωfix
       hc hcc
+  obtain ⟨ζ₁, hζ₁V, hζ₁U, hζ₁P⟩ :=
+    SectionFourSetup.exists_zeta_one hyp s4 details hCQ hZD hZP
   have hζ₁t : ζ₁ * hyp.t = hyp.t * ζ₁ :=
     Subgroup.mem_centralizer_singleton_iff.mp hζ₁V.2
   have hzbarW := hyp.mem_W_intrinsicResidualQuotient_of_mem_V details s4.P_le_D
