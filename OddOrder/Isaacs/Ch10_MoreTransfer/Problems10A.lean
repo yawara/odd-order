@@ -690,6 +690,47 @@ theorem quaternionProd_aut_fixes_frattini
     · simpa only [Prod.fst_mul, Prod.fst_inv] using hc
     · simp [hsnd]
 
+/-- `(Q₈ × C₂)' ≤ ⟨(a 2, 1)⟩` (交換子はつねに `1` か `(a 2, 1)`). -/
+theorem quaternionProd_commutator_le :
+    commutator (QuaternionGroup 2 × Multiplicative (ZMod 2)) ≤
+      Subgroup.zpowers
+        ((QuaternionGroup.a 2, 1) : QuaternionGroup 2 × Multiplicative (ZMod 2)) := by
+  rw [commutator_def, Subgroup.commutator_le]
+  intro x _ y _
+  have hsnd : (⁅x, y⁆ : QuaternionGroup 2 × Multiplicative (ZMod 2)).2 = 1 := by
+    simp only [commutatorElement_def, Prod.snd_mul, Prod.snd_inv]
+    rw [mul_comm x.2 y.2]
+    group
+  rcases quaternionTwo_commutatorElement x.1 y.1 with h | h
+  · have hone : (⁅x, y⁆ : QuaternionGroup 2 × Multiplicative (ZMod 2)) = 1 := by
+      refine Prod.ext ?_ ?_
+      · simpa only [commutatorElement_def, Prod.fst_mul, Prod.fst_inv, Prod.fst_one] using h
+      · simpa only [Prod.snd_one] using hsnd
+    rw [hone]
+    exact Subgroup.one_mem _
+  · have hz : (⁅x, y⁆ : QuaternionGroup 2 × Multiplicative (ZMod 2))
+        = (QuaternionGroup.a 2, 1) := by
+      refine Prod.ext ?_ ?_
+      · simpa only [commutatorElement_def, Prod.fst_mul, Prod.fst_inv] using h
+      · exact hsnd
+    rw [hz]
+    exact Subgroup.mem_zpowers _
+
+/-- `C₂` の生成元は自明でない. -/
+theorem multZModTwo_ofAdd_one_ne_one : (Multiplicative.ofAdd (1 : ZMod 2)) ≠ 1 := by decide
+
+/-- `t = (1, c)` は `(Q₈ × C₂)'` に入らない (だから `Abelianization` で非自明). -/
+theorem quaternionProd_t_notMem_commutator :
+    ((1, Multiplicative.ofAdd 1) : QuaternionGroup 2 × Multiplicative (ZMod 2)) ∉
+      commutator (QuaternionGroup 2 × Multiplicative (ZMod 2)) := by
+  intro hmem
+  obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp (quaternionProd_commutator_le hmem)
+  have hsnd : ((QuaternionGroup.a 2, 1) : QuaternionGroup 2 × Multiplicative (ZMod 2)) ^ k
+      = (((QuaternionGroup.a 2 : QuaternionGroup 2) ^ k, 1)) := by
+    simp [Prod.pow_def]
+  rw [hsnd] at hk
+  exact multZModTwo_ofAdd_one_ne_one (congrArg Prod.snd hk).symm
+
 /-- **書籍 hint の固定点**: `Q₈ × C₂` の自己同型は `t := (1, c)` を `Φ(P) = ⟨(a 2, 1)⟩`
 を法として固定する (`Ω₁(P)/Φ(P)` が `𝔽₂` 上 1 次元で Aut-不変だから). -/
 theorem quaternionProd_aut_fixes_mod_frattini
