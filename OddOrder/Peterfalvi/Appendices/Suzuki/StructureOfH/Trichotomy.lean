@@ -62,8 +62,10 @@ Ch. I §3 Proposition 1(c) carries in that branch; see
   `orderOf_st_eq_three_of_card_cube` — **case (3)**: `S` of order `q³` forces
   `st` to have order `3`, with no hypothesis on the type of `S`.
 * `isMulCommutative_or_isSuzuki2Group_Q` — the case split of Ch. I §2, for `Q`.
-* `trichotomy` — **the Proposition**, with the `W ≠ 1` clause of case (c) taken
-  as a hypothesis (issue 0164).
+
+The Proposition itself (`SecondCaseHypothesis.trichotomy`) is assembled in
+`WNeBot.lean`, which supplies the `W ≠ 1` clause of case (c)
+(`W_ne_bot_of_card_cube`) and therefore has to import this file.
 -/
 
 set_option autoImplicit false

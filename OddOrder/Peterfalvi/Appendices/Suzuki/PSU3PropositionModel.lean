@@ -316,6 +316,58 @@ theorem nonempty_theoremAConclusion_of_isStandardModel
       hζ hζ1 hωQ hωQ0 hf hhW
   exact hyp.nonempty_theoremAConclusion_psu3 H hn M hu Ψ hfQ hform hQ2
 
+/-- **🎯 Corollary 1 in the case `V = W`** (Peterfalvi Part II, Ch. IV §3, p. 132):
+`O^{2′}(G) ≅ PSU(3, q)`, with nothing of §2 or §3 owed.
+
+`V = W` is the case §2 closes by itself: its Proposition (`exists_f_eq_conj_inv`, p. 129)
+produces the pair `ω ∈ Q − Q₀`, `f(ω) = (ω⁻¹)^ζ` at a generator of `W`, and `h(ω) ∈ W`
+comes free there (`h_mem_W_of_freeD`, `D` acting fixed-point-freely on `(Q/Q₀)^#`).  So
+the hypothesis of the Proposition of §3 holds and
+`nonempty_theoremAConclusion_of_isStandardModel` applies.
+
+This is the exact analogue of `corollaryTwo_of_isStandardModel_of_closing`, whose
+conclusion is Corollary 2; here the conclusion is Corollary 1.  Together with
+`SectionFourSetup.nonempty_theoremAConclusion` (the case `V ≠ W`, Ch. IV §4) it covers
+both halves of Ch. IV. -/
+theorem nonempty_theoremAConclusion_of_isStandardModel_of_closing
+    (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (hn : 1 < m) (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
+    (hcard : 3 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
+    (hWcyc : IsCyclic ↥hyp.W)
+    (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
+    (x₀ : ↥(Subgroup.center hyp.Q)) (hmodel : hyp.IsStandardModel sfive M x₀)
+    (hQ2 : IsPGroup 2 ↥hyp.Q) :
+    Nonempty (TheoremAConclusion G Ω) := by
+  classical
+  have hm : m ≠ 0 := (Nat.zero_lt_one.trans hn).ne'
+  -- a generator of `W`, the book's `ζ`
+  obtain ⟨w, hw⟩ := hWcyc.exists_generator
+  have hwW : (w : G) ∈ hyp.W := w.2
+  have hwcard : orderOf ((w : G)) = Nat.card ↥hyp.W := by
+    rw [Subgroup.orderOf_coe, orderOf_eq_card_of_forall_mem_zpowers hw]
+  have hw1 : (⟨(w : G), hwW⟩ : ↥hyp.W) ≠ 1 := by
+    intro hc
+    have hval : (w : G) = 1 := by simpa using congrArg Subtype.val hc
+    rw [hval, orderOf_one] at hwcard
+    omega
+  -- §2's closing Proposition supplies the pair
+  obtain ⟨ω₁, hω₁Q, hω₁Q0⟩ := hyp.exists_mem_Q_notMem_Q0 hm hQ0card hcardQ
+  obtain ⟨ω₀, hω₀Q, hω₀Q0, y₀, hy₀Q0, hsq₀, hfinv⟩ :=
+    hyp.exists_f_eq_conj_inv M hZc H hC2 hVW hm hQ0card hmu hKcard hWdvd
+      (fun x hx => hyp.sq_mem_Q0_of_lemmaFiveSetup sfive hx) hwW
+      (fun hc => hw1 (Subtype.ext hc)) hwcard hω₁Q hω₁Q0
+  exact hyp.nonempty_theoremAConclusion_of_isStandardModel H hC2 hn sfive M hZc hmu
+    hQ0card hcard hKcard hWdvd hW1 hfQ x₀ hmodel hwW hw1 hω₀Q hω₀Q0 hfinv
+    (hyp.h_mem_W_of_freeD H M hZc hmu hVW hwW hω₀Q hω₀Q0 hfinv) hQ2
+
 end
 
 end Hypothesis

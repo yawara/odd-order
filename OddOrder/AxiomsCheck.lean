@@ -387,7 +387,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 15100
+set_option linter.style.longFile 15200
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -15093,3 +15093,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.nonempty_theoremAConclusion_of_isStandardModel
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.SectionFourSetup.nonempty_theoremAConclusion
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.nonempty_theoremAConclusion_of_isStandardModel_of_closing
