@@ -7230,6 +7230,23 @@ step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可
      `p`-群 `⟨u⟩` の非自明 `p`-群 `A^p` への作用は非自明な固定点 `z ≠ 1` をもつ。
   5. `z ∈ C_A(u) = Z(P)` かつ `z ∈ A^p ≤ K` ⟹ `z ∈ Z(P) ⊓ K = 1` で矛盾。
 
+### 10A.3 後半の残り 2 段 (2026-08-03、段 1–3 landing 済)
+
+landing 済 (`Ch10_MoreTransfer/Problems10A.lean`):
+`eq_of_le_of_index_prime` (指数素数 ⟹ 極大) /
+`mem_center_iff_commute_of_index_prime` (**`C_A(u) = Z(P)`**) /
+`pow_mem_of_isComplement'` (**`A^p ≤ K`**)。
+
+残り:
+* **段 4** `u`-不変な非自明 `p`-群 `A^p` に `⟨u⟩` が共役で作用 ⟹ 非自明な固定点。
+  道具 = **`IsPGroup.exists_fixed_point_of_prime_dvd_card_of_fixed_point`**
+  (`hpα : p ∣ Nat.card α`, `ha : a ∈ fixedPoints G α` ⟹ `∃ b ∈ fixedPoints, a ≠ b`)。
+  `G := ↥(Subgroup.zpowers u)` (⟨u⟩ は `p`-群)、`α := ↥Aᵖ` に
+  `⟨g,_⟩ • ⟨x,_⟩ = ⟨g x g⁻¹, _⟩` の `MulAction` を定義する (`A^p` の `u`-不変性が要る:
+  `A ◁ P` かつ `p` 乗と共役が可換だから)。`a := 1` を固定点として与える。
+* **段 5** 固定点 `z ≠ 1` は `z ∈ C_A(u) = Z(P)` (段 2) かつ `z ∈ A^p ≤ K` (段 3) なので
+  `z ∈ Z(P) ⊓ K = 1` (`IsComplement'.disjoint`) で矛盾 ⟹ `A^p = 1` ⟹ `A` は基本可換。
+
 ## 🎉 9D.4 完済 (2026-08-03) — Ch.9 完済
 
 ```
