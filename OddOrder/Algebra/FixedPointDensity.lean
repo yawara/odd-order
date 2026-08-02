@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Index
 import Mathlib.Algebra.Ring.Equiv
+import Mathlib.Algebra.Ring.Aut
+import Mathlib.GroupTheory.OrderOfElement
 
 /-!
 # An endomorphism fixing more than half the points is the identity
@@ -101,5 +103,26 @@ theorem _root_.RingEquiv.eq_refl_of_fixes_compl {R : Type*} [Ring R] [Finite R]
     (hcard : 2 * S.card < Nat.card R) :
     μ = RingEquiv.refl R :=
   RingEquiv.ext (eq_id_of_fixes_compl (μ : R ≃+ R).toAddMonoidHom S hfix hcard)
+
+/-- **An automorphism of odd order whose square fixes more than half the points is
+trivial** (Peterfalvi Part II, Ch. IV §4, p. 134).
+
+The last step of Ch. IV: the semilinear automorphism `μ` attached to `η` satisfies
+`X^{μ²} = X` off a three-element set, and `|F| ≥ 8`, so `μ² = 1`; `μ` having odd order it
+is trivial, whence `η ∈ W` and `h(ω) ∈ W`. -/
+theorem _root_.RingEquiv.eq_one_of_odd_orderOf_of_sq_fixes_compl {R : Type*} [Ring R]
+    [Finite R] (μ : RingAut R) (hodd : Odd (orderOf μ)) (S : Finset R)
+    (hfix : ∀ x : R, x ∉ S → μ (μ x) = x) (hcard : 2 * S.card < Nat.card R) :
+    μ = 1 := by
+  have hsq : μ * μ = 1 := by
+    have h := RingEquiv.eq_refl_of_fixes_compl ((μ * μ : RingAut R) : R ≃+* R) S
+      (fun x hx => hfix x hx) hcard
+    exact h
+  have hdvd : orderOf μ ∣ 2 := orderOf_dvd_of_pow_eq_one (by rw [sq]; exact hsq)
+  have h1 : orderOf μ = 1 := by
+    rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h | h
+    · exact h
+    · exact absurd (h ▸ hodd) (by decide)
+  exact orderOf_eq_one_iff.mp h1
 
 end OddOrder.FiniteField
