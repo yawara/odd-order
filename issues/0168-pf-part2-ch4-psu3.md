@@ -9012,3 +9012,21 @@ step (3) の出力 (`ζ₁ ∈ D ∩ U`, `x ∈ (Q−Q₀)∩U`, `f x = x^{-ζ�
 
 **残り**: `ζ̄` を「`ζ₁ ∈ (V∩U) − (P∩U)` の像」として取り直す。
 書籍の根拠は `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` (p.133)。
+
+### (215) 🎯 **`Z(U) ⊆ P`** (step (1)) — `hS` は外部入力でなかった
+
+`SectionFourSetup.center_residualImage_le_P`。書籍 p.132
+「Since `P Z(U)` centralizes `C_Q(P) ⊄ Q₀`, `P Z(U) ∩ W = 1` and so `Z(U) ⊂ P`」。
+
+必要な材料が全部そろっていたので `eq_P_of_centralizes` に食わせられた:
+* `Z(U) ≤ D` = (202)、`Z(U) ≤ C(t)` (`t ∈ U`、`Z(U)` は `U` の中心) ⟹
+  **`Z(U) ≤ V ⊓ U`**
+* Galois (`inf_le_sup_W_of_centralizes hcent`) ⟹ `Z(U) ≤ P ⊔ W`
+* `hfac` = (206)
+* **`hS` は導出できた** — `P·Z(U)` が `ω` を中心化するのは
+  `P` が `ω` を固定 (Glauberman) かつ `Z(U)` が `ω ∈ U` と可換だから。
+  ⟹ 外部入力ではなかった ((207) の見立てを訂正)。
+
+⟹ **§4 の外部入力は `hcent` 1 つだけ**になった
+(書籍「(V ∩ U)/(P ∩ U) centralizes `C_{Q₀}(P)`」= PSU(3,ℓ) の構造)
+＋ `ζ₁ ∈ (V∩U) − (P∩U)` の選択 ((214))。

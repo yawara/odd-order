@@ -71,6 +71,7 @@ membership facts it needs on the model:
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
 * `Hypothesis.SectionFourSetup.mem_W_of_stepThree` — **🎯🎯🎯 the same from step (3)'s
   output**, with the `ζ₁ ∈ ζ P` refinement carried out.
+* `Hypothesis.SectionFourSetup.center_residualImage_le_P` — **`Z(U) ⊆ P`** of step (1).
 * `Hypothesis.SectionFourSetup.exists_stepThree_data` — that output, produced from the
   section's standing data (steps (1)–(3) plumbed together).
 -/
@@ -1160,6 +1161,76 @@ theorem SectionFourSetup.mem_W_of_stepThree (s4 : hyp.SectionFourSetup) {f g k :
     (hyp.sq_mem_Q0_of_lemmaFiveSetup sfive hxQ) rfl hfζ hη'ζ hkζ htη' hη'D hη'V hη'x
     hznot hj
   exact hkW
+
+include hyp in
+/-- **🎯 `Z(U) ⊆ P`** (Peterfalvi Part II, Ch. IV §4, step (1), p. 132):
+
+> Since `P Z(U)` centralizes `C_Q(P) ⊄ Q₀`, `P Z(U) ∩ W = 1` and so `Z(U) ⊂ P`.
+
+Everything the book uses here is now available: `Z(U) ⊆ D` (`center_le_subgroupOf_D`) and
+`Z(U) ⊆ C_G(t)` (as `t ∈ U`) put `Z(U)` in `V ∩ U`, which the theorem of Galois
+(`inf_le_sup_W_of_centralizes`) puts in `P W`; and `P Z(U)` centralizes Glauberman's
+`ω ∈ C_Q(P) − Q₀` because `P` fixes it and `Z(U)` is central in `U ∋ ω`.  So
+`eq_P_of_centralizes` applies to `S = P Z(U)`. -/
+theorem SectionFourSetup.center_residualImage_le_P (s4 : hyp.SectionFourSetup)
+    {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hQ2 : IsPGroup 2 ↥hyp.Q)
+    (hcent : hyp.V ⊓ residualImage (G := G) s4.P ≤ Subgroup.centralizer
+      (((hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) : Subgroup G) : Set G))
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hωfix : ∀ a ∈ s4.P, a * ω * a⁻¹ = ω)
+    {η : G} (hηU : η ∈ residualImage (G := G) s4.P)
+    (hηc : (⟨η, hηU⟩ : ↥(residualImage (G := G) s4.P))
+      ∈ Subgroup.center ↥(residualImage (G := G) s4.P)) :
+    η ∈ s4.P := by
+  classical
+  have hZD := SectionFourSetup.center_residualImage_le_D hyp s4 hQ2 hωQ hωQ0 hωfix
+  have htU : hyp.t ∈ residualImage (G := G) s4.P :=
+    mem_residualImage_of_orderOf_eq_two_pow (G := G) s4.t_mem_centralizer (n := 1)
+      (by rw [pow_one]; exact orderOf_eq_prime hyp.t_sq hyp.t_ne_one)
+  have hωC : ω ∈ Subgroup.centralizer ((s4.P : Set G)) :=
+    Subgroup.mem_centralizer_iff.mpr fun a ha => by
+      have hconj := hωfix a ha
+      calc a * ω = (a * ω * a⁻¹) * a := by group
+        _ = ω * a := by rw [hconj]
+  have hωU : ω ∈ residualImage (G := G) s4.P :=
+    hyp.mem_residualImage_of_mem_Q hQ2 hωQ hωC
+  -- `Z(U)`, read in `G`
+  set Z : Subgroup G :=
+    (Subgroup.center ↥(residualImage (G := G) s4.P)).map
+      (residualImage (G := G) s4.P).subtype with hZdef
+  have hZV : Z ≤ hyp.V ⊓ residualImage (G := G) s4.P := by
+    rintro _ ⟨c, hc, rfl⟩
+    refine ⟨⟨Subgroup.mem_subgroupOf.mp (hZD hc),
+      Subgroup.mem_centralizer_singleton_iff.mpr ?_⟩, c.2⟩
+    have hz := Subgroup.mem_center_iff.mp hc ⟨hyp.t, htU⟩
+    exact (congrArg Subtype.val hz).symm
+  have hZPW : Z ≤ s4.P ⊔ hyp.W :=
+    le_trans hZV (s4.inf_le_sup_W_of_centralizes hcent)
+  set S : Subgroup G := s4.P ⊔ Z with hSdef
+  have hSPW : S ≤ s4.P ⊔ hyp.W := sup_le le_sup_left hZPW
+  have hfac : ∀ v ∈ S, ∃ p ∈ s4.P, ∃ w ∈ hyp.W, v = p * w := fun v hv =>
+    SectionFourSetup.exists_mem_P_mem_W_mul hyp s4 (hSPW hv)
+  have hPC : s4.P ≤ Subgroup.centralizer ({ω} : Set G) := by
+    intro a ha
+    refine Subgroup.mem_centralizer_singleton_iff.mpr ?_
+    have hconj := hωfix a ha
+    calc a * ω = (a * ω * a⁻¹) * a := by group
+      _ = ω * a := by rw [hconj]
+  have hZC : Z ≤ Subgroup.centralizer ({ω} : Set G) := by
+    rintro _ ⟨c, hc, rfl⟩
+    refine Subgroup.mem_centralizer_singleton_iff.mpr ?_
+    have hz := Subgroup.mem_center_iff.mp hc ⟨ω, hωU⟩
+    exact (congrArg Subtype.val hz).symm
+  have hSω : ∀ c ∈ S, c * ω = ω * c := fun c hc =>
+    Subgroup.mem_centralizer_singleton_iff.mp
+      ((sup_le hPC hZC : S ≤ Subgroup.centralizer ({ω} : Set G)) hc)
+  have hSP : S = s4.P :=
+    s4.eq_P_of_centralizes M hZ hmu le_sup_left hfac hωQ hωQ0 hSω
+  have hηZ : η ∈ Z := ⟨⟨η, hηU⟩, hηc, rfl⟩
+  have hηS : η ∈ S := (le_sup_right : Z ≤ S) hηZ
+  rwa [hSP] at hηS
 
 include hyp in
 /-- **🎯🎯 Step (3)'s output, packaged for `mem_W_of_stepThree`** (Peterfalvi Part II,
