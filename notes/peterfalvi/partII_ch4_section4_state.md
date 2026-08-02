@@ -85,7 +85,8 @@ Hypothesis.SectionFourSetup.exists_mem_W
 
 ```
 Hypothesis.SectionFourSetup.exists_mem_W
-  : (§4 の standing data のみ) ⟹ ∃ x ∈ Q − Q₀, k x ∈ W
+  : (§4 の standing data のみ)
+    ⟹ ∃ x ∈ Q − Q₀, ∃ ζ ∈ W^#, f x = ζ⁻¹x⁻¹ζ ∧ k x ∈ W    -- = §3 Prop の仮説
 ```
 外部入力ゼロ。`hcent` も `ζ₁ ∈ (V∩U) − (P∩U)` も導出できた:
 
@@ -118,9 +119,9 @@ Hypothesis.SectionFourSetup.exists_mem_W
 **§3 の Proposition の仮説そのもの**なので、Corollary 1 が `V ≠ W` の場合にも
 `O^{2′}(G) ≅ PSU(3,q)` を与えて Theorem A が閉じる。
 
-⚠ `exists_mem_W` は今 `k x ∈ W` だけを返す。Proposition の仮説にするには
-`f x = ζ⁻¹ x⁻¹ ζ` と `ζ ∈ W^#` も一緒に返す必要がある
-(証明内には `hfζ`/`hζW`/`hζ1` として在るので、結論に足すだけ)。
+✅ `exists_mem_W` の結論は強化済 (2026-08-02):
+`∃ x ∈ Q − Q₀, ∃ ζ ∈ W, ζ ≠ 1 ∧ f x = ζ⁻¹x⁻¹ζ ∧ k x ∈ W`
+= **§3 Proposition の仮説そのもの**。
 
 要調査: §3 Proposition の結論 (`θ = 1` と `f(ρ) = (ρ̄/y, 1/y)`) と
 Corollary 1 が repo にどこまで在るか。`stepThree` は Proposition の

@@ -425,7 +425,10 @@ The refinement `ζ₁ = p ζ` with `ζ ∈ C_W(P)` (`exists_refined_zeta`) rewri
 `f(x) = x^{-ζ}` because `p` centralizes `x ∈ U ≤ C_G(P)`, and `k(x) = ζ³ (p³ η)` because
 `p` commutes with `ζ ∈ C_W(P)`.  The new conjugator `η' = p³ η` again lies in `P`, is
 centralized by `t ∈ C_G(P)` and by `ζ`, and centralizes `x`; so `sectionFour_mem_W`
-applies and gives `η' ∈ W`, whence `k(x) = ζ³ η' ∈ W`. -/
+applies and gives `η' ∈ W`, whence `k(x) = ζ³ η' ∈ W`.
+
+The refined `ζ` is returned as well: together with `f(x) = x^{-ζ}` and `k(x) ∈ W` it is
+exactly the hypothesis of the Proposition of §3. -/
 theorem SectionFourSetup.mem_W_of_stepThree (s4 : hyp.SectionFourSetup) {f g k : G → G}
     (H : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g k)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
@@ -446,7 +449,7 @@ theorem SectionFourSetup.mem_W_of_stepThree (s4 : hyp.SectionFourSetup) {f g k :
     (hηc : (⟨η, hηU⟩ : ↥(residualImage (G := G) s4.P))
       ∈ Subgroup.center ↥(residualImage (G := G) s4.P))
     (hηP : η ∈ s4.P) (hkx : k x = ζ₁ ^ 3 * η) :
-    k x ∈ hyp.W := by
+    ∃ ζ ∈ hyp.W, ζ ≠ 1 ∧ f x = ζ⁻¹ * x⁻¹ * ζ ∧ k x ∈ hyp.W := by
   classical
   haveI : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
   haveI : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
@@ -510,10 +513,10 @@ theorem SectionFourSetup.mem_W_of_stepThree (s4 : hyp.SectionFourSetup) {f g k :
   have hznot := hyp.mu_W_notMem_frobFixed M hmu
     (show (⟨ζ, hζW⟩ : ↥hyp.W) ≠ 1 from fun hc => hζ1 (congrArg Subtype.val hc))
   obtain ⟨j, hj⟩ := SectionFourSetup.pow_odd_eq_one_of_mem_P hyp s4 hη'P
-  obtain ⟨hη'W, hkW⟩ := hyp.sectionFour_mem_W H hC2 M sfive hZ hm hQ0card hq hζW hxQ hxQ0
+  obtain ⟨-, hkW⟩ := hyp.sectionFour_mem_W H hC2 M sfive hZ hm hQ0card hq hζW hxQ hxQ0
     (hyp.sq_mem_Q0_of_lemmaFiveSetup sfive hxQ) rfl hfζ hη'ζ hkζ htη' hη'D hη'V hη'x
     hznot hj
-  exact hkW
+  exact ⟨ζ, hζW, hζ1, hfζ, hkW⟩
 
 include hyp in
 /-- **🎯 `Z(U) ⊆ P`** (Peterfalvi Part II, Ch. IV §4, step (1), p. 132):
@@ -871,7 +874,9 @@ Given the book's `ζ₁ ∈ (V ∩ U) − (P ∩ U)`, the whole section runs: it
 nontrivial element of the quotient's `W̄` (`mem_W_intrinsicResidualQuotient_of_mem_V`,
 `center_residualImage_le_P`), step (3) produces `z` lifting it, and `z` inherits
 `z ∈ V`, `z ∉ P` because it differs from `ζ₁` by an element of `Z(U) ⊆ P ≤ V`.
-`mem_W_of_stepThree` then gives `k(x) ∈ W`, which is what §3's Corollary 1 consumes. -/
+`mem_W_of_stepThree` then gives the full hypothesis of §3's Proposition — an
+`x ∈ Q − Q₀` and a `ζ ∈ W^#` with `f(x) = x^{-ζ}` and `k(x) ∈ W` — which is what its
+Corollary 1 consumes to identify `O^{2′}(G)` with `PSU(3, q)`. -/
 theorem SectionFourSetup.exists_mem_W (s4 : hyp.SectionFourSetup) {f g k : G → G}
     (H : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g k)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
@@ -889,7 +894,8 @@ theorem SectionFourSetup.exists_mem_W (s4 : hyp.SectionFourSetup) {f g k : G →
     (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer ((s4.P : Set G)))))
     (ih : TheoremAInductionBelow G Ω)
     (hl : 2 < Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G)))) :
-    ∃ x ∈ hyp.Q, x ∉ hyp.Q0 ∧ k x ∈ hyp.W := by
+    ∃ x ∈ hyp.Q, x ∉ hyp.Q0 ∧
+      ∃ ζ ∈ hyp.W, ζ ≠ 1 ∧ f x = ζ⁻¹ * x⁻¹ * ζ ∧ k x ∈ hyp.W := by
   classical
   letI := hyp.centralizerQuotientMulAction s4.P_le_V
   obtain ⟨ω, hωQ, hωQ0, hωfix⟩ := s4.exists_fixed_not_mem_Q0 hZ hCop hSolv
