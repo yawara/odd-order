@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
-import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.WNeBot
+import OddOrder.Peterfalvi.Appendices.Suzuki.StructureOfH.CaseABConclusion
 
 /-!
 # Peterfalvi Part II, Ch. IV §4, opening paragraph: the dichotomy that closes Theorem A
@@ -35,6 +35,9 @@ and then the case split itself.
 * `SecondCaseHypothesis.nonempty_theoremAConclusion_of_caseC` — **Theorem A's conclusion
   in case (c) of Ch. III §1**: `by_cases` on `FreeD`, §2 + Corollary 1 on one side and §4
   on the other.
+* `SecondCaseHypothesis.nonempty_theoremAConclusion` — **Theorem A under the standing
+  hypothesis of Ch. III**, all three cases of the Proposition of §1 together
+  (`theoremAConclusion_or_caseC2` disposes of (a) and (b)).
 
 `ℓ > 2` (the book's `U/Z(U) ≅ PSU(3, ℓ)` with `ℓ > 2`, read off Ch. I §3 Proposition 1(c)
 inside step (1) of §4) is still carried as a hypothesis, in the form §4's endpoint wants
@@ -95,6 +98,35 @@ theorem commute_of_mem_Q0_of_center (hZ : Subgroup.center hyp.Q = hyp.Q0.subgrou
   have hmem : (⟨y, hyp.Q0_le_Q hy⟩ : ↥hyp.Q) ∈ Subgroup.center hyp.Q := by
     rw [hZ]; exact Subgroup.mem_subgroupOf.mpr hy
   exact congrArg Subtype.val (Subgroup.mem_center_iff.mp hmem ⟨x, hx⟩)
+
+/-- **`q > 2`** — a Suzuki `2`-group has two distinct involutions by definition, and every
+involution of `Q` lies in `Q₀ = {x ∈ H | x² = 1}`, so `|Q₀| ≥ 3`.
+
+This sharpens `two_le_card_Q0`, and it is what turns `|Q₀| = 2^m` into `1 < m`, the
+numerical hypothesis Ch. IV §3 carries (`3 ≤ |F|`). -/
+theorem two_lt_card_Q0_of_isSuzuki2Group (hQsuz : IsSuzuki2Group ↥hyp.Q) :
+    2 < Nat.card ↥hyp.Q0 := by
+  classical
+  obtain ⟨-, -, ⟨x, y, hx, hy, hxy⟩, -⟩ := hQsuz
+  have hmem : ∀ z : ↥hyp.Q, z ∈ involutions ↥hyp.Q → (z : G) ∈ hyp.Q0 := fun z hz =>
+    ⟨by simpa using congrArg Subtype.val hz.1, hyp.Q_le_H z.2⟩
+  have hx1 : (x : G) ≠ 1 := fun hcon => hx.2 (Subtype.ext hcon)
+  have hy1 : (y : G) ≠ 1 := fun hcon => hy.2 (Subtype.ext hcon)
+  have hxy' : (x : G) ≠ (y : G) := fun hcon => hxy (Subtype.ext hcon)
+  have hsub : ({1, (x : G), (y : G)} : Set G) ⊆ (hyp.Q0 : Set G) := by
+    rintro z (rfl | rfl | rfl)
+    · exact hyp.Q0.one_mem
+    · exact hmem x hx
+    · exact hmem y hy
+  have hcount : ({1, (x : G), (y : G)} : Set G).ncard = 3 := by
+    rw [Set.ncard_insert_of_notMem (by simp [Ne.symm hx1, Ne.symm hy1]),
+      Set.ncard_insert_of_notMem (by simp [hxy']), Set.ncard_singleton]
+  have hcard : ((hyp.Q0 : Set G)).ncard = Nat.card ↥hyp.Q0 := (Nat.card_coe_set_eq _).symm
+  have hthree : (3 : ℕ) ≤ Nat.card ↥hyp.Q0 := by
+    rw [← hcard]
+    calc (3 : ℕ) = ({1, (x : G), (y : G)} : Set G).ncard := hcount.symm
+      _ ≤ (hyp.Q0 : Set G).ncard := Set.ncard_le_ncard hsub (Set.toFinite _)
+  omega
 
 /-! ## `¬ FreeD` produces §4's standing data -/
 
@@ -333,6 +365,44 @@ theorem nonempty_theoremAConclusion_of_caseC
       hQ0card hcardQ hmu hQ2 hQsuz (sc.coprime_card_subgroupOf_D hQ2 s4.P) hSolv hPbot
       (sc.twoRank_centralizer_ge_two s4.P s4.P_le_V s4.cardP s4.prime_cardP s4.card_P)
       hord (sc.isPGroup_two_Q_subgroupOf_centralizer hQ2 s4.P) ih (hl s4)
+
+/-- **🎯🎯🎯🎯🎯🎯🎯 Peterfalvi Part II, Theorem A under the standing hypothesis of
+Ch. III** (pp. 115–134): `O^{2′}(G)` is normal of odd index in `G` and carries the
+standard model, in *all three* cases of the Proposition of Ch. III §1.
+
+Cases (a) and (b) are `theoremAConclusion_or_caseC2` (Ch. III §3, p. 119, via Ch. I §3
+Proposition 2); case (c) is the whole of Ch. IV, entered through
+`nonempty_theoremAConclusion_of_caseC`.  Everything Ch. IV asks for beyond case (c)'s own
+output is built here: the Lemma 5 setup and the field model of Ch. III §3 from a
+non-trivial element of `W`, `μ`'s injectivity from Ch. III §3 step (4), and `q > 2` from
+the two involutions a Suzuki `2`-group has by definition.
+
+`hl` — the book's `ℓ > 2` inside step (1) of §4 — is the one clause still owed. -/
+theorem nonempty_theoremAConclusion (ih : Hypothesis.TheoremAInductionBelow G Ω)
+    (hl : ∀ s4 : sc.toHypothesis.SectionFourSetup,
+      2 < Nat.card ↥(sc.toHypothesis.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G)))) :
+    Nonempty (Hypothesis.TheoremAConclusion G Ω) := by
+  classical
+  rcases sc.theoremAConclusion_or_caseC2 ih with hdone | ⟨-, hQsuz, hcardQ, hord, hW⟩
+  · exact hdone
+  -- case (c): build the model of Ch. III §3, then run Ch. IV's dichotomy
+  have hQ2 : IsPGroup 2 ↥sc.toHypothesis.Q := sc.isPGroup_two_Q ih
+  obtain ⟨m, hQ0card⟩ := (hQ2.to_le sc.toHypothesis.Q0_le_Q).exists_card_eq
+  have hq2 := sc.toHypothesis.two_lt_card_Q0_of_isSuzuki2Group hQsuz
+  rw [hQ0card] at hq2
+  have hn : 1 < m := by
+    by_contra hcon
+    have hle : (2 : ℕ) ^ m ≤ 2 ^ 1 := Nat.pow_le_pow_right (by norm_num) (by omega)
+    omega
+  have hm : m ≠ 0 := (Nat.zero_lt_one.trans hn).ne'
+  obtain ⟨w, hwW, hwbot⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hW)
+  have hw1 : w ≠ 1 := fun hcon => hwbot (hcon ▸ Subgroup.one_mem ⊥)
+  obtain ⟨sfive⟩ := sc.toHypothesis.lemmaFiveSetup_of_orderThree_of_mem_W hwW hw1 hord
+    hQsuz hm hQ0card hcardQ ih
+  obtain ⟨M⟩ := sc.toHypothesis.nonempty_quotientFieldModel_of_orderThree hord hQsuz hm
+    hQ0card hcardQ ih sfive hwW hw1
+  exact sc.nonempty_theoremAConclusion_of_caseC M sfive hn hQ0card hcardQ
+    (sc.toHypothesis.mu_injective hord hm hQ0card hcardQ ih sfive M) hQsuz hord hW ih hl
 
 end SecondCaseHypothesis
 

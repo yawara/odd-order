@@ -256,6 +256,8 @@ Ch. I §3 Proposition 2 then gives Theorem A's conclusion. -/
 theorem theoremAConclusion_or_caseC2 (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     Nonempty (Hypothesis.TheoremAConclusion G Ω) ∨
       (Suzuki2Groups.IsTypeB.{u, 0} ↥sc.toHypothesis.Q ∧
+        OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q ∧
+        Nat.card ↥sc.toHypothesis.Q = Nat.card ↥sc.toHypothesis.Q0 ^ 3 ∧
         orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3 ∧
         sc.toHypothesis.W ≠ ⊥) := by
   rcases sc.trichotomy ind with ⟨hQ, h3⟩ | ⟨hA, hQcard, h5, -⟩ | hC2

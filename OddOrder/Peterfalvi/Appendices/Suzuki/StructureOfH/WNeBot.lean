@@ -159,8 +159,11 @@ theorem W_ne_bot_of_card_cube
 (`isMulCommutative_or_isSuzuki2Group_Q`) refined by Appendix III's two possible
 orders `|Q₀|²` and `|Q₀|³` (`natCard_Q_eq_sq_or_cube`).
 
-Case (b) also carries `|S| = |Q₀|²`, which is exactly the branch condition of
-`natCard_Q_eq_sq_or_cube` that produced it; §2's Proposition needs it.
+Case (b) also carries `|S| = |Q₀|²`, and case (c) carries `|S| = |Q₀|³` together with
+"`S` is a Suzuki `2`-group": these are exactly the branch conditions of
+`natCard_Q_eq_sq_or_cube` and `isMulCommutative_or_isSuzuki2Group_Q` that produced them,
+and Ch. IV needs them to build the model of Ch. III §3
+(`lemmaFiveSetup_of_orderThree_of_mem_W`, `nonempty_quotientFieldModel_of_orderThree`).
 
 The `W ≠ 1` clause of case (c) is `W_ne_bot_of_card_cube`; it subsumes both the
 book's deferred `PSU(3, ℓ)` computation ("as can be checked") and the repair of
@@ -173,6 +176,8 @@ theorem trichotomy (ind : Hypothesis.TheoremAInductionBelow G Ω) :
         orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 5 ∧
         sc.toHypothesis.W = ⊥)
       ∨ (Suzuki2Groups.IsTypeB.{uG, 0} ↥sc.toHypothesis.Q ∧
+        OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥sc.toHypothesis.Q ∧
+        Nat.card ↥sc.toHypothesis.Q = Nat.card ↥sc.toHypothesis.Q0 ^ 3 ∧
         orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3 ∧
         sc.toHypothesis.W ≠ ⊥) := by
   classical
@@ -202,7 +207,7 @@ theorem trichotomy (ind : Hypothesis.TheoremAInductionBelow G Ω) :
       have hW := sc.W_ne_bot_of_card_cube ind hQsuz hm hQ0card hcube
       obtain ⟨-, -, hB⟩ := sc.toHypothesis.lemmaFive_of_orderThree hst hQsuz hm
         hQ0card hcube ind
-      exact Or.inr (Or.inr ⟨hB hW, hst, hW⟩)
+      exact Or.inr (Or.inr ⟨hB hW, hQsuz, hcube, hst, hW⟩)
 
 end SecondCaseHypothesis
 
