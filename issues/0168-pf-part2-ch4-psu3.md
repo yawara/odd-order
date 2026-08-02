@@ -8628,3 +8628,27 @@ def W : Subgroup G := hyp.V ⊓ Subgroup.centralizer hyp.KSet   -- Basic.lean:18
    `eq_id_of_fixes_compl` を `↥F` か AddSubgroup 上で使う)。
 6. `coordFieldAut_eq_id_on_frobFixed_of_sq` → `coordFieldAut_eq_id_of_fixes_frobFixed`
    → `mem_W_of_coordFieldAut_eq_id` → `h(ω) = ζ³η ∈ W` → §3 Corollary 1。
+
+### (195) 🎯 `F` 上の shift trick と「全ての `X ∈ F^×` は `a^{-2μ}`」
+
+* `coordFieldAut_sq_eq_id_of_ten` — `μ²` は加法的で `F` を保つので不動点は
+  `F` の加法部分群。`F` の半分未満を除いて固定するなら全体で固定
+  (`eq_id_of_fixes_compl`)。⚠ `sectionFour_sq_eq_id` は `E` 全体を要求するので
+  使えない ((10) は `F` 上でしか成立しない)。
+* `exists_mem_K_coordFieldAut_sq_inv_eq` — **全ての `X ∈ F^×` は `a^{-2μ}`**。
+  3 つの全射の合成: `K` の二乗 (`|K| = q−1` 奇 ⟹ `powCoprime`) /
+  `μ(K) = F^×` (`exists_actualKActor_mu_eq`) / `σ` は `F` の全単射
+  (`coordFieldAut_mapsTo_frobFixed` + 単射 + 有限)。
+* `kActor_congr` — `kActor` は所属証明でなく元にのみ依存。
+
+**残り (Ch. IV §4 完了まで) — assembly 1 段のみ**:
+`sectionFour_ten_at` を `exists_mem_K_coordFieldAut_sq_inv_eq` で全 `X ∈ F^×` に
+展開し、`coordFieldAut_sq_eq_id_of_ten` に渡す。必要な追加材料:
+1. **`b` の供給** — `b s b⁻¹ = y·(a⁻¹ s a)` (§3 `stepTen_exists` 相当、
+   除外条件 `a ≠ α^{-τ}`)。
+2. **`ω`,`ζ`,`η`,`y` の供給** — §4 step (3) (`exists_f_eq_conj_inv_residual`) +
+   `ζ ∈ C_W(P)` への精密化 + `y = ω²`。
+3. 除外集合 `S` (≤ 4 点) と `2|S| < 2^m = q`。`q = ℓ^p ≥ 27` から自動。
+⟹ その後は `coordFieldAut_eq_id_on_frobFixed_of_sq` →
+`coordFieldAut_eq_id_of_fixes_frobFixed` → `mem_W_of_coordFieldAut_eq_id` →
+`h(ω) = ζ³η ∈ W` → §3 Corollary 1 で **Ch. IV 完了**。

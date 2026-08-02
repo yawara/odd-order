@@ -41,6 +41,9 @@ membership facts it needs on the model:
 * `Hypothesis.coordFieldAut_eq_id_on_frobFixed_of_sq` — `μ²|_F = id ⟹ μ|_F = id`.
 * `Hypothesis.coordFieldAut_eq_id_of_fixes_frobFixed` — **`μ = 1`** from `μ|_F = id` and
   the odd order of `η`.
+* `Hypothesis.exists_mem_K_coordFieldAut_sq_inv_eq` — every nonzero `X ∈ F` is `a^{-2μ}`.
+* `Hypothesis.coordFieldAut_sq_eq_id_of_ten` — the density step: `μ²` fixing all but a
+  sparse subset of `F` fixes all of `F`.
 * `Hypothesis.sectionFour_ten_at` — the whole chain (3)→(10) run at one admissible `a`.
 -/
 
@@ -339,6 +342,104 @@ theorem coordFieldAut_eq_id_of_fixes_frobFixed (M : hyp.QuotientFieldModel m)
     have hone : σ = 1 := eq_one_of_sq_eq_one_of_odd_pow hodd hsq hpow
     rw [h1] at hone
     exact OddOrder.FiniteField.qFrobenius_ne_one M.card hm hone
+
+include hyp in
+/-- `kActor` depends only on the element, not on the membership proof. -/
+theorem kActor_congr {x y : G} (hx : x ∈ hyp.K) (hy : y ∈ hyp.K) (hxy : x = y) :
+    hyp.kActor hx = hyp.kActor hy := by
+  subst hxy
+  rfl
+
+include hyp in
+/-- **Every nonzero `X ∈ F` is `a^{-2μ}` for some `a ∈ K`** (Peterfalvi Part II,
+Ch. IV §4, p. 134: (10) is asserted "for `X ∈ F − {0, α^{2τ}}`").
+
+Three surjectivities compose: squaring is bijective on `K` because `|K| = q − 1` is odd
+(`powCoprime`), `μ` maps `K` onto `F^×` (`exists_actualKActor_mu_eq`), and the field
+automorphism is a bijection of `F` (`coordFieldAut_mapsTo_frobFixed` plus injectivity and
+finiteness).  This is what lets (10) — proved at one `a` by `sectionFour_ten_at` — be
+quantified over `F`. -/
+theorem exists_mem_K_coordFieldAut_sq_inv_eq (M : hyp.QuotientFieldModel m)
+    (s : hyp.LemmaFiveSetup m) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    {d ζ : G} (hd : d ∈ hyp.D) (hζ : ζ ∈ hyp.W)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    {X : M.E} (hXF : X ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) (hX0 : X ≠ 0) :
+    ∃ (a : G) (haK : a ∈ hyp.K),
+      (hyp.coordFieldAut s M hm hQ0card hd hζ hznot
+        ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E))⁻¹ = X := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hmaps : ∀ {y : M.E}, y ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m →
+      hyp.coordFieldAut s M hm hQ0card hd hζ hznot y
+        ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := fun hy =>
+    hyp.coordFieldAut_mapsTo_frobFixed M s hm hQ0card hd hζ hznot hy
+  -- `μ` is a bijection of `F`
+  let ρ : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+      → ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) := fun z =>
+    ⟨hyp.coordFieldAut s M hm hQ0card hd hζ hznot (z : M.E), hmaps z.2⟩
+  have hρinj : Function.Injective ρ := fun z w hzw =>
+    Subtype.ext ((hyp.coordFieldAut s M hm hQ0card hd hζ hznot).injective
+      (congrArg Subtype.val hzw))
+  obtain ⟨z, hz⟩ := Finite.injective_iff_surjective.mp hρinj
+    ⟨X⁻¹, (OddOrder.FiniteField.frobFixedSubfield M.E 2 m).inv_mem hXF⟩
+  have hzval : hyp.coordFieldAut s M hm hQ0card hd hζ hznot (z : M.E) = X⁻¹ :=
+    congrArg Subtype.val hz
+  have hz0 : (z : M.E) ≠ 0 := by
+    intro hc
+    rw [hc, map_zero] at hzval
+    exact inv_ne_zero hX0 hzval.symm
+  -- pull `z` back to `K`
+  obtain ⟨k, hk⟩ := hyp.exists_actualKActor_mu_eq s M hm hQ0card z.2 hz0
+  obtain ⟨κ, hκ, hkκ⟩ := hyp.exists_kActor_eq k
+  -- squaring is bijective on `K`
+  have hcop : (Nat.card ↥hyp.K).Coprime 2 := Nat.coprime_two_right.mpr hyp.card_K_odd
+  obtain ⟨a, ha⟩ := (powCoprime (n := 2) hcop).surjective (⟨κ, hκ⟩ : ↥hyp.K)
+  have haval : ((a : G)) ^ 2 = κ := congrArg Subtype.val ha
+  refine ⟨(a : G), a.2, ?_⟩
+  rw [hyp.kActor_congr (pow_mem a.2 2) hκ haval, hkκ, hk, hzval, inv_inv]
+
+include hyp in
+/-- **The shift trick, on `F`** (Peterfalvi Part II, Ch. IV §4, p. 134: "Writing (10) with
+`X + 1` in place of `X` and subtracting (10) from the result, we see that `X^{μ²} = X`").
+
+`sectionFour_fixed_of_shift` turns the pair of instances of (10) at `X` and `X + 1` into
+`X^{μ²} = X`; this lemma is the density step that follows.  `μ²` is additive and maps `F`
+to itself (`coordFieldAut_mapsTo_frobFixed`), so its fixed points form an additive
+subgroup of `F`; if it fixes everything outside a set of fewer than half the elements of
+`F`, that subgroup is all of `F` (`eq_id_of_fixes_compl`).
+
+⚠ This is the `F`-level counterpart of `sectionFour_sq_eq_id`, which is stated for the
+whole field: (10) is only available on `F`, since its `X` is `a^{-2μ}` with `a ∈ K`. -/
+theorem coordFieldAut_sq_eq_id_of_ten (M : hyp.QuotientFieldModel m)
+    (s : hyp.LemmaFiveSetup m) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    {d ζ : G} (hd : d ∈ hyp.D) (hζ : ζ ∈ hyp.W)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    (S : Finset ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hten : ∀ z : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m), z ∉ S →
+      hyp.coordFieldAut s M hm hQ0card hd hζ hznot
+        (hyp.coordFieldAut s M hm hQ0card hd hζ hznot (z : M.E)) = (z : M.E))
+    (hcard : 2 * S.card < 2 ^ m)
+    {x : M.E} (hx : x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) :
+    hyp.coordFieldAut s M hm hQ0card hd hζ hznot
+        (hyp.coordFieldAut s M hm hQ0card hd hζ hznot x) = x := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hmaps : ∀ {y : M.E}, y ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m →
+      hyp.coordFieldAut s M hm hQ0card hd hζ hznot y
+        ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := fun hy =>
+    hyp.coordFieldAut_mapsTo_frobFixed M s hm hQ0card hd hζ hznot hy
+  let φ : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+      →+ ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) :=
+    { toFun := fun z => ⟨hyp.coordFieldAut s M hm hQ0card hd hζ hznot
+        (hyp.coordFieldAut s M hm hQ0card hd hζ hznot (z : M.E)), hmaps (hmaps z.2)⟩
+      map_zero' := Subtype.ext (by simp)
+      map_add' := fun z w => Subtype.ext (by simp) }
+  have hFcard : Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) = 2 ^ m :=
+    OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm
+  have hkey := OddOrder.FiniteField.eq_id_of_fixes_compl φ S
+    (fun z hz => Subtype.ext (hten z hz)) (by rw [hFcard]; exact hcard) ⟨x, hx⟩
+  exact congrArg Subtype.val hkey
 
 include hyp in
 /-- **🎯 (10) at one admissible `a`** (Peterfalvi Part II, Ch. IV §4, p. 134).
