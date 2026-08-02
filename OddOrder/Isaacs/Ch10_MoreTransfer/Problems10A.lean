@@ -594,6 +594,69 @@ theorem not_surjective_of_quaternionProd {W : Type*} [Group W] [Finite W]
     · exact hgv1 h'
     exact hwv (by rw [h, h'])
 
+/-- `C₂ ≀ C₂` (= `D₈`) は位数 `8`, 非可換で, involution を 2 つ以上もつ. -/
+theorem regularWreathTwo_card_and_involutions :
+    Nat.card (Multiplicative (ZMod 2) ≀ᵣ Multiplicative (ZMod 2)) = 8 ∧
+      ¬ IsMulCommutative (Multiplicative (ZMod 2) ≀ᵣ Multiplicative (ZMod 2)) ∧
+      ∃ w v : Multiplicative (ZMod 2) ≀ᵣ Multiplicative (ZMod 2),
+        w ≠ v ∧ w ≠ 1 ∧ v ≠ 1 ∧ w ^ 2 = 1 ∧ v ^ 2 = 1 := by
+  classical
+  set σ : Multiplicative (ZMod 2) := Multiplicative.ofAdd 1 with hσ
+  have hσ1 : σ ≠ 1 := by decide
+  have hσinv : σ⁻¹ = σ := by decide
+  have hsq : ∀ x : Multiplicative (ZMod 2), x * x = 1 := by decide
+  set f : Multiplicative (ZMod 2) → Multiplicative (ZMod 2) := fun x => if x = 1 then σ else 1
+    with hf
+  set e₁ : Multiplicative (ZMod 2) ≀ᵣ Multiplicative (ZMod 2) := ⟨f, 1⟩ with he₁
+  set e₂ : Multiplicative (ZMod 2) ≀ᵣ Multiplicative (ZMod 2) := ⟨1, σ⟩ with he₂
+  refine ⟨?_, ?_, e₁, e₂, ?_, ?_, ?_, ?_, ?_⟩
+  · rw [RegularWreathProduct.card, Nat.card_eq_fintype_card (α := Multiplicative (ZMod 2))]
+    simp
+  · intro hcomm
+    have h := hcomm.is_comm.comm e₁ e₂
+    have h1 : (e₁ * e₂).left 1 = (e₂ * e₁).left 1 := by rw [h]
+    have hL1 : (e₁ * e₂).left 1 = σ := by
+      simp [RegularWreathProduct.mul_def, he₁, he₂, hf]
+    have hL2 : (e₂ * e₁).left 1 = 1 := by
+      simp [RegularWreathProduct.mul_def, he₁, he₂, hf, hσinv, hσ1]
+    rw [hL1, hL2] at h1
+    exact hσ1 h1
+  · intro h
+    have h1 : e₁.right = e₂.right := by rw [h]
+    simp only [he₁, he₂] at h1
+    exact hσ1 h1.symm
+  · intro h
+    have h1 : e₁.left 1 = (1 : Multiplicative (ZMod 2) ≀ᵣ Multiplicative (ZMod 2)).left 1 := by
+      rw [h]
+    simp only [he₁, hf] at h1
+    exact hσ1 h1
+  · intro h
+    have h1 : e₂.right = (1 : Multiplicative (ZMod 2) ≀ᵣ Multiplicative (ZMod 2)).right := by
+      rw [h]
+    simp only [he₂] at h1
+    exact hσ1 h1
+  · rw [pow_two]
+    refine RegularWreathProduct.ext ?_ ?_
+    · funext x
+      simp [RegularWreathProduct.mul_def, he₁, hsq]
+    · simp [RegularWreathProduct.mul_def, he₁]
+  · rw [pow_two]
+    refine RegularWreathProduct.ext ?_ ?_
+    · funext x
+      simp [RegularWreathProduct.mul_def, he₂]
+    · simp [RegularWreathProduct.mul_def, he₂, hsq]
+
+/-- **10A.4 の第一段 (完成形)**: `C₂ ≀ C₂` は `Q₈ × C₂` の準同型像でない.
+
+`C₂ ≀ C₂` は位数 `8`, 非可換で involution を 2 つもつ
+(`regularWreathTwo_card_and_involutions`) から `not_surjective_of_quaternionProd`. -/
+theorem not_surjective_regularWreath_of_quaternionProd
+    (φ : (QuaternionGroup 2 × Multiplicative (ZMod 2)) →*
+      (Multiplicative (ZMod 2) ≀ᵣ Multiplicative (ZMod 2))) :
+    ¬ Function.Surjective φ := by
+  obtain ⟨hcard, hnc, w, v, hwv, hw1, hv1, hw2, hv2⟩ := regularWreathTwo_card_and_involutions
+  exact not_surjective_of_quaternionProd hcard hnc hwv hw1 hv1 hw2 hv2 φ
+
 section /- 10A.3 (後半への準備): 指数が素数の可換部分群 -/
 
 /-- 指数が素数 `p` の部分群は極大: `A ≤ H` なら `H = A` か `H = ⊤`. -/
