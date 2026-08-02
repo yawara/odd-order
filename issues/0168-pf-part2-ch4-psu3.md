@@ -8370,3 +8370,68 @@ E 座標へ落とす段の設計を詰めた結果、`stepTwo_linear` をその�
 ⚠ 実装の下ごしらえ: `d ∈ D` による `↥Q` の共役自己同型 (`conjQByW` の `D` 版) が
 repo に無いなら作る (`conjQByK` と同型の定義; `Q_normal_in_H` + `D_le_H` で well-defined)。
 その後 `MulEquiv.ext` で上の等式を示すだけ。
+
+### (186) 🎯 §4 の (4) が landing — `sectionFour_four_linear`
+
+commit `bb2832468`。新 leaf `PSU3SectionFourCoordinate.lean` (185 行)。
+
+* `sectionFour_conj_eta_of_commute` — `η` が `ζ` と可換 ⟹
+  `(ζ³η)(ζ⁻¹ x ζ)(ζ³η)⁻¹ = ζ²(η x η⁻¹)ζ⁻²`。書籍が `ζ ∈ C_W(P)`・`η ∈ P` を
+  取るのはここで効く。
+* `sectionFour_four_linear` — 書籍 p.133 の **(4)**
+  `a² f(ωs^a)‾ = ζ⁻¹ f(ωs^a)‾^η + ω̄`。
+
+⚠ (182) の設計課題は**両方とも消えた** (実測):
+1. **`hVW : V = W` は不要**。`coord_conj_eq` は元から `hVW` を取らない
+   (`stepTwo_linear` が取るのは `h_inv_eq` 経由で、§4 は
+   `stepOne_chain_of_h_eq_mul` を使うので不要)。`Function.Injective M.mu` も不要。
+2. **(4) の時点では半線形性が要らない**。書籍の `‾^η` を共役
+   `η · f(ωs^a) · η⁻¹` の座標そのままで持てばよい。
+
+### (187) 🎯 半線形性と体自己同型 `μ` — Appendix I Prop 2 を経由しない
+
+新 leaf `PSU3SectionFourSemilinear.lean`。(183) の「山場 = 抽象体 `F` と `M.E` の
+同定」は**回避できた**。
+
+**群レベル (pure group theory)**:
+* `conj_mem_W_of_mem_D` (`D_le_normalizer_W` の元形; `K` 側は既存の
+  `conj_mem_K_of_mem_D` = `StructureOfH/LinearCharacter.lean:58`)
+* `quotientDHom` / `coordConjD` — `D` の `Q ⧸ Z(Q)` 共役作用を `M.coord` で
+  `E` へ移した**加法**自己同型
+* `coordConjD_mu_smul` — **`(μ(κ,v)·e)^d = μ(κ^{d⁻¹}, v^{d⁻¹})·e^d`**。
+  `d((κv)x(κv)⁻¹)d⁻¹ = (dκvd⁻¹)(dxd⁻¹)(dκvd⁻¹)⁻¹` と `D` が `K`,`W` を
+  正規化することだけ。
+* `coordConjD_fixed_of_conj_eq` — 書籍の `ω̄^η = ω̄` (η が ω を中心化)
+
+**体自己同型 `μ` (route B)**: Appendix I Prop 2 の代わりに
+* `addEquiv_mul_mul_eq_of_span` (純代数, `hyp` 非依存) —
+  `F` 部分体 + `z` で `E = F + Fz` なら、「`Ψ(cx)Ψ1 = Ψc Ψx` が `c ∈ F ∪ {z}` で
+  成り立つ」⟹ **全 `x,y` で `Ψ(xy)Ψ1 = Ψx Ψy`**。2 行の計算。
+* `scaledRingEquiv` — `x ↦ Ψx/Ψ1` を `E ≃+* E` に。
+* `z ∉ F` は**既存の** `mu_W_notMem_frobFixed` (`PSU3RootGroupModel.lean:371`,
+  Ch. IV §3 p.131 用) をそのまま使う。⚠ 同名で書きかけたが衝突 —
+  **leaf build は他 leaf との名前衝突を検出しない** (自分の import closure に
+  `PSU3RootGroupModel` が無い)。フルビルドで初めて赤になった。以後 `coordFieldAut`
+  等は `hznot : μ(1,ζ) ∉ F` を仮説に取る形にして重複を消した。
+* `exists_frobFixed_repr` — `|F| = q`, `|E| = q²`, `z ∉ F` の独立性
+  (`eq_zero_of_add_mul_eq_zero`) から `(a,b) ↦ a+bz` が全単射。
+* `coordFieldAut` = **書籍の `μ`**、`coordConjD_mul_eq_coordFieldAut_mul` =
+  `(cx)^η = c^μ x^η` (全 `c ∈ E`)、`coordConjD_eq_coordFieldAut_mul` = `x^η = x^μ·1^η`。
+
+⟹ **(183)(184)(185) の実装プランは不要になった** (`actualKActor` の `η`-共役不変性も
+`exists_field_semilinear` への配線も要らない — 群の元レベルで完結する)。
+
+### (188) 残り: (3) と (5)–(10) の配線
+
+`PSU3SectionFourArithmetic.lean` の (5)〜(10) は**抽象体上で既に完成**
+(`sectionFour_seven_book` / `_eight_book` / `_nine` / `sectionFour_sq_eq_id` /
+`sectionFour_lambda_eq_one` / `eq_one_of_sq_eq_one_of_odd_pow`)。残りは:
+
+1. **(3)** `f(ωs^a)‾ = ζ a⁻² f(ωs^b)‾` — §2 (2) から。`stepTen_quotient_coord` が
+   §3 での同型物なので、それの §4 版。
+2. **(5)** = (4) に (3) を代入 + `coordConjD_mul_eq_coordFieldAut_mul` で
+   `(ζa⁻²)^μ = ζ^μ a^{-2μ}`、`ζ^μ = ζ` (η が ζ を中心化)。
+3. **(6)** = (4) を `b` で。
+4. (7)(8)(9) = 既存の算術補題に `A := a^{2μ}`, `B := b²`, `c := ζ`,
+   `w := ω̄`, `Z := μ(Z₇)` を食わせる。
+5. (10) → `μ² = 1` → `μ = 1` → `η ∈ W` → `h(ω) ∈ W` → §3 Corollary 1 で Ch. IV 完了。

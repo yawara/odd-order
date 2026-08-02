@@ -27,6 +27,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourSemilinear
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -14834,3 +14835,41 @@ of the book is what turns that conjugate into a scalar expression, from (5) onwa
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_conj_eta_of_commute
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_four_linear
+
+/-! **Ch. IV §4: `η` acts semilinearly on `E`** (issue 0168, 2026-08-02).
+`Peterfalvi/Appendices/Suzuki/PSU3SectionFourSemilinear.lean` — Peterfalvi Part II, p. 133:
+"by Proposition 2 of Appendix I, `η` acts as a semilinear mapping on `Q/Q₀ ≅ E`.  Let `μ` denote
+the automorphism of the field `E` associated with `η`."
+
+Conjugation by `d ∈ D` induces an *additive* automorphism `coordConjD` of `E`, and — `D`
+normalizing both `K` and `W` — it intertwines the scalar action of `K W` with that of the
+conjugated pair (`coordConjD_mu_smul`).  That much is pure group theory.
+
+The book's field automorphism `μ` is then obtained without invoking Appendix I, Proposition 2 at
+all: the scalars for which the intertwining relation is known are `μ(K) = F^×` and `μ(1, ζ)`, and
+the latter is assumed to lie outside `F` — which for `ζ ≠ 1` is the existing
+`mu_W_notMem_frobFixed` of Ch. IV §3 — so the two span `E` over `F` (`exists_frobFixed_repr`).
+`addEquiv_mul_mul_eq_of_span` then extends multiplicativity-up-to-`Ψ 1` from those scalars to all
+of `E`, and `scaledRingEquiv` divides by the constant to leave a genuine `E ≃+* E`.  This avoids
+identifying the abstract endomorphism field of Appendix I with the model's `E`. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.addEquiv_mul_mul_eq_of_span
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.addEquiv_mul_eq_scaledRingEquiv_mul
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.addEquiv_eq_scaledRingEquiv_mul_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_mem_W_of_mem_D
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordConjD_coord_val
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordConjD_mu_smul
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordConjD_fixed_of_conj_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_frobFixed_repr
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordConjD_mul_mul_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordConjD_mul_eq_coordFieldAut_mul
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordConjD_eq_coordFieldAut_mul
