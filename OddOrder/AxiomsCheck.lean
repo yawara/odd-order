@@ -15108,3 +15108,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normal_W_subgroupOf_D
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.h_mem_W_of_frobeniusD
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.h_inv_mul_mem_KW_of_stepTwenty

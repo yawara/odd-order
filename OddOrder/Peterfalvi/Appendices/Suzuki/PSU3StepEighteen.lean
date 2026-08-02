@@ -359,6 +359,79 @@ theorem h_inv_mul_mem_KW (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   rw [hinv, o3]
   exact hyp.KW.inv_mem (hyp.conj_t_mem_KW hmid)
 
+/-- **🎯 `h(ω_k⁻¹(0,r)) ∈ K W`** — the book's one-line "Moreover, by (H4)" (Peterfalvi
+Part II, Ch. IV §2, p. 129), in full.
+
+The element the closing Proposition applies (H5) to is `X = ω_k⁻¹(0,r)`, and
+`h_inv_mul_mem_KW` reduces `h(X) ∈ K W` to `h(ω(0,α+r)) ∈ K W`, where `ω(0,α+r)` is what
+the definition of the index `k` conjugates `ω_k(0,r)` from.  Now
+
+  `ω(0,α+r) = (ω(0,α))⁻¹`,
+
+because `(0,r) = ω²` makes `ω⁻¹ = ω(0,r)`; so (H4)'s `h(x⁻¹) = (h(x)^t)⁻¹` moves the
+question to `h(ω(0,α))`.  And `(0,α)` *is* one of the sequence values of (11) — it is the
+stopping value `z_N` of step (15) — so `h_mul_stepElevenSeq_mem_KW` applies.
+
+Every `t`-twist on the way stays inside `K W` (`conj_t_mem_KW`). -/
+theorem h_inv_mul_mem_KW_of_stepTwenty (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) (hhW : h ω ∈ hyp.W)
+    {N : ℕ} (hns : ∀ i < N, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1)
+    (hstop : y * (hyp.stepElevenSeq ζ y N).1 = 1)
+    {ωk ρ c : G} (hωkQ : ωk ∈ hyp.Q) (hωkQ0 : ωk ∉ hyp.Q0)
+    (hρdef : ρ = ω * ω) (hρQ0 : ρ ∈ hyp.Q0) (hcKW : c ∈ hyp.KW)
+    (hrel : ωk * ρ = c⁻¹ * f (ω * (ρ * y)) * c) :
+    h (ωk⁻¹ * ρ) ∈ hyp.KW := by
+  -- the stopping rule says `z_N = y`
+  have hzy : (hyp.stepElevenSeq ζ y N).1 = y := by
+    have hinv : y⁻¹ = (hyp.stepElevenSeq ζ y N).1 := inv_eq_of_mul_eq_one_right hstop
+    have hyy : y⁻¹ = y := by
+      have h2 := hyQ0.1
+      rw [sq] at h2
+      exact inv_eq_of_mul_eq_one_right h2
+    rw [← hinv, hyy]
+  -- `h(ω y) ∈ K W`, `y` being the stopping value of the sequence
+  have hωy : h (ω * y) ∈ hyp.KW := by
+    have := hyp.h_mul_stepElevenSeq_mem_KW H hC2 hζ hωQ hωQ0 hyQ0 hfω hhW N hns
+    rwa [hzy] at this
+  -- `ω(ρ y) = (ω y)⁻¹`, since `ρ = ω²` gives `ω⁻¹ = ω ρ`
+  obtain ⟨hωyQ, hωyQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hyQ0
+  have hωy1 : ω * y ≠ 1 := fun hc => hωyQ0 (hc ▸ hyp.Q0.one_mem)
+  have hρsq : ρ * ρ = 1 := by
+    have hs := hρQ0.1
+    rwa [sq] at hs
+  have hωinv : ω⁻¹ = ω * ρ := by
+    rw [hρdef]
+    rw [hρdef] at hρsq
+    calc ω⁻¹ = ((ω * ω) * (ω * ω)) * ω⁻¹ := by rw [hρsq, one_mul]
+      _ = ω * (ω * ω) := by group
+  have hyinv : y⁻¹ = y := by
+    have h2 := hyQ0.1
+    rw [sq] at h2
+    exact inv_eq_of_mul_eq_one_right h2
+  have hcy : y * ω = ω * y :=
+    (Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hyQ0) ω hωQ).symm
+  have hinvωy : (ω * y)⁻¹ = ω * (ρ * y) := by
+    rw [mul_inv_rev, hyinv, hωinv]
+    calc y * (ω * ρ) = (y * ω) * ρ := by group
+      _ = (ω * y) * ρ := by rw [hcy]
+      _ = ω * (ρ * y) := by
+          have hcρy : y * ρ = ρ * y :=
+            (Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hρQ0) y
+              (hyp.Q0_le_Q hyQ0))
+          rw [mul_assoc, hcρy]
+  -- (H4): `h(x⁻¹) = (h(x)^t)⁻¹`
+  obtain ⟨-, -, o3⟩ := hOne hyp.rankOneSetup H hωyQ hωy1
+  have hz : h (ω * (ρ * y)) ∈ hyp.KW := by
+    rw [← hinvωy, o3]
+    exact hyp.KW.inv_mem (hyp.conj_t_mem_KW hωy)
+  obtain ⟨hωρyQ, hωρyQ0⟩ :=
+    hyp.mul_mem_sdiff_Q0 hωQ hωQ0 (hyp.Q0.mul_mem hρQ0 hyQ0)
+  exact hyp.h_inv_mul_mem_KW H hωkQ hωkQ0 hρQ0 hωρyQ
+    (fun hc => hωρyQ0 (hc ▸ hyp.Q0.one_mem)) hcKW hrel hz
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.Appendices.Suzuki
