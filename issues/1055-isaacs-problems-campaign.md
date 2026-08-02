@@ -220,14 +220,17 @@ repo に `p`-length の定義が無かったので新設。
 ⚠ `NilpotentInjector/PiParts.lean` の `exists_isHallPart` / `isHallPart_nilPiPart` /
 `le_nilPiPart_of_isPiGroup` は環境の `[IsSolvable G]` から **`[IsSolvable ↥N]` に緩和**
 (3D.2 で `G` に可解性が無いため)。既存の呼び出しは instance 解決でそのまま通る。
-- [ ] Ch.4 Commutators
+- [x] **Ch.4 Commutators** — **🎉 完済 (実測 2026-08-02)**: 4A.1–13 / 4B.1–5 / 4C.1–3 /
+      4D.1–7 の全 28 問が `Ch04_Commutators/Problems*.lean` に anchored、実 sorry ゼロ
+      (コメント除去して計測)。チェックが外れたままだっただけ。
 - [x] Ch.5 Transfer — **🎉 完済 (2026-07-27)**: §5A–§5E 全問
 - [x] Ch.6 Frobenius Actions — **🎉 完済 (2026-07-27)**: §6A (11 問) / §6B (9 問) / §6C (2 問) 全問
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
-- [ ] Ch.8 Permutation Groups — **進行中 (2026-07-28)**: §8A (8A.1–8A.17) 完済 /
-      §8B は 8B.1–8B.10 完了 (8B.6 の `D₂ₚ` 同型のみ残) /
-      §8C は 8C.1–8C.5 完了, 8C.6 は「⟸」の `|A| = 3` のみ /
+- [ ] Ch.8 Permutation Groups — **残り 8C.6 のみ (実測 2026-08-02)**: §8A (8A.1–8A.17) 完済 /
+      §8B は **8B.1–8B.10 完済** (8B.6 の `D₂ₚ` 同型も
+      `Problems8B/DihedralStructure.lean` で完結済 — 旧注記が stale だった) /
+      §8C は 8C.1–8C.5 完済、**8C.6 は「⟸」の `|A| = 3` のみ** /
       §8D は **🎉 8D.1–8D.6 全問完済 (2026-07-28)**
 - [ ] Ch.9 More Subnormality
 - [ ] Ch.10 More Transfer
@@ -7148,3 +7151,36 @@ statement 再確認 (p. 308): `|Z(P)| = p`, `A` abelian, `|P:A| = p`, `Z(P)` は
 ⟹ **「ChatGPT 行き」とされていた難問 3 件 (9C.3 / 9D.4 / 10A.3 後半) はすべて
 Fable 5 単独で解決** (9C.3 は形式化まで完了; 9D.4 / 10A.3 後半は紙の証明を本 issue に
 記録済、形式化は文書順 9D.4 → 10A.3)。
+
+## 8C.6 の残り = `Aut(E)` の Iwasawa 構造 (2026-08-02 に設計確定)
+
+**Problem 8C.6** (p. 257、原文確認済):
+
+> Let `A` be an abelian group.  Show that `Aut(A)` is simple if and only if `A` has order
+> 3 or `A` is an elementary abelian 2-group of order at least 8.
+
+現状 = `Problems8C/AbelianAut.lean` の `isSimpleGroup_mulAut_of_card_eq_three` (`|A| = 3` 側)。
+
+### 残り (a) 「⟸」その 2: `E` 初等可換 2-群, `|E| ≥ 8` ⟹ `Aut(E)` 単純
+
+**判定器は mathlib に在る** (2026-08-02 実測、[issue 9505](9505-iwasawa-simplicity-criterion.md)):
+`MulAction.IwasawaStructure` + `IwasawaStructure.isSimpleGroup`
+(`Mathlib/GroupTheory/GroupAction/Iwasawa.lean`)。⚠ repo の
+`isSimpleGroup_of_isPerfect_of_isQuasiPreprimitive_of_isSolvable_stabilizer` は
+**点安定化群が可解**を要求するので `GL(n,2)` (`n ≥ 4`) では使えない — mathlib 版を使う。
+
+⟹ 組むべきは `Aut(E)` の Iwasawa 構造。**`GL(n,2)` との同型を経由せず `E` 上で内在的に**
+やるのが安い (`E` は `ZMod 2`-ベクトル空間; repo に `GroupTheory/ElementaryAbelian.lean`):
+
+| 要る部品 | 内容 |
+|---|---|
+| 作用 | `Aut(E)` が `Ω = {x : E // x ≠ 1}` に作用、**faithful** |
+| 準原始性 | `Ω` 上 2-推移的 (𝔽₂ 上は相異なる非零ベクトル 2 本が常に一次独立 + 基底延長) ⟹ preprimitive ⟹ `IsQuasiPreprimitive` |
+| `T v` | 中心 `v` の transvection 群 `{φ_f : x ↦ x · v^{f x} \| f : E →+ ZMod 2, f v = 0}` — 可換、`T (g • v) = conj g • T v` |
+| `is_generator` | transvection が `GL(n,2)` を生成 (`iSup T = ⊤`) |
+| perfect | `commutator (Aut E) = ⊤` (`n ≥ 3`) |
+
+### 残り (b) 「⟹」
+
+`A` 可換で `Aut(A)` 単純 ⟹ `|A| = 3` または `A` 初等可換 2-群で `|A| ≥ 8`。
+`A` を素数冪成分に分解して `Aut` が直積になることを使う。(a) の後で。
