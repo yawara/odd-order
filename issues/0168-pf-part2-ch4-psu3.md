@@ -8893,3 +8893,35 @@ top-level 定理では仮説として持つのが honest。
 
 **残り = top-level 定理のみ**。仮説は `hcent` と `hS` の 2 つ
 (書籍が structure of PSU(3,ℓ) から読み取る部分) + 周囲の standing data。
+
+### (209) top-level 定理の完全レシピ (最後の未確認リンクも実測で確定)
+
+最後の未確認だった「step (3) が要求する `ζ̄ ∈ W̄, ζ̄ ≠ 1`」は
+**`exists_ne_one_mem_W_intrinsicResidualQuotient`**
+(`PSU3SectionFourIntrinsic.lean:932`) がそのまま供給する。
+
+⟹ 組立て手順 (すべて既存 + 本セッションの補題):
+```
+obtain ⟨result, data, ⟨details⟩⟩ := nonempty_psu3Data_sectionFour s4 hZ hQsuz hCop hSolv hP hA3 hord ih
+obtain ⟨ω₀, hω₀Q, hω₀Q0, hω₀fix⟩ := s4.exists_fixed_not_mem_Q0 hZ hCop hSolv   -- Glauberman
+have hZD := center_residualImage_le_subgroupOf_D s4 hω₀Q … (ω₀ の位数は 2 冪)
+have hCQ := centralizer_cQ_isPGroup_of_quotient …
+obtain ⟨ζ̄, hζ̄W, hζ̄1⟩ := exists_ne_one_mem_W_intrinsicResidualQuotient details s4.P_le_D s4.t_mem_centralizer hCQ hZD
+obtain ⟨z, x, hzD, hxQ, hxQ0, hfx, c, hcZ, hkx⟩ :=
+  exists_f_eq_conj_inv_residual H s4.P_le_V hX details … ih ζ̄ hζ̄W hζ̄1
+obtain ⟨p, hp, ζ, hζW, hζC, hzpζ⟩ := SectionFourSetup.exists_refined_zeta hyp s4 hcent (z ∈ V) (z ∈ U)
+have hηP : (c : G) ∈ s4.P := eq_P_of_centralizes …            -- hS を使う
+exact sectionFour_mem_W H hC2 M sfive hZ hm hQ0card
+  (s4.eight_lt_natCard_Q0 hl ▸ hQ0card) hζW hxQ hxQ0 (x*x ∈ Q0) rfl
+  (hfx を conj_inv_eq_of_commute で ζ 版に) (hηζ) (hkx を cube_mul_eq_of_commute で)
+  (conj_t_eq_of_mem_center) hηD hηV (hηω) hznot (pow_odd_eq_one_of_mem_P hηP)
+```
+
+**⚠ 実測で分かった簡略化 2 つ**:
+* `hηω : η ω η⁻¹ = ω` は `η ∈ P` 経由でなく **`η ∈ Z(U)` と `x ∈ U`** から直接出る
+  (step (3) の `x` は `U` の中にある)。
+* `htη` も同様に `η ∈ Z(U)`, `t ∈ U` から (`conj_t_eq_of_mem_center`)。
+  `η ∈ P` が要るのは `hηord` (奇数位数) と `hηζ` (ζ ∈ C_W(P) との可換性) だけ。
+
+**追加で要りそうなもの**: `x² ∈ Q₀` (= `Q/Q₀` が基本可換)。
+`hZ : Z(Q) = Q₀` + `LemmaFiveSetup.isplit` 系にあるはず (要 grep)。
