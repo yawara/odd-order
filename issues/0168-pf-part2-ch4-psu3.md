@@ -8925,3 +8925,19 @@ exact sectionFour_mem_W H hC2 M sfive hZ hm hQ0card
 
 **追加で要りそうなもの**: `x² ∈ Q₀` (= `Q/Q₀` が基本可換)。
 `hZ : Z(Q) = Q₀` + `LemmaFiveSetup.isplit` 系にあるはず (要 grep)。
+
+### (210) 残る 2 つの入力を確定 — `x² ∈ Q₀` は既存、`ζ ≠ 1` は要 threading
+
+* `x² ∈ Q₀` = 既存の `sq_mem_Q0_of_lemmaFiveSetup` (`PSU3BarOrbit.lean:395`、
+  `sfive : LemmaFiveSetup m` から)。✅
+* ⚠ **`ζ ≠ 1`** (⟹ `hznot` via `mu_W_notMem_frobFixed`) は自動でない。
+  書籍は `ζ₁ ∈ (V ∩ U) − (P ∩ U)` と**選ぶ**ことで保証しており
+  (`|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` が根拠、p.133)、
+  repo の step (3) は任意の `ζ̄ ∈ W̄^#` から `z` を作るだけなので
+  `z ∉ P` (⟺ `ζ ≠ 1`) は別に供給が要る。
+  ⟹ top-level では `hz : z ∉ s4.P` 相当を仮説に持つか、
+  `exists_ne_one_mem_W_centralizer` (= `C_W(P) ≠ 1`, 既存) から
+  `ζ₁` を選び直す経路を作る。
+
+**⟹ §4 top-level の入力は出そろった**:
+既存 standing data + `hcent` + `hS` + `hl` (ℓ > 2) + `ζ ≠ 1` の供給。
