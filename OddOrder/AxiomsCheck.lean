@@ -15000,6 +15000,8 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.SectionFourSetup.exists_refined_zeta
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.SectionFourSetup.mem_W_of_stepThree
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.conj_inv_eq_of_commute
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.cube_mul_eq_of_commute

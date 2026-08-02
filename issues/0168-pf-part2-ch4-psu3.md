@@ -8941,3 +8941,23 @@ exact sectionFour_mem_W H hC2 M sfive hZ hm hQ0card
 
 **⟹ §4 top-level の入力は出そろった**:
 既存 standing data + `hcent` + `hS` + `hl` (ℓ > 2) + `ζ ≠ 1` の供給。
+
+### (211) 🎯🎯🎯 **step (3) の出力から `k x ∈ W` まで通った**
+
+`SectionFourSetup.mem_W_of_stepThree` — step (3) が出す
+`ζ₁ ∈ (V∩U) − (P∩U)`, `x ∈ (Q−Q₀)∩U` with `f x = x^{-ζ₁}`,
+`η ∈ Z(U) ⊆ P` with `k x = ζ₁³η` から **§4 の結論 `k x ∈ W`** を出す。
+
+* `exists_refined_zeta` ((208)) で `ζ₁ = p ζ` (`ζ ∈ C_W(P)`)
+* `f x = x^{-ζ}` — `p` は `x ∈ U ≤ C(P)` を中心化 (`conj_inv_eq_of_commute`)
+* `k x = ζ³ η'` (`η' := p³η`) — `p` は `ζ ∈ C_W(P)` と可換
+  (`cube_mul_eq_of_commute`)
+* `η' ∈ P` / `t η' t = η'` (`t ∈ C(P)` と `η ∈ Z(U)`) /
+  `η'ζ = ζη'` / `η' x η'⁻¹ = x` / 奇数位数 — すべて出る
+* `hq` = `eight_lt_natCard_Q0`、`hznot` = `mu_W_notMem_frobFixed` (要 `ζ ≠ 1`
+  ⟸ `ζ₁ ∉ P`)、`y = x²∈ Q₀` = `sq_mem_Q0_of_lemmaFiveSetup`
+* ⟹ `sectionFour_mem_W` が適用でき `η' ∈ W`、`k x = ζ³η' ∈ W`
+
+**残りは step (3) を呼ぶ最外殻だけ** — `nonempty_psu3Data_sectionFour` +
+`exists_ne_one_mem_W_intrinsicResidualQuotient` +
+`exists_f_eq_conj_inv_residual` を繋ぎ、`ζ₁ ∉ P` を供給する。

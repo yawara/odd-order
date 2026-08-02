@@ -65,6 +65,8 @@ membership facts it needs on the model:
 * `conj_inv_eq_of_commute`, `cube_mul_eq_of_commute` — the book's refinement
   `ζ₁ ∈ ζ P` (p. 133): `ω^{ζ₁} = ω^ζ` and `ζ₁³ P = ζ³ P`.
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
+* `Hypothesis.SectionFourSetup.mem_W_of_stepThree` — **🎯🎯🎯 the same from step (3)'s
+  output**, with the `ζ₁ ∈ ζ P` refinement carried out.
 -/
 
 set_option autoImplicit false
@@ -1018,6 +1020,107 @@ theorem sectionFour_mem_W {f g k : G → G}
   refine ⟨hηW, ?_⟩
   rw [hkω]
   exact hyp.W.mul_mem (pow_mem hζ 3) hηW
+
+include hyp in
+/-- **🎯🎯🎯 Peterfalvi Part II, Ch. IV §4 from step (3)'s output** (pp. 133–134).
+
+Step (3) produces `ζ₁ ∈ (V ∩ U) − (P ∩ U)`, an `x ∈ (Q − Q₀) ∩ U` with
+`f(x) = x^{-ζ₁}`, and an `η ∈ Z(U) ⊆ P` with `k(x) = ζ₁³ η`.  This theorem turns that
+into the section's conclusion `k(x) ∈ W`.
+
+The refinement `ζ₁ = p ζ` with `ζ ∈ C_W(P)` (`exists_refined_zeta`) rewrites both:
+`f(x) = x^{-ζ}` because `p` centralizes `x ∈ U ≤ C_G(P)`, and `k(x) = ζ³ (p³ η)` because
+`p` commutes with `ζ ∈ C_W(P)`.  The new conjugator `η' = p³ η` again lies in `P`, is
+centralized by `t ∈ C_G(P)` and by `ζ`, and centralizes `x`; so `sectionFour_mem_W`
+applies and gives `η' ∈ W`, whence `k(x) = ζ³ η' ∈ W`. -/
+theorem SectionFourSetup.mem_W_of_stepThree (s4 : hyp.SectionFourSetup) {f g k : G → G}
+    (H : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g k)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (M : hyp.QuotientFieldModel m) (sfive : hyp.LemmaFiveSetup m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hmu : Function.Injective M.mu)
+    (hl : 2 < Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))))
+    (hcent : hyp.V ⊓ residualImage (G := G) s4.P ≤ Subgroup.centralizer
+      (((hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) : Subgroup G) : Set G))
+    {ζ₁ x η : G}
+    (hζ₁V : ζ₁ ∈ hyp.V) (hζ₁U : ζ₁ ∈ residualImage (G := G) s4.P)
+    (hζ₁P : ζ₁ ∉ s4.P)
+    (hxQ : x ∈ hyp.Q) (hxQ0 : x ∉ hyp.Q0) (hxU : x ∈ residualImage (G := G) s4.P)
+    (hfx : f x = ζ₁⁻¹ * x⁻¹ * ζ₁)
+    (hηU : η ∈ residualImage (G := G) s4.P)
+    (hηc : (⟨η, hηU⟩ : ↥(residualImage (G := G) s4.P))
+      ∈ Subgroup.center ↥(residualImage (G := G) s4.P))
+    (hηP : η ∈ s4.P) (hkx : k x = ζ₁ ^ 3 * η) :
+    k x ∈ hyp.W := by
+  classical
+  haveI : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
+  haveI : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
+  obtain ⟨p, hp, ζ, hζW, hζC, hζ₁eq⟩ :=
+    SectionFourSetup.exists_refined_zeta hyp s4 hcent hζ₁V hζ₁U
+  -- `ζ ≠ 1`, else `ζ₁ = p ∈ P`
+  have hζ1 : ζ ≠ 1 := by
+    intro hc
+    exact hζ₁P (by rw [hζ₁eq, hc, mul_one]; exact hp)
+  -- `p` centralizes `x ∈ U ≤ C_G(P)` and commutes with `ζ ∈ C_W(P)`
+  have hxC : x ∈ Subgroup.centralizer ((s4.P : Set G)) := residualImage_le_centralizer hxU
+  have hpx : p * x = x * p := Subgroup.mem_centralizer_iff.mp hxC p hp
+  have hpζ : p * ζ = ζ * p := Subgroup.mem_centralizer_iff.mp hζC p hp
+  -- the rewritten `f` and `k`
+  have hfζ : f x = ζ⁻¹ * x⁻¹ * ζ := by
+    rw [hfx, hζ₁eq]
+    exact conj_inv_eq_of_commute hpx
+  have hkζ : k x = ζ ^ 3 * (p ^ 3 * η) := by
+    rw [hkx, hζ₁eq]
+    exact cube_mul_eq_of_commute hpζ
+  -- the new conjugator `η' = p³ η`
+  set η' := p ^ 3 * η with hη'def
+  have hη'P : η' ∈ s4.P := s4.P.mul_mem (pow_mem hp 3) hηP
+  have hη'V : η' ∈ hyp.V := s4.P_le_V hη'P
+  have hη'D : η' ∈ hyp.D := s4.P_le_D hη'P
+  -- `t` centralizes `P` and `Z(U)`
+  have htp : hyp.t * p = p * hyp.t :=
+    (Subgroup.mem_centralizer_iff.mp s4.t_mem_centralizer p hp).symm
+  have htη : hyp.t * η * hyp.t = η :=
+    hyp.conj_t_eq_of_mem_center
+      (mem_residualImage_of_orderOf_eq_two_pow (G := G) s4.t_mem_centralizer (n := 1)
+        (by rw [pow_one]; exact orderOf_eq_prime hyp.t_sq hyp.t_ne_one)) hηU hηc
+  have htη' : hyp.t * η' * hyp.t = η' := by
+    have htp3 : hyp.t * p ^ 3 = p ^ 3 * hyp.t := (Commute.pow_right (htp : Commute hyp.t p) 3).eq
+    calc hyp.t * η' * hyp.t = p ^ 3 * (hyp.t * η * hyp.t) := by
+          rw [hη'def, ← mul_assoc, htp3]; group
+      _ = η' := by rw [htη]
+  -- `η'` commutes with `ζ` and centralizes `x`
+  have hηζ : η * ζ = ζ * η := Subgroup.mem_centralizer_iff.mp hζC η hηP
+  have hη'ζ : η' * ζ = ζ * η' := by
+    calc η' * ζ = p ^ 3 * (η * ζ) := by rw [hη'def]; group
+      _ = p ^ 3 * (ζ * η) := by rw [hηζ]
+      _ = (p ^ 3 * ζ) * η := by group
+      _ = (ζ * p ^ 3) * η := by rw [(Commute.pow_left (hpζ : Commute p ζ) 3).eq]
+      _ = ζ * η' := by rw [hη'def]; group
+  have hηx : η * x = x * η := by
+    have hz := Subgroup.mem_center_iff.mp hηc ⟨x, hxU⟩
+    exact (congrArg Subtype.val hz).symm
+  have hη'x : η' * x * η'⁻¹ = x := by
+    have hp3x : p ^ 3 * x = x * p ^ 3 := (Commute.pow_left (hpx : Commute p x) 3).eq
+    calc η' * x * η'⁻¹ = p ^ 3 * (η * x) * η'⁻¹ := by rw [hη'def]; group
+      _ = p ^ 3 * (x * η) * η'⁻¹ := by rw [hηx]
+      _ = (p ^ 3 * x) * (η * η'⁻¹) := by group
+      _ = (x * p ^ 3) * (η * η'⁻¹) := by rw [hp3x]
+      _ = x * (p ^ 3 * η * η'⁻¹) := by group
+      _ = x := by rw [← hη'def, mul_inv_cancel, mul_one]
+  -- the remaining numeric inputs
+  have hq : 8 < 2 ^ m := by
+    rw [← hQ0card]
+    exact SectionFourSetup.eight_lt_natCard_Q0 hyp s4 hl
+  have hznot := hyp.mu_W_notMem_frobFixed M hmu
+    (show (⟨ζ, hζW⟩ : ↥hyp.W) ≠ 1 from fun hc => hζ1 (congrArg Subtype.val hc))
+  obtain ⟨j, hj⟩ := SectionFourSetup.pow_odd_eq_one_of_mem_P hyp s4 hη'P
+  obtain ⟨hη'W, hkW⟩ := hyp.sectionFour_mem_W H hC2 M sfive hZ hm hQ0card hq hζW hxQ hxQ0
+    (hyp.sq_mem_Q0_of_lemmaFiveSetup sfive hxQ) rfl hfζ hη'ζ hkζ htη' hη'D hη'V hη'x
+    hznot hj
+  exact hkW
 
 end Hypothesis
 
