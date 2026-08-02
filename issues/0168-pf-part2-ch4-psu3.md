@@ -7702,3 +7702,36 @@ commit `943afd971`。書籍 p.129 の Proposition 前半が Lean に:
    (`ω y = ω·ω² = ω³ = ω⁻¹`、`ω⁴ = 1` ゆえ)。
 
 これが済めば **`hsq` が消え、段 (2) の残債はゼロ**になる。
+
+### (158) 🎯 `hsq` 消滅 — 段 (2) の §2 側の残債はゼロに
+
+commit `e02a85891`。`corollaryTwo_of_isStandardModel_of_closing` を新設し、base pair を
+§2 の閉じの Proposition から直接供給するようにした。
+
+* 旧 `..._of_normalization` の `hsq` は**全称**形だったが、書籍が主張するのは**存在**形
+  (repo 側の特殊化債務だった)。新版はそれを取らない。
+* `ζ₀` も引数から外し、内部で `W` の生成元を選ぶ (書籍の選択)。代わりに
+  `hWcyc : IsCyclic ↥W` が入るが、これは `hWdvd` と**同じ補題**
+  (`isCyclic_W_and_card_dvd_of_orderThree`) が同時に返すので新たな債務ではない。
+* 補助 `sq_mem_Q0_of_lemmaFiveSetup` (`Q` の平方は `Q₀`)。
+
+**endpoint の現在の仮説** (`corollaryTwo_of_isStandardModel_of_closing`):
+`H`/`hC2`/`sfive`/`M`/`hZc`/`hmu`/`hVW`/`hm`/`hQ0card`/`hcardQ`/`hcard (3 ≤ |F|)`/
+`hKcard`/`hWdvd`/`hW1`/**`hWcyc`**/`hfQ`/`hhW`/`x₀`/`hmodel`/`ζ`。
+⟹ **§2 由来の未証明仮説はもう無い**。
+
+### ⚠ 次セッションはここから — Ch. IV §4 段 (2) の配線
+
+`isStandardModel_residualQuotient` (`PSU3SectionFourCorollaryTwo.lean`) が
+`U/Z(U)` 上のモデルを出すので、そこに `..._of_closing` を当てるのが段 (2) の完成。
+過去の実測 ((133)(136)(141)(142)、本 issue の表) では残り仮説はすべて
+「導出可・未接続」= **新規数学でなく配線**:
+
+* `hfQ` — `exists_fgh_mapsTo` (本ファイル) / `Setup.exists_fgh_one`
+* `hhW` — `h_mem_W` 経由 (`hVW`/`hWdvd`/`hZc`/`hmu` から)
+* `hWdvd` + **`hWcyc`** — `isCyclic_W_and_card_dvd_of_orderThree` が同時に返す
+* `hW1` — `exists_ne_one_mem_quotient_W`
+* 数値系 (`hm`/`hQ0card`/`hcardQ`/`hKcard`/`hcard`) — 内在版で既出 ((141)(142))
+
+⚠ `hcard : 3 ≤ |F|` は (143) で「θ が奇位数」へ置換済の側の話と混同しないこと
+(こちらは `θ|_F = 1` 分岐が要求する 3 元)。
