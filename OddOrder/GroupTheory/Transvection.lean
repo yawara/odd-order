@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Module.Equiv.Basic
 import Mathlib.Tactic.Abel
+import Mathlib.Tactic.Module
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.LinearAlgebra.Matrix.Transvection
 import Mathlib.LinearAlgebra.Matrix.ToLin
@@ -35,6 +36,8 @@ subgroups by the points of the action — here the non-zero vectors — and requ
 * `LinearMap.transvectionSubgroup_map_conj` — `T (g v) = g (T v) g⁻¹`.
 * `LinearMap.toMatrix_transvection` — the matrix of `transvection (B i) (c • B.coord j)` in
   the basis `B` is mathlib's `Matrix.transvection i j c`.
+* `LinearMap.commutator_transvection` — `⁅t_{v,f}, t_{w,g}⁆ = t_{w, -(g v) • f}` when `f`
+  kills both centres and `g` kills its own; the route to perfectness of the linear group.
 * `LinearMap.iSup_transvectionSubgroup_eq_top` — **over `𝔽₂` the transvections generate**,
   Iwasawa's `is_generator`.  Mathlib's Gaussian elimination
   (`Matrix.diagonal_transvection_induction_of_det_ne_zero`) writes any invertible matrix in
@@ -152,6 +155,37 @@ theorem transvectionSubgroup_map_conj (g : V ≃ₗ[R] V) (v : V) :
     change g * transvection v f hf * g⁻¹ ∈ _
     rw [conj_transvection]
     exact transvection_mem _ _ _
+
+/-- **The commutator of two transvections is a transvection** (Iwasawa's route to
+perfectness).
+
+If `f` kills both centres and `g` kills its own centre `w`, then
+
+  `⁅t_{v,f}, t_{w,g}⁆ = t_{w, -(g v) • f}`.
+
+Evaluating at `x`, the four factors telescope: `b⁻¹` subtracts `g x • w`, `a⁻¹` then
+subtracts `f x • v` (the `g x • w` term dies because `f w = 0`), `b` adds back
+`(g x − f x · g v) • w` (using `g w = 0`), and `a` adds back `f x • v` (using `f v = 0`
+and `f w = 0`).  What survives is `−f x · g v` in the direction `w`.
+
+Taking `g v = 1` — possible as soon as `v` and `w` are independent — exhibits *every*
+transvection with centre `w` as a commutator, which is what makes the linear group
+perfect once the dimension is at least `3` (one needs `v ∈ ker f`, `v ≠ 0`, `v ≠ w`). -/
+theorem commutator_transvection {v w : V} {f g : V →ₗ[R] R}
+    (hfv : f v = 0) (hfw : f w = 0) (hgw : g w = 0) :
+    (transvection v f hfv) * (transvection w g hgw) * (transvection v f hfv)⁻¹ *
+        (transvection w g hgw)⁻¹
+      = transvection w (-(g v) • f) (by simp [hfw]) := by
+  ext x
+  have hinvf : ∀ y : V, (transvection v f hfv)⁻¹ y = y - f y • v := fun _ => rfl
+  have hinvg : ∀ y : V, (transvection w g hgw)⁻¹ y = y - g y • w := fun _ => rfl
+  change (transvection v f hfv)
+      ((transvection w g hgw)
+        ((transvection v f hfv)⁻¹ ((transvection w g hgw)⁻¹ x))) = x + (-(g v) * f x) • w
+  rw [hinvg, hinvf]
+  simp only [transvection_apply, map_add, map_sub, map_smul, smul_eq_mul, hfv, hfw, hgw,
+    mul_zero, add_zero, sub_zero, zero_smul]
+  module
 
 section Coordinates
 
