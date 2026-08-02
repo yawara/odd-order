@@ -7915,3 +7915,19 @@ commit `5a294fc66`。(161) の読み通り、`ω⁻¹` 側で `h_inv_eq` を回�
 
 ⚠ この後さらに内在 ULift 版 (`intrinsicResidualQuotientULift`) へ移す必要がある
 ((141) の四つ組照合同型)。書籍の `f₁`,`h₁` は内在版に対応するため。
+
+### (164) 🎯🎯 Ch. IV §4 段 (2) が landing — `corollaryTwo_residualQuotient`
+
+commit `62eb97427`。(163) のレシピどおりで**初回ビルド green**。
+
+> `∀ ζ ∈ W^#`, `∃ f₁ g₁ h₁`, `IsFGH … ∧ ∃ ω ∈ Q − Q₀`, `f₁ ω = ζ⁻¹ω⁻¹ζ ∧ h₁ ω = ζ³`
+> (`hyp.residualQuotientHypothesis details` 上で)
+
+書籍 p.133 の段 (2)「§2 と §3 を `U` 相対で走らせる」の結論。**未証明仮説ゼロ**
+(`hpair`(154) → `hsq`(158) → `hhW`(162) の返済がここで効いた)。
+
+**残り**: 内在 ULift 版 (`intrinsicResidualQuotientULift`) への移送。書籍の `f₁`,`h₁` は
+`U ∩ H`, `U ∩ Q`, `U ∩ D`, `t` の像に関する写像なので、四つ組照合同型 ((141)
+`exists_mulEquiv_match_residualQuotient_t`) で `corollaryTwo_residualQuotient` の結論を
+移せばよい。`IsFGH` と結論はどちらも群同型で移送可能な形なので、
+**`Hypothesis.ofMulEquivPullback` 系の移送補題を 1 本足す**のが筋。
