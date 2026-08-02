@@ -534,6 +534,31 @@ theorem normal_of_le_centralizer (hsup : S ⊔ N = ⊤)
   rw [hrw]
   exact S.mul_mem (S.mul_mem ht hn) (S.inv_mem ht)
 
+/-- `T ◁ S` かつ `S` が Kegel の仮説をみたすなら `T` も.
+
+`(P ∩ S)` は `↥S` の Sylow (Kegel) なので, Lemma 9.31 の normal 段
+(`not_dvd_relIndex_inf_of_normal`) を `↥S` の中で `T.subgroupOf S` に当てればよい
+(`(P ∩ S) ∩ T = P ∩ T`). -/
+theorem KegelHypothesis.normalInSubgroup {T : Subgroup G} (hKS : KegelHypothesis S)
+    (hTS : T ≤ S) (hTnormal : (T.subgroupOf S).Normal) : KegelHypothesis T := by
+  intro p hp P
+  haveI := hp
+  haveI := hTnormal
+  have hPS_pg : IsPGroup p ↥(((P : Subgroup G) ⊓ S).subgroupOf S) :=
+    (P.isPGroup'.of_injective (Subgroup.inclusion inf_le_left)
+      (Subgroup.inclusion_injective _)).comap_subtype
+  have hPS_idx : ¬ p ∣ (((P : Subgroup G) ⊓ S).subgroupOf S).index := by
+    have := hKS p hp P
+    rwa [Subgroup.relIndex] at this
+  have hnorm := not_dvd_relIndex_inf_of_normal (T.subgroupOf S) (hPS_pg.toSylow hPS_idx)
+  rw [IsPGroup.toSylow_coe] at hnorm
+  have hmeet : ((P : Subgroup G) ⊓ S).subgroupOf S ⊓ T.subgroupOf S
+      = ((P : Subgroup G) ⊓ T).subgroupOf S := by
+    ext x
+    simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf]
+    exact ⟨fun h => ⟨h.1.1, h.2⟩, fun h => ⟨⟨h.1, hTS h.2⟩, h.2⟩⟩
+  rwa [hmeet, Subgroup.relIndex_subgroupOf hTS] at hnorm
+
 end Retraction
 
 /-! ## 冪零な極小正規部分群は基本可換 `p`-群 -/
@@ -670,6 +695,33 @@ theorem isSimpleGroup_of_isKegelMinimalCounterexample : IsSimpleGroup G := by
   exact hmc.not_isSubnormal
     (isSubnormal_of_pow_eq_one hmc.kegel (hmc.inf_eq_bot hN hNtop)
       (hmc.sup_eq_top (N := N) hN.2.1) hpN)
+
+/-- **9D.4 の第二段**: 極小反例の `S` は単純.
+
+`T ◁ S` が真なら `KegelHypothesis.normalInSubgroup` で `(G, T)` も Kegel の仮説をみたし,
+`|T| < |S|` から極小性で `T ◁◁ G`. `G` は単純なので `T = ⊥` か `⊤`; `T ≤ S ≠ ⊤` より
+`T = ⊥`. -/
+theorem isSimpleGroup_subgroup_of_isKegelMinimalCounterexample : IsSimpleGroup ↥S := by
+  haveI : IsSimpleGroup G := isSimpleGroup_of_isKegelMinimalCounterexample hmc
+  haveI : Nontrivial ↥S := S.nontrivial_iff_ne_bot.mpr hmc.ne_bot
+  refine { eq_bot_or_eq_top_of_normal := fun T' hT' => ?_ }
+  by_contra hcon
+  have hT'top : T' ≠ ⊤ := fun h => hcon (Or.inr h)
+  have hT'bot : T' ≠ ⊥ := fun h => hcon (Or.inl h)
+  have hTS : T'.map S.subtype ≤ S := Subgroup.map_subtype_le T'
+  have hTsub : (T'.map S.subtype).subgroupOf S = T' := by
+    rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective S.subtype_injective]
+  haveI : ((T'.map S.subtype).subgroupOf S).Normal := by rw [hTsub]; exact hT'
+  have hcardT : Nat.card ↥(T'.map S.subtype) = Nat.card ↥T' :=
+    (Nat.card_congr (Subgroup.equivMapOfInjective T' S.subtype S.subtype_injective).toEquiv).symm
+  have hlt : Nat.card ↥T' < Nat.card ↥S := card_lt_card_of_ne_top hT'top
+  have hsn : (T'.map S.subtype).IsSubnormal :=
+    hmc.2.2 _ (by omega) (hmc.kegel.normalInSubgroup hTS ‹_›)
+  rcases Subgroup.IsSubnormal.eq_bot_or_top_of_isSimpleGroup ‹IsSimpleGroup G› hsn with h | h
+  · refine hT'bot ?_
+    rw [← hTsub, h]
+    simp [Subgroup.subgroupOf]
+  · exact hmc.ne_top (top_le_iff.mp (h ▸ hTS))
 
 end MinimalNormal
 
