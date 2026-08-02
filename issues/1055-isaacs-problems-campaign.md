@@ -7212,6 +7212,24 @@ step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可
 
 ⟹ 元の「`N` 可換 / 非可換」の場合分けは **`F(G) ⊓ N = ⊥` / `N ≤ F(G)`** に置き換わる。
 
+## 次の frontier = 10A.3 後半 (2026-08-03 時点の Lean 側の入口)
+
+紙の証明は本 issue「10A.3 後半 (A は基本可換) 解決」節が正本。Lean 側:
+
+* 既存の前半 = `Ch10.exists_injective_hom_regularWreath_of_center_isComplement`
+  (`Ch10_MoreTransfer/Problems10A.lean` §10A.3)。⚠ この statement は **`A` の可換性を
+  仮定していない** (docstring は「可換部分群」と書いているが hypothesis に無い) ので、
+  後半は `[IsMulCommutative ↥A]` (または `hAcomm`) を明示的に足した**別 theorem**で書く。
+* 必要な段:
+  1. `A ◁ P` (指数 `p` = `p`-群の最小素因数 ⟹
+     `Subgroup.normal_of_index_eq_minFac_card`)、および `A` は極大
+     (`A ≤ H ≤ P` で `[P:A] = [P:H][H:A] = p` 素数)。
+  2. `u ∈ P ∖ A` を取り `P = ⟨A, u⟩` ⟹ **`C_A(u) = Z(P)`**。
+  3. `A = Z(P) × K` と `|Z(P)| = p` から `(zk)^p = k^p` ⟹ **`A^p ≤ K`**。
+  4. `A^p ≠ 1` と仮定。`A ◁ P` かつ `p` 乗は共役と可換なので `A^p` は `u`-不変。
+     `p`-群 `⟨u⟩` の非自明 `p`-群 `A^p` への作用は非自明な固定点 `z ≠ 1` をもつ。
+  5. `z ∈ C_A(u) = Z(P)` かつ `z ∈ A^p ≤ K` ⟹ `z ∈ Z(P) ⊓ K = 1` で矛盾。
+
 ## 🎉 9D.4 完済 (2026-08-03) — Ch.9 完済
 
 ```
