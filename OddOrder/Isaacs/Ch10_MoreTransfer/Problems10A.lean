@@ -1159,6 +1159,18 @@ theorem transfer_range_eq_of_quaternionProd {G : Type*} [Group G] [Finite G] (P 
   exact not_surjective_regularWreath_of_quaternionProd (φ.comp e.symm.toMonoidHom)
     (hφ.comp e.symm.surjective)
 
+/-- transfer が非自明なら `G' < G` (`Abelianization` は可換なので `G' ≤ ker`). -/
+theorem commutator_lt_top_of_transfer_ne_one {G : Type*} [Group G] [Finite G]
+    (P : Sylow 2 G) {g : G}
+    (hg : MonoidHom.transfer (Abelianization.of (G := ↥(P : Subgroup G))) g ≠ 1) :
+    commutator G < ⊤ := by
+  set v := MonoidHom.transfer (Abelianization.of (G := ↥(P : Subgroup G))) with hv
+  have hle : commutator G ≤ v.ker := Abelianization.commutator_subset_ker v
+  refine lt_of_le_of_lt hle ?_
+  refine lt_of_le_of_ne le_top ?_
+  intro htop
+  exact hg (MonoidHom.mem_ker.mp (htop.ge (Subgroup.mem_top g)))
+
 end
 
 end OddOrder.Isaacs.Ch10

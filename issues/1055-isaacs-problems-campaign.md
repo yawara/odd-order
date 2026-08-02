@@ -7258,6 +7258,32 @@ step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可
   `focalSubgroup P < P` の橋。repo の transfer API (`Ch05_Transfer`,
   `MonoidHom.transfer` / `transferRes`) で書く必要がある。
 
+### 10A.4 の残り = transfer 値の非自明性だけ (2026-08-03)
+
+landing 済 (`Problems10A.lean`): 第一段
+(`not_surjective_regularWreath_of_quaternionProd`) / Yoshida 適用
+(**`transfer_range_eq_of_quaternionProd`** = `N_G(P)` が 2-transfer を制御) /
+自己同型固定点 (`quaternionProd_aut_fixes_mod_frattini`) /
+`(Q₈ × C₂)' ≤ ⟨(a2,1)⟩` と `(1,c) ∉ P'` / **`commutator_lt_top_of_transfer_ne_one`**
+(transfer が非自明なら `G' < G`)。
+
+**残り 1 本**: `t := e.symm (1, c)` について `v_N t ≠ 1`、それを
+`transfer_range_eq_of_quaternionProd` で `v_G` 側へ移す。段取り:
+
+1. `H := (P : Subgroup G).subgroupOf N` は `↥N` に正規 (`P ◁ N`)。
+2. `s ∈ N` による共役は `↥P` の自己同型 (`MulAut.conjNormal` を
+   `subgroupOfEquivOfLe` で `↥P` に移す)。同型 `e` で `Q₈ × C₂` の自己同型に移すと
+   `quaternionProd_aut_fixes_mod_frattini` から `α (1,c) ∈ {(1,c), (a2,c)}`、
+   すなわち `c_s(t) · t⁻¹ ∈ P'` なので **`Abelianization.of (c_s t) = Abelianization.of t`**。
+3. repo の `transfer_eq_pow_of_map_conj_eq` で `v_N t = ϕ(t) ^ H.index`。
+4. `H.index = [N : P]` は奇数 (`P` は `N` の Sylow 2) かつ `ϕ(t)² = 1`
+   (`t² = 1`) なので `ϕ(t)^奇数 = ϕ(t)`。`ϕ(t) ≠ 1` は
+   `quaternionProd_t_notMem_commutator` から。
+5. `range v_G = range v_N ∋ v_N t ≠ 1` ⟹ `v_G` は非自明 ⟹
+   `commutator_lt_top_of_transfer_ne_one`。
+
+⚠ 一番配管が重いのは 2 (共役自己同型を `↥P` → `Q₈ × C₂` に移すところ)。
+
 ### 10A.4 の設計メモ (2026-08-03 追記)
 
 Yoshida (`Ch10.exists_surjective_wreath_of_transfer_range_lt`, repo に有り) を使うには
