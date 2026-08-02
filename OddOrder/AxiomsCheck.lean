@@ -14964,4 +14964,8 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_iterate_eq_self
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_eq_id_on_frobFixed_of_sq
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_eq_id_of_fixes_frobFixed
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_ten_at

@@ -38,8 +38,10 @@ membership facts it needs on the model:
   invariance.
 * `Hypothesis.mem_W_of_coordFieldAut_eq_id` — **`μ = 1 ⟹ η ∈ W`**, the book's closing
   "Thus `η ∈ W`".
+* `Hypothesis.coordFieldAut_eq_id_on_frobFixed_of_sq` — `μ²|_F = id ⟹ μ|_F = id`.
 * `Hypothesis.coordFieldAut_eq_id_of_fixes_frobFixed` — **`μ = 1`** from `μ|_F = id` and
   the odd order of `η`.
+* `Hypothesis.sectionFour_ten_at` — the whole chain (3)→(10) run at one admissible `a`.
 -/
 
 set_option autoImplicit false
@@ -267,6 +269,42 @@ theorem mem_W_of_coordFieldAut_eq_id (M : hyp.QuotientFieldModel m)
     _ = η * κ := by group
 
 include hyp in
+/-- **`μ²` fixing `F` pointwise already forces `μ|_F = id`**, `μ` having odd order.
+
+The book's "we see that `X^{μ²} = X` ... it follows that `μ = 1` since `μ` has odd order"
+splits into this step and `coordFieldAut_eq_id_of_fixes_frobFixed`.  Here `μ(F) ⊆ F`
+(`coordFieldAut_mapsTo_frobFixed`) lets `μ²` be iterated inside `F`, so `μ^[2k] = id`
+there, and `μ^[2k+1] = id` on all of `E` then reads `μ x = x`. -/
+theorem coordFieldAut_eq_id_on_frobFixed_of_sq (M : hyp.QuotientFieldModel m)
+    (s : hyp.LemmaFiveSetup m) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    {d ζ : G} (hd : d ∈ hyp.D) (hζ : ζ ∈ hyp.W)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    {k : ℕ} (hdn : d ^ (2 * k + 1) = 1)
+    (hsq : ∀ x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
+      hyp.coordFieldAut s M hm hQ0card hd hζ hznot
+        (hyp.coordFieldAut s M hm hQ0card hd hζ hznot x) = x)
+    {x : M.E} (hx : x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) :
+    hyp.coordFieldAut s M hm hQ0card hd hζ hznot x = x := by
+  set σ := hyp.coordFieldAut s M hm hQ0card hd hζ hznot with hσdef
+  have hiter2 : ∀ j : ℕ, ∀ y ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
+      (σ : M.E → M.E)^[2 * j] y = y := by
+    intro j
+    induction j with
+    | zero => intro y _; simp
+    | succ j ih =>
+        intro y hy
+        have he : 2 * (j + 1) = 2 * j + 2 := by ring
+        rw [he, Function.iterate_add_apply]
+        have h2y : (σ : M.E → M.E)^[2] y = y := hsq y hy
+        rw [h2y]
+        exact ih y hy
+  have hfull := hyp.coordFieldAut_iterate_eq_self s M hm hQ0card hd hζ hznot hdn x
+  have he : 2 * k + 1 = 1 + 2 * k := by ring
+  rw [he, Function.iterate_add_apply, hiter2 k x hx] at hfull
+  simpa using hfull
+
+include hyp in
 /-- **🎯 `μ = 1`** (Peterfalvi Part II, Ch. IV §4, p. 134: "It follows that `μ = 1` since
 `μ` has odd order and, if `μ ≠ 1`, then `|F| ≥ 8`").
 
@@ -301,6 +339,94 @@ theorem coordFieldAut_eq_id_of_fixes_frobFixed (M : hyp.QuotientFieldModel m)
     have hone : σ = 1 := eq_one_of_sq_eq_one_of_odd_pow hodd hsq hpow
     rw [h1] at hone
     exact OddOrder.FiniteField.qFrobenius_ne_one M.card hm hone
+
+include hyp in
+/-- **🎯 (10) at one admissible `a`** (Peterfalvi Part II, Ch. IV §4, p. 134).
+
+The whole chain of §4 run once: (3) and (4) give (5) and (6), the arithmetic of
+`PSU3SectionFourArithmetic` turns those into (7), (8), (9), `sectionFour_lambda` extracts
+`λ = 1` and the trace relation, and `sectionFour_ten` substitutes one into the other.  The
+outcome is the book's
+
+  `(ζ + ζ⁻¹ + X^μ) X = (ζ + ζ⁻¹ + X^{μ²}) X^μ`   at `X = a^{-2μ}`.
+
+`s₀` and `X` are passed as parameters with their defining equations so that the statement
+stays readable; a caller supplies `rfl` twice. -/
+theorem sectionFour_ten_at {f g k : G → G}
+    (H : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g k)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (M : hyp.QuotientFieldModel m) (s : hyp.LemmaFiveSetup m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    {ζ ω y a b η : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y)
+    (haK : a ∈ hyp.K) (haKset : a ∈ hyp.KSet) (hbKset : b ∈ hyp.KSet)
+    (hb2 : b ^ 2 ∈ hyp.K)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hηζ : η * ζ = ζ * η) (hkω : k ω = ζ ^ 3 * η)
+    (htη : hyp.t * η * hyp.t = η) (hηD : η ∈ hyp.D) (hηω : η * ω * η⁻¹ = ω)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    (hb : b * hyp.distinguishedInvolution * b⁻¹
+      = y * (a⁻¹ * hyp.distinguishedInvolution * a))
+    (hXQ : f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q)
+    (hYQ : f (ω * (b * hyp.distinguishedInvolution * b⁻¹)) ∈ hyp.Q)
+    {s₀ X : M.E}
+    (hs₀ : s₀ = ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹
+      + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E))
+    (hX : X = (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+      ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E))⁻¹) :
+    (s₀ + hyp.coordFieldAut s M hm hQ0card hηD hζ hznot X) * X
+      = (s₀ + hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+          (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot X))
+        * hyp.coordFieldAut s M hm hQ0card hηD hζ hznot X := by
+  subst hs₀
+  subst hX
+  have h2 : (2 : M.E) = 0 := by
+    have := M.charTwo
+    simpa using (CharP.cast_eq_zero M.E 2)
+  have hw : M.coord (Additive.ofMul (QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q))) ≠ 0 :=
+    hyp.coord_ne_zero_of_not_mem_Q0 M hZ hωQ hωQ0
+  have hPsiw : hyp.coordConjD M ⟨η, hηD⟩
+      (M.coord (Additive.ofMul (QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q))))
+      = M.coord (Additive.ofMul (QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q))) :=
+    hyp.coordConjD_fixed_of_conj_eq M hηD hωQ hηω
+  have h5 := hyp.sectionFour_five_of_three H hC2 M s hZ hm hQ0card hζ hωQ hωQ0 hyQ0 hsqω
+    haK haKset hf hηζ hkω htη hηD hznot hb hXQ hYQ
+  have h6 := hyp.sectionFour_six_linear H hC2 M hZ hζ hωQ hωQ0 hbKset hb2 hf hηζ hkω htη
+    hηD hYQ
+  obtain ⟨-, -, h9⟩ := hyp.sectionFour_seven_eight_nine M s hm hQ0card hζ hηD hznot
+    (pow_mem haK 2) hb2 hw hPsiw h5 h6
+  have hA0 : hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+      ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E) ≠ 0 :=
+    (map_ne_zero _).mpr (Units.ne_zero _)
+  have hc0 : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ ≠ 0 :=
+    inv_ne_zero (Units.ne_zero _)
+  have h6' : ((M.mu (hyp.kActor hb2, 1) : M.Eˣ) : M.E)
+        * M.coord (Additive.ofMul (QuotientGroup.mk
+            (⟨f (ω * (b * hyp.distinguishedInvolution * b⁻¹)), hYQ⟩ : ↥hyp.Q)))
+      = (((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹)⁻¹
+          * hyp.coordConjD M ⟨η, hηD⟩
+            (M.coord (Additive.ofMul (QuotientGroup.mk
+              (⟨f (ω * (b * hyp.distinguishedInvolution * b⁻¹)), hYQ⟩ : ↥hyp.Q))))
+        + M.coord (Additive.ofMul (QuotientGroup.mk (⟨ω, hωQ⟩ : ↥hyp.Q))) := by
+    rw [inv_inv]
+    exact h6
+  have hAB : hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+        ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)
+      + ((M.mu (hyp.kActor hb2, 1) : M.Eˣ) : M.E) ≠ 0 := fun hc =>
+    hyp.coordFieldAut_muK_ne_mu_W_inv M s hm hQ0card hηD hζ hznot (pow_mem haK 2)
+      (sectionFour_eq_of_add_eq_zero h2 hA0 hc0 hw h5 h6' hc)
+  obtain ⟨hfix, htr⟩ := hyp.sectionFour_lambda M s hm hQ0card hζ hηD hηζ hznot
+    (pow_mem haK 2) hb2 hAB h9
+  have hfixζ : η * ζ * η⁻¹ = ζ := by rw [hηζ, mul_assoc, mul_inv_cancel, mul_one]
+  have hsigC : hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+      ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E) = ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E) :=
+    hyp.coordFieldAut_muW_eq_self s M hm hQ0card hηD hζ hznot hζ hfixζ
+  refine sectionFour_ten h2 _ ?_ hfix ?_
+  · rw [map_add, map_inv₀, hsigC]
+  · rw [map_inv₀]
+    exact htr
 
 end Hypothesis
 

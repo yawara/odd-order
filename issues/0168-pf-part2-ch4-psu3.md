@@ -8601,3 +8601,30 @@ def W : Subgroup G := hyp.V ⊓ Subgroup.centralizer hyp.KSet   -- Basic.lean:18
    `|T| ≤ 4 < |F|/2 = q/2` は `q = ℓ^p ≥ 27` から。
 3. 上 2 つが揃えば `σ²|_F = id` → `σ|_F = id` → `μ = 1` → `η ∈ W` →
    `h(ω) = ζ³η ∈ W` → §3 Corollary 1 で **Ch. IV 完了**。
+
+### (194) 🎯 `σ²|_F = id ⟹ σ|_F = id` と **(3)→(10) の 1 本鎖 `sectionFour_ten_at`**
+
+* `coordFieldAut_eq_id_on_frobFixed_of_sq` — `σ(F) ⊆ F` で `σ^[2k] = id` on `F`、
+  `σ^[2k+1] = id` on `E` と合わせて `σ x = x` (`σ|_F` を束ねる必要なし)。
+* `sectionFour_ten_at` — **§4 の鎖を 1 本にまとめた**:
+  (3)+(4) → (5)(6) → (7)(8)(9) → λ → (10)。結論は書籍の
+  `(ζ+ζ⁻¹+X^μ)X = (ζ+ζ⁻¹+X^{μ²})X^μ` at `X = a^{-2μ}`。
+  `s₀`,`X` は定義式付きパラメータにして statement を読める長さに保った
+  (呼び出し側は `rfl` 2 つ)。
+
+**残り (Ch. IV §4 完了まで) — あと 1 段**:
+`sectionFour_ten_at` を `X ∈ F^× ∖ T` 全体で回す。必要なのは:
+1. **`a` の存在**: 与えられた `X ∈ F^×` に対し `a ∈ K` で
+   `σ(μ(kActor a²,1))⁻¹ = X` となるもの。`K` は奇数位数 ⟹ 二乗は全単射、
+   `μ(K) = F^×` (`exists_actualKActor_mu_eq`)、`σ` は `F^×` の全単射
+   (`coordFieldAut_mapsTo_frobFixed` + 単射)。
+2. **`b` の存在**: `b s b⁻¹ = y·(a⁻¹ s a)` — §3 の `stepTen_exists` 相当
+   (`a ≠ α^{-τ}` が除外条件)。
+3. **`ω`,`ζ`,`η` の供給**: §4 step (3) = `exists_f_eq_conj_inv_residual` +
+   `ζ ∈ C_W(P)` への精密化 (`exists_ne_one_mem_W_centralizer`)。
+4. `T` (除外点 ≤ 4) と `2|T| < |F| = q = ℓ^p ≥ 27`。
+5. ⟹ `sectionFour_sq_eq_id` 相当を `F` 上で回して `σ²|_F = id`
+   (⚠ `sectionFour_sq_eq_id` は `E` 全体を要求するので、`F` 版が要る:
+   `eq_id_of_fixes_compl` を `↥F` か AddSubgroup 上で使う)。
+6. `coordFieldAut_eq_id_on_frobFixed_of_sq` → `coordFieldAut_eq_id_of_fixes_frobFixed`
+   → `mem_W_of_coordFieldAut_eq_id` → `h(ω) = ζ³η ∈ W` → §3 Corollary 1。
