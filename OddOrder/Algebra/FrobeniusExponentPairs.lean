@@ -39,8 +39,8 @@ split out into a base leaf, this import should follow it.
   `λ` of order `2^n - 1`, the congruence consumed by `two_pow_pair_sum_eq`.
 * `frobIndex_pair_eq_of_pow_mul_eq` — the field form: if
   `a^{2^i} a^{2^j} = a^{2^k} a^{2^l}` for all `a`, then `{i, j} = {k, l}` mod `n`.
-* `odd_orderOf_inv_mul_of_mul_eq_mul_one` — the consequence §3 (3) consumes: if
-  `σ(a) τ(a) = a φ(a)` then `σ⁻¹τ` is `φ` or `φ⁻¹`, so it inherits `φ`'s odd order.
+* `odd_orderOf_inv_mul_of_mul_eq_mul` — the consequence §3 (3) consumes: if
+  `σ(a) τ(a) = ψ(a) φ(ψ(a))` then `σ⁻¹τ` is `φ` or `φ⁻¹`, so it inherits `φ`'s odd order.
 * `restrictToFrobFixed`, `odd_orderOf_restrictToFrobFixed_inv_mul` — the same for a pair
   of automorphisms of `E`, restricted to `F`.
 -/
@@ -92,7 +92,7 @@ theorem frobIndex_pair_eq_of_pow_mul_eq {F : Type*} [Field F] [Finite F]
   exact two_pow_pair_sum_eq (Nat.pos_of_ne_zero hn)
     (two_pow_pair_congruence_of_pow_eq (Nat.pos_of_ne_zero hn) hordg hpow)
 
-/-- **`{σ, τ} = {1, φ}`, read off as an order statement** (Peterfalvi Part II, Ch. III §3,
+/-- **`{σ, τ} = {ψ, φψ}`, read off as an order statement** (Peterfalvi Part II, Ch. III §3,
 p. 121).
 
 The book's step is
@@ -104,43 +104,52 @@ turned into what §3 (3) actually consumes, namely that `θ = σ⁻¹τ` has the
 the book's `θ` — in particular **odd**, since that is a structure field of the type-`B`
 datum (`TypeBData.phi_orderOf_odd`).
 
-Both branches land: `σ = 1, τ = φ` gives `σ⁻¹τ = φ`, and `σ = φ, τ = 1` gives `φ⁻¹`. -/
-theorem odd_orderOf_inv_mul_of_mul_eq_mul_one {F : Type*} [Field F] [Finite F] [CharP F 2]
-    {n : ℕ} (hn : n ≠ 0) (hcard : Nat.card F = 2 ^ n) (σ τ φ : RingAut F)
-    (hodd : Odd (orderOf φ)) (hmul : ∀ a : F, σ a * τ a = a * φ a) :
+The extra `ψ` is not decoration: the exponent `d` of Ch. III §3 is only determined up to
+a power of two (replacing the `Q₀`-coordinate by `Frobⁱ ∘ ι` replaces `d` by `2ⁱ d`), so
+the relation available is `a^d = ψ(a) · φ(ψ(a))` rather than `a · φ(a)`.  The twist
+`σ⁻¹τ` is unaffected: `RingAut F` is abelian, so both branches give `φ^{±1}`. -/
+theorem odd_orderOf_inv_mul_of_mul_eq_mul {F : Type*} [Field F] [Finite F] [CharP F 2]
+    {n : ℕ} (hn : n ≠ 0) (hcard : Nat.card F = 2 ^ n) (σ τ ψ φ : RingAut F)
+    (hodd : Odd (orderOf φ)) (hmul : ∀ a : F, σ a * τ a = ψ a * φ (ψ a)) :
     Odd (orderOf (σ⁻¹ * τ)) := by
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨i, hi⟩ := exists_pow_eq_of_ringAut hcard hn σ
   obtain ⟨j, hj⟩ := exists_pow_eq_of_ringAut hcard hn τ
-  obtain ⟨l, hl⟩ := exists_pow_eq_of_ringAut hcard hn φ
-  have hσ : σ = qFrobenius F 2 1 ^ i := by
-    rw [qFrobenius_pow]; exact RingEquiv.ext fun x => hi x
-  have hτ : τ = qFrobenius F 2 1 ^ j := by
-    rw [qFrobenius_pow]; exact RingEquiv.ext fun x => hj x
-  have hφ : φ = qFrobenius F 2 1 ^ l := by
-    rw [qFrobenius_pow]; exact RingEquiv.ext fun x => hl x
+  obtain ⟨s, hs⟩ := exists_pow_eq_of_ringAut hcard hn ψ
+  obtain ⟨r, hr⟩ := exists_pow_eq_of_ringAut hcard hn φ
+  have hpow : ∀ (α : RingAut F) (k : ℕ), (∀ x : F, α x = x ^ 2 ^ k) →
+      α = qFrobenius F 2 1 ^ k := by
+    intro α k hk
+    rw [qFrobenius_pow]
+    exact RingEquiv.ext fun x => hk x
+  have hσ := hpow σ i hi
+  have hτ := hpow τ j hj
+  have hψ := hpow ψ s hs
+  have hφ := hpow φ r hr
   -- congruent exponents give equal automorphisms, the Frobenius having order `n`
   have key : ∀ a b : ℕ, (a : ZMod n) = (b : ZMod n) →
       (qFrobenius F 2 1 : RingAut F) ^ a = qFrobenius F 2 1 ^ b := by
     intro a b hab
     rw [pow_eq_pow_iff_modEq, orderOf_frobenius hcard hn]
     exact (ZMod.natCast_eq_natCast_iff a b n).mp hab
-  have h : ∀ a : F, a ^ 2 ^ i * a ^ 2 ^ j = a ^ 2 ^ 0 * a ^ 2 ^ l := by
+  have h : ∀ a : F, a ^ 2 ^ i * a ^ 2 ^ j = a ^ 2 ^ s * a ^ 2 ^ (s + r) := by
     intro a
-    rw [pow_zero, pow_one, ← hi a, ← hj a, ← hl a]
+    rw [← hi a, ← hj a, ← hs a, pow_add, pow_mul, ← hr (a ^ 2 ^ s), ← hs a]
     exact hmul a
   rcases frobIndex_pair_eq_of_pow_mul_eq hn hcard h with ⟨h1, h2⟩ | ⟨h1, h2⟩
-  · -- `σ = 1` and `τ = φ`
-    have hσ1 : σ = 1 := by
-      rw [hσ, key i 0 (by simpa using h1), pow_zero]
-    have hτφ : τ = φ := by rw [hτ, hφ, key j l h2]
-    rw [hσ1, hτφ, inv_one, one_mul]
+  · -- `σ = ψ` and `τ = φψ`
+    have hστ : σ⁻¹ * τ = φ := by
+      rw [hσ, hτ, hψ, hφ] at *
+      rw [key i s h1, key j (s + r) h2, pow_add]
+      group
+    rw [hστ]
     exact hodd
-  · -- `σ = φ` and `τ = 1`
-    have hσφ : σ = φ := by rw [hσ, hφ, key i l h1]
-    have hτ1 : τ = 1 := by
-      rw [hτ, key j 0 (by simpa using h2), pow_zero]
-    rw [hσφ, hτ1, mul_one, orderOf_inv]
+  · -- `σ = φψ` and `τ = ψ`
+    have hστ : σ⁻¹ * τ = φ⁻¹ := by
+      rw [hσ, hτ, hψ, hφ] at *
+      rw [key i (s + r) h1, key j s h2, pow_add]
+      group
+    rw [hστ, orderOf_inv]
     exact hodd
 
 /-! ## Restricting Frobenius powers of `E` to the subfield `F` -/
@@ -279,14 +288,16 @@ to `F` is `θ` or `θ⁻¹`, hence of odd order.
 may be the `q`-Frobenius, of order `2`.  Only the restriction is constrained. -/
 theorem odd_orderOf_restrictToFrobFixed_inv_mul (hm : m ≠ 0)
     (hcard : Nat.card E = (2 ^ m) ^ 2) (σ τ : E ≃+* E)
-    (φ : RingAut ↥(frobFixedSubfield E 2 m)) (hodd : Odd (orderOf φ))
+    (ψ φ : RingAut ↥(frobFixedSubfield E 2 m)) (hodd : Odd (orderOf φ))
     (hmul : ∀ a : ↥(frobFixedSubfield E 2 m),
-      σ (a : E) * τ (a : E) = (a : E) * ((φ a : ↥(frobFixedSubfield E 2 m)) : E)) :
+      σ (a : E) * τ (a : E)
+        = ((ψ a : ↥(frobFixedSubfield E 2 m)) : E)
+          * ((φ (ψ a) : ↥(frobFixedSubfield E 2 m)) : E)) :
     Odd (orderOf ((restrictToFrobFixed (m := m) σ)⁻¹ * restrictToFrobFixed (m := m) τ)) := by
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   haveI : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
-  refine odd_orderOf_inv_mul_of_mul_eq_mul_one (F := ↥(frobFixedSubfield E 2 m)) hm
-    (natCard_frobFixedSubfield hcard hm) _ _ φ hodd fun a => ?_
+  refine odd_orderOf_inv_mul_of_mul_eq_mul (F := ↥(frobFixedSubfield E 2 m)) hm
+    (natCard_frobFixedSubfield hcard hm) _ _ ψ φ hodd fun a => ?_
   apply Subtype.ext
   push_cast
   exact hmul a

@@ -782,11 +782,14 @@ theorem mu_W_add_inv_ne_zero {m : ℕ} (M : hyp.QuotientFieldModel m)
 (Peterfalvi Part II, Ch. III §3, p. 121, into Ch. IV §3 (3), p. 130).
 
 The pair satisfies `σ(a) τ(a) = a^d` on `μ(K)`, which is all of `F^×`
-(`exists_actualKActor_mu_eq`).  If the exponent has the type-`B` shape `a^d = a · φ(a)`
-for an automorphism `φ` of `F` of odd order — that is Appendix III Definition 3's `θ`,
-carried by `Suzuki2Groups.TypeBData.phi` together with `phi_orderOf_odd` — then the book's
-`{σ|_F, τ|_F} = {1_F, φ}` forces `θ|_F` to be `φ` or `φ⁻¹`
-(`odd_orderOf_restrictToFrobFixed_inv_mul`), hence of odd order.
+(`exists_actualKActor_mu_eq`).  If the exponent has the type-`B` shape
+`a^d = ψ(a) · φ(ψ(a))` for an automorphism `φ` of `F` of odd order — that is Appendix III
+Definition 3's `θ`, carried by `Suzuki2Groups.TypeBData.phi` together with
+`phi_orderOf_odd` — then the book's `{σ|_F, τ|_F} = {ψ, φψ}` forces `θ|_F` to be `φ` or
+`φ⁻¹` (`odd_orderOf_restrictToFrobFixed_inv_mul`), hence of odd order.
+
+The `ψ` absorbs the freedom `d ↦ 2ⁱ d` in the choice of `Q₀`-coordinate, so no
+normalization of `d` is needed first.
 
 This is `stepThree_of_odd`'s `hodd`, reduced to a statement about the exponent `d` alone. -/
 theorem odd_orderOf_scalingPair_restrict {m : ℕ} (hm : m ≠ 0)
@@ -795,17 +798,20 @@ theorem odd_orderOf_scalingPair_restrict {m : ℕ} (hm : m ≠ 0)
     (hscale : ∀ k : ↥hyp.actualKActor,
       σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
         = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E))
-    (φ : RingAut ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (ψ φ : RingAut ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
     (hodd : Odd (orderOf φ))
     (hshape : ∀ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m), (a : M.E) ≠ 0 →
       (a : M.E) ^ d
-        = (a : M.E) * ((φ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) :
+        = ((ψ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+          * ((φ (ψ a) : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) :
     Odd (orderOf ((OddOrder.FiniteField.restrictToFrobFixed (m := m) σ)⁻¹ *
       OddOrder.FiniteField.restrictToFrobFixed (m := m) τ)) := by
-  refine OddOrder.FiniteField.odd_orderOf_restrictToFrobFixed_inv_mul hm M.card σ τ φ hodd
-    fun a => ?_
+  refine OddOrder.FiniteField.odd_orderOf_restrictToFrobFixed_inv_mul hm M.card σ τ ψ φ
+    hodd fun a => ?_
   rcases eq_or_ne ((a : M.E)) 0 with h0 | h0
-  · rw [h0, map_zero, map_zero, zero_mul, zero_mul]
+  · have ha0 : a = 0 := Subtype.ext (by simpa using h0)
+    rw [ha0]
+    simp
   · obtain ⟨k, hk⟩ := hyp.exists_actualKActor_mu_eq sfive M hm hQ0card a.2 h0
     have hs := hscale k
     rw [Units.val_zpow_eq_zpow_val, hk] at hs
