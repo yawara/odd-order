@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.QuotientGroup.Basic
 import Mathlib.GroupTheory.SpecificGroups.Cyclic.Basic
+import Mathlib.GroupTheory.SemidirectProduct
 
 /-!
 # Metacyclic Groups
@@ -172,5 +173,27 @@ theorem isSolvable (h : IsMetacyclic G) : IsSolvable G := by
     rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
 
 end IsMetacyclic
+
+/-- **巡回群同士の半直積は metacyclic**: `inl.range ≅ N` は正規巡回, 商は
+`rightHom` で `A` と同型. -/
+theorem isMetacyclic_semidirectProduct {N A : Type*} [Group N] [Group A] [IsCyclic N]
+    [IsCyclic A] (φ : A →* MulAut N) : IsMetacyclic (SemidirectProduct N A φ) := by
+  have hrange : (SemidirectProduct.inl : N →* SemidirectProduct N A φ).range
+      = (SemidirectProduct.rightHom : SemidirectProduct N A φ →* A).ker :=
+    SemidirectProduct.range_inl_eq_ker_rightHom
+  haveI hN : (SemidirectProduct.inl : N →* SemidirectProduct N A φ).range.Normal := by
+    rw [hrange]
+    infer_instance
+  refine ⟨(SemidirectProduct.inl : N →* SemidirectProduct N A φ).range, hN, ?_, ?_⟩
+  · exact isCyclic_of_surjective
+      (MonoidHom.ofInjective (SemidirectProduct.inl_injective (φ := φ)))
+      (MulEquiv.surjective _)
+  · have E : (SemidirectProduct N A φ) ⧸
+        (SemidirectProduct.inl : N →* SemidirectProduct N A φ).range ≃* A :=
+      (QuotientGroup.quotientMulEquivOfEq hrange).trans
+        (QuotientGroup.quotientKerEquivOfSurjective
+          (SemidirectProduct.rightHom : SemidirectProduct N A φ →* A)
+          SemidirectProduct.rightHom_surjective)
+    exact isCyclic_of_surjective E.symm (MulEquiv.surjective _)
 
 end OddOrder.GroupTheory
