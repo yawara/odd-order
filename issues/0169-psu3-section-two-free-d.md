@@ -57,8 +57,11 @@ fpf で切るしかなく、そのためには §2/§3 の `hVW` を fpf に一�
       `∀ ω c y, ω ∈ Q → ω ∉ Q0 → c ∈ D → y ∈ Q0 → c⁻¹ ω c = ω y → c = 1`。
       `eq_one_of_conj_eq_mul_Q0_of_mem_D` はこの述語の**証明**から
       「`V = W ⟹ FreeD`」という補題へ格下げする。
-- [ ] (2) `hVW` を `FreeD` に置換していく (40 宣言)。大半は
-      `eq_one_of_conj_eq_mul_Q0_of_mem_D` 経由なので機械的。
+- [x] (2) **完了 (2026-08-02)**。§2 の閉じ Proposition `exists_f_eq_conj_inv` と
+      Corollary 1 経路 `nonempty_theoremAConclusion_of_isStandardModel_of_closing` が
+      `FreeD` だけで走る。`PSU3BarOrbit.lean` / `PSU3StepTwenty.lean` /
+      `PSU3StepFifteen.lean` は `hVW` ゼロ。残る `hVW` は Corollary 2 側 (正当) と
+      旧 `D`-版の遺構のみ。
 - [x] (3) **数え上げは既に解決済だった** (2026-08-02 に実測して訂正)。
       `PSU3OrbitCount.lean` の `stepEight` /
       `ncard_eq_card_W_sub_one_of_f_eq_conj_self` は `[D : K] = |V|`
