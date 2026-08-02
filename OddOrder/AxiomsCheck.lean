@@ -41,6 +41,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FrobeniusD
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEighteen
 import OddOrder.GroupTheory.ZGroupNormalCyclic
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3TheoremADichotomy
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -15110,3 +15111,9 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.h_mem_W_of_frobeniusD
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.h_inv_mul_mem_KW_of_stepTwenty
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_prime_order_le_classStabilizer_of_not_freeD
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_sectionFourSetup_of_not_freeD
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.nonempty_theoremAConclusion_of_caseC
