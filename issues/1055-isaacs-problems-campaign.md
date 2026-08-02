@@ -7240,15 +7240,31 @@ step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可
    `(G ⧸ C_G(N)) →* (Additive ↥N) →ₗ[ZMod n] (Additive ↥N)`。
    ⚠ `CommGroup ↥N` は `[IsMulCommutative ↥N]` + `open scoped IsMulCommutative` で供給
    (直接 `[CommGroup ↥N]` は `Group ↥N` と diamond)。
-3. ⏳ `Representation.asModule` で `Module (MonoidAlgebra (ZMod p) (G ⧸ C_G(E)))` にし、
-   `MonoidAlgebra.Submodule.exists_isCompl` を当てる。
-   要件は `[Field (ZMod p)]` (= `Fact p.Prime` + `Mathlib.Algebra.Field.ZMod`)、
-   `[Finite (G ⧸ C_G(E))]`、**`[NeZero ((Nat.card (G ⧸ C_G(E)) : ZMod p))]`**
-   (これがちょうど `p ∤ |G : C_G(E)|`)。
-4. ⏳ 対応 `Submodule (ZMod p) (Additive ↥E)` (共役不変) ↔ `E` 内の `G`-正規部分群。
-   型シノニムを 3 段ホップする: `Submodule.toAddSubgroup` → `Additive` を戻して
-   `Subgroup ↥E` → `.map E.subtype` で `Subgroup G`。不変性から正規性が出る。
-   ここが残りの主作業 (~100-150 行)。
+3. ✅ **`exists_isCompl_invariant`** (`GroupTheory/MaschkeComplement.lean`, 2026-08-03):
+   `ρ : Representation k Q V` と `Q`-不変な `W` に対し `Q`-不変な補元。
+   mathlib の `MonoidAlgebra.Submodule.exists_isCompl` を
+   `Subrepresentation ρ ≃o Submodule k[Q] ρ.asModule` で翻訳しただけ。
+   要件 `[Field k] [Finite Q] [NeZero (Nat.card Q : k)]`。
+4. ✅ 対応の両側:
+   * **`subgroupOrderIsoSubmodule`** — `Subgroup E ≃o Submodule (ZMod n) (Additive E)`
+     (`Subgroup.toAddSubgroup` + `AddSubgroup.toZModSubmodule`)。
+   * **`normal_map_subtype_of_conj_invariant`** / **`conj_invariant_subgroupOf`** —
+     共役不変 ↔ `G`-正規。
+
+### 残り = 最終組み立てのみ (機械的, ~100 行)
+
+`E ◁ G` 基本可換 + `p ∤ (centralizer E).index` から:
+1. `letI : Module (ZMod p) (Additive ↥E) := zmodModule_of_pow_eq_one hexp`;
+   `haveI : Fact p.Prime`; `haveI : NeZero ((Nat.card (G ⧸ C) : ZMod p))`
+   (= `p ∤ index`; `Subgroup.index` は `Nat.card (G ⧸ C)` と定義的に等しい)。
+2. `ρ := conjQuotientLinear`; `W := subgroupOrderIsoSubmodule ((Soc G ⊓ E).subgroupOf E)`
+   (不変性は `conj_invariant_subgroupOf`; `Soc G ⊓ E` の正規性は socle と `E` の正規性から)。
+3. `exists_isCompl_invariant` で `W'` を得る。
+4. `M := (subgroupOrderIsoSubmodule.symm W').map E.subtype`。正規性は
+   `normal_map_subtype_of_conj_invariant`。`IsCompl` は順序同型と
+   `map E.subtype` (単射なので `⊓` 保存、`⊔` は常に保存、`map ⊤ = E`, `map ⊥ = ⊥`) で
+   `(Soc ⊓ E) ⊓ M = ⊥` / `(Soc ⊓ E) ⊔ M = E` に落ちる。
+5. 骨格 `le_socle_of_exists_normal_complement` に食わせて完了。
 
 この橋は BG/Pf 側でも使い回せる汎用インフラ。
 
