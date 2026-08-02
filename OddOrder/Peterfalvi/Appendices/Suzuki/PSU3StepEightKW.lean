@@ -39,6 +39,11 @@ is used.
   and `m₁ ≤ m − 1`.
 * `Hypothesis.stepEight_of_KW`, `Hypothesis.exists_mem_Q0_orbitOfF_eq_of_KW` — step (8)
   and its consequence, with `V = W` removed.
+* `Hypothesis.ncard_eq_card_W_sub_one_of_f_eq_conj_self_of_KW` — the same count as an
+  equality, and
+* `Hypothesis.exists_witness_mem_W_of_KW` — step (9)'s witness `f(ω z) = (ω y)^{k ζ}`
+  at a prescribed `ζ ∈ W^#`, both with `V = W` removed (issue 0169).
+* `Hypothesis.stepNine_of_KW` — step (9) itself, likewise.
 -/
 
 set_option autoImplicit false
@@ -377,6 +382,198 @@ theorem exists_mem_Q0_orbitOfF_eq_of_KW {m : ℕ} (M : hyp.QuotientFieldModel m)
       omega
   obtain ⟨x, hx⟩ := Set.nonempty_of_ncard_ne_zero hne
   exact ⟨x, hx⟩
+
+end
+
+section /- Ch. IV §2 (8)–(9): the equality count and step (9)'s witness (p. 124) -/
+
+/-- **The count of step (8) as an equality on the `K W`-shaped set** (Peterfalvi
+Part II, Ch. IV §2 (8), p. 124), with `V = W` removed.
+
+`≤` is `ncard_le_card_W_sub_one_of_f_eq_conj_self`; `≥` is the base fibre of
+`orbitOfF`, whose elements have `K W`-conjugators (`exists_conj_KW_of_coset_eq`) and
+which `stepEight_of_KW` counts as `|W| − 1`. -/
+theorem ncard_eq_card_W_sub_one_of_f_eq_conj_self_of_KW {m : ℕ}
+    (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hinj : Function.Injective M.mu)
+    (hK : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) :
+    {z : G | z ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ k ∈ hyp.K, ∃ v ∈ hyp.W,
+        f (ω * z) = (k * v)⁻¹ * (ω * y) * (k * v)}.ncard = Nat.card ↥hyp.W - 1 := by
+  classical
+  refine le_antisymm (hyp.ncard_le_card_W_sub_one_of_f_eq_conj_self H hC2 hωQ hωQ0) ?_
+  have hstep := (hyp.stepEight_of_KW M hZ H hC2 hm hQ0card hinj hK hWdvd hωQ hωQ0).2
+  have hsub : ((↑) : ↥hyp.Q0 → G) ''
+      {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x
+        = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)}
+      ⊆ {z : G | z ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ k ∈ hyp.K, ∃ v ∈ hyp.W,
+          f (ω * z) = (k * v)⁻¹ * (ω * y) * (k * v)} := by
+    rintro _ ⟨x, hx, rfl⟩
+    refine ⟨x.2, ?_⟩
+    exact hyp.exists_conj_KW_of_coset_eq M hZ hωQ
+      (hyp.f_mul_mem_Q H hC2 hωQ hωQ0 x) rfl rfl hx.symm
+  calc Nat.card ↥hyp.W - 1
+      = {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x
+          = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)}.ncard := hstep.symm
+    _ = (((↑) : ↥hyp.Q0 → G) ''
+          {x : ↥hyp.Q0 | hyp.orbitOfF M hZ H hC2 hωQ hωQ0 x
+            = QuotientGroup.mk (hyp.baseUnit M hZ hωQ hωQ0)}).ncard :=
+        (Set.ncard_image_of_injective _ Subtype.val_injective).symm
+    _ ≤ _ := Set.ncard_le_ncard hsub (Set.toFinite _)
+
+/-- **The witnesses realize every non-trivial element of `W`** (Peterfalvi Part II,
+Ch. IV §2 (9), p. 124), with `V = W` removed.
+
+The `W`-part of the conjugator is injective on the base fibre (step (7),
+`commute_of_mem_W_of_mem_K`), never trivial (`not_mem_K_of_f_eq_conj_self` together with
+`K ∩ W = 1`), and the fibre has `|W| − 1` elements — so the `W`-parts exhaust `W ∖ {1}`.
+
+This is the book's "there are elements `x, z ∈ Q₀` and `k ∈ K` such that
+`f(ω x) = (ω z)^{k ζ}`", and it replaces `exists_witness_coset_eq`, which reaches the
+same conclusion through `D/K` and therefore needs `|D : K| = |W|`, i.e. `V = W`. -/
+theorem exists_witness_mem_W_of_KW {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hinj : Function.Injective M.mu)
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    {ζ : G} (hζW : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1) :
+    ∃ z ∈ hyp.Q0, ∃ y ∈ hyp.Q0, ∃ k ∈ hyp.K,
+      f (ω * z) = (k * ζ)⁻¹ * (ω * y) * (k * ζ) := by
+  classical
+  set S : Set G := {x : G | x ∈ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ∃ k ∈ hyp.K, ∃ v ∈ hyp.W,
+    f (ω * x) = (k * v)⁻¹ * (ω * y) * (k * v)} with hSdef
+  have key : ∀ x ∈ S, ∃ v, v ∈ hyp.W ∧ ∃ k, k ∈ hyp.K ∧ ∃ b, b ∈ hyp.Q0 ∧
+      f (ω * x) = (k * v)⁻¹ * (ω * b) * (k * v) := by
+    rintro x ⟨-, b, hb, k, hk, v, hv, heq⟩
+    exact ⟨v, hv, k, hk, b, hb, heq⟩
+  choose! Vf hVfW Kf hKfK Bf hBfQ0 hAeq using key
+  set V' : G → ↥hyp.W := fun x => if hx : Vf x ∈ hyp.W then ⟨Vf x, hx⟩ else 1 with hV'def
+  have hV'val : ∀ x ∈ S, (V' x : G) = Vf x := by
+    intro x hx
+    simp only [hV'def, dif_pos (hVfW x hx)]
+  have hinjOn : Set.InjOn V' S := by
+    intro x₁ hx₁ x₂ hx₂ hxy
+    have hveq : Vf x₁ = Vf x₂ := by
+      rw [← hV'val x₁ hx₁, ← hV'val x₂ hx₂, hxy]
+    have hmem : (Kf x₁ * Vf x₁)⁻¹ * (Kf x₂ * Vf x₂) ∈ hyp.K := by
+      have hc : (Kf x₁ * Vf x₁)⁻¹ * (Kf x₂ * Vf x₂)
+          = (Vf x₁)⁻¹ * ((Kf x₁)⁻¹ * Kf x₂) * Vf x₁ := by
+        rw [hveq]; group
+      have hK' : (Kf x₁)⁻¹ * Kf x₂ ∈ hyp.K :=
+        hyp.K.mul_mem (hyp.K.inv_mem (hKfK x₁ hx₁)) (hKfK x₂ hx₂)
+      have hcm := hyp.commute_of_mem_W_of_mem_K (hVfW x₁ hx₁) hK'
+      have hsimp : (Vf x₁)⁻¹ * ((Kf x₁)⁻¹ * Kf x₂) * Vf x₁ = (Kf x₁)⁻¹ * Kf x₂ := by
+        rw [mul_assoc, hcm]
+        group
+      rw [hc, hsimp]
+      exact hK'
+    refine hyp.eq_of_inv_mul_mem_K H hC2 hωQ hωQ0 hx₁.1 hx₂.1
+      (hBfQ0 x₁ hx₁) (hBfQ0 x₂ hx₂)
+      (hyp.D.mul_mem (hyp.K_le_D (hKfK x₁ hx₁)) (hyp.W_le_D (hVfW x₁ hx₁)))
+      (hyp.D.mul_mem (hyp.K_le_D (hKfK x₂ hx₂)) (hyp.W_le_D (hVfW x₂ hx₂)))
+      (hAeq x₁ hx₁) (hAeq x₂ hx₂) hmem
+  have hmaps : V' '' S ⊆ (Set.univ \ {1} : Set ↥hyp.W) := by
+    rintro _ ⟨x, hx, rfl⟩
+    refine ⟨Set.mem_univ _, fun hc => ?_⟩
+    have hv1 : Vf x = 1 := by
+      rw [← hV'val x hx, hc]
+      rfl
+    have hmemK : Kf x * Vf x ∈ hyp.K := by
+      rw [hv1, mul_one]
+      exact hKfK x hx
+    exact hyp.not_mem_K_of_f_eq_conj_self H hC2 hωQ hωQ0 hx.1 (hBfQ0 x hx)
+      (hyp.D.mul_mem (hyp.K_le_D (hKfK x hx)) (hyp.W_le_D (hVfW x hx)))
+      (hAeq x hx) hmemK
+  have hScard := hyp.ncard_eq_card_W_sub_one_of_f_eq_conj_self_of_KW M hZ H hC2 hm
+    hQ0card hinj hKcard hWdvd hωQ hωQ0
+  have hdiff : (Set.univ \ {1} : Set ↥hyp.W).ncard = Nat.card ↥hyp.W - 1 := by
+    rw [Set.ncard_sdiff_singleton_of_mem (Set.mem_univ _), Set.ncard_univ]
+  have heq : V' '' S = (Set.univ \ {1} : Set ↥hyp.W) :=
+    Set.eq_of_subset_of_ncard_le hmaps
+      (by rw [hinjOn.ncard_image, hScard, hdiff]) (Set.toFinite _)
+  have hζ1' : (⟨ζ, hζW⟩ : ↥hyp.W) ≠ 1 := fun hc => hζ1 (congrArg Subtype.val hc)
+  obtain ⟨z, hz, hzζ⟩ : (⟨ζ, hζW⟩ : ↥hyp.W) ∈ V' '' S := by
+    rw [heq]
+    exact ⟨Set.mem_univ _, hζ1'⟩
+  have hvz : Vf z = ζ := by rw [← hV'val z hz, hzζ]
+  refine ⟨z, hz.1, Bf z, hBfQ0 z hz, Kf z, hKfK z hz, ?_⟩
+  have hz' := hAeq z hz
+  rwa [hvz] at hz'
+
+end
+
+section /- Ch. IV §2 (9): the normalization, with `V = W` removed (pp. 124–125) -/
+
+/-- **Peterfalvi Part II, Ch. IV §2, step (9)** (pp. 124–125), with `V = W` removed:
+
+> For all `i`, there are elements `ω'_i ∈ Q − Q₀` and `y_i ∈ Q₀^#` such that `ω̄'_i` is
+> in the orbit of `ω̄_i` under `KW` and `f(ω'_i) = (ω'_i y_i)^ζ`.
+
+Identical to `stepNine` except that the witness comes from `exists_witness_mem_W_of_KW`,
+which already presents the conjugator as `k ζ` with `k ∈ K`; `exists_sq_eq_of_mem_K`
+takes the square root of `k` and `f_conj_collapse` turns the exponent into `ζ`. -/
+theorem stepNine_of_KW {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hinj : Function.Injective M.mu)
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
+    {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    {ζ : G} (hζW : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1) :
+    ∃ ω' ∈ hyp.Q, ω' ∉ hyp.Q0 ∧
+      (∃ z ∈ hyp.Q0, OddOrder.GroupTheory.RankOneBNPair.dOrbitRel hyp.D (ω * z) ω') ∧
+      ∃ y ∈ hyp.Q0, y ≠ 1 ∧ f ω' = ζ⁻¹ * (ω' * y) * ζ := by
+  have hζD : ζ ∈ hyp.D := hyp.W_le_D hζW
+  obtain ⟨z, hzQ0, b, hbQ0, k, hkK, heq⟩ :=
+    hyp.exists_witness_mem_W_of_KW M hZ H hC2 hm hQ0card hinj hKcard hWdvd hωQ hωQ0
+      hζW hζ1
+  -- the conjugator is already `k ζ`; `W` centralizes `K`, so `ζ⁻¹ (k ζ) = k`
+  have hkK' : ζ⁻¹ * (k * ζ) ∈ hyp.K := by
+    have hcm := hyp.commute_of_mem_W_of_mem_K hζW hkK
+    have hval : ζ⁻¹ * (k * ζ) = k := by
+      rw [hcm]; group
+    rw [hval]; exact hkK
+  obtain ⟨c, hcK, hcsq⟩ := hyp.exists_sq_eq_of_mem_K hkK'
+  have hcKSet : c ∈ hyp.KSet := by
+    have hh : c ∈ (hyp.K : Set G) := hcK
+    rwa [hyp.coe_K] at hh
+  have haeq : k * ζ = c ^ 2 * ζ := by
+    rw [hcsq]
+    have hcm : ζ * (ζ⁻¹ * (k * ζ)) = k * ζ := by group
+    rw [← hyp.commute_of_mem_W_of_mem_K hζW hkK'] at hcm
+    exact hcm.symm
+  obtain ⟨hωzQ, hωzQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hzQ0
+  have hωz1 : ω * z ≠ 1 := fun hc => hωzQ0 (hc ▸ hyp.Q0.one_mem)
+  rw [haeq] at heq
+  have hcoll := hyp.f_conj_collapse H hωzQ hωz1 hzQ0 hcKSet hζW heq
+  have hcD : c ∈ hyp.D := hyp.K_le_D hcK
+  have hω'Q : c⁻¹ * (ω * z) * c ∈ hyp.Q := hyp.rankOneSetup.DQ c hcD _ hωzQ
+  have hω'Q0 : c⁻¹ * (ω * z) * c ∉ hyp.Q0 := by
+    intro hcc
+    refine hωzQ0 ?_
+    have e : ω * z = c * (c⁻¹ * (ω * z) * c) * c⁻¹ := by group
+    rw [e]
+    exact hyp.conj_mem_Q0_of_mem_H (hyp.D_le_H hcD) hcc
+  have hyQ0 : c⁻¹ * (z * b) * c ∈ hyp.Q0 := by
+    have := hyp.conj_mem_Q0_of_mem_H (hyp.H.inv_mem (hyp.D_le_H hcD))
+      (hyp.Q0.mul_mem hzQ0 hbQ0)
+    rwa [inv_inv] at this
+  refine ⟨_, hω'Q, hω'Q0, ⟨z, hzQ0, c, hcD, rfl⟩, _, hyQ0, ?_, hcoll⟩
+  exact hyp.ne_one_of_f_eq_conj H hC2 hω'Q hω'Q0 hζD hcoll
 
 end
 

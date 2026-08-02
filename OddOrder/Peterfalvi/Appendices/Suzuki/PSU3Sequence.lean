@@ -164,6 +164,35 @@ theorem stepElevenSeq_mem {ζ y : G} (hζ : ζ ∈ hyp.W) (hyQ0 : y ∈ hyp.Q0) 
     · rw [dif_neg hex]
       exact ⟨hz, hw, hd⟩
 
+/-- **The conjugators of (11) lie in `K W`** (Peterfalvi Part II, p. 125: "`d_i ∈ K W`").
+
+`d₀ = ζ ∈ W`, and the step multiplies by `ζ` and by a square from `K`; since `W`
+centralizes `K` the two parts can always be collected, so `d_i = k v` with `k ∈ K` and
+`v ∈ W`.  This is what lets step (15) be read against the `K W`-orbit count of step (8)
+without any hypothesis relating `V` and `W` (issue 0169). -/
+theorem stepElevenSeq_mem_KW {ζ y : G} (hζ : ζ ∈ hyp.W) (i : ℕ) :
+    ∃ k ∈ hyp.K, ∃ v ∈ hyp.W, (hyp.stepElevenSeq ζ y i).2.2 = k * v := by
+  classical
+  induction i with
+  | zero => exact ⟨1, hyp.K.one_mem, ζ, hζ, (one_mul ζ).symm⟩
+  | succ n ih =>
+    obtain ⟨k₀, hk₀, v₀, hv₀, hd⟩ := ih
+    rw [hyp.stepElevenSeq_succ, stepElevenNext]
+    by_cases hex : ∃ a ∈ hyp.K, a * hyp.distinguishedInvolution * a⁻¹
+        = y * (hyp.stepElevenSeq ζ y n).1
+    · rw [dif_pos hex]
+      have haK : (hex.choose)⁻¹ ^ 2 ∈ hyp.K := pow_mem (hyp.K.inv_mem hex.choose_spec.1) 2
+      refine ⟨k₀ * (hex.choose)⁻¹ ^ 2, hyp.K.mul_mem hk₀ haK, v₀ * ζ,
+        hyp.W.mul_mem hv₀ hζ, ?_⟩
+      have hcm := hyp.commute_of_mem_W_of_mem_K (hyp.W.mul_mem hv₀ hζ) haK
+      change (hyp.stepElevenSeq ζ y n).2.2 * ζ * (hex.choose)⁻¹ ^ 2 = _
+      calc (hyp.stepElevenSeq ζ y n).2.2 * ζ * (hex.choose)⁻¹ ^ 2
+          = k₀ * (v₀ * ζ * (hex.choose)⁻¹ ^ 2) := by rw [hd]; group
+        _ = k₀ * ((hex.choose)⁻¹ ^ 2 * (v₀ * ζ)) := by rw [hcm]
+        _ = k₀ * (hex.choose)⁻¹ ^ 2 * (v₀ * ζ) := by group
+    · rw [dif_neg hex]
+      exact ⟨k₀, hk₀, v₀, hv₀, hd⟩
+
 /-- **Step (11)** (Peterfalvi Part II, p. 125): the sequence carries the invariant
 
   `f(ω z_i) = (ω w_i)^{d_i}`
@@ -247,6 +276,25 @@ theorem stepElevenSeq_fst_mem_orbitSet (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       f (ω * x) = a⁻¹ * (ω * w) * a} := by
   obtain ⟨hz, hw, hd⟩ := hyp.stepElevenSeq_mem hζ hyQ0 i
   exact ⟨hz, _, hw, _, hd, hyp.stepElevenSeq_spec H hC2 hζ hωQ hωQ0 hyQ0 hfω i⟩
+
+/-- **Every `z_i` is one of the elements step (8) counts, in the `K W` shape**
+(Peterfalvi Part II, p. 126, step (15)).
+
+The same inclusion as `stepElevenSeq_fst_mem_orbitSet`, but recording the conjugator as
+`k v` with `k ∈ K`, `v ∈ W` (`stepElevenSeq_mem_KW`) — the set whose cardinality
+`ncard_eq_card_W_sub_one_of_f_eq_conj_self_of_KW` computes without `V = W`. -/
+theorem stepElevenSeq_fst_mem_orbitSet_KW (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) (i : ℕ) :
+    (hyp.stepElevenSeq ζ y i).1 ∈ {x : G | x ∈ hyp.Q0 ∧ ∃ w ∈ hyp.Q0, ∃ k ∈ hyp.K,
+      ∃ v ∈ hyp.W, f (ω * x) = (k * v)⁻¹ * (ω * w) * (k * v)} := by
+  obtain ⟨hz, hw, -⟩ := hyp.stepElevenSeq_mem hζ hyQ0 i
+  obtain ⟨k, hk, v, hv, hd⟩ := hyp.stepElevenSeq_mem_KW hζ i
+  refine ⟨hz, _, hw, k, hk, v, hv, ?_⟩
+  rw [← hd]
+  exact hyp.stepElevenSeq_spec H hC2 hζ hωQ hωQ0 hyQ0 hfω i
 
 /-- **The sequence runs only while `ζ^i ≠ 1`** (Peterfalvi Part II, p. 126, step (15)).
 

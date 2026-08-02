@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Sequence
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PairComparison
 
@@ -110,9 +111,7 @@ coset `ζ^{N+1}K`, and `K ∩ W = 1` then pins both `N` and the `K`-part. -/
 theorem stepFifteen_stop_d_eq_inv (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
-    {m : ℕ} (M : hyp.QuotientFieldModel m)
-    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hfree : hyp.FreeD)
     {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) {N : ℕ}
     (hstop : y * (hyp.stepElevenSeq ζ y N).1 = 1) :
@@ -147,7 +146,7 @@ theorem stepFifteen_stop_d_eq_inv (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
             (ω * (hyp.stepElevenSeq ζ y N).2.1) * (hyp.stepElevenSeq ζ y N).2.2)
             * ((hyp.stepElevenSeq ζ y N).2.2)⁻¹ := by rw [hspec]
       _ = ω * (hyp.stepElevenSeq ζ y N).2.1 := by group
-  have hone := hyp.eq_one_of_conj_eq_mul_Q0_of_mem_D M hZ hmu hVW hωQ hωQ0 hcD hw hconj
+  have hone := hfree hωQ hωQ0 hcD hw hconj
   have hinv : ((hyp.stepElevenSeq ζ y N).2.2)⁻¹ = ζ := by
     have e : ζ * (ζ⁻¹ * ((hyp.stepElevenSeq ζ y N).2.2)⁻¹) = ζ * 1 := by rw [hone]
     simpa using e
@@ -187,9 +186,7 @@ equality of exponents. -/
 theorem stepFifteen_length_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
-    {m : ℕ} (M : hyp.QuotientFieldModel m)
-    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hfree : hyp.FreeD)
     {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) {N : ℕ}
     (hns : ∀ i < N, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1)
@@ -197,7 +194,7 @@ theorem stepFifteen_length_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     N + 2 = orderOf ζ ∧
       ∀ k ∈ hyp.K, (hyp.stepElevenSeq ζ y N).2.2 = ζ ^ (N + 1) * k → k = 1 := by
   obtain ⟨k, hkK, hk⟩ := hyp.stepElevenSeq_coset hζ hyQ0 N hns
-  have hdinv := hyp.stepFifteen_stop_d_eq_inv H hC2 M hZ hmu hVW hζ hωQ hωQ0 hyQ0 hfω hstop
+  have hdinv := hyp.stepFifteen_stop_d_eq_inv H hC2 hfree hζ hωQ hωQ0 hyQ0 hfω hstop
   have hle : N + 1 + 1 ≤ orderOf ζ :=
     hyp.lt_orderOf_of_not_stopped H hC2 hζ hωQ hωQ0 hyQ0 hfω hns
   -- `k ζ^{N+2} = 1`
@@ -257,9 +254,7 @@ If `z_i = z_j` then the invariant of (11) presents the same element `f(ω z_i)` 
 theorem stepElevenSeq_fst_injOn (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
-    {m : ℕ} (M : hyp.QuotientFieldModel m)
-    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hfree : hyp.FreeD)
     {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ) {N : ℕ}
     (hns : ∀ i < N, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1) :
@@ -297,7 +292,7 @@ theorem stepElevenSeq_fst_injOn (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
         _ = (ω * (hyp.stepElevenSeq ζ y i).2.1) *
               (((hyp.stepElevenSeq ζ y i).2.1)⁻¹ * (hyp.stepElevenSeq ζ y j).2.1) := by
             group
-    have hone := hyp.eq_one_of_conj_eq_mul_Q0_of_mem_D M hZ hmu hVW hωiQ hωiQ0 hcD
+    have hone := hfree hωiQ hωiQ0 hcD
       (hyp.Q0.mul_mem (hyp.Q0.inv_mem hwi) hwj) hconj
     exact mul_inv_eq_one.mp hone
   -- distinct indices give distinct cosets `ζ^{i+1}K`
@@ -336,7 +331,7 @@ theorem stepFifteen_exhaust (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W) (hm : m ≠ 0)
+    (hmu : Function.Injective M.mu) (hfree : hyp.FreeD) (hm : m ≠ 0)
     (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (hK : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
     (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
@@ -346,23 +341,24 @@ theorem stepFifteen_exhaust (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hns : ∀ i < N, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1)
     (hstop : y * (hyp.stepElevenSeq ζ y N).1 = 1) :
     (fun i => (hyp.stepElevenSeq ζ y i).1) '' (Set.Iio (N + 1))
-      = {x : G | x ∈ hyp.Q0 ∧ ∃ w ∈ hyp.Q0, ∃ a ∈ hyp.D,
-          f (ω * x) = a⁻¹ * (ω * w) * a} := by
+      = {x : G | x ∈ hyp.Q0 ∧ ∃ w ∈ hyp.Q0, ∃ k ∈ hyp.K, ∃ v ∈ hyp.W,
+          f (ω * x) = (k * v)⁻¹ * (ω * w) * (k * v)} := by
   classical
-  have hlen := (hyp.stepFifteen_length_eq H hC2 M hZ hmu hVW hζ hωQ hωQ0 hyQ0 hfω hns
+  have hlen := (hyp.stepFifteen_length_eq H hC2 hfree hζ hωQ hωQ0 hyQ0 hfω hns
       hstop).1
-  have hinj := hyp.stepElevenSeq_fst_injOn H hC2 M hZ hmu hVW hζ hωQ hωQ0 hyQ0 hfω hns
+  have hinj := hyp.stepElevenSeq_fst_injOn H hC2 hfree hζ hωQ hωQ0 hyQ0 hfω hns
   have hsub : (fun i => (hyp.stepElevenSeq ζ y i).1) '' (Set.Iio (N + 1))
-      ⊆ {x : G | x ∈ hyp.Q0 ∧ ∃ w ∈ hyp.Q0, ∃ a ∈ hyp.D,
-          f (ω * x) = a⁻¹ * (ω * w) * a} := by
+      ⊆ {x : G | x ∈ hyp.Q0 ∧ ∃ w ∈ hyp.Q0, ∃ k ∈ hyp.K, ∃ v ∈ hyp.W,
+          f (ω * x) = (k * v)⁻¹ * (ω * w) * (k * v)} := by
     rintro _ ⟨i, -, rfl⟩
-    exact hyp.stepElevenSeq_fst_mem_orbitSet H hC2 hζ hωQ hωQ0 hyQ0 hfω i
+    exact hyp.stepElevenSeq_fst_mem_orbitSet_KW H hC2 hζ hωQ hωQ0 hyQ0 hfω i
   refine Set.eq_of_subset_of_ncard_le hsub ?_ (Set.toFinite _)
   have himg : ((fun i => (hyp.stepElevenSeq ζ y i).1) '' (Set.Iio (N + 1))).ncard = N + 1 := by
     rw [Set.InjOn.ncard_image hinj, ← Finset.coe_range, Set.ncard_coe_finset,
       Finset.card_range]
   rw [himg,
-    hyp.ncard_eq_card_W_sub_one_of_f_eq_conj_self M hZ H hC2 hVW hm hQ0card hmu hK hWdvd
+    hyp.ncard_eq_card_W_sub_one_of_f_eq_conj_self_of_KW M hZ H hC2 hm hQ0card hmu hK
+      hWdvd
       hωQ hωQ0]
   omega
 

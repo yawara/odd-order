@@ -120,7 +120,8 @@ theorem stepEighteen (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   obtain ⟨k, hkK, hkcoset, hk⟩ :=
     hyp.stepEighteen_unroll H hC2 hζ hωQ hωQ0 hyQ0 hfω N hns
   obtain ⟨hlen, hkone⟩ :=
-    hyp.stepFifteen_length_eq H hC2 M hZ hmu hVW hζ hωQ hωQ0 hyQ0 hfω hns hstop
+    hyp.stepFifteen_length_eq H hC2 (hyp.freeD_of_V_eq_W M hZ hmu hVW) hζ hωQ hωQ0
+      hyQ0 hfω hns hstop
   rw [hkone k hkK hkcoset, inv_one, mul_one, hzy] at hk
   -- (H4) gives the other reading of `h(ω y)`
   rw [hyp.h_mul_eq_conj_inv H hζ hωQ hωQ0 hyQ0 hfω] at hk
