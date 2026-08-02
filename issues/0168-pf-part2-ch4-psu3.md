@@ -7818,3 +7818,29 @@ Corollary 2 の証明で `h(ω) ∈ W` をどう出しているかを確定 → 
 `..._of_closing`) の仮説から芋づる式に落とす。
 ⟹ これが済めば endpoint の未証明仮説は `hfQ` (= `exists_fgh_mapsTo` で供給) と
 標準データのみになる。
+
+### (161) 🎯 書籍 p.132 の Corollary 2 は `h(ω) ∈ W` を**使っていない** — (H5) 直で `h(ω) = ζ³`
+
+原文 (p.132、pdftotext):
+
+> **Corollary 2.** If `G = PSU(3,q)` and if `ζ ∈ W^#`, then there is an element
+> `ω ∈ Q − Q₀` such that `f(ω) = ω^{-ζ}` and `h(ω) = ζ³`.
+> *Proof.* As `ζ⁻¹ + ζ^{-q} ≠ 0`, there is `ω̄ ∈ E − {0}` with `ω̄^{1+q} = ζ⁻¹ + ζ^{-q}`.
+> Then `ω = (ω̄, ζ⁻¹) ∈ Q`, `ω⁻¹ = (ω̄, ζ)` and `f(ω) = (ω̄ζ, ζ) = ω^{-ζ}`.
+> **Applying (H5), we thus see that `h(ω) = ζ³`.** ∎
+
+⟹ 書籍は `h(ω) ∈ W` を経由しない。(H5) `(f∘j)³(x) = x^{h(x)⁻¹}` を `f(ω) = ω^{-ζ}`
+に当てると `ω^{h(ω)⁻¹} = ω^{ζ⁻³}`、つまり `h(ω)⁻¹ζ³ ∈ D` が `ω` を `Q₀` を法として
+固定する ⟹ **`D` の自由性** (`eq_one_of_conj_eq_mul_Q0_of_mem_D`) で `h(ω) = ζ³`。
+
+⟹ **`hhW` は repo 側の特殊化債務**。`h_eq_zpow_three` が `h ω ∈ W` を取っているのが
+原因なので、そこを自由性で書き換えれば `hhW` は消える。
+
+**次セッションの手順**:
+1. `h_eq_zpow_three` (`PSU3SectionThree.lean` 付近) の証明を読み、`h ω ∈ W` が
+   どこで効いているかを実測。
+2. `(f∘j)³` の計算は既存 (`fj_cube_of_f_eq_conj_inv` / `hFive`) なので、
+   最後の「`D` の元が `ω` を `Q₀` 法で固定 ⟹ 1」を
+   `eq_one_of_conj_eq_mul_Q0_of_mem_D` に差し替える。
+3. `h_eq_zpow_three` から `h ω ∈ W` 仮説を落とす → `corollaryTwo` から `hhW` を落とす
+   → 上流 6 箇所 (`corollaryTwo_of_stepFour` … `..._of_closing`) を芋づるで掃除。
