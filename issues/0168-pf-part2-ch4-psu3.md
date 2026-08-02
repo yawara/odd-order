@@ -8081,3 +8081,24 @@ ambient の `f,h` と一致することを、`t x t = g·h·t·f` の分解の�
 `fgh_residualQuotient_eq` (169) / `eq_of_mk_eq_of_mem_Q` (170) の 4 本。
 ⚠ `ω` の持ち上げは `Q(intr) = (Q.subgroupOf U).map π` から、`ζ'` の持ち上げは
 `W(intr) ≤ D(intr) = (D.subgroupOf U).map π` から (どちらも `Subgroup.mem_map`)。
+
+### (172) 🎯🎯 §4 段 (3) 完了 — `exists_f_eq_conj_inv_residual`
+
+commit `4764df155`。新 leaf `PSU3SectionFourStepThree.lean` (段 (2) 内在版 + 段 (3);
+`PSU3SectionFourIntrinsic` が 1500 行超になったので分割、`OddOrder.lean` に配線済)。
+
+> `∀ ζ ∈ W̄^#`, `∃ z x ∈ U`, `z ∈ D ∧ x ∈ Q ∖ Q₀ ∧ f x = z⁻¹ x⁻¹ z`
+
+4 段の経路: 段 (2) → `U` への持ち上げ → `fgh_residualQuotient_eq` +
+`eq_of_mk_eq_of_mem_Q` で `U` 内の等式へ格上げ → `exists_fgh_residual`
+(canonical form の一意性) で ambient の `f` へ。
+
+**次**: 書籍 p.133 の段 (3) 後半以降。原文 (p.133 末尾〜134):
+> In the following calculations, we again identify `Q ⋊ K W` with the group `S₁ ⋊ K₁W₁`
+> of Chapter III §3. Then, by Proposition 2 of Appendix I, `η` acts as a semilinear
+> mapping on `Q/Q₀ = E`. … Put `ω² = (0,α)`. Let `a ∈ K` be such that `a ≠ a^{-τ}` and
+> let `b ∈ K` be such that `b^{1+θ} = α + a^{-(1+θ)}`. Then, by (2) of §2, …
+
+⟹ ここから先は `η` (= `P` の生成元の作用) の半線形性を使う計算。まず p.134 の
+ページ画像を読んで段の構造を確定すること (p.134 は取得済:
+`references/peterfalvi/pages/peterfalvi-p134.png`)。
