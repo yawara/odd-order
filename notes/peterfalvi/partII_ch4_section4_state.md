@@ -106,3 +106,22 @@ Hypothesis.SectionFourSetup.exists_mem_W
 * `show` は style linter に掛かる — `change` を使う。
 * AxiomsCheck の登録名は `namespace Hypothesis` 内なら `Hypothesis.` を付ける
   (leaf build では検出できず、フルビルドで初めて赤になる)。
+
+## 次の作業 = §3 Corollary 1 への接続 (Ch. IV 完了)
+
+書籍 p.132 (原文):
+
+> **Corollary 1.** Under the hypothesis of the proposition, `O^{2′}(G) = PSU(3,q)`.
+> In particular, if `V = W`, then `G` is isomorphic to `PSU(3,q)` or to `PGU(3,q)`.
+
+§4 の出力 (`∃ ω ∈ Q−Q₀`, `f(ω) = (ω⁻¹)^ζ` (ζ ∈ W^#), `h(ω) ∈ W`) は
+**§3 の Proposition の仮説そのもの**なので、Corollary 1 が `V ≠ W` の場合にも
+`O^{2′}(G) ≅ PSU(3,q)` を与えて Theorem A が閉じる。
+
+⚠ `exists_mem_W` は今 `k x ∈ W` だけを返す。Proposition の仮説にするには
+`f x = ζ⁻¹ x⁻¹ ζ` と `ζ ∈ W^#` も一緒に返す必要がある
+(証明内には `hfζ`/`hζW`/`hζ1` として在るので、結論に足すだけ)。
+
+要調査: §3 Proposition の結論 (`θ = 1` と `f(ρ) = (ρ̄/y, 1/y)`) と
+Corollary 1 が repo にどこまで在るか。`stepThree` は Proposition の
+stage (3) まで。`PSU3CorollaryTwo.lean` は Corollary 2 のみ。
