@@ -136,6 +136,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.ThompsonPComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Problems7C
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9D
+import OddOrder.Isaacs.Ch09_MoreSubnormality.KegelMinimalCounterexample
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Quasisimple
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Components
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Semisimple
@@ -15187,3 +15188,11 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch08.isSimpleGroup_mulAut_iff
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch09.KegelHypothesis.map_mk
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.exists_lt_of_isSubnormal_subgroupOf
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.IsKegelMinimalCounterexample.sup_eq_top
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.IsKegelMinimalCounterexample.inf_isSubnormal
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.IsKegelMinimalCounterexample.inf_eq_bot
