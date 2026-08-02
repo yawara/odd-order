@@ -710,6 +710,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
 import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisFieldMatching
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourIntrinsic
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourStepThree
 import OddOrder.Higman.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.Suzuki2Groups
 import OddOrder.Peterfalvi.Appendices.FeitSibley
