@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEquations
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryTwo
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourStepThree
 
 /-!
 # Peterfalvi Part II, Ch. IV §4: `λ = 1` and the trace relation
@@ -70,6 +71,8 @@ membership facts it needs on the model:
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
 * `Hypothesis.SectionFourSetup.mem_W_of_stepThree` — **🎯🎯🎯 the same from step (3)'s
   output**, with the `ζ₁ ∈ ζ P` refinement carried out.
+* `Hypothesis.SectionFourSetup.exists_stepThree_data` — that output, produced from the
+  section's standing data (steps (1)–(3) plumbed together).
 -/
 
 set_option autoImplicit false
@@ -1157,6 +1160,52 @@ theorem SectionFourSetup.mem_W_of_stepThree (s4 : hyp.SectionFourSetup) {f g k :
     (hyp.sq_mem_Q0_of_lemmaFiveSetup sfive hxQ) rfl hfζ hη'ζ hkζ htη' hη'D hη'V hη'x
     hznot hj
   exact hkW
+
+include hyp in
+/-- **🎯🎯 Step (3)'s output, packaged for `mem_W_of_stepThree`** (Peterfalvi Part II,
+Ch. IV §4, pp. 132–133).
+
+The plumbing of steps (1)–(3): Glauberman's `ω ∈ C_Q(P) − Q₀` gives `Z(U) ⊆ D`
+(`center_residualImage_le_D`), Ch. I §3 Proposition 1(c) gives the `PSU(3, ℓ)` branch
+(`nonempty_psu3Data_sectionFour`), the transported standing hypothesis has a nontrivial
+`W̄`-element (`exists_ne_one_mem_W_intrinsicResidualQuotient`), and step (3)
+(`exists_f_eq_conj_inv_residual`) reads the resulting `f`- and `h`-values back into `G`. -/
+theorem SectionFourSetup.exists_stepThree_data (s4 : hyp.SectionFourSetup) {f g k : G → G}
+    (H : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g k)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hQ2 : IsPGroup 2 ↥hyp.Q)
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
+    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer ((s4.P : Set G)))))
+    (ih : TheoremAInductionBelow G Ω) :
+    ∃ ζ₁ x η : G, ζ₁ ∈ hyp.D ∧ ζ₁ ∈ residualImage (G := G) s4.P ∧
+      x ∈ hyp.Q ∧ x ∉ hyp.Q0 ∧ x ∈ residualImage (G := G) s4.P ∧
+      f x = ζ₁⁻¹ * x⁻¹ * ζ₁ ∧
+      ∃ hηU : η ∈ residualImage (G := G) s4.P,
+        (⟨η, hηU⟩ : ↥(residualImage (G := G) s4.P))
+            ∈ Subgroup.center ↥(residualImage (G := G) s4.P) ∧
+          k x = ζ₁ ^ 3 * η := by
+  classical
+  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  obtain ⟨ω, hωQ, hωQ0, hωfix⟩ := s4.exists_fixed_not_mem_Q0 hZ hCop hSolv
+  have hZD := SectionFourSetup.center_residualImage_le_D hyp s4 hQ2 hωQ hωQ0 hωfix
+  obtain ⟨result, data, ⟨details⟩⟩ :=
+    hyp.nonempty_psu3Data_sectionFour s4 hZ hQsuz hCop hSolv hP hA3 hord ih
+  obtain ⟨zbar, hzbarW, hzbar1⟩ :=
+    hyp.exists_ne_one_mem_W_intrinsicResidualQuotient details s4.P_le_D
+      s4.t_mem_centralizer hCQ hZD
+  obtain ⟨z, x, hzD, hxQ, hxQ0, hfx, c, hcZ, hkx⟩ :=
+    hyp.exists_f_eq_conj_inv_residual H s4.P_le_V hP details s4.P_le_D
+      s4.t_mem_centralizer hCQ hZD ih zbar hzbarW hzbar1
+  refine ⟨(z : G), (x : G), (c : G), hzD, z.2, hxQ, hxQ0, x.2, hfx, c.2, ?_, ?_⟩
+  · simpa using hcZ
+  · rw [hkx]
+    push_cast
+    ring
 
 end Hypothesis
 

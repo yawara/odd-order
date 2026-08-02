@@ -8976,3 +8976,23 @@ exact sectionFour_mem_W H hC2 M sfive hZ hm hQ0card
 を繋いで `exists_f_eq_conj_inv_residual` を呼び、その出力を
 `mem_W_of_stepThree` ((211)) の形に整える。必要な追加入力は
 `η ∈ P` (`eq_P_of_centralizes`、要 `hS`) と `ζ₁ ∉ P` の 2 つ。
+
+### (213) 🎯🎯 step (1)–(3) の配管が全部繋がった
+
+`SectionFourSetup.exists_stepThree_data` — §4 の standing data から
+step (3) の出力 (`ζ₁ ∈ D ∩ U`, `x ∈ (Q−Q₀)∩U`, `f x = x^{-ζ₁}`,
+`η ∈ Z(U)` with `k x = ζ₁³η`) を `mem_W_of_stepThree` が食える形で produce:
+
+1. `s4.exists_fixed_not_mem_Q0` (Glauberman) → `ω ∈ C_Q(P) − Q₀`
+2. `center_residualImage_le_D` ((212)) → `hZD`
+3. `nonempty_psu3Data_sectionFour` ((204)) → `details`
+4. `exists_ne_one_mem_W_intrinsicResidualQuotient` → `ζ̄ ∈ W̄^#`
+5. `exists_f_eq_conj_inv_residual` → step (3) の出力
+
+⚠ import 追加: `PSU3SectionFourStepThree` (= Intrinsic 経由)。
+
+**残り = 最後の合成 1 本**:
+`exists_stepThree_data` + `mem_W_of_stepThree` を繋ぐには
+* `η ∈ P` — `eq_P_of_centralizes` (要 `hS`: `P·Z(U)` が `C_Q(P)` を中心化)
+* `ζ₁ ∉ P` — 書籍は `ζ₁ ∈ (V∩U) − (P∩U)` と選ぶ ((210))
+* `ζ₁ ∈ V` — `ζ₁ ∈ D` と `ζ₁ ∈ U ≤ C(t)` (`t ∈ U`) から
