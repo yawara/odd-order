@@ -7214,6 +7214,37 @@ step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可
 
 ⟹ 元の「`N` 可換 / 非可換」の場合分けは **`F(G) ⊓ N = ⊥` / `N ≤ F(G)`** に置き換わる。
 
+## 10B.1 の進捗と残り (2026-08-03)
+
+landing 済 (`Ch10_MoreTransfer/Problems10B.lean` + `GroupTheory/IsMetacyclic.lean`):
+
+* `isMetacyclic_semidirectProduct` (一般) — 巡回群同士の半直積は metacyclic。
+* `card_ker_unitsMap` / `orderOf_one_add_prime_dvd` — `1+p` の `(ZMod p^n)ˣ` での位数は
+  `p^{n-1}` を割る (還元 `(ZMod p^n)ˣ ↠ (ZMod p)ˣ` の核が位数 `p^{n-1}`)。
+  ⚠ LTE でなくこの経路なら **`p = 2` の例外を避けられる**。
+* `unitAutHom` / `orderOf_unitAutHom` — 単元が定める `Multiplicative (ZMod m)` の自己同型と
+  その位数 (= 単元の位数)。
+* `problem10B1Group` / `isMetacyclic_problem10B1` / `isPGroup_problem10B1` —
+  **`P = C ⋊ ⟨a⟩` は metacyclic な `p`-群** (`|P| = p^{n+k}`)。
+* `commutatorElement_inr_inl` / **`commutatorElement_inl_left`** —
+  `N` 可換なら `⁅inl y, g⁆ = inl (y · (φ (rightHom g) y)⁻¹)`。
+
+**残り = 冪零類 `= n`**。設計:
+
+`K k : Subgroup P := (Subgroup.zpowers (Multiplicative.ofAdd ((p ^ k : ℕ) : ZMod (p^n)))).map inl`
+とおいて **`lowerCentralSeries P (k+1) = K k`** を帰納で示す。
+
+* ⊇ (下から): `⁅inr a, inl (x^{p^{k-1}})⁆ = inl (x^{p^{k-1}·p}) = inl (x^{p^k})`
+  (`commutatorElement_inr_inl` + `u = 1+p`)。
+* ⊆ (上から): `Subgroup.commutator_le` で「`y ∈ K (k-1)`, `g ∈ ⊤`」に帰着し、
+  `commutatorElement_inl_left` から `⁅inl y, g⁆ = inl (y · (φ b y)⁻¹)`,
+  `toAdd y = c · p^{k-1}` なので `(1 - u^j) · c · p^{k-1}`。
+  **算術の核 = `(p : ZMod (p^n)) ∣ 1 - ↑(u^j)`** (`u ≡ 1 mod p` だから)。
+  ⟹ `ZMod.unitsMap` が群準同型なので `unitsMap (u^j) = 1`、あとは
+  「`castHom z = 0 ↔ (p : ZMod p^n) ∣ z`」の橋 (mathlib 名を要確認)。
+* 最後に `K n = ⊥` (`p^n = 0`), `K (n-1) ≠ ⊥` (`p^{n-1} ≠ 0`) から
+  `nilpotencyClass = n`。
+
 ## ⚠ scope 実測: Isaacs §10C は 6 問 (2026-08-03)
 
 旧インベントリの「10C(1) / 10C.1 未確認 (ページ画像未切り出し)」は**誤り**。
