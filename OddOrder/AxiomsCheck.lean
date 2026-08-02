@@ -26,6 +26,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3OrbitCount
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCoordinate
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -14815,3 +14816,21 @@ comment. -/
 #assert_only_allowed_axioms OddOrder.FiniteField.exists_ringAut_extending_frobFixedSubfield
 #assert_only_allowed_axioms OddOrder.FiniteField.eq_one_or_eq_qFrobenius_of_fixes
 #assert_only_allowed_axioms OddOrder.FiniteField.eq_or_eq_mul_qFrobenius_of_eq_on_frobFixed
+
+/-! **Ch. IV §4, the linear equation (4)** (issue 0168, 2026-08-02).
+`Peterfalvi/Appendices/Suzuki/PSU3SectionFourCoordinate.lean` — Peterfalvi Part II, p. 133.
+
+Step (3) of §4 gives `h(ω) = ζ³η` with `η ∈ P`, so the chain of §3's stage (1)
+(`stepOne_chain_of_h_eq_mul`) runs with that conjugator.  Since `η` commutes with `ζ` (the book
+takes `ζ ∈ C_W(P)`), the two `ζ`-conjugations flanking the `η`-conjugation on the right collapse
+into a single `ζ²`, and reading the chain in `Q ⧸ Z(Q) ≅ E` gives the book's
+
+  **(4)** `a² f(ω s^a)‾ = ζ⁻¹ f(ω s^a)‾^η + ω̄`,
+
+with `f(ω s^a)‾^η` the coordinate of the conjugate `η · f(ω s^a) · η⁻¹`.  No hypothesis `V = W`
+enters — §4 is the case `V ≠ W` — and no semilinearity is needed yet: the field automorphism `μ`
+of the book is what turns that conjugate into a scalar expression, from (5) onwards. -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_conj_eta_of_commute
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.sectionFour_four_linear
