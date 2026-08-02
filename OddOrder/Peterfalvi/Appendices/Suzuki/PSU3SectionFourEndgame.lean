@@ -55,6 +55,8 @@ membership facts it needs on the model:
   **`Z(U) ⊆ D`**, the `hZD` that §4's step (2)/(3) endpoints thread as a hypothesis.
 * `Hypothesis.nonempty_psu3Data_sectionFour` — the `PSU(3, ℓ)` branch data for `X = P`,
   which step (2) and step (3) run on.
+* `Hypothesis.conj_t_eq_of_mem_center`, `Hypothesis.SectionFourSetup.pow_odd_eq_one_of_mem_P`
+  — the `htη` and `hηord` of `sectionFour_mem_W`.
 * `conj_inv_eq_of_commute`, `cube_mul_eq_of_commute` — the book's refinement
   `ζ₁ ∈ ζ P` (p. 133): `ω^{ζ₁} = ω^ζ` and `ζ₁³ P = ζ³ P`.
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
@@ -855,6 +857,31 @@ theorem nonempty_psu3Data_sectionFour (s4 : hyp.SectionFourSetup)
   obtain ⟨data, -, details⟩ :=
     nonempty_psu3Data_of_orderOf_eq_three tri.branch hord hnea |>.some
   exact ⟨tri.result, data, ⟨details⟩⟩
+
+include hyp in
+/-- **`t` commutes with `Z(U)`** — since `t ∈ U`.  This is `htη` of
+`sectionFour_mem_W`, in the `t η t = η` shape §3's chain uses (`t² = 1`). -/
+theorem conj_t_eq_of_mem_center {U : Subgroup G} (htU : hyp.t ∈ U)
+    {η : G} (hη : η ∈ U) (hηc : (⟨η, hη⟩ : ↥U) ∈ Subgroup.center ↥U) :
+    hyp.t * η * hyp.t = η := by
+  have hc : hyp.t * η = η * hyp.t := by
+    have hz := Subgroup.mem_center_iff.mp hηc ⟨hyp.t, htU⟩
+    exact congrArg Subtype.val hz
+  calc hyp.t * η * hyp.t = η * (hyp.t * hyp.t) := by rw [hc]; group
+    _ = η := by rw [← sq, hyp.t_sq, mul_one]
+
+include hyp in
+/-- **`η ∈ P` has odd order** — `|P| = p` is an odd prime.  This is `hηord` of
+`sectionFour_mem_W`. -/
+theorem SectionFourSetup.pow_odd_eq_one_of_mem_P (s4 : hyp.SectionFourSetup) {η : G}
+    (hη : η ∈ s4.P) : ∃ j : ℕ, η ^ (2 * j + 1) = 1 := by
+  obtain ⟨j, hj⟩ := s4.odd_cardP
+  refine ⟨j, ?_⟩
+  rw [← hj, ← s4.card_P]
+  have h1 : (⟨η, hη⟩ : ↥s4.P) ^ Nat.card ↥s4.P = 1 := pow_card_eq_one'
+  have h2 := congrArg (Subtype.val (p := fun x => x ∈ s4.P)) h1
+  simp only [SubmonoidClass.coe_pow, OneMemClass.coe_one] at h2
+  exact h2
 
 /-! ### The book's refinement `ζ₁ ∈ ζ P`
 

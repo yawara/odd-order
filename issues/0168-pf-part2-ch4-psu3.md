@@ -8833,3 +8833,17 @@ threading されているだけ**で producer が無い。`hyp.D` は `Hypothesi
 * `η := c ∈ Z(U)` → `η ∈ P` は `eq_P_of_centralizes`
 * `hηζ`/`hηω`/`htη`/`hηord` は `η ∈ P` と `ζ ∈ C_W(P)`, `ω ∈ C_Q(P)`, `t ∈ U` から
 * `hq` = (199)、`hznot` = `mu_W_notMem_frobFixed`、`y := ω²`
+
+### (205) step (3) 出力 → `sectionFour_mem_W` 仮説の橋渡し 2 本
+
+* `conj_t_eq_of_mem_center` — `t ∈ U` なので `Z(U)` の元は `t` と可換、
+  `t² = 1` から `t η t = η` (= `htη`)。
+* `SectionFourSetup.pow_odd_eq_one_of_mem_P` — `η ∈ P`、`|P| = p` 奇素数
+  ⟹ `η^(2j+1) = 1` (= `hηord`)。
+
+残る変換は 1 行ずつで済むもの:
+`hηζ` = `mem_centralizer_iff.mp hζC η hηP` /
+`hηω` = `hωfix η hηP` /
+`hηD`,`hηV` = `η ∈ P ≤ V ≤ D`。
+
+⟹ **§4 の残りは `sectionFour_mem_W` を呼ぶ top-level 定理を書くだけ**。
