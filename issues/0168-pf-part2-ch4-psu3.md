@@ -7931,3 +7931,26 @@ commit `62eb97427`。(163) のレシピどおりで**初回ビルド green**。
 `exists_mulEquiv_match_residualQuotient_t`) で `corollaryTwo_residualQuotient` の結論を
 移せばよい。`IsFGH` と結論はどちらも群同型で移送可能な形なので、
 **`Hypothesis.ofMulEquivPullback` 系の移送補題を 1 本足す**のが筋。
+
+### (165) 内在版への移送レシピ — `IsFGH.map` がそのための道具 (docstring がそう書いている)
+
+`IsFGH.map` (`RankOneBNPair.lean:478`) の docstring:
+
+> …it is what Peterfalvi Part II, Ch. IV §4, step (2) (p. 133) uses to read Corollary 2
+> of §3 — proved for the quotient `U/Z(U)` — back inside `U`
+
+署名: `(hS' : Setup M' Q' D' t') (H : IsFGH M Q D t f g h) (H' : IsFGH M' Q' D' t' f₁ g₁ h₁)`
+`(π : L →* L') (ht : π t = t') (hQπ) (hDπ) (hxQ : x ∈ Q) (hx1 : π x ≠ 1)`
+⟹ `f₁ (π x) = π (f x) ∧ g₁ (π x) = π (g x) ∧ h₁ (π x) = π (h x)`。
+
+⟹ **移送補題の骨格** (次セッション):
+1. `ψ` と `H,Q,D,t` の対応を `exists_mulEquiv_match_residualQuotient_t` から取る
+   (`Q₀` は `map_Q0_of_mulEquiv`、`W` は `map_W_of_mulEquiv`; `HypothesisFieldMatching.lean`)。
+2. 内在側の三つ組は `exists_fgh_mapsTo` で別途作る (`f₂,g₂,h₂`)。
+3. `corollaryTwo_residualQuotient` の `ω` を `ψ ω` へ移す。`IsFGH.map` で
+   `f₂ (ψ ω) = ψ (f₁ ω) = ψ(ζ⁻¹ω⁻¹ζ) = (ψζ)⁻¹(ψω)⁻¹(ψζ)`、
+   `h₂ (ψ ω) = ψ (h₁ ω) = (ψζ)³`。
+4. `ψ ω ∉ Q₀'` は `map_Q0_of_mulEquiv` + `ψ` の単射性。
+   `ζ' := ψ ζ` は `W'^#` を走る (`map_W_of_mulEquiv`)。
+⟹ 結論は `corollaryTwo_residualQuotient` と同型の文が
+`intrinsicResidualQuotient` 上で成り立つ、という形になる。
