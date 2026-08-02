@@ -7786,3 +7786,35 @@ commit `e02a85891`。`corollaryTwo_of_isStandardModel_of_closing` を新設し�
 ⚠ 教訓: 本 issue は 7000 行を超え、古い ⚠ と新しい ✅ が混在している。
 **表の「✅ 導出可」は、根拠 (定理名) が併記されていなければ信用しない**
 ([[verify-port-state-by-number-not-coq-name]])。
+
+### (160) 🎯 `hhW` の消費点は **1 箇所・1 元だけ** — 弱化できる
+
+`corollaryTwo` (`PSU3InverseFormula.lean:925`) を実測。`hhW` の使用は末尾の 1 行のみ:
+
+```
+  exact ⟨(ωQ : G), hωmem, hnotQ0, hfeq,
+    hyp.h_eq_zpow_three H M hZc hmu hVW hζ hωmem hnotQ0 hfeq (hhW _ hωmem hnotQ0)⟩
+```
+
+⟹ **∀ 版は不要**。必要なのは「`corollaryTwo` が `ζ` から構成する当の `ω`」1 点での
+`h ω ∈ W` だけ。しかもその `ω` は `hfeq : f ω = ζ⁻¹ω⁻¹ζ` を満たしている。
+
+**弱化の候補 2 つ**:
+1. 仮説を `∀ ρ ∈ Q∖Q₀, f ρ = ζ⁻¹ρ⁻¹ζ → h ρ ∈ W` に絞る (消費点に必要十分)。
+   さらに `h_mem_W` で閉じられるか: `ω² ∈ Q₀` から `y := ω²` と置くと
+   `ω y = ω³ = ω⁻¹` なので `hfeq` は正規化 `f ω = ζ⁻¹(ω y)ζ` そのもの。
+   ⚠ ただし `h_mem_W` は **`hWcard : orderOf ζ = |W|`** (ζ が生成元) を要求する。
+   Corollary 2 の `ζ` は `W^#` の任意元なので、そのままでは当たらない。
+2. **書籍の道**: `corollaryTwo` の docstring 自身が
+   > the book's second conclusion `h(ω) = ζ³` is `h_eq_zpow_three` applied to the first
+   > (it needs `h(ω) ∈ W`, **which the book reads off (H5)**)
+
+   と書いている。⟹ **p.132 を読んで (H5) からの導出を形式化するのが本筋**。
+   (H5) は `(f∘j)³(x) = x^{h(x)⁻¹}` (`dOrbitRel_fj_cube` / `hFive`)。
+
+**次セッションの手順**: `references/peterfalvi/pages/peterfalvi-p132.png` を読み、
+Corollary 2 の証明で `h(ω) ∈ W` をどう出しているかを確定 → 形式化 → `hhW` を
+`corollaryTwo` から削除 → 上流 6 箇所 (`corollaryTwo_of_stepFour` …
+`..._of_closing`) の仮説から芋づる式に落とす。
+⟹ これが済めば endpoint の未証明仮説は `hfQ` (= `exists_fgh_mapsTo` で供給) と
+標準データのみになる。
