@@ -1332,6 +1332,60 @@ theorem exists_isStandardModel_intrinsicResidualQuotient (hXV : X ≤ hyp.V) (hX
       (hyp.theoremAInductionBelow_intrinsicResidualQuotient details hXD htX hCQ hZD hXV hX ih)
       x₀ hx₀⟩
 
+/-- **🎯 Ch. IV §4, step (2) for the *intrinsic* standing hypothesis on `U/Z(U)`**
+(Peterfalvi Part II, p. 133).
+
+`corollaryTwo_residualQuotient` proves Corollary 2 on the transported hypothesis; the
+book's `f₁`, `h₁` are the mappings of the intrinsic one, whose `H`, `Q`, `D`, `t` are the
+images of `U ∩ H`, `U ∩ Q`, `U ∩ D` and `t`.  The two are matched by
+`exists_mulEquiv_match_residualQuotient_t`, and `corollaryTwo_conclusion_of_mulEquiv`
+(through `IsFGH.map`) pushes the witness across. -/
+theorem corollaryTwo_intrinsicResidualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
+    (details : CentralizerPSUData hyp X result data)
+    (hXD : X ≤ hyp.D) (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X))
+    (ih : TheoremAInductionBelow G Ω) :
+    letI := MulAction.compHom (ULift.{v} (Unital data.n))
+      details.residualQuotientEquiv.toMonoidHom
+    ∀ ζ ∈ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).W, ζ ≠ 1 →
+      ∃ f₂ g₂ k₂ : (↥(residualImage (G := G) X) ⧸
+            Subgroup.center ↥(residualImage (G := G) X)) →
+          ↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X),
+        OddOrder.GroupTheory.RankOneBNPair.IsFGH
+            (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).H
+            (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q
+            (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).D
+            (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).t f₂ g₂ k₂ ∧
+          ∃ ω ∈ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q,
+            ω ∉ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q0 ∧
+              f₂ ω = ζ⁻¹ * ω⁻¹ * ζ ∧ k₂ ω = ζ ^ 3 := by
+  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+    details.residualQuotientEquiv.toMonoidHom
+  intro ζ hζW hζ1
+  obtain ⟨ψ, hH, hQ, hD, ht⟩ :=
+    hyp.exists_mulEquiv_match_residualQuotient_t details hXD htX hCQ hZD
+  -- pull `ζ` back along `ψ`
+  have hWmap := map_W_of_mulEquiv (hyp.residualQuotientHypothesis details)
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD) ψ hH hD
+  obtain ⟨ζ₀, hζ₀W, hζ₀ζ⟩ : ∃ ζ₀ ∈ (hyp.residualQuotientHypothesis details).W, ψ ζ₀ = ζ := by
+    rw [← hWmap] at hζW
+    exact hζW
+  have hζ₀1 : ζ₀ ≠ 1 := by
+    intro hc
+    exact hζ1 (by rw [← hζ₀ζ, hc, map_one])
+  obtain ⟨f₁, g₁, k₁, H₁, ω, hωQ, hωQ0, hf, hk⟩ :=
+    hyp.corollaryTwo_residualQuotient details hXV hX ih ζ₀ hζ₀W hζ₀1
+  obtain ⟨f₂, g₂, k₂, H₂, -⟩ :=
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).exists_fgh_mapsTo
+  obtain ⟨h1, h2, h3, h4⟩ := corollaryTwo_conclusion_of_mulEquiv
+    (hyp.residualQuotientHypothesis details)
+    (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD) ψ hH hQ hD ht H₁ H₂ hωQ hωQ0
+    hf hk
+  rw [hζ₀ζ] at h3 h4
+  exact ⟨f₂, g₂, k₂, H₂, ψ ω, h1, h2, h3, h4⟩
+
 end Model
 
 /-! ### §2 and §3 run outright on `C/𝒩(C)`
