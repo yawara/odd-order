@@ -8875,3 +8875,21 @@ inline に書かれていたものを抽出。
 * `hS : ∀ c ∈ P·Z(U), c·ω = ω·c` — 書籍「P Z(U) centralizes C_Q(P)」
 両方とも §4 step (1)(2) の PSU(3,ℓ) 構造から読み取る内容で、
 top-level 定理では仮説として持つのが honest。
+
+### (208) 🎯 `ζ₁ ∈ ζ P` の refinement を組立
+
+`SectionFourSetup.exists_refined_zeta` — `ζ₁ ∈ V ∩ U` から
+`ζ₁ = p·ζ` (`p ∈ P`, `ζ ∈ W`, `ζ ∈ C(P)`) を出す:
+1. Galois (`inf_le_sup_W_of_centralizes`) で `ζ₁ ∈ P ⊔ W`
+2. `exists_mem_P_mem_W_mul` ((206)) で `ζ₁ = p ζ`
+3. `ζ = p⁻¹ζ₁` で `p ∈ P ≤ C(P)` (P は素数位数巡回ゆえ可換) と
+   `ζ₁ ∈ U ≤ C(P)` ((207)) から `ζ ∈ C(P)`
+
+⚠ 実装メモ: 本 file の `variable (hyp)` は**明示**なので、`include hyp in` を
+付けた `SectionFourSetup.*` 補題は `s4.foo` のドット記法が使えない
+(`hyp` が先頭の明示引数になる)。`SectionFourSetup.foo hyp s4 …` と書く。
+`PSU3SectionFourSetup.lean` 側は `namespace SectionFourSetup` +
+`variable {hyp}` なのでドット記法が効く。
+
+**残り = top-level 定理のみ**。仮説は `hcent` と `hS` の 2 つ
+(書籍が structure of PSU(3,ℓ) から読み取る部分) + 周囲の standing data。

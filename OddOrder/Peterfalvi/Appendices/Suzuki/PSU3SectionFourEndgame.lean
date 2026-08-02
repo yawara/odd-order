@@ -60,6 +60,8 @@ membership facts it needs on the model:
 * `Hypothesis.SectionFourSetup.exists_mem_P_mem_W_mul` — `P ⊔ W = P · W`, the `hfac` of
   `inf_le_sup_centralizer_W` and `eq_P_of_centralizes`.
 * `Hypothesis.residualImage_le_centralizer` — `U ≤ C_G(X)`, its `hUC`.
+* `Hypothesis.SectionFourSetup.exists_refined_zeta` — **the book's `ζ₁ ∈ ζ P` with
+  `ζ ∈ C_W(P)`**.
 * `conj_inv_eq_of_commute`, `cube_mul_eq_of_commute` — the book's refinement
   `ζ₁ ∈ ζ P` (p. 133): `ω^{ζ₁} = ω^ζ` and `ζ₁³ P = ζ³ P`.
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
@@ -908,6 +910,40 @@ theorem SectionFourSetup.exists_mem_P_mem_W_mul (s4 : hyp.SectionFourSetup)
       (le_trans s4.P_le_D hyp.D_le_normalizer_W)
   obtain ⟨p, hp, w, hw, hpw⟩ : v ∈ (s4.P : Set G) * (hyp.W : Set G) := hcoe ▸ hv
   exact ⟨p, hp, w, hw, hpw.symm⟩
+
+include hyp in
+/-- **🎯 The book's `ζ₁ ∈ ζ P` with `ζ ∈ C_W(P)`** (Peterfalvi Part II, Ch. IV §4, p. 133).
+
+The theorem of Galois puts `ζ₁ ∈ V ∩ U` into `P W` (`inf_le_sup_W_of_centralizes`), and
+`P ⊔ W = P · W` factors it as `ζ₁ = p ζ`.  That `ζ` centralizes `P` is then automatic:
+`ζ = p⁻¹ ζ₁` with `p ∈ P ≤ C_G(P)` (`P` is cyclic of prime order, hence abelian) and
+`ζ₁ ∈ U ≤ C_G(P)`.
+
+`hcent` is the one input the book reads off the structure of `PSU(3, ℓ)`:
+"(V ∩ U)/(P ∩ U) centralizes `C_{Q₀}(P)`". -/
+theorem SectionFourSetup.exists_refined_zeta (s4 : hyp.SectionFourSetup)
+    (hcent : hyp.V ⊓ residualImage (G := G) s4.P ≤ Subgroup.centralizer
+      (((hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) : Subgroup G) : Set G))
+    {ζ₁ : G} (hζ₁V : ζ₁ ∈ hyp.V) (hζ₁U : ζ₁ ∈ residualImage (G := G) s4.P) :
+    ∃ p ∈ s4.P, ∃ ζ ∈ hyp.W,
+      ζ ∈ Subgroup.centralizer ((s4.P : Set G)) ∧ ζ₁ = p * ζ := by
+  haveI : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
+  haveI : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
+  have hPW : ζ₁ ∈ s4.P ⊔ hyp.W :=
+    s4.inf_le_sup_W_of_centralizes hcent ⟨hζ₁V, hζ₁U⟩
+  obtain ⟨p, hp, ζ, hζ, hpζ⟩ := SectionFourSetup.exists_mem_P_mem_W_mul hyp s4 hPW
+  refine ⟨p, hp, ζ, hζ, ?_, hpζ⟩
+  have hPC : s4.P ≤ Subgroup.centralizer ((s4.P : Set G)) := by
+    intro a ha
+    refine Subgroup.mem_centralizer_iff.mpr fun b hb => ?_
+    letI := IsCyclic.commGroup (α := ↥s4.P)
+    exact congrArg (Subtype.val (p := fun z => z ∈ s4.P))
+      (mul_comm (⟨b, hb⟩ : ↥s4.P) (⟨a, ha⟩ : ↥s4.P))
+  have hζ₁C : ζ₁ ∈ Subgroup.centralizer ((s4.P : Set G)) :=
+    residualImage_le_centralizer hζ₁U
+  have hζeq : ζ = p⁻¹ * ζ₁ := by rw [hpζ]; group
+  rw [hζeq]
+  exact Subgroup.mul_mem _ (Subgroup.inv_mem _ (hPC hp)) hζ₁C
 
 /-! ### The book's refinement `ζ₁ ∈ ζ P`
 
