@@ -15121,3 +15121,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.two_lt_card_Q0_of_isSuzuki2Group
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.SecondCaseHypothesis.nonempty_theoremAConclusion
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.SectionFourSetup.two_lt_natCard_inf_centralizer_Q0

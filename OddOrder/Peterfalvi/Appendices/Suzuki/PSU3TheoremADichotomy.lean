@@ -35,15 +35,17 @@ and then the case split itself.
 * `SecondCaseHypothesis.nonempty_theoremAConclusion_of_caseC` — **Theorem A's conclusion
   in case (c) of Ch. III §1**: `by_cases` on `FreeD`, §2 + Corollary 1 on one side and §4
   on the other.
+* `Hypothesis.SectionFourSetup.two_lt_natCard_inf_centralizer_Q0` — the book's `ℓ > 2`
+  inside step (1) of §4.
 * `SecondCaseHypothesis.nonempty_theoremAConclusion` — **Theorem A under the standing
   hypothesis of Ch. III**, all three cases of the Proposition of §1 together
-  (`theoremAConclusion_or_caseC2` disposes of (a) and (b)).
+  (`theoremAConclusion_or_caseC2` disposes of (a) and (b)), with the induction hypothesis
+  as its only input.
 
-`ℓ > 2` (the book's `U/Z(U) ≅ PSU(3, ℓ)` with `ℓ > 2`, read off Ch. I §3 Proposition 1(c)
-inside step (1) of §4) is still carried as a hypothesis, in the form §4's endpoint wants
-it: `2 < |C_{Q₀}(P)|` for every `SectionFourSetup`.  The 2-rank clause of the same step
-("by (C1), `C_G(P)` has 2-rank ≥ 2") is *not* a hypothesis here — it is the field
-`SecondCaseHypothesis.twoRank_centralizer_ge_two`.
+Both clauses of §4's step (1) come from Ch. I §3 Proposition 1(c) and are supplied here,
+not assumed: "`C_G(P)` has 2-rank ≥ 2" is the field
+`SecondCaseHypothesis.twoRank_centralizer_ge_two`, and `ℓ > 2` is
+`PSU3InductionTarget.one_lt_n` transported along `|C_{Q₀}(P)| = ℓ`.
 -/
 
 set_option autoImplicit false
@@ -269,6 +271,46 @@ theorem exists_sectionFourSetup_of_not_freeD {m : ℕ} (M : hyp.QuotientFieldMod
       (Subgroup.equivMapOfInjective P₀ (MulAut.conj k).toMonoidHom
         (MulAut.conj k).injective).toEquiv.symm
 
+/-- **`ℓ > 2`** (Peterfalvi Part II, Ch. IV §4, step (1), p. 132):
+
+> **(1)** Let `U = O^{2′}(C_G(P))`.  Then `U/(P ∩ U) ≅ PSU(3, ℓ)` with `q = ℓ^p` and
+> `ℓ > 2`.
+>
+> *Proof.* By (C1), `C_G(P)` has 2-rank `≥ 2` and, by Chapter I, §3, Proposition 1(c),
+> `U/Z(U) = PSU(3, ℓ)` for some `ℓ > 2` since `st` has order `3` and `C_Q(P)` has exponent
+> `4`.  Now `|C_{Q₀}(P)| = ℓ` …
+
+`ℓ > 2` is not a side condition of §4: it is part of what the induction returns
+(`PSU3InductionTarget.one_lt_n`, i.e. `ℓ = 2ⁿ` with `n ≥ 2` — the standard `PSU(3, ℓ)`
+model is only defined for those `ℓ`), and `|C_{Q₀}(P)| = ℓ` is
+`natCard_centralizerQ0_eq_baseField_of_psu3Target`.  The branch itself is §4's own
+`nonempty_psu3Data_sectionFour`, which is where `|st| = 3` and the exponent discriminator
+are spent. -/
+theorem SectionFourSetup.two_lt_natCard_inf_centralizer_Q0 (s4 : hyp.SectionFourSetup)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hQsuz : IsSuzuki2Group ↥hyp.Q)
+    (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
+    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (ih : TheoremAInductionBelow G Ω) :
+    2 < Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) := by
+  classical
+  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  obtain ⟨result, data, -⟩ :=
+    hyp.nonempty_psu3Data_sectionFour s4 hZ hQsuz hCop hSolv hP hA3 hord ih
+  have hbridge : Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer ((s4.P : Set G))))
+      = Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) := by
+    rw [← Subgroup.inf_subgroupOf_right]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_right).toEquiv
+  have hcard :=
+    hyp.natCard_centralizerQ0_eq_baseField_of_psu3Target s4.P_le_V hA3 result data
+  rw [hbridge, OddOrder.GroupTheory.SpecificGroups.ProjectiveUnitary.natCard_baseField
+    data.n (Nat.zero_lt_one.trans data.one_lt_n)] at hcard
+  have hpow : (2 : ℕ) ^ 2 ≤ 2 ^ data.n := Nat.pow_le_pow_right (by norm_num) data.one_lt_n
+  omega
+
 end Hypothesis
 
 /-! ## Case (c) of Ch. III §1 closes Theorem A -/
@@ -326,9 +368,7 @@ theorem nonempty_theoremAConclusion_of_caseC
     (hQsuz : IsSuzuki2Group ↥sc.toHypothesis.Q)
     (hord : orderOf (sc.toHypothesis.distinguishedInvolution * sc.toHypothesis.t) = 3)
     (hW : sc.toHypothesis.W ≠ ⊥)
-    (ih : Hypothesis.TheoremAInductionBelow G Ω)
-    (hl : ∀ s4 : sc.toHypothesis.SectionFourSetup,
-      2 < Nat.card ↥(sc.toHypothesis.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G)))) :
+    (ih : Hypothesis.TheoremAInductionBelow G Ω) :
     Nonempty (Hypothesis.TheoremAConclusion G Ω) := by
   classical
   have hm : m ≠ 0 := (Nat.zero_lt_one.trans hn).ne'
@@ -361,11 +401,16 @@ theorem nonempty_theoremAConclusion_of_caseC
       have hcard := s4.card_P
       rw [hc, Subgroup.card_bot] at hcard
       exact s4.prime_cardP.one_lt.ne hcard
+    have hA3 := sc.twoRank_centralizer_ge_two s4.P s4.P_le_V s4.cardP s4.prime_cardP
+      s4.card_P
+    have hCop := sc.coprime_card_subgroupOf_D hQ2 s4.P
     exact Hypothesis.SectionFourSetup.nonempty_theoremAConclusion sc.toHypothesis s4 M sfive
-      hQ0card hcardQ hmu hQ2 hQsuz (sc.coprime_card_subgroupOf_D hQ2 s4.P) hSolv hPbot
-      (sc.twoRank_centralizer_ge_two s4.P s4.P_le_V s4.cardP s4.prime_cardP s4.card_P)
-      hord (sc.isPGroup_two_Q_subgroupOf_centralizer hQ2 s4.P) ih (hl s4)
+      hQ0card hcardQ hmu hQ2 hQsuz hCop hSolv hPbot hA3 hord
+      (sc.isPGroup_two_Q_subgroupOf_centralizer hQ2 s4.P) ih
+      (Hypothesis.SectionFourSetup.two_lt_natCard_inf_centralizer_Q0 sc.toHypothesis s4
+        sfive.centerEqQ0 hQsuz hCop hSolv hPbot hA3 hord ih)
 
+include sc in
 /-- **🎯🎯🎯🎯🎯🎯🎯 Peterfalvi Part II, Theorem A under the standing hypothesis of
 Ch. III** (pp. 115–134): `O^{2′}(G)` is normal of odd index in `G` and carries the
 standard model, in *all three* cases of the Proposition of Ch. III §1.
@@ -377,10 +422,9 @@ output is built here: the Lemma 5 setup and the field model of Ch. III §3 from 
 non-trivial element of `W`, `μ`'s injectivity from Ch. III §3 step (4), and `q > 2` from
 the two involutions a Suzuki `2`-group has by definition.
 
-`hl` — the book's `ℓ > 2` inside step (1) of §4 — is the one clause still owed. -/
-theorem nonempty_theoremAConclusion (ih : Hypothesis.TheoremAInductionBelow G Ω)
-    (hl : ∀ s4 : sc.toHypothesis.SectionFourSetup,
-      2 < Nat.card ↥(sc.toHypothesis.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G)))) :
+Nothing is owed: `ℓ > 2` comes out of the induction itself
+(`SectionFourSetup.two_lt_natCard_inf_centralizer_Q0`). -/
+theorem nonempty_theoremAConclusion (ih : Hypothesis.TheoremAInductionBelow G Ω) :
     Nonempty (Hypothesis.TheoremAConclusion G Ω) := by
   classical
   rcases sc.theoremAConclusion_or_caseC2 ih with hdone | ⟨-, hQsuz, hcardQ, hord, hW⟩
@@ -402,7 +446,7 @@ theorem nonempty_theoremAConclusion (ih : Hypothesis.TheoremAInductionBelow G Ω
   obtain ⟨M⟩ := sc.toHypothesis.nonempty_quotientFieldModel_of_orderThree hord hQsuz hm
     hQ0card hcardQ ih sfive hwW hw1
   exact sc.nonempty_theoremAConclusion_of_caseC M sfive hn hQ0card hcardQ
-    (sc.toHypothesis.mu_injective hord hm hQ0card hcardQ ih sfive M) hQsuz hord hW ih hl
+    (sc.toHypothesis.mu_injective hord hm hQ0card hcardQ ih sfive M) hQsuz hord hW ih
 
 end SecondCaseHypothesis
 
