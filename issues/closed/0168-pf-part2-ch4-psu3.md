@@ -13,11 +13,13 @@ created: 2026-07-31
 
 ## やること
 
-- [ ]
+- [x] §1 の `f, g, h` と Lemma / §2 の (1)–(20) / §3 の Proposition と Corollary 1, 2 /
+      §4 の step (1)–(3) と endgame — **すべて完了 (2026-08-02)**
 
 ## 完了条件
 
-<!-- 何をもって closed とするか. 例: 該当 sorry が消える / lake build が通る / ノート x.md を書く -->
+**達成 (2026-08-02)**: Ch. IV (pp. 122–134) 全体が形式化され、Theorem A の帰納法まで閉じた。
+詳細は末尾「✅ クローズ」節。
 
 ## 進捗 (2026-07-31): §1 の `f`, `g`, `h`
 
@@ -9105,3 +9107,37 @@ standing data + hcent + (ζ₁ ∈ V∩U, ζ₁ ∉ P)  ⟹  ∃ x ∈ Q − Q�
   `|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` (`ℓ > 2` だから)
 
 どちらも §4 step (2) の PSU(3,ℓ) 構造読み取りで、書籍でも 1 文の主張。
+
+---
+
+## ✅ クローズ (2026-08-02) — Ch. IV 完了、さらに Theorem A の帰納法まで閉じた
+
+Ch. IV (pp. 122–134) の全節が形式化され、その先の組立ても通った:
+
+| 到達点 | 場所 |
+|---|---|
+| §3 Proposition | `proposition_inverseFormula` / `proposition_reciprocal` (`PSU3Proposition.lean`) |
+| §3 Corollary 1 | `nonempty_theoremAConclusion_psu3` (`PSU3CorollaryOne.lean`) |
+| §3 Corollary 2 | `PSU3CorollaryTwo.lean` |
+| §2 の閉じ Proposition | `exists_f_eq_conj_inv` (`FreeD` のみ、`V = W` 不要) |
+| §4 全体 | `SectionFourSetup.exists_mem_W` → `SectionFourSetup.nonempty_theoremAConclusion` |
+| **§4 冒頭の二分法** | `exists_sectionFourSetup_of_not_freeD` ([issue 0169](closed/0169-psu3-section-two-free-d.md)) |
+| **case (c) 全体** | `SecondCaseHypothesis.nonempty_theoremAConclusion` (仮説ゼロ・axiom-clean) |
+| **(C1) の場合分け** | `nonempty_theoremAConclusion_of_V_ne_bot` ([issue 0170](closed/0170-psu3-c1-first-or-second-case.md)) |
+| **Theorem A** | `theoremA` (`|G|` の強帰納法) |
+
+Ch. IV に起因する未形式化はゼロ。Suzuki Theorem A 全体に残るのは Ch. IV 外の 2 点のみ:
+
+1. **`ZassenhausClassification`** — 書籍 p.115 が [HB] XI.11.16 を引用で済ませる分類定理。
+   `def ... : Prop` の明示引数にしてあるので形式化の境界が型に出ている。低優先繰延。
+2. **[issue 0147](0147-q8-modular-char-theory-frozen.md)** — Ch. II が持つ唯一の `sorry`
+   (Brauer–Suzuki の `Q₈`)。PDF 確保待ちで blocked。
+
+到達状態の要約 note = [`notes/peterfalvi/partII_ch4_section4_state.md`](../notes/peterfalvi/partII_ch4_section4_state.md)。
+
+### 副産物の一般化 (Ch. IV 由来で他所でも使えるもの)
+
+* `OddOrder/GroupTheory/ZGroupNormalCyclic.lean` — `mem_of_pow_card_eq_one_of_isZGroup`
+* `OddOrder/GroupTheory/NearFieldFromSharplyTransitive.lean` — near-field ↔ sharply
+  2-transitive の順方向
+* `Hypothesis.two_lt_card_Q0_of_isSuzuki2Group` — `two_le_card_Q0` の強化
