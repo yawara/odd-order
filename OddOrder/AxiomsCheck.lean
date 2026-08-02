@@ -38,6 +38,8 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryOne
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FrobeniusD
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEighteen
+import OddOrder.GroupTheory.ZGroupNormalCyclic
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
@@ -15100,3 +15102,9 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isFrobeniusAction_D_of_freeD
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isZGroup_D_of_freeD
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.mem_of_pow_card_eq_one_of_isZGroup
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.normal_W_subgroupOf_D
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.h_mem_W_of_frobeniusD

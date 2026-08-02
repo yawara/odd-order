@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFifteen
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3FrobeniusD
+import OddOrder.GroupTheory.ZGroupNormalCyclic
 
 /-!
 # Peterfalvi Part II, Ch. IV §2, step (18): `(h(ω)ζ⁻¹)^m = 1`
@@ -201,6 +203,85 @@ theorem h_mem_W (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     eq_one_of_pow_two_pow_sub_one_of_pow_two_pow_add_one hm hκsub hκadd
   rw [hκv, hκ1, one_mul]
   exact hvW
+
+/-- **`W` is normal in `D`** — the book's "since `W ⊴ D`" (Peterfalvi Part II, p. 129).
+
+`W = D ∩ C(H ∩ I)` (Ch. I Prop 5, `W_eq_centralizer_involutions_H`) and conjugation by
+`d ∈ D ≤ H` permutes the involutions of `H`, so it preserves the centralizer
+condition. -/
+theorem normal_W_subgroupOf_D : (hyp.W.subgroupOf hyp.D).Normal := by
+  refine ⟨fun w hw d => ?_⟩
+  rw [Subgroup.mem_subgroupOf] at hw ⊢
+  rw [hyp.W_eq_centralizer_involutions_H] at hw ⊢
+  refine ⟨hyp.D.mul_mem (hyp.D.mul_mem d.2 hw.1) (hyp.D.inv_mem d.2),
+    Subgroup.mem_centralizer_iff.mpr fun q hq => ?_⟩
+  obtain ⟨hq2, hq1, hqH⟩ := hq
+  have hdH : (d : G) ∈ hyp.H := hyp.D_le_H d.2
+  -- conjugation by `d ∈ D ≤ H` permutes the involutions of `H`
+  have hqc : (d : G)⁻¹ * q * (d : G) ∈ {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := by
+    refine ⟨?_, ?_, hyp.H.mul_mem (hyp.H.mul_mem (hyp.H.inv_mem hdH) hqH) hdH⟩
+    · have : ((d : G)⁻¹ * q * (d : G)) ^ 2 = (d : G)⁻¹ * q ^ 2 * (d : G) := by
+        rw [sq, sq]; group
+      rw [this, hq2]; group
+    · intro hcon
+      refine hq1 ?_
+      have : q = (d : G) * ((d : G)⁻¹ * q * (d : G)) * (d : G)⁻¹ := by group
+      rw [this, hcon]; group
+  have hcw := Subgroup.mem_centralizer_iff.mp hw.2 _ hqc
+  push_cast
+  calc q * ((d : G) * (w : G) * (d : G)⁻¹)
+      = (d : G) * (((d : G)⁻¹ * q * (d : G)) * (w : G)) * (d : G)⁻¹ := by group
+    _ = (d : G) * ((w : G) * ((d : G)⁻¹ * q * (d : G))) * (d : G)⁻¹ := by rw [hcw]
+    _ = ((d : G) * (w : G) * (d : G)⁻¹) * q := by group
+
+/-- **`h(ω) ∈ W`, by the book's argument** (Peterfalvi Part II, p. 129, first half of §2's
+closing Proposition).
+
+Step (18) says `(h(ω)ζ⁻¹)^{|W|} = 1`, and §2's hypothesis makes `D` a Frobenius
+complement of odd order, hence a `Z`-group (`isZGroup_D_of_freeD`).  A cyclic normal
+subgroup of a `Z`-group absorbs every element it kills
+(`mem_of_pow_card_eq_one_of_isZGroup`), which is the book's `p`-component computation.
+So `h(ω)ζ⁻¹ ∈ W`, and `ζ ∈ W`.
+
+Unlike `h_mem_W` this never uses `D = K W`, i.e. never uses `V = W` — which is what
+Ch. IV §4 needs.  (`PSU3SectionThree.h_mem_W_of_freeD` is a different statement with a
+misleadingly similar name: there "free `D`" is spelled as the hypothesis `V = W`.) -/
+theorem h_mem_W_of_frobeniusD (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hfree : hyp.FreeD)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hWcyc : IsCyclic ↥hyp.W)
+    {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
+    (hWcard : orderOf ζ = Nat.card ↥hyp.W)
+    {N : ℕ} (hns : ∀ i < N, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1)
+    (hstop : y * (hyp.stepElevenSeq ζ y N).1 = 1) :
+    h ω ∈ hyp.W := by
+  classical
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
+  have h18 := hyp.stepEighteen H hC2 hfree hζ hωQ hωQ0 hyQ0 hfω hns hstop
+  haveI : IsZGroup ↥hyp.D := hyp.isZGroup_D_of_freeD hfree hZc hωQ hωQ0
+  haveI := hyp.normal_W_subgroupOf_D
+  have hWle : hyp.W ≤ hyp.D := hyp.W_le_D
+  have hcard : Nat.card ↥(hyp.W.subgroupOf hyp.D) = Nat.card ↥hyp.W :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hWle).toEquiv
+  haveI : IsCyclic ↥(hyp.W.subgroupOf hyp.D) :=
+    isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hWle).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hWle).symm.surjective
+  have hgD : h ω * ζ⁻¹ ∈ hyp.D :=
+    hyp.D.mul_mem (H.h_mem hωQ hω1) (hyp.D.inv_mem (hWle hζ))
+  have hpow : (⟨h ω * ζ⁻¹, hgD⟩ : ↥hyp.D) ^ Nat.card ↥(hyp.W.subgroupOf hyp.D) = 1 := by
+    refine Subtype.ext ?_
+    push_cast
+    rw [hcard, ← hWcard]
+    exact h18
+  have hmem := OddOrder.GroupTheory.mem_of_pow_card_eq_one_of_isZGroup
+    (W := hyp.W.subgroupOf hyp.D) inferInstance hpow
+  have hgW : h ω * ζ⁻¹ ∈ hyp.W := Subgroup.mem_subgroupOf.mp hmem
+  have hrw : h ω = (h ω * ζ⁻¹) * ζ := by group
+  rw [hrw]
+  exact hyp.W.mul_mem hgW hζ
 
 end Hypothesis
 

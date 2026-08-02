@@ -105,7 +105,25 @@ fpf で切るしかなく、そのためには §2/§3 の `hVW` を fpf に一�
 `stepElevenSeq_fst_injOn` は `M`・`hZ`・`hmu` が最初から不要だった (削除)。
 `stepFifteen_exhaust` は `KW`-形の集合で述べ直した (書籍の言い方そのもの)。
 
-### ⚠ 次の障害 = §2 (18) / `h(ω) ∈ W` — 書籍は **Frobenius 補群**で通す
+### ✅ 済 (続き): §2 (18) と Frobenius 補群
+
+* **(18) は交換性を使わない** (書籍 p.127 のページ画像で確認)。repo は
+  `commute_h_zeta` (= `D = KW`) 経由だったが、`N + 2 = orderOf ζ` から
+  `ζ^N = ζ^{-2}`、(H4) と突き合わせて `g^N h(ω) = ζ h(ω)⁻¹ ζ` (`g := h(ω)ζ⁻¹`)、
+  `g` を 2 つ掛けて `1`。⟹ `stepEighteen` の仮説は `FreeD` のみ
+  (`M`/`hZ`/`hmu`/`hWcard` も不要だった)。
+* **`FreeD ⟹ IsZGroup D`** (`PSU3FrobeniusD.lean`) — 書籍の Huppert V.8.15 引用。
+  `FreeD` = `IsFrobeniusAction D (Q ⧸ Z(Q))` そのもので、Isaacs Cor 6.17 に食わせる。
+* **一般補題** `mem_of_pow_card_eq_one_of_isZGroup`
+  (`OddOrder/GroupTheory/ZGroupNormalCyclic.lean`):
+  `IsZGroup D` + `W ⊴ D` + `IsCyclic W` + `g^{|W|} = 1` ⟹ `g ∈ W`。
+  書籍の `p`-成分論法。`W` が巡回なので `W_p ⊴ D` (`normal_of_le_of_isCyclic_normal`)
+  ⟹ **あらゆる** Sylow に含まれる (`IsPGroup.le_sylow_of_normal`) ので、書籍の
+  `|P ∩ W| = m_p` の同定は不要。`g` の `p`-分解は `exists_isPiElement_mul` を
+  `orderOf g` の強帰納法で。補助 `le_of_card_dvd_of_isCyclic` を
+  `CyclicSubgroupUniqueness.lean` に追加。
+
+### 旧記述 (解決済): §2 (18) / `h(ω) ∈ W` — 書籍は **Frobenius 補群**で通す
 
 `PSU3StepEighteen.lean` の `commute_h_zeta` / `h_mem_W` は
 `exists_mem_K_mem_W_mul hVW` (= `D = K W`) で `h(ω) = κ v` と分解している。
@@ -127,10 +145,9 @@ fpf で切るしかなく、そのためには §2/§3 の `hVW` を fpf に一�
   (13)(16)+(H6)+(1) の帰納なので、まず commutation を経由しない形に直すか、
   Frobenius 側から `h(ω) ∈ W` を直接出すかの二択。
 
-**次にやること**: 「奇数位数群が非自明群に固定点なく作用 ⟹ Sylow が巡回」を
-`OddOrder/GroupTheory/` に landing させ (repo に `sylow_two_isCyclic_or_quaternion`
-が在るので類似の道具が使える可能性)、書籍の `p`-成分論法で `h_mem_W` を
-`FreeD` から出す。
+**次にやること**: 上記 3 点は landing 済。`h_mem_W_of_freeD`
+(`PSU3StepEighteen.lean`、`W ⊴ D` = `normal_W_subgroupOf_D` 込み) を通したら
+(2) は完了で、残るのは (4) の case (c) 振り分け組立てのみ。
 
 ## 準備として済んでいること (2026-08-02)
 

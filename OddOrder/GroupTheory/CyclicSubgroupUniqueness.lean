@@ -81,6 +81,18 @@ theorem exists_subgroup_card_eq_of_isCyclic {C : Type*} [Group C] [Finite C] [Is
   refine ⟨(powMonoidHom d : C →* C).ker, ?_⟩
   rw [IsCyclic.card_powMonoidHom_ker (G := C) d, Nat.gcd_eq_right hd]
 
+/-- In a finite cyclic group, one subgroup is contained in another as soon as its order
+divides: the target has a subgroup of that order, and subgroups of equal order coincide. -/
+theorem le_of_card_dvd_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    {H K : Subgroup C} (hdvd : Nat.card ↥H ∣ Nat.card ↥K) : H ≤ K := by
+  obtain ⟨A, hA⟩ := exists_subgroup_card_eq_of_isCyclic (C := ↥K) hdvd
+  have hAle : A.map K.subtype ≤ K := by rintro _ ⟨x, -, rfl⟩; exact x.2
+  have hAcard : Nat.card ↥(A.map K.subtype) = Nat.card ↥H :=
+    (Nat.card_congr (Subgroup.equivMapOfInjective A K.subtype
+      Subtype.val_injective).toEquiv).symm.trans hA
+  rw [← cyclic_subgroup_eq_of_card_eq hAcard]
+  exact hAle
+
 /-- Every subgroup of a finite cyclic group is characteristic (it is the unique subgroup of
 its order, by `cyclic_subgroup_eq_of_card_eq`). -/
 theorem characteristic_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
