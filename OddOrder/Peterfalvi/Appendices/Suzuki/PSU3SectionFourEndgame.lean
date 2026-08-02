@@ -1198,7 +1198,7 @@ theorem SectionFourSetup.exists_stepThree_data (s4 : hyp.SectionFourSetup) {f g 
   obtain ⟨zbar, hzbarW, hzbar1⟩ :=
     hyp.exists_ne_one_mem_W_intrinsicResidualQuotient details s4.P_le_D
       s4.t_mem_centralizer hCQ hZD
-  obtain ⟨z, x, hzD, hxQ, hxQ0, hfx, c, hcZ, hkx⟩ :=
+  obtain ⟨z, x, hzD, -, hxQ, hxQ0, hfx, c, hcZ, hkx⟩ :=
     hyp.exists_f_eq_conj_inv_residual H s4.P_le_V hP details s4.P_le_D
       s4.t_mem_centralizer hCQ hZD ih zbar hzbarW hzbar1
   refine ⟨(z : G), (x : G), (c : G), hzD, z.2, hxQ, hxQ0, x.2, hfx, c.2, ?_, ?_⟩

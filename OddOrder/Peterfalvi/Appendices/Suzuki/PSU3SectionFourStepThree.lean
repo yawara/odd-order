@@ -109,6 +109,10 @@ Step (2) computes on `U/Z(U)`; this reads the answer back into `G`:
 * `exists_fgh_residual` — the uniqueness of the canonical form — replaces the
   `U`-relative `f₁` by the ambient `f`.
 
+The conclusion also records that `z` *lifts* the given `ζ` (`mk' z = ζ`): the caller needs
+that to transfer properties of a prescribed `ζ` — the book's `ζ₁ ∈ (V ∩ U) − (P ∩ U)` —
+to `z`, since the two differ by an element of `Z(U)`.
+
 `ζ` comes out in `D ∩ U` rather than in `W`: `W̄ ≤ D̄` is what lifts, an element of `U`
 centralizing `Q₀ ∩ U` need not centralize `Q₀`.  The book's sharper `ζ ∈ C_W(P ∩ U)` is a
 refinement of the same element. -/
@@ -124,8 +128,9 @@ theorem exists_f_eq_conj_inv_residual {f g h : G → G}
     letI := MulAction.compHom (ULift.{v} (Unital data.n))
       details.residualQuotientEquiv.toMonoidHom
     ∀ ζ ∈ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).W, ζ ≠ 1 →
-      ∃ z x : ↥(residualImage (G := G) X), (z : G) ∈ hyp.D ∧ (x : G) ∈ hyp.Q ∧
-        (x : G) ∉ hyp.Q0 ∧
+      ∃ z x : ↥(residualImage (G := G) X), (z : G) ∈ hyp.D ∧
+        QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) z = ζ ∧
+        (x : G) ∈ hyp.Q ∧ (x : G) ∉ hyp.Q0 ∧
         f (x : G) = (z : G)⁻¹ * (x : G)⁻¹ * (z : G) ∧
         ∃ c ∈ Subgroup.center ↥(residualImage (G := G) X),
           h (x : G) = ((z ^ 3 * c : ↥(residualImage (G := G) X)) : G) := by
@@ -182,7 +187,7 @@ theorem exists_f_eq_conj_inv_residual {f g h : G → G}
   have hcmem : (z ^ 3)⁻¹ * h₁ x ∈ Subgroup.center ↥(residualImage (G := G) X) := by
     rw [← QuotientGroup.eq]
     exact hkmk.symm
-  refine ⟨z, x, hzD', hxQ', hxQ0, ?_, (z ^ 3)⁻¹ * h₁ x, hcmem, ?_⟩
+  refine ⟨z, x, hzD', hzζ, hxQ', hxQ0, ?_, (z ^ 3)⁻¹ * h₁ x, hcmem, ?_⟩
   · rw [← (hamb x hxQ' hxne).1, heq]
     push_cast
     rfl
