@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Problems9D
 import OddOrder.Isaacs.Ch02_Subnormality.Basic
+import OddOrder.Isaacs.Ch01_Sylow.Basic
 
 /-!
 # Isaacs, Finite Group Theory — Problem 9D.4: Kegel 予想の極小反例 (p. 294)
@@ -337,6 +338,63 @@ theorem exists_pgroup_normalizedBy (hK : KegelHypothesis S) (hinf : S ⊓ N = �
       change n * (m * y * m⁻¹) * n⁻¹ = n * m * y * (n * m)⁻¹
       group
     exact fun r hr => hsub hr
+
+/-- **`(I)` step 5–6**: `F(G) ⊓ N = ⊥` なら Sylow の交わり `P ∩ S` は `N` を中心化する.
+
+`A := N ⊓ R` は `R` が `N`-不変なので `N` に正規, したがって `A ◁ N ◁ G` で subnormal.
+`A ≤ R ≤ P` は `p`-群ゆえ冪零なので `A ≤ F(G)` (`le_fitting_iff_isNilpotent_and_isSubnormal`),
+よって `A ≤ F(G) ⊓ N = ⊥`. `R` が `N` に正規化されることから `[N, R] ≤ N ⊓ R = ⊥`. -/
+theorem inf_le_centralizer_of_fitting_inf_eq_bot (hK : KegelHypothesis S) (hinf : S ⊓ N = ⊥)
+    (hsup : S ⊔ N = ⊤) (hFN : Ch01.fitting G ⊓ N = ⊥) {p : ℕ} [Fact p.Prime] (P : Sylow p G) :
+    (P : Subgroup G) ⊓ S ≤ Subgroup.centralizer (N : Set G) := by
+  obtain ⟨R, hPSR, hRP, hRN⟩ := exists_pgroup_normalizedBy hK hinf hsup P
+  -- `A := N ⊓ R` は `N` に正規
+  haveI hAnormal : ((N ⊓ R).subgroupOf N).Normal := by
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_left).mpr ?_
+    intro n hn
+    rw [Subgroup.mem_normalizer_iff]
+    intro y
+    constructor
+    · rintro ⟨hyN, hyR⟩
+      exact ⟨‹N.Normal›.conj_mem y hyN n, hRN n hn y hyR⟩
+    · rintro ⟨hyN, hyR⟩
+      have hy : y = n⁻¹ * (n * y * n⁻¹) * n⁻¹⁻¹ := by group
+      refine ⟨?_, ?_⟩
+      · rw [hy]; exact ‹N.Normal›.conj_mem _ hyN n⁻¹
+      · rw [hy]; exact hRN n⁻¹ (N.inv_mem hn) _ hyR
+  -- `A` は冪零で subnormal, したがって `A ≤ F(G)`
+  have hAsub : (N ⊓ R).IsSubnormal :=
+    Subgroup.IsSubnormal.trans inf_le_left (Subgroup.Normal.isSubnormal hAnormal)
+      (Subgroup.Normal.isSubnormal ‹N.Normal›)
+  have hApg : IsPGroup p ↥(N ⊓ R) :=
+    P.isPGroup'.of_injective (Subgroup.inclusion (le_trans inf_le_right hRP))
+      (Subgroup.inclusion_injective _)
+  have hAnilp : Group.IsNilpotent ↥(N ⊓ R) := hApg.isNilpotent
+  have hAbot : N ⊓ R = ⊥ := by
+    have hle : N ⊓ R ≤ Ch01.fitting G :=
+      (Ch02.le_fitting_iff_isNilpotent_and_isSubnormal _).mpr ⟨hAnilp, hAsub⟩
+    have : N ⊓ R ≤ Ch01.fitting G ⊓ N := le_inf hle inf_le_left
+    rw [hFN] at this
+    exact le_bot_iff.mp this
+  -- `[N, R] ≤ N ⊓ R = ⊥`
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff]
+  intro n hn
+  have hcomm : n * x * n⁻¹ * x⁻¹ ∈ N ⊓ R := by
+    refine ⟨?_, ?_⟩
+    · have heq : n * x * n⁻¹ * x⁻¹ = n * (x * n⁻¹ * x⁻¹) := by group
+      rw [heq]
+      exact N.mul_mem hn (‹N.Normal›.conj_mem n⁻¹ (N.inv_mem hn) x)
+    · exact R.mul_mem (hRN n hn x (hPSR hx)) (R.inv_mem (hPSR hx))
+  rw [hAbot] at hcomm
+  have := Subgroup.mem_bot.mp hcomm
+  have hxn : n * x = x * n := by
+    have hx' : n * x * n⁻¹ = x := by
+      have := mul_inv_eq_one.mp this
+      exact this
+    calc n * x = (n * x * n⁻¹) * n := by group
+      _ = x * n := by rw [hx']
+  exact hxn
 
 end Retraction
 

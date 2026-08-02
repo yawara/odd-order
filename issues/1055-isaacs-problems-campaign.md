@@ -7195,6 +7195,31 @@ characteristic で `N ◁ G` だから `F(N) ◁ G`、しかも `F(N) ≤ N`。`
 (b) 冪零正規部分群 ≤ Fitting (repo の `Ch02.le_fitting_iff_isNilpotent_and_isSubnormal` を
 `↥N` で使う)、(c) 極小正規 + 冪零 ⟹ 可換。
 
+### (I) の再構成 — `F(G) ⊓ N` による二分法 (2026-08-03、`N` 非可換の仮定が不要になる)
+
+step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可換という場合分けが消える**:
+
+`A := N ⊓ R` は `R` が `N`-不変なので `N` に正規 ⟹ `A ◁ N ◁ G` で **subnormal**、
+かつ `A ≤ R ≤ P` は `p`-群ゆえ**冪零** ⟹ `Ch02.le_fitting_iff_isNilpotent_and_isSubnormal`
+で **`A ≤ F(G)`**。よって `A ≤ F(G) ⊓ N`。ここで `F(G) ⊓ N ◁ G` かつ `≤ N` なので
+`N` の極小性から二分:
+
+* **`F(G) ⊓ N = ⊥`**: `A = ⊥` ⟹ `[N, R] = ⊥` ⟹ 各素数で `P ∩ S ≤ C_G(N)`
+  (landing 済 = `inf_le_centralizer_of_fitting_inf_eq_bot`) ⟹ `S ≤ C_G(N)`
+  (指数がどの素数でも割れないから) ⟹ `S ∩ N = 1` と `SN = G` で **`S ◁ G`** ⟹ 矛盾。
+* **`N ≤ F(G)`**: `N` は冪零な極小正規部分群 ⟹ (Sylow が characteristic なので極小性から)
+  `p`-群 ⟹ 従来の `O^p(G) ≤ S` 論法。
+
+⟹ 元の「`N` 可換 / 非可換」の場合分けは **`F(G) ⊓ N = ⊥` / `N ≤ F(G)`** に置き換わる。
+
+### 残り (2026-08-03 時点)
+
+1. `S ≤ C_G(N)`: 各素数 `p` で `C_G(N) ⊓ S` が `S` の Sylow `p` を含む ⟹
+   `[S : C_G(N) ⊓ S]` はどの素数でも割れない ⟹ `= 1` (`Subgroup.index_dvd_of_le`)。
+2. `S ≤ C_G(N)` + `S ∩ N = 1` + `SN = G` ⟹ `S ◁ G` ⟹ 矛盾。
+3. `N ≤ F(G)` の枝: `N` が `p`-群であること (Sylow char) → `O^p(G) ≤ S` → `S ◁◁ G`。
+4. (II) は `G` 単純が出た後なら短い (`IsSubnormal.eq_bot_or_top_of_isSimpleGroup`)。
+
 ### 形式化の次の必要部品
 
 * retraction `π_S : G →* ↥S` の構成 (`S ⊓ N = ⊥`, `S ⊔ N = ⊤` から)。
