@@ -8961,3 +8961,18 @@ exact sectionFour_mem_W H hC2 M sfive hZ hm hQ0card
 **残りは step (3) を呼ぶ最外殻だけ** — `nonempty_psu3Data_sectionFour` +
 `exists_ne_one_mem_W_intrinsicResidualQuotient` +
 `exists_f_eq_conj_inv_residual` を繋ぎ、`ζ₁ ∉ P` を供給する。
+
+### (212) `hZD` を Glauberman の `ω` から直接
+
+* `mem_residualImage_of_mem_Q` — `Q` は 2 群なので `Q ∩ C(X)` の元は `U` に入る
+  (`IsPGroup 2 Q` から位数が 2 冪、`Nat.dvd_prime_pow`)。
+* `SectionFourSetup.center_residualImage_le_D` — step (1) の Glauberman が出す
+  `ω ∈ C_Q(P) − Q₀` (`exists_fixed_not_mem_Q0` の出力そのままの形
+  `∀ a ∈ P, a ω a⁻¹ = ω`) から `hZD` を出す。
+
+⟹ 最外殻に必要な `hZD` は `s4.exists_fixed_not_mem_Q0` の出力に直接繋がる。
+
+**最外殻の残り**: `details` (=(204)) と `ζ̄` (`exists_ne_one_mem_W_intrinsicResidualQuotient`)
+を繋いで `exists_f_eq_conj_inv_residual` を呼び、その出力を
+`mem_W_of_stepThree` ((211)) の形に整える。必要な追加入力は
+`η ∈ P` (`eq_P_of_centralizes`、要 `hS`) と `ζ₁ ∉ P` の 2 つ。

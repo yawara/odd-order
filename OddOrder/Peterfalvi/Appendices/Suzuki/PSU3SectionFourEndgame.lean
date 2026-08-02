@@ -62,6 +62,9 @@ membership facts it needs on the model:
 * `Hypothesis.residualImage_le_centralizer` — `U ≤ C_G(X)`, its `hUC`.
 * `Hypothesis.SectionFourSetup.exists_refined_zeta` — **the book's `ζ₁ ∈ ζ P` with
   `ζ ∈ C_W(P)`**.
+* `Hypothesis.mem_residualImage_of_mem_Q`,
+  `Hypothesis.SectionFourSetup.center_residualImage_le_D` — `hZD` straight from
+  Glauberman's `ω ∈ C_Q(P) − Q₀`.
 * `conj_inv_eq_of_commute`, `cube_mul_eq_of_commute` — the book's refinement
   `ζ₁ ∈ ζ P` (p. 133): `ω^{ζ₁} = ω^ζ` and `ζ₁³ P = ζ³ P`.
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
@@ -898,6 +901,39 @@ theorem residualImage_le_centralizer {X : Subgroup G} :
     residualImage (G := G) X ≤ Subgroup.centralizer ((X : Set G)) := by
   rintro _ ⟨u, -, rfl⟩
   exact u.2
+
+include hyp in
+/-- Every element of `Q` centralizing `X` lies in `U = O^{2′}(C_G(X))`, because `Q` is a
+`2`-group. -/
+theorem mem_residualImage_of_mem_Q (hQ2 : IsPGroup 2 ↥hyp.Q) {X : Subgroup G} {x : G}
+    (hxQ : x ∈ hyp.Q) (hxC : x ∈ Subgroup.centralizer ((X : Set G))) :
+    x ∈ residualImage (G := G) X := by
+  obtain ⟨n, hn⟩ := hQ2 ⟨x, hxQ⟩
+  have hxn : x ^ 2 ^ n = 1 := by
+    have hv := congrArg (Subtype.val (p := fun z => z ∈ hyp.Q)) hn
+    simpa using hv
+  obtain ⟨j, -, hj⟩ :=
+    (Nat.dvd_prime_pow Nat.prime_two).mp (orderOf_dvd_of_pow_eq_one hxn)
+  exact mem_residualImage_of_orderOf_eq_two_pow (G := G) hxC hj
+
+include hyp in
+/-- **🎯 `hZD` from Glauberman's `ω`** — the `ω ∈ C_Q(P) − Q₀` of step (1) is a nontrivial
+element of `Q` centralizing `P`, hence lies in `U`; that plus `t ∈ U` gives `Z(U) ⊆ D`. -/
+theorem SectionFourSetup.center_residualImage_le_D (s4 : hyp.SectionFourSetup)
+    (hQ2 : IsPGroup 2 ↥hyp.Q) {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hωfix : ∀ a ∈ s4.P, a * ω * a⁻¹ = ω) :
+    Subgroup.center ↥(residualImage (G := G) s4.P)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) s4.P) := by
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
+  have hωC : ω ∈ Subgroup.centralizer ((s4.P : Set G)) :=
+    Subgroup.mem_centralizer_iff.mpr fun a ha => by
+      have hconj := hωfix a ha
+      calc a * ω = (a * ω * a⁻¹) * a := by group
+        _ = ω * a := by rw [hconj]
+  refine hyp.center_le_subgroupOf_D hωQ hω1
+    (hyp.mem_residualImage_of_mem_Q hQ2 hωQ hωC)
+    (mem_residualImage_of_orderOf_eq_two_pow (G := G) s4.t_mem_centralizer (n := 1)
+      (by rw [pow_one]; exact orderOf_eq_prime hyp.t_sq hyp.t_ne_one))
 
 open scoped Pointwise in
 include hyp in
