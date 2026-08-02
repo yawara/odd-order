@@ -332,6 +332,41 @@ theorem commutator_inl_mem_map_zpowers (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p
   rw [hval]
   exact ofAdd_mul_mem_zpowers _ _
 
+/-- `N` 可換なら `g · inl v · g⁻¹ = inl (φ (rightHom g) v)`. -/
+theorem conj_inl {N A : Type*} [CommGroup N] [Group A] {φ : A →* MulAut N}
+    (v : N) (g : SemidirectProduct N A φ) :
+    g * SemidirectProduct.inl v * g⁻¹
+      = SemidirectProduct.inl (φ (SemidirectProduct.rightHom g) v) := by
+  ext
+  · simp [mul_comm, mul_assoc]
+  · simp
+
+/-- `inl ⟨x^{p^k}⟩` は `P` の正規部分群. -/
+theorem normal_map_zpowers (hp : p.Prime) {u : (ZMod (p ^ n))ˣ} (k : ℕ) :
+    ((Subgroup.zpowers (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ k))).map
+      (SemidirectProduct.inl : _ →* problem10B1Group (p ^ n) u)).Normal := by
+  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  refine ⟨fun w hw g => ?_⟩
+  obtain ⟨v, hv, rfl⟩ := Subgroup.mem_map.mp hw
+  obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp hv
+  rw [conj_inl]
+  refine Subgroup.mem_map.mpr ⟨_, ?_, rfl⟩
+  obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp (SemidirectProduct.rightHom g).2
+  have hact : (Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ n) u)))
+      (SemidirectProduct.rightHom g) v
+      = Multiplicative.ofAdd (((u ^ j : (ZMod (p ^ n))ˣ) : ZMod (p ^ n)) *
+          Multiplicative.toAdd v) := by
+    have hsub : (Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ n) u)))
+        (SemidirectProduct.rightHom g) = unitAutHom (p ^ n) (u ^ j) := by
+      rw [map_zpow, hj]
+      rfl
+    rw [hsub]
+    rfl
+  have hvval : Multiplicative.toAdd v = (i : ZMod (p ^ n)) * (p : ZMod (p ^ n)) ^ k := by
+    rw [← hi, ← ofAdd_zsmul, toAdd_ofAdd, zsmul_eq_mul]
+  rw [hact, hvval, ← mul_assoc]
+  exact ofAdd_mul_mem_zpowers _ _
+
 end
 
 end OddOrder.Isaacs.Ch10
