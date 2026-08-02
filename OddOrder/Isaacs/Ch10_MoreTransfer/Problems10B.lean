@@ -141,6 +141,19 @@ theorem commutatorElement_inr_inl {N A : Type*} [Group N] [Group A] {φ : A →*
     exact (SemidirectProduct.inl_aut g x).symm
   rw [commutatorElement_def, key, ← map_inv, ← map_mul]
 
+/-- `N` が可換なら, 正規部分群 `inl N` の元との交換子は `inl` 成分だけで書ける:
+`⁅inl y, g⁆ = inl (y · (φ (rightHom g) y)⁻¹)`.
+
+これが下降中心列 `γ_{k+1} = ⁅γ_k, ⊤⁆` の計算の要 (右側の `g` は `rightHom g` にしか
+依らない). -/
+theorem commutatorElement_inl_left {N A : Type*} [CommGroup N] [Group A] {φ : A →* MulAut N}
+    (y : N) (g : SemidirectProduct N A φ) :
+    ⁅(SemidirectProduct.inl y : SemidirectProduct N A φ), g⁆
+      = SemidirectProduct.inl (y * (φ (SemidirectProduct.rightHom g) y)⁻¹) := by
+  ext
+  · simp [commutatorElement_def, mul_comm, mul_assoc]
+  · simp [commutatorElement_def]
+
 /-! ## Isaacs 10B.1 の群 `P = C ⋊ ⟨a⟩` -/
 
 /-- **Isaacs Problem 10B.1 の群**: `C = C_{p^n}` と単元 `u` の定める自己同型
