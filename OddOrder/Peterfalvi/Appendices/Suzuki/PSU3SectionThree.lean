@@ -250,6 +250,45 @@ theorem stepOne_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     _ = (hyp.t * ζ ^ 3 * hyp.t)⁻¹ := by rw [htinv]
     _ = (ζ ^ 3)⁻¹ := by rw [hp]
 
+/-- **The chain of stage (1) when `h(ω)` is `ζ³` times a `t`-fixed element** (Peterfalvi
+Part II, Ch. IV §4, p. 133).
+
+§4 runs the same chain, but there step (3) only gives `h(ω) ∈ ζ³P` — so the conjugator is
+`ζ³η` with `η ∈ P`.  The proof of `stepOne_chain` needs no more than that `t` fixes the
+conjugator, which it does: it fixes `ζ ∈ W` and, in §4, `η` lies in the centre of the
+group `U` that contains `t`.
+
+The `η = 1` case is `stepOne_chain`. -/
+theorem stepOne_chain_of_h_eq_mul (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {ζ ω a η : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (haK : a ∈ hyp.KSet) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hη : h ω = ζ ^ 3 * η) (htη : hyp.t * η * hyp.t = η) :
+    a ^ 2 * f ((ζ * ω * ζ⁻¹) * (a * hyp.distinguishedInvolution * a⁻¹)) * (a⁻¹) ^ 2
+        * (a * hyp.distinguishedInvolution * a⁻¹)
+      = (ζ ^ 3 * η) * f ((a * hyp.distinguishedInvolution * a⁻¹) * (ζ⁻¹ * ω * ζ))
+        * (ζ ^ 3 * η)⁻¹ * (ζ * ω * ζ⁻¹) := by
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
+  have htt : hyp.t * hyp.t = 1 := hyp.rankOneSetup.invol
+  -- `t` fixes the conjugator
+  have htd : hyp.t * (ζ ^ 3 * η) * hyp.t = ζ ^ 3 * η := by
+    have hpζ := hyp.conj_t_pow_eq hζ 3
+    calc hyp.t * (ζ ^ 3 * η) * hyp.t
+        = (hyp.t * ζ ^ 3 * hyp.t) * (hyp.t * η * hyp.t) := by
+          rw [show hyp.t * ζ ^ 3 * hyp.t * (hyp.t * η * hyp.t)
+            = hyp.t * ζ ^ 3 * (hyp.t * hyp.t) * η * hyp.t from by group, htt]
+          group
+      _ = ζ ^ 3 * η := by rw [hpζ, htη]
+  have htdinv : hyp.t * (ζ ^ 3 * η)⁻¹ * hyp.t = (ζ ^ 3 * η)⁻¹ := by
+    have htinv : hyp.t⁻¹ = hyp.t := inv_eq_of_mul_eq_one_right htt
+    calc hyp.t * (ζ ^ 3 * η)⁻¹ * hyp.t = (hyp.t⁻¹ * (ζ ^ 3 * η) * hyp.t⁻¹)⁻¹ := by group
+      _ = (hyp.t * (ζ ^ 3 * η) * hyp.t)⁻¹ := by rw [htinv]
+      _ = (ζ ^ 3 * η)⁻¹ := by rw [htd]
+  obtain ⟨-, -, o3⟩ := hOne hyp.rankOneSetup H hωQ hω1
+  rw [hη, htd] at o3
+  exact hyp.stepOne_chain_of_h H hC2 hζ hωQ hωQ0 haK hf o3 htdinv
+
 /-- **The two `f`-values of stage (1) are conjugates of a single one** (Peterfalvi
 Part II, p. 130, entering stage (2)).
 
