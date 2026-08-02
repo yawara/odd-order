@@ -84,6 +84,17 @@ noncomputable def linearOfMulAutHom {G : Type*} [Group G] (φ : G →* MulAut E)
 theorem linearOfMulAutHom_apply {G : Type*} [Group G] (φ : G →* MulAut E) (g : G) (x : E) :
     linearOfMulAutHom (n := n) φ g (Additive.ofMul x) = Additive.ofMul (φ g x) := rfl
 
+/-- 指数が `n` を割る可換群では, **部分群と `ZMod n`-部分加群が順序同型で対応する**
+(`Subgroup.toAddSubgroup` と mathlib の `AddSubgroup.toZModSubmodule` の合成).
+
+`⊓`, `⊔`, `⊥` を保つので, Maschke で得た補元をそのまま部分群の言葉に戻せる. -/
+def subgroupOrderIsoSubmodule : Subgroup E ≃o Submodule (ZMod n) (Additive E) :=
+  Subgroup.toAddSubgroup.trans (AddSubgroup.toZModSubmodule n)
+
+@[simp]
+theorem mem_subgroupOrderIsoSubmodule {S : Subgroup E} {x : E} :
+    Additive.ofMul x ∈ subgroupOrderIsoSubmodule (n := n) S ↔ x ∈ S := Iff.rfl
+
 /-! ## 正規部分群への共役作用 -/
 
 /-- 正規部分群への共役作用は中心化群を殺す. -/

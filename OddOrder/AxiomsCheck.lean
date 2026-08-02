@@ -15270,3 +15270,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.GroupTheory.isMetacyclic_semidirectProduct
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.conjNormal_eq_one_of_mem_centralizer
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.normal_map_subtype_of_conj_invariant
