@@ -37,6 +37,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryOne
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3PropositionModel
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourCorollaryOne
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -15090,3 +15091,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.proposition_of_isStandardModel
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.nonempty_theoremAConclusion_of_isStandardModel
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.SectionFourSetup.nonempty_theoremAConclusion
