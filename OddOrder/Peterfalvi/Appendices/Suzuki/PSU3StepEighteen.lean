@@ -92,19 +92,19 @@ theorem commute_h_zeta (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h) (hVW : hyp.V = 
 /-- **Step (18)** (Peterfalvi Part II, p. 127): `(h(ω)ζ⁻¹)^m = 1`, with `m = orderOf ζ`.
 
 At the stopping index `N` the sequence has `z_N = y`, so `stepEighteen_unroll` reads
-`h(ω y) = (h(ω)ζ⁻¹)^N h(ω) ζ^N`, its `K`-part being trivial by step (15).  Comparing with
-`h(ω y) = ζ h(ω)⁻¹ ζ⁻¹` and using that `h(ω)` commutes with `ζ` gives
-`h(ω)^{N+2} = 1`; and `N + 2 = orderOf ζ`, so `(h(ω)ζ⁻¹)^{N+2} = h(ω)^{N+2} ζ^{-(N+2)}`
-is `1`. -/
+`h(ω y) = (h(ω)ζ⁻¹)^N h(ω) ζ^N`, its `K`-part being trivial by step (15).  Since
+`N + 2 = orderOf ζ`, the tail `ζ^N` is `ζ^{-2}`, and comparing with (H4)'s
+`h(ω y) = ζ h(ω)⁻¹ ζ⁻¹` gives `g^N h(ω) = ζ h(ω)⁻¹ ζ` for `g = h(ω) ζ⁻¹`; two more
+factors of `g` then collapse to `1`.
+
+This is the book's own computation (p. 127) and, unlike the repository's previous route,
+it uses no commutation between `h(ω)` and `ζ` — hence no `V = W`. -/
 theorem stepEighteen (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
-    {m : ℕ} (M : hyp.QuotientFieldModel m)
-    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hfree : hyp.FreeD)
     {ζ ω y : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hyQ0 : y ∈ hyp.Q0) (hfω : f ω = ζ⁻¹ * (ω * y) * ζ)
-    (hWcard : orderOf ζ = Nat.card ↥hyp.W)
     {N : ℕ} (hns : ∀ i < N, y * (hyp.stepElevenSeq ζ y i).1 ≠ 1)
     (hstop : y * (hyp.stepElevenSeq ζ y N).1 = 1) :
     (h ω * ζ⁻¹) ^ orderOf ζ = 1 := by
@@ -120,35 +120,31 @@ theorem stepEighteen (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   obtain ⟨k, hkK, hkcoset, hk⟩ :=
     hyp.stepEighteen_unroll H hC2 hζ hωQ hωQ0 hyQ0 hfω N hns
   obtain ⟨hlen, hkone⟩ :=
-    hyp.stepFifteen_length_eq H hC2 (hyp.freeD_of_V_eq_W M hZ hmu hVW) hζ hωQ hωQ0
-      hyQ0 hfω hns hstop
+    hyp.stepFifteen_length_eq H hC2 hfree hζ hωQ hωQ0 hyQ0 hfω hns hstop
   rw [hkone k hkK hkcoset, inv_one, mul_one, hzy] at hk
   -- (H4) gives the other reading of `h(ω y)`
   rw [hyp.h_mul_eq_conj_inv H hζ hωQ hωQ0 hyQ0 hfω] at hk
-  -- `h(ω)` commutes with `ζ`
-  have hc : Commute (h ω) ζ := hyp.commute_h_zeta H hVW hζ hωQ hωQ0 hWcard
-  have hcinv : Commute (h ω) ζ⁻¹ := hc.inv_right
-  -- unwind to `h(ω)^{N+2} = 1`
-  have hleft : ζ * (h ω)⁻¹ * ζ⁻¹ = (h ω)⁻¹ := by
-    rw [(hc.symm.inv_right).eq]
-    group
-  have hright : (h ω * ζ⁻¹) ^ N * h ω * ζ ^ N = (h ω) ^ (N + 1) := by
-    rw [hcinv.mul_pow, inv_pow]
-    have hcomm2 : (ζ ^ N)⁻¹ * h ω = h ω * (ζ ^ N)⁻¹ := ((hc.pow_right N).symm.inv_left).eq
-    calc (h ω) ^ N * (ζ ^ N)⁻¹ * h ω * ζ ^ N
-        = (h ω) ^ N * ((ζ ^ N)⁻¹ * h ω) * ζ ^ N := by group
-      _ = (h ω) ^ N * (h ω * (ζ ^ N)⁻¹) * ζ ^ N := by rw [hcomm2]
-      _ = (h ω) ^ (N + 1) := by rw [pow_succ]; group
-  rw [hleft, hright] at hk
-  have hpow : (h ω) ^ (N + 2) = 1 := by
-    calc (h ω) ^ (N + 2) = (h ω) ^ (N + 1) * h ω := by rw [pow_succ]
-      _ = (h ω)⁻¹ * h ω := by rw [← hk]
-      _ = 1 := inv_mul_cancel _
-  -- assemble
+  -- `ζ^N = ζ^{-2}`, since `ζ` has order `N + 2`
   have hζpow : ζ ^ (N + 2) = 1 := by
     rw [hlen]
     exact pow_orderOf_eq_one ζ
-  rw [← hlen, hcinv.mul_pow, hpow, one_mul, inv_pow, hζpow, inv_one]
+  have hζN : ζ ^ N = (ζ ^ 2)⁻¹ :=
+    eq_inv_of_mul_eq_one_left (by rw [← pow_add]; exact hζpow)
+  -- so the unrolled identity reads `g^N h(ω) = ζ h(ω)⁻¹ ζ`
+  have hA : (h ω * ζ⁻¹) ^ N * h ω = ζ * (h ω)⁻¹ * ζ := by
+    have h2 : (h ω * ζ⁻¹) ^ N * h ω * (ζ ^ 2)⁻¹ = ζ * (h ω)⁻¹ * ζ⁻¹ := by
+      rw [← hζN]; exact hk.symm
+    calc (h ω * ζ⁻¹) ^ N * h ω
+        = (h ω * ζ⁻¹) ^ N * h ω * (ζ ^ 2)⁻¹ * ζ ^ 2 := by group
+      _ = ζ * (h ω)⁻¹ * ζ⁻¹ * ζ ^ 2 := by rw [h2]
+      _ = ζ * (h ω)⁻¹ * ζ := by group
+  -- two more factors of `g = h(ω) ζ⁻¹` close it
+  calc (h ω * ζ⁻¹) ^ orderOf ζ
+      = (h ω * ζ⁻¹) ^ (N + 2) := by rw [← hlen]
+    _ = (h ω * ζ⁻¹) ^ N * h ω * ζ⁻¹ * (h ω * ζ⁻¹) := by
+        rw [pow_succ, pow_succ]; group
+    _ = ζ * (h ω)⁻¹ * ζ * ζ⁻¹ * (h ω * ζ⁻¹) := by rw [hA]
+    _ = 1 := by group
 
 /-- **`h(ω) ∈ W`** (Peterfalvi Part II, p. 129, first half of §2's closing Proposition).
 
@@ -173,7 +169,8 @@ theorem h_mem_W (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
   have hc : Commute (h ω) ζ := hyp.commute_h_zeta H hVW hζ hωQ hωQ0 hWcard
   -- step (18), with the `ζ` factored off
-  have h18 := hyp.stepEighteen H hC2 M hZ hmu hVW hζ hωQ hωQ0 hyQ0 hfω hWcard hns hstop
+  have h18 := hyp.stepEighteen H hC2 (hyp.freeD_of_V_eq_W M hZ hmu hVW) hζ hωQ hωQ0
+    hyQ0 hfω hns hstop
   have hζpow : ζ ^ orderOf ζ = 1 := pow_orderOf_eq_one ζ
   have hhpow : (h ω) ^ orderOf ζ = 1 := by
     rw [hc.inv_right.mul_pow, inv_pow, hζpow, inv_one, mul_one] at h18
