@@ -361,7 +361,8 @@ theorem nonempty_theoremAConclusion_of_isStandardModel_of_closing
   -- §2's closing Proposition supplies the pair
   obtain ⟨ω₁, hω₁Q, hω₁Q0⟩ := hyp.exists_mem_Q_notMem_Q0 hm hQ0card hcardQ
   obtain ⟨ω₀, hω₀Q, hω₀Q0, y₀, hy₀Q0, hsq₀, hfinv⟩ :=
-    hyp.exists_f_eq_conj_inv M hZc H hC2 hVW hm hQ0card hmu hKcard hWdvd
+    hyp.exists_f_eq_conj_inv M hZc H hC2 hm hQ0card hmu
+      (hyp.freeD_of_V_eq_W M hZc hmu hVW) hWcyc hKcard hWdvd
       (fun x hx => hyp.sq_mem_Q0_of_lemmaFiveSetup sfive hx) hwW
       (fun hc => hw1 (Subtype.ext hc)) hwcard hω₁Q hω₁Q0
   exact hyp.nonempty_theoremAConclusion_of_isStandardModel H hC2 hn sfive M hZc hmu

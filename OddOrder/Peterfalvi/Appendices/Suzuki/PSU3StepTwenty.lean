@@ -422,11 +422,12 @@ theorem dOrbitRel_of_stepTwenty_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     {ζ ω ωi ωk y ρ : G}
     (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hωkQ : ωk ∈ hyp.Q) (hωkQ0 : ωk ∉ hyp.Q0)
-    (hyQ0 : y ∈ hyp.Q0) (hρQ0 : ρ ∈ hyp.Q0) (hρ : ρ = ω * ω) (hζD : ζ ∈ hyp.D)
+    (hyQ0 : y ∈ hyp.Q0) (hρQ0 : ρ ∈ hyp.Q0) (hρ : ρ = ω * ω) (hζW : ζ ∈ hyp.W)
     (hnorm : f ω = ζ⁻¹ * (ω * y) * ζ)
-    (hi : dOrbitRel hyp.D (f (ω * ρ)) (ωi * (ρ * y)))
-    (hk : dOrbitRel hyp.D (f (ω * (ρ * y))) (ωk * ρ)) :
-    dOrbitRel hyp.D (ωk⁻¹ * ρ) (ωi * (ρ * y)) := by
+    (hhX : h (ωk⁻¹ * ρ) ∈ hyp.KW)
+    (hi : dOrbitRel hyp.KW (f (ω * ρ)) (ωi * (ρ * y)))
+    (hk : dOrbitRel hyp.KW (f (ω * (ρ * y))) (ωk * ρ)) :
+    dOrbitRel hyp.KW (ωk⁻¹ * ρ) (ωi * (ρ * y)) := by
   classical
   have hne : ∀ {z : G}, z ∉ hyp.Q0 → z ≠ 1 := fun hz hc => hz (hc ▸ hyp.Q0.one_mem)
   have hinvQ0 : ∀ {z : G}, z ∈ hyp.Q0 → z⁻¹ = z := by
@@ -469,31 +470,33 @@ theorem dOrbitRel_of_stepTwenty_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   -- the two tools: `f ∘ f = id` and `f` descends to orbits
   have hff : ∀ {z : G}, z ∈ hyp.Q → z ≠ 1 → f (f z) = z :=
     fun hzQ hz1 => (hTwo hyp.rankOneSetup H hzQ hz1).1
-  have hfrel : ∀ {a b : G}, a ∈ hyp.Q → a ≠ 1 → dOrbitRel hyp.D a b →
-      dOrbitRel hyp.D (f a) (f b) := by
+  have hfrel : ∀ {a b : G}, a ∈ hyp.Q → a ≠ 1 → dOrbitRel hyp.KW a b →
+      dOrbitRel hyp.KW (f a) (f b) := by
     intro a b haQ ha1 hab
-    obtain ⟨d, hdD, rfl⟩ := hab
-    exact H.dOrbitRel_f hyp.rankOneSetup haQ ha1 hdD
+    obtain ⟨d, hdKW, rfl⟩ := hab
+    exact H.dOrbitRel_f_of_le hyp.rankOneSetup haQ ha1 hyp.KW_le_D
+      (fun _ ha => hyp.conj_t_mem_KW ha) hdKW
   -- step 1: `f(X⁻¹) ~ ω(ρy)`
-  have hs1 : dOrbitRel hyp.D (ω * (ρ * y)) (f (ωk * ρ)) := by
+  have hs1 : dOrbitRel hyp.KW (ω * (ρ * y)) (f (ωk * ρ)) := by
     have h := hfrel (H.f_mem hωρyQ (hne hωρyQ0))
       (IsFGH.f_ne_one hyp.rankOneSetup H hωρyQ (hne hωρyQ0)) hk
     rwa [hff hωρyQ (hne hωρyQ0)] at h
   -- step 2: `f((f X⁻¹)⁻¹) ~ ω`
-  have hs2 : dOrbitRel hyp.D ω (f ((f (ωk * ρ))⁻¹)) := by
-    have hinvrel : dOrbitRel hyp.D (ω * y) ((f (ωk * ρ))⁻¹) := by
+  have hs2 : dOrbitRel hyp.KW ω (f ((f (ωk * ρ))⁻¹)) := by
+    have hinvrel : dOrbitRel hyp.KW (ω * y) ((f (ωk * ρ))⁻¹) := by
       have h := dOrbitRel.inv hs1
       rwa [hprodinv] at h
     have h1 := hfrel hωyQ (hne hωyQ0) hinvrel
-    have h2 : dOrbitRel hyp.D (f (ω * y)) ω := by
-      have hnr : dOrbitRel hyp.D (ω * y) (f ω) := ⟨ζ, hζD, hnorm⟩
+    have h2 : dOrbitRel hyp.KW (f (ω * y)) ω := by
+      have hnr : dOrbitRel hyp.KW (ω * y) (f ω) :=
+        ⟨ζ, hyp.mem_KW_of_mem_W hζW, hnorm⟩
       have h := hfrel hωyQ (hne hωyQ0) hnr
       rwa [hff hωQ (hne hωQ0)] at h
     exact dOrbitRel.trans h2.symm h1
   -- step 3: `f((f((f X⁻¹)⁻¹))⁻¹) ~ ω_i(ρy)`
-  have hs3 : dOrbitRel hyp.D (ωi * (ρ * y))
+  have hs3 : dOrbitRel hyp.KW (ωi * (ρ * y))
       (f ((f ((f (ωk * ρ))⁻¹))⁻¹)) := by
-    have hinvrel : dOrbitRel hyp.D (ω * ρ) ((f ((f (ωk * ρ))⁻¹))⁻¹) := by
+    have hinvrel : dOrbitRel hyp.KW (ω * ρ) ((f ((f (ωk * ρ))⁻¹))⁻¹) := by
       have h := dOrbitRel.inv hs2
       rwa [hωinv] at h
     exact dOrbitRel.trans hi.symm (hfrel hωρQ (hne hωρQ0) hinvrel)
@@ -504,7 +507,7 @@ theorem dOrbitRel_of_stepTwenty_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     intro hc
     refine hne hωkρQ0 ?_
     rw [← hXinv, hc, inv_one]
-  have hcube := H.dOrbitRel_fj_cube hyp.rankOneSetup hXQ hX1
+  have hcube := H.dOrbitRel_fj_cube_of_mem hyp.rankOneSetup hXQ hX1 hhX
   rw [hXinv] at hcube
   exact dOrbitRel.trans hcube hs3.symm
 
@@ -517,9 +520,10 @@ of the `D`-action makes the conjugator trivial and the translates equal — whic
 theorem sq_eq_of_dOrbitRel (hfree : hyp.FreeD)
     {ω y ρ : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hyQ0 : y ∈ hyp.Q0) (hρQ0 : ρ ∈ hyp.Q0) (hsq : ω * ω ∈ hyp.Q0)
-    (hrel : GroupTheory.RankOneBNPair.dOrbitRel hyp.D (ω⁻¹ * ρ) (ω * (ρ * y))) :
+    (hrel : GroupTheory.RankOneBNPair.dOrbitRel hyp.KW (ω⁻¹ * ρ) (ω * (ρ * y))) :
     ω * ω = y := by
-  obtain ⟨d, hdD, hd⟩ := hrel
+  obtain ⟨d, hdKW, hd⟩ := hrel
+  have hdD : d ∈ hyp.D := hyp.KW_le_D hdKW
   have hsq1 : (ω * ω) * (ω * ω) = 1 := by
     have hs := hsq.1
     rwa [sq] at hs
@@ -580,14 +584,15 @@ theorem f_eq_conj_inv_of_stepTwenty_chain (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g
     {ζ ω ω' y ρ : G}
     (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hω'Q : ω' ∈ hyp.Q) (hω'Q0 : ω' ∉ hyp.Q0)
-    (hyQ0 : y ∈ hyp.Q0) (hρQ0 : ρ ∈ hyp.Q0) (hρ : ρ = ω * ω) (hζD : ζ ∈ hyp.D)
+    (hyQ0 : y ∈ hyp.Q0) (hρQ0 : ρ ∈ hyp.Q0) (hρ : ρ = ω * ω) (hζW : ζ ∈ hyp.W)
     (hsq' : ω' * ω' ∈ hyp.Q0)
     (hnorm : f ω = ζ⁻¹ * (ω * y) * ζ) (hnorm' : f ω' = ζ⁻¹ * (ω' * y) * ζ)
-    (hi : dOrbitRel hyp.D (f (ω * ρ)) (ω' * (ρ * y)))
-    (hk : dOrbitRel hyp.D (f (ω * (ρ * y))) (ω' * ρ)) :
+    (hhX : h (ω'⁻¹ * ρ) ∈ hyp.KW)
+    (hi : dOrbitRel hyp.KW (f (ω * ρ)) (ω' * (ρ * y)))
+    (hk : dOrbitRel hyp.KW (f (ω * (ρ * y))) (ω' * ρ)) :
     ω' * ω' = y ∧ f ω' = ζ⁻¹ * ω'⁻¹ * ζ := by
   have hchain := hyp.dOrbitRel_of_stepTwenty_chain H hωQ hωQ0 hω'Q hω'Q0 hyQ0 hρQ0 hρ
-    hζD hnorm hi hk
+    hζW hnorm hhX hi hk
   have hsq := hyp.sq_eq_of_dOrbitRel hfree hω'Q hω'Q0 hyQ0 hρQ0 hsq' hchain
   exact ⟨hsq, hyp.f_eq_conj_inv_of_sq_eq hyQ0 hnorm' hsq⟩
 
