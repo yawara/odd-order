@@ -7,6 +7,7 @@ import OddOrder.GroupTheory.IsMetacyclic
 import Mathlib.Data.ZMod.Units
 import Mathlib.Data.Nat.Totient
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.GroupTheory.PGroup
 
 /-!
 # Isaacs, Finite Group Theory — Problems 10B (書籍 p. 312)
@@ -121,6 +122,30 @@ theorem orderOf_unitAutHom_one_add_prime (hp : p.Prime) (hn : 0 < n) {u : (ZMod 
   haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
   rw [orderOf_unitAutHom]
   exact orderOf_one_add_prime_dvd hp hn hu
+
+/-! ## Isaacs 10B.1 の群 `P = C ⋊ ⟨a⟩` -/
+
+/-- **Isaacs Problem 10B.1 の群**: `C = C_{p^n}` と単元 `u` の定める自己同型
+`a : x ↦ x^u` について `P = C ⋊ ⟨a⟩`. -/
+abbrev problem10B1Group (m : ℕ) (u : (ZMod m)ˣ) : Type :=
+  SemidirectProduct (Multiplicative (ZMod m))
+    ↥(Subgroup.zpowers (unitAutHom m u)) (Subgroup.subtype _)
+
+/-- **10B.1 の "metacyclic"**: `C` も `⟨a⟩` も巡回なので半直積は metacyclic. -/
+theorem isMetacyclic_problem10B1 (m : ℕ) (u : (ZMod m)ˣ) :
+    OddOrder.GroupTheory.IsMetacyclic (problem10B1Group m u) :=
+  OddOrder.GroupTheory.isMetacyclic_semidirectProduct _
+
+/-- **10B.1 の "`p`-群"**: `|P| = p^n · orderOf a` で `orderOf a ∣ p^{n-1}`. -/
+theorem isPGroup_problem10B1 (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
+    (hu : (u : ZMod (p ^ n)) = 1 + (p : ZMod (p ^ n))) :
+    IsPGroup p (problem10B1Group (p ^ n) u) := by
+  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  obtain ⟨k, _, hk⟩ := (Nat.dvd_prime_pow hp).mp (orderOf_unitAutHom_one_add_prime hp hn hu)
+  refine IsPGroup.of_card (n := n + k) ?_
+  rw [SemidirectProduct.card, Nat.card_zpowers, hk, pow_add]
+  congr 1
+  rw [Nat.card_congr (Multiplicative.toAdd (α := ZMod (p ^ n))), Nat.card_zmod]
 
 end
 
