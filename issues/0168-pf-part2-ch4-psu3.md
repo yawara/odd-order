@@ -7867,3 +7867,20 @@ Corollary 2 の証明で `h(ω) ∈ W` をどう出しているかを確定 → 
   ⟹ `eq_one_of_conj_eq_mul_Q0_of_mem_D` (自由性) で `h(ω) = ζ³`。
 * 自由性の入力 (`M`/`hZ`/`hmu`/`hVW`) は `h_eq_zpow_three` が**既に取っている**ので
   仮説は増えない。
+
+### (162) 🎯 `hhW` 全廃 — endpoint の未証明仮説は `hfQ` と標準データのみに
+
+commit `5a294fc66`。(161) の読み通り、`ω⁻¹` 側で `h_inv_eq` を回すと (H4) の twist が
+最初から現れず、`hhW` は不要だった:
+
+* `f_inv_eq`: `f(ω⁻¹) = ζωζ⁻¹ = (ζ⁻¹)⁻¹(ω⁻¹)⁻¹(ζ⁻¹)` — `ζ ↦ ζ⁻¹` で同型の仮説。
+* `h_inv_eq` を `(ω⁻¹, ζ⁻¹)` に当てて `h(ω) = ζ³`。`h_inv_eq` は自由性だけで回るので
+  仮説増なし。
+
+⟹ `corollaryTwo` / `corollaryTwo_of_stepFour` / `PSU3CorollaryTwo` の endpoint 6 本から
+`hhW` を削除。`hpair` (154) → `hsq` (158) → `hhW` (162) と**特殊化債務 3 本を返済**。
+
+**`..._of_closing` の現在の仮説** = `H`/`hC2`/`sfive`/`M`/`hZc`/`hmu`/`hVW`/`hm`/
+`hQ0card`/`hcardQ`/`hcard`/`hKcard`/`hWdvd`/`hW1`/`hWcyc`/**`hfQ`**/`x₀`/`hmodel`/`ζ`。
+`hfQ` は `exists_fgh_mapsTo` が供給する (f,g,h を作る側とセット)。
+⟹ **残るは §4 段 (2) の配線のみ** ((158) の表、材料は全部所在確認済)。
