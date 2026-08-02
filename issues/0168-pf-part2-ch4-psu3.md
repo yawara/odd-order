@@ -8296,3 +8296,28 @@ commit 済。`h ω = ζ³η` + `t η t = η` ⟹ 書籍 p.133 の displayed 式
   ⟹ 結論 `a²·Y = ζ⁻¹·Y^η + ω̄` = 書籍の **(4)**。
 * (3) は §2 (2) だけから同様に。
 * 以後は `PSU3SectionFourArithmetic` の既存補題へ配線して Ch. IV 完了。
+
+### (182) ⚠ 重要: §4 の E 座標は**周囲の** `Q/Q₀`、`hVW` は成り立たない
+
+E 座標へ落とす段の設計を詰めた結果、`stepTwo_linear` をそのまま使えないことが判明:
+
+* §4 は「`V ≠ W` の場合」なので、**周囲の仮説では `hVW : V = W` が偽**。
+  `stepTwo_linear` は `hVW` を要求する (`conjQHom_kActor_apply_val` 経由) ので不可。
+* 書籍が `Q ⋊ KW ≅ S₁ ⋊ K₁W₁` と同一視するのは**周囲の** `Q`,`K`,`W`。
+  `η ∈ P ≤ V` は `V ≠ W` ゆえ `KW` の外にあり、だから `E = Q/Q₀` 上で
+  **半線形**に作用する (Appendix I Prop 2)。これが (4) に `Y^η` が現れる理由。
+* ⚠ 周囲の標準モデル自体は §4 でも存在する: `exists_standardModel` は
+  `hVW` を要求しない (`s`/`M`/`hst`/`hm`/`hQ0card`/`hcardQ`/`ih`/`x₀` のみ)。
+
+✅ 本セッションの §4 成果は `hVW` に依存していない (確認済):
+`exists_fgh_residual` / `fgh_residualQuotient_eq` / `eq_of_mk_eq_of_mem_Q` /
+`stepOne_chain_of_h` / `stepOne_chain_of_h_eq_mul` — いずれも `hVW` を取らない。
+段 (2)(3) が `hVW` を使うのは**商仮説** (`residualQuotientHypothesis_V_eq_W`、
+`U/Z(U) ≅ PSU(3,ℓ)` 側) についてであり、周囲の `V = W` ではない。
+
+**⟹ 次セッションの設計課題**: (4) の E 座標版を作るには
+1. 周囲の標準モデル `M` (§4 でも存在) を取る。
+2. `ζ³` の共役はスカラー倍 (`coord_conj_eq` 系; `ζ ∈ W` なので `μ(1,ζ)` が効く)。
+3. **`η` の共役は半線形** — `SemilinearField.lean:196` (Appendix I Prop 2(a)+(b)) で
+   `η` の作用に付随する体自己同型 `μ` を取り出す。⚠ この補題の入力
+   (可換群 `T` の作用等) を実測して、`η` の作用をその形に合わせるのが山場。
