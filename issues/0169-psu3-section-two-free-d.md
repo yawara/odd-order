@@ -170,10 +170,29 @@ fpf で切るしかなく、そのためには §2/§3 の `hVW` を fpf に一�
   (「`f(ω₁(0,x₁)) = (ω₂(0,x₂))^k` with `k ∈ K`」)。`D`-軌道で書けているのは
   `D = KW` (= `V = W`) を仮定しているから。
 
-  ⟹ 残りの実作業 = **`PSU3BarOrbit.lean` の軌道を `D` から `KW` へ張り替える**
-  (7 宣言)。`PSU3StepEightKW.lean` の `KW` 版群がそのまま材料になる。
-  それが済めば `exists_f_eq_conj_inv` (§2 の閉じ Proposition) が `FreeD` で出て、
-  (2) は完了。
+  ⟹ **`KW` を部分群として導入して `PSU3StepTwenty` は全部 `FreeD`/`KW` 化済**
+  (`KW` / `conj_t_mem_KW` / `KW_eq_D_of_V_eq_W`、`exists_mem_K_conj_of_mem_KW` /
+  `stepTwenty_of_mem_KW` / `sq_eq_of_dOrbitRel` / `f_eq_conj_inv_of_stepTwenty_chain`)。
+
+### ⚠ 残る 1 点 = (H5) 連鎖の共役子が `KW` に入ること (書籍 p.129 の 1 文)
+
+`PSU3BarOrbit.lean` の `barOrbitRel` を `KW`-軌道に張り替えようとして判明:
+`dOrbitRel_of_stepTwenty_chain` ((H5) の連鎖) が返す共役子は `h(x)⁻¹` で、
+これは `D` の元としてしか押さえられていない (`IsFGH.dOrbitRel_fj_cube`)。
+一方 `barOrbitRel` を `KW` にすると、この共役子も `KW` である必要がある。
+
+書籍 p.129 はまさにそこを 1 文で済ませている:
+
+> Moreover, by (H4), `h(f(ω(0,r))) ∈ K W`. By (H5), it follows that
+> `(ω̄⁻¹(0,r))^{KW} = (ω(0,α+r))^{KW}`, whence `i = k` and `ω_i² = (0,α)`.
+
+⟹ **次にやること** = 「`h(f(ω(0,r))) ∈ KW`」を (H4) + (19)/(20) の
+`d_i ∈ KW` (`stepElevenSeq_mem_KW` が既にある) から出す。それができれば
+`barOrbitRel` を `KW` にでき、`exists_f_eq_conj_inv` が `FreeD` で出て (2) 完了。
+
+現状 `PSU3BarOrbit.lean` は `hVW` を保持しているが、内部では
+`KW_eq_D_of_V_eq_W` / `freeD_of_V_eq_W` 経由で新 API に接続済なので、
+この 1 点が埋まれば置換は機械的。
 
 ## 準備として済んでいること (2026-08-02)
 
