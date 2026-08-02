@@ -8,6 +8,8 @@ import OddOrder.Isaacs.Ch02_Subnormality.Basic
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
 import Mathlib.GroupTheory.IndexNormal
+import Mathlib.GroupTheory.SpecificGroups.Quaternion
+import OddOrder.GroupTheory.CommGroupAut
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 
 /-!
@@ -470,6 +472,44 @@ theorem exists_injective_hom_regularWreath_of_index_sq [Finite P] {p : ℕ} [Fac
   exact hf_inj h4
 
 end -- 10A.5
+
+section /- 10A.4 への準備: 位数 2 の正規部分群と `Q₈` -/
+
+/-- **位数 `2` の正規部分群は中心に入る**: 共役は `1` でない `K` の元だから, `K` の
+非自明元が一意 (位数 2) で自分自身に戻る. -/
+theorem le_center_of_normal_card_eq_two {G : Type*} [Group G] {K : Subgroup G} [hKn : K.Normal]
+    (hK : Nat.card ↥K = 2) : K ≤ Subgroup.center G := by
+  intro k hk
+  rw [Subgroup.mem_center_iff]
+  intro g
+  rcases eq_or_ne k 1 with rfl | hk1
+  · simp
+  have hmem : g * k * g⁻¹ ∈ K := hKn.conj_mem k hk g
+  have hne : (⟨g * k * g⁻¹, hmem⟩ : ↥K) ≠ 1 := by
+    intro h
+    exact hk1 (by
+      have hc : g * k * g⁻¹ = 1 := congrArg Subtype.val h
+      have : k = g⁻¹ * (g * k * g⁻¹) * g := by group
+      rw [this, hc]
+      group)
+  have hk1' : (⟨k, hk⟩ : ↥K) ≠ 1 := fun h => hk1 (congrArg Subtype.val h)
+  have heq : (⟨g * k * g⁻¹, hmem⟩ : ↥K) = ⟨k, hk⟩ :=
+    OddOrder.GroupTheory.eq_of_ne_one_of_card_eq_two hK hne hk1'
+  have hconj : g * k * g⁻¹ = k := congrArg Subtype.val heq
+  calc g * k = (g * k * g⁻¹) * g := by group
+    _ = k * g := by rw [hconj]
+
+/-- `Q₈` の involution は `a 2` ただ一つ. -/
+theorem quaternionTwo_sq_eq_one_iff (g : QuaternionGroup 2) :
+    g ^ 2 = 1 ↔ g = 1 ∨ g = QuaternionGroup.a 2 := by
+  revert g; decide
+
+/-- `Q₈` の交換子はつねに `1` か `a 2` (`Q₈' = ⟨a 2⟩`). -/
+theorem quaternionTwo_commutatorElement (g h : QuaternionGroup 2) :
+    g * h * g⁻¹ * h⁻¹ = 1 ∨ g * h * g⁻¹ * h⁻¹ = QuaternionGroup.a 2 := by
+  revert g h; decide
+
+end
 
 section /- 10A.3 (後半への準備): 指数が素数の可換部分群 -/
 
