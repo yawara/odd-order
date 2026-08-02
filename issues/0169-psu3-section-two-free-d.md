@@ -82,7 +82,7 @@ fpf で切るしかなく、そのためには §2/§3 の `hVW` を fpf に一�
       (hVW-free)、`≥` は `stepEight_of_KW` から出る。
       消費点は `PSU3StepFifteen.lean:365`。
       ⟹ **(2) の置換はほぼ完全に機械的**。
-- [ ] (4) case (c) → Ch. IV の振り分けを組む:
+- [ ] (4) **次の作業** — case (c) → Ch. IV の振り分けを組む:
       `by_cases` on 「∃ 素数位数 `P ≤ D` with `C_{Q/Q₀}(P) ≠ 1`」
       * yes → `P` を `D`-共役で `V` へ入れ (書籍「`P` has three fixed points on `Ω`
         and so is conjugate in `D` to a subgroup of `V`」)、`P ∩ W = 1` は
@@ -249,3 +249,33 @@ sorry-free で出る。⟹ Ch. II (`theoremB`) + Ch. III case (a)(b)
   (§2 Proposition = p.129、§4 冒頭 = p.132)
 * Ch. IV 到達状態 = [`notes/peterfalvi/partII_ch4_section4_state.md`](../notes/peterfalvi/partII_ch4_section4_state.md)
 * 親 issue = [0168](0168-pf-part2-ch4-psu3.md)
+
+## (4) の実装メモ (2026-08-02 に部品を実測)
+
+```
+by_cases hfree : hyp.FreeD
+· -- §2 ⟹ Corollary 1 (2026-08-02 に landing した
+  --   nonempty_theoremAConclusion_of_isStandardModel_of_closing、FreeD 版)
+· -- ¬FreeD: `SectionFourSetup` を作って §4 経路
+```
+
+`¬FreeD` から `SectionFourSetup` を作る手順と部品:
+
+1. `¬FreeD` ⟹ `∃ ω ∈ Q−Q₀, c ∈ D∖{1}, y ∈ Q₀` で `c⁻¹ωc = ωy`。
+2. `c ≠ 1`, `|D|` 奇数 ⟹ 素数 `p ∣ orderOf c` を取り `P₀ := ⟨c^{orderOf c / p}⟩`
+   (位数 `p`)。`c` が `ω` の類を固定するので**その冪も固定する**
+   (`Q₀` は `D`-不変なので `c⁻ⁿωcⁿ ∈ ωQ₀` が帰納で出る)。
+3. **`P₀` を `V` へ共役**: `exists_conj_mem_D_map_le_V`
+   (`FixedPointCentralizer.lean:485`、Ch. I Prop 6(c)) が使える。
+   入力は `3 ≤ (MulAction.fixedPoints P₀ Ω).ncard`。
+   ⚠ **この「3 点」の補題が repo に無い** — 書籍は「`C_Q(P) ≠ 1` なので `P` は
+   `Ω` 上に 3 つの固定点を持つ」の 1 文。論法: `D` は 2 点 (`a` と `a^t`) を固定し、
+   `q ∈ C_Q(P)∖{1}` を取れば `q · a^t` が第 3 の固定点
+   (`P` が `q` を中心化し `a^t` を固定するから)。相異なることは
+   `Q^t ∩ M = 1` と `q · a = a` から。
+   ⟹ **これを landing させるのが (4) の最初の実作業**。
+4. 共役後の `P` について `P ⊓ W = ⊥`: `W` は常に fpf
+   (`eq_one_of_conj_eq_mul_Q0_of_mem_W`) なので、`P` の非自明元が `W` に入ると
+   `ω` の類を固定して矛盾。
+5. `SectionFourSetup` の残りのフィールド (`cardP` 素数・奇数、`card_P`、
+   `x`/`x_mem_Q`/`x_notMem_Q0`/`x_class_fixed`) は 1.–2. の witness をそのまま。
