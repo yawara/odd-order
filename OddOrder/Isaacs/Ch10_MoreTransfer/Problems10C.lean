@@ -5,6 +5,11 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.AugmentationIdeal
 import Mathlib.LinearAlgebra.Basis.SMul
+import Mathlib.LinearAlgebra.Matrix.ToLin
+import Mathlib.LinearAlgebra.Matrix.Trace
+import Mathlib.LinearAlgebra.Matrix.Reindex
+import Mathlib.LinearAlgebra.Matrix.Charpoly.Eigs
+import Mathlib.Analysis.Complex.Polynomial.Basic
 
 /-!
 # Isaacs, *Finite Group Theory*, Problems 10C (pp. 324)
@@ -569,5 +574,184 @@ theorem nonempty_abelianization_equiv_of_isUnitBasis (hb : IsUnitBasis H) :
     (abelianizationEquivOfNormalized hbK (fun k => hδK k k.2))⟩
 
 end Problem10C4
+
+section Problem10C5
+
+open scoped Matrix
+
+variable {G : Type*} [Group G] [Fintype G] [DecidableEq G]
+
+/-! ### Problem 10C.5
+
+`|G| = n`, `G = {g₁, …, gₙ}` と番号付けし, `a ∈ ℤ[G]` に対し `M(a)` を
+「`(i, j)` 成分 = `gᵢ a` における `gⱼ` の係数」で定める。このとき
+
+  `tr M(a) = n e`,  `e` = `a` における `1` の係数。
+
+対角成分は `gᵢ a` における `gᵢ` の係数 = `a (gᵢ⁻¹ gᵢ) = a 1 = e` で `i` によらない。
+(番号付け `Fin n ≃ G` は本質でないので添字集合は `G` 自身にとる。) -/
+
+/-- Isaacs 10C.5/10C.6 の行列 `M(a)`: `(i, j)` 成分は `gᵢ a` における `gⱼ` の係数
+(`M(a) i j = a (gᵢ⁻¹ gⱼ)`)。左正則表現の行列を反転 `g ↦ g⁻¹` で添字替えしたもので,
+その形で作るので**環準同型であることが構成から従う**。 -/
+noncomputable def regularMatrixHom :
+    MonoidAlgebra ℤ G →ₐ[ℤ] Matrix G G ℤ :=
+  ((Matrix.reindexAlgEquiv ℤ ℤ (Equiv.inv G)).toAlgHom).comp
+    (((LinearMap.toMatrixAlgEquiv (MonoidAlgebra.basis G ℤ)).toAlgHom).comp
+      (Algebra.lmul ℤ (MonoidAlgebra ℤ G)))
+
+/-- Isaacs 10C.5 の行列 `M(a)`. -/
+noncomputable def regularMatrix (a : MonoidAlgebra ℤ G) : Matrix G G ℤ :=
+  regularMatrixHom a
+
+@[simp]
+theorem regularMatrixHom_apply (a : MonoidAlgebra ℤ G) :
+    regularMatrixHom a = regularMatrix a := rfl
+
+theorem regularMatrix_apply (a : MonoidAlgebra ℤ G) (i j : G) :
+    regularMatrix a i j = a (i⁻¹ * j) := by
+  rw [regularMatrix, regularMatrixHom]
+  simp only [AlgHom.comp_apply, AlgEquiv.coe_algHom,
+    Matrix.coe_reindexAlgEquiv, Matrix.reindex_apply, Matrix.submatrix_apply,
+    Equiv.inv_symm, Equiv.inv_apply, LinearMap.toMatrixAlgEquiv_apply,
+    MonoidAlgebra.basis_apply]
+  change (a * MonoidAlgebra.single j⁻¹ (1 : ℤ)) i⁻¹ = _
+  rw [MonoidAlgebra.mul_single_apply, mul_one, inv_inv]
+
+/-- **Isaacs Problem 10C.5**: `tr M(a) = n e`, ここで `n = |G|`,
+`e` は `a` における `1` の係数。対角成分はどれも `a (gᵢ⁻¹ gᵢ) = a 1 = e`。 -/
+theorem trace_regularMatrix (a : MonoidAlgebra ℤ G) :
+    (regularMatrix a).trace = (Fintype.card G : ℤ) * a 1 := by
+  rw [Matrix.trace]
+  simp only [Matrix.diag_apply, regularMatrix_apply, inv_mul_cancel]
+  rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+
+end Problem10C5
+
+section Problem10C6
+
+variable {G : Type*} [Group G] [Fintype G] [DecidableEq G]
+
+/-! ### Problem 10C.6
+
+`a ∈ ℤ[G]` が `aᵐ = 1` (`m ≥ 1`) を満たすとき, `M(a)` の固有値はすべて 1 の冪根で,
+`e = a(1) ∈ {-1, 0, 1}`。
+
+`M` は環準同型 (`regularMatrixHom`) なので `M(a)ᵐ = M(1) = 1`。ℂ 上で見ると
+特性多項式の根 `μ` は固有ベクトル `v ≠ 0` を持ち `μᵐ v = M(a)ᵐ v = v` ゆえ
+`μᵐ = 1`, 特に `‖μ‖ = 1`。トレースは特性多項式の根の和なので
+
+  `|n e| = |tr M(a)| = |Σ μ| ≤ Σ ‖μ‖ = n`,
+
+よって `|e| ≤ 1`。 -/
+
+/-- `Aᵐ = 1` なら `A` の特性多項式の根は 1 の `m` 乗根 (根は固有値なので,
+固有ベクトル `v ≠ 0` に対し `v = Aᵐ v = μᵐ v`)。 -/
+theorem pow_eq_one_of_isRoot_charpoly {n : Type*} [Fintype n] [DecidableEq n]
+    {A : Matrix n n ℂ} {m : ℕ} (hA : A ^ m = 1) {μ : ℂ}
+    (hμ : A.charpoly.IsRoot μ) : μ ^ m = 1 := by
+  have hdet : (Matrix.scalar n μ - A).det = 0 := by
+    rw [← Matrix.eval_charpoly]
+    exact hμ
+  obtain ⟨v, hv, hvz⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hdet
+  have hAv : A.mulVec v = μ • v := by
+    have h := hvz
+    rw [Matrix.sub_mulVec, sub_eq_zero] at h
+    rw [← h]
+    funext i
+    simp [Matrix.scalar, Matrix.mulVec_diagonal]
+  have hpow : ∀ k : ℕ, (A ^ k).mulVec v = μ ^ k • v := by
+    intro k
+    induction k with
+    | zero => simp
+    | succ k ih =>
+      rw [pow_succ', ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul, hAv,
+        smul_smul, ← pow_succ]
+  have hm := hpow m
+  rw [hA, Matrix.one_mulVec] at hm
+  obtain ⟨i, hi⟩ := Function.ne_iff.mp hv
+  have hvi : v i = μ ^ m * v i := congrFun hm i
+  have hzero : (μ ^ m - 1) * v i = 0 := by
+    rw [sub_mul, one_mul, ← hvi, sub_self]
+  rcases mul_eq_zero.mp hzero with h | h
+  · exact sub_eq_zero.mp h
+  · exact absurd h hi
+
+/-- `Aᵐ = 1` (`m ≥ 1`) なら `|tr A| ≤ n` (固有値の絶対値がすべて 1 だから)。 -/
+theorem norm_trace_le_of_pow_eq_one {n : Type*} [Fintype n] [DecidableEq n]
+    {A : Matrix n n ℂ} {m : ℕ} (hm : 0 < m) (hA : A ^ m = 1) :
+    ‖A.trace‖ ≤ (Fintype.card n : ℝ) := by
+  have hroots : ∀ μ ∈ A.charpoly.roots, ‖μ‖ = 1 := by
+    intro μ hμ
+    have hμ1 : μ ^ m = 1 :=
+      pow_eq_one_of_isRoot_charpoly hA (Polynomial.isRoot_of_mem_roots hμ)
+    have h1 : ‖μ‖ ^ m = 1 := by rw [← norm_pow, hμ1, norm_one]
+    rcases lt_trichotomy ‖μ‖ 1 with h | h | h
+    · have := pow_lt_one₀ (norm_nonneg μ) h hm.ne'
+      linarith
+    · exact h
+    · have := one_lt_pow₀ h hm.ne'
+      linarith
+  have hcard : (Multiset.card A.charpoly.roots : ℝ) = (Fintype.card n : ℝ) := by
+    have hs : A.charpoly.roots.card = A.charpoly.natDegree :=
+      Polynomial.splits_iff_card_roots.mp (IsAlgClosed.splits A.charpoly)
+    rw [hs, Matrix.charpoly_natDegree_eq_dim]
+  rw [Matrix.trace_eq_sum_roots_charpoly]
+  refine (norm_multiset_sum_le _).trans ?_
+  have hmap : A.charpoly.roots.map (fun μ : ℂ => ‖μ‖)
+      = A.charpoly.roots.map (fun _ : ℂ => (1 : ℝ)) :=
+    Multiset.map_congr rfl hroots
+  rw [hmap, Multiset.map_const', Multiset.sum_replicate, nsmul_eq_mul, mul_one,
+    hcard]
+
+/-- `M(a)` を ℂ 係数に読み替えた行列。 -/
+noncomputable def regularMatrixC (a : MonoidAlgebra ℤ G) : Matrix G G ℂ :=
+  ((Int.castRingHom ℂ).mapMatrix) (regularMatrix a)
+
+theorem regularMatrixC_pow (a : MonoidAlgebra ℤ G) {m : ℕ} (ha : a ^ m = 1) :
+    regularMatrixC a ^ m = 1 := by
+  rw [regularMatrixC, ← map_pow, ← regularMatrixHom_apply, ← map_pow, ha,
+    map_one, map_one]
+
+/-- **Isaacs Problem 10C.6 (前半)**: `aᵐ = 1` なら `M(a)` の固有値
+(= 特性多項式の根) はすべて 1 の `m` 乗根。 -/
+theorem pow_eq_one_of_isRoot_charpoly_regularMatrixC (a : MonoidAlgebra ℤ G)
+    {m : ℕ} (ha : a ^ m = 1) {μ : ℂ}
+    (hμ : (regularMatrixC a).charpoly.IsRoot μ) : μ ^ m = 1 :=
+  pow_eq_one_of_isRoot_charpoly (regularMatrixC_pow a ha) hμ
+
+theorem trace_regularMatrixC (a : MonoidAlgebra ℤ G) :
+    (regularMatrixC a).trace = ((Fintype.card G : ℤ) * a 1 : ℤ) := by
+  rw [← trace_regularMatrix a, regularMatrixC, Matrix.trace, Matrix.trace]
+  push_cast
+  rfl
+
+end Problem10C6
+
+section Problem10C6Conclusion
+
+/-- **Isaacs Problem 10C.6 (後半)**: `aᵐ = 1` (`m ≥ 1`) なら
+`a` における `1` の係数 `e` は `-1, 0, 1` のいずれか。 -/
+theorem coeff_one_of_pow_eq_one {G : Type*} [Group G] [Finite G]
+    (a : MonoidAlgebra ℤ G) {m : ℕ} (hm : 0 < m)
+    (ha : a ^ m = 1) : a 1 = -1 ∨ a 1 = 0 ∨ a 1 = 1 := by
+  classical
+  have _ : Fintype G := Fintype.ofFinite G
+  have hn : 0 < Fintype.card G := Fintype.card_pos
+  have hbound := norm_trace_le_of_pow_eq_one (A := regularMatrixC a) hm
+    (regularMatrixC_pow a ha)
+  rw [trace_regularMatrixC] at hbound
+  have hreal : |((Fintype.card G : ℤ) * a 1 : ℤ)| ≤ (Fintype.card G : ℤ) := by
+    have : |(((Fintype.card G : ℤ) * a 1 : ℤ) : ℝ)| ≤ (Fintype.card G : ℝ) := by
+      simpa [Complex.norm_intCast] using hbound
+    exact_mod_cast this
+  rw [abs_mul, abs_of_nonneg (by positivity : (0 : ℤ) ≤ (Fintype.card G : ℤ))] at hreal
+  have hcard : (0 : ℤ) < (Fintype.card G : ℤ) := by exact_mod_cast hn
+  have habs : |a 1| ≤ 1 := le_of_mul_le_mul_left (by linarith) hcard
+  have h1 : -1 ≤ a 1 := (abs_le.mp habs).1
+  have h2 : a 1 ≤ 1 := (abs_le.mp habs).2
+  omega
+
+end Problem10C6Conclusion
 
 end OddOrder.Isaacs.Ch10

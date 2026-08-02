@@ -241,6 +241,15 @@ repo に `p`-length の定義が無かったので新設。
       **§10A (7 問) 🎉 完済 (2026-08-03)**: 10A.3 前半+後半 と **10A.4** が landing。
       **§10B (2 問) 🎉 完済 (2026-08-03)**: 10B.1 = `nilpotencyClass_problem10B1`、
       10B.2 = `le_socle_of_isElementaryAbelian_of_not_dvd_index`。
+      **§10C (6 問) 🎉 完済 (2026-08-03)** = `Problems10C.lean` (757 行):
+      10C.1 = `ker_mapDomainAlgHom_eq_mul_top` / `_eq_top_mul`、
+      10C.2 = mathlib 既存 (`LinearIndependent.finite` + `Module.Basis.indexEquiv`;
+      ラッパー方針で Lean には書かず file docstring に対応記録)、
+      10C.3 = `exists_isUnitBasis_augmentation_eq_one`、
+      10C.4 = `nonempty_abelianization_equiv_of_isUnitBasis`、
+      10C.5 = `trace_regularMatrix`、
+      10C.6 = `pow_eq_one_of_isRoot_charpoly_regularMatrixC` + `coeff_one_of_pow_eq_one`。
+      ⟹ **Isaacs Ch.10 の Problems (§10A/§10B/§10C 計 12 問) 全完済**。
       **§10C (6 問) は全部未着手**
 
 ## 方針
