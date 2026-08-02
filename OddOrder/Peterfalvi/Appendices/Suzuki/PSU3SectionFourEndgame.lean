@@ -53,6 +53,8 @@ membership facts it needs on the model:
 * `Hypothesis.SectionFourSetup.eight_lt_natCard_Q0` — `q > 8`, the counting hypothesis.
 * `Hypothesis.center_le_subgroupOf_D`, `Hypothesis.center_residualImage_le_subgroupOf_D` —
   **`Z(U) ⊆ D`**, the `hZD` that §4's step (2)/(3) endpoints thread as a hypothesis.
+* `Hypothesis.nonempty_psu3Data_sectionFour` — the `PSU(3, ℓ)` branch data for `X = P`,
+  which step (2) and step (3) run on.
 * `conj_inv_eq_of_commute`, `cube_mul_eq_of_commute` — the book's refinement
   `ζ₁ ∈ ζ P` (p. 133): `ω^{ζ₁} = ω^ζ` and `ζ₁³ P = ζ³ P`.
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
@@ -823,6 +825,36 @@ theorem center_residualImage_le_subgroupOf_D (s4 : hyp.SectionFourSetup)
       (n := 1) (by
         rw [pow_one]
         exact orderOf_eq_prime hyp.t_sq hyp.t_ne_one))
+
+include hyp in
+/-- **🎯 The `PSU(3, ℓ)` branch data for `X = P`** (Peterfalvi Part II, Ch. IV §4, step (1),
+p. 132).
+
+Ch. I §3 Proposition 1(c) applied inductively to `C_G(P)`
+(`centralizer_trichotomy_of_induction`) gives the trichotomy; §4's two discriminators —
+`|st| = 3` and "`C_Q(P)` has exponent `4`" (`not_isElementaryAbelian_cQ`) — pick the
+unitary branch (`nonempty_psu3Data_of_orderOf_eq_three`).  This is the `details` that
+step (2) and step (3) run on. -/
+theorem nonempty_psu3Data_sectionFour (s4 : hyp.SectionFourSetup)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
+    (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
+    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
+      Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
+    (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
+    (ih : TheoremAInductionBelow G Ω) :
+    letI := hyp.centralizerQuotientMulAction s4.P_le_V
+    ∃ (result : TheoremAConclusion (hyp.centralizerActionQuotient s4.P)
+        ↥(MulAction.fixedPoints s4.P Ω))
+      (data : PSU3InductionTarget (Omega := ↥(MulAction.fixedPoints s4.P Ω)) result.L),
+      Nonempty (CentralizerPSUData hyp s4.P result data) := by
+  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  have hnea := s4.not_isElementaryAbelian_cQ hQsuz hZ hCop hSolv
+  obtain ⟨tri⟩ := hyp.centralizer_trichotomy_of_induction s4.P_le_V hP hA3 ih
+  obtain ⟨data, -, details⟩ :=
+    nonempty_psu3Data_of_orderOf_eq_three tri.branch hord hnea |>.some
+  exact ⟨tri.result, data, ⟨details⟩⟩
 
 /-! ### The book's refinement `ζ₁ ∈ ζ P`
 

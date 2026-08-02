@@ -8818,3 +8818,18 @@ threading されているだけ**で producer が無い。`hyp.D` は `Hypothesi
 `hXD` = `s4.P_le_D` / `htX` = `s4.t_mem_centralizer` / `hZD` = 上記 /
 `hCQ` = `centralizer_cQ_isPGroup_of_quotient` / `hX` = `card_P`+`prime_cardP` /
 `hA3` = 周囲の仮説 / `details` = trichotomy 経由。
+
+### (204) 🎯 `details` (PSU3 分岐データ) の組立が landing
+
+`nonempty_psu3Data_sectionFour` — `X := s4.P` に対し
+`centralizer_trichotomy_of_induction` → `.branch` →
+`nonempty_psu3Data_of_orderOf_eq_three`(`hord` + `not_isElementaryAbelian_cQ`)
+で `CentralizerPSUData hyp s4.P result data` を出す。
+
+⟹ **step (3) (`exists_f_eq_conj_inv_residual`) を呼ぶ材料が全部そろった**。
+残りは step (3) の出力 (`z ∈ D ∩ U`, `x ∈ Q − Q₀`, `f x = z⁻¹x⁻¹z`,
+`h x = z³c`) を `sectionFour_mem_W` の仮説へ変換する 1 段:
+* `ζ₁ := z` → `ζ ∈ C_W(P)` は `inf_le_sup_centralizer_W` + (198) の 2 補題
+* `η := c ∈ Z(U)` → `η ∈ P` は `eq_P_of_centralizes`
+* `hηζ`/`hηω`/`htη`/`hηord` は `η ∈ P` と `ζ ∈ C_W(P)`, `ω ∈ C_Q(P)`, `t ∈ U` から
+* `hq` = (199)、`hznot` = `mu_W_notMem_frobFixed`、`y := ω²`
