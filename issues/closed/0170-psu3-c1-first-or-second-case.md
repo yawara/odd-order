@@ -126,3 +126,29 @@ Hypothesis.nonempty_theoremAConclusion_of_V_ne_bot
 
 1. **issue 0147** (Brauer–Suzuki `Q₈`) — Ch. II の唯一の sorry。
 2. `V = 1` の Zassenhaus 群分類 ([HB] XI.11.16) — 書籍が文献引用で済ませる箇所、低優先繰延。
+
+## ✅✅ 続き (同日): Theorem A の帰納法まで閉じた
+
+`TheoremAZassenhausCase.lean`:
+
+```
+theoremA : ZassenhausClassification →
+  ∀ {G Ω} [Group G] [MulAction G Ω] [Finite G], Hypothesis G Ω →
+    Nonempty (TheoremAConclusion G Ω)
+```
+
+書籍 p.115 の `V = 1` 段落。**文献引用は Zassenhaus 群の分類 ([HB] XI.11.16) だけ**で、
+「`G` が Zassenhaus 群」の 2 節は形式化済 (どちらも axiom-clean):
+
+| 定理 | 内容 |
+|---|---|
+| `eq_one_of_three_fixedPoints_of_V_eq_bot` | 3 点固定化群が自明 (2-推移性で基点対へ運び Prop 6(c)) |
+| `natCard_normal_ne_natCard_Omega` | 正規部分群は位数 `|Ω|` を持てない (⟹ 正則な正規部分群なし) |
+
+分類定理は `def ZassenhausClassification : Prop` として**明示の引数**にした
+(axiom でも sorry でもない ⟹ 形式化の境界が型に出る)。
+
+⟹ **issue 0170 クローズ**。Suzuki Theorem A に残るのは
+1. `ZassenhausClassification` ([HB] XI.11.16 の形式化) — 書籍が引用で済ませる箇所、低優先繰延
+2. issue 0147 (Brauer–Suzuki `Q₈`) — Ch. II の唯一の `sorry`
+の 2 つだけ。

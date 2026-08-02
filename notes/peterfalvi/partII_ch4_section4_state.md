@@ -360,3 +360,27 @@ case (a)(b) は既存の `theoremAConclusion_or_caseC2`。
 フィールド = `V_ne_bot : V ≠ 1` と
 `twoRank_centralizer_ge_two : 素数位数 P ≤ V に対し C_G(P) の 2-rank ≥ 2`。
 Ch. II (「第一の場合」) との接続がここ。
+
+## ✅✅✅✅ Suzuki Theorem A の帰納法が閉じた (2026-08-02, issue 0170)
+
+```
+theoremA : ZassenhausClassification →
+  ∀ {G Ω} [Group G] [MulAction G Ω] [Finite G], Hypothesis G Ω →
+    Nonempty (TheoremAConclusion G Ω)
+```
+(`TheoremAZassenhausCase.lean`; `|G|` の強帰納法)
+
+| 場合 | 経路 |
+|---|---|
+| `V ≠ 1`, 2-rank ≤ 1 の `P` あり | Ch. II `FirstCaseHypothesis.theoremB` |
+| `V ≠ 1`, (C1) 成立 | Ch. III/IV `SecondCaseHypothesis.nonempty_theoremAConclusion` |
+| `V = 1` | Zassenhaus 群の分類 ([HB] XI.11.16) = `ZassenhausClassification` (明示引数) |
+
+**残るのは 2 つだけ**:
+1. **`ZassenhausClassification`** — 書籍が文献引用で済ませる分類定理。`Prop` 引数として
+   明示してあるので境界が型に出ている。低優先繰延。
+2. **[issue 0147](../../issues/0147-q8-modular-char-theory-frozen.md)** — Ch. II が持つ
+   唯一の `sorry` (Brauer–Suzuki の `Q₈`、modular character theory)。これが埋まれば
+   `V ≠ 1` 側は完全に axiom-clean になる。
+
+⚠ `theoremA` 自身は 2. 経由で `sorryAx` を継承する (AxiomsCheck 非登録は意図的)。
