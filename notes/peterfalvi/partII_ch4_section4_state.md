@@ -208,3 +208,46 @@ Corollary 2 (`G ≅ PSU(3,q)`) は `V = W` が定理なので `_of_freeD` 版を
 ⟹ `Ω ≃ Option ↥Q` は `qRegularEquiv` + `basept ↦ none` で作り、
 `coords` 側と合わせるときに `inv` を挟む。`Unital n = Option (RootGroup n)` も
 同じ形なので `Equiv.optionCongr εQ` で繋がる。
+
+## Corollary 1 の組立てレシピ (2026-08-02、材料は全部そろった)
+
+engine = `Hypothesis.exists_conjQMulEquiv_actionEquiv` (`PointCoordinates.lean`):
+`f` を intertwine する `εQ : Q ≃* Q'` から `⟨Q^x⟩ ≃* ⟨Q'^x⟩` と**同変な
+`α : Ω ≃ Ω'`** が同時に出る。残りは `εQ` を作って梱包するだけ。
+
+### (a) `εQ` の構成
+```
+εQ := Ψ.trans ((Suzuki2Groups.unitaryRootEquiv hm M.card hu σ).trans
+                (rootEquivStandardRoot m))
+    : ↥hyp.Q ≃* ↥(standardRootSubgroup m) = ↥(standardHypothesis m hn).Q
+```
+* `σ : M.E ≃+* ProjectiveUnitary.Field m` = `FiniteField.ringEquivOfCardEq`
+  (濃度は `M.card : Nat.card M.E = (2^m)^2` と
+  `ProjectiveUnitary.natCard_field m hm : Nat.card (Field m) = 2^(2m)`)。
+* `(rootEquivStandardRoot m v : standardPermGroup m) = rootHom m v` (定義が
+  `MonoidHom.ofInjective (rootHom_injective m)`)。
+
+### (b) `hεf`
+`x ∈ Q^#` に対し
+* 左辺 = `rootHom m (unitaryRootEquiv (Ψ ⟨f x⟩))`
+* `proposition_reciprocal` (⟸ `proposition_inverseFormula_of_ne_one`) で
+  `unitaryRootEquiv (Ψ ⟨f x⟩) = RootGroup.reciprocal (unitaryRootEquiv (Ψ ⟨x⟩)) h1`
+* `standardModel_f_rootHom hn H' v hv : f' (rootHom m v) = rootHom m (reciprocal v hv)`
+⟹ 一致。`h1 : unitaryRootEquiv (Ψ ⟨x⟩) ≠ 1` は `x ≠ 1` から (両方同型)。
+
+### (c) faithfulness
+両側とも `Hypothesis.normalCore_H_eq_bot` (`DistinguishedInvolution.lean:334`)。
+
+### (d) `⟨Q'^x⟩ = ⊤` (標準モデル側)
+`closure_iUnion_conj_eq_normalClosure` で normalClosure に直し、
+`standardPermGroup_isSimpleGroup hn` + `standardRootSubgroup ≠ ⊥` で `⊤`。
+
+### (e) `⟨Q^x⟩ = O^{2′}(G)`
+`closure_iUnion_conj_eq_primeComplementResidual` (要 `Q` = Sylow 2)。
+`Setup.exists_sylow_two_eq` が `Q` を Sylow 2 として与える。
+
+### (f) 梱包
+`PSU3InductionTarget` の `n := m` / `one_lt_n` / `groupEquiv := e ≫ topEquiv` /
+`actionEquiv := α` (同変性は engine の出力) / `actionEquiv_bijective := α.bijective`。
+⟹ `TheoremAConclusion` の `L := O^{2′}(G)`、`normal`・`oddIndex` は
+`primeComplementResidual` の一般論。
