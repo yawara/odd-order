@@ -8767,3 +8767,23 @@ centralizer_trichotomy_of_induction hyp hXV hX hA3 ih
 * `hq`: (199) の `eight_lt_natCard_Q0`
 * `hznot`: `mu_W_notMem_frobFixed M hmu (ζ ≠ 1)`
 * `y := ω*ω ∈ Q0`、`hsqω := rfl`
+
+### (201) ⚠ `hZD : Z(U) ≤ D` は**どこでも生成されていない** — 実残債
+
+実測: `hZD` は `PSU3SectionFourIntrinsic.lean` に 177 箇所、
+`PSU3SectionFourStepThree.lean` に 20 箇所現れるが、**すべて仮説として
+threading されているだけ**で producer が無い。`hyp.D` は `Hypothesis` の
+構造体フィールド (`Basic.lean:148`; `H = Q ⋊ D`) なので自動では出ない。
+
+書籍 (p.132 step (1)) の該当箇所:
+> As `Z(U) ⊂ C_V(C_{Q₀}(P))`, `Z(U) ⊂ P W` by the theorem of Galois.
+
+つまり書籍は `Z(U) ⊆ V` (= `C_D(t)`) から出発している。`Z(U)` が `t` を
+中心化するのは `t ∈ U` (`t_mem_primeComplementResidual`) から即出るので、
+実質の残債は **`Z(U) ≤ D`** = 「`U` の中心は奇数位数ゆえ補群 `D` に入る」。
+`Q ∩ Z(U)` が自明なこと (`Z(U)` は奇数位数 / `Q` は 2 群) と
+`H = Q ⋊ D` の分解の一意性を使う筋のはず。
+
+⟹ **§4 完了には (200) の配管 + この `hZD` の証明が要る**。
+`hZD` は §4 の他の endpoint (step (2)(3)) でも threading されているので、
+証明できれば §4 全体の仮説が 1 本減る。
