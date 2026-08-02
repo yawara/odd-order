@@ -702,6 +702,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.PointCoordinates
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CorollaryOne
 import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
