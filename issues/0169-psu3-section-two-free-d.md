@@ -88,6 +88,50 @@ fpf で切るしかなく、そのためには §2/§3 の `hVW` を fpf に一�
       * no → `FreeD` ⟹ §2 ⟹ `nonempty_theoremAConclusion_of_isStandardModel_of_closing`
         の `hVW`-free 版
 
+## 進捗 (2026-08-02)
+
+### ✅ 済: (1) `FreeD` 導入、(3) 数え上げ、§2 (8)(9)(15)
+
+| 追加/変更 | 場所 |
+|---|---|
+| `FreeD` / `freeD_of_V_eq_W` | `PSU3OrbitCount.lean` |
+| `ncard_eq_card_W_sub_one_of_f_eq_conj_self_of_KW` | `PSU3StepEightKW.lean` |
+| `exists_witness_mem_W_of_KW` (step (9) の witness) | 同上 |
+| `stepNine_of_KW` | 同上 |
+| `stepElevenSeq_mem_KW` (書籍の `d_i ∈ KW`) / `stepElevenSeq_fst_mem_orbitSet_KW` | `PSU3Sequence.lean` |
+| `PSU3StepFifteen.lean` 4 定理を `hVW` → `FreeD` | — |
+
+⚠ 副産物: `stepFifteen_stop_d_eq_inv` / `stepFifteen_length_eq` /
+`stepElevenSeq_fst_injOn` は `M`・`hZ`・`hmu` が最初から不要だった (削除)。
+`stepFifteen_exhaust` は `KW`-形の集合で述べ直した (書籍の言い方そのもの)。
+
+### ⚠ 次の障害 = §2 (18) / `h(ω) ∈ W` — 書籍は **Frobenius 補群**で通す
+
+`PSU3StepEighteen.lean` の `commute_h_zeta` / `h_mem_W` は
+`exists_mem_K_mem_W_mul hVW` (= `D = K W`) で `h(ω) = κ v` と分解している。
+これは `V = W` そのものなので `FreeD` では出ない。
+
+**書籍 p.129 の Proposition 証明はまったく別の筋**:
+
+> By [H], Kapitel V, Satz 8.15, the Sylow subgroups of `D` are cyclic. Then (18)
+> implies that, if `ω` is one of the elements `ω_i`, then `h(ω) ∈ W`. In fact, if `p`
+> is a prime number, then, if `x` is the `p`-component of `h(ω)ζ⁻¹` and `P` is a Sylow
+> `p`-subgroup of `D` containing `x`, `x^{m_p} = 1` and `|P ∩ W| = m_p` since `W ⊴ D`,
+> whence `x ∈ W`.
+
+* 「`D` の Sylow が巡回」は **`D` が `(Q/Q₀)^#` に固定点なく作用する** (= `FreeD`)
+  ことから来る (Frobenius 補群; `D` は奇数位数なので quaternion 分岐は消える)。
+  ⟹ **`FreeD` がここで本質的に効く**。
+* (18) `(h(ω)ζ⁻¹)^m = 1` 自体は repo に在る (`stepEighteen`) が、
+  その証明が `commute_h_zeta` 経由で `hVW` を使っている。書籍の (18) 証明は
+  (13)(16)+(H6)+(1) の帰納なので、まず commutation を経由しない形に直すか、
+  Frobenius 側から `h(ω) ∈ W` を直接出すかの二択。
+
+**次にやること**: 「奇数位数群が非自明群に固定点なく作用 ⟹ Sylow が巡回」を
+`OddOrder/GroupTheory/` に landing させ (repo に `sylow_two_isCyclic_or_quaternion`
+が在るので類似の道具が使える可能性)、書籍の `p`-成分論法で `h_mem_W` を
+`FreeD` から出す。
+
 ## 準備として済んでいること (2026-08-02)
 
 * `stepThree_model` から `hVW` を除去済 (`hhW₀ : h ω₀ ∈ W` を直接取る形へ)。
