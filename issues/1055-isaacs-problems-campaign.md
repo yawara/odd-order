@@ -238,8 +238,8 @@ repo に `p`-length の定義が無かったので新設。
       `isSimpleGroup_and_not_isMulCommutative_of_isKegelMinimalCounterexample`
       (`Ch09_MoreSubnormality/KegelMinimalCounterexample.lean`, axiom-clean)
 - [ ] Ch.10 More Transfer — **⚠ 実測で §10C は 6 問 (旧インベントリの「10C(1)」は誤り)**。
-      §10A (7 問): 10A.1/10A.2/**10A.3 前半+後半 ✅ (2026-08-03)**/10A.5/10A.6/10A.7 ✅、
-      **10A.4 未**。§10B (2 問): 10B.2 は骨格のみ (Maschke 待ち)、**10B.1 未**。
+      **§10A (7 問) 🎉 完済 (2026-08-03)**: 10A.3 前半+後半 と **10A.4** が landing。
+      §10B (2 問): 10B.2 は骨格のみ (Maschke 待ち)、**10B.1 未**。
       **§10C (6 問) は全部未着手**
 
 ## 方針

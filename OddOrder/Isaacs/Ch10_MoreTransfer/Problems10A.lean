@@ -8,6 +8,7 @@ import OddOrder.Isaacs.Ch02_Subnormality.Basic
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
 import OddOrder.Isaacs.Ch10_MoreTransfer.Yoshida
+import OddOrder.GroupTheory.TransferInvariantTransversal
 import Mathlib.GroupTheory.IndexNormal
 import Mathlib.GroupTheory.SpecificGroups.Quaternion
 import OddOrder.GroupTheory.CommGroupAut
@@ -23,6 +24,8 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 10A。
   部分群** (`omegaOneOfIsRegularPGroup` がその部分群)。
 * **10A.5** `exists_injective_hom_regularWreath_of_index_sq` — `|P : Q| = p²` かつ
   `Q ∩ Z(P) = 1` なら `P` は `C_p ≀ C_p` の部分群と同型。
+* **10A.4** `commutator_lt_top_of_sylow_quaternionProd` — Sylow `2`-部分群が `Q₈ × C₂` に
+  同型なら `G' < G` (Yoshida + 「`C₂ ≀ C₂` は `Q₈ × C₂` の商でない」+ transfer)。
 * **10A.3 (前半)** `exists_injective_hom_regularWreath_of_center_isComplement` — `|Z(P)| = p`,
   `A` 可換で指数 `p`, `Z(P)` が `A` の直積因子なら `P ↪ C_p ≀ C_p` (10A.5 に帰着)。
   後半「`A` は基本可換」= `pow_eq_one_of_center_isComplement` ✅。
@@ -1244,6 +1247,84 @@ theorem commutator_lt_top_of_transfer_ne_one {G : Type*} [Group G] [Finite G]
   refine lt_of_le_of_ne le_top ?_
   intro htop
   exact hg (MonoidHom.mem_ker.mp (htop.ge (Subgroup.mem_top g)))
+
+/-- **Isaacs Problem 10A.4** (書籍 p. 308) ⭐: 有限群 `G` の Sylow `2`-部分群が
+`Q₈ × C₂` に同型なら `G' < G` (`G` は完全でない).
+
+Yoshida (Thm 10.1) と「`C₂ ≀ C₂` は `Q₈ × C₂` の準同型像でない」から `N = N_G(P)` は
+`2`-transfer を制御する (`transfer_range_eq_of_quaternionProd`)。`t := e.symm (1, c)` は
+`Ω₁(P) ∖ Φ(P)` の元で, `N` のどの共役も `Φ(P) = P'` を法として `t` を動かさない
+(`abelianization_conj_eq_of_quaternionProd`) ので, `N`-level transfer は
+`v_N t = (of t) ^ [N : P]`。`[N : P]` は奇数, `of t` は位数 2 なので `v_N t = of t ≠ 1`。
+制御から `G`-transfer の像も非自明で, `G' ≤ ker ≠ ⊤`。 -/
+theorem commutator_lt_top_of_sylow_quaternionProd {G : Type*} [Group G] [Finite G]
+    (P : Sylow 2 G) (e : ↥(P : Subgroup G) ≃* (QuaternionGroup 2 × Multiplicative (ZMod 2))) :
+    commutator G < ⊤ := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set t : ↥(P : Subgroup G) := e.symm (1, Multiplicative.ofAdd 1) with htdef
+  have ht : e t = (1, Multiplicative.ofAdd 1) := by rw [htdef, MulEquiv.apply_symm_apply]
+  have hxN : (t : G) ∈ Subgroup.normalizer ((P : Subgroup G) : Set G) :=
+    Subgroup.le_normalizer t.2
+  set x : ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)) := ⟨(t : G), hxN⟩ with hxdef
+  have hxH : x ∈ (P : Subgroup G).subgroupOf
+      (Subgroup.normalizer ((P : Subgroup G) : Set G)) := t.2
+  set ϕ := OddOrder.GroupTheory.transferRes
+    (Subgroup.le_normalizer (H := (P : Subgroup G))) (Abelianization.of (G := ↥(P : Subgroup G)))
+    with hϕdef
+  have hmem : ∀ s : ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)),
+      s⁻¹ * x * s ∈ (P : Subgroup G).subgroupOf
+        (Subgroup.normalizer ((P : Subgroup G) : Set G)) := by
+    intro s
+    change ((s⁻¹ * x * s : ↥(Subgroup.normalizer _)) : G) ∈ (P : Subgroup G)
+    have h := (Subgroup.mem_normalizer_iff.mp
+      ((Subgroup.normalizer ((P : Subgroup G) : Set G)).inv_mem s.2)) (t : G)
+    simpa [hxdef] using h.mp t.2
+  have hϕeq : ∀ s : ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)),
+      ϕ ⟨s⁻¹ * x * s, hmem s⟩ = ϕ ⟨x, hxH⟩ := by
+    intro s
+    have hcc : (⟨((s⁻¹ * x * s : ↥(Subgroup.normalizer _)) : G), hmem s⟩ :
+        ↥(P : Subgroup G)) = conjAutOfNormalizer s t := by
+      ext
+      simp [hxdef, mul_assoc]
+    change Abelianization.of (⟨((s⁻¹ * x * s : ↥(Subgroup.normalizer _)) : G), hmem s⟩ :
+        ↥(P : Subgroup G)) = Abelianization.of (⟨(x : G), hxH⟩ : ↥(P : Subgroup G))
+    rw [hcc]
+    exact abelianization_conj_eq_of_quaternionProd e ht (conjAutOfNormalizer s)
+  have hpow := OddOrder.GroupTheory.transfer_eq_pow_of_map_conj_eq ϕ hxH hmem hϕeq
+  -- `[N : P]` は奇数
+  have hidx : ¬ (2 ∣ ((P : Subgroup G).subgroupOf
+      (Subgroup.normalizer ((P : Subgroup G) : Set G))).index) := by
+    have h2 : (P : Subgroup G).relIndex (Subgroup.normalizer ((P : Subgroup G) : Set G))
+        ∣ (P : Subgroup G).index :=
+      Subgroup.relIndex_dvd_index_of_le Subgroup.le_normalizer
+    exact fun hd => P.not_dvd_index (hd.trans h2)
+  obtain ⟨k, hk⟩ : Odd ((P : Subgroup G).subgroupOf
+      (Subgroup.normalizer ((P : Subgroup G) : Set G))).index :=
+    Nat.odd_iff.mpr (Nat.two_dvd_ne_zero.mp hidx)
+  -- `of t` は位数 2, `of t ≠ 1`
+  have hsq2 : ((1, Multiplicative.ofAdd 1) :
+      QuaternionGroup 2 × Multiplicative (ZMod 2)) ^ 2 = 1 :=
+    (quaternionProd_sq_eq_one_iff _).mpr (Or.inr (Or.inr (Or.inl rfl)))
+  have ht2 : t ^ 2 = 1 := by
+    refine e.injective ?_
+    rw [map_pow, ht, hsq2, map_one]
+  have hof2 : (Abelianization.of t) ^ 2 = 1 := by rw [← map_pow, ht2, map_one]
+  have hofne : Abelianization.of t ≠ 1 := abelianization_of_ne_one_of_quaternionProd e ht
+  have hϕx : ϕ ⟨x, hxH⟩ = Abelianization.of t := by
+    change Abelianization.of (⟨(x : G), hxH⟩ : ↥(P : Subgroup G)) = Abelianization.of t
+    rfl
+  have hval : MonoidHom.transfer ϕ x = Abelianization.of t := by
+    rw [hpow, hϕx, hk, pow_add, pow_mul, hof2, one_pow, one_mul, pow_one]
+  -- 制御から `G`-transfer 側へ
+  have hrange := transfer_range_eq_of_quaternionProd P e
+  have hmemr : MonoidHom.transfer ϕ x
+      ∈ (MonoidHom.transfer (Abelianization.of (G := ↥(P : Subgroup G)))).range := by
+    rw [hrange, hϕdef]
+    exact ⟨x, rfl⟩
+  obtain ⟨g, hg⟩ := hmemr
+  refine commutator_lt_top_of_transfer_ne_one P (g := g) ?_
+  rw [hg, hval]
+  exact hofne
 
 end
 
