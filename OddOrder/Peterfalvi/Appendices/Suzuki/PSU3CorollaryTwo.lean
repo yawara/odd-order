@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3BarOrbit
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3ModelTwistOdd
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SequenceCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFive
@@ -45,9 +46,12 @@ because inversion fixes the quotient coordinate (`quotient_inv_eq`) while `μ(1,
 * `Hypothesis.corollaryTwo_of_sectionThree` — the two composed: Corollary 2 from the
   model of Ch. III §3, the type-`B` scaling pair and §2's base pair.
 * `Hypothesis.corollaryTwo_of_isStandardModel` — the same off the bundled predicate
-  `IsStandardModel`, so a caller supplies only the scaling pair and §2's base pair.
+  `IsStandardModel`, so a caller supplies only §2's base pair.
 * `Hypothesis.corollaryTwo_of_isStandardModel_of_normalization` — and with the base pair
   itself produced by §2 (9), leaving only the square relation of §2 (20).
+* `Hypothesis.corollaryTwo_of_isStandardModel_of_closing` — with §2 run in full: the base
+  pair comes from §2's closing Proposition (`exists_f_eq_conj_inv`), so nothing of §2 is
+  owed.
 -/
 
 set_option autoImplicit false
@@ -832,6 +836,68 @@ theorem corollaryTwo_of_isStandardModel_of_normalization
   exact hyp.corollaryTwo_of_isStandardModel H hC2 sfive M hZc hmu hVW hm hQ0card hcard
     hKcard hWdvd hW1 hfQ hhW x₀ hmodel hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0
     (hsq ω₀ hω₀Q hω₀Q0 y₀ hy₀Q0 hfω₀) hfω₀ hζ hζ1
+
+/-- **Peterfalvi Part II, Ch. IV §3, Corollary 2, with §2 run in full** (pp. 120–132).
+
+`corollaryTwo_of_isStandardModel_of_normalization` still asks for `hsq`, the square
+relation `ω² = (0,α)` that §2 closes with — and asks for it at *every* normalized pair,
+whereas the book only produces it at one.  `exists_f_eq_conj_inv` is that Proposition
+(p. 129), so here the base pair is produced outright and nothing of §2 is left owed.
+
+The base point `ζ₀` is chosen inside: the closing Proposition runs with a *generator* of
+`W` (the book's choice), which is why `IsCyclic W` appears — it is proved alongside
+`hWdvd` by `isCyclic_W_and_card_dvd_of_orderThree`.  The `ζ` of the conclusion is
+unrelated and stays a parameter. -/
+theorem corollaryTwo_of_isStandardModel_of_closing
+    (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
+    (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hcardQ : Nat.card ↥hyp.Q = Nat.card ↥hyp.Q0 ^ 3)
+    (hcard : 3 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1) (hW1 : 1 < Nat.card ↥hyp.W)
+    (hWcyc : IsCyclic ↥hyp.W)
+    (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
+    (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
+    (x₀ : ↥(Subgroup.center hyp.Q)) (hmodel : hyp.IsStandardModel sfive M x₀)
+    {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
+    ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
+  classical
+  -- a generator of `W`, the book's `ζ`
+  obtain ⟨w, hw⟩ := hWcyc.exists_generator
+  have hwW : (w : G) ∈ hyp.W := w.2
+  have hwcard : orderOf ((w : G)) = Nat.card ↥hyp.W := by
+    rw [Subgroup.orderOf_coe, orderOf_eq_card_of_forall_mem_zpowers hw]
+  have hw1 : (⟨(w : G), hwW⟩ : ↥hyp.W) ≠ 1 := by
+    intro hc
+    have hval : (w : G) = 1 := by simpa using congrArg Subtype.val hc
+    rw [hval, orderOf_one] at hwcard
+    omega
+  -- §2's closing Proposition supplies the base pair
+  obtain ⟨ω₁, hω₁Q, hω₁Q0⟩ := hyp.exists_mem_Q_notMem_Q0 hm hQ0card hcardQ
+  obtain ⟨ω₀, hω₀Q, hω₀Q0, y₀, hy₀Q0, hsq₀, hfinv⟩ :=
+    hyp.exists_f_eq_conj_inv M hZc H hC2 hVW hm hQ0card hmu hKcard hWdvd
+      (fun x hx => hyp.sq_mem_Q0_of_lemmaFiveSetup sfive hx) hwW
+      (fun hc => hw1 (Subtype.ext hc)) hwcard hω₁Q hω₁Q0
+  -- `ω₀ y₀ = ω₀⁻¹`, the two shapes of the normalization
+  have hω₀inv : ω₀ * y₀ = ω₀⁻¹ := by
+    have h4 : ω₀ * ω₀ * (ω₀ * ω₀) = 1 := by
+      have hs := hy₀Q0.1
+      rw [sq] at hs
+      rw [hsq₀]
+      exact hs
+    calc ω₀ * y₀ = ω₀ * (ω₀ * ω₀) := by rw [hsq₀]
+      _ = ω₀ * ω₀ * (ω₀ * ω₀) * ω₀⁻¹ := by group
+      _ = ω₀⁻¹ := by rw [h4, one_mul]
+  have hfω₀ : f ω₀ = (w : G)⁻¹ * (ω₀ * y₀) * (w : G) := by
+    rw [hω₀inv]
+    exact hfinv
+  exact hyp.corollaryTwo_of_isStandardModel H hC2 sfive M hZc hmu hVW hm hQ0card hcard
+    hKcard hWdvd hW1 hfQ hhW x₀ hmodel hwW hw1 hω₀Q hω₀Q0 hy₀Q0 hsq₀ hfω₀ hζ hζ1
 
 end Hypothesis
 

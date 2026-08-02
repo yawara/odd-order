@@ -390,6 +390,14 @@ theorem normalization_y_unique {ζ ω y y' : G}
   have h := hf.symm.trans hf'
   exact mul_left_cancel (mul_left_cancel (mul_right_cancel h))
 
+/-- **Squares of `Q` lie in `Q₀`** — the centre of `Q` is `Q₀` and squares are central
+(`LemmaFiveSetup.sqMem`). -/
+theorem sq_mem_Q0_of_lemmaFiveSetup {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
+    {x : G} (hx : x ∈ hyp.Q) : x * x ∈ hyp.Q0 := by
+  have hmem := sfive.sqMem ⟨x, hx⟩
+  rw [sfive.centerEqQ0, Subgroup.mem_subgroupOf] at hmem
+  simpa [sq] using hmem
+
 /-- **§2's closing Proposition** (Peterfalvi Part II, Ch. IV §2, p. 129):
 
 > Suppose that `D` acts without fixed points on `(Q/Q₀)^#`.  Then there exists an index
