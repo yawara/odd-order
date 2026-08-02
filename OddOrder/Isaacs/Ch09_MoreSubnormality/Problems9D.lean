@@ -527,6 +527,70 @@ theorem KegelHypothesis.infNormal [Finite G] {S : Subgroup G} (hK : KegelHypothe
   rw [hmeet2, Subgroup.relIndex_subgroupOf inf_le_right]
   exact hnorm
 
+/-- `A ≤ B` のとき, `↥B → ↥(B.map f)` (`MonoidHom.subgroupMap`) は `A.subgroupOf B` を
+`(A.map f).subgroupOf (B.map f)` に写す. -/
+theorem map_subgroupOf_subgroupMap {G' : Type*} [Group G'] (f : G →* G') {A B : Subgroup G}
+    (hAB : A ≤ B) :
+    (A.subgroupOf B).map (f.subgroupMap B) = (A.map f).subgroupOf (B.map f) := by
+  ext y
+  simp only [Subgroup.mem_map, Subgroup.mem_subgroupOf]
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    exact ⟨(x : G), hx, rfl⟩
+  · rintro ⟨a, ha, hay⟩
+    exact ⟨⟨a, hAB ha⟩, ha, Subtype.ext hay⟩
+
+/-- **(F2) 商への降下**: `N ◁ G` なら Kegel の仮説は `(G/N, SN/N)` にも降りる。
+
+`G/N` の Sylow は `Syl_p(G)` の像 (`Sylow.mapSurjective_surjective`)。像 `T̄ = (P ⊓ S)N/N`
+は `p`-群で, `S̄ = SN/N` の中での指数は `[S : P ⊓ S]` を割る (`Subgroup.index_map_dvd` を
+全射 `↥S → ↥S̄` に適用) から `p` と互いに素。したがって `T̄` は `S̄` の Sylow `p`-部分群で,
+`Q ⊓ S̄` はそれを含む `p`-部分群だから極大性で一致する。 -/
+theorem KegelHypothesis.map_mk [Finite G] {S : Subgroup G} (hK : KegelHypothesis S)
+    (N : Subgroup G) [N.Normal] :
+    KegelHypothesis (S.map (QuotientGroup.mk' N)) := by
+  intro p hp Q
+  haveI := hp
+  have hsurj : Function.Surjective (QuotientGroup.mk' N) := QuotientGroup.mk'_surjective N
+  obtain ⟨P, hPQ⟩ := Sylow.mapSurjective_surjective (f := QuotientGroup.mk' N) hsurj p Q
+  have hQcoe : (Q : Subgroup (G ⧸ N)) = (P : Subgroup G).map (QuotientGroup.mk' N) := by
+    rw [← hPQ, Sylow.coe_mapSurjective]
+  -- 記号
+  set φ := QuotientGroup.mk' N with hφ
+  set Sbar := S.map φ with hSbar
+  set Tbar := ((P : Subgroup G) ⊓ S).map φ with hTbar
+  have hTS : Tbar ≤ Sbar := Subgroup.map_mono inf_le_right
+  -- `Tbar` の `Sbar` 内の指数は `[S : P ⊓ S]` を割る
+  have hdvd : Tbar.relIndex Sbar ∣ ((P : Subgroup G) ⊓ S).relIndex S := by
+    have hmap := map_subgroupOf_subgroupMap (G := G) φ (A := (P : Subgroup G) ⊓ S) (B := S)
+      inf_le_right
+    have := Subgroup.index_map_dvd (H := ((P : Subgroup G) ⊓ S).subgroupOf S)
+      (f := φ.subgroupMap S) (φ.subgroupMap_surjective S)
+    rwa [hmap] at this
+  have hTidx : ¬ p ∣ Tbar.relIndex Sbar := fun hc => hK p hp P (hc.trans hdvd)
+  -- `Tbar` は `Sbar` の Sylow, `Q ⊓ Sbar` はそれを含む `p`-部分群
+  have hTpg : IsPGroup p ↥(Tbar.subgroupOf Sbar) :=
+    ((P.isPGroup'.of_injective (Subgroup.inclusion inf_le_left)
+      (Subgroup.inclusion_injective _)).map φ).comap_subtype
+  have hQpg : IsPGroup p ↥(((Q : Subgroup (G ⧸ N)) ⊓ Sbar).subgroupOf Sbar) :=
+    (Q.isPGroup'.of_injective (Subgroup.inclusion inf_le_left)
+      (Subgroup.inclusion_injective _)).comap_subtype
+  have hle : Tbar.subgroupOf Sbar ≤ ((Q : Subgroup (G ⧸ N)) ⊓ Sbar).subgroupOf Sbar := by
+    intro x hx
+    exact ⟨hQcoe ▸ Subgroup.map_mono inf_le_left hx, hTS hx⟩
+  have hSylEq := (hTpg.toSylow (by rwa [Subgroup.relIndex] at hTidx)).3 hQpg hle
+  rw [IsPGroup.toSylow_coe] at hSylEq
+  have heq : (Q : Subgroup (G ⧸ N)) ⊓ Sbar = Tbar := by
+    apply le_antisymm
+    · intro x hx
+      exact (SetLike.ext_iff.mp hSylEq (⟨x, hx.2⟩ : ↥Sbar)).mp hx
+    · intro x hx
+      refine ⟨?_, hTS hx⟩
+      rw [hQcoe]
+      exact Subgroup.map_mono inf_le_left hx
+  rw [heq]
+  exact hTidx
+
 end -- 9D.4
 
 end OddOrder.Isaacs.Ch09

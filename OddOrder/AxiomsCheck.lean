@@ -15184,3 +15184,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch08.card_linearEquiv_eq_six
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch08.isSimpleGroup_mulAut_iff
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.KegelHypothesis.map_mk

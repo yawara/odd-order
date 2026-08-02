@@ -227,13 +227,18 @@ repo に `p`-length の定義が無かったので新設。
 - [x] Ch.6 Frobenius Actions — **🎉 完済 (2026-07-27)**: §6A (11 問) / §6B (9 問) / §6C (2 問) 全問
 - [x] Ch.7 Thompson Subgroup — **🎉 完済 (2026-07-27)**: §7A (6 問) / §7C (7C.1) 全問
       (§7B に Problems 節は無い)
-- [ ] Ch.8 Permutation Groups — **残り 8C.6 のみ (実測 2026-08-02)**: §8A (8A.1–8A.17) 完済 /
+- [x] **Ch.8 Permutation Groups** — **🎉 完済 (2026-08-03)**: 8C.6 が訂正後の分類
+      (`isSimpleGroup_mulAut_iff`) で双方向 landing。以下は完済時点の内訳: §8A (8A.1–8A.17) 完済 /
       §8B は **8B.1–8B.10 完済** (8B.6 の `D₂ₚ` 同型も
       `Problems8B/DihedralStructure.lean` で完結済 — 旧注記が stale だった) /
       §8C は 8C.1–8C.5 完済、**8C.6 は「⟸」の `|A| = 3` のみ** /
       §8D は **🎉 8D.1–8D.6 全問完済 (2026-07-28)**
-- [ ] Ch.9 More Subnormality
-- [ ] Ch.10 More Transfer
+- [ ] Ch.9 More Subnormality — 9A ✅ / 9B ✅ / 9C ✅ / **9D.1–9D.3 ✅, 9D.4 進行中**
+      (紙の証明は本 issue「9D.4 の未解決 2 点を解決」節が正本。
+      **(F1) ✅ / (F2) ✅ 2026-08-03 `KegelHypothesis.map_mk` / (F3) ✅**、
+      残り = 極小反例 skeleton 1–4 → (I) `[S,N] = 1` → (II) `S` 非可換単純)
+- [ ] Ch.10 More Transfer — 10A.1/10A.2/10A.3 前半/10A.5–7/10B.2 ✅、
+      **10A.3 後半 (A は基本可換) は紙の証明済・未形式化**
 
 ## 方針
 
