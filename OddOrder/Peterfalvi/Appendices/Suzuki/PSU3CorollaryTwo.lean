@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki.ModelAction
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3ModelTwistOdd
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SequenceCoordinate
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepFive
 
@@ -725,12 +726,12 @@ this unpacks `IsStandardModel` — the same Proposition as a single predicate �
 it in, so a caller who has the Proposition on some group needs to supply only what is
 genuinely extra:
 
-* `hpair`, the type-`B` scaling pair, for whatever central identification `ι` and
-  exponent `d` the model exhibits.  The odd order sits inside it: the book's "`θ` is of
-  odd order" for the restriction of `θ = σ⁻¹τ` to `F`, which is all §3 (3) asks of the
-  pair.  `Hypothesis.exists_scalingPair_of_lemmaFiveSetup` produces such a pair from the
-  standing bundles; what it does not yet carry is the odd order.
 * the base pair `f(ω₀) = (ω₀ ω₀²)^{ζ₀}` that §2 closes with.
+
+The type-`B` scaling pair is *not* asked for: it is built from the model's own coordinate
+by `Hypothesis.exists_scalingPair_of_centerCoordinate`, and the book's "`θ` is of odd
+order" comes with it (`Hypothesis.odd_orderOf_scalingPair_of_model`), `K` being regular
+on `Z(Q)^#`.
 
 Two of the eleven clauses go unused here — the normalization `Φ(x₀) = (0, 1)` and the
 central half of the `K`-scaling — because Corollary 2 reads the model only through its
@@ -748,26 +749,6 @@ theorem corollaryTwo_of_isStandardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h
     (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
     (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
     (x₀ : ↥(Subgroup.center hyp.Q)) (hmodel : hyp.IsStandardModel sfive M x₀)
-    -- the type-`B` scaling pair, for the model's own `ι` and `d`
-    (hpair : ∀ (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
-        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ),
-      (∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
-        ((ι (Additive.ofMul (hyp.centerKHom k z)) :
-            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
-          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
-            ((ι (Additive.ofMul z) :
-              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) →
-      ∃ (σ τ : M.E ≃+* M.E)
-        (θF : RingAut ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)),
-        (∀ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
-          ((θF a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
-            = σ.symm (τ a)) ∧
-        Odd (orderOf θF) ∧
-        (∀ k : ↥hyp.actualKActor,
-          σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
-            = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E)) ∧
-        ∀ v : ↥hyp.W,
-          σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
     -- §2's base pair
     {ζ₀ ω₀ y₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
     (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0) (hy₀Q0 : y₀ ∈ hyp.Q0)
@@ -776,7 +757,22 @@ theorem corollaryTwo_of_isStandardModel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h
     ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
   obtain ⟨φ, θm, Φ, Θ, u, ι, hsemi, haniso, -, hΘq, hu, hconj, hquot, hW, hker,
     hdiagscale, d, hequiv, -, hΘc⟩ := hmodel
-  obtain ⟨σ, τ, θF, hθF, hodd, hscale, hWinv⟩ := hpair ι d hequiv
+  -- the type-`B` scaling pair, for the model's own `ι` and `d`
+  obtain ⟨σ, τ, hscale, hWinv⟩ :=
+    hyp.exists_scalingPair_of_centerCoordinate sfive M ι d hequiv
+  set θF : RingAut ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m) :=
+    (OddOrder.FiniteField.restrictToFrobFixed (m := m) σ)⁻¹ *
+      OddOrder.FiniteField.restrictToFrobFixed (m := m) τ with hθFdef
+  have hθF : ∀ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
+      ((θF a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
+        = σ.symm (τ (a : M.E)) :=
+    fun a => OddOrder.FiniteField.coe_restrictToFrobFixed_inv_mul σ τ a
+  -- the book's "`θ` is of odd order" is a *theorem* about the model: `K` is regular
+  -- on `Z(Q)^#`, so `a ↦ a^d = a · θ(a)` is onto `F^×`
+  have hodd : Odd (orderOf θF) :=
+    hyp.odd_orderOf_scalingPair_of_model hm hQ0card sfive M θm.toRingEquiv hsemi haniso
+      (hyp.cocycle_scale_of_diagScale M sfive ι d hequiv hdiagscale) ι hequiv σ τ hscale
+      θF hθF
   exact hyp.corollaryTwo_of_sectionThree H hC2 sfive M hZc hmu hVW hm hQ0card hcard
     hKcard hWdvd hW1 hfQ hhW θm hsemi haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv
     hdiagscale u hu hconj σ τ hscale hWinv θF hθF hodd hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀
@@ -806,8 +802,9 @@ theorem exists_mem_Q_notMem_Q0 {m : ℕ} (hm : m ≠ 0)
 §2 closes with (step (20)) is left, and it is taken here in the shape step (20) proves it
 — for every normalized pair at once.
 
-That isolates exactly what "run §2 relative to `U`" still owes: `hsq` and the type-`B`
-scaling pair `hpair`. -/
+That isolates exactly what "run §2 relative to `U`" still owes: `hsq`, the square relation
+of step (20).  The type-`B` scaling pair is no longer owed — it comes from the model
+itself (`Hypothesis.exists_scalingPair_of_centerCoordinate`). -/
 theorem corollaryTwo_of_isStandardModel_of_normalization
     (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
@@ -823,25 +820,6 @@ theorem corollaryTwo_of_isStandardModel_of_normalization
     (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
     (hhW : ∀ ρ : G, ρ ∈ hyp.Q → ρ ∉ hyp.Q0 → h ρ ∈ hyp.W)
     (x₀ : ↥(Subgroup.center hyp.Q)) (hmodel : hyp.IsStandardModel sfive M x₀)
-    (hpair : ∀ (ι : Additive ↥(Subgroup.center hyp.Q) ≃+
-        ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) (d : ℤ),
-      (∀ (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)),
-        ((ι (Additive.ofMul (hyp.centerKHom k z)) :
-            ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
-          = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) *
-            ((ι (Additive.ofMul z) :
-              ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)) →
-      ∃ (σ τ : M.E ≃+* M.E)
-        (θF : RingAut ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)),
-        (∀ a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m),
-          ((θF a : ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E)
-            = σ.symm (τ a)) ∧
-        Odd (orderOf θF) ∧
-        (∀ k : ↥hyp.actualKActor,
-          σ ((M.mu (k, 1) : M.Eˣ) : M.E) * τ ((M.mu (k, 1) : M.Eˣ) : M.E)
-            = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E)) ∧
-        ∀ v : ↥hyp.W,
-          σ ((M.mu (1, v) : M.Eˣ) : M.E) * τ ((M.mu (1, v) : M.Eˣ) : M.E) = 1)
     -- §2 (20): a normalized pair squares to its `y`
     {ζ₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
     (hsq : ∀ ω' ∈ hyp.Q, ω' ∉ hyp.Q0 → ∀ y ∈ hyp.Q0,
@@ -852,7 +830,7 @@ theorem corollaryTwo_of_isStandardModel_of_normalization
   obtain ⟨ω₀, hω₀Q, hω₀Q0, y₀, hy₀Q0, -, hfω₀⟩ := hyp.stepNine M hZc H hC2 hVW hm hQ0card
     hmu hKcard hWdvd hωQ hωQ0 hζ₀ (fun hc => hζ₀1 (Subtype.ext hc))
   exact hyp.corollaryTwo_of_isStandardModel H hC2 sfive M hZc hmu hVW hm hQ0card hcard
-    hKcard hWdvd hW1 hfQ hhW x₀ hmodel hpair hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0
+    hKcard hWdvd hW1 hfQ hhW x₀ hmodel hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0
     (hsq ω₀ hω₀Q hω₀Q0 y₀ hy₀Q0 hfω₀) hfω₀ hζ hζ1
 
 end Hypothesis

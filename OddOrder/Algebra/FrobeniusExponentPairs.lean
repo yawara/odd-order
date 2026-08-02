@@ -152,6 +152,126 @@ theorem odd_orderOf_inv_mul_of_mul_eq_mul {F : Type*} [Field F] [Finite F] [Char
     rw [hστ, orderOf_inv]
     exact hodd
 
+/-! ## Odd order from surjectivity of the product map -/
+
+/-- **`2^g + 1` divides `2^{2g} − 1`** — the factorization `(x + 1)(x − 1) = x² − 1`
+at `x = 2^g`. -/
+theorem two_pow_add_one_dvd_two_pow_two_mul_sub_one (g : ℕ) :
+    2 ^ g + 1 ∣ 2 ^ (2 * g) - 1 := by
+  refine ⟨2 ^ g - 1, ?_⟩
+  have h2 : (2 : ℕ) ^ (2 * g) = 2 ^ g * 2 ^ g := by rw [two_mul, pow_add]
+  obtain ⟨b, hb⟩ : ∃ b, (2 : ℕ) ^ g = b + 1 :=
+    ⟨2 ^ g - 1, by have : 1 ≤ (2 : ℕ) ^ g := Nat.one_le_two_pow; omega⟩
+  rw [h2, hb]
+  simp only [Nat.add_sub_cancel]
+  have hsq : (b + 1) * (b + 1) = b * b + 2 * b + 1 := by ring
+  rw [hsq, Nat.add_sub_cancel]
+  ring
+
+/-- **An automorphism whose product map is onto has odd order** (Higman's condition on
+the twist of a Suzuki `2`-group; Peterfalvi Part II, Ch. III §3, p. 121).
+
+Writing `ρ = Frob^r`, the map `a ↦ a · ρ(a)` is `a ↦ a^{1 + 2^r}`, and on the cyclic group
+`F^×` of order `2^n − 1` it is onto exactly when `gcd(1 + 2^r, 2^n − 1) = 1`.  Were
+`orderOf ρ = n / gcd(n, r)` even, then with `g = gcd(n, r)` the number `2^g + 1 > 1` would
+divide both `2^r + 1` (because `r / g` is odd) and `2^n − 1` (because `2g ∣ n`), so an
+element of `F^×` of order dividing `2^g + 1` would be a *second* preimage of `1`.
+
+This is where "`θ` is of odd order" (Appendix III Definition 3) comes from in the standard
+model: `a ↦ a · θ(a)` is `a ↦ a^d`, the action of `K` on the centre in the coordinate `ι`,
+and `K` is regular on `Z(Q)^#` — so that map is onto `F^×`. -/
+theorem odd_orderOf_of_mul_self_surjective {F : Type*} [Field F] [Finite F] [CharP F 2]
+    {n : ℕ} (hn : n ≠ 0) (hcard : Nat.card F = 2 ^ n) (ρ : RingAut F)
+    (hsurj : ∀ a : F, a ≠ 0 → ∃ b : F, b ≠ 0 ∧ b * ρ b = a) :
+    Odd (orderOf ρ) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI : Fintype F := Fintype.ofFinite F
+  -- a surjective self-map of the finite group `F^×` is injective
+  have hker : ∀ a : F, a ≠ 0 → a * ρ a = 1 → a = 1 := by
+    set ν : Fˣ →* Fˣ := MonoidHom.id Fˣ * Units.map ρ.toRingHom.toMonoidHom with hν
+    have hνapp : ∀ u : Fˣ, ((ν u : Fˣ) : F) = (u : F) * ρ (u : F) := fun _ => rfl
+    have hνsurj : Function.Surjective ν := by
+      intro u
+      obtain ⟨b, hb0, hb⟩ := hsurj (u : F) u.ne_zero
+      exact ⟨Units.mk0 b hb0, Units.ext (by rw [hνapp]; exact hb)⟩
+    have hνinj : Function.Injective ν := Finite.injective_iff_surjective.mpr hνsurj
+    intro a ha0 ha
+    have h1 : ν (Units.mk0 a ha0) = ν 1 := by
+      refine Units.ext ?_
+      rw [hνapp, hνapp]
+      simpa using ha
+    simpa using congrArg (fun u : Fˣ => (u : F)) (hνinj h1)
+  -- `ρ = Frob^r`, of order `n / gcd(n, r)`
+  obtain ⟨r, hr⟩ := exists_pow_eq_of_ringAut hcard hn ρ
+  have hfrobord : orderOf (qFrobenius F 2 1) = n := orderOf_frobenius hcard hn
+  have hfin : IsOfFinOrder (qFrobenius F 2 1) := by
+    refine orderOf_pos_iff.mp ?_
+    rw [hfrobord]
+    exact Nat.pos_of_ne_zero hn
+  have hρ : ρ = qFrobenius F 2 1 ^ r := by
+    rw [qFrobenius_pow]
+    exact RingEquiv.ext fun x => hr x
+  have hord : orderOf ρ = n / Nat.gcd n r := by
+    rw [hρ, hfin.orderOf_pow, hfrobord]
+  rw [hord]
+  by_contra hcon
+  rw [Nat.not_odd_iff_even] at hcon
+  -- `n = g N` with `N` even, hence `r = g s` with `s` odd
+  have hgpos : 0 < Nat.gcd n r :=
+    Nat.pos_of_ne_zero fun h => hn (Nat.eq_zero_of_gcd_eq_zero_left h)
+  set g := Nat.gcd n r with hg
+  have hgn : g ∣ n := Nat.gcd_dvd_left n r
+  have hgr : g ∣ r := Nat.gcd_dvd_right n r
+  have hcop : Nat.gcd (n / g) (r / g) = 1 := Nat.coprime_div_gcd_div_gcd hgpos
+  have hsodd : Odd (r / g) := by
+    rcases Nat.even_or_odd (r / g) with hs | hs
+    · exfalso
+      have h2 : (2 : ℕ) ∣ Nat.gcd (n / g) (r / g) := Nat.dvd_gcd hcon.two_dvd hs.two_dvd
+      rw [hcop] at h2
+      omega
+    · exact hs
+  -- `c = 2^g + 1` divides both `2^r + 1` and `2^n − 1`
+  have hcr : 2 ^ g + 1 ∣ 2 ^ r + 1 := by
+    have hrgs : (2 : ℕ) ^ r = (2 ^ g) ^ (r / g) := by
+      rw [← pow_mul, Nat.mul_div_cancel' hgr]
+    rw [hrgs]
+    simpa using hsodd.nat_add_dvd_pow_add_pow (2 ^ g) 1
+  have hcn : 2 ^ g + 1 ∣ 2 ^ n - 1 := by
+    refine dvd_trans (two_pow_add_one_dvd_two_pow_two_mul_sub_one g) ?_
+    refine Nat.pow_sub_one_dvd_pow_sub_one 2 ?_
+    obtain ⟨N', hN'⟩ := hcon
+    refine ⟨N', ?_⟩
+    have hn' : n = g * (n / g) := (Nat.mul_div_cancel' hgn).symm
+    rw [hn', hN']
+    ring
+  -- the second preimage of `1`
+  obtain ⟨ω, hω⟩ := IsCyclic.exists_generator (α := Fˣ)
+  have hordω : orderOf ((ω : F)) = 2 ^ n - 1 := by
+    rw [orderOf_units, orderOf_eq_card_of_forall_mem_zpowers hω,
+      Nat.card_eq_fintype_card, Fintype.card_units, ← Nat.card_eq_fintype_card, hcard]
+  have h2n : 1 < 2 ^ n := Nat.one_lt_pow hn (by norm_num)
+  have hclt : 1 < 2 ^ g + 1 := by have : 1 ≤ (2 : ℕ) ^ g := Nat.one_le_two_pow; omega
+  obtain ⟨e, he⟩ := hcn
+  have hepos : 0 < e := by
+    rcases Nat.eq_zero_or_pos e with h | h
+    · rw [h, mul_zero] at he; omega
+    · exact h
+  have helt : e < 2 ^ n - 1 := by
+    rw [he]
+    exact lt_mul_iff_one_lt_left hepos |>.mpr hclt
+  have ha0 : (ω : F) ^ e ≠ 0 := pow_ne_zero _ (Units.ne_zero ω)
+  have hane : (ω : F) ^ e ≠ 1 :=
+    pow_ne_one_of_lt_orderOf (by omega) (by rw [hordω]; exact helt)
+  have hac : ((ω : F) ^ e) ^ (2 ^ g + 1) = 1 := by
+    rw [← pow_mul, mul_comm e (2 ^ g + 1), ← he, ← hordω, pow_orderOf_eq_one]
+  refine hane (hker _ ha0 ?_)
+  obtain ⟨u, hu⟩ := hcr
+  calc (ω : F) ^ e * ρ ((ω : F) ^ e)
+      = ((ω : F) ^ e) ^ (2 ^ r + 1) := by rw [hr, pow_succ, mul_comm]
+    _ = (((ω : F) ^ e) ^ (2 ^ g + 1)) ^ u := by rw [hu, pow_mul]
+    _ = 1 := by rw [hac, one_pow]
+
 /-! ## Restricting Frobenius powers of `E` to the subfield `F` -/
 
 section Restrict
@@ -301,6 +421,26 @@ theorem odd_orderOf_restrictToFrobFixed_inv_mul (hm : m ≠ 0)
   apply Subtype.ext
   push_cast
   exact hmul a
+
+/-- **The twist of `E` has odd order on `F` as soon as `a ↦ a · θ(a)` is onto `F^×`**
+(Peterfalvi Part II, Ch. III §3, p. 121, into Ch. IV §3 (3), p. 130).
+
+`odd_orderOf_of_mul_self_surjective` for the subfield `F = {x : x^q = x}` of order `2^m`,
+stated for an automorphism of `E` through its restriction.  In the standard model the
+product map is `a ↦ a^d`, which is onto `F^×` because `K` is regular on `Z(Q)^#`. -/
+theorem odd_orderOf_restrictToFrobFixed_of_mul_self_surjective (hm : m ≠ 0)
+    (hcard : Nat.card E = (2 ^ m) ^ 2) (θ : E ≃+* E)
+    (hsurj : ∀ a ∈ frobFixedSubfield E 2 m, a ≠ 0 →
+      ∃ b ∈ frobFixedSubfield E 2 m, b ≠ 0 ∧ b * θ b = a) :
+    Odd (orderOf (restrictToFrobFixed (m := m) θ)) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  haveI : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
+  refine odd_orderOf_of_mul_self_surjective (F := ↥(frobFixedSubfield E 2 m)) hm
+    (natCard_frobFixedSubfield hcard hm) _ fun a ha0 => ?_
+  obtain ⟨b, hbF, hb0, hb⟩ := hsurj (a : E) a.2 fun h => ha0 (Subtype.ext h)
+  refine ⟨⟨b, hbF⟩, fun h => hb0 (congrArg Subtype.val h), Subtype.ext ?_⟩
+  push_cast
+  exact hb
 
 end Restrict
 
