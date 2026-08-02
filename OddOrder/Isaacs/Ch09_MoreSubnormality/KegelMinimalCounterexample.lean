@@ -308,6 +308,36 @@ theorem inf_le_smul (hK : KegelHypothesis S) (hinf : S ⊓ N = ⊥) (hsup : S �
     (P : Subgroup G) ⊓ S ≤ ((n • P : Sylow p G) : Subgroup G) :=
   (inf_smul_eq_inf hK hinf hsup P hn) ▸ inf_le_left
 
+omit [Finite G] in
+/-- **`(I)` step 4**: `R := ⟨(P ∩ S)^N⟩` は `P` に含まれる (したがって `p`-群) で,
+`N` に正規化される. -/
+theorem exists_pgroup_normalizedBy (hK : KegelHypothesis S) (hinf : S ⊓ N = ⊥)
+    (hsup : S ⊔ N = ⊤) {p : ℕ} [Fact p.Prime] (P : Sylow p G) :
+    ∃ R : Subgroup G, (P : Subgroup G) ⊓ S ≤ R ∧ R ≤ (P : Subgroup G) ∧
+      ∀ n ∈ N, ∀ r ∈ R, n * r * n⁻¹ ∈ R := by
+  classical
+  set X : Set G := {x : G | ∃ n ∈ N, ∃ y ∈ (P : Subgroup G) ⊓ S, x = n * y * n⁻¹} with hX
+  refine ⟨Subgroup.closure X, ?_, ?_, ?_⟩
+  · intro y hy
+    exact Subgroup.subset_closure ⟨1, N.one_mem, y, hy, by group⟩
+  · rw [Subgroup.closure_le]
+    rintro x ⟨n, hn, y, hy, rfl⟩
+    have h1 : y ∈ ((n⁻¹ • P : Sylow p G) : Subgroup G) :=
+      inf_le_smul hK hinf hsup P (N.inv_mem hn) hy
+    rw [mem_smul_sylow_iff] at h1
+    have h2 : n * y * n⁻¹ ∈ (P : Subgroup G) := by
+      have hgr : (n⁻¹)⁻¹ * y * n⁻¹ = n * y * n⁻¹ := by group
+      rwa [hgr] at h1
+    exact h2
+  · intro n hn
+    have hsub : Subgroup.closure X ≤ (Subgroup.closure X).comap (MulAut.conj n).toMonoidHom := by
+      rw [Subgroup.closure_le]
+      rintro x ⟨m, hm, y, hy, rfl⟩
+      refine Subgroup.subset_closure ⟨n * m, N.mul_mem hn hm, y, hy, ?_⟩
+      change n * (m * y * m⁻¹) * n⁻¹ = n * m * y * (n * m)⁻¹
+      group
+    exact fun r hr => hsub hr
+
 end Retraction
 
 end -- 9D.4
