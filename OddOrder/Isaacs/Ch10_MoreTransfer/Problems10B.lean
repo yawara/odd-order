@@ -34,6 +34,8 @@ set_option autoImplicit false
 
 namespace OddOrder.Isaacs.Ch10
 
+open scoped commutatorElement
+
 section /- 10B.1: `(ZMod (p^n))ˣ` の `1`-単位群は `p`-群 (p. 312) -/
 
 variable {p n : ℕ}
@@ -122,6 +124,22 @@ theorem orderOf_unitAutHom_one_add_prime (hp : p.Prime) (hn : 0 < n) {u : (ZMod 
   haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
   rw [orderOf_unitAutHom]
   exact orderOf_one_add_prime_dvd hp hn hu
+
+/-! ## 半直積の交換子 -/
+
+/-- 半直積での基本交換子: `⁅inr g, inl x⁆ = inl (φ g x · x⁻¹)`.
+
+`SemidirectProduct.inl_aut` (`inl (φ g x) = inr g * inl x * inr g⁻¹`) の言い換え。 -/
+theorem commutatorElement_inr_inl {N A : Type*} [Group N] [Group A] {φ : A →* MulAut N}
+    (g : A) (x : N) :
+    ⁅(SemidirectProduct.inr g : SemidirectProduct N A φ),
+        (SemidirectProduct.inl x : SemidirectProduct N A φ)⁆
+      = SemidirectProduct.inl (φ g x * x⁻¹) := by
+  have key : (SemidirectProduct.inr g : SemidirectProduct N A φ) * SemidirectProduct.inl x *
+      (SemidirectProduct.inr g)⁻¹ = SemidirectProduct.inl (φ g x) := by
+    rw [← map_inv]
+    exact (SemidirectProduct.inl_aut g x).symm
+  rw [commutatorElement_def, key, ← map_inv, ← map_mul]
 
 /-! ## Isaacs 10B.1 の群 `P = C ⋊ ⟨a⟩` -/
 
