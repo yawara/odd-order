@@ -57,6 +57,8 @@ membership facts it needs on the model:
   which step (2) and step (3) run on.
 * `Hypothesis.conj_t_eq_of_mem_center`, `Hypothesis.SectionFourSetup.pow_odd_eq_one_of_mem_P`
   — the `htη` and `hηord` of `sectionFour_mem_W`.
+* `Hypothesis.SectionFourSetup.exists_mem_P_mem_W_mul` — `P ⊔ W = P · W`, the `hfac` of
+  `inf_le_sup_centralizer_W` and `eq_P_of_centralizes`.
 * `conj_inv_eq_of_commute`, `cube_mul_eq_of_commute` — the book's refinement
   `ζ₁ ∈ ζ P` (p. 133): `ω^{ζ₁} = ω^ζ` and `ζ₁³ P = ζ³ P`.
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
@@ -882,6 +884,20 @@ theorem SectionFourSetup.pow_odd_eq_one_of_mem_P (s4 : hyp.SectionFourSetup) {η
   have h2 := congrArg (Subtype.val (p := fun x => x ∈ s4.P)) h1
   simp only [SubmonoidClass.coe_pow, OneMemClass.coe_one] at h2
   exact h2
+
+open scoped Pointwise in
+include hyp in
+/-- **`P ⊔ W = P · W`** — `P ≤ D` normalizes `W` (`D_le_normalizer_W`), so the join is a
+product.  This is the factorization hypothesis `hfac` of both
+`inf_le_sup_centralizer_W` and `eq_P_of_centralizes`. -/
+theorem SectionFourSetup.exists_mem_P_mem_W_mul (s4 : hyp.SectionFourSetup)
+    {v : G} (hv : v ∈ s4.P ⊔ hyp.W) :
+    ∃ p ∈ s4.P, ∃ w ∈ hyp.W, v = p * w := by
+  have hcoe : ((s4.P ⊔ hyp.W : Subgroup G) : Set G) = (s4.P : Set G) * (hyp.W : Set G) :=
+    Subgroup.coe_mul_of_left_le_normalizer_right _ _
+      (le_trans s4.P_le_D hyp.D_le_normalizer_W)
+  obtain ⟨p, hp, w, hw, hpw⟩ : v ∈ (s4.P : Set G) * (hyp.W : Set G) := hcoe ▸ hv
+  exact ⟨p, hp, w, hw, hpw.symm⟩
 
 /-! ### The book's refinement `ζ₁ ∈ ζ P`
 

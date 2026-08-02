@@ -8847,3 +8847,18 @@ threading されているだけ**で producer が無い。`hyp.D` は `Hypothesi
 `hηD`,`hηV` = `η ∈ P ≤ V ≤ D`。
 
 ⟹ **§4 の残りは `sectionFour_mem_W` を呼ぶ top-level 定理を書くだけ**。
+
+### (206) `P ⊔ W = P·W` を再利用可能な補題に抽出
+
+`SectionFourSetup.exists_mem_P_mem_W_mul` — `P ≤ D ≤ N(W)`
+(`D_le_normalizer_W`) から `Subgroup.coe_mul_of_left_le_normalizer_right` で
+`(P ⊔ W : Set G) = P · W`。`exists_ne_one_mem_W_centralizer` の証明内で
+inline に書かれていたものを抽出。
+
+これが `inf_le_sup_centralizer_W` と `eq_P_of_centralizes` の `hfac` になる。
+
+**§4 top-level 定理の残り入力** (書籍が「by the structure of PSU(3,ℓ)」で
+読み取る部分):
+* `hcent : V ⊓ U ≤ centralizer (C_{Q₀}(P))` — `inf_le_sup_W_of_centralizes` の入力
+* `hUC : U ≤ C(P)` — `U = O^{2′}(C_G(P))` から自明のはず
+* `hS : ∀ c ∈ P·Z(U), c·ω = ω·c` — `eq_P_of_centralizes` の入力
