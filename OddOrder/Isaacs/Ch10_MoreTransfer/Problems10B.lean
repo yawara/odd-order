@@ -367,6 +367,50 @@ theorem normal_map_zpowers (hp : p.Prime) {u : (ZMod (p ^ n))ˣ} (k : ℕ) :
   rw [hact, hvval, ← mul_assoc]
   exact ofAdd_mul_mem_zpowers _ _
 
+/-- **基点**: `⁅⊤, ⊤⁆ ≤ inl⟨x^p⟩`. -/
+theorem commutator_top_le_map_zpowers (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
+    (hu : ZMod.unitsMap (dvd_pow_self p hn.ne' : p ∣ p ^ n) u = 1) :
+    ⁅(⊤ : Subgroup (problem10B1Group (p ^ n) u)),
+        (⊤ : Subgroup (problem10B1Group (p ^ n) u))⁆
+      ≤ (Subgroup.zpowers (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (0 + 1)))).map
+        (SemidirectProduct.inl : _ →* problem10B1Group (p ^ n) u) := by
+  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  set K := (Subgroup.zpowers (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (0 + 1)))).map
+    (SemidirectProduct.inl : _ →* problem10B1Group (p ^ n) u) with hK
+  haveI : K.Normal := by
+    rw [hK]
+    exact normal_map_zpowers hp _
+  have hkey : ∀ (y : Multiplicative (ZMod (p ^ n))) (w : problem10B1Group (p ^ n) u),
+      ⁅(SemidirectProduct.inl y : problem10B1Group (p ^ n) u), w⁆ ∈ K := fun y w =>
+    commutator_inl_mem_map_zpowers hp hn hu 0 (c := Multiplicative.toAdd y) (by simp) w
+  have habel : ∀ b c : ↥(Subgroup.zpowers (unitAutHom (p ^ n) u)), b * c = c * b := by
+    intro b c
+    obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp b.2
+    obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp c.2
+    refine Subtype.ext ?_
+    rw [Subgroup.coe_mul, Subgroup.coe_mul, ← hi, ← hj, ← zpow_add, ← zpow_add, add_comm]
+  have hinr : ∀ (b : ↥(Subgroup.zpowers (unitAutHom (p ^ n) u)))
+      (w : problem10B1Group (p ^ n) u),
+      ⁅(SemidirectProduct.inr b : problem10B1Group (p ^ n) u), w⁆ ∈ K := by
+    intro b w
+    rw [show w = SemidirectProduct.inl w.left * SemidirectProduct.inr w.right from
+      (SemidirectProduct.inl_left_mul_inr_right w).symm,
+      commutatorElement_mul_right_eq_mul_conj]
+    have h2 : ⁅(SemidirectProduct.inr b : problem10B1Group (p ^ n) u),
+        (SemidirectProduct.inr w.right : problem10B1Group (p ^ n) u)⁆ = 1 := by
+      rw [← map_commutatorElement (SemidirectProduct.inr :
+        ↥(Subgroup.zpowers (unitAutHom (p ^ n) u)) →* problem10B1Group (p ^ n) u),
+        commutatorElement_def, habel b w.right]
+      simp
+    rw [h2, mul_one, mul_inv_cancel_right, ← commutatorElement_inv]
+    exact K.inv_mem (hkey _ _)
+  rw [Subgroup.commutator_le]
+  intro g _ h _
+  rw [show g = SemidirectProduct.inl g.left * SemidirectProduct.inr g.right from
+    (SemidirectProduct.inl_left_mul_inr_right g).symm,
+    commutatorElement_mul_left_eq_conj_mul]
+  exact K.mul_mem (‹K.Normal›.conj_mem _ (hinr _ _) _) (hkey _ _)
+
 end
 
 end OddOrder.Isaacs.Ch10

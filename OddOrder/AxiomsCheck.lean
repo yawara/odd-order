@@ -15261,4 +15261,6 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch10.commutator_inl_mem_map_zpowers
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.commutator_top_le_map_zpowers
+#assert_only_allowed_axioms
   OddOrder.GroupTheory.isMetacyclic_semidirectProduct
