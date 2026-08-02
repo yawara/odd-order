@@ -8007,3 +8007,20 @@ ambient の `f,h` と一致することを、`t x t = g·h·t·f` の分解の�
 **着手点**: 段 (2) の内在版 `corollaryTwo_intrinsicResidualQuotient` の `ω` は
 `U/Z(U)` の元なので、まず `U` へ持ち上げ (`Z(U)` を法とする曖昧さは `Q₀` に吸収)、
 次に `existsUnique_canonicalForm` で ambient の `f`,`h` と同定する。
+
+### (168) 追記 — 段 (3) の道具は 2 本とも既存、`f` の同定は 2 段
+
+書籍の「by the uniqueness of the canonical form」は repo では 2 段に分かれる:
+
+1. **商 → `U`**: `IsFGH.map` (`RankOneBNPair.lean:478`) を `π : U → U/Z(U)` に当てる
+   (`π` は同型でなく準同型でよい設計)。docstring 曰く
+   > the conclusions there hold modulo the kernel, which is the book's `P ∩ U`
+2. **`U` → ambient `G`**: `IsFGH.eq_of_le` (同 l.413) — `Q' ≤ Q`, `D' ≤ D` と両側の
+   `IsFGH` から `f x = f₁ x ∧ g x = g₁ x ∧ h x = h₁ x` (`x ∈ Q'^#`)。
+   これがまさに「canonical form の一意性」の内容 (`fgh_eq_of_canonical` を呼ぶ)。
+
+⟹ 段 (3) の実装は
+`corollaryTwo_intrinsicResidualQuotient` → (1) で `U` 上の三つ組へ →
+(2) で ambient の `f,h` へ、の 2 段。`U` 上の rank-one setup は
+`rankOneSetup_residual` (`PSU3SectionFourCorollaryTwo.lean`) が供給する。
+⚠ (1) では `π ω ≠ 1` (= `ω ∉ Z(U)`) が要る。`ω ∉ Q₀` から出す。
