@@ -476,6 +476,71 @@ theorem even_card_cQ (hXD : X ≤ hyp.D)
   · exact h
   · exact absurd h (Nat.not_even_iff_odd.mpr hoddD)
 
+/-! ## Three fixed points from a non-trivial `C_Q(X)` (p. 102) -/
+
+/-- **`C_Q(X) ≠ 1` gives `X` three fixed points on `Ω`** (Peterfalvi Part II, Ch. IV §4,
+p. 132: "Since `C_Q(P) ≠ 1`, `P` has three fixed points on `Ω`").
+
+`X ≤ D` fixes `basept` and `t · basept`, which are distinct because `t ∉ H`.  A
+non-trivial `q ∈ C_Q(X)` produces a third one, `q · (t · basept)`: it is `X`-fixed
+because `q` commutes with `X`, it differs from `t · basept` because `Q` is regular on
+`Ω − {basept}` (`qRegularEquiv`), and it differs from `basept` because `q ∈ Q ≤ H` fixes
+`basept`.
+
+This is what feeds `exists_conj_mem_D_map_le_V` (Ch. I Prop 6 (c)). -/
+theorem three_le_ncard_fixedPoints_of_mem_centralizer (hXD : X ≤ hyp.D)
+    {q : G} (hqQ : q ∈ hyp.Q) (hq1 : q ≠ 1)
+    (hqc : ∀ x ∈ X, x * q = q * x) :
+    3 ≤ (fixedPoints X Ω).ncard := by
+  classical
+  haveI := hyp.finite_Omega
+  have hXstab : ∀ x ∈ X, x • hyp.basept = hyp.basept ∧ x • (hyp.t • hyp.basept)
+      = hyp.t • hyp.basept := by
+    intro x hx
+    have hxD : x ∈ hyp.D := hXD hx
+    rw [hyp.D_eq_stabilizer_inf] at hxD
+    exact ⟨mem_stabilizer_iff.mp hxD.1, mem_stabilizer_iff.mp hxD.2⟩
+  -- the three points
+  have hmem₁ : hyp.basept ∈ fixedPoints X Ω := fun x => (hXstab x x.2).1
+  have hmem₂ : hyp.t • hyp.basept ∈ fixedPoints X Ω := fun x => (hXstab x x.2).2
+  have hmem₃ : q • (hyp.t • hyp.basept) ∈ fixedPoints X Ω := by
+    intro x
+    have hx := (hXstab (x : G) x.2).2
+    calc (x : G) • (q • (hyp.t • hyp.basept))
+        = ((x : G) * q) • (hyp.t • hyp.basept) := (mul_smul _ _ _).symm
+      _ = (q * (x : G)) • (hyp.t • hyp.basept) := by rw [hqc (x : G) x.2]
+      _ = q • ((x : G) • (hyp.t • hyp.basept)) := mul_smul _ _ _
+      _ = q • (hyp.t • hyp.basept) := by rw [hx]
+  -- and they are distinct
+  have h₁₂ : hyp.basept ≠ hyp.t • hyp.basept :=
+    fun hc => hyp.smul_basept_ne_of_not_mem_H hyp.t_not_mem_H hc.symm
+  have h₂₃ : hyp.t • hyp.basept ≠ q • (hyp.t • hyp.basept) := by
+    intro hc
+    refine hq1 ?_
+    have : (hyp.qRegularEquiv ⟨q, hqQ⟩ : {ω : Ω // ω ≠ hyp.basept})
+        = hyp.qRegularEquiv ⟨1, hyp.Q.one_mem⟩ := by
+      refine Subtype.ext ?_
+      change q • (hyp.t • hyp.basept) = (1 : G) • (hyp.t • hyp.basept)
+      rw [one_smul, ← hc]
+    exact congrArg Subtype.val (hyp.qRegularEquiv.injective this)
+  have h₁₃ : hyp.basept ≠ q • (hyp.t • hyp.basept) := by
+    intro hc
+    refine h₁₂ ?_
+    have hqfix : q⁻¹ • hyp.basept = hyp.basept :=
+      hyp.smul_basept_eq_of_mem_H (hyp.H.inv_mem (hyp.Q_le_H hqQ))
+    calc hyp.basept = q⁻¹ • hyp.basept := hqfix.symm
+      _ = q⁻¹ • (q • (hyp.t • hyp.basept)) := by rw [← hc]
+      _ = hyp.t • hyp.basept := inv_smul_smul _ _
+  -- three distinct members
+  have hsub : ({hyp.basept, hyp.t • hyp.basept, q • (hyp.t • hyp.basept)} : Set Ω)
+      ⊆ fixedPoints X Ω := by
+    rintro z (rfl | rfl | rfl) <;> assumption
+  calc (3 : ℕ)
+      = ({hyp.basept, hyp.t • hyp.basept, q • (hyp.t • hyp.basept)} : Set Ω).ncard := by
+        rw [Set.ncard_insert_of_notMem (by simp [h₁₂, h₁₃]),
+          Set.ncard_insert_of_notMem (by simp [h₂₃]), Set.ncard_singleton]
+    _ ≤ _ := Set.ncard_le_ncard hsub (Set.toFinite _)
+
 /-! ## Prop 6 (c): `X` is conjugate in `D` to a subgroup of `V` (p. 102) -/
 
 /-- **Peterfalvi Part II, Ch. I Prop 6 (c)** (p. 102) — `X` is conjugate in
