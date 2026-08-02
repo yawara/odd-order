@@ -79,7 +79,7 @@ theorem stepFour_fibre (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
     (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
@@ -117,7 +117,7 @@ theorem stepFour_fibre (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
     {ζ ω : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1)
-    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hhW : h ω ∈ hyp.W)
     (hstage3 : (Ψ ⟨ω, hωQ⟩).quotient ^ (2 ^ m + 1)
       = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
         + ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹) :
@@ -136,8 +136,6 @@ theorem stepFour_fibre (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       f (ω * (a * hyp.distinguishedInvolution * a⁻¹)) ∈ hyp.Q := fun a haK =>
     hfQ _ (hyp.Q.mul_mem hωQ (hyp.Q0_le_Q
       (hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D haK) hyp.distinguishedInvolution_mem_Q0)))
-  -- with `V = W` the freeness of `D` supplies `h(ω) ∈ W`, which the general stages take
-  have hhW : h ω ∈ hyp.W := hyp.h_mem_W_of_freeD H M hZc hmu hVW hζ hωQ hωQ0 hf
   have hx := hyp.stepFour_base H hC2 sfive M hZc hmu Φ hquot ι hker hu Ψ hΨq hΨc
     hconjq hconjy d hequiv hdsq hs hζ hζ1 hωQ hωQ0 hf hhW hstage3 hm hQ0card hfibQ
   refine ⟨hx, fun ρ hρQ hfρQ hfib hne => ?_⟩
@@ -164,7 +162,7 @@ theorem stepFour_cover_of_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
     (Φ : ↥hyp.Q ≃* Suzuki2Groups.BilinearTwistedProduct φ)
@@ -202,7 +200,7 @@ theorem stepFour_cover_of_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (hfQ : ∀ ρ : G, ρ ∈ hyp.Q → f ρ ∈ hyp.Q)
     {ζ ω : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1)
-    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ)
+    (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hhW : h ω ∈ hyp.W)
     (hstage3 : (Ψ ⟨ω, hωQ⟩).quotient ^ (2 ^ m + 1)
       = ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
         + ((M.mu ((1 : ↥hyp.actualKActor), (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹) :
@@ -238,11 +236,13 @@ theorem stepFour_cover_of_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
           (⟨ζ⁻¹, hζinv⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
     rw [hyp.quotient_inv_eq M hu Ψ hωQ hωinvQ, hstage3, hmuinv, inv_inv]
     exact add_comm _ _
-  obtain ⟨hx, hcov1⟩ := hyp.stepFour_fibre H hC2 sfive M hZc hmu hVW Φ hquot ι hker hu Ψ
-    hene hΨq hΨc hconjq hconjy d hequiv hdsq hs hm hQ0card hfQ hζ hζ1 hωQ hωQ0 hf hstage3
-  obtain ⟨hxinv, hcov2⟩ := hyp.stepFour_fibre H hC2 sfive M hZc hmu hVW Φ hquot ι hker hu
+  have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
+  obtain ⟨hx, hcov1⟩ := hyp.stepFour_fibre H hC2 sfive M hZc hmu Φ hquot ι hker hu Ψ
+    hene hΨq hΨc hconjq hconjy d hequiv hdsq hs hm hQ0card hfQ hζ hζ1 hωQ hωQ0 hf hhW
+    hstage3
+  obtain ⟨hxinv, hcov2⟩ := hyp.stepFour_fibre H hC2 sfive M hZc hmu Φ hquot ι hker hu
     Ψ hene hΨq hΨc hconjq hconjy d hequiv hdsq hs hm hQ0card hfQ hζinv hζinv1 hωinvQ
-    hωinvQ0 hfinv hstage3inv
+    hωinvQ0 hfinv (hyp.h_inv_mem_W H hωQ hω1 hhW) hstage3inv
   have hxne : Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω, hωQ⟩)
       ≠ Suzuki2Groups.unitaryCoord m u (Ψ ⟨ω⁻¹, hωinvQ⟩) := by
     rw [hx, hxinv, hmuinv]
@@ -314,9 +314,10 @@ theorem corollaryTwo_of_base (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 :=
   hyp.corollaryTwo_of_stepFour H hC2 sfive M hZc hVW Φ hquot ι hker hu Ψ hene hΨq hΨc
     hconjq hconjy d hequiv hdsq hs hm hQ0card hmu hKcard hWdvd hW1 hfQ hω₀Q hω₀Q0
-    (fun σ hσQ => hyp.stepFour_cover_of_base H hC2 sfive M hZc hmu hVW Φ hquot ι hker hu
+    (fun σ hσQ => hyp.stepFour_cover_of_base H hC2 sfive M hZc hmu Φ hquot ι hker hu
       Ψ hene hΨq hΨc hconjq hconjy d hequiv hdsq hs hm hQ0card hfQ hζ₀ hζ₀1 hω₀Q hω₀Q0
-      hf₀ hstage3 σ hσQ (hfQ σ hσQ))
+      hf₀ (hyp.h_mem_W_of_freeD H M hZc hmu hVW hζ₀ hω₀Q hω₀Q0 hf₀) hstage3 σ hσQ
+      (hfQ σ hσQ))
     hζ hζ1
 
 /-- **Peterfalvi Part II, Ch. IV §3, Corollary 2**, on the output of the Proposition of

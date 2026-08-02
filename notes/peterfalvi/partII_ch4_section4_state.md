@@ -144,3 +144,55 @@ stage (3) まで。`PSU3CorollaryTwo.lean` は Corollary 2 のみ。
 **次セッションの入口**: `PSU3RootGroupModel` / `PSU3StarEquation` /
 `PSU3InverseFormula` を読み、§3 Proposition が 1 本に組まれているかを実測する。
 組まれていれば `exists_mem_W` の出力を食わせるだけで Ch. IV が閉じる。
+
+## §3 の `V = W` は repo 側の特殊化債務だった (2026-08-02, 解消済)
+
+書籍 p.129 の §3 Proposition は `V = W` を仮定しない。仮定するのは
+`ω ∈ Q−Q₀`, `ζ ∈ W^#`, `f(ω) = (ω⁻¹)^ζ`, **`h(ω) ∈ W`** の 4 つだけ。
+それでも repo の §3 は `hVW : V = W` を全段に threading していた。根は 2 つ:
+
+1. **§2 step (8) の fibre bound**。書籍は `mᵢ ≤ m = |W|`、repo は `mᵢ ≤ |V|`。
+   repo は共役元を `a ∈ D` としか記録せず `x ↦ aK ∈ D/K` (`|D:K| = |V|`) で
+   数えていた。squeeze は `n·m = q+1` でしか閉じないので `V = W` が要る。
+   **書籍の論法**: fibre 条件は `KW`-軌道への所属なので共役元は `k v`
+   (`k ∈ K`, `v ∈ W`) の形。`x ↦ v` が `W` への単射 (同じ `v` なら 2 つの
+   共役元は `K` の同じ剰余類 ⟹ step (7))。`k v ∈ K ⟺ v = 1` で `m₁ ≤ m−1`。
+   ⟹ `PSU3StepEightKW.lean` (`stepEight_of_KW`,
+   `exists_mem_Q0_orbitOfF_eq_of_KW`)。
+
+2. **`D` の `(Q/Q₀)^#` 上の自由性** (`eq_one_of_conj_eq_mul_Q0_of_mem_D`)。
+   内部で `D = KW` を使い、それが `V = W` を要求していた。
+   **書籍の論法**: `h(ω⁻¹) = (h(ω)^t)⁻¹ = h(ω)⁻¹ ∈ W` (∵ `h(ω) ∈ W ≤ C_D(t)`)
+   なので `ζ³·h(ω⁻¹) ∈ W`、`W`-自由性 (`..._of_mem_W`、`V=W` 不要) で足りる。
+   ⟹ `h_inv_eq` 以下 §3 全段の `hVW` を `hhW : h ω ∈ hyp.W` に置換。
+
+Corollary 2 (`G ≅ PSU(3,q)`) は `V = W` が定理なので `_of_freeD` 版を保持し、
+`h_mem_W_of_freeD` で `hhW` を作って一般版へ渡す (証明の重複ゼロ)。
+
+## §3 Proposition が 1 本に組み上がった (2026-08-02)
+
+`PSU3Proposition.lean`:
+* `proposition_inverseFormula` — 書籍の仮説 (上記 4 つ) から
+  **全ての `ρ ∈ Q−Q₀`** で `f(ρ)` の単位座標が `(ρ̄/y, 1/y)`。
+  stage (4) = `stepFour_cover_of_base`、stage (5) = `stepFive`。
+* `proposition_reciprocal` — それを `unitaryRootEquiv` で `RootGroup q` に移し
+  **`ε(f ρ) = RootGroup.reciprocal (ε ρ)`**。
+
+対になる標準モデル側 = `StandardModelFGH.lean` の `standardModel_f_rootHom`
+(`f(R u) = R(u₁/u₂, 1/u₂)`、Bruhat 関係から `fgh_eq_of_canonical` で読み取り)。
+
+## 次の作業 = Corollary 1 の組立て
+
+材料は揃った:
+* `RankOneBNPairRigidity.lean` の `conjQMulEquivOfData`
+  (`εQ : Q ≃* Q'` が `f` と `f'` を intertwine ⟹ `⟨Q^x⟩ ≃* ⟨Q'^x⟩`) と
+  `closure_iUnion_conj_eq_primeComplementResidual` (`⟨Q^x⟩ = O^{2′}(L)`)。
+* `G` 側 = `proposition_reciprocal`、標準モデル側 = `standardModel_f_rootHom`、
+  `Q ≃* RootGroup q` = `unitaryRootEquiv ∘ Ψ`、
+  `RootGroup q ≃* standardRootSubgroup q` = `rootEquivStandardRoot`。
+* faithfulness = `Setup.normalCore_eq_bot` / `..._of_isSimpleGroup`。
+
+残るのは **`PSU3InductionTarget` の `actionEquiv`** — 群同型だけでなく
+`Ω ≃ Unital n` の同変全単射が要る。`conjQMulEquivOfPermMatch` は点集合
+`Option ↥Q ≃ Option ↥Q'` から作られているので原理的には取れる
+(`coordsEquiv : (L ⧸ M) ≃ Option ↥Q`)。ここが次の設計ポイント。

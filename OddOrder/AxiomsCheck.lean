@@ -33,6 +33,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourEndgame
 import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
@@ -15054,3 +15055,11 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.stepEight_of_KW
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.exists_mem_Q0_orbitOfF_eq_of_KW
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.h_inv_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.h_eq_zpow_three
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.proposition_inverseFormula
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.proposition_reciprocal

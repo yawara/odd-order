@@ -700,6 +700,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelHypothesis
 import OddOrder.Peterfalvi.Appendices.Suzuki.StandardModelFGH
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3StepEightKW
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3UnitaryRootEquiv
+import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Proposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisTransport
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionFourModel
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3SectionThree
