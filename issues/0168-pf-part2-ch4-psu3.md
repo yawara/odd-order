@@ -8024,3 +8024,20 @@ ambient の `f,h` と一致することを、`t x t = g·h·t·f` の分解の�
 (2) で ambient の `f,h` へ、の 2 段。`U` 上の rank-one setup は
 `rankOneSetup_residual` (`PSU3SectionFourCorollaryTwo.lean`) が供給する。
 ⚠ (1) では `π ω ≠ 1` (= `ω ∉ Z(U)`) が要る。`ω ∉ Q₀` から出す。
+
+### (169) §4 段 (3) の 2 段が landing
+
+* `exists_fgh_residual` — `U` 相対の `f₁,h₁` = ambient の `f,h` (`(f₁ x : G) = f x`)。
+  経路 = `Setup.exists_fgh_one` → `IsFGH.ofSubtype` → `IsFGH.eq_of_le`
+  (= canonical form の一意性)。
+* `fgh_residualQuotient_eq` — `f₂ (π x) = π (f₁ x)` (`IsFGH.map`, `π : U → U/Z(U)`)。
+
+⟹ 段 (2) の結論 (`U/Z(U)` 上) は ambient の `f,h` の像として読める。
+
+**次**: この 2 本と `corollaryTwo_intrinsicResidualQuotient` を繋いで、
+書籍 p.133 の「`f(ω) = ω^{-ζ}` かつ `h(ω) ∈ C_W(P)`」を ambient で述べる。
+⚠ 繋ぐには内在仮説の `f₂,g₂,k₂` (段 (2) の出力) と、ここで作る `U` 側の `f₁,g₁,h₁` が
+**同じ IsFGH 三つ組**であることを使う — `fgh_residualQuotient_eq` は両方を仮説に取る
+形にしてあるので、段 (2) の出力をそのまま `H₂` に渡せばよい。
+⚠ ω の持ち上げ: 段 (2) の `ω` は `U/Z(U)` の元。`Q(intrinsic) = (Q.subgroupOf U).map π`
+なので `∃ x : ↥U, (x:G) ∈ Q ∧ π x = ω` が取れる。`ω ∉ Q₀(intrinsic)` から `π x ≠ 1`。
