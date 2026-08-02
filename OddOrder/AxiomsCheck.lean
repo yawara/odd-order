@@ -12,6 +12,7 @@ import OddOrder.Algebra.FixedPointsGalois
 import OddOrder.Algebra.QuadraticFrobenius
 import OddOrder.Algebra.FrobeniusExponentPairs
 import OddOrder.Algebra.QuadraticTraceCorrection
+import OddOrder.GroupTheory.MaschkeComplement
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearBilinearLift
 import OddOrder.Algebra.SemilinearFixedPoint
 import OddOrder.GroupTheory.SemilinearOrbitFixedPoint
@@ -15272,3 +15273,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.GroupTheory.conjNormal_eq_one_of_mem_centralizer
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.normal_map_subtype_of_conj_invariant
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_isCompl_invariant

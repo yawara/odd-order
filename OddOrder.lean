@@ -63,6 +63,7 @@ import OddOrder.GroupTheory.Transvection
 import OddOrder.GroupTheory.NonzeroVectorAction
 import OddOrder.GroupTheory.ElementaryAbelianLinear
 import OddOrder.GroupTheory.CommGroupAut
+import OddOrder.GroupTheory.MaschkeComplement
 import OddOrder.GroupTheory.LinearGroupSimple
 import OddOrder.GroupTheory.ThompsonSubgroupAbelian
 import OddOrder.GroupTheory.GlaubermanReplacement
