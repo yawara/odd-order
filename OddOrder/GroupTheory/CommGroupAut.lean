@@ -7,6 +7,9 @@ import OddOrder.GroupTheory.ElementaryAbelianLinear
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.GroupTheory.Exponent
 import Mathlib.Data.ZMod.Units
+import Mathlib.Data.ZMod.QuotientGroup
+import Mathlib.LinearAlgebra.Basis.VectorSpace
+import Mathlib.Algebra.Field.ZMod
 
 /-!
 # The automorphism group of a commutative group
@@ -221,5 +224,256 @@ theorem exponent_mem_of_isSimpleGroup_mulAut (hs : IsSimpleGroup (MulAut A))
   · exact Or.inr (Or.inr he)
 
 end Exponent
+
+/-! ## Square-zero endomorphisms produce automorphisms -/
+
+/-- 可換群の自己準同型 `f` が `f ∘ f = 1` (自明写像) をみたすなら `a ↦ a * f a` は自己同型
+(逆写像は `a ↦ a * (f a)⁻¹`). 加法的に書けば `f² = 0` のとき `1 + f` が可逆で
+`(1 + f)⁻¹ = 1 - f`, ということ. -/
+def mulAutOfSquareZero (f : A →* A) (hf : ∀ a, f (f a) = 1) : MulAut A where
+  toFun a := a * f a
+  invFun a := a * (f a)⁻¹
+  left_inv a := by simp [map_mul, hf]
+  right_inv a := by simp [map_mul, hf]
+  map_mul' a b := by simp [map_mul, mul_comm, mul_assoc, mul_left_comm]
+
+@[simp]
+theorem mulAutOfSquareZero_apply (f : A →* A) (hf : ∀ a, f (f a) = 1) (a : A) :
+    mulAutOfSquareZero f hf a = a * f a := rfl
+
+theorem mulAutOfSquareZero_ne_one {f : A →* A} (hf : ∀ a, f (f a) = 1) (hne : f ≠ 1) :
+    mulAutOfSquareZero f hf ≠ 1 := by
+  intro hc
+  refine hne (MonoidHom.ext fun a => ?_)
+  have := congrArg (fun φ : MulAut A => φ a) hc
+  simp only [mulAutOfSquareZero_apply, MulAut.one_apply] at this
+  simpa using (mul_eq_left.mp this)
+
+/-- 位数 `2` の群では非自明な元は一意. -/
+theorem eq_of_ne_one_of_card_eq_two {G : Type*} [Group G] (hG : Nat.card G = 2) {x y : G}
+    (hx : x ≠ 1) (hy : y ≠ 1) : x = y := by
+  classical
+  haveI : Finite G := Nat.finite_of_card_ne_zero (by omega)
+  haveI := Fintype.ofFinite G
+  by_contra hxy
+  have hcard3 : ({1, x, y} : Finset G).card = 3 := by
+    rw [Finset.card_insert_of_notMem (by simp [Ne.symm hx, Ne.symm hy]),
+      Finset.card_insert_of_notMem (by simp [hxy]), Finset.card_singleton]
+  have hle := Finset.card_le_card (Finset.subset_univ ({1, x, y} : Finset G))
+  rw [hcard3, Finset.card_univ, ← Nat.card_eq_fintype_card, hG] at hle
+  omega
+
+/-- **`|Aut(A)| = 2` かつ `A` の指数が `2` より大きいとき, 非自明な冪零自己準同型は
+`a ↦ a⁻²` に限る.**
+
+`f² = 1` なら `a ↦ a * f a` は自己同型 (`mulAutOfSquareZero`) で, `f ≠ 1` から自明でない.
+`Aut(A)` の非自明な元は反転しかない (`eq_of_ne_one_of_card_eq_two`) ので
+`a * f a = a⁻¹`. -/
+theorem eq_inv_sq_of_card_mulAut_eq_two (hcard : Nat.card (MulAut A) = 2)
+    (hexp : ∃ a : A, a ^ 2 ≠ 1) {f : A →* A} (hf : ∀ a, f (f a) = 1) (hne : f ≠ 1) :
+    ∀ a : A, f a = (a ^ 2)⁻¹ := by
+  have hinv : invMulAut A ≠ 1 := by
+    intro hc
+    obtain ⟨a, ha⟩ := hexp
+    exact ha (invMulAut_eq_one_iff.mp hc a)
+  have := eq_of_ne_one_of_card_eq_two hcard (mulAutOfSquareZero_ne_one hf hne) hinv
+  intro a
+  have ha := congrArg (fun φ : MulAut A => φ a) this
+  simp only [mulAutOfSquareZero_apply, invMulAut_apply] at ha
+  rw [pow_two, mul_inv]
+  calc f a = a⁻¹ * (a * f a) := by group
+    _ = a⁻¹ * a⁻¹ := by rw [ha]
+
+/-! ## A proper subgroup is killed by some character of prime order -/
+
+/-- **`Additive V` が `𝔽ₚ` 上の非自明なベクトル空間なら, `V` には非自明な指標
+`V →* Multiplicative (ZMod p)` がある** — 基底の座標関数を乗法的に読み替えるだけ.
+
+⚠ 加群構造は **instance 引数**で取る: 呼び出し側が `letI` で供給した `ZMod p`-加群構造の
+下では `V →ₗ[ZMod p] ZMod p` の関数強制が解決しないので, 線形写像を扱う部分をこの補題に
+閉じ込め, 外へは `MonoidHom` だけを渡す. -/
+theorem exists_nontrivial_hom_of_zmodModule {p : ℕ} (hp : p.Prime) {V : Type*} [CommGroup V]
+    [Nontrivial V] [Module (ZMod p) (Additive V)] :
+    ∃ π : V →* Multiplicative (ZMod p), π ≠ 1 := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : Nontrivial (Additive V) := inferInstanceAs (Nontrivial V)
+  set b := Module.Basis.ofVectorSpace (ZMod p) (Additive V) with hb
+  obtain ⟨i⟩ := b.index_nonempty
+  have hbi : b.coord i (b i) = 1 := by
+    rw [Module.Basis.coord_apply, Module.Basis.repr_self, Finsupp.single_eq_same]
+  refine ⟨{ toFun := fun v => Multiplicative.ofAdd (b.coord i (Additive.ofMul v))
+            map_one' := by simp
+            map_mul' := fun x y => by simp [ofMul_mul, map_add] }, fun hc => ?_⟩
+  have hval :=
+    congrArg (fun ψ : V →* Multiplicative (ZMod p) => ψ (Additive.toMul (b i))) hc
+  simp only [MonoidHom.coe_mk, OneHom.coe_mk, MonoidHom.one_apply, ofMul_toMul] at hval
+  have h0 : b.coord i (b i) = 0 := by simpa using congrArg Multiplicative.toAdd hval
+  rw [hbi] at h0
+  exact one_ne_zero h0
+
+/-- **非自明な有限可換群には, ある素数 `p` について非自明な指標
+`Q →* Multiplicative (ZMod p)` がある.**
+
+`p` を `|Q|` の素因数とすると, Cauchy から `Q` の `p` 乗写像は単射でなく, 有限性から
+したがって全射でもない. よって `V = Q/Q^p` は非自明で指数が `p` を割る — つまり `𝔽ₚ` 上の
+非自明なベクトル空間で, 基底の座標関数が求める指標を与える. -/
+theorem exists_prime_nontrivial_hom (Q : Type*) [CommGroup Q] [Finite Q] [Nontrivial Q] :
+    ∃ p : ℕ, ∃ _ : p.Prime, ∃ π : Q →* Multiplicative (ZMod p), π ≠ 1 := by
+  classical
+  set p := (Nat.card Q).minFac with hpdef
+  have hcardQ : 1 < Nat.card Q := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+  have hp : p.Prime := Nat.minFac_prime (by omega)
+  haveI : Fact p.Prime := ⟨hp⟩
+  -- `p` 乗写像は単射でない (Cauchy) から全射でもない
+  haveI := Fintype.ofFinite Q
+  obtain ⟨q, hq⟩ : ∃ q : Q, orderOf q = p :=
+    exists_prime_orderOf_dvd_card p (by rw [← Nat.card_eq_fintype_card]; exact Nat.minFac_dvd _)
+  have hq1 : q ≠ 1 := by
+    intro hcq
+    rw [hcq, orderOf_one] at hq
+    exact hp.one_lt.ne hq
+  have hnotsurj : ¬ Function.Surjective (powMonoidHom p : Q →* Q) := by
+    rw [← Finite.injective_iff_surjective]
+    intro hinj
+    refine hq1 (hinj ?_)
+    change q ^ p = (1 : Q) ^ p
+    rw [one_pow, ← hq, pow_orderOf_eq_one]
+  set R := (powMonoidHom p : Q →* Q).range with hRdef
+  have hR : R ≠ ⊤ := fun hc => hnotsurj (MonoidHom.range_eq_top.mp hc)
+  -- `V := Q ⧸ R` は非自明で指数が `p` を割る
+  obtain ⟨v₀, hv₀⟩ : ∃ v : Q, v ∉ R := by
+    by_contra hc
+    exact hR (Subgroup.eq_top_iff' R |>.mpr fun x => not_not.mp fun hx => hc ⟨x, hx⟩)
+  haveI : Nontrivial (Q ⧸ R) :=
+    ⟨⟨QuotientGroup.mk v₀, 1, by simpa [QuotientGroup.eq_one_iff] using hv₀⟩⟩
+  have hVexp : ∀ v : Q ⧸ R, v ^ p = 1 := by
+    intro v
+    induction v using QuotientGroup.induction_on with
+    | H x =>
+      rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+      exact ⟨x, rfl⟩
+  letI : Module (ZMod p) (Additive (Q ⧸ R)) := zmodModule_of_pow_eq_one (n := p) hVexp
+  obtain ⟨π, hπ⟩ := exists_nontrivial_hom_of_zmodModule (V := Q ⧸ R) hp
+  refine ⟨p, hp, π.comp (QuotientGroup.mk' R), fun hc => hπ (MonoidHom.ext fun y => ?_)⟩
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective R y
+  simpa using congrArg (fun ψ : Q →* Multiplicative (ZMod p) => ψ x) hc
+
+/-- **有限可換群の真部分群 `H` は, ある素数位数の指標で殺される.**
+
+`A ⧸ H` は非自明なので `exists_prime_nontrivial_hom` を適用し, 商写像と合成する. -/
+theorem exists_prime_hom_of_ne_top [Finite A] {H : Subgroup A} (hH : H ≠ ⊤) :
+    ∃ p : ℕ, ∃ _ : p.Prime, ∃ φ : A →* Multiplicative (ZMod p),
+      (∀ x ∈ H, φ x = 1) ∧ φ ≠ 1 := by
+  obtain ⟨a₀, ha₀⟩ : ∃ a : A, a ∉ H := by
+    by_contra hc
+    exact hH (Subgroup.eq_top_iff' H |>.mpr fun x => not_not.mp fun hx => hc ⟨x, hx⟩)
+  haveI : Nontrivial (A ⧸ H) :=
+    ⟨⟨QuotientGroup.mk a₀, 1, by simpa [QuotientGroup.eq_one_iff] using ha₀⟩⟩
+  obtain ⟨p, hp, π, hπ⟩ := exists_prime_nontrivial_hom (A ⧸ H)
+  refine ⟨p, hp, π.comp (QuotientGroup.mk' H), fun x hx => ?_, ?_⟩
+  · have hx1 : (x : A ⧸ H) = 1 := (QuotientGroup.eq_one_iff x).mpr hx
+    change π ((QuotientGroup.mk' H) x) = 1
+    rw [QuotientGroup.mk'_apply, hx1, map_one]
+  · intro hc
+    refine hπ (MonoidHom.ext fun y => ?_)
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective H y
+    simpa using congrArg (fun ψ : A →* Multiplicative (ZMod p) => ψ x) hc
+
+/-! ## `|Aut(A)| = 2` forces cyclicity -/
+
+/-- **`|Aut(A)| = 2` かつ指数が `2` より大きい有限可換群は巡回群.**
+
+指数と同じ位数の元 `g` をとり, `⟨g⟩ ≠ ⊤` と仮定して矛盾を導く. `exists_prime_hom_of_ne_top`
+から, ある素数 `p` と `⟨g⟩` を殺す非自明な指標 `φ : A →* Multiplicative (ZMod p)` が取れる.
+`p ∣ orderOf g` なので `h := g ^ (orderOf g / p)` は位数 `p` で, `f a := h ^ (φ a).val` は
+自己準同型. その像は `⟨h⟩ ≤ ⟨g⟩ ≤ ker φ` に入るから `f ∘ f = 1` であり, `φ ≠ 1` から
+`f ≠ 1`. よって `eq_inv_sq_of_card_mulAut_eq_two` が `f a = a⁻²` を強制するが,
+`a = g` では `f g = 1` (`φ g = 1`) なので `g ^ 2 = 1` となり指数 `> 2` に矛盾. -/
+theorem isCyclic_of_card_mulAut_eq_two [Finite A] (hcard : Nat.card (MulAut A) = 2)
+    (hexp : ∃ a : A, a ^ 2 ≠ 1) : IsCyclic A := by
+  classical
+  obtain ⟨g, hg⟩ := Monoid.exists_orderOf_eq_exponent (G := A) Monoid.ExponentExists.of_finite
+  have hg2 : g ^ 2 ≠ 1 := by
+    intro hc
+    obtain ⟨a, ha⟩ := hexp
+    have hdvd : Monoid.exponent A ∣ 2 := hg ▸ orderOf_dvd_of_pow_eq_one hc
+    exact ha (orderOf_dvd_iff_pow_eq_one.mp ((Monoid.order_dvd_exponent a).trans hdvd))
+  rw [isCyclic_iff_exists_zpowers_eq_top]
+  refine ⟨g, ?_⟩
+  by_contra hne
+  obtain ⟨p, hp, φ, hφker, hφ⟩ := exists_prime_hom_of_ne_top (A := A) hne
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : NeZero p := ⟨hp.pos.ne'⟩
+  obtain ⟨a₁, ha₁⟩ : ∃ a : A, φ a ≠ 1 := by
+    by_contra hc
+    exact hφ (MonoidHom.ext fun a => not_not.mp fun hx => hc ⟨a, hx⟩)
+  -- `p ∣ orderOf g`
+  have hcardMul : Nat.card (Multiplicative (ZMod p)) = p := by
+    rw [Nat.card_congr (Multiplicative.toAdd (α := ZMod p)), Nat.card_zmod]
+  have hordφ : orderOf (φ a₁) = p := by
+    have hdvd : orderOf (φ a₁) ∣ p := by
+      have hd := orderOf_dvd_natCard (φ a₁)
+      rwa [hcardMul] at hd
+    rcases (Nat.dvd_prime hp).mp hdvd with h1 | h1
+    · exact absurd (orderOf_eq_one_iff.mp h1) ha₁
+    · exact h1
+  have hpg : p ∣ orderOf g := by
+    rw [hg]
+    exact hordφ ▸ (orderOf_map_dvd φ a₁).trans (Monoid.order_dvd_exponent a₁)
+  -- 位数 `p` の元 `h ∈ ⟨g⟩`
+  have hn0 : orderOf g ≠ 0 := (orderOf_pos g).ne'
+  have hdivpos : orderOf g / p ≠ 0 :=
+    Nat.div_ne_zero_iff.mpr ⟨hp.pos.ne', Nat.le_of_dvd (Nat.pos_of_ne_zero hn0) hpg⟩
+  have hhord : orderOf (g ^ (orderOf g / p)) = p := by
+    rw [orderOf_pow' _ hdivpos, Nat.gcd_eq_right (Nat.div_dvd_of_dvd hpg),
+      Nat.div_div_self hpg hn0]
+  -- 自己準同型 `f a = h ^ (φ a).val`
+  have hmul : ∀ x y : Multiplicative (ZMod p),
+      (g ^ (orderOf g / p)) ^ (Multiplicative.toAdd (x * y)).val
+        = (g ^ (orderOf g / p)) ^ (Multiplicative.toAdd x).val *
+          (g ^ (orderOf g / p)) ^ (Multiplicative.toAdd y).val := by
+    intro x y
+    rw [toAdd_mul, ZMod.val_add, ← pow_add]
+    conv_rhs => rw [← pow_mod_orderOf (g ^ (orderOf g / p)), hhord]
+  let f : A →* A :=
+    { toFun := fun a => (g ^ (orderOf g / p)) ^ (Multiplicative.toAdd (φ a)).val
+      map_one' := by simp
+      map_mul' := fun a b => by rw [map_mul]; exact hmul _ _ }
+  have hfapp : ∀ a : A, f a = (g ^ (orderOf g / p)) ^ (Multiplicative.toAdd (φ a)).val :=
+    fun _ => rfl
+  have hfg : f g = 1 := by
+    rw [hfapp, hφker g (Subgroup.mem_zpowers g)]
+    simp
+  have hff : ∀ a, f (f a) = 1 := by
+    intro a
+    have hmem : f a ∈ Subgroup.zpowers g := by
+      rw [hfapp, ← pow_mul]
+      exact Subgroup.pow_mem _ (Subgroup.mem_zpowers g) _
+    rw [hfapp, hφker _ hmem]
+    simp
+  have hfne : f ≠ 1 := by
+    intro hc
+    have hval : (g ^ (orderOf g / p)) ^ (Multiplicative.toAdd (φ a₁)).val = 1 := by
+      rw [← hfapp, hc]; rfl
+    refine pow_ne_one_of_lt_orderOf ?_ (by rw [hhord]; exact ZMod.val_lt _) hval
+    intro h0
+    exact ha₁ (by simpa using congrArg Multiplicative.ofAdd ((ZMod.val_eq_zero _).mp h0))
+  have hkey := eq_inv_sq_of_card_mulAut_eq_two hcard hexp hff hfne g
+  rw [hfg] at hkey
+  exact hg2 (by simpa using hkey.symm)
+
+/-- **`Aut(A)` が単純で `A` の指数が `2` より大きいなら, `A` は位数 `3`, `4`, `6` の巡回群.**
+
+`card_mulAut_eq_two_of_isSimpleGroup` で `|Aut(A)| = 2`,
+`isCyclic_of_card_mulAut_eq_two` で巡回性, `exponent_mem_of_isSimpleGroup_mulAut` で
+指数 (= 巡回群なので位数) が `3, 4, 6` のいずれか. -/
+theorem isCyclic_and_card_of_isSimpleGroup_mulAut [Finite A] (hs : IsSimpleGroup (MulAut A))
+    (hexp : ∃ a : A, a ^ 2 ≠ 1) :
+    IsCyclic A ∧ (Nat.card A = 3 ∨ Nat.card A = 4 ∨ Nat.card A = 6) := by
+  haveI : IsCyclic A :=
+    isCyclic_of_card_mulAut_eq_two (card_mulAut_eq_two_of_isSimpleGroup hs hexp) hexp
+  refine ⟨inferInstance, ?_⟩
+  have hexpA := exponent_mem_of_isSimpleGroup_mulAut hs hexp
+  rwa [IsCyclic.exponent_eq_card] at hexpA
 
 end OddOrder.GroupTheory
