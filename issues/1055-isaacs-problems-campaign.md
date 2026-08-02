@@ -7212,6 +7212,35 @@ step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可
 
 ⟹ 元の「`N` 可換 / 非可換」の場合分けは **`F(G) ⊓ N = ⊥` / `N ≤ F(G)`** に置き換わる。
 
+### 残り枝 `N ≤ F(G)` の設計 — `O^p` を名指ししない `normalCore` 経路 (2026-08-03)
+
+`le_fitting_of_isMinimalNormal` が landing したので、残るのは `N ≤ F(G)` の場合。
+
+1. **`N` は冪零**: `Ch02.le_fitting_iff_isNilpotent_and_isSubnormal` の順方向。
+2. **`N` は可換**: `⁅N, N⁆ ◁ G` (正規部分群同士の交換子) かつ `≤ N` なので極小性から
+   `⊥` か `N`。`= N` なら `N` は完全 (perfect) だが冪零 ⟹ 可解なので導来列が `⊥` に
+   落ちる ⟹ `N = ⊥` で `N ≠ ⊥` に矛盾。⟹ `⁅N,N⁆ = ⊥`。
+3. **`N` は指数 `p`**: `p` を `|N|` の素因数とする。`N` 可換なので `N^p = {x^p}` は部分群で、
+   `N ◁ G` から `(x^p)^g = (x^g)^p` ⟹ **`N^p ◁ G`**。極小性から `⊥` か `N`。`= N` なら
+   `p` 乗写像が全射 ⟹ 有限性で単射 ⟹ 位数 `p` の元が無い ⟹ Cauchy に矛盾。
+   ⟹ `N^p = ⊥`、つまり `|N| = p^k`。
+   ⚠ この経路は **characteristic 部分群を一切使わない** (char-in-normal 補題が不要)。
+4. **`q ≠ p` の Sylow は `S` に入る**: `|G| = |S| · |N|` (∵ `S ∩ N = 1`, `SN = G`) で
+   `|N| = p^k` なので `|G|_q = |S|_q`。Kegel から `Q ∩ S ∈ Syl_q(S)` なので位数が等しく
+   **`Q = Q ∩ S ≤ S`**。
+5. **`S ◁◁ G`** (`O^p(G)` を名指ししない):
+   `K := Subgroup.normalCore S` とすると、各 `q ≠ p` と各 `Q ∈ Syl_q(G)` について
+   `Q ≤ S^g` (∵ `Q^{g⁻¹}` も Sylow なので step 4 で `≤ S`) ⟹ **`Q ≤ K`** ⟹
+   `q ∤ [G : K]`。よって `[G:K]` の素因数は `p` のみ = `G ⧸ K` は `p`-群 ⟹ 冪零 ⟹
+   その任意の部分群は subnormal (`Ch02.isSubnormal_of_isNilpotent_finite`) ⟹
+   `S/K ◁◁ G/K` ⟹ (`K ≤ S` なので対応定理 = `IsSubnormal.comap` + `comap_map_eq`)
+   **`S ◁◁ G`** で反例に矛盾。
+
+⟹ これで `G` は単純。そのあと (II) は短い
+(`Subgroup.IsSubnormal.eq_bot_or_top_of_isSimpleGroup` があるので
+「`T ◁ S` 真 ⟹ `(G,T)` も Kegel ⟹ 極小性で `T ◁◁ G` ⟹ `T = ⊥`」で `S` 単純、
+非可換は `|S| = q` 素数なら `S ≤ ⋂ Syl_q(G) ◁ G` から `G` が `q`-群になって矛盾)。
+
 ### 残り (2026-08-03 時点)
 
 1. `S ≤ C_G(N)`: 各素数 `p` で `C_G(N) ⊓ S` が `S` の Sylow `p` を含む ⟹
