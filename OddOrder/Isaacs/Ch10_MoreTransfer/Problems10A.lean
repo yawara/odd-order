@@ -518,6 +518,18 @@ theorem mem_center_iff_commute_of_index_prime [Finite P] {p : ℕ} (hp : p.Prime
 
 end
 
+/-- `A = Z × K` (可換群の直積分解) で `Z` の指数が `p` を割るなら `A^p ≤ K`.
+
+`a = z * k` と書くと `a ^ p = z ^ p * k ^ p = k ^ p ∈ K`. -/
+theorem pow_mem_of_isComplement' {A : Type*} [CommGroup A] {Z K : Subgroup A}
+    (h : Subgroup.IsComplement' Z K) {p : ℕ} (hZ : ∀ z ∈ Z, z ^ p = 1) (a : A) :
+    a ^ p ∈ K := by
+  have hmem : a ∈ (↑(Z ⊔ K) : Set A) := by rw [h.sup_eq_top]; trivial
+  rw [Subgroup.normal_mul] at hmem
+  obtain ⟨z, hz, k, hk, rfl⟩ := hmem
+  rw [mul_pow, hZ z hz, one_mul]
+  exact K.pow_mem hk p
+
 section /- 10A.3 (前半): Z(P) が A の直積因子なら C_p ≀ C_p に埋め込める (p. 308) -/
 
 /-- **Isaacs Problem 10A.3 の前半** (書籍 p. 308) ⭐: `P` を `p`-群, `|Z(P)| = p`,
