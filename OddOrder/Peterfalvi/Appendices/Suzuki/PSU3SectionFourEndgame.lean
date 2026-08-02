@@ -38,6 +38,8 @@ membership facts it needs on the model:
   invariance.
 * `Hypothesis.mem_W_of_coordFieldAut_eq_id` — **`μ = 1 ⟹ η ∈ W`**, the book's closing
   "Thus `η ∈ W`".
+* `Hypothesis.coordFieldAut_eq_id_of_fixes_frobFixed` — **`μ = 1`** from `μ|_F = id` and
+  the odd order of `η`.
 -/
 
 set_option autoImplicit false
@@ -60,6 +62,15 @@ theorem sectionFour_ten {E : Type*} [Field E] (h2 : (2 : E) = 0) (σ : E ≃+* E
   rw [map_mul, hσB] at hfix
   rw [← hB]
   exact hfix.symm
+
+/-- The `n`-th power of a ring automorphism is its `n`-fold iterate. -/
+theorem ringEquiv_pow_apply {E : Type*} [Field E] (σ : E ≃+* E) (n : ℕ) (x : E) :
+    (σ ^ n) x = (σ : E → E)^[n] x := by
+  induction n generalizing x with
+  | zero => rfl
+  | succ n ih =>
+      have hstep : ((σ ^ n) * σ) x = (σ ^ n) (σ x) := rfl
+      rw [pow_succ, hstep, ih, Function.iterate_succ_apply]
 
 namespace Hypothesis
 
@@ -254,6 +265,42 @@ theorem mem_W_of_coordFieldAut_eq_id (M : hyp.QuotientFieldModel m)
   have hfix : η * κ * η⁻¹ = κ := (congrArg Subtype.val hconj).symm
   calc κ * η = (η * κ * η⁻¹) * η := by rw [hfix]
     _ = η * κ := by group
+
+include hyp in
+/-- **🎯 `μ = 1`** (Peterfalvi Part II, Ch. IV §4, p. 134: "It follows that `μ = 1` since
+`μ` has odd order and, if `μ ≠ 1`, then `|F| ≥ 8`").
+
+An automorphism of `E` fixing `F = {x : x^q = x}` pointwise is `1` or the `q`-power
+Frobenius (`eq_one_or_eq_qFrobenius_of_fixes`).  The Frobenius has order `2`, while `μ`
+has odd order because `η` does (`coordFieldAut_iterate_eq_self`); so the second
+alternative would force `μ = 1 = σ₀`, contradicting `qFrobenius_ne_one`. -/
+theorem coordFieldAut_eq_id_of_fixes_frobFixed (M : hyp.QuotientFieldModel m)
+    (s : hyp.LemmaFiveSetup m) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    {d ζ : G} (hd : d ∈ hyp.D) (hζ : ζ ∈ hyp.W)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    {n : ℕ} (hodd : Odd n) (hdn : d ^ n = 1)
+    (hfix : ∀ x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
+      hyp.coordFieldAut s M hm hQ0card hd hζ hznot x = x) (x : M.E) :
+    hyp.coordFieldAut s M hm hQ0card hd hζ hznot x = x := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set σ := hyp.coordFieldAut s M hm hQ0card hd hζ hznot with hσdef
+  have hfix' : ∀ y : M.E, y ^ 2 ^ m = y → σ y = y := fun y hy =>
+    hfix y (OddOrder.FiniteField.mem_frobFixedSubfield.mpr hy)
+  have hpow : σ ^ n = 1 := by
+    refine RingEquiv.ext fun y => ?_
+    rw [ringEquiv_pow_apply, hσdef,
+      hyp.coordFieldAut_iterate_eq_self s M hm hQ0card hd hζ hznot hdn]
+    rfl
+  rcases OddOrder.FiniteField.eq_one_or_eq_qFrobenius_of_fixes M.card hm hfix' with h1 | h1
+  · rw [h1]; rfl
+  · exfalso
+    have hsq : σ ^ 2 = 1 := by
+      rw [h1]
+      exact OddOrder.FiniteField.qFrobenius_sq M.card
+    have hone : σ = 1 := eq_one_of_sq_eq_one_of_odd_pow hodd hsq hpow
+    rw [h1] at hone
+    exact OddOrder.FiniteField.qFrobenius_ne_one M.card hm hone
 
 end Hypothesis
 

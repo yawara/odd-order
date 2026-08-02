@@ -14941,7 +14941,13 @@ element).
 And the book's closing "Thus `η ∈ W`" — stated without argument — is the *definition* of `W`:
 `W = C_V(K)` (`Hypothesis.W`, p. 98), and `μ = 1` says `μ(κ^η) = μ(κ)` for every `κ ∈ K`
 (`coordFieldAut_muK`), whence `κ^η = κ` because `μ` on `K` and the conjugation action of `K` on `Q`
-are both faithful (`mem_W_of_coordFieldAut_eq_id`).  No Galois correspondence on `Q₀` is needed. -/
+are both faithful (`mem_W_of_coordFieldAut_eq_id`).  No Galois correspondence on `Q₀` is needed.
+
+The odd order of `μ` comes from that of `η`: `coordConjD` is multiplicative in `d`
+(`coordConjD_iterate`), and `Ψ^[n] = id` forces `σ^[n] = id` because `Ψ^[n] x = σ^[n] x · Ψ^[n] 1`
+(`addEquiv_iterate_eq_scaledRingEquiv_iterate_mul`).  With that, an automorphism fixing `F`
+pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
+(`coordFieldAut_eq_id_of_fixes_frobFixed`). -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_mapsTo_frobFixed
 #assert_only_allowed_axioms
@@ -14949,3 +14955,13 @@ are both faithful (`mem_W_of_coordFieldAut_eq_id`).  No Galois correspondence on
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.sectionFour_ten
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.mem_W_of_coordFieldAut_eq_id
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.addEquiv_iterate_eq_scaledRingEquiv_iterate_mul
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.scaledRingEquiv_iterate_eq_self
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordConjD_iterate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_iterate_eq_self
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.coordFieldAut_eq_id_of_fixes_frobFixed

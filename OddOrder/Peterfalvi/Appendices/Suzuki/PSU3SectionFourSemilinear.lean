@@ -140,6 +140,30 @@ theorem addEquiv_eq_scaledRingEquiv_mul_one (Ψ : E ≃+ E) (h1 : Ψ 1 ≠ 0)
     Ψ x = scaledRingEquiv Ψ h1 hmul x * Ψ 1 := by
   rw [scaledRingEquiv_apply, mul_assoc, inv_mul_cancel₀ h1, mul_one]
 
+/-- **`Ψ` iterated is `σ` iterated, up to the constant `Ψ^[n] 1`.**
+
+This is what turns "`η` has odd order" into "`μ` has odd order": if `Ψ^[n] = id` then
+taking `x = 1` makes the constant `1`, so `σ^[n] = id` too
+(`scaledRingEquiv_iterate_eq_self`). -/
+theorem addEquiv_iterate_eq_scaledRingEquiv_iterate_mul (Ψ : E ≃+ E) (h1 : Ψ 1 ≠ 0)
+    (hmul : ∀ x y : E, Ψ (x * y) * Ψ 1 = Ψ x * Ψ y) (n : ℕ) (x : E) :
+    (Ψ : E → E)^[n] x
+      = ((scaledRingEquiv Ψ h1 hmul : E → E)^[n] x) * ((Ψ : E → E)^[n] 1) := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+      simp only [Function.iterate_succ_apply']
+      rw [ih, addEquiv_mul_eq_scaledRingEquiv_mul Ψ h1 hmul]
+
+/-- **`Ψ^[n] = id` forces `σ^[n] = id`.** -/
+theorem scaledRingEquiv_iterate_eq_self (Ψ : E ≃+ E) (h1 : Ψ 1 ≠ 0)
+    (hmul : ∀ x y : E, Ψ (x * y) * Ψ 1 = Ψ x * Ψ y) {n : ℕ}
+    (hn : ∀ y : E, (Ψ : E → E)^[n] y = y) (x : E) :
+    (scaledRingEquiv Ψ h1 hmul : E → E)^[n] x = x := by
+  have h := addEquiv_iterate_eq_scaledRingEquiv_iterate_mul Ψ h1 hmul n x
+  rw [hn x, hn 1, mul_one] at h
+  exact h.symm
+
 /-- The intertwining hypothesis of `addEquiv_mul_mul_eq_of_span`, in the form the group
 theory delivers it: `Ψ (c x) = ν c · Ψ x` for a *constant* `ν c`. -/
 theorem mul_apply_one_eq_of_smul (Ψ : E ≃+ E) {c ν : E}
@@ -408,6 +432,60 @@ theorem coordConjD_eq_coordFieldAut_mul (s : hyp.LemmaFiveSetup m)
     hyp.coordConjD M ⟨d, hd⟩ x
       = hyp.coordFieldAut s M hm hQ0card hd hζ hznot x * hyp.coordConjD M ⟨d, hd⟩ 1 :=
   addEquiv_eq_scaledRingEquiv_mul_one _ _ _ x
+
+/-! ### `coordConjD` is multiplicative in `d`
+
+Needed to turn "`η` has order `p`" into "the action of `η` on `E` iterates to the
+identity after `p` steps", which is the odd-order input of the endgame. -/
+
+include hyp in
+theorem coordConjD_mul_apply (M : hyp.QuotientFieldModel m) (d e : ↥hyp.D) (x : M.E) :
+    hyp.coordConjD M (d * e) x = hyp.coordConjD M d (hyp.coordConjD M e x) := by
+  obtain ⟨y, rfl⟩ := M.coord.surjective x
+  obtain ⟨q, hq⟩ := QuotientGroup.mk_surjective (Additive.toMul y)
+  have hy : y = Additive.ofMul (QuotientGroup.mk q) := by rw [hq]; rfl
+  subst hy
+  rw [hyp.coordConjD_apply_coord, hyp.coordConjD_apply_coord, hyp.coordConjD_apply_coord,
+    map_mul]
+  rfl
+
+include hyp in
+@[simp] theorem coordConjD_one_apply (M : hyp.QuotientFieldModel m) (x : M.E) :
+    hyp.coordConjD M 1 x = x := by
+  obtain ⟨y, rfl⟩ := M.coord.surjective x
+  obtain ⟨q, hq⟩ := QuotientGroup.mk_surjective (Additive.toMul y)
+  have hy : y = Additive.ofMul (QuotientGroup.mk q) := by rw [hq]; rfl
+  subst hy
+  rw [hyp.coordConjD_apply_coord, map_one]
+  rfl
+
+include hyp in
+theorem coordConjD_iterate (M : hyp.QuotientFieldModel m) (d : ↥hyp.D) (n : ℕ) (x : M.E) :
+    (hyp.coordConjD M d : M.E → M.E)^[n] x = hyp.coordConjD M (d ^ n) x := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+      rw [Function.iterate_succ_apply', ih, ← hyp.coordConjD_mul_apply, ← pow_succ']
+
+include hyp in
+/-- **`μ` has odd order**: if `d^n = 1` in `D` then `μ^[n] = id` on `E`.
+
+In §4, `d = η` lies in `P`, of odd prime order `p`, and this is the "since `μ` has odd
+order" of the book's last sentence (p. 134). -/
+theorem coordFieldAut_iterate_eq_self (s : hyp.LemmaFiveSetup m)
+    (M : hyp.QuotientFieldModel m) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    {d ζ : G} (hd : d ∈ hyp.D) (hζ : ζ ∈ hyp.W)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    {n : ℕ} (hdn : d ^ n = 1) (x : M.E) :
+    (hyp.coordFieldAut s M hm hQ0card hd hζ hznot : M.E → M.E)^[n] x = x := by
+  have hdn' : (⟨d, hd⟩ : ↥hyp.D) ^ n = 1 := Subtype.ext (by simpa using hdn)
+  have hΨn : ∀ y : M.E, (hyp.coordConjD M ⟨d, hd⟩ : M.E → M.E)^[n] y = y := by
+    intro y
+    rw [hyp.coordConjD_iterate M ⟨d, hd⟩ n y, hdn', hyp.coordConjD_one_apply]
+  exact scaledRingEquiv_iterate_eq_self (hyp.coordConjD M ⟨d, hd⟩)
+    (fun hc => one_ne_zero ((hyp.coordConjD M ⟨d, hd⟩).injective (by rw [hc, map_zero])))
+    (hyp.coordConjD_mul_mul_eq s M hm hQ0card hd hζ hznot) hΨn x
 
 /-! ### `μ` on the scalars of `K W`
 

@@ -8577,3 +8577,27 @@ def W : Subgroup G := hyp.V ⊓ Subgroup.centralizer hyp.KSet   -- Basic.lean:18
    **`σ = 1`**。
 5. `mem_W_of_coordFieldAut_eq_id` で `η ∈ W`、`h(ω) = ζ³η ∈ W` ⟹
    §3 Corollary 1 で **Ch. IV 完了**。
+
+### (193) 🎯 `μ` の奇数位数と **`μ = 1`** が landing
+
+* `addEquiv_iterate_eq_scaledRingEquiv_iterate_mul` (純代数) —
+  `Ψ^[n] x = σ^[n] x · Ψ^[n] 1`。⟹ `scaledRingEquiv_iterate_eq_self`:
+  `Ψ^[n] = id` なら `σ^[n] = id`。
+* `coordConjD_mul_apply` / `coordConjD_one_apply` / `coordConjD_iterate` —
+  `coordConjD` は `d` について乗法的 (`quotientDHom` が MonoidHom)。
+* `coordFieldAut_iterate_eq_self` — `d^n = 1` ⟹ `μ^[n] = id` (書籍の
+  「since `μ` has odd order」)。
+* `ringEquiv_pow_apply` — `(σ^n) x = σ^[n] x`。
+* `coordFieldAut_eq_id_of_fixes_frobFixed` — **`μ = 1`**。
+  `F` を各点固定する `E` の自己同型は `1` か `q`-Frobenius
+  (`eq_one_or_eq_qFrobenius_of_fixes`)、後者は位数 2 で `μ` は奇数位数 ⟹ `1`。
+
+**残り (Ch. IV §4)**:
+1. `σ²|_F = id ⟹ σ|_F = id` — `σ(F) ⊆ F` と `σ^[n] = id` (n 奇) から
+   `σ^[2k+1] x = σ^[1](σ^[2k] x) = σ x` かつ `= x`。`σ|_F` を束ねる必要なし。
+2. **(10) を `F^×` 全体で回す assembly** — 最大の残り。`X ∈ F^× ∖ T` ごとに
+   `a ∈ K` を取り (`K` 奇数位数ゆえ二乗は全単射、`σ` は `F^×` の全単射)、
+   `b` を作って (3)–(9)→λ→(10)。§4 の standing data を束ねる必要がある。
+   `|T| ≤ 4 < |F|/2 = q/2` は `q = ℓ^p ≥ 27` から。
+3. 上 2 つが揃えば `σ²|_F = id` → `σ|_F = id` → `μ = 1` → `η ∈ W` →
+   `h(ω) = ζ³η ∈ W` → §3 Corollary 1 で **Ch. IV 完了**。
