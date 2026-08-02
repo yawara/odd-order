@@ -15275,6 +15275,10 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch10.ker_mapDomainAlgHom_eq_top_mul
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.exists_isUnitBasis_augmentation_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.nonempty_abelianization_equiv_of_isUnitBasis
+#assert_only_allowed_axioms
   OddOrder.GroupTheory.isMetacyclic_semidirectProduct
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.conjNormal_eq_one_of_mem_centralizer
