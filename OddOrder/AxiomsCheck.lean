@@ -15268,6 +15268,8 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch10.nilpotencyClass_problem10B1
 #assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.le_socle_of_isElementaryAbelian_of_not_dvd_index
+#assert_only_allowed_axioms
   OddOrder.GroupTheory.isMetacyclic_semidirectProduct
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.conjNormal_eq_one_of_mem_centralizer

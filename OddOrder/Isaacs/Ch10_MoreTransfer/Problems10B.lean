@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.IsMetacyclic
+import OddOrder.GroupTheory.MaschkeComplement
+import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
 import Mathlib.Data.ZMod.Units
 import Mathlib.Data.Nat.Totient
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
@@ -482,6 +484,73 @@ theorem nilpotencyClass_problem10B1 (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ 
   · exact Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp hbot
   · by_contra hlt
     exact hne (Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr (by omega))
+
+end
+
+section /- 10B.2: 基本可換な正規部分群は socle に入る (p. 312) -/
+
+open OddOrder.GroupTheory
+
+open scoped IsMulCommutative in
+/-- **Isaacs Problem 10B.2** (書籍 p. 312) ⭐: `E ◁ G` が基本可換 `p`-群で
+`p ∤ |G : C_G(E)|` なら `E ≤ Soc(G)`.
+
+`Additive ↥E` を `𝔽ₚ`-加群と見て共役作用の表現 (`conjQuotientLinear`) を取り、
+`Soc(G) ⊓ E` に対応する部分加群に Maschke (`exists_isCompl_invariant`) を当てて
+`G`-不変な補元を得る。あとは骨格 `le_socle_of_exists_normal_complement`。 -/
+theorem le_socle_of_module_of_not_dvd_index {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] {E : Subgroup G} [E.Normal] [IsMulCommutative ↥E]
+    [Module (ZMod p) (Additive ↥E)]
+    (hidx : ¬ p ∣ (Subgroup.centralizer (E : Set G)).index) :
+    E ≤ Ch02.socle G := by
+  classical
+  haveI : NeZero ((Nat.card (G ⧸ Subgroup.centralizer (E : Set G)) : ZMod p)) :=
+    ⟨fun h => hidx ((ZMod.natCast_eq_zero_iff _ _).mp h)⟩
+  set S : Subgroup ↥E := (Ch02.socle G ⊓ E).subgroupOf E with hS
+  have hWinv : ∀ q : G ⧸ Subgroup.centralizer (E : Set G), ∀ ⦃v : Additive ↥E⦄,
+      v ∈ subgroupOrderIsoSubmodule (n := p) S →
+      conjQuotientLinear (n := p) q v ∈ subgroupOrderIsoSubmodule (n := p) S := by
+    intro q
+    induction q using QuotientGroup.induction_on with
+    | H g =>
+      intro v hv
+      exact conj_invariant_subgroupOf (M := Ch02.socle G ⊓ E) g (Additive.toMul v) hv
+  obtain ⟨W', hW'inv, hcompl⟩ :=
+    exists_isCompl_invariant (conjQuotientLinear (n := p) (N := E) (G := G)) _ hWinv
+  set T : Subgroup ↥E := (subgroupOrderIsoSubmodule (n := p)).symm W' with hT
+  have hcomplST : IsCompl S T := by
+    have h := (subgroupOrderIsoSubmodule (n := p) (E := ↥E)).symm.isCompl hcompl
+    rwa [OrderIso.symm_apply_apply] at h
+  have hmapS : S.map E.subtype = Ch02.socle G ⊓ E :=
+    Subgroup.map_subgroupOf_eq_of_le inf_le_right
+  refine le_socle_of_exists_normal_complement
+    ⟨T.map E.subtype, ?_, Subgroup.map_subtype_le T, ?_, ?_⟩
+  · refine normal_map_subtype_of_conj_invariant ?_
+    intro g x hx
+    exact hW'inv (QuotientGroup.mk g) hx
+  · refine le_bot_iff.mp ?_
+    rintro x ⟨hx1, hx2⟩
+    obtain ⟨t, ht, rfl⟩ := Subgroup.mem_map.mp hx2
+    have hsS : t ∈ S := by
+      rw [hS, Subgroup.mem_subgroupOf]
+      exact hx1
+    have hmem : t ∈ S ⊓ T := ⟨hsS, ht⟩
+    rw [disjoint_iff.mp hcomplST.disjoint, Subgroup.mem_bot] at hmem
+    rw [hmem]
+    simp
+  · rw [← hmapS, ← Subgroup.map_sup, (codisjoint_iff.mp hcomplST.codisjoint),
+      ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+
+open scoped IsMulCommutative in
+/-- **Isaacs Problem 10B.2** (書籍 p. 312) ⭐ (指数条件の形): `E ◁ G` が指数 `p` の
+可換群で `p ∤ |G : C_G(E)|` なら `E ≤ Soc(G)`. -/
+theorem le_socle_of_isElementaryAbelian_of_not_dvd_index {G : Type*} [Group G] [Finite G]
+    {p : ℕ} [Fact p.Prime] {E : Subgroup G} [E.Normal] [IsMulCommutative ↥E]
+    (hexp : ∀ x : ↥E, x ^ p = 1)
+    (hidx : ¬ p ∣ (Subgroup.centralizer (E : Set G)).index) :
+    E ≤ Ch02.socle G := by
+  letI : Module (ZMod p) (Additive ↥E) := zmodModule_of_pow_eq_one (n := p) hexp
+  exact le_socle_of_module_of_not_dvd_index hidx
 
 end
 
