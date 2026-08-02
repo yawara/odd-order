@@ -378,6 +378,35 @@ theorem fgh_residualQuotient_eq (hXD : X ≤ hyp.D)
     (Subgroup.mem_subgroupOf.mpr hxQ) hx1
   exact ⟨hf, hh⟩
 
+/-- **The projection `U → U/Z(U)` is injective on `Q ∩ U`** (Peterfalvi Part II,
+Ch. IV §4, step (3), p. 133).
+
+`Z(U) ≤ D` (the standing `hZD`) and `Q ⊓ D = 1` in any rank-one setup
+(`Setup.Q_inf_D_eq_bot`), so the kernel meets `Q` trivially.  That is what upgrades the
+conclusions of step (2) — computed on `U/Z(U)` — to equations in `U` itself. -/
+theorem eq_of_mk_eq_of_mem_Q (hXD : X ≤ hyp.D)
+    (htX : hyp.t ∈ Subgroup.centralizer (X : Set G))
+    (hCQ : IsPGroup 2 ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))))
+    (hZD : Subgroup.center ↥(residualImage (G := G) X)
+      ≤ hyp.D.subgroupOf (residualImage (G := G) X))
+    {x y : ↥(residualImage (G := G) X)} (hxQ : (x : G) ∈ hyp.Q) (hyQ : (y : G) ∈ hyp.Q)
+    (hmk : QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) x
+      = QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) y) :
+    x = y := by
+  have hdiv : x⁻¹ * y ∈ Subgroup.center ↥(residualImage (G := G) X) := by
+    rw [← QuotientGroup.eq]
+    exact hmk
+  have hD : x⁻¹ * y ∈ hyp.D.subgroupOf (residualImage (G := G) X) := hZD hdiv
+  have hQ : x⁻¹ * y ∈ hyp.Q.subgroupOf (residualImage (G := G) X) :=
+    Subgroup.mul_mem _ (Subgroup.inv_mem _ (Subgroup.mem_subgroupOf.mpr hxQ))
+      (Subgroup.mem_subgroupOf.mpr hyQ)
+  have hbot := (hyp.rankOneSetup_residual hXD htX hCQ).Q_inf_D_eq_bot
+  have hone : x⁻¹ * y = 1 := by
+    have : x⁻¹ * y ∈ (hyp.Q.subgroupOf (residualImage (G := G) X)) ⊓
+        (hyp.D.subgroupOf (residualImage (G := G) X)) := ⟨hQ, hD⟩
+    rwa [hbot, Subgroup.mem_bot] at this
+  exact inv_mul_eq_one.mp hone
+
 end Centralizer
 
 universe u v
