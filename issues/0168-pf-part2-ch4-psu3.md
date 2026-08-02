@@ -8279,3 +8279,20 @@ commit `3b2c18ab4`。`stepOne_chain_of_h`:
    `Z(U) ≤ D` から `V` まで言えるか要実測)。
 2. `stepOne_chain_of_h` に `d = ζ³η` で当てる。
 3. E 座標へ落とす (`stepTwo_linear` が手本、`η` の項だけ半線形)。
+
+### (181) §4 の群レベル連鎖が landing — `stepOne_chain_of_h_eq_mul`
+
+commit 済。`h ω = ζ³η` + `t η t = η` ⟹ 書籍 p.133 の displayed 式
+
+> `a² f(ω^{ζ⁻¹} s^a) a⁻² s^a = (ζ³η) · f(s^a ω^ζ) · (ζ³η)⁻¹ · ω^{ζ⁻¹}`
+
+⚠ `t η t = η` は §4 では自動 — `η ∈ Z(U)` かつ `t ∈ U` (`t_mem_residual`) なので
+中心の元として `t` と可換。
+
+**残り** = E 座標へ落として (4) を出す 1 段:
+* 手本は `stepTwo_linear` (`PSU3SectionThree.lean`) — `s^a ∈ Q₀` は消え、
+  `ζ`/`a²` の共役はスカラー倍。
+* **`η` の共役だけが半線形** (Appendix I Prop 2 = `SemilinearField.lean:196`)。
+  ⟹ 結論 `a²·Y = ζ⁻¹·Y^η + ω̄` = 書籍の **(4)**。
+* (3) は §2 (2) だけから同様に。
+* 以後は `PSU3SectionFourArithmetic` の既存補題へ配線して Ch. IV 完了。
