@@ -84,4 +84,36 @@ noncomputable def linearOfMulAutHom {G : Type*} [Group G] (φ : G →* MulAut E)
 theorem linearOfMulAutHom_apply {G : Type*} [Group G] (φ : G →* MulAut E) (g : G) (x : E) :
     linearOfMulAutHom (n := n) φ g (Additive.ofMul x) = Additive.ofMul (φ g x) := rfl
 
+/-! ## 正規部分群への共役作用 -/
+
+/-- 正規部分群への共役作用は中心化群を殺す. -/
+theorem conjNormal_eq_one_of_mem_centralizer {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    {g : G} (hg : g ∈ Subgroup.centralizer (N : Set G)) :
+    (MulAut.conjNormal g : MulAut ↥N) = 1 := by
+  ext h
+  rw [MulAut.conjNormal_apply]
+  have hcomm := (Subgroup.mem_centralizer_iff.mp hg) (h : G) h.2
+  calc (g : G) * (h : G) * g⁻¹ = ((h : G) * g) * g⁻¹ := by rw [hcomm]
+    _ = (h : G) := by group
+
+open scoped IsMulCommutative in
+/-- **`N ◁ G` が可換なら, 共役作用は `G ⧸ C_G(N)` の `ZMod n`-線形表現を定める.**
+
+Maschke (`MonoidAlgebra.Submodule.exists_isCompl`) は `p ∤ |G ⧸ C_G(N)|` のときに
+この表現へ適用できる. -/
+noncomputable def conjQuotientLinear {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    [IsMulCommutative ↥N] {n : ℕ} [Module (ZMod n) (Additive ↥N)] :
+    (G ⧸ Subgroup.centralizer (N : Set G)) →*
+      (Additive ↥N) →ₗ[ZMod n] (Additive ↥N) :=
+  linearOfMulAutHom
+    (QuotientGroup.lift (Subgroup.centralizer (N : Set G)) MulAut.conjNormal
+      fun _ hg => conjNormal_eq_one_of_mem_centralizer hg)
+
+open scoped IsMulCommutative in
+@[simp]
+theorem conjQuotientLinear_apply {G : Type*} [Group G] {N : Subgroup G} [N.Normal]
+    [IsMulCommutative ↥N] {n : ℕ} [Module (ZMod n) (Additive ↥N)] (g : G) (x : ↥N) :
+    conjQuotientLinear (n := n) (QuotientGroup.mk g) (Additive.ofMul x)
+      = Additive.ofMul (MulAut.conjNormal g x) := rfl
+
 end OddOrder.GroupTheory
