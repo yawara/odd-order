@@ -7469,3 +7469,35 @@ leaf build では衝突が見えず素通り → フルビルドで `has already
 `4102db2c8` で撤回。**橋は既存補題をそのまま使えばよい**。
 ⚠ 書く前に概念名で grep する ([[grep-before-writing-transport-defs]])。
 ⚠ 新規宣言は leaf build が green でも**フルビルドまで名前衝突を検出しない**。
+
+### (152) 🎯 `hodd` = 「モデル自身の twist が奇位数」1 文に還元 — type-`B` transport は不要になった
+
+(151) で「認識定理の露出リファクタが要る」と書いたが、**もっと短い道があった** (commits
+`705163994`, `6b749895e`)。
+
+**(a) ペア補題を一般化** (`705163994`): Ch. III §3 の `d` は座標の取り替えで `2ⁱ d` になる
+ので、手元の関係は `a^d = a·φ(a)` でなく `a^d = ψ(a)·φ(ψ(a))`。`RingAut F` は可換ゆえ
+twist `σ⁻¹τ` は `φ^{±1}` のまま。⟹ **`d` の `1 + 2^t` 正規化は不要**。
+
+**(b) `hshape` はモデルから直接出る** (`6b749895e`): `thetaModel_eq_id_on_frobFixed` の
+証明内部に `μ(k)·θ(μ(k)) = μ(k)^d` があった (cocycle の半線形性 `hsemi` と `K`-scaling
+`hscaleQ0` を `x = y = 1` で評価; anisotropy より `φ(1,1) ≠ 0`)。これを
+`zpow_eq_mul_thetaModel` として切り出し、`μ(K) = F^×` と合わせて
+**`a^d = a·θ(a)` on `F^×`** を得た。
+
+⟹ `odd_orderOf_scalingPair_restrict_of_model`:
+
+> `hsemi` + `haniso` + `hscaleQ0` + `hscale` + **`Odd (orderOf (θ|_F))`**
+> ⟹ `Odd (orderOf ((σ|_F)⁻¹ · τ|_F))` (= `stepThree_of_odd` の `hodd`)
+
+**`θ` はモデル自身の cocycle の twist** — `IsStandardModel` が `hsemi` と一緒に返すもの。
+⟹ **体の同定も、`d` の正規化も、認識定理の露出リファクタも一切不要**。
+
+**残る唯一の入力**: `Odd (orderOf (θ|_F))`。これは Appendix III Def 3 の `θ` そのもので、
+`Suzuki2Groups.TypeBData.phi_orderOf_odd` が持っている。結び付けは
+「モデルの cocycle `φ` と type-`B` の平方写像が同じもの」という**1 点の同定**のみ
+(`typeBQuadraticMap_smul` が既存の橋)。
+
+**次**: `IsStandardModel` の `θ` について `Odd (orderOf (θ|_F))` を出す。
+`isTypeB_Q_of_orderThree_of_mem_W` の `TypeBData` と、`exists_bilinear_lift_normalized`
+が返す `θ` を突き合わせる。
