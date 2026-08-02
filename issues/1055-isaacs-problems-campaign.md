@@ -7186,7 +7186,7 @@ Fable 5 単独で解決** (9C.3 は形式化まで完了; 9D.4 / 10A.3 後半は
 |---|---|
 | `T v` (可換 + `is_conj`) | ✅ **2026-08-02**: `OddOrder/GroupTheory/Transvection.lean` — `LinearMap.transvection v f hf` / `transvectionSubgroup v` / `transvectionSubgroup_isMulCommutative` / `transvectionSubgroup_map_conj`。axiom-clean |
 | `MulAut E ≃* (V ≃ₗ[ZMod 2] V)` | 未 (`AddCommGroup.zmodModule` で `Module (ZMod 2) (Additive E)` を作る) |
-| 作用 + faithful + 2-推移性 | 未 |
+| 作用 + faithful + 2-推移性 | ✅ **2026-08-03**: `OddOrder/GroupTheory/NonzeroVectorAction.lean` — `NonzeroVector K V` への `MulAction` / `FaithfulSMul` / `exists_linearEquiv_apply_eq_of_linearIndependent` / `linearIndependent_pair_of_ne_of_ne_zero` (𝔽₂ 固有) / `isPreprimitive_nonzeroVector`。⚠ 2 元体は `K = ZMod 2` に固定せず `∀ x : K, x = 0 ∨ x = 1` で持つ |
 | `is_generator` | 未 — mathlib の `Matrix.diagonal_transvection_induction_of_det_ne_zero` (Gauss 消去) が使える。`ZMod 2` では可逆対角行列は単位行列だけなので「transvection が生成」が直ちに出る |
 | perfect | 未 |
 
