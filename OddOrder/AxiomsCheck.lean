@@ -25,6 +25,7 @@ import OddOrder.GroupTheory.RankOneBNPair
 import OddOrder.GroupTheory.Transvection
 import OddOrder.GroupTheory.NonzeroVectorAction
 import OddOrder.GroupTheory.ElementaryAbelianLinear
+import OddOrder.GroupTheory.LinearGroupSimple
 import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
@@ -15156,3 +15157,7 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.GroupTheory.exists_dual_eq_zero_eq_one
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.exists_mem_ker_ne_zero_ne
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.commutator_linearEquiv_eq_top
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isSimpleGroup_linearEquiv
