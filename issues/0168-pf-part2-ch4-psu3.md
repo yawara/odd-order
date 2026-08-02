@@ -8652,3 +8652,23 @@ def W : Subgroup G := hyp.V ⊓ Subgroup.centralizer hyp.KSet   -- Basic.lean:18
 ⟹ その後は `coordFieldAut_eq_id_on_frobFixed_of_sq` →
 `coordFieldAut_eq_id_of_fixes_frobFixed` → `mem_W_of_coordFieldAut_eq_id` →
 `h(ω) = ζ³η ∈ W` → §3 Corollary 1 で **Ch. IV 完了**。
+
+### (196) 🎯 `sectionFour_ten_of_mem_frobFixed` — (10) を全 admissible `X ∈ F^×` で
+
+`a` と `b` を**仮定でなく生成する**版:
+* `a` = `exists_mem_K_coordFieldAut_sq_inv_eq` ((195))
+* `b` = 既存の `stepTen_exists` (`PSU3Preliminary.lean:1192`)。⚠ 向きが逆
+  (`b⁻¹ s b = y·(a s a⁻¹)`) なので `a := a⁻¹`, `b := b⁻¹` で当てる。
+  side condition `y·s^{a⁻¹} ≠ 1` = 書籍の `a ≠ α^{-τ}` → `hadm` に hoist。
+* `f`-値の `Q` 所属 = `ω s^a ∈ Q − Q₀` が非自明 ⟹ `IsFGH.mem`。
+
+**残り = 最後の 1 段**:
+`hadm` が失敗する `X` が高々 2 点であること (+ shift 用に `X+1` 側で 2 点) を数え、
+`coordFieldAut_sq_eq_id_of_ten` の `S : Finset ↥F` (|S| ≤ 4) を作る。
+* 悪い `a` は `a⁻¹ s a = y⁻¹` を満たすもの ⟹ `injOn_conj_KSet` により高々 1 個。
+* `a ↦ X(a)` は単射 (全射性の構成が全単射の合成) ⟹ 悪い `X` は高々 1 個 + `0`。
+* `2·4 < 2^m = q = ℓ^p` は `ℓ > 2`, `p ≥ 3` ⟹ `q ≥ 27` から。
+その後は
+`coordFieldAut_sq_eq_id_of_ten` → `coordFieldAut_eq_id_on_frobFixed_of_sq` →
+`coordFieldAut_eq_id_of_fixes_frobFixed` → `mem_W_of_coordFieldAut_eq_id` →
+`h(ω) = ζ³η ∈ W` → §3 Corollary 1 で **Ch. IV 完了**。

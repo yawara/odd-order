@@ -45,6 +45,8 @@ membership facts it needs on the model:
 * `Hypothesis.coordFieldAut_sq_eq_id_of_ten` — the density step: `μ²` fixing all but a
   sparse subset of `F` fixes all of `F`.
 * `Hypothesis.sectionFour_ten_at` — the whole chain (3)→(10) run at one admissible `a`.
+* `Hypothesis.sectionFour_ten_of_mem_frobFixed` — the same at every admissible `X ∈ F^×`,
+  with `a` and `b` produced rather than assumed.
 -/
 
 set_option autoImplicit false
@@ -528,6 +530,77 @@ theorem sectionFour_ten_at {f g k : G → G}
   · rw [map_add, map_inv₀, hsigC]
   · rw [map_inv₀]
     exact htr
+
+include hyp in
+/-- **🎯 (10) at every admissible `X ∈ F^×`** (Peterfalvi Part II, Ch. IV §4, p. 134).
+
+`exists_mem_K_coordFieldAut_sq_inv_eq` produces the `a ∈ K` with `a^{-2μ} = X`, the book's
+`b` comes from `stepTen_exists` (its side condition `y · s^{a⁻¹} ≠ 1` is the book's
+`a ≠ α^{-τ}`, here hoisted into `hadm`), and `sectionFour_ten_at` runs the chain.
+
+The two `f`-values are in `Q` because `ω s^a ∈ Q − Q₀` is nontrivial, so `IsFGH.mem`
+applies. -/
+theorem sectionFour_ten_of_mem_frobFixed {f g k : G → G}
+    (H : OddOrder.GroupTheory.RankOneBNPair.IsFGH hyp.H hyp.Q hyp.D hyp.t f g k)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (M : hyp.QuotientFieldModel m) (s : hyp.LemmaFiveSetup m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    {ζ ω y η : G} (hζ : ζ ∈ hyp.W) (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hsqω : ω * ω = y)
+    (hf : f ω = ζ⁻¹ * ω⁻¹ * ζ) (hηζ : η * ζ = ζ * η) (hkω : k ω = ζ ^ 3 * η)
+    (htη : hyp.t * η * hyp.t = η) (hηD : η ∈ hyp.D) (hηω : η * ω * η⁻¹ = ω)
+    (hznot : ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)
+      ∉ OddOrder.FiniteField.frobFixedSubfield M.E 2 m)
+    {X : M.E} (hXF : X ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) (hX0 : X ≠ 0)
+    (hadm : ∀ (a : G) (haK : a ∈ hyp.K),
+      (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+        ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E))⁻¹ = X →
+      y * (a⁻¹ * hyp.distinguishedInvolution * a) ≠ 1)
+    {s₀ : M.E}
+    (hs₀ : s₀ = ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹
+      + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)) :
+    (s₀ + hyp.coordFieldAut s M hm hQ0card hηD hζ hznot X) * X
+      = (s₀ + hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
+          (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot X))
+        * hyp.coordFieldAut s M hm hQ0card hηD hζ hznot X := by
+  obtain ⟨a, haK, hXa⟩ :=
+    hyp.exists_mem_K_coordFieldAut_sq_inv_eq M s hm hQ0card hηD hζ hznot hXF hX0
+  have hne := hadm a haK hXa
+  -- `ω⁴ = 1`, so `f(ω) = (ω y)^ζ`
+  have hy2 : y * y = 1 := by
+    have hq := hyp.sq_eq_one_of_mem_Q0 hyQ0
+    rwa [sq] at hq
+  have hω4 : ω * y = ω⁻¹ := by
+    have h4 : ω * ω * (ω * ω) = 1 := by rw [hsqω]; exact hy2
+    calc ω * y = ω * (ω * ω) := by rw [hsqω]
+      _ = (ω * ω * (ω * ω)) * ω⁻¹ := by group
+      _ = ω⁻¹ := by rw [h4, one_mul]
+  have hfω : f ω = ζ⁻¹ * (ω * y) * ζ := by rw [hω4]; exact hf
+  -- the book's `b`
+  have haiK : a⁻¹ ∈ hyp.K := hyp.K.inv_mem haK
+  have hne' : y * (a⁻¹ * hyp.distinguishedInvolution * a⁻¹⁻¹) ≠ 1 := by rwa [inv_inv]
+  obtain ⟨b, hbK, hbconj, -⟩ :=
+    hyp.stepTen_exists H hC2 hζ hωQ hωQ0 hyQ0 haiK hfω hne'
+  have hbiK : b⁻¹ ∈ hyp.K := hyp.K.inv_mem hbK
+  have hb : b⁻¹ * hyp.distinguishedInvolution * b⁻¹⁻¹
+      = y * (a⁻¹ * hyp.distinguishedInvolution * a) := by
+    rw [inv_inv, hbconj, inv_inv]
+  -- the two `f`-values lie in `Q`
+  have hmemQ : ∀ {c : G}, c ∈ hyp.K →
+      f (ω * (c * hyp.distinguishedInvolution * c⁻¹)) ∈ hyp.Q := by
+    intro c hc
+    have hzQ0 : c * hyp.distinguishedInvolution * c⁻¹ ∈ hyp.Q0 :=
+      hyp.conj_mem_Q0_of_mem_D (hyp.K_le_D hc) hyp.distinguishedInvolution_mem_Q0
+    obtain ⟨hprodQ, hprodQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hzQ0
+    exact (H.mem _ hprodQ (fun hc1 => hprodQ0 (hc1 ▸ hyp.Q0.one_mem))).1
+  have haKset : a ∈ hyp.KSet := by rw [← SetLike.mem_coe, hyp.coe_K] at haK; exact haK
+  have hbiKset : b⁻¹ ∈ hyp.KSet := by
+    rw [← SetLike.mem_coe, hyp.coe_K] at hbiK; exact hbiK
+  exact hyp.sectionFour_ten_at H hC2 M s hZ hm hQ0card hζ hωQ hωQ0 hyQ0 hsqω haK haKset
+    hbiKset (pow_mem hbiK 2) hf hηζ hkω htη hηD hηω hznot hb (hmemQ haK) (hmemQ hbiK)
+    hs₀ hXa.symm
 
 end Hypothesis
 
