@@ -8731,3 +8731,39 @@ def W : Subgroup G := hyp.V ⊓ Subgroup.centralizer hyp.KSet   -- Basic.lean:18
 パラメータ化されているので、`X := s4.P` と
 `isStandardModel_centralizerQuotient` (`PSU3SectionFourIntrinsic.lean:1350`)
 から `details` を組む配管が要る。
+
+### (200) 残り配線の配管図 (実測)
+
+step (3) の `details : CentralizerPSUData hyp X result data` は次の鎖で作れる
+(すべて既存、新しい数学は無い):
+
+```
+centralizer_trichotomy_of_induction hyp hXV hX hA3 ih
+    : Nonempty (CentralizerTrichotomyData hyp X)          -- CentralizerTrichotomy.lean:217
+  └─ .branch : CentralizerBranchData hyp X result          -- 同 :179 (inductive)
+       ↓ nonempty_psu3Data_of_orderOf_eq_three br hord hnea   -- 同 :370
+         (hord : orderOf (s·t) = 3、hnea = s4.not_isElementaryAbelian_cQ)
+    : Nonempty (Σ' data, (result.target = psu3 data) ×' CentralizerPSUData hyp X result data)
+  └─ exists_f_eq_conj_inv_residual Hfgh hXV hX details hXD htX hCQ hZD ih
+                                                          -- PSU3SectionFourStepThree.lean:115
+    : ∃ z x, z ∈ D ∧ x ∈ Q ∧ x ∉ Q0 ∧ f x = z⁻¹x⁻¹z ∧ ∃ c ∈ Z(U), h x = (z³c : G)
+```
+
+`X := s4.P` で当てる。追加で要るもの:
+* `hXD : s4.P ≤ hyp.D` = `s4.P_le_D` ✓
+* `htX : t ∈ C(P)` = `s4.t_mem_centralizer` ✓
+* `hCQ : IsPGroup 2 (Q.subgroupOf C(P))` — `centralizer_cQ_isPGroup_of_quotient` 経由
+* `hZD : Z(U) ≤ D.subgroupOf U` — ⚠ 要調査 (`U = residualImage P`)
+* `hA3` (4 元の基本可換部分群) — 周囲の仮説として引き回す
+* `hX : s4.P ≠ ⊥` — `card_P` + `prime_cardP` から
+
+そのあと `sectionFour_mem_W` の各仮説へ:
+* `ζ₁ := z ∈ D ∩ U`、`η := c ∈ Z(U)`
+* `ζ` (∈ `C_W(P)`) は `inf_le_sup_centralizer_W` の分解 + (198) の 2 補題
+* `hηD`/`hηV`: `Z(U) ⊆ P ≤ V ≤ D` (`eq_P_of_centralizes`)
+* `hηζ`/`hηω`: `η ∈ P`、`ζ ∈ C_W(P)`、`ω ∈ C_Q(P)`
+* `htη`: `η ∈ Z(U)`, `t ∈ U` (`t_mem_primeComplementResidual`)
+* `hηord`: `η ∈ P`、`|P| = cardP` 奇素数
+* `hq`: (199) の `eight_lt_natCard_Q0`
+* `hznot`: `mu_W_notMem_frobFixed M hmu (ζ ≠ 1)`
+* `y := ω*ω ∈ Q0`、`hsqω := rfl`
