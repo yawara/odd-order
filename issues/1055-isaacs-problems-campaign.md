@@ -7134,6 +7134,28 @@ deferred だった step (b) の未解決点は **Thm 2.6 (Wielandt) がそのま
 (I) の endgame (半単純の正規部分群 = 部分積、は `Semisimple.lean` / Problems9A 圏を実測) →
 (II)。すべて教科書レベルの標準事実のみで、CFSG 系の外部入力は不要。
 
+## 9D.4 の Lean 側の枠組み — 極小反例の述語 (2026-08-03 決定)
+
+(F1)(F2)(F3) の 3 降下がすべて landing した (`KegelHypothesis.subgroupOf` /
+`KegelHypothesis.map_mk` / `KegelHypothesis.infNormal`)。次は極小反例の skeleton。
+
+**「極小反例」の Lean での持ち方** — 降下先 (`↥H` と `G ⧸ N`) は `G` と同じ universe に
+いるので、同 universe 内の全群にわたる極小性で足りる:
+
+```lean
+def IsKegelMinimalCounterexample {G : Type u} [Group G] [Finite G] (S : Subgroup G) : Prop :=
+  KegelHypothesis S ∧ ¬ S.IsSubnormal ∧
+    ∀ (H : Type u) (_ : Group H) (_ : Finite H) (T : Subgroup H),
+      Nat.card T + Nat.card H < Nat.card S + Nat.card G → KegelHypothesis T → T.IsSubnormal
+```
+
+skeleton の各段でこの第 3 成分を `↥H` / `G ⧸ N` に当てる。必要な補助:
+
+* `S ◁◁ H` かつ `H ◁◁ G` ⟹ `S ◁◁ G` (subnormality の推移性、Ch02 に既存のはず — 要実測)
+* `N ≤ H` かつ `H/N ◁◁ G/N` ⟹ `H ◁◁ G` (対応定理、要実測 or 新規)
+* `Nat.card (G ⧸ N) < Nat.card G` (`N ≠ ⊥`) / `Nat.card (S.map (mk' N)) ≤ Nat.card S`
+* 正規閉包の真降下 `T ◁◁ K`, `T < K` ⟹ `T^K < K` (skeleton 4 と (II) 4 の両方で使う)
+
 ## 10A.3 後半 (A は基本可換) 解決 — Fable 5 単独・紙の証明 (2026-07-30)
 
 statement 再確認 (p. 308): `|Z(P)| = p`, `A` abelian, `|P:A| = p`, `Z(P)` は `A` の直積因子
