@@ -58,6 +58,18 @@ Hypothesis.SectionFourSetup.exists_mem_W
 
 ⟹ **実装済** (`inf_le_centralizer_centralizer_Q0`)。`exists_mem_W` の仮説からも外れた。
 
+## `V̄`-元の持ち上げは `V` に留まる (2026-08-02)
+
+`SectionFourSetup.eq_one_of_conj_t_mem_P`: 任意の `ζ` に対し
+`c := ζ⁻¹·ζ^t` は `c^t = c⁻¹` を満たす (`t² = 1` の 2 行計算)。
+もし `c ∈ P` なら `t ∈ C_G(P)` で `c^t = c` なので `c = c⁻¹`、
+`P` は奇数位数だから **`c = 1`**。
+
+⟹ `V̄`-元の持ち上げ `ζ₁ ∈ D ∩ U` は `[ζ₁,t] ∈ Z(U) ⊆ P` を持つので
+`[ζ₁,t] = 1`、すなわち **`ζ₁ ∈ V`**。持ち上げの `V`-所属は自動。
+
+残るのは `ζ₁ ∉ P` の方だけ (書籍の `(V∩U)/(P∩U) ≠ 1`)。
+
 ## 残り = **`ζ₁ ∈ (V ∩ U) − (P ∩ U)` の存在 1 つだけ**
 
 書籍 §4 step (2) (p. 133)「`|(V∩U)/(P∩U)| = (ℓ+1)/(ℓ+1,3) ≠ 1` since `ℓ > 2`」。
