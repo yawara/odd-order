@@ -13,6 +13,7 @@ import OddOrder.Algebra.SemilinearFixedPoint
 import OddOrder.Algebra.PrincipalIdealTheorem
 import OddOrder.Algebra.QuadraticMapCoordinates
 import OddOrder.GroupTheory.AInvariantComplement
+import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.QuaternionRecognition
 import OddOrder.GroupTheory.SolvablePrimeIndex
 import OddOrder.GroupTheory.AInvariantPiSubgroups

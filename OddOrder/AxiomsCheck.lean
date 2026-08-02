@@ -154,6 +154,7 @@ import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10B
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10C
+import OddOrder.GroupTheory.PRegularElement
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
@@ -404,7 +405,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 15300
+set_option linter.style.longFile 15400
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -15284,6 +15285,19 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch10.pow_eq_one_of_isRoot_charpoly_regularMatrixC
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch10.coeff_one_of_pow_eq_one
+
+/-! **`p`-regular elements and the `p` / `p'` decomposition** (`GroupTheory.PRegularElement`,
+issue 9506 = the bottom-up first stage of the modular character theory needed for the Q₈
+Brauer--Suzuki case, issue 0147).  mathlib has no `p`/`p'` factorisation of a group element. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.pRegularPart_mul_pPart
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isPElement_pPart
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isPRegular_pRegularPart
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.eq_pPart_of_commute
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isMetacyclic_semidirectProduct
 #assert_only_allowed_axioms
