@@ -7974,3 +7974,19 @@ theorem corollaryTwo_intrinsicResidualQuotient … :
 4. 内在側の三つ組は `exists_fgh_mapsTo`、`corollaryTwo_conclusion_of_mulEquiv` で移送
 ⚠ `intrinsicResidualQuotient` と `intrinsicResidualQuotientULift` の使い分けに注意
 (照合同型は前者、標準モデルは後者)。
+
+### (167) 🎯🎯 段 (2) 完了 — 内在版 `corollaryTwo_intrinsicResidualQuotient`
+
+commit 済。書籍 p.133 の段 (2) が、書籍の意味の写像 (`f₁`,`h₁` = 内在仮説の三つ組) に
+ついて**未証明仮説ゼロで**成立:
+
+> `∀ ζ ∈ W^#`, `∃ f₂ g₂ k₂`, `IsFGH … ∧ ∃ ω ∈ Q − Q₀`, `f₂ ω = ζ⁻¹ω⁻¹ζ ∧ k₂ ω = ζ³`
+
+経路: `corollaryTwo_residualQuotient` → `exists_mulEquiv_match_residualQuotient_t`
+→ `corollaryTwo_conclusion_of_mulEquiv`。
+
+**このセッションの成果** (段 154-167): `hpair` / `hsq` / `hhW` の特殊化債務 3 本を返済し、
+§2 の閉じの Proposition (p.129) を証明し、段 (2) を transported/内在の両方で閉じた。
+
+**次**: Ch. IV §4 の段 (3) 以降 (p.133-134)。段 (2) の結論を `U` 内へ読み戻す
+(`IsFGH.map` の docstring が言う "back inside `U`") ところから。
