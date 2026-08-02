@@ -8192,3 +8192,21 @@ commit `de912f257`。書籍 p.134 の最終ステップ (`μ² = 1` から `μ =
 ⚠ 教訓 ([[grep-before-writing-transport-defs]]): 着手前に `PSU3SectionFour*` の
 **5 ファイル**を必ず確認する (Arithmetic / Setup / Model / CorollaryTwo / Intrinsic /
 StepThree)。ページ画像だけ見て「未形式化」と判断しない。
+
+### (177) 段 (3) に `h` 側を追加 — `η` が定義可能に
+
+`exists_f_eq_conj_inv_residual` の結論に `∃ c ∈ Z(U), h ω = (z³c : G)` を追加
+(書籍 p.133 の `h(ω) ∈ ζ³P`; 核 `Z(U)` が書籍の `P ∩ U`)。
+
+⟹ **`η := (z³)⁻¹ h₁ x ∈ Z(U)`** が §4 の (3)(4) で使う元。
+
+**§4 の残り (群側)**:
+* **(3)** `f(ωs^a)‾ = ζa⁻²·f(ωs^b)‾`
+* **(4)** `a²·f(ωs^a)‾ = ζ⁻¹·(f(ωs^a)‾)^η + ω̄`
+  導出は書籍 p.133 の
+  `f(ω⁻¹s^{a⁻¹}) = f(f(ω⁻¹)s^a)^{a²}s^a = f(g(ω⁻¹)s^a)^{h(ω⁻¹)^t}f(ω⁻¹)`
+  — 前者が §2 (2) = `f_mul_conj_distinguishedInvolution`
+  (`PSU3Preliminary.lean:137`)、後者が §2 (3) =
+  `f_conj_distinguishedInvolution_mul` (同 l.162)。**どちらも既存**。
+* `η` の半線形性 (Appendix I Prop 2) で体自己同型 `μ` を取り出す
+* 既存の体計算 (`PSU3SectionFourArithmetic`) へ配線
