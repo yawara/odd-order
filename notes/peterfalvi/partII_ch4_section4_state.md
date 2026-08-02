@@ -103,3 +103,26 @@ docstring が「書籍の `(ℓ+1)/(ℓ+1,3) ≠ 1` を step (2) が使う形」
 * `show` は style linter に掛かる — `change` を使う。
 * AxiomsCheck の登録名は `namespace Hypothesis` 内なら `Hypothesis.` を付ける
   (leaf build では検出できず、フルビルドで初めて赤になる)。
+
+## 残り 1 本の組立てレシピ (2026-08-02、実装は次セッション)
+
+`exists_mem_W` から `{ζ₁} (hζ₁V) (hζ₁U) (hζ₁P)` を外し、`details` を得た直後に
+内部で作る:
+
+```
+obtain ⟨zeta, hzetaW, hzeta1⟩ := exists_ne_one_mem_W_intrinsicResidualQuotient details …
+have hzetaV : zeta ∈ (intrinsic).V := by rw [V_eq_W_intrinsicResidualQuotient …]; exact hzetaW
+obtain ⟨z₀, hz₀D, hz₀eq⟩ := hzetaV.1            -- D̄ = (D∩U) の像
+-- [z₀,t] ∈ Z(U) ⊆ P ⟹ = 1  (eq_one_of_conj_t_mem_P)
+--   hzetaV.2 : zeta ∈ centralizer {t̄}  →  mk(t̄·z₀) = mk(z₀·t̄)
+--   → QuotientGroup.eq → (t̄z₀)⁻¹(z₀t̄) ∈ Z(U) → hZP で ∈ P
+have hzV : (z₀:G) ∈ V    -- ⟨hz₀D, mem_centralizer_singleton_iff.mpr …⟩
+have hzP : (z₀:G) ∉ P := notMem_P_of_mk_ne_one … (hz₀eq ▸ hzeta1)
+-- 以降は現行の本体 (step (3) を `zeta` で呼び、持ち上げ差を `Z(U) ⊆ P` で吸収)
+```
+
+⚠ 一度 WIP で書いたが 3 箇所の型不一致 (coercion 周り) で止まり、`sorry` を
+入れない方針で revert した。詰まりどころ:
+* `hcomm` の向き (`mem_centralizer_singleton_iff` は `a*b = b*a`)
+* `hker` を `hZP` に渡すときの `⟨_, _⟩` の形 (`simpa` が過剰簡約する)
+* `eq_one_of_conj_t_mem_P` の `heq` は `ζ⁻¹ * (t*ζ*t) = c` の形ちょうど
