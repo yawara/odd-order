@@ -126,11 +126,13 @@ theorem exists_f_eq_conj_inv_residual {f g h : G → G}
     ∀ ζ ∈ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).W, ζ ≠ 1 →
       ∃ z x : ↥(residualImage (G := G) X), (z : G) ∈ hyp.D ∧ (x : G) ∈ hyp.Q ∧
         (x : G) ∉ hyp.Q0 ∧
-        f (x : G) = (z : G)⁻¹ * (x : G)⁻¹ * (z : G) := by
+        f (x : G) = (z : G)⁻¹ * (x : G)⁻¹ * (z : G) ∧
+        ∃ c ∈ Subgroup.center ↥(residualImage (G := G) X),
+          h (x : G) = ((z ^ 3 * c : ↥(residualImage (G := G) X)) : G) := by
   letI := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   intro ζ hζW hζ1
-  obtain ⟨f₂, g₂, k₂, H₂, ω, hωQ, hωQ0, hfω, -⟩ :=
+  obtain ⟨f₂, g₂, k₂, H₂, ω, hωQ, hωQ0, hfω, hkω⟩ :=
     hyp.corollaryTwo_intrinsicResidualQuotient hXV hX details hXD htX hCQ hZD ih ζ hζW hζ1
   obtain ⟨f₁, g₁, h₁, H₁, hamb⟩ := hyp.exists_fgh_residual Hfgh hXD htX hCQ
   obtain ⟨x, hxQ, hxω⟩ := hωQ
@@ -161,7 +163,7 @@ theorem exists_f_eq_conj_inv_residual {f g h : G → G}
   have hxU1 : x ≠ 1 := fun hc => hx1 (by rw [hc, map_one])
   have hxne : (x : G) ≠ 1 := fun hc => hxU1 (Subtype.ext hc)
   -- the equation between the images
-  obtain ⟨hf₂, -⟩ := hyp.fgh_residualQuotient_eq hXD htX hCQ hZD H₁ H₂ hxQ' hx1
+  obtain ⟨hf₂, hk₂⟩ := hyp.fgh_residualQuotient_eq hXD htX hCQ hZD H₁ H₂ hxQ' hx1
   have hmk : QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) (f₁ x)
       = QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X))
         (z⁻¹ * x⁻¹ * z) := by
@@ -173,10 +175,20 @@ theorem exists_f_eq_conj_inv_residual {f g h : G → G}
   have heq : f₁ x = z⁻¹ * x⁻¹ * z :=
     hyp.eq_of_mk_eq_of_mem_Q hXD htX hCQ hZD (Subgroup.mem_subgroupOf.mp hfQ₁)
       (Subgroup.mem_subgroupOf.mp hconj) hmk
-  refine ⟨z, x, hzD', hxQ', hxQ0, ?_⟩
-  rw [← (hamb x hxQ' hxne).1, heq]
-  push_cast
-  rfl
+  -- the `h`-half: `h(ω)` is `ζ³` modulo the kernel `Z(U)`
+  have hkmk : QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) (h₁ x)
+      = QuotientGroup.mk' (Subgroup.center ↥(residualImage (G := G) X)) (z ^ 3) := by
+    rw [← hk₂, hxω, hkω, ← hzζ, ← map_pow]
+  have hcmem : (z ^ 3)⁻¹ * h₁ x ∈ Subgroup.center ↥(residualImage (G := G) X) := by
+    rw [← QuotientGroup.eq]
+    exact hkmk.symm
+  refine ⟨z, x, hzD', hxQ', hxQ0, ?_, (z ^ 3)⁻¹ * h₁ x, hcmem, ?_⟩
+  · rw [← (hamb x hxQ' hxne).1, heq]
+    push_cast
+    rfl
+  · rw [← (hamb x hxQ' hxne).2]
+    congr 1
+    group
 
 end Hypothesis
 
