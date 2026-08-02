@@ -61,6 +61,7 @@ import OddOrder.GroupTheory.CNGroupStructure
 import OddOrder.GroupTheory.ThreeStepGroup
 import OddOrder.GroupTheory.Transvection
 import OddOrder.GroupTheory.NonzeroVectorAction
+import OddOrder.GroupTheory.ElementaryAbelianLinear
 import OddOrder.GroupTheory.ThompsonSubgroupAbelian
 import OddOrder.GroupTheory.GlaubermanReplacement
 import OddOrder.GroupTheory.GlaubermanZJ

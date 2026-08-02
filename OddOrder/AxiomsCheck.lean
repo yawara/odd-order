@@ -24,6 +24,7 @@ import OddOrder.GroupTheory.CentralExtensionAutomorphisms
 import OddOrder.GroupTheory.RankOneBNPair
 import OddOrder.GroupTheory.Transvection
 import OddOrder.GroupTheory.NonzeroVectorAction
+import OddOrder.GroupTheory.ElementaryAbelianLinear
 import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
@@ -15143,3 +15144,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.GroupTheory.linearIndependent_pair_of_ne_of_ne_zero
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isPreprimitive_nonzeroVector
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.mulAutEquivLinearEquiv

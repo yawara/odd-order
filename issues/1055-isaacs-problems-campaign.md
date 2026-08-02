@@ -7185,10 +7185,10 @@ Fable 5 単独で解決** (9C.3 は形式化まで完了; 9D.4 / 10A.3 後半は
 | 部品 | 状態 |
 |---|---|
 | `T v` (可換 + `is_conj`) | ✅ **2026-08-02**: `OddOrder/GroupTheory/Transvection.lean` — `LinearMap.transvection v f hf` / `transvectionSubgroup v` / `transvectionSubgroup_isMulCommutative` / `transvectionSubgroup_map_conj`。axiom-clean |
-| `MulAut E ≃* (V ≃ₗ[ZMod 2] V)` | 未 (`AddCommGroup.zmodModule` で `Module (ZMod 2) (Additive E)` を作る) |
+| `MulAut E ≃* (V ≃ₗ[ZMod 2] V)` | ✅ **2026-08-03**: `OddOrder/GroupTheory/ElementaryAbelianLinear.lean` — `zmodModule_of_pow_eq_one` (指数 `n` から `Module (ZMod n) (Additive E)`) と `mulAutEquivLinearEquiv : MulAut E ≃* (Additive E ≃ₗ[ZMod n] Additive E)`。加法写像は `ZMod n`-線形が自動 (`ZMod.map_smul`)。⚠ module 構造は**instance 引数**で取る (`AddCommGroup.zmodModule` は reducible non-instance なので呼び出し側が `letI` で供給)。⚠ `n` が statement に現れない simp 補題は `(n := n)` で pin しないと instance 解決が stuck |
 | 作用 + faithful + 2-推移性 | ✅ **2026-08-03**: `OddOrder/GroupTheory/NonzeroVectorAction.lean` — `NonzeroVector K V` への `MulAction` / `FaithfulSMul` / `exists_linearEquiv_apply_eq_of_linearIndependent` / `linearIndependent_pair_of_ne_of_ne_zero` (𝔽₂ 固有) / `isPreprimitive_nonzeroVector`。⚠ 2 元体は `K = ZMod 2` に固定せず `∀ x : K, x = 0 ∨ x = 1` で持つ |
-| `is_generator` | 未 — mathlib の `Matrix.diagonal_transvection_induction_of_det_ne_zero` (Gauss 消去) が使える。`ZMod 2` では可逆対角行列は単位行列だけなので「transvection が生成」が直ちに出る |
-| perfect | 未 |
+| `is_generator` | **未 — 残り最大の部品**。mathlib の `Matrix.diagonal_transvection_induction_of_det_ne_zero` (Gauss 消去) が使える。`ZMod 2` では可逆対角行列は単位行列だけなので「transvection が生成」が出る。⚠ 行列 ↔ 線形写像の配管が要る: 基底 `B` を取り `P M := ∀ g' : V ≃ₗ V, toMatrix B B g' = M → g' ∈ ⨆ v, transvectionSubgroup v` で帰納法を回す (`hdiag` は `ZMod 2` で `D = 1`、`htransvec` は `Matrix.transvection i j c` ↔ `LinearMap.transvection (B i) (c • B.coord j)`、`hmul` は `toMatrix` の全単射性から因子の equiv を作る) |
+| perfect | 未 — `is_generator` の後。`n ≥ 3` なら各 transvection が transvection 同士の交換子で書けるので `commutator = ⊤` が従う |
 
 ### 残り (b) 「⟹」
 
