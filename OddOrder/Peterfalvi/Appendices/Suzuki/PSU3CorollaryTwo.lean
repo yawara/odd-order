@@ -484,14 +484,18 @@ So this is `stepThree_of_odd` composed with that upgrade: out come exactly `hθ`
 `hodd` is the book's "`θ` is of odd order" (p. 130), which is what it derives `|F| ≥ 8`
 from; `hcard` is then only the three elements the `θ|_F = 1` branch needs.  It is stated
 for `θF`, the restriction of `θ = σ⁻¹τ` to `F`, because that is where the book's `θ` lives
-— on `E` the same map may be the `q`-Frobenius, of order `2`. -/
+— on `E` the same map may be the `q`-Frobenius, of order `2`.
+
+`h(ω₀) ∈ W` is taken as a hypothesis rather than derived from `V = W`: it is what §3
+actually uses, and §4 — whose case is `V ≠ W` — supplies it directly.  In the `V = W`
+case it comes from `h_mem_W_of_freeD`. -/
 theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
     {m : ℕ} (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
     (sfive : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldModel m)
     (hZc : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    (hmu : Function.Injective M.mu)
     (hcard : 3 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m))
     {φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)}
@@ -537,7 +541,8 @@ theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     -- §2's base pair
     {ζ₀ ω₀ y₀ : G} (hζ₀ : ζ₀ ∈ hyp.W) (hζ₀1 : (⟨ζ₀, hζ₀⟩ : ↥hyp.W) ≠ 1)
     (hω₀Q : ω₀ ∈ hyp.Q) (hω₀Q0 : ω₀ ∉ hyp.Q0) (hy₀Q0 : y₀ ∈ hyp.Q0)
-    (hsqω₀ : ω₀ * ω₀ = y₀) (hfω₀ : f ω₀ = ζ₀⁻¹ * (ω₀ * y₀) * ζ₀) :
+    (hsqω₀ : ω₀ * ω₀ = y₀) (hfω₀ : f ω₀ = ζ₀⁻¹ * (ω₀ * y₀) * ζ₀)
+    (hhW₀ : h ω₀ ∈ hyp.W) :
     (∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, θm a = a) ∧
       hyp.centerCoord sfive M ι hy₀Q0 /
           hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0
@@ -545,9 +550,6 @@ theorem stepThree_model (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
           + ((M.mu ((1 : ↥hyp.actualKActor),
             (⟨ζ₀, hζ₀⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹ := by
   have hζ₀ne : ζ₀ ≠ 1 := fun hc => hζ₀1 (Subtype.ext hc)
-  have hf₀ : f ω₀ = ζ₀⁻¹ * ω₀⁻¹ * ζ₀ := hyp.f_eq_conj_inv_of_sq_eq hy₀Q0 hfω₀ hsqω₀
-  have hhW₀ : h ω₀ ∈ hyp.W :=
-    hyp.h_mem_W_of_freeD H M hZc hmu hVW hζ₀ hω₀Q hω₀Q0 hf₀
   obtain ⟨hστ0, hαst⟩ := hyp.stepThree_of_odd H hC2 hm hQ0card sfive M hZc hmu hcard
     ι d hequiv σ τ (σ.symm.toRingHom.comp τ.toRingHom).toAddMonoidHom (fun _ => rfl) θF
     hθF hodd hscale hWinv hζ₀ hζ₀ne hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀ hhW₀
@@ -671,9 +673,11 @@ theorem corollaryTwo_of_sectionThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hsqω₀ : ω₀ * ω₀ = y₀) (hfω₀ : f ω₀ = ζ₀⁻¹ * (ω₀ * y₀) * ζ₀)
     {ζ : G} (hζ : ζ ∈ hyp.W) (hζ1 : (⟨ζ, hζ⟩ : ↥hyp.W) ≠ 1) :
     ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h ω = ζ ^ 3 := by
-  obtain ⟨hθ, hα⟩ := hyp.stepThree_model H hC2 hm hQ0card sfive M hZc hmu hVW hcard θm
+  obtain ⟨hθ, hα⟩ := hyp.stepThree_model H hC2 hm hQ0card sfive M hZc hmu hcard θm
     hsemi haniso ι d hequiv hdiagscale σ τ hscale hWinv θF hθF hodd hζ₀ hζ₀1 hω₀Q hω₀Q0
     hy₀Q0 hsqω₀ hfω₀
+    (hyp.h_mem_W_of_freeD H M hZc hmu hVW hζ₀ hω₀Q hω₀Q0
+      (hyp.f_eq_conj_inv_of_sq_eq hy₀Q0 hfω₀ hsqω₀))
   exact hyp.corollaryTwo_of_standardModel H hC2 sfive M hZc hmu hVW hm hQ0card hKcard
     hWdvd hW1 hfQ θm hsemi hθ haniso Φ hquot ι hker hW Θ hΘq hΘc hequiv uAut huAut
     hconj hζ₀ hζ₀1 hω₀Q hω₀Q0 hy₀Q0 hsqω₀ hfω₀ hα hζ hζ1
