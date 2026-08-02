@@ -1220,6 +1220,19 @@ theorem abelianization_conj_eq_of_quaternionProd {G : Type*} [Group G] {P : Subg
       (QuotientGroup.eq_one_iff z).mpr (quaternionProd_symm_mem_commutator e)
     rw [hz1, one_mul]
 
+/-- `t = e.symm (1, c)` の像は `Abelianization ↥P` で非自明. -/
+theorem abelianization_of_ne_one_of_quaternionProd {G : Type*} [Group G] {P : Subgroup G}
+    (e : ↥P ≃* (QuaternionGroup 2 × Multiplicative (ZMod 2)))
+    {t : ↥P} (ht : e t = (1, Multiplicative.ofAdd 1)) : Abelianization.of t ≠ 1 := by
+  intro h
+  have hmem : t ∈ commutator ↥P := (QuotientGroup.eq_one_iff t).mp h
+  have hmapc : (commutator ↥P).map e.toMonoidHom = commutator _ := by
+    rw [commutator_def, Subgroup.map_commutator, Subgroup.map_top_of_surjective _ e.surjective,
+      commutator_def]
+  refine quaternionProd_t_notMem_commutator ?_
+  rw [← ht, ← hmapc]
+  exact Subgroup.mem_map_of_mem _ hmem
+
 /-- transfer が非自明なら `G' < G` (`Abelianization` は可換なので `G' ≤ ker`). -/
 theorem commutator_lt_top_of_transfer_ne_one {G : Type*} [Group G] [Finite G]
     (P : Sylow 2 G) {g : G}
