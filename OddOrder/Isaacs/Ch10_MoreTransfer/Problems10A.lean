@@ -1178,6 +1178,24 @@ theorem quaternionProd_symm_mem_commutator {G : Type*} [Group G] {P : Subgroup G
   rw [hmap]
   exact commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
 
+/-- 正規化群の元 `s` による共役 `y ↦ s⁻¹ y s` は部分群 `P` の自己同型. -/
+def conjAutOfNormalizer {G : Type*} [Group G] {P : Subgroup G}
+    (s : ↥(Subgroup.normalizer (P : Set G))) : MulAut ↥P where
+  toFun y := ⟨(s : G)⁻¹ * (y : G) * (s : G), by
+    have h := (Subgroup.mem_normalizer_iff.mp
+      ((Subgroup.normalizer (P : Set G)).inv_mem s.2)) (y : G)
+    simpa using h.mp y.2⟩
+  invFun y := ⟨(s : G) * (y : G) * (s : G)⁻¹,
+    (Subgroup.mem_normalizer_iff.mp s.2 (y : G)).mp y.2⟩
+  left_inv y := by ext; simp [mul_assoc]
+  right_inv y := by ext; simp [mul_assoc]
+  map_mul' a b := by ext; simp [mul_assoc]
+
+@[simp]
+theorem conjAutOfNormalizer_coe {G : Type*} [Group G] {P : Subgroup G}
+    (s : ↥(Subgroup.normalizer (P : Set G))) (y : ↥P) :
+    ((conjAutOfNormalizer s y : ↥P) : G) = (s : G)⁻¹ * (y : G) * (s : G) := rfl
+
 /-- **10A.4 の共役不変性**: `s ∈ N_G(P)` による共役は `Abelianization ↥P` の上で
 `t = e.symm (1, c)` を動かさない. -/
 theorem abelianization_conj_eq_of_quaternionProd {G : Type*} [Group G] {P : Subgroup G}
