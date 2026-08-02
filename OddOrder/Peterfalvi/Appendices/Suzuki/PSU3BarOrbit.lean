@@ -38,12 +38,14 @@ the orbit of `ω` — the book's "`ω̄'_i` is in the orbit of `ω̄_i` under `K
   `ω_1, …, ω_n` as an orbit-invariant map.
 * `Hypothesis.not_dOrbitRel_self_mul_Q0` — freeness of the `D`-action, in the shape used.
 * `Hypothesis.dOrbitRel_of_stepTwenty_degenerate`,
-  `Hypothesis.barOrbitRel_of_stepTwenty_degenerate_one` — the two degenerate cases of
-  step (20), each of which collapses the two orbits.
+  `Hypothesis.dOrbitRel_of_stepTwenty_degenerate_one` — the two degenerate cases of
+  step (20), each of which puts a `Q₀`-translate of `ω'` in the orbit of `ω z`.
 * `Hypothesis.dOrbitRel_mul_of_barOrbitRel` — step (20)'s precise form
-  `f(ω z) = (ω'(z y))^d` from mere orbit membership, for `ω`, `ω'` in *different* orbits.
+  `f(ω z) = (ω'(z y))^d` from mere orbit membership.
 * `Hypothesis.y_eq_of_barOrbitRel` — step (20)'s first assertion `α₁ = α₂` in the same
   setting.
+* `Hypothesis.exists_f_eq_conj_inv` — **§2's closing Proposition** (p. 129):
+  `∃ ω ∈ Q − Q₀`, `ω² = y` and `f(ω) = (ω⁻¹)^ζ`.
 -/
 
 set_option autoImplicit false
@@ -247,7 +249,10 @@ The book's (20) reads: for every `x` such that `f(ω₁(0,x))‾` lies in the or
 
 So orbit membership alone pins the `Q₀`-coordinate of the image.  Here that is
 `stepTwenty_snd` (which gives `z = w y`) plus the disposal of its side condition
-`w y ≠ 1` by `dOrbitRel_of_stepTwenty_degenerate`, whose conclusion `hdeg` excludes. -/
+`w y ≠ 1` by `dOrbitRel_of_stepTwenty_degenerate`, whose conclusion `hdeg` excludes.
+
+`hdeg` is not a real restriction: when `ω' = ω` it is `not_dOrbitRel_self_mul_Q0`, and
+otherwise it follows from the orbit-invariance of a transversal. -/
 theorem dOrbitRel_mul_of_barOrbitRel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
@@ -258,13 +263,13 @@ theorem dOrbitRel_mul_of_barOrbitRel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hyQ0 : y ∈ hyp.Q0) (hzQ0 : z ∈ hyp.Q0)
     (hf : f ω = ζ⁻¹ * (ω * y) * ζ) (hf' : f ω' = ζ⁻¹ * (ω' * y) * ζ)
     (hz1 : z ≠ 1) (hbar : hyp.barOrbitRel (f (ω * z)) ω')
-    (hne : ¬ hyp.barOrbitRel ω ω') :
+    (hdeg : ¬ dOrbitRel hyp.D ω' (ω * z)) :
     dOrbitRel hyp.D (f (ω * z)) (ω' * (z * y)) := by
   have hζD : ζ ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hζ)
   obtain ⟨w, hwQ0, c, hcD, hc⟩ := hbar.symm
   by_cases hwy : w * y = 1
   · -- the degenerate case: `w = y`, which puts `ω'` in the orbit of `ω z`
-    refine absurd ?_ hne
+    refine absurd ?_ hdeg
     have hyinv : y⁻¹ = y := by
       have hs := hyQ0.1
       rw [sq] at hs
@@ -273,9 +278,7 @@ theorem dOrbitRel_mul_of_barOrbitRel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       rw [← hyinv]
       exact eq_inv_of_mul_eq_one_left hwy
     rw [hwy'] at hc
-    exact barOrbitRel.trans (barOrbitRel.mul_Q0 hzQ0)
-      (barOrbitRel.symm (barOrbitRel.of_dOrbitRel
-        (hyp.dOrbitRel_of_stepTwenty_degenerate H hζD hωQ hωQ0 hω'Q hω'Q0 hzQ0 hcD hf' hc)))
+    exact hyp.dOrbitRel_of_stepTwenty_degenerate H hζD hωQ hωQ0 hω'Q hω'Q0 hzQ0 hcD hf' hc
   · -- the generic case: step (20) reads off `w = z y`
     have hzw : z = w * y :=
       hyp.stepTwenty_snd H hC2 hVW hζ hWcard hωQ hωQ0 hω'Q hω'Q0 hyQ0 hf hf' hzQ0 hwQ0
@@ -292,16 +295,17 @@ theorem dOrbitRel_mul_of_barOrbitRel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
 
 If `f(ω z) = (ω')^c` outright then, applying `f` — (H3) for the conjugator, (H2) for the
 two `f`'s — and reading `f(ω')` through its normalization, `ω z` lies in the `D`-orbit of
-`ω' y'`.  Both are `Q₀`-translates, so `ω` and `ω'` share an orbit. -/
-theorem barOrbitRel_of_stepTwenty_degenerate_one
+`ω' y'` — so `ω` and `ω'` share an orbit, and when `ω' = ω` the freeness of the action
+(`not_dOrbitRel_self_mul_Q0`) turns that into a contradiction. -/
+theorem dOrbitRel_of_stepTwenty_degenerate_one
     (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     {ζ ω ω' y' z c : G} (hζD : ζ ∈ hyp.D)
     (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
     (hω'Q : ω' ∈ hyp.Q) (hω'Q0 : ω' ∉ hyp.Q0)
-    (hy'Q0 : y' ∈ hyp.Q0) (hzQ0 : z ∈ hyp.Q0) (hcD : c ∈ hyp.D)
+    (hzQ0 : z ∈ hyp.Q0) (hcD : c ∈ hyp.D)
     (hf' : f ω' = ζ⁻¹ * (ω' * y') * ζ)
     (hrel : f (ω * z) = c⁻¹ * ω' * c) :
-    hyp.barOrbitRel ω ω' := by
+    dOrbitRel hyp.D (ω' * y') (ω * z) := by
   obtain ⟨hωzQ, hωzQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hzQ0
   have hωz1 : ω * z ≠ 1 := fun hc => hωzQ0 (hc ▸ hyp.Q0.one_mem)
   have hω'1 : ω' ≠ 1 := fun hc => hω'Q0 (hc ▸ hyp.Q0.one_mem)
@@ -314,17 +318,16 @@ theorem barOrbitRel_of_stepTwenty_degenerate_one
     group
   have hbD : ζ * (hyp.t * c * hyp.t) ∈ hyp.D :=
     hyp.D.mul_mem hζD (hyp.rankOneSetup.Dstab c hcD)
-  refine barOrbitRel.trans (barOrbitRel.mul_Q0 hzQ0) (barOrbitRel.symm ?_)
-  exact barOrbitRel.trans (barOrbitRel.mul_Q0 hy'Q0) (barOrbitRel.of_dOrbitRel ⟨_, hbD, hb⟩)
+  exact ⟨_, hbD, hb⟩
 
 /-- **All normalized representatives of distinct orbits share the same `y`** (Peterfalvi
 Part II, p. 128: step (20)'s first assertion `α₁ = α₂`), read through orbit membership.
 
 `stepTwenty_of_mem_D` needs four nondegeneracy conditions; two of them concern the
-`Q₀`-coordinate `w` of the pairing, and both degenerate cases (`w = 1`, `w = y'`) put `ω`
-and `ω'` in one orbit — so `hne` supplies them.  The remaining two are about `z`, and in
-the closing Proposition they are `ω² ≠ 1` and the case `ω² = y` in which there is nothing
-left to prove. -/
+`Q₀`-coordinate `w` of the pairing, and the two degenerate cases (`w = 1`, `w = y'`) are
+excluded by `hdeg2` and `hdeg1`.  The remaining two are about `z`, and in the closing
+Proposition they are `ω² ≠ 1` and the case `ω² = y` in which there is nothing left to
+prove. -/
 theorem y_eq_of_barOrbitRel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
       = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
@@ -336,19 +339,20 @@ theorem y_eq_of_barOrbitRel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     (hf : f ω = ζ⁻¹ * (ω * y) * ζ) (hf' : f ω' = ζ⁻¹ * (ω' * y') * ζ)
     (hz1 : z ≠ 1) (hzy : z * y ≠ 1)
     (hbar : hyp.barOrbitRel (f (ω * z)) ω')
-    (hne : ¬ hyp.barOrbitRel ω ω') :
+    (hdeg1 : ¬ dOrbitRel hyp.D ω' (ω * z))
+    (hdeg2 : ¬ dOrbitRel hyp.D (ω' * y') (ω * z)) :
     y = y' := by
   have hζD : ζ ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hζ)
   obtain ⟨w, hwQ0, c, hcD, hc⟩ := hbar.symm
   have hw1 : w ≠ 1 := by
     intro hcc
-    refine hne ?_
+    refine hdeg2 ?_
     rw [hcc, mul_one] at hc
-    exact hyp.barOrbitRel_of_stepTwenty_degenerate_one H hζD hωQ hωQ0 hω'Q hω'Q0 hy'Q0
+    exact hyp.dOrbitRel_of_stepTwenty_degenerate_one H hζD hωQ hωQ0 hω'Q hω'Q0
       hzQ0 hcD hf' hc
   have hwy' : w * y' ≠ 1 := by
     intro hcc
-    refine hne ?_
+    refine hdeg1 ?_
     have hyinv : y'⁻¹ = y' := by
       have hs := hy'Q0.1
       rw [sq] at hs
@@ -357,11 +361,185 @@ theorem y_eq_of_barOrbitRel (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
       rw [← hyinv]
       exact eq_inv_of_mul_eq_one_left hcc
     rw [hwy''] at hc
-    exact barOrbitRel.trans (barOrbitRel.mul_Q0 hzQ0)
-      (barOrbitRel.symm (barOrbitRel.of_dOrbitRel
-        (hyp.dOrbitRel_of_stepTwenty_degenerate H hζD hωQ hωQ0 hω'Q hω'Q0 hzQ0 hcD hf' hc)))
+    exact hyp.dOrbitRel_of_stepTwenty_degenerate H hζD hωQ hωQ0 hω'Q hω'Q0 hzQ0 hcD hf' hc
   exact hyp.stepTwenty_of_mem_D H hC2 hVW hζ hWcard hωQ hωQ0 hω'Q hω'Q0 hyQ0 hy'Q0 hzQ0
     hwQ0 hf hf' hcD hc hz1 hw1 hzy hwy'
+
+/-- Freeness again, for two `Q₀`-translates of one `ω`. -/
+theorem not_dOrbitRel_mul_Q0_mul_Q0 {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (hmu : Function.Injective M.mu) (hVW : hyp.V = hyp.W)
+    {ω y z : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0)
+    (hyQ0 : y ∈ hyp.Q0) (hzQ0 : z ∈ hyp.Q0) (hyz : y * z ≠ 1) :
+    ¬ dOrbitRel hyp.D (ω * y) (ω * z) := by
+  intro hcon
+  obtain ⟨hωyQ, hωyQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hyQ0
+  obtain ⟨d, hdD, hd⟩ := hcon
+  have hyy : y * y = 1 := by
+    have hs := hyQ0.1
+    rwa [sq] at hs
+  have hrw : ω * y * (y * z) = ω * z := by
+    rw [← mul_assoc, mul_assoc ω y y, hyy, mul_one]
+  exact hyp.not_dOrbitRel_self_mul_Q0 M hZ hmu hVW hωyQ hωyQ0
+    (hyp.Q0.mul_mem hyQ0 hzQ0) hyz ⟨d, hdD, by rw [hrw]; exact hd⟩
+
+omit [Finite G] in
+/-- The `y` of a normalization is determined by `ω` (and `ζ`). -/
+theorem normalization_y_unique {ζ ω y y' : G}
+    (hf : f ω = ζ⁻¹ * (ω * y) * ζ) (hf' : f ω = ζ⁻¹ * (ω * y') * ζ) : y = y' := by
+  have h := hf.symm.trans hf'
+  exact mul_left_cancel (mul_left_cancel (mul_right_cancel h))
+
+/-- **§2's closing Proposition** (Peterfalvi Part II, Ch. IV §2, p. 129):
+
+> Suppose that `D` acts without fixed points on `(Q/Q₀)^#`.  Then there exists an index
+> `i`, `1 ≤ i ≤ n`, such that `f(ω) = (ω⁻¹)^ζ` and `h(ω) ∈ W` for `ω = ω_i`.
+
+The freeness hypothesis is carried by `M`, `hZ`, `hmu`, `hVW` (it is
+`eq_one_of_conj_eq_mul_Q0_of_mem_D`); `h(ω) ∈ W` is `h_mem_W`, proved separately.
+
+The proof is the book's.  Take `ω` a normalized representative, `ρ = ω²` and `y` its
+normalization element.  If `ρ = y` there is nothing to do.  Otherwise let `ω_i` and `ω_k`
+be the representatives of the orbits of `f(ω⁻¹) = f(ωρ)` and of `f(ω⁻¹(0,α)) = f(ω(ρy))`.
+Step (20) — available through orbit membership by `dOrbitRel_mul_of_barOrbitRel`, its side
+conditions being the freeness — turns those memberships into the two precise relations
+that the (H5) chain consumes, and the chain returns
+`(ω_k⁻¹ρ)^{KW} = (ω_i(ρy))^{KW}`.  Both sides are `Q₀`-translates, so `ω_i` and `ω_k` share
+an orbit and the transversal makes them equal: the book's "whence `i = k`".  Freeness once
+more (`sq_eq_of_dOrbitRel`) then gives `ω_i² = y`. -/
+theorem exists_f_eq_conj_inv {m : ℕ} (M : hyp.QuotientFieldModel m)
+    (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
+    (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
+    (hC2 : hyp.t * hyp.distinguishedInvolution * hyp.t
+      = hyp.distinguishedInvolution * hyp.t * hyp.distinguishedInvolution)
+    (hVW : hyp.V = hyp.W) (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 = 2 ^ m)
+    (hmu : Function.Injective M.mu)
+    (hKcard : Nat.card ↥hyp.actualKActor = 2 ^ m - 1)
+    (hWdvd : Nat.card ↥hyp.W ∣ 2 ^ m + 1)
+    (hsqQ0 : ∀ x ∈ hyp.Q, x * x ∈ hyp.Q0)
+    {ζ : G} (hζW : ζ ∈ hyp.W) (hζ1 : ζ ≠ 1)
+    (hWcard : orderOf ζ = Nat.card ↥hyp.W)
+    {x₀ : G} (hx₀Q : x₀ ∈ hyp.Q) (hx₀Q0 : x₀ ∉ hyp.Q0) :
+    ∃ ω ∈ hyp.Q, ω ∉ hyp.Q0 ∧ ∃ y ∈ hyp.Q0, ω * ω = y ∧ f ω = ζ⁻¹ * ω⁻¹ * ζ := by
+  classical
+  have hζD : ζ ∈ hyp.D := hyp.V_le_D (hyp.W_le_V hζW)
+  obtain ⟨r, hrinv, hrspec⟩ := hyp.exists_normalizedOrbitRep M hZ H hC2 hVW hm hQ0card hmu
+    hKcard hWdvd hζW hζ1
+  have hrfix : ∀ x ∈ hyp.Q, x ∉ hyp.Q0 → r (r x) = r x := fun x hxQ hxQ0 =>
+    (hrinv x (r x) (hrspec x hxQ hxQ0).2.2.1).symm
+  obtain ⟨hωQ, hωQ0, -, y, hyQ0, -, hnorm⟩ := hrspec x₀ hx₀Q hx₀Q0
+  set ω := r x₀ with hωdef
+  -- `ρ = ω²`
+  have hρQ0 : ω * ω ∈ hyp.Q0 := hsqQ0 ω hωQ
+  have hρ1 : ω * ω ≠ 1 := fun hc => hωQ0 ⟨by rw [sq]; exact hc, hyp.Q_le_H hωQ⟩
+  by_cases hcase : ω * ω = y
+  · exact ⟨ω, hωQ, hωQ0, y, hyQ0, hcase, hyp.f_eq_conj_inv_of_sq_eq hyQ0 hnorm hcase⟩
+  -- `y ≠ ρ`, in the two forms the side conditions take
+  have hyinv : y⁻¹ = y := by
+    have hs := hyQ0.1
+    rw [sq] at hs
+    exact inv_eq_of_mul_eq_one_right hs
+  have hyρ : y * (ω * ω) ≠ 1 := by
+    intro hc
+    exact hcase (by rw [← hyinv]; exact (inv_eq_of_mul_eq_one_right hc).symm)
+  have hρy : ω * ω * y ≠ 1 := by
+    intro hc
+    exact hcase (by rw [← hyinv]; exact (inv_eq_of_mul_eq_one_left hc).symm)
+  -- `ω` is fixed by the transversal, so anything in its orbit and in the image is `ω`
+  have hcoll : ∀ x : G, x ∈ hyp.Q → x ∉ hyp.Q0 → hyp.barOrbitRel ω (r x) → r x = ω := by
+    intro x hxQ hxQ0 hbar
+    have h1 : r ω = r (r x) := hrinv ω (r x) hbar
+    rw [hrfix x hxQ hxQ0, hωdef, hrfix x₀ hx₀Q hx₀Q0] at h1
+    exact h1.symm
+  set ρ := ω * ω with hρdef
+  have hρyQ0 : ρ * y ∈ hyp.Q0 := hyp.Q0.mul_mem hρQ0 hyQ0
+  have hyy : y * y = 1 := by
+    have hs := hyQ0.1
+    rwa [sq] at hs
+  have hcomm : y * ρ = ρ * y :=
+    Subgroup.mem_centralizer_iff.mp (hyp.Q0_le_centralizer_Q hρQ0) y (hyp.Q0_le_Q hyQ0)
+  have hρyy : ρ * y * y = ρ := by rw [mul_assoc, hyy, mul_one]
+  have hyρy : y * (ρ * y) = ρ := by rw [← mul_assoc, hcomm, mul_assoc, hyy, mul_one]
+  -- the `i`-side: the representative of the orbit of `f(ω ρ)`
+  obtain ⟨hωρQ, hωρQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hρQ0
+  obtain ⟨hfρQ, hfρQ0⟩ := hyp.f_mem_sdiff_Q0 H hC2 hωρQ hωρQ0
+  obtain ⟨hωiQ, hωiQ0, hωibar, yi, hyiQ0, -, hnormi⟩ := hrspec _ hfρQ hfρQ0
+  set ωi := r (f (ω * ρ)) with hωidef
+  -- the `k`-side: the representative of the orbit of `f(ω ρ y)`
+  obtain ⟨hωρyQ, hωρyQ0⟩ := hyp.mul_mem_sdiff_Q0 hωQ hωQ0 hρyQ0
+  obtain ⟨hfρyQ, hfρyQ0⟩ := hyp.f_mem_sdiff_Q0 H hC2 hωρyQ hωρyQ0
+  obtain ⟨hωkQ, hωkQ0, hωkbar, yk, hykQ0, -, hnormk⟩ := hrspec _ hfρyQ hfρyQ0
+  set ωk := r (f (ω * (ρ * y))) with hωkdef
+  -- nondegeneracy on the `i`-side
+  have hdeg_i : ¬ dOrbitRel hyp.D ωi (ω * ρ) := by
+    intro hcon
+    have heq : ωi = ω := hcoll _ hfρQ hfρQ0 (barOrbitRel.trans (barOrbitRel.mul_Q0 hρQ0)
+      (barOrbitRel.symm (barOrbitRel.of_dOrbitRel hcon)))
+    rw [heq] at hcon
+    exact hyp.not_dOrbitRel_self_mul_Q0 M hZ hmu hVW hωQ hωQ0 hρQ0 hρ1 hcon
+  have hdeg2_i : ¬ dOrbitRel hyp.D (ωi * yi) (ω * ρ) := by
+    intro hcon
+    have heq : ωi = ω := hcoll _ hfρQ hfρQ0 (barOrbitRel.trans (barOrbitRel.mul_Q0 hρQ0)
+      (barOrbitRel.symm (barOrbitRel.trans (barOrbitRel.mul_Q0 hyiQ0)
+        (barOrbitRel.of_dOrbitRel hcon))))
+    rw [heq] at hcon hnormi
+    rw [normalization_y_unique hnormi hnorm] at hcon
+    exact hyp.not_dOrbitRel_mul_Q0_mul_Q0 M hZ hmu hVW hωQ hωQ0 hyQ0 hρQ0 hyρ hcon
+  -- nondegeneracy on the `k`-side
+  have hdeg_k : ¬ dOrbitRel hyp.D ωk (ω * (ρ * y)) := by
+    intro hcon
+    have heq : ωk = ω := hcoll _ hfρyQ hfρyQ0 (barOrbitRel.trans (barOrbitRel.mul_Q0 hρyQ0)
+      (barOrbitRel.symm (barOrbitRel.of_dOrbitRel hcon)))
+    rw [heq] at hcon
+    exact hyp.not_dOrbitRel_self_mul_Q0 M hZ hmu hVW hωQ hωQ0 hρyQ0 hρy hcon
+  have hdeg2_k : ¬ dOrbitRel hyp.D (ωk * yk) (ω * (ρ * y)) := by
+    intro hcon
+    have heq : ωk = ω := hcoll _ hfρyQ hfρyQ0 (barOrbitRel.trans (barOrbitRel.mul_Q0 hρyQ0)
+      (barOrbitRel.symm (barOrbitRel.trans (barOrbitRel.mul_Q0 hykQ0)
+        (barOrbitRel.of_dOrbitRel hcon))))
+    rw [heq] at hcon hnormk
+    rw [normalization_y_unique hnormk hnorm] at hcon
+    exact hyp.not_dOrbitRel_mul_Q0_mul_Q0 M hZ hmu hVW hωQ hωQ0 hyQ0 hρyQ0
+      (by rw [hyρy]; exact hρ1) hcon
+  -- step (20)'s first assertion: the two representatives carry the same `y`
+  have hnormi' : f ωi = ζ⁻¹ * (ωi * y) * ζ := by
+    rw [hyp.y_eq_of_barOrbitRel H hC2 hVW hζW hWcard hωQ hωQ0 hωiQ hωiQ0 hyQ0 hyiQ0
+      hρQ0 hnorm hnormi hρ1 hρy hωibar hdeg_i hdeg2_i]
+    exact hnormi
+  have hnormk' : f ωk = ζ⁻¹ * (ωk * y) * ζ := by
+    rw [hyp.y_eq_of_barOrbitRel H hC2 hVW hζW hWcard hωQ hωQ0 hωkQ hωkQ0 hyQ0 hykQ0
+      hρyQ0 hnorm hnormk hρy (by rw [hρyy]; exact hρ1) hωkbar hdeg_k hdeg2_k]
+    exact hnormk
+  -- step (20)'s second assertion on both sides: the two inputs of the (H5) chain
+  have hi : dOrbitRel hyp.D (f (ω * ρ)) (ωi * (ρ * y)) :=
+    hyp.dOrbitRel_mul_of_barOrbitRel H hC2 hVW hζW hWcard hωQ hωQ0 hωiQ hωiQ0 hyQ0 hρQ0
+      hnorm hnormi' hρ1 hωibar hdeg_i
+  have hk : dOrbitRel hyp.D (f (ω * (ρ * y))) (ωk * ρ) := by
+    have hkk := hyp.dOrbitRel_mul_of_barOrbitRel H hC2 hVW hζW hWcard hωQ hωQ0 hωkQ hωkQ0
+      hyQ0 hρyQ0 hnorm hnormk' hρy hωkbar hdeg_k
+    rwa [hρyy] at hkk
+  -- the (H5) chain, and the book's "whence `i = k`"
+  have hchain := hyp.dOrbitRel_of_stepTwenty_chain H hωQ hωQ0 hωkQ hωkQ0 hyQ0 hρQ0
+    hρdef hζD hnorm hi hk
+  have hωksq : ωk * ωk ∈ hyp.Q0 := hsqQ0 ωk hωkQ
+  have hωkinv : ωk⁻¹ = ωk * (ωk * ωk) := by
+    have h4 : ωk * ωk * (ωk * ωk) = 1 := by
+      have hs := hωksq.1
+      rwa [sq] at hs
+    calc ωk⁻¹ = ωk * ωk * (ωk * ωk) * ωk⁻¹ := by rw [h4, one_mul]
+      _ = ωk * (ωk * ωk) := by group
+  have hbarki : hyp.barOrbitRel ωk ωi := by
+    refine barOrbitRel.trans ?_ (barOrbitRel.symm (barOrbitRel.mul_Q0 hρyQ0))
+    refine barOrbitRel.trans ?_ (barOrbitRel.of_dOrbitRel hchain)
+    rw [hωkinv, mul_assoc]
+    exact barOrbitRel.mul_Q0 (hyp.Q0.mul_mem hωksq hρQ0)
+  have hωifix : r ωi = ωi := by rw [hωidef]; exact hrfix _ hfρQ hfρQ0
+  have hωkfix : r ωk = ωk := by rw [hωkdef]; exact hrfix _ hfρyQ hfρyQ0
+  have hki : ωk = ωi := by rw [← hωkfix, ← hωifix]; exact hrinv _ _ hbarki
+  rw [hki] at hchain
+  have hsqi : ωi * ωi = y := hyp.sq_eq_of_dOrbitRel M hZ hmu hVW hωiQ hωiQ0 hyQ0 hρQ0
+    (hsqQ0 ωi hωiQ) hchain
+  exact ⟨ωi, hωiQ, hωiQ0, y, hyQ0, hsqi, hyp.f_eq_conj_inv_of_sq_eq hyQ0 hnormi' hsqi⟩
 
 end Hypothesis
 
