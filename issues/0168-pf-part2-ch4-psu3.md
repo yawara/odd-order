@@ -7954,3 +7954,23 @@ commit `62eb97427`。(163) のレシピどおりで**初回ビルド green**。
    `ζ' := ψ ζ` は `W'^#` を走る (`map_W_of_mulEquiv`)。
 ⟹ 結論は `corollaryTwo_residualQuotient` と同型の文が
 `intrinsicResidualQuotient` 上で成り立つ、という形になる。
+
+### (166) 移送補題 landing — 段 (2) 内在版まであと 1 手
+
+commit `0a8002626`。`corollaryTwo_conclusion_of_mulEquiv`
+(`HypothesisFieldMatching.lean`) が結論の移送を担う (核は `IsFGH.map`)。
+
+**残り 1 手** = 組み立て: `PSU3SectionFourIntrinsic.lean` に
+
+```
+theorem corollaryTwo_intrinsicResidualQuotient … :
+  ∀ ζ ∈ (intrinsic hyp).W, ζ ≠ 1 → ∃ f₂ g₂ k₂, IsFGH … ∧ ∃ ω ∈ Q, ω ∉ Q₀ ∧ …
+```
+を書く。手順:
+1. `ψ` と 4 つ組対応 ← `exists_mulEquiv_match_residualQuotient_t`
+2. 内在側の `ζ` を transported 側へ引き戻す (`map_W_of_mulEquiv` の逆向き:
+   `ζ = ψ ζ₀` となる `ζ₀ ∈ W` を取る)
+3. `corollaryTwo_residualQuotient` を `ζ₀` に当てて `(f₁,g₁,k₁,ω)` を得る
+4. 内在側の三つ組は `exists_fgh_mapsTo`、`corollaryTwo_conclusion_of_mulEquiv` で移送
+⚠ `intrinsicResidualQuotient` と `intrinsicResidualQuotientULift` の使い分けに注意
+(照合同型は前者、標準モデルは後者)。
