@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Module.Equiv.Basic
 import Mathlib.Tactic.Abel
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.LinearAlgebra.Matrix.Transvection
+import Mathlib.LinearAlgebra.Matrix.ToLin
 
 /-!
 # Transvections, coordinate-free
@@ -29,6 +31,8 @@ subgroups by the points of the action — here the non-zero vectors — and requ
 * `LinearMap.transvectionSubgroup_isMulCommutative` — it is abelian:
   `t_{v,f} * t_{v,g} = t_{v,f+g}`.
 * `LinearMap.transvectionSubgroup_map_conj` — `T (g v) = g (T v) g⁻¹`.
+* `LinearMap.toMatrix_transvection` — the matrix of `transvection (B i) (c • B.coord j)` in
+  the basis `B` is mathlib's `Matrix.transvection i j c`.
 
 ## References
 
@@ -141,6 +145,42 @@ theorem transvectionSubgroup_map_conj (g : V ≃ₗ[R] V) (v : V) :
     change g * transvection v f hf * g⁻¹ ∈ _
     rw [conj_transvection]
     exact transvection_mem _ _ _
+
+section Coordinates
+
+open Matrix
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- **Mathlib's matrix transvection is the coordinate-free one at a basis vector.**
+
+`Matrix.transvection i j c = 1 + single i j c` adds `c` times the `j`-th coordinate to the
+`i`-th, which is `x ↦ x + (c · xⱼ) • Bᵢ`: centre `B i`, functional `c • B.coord j`.  This
+is the bridge that lets mathlib's Gaussian elimination
+(`Matrix.diagonal_transvection_induction_of_det_ne_zero`) be read as a statement about
+`transvectionSubgroup`. -/
+theorem toMatrix_transvection (B : Module.Basis ι R V) {i j : ι} (hij : i ≠ j) (c : R)
+    (hf : (c • B.coord j) (B i) = 0) :
+    LinearMap.toMatrix B B
+        ((transvection (B i) (c • B.coord j) hf : V ≃ₗ[R] V) : V →ₗ[R] V)
+      = Matrix.transvection i j c := by
+  ext k l
+  rw [LinearMap.toMatrix_apply]
+  have hval : ((transvection (B i) (c • B.coord j) hf : V ≃ₗ[R] V) : V →ₗ[R] V) (B l)
+      = B l + (c * (B.repr (B l)) j) • B i := rfl
+  rw [hval, map_add, Finsupp.add_apply, map_smul, Finsupp.smul_apply, B.repr_self,
+    B.repr_self, smul_eq_mul]
+  simp only [Matrix.transvection, Matrix.add_apply, Matrix.one_apply, Matrix.single,
+    Matrix.of_apply, Finsupp.single_apply]
+  by_cases hlj : l = j
+  · subst hlj
+    by_cases hki : k = i
+    · subst hki
+      simp [hij, Ne.symm hij]
+    · simp [Ne.symm hki, eq_comm]
+  · simp [hlj, Ne.symm hlj, eq_comm]
+
+end Coordinates
 
 end LinearMap
 
