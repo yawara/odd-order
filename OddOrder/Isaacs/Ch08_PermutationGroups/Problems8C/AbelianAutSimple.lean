@@ -64,4 +64,47 @@ theorem isSimpleGroup_mulAut_of_elementaryAbelian_two {A : Type*} [CommGroup A] 
   haveI := isSimpleGroup_linearEquiv (K := ZMod 2) (V := Additive A) hK h3
   exact (mulAutEquivLinearEquiv (n := 2) (E := A)).isSimpleGroup
 
+
+/-! ## ⚠ 書籍の「⟹」は偽 — 反例 `A = ℤ/4`
+
+Isaacs Problem 8C.6 は「`Aut(A)` 単純 ⟺ `|A| = 3` または `A` が位数 8 以上の初等可換
+2-群」と述べるが、**「⟹」は反例をもつ**: `A = ℤ/4` は巡回群なので
+`|Aut(A)| = φ(4) = 2` で `Aut(A)` は単純、しかし `|A| = 4 ≠ 3` で `A` は位数 4 の元を
+もつから初等可換 2-群でもない。(`ℤ/6` も同様: `φ(6) = 2`。)
+
+正しい分類は — `Aut(A)` が可換な単純群 `≅ ℤ/2` になるのは
+`A ∈ {ℤ/3, ℤ/4, ℤ/6}` のちょうど 3 つ (古典的な `φ(n) = 2` の解)、
+非可換単純になるのは `A` が位数 8 以上の初等可換 2-群のとき (`GL(n,2)`, `n ≥ 3`)。
+書籍の主張は前者の 3 つのうち `ℤ/3` しか挙げていない。
+-/
+
+/-- **⚠ Isaacs Problem 8C.6 の「⟹」の反例** — `A = ℤ/4` (乗法記法) は
+`Aut(A)` が単純だが位数 `3` でも初等可換 `2`-群でもない。
+
+`ℤ/4` は巡回なので `|Aut(A)| = φ(4) = 2` は素数、よって `Aut(A)` は単純
+(`isSimpleGroup_of_prime_card`)。一方 `A` には位数 4 の元があるので `x ^ 2 ≠ 1`。 -/
+theorem exists_isSimpleGroup_mulAut_not_card_three_not_elementaryAbelian :
+    ∃ (A : Type) (_ : CommGroup A) (_ : Finite A),
+      IsSimpleGroup (MulAut A) ∧ Nat.card A ≠ 3 ∧ ∃ x : A, x ^ 2 ≠ 1 := by
+  classical
+  refine ⟨Multiplicative (ZMod 4), inferInstance, inferInstance, ?_, ?_, ?_⟩
+  · haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    refine isSimpleGroup_of_prime_card (p := 2) ?_
+    rw [IsCyclic.card_mulAut]
+    have hcard : Nat.card (Multiplicative (ZMod 4)) = 4 := by
+      rw [Nat.card_eq_fintype_card]
+      exact ZMod.card 4
+    rw [hcard]
+    decide
+  · have hcard : Nat.card (Multiplicative (ZMod 4)) = 4 := by
+      rw [Nat.card_eq_fintype_card]
+      exact ZMod.card 4
+    omega
+  · refine ⟨Multiplicative.ofAdd (1 : ZMod 4), ?_⟩
+    intro hc
+    rw [pow_two, ← ofAdd_add] at hc
+    have hz : (1 + 1 : ZMod 4) = 0 := by
+      simpa using congrArg Multiplicative.toAdd hc
+    exact absurd hz (by decide)
+
 end OddOrder.Isaacs.Ch08

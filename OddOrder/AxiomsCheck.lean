@@ -15164,3 +15164,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.GroupTheory.isSimpleGroup_linearEquiv
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch08.isSimpleGroup_mulAut_of_elementaryAbelian_two
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch08.exists_isSimpleGroup_mulAut_not_card_three_not_elementaryAbelian

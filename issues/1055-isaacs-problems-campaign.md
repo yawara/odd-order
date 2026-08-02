@@ -7219,7 +7219,29 @@ Isaacs.Ch08.isSimpleGroup_mulAut_of_elementaryAbelian_two
 `decide` は局所 instance が context にあると「free variables」で落ちるので
 **独立した theorem に切り出す** (`zmod_two_eq_zero_or_one`)。
 
-### 残り (b) 「⟹」
+### ⚠⚠ 残り (b) 「⟹」は**書籍の主張のままでは偽** (2026-08-03 に反例を形式化)
 
-`A` 可換で `Aut(A)` 単純 ⟹ `|A| = 3` または `A` 初等可換 2-群で `|A| ≥ 8`。
-`A` を素数冪成分に分解して `Aut` が直積になることを使う。(a) の後で。
+書籍 p.257 の原文は PDF ページ画像で確認済 (`references/isaacs/pages/isaacs-p257-270.png`):
+
+> **8C.6.** Let `A` be an abelian group.  Show that `Aut(A)` is simple if and only if `A`
+> has order 3 or `A` is an elementary abelian 2-group of order at least 8.
+
+**「⟹」は反例をもつ**: `A = ℤ/4` は巡回なので `|Aut(A)| = φ(4) = 2` (素数) ⟹ `Aut(A)`
+単純。しかし `|A| = 4 ≠ 3` で、位数 4 の元があるから初等可換 2-群でもない。
+`ℤ/6` も同じ (`φ(6) = 2`)。
+
+形式化済: `exists_isSimpleGroup_mulAut_not_card_three_not_elementaryAbelian`
+(`Problems8C/AbelianAutSimple.lean`, axiom-clean)。
+
+**正しい分類** (紙の議論): 可換群 `A` の原始分解 `A = ∏ A_p` で
+`Aut(A) ≅ ∏ Aut(A_p)`、単純なら非自明因子はちょうど 1 つ
+(`Aut(A_p) = 1 ⟺ A_p ∈ {1, ℤ/2}`)。`p`-群 `A_p` については
+* 巡回 `ℤ/p^e`: `Aut` は位数 `p^{e-1}(p-1)` の巡回 ⟹ 素数になるのは `ℤ/3` と `ℤ/4` のみ
+* 階数 ≥ 2 で非初等可換: `Φ(A)` 上の合同部分群が非自明な固有正規部分群 ⟹ 非単純
+* 初等可換 `p`-群 (階数 `n ≥ 2`): `Aut = GL(n,p)`。`p > 2` は中心 `≅ ℤ/(p−1)` が非自明 ⟹
+  非単純。`p = 2` は `n = 2` が `S₃` で非単純、`n ≥ 3` が単純
+
+⟹ **`Aut(A)` 単純 ⟺ `A ∈ {ℤ/3, ℤ/4, ℤ/6}` または `A` が位数 8 以上の初等可換 2-群**。
+書籍は前 3 者のうち `ℤ/3` しか挙げていない (漏れ)。
+
+⟹ 形式化するのは**訂正後の分類**。次の作業はその「⟹」(原始分解 + 各場合)。
