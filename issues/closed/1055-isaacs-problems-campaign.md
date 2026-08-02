@@ -237,7 +237,8 @@ repo に `p`-length の定義が無かったので新設。
       **9D.1–9D.4 ✅**。9D.4 =
       `isSimpleGroup_and_not_isMulCommutative_of_isKegelMinimalCounterexample`
       (`Ch09_MoreSubnormality/KegelMinimalCounterexample.lean`, axiom-clean)
-- [ ] Ch.10 More Transfer — **⚠ 実測で §10C は 6 問 (旧インベントリの「10C(1)」は誤り)**。
+- [x] **Ch.10 More Transfer** — **🎉 完済 (2026-08-03)**。
+      **⚠ 実測で §10C は 6 問 (旧インベントリの「10C(1)」は誤り)**。
       **§10A (7 問) 🎉 完済 (2026-08-03)**: 10A.3 前半+後半 と **10A.4** が landing。
       **§10B (2 問) 🎉 完済 (2026-08-03)**: 10B.1 = `nilpotencyClass_problem10B1`、
       10B.2 = `le_socle_of_isElementaryAbelian_of_not_dvd_index`。
@@ -249,8 +250,30 @@ repo に `p`-length の定義が無かったので新設。
       10C.4 = `nonempty_abelianization_equiv_of_isUnitBasis`、
       10C.5 = `trace_regularMatrix`、
       10C.6 = `pow_eq_one_of_isRoot_charpoly_regularMatrixC` + `coeff_one_of_pow_eq_one`。
-      ⟹ **Isaacs Ch.10 の Problems (§10A/§10B/§10C 計 12 問) 全完済**。
-      **§10C (6 問) は全部未着手**
+      ⟹ **Isaacs Ch.10 の Problems (§10A 7 + §10B 2 + §10C 6 = 15 問) 全完済**
+      (commit b7dbc724c の message は「12 問」と書いたが実測は 15 問)。
+
+## 🎉 campaign 完了 (2026-08-03) — 実測による確認
+
+Ch.1–Ch.10 の全 section の演習が形式化され, **campaign は完了**。close する。
+
+実測 (2026-08-03, このセッション):
+
+* `OddOrder/Isaacs/**` で名前に `Problems` を含む `.lean` = **133 file**,
+  コメント除去後の実 `sorry` = **0**。
+* 原文 `pdftotext` から抽出した問題ラベル (行頭 `NX.M.`) = 249 件
+  (章節別内訳: 1A 9 / 1B 2 / 1C 7 / 1D 4 / 1E 6 / 1F 2 / 1G 4 / 2A 8 / 2B 6 / 2C 1 /
+  2D 2 / 3A 9 / 3B 8 / 3C 8 / 3D 4 / 3E 5 / 3F 5 / 4A 13 / 4B 5 / 4C 3 / 4D 7 /
+  5A 8 / 5B 3 / 5C 13 / 5D 6 / 5E 3 / 6A 10 / 6B 9 / 6C 2 / 7A 6 / 7C 1 /
+  8A 13 / 8B 10 / 8C 6 / 8D 6 / 9A 8 / 9B 5 / 9C 3 / 9D 4 / 10A 7 / 10B 2 / 10C 6;
+  OCR で行頭が崩れた分は落ちているので下限)。
+  repo 側の `Problem NX.M` アンカー = 289 件で, 差分 2 件 (`1F.1` / `3C.1`) も
+  別表記でアンカー済 (`ProblemsBrodkey.lean` の `**1F.1**`,
+  `Ch03_SplitExtensions/Basic.lean` の `hall_D` = `**Isaacs 3C.1**`) と確認。
+* Isaacs の Appendix (The Basics) には Problems 節が無い (原文 grep で確認)。
+
+⚠ 「mathlib/repo 既存で即従う」と記録した演習 (ラッパー方針で Lean に書かなかったもの)
+は docstring に対応先を書いてある。10C.2 がその最後の例。
 
 ## 方針
 
