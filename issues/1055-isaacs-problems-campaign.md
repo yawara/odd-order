@@ -237,8 +237,9 @@ repo に `p`-length の定義が無かったので新設。
       **9D.1–9D.4 ✅**。9D.4 =
       `isSimpleGroup_and_not_isMulCommutative_of_isKegelMinimalCounterexample`
       (`Ch09_MoreSubnormality/KegelMinimalCounterexample.lean`, axiom-clean)
-- [ ] Ch.10 More Transfer — 10A.1/10A.2/10A.3 前半/10A.5–7/10B.2 ✅、
-      **10A.3 後半 (A は基本可換) は紙の証明済・未形式化**
+- [ ] Ch.10 More Transfer — 10A.1/10A.2/**10A.3 (前半+後半 ✅ 2026-08-03)**/10A.5–7/
+      10B.2 ✅。10A.3 後半 = `pow_eq_one_of_center_isComplement`。
+      残 = §10B/§10C の未着手分の実測 (10B.2 は Maschke 待ち)
 
 ## 方針
 

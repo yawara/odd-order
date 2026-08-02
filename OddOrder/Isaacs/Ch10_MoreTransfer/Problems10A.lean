@@ -7,6 +7,7 @@ import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality.Basic
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.Isaacs.Ch10_MoreTransfer.WreathRecognition
+import Mathlib.GroupTheory.IndexNormal
 import OddOrder.Isaacs.Ch09_MoreSubnormality.Schenkman
 
 /-!
@@ -21,7 +22,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 10A。
   `Q ∩ Z(P) = 1` なら `P` は `C_p ≀ C_p` の部分群と同型。
 * **10A.3 (前半)** `exists_injective_hom_regularWreath_of_center_isComplement` — `|Z(P)| = p`,
   `A` 可換で指数 `p`, `Z(P)` が `A` の直積因子なら `P ↪ C_p ≀ C_p` (10A.5 に帰着)。
-  ⏳ 後半「`A` は基本可換」は未着手 (issue 1055 参照)。
+  後半「`A` は基本可換」= `pow_eq_one_of_center_isComplement` ✅。
 * **10A.6** `isTwoTransitive_iff_exists_doubleCoset` — 推移的作用の点安定化群 `H` について
   **2-推移的 ⟺ ある `g` で `G = H ∪ HgH`**。
 * **10A.7** `exists_surjective_wreath_of_mem_compl_orders` — `A ◁ P` が基本可換で指数 `p`,
@@ -530,6 +531,80 @@ theorem pow_mem_of_isComplement' {A : Type*} [CommGroup A] {Z K : Subgroup A}
   rw [mul_pow, hZ z hz, one_mul]
   exact K.pow_mem hk p
 
+open scoped IsMulCommutative in
+/-- **Isaacs Problem 10A.3 の後半** (書籍 p. 308) ⭐: 前半と同じ仮定
+(`|Z(P)| = p`, `A` 可換で指数 `p`, `Z(P)` が `A` の直積因子) のもとで **`A` は基本可換**.
+
+`A^p := {a^p | a ∈ A}` は `A ◁ P` (指数 = 最小素因数) と `(gag⁻¹)^p = g a^p g⁻¹` から
+`P` に正規。直積分解 `A = Z(P) × K` と `|Z(P)| = p` から `A^p ≤ K`
+(`pow_mem_of_isComplement'`)。もし `A^p ≠ 1` なら, `p`-群の非自明正規部分群は中心と
+非自明に交わる (Isaacs Thm 1.19 = `IsPGroup.normal_inf_center_nontrivial`) ので
+`1 ≠ z ∈ A^p ⊓ Z(P) ≤ K ⊓ Z(P) = 1` となって矛盾。 -/
+theorem pow_eq_one_of_center_isComplement [Finite P] {p : ℕ} [Fact p.Prime]
+    (hP : IsPGroup p P) {A : Subgroup P} [IsMulCommutative ↥A] (hidx : A.index = p)
+    (hZ : Nat.card (Subgroup.center P) = p) (_hZle : Subgroup.center P ≤ A)
+    {K : Subgroup ↥A} (hK : Subgroup.IsComplement' ((Subgroup.center P).subgroupOf A) K)
+    {a : P} (ha : a ∈ A) : a ^ p = 1 := by
+  have hp : p.Prime := Fact.out
+  have hcommA : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := fun x hx y hy =>
+    congrArg Subtype.val (IsMulCommutative.is_comm.comm (⟨x, hx⟩ : ↥A) ⟨y, hy⟩)
+  -- `A ◁ P`: 指数 `p` は `|P|` の最小素因数
+  have hcardP : ∃ n : ℕ, Nat.card P = p ^ n := (IsPGroup.iff_card).mp hP
+  obtain ⟨n, hn⟩ := hcardP
+  have hn0 : n ≠ 0 := by
+    intro h0
+    rw [h0, pow_zero] at hn
+    have hmul := Subgroup.card_mul_index A
+    rw [hidx, hn] at hmul
+    have h1 := hp.one_lt
+    have h2 : p = 1 := Nat.eq_one_of_dvd_one (Dvd.intro_left _ hmul)
+    omega
+  haveI : A.Normal := by
+    refine Subgroup.normal_of_index_eq_minFac_card ?_
+    rw [hidx, hn, hp.pow_minFac hn0]
+  -- `A^p` は `P` の正規部分群
+  set Ap : Subgroup P :=
+    { carrier := {y : P | ∃ x ∈ A, x ^ p = y}
+      one_mem' := ⟨1, A.one_mem, one_pow p⟩
+      mul_mem' := by
+        rintro _ _ ⟨x, hx, rfl⟩ ⟨y, hy, rfl⟩
+        exact ⟨x * y, A.mul_mem hx hy, Commute.mul_pow (hcommA x hx y hy) p⟩
+      inv_mem' := by
+        rintro _ ⟨x, hx, rfl⟩
+        exact ⟨x⁻¹, A.inv_mem hx, by rw [inv_pow]⟩ } with hApdef
+  haveI : Ap.Normal := by
+    refine ⟨fun y hy g => ?_⟩
+    obtain ⟨x, hx, rfl⟩ := hy
+    exact ⟨g * x * g⁻¹, ‹A.Normal›.conj_mem x hx g, by rw [conj_pow]⟩
+  -- `A^p ≤ K` (の `P` への像)
+  have hZp : ∀ z ∈ (Subgroup.center P).subgroupOf A, z ^ p = 1 := by
+    intro z hz
+    have h1 : ((z : P)) ∈ Subgroup.center P := hz
+    have h2 : orderOf (⟨(z : P), h1⟩ : ↥(Subgroup.center P)) ∣ p := hZ ▸ orderOf_dvd_natCard _
+    have h3 := orderOf_dvd_iff_pow_eq_one.mp h2
+    refine Subtype.ext ?_
+    have h4 : ((⟨(z : P), h1⟩ : ↥(Subgroup.center P)) ^ p : P) = 1 := congrArg Subtype.val h3
+    simpa using h4
+  have hApK : ∀ (x : P) (hx : x ∈ A), (⟨x ^ p, A.pow_mem hx p⟩ : ↥A) ∈ K := by
+    intro x hx
+    have := pow_mem_of_isComplement' hK hZp (⟨x, hx⟩ : ↥A)
+    simpa using this
+  -- `A^p ⊓ Z(P)` の元は `1`
+  have hkey : ∀ z : P, z ∈ Ap ⊓ Subgroup.center P → z = 1 := by
+    rintro z ⟨⟨x, hx, rfl⟩, hzc⟩
+    have hxpA : x ^ p ∈ A := A.pow_mem hx p
+    have h1 : (⟨x ^ p, hxpA⟩ : ↥A) ∈ K := hApK x hx
+    have h2 : (⟨x ^ p, hxpA⟩ : ↥A) ∈ (Subgroup.center P).subgroupOf A := hzc
+    exact congrArg Subtype.val (Subgroup.mem_bot.mp (hK.disjoint.le_bot ⟨h2, h1⟩))
+  -- `A^p = 1`
+  by_contra hcon
+  haveI : Nontrivial ↥Ap :=
+    ⟨⟨1, ⟨a ^ p, ⟨a, ha, rfl⟩⟩, fun h => hcon (congrArg Subtype.val h).symm⟩⟩
+  haveI := Ch01.IsPGroup.normal_inf_center_nontrivial (P := P) hP (N := Ap) inferInstance
+  obtain ⟨⟨z, hz⟩, ⟨w, hw⟩, hzw⟩ :=
+    exists_pair_ne ↥((Ap ⊓ Subgroup.center P : Subgroup P))
+  exact hzw (Subtype.ext ((hkey z hz).trans (hkey w hw).symm))
+
 section /- 10A.3 (前半): Z(P) が A の直積因子なら C_p ≀ C_p に埋め込める (p. 308) -/
 
 /-- **Isaacs Problem 10A.3 の前半** (書籍 p. 308) ⭐: `P` を `p`-群, `|Z(P)| = p`,
@@ -540,7 +615,7 @@ section /- 10A.3 (前半): Z(P) が A の直積因子なら C_p ≀ C_p に埋�
 `Q ∩ Z(P) = 1` なので **10A.5** (`exists_injective_hom_regularWreath_of_index_sq`)
 がそのまま使える。
 
-⏳ 書籍の後半「`A` は基本可換」は別の議論が要るため未形式化 (issue 1055 に記録)。 -/
+後半「`A` は基本可換」は `pow_eq_one_of_center_isComplement`。 -/
 theorem exists_injective_hom_regularWreath_of_center_isComplement [Finite P] {p : ℕ}
     [Fact p.Prime] (hP : IsPGroup p P) {A : Subgroup P} (hidx : A.index = p)
     (hZ : Nat.card (Subgroup.center P) = p) (hZle : Subgroup.center P ≤ A)

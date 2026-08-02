@@ -150,6 +150,7 @@ import OddOrder.Isaacs.Ch09_MoreSubnormality.SubnormalClosure
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.ForwardFromCh03
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
+import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
@@ -15226,3 +15227,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch09.isSimpleGroup_subgroup_of_isKegelMinimalCounterexample
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch09.isSimpleGroup_and_not_isMulCommutative_of_isKegelMinimalCounterexample
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch10.pow_eq_one_of_center_isComplement
