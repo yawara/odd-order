@@ -7232,16 +7232,25 @@ step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可
 `E` もともに `p`-群なので Hall でない。coprime なのは「作用する側 `G/C_G(E)` の位数と
 `|E|`」であって、これは Schur–Zassenhaus でなく **Maschke** の状況。
 
-必要な橋 (未実装):
-1. `Additive ↥E` に `ZMod p`-加群構造 (`IsElementaryAbelian` から;
-   `CommGroupAut.lean` の `zmodModule_of_pow_eq_one` が使える)。
-2. 共役作用を `Representation (ZMod p) (G ⧸ C_G(E)) (Additive ↥E)` にする
-   (`p ∤ |G : C_G(E)|` から `Invertible ((Nat.card (G ⧸ C_G(E)) : ZMod p))`)。
-3. mathlib の `MonoidAlgebra.Submodule.exists_isCompl` で部分表現の補元を取る。
-4. 「`G`-部分加群 ↔ `E` に含まれる `G`-正規部分群」の対応で骨格に食わせる。
+必要な橋:
+1. ✅ `Additive ↥E` に `ZMod p`-加群構造 = `zmodModule_of_pow_eq_one`
+   (`CommGroupAut.lean`, 2026-08-03)。
+2. ✅ 共役作用の線形表現 = **`linearOfMulAutHom` / `conjQuotientLinear`**
+   (`ElementaryAbelianLinear.lean`, 2026-08-03):
+   `(G ⧸ C_G(N)) →* (Additive ↥N) →ₗ[ZMod n] (Additive ↥N)`。
+   ⚠ `CommGroup ↥N` は `[IsMulCommutative ↥N]` + `open scoped IsMulCommutative` で供給
+   (直接 `[CommGroup ↥N]` は `Group ↥N` と diamond)。
+3. ⏳ `Representation.asModule` で `Module (MonoidAlgebra (ZMod p) (G ⧸ C_G(E)))` にし、
+   `MonoidAlgebra.Submodule.exists_isCompl` を当てる。
+   要件は `[Field (ZMod p)]` (= `Fact p.Prime` + `Mathlib.Algebra.Field.ZMod`)、
+   `[Finite (G ⧸ C_G(E))]`、**`[NeZero ((Nat.card (G ⧸ C_G(E)) : ZMod p))]`**
+   (これがちょうど `p ∤ |G : C_G(E)|`)。
+4. ⏳ 対応 `Submodule (ZMod p) (Additive ↥E)` (共役不変) ↔ `E` 内の `G`-正規部分群。
+   型シノニムを 3 段ホップする: `Submodule.toAddSubgroup` → `Additive` を戻して
+   `Subgroup ↥E` → `.map E.subtype` で `Subgroup G`。不変性から正規性が出る。
+   ここが残りの主作業 (~100-150 行)。
 
-この橋は BG/Pf 側でも使い回せる汎用インフラなので、`OddOrder/GroupTheory/` に
-独立 leaf を切るのが良い。
+この橋は BG/Pf 側でも使い回せる汎用インフラ。
 
 ## 10B.1 の進捗と残り (2026-08-03)
 
