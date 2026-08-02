@@ -8261,3 +8261,21 @@ f(ω^{ζ⁻¹} s^a)^{a²} s^a = f(ω^ζ s^a)^{ζ⁻³η} ω^{ζ⁻¹}
 以後は `sectionFour_seven_book` / `_eight_book` / `_nine` / `sectionFour_sq_eq_id` /
 `eq_one_of_sq_eq_one_of_odd_pow` に配線して `μ = 1` ⟹ `η ∈ W` ⟹ `h(ω) ∈ W` ⟹
 §3 Corollary 1 で Ch. IV 完了。
+
+### (180) 段 (1) の連鎖を `h ω` 一般化 — §4 の (4) はこれを `d = ζ³η` で回すだけ
+
+commit `3b2c18ab4`。`stepOne_chain_of_h`:
+
+> `h ω⁻¹ = d⁻¹` かつ `t d⁻¹ t = d⁻¹` ⟹
+> `a² f(ω^{ζ⁻¹} s^a) a⁻² s^a = d · f(s^a ω^ζ) · d⁻¹ · ω^{ζ⁻¹}`
+
+`stepOne_chain` は `d = ζ³` の場合として再証明。⚠ 一般版は `M`/`hZ`/`hmu`/`hVW`
+不要 (それらは `h_inv_eq` 専用だった)。
+
+**次セッション**: §4 の (4) を出す。
+1. 段 (3) の出力 `h ω = ζ³η` (η ∈ Z(U)) から `h ω⁻¹ = (ζ³η)⁻¹` を (H4) (`hOne`) で
+   出す。`t` は `ζ ∈ W` を中心化 (`conj_t_pow_eq`) し、`η ∈ Z(U) ≤ D` について
+   `t η t = η` が要る (⚠ `η ∈ P ≤ V` なら `commute_t_of_mem_V` で出る —
+   `Z(U) ≤ D` から `V` まで言えるか要実測)。
+2. `stepOne_chain_of_h` に `d = ζ³η` で当てる。
+3. E 座標へ落とす (`stepTwo_linear` が手本、`η` の項だけ半線形)。
