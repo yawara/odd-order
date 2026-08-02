@@ -7215,6 +7215,34 @@ step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可
 
 ⟹ 元の「`N` 可換 / 非可換」の場合分けは **`F(G) ⊓ N = ⊥` / `N ≤ F(G)`** に置き換わる。
 
+## 🎉 10B.1 完済 (2026-08-03) — 次の frontier = 10B.2 (Maschke)
+
+`nilpotencyClass_problem10B1` / `isMetacyclic_problem10B1` / `isPGroup_problem10B1`
+(`Ch10_MoreTransfer/Problems10B.lean`, すべて axiom-clean)。
+⚠ 書籍 note の「`p > 2` なら…」に関わらず本形式化は **`p = 2` 込みで一様**
+(`p`-群性を LTE でなく還元写像 `(ZMod p^n)ˣ ↠ (ZMod p)ˣ` の核経由で出したため)。
+
+### 10B.2 の残り = Maschke 本体 (再確認 2026-08-03)
+
+骨格 `le_socle_of_exists_normal_complement` (`Problems10A.lean`) は landing 済で、
+必要なのは「`Soc(G) ⊓ E` の `G`-不変な補元が `E` の中に取れる」ことだけ。
+
+⚠ **既存の `exists_aInvariant_complement_within_normal` は使えない** — あちらは
+`N` が `M'` の **Hall** 部分群であることを要求するが、10B.2 では `N = Soc(G) ⊓ E` も
+`E` もともに `p`-群なので Hall でない。coprime なのは「作用する側 `G/C_G(E)` の位数と
+`|E|`」であって、これは Schur–Zassenhaus でなく **Maschke** の状況。
+
+必要な橋 (未実装):
+1. `Additive ↥E` に `ZMod p`-加群構造 (`IsElementaryAbelian` から;
+   `CommGroupAut.lean` の `zmodModule_of_pow_eq_one` が使える)。
+2. 共役作用を `Representation (ZMod p) (G ⧸ C_G(E)) (Additive ↥E)` にする
+   (`p ∤ |G : C_G(E)|` から `Invertible ((Nat.card (G ⧸ C_G(E)) : ZMod p))`)。
+3. mathlib の `MonoidAlgebra.Submodule.exists_isCompl` で部分表現の補元を取る。
+4. 「`G`-部分加群 ↔ `E` に含まれる `G`-正規部分群」の対応で骨格に食わせる。
+
+この橋は BG/Pf 側でも使い回せる汎用インフラなので、`OddOrder/GroupTheory/` に
+独立 leaf を切るのが良い。
+
 ## 10B.1 の進捗と残り (2026-08-03)
 
 landing 済 (`Ch10_MoreTransfer/Problems10B.lean` + `GroupTheory/IsMetacyclic.lean`):
