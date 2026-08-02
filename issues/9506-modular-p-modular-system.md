@@ -49,10 +49,20 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
 
 ## やること (bottom-up)
 
+- [x] **`p`-正則元の API** = `OddOrder/GroupTheory/PRegularElement.lean` (2026-08-03)。
+      `IsPElement` / `IsPRegular` / `pPart` / `pRegularPart` と分解
+      `g = g_{p'} · g_p`・**一意性** (`eq_pPart_of_commute`)・共役同変性。
+      mathlib は群の元 1 個の `p`/`p'` 分解を持たない (実測)。
+      ⚠ `(ordCompl[p] n : ℤ)` は **ℤ の除算**で elaborate される罠あり (docstring に明記)。
+- [x] **根の持ち上げ** = `.../Modular/RootsOfUnityLift.lean` (2026-08-03)。
+      Henselian 局所環 `𝒪` で `n` が単元なら還元は同型 `μ_n(𝒪) ≃* μ_n(k)` を誘導
+      (`rootsOfUnityEquivResidue`)。一意性は `X^n - 1` の 1 次 Taylor 展開
+      (`Polynomial.binomExpansion`) で `f'(b) = n b^{n-1}` が単元、
+      存在は `HenselianLocalRing.is_henselian`。
+      ⟹ **これが p-modular system の技術的核**。`𝒪` に完備 DVR を要求せず
+      Henselian だけで足りることが分かったので、束ねの仮説はこれに合わせる。
 - [ ] `OddOrder/GroupTheory/RepresentationTheory/Modular/PModularSystem.lean` —
-      `𝒪` (完備 DVR, char 0) / `K = Frac 𝒪` / `k = 𝒪/J(𝒪)` (char `p`) の束ね、
-      還元射 `𝒪 → k`
-- [ ] `p'`-根の一致: `U = μ_{p'}(K)` と `k^×` の `p'`-部分の同型
+      `𝒪` (Henselian 局所環, char 0) / `K = Frac 𝒪` / `k` (char `p`) の束ね
 - [ ] 分裂条件 (`|G|` 乗根を含む) と、**具体構成による instance**
 - [ ] `p`-regular 元 / `p`-regular 類の API (`IsPRegular g ↔ p ∤ orderOf g`)
 - [ ] Brauer 指標 `IBr`: `k G`-加群の `p`-regular 元でのトレースを `U` 経由で char 0 へ持ち上げ

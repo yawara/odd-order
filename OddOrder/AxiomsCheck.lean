@@ -155,6 +155,7 @@ import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10B
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10C
 import OddOrder.GroupTheory.PRegularElement
+import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
@@ -15298,6 +15299,17 @@ Brauer--Suzuki case, issue 0147).  mathlib has no `p`/`p'` factorisation of a gr
   OddOrder.GroupTheory.isPRegular_pRegularPart
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.eq_pPart_of_commute
+
+/-! **Lifting roots of unity along the residue map of a Henselian local ring**
+(`GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift`, issue 9506).  This is the
+technical heart of a `p`-modular system: `μ_n(𝒪) ≃* μ_n(k)` whenever `n` is a unit of `𝒪`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_of_pow_eq_one_of_sub_mem
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_pow_eq_one_residue_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.rootsOfUnityEquivResidue
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isMetacyclic_semidirectProduct
 #assert_only_allowed_axioms

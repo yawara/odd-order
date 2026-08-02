@@ -99,6 +99,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 import OddOrder.GroupTheory.RepresentationTheory.CenterModuleDecomp
 import OddOrder.GroupTheory.RepresentationTheory.CenterProjConjugation
 import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
 import OddOrder.GroupTheory.RepresentationTheory.PiAlgebraAut
 import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
 import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
