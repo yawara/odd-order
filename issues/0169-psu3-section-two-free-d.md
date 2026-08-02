@@ -265,15 +265,16 @@ by_cases hfree : hyp.FreeD
 2. `c ≠ 1`, `|D|` 奇数 ⟹ 素数 `p ∣ orderOf c` を取り `P₀ := ⟨c^{orderOf c / p}⟩`
    (位数 `p`)。`c` が `ω` の類を固定するので**その冪も固定する**
    (`Q₀` は `D`-不変なので `c⁻ⁿωcⁿ ∈ ωQ₀` が帰納で出る)。
-3. **`P₀` を `V` へ共役**: `exists_conj_mem_D_map_le_V`
-   (`FixedPointCentralizer.lean:485`、Ch. I Prop 6(c)) が使える。
-   入力は `3 ≤ (MulAction.fixedPoints P₀ Ω).ncard`。
-   ⚠ **この「3 点」の補題が repo に無い** — 書籍は「`C_Q(P) ≠ 1` なので `P` は
-   `Ω` 上に 3 つの固定点を持つ」の 1 文。論法: `D` は 2 点 (`a` と `a^t`) を固定し、
-   `q ∈ C_Q(P)∖{1}` を取れば `q · a^t` が第 3 の固定点
-   (`P` が `q` を中心化し `a^t` を固定するから)。相異なることは
-   `Q^t ∩ M = 1` と `q · a = a` から。
-   ⟹ **これを landing させるのが (4) の最初の実作業**。
+3. ✅ **済 (2026-08-02)**: 「3 点」の補題
+   `three_le_ncard_fixedPoints_of_mem_centralizer` (`FixedPointCentralizer.lean`)。
+   これで `exists_conj_mem_D_map_le_V` (同ファイル、Ch. I Prop 6(c)) が使える。
+   ⚠ その入力の `q ∈ C_Q(P₀)∖{1}` は **`hyp.exists_fixed_not_mem_Q0`**
+   (`PSU3SectionFourSetup.lean` 付近、Glauberman/coprime lift = Isaacs Cor 3.28)
+   から取る: 「`C_{Q/Q₀}(P₀) ≠ 1`」(= 2. の類固定) を `C_Q(P₀) ⊄ Q₀` に持ち上げる。
+   ⚠ `C_{Q₀}(P₀) ≠ 1` は**一般には偽** (`K` は `Q₀^#` 上正則) なので、
+   必ず商 `Q/Q₀` 側の固定点から持ち上げること。
+   要る追加仮説 = `hCop` (coprime) と `hSolv`。どちらも
+   `SectionFourSetup.nonempty_theoremAConclusion` が既に取っている。
 4. 共役後の `P` について `P ⊓ W = ⊥`: `W` は常に fpf
    (`eq_one_of_conj_eq_mul_Q0_of_mem_W`) なので、`P` の非自明元が `W` に入ると
    `ω` の類を固定して矛盾。
